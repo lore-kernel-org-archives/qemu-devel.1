@@ -1,26 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58659)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58984)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1d92j4-0003L3-1g
-	for qemu-devel@nongnu.org; Fri, 12 May 2017 01:02:52 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1d92lD-000474-FX
+	for qemu-devel@nongnu.org; Fri, 12 May 2017 01:05:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1d92j2-0006YX-C3
-	for qemu-devel@nongnu.org; Fri, 12 May 2017 01:02:50 -0400
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <1494348286-10253-1-git-send-email-sundeep.lkml@gmail.com>
-	<1494348286-10253-5-git-send-email-sundeep.lkml@gmail.com>
-	<b913e666-8df3-714f-3ff9-e8f4ff9e7098@amsat.org>
-	<CALHRZuptHwyzu0Y98VWnNd785W80AZ=+1cr_rfegvDo5amh+3g@mail.gmail.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <7ee4c347-4502-863a-8c9f-faaf8fab17f3@amsat.org>
-Date: Fri, 12 May 2017 02:02:37 -0300
-MIME-Version: 1.0
-In-Reply-To: <CALHRZuptHwyzu0Y98VWnNd785W80AZ=+1cr_rfegvDo5amh+3g@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [Qemu-devel PATCH 4/5] msf2: Add Smartfusion2 SoC.
+	(envelope-from <dgibson@ozlabs.org>) id 1d92lB-0008L5-I8
+	for qemu-devel@nongnu.org; Fri, 12 May 2017 01:05:03 -0400
+From: David Gibson <david@gibson.dropbear.id.au>
+Date: Fri, 12 May 2017 15:04:48 +1000
+Message-Id: <20170512050451.9979-3-david@gibson.dropbear.id.au>
+In-Reply-To: <20170512050451.9979-1-david@gibson.dropbear.id.au>
+References: <20170512050451.9979-1-david@gibson.dropbear.id.au>
+Subject: [Qemu-devel] [PATCHv6 2/5] pseries: Implement HPT resizing
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,242 +19,473 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: sundeep subbaraya <sundeep.lkml@gmail.com>, Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, Alistair Francis <alistair23@gmail.com>
-Cc: Peter Crosthwaite <crosthwaite.peter@gmail.com>, qemu-arm <qemu-arm@nongnu.org>
+To: thuth@redhat.com, lvivier@redhat.com, mdroth@linux.vnet.ibm.com, bharata@linux.vnet.ibm.com, aik@ozlabs.ru
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, agraf@suse.de, benh@kernel.crashing.org, David Gibson <david@gibson.dropbear.id.au>
 
-On 05/12/2017 12:17 AM, sundeep subbaraya wrote:
-> Hi Philippe,
->
-> On Wed, May 10, 2017 at 5:20 PM, Philippe Mathieu-Daudé <f4bug@amsat.org>
-> wrote:
->
->> Hi Subbaraya,
->>
->>
->> On 05/09/2017 01:44 PM, Subbaraya Sundeep wrote:
->>
->>> Smartfusion2 SoC has hardened Microcontroller subsystem
->>> and flash based FPGA fabric. This patch adds support for
->>> Microcontroller subsystem in the SoC.
->>>
->>> Signed-off-by: Subbaraya Sundeep <sundeep.lkml@gmail.com>
->>> ---
->>>  default-configs/arm-softmmu.mak |   1 +
->>>  hw/arm/Makefile.objs            |   2 +-
->>>  hw/arm/msf2-soc.c               | 188 ++++++++++++++++++++++++++++++
->>> ++++++++++
->>>  include/hw/arm/msf2-soc.h       |  60 +++++++++++++
->>>  4 files changed, 250 insertions(+), 1 deletion(-)
->>>  create mode 100644 hw/arm/msf2-soc.c
->>>  create mode 100644 include/hw/arm/msf2-soc.h
->>>
->>> diff --git a/default-configs/arm-softmmu.mak
->>> b/default-configs/arm-softmmu.mak
->>> index 78d7af0..7062512 100644
->>> --- a/default-configs/arm-softmmu.mak
->>> +++ b/default-configs/arm-softmmu.mak
->>> @@ -122,3 +122,4 @@ CONFIG_ACPI=y
->>>  CONFIG_SMBIOS=y
->>>  CONFIG_ASPEED_SOC=y
->>>  CONFIG_GPIO_KEY=y
->>> +CONFIG_MSF2=y
->>> diff --git a/hw/arm/Makefile.objs b/hw/arm/Makefile.objs
->>> index 4c5c4ee..ae5e4a3 100644
->>> --- a/hw/arm/Makefile.objs
->>> +++ b/hw/arm/Makefile.objs
->>> @@ -1,7 +1,7 @@
->>>  obj-y += boot.o collie.o exynos4_boards.o gumstix.o highbank.o
->>>  obj-$(CONFIG_DIGIC) += digic_boards.o
->>>  obj-y += integratorcp.o mainstone.o musicpal.o nseries.o
->>> -obj-y += omap_sx1.o palm.o realview.o spitz.o stellaris.o
->>> +obj-y += omap_sx1.o palm.o realview.o spitz.o stellaris.o msf2-soc.o
->>>
->>
->> Not a big deal, but since you added CONFIG_MSF2 why not using it here and
->> the Makefiles you touched (misc/ssi/timer)?
->>
->> obj-$(CONFIG_MSF2) += msf2-soc.o
->>
->>   OK. Will change it.
->
->>
->>  obj-y += tosa.o versatilepb.o vexpress.o virt.o xilinx_zynq.o z2.o
->>>  obj-$(CONFIG_ACPI) += virt-acpi-build.o
->>>  obj-y += netduino2.o
-[...]
->>> +    MemoryRegion *system_memory = get_system_memory();
->>> +    MemoryRegion *nvm = g_new(MemoryRegion, 1);
->>> +    MemoryRegion *nvm_alias = g_new(MemoryRegion, 1);
->>> +    MemoryRegion *sram = g_new(MemoryRegion, 1);
->>> +    MemoryRegion *ddr = g_new(MemoryRegion, 1);
->>> +
->>> +    memory_region_init_ram(nvm, NULL, "MSF2.envm", ENVM_SIZE,
->>> +                           &error_fatal);
->>>
->>
->> Maybe you can name it "eNVM" to match the documentation.
->>
->> Also envm_size should be a per-model property.
->>
->
-> Ok.
->
->>
->> +    memory_region_init_alias(nvm_alias, NULL, "MSF2.flash.alias",
->>> +                             nvm, 0, ENVM_SIZE);
->>>
->>
->> Hmmm well this would be the "Cache Matrix Remap" which happens to be
->> mapped by default to eNVM on cold reset.
->> Naming it "MSF2.flash.alias" is pretty confusing.
->>
->
-> Exactly it is Cache Matrix Remap.
-> AFAIK currently we cannot remap memory during runtime in Qemu.
-> So I handled default remap with alias.
-> Please suggest the name. MSF2.eNVM.alias sounds fine?
+This patch implements hypercalls allowing a PAPR guest to resize its own
+hash page table.  This will eventually allow for more flexible memory
+hotplug.
 
-Hmm Peter, Francis?
+The implementation is partially asynchronous, handled in a special thread
+running the hpt_prepare_thread() function.  The state of a pending resize
+is stored in SPAPR_MACHINE->pending_hpt.
 
-Personally I prefer "bus_remap.alias" which is explicit.
+The H_RESIZE_HPT_PREPARE hypercall will kick off creation of a new HPT, or,
+if one is already in progress, monitor it for completion.  If there is an
+existing HPT resize in progress that doesn't match the size specified in
+the call, it will cancel it, replacing it with a new one matching the
+given size.
 
-"eNVM.alias" is only true on Cold Reset.
+The H_RESIZE_HPT_COMMIT completes transition to a resized HPT, and can only
+be called successfully once H_RESIZE_HPT_PREPARE has successfully
+completed initialization of a new HPT.  The guest must ensure that there
+are no concurrent accesses to the existing HPT while this is called (this
+effectively means stop_machine() for Linux guests).
 
->>
->> +    vmstate_register_ram_global(nvm);
->>> +
->>> +    memory_region_set_readonly(nvm, true);
->>> +    memory_region_set_readonly(nvm_alias, true);
->>> +
->>> +    memory_region_add_subregion(system_memory, ENVM_BASE_ADDRESS, nvm);
->>> +    memory_region_add_subregion(system_memory, 0, nvm_alias);
->>> +
->>> +    memory_region_init_ram(ddr, NULL, "MSF2.ddr", DDR_SIZE,
->>> +                           &error_fatal);
->>>
->>
->> Wrong, there is no DDR on this SoC.
->>
-> DDR controller is there in Smartfusion2 (different from Smartfusion). As
-> you said below this
-> should be in board file.
+For now H_RESIZE_HPT_COMMIT goes through the whole old HPT, rehashing each
+HPTE into the new HPT.  This can have quite high latency, but it seems to
+be of the order of typical migration downtime latencies for HPTs of size
+up to ~2GiB (which would be used in a 256GiB guest).
 
-There IS a DDRC in this SoC, but here you are registering a DDR 'ram' 
-memory region, not a controller. This SoC can be used without any DDR, 
-enough using embedded eNVM and eSRAM.
+In future we probably want to move more of the rehashing to the "prepare"
+phase, by having H_ENTER and other hcalls update both current and
+pending HPTs.  That's a project for another day, but should be possible
+without any changes to the guest interface.
 
-Now it happens your SoM board provides a DDR chip connected to this SoC.
+Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+---
+ hw/ppc/spapr.c          |   4 +-
+ hw/ppc/spapr_hcall.c    | 306 +++++++++++++++++++++++++++++++++++++++++++++++-
+ include/hw/ppc/spapr.h  |   6 +
+ target/ppc/mmu-hash64.h |   4 +
+ 4 files changed, 314 insertions(+), 6 deletions(-)
 
->>
->> +    vmstate_register_ram_global(ddr);
->>> +    memory_region_add_subregion(system_memory, DDR_BASE_ADDRESS, ddr);
->>> +
->>> +    memory_region_init_ram(sram, NULL, "MSF2.sram", SRAM_SIZE,
->>> +                           &error_fatal);
->>>
->>
->> I'd rather like to see it named "eSRAM" somehow, so there is no confusion
->> possible with external SRAM a SoM/board can map at 0x60000000.
->>
->> Same comment than envm_size, sram_size should be a per-model property.
->>
->> OK
->
->> +    vmstate_register_ram_global(sram);
->>> +    memory_region_add_subregion(system_memory, SRAM_BASE_ADDRESS, sram);
->>> +
->>> +    armv7m = DEVICE(&s->armv7m);
->>> +    qdev_prop_set_uint32(armv7m, "num-irq", 96);
->>>
->>
->> Can you point me to your datasheet? I thought the SF2 had 240 IRQs.
->
->
-> Please go to link:
-> https://www.microsemi.com/document-portal/search_form
-> and provide search keyword as "UG0331". You can the download the spec.
-> It has 81 irqs I remember when I have given 81 qemu complained not multiple
-> of 4.
-> I checked again with 81 and it is fine. I will change it to 81.
-
-Ok :)
-
-> +    qdev_prop_set_string(armv7m, "cpu-model", "cortex-m3");
->>> +    object_property_set_link(OBJECT(&s->armv7m),
->>> OBJECT(get_system_memory()),
->>> +                                     "memory", &error_abort);
-[...]
->>> +#define MSF2_NUM_SPIS         2
->>> +#define MSF2_NUM_UARTS        2
->>> +
->>> +#define ENVM_BASE_ADDRESS     0x60000000
->>> +#define ENVM_SIZE             (128 * 1024)
->>>
->>
->> The SoC design ENVM_SIZE is 1MB, 128K seems your particular model.
->>
->
->  M2S010 SoC device has 256K eNMV. My bad it should be 256 instead of 128.
->  The board I have contains M2S010 device in SOM.
->
-
-What I mean here is on the SF2 the eNVM "region size" (as seen by the 
-AHB Bus) is 1MB. Now your SoC M2S010 provides 256KB in this dedicated 1M 
-region.
-
-I find your #define confusing, what about:
-
-#define ENVM_REGION_SIZE      (1 * M_BYTE)
-#define M2S010_ENVM_SIZE      (256 * K_BYTE)
-
-(?_BYTE from "qemu/cutils.h")
-
-I wanted to clarify this because you named your functions as it can 
-models any SF2 but actually you restrict it to your M2S010.
-
-Maybe to start you can rename msf2_soc_x() -> m2s010_sf2_soc_x() then if 
-needed this can be generalized to other SoCs from SF2 family?
-
->> +
->>> +#define DDR_BASE_ADDRESS      0xA0000000
->>> +#define DDR_SIZE              (64 * 1024 * 1024)
->>>
->>
->> This belongs to the SoM.
->> Yes will change it.
->>
->>> +
->>> +#define SRAM_BASE_ADDRESS     0x20000000
->>> +#define SRAM_SIZE             (64 * 1024)
->>>
->>
->> Indeed this SoC is designed to have up to 64K of SRAM.
->> Luckily your model provides 64K.
->>
->
->
-> Yes it is 64k :)
->
-
-Same here, what you have is:
-
-#define ESRAM_REGION_SIZE     (64 * K_BYTE)
-#define M2S010_ESRAM_SIZE     (64 * K_BYTE)
-
-which happens to be equal but does not mean the same, do you see the 
-difference?
-
-> +
->>> +typedef struct MSF2State {
->>> +    /*< private >*/
->>> +    SysBusDevice parent_obj;
->>> +    /*< public >*/
->>> +
->>> +    ARMv7MState armv7m;
->>> +
->>> +    MSF2SysregState sysreg;
->>> +    MSF2TimerState timer;
->>> +    MSF2SpiState spi[MSF2_NUM_SPIS];
->>> +} MSF2State;
->>> +
->>> +#endif
+diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+index 50beee0..b9b7733 100644
+--- a/hw/ppc/spapr.c
++++ b/hw/ppc/spapr.c
+@@ -95,8 +95,6 @@
+ 
+ #define PHANDLE_XICP            0x00001111
+ 
+-#define HTAB_SIZE(spapr)        (1ULL << ((spapr)->htab_shift))
+-
+ static ICSState *spapr_ics_create(sPAPRMachineState *spapr,
+                                   const char *type_ics,
+                                   int nr_irqs, Error **errp)
+@@ -1214,7 +1212,7 @@ static void spapr_store_hpte(PPCVirtualHypervisor *vhyp, hwaddr ptex,
+     }
+ }
+ 
+-static int spapr_hpt_shift_for_ramsize(uint64_t ramsize)
++int spapr_hpt_shift_for_ramsize(uint64_t ramsize)
+ {
+     int shift;
+ 
+diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
+index 29d549f..2979208 100644
+--- a/hw/ppc/spapr_hcall.c
++++ b/hw/ppc/spapr_hcall.c
+@@ -3,6 +3,7 @@
+ #include "sysemu/hw_accel.h"
+ #include "sysemu/sysemu.h"
+ #include "qemu/log.h"
++#include "qemu/error-report.h"
+ #include "cpu.h"
+ #include "exec/exec-all.h"
+ #include "helper_regs.h"
+@@ -354,20 +355,286 @@ static target_ulong h_read(PowerPCCPU *cpu, sPAPRMachineState *spapr,
+     return H_SUCCESS;
+ }
+ 
++struct sPAPRPendingHPT {
++    /* These fields are read-only after initialization */
++    int shift;
++    QemuThread thread;
++
++    /* These fields are protected by the BQL */
++    bool complete;
++
++    /* These fields are private to the preparation thread if
++     * !complete, otherwise protected by the BQL */
++    int ret;
++    void *hpt;
++};
++
++static void free_pending_hpt(sPAPRPendingHPT *pending)
++{
++    if (pending->hpt) {
++        qemu_vfree(pending->hpt);
++    }
++
++    g_free(pending);
++}
++
++static void *hpt_prepare_thread(void *opaque)
++{
++    sPAPRPendingHPT *pending = opaque;
++    size_t size = 1ULL << pending->shift;
++
++    pending->hpt = qemu_memalign(size, size);
++    if (pending->hpt) {
++        memset(pending->hpt, 0, size);
++        pending->ret = H_SUCCESS;
++    } else {
++        pending->ret = H_NO_MEM;
++    }
++
++    qemu_mutex_lock_iothread();
++
++    if (SPAPR_MACHINE(qdev_get_machine())->pending_hpt == pending) {
++        /* Ready to go */
++        pending->complete = true;
++    } else {
++        /* We've been cancelled, clean ourselves up */
++        free_pending_hpt(pending);
++    }
++
++    qemu_mutex_unlock_iothread();
++    return NULL;
++}
++
++/* Must be called with BQL held */
++static void cancel_hpt_prepare(sPAPRMachineState *spapr)
++{
++    sPAPRPendingHPT *pending = spapr->pending_hpt;
++
++    /* Let the thread know it's cancelled */
++    spapr->pending_hpt = NULL;
++
++    if (!pending) {
++        /* Nothing to do */
++        return;
++    }
++
++    if (!pending->complete) {
++        /* thread will clean itself up */
++        return;
++    }
++
++    free_pending_hpt(pending);
++}
++
+ static target_ulong h_resize_hpt_prepare(PowerPCCPU *cpu,
+                                          sPAPRMachineState *spapr,
+                                          target_ulong opcode,
+                                          target_ulong *args)
+ {
+     target_ulong flags = args[0];
+-    target_ulong shift = args[1];
++    int shift = args[1];
++    sPAPRPendingHPT *pending = spapr->pending_hpt;
++    uint64_t current_ram_size = MACHINE(spapr)->ram_size;
+ 
+     if (spapr->resize_hpt == SPAPR_RESIZE_HPT_DISABLED) {
+         return H_AUTHORITY;
+     }
+ 
+     trace_spapr_h_resize_hpt_prepare(flags, shift);
+-    return H_HARDWARE;
++
++    if (flags != 0) {
++        return H_PARAMETER;
++    }
++
++    if (shift && ((shift < 18) || (shift > 46))) {
++        return H_PARAMETER;
++    }
++
++    current_ram_size = pc_existing_dimms_capacity(&error_fatal);
++
++    /* We only allow the guest to allocate an HPT one order above what
++     * we'd normally give them (to stop a small guest claiming a huge
++     * chunk of resources in the HPT */
++    if (shift > (spapr_hpt_shift_for_ramsize(current_ram_size) + 1)) {
++        return H_RESOURCE;
++    }
++
++    if (pending) {
++        /* something already in progress */
++        if (pending->shift == shift) {
++            /* and it's suitable */
++            if (pending->complete) {
++                return pending->ret;
++            } else {
++                return H_LONG_BUSY_ORDER_100_MSEC;
++            }
++        }
++
++        /* not suitable, cancel and replace */
++        cancel_hpt_prepare(spapr);
++    }
++
++    if (!shift) {
++        /* nothing to do */
++        return H_SUCCESS;
++    }
++
++    /* start new prepare */
++
++    pending = g_new0(sPAPRPendingHPT, 1);
++    pending->shift = shift;
++    pending->ret = H_HARDWARE;
++
++    qemu_thread_create(&pending->thread, "sPAPR HPT prepare",
++                       hpt_prepare_thread, pending, QEMU_THREAD_DETACHED);
++
++    spapr->pending_hpt = pending;
++
++    /* In theory we could estimate the time more accurately based on
++     * the new size, but there's not much point */
++    return H_LONG_BUSY_ORDER_100_MSEC;
++}
++
++static uint64_t new_hpte_load0(void *htab, uint64_t pteg, int slot)
++{
++    uint8_t *addr = htab;
++
++    addr += pteg * HASH_PTEG_SIZE_64;
++    addr += slot * HASH_PTE_SIZE_64;
++    return  ldq_p(addr);
++}
++
++static void new_hpte_store(void *htab, uint64_t pteg, int slot,
++                           uint64_t pte0, uint64_t pte1)
++{
++    uint8_t *addr = htab;
++
++    addr += pteg * HASH_PTEG_SIZE_64;
++    addr += slot * HASH_PTE_SIZE_64;
++
++    stq_p(addr, pte0);
++    stq_p(addr + HASH_PTE_SIZE_64/2, pte1);
++}
++
++static int rehash_hpte(PowerPCCPU *cpu,
++                       const ppc_hash_pte64_t *hptes,
++                       void *old_hpt, uint64_t oldsize,
++                       void *new_hpt, uint64_t newsize,
++                       uint64_t pteg, int slot)
++{
++    uint64_t old_hash_mask = (oldsize >> 7) - 1;
++    uint64_t new_hash_mask = (newsize >> 7) - 1;
++    target_ulong pte0 = ppc_hash64_hpte0(cpu, hptes, slot);
++    target_ulong pte1;
++    uint64_t avpn;
++    unsigned base_pg_shift;
++    uint64_t hash, new_pteg, replace_pte0;
++
++    if (!(pte0 & HPTE64_V_VALID) || !(pte0 & HPTE64_V_BOLTED)) {
++        return H_SUCCESS;
++    }
++
++    pte1 = ppc_hash64_hpte1(cpu, hptes, slot);
++
++    base_pg_shift = ppc_hash64_hpte_page_shift_noslb(cpu, pte0, pte1);
++    assert(base_pg_shift); /* H_ENTER shouldn't allow a bad encoding */
++    avpn = HPTE64_V_AVPN_VAL(pte0) & ~(((1ULL << base_pg_shift) - 1) >> 23);
++
++    if (pte0 & HPTE64_V_SECONDARY) {
++        pteg = ~pteg;
++    }
++
++    if ((pte0 & HPTE64_V_SSIZE) == HPTE64_V_SSIZE_256M) {
++        uint64_t offset, vsid;
++
++        /* We only have 28 - 23 bits of offset in avpn */
++        offset = (avpn & 0x1f) << 23;
++        vsid = avpn >> 5;
++        /* We can find more bits from the pteg value */
++        if (base_pg_shift < 23) {
++            offset |= ((vsid ^ pteg) & old_hash_mask) << base_pg_shift;
++        }
++
++        hash = vsid ^ (offset >> base_pg_shift);
++    } else if ((pte0 & HPTE64_V_SSIZE) == HPTE64_V_SSIZE_1T) {
++        uint64_t offset, vsid;
++
++        /* We only have 40 - 23 bits of seg_off in avpn */
++        offset = (avpn & 0x1ffff) << 23;
++        vsid = avpn >> 17;
++        if (base_pg_shift < 23) {
++            offset |= ((vsid ^ (vsid << 25) ^ pteg) & old_hash_mask)
++                << base_pg_shift;
++        }
++
++        hash = vsid ^ (vsid << 25) ^ (offset >> base_pg_shift);
++    } else {
++        error_report("rehash_pte: Bad segment size in HPTE");
++        return H_HARDWARE;
++    }
++
++    new_pteg = hash & new_hash_mask;
++    if (pte0 & HPTE64_V_SECONDARY) {
++        assert(~pteg == (hash & old_hash_mask));
++        new_pteg = ~new_pteg;
++    } else {
++        assert(pteg == (hash & old_hash_mask));
++    }
++    assert((oldsize != newsize) || (pteg == new_pteg));
++    replace_pte0 = new_hpte_load0(new_hpt, new_pteg, slot);
++    /*
++     * Strictly speaking, we don't need all these tests, since we only
++     * ever rehash bolted HPTEs.  We might in future handle non-bolted
++     * HPTEs, though so make the logic correct for those cases as
++     * well.
++     */
++    if (replace_pte0 & HPTE64_V_VALID) {
++        assert(newsize < oldsize);
++        if (replace_pte0 & HPTE64_V_BOLTED) {
++            if (pte0 & HPTE64_V_BOLTED) {
++                /* Bolted collision, nothing we can do */
++                return H_PTEG_FULL;
++            } else {
++                /* Discard this hpte */
++                return H_SUCCESS;
++            }
++        }
++    }
++
++    new_hpte_store(new_hpt, new_pteg, slot, pte0, pte1);
++    return H_SUCCESS;
++}
++
++static int rehash_hpt(PowerPCCPU *cpu,
++                      void *old_hpt, uint64_t oldsize,
++                      void *new_hpt, uint64_t newsize)
++{
++    uint64_t n_ptegs = oldsize >> 7;
++    uint64_t pteg;
++    int slot;
++    int rc;
++
++    for (pteg = 0; pteg < n_ptegs; pteg++) {
++        hwaddr ptex = pteg *HPTES_PER_GROUP;
++        const ppc_hash_pte64_t *hptes
++            = ppc_hash64_map_hptes(cpu, ptex, HPTES_PER_GROUP);
++
++        if (!hptes) {
++            return H_HARDWARE;
++        }
++
++        for (slot = 0; slot < HPTES_PER_GROUP; slot++) {
++            rc = rehash_hpte(cpu, hptes, old_hpt, oldsize, new_hpt, newsize,
++                             pteg, slot);
++            if (rc != H_SUCCESS) {
++                ppc_hash64_unmap_hptes(cpu, hptes, ptex, HPTES_PER_GROUP);
++                return rc;
++            }
++        }
++        ppc_hash64_unmap_hptes(cpu, hptes, ptex, HPTES_PER_GROUP);
++    }
++
++    return H_SUCCESS;
+ }
+ 
+ static target_ulong h_resize_hpt_commit(PowerPCCPU *cpu,
+@@ -377,13 +644,46 @@ static target_ulong h_resize_hpt_commit(PowerPCCPU *cpu,
+ {
+     target_ulong flags = args[0];
+     target_ulong shift = args[1];
++    sPAPRPendingHPT *pending = spapr->pending_hpt;
++    int rc;
++    size_t newsize;
+ 
+     if (spapr->resize_hpt == SPAPR_RESIZE_HPT_DISABLED) {
+         return H_AUTHORITY;
+     }
+ 
+     trace_spapr_h_resize_hpt_commit(flags, shift);
+-    return H_HARDWARE;
++
++    if (flags != 0) {
++        return H_PARAMETER;
++    }
++
++    if (!pending || (pending->shift != shift)) {
++        /* no matching prepare */
++        return H_CLOSED;
++    }
++
++    if (!pending->complete) {
++        /* prepare has not completed */
++        return H_BUSY;
++    }
++
++    newsize = 1ULL << pending->shift;
++    rc = rehash_hpt(cpu, spapr->htab, HTAB_SIZE(spapr),
++                    pending->hpt, newsize);
++    if (rc == H_SUCCESS) {
++        qemu_vfree(spapr->htab);
++        spapr->htab = pending->hpt;
++        spapr->htab_shift = pending->shift;
++
++        pending->hpt = NULL; /* so it's not free()d */
++    }
++
++    /* Clean up */
++    spapr->pending_hpt = NULL;
++    free_pending_hpt(pending);
++
++    return rc;
+ }
+ 
+ static target_ulong h_set_sprg0(PowerPCCPU *cpu, sPAPRMachineState *spapr,
+diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
+index a1fa801..e1b402b 100644
+--- a/include/hw/ppc/spapr.h
++++ b/include/hw/ppc/spapr.h
+@@ -14,6 +14,7 @@ struct sPAPRNVRAM;
+ typedef struct sPAPRConfigureConnectorState sPAPRConfigureConnectorState;
+ typedef struct sPAPREventLogEntry sPAPREventLogEntry;
+ typedef struct sPAPREventSource sPAPREventSource;
++typedef struct sPAPRPendingHPT sPAPRPendingHPT;
+ 
+ #define HPTE64_V_HPTE_DIRTY     0x0000000000000040ULL
+ #define SPAPR_ENTRY_POINT       0x100
+@@ -84,6 +85,8 @@ struct sPAPRMachineState {
+     void *htab;
+     uint32_t htab_shift;
+     uint64_t patb_entry; /* Process tbl registed in H_REGISTER_PROCESS_TABLE */
++    sPAPRPendingHPT *pending_hpt; /* in-progress resize */
++
+     hwaddr rma_size;
+     int vrma_adjust;
+     ssize_t rtas_size;
+@@ -646,6 +649,7 @@ void spapr_hotplug_req_remove_by_count_indexed(sPAPRDRConnectorType drc_type,
+                                                uint32_t count, uint32_t index);
+ void *spapr_populate_hotplug_cpu_dt(CPUState *cs, int *fdt_offset,
+                                     sPAPRMachineState *spapr);
++int spapr_hpt_shift_for_ramsize(uint64_t ramsize);
+ 
+ /* rtas-configure-connector state */
+ struct sPAPRConfigureConnectorState {
+@@ -692,4 +696,6 @@ int spapr_rng_populate_dt(void *fdt);
+ 
+ void spapr_do_system_reset_on_cpu(CPUState *cs, run_on_cpu_data arg);
+ 
++#define HTAB_SIZE(spapr)        (1ULL << ((spapr)->htab_shift))
++
+ #endif /* HW_SPAPR_H */
+diff --git a/target/ppc/mmu-hash64.h b/target/ppc/mmu-hash64.h
+index 54f1e37..d297b97 100644
+--- a/target/ppc/mmu-hash64.h
++++ b/target/ppc/mmu-hash64.h
+@@ -63,11 +63,15 @@ void ppc_hash64_update_rmls(CPUPPCState *env);
+ #define HASH_PTE_SIZE_64        16
+ #define HASH_PTEG_SIZE_64       (HASH_PTE_SIZE_64 * HPTES_PER_GROUP)
+ 
++#define HPTE64_V_SSIZE          SLB_VSID_B
++#define HPTE64_V_SSIZE_256M     SLB_VSID_B_256M
++#define HPTE64_V_SSIZE_1T       SLB_VSID_B_1T
+ #define HPTE64_V_SSIZE_SHIFT    62
+ #define HPTE64_V_AVPN_SHIFT     7
+ #define HPTE64_V_AVPN           0x3fffffffffffff80ULL
+ #define HPTE64_V_AVPN_VAL(x)    (((x) & HPTE64_V_AVPN) >> HPTE64_V_AVPN_SHIFT)
+ #define HPTE64_V_COMPARE(x, y)  (!(((x) ^ (y)) & 0xffffffffffffff83ULL))
++#define HPTE64_V_BOLTED         0x0000000000000010ULL
+ #define HPTE64_V_LARGE          0x0000000000000004ULL
+ #define HPTE64_V_SECONDARY      0x0000000000000002ULL
+ #define HPTE64_V_VALID          0x0000000000000001ULL
+-- 
+2.9.3
