@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48442)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48441)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1d9D0h-0002rx-Ee
+	(envelope-from <quintela@redhat.com>) id 1d9D0h-0002rw-EI
 	for qemu-devel@nongnu.org; Fri, 12 May 2017 12:01:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1d9D0e-0005Lu-8w
+	(envelope-from <quintela@redhat.com>) id 1d9D0g-0005Nw-2R
 	for qemu-devel@nongnu.org; Fri, 12 May 2017 12:01:43 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:54680)
+Received: from mx1.redhat.com ([209.132.183.28]:46544)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1d9D0e-0005LI-3w
-	for qemu-devel@nongnu.org; Fri, 12 May 2017 12:01:40 -0400
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1d9D0f-0005Mk-Tn
+	for qemu-devel@nongnu.org; Fri, 12 May 2017 12:01:42 -0400
 Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
 	[10.5.11.11])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 0E86F635E2
-	for <qemu-devel@nongnu.org>; Fri, 12 May 2017 16:01:39 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id D2B9234A6
+	for <qemu-devel@nongnu.org>; Fri, 12 May 2017 16:01:40 +0000 (UTC)
 From: Juan Quintela <quintela@redhat.com>
-Date: Fri, 12 May 2017 18:00:54 +0200
-Message-Id: <20170512160055.9081-12-quintela@redhat.com>
+Date: Fri, 12 May 2017 18:00:55 +0200
+Message-Id: <20170512160055.9081-13-quintela@redhat.com>
 In-Reply-To: <20170512160055.9081-1-quintela@redhat.com>
 References: <20170512160055.9081-1-quintela@redhat.com>
-Subject: [Qemu-devel] [PATCH 11/12] migration: Remove vmstate.h from
- migration.h
+Subject: [Qemu-devel] [PATCH 12/12] migration: migration.h was not needed
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,79 +32,89 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: dgilbert@redhat.com, lvivier@redhat.com, peterx@redhat.com
 
+This files don't use any function from migration.h, so drop it.
+
 Signed-off-by: Juan Quintela <quintela@redhat.com>
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-
---
-
-Minor rearrangements due to rebase
 ---
- include/migration/migration.h | 1 -
- migration/block.c             | 1 +
- migration/colo-comm.c         | 1 +
- migration/migration.c         | 1 +
- migration/ram.c               | 1 +
- 5 files changed, 4 insertions(+), 1 deletion(-)
+ block/qed.c             | 1 -
+ hw/i386/pc_q35.c        | 1 -
+ hw/virtio/vhost-user.c  | 1 -
+ hw/virtio/vhost-vsock.c | 1 -
+ hw/virtio/virtio.c      | 1 -
+ monitor.c               | 1 -
+ 6 files changed, 6 deletions(-)
 
-diff --git a/include/migration/migration.h b/include/migration/migration.h
-index 5ae21e6..a564ecd 100644
---- a/include/migration/migration.h
-+++ b/include/migration/migration.h
-@@ -18,7 +18,6 @@
- #include "qemu-common.h"
- #include "qemu/thread.h"
- #include "qemu/notify.h"
--#include "migration/vmstate.h"
- #include "io/channel.h"
- #include "qapi-types.h"
- #include "exec/cpu-common.h"
-diff --git a/migration/block.c b/migration/block.c
-index d2923b3..c919787 100644
---- a/migration/block.c
-+++ b/migration/block.c
-@@ -27,6 +27,7 @@
- #include "migration/migration.h"
- #include "sysemu/blockdev.h"
- #include "migration/qemu-file.h"
-+#include "migration/vmstate.h"
+diff --git a/block/qed.c b/block/qed.c
+index fd76817..8d899fd 100644
+--- a/block/qed.c
++++ b/block/qed.c
+@@ -19,7 +19,6 @@
+ #include "trace.h"
+ #include "qed.h"
+ #include "qapi/qmp/qerror.h"
+-#include "migration/migration.h"
  #include "sysemu/block-backend.h"
  
- #define BLOCK_SIZE                       (1 << 20)
-diff --git a/migration/colo-comm.c b/migration/colo-comm.c
-index 9b35027..b4288b8 100644
---- a/migration/colo-comm.c
-+++ b/migration/colo-comm.c
-@@ -13,6 +13,7 @@
+ static const AIOCBInfo qed_aiocb_info = {
+diff --git a/hw/i386/pc_q35.c b/hw/i386/pc_q35.c
+index dd792a8..76b08f8 100644
+--- a/hw/i386/pc_q35.c
++++ b/hw/i386/pc_q35.c
+@@ -46,7 +46,6 @@
+ #include "hw/ide/ahci.h"
+ #include "hw/usb.h"
+ #include "qemu/error-report.h"
+-#include "migration/migration.h"
  
- #include "qemu/osdep.h"
- #include "migration/migration.h"
-+#include "migration/vmstate.h"
- #include "colo.h"
- #include "trace.h"
+ /* ICH9 AHCI has 6 ports */
+ #define MAX_SATA_PORTS     6
+diff --git a/hw/virtio/vhost-user.c b/hw/virtio/vhost-user.c
+index 9334a8a..ebc8ccf 100644
+--- a/hw/virtio/vhost-user.c
++++ b/hw/virtio/vhost-user.c
+@@ -17,7 +17,6 @@
+ #include "sysemu/kvm.h"
+ #include "qemu/error-report.h"
+ #include "qemu/sockets.h"
+-#include "migration/migration.h"
  
-diff --git a/migration/migration.c b/migration/migration.c
-index a5a17fe..7ac09f0 100644
---- a/migration/migration.c
-+++ b/migration/migration.c
-@@ -21,6 +21,7 @@
- #include "migration/migration.h"
- #include "qemu-file-channel.h"
- #include "migration/qemu-file.h"
-+#include "migration/vmstate.h"
- #include "sysemu/sysemu.h"
- #include "block/block.h"
- #include "qapi/qmp/qerror.h"
-diff --git a/migration/ram.c b/migration/ram.c
-index ce5019b..abd97d9 100644
---- a/migration/ram.c
-+++ b/migration/ram.c
-@@ -38,6 +38,7 @@
- #include "xbzrle.h"
- #include "migration/migration.h"
- #include "migration/qemu-file.h"
-+#include "migration/vmstate.h"
- #include "postcopy-ram.h"
- #include "exec/address-spaces.h"
- #include "migration/page_cache.h"
+ #include <sys/ioctl.h>
+ #include <sys/socket.h>
+diff --git a/hw/virtio/vhost-vsock.c b/hw/virtio/vhost-vsock.c
+index b481562..49e0022 100644
+--- a/hw/virtio/vhost-vsock.c
++++ b/hw/virtio/vhost-vsock.c
+@@ -17,7 +17,6 @@
+ #include "qapi/error.h"
+ #include "hw/virtio/virtio-bus.h"
+ #include "hw/virtio/virtio-access.h"
+-#include "migration/migration.h"
+ #include "qemu/error-report.h"
+ #include "hw/virtio/vhost-vsock.h"
+ #include "qemu/iov.h"
+diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
+index 03592c5..2d2b6bf 100644
+--- a/hw/virtio/virtio.c
++++ b/hw/virtio/virtio.c
+@@ -21,7 +21,6 @@
+ #include "hw/virtio/virtio.h"
+ #include "qemu/atomic.h"
+ #include "hw/virtio/virtio-bus.h"
+-#include "migration/migration.h"
+ #include "hw/virtio/virtio-access.h"
+ #include "sysemu/dma.h"
+ 
+diff --git a/monitor.c b/monitor.c
+index 078cba5..fa295c4 100644
+--- a/monitor.c
++++ b/monitor.c
+@@ -49,7 +49,6 @@
+ #include "disas/disas.h"
+ #include "sysemu/balloon.h"
+ #include "qemu/timer.h"
+-#include "migration/migration.h"
+ #include "sysemu/hw_accel.h"
+ #include "qemu/acl.h"
+ #include "sysemu/tpm.h"
 -- 
 2.9.3
