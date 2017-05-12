@@ -1,24 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57403)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60870)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1d9FYQ-0001lU-5f
-	for qemu-devel@nongnu.org; Fri, 12 May 2017 14:44:43 -0400
+	(envelope-from <anthony.xu@intel.com>) id 1d9FjF-0004QE-6p
+	for qemu-devel@nongnu.org; Fri, 12 May 2017 14:55:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1d9FYL-0005Mq-4I
-	for qemu-devel@nongnu.org; Fri, 12 May 2017 14:44:42 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:40752)
+	(envelope-from <anthony.xu@intel.com>) id 1d9FjA-0005mP-Sc
+	for qemu-devel@nongnu.org; Fri, 12 May 2017 14:55:53 -0400
+Received: from mga07.intel.com ([134.134.136.100]:35644)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1d9FYK-0005Kt-RL
-	for qemu-devel@nongnu.org; Fri, 12 May 2017 14:44:37 -0400
-Date: Fri, 12 May 2017 15:44:30 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20170512184430.GA22043@thinpad.lan.raisama.net>
-References: <20170503203604.31462-1-ehabkost@redhat.com>
+	(Exim 4.71) (envelope-from <anthony.xu@intel.com>)
+	id 1d9FjA-0005fB-IP
+	for qemu-devel@nongnu.org; Fri, 12 May 2017 14:55:48 -0400
+From: "Xu, Anthony" <anthony.xu@intel.com>
+Date: Fri, 12 May 2017 18:55:43 +0000
+Message-ID: <4712D8F4B26E034E80552F30A67BE0B1AB6AA2@ORSMSX112.amr.corp.intel.com>
+References: <1494502528-12670-1-git-send-email-pbonzini@redhat.com>
+	<20170511145312.GA822@morn.lan>
+	<618febcf-af6d-5fc6-0274-4f64c53f9763@redhat.com>
+	<20170511163447.GA7785@morn.lan>
+	<4712D8F4B26E034E80552F30A67BE0B1AB61D5@ORSMSX112.amr.corp.intel.com>
+	<ff74288a-d26d-b037-2b55-7dac459aa4ec@redhat.com>
+In-Reply-To: <ff74288a-d26d-b037-2b55-7dac459aa4ec@redhat.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170503203604.31462-1-ehabkost@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH RESEND v2 00/21] qdev/sysbus: Set
- user_creatable=false by default on sysbus
+Subject: Re: [Qemu-devel] [PATCH] target/i386: enable A20 automatically in
+ system management mode
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,141 +34,22 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>, Alexander Graf <agraf@suse.de>, Markus Armbruster <armbru@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Laszlo Ersek <lersek@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>, Kevin O'Connor <kevin@koconnor.net>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 
-Ping? If there are no objections to this series, I plan to merge
-it through the Machine Core tree.
-
-If anybody is interested, below are the results of squashing
-patches 2-20 together:
-
----
- hw/core/sysbus.c         | 11 +++++++++++
- hw/i386/amd_iommu.c      |  2 ++
- hw/i386/intel_iommu.c    |  2 ++
- hw/net/fsl_etsec/etsec.c |  2 ++
- hw/ppc/spapr_pci.c       |  2 ++
- hw/vfio/amd-xgbe.c       |  2 ++
- hw/vfio/calxeda-xgmac.c  |  2 ++
- hw/xen/xen_backend.c     |  2 ++
- 8 files changed, 25 insertions(+)
-
-diff --git a/hw/core/sysbus.c b/hw/core/sysbus.c
-index c0f560b289..5d0887f499 100644
---- a/hw/core/sysbus.c
-+++ b/hw/core/sysbus.c
-@@ -326,6 +326,17 @@ static void sysbus_device_class_init(ObjectClass *klass, void *data)
-     DeviceClass *k = DEVICE_CLASS(klass);
-     k->init = sysbus_device_init;
-     k->bus_type = TYPE_SYSTEM_BUS;
-+    /*
-+     * device_add plugs devices into a suitable bus.  For "real" buses,
-+     * that actually connects the device.  For sysbus, the connections
-+     * need to be made separately, and device_add can't do that.  The
-+     * device would be left unconnected, and will probably not work
-+     *
-+     * However, a few machines can handle device_add/-device with
-+     * a few specific sysbus devices. In those cases, the device
-+     * subclass needs to override it and set user_creatable=true.
-+     */
-+    k->user_creatable = false;
- }
- 
- static const TypeInfo sysbus_device_type_info = {
-diff --git a/hw/i386/amd_iommu.c b/hw/i386/amd_iommu.c
-index f86a40aa30..efcc93cbfd 100644
---- a/hw/i386/amd_iommu.c
-+++ b/hw/i386/amd_iommu.c
-@@ -1186,6 +1186,8 @@ static void amdvi_class_init(ObjectClass *klass, void* data)
-     dc->vmsd = &vmstate_amdvi;
-     dc->hotpluggable = false;
-     dc_class->realize = amdvi_realize;
-+    /* Supported by the pc-q35-* machine types */
-+    dc->user_creatable = true;
- }
- 
- static const TypeInfo amdvi = {
-diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
-index 02f047c8e3..327a46cd19 100644
---- a/hw/i386/intel_iommu.c
-+++ b/hw/i386/intel_iommu.c
-@@ -3009,6 +3009,8 @@ static void vtd_class_init(ObjectClass *klass, void *data)
-     dc->hotpluggable = false;
-     x86_class->realize = vtd_realize;
-     x86_class->int_remap = vtd_int_remap;
-+    /* Supported by the pc-q35-* machine types */
-+    dc->user_creatable = true;
- }
- 
- static const TypeInfo vtd_info = {
-diff --git a/hw/net/fsl_etsec/etsec.c b/hw/net/fsl_etsec/etsec.c
-index aa2b0d5a85..9da1932970 100644
---- a/hw/net/fsl_etsec/etsec.c
-+++ b/hw/net/fsl_etsec/etsec.c
-@@ -416,6 +416,8 @@ static void etsec_class_init(ObjectClass *klass, void *data)
-     dc->realize = etsec_realize;
-     dc->reset = etsec_reset;
-     dc->props = etsec_properties;
-+    /* Supported by ppce500 machine */
-+    dc->user_creatable = true;
- }
- 
- static TypeInfo etsec_info = {
-diff --git a/hw/ppc/spapr_pci.c b/hw/ppc/spapr_pci.c
-index e7567e2e8f..a7cff32bbf 100644
---- a/hw/ppc/spapr_pci.c
-+++ b/hw/ppc/spapr_pci.c
-@@ -1994,6 +1994,8 @@ static void spapr_phb_class_init(ObjectClass *klass, void *data)
-     dc->props = spapr_phb_properties;
-     dc->reset = spapr_phb_reset;
-     dc->vmsd = &vmstate_spapr_pci;
-+    /* Supported by TYPE_SPAPR_MACHINE */
-+    dc->user_creatable = true;
-     set_bit(DEVICE_CATEGORY_BRIDGE, dc->categories);
-     hp->plug = spapr_phb_hot_plug_child;
-     hp->unplug = spapr_phb_hot_unplug_child;
-diff --git a/hw/vfio/amd-xgbe.c b/hw/vfio/amd-xgbe.c
-index 2c60310cf9..fab196cebf 100644
---- a/hw/vfio/amd-xgbe.c
-+++ b/hw/vfio/amd-xgbe.c
-@@ -38,6 +38,8 @@ static void vfio_amd_xgbe_class_init(ObjectClass *klass, void *data)
-     dc->realize = amd_xgbe_realize;
-     dc->desc = "VFIO AMD XGBE";
-     dc->vmsd = &vfio_platform_amd_xgbe_vmstate;
-+    /* Supported by TYPE_VIRT_MACHINE */
-+    dc->user_creatable = true;
- }
- 
- static const TypeInfo vfio_amd_xgbe_dev_info = {
-diff --git a/hw/vfio/calxeda-xgmac.c b/hw/vfio/calxeda-xgmac.c
-index bb15d588e5..7bb17af7ad 100644
---- a/hw/vfio/calxeda-xgmac.c
-+++ b/hw/vfio/calxeda-xgmac.c
-@@ -38,6 +38,8 @@ static void vfio_calxeda_xgmac_class_init(ObjectClass *klass, void *data)
-     dc->realize = calxeda_xgmac_realize;
-     dc->desc = "VFIO Calxeda XGMAC";
-     dc->vmsd = &vfio_platform_calxeda_xgmac_vmstate;
-+    /* Supported by TYPE_VIRT_MACHINE */
-+    dc->user_creatable = true;
- }
- 
- static const TypeInfo vfio_calxeda_xgmac_dev_info = {
-diff --git a/hw/xen/xen_backend.c b/hw/xen/xen_backend.c
-index c85f1637e4..f29b2b027b 100644
---- a/hw/xen/xen_backend.c
-+++ b/hw/xen/xen_backend.c
-@@ -619,6 +619,8 @@ static void xendev_class_init(ObjectClass *klass, void *data)
- 
-     dc->props = xendev_properties;
-     set_bit(DEVICE_CATEGORY_MISC, dc->categories);
-+    /* xen-backend devices can be plugged/unplugged dynamically */
-+    dc->user_creatable = true;
- }
- 
- static const TypeInfo xendev_type_info = {
--- 
-2.11.0.259.g40922b1
-
--- 
-Eduardo
+IA0KPiBPbiAxMi8wNS8yMDE3IDAxOjU1LCBYdSwgQW50aG9ueSB3cm90ZToNCj4gPiBIaSBQYW9s
+bywNCj4gPg0KPiA+IEluIEtWTSBtb2RlLCBzZWVtcyBBMjAgaXMgaWdub3JlZC4NCj4gPiBEbyB5
+b3Ugc2VlIGFueSBwb3RlbnRpYWwgaXNzdWUgaGVyZT8NCj4gDQo+IE5vOyByZWNlbnQgcHJvY2Vz
+c29ycyBkb24ndCBoYXZlIEEyMCBhdCBhbGwuDQoNCkkgbWVhbiBBMjAgaW4gZ3Vlc3QsIG5vdCBB
+MjAgaW4gaG9zdC4gIA0KR3Vlc3QgaXMgcnVubmluZyBvbiBvbGQgcGxhdGZvcm0sIGl0IHRyaWVz
+IHRvIGNvbnRyb2wgQTIwICB0aHJvdWdoIHBvcnQgOTIgbGlrZSB3aGF0IFNlYUJpb3MgZG9lcy4N
+ClFFTVUvS1ZNIGRvZXMgaGFuZGxlIHBvcnQgOTIgYWNjZXNzIHRvIHNldCBjb3JyZWN0IGVudi0+
+YTIwX21hc2ssDQpidXQgUUVNVS9LVk0gaWdub3JlcyBBMjAgc3RhdHVzIHdoZW4gaGFuZGxpbmcg
+Z3Vlc3QgbWVtb3J5IGFjY2Vzcy4NCg0KU2luY2UgUUVNVS9LVk0gd29ya3Mgd2VsbCB3aXRoIFNl
+YUJpb3MsIGRvZXMgdGhhdCBpbXBseSBTZWFCaW9zIGRvZXNuJ3QgZ2VuZXJhdGUgYWRkcmVzcw0K
+bGFyZ2VyIHRoYW4gMHgxMDAwMDAgaW4gcmVhbCBtb2RlPw0KDQpJZiB0aGF0J3MgdGhlIGNhc2Us
+ICBRRU1VL1RDRyBzaG91bGQgd29yayB3aXRoIFNlYUJpb3MgZXZlbiB3aXRoIGlnbm9yaW5nIEEy
+MC4NCg0KRHVyaW5nIFNlYUJpb3MgYm9vdCwgdGhlcmUgYXJlID4zNTAgcG9ydCA5MiBhY2Nlc3Ms
+IGlmIHdlIGRvbid0IG5lZWQgdG8gaGFuZGxlIEEyMCwgDQp3ZSBjYW4gbWFrZSBBMjAgY29uZmln
+dXJhYmxlIGluIFNlYWJpb3MsIEl0IG1heSByZWR1Y2UgU2VhQmlvcyBib290IHRpbWUuDQoNCg0K
+QW50aG9ueQ0KDQoNCg0K
