@@ -1,24 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47308)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48237)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1d91NO-0006cQ-3Z
-	for qemu-devel@nongnu.org; Thu, 11 May 2017 23:36:26 -0400
+	(envelope-from <peterx@redhat.com>) id 1d91Re-0001l6-UX
+	for qemu-devel@nongnu.org; Thu, 11 May 2017 23:40:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1d91NN-0003fJ-0t
-	for qemu-devel@nongnu.org; Thu, 11 May 2017 23:36:22 -0400
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Fri, 12 May 2017 00:35:42 -0300
-Message-Id: <20170512033543.6789-5-f4bug@amsat.org>
-In-Reply-To: <20170512033543.6789-1-f4bug@amsat.org>
-References: <20170512033543.6789-1-f4bug@amsat.org>
+	(envelope-from <peterx@redhat.com>) id 1d91Rb-0005VL-0l
+	for qemu-devel@nongnu.org; Thu, 11 May 2017 23:40:46 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:51814)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1d91Ra-0005Us-NT
+	for qemu-devel@nongnu.org; Thu, 11 May 2017 23:40:42 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 6BA32C059738
+	for <qemu-devel@nongnu.org>; Fri, 12 May 2017 03:40:41 +0000 (UTC)
+Date: Fri, 12 May 2017 11:40:33 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20170512034033.GN28293@pxdev.xzpeter.org>
+References: <20170511163228.6666-1-quintela@redhat.com>
+	<20170511163228.6666-3-quintela@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v3 4/5] target/ppc: using various functions
- using extract op
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20170511163228.6666-3-quintela@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 2/3] migration: Remove use of old
+ MigrationParams
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,103 +34,190 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, Aurelien Jarno <aurelien@aurel32.net>, Richard Henderson <rth@twiddle.net>, David Gibson <david@gibson.dropbear.id.au>, Alexander Graf <agraf@suse.de>, qemu-ppc@nongnu.org
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+To: Juan Quintela <quintela@redhat.com>
+Cc: qemu-devel@nongnu.org, dgilbert@redhat.com, lvivier@redhat.com
 
-Patch created mechanically using Coccinelle script via:
+On Thu, May 11, 2017 at 06:32:27PM +0200, Juan Quintela wrote:
+> We have change in the previous patch to use migration capabilities for
+> it.  Notice that we continue using the old command line flags from
+> migrate command from the time being.  Remove the set_params method as
+> now it is empty.
+> 
+> Signed-off-by: Juan Quintela <quintela@redhat.com>
+> ---
+>  include/migration/migration.h |  3 +--
+>  migration/block.c             | 17 ++---------------
+>  migration/colo.c              |  5 +++--
+>  migration/migration.c         |  8 +++++---
+>  migration/savevm.c            |  2 --
+>  5 files changed, 11 insertions(+), 24 deletions(-)
+> 
+> diff --git a/include/migration/migration.h b/include/migration/migration.h
+> index 30c2913..2d5525c 100644
+> --- a/include/migration/migration.h
+> +++ b/include/migration/migration.h
+> @@ -39,8 +39,7 @@
+>  #define QEMU_VM_SECTION_FOOTER       0x7e
+>  
+>  struct MigrationParams {
+> -    bool blk;
+> -    bool shared;
+> +    bool unused; /* C doesn't allow empty structs */
+>  };
+>  
+>  /* Messages sent on the return path from destination to source */
+> diff --git a/migration/block.c b/migration/block.c
+> index 060087f..fcfa823 100644
+> --- a/migration/block.c
+> +++ b/migration/block.c
+> @@ -94,9 +94,6 @@ typedef struct BlkMigBlock {
+>  } BlkMigBlock;
+>  
+>  typedef struct BlkMigState {
+> -    /* Written during setup phase.  Can be read without a lock.  */
+> -    int blk_enable;
+> -    int shared_base;
+>      QSIMPLEQ_HEAD(bmds_list, BlkMigDevState) bmds_list;
+>      int64_t total_sector_sum;
+>      bool zero_blocks;
+> @@ -425,7 +422,7 @@ static int init_blk_migration(QEMUFile *f)
+>          bmds->bulk_completed = 0;
+>          bmds->total_sectors = sectors;
+>          bmds->completed_sectors = 0;
+> -        bmds->shared_base = block_mig_state.shared_base;
+> +        bmds->shared_base = migrate_use_block_shared();
+>  
+>          assert(i < num_bs);
+>          bmds_bs[i].bmds = bmds;
+> @@ -994,22 +991,12 @@ static int block_load(QEMUFile *f, void *opaque, int version_id)
+>      return 0;
+>  }
+>  
+> -static void block_set_params(const MigrationParams *params, void *opaque)
+> -{
+> -    block_mig_state.blk_enable = params->blk;
+> -    block_mig_state.shared_base = params->shared;
+> -
+> -    /* shared base means that blk_enable = 1 */
+> -    block_mig_state.blk_enable |= params->shared;
+> -}
+> -
+>  static bool block_is_active(void *opaque)
+>  {
+> -    return block_mig_state.blk_enable == 1;
+> +    return migrate_use_block_enabled();
+>  }
+>  
+>  static SaveVMHandlers savevm_block_handlers = {
+> -    .set_params = block_set_params,
+>      .save_live_setup = block_save_setup,
+>      .save_live_iterate = block_save_iterate,
+>      .save_live_complete_precopy = block_save_complete,
+> diff --git a/migration/colo.c b/migration/colo.c
+> index 963c802..e772384 100644
+> --- a/migration/colo.c
+> +++ b/migration/colo.c
+> @@ -14,6 +14,7 @@
+>  #include "qemu/timer.h"
+>  #include "sysemu/sysemu.h"
+>  #include "migration/colo.h"
+> +#include "migration/block.h"
+>  #include "io/channel-buffer.h"
+>  #include "trace.h"
+>  #include "qemu/error-report.h"
+> @@ -345,8 +346,8 @@ static int colo_do_checkpoint_transaction(MigrationState *s,
+>      }
+>  
+>      /* Disable block migration */
+> -    s->params.blk = 0;
+> -    s->params.shared = 0;
+> +    migrate_set_block_enabled(s, false);
+> +    migrate_set_block_shared(s, false);
+>      qemu_savevm_state_header(fb);
+>      qemu_savevm_state_begin(fb, &s->params);
+>      qemu_mutex_lock_iothread();
+> diff --git a/migration/migration.c b/migration/migration.c
+> index 2f981aa..8a3bf89 100644
+> --- a/migration/migration.c
+> +++ b/migration/migration.c
+> @@ -787,6 +787,10 @@ void qmp_migrate_set_capabilities(MigrationCapabilityStatusList *params,
+>          s->enabled_capabilities[cap->value->capability] = cap->value->state;
+>      }
+>  
+> +    if (s->enabled_capabilities[MIGRATION_CAPABILITY_BLOCK_SHARED]) {
+> +        s->enabled_capabilities[MIGRATION_CAPABILITY_BLOCK_ENABLED] = true;
+> +    }
+> +
 
-    $ spatch --macro-file scripts/cocci-macro-file.h --in-place \
-        --sp-file scripts/coccinelle/tcg_gen_extract.cocci --dir target
+[1]
 
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
----
+>      if (migrate_postcopy_ram()) {
+>          if (migrate_use_compression()) {
+>              /* The decompression threads asynchronously write into RAM
+> @@ -1214,9 +1218,6 @@ void qmp_migrate(const char *uri, bool has_blk, bool blk,
+>      MigrationParams params;
+>      const char *p;
+>  
+> -    params.blk = has_blk && blk;
+> -    params.shared = has_inc && inc;
+> -
+>      if (migration_is_setup_or_active(s->state) ||
+>          s->state == MIGRATION_STATUS_CANCELLING ||
+>          s->state == MIGRATION_STATUS_COLO) {
+> @@ -1239,6 +1240,7 @@ void qmp_migrate(const char *uri, bool has_blk, bool blk,
+>      }
+>  
+>      if (has_inc && inc) {
+> +        migrate_set_block_enabled(s, true);
+>          migrate_set_block_shared(s, true);
 
-David I did not add your Reviewed-by as suggested by Laurent Vivier after
-Nikunj A Dadhania review.
+[2]
 
- target/ppc/translate.c              |  9 +++------
- target/ppc/translate/vsx-impl.inc.c | 15 +++++----------
- 2 files changed, 8 insertions(+), 16 deletions(-)
+IIUC for [1] & [2] we are solving the same problem that "shared"
+depends on "enabled" bit. Would it be good to unitfy this dependency
+somewhere? E.g., by changing migrate_set_block_shared() into:
 
-diff --git a/target/ppc/translate.c b/target/ppc/translate.c
-index f40b5a1abf..64ab412bf3 100644
---- a/target/ppc/translate.c
-+++ b/target/ppc/translate.c
-@@ -868,8 +868,7 @@ static inline void gen_op_arith_add(DisasContext *ctx, TCGv ret, TCGv arg1,
-             }
-             tcg_gen_xor_tl(cpu_ca, t0, t1);        /* bits changed w/ carry */
-             tcg_temp_free(t1);
--            tcg_gen_shri_tl(cpu_ca, cpu_ca, 32);   /* extract bit 32 */
--            tcg_gen_andi_tl(cpu_ca, cpu_ca, 1);
-+            tcg_gen_extract_tl(cpu_ca, cpu_ca, 32, 1);
-             if (is_isa300(ctx)) {
-                 tcg_gen_mov_tl(cpu_ca32, cpu_ca);
-             }
-@@ -1399,8 +1398,7 @@ static inline void gen_op_arith_subf(DisasContext *ctx, TCGv ret, TCGv arg1,
-             tcg_temp_free(inv1);
-             tcg_gen_xor_tl(cpu_ca, t0, t1);         /* bits changes w/ carry */
-             tcg_temp_free(t1);
--            tcg_gen_shri_tl(cpu_ca, cpu_ca, 32);    /* extract bit 32 */
--            tcg_gen_andi_tl(cpu_ca, cpu_ca, 1);
-+            tcg_gen_extract_tl(cpu_ca, cpu_ca, 32, 1);
-             if (is_isa300(ctx)) {
-                 tcg_gen_mov_tl(cpu_ca32, cpu_ca);
-             }
-@@ -5383,8 +5381,7 @@ static void gen_mfsri(DisasContext *ctx)
-     CHK_SV;
-     t0 = tcg_temp_new();
-     gen_addr_reg_index(ctx, t0);
--    tcg_gen_shri_tl(t0, t0, 28);
--    tcg_gen_andi_tl(t0, t0, 0xF);
-+    tcg_gen_extract_tl(t0, t0, 28, 0xF);
-     gen_helper_load_sr(cpu_gpr[rd], cpu_env, t0);
-     tcg_temp_free(t0);
-     if (ra != 0 && ra != rd)
-diff --git a/target/ppc/translate/vsx-impl.inc.c b/target/ppc/translate/vsx-impl.inc.c
-index 7f12908029..9faffd2ddc 100644
---- a/target/ppc/translate/vsx-impl.inc.c
-+++ b/target/ppc/translate/vsx-impl.inc.c
-@@ -1262,8 +1262,7 @@ static void gen_xsxexpqp(DisasContext *ctx)
-         gen_exception(ctx, POWERPC_EXCP_VSXU);
-         return;
-     }
--    tcg_gen_shri_i64(xth, xbh, 48);
--    tcg_gen_andi_i64(xth, xth, 0x7FFF);
-+    tcg_gen_extract_i64(xth, xbh, 48, 0x7FFF);
-     tcg_gen_movi_i64(xtl, 0);
- }
- 
-@@ -1448,10 +1447,8 @@ static void gen_xvxexpdp(DisasContext *ctx)
-         gen_exception(ctx, POWERPC_EXCP_VSXU);
-         return;
-     }
--    tcg_gen_shri_i64(xth, xbh, 52);
--    tcg_gen_andi_i64(xth, xth, 0x7FF);
--    tcg_gen_shri_i64(xtl, xbl, 52);
--    tcg_gen_andi_i64(xtl, xtl, 0x7FF);
-+    tcg_gen_extract_i64(xth, xbh, 52, 0x7FF);
-+    tcg_gen_extract_i64(xtl, xbl, 52, 0x7FF);
- }
- 
- GEN_VSX_HELPER_2(xvxsigsp, 0x00, 0x04, 0, PPC2_ISA300)
-@@ -1474,16 +1471,14 @@ static void gen_xvxsigdp(DisasContext *ctx)
-     zr = tcg_const_i64(0);
-     nan = tcg_const_i64(2047);
- 
--    tcg_gen_shri_i64(exp, xbh, 52);
--    tcg_gen_andi_i64(exp, exp, 0x7FF);
-+    tcg_gen_extract_i64(exp, xbh, 52, 0x7FF);
-     tcg_gen_movi_i64(t0, 0x0010000000000000);
-     tcg_gen_movcond_i64(TCG_COND_EQ, t0, exp, zr, zr, t0);
-     tcg_gen_movcond_i64(TCG_COND_EQ, t0, exp, nan, zr, t0);
-     tcg_gen_andi_i64(xth, xbh, 0x000FFFFFFFFFFFFF);
-     tcg_gen_or_i64(xth, xth, t0);
- 
--    tcg_gen_shri_i64(exp, xbl, 52);
--    tcg_gen_andi_i64(exp, exp, 0x7FF);
-+    tcg_gen_extract_i64(exp, xbl, 52, 0x7FF);
-     tcg_gen_movi_i64(t0, 0x0010000000000000);
-     tcg_gen_movcond_i64(TCG_COND_EQ, t0, exp, zr, zr, t0);
-     tcg_gen_movcond_i64(TCG_COND_EQ, t0, exp, nan, zr, t0);
+void migrate_set_block_shared(MigrationState *s, bool value)
+{
+    s->enabled_capabilities[MIGRATION_CAPABILITY_BLOCK_SHARED] = value;
+    if (value) {
+        migrate_set_block_enabled(s, true);
+    }
+}
+
+?
+
+Another thing to mention: after switching to the capability interface,
+we'll cache the "enabled" and "shared" bits now while we don't cache
+it before, right? IIUC it'll affect behavior of such sequence:
+
+- 1st migrate with enabled=1, shared=1, then
+- 2nd migrate with enabled=0, shared=0
+
+Before the series, the 2nd migrate will use enabled=shared=0, but
+after the series it should be using enabled=shared=1. Not sure whether
+this would be a problem (or I missed anything?).
+
+Thanks,
+
+>      }
+>  
+> diff --git a/migration/savevm.c b/migration/savevm.c
+> index f8d1e8b..221fb4b 100644
+> --- a/migration/savevm.c
+> +++ b/migration/savevm.c
+> @@ -1233,8 +1233,6 @@ static int qemu_savevm_state(QEMUFile *f, Error **errp)
+>  {
+>      int ret;
+>      MigrationParams params = {
+> -        .blk = 0,
+> -        .shared = 0
+>      };
+>      MigrationState *ms = migrate_init(&params);
+>      MigrationStatus status;
+> -- 
+> 2.9.3
+> 
+
 -- 
-2.11.0
+Peter Xu
