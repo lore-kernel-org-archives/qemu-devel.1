@@ -1,26 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46608)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48759)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yi.l.liu@linux.intel.com>) id 1d983H-0007As-As
-	for qemu-devel@nongnu.org; Fri, 12 May 2017 06:44:04 -0400
+	(envelope-from <quintela@redhat.com>) id 1d98EM-0001Z8-Hx
+	for qemu-devel@nongnu.org; Fri, 12 May 2017 06:55:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yi.l.liu@linux.intel.com>) id 1d983C-00033P-K0
-	for qemu-devel@nongnu.org; Fri, 12 May 2017 06:44:03 -0400
-Received: from mga05.intel.com ([192.55.52.43]:37327)
+	(envelope-from <quintela@redhat.com>) id 1d98EI-00016f-MC
+	for qemu-devel@nongnu.org; Fri, 12 May 2017 06:55:30 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:41600)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <yi.l.liu@linux.intel.com>)
-	id 1d983C-000331-Bl
-	for qemu-devel@nongnu.org; Fri, 12 May 2017 06:43:58 -0400
-Date: Thu, 11 May 2017 18:29:56 +0800
-From: "Liu, Yi L" <yi.l.liu@linux.intel.com>
-Message-ID: <20170511102956.GE2931@gmail.com>
-References: <1493201525-14418-1-git-send-email-yi.l.liu@intel.com>
-	<1493201525-14418-7-git-send-email-yi.l.liu@intel.com>
-	<9441ea23-1867-f59a-1ae3-be5afa4d51da@gmail.com>
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1d98EI-00015f-Dj
+	for qemu-devel@nongnu.org; Fri, 12 May 2017 06:55:26 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 1855980096
+	for <qemu-devel@nongnu.org>; Fri, 12 May 2017 10:55:25 +0000 (UTC)
+From: Juan Quintela <quintela@redhat.com>
+In-Reply-To: <20170512034033.GN28293@pxdev.xzpeter.org> (Peter Xu's message of
+	"Fri, 12 May 2017 11:40:33 +0800")
+References: <20170511163228.6666-1-quintela@redhat.com>
+	<20170511163228.6666-3-quintela@redhat.com>
+	<20170512034033.GN28293@pxdev.xzpeter.org>
+Reply-To: quintela@redhat.com
+Date: Fri, 12 May 2017 12:55:22 +0200
+Message-ID: <877f1mgx9h.fsf@secure.mitica>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <9441ea23-1867-f59a-1ae3-be5afa4d51da@gmail.com>
-Subject: Re: [Qemu-devel] [RFC PATCH 6/8] VFIO: do pasid table binding
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH 2/3] migration: Remove use of old
+ MigrationParams
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,104 +36,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Xiao Guangrong <guangrong.xiao@gmail.com>
-Cc: "Liu, Yi L" <yi.l.liu@intel.com>, kvm@vger.kernel.org, iommu@lists.linux-foundation.org, alex.williamson@redhat.com, peterx@redhat.com, tianyu.lan@intel.com, kevin.tian@intel.com, ashok.raj@intel.com, jean-philippe.brucker@arm.com, jasowang@redhat.com, qemu-devel@nongnu.org, jacob.jun.pan@intel.com
+To: Peter Xu <peterx@redhat.com>
+Cc: qemu-devel@nongnu.org, dgilbert@redhat.com, lvivier@redhat.com
 
-On Tue, May 09, 2017 at 03:55:20PM +0800, Xiao Guangrong wrote:
-> 
-> 
-> On 04/26/2017 06:12 PM, Liu, Yi L wrote:
-> >From: "Liu, Yi L" <yi.l.liu@linux.intel.com>
-> >
-> >This patch adds IOCTL processing in vfio_iommu_type1 for
-> >VFIO_IOMMU_SVM_BIND_TASK. Binds the PASID table bind by
-> >calling iommu_ops->bind_pasid_table to link the whole
-> >PASID table to pIOMMU.
-> >
-> >For VT-d, it is linking the guest PASID table to host pIOMMU.
-> >This is key point to support SVM virtualization on VT-d.
-> >
-> >Signed-off-by: Liu, Yi L <yi.l.liu@linux.intel.com>
-> >---
-> >  drivers/vfio/vfio_iommu_type1.c | 72 +++++++++++++++++++++++++++++++++++++++++
-> >  1 file changed, 72 insertions(+)
-> >
-> >diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
-> >index b3cc33f..30b6d48 100644
-> >--- a/drivers/vfio/vfio_iommu_type1.c
-> >+++ b/drivers/vfio/vfio_iommu_type1.c
-> >@@ -1512,6 +1512,50 @@ static int vfio_domains_have_iommu_cache(struct vfio_iommu *iommu)
-> >  	return ret;
-> >  }
-> >+struct vfio_svm_task {
-> >+	struct iommu_domain *domain;
-> >+	void *payload;
-> >+};
-> >+
-> >+static int bind_pasid_tbl_fn(struct device *dev, void *data)
-> >+{
-> >+	int ret = 0;
-> >+	struct vfio_svm_task *task = data;
-> >+	struct pasid_table_info *pasidt_binfo;
-> >+
-> >+	pasidt_binfo = task->payload;
-> >+	ret = iommu_bind_pasid_table(task->domain, dev, pasidt_binfo);
-> >+	return ret;
-> >+}
-> >+
-> >+static int vfio_do_svm_task(struct vfio_iommu *iommu, void *data,
-> >+				int (*fn)(struct device *, void *))
-> >+{
-> >+	int ret = 0;
-> >+	struct vfio_domain *d;
-> >+	struct vfio_group *g;
-> >+	struct vfio_svm_task task;
-> >+
-> >+	task.payload = data;
-> >+
-> >+	mutex_lock(&iommu->lock);
-> >+
-> >+	list_for_each_entry(d, &iommu->domain_list, next) {
-> >+		list_for_each_entry(g, &d->group_list, next) {
-> >+			if (g->iommu_group != NULL) {
-> >+				task.domain = d->domain;
-> >+				ret = iommu_group_for_each_dev(
-> >+					g->iommu_group, &task, fn);
-> >+				if (ret != 0)
-> >+					break;
-> >+			}
-> >+		}
-> >+	}
-> >+
-> >+	mutex_unlock(&iommu->lock);
-> >+	return ret;
-> >+}
-> >+
-> >  static long vfio_iommu_type1_ioctl(void *iommu_data,
-> >  				   unsigned int cmd, unsigned long arg)
-> >  {
-> >@@ -1582,6 +1626,34 @@ static long vfio_iommu_type1_ioctl(void *iommu_data,
-> >  		return copy_to_user((void __user *)arg, &unmap, minsz) ?
-> >  			-EFAULT : 0;
-> >+	} else if (cmd == VFIO_IOMMU_SVM_BIND_TASK) {
-> >+		struct vfio_device_svm hdr;
-> >+		u8 *data = NULL;
-> >+		int ret = 0;
-> >+
-> >+		minsz = offsetofend(struct vfio_device_svm, length);
-> >+		if (copy_from_user(&hdr, (void __user *)arg, minsz))
-> >+			return -EFAULT;
-> >+
-> >+		if (hdr.length == 0)
-> >+			return -EINVAL;
-> >+
-> >+		data = memdup_user((void __user *)(arg + minsz),
-> >+					hdr.length);
-> 
-> You should check the @length is at least sizeof(struct pasid_table_info) as
-> kernel uses it as pasid_table_info, a evil application can crash kernel.
+Peter Xu <peterx@redhat.com> wrote:
+> On Thu, May 11, 2017 at 06:32:27PM +0200, Juan Quintela wrote:
 
-Yes, thx for the remind.
+>> @@ -1214,9 +1218,6 @@ void qmp_migrate(const char *uri, bool has_blk, bool blk,
+>>      MigrationParams params;
+>>      const char *p;
+>>  
+>> -    params.blk = has_blk && blk;
+>> -    params.shared = has_inc && inc;
+>> -
+>>      if (migration_is_setup_or_active(s->state) ||
+>>          s->state == MIGRATION_STATUS_CANCELLING ||
+>>          s->state == MIGRATION_STATUS_COLO) {
+>> @@ -1239,6 +1240,7 @@ void qmp_migrate(const char *uri, bool has_blk, bool blk,
+>>      }
+>>  
+>>      if (has_inc && inc) {
+>> +        migrate_set_block_enabled(s, true);
+>>          migrate_set_block_shared(s, true);
+>
+> [2]
+>
+> IIUC for [1] & [2] we are solving the same problem that "shared"
+> depends on "enabled" bit. Would it be good to unitfy this dependency
+> somewhere? E.g., by changing migrate_set_block_shared() into:
+>
+> void migrate_set_block_shared(MigrationState *s, bool value)
+> {
+>     s->enabled_capabilities[MIGRATION_CAPABILITY_BLOCK_SHARED] = value;
+>     if (value) {
+>         migrate_set_block_enabled(s, true);
+>     }
+> }
 
-Thanks,
-Yi L 
+ok with this.
+I will add once here that when we disable block enabled, we also disable
+shared, or just let it that way?
+
+> Another thing to mention: after switching to the capability interface,
+> we'll cache the "enabled" and "shared" bits now while we don't cache
+> it before, right? IIUC it'll affect behavior of such sequence:
+>
+> - 1st migrate with enabled=1, shared=1, then
+> - 2nd migrate with enabled=0, shared=0
+>
+> Before the series, the 2nd migrate will use enabled=shared=0, but
+> after the series it should be using enabled=shared=1. Not sure whether
+> this would be a problem (or I missed anything?).
+
+We can't be consistent with both old/new way.
+
+Old way: we always setup the capabilities on command line (that should
+have been deprecated long, long ago)
+
+New way: Once set, they stay set.
+
+So, alternatives are:
+- If we are going to deprecate the old way, just let things as they are
+  on this patch (easier for me O:-)
+
+- Always disable this features at the end of migration: Compatible with
+  old migration semantics, bet we are inconsistent with all other
+  capabilities.
+
+- Add yet more code to only disable them when we are setting them
+  through the command line.  More code to maintain.
+
+My idea would be to deprecate the migrate command line parameter, that
+is the reason why I did the 1st option.  I hope that in due curse, we
+would be able to remove the code.  But if anyone strongly think that any
+of the other options is better, please let me know.
+
+Later, Juan.
