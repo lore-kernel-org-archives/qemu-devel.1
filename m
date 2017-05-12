@@ -1,25 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60229)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37915)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1d9JYB-0006TK-Gv
-	for qemu-devel@nongnu.org; Fri, 12 May 2017 19:00:45 -0400
+	(envelope-from <anthony.xu@intel.com>) id 1d9Jpz-00023Q-OW
+	for qemu-devel@nongnu.org; Fri, 12 May 2017 19:19:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1d9JYA-0000Kp-5K
-	for qemu-devel@nongnu.org; Fri, 12 May 2017 19:00:43 -0400
-References: <20170411011718.9152-1-eblake@redhat.com>
-	<20170411011718.9152-2-eblake@redhat.com>
-	<20170412094909.GC4955@noname.str.redhat.com>
-	<161300e8-fefb-f2c6-09cd-afd16d14bca0@redhat.com>
-	<7171308e-833e-38a0-8775-9b5a52b8a105@redhat.com>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <26c745c7-2497-7adf-eee1-3547f1aeb95c@redhat.com>
-Date: Fri, 12 May 2017 19:00:33 -0400
-MIME-Version: 1.0
-In-Reply-To: <7171308e-833e-38a0-8775-9b5a52b8a105@redhat.com>
-Content-Type: text/plain; charset=utf-8
+	(envelope-from <anthony.xu@intel.com>) id 1d9Jpw-0008W6-Ir
+	for qemu-devel@nongnu.org; Fri, 12 May 2017 19:19:07 -0400
+Received: from mga11.intel.com ([192.55.52.93]:49779)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <anthony.xu@intel.com>)
+	id 1d9Jpw-0008Uv-8A
+	for qemu-devel@nongnu.org; Fri, 12 May 2017 19:19:04 -0400
+From: "Xu, Anthony" <anthony.xu@intel.com>
+Date: Fri, 12 May 2017 23:19:00 +0000
+Message-ID: <4712D8F4B26E034E80552F30A67BE0B1AB6CBF@ORSMSX112.amr.corp.intel.com>
+References: <1494502528-12670-1-git-send-email-pbonzini@redhat.com>
+	<20170511145312.GA822@morn.lan>
+	<618febcf-af6d-5fc6-0274-4f64c53f9763@redhat.com>
+	<20170511163447.GA7785@morn.lan>
+	<4712D8F4B26E034E80552F30A67BE0B1AB61D5@ORSMSX112.amr.corp.intel.com>
+	<ff74288a-d26d-b037-2b55-7dac459aa4ec@redhat.com>
+	<4712D8F4B26E034E80552F30A67BE0B1AB6AA2@ORSMSX112.amr.corp.intel.com>
+	<f9c33614-be36-e789-b72b-b4ffcc8bb6a8@redhat.com>
+	<20170512193840.GA22454@morn.lan>
+In-Reply-To: <20170512193840.GA22454@morn.lan>
 Content-Language: en-US
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v9 01/13] qcow2: Unallocate unmapped zero
- clusters if no backing file
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [PATCH] target/i386: enable A20 automatically in
+ system management mode
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,124 +37,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>, Eric Blake <eblake@redhat.com>, Kevin Wolf <kwolf@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org
+To: Kevin O'Connor <kevin@koconnor.net>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 
-
-
-On 05/12/2017 12:06 PM, Max Reitz wrote:
-> On 2017-05-11 16:56, Eric Blake wrote:
->> [revisiting this older patch version, even though the final version in
->> today's pull request changed somewhat from this approach]
->>
->> On 04/12/2017 04:49 AM, Kevin Wolf wrote:
->>> Am 11.04.2017 um 03:17 hat Eric Blake geschrieben:
->>>> 'qemu-img map' already coalesces information about unallocated
->>>> clusters (those with status 0) and pure zero clusters (those
->>>> with status BDRV_BLOCK_ZERO and no offset).  Furthermore, all
->>>> qcow2 images with no backing file already report all unallocated
->>>> clusters (in the preallocation sense of clusters with no offset)
->>>> as BDRV_BLOCK_ZERO, regardless of whether the QCOW_OFLAG_ZERO was
->>>> set in that L2 entry (QCOW_OFLAG_ZERO also implies a return of
->>>> BDRV_BLOCK_ALLOCATED, but we intentionally do not expose that bit
->>>> to external users), thanks to generic block layer code in
->>>> bdrv_co_get_block_status().
->>>>
->>>> So, for an image with no backing file, having bdrv_pwrite_zeroes
->>>> mark clusters as unallocated (defer to backing file) rather than
->>>> reads-as-zero (regardless of backing file) makes no difference
->>>> to normal behavior, but may potentially allow for fewer writes to
->>>> the L2 table of a freshly-created image where the L2 table is
->>>> initially written to all-zeroes (although I don't actually know
->>>> if we skip an L2 update and flush when re-writing the same
->>>> contents as already present).
->>>
->>> I don't get this. Allocating a cluster always involves an L2 update, =
-no
->>> matter whether it was previously unallocated or a zero cluster.
->>
->> On IRC, John, Kevin, and I were discussing the current situation with
->> libvirt NBD storage migration.  When libvirt creates a file on the
->> destination (rather than the user pre-creating it), it currently
->> defaults to 0.10 [v2] images, even if the source was a 1.1 image [v3]
->> (arguably something that could be improved in libvirt, but
->> https://bugzilla.redhat.com/show_bug.cgi?id=3D1371749 was closed as no=
-t a
->> bug).
->>
->> Therefore, the use case of doing a mirror job to a v2 image, and havin=
-g
->> that image become thick even though the source was thin, is happening
->> more than we'd like
->> (https://bugzilla.redhat.com/show_bug.cgi?id=3D1371749).  While Kevin =
-had
->> a point that in the common case we ALWAYS want to turn an unallocated
->> cluster into a zero cluster (so that we don't have to audit whether al=
-l
->> callers are properly accounting for the case where a backing image is
->> added later), our conversation on IRC today conceded that we may want =
+wrote:
+> > On 12/05/2017 20:55, Xu, Anthony wrote:
+> > > If that's the case,  QEMU/TCG should work with SeaBios even with
+> ignoring A20.
+> > >
+> > > During SeaBios boot, there are >350 port 92 access, if we don't need =
 to
->> introduce a new BDRV_REQ_READ_ZERO_NOP (or some such name) that
->> particular callers can use to request that if a cluster already reads =
-as
->> zeroes, the write zero request does NOT have to change it.  Normal gue=
-st
->> operations would not use the flag, but mirroring IS a case that would
->> use the flag, so that we can end up with thinner mirrors even to 0.10
->> images.
->>
->> The other consideration is that on 0.10 images, even if we have to
->> allocate, right now our allocation is done by way of failing with
->> -ENOTSUP and falling back to the normal pwrite() of explicit zeroes.  =
-It
->> may be worth teaching the qcow2 layer to explicitly handle write zeroe=
-s,
->> even on 0.10 images, by allocating a cluster (as needed) but then
->> telling bs->file to write zeroes (punching a hole as appropriate) so
->> that the file is still thin.  In fact, it matches the fact that we
->> already have code that probes whether a qcow2 cluster that reports
->> BDRV_BLOCK_DATA|BDRV_BLOCK_OFFSET_VALID then probes bs->file to see if
->> there is a hole there, at which point it can add BDRV_BLOCK_ZERO to th=
-e
->> bdrv_get_block_status.
->>
->> I don't know which one of us will tackle patches along these lines, bu=
-t
->> wanted to at least capture the gist of the IRC conversation in the
->> archives for a bit more permanence.
+> handle A20,
+> > > we can make A20 configurable in Seabios, It may reduce SeaBios boot
+> time.
+> >
+> > Yes, that's a good idea.
 >=20
-> Just short ideas:
->=20
-> (1) I do consider it a bug if v2 images are created. The BZ wasn't
-> closed for a very good reason, but because nobody answered this questio=
-n:
->=20
->> is this really a problem?
->=20
-> And apparently it is.
->=20
-> (2) There is a way of creating zero clusters on v2 images, but we've
-> never done it (yet): You create a single data cluster containing zeroes
-> and then you just point to it whenever you need a zero cluster (until
-> its refcount overflows, at which point you allocate another cluster).
-> Maybe that helps.
->=20
-> I'd be really careful with optimizations for v2 images. You have alread=
-y
-> proven to me that my fears of too much complexity are out of proportion=
-s
-> sometimes, but still. v2 upstream is old legacy and should be treated a=
-s
-> such, at least IMHO.
->=20
-> Max
->=20
->=20
+> SeaBIOS defaults to enabling A20 and it's a rare beast that disables
+> it.  One could change x86.h:set_a20 and romlayout.S:transition32 to
+> only issue the outb() if the inb() indicates a change is needed.  That
+> would likely eliminate half the accesses.
 
-I agree that V2 changes should be limited in nature, but there are
-less-fiddly ways to have thin 0.10 images on sparse filesystems. This
-way feels a little too clever and mostly likely too intrusive for an old
-format.
+The 350 port 92 access is for write operation only.
+If include the inb(), it would be 700, and every time it actually has a cha=
+nge
+To be precise, It is about 175 switches from 32 bit to 16 bit, then back to=
+ 32 bit.
+call16 is called 175 times during Seabios boot without any option rom,
+It would be more if some option roms are included.
 
-I'd also think that it'd probably confuse older copies of qemu-img
-check, so maybe this is too hacky of a solution.
+
+I think A20 is disabled by default in SeaBios.
+Call16Data.a20 is initialized to 0,
+call16_override may set Call16Data.a20 to 1,
+call16 called before call16_override would disable and enable A20.
+
+BTW, A20 is enabled in QEMU by default.
+
+
+
+>=20
+> I'd be surprised if it would impact the overall boot time though.
+> SeaBIOS only touches the port on a cpu mode switch and I would have
+> thought that was heavier than an IO port access.  Maybe that is skewed
+> on KVM though.
+
+Maybe not, but if we have more these kind  of optimizations , we may see th=
+e impact.
+A20 is already configurable in SeaBios,  CONFIG_DISABLE_A20.
+Then the change is very small. No PORT_A20 access after the change.
+
+
+-Anthony
+
+
+diff --git a/src/x86.h b/src/x86.h
+index a770e6f..8efb94a 100644
+--- a/src/x86.h
++++ b/src/x86.h
+@@ -21,6 +21,7 @@
+ #ifndef __ASSEMBLY__
+
+ #include "types.h" // u32
++#include "../out/autoconf.h"
+
+ static inline void irq_disable(void)
+ {
+@@ -254,13 +255,19 @@ static inline void lgdt(struct descloc_s *desc) {
+ }
+
+ static inline u8 get_a20(void) {
+-    return (inb(PORT_A20) & A20_ENABLE_BIT) !=3D 0;
++    if (CONFIG_DISABLE_A20) {
++        return (inb(PORT_A20) & A20_ENABLE_BIT) !=3D 0;
++    }
++    return 1;
+ }
+
+ static inline u8 set_a20(u8 cond) {
+-    u8 val =3D inb(PORT_A20);
+-    outb((val & ~A20_ENABLE_BIT) | (cond ? A20_ENABLE_BIT : 0), PORT_A20);
+-    return (val & A20_ENABLE_BIT) !=3D 0;
++    if (CONFIG_DISABLE_A20) {
++        u8 val =3D inb(PORT_A20);
++        outb((val & ~A20_ENABLE_BIT) | (cond ? A20_ENABLE_BIT : 0), PORT_A=
+20);
++        return (val & A20_ENABLE_BIT) !=3D 0;
++    }
++    return 1;
+ }
