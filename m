@@ -1,25 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60331)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36347)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pradeep.jagadeesh@huawei.com>) id 1d95YO-0002hU-Gi
-	for qemu-devel@nongnu.org; Fri, 12 May 2017 04:04:41 -0400
+	(envelope-from <guangrong.xiao@gmail.com>) id 1d95e1-0004oz-H7
+	for qemu-devel@nongnu.org; Fri, 12 May 2017 04:09:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pradeep.jagadeesh@huawei.com>) id 1d95Xq-0002PC-Ld
-	for qemu-devel@nongnu.org; Fri, 12 May 2017 04:04:00 -0400
-Received: from lhrrgout.huawei.com ([194.213.3.17]:13276)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <pradeep.jagadeesh@huawei.com>) id 1d95Xp-0002GC-NU
-	for qemu-devel@nongnu.org; Fri, 12 May 2017 04:03:26 -0400
-From: Pradeep Jagadeesh <pradeep.jagadeesh@huawei.com>
-References: <1494405683-20877-1-git-send-email-pradeep.jagadeesh@huawei.com>
-	<1494405683-20877-4-git-send-email-pradeep.jagadeesh@huawei.com>
-	<20170511095022.2478c784@bahia.lan>
-Message-ID: <d2ad9283-a7d5-50d4-4deb-4f604d2d16e5@huawei.com>
-Date: Fri, 12 May 2017 10:03:02 +0200
+	(envelope-from <guangrong.xiao@gmail.com>) id 1d95dy-00075f-9o
+	for qemu-devel@nongnu.org; Fri, 12 May 2017 04:09:49 -0400
+Received: from mail-pg0-x242.google.com ([2607:f8b0:400e:c05::242]:34002)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <guangrong.xiao@gmail.com>)
+	id 1d95dy-00075S-1f
+	for qemu-devel@nongnu.org; Fri, 12 May 2017 04:09:46 -0400
+Received: by mail-pg0-x242.google.com with SMTP id u187so6717582pgb.1
+	for <qemu-devel@nongnu.org>; Fri, 12 May 2017 01:09:44 -0700 (PDT)
+References: <830bfc39-56c7-a901-9ebb-77d6e7a5614c@huawei.com>
+	<874lxeovrg.fsf@secure.mitica>
+	<7cd332ec-48d4-1feb-12e2-97b50b04e028@huawei.com>
+	<20170424164244.GJ2362@work-vm>
+	<B2D15215269B544CADD246097EACE747395AD759@dggeml511-mbx.china.huawei.com>
+	<85e3a0dd-20c8-8ff2-37ce-bfdf543e7787@redhat.com>
+From: Xiao Guangrong <guangrong.xiao@gmail.com>
+Message-ID: <a35ce92b-d10b-646b-34d0-d7f075fc46d4@gmail.com>
+Date: Fri, 12 May 2017 16:09:45 +0800
 MIME-Version: 1.0
-In-Reply-To: <20170511095022.2478c784@bahia.lan>
-Content-Type: text/plain; charset="windows-1252"; format=flowed
+In-Reply-To: <85e3a0dd-20c8-8ff2-37ce-bfdf543e7787@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v4 3/4] qmp: refactor duplicate code
+Subject: Re: [Qemu-devel] About QEMU BQL and dirty log switch in Migration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,225 +35,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>, Pradeep Jagadeesh <pradeepkiruvale@gmail.com>
-Cc: eric blake <eblake@redhat.com>, alberto garcia <berto@igalia.com>, jani
-	kokkonen <jani.kokkonen@huawei.com>, qemu-devel@nongnu.org
+To: Paolo Bonzini <pbonzini@redhat.com>, "Zhoujian (jay)" <jianjay.zhou@huawei.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, yanghongyang <yanghongyang@huawei.com>
+Cc: Wanpeng Li <kernellwp@gmail.com>, Zhanghailiang <zhang.zhanghailiang@huawei.com>, "quintela@redhat.com" <quintela@redhat.com>, "wangxin (U)" <wangxinxin.wang@huawei.com>, Xiao Guangrong <xiaoguangrong@tencent.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "Gonglei (Arei)" <arei.gonglei@huawei.com>, Huangzhichao <huangzhichao@huawei.com>, "Herongguang (Stephen)" <herongguang.he@huawei.com>
 
-On 5/11/2017 9:50 AM, Greg Kurz wrote:
-> On Wed, 10 May 2017 04:41:22 -0400
-> Pradeep Jagadeesh <pradeepkiruvale@gmail.com> wrote:
->
->> This patch factor out the duplicate qmp throttle interface code
->> that was present in both block and fsdev device files.
->>
->
-> There isn't any duplicated code at this stage since you have changed the
-> patch ordering.
->
-> Also, this patch is factoring out several things:
-> - factoring code out of qmp_block_set_io_throttle()
-> - factoring code out of hmp_block_set_io_throttle()
-> So I'm not sure the patch title is quite right either.
->
-> This seems to be the same in patch 4: it only mentions QMP even though
-> it adds QMP and HMP interfaces. Maybe you should change this part of
-> the series.
->
-> A patch to introduce the full QMP interface, including the associated
-> code refactoring (whose need would then be obvious). And a similar patch
-> for the HMP interface.
-But without hmp functionalities the qmp does not work. So, I just kept 
-both together.
->
->> Signed-off-by: Pradeep Jagadeesh <pradeep.jagadeesh@huawei.com>
->> ---
->>  blockdev.c                      | 53 +++-------------------------------------
->>  hmp.c                           | 21 +++++++++++-----
->>  include/qemu/throttle-options.h |  2 ++
->>  util/throttle-options.c         | 54 +++++++++++++++++++++++++++++++++++++++++
->>  4 files changed, 74 insertions(+), 56 deletions(-)
->>
->> diff --git a/blockdev.c b/blockdev.c
->> index a0eb2ed..a55f6be 100644
->> --- a/blockdev.c
->> +++ b/blockdev.c
->> @@ -2593,6 +2593,7 @@ void qmp_block_set_io_throttle(BlockIOThrottle *arg, Error **errp)
->>      BlockDriverState *bs;
->>      BlockBackend *blk;
->>      AioContext *aio_context;
->> +    IOThrottle *iothrottle;
->>
->>      blk = qmp_get_blk(arg->has_device ? arg->device : NULL,
->>                        arg->has_id ? arg->id : NULL,
->> @@ -2610,56 +2611,8 @@ void qmp_block_set_io_throttle(BlockIOThrottle *arg, Error **errp)
->>          goto out;
->>      }
->>
->> -    throttle_config_init(&cfg);
->> -    cfg.buckets[THROTTLE_BPS_TOTAL].avg = arg->bps;
->> -    cfg.buckets[THROTTLE_BPS_READ].avg  = arg->bps_rd;
->> -    cfg.buckets[THROTTLE_BPS_WRITE].avg = arg->bps_wr;
->> -
->> -    cfg.buckets[THROTTLE_OPS_TOTAL].avg = arg->iops;
->> -    cfg.buckets[THROTTLE_OPS_READ].avg  = arg->iops_rd;
->> -    cfg.buckets[THROTTLE_OPS_WRITE].avg = arg->iops_wr;
->> -
->> -    if (arg->has_bps_max) {
->> -        cfg.buckets[THROTTLE_BPS_TOTAL].max = arg->bps_max;
->> -    }
->> -    if (arg->has_bps_rd_max) {
->> -        cfg.buckets[THROTTLE_BPS_READ].max = arg->bps_rd_max;
->> -    }
->> -    if (arg->has_bps_wr_max) {
->> -        cfg.buckets[THROTTLE_BPS_WRITE].max = arg->bps_wr_max;
->> -    }
->> -    if (arg->has_iops_max) {
->> -        cfg.buckets[THROTTLE_OPS_TOTAL].max = arg->iops_max;
->> -    }
->> -    if (arg->has_iops_rd_max) {
->> -        cfg.buckets[THROTTLE_OPS_READ].max = arg->iops_rd_max;
->> -    }
->> -    if (arg->has_iops_wr_max) {
->> -        cfg.buckets[THROTTLE_OPS_WRITE].max = arg->iops_wr_max;
->> -    }
->> -
->> -    if (arg->has_bps_max_length) {
->> -        cfg.buckets[THROTTLE_BPS_TOTAL].burst_length = arg->bps_max_length;
->> -    }
->> -    if (arg->has_bps_rd_max_length) {
->> -        cfg.buckets[THROTTLE_BPS_READ].burst_length = arg->bps_rd_max_length;
->> -    }
->> -    if (arg->has_bps_wr_max_length) {
->> -        cfg.buckets[THROTTLE_BPS_WRITE].burst_length = arg->bps_wr_max_length;
->> -    }
->> -    if (arg->has_iops_max_length) {
->> -        cfg.buckets[THROTTLE_OPS_TOTAL].burst_length = arg->iops_max_length;
->> -    }
->> -    if (arg->has_iops_rd_max_length) {
->> -        cfg.buckets[THROTTLE_OPS_READ].burst_length = arg->iops_rd_max_length;
->> -    }
->> -    if (arg->has_iops_wr_max_length) {
->> -        cfg.buckets[THROTTLE_OPS_WRITE].burst_length = arg->iops_wr_max_length;
->> -    }
->> -
->> -    if (arg->has_iops_size) {
->> -        cfg.op_size = arg->iops_size;
->> -    }
->> +    iothrottle = qapi_BlockIOThrottle_base(arg);
->> +    qmp_set_io_throttle(&cfg, iothrottle);
->>
->>      if (!throttle_is_valid(&cfg, errp)) {
->>          goto out;
->> diff --git a/hmp.c b/hmp.c
->> index ab407d6..9660373 100644
->> --- a/hmp.c
->> +++ b/hmp.c
->> @@ -1552,20 +1552,29 @@ void hmp_change(Monitor *mon, const QDict *qdict)
->>      hmp_handle_error(mon, &err);
->>  }
->>
->> +static void hmp_initialize_io_throttle(IOThrottle *iot, const QDict *qdict)
->> +{
->> +    iot->has_id = true;
->> +    iot->id = (char *) qdict_get_str(qdict, "id");
->> +    iot->bps = qdict_get_int(qdict, "bps");
->> +    iot->bps_rd = qdict_get_int(qdict, "bps_rd");
->> +    iot->bps_wr = qdict_get_int(qdict, "bps_wr");
->> +    iot->iops = qdict_get_int(qdict, "iops");
->> +    iot->iops_rd = qdict_get_int(qdict, "iops_rd");
->> +    iot->iops_wr = qdict_get_int(qdict, "iops_wr");
->> +}
->> +
->>  void hmp_block_set_io_throttle(Monitor *mon, const QDict *qdict)
->>  {
->>      Error *err = NULL;
->> +    IOThrottle *iothrottle;
->>      BlockIOThrottle throttle = {
->>          .has_device = true,
->>          .device = (char *) qdict_get_str(qdict, "device"),
->> -        .bps = qdict_get_int(qdict, "bps"),
->> -        .bps_rd = qdict_get_int(qdict, "bps_rd"),
->> -        .bps_wr = qdict_get_int(qdict, "bps_wr"),
->> -        .iops = qdict_get_int(qdict, "iops"),
->> -        .iops_rd = qdict_get_int(qdict, "iops_rd"),
->> -        .iops_wr = qdict_get_int(qdict, "iops_wr"),
->>      };
->>
->> +    iothrottle = qapi_BlockIOThrottle_base(&throttle);
->> +    hmp_initialize_io_throttle(iothrottle, qdict);
->>      qmp_block_set_io_throttle(&throttle, &err);
->>      hmp_handle_error(mon, &err);
->>  }
->> diff --git a/include/qemu/throttle-options.h b/include/qemu/throttle-options.h
->> index 9b68eb8..ccf10cc 100644
->> --- a/include/qemu/throttle-options.h
->> +++ b/include/qemu/throttle-options.h
->> @@ -94,4 +94,6 @@
->>
->>  void parse_io_throttle_options(ThrottleConfig *, QemuOpts *);
->>
->> +void qmp_set_io_throttle(ThrottleConfig *, IOThrottle *);
->> +
->>  #endif
->> diff --git a/util/throttle-options.c b/util/throttle-options.c
->> index 02b26b8..ded57bc 100644
->> --- a/util/throttle-options.c
->> +++ b/util/throttle-options.c
->> @@ -49,3 +49,57 @@ void parse_io_throttle_options(ThrottleConfig *throttle_cfg, QemuOpts *opts)
->>          qemu_opt_get_number(opts, "throttling.iops-size", 0);
->>
->>  }
->> +
->> +void qmp_set_io_throttle(ThrottleConfig *cfg, IOThrottle *arg)
->> +{
->> +    throttle_config_init(cfg);
->> +    cfg->buckets[THROTTLE_BPS_TOTAL].avg = arg->bps;
->> +    cfg->buckets[THROTTLE_BPS_READ].avg  = arg->bps_rd;
->> +    cfg->buckets[THROTTLE_BPS_WRITE].avg = arg->bps_wr;
->> +
->> +    cfg->buckets[THROTTLE_OPS_TOTAL].avg = arg->iops;
->> +    cfg->buckets[THROTTLE_OPS_READ].avg  = arg->iops_rd;
->> +    cfg->buckets[THROTTLE_OPS_WRITE].avg = arg->iops_wr;
->> +
->> +    if (arg->has_bps_max) {
->> +        cfg->buckets[THROTTLE_BPS_TOTAL].max = arg->bps_max;
->> +    }
->> +    if (arg->has_bps_rd_max) {
->> +        cfg->buckets[THROTTLE_BPS_READ].max = arg->bps_rd_max;
->> +    }
->> +    if (arg->has_bps_wr_max) {
->> +        cfg->buckets[THROTTLE_BPS_WRITE].max = arg->bps_wr_max;
->> +    }
->> +    if (arg->has_iops_max) {
->> +        cfg->buckets[THROTTLE_OPS_TOTAL].max = arg->iops_max;
->> +    }
->> +    if (arg->has_iops_rd_max) {
->> +        cfg->buckets[THROTTLE_OPS_READ].max = arg->iops_rd_max;
->> +    }
->> +    if (arg->has_iops_wr_max) {
->> +        cfg->buckets[THROTTLE_OPS_WRITE].max = arg->iops_wr_max;
->> +    }
->> +
->> +    if (arg->has_bps_max_length) {
->> +        cfg->buckets[THROTTLE_BPS_TOTAL].burst_length = arg->bps_max_length;
->> +    }
->> +    if (arg->has_bps_rd_max_length) {
->> +        cfg->buckets[THROTTLE_BPS_READ].burst_length = arg->bps_rd_max_length;
->> +    }
->> +    if (arg->has_bps_wr_max_length) {
->> +        cfg->buckets[THROTTLE_BPS_WRITE].burst_length = arg->bps_wr_max_length;
->> +    }
->> +    if (arg->has_iops_max_length) {
->> +        cfg->buckets[THROTTLE_OPS_TOTAL].burst_length = arg->iops_max_length;
->> +    }
->> +    if (arg->has_iops_rd_max_length) {
->> +        cfg->buckets[THROTTLE_OPS_READ].burst_length = arg->iops_rd_max_length;
->> +    }
->> +    if (arg->has_iops_wr_max_length) {
->> +        cfg->buckets[THROTTLE_OPS_WRITE].burst_length = arg->iops_wr_max_length;
->> +    }
->> +
->> +    if (arg->has_iops_size) {
->> +        cfg->op_size = arg->iops_size;
->> +    }
->> +}
+
+
+On 05/11/2017 08:24 PM, Paolo Bonzini wrote:
+> 
+> 
+> On 11/05/2017 14:07, Zhoujian (jay) wrote:
+>> -        * Scan sptes if dirty logging has been stopped, dropping those
+>> -        * which can be collapsed into a single large-page spte.  Later
+>> -        * page faults will create the large-page sptes.
+>> +        * Reset each vcpu's mmu, then page faults will create the large-page
+>> +        * sptes later.
+>>           */
+>>          if ((change != KVM_MR_DELETE) &&
+>>                  (old->flags & KVM_MEM_LOG_DIRTY_PAGES) &&
+>> -               !(new->flags & KVM_MEM_LOG_DIRTY_PAGES))
+>> -               kvm_mmu_zap_collapsible_sptes(kvm, new);
+>> +               !(new->flags & KVM_MEM_LOG_DIRTY_PAGES)) {
+>> +               kvm_for_each_vcpu(i, vcpu, kvm)
+>> +                       kvm_mmu_reset_context(vcpu);
+> 
+> This should be "kvm_make_all_cpus_request(kvm, KVM_REQ_MMU_RELOAD);" but
+> I am not sure it is enough.  I think that if you do not zap the SPTEs,
+> the page faults will use 4K SPTEs, not large ones (though I'd have to
+> check better; CCing Xiao and Wanpeng).
+
+Yes, Paolo is right. kvm_mmu_reset_context() just reloads vCPU's
+root page table, 4k mappings are still kept.
+
+There are two issues reported:
+- one is kvm_mmu_slot_apply_flags(), when enable dirty log tracking.
+
+   Its root cause is kvm_mmu_slot_remove_write_access() takes too much
+   time.
+
+   We can make the code adaptive to use the new fast-write-protect faculty
+   introduced by my patchset, i.e, if the number of pages contained in this
+   memslot is more than > TOTAL * FAST_WRITE_PROTECT_PAGE_PERCENTAGE, then
+   we use fast-write-protect instead.
+
+- another one is kvm_mmu_zap_collapsible_sptes() when disable dirty
+   log tracking.
+
+   collapsible_sptes zaps 4k mappings to make memory-read happy, it is not
+   required by the semanteme of KVM_SET_USER_MEMORY_REGION and it is not
+   urgent for vCPU's running, it could be done in a separate thread and use
+   lock-break technology.
+
+Thanks!
