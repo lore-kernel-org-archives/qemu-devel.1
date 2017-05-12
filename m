@@ -1,21 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39607)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39630)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <hare@suse.de>) id 1d97hB-00051l-1k
+	(envelope-from <lprosek@redhat.com>) id 1d97hB-000527-R8
 	for qemu-devel@nongnu.org; Fri, 12 May 2017 06:21:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <hare@suse.de>) id 1d97h7-00064O-U3
+	(envelope-from <lprosek@redhat.com>) id 1d97h8-00065a-Pf
 	for qemu-devel@nongnu.org; Fri, 12 May 2017 06:21:13 -0400
-Received: from mx2.suse.de ([195.135.220.15]:39439 helo=mx1.suse.de)
+Received: from mx1.redhat.com ([209.132.183.28]:41678)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <hare@suse.de>) id 1d97h7-0005z3-NS
-	for qemu-devel@nongnu.org; Fri, 12 May 2017 06:21:09 -0400
-From: Hannes Reinecke <hare@suse.de>
-Date: Fri, 12 May 2017 12:20:57 +0200
-Message-Id: <20170512102057.5855-5-hare@suse.de>
-In-Reply-To: <20170512102057.5855-1-hare@suse.de>
-References: <20170512102057.5855-1-hare@suse.de>
-Subject: [Qemu-devel] [PATCH 4/4] virtio: implement VIRTIO_SCSI_F_TIMEOUT
- feature
+	(Exim 4.71) (envelope-from <lprosek@redhat.com>) id 1d97h8-000641-JO
+	for qemu-devel@nongnu.org; Fri, 12 May 2017 06:21:10 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 5B71F448D82
+	for <qemu-devel@nongnu.org>; Fri, 12 May 2017 10:21:09 +0000 (UTC)
+From: Ladi Prosek <lprosek@redhat.com>
+Date: Fri, 12 May 2017 12:21:00 +0200
+Message-Id: <20170512102100.22675-1-lprosek@redhat.com>
+Subject: [Qemu-devel] [PATCH] xhci: relax link check
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,64 +27,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Alexander Graf <agraf@suse.com>, qemu-devel@nongnu.org, Hannes Reinecke <hare@suse.de>, Hannes Reinecke <hare@suse.com>
+To: qemu-devel@nongnu.org
+Cc: kraxel@redhat.com
 
-Implement a handler for the VIRTIO_SCSI_F_TIMEOUT feature, which
-allows to pass in the assigned command timeout in seconds or
-minutes. This allows to specify a timeout up to 3 hours.
+The strict td link limit added by commit "05f43d4 xhci: limit the
+number of link trbs we are willing to process" causes problems with
+Windows guests. Let's raise the limit.
 
-Signed-off-by: Hannes Reinecke <hare@suse.com>
+This change is analogous to:
+
+  commit ab6b1105a2259c7072905887f71caa850ce63190
+  Author: Gerd Hoffmann <kraxel@redhat.com>
+  Date:   Tue Mar 7 09:40:18 2017 +0100
+
+      ohci: relax link check
+
+Signed-off-by: Ladi Prosek <lprosek@redhat.com>
 ---
- hw/scsi/virtio-scsi.c                        | 16 ++++++++++++++++
- include/standard-headers/linux/virtio_scsi.h |  1 +
- 2 files changed, 17 insertions(+)
+ hw/usb/hcd-xhci.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/hw/scsi/virtio-scsi.c b/hw/scsi/virtio-scsi.c
-index 46a3e3f280..f1c2f7cb5b 100644
---- a/hw/scsi/virtio-scsi.c
-+++ b/hw/scsi/virtio-scsi.c
-@@ -534,6 +534,7 @@ static void virtio_scsi_fail_cmd_req(VirtIOSCSIReq *req)
- static int virtio_scsi_handle_cmd_req_prepare(VirtIOSCSI *s, VirtIOSCSIReq *req)
- {
-     VirtIOSCSICommon *vs = &s->parent_obj;
-+    VirtIODevice *vdev = VIRTIO_DEVICE(s);
-     SCSIDevice *d;
-     int rc;
+diff --git a/hw/usb/hcd-xhci.c b/hw/usb/hcd-xhci.c
+index d3d47bf..77d8e11 100644
+--- a/hw/usb/hcd-xhci.c
++++ b/hw/usb/hcd-xhci.c
+@@ -50,7 +50,7 @@
+ /* Very pessimistic, let's hope it's enough for all cases */
+ #define EV_QUEUE (((3 * 24) + 16) * MAXSLOTS)
  
-@@ -560,6 +561,21 @@ static int virtio_scsi_handle_cmd_req_prepare(VirtIOSCSI *s, VirtIOSCSIReq *req)
-                              virtio_scsi_get_lun(req->req.cmd.lun),
-                              req->req.cmd.cdb, req);
+-#define TRB_LINK_LIMIT  4
++#define TRB_LINK_LIMIT  32
+ #define COMMAND_LIMIT   256
+ #define TRANSFER_LIMIT  256
  
-+    if (virtio_vdev_has_feature(vdev, VIRTIO_SCSI_F_TIMEOUT)) {
-+        int timeout = (int)req->req.cmd.crn;
-+
-+        if (timeout < 60) {
-+            /* Timeouts below 60 are in seconds */
-+            req->sreq->timeout = timeout * 1000;
-+        } else if (timeout == 255) {
-+            /* 255 is infinite timeout */
-+            req->sreq->timeout = UINT_MAX;
-+        } else {
-+            /* Otherwise the timeout is in minutes */
-+            req->sreq->timeout = timeout * 1000 * 60;
-+        }
-+    }
-+
-     if (req->sreq->cmd.mode != SCSI_XFER_NONE
-         && (req->sreq->cmd.mode != req->mode ||
-             req->sreq->cmd.xfer > req->qsgl.size)) {
-diff --git a/include/standard-headers/linux/virtio_scsi.h b/include/standard-headers/linux/virtio_scsi.h
-index ab66166b6a..b00e2b95ab 100644
---- a/include/standard-headers/linux/virtio_scsi.h
-+++ b/include/standard-headers/linux/virtio_scsi.h
-@@ -120,6 +120,7 @@ struct virtio_scsi_config {
- #define VIRTIO_SCSI_F_HOTPLUG                  1
- #define VIRTIO_SCSI_F_CHANGE                   2
- #define VIRTIO_SCSI_F_T10_PI                   3
-+#define VIRTIO_SCSI_F_TIMEOUT                  4
- 
- /* Response codes */
- #define VIRTIO_SCSI_S_OK                       0
 -- 
-2.12.0
+2.9.3
