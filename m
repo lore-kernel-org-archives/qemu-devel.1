@@ -1,27 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41151)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43469)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <maxime.coquelin@redhat.com>) id 1d9BSU-0008V2-HF
-	for qemu-devel@nongnu.org; Fri, 12 May 2017 10:22:20 -0400
+	(envelope-from <alarson@ddci.com>) id 1d9BeT-00037h-M3
+	for qemu-devel@nongnu.org; Fri, 12 May 2017 10:34:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <maxime.coquelin@redhat.com>) id 1d9BSP-0004gj-KR
-	for qemu-devel@nongnu.org; Fri, 12 May 2017 10:22:18 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:36668)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <maxime.coquelin@redhat.com>)
-	id 1d9BSP-0004g3-BP
-	for qemu-devel@nongnu.org; Fri, 12 May 2017 10:22:13 -0400
-References: <20170511123246.31308-1-maxime.coquelin@redhat.com>
-	<20170511123246.31308-7-maxime.coquelin@redhat.com>
-	<20170511203345-mutt-send-email-mst@kernel.org>
-From: Maxime Coquelin <maxime.coquelin@redhat.com>
-Message-ID: <62516ce5-9d4c-d021-c4ab-a767c7f07b31@redhat.com>
-Date: Fri, 12 May 2017 16:21:58 +0200
+	(envelope-from <alarson@ddci.com>) id 1d9BeP-0003Tg-Ri
+	for qemu-devel@nongnu.org; Fri, 12 May 2017 10:34:41 -0400
+In-Reply-To: <20170512065204.GJ12908@umbus.fritz.box>
+References: <201705030257.v432vMO2008047@linux03a.ddci.com>
+	<20170512065204.GJ12908@umbus.fritz.box>
 MIME-Version: 1.0
-In-Reply-To: <20170511203345-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 6/6] spec/vhost-user spec: Add IOMMU support
+From: alarson@ddci.com
+Message-ID: <OFFF668533.5CB81117-ON8625811E.004C96EA-8625811E.0050117D@ddci.com>
+Date: Fri, 12 May 2017 09:34:33 -0500
+Content-Type: text/plain; charset="US-ASCII"
+Subject: Re: [Qemu-devel] [PATCH v2] target-ppc: Enable open-pic timers to
+ count and generate interrupts
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,179 +23,111 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: peterx@redhat.com, marcandre.lureau@gmail.com, vkaplans@redhat.com, jasowang@redhat.com, wexu@redhat.com, yuanhan.liu@linux.intel.com, qemu-devel@nongnu.org, jfreiman@redhat.com
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: agraf@suse.de, qemu-devel@nongnu.org, qemu-ppc@nongnu.org
 
+David Gibson <david@gibson.dropbear.id.au> wrote on 05/12/2017 01:52:04 
+AM:
 
-
-On 05/11/2017 08:25 PM, Michael S. Tsirkin wrote:
-> On Thu, May 11, 2017 at 02:32:46PM +0200, Maxime Coquelin wrote:
->> This patch specifies and implements the master/slave communication
->> to support device IOTLB in slave.
->>
->> The vhost_iotlb_msg structure introduced for kernel backends is
->> re-used, making the design close between the two backends.
->>
->> An exception is the use of the secondary channel to enable the
->> slave to send IOTLB miss requests to the master.
->>
->> Signed-off-by: Maxime Coquelin <maxime.coquelin@redhat.com>
->> ---
->>   docs/specs/vhost-user.txt | 75 +++++++++++++++++++++++++++++++++++++++++++++++
->>   hw/virtio/vhost-user.c    | 31 ++++++++++++++++++++
->>   2 files changed, 106 insertions(+)
->>
->> diff --git a/docs/specs/vhost-user.txt b/docs/specs/vhost-user.txt
->> index 5fa7016..4a1f0c3 100644
->> --- a/docs/specs/vhost-user.txt
->> +++ b/docs/specs/vhost-user.txt
->> @@ -97,6 +97,23 @@ Depending on the request type, payload can be:
->>      log offset: offset from start of supplied file descriptor
->>          where logging starts (i.e. where guest address 0 would be logged)
->>   
->> + * An IOTLB message
->> +   ---------------------------------------------------------
->> +   | iova | size | user address | permissions flags | type |
->> +   ---------------------------------------------------------
->> +
->> +   IOVA: a 64-bit guest I/O virtual address
+> From: David Gibson <david@gibson.dropbear.id.au>
+> To: Aaron Larson <alarson@ddci.com>
+> Cc: agraf@suse.de, qemu-devel@nongnu.org, qemu-ppc@nongnu.org
+> Date: 05/12/2017 01:52 AM
+> Subject: Re: [PATCH v2] target-ppc: Enable open-pic timers to count and 
+generate interrupts
 > 
-> guest -> VM
-
-Ok.
-
+> On Tue, May 02, 2017 at 07:57:22PM -0700, Aaron Larson wrote:
+> > 
+> > Previous QEMU open-pic implemented the 4 open-pic timers including all
+> > timer registers, but the timers did not "count" or generate any
+> > interrupts.  The patch makes the timers both count and generate
+> > interrupts.  The timer clock frequency is fixed at 100MHZ.
+> > 
+> > Signed-off-by: Aaron Larson <alarson@ddci.com>
 > 
->> +   Size: a 64-bit size
+> Looks sound in concept AFAICT not knowing the openpic hardware.
+
+Thanks again for your review.  I will provide an updated patch to
+address all of the comments, but I need a bit more guidance on some.
+
+> > ---
+> >  hw/intc/openpic.c | 135 
+++++++++++++++++++++++++++++++++++++++++++++++--------
+> >  1 file changed, 117 insertions(+), 18 deletions(-)
+> > 
+
+> > +/* If enabled is true, arranges for an interrupt to be raised val 
+clocks into
+> > +   the future, if enabled is false cancels the timer. */
+> > +static void openpic_tmr_set_tmr(OpenPICTimer *tmr, uint32_t val, bool 
+enabled)
+> > +{
+> > +    /* If timer doesn't exist, create it. */
+> > +    if (tmr->qemu_timer == NULL) {
+> > +        tmr->qemu_timer = timer_new_ns(QEMU_CLOCK_VIRTUAL, 
+&qemu_timer_cb, tmr);
+> > +        DPRINTF("Created timer for n_IRQ %d\n", tmr->n_IRQ);
 > 
-> How do you specify "all memory"? give special meaning to size 0?
+> Is there a reason to lazily create the timer, rather than always
+> creating it at init time and just activating it when the timer is set?
 
-Good point, it does not support all memory currently.
-It is not vhost-user specific, but general to the vhost implementation.
+I'm not familiar with the QEMU timer code so guidance is appreciated,
+but a quick check indicates there wouldn't be much overhead to do as
+you suggest.  I will change to that approach.
 
->> +   User address: a 64-bit user address
->> +   Permissions flags: a 8-bit bit field:
->> +    - Bit 0: Read access
->> +    - Bit 1: Write access
+> > +    }
+> > +    uint64_t ns = ticks_to_ns(val & ~TCCR_TOG);
+> > +    /* A count of zero causes a timer to be set to expire 
+immediately.  This
+> > +       effectively stops the simulation so we don't honor that 
+configuration.
+> > +       On real hardware, this would generate an interrupt on every 
+clock cycle
+> > +       if the interrupt was unmasked. */
 > 
-> Can both bits be set? Can none?
+> Could you also jam up if the count is non-zero but a too-small value
+> to make forward progress?  ...
 
-Both. I will change it by listing values directly:
-  - 0 : No access
-  - 1 : Read
-  - 2 : Write
-  - 3 : Read Write
+The case I'm concerned about is where a transient value is programmed
+to the timer and the interrupt is masked.  In that case QEMU will fire
+the timer on (potentially) every other clock, which will slow the
+emulation down until a more sane value is programmed.  I could add
+code to inhibit the timer while the associated interrupt is masked,
+but that is messy, and this seems like an unlikely corner case.
 
->> +   Type: a 8-bit IOTLB message type:
->> +    - 1: IOTLB miss
->> +    - 2: IOTLB update
->> +    - 3: IOTLB invalidate
->> +    - 4: IOTLB access fail
->> +
->>   In QEMU the vhost-user message is implemented with the following struct:
->>   
->>   typedef struct VhostUserMsg {
->> @@ -109,6 +126,7 @@ typedef struct VhostUserMsg {
->>           struct vhost_vring_addr addr;
->>           VhostUserMemory memory;
->>           VhostUserLog log;
->> +        struct vhost_iotlb_msg iotlb;
->>       };
->>   } QEMU_PACKED VhostUserMsg;
->>   
->> @@ -253,6 +271,31 @@ Once the source has finished migration, rings will be stopped by
->>   the source. No further update must be done before rings are
->>   restarted.
->>   
->> +IOMMU support
->> +-------------
->> +
->> +When the VIRTIO_F_IOMMU_PLATFORM feature has been negotiated, the master has
->> +to send IOTLB entries update & invalidation by sending VHOST_USER_IOTLB_MSG
->> +requests to the slave with a struct vhost_iotlb_msg payload.
+Let me know how you'd like this handled.
+
+> >  static void openpic_tmr_write(void *opaque, hwaddr addr, uint64_t 
+val,
+> > -                                unsigned len)
+> > +                              unsigned len)
+> >  {
+> >      OpenPICState *opp = opaque;
+> >      int idx;
+> > 
+> > -    addr += 0x10f0;
+> > -
+> >      DPRINTF("%s: addr %#" HWADDR_PRIx " <= %08" PRIx64 "\n",
+> > -            __func__, addr, val);
+> > +            __func__, (addr + 0x10f0), val);
+> >      if (addr & 0xF) {
+> >          return;
+> >      }
+> > 
+> > -    if (addr == 0x10f0) {
+> > +    if (addr == 0) {
 > 
-> Always? This seems a bit strange since iommu can be enabled/disabled
-> dynamically.
-Ok, what about:
+> I don't really understand how this change fits in with the rest - it
+> appears to be changing existing unrelated behaviour.
 
-When the VIRTIO_F_IOMMU_PLATFORM feature has been negotiated and iommu
-is enbaled, the master sends IOTLB entries update & invalidation via
-VHOST_USER_IOTLB_MSG requests to the slave with a struct vhost_iotlb_msg
-payload.
-
-
-> Closing channel seems like a wrong thing to do for this.
-
-Sorry, I'm not sure to get your comment.
-
->> For update events,
->> +the iotlb payload has to be filled with the update message type (2), the I/O
->> +virtual address, the size, the user virtual address, and the permissions
->> +flags. For invalidation events, the iotlb payload has to be filled with the
->> +invalidation message type (3), the I/O virtual address and the size. On
->> +success, the slave is expected to reply with a zero payload, non-zero
->> +otherwise.
->> +
->> +When the VHOST_USER_PROTOCOL_F_SLAVE_REQ is supported by the slave, and the
->> +master initiated the slave to master communication channel using the
->> +VHOST_USER_SET_SLAVE_REQ_FD request, the slave can send IOTLB miss and access
->> +failure events by sending VHOST_USER_SLAVE_IOTLB_MSG requests to the master
->> +with a struct vhost_iotlb_msg payload. For miss events, the iotlb payload has
->> +to be filled with the miss message type (1), the I/O virtual address and the
->> +permissions flags. For access failure event, the iotlb payload has to be
->> +filled with the access failure message type (4), the I/O virtual address and
->> +the permissions flags. For synchronization purpose, the slave may rely on the
->> +reply-ack feature, so the master may send a reply when operation is completed
->> +if the reply-ack feature is negotiated and slaves requests a reply.
->> +
->>   Slave communication
->>   -------------------
->>   
->> @@ -514,6 +557,38 @@ Master message types
->>         If VHOST_USER_PROTOCOL_F_REPLY_ACK is negotiated, slave must respond
->>         with zero for success, non-zero otherwise.
->>   
->> + * VHOST_USER_IOTLB_MSG
->> +
->> +      Id: 22
->> +      Equivalent ioctl: N/A (equivalent to VHOST_IOTLB_MSG message type)
->> +      Master payload: struct vhost_iotlb_msg
->> +      Slave payload: u64
->> +
->> +      Send IOTLB messages with struct vhost_iotlb_msg as payload.
->> +      Master sends such requests to update and invalidate entries in the device
->> +      IOTLB. The slave has to acknowledge the request with sending zero as u64
->> +      payload for success, non-zero otherwise.
->> +      This request should be send only when VIRTIO_F_IOMMU_PLATFORM feature
->> +      has been successfully negotiated.
->> +
->> +Slave message types
->> +-------------------
->> +
->> + * VHOST_USER_SLAVE_IOTLB_MSG
->> +
->> +      Id: 1
->> +      Equivalent ioctl: N/A (equivalent to VHOST_IOTLB_MSG message type)
->> +      Slave payload: struct vhost_iotlb_msg
->> +      Master payload: N/A
->> +
->> +      Send IOTLB messages with struct vhost_iotlb_msg as payload.
->> +      Slave sends such requests to notify of an IOTLB miss, or an IOTLB
->> +      access failure. If VHOST_USER_PROTOCOL_F_REPLY_ACK is negotiated,
->> +      and slave set the VHOST_USER_NEED_REPLY flag, master must respond with
->> +      zero when operation is successfully completed, or non-zero otherwise.
->> +      This request should be send only when VIRTIO_F_IOMMU_PLATFORM feature
->> +      has been successfully negotiated.
->> +
-> 
-> Are there limitations on number of messages in flight?
-
-I didn't think about this, I would say the maximum number of messages in
-flight is dependent on the socket buffer size (which is kept to default
-in this series).
-
-You question highlights a bug in by DPDK prototype, as the MISS request
-can be sent by multiple threads, and I didn't protected this with a lock
-to prevent concurrent read on the socket when waiting for the REPLY_ACK.
-
-Thanks,
-Maxime
+I debated on changing this.  I needed to make changes to both the
+timer read and write code, and the existing code was inconsistent on
+the treatment of the offset.  The open-pic has a standard memory map
+and the timer block starts at 0x10f0 from the BAR.  Of course the
+region in QEMU for the timer is setup such that the timer is at offset
+zero in the QEMU timer memory region.  The write code added the offset
+to match the hardware, the read code did not, and consequently the
+code I added for timer read and write needed to be gratuitously
+different because of that.  I chose to update the write to match the
+read.  I can undo the change, if you'd like, but it does make the
+resulting code harder to understand (IMHO).
