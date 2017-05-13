@@ -1,23 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56751)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40529)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <viniciusfre@gmail.com>) id 1d9JPq-0005Wz-Fa
-	for qemu-devel@nongnu.org; Fri, 12 May 2017 18:52:07 -0400
+	(envelope-from <bobby.prani@gmail.com>) id 1d9ZR3-0000ZD-5X
+	for qemu-devel@nongnu.org; Sat, 13 May 2017 11:58:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <viniciusfre@gmail.com>) id 1d9JPp-0000qX-OQ
-	for qemu-devel@nongnu.org; Fri, 12 May 2017 18:52:06 -0400
-Received: from mail-ua0-x22a.google.com ([2607:f8b0:400c:c08::22a]:35472)
+	(envelope-from <bobby.prani@gmail.com>) id 1d9ZQy-0007c0-AL
+	for qemu-devel@nongnu.org; Sat, 13 May 2017 11:58:25 -0400
+Received: from mail-yw0-x241.google.com ([2607:f8b0:4002:c05::241]:34400)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <viniciusfre@gmail.com>)
-	id 1d9JPp-0000p6-KF
-	for qemu-devel@nongnu.org; Fri, 12 May 2017 18:52:05 -0400
-Received: by mail-ua0-x22a.google.com with SMTP id e55so54734141uaa.2
-	for <qemu-devel@nongnu.org>; Fri, 12 May 2017 15:52:03 -0700 (PDT)
-MIME-Version: 1.0
-From: Vinicius Maciel <viniciusfre@gmail.com>
-Date: Fri, 12 May 2017 19:52:02 -0300
-Message-ID: <CAEz5UgEp8wRBxeg4nAAd9GVeihcXQv__jfrjQtnVNT8eTNCLOw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: [Qemu-devel]  MIPS little endian - Bug when decoding physaddr
+	(Exim 4.71) (envelope-from <bobby.prani@gmail.com>)
+	id 1d9ZQy-0007aD-4Q
+	for qemu-devel@nongnu.org; Sat, 13 May 2017 11:58:20 -0400
+Received: by mail-yw0-x241.google.com with SMTP id 17so3275179ywk.1
+	for <qemu-devel@nongnu.org>; Sat, 13 May 2017 08:58:18 -0700 (PDT)
+From: Pranith Kumar <bobby.prani@gmail.com>
+Date: Sat, 13 May 2017 11:58:16 -0400
+Message-Id: <20170513155816.17294-1-bobby.prani@gmail.com>
+Subject: [Qemu-devel] [PATCH] tcg/i386: 'nop' instruction with 'lock' prefix
+ is illegal
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,29 +25,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, "open list:All patches CC here" <qemu-devel@nongnu.org>
 
-Hi all,
+The instruction "lock nopl (%rax)" should raise an exception. However,
+we don't do that since we do not check for lock prefix for nop
+instructions. The following patch adds this check and makes the
+behavior similar to hardware.
 
-I'm trying to emulate a MIPS 74Kc using a custom machine in order to run a
-CFE bootloader from broadcom. The CPU is Broadcom BCM5357. The problem
-happens when Qemu calculates physaddr inside io_readx(), cputlb.c:line 784
+Signed-off-by: Pranith Kumar <bobby.prani@gmail.com>
+---
+ target/i386/translate.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-physaddr = (physaddr & TARGET_PAGE_MASK) + addr;
-
-After run this line the the value is 0x18000000, which is clearly wrong.
-More informations:
-
-BUG function: io_readx
-Assembly instruction: lw t1,0(a2)
-Machine code: 0x8cc90000 (Little endian)
-Access address: 0xb8000000
-
-Assembly code:
-80702f30 <board_earlyinit>:
-80702f30: 3c06b800 lui a2,0xb800
-80702f34: 24075350 li a3,21328
-80702f38: 8cc90000 lw t1,0(a2) <----
-
-Thanks,
-Vinicius
+diff --git a/target/i386/translate.c b/target/i386/translate.c
+index 1d1372fb43..76f4ccd3b4 100644
+--- a/target/i386/translate.c
++++ b/target/i386/translate.c
+@@ -7881,6 +7881,9 @@ static target_ulong disas_insn(CPUX86State *env, DisasContext *s,
+         gen_nop_modrm(env, s, modrm);
+         break;
+     case 0x119: case 0x11c ... 0x11f: /* nop (multi byte) */
++        if (prefixes & PREFIX_LOCK) {
++            goto illegal_op;
++        }
+         modrm = cpu_ldub_code(env, s->pc++);
+         gen_nop_modrm(env, s, modrm);
+         break;
+-- 
+2.13.0
