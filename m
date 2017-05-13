@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56702)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57242)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1d9eDL-0005ir-F1
-	for qemu-devel@nongnu.org; Sat, 13 May 2017 17:04:36 -0400
+	id 1d9eHz-00074b-Je
+	for qemu-devel@nongnu.org; Sat, 13 May 2017 17:09:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1d9eDI-0001ku-9e
-	for qemu-devel@nongnu.org; Sat, 13 May 2017 17:04:35 -0400
-Received: from mail-qk0-x242.google.com ([2607:f8b0:400d:c09::242]:35890)
+	id 1d9eHw-0005H6-Cx
+	for qemu-devel@nongnu.org; Sat, 13 May 2017 17:09:23 -0400
+Received: from mail-qt0-x244.google.com ([2607:f8b0:400d:c0d::244]:33858)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1d9eDI-0001k9-5E
-	for qemu-devel@nongnu.org; Sat, 13 May 2017 17:04:32 -0400
-Received: by mail-qk0-x242.google.com with SMTP id y128so12273797qka.3
-	for <qemu-devel@nongnu.org>; Sat, 13 May 2017 14:04:32 -0700 (PDT)
+	id 1d9eHw-0005H0-8W
+	for qemu-devel@nongnu.org; Sat, 13 May 2017 17:09:20 -0400
+Received: by mail-qt0-x244.google.com with SMTP id l39so11001955qtb.1
+	for <qemu-devel@nongnu.org>; Sat, 13 May 2017 14:09:20 -0700 (PDT)
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
-References: <20170512083556.22539-1-maozy.fnst@cn.fujitsu.com>
+References: <20170513004616.25749-1-n54@gmx.com>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <e8387a72-2183-538f-970c-01335526183b@amsat.org>
-Date: Sat, 13 May 2017 18:04:27 -0300
+Message-ID: <056c1582-e264-ca47-520d-c14c4cface05@amsat.org>
+Date: Sat, 13 May 2017 18:09:16 -0300
 MIME-Version: 1.0
-In-Reply-To: <20170512083556.22539-1-maozy.fnst@cn.fujitsu.com>
+In-Reply-To: <20170513004616.25749-1-n54@gmx.com>
 Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] hw/net/rocker/rocker: Convert pci device
- .init() to .realize()
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH] ivshmem-server: Detect and use if there is
+ required -lrt linking
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,166 +34,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>, qemu-devel@nongnu.org
-Cc: jasowang@redhat.com, jiri@resnulli.us
+To: Kamil Rytarowski <n54@gmx.com>, qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org
 
-Hi Mao,
+On 05/12/2017 09:46 PM, Kamil Rytarowski wrote:
+> ivshmem-server makes use of the POSIX shared memory object interfaces.
+> This library is provided on NetBSD in -lrt (POSIX Real-time Library).
+> Add ./configure check if there is needed -lrt linking for shm_open()
+> and if so use it. Introduce new configure generated variable LIBS_SHMLIB.
+>
+> This fixes build issue on NetBSD.
+>
+> Signed-off-by: Kamil Rytarowski <n54@gmx.com>
 
-You can use shorter patch subject "net/rocker" instead of 
-"hw/net/rocker/rocker".
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
-On 05/12/2017 05:35 AM, Mao Zhongyi wrote:
-> Convert pci device .init() to .realize(). Also improve -device rocker
-> error reporting. Because when -device rocker fails, it first reports
-> a specific error, then a generic one, like this:
->
->     $ x86_64-softmmu/qemu-system-x86_64 -device rocker,name=qemu-rocker
->     rocker: name too long; please shorten to at most 9 chars
->     qemu-system-x86_64: -device rocker,name=qemu-rocker: Device initialization failed
->
-> Convert pci_rocker_init() to Error to get rid of the unwanted second
-> error message.
->
-> Cc: jiri@resnulli.us
-> Cc: jasowang@redhat.com
-> Signed-off-by: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
 > ---
->  hw/net/rocker/rocker.c | 31 +++++++++++++------------------
->  1 file changed, 13 insertions(+), 18 deletions(-)
+>  Makefile  |  1 +
+>  configure | 20 ++++++++++++++++++++
+>  2 files changed, 21 insertions(+)
 >
-> diff --git a/hw/net/rocker/rocker.c b/hw/net/rocker/rocker.c
-> index 6e70fdd..2cebc31 100644
-> --- a/hw/net/rocker/rocker.c
-> +++ b/hw/net/rocker/rocker.c
-> @@ -1252,20 +1252,18 @@ rollback:
->      return err;
->  }
+> diff --git a/Makefile b/Makefile
+> index 31d41a7eae..3248cb53d7 100644
+> --- a/Makefile
+> +++ b/Makefile
+> @@ -473,6 +473,7 @@ ivshmem-client$(EXESUF): $(ivshmem-client-obj-y) $(COMMON_LDADDS)
+>  	$(call LINK, $^)
+>  ivshmem-server$(EXESUF): $(ivshmem-server-obj-y) $(COMMON_LDADDS)
+>  	$(call LINK, $^)
+> +ivshmem-server$(EXESUF): LIBS += $(LIBS_SHMLIB)
 >
-> -static int rocker_msix_init(Rocker *r)
-> +static int rocker_msix_init(Rocker *r, Error **errp)
->  {
->      PCIDevice *dev = PCI_DEVICE(r);
->      int err;
-> -    Error *local_err = NULL;
+>  module_block.h: $(SRC_PATH)/scripts/modules/module_block.py config-host.mak
+>  	$(call quiet-command,$(PYTHON) $< $@ \
+> diff --git a/configure b/configure
+> index 7c020c076b..50c3aee746 100755
+> --- a/configure
+> +++ b/configure
+> @@ -179,6 +179,7 @@ audio_pt_int=""
+>  audio_win_int=""
+>  cc_i386=i386-pc-linux-gnu-gcc
+>  libs_qga=""
+> +libs_shmlib=""
+>  debug_info="yes"
+>  stack_protector=""
 >
->      err = msix_init(dev, ROCKER_MSIX_VEC_COUNT(r->fp_ports),
->                      &r->msix_bar,
->                      ROCKER_PCI_MSIX_BAR_IDX, ROCKER_PCI_MSIX_TABLE_OFFSET,
->                      &r->msix_bar,
->                      ROCKER_PCI_MSIX_BAR_IDX, ROCKER_PCI_MSIX_PBA_OFFSET,
-> -                    0, &local_err);
-> +                    0, errp);
->      if (err) {
-> -        error_report_err(local_err);
->          return err;
->      }
+> @@ -4133,6 +4134,24 @@ elif compile_prog "" "$pthread_lib -lrt" ; then
+>    libs_qga="$libs_qga -lrt"
+>  fi
 >
-> @@ -1301,7 +1299,7 @@ static World *rocker_world_type_by_name(Rocker *r, const char *name)
->      return NULL;
->  }
->
-> -static int pci_rocker_init(PCIDevice *dev)
-> +static void pci_rocker_realize(PCIDevice *dev, Error **errp)
->  {
->      Rocker *r = to_rocker(dev);
->      const MACAddr zero = { .a = { 0, 0, 0, 0, 0, 0 } };
-> @@ -1315,7 +1313,7 @@ static int pci_rocker_init(PCIDevice *dev)
->
->      for (i = 0; i < ROCKER_WORLD_TYPE_MAX; i++) {
->          if (!r->worlds[i]) {
-> -            err = -ENOMEM;
-> +            error_setg(errp, "allocate worlds failed");
->              goto err_world_alloc;
->          }
->      }
-> @@ -1326,10 +1324,9 @@ static int pci_rocker_init(PCIDevice *dev)
->
->      r->world_dflt = rocker_world_type_by_name(r, r->world_name);
->      if (!r->world_dflt) {
-> -        fprintf(stderr,
-> -                "rocker: requested world \"%s\" does not exist\n",
-> +        error_setg(errp,
-> +                "rocker: invalid argument, requested world %s does not exist",
->                  r->world_name);
-> -        err = -EINVAL;
->          goto err_world_type_by_name;
->      }
->
-> @@ -1349,7 +1346,7 @@ static int pci_rocker_init(PCIDevice *dev)
->
->      /* MSI-X init */
->
-> -    err = rocker_msix_init(r);
-> +    err = rocker_msix_init(r, errp);
->      if (err) {
->          goto err_msix_init;
->      }
-> @@ -1361,7 +1358,7 @@ static int pci_rocker_init(PCIDevice *dev)
->      }
->
->      if (rocker_find(r->name)) {
-> -        err = -EEXIST;
-> +        error_setg(errp, "rocker %s already exists", r->name);
-
-Use column to have consistent logging:
-
-         error_setg(errp, "rocker: %s already exists", r->name);
-
->          goto err_duplicate;
->      }
->
-> @@ -1375,10 +1372,10 @@ static int pci_rocker_init(PCIDevice *dev)
->  #define ROCKER_IFNAMSIZ 16
->  #define MAX_ROCKER_NAME_LEN  (ROCKER_IFNAMSIZ - 1 - 3 - 3)
->      if (strlen(r->name) > MAX_ROCKER_NAME_LEN) {
-> -        fprintf(stderr,
-> -                "rocker: name too long; please shorten to at most %d chars\n",
-> +        error_setg(errp,
-> +                "rocker: name too long; please shorten to at most %d chars",
->                  MAX_ROCKER_NAME_LEN);
-> -        return -EINVAL;
-> +        return;
-
-I think the correct cleanup is: "goto err_duplicate;"
-
-Or if you want to be more specific, add another goto label 
-"err_name_too_long" before the "err_duplicate" label.
-
->      }
->
->      if (memcmp(&r->fp_start_macaddr, &zero, sizeof(zero)) == 0) {
-> @@ -1410,7 +1407,6 @@ static int pci_rocker_init(PCIDevice *dev)
->       * .....
->       */
->
-> -    err = -ENOMEM;
->      for (i = 0; i < rocker_pci_ring_count(r); i++) {
->          DescRing *ring = desc_ring_alloc(r, i);
->
-> @@ -1447,7 +1443,7 @@ static int pci_rocker_init(PCIDevice *dev)
->
->      QLIST_INSERT_HEAD(&rockers, r, next);
->
-> -    return 0;
-> +    return;
->
->  err_port_alloc:
->      for (--i; i >= 0; i--) {
-> @@ -1473,7 +1469,6 @@ err_world_alloc:
->              world_free(r->worlds[i]);
->          }
->      }
-> -    return err;
->  }
->
->  static void pci_rocker_uninit(PCIDevice *dev)
-> @@ -1558,7 +1553,7 @@ static void rocker_class_init(ObjectClass *klass, void *data)
->      DeviceClass *dc = DEVICE_CLASS(klass);
->      PCIDeviceClass *k = PCI_DEVICE_CLASS(klass);
->
-> -    k->init = pci_rocker_init;
-> +    k->realize = pci_rocker_realize;
->      k->exit = pci_rocker_uninit;
->      k->vendor_id = PCI_VENDOR_ID_REDHAT;
->      k->device_id = PCI_DEVICE_ID_REDHAT_ROCKER;
+> +##########################################
+> +# Do we need librt for shm_open()
+> +cat > $TMPC <<EOF
+> +#include <sys/mman.h>
+> +#include <sys/stat.h>
+> +#include <fcntl.h>
+> +#include <stddef.h>
+> +int main(void) {
+> +  return shm_open(NULL, O_RDWR, 0644);
+> +}
+> +EOF
+> +
+> +if compile_prog "" "" ; then
+> +  :
+> +elif compile_prog "" "-lrt" ; then
+> +  libs_shmlib="$libs_shmlib -lrt"
+> +fi
+> +
+>  if test "$darwin" != "yes" -a "$mingw32" != "yes" -a "$solaris" != yes -a \
+>          "$aix" != "yes" -a "$haiku" != "yes" ; then
+>      libs_softmmu="-lutil $libs_softmmu"
+> @@ -5949,6 +5968,7 @@ echo "EXESUF=$EXESUF" >> $config_host_mak
+>  echo "DSOSUF=$DSOSUF" >> $config_host_mak
+>  echo "LDFLAGS_SHARED=$LDFLAGS_SHARED" >> $config_host_mak
+>  echo "LIBS_QGA+=$libs_qga" >> $config_host_mak
+> +echo "LIBS_SHMLIB+=$libs_shmlib" >> $config_host_mak
+>  echo "TASN1_LIBS=$tasn1_libs" >> $config_host_mak
+>  echo "TASN1_CFLAGS=$tasn1_cflags" >> $config_host_mak
+>  echo "POD2MAN=$POD2MAN" >> $config_host_mak
 >
