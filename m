@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44821)
-	by lists.gnu.org with esmtp (Exim 4.71) (envelope-from <n54@gmx.com>)
-	id 1d9LK9-0001zu-0K
-	for qemu-devel@nongnu.org; Fri, 12 May 2017 20:54:21 -0400
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48291)
+	by lists.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <lu.zhipeng@zte.com.cn>) id 1d9LTY-0004aB-9W
+	for qemu-devel@nongnu.org; Fri, 12 May 2017 21:04:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <n54@gmx.com>) id 1d9LK4-0006nx-6F
-	for qemu-devel@nongnu.org; Fri, 12 May 2017 20:54:21 -0400
-Received: from mout.gmx.net ([212.227.15.15]:64848)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <n54@gmx.com>) id 1d9LK3-0006n6-RQ
-	for qemu-devel@nongnu.org; Fri, 12 May 2017 20:54:16 -0400
-From: Kamil Rytarowski <n54@gmx.com>
-Date: Sat, 13 May 2017 02:46:16 +0200
-Message-Id: <20170513004616.25749-1-n54@gmx.com>
-Subject: [Qemu-devel] [PATCH] ivshmem-server: Detect and use if there is
- required -lrt linking
+	(envelope-from <lu.zhipeng@zte.com.cn>) id 1d9LTT-0008R8-GV
+	for qemu-devel@nongnu.org; Fri, 12 May 2017 21:04:04 -0400
+Received: from mx7.zte.com.cn ([202.103.147.169]:49905)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <lu.zhipeng@zte.com.cn>) id 1d9LTS-0008OB-Ls
+	for qemu-devel@nongnu.org; Fri, 12 May 2017 21:03:59 -0400
+From: ZhiPeng Lu <lu.zhipeng@zte.com.cn>
+Date: Sat, 13 May 2017 09:03:21 +0800
+Message-Id: <1494637401-15849-1-git-send-email-lu.zhipeng@zte.com.cn>
+Subject: [Qemu-devel] [PATCH RESEND v6] qga: Add support network interface
+ statistics in guest-network-get-interfaces command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,78 +22,185 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, Kamil Rytarowski <n54@gmx.com>
+To: mdroth@linux.vnet.ibm.com
+Cc: qemu-devel@nongnu.org, ZhiPeng Lu <lu.zhipeng@zte.com.cn>, "Daniel P. Berrange" <berrange@redhat.com>
 
-ivshmem-server makes use of the POSIX shared memory object interfaces.
-This library is provided on NetBSD in -lrt (POSIX Real-time Library).
-Add ./configure check if there is needed -lrt linking for shm_open()
-and if so use it. Introduce new configure generated variable LIBS_SHMLIB.
+we can get the network interface statistics inside a virtual machine by
+guest-network-get-interfaces command. it is very useful for us to monitor
+and analyze network traffic.
 
-This fixes build issue on NetBSD.
-
-Signed-off-by: Kamil Rytarowski <n54@gmx.com>
+Signed-off-by: ZhiPeng Lu <lu.zhipeng@zte.com.cn>
+Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
 ---
- Makefile  |  1 +
- configure | 20 ++++++++++++++++++++
- 2 files changed, 21 insertions(+)
+ qga/commands-posix.c | 80 +++++++++++++++++++++++++++++++++++++++++++++++++++-
+ qga/qapi-schema.json | 38 ++++++++++++++++++++++++-
+ 2 files changed, 116 insertions(+), 2 deletions(-)
 
-diff --git a/Makefile b/Makefile
-index 31d41a7eae..3248cb53d7 100644
---- a/Makefile
-+++ b/Makefile
-@@ -473,6 +473,7 @@ ivshmem-client$(EXESUF): $(ivshmem-client-obj-y) $(COMMON_LDADDS)
- 	$(call LINK, $^)
- ivshmem-server$(EXESUF): $(ivshmem-server-obj-y) $(COMMON_LDADDS)
- 	$(call LINK, $^)
-+ivshmem-server$(EXESUF): LIBS += $(LIBS_SHMLIB)
+diff --git a/qga/commands-posix.c b/qga/commands-posix.c
+index 915df9e..233b024 100644
+--- a/qga/commands-posix.c
++++ b/qga/commands-posix.c
+@@ -1638,6 +1638,73 @@ guest_find_interface(GuestNetworkInterfaceList *head,
+     return head;
+ }
  
- module_block.h: $(SRC_PATH)/scripts/modules/module_block.py config-host.mak
- 	$(call quiet-command,$(PYTHON) $< $@ \
-diff --git a/configure b/configure
-index 7c020c076b..50c3aee746 100755
---- a/configure
-+++ b/configure
-@@ -179,6 +179,7 @@ audio_pt_int=""
- audio_win_int=""
- cc_i386=i386-pc-linux-gnu-gcc
- libs_qga=""
-+libs_shmlib=""
- debug_info="yes"
- stack_protector=""
- 
-@@ -4133,6 +4134,24 @@ elif compile_prog "" "$pthread_lib -lrt" ; then
-   libs_qga="$libs_qga -lrt"
- fi
- 
-+##########################################
-+# Do we need librt for shm_open()
-+cat > $TMPC <<EOF
-+#include <sys/mman.h>
-+#include <sys/stat.h>
-+#include <fcntl.h>
-+#include <stddef.h>
-+int main(void) {
-+  return shm_open(NULL, O_RDWR, 0644);
++
++static int str_trim_off(const char *s, int off, int lmt)
++{
++    for (; off < lmt; ++off) {
++        if (!isspace(s[off])) {
++            break;
++        }
++    }
++    return off;
 +}
-+EOF
 +
-+if compile_prog "" "" ; then
-+  :
-+elif compile_prog "" "-lrt" ; then
-+  libs_shmlib="$libs_shmlib -lrt"
-+fi
++static int guest_get_network_stats(const char *name,
++                       GuestNetworkInterfaceStat *stats)
++{
++    int name_len;
++    char const *devinfo = "/proc/net/dev";
++    FILE *fp;
++    char *line = NULL, *colon;
++    size_t n;
++    fp = fopen(devinfo, "r");
++    if (!fp) {
++        return -1;
++    }
++    name_len = strlen(name);
++    while (getline(&line, &n, fp) != -1) {
++        long long dummy;
++        long long rx_bytes;
++        long long rx_packets;
++        long long rx_errs;
++        long long rx_dropped;
++        long long tx_bytes;
++        long long tx_packets;
++        long long tx_errs;
++        long long tx_dropped;
++        int trim_off;
++        colon = strchr(line, ':');
++        if (!colon) {
++            continue;
++        }
++        trim_off = str_trim_off(line, 0, strlen(line));
++        if (colon - name_len - trim_off == line &&
++           strncmp(line + trim_off, name, colon - line - trim_off) == 0) {
++            if (sscanf(colon + 1,
++                "%lld %lld %lld %lld %lld %lld %lld %lld %lld %lld %lld %lld %lld %lld %lld %lld",
++                  &rx_bytes, &rx_packets, &rx_errs, &rx_dropped,
++                  &dummy, &dummy, &dummy, &dummy,
++                  &tx_bytes, &tx_packets, &tx_errs, &tx_dropped,
++                  &dummy, &dummy, &dummy, &dummy) != 16) {
++                continue;
++            }
++            stats->rx_bytes = rx_bytes;
++            stats->rx_packets = rx_packets;
++            stats->rx_errs = rx_errs;
++            stats->rx_dropped = rx_dropped;
++            stats->tx_bytes = tx_bytes;
++            stats->tx_packets = tx_packets;
++            stats->tx_errs = tx_errs;
++            stats->tx_dropped = tx_dropped;
++            fclose(fp);
++            return 0;
++        }
++    }
++    fclose(fp);
++    g_debug("/proc/net/dev: Interface not found");
++    return -1;
++}
 +
- if test "$darwin" != "yes" -a "$mingw32" != "yes" -a "$solaris" != yes -a \
-         "$aix" != "yes" -a "$haiku" != "yes" ; then
-     libs_softmmu="-lutil $libs_softmmu"
-@@ -5949,6 +5968,7 @@ echo "EXESUF=$EXESUF" >> $config_host_mak
- echo "DSOSUF=$DSOSUF" >> $config_host_mak
- echo "LDFLAGS_SHARED=$LDFLAGS_SHARED" >> $config_host_mak
- echo "LIBS_QGA+=$libs_qga" >> $config_host_mak
-+echo "LIBS_SHMLIB+=$libs_shmlib" >> $config_host_mak
- echo "TASN1_LIBS=$tasn1_libs" >> $config_host_mak
- echo "TASN1_CFLAGS=$tasn1_cflags" >> $config_host_mak
- echo "POD2MAN=$POD2MAN" >> $config_host_mak
+ /*
+  * Build information about guest interfaces
+  */
+@@ -1654,6 +1721,7 @@ GuestNetworkInterfaceList *qmp_guest_network_get_interfaces(Error **errp)
+     for (ifa = ifap; ifa; ifa = ifa->ifa_next) {
+         GuestNetworkInterfaceList *info;
+         GuestIpAddressList **address_list = NULL, *address_item = NULL;
++        GuestNetworkInterfaceStat  *interface_stat = NULL;
+         char addr4[INET_ADDRSTRLEN];
+         char addr6[INET6_ADDRSTRLEN];
+         int sock;
+@@ -1773,7 +1841,17 @@ GuestNetworkInterfaceList *qmp_guest_network_get_interfaces(Error **errp)
+ 
+         info->value->has_ip_addresses = true;
+ 
+-
++        if (!info->value->has_statistics) {
++            interface_stat = g_malloc0(sizeof(*interface_stat));
++            if (guest_get_network_stats(info->value->name,
++                interface_stat) == -1) {
++                info->value->has_statistics = false;
++                g_free(interface_stat);
++            } else {
++                info->value->statistics = interface_stat;
++                info->value->has_statistics = true;
++            }
++        }
+     }
+ 
+     freeifaddrs(ifap);
+diff --git a/qga/qapi-schema.json b/qga/qapi-schema.json
+index a02dbf2..948219b 100644
+--- a/qga/qapi-schema.json
++++ b/qga/qapi-schema.json
+@@ -635,6 +635,38 @@
+            'prefix': 'int'} }
+ 
+ ##
++# @GuestNetworkInterfaceStat:
++#
++# @rx-bytes: total bytes received
++#
++# @rx-packets: total packets received
++#
++# @rx-errs: bad packets received
++#
++# @rx-dropped: receiver dropped packets
++#
++# @tx-bytes: total bytes transmitted
++#
++# @tx-packets: total packets transmitted
++#
++# @tx-errs: packet transmit problems
++#
++# @tx-dropped: dropped packets transmitted
++#
++# Since: 2.10
++##
++{ 'struct': 'GuestNetworkInterfaceStat',
++  'data': {'rx-bytes': 'uint64',
++            'rx-packets': 'uint64',
++            'rx-errs': 'uint64',
++            'rx-dropped': 'uint64',
++            'tx-bytes': 'uint64',
++            'tx-packets': 'uint64',
++            'tx-errs': 'uint64',
++            'tx-dropped': 'uint64'
++           } }
++
++##
+ # @GuestNetworkInterface:
+ #
+ # @name: The name of interface for which info are being delivered
+@@ -643,12 +675,16 @@
+ #
+ # @ip-addresses: List of addresses assigned to @name
+ #
++# @statistics: various statistic counters related to @name
++# (since 2.10)
++#
+ # Since: 1.1
+ ##
+ { 'struct': 'GuestNetworkInterface',
+   'data': {'name': 'str',
+            '*hardware-address': 'str',
+-           '*ip-addresses': ['GuestIpAddress'] } }
++           '*ip-addresses': ['GuestIpAddress'],
++           '*statistics': 'GuestNetworkInterfaceStat' } }
+ 
+ ##
+ # @guest-network-get-interfaces:
 -- 
-2.12.2
+1.8.3.1
