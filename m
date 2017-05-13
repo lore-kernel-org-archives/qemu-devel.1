@@ -1,36 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55512)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37089)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <anthony.xu@intel.com>) id 1d9LnR-0003T1-Up
-	for qemu-devel@nongnu.org; Fri, 12 May 2017 21:24:39 -0400
+	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1d9MHh-0002SF-O7
+	for qemu-devel@nongnu.org; Fri, 12 May 2017 21:55:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <anthony.xu@intel.com>) id 1d9LnO-0003AO-Pf
-	for qemu-devel@nongnu.org; Fri, 12 May 2017 21:24:37 -0400
-Received: from mga02.intel.com ([134.134.136.20]:2961)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <anthony.xu@intel.com>)
-	id 1d9LnO-00037y-E5
-	for qemu-devel@nongnu.org; Fri, 12 May 2017 21:24:34 -0400
-From: "Xu, Anthony" <anthony.xu@intel.com>
-Date: Sat, 13 May 2017 01:24:30 +0000
-Message-ID: <4712D8F4B26E034E80552F30A67BE0B1AB6DEF@ORSMSX112.amr.corp.intel.com>
-References: <1494502528-12670-1-git-send-email-pbonzini@redhat.com>
-	<20170511145312.GA822@morn.lan>
-	<618febcf-af6d-5fc6-0274-4f64c53f9763@redhat.com>
-	<20170511163447.GA7785@morn.lan>
-	<4712D8F4B26E034E80552F30A67BE0B1AB61D5@ORSMSX112.amr.corp.intel.com>
-	<ff74288a-d26d-b037-2b55-7dac459aa4ec@redhat.com>
-	<4712D8F4B26E034E80552F30A67BE0B1AB6AA2@ORSMSX112.amr.corp.intel.com>
-	<f9c33614-be36-e789-b72b-b4ffcc8bb6a8@redhat.com>
-	<20170512193840.GA22454@morn.lan>
-	<4712D8F4B26E034E80552F30A67BE0B1AB6CBF@ORSMSX112.amr.corp.intel.com>
-	<20170513000141.GA542@morn.lan>
-In-Reply-To: <20170513000141.GA542@morn.lan>
-Content-Language: en-US
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1d9MHd-0007Es-4B
+	for qemu-devel@nongnu.org; Fri, 12 May 2017 21:55:53 -0400
+Received: from szxga02-in.huawei.com ([45.249.212.188]:3925)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
+	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1d9MHc-0007A5-9I
+	for qemu-devel@nongnu.org; Fri, 12 May 2017 21:55:49 -0400
+References: <1494553288-30764-1-git-send-email-zhangchen.fnst@cn.fujitsu.com>
+	<1494553288-30764-3-git-send-email-zhangchen.fnst@cn.fujitsu.com>
+From: Hailiang Zhang <zhang.zhanghailiang@huawei.com>
+Message-ID: <59166622.4000009@huawei.com>
+Date: Sat, 13 May 2017 09:49:22 +0800
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH] target/i386: enable A20 automatically in
- system management mode
+In-Reply-To: <1494553288-30764-3-git-send-email-zhangchen.fnst@cn.fujitsu.com>
+Content-Type: text/plain; charset="windows-1252"; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH V4 02/12] net/filter-mirror.c: Add new
+ option to enable vnet support for filter-mirror
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,93 +28,114 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin O'Connor <kevin@koconnor.net>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+To: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>, qemu devel <qemu-devel@nongnu.org>, Jason Wang <jasowang@redhat.com>
+Cc: weifuqiang <weifuqiang@huawei.com>, "eddie . dong" <eddie.dong@intel.com>, bian naimeng <biannm@cn.fujitsu.com>, Li Zhijian <lizhijian@cn.fujitsu.com>
 
-> -----Original Message-----
-> From: Kevin O'Connor [mailto:kevin@koconnor.net]
-> Sent: Friday, May 12, 2017 5:02 PM
-> To: Xu, Anthony <anthony.xu@intel.com>
-> Cc: Paolo Bonzini <pbonzini@redhat.com>; qemu-devel@nongnu.org
-> Subject: Re: [PATCH] target/i386: enable A20 automatically in system
-> management mode
->=20
-> On Fri, May 12, 2017 at 11:19:00PM +0000, Xu, Anthony wrote:
-> > > SeaBIOS defaults to enabling A20 and it's a rare beast that disables
-> > > it.  One could change x86.h:set_a20 and romlayout.S:transition32 to
-> > > only issue the outb() if the inb() indicates a change is needed.  Tha=
-t
-> > > would likely eliminate half the accesses.
-> >
-> > The 350 port 92 access is for write operation only.
-> > If include the inb(), it would be 700, and every time it actually has a=
- change
-> > To be precise, It is about 175 switches from 32 bit to 16 bit, then bac=
-k to 32
-> bit.
-> > call16 is called 175 times during Seabios boot without any option rom,
-> > It would be more if some option roms are included.
-> >
-> >
-> > I think A20 is disabled by default in SeaBios.
->=20
-> I don't know why you think that.  One can check with:
->=20
-> --- a/src/stacks.c
-> +++ b/src/stacks.c
-> @@ -99,6 +99,8 @@ call32_post(void)
->          if (cr0_caching)
->              cr0_mask(CR0_CD|CR0_NW, cr0_caching);
->      }
-> +    if (!get_a20())
-> +        dprintf(1, "a20=3D0\n");
->=20
->      // Restore cmos index register
->      outb(GET_LOW(Call16Data.cmosindex), PORT_CMOS_INDEX);
->=20
-> With the above I only see a handful of cases where SeaBIOS has to
-> restore a20 to a disabled state.
+Hi,
 
-I think it is related to accel and platform, the result I gave before is fo=
-r q35 tcg,
+On 2017/5/12 9:41, Zhang Chen wrote:
+> We add the vnet_hdr option for filter-mirror, default is disable.
+> If you use virtio-net-pci net driver, please enable it.
+> You can use it for example:
+> -object filter-mirror,id=m0,netdev=hn0,queue=tx,outdev=mirror0,vnet_hdr=on
 
-With the above change,   I got below data
-
-Platform	accel		count of restoring A20 to 0
-Q35		kvm		96
-Q35		tcg		271
-PC		kvm		3
-PC		tcg		3
-
-A lot of A20 restoring happen when SeaBIOS scans AHCI links.
+Is there any way to detect whether or not the vNIC using vnet_hdr ?
+I don't think it is a good idea to let users to confirm it, especially for users who may not
+be so familiar with the vNIC realizing in qemu.
 
 
->=20
-> The handful I do see are due to cases where yield() is called prior to
-> option rom initialization.  Those handful are eliminated for me with
-> the following fix:
->=20
-> --- a/src/stacks.c
-> +++ b/src/stacks.c
-> @@ -496,6 +496,7 @@ void
->  thread_setup(void)
->  {
->      CanInterrupt =3D 1;
-> +    call16_override(1);
->      if (! CONFIG_THREADS)
->          return;
->      ThreadControl =3D romfile_loadint("etc/threads", 1);
+Thanks,
+Hailiang
 
-But I still see a lot of PORT_A20 accesses in QEMU as I expected
-
-
->=20
-> What OS / bootloader are you running?
-
-/x86_64-softmmu/qemu-system-x86_64 -bios /home/root/git/seabios/out/bios.bi=
-n -smp 1=20
--machine q35,accel=3Dtcg -m 1G -drive format=3Draw,file=3D/home/root/images=
-/centos7.2.img,if=3Dide,index=3D0=20
--nographic  -nodefaults  -serial stdio -monitor pty
-
--Anthony
+> Signed-off-by: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
+> ---
+>   net/filter-mirror.c | 34 ++++++++++++++++++++++++++++++++++
+>   qemu-options.hx     |  5 +++--
+>   2 files changed, 37 insertions(+), 2 deletions(-)
+>
+> diff --git a/net/filter-mirror.c b/net/filter-mirror.c
+> index 72fa7c2..3766414 100644
+> --- a/net/filter-mirror.c
+> +++ b/net/filter-mirror.c
+> @@ -38,6 +38,7 @@ typedef struct MirrorState {
+>       NetFilterState parent_obj;
+>       char *indev;
+>       char *outdev;
+> +    bool vnet_hdr;
+>       CharBackend chr_in;
+>       CharBackend chr_out;
+>       SocketReadState rs;
+> @@ -308,6 +309,13 @@ static char *filter_mirror_get_outdev(Object *obj, Error **errp)
+>       return g_strdup(s->outdev);
+>   }
+>   
+> +static char *filter_mirror_get_vnet_hdr(Object *obj, Error **errp)
+> +{
+> +    MirrorState *s = FILTER_MIRROR(obj);
+> +
+> +    return s->vnet_hdr ? g_strdup("on") : g_strdup("off");
+> +}
+> +
+>   static void
+>   filter_mirror_set_outdev(Object *obj, const char *value, Error **errp)
+>   {
+> @@ -322,6 +330,21 @@ filter_mirror_set_outdev(Object *obj, const char *value, Error **errp)
+>       }
+>   }
+>   
+> +static void filter_mirror_set_vnet_hdr(Object *obj,
+> +                                       const char *value,
+> +                                       Error **errp)
+> +{
+> +    MirrorState *s = FILTER_MIRROR(obj);
+> +
+> +    if (strcmp(value, "on") && strcmp(value, "off")) {
+> +        error_setg(errp, "Invalid value for filter-mirror vnet_hdr, "
+> +                         "should be 'on' or 'off'");
+> +        return;
+> +    }
+> +
+> +    s->vnet_hdr = !strcmp(value, "on");
+> +}
+> +
+>   static char *filter_redirector_get_outdev(Object *obj, Error **errp)
+>   {
+>       MirrorState *s = FILTER_REDIRECTOR(obj);
+> @@ -340,8 +363,19 @@ filter_redirector_set_outdev(Object *obj, const char *value, Error **errp)
+>   
+>   static void filter_mirror_init(Object *obj)
+>   {
+> +    MirrorState *s = FILTER_MIRROR(obj);
+> +
+>       object_property_add_str(obj, "outdev", filter_mirror_get_outdev,
+>                               filter_mirror_set_outdev, NULL);
+> +
+> +    /*
+> +     * The vnet_hdr is disabled by default, if you want to enable
+> +     * this option, you must enable all the option on related modules
+> +     * (like other filter or colo-compare).
+> +     */
+> +    s->vnet_hdr = false;
+> +    object_property_add_str(obj, "vnet_hdr", filter_mirror_get_vnet_hdr,
+> +                             filter_mirror_set_vnet_hdr, NULL);
+>   }
+>   
+>   static void filter_redirector_init(Object *obj)
+> diff --git a/qemu-options.hx b/qemu-options.hx
+> index 70c0ded..1e08481 100644
+> --- a/qemu-options.hx
+> +++ b/qemu-options.hx
+> @@ -4024,10 +4024,11 @@ queue @var{all|rx|tx} is an option that can be applied to any netfilter.
+>   @option{tx}: the filter is attached to the transmit queue of the netdev,
+>                where it will receive packets sent by the netdev.
+>   
+> -@item -object filter-mirror,id=@var{id},netdev=@var{netdevid},outdev=@var{chardevid}[,queue=@var{all|rx|tx}]
+> +@item -object filter-mirror,id=@var{id},netdev=@var{netdevid},outdev=@var{chardevid},vnet_hdr=@var{on|off}[,queue=@var{all|rx|tx}]
+>   
+>   filter-mirror on netdev @var{netdevid},mirror net packet to chardev
+> -@var{chardevid}
+> +@var{chardevid}, if vnet_hdr = on, filter-mirror will mirror packet
+> +with vnet_hdr_len.
+>   
+>   @item -object filter-redirector,id=@var{id},netdev=@var{netdevid},indev=@var{chardevid},
+>   outdev=@var{chardevid}[,queue=@var{all|rx|tx}]
