@@ -1,27 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53189)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54429)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <arei.gonglei@huawei.com>) id 1d9LgX-0000hJ-TI
-	for qemu-devel@nongnu.org; Fri, 12 May 2017 21:17:31 -0400
+	(envelope-from <arei.gonglei@huawei.com>) id 1d9Lkd-00027e-UF
+	for qemu-devel@nongnu.org; Fri, 12 May 2017 21:21:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <arei.gonglei@huawei.com>) id 1d9LgU-0005fL-Ny
-	for qemu-devel@nongnu.org; Fri, 12 May 2017 21:17:29 -0400
-Received: from szxga03-in.huawei.com ([45.249.212.189]:3866)
+	(envelope-from <arei.gonglei@huawei.com>) id 1d9Lka-0000h8-PV
+	for qemu-devel@nongnu.org; Fri, 12 May 2017 21:21:43 -0400
+Received: from szxga01-in.huawei.com ([45.249.212.187]:3993)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <arei.gonglei@huawei.com>) id 1d9LgT-0005Yu-Uh
-	for qemu-devel@nongnu.org; Fri, 12 May 2017 21:17:26 -0400
+	(envelope-from <arei.gonglei@huawei.com>) id 1d9LkZ-0000fb-WD
+	for qemu-devel@nongnu.org; Fri, 12 May 2017 21:21:40 -0400
 From: "Gonglei (Arei)" <arei.gonglei@huawei.com>
-Date: Sat, 13 May 2017 01:16:58 +0000
-Message-ID: <33183CC9F5247A488A2544077AF19020DA278AA0@DGGEMA505-MBS.china.huawei.com>
+Date: Sat, 13 May 2017 01:21:14 +0000
+Message-ID: <33183CC9F5247A488A2544077AF19020DA279AB2@DGGEMA505-MBS.china.huawei.com>
 References: <1494243504-127980-1-git-send-email-arei.gonglei@huawei.com>
-	<1494243504-127980-7-git-send-email-arei.gonglei@huawei.com>
-	<520f45d4-33d7-8836-3140-a92ee5d15421@linux.vnet.ibm.com>
-In-Reply-To: <520f45d4-33d7-8836-3140-a92ee5d15421@linux.vnet.ibm.com>
+	<1494243504-127980-9-git-send-email-arei.gonglei@huawei.com>
+	<20170511170527.5846a676.cornelia.huck@de.ibm.com>
+	<33183CC9F5247A488A2544077AF19020DA26D816@DGGEMA505-MBX.china.huawei.com>
+	<20170512132146.64b811be.cornelia.huck@de.ibm.com>
+In-Reply-To: <20170512132146.64b811be.cornelia.huck@de.ibm.com>
 Content-Language: zh-CN
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [RFC v1 6/9] virtio-crypto: rework
- virtio_crypto_handle_request
+Subject: Re: [Qemu-devel] [RFC v1 8/9] virtio-crypto: add host feature bits
+ support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,125 +32,113 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Halil Pasic <pasic@linux.vnet.ibm.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "mst@redhat.com" <mst@redhat.com>, "Huangweidong (C)" <weidong.huang@huawei.com>, "stefanha@redhat.com" <stefanha@redhat.com>, Luonengjun <luonengjun@huawei.com>, "cornelia.huck@de.ibm.com" <cornelia.huck@de.ibm.com>, Linqiangmin <linqiangmin@huawei.com>, "xin.zeng@intel.com" <xin.zeng@intel.com>, "Wubin (H)" <wu.wubin@huawei.com>
+To: Cornelia Huck <cornelia.huck@de.ibm.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "mst@redhat.com" <mst@redhat.com>, "Huangweidong (C)" <weidong.huang@huawei.com>, "pasic@linux.vnet.ibm.com" <pasic@linux.vnet.ibm.com>, "stefanha@redhat.com" <stefanha@redhat.com>, Luonengjun <luonengjun@huawei.com>, Linqiangmin <linqiangmin@huawei.com>, "xin.zeng@intel.com" <xin.zeng@intel.com>, "Wubin
+	(H)" <wu.wubin@huawei.com>
 
-
-> From: Halil Pasic [mailto:pasic@linux.vnet.ibm.com]
-> Sent: Friday, May 12, 2017 7:02 PM
+> From: Cornelia Huck [mailto:cornelia.huck@de.ibm.com]
+> Sent: Friday, May 12, 2017 7:22 PM
+> To: Gonglei (Arei)
+> Cc: qemu-devel@nongnu.org; mst@redhat.com; Huangweidong (C);
+> pasic@linux.vnet.ibm.com; stefanha@redhat.com; Luonengjun; Linqiangmin;
+> xin.zeng@intel.com; Wubin (H)
+> Subject: Re: [RFC v1 8/9] virtio-crypto: add host feature bits support
 >=20
+> On Fri, 12 May 2017 00:55:23 +0000
+> "Gonglei (Arei)" <arei.gonglei@huawei.com> wrote:
 >=20
-> On 05/08/2017 01:38 PM, Gonglei wrote:
-> > According to the new spec, we should use different
-> > requst structure to store the data request based
-> > on whether VIRTIO_CRYPTO_F_MUX_MODE feature bit is
-> > negotiated or not.
+> > >
+> > > From: Cornelia Huck [mailto:cornelia.huck@de.ibm.com]
+> > > Sent: Thursday, May 11, 2017 11:05 PM
+> > > Subject: Re: [RFC v1 8/9] virtio-crypto: add host feature bits suppor=
+t
+> > >
+> > > On Mon, 8 May 2017 19:38:23 +0800
+> > > Gonglei <arei.gonglei@huawei.com> wrote:
+> > >
+> > > > We enable all feature bits acquiescently.
+> > > >
+> > > > Signed-off-by: Gonglei <arei.gonglei@huawei.com>
+> > > > ---
+> > > >  hw/virtio/virtio-crypto.c         | 15 +++++++++++++++
+> > > >  include/hw/virtio/virtio-crypto.h |  1 +
+> > > >  2 files changed, 16 insertions(+)
+> > > >
+> > > > diff --git a/hw/virtio/virtio-crypto.c b/hw/virtio/virtio-crypto.c
+> > > > index 5422f25..3dc0ff2 100644
+> > > > --- a/hw/virtio/virtio-crypto.c
+> > > > +++ b/hw/virtio/virtio-crypto.c
+> > > > @@ -1034,6 +1034,11 @@ static uint64_t
+> > > virtio_crypto_get_features(VirtIODevice *vdev,
+> > > >                                             uint64_t features,
+> > > >                                             Error **errp)
+> > > >  {
+> > > > +    VirtIOCrypto *vcrypto =3D VIRTIO_CRYPTO(vdev);
+> > > > +
+> > > > +    /* Firstly sync all virtio-crypto possible supported features =
+*/
+> > > > +    features |=3D vcrypto->host_features;
+> > > > +
+> > > >      return features;
+> > > >  }
+> > > >
+> > > > @@ -1144,6 +1149,16 @@ static const VMStateDescription
+> > > vmstate_virtio_crypto =3D {
+> > > >  };
+> > > >
+> > > >  static Property virtio_crypto_properties[] =3D {
+> > > > +    DEFINE_PROP_BIT("mux_mode", VirtIOCrypto, host_features,
+> > > > +                    VIRTIO_CRYPTO_F_MUX_MODE, true),
+> > > > +    DEFINE_PROP_BIT("cipher_stateless_mode", VirtIOCrypto,
+> > > host_features,
+> > > > +                    VIRTIO_CRYPTO_F_CIPHER_STATELESS_MODE,
+> > > true),
+> > > > +    DEFINE_PROP_BIT("hash_stateless_mode", VirtIOCrypto,
+> > > host_features,
+> > > > +                    VIRTIO_CRYPTO_F_HASH_STATELESS_MODE,
+> > > true),
+> > > > +    DEFINE_PROP_BIT("mac_stateless_mode", VirtIOCrypto,
+> > > host_features,
+> > > > +                    VIRTIO_CRYPTO_F_MAC_STATELESS_MODE,
+> true),
+> > > > +    DEFINE_PROP_BIT("aead_stateless_mode", VirtIOCrypto,
+> > > host_features,
+> > > > +                    VIRTIO_CRYPTO_F_AEAD_STATELESS_MODE,
+> > > true),
+> > > >      DEFINE_PROP_END_OF_LIST(),
+> > > >  };
+> > > >
+> > > > diff --git a/include/hw/virtio/virtio-crypto.h
+> b/include/hw/virtio/virtio-crypto.h
+> > > > index 465ad20..30ea51d 100644
+> > > > --- a/include/hw/virtio/virtio-crypto.h
+> > > > +++ b/include/hw/virtio/virtio-crypto.h
+> > > > @@ -97,6 +97,7 @@ typedef struct VirtIOCrypto {
+> > > >      int multiqueue;
+> > > >      uint32_t curr_queues;
+> > > >      size_t config_size;
+> > > > +    uint32_t host_features;
+> > >
+> > > I'd just make that 64 bits from the start.
+> > >
+> > Yes, that's better.
 > >
-> > In this patch, we havn't supported stateless mode
-> > yet. The device reportes an error if both
-> > VIRTIO_CRYPTO_F_MUX_MODE and
-> VIRTIO_CRYPTO_F_CIPHER_STATELESS_MODE
-> > are negotiated, meanwhile the header.flag doesn't set
-> > to VIRTIO_CRYPTO_FLAG_SESSION_MODE.
+> > > >  } VirtIOCrypto;
+> > > >
+> > > >  #endif /* _QEMU_VIRTIO_CRYPTO_H */
+> > >
+> > > Don't you need some kind of compat handling?
 > >
-> > Let's handle this scenario in the following patches.
-> >
-> > Signed-off-by: Gonglei <arei.gonglei@huawei.com>
-> > ---
-> >  hw/virtio/virtio-crypto.c | 83
-> ++++++++++++++++++++++++++++++++++++++++-------
-> >  1 file changed, 71 insertions(+), 12 deletions(-)
-> >
-> > diff --git a/hw/virtio/virtio-crypto.c b/hw/virtio/virtio-crypto.c
-> > index 0353eb6..c4b8a2c 100644
-> > --- a/hw/virtio/virtio-crypto.c
-> > +++ b/hw/virtio/virtio-crypto.c
-> > @@ -577,6 +577,7 @@ virtio_crypto_handle_request(VirtIOCryptoReq
-> *request)
-> >      VirtQueueElement *elem =3D &request->elem;
-> >      int queue_index =3D
-> virtio_crypto_vq2q(virtio_get_queue_index(request->vq));
-> >      struct virtio_crypto_op_data_req req;
-> > +    struct virtio_crypto_op_data_req_mux req_mux;
-> >      int ret;
-> >      struct iovec *in_iov;
-> >      struct iovec *out_iov;
-> > @@ -587,6 +588,9 @@ virtio_crypto_handle_request(VirtIOCryptoReq
-> *request)
-> >      uint64_t session_id;
-> >      CryptoDevBackendSymOpInfo *sym_op_info =3D NULL;
-> >      Error *local_err =3D NULL;
-> > +    bool mux_mode_is_negotiated;
-> > +    struct virtio_crypto_op_header *header;
-> > +    bool is_stateless_req =3D false;
-> >
-> >      if (elem->out_num < 1 || elem->in_num < 1) {
-> >          virtio_error(vdev, "virtio-crypto dataq missing headers");
-> > @@ -597,12 +601,28 @@ virtio_crypto_handle_request(VirtIOCryptoReq
-> *request)
-> >      out_iov =3D elem->out_sg;
-> >      in_num =3D elem->in_num;
-> >      in_iov =3D elem->in_sg;
-> > -    if (unlikely(iov_to_buf(out_iov, out_num, 0, &req, sizeof(req))
-> > -                !=3D sizeof(req))) {
-> > -        virtio_error(vdev, "virtio-crypto request outhdr too short");
-> > -        return -1;
-> > +
-> > +    mux_mode_is_negotiated =3D
-> > +        virtio_vdev_has_feature(vdev, VIRTIO_CRYPTO_F_MUX_MODE);
-> > +    if (!mux_mode_is_negotiated) {
-> > +        if (unlikely(iov_to_buf(out_iov, out_num, 0, &req, sizeof(req)=
-)
-> > +                    !=3D sizeof(req))) {
-> > +            virtio_error(vdev, "virtio-crypto request outhdr too short=
-");
-> > +            return -1;
-> > +        }
-> > +        iov_discard_front(&out_iov, &out_num, sizeof(req));
-> > +
-> > +        header =3D &req.header;
-> > +    } else {
-> > +        if (unlikely(iov_to_buf(out_iov, out_num, 0, &req_mux,
-> > +                sizeof(req_mux)) !=3D sizeof(req_mux))) {
-> > +            virtio_error(vdev, "virtio-crypto request outhdr too short=
-");
-> > +            return -1;
-> > +        }
-> > +        iov_discard_front(&out_iov, &out_num, sizeof(req_mux));
-> > +
-> > +        header =3D &req_mux.header;
+> > I did that in patch 6 according to the results of those feature bits ne=
+gotiated.
+> > Patch 9 tests both session mode and stateless mode, they are work. :)
 >=20
-> I wonder if this request length checking logic is conform to the
-> most recent spec draft on the list ("[PATCH v18 0/2] virtio-crypto:
-> virtio crypto device specification").
->=20
-Sure. Please see below normative formulation:
+> Ah, I meant machine compat handling. You probably don't want to offer
+> these feature bits in older compat machines.
 
-'''
-\drivernormative{\paragraph}{Symmetric algorithms Operation}{Device Types /=
- Crypto Device / Device Operation / Symmetric algorithms Operation}
-...
-\item If the VIRTIO_CRYPTO_F_MUX_MODE feature bit is negotiated, the driver=
- MUST use struct virtio_crypto_op_data_req_mux to wrap crypto requests.
-Otherwise, the driver MUST use struct virtio_crypto_op_data_req.
-...
-'''
-
-> AFAIU here you allow only requests of two sizes: one fixed size
-> for VIRTIO_CRYPTO_F_MUX_MODE and one without that feature. This
-> means that some requests need quite some padding between what
-> you call the 'request' and the actual data on which the crypto
-> operation dictated by the 'request' needs to be performed.
-
-Yes, that's true.
-
-> What are the benefits of this approach?
->=20
-We could unify the request for all algorithms, both symmetric algos and asy=
-mmetric algos,
-which is very convenient for handling tens of hundreds of different algorit=
-hm requests.
-
+Oh, yes, the older compat machines only can support session mode.
+I don't think it's necessary to offer these feature bits which have to
+be false default.
 
 Thanks,
 -Gonglei
