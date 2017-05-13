@@ -1,25 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60345)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34113)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1d9emu-0005Sk-Qw
-	for qemu-devel@nongnu.org; Sat, 13 May 2017 17:41:22 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1d9f2K-0000P0-Rg
+	for qemu-devel@nongnu.org; Sat, 13 May 2017 17:57:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1d9emr-0006VD-Ie
-	for qemu-devel@nongnu.org; Sat, 13 May 2017 17:41:20 -0400
-Resent-Message-Id: <E1d9emr-0006VD-Ie@eggs.gnu.org>
-Received: from sender-of-o52.zoho.com ([135.84.80.217]:21415)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1d9emr-0006SA-9q
-	for qemu-devel@nongnu.org; Sat, 13 May 2017 17:41:17 -0400
-In-Reply-To: <20170509173559.31598-1-marcandre.lureau@redhat.com>
-Message-ID: <149471166746.447.4283014814029503743@c05f1edc8ed1>
-Reply-To: <qemu-devel@nongnu.org>
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1d9f2F-0000Tx-Vx
+	for qemu-devel@nongnu.org; Sat, 13 May 2017 17:57:16 -0400
+Received: from mail-qt0-x243.google.com ([2607:f8b0:400d:c0d::243]:36339)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1d9f2F-0000Tg-S3
+	for qemu-devel@nongnu.org; Sat, 13 May 2017 17:57:11 -0400
+Received: by mail-qt0-x243.google.com with SMTP id j13so11073886qta.3
+	for <qemu-devel@nongnu.org>; Sat, 13 May 2017 14:57:11 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <CAEz5UgEp8wRBxeg4nAAd9GVeihcXQv__jfrjQtnVNT8eTNCLOw@mail.gmail.com>
+	<20170513182814.ydpkjeekvvjf5rzo@aurel32.net>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <ecb7491d-6446-a9fa-49d1-f4aaade16470@amsat.org>
+Date: Sat, 13 May 2017 18:57:07 -0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Sat, 13 May 2017 14:41:08 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH 00/17] qobject/qapi: add uint type
+In-Reply-To: <20170513182814.ydpkjeekvvjf5rzo@aurel32.net>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] MIPS little endian - Bug when decoding physaddr
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,75 +34,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: marcandre.lureau@redhat.com
-Cc: famz@redhat.com, qemu-devel@nongnu.org, armbru@redhat.com
+To: Aurelien Jarno <aurelien@aurel32.net>, Vinicius Maciel <viniciusfre@gmail.com>
+Cc: qemu-devel@nongnu.org
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKU3ViamVjdDogW1FlbXUt
-ZGV2ZWxdIFtQQVRDSCAwMC8xN10gcW9iamVjdC9xYXBpOiBhZGQgdWludCB0eXBlClR5cGU6IHNl
-cmllcwpNZXNzYWdlLWlkOiAyMDE3MDUwOTE3MzU1OS4zMTU5OC0xLW1hcmNhbmRyZS5sdXJlYXVA
-cmVkaGF0LmNvbQoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaAoKQkFTRT1i
-YXNlCm49MQp0b3RhbD0kKGdpdCBsb2cgLS1vbmVsaW5lICRCQVNFLi4gfCB3YyAtbCkKZmFpbGVk
-PTAKCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxv
-Y2FsIGRpZmYucmVuYW1lcyBUcnVlCgpjb21taXRzPSIkKGdpdCBsb2cgLS1mb3JtYXQ9JUggLS1y
-ZXZlcnNlICRCQVNFLi4pIgpmb3IgYyBpbiAkY29tbWl0czsgZG8KICAgIGVjaG8gIkNoZWNraW5n
-IFBBVENIICRuLyR0b3RhbDogJChnaXQgbG9nIC1uIDEgLS1mb3JtYXQ9JXMgJGMpLi4uIgogICAg
-aWYgISBnaXQgc2hvdyAkYyAtLWZvcm1hdD1lbWFpbCB8IC4vc2NyaXB0cy9jaGVja3BhdGNoLnBs
-IC0tbWFpbGJhY2sgLTsgdGhlbgogICAgICAgIGZhaWxlZD0xCiAgICAgICAgZWNobwogICAgZmkK
-ICAgIG49JCgobisxKSkKZG9uZQoKZXhpdCAkZmFpbGVkCj09PSBURVNUIFNDUklQVCBFTkQgPT09
-CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0CkZyb20g
-aHR0cHM6Ly9naXRodWIuY29tL3BhdGNoZXctcHJvamVjdC9xZW11CiAtIFt0YWcgdXBkYXRlXSAg
-ICAgIHBhdGNoZXcvMTQ5NDU1MzI4OC0zMDc2NC0xLWdpdC1zZW5kLWVtYWlsLXpoYW5nY2hlbi5m
-bnN0QGNuLmZ1aml0c3UuY29tIC0+IHBhdGNoZXcvMTQ5NDU1MzI4OC0zMDc2NC0xLWdpdC1zZW5k
-LWVtYWlsLXpoYW5nY2hlbi5mbnN0QGNuLmZ1aml0c3UuY29tCiAtIFt0YWcgdXBkYXRlXSAgICAg
-IHBhdGNoZXcvMjAxNzA1MTMwMDQ2MTYuMjU3NDktMS1uNTRAZ214LmNvbSAtPiBwYXRjaGV3LzIw
-MTcwNTEzMDA0NjE2LjI1NzQ5LTEtbjU0QGdteC5jb20KU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNo
-ICd0ZXN0JwpiMzcxY2JkIHFvYmplY3Q6IG1vdmUgZHVtcF9xb2JqZWN0KCkgZnJvbSBibG9jay8g
-dG8gcW9iamVjdC8KYmZkNmZjNyBSRkM6IHFkaWN0OiBhZGQgdWludApkY2Q1MzcwIFVzZSB1aW50
-IHByb3BlcnR5IGdldHRlci9zZXR0ZXIgd2hlcmUgYXBwcm9wcmlhdGUKMTQzZTIxNCBhY3BpOiBm
-aXggczMvczQgZGlzYWJsZWQgdHlwZQpkOTllOTczIHFkZXY6IHVzZSBhcHByb3ByaWF0ZSBnZXR0
-ZXIvc2V0dGVycyB0eXBlCmRiMWRmZWEgcWRldjogdXNlIGludCBhbmQgdWludCBwcm9wZXJ0aWVz
-IGFzIGFwcHJvcHJpYXRlCjE2MDE3ZmQgb2JqZWN0OiB1c2UgbW9yZSBzcGVjaWZpYyBwcm9wZXJ0
-eSB0eXBlIG5hbWVzCjc0MWIxMGYgb2JqZWN0OiBhZGQgdWludCBwcm9wZXJ0eSBzZXR0ZXIvZ2V0
-dGVyCmIzODA0YmQgcW51bTogZml4IGdldF9pbnQoKSB3aXRoIHZhbHVlcyA+IElOVDY0X01BWAoy
-YWJhN2ZjIHFhcGk6IHVwZGF0ZSB0aGUgcW9iamVjdCB2aXNpdG9yIHRvIHVzZSBRVUludAo1ZTYz
-N2U0IGpzb246IGxlYXJuIHRvIHBhcnNlIHVpbnQ2NCBudW1iZXJzCjAzYzNjMGEgcW51bTogYWRk
-IHVpbnQgdHlwZQpmOTAxMWEzIHFhcGk6IHJlbW92ZSBwcm9tb3RlX2ludAo3NTVjMjQ2IHFhcGk6
-IG1lcmdlIFFJbnQgYW5kIFFGbG9hdCBpbiBRTnVtCjRkMzcwMzIgdGVzdHM6IHJlbW92ZSBhbHQg
-bnVtLWludCBjYXNlcwplOTcyMmFjIG9iamVjdDogZml4IHBvdGVudGlhbCBsZWFrIGluIGdldHRl
-cnMKOTg4Y2I1MyBxZGV2OiByZW1vdmUgUHJvcGVydHlJbmZvLnF0eXBlIGZpZWxkCgo9PT0gT1VU
-UFVUIEJFR0lOID09PQpDaGVja2luZyBQQVRDSCAxLzE3OiBxZGV2OiByZW1vdmUgUHJvcGVydHlJ
-bmZvLnF0eXBlIGZpZWxkLi4uCkNoZWNraW5nIFBBVENIIDIvMTc6IG9iamVjdDogZml4IHBvdGVu
-dGlhbCBsZWFrIGluIGdldHRlcnMuLi4KQ2hlY2tpbmcgUEFUQ0ggMy8xNzogdGVzdHM6IHJlbW92
-ZSBhbHQgbnVtLWludCBjYXNlcy4uLgpDaGVja2luZyBQQVRDSCA0LzE3OiBxYXBpOiBtZXJnZSBR
-SW50IGFuZCBRRmxvYXQgaW4gUU51bS4uLgpFUlJPUjogZG8gbm90IHVzZSBDOTkgLy8gY29tbWVu
-dHMKIzE4ODU6IEZJTEU6IHRlc3RzL2NoZWNrLXFudW0uYzozNToKKyAgICAvLyBkZXN0cm95IGRv
-ZXNuJ3QgZXhpdCB5ZXQKCkVSUk9SOiBkbyBub3QgdXNlIEM5OSAvLyBjb21tZW50cwojMTkwMDog
-RklMRTogdGVzdHMvY2hlY2stcW51bS5jOjUwOgorICAgIC8vIGRlc3Ryb3kgZG9lc24ndCBleGl0
-IHlldAoKdG90YWw6IDIgZXJyb3JzLCAwIHdhcm5pbmdzLCAxNzY2IGxpbmVzIGNoZWNrZWQKCllv
-dXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRo
-ZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFp
-bmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCkNoZWNraW5nIFBBVENIIDUvMTc6
-IHFhcGk6IHJlbW92ZSBwcm9tb3RlX2ludC4uLgpDaGVja2luZyBQQVRDSCA2LzE3OiBxbnVtOiBh
-ZGQgdWludCB0eXBlLi4uCkVSUk9SOiBkbyBub3QgdXNlIEM5OSAvLyBjb21tZW50cwojMTUyOiBG
-SUxFOiB0ZXN0cy9jaGVjay1xbnVtLmM6NTA6CisgICAgLy8gZGVzdHJveSBkb2Vzbid0IGV4aXQg
-eWV0Cgp0b3RhbDogMSBlcnJvcnMsIDAgd2FybmluZ3MsIDE4MiBsaW5lcyBjaGVja2VkCgpZb3Vy
-IHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVz
-ZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5l
-ciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgpDaGVja2luZyBQQVRDSCA3LzE3OiBq
-c29uOiBsZWFybiB0byBwYXJzZSB1aW50NjQgbnVtYmVycy4uLgpDaGVja2luZyBQQVRDSCA4LzE3
-OiBxYXBpOiB1cGRhdGUgdGhlIHFvYmplY3QgdmlzaXRvciB0byB1c2UgUVVJbnQuLi4KQ2hlY2tp
-bmcgUEFUQ0ggOS8xNzogcW51bTogZml4IGdldF9pbnQoKSB3aXRoIHZhbHVlcyA+IElOVDY0X01B
-WC4uLgpDaGVja2luZyBQQVRDSCAxMC8xNzogb2JqZWN0OiBhZGQgdWludCBwcm9wZXJ0eSBzZXR0
-ZXIvZ2V0dGVyLi4uCkNoZWNraW5nIFBBVENIIDExLzE3OiBvYmplY3Q6IHVzZSBtb3JlIHNwZWNp
-ZmljIHByb3BlcnR5IHR5cGUgbmFtZXMuLi4KQ2hlY2tpbmcgUEFUQ0ggMTIvMTc6IHFkZXY6IHVz
-ZSBpbnQgYW5kIHVpbnQgcHJvcGVydGllcyBhcyBhcHByb3ByaWF0ZS4uLgpDaGVja2luZyBQQVRD
-SCAxMy8xNzogcWRldjogdXNlIGFwcHJvcHJpYXRlIGdldHRlci9zZXR0ZXJzIHR5cGUuLi4KQ2hl
-Y2tpbmcgUEFUQ0ggMTQvMTc6IGFjcGk6IGZpeCBzMy9zNCBkaXNhYmxlZCB0eXBlLi4uCkNoZWNr
-aW5nIFBBVENIIDE1LzE3OiBVc2UgdWludCBwcm9wZXJ0eSBnZXR0ZXIvc2V0dGVyIHdoZXJlIGFw
-cHJvcHJpYXRlLi4uCkNoZWNraW5nIFBBVENIIDE2LzE3OiBSRkM6IHFkaWN0OiBhZGQgdWludC4u
-LgpDaGVja2luZyBQQVRDSCAxNy8xNzogcW9iamVjdDogbW92ZSBkdW1wX3FvYmplY3QoKSBmcm9t
-IGJsb2NrLyB0byBxb2JqZWN0Ly4uLgo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFuZCBl
-eGl0ZWQgd2l0aCBjb2RlOiAxCgoKLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5
-IFBhdGNoZXcgW2h0dHA6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNr
-IHRvIHBhdGNoZXctZGV2ZWxAZnJlZWxpc3RzLm9yZw==
+Hi Vinicius,
+
+> On 2017-05-12 19:52, Vinicius Maciel wrote:
+>> Hi all,
+>>
+>> I'm trying to emulate a MIPS 74Kc using a custom machine in order to run a
+>> CFE bootloader from broadcom. The CPU is Broadcom BCM5357. The problem
+
+Here is your problem, there is no such model in QEMU.
+
+>> happens when Qemu calculates physaddr inside io_readx(), cputlb.c:line 784
+>>
+>> physaddr = (physaddr & TARGET_PAGE_MASK) + addr;
+>>
+>> After run this line the the value is 0x18000000, which is clearly wrong.
+
+The Broadcom BCM5357 is a WiSoc (Wireless System-On-Chip).
+
+A SoC (System-On-Chip) is not limited to a MIPS CPU but has a large set 
+of embedded peripherals.
+
+QEMU does models the MIPS 74Kf cpu, but not the BCM5357 peripherals.
+
+At this physical address this SoC family maps a bus called 
+SiliconBackplane (BP).
+The first peripheral mapped in the BP region is the ChipCommon (CC). 
+Common meaning this core registers intend to be consistent between 
+different models/releases using this BP bus, so a firmware can check it 
+is running the correct hardware or check if peripherals/features are 
+available/enabled to configure/use them.
+
+My guess is your CFE function board_earlyinit() is trying to determine 
+the chip model by reading the ChipID from the CC it supposed is 
+physically mapped at 0x18000000, which is not modeled in QEMU.
+
+Phil.
+
+>
+> I don't think it's wrong, see below:
+>
+>> More informations:
+>>
+>> BUG function: io_readx
+>> Assembly instruction: lw t1,0(a2)
+>> Machine code: 0x8cc90000 (Little endian)
+>> Access address: 0xb8000000
+>>
+>> Assembly code:
+>> 80702f30 <board_earlyinit>:
+>> 80702f30: 3c06b800 lui a2,0xb800
+>
+> This load 0xb8000000 in a2
+>
+>> 80702f34: 24075350 li a3,21328
+>> 80702f38: 8cc90000 lw t1,0(a2) <----
+>
+> Now this try to load a value from the virtual address 0xb8000000. This
+> address corresponds to kseg1 (Kernel Unmapped Uncached) and is mapped
+> to the physical address 0x18000000. See the MIPS32 Privileged Resource
+> Architecture Manual for more details how the virtual to physical mapping
+> works.
+>
+> Aurelien
+>
