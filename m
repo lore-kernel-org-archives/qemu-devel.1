@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36726)
-	by lists.gnu.org with esmtp (Exim 4.71) (envelope-from <n54@gmx.com>)
-	id 1d9fSX-0007oS-KT
-	for qemu-devel@nongnu.org; Sat, 13 May 2017 18:24:22 -0400
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37485)
+	by lists.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1d9fds-0001aG-G0
+	for qemu-devel@nongnu.org; Sat, 13 May 2017 18:36:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <n54@gmx.com>) id 1d9fSU-0005Yi-HS
-	for qemu-devel@nongnu.org; Sat, 13 May 2017 18:24:21 -0400
-Received: from mout.gmx.net ([212.227.15.19]:51626)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <n54@gmx.com>) id 1d9fSU-0005WM-5f
-	for qemu-devel@nongnu.org; Sat, 13 May 2017 18:24:18 -0400
-References: <20170513015449.24061-1-n54@gmx.com>
-	<91e1cbd3-88e6-2b7a-c4e4-824c54f34c52@amsat.org>
-From: Kamil Rytarowski <n54@gmx.com>
-Message-ID: <d322706d-02e0-14a3-552b-df8201a5689a@gmx.com>
-Date: Sun, 14 May 2017 00:15:40 +0200
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1d9fdp-0005Vd-2g
+	for qemu-devel@nongnu.org; Sat, 13 May 2017 18:36:04 -0400
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <1493122030-32191-1-git-send-email-peter.maydell@linaro.org>
+	<1493122030-32191-5-git-send-email-peter.maydell@linaro.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <2ad8e931-12e0-2f7d-2141-402c20ccb463@amsat.org>
+Date: Sat, 13 May 2017 19:35:50 -0300
 MIME-Version: 1.0
-In-Reply-To: <91e1cbd3-88e6-2b7a-c4e4-824c54f34c52@amsat.org>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="EgQnaunUtxmbn3fmhWvhTEUt6dUHliMV7"
-Subject: Re: [Qemu-devel] [PATCH] libvixl: Correct ordering of includes and
- fix NetBSD build
+In-Reply-To: <1493122030-32191-5-git-send-email-peter.maydell@linaro.org>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 04/13] arm: Clean up handling of no-MPU
+ PMSA CPUs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,116 +28,180 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, claudio.fontana@huawei.com
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-devel@nongnu.org
+Cc: Alistair Francis <alistair.francis@xilinx.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, patches@linaro.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---EgQnaunUtxmbn3fmhWvhTEUt6dUHliMV7
-From: Kamil Rytarowski <n54@gmx.com>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
- qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, claudio.fontana@huawei.com
-Message-ID: <d322706d-02e0-14a3-552b-df8201a5689a@gmx.com>
-Subject: Re: [Qemu-devel] [PATCH] libvixl: Correct ordering of includes and
- fix NetBSD build
-References: <20170513015449.24061-1-n54@gmx.com>
- <91e1cbd3-88e6-2b7a-c4e4-824c54f34c52@amsat.org>
-In-Reply-To: <91e1cbd3-88e6-2b7a-c4e4-824c54f34c52@amsat.org>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: quoted-printable
+Hi Peter,
 
-Hello,
+On 04/25/2017 09:07 AM, Peter Maydell wrote:
+> ARM CPUs come in two flavours:
+>  * proper MMU ("VMSA")
+>  * only an MPU ("PMSA")
+> For PMSA, the MPU may be implemented, or not (in which case there
+> is default "always acts the same" behaviour, but it isn't guest
+> programmable).
+>
+> QEMU is a bit confused about how we indicate this: we have an
+> ARM_FEATURE_MPU, but it's not clear whether this indicates
+> "PMSA, not VMSA" or "PMSA and MPU present" , and sometimes we
+> use it for one purpose and sometimes the other.
+>
+> Currently trying to implement a PMSA-without-MPU core won't
+> work correctly because we turn off the ARM_FEATURE_MPU bit
+> and then a lot of things which should still exist get
+> turned off too.
+>
+> As the first step in cleaning this up, rename the feature
+> bit to ARM_FEATURE_PMSA, which indicates a PMSA CPU (with
+> or without MPU).
+>
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> ---
+>  target/arm/cpu.h     |  2 +-
+>  target/arm/cpu.c     | 12 ++++++------
+>  target/arm/helper.c  | 12 ++++++------
+>  target/arm/machine.c |  2 +-
+>  4 files changed, 14 insertions(+), 14 deletions(-)
+>
+> diff --git a/target/arm/cpu.h b/target/arm/cpu.h
+> index 253565b..0718955 100644
+> --- a/target/arm/cpu.h
+> +++ b/target/arm/cpu.h
+> @@ -1179,7 +1179,7 @@ enum arm_features {
+>      ARM_FEATURE_V6K,
+>      ARM_FEATURE_V7,
+>      ARM_FEATURE_THUMB2,
+> -    ARM_FEATURE_MPU,    /* Only has Memory Protection Unit, not full MMU.  */
+> +    ARM_FEATURE_PMSA,   /* no MMU; may have Memory Protection Unit */
+>      ARM_FEATURE_VFP3,
+>      ARM_FEATURE_VFP_FP16,
+>      ARM_FEATURE_NEON,
+> diff --git a/target/arm/cpu.c b/target/arm/cpu.c
+> index b357aee..f17e279 100644
+> --- a/target/arm/cpu.c
+> +++ b/target/arm/cpu.c
+> @@ -586,7 +586,7 @@ static void arm_cpu_post_init(Object *obj)
+>                                   &error_abort);
+>      }
+>
+> -    if (arm_feature(&cpu->env, ARM_FEATURE_MPU)) {
+> +    if (arm_feature(&cpu->env, ARM_FEATURE_PMSA)) {
+>          qdev_property_add_static(DEVICE(obj), &arm_cpu_has_mpu_property,
+>                                   &error_abort);
+>          if (arm_feature(&cpu->env, ARM_FEATURE_V7)) {
+> @@ -682,7 +682,7 @@ static void arm_cpu_realizefn(DeviceState *dev, Error **errp)
+>
+>      if (arm_feature(env, ARM_FEATURE_V7) &&
+>          !arm_feature(env, ARM_FEATURE_M) &&
+> -        !arm_feature(env, ARM_FEATURE_MPU)) {
+> +        !arm_feature(env, ARM_FEATURE_PMSA)) {
+>          /* v7VMSA drops support for the old ARMv5 tiny pages, so we
+>           * can use 4K pages.
+>           */
+> @@ -758,10 +758,10 @@ static void arm_cpu_realizefn(DeviceState *dev, Error **errp)
+>      }
+>
+>      if (!cpu->has_mpu) {
+> -        unset_feature(env, ARM_FEATURE_MPU);
+> +        unset_feature(ARM_FEATURE_PMSA);
 
-I will give it a try and submit as a new patch.
+With the missing 'env' argument:
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
-On 14.05.2017 00:04, Philippe Mathieu-Daud=E9 wrote:
-> Hi Kamil,
->=20
-> I think it is safer to add it in disas/libvixl/Makefile.objs where
-> QEMU_CFLAGS are tuned for libvixl.
-> This way you don't need to modify upstream libvixl.
->=20
-> Regards,
->=20
-> Phil.
->=20
-> On 05/12/2017 10:54 PM, Kamil Rytarowski wrote:
->> The __STDC_CONSTANT_MACROS symbol must be defined before including
->> directly or indirectly <stdint.h> in order to get support for macros
->> for integer constants like INT8_C().
->>
->> The vixl/globals.h headers defines __STDC_CONSTANT_MACROS and must be
->> included before other system headers.
->>
->> This change fixes build failures on NetBSD.
->>
->> Signed-off-by: Kamil Rytarowski <n54@gmx.com>
->> ---
->>  disas/libvixl/vixl/a64/disasm-a64.cc | 2 +-
->>  disas/libvixl/vixl/utils.h           | 4 ++--
->>  2 files changed, 3 insertions(+), 3 deletions(-)
->>
->> diff --git a/disas/libvixl/vixl/a64/disasm-a64.cc
->> b/disas/libvixl/vixl/a64/disasm-a64.cc
->> index 7a58a5c087..fc87306893 100644
->> --- a/disas/libvixl/vixl/a64/disasm-a64.cc
->> +++ b/disas/libvixl/vixl/a64/disasm-a64.cc
->> @@ -24,8 +24,8 @@
->>  // OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT=
-
->> OF THE USE
->>  // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAG=
-E.
->>
->> -#include <cstdlib>
->>  #include "vixl/a64/disasm-a64.h"
->> +#include <cstdlib>
->>
->>  namespace vixl {
->>
->> diff --git a/disas/libvixl/vixl/utils.h b/disas/libvixl/vixl/utils.h
->> index 5ab134e240..17034addbc 100644
->> --- a/disas/libvixl/vixl/utils.h
->> +++ b/disas/libvixl/vixl/utils.h
->> @@ -27,10 +27,10 @@
->>  #ifndef VIXL_UTILS_H
->>  #define VIXL_UTILS_H
->>
->> -#include <string.h>
->> -#include <cmath>
->>  #include "vixl/globals.h"
->>  #include "vixl/compiler-intrinsics.h"
->> +#include <string.h>
->> +#include <cmath>
->>
->>  namespace vixl {
->>
->>
->=20
-
-
-
---EgQnaunUtxmbn3fmhWvhTEUt6dUHliMV7
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-
-iQIcBAEBCAAGBQJZF4WcAAoJEEuzCOmwLnZsBCYQAMUkBOjXYGUEpoSiSSGhipNZ
-QPoxw/ow1mrLssH/E6YxGNdwRpYKDtK1H0Efb6vr+c+FjYt/R7RhvtuUzCmGXhXE
-H/t8mIwZnZKb2b56KXxaWXvm+lr7ZWXbgjATQjRmZMzKA9lSgr8GDGeoJhvGvA/T
-oJ5+h2g/RRvMNd3Bykuj+PZ//xCt2IYzmcWRAoYEOnbqpsNj3MbZ6Ao6CmP8UMrE
-TFSr1ekHJdxppEPtIye7kQmUj1JaAnBYT0TQJLIHnzIlKdoCkzgbBJ/LCPj1czRX
-8kDk9nabXg0Blu4OhcJHm45HrLe35BhPFLC6MvfNkRn+BJ5QGj5X7kgMJ+kRjO5K
-obS34HVOEWme7gUgWkWu0uSyt9PZFQLEPqKEaoaiz/NtbSURLrYYwLE0QQbGVa6a
-X0fQ38vvUv7O1j1jfZ6Fe+L6fEU++jU8WCFUB2qVicrXm8QNmaab0MD0CQhSfS4a
-ag14d5aTuI1mICD45UnjhL2ikSgOIgBIw4IhEIBRpShpzwkhtrgYjQDd8X/Ifrft
-4RPrbqscdWd1AFL9Wu/ziN4jMnrE3y1e1vYy7xwKayggqB0d+PdMSGfi+n5Q+bVs
-OZNxOKP2JJkeyupq7uuPaPpAdBkDQ6MuiUMoX3A98gukd3h8nOu6u2TK8/+dC+8/
-Nu6KH2PurSANx4e8wpmh
-=BX91
------END PGP SIGNATURE-----
-
---EgQnaunUtxmbn3fmhWvhTEUt6dUHliMV7--
+>      }
+>
+> -    if (arm_feature(env, ARM_FEATURE_MPU) &&
+> +    if (arm_feature(env, ARM_FEATURE_PMSA) &&
+>          arm_feature(env, ARM_FEATURE_V7)) {
+>          uint32_t nr = cpu->pmsav7_dregion;
+>
+> @@ -861,7 +861,7 @@ static void arm946_initfn(Object *obj)
+>
+>      cpu->dtb_compatible = "arm,arm946";
+>      set_feature(&cpu->env, ARM_FEATURE_V5);
+> -    set_feature(&cpu->env, ARM_FEATURE_MPU);
+> +    set_feature(&cpu->env, ARM_FEATURE_PMSA);
+>      set_feature(&cpu->env, ARM_FEATURE_DUMMY_C15_REGS);
+>      cpu->midr = 0x41059461;
+>      cpu->ctr = 0x0f004006;
+> @@ -1073,7 +1073,7 @@ static void cortex_r5_initfn(Object *obj)
+>      set_feature(&cpu->env, ARM_FEATURE_THUMB_DIV);
+>      set_feature(&cpu->env, ARM_FEATURE_ARM_DIV);
+>      set_feature(&cpu->env, ARM_FEATURE_V7MP);
+> -    set_feature(&cpu->env, ARM_FEATURE_MPU);
+> +    set_feature(&cpu->env, ARM_FEATURE_PMSA);
+>      cpu->midr = 0x411fc153; /* r1p3 */
+>      cpu->id_pfr0 = 0x0131;
+>      cpu->id_pfr1 = 0x001;
+> diff --git a/target/arm/helper.c b/target/arm/helper.c
+> index 791332c..404bfdb 100644
+> --- a/target/arm/helper.c
+> +++ b/target/arm/helper.c
+> @@ -485,7 +485,7 @@ static void contextidr_write(CPUARMState *env, const ARMCPRegInfo *ri,
+>  {
+>      ARMCPU *cpu = arm_env_get_cpu(env);
+>
+> -    if (raw_read(env, ri) != value && !arm_feature(env, ARM_FEATURE_MPU)
+> +    if (raw_read(env, ri) != value && !arm_feature(env, ARM_FEATURE_PMSA)
+>          && !extended_addresses_enabled(env)) {
+>          /* For VMSA (when not using the LPAE long descriptor page table
+>           * format) this register includes the ASID, so do a TLB flush.
+> @@ -4615,7 +4615,7 @@ void register_cp_regs_for_features(ARMCPU *cpu)
+>          define_arm_cp_regs(cpu, v6k_cp_reginfo);
+>      }
+>      if (arm_feature(env, ARM_FEATURE_V7MP) &&
+> -        !arm_feature(env, ARM_FEATURE_MPU)) {
+> +        !arm_feature(env, ARM_FEATURE_PMSA)) {
+>          define_arm_cp_regs(cpu, v7mp_cp_reginfo);
+>      }
+>      if (arm_feature(env, ARM_FEATURE_V7)) {
+> @@ -4969,7 +4969,7 @@ void register_cp_regs_for_features(ARMCPU *cpu)
+>          }
+>      }
+>
+> -    if (arm_feature(env, ARM_FEATURE_MPU)) {
+> +    if (arm_feature(env, ARM_FEATURE_PMSA)) {
+>          if (arm_feature(env, ARM_FEATURE_V6)) {
+>              /* PMSAv6 not implemented */
+>              assert(arm_feature(env, ARM_FEATURE_V7));
+> @@ -5131,7 +5131,7 @@ void register_cp_regs_for_features(ARMCPU *cpu)
+>              define_arm_cp_regs(cpu, id_pre_v8_midr_cp_reginfo);
+>          }
+>          define_arm_cp_regs(cpu, id_cp_reginfo);
+> -        if (!arm_feature(env, ARM_FEATURE_MPU)) {
+> +        if (!arm_feature(env, ARM_FEATURE_PMSA)) {
+>              define_one_arm_cp_reg(cpu, &id_tlbtr_reginfo);
+>          } else if (arm_feature(env, ARM_FEATURE_V7)) {
+>              define_one_arm_cp_reg(cpu, &id_mpuir_reginfo);
+> @@ -8442,7 +8442,7 @@ static bool get_phys_addr(CPUARMState *env, target_ulong address,
+>      /* pmsav7 has special handling for when MPU is disabled so call it before
+>       * the common MMU/MPU disabled check below.
+>       */
+> -    if (arm_feature(env, ARM_FEATURE_MPU) &&
+> +    if (arm_feature(env, ARM_FEATURE_PMSA) &&
+>          arm_feature(env, ARM_FEATURE_V7)) {
+>          *page_size = TARGET_PAGE_SIZE;
+>          return get_phys_addr_pmsav7(env, address, access_type, mmu_idx,
+> @@ -8457,7 +8457,7 @@ static bool get_phys_addr(CPUARMState *env, target_ulong address,
+>          return 0;
+>      }
+>
+> -    if (arm_feature(env, ARM_FEATURE_MPU)) {
+> +    if (arm_feature(env, ARM_FEATURE_PMSA)) {
+>          /* Pre-v7 MPU */
+>          *page_size = TARGET_PAGE_SIZE;
+>          return get_phys_addr_pmsav5(env, address, access_type, mmu_idx,
+> diff --git a/target/arm/machine.c b/target/arm/machine.c
+> index d8094a8..ac6b758 100644
+> --- a/target/arm/machine.c
+> +++ b/target/arm/machine.c
+> @@ -142,7 +142,7 @@ static bool pmsav7_needed(void *opaque)
+>      ARMCPU *cpu = opaque;
+>      CPUARMState *env = &cpu->env;
+>
+> -    return arm_feature(env, ARM_FEATURE_MPU) &&
+> +    return arm_feature(env, ARM_FEATURE_PMSA) &&
+>             arm_feature(env, ARM_FEATURE_V7);
+>  }
+>
+>
