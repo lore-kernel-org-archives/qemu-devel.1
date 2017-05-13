@@ -1,32 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58713)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60345)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1d9eWj-0001nn-KZ
-	for qemu-devel@nongnu.org; Sat, 13 May 2017 17:24:38 -0400
+	(envelope-from <no-reply@patchew.org>) id 1d9emu-0005Sk-Qw
+	for qemu-devel@nongnu.org; Sat, 13 May 2017 17:41:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1d9eWg-0006SN-Ej
-	for qemu-devel@nongnu.org; Sat, 13 May 2017 17:24:37 -0400
-Received: from mail-qt0-x241.google.com ([2607:f8b0:400d:c0d::241]:33124)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1d9eWg-0006Rb-A3
-	for qemu-devel@nongnu.org; Sat, 13 May 2017 17:24:34 -0400
-Received: by mail-qt0-x241.google.com with SMTP id a46so11034571qte.0
-	for <qemu-devel@nongnu.org>; Sat, 13 May 2017 14:24:34 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <1494553288-30764-1-git-send-email-zhangchen.fnst@cn.fujitsu.com>
-	<1494553288-30764-2-git-send-email-zhangchen.fnst@cn.fujitsu.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <80a52ceb-6e69-f4ee-04c7-1219bb7947c1@amsat.org>
-Date: Sat, 13 May 2017 18:24:29 -0300
+	(envelope-from <no-reply@patchew.org>) id 1d9emr-0006VD-Ie
+	for qemu-devel@nongnu.org; Sat, 13 May 2017 17:41:20 -0400
+Resent-Message-Id: <E1d9emr-0006VD-Ie@eggs.gnu.org>
+Received: from sender-of-o52.zoho.com ([135.84.80.217]:21415)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1d9emr-0006SA-9q
+	for qemu-devel@nongnu.org; Sat, 13 May 2017 17:41:17 -0400
+In-Reply-To: <20170509173559.31598-1-marcandre.lureau@redhat.com>
+Message-ID: <149471166746.447.4283014814029503743@c05f1edc8ed1>
+Reply-To: <qemu-devel@nongnu.org>
 MIME-Version: 1.0
-In-Reply-To: <1494553288-30764-2-git-send-email-zhangchen.fnst@cn.fujitsu.com>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH V4 01/12] net: Add vnet_hdr_len related
- arguments in NetClientState
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Sat, 13 May 2017 14:41:08 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PATCH 00/17] qobject/qapi: add uint type
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,58 +28,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>, qemu devel <qemu-devel@nongnu.org>, Jason Wang <jasowang@redhat.com>
-Cc: zhanghailiang <zhang.zhanghailiang@huawei.com>, Li Zhijian <lizhijian@cn.fujitsu.com>, weifuqiang <weifuqiang@huawei.com>, "eddie . dong" <eddie.dong@intel.com>, bian naimeng <biannm@cn.fujitsu.com>
+To: marcandre.lureau@redhat.com
+Cc: famz@redhat.com, qemu-devel@nongnu.org, armbru@redhat.com
 
-Hi Zhang
-
-On 05/11/2017 10:41 PM, Zhang Chen wrote:
-> Add vnet_hdr_len and using_vnet_hdr arguments in NetClientState
-> that make othermodule get real vnet_hdr_len easily.
->
-> Signed-off-by: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
-> ---
->  include/net/net.h | 2 ++
->  net/net.c         | 2 ++
->  2 files changed, 4 insertions(+)
->
-> diff --git a/include/net/net.h b/include/net/net.h
-> index 99b28d5..70edfc0 100644
-> --- a/include/net/net.h
-> +++ b/include/net/net.h
-> @@ -100,6 +100,8 @@ struct NetClientState {
->      unsigned int queue_index;
->      unsigned rxfilter_notify_enabled:1;
->      int vring_enable;
-> +    bool using_vnet_hdr;
-> +    int vnet_hdr_len;
->      QTAILQ_HEAD(NetFilterHead, NetFilterState) filters;
->  };
->
-> diff --git a/net/net.c b/net/net.c
-> index 0ac3b9e..a00a0c9 100644
-> --- a/net/net.c
-> +++ b/net/net.c
-> @@ -472,6 +472,7 @@ void qemu_using_vnet_hdr(NetClientState *nc, bool enable)
->          return;
->      }
->
-> +    nc->using_vnet_hdr = enable;
->      nc->info->using_vnet_hdr(nc, enable);
->  }
->
-> @@ -491,6 +492,7 @@ void qemu_set_vnet_hdr_len(NetClientState *nc, int len)
->          return;
->      }
->
-> +    nc->vnet_hdr_len = len;
->      nc->info->set_vnet_hdr_len(nc, len);
->  }
->
-
-For what it's worth, now having those fields in NetClientState it is 
-possible to remove a deref to NetClientInfo in qemu_has_vnet_hdr() and 
-qemu_has_vnet_hdr_len().
-
-Anyway,
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKU3ViamVjdDogW1FlbXUt
+ZGV2ZWxdIFtQQVRDSCAwMC8xN10gcW9iamVjdC9xYXBpOiBhZGQgdWludCB0eXBlClR5cGU6IHNl
+cmllcwpNZXNzYWdlLWlkOiAyMDE3MDUwOTE3MzU1OS4zMTU5OC0xLW1hcmNhbmRyZS5sdXJlYXVA
+cmVkaGF0LmNvbQoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaAoKQkFTRT1i
+YXNlCm49MQp0b3RhbD0kKGdpdCBsb2cgLS1vbmVsaW5lICRCQVNFLi4gfCB3YyAtbCkKZmFpbGVk
+PTAKCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxv
+Y2FsIGRpZmYucmVuYW1lcyBUcnVlCgpjb21taXRzPSIkKGdpdCBsb2cgLS1mb3JtYXQ9JUggLS1y
+ZXZlcnNlICRCQVNFLi4pIgpmb3IgYyBpbiAkY29tbWl0czsgZG8KICAgIGVjaG8gIkNoZWNraW5n
+IFBBVENIICRuLyR0b3RhbDogJChnaXQgbG9nIC1uIDEgLS1mb3JtYXQ9JXMgJGMpLi4uIgogICAg
+aWYgISBnaXQgc2hvdyAkYyAtLWZvcm1hdD1lbWFpbCB8IC4vc2NyaXB0cy9jaGVja3BhdGNoLnBs
+IC0tbWFpbGJhY2sgLTsgdGhlbgogICAgICAgIGZhaWxlZD0xCiAgICAgICAgZWNobwogICAgZmkK
+ICAgIG49JCgobisxKSkKZG9uZQoKZXhpdCAkZmFpbGVkCj09PSBURVNUIFNDUklQVCBFTkQgPT09
+CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0CkZyb20g
+aHR0cHM6Ly9naXRodWIuY29tL3BhdGNoZXctcHJvamVjdC9xZW11CiAtIFt0YWcgdXBkYXRlXSAg
+ICAgIHBhdGNoZXcvMTQ5NDU1MzI4OC0zMDc2NC0xLWdpdC1zZW5kLWVtYWlsLXpoYW5nY2hlbi5m
+bnN0QGNuLmZ1aml0c3UuY29tIC0+IHBhdGNoZXcvMTQ5NDU1MzI4OC0zMDc2NC0xLWdpdC1zZW5k
+LWVtYWlsLXpoYW5nY2hlbi5mbnN0QGNuLmZ1aml0c3UuY29tCiAtIFt0YWcgdXBkYXRlXSAgICAg
+IHBhdGNoZXcvMjAxNzA1MTMwMDQ2MTYuMjU3NDktMS1uNTRAZ214LmNvbSAtPiBwYXRjaGV3LzIw
+MTcwNTEzMDA0NjE2LjI1NzQ5LTEtbjU0QGdteC5jb20KU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNo
+ICd0ZXN0JwpiMzcxY2JkIHFvYmplY3Q6IG1vdmUgZHVtcF9xb2JqZWN0KCkgZnJvbSBibG9jay8g
+dG8gcW9iamVjdC8KYmZkNmZjNyBSRkM6IHFkaWN0OiBhZGQgdWludApkY2Q1MzcwIFVzZSB1aW50
+IHByb3BlcnR5IGdldHRlci9zZXR0ZXIgd2hlcmUgYXBwcm9wcmlhdGUKMTQzZTIxNCBhY3BpOiBm
+aXggczMvczQgZGlzYWJsZWQgdHlwZQpkOTllOTczIHFkZXY6IHVzZSBhcHByb3ByaWF0ZSBnZXR0
+ZXIvc2V0dGVycyB0eXBlCmRiMWRmZWEgcWRldjogdXNlIGludCBhbmQgdWludCBwcm9wZXJ0aWVz
+IGFzIGFwcHJvcHJpYXRlCjE2MDE3ZmQgb2JqZWN0OiB1c2UgbW9yZSBzcGVjaWZpYyBwcm9wZXJ0
+eSB0eXBlIG5hbWVzCjc0MWIxMGYgb2JqZWN0OiBhZGQgdWludCBwcm9wZXJ0eSBzZXR0ZXIvZ2V0
+dGVyCmIzODA0YmQgcW51bTogZml4IGdldF9pbnQoKSB3aXRoIHZhbHVlcyA+IElOVDY0X01BWAoy
+YWJhN2ZjIHFhcGk6IHVwZGF0ZSB0aGUgcW9iamVjdCB2aXNpdG9yIHRvIHVzZSBRVUludAo1ZTYz
+N2U0IGpzb246IGxlYXJuIHRvIHBhcnNlIHVpbnQ2NCBudW1iZXJzCjAzYzNjMGEgcW51bTogYWRk
+IHVpbnQgdHlwZQpmOTAxMWEzIHFhcGk6IHJlbW92ZSBwcm9tb3RlX2ludAo3NTVjMjQ2IHFhcGk6
+IG1lcmdlIFFJbnQgYW5kIFFGbG9hdCBpbiBRTnVtCjRkMzcwMzIgdGVzdHM6IHJlbW92ZSBhbHQg
+bnVtLWludCBjYXNlcwplOTcyMmFjIG9iamVjdDogZml4IHBvdGVudGlhbCBsZWFrIGluIGdldHRl
+cnMKOTg4Y2I1MyBxZGV2OiByZW1vdmUgUHJvcGVydHlJbmZvLnF0eXBlIGZpZWxkCgo9PT0gT1VU
+UFVUIEJFR0lOID09PQpDaGVja2luZyBQQVRDSCAxLzE3OiBxZGV2OiByZW1vdmUgUHJvcGVydHlJ
+bmZvLnF0eXBlIGZpZWxkLi4uCkNoZWNraW5nIFBBVENIIDIvMTc6IG9iamVjdDogZml4IHBvdGVu
+dGlhbCBsZWFrIGluIGdldHRlcnMuLi4KQ2hlY2tpbmcgUEFUQ0ggMy8xNzogdGVzdHM6IHJlbW92
+ZSBhbHQgbnVtLWludCBjYXNlcy4uLgpDaGVja2luZyBQQVRDSCA0LzE3OiBxYXBpOiBtZXJnZSBR
+SW50IGFuZCBRRmxvYXQgaW4gUU51bS4uLgpFUlJPUjogZG8gbm90IHVzZSBDOTkgLy8gY29tbWVu
+dHMKIzE4ODU6IEZJTEU6IHRlc3RzL2NoZWNrLXFudW0uYzozNToKKyAgICAvLyBkZXN0cm95IGRv
+ZXNuJ3QgZXhpdCB5ZXQKCkVSUk9SOiBkbyBub3QgdXNlIEM5OSAvLyBjb21tZW50cwojMTkwMDog
+RklMRTogdGVzdHMvY2hlY2stcW51bS5jOjUwOgorICAgIC8vIGRlc3Ryb3kgZG9lc24ndCBleGl0
+IHlldAoKdG90YWw6IDIgZXJyb3JzLCAwIHdhcm5pbmdzLCAxNzY2IGxpbmVzIGNoZWNrZWQKCllv
+dXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRo
+ZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFp
+bmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCkNoZWNraW5nIFBBVENIIDUvMTc6
+IHFhcGk6IHJlbW92ZSBwcm9tb3RlX2ludC4uLgpDaGVja2luZyBQQVRDSCA2LzE3OiBxbnVtOiBh
+ZGQgdWludCB0eXBlLi4uCkVSUk9SOiBkbyBub3QgdXNlIEM5OSAvLyBjb21tZW50cwojMTUyOiBG
+SUxFOiB0ZXN0cy9jaGVjay1xbnVtLmM6NTA6CisgICAgLy8gZGVzdHJveSBkb2Vzbid0IGV4aXQg
+eWV0Cgp0b3RhbDogMSBlcnJvcnMsIDAgd2FybmluZ3MsIDE4MiBsaW5lcyBjaGVja2VkCgpZb3Vy
+IHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVz
+ZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5l
+ciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgpDaGVja2luZyBQQVRDSCA3LzE3OiBq
+c29uOiBsZWFybiB0byBwYXJzZSB1aW50NjQgbnVtYmVycy4uLgpDaGVja2luZyBQQVRDSCA4LzE3
+OiBxYXBpOiB1cGRhdGUgdGhlIHFvYmplY3QgdmlzaXRvciB0byB1c2UgUVVJbnQuLi4KQ2hlY2tp
+bmcgUEFUQ0ggOS8xNzogcW51bTogZml4IGdldF9pbnQoKSB3aXRoIHZhbHVlcyA+IElOVDY0X01B
+WC4uLgpDaGVja2luZyBQQVRDSCAxMC8xNzogb2JqZWN0OiBhZGQgdWludCBwcm9wZXJ0eSBzZXR0
+ZXIvZ2V0dGVyLi4uCkNoZWNraW5nIFBBVENIIDExLzE3OiBvYmplY3Q6IHVzZSBtb3JlIHNwZWNp
+ZmljIHByb3BlcnR5IHR5cGUgbmFtZXMuLi4KQ2hlY2tpbmcgUEFUQ0ggMTIvMTc6IHFkZXY6IHVz
+ZSBpbnQgYW5kIHVpbnQgcHJvcGVydGllcyBhcyBhcHByb3ByaWF0ZS4uLgpDaGVja2luZyBQQVRD
+SCAxMy8xNzogcWRldjogdXNlIGFwcHJvcHJpYXRlIGdldHRlci9zZXR0ZXJzIHR5cGUuLi4KQ2hl
+Y2tpbmcgUEFUQ0ggMTQvMTc6IGFjcGk6IGZpeCBzMy9zNCBkaXNhYmxlZCB0eXBlLi4uCkNoZWNr
+aW5nIFBBVENIIDE1LzE3OiBVc2UgdWludCBwcm9wZXJ0eSBnZXR0ZXIvc2V0dGVyIHdoZXJlIGFw
+cHJvcHJpYXRlLi4uCkNoZWNraW5nIFBBVENIIDE2LzE3OiBSRkM6IHFkaWN0OiBhZGQgdWludC4u
+LgpDaGVja2luZyBQQVRDSCAxNy8xNzogcW9iamVjdDogbW92ZSBkdW1wX3FvYmplY3QoKSBmcm9t
+IGJsb2NrLyB0byBxb2JqZWN0Ly4uLgo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFuZCBl
+eGl0ZWQgd2l0aCBjb2RlOiAxCgoKLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5
+IFBhdGNoZXcgW2h0dHA6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNr
+IHRvIHBhdGNoZXctZGV2ZWxAZnJlZWxpc3RzLm9yZw==
