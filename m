@@ -1,30 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35606)
-	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1d9Kvx-0008Pa-Lq
-	for qemu-devel@nongnu.org; Fri, 12 May 2017 20:29:22 -0400
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44821)
+	by lists.gnu.org with esmtp (Exim 4.71) (envelope-from <n54@gmx.com>)
+	id 1d9LK9-0001zu-0K
+	for qemu-devel@nongnu.org; Fri, 12 May 2017 20:54:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1d9Kvt-000803-Ox
-	for qemu-devel@nongnu.org; Fri, 12 May 2017 20:29:21 -0400
-Received: from mail-qt0-x244.google.com ([2607:f8b0:400d:c0d::244]:32771)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1d9Kvt-0007yp-Lm
-	for qemu-devel@nongnu.org; Fri, 12 May 2017 20:29:17 -0400
-Received: by mail-qt0-x244.google.com with SMTP id a46so8795209qte.0
-	for <qemu-devel@nongnu.org>; Fri, 12 May 2017 17:29:17 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Fri, 12 May 2017 21:29:06 -0300
-Message-Id: <20170513002906.31201-1-f4bug@amsat.org>
-In-Reply-To: <a98c67f8-3c5c-b68d-beea-f1972bb3dc0d@twiddle.net>
-References: <a98c67f8-3c5c-b68d-beea-f1972bb3dc0d@twiddle.net>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH] tcg: optimize gen_extr_i64_i32()
+	(envelope-from <n54@gmx.com>) id 1d9LK4-0006nx-6F
+	for qemu-devel@nongnu.org; Fri, 12 May 2017 20:54:21 -0400
+Received: from mout.gmx.net ([212.227.15.15]:64848)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <n54@gmx.com>) id 1d9LK3-0006n6-RQ
+	for qemu-devel@nongnu.org; Fri, 12 May 2017 20:54:16 -0400
+From: Kamil Rytarowski <n54@gmx.com>
+Date: Sat, 13 May 2017 02:46:16 +0200
+Message-Id: <20170513004616.25749-1-n54@gmx.com>
+Subject: [Qemu-devel] [PATCH] ivshmem-server: Detect and use if there is
+ required -lrt linking
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,40 +22,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>, Aurelien Jarno <aurelien@aurel32.net>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+To: qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, Kamil Rytarowski <n54@gmx.com>
 
-Inspired by Richard Henderson comment:
+ivshmem-server makes use of the POSIX shared memory object interfaces.
+This library is provided on NetBSD in -lrt (POSIX Real-time Library).
+Add ./configure check if there is needed -lrt linking for shm_open()
+and if so use it. Introduce new configure generated variable LIBS_SHMLIB.
 
-    http://lists.nongnu.org/archive/html/qemu-devel/2017-05/msg02277.html
+This fixes build issue on NetBSD.
 
-Patch applied mechanically with this coccinelle semantic patch:
-
-    @@
-    expression lo, hi,arg;
-    @@
-    -tcg_gen_extrl_i64_i32(lo, arg);
-    -tcg_gen_extrh_i64_i32(hi, arg);
-    +tcg_gen_extr_i64_i32(lo, hi, arg);
-
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Signed-off-by: Kamil Rytarowski <n54@gmx.com>
 ---
- tcg/tcg-op.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+ Makefile  |  1 +
+ configure | 20 ++++++++++++++++++++
+ 2 files changed, 21 insertions(+)
 
-diff --git a/tcg/tcg-op.c b/tcg/tcg-op.c
-index 6b1f41500c..f3d556c21a 100644
---- a/tcg/tcg-op.c
-+++ b/tcg/tcg-op.c
-@@ -2562,8 +2562,7 @@ void tcg_gen_extr_i64_i32(TCGv_i32 lo, TCGv_i32 hi, TCGv_i64 arg)
-         tcg_gen_mov_i32(lo, TCGV_LOW(arg));
-         tcg_gen_mov_i32(hi, TCGV_HIGH(arg));
-     } else {
--        tcg_gen_extrl_i64_i32(lo, arg);
--        tcg_gen_extrh_i64_i32(hi, arg);
-+        tcg_gen_extr_i64_i32(lo, hi, arg);
-     }
- }
+diff --git a/Makefile b/Makefile
+index 31d41a7eae..3248cb53d7 100644
+--- a/Makefile
++++ b/Makefile
+@@ -473,6 +473,7 @@ ivshmem-client$(EXESUF): $(ivshmem-client-obj-y) $(COMMON_LDADDS)
+ 	$(call LINK, $^)
+ ivshmem-server$(EXESUF): $(ivshmem-server-obj-y) $(COMMON_LDADDS)
+ 	$(call LINK, $^)
++ivshmem-server$(EXESUF): LIBS += $(LIBS_SHMLIB)
  
+ module_block.h: $(SRC_PATH)/scripts/modules/module_block.py config-host.mak
+ 	$(call quiet-command,$(PYTHON) $< $@ \
+diff --git a/configure b/configure
+index 7c020c076b..50c3aee746 100755
+--- a/configure
++++ b/configure
+@@ -179,6 +179,7 @@ audio_pt_int=""
+ audio_win_int=""
+ cc_i386=i386-pc-linux-gnu-gcc
+ libs_qga=""
++libs_shmlib=""
+ debug_info="yes"
+ stack_protector=""
+ 
+@@ -4133,6 +4134,24 @@ elif compile_prog "" "$pthread_lib -lrt" ; then
+   libs_qga="$libs_qga -lrt"
+ fi
+ 
++##########################################
++# Do we need librt for shm_open()
++cat > $TMPC <<EOF
++#include <sys/mman.h>
++#include <sys/stat.h>
++#include <fcntl.h>
++#include <stddef.h>
++int main(void) {
++  return shm_open(NULL, O_RDWR, 0644);
++}
++EOF
++
++if compile_prog "" "" ; then
++  :
++elif compile_prog "" "-lrt" ; then
++  libs_shmlib="$libs_shmlib -lrt"
++fi
++
+ if test "$darwin" != "yes" -a "$mingw32" != "yes" -a "$solaris" != yes -a \
+         "$aix" != "yes" -a "$haiku" != "yes" ; then
+     libs_softmmu="-lutil $libs_softmmu"
+@@ -5949,6 +5968,7 @@ echo "EXESUF=$EXESUF" >> $config_host_mak
+ echo "DSOSUF=$DSOSUF" >> $config_host_mak
+ echo "LDFLAGS_SHARED=$LDFLAGS_SHARED" >> $config_host_mak
+ echo "LIBS_QGA+=$libs_qga" >> $config_host_mak
++echo "LIBS_SHMLIB+=$libs_shmlib" >> $config_host_mak
+ echo "TASN1_LIBS=$tasn1_libs" >> $config_host_mak
+ echo "TASN1_CFLAGS=$tasn1_cflags" >> $config_host_mak
+ echo "POD2MAN=$POD2MAN" >> $config_host_mak
 -- 
-2.11.0
+2.12.2
