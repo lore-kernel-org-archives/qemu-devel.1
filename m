@@ -1,29 +1,36 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54429)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55512)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <arei.gonglei@huawei.com>) id 1d9Lkd-00027e-UF
-	for qemu-devel@nongnu.org; Fri, 12 May 2017 21:21:44 -0400
+	(envelope-from <anthony.xu@intel.com>) id 1d9LnR-0003T1-Up
+	for qemu-devel@nongnu.org; Fri, 12 May 2017 21:24:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <arei.gonglei@huawei.com>) id 1d9Lka-0000h8-PV
-	for qemu-devel@nongnu.org; Fri, 12 May 2017 21:21:43 -0400
-Received: from szxga01-in.huawei.com ([45.249.212.187]:3993)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <arei.gonglei@huawei.com>) id 1d9LkZ-0000fb-WD
-	for qemu-devel@nongnu.org; Fri, 12 May 2017 21:21:40 -0400
-From: "Gonglei (Arei)" <arei.gonglei@huawei.com>
-Date: Sat, 13 May 2017 01:21:14 +0000
-Message-ID: <33183CC9F5247A488A2544077AF19020DA279AB2@DGGEMA505-MBS.china.huawei.com>
-References: <1494243504-127980-1-git-send-email-arei.gonglei@huawei.com>
-	<1494243504-127980-9-git-send-email-arei.gonglei@huawei.com>
-	<20170511170527.5846a676.cornelia.huck@de.ibm.com>
-	<33183CC9F5247A488A2544077AF19020DA26D816@DGGEMA505-MBX.china.huawei.com>
-	<20170512132146.64b811be.cornelia.huck@de.ibm.com>
-In-Reply-To: <20170512132146.64b811be.cornelia.huck@de.ibm.com>
-Content-Language: zh-CN
+	(envelope-from <anthony.xu@intel.com>) id 1d9LnO-0003AO-Pf
+	for qemu-devel@nongnu.org; Fri, 12 May 2017 21:24:37 -0400
+Received: from mga02.intel.com ([134.134.136.20]:2961)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <anthony.xu@intel.com>)
+	id 1d9LnO-00037y-E5
+	for qemu-devel@nongnu.org; Fri, 12 May 2017 21:24:34 -0400
+From: "Xu, Anthony" <anthony.xu@intel.com>
+Date: Sat, 13 May 2017 01:24:30 +0000
+Message-ID: <4712D8F4B26E034E80552F30A67BE0B1AB6DEF@ORSMSX112.amr.corp.intel.com>
+References: <1494502528-12670-1-git-send-email-pbonzini@redhat.com>
+	<20170511145312.GA822@morn.lan>
+	<618febcf-af6d-5fc6-0274-4f64c53f9763@redhat.com>
+	<20170511163447.GA7785@morn.lan>
+	<4712D8F4B26E034E80552F30A67BE0B1AB61D5@ORSMSX112.amr.corp.intel.com>
+	<ff74288a-d26d-b037-2b55-7dac459aa4ec@redhat.com>
+	<4712D8F4B26E034E80552F30A67BE0B1AB6AA2@ORSMSX112.amr.corp.intel.com>
+	<f9c33614-be36-e789-b72b-b4ffcc8bb6a8@redhat.com>
+	<20170512193840.GA22454@morn.lan>
+	<4712D8F4B26E034E80552F30A67BE0B1AB6CBF@ORSMSX112.amr.corp.intel.com>
+	<20170513000141.GA542@morn.lan>
+In-Reply-To: <20170513000141.GA542@morn.lan>
+Content-Language: en-US
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [RFC v1 8/9] virtio-crypto: add host feature bits
- support
+Subject: Re: [Qemu-devel] [PATCH] target/i386: enable A20 automatically in
+ system management mode
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,113 +39,93 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cornelia.huck@de.ibm.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "mst@redhat.com" <mst@redhat.com>, "Huangweidong (C)" <weidong.huang@huawei.com>, "pasic@linux.vnet.ibm.com" <pasic@linux.vnet.ibm.com>, "stefanha@redhat.com" <stefanha@redhat.com>, Luonengjun <luonengjun@huawei.com>, Linqiangmin <linqiangmin@huawei.com>, "xin.zeng@intel.com" <xin.zeng@intel.com>, "Wubin
-	(H)" <wu.wubin@huawei.com>
+To: Kevin O'Connor <kevin@koconnor.net>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 
-> From: Cornelia Huck [mailto:cornelia.huck@de.ibm.com]
-> Sent: Friday, May 12, 2017 7:22 PM
-> To: Gonglei (Arei)
-> Cc: qemu-devel@nongnu.org; mst@redhat.com; Huangweidong (C);
-> pasic@linux.vnet.ibm.com; stefanha@redhat.com; Luonengjun; Linqiangmin;
-> xin.zeng@intel.com; Wubin (H)
-> Subject: Re: [RFC v1 8/9] virtio-crypto: add host feature bits support
+> -----Original Message-----
+> From: Kevin O'Connor [mailto:kevin@koconnor.net]
+> Sent: Friday, May 12, 2017 5:02 PM
+> To: Xu, Anthony <anthony.xu@intel.com>
+> Cc: Paolo Bonzini <pbonzini@redhat.com>; qemu-devel@nongnu.org
+> Subject: Re: [PATCH] target/i386: enable A20 automatically in system
+> management mode
 >=20
-> On Fri, 12 May 2017 00:55:23 +0000
-> "Gonglei (Arei)" <arei.gonglei@huawei.com> wrote:
->=20
-> > >
-> > > From: Cornelia Huck [mailto:cornelia.huck@de.ibm.com]
-> > > Sent: Thursday, May 11, 2017 11:05 PM
-> > > Subject: Re: [RFC v1 8/9] virtio-crypto: add host feature bits suppor=
+> On Fri, May 12, 2017 at 11:19:00PM +0000, Xu, Anthony wrote:
+> > > SeaBIOS defaults to enabling A20 and it's a rare beast that disables
+> > > it.  One could change x86.h:set_a20 and romlayout.S:transition32 to
+> > > only issue the outb() if the inb() indicates a change is needed.  Tha=
 t
-> > >
-> > > On Mon, 8 May 2017 19:38:23 +0800
-> > > Gonglei <arei.gonglei@huawei.com> wrote:
-> > >
-> > > > We enable all feature bits acquiescently.
-> > > >
-> > > > Signed-off-by: Gonglei <arei.gonglei@huawei.com>
-> > > > ---
-> > > >  hw/virtio/virtio-crypto.c         | 15 +++++++++++++++
-> > > >  include/hw/virtio/virtio-crypto.h |  1 +
-> > > >  2 files changed, 16 insertions(+)
-> > > >
-> > > > diff --git a/hw/virtio/virtio-crypto.c b/hw/virtio/virtio-crypto.c
-> > > > index 5422f25..3dc0ff2 100644
-> > > > --- a/hw/virtio/virtio-crypto.c
-> > > > +++ b/hw/virtio/virtio-crypto.c
-> > > > @@ -1034,6 +1034,11 @@ static uint64_t
-> > > virtio_crypto_get_features(VirtIODevice *vdev,
-> > > >                                             uint64_t features,
-> > > >                                             Error **errp)
-> > > >  {
-> > > > +    VirtIOCrypto *vcrypto =3D VIRTIO_CRYPTO(vdev);
-> > > > +
-> > > > +    /* Firstly sync all virtio-crypto possible supported features =
-*/
-> > > > +    features |=3D vcrypto->host_features;
-> > > > +
-> > > >      return features;
-> > > >  }
-> > > >
-> > > > @@ -1144,6 +1149,16 @@ static const VMStateDescription
-> > > vmstate_virtio_crypto =3D {
-> > > >  };
-> > > >
-> > > >  static Property virtio_crypto_properties[] =3D {
-> > > > +    DEFINE_PROP_BIT("mux_mode", VirtIOCrypto, host_features,
-> > > > +                    VIRTIO_CRYPTO_F_MUX_MODE, true),
-> > > > +    DEFINE_PROP_BIT("cipher_stateless_mode", VirtIOCrypto,
-> > > host_features,
-> > > > +                    VIRTIO_CRYPTO_F_CIPHER_STATELESS_MODE,
-> > > true),
-> > > > +    DEFINE_PROP_BIT("hash_stateless_mode", VirtIOCrypto,
-> > > host_features,
-> > > > +                    VIRTIO_CRYPTO_F_HASH_STATELESS_MODE,
-> > > true),
-> > > > +    DEFINE_PROP_BIT("mac_stateless_mode", VirtIOCrypto,
-> > > host_features,
-> > > > +                    VIRTIO_CRYPTO_F_MAC_STATELESS_MODE,
-> true),
-> > > > +    DEFINE_PROP_BIT("aead_stateless_mode", VirtIOCrypto,
-> > > host_features,
-> > > > +                    VIRTIO_CRYPTO_F_AEAD_STATELESS_MODE,
-> > > true),
-> > > >      DEFINE_PROP_END_OF_LIST(),
-> > > >  };
-> > > >
-> > > > diff --git a/include/hw/virtio/virtio-crypto.h
-> b/include/hw/virtio/virtio-crypto.h
-> > > > index 465ad20..30ea51d 100644
-> > > > --- a/include/hw/virtio/virtio-crypto.h
-> > > > +++ b/include/hw/virtio/virtio-crypto.h
-> > > > @@ -97,6 +97,7 @@ typedef struct VirtIOCrypto {
-> > > >      int multiqueue;
-> > > >      uint32_t curr_queues;
-> > > >      size_t config_size;
-> > > > +    uint32_t host_features;
-> > >
-> > > I'd just make that 64 bits from the start.
-> > >
-> > Yes, that's better.
+> > > would likely eliminate half the accesses.
 > >
-> > > >  } VirtIOCrypto;
-> > > >
-> > > >  #endif /* _QEMU_VIRTIO_CRYPTO_H */
-> > >
-> > > Don't you need some kind of compat handling?
+> > The 350 port 92 access is for write operation only.
+> > If include the inb(), it would be 700, and every time it actually has a=
+ change
+> > To be precise, It is about 175 switches from 32 bit to 16 bit, then bac=
+k to 32
+> bit.
+> > call16 is called 175 times during Seabios boot without any option rom,
+> > It would be more if some option roms are included.
 > >
-> > I did that in patch 6 according to the results of those feature bits ne=
-gotiated.
-> > Patch 9 tests both session mode and stateless mode, they are work. :)
+> >
+> > I think A20 is disabled by default in SeaBios.
 >=20
-> Ah, I meant machine compat handling. You probably don't want to offer
-> these feature bits in older compat machines.
+> I don't know why you think that.  One can check with:
+>=20
+> --- a/src/stacks.c
+> +++ b/src/stacks.c
+> @@ -99,6 +99,8 @@ call32_post(void)
+>          if (cr0_caching)
+>              cr0_mask(CR0_CD|CR0_NW, cr0_caching);
+>      }
+> +    if (!get_a20())
+> +        dprintf(1, "a20=3D0\n");
+>=20
+>      // Restore cmos index register
+>      outb(GET_LOW(Call16Data.cmosindex), PORT_CMOS_INDEX);
+>=20
+> With the above I only see a handful of cases where SeaBIOS has to
+> restore a20 to a disabled state.
 
-Oh, yes, the older compat machines only can support session mode.
-I don't think it's necessary to offer these feature bits which have to
-be false default.
+I think it is related to accel and platform, the result I gave before is fo=
+r q35 tcg,
 
-Thanks,
--Gonglei
+With the above change,   I got below data
+
+Platform	accel		count of restoring A20 to 0
+Q35		kvm		96
+Q35		tcg		271
+PC		kvm		3
+PC		tcg		3
+
+A lot of A20 restoring happen when SeaBIOS scans AHCI links.
+
+
+>=20
+> The handful I do see are due to cases where yield() is called prior to
+> option rom initialization.  Those handful are eliminated for me with
+> the following fix:
+>=20
+> --- a/src/stacks.c
+> +++ b/src/stacks.c
+> @@ -496,6 +496,7 @@ void
+>  thread_setup(void)
+>  {
+>      CanInterrupt =3D 1;
+> +    call16_override(1);
+>      if (! CONFIG_THREADS)
+>          return;
+>      ThreadControl =3D romfile_loadint("etc/threads", 1);
+
+But I still see a lot of PORT_A20 accesses in QEMU as I expected
+
+
+>=20
+> What OS / bootloader are you running?
+
+/x86_64-softmmu/qemu-system-x86_64 -bios /home/root/git/seabios/out/bios.bi=
+n -smp 1=20
+-machine q35,accel=3Dtcg -m 1G -drive format=3Draw,file=3D/home/root/images=
+/centos7.2.img,if=3Dide,index=3D0=20
+-nographic  -nodefaults  -serial stdio -monitor pty
+
+-Anthony
