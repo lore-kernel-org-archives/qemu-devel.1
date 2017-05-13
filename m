@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41889)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52721)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1d9NoD-00080I-KJ
-	for qemu-devel@nongnu.org; Fri, 12 May 2017 23:33:39 -0400
+	(envelope-from <no-reply@patchew.org>) id 1d9OJf-0008SB-BB
+	for qemu-devel@nongnu.org; Sat, 13 May 2017 00:06:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1d9NoA-0005PU-Dd
-	for qemu-devel@nongnu.org; Fri, 12 May 2017 23:33:33 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:57838)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1d9No9-0005Nm-Uh
-	for qemu-devel@nongnu.org; Fri, 12 May 2017 23:33:30 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id E4A9FC057FA8
-	for <qemu-devel@nongnu.org>; Sat, 13 May 2017 03:33:28 +0000 (UTC)
-From: Eduardo Habkost <ehabkost@redhat.com>
-Date: Sat, 13 May 2017 00:33:16 -0300
-Message-Id: <20170513033316.22395-4-ehabkost@redhat.com>
+	(envelope-from <no-reply@patchew.org>) id 1d9OJc-00067z-3q
+	for qemu-devel@nongnu.org; Sat, 13 May 2017 00:06:03 -0400
+Resent-Message-Id: <E1d9OJc-00067z-3q@eggs.gnu.org>
+Received: from sender-of-o52.zoho.com ([135.84.80.217]:21327)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1d9OJb-000647-JJ
+	for qemu-devel@nongnu.org; Sat, 13 May 2017 00:05:59 -0400
 In-Reply-To: <20170513033316.22395-1-ehabkost@redhat.com>
-References: <20170513033316.22395-1-ehabkost@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 3/3] scripts: Test script to look for
- -device crashes
+Message-ID: <149464834744.396.16087272829990660175@c05f1edc8ed1>
+Reply-To: <qemu-devel@nongnu.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Fri, 12 May 2017 21:05:48 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PATCH v2 0/3] script for crash-testing -device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,581 +28,379 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Thomas Huth <thuth@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Markus Armbruster <armbru@redhat.com>
+To: ehabkost@redhat.com
+Cc: famz@redhat.com, qemu-devel@nongnu.org, marcel@redhat.com, thuth@redhat.com, armbru@redhat.com
 
-Test code to check if we can crash QEMU using -device. It will
-test all accel/machine/device combinations by default, which may
-take a few hours (it's more than 90k test cases). There's a "-r"
-option that makes it test a random sample of combinations.
-
-The scripts contains a whitelist for: 1) known error messages
-that make QEMU exit cleanly; 2) known QEMU crashes.
-
-This is the behavior when the script finds a failure:
-
-* Known clean (exitcode=1) error messages generate INFO messages
-  (visible only in verbose mode), to make script output shorter
-* Unknown clean error messages generate warnings
-  (visible by default)
-* Known crashes generate error messages, but are not fatal
-* Unknown crashes generate fatal error messages
-
-I'm unsure about the need to maintain a list of known clean error
-messages, but I wanted to at least document all existing failure
-cases to use as base to build more comprehensive test code.
-
-Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
----
-Changes v1 -> v2:
-* New whitelist entries:
-  * "could not find stage1 bootloader"
-  * Segfaults when using devices: a15mpcore_priv, sb16, cs4231a, arm-gicv3
-* Format "success" line using formatTestCase(), and using DEBUg
-  loglevel
-* Reword "test case:" line with "running test case:", for clarity
-* Fix "pc-.*" whitelist to include "q35" too
-* Add --devtype option to test only a specific device type
-* Send all log messages to stdout instead of stderr
-* Avoid printing "obsolete whitelist entry?" messages if we know
-  we are not testing every single accel/machine/device
-  combination
-* --quick mode, to skip cases where failures are always expected,
-  and to print a warning in case we don't get an expected failure
-* Use qemu.QEMUMachine instead of qtest.QEMUQtestMachine, as we don't
-  use any of the QEMUQtestMachine features
-* Fix handling of multiple '-t' options
-* Simplify code that generate random sample of test cases
----
- scripts/device-crash-test.py | 520 +++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 520 insertions(+)
- create mode 100755 scripts/device-crash-test.py
-
-diff --git a/scripts/device-crash-test.py b/scripts/device-crash-test.py
-new file mode 100755
-index 0000000000..550da70ec7
---- /dev/null
-+++ b/scripts/device-crash-test.py
-@@ -0,0 +1,520 @@
-+#!/usr/bin/env python2.7
-+#
-+# Run QEMU with all combinations of -machine and -device types,
-+# check for crashes and unexpected errors.
-+#
-+#  Copyright (c) 2017 Red Hat Inc
-+#
-+# Author:
-+#  Eduardo Habkost <ehabkost@redhat.com>
-+#
-+# This library is free software; you can redistribute it and/or
-+# modify it under the terms of the GNU Lesser General Public
-+# License as published by the Free Software Foundation; either
-+# version 2 of the License, or (at your option) any later version.
-+#
-+# This library is distributed in the hope that it will be useful,
-+# but WITHOUT ANY WARRANTY; without even the implied warranty of
-+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+# Lesser General Public License for more details.
-+#
-+# You should have received a copy of the GNU Lesser General Public
-+# License along with this library; if not, see <http://www.gnu.org/licenses/>.
-+#
-+
-+import sys, os, glob
-+sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'scripts'))
-+
-+from itertools import chain
-+from qemu import QEMUMachine
-+import logging, traceback, re, random, argparse
-+
-+logger = logging.getLogger('device-crash-test')
-+dbg = logger.debug
-+
-+# Valid whitelist entry keys:
-+# - accel: regexp, full match only
-+# - machine: regexp, full match only
-+# - device: regexp, full match only
-+# - log: regexp, partial match allowed
-+# - exitcode: if not present, defaults to 1. If None, matches any exitcode
-+# - warn: if True, matching failures will be logged as warnings
-+# - expected: if True, QEMU is expected to always fail every time
-+#   when testing the corresponding test case
-+ERROR_WHITELIST = [
-+  # Machines that won't work out of the box:
-+  #             MACHINE                         | ERROR MESSAGE
-+  dict(machine='niagara', expected=True),       # Unable to load a firmware for -M niagara
-+  dict(machine='boston', expected=True),        # Please provide either a -kernel or -bios argument
-+  dict(machine='leon3_generic', expected=True), # Can't read bios image (null)
-+
-+  # devices that don't work out of the box because they require extra options to "-device DEV":
-+  #            DEVICE                                    | ERROR MESSAGE
-+  dict(device='.*-(i386|x86_64)-cpu', expected=True),    # CPU socket-id is not set
-+  dict(device='ARM,bitband-memory', expected=True),      # source-memory property not set
-+  dict(device='arm.cortex-a9-global-timer', expected=True), # a9_gtimer_realize: num-cpu must be between 1 and 4
-+  dict(device='arm_mptimer', expected=True),             # num-cpu must be between 1 and 4
-+  dict(device='armv7m', expected=True),                  # memory property was not set
-+  dict(device='aspeed.scu', expected=True),              # Unknown silicon revision: 0x0
-+  dict(device='aspeed.sdmc', expected=True),             # Unknown silicon revision: 0x0
-+  dict(device='bcm2835-dma', expected=True),             # bcm2835_dma_realize: required dma-mr link not found: Property '.dma-mr' not found
-+  dict(device='bcm2835-fb', expected=True),              # bcm2835_fb_realize: required vcram-base property not set
-+  dict(device='bcm2835-mbox', expected=True),            # bcm2835_mbox_realize: required mbox-mr link not found: Property '.mbox-mr' not found
-+  dict(device='bcm2835-peripherals', expected=True),     # bcm2835_peripherals_realize: required ram link not found: Property '.ram' not found
-+  dict(device='bcm2835-property', expected=True),        # bcm2835_property_realize: required fb link not found: Property '.fb' not found
-+  dict(device='bcm2835_gpio', expected=True),            # bcm2835_gpio_realize: required sdhci link not found: Property '.sdbus-sdhci' not found
-+  dict(device='bcm2836', expected=True),                 # bcm2836_realize: required ram link not found: Property '.ram' not found
-+  dict(device='cfi.pflash01', expected=True),            # attribute "sector-length" not specified or zero.
-+  dict(device='cfi.pflash02', expected=True),            # attribute "sector-length" not specified or zero.
-+  dict(device='icp', expected=True),                     # icp_realize: required link 'xics' not found: Property '.xics' not found
-+  dict(device='ics', expected=True),                     # ics_base_realize: required link 'xics' not found: Property '.xics' not found
-+  dict(device='ide-drive', expected=True),               # No drive specified
-+  dict(device='ide-hd', expected=True),                  # No drive specified
-+  dict(device='ipmi-bmc-extern', expected=True),         # IPMI external bmc requires chardev attribute
-+  dict(device='isa-debugcon', expected=True),            # Can't create serial device, empty char device
-+  dict(device='isa-ipmi-bt', expected=True),             # IPMI device requires a bmc attribute to be set
-+  dict(device='isa-ipmi-kcs', expected=True),            # IPMI device requires a bmc attribute to be set
-+  dict(device='isa-parallel', expected=True),            # Can't create serial device, empty char device
-+  dict(device='isa-serial', expected=True),              # Can't create serial device, empty char device
-+  dict(device='ivshmem', expected=True),                 # You must specify either 'shm' or 'chardev'
-+  dict(device='ivshmem-doorbell', expected=True),        # You must specify a 'chardev'
-+  dict(device='ivshmem-plain', expected=True),           # You must specify a 'memdev'
-+  dict(device='kvm-pci-assign', expected=True),          # no host device specified
-+  dict(device='loader', expected=True),                  # please include valid arguments
-+  dict(device='nand', expected=True),                    #' Unsupported NAND block size 0x1
-+  dict(device='nvdimm', expected=True),                  # 'memdev' property is not set
-+  dict(device='nvme', expected=True),                    # Device initialization failed
-+  dict(device='pc-dimm', expected=True),                 # 'memdev' property is not set
-+  dict(device='pci-bridge', expected=True),              # Bridge chassis not specified. Each bridge is required to be assigned a unique chassis id > 0.
-+  dict(device='pci-bridge-seat', expected=True),         # Bridge chassis not specified. Each bridge is required to be assigned a unique chassis id > 0.
-+  dict(device='pci-serial', expected=True),              # Can't create serial device, empty char device
-+  dict(device='pci-serial-2x', expected=True),           # Can't create serial device, empty char device
-+  dict(device='pci-serial-4x', expected=True),           # Can't create serial device, empty char device
-+  dict(device='pxa2xx-dma', expected=True),              # channels value invalid
-+  dict(device='pxb', expected=True),                     # Bridge chassis not specified. Each bridge is required to be assigned a unique chassis id > 0.
-+  dict(device='scsi-block', expected=True),              # drive property not set
-+  dict(device='scsi-disk', expected=True),               # drive property not set
-+  dict(device='scsi-generic', expected=True),            # drive property not set
-+  dict(device='scsi-hd', expected=True),                 # drive property not set
-+  dict(device='spapr-pci-host-bridge', expected=True),   # BUID not specified for PHB
-+  dict(device='spapr-pci-vfio-host-bridge', expected=True), # BUID not specified for PHB
-+  dict(device='spapr-rng', expected=True),               #' spapr-rng needs an RNG backend!
-+  dict(device='spapr-vty', expected=True),               # chardev property not set
-+  dict(device='tpm-tis', expected=True),                 # tpm_tis: backend driver with id (null) could not be found
-+  dict(device='unimplemented-device', expected=True),    # property 'size' not specified or zero
-+  dict(device='usb-braille', expected=True),             # Property chardev is required
-+  dict(device='usb-mtp', expected=True),                 # x-root property must be configured
-+  dict(device='usb-redir', expected=True),               # Parameter 'chardev' is missing
-+  dict(device='usb-serial', expected=True),              # Property chardev is required
-+  dict(device='usb-storage', expected=True),             # drive property not set
-+  dict(device='vfio-amd-xgbe', expected=True),           # -device vfio-amd-xgbe: vfio error: wrong host device name
-+  dict(device='vfio-calxeda-xgmac', expected=True),      # -device vfio-calxeda-xgmac: vfio error: wrong host device name
-+  dict(device='vfio-pci', expected=True),                # No provided host device
-+  dict(device='vfio-pci-igd-lpc-bridge', expected=True), # VFIO dummy ISA/LPC bridge must have address 1f.0
-+  dict(device='vhost-scsi.*', expected=True),            # vhost-scsi: missing wwpn
-+  dict(device='vhost-vsock-device', expected=True),      # guest-cid property must be greater than 2
-+  dict(device='vhost-vsock-pci', expected=True),         # guest-cid property must be greater than 2
-+  dict(device='virtio-9p-ccw', expected=True),           # 9pfs device couldn't find fsdev with the id = NULL
-+  dict(device='virtio-9p-device', expected=True),        # 9pfs device couldn't find fsdev with the id = NULL
-+  dict(device='virtio-9p-pci', expected=True),           # 9pfs device couldn't find fsdev with the id = NULL
-+  dict(device='virtio-blk-ccw', expected=True),          # drive property not set
-+  dict(device='virtio-blk-device', expected=True),       # drive property not set
-+  dict(device='virtio-blk-device', expected=True),       # drive property not set
-+  dict(device='virtio-blk-pci', expected=True),          # drive property not set
-+  dict(device='virtio-crypto-ccw', expected=True),       # 'cryptodev' parameter expects a valid object
-+  dict(device='virtio-crypto-device', expected=True),    # 'cryptodev' parameter expects a valid object
-+  dict(device='virtio-crypto-pci', expected=True),       # 'cryptodev' parameter expects a valid object
-+  dict(device='virtio-input-host-device', expected=True), # evdev property is required
-+  dict(device='virtio-input-host-pci', expected=True),   # evdev property is required
-+  dict(device='xen-pvdevice', expected=True),            # Device ID invalid, it must always be supplied
-+  dict(device='vhost-vsock-ccw', expected=True),         # guest-cid property must be greater than 2
-+  dict(device='ALTR.timer', expected=True),              # "clock-frequency" property must be provided
-+  dict(device='zpci', expected=True),                    # target must be defined
-+
-+  # ioapic devices are already created by pc and will fail:
-+  dict(machine='q35|pc.*', device='kvm-ioapic', expected=True), # Only 1 ioapics allowed
-+  dict(machine='q35|pc.*', device='ioapic', expected=True),     # Only 1 ioapics allowed
-+
-+  # KVM-specific devices shouldn't be tried without accel=kvm:
-+  dict(accel='(?!kvm).*', device='kvmclock', expected=True),
-+  dict(accel='(?!kvm).*', device='kvm-pci-assign', expected=True),
-+
-+  # xen-specific machines and devices:
-+  dict(accel='(?!xen).*', machine='xen.*', expected=True),
-+  dict(accel='(?!xen).*', device='xen-.*', expected=True),
-+
-+  # KNOWN CRASHES:
-+  # known crashes will generate error messages, but won't be fatal:
-+  dict(exitcode=-6, log=r"Device 'serial0' is in use", loglevel=logging.ERROR),
-+  dict(exitcode=-6, log=r"spapr_rtas_register: Assertion .*rtas_table\[token\]\.name.* failed", loglevel=logging.ERROR),
-+  dict(exitcode=-6, log=r"qemu_net_client_setup: Assertion `!peer->peer' failed", loglevel=logging.ERROR),
-+  dict(exitcode=-6, log=r'RAMBlock "[\w.-]+" already registered', loglevel=logging.ERROR),
-+  dict(exitcode=-6, log=r"find_ram_offset: Assertion `size != 0' failed.", loglevel=logging.ERROR),
-+  dict(exitcode=-6, log=r"puv3_load_kernel: Assertion `kernel_filename != NULL' failed", loglevel=logging.ERROR),
-+  dict(exitcode=-6, log=r"add_cpreg_to_hashtable: code should not be reached", loglevel=logging.ERROR),
-+  dict(exitcode=-6, log=r"qemu_alloc_display: Assertion `surface->image != NULL' failed", loglevel=logging.ERROR),
-+  dict(exitcode=-6, log=r"Unexpected error in error_set_from_qdev_prop_error", loglevel=logging.ERROR),
-+  dict(exitcode=-6, log=r"Object .* is not an instance of type spapr-machine", loglevel=logging.ERROR),
-+  dict(exitcode=-6, log=r"Object .* is not an instance of type generic-pc-machine", loglevel=logging.ERROR),
-+  dict(exitcode=-6, log=r"Object .* is not an instance of type e500-ccsr", loglevel=logging.ERROR),
-+  dict(exitcode=-6, log=r"vmstate_register_with_alias_id: Assertion `!se->compat || se->instance_id == 0' failed", loglevel=logging.ERROR),
-+  dict(exitcode=-11, device='stm32f205-soc', loglevel=logging.ERROR, expected=True),
-+  dict(exitcode=-11, device='xlnx,zynqmp', loglevel=logging.ERROR, expected=True),
-+  dict(exitcode=-11, device='mips-cps', loglevel=logging.ERROR, expected=True),
-+  dict(exitcode=-11, device='gus', loglevel=logging.ERROR, expected=True),
-+  dict(exitcode=-11, device='a9mpcore_priv', loglevel=logging.ERROR, expected=True),
-+  dict(exitcode=-11, device='a15mpcore_priv', loglevel=logging.ERROR, expected=True),
-+  dict(exitcode=-11, device='isa-serial', loglevel=logging.ERROR, expected=True),
-+  dict(exitcode=-11, device='sb16', loglevel=logging.ERROR, expected=True),
-+  dict(exitcode=-11, device='cs4231a', loglevel=logging.ERROR, expected=True),
-+  dict(exitcode=-11, device='arm-gicv3', loglevel=logging.ERROR, expected=True),
-+  dict(exitcode=-11, machine='isapc', device='.*-iommu', loglevel=logging.ERROR, expected=True),
-+
-+  # Some error messages that are common on multiple devices/machines:
-+  dict(log=r"No '[\w-]+' bus found for device '[\w-]+'"),
-+  dict(log=r"images* must be given with the 'pflash' parameter"),
-+  dict(log=r"(Guest|ROM|Flash|Kernel) image must be specified"),
-+  dict(log=r"[cC]ould not load [\w ]+ (BIOS|bios) '[\w-]+\.bin'"),
-+  dict(log=r"Couldn't find rom image '[\w-]+\.bin'"),
-+  dict(log=r"speed mismatch trying to attach usb device"),
-+  dict(log=r"Can't create a second ISA bus"),
-+  dict(log=r"duplicate fw_cfg file name"),
-+  # sysbus-related error messages: most machines reject most dynamic sysbus devices:
-+  #TODO: expected=True entries for unsupported sysbus devices
-+  dict(log=r"Option '-device [\w.,-]+' cannot be handled by this machine"),
-+  dict(log=r"Device [\w.,-]+ is not supported by this machine yet"),
-+  dict(log=r"Device [\w.,-]+ can not be dynamically instantiated"),
-+  dict(log=r"Platform Bus: Can not fit MMIO region of size "),
-+  # other more specific errors we will ignore:
-+  dict(device='allwinner-a10', log="Unsupported NIC model:"),
-+  dict(device='.*-spapr-cpu-core', log=r"CPU core type should be"),
-+  dict(log=r"MSI(-X)? is not supported by interrupt controller"),
-+  dict(log=r"pxb-pcie? devices cannot reside on a PCIe? bus"),
-+  dict(log=r"Ignoring smp_cpus value"),
-+  dict(log=r"sd_init failed: Drive 'sd0' is already in use because it has been automatically connected to another device"),
-+  dict(log=r"This CPU requires a smaller page size than the system is using"),
-+  dict(log=r"MSI-X support is mandatory in the S390 architecture"),
-+  dict(log=r"rom check and register reset failed"),
-+  dict(log=r"Unable to initialize GIC, CPUState for CPU#0 not valid"),
-+  dict(log=r"Multiple VT220 operator consoles are not supported"),
-+  dict(log=r"core 0 already populated"),
-+  dict(log=r"could not find stage1 bootloader"),
-+
-+  # other exitcode=1 failures not listed above will generate warnings:
-+  dict(exitcode=1, loglevel=logging.WARN),
-+
-+  # everything else (including SIGABRT and SIGSEGV) will be a fatal error:
-+  dict(exitcode=None, fatal=True, loglevel=logging.FATAL),
-+]
-+
-+def whitelistMatch(wl, f):
-+    t = f.get('testcase', {})
-+    return (not wl.has_key('machine') \
-+            or not t.has_key('machine') \
-+            or re.match(wl['machine'] +'$', t['machine'])) \
-+           and (not wl.has_key('accel') \
-+                or not t.has_key('accel') \
-+                or re.match(wl['accel'] +'$', t['accel'])) \
-+           and (not wl.has_key('device') \
-+                or not t.has_key('device') \
-+                or re.match(wl['device'] +'$', t['device'])) \
-+           and (wl.get('exitcode', 1) is None \
-+                or not f.has_key('exitcode')
-+                or f['exitcode'] == wl.get('exitcode', 1)) \
-+           and (not wl.has_key('log') \
-+                or not f.has_key('log') \
-+                or re.search(wl['log'], f['log'], re.MULTILINE))
-+
-+def checkWhitelist(f):
-+    """Look up whitelist entry for failure dictionary
-+
-+    Returns index in ERROR_WHITELIST
-+    """
-+    for i,wl in enumerate(ERROR_WHITELIST):
-+        #dbg("whitelist entry: %r", wl)
-+        if whitelistMatch(wl, f):
-+            return i, wl
-+
-+    raise Exception("this should never happen")
-+
-+def qemuOptsEscape(s):
-+    return s.replace(",", ",,")
-+
-+def formatTestCase(t):
-+    return ' '.join('%s=%s' % (k, v) for k,v in t.items())
-+
-+def qomListTypeNames(vm, **kwargs):
-+    """Run qom-list-types QMP command, return type names"""
-+    types = vm.command('qom-list-types', **kwargs)
-+    return [t['name'] for t in types]
-+
-+def infoQDM(vm):
-+    """Parse 'info qdm' output"""
-+    args = {'command-line': 'info qdm'}
-+    devhelp = vm.command('human-monitor-command', **args)
-+    for l in devhelp.split('\n'):
-+        l = l.strip()
-+        if l == '' or l.endswith(':'):
-+            continue
-+        d = {'name': re.search(r'name "([^"]+)"', l).group(1),
-+             'no-user': (re.search(', no-user', l) is not None)}
-+        #dbg('info qdm item: %r', d)
-+        yield d
-+
-+
-+class QemuBinaryInfo:
-+    def __init__(self, binary, devtype):
-+        if devtype is None:
-+            devtype = 'device'
-+
-+        dbg("devtype: %r", devtype)
-+        args = ['-S', '-machine', 'none,accel=kvm:tcg']
-+        dbg("querying info for QEMU binary: %s", binary)
-+        vm = QEMUMachine(binary=binary, args=args)
-+        vm.launch()
-+        try:
-+            self.alldevs = set(qomListTypeNames(vm, implements=devtype, abstract=False))
-+            # there's no way to query cannot_instantiate_with_device_add_yet using QMP,
-+            # so use 'info qdm':
-+            self.no_user_devs = set([d['name'] for d in infoQDM(vm, ) if d['no-user']])
-+            self.machines = list(m['name'] for m in vm.command('query-machines'))
-+            self.user_devs = self.alldevs.difference(self.no_user_devs)
-+            self.kvm_available = vm.command('query-kvm')['enabled']
-+        finally:
-+            vm.shutdown()
-+
-+BINARY_INFO = {}
-+def getBinaryInfo(args, binary):
-+    if not BINARY_INFO.has_key(binary):
-+        BINARY_INFO[binary] = QemuBinaryInfo(binary, args.devtype)
-+    return BINARY_INFO[binary]
-+
-+def checkOneCase(args, testcase):
-+    """Check one specific case
-+
-+    Returns a dictionary containing failure information on error,
-+    or None on success
-+    """
-+    binary = testcase['binary']
-+    accel = testcase['accel']
-+    machine = testcase['machine']
-+    device = testcase['device']
-+    info = getBinaryInfo(args, binary)
-+
-+    dbg("will test: %r", testcase)
-+
-+    args = ['-S', '-machine', '%s,accel=%s' % (machine, accel),
-+            '-device', qemuOptsEscape(device)]
-+    cmdline = ' '.join([binary] + args)
-+    dbg("will launch QEMU: %s", cmdline)
-+    vm = QEMUMachine(binary=binary, args=args)
-+
-+    exception = None
-+    try:
-+        vm.launch()
-+    except KeyboardInterrupt:
-+        raise
-+    except Exception,e:
-+        exception = e
-+    finally:
-+        vm.shutdown()
-+        ec = vm.exitcode()
-+        log = vm.get_log()
-+
-+    if exception is not None or ec != 0:
-+        f = dict(exception = exception,
-+                 exitcode = ec,
-+                 log = log,
-+                 testcase = testcase,
-+                 cmdline=cmdline)
-+        return f
-+
-+def binariesToTest(args, testcase):
-+    if args.qemu:
-+        r = args.qemu
-+    else:
-+        r = glob.glob('./*-softmmu/qemu-system-*')
-+    return r
-+
-+def accelsToTest(args, testcase):
-+    if getBinaryInfo(args, testcase['binary']).kvm_available:
-+        yield 'kvm'
-+    yield 'tcg'
-+
-+def machinesToTest(args, testcase):
-+    return getBinaryInfo(args, testcase['binary']).machines
-+
-+def devicesToTest(args, testcase):
-+    return getBinaryInfo(args, testcase['binary']).user_devs
-+
-+TESTCASE_VARIABLES = [
-+    ('binary', binariesToTest),
-+    ('accel', accelsToTest),
-+    ('machine', machinesToTest),
-+    ('device', devicesToTest),
-+]
-+
-+def genCases1(args, testcases, var, fn):
-+    """Generate new testcases for one variable
-+
-+    If an existing item already has a variable set, don't
-+    generate new items and just return it directly. This
-+    allows the "-t" command-line option to be used to choose
-+    a specific test case.
-+    """
-+    for testcase in testcases:
-+        t = testcase.copy
-+        if testcase.has_key(var):
-+            yield testcase.copy()
-+        else:
-+            for i in fn(args, testcase):
-+                t = testcase.copy()
-+                t[var] = i
-+                yield t
-+
-+def genCases(args, testcase):
-+    """Generate test cases for all variables
-+    """
-+    cases = [testcase.copy()]
-+    for var,fn in TESTCASE_VARIABLES:
-+        dbg("var: %r, fn: %r", var, fn)
-+        cases = genCases1(args, cases, var, fn)
-+    return cases
-+
-+def genAllCases(args, testcase):
-+    return genCases(args, testcase)
-+
-+def pickRandomCase(args, testcase):
-+    cases = list(genCases(args, testcase))
-+    if cases:
-+        assert len(cases) == 1
-+        return cases[0]
-+
-+def casesToTest(args, testcase):
-+    cases = genAllCases(args, testcase)
-+    if args.random:
-+        cases = random.sample(list(cases), args.random)
-+    if args.debug:
-+        cases = list(cases)
-+        dbg("%d test cases to test", len(cases))
-+    if args.shuffle:
-+        cases = list(cases)
-+        random.shuffle(cases)
-+    return cases
-+
-+def logFailure(f, level):
-+    t = f['testcase']
-+    logger.log(level, "failed: %s", formatTestCase(t))
-+    logger.log(level, "cmdline: %s", f['cmdline'])
-+    for l in f['log'].strip().split('\n'):
-+        logger.log(level, "log: %s", l)
-+    logger.log(level, "exit code: %r", f['exitcode'])
-+
-+def main():
-+    parser = argparse.ArgumentParser(description="QEMU -device crash test")
-+    parser.add_argument('-t', metavar='KEY=VALUE', nargs='*',
-+                        help="Limit test cases to KEY=VALUE",
-+                        action='append', dest='testcases', default=[])
-+    parser.add_argument('-d', '--debug', action='store_true',
-+                        help='debug output')
-+    parser.add_argument('-v', '--verbose', action='store_true',
-+                        help='verbose output')
-+    parser.add_argument('-r', '--random', type=int, metavar='COUNT',
-+                        help='run a random sample of COUNT test cases',
-+                        default=0)
-+    parser.add_argument('--shuffle', action='store_true',
-+                        help='Run test cases in random order')
-+    parser.add_argument('--dry-run', action='store_true',
-+                        help="Don't run any tests, just generate list")
-+    parser.add_argument('-D', '--devtype', metavar='TYPE',
-+                        help="Test only device types that implement TYPE")
-+    parser.add_argument('-Q', '--quick', action='store_true',
-+                        help="Quick mode, skip test cases that are expected to fail")
-+    parser.add_argument('qemu', nargs='*', metavar='QEMU',
-+                        help='QEMU binary to run')
-+    args = parser.parse_args()
-+
-+    if args.debug:
-+        lvl = logging.DEBUG
-+    elif args.verbose:
-+        lvl = level=logging.INFO
-+    else:
-+        lvl = level=logging.WARN
-+    logging.basicConfig(stream=sys.stdout, level=lvl, format='%(levelname)s: %(message)s')
-+
-+
-+    interrupted = False
-+    fatal_failures = []
-+    wl_stats = {}
-+    skipped = 0
-+    total = 0
-+
-+    tc = {}
-+    dbg("testcases: %r", args.testcases)
-+    if args.testcases:
-+        for t in chain(*args.testcases):
-+            for kv in t.split():
-+                k,v = kv.split('=', 1)
-+                tc[k] = v
-+
-+    if len(binariesToTest(args, tc)) == 0:
-+        print >>sys.stderr, "No QEMU binary found"
-+        parser.print_usage(sys.stderr)
-+        return 1
-+
-+    for t in casesToTest(args, tc):
-+        logger.info("running test case: %s", formatTestCase(t))
-+        total += 1
-+
-+        _,expected_match = checkWhitelist({'testcase': t})
-+        if args.quick and expected_match.get('expected'):
-+            dbg("Skipped: %s", formatTestCase(t))
-+            skipped += 1
-+            continue
-+
-+        if args.dry_run:
-+            continue
-+
-+        try:
-+            f = checkOneCase(args, t)
-+        except KeyboardInterrupt:
-+            interrupted = True
-+            break
-+
-+        if f:
-+            i,wl = checkWhitelist(f)
-+            dbg("testcase: %r, whitelist match: %r", t, wl)
-+            wl_stats.setdefault(i, []).append(f)
-+            logFailure(f, wl.get('loglevel', logging.DEBUG))
-+            if wl.get('fatal'):
-+                fatal_failures.append(f)
-+        else:
-+            dbg("success: %s", formatTestCase(t))
-+            if expected_match.get('expected'):
-+                logger.warn("Didn't fail as expected: %s", formatTestCase(t))
-+
-+    logger.info("Total: %d test cases", total)
-+    if skipped:
-+        logger.info("Skipped %d test cases", skipped)
-+
-+    # tell us about obsolete whitelist entries so we can clean it up after
-+    # bugs are fixed:
-+    if not (interrupted or args.random or args.dry_run \
-+            or args.testcases or args.qemu or args.devtype):
-+        for i,wl in enumerate(ERROR_WHITELIST):
-+            if not wl_stats.get(i) and not wl.get('fatal'):
-+                logger.info("Obsolete whitelist entry? %r", wl)
-+
-+    stats = sorted([(len(wl_stats[i]), i) for i in wl_stats])
-+    for count,i in stats:
-+        dbg("whitelist entry stats: %d: %r", count, ERROR_WHITELIST[i])
-+
-+    if fatal_failures:
-+        for f in fatal_failures:
-+            t = f['testcase']
-+            logger.error("Fatal failure: %s", formatTestCase(t))
-+        logger.error("Fatal failures on some machine/device combinations")
-+        return 1
-+
-+if __name__ == '__main__':
-+    sys.exit(main())
--- 
-2.11.0.259.g40922b1
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
+c3NhZ2UtaWQ6IDIwMTcwNTEzMDMzMzE2LjIyMzk1LTEtZWhhYmtvc3RAcmVkaGF0LmNvbQpTdWJq
+ZWN0OiBbUWVtdS1kZXZlbF0gW1BBVENIIHYyIDAvM10gc2NyaXB0IGZvciBjcmFzaC10ZXN0aW5n
+IC1kZXZpY2UKCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKCkJBU0U9YmFz
+ZQpuPTEKdG90YWw9JChnaXQgbG9nIC0tb25lbGluZSAkQkFTRS4uIHwgd2MgLWwpCmZhaWxlZD0w
+CgpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2Nh
+bCBkaWZmLnJlbmFtZXMgVHJ1ZQoKY29tbWl0cz0iJChnaXQgbG9nIC0tZm9ybWF0PSVIIC0tcmV2
+ZXJzZSAkQkFTRS4uKSIKZm9yIGMgaW4gJGNvbW1pdHM7IGRvCiAgICBlY2hvICJDaGVja2luZyBQ
+QVRDSCAkbi8kdG90YWw6ICQoZ2l0IGxvZyAtbiAxIC0tZm9ybWF0PSVzICRjKS4uLiIKICAgIGlm
+ICEgZ2l0IHNob3cgJGMgLS1mb3JtYXQ9ZW1haWwgfCAuL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAt
+LW1haWxiYWNrIC07IHRoZW4KICAgICAgICBmYWlsZWQ9MQogICAgICAgIGVjaG8KICAgIGZpCiAg
+ICBuPSQoKG4rMSkpCmRvbmUKCmV4aXQgJGZhaWxlZAo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoK
+VXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApTd2l0Y2hl
+ZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCjY3ZmZjMDMgc2NyaXB0czogVGVzdCBzY3JpcHQgdG8g
+bG9vayBmb3IgLWRldmljZSBjcmFzaGVzCjBiZTAwMTIgcWVtdS5weTogQWRkIFFFTVVNYWNoaW5l
+LmV4aXRjb2RlKCkgbWV0aG9kCjJkZWEyNzggcWVtdS5weTogRG9uJ3Qgc2V0IF9wb3Blbj1Ob25l
+IG9uIGVycm9yL3NodXRkb3duCgo9PT0gT1VUUFVUIEJFR0lOID09PQpDaGVja2luZyBQQVRDSCAx
+LzM6IHFlbXUucHk6IERvbid0IHNldCBfcG9wZW49Tm9uZSBvbiBlcnJvci9zaHV0ZG93bi4uLgpD
+aGVja2luZyBQQVRDSCAyLzM6IHFlbXUucHk6IEFkZCBRRU1VTWFjaGluZS5leGl0Y29kZSgpIG1l
+dGhvZC4uLgpDaGVja2luZyBQQVRDSCAzLzM6IHNjcmlwdHM6IFRlc3Qgc2NyaXB0IHRvIGxvb2sg
+Zm9yIC1kZXZpY2UgY3Jhc2hlcy4uLgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwoj
+ODI6IEZJTEU6IHNjcmlwdHMvZGV2aWNlLWNyYXNoLXRlc3QucHk6NDc6CisgIGRpY3QobWFjaGlu
+ZT0nbmlhZ2FyYScsIGV4cGVjdGVkPVRydWUpLCAgICAgICAjIFVuYWJsZSB0byBsb2FkIGEgZmly
+bXdhcmUgZm9yIC1NIG5pYWdhcmEKCkVSUk9SOiBsaW5lIG92ZXIgOTAgY2hhcmFjdGVycwojODM6
+IEZJTEU6IHNjcmlwdHMvZGV2aWNlLWNyYXNoLXRlc3QucHk6NDg6CisgIGRpY3QobWFjaGluZT0n
+Ym9zdG9uJywgZXhwZWN0ZWQ9VHJ1ZSksICAgICAgICAjIFBsZWFzZSBwcm92aWRlIGVpdGhlciBh
+IC1rZXJuZWwgb3IgLWJpb3MgYXJndW1lbnQKCkVSUk9SOiBsaW5lIG92ZXIgOTAgY2hhcmFjdGVy
+cwojODY6IEZJTEU6IHNjcmlwdHMvZGV2aWNlLWNyYXNoLXRlc3QucHk6NTE6CisgICMgZGV2aWNl
+cyB0aGF0IGRvbid0IHdvcmsgb3V0IG9mIHRoZSBib3ggYmVjYXVzZSB0aGV5IHJlcXVpcmUgZXh0
+cmEgb3B0aW9ucyB0byAiLWRldmljZSBERVYiOgoKV0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJh
+Y3RlcnMKIzg4OiBGSUxFOiBzY3JpcHRzL2RldmljZS1jcmFzaC10ZXN0LnB5OjUzOgorICBkaWN0
+KGRldmljZT0nLiotKGkzODZ8eDg2XzY0KS1jcHUnLCBleHBlY3RlZD1UcnVlKSwgICAgIyBDUFUg
+c29ja2V0LWlkIGlzIG5vdCBzZXQKCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiM4
+OTogRklMRTogc2NyaXB0cy9kZXZpY2UtY3Jhc2gtdGVzdC5weTo1NDoKKyAgZGljdChkZXZpY2U9
+J0FSTSxiaXRiYW5kLW1lbW9yeScsIGV4cGVjdGVkPVRydWUpLCAgICAgICMgc291cmNlLW1lbW9y
+eSBwcm9wZXJ0eSBub3Qgc2V0CgpFUlJPUjogbGluZSBvdmVyIDkwIGNoYXJhY3RlcnMKIzkwOiBG
+SUxFOiBzY3JpcHRzL2RldmljZS1jcmFzaC10ZXN0LnB5OjU1OgorICBkaWN0KGRldmljZT0nYXJt
+LmNvcnRleC1hOS1nbG9iYWwtdGltZXInLCBleHBlY3RlZD1UcnVlKSwgIyBhOV9ndGltZXJfcmVh
+bGl6ZTogbnVtLWNwdSBtdXN0IGJlIGJldHdlZW4gMSBhbmQgNAoKV0FSTklORzogbGluZSBvdmVy
+IDgwIGNoYXJhY3RlcnMKIzkxOiBGSUxFOiBzY3JpcHRzL2RldmljZS1jcmFzaC10ZXN0LnB5OjU2
+OgorICBkaWN0KGRldmljZT0nYXJtX21wdGltZXInLCBleHBlY3RlZD1UcnVlKSwgICAgICAgICAg
+ICAgIyBudW0tY3B1IG11c3QgYmUgYmV0d2VlbiAxIGFuZCA0CgpXQVJOSU5HOiBsaW5lIG92ZXIg
+ODAgY2hhcmFjdGVycwojOTI6IEZJTEU6IHNjcmlwdHMvZGV2aWNlLWNyYXNoLXRlc3QucHk6NTc6
+CisgIGRpY3QoZGV2aWNlPSdhcm12N20nLCBleHBlY3RlZD1UcnVlKSwgICAgICAgICAgICAgICAg
+ICAjIG1lbW9yeSBwcm9wZXJ0eSB3YXMgbm90IHNldAoKV0FSTklORzogbGluZSBvdmVyIDgwIGNo
+YXJhY3RlcnMKIzkzOiBGSUxFOiBzY3JpcHRzL2RldmljZS1jcmFzaC10ZXN0LnB5OjU4OgorICBk
+aWN0KGRldmljZT0nYXNwZWVkLnNjdScsIGV4cGVjdGVkPVRydWUpLCAgICAgICAgICAgICAgIyBV
+bmtub3duIHNpbGljb24gcmV2aXNpb246IDB4MAoKV0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJh
+Y3RlcnMKIzk0OiBGSUxFOiBzY3JpcHRzL2RldmljZS1jcmFzaC10ZXN0LnB5OjU5OgorICBkaWN0
+KGRldmljZT0nYXNwZWVkLnNkbWMnLCBleHBlY3RlZD1UcnVlKSwgICAgICAgICAgICAgIyBVbmtu
+b3duIHNpbGljb24gcmV2aXNpb246IDB4MAoKRVJST1I6IGxpbmUgb3ZlciA5MCBjaGFyYWN0ZXJz
+CiM5NTogRklMRTogc2NyaXB0cy9kZXZpY2UtY3Jhc2gtdGVzdC5weTo2MDoKKyAgZGljdChkZXZp
+Y2U9J2JjbTI4MzUtZG1hJywgZXhwZWN0ZWQ9VHJ1ZSksICAgICAgICAgICAgICMgYmNtMjgzNV9k
+bWFfcmVhbGl6ZTogcmVxdWlyZWQgZG1hLW1yIGxpbmsgbm90IGZvdW5kOiBQcm9wZXJ0eSAnLmRt
+YS1tcicgbm90IGZvdW5kCgpFUlJPUjogbGluZSBvdmVyIDkwIGNoYXJhY3RlcnMKIzk2OiBGSUxF
+OiBzY3JpcHRzL2RldmljZS1jcmFzaC10ZXN0LnB5OjYxOgorICBkaWN0KGRldmljZT0nYmNtMjgz
+NS1mYicsIGV4cGVjdGVkPVRydWUpLCAgICAgICAgICAgICAgIyBiY20yODM1X2ZiX3JlYWxpemU6
+IHJlcXVpcmVkIHZjcmFtLWJhc2UgcHJvcGVydHkgbm90IHNldAoKRVJST1I6IGxpbmUgb3ZlciA5
+MCBjaGFyYWN0ZXJzCiM5NzogRklMRTogc2NyaXB0cy9kZXZpY2UtY3Jhc2gtdGVzdC5weTo2MjoK
+KyAgZGljdChkZXZpY2U9J2JjbTI4MzUtbWJveCcsIGV4cGVjdGVkPVRydWUpLCAgICAgICAgICAg
+ICMgYmNtMjgzNV9tYm94X3JlYWxpemU6IHJlcXVpcmVkIG1ib3gtbXIgbGluayBub3QgZm91bmQ6
+IFByb3BlcnR5ICcubWJveC1tcicgbm90IGZvdW5kCgpFUlJPUjogbGluZSBvdmVyIDkwIGNoYXJh
+Y3RlcnMKIzk4OiBGSUxFOiBzY3JpcHRzL2RldmljZS1jcmFzaC10ZXN0LnB5OjYzOgorICBkaWN0
+KGRldmljZT0nYmNtMjgzNS1wZXJpcGhlcmFscycsIGV4cGVjdGVkPVRydWUpLCAgICAgIyBiY20y
+ODM1X3BlcmlwaGVyYWxzX3JlYWxpemU6IHJlcXVpcmVkIHJhbSBsaW5rIG5vdCBmb3VuZDogUHJv
+cGVydHkgJy5yYW0nIG5vdCBmb3VuZAoKRVJST1I6IGxpbmUgb3ZlciA5MCBjaGFyYWN0ZXJzCiM5
+OTogRklMRTogc2NyaXB0cy9kZXZpY2UtY3Jhc2gtdGVzdC5weTo2NDoKKyAgZGljdChkZXZpY2U9
+J2JjbTI4MzUtcHJvcGVydHknLCBleHBlY3RlZD1UcnVlKSwgICAgICAgICMgYmNtMjgzNV9wcm9w
+ZXJ0eV9yZWFsaXplOiByZXF1aXJlZCBmYiBsaW5rIG5vdCBmb3VuZDogUHJvcGVydHkgJy5mYicg
+bm90IGZvdW5kCgpFUlJPUjogbGluZSBvdmVyIDkwIGNoYXJhY3RlcnMKIzEwMDogRklMRTogc2Ny
+aXB0cy9kZXZpY2UtY3Jhc2gtdGVzdC5weTo2NToKKyAgZGljdChkZXZpY2U9J2JjbTI4MzVfZ3Bp
+bycsIGV4cGVjdGVkPVRydWUpLCAgICAgICAgICAgICMgYmNtMjgzNV9ncGlvX3JlYWxpemU6IHJl
+cXVpcmVkIHNkaGNpIGxpbmsgbm90IGZvdW5kOiBQcm9wZXJ0eSAnLnNkYnVzLXNkaGNpJyBub3Qg
+Zm91bmQKCkVSUk9SOiBsaW5lIG92ZXIgOTAgY2hhcmFjdGVycwojMTAxOiBGSUxFOiBzY3JpcHRz
+L2RldmljZS1jcmFzaC10ZXN0LnB5OjY2OgorICBkaWN0KGRldmljZT0nYmNtMjgzNicsIGV4cGVj
+dGVkPVRydWUpLCAgICAgICAgICAgICAgICAgIyBiY20yODM2X3JlYWxpemU6IHJlcXVpcmVkIHJh
+bSBsaW5rIG5vdCBmb3VuZDogUHJvcGVydHkgJy5yYW0nIG5vdCBmb3VuZAoKRVJST1I6IGxpbmUg
+b3ZlciA5MCBjaGFyYWN0ZXJzCiMxMDI6IEZJTEU6IHNjcmlwdHMvZGV2aWNlLWNyYXNoLXRlc3Qu
+cHk6Njc6CisgIGRpY3QoZGV2aWNlPSdjZmkucGZsYXNoMDEnLCBleHBlY3RlZD1UcnVlKSwgICAg
+ICAgICAgICAjIGF0dHJpYnV0ZSAic2VjdG9yLWxlbmd0aCIgbm90IHNwZWNpZmllZCBvciB6ZXJv
+LgoKRVJST1I6IGxpbmUgb3ZlciA5MCBjaGFyYWN0ZXJzCiMxMDM6IEZJTEU6IHNjcmlwdHMvZGV2
+aWNlLWNyYXNoLXRlc3QucHk6Njg6CisgIGRpY3QoZGV2aWNlPSdjZmkucGZsYXNoMDInLCBleHBl
+Y3RlZD1UcnVlKSwgICAgICAgICAgICAjIGF0dHJpYnV0ZSAic2VjdG9yLWxlbmd0aCIgbm90IHNw
+ZWNpZmllZCBvciB6ZXJvLgoKRVJST1I6IGxpbmUgb3ZlciA5MCBjaGFyYWN0ZXJzCiMxMDQ6IEZJ
+TEU6IHNjcmlwdHMvZGV2aWNlLWNyYXNoLXRlc3QucHk6Njk6CisgIGRpY3QoZGV2aWNlPSdpY3An
+LCBleHBlY3RlZD1UcnVlKSwgICAgICAgICAgICAgICAgICAgICAjIGljcF9yZWFsaXplOiByZXF1
+aXJlZCBsaW5rICd4aWNzJyBub3QgZm91bmQ6IFByb3BlcnR5ICcueGljcycgbm90IGZvdW5kCgpF
+UlJPUjogbGluZSBvdmVyIDkwIGNoYXJhY3RlcnMKIzEwNTogRklMRTogc2NyaXB0cy9kZXZpY2Ut
+Y3Jhc2gtdGVzdC5weTo3MDoKKyAgZGljdChkZXZpY2U9J2ljcycsIGV4cGVjdGVkPVRydWUpLCAg
+ICAgICAgICAgICAgICAgICAgICMgaWNzX2Jhc2VfcmVhbGl6ZTogcmVxdWlyZWQgbGluayAneGlj
+cycgbm90IGZvdW5kOiBQcm9wZXJ0eSAnLnhpY3MnIG5vdCBmb3VuZAoKRVJST1I6IGxpbmUgb3Zl
+ciA5MCBjaGFyYWN0ZXJzCiMxMDg6IEZJTEU6IHNjcmlwdHMvZGV2aWNlLWNyYXNoLXRlc3QucHk6
+NzM6CisgIGRpY3QoZGV2aWNlPSdpcG1pLWJtYy1leHRlcm4nLCBleHBlY3RlZD1UcnVlKSwgICAg
+ICAgICAjIElQTUkgZXh0ZXJuYWwgYm1jIHJlcXVpcmVzIGNoYXJkZXYgYXR0cmlidXRlCgpFUlJP
+UjogbGluZSBvdmVyIDkwIGNoYXJhY3RlcnMKIzEwOTogRklMRTogc2NyaXB0cy9kZXZpY2UtY3Jh
+c2gtdGVzdC5weTo3NDoKKyAgZGljdChkZXZpY2U9J2lzYS1kZWJ1Z2NvbicsIGV4cGVjdGVkPVRy
+dWUpLCAgICAgICAgICAgICMgQ2FuJ3QgY3JlYXRlIHNlcmlhbCBkZXZpY2UsIGVtcHR5IGNoYXIg
+ZGV2aWNlCgpFUlJPUjogbGluZSBvdmVyIDkwIGNoYXJhY3RlcnMKIzExMDogRklMRTogc2NyaXB0
+cy9kZXZpY2UtY3Jhc2gtdGVzdC5weTo3NToKKyAgZGljdChkZXZpY2U9J2lzYS1pcG1pLWJ0Jywg
+ZXhwZWN0ZWQ9VHJ1ZSksICAgICAgICAgICAgICMgSVBNSSBkZXZpY2UgcmVxdWlyZXMgYSBibWMg
+YXR0cmlidXRlIHRvIGJlIHNldAoKRVJST1I6IGxpbmUgb3ZlciA5MCBjaGFyYWN0ZXJzCiMxMTE6
+IEZJTEU6IHNjcmlwdHMvZGV2aWNlLWNyYXNoLXRlc3QucHk6NzY6CisgIGRpY3QoZGV2aWNlPSdp
+c2EtaXBtaS1rY3MnLCBleHBlY3RlZD1UcnVlKSwgICAgICAgICAgICAjIElQTUkgZGV2aWNlIHJl
+cXVpcmVzIGEgYm1jIGF0dHJpYnV0ZSB0byBiZSBzZXQKCkVSUk9SOiBsaW5lIG92ZXIgOTAgY2hh
+cmFjdGVycwojMTEyOiBGSUxFOiBzY3JpcHRzL2RldmljZS1jcmFzaC10ZXN0LnB5Ojc3OgorICBk
+aWN0KGRldmljZT0naXNhLXBhcmFsbGVsJywgZXhwZWN0ZWQ9VHJ1ZSksICAgICAgICAgICAgIyBD
+YW4ndCBjcmVhdGUgc2VyaWFsIGRldmljZSwgZW1wdHkgY2hhciBkZXZpY2UKCkVSUk9SOiBsaW5l
+IG92ZXIgOTAgY2hhcmFjdGVycwojMTEzOiBGSUxFOiBzY3JpcHRzL2RldmljZS1jcmFzaC10ZXN0
+LnB5Ojc4OgorICBkaWN0KGRldmljZT0naXNhLXNlcmlhbCcsIGV4cGVjdGVkPVRydWUpLCAgICAg
+ICAgICAgICAgIyBDYW4ndCBjcmVhdGUgc2VyaWFsIGRldmljZSwgZW1wdHkgY2hhciBkZXZpY2UK
+CkVSUk9SOiBsaW5lIG92ZXIgOTAgY2hhcmFjdGVycwojMTE0OiBGSUxFOiBzY3JpcHRzL2Rldmlj
+ZS1jcmFzaC10ZXN0LnB5Ojc5OgorICBkaWN0KGRldmljZT0naXZzaG1lbScsIGV4cGVjdGVkPVRy
+dWUpLCAgICAgICAgICAgICAgICAgIyBZb3UgbXVzdCBzcGVjaWZ5IGVpdGhlciAnc2htJyBvciAn
+Y2hhcmRldicKCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiMxMTU6IEZJTEU6IHNj
+cmlwdHMvZGV2aWNlLWNyYXNoLXRlc3QucHk6ODA6CisgIGRpY3QoZGV2aWNlPSdpdnNobWVtLWRv
+b3JiZWxsJywgZXhwZWN0ZWQ9VHJ1ZSksICAgICAgICAjIFlvdSBtdXN0IHNwZWNpZnkgYSAnY2hh
+cmRldicKCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiMxMTY6IEZJTEU6IHNjcmlw
+dHMvZGV2aWNlLWNyYXNoLXRlc3QucHk6ODE6CisgIGRpY3QoZGV2aWNlPSdpdnNobWVtLXBsYWlu
+JywgZXhwZWN0ZWQ9VHJ1ZSksICAgICAgICAgICAjIFlvdSBtdXN0IHNwZWNpZnkgYSAnbWVtZGV2
+JwoKV0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzExNzogRklMRTogc2NyaXB0cy9k
+ZXZpY2UtY3Jhc2gtdGVzdC5weTo4MjoKKyAgZGljdChkZXZpY2U9J2t2bS1wY2ktYXNzaWduJywg
+ZXhwZWN0ZWQ9VHJ1ZSksICAgICAgICAgICMgbm8gaG9zdCBkZXZpY2Ugc3BlY2lmaWVkCgpXQVJO
+SU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojMTE4OiBGSUxFOiBzY3JpcHRzL2RldmljZS1j
+cmFzaC10ZXN0LnB5OjgzOgorICBkaWN0KGRldmljZT0nbG9hZGVyJywgZXhwZWN0ZWQ9VHJ1ZSks
+ICAgICAgICAgICAgICAgICAgIyBwbGVhc2UgaW5jbHVkZSB2YWxpZCBhcmd1bWVudHMKCkVSUk9S
+OiBsaW5lIG92ZXIgOTAgY2hhcmFjdGVycwojMTE5OiBGSUxFOiBzY3JpcHRzL2RldmljZS1jcmFz
+aC10ZXN0LnB5Ojg0OgorICBkaWN0KGRldmljZT0nbmFuZCcsIGV4cGVjdGVkPVRydWUpLCAgICAg
+ICAgICAgICAgICAgICAgIycgVW5zdXBwb3J0ZWQgTkFORCBibG9jayBzaXplIDB4MQoKV0FSTklO
+RzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzEyMDogRklMRTogc2NyaXB0cy9kZXZpY2UtY3Jh
+c2gtdGVzdC5weTo4NToKKyAgZGljdChkZXZpY2U9J252ZGltbScsIGV4cGVjdGVkPVRydWUpLCAg
+ICAgICAgICAgICAgICAgICMgJ21lbWRldicgcHJvcGVydHkgaXMgbm90IHNldAoKV0FSTklORzog
+bGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzEyMTogRklMRTogc2NyaXB0cy9kZXZpY2UtY3Jhc2gt
+dGVzdC5weTo4NjoKKyAgZGljdChkZXZpY2U9J252bWUnLCBleHBlY3RlZD1UcnVlKSwgICAgICAg
+ICAgICAgICAgICAgICMgRGV2aWNlIGluaXRpYWxpemF0aW9uIGZhaWxlZAoKV0FSTklORzogbGlu
+ZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzEyMjogRklMRTogc2NyaXB0cy9kZXZpY2UtY3Jhc2gtdGVz
+dC5weTo4NzoKKyAgZGljdChkZXZpY2U9J3BjLWRpbW0nLCBleHBlY3RlZD1UcnVlKSwgICAgICAg
+ICAgICAgICAgICMgJ21lbWRldicgcHJvcGVydHkgaXMgbm90IHNldAoKRVJST1I6IGxpbmUgb3Zl
+ciA5MCBjaGFyYWN0ZXJzCiMxMjM6IEZJTEU6IHNjcmlwdHMvZGV2aWNlLWNyYXNoLXRlc3QucHk6
+ODg6CisgIGRpY3QoZGV2aWNlPSdwY2ktYnJpZGdlJywgZXhwZWN0ZWQ9VHJ1ZSksICAgICAgICAg
+ICAgICAjIEJyaWRnZSBjaGFzc2lzIG5vdCBzcGVjaWZpZWQuIEVhY2ggYnJpZGdlIGlzIHJlcXVp
+cmVkIHRvIGJlIGFzc2lnbmVkIGEgdW5pcXVlIGNoYXNzaXMgaWQgPiAwLgoKRVJST1I6IGxpbmUg
+b3ZlciA5MCBjaGFyYWN0ZXJzCiMxMjQ6IEZJTEU6IHNjcmlwdHMvZGV2aWNlLWNyYXNoLXRlc3Qu
+cHk6ODk6CisgIGRpY3QoZGV2aWNlPSdwY2ktYnJpZGdlLXNlYXQnLCBleHBlY3RlZD1UcnVlKSwg
+ICAgICAgICAjIEJyaWRnZSBjaGFzc2lzIG5vdCBzcGVjaWZpZWQuIEVhY2ggYnJpZGdlIGlzIHJl
+cXVpcmVkIHRvIGJlIGFzc2lnbmVkIGEgdW5pcXVlIGNoYXNzaXMgaWQgPiAwLgoKRVJST1I6IGxp
+bmUgb3ZlciA5MCBjaGFyYWN0ZXJzCiMxMjU6IEZJTEU6IHNjcmlwdHMvZGV2aWNlLWNyYXNoLXRl
+c3QucHk6OTA6CisgIGRpY3QoZGV2aWNlPSdwY2ktc2VyaWFsJywgZXhwZWN0ZWQ9VHJ1ZSksICAg
+ICAgICAgICAgICAjIENhbid0IGNyZWF0ZSBzZXJpYWwgZGV2aWNlLCBlbXB0eSBjaGFyIGRldmlj
+ZQoKRVJST1I6IGxpbmUgb3ZlciA5MCBjaGFyYWN0ZXJzCiMxMjY6IEZJTEU6IHNjcmlwdHMvZGV2
+aWNlLWNyYXNoLXRlc3QucHk6OTE6CisgIGRpY3QoZGV2aWNlPSdwY2ktc2VyaWFsLTJ4JywgZXhw
+ZWN0ZWQ9VHJ1ZSksICAgICAgICAgICAjIENhbid0IGNyZWF0ZSBzZXJpYWwgZGV2aWNlLCBlbXB0
+eSBjaGFyIGRldmljZQoKRVJST1I6IGxpbmUgb3ZlciA5MCBjaGFyYWN0ZXJzCiMxMjc6IEZJTEU6
+IHNjcmlwdHMvZGV2aWNlLWNyYXNoLXRlc3QucHk6OTI6CisgIGRpY3QoZGV2aWNlPSdwY2ktc2Vy
+aWFsLTR4JywgZXhwZWN0ZWQ9VHJ1ZSksICAgICAgICAgICAjIENhbid0IGNyZWF0ZSBzZXJpYWwg
+ZGV2aWNlLCBlbXB0eSBjaGFyIGRldmljZQoKV0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3Rl
+cnMKIzEyODogRklMRTogc2NyaXB0cy9kZXZpY2UtY3Jhc2gtdGVzdC5weTo5MzoKKyAgZGljdChk
+ZXZpY2U9J3B4YTJ4eC1kbWEnLCBleHBlY3RlZD1UcnVlKSwgICAgICAgICAgICAgICMgY2hhbm5l
+bHMgdmFsdWUgaW52YWxpZAoKRVJST1I6IGxpbmUgb3ZlciA5MCBjaGFyYWN0ZXJzCiMxMjk6IEZJ
+TEU6IHNjcmlwdHMvZGV2aWNlLWNyYXNoLXRlc3QucHk6OTQ6CisgIGRpY3QoZGV2aWNlPSdweGIn
+LCBleHBlY3RlZD1UcnVlKSwgICAgICAgICAgICAgICAgICAgICAjIEJyaWRnZSBjaGFzc2lzIG5v
+dCBzcGVjaWZpZWQuIEVhY2ggYnJpZGdlIGlzIHJlcXVpcmVkIHRvIGJlIGFzc2lnbmVkIGEgdW5p
+cXVlIGNoYXNzaXMgaWQgPiAwLgoKV0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzEz
+MDogRklMRTogc2NyaXB0cy9kZXZpY2UtY3Jhc2gtdGVzdC5weTo5NToKKyAgZGljdChkZXZpY2U9
+J3Njc2ktYmxvY2snLCBleHBlY3RlZD1UcnVlKSwgICAgICAgICAgICAgICMgZHJpdmUgcHJvcGVy
+dHkgbm90IHNldAoKV0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzEzMTogRklMRTog
+c2NyaXB0cy9kZXZpY2UtY3Jhc2gtdGVzdC5weTo5NjoKKyAgZGljdChkZXZpY2U9J3Njc2ktZGlz
+aycsIGV4cGVjdGVkPVRydWUpLCAgICAgICAgICAgICAgICMgZHJpdmUgcHJvcGVydHkgbm90IHNl
+dAoKV0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzEzMjogRklMRTogc2NyaXB0cy9k
+ZXZpY2UtY3Jhc2gtdGVzdC5weTo5NzoKKyAgZGljdChkZXZpY2U9J3Njc2ktZ2VuZXJpYycsIGV4
+cGVjdGVkPVRydWUpLCAgICAgICAgICAgICMgZHJpdmUgcHJvcGVydHkgbm90IHNldAoKV0FSTklO
+RzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzEzMzogRklMRTogc2NyaXB0cy9kZXZpY2UtY3Jh
+c2gtdGVzdC5weTo5ODoKKyAgZGljdChkZXZpY2U9J3Njc2ktaGQnLCBleHBlY3RlZD1UcnVlKSwg
+ICAgICAgICAgICAgICAgICMgZHJpdmUgcHJvcGVydHkgbm90IHNldAoKV0FSTklORzogbGluZSBv
+dmVyIDgwIGNoYXJhY3RlcnMKIzEzNDogRklMRTogc2NyaXB0cy9kZXZpY2UtY3Jhc2gtdGVzdC5w
+eTo5OToKKyAgZGljdChkZXZpY2U9J3NwYXByLXBjaS1ob3N0LWJyaWRnZScsIGV4cGVjdGVkPVRy
+dWUpLCAgICMgQlVJRCBub3Qgc3BlY2lmaWVkIGZvciBQSEIKCldBUk5JTkc6IGxpbmUgb3ZlciA4
+MCBjaGFyYWN0ZXJzCiMxMzU6IEZJTEU6IHNjcmlwdHMvZGV2aWNlLWNyYXNoLXRlc3QucHk6MTAw
+OgorICBkaWN0KGRldmljZT0nc3BhcHItcGNpLXZmaW8taG9zdC1icmlkZ2UnLCBleHBlY3RlZD1U
+cnVlKSwgIyBCVUlEIG5vdCBzcGVjaWZpZWQgZm9yIFBIQgoKRVJST1I6IGxpbmUgb3ZlciA5MCBj
+aGFyYWN0ZXJzCiMxMzY6IEZJTEU6IHNjcmlwdHMvZGV2aWNlLWNyYXNoLXRlc3QucHk6MTAxOgor
+ICBkaWN0KGRldmljZT0nc3BhcHItcm5nJywgZXhwZWN0ZWQ9VHJ1ZSksICAgICAgICAgICAgICAg
+Iycgc3BhcHItcm5nIG5lZWRzIGFuIFJORyBiYWNrZW5kIQoKV0FSTklORzogbGluZSBvdmVyIDgw
+IGNoYXJhY3RlcnMKIzEzNzogRklMRTogc2NyaXB0cy9kZXZpY2UtY3Jhc2gtdGVzdC5weToxMDI6
+CisgIGRpY3QoZGV2aWNlPSdzcGFwci12dHknLCBleHBlY3RlZD1UcnVlKSwgICAgICAgICAgICAg
+ICAjIGNoYXJkZXYgcHJvcGVydHkgbm90IHNldAoKRVJST1I6IGxpbmUgb3ZlciA5MCBjaGFyYWN0
+ZXJzCiMxMzg6IEZJTEU6IHNjcmlwdHMvZGV2aWNlLWNyYXNoLXRlc3QucHk6MTAzOgorICBkaWN0
+KGRldmljZT0ndHBtLXRpcycsIGV4cGVjdGVkPVRydWUpLCAgICAgICAgICAgICAgICAgIyB0cG1f
+dGlzOiBiYWNrZW5kIGRyaXZlciB3aXRoIGlkIChudWxsKSBjb3VsZCBub3QgYmUgZm91bmQKCkVS
+Uk9SOiBsaW5lIG92ZXIgOTAgY2hhcmFjdGVycwojMTM5OiBGSUxFOiBzY3JpcHRzL2RldmljZS1j
+cmFzaC10ZXN0LnB5OjEwNDoKKyAgZGljdChkZXZpY2U9J3VuaW1wbGVtZW50ZWQtZGV2aWNlJywg
+ZXhwZWN0ZWQ9VHJ1ZSksICAgICMgcHJvcGVydHkgJ3NpemUnIG5vdCBzcGVjaWZpZWQgb3IgemVy
+bwoKV0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzE0MDogRklMRTogc2NyaXB0cy9k
+ZXZpY2UtY3Jhc2gtdGVzdC5weToxMDU6CisgIGRpY3QoZGV2aWNlPSd1c2ItYnJhaWxsZScsIGV4
+cGVjdGVkPVRydWUpLCAgICAgICAgICAgICAjIFByb3BlcnR5IGNoYXJkZXYgaXMgcmVxdWlyZWQK
+CkVSUk9SOiBsaW5lIG92ZXIgOTAgY2hhcmFjdGVycwojMTQxOiBGSUxFOiBzY3JpcHRzL2Rldmlj
+ZS1jcmFzaC10ZXN0LnB5OjEwNjoKKyAgZGljdChkZXZpY2U9J3VzYi1tdHAnLCBleHBlY3RlZD1U
+cnVlKSwgICAgICAgICAgICAgICAgICMgeC1yb290IHByb3BlcnR5IG11c3QgYmUgY29uZmlndXJl
+ZAoKV0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzE0MjogRklMRTogc2NyaXB0cy9k
+ZXZpY2UtY3Jhc2gtdGVzdC5weToxMDc6CisgIGRpY3QoZGV2aWNlPSd1c2ItcmVkaXInLCBleHBl
+Y3RlZD1UcnVlKSwgICAgICAgICAgICAgICAjIFBhcmFtZXRlciAnY2hhcmRldicgaXMgbWlzc2lu
+ZwoKV0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzE0MzogRklMRTogc2NyaXB0cy9k
+ZXZpY2UtY3Jhc2gtdGVzdC5weToxMDg6CisgIGRpY3QoZGV2aWNlPSd1c2Itc2VyaWFsJywgZXhw
+ZWN0ZWQ9VHJ1ZSksICAgICAgICAgICAgICAjIFByb3BlcnR5IGNoYXJkZXYgaXMgcmVxdWlyZWQK
+CldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiMxNDQ6IEZJTEU6IHNjcmlwdHMvZGV2
+aWNlLWNyYXNoLXRlc3QucHk6MTA5OgorICBkaWN0KGRldmljZT0ndXNiLXN0b3JhZ2UnLCBleHBl
+Y3RlZD1UcnVlKSwgICAgICAgICAgICAgIyBkcml2ZSBwcm9wZXJ0eSBub3Qgc2V0CgpFUlJPUjog
+bGluZSBvdmVyIDkwIGNoYXJhY3RlcnMKIzE0NTogRklMRTogc2NyaXB0cy9kZXZpY2UtY3Jhc2gt
+dGVzdC5weToxMTA6CisgIGRpY3QoZGV2aWNlPSd2ZmlvLWFtZC14Z2JlJywgZXhwZWN0ZWQ9VHJ1
+ZSksICAgICAgICAgICAjIC1kZXZpY2UgdmZpby1hbWQteGdiZTogdmZpbyBlcnJvcjogd3Jvbmcg
+aG9zdCBkZXZpY2UgbmFtZQoKRVJST1I6IGxpbmUgb3ZlciA5MCBjaGFyYWN0ZXJzCiMxNDY6IEZJ
+TEU6IHNjcmlwdHMvZGV2aWNlLWNyYXNoLXRlc3QucHk6MTExOgorICBkaWN0KGRldmljZT0ndmZp
+by1jYWx4ZWRhLXhnbWFjJywgZXhwZWN0ZWQ9VHJ1ZSksICAgICAgIyAtZGV2aWNlIHZmaW8tY2Fs
+eGVkYS14Z21hYzogdmZpbyBlcnJvcjogd3JvbmcgaG9zdCBkZXZpY2UgbmFtZQoKV0FSTklORzog
+bGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzE0NzogRklMRTogc2NyaXB0cy9kZXZpY2UtY3Jhc2gt
+dGVzdC5weToxMTI6CisgIGRpY3QoZGV2aWNlPSd2ZmlvLXBjaScsIGV4cGVjdGVkPVRydWUpLCAg
+ICAgICAgICAgICAgICAjIE5vIHByb3ZpZGVkIGhvc3QgZGV2aWNlCgpFUlJPUjogbGluZSBvdmVy
+IDkwIGNoYXJhY3RlcnMKIzE0ODogRklMRTogc2NyaXB0cy9kZXZpY2UtY3Jhc2gtdGVzdC5weTox
+MTM6CisgIGRpY3QoZGV2aWNlPSd2ZmlvLXBjaS1pZ2QtbHBjLWJyaWRnZScsIGV4cGVjdGVkPVRy
+dWUpLCAjIFZGSU8gZHVtbXkgSVNBL0xQQyBicmlkZ2UgbXVzdCBoYXZlIGFkZHJlc3MgMWYuMAoK
+V0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzE0OTogRklMRTogc2NyaXB0cy9kZXZp
+Y2UtY3Jhc2gtdGVzdC5weToxMTQ6CisgIGRpY3QoZGV2aWNlPSd2aG9zdC1zY3NpLionLCBleHBl
+Y3RlZD1UcnVlKSwgICAgICAgICAgICAjIHZob3N0LXNjc2k6IG1pc3Npbmcgd3dwbgoKRVJST1I6
+IGxpbmUgb3ZlciA5MCBjaGFyYWN0ZXJzCiMxNTA6IEZJTEU6IHNjcmlwdHMvZGV2aWNlLWNyYXNo
+LXRlc3QucHk6MTE1OgorICBkaWN0KGRldmljZT0ndmhvc3QtdnNvY2stZGV2aWNlJywgZXhwZWN0
+ZWQ9VHJ1ZSksICAgICAgIyBndWVzdC1jaWQgcHJvcGVydHkgbXVzdCBiZSBncmVhdGVyIHRoYW4g
+MgoKRVJST1I6IGxpbmUgb3ZlciA5MCBjaGFyYWN0ZXJzCiMxNTE6IEZJTEU6IHNjcmlwdHMvZGV2
+aWNlLWNyYXNoLXRlc3QucHk6MTE2OgorICBkaWN0KGRldmljZT0ndmhvc3QtdnNvY2stcGNpJywg
+ZXhwZWN0ZWQ9VHJ1ZSksICAgICAgICAgIyBndWVzdC1jaWQgcHJvcGVydHkgbXVzdCBiZSBncmVh
+dGVyIHRoYW4gMgoKRVJST1I6IGxpbmUgb3ZlciA5MCBjaGFyYWN0ZXJzCiMxNTI6IEZJTEU6IHNj
+cmlwdHMvZGV2aWNlLWNyYXNoLXRlc3QucHk6MTE3OgorICBkaWN0KGRldmljZT0ndmlydGlvLTlw
+LWNjdycsIGV4cGVjdGVkPVRydWUpLCAgICAgICAgICAgIyA5cGZzIGRldmljZSBjb3VsZG4ndCBm
+aW5kIGZzZGV2IHdpdGggdGhlIGlkID0gTlVMTAoKRVJST1I6IGxpbmUgb3ZlciA5MCBjaGFyYWN0
+ZXJzCiMxNTM6IEZJTEU6IHNjcmlwdHMvZGV2aWNlLWNyYXNoLXRlc3QucHk6MTE4OgorICBkaWN0
+KGRldmljZT0ndmlydGlvLTlwLWRldmljZScsIGV4cGVjdGVkPVRydWUpLCAgICAgICAgIyA5cGZz
+IGRldmljZSBjb3VsZG4ndCBmaW5kIGZzZGV2IHdpdGggdGhlIGlkID0gTlVMTAoKRVJST1I6IGxp
+bmUgb3ZlciA5MCBjaGFyYWN0ZXJzCiMxNTQ6IEZJTEU6IHNjcmlwdHMvZGV2aWNlLWNyYXNoLXRl
+c3QucHk6MTE5OgorICBkaWN0KGRldmljZT0ndmlydGlvLTlwLXBjaScsIGV4cGVjdGVkPVRydWUp
+LCAgICAgICAgICAgIyA5cGZzIGRldmljZSBjb3VsZG4ndCBmaW5kIGZzZGV2IHdpdGggdGhlIGlk
+ID0gTlVMTAoKV0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzE1NTogRklMRTogc2Ny
+aXB0cy9kZXZpY2UtY3Jhc2gtdGVzdC5weToxMjA6CisgIGRpY3QoZGV2aWNlPSd2aXJ0aW8tYmxr
+LWNjdycsIGV4cGVjdGVkPVRydWUpLCAgICAgICAgICAjIGRyaXZlIHByb3BlcnR5IG5vdCBzZXQK
+CldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiMxNTY6IEZJTEU6IHNjcmlwdHMvZGV2
+aWNlLWNyYXNoLXRlc3QucHk6MTIxOgorICBkaWN0KGRldmljZT0ndmlydGlvLWJsay1kZXZpY2Un
+LCBleHBlY3RlZD1UcnVlKSwgICAgICAgIyBkcml2ZSBwcm9wZXJ0eSBub3Qgc2V0CgpXQVJOSU5H
+OiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojMTU3OiBGSUxFOiBzY3JpcHRzL2RldmljZS1jcmFz
+aC10ZXN0LnB5OjEyMjoKKyAgZGljdChkZXZpY2U9J3ZpcnRpby1ibGstZGV2aWNlJywgZXhwZWN0
+ZWQ9VHJ1ZSksICAgICAgICMgZHJpdmUgcHJvcGVydHkgbm90IHNldAoKV0FSTklORzogbGluZSBv
+dmVyIDgwIGNoYXJhY3RlcnMKIzE1ODogRklMRTogc2NyaXB0cy9kZXZpY2UtY3Jhc2gtdGVzdC5w
+eToxMjM6CisgIGRpY3QoZGV2aWNlPSd2aXJ0aW8tYmxrLXBjaScsIGV4cGVjdGVkPVRydWUpLCAg
+ICAgICAgICAjIGRyaXZlIHByb3BlcnR5IG5vdCBzZXQKCkVSUk9SOiBsaW5lIG92ZXIgOTAgY2hh
+cmFjdGVycwojMTU5OiBGSUxFOiBzY3JpcHRzL2RldmljZS1jcmFzaC10ZXN0LnB5OjEyNDoKKyAg
+ZGljdChkZXZpY2U9J3ZpcnRpby1jcnlwdG8tY2N3JywgZXhwZWN0ZWQ9VHJ1ZSksICAgICAgICMg
+J2NyeXB0b2RldicgcGFyYW1ldGVyIGV4cGVjdHMgYSB2YWxpZCBvYmplY3QKCkVSUk9SOiBsaW5l
+IG92ZXIgOTAgY2hhcmFjdGVycwojMTYwOiBGSUxFOiBzY3JpcHRzL2RldmljZS1jcmFzaC10ZXN0
+LnB5OjEyNToKKyAgZGljdChkZXZpY2U9J3ZpcnRpby1jcnlwdG8tZGV2aWNlJywgZXhwZWN0ZWQ9
+VHJ1ZSksICAgICMgJ2NyeXB0b2RldicgcGFyYW1ldGVyIGV4cGVjdHMgYSB2YWxpZCBvYmplY3QK
+CkVSUk9SOiBsaW5lIG92ZXIgOTAgY2hhcmFjdGVycwojMTYxOiBGSUxFOiBzY3JpcHRzL2Rldmlj
+ZS1jcmFzaC10ZXN0LnB5OjEyNjoKKyAgZGljdChkZXZpY2U9J3ZpcnRpby1jcnlwdG8tcGNpJywg
+ZXhwZWN0ZWQ9VHJ1ZSksICAgICAgICMgJ2NyeXB0b2RldicgcGFyYW1ldGVyIGV4cGVjdHMgYSB2
+YWxpZCBvYmplY3QKCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiMxNjI6IEZJTEU6
+IHNjcmlwdHMvZGV2aWNlLWNyYXNoLXRlc3QucHk6MTI3OgorICBkaWN0KGRldmljZT0ndmlydGlv
+LWlucHV0LWhvc3QtZGV2aWNlJywgZXhwZWN0ZWQ9VHJ1ZSksICMgZXZkZXYgcHJvcGVydHkgaXMg
+cmVxdWlyZWQKCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiMxNjM6IEZJTEU6IHNj
+cmlwdHMvZGV2aWNlLWNyYXNoLXRlc3QucHk6MTI4OgorICBkaWN0KGRldmljZT0ndmlydGlvLWlu
+cHV0LWhvc3QtcGNpJywgZXhwZWN0ZWQ9VHJ1ZSksICAgIyBldmRldiBwcm9wZXJ0eSBpcyByZXF1
+aXJlZAoKRVJST1I6IGxpbmUgb3ZlciA5MCBjaGFyYWN0ZXJzCiMxNjQ6IEZJTEU6IHNjcmlwdHMv
+ZGV2aWNlLWNyYXNoLXRlc3QucHk6MTI5OgorICBkaWN0KGRldmljZT0neGVuLXB2ZGV2aWNlJywg
+ZXhwZWN0ZWQ9VHJ1ZSksICAgICAgICAgICAgIyBEZXZpY2UgSUQgaW52YWxpZCwgaXQgbXVzdCBh
+bHdheXMgYmUgc3VwcGxpZWQKCkVSUk9SOiBsaW5lIG92ZXIgOTAgY2hhcmFjdGVycwojMTY1OiBG
+SUxFOiBzY3JpcHRzL2RldmljZS1jcmFzaC10ZXN0LnB5OjEzMDoKKyAgZGljdChkZXZpY2U9J3Zo
+b3N0LXZzb2NrLWNjdycsIGV4cGVjdGVkPVRydWUpLCAgICAgICAgICMgZ3Vlc3QtY2lkIHByb3Bl
+cnR5IG11c3QgYmUgZ3JlYXRlciB0aGFuIDIKCkVSUk9SOiBsaW5lIG92ZXIgOTAgY2hhcmFjdGVy
+cwojMTY2OiBGSUxFOiBzY3JpcHRzL2RldmljZS1jcmFzaC10ZXN0LnB5OjEzMToKKyAgZGljdChk
+ZXZpY2U9J0FMVFIudGltZXInLCBleHBlY3RlZD1UcnVlKSwgICAgICAgICAgICAgICMgImNsb2Nr
+LWZyZXF1ZW5jeSIgcHJvcGVydHkgbXVzdCBiZSBwcm92aWRlZAoKV0FSTklORzogbGluZSBvdmVy
+IDgwIGNoYXJhY3RlcnMKIzE2NzogRklMRTogc2NyaXB0cy9kZXZpY2UtY3Jhc2gtdGVzdC5weTox
+MzI6CisgIGRpY3QoZGV2aWNlPSd6cGNpJywgZXhwZWN0ZWQ9VHJ1ZSksICAgICAgICAgICAgICAg
+ICAgICAjIHRhcmdldCBtdXN0IGJlIGRlZmluZWQKCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFy
+YWN0ZXJzCiMxNzA6IEZJTEU6IHNjcmlwdHMvZGV2aWNlLWNyYXNoLXRlc3QucHk6MTM1OgorICBk
+aWN0KG1hY2hpbmU9J3EzNXxwYy4qJywgZGV2aWNlPSdrdm0taW9hcGljJywgZXhwZWN0ZWQ9VHJ1
+ZSksICMgT25seSAxIGlvYXBpY3MgYWxsb3dlZAoKV0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJh
+Y3RlcnMKIzE3MTogRklMRTogc2NyaXB0cy9kZXZpY2UtY3Jhc2gtdGVzdC5weToxMzY6CisgIGRp
+Y3QobWFjaGluZT0ncTM1fHBjLionLCBkZXZpY2U9J2lvYXBpYycsIGV4cGVjdGVkPVRydWUpLCAg
+ICAgIyBPbmx5IDEgaW9hcGljcyBhbGxvd2VkCgpFUlJPUjogbGluZSBvdmVyIDkwIGNoYXJhY3Rl
+cnMKIzE4NDogRklMRTogc2NyaXB0cy9kZXZpY2UtY3Jhc2gtdGVzdC5weToxNDk6CisgIGRpY3Qo
+ZXhpdGNvZGU9LTYsIGxvZz1yInNwYXByX3J0YXNfcmVnaXN0ZXI6IEFzc2VydGlvbiAuKnJ0YXNf
+dGFibGVcW3Rva2VuXF1cLm5hbWUuKiBmYWlsZWQiLCBsb2dsZXZlbD1sb2dnaW5nLkVSUk9SKSwK
+CkVSUk9SOiBsaW5lIG92ZXIgOTAgY2hhcmFjdGVycwojMTg1OiBGSUxFOiBzY3JpcHRzL2Rldmlj
+ZS1jcmFzaC10ZXN0LnB5OjE1MDoKKyAgZGljdChleGl0Y29kZT0tNiwgbG9nPXIicWVtdV9uZXRf
+Y2xpZW50X3NldHVwOiBBc3NlcnRpb24gYCFwZWVyLT5wZWVyJyBmYWlsZWQiLCBsb2dsZXZlbD1s
+b2dnaW5nLkVSUk9SKSwKCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiMxODY6IEZJ
+TEU6IHNjcmlwdHMvZGV2aWNlLWNyYXNoLXRlc3QucHk6MTUxOgorICBkaWN0KGV4aXRjb2RlPS02
+LCBsb2c9cidSQU1CbG9jayAiW1x3Li1dKyIgYWxyZWFkeSByZWdpc3RlcmVkJywgbG9nbGV2ZWw9
+bG9nZ2luZy5FUlJPUiksCgpFUlJPUjogbGluZSBvdmVyIDkwIGNoYXJhY3RlcnMKIzE4NzogRklM
+RTogc2NyaXB0cy9kZXZpY2UtY3Jhc2gtdGVzdC5weToxNTI6CisgIGRpY3QoZXhpdGNvZGU9LTYs
+IGxvZz1yImZpbmRfcmFtX29mZnNldDogQXNzZXJ0aW9uIGBzaXplICE9IDAnIGZhaWxlZC4iLCBs
+b2dsZXZlbD1sb2dnaW5nLkVSUk9SKSwKCkVSUk9SOiBsaW5lIG92ZXIgOTAgY2hhcmFjdGVycwoj
+MTg4OiBGSUxFOiBzY3JpcHRzL2RldmljZS1jcmFzaC10ZXN0LnB5OjE1MzoKKyAgZGljdChleGl0
+Y29kZT0tNiwgbG9nPXIicHV2M19sb2FkX2tlcm5lbDogQXNzZXJ0aW9uIGBrZXJuZWxfZmlsZW5h
+bWUgIT0gTlVMTCcgZmFpbGVkIiwgbG9nbGV2ZWw9bG9nZ2luZy5FUlJPUiksCgpFUlJPUjogbGlu
+ZSBvdmVyIDkwIGNoYXJhY3RlcnMKIzE4OTogRklMRTogc2NyaXB0cy9kZXZpY2UtY3Jhc2gtdGVz
+dC5weToxNTQ6CisgIGRpY3QoZXhpdGNvZGU9LTYsIGxvZz1yImFkZF9jcHJlZ190b19oYXNodGFi
+bGU6IGNvZGUgc2hvdWxkIG5vdCBiZSByZWFjaGVkIiwgbG9nbGV2ZWw9bG9nZ2luZy5FUlJPUiks
+CgpFUlJPUjogbGluZSBvdmVyIDkwIGNoYXJhY3RlcnMKIzE5MDogRklMRTogc2NyaXB0cy9kZXZp
+Y2UtY3Jhc2gtdGVzdC5weToxNTU6CisgIGRpY3QoZXhpdGNvZGU9LTYsIGxvZz1yInFlbXVfYWxs
+b2NfZGlzcGxheTogQXNzZXJ0aW9uIGBzdXJmYWNlLT5pbWFnZSAhPSBOVUxMJyBmYWlsZWQiLCBs
+b2dsZXZlbD1sb2dnaW5nLkVSUk9SKSwKCkVSUk9SOiBsaW5lIG92ZXIgOTAgY2hhcmFjdGVycwoj
+MTkxOiBGSUxFOiBzY3JpcHRzL2RldmljZS1jcmFzaC10ZXN0LnB5OjE1NjoKKyAgZGljdChleGl0
+Y29kZT0tNiwgbG9nPXIiVW5leHBlY3RlZCBlcnJvciBpbiBlcnJvcl9zZXRfZnJvbV9xZGV2X3By
+b3BfZXJyb3IiLCBsb2dsZXZlbD1sb2dnaW5nLkVSUk9SKSwKCkVSUk9SOiBsaW5lIG92ZXIgOTAg
+Y2hhcmFjdGVycwojMTkyOiBGSUxFOiBzY3JpcHRzL2RldmljZS1jcmFzaC10ZXN0LnB5OjE1NzoK
+KyAgZGljdChleGl0Y29kZT0tNiwgbG9nPXIiT2JqZWN0IC4qIGlzIG5vdCBhbiBpbnN0YW5jZSBv
+ZiB0eXBlIHNwYXByLW1hY2hpbmUiLCBsb2dsZXZlbD1sb2dnaW5nLkVSUk9SKSwKCkVSUk9SOiBs
+aW5lIG92ZXIgOTAgY2hhcmFjdGVycwojMTkzOiBGSUxFOiBzY3JpcHRzL2RldmljZS1jcmFzaC10
+ZXN0LnB5OjE1ODoKKyAgZGljdChleGl0Y29kZT0tNiwgbG9nPXIiT2JqZWN0IC4qIGlzIG5vdCBh
+biBpbnN0YW5jZSBvZiB0eXBlIGdlbmVyaWMtcGMtbWFjaGluZSIsIGxvZ2xldmVsPWxvZ2dpbmcu
+RVJST1IpLAoKRVJST1I6IGxpbmUgb3ZlciA5MCBjaGFyYWN0ZXJzCiMxOTQ6IEZJTEU6IHNjcmlw
+dHMvZGV2aWNlLWNyYXNoLXRlc3QucHk6MTU5OgorICBkaWN0KGV4aXRjb2RlPS02LCBsb2c9ciJP
+YmplY3QgLiogaXMgbm90IGFuIGluc3RhbmNlIG9mIHR5cGUgZTUwMC1jY3NyIiwgbG9nbGV2ZWw9
+bG9nZ2luZy5FUlJPUiksCgpFUlJPUjogbGluZSBvdmVyIDkwIGNoYXJhY3RlcnMKIzE5NTogRklM
+RTogc2NyaXB0cy9kZXZpY2UtY3Jhc2gtdGVzdC5weToxNjA6CisgIGRpY3QoZXhpdGNvZGU9LTYs
+IGxvZz1yInZtc3RhdGVfcmVnaXN0ZXJfd2l0aF9hbGlhc19pZDogQXNzZXJ0aW9uIGAhc2UtPmNv
+bXBhdCB8fCBzZS0+aW5zdGFuY2VfaWQgPT0gMCcgZmFpbGVkIiwgbG9nbGV2ZWw9bG9nZ2luZy5F
+UlJPUiksCgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojMTk2OiBGSUxFOiBzY3Jp
+cHRzL2RldmljZS1jcmFzaC10ZXN0LnB5OjE2MToKKyAgZGljdChleGl0Y29kZT0tMTEsIGRldmlj
+ZT0nc3RtMzJmMjA1LXNvYycsIGxvZ2xldmVsPWxvZ2dpbmcuRVJST1IsIGV4cGVjdGVkPVRydWUp
+LAoKV0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzE5NzogRklMRTogc2NyaXB0cy9k
+ZXZpY2UtY3Jhc2gtdGVzdC5weToxNjI6CisgIGRpY3QoZXhpdGNvZGU9LTExLCBkZXZpY2U9J3hs
+bngsenlucW1wJywgbG9nbGV2ZWw9bG9nZ2luZy5FUlJPUiwgZXhwZWN0ZWQ9VHJ1ZSksCgpXQVJO
+SU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojMjAwOiBGSUxFOiBzY3JpcHRzL2RldmljZS1j
+cmFzaC10ZXN0LnB5OjE2NToKKyAgZGljdChleGl0Y29kZT0tMTEsIGRldmljZT0nYTltcGNvcmVf
+cHJpdicsIGxvZ2xldmVsPWxvZ2dpbmcuRVJST1IsIGV4cGVjdGVkPVRydWUpLAoKV0FSTklORzog
+bGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzIwMTogRklMRTogc2NyaXB0cy9kZXZpY2UtY3Jhc2gt
+dGVzdC5weToxNjY6CisgIGRpY3QoZXhpdGNvZGU9LTExLCBkZXZpY2U9J2ExNW1wY29yZV9wcml2
+JywgbG9nbGV2ZWw9bG9nZ2luZy5FUlJPUiwgZXhwZWN0ZWQ9VHJ1ZSksCgpXQVJOSU5HOiBsaW5l
+IG92ZXIgODAgY2hhcmFjdGVycwojMjAyOiBGSUxFOiBzY3JpcHRzL2RldmljZS1jcmFzaC10ZXN0
+LnB5OjE2NzoKKyAgZGljdChleGl0Y29kZT0tMTEsIGRldmljZT0naXNhLXNlcmlhbCcsIGxvZ2xl
+dmVsPWxvZ2dpbmcuRVJST1IsIGV4cGVjdGVkPVRydWUpLAoKRVJST1I6IGxpbmUgb3ZlciA5MCBj
+aGFyYWN0ZXJzCiMyMDY6IEZJTEU6IHNjcmlwdHMvZGV2aWNlLWNyYXNoLXRlc3QucHk6MTcxOgor
+ICBkaWN0KGV4aXRjb2RlPS0xMSwgbWFjaGluZT0naXNhcGMnLCBkZXZpY2U9Jy4qLWlvbW11Jywg
+bG9nbGV2ZWw9bG9nZ2luZy5FUlJPUiwgZXhwZWN0ZWQ9VHJ1ZSksCgpXQVJOSU5HOiBsaW5lIG92
+ZXIgODAgY2hhcmFjdGVycwojMjE3OiBGSUxFOiBzY3JpcHRzL2RldmljZS1jcmFzaC10ZXN0LnB5
+OjE4MjoKKyAgIyBzeXNidXMtcmVsYXRlZCBlcnJvciBtZXNzYWdlczogbW9zdCBtYWNoaW5lcyBy
+ZWplY3QgbW9zdCBkeW5hbWljIHN5c2J1cyBkZXZpY2VzOgoKRVJST1I6IGxpbmUgb3ZlciA5MCBj
+aGFyYWN0ZXJzCiMyMjk6IEZJTEU6IHNjcmlwdHMvZGV2aWNlLWNyYXNoLXRlc3QucHk6MTk0Ogor
+ICBkaWN0KGxvZz1yInNkX2luaXQgZmFpbGVkOiBEcml2ZSAnc2QwJyBpcyBhbHJlYWR5IGluIHVz
+ZSBiZWNhdXNlIGl0IGhhcyBiZWVuIGF1dG9tYXRpY2FsbHkgY29ubmVjdGVkIHRvIGFub3RoZXIg
+ZGV2aWNlIiksCgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojMzExOiBGSUxFOiBz
+Y3JpcHRzL2RldmljZS1jcmFzaC10ZXN0LnB5OjI3NjoKKyAgICAgICAgICAgIHNlbGYuYWxsZGV2
+cyA9IHNldChxb21MaXN0VHlwZU5hbWVzKHZtLCBpbXBsZW1lbnRzPWRldnR5cGUsIGFic3RyYWN0
+PUZhbHNlKSkKCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiMzMTI6IEZJTEU6IHNj
+cmlwdHMvZGV2aWNlLWNyYXNoLXRlc3QucHk6Mjc3OgorICAgICAgICAgICAgIyB0aGVyZSdzIG5v
+IHdheSB0byBxdWVyeSBjYW5ub3RfaW5zdGFudGlhdGVfd2l0aF9kZXZpY2VfYWRkX3lldCB1c2lu
+ZyBRTVAsCgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojMzE0OiBGSUxFOiBzY3Jp
+cHRzL2RldmljZS1jcmFzaC10ZXN0LnB5OjI3OToKKyAgICAgICAgICAgIHNlbGYubm9fdXNlcl9k
+ZXZzID0gc2V0KFtkWyduYW1lJ10gZm9yIGQgaW4gaW5mb1FETSh2bSwgKSBpZiBkWyduby11c2Vy
+J11dKQoKV0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzMxNTogRklMRTogc2NyaXB0
+cy9kZXZpY2UtY3Jhc2gtdGVzdC5weToyODA6CisgICAgICAgICAgICBzZWxmLm1hY2hpbmVzID0g
+bGlzdChtWyduYW1lJ10gZm9yIG0gaW4gdm0uY29tbWFuZCgncXVlcnktbWFjaGluZXMnKSkKCldB
+Uk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiM0Njc6IEZJTEU6IHNjcmlwdHMvZGV2aWNl
+LWNyYXNoLXRlc3QucHk6NDMyOgorICAgICAgICAgICAgICAgICAgICAgICAgaGVscD0iUXVpY2sg
+bW9kZSwgc2tpcCB0ZXN0IGNhc2VzIHRoYXQgYXJlIGV4cGVjdGVkIHRvIGZhaWwiKQoKV0FSTklO
+RzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzQ3ODogRklMRTogc2NyaXB0cy9kZXZpY2UtY3Jh
+c2gtdGVzdC5weTo0NDM6CisgICAgbG9nZ2luZy5iYXNpY0NvbmZpZyhzdHJlYW09c3lzLnN0ZG91
+dCwgbGV2ZWw9bHZsLCBmb3JtYXQ9JyUobGV2ZWxuYW1lKXM6ICUobWVzc2FnZSlzJykKCnRvdGFs
+OiA1OSBlcnJvcnMsIDUwIHdhcm5pbmdzLCA1MjAgbGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBo
+YXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3Jz
+CmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpD
+SEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1h
+bmQgZXhpdGVkIHdpdGggY29kZTogMQoKCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxs
+eSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVk
+YmFjayB0byBwYXRjaGV3LWRldmVsQGZyZWVsaXN0cy5vcmc=
