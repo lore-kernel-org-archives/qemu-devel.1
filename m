@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37157)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37144)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aurelien@aurel32.net>) id 1d9TQC-0005B3-Vf
+	(envelope-from <aurelien@aurel32.net>) id 1d9TQC-0005B1-Fq
 	for qemu-devel@nongnu.org; Sat, 13 May 2017 05:33:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aurelien@aurel32.net>) id 1d9TQA-0001Lm-R1
+	(envelope-from <aurelien@aurel32.net>) id 1d9TQA-0001Lc-Qe
 	for qemu-devel@nongnu.org; Sat, 13 May 2017 05:33:08 -0400
-Received: from hall.aurel32.net ([2001:bc8:30d7:100::1]:43770)
+Received: from hall.aurel32.net ([2001:bc8:30d7:100::1]:43772)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <aurelien@aurel32.net>)
-	id 1d9TQA-0001HD-Gd
+	id 1d9TQA-0001HE-HH
 	for qemu-devel@nongnu.org; Sat, 13 May 2017 05:33:06 -0400
 From: Aurelien Jarno <aurelien@aurel32.net>
-Date: Sat, 13 May 2017 11:32:47 +0200
-Message-Id: <20170513093248.18230-15-aurelien@aurel32.net>
+Date: Sat, 13 May 2017 11:32:35 +0200
+Message-Id: <20170513093248.18230-3-aurelien@aurel32.net>
 In-Reply-To: <20170513093248.18230-1-aurelien@aurel32.net>
 References: <20170513093248.18230-1-aurelien@aurel32.net>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 14/15] target/sh4: trap unaligned accesses
+Subject: [Qemu-devel] [PULL 02/15] target/sh4: get rid of DELAY_SLOT_CLEARME
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,102 +30,95 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Stefan Hajnoczi <stefanha@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>
 
-SH4 requires that memory accesses are naturally aligned, except for the
-SH4-A movua.l instructions which can do unaligned loads.
+Now that ctx->flags has been split, it becomes clear that
+DELAY_SLOT_CLEARME has not impact on the code generation: in both case
+ctx->envflags is cleared, either by clearing all the flags, or by
+setting it to 0. This is left-over from pre-TCG era.
 
 Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 Reviewed-by: Richard Henderson <rth@twiddle.net>
 Signed-off-by: Aurelien Jarno <aurelien@aurel32.net>
 ---
- target/sh4/cpu.c       |  1 +
- target/sh4/cpu.h       |  4 ++++
- target/sh4/op_helper.c | 16 ++++++++++++++++
- target/sh4/translate.c |  6 ++++--
- 4 files changed, 25 insertions(+), 2 deletions(-)
+ target/sh4/cpu.h       |  3 +--
+ target/sh4/helper.c    |  2 --
+ target/sh4/translate.c | 17 +++++------------
+ 3 files changed, 6 insertions(+), 16 deletions(-)
 
-diff --git a/target/sh4/cpu.c b/target/sh4/cpu.c
-index 9a481c35dc..9da7e1ed38 100644
---- a/target/sh4/cpu.c
-+++ b/target/sh4/cpu.c
-@@ -301,6 +301,7 @@ static void superh_cpu_class_init(ObjectClass *oc, void *data)
- #ifdef CONFIG_USER_ONLY
-     cc->handle_mmu_fault = superh_cpu_handle_mmu_fault;
- #else
-+    cc->do_unaligned_access = superh_cpu_do_unaligned_access;
-     cc->get_phys_page_debug = superh_cpu_get_phys_page_debug;
- #endif
-     cc->disas_set_info = superh_cpu_disas_set_info;
 diff --git a/target/sh4/cpu.h b/target/sh4/cpu.h
-index faab3012f9..6c07c6b24b 100644
+index cad8989f7e..9445cc779f 100644
 --- a/target/sh4/cpu.h
 +++ b/target/sh4/cpu.h
-@@ -24,6 +24,7 @@
- #include "cpu-qom.h"
+@@ -93,7 +93,6 @@
+ #define DELAY_SLOT             (1 << 0)
+ #define DELAY_SLOT_CONDITIONAL (1 << 1)
+ #define DELAY_SLOT_TRUE        (1 << 2)
+-#define DELAY_SLOT_CLEARME     (1 << 3)
+ /* The dynamic value of the DELAY_SLOT_TRUE flag determines whether the jump
+  * after the delay slot should be taken or not. It is calculated from SR_T.
+  *
+@@ -384,7 +383,7 @@ static inline void cpu_get_tb_cpu_state(CPUSH4State *env, target_ulong *pc,
+     *pc = env->pc;
+     *cs_base = 0;
+     *flags = (env->flags & (DELAY_SLOT | DELAY_SLOT_CONDITIONAL
+-                    | DELAY_SLOT_TRUE | DELAY_SLOT_CLEARME))   /* Bits  0- 3 */
++                    | DELAY_SLOT_TRUE))                        /* Bits  0- 2 */
+             | (env->fpscr & (FPSCR_FR | FPSCR_SZ | FPSCR_PR))  /* Bits 19-21 */
+             | (env->sr & ((1u << SR_MD) | (1u << SR_RB)))      /* Bits 29-30 */
+             | (env->sr & (1u << SR_FD))                        /* Bit 15 */
+diff --git a/target/sh4/helper.c b/target/sh4/helper.c
+index 036c5ca56c..71bb49a670 100644
+--- a/target/sh4/helper.c
++++ b/target/sh4/helper.c
+@@ -170,8 +170,6 @@ void superh_cpu_do_interrupt(CPUState *cs)
+ 	/* Clear flags for exception/interrupt routine. */
+ 	env->flags &= ~(DELAY_SLOT | DELAY_SLOT_CONDITIONAL | DELAY_SLOT_TRUE);
+     }
+-    if (env->flags & DELAY_SLOT_CLEARME)
+-        env->flags = 0;
  
- #define TARGET_LONG_BITS 32
-+#define ALIGNED_ONLY
- 
- /* CPU Subtypes */
- #define SH_CPU_SH7750  (1 << 0)
-@@ -215,6 +216,9 @@ void superh_cpu_dump_state(CPUState *cpu, FILE *f,
- hwaddr superh_cpu_get_phys_page_debug(CPUState *cpu, vaddr addr);
- int superh_cpu_gdb_read_register(CPUState *cpu, uint8_t *buf, int reg);
- int superh_cpu_gdb_write_register(CPUState *cpu, uint8_t *buf, int reg);
-+void superh_cpu_do_unaligned_access(CPUState *cpu, vaddr addr,
-+                                    MMUAccessType access_type,
-+                                    int mmu_idx, uintptr_t retaddr);
- 
- void sh4_translate_init(void);
- SuperHCPU *cpu_sh4_init(const char *cpu_model);
-diff --git a/target/sh4/op_helper.c b/target/sh4/op_helper.c
-index 684d3f3758..fa238c660e 100644
---- a/target/sh4/op_helper.c
-+++ b/target/sh4/op_helper.c
-@@ -24,6 +24,22 @@
- 
- #ifndef CONFIG_USER_ONLY
- 
-+void superh_cpu_do_unaligned_access(CPUState *cs, vaddr addr,
-+                                    MMUAccessType access_type,
-+                                    int mmu_idx, uintptr_t retaddr)
-+{
-+    switch (access_type) {
-+    case MMU_INST_FETCH:
-+    case MMU_DATA_LOAD:
-+        cs->exception_index = 0x0e0;
-+        break;
-+    case MMU_DATA_STORE:
-+        cs->exception_index = 0x100;
-+        break;
-+    }
-+    cpu_loop_exit_restore(cs, retaddr);
-+}
-+
- void tlb_fill(CPUState *cs, target_ulong addr, MMUAccessType access_type,
-               int mmu_idx, uintptr_t retaddr)
- {
+     if (do_exp) {
+         env->expevt = cs->exception_index;
 diff --git a/target/sh4/translate.c b/target/sh4/translate.c
-index 4bb9105865..0bc2f9ff19 100644
+index 6b526a02f2..d84a7a2e6e 100644
 --- a/target/sh4/translate.c
 +++ b/target/sh4/translate.c
-@@ -1504,14 +1504,16 @@ static void _decode_opc(DisasContext * ctx)
-     case 0x40a9:                /* movua.l @Rm,R0 */
-         /* Load non-boundary-aligned data */
-         if (ctx->features & SH_FEATURE_SH4A) {
--            tcg_gen_qemu_ld_i32(REG(0), REG(B11_8), ctx->memidx, MO_TEUL);
-+            tcg_gen_qemu_ld_i32(REG(0), REG(B11_8), ctx->memidx,
-+                                MO_TEUL | MO_UNALN);
-             return;
-         }
-         break;
-     case 0x40e9:                /* movua.l @Rm+,R0 */
-         /* Load non-boundary-aligned data */
-         if (ctx->features & SH_FEATURE_SH4A) {
--            tcg_gen_qemu_ld_i32(REG(0), REG(B11_8), ctx->memidx, MO_TEUL);
-+            tcg_gen_qemu_ld_i32(REG(0), REG(B11_8), ctx->memidx,
-+                                MO_TEUL | MO_UNALN);
-             tcg_gen_addi_i32(REG(B11_8), REG(B11_8), 4);
-             return;
-         }
+@@ -1804,15 +1804,9 @@ static void decode_opc(DisasContext * ctx)
+     _decode_opc(ctx);
+ 
+     if (old_flags & (DELAY_SLOT | DELAY_SLOT_CONDITIONAL)) {
+-        if (ctx->envflags & DELAY_SLOT_CLEARME) {
+-            gen_store_flags(0);
+-        } else {
+-	    /* go out of the delay slot */
+-            uint32_t new_flags = ctx->envflags;
+-	    new_flags &= ~(DELAY_SLOT | DELAY_SLOT_CONDITIONAL);
+-	    gen_store_flags(new_flags);
+-        }
+-        ctx->envflags = 0;
++        /* go out of the delay slot */
++        ctx->envflags &= ~(DELAY_SLOT | DELAY_SLOT_CONDITIONAL);
++        gen_store_flags(ctx->envflags);
+         ctx->bstate = BS_BRANCH;
+         if (old_flags & DELAY_SLOT_CONDITIONAL) {
+ 	    gen_delayed_conditional_jump(ctx);
+@@ -1840,8 +1834,7 @@ void gen_intermediate_code(CPUSH4State * env, struct TranslationBlock *tb)
+     pc_start = tb->pc;
+     ctx.pc = pc_start;
+     ctx.tbflags = (uint32_t)tb->flags;
+-    ctx.envflags = tb->flags & (DELAY_SLOT | DELAY_SLOT_CONDITIONAL |
+-                                DELAY_SLOT_CLEARME);
++    ctx.envflags = tb->flags & (DELAY_SLOT | DELAY_SLOT_CONDITIONAL);
+     ctx.bstate = BS_NONE;
+     ctx.memidx = (ctx.tbflags & (1u << SR_MD)) == 0 ? 1 : 0;
+     /* We don't know if the delayed pc came from a dynamic or static branch,
+@@ -1908,7 +1901,7 @@ void gen_intermediate_code(CPUSH4State * env, struct TranslationBlock *tb)
+             /* fall through */
+         case BS_NONE:
+             if (ctx.envflags) {
+-                gen_store_flags(ctx.envflags | DELAY_SLOT_CLEARME);
++                gen_store_flags(ctx.envflags);
+ 	    }
+             gen_goto_tb(&ctx, 0, ctx.pc);
+             break;
 -- 
 2.11.0
