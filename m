@@ -1,26 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53417)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58473)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1d9uYR-0004iS-PN
-	for qemu-devel@nongnu.org; Sun, 14 May 2017 10:31:29 -0400
+	(envelope-from <rth7680@gmail.com>) id 1dA0oe-0001Yz-Pg
+	for qemu-devel@nongnu.org; Sun, 14 May 2017 17:12:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1d9uYO-0001Zb-HI
-	for qemu-devel@nongnu.org; Sun, 14 May 2017 10:31:27 -0400
-Received: from [59.151.112.132] (port=4692 helo=heian.cn.fujitsu.com)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1d9uYN-0001Oe-Af
-	for qemu-devel@nongnu.org; Sun, 14 May 2017 10:31:24 -0400
-References: <1494553288-30764-1-git-send-email-zhangchen.fnst@cn.fujitsu.com>
-	<1494553288-30764-3-git-send-email-zhangchen.fnst@cn.fujitsu.com>
-	<59166622.4000009@huawei.com>
-From: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
-Message-ID: <710081a0-1263-bc8d-a0c6-ee8a3e0ed411@cn.fujitsu.com>
-Date: Sun, 14 May 2017 22:31:17 +0800
+	(envelope-from <rth7680@gmail.com>) id 1dA0oe-0002nU-3m
+	for qemu-devel@nongnu.org; Sun, 14 May 2017 17:12:36 -0400
+Received: from mail-pf0-x244.google.com ([2607:f8b0:400e:c00::244]:32924)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1dA0od-0002m9-Sb
+	for qemu-devel@nongnu.org; Sun, 14 May 2017 17:12:36 -0400
+Received: by mail-pf0-x244.google.com with SMTP id f27so2964798pfe.0
+	for <qemu-devel@nongnu.org>; Sun, 14 May 2017 14:12:35 -0700 (PDT)
+Sender: Richard Henderson <rth7680@gmail.com>
+References: <20170513155816.17294-1-bobby.prani@gmail.com>
+From: Richard Henderson <rth@twiddle.net>
+Message-ID: <a4f70b68-ec18-4237-79fa-b106bc3e29d0@twiddle.net>
+Date: Sun, 14 May 2017 14:12:30 -0700
 MIME-Version: 1.0
-In-Reply-To: <59166622.4000009@huawei.com>
-Content-Type: text/plain; charset="utf-8"; format=flowed
+In-Reply-To: <20170513155816.17294-1-bobby.prani@gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH V4 02/12] net/filter-mirror.c: Add new
- option to enable vnet support for filter-mirror
+Subject: Re: [Qemu-devel] [PATCH] tcg/i386: 'nop' instruction with 'lock'
+ prefix is illegal
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,143 +31,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Hailiang Zhang <zhang.zhanghailiang@huawei.com>, qemu devel <qemu-devel@nongnu.org>, Jason Wang <jasowang@redhat.com>
-Cc: zhangchen.fnst@cn.fujitsu.com, weifuqiang <weifuqiang@huawei.com>, "eddie . dong" <eddie.dong@intel.com>, bian naimeng <biannm@cn.fujitsu.com>, Li Zhijian <lizhijian@cn.fujitsu.com>
+To: Pranith Kumar <bobby.prani@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, "open list:All patches CC here" <qemu-devel@nongnu.org>
+
+On 05/13/2017 08:58 AM, Pranith Kumar wrote:
+> The instruction "lock nopl (%rax)" should raise an exception. However,
+> we don't do that since we do not check for lock prefix for nop
+> instructions. The following patch adds this check and makes the
+> behavior similar to hardware.
+> 
+> Signed-off-by: Pranith Kumar <bobby.prani@gmail.com>
+> ---
+>   target/i386/translate.c | 3 +++
+>   1 file changed, 3 insertions(+)
+> 
+> diff --git a/target/i386/translate.c b/target/i386/translate.c
+> index 1d1372fb43..76f4ccd3b4 100644
+> --- a/target/i386/translate.c
+> +++ b/target/i386/translate.c
+> @@ -7881,6 +7881,9 @@ static target_ulong disas_insn(CPUX86State *env, DisasContext *s,
+>           gen_nop_modrm(env, s, modrm);
+>           break;
+>       case 0x119: case 0x11c ... 0x11f: /* nop (multi byte) */
+> +        if (prefixes & PREFIX_LOCK) {
+> +            goto illegal_op;
+> +        }
+>           modrm = cpu_ldub_code(env, s->pc++);
+>           gen_nop_modrm(env, s, modrm);
+>           break;
+> 
+Surely you'd also want to make this change for 0x11a and 0x11b.  Which would 
+also simplify that code a bit.
+
+That said, there's *lots* of missing LOCK prefix checks.  What brings this one 
+in particular to your attention?
 
 
-
-On 05/13/2017 09:49 AM, Hailiang Zhang wrote:
-> Hi,
->
-> On 2017/5/12 9:41, Zhang Chen wrote:
->> We add the vnet_hdr option for filter-mirror, default is disable.
->> If you use virtio-net-pci net driver, please enable it.
->> You can use it for example:
->> -object 
->> filter-mirror,id=m0,netdev=hn0,queue=tx,outdev=mirror0,vnet_hdr=on
->
-> Is there any way to detect whether or not the vNIC using vnet_hdr ?
-
-Yes, we can. but we can't ensure the backward compatibility.
-Detail:
-https://lists.nongnu.org/archive/html/qemu-devel/2017-05/msg01959.html
-
-> I don't think it is a good idea to let users to confirm it, especially 
-> for users who may not
-> be so familiar with the vNIC realizing in qemu.
->
-
-If you don't use virtio-net-pci that you need't add this option, default 
-is false.
-
-Thanks
-Zhang Chen
-
->
-> Thanks,
-> Hailiang
->
->> Signed-off-by: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
->> ---
->>   net/filter-mirror.c | 34 ++++++++++++++++++++++++++++++++++
->>   qemu-options.hx     |  5 +++--
->>   2 files changed, 37 insertions(+), 2 deletions(-)
->>
->> diff --git a/net/filter-mirror.c b/net/filter-mirror.c
->> index 72fa7c2..3766414 100644
->> --- a/net/filter-mirror.c
->> +++ b/net/filter-mirror.c
->> @@ -38,6 +38,7 @@ typedef struct MirrorState {
->>       NetFilterState parent_obj;
->>       char *indev;
->>       char *outdev;
->> +    bool vnet_hdr;
->>       CharBackend chr_in;
->>       CharBackend chr_out;
->>       SocketReadState rs;
->> @@ -308,6 +309,13 @@ static char *filter_mirror_get_outdev(Object 
->> *obj, Error **errp)
->>       return g_strdup(s->outdev);
->>   }
->>   +static char *filter_mirror_get_vnet_hdr(Object *obj, Error **errp)
->> +{
->> +    MirrorState *s = FILTER_MIRROR(obj);
->> +
->> +    return s->vnet_hdr ? g_strdup("on") : g_strdup("off");
->> +}
->> +
->>   static void
->>   filter_mirror_set_outdev(Object *obj, const char *value, Error **errp)
->>   {
->> @@ -322,6 +330,21 @@ filter_mirror_set_outdev(Object *obj, const char 
->> *value, Error **errp)
->>       }
->>   }
->>   +static void filter_mirror_set_vnet_hdr(Object *obj,
->> +                                       const char *value,
->> +                                       Error **errp)
->> +{
->> +    MirrorState *s = FILTER_MIRROR(obj);
->> +
->> +    if (strcmp(value, "on") && strcmp(value, "off")) {
->> +        error_setg(errp, "Invalid value for filter-mirror vnet_hdr, "
->> +                         "should be 'on' or 'off'");
->> +        return;
->> +    }
->> +
->> +    s->vnet_hdr = !strcmp(value, "on");
->> +}
->> +
->>   static char *filter_redirector_get_outdev(Object *obj, Error **errp)
->>   {
->>       MirrorState *s = FILTER_REDIRECTOR(obj);
->> @@ -340,8 +363,19 @@ filter_redirector_set_outdev(Object *obj, const 
->> char *value, Error **errp)
->>     static void filter_mirror_init(Object *obj)
->>   {
->> +    MirrorState *s = FILTER_MIRROR(obj);
->> +
->>       object_property_add_str(obj, "outdev", filter_mirror_get_outdev,
->>                               filter_mirror_set_outdev, NULL);
->> +
->> +    /*
->> +     * The vnet_hdr is disabled by default, if you want to enable
->> +     * this option, you must enable all the option on related modules
->> +     * (like other filter or colo-compare).
->> +     */
->> +    s->vnet_hdr = false;
->> +    object_property_add_str(obj, "vnet_hdr", 
->> filter_mirror_get_vnet_hdr,
->> +                             filter_mirror_set_vnet_hdr, NULL);
->>   }
->>     static void filter_redirector_init(Object *obj)
->> diff --git a/qemu-options.hx b/qemu-options.hx
->> index 70c0ded..1e08481 100644
->> --- a/qemu-options.hx
->> +++ b/qemu-options.hx
->> @@ -4024,10 +4024,11 @@ queue @var{all|rx|tx} is an option that can 
->> be applied to any netfilter.
->>   @option{tx}: the filter is attached to the transmit queue of the 
->> netdev,
->>                where it will receive packets sent by the netdev.
->>   -@item -object 
->> filter-mirror,id=@var{id},netdev=@var{netdevid},outdev=@var{chardevid}[,queue=@var{all|rx|tx}]
->> +@item -object 
->> filter-mirror,id=@var{id},netdev=@var{netdevid},outdev=@var{chardevid},vnet_hdr=@var{on|off}[,queue=@var{all|rx|tx}]
->>     filter-mirror on netdev @var{netdevid},mirror net packet to chardev
->> -@var{chardevid}
->> +@var{chardevid}, if vnet_hdr = on, filter-mirror will mirror packet
->> +with vnet_hdr_len.
->>     @item -object 
->> filter-redirector,id=@var{id},netdev=@var{netdevid},indev=@var{chardevid},
->>   outdev=@var{chardevid}[,queue=@var{all|rx|tx}]
->
->
->
->
-> .
->
-
--- 
-Thanks
-Zhang Chen
+r~
