@@ -1,25 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53509)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54010)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1d9mCp-0002Ka-Ql
-	for qemu-devel@nongnu.org; Sun, 14 May 2017 01:36:36 -0400
+	id 1d9mI8-0003aI-6B
+	for qemu-devel@nongnu.org; Sun, 14 May 2017 01:42:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1d9mCl-0008AW-4g
-	for qemu-devel@nongnu.org; Sun, 14 May 2017 01:36:35 -0400
+	id 1d9mI3-0002zf-GI
+	for qemu-devel@nongnu.org; Sun, 14 May 2017 01:42:04 -0400
+Received: from mail-qk0-x242.google.com ([2607:f8b0:400d:c09::242]:34441)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1d9mI3-0002zQ-AO
+	for qemu-devel@nongnu.org; Sun, 14 May 2017 01:41:59 -0400
+Received: by mail-qk0-x242.google.com with SMTP id u75so13034630qka.1
+	for <qemu-devel@nongnu.org>; Sat, 13 May 2017 22:41:59 -0700 (PDT)
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
-References: <1493226792-3237-1-git-send-email-peter.maydell@linaro.org>
-	<1493226792-3237-2-git-send-email-peter.maydell@linaro.org>
+References: <20170514051820.15985-1-n54@gmx.com>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <58ed86e6-0b92-152e-2238-302554651306@amsat.org>
-Date: Sun, 14 May 2017 02:36:26 -0300
+Message-ID: <ccaec2d6-49d5-045a-219d-9d6e5deb6c79@amsat.org>
+Date: Sun, 14 May 2017 02:41:55 -0300
 MIME-Version: 1.0
-In-Reply-To: <1493226792-3237-2-git-send-email-peter.maydell@linaro.org>
+In-Reply-To: <20170514051820.15985-1-n54@gmx.com>
 Content-Type: text/plain; charset=windows-1252; format=flowed
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH 1/3] hw/intc/arm_gicv3_cpuif:
- Fix reset value for VMCR_EL2.VBPR1
+Subject: Re: [Qemu-devel] [PATCH] libvixl: Correct build failures on NetBSD
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,35 +33,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-devel@nongnu.org
-Cc: patches@linaro.org
+To: Kamil Rytarowski <n54@gmx.com>, qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, claudio.fontana@gmail.com
 
-On 04/26/2017 02:13 PM, Peter Maydell wrote:
-> We were setting the VBPR1 field of VMCR_EL2 to icv_min_vbpr()
-> on reset, but this is not correct. The field should reset to
-> the minimum value of ICV_BPR0_EL1 plus one.
+On 05/14/2017 02:18 AM, Kamil Rytarowski wrote:
+> Ensure that C99 macros are defined regardless of the inclusion order of
+> headers in vixl. This is required at least on NetBSD.
 >
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-> ---
->  hw/intc/arm_gicv3_cpuif.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+> The vixl/globals.h headers defines __STDC_CONSTANT_MACROS and must be
+> included before other system headers.
 >
-> diff --git a/hw/intc/arm_gicv3_cpuif.c b/hw/intc/arm_gicv3_cpuif.c
-> index 0b20856..d31eba0 100644
-> --- a/hw/intc/arm_gicv3_cpuif.c
-> +++ b/hw/intc/arm_gicv3_cpuif.c
-> @@ -2014,7 +2014,7 @@ static void icc_reset(CPUARMState *env, const ARMCPRegInfo *ri)
->      cs->ich_hcr_el2 = 0;
->      memset(cs->ich_lr_el2, 0, sizeof(cs->ich_lr_el2));
->      cs->ich_vmcr_el2 = ICH_VMCR_EL2_VFIQEN |
-> -        (icv_min_vbpr(cs) << ICH_VMCR_EL2_VBPR1_SHIFT) |
-> +        ((icv_min_vbpr(cs) + 1) << ICH_VMCR_EL2_VBPR1_SHIFT) |
-
-Indeed "a BPR of 0 is impossible (the minimum value is 1)"
+> This file defines unconditionally the following macros, without altering
+> the original sources:
+>  - __STDC_CONSTANT_MACROS
+>  - __STDC_LIMIT_MACROS
+>  - __STDC_FORMAT_MACROS
+>
+> Signed-off-by: Kamil Rytarowski <n54@gmx.com>
 
 Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
->          (icv_min_vbpr(cs) << ICH_VMCR_EL2_VBPR0_SHIFT);
->  }
+> ---
+>  disas/libvixl/Makefile.objs | 3 +++
+>  1 file changed, 3 insertions(+)
 >
+> diff --git a/disas/libvixl/Makefile.objs b/disas/libvixl/Makefile.objs
+> index bbe7695fdb..860fb7f384 100644
+> --- a/disas/libvixl/Makefile.objs
+> +++ b/disas/libvixl/Makefile.objs
+> @@ -7,5 +7,8 @@ libvixl_OBJS = vixl/utils.o \
+>  # The -Wno-sign-compare is needed only for gcc 4.6, which complains about
+>  # some signed-unsigned equality comparisons which later gcc versions do not.
+>  $(addprefix $(obj)/,$(libvixl_OBJS)): QEMU_CFLAGS := -I$(SRC_PATH)/disas/libvixl $(QEMU_CFLAGS) -Wno-sign-compare
+> +# Ensure that C99 macros are defined regardless of the inclusion order of
+> +# headers in vixl. This is required at least on NetBSD.
+> +$(addprefix $(obj)/,$(libvixl_OBJS)): QEMU_CFLAGS += -D__STDC_CONSTANT_MACROS -D__STDC_LIMIT_MACROS -D__STDC_FORMAT_MACROS
+>
+>  common-obj-$(CONFIG_ARM_A64_DIS) += $(libvixl_OBJS)
 >
