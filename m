@@ -1,27 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41814)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43722)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1dAEMF-0004Xo-JJ
-	for qemu-devel@nongnu.org; Mon, 15 May 2017 07:40:15 -0400
+	(envelope-from <clg@kaod.org>) id 1dAETZ-0001Ml-4e
+	for qemu-devel@nongnu.org; Mon, 15 May 2017 07:47:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1dAEME-0002aP-Im
-	for qemu-devel@nongnu.org; Mon, 15 May 2017 07:40:11 -0400
-Received: from 10.mo69.mail-out.ovh.net ([46.105.73.241]:43950)
+	(envelope-from <clg@kaod.org>) id 1dAETW-0006Pl-1l
+	for qemu-devel@nongnu.org; Mon, 15 May 2017 07:47:45 -0400
+Received: from 2.mo69.mail-out.ovh.net ([178.33.251.80]:43298)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1dAEME-0002Zk-9T
-	for qemu-devel@nongnu.org; Mon, 15 May 2017 07:40:10 -0400
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1dAETV-0006PS-S3
+	for qemu-devel@nongnu.org; Mon, 15 May 2017 07:47:41 -0400
 Received: from player699.ha.ovh.net (b9.ovh.net [213.186.33.59])
-	by mo69.mail-out.ovh.net (Postfix) with ESMTP id 3B3601FC04
-	for <qemu-devel@nongnu.org>; Mon, 15 May 2017 13:40:09 +0200 (CEST)
-From: Greg Kurz <groug@kaod.org>
-Date: Mon, 15 May 2017 13:40:04 +0200
-Message-ID: <149484840466.20089.893964776019028654.stgit@bahia.lan>
-In-Reply-To: <149484833874.20089.4164801378197848306.stgit@bahia.lan>
+	by mo69.mail-out.ovh.net (Postfix) with ESMTP id 6BF271DE9F
+	for <qemu-devel@nongnu.org>; Mon, 15 May 2017 13:47:40 +0200 (CEST)
 References: <149484833874.20089.4164801378197848306.stgit@bahia.lan>
+	<149484836649.20089.8174753739169885859.stgit@bahia.lan>
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <27242b95-b09a-c83d-6245-ea910fef9878@kaod.org>
+Date: Mon, 15 May 2017 13:47:30 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] [PATCH 6/6] spapr: fix migration of ICP objects
- from/to older QEMU
+In-Reply-To: <149484836649.20089.8174753739169885859.stgit@bahia.lan>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 2/6] spapr: fix error path of required
+ kernel-irqchip
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,169 +31,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
-Cc: Bharata B Rao <bharata@linux.vnet.ibm.com>, Cedric Le Goater <clg@kaod.org>, David Gibson <david@gibson.dropbear.id.au>
+To: Greg Kurz <groug@kaod.org>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+Cc: Bharata B Rao <bharata@linux.vnet.ibm.com>, David Gibson <david@gibson.dropbear.id.au>
 
-Commit 5bc8d26de20c ("spapr: allocate the ICPState object from under
-sPAPRCPUCore") moved ICP objects from the machine to CPU cores. This
-is an improvement since we no longer allocate ICP objects that will
-never be used. But it has the side-effect of breaking migration of
-older machine types from older QEMU versions.
+On 05/15/2017 01:39 PM, Greg Kurz wrote:
+> QEMU should exit if the user explicitely asked for kernel-irqchip suppo=
+rt
+> and "xics-kvm" initialization fails.
+>=20
+> The changelog of commit 34f2af3d3edf ("spapr: Clean up misuse of qdev_i=
+nit()
+> in xics-kvm creation") reads:
+>=20
+>     While there, improve the error message when we can't satisfy an
+>     explicit user request for "xics-kvm", and exit(1) instead of abort(=
+).
+>     Simplify the abort when we can't create "xics".
+>=20
+> This patch adds the missing call to exit().
+>=20
+> Signed-off-by: Greg Kurz <groug@kaod.org>
 
-This patch introduces a compat flag in the sPAPR machine class so
-that all pseries machine up to 2.9 go on with the previous behavior
-of pre-allocating ICP objects.
 
-While here, we also ensure that object_property_add_child() errors cause
-QEMU to abort for newer machines.
+Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
 
-Signed-off-by: Greg Kurz <groug@kaod.org>
----
- hw/ppc/spapr.c          |   36 ++++++++++++++++++++++++++++++++++++
- hw/ppc/spapr_cpu_core.c |   28 ++++++++++++++++++++--------
- include/hw/ppc/spapr.h  |    2 ++
- 3 files changed, 58 insertions(+), 8 deletions(-)
-
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index c53989bb10b1..ab3683bcd677 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -126,6 +126,7 @@ error:
- static void xics_system_init(MachineState *machine, int nr_irqs, Error **errp)
- {
-     sPAPRMachineState *spapr = SPAPR_MACHINE(machine);
-+    sPAPRMachineClass *smc = SPAPR_MACHINE_GET_CLASS(spapr);
-     Error *local_err = NULL;
- 
-     if (kvm_enabled()) {
-@@ -151,6 +152,38 @@ static void xics_system_init(MachineState *machine, int nr_irqs, Error **errp)
-                                       &local_err);
-     }
- 
-+    if (!spapr->ics) {
-+        goto out;
-+    }
-+
-+    if (smc->must_pre_allocate_icps) {
-+        int smt = kvmppc_smt_threads();
-+        int nr_servers = DIV_ROUND_UP(max_cpus * smt, smp_threads);
-+        int i;
-+
-+        spapr->legacy_icps = g_malloc0(nr_servers * sizeof(ICPState));
-+
-+        for (i = 0; i < nr_servers; i++) {
-+            void* obj = &spapr->legacy_icps[i];
-+
-+            object_initialize(obj, sizeof(ICPState), spapr->icp_type);
-+            object_property_add_child(OBJECT(spapr), "icp[*]", obj,
-+                                      &error_abort);
-+            object_unref(obj);
-+            object_property_add_const_link(obj, "xics", OBJECT(spapr),
-+                                           &error_abort);
-+            object_property_set_bool(obj, true, "realized", &local_err);
-+            if (local_err) {
-+                while (i--) {
-+                    object_unparent(obj);
-+                }
-+                g_free(spapr->legacy_icps);
-+                break;
-+            }
-+        }
-+    }
-+
-+out:
-     error_propagate(errp, local_err);
- }
- 
-@@ -3256,8 +3289,11 @@ static void spapr_machine_2_9_instance_options(MachineState *machine)
- 
- static void spapr_machine_2_9_class_options(MachineClass *mc)
- {
-+    sPAPRMachineClass *smc = SPAPR_MACHINE_CLASS(mc);
-+
-     spapr_machine_2_10_class_options(mc);
-     SET_MACHINE_COMPAT(mc, SPAPR_COMPAT_2_9);
-+    smc->must_pre_allocate_icps = true;
- }
- 
- DEFINE_SPAPR_MACHINE(2_9, "2.9", false);
-diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
-index 63d160f7e010..5476647efa06 100644
---- a/hw/ppc/spapr_cpu_core.c
-+++ b/hw/ppc/spapr_cpu_core.c
-@@ -119,6 +119,7 @@ static void spapr_cpu_core_unrealizefn(DeviceState *dev, Error **errp)
-     size_t size = object_type_get_instance_size(typename);
-     CPUCore *cc = CPU_CORE(dev);
-     int i;
-+    sPAPRMachineState *spapr = SPAPR_MACHINE(qdev_get_machine());
- 
-     for (i = 0; i < cc->nr_threads; i++) {
-         void *obj = sc->threads + i * size;
-@@ -127,7 +128,9 @@ static void spapr_cpu_core_unrealizefn(DeviceState *dev, Error **errp)
-         PowerPCCPU *cpu = POWERPC_CPU(cs);
- 
-         spapr_cpu_destroy(cpu);
--        object_unparent(cpu->intc);
-+        if (!spapr->legacy_icps) {
-+            object_unparent(cpu->intc);
-+        }
-         cpu_remove_sync(cs);
-         object_unparent(obj);
-     }
-@@ -142,12 +145,19 @@ static void spapr_cpu_core_realize_child(Object *child, Error **errp)
-     PowerPCCPU *cpu = POWERPC_CPU(cs);
-     Object *obj;
- 
--    obj = object_new(spapr->icp_type);
--    object_property_add_child(OBJECT(cpu), "icp", obj, NULL);
--    object_property_add_const_link(obj, "xics", OBJECT(spapr), &error_abort);
--    object_property_set_bool(obj, true, "realized", &local_err);
--    if (local_err) {
--        goto error;
-+    if (spapr->legacy_icps) {
-+        int index = cpu->parent_obj.cpu_index;
-+
-+        obj = OBJECT(&spapr->legacy_icps[index]);
-+    } else {
-+        obj = object_new(spapr->icp_type);
-+        object_property_add_child(OBJECT(cpu), "icp", obj, &error_abort);
-+        object_property_add_const_link(obj, "xics", OBJECT(spapr),
-+                                       &error_abort);
-+        object_property_set_bool(obj, true, "realized", &local_err);
-+        if (local_err) {
-+            goto error;
-+        }
-     }
- 
-     object_property_set_bool(child, true, "realized", &local_err);
-@@ -164,7 +174,9 @@ static void spapr_cpu_core_realize_child(Object *child, Error **errp)
-     return;
- 
- error:
--    object_unparent(obj);
-+    if (!spapr->legacy_icps) {
-+        object_unparent(obj);
-+    }
-     error_propagate(errp, local_err);
- }
- 
-diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
-index 5802f888c39d..72cd5af2679b 100644
---- a/include/hw/ppc/spapr.h
-+++ b/include/hw/ppc/spapr.h
-@@ -53,6 +53,7 @@ struct sPAPRMachineClass {
-     bool dr_lmb_enabled;       /* enable dynamic-reconfig/hotplug of LMBs */
-     bool use_ohci_by_default;  /* use USB-OHCI instead of XHCI */
-     const char *tcg_default_cpu; /* which (TCG) CPU to simulate by default */
-+    bool must_pre_allocate_icps; /* only for pseries-2.9 and older */
-     void (*phb_placement)(sPAPRMachineState *spapr, uint32_t index,
-                           uint64_t *buid, hwaddr *pio, 
-                           hwaddr *mmio32, hwaddr *mmio64,
-@@ -109,6 +110,7 @@ struct sPAPRMachineState {
-     MemoryHotplugState hotplug_memory;
- 
-     const char *icp_type;
-+    ICPState *legacy_icps;
- };
- 
- #define H_SUCCESS         0
+> ---
+>  hw/ppc/spapr.c |    1 +
+>  1 file changed, 1 insertion(+)
+>=20
+> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> index abfb99b71b7d..f477d7b8a210 100644
+> --- a/hw/ppc/spapr.c
+> +++ b/hw/ppc/spapr.c
+> @@ -133,6 +133,7 @@ static void xics_system_init(MachineState *machine,=
+ int nr_irqs, Error **errp)
+>          if (machine_kernel_irqchip_required(machine) && !spapr->ics) {
+>              error_reportf_err(err,
+>                                "kernel_irqchip requested but unavailabl=
+e: ");
+> +            exit(EXIT_FAILURE);
+>          } else {
+>              error_free(err);
+>          }
+>=20
