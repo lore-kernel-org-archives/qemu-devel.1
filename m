@@ -1,30 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50826)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51109)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dAEsC-0004db-6W
-	for qemu-devel@nongnu.org; Mon, 15 May 2017 08:13:13 -0400
+	(envelope-from <no-reply@patchew.org>) id 1dAEt7-0005Ge-42
+	for qemu-devel@nongnu.org; Mon, 15 May 2017 08:14:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dAEs8-0000Pz-Vk
-	for qemu-devel@nongnu.org; Mon, 15 May 2017 08:13:12 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53796)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dAEs8-0000Ps-PH
-	for qemu-devel@nongnu.org; Mon, 15 May 2017 08:13:08 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id AA74A4E357
-	for <qemu-devel@nongnu.org>; Mon, 15 May 2017 12:13:07 +0000 (UTC)
-Date: Mon, 15 May 2017 13:13:01 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170515121301.GF2089@work-vm>
-References: <20170503104257.5127-1-dgilbert@redhat.com>
-	<dcdd1530-4e73-f998-b85f-06db4f1c4b63@redhat.com>
+	(envelope-from <no-reply@patchew.org>) id 1dAEt1-0000nX-An
+	for qemu-devel@nongnu.org; Mon, 15 May 2017 08:14:09 -0400
+Resent-Message-Id: <E1dAEt1-0000nX-An@eggs.gnu.org>
+In-Reply-To: <149484833874.20089.4164801378197848306.stgit@bahia.lan>
+Message-ID: <149485041417.489.11034345945561703613@c05f1edc8ed1>
+Reply-To: <qemu-devel@nongnu.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <dcdd1530-4e73-f998-b85f-06db4f1c4b63@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] block migration: Allow compile time disable
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Mon, 15 May 2017 05:13:34 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PATCH 0/6] spapr/xics: fix migration of older
+ machine types
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,57 +24,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: qemu-devel@nongnu.org, quintela@redhat.com, jcody@redhat.com, kwolf@redhat.com, kashyap@redhat.com
+To: groug@kaod.org
+Cc: famz@redhat.com, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, david@gibson.dropbear.id.au, clg@kaod.org, bharata@linux.vnet.ibm.com
 
-* Eric Blake (eblake@redhat.com) wrote:
-> On 05/03/2017 05:42 AM, Dr. David Alan Gilbert (git) wrote:
-> > From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-> > 
-> > Many users now prefer to use drive_mirror over NBD as an
-> > alternative to the older migrate -b option; drive_mirror is
-> > more complex to setup but gives you more options (e.g. only
-> > migrating some of the disks if some of them are shared).
-> > 
-> > Allow the large chunk of block migration code to be compiled
-> > out for those who don't use it.
-> > 
-> > Based on a downstream-patch we've had for a while by Jeff Cody.
-> > 
-> > Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> > ---
-> > @@ -1222,6 +1226,14 @@ void qmp_migrate(const char *uri, bool has_blk, bool blk,
-> >      params.blk = has_blk && blk;
-> >      params.shared = has_inc && inc;
-> >  
-> > +#ifndef CONFIG_LIVE_BLOCK_MIGRATION
-> > +    if (params.blk || params.shared) {
-> > +        error_setg(errp, "QEMU compiled without old-style block migration. "
-> > +                         "Use drive_mirror+NBD.");
-> 
-> error_setg() should not be used with '.' (it should be a single phrase,
-> here you are trying to stuff in two sentences).  error_append_hint() can
-> be used to supply the advice about using drive_mirror+NBD as the
-> alternative.
-> 
-> Otherwise this looks reasonable to me.
-
-Done as:
-        error_setg(errp, "QEMU compiled without old-style block migration");
-        error_append_hint(errp, "Use drive_mirror+NBD.\n");
-
-(All the places I can see seem to have . and \n in append_hint)
-
-Dave
-
-> -- 
-> Eric Blake, Principal Software Engineer
-> Red Hat, Inc.           +1-919-301-3266
-> Virtualization:  qemu.org | libvirt.org
-> 
-> 
-
-
-
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKU3ViamVjdDogW1FlbXUt
+ZGV2ZWxdIFtQQVRDSCAwLzZdIHNwYXByL3hpY3M6IGZpeCBtaWdyYXRpb24gb2Ygb2xkZXIgbWFj
+aGluZSB0eXBlcwpNZXNzYWdlLWlkOiAxNDk0ODQ4MzM4NzQuMjAwODkuNDE2NDgwMTM3ODE5Nzg0
+ODMwNi5zdGdpdEBiYWhpYS5sYW4KVHlwZTogc2VyaWVzCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4g
+PT09CiMhL2Jpbi9iYXNoCgpCQVNFPWJhc2UKbj0xCnRvdGFsPSQoZ2l0IGxvZyAtLW9uZWxpbmUg
+JEJBU0UuLiB8IHdjIC1sKQpmYWlsZWQ9MAoKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1l
+bGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKCmNvbW1pdHM9IiQo
+Z2l0IGxvZyAtLWZvcm1hdD0lSCAtLXJldmVyc2UgJEJBU0UuLikiCmZvciBjIGluICRjb21taXRz
+OyBkbwogICAgZWNobyAiQ2hlY2tpbmcgUEFUQ0ggJG4vJHRvdGFsOiAkKGdpdCBsb2cgLW4gMSAt
+LWZvcm1hdD0lcyAkYykuLi4iCiAgICBpZiAhIGdpdCBzaG93ICRjIC0tZm9ybWF0PWVtYWlsIHwg
+Li9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFjayAtOyB0aGVuCiAgICAgICAgZmFpbGVk
+PTEKICAgICAgICBlY2hvCiAgICBmaQogICAgbj0kKChuKzEpKQpkb25lCgpleGl0ICRmYWlsZWQK
+PT09IFRFU1QgU0NSSVBUIEVORCA9PT0KClVwZGF0aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFk
+ZWY3ZjQ0YmQ4ODg3MTMzODQKRnJvbSBodHRwczovL2dpdGh1Yi5jb20vcGF0Y2hldy1wcm9qZWN0
+L3FlbXUKIC0gW3RhZyB1cGRhdGVdICAgICAgcGF0Y2hldy8xNDk0ODQ4MzM4NzQuMjAwODkuNDE2
+NDgwMTM3ODE5Nzg0ODMwNi5zdGdpdEBiYWhpYS5sYW4gLT4gcGF0Y2hldy8xNDk0ODQ4MzM4NzQu
+MjAwODkuNDE2NDgwMTM3ODE5Nzg0ODMwNi5zdGdpdEBiYWhpYS5sYW4KU3dpdGNoZWQgdG8gYSBu
+ZXcgYnJhbmNoICd0ZXN0JwozYzM4MjRhIHNwYXByOiBmaXggbWlncmF0aW9uIG9mIElDUCBvYmpl
+Y3RzIGZyb20vdG8gb2xkZXIgUUVNVQoyODAxNjRmIHNwYXByLWNwdS1jb3JlOiByZWxlYXNlIElD
+UCBvYmplY3Qgd2hlbiByZWFsaXphdGlvbiBmYWlscwo1YmM3MmViIHNwYXByOiBzYW5pdGl6ZSBl
+cnJvciBoYW5kbGluZyBpbiBzcGFwcl9pY3NfY3JlYXRlKCkKZmExNWQwMCBzcGFwcjogZml4IGVy
+cm9yIHJlcG9ydGluZyBpbiB4aWNzX3N5c3RlbV9pbml0KCkKZWNiZTIzNCBzcGFwcjogZml4IGVy
+cm9yIHBhdGggb2YgcmVxdWlyZWQga2VybmVsLWlycWNoaXAKYjdjZjczZCBwcGMveGljczogc2lt
+cGxpZnkgcHJvdG90eXBlIG9mIHhpY3Nfc3BhcHJfaW5pdCgpCgo9PT0gT1VUUFVUIEJFR0lOID09
+PQpDaGVja2luZyBQQVRDSCAxLzY6IHBwYy94aWNzOiBzaW1wbGlmeSBwcm90b3R5cGUgb2YgeGlj
+c19zcGFwcl9pbml0KCkuLi4KQ2hlY2tpbmcgUEFUQ0ggMi82OiBzcGFwcjogZml4IGVycm9yIHBh
+dGggb2YgcmVxdWlyZWQga2VybmVsLWlycWNoaXAuLi4KQ2hlY2tpbmcgUEFUQ0ggMy82OiBzcGFw
+cjogZml4IGVycm9yIHJlcG9ydGluZyBpbiB4aWNzX3N5c3RlbV9pbml0KCkuLi4KQ2hlY2tpbmcg
+UEFUQ0ggNC82OiBzcGFwcjogc2FuaXRpemUgZXJyb3IgaGFuZGxpbmcgaW4gc3BhcHJfaWNzX2Ny
+ZWF0ZSgpLi4uCkNoZWNraW5nIFBBVENIIDUvNjogc3BhcHItY3B1LWNvcmU6IHJlbGVhc2UgSUNQ
+IG9iamVjdCB3aGVuIHJlYWxpemF0aW9uIGZhaWxzLi4uCkNoZWNraW5nIFBBVENIIDYvNjogc3Bh
+cHI6IGZpeCBtaWdyYXRpb24gb2YgSUNQIG9iamVjdHMgZnJvbS90byBvbGRlciBRRU1VLi4uCkVS
+Uk9SOiAiZm9vKiBiYXIiIHNob3VsZCBiZSAiZm9vICpiYXIiCiM1MDogRklMRTogaHcvcHBjL3Nw
+YXByLmM6MTY3OgorICAgICAgICAgICAgdm9pZCogb2JqID0gJnNwYXByLT5sZWdhY3lfaWNwc1tp
+XTsKCnRvdGFsOiAxIGVycm9ycywgMCB3YXJuaW5ncywgMTIyIGxpbmVzIGNoZWNrZWQKCllvdXIg
+cGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNl
+IGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVy
+LCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCj09PSBPVVRQVVQgRU5EID09PQoKVGVz
+dCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9t
+YXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlv
+dXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEBmcmVlbGlzdHMub3Jn
