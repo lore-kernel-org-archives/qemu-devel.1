@@ -1,20 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34204)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35973)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1dABj4-0003zo-Bt
-	for qemu-devel@nongnu.org; Mon, 15 May 2017 04:51:35 -0400
+	(envelope-from <peterx@redhat.com>) id 1dABrj-0007ao-KJ
+	for qemu-devel@nongnu.org; Mon, 15 May 2017 05:00:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1dABiz-0005eU-Dp
-	for qemu-devel@nongnu.org; Mon, 15 May 2017 04:51:34 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:37472)
+	(envelope-from <peterx@redhat.com>) id 1dABrf-00013D-ME
+	for qemu-devel@nongnu.org; Mon, 15 May 2017 05:00:31 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:41936)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1dABiz-0005dd-5c
-	for qemu-devel@nongnu.org; Mon, 15 May 2017 04:51:29 -0400
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1dABrf-000130-DO
+	for qemu-devel@nongnu.org; Mon, 15 May 2017 05:00:27 -0400
+Date: Mon, 15 May 2017 17:00:06 +0800
 From: Peter Xu <peterx@redhat.com>
-Date: Mon, 15 May 2017 16:51:00 +0800
-Message-Id: <1494838260-30439-5-git-send-email-peterx@redhat.com>
-In-Reply-To: <1494838260-30439-1-git-send-email-peterx@redhat.com>
-References: <1494838260-30439-1-git-send-email-peterx@redhat.com>
-Subject: [Qemu-devel] [PATCH 4/4] exec: abstract address_space_do_translate()
+Message-ID: <20170515090006.GA10415@pxdev.xzpeter.org>
+References: <1494403315-12760-1-git-send-email-peterx@redhat.com>
+	<1494403315-12760-5-git-send-email-peterx@redhat.com>
+	<20170511015637.GF14408@umbus.fritz.box>
+	<20170511093603.GJ28293@pxdev.xzpeter.org>
+	<20170512052508.GD12908@umbus.fritz.box>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20170512052508.GD12908@umbus.fritz.box>
+Subject: Re: [Qemu-devel] [PATCH v3 04/12] memory: fix
+ address_space_get_iotlb_entry()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,162 +31,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: David Gibson <david@gibson.dropbear.id.au>, Paolo Bonzini <pbonzini@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, peterx@redhat.com, Jason Wang <jasowang@redhat.com>
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-devel@nongnu.org, "Michael S . Tsirkin" <mst@redhat.com>, yi.l.liu@intel.com, Marcel Apfelbaum <marcel@redhat.com>, Lan Tianyu <tianyu.lan@intel.com>, Jason Wang <jasowang@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-This function is an abstraction helper for address_space_translate() and
-address_space_get_iotlb_entry(). It does the lookup of address into
-memory region section, then do proper IOMMU translation if necessary.
-With that, refactor the two existing functions a bit to use it.
+On Fri, May 12, 2017 at 03:25:08PM +1000, David Gibson wrote:
+> On Thu, May 11, 2017 at 05:36:03PM +0800, Peter Xu wrote:
+> > On Thu, May 11, 2017 at 11:56:38AM +1000, David Gibson wrote:
+> > > On Wed, May 10, 2017 at 04:01:47PM +0800, Peter Xu wrote:
+> > > > This function has an assumption that we will definitely call translate()
+> > > > once (or say, the addr will be located inside one IOMMU memory region),
+> > > > otherwise an empty IOTLB will be returned. Nevertheless, this is not
+> > > > what we want. When there is no IOMMU memory region, we should build up a
+> > > > static mapping for the caller, instead of an invalid IOTLB.
+> > > > 
+> > > > We won't trigger this path before VT-d passthrough mode. When
+> > > > passthrough mode for a vhost device is setup, VT-d is possible to
+> > > > disable the IOMMU region for that device. Without current patch, we'll
+> > > > get a vhost boot failure, and it'll be failed over to virtio userspace
+> > > > mode.
+> > > 
+> > > This doesn't look right to me.  You're assuming the target is
+> > > address_space_memory, which might not be the case - and you should be
+> > > able to check from the MR you do hit.  Furthermore it doesn't look
+> > > like you're accounting for the trivial translation if the section's
+> > > offset in the address space is different from its offset in the MR.
+> > 
+> > Do you mean this line?
+> > 
+> >         addr = addr - section->offset_within_address_space
+> >                + section->offset_within_region;
+> 
+> Uh.. where is that line?  But.. wait, yes, I think I was mistaken.  I saw:
+> 	.translated_addr = iova,
+> 	
+> and thought that meant you were assuming an identify mapping from iova
+> to translated addr.  But thinking more carefull, IIRC iova and
+> translated_addr are both relative to the MR, not the AS, so I think
+> that is correct after all.
+> 
+> > I thought it was calculating the relative address against that memory
+> > region. That should only be useful if we want to do further
+> > translate(), right? For the path that this patch tries to handle (when
+> > there is no translate() call), then this "addr" is useless here?
+> > 
+> > Regarding to the address space assignment - do you mean, e.g., I
+> > should use section->address_space here instead of
+> > &system_address_space? If so, I can do the switch.
+> 
+> Yes, I think you should.
+> 
+> > But after all, for
+> > now address_space_get_iotlb_entry() is only used by vhost codes, and
+> > it only check against iotlb.target_as == NULL, so the address space
+> > didn't count too much here...
+> 
+> > Another reason I used &address_space_memory is that in
+> > vfio_iommu_map_notify() we have a check against it:
+> > 
+> >     if (iotlb->target_as != &address_space_memory) {
+> >         error_report("Wrong target AS \"%s\", only system memory is allowed",
+> >                      iotlb->target_as->name ? iotlb->target_as->name : "none");
+> >         return;
+> >     }
+> > 
+> > Or say, we have some assumptions (not only in this patch) that assumes
+> > this iotlb.target_as should be system_address_space.
+> 
+> Right, the vhost code can only handle some IOMMU setups - something
+> like nested IOMMUs would break it.  But this way if someone sets up a
+> machine with an IOMMU configuration that vhost can't handle, you'll
+> get an error message, rather than accesses to unexpected locations,
+> which could cause really hard to debug corruption.
+> 
+> In other words we make assumptions, but we should _test_ those
+> assumptions.
+> 
+> I also think it would make sense to use address_space_translate() if we
+> can, since it's an existing interface for a very similar operation.
 
-Signed-off-by: Peter Xu <peterx@redhat.com>
----
- exec.c | 99 +++++++++++++++++++++++++++++++++++++++++++-----------------------
- 1 file changed, 65 insertions(+), 34 deletions(-)
+I did give it a shot to generalize these two functions in this series
+(I just posted it):
 
-diff --git a/exec.c b/exec.c
-index 32e5394..efc80a8 100644
---- a/exec.c
-+++ b/exec.c
-@@ -463,18 +463,20 @@ address_space_translate_internal(AddressSpaceDispatch *d, hwaddr addr, hwaddr *x
- }
- 
- /* Called from RCU critical section */
--IOMMUTLBEntry address_space_get_iotlb_entry(AddressSpace *as, hwaddr addr,
--                                            bool is_write)
-+static MemoryRegionSection address_space_do_translate(AddressSpace *as,
-+                                                      hwaddr addr,
-+                                                      hwaddr *xlat,
-+                                                      hwaddr *plen,
-+                                                      bool is_write,
-+                                                      bool is_mmio)
- {
--    IOMMUTLBEntry iotlb = {0};
-+    IOMMUTLBEntry iotlb;
-     MemoryRegionSection *section;
-     MemoryRegion *mr;
- 
-     for (;;) {
-         AddressSpaceDispatch *d = atomic_rcu_read(&as->dispatch);
--        section = address_space_lookup_region(d, addr, false);
--        addr = addr - section->offset_within_address_space
--               + section->offset_within_region;
-+        section = address_space_translate_internal(d, addr, &addr, plen, is_mmio);
-         mr = section->mr;
- 
-         if (!mr->iommu_ops) {
-@@ -482,55 +484,84 @@ IOMMUTLBEntry address_space_get_iotlb_entry(AddressSpace *as, hwaddr addr,
-         }
- 
-         iotlb = mr->iommu_ops->translate(mr, addr, is_write);
-+        addr = ((iotlb.translated_addr & ~iotlb.addr_mask)
-+                | (addr & iotlb.addr_mask));
-+        *plen = MIN(*plen, (addr | iotlb.addr_mask) - addr + 1);
-         if (!(iotlb.perm & (1 << is_write))) {
--            iotlb.target_as = NULL;
--            break;
-+            goto translate_fail;
-         }
- 
--        addr = ((iotlb.translated_addr & ~iotlb.addr_mask)
--                | (addr & iotlb.addr_mask));
-         as = iotlb.target_as;
-     }
- 
--    return iotlb;
-+    *xlat = addr;
-+
-+    return *section;
-+
-+translate_fail:
-+    return (MemoryRegionSection) { .mr = &io_mem_unassigned };
- }
- 
- /* Called from RCU critical section */
--MemoryRegion *address_space_translate(AddressSpace *as, hwaddr addr,
--                                      hwaddr *xlat, hwaddr *plen,
--                                      bool is_write)
-+IOMMUTLBEntry address_space_get_iotlb_entry(AddressSpace *as, hwaddr addr,
-+                                            bool is_write)
- {
--    IOMMUTLBEntry iotlb;
--    MemoryRegionSection *section;
--    MemoryRegion *mr;
-+    MemoryRegionSection section;
-+    hwaddr xlat, plen;
- 
--    for (;;) {
--        AddressSpaceDispatch *d = atomic_rcu_read(&as->dispatch);
--        section = address_space_translate_internal(d, addr, &addr, plen, true);
--        mr = section->mr;
-+    /* Try to get maximum page mask during translation. */
-+    plen = (hwaddr)-1;
- 
--        if (!mr->iommu_ops) {
--            break;
--        }
-+    /* This can never be MMIO. */
-+    section = address_space_do_translate(as, addr, &xlat, &plen,
-+                                         is_write, false);
- 
--        iotlb = mr->iommu_ops->translate(mr, addr, is_write);
--        addr = ((iotlb.translated_addr & ~iotlb.addr_mask)
--                | (addr & iotlb.addr_mask));
--        *plen = MIN(*plen, (addr | iotlb.addr_mask) - addr + 1);
--        if (!(iotlb.perm & (1 << is_write))) {
--            mr = &io_mem_unassigned;
--            break;
--        }
-+    /* Illegal translation */
-+    if (section.mr == &io_mem_unassigned) {
-+        goto iotlb_fail;
-+    }
- 
--        as = iotlb.target_as;
-+    if (plen == (hwaddr)-1) {
-+        /*
-+         * We use default page size here. Logically it only happens
-+         * for identity mappings.
-+         */
-+        plen = TARGET_PAGE_SIZE;
-     }
- 
-+    /* Convert to address mask */
-+    plen -= 1;
-+
-+    return (IOMMUTLBEntry) {
-+        .target_as = section.address_space,
-+        .iova = addr & ~plen,
-+        .translated_addr = xlat & ~plen,
-+        .addr_mask = plen,
-+        /* IOTLBs are for DMAs, and DMA only allows on RAMs. */
-+        .perm = IOMMU_RW,
-+    };
-+
-+iotlb_fail:
-+    return (IOMMUTLBEntry) {0};
-+}
-+
-+/* Called from RCU critical section */
-+MemoryRegion *address_space_translate(AddressSpace *as, hwaddr addr,
-+                                      hwaddr *xlat, hwaddr *plen,
-+                                      bool is_write)
-+{
-+    MemoryRegion *mr;
-+    MemoryRegionSection section;
-+
-+    /* This can be MMIO, so setup MMIO bit. */
-+    section = address_space_do_translate(as, addr, xlat, plen, is_write, true);
-+    mr = section.mr;
-+
-     if (xen_enabled() && memory_access_is_direct(mr, is_write)) {
-         hwaddr page = ((addr & TARGET_PAGE_MASK) + TARGET_PAGE_SIZE) - addr;
-         *plen = MIN(page, *plen);
-     }
- 
--    *xlat = addr;
-     return mr;
- }
- 
+  [PATCH 0/4] exec: address space translation cleanups
+
+Please see whether that'll be a good replacement of this single patch.
+
+Thanks,
+
 -- 
-2.7.4
+Peter Xu
