@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55290)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55313)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1dA8uy-0007zJ-50
-	for qemu-devel@nongnu.org; Mon, 15 May 2017 01:51:41 -0400
+	(envelope-from <clg@kaod.org>) id 1dA8uz-000815-Nb
+	for qemu-devel@nongnu.org; Mon, 15 May 2017 01:51:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1dA8ut-0001Bj-HZ
-	for qemu-devel@nongnu.org; Mon, 15 May 2017 01:51:40 -0400
-Received: from 11.mo4.mail-out.ovh.net ([46.105.34.195]:48955)
+	(envelope-from <clg@kaod.org>) id 1dA8uy-0001FY-EG
+	for qemu-devel@nongnu.org; Mon, 15 May 2017 01:51:41 -0400
+Received: from 14.mo4.mail-out.ovh.net ([46.105.40.29]:37595)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1dA8ut-00019O-B9
-	for qemu-devel@nongnu.org; Mon, 15 May 2017 01:51:35 -0400
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1dA8uy-0001EM-8R
+	for qemu-devel@nongnu.org; Mon, 15 May 2017 01:51:40 -0400
 Received: from player772.ha.ovh.net (b6.ovh.net [213.186.33.56])
-	by mo4.mail-out.ovh.net (Postfix) with ESMTP id C25756408E
-	for <qemu-devel@nongnu.org>; Mon, 15 May 2017 07:51:26 +0200 (CEST)
+	by mo4.mail-out.ovh.net (Postfix) with ESMTP id 2F12063A76
+	for <qemu-devel@nongnu.org>; Mon, 15 May 2017 07:51:39 +0200 (CEST)
 From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
-Date: Mon, 15 May 2017 07:51:11 +0200
-Message-Id: <1494827476-1487-2-git-send-email-clg@kaod.org>
+Date: Mon, 15 May 2017 07:51:14 +0200
+Message-Id: <1494827476-1487-5-git-send-email-clg@kaod.org>
 In-Reply-To: <1494827476-1487-1-git-send-email-clg@kaod.org>
 References: <1494827476-1487-1-git-send-email-clg@kaod.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH 1/6] aspeed/i2c: improve command handling
+Subject: [Qemu-devel] [PATCH 4/6] aspeed: add some I2C devices to the Aspeed
+ machines
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,100 +33,92 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Peter Maydell <peter.maydell@linaro.org>
 Cc: qemu-arm@nongnu.org, qemu-devel@nongnu.org, =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
 
-Multiple I2C commands can be fired simultaneously and the controller
-execute the commands following these priorities:
-
-  (1) Master Start Command
-  (2) Master Transmit Command
-  (3) Slave Transmit Command or Master Receive Command
-  (4) Master Stop Command
-
-The current code is incorrect with respect to the above sequence and
-needs to be reworked to handle each individual command.
+Let's add an RTC to the palmetto BMC and a LM75 temperature sensor to
+the AST2500 EVB to start with.
 
 Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
 ---
- hw/i2c/aspeed_i2c.c | 24 ++++++++++++++++++------
- 1 file changed, 18 insertions(+), 6 deletions(-)
+ hw/arm/aspeed.c | 27 +++++++++++++++++++++++++++
+ 1 file changed, 27 insertions(+)
 
-diff --git a/hw/i2c/aspeed_i2c.c b/hw/i2c/aspeed_i2c.c
-index ce5b1f0fa493..56a4fdf5c542 100644
---- a/hw/i2c/aspeed_i2c.c
-+++ b/hw/i2c/aspeed_i2c.c
-@@ -171,6 +171,7 @@ static uint64_t aspeed_i2c_bus_read(void *opaque, hwa=
-ddr offset,
+diff --git a/hw/arm/aspeed.c b/hw/arm/aspeed.c
+index 283c03881493..e824ea87a9af 100644
+--- a/hw/arm/aspeed.c
++++ b/hw/arm/aspeed.c
+@@ -39,6 +39,7 @@ typedef struct AspeedBoardConfig {
+     const char *fmc_model;
+     const char *spi_model;
+     uint32_t num_cs;
++    void (*i2c_init)(AspeedBoardState *bmc);
+ } AspeedBoardConfig;
 =20
- static void aspeed_i2c_bus_handle_cmd(AspeedI2CBus *bus, uint64_t value)
- {
-+    bus->cmd &=3D ~0xFFFF;
-     bus->cmd |=3D value & 0xFFFF;
-     bus->intr_status =3D 0;
+ enum {
+@@ -82,6 +83,9 @@ enum {
+         SCU_AST2500_HW_STRAP_ACPI_ENABLE |                              =
+\
+         SCU_HW_STRAP_SPI_MODE(SCU_HW_STRAP_SPI_MASTER))
 =20
-@@ -182,15 +183,27 @@ static void aspeed_i2c_bus_handle_cmd(AspeedI2CBus =
-*bus, uint64_t value)
-             bus->intr_status |=3D I2CD_INTR_TX_ACK;
-         }
-=20
--    } else if (bus->cmd & I2CD_M_TX_CMD) {
-+        /* START command is also a TX command, as the slave address is
-+         * sent on the bus */
-+        bus->cmd &=3D ~(I2CD_M_START_CMD | I2CD_M_TX_CMD);
++static void palmetto_bmc_i2c_init(AspeedBoardState *bmc);
++static void ast2500_evb_i2c_init(AspeedBoardState *bmc);
 +
-+        /* No slave found */
-+        if (!i2c_bus_busy(bus->bus)) {
-+            return;
-+        }
+ static const AspeedBoardConfig aspeed_boards[] =3D {
+     [PALMETTO_BMC] =3D {
+         .soc_name  =3D "ast2400-a1",
+@@ -89,6 +93,7 @@ static const AspeedBoardConfig aspeed_boards[] =3D {
+         .fmc_model =3D "n25q256a",
+         .spi_model =3D "mx25l25635e",
+         .num_cs    =3D 1,
++        .i2c_init  =3D palmetto_bmc_i2c_init,
+     },
+     [AST2500_EVB]  =3D {
+         .soc_name  =3D "ast2500-a1",
+@@ -96,6 +101,7 @@ static const AspeedBoardConfig aspeed_boards[] =3D {
+         .fmc_model =3D "n25q256a",
+         .spi_model =3D "mx25l25635e",
+         .num_cs    =3D 1,
++        .i2c_init  =3D ast2500_evb_i2c_init,
+     },
+     [ROMULUS_BMC]  =3D {
+         .soc_name  =3D "ast2500-a1",
+@@ -223,9 +229,22 @@ static void aspeed_board_init(MachineState *machine,
+     aspeed_board_binfo.ram_size =3D ram_size;
+     aspeed_board_binfo.loader_start =3D sc->info->sdram_base;
+=20
++    if (cfg->i2c_init) {
++        cfg->i2c_init(bmc);
 +    }
 +
-+    if (bus->cmd & I2CD_M_TX_CMD) {
-         if (i2c_send(bus->bus, bus->buf)) {
-             bus->intr_status |=3D (I2CD_INTR_TX_NAK | I2CD_INTR_ABNORMAL=
-);
-             i2c_end_transfer(bus->bus);
-         } else {
-             bus->intr_status |=3D I2CD_INTR_TX_ACK;
-         }
-+        bus->cmd &=3D ~I2CD_M_TX_CMD;
-+    }
-=20
--    } else if (bus->cmd & I2CD_M_RX_CMD) {
-+    if (bus->cmd & I2CD_M_RX_CMD) {
-         int ret =3D i2c_recv(bus->bus);
-         if (ret < 0) {
-             qemu_log_mask(LOG_GUEST_ERROR, "%s: read failed\n", __func__=
-);
-@@ -199,6 +212,7 @@ static void aspeed_i2c_bus_handle_cmd(AspeedI2CBus *b=
-us, uint64_t value)
-             bus->intr_status |=3D I2CD_INTR_RX_DONE;
-         }
-         bus->buf =3D (ret & I2CD_BYTE_BUF_RX_MASK) << I2CD_BYTE_BUF_RX_S=
-HIFT;
-+        bus->cmd &=3D ~I2CD_M_RX_CMD;
-     }
-=20
-     if (bus->cmd & (I2CD_M_STOP_CMD | I2CD_M_S_RX_CMD_LAST)) {
-@@ -208,11 +222,8 @@ static void aspeed_i2c_bus_handle_cmd(AspeedI2CBus *=
-bus, uint64_t value)
-             i2c_end_transfer(bus->bus);
-             bus->intr_status |=3D I2CD_INTR_NORMAL_STOP;
-         }
-+        bus->cmd &=3D ~I2CD_M_STOP_CMD;
-     }
--
--    /* command is handled, reset it and check for interrupts  */
--    bus->cmd &=3D ~0xFFFF;
--    aspeed_i2c_bus_raise_interrupt(bus);
+     arm_load_kernel(ARM_CPU(first_cpu), &aspeed_board_binfo);
  }
 =20
- static void aspeed_i2c_bus_write(void *opaque, hwaddr offset,
-@@ -262,6 +273,7 @@ static void aspeed_i2c_bus_write(void *opaque, hwaddr=
- offset,
-         }
++static void palmetto_bmc_i2c_init(AspeedBoardState *bmc)
++{
++    AspeedSoCState *soc =3D &bmc->soc;
++
++    /* The palmetto platform expects a ds3231 RTC but a ds1338 is
++     * enough to provide basic RTC features. Alarms will be missing */
++    i2c_create_slave(aspeed_i2c_get_bus(DEVICE(&soc->i2c), 0), "ds1338",=
+ 0x68);
++}
++
+ static void palmetto_bmc_init(MachineState *machine)
+ {
+     aspeed_board_init(machine, &aspeed_boards[PALMETTO_BMC]);
+@@ -250,6 +269,14 @@ static const TypeInfo palmetto_bmc_type =3D {
+     .class_init =3D palmetto_bmc_class_init,
+ };
 =20
-         aspeed_i2c_bus_handle_cmd(bus, value);
-+        aspeed_i2c_bus_raise_interrupt(bus);
-         break;
-=20
-     default:
++static void ast2500_evb_i2c_init(AspeedBoardState *bmc)
++{
++    AspeedSoCState *soc =3D &bmc->soc;
++
++    /* The AST2500 EVB expects a LM75 but a TMP105 is compatible */
++    i2c_create_slave(aspeed_i2c_get_bus(DEVICE(&soc->i2c), 7), "tmp105",=
+ 0x4d);
++}
++
+ static void ast2500_evb_init(MachineState *machine)
+ {
+     aspeed_board_init(machine, &aspeed_boards[AST2500_EVB]);
 --=20
 2.7.4
