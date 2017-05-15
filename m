@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37576)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37759)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Milos.Stojanovic@rt-rk.com>) id 1dAHX3-0001VF-9C
-	for qemu-devel@nongnu.org; Mon, 15 May 2017 11:03:37 -0400
+	(envelope-from <Milos.Stojanovic@rt-rk.com>) id 1dAHXZ-0001x9-F0
+	for qemu-devel@nongnu.org; Mon, 15 May 2017 11:04:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <Milos.Stojanovic@rt-rk.com>) id 1dAHWy-0005Rn-EN
-	for qemu-devel@nongnu.org; Mon, 15 May 2017 11:03:33 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:46049 helo=mail.rt-rk.com)
+	(envelope-from <Milos.Stojanovic@rt-rk.com>) id 1dAHXV-0005rU-Ik
+	for qemu-devel@nongnu.org; Mon, 15 May 2017 11:04:05 -0400
+Received: from mx2.rt-rk.com ([89.216.37.149]:46231 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <Milos.Stojanovic@rt-rk.com>)
-	id 1dAHWy-0005R5-6t
-	for qemu-devel@nongnu.org; Mon, 15 May 2017 11:03:28 -0400
+	id 1dAHXV-0005qz-Bl
+	for qemu-devel@nongnu.org; Mon, 15 May 2017 11:04:01 -0400
 From: =?UTF-8?q?Milo=C5=A1=20Stojanovi=C4=87?= <Milos.Stojanovic@rt-rk.com>
-Date: Mon, 15 May 2017 16:59:46 +0200
-Message-Id: <1494860396-24930-7-git-send-email-Milos.Stojanovic@rt-rk.com>
+Date: Mon, 15 May 2017 16:59:47 +0200
+Message-Id: <1494860396-24930-8-git-send-email-Milos.Stojanovic@rt-rk.com>
 In-Reply-To: <1494860396-24930-1-git-send-email-Milos.Stojanovic@rt-rk.com>
 References: <1494860396-24930-1-git-send-email-Milos.Stojanovic@rt-rk.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v2 06/16] linux-user: add support for
- rt_tgsigqueueinfo() system call
+Subject: [Qemu-devel] [PATCH v2 07/16] linux-user: add rt_tgsigqueueinfo()
+ strace
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,73 +31,60 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, riku.voipio@iki.fi
 Cc: laurent@vivier.eu, Miodrag.Dinic@rt-rk.com, Aleksandar.Markovic@rt-rk.com, Petar.Jovanovic@rt-rk.com, yongbok.kim@imgtec.com, Milos.Stojanovic@rt-rk.com
 
-Add a new system call: rt_tgsigqueueinfo().
+This commit improves strace support for syscall rt_tgsigqueueinfo().
 
-This system call is similar to rt_sigqueueinfo(), but instead of
-sending the signal and data to the whole thread group with the ID
-equal to the argument tgid, it sends it to a single thread within
-that thread group. The ID of the thread is specified by the tid
-argument.
+Prior to this commit, typical strace output used to look like this:
+7775 rt_tgsigqueueinfo(7775,7775,50,1996483164,0,0) =3D 0
 
-The implementation is based on the rt_sigqueueinfo() in linux-user
-mode, where the tid is added as the second argument and the
-previous second and third argument become arguments three and four,
-respectively.
+After this commit, it looks like this:
+7775 rt_tgsigqueueinfo(7775,7775,50,0x76ffea5c) =3D 0
 
 Signed-off-by: Milo=C5=A1 Stojanovi=C4=87 <Milos.Stojanovic@rt-rk.com>
-
-Conflicts:
-	linux-user/syscall.c
 ---
- linux-user/syscall.c | 16 ++++++++++++++++
- 1 file changed, 16 insertions(+)
+ linux-user/strace.c    | 15 +++++++++++++++
+ linux-user/strace.list |  2 +-
+ 2 files changed, 16 insertions(+), 1 deletion(-)
 
-diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-index 9ec7ccd..d3b769e 100644
---- a/linux-user/syscall.c
-+++ b/linux-user/syscall.c
-@@ -238,6 +238,7 @@ static type name (type1 arg1,type2 arg2,type3 arg3,ty=
-pe4 arg4,type5 arg5,	\
- #define __NR_sys_getdents64 __NR_getdents64
- #define __NR_sys_getpriority __NR_getpriority
- #define __NR_sys_rt_sigqueueinfo __NR_rt_sigqueueinfo
-+#define __NR_sys_rt_tgsigqueueinfo __NR_rt_tgsigqueueinfo
- #define __NR_sys_syslog __NR_syslog
- #define __NR_sys_futex __NR_futex
- #define __NR_sys_inotify_init __NR_inotify_init
-@@ -275,6 +276,8 @@ _syscall5(int, _llseek,  uint,  fd, ulong, hi, ulong,=
- lo,
-           loff_t *, res, uint, wh);
+diff --git a/linux-user/strace.c b/linux-user/strace.c
+index f6f76a5..779cda1 100644
+--- a/linux-user/strace.c
++++ b/linux-user/strace.c
+@@ -1915,6 +1915,21 @@ print_rt_sigqueueinfo(const struct syscallname *na=
+me,
+ }
  #endif
- _syscall3(int, sys_rt_sigqueueinfo, pid_t, pid, int, sig, siginfo_t *, u=
-info)
-+_syscall4(int, sys_rt_tgsigqueueinfo, pid_t, pid, pid_t, tid, int, sig,
-+          siginfo_t *, uinfo)
- _syscall3(int,sys_syslog,int,type,char*,bufp,int,len)
- #ifdef __NR_exit_group
- _syscall1(int,exit_group,int,error_code)
-@@ -8843,6 +8846,19 @@ abi_long do_syscall(void *cpu_env, int num, abi_lo=
-ng arg1,
-             ret =3D get_errno(sys_rt_sigqueueinfo(arg1, arg2, &uinfo));
-         }
-         break;
-+    case TARGET_NR_rt_tgsigqueueinfo:
-+        {
-+            siginfo_t uinfo;
+=20
++#ifdef TARGET_NR_rt_tgsigqueueinfo
++static void
++print_rt_tgsigqueueinfo(const struct syscallname *name,
++    abi_long arg0, abi_long arg1, abi_long arg2,
++    abi_long arg3, abi_long arg4, abi_long arg5)
++{
++    print_syscall_prologue(name);
++    print_raw_param("%d", arg0, 0);
++    print_raw_param("%d", arg1, 0);
++    print_signal(arg2, 0);
++    print_pointer(arg3, 1);
++    print_syscall_epilogue(name);
++}
++#endif
 +
-+            p =3D lock_user(VERIFY_READ, arg4, sizeof(target_siginfo_t),=
- 1);
-+            if (!p) {
-+                goto efault;
-+            }
-+            target_to_host_siginfo(&uinfo, p);
-+            unlock_user(p, arg4, 0);
-+            ret =3D get_errno(sys_rt_tgsigqueueinfo(arg1, arg2, arg3, &u=
-info));
-+        }
-+        break;
- #ifdef TARGET_NR_sigreturn
-     case TARGET_NR_sigreturn:
-         if (block_signals()) {
+ #ifdef TARGET_NR_syslog
+ static void
+ print_syslog_action(abi_ulong arg, int last)
+diff --git a/linux-user/strace.list b/linux-user/strace.list
+index 373d436..a91e33f 100644
+--- a/linux-user/strace.list
++++ b/linux-user/strace.list
+@@ -1167,7 +1167,7 @@
+ { TARGET_NR_rt_sigtimedwait, "rt_sigtimedwait" , NULL, NULL, NULL },
+ #endif
+ #ifdef TARGET_NR_rt_tgsigqueueinfo
+-{ TARGET_NR_rt_tgsigqueueinfo, "rt_tgsigqueueinfo" , NULL, NULL, NULL },
++{ TARGET_NR_rt_tgsigqueueinfo, "rt_tgsigqueueinfo" , NULL, print_rt_tgsi=
+gqueueinfo, NULL },
+ #endif
+ #ifdef TARGET_NR_sched_getaffinity
+ { TARGET_NR_sched_getaffinity, "sched_getaffinity" , NULL, NULL, NULL },
 --=20
 1.9.1
