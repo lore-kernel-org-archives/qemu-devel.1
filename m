@@ -1,32 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34752)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34900)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1dADnv-0002sm-Nb
-	for qemu-devel@nongnu.org; Mon, 15 May 2017 07:04:44 -0400
+	(envelope-from <no-reply@patchew.org>) id 1dADoi-0003IR-P7
+	for qemu-devel@nongnu.org; Mon, 15 May 2017 07:05:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1dADns-00029M-Jw
-	for qemu-devel@nongnu.org; Mon, 15 May 2017 07:04:43 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58628)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1dADns-00029E-Dp
-	for qemu-devel@nongnu.org; Mon, 15 May 2017 07:04:40 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 42BFD76FF
-	for <qemu-devel@nongnu.org>; Mon, 15 May 2017 11:04:39 +0000 (UTC)
-From: Juan Quintela <quintela@redhat.com>
-In-Reply-To: <20170512175105.GI2069@work-vm> (David Alan Gilbert's message of
-	"Fri, 12 May 2017 18:51:06 +0100")
-References: <20170512160055.9081-1-quintela@redhat.com>
-	<20170512160055.9081-6-quintela@redhat.com>
-	<20170512175105.GI2069@work-vm>
-Reply-To: quintela@redhat.com
-Date: Mon, 15 May 2017 13:04:36 +0200
-Message-ID: <87h90mfkjf.fsf@secure.mitica>
+	(envelope-from <no-reply@patchew.org>) id 1dADof-0002TD-KG
+	for qemu-devel@nongnu.org; Mon, 15 May 2017 07:05:32 -0400
+Resent-Message-Id: <E1dADof-0002TD-KG@eggs.gnu.org>
+In-Reply-To: <20170515100059.15795-1-pbonzini@redhat.com>
+Message-ID: <149484630867.489.13711067680188659367@c05f1edc8ed1>
+Reply-To: <qemu-devel@nongnu.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH 05/12] migration: Move colo.h to migration/
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Mon, 15 May 2017 04:05:09 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PATCH v3 0/7] curl: locking cleanups/fixes,
+ coroutine conversion, remove aio_poll
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,25 +24,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: qemu-devel@nongnu.org, lvivier@redhat.com, peterx@redhat.com
+To: pbonzini@redhat.com
+Cc: famz@redhat.com, qemu-devel@nongnu.org, jcody@redhat.com, rjones@redhat.com, qemu-block@nongnu.org
 
-"Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
-D> * Juan Quintela (quintela@redhat.com) wrote:
->> There are functions only used by migration code.
->
-> That's only mostly true; see the current 'integrate colo frame with
-> block replication and net compare' series (posted 22nd April).
-> That adds colo_handle_shutdown to this header and calls it from vl.c
-> ( https://lists.gnu.org/archive/html/qemu-devel/2017-04/msg03901.html )
-> where should that go?
-
-Dropped.
-
-It compiled, but who knows O:-)
-
-> There's also a net/colo.h as well, so using the
->   #include "colo.h" in migration is correct but that's
-> really scary when there are two files of the same name.
-
-Yeap, it is scary ...
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKU3ViamVjdDogW1FlbXUt
+ZGV2ZWxdIFtQQVRDSCB2MyAwLzddIGN1cmw6IGxvY2tpbmcgY2xlYW51cHMvZml4ZXMsIGNvcm91
+dGluZSBjb252ZXJzaW9uLCByZW1vdmUgYWlvX3BvbGwKTWVzc2FnZS1pZDogMjAxNzA1MTUxMDAw
+NTkuMTU3OTUtMS1wYm9uemluaUByZWRoYXQuY29tClR5cGU6IHNlcmllcwoKPT09IFRFU1QgU0NS
+SVBUIEJFR0lOID09PQojIS9iaW4vYmFzaAoKQkFTRT1iYXNlCm49MQp0b3RhbD0kKGdpdCBsb2cg
+LS1vbmVsaW5lICRCQVNFLi4gfCB3YyAtbCkKZmFpbGVkPTAKCmdpdCBjb25maWcgLS1sb2NhbCBk
+aWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCgpj
+b21taXRzPSIkKGdpdCBsb2cgLS1mb3JtYXQ9JUggLS1yZXZlcnNlICRCQVNFLi4pIgpmb3IgYyBp
+biAkY29tbWl0czsgZG8KICAgIGVjaG8gIkNoZWNraW5nIFBBVENIICRuLyR0b3RhbDogJChnaXQg
+bG9nIC1uIDEgLS1mb3JtYXQ9JXMgJGMpLi4uIgogICAgaWYgISBnaXQgc2hvdyAkYyAtLWZvcm1h
+dD1lbWFpbCB8IC4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgLTsgdGhlbgogICAg
+ICAgIGZhaWxlZD0xCiAgICAgICAgZWNobwogICAgZmkKICAgIG49JCgobisxKSkKZG9uZQoKZXhp
+dCAkZmFpbGVkCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZm
+ODc4MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0CkZyb20gaHR0cHM6Ly9naXRodWIuY29tL3BhdGNo
+ZXctcHJvamVjdC9xZW11CiAqIFtuZXcgdGFnXSAgICAgICAgIHBhdGNoZXcvMjAxNzA1MTUxMDQ1
+NDMuMzIwNDQtMS1rcmF4ZWxAcmVkaGF0LmNvbSAtPiBwYXRjaGV3LzIwMTcwNTE1MTA0NTQzLjMy
+MDQ0LTEta3JheGVsQHJlZGhhdC5jb20KU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0Jwpl
+OTI2YWRiIGN1cmw6IGRvIG5vdCBkbyBhaW9fcG9sbCB3aGVuIHdhaXRpbmcgZm9yIGEgZnJlZSBD
+VVJMU3RhdGUKNGVlYmM2OCBjdXJsOiBjb252ZXJ0IHJlYWR2IHRvIGNvcm91dGluZXMKZjRiNDli
+YyBjdXJsOiBjb252ZXJ0IENVUkxBSU9DQiB0byBieXRlIHZhbHVlcwo2MTA5ODBkIGN1cmw6IHNw
+bGl0IGN1cmxfZmluZF9zdGF0ZS9jdXJsX2luaXRfc3RhdGUKYzVjYTRkYyBjdXJsOiBhdm9pZCBy
+ZWN1cnNpdmUgbG9ja2luZyBvZiBCRFJWQ1VSTFN0YXRlIG11dGV4CjNhY2U5Y2UgY3VybDogbmV2
+ZXIgaW52b2tlIGNhbGxiYWNrcyB3aXRoIHMtPm11dGV4IGhlbGQKYjMxZmNiZiBjdXJsOiBzdHJl
+bmd0aGVuIGFzc2VydGlvbiBpbiBjdXJsX2NsZWFuX3N0YXRlCgo9PT0gT1VUUFVUIEJFR0lOID09
+PQpDaGVja2luZyBQQVRDSCAxLzc6IGN1cmw6IHN0cmVuZ3RoZW4gYXNzZXJ0aW9uIGluIGN1cmxf
+Y2xlYW5fc3RhdGUuLi4KRVJST1I6IHNwYWNlcyByZXF1aXJlZCBhcm91bmQgdGhhdCAnPScgKGN0
+eDpWeFYpCiMyNDogRklMRTogYmxvY2svY3VybC5jOjUzNjoKKyAgICBmb3IgKGo9MDsgaiA8IENV
+UkxfTlVNX0FDQjsgaisrKSB7CiAgICAgICAgICAgXgoKdG90YWw6IDEgZXJyb3JzLCAwIHdhcm5p
+bmdzLCAxMSBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxl
+YXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyBy
+ZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5F
+UlMuCgpDaGVja2luZyBQQVRDSCAyLzc6IGN1cmw6IG5ldmVyIGludm9rZSBjYWxsYmFja3Mgd2l0
+aCBzLT5tdXRleCBoZWxkLi4uCkNoZWNraW5nIFBBVENIIDMvNzogY3VybDogYXZvaWQgcmVjdXJz
+aXZlIGxvY2tpbmcgb2YgQkRSVkNVUkxTdGF0ZSBtdXRleC4uLgpDaGVja2luZyBQQVRDSCA0Lzc6
+IGN1cmw6IHNwbGl0IGN1cmxfZmluZF9zdGF0ZS9jdXJsX2luaXRfc3RhdGUuLi4KRVJST1I6IHNw
+YWNlcyByZXF1aXJlZCBhcm91bmQgdGhhdCAnPScgKGN0eDpWeFYpCiM0MDogRklMRTogYmxvY2sv
+Y3VybC5jOjQ2MzoKKyAgICBmb3IgKGk9MDsgaSA8IENVUkxfTlVNX1NUQVRFUzsgaSsrKSB7CiAg
+ICAgICAgICAgXgoKdG90YWw6IDEgZXJyb3JzLCAwIHdhcm5pbmdzLCA5MiBsaW5lcyBjaGVja2Vk
+CgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBv
+ZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFp
+bnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgpDaGVja2luZyBQQVRDSCA1
+Lzc6IGN1cmw6IGNvbnZlcnQgQ1VSTEFJT0NCIHRvIGJ5dGUgdmFsdWVzLi4uCkNoZWNraW5nIFBB
+VENIIDYvNzogY3VybDogY29udmVydCByZWFkdiB0byBjb3JvdXRpbmVzLi4uCkNoZWNraW5nIFBB
+VENIIDcvNzogY3VybDogZG8gbm90IGRvIGFpb19wb2xsIHdoZW4gd2FpdGluZyBmb3IgYSBmcmVl
+IENVUkxTdGF0ZS4uLgo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFuZCBleGl0ZWQgd2l0
+aCBjb2RlOiAxCgoKLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcg
+W2h0dHA6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNo
+ZXctZGV2ZWxAZnJlZWxpc3RzLm9yZw==
