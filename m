@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54454)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55248)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1dA8pN-0006yy-VF
-	for qemu-devel@nongnu.org; Mon, 15 May 2017 01:45:55 -0400
+	(envelope-from <clg@kaod.org>) id 1dA8uv-0007xc-2N
+	for qemu-devel@nongnu.org; Mon, 15 May 2017 01:51:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1dA8pI-0006dT-ST
-	for qemu-devel@nongnu.org; Mon, 15 May 2017 01:45:53 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47402)
+	(envelope-from <clg@kaod.org>) id 1dA8uq-0001AV-Ij
+	for qemu-devel@nongnu.org; Mon, 15 May 2017 01:51:37 -0400
+Received: from 2.mo4.mail-out.ovh.net ([46.105.72.36]:43053)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1dA8pI-0006dK-J5
-	for qemu-devel@nongnu.org; Mon, 15 May 2017 01:45:48 -0400
-References: <20170511123246.31308-1-maxime.coquelin@redhat.com>
-	<20170511123246.31308-7-maxime.coquelin@redhat.com>
-	<20170511203345-mutt-send-email-mst@kernel.org>
-	<62516ce5-9d4c-d021-c4ab-a767c7f07b31@redhat.com>
-	<20170513025938-mutt-send-email-mst@kernel.org>
-From: Jason Wang <jasowang@redhat.com>
-Message-ID: <9f030e52-60ec-0b42-e0d0-6158eebf99d4@redhat.com>
-Date: Mon, 15 May 2017 13:45:28 +0800
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1dA8uq-00019x-Cl
+	for qemu-devel@nongnu.org; Mon, 15 May 2017 01:51:32 -0400
+Received: from player772.ha.ovh.net (b6.ovh.net [213.186.33.56])
+	by mo4.mail-out.ovh.net (Postfix) with ESMTP id E380964085
+	for <qemu-devel@nongnu.org>; Mon, 15 May 2017 07:51:30 +0200 (CEST)
+From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
+Date: Mon, 15 May 2017 07:51:12 +0200
+Message-Id: <1494827476-1487-3-git-send-email-clg@kaod.org>
+In-Reply-To: <1494827476-1487-1-git-send-email-clg@kaod.org>
+References: <1494827476-1487-1-git-send-email-clg@kaod.org>
 MIME-Version: 1.0
-In-Reply-To: <20170513025938-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 6/6] spec/vhost-user spec: Add IOMMU support
+Subject: [Qemu-devel] [PATCH 2/6] aspeed/i2c: handle LAST command under the
+ RX command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,57 +30,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>, Maxime Coquelin <maxime.coquelin@redhat.com>
-Cc: yuanhan.liu@linux.intel.com, qemu-devel@nongnu.org, peterx@redhat.com, marcandre.lureau@gmail.com, wexu@redhat.com, vkaplans@redhat.com, jfreiman@redhat.com
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-arm@nongnu.org, qemu-devel@nongnu.org, =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
 
+Today, the LAST command is handled with the STOP command but this is
+incorrect. Also nack the I2C bus when a LAST is issued.
 
+Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
+---
+ hw/i2c/aspeed_i2c.c | 9 ++++++---
+ 1 file changed, 6 insertions(+), 3 deletions(-)
 
-On 2017=E5=B9=B405=E6=9C=8813=E6=97=A5 08:02, Michael S. Tsirkin wrote:
-> On Fri, May 12, 2017 at 04:21:58PM +0200, Maxime Coquelin wrote:
->>
->> On 05/11/2017 08:25 PM, Michael S. Tsirkin wrote:
->>> On Thu, May 11, 2017 at 02:32:46PM +0200, Maxime Coquelin wrote:
->>>> This patch specifies and implements the master/slave communication
->>>> to support device IOTLB in slave.
->>>>
->>>> The vhost_iotlb_msg structure introduced for kernel backends is
->>>> re-used, making the design close between the two backends.
->>>>
->>>> An exception is the use of the secondary channel to enable the
->>>> slave to send IOTLB miss requests to the master.
->>>>
->>>> Signed-off-by: Maxime Coquelin <maxime.coquelin@redhat.com>
->>>> ---
->>>>    docs/specs/vhost-user.txt | 75 ++++++++++++++++++++++++++++++++++=
-+++++++++++++
->>>>    hw/virtio/vhost-user.c    | 31 ++++++++++++++++++++
->>>>    2 files changed, 106 insertions(+)
->>>>
->>>> diff --git a/docs/specs/vhost-user.txt b/docs/specs/vhost-user.txt
->>>> index 5fa7016..4a1f0c3 100644
->>>> --- a/docs/specs/vhost-user.txt
->>>> +++ b/docs/specs/vhost-user.txt
->>>> @@ -97,6 +97,23 @@ Depending on the request type, payload can be:
->>>>       log offset: offset from start of supplied file descriptor
->>>>           where logging starts (i.e. where guest address 0 would be =
-logged)
->>>> + * An IOTLB message
->>>> +   ---------------------------------------------------------
->>>> +   | iova | size | user address | permissions flags | type |
->>>> +   ---------------------------------------------------------
->>>> +
->>>> +   IOVA: a 64-bit guest I/O virtual address
->>> guest -> VM
->> Ok.
->>
->>>> +   Size: a 64-bit size
->>> How do you specify "all memory"? give special meaning to size 0?
->> Good point, it does not support all memory currently.
->> It is not vhost-user specific, but general to the vhost implementation=
-.
-> But iommu needs it to support passthrough.
-
-Probably not, we will just pass the mappings in vhost_memory_region to=20
-vhost. Its memory_size is also a __u64.
-
-Thanks
+diff --git a/hw/i2c/aspeed_i2c.c b/hw/i2c/aspeed_i2c.c
+index 56a4fdf5c542..67004c675359 100644
+--- a/hw/i2c/aspeed_i2c.c
++++ b/hw/i2c/aspeed_i2c.c
+@@ -203,7 +203,7 @@ static void aspeed_i2c_bus_handle_cmd(AspeedI2CBus *b=
+us, uint64_t value)
+         bus->cmd &=3D ~I2CD_M_TX_CMD;
+     }
+=20
+-    if (bus->cmd & I2CD_M_RX_CMD) {
++    if (bus->cmd & (I2CD_M_RX_CMD | I2CD_M_S_RX_CMD_LAST)) {
+         int ret =3D i2c_recv(bus->bus);
+         if (ret < 0) {
+             qemu_log_mask(LOG_GUEST_ERROR, "%s: read failed\n", __func__=
+);
+@@ -212,10 +212,13 @@ static void aspeed_i2c_bus_handle_cmd(AspeedI2CBus =
+*bus, uint64_t value)
+             bus->intr_status |=3D I2CD_INTR_RX_DONE;
+         }
+         bus->buf =3D (ret & I2CD_BYTE_BUF_RX_MASK) << I2CD_BYTE_BUF_RX_S=
+HIFT;
+-        bus->cmd &=3D ~I2CD_M_RX_CMD;
++        if (bus->cmd & I2CD_M_S_RX_CMD_LAST) {
++            i2c_nack(bus->bus);
++        }
++        bus->cmd &=3D ~(I2CD_M_RX_CMD | I2CD_M_S_RX_CMD_LAST);
+     }
+=20
+-    if (bus->cmd & (I2CD_M_STOP_CMD | I2CD_M_S_RX_CMD_LAST)) {
++    if (bus->cmd & I2CD_M_STOP_CMD) {
+         if (!i2c_bus_busy(bus->bus)) {
+             bus->intr_status |=3D I2CD_INTR_ABNORMAL;
+         } else {
+--=20
+2.7.4
