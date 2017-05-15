@@ -1,41 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53434)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56522)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bjsdjshi@linux.vnet.ibm.com>) id 1dA5rb-0006Xt-Ev
-	for qemu-devel@nongnu.org; Sun, 14 May 2017 22:36:00 -0400
+	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1dA694-00010V-JB
+	for qemu-devel@nongnu.org; Sun, 14 May 2017 22:54:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bjsdjshi@linux.vnet.ibm.com>) id 1dA5rY-0004JW-9b
-	for qemu-devel@nongnu.org; Sun, 14 May 2017 22:35:59 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:52649)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bjsdjshi@linux.vnet.ibm.com>)
-	id 1dA5rX-0004JN-Vg
-	for qemu-devel@nongnu.org; Sun, 14 May 2017 22:35:56 -0400
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v4F2YA65143960
-	for <qemu-devel@nongnu.org>; Sun, 14 May 2017 22:35:54 -0400
-Received: from e33.co.us.ibm.com (e33.co.us.ibm.com [32.97.110.151])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2aee6tv0vj-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Sun, 14 May 2017 22:35:54 -0400
-Received: from localhost
-	by e33.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <bjsdjshi@linux.vnet.ibm.com>;
-	Sun, 14 May 2017 20:35:53 -0600
-Date: Mon, 15 May 2017 10:35:46 +0800
-From: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
-References: <20170505020352.8984-1-bjsdjshi@linux.vnet.ibm.com>
-	<20170505020352.8984-10-bjsdjshi@linux.vnet.ibm.com>
-	<20170511154904.30185793@w520.home>
-	<20170515023148.GB11226@bjsdjshi@linux.vnet.ibm.com>
+	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1dA690-0006ve-LB
+	for qemu-devel@nongnu.org; Sun, 14 May 2017 22:54:02 -0400
+Received: from [59.151.112.132] (port=25524 helo=heian.cn.fujitsu.com)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1dA68z-0006sL-KS
+	for qemu-devel@nongnu.org; Sun, 14 May 2017 22:53:58 -0400
+From: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
+Date: Mon, 15 May 2017 10:53:19 +0800
+Message-ID: <271c246e5d92be095de3dc28dcaf85184e05264a.1494816085.git.maozy.fnst@cn.fujitsu.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170515023148.GB11226@bjsdjshi@linux.vnet.ibm.com>
-Message-Id: <20170515023546.GC11226@bjsdjshi@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH v7 09/13] vfio/ccw: get irqs info and set
- the eventfd fd
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH v2] net/rocker: Convert pci device .init() to
+ .realize()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -44,100 +24,159 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alex Williamson <alex.williamson@redhat.com>, Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, kvm@vger.kernel.org, linux-s390@vger.kernel.org, qemu-devel@nongnu.org, cornelia.huck@de.ibm.com, borntraeger@de.ibm.com, agraf@suse.com, eric.auger@redhat.com
+To: qemu-devel@nongnu.org
+Cc: jiri@resnulli.us, jasowang@redhat.com, f4bug@amsat.org
 
-* Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com> [2017-05-15 10:31:48 +0800]:
+Convert pci device .init() to .realize(). Also improve -device rocker
+error reporting. Because when -device rocker fails, it first reports
+a specific error, then a generic one, like this:
 
-> * Alex Williamson <alex.williamson@redhat.com> [2017-05-11 15:49:04 -0600]:
-> 
-> Hi Alex,
-> 
-> [...]
-> 
-> > > diff --git a/hw/vfio/ccw.c b/hw/vfio/ccw.c
-> > > index 7ddcfd7..6760cee 100644
-> > > --- a/hw/vfio/ccw.c
-> > > +++ b/hw/vfio/ccw.c
-> 
-> [...]
-> 
-> > > +static void vfio_ccw_register_io_notifier(VFIOCCWDevice *vcdev, Error **errp)
-> > > +{
-> > > +    VFIODevice *vdev = &vcdev->vdev;
-> > > +    struct vfio_irq_info *irq_info;
-> > > +    struct vfio_irq_set *irq_set;
-> > > +    size_t argsz;
-> > > +    int32_t *pfd;
-> > > +
-> > > +    if (vdev->num_irqs < VFIO_CCW_IO_IRQ_INDEX + 1) {
-> > > +        error_setg(errp, "vfio: unexpected number of io irqs %u",
-> > > +                   vdev->num_irqs);
-> > > +        return;
-> > > +    }
-> > > +
-> > > +    argsz = sizeof(*irq_set);
-> > > +    irq_info = g_malloc0(argsz);
-> > > +    irq_info->index = VFIO_CCW_IO_IRQ_INDEX;
-> > > +    irq_info->argsz = argsz;
-> > > +    if (ioctl(vdev->fd, VFIO_DEVICE_GET_IRQ_INFO,
-> > > +              irq_info) < 0 || irq_info->count < 1) {
-> > > +        error_setg_errno(errp, errno, "vfio: Error getting irq info");
-> > > +        goto get_error;
-> > > +    }
-> > > +
-> > > +    if (event_notifier_init(&vcdev->io_notifier, 0)) {
-> > > +        error_setg_errno(errp, errno,
-> > > +                         "vfio: Unable to init event notifier for IO");
-> > > +        goto get_error;
-> > > +    }
-> > > +
-> > > +    argsz = sizeof(*irq_set) + sizeof(*pfd);
-> > > +    irq_set = g_malloc0(argsz);
-> > > +    irq_set->argsz = argsz;
-> > > +    irq_set->flags = VFIO_IRQ_SET_DATA_EVENTFD |
-> > > +                     VFIO_IRQ_SET_ACTION_TRIGGER;
-> > > +    irq_set->index = VFIO_CCW_IO_IRQ_INDEX;
-> > > +    irq_set->start = 0;
-> > > +    irq_set->count = 1;
-> > > +    pfd = (int32_t *) &irq_set->data;
-> > > +
-> > > +    *pfd = event_notifier_get_fd(&vcdev->io_notifier);
-> > > +    qemu_set_fd_handler(*pfd, vfio_ccw_io_notifier_handler, NULL, vcdev);
-> > > +    if (ioctl(vdev->fd, VFIO_DEVICE_SET_IRQS, irq_set)) {
-> > > +        error_setg(errp, "vfio: Failed to set up io notification");
-> > > +        qemu_set_fd_handler(*pfd, NULL, NULL, vcdev);
-> > > +        event_notifier_cleanup(&vcdev->io_notifier);
-> > > +        goto set_error;
-> > 
-> > 
-> > nit, unnecessary goto here.  set_error label is unused if removed.
-> Ok, I will remove both this goto line and the set_error label line!
-> 
-And rename get_error to out_free_info, which is the more reasonable
-label name to me. :>
+    $ x86_64-softmmu/qemu-system-x86_64 -device rocker,name=qemu-rocker
+    rocker: name too long; please shorten to at most 9 chars
+    qemu-system-x86_64: -device rocker,name=qemu-rocker: Device initialization failed
 
-> > 
-> > Otherwise,
-> > 
-> > Acked-by: Alex Williamson <alex.williamson@redhat.com>
-> > 
-> > 
-> Thanks for all of your A-Bs! I will add them in next version.
-> 
-> > > +    }
-> > > +
-> > > +set_error:
-> > > +    g_free(irq_set);
-> > > +
-> > > +get_error:
-> > > +    g_free(irq_info);
-> > > +}
-> > > +
-> 
-> [...]
-> 
-> -- 
-> Dong Jia Shi
+Convert pci_rocker_init() to Error to get rid of the unwanted second
+error message.
 
+Cc: jiri@resnulli.us
+Cc: jasowang@redhat.com
+Cc: f4bug@amsat.org
+Signed-off-by: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
+---
+ hw/net/rocker/rocker.c | 32 ++++++++++++++------------------
+ 1 file changed, 14 insertions(+), 18 deletions(-)
+
+diff --git a/hw/net/rocker/rocker.c b/hw/net/rocker/rocker.c
+index 6e70fdd..a1de705 100644
+--- a/hw/net/rocker/rocker.c
++++ b/hw/net/rocker/rocker.c
+@@ -1252,20 +1252,18 @@ rollback:
+     return err;
+ }
+ 
+-static int rocker_msix_init(Rocker *r)
++static int rocker_msix_init(Rocker *r, Error **errp)
+ {
+     PCIDevice *dev = PCI_DEVICE(r);
+     int err;
+-    Error *local_err = NULL;
+ 
+     err = msix_init(dev, ROCKER_MSIX_VEC_COUNT(r->fp_ports),
+                     &r->msix_bar,
+                     ROCKER_PCI_MSIX_BAR_IDX, ROCKER_PCI_MSIX_TABLE_OFFSET,
+                     &r->msix_bar,
+                     ROCKER_PCI_MSIX_BAR_IDX, ROCKER_PCI_MSIX_PBA_OFFSET,
+-                    0, &local_err);
++                    0, errp);
+     if (err) {
+-        error_report_err(local_err);
+         return err;
+     }
+ 
+@@ -1301,7 +1299,7 @@ static World *rocker_world_type_by_name(Rocker *r, const char *name)
+     return NULL;
+ }
+ 
+-static int pci_rocker_init(PCIDevice *dev)
++static void pci_rocker_realize(PCIDevice *dev, Error **errp)
+ {
+     Rocker *r = to_rocker(dev);
+     const MACAddr zero = { .a = { 0, 0, 0, 0, 0, 0 } };
+@@ -1315,7 +1313,7 @@ static int pci_rocker_init(PCIDevice *dev)
+ 
+     for (i = 0; i < ROCKER_WORLD_TYPE_MAX; i++) {
+         if (!r->worlds[i]) {
+-            err = -ENOMEM;
++            error_setg(errp, "allocate worlds failed");
+             goto err_world_alloc;
+         }
+     }
+@@ -1326,10 +1324,9 @@ static int pci_rocker_init(PCIDevice *dev)
+ 
+     r->world_dflt = rocker_world_type_by_name(r, r->world_name);
+     if (!r->world_dflt) {
+-        fprintf(stderr,
+-                "rocker: requested world \"%s\" does not exist\n",
++        error_setg(errp,
++                "rocker: invalid argument, requested world %s does not exist",
+                 r->world_name);
+-        err = -EINVAL;
+         goto err_world_type_by_name;
+     }
+ 
+@@ -1349,7 +1346,7 @@ static int pci_rocker_init(PCIDevice *dev)
+ 
+     /* MSI-X init */
+ 
+-    err = rocker_msix_init(r);
++    err = rocker_msix_init(r, errp);
+     if (err) {
+         goto err_msix_init;
+     }
+@@ -1361,7 +1358,7 @@ static int pci_rocker_init(PCIDevice *dev)
+     }
+ 
+     if (rocker_find(r->name)) {
+-        err = -EEXIST;
++        error_setg(errp, "rocker: %s already exists", r->name);
+         goto err_duplicate;
+     }
+ 
+@@ -1375,10 +1372,10 @@ static int pci_rocker_init(PCIDevice *dev)
+ #define ROCKER_IFNAMSIZ 16
+ #define MAX_ROCKER_NAME_LEN  (ROCKER_IFNAMSIZ - 1 - 3 - 3)
+     if (strlen(r->name) > MAX_ROCKER_NAME_LEN) {
+-        fprintf(stderr,
+-                "rocker: name too long; please shorten to at most %d chars\n",
++        error_setg(errp,
++                "rocker: name too long; please shorten to at most %d chars",
+                 MAX_ROCKER_NAME_LEN);
+-        return -EINVAL;
++        goto err_name_too_long;
+     }
+ 
+     if (memcmp(&r->fp_start_macaddr, &zero, sizeof(zero)) == 0) {
+@@ -1410,7 +1407,6 @@ static int pci_rocker_init(PCIDevice *dev)
+      * .....
+      */
+ 
+-    err = -ENOMEM;
+     for (i = 0; i < rocker_pci_ring_count(r); i++) {
+         DescRing *ring = desc_ring_alloc(r, i);
+ 
+@@ -1447,7 +1443,7 @@ static int pci_rocker_init(PCIDevice *dev)
+ 
+     QLIST_INSERT_HEAD(&rockers, r, next);
+ 
+-    return 0;
++    return;
+ 
+ err_port_alloc:
+     for (--i; i >= 0; i--) {
+@@ -1461,6 +1457,7 @@ err_ring_alloc:
+     }
+     g_free(r->rings);
+ err_rings_alloc:
++err_name_too_long:
+ err_duplicate:
+     rocker_msix_uninit(r);
+ err_msix_init:
+@@ -1473,7 +1470,6 @@ err_world_alloc:
+             world_free(r->worlds[i]);
+         }
+     }
+-    return err;
+ }
+ 
+ static void pci_rocker_uninit(PCIDevice *dev)
+@@ -1558,7 +1554,7 @@ static void rocker_class_init(ObjectClass *klass, void *data)
+     DeviceClass *dc = DEVICE_CLASS(klass);
+     PCIDeviceClass *k = PCI_DEVICE_CLASS(klass);
+ 
+-    k->init = pci_rocker_init;
++    k->realize = pci_rocker_realize;
+     k->exit = pci_rocker_uninit;
+     k->vendor_id = PCI_VENDOR_ID_REDHAT;
+     k->device_id = PCI_DEVICE_ID_REDHAT_ROCKER;
 -- 
-Dong Jia Shi
+2.9.3
