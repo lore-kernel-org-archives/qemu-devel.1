@@ -1,22 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34479)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35014)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rjones@redhat.com>) id 1dAMdI-0000pM-RX
-	for qemu-devel@nongnu.org; Mon, 15 May 2017 16:30:21 -0400
+	(envelope-from <hpoussin@reactos.org>) id 1dAMeO-0001Od-7M
+	for qemu-devel@nongnu.org; Mon, 15 May 2017 16:31:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rjones@redhat.com>) id 1dAMdH-000307-OH
-	for qemu-devel@nongnu.org; Mon, 15 May 2017 16:30:20 -0400
-Date: Mon, 15 May 2017 21:30:05 +0100
-From: "Richard W.M. Jones" <rjones@redhat.com>
-Message-ID: <20170515203004.GD16511@redhat.com>
-References: <20170510143205.32013-1-pbonzini@redhat.com>
-	<20170510155700.GY16511@redhat.com>
-	<0c3040de-aabb-ae8c-7689-a6012f8c72e5@redhat.com>
+	(envelope-from <hpoussin@reactos.org>) id 1dAMeM-0003XN-WC
+	for qemu-devel@nongnu.org; Mon, 15 May 2017 16:31:28 -0400
+From: =?UTF-8?q?Herv=C3=A9=20Poussineau?= <hpoussin@reactos.org>
+Date: Mon, 15 May 2017 22:31:01 +0200
+Message-Id: <20170515203114.9477-2-hpoussin@reactos.org>
+In-Reply-To: <20170515203114.9477-1-hpoussin@reactos.org>
+References: <20170515203114.9477-1-hpoussin@reactos.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <0c3040de-aabb-ae8c-7689-a6012f8c72e5@redhat.com>
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v2 0/7] curl: locking
- cleanups/fixes, coroutine conversion, remove aio_poll
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH 01/13] vvfat: fix qemu-img map and qemu-img
+ convert
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,38 +23,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org, qemu-stable@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org, =?UTF-8?q?Herv=C3=A9=20Poussineau?= <hpoussin@reactos.org>
 
-On Mon, May 15, 2017 at 09:12:54PM +0200, Max Reitz wrote:
-> On 2017-05-10 17:57, Richard W.M. Jones wrote:
-> > On Wed, May 10, 2017 at 04:31:58PM +0200, Paolo Bonzini wrote:
-> >> Since the last patch in v1 didn't work, I bit the bullet and converted
-> >> the whole thing to coroutines (patches 4-6).  This in turns allows a more
-> >> elegant solution to wait for CURLStates to get free (patch 7).
-> >>
-> >> I tested this by lowering CURL_NUM_STATES to 2.  With this change, the
-> >> buggy case triggers a couple times while booting a Fedora netinst image.
-> > 
-> > This series fixes the original bug, so:
-> > 
-> >   Tested-by: Richard W.M. Jones <rjones@redhat.com>
-> > 
-> > I think the Reported-by in patch 3 should credit Kun Wei for finding
-> > the bug, and we should probably mention the BZ too:
-> > 
-> >   Reported-by: Kun Wei <kuwei@redhat.com>
-> >   Bugzilla: https://bugzilla.redhat.com/show_bug.cgi?id=1447590
-> 
-> This one is older, though:
-> https://bugzilla.redhat.com/show_bug.cgi?id=1437393
+- bs->total_sectors is the number of sectors of the whole disk
+- s->sector_count is the number of sectors of the FAT partition
 
-Fair enough, it does seem to be the same issue.
+This fixes the following assert in qemu-img map:
+qemu-img.c:2641: get_block_status: Assertion `nb_sectors' failed.
 
-Rich.
+This also fixes an infinite loop in qemu-img convert.
 
--- 
-Richard Jones, Virtualization Group, Red Hat http://people.redhat.com/~rjones
-Read my programming and virtualization blog: http://rwmj.wordpress.com
-virt-builder quickly builds VMs from scratch
-http://libguestfs.org/virt-builder.1.html
+Fixes: 4480e0f924a42e1db8b8cfcac4d0634dd1bb27a0
+Fixes: https://bugs.launchpad.net/qemu/+bug/1599539
+Signed-off-by: Herv=C3=A9 Poussineau <hpoussin@reactos.org>
+---
+ block/vvfat.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
+
+diff --git a/block/vvfat.c b/block/vvfat.c
+index af5153d27d..dfa2a242e1 100644
+--- a/block/vvfat.c
++++ b/block/vvfat.c
+@@ -2958,8 +2958,7 @@ vvfat_co_pwritev(BlockDriverState *bs, uint64_t off=
+set, uint64_t bytes,
+ static int64_t coroutine_fn vvfat_co_get_block_status(BlockDriverState *=
+bs,
+ 	int64_t sector_num, int nb_sectors, int *n, BlockDriverState **file)
+ {
+-    BDRVVVFATState* s =3D bs->opaque;
+-    *n =3D s->sector_count - sector_num;
++    *n =3D bs->total_sectors - sector_num;
+     if (*n > nb_sectors) {
+         *n =3D nb_sectors;
+     } else if (*n < 0) {
+--=20
+2.11.0
