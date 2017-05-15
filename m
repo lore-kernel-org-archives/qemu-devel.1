@@ -1,26 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54519)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54612)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1dAGiP-0000iB-Dn
-	for qemu-devel@nongnu.org; Mon, 15 May 2017 10:11:14 -0400
+	(envelope-from <famz@redhat.com>) id 1dAGiY-0000pF-7Z
+	for qemu-devel@nongnu.org; Mon, 15 May 2017 10:11:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1dAGiK-0006R1-Iu
-	for qemu-devel@nongnu.org; Mon, 15 May 2017 10:11:13 -0400
-Received: from mail-qk0-x243.google.com ([2607:f8b0:400d:c09::243]:36129)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1dAGiK-0006Qt-Do
-	for qemu-devel@nongnu.org; Mon, 15 May 2017 10:11:08 -0400
-Received: by mail-qk0-x243.google.com with SMTP id y128so17296690qka.3
-	for <qemu-devel@nongnu.org>; Mon, 15 May 2017 07:11:08 -0700 (PDT)
-Date: Mon, 15 May 2017 15:11:05 +0100
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20170515141105.GM1201@stefanha-x1.localdomain>
-References: <20170512234009.32557-1-rth@twiddle.net>
+	(envelope-from <famz@redhat.com>) id 1dAGiX-0006YD-8Z
+	for qemu-devel@nongnu.org; Mon, 15 May 2017 10:11:22 -0400
+Date: Mon, 15 May 2017 22:11:12 +0800
+From: Fam Zheng <famz@redhat.com>
+Message-ID: <20170515141112.GA17921@lemon.lan>
+References: <20170515105032.GD23262@lemon.lan>
+	<26b2441d-e80c-eeef-fba1-67b2529e9287@kamp.de>
+	<20170515115318.GA7305@lemon.lan>
+	<243331f2-3822-3c0e-b4a5-9f3de2302fe4@kamp.de>
+	<20170515122802.GB7305@lemon.lan>
+	<b850c6d3-c104-b171-0e7d-40ebf6780d6e@kamp.de>
+	<20170515125202.GC7305@lemon.lan>
+	<0e904501-91c6-7186-f5e6-8c2b60bda8cf@kamp.de>
+	<20170515133515.GD7305@lemon.lan>
+	<498e1918-4e53-02b9-1528-5220d3b9cca8@kamp.de>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="YS7t75H5cNTCpbja"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20170512234009.32557-1-rth@twiddle.net>
-Subject: Re: [Qemu-devel] [PULL 0/9] Queued s390 patches
+In-Reply-To: <498e1918-4e53-02b9-1528-5220d3b9cca8@kamp.de>
+Subject: Re: [Qemu-devel] [RFC PATCH] qemu-io: add drain/undrain cmd
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,89 +31,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <rth@twiddle.net>
-Cc: qemu-devel@nongnu.org, stefanha@redhat.com
+To: Peter Lieven <pl@kamp.de>
+Cc: kwolf@redhat.com, qemu-devel@nongnu.org, qemu-block@nongnu.org, mreitz@redhat.com, jsnow@redhat.com
 
+On Mon, 05/15 16:02, Peter Lieven wrote:
+> > > do you have a pointer to the image locking mechanism?
+> > It hit qemu.git master just a moment ago. See raw_check_perm.
+> 
+> which master are you looking at?
+> 
+> $ git fetch upstream
+> $ git log upstream/master --oneline
+> 3a87606 Merge tag 'tracing-pull-request' into staging
+> b54933e Merge tag 'block-pull-request' into staging
+> 3753e25 Merge remote-tracking branch 'kwolf/tags/for-upstream' into staging
+> 5651743 trace: add sanity check
+> 321d1db aio: add missing aio_notify() to aio_enable_external()
+> ee29d6a block: Simplify BDRV_BLOCK_RAW recursion
+> 33c53c5 coroutine: remove GThread implementation
+> ecc1f5a maintainers: Add myself as linux-user reviewer
+> d541e20 Merge remote-tracking branch 'mreitz/tags/pull-block-2017-05-11' into queue-block
+> 8dd30c8 MAINTAINERS: Add qemu-progress to the block layer
+> d2cb36a qcow2: Discard/zero clusters by byte count
+> f10ee13 qcow2: Assert that cluster operations are aligned
+> fbaa6bb qcow2: Optimize write zero of unaligned tail cluster
+> e249d51 iotests: Add test 179 to cover write zeroes with unmap
+> d9ca221 iotests: Improve _filter_qemu_img_map
+> 06cc5e2 qcow2: Optimize zero_single_l2() to minimize L2 churn
+> fdfab37 qcow2: Make distinction between zero cluster types obvious
+> 3ef9521 qcow2: Name typedef for cluster type
+> 4341df8 qcow2: Correctly report status of preallocated zero clusters
+> 4c41cb4 block: Update comments on BDRV_BLOCK_* meanings
 
---YS7t75H5cNTCpbja
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+It's 244a5668 "file-posix: Add image locking to perm operations".
 
-On Fri, May 12, 2017 at 04:40:00PM -0700, Richard Henderson wrote:
-> This is a combination of my queued patches and those
-> posted by Aurelien this week.
->=20
->=20
-> r~
->=20
->=20
-> The following changes since commit ecc1f5adeec4e3324d1b695a7c54e3967c5269=
-49:
->=20
->   maintainers: Add myself as linux-user reviewer (2017-05-11 13:31:11 -04=
-00)
->=20
-> are available in the git repository at:
->=20
->   git://github.com/rth7680/qemu.git tags/pull-s390-20170512
->=20
-> for you to fetch changes up to 538fad597d898f677f81cb4daacd37e7cdc18e6e:
->=20
->   target/s390x: implement serialization in BRANCH CONDITION (2017-05-12 1=
-5:48:41 -0700)
->=20
-> ----------------------------------------------------------------
-> Queued target/s390 patches
->=20
-> ----------------------------------------------------------------
-> Aurelien Jarno (3):
->       target/s390x: mask the SIGP order_code using SIGP_ORDER_MASK
->       target/s390x: fix SIGNAL PROCESSOR return value
->       target/s390x: implement serialization in BRANCH CONDITION
->=20
-> Eric Bischoff (1):
->       target/s390x: Implement LOAD PAIR DISJOINT
->=20
-> Miroslav Benes (1):
->       target/s390x: Implement LOAD PROGRAM PARAMETER
->=20
-> Richard Henderson (4):
->       target/s390x: Implement STORE FACILITIES LIST EXTENDED
->       target/s390x: Diagnose specification exception for atomics
->       target/s390x: Use atomic operations for COMPARE SWAP
->       target/s390x: Use atomic operations for LOAD AND OP
->=20
->  target/s390x/cpu.c         |   1 +
->  target/s390x/cpu.h         |   6 ++
->  target/s390x/helper.c      |  16 +++
->  target/s390x/helper.h      |   3 +
->  target/s390x/insn-data.def |  38 ++++---
->  target/s390x/kvm.c         |   2 -
->  target/s390x/mem_helper.c  |  40 ++++++++
->  target/s390x/misc_helper.c |  62 +++++++++++-
->  target/s390x/translate.c   | 245 ++++++++++++++++++++++++++-------------=
-------
->  9 files changed, 288 insertions(+), 125 deletions(-)
->=20
-
-Thanks, applied to my staging tree:
-https://github.com/stefanha/qemu/commits/staging
-
-Stefan
-
---YS7t75H5cNTCpbja
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJZGbb5AAoJEJykq7OBq3PIFFYIAJW6RY7UrBUE5vAsb2pqQ0bq
-HtjIbomuOTNEJKxdYS1GlDrHcjGFakrFiAqVDBYsMQHQ38hF62C4RPWJSLIJBuol
-yoFORl/vgPrcjac8TOaAdveUQW6tQh+klS4vsrbAAFRTl/lXGexytKZhTAGCK3Cc
-EXzuilYosVnaE6EzN58SJ1lKjfJrusZhlnncPwH698TR8XWIOTwUB3F+bMSUmGSU
-5S0OvmQwUL+uYoX+9u7V9hwhrzxBpEXCCg97+0U7EwXApA/ezgieYMxILK+SJ0kA
-binWT19ocTnFFGT80f0mgn7qEtCOssSM2vN64MNNgTbqwWpoeVNXpjy4030OtTo=
-=NfLA
------END PGP SIGNATURE-----
-
---YS7t75H5cNTCpbja--
+Fam
