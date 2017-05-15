@@ -1,26 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37930)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39499)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1dAMlN-0007dT-Ek
-	for qemu-devel@nongnu.org; Mon, 15 May 2017 16:38:42 -0400
+	(envelope-from <eblake@redhat.com>) id 1dAMpo-00039M-Pg
+	for qemu-devel@nongnu.org; Mon, 15 May 2017 16:43:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1dAMlK-0006bw-Ay
-	for qemu-devel@nongnu.org; Mon, 15 May 2017 16:38:41 -0400
-Resent-Message-Id: <E1dAMlK-0006bw-Ay@eggs.gnu.org>
-Received: from sender-of-o52.zoho.com ([135.84.80.217]:21343)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1dAMlK-0006bS-3E
-	for qemu-devel@nongnu.org; Mon, 15 May 2017 16:38:38 -0400
-In-Reply-To: <20170515194149.16288-1-eblake@redhat.com>
-Message-ID: <149488067280.492.4602018300691259542@c05f1edc8ed1>
-Reply-To: <qemu-devel@nongnu.org>
+	(envelope-from <eblake@redhat.com>) id 1dAMpn-0000G9-P8
+	for qemu-devel@nongnu.org; Mon, 15 May 2017 16:43:16 -0400
+References: <20170515203114.9477-1-hpoussin@reactos.org>
+	<20170515203114.9477-2-hpoussin@reactos.org>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <77e136d2-34f0-87db-914c-84d3990269b9@redhat.com>
+Date: Mon, 15 May 2017 15:42:53 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Mon, 15 May 2017 13:37:53 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH v8 0/5] event: Add source information to
- SHUTDOWN
+In-Reply-To: <20170515203114.9477-2-hpoussin@reactos.org>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="mAewADuvaLQ40PLqIOguJU4K24U3NuCo1"
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 01/13] vvfat: fix qemu-img map
+ and qemu-img convert
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,46 +25,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: eblake@redhat.com
-Cc: famz@redhat.com, qemu-devel@nongnu.org, armbru@redhat.com, alistair.francis@xilinx.com
+To: =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, qemu-stable <qemu-stable@nongnu.org>
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKU3ViamVjdDogW1FlbXUt
-ZGV2ZWxdIFtQQVRDSCB2OCAwLzVdIGV2ZW50OiBBZGQgc291cmNlIGluZm9ybWF0aW9uIHRvIFNI
-VVRET1dOCk1lc3NhZ2UtaWQ6IDIwMTcwNTE1MTk0MTQ5LjE2Mjg4LTEtZWJsYWtlQHJlZGhhdC5j
-b20KVHlwZTogc2VyaWVzCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCgpC
-QVNFPWJhc2UKbj0xCnRvdGFsPSQoZ2l0IGxvZyAtLW9uZWxpbmUgJEJBU0UuLiB8IHdjIC1sKQpm
-YWlsZWQ9MAoKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmln
-IC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKCmNvbW1pdHM9IiQoZ2l0IGxvZyAtLWZvcm1hdD0l
-SCAtLXJldmVyc2UgJEJBU0UuLikiCmZvciBjIGluICRjb21taXRzOyBkbwogICAgZWNobyAiQ2hl
-Y2tpbmcgUEFUQ0ggJG4vJHRvdGFsOiAkKGdpdCBsb2cgLW4gMSAtLWZvcm1hdD0lcyAkYykuLi4i
-CiAgICBpZiAhIGdpdCBzaG93ICRjIC0tZm9ybWF0PWVtYWlsIHwgLi9zY3JpcHRzL2NoZWNrcGF0
-Y2gucGwgLS1tYWlsYmFjayAtOyB0aGVuCiAgICAgICAgZmFpbGVkPTEKICAgICAgICBlY2hvCiAg
-ICBmaQogICAgbj0kKChuKzEpKQpkb25lCgpleGl0ICRmYWlsZWQKPT09IFRFU1QgU0NSSVBUIEVO
-RCA9PT0KClVwZGF0aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQK
-RnJvbSBodHRwczovL2dpdGh1Yi5jb20vcGF0Y2hldy1wcm9qZWN0L3FlbXUKICogW25ldyB0YWdd
-ICAgICAgICAgcGF0Y2hldy8yMDE3MDUxNTE5NTQzOS4xNzY3Ny0xLWVibGFrZUByZWRoYXQuY29t
-IC0+IHBhdGNoZXcvMjAxNzA1MTUxOTU0MzkuMTc2NzctMS1lYmxha2VAcmVkaGF0LmNvbQpTd2l0
-Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCjExYzRiNjIgc2h1dGRvd246IEV4cG9zZSBib29s
-IGNhdXNlIGluIFNIVVRET1dOIGFuZCBSRVNFVCBldmVudHMKMDYxMTg5ZSBzaHV0ZG93bjogQWRk
-IHNvdXJjZSBpbmZvcm1hdGlvbiB0byBTSFVURE9XTiBhbmQgUkVTRVQKMTNkYzdiOSBzaHV0ZG93
-bjogUHJlc2VydmUgc2h1dGRvd24gY2F1c2UgdGhyb3VnaCByZXBsYXkKOTlhMjBkNSBzaHV0ZG93
-bjogUHJlcGFyZSBmb3IgdXNlIG9mIGFuIGVudW0gaW4gcmVzZXQvc2h1dGRvd25fcmVxdWVzdAph
-YjI4YmIxIHNodXRkb3duOiBTaW1wbGlmeSBzaHV0ZG93bl9zaWduYWwKCj09PSBPVVRQVVQgQkVH
-SU4gPT09CkNoZWNraW5nIFBBVENIIDEvNTogc2h1dGRvd246IFNpbXBsaWZ5IHNodXRkb3duX3Np
-Z25hbC4uLgpDaGVja2luZyBQQVRDSCAyLzU6IHNodXRkb3duOiBQcmVwYXJlIGZvciB1c2Ugb2Yg
-YW4gZW51bSBpbiByZXNldC9zaHV0ZG93bl9yZXF1ZXN0Li4uCkNoZWNraW5nIFBBVENIIDMvNTog
-c2h1dGRvd246IFByZXNlcnZlIHNodXRkb3duIGNhdXNlIHRocm91Z2ggcmVwbGF5Li4uCkNoZWNr
-aW5nIFBBVENIIDQvNTogc2h1dGRvd246IEFkZCBzb3VyY2UgaW5mb3JtYXRpb24gdG8gU0hVVERP
-V04gYW5kIFJFU0VULi4uCkNoZWNraW5nIFBBVENIIDUvNTogc2h1dGRvd246IEV4cG9zZSBib29s
-IGNhdXNlIGluIFNIVVRET1dOIGFuZCBSRVNFVCBldmVudHMuLi4KRVJST1I6IG9wZW4gYnJhY2Ug
-J3snIGZvbGxvd2luZyBmdW5jdGlvbiBkZWNsYXJhdGlvbnMgZ28gb24gdGhlIG5leHQgbGluZQoj
-NjE6IEZJTEU6IGluY2x1ZGUvc3lzZW11L3N5c2VtdS5oOjUyOgorc3RhdGljIGlubGluZSBib29s
-IHNodXRkb3duX2NhdXNlZF9ieV9ndWVzdChTaHV0ZG93bkNhdXNlIGNhdXNlKSB7Cgp0b3RhbDog
-MSBlcnJvcnMsIDAgd2FybmluZ3MsIDE5NSBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBz
-dHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJl
-IGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNL
-UEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFuZCBl
-eGl0ZWQgd2l0aCBjb2RlOiAxCgoKLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5
-IFBhdGNoZXcgW2h0dHA6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNr
-IHRvIHBhdGNoZXctZGV2ZWxAZnJlZWxpc3RzLm9yZw==
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--mAewADuvaLQ40PLqIOguJU4K24U3NuCo1
+From: Eric Blake <eblake@redhat.com>
+To: =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>,
+ qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org,
+ Max Reitz <mreitz@redhat.com>, qemu-stable <qemu-stable@nongnu.org>
+Message-ID: <77e136d2-34f0-87db-914c-84d3990269b9@redhat.com>
+Subject: Re: [Qemu-block] [PATCH 01/13] vvfat: fix qemu-img map and qemu-img
+ convert
+References: <20170515203114.9477-1-hpoussin@reactos.org>
+ <20170515203114.9477-2-hpoussin@reactos.org>
+In-Reply-To: <20170515203114.9477-2-hpoussin@reactos.org>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 05/15/2017 03:31 PM, Herv=C3=A9 Poussineau wrote:
+> - bs->total_sectors is the number of sectors of the whole disk
+> - s->sector_count is the number of sectors of the FAT partition
+>=20
+> This fixes the following assert in qemu-img map:
+> qemu-img.c:2641: get_block_status: Assertion `nb_sectors' failed.
+>=20
+> This also fixes an infinite loop in qemu-img convert.
+>=20
+> Fixes: 4480e0f924a42e1db8b8cfcac4d0634dd1bb27a0
+
+Wow - broken since 1.2? Not many vvfat users, are there.
+
+Herv=C3=A9, you might want to work out with Kevin whether to take
+co-maintainership over vvfat, in addition to your other areas.
+
+> Fixes: https://bugs.launchpad.net/qemu/+bug/1599539
+> Signed-off-by: Herv=C3=A9 Poussineau <hpoussin@reactos.org>
+
+CC: qemu-stable@nongnu.org
+
+> ---
+>  block/vvfat.c | 3 +--
+>  1 file changed, 1 insertion(+), 2 deletions(-)
+
+Reviewed-by: Eric Blake <eblake@redhat.com>
+
+(I will rebase my work for changing block_status into byte-based on top
+of this)
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--mAewADuvaLQ40PLqIOguJU4K24U3NuCo1
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEcBAEBCAAGBQJZGhLOAAoJEKeha0olJ0NqWjIIAISySseDLyjpHygJR5eD26Tv
+bqlptjFloOwqDm7qUCYax7VOInmIItGGDh666RIsYZDwf+gx5VigzOQhoxuwZPfC
+NniOjmHj/LCDd6PJCmqjdDiFGCkzLmrtC1MWHClu1mX0YpEDZf/6YWeCvwjRw2eH
++EQe65KKzZkdGFDg1HRxfOPKakCnRTFO6JAQGcqWmxxNJbbVr5jIpOz30pf+ZVys
+qsTBIUtu0eOMWbVAGGZ5UylbupK+Mxeyl0Nfa155A5CvoqY9+3z19oSgE6CZMDOX
+NVdxGka7BAs1QOwZfY8jaDng8xU+LfaiB1TSGY24vUX4XdwPOPU3tiO8twSZmuY=
+=YDPk
+-----END PGP SIGNATURE-----
+
+--mAewADuvaLQ40PLqIOguJU4K24U3NuCo1--
