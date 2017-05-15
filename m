@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44235)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44624)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dAG9k-0007jQ-GC
-	for qemu-devel@nongnu.org; Mon, 15 May 2017 09:35:25 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dAGB5-0008JU-6t
+	for qemu-devel@nongnu.org; Mon, 15 May 2017 09:36:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dAG9j-0005Cg-7s
-	for qemu-devel@nongnu.org; Mon, 15 May 2017 09:35:24 -0400
-Date: Mon, 15 May 2017 21:35:15 +0800
-From: Fam Zheng <famz@redhat.com>
-Message-ID: <20170515133515.GD7305@lemon.lan>
-References: <1494842563-6534-1-git-send-email-pl@kamp.de>
-	<20170515105032.GD23262@lemon.lan>
-	<26b2441d-e80c-eeef-fba1-67b2529e9287@kamp.de>
-	<20170515115318.GA7305@lemon.lan>
-	<243331f2-3822-3c0e-b4a5-9f3de2302fe4@kamp.de>
-	<20170515122802.GB7305@lemon.lan>
-	<b850c6d3-c104-b171-0e7d-40ebf6780d6e@kamp.de>
-	<20170515125202.GC7305@lemon.lan>
-	<0e904501-91c6-7186-f5e6-8c2b60bda8cf@kamp.de>
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dAGB2-0005tm-28
+	for qemu-devel@nongnu.org; Mon, 15 May 2017 09:36:47 -0400
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <149484833874.20089.4164801378197848306.stgit@bahia.lan>
+	<149484835694.20089.2114938170632779266.stgit@bahia.lan>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <6e1c2116-e7b5-083b-6eeb-87356f8e1996@amsat.org>
+Date: Mon, 15 May 2017 10:36:40 -0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <0e904501-91c6-7186-f5e6-8c2b60bda8cf@kamp.de>
-Subject: Re: [Qemu-devel] [RFC PATCH] qemu-io: add drain/undrain cmd
+In-Reply-To: <149484835694.20089.2114938170632779266.stgit@bahia.lan>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 1/6] ppc/xics: simplify prototype of
+ xics_spapr_init()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,85 +28,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Lieven <pl@kamp.de>
-Cc: kwolf@redhat.com, qemu-devel@nongnu.org, qemu-block@nongnu.org, mreitz@redhat.com, jsnow@redhat.com
+To: Greg Kurz <groug@kaod.org>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+Cc: David Gibson <david@gibson.dropbear.id.au>, Cedric Le Goater <clg@kaod.org>, Bharata B Rao <bharata@linux.vnet.ibm.com>
 
-On Mon, 05/15 15:01, Peter Lieven wrote:
-> Am 15.05.2017 um 14:52 schrieb Fam Zheng:
-> > On Mon, 05/15 14:32, Peter Lieven wrote:
-> > > Am 15.05.2017 um 14:28 schrieb Fam Zheng:
-> > > > On Mon, 05/15 13:58, Peter Lieven wrote:
-> > > > > Am 15.05.2017 um 13:53 schrieb Fam Zheng:
-> > > > > > On Mon, 05/15 13:26, Peter Lieven wrote:
-> > > > > > > Am 15.05.2017 um 12:50 schrieb Fam Zheng:
-> > > > > > > > On Mon, 05/15 12:02, Peter Lieven wrote:
-> > > > > > > > > Hi Block developers,
-> > > > > > > > > 
-> > > > > > > > > I would like to add a feature to Qemu to drain all traffic from a block so that
-> > > > > > > > > I can take external snaphosts without the risk to that in the middle of a write
-> > > > > > > > > operation. Its meant for cases where where QGA freeze/thaw is not available.
-> > > > > > > > > 
-> > > > > > > > > For me its enough to have this through qemu-io, but Kevin asked me to check
-> > > > > > > > > if its not worth to have a stable API for it and present it via QMP/HMP.
-> > > > > > > > > 
-> > > > > > > > > What are your thoughts?
-> > > > > > > > For debugging purpose or a "hacky" usage where you know what you are doing, it
-> > > > > > > > may be fine to have this. The only issue is it should be a separate flag, like
-> > > > > > > > BlockJob.user_paused.
-> > > > > > > How can I add, remove such a flag?
-> > > > > > Like bs->user_drained. Set it in "drain" command, then increment
-> > > > > > bs->quiesce_counter if toggled; vise versa.
-> > > > > Ah okay. You wouldn't use bdrv_drained_begin/end? Because in these functions
-> > > > > the counter is incremented already.
-> > > > You're right, calling bdrv_drained_begin() is better.
-> > > > 
-> > > > > 
-> > > > > > > > What happens from guest perspective? In the case of virtio, the request queue is
-> > > > > > > > not handled and -ETIMEDOUT may happen. With IDE, I/O commands are still handled,
-> > > > > > > > the command is not effective (or rather the implementation is not complete).
-> > > > > > > That it only works with virtio is fine. However, the thing it does not work correctly
-> > > > > > > apply then also to all other users of the drained_begin/end functions, right?
-> > > > > > > As for the timeout I only plan to drain the device for about 1 second.
-> > > > > > It didn't matter because for IDE, the invariant (staying quiesced as long as
-> > > > > > necessary) is already ensured by BQL.  Virtio is different because it supports
-> > > > > > ioeventfd and data plane.
-> > > > > Okay understood. So my use of bdrv_drained_begin/end is more an abuse of
-> > > > > these functions?
-> > > > Sort of. But it's not unreasonable to "extend" bdrv_drained_begin/end to cover
-> > > > IDE, I just haven't thought about "how".
-> > > > 
-> > > > > Do you have another idea how to achieve what I want? I was thinking of throttle
-> > > > > the I/O to zero. It would be enough to do this for writes, reading doesn't hurt in
-> > > > > my case.
-> > > > Maybe add a block filter on top of the drained node, drain it when doing so,
-> > > > then queue all further requests with a CoQueue until "undrain".  (It is then not
-> > > > quite to "drain" but to "halt" or "pause", though.)
-> > > To get the drain for free was why I was looking at this approach. If I read correctly
-> > > if I keep using bdrv_drained_begin/end its too hacky to implement it in QMP?
-> > I think so.
-> > 
-> > > If yes, would support adding it to qemu-io?
-> > I'm under the impression that you are looking to a real use case, I don't think
-> > I like the idea. Also, accessing the image from other processes while QEMU is
-> > using it is strongly discouraged, and there is the coming image locking
-> > mechanism to prevent this from happening. Why is the blockdev-snapshot command
-> > not enough?
-> 
-> blockdev-snapshot is enough, but I still fear the case there is suddenly too much I/O
-> for the live-commit. And that the whole snapshot / commit code is more senstive than
-> just stopping I/O for a second or two.
+On 05/15/2017 08:39 AM, Greg Kurz wrote:
+> This function only does hypercall and RTAS-call registration, and thus
+> never returns an error. This patch adapt the prototype to reflect that.
+>
+> Signed-off-by: Greg Kurz <groug@kaod.org>
 
-In this case, the image fleecing approach may be what you need. It creates a
-temporary point in time snapshot which is lightweight and disposable. Something
-like:
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
-https://lists.gnu.org/archive/html/qemu-devel/2014-03/msg01359.html
-
-(Ccing John who may have more up-to-date pointers)
-
-> 
-> do you have a pointer to the image locking mechanism?
-
-It hit qemu.git master just a moment ago. See raw_check_perm.
-
-Fam
+> ---
+>  hw/intc/xics_spapr.c  |    3 +--
+>  hw/ppc/spapr.c        |    2 +-
+>  include/hw/ppc/xics.h |    2 +-
+>  3 files changed, 3 insertions(+), 4 deletions(-)
+>
+> diff --git a/hw/intc/xics_spapr.c b/hw/intc/xics_spapr.c
+> index f05308b897f2..d98ea8b13068 100644
+> --- a/hw/intc/xics_spapr.c
+> +++ b/hw/intc/xics_spapr.c
+> @@ -229,7 +229,7 @@ static void rtas_int_on(PowerPCCPU *cpu, sPAPRMachineState *spapr,
+>      rtas_st(rets, 0, RTAS_OUT_SUCCESS);
+>  }
+>
+> -int xics_spapr_init(sPAPRMachineState *spapr, Error **errp)
+> +void xics_spapr_init(sPAPRMachineState *spapr)
+>  {
+>      /* Registration of global state belongs into realize */
+>      spapr_rtas_register(RTAS_IBM_SET_XIVE, "ibm,set-xive", rtas_set_xive);
+> @@ -243,7 +243,6 @@ int xics_spapr_init(sPAPRMachineState *spapr, Error **errp)
+>      spapr_register_hypercall(H_XIRR_X, h_xirr_x);
+>      spapr_register_hypercall(H_EOI, h_eoi);
+>      spapr_register_hypercall(H_IPOLL, h_ipoll);
+> -    return 0;
+>  }
+>
+>  #define ICS_IRQ_FREE(ics, srcno)   \
+> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> index 1b7cadab0cdf..abfb99b71b7d 100644
+> --- a/hw/ppc/spapr.c
+> +++ b/hw/ppc/spapr.c
+> @@ -139,7 +139,7 @@ static void xics_system_init(MachineState *machine, int nr_irqs, Error **errp)
+>      }
+>
+>      if (!spapr->ics) {
+> -        xics_spapr_init(spapr, errp);
+> +        xics_spapr_init(spapr);
+>          spapr->icp_type = TYPE_ICP;
+>          spapr->ics = spapr_ics_create(spapr, TYPE_ICS_SIMPLE, nr_irqs, errp);
+>      }
+> diff --git a/include/hw/ppc/xics.h b/include/hw/ppc/xics.h
+> index 05e6acbb3533..d6cb51f3ad5d 100644
+> --- a/include/hw/ppc/xics.h
+> +++ b/include/hw/ppc/xics.h
+> @@ -206,6 +206,6 @@ void icp_resend(ICPState *ss);
+>  typedef struct sPAPRMachineState sPAPRMachineState;
+>
+>  int xics_kvm_init(sPAPRMachineState *spapr, Error **errp);
+> -int xics_spapr_init(sPAPRMachineState *spapr, Error **errp);
+> +void xics_spapr_init(sPAPRMachineState *spapr);
+>
+>  #endif /* XICS_H */
+>
+>
