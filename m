@@ -1,25 +1,36 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47063)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47452)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dAJvz-0006lc-0M
-	for qemu-devel@nongnu.org; Mon, 15 May 2017 13:37:28 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1dAJxI-0007Q2-7I
+	for qemu-devel@nongnu.org; Mon, 15 May 2017 13:38:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dAJvu-0007iD-VW
-	for qemu-devel@nongnu.org; Mon, 15 May 2017 13:37:27 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60892)
+	(envelope-from <dgilbert@redhat.com>) id 1dAJxD-00007S-8Z
+	for qemu-devel@nongnu.org; Mon, 15 May 2017 13:38:48 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40060)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dAJvu-0007i1-MD
-	for qemu-devel@nongnu.org; Mon, 15 May 2017 13:37:22 -0400
-References: <149486383099.19357.10170962018755572073.stgit@bahia.lan>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <b5fad238-40ac-7deb-e1b6-33e57c0bb117@redhat.com>
-Date: Mon, 15 May 2017 12:37:08 -0500
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dAJxC-00007H-VO
+	for qemu-devel@nongnu.org; Mon, 15 May 2017 13:38:43 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id BD8E4AB99E
+	for <qemu-devel@nongnu.org>; Mon, 15 May 2017 17:38:41 +0000 (UTC)
+Date: Mon, 15 May 2017 18:38:34 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170515173834.GI2089@work-vm>
+References: <20170512034033.GN28293@pxdev.xzpeter.org>
+	<877f1mgx9h.fsf@secure.mitica>
+	<5bab598f-30eb-fcf6-9d06-8f683b466414@redhat.com>
+	<87lgpyfo28.fsf@secure.mitica> <87k25iqf4m.fsf@dusky.pond.sub.org>
+	<87efvqdqqj.fsf@secure.mitica> <20170515163841.GB2324@work-vm>
+	<87a86edpot.fsf@secure.mitica> <20170515172736.GA26717@work-vm>
+	<871srqdnvw.fsf@secure.mitica>
 MIME-Version: 1.0
-In-Reply-To: <149486383099.19357.10170962018755572073.stgit@bahia.lan>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="NAaqQtBIbe9v3pFuNwcwWfOAqJWMxqHBi"
-Subject: Re: [Qemu-devel] [PATCH] 9pfs: local: forbid client access to
- metadata (CVE-2017-7493)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <871srqdnvw.fsf@secure.mitica>
+Subject: Re: [Qemu-devel] [PATCH 2/3] migration: Remove use of old
+ MigrationParams
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,84 +39,122 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org
-Cc: Leo Gaspard <leo@gaspard.io>, Prasad J Pandit <prasad@redhat.com>
+To: Juan Quintela <quintela@redhat.com>
+Cc: Markus Armbruster <armbru@redhat.com>, Eric Blake <eblake@redhat.com>, lvivier@redhat.com, qemu-devel@nongnu.org, Peter Xu <peterx@redhat.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---NAaqQtBIbe9v3pFuNwcwWfOAqJWMxqHBi
-From: Eric Blake <eblake@redhat.com>
-To: Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org
-Cc: Leo Gaspard <leo@gaspard.io>, Prasad J Pandit <prasad@redhat.com>
-Message-ID: <b5fad238-40ac-7deb-e1b6-33e57c0bb117@redhat.com>
-Subject: Re: [PATCH] 9pfs: local: forbid client access to metadata
- (CVE-2017-7493)
-References: <149486383099.19357.10170962018755572073.stgit@bahia.lan>
-In-Reply-To: <149486383099.19357.10170962018755572073.stgit@bahia.lan>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+* Juan Quintela (quintela@redhat.com) wrote:
+> "Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
+> > * Juan Quintela (quintela@redhat.com) wrote:
+> >> "Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
+> >> > * Juan Quintela (quintela@redhat.com) wrote:
+> >> >> Markus Armbruster <armbru@redhat.com> wrote:
+> >> >> > Juan Quintela <quintela@redhat.com> writes:
+> >> >> >
+> >> >> >> Eric Blake <eblake@redhat.com> wrote:
+> >> >> 
+> >> >> 
+> >> >> >>> Or is the proposal that we are also going to simplify the QMP 'migrate'
+> >> >> >>> command to get rid of crufty parameters?
+> >> >> >>
+> >> >> >> I didn't read it that way, but I would not oppose O:-)
+> >> >> >>
+> >> >> >> Later, Juan.
+> >> >> >
+> >> >> > I'm not too familiar with this stuff, so please correct my
+> >> >> > misunderstandings.
+> >> >> >
+> >> >> > "Normal" migration configuration is global state, i.e. it applies to all
+> >> >> > future migrations.
+> >> >> >
+> >> >> > Except the "migrate" command's flags apply to just the migration kicked
+> >> >> > off by that command.
+> >> >> >
+> >> >> > QMP command "migrate" has two flags "blk" (HMP: -b) and "inc" (HMP: -i).
+> >> >> > !blk && inc makes no sense and is silently treated like !blk && !inc.
+> >> >> >
+> >> >> > There's a third flag "detach" (HMP: -d), but it does nothing in QMP.
+> >> >> 
+> >> >> As qmp command is asynchronous, you can think that -d is *always* on in
+> >> >> QMP O:-)
+> >> >> 
+> >> >> > You'd like to deprecate these flags in favour of "normal" configuration.
+> >> >> > However, we need to maintain QMP backward compatibility at least for a
+> >> >> > while.  HMP backward compatibility is nice to have, but not required.
+> >> >> >
+> >> >> > First step is to design the new interface you want.  Second step is to
+> >> >> > figure out backward compatibility.
+> >> >> >
+> >> >> > The new interface adds a block migration tri-state (off,
+> >> >> > non-incremental, incremental) to global state, default off.  Whether
+> >> >> > it's done as two bools or an enum of three values doesn't matter here.
+> >> >> 
+> >> >> Tristates will complicate it.  I still think that:
+> >> >> 
+> >> >> - capability: block_migration
+> >> >> - parameter: block_shared
+> >> >> 
+> >> >> Makes more sense, no?
+> >> >
+> >> > I don't understand what making block_shared a parameter gives you as
+> >> > opposed to simply having two capabilities.
+> >> >
+> >> > (And how did we get 'shared'? We started off with block & incremental)
+> >> 
+> >> The variables on MigrationParams:
+> >> 
+> >> struct MigrationParams {
+> >>     bool blk;
+> >>     bool shared;
+> >> };
+> >> 
+> >> 
+> >> I can move to incremental.  I am not sure which one is clearer.
+> >> 
+> >> The advantage of having shared as a parameter is that we forget about
+> >> all this dependency bussiness.  Is the same than compression_threads
+> >> paramter, you setup to whichever value that you want.  But you don't get
+> >> compression_threads until you set the compress capability.
+> >> 
+> >> So, in this case we will have:
+> >> 
+> >> block capability: Are we using block migration or not
+> >> block-incremental parameter: If we are using block migration, are we
+> >>       using incremental copying of the block layer?
+> >
+> > If it's still a boolean why does having it as a parameter remove the
+> > dependency?
+> 
+> Forget -b/-i.
+> 
+> migration_set_parameter compression_threads 8
+> 
+> migrate <foo>
+> 
+> We don't use compression_threads at all
+> 
+> migrate_set_capability compress
+> 
+> migrate <foo>
+> 
+> Now, we use compression threads.
+> 
+> So, compression_threads parameter is a parameter that is only used when
+> compress capability is enabled.
+> 
+> Same for block migration.  Block_incremental parameter is used only when
+> block migration capability is setup.  No dependency check needed at all.
+> 
+> Or I am losing something obvious here?
 
-On 05/15/2017 11:07 AM, Greg Kurz wrote:
-> When using the mapped-file security mode, we shouldn't let the client m=
-ess
-> with the metadata. The current code already tries to hide the metadata =
-dir
-> from the client by skipping it in local_readdir(). But the client can s=
-till
-> access or modify it through several other operations. This can be used =
-to
-> escalate privileges in the guest.
->=20
-> Affected backend operations are:
-> - local_mknod()
-> - local_mkdir()
-> - local_open2()
-> - local_symlink()
-> - local_link()
-> - local_unlinkat()
-> - local_renameat()
-> - local_rename()
-> - local_name_to_path()
->=20
-> Other operations are safe because they are only passed a fid path, whic=
-h
-> is computed internally in local_name_to_path().
->=20
-> This patch converts all the functions listed above to fail and return
-> EINVAL when being passed the name of the metadata dir. This may look
-> like a poor choice for errno, but there's no such thing as an illegal
-> path name on Linux and I could not think of anything better.
->=20
-> This fixes CVE-2017-7493.
->=20
-> Reported-by: Leo Gaspard <leo@gaspard.io>
-> Signed-off-by: Greg Kurz <groug@kaod.org>
-> ---
+Ah, you've made up a new rule - I don't think it's a bad rule
+but is it true? Do we always enable a capability before we use a
+parameter? I don't think so - I think the tls parameters don't have
+a capability.
+My previous rule was just that if it was a bool it was a capability
+and you can have whatever dependencies you like there - or none.
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
+Dave
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---NAaqQtBIbe9v3pFuNwcwWfOAqJWMxqHBi
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEcBAEBCAAGBQJZGedEAAoJEKeha0olJ0Nq+GkIAID5SSHOewQETaVyV1fd1YEw
-xMmUI0dQjVQy4STKOgXeia2A6xstDykf7+PXwp+bIGamKLc5ywECZUh5XVvziZpZ
-BnAldFYlHUrEra6KpORO2MGTTKirXtKGplxf0zrfclQeo3iOzO8wSD4JnkZHisxC
-hjQPCCxAJQFkLVyXeDiyfj3lrBs2LY33ZkKKC1AULhp+mbDkJV5TRm2kP3vzZNnN
-rPeB+fa7mDA/WGvCyXnva/CpgUb9/tdy6TQK0XlkJywDlU6CnVRVUasZcWvIZMNe
-TNZFCYHUAhreFaR0ZaxEqtZHUMH8u1ok6QtO1sy6E0vy2NDoQ0S9i4cERgd9Auw=
-=Vr4C
------END PGP SIGNATURE-----
-
---NAaqQtBIbe9v3pFuNwcwWfOAqJWMxqHBi--
+> Later, Juan.
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
