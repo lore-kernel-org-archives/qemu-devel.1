@@ -1,26 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60752)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33590)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1dAKqb-0005B8-FL
-	for qemu-devel@nongnu.org; Mon, 15 May 2017 14:35:59 -0400
+	(envelope-from <mreitz@redhat.com>) id 1dAKvx-0006R7-5a
+	for qemu-devel@nongnu.org; Mon, 15 May 2017 14:41:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1dAKqZ-0002x5-R1
-	for qemu-devel@nongnu.org; Mon, 15 May 2017 14:35:57 -0400
-References: <20170411011718.9152-1-eblake@redhat.com>
-	<20170411011718.9152-2-eblake@redhat.com>
-	<20170412094909.GC4955@noname.str.redhat.com>
-	<161300e8-fefb-f2c6-09cd-afd16d14bca0@redhat.com>
-	<7171308e-833e-38a0-8775-9b5a52b8a105@redhat.com>
-	<26c745c7-2497-7adf-eee1-3547f1aeb95c@redhat.com>
+	(envelope-from <mreitz@redhat.com>) id 1dAKvv-0004zu-Kz
+	for qemu-devel@nongnu.org; Mon, 15 May 2017 14:41:29 -0400
+References: <20170511182705.23648-1-jsnow@redhat.com>
+	<19a665be-12c2-2876-0438-08327d94473e@redhat.com>
+	<6b8d6c51-d849-75fa-59c1-dd256471c0dc@redhat.com>
+	<815d2530-7767-0f1d-d9d4-3b6c8de0260b@redhat.com>
 From: Max Reitz <mreitz@redhat.com>
-Message-ID: <91600f4a-e265-c353-c688-b220c3e867dd@redhat.com>
-Date: Mon, 15 May 2017 20:35:43 +0200
+Message-ID: <de0c59c3-2516-db0e-1a02-99b3ea0a0a65@redhat.com>
+Date: Mon, 15 May 2017 20:41:12 +0200
 MIME-Version: 1.0
-In-Reply-To: <26c745c7-2497-7adf-eee1-3547f1aeb95c@redhat.com>
+In-Reply-To: <815d2530-7767-0f1d-d9d4-3b6c8de0260b@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="5SJRDTdfr3F3w9IBB1rj34KIe78R0qddw"
-Subject: Re: [Qemu-devel] [PATCH v9 01/13] qcow2: Unallocate unmapped zero
- clusters if no backing file
+	boundary="IJVw5iKNPpfqTrDn1rRgqnHsk5CVNNr9x"
+Subject: Re: [Qemu-devel] [PATCH v4] qemu-img: Check for backing image if
+ specified during create
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,226 +27,133 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>, Eric Blake <eblake@redhat.com>, Kevin Wolf <kwolf@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org
+To: John Snow <jsnow@redhat.com>, Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org
+Cc: kwolf@redhat.com, qemu-devel@nongnu.org
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---5SJRDTdfr3F3w9IBB1rj34KIe78R0qddw
+--IJVw5iKNPpfqTrDn1rRgqnHsk5CVNNr9x
 From: Max Reitz <mreitz@redhat.com>
 To: John Snow <jsnow@redhat.com>, Eric Blake <eblake@redhat.com>,
- Kevin Wolf <kwolf@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org
-Message-ID: <91600f4a-e265-c353-c688-b220c3e867dd@redhat.com>
-Subject: Re: [PATCH v9 01/13] qcow2: Unallocate unmapped zero clusters if no
- backing file
-References: <20170411011718.9152-1-eblake@redhat.com>
- <20170411011718.9152-2-eblake@redhat.com>
- <20170412094909.GC4955@noname.str.redhat.com>
- <161300e8-fefb-f2c6-09cd-afd16d14bca0@redhat.com>
- <7171308e-833e-38a0-8775-9b5a52b8a105@redhat.com>
- <26c745c7-2497-7adf-eee1-3547f1aeb95c@redhat.com>
-In-Reply-To: <26c745c7-2497-7adf-eee1-3547f1aeb95c@redhat.com>
+ qemu-block@nongnu.org
+Cc: kwolf@redhat.com, qemu-devel@nongnu.org
+Message-ID: <de0c59c3-2516-db0e-1a02-99b3ea0a0a65@redhat.com>
+Subject: Re: [PATCH v4] qemu-img: Check for backing image if specified during
+ create
+References: <20170511182705.23648-1-jsnow@redhat.com>
+ <19a665be-12c2-2876-0438-08327d94473e@redhat.com>
+ <6b8d6c51-d849-75fa-59c1-dd256471c0dc@redhat.com>
+ <815d2530-7767-0f1d-d9d4-3b6c8de0260b@redhat.com>
+In-Reply-To: <815d2530-7767-0f1d-d9d4-3b6c8de0260b@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On 2017-05-13 01:00, John Snow wrote:
+On 2017-05-12 21:47, John Snow wrote:
 >=20
 >=20
-> On 05/12/2017 12:06 PM, Max Reitz wrote:
->> On 2017-05-11 16:56, Eric Blake wrote:
->>> [revisiting this older patch version, even though the final version i=
-n
->>> today's pull request changed somewhat from this approach]
->>>
->>> On 04/12/2017 04:49 AM, Kevin Wolf wrote:
->>>> Am 11.04.2017 um 03:17 hat Eric Blake geschrieben:
->>>>> 'qemu-img map' already coalesces information about unallocated
->>>>> clusters (those with status 0) and pure zero clusters (those
->>>>> with status BDRV_BLOCK_ZERO and no offset).  Furthermore, all
->>>>> qcow2 images with no backing file already report all unallocated
->>>>> clusters (in the preallocation sense of clusters with no offset)
->>>>> as BDRV_BLOCK_ZERO, regardless of whether the QCOW_OFLAG_ZERO was
->>>>> set in that L2 entry (QCOW_OFLAG_ZERO also implies a return of
->>>>> BDRV_BLOCK_ALLOCATED, but we intentionally do not expose that bit
->>>>> to external users), thanks to generic block layer code in
->>>>> bdrv_co_get_block_status().
->>>>>
->>>>> So, for an image with no backing file, having bdrv_pwrite_zeroes
->>>>> mark clusters as unallocated (defer to backing file) rather than
->>>>> reads-as-zero (regardless of backing file) makes no difference
->>>>> to normal behavior, but may potentially allow for fewer writes to
->>>>> the L2 table of a freshly-created image where the L2 table is
->>>>> initially written to all-zeroes (although I don't actually know
->>>>> if we skip an L2 update and flush when re-writing the same
->>>>> contents as already present).
+> On 05/12/2017 03:46 PM, Eric Blake wrote:
+>> On 05/12/2017 01:07 PM, Max Reitz wrote:
+>>> On 2017-05-11 20:27, John Snow wrote:
+>>>> Fixes: https://bugzilla.redhat.com/show_bug.cgi?id=3D1213786
 >>>>
->>>> I don't get this. Allocating a cluster always involves an L2 update,=
- no
->>>> matter whether it was previously unallocated or a zero cluster.
+>>>> Or, rather, force the open of a backing image if one was specified
+>>>> for creation. Using a similar -unsafe option as rebase, allow qemu-i=
+mg
+>>>> to ignore the backing file validation if possible.
+>>>>
+>>
+>>>> +++ b/block.c
+>>>> @@ -4275,37 +4275,37 @@ void bdrv_img_create(const char *filename, c=
+onst char *fmt,
+>>>>      // The size for the image must always be specified, with one ex=
+ception:
+>>>>      // If we are using a backing file, we can obtain the size from =
+there
+>>>>      size =3D qemu_opt_get_size(opts, BLOCK_OPT_SIZE, 0);
+>>>> -    if (size =3D=3D -1) {
 >>>
->>> On IRC, John, Kevin, and I were discussing the current situation with=
-
->>> libvirt NBD storage migration.  When libvirt creates a file on the
->>> destination (rather than the user pre-creating it), it currently
->>> defaults to 0.10 [v2] images, even if the source was a 1.1 image [v3]=
-
->>> (arguably something that could be improved in libvirt, but
->>> https://bugzilla.redhat.com/show_bug.cgi?id=3D1371749 was closed as n=
-ot a
->>> bug).
+>>> "Hang on, why should this be -1 when the defval is 0? Where does the =
+-1
+>>> come from?"
+>>> "..."
+>>> "Oh, the option exists and is set to -1? Why is that?"
+>>> "..."
+>>> "Oh, because this function always sets it itself, and because @img_si=
+ze
+>>> is set to (uint64_t)-1."
+>>
+>> I had pretty much the same conversation on my v1 review.
+>> https://lists.gnu.org/archive/html/qemu-devel/2017-05/msg01097.html
+>>
 >>>
->>> Therefore, the use case of doing a mirror job to a v2 image, and havi=
-ng
->>> that image become thick even though the source was thin, is happening=
+>>> First, I won't start with how signed integer overflow is
+>>> implementation-defined in C because I hope you have thrashed that out=
 
->>> more than we'd like
->>> (https://bugzilla.redhat.com/show_bug.cgi?id=3D1371749).  While Kevin=
- had
->>> a point that in the common case we ALWAYS want to turn an unallocated=
-
->>> cluster into a zero cluster (so that we don't have to audit whether a=
-ll
->>> callers are properly accounting for the case where a backing image is=
-
->>> added later), our conversation on IRC today conceded that we may want=
- to
->>> introduce a new BDRV_REQ_READ_ZERO_NOP (or some such name) that
->>> particular callers can use to request that if a cluster already reads=
- as
->>> zeroes, the write zero request does NOT have to change it.  Normal gu=
-est
->>> operations would not use the flag, but mirroring IS a case that would=
-
->>> use the flag, so that we can end up with thinner mirrors even to 0.10=
-
->>> images.
-
-Reading this again, you could just pass through the write-zero request.
-The issue right now is that the qcow2 driver just returns -ENOTSUP for
-every write-zero request on v2 images when it could just create a data
-cluster and invoke a write-zero request on the data.
-
-Just not suppressing the BDRV_REQ_ZERO_WRITE flag for the generic
-fall-back zero write (with bs->supported_write_flags listing it) and
-then issuing a bdrv_co_pwrite_zeroes() in qcow2_co_pwritev() works (with
-BDRV_REQ_MAY_UNMAP).
-
-(Whether or not to set BDRV_REQ_MAY_UNMAP should be derived from...
-Maybe QCOW2_DISCARD_OTHER?)
-
->>> The other consideration is that on 0.10 images, even if we have to
->>> allocate, right now our allocation is done by way of failing with
->>> -ENOTSUP and falling back to the normal pwrite() of explicit zeroes. =
- It
->>> may be worth teaching the qcow2 layer to explicitly handle write zero=
-es,
->>> even on 0.10 images, by allocating a cluster (as needed) but then
->>> telling bs->file to write zeroes (punching a hole as appropriate) so
->>> that the file is still thin.  In fact, it matches the fact that we
->>> already have code that probes whether a qcow2 cluster that reports
->>> BDRV_BLOCK_DATA|BDRV_BLOCK_OFFSET_VALID then probes bs->file to see i=
-f
->>> there is a hole there, at which point it can add BDRV_BLOCK_ZERO to t=
-he
->>> bdrv_get_block_status.
->>>
->>> I don't know which one of us will tackle patches along these lines, b=
+>>> with Eric (I hope that "to thrash out" is a good translation for
+>>> "auskaspern" (lit. "to buffoon out").).
+>>
+>> Sounds like a reasonable choice of words, even if I don't speak the
+>> counterpart language to validate your translation.
+>>
+>> (uint64_t)-1 is well-defined in C (so I think we're just fine here). B=
 ut
->>> wanted to at least capture the gist of the IRC conversation in the
->>> archives for a bit more permanence.
+>> (int64_t)UINT64_MAX is where signed integer overflow does indeed throw=
+
+>> wrinkles at you.
+
+We're not really fine because that conversion happens when the result of
+qemu_opt_get_size() (a uint64_t) is stored in size (an int64_t).
+
+>> I seem to recall that qemu has chosen to use compiler flags and/or
+>> assumptions that we are using 2s-complement arithmetic with sane
+>> behavior (that is, tighter behavior than the bare minimum that C
+>> requires), because it was easier than auditing our code for strict C
+>> compliance on border cases of conversions from unsigned to signed that=
+
+>> trigger undefined behavior.  But again, I don't think it affects this
+>> patch (where our conversion is only from signed to unsigned, and that =
+is
+>> well-defined behavior).
+
+Right. Which is why I said I won't even start on it, but of course I
+did. O:-)
+
+>>> Second, well, at least we should put -1 as the default value here, th=
+en.
 >>
->> Just short ideas:
+>> Indeed, now that two reviewers have tripped on it,
+>> qemu_opt_get_size(,,-1) would be nicer.
 >>
->> (1) I do consider it a bug if v2 images are created. The BZ wasn't
->> closed for a very good reason, but because nobody answered this questi=
-on:
+>>>
+>>> Not strictly your fault or something that you need to fix, but it is
+>>> just a single line in the vicinity...
+>>>
+>>> Let me know if you want to address this, for now I'll leave a
+>>>
+>>> Reviewed-by: Max Reitz <mreitz@redhat.com>
+>>>
+>>> here if you don't want to.
 >>
->>> is this really a problem?
->>
->> And apparently it is.
->>
->> (2) There is a way of creating zero clusters on v2 images, but we've
->> never done it (yet): You create a single data cluster containing zeroe=
-s
->> and then you just point to it whenever you need a zero cluster (until
->> its refcount overflows, at which point you allocate another cluster).
->> Maybe that helps.
->>
->> I'd be really careful with optimizations for v2 images. You have alrea=
-dy
->> proven to me that my fears of too much complexity are out of proportio=
-ns
->> sometimes, but still. v2 upstream is old legacy and should be treated =
-as
->> such, at least IMHO.
->>
->> Max
->>
+>> I'm okay whether you want to squash that fix into this patch, or wheth=
+er
+>> you do it as a separate followup patch.
 >>
 >=20
-> I agree that V2 changes should be limited in nature, but there are
-> less-fiddly ways to have thin 0.10 images on sparse filesystems. This
-> way feels a little too clever and mostly likely too intrusive for an ol=
-d
-> format.
+> I had considered the issue separate; but you're welcome to either write=
 
-Yes.
+> a patch or squish it into this one, I'm not going to be picky.
 
-> I'd also think that it'd probably confuse older copies of qemu-img
-> check, so maybe this is too hacky of a solution.
+Yep, it is a separate issue, just related. :-)
 
-I don't.
+But since you and Eric agree, I've squashed it in and thus I'm more than
+glad to thank you very much and announce this patch as applied to my
+block branch:
 
-Anyway, feel free to convince me by writing a simple patch that allows
-the v2 sparseness you need.
-
-Let's again get to the root of the issue: Mirroring to a new v2 qcow2
-image does not create a sparse image. There are multiple questions here:
-
-(1) Who does mirroring?
-(2) Who uses v2 qcow2 for the destination?
-(3) Who needs sparse images?
-
-(1) is clear, everybody does it. (3) is rather clear, it would be nice
-to have (but not an absolute catastrophe if we didn't). So what remains
-is (2).
-
-=46rom qemu's perspective, qcow2v3 has been the default for quite some
-time. So just using qemu, nobody will use v2.
-
-Maybe you're using an old qemu, maybe you're using RHEL 6's qemu which
-only supports v2. This is an argument, but I'd very much just recommend
-an update. (Bit of an internal question: Are you willing to backport the
-upstream changes this would bring to RHEL 6?)
-
-And then there's the case the BZ is about: Maybe you're using a
-management tool which forces v2 images. I'd call it a bug in the
-management tool because we didn't make v3 the default for nothing. Maybe
-there are good reasons why some management tools create v2, but I don't
-know any and when the BZ was closed none were given. It was just closed
-because there was no apparent reason not to (but there is!).
-
-
-So I see the following courses of action:
-
-1. Ignore the v2 "issue". It's not an upstream issue, it's a bug in a
-management tool, so let's just reopen the BZ and ignore RHEL 6 users.
-Also, v2 just is a limited format, there is a reason v3 exists! So I
-wouldn't even call it an issue, it's just how it is.
-
-2. Improve v2. Would "fix" the issue at hand while still not letting
-RHEL 7's libvirt create v3 images (which might very well come back to
-haunt us some other day), and would complicate upstream code for no
-upstream reason.
-
-Now, as I said, I'm open to be convinced that (2) is viable: If the
-change is simple enough, sure, let's take it, why not. But I don't see
-the point still.
+https://github.com/XanClic/qemu/commits/block
 
 Max
 
 
---5SJRDTdfr3F3w9IBB1rj34KIe78R0qddw
+--IJVw5iKNPpfqTrDn1rRgqnHsk5CVNNr9x
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
@@ -256,14 +161,14 @@ Content-Disposition: attachment; filename="signature.asc"
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v2
 
-iQEvBAEBCAAZBQJZGfT/EhxtcmVpdHpAcmVkaGF0LmNvbQAKCRD0B9sAYdXPQG7t
-CAC+qmAVmiN7T34cqST5oQlrJZtslGmMsWMUP/Z7Hl7WexrxGzDU3ffo96EuV0bn
-ontrEOX29BrRtptjssSgr+pYUIcjctiZ4wvatPjvbK8eMdg+SLEob2WlOtw3e1CO
-kYr6zL5eUuqwRhK8MqCknHBEVcqFzzEr5N3kVOGLEC+u5sE4ENYY53inxdsr+9Cu
-UTNCOkGll0wVecfYunPrDinV8VtG7zlTjgdNvwEtyJj2m6jsgFu9VilqnPlYGQqJ
-ozuXb/0jbL8J9HWgCILl/0NO3PeXB/nhzuIX09RnHR4KgUDoLSTA5Qgog3v5Y89r
-paJVeyqavq/I+l8fFcxgxWnq
-=zqhx
+iQEvBAEBCAAZBQJZGfZJEhxtcmVpdHpAcmVkaGF0LmNvbQAKCRD0B9sAYdXPQKU5
+B/9UZ0fE1iiQN4Be8Jnc0Y8dVj856okTJxc1GcQpjz5c1pzHjYWWQmsx1JQ0wI0K
+4EnmJtO9/L6mHiEFF0T6Kh4GkhdFkfJbeHpkWcFfKrLOposMk7sP0v1/rS2Bp9S4
+KkNXB95sXoO2D4pIQ5SjVyFvxeyv7Lv435REFyIHUt15QAF6mqwMTsm0hECtxUAK
+HEHHFqiL+kxRGnkaNaO5hg1eHx+eY5dxvIP/aeKmbxDUelTshBFJrH8lBSB7JT0y
+iEDr/O8ekIQrreSO7YALClKVtkvThszKevMoMzf++FJXYcteQWDM1T2pL1j4+/l1
+UDVK6uIp+FQDxXpR/Ksh4L2L
+=T8A8
 -----END PGP SIGNATURE-----
 
---5SJRDTdfr3F3w9IBB1rj34KIe78R0qddw--
+--IJVw5iKNPpfqTrDn1rRgqnHsk5CVNNr9x--
