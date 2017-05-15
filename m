@@ -1,21 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43171)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46224)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1dALfV-0007i5-8h
-	for qemu-devel@nongnu.org; Mon, 15 May 2017 15:28:34 -0400
+	(envelope-from <eblake@redhat.com>) id 1dALsZ-0001oh-9B
+	for qemu-devel@nongnu.org; Mon, 15 May 2017 15:42:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1dALfU-0000GP-GJ
-	for qemu-devel@nongnu.org; Mon, 15 May 2017 15:28:33 -0400
-References: <20170515100059.15795-1-pbonzini@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <fd8c0dcf-57c5-998d-e5ff-a028e0048968@redhat.com>
-Date: Mon, 15 May 2017 21:28:23 +0200
-MIME-Version: 1.0
-In-Reply-To: <20170515100059.15795-1-pbonzini@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="SGCXTcBLa7bQoiQja8Rw9KWrTlUHNj4BW"
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v3 0/7] curl: locking
- cleanups/fixes, coroutine conversion, remove aio_poll
+	(envelope-from <eblake@redhat.com>) id 1dALsW-0005pg-5v
+	for qemu-devel@nongnu.org; Mon, 15 May 2017 15:42:03 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:44924)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dALsV-0005pR-T6
+	for qemu-devel@nongnu.org; Mon, 15 May 2017 15:42:00 -0400
+From: Eric Blake <eblake@redhat.com>
+Date: Mon, 15 May 2017 14:41:44 -0500
+Message-Id: <20170515194149.16288-1-eblake@redhat.com>
+Subject: [Qemu-devel] [PATCH v8 0/5] event: Add source information to
+ SHUTDOWN
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,63 +22,108 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
-Cc: rjones@redhat.com, qemu-block@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: armbru@redhat.com, berrange@redhat.com, alistair.francis@xilinx.com
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---SGCXTcBLa7bQoiQja8Rw9KWrTlUHNj4BW
-From: Max Reitz <mreitz@redhat.com>
-To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
-Cc: rjones@redhat.com, qemu-block@nongnu.org
-Message-ID: <fd8c0dcf-57c5-998d-e5ff-a028e0048968@redhat.com>
-Subject: Re: [Qemu-block] [PATCH v3 0/7] curl: locking cleanups/fixes,
- coroutine conversion, remove aio_poll
-References: <20170515100059.15795-1-pbonzini@redhat.com>
-In-Reply-To: <20170515100059.15795-1-pbonzini@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+v6 was here:
+https://lists.gnu.org/archive/html/qemu-devel/2017-05/msg01380.html
+v7 was here:
+https://lists.gnu.org/archive/html/qemu-devel/2017-05/msg01848.html
 
-On 2017-05-15 12:00, Paolo Bonzini wrote:
-> Compared to v2, this silences checkpatch and correctly destroy the mute=
-x on
-> exiting from curl_open with an error.
->=20
-> Paolo
->=20
-> Paolo Bonzini (7):
->   curl: strengthen assertion in curl_clean_state
->   curl: never invoke callbacks with s->mutex held
->   curl: avoid recursive locking of BDRVCURLState mutex
->   curl: split curl_find_state/curl_init_state
->   curl: convert CURLAIOCB to byte values
->   curl: convert readv to coroutines
->   curl: do not do aio_poll when waiting for a free CURLState
->=20
->  block/curl.c | 217 +++++++++++++++++++++++++++++++++------------------=
---------
->  1 file changed, 121 insertions(+), 96 deletions(-)
+Since then:
+- reorder the series [Markus]
+- tweak some comments [Markus]
+- add helper function in patch 5 [Markus]
 
-Modulo checkpatch:
+001/5:[----] [--] 'shutdown: Simplify shutdown_signal'
+002/5:[0011] [FC] 'shutdown: Prepare for use of an enum in reset/shutdown_request'
+003/5:[0009] [FC] 'shutdown: Preserve shutdown cause through replay'
+004/5:[0014] [FC] 'shutdown: Add source information to SHUTDOWN and RESET'
+005/5:[0010] [FC] 'shutdown: Expose bool cause in SHUTDOWN and RESET events'
 
-Reviewed-by: Max Reitz <mreitz@redhat.com>
+Eric Blake (5):
+  shutdown: Simplify shutdown_signal
+  shutdown: Prepare for use of an enum in reset/shutdown_request
+  shutdown: Preserve shutdown cause through replay
+  shutdown: Add source information to SHUTDOWN and RESET
+  shutdown: Expose bool cause in SHUTDOWN and RESET events
 
+ qapi/event.json             | 17 ++++++++---
+ include/sysemu/replay.h     |  3 +-
+ include/sysemu/sysemu.h     | 31 +++++++++++++++-----
+ replay/replay-internal.h    |  3 +-
+ vl.c                        | 69 ++++++++++++++++++++++++++-------------------
+ hw/acpi/core.c              |  4 +--
+ hw/arm/highbank.c           |  4 +--
+ hw/arm/integratorcp.c       |  2 +-
+ hw/arm/musicpal.c           |  2 +-
+ hw/arm/omap1.c              | 10 ++++---
+ hw/arm/omap2.c              |  2 +-
+ hw/arm/spitz.c              |  2 +-
+ hw/arm/stellaris.c          |  2 +-
+ hw/arm/tosa.c               |  2 +-
+ hw/i386/pc.c                |  2 +-
+ hw/i386/xen/xen-hvm.c       |  9 ++++--
+ hw/input/pckbd.c            |  4 +--
+ hw/ipmi/ipmi.c              |  4 +--
+ hw/isa/lpc_ich9.c           |  2 +-
+ hw/mips/boston.c            |  2 +-
+ hw/mips/mips_malta.c        |  2 +-
+ hw/mips/mips_r4k.c          |  4 +--
+ hw/misc/arm_sysctl.c        |  8 +++---
+ hw/misc/cbus.c              |  2 +-
+ hw/misc/macio/cuda.c        |  4 +--
+ hw/misc/slavio_misc.c       |  4 +--
+ hw/misc/zynq_slcr.c         |  2 +-
+ hw/pci-host/apb.c           |  4 +--
+ hw/pci-host/bonito.c        |  2 +-
+ hw/pci-host/piix.c          |  2 +-
+ hw/ppc/e500.c               |  2 +-
+ hw/ppc/mpc8544_guts.c       |  2 +-
+ hw/ppc/ppc.c                |  2 +-
+ hw/ppc/ppc405_uc.c          |  2 +-
+ hw/ppc/spapr_hcall.c        |  2 +-
+ hw/ppc/spapr_rtas.c         |  4 +--
+ hw/s390x/ipl.c              |  2 +-
+ hw/sh4/r2d.c                |  2 +-
+ hw/timer/etraxfs_timer.c    |  2 +-
+ hw/timer/m48t59.c           |  4 +--
+ hw/timer/milkymist-sysctl.c |  4 +--
+ hw/timer/pxa2xx_timer.c     |  2 +-
+ hw/watchdog/watchdog.c      |  2 +-
+ hw/xenpv/xen_domainbuild.c  |  2 +-
+ hw/xtensa/xtfpga.c          |  2 +-
+ kvm-all.c                   |  6 ++--
+ migration/colo.c            |  2 +-
+ migration/savevm.c          |  2 +-
+ os-win32.c                  |  2 +-
+ qmp.c                       |  4 +--
+ replay/replay.c             |  9 +++---
+ target/alpha/sys_helper.c   |  4 +--
+ target/arm/psci.c           |  4 +--
+ target/i386/excp_helper.c   |  2 +-
+ target/i386/hax-all.c       |  6 ++--
+ target/i386/helper.c        |  2 +-
+ target/i386/kvm.c           |  2 +-
+ target/s390x/helper.c       |  2 +-
+ target/s390x/kvm.c          |  4 +--
+ target/s390x/misc_helper.c  |  4 +--
+ target/sparc/int32_helper.c |  2 +-
+ ui/sdl.c                    |  2 +-
+ ui/sdl2.c                   |  4 +--
+ tests/qemu-iotests/071.out  |  4 +--
+ tests/qemu-iotests/081.out  |  2 +-
+ tests/qemu-iotests/087.out  | 12 ++++----
+ tests/qemu-iotests/094.out  |  2 +-
+ tests/qemu-iotests/117.out  |  2 +-
+ tests/qemu-iotests/119.out  |  2 +-
+ tests/qemu-iotests/120.out  |  2 +-
+ tests/qemu-iotests/140.out  |  2 +-
+ tests/qemu-iotests/143.out  |  2 +-
+ tests/qemu-iotests/156.out  |  2 +-
+ trace-events                |  2 +-
+ ui/cocoa.m                  |  2 +-
+ 75 files changed, 195 insertions(+), 150 deletions(-)
 
---SGCXTcBLa7bQoiQja8Rw9KWrTlUHNj4BW
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-
-iQEvBAEBCAAZBQJZGgFXEhxtcmVpdHpAcmVkaGF0LmNvbQAKCRD0B9sAYdXPQPEF
-B/9K6mj0PA/xxw0/0nGgkNPadUZvreX5DnF0J2ESWRgS4rf1aGyJKOfZm8tw25zJ
-vWJwpq5wKtPjKu4Lqn99Kl7UiJdDgKYxR/gZqJyrucxj5PE6hiYqGnFEKdfXPox1
-Ci4kWpJYqfFpnFghq+DYnNLsMVNbv3nGjn8+oL78jtw6GbAqgXfaeXLkPvM05euD
-ssby97yp9xsIEgRtSAKgE3gwdxNA6/KRqjfDZ9v9mYply/5WAsqRcMqbB7tdTN5z
-ZOtIISRay1lzUeFqyoLkRkmRf972sbLVKptIac09o9cirv7G/ViYQdjRF3S/4qu9
-0KPsdVRO3NOVrhG8RHFnEkTe
-=2VpG
------END PGP SIGNATURE-----
-
---SGCXTcBLa7bQoiQja8Rw9KWrTlUHNj4BW--
+-- 
+2.9.4
