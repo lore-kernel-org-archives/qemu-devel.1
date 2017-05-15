@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38284)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38441)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Milos.Stojanovic@rt-rk.com>) id 1dAHZC-0003Tl-SD
-	for qemu-devel@nongnu.org; Mon, 15 May 2017 11:05:51 -0400
+	(envelope-from <Milos.Stojanovic@rt-rk.com>) id 1dAHZj-0003sX-S6
+	for qemu-devel@nongnu.org; Mon, 15 May 2017 11:06:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <Milos.Stojanovic@rt-rk.com>) id 1dAHZ8-0006QX-A0
-	for qemu-devel@nongnu.org; Mon, 15 May 2017 11:05:46 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:46755 helo=mail.rt-rk.com)
+	(envelope-from <Milos.Stojanovic@rt-rk.com>) id 1dAHZf-0006e0-Tg
+	for qemu-devel@nongnu.org; Mon, 15 May 2017 11:06:19 -0400
+Received: from mx2.rt-rk.com ([89.216.37.149]:47055 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <Milos.Stojanovic@rt-rk.com>)
-	id 1dAHZ8-0006Pp-2G
-	for qemu-devel@nongnu.org; Mon, 15 May 2017 11:05:42 -0400
+	id 1dAHZf-0006dS-N1
+	for qemu-devel@nongnu.org; Mon, 15 May 2017 11:06:15 -0400
 From: =?UTF-8?q?Milo=C5=A1=20Stojanovi=C4=87?= <Milos.Stojanovic@rt-rk.com>
-Date: Mon, 15 May 2017 16:59:50 +0200
-Message-Id: <1494860396-24930-11-git-send-email-Milos.Stojanovic@rt-rk.com>
+Date: Mon, 15 May 2017 16:59:51 +0200
+Message-Id: <1494860396-24930-12-git-send-email-Milos.Stojanovic@rt-rk.com>
 In-Reply-To: <1494860396-24930-1-git-send-email-Milos.Stojanovic@rt-rk.com>
 References: <1494860396-24930-1-git-send-email-Milos.Stojanovic@rt-rk.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v2 10/16] [RFC] linux-user: add support for
- tracking the target signal mask
+Subject: [Qemu-devel] [PATCH v2 11/16] [RFC] linux-user: add
+ target_sigdelset() and target_sigorset()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,74 +31,56 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, riku.voipio@iki.fi
 Cc: laurent@vivier.eu, Miodrag.Dinic@rt-rk.com, Aleksandar.Markovic@rt-rk.com, Petar.Jovanovic@rt-rk.com, yongbok.kim@imgtec.com, Milos.Stojanovic@rt-rk.com
 
-If TRACK_TARGET_SIGMASK is defined, add fields in the TaskState structure
-which will hold the target signal and suspend mask and add support for
-initialization and forking. No functional changes are being introduced in
-this commit. The TRACK_TARGET_SIGMASK will be defined in a later commit
-where the target signal masks will be needed in order to implement
-multiplexing of real-time target signals which are out of the host range.
+Add two inline functions that work with the signal set of the target.
 
-Currently, QEMU has a copy of the host signal and suspend masks and that
-is usually enough, since most of the time the signal mask of the target
-architecture is either the same length or narrower. If however the signal
-mask is wider, then part of it won't be tracked.
+target_sigdelset() removes a signal from target_sigset_t.
+target_sigorset() creates a union of two target_sigset_t.
 
-This commit enables adding support for separately tracking the target
-signal masks in the following commits.
+These functions will be used for introducing support for tracking the
+target signal set. Functions for emptying and adding into a target signal
+set already exist so this commit will serve as a supplement.
 
 Signed-off-by: Milo=C5=A1 Stojanovi=C4=87 <Milos.Stojanovic@rt-rk.com>
 ---
- linux-user/qemu.h    | 5 +++++
- linux-user/signal.c  | 3 +++
- linux-user/syscall.c | 3 +++
- 3 files changed, 11 insertions(+)
+ linux-user/signal.c | 16 ++++++++++++++++
+ 1 file changed, 16 insertions(+)
 
-diff --git a/linux-user/qemu.h b/linux-user/qemu.h
-index 4edd7d0..6ce0811 100644
---- a/linux-user/qemu.h
-+++ b/linux-user/qemu.h
-@@ -139,6 +139,11 @@ typedef struct TaskState {
-      * currently in the middle of such a syscall
-      */
-     sigset_t sigsuspend_mask;
-+#ifdef TRACK_TARGET_SIGMASK
-+    /* Track the target signal and suspend masks. */
-+    target_sigset_t target_signal_mask;
-+    target_sigset_t target_sigsuspend_mask;
-+#endif
-     /* Nonzero if we're leaving a sigsuspend and sigsuspend_mask is vali=
-d. */
-     int in_sigsuspend;
-=20
 diff --git a/linux-user/signal.c b/linux-user/signal.c
-index 3d18d1b..54c3be7 100644
+index 54c3be7..ae4da79 100644
 --- a/linux-user/signal.c
 +++ b/linux-user/signal.c
-@@ -485,6 +485,9 @@ void signal_init(void)
+@@ -120,6 +120,12 @@ static inline void target_sigaddset(target_sigset_t =
+*set, int signum)
+     set->sig[signum / TARGET_NSIG_BPW] |=3D mask;
+ }
 =20
-     /* Set the signal mask from the host mask. */
-     sigprocmask(0, 0, &ts->signal_mask);
-+#ifdef TRACK_TARGET_SIGMASK
-+    host_to_target_sigset_internal(&ts->target_signal_mask, &ts->signal_=
-mask);
-+#endif
++static inline void target_sigdelset(target_sigset_t *set, int signum)
++{
++    abi_ulong mask =3D (abi_ulong)1 << (--signum % TARGET_NSIG_BPW);
++    set->sig[signum / TARGET_NSIG_BPW] &=3D ~mask;
++}
++
+ static inline int target_sigismember(const target_sigset_t *set, int sig=
+num)
+ {
+     signum--;
+@@ -127,6 +133,16 @@ static inline int target_sigismember(const target_si=
+gset_t *set, int signum)
+     return ((set->sig[signum / TARGET_NSIG_BPW] & mask) !=3D 0);
+ }
 =20
-     /* set all host signal handlers. ALL signals are blocked during
-        the handlers to serialize them. */
-diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-index d3b769e..94ecae3 100644
---- a/linux-user/syscall.c
-+++ b/linux-user/syscall.c
-@@ -6279,6 +6279,9 @@ static int do_fork(CPUArchState *env, unsigned int =
-flags, abi_ulong newsp,
-         ts->bprm =3D parent_ts->bprm;
-         ts->info =3D parent_ts->info;
-         ts->signal_mask =3D parent_ts->signal_mask;
-+#ifdef TRACK_TARGET_SIGMASK
-+        ts->target_signal_mask =3D parent_ts->target_signal_mask;
-+#endif
-=20
-         if (flags & CLONE_CHILD_CLEARTID) {
-             ts->child_tidptr =3D child_tidptr;
++static inline void target_sigorset(target_sigset_t *set,
++                                   const target_sigset_t *left,
++                                   const target_sigset_t *right)
++{
++    int i;
++    for (i =3D 0; i < TARGET_NSIG_WORDS; i++) {
++        set->sig[i] =3D left->sig[i] | right->sig[i];
++    }
++}
++
+ static void host_to_target_sigset_internal(target_sigset_t *d,
+                                            const sigset_t *s)
+ {
 --=20
 1.9.1
