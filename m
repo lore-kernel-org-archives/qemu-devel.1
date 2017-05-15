@@ -1,21 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35603)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36420)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dAFgc-0007gV-KF
-	for qemu-devel@nongnu.org; Mon, 15 May 2017 09:05:23 -0400
+	(envelope-from <danielhb@linux.vnet.ibm.com>) id 1dAFiR-0000jU-Jb
+	for qemu-devel@nongnu.org; Mon, 15 May 2017 09:07:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dAFgb-000844-Cz
-	for qemu-devel@nongnu.org; Mon, 15 May 2017 09:05:18 -0400
-Date: Mon, 15 May 2017 15:05:00 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20170515130500.GB4018@noname.redhat.com>
-References: <1494851980-6831-1-git-send-email-kwolf@redhat.com>
-	<w51shk6s2y0.fsf@maestria.local.igalia.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <w51shk6s2y0.fsf@maestria.local.igalia.com>
-Subject: Re: [Qemu-devel] [PATCH] qemu-iotests: Test streaming with missing
- job ID
+	(envelope-from <danielhb@linux.vnet.ibm.com>) id 1dAFiM-0000xK-G1
+	for qemu-devel@nongnu.org; Mon, 15 May 2017 09:07:11 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:51457
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <danielhb@linux.vnet.ibm.com>)
+	id 1dAFiM-0000vi-AX
+	for qemu-devel@nongnu.org; Mon, 15 May 2017 09:07:06 -0400
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v4FD40QD059521
+	for <qemu-devel@nongnu.org>; Mon, 15 May 2017 09:07:04 -0400
+Received: from e24smtp02.br.ibm.com (e24smtp02.br.ibm.com [32.104.18.86])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2afcnkh1mg-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Mon, 15 May 2017 09:07:04 -0400
+Received: from localhost
+	by e24smtp02.br.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <danielhb@linux.vnet.ibm.com>;
+	Mon, 15 May 2017 10:07:02 -0300
+From: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
+Date: Mon, 15 May 2017 10:06:49 -0300
+Message-Id: <20170515130650.22764-1-danielhb@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [PATCH v9] migrate pending_events of spapr state
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,43 +36,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alberto Garcia <berto@igalia.com>
-Cc: qemu-block@nongnu.org, kchamart@redhat.com, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: qemu-ppc@nongnu.org, david@gibson.dropbear.id.au, mdroth@linux.vnet.ibm.com
 
-Am 15.05.2017 um 14:46 hat Alberto Garcia geschrieben:
-> On Mon 15 May 2017 02:39:40 PM CEST, Kevin Wolf wrote:
-> > This adds a small test for the image streaming error path for failing
-> > block_job_create(), which would have found the null pointer dereference
-> > in commit a170a91f.
-> >
-> > Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-> > ---
-> >  tests/qemu-iotests/030     | 4 ++++
-> >  tests/qemu-iotests/030.out | 4 ++--
-> >  2 files changed, 6 insertions(+), 2 deletions(-)
-> >
-> > diff --git a/tests/qemu-iotests/030 b/tests/qemu-iotests/030
-> > index e00c11b..feee861 100755
-> > --- a/tests/qemu-iotests/030
-> > +++ b/tests/qemu-iotests/030
-> > @@ -147,6 +147,10 @@ class TestSingleDrive(iotests.QMPTestCase):
-> >          result = self.vm.qmp('block-stream', device='nonexistent')
-> >          self.assert_qmp(result, 'error/class', 'GenericError')
-> >  
-> > +    def test_job_id_missing(self):
-> > +        result = self.vm.qmp('block-stream', device='mid')
-> > +        self.assert_qmp(result, 'error/class', 'GenericError')
-> 
-> Mmm... but does that trigger the bug?
-> 
-> The bug happens if the user tries to create a stream job on a BDS that:
-> 
-> a) exists
-> b) is not the active node (i.e. needs reopening in read-write mode)
-> c) its node name is not valid for a block job (e.g. it contains a '#')
+This patch was detached from the patchset:
 
-I don't think c) is necessary, block jobs that are owned by a BDS
-identified by a node name always require an explicit job ID. And yes, I
-did test that it actually breaks before your fix.
+"[PATCH v9 0/6] migration/ppc: migrating DRC, ccs_list and pending_events"
 
-Kevin
+Because it is independent and has use outside of the scope of the
+pseries DRC migration patchset.
+
+
+Change log:
+
+v9: no changes
+
+v8: no changes
+
+v7: no changes
+
+v6: - Rebased with QEMU master after 6+ months.
+class and minor improvements.
+    - Added clarifications from the previous v5 discussions in the commit messages.
+
+v5: - Rebased on David's ppc-for-2.8.
+
+v4: - Rebased on David's ppc-for-2.7. 
+
+v3: - Simplify overall design followng discussion with Paolo. No longer need
+      metadata to migrate QTAILQ.
+    - Extend VMStateInfo instead of adding similar fields to VMStateField.
+
+v2: - Put the newly added migrating fields in subsections so that backward 
+      migration is not broken.  
+(link: https://lists.nongnu.org/archive/html/qemu-devel/2016-05/msg04188.html)
+
+v1: - Inital version.
+(link: https://lists.nongnu.org/archive/html/qemu-devel/2016-04/msg02601.html)
+
+
+Jianjun Duan (1):
+  migration: spapr: migrate pending_events of spapr state
+
+ hw/ppc/spapr.c         | 33 +++++++++++++++++++++++++++++++++
+ hw/ppc/spapr_events.c  | 24 +++++++++++++-----------
+ include/hw/ppc/spapr.h |  3 ++-
+ 3 files changed, 48 insertions(+), 12 deletions(-)
+
+-- 
+2.9.3
