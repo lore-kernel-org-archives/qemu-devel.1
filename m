@@ -1,32 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35042)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38878)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dA9bb-0006fT-DK
-	for qemu-devel@nongnu.org; Mon, 15 May 2017 02:35:44 -0400
+	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1dA9vb-00024K-KH
+	for qemu-devel@nongnu.org; Mon, 15 May 2017 02:56:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dA9bY-0004kc-CQ
-	for qemu-devel@nongnu.org; Mon, 15 May 2017 02:35:43 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:55578)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dA9bY-0004im-7F
-	for qemu-devel@nongnu.org; Mon, 15 May 2017 02:35:40 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 45CDA369C3
-	for <qemu-devel@nongnu.org>; Mon, 15 May 2017 06:35:38 +0000 (UTC)
-From: Markus Armbruster <armbru@redhat.com>
-References: <20170509173559.31598-1-marcandre.lureau@redhat.com>
-	<20170509173559.31598-5-marcandre.lureau@redhat.com>
-	<874lwqjzjl.fsf@dusky.pond.sub.org>
-	<20170512090335.6b20c3ec@redhat.com>
-Date: Mon, 15 May 2017 08:35:32 +0200
-In-Reply-To: <20170512090335.6b20c3ec@redhat.com> (Luiz Capitulino's message
-	of "Fri, 12 May 2017 09:03:35 -0400")
-Message-ID: <87bmqu4ogb.fsf@dusky.pond.sub.org>
+	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1dA9vX-0003WS-Ej
+	for qemu-devel@nongnu.org; Mon, 15 May 2017 02:56:23 -0400
+Received: from [59.151.112.132] (port=61654 helo=heian.cn.fujitsu.com)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1dA9vX-0003WG-1q
+	for qemu-devel@nongnu.org; Mon, 15 May 2017 02:56:19 -0400
+References: <1494553288-30764-1-git-send-email-zhangchen.fnst@cn.fujitsu.com>
+	<1494553288-30764-2-git-send-email-zhangchen.fnst@cn.fujitsu.com>
+	<80a52ceb-6e69-f4ee-04c7-1219bb7947c1@amsat.org>
+	<ed2e0bd5-4a69-63d9-497c-b0b6aaac404d@redhat.com>
+From: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
+Message-ID: <11a77586-ec42-d1cd-f4d1-f7444cf5febb@cn.fujitsu.com>
+Date: Mon, 15 May 2017 14:56:14 +0800
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH 04/17] qapi: merge QInt and QFloat in QNum
+In-Reply-To: <ed2e0bd5-4a69-63d9-497c-b0b6aaac404d@redhat.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH V4 01/12] net: Add vnet_hdr_len related
+ arguments in NetClientState
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,19 +30,87 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Luiz Capitulino <lcapitulino@redhat.com>
-Cc: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org
+To: Jason Wang <jasowang@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, qemu devel <qemu-devel@nongnu.org>
+Cc: zhangchen.fnst@cn.fujitsu.com, bian naimeng <biannm@cn.fujitsu.com>, "eddie . dong" <eddie.dong@intel.com>, zhanghailiang <zhang.zhanghailiang@huawei.com>, Li Zhijian <lizhijian@cn.fujitsu.com>, weifuqiang <weifuqiang@huawei.com>
 
-Luiz Capitulino <lcapitulino@redhat.com> writes:
 
-> On Fri, 12 May 2017 09:37:50 +0200
-> Markus Armbruster <armbru@redhat.com> wrote:
+
+On 05/15/2017 11:24 AM, Jason Wang wrote:
 >
->> Luiz, there's a lone question for you further down.  Search for your
->> name.
 >
-> I could not a question, can you paste it here?
+> On 2017年05月14日 05:24, Philippe Mathieu-Daudé wrote:
+>> Hi Zhang
+>>
+>> On 05/11/2017 10:41 PM, Zhang Chen wrote:
+>>> Add vnet_hdr_len and using_vnet_hdr arguments in NetClientState
+>>> that make othermodule get real vnet_hdr_len easily.
+>>>
+>>> Signed-off-by: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
+>>> ---
+>>>  include/net/net.h | 2 ++
+>>>  net/net.c         | 2 ++
+>>>  2 files changed, 4 insertions(+)
+>>>
+>>> diff --git a/include/net/net.h b/include/net/net.h
+>>> index 99b28d5..70edfc0 100644
+>>> --- a/include/net/net.h
+>>> +++ b/include/net/net.h
+>>> @@ -100,6 +100,8 @@ struct NetClientState {
+>>>      unsigned int queue_index;
+>>>      unsigned rxfilter_notify_enabled:1;
+>>>      int vring_enable;
+>>> +    bool using_vnet_hdr;
+>>> +    int vnet_hdr_len;
+>>>      QTAILQ_HEAD(NetFilterHead, NetFilterState) filters;
+>>>  };
+>>>
+>>> diff --git a/net/net.c b/net/net.c
+>>> index 0ac3b9e..a00a0c9 100644
+>>> --- a/net/net.c
+>>> +++ b/net/net.c
+>>> @@ -472,6 +472,7 @@ void qemu_using_vnet_hdr(NetClientState *nc, 
+>>> bool enable)
+>>>          return;
+>>>      }
+>>>
+>>> +    nc->using_vnet_hdr = enable;
+>>>      nc->info->using_vnet_hdr(nc, enable);
+>>>  }
+>>>
+>>> @@ -491,6 +492,7 @@ void qemu_set_vnet_hdr_len(NetClientState *nc, 
+>>> int len)
+>>>          return;
+>>>      }
+>>>
+>>> +    nc->vnet_hdr_len = len;
+>>>      nc->info->set_vnet_hdr_len(nc, len);
+>>>  }
+>>>
+>>
+>> For what it's worth, now having those fields in NetClientState it is 
+>> possible to remove a deref to NetClientInfo in qemu_has_vnet_hdr() 
+>> and qemu_has_vnet_hdr_len().
+>>
+>> Anyway,
+>> Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+>>
+>>
+>
+> Yes and this could be done on top with removing private e.g vnet_hdr_len.
 
-Uh, I actually spun it out into its own message, so you don't have to
-wade through this one, then forgot to update this one.  I award myself
-one point out of ten for trying.
+Do you means we will remove the qemu_has_vnet_hdr() and 
+qemu_has_vnet_hdr_len() in the future?
+
+Thanks
+Zhang Chen
+
+>
+> Thanks
+>
+>
+> .
+>
+
+-- 
+Thanks
+Zhang Chen
