@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47761)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48080)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1dAAim-00066s-6j
-	for qemu-devel@nongnu.org; Mon, 15 May 2017 03:47:13 -0400
+	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1dAAkW-00072Z-GF
+	for qemu-devel@nongnu.org; Mon, 15 May 2017 03:49:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1dAAij-0000bT-3H
-	for qemu-devel@nongnu.org; Mon, 15 May 2017 03:47:12 -0400
-Received: from [59.151.112.132] (port=36175 helo=heian.cn.fujitsu.com)
+	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1dAAkT-0001HX-DZ
+	for qemu-devel@nongnu.org; Mon, 15 May 2017 03:49:00 -0400
+Received: from [59.151.112.132] (port=53891 helo=heian.cn.fujitsu.com)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1dAAii-0000Zf-3q
-	for qemu-devel@nongnu.org; Mon, 15 May 2017 03:47:09 -0400
+	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1dAAkS-0001H8-E5
+	for qemu-devel@nongnu.org; Mon, 15 May 2017 03:48:57 -0400
 References: <1494553288-30764-1-git-send-email-zhangchen.fnst@cn.fujitsu.com>
-	<1494553288-30764-5-git-send-email-zhangchen.fnst@cn.fujitsu.com>
-	<e27f514c-b2eb-838a-d8cd-4de0a66591cb@redhat.com>
+	<1494553288-30764-6-git-send-email-zhangchen.fnst@cn.fujitsu.com>
+	<adbf3cf7-29c5-13c3-c4ff-d05598c7bb17@redhat.com>
 From: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
-Message-ID: <80c4d00e-8549-503f-de35-ff03d65af9ea@cn.fujitsu.com>
-Date: Mon, 15 May 2017 15:47:15 +0800
+Message-ID: <34128ab7-e2b2-fb10-2dad-0f54a3f907ff@cn.fujitsu.com>
+Date: Mon, 15 May 2017 15:49:05 +0800
 MIME-Version: 1.0
-In-Reply-To: <e27f514c-b2eb-838a-d8cd-4de0a66591cb@redhat.com>
+In-Reply-To: <adbf3cf7-29c5-13c3-c4ff-d05598c7bb17@redhat.com>
 Content-Type: text/plain; charset="utf-8"; format=flowed
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH V4 04/12] net/filter-mirror.c: Add new
- option to enable vnet support for filter-redirector
+Subject: Re: [Qemu-devel] [PATCH V4 05/12] net/net.c: Add vnet_hdr support
+ in SocketReadState
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,16 +35,62 @@ Cc: zhangchen.fnst@cn.fujitsu.com, zhanghailiang <zhang.zhanghailiang@huawei.com
 
 
 
-On 05/15/2017 11:31 AM, Jason Wang wrote:
+On 05/15/2017 12:02 PM, Jason Wang wrote:
 >
 >
 > On 2017年05月12日 09:41, Zhang Chen wrote:
->> We add the vnet_hdr option for filter-redirector, default is disable.
->> If you use virtio-net-pci net driver, please enable it.
+>> Address Jason Wang's comments add vnet header length to SocketReadState.
 >
-> We need a better commit log here to explain e.g why we need this option.
+> Better to use "Suggested-by" instead of this :).
 
-OK. I will more comments in next version.
+I got it~
+
+>
+>> We add a flag to dicide whether net_fill_rstate() to read
+>> struct  {int size; int vnet_hdr_len; const uint8_t buf[];} or not.
+>
+> Few words to explain the format is better than e.g a struct.
+
+OK, will fix it in next version.
+
+>
+>>
+>> Signed-off-by: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
+>> ---
+>>   include/net/net.h   |  9 +++++++--
+>>   net/colo-compare.c  |  4 ++--
+>>   net/filter-mirror.c |  2 +-
+>>   net/net.c           | 36 ++++++++++++++++++++++++++++++++----
+>>   net/socket.c        |  2 +-
+>>   5 files changed, 43 insertions(+), 10 deletions(-)
+>>
+>> diff --git a/include/net/net.h b/include/net/net.h
+>> index 70edfc0..0763636 100644
+>> --- a/include/net/net.h
+>> +++ b/include/net/net.h
+>> @@ -113,14 +113,19 @@ typedef struct NICState {
+>>   } NICState;
+>>     struct SocketReadState {
+>> -    int state; /* 0 = getting length, 1 = getting data */
+>> +    /* 0 = getting length, 1 = getting vnet header length, 2 = 
+>> getting data */
+>> +    int state;
+>>       uint32_t index;
+>>       uint32_t packet_len;
+>> +    uint32_t vnet_hdr_len;
+>>       uint8_t buf[NET_BUFSIZE];
+>>       SocketReadStateFinalize *finalize;
+>>   };
+>>   -int net_fill_rstate(SocketReadState *rs, const uint8_t *buf, int 
+>> size);
+>> +int net_fill_rstate(SocketReadState *rs,
+>> +                    const uint8_t *buf,
+>> +                    int size,
+>> +                    bool vnet_hdr);
+>
+> Why not just move vnet_hdr to SocketReadState?
+
+Good idea.
 
 Thanks
 Zhang Chen
@@ -52,102 +98,115 @@ Zhang Chen
 >
 > Thanks
 >
->> You can use it for example:
->> -object 
->> filter-redirector,id=r0,netdev=hn0,queue=tx,outdev=red0,vnet_hdr=on
->>
->> Signed-off-by: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
->> ---
->>   net/filter-mirror.c | 33 +++++++++++++++++++++++++++++++++
->>   qemu-options.hx     |  5 +++--
->>   2 files changed, 36 insertions(+), 2 deletions(-)
->>
+>>   char *qemu_mac_strdup_printf(const uint8_t *macaddr);
+>>   NetClientState *qemu_find_netdev(const char *id);
+>>   int qemu_find_net_clients_except(const char *id, NetClientState **ncs,
+>> diff --git a/net/colo-compare.c b/net/colo-compare.c
+>> index 4ab80b1..332f57e 100644
+>> --- a/net/colo-compare.c
+>> +++ b/net/colo-compare.c
+>> @@ -530,7 +530,7 @@ static void compare_pri_chr_in(void *opaque, 
+>> const uint8_t *buf, int size)
+>>       CompareState *s = COLO_COMPARE(opaque);
+>>       int ret;
+>>   -    ret = net_fill_rstate(&s->pri_rs, buf, size);
+>> +    ret = net_fill_rstate(&s->pri_rs, buf, size, false);
+>>       if (ret == -1) {
+>>           qemu_chr_fe_set_handlers(&s->chr_pri_in, NULL, NULL, NULL,
+>>                                    NULL, NULL, true);
+>> @@ -547,7 +547,7 @@ static void compare_sec_chr_in(void *opaque, 
+>> const uint8_t *buf, int size)
+>>       CompareState *s = COLO_COMPARE(opaque);
+>>       int ret;
+>>   -    ret = net_fill_rstate(&s->sec_rs, buf, size);
+>> +    ret = net_fill_rstate(&s->sec_rs, buf, size, false);
+>>       if (ret == -1) {
+>>           qemu_chr_fe_set_handlers(&s->chr_sec_in, NULL, NULL, NULL,
+>>                                    NULL, NULL, true);
 >> diff --git a/net/filter-mirror.c b/net/filter-mirror.c
->> index 64323fc..a65853c 100644
+>> index a65853c..4649416 100644
 >> --- a/net/filter-mirror.c
 >> +++ b/net/filter-mirror.c
->> @@ -377,6 +377,13 @@ static char *filter_redirector_get_outdev(Object 
->> *obj, Error **errp)
->>       return g_strdup(s->outdev);
->>   }
->>   +static char *filter_redirector_get_vnet_hdr(Object *obj, Error 
->> **errp)
->> +{
->> +    MirrorState *s = FILTER_REDIRECTOR(obj);
->> +
->> +    return s->vnet_hdr ? g_strdup("on") : g_strdup("off");
->> +}
->> +
->>   static void
->>   filter_redirector_set_outdev(Object *obj, const char *value, Error 
->> **errp)
+>> @@ -134,7 +134,7 @@ static void redirector_chr_read(void *opaque, 
+>> const uint8_t *buf, int size)
+>>       MirrorState *s = FILTER_REDIRECTOR(nf);
+>>       int ret;
+>>   -    ret = net_fill_rstate(&s->rs, buf, size);
+>> +    ret = net_fill_rstate(&s->rs, buf, size, s->vnet_hdr);
+>>         if (ret == -1) {
+>>           qemu_chr_fe_set_handlers(&s->chr_in, NULL, NULL, NULL,
+>> diff --git a/net/net.c b/net/net.c
+>> index a00a0c9..a9c97cf 100644
+>> --- a/net/net.c
+>> +++ b/net/net.c
+>> @@ -1618,13 +1618,20 @@ void net_socket_rs_init(SocketReadState *rs,
+>>    * 0: success
+>>    * -1: error occurs
+>>    */
+>> -int net_fill_rstate(SocketReadState *rs, const uint8_t *buf, int size)
+>> +int net_fill_rstate(SocketReadState *rs,
+>> +                    const uint8_t *buf,
+>> +                    int size,
+>> +                    bool vnet_hdr)
 >>   {
->> @@ -386,6 +393,21 @@ filter_redirector_set_outdev(Object *obj, const 
->> char *value, Error **errp)
->>       s->outdev = g_strdup(value);
->>   }
->>   +static void filter_redirector_set_vnet_hdr(Object *obj,
->> +                                           const char *value,
->> +                                           Error **errp)
->> +{
->> +    MirrorState *s = FILTER_REDIRECTOR(obj);
->> +
->> +    if (strcmp(value, "on") && strcmp(value, "off")) {
->> +        error_setg(errp, "Invalid value for filter-redirector 
->> vnet_hdr, "
->> +                         "should be 'on' or 'off'");
->> +        return;
->> +    }
->> +
->> +    s->vnet_hdr = !strcmp(value, "on");
->> +}
->> +
->>   static void filter_mirror_init(Object *obj)
->>   {
->>       MirrorState *s = FILTER_MIRROR(obj);
->> @@ -405,10 +427,21 @@ static void filter_mirror_init(Object *obj)
->>     static void filter_redirector_init(Object *obj)
->>   {
->> +    MirrorState *s = FILTER_REDIRECTOR(obj);
->> +
->>       object_property_add_str(obj, "indev", filter_redirector_get_indev,
->>                               filter_redirector_set_indev, NULL);
->>       object_property_add_str(obj, "outdev", 
->> filter_redirector_get_outdev,
->>                               filter_redirector_set_outdev, NULL);
->> +
->> +    /*
->> +     * The vnet_hdr is disabled by default, if you want to enable
->> +     * this option, you must enable all the option on related modules
->> +     * (like other filter or colo-compare).
->> +     */
->> +    s->vnet_hdr = false;
->> +    object_property_add_str(obj, "vnet_hdr", 
->> filter_redirector_get_vnet_hdr,
->> +                            filter_redirector_set_vnet_hdr, NULL);
->>   }
->>     static void filter_mirror_fini(Object *obj)
->> diff --git a/qemu-options.hx b/qemu-options.hx
->> index 1e08481..0f81c22 100644
->> --- a/qemu-options.hx
->> +++ b/qemu-options.hx
->> @@ -4031,10 +4031,11 @@ filter-mirror on netdev @var{netdevid},mirror 
->> net packet to chardev
->>   with vnet_hdr_len.
->>     @item -object 
->> filter-redirector,id=@var{id},netdev=@var{netdevid},indev=@var{chardevid},
->> -outdev=@var{chardevid}[,queue=@var{all|rx|tx}]
->> +outdev=@var{chardevid},vnet_hdr=@var{on|off}[,queue=@var{all|rx|tx}]
->>     filter-redirector on netdev @var{netdevid},redirect filter's net 
->> packet to chardev
->> -@var{chardevid},and redirect indev's packet to filter.
->> +@var{chardevid},and redirect indev's packet to filter.if vnet_hdr = on,
->> +filter-redirector will redirect packet with vnet_hdr_len.
->>   Create a filter-redirector we need to differ outdev id from indev 
->> id, id can not
->>   be the same. we can just use indev or outdev, but at least one of 
->> indev or outdev
->>   need to be specified.
+>>       unsigned int l;
+>>         while (size > 0) {
+>> -        /* reassemble a packet from the network */
+>> -        switch (rs->state) { /* 0 = getting length, 1 = getting data */
+>> +        /* Reassemble a packet from the network.
+>> +         * 0 = getting length.
+>> +         * 1 = getting vnet header length.
+>> +         * 2 = getting data.
+>> +         */
+>> +        switch (rs->state) {
+>>           case 0:
+>>               l = 4 - rs->index;
+>>               if (l > size) {
+>> @@ -1638,10 +1645,31 @@ int net_fill_rstate(SocketReadState *rs, 
+>> const uint8_t *buf, int size)
+>>                   /* got length */
+>>                   rs->packet_len = ntohl(*(uint32_t *)rs->buf);
+>>                   rs->index = 0;
+>> -                rs->state = 1;
+>> +                if (vnet_hdr) {
+>> +                    rs->state = 1;
+>> +                } else {
+>> +                    rs->state = 2;
+>> +                    rs->vnet_hdr_len = 0;
+>> +                }
+>>               }
+>>               break;
+>>           case 1:
+>> +            l = 4 - rs->index;
+>> +            if (l > size) {
+>> +                l = size;
+>> +            }
+>> +            memcpy(rs->buf + rs->index, buf, l);
+>> +            buf += l;
+>> +            size -= l;
+>> +            rs->index += l;
+>> +            if (rs->index == 4) {
+>> +                /* got vnet header length */
+>> +                rs->vnet_hdr_len = ntohl(*(uint32_t *)rs->buf);
+>> +                rs->index = 0;
+>> +                rs->state = 2;
+>> +            }
+>> +            break;
+>> +        case 2:
+>>               l = rs->packet_len - rs->index;
+>>               if (l > size) {
+>>                   l = size;
+>> diff --git a/net/socket.c b/net/socket.c
+>> index b8c931e..4e58eff 100644
+>> --- a/net/socket.c
+>> +++ b/net/socket.c
+>> @@ -182,7 +182,7 @@ static void net_socket_send(void *opaque)
+>>       }
+>>       buf = buf1;
+>>   -    ret = net_fill_rstate(&s->rs, buf, size);
+>> +    ret = net_fill_rstate(&s->rs, buf, size, false);
+>>         if (ret == -1) {
+>>           goto eoc;
 >
 >
 >
