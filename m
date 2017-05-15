@@ -1,31 +1,36 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37309)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37816)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1dAFkp-0002dr-Ba
-	for qemu-devel@nongnu.org; Mon, 15 May 2017 09:09:43 -0400
+	(envelope-from <danielhb@linux.vnet.ibm.com>) id 1dAFmJ-0003eF-6Q
+	for qemu-devel@nongnu.org; Mon, 15 May 2017 09:11:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1dAFkk-00036u-CV
-	for qemu-devel@nongnu.org; Mon, 15 May 2017 09:09:39 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47088)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1dAFkk-00036n-57
-	for qemu-devel@nongnu.org; Mon, 15 May 2017 09:09:34 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 583BA13AA1
-	for <qemu-devel@nongnu.org>; Mon, 15 May 2017 13:09:33 +0000 (UTC)
-From: Juan Quintela <quintela@redhat.com>
-In-Reply-To: <20170515130202.GG2089@work-vm> (David Alan Gilbert's message of
-	"Mon, 15 May 2017 14:02:03 +0100")
-References: <20170503104257.5127-1-dgilbert@redhat.com>
-	<87pofpizmj.fsf@secure.mitica> <20170515130202.GG2089@work-vm>
-Reply-To: quintela@redhat.com
-Date: Mon, 15 May 2017 15:09:29 +0200
-Message-ID: <8737c6fera.fsf@secure.mitica>
-MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH] block migration: Allow compile time disable
+	(envelope-from <danielhb@linux.vnet.ibm.com>) id 1dAFmH-0004D5-KP
+	for qemu-devel@nongnu.org; Mon, 15 May 2017 09:11:11 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:52801
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <danielhb@linux.vnet.ibm.com>)
+	id 1dAFmH-0004Cv-FO
+	for qemu-devel@nongnu.org; Mon, 15 May 2017 09:11:09 -0400
+Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v4FD47Ug187486
+	for <qemu-devel@nongnu.org>; Mon, 15 May 2017 09:11:09 -0400
+Received: from e24smtp04.br.ibm.com (e24smtp04.br.ibm.com [32.104.18.25])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2afbmxveej-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Mon, 15 May 2017 09:11:08 -0400
+Received: from localhost
+	by e24smtp04.br.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <danielhb@linux.vnet.ibm.com>;
+	Mon, 15 May 2017 10:11:06 -0300
+From: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
+Date: Mon, 15 May 2017 10:10:52 -0300
+In-Reply-To: <20170515131052.23457-1-danielhb@linux.vnet.ibm.com>
+References: <20170515131052.23457-1-danielhb@linux.vnet.ibm.com>
+Message-Id: <20170515131052.23457-2-danielhb@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [PATCH v10] migration: spapr: migrate pending_events
+ of spapr state
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,92 +39,205 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: qemu-devel@nongnu.org, jcody@redhat.com, kwolf@redhat.com, kashyap@redhat.com
+To: qemu-devel@nongnu.org
+Cc: qemu-ppc@nongnu.org, david@gibson.dropbear.id.au, mdroth@linux.vnet.ibm.com
 
-"Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
-> * Juan Quintela (quintela@redhat.com) wrote:
->> "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com> wrote:
->> > From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
->> >
->> > Many users now prefer to use drive_mirror over NBD as an
->> > alternative to the older migrate -b option; drive_mirror is
->> > more complex to setup but gives you more options (e.g. only
->> > migrating some of the disks if some of them are shared).
->> >
->> > Allow the large chunk of block migration code to be compiled
->> > out for those who don't use it.
->> >
->> > Based on a downstream-patch we've had for a while by Jeff Cody.
->> >
->> > Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
->> 
->> Reviewed-by: Juan Quintela <quintela@redhat.com>
->> 
->> > diff --git a/migration/migration.c b/migration/migration.c
->> > index 353f2728cf..ffce72aabc 100644
->> > --- a/migration/migration.c
->> > +++ b/migration/migration.c
->> > @@ -692,6 +692,7 @@ MigrationInfo *qmp_query_migrate(Error **errp)
->> >  
->> >          populate_ram_info(info, s);
->> >  
->> > +#ifdef CONFIG_LIVE_BLOCK_MIGRATION
->> >          if (blk_mig_active()) {
->> >              info->has_disk = true;
->> >              info->disk = g_malloc0(sizeof(*info->disk));
->> > @@ -699,6 +700,7 @@ MigrationInfo *qmp_query_migrate(Error **errp)
->> >              info->disk->remaining = blk_mig_bytes_remaining();
->> >              info->disk->total = blk_mig_bytes_total();
->> >          }
->> > +#endif
->> 
->> I think it can be cleaner to move this inside block.c and just export a
->> function that is empty in case it is compiled out, but that it is just
->> me, so you got the revieweb by anyways.
->> 
->> >          }
->> >      }
->> >  
->> > +#ifdef CONFIG_LIVE_BLOCK_MIGRATION
->> >      blk_mig_init();
->> > +#endif
->> >      ram_mig_init();
->> >  
->> >      /* If the currently selected machine wishes to override the units-per-bus
->> 
->> Same here, I preffer the ifdef in the header than here.
->
-> OK, done I've now got the block.h header having:
-> #ifdef CONFIG_LIVE_BLOCK_MIGRATION
-> void blk_mig_init(void);
-> int blk_mig_active(void);
-> uint64_t blk_mig_bytes_transferred(void);
-> uint64_t blk_mig_bytes_remaining(void);
-> uint64_t blk_mig_bytes_total(void);
->
-> #else
-> static inline void blk_mig_init(void) { };
-> static inline int blk_mig_active(void)
-> {
->     return false;
-> }
-> static inline uint64_t blk_mig_bytes_transferred(void)
-> {
->     return 0;
-> }
->
-> static inline uint64_t blk_mig_bytes_remaining(void)
-> {
->     return 0;
-> }
->
-> static inline uint64_t blk_mig_bytes_total(void)
-> {
->     return 0;
-> }
-> #endif /* CONFIG_LIVE_BLOCK_MIGRATION */
->
-> Dave
+From: Jianjun Duan <duanj@linux.vnet.ibm.com>
 
-good for me.  Thanks.
+In racing situations between hotplug events and migration operation,
+a rtas hotplug event could have not yet be delivered to the source
+guest when migration is started. In this case the pending_events of
+spapr state need be transmitted to the target so that the hotplug
+event can be finished on the target.
+
+All the different fields of the events are encoded as defined by
+PAPR. We can migrate them as uint8_t binary stream without any
+concerns about data padding or endianess.
+
+pending_events is put in a subsection in the spapr state VMSD to make
+sure migration across different versions is not broken.
+
+Signed-off-by: Jianjun Duan <duanj@linux.vnet.ibm.com>
+Signed-off-by: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
+---
+ hw/ppc/spapr.c         | 33 +++++++++++++++++++++++++++++++++
+ hw/ppc/spapr_events.c  | 24 +++++++++++++-----------
+ include/hw/ppc/spapr.h |  3 ++-
+ 3 files changed, 48 insertions(+), 12 deletions(-)
+
+diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+index 80d12d0..8cfdc71 100644
+--- a/hw/ppc/spapr.c
++++ b/hw/ppc/spapr.c
+@@ -1437,6 +1437,38 @@ static bool version_before_3(void *opaque, int version_id)
+     return version_id < 3;
+ }
+ 
++static bool spapr_pending_events_needed(void *opaque)
++{
++    sPAPRMachineState *spapr = (sPAPRMachineState *)opaque;
++    return !QTAILQ_EMPTY(&spapr->pending_events);
++}
++
++static const VMStateDescription vmstate_spapr_event_entry = {
++    .name = "spapr_event_log_entry",
++    .version_id = 1,
++    .minimum_version_id = 1,
++    .fields = (VMStateField[]) {
++        VMSTATE_INT32(log_type, sPAPREventLogEntry),
++        VMSTATE_BOOL(exception, sPAPREventLogEntry),
++        VMSTATE_UINT32(data_size, sPAPREventLogEntry),
++        VMSTATE_VARRAY_UINT32_ALLOC(data, sPAPREventLogEntry, data_size,
++                                    0, vmstate_info_uint8, uint8_t),
++        VMSTATE_END_OF_LIST()
++    },
++};
++
++static const VMStateDescription vmstate_spapr_pending_events = {
++    .name = "spapr_pending_events",
++    .version_id = 1,
++    .minimum_version_id = 1,
++    .needed = spapr_pending_events_needed,
++    .fields = (VMStateField[]) {
++        VMSTATE_QTAILQ_V(pending_events, sPAPRMachineState, 1,
++                         vmstate_spapr_event_entry, sPAPREventLogEntry, next),
++        VMSTATE_END_OF_LIST()
++    },
++};
++
+ static bool spapr_ov5_cas_needed(void *opaque)
+ {
+     sPAPRMachineState *spapr = opaque;
+@@ -1535,6 +1567,7 @@ static const VMStateDescription vmstate_spapr = {
+     .subsections = (const VMStateDescription*[]) {
+         &vmstate_spapr_ov5_cas,
+         &vmstate_spapr_patb_entry,
++        &vmstate_spapr_pending_events,
+         NULL
+     }
+ };
+diff --git a/hw/ppc/spapr_events.c b/hw/ppc/spapr_events.c
+index f0b28d8..70c7cfc 100644
+--- a/hw/ppc/spapr_events.c
++++ b/hw/ppc/spapr_events.c
+@@ -342,7 +342,8 @@ static int rtas_event_log_to_irq(sPAPRMachineState *spapr, int log_type)
+     return source->irq;
+ }
+ 
+-static void rtas_event_log_queue(int log_type, void *data, bool exception)
++static void rtas_event_log_queue(int log_type, void *data, bool exception,
++                                 int data_size)
+ {
+     sPAPRMachineState *spapr = SPAPR_MACHINE(qdev_get_machine());
+     sPAPREventLogEntry *entry = g_new(sPAPREventLogEntry, 1);
+@@ -351,6 +352,7 @@ static void rtas_event_log_queue(int log_type, void *data, bool exception)
+     entry->log_type = log_type;
+     entry->exception = exception;
+     entry->data = data;
++    entry->data_size = data_size;
+     QTAILQ_INSERT_TAIL(&spapr->pending_events, entry, next);
+ }
+ 
+@@ -445,6 +447,7 @@ static void spapr_powerdown_req(Notifier *n, void *opaque)
+     struct rtas_event_log_v6_mainb *mainb;
+     struct rtas_event_log_v6_epow *epow;
+     struct epow_log_full *new_epow;
++    uint32_t data_size;
+ 
+     new_epow = g_malloc0(sizeof(*new_epow));
+     hdr = &new_epow->hdr;
+@@ -453,14 +456,13 @@ static void spapr_powerdown_req(Notifier *n, void *opaque)
+     mainb = &new_epow->mainb;
+     epow = &new_epow->epow;
+ 
++    data_size = sizeof(*new_epow);
+     hdr->summary = cpu_to_be32(RTAS_LOG_VERSION_6
+                                | RTAS_LOG_SEVERITY_EVENT
+                                | RTAS_LOG_DISPOSITION_NOT_RECOVERED
+                                | RTAS_LOG_OPTIONAL_PART_PRESENT
+                                | RTAS_LOG_TYPE_EPOW);
+-    hdr->extended_length = cpu_to_be32(sizeof(*new_epow)
+-                                       - sizeof(new_epow->hdr));
+-
++    hdr->extended_length = cpu_to_be32(data_size - sizeof(new_epow->hdr));
+     spapr_init_v6hdr(v6hdr);
+     spapr_init_maina(maina, 3 /* Main-A, Main-B and EPOW */);
+ 
+@@ -479,7 +481,7 @@ static void spapr_powerdown_req(Notifier *n, void *opaque)
+     epow->event_modifier = RTAS_LOG_V6_EPOW_MODIFIER_NORMAL;
+     epow->extended_modifier = RTAS_LOG_V6_EPOW_XMODIFIER_PARTITION_SPECIFIC;
+ 
+-    rtas_event_log_queue(RTAS_LOG_TYPE_EPOW, new_epow, true);
++    rtas_event_log_queue(RTAS_LOG_TYPE_EPOW, new_epow, true, data_size);
+ 
+     qemu_irq_pulse(xics_get_qirq(XICS_FABRIC(spapr),
+                                  rtas_event_log_to_irq(spapr,
+@@ -504,6 +506,7 @@ static void spapr_hotplug_req_event(uint8_t hp_id, uint8_t hp_action,
+     struct rtas_event_log_v6_maina *maina;
+     struct rtas_event_log_v6_mainb *mainb;
+     struct rtas_event_log_v6_hp *hp;
++    uint32_t data_size;
+ 
+     new_hp = g_malloc0(sizeof(struct hp_log_full));
+     hdr = &new_hp->hdr;
+@@ -512,14 +515,14 @@ static void spapr_hotplug_req_event(uint8_t hp_id, uint8_t hp_action,
+     mainb = &new_hp->mainb;
+     hp = &new_hp->hp;
+ 
++    data_size = sizeof(*new_hp);
+     hdr->summary = cpu_to_be32(RTAS_LOG_VERSION_6
+                                | RTAS_LOG_SEVERITY_EVENT
+                                | RTAS_LOG_DISPOSITION_NOT_RECOVERED
+                                | RTAS_LOG_OPTIONAL_PART_PRESENT
+                                | RTAS_LOG_INITIATOR_HOTPLUG
+                                | RTAS_LOG_TYPE_HOTPLUG);
+-    hdr->extended_length = cpu_to_be32(sizeof(*new_hp)
+-                                       - sizeof(new_hp->hdr));
++    hdr->extended_length = cpu_to_be32(data_size - sizeof(new_hp->hdr));
+ 
+     spapr_init_v6hdr(v6hdr);
+     spapr_init_maina(maina, 3 /* Main-A, Main-B, HP */);
+@@ -572,7 +575,7 @@ static void spapr_hotplug_req_event(uint8_t hp_id, uint8_t hp_action,
+             cpu_to_be32(drc_id->count_indexed.index);
+     }
+ 
+-    rtas_event_log_queue(RTAS_LOG_TYPE_HOTPLUG, new_hp, true);
++    rtas_event_log_queue(RTAS_LOG_TYPE_HOTPLUG, new_hp, true, data_size);
+ 
+     qemu_irq_pulse(xics_get_qirq(XICS_FABRIC(spapr),
+                                  rtas_event_log_to_irq(spapr,
+@@ -671,8 +674,7 @@ static void check_exception(PowerPCCPU *cpu, sPAPRMachineState *spapr,
+     if (!event) {
+         goto out_no_events;
+     }
+-
+-    hdr = event->data;
++    hdr = (struct rtas_error_log *)event->data;
+     event_len = be32_to_cpu(hdr->extended_length) + sizeof(*hdr);
+ 
+     if (event_len < len) {
+@@ -728,7 +730,7 @@ static void event_scan(PowerPCCPU *cpu, sPAPRMachineState *spapr,
+         goto out_no_events;
+     }
+ 
+-    hdr = event->data;
++    hdr = (struct rtas_error_log *)event->data;
+     event_len = be32_to_cpu(hdr->extended_length) + sizeof(*hdr);
+ 
+     if (event_len < len) {
+diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
+index 5802f88..fbe1d93 100644
+--- a/include/hw/ppc/spapr.h
++++ b/include/hw/ppc/spapr.h
+@@ -599,7 +599,8 @@ sPAPRTCETable *spapr_tce_find_by_liobn(target_ulong liobn);
+ struct sPAPREventLogEntry {
+     int log_type;
+     bool exception;
+-    void *data;
++    uint8_t *data;
++    uint32_t data_size;
+     QTAILQ_ENTRY(sPAPREventLogEntry) next;
+ };
+ 
+-- 
+2.9.3
