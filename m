@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34177)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35149)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1dAHGe-0004Tv-JD
-	for qemu-devel@nongnu.org; Mon, 15 May 2017 10:46:37 -0400
+	(envelope-from <eblake@redhat.com>) id 1dAHMT-0005cu-PW
+	for qemu-devel@nongnu.org; Mon, 15 May 2017 10:52:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1dAHGb-00071B-Dg
-	for qemu-devel@nongnu.org; Mon, 15 May 2017 10:46:36 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:16294)
+	(envelope-from <eblake@redhat.com>) id 1dAHMQ-00013r-Lm
+	for qemu-devel@nongnu.org; Mon, 15 May 2017 10:52:37 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:36513)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1dAHGb-00070v-4V
-	for qemu-devel@nongnu.org; Mon, 15 May 2017 10:46:33 -0400
-Date: Mon, 15 May 2017 17:46:28 +0300
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20170515174044-mutt-send-email-mst@kernel.org>
-References: <1494478641-24549-1-git-send-email-wei.w.wang@intel.com>
-	<591974EB.2010409@intel.com>
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dAHMQ-00013N-DK
+	for qemu-devel@nongnu.org; Mon, 15 May 2017 10:52:34 -0400
+References: <20170512155249.8853-1-quintela@redhat.com>
+	<20170515135848.GL1201@stefanha-x1.localdomain>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <feb33c55-a56e-2a87-eafd-fbbe1f3c982b@redhat.com>
+Date: Mon, 15 May 2017 09:52:03 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <591974EB.2010409@intel.com>
-Subject: Re: [Qemu-devel] [PATCH] virtio-net: keep the packet layout intact
+In-Reply-To: <20170515135848.GL1201@stefanha-x1.localdomain>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="JLPuKALgw3F7HjG4lXLKxAx3Nujhd9KFH"
+Subject: Re: [Qemu-devel] [PULL 0/5] Migration pull request
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,104 +28,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Wei Wang <wei.w.wang@intel.com>
-Cc: jasowang@redhat.com, stefanha@gmail.com, marcandre.lureau@gmail.com, pbonzini@redhat.com, virtio-dev@lists.oasis-open.org, qemu-devel@nongnu.org, jan.scheurich@ericsson.com
+To: Stefan Hajnoczi <stefanha@gmail.com>, Juan Quintela <quintela@redhat.com>
+Cc: lvivier@redhat.com, qemu-devel@nongnu.org, peterx@redhat.com, dgilbert@redhat.com
 
-On Mon, May 15, 2017 at 05:29:15PM +0800, Wei Wang wrote:
-> Ping for comments, thanks.
-> 
-> On 05/11/2017 12:57 PM, Wei Wang wrote:
-> > The current implementation may change the packet layout when
-> > vnet_hdr needs an endianness swap. The layout change causes
-> > one more iov to be added to the iov[] passed from the guest, which
-> > is a barrier to making the TX queue size 1024 due to the possible
-> > off-by-one issue.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--JLPuKALgw3F7HjG4lXLKxAx3Nujhd9KFH
+From: Eric Blake <eblake@redhat.com>
+To: Stefan Hajnoczi <stefanha@gmail.com>, Juan Quintela <quintela@redhat.com>
+Cc: lvivier@redhat.com, qemu-devel@nongnu.org, peterx@redhat.com,
+ dgilbert@redhat.com
+Message-ID: <feb33c55-a56e-2a87-eafd-fbbe1f3c982b@redhat.com>
+Subject: Re: [Qemu-devel] [PULL 0/5] Migration pull request
+References: <20170512155249.8853-1-quintela@redhat.com>
+ <20170515135848.GL1201@stefanha-x1.localdomain>
+In-Reply-To: <20170515135848.GL1201@stefanha-x1.localdomain>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-It blocks making it 512 but I don't think we can make it 1024
-as entries might cross page boundaries and get split.
+On 05/15/2017 08:58 AM, Stefan Hajnoczi wrote:
 
+>> ----------------------------------------------------------------
+>> Juan Quintela (5):
+>>       migration: Fix regression with compression threads
+>>       migration: Pass Error ** argument to {save,load}_vmstate
+>>       ram: Rename RAM_SAVE_FLAG_COMPRESS to RAM_SAVE_FLAG_ZERO
+>>       migration: Create block capabilities for shared and enable
 
-> > 
-> > This patch changes the implementation to remain the packet layout
-> > intact. In this case, the number of iov[] passed to writev will be
-> > equal to the number obtained from the guest.
-> > 
-> > Signed-off-by: Wei Wang <wei.w.wang@intel.com>
+We may still end up changing our representation of these capabilities (I
+don't think the design discussion has completed) - but as long as we get
+it done before 2.10, I don't see a reason to have to unstage the pull
+request.
 
-As this is at the cost of a full data copy, I don't think
-this makes sense. We could limit this when sg list does not fit
-in 1024.
-
-But I really think we should just add a max s/g field to virtio
-and then we'll be free to increase the ring size.
-
-> > ---
-> >   hw/net/virtio-net.c | 29 ++++++++++++++---------------
-> >   1 file changed, 14 insertions(+), 15 deletions(-)
-> > 
-> > diff --git a/hw/net/virtio-net.c b/hw/net/virtio-net.c
-> > index 7d091c9..a51e9a8 100644
-> > --- a/hw/net/virtio-net.c
-> > +++ b/hw/net/virtio-net.c
-> > @@ -1287,8 +1287,7 @@ static int32_t virtio_net_flush_tx(VirtIONetQueue *q)
-> >       for (;;) {
-> >           ssize_t ret;
-> >           unsigned int out_num;
-> > -        struct iovec sg[VIRTQUEUE_MAX_SIZE], sg2[VIRTQUEUE_MAX_SIZE + 1], *out_sg;
-> > -        struct virtio_net_hdr_mrg_rxbuf mhdr;
-> > +        struct iovec sg[VIRTQUEUE_MAX_SIZE], mhdr, *out_sg;
-> >           elem = virtqueue_pop(q->tx_vq, sizeof(VirtQueueElement));
-> >           if (!elem) {
-> > @@ -1305,7 +1304,10 @@ static int32_t virtio_net_flush_tx(VirtIONetQueue *q)
-> >           }
-> >           if (n->has_vnet_hdr) {
-> > -            if (iov_to_buf(out_sg, out_num, 0, &mhdr, n->guest_hdr_len) <
-> > +            /* Buffer to copy vnet_hdr and the possible adjacent data */
-> > +            mhdr.iov_len = out_sg[0].iov_len;
-> > +            mhdr.iov_base = g_malloc0(mhdr.iov_len);
-> > +            if (iov_to_buf(out_sg, out_num, 0, mhdr.iov_base, mhdr.iov_len) <
-> >                   n->guest_hdr_len) {
-> >                   virtio_error(vdev, "virtio-net header incorrect");
-> >                   virtqueue_detach_element(q->tx_vq, elem, 0);
-> > @@ -1313,17 +1315,12 @@ static int32_t virtio_net_flush_tx(VirtIONetQueue *q)
-> >                   return -EINVAL;
-> >               }
-> >               if (n->needs_vnet_hdr_swap) {
-> > -                virtio_net_hdr_swap(vdev, (void *) &mhdr);
-> > -                sg2[0].iov_base = &mhdr;
-> > -                sg2[0].iov_len = n->guest_hdr_len;
-> > -                out_num = iov_copy(&sg2[1], ARRAY_SIZE(sg2) - 1,
-> > -                                   out_sg, out_num,
-> > -                                   n->guest_hdr_len, -1);
-> > -                if (out_num == VIRTQUEUE_MAX_SIZE) {
-> > -                    goto drop;
-> > -		}
-> > -                out_num += 1;
-> > -                out_sg = sg2;
-> > +                virtio_net_hdr_swap(vdev, mhdr.iov_base);
-> > +                /* Copy the first iov where the vnet_hdr resides in */
-> > +                out_num = iov_copy(sg, 1, &mhdr, 1, 0, mhdr.iov_len);
-> > +                out_num += iov_copy(sg + 1, ARRAY_SIZE(sg) - 1, out_sg + 1,
-> > +                                    elem->out_num - 1, 0, -1);
-> > +                out_sg = sg;
-> >   	    }
-> >           }
-> >           /*
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
 
 
+--JLPuKALgw3F7HjG4lXLKxAx3Nujhd9KFH
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-> > @@ -1345,13 +1342,15 @@ static int32_t virtio_net_flush_tx(VirtIONetQueue *q)
-> >           ret = qemu_sendv_packet_async(qemu_get_subqueue(n->nic, queue_index),
-> >                                         out_sg, out_num, virtio_net_tx_complete);
-> > +        if (n->has_vnet_hdr) {
-> > +            g_free(mhdr.iov_base);
-> > +        }
-> >           if (ret == 0) {
-> >               virtio_queue_set_notification(q->tx_vq, 0);
-> >               q->async_tx.elem = elem;
-> >               return -EBUSY;
-> >           }
-> > -drop:
-> >           virtqueue_push(q->tx_vq, elem, 0);
-> >           virtio_notify(vdev, q->tx_vq);
-> >           g_free(elem);
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEcBAEBCAAGBQJZGcCTAAoJEKeha0olJ0NqWIQH/3w2E7/PhawYQmH4ehbTuZfT
+p7qwKTp0zHqQdcNuWazDwY+rqBm70SmCw6SOFZctbf5pFuDuc/U7NF2FpDNyDqao
+ku8ZcbOhRSOSdAqjjiek/cub38qBDVJrXXZ5miqKy37e46p3y5yFj6OAL/4fJ3Gw
+uCBTRqUjHG7qnqMLmQH9Qii8pmgK6Qhxn2aR4bh7u5dyWEgd/2Kr/l3LP/0jJNmM
+RcoiVwU6RDg7zteKC+Lpau6cz3VYbQubjajeEwSj0Ne85yDwOfDnm7s+tBNAKBiJ
+oBQKLDjEKXrPgKHPtfZmYsEHWfkKTlPlx91huddjSwIcikLlhSrZx9X/IcfjEPk=
+=L8IK
+-----END PGP SIGNATURE-----
+
+--JLPuKALgw3F7HjG4lXLKxAx3Nujhd9KFH--
