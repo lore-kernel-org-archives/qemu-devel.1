@@ -1,25 +1,40 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49932)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49934)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1dA5eg-0003br-J6
-	for qemu-devel@nongnu.org; Sun, 14 May 2017 22:22:39 -0400
+	(envelope-from <bjsdjshi@linux.vnet.ibm.com>) id 1dA5eh-0003bw-7F
+	for qemu-devel@nongnu.org; Sun, 14 May 2017 22:22:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1dA5ed-0004KV-EH
-	for qemu-devel@nongnu.org; Sun, 14 May 2017 22:22:38 -0400
-Received: from [59.151.112.132] (port=3436 helo=heian.cn.fujitsu.com)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1dA5ec-0004E3-DY
-	for qemu-devel@nongnu.org; Sun, 14 May 2017 22:22:35 -0400
-References: <20170512083556.22539-1-maozy.fnst@cn.fujitsu.com>
-	<e8387a72-2183-538f-970c-01335526183b@amsat.org>
-From: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
-Message-ID: <b3138689-39f4-ac5c-d058-f3b8138a1844@cn.fujitsu.com>
-Date: Mon, 15 May 2017 10:21:59 +0800
+	(envelope-from <bjsdjshi@linux.vnet.ibm.com>) id 1dA5ee-0004Kt-4P
+	for qemu-devel@nongnu.org; Sun, 14 May 2017 22:22:39 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:50396)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bjsdjshi@linux.vnet.ibm.com>)
+	id 1dA5ed-0004Je-Qe
+	for qemu-devel@nongnu.org; Sun, 14 May 2017 22:22:36 -0400
+Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v4F2Iojt025768
+	for <qemu-devel@nongnu.org>; Sun, 14 May 2017 22:22:33 -0400
+Received: from e35.co.us.ibm.com (e35.co.us.ibm.com [32.97.110.153])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2aedhwvdgn-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Sun, 14 May 2017 22:22:32 -0400
+Received: from localhost
+	by e35.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <bjsdjshi@linux.vnet.ibm.com>;
+	Sun, 14 May 2017 20:22:32 -0600
+Date: Mon, 15 May 2017 10:22:26 +0800
+From: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
+References: <20170505020352.8984-1-bjsdjshi@linux.vnet.ibm.com>
+	<20170505020352.8984-7-bjsdjshi@linux.vnet.ibm.com>
+	<20170511151356.78516f2b@w520.home>
 MIME-Version: 1.0
-In-Reply-To: <e8387a72-2183-538f-970c-01335526183b@amsat.org>
-Content-Type: text/plain; charset="windows-1252"; format=flowed
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH] hw/net/rocker/rocker: Convert pci device
- .init() to .realize()
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170511151356.78516f2b@w520.home>
+Message-Id: <20170515022226.GA11226@bjsdjshi@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH v7 06/13] s390x/css: device support for
+ s390-ccw passthrough
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,190 +43,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, qemu-devel@nongnu.org
-Cc: jasowang@redhat.com, jiri@resnulli.us
+To: Alex Williamson <alex.williamson@redhat.com>
+Cc: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, kvm@vger.kernel.org, linux-s390@vger.kernel.org, qemu-devel@nongnu.org, cornelia.huck@de.ibm.com, borntraeger@de.ibm.com, agraf@suse.com, eric.auger@redhat.com
 
-Hi, Philippe
+* Alex Williamson <alex.williamson@redhat.com> [2017-05-11 15:13:56 -0600]:
 
+[...]
 
-On 05/14/2017 05:04 AM, Philippe Mathieu-Daudé wrote:
-> Hi Mao,
->
-> You can use shorter patch subject "net/rocker" instead of
-> "hw/net/rocker/rocker".
+> > diff --git a/hw/s390x/s390-ccw.c b/hw/s390x/s390-ccw.c
+> > new file mode 100644
+> > index 0000000..b1aadcd
+> > --- /dev/null
+> > +++ b/hw/s390x/s390-ccw.c
+> > @@ -0,0 +1,138 @@
+> > +/*
+> > + * s390 CCW Assignment Support
+> > + *
+> > + * Copyright 2017 IBM Corp
+> > + * Author(s): Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
+> > + *            Xiao Feng Ren <renxiaof@linux.vnet.ibm.com>
+> > + *            Pierre Morel <pmorel@linux.vnet.ibm.com>
+> > + *
+> > + * This work is licensed under the terms of the GNU GPL, version 2
+> > + * or (at your option) any later version. See the COPYING file in the
+> > + * top-level directory.
+> > + */
+> > +#include "qemu/osdep.h"
+> > +#include "qapi/error.h"
+> > +#include "hw/sysbus.h"
+> > +#include "libgen.h"
+> > +#include "hw/s390x/css.h"
+> > +#include "hw/s390x/css-bridge.h"
+> > +#include "s390-ccw.h"
+> > +
+> > +static void s390_ccw_get_dev_info(S390CCWDevice *cdev,
+> > +                                  char *sysfsdev,
+> > +                                  Error **errp)
+> > +{
+> > +    unsigned int cssid, ssid, devid;
+> > +    char dev_path[PATH_MAX] = {0}, *tmp;
+> > +
+> > +    if (!sysfsdev) {
+> > +        error_setg(errp, "No host device provided");
+> > +        error_append_hint(errp,
+> > +                          "Use -device vfio-ccw,sysfsdev=PATH_TO_DEVICE\n");
+> > +        return;
+> > +    }
+> > +
+> > +    if (!realpath(sysfsdev, dev_path)) {
+> > +        error_setg_errno(errp, errno, "Host device '%s' not found", sysfsdev);
+> > +        return;
+> > +    }
+> > +
+> > +    cdev->mdevid = g_strdup(basename(dev_path));
+> > +
+> > +    tmp = basename(dirname(dev_path));
+> > +    sscanf(tmp, "%2x.%1x.%4x", &cssid, &ssid, &devid);
+> 
+> 
+> Seems like an oversight not to check this return value.
+> 
+> 
+Hi Alex,
 
-Thanks for your suggestion :)OK, will do the fix right away.
+As I replied to Eric in v6, this is safe, since the format of the input
+is an interface that the kernel provides for the userland program.
 
->
-> On 05/12/2017 05:35 AM, Mao Zhongyi wrote:
->> Convert pci device .init() to .realize(). Also improve -device rocker
->> error reporting. Because when -device rocker fails, it first reports
->> a specific error, then a generic one, like this:
->>
->>     $ x86_64-softmmu/qemu-system-x86_64 -device rocker,name=qemu-rocker
->>     rocker: name too long; please shorten to at most 9 chars
->>     qemu-system-x86_64: -device rocker,name=qemu-rocker: Device
->> initialization failed
->>
->> Convert pci_rocker_init() to Error to get rid of the unwanted second
->> error message.
->>
->> Cc: jiri@resnulli.us
->> Cc: jasowang@redhat.com
->> Signed-off-by: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
->> ---
->>  hw/net/rocker/rocker.c | 31 +++++++++++++------------------
->>  1 file changed, 13 insertions(+), 18 deletions(-)
->>
->> diff --git a/hw/net/rocker/rocker.c b/hw/net/rocker/rocker.c
->> index 6e70fdd..2cebc31 100644
->> --- a/hw/net/rocker/rocker.c
->> +++ b/hw/net/rocker/rocker.c
->> @@ -1252,20 +1252,18 @@ rollback:
->>      return err;
->>  }
->>
->> -static int rocker_msix_init(Rocker *r)
->> +static int rocker_msix_init(Rocker *r, Error **errp)
->>  {
->>      PCIDevice *dev = PCI_DEVICE(r);
->>      int err;
->> -    Error *local_err = NULL;
->>
->>      err = msix_init(dev, ROCKER_MSIX_VEC_COUNT(r->fp_ports),
->>                      &r->msix_bar,
->>                      ROCKER_PCI_MSIX_BAR_IDX,
->> ROCKER_PCI_MSIX_TABLE_OFFSET,
->>                      &r->msix_bar,
->>                      ROCKER_PCI_MSIX_BAR_IDX, ROCKER_PCI_MSIX_PBA_OFFSET,
->> -                    0, &local_err);
->> +                    0, errp);
->>      if (err) {
->> -        error_report_err(local_err);
->>          return err;
->>      }
->>
->> @@ -1301,7 +1299,7 @@ static World *rocker_world_type_by_name(Rocker
->> *r, const char *name)
->>      return NULL;
->>  }
->>
->> -static int pci_rocker_init(PCIDevice *dev)
->> +static void pci_rocker_realize(PCIDevice *dev, Error **errp)
->>  {
->>      Rocker *r = to_rocker(dev);
->>      const MACAddr zero = { .a = { 0, 0, 0, 0, 0, 0 } };
->> @@ -1315,7 +1313,7 @@ static int pci_rocker_init(PCIDevice *dev)
->>
->>      for (i = 0; i < ROCKER_WORLD_TYPE_MAX; i++) {
->>          if (!r->worlds[i]) {
->> -            err = -ENOMEM;
->> +            error_setg(errp, "allocate worlds failed");
->>              goto err_world_alloc;
->>          }
->>      }
->> @@ -1326,10 +1324,9 @@ static int pci_rocker_init(PCIDevice *dev)
->>
->>      r->world_dflt = rocker_world_type_by_name(r, r->world_name);
->>      if (!r->world_dflt) {
->> -        fprintf(stderr,
->> -                "rocker: requested world \"%s\" does not exist\n",
->> +        error_setg(errp,
->> +                "rocker: invalid argument, requested world %s does
->> not exist",
->>                  r->world_name);
->> -        err = -EINVAL;
->>          goto err_world_type_by_name;
->>      }
->>
->> @@ -1349,7 +1346,7 @@ static int pci_rocker_init(PCIDevice *dev)
->>
->>      /* MSI-X init */
->>
->> -    err = rocker_msix_init(r);
->> +    err = rocker_msix_init(r, errp);
->>      if (err) {
->>          goto err_msix_init;
->>      }
->> @@ -1361,7 +1358,7 @@ static int pci_rocker_init(PCIDevice *dev)
->>      }
->>
->>      if (rocker_find(r->name)) {
->> -        err = -EEXIST;
->> +        error_setg(errp, "rocker %s already exists", r->name);
->
-> Use column to have consistent logging:
->
->         error_setg(errp, "rocker: %s already exists", r->name);
->
+Anyway, I will add a check since both of you question it.
 
-OK, I see, will fix it in the v2.
-Thanks
+> > +
+> > +    cdev->hostid.cssid = cssid;
+> > +    cdev->hostid.ssid = ssid;
+> > +    cdev->hostid.devid = devid;
+> > +    cdev->hostid.valid = true;
+> > +}
+> > +
+> 
 
->>          goto err_duplicate;
->>      }
->>
->> @@ -1375,10 +1372,10 @@ static int pci_rocker_init(PCIDevice *dev)
->>  #define ROCKER_IFNAMSIZ 16
->>  #define MAX_ROCKER_NAME_LEN  (ROCKER_IFNAMSIZ - 1 - 3 - 3)
->>      if (strlen(r->name) > MAX_ROCKER_NAME_LEN) {
->> -        fprintf(stderr,
->> -                "rocker: name too long; please shorten to at most %d
->> chars\n",
->> +        error_setg(errp,
->> +                "rocker: name too long; please shorten to at most %d
->> chars",
->>                  MAX_ROCKER_NAME_LEN);
->> -        return -EINVAL;
->> +        return;
->
-> I think the correct cleanup is: "goto err_duplicate;"
->
-> Or if you want to be more specific, add another goto label
-> "err_name_too_long" before the "err_duplicate" label.
->
-
-Thanks very much for your detailed explanation:) I will add a new label
-to make a correct cleanup in the v2.
-
-Mao
-
->>      }
->>
->>      if (memcmp(&r->fp_start_macaddr, &zero, sizeof(zero)) == 0) {
->> @@ -1410,7 +1407,6 @@ static int pci_rocker_init(PCIDevice *dev)
->>       * .....
->>       */
->>
->> -    err = -ENOMEM;
->>      for (i = 0; i < rocker_pci_ring_count(r); i++) {
->>          DescRing *ring = desc_ring_alloc(r, i);
->>
->> @@ -1447,7 +1443,7 @@ static int pci_rocker_init(PCIDevice *dev)
->>
->>      QLIST_INSERT_HEAD(&rockers, r, next);
->>
->> -    return 0;
->> +    return;
->>
->>  err_port_alloc:
->>      for (--i; i >= 0; i--) {
->> @@ -1473,7 +1469,6 @@ err_world_alloc:
->>              world_free(r->worlds[i]);
->>          }
->>      }
->> -    return err;
->>  }
->>
->>  static void pci_rocker_uninit(PCIDevice *dev)
->> @@ -1558,7 +1553,7 @@ static void rocker_class_init(ObjectClass
->> *klass, void *data)
->>      DeviceClass *dc = DEVICE_CLASS(klass);
->>      PCIDeviceClass *k = PCI_DEVICE_CLASS(klass);
->>
->> -    k->init = pci_rocker_init;
->> +    k->realize = pci_rocker_realize;
->>      k->exit = pci_rocker_uninit;
->>      k->vendor_id = PCI_VENDOR_ID_REDHAT;
->>      k->device_id = PCI_DEVICE_ID_REDHAT_ROCKER;
->>
+-- 
+Dong Jia Shi
