@@ -1,27 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50130)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50826)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jean-philippe.brucker@arm.com>) id 1dAEpy-0003sC-Ag
-	for qemu-devel@nongnu.org; Mon, 15 May 2017 08:10:56 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1dAEsC-0004db-6W
+	for qemu-devel@nongnu.org; Mon, 15 May 2017 08:13:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jean-philippe.brucker@arm.com>) id 1dAEpv-00084g-4t
-	for qemu-devel@nongnu.org; Mon, 15 May 2017 08:10:54 -0400
-Received: from foss.arm.com ([217.140.101.70]:58964)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jean-philippe.brucker@arm.com>) id 1dAEpu-00083u-TJ
-	for qemu-devel@nongnu.org; Mon, 15 May 2017 08:10:51 -0400
-References: <1493201525-14418-1-git-send-email-yi.l.liu@intel.com>
-	<1493201525-14418-8-git-send-email-yi.l.liu@intel.com>
-	<cc330a8f-e087-9b6f-2a40-38b58688d300@arm.com>
-	<20170514101258.GA22110@gmail.com>
-From: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>
-Message-ID: <909f827d-e620-1f18-dc74-dfb46d93d305@arm.com>
-Date: Mon, 15 May 2017 13:14:06 +0100
+	(envelope-from <dgilbert@redhat.com>) id 1dAEs8-0000Pz-Vk
+	for qemu-devel@nongnu.org; Mon, 15 May 2017 08:13:12 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53796)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dAEs8-0000Ps-PH
+	for qemu-devel@nongnu.org; Mon, 15 May 2017 08:13:08 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id AA74A4E357
+	for <qemu-devel@nongnu.org>; Mon, 15 May 2017 12:13:07 +0000 (UTC)
+Date: Mon, 15 May 2017 13:13:01 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170515121301.GF2089@work-vm>
+References: <20170503104257.5127-1-dgilbert@redhat.com>
+	<dcdd1530-4e73-f998-b85f-06db4f1c4b63@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20170514101258.GA22110@gmail.com>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC PATCH 7/8] VFIO: Add new IOCTL for IOMMU TLB
- invalidate propagation
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <dcdd1530-4e73-f998-b85f-06db4f1c4b63@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] block migration: Allow compile time disable
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,141 +33,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Liu, Yi L" <yi.l.liu@linux.intel.com>
-Cc: "Liu, Yi L" <yi.l.liu@intel.com>, kvm@vger.kernel.org, iommu@lists.linux-foundation.org, alex.williamson@redhat.com, peterx@redhat.com, jasowang@redhat.com, qemu-devel@nongnu.org, kevin.tian@intel.com, ashok.raj@intel.com, jacob.jun.pan@intel.com, tianyu.lan@intel.com
+To: Eric Blake <eblake@redhat.com>
+Cc: qemu-devel@nongnu.org, quintela@redhat.com, jcody@redhat.com, kwolf@redhat.com, kashyap@redhat.com
 
-On 14/05/17 11:12, Liu, Yi L wrote:
-> On Fri, May 12, 2017 at 01:11:02PM +0100, Jean-Philippe Brucker wrote:
->> Hi Yi,
->>
->> On 26/04/17 11:12, Liu, Yi L wrote:
->>> From: "Liu, Yi L" <yi.l.liu@linux.intel.com>
->>>
->>> This patch adds VFIO_IOMMU_TLB_INVALIDATE to propagate IOMMU TLB
->>> invalidate request from guest to host.
->>>
->>> In the case of SVM virtualization on VT-d, host IOMMU driver has
->>> no knowledge of caching structure updates unless the guest
->>> invalidation activities are passed down to the host. So a new
->>> IOCTL is needed to propagate the guest cache invalidation through
->>> VFIO.
->>>
->>> Signed-off-by: Liu, Yi L <yi.l.liu@linux.intel.com>
->>> ---
->>>  include/uapi/linux/vfio.h | 9 +++++++++
->>>  1 file changed, 9 insertions(+)
->>>
->>> diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
->>> index 6b97987..50c51f8 100644
->>> --- a/include/uapi/linux/vfio.h
->>> +++ b/include/uapi/linux/vfio.h
->>> @@ -564,6 +564,15 @@ struct vfio_device_svm {
->>>  
->>>  #define VFIO_IOMMU_SVM_BIND_TASK	_IO(VFIO_TYPE, VFIO_BASE + 22)
->>>  
->>> +/* For IOMMU TLB Invalidation Propagation */
->>> +struct vfio_iommu_tlb_invalidate {
->>> +	__u32	argsz;
->>> +	__u32	length;
->>> +	__u8	data[];
->>> +};
->>
->> We initially discussed something a little more generic than this, with
->> most info explicitly described and only pIOMMU-specific quirks and hints
->> in an opaque structure. Out of curiosity, why the change? I'm not against
->> a fully opaque structure, but there seem to be a large overlap between TLB
->> invalidations across architectures.
+* Eric Blake (eblake@redhat.com) wrote:
+> On 05/03/2017 05:42 AM, Dr. David Alan Gilbert (git) wrote:
+> > From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+> > 
+> > Many users now prefer to use drive_mirror over NBD as an
+> > alternative to the older migrate -b option; drive_mirror is
+> > more complex to setup but gives you more options (e.g. only
+> > migrating some of the disks if some of them are shared).
+> > 
+> > Allow the large chunk of block migration code to be compiled
+> > out for those who don't use it.
+> > 
+> > Based on a downstream-patch we've had for a while by Jeff Cody.
+> > 
+> > Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> > ---
+> > @@ -1222,6 +1226,14 @@ void qmp_migrate(const char *uri, bool has_blk, bool blk,
+> >      params.blk = has_blk && blk;
+> >      params.shared = has_inc && inc;
+> >  
+> > +#ifndef CONFIG_LIVE_BLOCK_MIGRATION
+> > +    if (params.blk || params.shared) {
+> > +        error_setg(errp, "QEMU compiled without old-style block migration. "
+> > +                         "Use drive_mirror+NBD.");
 > 
-> Hi Jean,
+> error_setg() should not be used with '.' (it should be a single phrase,
+> here you are trying to stuff in two sentences).  error_append_hint() can
+> be used to supply the advice about using drive_mirror+NBD as the
+> alternative.
 > 
-> As my cover letter mentioned, it is an open on the iommu tlb invalidate
-> propagation. Paste it here since it's in the cover letter for Qemu part
-> changes. Pls refer to the [Open] session in the following link.
-> 
-> http://www.spinics.net/lists/kvm/msg148798.html
-> 
-> I want to see if community wants to have opaque structure or not
-> on iommu tlb invalidate propagation. Personally, I incline to use
-> opaque structure. But it's better to gather the comments before
-> deciding it. To assist the discussion, I put the full opaque structure
-> here. Once community gets consensus on using opaque structure for
-> iommu tlb invalidate propagation, I'm glad to work with you on a
-> structure with partial opaque since there seems to be overlap across
-> arch.
+> Otherwise this looks reasonable to me.
 
-I see, thanks for the pointer. I'm not fan of using the pIOMMU format in
-invalidations, but I understand the appeal in your case, where you can
-shave off the overhead of parsing/re-assembling the pIOMMU format.
+Done as:
+        error_setg(errp, "QEMU compiled without old-style block migration");
+        error_append_hint(errp, "Use drive_mirror+NBD.\n");
 
-It's not suitable for generic io-pgtable, where different pIOMMUs may
-offer the same page table format but different invalidation methods. I
-guess I could make it work by negotiating invalidation method at bind
-time, falling back to the generic format for virtio-iommu. We already have
-to do some related negotiation for SVM on SMMU, where in embedded
-implementations the guest doesn't need to send invalidation requests via
-IOMMU queue, but can do it using CPU instructions instead.
+(All the places I can see seem to have . and \n in append_hint)
 
->> For what it's worth, when prototyping the paravirtualized IOMMU I came up
->> with the following.
->>
->> (From the paravirtualized POV, the SMMU also has to swizzle endianess
->> after unpacking an opaque structure, since userspace doesn't know what's
->> in it and guest might use a different endianess. So we need to force all
->> opaque data to be e.g. little-endian.)
->>
->> struct vfio_iommu_tlb_invalidate {
->> 	__u32	argsz;
->> 	__u32	scope;
->> 	__u32	flags;
->> 	__u32	pasid;
->> 	__u64	vaddr;
->> 	__u64	size;
->> 	__u8	data[];
->> };
->>
->> Scope is a bitfields restricting the invalidation scope. By default
->> invalidate the whole container (all PASIDs and all VAs). @pasid, @vaddr
->> and @size are unused.
->>
->> Adding VFIO_IOMMU_INVALIDATE_PASID (1 << 0) restricts the invalidation
->> scope to the pasid described by @pasid.
->> Adding VFIO_IOMMU_INVALIDATE_VADDR (1 << 1) restricts the invalidation
->> scope to the address range described by (@vaddr, @size).
->>
->> So setting scope = VFIO_IOMMU_INVALIDATE_VADDR would invalidate the VA
->> range for *all* pasids (as well as no_pasid). Setting scope =
->> (VFIO_IOMMU_INVALIDATE_VADDR|VFIO_IOMMU_INVALIDATE_PASID) would invalidate
->> the VA range only for @pasid.
->>
+Dave
+
+> -- 
+> Eric Blake, Principal Software Engineer
+> Red Hat, Inc.           +1-919-301-3266
+> Virtualization:  qemu.org | libvirt.org
 > 
-> Besides VA range flusing, there is PASID Cache flushing on VT-d. How about
-> SMMU? So I think besides the two scope you defined, may need one more to
-> indicate if it's PASID Cache flushing.
-
-Yes, invalidating all TLB entries associated to a PASID would be done by
-setting scope = VFIO_IOMMU_INVALIDATE_PASID. In which case field @pasid is
-valid, and fields (@vaddr, @size) aren't used.
-
-Thanks,
-Jean
-
->> Flags depend on the selected scope:
->>
->> VFIO_IOMMU_INVALIDATE_NO_PASID, indicating that invalidation (either
->> without scope or with INVALIDATE_VADDR) targets non-pasid mappings
->> exclusively (some architectures, e.g. SMMU, allow this)
->>
->> VFIO_IOMMU_INVALIDATE_VADDR_LEAF, indicating that the pIOMMU doesn't need
->> to invalidate all intermediate tables cached as part of the PTW for vaddr,
->> only the last-level entry (pte). This is a hint.
->>
->> I guess what's missing for Intel IOMMU and would go in @data is the
->> "global" hint (which we don't have in SMMU invalidations). Do you see
->> anything else, that the pIOMMU cannot deduce from this structure?
->>
 > 
-> For Intel platform, Drain read/write would be needed in the opaque.
-> 
-> Thanks,
-> Yi L
-> 
+
+
+
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
