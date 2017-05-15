@@ -1,26 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42941)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43458)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1dAG56-00050X-LD
-	for qemu-devel@nongnu.org; Mon, 15 May 2017 09:30:37 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dAG75-0006VK-Dn
+	for qemu-devel@nongnu.org; Mon, 15 May 2017 09:32:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1dAG55-00032H-L7
-	for qemu-devel@nongnu.org; Mon, 15 May 2017 09:30:36 -0400
-Received: from mail-lf0-x242.google.com ([2a00:1450:4010:c07::242]:34275)
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dAG72-0003jX-9M
+	for qemu-devel@nongnu.org; Mon, 15 May 2017 09:32:39 -0400
+Received: from mail-qt0-x241.google.com ([2607:f8b0:400d:c0d::241]:35741)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1dAG55-00030y-EF
-	for qemu-devel@nongnu.org; Mon, 15 May 2017 09:30:35 -0400
-Received: by mail-lf0-x242.google.com with SMTP id q24so3259107lfb.1
-	for <qemu-devel@nongnu.org>; Mon, 15 May 2017 06:30:35 -0700 (PDT)
-Date: Mon, 15 May 2017 14:30:31 +0100
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20170515133031.GH1201@stefanha-x1.localdomain>
-References: <20170512122158.32032-1-kraxel@redhat.com>
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dAG72-0003im-6B
+	for qemu-devel@nongnu.org; Mon, 15 May 2017 09:32:36 -0400
+Received: by mail-qt0-x241.google.com with SMTP id r58so15519133qtb.2
+	for <qemu-devel@nongnu.org>; Mon, 15 May 2017 06:32:36 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20170515104543.32044-1-kraxel@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <b8046b2f-976f-01b9-c9ea-c9fded14f35d@amsat.org>
+Date: Mon, 15 May 2017 10:32:32 -0300
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="o71xDhNo7p97+qVi"
-Content-Disposition: inline
-In-Reply-To: <20170512122158.32032-1-kraxel@redhat.com>
-Subject: Re: [Qemu-devel] [PULL 0/6] usb patch queue
+In-Reply-To: <20170515104543.32044-1-kraxel@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH] ehci: fix overflow in frame timer code
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,83 +33,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org
+Cc: 8610_28@163.com
 
+Hi Gerd, 李林,
 
---o71xDhNo7p97+qVi
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+On 05/15/2017 07:45 AM, Gerd Hoffmann wrote:
+> In case the frame timer doesn't run for a while due to the host being
+> busy skipped_uframes can become big enough that UFRAME_TIMER_NS *
+> skipped_uframes overflows.  Which in turn throws off all subsequent
+> ehci frame timer calculations.
+>
+> Reported-by: 李林 <8610_28@163.com>
 
-On Fri, May 12, 2017 at 02:21:52PM +0200, Gerd Hoffmann wrote:
->   Hi,
->=20
-> Here comes the usb patch queue, with a bugfix collection and a
-> documentation update.
->=20
-> please pull,
->   Gerd
->=20
-> The following changes since commit 76d20ea0f1b26ebd5da2f5fb2fdf3250cde887=
-bb:
->=20
->   Merge remote-tracking branch 'armbru/tags/pull-qapi-2017-05-04-v3' into=
- staging (2017-05-09 15:49:14 -0400)
->=20
-> are available in the git repository at:
->=20
->   git://git.kraxel.org/qemu tags/pull-usb-20170512-1
->=20
-> for you to fetch changes up to aa612b364ecbe1dc034efcabb04526f24e56c145:
->=20
->   hw/usb/dev-serial: Do not try to set vendorid or productid properties (=
-2017-05-12 12:30:23 +0200)
->=20
-> ----------------------------------------------------------------
-> usb: bugfixes, doc update
->=20
-> ----------------------------------------------------------------
-> Gerd Hoffmann (1):
->       usb-redir: fix stack overflow in usbredir_log_data
->=20
-> Ladi Prosek (3):
->       xhci: fix logging
->       usb-hub: clear PORT_STAT_SUSPEND on wakeup
->       xhci: relax link check
->=20
-> Thomas Huth (2):
->       qemu-doc: Update to use the new way of attaching USB devices
->       hw/usb/dev-serial: Do not try to set vendorid or productid properti=
-es
->=20
->  docs/qdev-device-use.txt |  6 ++--
->  hw/usb/dev-hub.c         |  1 +
->  hw/usb/dev-serial.c      | 24 ++++---------
->  hw/usb/hcd-xhci.c        |  9 ++---
->  hw/usb/redirect.c        | 13 +------
->  qemu-doc.texi            | 91 +++++++++++++++++++++++++++---------------=
-------
->  6 files changed, 64 insertions(+), 80 deletions(-)
->=20
+李林: You may want to add your Signed-off-by here along with Gerd's.
 
-Thanks, applied to my staging tree:
-https://github.com/stefanha/qemu/commits/staging
+> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
 
-Stefan
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
---o71xDhNo7p97+qVi
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJZGa13AAoJEJykq7OBq3PIgCUIAKoy6jJAXGxqtJdQkBoNDhNa
-50/R3Lg3LfGBK+JBQYFejKPy+17SqO9SeEMoKjLSlQ5Xn5mpGIQrC5yJm1/0RSkE
-B2Q2gdt0vF91f4u5Ev2rtMjBuXuYmHn8m93XZMrqmLe/5jbTns6/H5NA/pVwjiqn
-jNFgJcKLyWC/Mz7Qgp/cFTakSPhAhez8GcjhbBQ6xm/4VIJRG/f1S4zcJECKF/6z
-QLedTCkpaw+iyA2gW9vhyMgGY9elxHd+/pVsCexxd2QX47rwROm8HSxUoqvYmRZv
-IwygCT7nu/PA3QLRoI2aDldDUsfq68W83AVbS/tmlLy1hp/nqW2d7J7V+PXuVak=
-=7Pqn
------END PGP SIGNATURE-----
-
---o71xDhNo7p97+qVi--
+> ---
+>  hw/usb/hcd-ehci.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/hw/usb/hcd-ehci.c b/hw/usb/hcd-ehci.c
+> index 3703a8dddc..17c572c55f 100644
+> --- a/hw/usb/hcd-ehci.c
+> +++ b/hw/usb/hcd-ehci.c
+> @@ -2238,7 +2238,7 @@ static void ehci_work_bh(void *opaque)
+>      int need_timer = 0;
+>      int64_t expire_time, t_now;
+>      uint64_t ns_elapsed;
+> -    int uframes, skipped_uframes;
+> +    uint64_t uframes, skipped_uframes;
+>      int i;
+>
+>      t_now = qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
+>
