@@ -1,21 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35739)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35762)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1dAJ9e-0000hS-Bd
-	for qemu-devel@nongnu.org; Mon, 15 May 2017 12:47:31 -0400
+	(envelope-from <berrange@redhat.com>) id 1dAJ9g-0000hf-DL
+	for qemu-devel@nongnu.org; Mon, 15 May 2017 12:47:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1dAJ9d-0002VZ-6f
-	for qemu-devel@nongnu.org; Mon, 15 May 2017 12:47:30 -0400
-MIME-Version: 1.0
-Sender: alistair23@gmail.com
-In-Reply-To: <757990479.60759.1494722527715@mail.yahoo.com>
-References: <757990479.60759.1494722527715.ref@mail.yahoo.com>
-	<757990479.60759.1494722527715@mail.yahoo.com>
-From: Alistair Francis <alistair.francis@xilinx.com>
-Date: Mon, 15 May 2017 09:46:57 -0700
-Message-ID: <CAKmqyKPy35OuMkixGnDXOvApAu82uXrtQStSz4GzHNRStdFFNA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] Changes to Broadcom(BCM) files and Raspberry Pi
- files. Addition of PanelEmu
+	(envelope-from <berrange@redhat.com>) id 1dAJ9f-0002Wx-5w
+	for qemu-devel@nongnu.org; Mon, 15 May 2017 12:47:32 -0400
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Date: Mon, 15 May 2017 17:47:08 +0100
+Message-Id: <20170515164712.6643-1-berrange@redhat.com>
+Subject: [Qemu-devel] [PATCH v10 0/4] Improve convert and dd commands
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,92 +17,116 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Bradley <flypie1@yahoo.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, John Bradley <flypie@rocketmail.com>, Laurent Vivier <lvivier@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>, Markus Armbruster <armbru@redhat.com>, Alistair Francis <alistair.francis@xilinx.com>
+To: qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Eric Blake <eblake@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Fam Zheng <famz@redhat.com>, Max Reitz <mreitz@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>
 
-On Sat, May 13, 2017 at 5:42 PM, John Bradley via Qemu-devel
-<qemu-devel@nongnu.org> wrote:
-> From 7f74f048f135d9c9c230a9e90f72451c841c6d35 Mon Sep 17 00:00:00 2001
-> From: John Bradley <flypie@rocketmail.com>
-> Date: Sat, 13 May 2017 23:07:47 +0100
-> Subject: [PATCH] Changes to Broadcom(BCM) files and Raspberry Pi files.
-> Addition of PanelEmu
->
-> The files add the ability to attach, via TCP, a panel emulator
-> The include a unification of several PD Raspberry PI additions
-> A modification to dev-network to all circle SDK WWW client to work
-> The DummyPanel is not included but available at
-> https://github.com/flypie/GDummyPanel.git
->
-> Signed-off-by: John Bradley <flypie@rocketmail.com>
+Update to
 
-Hey John,
+  v1: https://lists.gnu.org/archive/html/qemu-devel/2017-01/msg05699.html
+  v2: https://lists.gnu.org/archive/html/qemu-devel/2017-02/msg00728.html
+  v3: https://lists.gnu.org/archive/html/qemu-devel/2017-02/msg04391.html
+  v4: https://lists.gnu.org/archive/html/qemu-devel/2017-04/msg02153.html
+  v5: https://lists.gnu.org/archive/html/qemu-devel/2017-04/msg04109.html
+  v6: https://lists.gnu.org/archive/html/qemu-devel/2017-05/msg00215.html
+  v7: https://lists.gnu.org/archive/html/qemu-devel/2017-05/msg00242.html
+  v8: https://lists.gnu.org/archive/html/qemu-devel/2017-05/msg02028.html
+  v9: https://lists.gnu.org/archive/html/qemu-devel/2017-05/msg03504.html
 
-Thanks for the patch!
+This series is in response to Max pointing out that you cannot
+use 'convert' for an encrypted target image.
 
-Unfortunately this patch is too long to review, you need to split the
-patch up into shorter more readable patches. Otherwise it's too hard
-to people to understand what you are changing and why.
+The 'convert' and 'dd' commands need to first create the image
+and then open it. The bdrv_create() method takes a set of options
+for creating the image, which let us provide a key-secret for the
+encryption key. When the commands then open the new image, they
+don't provide any options, so the image is unable to be opened
+due to lack of encryption key. It is also not possible to use
+the --image-opts argument to provide structured options in the
+target image name - it must be a plain filename to satisfy the
+bdrv_create() API contract.
 
-There are some details here:
-http://wiki.qemu.org/Contribute/SubmitAPatch about how to split up
-patches. Each patch applied in order shouldn't break any compilation
-or runtime. Generally the flow is to add the logic in earlier patches
-and then connect it and switch it on in the later patches.
+This series addresses these problems to some extent
 
-Try splitting up adding/editing each individual device and send that
-our first. That is generally the easiest to review/accept.
+ - Adds a new --target-image-opts flag which is used to say
+   that the target filename is using structured options.
+   It is *only* permitted to use this when -n is also set.
+   ie the target image must be pre-created so convert/dd
+   don't need to run bdrv_create().
 
-Thanks,
+ - When --target-image-opts is not used, add special case
+   code that identifies options passed to bdrv_create()
+   named "*key-secret" and adds them to the options used
+   to open the new image
 
-Alistair
+In future it is desirable to make --target-image-opts work even when -n is
+*not* given. This requires considerable work to create a new bdrv_create()
+API impl.
 
-> ---
-> .gitignore                           |   54 ++
-> hw/arm/Makefile.objs                 |    2 +-
-> hw/arm/bcm2835.c                     |  114 ++++
-> hw/arm/bcm2835_peripherals.c         |  104 ++++
-> hw/arm/bcm2836.c                     |    3 +-
-> hw/arm/raspi.c                       |   77 ++-
-> hw/gpio/bcm2835_gpio.c               |  333 ++++++-----
-> hw/misc/Makefile.objs                |    2 +
-> hw/misc/bcm2835_mphi.c               |  163 ++++++
-> hw/misc/bcm2835_power.c              |  106 ++++
-> hw/timer/Makefile.objs               |    2 +
-> hw/timer/bcm2835_st.c                |  202 +++++++
-> hw/timer/bcm2835_timer.c             |  224 +++++++
-> hw/usb/Makefile.objs                 |    4 +-
-> hw/usb/bcm2835_usb.c                 |  604 +++++++++++++++++++
-> hw/usb/bcm2835_usb_regs.h            | 1061 ++++++++++++++++++++++++++++++++++
-> hw/usb/dev-network.c                 |    2 +-
-> include/hw/arm/bcm2835.h             |   37 ++
-> include/hw/arm/bcm2835_peripherals.h |   10 +
-> include/hw/gpio/bcm2835_gpio.h       |    5 +
-> include/hw/intc/bcm2835_control.h    |   53 ++
-> include/hw/intc/bcm2836_control.h    |    2 +
-> include/hw/misc/bcm2835_mphi.h       |   28 +
-> include/hw/misc/bcm2835_power.h      |   22 +
-> include/hw/timer/bcm2835_st.h        |   25 +
-> include/hw/timer/bcm2835_timer.h     |   32 +
-> include/hw/usb/bcm2835_usb.h         |   78 +++
-> include/qemu/PanelEmu.h              |   53 ++
-> util/Makefile.objs                   |    1 +
-> util/PanelEmu.c                      |  293 ++++++++++
-> 30 files changed, 3547 insertions(+), 149 deletions(-)
-> create mode 100644 hw/arm/bcm2835.c
-> create mode 100644 hw/misc/bcm2835_mphi.c
-> create mode 100644 hw/misc/bcm2835_power.c
-> create mode 100644 hw/timer/bcm2835_st.c
-> create mode 100644 hw/timer/bcm2835_timer.c
-> create mode 100644 hw/usb/bcm2835_usb.c
-> create mode 100644 hw/usb/bcm2835_usb_regs.h
-> create mode 100644 include/hw/arm/bcm2835.h
-> create mode 100644 include/hw/intc/bcm2835_control.h
-> create mode 100644 include/hw/misc/bcm2835_mphi.h
-> create mode 100644 include/hw/misc/bcm2835_power.h
-> create mode 100644 include/hw/timer/bcm2835_st.h
-> create mode 100644 include/hw/timer/bcm2835_timer.h
-> create mode 100644 include/hw/usb/bcm2835_usb.h
-> create mode 100644 include/qemu/PanelEmu.h
-> create mode 100644 util/PanelEmu.c
->
+The first patch fixes a bug in the 'dd' command while the second adds support
+for the missing '--object' arg to 'dd', allowing it to reference secrets when
+opening files.  The last two patches implement the new features described above
+for the 'convert' command.
+
+Changed in v10:
+
+ - Fixed crash in qemu-img when locking flag is set, without
+   fmt being set (seen when running iotest 153).
+
+Changed in v9:
+
+ - Rebased against Kevin's "block" branch with Fam's patch
+   "qemu-img: Fix documentation of convert" applied first
+
+Changed in v8:
+
+ - Readd accidentally dropped check for compression (Max)
+ - Fix indentation of variable declaration (Max)
+ - Fix goto jump target (Max)
+
+Changed in v7:
+
+ - Drop the (accidentally included) revert patch (Eric)
+
+Changed in v6:
+
+ - Fix misc typos (Fam)
+ - Resolve messy conflicts wrt max/block-next (Max)
+
+Changed in v5:
+
+ - Fix return value (Max)
+ - Misc doc changes (Max)
+ - Use error_abort (Max)
+
+Changed in v4:
+
+ - Refactor img_open_new_file in terms of img_open_file (Kevin)
+
+Changed in v3:
+
+ - Drop all patches affecting the 'dd' command except for the clear bug fix
+   and the --object support. They can be re-considered once dd is rewritten
+   to run ontop of convert.
+ - Use consistent return/goto style in dd command (Max)
+ - Fix error reporting when using compressed image and skip-create (Max)
+ - Unconditionally create QDict when open files (Max)
+
+Changed in v2:
+
+ - Replace dd -n flag with support for conv=nocreat,notrunc
+ - Misc typos (Eric, Fam)
+
+
+Daniel P. Berrange (4):
+  qemu-img: add support for --object with 'dd' command
+  qemu-img: fix --image-opts usage with dd command
+  qemu-img: introduce --target-image-opts for 'convert' command
+  qemu-img: copy *key-secret opts when opening newly created files
+
+ qemu-img-cmds.hx |   4 +-
+ qemu-img.c       | 147 +++++++++++++++++++++++++++++++++++++++++++------------
+ qemu-img.texi    |  12 ++++-
+ 3 files changed, 128 insertions(+), 35 deletions(-)
+
+-- 
+2.9.3
