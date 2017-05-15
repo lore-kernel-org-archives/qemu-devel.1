@@ -1,34 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43479)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46606)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dA7ew-0003ZG-1s
-	for qemu-devel@nongnu.org; Mon, 15 May 2017 00:31:03 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1dA7yb-0006ss-Pz
+	for qemu-devel@nongnu.org; Mon, 15 May 2017 00:51:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dA7es-0001Py-SF
-	for qemu-devel@nongnu.org; Mon, 15 May 2017 00:31:02 -0400
-Received: from indium.canonical.com ([91.189.90.7]:49906)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1dA7es-0001O0-HJ
-	for qemu-devel@nongnu.org; Mon, 15 May 2017 00:30:58 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1dA7ep-0007sH-OZ
-	for <qemu-devel@nongnu.org>; Mon, 15 May 2017 04:30:55 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 8E6B42E80DD
-	for <qemu-devel@nongnu.org>; Mon, 15 May 2017 04:30:54 +0000 (UTC)
+	(envelope-from <dgibson@ozlabs.org>) id 1dA7ya-0001dv-4k
+	for qemu-devel@nongnu.org; Mon, 15 May 2017 00:51:21 -0400
+Date: Mon, 15 May 2017 14:12:58 +1000
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20170515041258.GA11105@umbus.fritz.box>
+References: <20170512233843.27713-1-f4bug@amsat.org>
+	<20170512233843.27713-6-f4bug@amsat.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 15 May 2017 04:17:25 -0000
-From: Launchpad Bug Tracker <720657@bugs.launchpad.net>
-Reply-To: Bug 720657 <720657@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20110217115121.6900.44475.malonedeb@wampee.canonical.com>
-Message-Id: <20170515041725.14553.7068.malone@loganberry.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 720657] Re: SVM intercept for VINTR exits too
- early
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="DocE+STaALJfprDB"
+Content-Disposition: inline
+In-Reply-To: <20170512233843.27713-6-f4bug@amsat.org>
+Subject: Re: [Qemu-devel] [PATCH v4 5/6] target/ppc: optimize various
+ functions using extract op
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,62 +25,214 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-
-[Expired for QEMU because there has been no activity for 60 days.]
-
-** Changed in: qemu
-       Status: Incomplete =3D> Expired
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/720657
-
-Title:
-  SVM intercept for VINTR exits too early
-
-Status in QEMU:
-  Expired
-
-Bug description:
-  The following happens with QEMU-0.14-rc2. QEMU-0.13 did not have this
-  problem.
-
-  A guest operating system running inside an SVM VM contains the following =
-code sequence:
-  c000002b:       fb                      sti    =
-
-  c000002c:       0f 35                   sysexit =
+To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
+Cc: qemu-devel@nongnu.org, Aurelien Jarno <aurelien@aurel32.net>, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>, qemu-ppc@nongnu.org
 
 
-  The following is a list of exits that occur at guest RIP 0xc000002c
-  (other exits omitted for clarity):
+--DocE+STaALJfprDB
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-  exit=3D0x60 int_shadow=3D0x1 int_control=3D0x1000000 inj=3D0x600000000 ri=
-p=3D0xc000002c
-  entry: int_shadow=3D0x1 int_control=3D0x1000000 inj=3D0x600000000
+On Fri, May 12, 2017 at 08:38:42PM -0300, Philippe Mathieu-Daud=E9 wrote:
+> Patch created mechanically using Coccinelle script via:
+>=20
+>     $ spatch --macro-file scripts/cocci-macro-file.h --in-place \
+>         --sp-file scripts/coccinelle/tcg_gen_extract.cocci --dir target
+>=20
+> Signed-off-by: Philippe Mathieu-Daud=E9 <f4bug@amsat.org>
 
-  (exit due to physical interrupt, correctly reports STI blocking, entry
-  does not inject anything)
+Acked-by: David Gibson <david@gibson.dropbear.id.au>
 
-  exit=3D0x60 int_shadow=3D0x1 int_control=3D0x1000000 inj=3D0x600000000 ri=
-p=3D0xc000002c
-  entry: int_shadow=3D0x1 int_control=3D0x1100100 inj=3D0x600000000
+Do you want me to merge this via my ppc tree, or is the whole set
+going in via some other path?
 
-  (exit due to physical interrupt, correctly reports STI blocking, entry
-  pends a VINTR to cause a VM exit when interrupt window opens. VINTR is
-  being intercepted by the hypervisor.)
+> ---
+>  target/ppc/translate.c              | 21 +++++++--------------
+>  target/ppc/translate/vsx-impl.inc.c | 24 ++++++++----------------
+>  2 files changed, 15 insertions(+), 30 deletions(-)
+>=20
+> diff --git a/target/ppc/translate.c b/target/ppc/translate.c
+> index f40b5a1abf..6521365bfa 100644
+> --- a/target/ppc/translate.c
+> +++ b/target/ppc/translate.c
+> @@ -868,8 +868,7 @@ static inline void gen_op_arith_add(DisasContext *ctx=
+, TCGv ret, TCGv arg1,
+>              }
+>              tcg_gen_xor_tl(cpu_ca, t0, t1);        /* bits changed w/ ca=
+rry */
+>              tcg_temp_free(t1);
+> -            tcg_gen_shri_tl(cpu_ca, cpu_ca, 32);   /* extract bit 32 */
+> -            tcg_gen_andi_tl(cpu_ca, cpu_ca, 1);
+> +            tcg_gen_extract_tl(cpu_ca, cpu_ca, 32, 1);
+>              if (is_isa300(ctx)) {
+>                  tcg_gen_mov_tl(cpu_ca32, cpu_ca);
+>              }
+> @@ -1399,8 +1398,7 @@ static inline void gen_op_arith_subf(DisasContext *=
+ctx, TCGv ret, TCGv arg1,
+>              tcg_temp_free(inv1);
+>              tcg_gen_xor_tl(cpu_ca, t0, t1);         /* bits changes w/ c=
+arry */
+>              tcg_temp_free(t1);
+> -            tcg_gen_shri_tl(cpu_ca, cpu_ca, 32);    /* extract bit 32 */
+> -            tcg_gen_andi_tl(cpu_ca, cpu_ca, 1);
+> +            tcg_gen_extract_tl(cpu_ca, cpu_ca, 32, 1);
+>              if (is_isa300(ctx)) {
+>                  tcg_gen_mov_tl(cpu_ca32, cpu_ca);
+>              }
+> @@ -4310,8 +4308,7 @@ static void gen_mfsrin(DisasContext *ctx)
+> =20
+>      CHK_SV;
+>      t0 =3D tcg_temp_new();
+> -    tcg_gen_shri_tl(t0, cpu_gpr[rB(ctx->opcode)], 28);
+> -    tcg_gen_andi_tl(t0, t0, 0xF);
+> +    tcg_gen_extract_tl(t0, cpu_gpr[rB(ctx->opcode)], 28, 4);
+>      gen_helper_load_sr(cpu_gpr[rD(ctx->opcode)], cpu_env, t0);
+>      tcg_temp_free(t0);
+>  #endif /* defined(CONFIG_USER_ONLY) */
+> @@ -4342,8 +4339,7 @@ static void gen_mtsrin(DisasContext *ctx)
+>      CHK_SV;
+> =20
+>      t0 =3D tcg_temp_new();
+> -    tcg_gen_shri_tl(t0, cpu_gpr[rB(ctx->opcode)], 28);
+> -    tcg_gen_andi_tl(t0, t0, 0xF);
+> +    tcg_gen_extract_tl(t0, cpu_gpr[rB(ctx->opcode)], 28, 4);
+>      gen_helper_store_sr(cpu_env, t0, cpu_gpr[rD(ctx->opcode)]);
+>      tcg_temp_free(t0);
+>  #endif /* defined(CONFIG_USER_ONLY) */
+> @@ -4377,8 +4373,7 @@ static void gen_mfsrin_64b(DisasContext *ctx)
+> =20
+>      CHK_SV;
+>      t0 =3D tcg_temp_new();
+> -    tcg_gen_shri_tl(t0, cpu_gpr[rB(ctx->opcode)], 28);
+> -    tcg_gen_andi_tl(t0, t0, 0xF);
+> +    tcg_gen_extract_tl(t0, cpu_gpr[rB(ctx->opcode)], 28, 4);
+>      gen_helper_load_sr(cpu_gpr[rD(ctx->opcode)], cpu_env, t0);
+>      tcg_temp_free(t0);
+>  #endif /* defined(CONFIG_USER_ONLY) */
+> @@ -4409,8 +4404,7 @@ static void gen_mtsrin_64b(DisasContext *ctx)
+> =20
+>      CHK_SV;
+>      t0 =3D tcg_temp_new();
+> -    tcg_gen_shri_tl(t0, cpu_gpr[rB(ctx->opcode)], 28);
+> -    tcg_gen_andi_tl(t0, t0, 0xF);
+> +    tcg_gen_extract_tl(t0, cpu_gpr[rB(ctx->opcode)], 28, 4);
+>      gen_helper_store_sr(cpu_env, t0, cpu_gpr[rS(ctx->opcode)]);
+>      tcg_temp_free(t0);
+>  #endif /* defined(CONFIG_USER_ONLY) */
+> @@ -5383,8 +5377,7 @@ static void gen_mfsri(DisasContext *ctx)
+>      CHK_SV;
+>      t0 =3D tcg_temp_new();
+>      gen_addr_reg_index(ctx, t0);
+> -    tcg_gen_shri_tl(t0, t0, 28);
+> -    tcg_gen_andi_tl(t0, t0, 0xF);
+> +    tcg_gen_extract_tl(t0, t0, 28, 4);
+>      gen_helper_load_sr(cpu_gpr[rd], cpu_env, t0);
+>      tcg_temp_free(t0);
+>      if (ra !=3D 0 && ra !=3D rd)
+> diff --git a/target/ppc/translate/vsx-impl.inc.c b/target/ppc/translate/v=
+sx-impl.inc.c
+> index 7f12908029..85ed135d44 100644
+> --- a/target/ppc/translate/vsx-impl.inc.c
+> +++ b/target/ppc/translate/vsx-impl.inc.c
+> @@ -1248,8 +1248,7 @@ static void gen_xsxexpdp(DisasContext *ctx)
+>          gen_exception(ctx, POWERPC_EXCP_VSXU);
+>          return;
+>      }
+> -    tcg_gen_shri_i64(rt, cpu_vsrh(xB(ctx->opcode)), 52);
+> -    tcg_gen_andi_i64(rt, rt, 0x7FF);
+> +    tcg_gen_extract_i64(rt, cpu_vsrh(xB(ctx->opcode)), 52, 11);
+>  }
+> =20
+>  static void gen_xsxexpqp(DisasContext *ctx)
+> @@ -1262,8 +1261,7 @@ static void gen_xsxexpqp(DisasContext *ctx)
+>          gen_exception(ctx, POWERPC_EXCP_VSXU);
+>          return;
+>      }
+> -    tcg_gen_shri_i64(xth, xbh, 48);
+> -    tcg_gen_andi_i64(xth, xth, 0x7FFF);
+> +    tcg_gen_extract_i64(xth, xbh, 48, 15);
+>      tcg_gen_movi_i64(xtl, 0);
+>  }
+> =20
+> @@ -1323,8 +1321,7 @@ static void gen_xsxsigdp(DisasContext *ctx)
+>      zr =3D tcg_const_i64(0);
+>      nan =3D tcg_const_i64(2047);
+> =20
+> -    tcg_gen_shri_i64(exp, cpu_vsrh(xB(ctx->opcode)), 52);
+> -    tcg_gen_andi_i64(exp, exp, 0x7FF);
+> +    tcg_gen_extract_i64(exp, cpu_vsrh(xB(ctx->opcode)), 52, 11);
+>      tcg_gen_movi_i64(t0, 0x0010000000000000);
+>      tcg_gen_movcond_i64(TCG_COND_EQ, t0, exp, zr, zr, t0);
+>      tcg_gen_movcond_i64(TCG_COND_EQ, t0, exp, nan, zr, t0);
+> @@ -1352,8 +1349,7 @@ static void gen_xsxsigqp(DisasContext *ctx)
+>      zr =3D tcg_const_i64(0);
+>      nan =3D tcg_const_i64(32767);
+> =20
+> -    tcg_gen_shri_i64(exp, cpu_vsrh(rB(ctx->opcode) + 32), 48);
+> -    tcg_gen_andi_i64(exp, exp, 0x7FFF);
+> +    tcg_gen_extract_i64(exp, cpu_vsrh(rB(ctx->opcode) + 32), 48, 15);
+>      tcg_gen_movi_i64(t0, 0x0001000000000000);
+>      tcg_gen_movcond_i64(TCG_COND_EQ, t0, exp, zr, zr, t0);
+>      tcg_gen_movcond_i64(TCG_COND_EQ, t0, exp, nan, zr, t0);
+> @@ -1448,10 +1444,8 @@ static void gen_xvxexpdp(DisasContext *ctx)
+>          gen_exception(ctx, POWERPC_EXCP_VSXU);
+>          return;
+>      }
+> -    tcg_gen_shri_i64(xth, xbh, 52);
+> -    tcg_gen_andi_i64(xth, xth, 0x7FF);
+> -    tcg_gen_shri_i64(xtl, xbl, 52);
+> -    tcg_gen_andi_i64(xtl, xtl, 0x7FF);
+> +    tcg_gen_extract_i64(xth, xbh, 52, 11);
+> +    tcg_gen_extract_i64(xtl, xbl, 52, 11);
+>  }
+> =20
+>  GEN_VSX_HELPER_2(xvxsigsp, 0x00, 0x04, 0, PPC2_ISA300)
+> @@ -1474,16 +1468,14 @@ static void gen_xvxsigdp(DisasContext *ctx)
+>      zr =3D tcg_const_i64(0);
+>      nan =3D tcg_const_i64(2047);
+> =20
+> -    tcg_gen_shri_i64(exp, xbh, 52);
+> -    tcg_gen_andi_i64(exp, exp, 0x7FF);
+> +    tcg_gen_extract_i64(exp, xbh, 52, 11);
+>      tcg_gen_movi_i64(t0, 0x0010000000000000);
+>      tcg_gen_movcond_i64(TCG_COND_EQ, t0, exp, zr, zr, t0);
+>      tcg_gen_movcond_i64(TCG_COND_EQ, t0, exp, nan, zr, t0);
+>      tcg_gen_andi_i64(xth, xbh, 0x000FFFFFFFFFFFFF);
+>      tcg_gen_or_i64(xth, xth, t0);
+> =20
+> -    tcg_gen_shri_i64(exp, xbl, 52);
+> -    tcg_gen_andi_i64(exp, exp, 0x7FF);
+> +    tcg_gen_extract_i64(exp, xbl, 52, 11);
+>      tcg_gen_movi_i64(t0, 0x0010000000000000);
+>      tcg_gen_movcond_i64(TCG_COND_EQ, t0, exp, zr, zr, t0);
+>      tcg_gen_movcond_i64(TCG_COND_EQ, t0, exp, nan, zr, t0);
 
-  exit=3D0x64 int_shadow=3D0x0 int_control=3D0x1100100 inj=3D0x600000000 ri=
-p=3D0xc000002c
-  entry: int_shadow=3D0x0 int_control=3D0x1000000 inj=3D0x6800000a0
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
 
-  (exit due to VINTR. At this point STI blocking is still effective -
-  though not reported. Actually, the VINTR exit should occur AFTER the
-  SYSEXIT instruction, not after STI. Due to this bug, the hypervisor
-  injects vector 0xa0 into an interrupt shadow, and things break).
+--DocE+STaALJfprDB
+Content-Type: application/pgp-signature; name="signature.asc"
 
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/720657/+subscriptions
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iQIcBAEBCAAGBQJZGSrHAAoJEGw4ysog2bOSOIwQAJ1hMILAMB0JvQdXOKZM1BlV
+di2Cd5GEXRS6S5NagdzCFXIx7ype5imx2r/kTjR3bJF9TX4iwxuQNWI9MkjEZKbQ
+JEdXSmNbJE2DhiEssl9EXMSl30BOq58KB+JVtp8G67TCBpkKbkVoehHOoojxIQa1
+VmSBtoth30P9+n9wbLOSY8wPCOC40qyB9o0eEuZAJhS0+WKATpBbdmhKMfkOXvZc
+KWd9m2PGdOsOvQEoubaP3Q+hiNpYPxDf9jGNhxtCrNGtbUUDasGkYaihhEBBm5aa
+V8e9QIJzbh9hbAjOaHvv+DR8eDoocwce7yrGqYK6agrkQPL591WWS8nhK8tkmXig
+9niGNZZ3jES/AOVan+VIW2kUlLKkxjEfrQUqjp8QbGHr5Ia121qyeOC4gxwAcnMq
+Y7r0qcA18OWxvUsKhkee6nOxzN96GJBXsMpVqmdN8FR2hpjSgCv93o90UKll3sGk
+8LZ9XouB93zd7R+vzKOR7B8q1mLVetgEW8tsunYEy9Y3JttdE0BjmSFQR+QsH2kb
+rKMYYOqWmksBIUJiy0UpRvcmM1MbZtKDCsL5HQt+moqduFzWN09i7XyRDVVQ4FXb
+QgwM3q9N50n8CBS1Qx3PBOvDUtwHTXQSXhKJCwlZXfRVdrcGkkd5sVYh+8NS2O9l
+7a5LPOVOt0o1kj+NBV6L
+=6gnU
+-----END PGP SIGNATURE-----
+
+--DocE+STaALJfprDB--
