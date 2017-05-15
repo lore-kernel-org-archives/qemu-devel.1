@@ -1,25 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59641)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60654)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dAFTx-0000XN-2i
-	for qemu-devel@nongnu.org; Mon, 15 May 2017 08:52:14 -0400
+	(envelope-from <stefanha@gmail.com>) id 1dAFWR-0001e4-AB
+	for qemu-devel@nongnu.org; Mon, 15 May 2017 08:54:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dAFTw-0002Ic-3C
-	for qemu-devel@nongnu.org; Mon, 15 May 2017 08:52:13 -0400
-Date: Mon, 15 May 2017 20:52:02 +0800
-From: Fam Zheng <famz@redhat.com>
-Message-ID: <20170515125202.GC7305@lemon.lan>
-References: <1494842563-6534-1-git-send-email-pl@kamp.de>
-	<20170515105032.GD23262@lemon.lan>
-	<26b2441d-e80c-eeef-fba1-67b2529e9287@kamp.de>
-	<20170515115318.GA7305@lemon.lan>
-	<243331f2-3822-3c0e-b4a5-9f3de2302fe4@kamp.de>
-	<20170515122802.GB7305@lemon.lan>
-	<b850c6d3-c104-b171-0e7d-40ebf6780d6e@kamp.de>
+	(envelope-from <stefanha@gmail.com>) id 1dAFWQ-0003kb-A5
+	for qemu-devel@nongnu.org; Mon, 15 May 2017 08:54:47 -0400
+Date: Mon, 15 May 2017 13:54:43 +0100
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20170515125443.GB1201@stefanha-x1.localdomain>
+References: <20170505021500.19315-1-eblake@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="cvVnyQ+4j833TQvp"
 Content-Disposition: inline
-In-Reply-To: <b850c6d3-c104-b171-0e7d-40ebf6780d6e@kamp.de>
-Subject: Re: [Qemu-devel] [RFC PATCH] qemu-io: add drain/undrain cmd
+In-Reply-To: <20170505021500.19315-1-eblake@redhat.com>
+Subject: Re: [Qemu-devel] [Qemu-block] [RFC PATCH 0/2] Enhance block status
+ when crossing EOF
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,70 +24,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Lieven <pl@kamp.de>
-Cc: kwolf@redhat.com, qemu-devel@nongnu.org, qemu-block@nongnu.org, mreitz@redhat.com
+To: Eric Blake <eblake@redhat.com>
+Cc: qemu-devel@nongnu.org, kwolf@redhat.com, qemu-block@nongnu.org, mreitz@redhat.com
 
-On Mon, 05/15 14:32, Peter Lieven wrote:
-> Am 15.05.2017 um 14:28 schrieb Fam Zheng:
-> > On Mon, 05/15 13:58, Peter Lieven wrote:
-> > > Am 15.05.2017 um 13:53 schrieb Fam Zheng:
-> > > > On Mon, 05/15 13:26, Peter Lieven wrote:
-> > > > > Am 15.05.2017 um 12:50 schrieb Fam Zheng:
-> > > > > > On Mon, 05/15 12:02, Peter Lieven wrote:
-> > > > > > > Hi Block developers,
-> > > > > > > 
-> > > > > > > I would like to add a feature to Qemu to drain all traffic from a block so that
-> > > > > > > I can take external snaphosts without the risk to that in the middle of a write
-> > > > > > > operation. Its meant for cases where where QGA freeze/thaw is not available.
-> > > > > > > 
-> > > > > > > For me its enough to have this through qemu-io, but Kevin asked me to check
-> > > > > > > if its not worth to have a stable API for it and present it via QMP/HMP.
-> > > > > > > 
-> > > > > > > What are your thoughts?
-> > > > > > For debugging purpose or a "hacky" usage where you know what you are doing, it
-> > > > > > may be fine to have this. The only issue is it should be a separate flag, like
-> > > > > > BlockJob.user_paused.
-> > > > > How can I add, remove such a flag?
-> > > > Like bs->user_drained. Set it in "drain" command, then increment
-> > > > bs->quiesce_counter if toggled; vise versa.
-> > > Ah okay. You wouldn't use bdrv_drained_begin/end? Because in these functions
-> > > the counter is incremented already.
-> > You're right, calling bdrv_drained_begin() is better.
-> > 
-> > > 
-> > > 
-> > > > > > What happens from guest perspective? In the case of virtio, the request queue is
-> > > > > > not handled and -ETIMEDOUT may happen. With IDE, I/O commands are still handled,
-> > > > > > the command is not effective (or rather the implementation is not complete).
-> > > > > That it only works with virtio is fine. However, the thing it does not work correctly
-> > > > > apply then also to all other users of the drained_begin/end functions, right?
-> > > > > As for the timeout I only plan to drain the device for about 1 second.
-> > > > It didn't matter because for IDE, the invariant (staying quiesced as long as
-> > > > necessary) is already ensured by BQL.  Virtio is different because it supports
-> > > > ioeventfd and data plane.
-> > > Okay understood. So my use of bdrv_drained_begin/end is more an abuse of
-> > > these functions?
-> > Sort of. But it's not unreasonable to "extend" bdrv_drained_begin/end to cover
-> > IDE, I just haven't thought about "how".
-> > 
-> > > Do you have another idea how to achieve what I want? I was thinking of throttle
-> > > the I/O to zero. It would be enough to do this for writes, reading doesn't hurt in
-> > > my case.
-> > Maybe add a block filter on top of the drained node, drain it when doing so,
-> > then queue all further requests with a CoQueue until "undrain".  (It is then not
-> > quite to "drain" but to "halt" or "pause", though.)
-> 
-> To get the drain for free was why I was looking at this approach. If I read correctly
-> if I keep using bdrv_drained_begin/end its too hacky to implement it in QMP?
 
-I think so.
+--cvVnyQ+4j833TQvp
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-> If yes, would support adding it to qemu-io?
+On Thu, May 04, 2017 at 09:14:58PM -0500, Eric Blake wrote:
+> As mentioned in my 'qcow2 zero-cluster tweaks' cover letter
+> https://lists.gnu.org/archive/html/qemu-devel/2017-05/msg00722.html
+> I hit a case where we were not fully optimizing a write-zeroes
+> operation when we have a backing file that is shorter than the
+> active layer, and where the request crosses that boundary.  I don't
+> know that the situation will be all that common (most qcow2 files
+> happen to be cluster-aligned in size; and most backing chains use
+> the same length at each layer of the chain), but for RFC purposes,
+> I wanted to explore how easy it would be to optimize the case
+> anyways, and to see if we can think of any other cases where
+> knowing that a block status crossed an end-of-file boundary can
+> be exploited for less work.
+>=20
+> Thus, this is a followup to that series, but I'm also okay if we
+> think it is too much maintenance compared to the potential gains,
+> and decide to drop it after all.
+>=20
+> Another potential use that I thought of: we may someday want to
+> track BDS length by bytes.  Right now, bdrv_getlength() returns a
+> value in bytes, but which is sector-aligned, by adding padding;
+> but raw-format.c is able to see the transition between data up to
+> EOF followed by a hole after EOF.  Because of that, my series to
+> convert bdrv_get_block_status() into a byte-based interface has to
+> fudge things - any time we see a mid-sector hole being reported,
+> we know it is because we hit EOF, and can round the result up to
+> the next sector boundary.  Having the BDRV_BLOCK_EOF flag set in
+> that case may alert clients that the rounding took place, or help
+> us when we quit doing the rounding and actually start tracking BDS
+> lengths by bytes even where it is not sector-aligned.
+>=20
+> Eric Blake (2):
+>   block: Add BDRV_BLOCK_EOF to bdrv_get_block_status()
+>   block: Exploit BDRV_BLOCK_EOF for larger zero blocks
+>=20
+>  include/block/block.h      |  2 ++
+>  block/io.c                 | 42 +++++++++++++++++++++++++++++++++-------=
+--
+>  tests/qemu-iotests/154     |  4 ----
+>  tests/qemu-iotests/154.out | 12 ++++++------
+>  4 files changed, 41 insertions(+), 19 deletions(-)
+>=20
+> --=20
+> 2.9.3
+>=20
+>=20
 
-I'm under the impression that you are looking to a real use case, I don't think
-I like the idea. Also, accessing the image from other processes while QEMU is
-using it is strongly discouraged, and there is the coming image locking
-mechanism to prevent this from happening. Why is the blockdev-snapshot command
-not enough?
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 
-Fam
+--cvVnyQ+4j833TQvp
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJZGaUTAAoJEJykq7OBq3PIgZEH+gMRJ0+JelWImyG/vDlKiXYK
+ZZ8wZXZ0m1QglH8DSprVZ+1/Z8gDtRWfLl9PwZCDLrrtcRxYDAesQ27f6sOHxc0K
+xe6m80cWwyAphmq0/t6RIhXM8+j9tTPJa/nHYGbWEE9HYc2LICivF06YhroU8mlT
+vwAxCCPARVtqemy+bHyTacujfzUenz1zOjIAFfUlalv4Gq/rKEDb8GT9Un5trdc5
++8k3uxh5tVaVn1x6j1oiNFhbR521uL4Foajkfcmr1OVjAzE0ISsJ1pwcGM03F+oq
+ufwWGRTVe2chcwDwx8qwbvNhEb3+MBjtkuA4OnCrxT3hPFdttw9sKmBsVaSoEdg=
+=e5gp
+-----END PGP SIGNATURE-----
+
+--cvVnyQ+4j833TQvp--
