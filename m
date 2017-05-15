@@ -1,20 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36876)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37077)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dAHU7-0007gA-8o
-	for qemu-devel@nongnu.org; Mon, 15 May 2017 11:00:37 -0400
+	(envelope-from <Milos.Stojanovic@rt-rk.com>) id 1dAHUt-0008DN-0j
+	for qemu-devel@nongnu.org; Mon, 15 May 2017 11:01:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dAHU6-00047E-Dc
-	for qemu-devel@nongnu.org; Mon, 15 May 2017 11:00:31 -0400
-References: <20170515141014.25793-1-famz@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <efc90945-9b9e-9e52-80b6-96ab49294858@redhat.com>
-Date: Mon, 15 May 2017 10:00:16 -0500
+	(envelope-from <Milos.Stojanovic@rt-rk.com>) id 1dAHUo-0004J8-5G
+	for qemu-devel@nongnu.org; Mon, 15 May 2017 11:01:19 -0400
+Received: from mx2.rt-rk.com ([89.216.37.149]:45605 helo=mail.rt-rk.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <Milos.Stojanovic@rt-rk.com>)
+	id 1dAHUn-0004IV-Pw
+	for qemu-devel@nongnu.org; Mon, 15 May 2017 11:01:14 -0400
+From: =?UTF-8?q?Milo=C5=A1=20Stojanovi=C4=87?= <Milos.Stojanovic@rt-rk.com>
+Date: Mon, 15 May 2017 16:59:42 +0200
+Message-Id: <1494860396-24930-3-git-send-email-Milos.Stojanovic@rt-rk.com>
+In-Reply-To: <1494860396-24930-1-git-send-email-Milos.Stojanovic@rt-rk.com>
+References: <1494860396-24930-1-git-send-email-Milos.Stojanovic@rt-rk.com>
 MIME-Version: 1.0
-In-Reply-To: <20170515141014.25793-1-famz@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="MM0koiRnqC2AhJFFovG4CSi23AnPqLqd9"
-Subject: Re: [Qemu-devel] [PATCH] qemu-img: Fix leakage of options on error
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v2 02/16] linux-user: add tkill(),
+ tgkill() and rt_sigqueueinfo() strace
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,56 +28,130 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
+To: qemu-devel@nongnu.org, riku.voipio@iki.fi
+Cc: laurent@vivier.eu, Miodrag.Dinic@rt-rk.com, Aleksandar.Markovic@rt-rk.com, Petar.Jovanovic@rt-rk.com, yongbok.kim@imgtec.com, Milos.Stojanovic@rt-rk.com
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---MM0koiRnqC2AhJFFovG4CSi23AnPqLqd9
-From: Eric Blake <eblake@redhat.com>
-To: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org,
- Max Reitz <mreitz@redhat.com>
-Message-ID: <efc90945-9b9e-9e52-80b6-96ab49294858@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] qemu-img: Fix leakage of options on error
-References: <20170515141014.25793-1-famz@redhat.com>
-In-Reply-To: <20170515141014.25793-1-famz@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Improve strace support for syscall tkill(), tgkill() and rt_sigqueueinfo(=
+)
+by implementing print functions that match arguments types of the system
+calls and add them to the corresponding starce.list entry.
 
-On 05/15/2017 09:10 AM, Fam Zheng wrote:
-> Reported by Coverity.
->=20
-> Signed-off-by: Fam Zheng <famz@redhat.com>
-> ---
->  qemu-img.c | 1 +
->  1 file changed, 1 insertion(+)
+tkill:
+Prior to this commit, typical strace output used to look like this:
+4886 tkill(4886,50,0,4832615904,0,-9151031864016699136) =3D 0
+After this commit, it looks like this:
+4886 tkill(4886,50) =3D 0
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
+tgkill:
+Prior to this commit, typical strace output used to look like this:
+4890 tgkill(4890,4890,50,8,4832630528,4832615904) =3D 0
+After this commit, it looks like this:
+4890 tgkill(4890,4890,50) =3D 0
 
+rt_sigqueueinfo:
+Prior to this commit, typical strace output used to look like this:
+8307 rt_sigqueueinfo(8307,50,1996483164,0,0,50) =3D 0
+After this commit, it looks like this:
+8307 rt_sigqueueinfo(8307,50,0x00000040007ff6b0) =3D 0
 
+Signed-off-by: Milo=C5=A1 Stojanovi=C4=87 <Milos.Stojanovic@rt-rk.com>
+---
+ linux-user/strace.c    | 41 +++++++++++++++++++++++++++++++++++++++++
+ linux-user/strace.list |  6 +++---
+ 2 files changed, 44 insertions(+), 3 deletions(-)
+
+diff --git a/linux-user/strace.c b/linux-user/strace.c
+index 8fb1b6e..f6f76a5 100644
+--- a/linux-user/strace.c
++++ b/linux-user/strace.c
+@@ -1901,6 +1901,20 @@ print_rt_sigprocmask(const struct syscallname *nam=
+e,
+ }
+ #endif
+=20
++#ifdef TARGET_NR_rt_sigqueueinfo
++static void
++print_rt_sigqueueinfo(const struct syscallname *name,
++    abi_long arg0, abi_long arg1, abi_long arg2,
++    abi_long arg3, abi_long arg4, abi_long arg5)
++{
++    print_syscall_prologue(name);
++    print_raw_param("%d", arg0, 0);
++    print_signal(arg1, 0);
++    print_pointer(arg2, 1);
++    print_syscall_epilogue(name);
++}
++#endif
++
+ #ifdef TARGET_NR_syslog
+ static void
+ print_syslog_action(abi_ulong arg, int last)
+@@ -2415,6 +2429,33 @@ print_kill(const struct syscallname *name,
+ }
+ #endif
+=20
++#ifdef TARGET_NR_tkill
++static void
++print_tkill(const struct syscallname *name,
++    abi_long arg0, abi_long arg1, abi_long arg2,
++    abi_long arg3, abi_long arg4, abi_long arg5)
++{
++    print_syscall_prologue(name);
++    print_raw_param("%d", arg0, 0);
++    print_signal(arg1, 1);
++    print_syscall_epilogue(name);
++}
++#endif
++
++#ifdef TARGET_NR_tgkill
++static void
++print_tgkill(const struct syscallname *name,
++    abi_long arg0, abi_long arg1, abi_long arg2,
++    abi_long arg3, abi_long arg4, abi_long arg5)
++{
++    print_syscall_prologue(name);
++    print_raw_param("%d", arg0, 0);
++    print_raw_param("%d", arg1, 0);
++    print_signal(arg2, 1);
++    print_syscall_epilogue(name);
++}
++#endif
++
+ /*
+  * An array of all of the syscalls we know about
+  */
+diff --git a/linux-user/strace.list b/linux-user/strace.list
+index 6e33788..373d436 100644
+--- a/linux-user/strace.list
++++ b/linux-user/strace.list
+@@ -1155,7 +1155,7 @@
+ { TARGET_NR_rt_sigprocmask, "rt_sigprocmask" , NULL, print_rt_sigprocmas=
+k, NULL },
+ #endif
+ #ifdef TARGET_NR_rt_sigqueueinfo
+-{ TARGET_NR_rt_sigqueueinfo, "rt_sigqueueinfo" , NULL, NULL, NULL },
++{ TARGET_NR_rt_sigqueueinfo, "rt_sigqueueinfo" , NULL, print_rt_sigqueue=
+info, NULL },
+ #endif
+ #ifdef TARGET_NR_rt_sigreturn
+ { TARGET_NR_rt_sigreturn, "rt_sigreturn" , NULL, NULL, NULL },
+@@ -1498,7 +1498,7 @@
+ { TARGET_NR_tee, "tee" , NULL, NULL, NULL },
+ #endif
+ #ifdef TARGET_NR_tgkill
+-{ TARGET_NR_tgkill, "tgkill" , NULL, NULL, NULL },
++{ TARGET_NR_tgkill, "tgkill" , NULL, print_tgkill, NULL },
+ #endif
+ #ifdef TARGET_NR_time
+ { TARGET_NR_time, "time" , NULL, NULL, NULL },
+@@ -1534,7 +1534,7 @@
+ { TARGET_NR_times, "times" , NULL, NULL, NULL },
+ #endif
+ #ifdef TARGET_NR_tkill
+-{ TARGET_NR_tkill, "tkill" , NULL, NULL, NULL },
++{ TARGET_NR_tkill, "tkill" , NULL, print_tkill, NULL },
+ #endif
+ #ifdef TARGET_NR_truncate
+ { TARGET_NR_truncate, "truncate" , NULL, NULL, NULL },
 --=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---MM0koiRnqC2AhJFFovG4CSi23AnPqLqd9
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEcBAEBCAAGBQJZGcKAAAoJEKeha0olJ0NqxPwIAK8npkcABfeHPuh1HQNFGgxa
-tCQgwwrV+eB6S383KkyCPx9gE2SpU618ezjRu5uaQP4s+lgPRshjUUOTDkymXf3r
-1doVIfGsmjyitsfZI1iXQb8YsOmldcg5jhoZbtYUi3f08hvCEIrnpPRZ214yzBBw
-kCsDjg0kr6yusoLKg1ReEBfRSuHfMIrSYS78jk7W8u8FbL5YRaeazBN5MM/bFBYc
-jErplmFDPPNaEUIfrSiVZqS5xM90cxxfxy4X0aGGVivAnIHISIaQq/GpC9E+emww
-KK1paRMGZuQr9GimLIFp2uF1KdZf9PCywLTwtRTuiIWnlhYGbhnGz/D7JgCCmQk=
-=i6Qo
------END PGP SIGNATURE-----
-
---MM0koiRnqC2AhJFFovG4CSi23AnPqLqd9--
+1.9.1
