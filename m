@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37387)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37576)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Milos.Stojanovic@rt-rk.com>) id 1dAHWV-00011s-E5
-	for qemu-devel@nongnu.org; Mon, 15 May 2017 11:03:03 -0400
+	(envelope-from <Milos.Stojanovic@rt-rk.com>) id 1dAHX3-0001VF-9C
+	for qemu-devel@nongnu.org; Mon, 15 May 2017 11:03:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <Milos.Stojanovic@rt-rk.com>) id 1dAHWQ-00052g-GK
-	for qemu-devel@nongnu.org; Mon, 15 May 2017 11:02:59 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:45938 helo=mail.rt-rk.com)
+	(envelope-from <Milos.Stojanovic@rt-rk.com>) id 1dAHWy-0005Rn-EN
+	for qemu-devel@nongnu.org; Mon, 15 May 2017 11:03:33 -0400
+Received: from mx2.rt-rk.com ([89.216.37.149]:46049 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <Milos.Stojanovic@rt-rk.com>)
-	id 1dAHWQ-00050r-9T
-	for qemu-devel@nongnu.org; Mon, 15 May 2017 11:02:54 -0400
+	id 1dAHWy-0005R5-6t
+	for qemu-devel@nongnu.org; Mon, 15 May 2017 11:03:28 -0400
 From: =?UTF-8?q?Milo=C5=A1=20Stojanovi=C4=87?= <Milos.Stojanovic@rt-rk.com>
-Date: Mon, 15 May 2017 16:59:45 +0200
-Message-Id: <1494860396-24930-6-git-send-email-Milos.Stojanovic@rt-rk.com>
+Date: Mon, 15 May 2017 16:59:46 +0200
+Message-Id: <1494860396-24930-7-git-send-email-Milos.Stojanovic@rt-rk.com>
 In-Reply-To: <1494860396-24930-1-git-send-email-Milos.Stojanovic@rt-rk.com>
 References: <1494860396-24930-1-git-send-email-Milos.Stojanovic@rt-rk.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v2 05/16] linux-user: fix argument type
- declaration of rt_sigqueinfo() syscall
+Subject: [Qemu-devel] [PATCH v2 06/16] linux-user: add support for
+ rt_tgsigqueueinfo() system call
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,31 +31,73 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, riku.voipio@iki.fi
 Cc: laurent@vivier.eu, Miodrag.Dinic@rt-rk.com, Aleksandar.Markovic@rt-rk.com, Petar.Jovanovic@rt-rk.com, yongbok.kim@imgtec.com, Milos.Stojanovic@rt-rk.com
 
-Change the type of the first argument of rt_sigqueinfo() from int to pid_=
-t
-in the syscall declaration to match specifications of the system call.
+Add a new system call: rt_tgsigqueueinfo().
 
-Proper spacing is added to satisfy checkpatch.pl.
+This system call is similar to rt_sigqueueinfo(), but instead of
+sending the signal and data to the whole thread group with the ID
+equal to the argument tgid, it sends it to a single thread within
+that thread group. The ID of the thread is specified by the tid
+argument.
+
+The implementation is based on the rt_sigqueueinfo() in linux-user
+mode, where the tid is added as the second argument and the
+previous second and third argument become arguments three and four,
+respectively.
 
 Signed-off-by: Milo=C5=A1 Stojanovi=C4=87 <Milos.Stojanovic@rt-rk.com>
+
+Conflicts:
+	linux-user/syscall.c
 ---
- linux-user/syscall.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ linux-user/syscall.c | 16 ++++++++++++++++
+ 1 file changed, 16 insertions(+)
 
 diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-index ff03e1a..9ec7ccd 100644
+index 9ec7ccd..d3b769e 100644
 --- a/linux-user/syscall.c
 +++ b/linux-user/syscall.c
-@@ -274,7 +274,7 @@ _syscall3(int, sys_getdents64, uint, fd, struct linux=
-_dirent64 *, dirp, uint, co
- _syscall5(int, _llseek,  uint,  fd, ulong, hi, ulong, lo,
+@@ -238,6 +238,7 @@ static type name (type1 arg1,type2 arg2,type3 arg3,ty=
+pe4 arg4,type5 arg5,	\
+ #define __NR_sys_getdents64 __NR_getdents64
+ #define __NR_sys_getpriority __NR_getpriority
+ #define __NR_sys_rt_sigqueueinfo __NR_rt_sigqueueinfo
++#define __NR_sys_rt_tgsigqueueinfo __NR_rt_tgsigqueueinfo
+ #define __NR_sys_syslog __NR_syslog
+ #define __NR_sys_futex __NR_futex
+ #define __NR_sys_inotify_init __NR_inotify_init
+@@ -275,6 +276,8 @@ _syscall5(int, _llseek,  uint,  fd, ulong, hi, ulong,=
+ lo,
            loff_t *, res, uint, wh);
  #endif
--_syscall3(int,sys_rt_sigqueueinfo,int,pid,int,sig,siginfo_t *,uinfo)
-+_syscall3(int, sys_rt_sigqueueinfo, pid_t, pid, int, sig, siginfo_t *, u=
+ _syscall3(int, sys_rt_sigqueueinfo, pid_t, pid, int, sig, siginfo_t *, u=
 info)
++_syscall4(int, sys_rt_tgsigqueueinfo, pid_t, pid, pid_t, tid, int, sig,
++          siginfo_t *, uinfo)
  _syscall3(int,sys_syslog,int,type,char*,bufp,int,len)
  #ifdef __NR_exit_group
  _syscall1(int,exit_group,int,error_code)
+@@ -8843,6 +8846,19 @@ abi_long do_syscall(void *cpu_env, int num, abi_lo=
+ng arg1,
+             ret =3D get_errno(sys_rt_sigqueueinfo(arg1, arg2, &uinfo));
+         }
+         break;
++    case TARGET_NR_rt_tgsigqueueinfo:
++        {
++            siginfo_t uinfo;
++
++            p =3D lock_user(VERIFY_READ, arg4, sizeof(target_siginfo_t),=
+ 1);
++            if (!p) {
++                goto efault;
++            }
++            target_to_host_siginfo(&uinfo, p);
++            unlock_user(p, arg4, 0);
++            ret =3D get_errno(sys_rt_tgsigqueueinfo(arg1, arg2, arg3, &u=
+info));
++        }
++        break;
+ #ifdef TARGET_NR_sigreturn
+     case TARGET_NR_sigreturn:
+         if (block_signals()) {
 --=20
 1.9.1
