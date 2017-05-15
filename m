@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51103)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52719)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1dAAqp-0008Me-3A
-	for qemu-devel@nongnu.org; Mon, 15 May 2017 03:55:32 -0400
+	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1dAAyK-0001Bl-3O
+	for qemu-devel@nongnu.org; Mon, 15 May 2017 04:03:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1dAAqm-0005gj-0g
-	for qemu-devel@nongnu.org; Mon, 15 May 2017 03:55:31 -0400
-Received: from [59.151.112.132] (port=36659 helo=heian.cn.fujitsu.com)
+	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1dAAyF-0000Kw-IU
+	for qemu-devel@nongnu.org; Mon, 15 May 2017 04:03:16 -0400
+Received: from [59.151.112.132] (port=62873 helo=heian.cn.fujitsu.com)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1dAAql-0005eO-1G
-	for qemu-devel@nongnu.org; Mon, 15 May 2017 03:55:27 -0400
+	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1dAAyE-0000J7-IA
+	for qemu-devel@nongnu.org; Mon, 15 May 2017 04:03:11 -0400
 References: <1494553288-30764-1-git-send-email-zhangchen.fnst@cn.fujitsu.com>
-	<1494553288-30764-7-git-send-email-zhangchen.fnst@cn.fujitsu.com>
-	<c08c1b97-3035-b87f-fd5a-e5ab9646714c@redhat.com>
+	<1494553288-30764-8-git-send-email-zhangchen.fnst@cn.fujitsu.com>
+	<8779a4c4-17eb-c643-6a44-6f20f55cb6f7@redhat.com>
 From: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
-Message-ID: <d3ab5ad6-e337-5de3-f226-fc4c2f25061e@cn.fujitsu.com>
-Date: Mon, 15 May 2017 15:55:36 +0800
+Message-ID: <ee114082-00f8-d5cf-7370-8d17b178dd63@cn.fujitsu.com>
+Date: Mon, 15 May 2017 16:03:17 +0800
 MIME-Version: 1.0
-In-Reply-To: <c08c1b97-3035-b87f-fd5a-e5ab9646714c@redhat.com>
+In-Reply-To: <8779a4c4-17eb-c643-6a44-6f20f55cb6f7@redhat.com>
 Content-Type: text/plain; charset="utf-8"; format=flowed
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH V4 06/12] net/colo-compare.c: Add new
- option to enable vnet support for colo-compare
+Subject: Re: [Qemu-devel] [PATCH V4 07/12] net/colo.c: Make vnet_hdr_len as
+ packet property
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,128 +35,101 @@ Cc: zhangchen.fnst@cn.fujitsu.com, zhanghailiang <zhang.zhanghailiang@huawei.com
 
 
 
-On 05/15/2017 12:03 PM, Jason Wang wrote:
+On 05/15/2017 12:05 PM, Jason Wang wrote:
 >
 >
 > On 2017年05月12日 09:41, Zhang Chen wrote:
->> We add the vnet_hdr option for colo-compare, default is disable.
->> If you use virtio-net-pci net driver, please enable it.
->> You can use it for example:
->> -object 
->> colo-compare,id=comp0,primary_in=compare0-0,secondary_in=compare1,outdev=compare_out0,vnet_hdr=on
+>> We can use this property flush and send packet with vnet_hdr_len.
 >>
 >> Signed-off-by: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
->> ---
->>   net/colo-compare.c | 34 +++++++++++++++++++++++++++++++++-
->>   qemu-options.hx    |  3 ++-
->>   2 files changed, 35 insertions(+), 2 deletions(-)
->>
->> diff --git a/net/colo-compare.c b/net/colo-compare.c
->> index 332f57e..99a6912 100644
->> --- a/net/colo-compare.c
->> +++ b/net/colo-compare.c
->> @@ -73,6 +73,7 @@ typedef struct CompareState {
->>       CharBackend chr_out;
->>       SocketReadState pri_rs;
->>       SocketReadState sec_rs;
->> +    bool vnet_hdr;
->>         /* connection list: the connections belonged to this NIC 
->> could be found
->>        * in this list.
->> @@ -642,6 +643,28 @@ static void compare_set_outdev(Object *obj, 
->> const char *value, Error **errp)
->>       s->outdev = g_strdup(value);
->>   }
->>   +static char *compare_get_vnet_hdr(Object *obj, Error **errp)
->> +{
->> +    CompareState *s = COLO_COMPARE(obj);
->> +
->> +    return s->vnet_hdr ? g_strdup("on") : g_strdup("off");
->> +}
->> +
->> +static void compare_set_vnet_hdr(Object *obj,
->> +                                 const char *value,
->> +                                 Error **errp)
->> +{
->> +    CompareState *s = COLO_COMPARE(obj);
->> +
->> +    if (strcmp(value, "on") && strcmp(value, "off")) {
->> +        error_setg(errp, "Invalid value for colo-compare vnet_hdr, "
->> +                         "should be 'on' or 'off'");
->> +        return;
->> +    }
->> +
->> +    s->vnet_hdr = !strcmp(value, "on");
->> +}
->> +
->>   static void compare_pri_rs_finalize(SocketReadState *pri_rs)
->>   {
->>       CompareState *s = container_of(pri_rs, CompareState, pri_rs);
->> @@ -667,7 +690,6 @@ static void 
->> compare_sec_rs_finalize(SocketReadState *sec_rs)
->>       }
->>   }
->>   -
 >
-> Unnecessary whitespace change.
+> Then I think it's not necessary to store vnet_hdr_len in SocketReadState?
 
-I will remove it in next version.
+Do you means we keep the patch 05/12 in original?
 
->
->>   /*
->>    * Return 0 is success.
->>    * Return 1 is failed.
->> @@ -775,6 +797,8 @@ static void colo_compare_class_init(ObjectClass 
->> *oc, void *data)
->>     static void colo_compare_init(Object *obj)
->>   {
->> +    CompareState *s = COLO_COMPARE(obj);
->> +
->>       object_property_add_str(obj, "primary_in",
->>                               compare_get_pri_indev, 
->> compare_set_pri_indev,
->>                               NULL);
->> @@ -784,6 +808,14 @@ static void colo_compare_init(Object *obj)
->>       object_property_add_str(obj, "outdev",
->>                               compare_get_outdev, compare_set_outdev,
->>                               NULL);
->> +    /*
->> +     * The vnet_hdr is disabled by default, if you want to enable
->> +     * this option, you must enable all the option on related modules
->> +     * (like other filter or colo-compare).
->> +     */
->> +    s->vnet_hdr = false;
->> +    object_property_add_str(obj, "vnet_hdr", compare_get_vnet_hdr,
->> +                            compare_set_vnet_hdr, NULL);
->>   }
->>     static void colo_compare_finalize(Object *obj)
->> diff --git a/qemu-options.hx b/qemu-options.hx
->> index 0f81c22..115b83f 100644
->> --- a/qemu-options.hx
->> +++ b/qemu-options.hx
->> @@ -4061,12 +4061,13 @@ The file format is libpcap, so it can be 
->> analyzed with tools such as tcpdump
->>   or Wireshark.
->>     @item -object 
->> colo-compare,id=@var{id},primary_in=@var{chardevid},secondary_in=@var{chardevid},
->> -outdev=@var{chardevid}
->> +outdev=@var{chardevid},vnet_hdr=@var{on|off}
->>     Colo-compare gets packet from primary_in@var{chardevid} and 
->> secondary_in@var{chardevid}, than compare primary packet with
->>   secondary packet. If the packets are same, we will output primary
->>   packet to outdev@var{chardevid}, else we will notify colo-frame
->>   do checkpoint and send primary packet to outdev@var{chardevid}.
->> +if vnet_hdr = on, colo compare will send/recv packet with vnet_hdr_len.
->>     we must use it with the help of filter-mirror and filter-redirector.
->
-> Please squash this into its function implementation.
-
-OK.
 Thanks
 Zhang Chen
 
 >
 > Thanks
+>
+>> ---
+>>   net/colo-compare.c    | 8 ++++++--
+>>   net/colo.c            | 3 ++-
+>>   net/colo.h            | 4 +++-
+>>   net/filter-rewriter.c | 2 +-
+>>   4 files changed, 12 insertions(+), 5 deletions(-)
+>>
+>> diff --git a/net/colo-compare.c b/net/colo-compare.c
+>> index 99a6912..87a9529 100644
+>> --- a/net/colo-compare.c
+>> +++ b/net/colo-compare.c
+>> @@ -122,9 +122,13 @@ static int packet_enqueue(CompareState *s, int 
+>> mode)
+>>       Connection *conn;
+>>         if (mode == PRIMARY_IN) {
+>> -        pkt = packet_new(s->pri_rs.buf, s->pri_rs.packet_len);
+>> +        pkt = packet_new(s->pri_rs.buf,
+>> +                         s->pri_rs.packet_len,
+>> +                         s->pri_rs.vnet_hdr_len);
+>>       } else {
+>> -        pkt = packet_new(s->sec_rs.buf, s->sec_rs.packet_len);
+>> +        pkt = packet_new(s->sec_rs.buf,
+>> +                         s->sec_rs.packet_len,
+>> +                         s->sec_rs.vnet_hdr_len);
+>>       }
+>>         if (parse_packet_early(pkt)) {
+>> diff --git a/net/colo.c b/net/colo.c
+>> index 8cc166b..180eaed 100644
+>> --- a/net/colo.c
+>> +++ b/net/colo.c
+>> @@ -153,13 +153,14 @@ void connection_destroy(void *opaque)
+>>       g_slice_free(Connection, conn);
+>>   }
+>>   -Packet *packet_new(const void *data, int size)
+>> +Packet *packet_new(const void *data, int size, int vnet_hdr_len)
+>>   {
+>>       Packet *pkt = g_slice_new(Packet);
+>>         pkt->data = g_memdup(data, size);
+>>       pkt->size = size;
+>>       pkt->creation_ms = qemu_clock_get_ms(QEMU_CLOCK_HOST);
+>> +    pkt->vnet_hdr_len = vnet_hdr_len;
+>>         return pkt;
+>>   }
+>> diff --git a/net/colo.h b/net/colo.h
+>> index 7c524f3..caedb0d 100644
+>> --- a/net/colo.h
+>> +++ b/net/colo.h
+>> @@ -43,6 +43,8 @@ typedef struct Packet {
+>>       int size;
+>>       /* Time of packet creation, in wall clock ms */
+>>       int64_t creation_ms;
+>> +    /* Get vnet_hdr_len from filter */
+>> +    uint32_t vnet_hdr_len;
+>>   } Packet;
+>>     typedef struct ConnectionKey {
+>> @@ -82,7 +84,7 @@ Connection *connection_get(GHashTable 
+>> *connection_track_table,
+>>                              ConnectionKey *key,
+>>                              GQueue *conn_list);
+>>   void connection_hashtable_reset(GHashTable *connection_track_table);
+>> -Packet *packet_new(const void *data, int size);
+>> +Packet *packet_new(const void *data, int size, int vnet_hdr_len);
+>>   void packet_destroy(void *opaque, void *user_data);
+>>     #endif /* QEMU_COLO_PROXY_H */
+>> diff --git a/net/filter-rewriter.c b/net/filter-rewriter.c
+>> index afa06e8..63256c7 100644
+>> --- a/net/filter-rewriter.c
+>> +++ b/net/filter-rewriter.c
+>> @@ -158,7 +158,7 @@ static ssize_t 
+>> colo_rewriter_receive_iov(NetFilterState *nf,
+>>       char *buf = g_malloc0(size);
+>>         iov_to_buf(iov, iovcnt, 0, buf, size);
+>> -    pkt = packet_new(buf, size);
+>> +    pkt = packet_new(buf, size, 0);
+>>       g_free(buf);
+>>         /*
+>
 >
 >
 > .
