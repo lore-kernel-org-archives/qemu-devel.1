@@ -1,26 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39379)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39669)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1dAFqA-00070Q-18
-	for qemu-devel@nongnu.org; Mon, 15 May 2017 09:15:11 -0400
+	(envelope-from <groug@kaod.org>) id 1dAFrE-0007qG-O8
+	for qemu-devel@nongnu.org; Mon, 15 May 2017 09:16:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1dAFq5-0005rD-NJ
-	for qemu-devel@nongnu.org; Mon, 15 May 2017 09:15:10 -0400
-Received: from mail-lf0-x244.google.com ([2a00:1450:4010:c07::244]:34387)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1dAFq5-0005r2-AT
-	for qemu-devel@nongnu.org; Mon, 15 May 2017 09:15:05 -0400
-Received: by mail-lf0-x244.google.com with SMTP id q24so3200485lfb.1
-	for <qemu-devel@nongnu.org>; Mon, 15 May 2017 06:15:05 -0700 (PDT)
-Date: Mon, 15 May 2017 14:15:01 +0100
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20170515131501.GF1201@stefanha-x1.localdomain>
-References: <20170511191843.13784-1-ehabkost@redhat.com>
+	(envelope-from <groug@kaod.org>) id 1dAFrA-0006Ix-Lm
+	for qemu-devel@nongnu.org; Mon, 15 May 2017 09:16:16 -0400
+Received: from 3.mo69.mail-out.ovh.net ([188.165.52.203]:32775)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1dAFrA-0006IR-Ba
+	for qemu-devel@nongnu.org; Mon, 15 May 2017 09:16:12 -0400
+Received: from player699.ha.ovh.net (b9.ovh.net [213.186.33.59])
+	by mo69.mail-out.ovh.net (Postfix) with ESMTP id 038611FF04
+	for <qemu-devel@nongnu.org>; Mon, 15 May 2017 15:16:10 +0200 (CEST)
+Date: Mon, 15 May 2017 15:16:02 +0200
+From: Greg Kurz <groug@kaod.org>
+Message-ID: <20170515151602.61dc381d@bahia>
+In-Reply-To: <a94cf0ed-3318-fb2d-f16c-4d2b12fff3bb@kaod.org>
+References: <149484833874.20089.4164801378197848306.stgit@bahia.lan>
+	<149484840466.20089.893964776019028654.stgit@bahia.lan>
+	<a94cf0ed-3318-fb2d-f16c-4d2b12fff3bb@kaod.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="m1UC1K4AOz1Ywdkx"
-Content-Disposition: inline
-In-Reply-To: <20170511191843.13784-1-ehabkost@redhat.com>
-Subject: Re: [Qemu-devel] [PULL 00/29] x86 and machine queue, 2017-05-11
+	boundary="Sig_/SsbBB+3FcMM+Wd.ZNiBQEKe";
+	protocol="application/pgp-signature"
+Subject: Re: [Qemu-devel] [PATCH 6/6] spapr: fix migration of ICP objects
+ from/to older QEMU
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,152 +33,250 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Marcel Apfelbaum <marcel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, qemu-devel@nongnu.org, Igor Mammedov <imammedo@redhat.com>
+To: =?UTF-8?B?Q8OpZHJpYw==?= Le Goater <clg@kaod.org>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Bharata B Rao <bharata@linux.vnet.ibm.com>, David Gibson <david@gibson.dropbear.id.au>
 
-
---m1UC1K4AOz1Ywdkx
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+--Sig_/SsbBB+3FcMM+Wd.ZNiBQEKe
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, May 11, 2017 at 04:18:14PM -0300, Eduardo Habkost wrote:
-> The following changes since commit 76d20ea0f1b26ebd5da2f5fb2fdf3250cde887=
-bb:
+On Mon, 15 May 2017 14:22:32 +0200
+C=C3=A9dric Le Goater <clg@kaod.org> wrote:
+
+> On 05/15/2017 01:40 PM, Greg Kurz wrote:
+> > Commit 5bc8d26de20c ("spapr: allocate the ICPState object from under
+> > sPAPRCPUCore") moved ICP objects from the machine to CPU cores. This
+> > is an improvement since we no longer allocate ICP objects that will
+> > never be used. But it has the side-effect of breaking migration of
+> > older machine types from older QEMU versions.
+> >=20
+> > This patch introduces a compat flag in the sPAPR machine class so
+> > that all pseries machine up to 2.9 go on with the previous behavior
+> > of pre-allocating ICP objects. =20
 >=20
->   Merge remote-tracking branch 'armbru/tags/pull-qapi-2017-05-04-v3' into=
- staging (2017-05-09 15:49:14 -0400)
+> I think this is a quite elegant way to a handle the migration=20
+> regression. Thanks for taking care of it.
 >=20
-> are available in the git repository at:
->=20
->   git://github.com/ehabkost/qemu.git tags/x86-and-machine-pull-request
->=20
-> for you to fetch changes up to 08b277ac46da8b02e50cec455eca7cb2d12ffcf0:
->=20
->   migration/i386: Remove support for pre-0.12 formats (2017-05-11 16:08:5=
-1 -0300)
->=20
-> ----------------------------------------------------------------
-> x86 and machine queue, 2017-05-11
->=20
-> Highlights:
-> * New "-numa cpu" option
-> * NUMA distance configuration
-> * migration/i386 vmstatification
->=20
-> ----------------------------------------------------------------
->=20
-> Daniel P. Berrange (1):
->   i386: rewrite way CPUID index is validated
->=20
-> Dr. David Alan Gilbert (3):
->   migration/i386: Remove old non-softfloat 64bit FP support
->   vmstatification: i386 FPReg
->   migration/i386: Remove support for pre-0.12 formats
->=20
-> He Chen (2):
->   numa: Allow setting NUMA distance for different NUMA nodes
->   tests: acpi: extend cphp and memhp testcase with numa distance check
->=20
-> Igor Mammedov (22):
->   tests: add CPUs to numa node mapping test
->   hw/arm/virt: extract mp-affinity calculation in separate function
->   hw/arm/virt: use machine->possible_cpus for storing possible topology
->     info
->   hw/arm/virt: explicitly allocate cpu_index for cpus
->   numa: move source of default CPUs to NUMA node mapping into boards
->   spapr: add node-id property to sPAPR core
->   pc: add node-id property to CPU
->   virt-arm: add node-id property to CPU
->   numa: add check that board supports cpu_index to node mapping
->   numa: mirror cpu to node mapping in MachineState::possible_cpus
->   numa: do default mapping based on possible_cpus instead of node_cpu
->     bitmaps
->   pc: get numa node mapping from possible_cpus instead of
->     numa_get_node_for_cpu()
->   spapr: get numa node mapping from possible_cpus instead of
->     numa_get_node_for_cpu()
->   virt-arm: get numa node mapping from possible_cpus instead of
->     numa_get_node_for_cpu()
->   QMP: include CpuInstanceProperties into query_cpus output output
->   tests: numa: add case for QMP command query-cpus
->   numa: remove no longer need numa_post_machine_init()
->   machine: call machine init from wrapper
->   numa: use possible_cpus for not mapped CPUs check
->   numa: remove node_cpu bitmaps as they are no longer used
->   numa: add '-numa cpu,...' option for property based node mapping
->   tests: check -numa node,cpu=3Dprops_list usecase
->=20
-> Laurent Vivier (1):
->   numa: equally distribute memory on nodes
->=20
->  qapi-schema.json                    |  53 ++++++-
->  include/hw/acpi/aml-build.h         |   1 +
->  include/hw/boards.h                 |  14 +-
->  include/hw/ppc/spapr_cpu_core.h     |   1 +
->  include/qemu/typedefs.h             |   1 +
->  include/qom/cpu.h                   |   2 +
->  include/sysemu/numa.h               |  18 +--
->  include/sysemu/sysemu.h             |   4 +
->  target/arm/cpu.h                    |   2 +
->  cpus.c                              |  10 ++
->  hw/acpi/aml-build.c                 |  26 ++++
->  hw/acpi/cpu.c                       |   7 +-
->  hw/arm/virt-acpi-build.c            |  19 +--
->  hw/arm/virt.c                       | 123 ++++++++++++---
->  hw/core/machine.c                   | 162 +++++++++++++++++++
->  hw/i386/acpi-build.c                |  15 +-
->  hw/i386/pc.c                        |  54 +++++--
->  hw/i386/pc_piix.c                   |   2 +
->  hw/i386/pc_q35.c                    |   2 +
->  hw/ppc/spapr.c                      |  46 +++++-
->  hw/ppc/spapr_cpu_core.c             |  21 +--
->  numa.c                              | 302 ++++++++++++++++++++++++------=
-------
->  target/arm/cpu.c                    |  13 +-
->  target/i386/cpu.c                   |  36 ++---
->  target/i386/machine.c               | 266 ++++++++-----------------------
->  tests/bios-tables-test.c            |  16 +-
->  tests/numa-test.c                   | 302 ++++++++++++++++++++++++++++++=
-++++++
->  vl.c                                |   6 +-
->  qemu-options.hx                     |  36 ++++-
->  tests/Makefile.include              |   5 +
->  tests/acpi-test-data/pc/SLIT.cphp   | Bin 0 -> 48 bytes
->  tests/acpi-test-data/pc/SLIT.memhp  | Bin 0 -> 48 bytes
->  tests/acpi-test-data/pc/SRAT.memhp  | Bin 224 -> 264 bytes
->  tests/acpi-test-data/q35/SLIT.cphp  | Bin 0 -> 48 bytes
->  tests/acpi-test-data/q35/SLIT.memhp | Bin 0 -> 48 bytes
->  tests/acpi-test-data/q35/SRAT.memhp | Bin 224 -> 264 bytes
->  36 files changed, 1146 insertions(+), 419 deletions(-)
->  create mode 100644 tests/numa-test.c
->  create mode 100644 tests/acpi-test-data/pc/SLIT.cphp
->  create mode 100644 tests/acpi-test-data/pc/SLIT.memhp
->  create mode 100644 tests/acpi-test-data/q35/SLIT.cphp
->  create mode 100644 tests/acpi-test-data/q35/SLIT.memhp
->=20
-> --=20
-> 2.11.0.259.g40922b1
->=20
+> Have you tried to simply reparent the ICPs objects to OBJECT(spapr)=20
+> instead of the OBJECT(cpu)  ?=20
 >=20
 
-Thanks, applied to my staging tree:
-https://github.com/stefanha/qemu/commits/staging
+Do you mean to reparent unconditionally to OBJECT(spapr) for all
+machine versions ? I'm not sure this would be beneficial, but I
+might be missing something...
 
-Stefan
+> See some minor comments below.
+>=20
+> > While here, we also ensure that object_property_add_child() errors cause
+> > QEMU to abort for newer machines.
+> >=20
+> > Signed-off-by: Greg Kurz <groug@kaod.org>
+> > ---
+> >  hw/ppc/spapr.c          |   36 ++++++++++++++++++++++++++++++++++++
+> >  hw/ppc/spapr_cpu_core.c |   28 ++++++++++++++++++++--------
+> >  include/hw/ppc/spapr.h  |    2 ++
+> >  3 files changed, 58 insertions(+), 8 deletions(-)
+> >=20
+> > diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> > index c53989bb10b1..ab3683bcd677 100644
+> > --- a/hw/ppc/spapr.c
+> > +++ b/hw/ppc/spapr.c
+> > @@ -126,6 +126,7 @@ error:
+> >  static void xics_system_init(MachineState *machine, int nr_irqs, Error=
+ **errp)
+> >  {
+> >      sPAPRMachineState *spapr =3D SPAPR_MACHINE(machine);
+> > +    sPAPRMachineClass *smc =3D SPAPR_MACHINE_GET_CLASS(spapr);
+> >      Error *local_err =3D NULL;
+> > =20
+> >      if (kvm_enabled()) {
+> > @@ -151,6 +152,38 @@ static void xics_system_init(MachineState *machine=
+, int nr_irqs, Error **errp)
+> >                                        &local_err);
+> >      }
+> > =20
+> > +    if (!spapr->ics) {
+> > +        goto out;
+> > +    }
+> > +
+> > +    if (smc->must_pre_allocate_icps) { =20
+>=20
+> I am not sure I like 'must', I think 'pre_allocate_icps' should be enough=
+ ?=20
+> or simply 'allocate_legacy_icps' ?
+>=20
 
---m1UC1K4AOz1Ywdkx
-Content-Type: application/pgp-signature; name="signature.asc"
+Ok. I'll go for the latter if it's ok with David.
+
+> > +        int smt =3D kvmppc_smt_threads();
+> > +        int nr_servers =3D DIV_ROUND_UP(max_cpus * smt, smp_threads); =
+=20
+>=20
+> may be we should reintroduce nr_servers at the machine level ?=20
+>=20
+
+I had reintroduced it but then I realized it was only used in this
+function.
+
+> > +        int i;
+> > +
+> > +        spapr->legacy_icps =3D g_malloc0(nr_servers * sizeof(ICPState)=
+);
+> > +
+> > +        for (i =3D 0; i < nr_servers; i++) {
+> > +            void* obj =3D &spapr->legacy_icps[i]; =20
+>=20
+> 'void *'
+>=20
+
+Yeah, patchew already yelled at me :)
+
+> > +
+> > +            object_initialize(obj, sizeof(ICPState), spapr->icp_type);
+> > +            object_property_add_child(OBJECT(spapr), "icp[*]", obj,
+> > +                                      &error_abort); =20
+>=20
+> David does not like the "icp[*]" syntax.
+>=20
+
+Ah... I wasn't aware of that. But I agree that I should probably create
+the object names based on 'i', rather than relying on the more complex
+logic in object_property_add().
+
+> > +            object_unref(obj);
+> > +            object_property_add_const_link(obj, "xics", OBJECT(spapr),
+> > +                                           &error_abort);
+> > +            object_property_set_bool(obj, true, "realized", &local_err=
+);
+> > +            if (local_err) {
+> > +                while (i--) {
+> > +                    object_unparent(obj);
+> > +                }
+> > +                g_free(spapr->legacy_icps);
+> > +                break;
+> > +            }
+> > +        }
+> > +    }
+> > +
+> > +out:
+> >      error_propagate(errp, local_err);
+> >  }
+> > =20
+> > @@ -3256,8 +3289,11 @@ static void spapr_machine_2_9_instance_options(M=
+achineState *machine)
+> > =20
+> >  static void spapr_machine_2_9_class_options(MachineClass *mc)
+> >  {
+> > +    sPAPRMachineClass *smc =3D SPAPR_MACHINE_CLASS(mc);
+> > +
+> >      spapr_machine_2_10_class_options(mc);
+> >      SET_MACHINE_COMPAT(mc, SPAPR_COMPAT_2_9);
+> > +    smc->must_pre_allocate_icps =3D true;
+> >  }
+> > =20
+> >  DEFINE_SPAPR_MACHINE(2_9, "2.9", false);
+> > diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
+> > index 63d160f7e010..5476647efa06 100644
+> > --- a/hw/ppc/spapr_cpu_core.c
+> > +++ b/hw/ppc/spapr_cpu_core.c
+> > @@ -119,6 +119,7 @@ static void spapr_cpu_core_unrealizefn(DeviceState =
+*dev, Error **errp)
+> >      size_t size =3D object_type_get_instance_size(typename);
+> >      CPUCore *cc =3D CPU_CORE(dev);
+> >      int i;
+> > +    sPAPRMachineState *spapr =3D SPAPR_MACHINE(qdev_get_machine());
+> > =20
+> >      for (i =3D 0; i < cc->nr_threads; i++) {
+> >          void *obj =3D sc->threads + i * size;
+> > @@ -127,7 +128,9 @@ static void spapr_cpu_core_unrealizefn(DeviceState =
+*dev, Error **errp)
+> >          PowerPCCPU *cpu =3D POWERPC_CPU(cs);
+> > =20
+> >          spapr_cpu_destroy(cpu);
+> > -        object_unparent(cpu->intc);
+> > +        if (!spapr->legacy_icps) {
+> > +            object_unparent(cpu->intc);
+> > +        }
+> >          cpu_remove_sync(cs);
+> >          object_unparent(obj);
+> >      }
+> > @@ -142,12 +145,19 @@ static void spapr_cpu_core_realize_child(Object *=
+child, Error **errp)
+> >      PowerPCCPU *cpu =3D POWERPC_CPU(cs);
+> >      Object *obj;
+> > =20
+> > -    obj =3D object_new(spapr->icp_type);
+> > -    object_property_add_child(OBJECT(cpu), "icp", obj, NULL);
+> > -    object_property_add_const_link(obj, "xics", OBJECT(spapr), &error_=
+abort);
+> > -    object_property_set_bool(obj, true, "realized", &local_err);
+> > -    if (local_err) {
+> > -        goto error;
+> > +    if (spapr->legacy_icps) {
+> > +        int index =3D cpu->parent_obj.cpu_index;
+> > +
+> > +        obj =3D OBJECT(&spapr->legacy_icps[index]);
+> > +    } else {
+> > +        obj =3D object_new(spapr->icp_type);
+> > +        object_property_add_child(OBJECT(cpu), "icp", obj, &error_abor=
+t);
+> > +        object_property_add_const_link(obj, "xics", OBJECT(spapr),
+> > +                                       &error_abort);
+> > +        object_property_set_bool(obj, true, "realized", &local_err);
+> > +        if (local_err) {
+> > +            goto error;
+> > +        }
+> >      }
+> > =20
+> >      object_property_set_bool(child, true, "realized", &local_err);
+> > @@ -164,7 +174,9 @@ static void spapr_cpu_core_realize_child(Object *ch=
+ild, Error **errp)
+> >      return;
+> > =20
+> >  error:
+> > -    object_unparent(obj);
+> > +    if (!spapr->legacy_icps) {
+> > +        object_unparent(obj);
+> > +    }
+> >      error_propagate(errp, local_err);
+> >  }
+> > =20
+> > diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
+> > index 5802f888c39d..72cd5af2679b 100644
+> > --- a/include/hw/ppc/spapr.h
+> > +++ b/include/hw/ppc/spapr.h
+> > @@ -53,6 +53,7 @@ struct sPAPRMachineClass {
+> >      bool dr_lmb_enabled;       /* enable dynamic-reconfig/hotplug of L=
+MBs */
+> >      bool use_ohci_by_default;  /* use USB-OHCI instead of XHCI */
+> >      const char *tcg_default_cpu; /* which (TCG) CPU to simulate by def=
+ault */
+> > +    bool must_pre_allocate_icps; /* only for pseries-2.9 and older */
+> >      void (*phb_placement)(sPAPRMachineState *spapr, uint32_t index,
+> >                            uint64_t *buid, hwaddr *pio,=20
+> >                            hwaddr *mmio32, hwaddr *mmio64,
+> > @@ -109,6 +110,7 @@ struct sPAPRMachineState {
+> >      MemoryHotplugState hotplug_memory;
+> > =20
+> >      const char *icp_type;
+> > +    ICPState *legacy_icps;
+> >  };
+> > =20
+> >  #define H_SUCCESS         0
+> >  =20
+>=20
+
+
+--Sig_/SsbBB+3FcMM+Wd.ZNiBQEKe
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
 
 -----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
 
-iQEcBAEBAgAGBQJZGanVAAoJEJykq7OBq3PIGq4H/R5h8xNzf1/99AUNfmwkyP45
-E38hSQPWWGdC5//swf7rJLgfrC9E6mLEe2ni7asb2+IRhoZltRJezrkQgVIEq5YM
-MWHaBUF01KfKUwT1PmVkgaEs4TnDjipip0b0ujNan2TwH2G1/HngsvmZNN77d6dS
-WWGTcWioC/jnWEqEK4oXZqDvCgeefQs8fQqiR09g5vlABzv21faIhSaRvUHHDxNY
-2I8uzMXCZ/Y0QeEfr8ckSBLS1t8xTUCVMrdClp6WWaQj3zahlmcB4XkpmUGYdWqg
-+RBqCaRYpPNnS+Rnbc+eh3Y2fSbpAZXLE9+V1c6UnT6MvFYAIfJXxWR2KcdEeao=
-=gJlM
+iEYEARECAAYFAlkZqhIACgkQAvw66wEB28LDtQCcCQvV5YH4LQf21VWkIAIh/u3b
+BGEAn2gD+nm76F3L8jsI1VhhpOW13Tle
+=SV8W
 -----END PGP SIGNATURE-----
 
---m1UC1K4AOz1Ywdkx--
+--Sig_/SsbBB+3FcMM+Wd.ZNiBQEKe--
