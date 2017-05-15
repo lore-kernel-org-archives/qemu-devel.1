@@ -1,28 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47799)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48983)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1dAEi6-0008EI-9E
-	for qemu-devel@nongnu.org; Mon, 15 May 2017 08:02:47 -0400
+	(envelope-from <groug@kaod.org>) id 1dAEli-0001aQ-Na
+	for qemu-devel@nongnu.org; Mon, 15 May 2017 08:06:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1dAEi0-0004UF-PN
-	for qemu-devel@nongnu.org; Mon, 15 May 2017 08:02:46 -0400
-Received: from 6.mo69.mail-out.ovh.net ([46.105.50.107]:49734)
+	(envelope-from <groug@kaod.org>) id 1dAElf-0006YB-J0
+	for qemu-devel@nongnu.org; Mon, 15 May 2017 08:06:30 -0400
+Received: from 5.mo69.mail-out.ovh.net ([46.105.43.105]:60019)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1dAEi0-0004Tj-Iy
-	for qemu-devel@nongnu.org; Mon, 15 May 2017 08:02:40 -0400
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1dAElf-0006Xz-CG
+	for qemu-devel@nongnu.org; Mon, 15 May 2017 08:06:27 -0400
 Received: from player699.ha.ovh.net (b9.ovh.net [213.186.33.59])
-	by mo69.mail-out.ovh.net (Postfix) with ESMTP id 304C81F2C6
-	for <qemu-devel@nongnu.org>; Mon, 15 May 2017 14:02:39 +0200 (CEST)
+	by mo69.mail-out.ovh.net (Postfix) with ESMTP id DEB641FD04
+	for <qemu-devel@nongnu.org>; Mon, 15 May 2017 14:06:25 +0200 (CEST)
+Date: Mon, 15 May 2017 14:06:18 +0200
+From: Greg Kurz <groug@kaod.org>
+Message-ID: <20170515140618.22fad5fe@bahia>
+In-Reply-To: <e962c484-f89f-8623-d66e-8a904e814359@kaod.org>
 References: <149484833874.20089.4164801378197848306.stgit@bahia.lan>
-	<149484839512.20089.2730407279712230463.stgit@bahia.lan>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <6bbb2627-c360-289f-039d-2b899e2e6d9c@kaod.org>
-Date: Mon, 15 May 2017 14:02:34 +0200
+	<149484838558.20089.5029926585755792842.stgit@bahia.lan>
+	<e962c484-f89f-8623-d66e-8a904e814359@kaod.org>
 MIME-Version: 1.0
-In-Reply-To: <149484839512.20089.2730407279712230463.stgit@bahia.lan>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 5/6] spapr-cpu-core: release ICP object
- when realization fails
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	boundary="Sig_/P0l61P2K_MV3qQUayII4MPp";
+	protocol="application/pgp-signature"
+Subject: Re: [Qemu-devel] [PATCH 4/6] spapr: sanitize error handling in
+ spapr_ics_create()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,58 +33,102 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
-Cc: Bharata B Rao <bharata@linux.vnet.ibm.com>, David Gibson <david@gibson.dropbear.id.au>
+To: =?UTF-8?B?Q8OpZHJpYw==?= Le Goater <clg@kaod.org>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Bharata B Rao <bharata@linux.vnet.ibm.com>, David Gibson <david@gibson.dropbear.id.au>
 
-On 05/15/2017 01:39 PM, Greg Kurz wrote:
-> While here we introduce a single error path to avoid code duplication.
-> 
-> Signed-off-by: Greg Kurz <groug@kaod.org>
-> ---
->  hw/ppc/spapr_cpu_core.c |   16 ++++++++--------
->  1 file changed, 8 insertions(+), 8 deletions(-)
-> 
-> diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
-> index 4389ef4c2aef..63d160f7e010 100644
-> --- a/hw/ppc/spapr_cpu_core.c
-> +++ b/hw/ppc/spapr_cpu_core.c
-> @@ -147,25 +147,25 @@ static void spapr_cpu_core_realize_child(Object *child, Error **errp)
->      object_property_add_const_link(obj, "xics", OBJECT(spapr), &error_abort);
->      object_property_set_bool(obj, true, "realized", &local_err);
->      if (local_err) {
-> -        error_propagate(errp, local_err);
-> -        return;
-> +        goto error;
+--Sig_/P0l61P2K_MV3qQUayII4MPp
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-the error: statement below adds an object_unparent(). is that ok ? 
+On Mon, 15 May 2017 13:59:33 +0200
+C=C3=A9dric Le Goater <clg@kaod.org> wrote:
 
-C. 
+> On 05/15/2017 01:39 PM, Greg Kurz wrote:
+> > The spapr_ics_create() function handles errors in a rather convoluted
+> > way, with two local Error * variables. Moreover, failing to parent the
+> > ICS object to the machine should be considered as a bug but it is
+> > currently ignored. =20
+>=20
+> I am not sure what should be done for object_property_add_child()
+> errors but QEMU generally uses NULL for 'Error **'. It might be=20
+> wrong though.
+>=20
+> As for the local error handling, it is following what is described in=20
+> qapi/error.h. Isn't it ?
+>=20
 
->      }
->  
->      object_property_set_bool(child, true, "realized", &local_err);
->      if (local_err) {
-> -        object_unparent(obj);
-> -        error_propagate(errp, local_err);
-> -        return;
-> +        goto error;
->      }
->  
->      spapr_cpu_init(spapr, cpu, &local_err);
->      if (local_err) {
-> -        object_unparent(obj);
-> -        error_propagate(errp, local_err);
-> -        return;
-> +        goto error;
->      }
->  
->      xics_cpu_setup(XICS_FABRIC(spapr), cpu, ICP(obj));
-> +    return;
-> +
-> +error:
-> +    object_unparent(obj);
-> +    error_propagate(errp, local_err);
->  }
->  
->  static void spapr_cpu_core_realize(DeviceState *dev, Error **errp)
-> 
+Yes, it does follow the "Receive and accumulate multiple errors" recommanda=
+tion,
+but does it make sense to realize the ICS object if we failed to set nr-irq=
+s ?
+
+> Cheers,
+>=20
+> C.=20
+>=20
+> =20
+> > This patch addresses both issues.
+> >=20
+> > Signed-off-by: Greg Kurz <groug@kaod.org>
+> > ---
+> >  hw/ppc/spapr.c |   19 ++++++++++++-------
+> >  1 file changed, 12 insertions(+), 7 deletions(-)
+> >=20
+> > diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> > index 44f7dc7f40e9..c53989bb10b1 100644
+> > --- a/hw/ppc/spapr.c
+> > +++ b/hw/ppc/spapr.c
+> > @@ -101,21 +101,26 @@ static ICSState *spapr_ics_create(sPAPRMachineSta=
+te *spapr,
+> >                                    const char *type_ics,
+> >                                    int nr_irqs, Error **errp)
+> >  {
+> > -    Error *err =3D NULL, *local_err =3D NULL;
+> > +    Error *local_err =3D NULL;
+> >      Object *obj;
+> > =20
+> >      obj =3D object_new(type_ics);
+> > -    object_property_add_child(OBJECT(spapr), "ics", obj, NULL);
+> > +    object_property_add_child(OBJECT(spapr), "ics", obj, &error_abort);
+> >      object_property_add_const_link(obj, "xics", OBJECT(spapr), &error_=
+abort);
+> > -    object_property_set_int(obj, nr_irqs, "nr-irqs", &err);
+> > +    object_property_set_int(obj, nr_irqs, "nr-irqs", &local_err);
+> > +    if (local_err) {
+> > +        goto error;
+> > +    }
+> >      object_property_set_bool(obj, true, "realized", &local_err);
+> > -    error_propagate(&err, local_err);
+> > -    if (err) {
+> > -        error_propagate(errp, err);
+> > -        return NULL;
+> > +    if (local_err) {
+> > +        goto error;
+> >      }
+> > =20
+> >      return ICS_SIMPLE(obj);
+> > +
+> > +error:
+> > +    error_propagate(errp, local_err);
+> > +    return NULL;
+> >  }
+> > =20
+> >  static void xics_system_init(MachineState *machine, int nr_irqs, Error=
+ **errp)
+> >  =20
+>=20
+
+
+--Sig_/P0l61P2K_MV3qQUayII4MPp
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iEYEARECAAYFAlkZmboACgkQAvw66wEB28JLVQCfbd2NvS+g4KmF/sJJnnf2lDyN
+0YUAoKAEVApkuzm/XHxfY3RwTqKDE7HL
+=DDuu
+-----END PGP SIGNATURE-----
+
+--Sig_/P0l61P2K_MV3qQUayII4MPp--
