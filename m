@@ -1,28 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54498)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54519)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lvivier@redhat.com>) id 1dAGiH-0000bd-5D
-	for qemu-devel@nongnu.org; Mon, 15 May 2017 10:11:06 -0400
+	(envelope-from <stefanha@gmail.com>) id 1dAGiP-0000iB-Dn
+	for qemu-devel@nongnu.org; Mon, 15 May 2017 10:11:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lvivier@redhat.com>) id 1dAGiD-0006PY-K1
-	for qemu-devel@nongnu.org; Mon, 15 May 2017 10:11:04 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:36160)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lvivier@redhat.com>) id 1dAGiD-0006PF-6K
-	for qemu-devel@nongnu.org; Mon, 15 May 2017 10:11:01 -0400
-References: <20170512233843.27713-1-f4bug@amsat.org>
-	<20170512233843.27713-2-f4bug@amsat.org>
-	<b5660d99-c854-1930-8806-5989c69f90d1@redhat.com>
-	<27c7761e-48c8-9398-ea89-b1fb67602cef@redhat.com>
-From: Laurent Vivier <lvivier@redhat.com>
-Message-ID: <19ed7405-d072-de74-867b-c353e59bee48@redhat.com>
-Date: Mon, 15 May 2017 16:10:54 +0200
+	(envelope-from <stefanha@gmail.com>) id 1dAGiK-0006R1-Iu
+	for qemu-devel@nongnu.org; Mon, 15 May 2017 10:11:13 -0400
+Received: from mail-qk0-x243.google.com ([2607:f8b0:400d:c09::243]:36129)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1dAGiK-0006Qt-Do
+	for qemu-devel@nongnu.org; Mon, 15 May 2017 10:11:08 -0400
+Received: by mail-qk0-x243.google.com with SMTP id y128so17296690qka.3
+	for <qemu-devel@nongnu.org>; Mon, 15 May 2017 07:11:08 -0700 (PDT)
+Date: Mon, 15 May 2017 15:11:05 +0100
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20170515141105.GM1201@stefanha-x1.localdomain>
+References: <20170512234009.32557-1-rth@twiddle.net>
 MIME-Version: 1.0
-In-Reply-To: <27c7761e-48c8-9398-ea89-b1fb67602cef@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC PATCH v4 1/6] coccinelle: add a script to
- optimize tcg op using tcg_gen_extract()
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="YS7t75H5cNTCpbja"
+Content-Disposition: inline
+In-Reply-To: <20170512234009.32557-1-rth@twiddle.net>
+Subject: Re: [Qemu-devel] [PULL 0/9] Queued s390 patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,52 +29,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, Eric Blake <eblake@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, Aurelien Jarno <aurelien@aurel32.net>, Richard Henderson <rth@twiddle.net>, Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>, Markus Armbruster <armbru@redhat.com>, Michael Tokarev <mjt@tls.msk.ru>, Eduardo Habkost <ehabkost@redhat.com>
-Cc: Markus Elfring <elfring@users.sourceforge.net>, Julia Lawall <julia.lawall@lip6.fr>, Nicolas Palix <nicolas.palix@imag.fr>
+To: Richard Henderson <rth@twiddle.net>
+Cc: qemu-devel@nongnu.org, stefanha@redhat.com
 
-On 15/05/2017 16:06, Paolo Bonzini wrote:
+
+--YS7t75H5cNTCpbja
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Fri, May 12, 2017 at 04:40:00PM -0700, Richard Henderson wrote:
+> This is a combination of my queued patches and those
+> posted by Aurelien this week.
 >=20
 >=20
-> On 15/05/2017 16:04, Eric Blake wrote:
->> On 05/12/2017 06:38 PM, Philippe Mathieu-Daud=C3=A9 wrote:
->>> If you have coccinelle installed you can apply this script using:
->>>
->>>     $ spatch \
->>>         --macro-file scripts/cocci-macro-file.h \
->>>         --dir target --in-place
->>>
->>> You can also use directly Peter Senna Tschudin docker image (easier):
->>>
->>>     $ docker run -v `pwd`:`pwd` -w `pwd` petersenna/coccinelle \
->>>         --sp-file scripts/coccinelle/tcg_gen_extract.cocci \
->>>         --macro-file scripts/cocci-macro-file.h \
->>>         --dir target --in-place
->>>
->>> Then verified that no manual touchups are required.
->>>
->>> The following thread was helpful while writing this script:
->>>
->>>     https://github.com/coccinelle/coccinelle/issues/86
->>>
->>> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
->>> ---
->>>  scripts/coccinelle/tcg_gen_extract.cocci | 103 +++++++++++++++++++++=
-++++++++++
->>>  1 file changed, 103 insertions(+)
->>>  create mode 100644 scripts/coccinelle/tcg_gen_extract.cocci
->>
->> It's still not obvious to me whether we want this script in the tree (=
-as
->> something we plan to rerun regularly to check for regressions), or jus=
-t
->> in the commit message (useful for the one-time location of spots to
->> optimize, but something we don't anticipate repeating).
+> r~
 >=20
-> I think it's useful.  New backends can have this issue, plus it shows
-> some advanced Coccinelle techniques.
+>=20
+> The following changes since commit ecc1f5adeec4e3324d1b695a7c54e3967c5269=
+49:
+>=20
+>   maintainers: Add myself as linux-user reviewer (2017-05-11 13:31:11 -04=
+00)
+>=20
+> are available in the git repository at:
+>=20
+>   git://github.com/rth7680/qemu.git tags/pull-s390-20170512
+>=20
+> for you to fetch changes up to 538fad597d898f677f81cb4daacd37e7cdc18e6e:
+>=20
+>   target/s390x: implement serialization in BRANCH CONDITION (2017-05-12 1=
+5:48:41 -0700)
+>=20
+> ----------------------------------------------------------------
+> Queued target/s390 patches
+>=20
+> ----------------------------------------------------------------
+> Aurelien Jarno (3):
+>       target/s390x: mask the SIGP order_code using SIGP_ORDER_MASK
+>       target/s390x: fix SIGNAL PROCESSOR return value
+>       target/s390x: implement serialization in BRANCH CONDITION
+>=20
+> Eric Bischoff (1):
+>       target/s390x: Implement LOAD PAIR DISJOINT
+>=20
+> Miroslav Benes (1):
+>       target/s390x: Implement LOAD PROGRAM PARAMETER
+>=20
+> Richard Henderson (4):
+>       target/s390x: Implement STORE FACILITIES LIST EXTENDED
+>       target/s390x: Diagnose specification exception for atomics
+>       target/s390x: Use atomic operations for COMPARE SWAP
+>       target/s390x: Use atomic operations for LOAD AND OP
+>=20
+>  target/s390x/cpu.c         |   1 +
+>  target/s390x/cpu.h         |   6 ++
+>  target/s390x/helper.c      |  16 +++
+>  target/s390x/helper.h      |   3 +
+>  target/s390x/insn-data.def |  38 ++++---
+>  target/s390x/kvm.c         |   2 -
+>  target/s390x/mem_helper.c  |  40 ++++++++
+>  target/s390x/misc_helper.c |  62 +++++++++++-
+>  target/s390x/translate.c   | 245 ++++++++++++++++++++++++++-------------=
+------
+>  9 files changed, 288 insertions(+), 125 deletions(-)
 >=20
 
-I agree: I think it's a good idea to have a place in QEMU directory with
-all past coccinelle scripts to help to write the new ones.
+Thanks, applied to my staging tree:
+https://github.com/stefanha/qemu/commits/staging
 
-Laurent
+Stefan
+
+--YS7t75H5cNTCpbja
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJZGbb5AAoJEJykq7OBq3PIFFYIAJW6RY7UrBUE5vAsb2pqQ0bq
+HtjIbomuOTNEJKxdYS1GlDrHcjGFakrFiAqVDBYsMQHQ38hF62C4RPWJSLIJBuol
+yoFORl/vgPrcjac8TOaAdveUQW6tQh+klS4vsrbAAFRTl/lXGexytKZhTAGCK3Cc
+EXzuilYosVnaE6EzN58SJ1lKjfJrusZhlnncPwH698TR8XWIOTwUB3F+bMSUmGSU
+5S0OvmQwUL+uYoX+9u7V9hwhrzxBpEXCCg97+0U7EwXApA/ezgieYMxILK+SJ0kA
+binWT19ocTnFFGT80f0mgn7qEtCOssSM2vN64MNNgTbqwWpoeVNXpjy4030OtTo=
+=NfLA
+-----END PGP SIGNATURE-----
+
+--YS7t75H5cNTCpbja--
