@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38071)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38284)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Milos.Stojanovic@rt-rk.com>) id 1dAHYh-00034b-BI
-	for qemu-devel@nongnu.org; Mon, 15 May 2017 11:05:19 -0400
+	(envelope-from <Milos.Stojanovic@rt-rk.com>) id 1dAHZC-0003Tl-SD
+	for qemu-devel@nongnu.org; Mon, 15 May 2017 11:05:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <Milos.Stojanovic@rt-rk.com>) id 1dAHYc-0006GE-2d
-	for qemu-devel@nongnu.org; Mon, 15 May 2017 11:05:15 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:46608 helo=mail.rt-rk.com)
+	(envelope-from <Milos.Stojanovic@rt-rk.com>) id 1dAHZ8-0006QX-A0
+	for qemu-devel@nongnu.org; Mon, 15 May 2017 11:05:46 -0400
+Received: from mx2.rt-rk.com ([89.216.37.149]:46755 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <Milos.Stojanovic@rt-rk.com>)
-	id 1dAHYb-0006DS-ME
-	for qemu-devel@nongnu.org; Mon, 15 May 2017 11:05:10 -0400
+	id 1dAHZ8-0006Pp-2G
+	for qemu-devel@nongnu.org; Mon, 15 May 2017 11:05:42 -0400
 From: =?UTF-8?q?Milo=C5=A1=20Stojanovi=C4=87?= <Milos.Stojanovic@rt-rk.com>
-Date: Mon, 15 May 2017 16:59:49 +0200
-Message-Id: <1494860396-24930-10-git-send-email-Milos.Stojanovic@rt-rk.com>
+Date: Mon, 15 May 2017 16:59:50 +0200
+Message-Id: <1494860396-24930-11-git-send-email-Milos.Stojanovic@rt-rk.com>
 In-Reply-To: <1494860396-24930-1-git-send-email-Milos.Stojanovic@rt-rk.com>
 References: <1494860396-24930-1-git-send-email-Milos.Stojanovic@rt-rk.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v2 09/16] linux-user: add strace support for
- uinfo structure of rt_sigqueueinfo() and rt_tgsigqueueinfo()
+Subject: [Qemu-devel] [PATCH v2 10/16] [RFC] linux-user: add support for
+ tracking the target signal mask
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,188 +31,74 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, riku.voipio@iki.fi
 Cc: laurent@vivier.eu, Miodrag.Dinic@rt-rk.com, Aleksandar.Markovic@rt-rk.com, Petar.Jovanovic@rt-rk.com, yongbok.kim@imgtec.com, Milos.Stojanovic@rt-rk.com
 
-This commit adds support for printing the content of the target_siginfo_t
-structure in a similar way to how it is printed by the host strace. The
-pointer to this structure is sent as the last argument of the
-rt_sigqueueinfo() and rt_tgsigqueueinfo() system calls.
-For this purpose, print_siginfo() is used and the get_target_siginfo()
-function is implemented in order to get the information obtained from
-the pointer into the form that print_siginfo() expects.
+If TRACK_TARGET_SIGMASK is defined, add fields in the TaskState structure
+which will hold the target signal and suspend mask and add support for
+initialization and forking. No functional changes are being introduced in
+this commit. The TRACK_TARGET_SIGMASK will be defined in a later commit
+where the target signal masks will be needed in order to implement
+multiplexing of real-time target signals which are out of the host range.
 
-The get_target_siginfo() function is based on
-host_to_target_siginfo_noswap() in linux-user mode, but here both
-arguments are pointers to target_siginfo_t, so instead of converting
-the information to siginfo_t it just extracts and copies it to a
-target_siginfo_t structure.
+Currently, QEMU has a copy of the host signal and suspend masks and that
+is usually enough, since most of the time the signal mask of the target
+architecture is either the same length or narrower. If however the signal
+mask is wider, then part of it won't be tracked.
 
-Prior to this commit, typical strace output used to look like this:
-8307 rt_sigqueueinfo(8307,50,0x00000040007ff6b0) =3D 0
-
-After this commit, it looks like this:
-8307 rt_sigqueueinfo(8307,50,{si_signo=3D50, si_code=3DSI_QUEUE, si_pid=3D=
-8307,
-si_uid=3D1000, si_sigval=3D17716762128}) =3D 0
+This commit enables adding support for separately tracking the target
+signal masks in the following commits.
 
 Signed-off-by: Milo=C5=A1 Stojanovi=C4=87 <Milos.Stojanovic@rt-rk.com>
 ---
- linux-user/strace.c | 113 ++++++++++++++++++++++++++++++++++++++++++++++=
-+++++-
- 1 file changed, 111 insertions(+), 2 deletions(-)
+ linux-user/qemu.h    | 5 +++++
+ linux-user/signal.c  | 3 +++
+ linux-user/syscall.c | 3 +++
+ 3 files changed, 11 insertions(+)
 
-diff --git a/linux-user/strace.c b/linux-user/strace.c
-index 5fbe067..d821d16 100644
---- a/linux-user/strace.c
-+++ b/linux-user/strace.c
-@@ -188,6 +188,93 @@ static void print_si_code(int arg)
-     gemu_log("%s", codename);
- }
+diff --git a/linux-user/qemu.h b/linux-user/qemu.h
+index 4edd7d0..6ce0811 100644
+--- a/linux-user/qemu.h
++++ b/linux-user/qemu.h
+@@ -139,6 +139,11 @@ typedef struct TaskState {
+      * currently in the middle of such a syscall
+      */
+     sigset_t sigsuspend_mask;
++#ifdef TRACK_TARGET_SIGMASK
++    /* Track the target signal and suspend masks. */
++    target_sigset_t target_signal_mask;
++    target_sigset_t target_sigsuspend_mask;
++#endif
+     /* Nonzero if we're leaving a sigsuspend and sigsuspend_mask is vali=
+d. */
+     int in_sigsuspend;
 =20
-+static void get_target_siginfo(target_siginfo_t *tinfo,
-+                                const target_siginfo_t *info)
-+{
-+    abi_ulong sival_ptr;
-+
-+    int sig;
-+    int si_errno;
-+    int si_code;
-+    int si_type;
-+
-+    __get_user(sig, &info->si_signo);
-+    __get_user(si_errno, &tinfo->si_errno);
-+    __get_user(si_code, &info->si_code);
-+
-+    tinfo->si_signo =3D sig;
-+    tinfo->si_errno =3D si_errno;
-+    tinfo->si_code =3D si_code;
-+
-+    /* Ensure we don't leak random junk to the guest later */
-+    memset(tinfo->_sifields._pad, 0, sizeof(tinfo->_sifields._pad));
-+
-+    /* This is awkward, because we have to use a combination of
-+     * the si_code and si_signo to figure out which of the union's
-+     * members are valid. (Within the host kernel it is always possible
-+     * to tell, but the kernel carefully avoids giving userspace the
-+     * high 16 bits of si_code, so we don't have the information to
-+     * do this the easy way...) We therefore make our best guess,
-+     * bearing in mind that a guest can spoof most of the si_codes
-+     * via rt_sigqueueinfo() if it likes.
-+     *
-+     * Once we have made our guess, we record it in the top 16 bits of
-+     * the si_code, so that print_siginfo() later can use it.
-+     * print_siginfo() will strip these top bits out before printing
-+     * the si_code.
-+     */
-+
-+    switch (si_code) {
-+    case SI_USER:
-+    case SI_TKILL:
-+    case SI_KERNEL:
-+        /* Sent via kill(), tkill() or tgkill(), or direct from the kern=
-el.
-+         * These are the only unspoofable si_code values.
-+         */
-+        __get_user(tinfo->_sifields._kill._pid, &info->_sifields._kill._=
-pid);
-+        __get_user(tinfo->_sifields._kill._uid, &info->_sifields._kill._=
-uid);
-+        si_type =3D QEMU_SI_KILL;
-+        break;
-+    default:
-+        /* Everything else is spoofable. Make best guess based on signal=
- */
-+        switch (sig) {
-+        case TARGET_SIGCHLD:
-+            __get_user(tinfo->_sifields._sigchld._pid,
-+                       &info->_sifields._sigchld._pid);
-+            __get_user(tinfo->_sifields._sigchld._uid,
-+                       &info->_sifields._sigchld._uid);
-+            __get_user(tinfo->_sifields._sigchld._status,
-+                       &info->_sifields._sigchld._status);
-+            __get_user(tinfo->_sifields._sigchld._utime,
-+                       &info->_sifields._sigchld._utime);
-+            __get_user(tinfo->_sifields._sigchld._stime,
-+                       &info->_sifields._sigchld._stime);
-+            si_type =3D QEMU_SI_CHLD;
-+            break;
-+        case TARGET_SIGIO:
-+            __get_user(tinfo->_sifields._sigpoll._band,
-+                       &info->_sifields._sigpoll._band);
-+            __get_user(tinfo->_sifields._sigpoll._fd,
-+                       &info->_sifields._sigpoll._fd);
-+            si_type =3D QEMU_SI_POLL;
-+            break;
-+        default:
-+            /* Assume a sigqueue()/mq_notify()/rt_sigqueueinfo() source.=
- */
-+            __get_user(tinfo->_sifields._rt._pid, &info->_sifields._rt._=
-pid);
-+            __get_user(tinfo->_sifields._rt._uid, &info->_sifields._rt._=
-uid);
-+            /* XXX: potential problem if 64 bit */
-+            __get_user(sival_ptr, &info->_sifields._rt._sigval.sival_ptr=
-);
-+            tinfo->_sifields._rt._sigval.sival_ptr =3D sival_ptr;
-+
-+            si_type =3D QEMU_SI_RT;
-+            break;
-+        }
-+        break;
-+    }
-+
-+    tinfo->si_code =3D deposit32(si_code, 16, 16, si_type);
-+}
-+
- static void print_siginfo(const target_siginfo_t *tinfo)
- {
-     /* Print a target_siginfo_t in the format desired for printing
-@@ -1907,10 +1994,21 @@ print_rt_sigqueueinfo(const struct syscallname *n=
-ame,
-     abi_long arg0, abi_long arg1, abi_long arg2,
-     abi_long arg3, abi_long arg4, abi_long arg5)
- {
-+    void *p;
-+    target_siginfo_t uinfo;
-+
-     print_syscall_prologue(name);
-     print_raw_param("%d", arg0, 0);
-     print_signal(arg1, 0);
--    print_pointer(arg2, 1);
-+    p =3D lock_user(VERIFY_READ, arg2, sizeof(target_siginfo_t), 1);
-+    if (p) {
-+        get_target_siginfo(&uinfo, p);
-+        print_siginfo(&uinfo);
-+
-+        unlock_user(p, arg2, 0);
-+    } else {
-+        print_pointer(arg2, 1);
-+    }
-     print_syscall_epilogue(name);
- }
- #endif
-@@ -1921,11 +2019,22 @@ print_rt_tgsigqueueinfo(const struct syscallname =
-*name,
-     abi_long arg0, abi_long arg1, abi_long arg2,
-     abi_long arg3, abi_long arg4, abi_long arg5)
- {
-+    void *p;
-+    target_siginfo_t uinfo;
-+
-     print_syscall_prologue(name);
-     print_raw_param("%d", arg0, 0);
-     print_raw_param("%d", arg1, 0);
-     print_signal(arg2, 0);
--    print_pointer(arg3, 1);
-+    p =3D lock_user(VERIFY_READ, arg3, sizeof(target_siginfo_t), 1);
-+    if (p) {
-+        get_target_siginfo(&uinfo, p);
-+        print_siginfo(&uinfo);
-+
-+        unlock_user(p, arg3, 0);
-+    } else {
-+        print_pointer(arg3, 1);
-+    }
-     print_syscall_epilogue(name);
- }
- #endif
+diff --git a/linux-user/signal.c b/linux-user/signal.c
+index 3d18d1b..54c3be7 100644
+--- a/linux-user/signal.c
++++ b/linux-user/signal.c
+@@ -485,6 +485,9 @@ void signal_init(void)
+=20
+     /* Set the signal mask from the host mask. */
+     sigprocmask(0, 0, &ts->signal_mask);
++#ifdef TRACK_TARGET_SIGMASK
++    host_to_target_sigset_internal(&ts->target_signal_mask, &ts->signal_=
+mask);
++#endif
+=20
+     /* set all host signal handlers. ALL signals are blocked during
+        the handlers to serialize them. */
+diff --git a/linux-user/syscall.c b/linux-user/syscall.c
+index d3b769e..94ecae3 100644
+--- a/linux-user/syscall.c
++++ b/linux-user/syscall.c
+@@ -6279,6 +6279,9 @@ static int do_fork(CPUArchState *env, unsigned int =
+flags, abi_ulong newsp,
+         ts->bprm =3D parent_ts->bprm;
+         ts->info =3D parent_ts->info;
+         ts->signal_mask =3D parent_ts->signal_mask;
++#ifdef TRACK_TARGET_SIGMASK
++        ts->target_signal_mask =3D parent_ts->target_signal_mask;
++#endif
+=20
+         if (flags & CLONE_CHILD_CLEARTID) {
+             ts->child_tidptr =3D child_tidptr;
 --=20
 1.9.1
