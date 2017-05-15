@@ -1,24 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60002)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33199)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1dA6Sl-0004Zy-PI
-	for qemu-devel@nongnu.org; Sun, 14 May 2017 23:14:24 -0400
+	(envelope-from <jasowang@redhat.com>) id 1dA6d5-0006Yo-Ip
+	for qemu-devel@nongnu.org; Sun, 14 May 2017 23:25:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1dA6Si-0002WP-Jw
-	for qemu-devel@nongnu.org; Sun, 14 May 2017 23:14:23 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:54396)
+	(envelope-from <jasowang@redhat.com>) id 1dA6d2-0007Vk-DZ
+	for qemu-devel@nongnu.org; Sun, 14 May 2017 23:25:03 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37356)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1dA6Si-0002Uw-Dq
-	for qemu-devel@nongnu.org; Sun, 14 May 2017 23:14:20 -0400
-References: <1494552955-30529-1-git-send-email-zhangchen.fnst@cn.fujitsu.com>
+	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1dA6d2-0007V4-6y
+	for qemu-devel@nongnu.org; Sun, 14 May 2017 23:25:00 -0400
+References: <1494553288-30764-1-git-send-email-zhangchen.fnst@cn.fujitsu.com>
+	<1494553288-30764-2-git-send-email-zhangchen.fnst@cn.fujitsu.com>
+	<80a52ceb-6e69-f4ee-04c7-1219bb7947c1@amsat.org>
 From: Jason Wang <jasowang@redhat.com>
-Message-ID: <fc95d874-9492-68ec-f613-59940d1f4a94@redhat.com>
-Date: Mon, 15 May 2017 11:14:11 +0800
+Message-ID: <ed2e0bd5-4a69-63d9-497c-b0b6aaac404d@redhat.com>
+Date: Mon, 15 May 2017 11:24:51 +0800
 MIME-Version: 1.0
-In-Reply-To: <1494552955-30529-1-git-send-email-zhangchen.fnst@cn.fujitsu.com>
+In-Reply-To: <80a52ceb-6e69-f4ee-04c7-1219bb7947c1@amsat.org>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 0/3] Optimize filter-mirror and
- filter-rewriter
+Subject: Re: [Qemu-devel] [PATCH V4 01/12] net: Add vnet_hdr_len related
+ arguments in NetClientState
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,24 +29,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>, qemu devel <qemu-devel@nongnu.org>
-Cc: zhanghailiang <zhang.zhanghailiang@huawei.com>
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Zhang Chen <zhangchen.fnst@cn.fujitsu.com>, qemu devel <qemu-devel@nongnu.org>
+Cc: bian naimeng <biannm@cn.fujitsu.com>, "eddie . dong" <eddie.dong@intel.com>, zhanghailiang <zhang.zhanghailiang@huawei.com>, Li Zhijian <lizhijian@cn.fujitsu.com>, weifuqiang <weifuqiang@huawei.com>
 
 
 
-On 2017=E5=B9=B405=E6=9C=8812=E6=97=A5 09:35, Zhang Chen wrote:
-> Fix some duplicate codes and remove unused codes.
+On 2017=E5=B9=B405=E6=9C=8814=E6=97=A5 05:24, Philippe Mathieu-Daud=C3=A9=
+ wrote:
+> Hi Zhang
 >
-> Zhang Chen (3):
->    net/filter-mirror.c: Remove duplicate check code.
->    net/filter-mirror.c: Rename filter_mirror_send() and fix codestyle
->    net/filter-rewriter: Remove unused option in filter-rewirter
+> On 05/11/2017 10:41 PM, Zhang Chen wrote:
+>> Add vnet_hdr_len and using_vnet_hdr arguments in NetClientState
+>> that make othermodule get real vnet_hdr_len easily.
+>>
+>> Signed-off-by: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
+>> ---
+>>  include/net/net.h | 2 ++
+>>  net/net.c         | 2 ++
+>>  2 files changed, 4 insertions(+)
+>>
+>> diff --git a/include/net/net.h b/include/net/net.h
+>> index 99b28d5..70edfc0 100644
+>> --- a/include/net/net.h
+>> +++ b/include/net/net.h
+>> @@ -100,6 +100,8 @@ struct NetClientState {
+>>      unsigned int queue_index;
+>>      unsigned rxfilter_notify_enabled:1;
+>>      int vring_enable;
+>> +    bool using_vnet_hdr;
+>> +    int vnet_hdr_len;
+>>      QTAILQ_HEAD(NetFilterHead, NetFilterState) filters;
+>>  };
+>>
+>> diff --git a/net/net.c b/net/net.c
+>> index 0ac3b9e..a00a0c9 100644
+>> --- a/net/net.c
+>> +++ b/net/net.c
+>> @@ -472,6 +472,7 @@ void qemu_using_vnet_hdr(NetClientState *nc, bool=20
+>> enable)
+>>          return;
+>>      }
+>>
+>> +    nc->using_vnet_hdr =3D enable;
+>>      nc->info->using_vnet_hdr(nc, enable);
+>>  }
+>>
+>> @@ -491,6 +492,7 @@ void qemu_set_vnet_hdr_len(NetClientState *nc,=20
+>> int len)
+>>          return;
+>>      }
+>>
+>> +    nc->vnet_hdr_len =3D len;
+>>      nc->info->set_vnet_hdr_len(nc, len);
+>>  }
+>>
 >
->   net/filter-mirror.c | 35 ++++++++++++++++-------------------
->   qemu-options.hx     |  3 ++-
->   2 files changed, 18 insertions(+), 20 deletions(-)
+> For what it's worth, now having those fields in NetClientState it is=20
+> possible to remove a deref to NetClientInfo in qemu_has_vnet_hdr() and=20
+> qemu_has_vnet_hdr_len().
+>
+> Anyway,
+> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+>
 >
 
-Looks good to me, just need to address Eric's comment on patch 3.
+Yes and this could be done on top with removing private e.g vnet_hdr_len.
 
 Thanks
