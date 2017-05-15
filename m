@@ -1,27 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56132)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57298)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1dAGnk-0004Me-M9
-	for qemu-devel@nongnu.org; Mon, 15 May 2017 10:16:45 -0400
+	(envelope-from <eblake@redhat.com>) id 1dAGtT-0005iu-9E
+	for qemu-devel@nongnu.org; Mon, 15 May 2017 10:22:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1dAGng-00019x-5d
-	for qemu-devel@nongnu.org; Mon, 15 May 2017 10:16:44 -0400
-Received: from mail-wm0-x22a.google.com ([2a00:1450:400c:c09::22a]:36696)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1dAGnf-00017g-Td
-	for qemu-devel@nongnu.org; Mon, 15 May 2017 10:16:40 -0400
-Received: by mail-wm0-x22a.google.com with SMTP id u65so83171306wmu.1
-	for <qemu-devel@nongnu.org>; Mon, 15 May 2017 07:16:39 -0700 (PDT)
-References: <20170515134753.28412-1-stefanha@redhat.com>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <20170515134753.28412-1-stefanha@redhat.com>
-Date: Mon, 15 May 2017 15:17:28 +0100
-Message-ID: <87a86erypz.fsf@linaro.org>
+	(envelope-from <eblake@redhat.com>) id 1dAGtS-0004Hq-82
+	for qemu-devel@nongnu.org; Mon, 15 May 2017 10:22:39 -0400
+References: <20170515103551.31313-1-famz@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <b5e4d8ea-fffe-71c5-81f7-7cc948b6df92@redhat.com>
+Date: Mon, 15 May 2017 09:22:22 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH] .gdbinit: load QEMU sub-commands when gdb
- starts
+In-Reply-To: <20170515103551.31313-1-famz@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="Vd0VSaEdmNPoh468d6F4RDnaf628foOqD"
+Subject: Re: [Qemu-devel] [PATCH] qemu-img: Fix documentation of convert
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,47 +23,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--Vd0VSaEdmNPoh468d6F4RDnaf628foOqD
+From: Eric Blake <eblake@redhat.com>
+To: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org,
+ Max Reitz <mreitz@redhat.com>
+Message-ID: <b5e4d8ea-fffe-71c5-81f7-7cc948b6df92@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] qemu-img: Fix documentation of convert
+References: <20170515103551.31313-1-famz@redhat.com>
+In-Reply-To: <20170515103551.31313-1-famz@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Stefan Hajnoczi <stefanha@redhat.com> writes:
-
-> The scripts/qemu-gdb.py file is not easily discoverable.  Add a .gdbinit
-> file so GDB either loads qemu-gdb.py automatically or prints a message
-> informing the user how to enable them (some systems disable ./.gdbinit
-> loading for security reasons).
->
-> Suggested-by: Eric Blake <eblake@redhat.com>
-> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+On 05/15/2017 05:35 AM, Fam Zheng wrote:
+> It got lost in commit a8d16f9ca "qemu-img: Update documentation for -U"=
+=2E
+>=20
+> Reported-by: Max Reitz <mreitz@redhat.com>
+> Signed-off-by: Fam Zheng <famz@redhat.com>
 > ---
->  .gdbinit | 8 ++++++++
->  1 file changed, 8 insertions(+)
->  create mode 100644 .gdbinit
->
-> diff --git a/.gdbinit b/.gdbinit
-> new file mode 100644
-> index 0000000..9d322fc
-> --- /dev/null
-> +++ b/.gdbinit
-> @@ -0,0 +1,8 @@
-> +# GDB may have ./.gdbinit loading disabled by default.  In that case you can
-> +# follow the instructions it prints.  They boil down to adding the following to
-> +# your home directory's ~/.gdbinit file:
-> +#
-> +#   add-auto-load-safe-path /path/to/qemu/.gdbinit
-> +
-> +# Load QEMU-specific sub-commands and settings
-> +source scripts/qemu-gdb.py
+>  qemu-img-cmds.hx | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
 
-While this works well enough you might as well just comment the helper
-script itself. Would this script take precedence over a users
-~/.gdbinit? How would it work for out-of-tree builds?
+Reviewed-by: Eric Blake <eblake@redhat.com>
 
-GDB does have a mechanism for autoloading extensions by way of adding
-ELF sections:
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
 
-  https://sourceware.org/gdb/current/onlinedocs/gdb/dotdebug_005fgdb_005fscripts-section.html#dotdebug_005fgdb_005fscripts-section
 
---
-Alex Bennée
+--Vd0VSaEdmNPoh468d6F4RDnaf628foOqD
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEcBAEBCAAGBQJZGbmeAAoJEKeha0olJ0NqUpIIAIJN6Kwa9DTXJ8r3xHMeMWnN
+yEk+Grv4n2QFQAQEOMGSE7mOR1sLeoka2RaFNtSfvK6CjERKhOWwgYs935niMHwP
+zDLuJrA2LYVvgekASl9PJVeG45w7hh/hXJoqnXV3JnmRT+u4stBfYuqZOmI7jfKF
+DL9tDVIgS8vZEqVc7qUFiy13l2PHIAjy/rq7PRFwvskNjUCmwnI3BwrHEXpI3xcj
+/CS9HL5kXVZ3xqZvYkhTHQXNt3CKYgM+FOAdIBhG6h1l7pEhV+xcBetJoRymLZfu
+Bg9+Pge8zrgIemJSncG1NHbAMgErtDJmHzRSauEpfGy1XyIKIDMEjt0Ih+eGysw=
+=2nEu
+-----END PGP SIGNATURE-----
+
+--Vd0VSaEdmNPoh468d6F4RDnaf628foOqD--
