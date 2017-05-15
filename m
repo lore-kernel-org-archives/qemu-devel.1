@@ -1,23 +1,37 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37330)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37647)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1dAJGX-0005v4-OP
-	for qemu-devel@nongnu.org; Mon, 15 May 2017 12:54:39 -0400
+	(envelope-from <quintela@redhat.com>) id 1dAJIK-0006aK-SA
+	for qemu-devel@nongnu.org; Mon, 15 May 2017 12:56:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1dAJGV-0006Z6-W4
-	for qemu-devel@nongnu.org; Mon, 15 May 2017 12:54:37 -0400
+	(envelope-from <quintela@redhat.com>) id 1dAJIF-0007T9-RT
+	for qemu-devel@nongnu.org; Mon, 15 May 2017 12:56:28 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:45948)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1dAJIF-0007Sb-Ir
+	for qemu-devel@nongnu.org; Mon, 15 May 2017 12:56:23 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 3C058C04B92C
+	for <qemu-devel@nongnu.org>; Mon, 15 May 2017 16:56:22 +0000 (UTC)
+From: Juan Quintela <quintela@redhat.com>
+In-Reply-To: <20170515163841.GB2324@work-vm> (David Alan Gilbert's message of
+	"Mon, 15 May 2017 17:38:41 +0100")
+References: <20170511163228.6666-1-quintela@redhat.com>
+	<20170511163228.6666-3-quintela@redhat.com>
+	<20170512034033.GN28293@pxdev.xzpeter.org>
+	<877f1mgx9h.fsf@secure.mitica>
+	<5bab598f-30eb-fcf6-9d06-8f683b466414@redhat.com>
+	<87lgpyfo28.fsf@secure.mitica> <87k25iqf4m.fsf@dusky.pond.sub.org>
+	<87efvqdqqj.fsf@secure.mitica> <20170515163841.GB2324@work-vm>
+Reply-To: quintela@redhat.com
+Date: Mon, 15 May 2017 18:56:18 +0200
+Message-ID: <87a86edpot.fsf@secure.mitica>
 MIME-Version: 1.0
-In-Reply-To: <7ee4c347-4502-863a-8c9f-faaf8fab17f3@amsat.org>
-References: <1494348286-10253-1-git-send-email-sundeep.lkml@gmail.com>
-	<1494348286-10253-5-git-send-email-sundeep.lkml@gmail.com>
-	<b913e666-8df3-714f-3ff9-e8f4ff9e7098@amsat.org>
-	<CALHRZuptHwyzu0Y98VWnNd785W80AZ=+1cr_rfegvDo5amh+3g@mail.gmail.com>
-	<7ee4c347-4502-863a-8c9f-faaf8fab17f3@amsat.org>
-From: Alistair Francis <alistair23@gmail.com>
-Date: Mon, 15 May 2017 09:54:04 -0700
-Message-ID: <CAKmqyKMbC67ppDLSXQegXaDZB6O=aSOSzdGtJsfP7RCGxy_rNg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [Qemu-devel PATCH 4/5] msf2: Add Smartfusion2 SoC.
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH 2/3] migration: Remove use of old
+ MigrationParams
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,290 +40,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
-Cc: sundeep subbaraya <sundeep.lkml@gmail.com>, Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, qemu-arm <qemu-arm@nongnu.org>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: Markus Armbruster <armbru@redhat.com>, Eric Blake <eblake@redhat.com>, lvivier@redhat.com, qemu-devel@nongnu.org, Peter Xu <peterx@redhat.com>
 
- On Thu, May 11, 2017 at 10:02 PM, Philippe Mathieu-Daud=C3=A9
-<f4bug@amsat.org> wrote:
-> On 05/12/2017 12:17 AM, sundeep subbaraya wrote:
->>
->> Hi Philippe,
->>
->> On Wed, May 10, 2017 at 5:20 PM, Philippe Mathieu-Daud=C3=A9 <f4bug@amsa=
-t.org>
->> wrote:
->>
->>> Hi Subbaraya,
->>>
->>>
->>> On 05/09/2017 01:44 PM, Subbaraya Sundeep wrote:
->>>
->>>> Smartfusion2 SoC has hardened Microcontroller subsystem
->>>> and flash based FPGA fabric. This patch adds support for
->>>> Microcontroller subsystem in the SoC.
->>>>
->>>> Signed-off-by: Subbaraya Sundeep <sundeep.lkml@gmail.com>
->>>> ---
->>>>  default-configs/arm-softmmu.mak |   1 +
->>>>  hw/arm/Makefile.objs            |   2 +-
->>>>  hw/arm/msf2-soc.c               | 188 ++++++++++++++++++++++++++++++
->>>> ++++++++++
->>>>  include/hw/arm/msf2-soc.h       |  60 +++++++++++++
->>>>  4 files changed, 250 insertions(+), 1 deletion(-)
->>>>  create mode 100644 hw/arm/msf2-soc.c
->>>>  create mode 100644 include/hw/arm/msf2-soc.h
->>>>
->>>> diff --git a/default-configs/arm-softmmu.mak
->>>> b/default-configs/arm-softmmu.mak
->>>> index 78d7af0..7062512 100644
->>>> --- a/default-configs/arm-softmmu.mak
->>>> +++ b/default-configs/arm-softmmu.mak
->>>> @@ -122,3 +122,4 @@ CONFIG_ACPI=3Dy
->>>>  CONFIG_SMBIOS=3Dy
->>>>  CONFIG_ASPEED_SOC=3Dy
->>>>  CONFIG_GPIO_KEY=3Dy
->>>> +CONFIG_MSF2=3Dy
->>>> diff --git a/hw/arm/Makefile.objs b/hw/arm/Makefile.objs
->>>> index 4c5c4ee..ae5e4a3 100644
->>>> --- a/hw/arm/Makefile.objs
->>>> +++ b/hw/arm/Makefile.objs
->>>> @@ -1,7 +1,7 @@
->>>>  obj-y +=3D boot.o collie.o exynos4_boards.o gumstix.o highbank.o
->>>>  obj-$(CONFIG_DIGIC) +=3D digic_boards.o
->>>>  obj-y +=3D integratorcp.o mainstone.o musicpal.o nseries.o
->>>> -obj-y +=3D omap_sx1.o palm.o realview.o spitz.o stellaris.o
->>>> +obj-y +=3D omap_sx1.o palm.o realview.o spitz.o stellaris.o msf2-soc.=
-o
->>>>
->>>
->>> Not a big deal, but since you added CONFIG_MSF2 why not using it here a=
-nd
->>> the Makefiles you touched (misc/ssi/timer)?
->>>
->>> obj-$(CONFIG_MSF2) +=3D msf2-soc.o
->>>
->>>   OK. Will change it.
->>
->>
->>>
->>>  obj-y +=3D tosa.o versatilepb.o vexpress.o virt.o xilinx_zynq.o z2.o
->>>>
->>>>  obj-$(CONFIG_ACPI) +=3D virt-acpi-build.o
->>>>  obj-y +=3D netduino2.o
+"Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
+> * Juan Quintela (quintela@redhat.com) wrote:
+>> Markus Armbruster <armbru@redhat.com> wrote:
+>> > Juan Quintela <quintela@redhat.com> writes:
+>> >
+>> >> Eric Blake <eblake@redhat.com> wrote:
+>> 
+>> 
+>> >>> Or is the proposal that we are also going to simplify the QMP 'migrate'
+>> >>> command to get rid of crufty parameters?
+>> >>
+>> >> I didn't read it that way, but I would not oppose O:-)
+>> >>
+>> >> Later, Juan.
+>> >
+>> > I'm not too familiar with this stuff, so please correct my
+>> > misunderstandings.
+>> >
+>> > "Normal" migration configuration is global state, i.e. it applies to all
+>> > future migrations.
+>> >
+>> > Except the "migrate" command's flags apply to just the migration kicked
+>> > off by that command.
+>> >
+>> > QMP command "migrate" has two flags "blk" (HMP: -b) and "inc" (HMP: -i).
+>> > !blk && inc makes no sense and is silently treated like !blk && !inc.
+>> >
+>> > There's a third flag "detach" (HMP: -d), but it does nothing in QMP.
+>> 
+>> As qmp command is asynchronous, you can think that -d is *always* on in
+>> QMP O:-)
+>> 
+>> > You'd like to deprecate these flags in favour of "normal" configuration.
+>> > However, we need to maintain QMP backward compatibility at least for a
+>> > while.  HMP backward compatibility is nice to have, but not required.
+>> >
+>> > First step is to design the new interface you want.  Second step is to
+>> > figure out backward compatibility.
+>> >
+>> > The new interface adds a block migration tri-state (off,
+>> > non-incremental, incremental) to global state, default off.  Whether
+>> > it's done as two bools or an enum of three values doesn't matter here.
+>> 
+>> Tristates will complicate it.  I still think that:
+>> 
+>> - capability: block_migration
+>> - parameter: block_shared
+>> 
+>> Makes more sense, no?
 >
-> [...]
->>>>
->>>> +    MemoryRegion *system_memory =3D get_system_memory();
->>>> +    MemoryRegion *nvm =3D g_new(MemoryRegion, 1);
->>>> +    MemoryRegion *nvm_alias =3D g_new(MemoryRegion, 1);
->>>> +    MemoryRegion *sram =3D g_new(MemoryRegion, 1);
->>>> +    MemoryRegion *ddr =3D g_new(MemoryRegion, 1);
->>>> +
->>>> +    memory_region_init_ram(nvm, NULL, "MSF2.envm", ENVM_SIZE,
->>>> +                           &error_fatal);
->>>>
->>>
->>> Maybe you can name it "eNVM" to match the documentation.
->>>
->>> Also envm_size should be a per-model property.
->>>
->>
->> Ok.
->>
->>>
->>> +    memory_region_init_alias(nvm_alias, NULL, "MSF2.flash.alias",
->>>>
->>>> +                             nvm, 0, ENVM_SIZE);
->>>>
->>>
->>> Hmmm well this would be the "Cache Matrix Remap" which happens to be
->>> mapped by default to eNVM on cold reset.
->>> Naming it "MSF2.flash.alias" is pretty confusing.
->>>
->>
->> Exactly it is Cache Matrix Remap.
->> AFAIK currently we cannot remap memory during runtime in Qemu.
->> So I handled default remap with alias.
->> Please suggest the name. MSF2.eNVM.alias sounds fine?
+> I don't understand what making block_shared a parameter gives you as
+> opposed to simply having two capabilities.
 >
->
-> Hmm Peter, Francis?
->
-> Personally I prefer "bus_remap.alias" which is explicit.
->
-> "eNVM.alias" is only true on Cold Reset.
+> (And how did we get 'shared'? We started off with block & incremental)
 
-Yeah, I'm pretty sure you can't remap memory (unless that is some new
-feature I missed).
+The variables on MigrationParams:
 
-Creating an alias seems like the right idea (you can even
-enable/disable it as needed to pretend we have dynamic remapping).
+struct MigrationParams {
+    bool blk;
+    bool shared;
+};
 
-As for names usually just copy the data sheet. MSF2.eNVM.alias sounds
-fine to me.
 
-Thanks,
+I can move to incremental.  I am not sure which one is clearer.
 
-Alistair
+The advantage of having shared as a parameter is that we forget about
+all this dependency bussiness.  Is the same than compression_threads
+paramter, you setup to whichever value that you want.  But you don't get
+compression_threads until you set the compress capability.
 
->
->>>
->>> +    vmstate_register_ram_global(nvm);
->>>>
->>>> +
->>>> +    memory_region_set_readonly(nvm, true);
->>>> +    memory_region_set_readonly(nvm_alias, true);
->>>> +
->>>> +    memory_region_add_subregion(system_memory, ENVM_BASE_ADDRESS, nvm=
-);
->>>> +    memory_region_add_subregion(system_memory, 0, nvm_alias);
->>>> +
->>>> +    memory_region_init_ram(ddr, NULL, "MSF2.ddr", DDR_SIZE,
->>>> +                           &error_fatal);
->>>>
->>>
->>> Wrong, there is no DDR on this SoC.
->>>
->> DDR controller is there in Smartfusion2 (different from Smartfusion). As
->> you said below this
->> should be in board file.
->
->
-> There IS a DDRC in this SoC, but here you are registering a DDR 'ram' mem=
-ory
-> region, not a controller. This SoC can be used without any DDR, enough us=
-ing
-> embedded eNVM and eSRAM.
->
-> Now it happens your SoM board provides a DDR chip connected to this SoC.
->
->>>
->>> +    vmstate_register_ram_global(ddr);
->>>>
->>>> +    memory_region_add_subregion(system_memory, DDR_BASE_ADDRESS, ddr)=
-;
->>>> +
->>>> +    memory_region_init_ram(sram, NULL, "MSF2.sram", SRAM_SIZE,
->>>> +                           &error_fatal);
->>>>
->>>
->>> I'd rather like to see it named "eSRAM" somehow, so there is no confusi=
-on
->>> possible with external SRAM a SoM/board can map at 0x60000000.
->>>
->>> Same comment than envm_size, sram_size should be a per-model property.
->>>
->>> OK
->>
->>
->>> +    vmstate_register_ram_global(sram);
->>>>
->>>> +    memory_region_add_subregion(system_memory, SRAM_BASE_ADDRESS,
->>>> sram);
->>>> +
->>>> +    armv7m =3D DEVICE(&s->armv7m);
->>>> +    qdev_prop_set_uint32(armv7m, "num-irq", 96);
->>>>
->>>
->>> Can you point me to your datasheet? I thought the SF2 had 240 IRQs.
->>
->>
->>
->> Please go to link:
->> https://www.microsemi.com/document-portal/search_form
->> and provide search keyword as "UG0331". You can the download the spec.
->> It has 81 irqs I remember when I have given 81 qemu complained not
->> multiple
->> of 4.
->> I checked again with 81 and it is fine. I will change it to 81.
->
->
-> Ok :)
->
->> +    qdev_prop_set_string(armv7m, "cpu-model", "cortex-m3");
->>>>
->>>> +    object_property_set_link(OBJECT(&s->armv7m),
->>>> OBJECT(get_system_memory()),
->>>> +                                     "memory", &error_abort);
->
-> [...]
->>>>
->>>> +#define MSF2_NUM_SPIS         2
->>>> +#define MSF2_NUM_UARTS        2
->>>> +
->>>> +#define ENVM_BASE_ADDRESS     0x60000000
->>>> +#define ENVM_SIZE             (128 * 1024)
->>>>
->>>
->>> The SoC design ENVM_SIZE is 1MB, 128K seems your particular model.
->>>
->>
->>  M2S010 SoC device has 256K eNMV. My bad it should be 256 instead of 128=
-.
->>  The board I have contains M2S010 device in SOM.
->>
->
-> What I mean here is on the SF2 the eNVM "region size" (as seen by the AHB
-> Bus) is 1MB. Now your SoC M2S010 provides 256KB in this dedicated 1M regi=
-on.
->
-> I find your #define confusing, what about:
->
-> #define ENVM_REGION_SIZE      (1 * M_BYTE)
-> #define M2S010_ENVM_SIZE      (256 * K_BYTE)
->
-> (?_BYTE from "qemu/cutils.h")
->
-> I wanted to clarify this because you named your functions as it can model=
-s
-> any SF2 but actually you restrict it to your M2S010.
->
-> Maybe to start you can rename msf2_soc_x() -> m2s010_sf2_soc_x() then if
-> needed this can be generalized to other SoCs from SF2 family?
->
->>> +
->>>>
->>>> +#define DDR_BASE_ADDRESS      0xA0000000
->>>> +#define DDR_SIZE              (64 * 1024 * 1024)
->>>>
->>>
->>> This belongs to the SoM.
->>> Yes will change it.
->>>
->>>> +
->>>> +#define SRAM_BASE_ADDRESS     0x20000000
->>>> +#define SRAM_SIZE             (64 * 1024)
->>>>
->>>
->>> Indeed this SoC is designed to have up to 64K of SRAM.
->>> Luckily your model provides 64K.
->>>
->>
->>
->> Yes it is 64k :)
->>
->
-> Same here, what you have is:
->
-> #define ESRAM_REGION_SIZE     (64 * K_BYTE)
-> #define M2S010_ESRAM_SIZE     (64 * K_BYTE)
->
-> which happens to be equal but does not mean the same, do you see the
-> difference?
->
->
->> +
->>>>
->>>> +typedef struct MSF2State {
->>>> +    /*< private >*/
->>>> +    SysBusDevice parent_obj;
->>>> +    /*< public >*/
->>>> +
->>>> +    ARMv7MState armv7m;
->>>> +
->>>> +    MSF2SysregState sysreg;
->>>> +    MSF2TimerState timer;
->>>> +    MSF2SpiState spi[MSF2_NUM_SPIS];
->>>> +} MSF2State;
->>>> +
->>>> +#endif
+So, in this case we will have:
+
+block capability: Are we using block migration or not
+block-incremental parameter: If we are using block migration, are we
+      using incremental copying of the block layer?
+
+
+Later, Juan.
