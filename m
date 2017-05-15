@@ -1,33 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51909)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53991)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1dAIP0-0005G6-8L
-	for qemu-devel@nongnu.org; Mon, 15 May 2017 11:59:19 -0400
+	(envelope-from <armbru@redhat.com>) id 1dAIVf-0002dG-VA
+	for qemu-devel@nongnu.org; Mon, 15 May 2017 12:06:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1dAIOx-0006WW-7V
-	for qemu-devel@nongnu.org; Mon, 15 May 2017 11:59:18 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:57436)
+	(envelope-from <armbru@redhat.com>) id 1dAIVb-0000Xn-GF
+	for qemu-devel@nongnu.org; Mon, 15 May 2017 12:06:11 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:60568)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1dAIOw-0006Vj-UQ
-	for qemu-devel@nongnu.org; Mon, 15 May 2017 11:59:15 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dAIVa-0000XW-RS
+	for qemu-devel@nongnu.org; Mon, 15 May 2017 12:06:07 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id A9A9E48DEC
-	for <qemu-devel@nongnu.org>; Mon, 15 May 2017 15:59:13 +0000 (UTC)
-From: Juan Quintela <quintela@redhat.com>
-In-Reply-To: <22efcebe-e6fb-d053-7216-10ccd63f7287@redhat.com> (Eric Blake's
-	message of "Mon, 15 May 2017 09:28:40 -0500")
+	by mx1.redhat.com (Postfix) with ESMTPS id D07EA5F742
+	for <qemu-devel@nongnu.org>; Mon, 15 May 2017 16:06:04 +0000 (UTC)
+From: Markus Armbruster <armbru@redhat.com>
 References: <20170511163228.6666-1-quintela@redhat.com>
 	<20170511163228.6666-3-quintela@redhat.com>
 	<20170512034033.GN28293@pxdev.xzpeter.org>
 	<877f1mgx9h.fsf@secure.mitica>
 	<5bab598f-30eb-fcf6-9d06-8f683b466414@redhat.com>
 	<87lgpyfo28.fsf@secure.mitica>
-	<22efcebe-e6fb-d053-7216-10ccd63f7287@redhat.com>
-Reply-To: quintela@redhat.com
-Date: Mon, 15 May 2017 17:59:02 +0200
-Message-ID: <87mvaedsc9.fsf@secure.mitica>
+Date: Mon, 15 May 2017 18:06:01 +0200
+In-Reply-To: <87lgpyfo28.fsf@secure.mitica> (Juan Quintela's message of "Mon,
+	15 May 2017 11:48:31 +0200")
+Message-ID: <87k25iqf4m.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
 Content-Type: text/plain
 Subject: Re: [Qemu-devel] [PATCH 2/3] migration: Remove use of old
@@ -40,290 +38,150 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: Peter Xu <peterx@redhat.com>, lvivier@redhat.com, qemu-devel@nongnu.org, dgilbert@redhat.com, Markus Armbruster <armbru@redhat.com>
+To: Juan Quintela <quintela@redhat.com>
+Cc: Eric Blake <eblake@redhat.com>, lvivier@redhat.com, qemu-devel@nongnu.org, Peter Xu <peterx@redhat.com>, dgilbert@redhat.com
 
-Eric Blake <eblake@redhat.com> wrote:
-> [adding Markus]
->
-> On 05/15/2017 04:48 AM, Juan Quintela wrote:
->> Eric Blake <eblake@redhat.com> wrote:
->>> On 05/12/2017 05:55 AM, Juan Quintela wrote:
->>>>>> @@ -1239,6 +1240,7 @@ void qmp_migrate(const char *uri, bool has_blk, bool blk,
->>>>>>      }
->>>>>>  
->>>>>>      if (has_inc && inc) {
->>>>>> +        migrate_set_block_enabled(s, true);
->>>>>>          migrate_set_block_shared(s, true);
->>>>>
->>>>> [2]
->>>>>
->>>>> IIUC for [1] & [2] we are solving the same problem that "shared"
->>>>> depends on "enabled" bit. Would it be good to unitfy this dependency
->>>>> somewhere? E.g., by changing migrate_set_block_shared() into:
->>>>>
->>>>> void migrate_set_block_shared(MigrationState *s, bool value)
->>>>> {
->>>>>     s->enabled_capabilities[MIGRATION_CAPABILITY_BLOCK_SHARED] = value;
->>>>>     if (value) {
->>>>>         migrate_set_block_enabled(s, true);
->>>>>     }
->>>>> }
+Juan Quintela <quintela@redhat.com> writes:
+
+> Eric Blake <eblake@redhat.com> wrote:
+>> On 05/12/2017 05:55 AM, Juan Quintela wrote:
+>>>>> @@ -1239,6 +1240,7 @@ void qmp_migrate(const char *uri, bool has_blk, bool blk,
+>>>>>      }
+>>>>>  
+>>>>>      if (has_inc && inc) {
+>>>>> +        migrate_set_block_enabled(s, true);
+>>>>>          migrate_set_block_shared(s, true);
 >>>>
->>>> ok with this.
->>>
->>> Or, as I commented on 1/3, maybe having a single property that is a
->>> tri-state enum value, instead of 2 separate boolean properties, might be
->>> nicer (but certainly a bit more complex to code up).
->> 
->> If you teach me how to do the qapi/qmp part, I will do the other bits.
->> I don't really care if we do it one way or the other.
+>>>> [2]
+>>>>
+>>>> IIUC for [1] & [2] we are solving the same problem that "shared"
+>>>> depends on "enabled" bit. Would it be good to unitfy this dependency
+>>>> somewhere? E.g., by changing migrate_set_block_shared() into:
+>>>>
+>>>> void migrate_set_block_shared(MigrationState *s, bool value)
+>>>> {
+>>>>     s->enabled_capabilities[MIGRATION_CAPABILITY_BLOCK_SHARED] = value;
+>>>>     if (value) {
+>>>>         migrate_set_block_enabled(s, true);
+>>>>     }
+>>>> }
+>>> 
+>>> ok with this.
+>>
+>> Or, as I commented on 1/3, maybe having a single property that is a
+>> tri-state enum value, instead of 2 separate boolean properties, might be
+>> nicer (but certainly a bit more complex to code up).
 >
-> Adding Markus in, as I value his opinion on matters of UI design.
+> If you teach me how to do the qapi/qmp part, I will do the other bits.
+> I don't really care if we do it one way or the other.
+>
+>>> I will add once here that when we disable block enabled, we also disable
+>>> shared, or just let it that way?
+>>> 
+>>>> Another thing to mention: after switching to the capability interface,
+>>>> we'll cache the "enabled" and "shared" bits now while we don't cache
+>>>> it before, right? IIUC it'll affect behavior of such sequence:
+>>>>
+>>>> - 1st migrate with enabled=1, shared=1, then
+>>>> - 2nd migrate with enabled=0, shared=0
+>>>>
+>>>> Before the series, the 2nd migrate will use enabled=shared=0, but
+>>>> after the series it should be using enabled=shared=1. Not sure whether
+>>>> this would be a problem (or I missed anything?).
+>>> 
+>>> We can't be consistent with both old/new way.
+>>> 
+>>> Old way: we always setup the capabilities on command line (that should
+>>> have been deprecated long, long ago)
+>>
+>> Well, the easy way out is to have the HMP migrate command (I assume
+>> that's what you mean by "on command line") explicitly clear the
+>> parameters if it is called without the -b/-i flag.  So the start of each
+>> migration is what changes the properties, so long as you are still using
+>> HMP to start the migration.  Or, on the QMP side, since 'migrate' has
+>> optional 'blk' and 'inc' booleans, basically leave the settings alone if
+>> the parameters were omitted, and explicitly update the property to the
+>> value of those parameters if they were present.
+>
+> We are going to have trouble whatever way that we do it, or we start
+> doing lots of strange things.
+>
+> Forget about qmp, we are going to assume that it is consistent with hmp.
+>
+> migrate_set_capabilities block_enabled on
+> migrate -b .....
+>
+> Should migrate disable the block_enabled capability?  Give one
+> warning/error?
+>
+> And notice that this only matter if we do a migration, we cancel/get one
+> error, and then we migrate again.
+>
+> What I tried to do is assume that -b/-i arguments don't exist.  And if
+> the user use them, we implement its behaviour with the minimal fuss
+> possibly.
+>
+> Only way that I can think of being consistent and bug compatible will be
+> to store:
+> - old block_shared/enanbeld capability value
+> - if we set -b/-i on the command line
+>
+> In migration cleanup do the right thing depending on this four
+> variables.  I think that it is adding lots of complexity for very few
+> improvement.
+>
+>
+>> Or is the proposal that we are also going to simplify the QMP 'migrate'
+>> command to get rid of crufty parameters?
+>
+> I didn't read it that way, but I would not oppose O:-)
+>
+> Later, Juan.
 
+I'm not too familiar with this stuff, so please correct my
+misunderstandings.
 
-This is my "working" version of Dave patch on top of my block layer
-changes.  Still using the two capabilities.
+"Normal" migration configuration is global state, i.e. it applies to all
+future migrations.
 
-I am open to suggestions
+Except the "migrate" command's flags apply to just the migration kicked
+off by that command.
 
+QMP command "migrate" has two flags "blk" (HMP: -b) and "inc" (HMP: -i).
+!blk && inc makes no sense and is silently treated like !blk && !inc.
 
-commit 242852b71ec2b8f08754afa6eafce6fa3fe69139
-Author: Dr. David Alan Gilbert <dgilbert@redhat.com>
-Date:   Mon May 15 15:05:29 2017 +0100
+There's a third flag "detach" (HMP: -d), but it does nothing in QMP.
 
-    block migration: Allow compile time disable
-    
-    Many users now prefer to use drive_mirror over NBD as an
-    alternative to the older migrate -b option; drive_mirror is
-    more complex to setup but gives you more options (e.g. only
-    migrating some of the disks if some of them are shared).
-    
-    Allow the large chunk of block migration code to be compiled
-    out for those who don't use it.
-    
-    Based on a downstream-patch we've had for a while by Jeff Cody.
-    
-    Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+You'd like to deprecate these flags in favour of "normal" configuration.
+However, we need to maintain QMP backward compatibility at least for a
+while.  HMP backward compatibility is nice to have, but not required.
 
-diff --git a/configure b/configure
-index 7c020c0..7aba6c5 100755
---- a/configure
-+++ b/configure
-@@ -316,6 +316,7 @@ vte=""
- virglrenderer=""
- tpm="yes"
- libssh2=""
-+live_block_migration="yes"
- numa=""
- tcmalloc="no"
- jemalloc="no"
-@@ -1168,6 +1169,10 @@ for opt do
-   ;;
-   --enable-libssh2) libssh2="yes"
-   ;;
-+  --disable-live-block-migration) live_block_migration="no"
-+  ;;
-+  --enable-live-block-migration) live_block_migration="yes"
-+  ;;
-   --disable-numa) numa="no"
-   ;;
-   --enable-numa) numa="yes"
-@@ -1400,6 +1405,7 @@ disabled with --disable-FEATURE, default is enabled if available:
-   libnfs          nfs support
-   smartcard       smartcard support (libcacard)
-   libusb          libusb (for usb passthrough)
-+  live-block-migration   Block migration in the main migration stream
-   usb-redir       usb network redirection support
-   lzo             support of lzo compression library
-   snappy          support of snappy compression library
-@@ -5224,6 +5230,7 @@ echo "TPM support       $tpm"
- echo "libssh2 support   $libssh2"
- echo "TPM passthrough   $tpm_passthrough"
- echo "QOM debugging     $qom_cast_debug"
-+echo "Live block migration $live_block_migration"
- echo "lzo support       $lzo"
- echo "snappy support    $snappy"
- echo "bzip2 support     $bzip2"
-@@ -5790,6 +5797,10 @@ if test "$libssh2" = "yes" ; then
-   echo "LIBSSH2_LIBS=$libssh2_libs" >> $config_host_mak
- fi
- 
-+if test "$live_block_migration" = "yes" ; then
-+  echo "CONFIG_LIVE_BLOCK_MIGRATION=y" >> $config_host_mak
-+fi
-+
- # USB host support
- if test "$libusb" = "yes"; then
-   echo "HOST_USB=libusb legacy" >> $config_host_mak
-diff --git a/include/migration/misc.h b/include/migration/misc.h
-index 5c62e92..99b5795 100644
---- a/include/migration/misc.h
-+++ b/include/migration/misc.h
-@@ -22,7 +22,12 @@ void ram_mig_init(void);
- 
- /* migration/block.c */
- 
-+#ifdef CONFIG_LIVE_BLOCK_MIGRATION
- void blk_mig_init(void);
-+#else
-+static inline void blk_mig_init(void) { };
-+#endif
-+
- 
- #define SELF_ANNOUNCE_ROUNDS 5
- 
-diff --git a/migration/Makefile.objs b/migration/Makefile.objs
-index 4277c88..1c7770d 100644
---- a/migration/Makefile.objs
-+++ b/migration/Makefile.objs
-@@ -9,5 +9,5 @@ common-obj-y += qjson.o
- 
- common-obj-$(CONFIG_RDMA) += rdma.o
- 
--common-obj-y += block.o
-+common-obj-$(CONFIG_LIVE_BLOCK_MIGRATION) += block.o
- 
-diff --git a/migration/block.h b/migration/block.h
-index a4d4974..1884fd0 100644
---- a/migration/block.h
-+++ b/migration/block.h
-@@ -14,12 +14,33 @@
- #ifndef MIGRATION_BLOCK_H
- #define MIGRATION_BLOCK_H
- 
-+#ifdef CONFIG_LIVE_BLOCK_MIGRATION
- int blk_mig_active(void);
- uint64_t blk_mig_bytes_transferred(void);
- uint64_t blk_mig_bytes_remaining(void);
- uint64_t blk_mig_bytes_total(void);
- 
--void migrate_set_block_shared(MigrationState *s, bool value);
--void migrate_set_block_enabled(MigrationState *s, bool value);
-+#else
-+static inline int blk_mig_active(void)
-+{
-+    return false;
-+}
-+static inline uint64_t blk_mig_bytes_transferred(void)
-+{
-+    return 0;
-+}
- 
-+static inline uint64_t blk_mig_bytes_remaining(void)
-+{
-+    return 0;
-+}
-+
-+static inline uint64_t blk_mig_bytes_total(void)
-+{
-+    return 0;
-+}
-+#endif /* CONFIG_LIVE_BLOCK_MIGRATION */
-+
-+bool migrate_set_block_shared(MigrationState *s, bool value, Error **errp);
-+bool migrate_set_block_enabled(MigrationState *s, bool value, Error **errp);
- #endif /* MIGRATION_BLOCK_H */
-diff --git a/migration/colo.c b/migration/colo.c
-index 10ee97c..4c652ba 100644
---- a/migration/colo.c
-+++ b/migration/colo.c
-@@ -348,8 +348,8 @@ static int colo_do_checkpoint_transaction(MigrationState *s,
-     }
- 
-     /* Disable block migration */
--    migrate_set_block_enabled(s, false);
--    migrate_set_block_shared(s, false);
-+    migrate_set_block_enabled(s, false, NULL);
-+    migrate_set_block_shared(s, false, NULL);
-     qemu_savevm_state_header(fb);
-     qemu_savevm_state_begin(fb);
-     qemu_mutex_lock_iothread();
-diff --git a/migration/migration.c b/migration/migration.c
-index fd0b11f..a525de5 100644
---- a/migration/migration.c
-+++ b/migration/migration.c
-@@ -595,11 +595,20 @@ void qmp_migrate_set_capabilities(MigrationCapabilityStatusList *params,
-         }
-         s->enabled_capabilities[cap->value->capability] = cap->value->state;
-     }
--
-+#ifdef CONFIG_LIVE_BLOCK_MIGRATION
-     if (s->enabled_capabilities[MIGRATION_CAPABILITY_BLOCK_SHARED]) {
-         s->enabled_capabilities[MIGRATION_CAPABILITY_BLOCK_ENABLED] = true;
-     }
--
-+#else
-+    if ((s->enabled_capabilities[MIGRATION_CAPABILITY_BLOCK_SHARED])
-+        ||(s->enabled_capabilities[MIGRATION_CAPABILITY_BLOCK_SHARED])) {
-+        error_setg(errp, "QEMU compiled without old-style (blk/-b, inc/-i) "
-+                         "block migration");
-+        error_append_hint(errp, "Use drive_mirror+NBD instead.\n");
-+        s->enabled_capabilities[MIGRATION_CAPABILITY_BLOCK_ENABLED] = false;
-+        s->enabled_capabilities[MIGRATION_CAPABILITY_BLOCK_SHARED] = false;
-+    }
-+#endif
-     if (migrate_postcopy_ram()) {
-         if (migrate_use_compression()) {
-             /* The decompression threads asynchronously write into RAM
-@@ -1004,20 +1013,38 @@ bool migration_is_blocked(Error **errp)
-     return false;
- }
- 
--void migrate_set_block_shared(MigrationState *s, bool value)
-+bool migrate_set_block_shared(MigrationState *s, bool value, Error **errp)
- {
-+#ifndef CONFIG_LIVE_BLOCK_MIGRATION
-+    if (value) {
-+        error_setg(errp, "QEMU compiled without old-style (blk/-b, inc/-i) "
-+                         "block migration");
-+        error_append_hint(errp, "Use drive_mirror+NBD instead.\n");
-+        return false;
-+    }
-+#endif
-     s->enabled_capabilities[MIGRATION_CAPABILITY_BLOCK_SHARED] = value;
-     if (value) {
-         s->enabled_capabilities[MIGRATION_CAPABILITY_BLOCK_ENABLED] = true;
-     }
-+    return true;
- }
- 
--void migrate_set_block_enabled(MigrationState *s, bool value)
-+bool migrate_set_block_enabled(MigrationState *s, bool value, Error **errp)
- {
-+#ifndef CONFIG_LIVE_BLOCK_MIGRATION
-+    if (value) {
-+        error_setg(errp, "QEMU compiled without old-style (blk/-b, inc/-i) "
-+                         "block migration");
-+        error_append_hint(errp, "Use drive_mirror+NBD instead.\n");
-+        return false;
-+    }
-+#endif
-     s->enabled_capabilities[MIGRATION_CAPABILITY_BLOCK_ENABLED] = value;
-     if (!value) {
-         s->enabled_capabilities[MIGRATION_CAPABILITY_BLOCK_SHARED] = false;
-     }
-+    return true;
- }
- 
- void qmp_migrate(const char *uri, bool has_blk, bool blk,
-@@ -1046,11 +1073,17 @@ void qmp_migrate(const char *uri, bool has_blk, bool blk,
-     s = migrate_init();
- 
-     if (has_blk && blk) {
--        migrate_set_block_enabled(s, true);
-+        if(!migrate_set_block_enabled(s, true, &local_err)) {
-+            error_propagate(errp, local_err);
-+            return;
-+        }
-     }
- 
-     if (has_inc && inc) {
--        migrate_set_block_shared(s, true);
-+        if(!migrate_set_block_shared(s, true, &local_err)) {
-+            error_propagate(errp, local_err);
-+            return;
-+        }
-     }
- 
-     if (strstart(uri, "tcp:", &p)) {
+First step is to design the new interface you want.  Second step is to
+figure out backward compatibility.
+
+The new interface adds a block migration tri-state (off,
+non-incremental, incremental) to global state, default off.  Whether
+it's done as two bools or an enum of three values doesn't matter here.
+
+If the new interface isn't used, the old one still needs to work.  If it
+is used, the old one either has to do "the right thing", or fail
+cleanly.
+
+We approximate "new interface isn't used" by "block migration is off in
+global state".  When it is off, the migration command needs to honor its
+two flags for compatibility.  It must leave block migration off in
+global state.  Yes, this will complicate the implementation until we
+actually remove the deprecated flags.  Par for the backward compatility
+course.
+
+When block migration isn't off in global state, we can either
+
+* let the flags take precedence over the global state (one
+  interpretation of "do the right thing"), or
+
+* reject flags that conflict with global state (another interpretation),
+  or
+
+* reject *all* flags (fail cleanly).
+
+The last one looks perfectly servicable to me.
