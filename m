@@ -1,17 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35921)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37330)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dAJAL-0001Hm-Ql
-	for qemu-devel@nongnu.org; Mon, 15 May 2017 12:48:15 -0400
+	(envelope-from <alistair23@gmail.com>) id 1dAJGX-0005v4-OP
+	for qemu-devel@nongnu.org; Mon, 15 May 2017 12:54:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dAJAG-00032N-Rj
-	for qemu-devel@nongnu.org; Mon, 15 May 2017 12:48:13 -0400
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Date: Mon, 15 May 2017 17:47:11 +0100
-Message-Id: <20170515164712.6643-4-berrange@redhat.com>
-In-Reply-To: <20170515164712.6643-1-berrange@redhat.com>
-References: <20170515164712.6643-1-berrange@redhat.com>
-Subject: [Qemu-devel] [PATCH v10 3/4] qemu-img: introduce
- --target-image-opts for 'convert' command
+	(envelope-from <alistair23@gmail.com>) id 1dAJGV-0006Z6-W4
+	for qemu-devel@nongnu.org; Mon, 15 May 2017 12:54:37 -0400
+MIME-Version: 1.0
+In-Reply-To: <7ee4c347-4502-863a-8c9f-faaf8fab17f3@amsat.org>
+References: <1494348286-10253-1-git-send-email-sundeep.lkml@gmail.com>
+	<1494348286-10253-5-git-send-email-sundeep.lkml@gmail.com>
+	<b913e666-8df3-714f-3ff9-e8f4ff9e7098@amsat.org>
+	<CALHRZuptHwyzu0Y98VWnNd785W80AZ=+1cr_rfegvDo5amh+3g@mail.gmail.com>
+	<7ee4c347-4502-863a-8c9f-faaf8fab17f3@amsat.org>
+From: Alistair Francis <alistair23@gmail.com>
+Date: Mon, 15 May 2017 09:54:04 -0700
+Message-ID: <CAKmqyKMbC67ppDLSXQegXaDZB6O=aSOSzdGtJsfP7RCGxy_rNg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [Qemu-devel PATCH 4/5] msf2: Add Smartfusion2 SoC.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,231 +26,290 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Eric Blake <eblake@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Fam Zheng <famz@redhat.com>, Max Reitz <mreitz@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+Cc: sundeep subbaraya <sundeep.lkml@gmail.com>, Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, qemu-arm <qemu-arm@nongnu.org>
 
-The '--image-opts' flag indicates whether the source filename
-includes options. The target filename has to remain in the
-plain filename format though, since it needs to be passed to
-bdrv_create().  When using --skip-create though, it would be
-possible to use image-opts syntax. This adds --target-image-opts
-to indicate that the target filename includes options. Currently
-this mandates use of the --skip-create flag too.
+ On Thu, May 11, 2017 at 10:02 PM, Philippe Mathieu-Daud=C3=A9
+<f4bug@amsat.org> wrote:
+> On 05/12/2017 12:17 AM, sundeep subbaraya wrote:
+>>
+>> Hi Philippe,
+>>
+>> On Wed, May 10, 2017 at 5:20 PM, Philippe Mathieu-Daud=C3=A9 <f4bug@amsa=
+t.org>
+>> wrote:
+>>
+>>> Hi Subbaraya,
+>>>
+>>>
+>>> On 05/09/2017 01:44 PM, Subbaraya Sundeep wrote:
+>>>
+>>>> Smartfusion2 SoC has hardened Microcontroller subsystem
+>>>> and flash based FPGA fabric. This patch adds support for
+>>>> Microcontroller subsystem in the SoC.
+>>>>
+>>>> Signed-off-by: Subbaraya Sundeep <sundeep.lkml@gmail.com>
+>>>> ---
+>>>>  default-configs/arm-softmmu.mak |   1 +
+>>>>  hw/arm/Makefile.objs            |   2 +-
+>>>>  hw/arm/msf2-soc.c               | 188 ++++++++++++++++++++++++++++++
+>>>> ++++++++++
+>>>>  include/hw/arm/msf2-soc.h       |  60 +++++++++++++
+>>>>  4 files changed, 250 insertions(+), 1 deletion(-)
+>>>>  create mode 100644 hw/arm/msf2-soc.c
+>>>>  create mode 100644 include/hw/arm/msf2-soc.h
+>>>>
+>>>> diff --git a/default-configs/arm-softmmu.mak
+>>>> b/default-configs/arm-softmmu.mak
+>>>> index 78d7af0..7062512 100644
+>>>> --- a/default-configs/arm-softmmu.mak
+>>>> +++ b/default-configs/arm-softmmu.mak
+>>>> @@ -122,3 +122,4 @@ CONFIG_ACPI=3Dy
+>>>>  CONFIG_SMBIOS=3Dy
+>>>>  CONFIG_ASPEED_SOC=3Dy
+>>>>  CONFIG_GPIO_KEY=3Dy
+>>>> +CONFIG_MSF2=3Dy
+>>>> diff --git a/hw/arm/Makefile.objs b/hw/arm/Makefile.objs
+>>>> index 4c5c4ee..ae5e4a3 100644
+>>>> --- a/hw/arm/Makefile.objs
+>>>> +++ b/hw/arm/Makefile.objs
+>>>> @@ -1,7 +1,7 @@
+>>>>  obj-y +=3D boot.o collie.o exynos4_boards.o gumstix.o highbank.o
+>>>>  obj-$(CONFIG_DIGIC) +=3D digic_boards.o
+>>>>  obj-y +=3D integratorcp.o mainstone.o musicpal.o nseries.o
+>>>> -obj-y +=3D omap_sx1.o palm.o realview.o spitz.o stellaris.o
+>>>> +obj-y +=3D omap_sx1.o palm.o realview.o spitz.o stellaris.o msf2-soc.=
+o
+>>>>
+>>>
+>>> Not a big deal, but since you added CONFIG_MSF2 why not using it here a=
+nd
+>>> the Makefiles you touched (misc/ssi/timer)?
+>>>
+>>> obj-$(CONFIG_MSF2) +=3D msf2-soc.o
+>>>
+>>>   OK. Will change it.
+>>
+>>
+>>>
+>>>  obj-y +=3D tosa.o versatilepb.o vexpress.o virt.o xilinx_zynq.o z2.o
+>>>>
+>>>>  obj-$(CONFIG_ACPI) +=3D virt-acpi-build.o
+>>>>  obj-y +=3D netduino2.o
+>
+> [...]
+>>>>
+>>>> +    MemoryRegion *system_memory =3D get_system_memory();
+>>>> +    MemoryRegion *nvm =3D g_new(MemoryRegion, 1);
+>>>> +    MemoryRegion *nvm_alias =3D g_new(MemoryRegion, 1);
+>>>> +    MemoryRegion *sram =3D g_new(MemoryRegion, 1);
+>>>> +    MemoryRegion *ddr =3D g_new(MemoryRegion, 1);
+>>>> +
+>>>> +    memory_region_init_ram(nvm, NULL, "MSF2.envm", ENVM_SIZE,
+>>>> +                           &error_fatal);
+>>>>
+>>>
+>>> Maybe you can name it "eNVM" to match the documentation.
+>>>
+>>> Also envm_size should be a per-model property.
+>>>
+>>
+>> Ok.
+>>
+>>>
+>>> +    memory_region_init_alias(nvm_alias, NULL, "MSF2.flash.alias",
+>>>>
+>>>> +                             nvm, 0, ENVM_SIZE);
+>>>>
+>>>
+>>> Hmmm well this would be the "Cache Matrix Remap" which happens to be
+>>> mapped by default to eNVM on cold reset.
+>>> Naming it "MSF2.flash.alias" is pretty confusing.
+>>>
+>>
+>> Exactly it is Cache Matrix Remap.
+>> AFAIK currently we cannot remap memory during runtime in Qemu.
+>> So I handled default remap with alias.
+>> Please suggest the name. MSF2.eNVM.alias sounds fine?
+>
+>
+> Hmm Peter, Francis?
+>
+> Personally I prefer "bus_remap.alias" which is explicit.
+>
+> "eNVM.alias" is only true on Cold Reset.
 
-Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
----
- qemu-img-cmds.hx |  4 +--
- qemu-img.c       | 84 ++++++++++++++++++++++++++++++++++++++------------------
- qemu-img.texi    | 12 ++++++--
- 3 files changed, 69 insertions(+), 31 deletions(-)
+Yeah, I'm pretty sure you can't remap memory (unless that is some new
+feature I missed).
 
-diff --git a/qemu-img-cmds.hx b/qemu-img-cmds.hx
-index 469ec12..c298331 100644
---- a/qemu-img-cmds.hx
-+++ b/qemu-img-cmds.hx
-@@ -40,9 +40,9 @@ STEXI
- ETEXI
- 
- DEF("convert", img_convert,
--    "convert [--object objectdef] [--image-opts] [-U] [-c] [-p] [-q] [-n] [-f fmt] [-t cache] [-T src_cache] [-O output_fmt] [-B backing_file] [-o options] [-s snapshot_id_or_name] [-l snapshot_param] [-S sparse_size] [-m num_coroutines] [-W] filename [filename2 [...]] output_filename")
-+    "convert [--object objectdef] [--image-opts] [--target-image-opts] [-U] [-c] [-p] [-q] [-n] [-f fmt] [-t cache] [-T src_cache] [-O output_fmt] [-B backing_file] [-o options] [-s snapshot_id_or_name] [-l snapshot_param] [-S sparse_size] [-m num_coroutines] [-W] filename [filename2 [...]] output_filename")
- STEXI
--@item convert [--object @var{objectdef}] [--image-opts] [-U] [-c] [-p] [-q] [-n] [-f @var{fmt}] [-t @var{cache}] [-T @var{src_cache}] [-O @var{output_fmt}] [-B @var{backing_file}][-o @var{options}] [-s @var{snapshot_id_or_name}] [-l @var{snapshot_param}] [-S @var{sparse_size}] [-m @var{num_coroutines}] [-W] @var{filename} [@var{filename2} [...]] @var{output_filename}
-+@item convert [--object @var{objectdef}] [--image-opts] [--target-image-opts] [-U] [-c] [-p] [-q] [-n] [-f @var{fmt}] [-t @var{cache}] [-T @var{src_cache}] [-O @var{output_fmt}] [-B @var{backing_file}][-o @var{options}] [-s @var{snapshot_id_or_name}] [-l @var{snapshot_param}] [-S @var{sparse_size}] [-m @var{num_coroutines}] [-W] @var{filename} [@var{filename2} [...]] @var{output_filename}
- ETEXI
- 
- DEF("dd", img_dd,
-diff --git a/qemu-img.c b/qemu-img.c
-index 4dc1d56..e0e3d31 100644
---- a/qemu-img.c
-+++ b/qemu-img.c
-@@ -60,6 +60,7 @@ enum {
-     OPTION_PATTERN = 260,
-     OPTION_FLUSH_INTERVAL = 261,
-     OPTION_NO_DRAIN = 262,
-+    OPTION_TARGET_IMAGE_OPTS = 263,
- };
- 
- typedef enum OutputFormat {
-@@ -1913,10 +1914,10 @@ static int convert_do_copy(ImgConvertState *s)
- static int img_convert(int argc, char **argv)
- {
-     int c, bs_i, flags, src_flags = 0;
--    const char *fmt = NULL, *out_fmt = "raw", *cache = "unsafe",
-+    const char *fmt = NULL, *out_fmt = NULL, *cache = "unsafe",
-                *src_cache = BDRV_DEFAULT_CACHE, *out_baseimg = NULL,
-                *out_filename, *out_baseimg_param, *snapshot_name = NULL;
--    BlockDriver *drv, *proto_drv;
-+    BlockDriver *drv = NULL, *proto_drv = NULL;
-     BlockDriverInfo bdi;
-     BlockDriverState *out_bs;
-     QemuOpts *opts = NULL, *sn_opts = NULL;
-@@ -1924,7 +1925,7 @@ static int img_convert(int argc, char **argv)
-     char *options = NULL;
-     Error *local_err = NULL;
-     bool writethrough, src_writethrough, quiet = false, image_opts = false,
--         skip_create = false, progress = false;
-+         skip_create = false, progress = false, tgt_image_opts = false;
-     int64_t ret = -EINVAL;
-     bool force_share = false;
- 
-@@ -1942,6 +1943,7 @@ static int img_convert(int argc, char **argv)
-             {"object", required_argument, 0, OPTION_OBJECT},
-             {"image-opts", no_argument, 0, OPTION_IMAGE_OPTS},
-             {"force-share", no_argument, 0, 'U'},
-+            {"target-image-opts", no_argument, 0, OPTION_TARGET_IMAGE_OPTS},
-             {0, 0, 0, 0}
-         };
-         c = getopt_long(argc, argv, ":hf:O:B:ce6o:s:l:S:pt:T:qnm:WU",
-@@ -2062,9 +2064,16 @@ static int img_convert(int argc, char **argv)
-         case OPTION_IMAGE_OPTS:
-             image_opts = true;
-             break;
-+        case OPTION_TARGET_IMAGE_OPTS:
-+            tgt_image_opts = true;
-+            break;
-         }
-     }
- 
-+    if (!out_fmt && !tgt_image_opts) {
-+        out_fmt = "raw";
-+    }
-+
-     if (qemu_opts_foreach(&qemu_object_opts,
-                           user_creatable_add_opts_foreach,
-                           NULL, NULL)) {
-@@ -2076,12 +2085,22 @@ static int img_convert(int argc, char **argv)
-         goto fail_getopt;
-     }
- 
-+    if (tgt_image_opts && !skip_create) {
-+        error_report("--target-image-opts requires use of -n flag");
-+        goto fail_getopt;
-+    }
-+
-     s.src_num = argc - optind - 1;
-     out_filename = s.src_num >= 1 ? argv[argc - 1] : NULL;
- 
-     if (options && has_help_option(options)) {
--        ret = print_block_option_help(out_filename, out_fmt);
--        goto fail_getopt;
-+        if (out_fmt) {
-+            ret = print_block_option_help(out_filename, out_fmt);
-+            goto fail_getopt;
-+        } else {
-+            error_report("Option help requires a format be specified");
-+            goto fail_getopt;
-+        }
-     }
- 
-     if (s.src_num < 1) {
-@@ -2146,22 +2165,22 @@ static int img_convert(int argc, char **argv)
-         goto out;
-     }
- 
--    /* Find driver and parse its options */
--    drv = bdrv_find_format(out_fmt);
--    if (!drv) {
--        error_report("Unknown file format '%s'", out_fmt);
--        ret = -1;
--        goto out;
--    }
-+    if (!skip_create) {
-+        /* Find driver and parse its options */
-+        drv = bdrv_find_format(out_fmt);
-+        if (!drv) {
-+            error_report("Unknown file format '%s'", out_fmt);
-+            ret = -1;
-+            goto out;
-+        }
- 
--    proto_drv = bdrv_find_protocol(out_filename, true, &local_err);
--    if (!proto_drv) {
--        error_report_err(local_err);
--        ret = -1;
--        goto out;
--    }
-+        proto_drv = bdrv_find_protocol(out_filename, true, &local_err);
-+        if (!proto_drv) {
-+            error_report_err(local_err);
-+            ret = -1;
-+            goto out;
-+        }
- 
--    if (!skip_create) {
-         if (!drv->create_opts) {
-             error_report("Format driver '%s' does not support image creation",
-                          drv->format_name);
-@@ -2218,7 +2237,7 @@ static int img_convert(int argc, char **argv)
-         const char *preallocation =
-             qemu_opt_get(opts, BLOCK_OPT_PREALLOC);
- 
--        if (!drv->bdrv_co_pwritev_compressed) {
-+        if (drv && !drv->bdrv_co_pwritev_compressed) {
-             error_report("Compression not supported for this file format");
-             ret = -1;
-             goto out;
-@@ -2258,19 +2277,30 @@ static int img_convert(int argc, char **argv)
-         goto out;
-     }
- 
--    /* XXX we should allow --image-opts to trigger use of
--     * img_open() here, but then we have trouble with
--     * the bdrv_create() call which takes different params.
--     * Not critical right now, so fix can wait...
--     */
--    s.target = img_open_file(out_filename, out_fmt, flags, writethrough, quiet,
--                             false);
-+    if (skip_create) {
-+        s.target = img_open(tgt_image_opts, out_filename, out_fmt,
-+                            flags, writethrough, quiet, false);
-+    } else {
-+        /* TODO ultimately we should allow --target-image-opts
-+         * to be used even when -n is not given.
-+         * That has to wait for bdrv_create to be improved
-+         * to allow filenames in option syntax
-+         */
-+        s.target = img_open_file(out_filename, out_fmt, flags,
-+                                 writethrough, quiet, false);
-+    }
-     if (!s.target) {
-         ret = -1;
-         goto out;
-     }
-     out_bs = blk_bs(s.target);
- 
-+    if (s.compressed && !out_bs->drv->bdrv_co_pwritev_compressed) {
-+        error_report("Compression not supported for this file format");
-+        ret = -1;
-+        goto out;
-+    }
-+
-     /* increase bufsectors from the default 4096 (2M) if opt_transfer
-      * or discard_alignment of the out_bs is greater. Limit to 32768 (16MB)
-      * as maximum. */
-diff --git a/qemu-img.texi b/qemu-img.texi
-index 50a2364..5b925ec 100644
---- a/qemu-img.texi
-+++ b/qemu-img.texi
-@@ -45,9 +45,17 @@ keys.
- 
- @item --image-opts
- 
--Indicates that the @var{filename} parameter is to be interpreted as a
-+Indicates that the source @var{filename} parameter is to be interpreted as a
- full option string, not a plain filename. This parameter is mutually
--exclusive with the @var{-f} and @var{-F} parameters.
-+exclusive with the @var{-f} parameter.
-+
-+@item --target-image-opts
-+
-+Indicates that the @var{output_filename} parameter(s) are to be interpreted as
-+a full option string, not a plain filename. This parameter is mutually
-+exclusive with the @var{-O} parameters. It is currently required to also use
-+the @var{-n} parameter to skip image creation. This restriction may be relaxed
-+in a future release.
- 
- @item fmt
- is the disk image format. It is guessed automatically in most cases. See below
--- 
-2.9.3
+Creating an alias seems like the right idea (you can even
+enable/disable it as needed to pretend we have dynamic remapping).
+
+As for names usually just copy the data sheet. MSF2.eNVM.alias sounds
+fine to me.
+
+Thanks,
+
+Alistair
+
+>
+>>>
+>>> +    vmstate_register_ram_global(nvm);
+>>>>
+>>>> +
+>>>> +    memory_region_set_readonly(nvm, true);
+>>>> +    memory_region_set_readonly(nvm_alias, true);
+>>>> +
+>>>> +    memory_region_add_subregion(system_memory, ENVM_BASE_ADDRESS, nvm=
+);
+>>>> +    memory_region_add_subregion(system_memory, 0, nvm_alias);
+>>>> +
+>>>> +    memory_region_init_ram(ddr, NULL, "MSF2.ddr", DDR_SIZE,
+>>>> +                           &error_fatal);
+>>>>
+>>>
+>>> Wrong, there is no DDR on this SoC.
+>>>
+>> DDR controller is there in Smartfusion2 (different from Smartfusion). As
+>> you said below this
+>> should be in board file.
+>
+>
+> There IS a DDRC in this SoC, but here you are registering a DDR 'ram' mem=
+ory
+> region, not a controller. This SoC can be used without any DDR, enough us=
+ing
+> embedded eNVM and eSRAM.
+>
+> Now it happens your SoM board provides a DDR chip connected to this SoC.
+>
+>>>
+>>> +    vmstate_register_ram_global(ddr);
+>>>>
+>>>> +    memory_region_add_subregion(system_memory, DDR_BASE_ADDRESS, ddr)=
+;
+>>>> +
+>>>> +    memory_region_init_ram(sram, NULL, "MSF2.sram", SRAM_SIZE,
+>>>> +                           &error_fatal);
+>>>>
+>>>
+>>> I'd rather like to see it named "eSRAM" somehow, so there is no confusi=
+on
+>>> possible with external SRAM a SoM/board can map at 0x60000000.
+>>>
+>>> Same comment than envm_size, sram_size should be a per-model property.
+>>>
+>>> OK
+>>
+>>
+>>> +    vmstate_register_ram_global(sram);
+>>>>
+>>>> +    memory_region_add_subregion(system_memory, SRAM_BASE_ADDRESS,
+>>>> sram);
+>>>> +
+>>>> +    armv7m =3D DEVICE(&s->armv7m);
+>>>> +    qdev_prop_set_uint32(armv7m, "num-irq", 96);
+>>>>
+>>>
+>>> Can you point me to your datasheet? I thought the SF2 had 240 IRQs.
+>>
+>>
+>>
+>> Please go to link:
+>> https://www.microsemi.com/document-portal/search_form
+>> and provide search keyword as "UG0331". You can the download the spec.
+>> It has 81 irqs I remember when I have given 81 qemu complained not
+>> multiple
+>> of 4.
+>> I checked again with 81 and it is fine. I will change it to 81.
+>
+>
+> Ok :)
+>
+>> +    qdev_prop_set_string(armv7m, "cpu-model", "cortex-m3");
+>>>>
+>>>> +    object_property_set_link(OBJECT(&s->armv7m),
+>>>> OBJECT(get_system_memory()),
+>>>> +                                     "memory", &error_abort);
+>
+> [...]
+>>>>
+>>>> +#define MSF2_NUM_SPIS         2
+>>>> +#define MSF2_NUM_UARTS        2
+>>>> +
+>>>> +#define ENVM_BASE_ADDRESS     0x60000000
+>>>> +#define ENVM_SIZE             (128 * 1024)
+>>>>
+>>>
+>>> The SoC design ENVM_SIZE is 1MB, 128K seems your particular model.
+>>>
+>>
+>>  M2S010 SoC device has 256K eNMV. My bad it should be 256 instead of 128=
+.
+>>  The board I have contains M2S010 device in SOM.
+>>
+>
+> What I mean here is on the SF2 the eNVM "region size" (as seen by the AHB
+> Bus) is 1MB. Now your SoC M2S010 provides 256KB in this dedicated 1M regi=
+on.
+>
+> I find your #define confusing, what about:
+>
+> #define ENVM_REGION_SIZE      (1 * M_BYTE)
+> #define M2S010_ENVM_SIZE      (256 * K_BYTE)
+>
+> (?_BYTE from "qemu/cutils.h")
+>
+> I wanted to clarify this because you named your functions as it can model=
+s
+> any SF2 but actually you restrict it to your M2S010.
+>
+> Maybe to start you can rename msf2_soc_x() -> m2s010_sf2_soc_x() then if
+> needed this can be generalized to other SoCs from SF2 family?
+>
+>>> +
+>>>>
+>>>> +#define DDR_BASE_ADDRESS      0xA0000000
+>>>> +#define DDR_SIZE              (64 * 1024 * 1024)
+>>>>
+>>>
+>>> This belongs to the SoM.
+>>> Yes will change it.
+>>>
+>>>> +
+>>>> +#define SRAM_BASE_ADDRESS     0x20000000
+>>>> +#define SRAM_SIZE             (64 * 1024)
+>>>>
+>>>
+>>> Indeed this SoC is designed to have up to 64K of SRAM.
+>>> Luckily your model provides 64K.
+>>>
+>>
+>>
+>> Yes it is 64k :)
+>>
+>
+> Same here, what you have is:
+>
+> #define ESRAM_REGION_SIZE     (64 * K_BYTE)
+> #define M2S010_ESRAM_SIZE     (64 * K_BYTE)
+>
+> which happens to be equal but does not mean the same, do you see the
+> difference?
+>
+>
+>> +
+>>>>
+>>>> +typedef struct MSF2State {
+>>>> +    /*< private >*/
+>>>> +    SysBusDevice parent_obj;
+>>>> +    /*< public >*/
+>>>> +
+>>>> +    ARMv7MState armv7m;
+>>>> +
+>>>> +    MSF2SysregState sysreg;
+>>>> +    MSF2TimerState timer;
+>>>> +    MSF2SpiState spi[MSF2_NUM_SPIS];
+>>>> +} MSF2State;
+>>>> +
+>>>> +#endif
