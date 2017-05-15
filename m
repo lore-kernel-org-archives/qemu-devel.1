@@ -1,14 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39277)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39337)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ndevos@redhat.com>) id 1dALQH-0003nG-Po
-	for qemu-devel@nongnu.org; Mon, 15 May 2017 15:12:50 -0400
+	(envelope-from <mreitz@redhat.com>) id 1dALQZ-0003wQ-48
+	for qemu-devel@nongnu.org; Mon, 15 May 2017 15:13:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ndevos@redhat.com>) id 1dALQG-000192-QH
-	for qemu-devel@nongnu.org; Mon, 15 May 2017 15:12:49 -0400
-From: Niels de Vos <ndevos@redhat.com>
-Date: Mon, 15 May 2017 21:11:36 +0200
-Message-Id: <20170515191136.24314-1-ndevos@redhat.com>
-Subject: [Qemu-devel] [PATCH] gluster: add support for PREALLOC_MODE_FALLOC
+	(envelope-from <mreitz@redhat.com>) id 1dALQY-0001GM-25
+	for qemu-devel@nongnu.org; Mon, 15 May 2017 15:13:07 -0400
+References: <20170510143205.32013-1-pbonzini@redhat.com>
+	<20170510155700.GY16511@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <0c3040de-aabb-ae8c-7689-a6012f8c72e5@redhat.com>
+Date: Mon, 15 May 2017 21:12:54 +0200
+MIME-Version: 1.0
+In-Reply-To: <20170510155700.GY16511@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="XvtsXEuuMebFpsKHguD80pPs396xnLRR3"
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v2 0/7] curl: locking
+ cleanups/fixes, coroutine conversion, remove aio_poll
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -17,132 +25,99 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jeff Cody <jcody@redhat.com>, Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, Niels de Vos <ndevos@redhat.com>
+To: "Richard W.M. Jones" <rjones@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, qemu-stable@nongnu.org
 
-Add missing support for "preallocation=falloc" to the Gluster block
-driver. This change bases its logic on that of block/file-posix.c and
-removed the gluster_supports_zerofill() function in favour of an #ifdef
-check in an easy to read switch-statement.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--XvtsXEuuMebFpsKHguD80pPs396xnLRR3
+From: Max Reitz <mreitz@redhat.com>
+To: "Richard W.M. Jones" <rjones@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, qemu-stable@nongnu.org
+Message-ID: <0c3040de-aabb-ae8c-7689-a6012f8c72e5@redhat.com>
+Subject: Re: [Qemu-block] [PATCH v2 0/7] curl: locking cleanups/fixes,
+ coroutine conversion, remove aio_poll
+References: <20170510143205.32013-1-pbonzini@redhat.com>
+ <20170510155700.GY16511@redhat.com>
+In-Reply-To: <20170510155700.GY16511@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Reported-by: Satheesaran Sundaramoorthi <sasundar@redhat.com>
-URL: https://bugzilla.redhat.com/1450759
-Signed-off-by: Niels de Vos <ndevos@redhat.com>
----
- block/gluster.c | 61 +++++++++++++++++++++++++++++++++++----------------------
- 1 file changed, 38 insertions(+), 23 deletions(-)
+On 2017-05-10 17:57, Richard W.M. Jones wrote:
+> On Wed, May 10, 2017 at 04:31:58PM +0200, Paolo Bonzini wrote:
+>> Since the last patch in v1 didn't work, I bit the bullet and converted=
 
-diff --git a/block/gluster.c b/block/gluster.c
-index 7c76cd0..566166f 100644
---- a/block/gluster.c
-+++ b/block/gluster.c
-@@ -965,11 +965,6 @@ static coroutine_fn int qemu_gluster_co_pwrite_zeroes(BlockDriverState *bs,
-     return acb.ret;
- }
- 
--static inline bool gluster_supports_zerofill(void)
--{
--    return 1;
--}
--
- static inline int qemu_gluster_zerofill(struct glfs_fd *fd, int64_t offset,
-                                         int64_t size)
- {
-@@ -977,11 +972,6 @@ static inline int qemu_gluster_zerofill(struct glfs_fd *fd, int64_t offset,
- }
- 
- #else
--static inline bool gluster_supports_zerofill(void)
--{
--    return 0;
--}
--
- static inline int qemu_gluster_zerofill(struct glfs_fd *fd, int64_t offset,
-                                         int64_t size)
- {
-@@ -996,9 +986,10 @@ static int qemu_gluster_create(const char *filename,
-     struct glfs *glfs;
-     struct glfs_fd *fd;
-     int ret = 0;
--    int prealloc = 0;
-+    PreallocMode prealloc;
-     int64_t total_size = 0;
-     char *tmp = NULL;
-+    Error *local_err = NULL;
- 
-     gconf = g_new0(BlockdevOptionsGluster, 1);
-     gconf->debug = qemu_opt_get_number_del(opts, GLUSTER_OPT_DEBUG,
-@@ -1026,13 +1017,12 @@ static int qemu_gluster_create(const char *filename,
-                           BDRV_SECTOR_SIZE);
- 
-     tmp = qemu_opt_get_del(opts, BLOCK_OPT_PREALLOC);
--    if (!tmp || !strcmp(tmp, "off")) {
--        prealloc = 0;
--    } else if (!strcmp(tmp, "full") && gluster_supports_zerofill()) {
--        prealloc = 1;
--    } else {
--        error_setg(errp, "Invalid preallocation mode: '%s'"
--                         " or GlusterFS doesn't support zerofill API", tmp);
-+    prealloc = qapi_enum_parse(PreallocMode_lookup, tmp,
-+                               PREALLOC_MODE__MAX, PREALLOC_MODE_OFF,
-+                               &local_err);
-+    g_free(tmp);
-+    if (local_err) {
-+        error_propagate(errp, local_err);
-         ret = -EINVAL;
-         goto out;
-     }
-@@ -1041,21 +1031,46 @@ static int qemu_gluster_create(const char *filename,
-                     O_WRONLY | O_CREAT | O_TRUNC | O_BINARY, S_IRUSR | S_IWUSR);
-     if (!fd) {
-         ret = -errno;
--    } else {
-+        goto out;
-+    }
-+
-+    switch (prealloc) {
-+    case PREALLOC_MODE_FALLOC:
-+        if (!glfs_fallocate(fd, 0, 0, total_size)) {
-+            error_setg(errp, "Could not preallocate data for the new file");
-+            ret = -errno;
-+        }
-+        break;
-+#ifdef CONFIG_GLUSTERFS_ZEROFILL
-+    case PREALLOC_MODE_FULL:
-         if (!glfs_ftruncate(fd, total_size)) {
--            if (prealloc && qemu_gluster_zerofill(fd, 0, total_size)) {
-+            if (qemu_gluster_zerofill(fd, 0, total_size)) {
-+                error_setg(errp, "Could not zerofill the new file");
-                 ret = -errno;
-             }
-         } else {
-+            error_setg(errp, "Could not resize file");
-             ret = -errno;
-         }
--
--        if (glfs_close(fd) != 0) {
-+        break;
-+#endif /* CONFIG_GLUSTERFS_ZEROFILL */
-+    case PREALLOC_MODE_OFF:
-+        if (glfs_ftruncate(fd, total_size) != 0) {
-             ret = -errno;
-+            error_setg(errp, "Could not resize file");
-         }
-+        break;
-+    default:
-+        ret = -EINVAL;
-+        error_setg(errp, "Unsupported preallocation mode: %s",
-+                   PreallocMode_lookup[prealloc]);
-+        break;
-+    }
-+
-+    if (glfs_close(fd) != 0) {
-+        ret = -errno;
-     }
- out:
--    g_free(tmp);
-     qapi_free_BlockdevOptionsGluster(gconf);
-     glfs_clear_preopened(glfs);
-     return ret;
--- 
-2.9.3
+>> the whole thing to coroutines (patches 4-6).  This in turns allows a m=
+ore
+>> elegant solution to wait for CURLStates to get free (patch 7).
+>>
+>> I tested this by lowering CURL_NUM_STATES to 2.  With this change, the=
+
+>> buggy case triggers a couple times while booting a Fedora netinst imag=
+e.
+>=20
+> This series fixes the original bug, so:
+>=20
+>   Tested-by: Richard W.M. Jones <rjones@redhat.com>
+>=20
+> I think the Reported-by in patch 3 should credit Kun Wei for finding
+> the bug, and we should probably mention the BZ too:
+>=20
+>   Reported-by: Kun Wei <kuwei@redhat.com>
+>   Bugzilla: https://bugzilla.redhat.com/show_bug.cgi?id=3D1447590
+
+This one is older, though:
+https://bugzilla.redhat.com/show_bug.cgi?id=3D1437393
+
+:-)
+
+Max
+
+> A nit pick perhaps but in patch 5 you say "This was broken before for
+> disks > 2TB, but now it would break at 4GB.".
+> I understand after reading it a few times that you mean it would be
+> broken at 4GB, if you hadn't changed size_t -> uint64_t (on 32 bit
+> platforms).  Perhaps better to clarify that sentence.
+>=20
+> ---
+>=20
+> I also ran some performance and stability testing.  I used virt-ls for
+> this.  The following command will iterate over every file in a remote
+> guest image and print an md5sum:
+>=20
+>   LIBGUESTFS_BACKEND=3Ddirect \
+>   LIBGUESTFS_HV=3D~/d/qemu/x86_64-softmmu/qemu-system-x86_64 \
+>   virt-ls -a http://somehost/rhel-guest-image-7.1-20150224.0.x86_64.qco=
+w2 \
+>           -lR --checksum /
+>=20
+> I timed this with and without your patches, but there was no
+> significant difference (but note that virt-ls is a fundamentally
+> sequential program).
+>=20
+> It didn't crash or hang at any time during my testing.
+>=20
+> Rich.
+>=20
+
+
+
+--XvtsXEuuMebFpsKHguD80pPs396xnLRR3
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iQEvBAEBCAAZBQJZGf22EhxtcmVpdHpAcmVkaGF0LmNvbQAKCRD0B9sAYdXPQH6s
+B/wLuB1pLLIipgyKxW4gk1xcZ2jcvGBoHK7Al6O4GXZ4ZToTxq/zBQoMM+kefkMs
+OSo8ETXS7y2Kv6GnBdbU9j/1IiTjD2bBwRIpAOmt7siYm1VOfobT5oT6V1h87snI
+BoQ5mj/8xHzyImv7tujQvN+9jgapnqqJHhqwSU3XaHMo2aAtD/ze86hXbe69ZHVQ
+DupY8QVnf8K/rAvUHByKvzlAvN6VW8U3LgjvWMmFrXlZnDOCrwTPS1LAb0xXi9u/
+JEVRyd/ivAYU9GluzlFRkNr3wMArArRSr2uSkRCa3v7YAY9CWiGaE2HL2KIChUx0
+fzSQCnopvNg5AxTgwjcUnsOt
+=7ZAM
+-----END PGP SIGNATURE-----
+
+--XvtsXEuuMebFpsKHguD80pPs396xnLRR3--
