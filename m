@@ -1,30 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40010)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41391)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dAA3D-000681-48
-	for qemu-devel@nongnu.org; Mon, 15 May 2017 03:04:16 -0400
+	(envelope-from <armbru@redhat.com>) id 1dAACg-00087p-Kc
+	for qemu-devel@nongnu.org; Mon, 15 May 2017 03:14:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dAA38-0006gm-7A
-	for qemu-devel@nongnu.org; Mon, 15 May 2017 03:04:15 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:40204)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dAA37-0006gi-U9
-	for qemu-devel@nongnu.org; Mon, 15 May 2017 03:04:10 -0400
+	(envelope-from <armbru@redhat.com>) id 1dAACd-00043x-E6
+	for qemu-devel@nongnu.org; Mon, 15 May 2017 03:14:02 -0400
 From: Markus Armbruster <armbru@redhat.com>
-References: <0f1f5bcd-815a-c070-5ba7-281f5a0ee146@twiddle.net>
-	<20170510235204.9657-1-f4bug@amsat.org>
-	<551f0d70-acdf-1a40-6aec-00b1dd40133d@amsat.org>
-	<87efvvzrwo.fsf@dusky.pond.sub.org>
-	<cc870909-1694-73a3-db66-2d113736c7d6@amsat.org>
-Date: Mon, 15 May 2017 09:04:05 +0200
-In-Reply-To: <cc870909-1694-73a3-db66-2d113736c7d6@amsat.org> ("Philippe
-	=?utf-8?Q?Mathieu-Daud=C3=A9=22's?= message of "Thu,
-	11 May 2017 23:01:09 -0300")
-Message-ID: <8737c64n4q.fsf@dusky.pond.sub.org>
+References: <1481822644-617-1-git-send-email-mdroth@linux.vnet.ibm.com>
+	<1481822644-617-2-git-send-email-mdroth@linux.vnet.ibm.com>
+	<20170512102204.GG2069@work-vm>
+Date: Mon, 15 May 2017 09:13:55 +0200
+In-Reply-To: <20170512102204.GG2069@work-vm> (David Alan Gilbert's message of
+	"Fri, 12 May 2017 11:22:04 +0100")
+Message-ID: <87y3ty383w.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC PATCH v2] coccinelle: add a script to
- optimize tcg op using tcg_gen_extract()
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH 1/2] tests: check-qom-proplist: add checks
+ for cmdline-created objects
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,58 +25,148 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Cc: Laurent Vivier <lvivier@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>, Michael Tokarev <mjt@tls.msk.ru>, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>, Richard Henderson <rth@twiddle.net>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: Michael Roth <mdroth@linux.vnet.ibm.com>, qemu-stable@nongnu.org, qemu-devel@nongnu.org, =?utf-8?Q?Andreas_F=C3=A4rber?= <afaerber@suse.de>
 
-Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> writes:
+"Dr. David Alan Gilbert" <dgilbert@redhat.com> writes:
 
-> Hi Markus,
->
-> On 05/11/2017 06:03 AM, Markus Armbruster wrote:
->> Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> writes:
->>
->>> Ok I just understood Richard explanation, so this patch is WRONG and I
->>> need to get some real rest :(
->>
->> Ha!  Get some sleep; we'll still be around in the morning ;)
->>
->>> On 05/10/2017 08:52 PM, Philippe Mathieu-Daud=C3=A9 wrote:
->>>> Apply this script using:
->>>>
->>>> $ docker run -v `pwd`:`pwd` -w `pwd` petersenna/coccinelle \
->>>>     --sp-file scripts/coccinelle/tcg_gen_extract.cocci \
->>>>     --macro-file scripts/cocci-macro-file.h \
->>>>     --dir target \
->>>>     --in-place
->>>>
->>>> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
->>>> ---
->>>>
->>>> This is a new version of the coccinelle script addressing Richard comm=
-ents and
->>>> trying to do it correctly. Also changed license to GPLv2+.
->>>>
->>>> The first rule matches, it calls a python2 script that basically check=
-s the
->>>> target_ulong is not overflowed: (msk << ofs) >> sizeof(target_ulong) =
-=3D=3D 0
->>>
->>> WRONG
->> [...]
->>
->> Is this script likely to be rerun in the future?  If yes, keeping it in
->> scripts/coccinelle/ is a good idea.  If no, I recommend to store it in
->> the commit message instead.
->
-> It is unlikely to be rerun in the future, at least for this specific
-> pattern. But it can be easily adapted for another TCG optimization.
->
-> I could not find much documentation about how to do a such script
-> using Python, except on a thread [1]. If it is documented enough I
-> think it is worth to keep it.
->
-> About putting it in each commit message, it is now 3 times bigger than
-> the patch it generates!
+> I notice this pair of patches doesn't seem to have gone anywhere.
+> WHile it's labelled as a monitor fix, it's all QOM stuff, so I don't
+> think it should be going via me.
 
-Consider putting it into the first commit message, and have the others
-reference back.
+It's somewhere between QOM and QemuOpts.  Andreas, please have a look.
+Feel free to ask me to take the patch through my tree.
+
+> Dave
+>
+> * Michael Roth (mdroth@linux.vnet.ibm.com) wrote:
+>> check-qom-proplist originally added tests for verifying that
+>> object-creation helpers object_new_with_{props,propv} behaved in
+>> similar fashion to the "traditional" method involving setting each
+>> individual property separately after object creation rather than
+>> via a single call.
+>> 
+>> Another similar "helper" for creating Objects exists in the form of
+>> objects specified via -object command-line parameters. By that
+>> rationale, we extend check-qom-proplist to include similar checks
+>> for command-line-created objects by employing the same
+>> qemu_opts_parse()-based parsing the vl.c employs.
+>> 
+>> This parser has a side-effect of parsing the object's options into
+>> a QemuOpt structure and registering this in the global QemuOptsList
+>> using the Object's ID. This can conflict with future Object instances
+>> that attempt to use the same ID if we don't ensure this is cleaned
+>> up as part of Object finalization, so we include a FIXME stub to test
+>> for this case, which will then be resolved in a subsequent patch.
+>> 
+>> Suggested-by: Daniel Berrange <berrange@redhat.com>
+>> Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+>> Cc: Markus Armbruster <armbru@redhat.com>
+>> Cc: Eric Blake <eblake@redhat.com>
+>> Cc: Daniel Berrange <berrange@redhat.com>
+>> Cc: qemu-stable@nongnu.org
+>> Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
+>> Reviewed-by: Markus Armbruster <armbru@redhat.com>
+>> ---
+>>  tests/check-qom-proplist.c | 55 ++++++++++++++++++++++++++++++++++++++++++++++
+>>  1 file changed, 55 insertions(+)
+>> 
+>> diff --git a/tests/check-qom-proplist.c b/tests/check-qom-proplist.c
+>> index a16cefc..e3f56ca 100644
+>> --- a/tests/check-qom-proplist.c
+>> +++ b/tests/check-qom-proplist.c
+>> @@ -23,6 +23,9 @@
+>>  #include "qapi/error.h"
+>>  #include "qom/object.h"
+>>  #include "qemu/module.h"
+>> +#include "qemu/option.h"
+>> +#include "qemu/config-file.h"
+>> +#include "qom/object_interfaces.h"
+>>  
+>>  
+>>  #define TYPE_DUMMY "qemu-dummy"
+>> @@ -162,6 +165,10 @@ static const TypeInfo dummy_info = {
+>>      .instance_finalize = dummy_finalize,
+>>      .class_size = sizeof(DummyObjectClass),
+>>      .class_init = dummy_class_init,
+>> +    .interfaces = (InterfaceInfo[]) {
+>> +        { TYPE_USER_CREATABLE },
+>> +        { }
+>> +    }
+>>  };
+>>  
+>>  
+>> @@ -320,6 +327,14 @@ static const TypeInfo dummy_backend_info = {
+>>      .class_size = sizeof(DummyBackendClass),
+>>  };
+>>  
+>> +static QemuOptsList qemu_object_opts = {
+>> +    .name = "object",
+>> +    .implied_opt_name = "qom-type",
+>> +    .head = QTAILQ_HEAD_INITIALIZER(qemu_object_opts.head),
+>> +    .desc = {
+>> +        { }
+>> +    },
+>> +};
+>>  
+>>  
+>>  static void test_dummy_createv(void)
+>> @@ -388,6 +403,45 @@ static void test_dummy_createlist(void)
+>>      object_unparent(OBJECT(dobj));
+>>  }
+>>  
+>> +static void test_dummy_createcmdl(void)
+>> +{
+>> +    QemuOpts *opts;
+>> +    DummyObject *dobj;
+>> +    Error *err = NULL;
+>> +    const char *params = TYPE_DUMMY \
+>> +                         ",id=dev0," \
+>> +                         "bv=yes,sv=Hiss hiss hiss,av=platypus";
+>> +
+>> +    qemu_add_opts(&qemu_object_opts);
+>> +    opts = qemu_opts_parse(&qemu_object_opts, params, true, &err);
+>> +    g_assert(err == NULL);
+>> +    g_assert(opts);
+>> +
+>> +    dobj = DUMMY_OBJECT(user_creatable_add_opts(opts, &err));
+>> +    g_assert(err == NULL);
+>> +    g_assert(dobj);
+>> +    g_assert_cmpstr(dobj->sv, ==, "Hiss hiss hiss");
+>> +    g_assert(dobj->bv == true);
+>> +    g_assert(dobj->av == DUMMY_PLATYPUS);
+>> +
+>> +    user_creatable_del("dev0", &err);
+>> +    g_assert(err == NULL);
+>> +    error_free(err);
+>> +
+>> +    /* cmdline-parsing via qemu_opts_parse() results in a QemuOpts entry
+>> +     * corresponding to the Object's ID to be added to the QemuOptsList
+>> +     * for objects. To avoid having this entry conflict with future
+>> +     * Objects using the same ID (which can happen in cases where
+>> +     * qemu_opts_parse() is used to parse the object params, such as
+>> +     * with hmp_object_add() at the time of this comment), we need to
+>> +     * check for this in user_creatable_del() and remove the QemuOpts if
+>> +     * it is present.
+>> +     *
+>> +     * FIXME: add an assert to verify that the QemuOpts is cleaned up
+>> +     * once the corresponding cleanup code is added.
+>> +     */
+>> +}
+>> +
+>>  static void test_dummy_badenum(void)
+>>  {
+>>      Error *err = NULL;
+>> @@ -525,6 +579,7 @@ int main(int argc, char **argv)
+>>  
+>>      g_test_add_func("/qom/proplist/createlist", test_dummy_createlist);
+>>      g_test_add_func("/qom/proplist/createv", test_dummy_createv);
+>> +    g_test_add_func("/qom/proplist/createcmdline", test_dummy_createcmdl);
+>>      g_test_add_func("/qom/proplist/badenum", test_dummy_badenum);
+>>      g_test_add_func("/qom/proplist/getenum", test_dummy_getenum);
+>>      g_test_add_func("/qom/proplist/iterator", test_dummy_iterator);
+>> -- 
+>> 1.9.1
+>> 
+> --
+> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
