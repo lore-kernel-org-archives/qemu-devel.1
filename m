@@ -1,27 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43699)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45898)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dAPIK-00062y-Ca
-	for qemu-devel@nongnu.org; Mon, 15 May 2017 19:20:53 -0400
+	id 1dAPUu-0000VH-M4
+	for qemu-devel@nongnu.org; Mon, 15 May 2017 19:33:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dAPIJ-0002xa-4N
-	for qemu-devel@nongnu.org; Mon, 15 May 2017 19:20:52 -0400
+	id 1dAPUr-0007sT-Jo
+	for qemu-devel@nongnu.org; Mon, 15 May 2017 19:33:52 -0400
+Received: from mail-qk0-x244.google.com ([2607:f8b0:400d:c09::244]:34920)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dAPUr-0007sI-Dq
+	for qemu-devel@nongnu.org; Mon, 15 May 2017 19:33:49 -0400
+Received: by mail-qk0-x244.google.com with SMTP id k74so20097571qke.2
+	for <qemu-devel@nongnu.org>; Mon, 15 May 2017 16:33:49 -0700 (PDT)
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
-References: <757990479.60759.1494722527715.ref@mail.yahoo.com>
-	<757990479.60759.1494722527715@mail.yahoo.com>
-	<CAKmqyKPy35OuMkixGnDXOvApAu82uXrtQStSz4GzHNRStdFFNA@mail.gmail.com>
-	<1337329283.3100470.1494870647989@mail.yahoo.com>
+References: <1494860396-24930-1-git-send-email-Milos.Stojanovic@rt-rk.com>
+	<1494860396-24930-2-git-send-email-Milos.Stojanovic@rt-rk.com>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <90703952-bc99-ecfe-96c7-810bb1784dce@amsat.org>
-Date: Mon, 15 May 2017 20:20:40 -0300
+Message-ID: <1e44a26c-ff7f-1865-bcc8-8d3282173d52@amsat.org>
+Date: Mon, 15 May 2017 20:33:44 -0300
 MIME-Version: 1.0
-In-Reply-To: <1337329283.3100470.1494870647989@mail.yahoo.com>
+In-Reply-To: <1494860396-24930-2-git-send-email-Milos.Stojanovic@rt-rk.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [Qemu-arm] Changes to Broadcom(BCM) files and
- Raspberry Pi files. Addition of PanelEmu
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v2 01/16] linux-user: add strace for
+ getuid(), gettid(), getppid(), geteuid()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,101 +35,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Bradley <flypie1@yahoo.com>, Alistair Francis <alistair.francis@xilinx.com>
-Cc: Laurent Vivier <lvivier@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, John Bradley <flypie@rocketmail.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Markus Armbruster <armbru@redhat.com>, "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>
+To: =?UTF-8?B?TWlsb8WhIFN0b2phbm92acSH?= <Milos.Stojanovic@rt-rk.com>, qemu-devel@nongnu.org, riku.voipio@iki.fi
+Cc: Miodrag.Dinic@rt-rk.com, laurent@vivier.eu, Petar.Jovanovic@rt-rk.com, Aleksandar.Markovic@rt-rk.com, yongbok.kim@imgtec.com
 
-Hi John,
+On 05/15/2017 11:59 AM, Miloš Stojanović wrote:
+> Improve strace support for syscalls getuid(), gettid(), getppid()
+> and geteuid(). Since these system calls don't have arguments, "%s()"
+> is added in the corresponding strace.list entry so that no arguments
+> are printed.
+>
+> getuid:
+> Prior to this commit, typical strace output used to look like this:
+> 4894 getuid(4894,0,0,274886293296,-3689348814741910323,4832615904) = 1000
+> After this commit, it looks like this:
+> 4894 getuid() = 1000
+>
+> gettid:
+> Prior to this commit, typical strace output used to look like this:
+> 8307 gettid(0,0,64,0,4832630528,4832615840) = 8307
+> After this commit, it looks like this:
+> 8307 gettid() = 8307
+>
+> getppid:
+> Prior to this commit, typical strace output used to look like this:
+> 20588 getppid(20588,64,0,4832630528,4832615888,0) = 20625
+> After this commit, it looks like this:
+> 20588 getppid() = 20625
+>
+> geteuid:
+> Prior to this commit, typical strace output used to look like this:
+> 20588 geteuid(64,0,0,4832615888,0,-9151031864016699136) = 1000
+> After this commit, it looks like this:
+> 20588 geteuid() = 1000
+>
+> Signed-off-by: Miloš Stojanović <Milos.Stojanovic@rt-rk.com>
 
-> That is going to be very difficult as a lot of the changes are
-> interlinked the vast majority of the patch is new files.
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
-I rebased your branch on latest qemu/master here:
-
-https://github.com/philmd/qemu/tree/flypie-GDummyPanel-rebased
-
-It is much easier to follow now, the big XML files you added/removed 
-also disappeared (gitk was crashing 'Out Of Memory' trying to look at 
-your tree).
-
-I hope it can help you to continue reordering in smaller patches.
-
-Regards,
-
-Phil.
-
-On 05/15/2017 01:46 PM, Alistair Francis wrote:
+> ---
+>  linux-user/strace.list | 8 ++++----
+>  1 file changed, 4 insertions(+), 4 deletions(-)
 >
-> Hey John,
->
-> Thanks for the patch!
->
-> Unfortunately this patch is too long to review, you need to split the
-> patch up into shorter more readable patches. Otherwise it's too hard
-> to people to understand what you are changing and why.
->
-> There are some details here:
-> http://wiki.qemu.org/Contribute/SubmitAPatch
-> <http://wiki.qemu.org/Contribute/SubmitAPatch>about how to split up
-> patches. Each patch applied in order shouldn't break any compilation
-> or runtime. Generally the flow is to add the logic in earlier patches
-> and then connect it and switch it on in the later patches.
->
-> Try splitting up adding/editing each individual device and send that
-> our first. That is generally the easiest to review/accept.
->
-> Thanks,
->
-> Alistair
->
->> ---
->> .gitignore                          |  54 ++
->> hw/arm/Makefile.objs                |    2 +-
->> hw/arm/bcm2835.c                    |  114 ++++
->> hw/arm/bcm2835_peripherals.c        |  104 ++++
->> hw/arm/bcm2836.c                    |    3 +-
->> hw/arm/raspi.c                      |  77 ++-
->> hw/gpio/bcm2835_gpio.c              |  333 ++++++-----
->> hw/misc/Makefile.objs                |    2 +
->> hw/misc/bcm2835_mphi.c              |  163 ++++++
->> hw/misc/bcm2835_power.c              |  106 ++++
->> hw/timer/Makefile.objs              |    2 +
->> hw/timer/bcm2835_st.c                |  202 +++++++
->> hw/timer/bcm2835_timer.c            |  224 +++++++
->> hw/usb/Makefile.objs                |    4 +-
->> hw/usb/bcm2835_usb.c                |  604 +++++++++++++++++++
->> hw/usb/bcm2835_usb_regs.h            | 1061
-> ++++++++++++++++++++++++++++++++++
->> hw/usb/dev-network.c                |    2 +-
->> include/hw/arm/bcm2835.h            |  37 ++
->> include/hw/arm/bcm2835_peripherals.h |  10 +
->> include/hw/gpio/bcm2835_gpio.h      |    5 +
->> include/hw/intc/bcm2835_control.h    |  53 ++
->> include/hw/intc/bcm2836_control.h    |    2 +
->> include/hw/misc/bcm2835_mphi.h      |  28 +
->> include/hw/misc/bcm2835_power.h      |  22 +
->> include/hw/timer/bcm2835_st.h        |  25 +
->> include/hw/timer/bcm2835_timer.h    |  32 +
->> include/hw/usb/bcm2835_usb.h        |  78 +++
->> include/qemu/PanelEmu.h              |  53 ++
->> util/Makefile.objs                  |    1 +
->> util/PanelEmu.c                      |  293 ++++++++++
->> 30 files changed, 3547 insertions(+), 149 deletions(-)
->> create mode 100644 hw/arm/bcm2835.c
->> create mode 100644 hw/misc/bcm2835_mphi.c
->> create mode 100644 hw/misc/bcm2835_power.c
->> create mode 100644 hw/timer/bcm2835_st.c
->> create mode 100644 hw/timer/bcm2835_timer.c
->> create mode 100644 hw/usb/bcm2835_usb.c
->> create mode 100644 hw/usb/bcm2835_usb_regs.h
->> create mode 100644 include/hw/arm/bcm2835.h
->> create mode 100644 include/hw/intc/bcm2835_control.h
->> create mode 100644 include/hw/misc/bcm2835_mphi.h
->> create mode 100644 include/hw/misc/bcm2835_power.h
->> create mode 100644 include/hw/timer/bcm2835_st.h
->> create mode 100644 include/hw/timer/bcm2835_timer.h
->> create mode 100644 include/hw/usb/bcm2835_usb.h
->> create mode 100644 include/qemu/PanelEmu.h
->> create mode 100644 util/PanelEmu.c
->>
->
+> diff --git a/linux-user/strace.list b/linux-user/strace.list
+> index 3b1282e..6e33788 100644
+> --- a/linux-user/strace.list
+> +++ b/linux-user/strace.list
+> @@ -290,7 +290,7 @@
+>  { TARGET_NR_getegid32, "getegid32" , NULL, NULL, NULL },
+>  #endif
+>  #ifdef TARGET_NR_geteuid
+> -{ TARGET_NR_geteuid, "geteuid" , NULL, NULL, NULL },
+> +{ TARGET_NR_geteuid, "geteuid" , "%s()", NULL, NULL },
+>  #endif
+>  #ifdef TARGET_NR_geteuid32
+>  { TARGET_NR_geteuid32, "geteuid32" , NULL, NULL, NULL },
+> @@ -338,7 +338,7 @@
+>  { TARGET_NR_getpmsg, "getpmsg" , NULL, NULL, NULL },
+>  #endif
+>  #ifdef TARGET_NR_getppid
+> -{ TARGET_NR_getppid, "getppid" , NULL, NULL, NULL },
+> +{ TARGET_NR_getppid, "getppid" , "%s()", NULL, NULL },
+>  #endif
+>  #ifdef TARGET_NR_getpriority
+>  { TARGET_NR_getpriority, "getpriority", "%s(%#x,%#x)", NULL, NULL },
+> @@ -381,13 +381,13 @@
+>    NULL, NULL },
+>  #endif
+>  #ifdef TARGET_NR_gettid
+> -{ TARGET_NR_gettid, "gettid" , NULL, NULL, NULL },
+> +{ TARGET_NR_gettid, "gettid" , "%s()", NULL, NULL },
+>  #endif
+>  #ifdef TARGET_NR_gettimeofday
+>  { TARGET_NR_gettimeofday, "gettimeofday" , NULL, NULL, NULL },
+>  #endif
+>  #ifdef TARGET_NR_getuid
+> -{ TARGET_NR_getuid, "getuid" , NULL, NULL, NULL },
+> +{ TARGET_NR_getuid, "getuid" , "%s()", NULL, NULL },
+>  #endif
+>  #ifdef TARGET_NR_getuid32
+>  { TARGET_NR_getuid32, "getuid32" , NULL, NULL, NULL },
 >
