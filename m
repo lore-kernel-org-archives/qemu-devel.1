@@ -1,22 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36783)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36828)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Milos.Stojanovic@rt-rk.com>) id 1dAHTx-0007Zw-0u
-	for qemu-devel@nongnu.org; Mon, 15 May 2017 11:00:27 -0400
+	(envelope-from <eblake@redhat.com>) id 1dAHU3-0007da-Qz
+	for qemu-devel@nongnu.org; Mon, 15 May 2017 11:00:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <Milos.Stojanovic@rt-rk.com>) id 1dAHTq-00042Q-NH
-	for qemu-devel@nongnu.org; Mon, 15 May 2017 11:00:21 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:45277 helo=mail.rt-rk.com)
+	(envelope-from <eblake@redhat.com>) id 1dAHTz-00045D-7B
+	for qemu-devel@nongnu.org; Mon, 15 May 2017 11:00:27 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:35702)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <Milos.Stojanovic@rt-rk.com>)
-	id 1dAHTq-0003rR-Al
-	for qemu-devel@nongnu.org; Mon, 15 May 2017 11:00:14 -0400
-From: =?UTF-8?q?Milo=C5=A1=20Stojanovi=C4=87?= <Milos.Stojanovic@rt-rk.com>
-Date: Mon, 15 May 2017 16:59:40 +0200
-Message-Id: <1494860396-24930-1-git-send-email-Milos.Stojanovic@rt-rk.com>
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dAHTy-00044j-Te
+	for qemu-devel@nongnu.org; Mon, 15 May 2017 11:00:23 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 74BFAC05973C
+	for <qemu-devel@nongnu.org>; Mon, 15 May 2017 15:00:21 +0000 (UTC)
+References: <20170515140529.23264-1-dgilbert@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <52e7394a-627f-539c-9c13-8385cfceaf00@redhat.com>
+Date: Mon, 15 May 2017 09:59:40 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v2 00/16] Augment support for signal handling
+In-Reply-To: <20170515140529.23264-1-dgilbert@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="HXv2w8AbrqODjwjsnag8wXemPg5TTQDcc"
+Subject: Re: [Qemu-devel] [PATCH v2] block migration: Allow compile time
+ disable
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,128 +34,103 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, riku.voipio@iki.fi
-Cc: laurent@vivier.eu, Miodrag.Dinic@rt-rk.com, Aleksandar.Markovic@rt-rk.com, Petar.Jovanovic@rt-rk.com, yongbok.kim@imgtec.com, Milos.Stojanovic@rt-rk.com
+To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>, qemu-devel@nongnu.org, quintela@redhat.com, kashyap@redhat.com, jcody@redhat.com, kwolf@redhat.com, Markus Armbruster <armbru@redhat.com>
 
-Change from v1 to v2:
-tswapal_target_sigset() is no longer static since it was breaking the bui=
-ld.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--HXv2w8AbrqODjwjsnag8wXemPg5TTQDcc
+From: Eric Blake <eblake@redhat.com>
+To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>,
+ qemu-devel@nongnu.org, quintela@redhat.com, kashyap@redhat.com,
+ jcody@redhat.com, kwolf@redhat.com, Markus Armbruster <armbru@redhat.com>
+Message-ID: <52e7394a-627f-539c-9c13-8385cfceaf00@redhat.com>
+Subject: Re: [PATCH v2] block migration: Allow compile time disable
+References: <20170515140529.23264-1-dgilbert@redhat.com>
+In-Reply-To: <20170515140529.23264-1-dgilbert@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-This patch set deals with QEMU Linux user mode functionalities related to
-signal handling. It is composed of four sections:
+On 05/15/2017 09:05 AM, Dr. David Alan Gilbert (git) wrote:
+> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+>=20
+> Many users now prefer to use drive_mirror over NBD as an
+> alternative to the older migrate -b option; drive_mirror is
+> more complex to setup but gives you more options (e.g. only
+> migrating some of the disks if some of them are shared).
+>=20
+> Allow the large chunk of block migration code to be compiled
+> out for those who don't use it.
+>=20
+> Based on a downstream-patch we've had for a while by Jeff Cody.
+>=20
+> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> ---
+>  configure                 | 11 +++++++++++
+>  include/migration/block.h | 23 +++++++++++++++++++++++
+>  migration/Makefile.objs   |  2 +-
+>  migration/migration.c     |  9 +++++++++
+>  4 files changed, 44 insertions(+), 1 deletion(-)
+>=20
 
-A. Extend strace support (patches 1-2, 8-9):
+> @@ -1400,6 +1405,7 @@ disabled with --disable-FEATURE, default is enabl=
+ed if available:
+>    libnfs          nfs support
+>    smartcard       smartcard support (libcacard)
+>    libusb          libusb (for usb passthrough)
+> +  live-block-migration   Block migration in the main migration stream
 
-   Strace support is added for getuid(), gettid(), getppid(), geteuid(),
-   tkill(), tgkill() and rt_sigqueueinfo(), along with support for printi=
-ng
-   the uinfo structure of rt_sigqueueinfo() of rt_tgsigqueueinfo() instea=
-d
-   of a pointer to it. Additionally, some minor fixes of inconsistent spa=
-ces
-   in the output of print_siginfo() are added.
+Bummer that the long name breaks alignment. But I don't have any
+bikeshed paint handy to suggest a shorter name.
 
-B. Fix some signal handling issues (patches 3-5):
+> +++ b/migration/migration.c
+> @@ -1213,6 +1213,15 @@ void qmp_migrate(const char *uri, bool has_blk, =
+bool blk,
+>      params.blk =3D has_blk && blk;
+>      params.shared =3D has_inc && inc;
+> =20
+> +#ifndef CONFIG_LIVE_BLOCK_MIGRATION
+> +    if (params.blk || params.shared) {
+> +        error_setg(errp, "QEMU compiled without old-style (blk/-b, inc=
+/-i) "
+> +                         "block migration");
+> +        error_append_hint(errp, "Use drive_mirror+NBD instead.\n");
+> +        return;
+> +    }
+> +#endif
 
-   Fix the ssetmask() system call by removing the invocation of
-   sigorset() using the old and the new signal masks as arguments.
-   Change the unlock_user() argument from arg1 to arg3 to match with
-   lock_user(), since arg3 contains the pointer to the siginfo_t structur=
-e.
-   Change the type of the first argument of rt_sigqueinfo()
-   from int to pid_t in the syscall declaration.
+Juan's pending series to simplify the representation of -b/-i may also
+play a role here, particularly if we want to bite the bullet and change
+the QMP command to drop the optional parameters altogether.
 
-C. Adding support for rt_tgsigqueueinfo() (patches 6-7):
+It may be worth documenting in the .json file (independently of whether
+the configure option is used) that blk/inc are deprecated, and may be
+removed in a future release, if we want to start the clock on removing th=
+em.
 
-   Add a new system call: rt_tgsigqueueinfo().
-
-   This system call is similar to rt_sigqueueinfo(), but instead of
-   sending the signal and data to the whole thread group with the ID
-   equal to the argument tgid, it sends it to a single thread within
-   that thread group. The ID of the thread is specified by the tid
-   argument.
-
-   The implementation is based on the rt_sigqueueinfo() in linux-user
-   mode, where the tid is added as the second argument and the
-   previous second and third argument become arguments three and four,
-   respectively.
-
-D. Add support for larger target signal range (RFC patches 10-16):
-
-   Add target signal mask tracking and multiplexing of target signals out
-   of the host range. The patches are marked as RFC because they introduc=
-e
-   significant new functionalities regarding signal handling in QEMU.
-
-   Currently, QEMU has a copy of the host signal and suspend masks and
-   that is usually enough, since most of the time the signal mask of the
-   target architecture is either the same length or narrower. If however
-   the signal mask is wider, then part of it won't be tracked. The signal=
-s
-   that are in the target range but out of the host range were treated li=
-ke
-   faulty signals and couldn't be used. This problem is solved by enablin=
-g
-   the usage of one of the host signals as a multiplex for all the target
-   signals that are out of range. In order to have the target signal mask=
-s
-   available, tracking of target signal masks is implemented.
-
-   The rt_sigqueueinfo()/rt_tgsigqueueinfo() system calls multiplex targe=
-t
-   signals by setting the si_errno value to the actual value of the signa=
-l
-   and sending the signal to a predefined host signal number.
-   The host_signal_handler() will pull out the multiplexed signals and se=
-t
-   their signal number to the correct value. The si_errno field is used
-   here but this implementation can be replaced with any other unused fie=
-ld
-   in the uinfo structure. Using this implementation both rt_sigqueueinfo=
-(),
-   rt_tgsigqueueinfo(), as well as kill() (for pid > 0) and tgkill() can =
-be
-   emulated.
-
-   The tkill() system call and kill() with the argument pid <=3D 0 couldn=
-'t
-   be implemented simply using this method because it requires acquiring
-   information about, and sending simultaneous signals to multiple thread=
-s
-   or processes. These functionalities are out of the scope of
-   rt_sigqueueinfo()/rt_tgsigqueueinfo().
-
-Milo=C5=A1 Stojanovi=C4=87 (16):
-  linux-user: add strace for getuid(), gettid(), getppid(), geteuid()
-  linux-user: add tkill(), tgkill() and rt_sigqueueinfo() strace
-  linux-user: fix ssetmask() system call
-  linux-user: fix mismatch of lock/unlock_user() invocations in
-    rt_sigqueinfo() syscall
-  linux-user: fix argument type declaration of rt_sigqueinfo() syscall
-  linux-user: add support for rt_tgsigqueueinfo() system call
-  linux-user: add rt_tgsigqueueinfo() strace
-  linux-user: fix inconsistent spaces in print_siginfo() output
-  linux-user: add strace support for uinfo structure of
-    rt_sigqueueinfo() and rt_tgsigqueueinfo()
-  [RFC] linux-user: add support for tracking the target signal mask
-  [RFC] linux-user: add target_sigdelset() and target_sigorset()
-  [RFC] linux-user: fix sigismember() check
-  [RFC] linux-user: add functions for working with the target signal
-    mask
-  [RFC] linux-user: add functionality for tracking target signal mask
-  [RFC] linux-user: add support for multiplexing larger target signals
-  [RFC] linux-user: add support for multiplexing signals in
-    rt_sigqueueinfo(), rt_tgsigqueueinfo(), kill() and tgkill()
-    syscalls.
-
- linux-user/qemu.h         |  11 +++
- linux-user/signal.c       | 235 ++++++++++++++++++++++++++++++++++++++++=
-+++++-
- linux-user/strace.c       | 177 ++++++++++++++++++++++++++++++++--
- linux-user/strace.list    |  16 ++--
- linux-user/syscall.c      | 208 +++++++++++++++++++++++++++++++++++++---
- linux-user/syscall_defs.h |  32 +++++++
- 6 files changed, 651 insertions(+), 28 deletions(-)
+Reviewed-by: Eric Blake <eblake@redhat.com>
 
 --=20
-1.9.1
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--HXv2w8AbrqODjwjsnag8wXemPg5TTQDcc
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEcBAEBCAAGBQJZGcJcAAoJEKeha0olJ0Nq1vMIAK8R3yqZFdutP8N/eSEjr5hG
+K0EwIIn/JqkbkXQVAsm2+Z8SLM7AOrP4M8tQ2uTKtsLVoxdVXD9UeXs7iUhn3bb1
+RI5WtphnxR2Ng05jZiTyE4ResrReES6al14ErKO6Sfy4efZrGwOZEZV12shFN9xO
+PUjBe2tP33zJW3CcPkBCffeg/VqcdpYLtffjYUUTYwfqdYpMfTxcn446OjJK3r8h
+IX8IHWQ2d5cawjYsKwIdabs7fOudtATYkgt43s87UQefDrMUGsW1od/AuMdUANVD
+6lt9AvtcxooGNxw4HasK5/e1WpMGPDHQdT5TEIaf6IkxsNslQDHhd3DSRItb390=
+=bbGt
+-----END PGP SIGNATURE-----
+
+--HXv2w8AbrqODjwjsnag8wXemPg5TTQDcc--
