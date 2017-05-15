@@ -1,27 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37322)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37309)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1dAFkr-0002fd-Rq
-	for qemu-devel@nongnu.org; Mon, 15 May 2017 09:09:42 -0400
+	(envelope-from <quintela@redhat.com>) id 1dAFkp-0002dr-Ba
+	for qemu-devel@nongnu.org; Mon, 15 May 2017 09:09:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1dAFkn-00038f-JI
-	for qemu-devel@nongnu.org; Mon, 15 May 2017 09:09:41 -0400
-Received: from mail-wm0-x243.google.com ([2a00:1450:400c:c09::243]:36771)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1dAFkn-00038M-D0
-	for qemu-devel@nongnu.org; Mon, 15 May 2017 09:09:37 -0400
-Received: by mail-wm0-x243.google.com with SMTP id u65so28122117wmu.3
-	for <qemu-devel@nongnu.org>; Mon, 15 May 2017 06:09:37 -0700 (PDT)
-Date: Mon, 15 May 2017 14:09:34 +0100
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20170515130934.GE1201@stefanha-x1.localdomain>
-References: <20170511144339.13027-1-kraxel@redhat.com>
+	(envelope-from <quintela@redhat.com>) id 1dAFkk-00036u-CV
+	for qemu-devel@nongnu.org; Mon, 15 May 2017 09:09:39 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47088)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1dAFkk-00036n-57
+	for qemu-devel@nongnu.org; Mon, 15 May 2017 09:09:34 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 583BA13AA1
+	for <qemu-devel@nongnu.org>; Mon, 15 May 2017 13:09:33 +0000 (UTC)
+From: Juan Quintela <quintela@redhat.com>
+In-Reply-To: <20170515130202.GG2089@work-vm> (David Alan Gilbert's message of
+	"Mon, 15 May 2017 14:02:03 +0100")
+References: <20170503104257.5127-1-dgilbert@redhat.com>
+	<87pofpizmj.fsf@secure.mitica> <20170515130202.GG2089@work-vm>
+Reply-To: quintela@redhat.com
+Date: Mon, 15 May 2017 15:09:29 +0200
+Message-ID: <8737c6fera.fsf@secure.mitica>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="C94crkcyjafcjHxo"
-Content-Disposition: inline
-In-Reply-To: <20170511144339.13027-1-kraxel@redhat.com>
-Subject: Re: [Qemu-devel] [PULL 0/4] make display updates thread safe,
- batch #2
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH] block migration: Allow compile time disable
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,75 +34,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: qemu-devel@nongnu.org, jcody@redhat.com, kwolf@redhat.com, kashyap@redhat.com
 
+"Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
+> * Juan Quintela (quintela@redhat.com) wrote:
+>> "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com> wrote:
+>> > From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+>> >
+>> > Many users now prefer to use drive_mirror over NBD as an
+>> > alternative to the older migrate -b option; drive_mirror is
+>> > more complex to setup but gives you more options (e.g. only
+>> > migrating some of the disks if some of them are shared).
+>> >
+>> > Allow the large chunk of block migration code to be compiled
+>> > out for those who don't use it.
+>> >
+>> > Based on a downstream-patch we've had for a while by Jeff Cody.
+>> >
+>> > Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+>> 
+>> Reviewed-by: Juan Quintela <quintela@redhat.com>
+>> 
+>> > diff --git a/migration/migration.c b/migration/migration.c
+>> > index 353f2728cf..ffce72aabc 100644
+>> > --- a/migration/migration.c
+>> > +++ b/migration/migration.c
+>> > @@ -692,6 +692,7 @@ MigrationInfo *qmp_query_migrate(Error **errp)
+>> >  
+>> >          populate_ram_info(info, s);
+>> >  
+>> > +#ifdef CONFIG_LIVE_BLOCK_MIGRATION
+>> >          if (blk_mig_active()) {
+>> >              info->has_disk = true;
+>> >              info->disk = g_malloc0(sizeof(*info->disk));
+>> > @@ -699,6 +700,7 @@ MigrationInfo *qmp_query_migrate(Error **errp)
+>> >              info->disk->remaining = blk_mig_bytes_remaining();
+>> >              info->disk->total = blk_mig_bytes_total();
+>> >          }
+>> > +#endif
+>> 
+>> I think it can be cleaner to move this inside block.c and just export a
+>> function that is empty in case it is compiled out, but that it is just
+>> me, so you got the revieweb by anyways.
+>> 
+>> >          }
+>> >      }
+>> >  
+>> > +#ifdef CONFIG_LIVE_BLOCK_MIGRATION
+>> >      blk_mig_init();
+>> > +#endif
+>> >      ram_mig_init();
+>> >  
+>> >      /* If the currently selected machine wishes to override the units-per-bus
+>> 
+>> Same here, I preffer the ifdef in the header than here.
+>
+> OK, done I've now got the block.h header having:
+> #ifdef CONFIG_LIVE_BLOCK_MIGRATION
+> void blk_mig_init(void);
+> int blk_mig_active(void);
+> uint64_t blk_mig_bytes_transferred(void);
+> uint64_t blk_mig_bytes_remaining(void);
+> uint64_t blk_mig_bytes_total(void);
+>
+> #else
+> static inline void blk_mig_init(void) { };
+> static inline int blk_mig_active(void)
+> {
+>     return false;
+> }
+> static inline uint64_t blk_mig_bytes_transferred(void)
+> {
+>     return 0;
+> }
+>
+> static inline uint64_t blk_mig_bytes_remaining(void)
+> {
+>     return 0;
+> }
+>
+> static inline uint64_t blk_mig_bytes_total(void)
+> {
+>     return 0;
+> }
+> #endif /* CONFIG_LIVE_BLOCK_MIGRATION */
+>
+> Dave
 
---C94crkcyjafcjHxo
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Thu, May 11, 2017 at 04:43:35PM +0200, Gerd Hoffmann wrote:
->   Hi,
->=20
-> Here is the vga patch queue, with the second patch batch to make display
-> updates thread-safe.
->=20
-> please pull,
->   Gerd
->=20
-> The following changes since commit 76d20ea0f1b26ebd5da2f5fb2fdf3250cde887=
-bb:
->=20
->   Merge remote-tracking branch 'armbru/tags/pull-qapi-2017-05-04-v3' into=
- staging (2017-05-09 15:49:14 -0400)
->=20
-> are available in the git repository at:
->=20
->   git://git.kraxel.org/qemu tags/pull-vga-20170511-1
->=20
-> for you to fetch changes up to bfc56535f793c557aa754c50213fc5f882e6482d:
->=20
->   vga: fix display update region calculation (2017-05-11 09:50:32 +0200)
->=20
-> ----------------------------------------------------------------
-> make display updates thread safe, batch #2
->=20
-> ----------------------------------------------------------------
-> Gerd Hoffmann (2):
->       sm501: make display updates thread safe
->       vga: fix display update region calculation
->=20
-> Mark Cave-Ayland (2):
->       cg3: make display updates thread safe
->       tcx: make display updates thread safe
->=20
->  hw/display/cg3.c   | 41 ++++++++++++++++----------------
->  hw/display/sm501.c | 27 ++++++----------------
->  hw/display/tcx.c   | 68 +++++++++++++++++++-----------------------------=
-------
->  hw/display/vga.c   |  2 +-
->  4 files changed, 53 insertions(+), 85 deletions(-)
->=20
-
-Thanks, applied to my staging tree:
-https://github.com/stefanha/qemu/commits/staging
-
-Stefan
-
---C94crkcyjafcjHxo
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJZGaiOAAoJEJykq7OBq3PI4TsH/RSxDLXLvwbK1bqwcn09oMWZ
-V/V6yY027KfIevVEr9oE5BMlVCWcrfcvNCRUJiCit0p8RjASomrThYuvRYWzkTL8
-wF6pXy8GALDP1Gu1WLoE63nej1PZ/UgrYt58pLrOLoGqP4Xgb3PnTgvqEynMRUBL
-ySqD9TbC2jeY+f4OVXyCnQeM0UfR0Rr/Ci8LL0bUTr8kDYx2gEghQB4Wz1AZ9CeL
-dF9HFQE4Ql+DbBMQ3YaefhbzGwpKMtA0l7K4jIi2WK/1gWperWdmvqqwdaEKBfyr
-pt7ZUbevVTvgyJ+82PC4EfiaafGiOPyfiZ9ilsEhYCBK+l3vT11xf4Pd3eSLgf4=
-=Mhm+
------END PGP SIGNATURE-----
-
---C94crkcyjafcjHxo--
+good for me.  Thanks.
