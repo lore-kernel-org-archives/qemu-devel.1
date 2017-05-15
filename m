@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36633)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49932)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dA4vt-0004oV-5Y
-	for qemu-devel@nongnu.org; Sun, 14 May 2017 21:36:22 -0400
+	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1dA5eg-0003br-J6
+	for qemu-devel@nongnu.org; Sun, 14 May 2017 22:22:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dA4vq-0003dY-0N
-	for qemu-devel@nongnu.org; Sun, 14 May 2017 21:36:21 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:42860)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1dA4vp-0003cu-Pz
-	for qemu-devel@nongnu.org; Sun, 14 May 2017 21:36:17 -0400
-Date: Mon, 15 May 2017 09:36:13 +0800
-From: Fam Zheng <famz@redhat.com>
-Message-ID: <20170515013613.GA23262@lemon.lan>
-References: <87efvrovn7.fsf@gmail.com>
+	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1dA5ed-0004KV-EH
+	for qemu-devel@nongnu.org; Sun, 14 May 2017 22:22:38 -0400
+Received: from [59.151.112.132] (port=3436 helo=heian.cn.fujitsu.com)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1dA5ec-0004E3-DY
+	for qemu-devel@nongnu.org; Sun, 14 May 2017 22:22:35 -0400
+References: <20170512083556.22539-1-maozy.fnst@cn.fujitsu.com>
+	<e8387a72-2183-538f-970c-01335526183b@amsat.org>
+From: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
+Message-ID: <b3138689-39f4-ac5c-d058-f3b8138a1844@cn.fujitsu.com>
+Date: Mon, 15 May 2017 10:21:59 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <87efvrovn7.fsf@gmail.com>
-Subject: Re: [Qemu-devel] Installing Windows with virtio (was: QEMU,
- increase graphics memory)
+In-Reply-To: <e8387a72-2183-538f-970c-01335526183b@amsat.org>
+Content-Type: text/plain; charset="windows-1252"; format=flowed
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH] hw/net/rocker/rocker: Convert pci device
+ .init() to .realize()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,64 +28,190 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "jenia.ivlev" <jenia.ivlev@gmail.com>
-Cc: qemu-devel@nongnu.org
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, qemu-devel@nongnu.org
+Cc: jasowang@redhat.com, jiri@resnulli.us
 
-On Sun, 05/14 19:39, jenia.ivlev wrote:
-> 
-> I wanted to get more graphics memory on my QEMU Windows client.
-> 
-> I decided to install **Virtio** drivers for QEMU to achieve that purpose.
-> 
-> I create an *imagine_file* like this:
-> 
-> 
->     qemu-img create -f raw image_file 4G
-> 
-> 
-> Also, I ran the windows-install like this:
-> 
-> 
->     qemu-system-x86_64 -enable-kvm -m 4G -cdrom "OS.iso" -boot order=c -drive file=image_file,if=virtio
-> 
-> 
-> But when Windows ran, it didn't find any hard-drive (the *image_file*
-> basically). It asked for some drivers instead. I think it wanted drivers
-> to communicate with the hard-drive (*image_file*).
-> 
-> Running the install without Virtio works though:
-> 
-> 
->     qemu-system-x86_64 -enable-kvm -m 4G -cdrom "OS.iso" -boot order=d -drive file=image_file,format=raw
-> 
-> 
-> The difference betweeen the two commands is:
-> 
-> 
->     order=c vs order=d
-> 
-> 
-> and
-> 
-> 
->     if=virtio vs format=raw
-> 
-> 
-> How do I install windows with Virtio in QEMU?
-> 
-> My original goal is to get 512 MB of graphics memory on Windows (running
-> as a guest in QEMU). Unfortunately, by default  (no Virtio) I get 8MB of
-> video memory which is not enough for my purposes
-> 
-> 
-> Thanks
-> 
-> P.S. My OS is Arch-Linux
-
-Since you use ArchLinux, wiki.archlinux.org is rather helpful, as always.  Yes,
-you need virtio drivers:
-
-https://wiki.archlinux.org/index.php/QEMU#New_Install_of_Windows
+Hi, Philippe
 
 
-Fam
+On 05/14/2017 05:04 AM, Philippe Mathieu-Daudé wrote:
+> Hi Mao,
+>
+> You can use shorter patch subject "net/rocker" instead of
+> "hw/net/rocker/rocker".
+
+Thanks for your suggestion :)OK, will do the fix right away.
+
+>
+> On 05/12/2017 05:35 AM, Mao Zhongyi wrote:
+>> Convert pci device .init() to .realize(). Also improve -device rocker
+>> error reporting. Because when -device rocker fails, it first reports
+>> a specific error, then a generic one, like this:
+>>
+>>     $ x86_64-softmmu/qemu-system-x86_64 -device rocker,name=qemu-rocker
+>>     rocker: name too long; please shorten to at most 9 chars
+>>     qemu-system-x86_64: -device rocker,name=qemu-rocker: Device
+>> initialization failed
+>>
+>> Convert pci_rocker_init() to Error to get rid of the unwanted second
+>> error message.
+>>
+>> Cc: jiri@resnulli.us
+>> Cc: jasowang@redhat.com
+>> Signed-off-by: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
+>> ---
+>>  hw/net/rocker/rocker.c | 31 +++++++++++++------------------
+>>  1 file changed, 13 insertions(+), 18 deletions(-)
+>>
+>> diff --git a/hw/net/rocker/rocker.c b/hw/net/rocker/rocker.c
+>> index 6e70fdd..2cebc31 100644
+>> --- a/hw/net/rocker/rocker.c
+>> +++ b/hw/net/rocker/rocker.c
+>> @@ -1252,20 +1252,18 @@ rollback:
+>>      return err;
+>>  }
+>>
+>> -static int rocker_msix_init(Rocker *r)
+>> +static int rocker_msix_init(Rocker *r, Error **errp)
+>>  {
+>>      PCIDevice *dev = PCI_DEVICE(r);
+>>      int err;
+>> -    Error *local_err = NULL;
+>>
+>>      err = msix_init(dev, ROCKER_MSIX_VEC_COUNT(r->fp_ports),
+>>                      &r->msix_bar,
+>>                      ROCKER_PCI_MSIX_BAR_IDX,
+>> ROCKER_PCI_MSIX_TABLE_OFFSET,
+>>                      &r->msix_bar,
+>>                      ROCKER_PCI_MSIX_BAR_IDX, ROCKER_PCI_MSIX_PBA_OFFSET,
+>> -                    0, &local_err);
+>> +                    0, errp);
+>>      if (err) {
+>> -        error_report_err(local_err);
+>>          return err;
+>>      }
+>>
+>> @@ -1301,7 +1299,7 @@ static World *rocker_world_type_by_name(Rocker
+>> *r, const char *name)
+>>      return NULL;
+>>  }
+>>
+>> -static int pci_rocker_init(PCIDevice *dev)
+>> +static void pci_rocker_realize(PCIDevice *dev, Error **errp)
+>>  {
+>>      Rocker *r = to_rocker(dev);
+>>      const MACAddr zero = { .a = { 0, 0, 0, 0, 0, 0 } };
+>> @@ -1315,7 +1313,7 @@ static int pci_rocker_init(PCIDevice *dev)
+>>
+>>      for (i = 0; i < ROCKER_WORLD_TYPE_MAX; i++) {
+>>          if (!r->worlds[i]) {
+>> -            err = -ENOMEM;
+>> +            error_setg(errp, "allocate worlds failed");
+>>              goto err_world_alloc;
+>>          }
+>>      }
+>> @@ -1326,10 +1324,9 @@ static int pci_rocker_init(PCIDevice *dev)
+>>
+>>      r->world_dflt = rocker_world_type_by_name(r, r->world_name);
+>>      if (!r->world_dflt) {
+>> -        fprintf(stderr,
+>> -                "rocker: requested world \"%s\" does not exist\n",
+>> +        error_setg(errp,
+>> +                "rocker: invalid argument, requested world %s does
+>> not exist",
+>>                  r->world_name);
+>> -        err = -EINVAL;
+>>          goto err_world_type_by_name;
+>>      }
+>>
+>> @@ -1349,7 +1346,7 @@ static int pci_rocker_init(PCIDevice *dev)
+>>
+>>      /* MSI-X init */
+>>
+>> -    err = rocker_msix_init(r);
+>> +    err = rocker_msix_init(r, errp);
+>>      if (err) {
+>>          goto err_msix_init;
+>>      }
+>> @@ -1361,7 +1358,7 @@ static int pci_rocker_init(PCIDevice *dev)
+>>      }
+>>
+>>      if (rocker_find(r->name)) {
+>> -        err = -EEXIST;
+>> +        error_setg(errp, "rocker %s already exists", r->name);
+>
+> Use column to have consistent logging:
+>
+>         error_setg(errp, "rocker: %s already exists", r->name);
+>
+
+OK, I see, will fix it in the v2.
+Thanks
+
+>>          goto err_duplicate;
+>>      }
+>>
+>> @@ -1375,10 +1372,10 @@ static int pci_rocker_init(PCIDevice *dev)
+>>  #define ROCKER_IFNAMSIZ 16
+>>  #define MAX_ROCKER_NAME_LEN  (ROCKER_IFNAMSIZ - 1 - 3 - 3)
+>>      if (strlen(r->name) > MAX_ROCKER_NAME_LEN) {
+>> -        fprintf(stderr,
+>> -                "rocker: name too long; please shorten to at most %d
+>> chars\n",
+>> +        error_setg(errp,
+>> +                "rocker: name too long; please shorten to at most %d
+>> chars",
+>>                  MAX_ROCKER_NAME_LEN);
+>> -        return -EINVAL;
+>> +        return;
+>
+> I think the correct cleanup is: "goto err_duplicate;"
+>
+> Or if you want to be more specific, add another goto label
+> "err_name_too_long" before the "err_duplicate" label.
+>
+
+Thanks very much for your detailed explanation:) I will add a new label
+to make a correct cleanup in the v2.
+
+Mao
+
+>>      }
+>>
+>>      if (memcmp(&r->fp_start_macaddr, &zero, sizeof(zero)) == 0) {
+>> @@ -1410,7 +1407,6 @@ static int pci_rocker_init(PCIDevice *dev)
+>>       * .....
+>>       */
+>>
+>> -    err = -ENOMEM;
+>>      for (i = 0; i < rocker_pci_ring_count(r); i++) {
+>>          DescRing *ring = desc_ring_alloc(r, i);
+>>
+>> @@ -1447,7 +1443,7 @@ static int pci_rocker_init(PCIDevice *dev)
+>>
+>>      QLIST_INSERT_HEAD(&rockers, r, next);
+>>
+>> -    return 0;
+>> +    return;
+>>
+>>  err_port_alloc:
+>>      for (--i; i >= 0; i--) {
+>> @@ -1473,7 +1469,6 @@ err_world_alloc:
+>>              world_free(r->worlds[i]);
+>>          }
+>>      }
+>> -    return err;
+>>  }
+>>
+>>  static void pci_rocker_uninit(PCIDevice *dev)
+>> @@ -1558,7 +1553,7 @@ static void rocker_class_init(ObjectClass
+>> *klass, void *data)
+>>      DeviceClass *dc = DEVICE_CLASS(klass);
+>>      PCIDeviceClass *k = PCI_DEVICE_CLASS(klass);
+>>
+>> -    k->init = pci_rocker_init;
+>> +    k->realize = pci_rocker_realize;
+>>      k->exit = pci_rocker_uninit;
+>>      k->vendor_id = PCI_VENDOR_ID_REDHAT;
+>>      k->device_id = PCI_DEVICE_ID_REDHAT_ROCKER;
+>>
