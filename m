@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43513)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44235)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dAG7T-0006iz-Sa
-	for qemu-devel@nongnu.org; Mon, 15 May 2017 09:33:11 -0400
+	(envelope-from <famz@redhat.com>) id 1dAG9k-0007jQ-GC
+	for qemu-devel@nongnu.org; Mon, 15 May 2017 09:35:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dAG7Q-00048i-OM
-	for qemu-devel@nongnu.org; Mon, 15 May 2017 09:33:03 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47322)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1dAG7Q-00048H-G6
-	for qemu-devel@nongnu.org; Mon, 15 May 2017 09:33:00 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id C2DEB3DBD6
-	for <qemu-devel@nongnu.org>; Mon, 15 May 2017 13:32:58 +0000 (UTC)
-From: Thomas Huth <thuth@redhat.com>
-Date: Mon, 15 May 2017 15:32:56 +0200
-Message-Id: <1494855176-11127-1-git-send-email-thuth@redhat.com>
-Subject: [Qemu-devel] [PATCH] hmp / net: Mark host_net_add/remove as
- deprecated
+	(envelope-from <famz@redhat.com>) id 1dAG9j-0005Cg-7s
+	for qemu-devel@nongnu.org; Mon, 15 May 2017 09:35:24 -0400
+Date: Mon, 15 May 2017 21:35:15 +0800
+From: Fam Zheng <famz@redhat.com>
+Message-ID: <20170515133515.GD7305@lemon.lan>
+References: <1494842563-6534-1-git-send-email-pl@kamp.de>
+	<20170515105032.GD23262@lemon.lan>
+	<26b2441d-e80c-eeef-fba1-67b2529e9287@kamp.de>
+	<20170515115318.GA7305@lemon.lan>
+	<243331f2-3822-3c0e-b4a5-9f3de2302fe4@kamp.de>
+	<20170515122802.GB7305@lemon.lan>
+	<b850c6d3-c104-b171-0e7d-40ebf6780d6e@kamp.de>
+	<20170515125202.GC7305@lemon.lan>
+	<0e904501-91c6-7186-f5e6-8c2b60bda8cf@kamp.de>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <0e904501-91c6-7186-f5e6-8c2b60bda8cf@kamp.de>
+Subject: Re: [Qemu-devel] [RFC PATCH] qemu-io: add drain/undrain cmd
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,93 +30,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Jason Wang <jasowang@redhat.com>, dgilbert@redhat.com
+To: Peter Lieven <pl@kamp.de>
+Cc: kwolf@redhat.com, qemu-devel@nongnu.org, qemu-block@nongnu.org, mreitz@redhat.com, jsnow@redhat.com
 
-The netdev_add and netdev_del commands should be used nowadays instead.
+On Mon, 05/15 15:01, Peter Lieven wrote:
+> Am 15.05.2017 um 14:52 schrieb Fam Zheng:
+> > On Mon, 05/15 14:32, Peter Lieven wrote:
+> > > Am 15.05.2017 um 14:28 schrieb Fam Zheng:
+> > > > On Mon, 05/15 13:58, Peter Lieven wrote:
+> > > > > Am 15.05.2017 um 13:53 schrieb Fam Zheng:
+> > > > > > On Mon, 05/15 13:26, Peter Lieven wrote:
+> > > > > > > Am 15.05.2017 um 12:50 schrieb Fam Zheng:
+> > > > > > > > On Mon, 05/15 12:02, Peter Lieven wrote:
+> > > > > > > > > Hi Block developers,
+> > > > > > > > > 
+> > > > > > > > > I would like to add a feature to Qemu to drain all traffic from a block so that
+> > > > > > > > > I can take external snaphosts without the risk to that in the middle of a write
+> > > > > > > > > operation. Its meant for cases where where QGA freeze/thaw is not available.
+> > > > > > > > > 
+> > > > > > > > > For me its enough to have this through qemu-io, but Kevin asked me to check
+> > > > > > > > > if its not worth to have a stable API for it and present it via QMP/HMP.
+> > > > > > > > > 
+> > > > > > > > > What are your thoughts?
+> > > > > > > > For debugging purpose or a "hacky" usage where you know what you are doing, it
+> > > > > > > > may be fine to have this. The only issue is it should be a separate flag, like
+> > > > > > > > BlockJob.user_paused.
+> > > > > > > How can I add, remove such a flag?
+> > > > > > Like bs->user_drained. Set it in "drain" command, then increment
+> > > > > > bs->quiesce_counter if toggled; vise versa.
+> > > > > Ah okay. You wouldn't use bdrv_drained_begin/end? Because in these functions
+> > > > > the counter is incremented already.
+> > > > You're right, calling bdrv_drained_begin() is better.
+> > > > 
+> > > > > 
+> > > > > > > > What happens from guest perspective? In the case of virtio, the request queue is
+> > > > > > > > not handled and -ETIMEDOUT may happen. With IDE, I/O commands are still handled,
+> > > > > > > > the command is not effective (or rather the implementation is not complete).
+> > > > > > > That it only works with virtio is fine. However, the thing it does not work correctly
+> > > > > > > apply then also to all other users of the drained_begin/end functions, right?
+> > > > > > > As for the timeout I only plan to drain the device for about 1 second.
+> > > > > > It didn't matter because for IDE, the invariant (staying quiesced as long as
+> > > > > > necessary) is already ensured by BQL.  Virtio is different because it supports
+> > > > > > ioeventfd and data plane.
+> > > > > Okay understood. So my use of bdrv_drained_begin/end is more an abuse of
+> > > > > these functions?
+> > > > Sort of. But it's not unreasonable to "extend" bdrv_drained_begin/end to cover
+> > > > IDE, I just haven't thought about "how".
+> > > > 
+> > > > > Do you have another idea how to achieve what I want? I was thinking of throttle
+> > > > > the I/O to zero. It would be enough to do this for writes, reading doesn't hurt in
+> > > > > my case.
+> > > > Maybe add a block filter on top of the drained node, drain it when doing so,
+> > > > then queue all further requests with a CoQueue until "undrain".  (It is then not
+> > > > quite to "drain" but to "halt" or "pause", though.)
+> > > To get the drain for free was why I was looking at this approach. If I read correctly
+> > > if I keep using bdrv_drained_begin/end its too hacky to implement it in QMP?
+> > I think so.
+> > 
+> > > If yes, would support adding it to qemu-io?
+> > I'm under the impression that you are looking to a real use case, I don't think
+> > I like the idea. Also, accessing the image from other processes while QEMU is
+> > using it is strongly discouraged, and there is the coming image locking
+> > mechanism to prevent this from happening. Why is the blockdev-snapshot command
+> > not enough?
+> 
+> blockdev-snapshot is enough, but I still fear the case there is suddenly too much I/O
+> for the live-commit. And that the whole snapshot / commit code is more senstive than
+> just stopping I/O for a second or two.
 
-Signed-off-by: Thomas Huth <thuth@redhat.com>
----
- hmp-commands.hx |  8 ++++----
- net/net.c       | 13 +++++++++++++
- 2 files changed, 17 insertions(+), 4 deletions(-)
+In this case, the image fleecing approach may be what you need. It creates a
+temporary point in time snapshot which is lightweight and disposable. Something
+like:
 
-diff --git a/hmp-commands.hx b/hmp-commands.hx
-index 0aca984..baeac47 100644
---- a/hmp-commands.hx
-+++ b/hmp-commands.hx
-@@ -1296,7 +1296,7 @@ ETEXI
-         .name       = "host_net_add",
-         .args_type  = "device:s,opts:s?",
-         .params     = "tap|user|socket|vde|netmap|bridge|vhost-user|dump [options]",
--        .help       = "add host VLAN client",
-+        .help       = "add host VLAN client (deprecated, use netdev_add instead)",
-         .cmd        = hmp_host_net_add,
-         .command_completion = host_net_add_completion,
-     },
-@@ -1304,14 +1304,14 @@ ETEXI
- STEXI
- @item host_net_add
- @findex host_net_add
--Add host VLAN client.
-+Add host VLAN client. Deprecated, please use @code{netdev_add} instead.
- ETEXI
- 
-     {
-         .name       = "host_net_remove",
-         .args_type  = "vlan_id:i,device:s",
-         .params     = "vlan_id name",
--        .help       = "remove host VLAN client",
-+        .help       = "remove host VLAN client (deprecated, use netdev_del instead)",
-         .cmd        = hmp_host_net_remove,
-         .command_completion = host_net_remove_completion,
-     },
-@@ -1319,7 +1319,7 @@ ETEXI
- STEXI
- @item host_net_remove
- @findex host_net_remove
--Remove host VLAN client.
-+Remove host VLAN client. Deprecated, please use @code{netdev_del} instead.
- ETEXI
- 
-     {
-diff --git a/net/net.c b/net/net.c
-index 0ac3b9e..6235aab 100644
---- a/net/net.c
-+++ b/net/net.c
-@@ -45,6 +45,7 @@
- #include "qapi-visit.h"
- #include "qapi/opts-visitor.h"
- #include "sysemu/sysemu.h"
-+#include "sysemu/qtest.h"
- #include "net/filter.h"
- #include "qapi/string-output-visitor.h"
- 
-@@ -1149,6 +1150,12 @@ void hmp_host_net_add(Monitor *mon, const QDict *qdict)
-     const char *opts_str = qdict_get_try_str(qdict, "opts");
-     Error *local_err = NULL;
-     QemuOpts *opts;
-+    static bool warned;
-+
-+    if (!warned && !qtest_enabled()) {
-+        error_report("host_net_add is deprecated, use netdev_add instead");
-+        warned = true;
-+    }
- 
-     if (!net_host_check_device(device)) {
-         monitor_printf(mon, "invalid host network device %s\n", device);
-@@ -1175,6 +1182,12 @@ void hmp_host_net_remove(Monitor *mon, const QDict *qdict)
-     NetClientState *nc;
-     int vlan_id = qdict_get_int(qdict, "vlan_id");
-     const char *device = qdict_get_str(qdict, "device");
-+    static bool warned;
-+
-+    if (!warned && !qtest_enabled()) {
-+        error_report("host_net_remove is deprecated, use netdev_del instead");
-+        warned = true;
-+    }
- 
-     nc = net_hub_find_client_by_name(vlan_id, device);
-     if (!nc) {
--- 
-1.8.3.1
+https://lists.gnu.org/archive/html/qemu-devel/2014-03/msg01359.html
+
+(Ccing John who may have more up-to-date pointers)
+
+> 
+> do you have a pointer to the image locking mechanism?
+
+It hit qemu.git master just a moment ago. See raw_check_perm.
+
+Fam
