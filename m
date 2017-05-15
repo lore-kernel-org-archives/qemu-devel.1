@@ -1,25 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44624)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45210)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dAGB5-0008JU-6t
-	for qemu-devel@nongnu.org; Mon, 15 May 2017 09:36:48 -0400
+	(envelope-from <stefanha@gmail.com>) id 1dAGDC-0000ei-Os
+	for qemu-devel@nongnu.org; Mon, 15 May 2017 09:38:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dAGB2-0005tm-28
-	for qemu-devel@nongnu.org; Mon, 15 May 2017 09:36:47 -0400
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <149484833874.20089.4164801378197848306.stgit@bahia.lan>
-	<149484835694.20089.2114938170632779266.stgit@bahia.lan>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <6e1c2116-e7b5-083b-6eeb-87356f8e1996@amsat.org>
-Date: Mon, 15 May 2017 10:36:40 -0300
+	(envelope-from <stefanha@gmail.com>) id 1dAGD9-0006tM-Km
+	for qemu-devel@nongnu.org; Mon, 15 May 2017 09:38:58 -0400
+Received: from mail-lf0-x242.google.com ([2a00:1450:4010:c07::242]:36645)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1dAGD9-0006ss-BW
+	for qemu-devel@nongnu.org; Mon, 15 May 2017 09:38:55 -0400
+Received: by mail-lf0-x242.google.com with SMTP id h4so3297036lfj.3
+	for <qemu-devel@nongnu.org>; Mon, 15 May 2017 06:38:55 -0700 (PDT)
+Date: Mon, 15 May 2017 14:38:51 +0100
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20170515133851.GI1201@stefanha-x1.localdomain>
+References: <20170512143717.30391-1-stefanha@redhat.com>
+	<20170512143717.30391-2-stefanha@redhat.com>
+	<d876c5bf-6820-33e6-66e3-35ce670b7e7e@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <149484835694.20089.2114938170632779266.stgit@bahia.lan>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 1/6] ppc/xics: simplify prototype of
- xics_spapr_init()
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="yzvKDKJiLNESc64M"
+Content-Disposition: inline
+In-Reply-To: <d876c5bf-6820-33e6-66e3-35ce670b7e7e@redhat.com>
+Subject: Re: [Qemu-devel] [PULL for-2.9 1/3] coroutine: remove GThread
+ implementation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,68 +32,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
-Cc: David Gibson <david@gibson.dropbear.id.au>, Cedric Le Goater <clg@kaod.org>, Bharata B Rao <bharata@linux.vnet.ibm.com>
+To: Eric Blake <eblake@redhat.com>
+Cc: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>
 
-On 05/15/2017 08:39 AM, Greg Kurz wrote:
-> This function only does hypercall and RTAS-call registration, and thus
-> never returns an error. This patch adapt the prototype to reflect that.
->
-> Signed-off-by: Greg Kurz <groug@kaod.org>
 
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+--yzvKDKJiLNESc64M
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-> ---
->  hw/intc/xics_spapr.c  |    3 +--
->  hw/ppc/spapr.c        |    2 +-
->  include/hw/ppc/xics.h |    2 +-
->  3 files changed, 3 insertions(+), 4 deletions(-)
->
-> diff --git a/hw/intc/xics_spapr.c b/hw/intc/xics_spapr.c
-> index f05308b897f2..d98ea8b13068 100644
-> --- a/hw/intc/xics_spapr.c
-> +++ b/hw/intc/xics_spapr.c
-> @@ -229,7 +229,7 @@ static void rtas_int_on(PowerPCCPU *cpu, sPAPRMachineState *spapr,
->      rtas_st(rets, 0, RTAS_OUT_SUCCESS);
->  }
->
-> -int xics_spapr_init(sPAPRMachineState *spapr, Error **errp)
-> +void xics_spapr_init(sPAPRMachineState *spapr)
->  {
->      /* Registration of global state belongs into realize */
->      spapr_rtas_register(RTAS_IBM_SET_XIVE, "ibm,set-xive", rtas_set_xive);
-> @@ -243,7 +243,6 @@ int xics_spapr_init(sPAPRMachineState *spapr, Error **errp)
->      spapr_register_hypercall(H_XIRR_X, h_xirr_x);
->      spapr_register_hypercall(H_EOI, h_eoi);
->      spapr_register_hypercall(H_IPOLL, h_ipoll);
-> -    return 0;
->  }
->
->  #define ICS_IRQ_FREE(ics, srcno)   \
-> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> index 1b7cadab0cdf..abfb99b71b7d 100644
-> --- a/hw/ppc/spapr.c
-> +++ b/hw/ppc/spapr.c
-> @@ -139,7 +139,7 @@ static void xics_system_init(MachineState *machine, int nr_irqs, Error **errp)
->      }
->
->      if (!spapr->ics) {
-> -        xics_spapr_init(spapr, errp);
-> +        xics_spapr_init(spapr);
->          spapr->icp_type = TYPE_ICP;
->          spapr->ics = spapr_ics_create(spapr, TYPE_ICS_SIMPLE, nr_irqs, errp);
->      }
-> diff --git a/include/hw/ppc/xics.h b/include/hw/ppc/xics.h
-> index 05e6acbb3533..d6cb51f3ad5d 100644
-> --- a/include/hw/ppc/xics.h
-> +++ b/include/hw/ppc/xics.h
-> @@ -206,6 +206,6 @@ void icp_resend(ICPState *ss);
->  typedef struct sPAPRMachineState sPAPRMachineState;
->
->  int xics_kvm_init(sPAPRMachineState *spapr, Error **errp);
-> -int xics_spapr_init(sPAPRMachineState *spapr, Error **errp);
-> +void xics_spapr_init(sPAPRMachineState *spapr);
->
->  #endif /* XICS_H */
->
->
+On Fri, May 12, 2017 at 03:19:18PM -0500, Eric Blake wrote:
+> On 05/12/2017 09:37 AM, Stefan Hajnoczi wrote:
+> > From: "Daniel P. Berrange" <berrange@redhat.com>
+> >=20
+> > The GThread implementation is not functional enough to actually
+> > run QEMU reliably. While it was potentially useful for debugging,
+> > we have a scripts/qemugdb/coroutine.py to enable tracing of
+> > ucontext coroutines in GDB, so that removes the only reason for
+> > GThread to exist.
+> >=20
+>=20
+> Quick question (unrelated to the pull request): Can we get a patch to
+> scripts/qemugdb/coroutine.py or nearby that mentions the preferred way
+> to actually use the script?  I didn't know the script existed before
+> seeing this commit message, and was sad to see that it was not
+> self-documenting (or else a scripts/qemugdb/README file) on how best to
+> utilize the script (is it as simple as running 'gdb --some-arg
+> /path/to/coroutine.py'? do you have to install some magic file to tell
+> gdb to autoload the file any time you are debugging qemu? something
+> else???).
+>=20
+> Okay, I searched a bit harder, and found that scripts/qemu-gdb.py loads
+> these subscripts, if you type 'source scripts/qemu-gdb.py' at the (gdb)
+> prompt.  Still, is there a way to automate that so that the scripts are
+> loaded every time you fire up gdb, instead of having to remember to do
+> it by hand? And if so, can that be documented?
+
+I'll send a patch to add a .gdbinit file.
+
+Stefan
+
+--yzvKDKJiLNESc64M
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJZGa9rAAoJEJykq7OBq3PIPzoIAIvJSPuG2B2xejU65dvRKc6B
+ODGUY4eZ4tqEuwCJUbRDY2HeSbd8GilGR5qc+zkv7h/JpnO/p/7lq5mA+VY/5fUt
+Dz9Iflyi+IJbaAWVTbnhiKLVgGaJxG25eyiRhLzNY9maxFucs49ZNQLQ4bH9pXmM
+atkuyRBsKa5mhp2coHhIwibQuEUDzORIKzHu4FcP9loXiWOp7MzKoIsF7/L+q7ph
+xhlYBJzRo05u1m511i0Rrvp7Wm3TsciYbCUpx/Ca0MckUO26RbszGGLE4/poXiFV
+a/pbozyhjzAw7QYxtPsji/juRr6DdiSHMvbtQt6mqd21A42wyL7BDkxPBioaS3U=
+=722/
+-----END PGP SIGNATURE-----
+
+--yzvKDKJiLNESc64M--
