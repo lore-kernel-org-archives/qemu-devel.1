@@ -1,23 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60322)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35042)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1dA9Lc-0002LT-IK
-	for qemu-devel@nongnu.org; Mon, 15 May 2017 02:19:13 -0400
+	(envelope-from <armbru@redhat.com>) id 1dA9bb-0006fT-DK
+	for qemu-devel@nongnu.org; Mon, 15 May 2017 02:35:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1dA9LZ-0004Du-Pd
-	for qemu-devel@nongnu.org; Mon, 15 May 2017 02:19:12 -0400
-Received: from [59.151.112.132] (port=24427 helo=heian.cn.fujitsu.com)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1dA9LZ-00048O-3x
-	for qemu-devel@nongnu.org; Mon, 15 May 2017 02:19:09 -0400
-From: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
-Date: Mon, 15 May 2017 14:18:21 +0800
-Message-ID: <1494829102-1812-3-git-send-email-zhangchen.fnst@cn.fujitsu.com>
-In-Reply-To: <1494829102-1812-1-git-send-email-zhangchen.fnst@cn.fujitsu.com>
-References: <1494829102-1812-1-git-send-email-zhangchen.fnst@cn.fujitsu.com>
+	(envelope-from <armbru@redhat.com>) id 1dA9bY-0004kc-CQ
+	for qemu-devel@nongnu.org; Mon, 15 May 2017 02:35:43 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55578)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dA9bY-0004im-7F
+	for qemu-devel@nongnu.org; Mon, 15 May 2017 02:35:40 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 45CDA369C3
+	for <qemu-devel@nongnu.org>; Mon, 15 May 2017 06:35:38 +0000 (UTC)
+From: Markus Armbruster <armbru@redhat.com>
+References: <20170509173559.31598-1-marcandre.lureau@redhat.com>
+	<20170509173559.31598-5-marcandre.lureau@redhat.com>
+	<874lwqjzjl.fsf@dusky.pond.sub.org>
+	<20170512090335.6b20c3ec@redhat.com>
+Date: Mon, 15 May 2017 08:35:32 +0200
+In-Reply-To: <20170512090335.6b20c3ec@redhat.com> (Luiz Capitulino's message
+	of "Fri, 12 May 2017 09:03:35 -0400")
+Message-ID: <87bmqu4ogb.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH RESEND V2 2/3] net/filter-mirror.c: Rename
- filter_mirror_send() and fix codestyle
+Subject: Re: [Qemu-devel] [PATCH 04/17] qapi: merge QInt and QFloat in QNum
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,95 +35,19 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu devel <qemu-devel@nongnu.org>, Jason Wang <jasowang@redhat.com>
-Cc: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>, zhanghailiang <zhang.zhanghailiang@huawei.com>, Eric Blake <eblake@redhat.com>
+To: Luiz Capitulino <lcapitulino@redhat.com>
+Cc: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org
 
-Because filter_mirror_receive_iov() and filter_redirector_receive_iov()
-both use the filter_mirror_send() to send packet, so I change
-filter_mirror_send() to filter_send() that looks more common.
-And fix some codestyle.
+Luiz Capitulino <lcapitulino@redhat.com> writes:
 
-Signed-off-by: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
----
- net/filter-mirror.c | 29 ++++++++++++++++-------------
- 1 file changed, 16 insertions(+), 13 deletions(-)
+> On Fri, 12 May 2017 09:37:50 +0200
+> Markus Armbruster <armbru@redhat.com> wrote:
+>
+>> Luiz, there's a lone question for you further down.  Search for your
+>> name.
+>
+> I could not a question, can you paste it here?
 
-diff --git a/net/filter-mirror.c b/net/filter-mirror.c
-index fd0322f..8b1b069 100644
---- a/net/filter-mirror.c
-+++ b/net/filter-mirror.c
-@@ -43,9 +43,9 @@ typedef struct MirrorState {
-     SocketReadState rs;
- } MirrorState;
- 
--static int filter_mirror_send(CharBackend *chr_out,
--                              const struct iovec *iov,
--                              int iovcnt)
-+static int filter_send(CharBackend *chr_out,
-+                       const struct iovec *iov,
-+                       int iovcnt)
- {
-     int ret = 0;
-     ssize_t size = 0;
-@@ -141,9 +141,9 @@ static ssize_t filter_mirror_receive_iov(NetFilterState *nf,
-     MirrorState *s = FILTER_MIRROR(nf);
-     int ret;
- 
--    ret = filter_mirror_send(&s->chr_out, iov, iovcnt);
-+    ret = filter_send(&s->chr_out, iov, iovcnt);
-     if (ret) {
--        error_report("filter_mirror_send failed(%s)", strerror(-ret));
-+        error_report("filter mirror send failed(%s)", strerror(-ret));
-     }
- 
-     /*
-@@ -164,9 +164,9 @@ static ssize_t filter_redirector_receive_iov(NetFilterState *nf,
-     int ret;
- 
-     if (qemu_chr_fe_get_driver(&s->chr_out)) {
--        ret = filter_mirror_send(&s->chr_out, iov, iovcnt);
-+        ret = filter_send(&s->chr_out, iov, iovcnt);
-         if (ret) {
--            error_report("filter_mirror_send failed(%s)", strerror(-ret));
-+            error_report("filter redirector send failed(%s)", strerror(-ret));
-         }
-         return iov_size(iov, iovcnt);
-     } else {
-@@ -286,8 +286,9 @@ static char *filter_redirector_get_indev(Object *obj, Error **errp)
-     return g_strdup(s->indev);
- }
- 
--static void
--filter_redirector_set_indev(Object *obj, const char *value, Error **errp)
-+static void filter_redirector_set_indev(Object *obj,
-+                                        const char *value,
-+                                        Error **errp)
- {
-     MirrorState *s = FILTER_REDIRECTOR(obj);
- 
-@@ -302,8 +303,9 @@ static char *filter_mirror_get_outdev(Object *obj, Error **errp)
-     return g_strdup(s->outdev);
- }
- 
--static void
--filter_mirror_set_outdev(Object *obj, const char *value, Error **errp)
-+static void filter_mirror_set_outdev(Object *obj,
-+                                     const char *value,
-+                                     Error **errp)
- {
-     MirrorState *s = FILTER_MIRROR(obj);
- 
-@@ -323,8 +325,9 @@ static char *filter_redirector_get_outdev(Object *obj, Error **errp)
-     return g_strdup(s->outdev);
- }
- 
--static void
--filter_redirector_set_outdev(Object *obj, const char *value, Error **errp)
-+static void filter_redirector_set_outdev(Object *obj,
-+                                         const char *value,
-+                                         Error **errp)
- {
-     MirrorState *s = FILTER_REDIRECTOR(obj);
- 
--- 
-2.7.4
+Uh, I actually spun it out into its own message, so you don't have to
+wade through this one, then forgot to update this one.  I award myself
+one point out of ten for trying.
