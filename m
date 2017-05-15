@@ -1,21 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60323)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60325)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1dA9Lc-0002LU-IN
+	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1dA9Lc-0002LW-Iw
 	for qemu-devel@nongnu.org; Mon, 15 May 2017 02:19:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1dA9LZ-0004D2-FX
+	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1dA9La-0004Gb-Mb
 	for qemu-devel@nongnu.org; Mon, 15 May 2017 02:19:12 -0400
-Received: from [59.151.112.132] (port=40879 helo=heian.cn.fujitsu.com)
+Received: from [59.151.112.132] (port=48072 helo=heian.cn.fujitsu.com)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1dA9LZ-00046a-3m
-	for qemu-devel@nongnu.org; Mon, 15 May 2017 02:19:09 -0400
+	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1dA9La-000497-AD
+	for qemu-devel@nongnu.org; Mon, 15 May 2017 02:19:10 -0400
 From: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
-Date: Mon, 15 May 2017 14:18:19 +0800
-Message-ID: <1494829102-1812-1-git-send-email-zhangchen.fnst@cn.fujitsu.com>
+Date: Mon, 15 May 2017 14:18:22 +0800
+Message-ID: <1494829102-1812-4-git-send-email-zhangchen.fnst@cn.fujitsu.com>
+In-Reply-To: <1494829102-1812-1-git-send-email-zhangchen.fnst@cn.fujitsu.com>
+References: <1494829102-1812-1-git-send-email-zhangchen.fnst@cn.fujitsu.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH RESEND V2 0/3] Optimize filter-mirror and
- filter-rewriter
+Subject: [Qemu-devel] [PATCH RESEND V2 3/3] net/filter-rewriter: Remove
+ unused option in filter-rewriter
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,18 +29,23 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu devel <qemu-devel@nongnu.org>, Jason Wang <jasowang@redhat.com>
 Cc: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>, zhanghailiang <zhang.zhanghailiang@huawei.com>, Eric Blake <eblake@redhat.com>
 
-Fix some duplicate codes and remove unused codes.
+Signed-off-by: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
+---
+ qemu-options.hx | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-v2: Address Eric's comment on patch 3.
-
-Zhang Chen (3):
-  net/filter-mirror.c: Remove duplicate check code.
-  net/filter-mirror.c: Rename filter_mirror_send() and fix codestyle
-  net/filter-rewriter: Remove unused option in filter-rewriter
-
- net/filter-mirror.c | 35 ++++++++++++++++-------------------
- qemu-options.hx     |  2 +-
- 2 files changed, 17 insertions(+), 20 deletions(-)
-
+diff --git a/qemu-options.hx b/qemu-options.hx
+index f806af9..cbec279 100644
+--- a/qemu-options.hx
++++ b/qemu-options.hx
+@@ -4038,7 +4038,7 @@ Create a filter-redirector we need to differ outdev id from indev id, id can not
+ be the same. we can just use indev or outdev, but at least one of indev or outdev
+ need to be specified.
+ 
+-@item -object filter-rewriter,id=@var{id},netdev=@var{netdevid},rewriter-mode=@var{mode}[,queue=@var{all|rx|tx}]
++@item -object filter-rewriter,id=@var{id},netdev=@var{netdevid}[,queue=@var{all|rx|tx}]
+ 
+ Filter-rewriter is a part of COLO project.It will rewrite tcp packet to
+ secondary from primary to keep secondary tcp connection,and rewrite
 -- 
 2.7.4
