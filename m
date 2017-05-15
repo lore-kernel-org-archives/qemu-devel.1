@@ -1,27 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36535)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36783)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bobby.prani@gmail.com>) id 1dAHT3-00073B-3S
-	for qemu-devel@nongnu.org; Mon, 15 May 2017 10:59:25 -0400
+	(envelope-from <Milos.Stojanovic@rt-rk.com>) id 1dAHTx-0007Zw-0u
+	for qemu-devel@nongnu.org; Mon, 15 May 2017 11:00:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bobby.prani@gmail.com>) id 1dAHT2-0003km-7C
-	for qemu-devel@nongnu.org; Mon, 15 May 2017 10:59:25 -0400
-Received: from mail-yb0-x22c.google.com ([2607:f8b0:4002:c09::22c]:33200)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bobby.prani@gmail.com>)
-	id 1dAHT1-0003ke-Re
-	for qemu-devel@nongnu.org; Mon, 15 May 2017 10:59:24 -0400
-Received: by mail-yb0-x22c.google.com with SMTP id j17so28224654ybj.0
-	for <qemu-devel@nongnu.org>; Mon, 15 May 2017 07:59:23 -0700 (PDT)
+	(envelope-from <Milos.Stojanovic@rt-rk.com>) id 1dAHTq-00042Q-NH
+	for qemu-devel@nongnu.org; Mon, 15 May 2017 11:00:21 -0400
+Received: from mx2.rt-rk.com ([89.216.37.149]:45277 helo=mail.rt-rk.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <Milos.Stojanovic@rt-rk.com>)
+	id 1dAHTq-0003rR-Al
+	for qemu-devel@nongnu.org; Mon, 15 May 2017 11:00:14 -0400
+From: =?UTF-8?q?Milo=C5=A1=20Stojanovi=C4=87?= <Milos.Stojanovic@rt-rk.com>
+Date: Mon, 15 May 2017 16:59:40 +0200
+Message-Id: <1494860396-24930-1-git-send-email-Milos.Stojanovic@rt-rk.com>
 MIME-Version: 1.0
-In-Reply-To: <a4f70b68-ec18-4237-79fa-b106bc3e29d0@twiddle.net>
-References: <20170513155816.17294-1-bobby.prani@gmail.com>
-	<a4f70b68-ec18-4237-79fa-b106bc3e29d0@twiddle.net>
-From: Pranith Kumar <bobby.prani@gmail.com>
-Date: Mon, 15 May 2017 10:58:52 -0400
-Message-ID: <CAJhHMCC+1UA10c+2xT_BWhK-Aw6W2Z+5tTbtXyJG4rwBkY4MZw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH] tcg/i386: 'nop' instruction with 'lock'
- prefix is illegal
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v2 00/16] Augment support for signal handling
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,34 +25,128 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <rth@twiddle.net>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, "open list:All patches CC here" <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org, riku.voipio@iki.fi
+Cc: laurent@vivier.eu, Miodrag.Dinic@rt-rk.com, Aleksandar.Markovic@rt-rk.com, Petar.Jovanovic@rt-rk.com, yongbok.kim@imgtec.com, Milos.Stojanovic@rt-rk.com
 
-On Sun, May 14, 2017 at 5:12 PM, Richard Henderson <rth@twiddle.net> wrote:
->>
-> Surely you'd also want to make this change for 0x11a and 0x11b.  Which would
-> also simplify that code a bit.
->
-> That said, there's *lots* of missing LOCK prefix checks.  What brings this
-> one in particular to your attention?
->
+Change from v1 to v2:
+tswapal_target_sigset() is no longer static since it was breaking the bui=
+ld.
 
-The motivation for this change is here:
-https://github.com/aquynh/capstone/issues/915
+This patch set deals with QEMU Linux user mode functionalities related to
+signal handling. It is composed of four sections:
 
-Apparently LLVM generates it in certain scenarios when padding with
-multi-byte nop (it shouldn't).
+A. Extend strace support (patches 1-2, 8-9):
 
->From what I understand, a proper instruction like "lock; <valid inst>"
-is converted to "lock; multi-byte nop; <valid inst>" due to code
-alignment.
+   Strace support is added for getuid(), gettid(), getppid(), geteuid(),
+   tkill(), tgkill() and rt_sigqueueinfo(), along with support for printi=
+ng
+   the uinfo structure of rt_sigqueueinfo() of rt_tgsigqueueinfo() instea=
+d
+   of a pointer to it. Additionally, some minor fixes of inconsistent spa=
+ces
+   in the output of print_siginfo() are added.
 
-There were bugs reported regarding this:
-https://bugs.chromium.org/p/nativeclient/issues/detail?id=3929
+B. Fix some signal handling issues (patches 3-5):
 
-I am not sure we want to fix this, but I thought it would be easy
-enough to cover this case.
+   Fix the ssetmask() system call by removing the invocation of
+   sigorset() using the old and the new signal masks as arguments.
+   Change the unlock_user() argument from arg1 to arg3 to match with
+   lock_user(), since arg3 contains the pointer to the siginfo_t structur=
+e.
+   Change the type of the first argument of rt_sigqueinfo()
+   from int to pid_t in the syscall declaration.
 
-Thanks,
--- 
-Pranith
+C. Adding support for rt_tgsigqueueinfo() (patches 6-7):
+
+   Add a new system call: rt_tgsigqueueinfo().
+
+   This system call is similar to rt_sigqueueinfo(), but instead of
+   sending the signal and data to the whole thread group with the ID
+   equal to the argument tgid, it sends it to a single thread within
+   that thread group. The ID of the thread is specified by the tid
+   argument.
+
+   The implementation is based on the rt_sigqueueinfo() in linux-user
+   mode, where the tid is added as the second argument and the
+   previous second and third argument become arguments three and four,
+   respectively.
+
+D. Add support for larger target signal range (RFC patches 10-16):
+
+   Add target signal mask tracking and multiplexing of target signals out
+   of the host range. The patches are marked as RFC because they introduc=
+e
+   significant new functionalities regarding signal handling in QEMU.
+
+   Currently, QEMU has a copy of the host signal and suspend masks and
+   that is usually enough, since most of the time the signal mask of the
+   target architecture is either the same length or narrower. If however
+   the signal mask is wider, then part of it won't be tracked. The signal=
+s
+   that are in the target range but out of the host range were treated li=
+ke
+   faulty signals and couldn't be used. This problem is solved by enablin=
+g
+   the usage of one of the host signals as a multiplex for all the target
+   signals that are out of range. In order to have the target signal mask=
+s
+   available, tracking of target signal masks is implemented.
+
+   The rt_sigqueueinfo()/rt_tgsigqueueinfo() system calls multiplex targe=
+t
+   signals by setting the si_errno value to the actual value of the signa=
+l
+   and sending the signal to a predefined host signal number.
+   The host_signal_handler() will pull out the multiplexed signals and se=
+t
+   their signal number to the correct value. The si_errno field is used
+   here but this implementation can be replaced with any other unused fie=
+ld
+   in the uinfo structure. Using this implementation both rt_sigqueueinfo=
+(),
+   rt_tgsigqueueinfo(), as well as kill() (for pid > 0) and tgkill() can =
+be
+   emulated.
+
+   The tkill() system call and kill() with the argument pid <=3D 0 couldn=
+'t
+   be implemented simply using this method because it requires acquiring
+   information about, and sending simultaneous signals to multiple thread=
+s
+   or processes. These functionalities are out of the scope of
+   rt_sigqueueinfo()/rt_tgsigqueueinfo().
+
+Milo=C5=A1 Stojanovi=C4=87 (16):
+  linux-user: add strace for getuid(), gettid(), getppid(), geteuid()
+  linux-user: add tkill(), tgkill() and rt_sigqueueinfo() strace
+  linux-user: fix ssetmask() system call
+  linux-user: fix mismatch of lock/unlock_user() invocations in
+    rt_sigqueinfo() syscall
+  linux-user: fix argument type declaration of rt_sigqueinfo() syscall
+  linux-user: add support for rt_tgsigqueueinfo() system call
+  linux-user: add rt_tgsigqueueinfo() strace
+  linux-user: fix inconsistent spaces in print_siginfo() output
+  linux-user: add strace support for uinfo structure of
+    rt_sigqueueinfo() and rt_tgsigqueueinfo()
+  [RFC] linux-user: add support for tracking the target signal mask
+  [RFC] linux-user: add target_sigdelset() and target_sigorset()
+  [RFC] linux-user: fix sigismember() check
+  [RFC] linux-user: add functions for working with the target signal
+    mask
+  [RFC] linux-user: add functionality for tracking target signal mask
+  [RFC] linux-user: add support for multiplexing larger target signals
+  [RFC] linux-user: add support for multiplexing signals in
+    rt_sigqueueinfo(), rt_tgsigqueueinfo(), kill() and tgkill()
+    syscalls.
+
+ linux-user/qemu.h         |  11 +++
+ linux-user/signal.c       | 235 ++++++++++++++++++++++++++++++++++++++++=
++++++-
+ linux-user/strace.c       | 177 ++++++++++++++++++++++++++++++++--
+ linux-user/strace.list    |  16 ++--
+ linux-user/syscall.c      | 208 +++++++++++++++++++++++++++++++++++++---
+ linux-user/syscall_defs.h |  32 +++++++
+ 6 files changed, 651 insertions(+), 28 deletions(-)
+
+--=20
+1.9.1
