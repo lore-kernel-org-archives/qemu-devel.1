@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38562)
-	by lists.gnu.org with esmtp (Exim 4.71) (envelope-from <pl@kamp.de>)
-	id 1dAE9D-000095-Em
-	for qemu-devel@nongnu.org; Mon, 15 May 2017 07:26:44 -0400
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41519)
+	by lists.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <groug@kaod.org>) id 1dAELV-0003rl-Pm
+	for qemu-devel@nongnu.org; Mon, 15 May 2017 07:39:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pl@kamp.de>) id 1dAE98-0005IL-It
-	for qemu-devel@nongnu.org; Mon, 15 May 2017 07:26:43 -0400
-Received: from mx-v6.kamp.de ([2a02:248:0:51::16]:34137 helo=mx01.kamp.de)
+	(envelope-from <groug@kaod.org>) id 1dAELR-00023Q-PY
+	for qemu-devel@nongnu.org; Mon, 15 May 2017 07:39:25 -0400
+Received: from 7.mo69.mail-out.ovh.net ([46.105.50.32]:36521)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pl@kamp.de>) id 1dAE98-0005HM-9v
-	for qemu-devel@nongnu.org; Mon, 15 May 2017 07:26:38 -0400
-References: <1494842563-6534-1-git-send-email-pl@kamp.de>
-	<20170515105032.GD23262@lemon.lan>
-From: Peter Lieven <pl@kamp.de>
-Message-ID: <26b2441d-e80c-eeef-fba1-67b2529e9287@kamp.de>
-Date: Mon, 15 May 2017 13:26:34 +0200
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1dAELR-0001yj-JA
+	for qemu-devel@nongnu.org; Mon, 15 May 2017 07:39:21 -0400
+Received: from player699.ha.ovh.net (b9.ovh.net [213.186.33.59])
+	by mo69.mail-out.ovh.net (Postfix) with ESMTP id EBF6C1FB35
+	for <qemu-devel@nongnu.org>; Mon, 15 May 2017 13:39:11 +0200 (CEST)
+From: Greg Kurz <groug@kaod.org>
+Date: Mon, 15 May 2017 13:38:58 +0200
+Message-ID: <149484833874.20089.4164801378197848306.stgit@bahia.lan>
 MIME-Version: 1.0
-In-Reply-To: <20170515105032.GD23262@lemon.lan>
-Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC PATCH] qemu-io: add drain/undrain cmd
+Subject: [Qemu-devel] [PATCH 0/6] spapr/xics: fix migration of older machine
+ types
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,35 +28,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>
-Cc: qemu-block@nongnu.org, kwolf@redhat.com, qemu-devel@nongnu.org, mreitz@redhat.com
+To: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+Cc: Bharata B Rao <bharata@linux.vnet.ibm.com>, Cedric Le Goater <clg@kaod.org>, David Gibson <david@gibson.dropbear.id.au>
 
-Am 15.05.2017 um 12:50 schrieb Fam Zheng:
-> On Mon, 05/15 12:02, Peter Lieven wrote:
->> Hi Block developers,
->>
->> I would like to add a feature to Qemu to drain all traffic from a block so that
->> I can take external snaphosts without the risk to that in the middle of a write
->> operation. Its meant for cases where where QGA freeze/thaw is not available.
->>
->> For me its enough to have this through qemu-io, but Kevin asked me to check
->> if its not worth to have a stable API for it and present it via QMP/HMP.
->>
->> What are your thoughts?
-> For debugging purpose or a "hacky" usage where you know what you are doing, it
-> may be fine to have this. The only issue is it should be a separate flag, like
-> BlockJob.user_paused.
+Recent work on XICS broke migration of older machine types. The target
+fails with:
 
-How can I add, remove such a flag?
+qemu-system-ppc64: Unknown savevm section or instance 'icp/server' 1
+qemu-system-ppc64: load of migration failed: Invalid argument
 
->
-> What happens from guest perspective? In the case of virtio, the request queue is
-> not handled and -ETIMEDOUT may happen. With IDE, I/O commands are still handled,
-> the command is not effective (or rather the implementation is not complete).
+This happens because the current code no longer pre-allocates ICP objects
+at machine init time.
 
-That it only works with virtio is fine. However, the thing it does not work correctly
-apply then also to all other users of the drained_begin/end functions, right?
-As for the timeout I only plan to drain the device for about 1 second.
+This series restore the previous behavior for older machine types (patch 6).
+Since the fix adds an error path to cover the case when realization of the
+ICP objects fails, the series first does some cleanup on the way errors are
+handled (patch 1-5).
 
-Thanks,
-Peter
+I could successfully migrate older machines back and forth with QEMU 2.9:
+- pseries-2.9
+- pseries-2.9 with hotplugged CPUs
+- pseries-2.6 (pre CPU hotplug support)
+
+This series is based on:
+
+https://github.com/dgibson/qemu.git ppc-for-2.10
+
+--
+Greg
+
+---
+
+Greg Kurz (6):
+      ppc/xics: simplify prototype of xics_spapr_init()
+      spapr: fix error path of required kernel-irqchip
+      spapr: fix error reporting in xics_system_init()
+      spapr: sanitize error handling in spapr_ics_create()
+      spapr-cpu-core: release ICP object when realization fails
+      spapr: fix migration of ICP objects from/to older QEMU
+
+
+ hw/intc/xics_spapr.c    |    3 +-
+ hw/ppc/spapr.c          |   75 ++++++++++++++++++++++++++++++++++++++---------
+ hw/ppc/spapr_cpu_core.c |   40 ++++++++++++++++---------
+ include/hw/ppc/spapr.h  |    2 +
+ include/hw/ppc/xics.h   |    2 +
+ 5 files changed, 90 insertions(+), 32 deletions(-)
