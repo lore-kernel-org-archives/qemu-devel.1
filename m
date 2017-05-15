@@ -1,36 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47452)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48885)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dAJxI-0007Q2-7I
-	for qemu-devel@nongnu.org; Mon, 15 May 2017 13:38:49 -0400
+	(envelope-from <mreitz@redhat.com>) id 1dAK1t-0000jA-KF
+	for qemu-devel@nongnu.org; Mon, 15 May 2017 13:43:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dAJxD-00007S-8Z
-	for qemu-devel@nongnu.org; Mon, 15 May 2017 13:38:48 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:40060)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dAJxC-00007H-VO
-	for qemu-devel@nongnu.org; Mon, 15 May 2017 13:38:43 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id BD8E4AB99E
-	for <qemu-devel@nongnu.org>; Mon, 15 May 2017 17:38:41 +0000 (UTC)
-Date: Mon, 15 May 2017 18:38:34 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170515173834.GI2089@work-vm>
-References: <20170512034033.GN28293@pxdev.xzpeter.org>
-	<877f1mgx9h.fsf@secure.mitica>
-	<5bab598f-30eb-fcf6-9d06-8f683b466414@redhat.com>
-	<87lgpyfo28.fsf@secure.mitica> <87k25iqf4m.fsf@dusky.pond.sub.org>
-	<87efvqdqqj.fsf@secure.mitica> <20170515163841.GB2324@work-vm>
-	<87a86edpot.fsf@secure.mitica> <20170515172736.GA26717@work-vm>
-	<871srqdnvw.fsf@secure.mitica>
+	(envelope-from <mreitz@redhat.com>) id 1dAK1s-0001yb-G8
+	for qemu-devel@nongnu.org; Mon, 15 May 2017 13:43:33 -0400
+References: <20170515140410.14172-1-berrange@redhat.com>
+	<20170515140410.14172-5-berrange@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <e2a74028-c9c0-6b6a-4c13-27fab303a2e1@redhat.com>
+Date: Mon, 15 May 2017 19:43:15 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <871srqdnvw.fsf@secure.mitica>
-Subject: Re: [Qemu-devel] [PATCH 2/3] migration: Remove use of old
- MigrationParams
+In-Reply-To: <20170515140410.14172-5-berrange@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="5oSjNrDpF9TMmst0t5srtwjccgsoPxkeJ"
+Subject: Re: [Qemu-devel] [PATCH v9 4/4] qemu-img: copy *key-secret opts
+ when opening newly created files
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,122 +25,178 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Juan Quintela <quintela@redhat.com>
-Cc: Markus Armbruster <armbru@redhat.com>, Eric Blake <eblake@redhat.com>, lvivier@redhat.com, qemu-devel@nongnu.org, Peter Xu <peterx@redhat.com>
+To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Eric Blake <eblake@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Fam Zheng <famz@redhat.com>
 
-* Juan Quintela (quintela@redhat.com) wrote:
-> "Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
-> > * Juan Quintela (quintela@redhat.com) wrote:
-> >> "Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
-> >> > * Juan Quintela (quintela@redhat.com) wrote:
-> >> >> Markus Armbruster <armbru@redhat.com> wrote:
-> >> >> > Juan Quintela <quintela@redhat.com> writes:
-> >> >> >
-> >> >> >> Eric Blake <eblake@redhat.com> wrote:
-> >> >> 
-> >> >> 
-> >> >> >>> Or is the proposal that we are also going to simplify the QMP 'migrate'
-> >> >> >>> command to get rid of crufty parameters?
-> >> >> >>
-> >> >> >> I didn't read it that way, but I would not oppose O:-)
-> >> >> >>
-> >> >> >> Later, Juan.
-> >> >> >
-> >> >> > I'm not too familiar with this stuff, so please correct my
-> >> >> > misunderstandings.
-> >> >> >
-> >> >> > "Normal" migration configuration is global state, i.e. it applies to all
-> >> >> > future migrations.
-> >> >> >
-> >> >> > Except the "migrate" command's flags apply to just the migration kicked
-> >> >> > off by that command.
-> >> >> >
-> >> >> > QMP command "migrate" has two flags "blk" (HMP: -b) and "inc" (HMP: -i).
-> >> >> > !blk && inc makes no sense and is silently treated like !blk && !inc.
-> >> >> >
-> >> >> > There's a third flag "detach" (HMP: -d), but it does nothing in QMP.
-> >> >> 
-> >> >> As qmp command is asynchronous, you can think that -d is *always* on in
-> >> >> QMP O:-)
-> >> >> 
-> >> >> > You'd like to deprecate these flags in favour of "normal" configuration.
-> >> >> > However, we need to maintain QMP backward compatibility at least for a
-> >> >> > while.  HMP backward compatibility is nice to have, but not required.
-> >> >> >
-> >> >> > First step is to design the new interface you want.  Second step is to
-> >> >> > figure out backward compatibility.
-> >> >> >
-> >> >> > The new interface adds a block migration tri-state (off,
-> >> >> > non-incremental, incremental) to global state, default off.  Whether
-> >> >> > it's done as two bools or an enum of three values doesn't matter here.
-> >> >> 
-> >> >> Tristates will complicate it.  I still think that:
-> >> >> 
-> >> >> - capability: block_migration
-> >> >> - parameter: block_shared
-> >> >> 
-> >> >> Makes more sense, no?
-> >> >
-> >> > I don't understand what making block_shared a parameter gives you as
-> >> > opposed to simply having two capabilities.
-> >> >
-> >> > (And how did we get 'shared'? We started off with block & incremental)
-> >> 
-> >> The variables on MigrationParams:
-> >> 
-> >> struct MigrationParams {
-> >>     bool blk;
-> >>     bool shared;
-> >> };
-> >> 
-> >> 
-> >> I can move to incremental.  I am not sure which one is clearer.
-> >> 
-> >> The advantage of having shared as a parameter is that we forget about
-> >> all this dependency bussiness.  Is the same than compression_threads
-> >> paramter, you setup to whichever value that you want.  But you don't get
-> >> compression_threads until you set the compress capability.
-> >> 
-> >> So, in this case we will have:
-> >> 
-> >> block capability: Are we using block migration or not
-> >> block-incremental parameter: If we are using block migration, are we
-> >>       using incremental copying of the block layer?
-> >
-> > If it's still a boolean why does having it as a parameter remove the
-> > dependency?
-> 
-> Forget -b/-i.
-> 
-> migration_set_parameter compression_threads 8
-> 
-> migrate <foo>
-> 
-> We don't use compression_threads at all
-> 
-> migrate_set_capability compress
-> 
-> migrate <foo>
-> 
-> Now, we use compression threads.
-> 
-> So, compression_threads parameter is a parameter that is only used when
-> compress capability is enabled.
-> 
-> Same for block migration.  Block_incremental parameter is used only when
-> block migration capability is setup.  No dependency check needed at all.
-> 
-> Or I am losing something obvious here?
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--5oSjNrDpF9TMmst0t5srtwjccgsoPxkeJ
+From: Max Reitz <mreitz@redhat.com>
+To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Eric Blake <eblake@redhat.com>,
+ Kevin Wolf <kwolf@redhat.com>, Fam Zheng <famz@redhat.com>
+Message-ID: <e2a74028-c9c0-6b6a-4c13-27fab303a2e1@redhat.com>
+Subject: Re: [PATCH v9 4/4] qemu-img: copy *key-secret opts when opening newly
+ created files
+References: <20170515140410.14172-1-berrange@redhat.com>
+ <20170515140410.14172-5-berrange@redhat.com>
+In-Reply-To: <20170515140410.14172-5-berrange@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Ah, you've made up a new rule - I don't think it's a bad rule
-but is it true? Do we always enable a capability before we use a
-parameter? I don't think so - I think the tls parameters don't have
-a capability.
-My previous rule was just that if it was a bool it was a capability
-and you can have whatever dependencies you like there - or none.
+On 2017-05-15 16:04, Daniel P. Berrange wrote:
+> The qemu-img dd/convert commands will create an image file and
+> then try to open it. Historically it has been possible to open
+> new files without passing any options. With encrypted files
+> though, the *key-secret options are mandatory, so we need to
+> provide those options when opening the newly created file.
+>=20
+> Reviewed-by: Max Reitz <mreitz@redhat.com>
+> Reviewed-by: Fam Zheng <famz@redhat.com>
+> Reviewed-by: Eric Blake <eblake@redhat.com>
+> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
+> ---
+>  qemu-img.c | 42 +++++++++++++++++++++++++++++++++++++-----
+>  1 file changed, 37 insertions(+), 5 deletions(-)
+>=20
+> diff --git a/qemu-img.c b/qemu-img.c
+> index e0e3d31..dcddded 100644
+> --- a/qemu-img.c
+> +++ b/qemu-img.c
+> @@ -314,15 +314,18 @@ static BlockBackend *img_open_opts(const char *op=
+tstr,
+>  }
+> =20
+>  static BlockBackend *img_open_file(const char *filename,
+> +                                   QDict *options,
+>                                     const char *fmt, int flags,
+>                                     bool writethrough, bool quiet,
+>                                     bool force_share)
+>  {
+>      BlockBackend *blk;
+>      Error *local_err =3D NULL;
+> -    QDict *options =3D qdict_new();
+> =20
+>      if (fmt) {
+> +        if (!options) {
+> +            options =3D qdict_new();
+> +        }
 
-Dave
+This is the only place where my attempted rebase and your version
+differ. I think this has to be done unconditionally, because otherwise:
 
-> Later, Juan.
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+$ ./qemu-img info -U null-co://
+[1]    16327 segmentation fault (core dumped)  ./qemu-img info -U null-co=
+://
+
+Also, I'm not sure the R-bs apply for this patch any longer.
+
+(They do for patch 1 because it's just a contextual difference. For
+patch 2, it's a borderline case (I would drop it, but I can understand
+keeping it). For patch 3 it's more than just borderline - I would
+definitely drop the R-b, but the differences are still rather
+mechanical, so it is acceptable to keep it.
+But I think there are too many changes here in this patch to keep the
+R-bs. In fact, I'm pretty sure none of Eric, Fam and me have given an
+R-b to this segfault...)
+
+Max
+
+>          qdict_put_str(options, "driver", fmt);
+>      }
+> =20
+> @@ -344,6 +347,35 @@ static BlockBackend *img_open_file(const char *fil=
+ename,
+>  }
+> =20
+> =20
+> +static int img_add_key_secrets(void *opaque,
+> +                               const char *name, const char *value,
+> +                               Error **errp)
+> +{
+> +    QDict *options =3D opaque;
+> +
+> +    if (g_str_has_suffix(name, "key-secret")) {
+> +        qdict_put(options, name, qstring_from_str(value));
+> +    }
+> +
+> +    return 0;
+> +}
+> +
+> +static BlockBackend *img_open_new_file(const char *filename,
+> +                                       QemuOpts *create_opts,
+> +                                       const char *fmt, int flags,
+> +                                       bool writethrough, bool quiet,
+> +                                       bool force_share)
+> +{
+> +    QDict *options =3D NULL;
+> +
+> +    options =3D qdict_new();
+> +    qemu_opt_foreach(create_opts, img_add_key_secrets, options, &error=
+_abort);
+> +
+> +    return img_open_file(filename, options, fmt, flags, writethrough, =
+quiet,
+> +                         force_share);
+> +}
+> +
+> +
+>  static BlockBackend *img_open(bool image_opts,
+>                                const char *filename,
+>                                const char *fmt, int flags, bool writeth=
+rough,
+> @@ -364,7 +396,7 @@ static BlockBackend *img_open(bool image_opts,
+>          blk =3D img_open_opts(filename, opts, flags, writethrough, qui=
+et,
+>                              force_share);
+>      } else {
+> -        blk =3D img_open_file(filename, fmt, flags, writethrough, quie=
+t,
+> +        blk =3D img_open_file(filename, NULL, fmt, flags, writethrough=
+, quiet,
+>                              force_share);
+>      }
+>      return blk;
+> @@ -2286,8 +2318,8 @@ static int img_convert(int argc, char **argv)
+>           * That has to wait for bdrv_create to be improved
+>           * to allow filenames in option syntax
+>           */
+> -        s.target =3D img_open_file(out_filename, out_fmt, flags,
+> -                                 writethrough, quiet, false);
+> +        s.target =3D img_open_new_file(out_filename, opts, out_fmt,
+> +                                     flags, writethrough, quiet, false=
+);
+>      }
+>      if (!s.target) {
+>          ret =3D -1;
+> @@ -4351,7 +4383,7 @@ static int img_dd(int argc, char **argv)
+>       * with the bdrv_create() call above which does not
+>       * support image-opts style.
+>       */
+> -    blk2 =3D img_open_file(out.filename, out_fmt, BDRV_O_RDWR,
+> +    blk2 =3D img_open_file(out.filename, NULL, out_fmt, BDRV_O_RDWR,
+>                           false, false, false);
+> =20
+>      if (!blk2) {
+>=20
+
+
+
+--5oSjNrDpF9TMmst0t5srtwjccgsoPxkeJ
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iQEvBAEBCAAZBQJZGeizEhxtcmVpdHpAcmVkaGF0LmNvbQAKCRD0B9sAYdXPQJ04
+B/9af+5Ym1Zl+U4Ug3UY0Px7G//mmIf6Ij+PikEhE0tYkqEvOnkeUpQNYTExt0p8
+/kqlPky37QD9J+i19uwpvk/qVnHcAHnjmNH70HShrFk/Wm9QJpQQOZ3y5e67lG6B
+5pngoCkIB7V7f5hWPT+oAeepgXdz4QwHDLevRoHPrfVZpeBpqwAB+Pp8aN/atXZk
+unJmWmtvkbqRD+U9iTFTXLVB9G1USWLIjhywP51rs+iZUgPjzpTFsWC8PwDWba2R
+EvM90iesl0F9tFw3PGiCpgJOkSyD5N9C6WUV1ji+mfFeuycTkQ39KM+up6S6UJe+
+4lpngcDUxieuFxqwAbjl97TT
+=fY37
+-----END PGP SIGNATURE-----
+
+--5oSjNrDpF9TMmst0t5srtwjccgsoPxkeJ--
