@@ -1,21 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54376)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51396)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dANkd-0005K5-3s
-	for qemu-devel@nongnu.org; Mon, 15 May 2017 17:42:03 -0400
+	(envelope-from <flypie1@yahoo.com>) id 1dAK96-0004oJ-QU
+	for qemu-devel@nongnu.org; Mon, 15 May 2017 13:51:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dANkc-0004tZ-6g
-	for qemu-devel@nongnu.org; Mon, 15 May 2017 17:41:59 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:51602)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dANkb-0004tI-Tc
-	for qemu-devel@nongnu.org; Mon, 15 May 2017 17:41:58 -0400
-From: Eric Blake <eblake@redhat.com>
-Date: Mon, 15 May 2017 16:41:12 -0500
-Message-Id: <20170515214114.15442-4-eblake@redhat.com>
-In-Reply-To: <20170515214114.15442-1-eblake@redhat.com>
-References: <20170515214114.15442-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PATCH v9 3/5] shutdown: Preserve shutdown cause
- through replay
+	(envelope-from <flypie1@yahoo.com>) id 1dAK92-0004mv-OU
+	for qemu-devel@nongnu.org; Mon, 15 May 2017 13:51:00 -0400
+Received: from nm10-vm8.bullet.mail.ir2.yahoo.com ([212.82.96.160]:45306)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
+	(envelope-from <flypie1@yahoo.com>) id 1dAK92-0004lP-3w
+	for qemu-devel@nongnu.org; Mon, 15 May 2017 13:50:56 -0400
+Date: Mon, 15 May 2017 17:50:47 +0000 (UTC)
+From: John Bradley <flypie1@yahoo.com>
+Reply-To: John Bradley <flypie1@yahoo.com>
+Message-ID: <1337329283.3100470.1494870647989@mail.yahoo.com>
+In-Reply-To: <CAKmqyKPy35OuMkixGnDXOvApAu82uXrtQStSz4GzHNRStdFFNA@mail.gmail.com>
+References: <757990479.60759.1494722527715.ref@mail.yahoo.com>
+	<757990479.60759.1494722527715@mail.yahoo.com>
+	<CAKmqyKPy35OuMkixGnDXOvApAu82uXrtQStSz4GzHNRStdFFNA@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] Changes to Broadcom(BCM) files and Raspberry Pi
+ files. Addition of PanelEmu
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,117 +30,124 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: armbru@redhat.com, berrange@redhat.com, alistair.francis@xilinx.com, Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>, Paolo Bonzini <pbonzini@redhat.com>
+To: Alistair Francis <alistair.francis@xilinx.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, John Bradley <flypie@rocketmail.com>, Laurent Vivier <lvivier@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>, Markus Armbruster <armbru@redhat.com>
 
-With the recent addition of ShutdownCause, we want to be able to pass
-a cause through any shutdown request, and then faithfully replay that
-cause when later replaying the same sequence.  The easiest way is to
-expand the reply event mechanism to track a series of values for
-EVENT_SHUTDOWN, one corresponding to each value of ShutdownCause.
+Hi,
+That is going to be very difficult as a lot of the changes are interlinked =
+the vast majority of the patch is new files.=C2=A0John BradleyTel: 07896 83=
+9635Skype: flypie125 125B Grove StreetEdge Hill Liverpool L7 7AF=20
 
-We are free to change the replay stream as needed, since there are
-already no guarantees about being able to use a replay stream by
-any other version of qemu than the one that generated it.
+    On Monday, 15 May 2017, 17:54, Alistair Francis <alistair.francis@xilin=
+x.com> wrote:
+=20
 
-The cause is not actually fed back until the next patch changes the
-signature for requesting a shutdown; a TODO marks that upcoming change.
+ On Sat, May 13, 2017 at 5:42 PM, John Bradley via Qemu-devel
+<qemu-devel@nongnu.org> wrote:
+> From 7f74f048f135d9c9c230a9e90f72451c841c6d35 Mon Sep 17 00:00:00 2001
+> From: John Bradley <flypie@rocketmail.com>
+> Date: Sat, 13 May 2017 23:07:47 +0100
+> Subject: [PATCH] Changes to Broadcom(BCM) files and Raspberry Pi files.
+> Addition of PanelEmu
+>
+> The files add the ability to attach, via TCP, a panel emulator
+> The include a unification of several PD Raspberry PI additions
+> A modification to dev-network to all circle SDK WWW client to work
+> The DummyPanel is not included but available at
+> https://github.com/flypie/GDummyPanel.git
+>
+> Signed-off-by: John Bradley <flypie@rocketmail.com>
 
-Yes, this uses the gcc/clang extension of a ranged case label,
-but this is not the first time we've used non-C99 constructs.
+Hey John,
 
-Signed-off-by: Eric Blake <eblake@redhat.com>
-Reviewed-by: Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
+Thanks for the patch!
 
----
-v8: hoist earlier in series, tweaks minor enough to keep R-b
-v7: rebase to context
-v6: new patch
----
- include/sysemu/replay.h  | 3 ++-
- replay/replay-internal.h | 3 ++-
- vl.c                     | 2 +-
- replay/replay.c          | 7 ++++---
- 4 files changed, 9 insertions(+), 6 deletions(-)
+Unfortunately this patch is too long to review, you need to split the
+patch up into shorter more readable patches. Otherwise it's too hard
+to people to understand what you are changing and why.
 
-diff --git a/include/sysemu/replay.h b/include/sysemu/replay.h
-index f1c0712..fa14d0e 100644
---- a/include/sysemu/replay.h
-+++ b/include/sysemu/replay.h
-@@ -13,6 +13,7 @@
-  */
+There are some details here:
+http://wiki.qemu.org/Contribute/SubmitAPatch about how to split up
+patches. Each patch applied in order shouldn't break any compilation
+or runtime. Generally the flow is to add the logic in earlier patches
+and then connect it and switch it on in the later patches.
 
- #include "qapi-types.h"
-+#include "sysemu.h"
+Try splitting up adding/editing each individual device and send that
+our first. That is generally the easiest to review/accept.
 
- /* replay clock kinds */
- enum ReplayClockKind {
-@@ -98,7 +99,7 @@ int64_t replay_read_clock(ReplayClockKind kind);
- /* Events */
+Thanks,
 
- /*! Called when qemu shutdown is requested. */
--void replay_shutdown_request(void);
-+void replay_shutdown_request(ShutdownCause cause);
- /*! Should be called at check points in the execution.
-     These check points are skipped, if they were not met.
-     Saves checkpoint in the SAVE mode and validates in the PLAY mode.
-diff --git a/replay/replay-internal.h b/replay/replay-internal.h
-index ed66ed8..3ebb199 100644
---- a/replay/replay-internal.h
-+++ b/replay/replay-internal.h
-@@ -22,8 +22,9 @@ enum ReplayEvents {
-     EVENT_EXCEPTION,
-     /* for async events */
-     EVENT_ASYNC,
--    /* for shutdown request */
-+    /* for shutdown requests, range allows recovery of ShutdownCause */
-     EVENT_SHUTDOWN,
-+    EVENT_SHUTDOWN_LAST = EVENT_SHUTDOWN + SHUTDOWN_CAUSE__MAX,
-     /* for character device write event */
-     EVENT_CHAR_WRITE,
-     /* for character device read all event */
-diff --git a/vl.c b/vl.c
-index 5c61d8c..51ed60f 100644
---- a/vl.c
-+++ b/vl.c
-@@ -1821,8 +1821,8 @@ void qemu_system_killed(int signal, pid_t pid)
- void qemu_system_shutdown_request(void)
- {
-     trace_qemu_system_shutdown_request();
--    replay_shutdown_request();
-     /* TODO - add a parameter to allow callers to specify reason */
-+    replay_shutdown_request(SHUTDOWN_CAUSE_HOST_ERROR);
-     shutdown_requested = SHUTDOWN_CAUSE_HOST_ERROR;
-     qemu_notify_event();
- }
-diff --git a/replay/replay.c b/replay/replay.c
-index f810628..bf94e81 100644
---- a/replay/replay.c
-+++ b/replay/replay.c
-@@ -49,8 +49,9 @@ bool replay_next_event_is(int event)
-             res = true;
-         }
-         switch (replay_state.data_kind) {
--        case EVENT_SHUTDOWN:
-+        case EVENT_SHUTDOWN ... EVENT_SHUTDOWN_LAST:
-             replay_finish_event();
-+            /* TODO - pass replay_state.data_kind - EVENT_SHUTDOWN as cause */
-             qemu_system_shutdown_request();
-             break;
-         default:
-@@ -170,11 +171,11 @@ bool replay_has_interrupt(void)
-     return res;
- }
+Alistair
 
--void replay_shutdown_request(void)
-+void replay_shutdown_request(ShutdownCause cause)
- {
-     if (replay_mode == REPLAY_MODE_RECORD) {
-         replay_mutex_lock();
--        replay_put_event(EVENT_SHUTDOWN);
-+        replay_put_event(EVENT_SHUTDOWN + cause);
-         replay_mutex_unlock();
-     }
- }
--- 
-2.9.4
+> ---
+> .gitignore=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 |=C2=A0 54 ++
+> hw/arm/Makefile.objs=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 |=C2=A0 =C2=A0 2 +-
+> hw/arm/bcm2835.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 |=C2=A0 114 ++++
+> hw/arm/bcm2835_peripherals.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 |=C2=A0 104 ++++
+> hw/arm/bcm2836.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 |=C2=A0 =C2=A0 3 +-
+> hw/arm/raspi.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 |=C2=A0 77 ++-
+> hw/gpio/bcm2835_gpio.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 |=
+=C2=A0 333 ++++++-----
+> hw/misc/Makefile.objs=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 |=C2=A0 =C2=A0 2 +
+> hw/misc/bcm2835_mphi.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 |=
+=C2=A0 163 ++++++
+> hw/misc/bcm2835_power.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 |=
+=C2=A0 106 ++++
+> hw/timer/Makefile.objs=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 |=
+=C2=A0 =C2=A0 2 +
+> hw/timer/bcm2835_st.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 |=C2=A0 202 +++++++
+> hw/timer/bcm2835_timer.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 |=C2=A0=
+ 224 +++++++
+> hw/usb/Makefile.objs=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 |=C2=A0 =C2=A0 4 +-
+> hw/usb/bcm2835_usb.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 |=C2=A0 604 +++++++++++++++++++
+> hw/usb/bcm2835_usb_regs.h=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 | 1061=
+ ++++++++++++++++++++++++++++++++++
+> hw/usb/dev-network.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 |=C2=A0 =C2=A0 2 +-
+> include/hw/arm/bcm2835.h=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 |=C2=A0=
+ 37 ++
+> include/hw/arm/bcm2835_peripherals.h |=C2=A0 10 +
+> include/hw/gpio/bcm2835_gpio.h=C2=A0 =C2=A0 =C2=A0 |=C2=A0 =C2=A0 5 +
+> include/hw/intc/bcm2835_control.h=C2=A0 =C2=A0 |=C2=A0 53 ++
+> include/hw/intc/bcm2836_control.h=C2=A0 =C2=A0 |=C2=A0 =C2=A0 2 +
+> include/hw/misc/bcm2835_mphi.h=C2=A0 =C2=A0 =C2=A0 |=C2=A0 28 +
+> include/hw/misc/bcm2835_power.h=C2=A0 =C2=A0 =C2=A0 |=C2=A0 22 +
+> include/hw/timer/bcm2835_st.h=C2=A0 =C2=A0 =C2=A0 =C2=A0 |=C2=A0 25 +
+> include/hw/timer/bcm2835_timer.h=C2=A0 =C2=A0 |=C2=A0 32 +
+> include/hw/usb/bcm2835_usb.h=C2=A0 =C2=A0 =C2=A0 =C2=A0 |=C2=A0 78 +++
+> include/qemu/PanelEmu.h=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 |=
+=C2=A0 53 ++
+> util/Makefile.objs=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 |=C2=A0 =C2=A0 1 +
+> util/PanelEmu.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 |=C2=A0 293 ++++++++++
+> 30 files changed, 3547 insertions(+), 149 deletions(-)
+> create mode 100644 hw/arm/bcm2835.c
+> create mode 100644 hw/misc/bcm2835_mphi.c
+> create mode 100644 hw/misc/bcm2835_power.c
+> create mode 100644 hw/timer/bcm2835_st.c
+> create mode 100644 hw/timer/bcm2835_timer.c
+> create mode 100644 hw/usb/bcm2835_usb.c
+> create mode 100644 hw/usb/bcm2835_usb_regs.h
+> create mode 100644 include/hw/arm/bcm2835.h
+> create mode 100644 include/hw/intc/bcm2835_control.h
+> create mode 100644 include/hw/misc/bcm2835_mphi.h
+> create mode 100644 include/hw/misc/bcm2835_power.h
+> create mode 100644 include/hw/timer/bcm2835_st.h
+> create mode 100644 include/hw/timer/bcm2835_timer.h
+> create mode 100644 include/hw/usb/bcm2835_usb.h
+> create mode 100644 include/qemu/PanelEmu.h
+> create mode 100644 util/PanelEmu.c
+>
+
+
+  =20
