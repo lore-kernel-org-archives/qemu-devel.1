@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41519)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41533)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1dAELV-0003rl-Pm
-	for qemu-devel@nongnu.org; Mon, 15 May 2017 07:39:26 -0400
+	(envelope-from <groug@kaod.org>) id 1dAELW-0003rw-W8
+	for qemu-devel@nongnu.org; Mon, 15 May 2017 07:39:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1dAELR-00023Q-PY
-	for qemu-devel@nongnu.org; Mon, 15 May 2017 07:39:25 -0400
-Received: from 7.mo69.mail-out.ovh.net ([46.105.50.32]:36521)
+	(envelope-from <groug@kaod.org>) id 1dAELT-00024d-1a
+	for qemu-devel@nongnu.org; Mon, 15 May 2017 07:39:27 -0400
+Received: from 8.mo69.mail-out.ovh.net ([46.105.56.233]:38823)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1dAELR-0001yj-JA
-	for qemu-devel@nongnu.org; Mon, 15 May 2017 07:39:21 -0400
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1dAELS-00023W-Rd
+	for qemu-devel@nongnu.org; Mon, 15 May 2017 07:39:22 -0400
 Received: from player699.ha.ovh.net (b9.ovh.net [213.186.33.59])
-	by mo69.mail-out.ovh.net (Postfix) with ESMTP id EBF6C1FB35
-	for <qemu-devel@nongnu.org>; Mon, 15 May 2017 13:39:11 +0200 (CEST)
+	by mo69.mail-out.ovh.net (Postfix) with ESMTP id 7487C1FC57
+	for <qemu-devel@nongnu.org>; Mon, 15 May 2017 13:39:21 +0200 (CEST)
 From: Greg Kurz <groug@kaod.org>
-Date: Mon, 15 May 2017 13:38:58 +0200
-Message-ID: <149484833874.20089.4164801378197848306.stgit@bahia.lan>
+Date: Mon, 15 May 2017 13:39:16 +0200
+Message-ID: <149484835694.20089.2114938170632779266.stgit@bahia.lan>
+In-Reply-To: <149484833874.20089.4164801378197848306.stgit@bahia.lan>
+References: <149484833874.20089.4164801378197848306.stgit@bahia.lan>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] [PATCH 0/6] spapr/xics: fix migration of older machine
- types
+Subject: [Qemu-devel] [PATCH 1/6] ppc/xics: simplify prototype of
+ xics_spapr_init()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,46 +33,59 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 Cc: Bharata B Rao <bharata@linux.vnet.ibm.com>, Cedric Le Goater <clg@kaod.org>, David Gibson <david@gibson.dropbear.id.au>
 
-Recent work on XICS broke migration of older machine types. The target
-fails with:
+This function only does hypercall and RTAS-call registration, and thus
+never returns an error. This patch adapt the prototype to reflect that.
 
-qemu-system-ppc64: Unknown savevm section or instance 'icp/server' 1
-qemu-system-ppc64: load of migration failed: Invalid argument
-
-This happens because the current code no longer pre-allocates ICP objects
-at machine init time.
-
-This series restore the previous behavior for older machine types (patch 6).
-Since the fix adds an error path to cover the case when realization of the
-ICP objects fails, the series first does some cleanup on the way errors are
-handled (patch 1-5).
-
-I could successfully migrate older machines back and forth with QEMU 2.9:
-- pseries-2.9
-- pseries-2.9 with hotplugged CPUs
-- pseries-2.6 (pre CPU hotplug support)
-
-This series is based on:
-
-https://github.com/dgibson/qemu.git ppc-for-2.10
-
---
-Greg
-
+Signed-off-by: Greg Kurz <groug@kaod.org>
 ---
+ hw/intc/xics_spapr.c  |    3 +--
+ hw/ppc/spapr.c        |    2 +-
+ include/hw/ppc/xics.h |    2 +-
+ 3 files changed, 3 insertions(+), 4 deletions(-)
 
-Greg Kurz (6):
-      ppc/xics: simplify prototype of xics_spapr_init()
-      spapr: fix error path of required kernel-irqchip
-      spapr: fix error reporting in xics_system_init()
-      spapr: sanitize error handling in spapr_ics_create()
-      spapr-cpu-core: release ICP object when realization fails
-      spapr: fix migration of ICP objects from/to older QEMU
-
-
- hw/intc/xics_spapr.c    |    3 +-
- hw/ppc/spapr.c          |   75 ++++++++++++++++++++++++++++++++++++++---------
- hw/ppc/spapr_cpu_core.c |   40 ++++++++++++++++---------
- include/hw/ppc/spapr.h  |    2 +
- include/hw/ppc/xics.h   |    2 +
- 5 files changed, 90 insertions(+), 32 deletions(-)
+diff --git a/hw/intc/xics_spapr.c b/hw/intc/xics_spapr.c
+index f05308b897f2..d98ea8b13068 100644
+--- a/hw/intc/xics_spapr.c
++++ b/hw/intc/xics_spapr.c
+@@ -229,7 +229,7 @@ static void rtas_int_on(PowerPCCPU *cpu, sPAPRMachineState *spapr,
+     rtas_st(rets, 0, RTAS_OUT_SUCCESS);
+ }
+ 
+-int xics_spapr_init(sPAPRMachineState *spapr, Error **errp)
++void xics_spapr_init(sPAPRMachineState *spapr)
+ {
+     /* Registration of global state belongs into realize */
+     spapr_rtas_register(RTAS_IBM_SET_XIVE, "ibm,set-xive", rtas_set_xive);
+@@ -243,7 +243,6 @@ int xics_spapr_init(sPAPRMachineState *spapr, Error **errp)
+     spapr_register_hypercall(H_XIRR_X, h_xirr_x);
+     spapr_register_hypercall(H_EOI, h_eoi);
+     spapr_register_hypercall(H_IPOLL, h_ipoll);
+-    return 0;
+ }
+ 
+ #define ICS_IRQ_FREE(ics, srcno)   \
+diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+index 1b7cadab0cdf..abfb99b71b7d 100644
+--- a/hw/ppc/spapr.c
++++ b/hw/ppc/spapr.c
+@@ -139,7 +139,7 @@ static void xics_system_init(MachineState *machine, int nr_irqs, Error **errp)
+     }
+ 
+     if (!spapr->ics) {
+-        xics_spapr_init(spapr, errp);
++        xics_spapr_init(spapr);
+         spapr->icp_type = TYPE_ICP;
+         spapr->ics = spapr_ics_create(spapr, TYPE_ICS_SIMPLE, nr_irqs, errp);
+     }
+diff --git a/include/hw/ppc/xics.h b/include/hw/ppc/xics.h
+index 05e6acbb3533..d6cb51f3ad5d 100644
+--- a/include/hw/ppc/xics.h
++++ b/include/hw/ppc/xics.h
+@@ -206,6 +206,6 @@ void icp_resend(ICPState *ss);
+ typedef struct sPAPRMachineState sPAPRMachineState;
+ 
+ int xics_kvm_init(sPAPRMachineState *spapr, Error **errp);
+-int xics_spapr_init(sPAPRMachineState *spapr, Error **errp);
++void xics_spapr_init(sPAPRMachineState *spapr);
+ 
+ #endif /* XICS_H */
