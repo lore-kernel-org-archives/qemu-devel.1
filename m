@@ -1,25 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36925)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36876)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Milos.Stojanovic@rt-rk.com>) id 1dAHUE-0007lk-T9
-	for qemu-devel@nongnu.org; Mon, 15 May 2017 11:00:44 -0400
+	(envelope-from <eblake@redhat.com>) id 1dAHU7-0007gA-8o
+	for qemu-devel@nongnu.org; Mon, 15 May 2017 11:00:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <Milos.Stojanovic@rt-rk.com>) id 1dAHU9-00049C-WA
-	for qemu-devel@nongnu.org; Mon, 15 May 2017 11:00:38 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:45437 helo=mail.rt-rk.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <Milos.Stojanovic@rt-rk.com>)
-	id 1dAHU9-00048H-Om
-	for qemu-devel@nongnu.org; Mon, 15 May 2017 11:00:33 -0400
-From: =?UTF-8?q?Milo=C5=A1=20Stojanovi=C4=87?= <Milos.Stojanovic@rt-rk.com>
-Date: Mon, 15 May 2017 16:59:41 +0200
-Message-Id: <1494860396-24930-2-git-send-email-Milos.Stojanovic@rt-rk.com>
-In-Reply-To: <1494860396-24930-1-git-send-email-Milos.Stojanovic@rt-rk.com>
-References: <1494860396-24930-1-git-send-email-Milos.Stojanovic@rt-rk.com>
+	(envelope-from <eblake@redhat.com>) id 1dAHU6-00047E-Dc
+	for qemu-devel@nongnu.org; Mon, 15 May 2017 11:00:31 -0400
+References: <20170515141014.25793-1-famz@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <efc90945-9b9e-9e52-80b6-96ab49294858@redhat.com>
+Date: Mon, 15 May 2017 10:00:16 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v2 01/16] linux-user: add strace for getuid(),
- gettid(), getppid(), geteuid()
+In-Reply-To: <20170515141014.25793-1-famz@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="MM0koiRnqC2AhJFFovG4CSi23AnPqLqd9"
+Subject: Re: [Qemu-devel] [PATCH] qemu-img: Fix leakage of options on error
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,81 +23,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, riku.voipio@iki.fi
-Cc: laurent@vivier.eu, Miodrag.Dinic@rt-rk.com, Aleksandar.Markovic@rt-rk.com, Petar.Jovanovic@rt-rk.com, yongbok.kim@imgtec.com, Milos.Stojanovic@rt-rk.com
+To: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 
-Improve strace support for syscalls getuid(), gettid(), getppid()
-and geteuid(). Since these system calls don't have arguments, "%s()"
-is added in the corresponding strace.list entry so that no arguments
-are printed.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--MM0koiRnqC2AhJFFovG4CSi23AnPqLqd9
+From: Eric Blake <eblake@redhat.com>
+To: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org,
+ Max Reitz <mreitz@redhat.com>
+Message-ID: <efc90945-9b9e-9e52-80b6-96ab49294858@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] qemu-img: Fix leakage of options on error
+References: <20170515141014.25793-1-famz@redhat.com>
+In-Reply-To: <20170515141014.25793-1-famz@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-getuid:
-Prior to this commit, typical strace output used to look like this:
-4894 getuid(4894,0,0,274886293296,-3689348814741910323,4832615904) =3D 10=
-00
-After this commit, it looks like this:
-4894 getuid() =3D 1000
+On 05/15/2017 09:10 AM, Fam Zheng wrote:
+> Reported by Coverity.
+>=20
+> Signed-off-by: Fam Zheng <famz@redhat.com>
+> ---
+>  qemu-img.c | 1 +
+>  1 file changed, 1 insertion(+)
 
-gettid:
-Prior to this commit, typical strace output used to look like this:
-8307 gettid(0,0,64,0,4832630528,4832615840) =3D 8307
-After this commit, it looks like this:
-8307 gettid() =3D 8307
+Reviewed-by: Eric Blake <eblake@redhat.com>
 
-getppid:
-Prior to this commit, typical strace output used to look like this:
-20588 getppid(20588,64,0,4832630528,4832615888,0) =3D 20625
-After this commit, it looks like this:
-20588 getppid() =3D 20625
 
-geteuid:
-Prior to this commit, typical strace output used to look like this:
-20588 geteuid(64,0,0,4832615888,0,-9151031864016699136) =3D 1000
-After this commit, it looks like this:
-20588 geteuid() =3D 1000
-
-Signed-off-by: Milo=C5=A1 Stojanovi=C4=87 <Milos.Stojanovic@rt-rk.com>
----
- linux-user/strace.list | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
-
-diff --git a/linux-user/strace.list b/linux-user/strace.list
-index 3b1282e..6e33788 100644
---- a/linux-user/strace.list
-+++ b/linux-user/strace.list
-@@ -290,7 +290,7 @@
- { TARGET_NR_getegid32, "getegid32" , NULL, NULL, NULL },
- #endif
- #ifdef TARGET_NR_geteuid
--{ TARGET_NR_geteuid, "geteuid" , NULL, NULL, NULL },
-+{ TARGET_NR_geteuid, "geteuid" , "%s()", NULL, NULL },
- #endif
- #ifdef TARGET_NR_geteuid32
- { TARGET_NR_geteuid32, "geteuid32" , NULL, NULL, NULL },
-@@ -338,7 +338,7 @@
- { TARGET_NR_getpmsg, "getpmsg" , NULL, NULL, NULL },
- #endif
- #ifdef TARGET_NR_getppid
--{ TARGET_NR_getppid, "getppid" , NULL, NULL, NULL },
-+{ TARGET_NR_getppid, "getppid" , "%s()", NULL, NULL },
- #endif
- #ifdef TARGET_NR_getpriority
- { TARGET_NR_getpriority, "getpriority", "%s(%#x,%#x)", NULL, NULL },
-@@ -381,13 +381,13 @@
-   NULL, NULL },
- #endif
- #ifdef TARGET_NR_gettid
--{ TARGET_NR_gettid, "gettid" , NULL, NULL, NULL },
-+{ TARGET_NR_gettid, "gettid" , "%s()", NULL, NULL },
- #endif
- #ifdef TARGET_NR_gettimeofday
- { TARGET_NR_gettimeofday, "gettimeofday" , NULL, NULL, NULL },
- #endif
- #ifdef TARGET_NR_getuid
--{ TARGET_NR_getuid, "getuid" , NULL, NULL, NULL },
-+{ TARGET_NR_getuid, "getuid" , "%s()", NULL, NULL },
- #endif
- #ifdef TARGET_NR_getuid32
- { TARGET_NR_getuid32, "getuid32" , NULL, NULL, NULL },
 --=20
-1.9.1
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--MM0koiRnqC2AhJFFovG4CSi23AnPqLqd9
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEcBAEBCAAGBQJZGcKAAAoJEKeha0olJ0NqxPwIAK8npkcABfeHPuh1HQNFGgxa
+tCQgwwrV+eB6S383KkyCPx9gE2SpU618ezjRu5uaQP4s+lgPRshjUUOTDkymXf3r
+1doVIfGsmjyitsfZI1iXQb8YsOmldcg5jhoZbtYUi3f08hvCEIrnpPRZ214yzBBw
+kCsDjg0kr6yusoLKg1ReEBfRSuHfMIrSYS78jk7W8u8FbL5YRaeazBN5MM/bFBYc
+jErplmFDPPNaEUIfrSiVZqS5xM90cxxfxy4X0aGGVivAnIHISIaQq/GpC9E+emww
+KK1paRMGZuQr9GimLIFp2uF1KdZf9PCywLTwtRTuiIWnlhYGbhnGz/D7JgCCmQk=
+=i6Qo
+-----END PGP SIGNATURE-----
+
+--MM0koiRnqC2AhJFFovG4CSi23AnPqLqd9--
