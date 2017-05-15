@@ -1,21 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51109)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51455)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1dAEt7-0005Ge-42
-	for qemu-devel@nongnu.org; Mon, 15 May 2017 08:14:12 -0400
+	(envelope-from <peterx@redhat.com>) id 1dAEvQ-00066V-Il
+	for qemu-devel@nongnu.org; Mon, 15 May 2017 08:16:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1dAEt1-0000nX-An
-	for qemu-devel@nongnu.org; Mon, 15 May 2017 08:14:09 -0400
-Resent-Message-Id: <E1dAEt1-0000nX-An@eggs.gnu.org>
-In-Reply-To: <149484833874.20089.4164801378197848306.stgit@bahia.lan>
-Message-ID: <149485041417.489.11034345945561703613@c05f1edc8ed1>
-Reply-To: <qemu-devel@nongnu.org>
+	(envelope-from <peterx@redhat.com>) id 1dAEvN-0001f8-BG
+	for qemu-devel@nongnu.org; Mon, 15 May 2017 08:16:32 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:51329)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1dAEvN-0001eL-5z
+	for qemu-devel@nongnu.org; Mon, 15 May 2017 08:16:29 -0400
+Date: Mon, 15 May 2017 20:16:20 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20170515121620.GD31572@pxdev.xzpeter.org>
+References: <1494838260-30439-1-git-send-email-peterx@redhat.com>
+	<1494838260-30439-3-git-send-email-peterx@redhat.com>
+	<6c4a5786-0ac0-4e25-9398-cd233dce7c17@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Mon, 15 May 2017 05:13:34 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH 0/6] spapr/xics: fix migration of older
- machine types
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <6c4a5786-0ac0-4e25-9398-cd233dce7c17@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 2/4] exec: rename resolve_subpage
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,48 +28,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: groug@kaod.org
-Cc: famz@redhat.com, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, david@gibson.dropbear.id.au, clg@kaod.org, bharata@linux.vnet.ibm.com
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, "Michael S . Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKU3ViamVjdDogW1FlbXUt
-ZGV2ZWxdIFtQQVRDSCAwLzZdIHNwYXByL3hpY3M6IGZpeCBtaWdyYXRpb24gb2Ygb2xkZXIgbWFj
-aGluZSB0eXBlcwpNZXNzYWdlLWlkOiAxNDk0ODQ4MzM4NzQuMjAwODkuNDE2NDgwMTM3ODE5Nzg0
-ODMwNi5zdGdpdEBiYWhpYS5sYW4KVHlwZTogc2VyaWVzCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4g
-PT09CiMhL2Jpbi9iYXNoCgpCQVNFPWJhc2UKbj0xCnRvdGFsPSQoZ2l0IGxvZyAtLW9uZWxpbmUg
-JEJBU0UuLiB8IHdjIC1sKQpmYWlsZWQ9MAoKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1l
-bGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKCmNvbW1pdHM9IiQo
-Z2l0IGxvZyAtLWZvcm1hdD0lSCAtLXJldmVyc2UgJEJBU0UuLikiCmZvciBjIGluICRjb21taXRz
-OyBkbwogICAgZWNobyAiQ2hlY2tpbmcgUEFUQ0ggJG4vJHRvdGFsOiAkKGdpdCBsb2cgLW4gMSAt
-LWZvcm1hdD0lcyAkYykuLi4iCiAgICBpZiAhIGdpdCBzaG93ICRjIC0tZm9ybWF0PWVtYWlsIHwg
-Li9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFjayAtOyB0aGVuCiAgICAgICAgZmFpbGVk
-PTEKICAgICAgICBlY2hvCiAgICBmaQogICAgbj0kKChuKzEpKQpkb25lCgpleGl0ICRmYWlsZWQK
-PT09IFRFU1QgU0NSSVBUIEVORCA9PT0KClVwZGF0aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFk
-ZWY3ZjQ0YmQ4ODg3MTMzODQKRnJvbSBodHRwczovL2dpdGh1Yi5jb20vcGF0Y2hldy1wcm9qZWN0
-L3FlbXUKIC0gW3RhZyB1cGRhdGVdICAgICAgcGF0Y2hldy8xNDk0ODQ4MzM4NzQuMjAwODkuNDE2
-NDgwMTM3ODE5Nzg0ODMwNi5zdGdpdEBiYWhpYS5sYW4gLT4gcGF0Y2hldy8xNDk0ODQ4MzM4NzQu
-MjAwODkuNDE2NDgwMTM3ODE5Nzg0ODMwNi5zdGdpdEBiYWhpYS5sYW4KU3dpdGNoZWQgdG8gYSBu
-ZXcgYnJhbmNoICd0ZXN0JwozYzM4MjRhIHNwYXByOiBmaXggbWlncmF0aW9uIG9mIElDUCBvYmpl
-Y3RzIGZyb20vdG8gb2xkZXIgUUVNVQoyODAxNjRmIHNwYXByLWNwdS1jb3JlOiByZWxlYXNlIElD
-UCBvYmplY3Qgd2hlbiByZWFsaXphdGlvbiBmYWlscwo1YmM3MmViIHNwYXByOiBzYW5pdGl6ZSBl
-cnJvciBoYW5kbGluZyBpbiBzcGFwcl9pY3NfY3JlYXRlKCkKZmExNWQwMCBzcGFwcjogZml4IGVy
-cm9yIHJlcG9ydGluZyBpbiB4aWNzX3N5c3RlbV9pbml0KCkKZWNiZTIzNCBzcGFwcjogZml4IGVy
-cm9yIHBhdGggb2YgcmVxdWlyZWQga2VybmVsLWlycWNoaXAKYjdjZjczZCBwcGMveGljczogc2lt
-cGxpZnkgcHJvdG90eXBlIG9mIHhpY3Nfc3BhcHJfaW5pdCgpCgo9PT0gT1VUUFVUIEJFR0lOID09
-PQpDaGVja2luZyBQQVRDSCAxLzY6IHBwYy94aWNzOiBzaW1wbGlmeSBwcm90b3R5cGUgb2YgeGlj
-c19zcGFwcl9pbml0KCkuLi4KQ2hlY2tpbmcgUEFUQ0ggMi82OiBzcGFwcjogZml4IGVycm9yIHBh
-dGggb2YgcmVxdWlyZWQga2VybmVsLWlycWNoaXAuLi4KQ2hlY2tpbmcgUEFUQ0ggMy82OiBzcGFw
-cjogZml4IGVycm9yIHJlcG9ydGluZyBpbiB4aWNzX3N5c3RlbV9pbml0KCkuLi4KQ2hlY2tpbmcg
-UEFUQ0ggNC82OiBzcGFwcjogc2FuaXRpemUgZXJyb3IgaGFuZGxpbmcgaW4gc3BhcHJfaWNzX2Ny
-ZWF0ZSgpLi4uCkNoZWNraW5nIFBBVENIIDUvNjogc3BhcHItY3B1LWNvcmU6IHJlbGVhc2UgSUNQ
-IG9iamVjdCB3aGVuIHJlYWxpemF0aW9uIGZhaWxzLi4uCkNoZWNraW5nIFBBVENIIDYvNjogc3Bh
-cHI6IGZpeCBtaWdyYXRpb24gb2YgSUNQIG9iamVjdHMgZnJvbS90byBvbGRlciBRRU1VLi4uCkVS
-Uk9SOiAiZm9vKiBiYXIiIHNob3VsZCBiZSAiZm9vICpiYXIiCiM1MDogRklMRTogaHcvcHBjL3Nw
-YXByLmM6MTY3OgorICAgICAgICAgICAgdm9pZCogb2JqID0gJnNwYXByLT5sZWdhY3lfaWNwc1tp
-XTsKCnRvdGFsOiAxIGVycm9ycywgMCB3YXJuaW5ncywgMTIyIGxpbmVzIGNoZWNrZWQKCllvdXIg
-cGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNl
-IGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVy
-LCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCj09PSBPVVRQVVQgRU5EID09PQoKVGVz
-dCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9t
-YXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlv
-dXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEBmcmVlbGlzdHMub3Jn
+On Mon, May 15, 2017 at 11:03:49AM +0200, Paolo Bonzini wrote:
+> 
+> 
+> On 15/05/2017 10:50, Peter Xu wrote:
+> > It is not easy for people to know "what this parameter does" before
+> > knowing "what is subpage". Let's use "is_mmio" to make it easier to
+> > understand.
+> > 
+> > Signed-off-by: Peter Xu <peterx@redhat.com>
+> 
+> Maybe invert the direction and call it for_iotlb?
+
+I wasn't aware that tcg is using resolve_subpage==false always. Then
+at least is_mmio does not suite here. I am not sure whether for-iotlb
+suites here either... So maybe I will just drop this patch as well,
+just like patch 3.
+
+Thanks for reviewing it!
+
+-- 
+Peter Xu
