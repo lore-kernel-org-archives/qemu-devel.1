@@ -1,36 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54245)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54339)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1dAIWF-000330-1x
-	for qemu-devel@nongnu.org; Mon, 15 May 2017 12:06:48 -0400
+	(envelope-from <groug@kaod.org>) id 1dAIWq-0003Ye-9i
+	for qemu-devel@nongnu.org; Mon, 15 May 2017 12:07:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1dAIWB-0000eS-S7
-	for qemu-devel@nongnu.org; Mon, 15 May 2017 12:06:46 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:38522)
+	(envelope-from <groug@kaod.org>) id 1dAIWn-0000j2-2A
+	for qemu-devel@nongnu.org; Mon, 15 May 2017 12:07:24 -0400
+Received: from 3.mo69.mail-out.ovh.net ([188.165.52.203]:37335)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1dAIWB-0000eI-J0
-	for qemu-devel@nongnu.org; Mon, 15 May 2017 12:06:43 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 8E7234E338
-	for <qemu-devel@nongnu.org>; Mon, 15 May 2017 16:06:42 +0000 (UTC)
-From: Juan Quintela <quintela@redhat.com>
-In-Reply-To: <87r2zqqged.fsf@dusky.pond.sub.org> (Markus Armbruster's message
-	of "Mon, 15 May 2017 17:38:34 +0200")
-References: <20170511163228.6666-1-quintela@redhat.com>
-	<20170511163228.6666-2-quintela@redhat.com>
-	<0bbb5f93-83bb-47b9-e7dd-d0824f3d8b61@redhat.com>
-	<87pofafoek.fsf@secure.mitica> <20170515094655.GC2089@work-vm>
-	<6ad3d1a1-ae63-b01d-b6a0-72a017b343aa@redhat.com>
-	<87r2zqqged.fsf@dusky.pond.sub.org>
-Reply-To: quintela@redhat.com
-Date: Mon, 15 May 2017 18:06:40 +0200
-Message-ID: <87inl2drzj.fsf@secure.mitica>
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1dAIWm-0000ip-Mr
+	for qemu-devel@nongnu.org; Mon, 15 May 2017 12:07:20 -0400
+Received: from player699.ha.ovh.net (b9.ovh.net [213.186.33.59])
+	by mo69.mail-out.ovh.net (Postfix) with ESMTP id 48AD01FC2D
+	for <qemu-devel@nongnu.org>; Mon, 15 May 2017 18:07:18 +0200 (CEST)
+From: Greg Kurz <groug@kaod.org>
+Date: Mon, 15 May 2017 18:07:12 +0200
+Message-ID: <149486383099.19357.10170962018755572073.stgit@bahia.lan>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH 1/3] migration: Create block capabilities
- for shared and enable
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Subject: [Qemu-devel] [PATCH] 9pfs: local: forbid client access to metadata
+ (CVE-2017-7493)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,112 +28,186 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: Eric Blake <eblake@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, lvivier@redhat.com, qemu-devel@nongnu.org, peterx@redhat.com
+To: qemu-devel@nongnu.org
+Cc: Leo Gaspard <leo@gaspard.io>, Prasad J Pandit <prasad@redhat.com>, Eric Blake <eblake@redhat.com>, Greg Kurz <groug@kaod.org>
 
-Markus Armbruster <armbru@redhat.com> wrote:
-> Eric Blake <eblake@redhat.com> writes:
->
->> On 05/15/2017 04:46 AM, Dr. David Alan Gilbert wrote:
->>> * Juan Quintela (quintela@redhat.com) wrote:
->>>> Eric Blake <eblake@redhat.com> wrote:
->>>>> On 05/11/2017 11:32 AM, Juan Quintela wrote:
->>>>>> Those two capabilities were added through the command line.  Notice that
->>>>>> we just created them.  This is just the boilerplate.
->>>>>>
->>>>>> Signed-off-by: Juan Quintela <quintela@redhat.com>
->>>>>> Reviewed-by: Eric Blake <eblake@redhat.com>
->>>>>>
->>>>>> --
->>>>>>
->>>>>> Make migrate_set_block_* take a boolean argument.
->>>>>
->>>>> Question - do we support the orthogonal selection of all 4 combinations
->>>>> under HMP 'migrate' (no argument, -b alone, -i alone, -b and -i
->>>>> together), or are there only 3 actual states? If the latter, should we
->>>>> represent this as a single enum-valued property, rather than as two
->>>>> independent boolean properties?
->>>>
->>>> { 'enum': 'MigrationCapability',
->>>>   'data': ['xbzrle', 'rdma-pin-all', 'auto-converge', 'zero-blocks',
->>>>            'compress', 'events', 'postcopy-ram', 'x-colo', 'release-ram'] }
->>>>
->>>>
->>>> My understanding is that we can only have boolean capabilities here.
->>>> Or, how could we put a non-boolean capability?
->>
->> If we want a non-boolean, then we make it a migration parameter rather
->> than a migration capability.  There may be other advantages to using
->> MigrationParameter instead of MigrationCapability (such as making it
->> easier to figure out whether the parameter settings are persistent or
->> apply per-migration).
->
-> What makes a migration knob a MigrationCapability rather than a
-> MigrationParameter?  Type bool, or is there more to it?
+When using the mapped-file security mode, we shouldn't let the client mess
+with the metadata. The current code already tries to hide the metadata dir
+from the client by skipping it in local_readdir(). But the client can still
+access or modify it through several other operations. This can be used to
+escalate privileges in the guest.
 
-I didn't started this, but *my* undersanding:
+Affected backend operations are:
+- local_mknod()
+- local_mkdir()
+- local_open2()
+- local_symlink()
+- local_link()
+- local_unlinkat()
+- local_renameat()
+- local_rename()
+- local_name_to_path()
 
-Migration capability: we have to set this up before migration starts.
-It is like a property that we can't change later.  We can't add a
-compression thread in the middle of migration (notice that we "could"
-but current code can't).
+Other operations are safe because they are only passed a fid path, which
+is computed internally in local_name_to_path().
 
-So, block enabled migration is a capability.
+This patch converts all the functions listed above to fail and return
+EINVAL when being passed the name of the metadata dir. This may look
+like a poor choice for errno, but there's no such thing as an illegal
+path name on Linux and I could not think of anything better.
 
-Block shared on the other hand is weird.  *My* understading of the code
-is that we have a qcow2 overlay on top of the base image, and:
+This fixes CVE-2017-7493.
 
-- without shared: we migrate all the block device
-- with shared: we migrate only the top overlay
+Reported-by: Leo Gaspard <leo@gaspard.io>
+Signed-off-by: Greg Kurz <groug@kaod.org>
+---
+ hw/9pfs/9p-local.c |   58 ++++++++++++++++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 56 insertions(+), 2 deletions(-)
 
-So, thisk could be a parameter of block migration.  If anyone understand
-better than me, please stand up.
+I had already sent a similar fix as part of a bigger patchset 10 days ago,
+but it turned out that a CVE got created since then for this specific issue.
+I hence repost a standalone patch with some minor changes and an updated
+changelog.
 
->>> Lets keep this simple and stick with the booleans.
->>> 
->>> Dave
->>> 
->>>> There are three states as far as I can see.
->
-> Begs the question how the fourth state behaves.  Documentation is of no
-> help:
->
->     diff --git a/qapi-schema.json b/qapi-schema.json
->     index 5728b7f..109852e 100644
->     --- a/qapi-schema.json
->     +++ b/qapi-schema.json
->     @@ -894,11 +894,16 @@
->      # @release-ram: if enabled, qemu will free the migrated ram pages on the source
->      #        during postcopy-ram migration. (since 2.9)
->      #
->     +# @block-enabled: enable block migration (Since 2.10)
->     +#
->     +# @block-shared: enable block shared migration (Since 2.10)
->     +#
->      # Since: 1.2
->      ##
->
-> Please explain all four states clearly there.
+Eric,
 
-Is the previous explanation enough?
+I'd appreciate if you could review this, so that I can send a pull request
+ASAP.
 
->> I'll leave it up to you as maintainers which way you prefer, I'm just
->> offering the potential design tradeoffs for simplicity of booleans (but
->> complexity in an unused state) vs. simplicity of design (but complexity
->> in code).
->
-> For what it's worth, I dislike entangled booleans.
+Thanks.
 
-Some here, but except if we put shared as a migration parameter, I don't
-know what to do here.
+--
+Greg
 
-{ 'enum': 'MigrationParameter',
-  'data': ['compress-level', 'compress-threads', 'decompress-threads',
-           'cpu-throttle-initial', 'cpu-throttle-increment',
-           'tls-creds', 'tls-hostname', 'max-bandwidth',
-           'downtime-limit', 'x-checkpoint-delay' ] }
-
-
-I don't see either how to define that block_shared will be a boolean parameter.
-
-Later, Juan.
+diff --git a/hw/9pfs/9p-local.c b/hw/9pfs/9p-local.c
+index f3ebca4f7a56..a2486566afb7 100644
+--- a/hw/9pfs/9p-local.c
++++ b/hw/9pfs/9p-local.c
+@@ -452,6 +452,11 @@ static off_t local_telldir(FsContext *ctx, V9fsFidOpenState *fs)
+     return telldir(fs->dir.stream);
+ }
+ 
++static bool local_is_mapped_file_metadata(FsContext *fs_ctx, const char *name)
++{
++    return !strcmp(name, VIRTFS_META_DIR);
++}
++
+ static struct dirent *local_readdir(FsContext *ctx, V9fsFidOpenState *fs)
+ {
+     struct dirent *entry;
+@@ -465,8 +470,8 @@ again:
+     if (ctx->export_flags & V9FS_SM_MAPPED) {
+         entry->d_type = DT_UNKNOWN;
+     } else if (ctx->export_flags & V9FS_SM_MAPPED_FILE) {
+-        if (!strcmp(entry->d_name, VIRTFS_META_DIR)) {
+-            /* skp the meta data directory */
++        if (local_is_mapped_file_metadata(ctx, entry->d_name)) {
++            /* skip the meta data directory */
+             goto again;
+         }
+         entry->d_type = DT_UNKNOWN;
+@@ -559,6 +564,12 @@ static int local_mknod(FsContext *fs_ctx, V9fsPath *dir_path,
+     int err = -1;
+     int dirfd;
+ 
++    if (fs_ctx->export_flags & V9FS_SM_MAPPED_FILE &&
++        local_is_mapped_file_metadata(fs_ctx, name)) {
++        errno = EINVAL;
++        return -1;
++    }
++
+     dirfd = local_opendir_nofollow(fs_ctx, dir_path->data);
+     if (dirfd == -1) {
+         return -1;
+@@ -605,6 +616,12 @@ static int local_mkdir(FsContext *fs_ctx, V9fsPath *dir_path,
+     int err = -1;
+     int dirfd;
+ 
++    if (fs_ctx->export_flags & V9FS_SM_MAPPED_FILE &&
++        local_is_mapped_file_metadata(fs_ctx, name)) {
++        errno = EINVAL;
++        return -1;
++    }
++
+     dirfd = local_opendir_nofollow(fs_ctx, dir_path->data);
+     if (dirfd == -1) {
+         return -1;
+@@ -694,6 +711,12 @@ static int local_open2(FsContext *fs_ctx, V9fsPath *dir_path, const char *name,
+     int err = -1;
+     int dirfd;
+ 
++    if (fs_ctx->export_flags & V9FS_SM_MAPPED_FILE &&
++        local_is_mapped_file_metadata(fs_ctx, name)) {
++        errno = EINVAL;
++        return -1;
++    }
++
+     /*
+      * Mark all the open to not follow symlinks
+      */
+@@ -752,6 +775,12 @@ static int local_symlink(FsContext *fs_ctx, const char *oldpath,
+     int err = -1;
+     int dirfd;
+ 
++    if (fs_ctx->export_flags & V9FS_SM_MAPPED_FILE &&
++        local_is_mapped_file_metadata(fs_ctx, name)) {
++        errno = EINVAL;
++        return -1;
++    }
++
+     dirfd = local_opendir_nofollow(fs_ctx, dir_path->data);
+     if (dirfd == -1) {
+         return -1;
+@@ -826,6 +855,12 @@ static int local_link(FsContext *ctx, V9fsPath *oldpath,
+     int ret = -1;
+     int odirfd, ndirfd;
+ 
++    if (ctx->export_flags & V9FS_SM_MAPPED_FILE &&
++        local_is_mapped_file_metadata(ctx, name)) {
++        errno = EINVAL;
++        return -1;
++    }
++
+     odirfd = local_opendir_nofollow(ctx, odirpath);
+     if (odirfd == -1) {
+         goto out;
+@@ -1096,6 +1131,12 @@ static int local_lremovexattr(FsContext *ctx, V9fsPath *fs_path,
+ static int local_name_to_path(FsContext *ctx, V9fsPath *dir_path,
+                               const char *name, V9fsPath *target)
+ {
++    if (ctx->export_flags & V9FS_SM_MAPPED_FILE &&
++        local_is_mapped_file_metadata(ctx, name)) {
++        errno = EINVAL;
++        return -1;
++    }
++
+     if (dir_path) {
+         v9fs_path_sprintf(target, "%s/%s", dir_path->data, name);
+     } else if (strcmp(name, "/")) {
+@@ -1116,6 +1157,13 @@ static int local_renameat(FsContext *ctx, V9fsPath *olddir,
+     int ret;
+     int odirfd, ndirfd;
+ 
++    if (ctx->export_flags & V9FS_SM_MAPPED_FILE &&
++        (local_is_mapped_file_metadata(ctx, old_name) ||
++         local_is_mapped_file_metadata(ctx, new_name))) {
++        errno = EINVAL;
++        return -1;
++    }
++
+     odirfd = local_opendir_nofollow(ctx, olddir->data);
+     if (odirfd == -1) {
+         return -1;
+@@ -1206,6 +1254,12 @@ static int local_unlinkat(FsContext *ctx, V9fsPath *dir,
+     int ret;
+     int dirfd;
+ 
++    if (ctx->export_flags & V9FS_SM_MAPPED_FILE &&
++        local_is_mapped_file_metadata(ctx, name)) {
++        errno = EINVAL;
++        return -1;
++    }
++
+     dirfd = local_opendir_nofollow(ctx, dir->data);
+     if (dirfd == -1) {
+         return -1;
