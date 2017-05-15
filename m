@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49532)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49563)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dACoW-0000YE-Ql
-	for qemu-devel@nongnu.org; Mon, 15 May 2017 06:01:18 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1dACoZ-0000ax-Eq
+	for qemu-devel@nongnu.org; Mon, 15 May 2017 06:01:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dACoV-0005tm-8v
-	for qemu-devel@nongnu.org; Mon, 15 May 2017 06:01:16 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1dACoU-0005tH-K1
+	for qemu-devel@nongnu.org; Mon, 15 May 2017 06:01:19 -0400
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Mon, 15 May 2017 12:00:57 +0200
-Message-Id: <20170515100059.15795-6-pbonzini@redhat.com>
+Date: Mon, 15 May 2017 12:00:55 +0200
+Message-Id: <20170515100059.15795-4-pbonzini@redhat.com>
 In-Reply-To: <20170515100059.15795-1-pbonzini@redhat.com>
 References: <20170515100059.15795-1-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 5/7] curl: convert CURLAIOCB to byte values
+Subject: [Qemu-devel] [PATCH v3 3/7] curl: avoid recursive locking of
+ BDRVCURLState mutex
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,154 +21,126 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: jcody@redhat.com, rjones@redhat.com, qemu-block@nongnu.org
+Cc: jcody@redhat.com, rjones@redhat.com, qemu-block@nongnu.org, qemu-stable@nongnu.org
 
-This is in preparation for the conversion from bdrv_aio_readv to
-bdrv_co_preadv, and it also requires changing some of the size_t values
-to uint64_t.  This was broken before for disks > 2TB, but now it would
-break at 4GB.
+The curl driver has a ugly hack where, if it cannot find an empty CURLState,
+it just uses aio_poll to wait for one to be empty.  This is probably
+buggy when used together with dataplane, and the simplest way to fix it
+is to use coroutines instead.
 
-Reviewed-by: Jeff Cody <jcody@redhat.com>
+A more immediate effect of the bug however is that it can cause a
+recursive call to curl_readv_bh_cb and recursively taking the
+BDRVCURLState mutex.  This causes a deadlock.
+
+The fix is to unlock the mutex around aio_poll, but for cleanliness we
+should also take the mutex around all calls to curl_init_state, even if
+reaching the unlock/lock pair is impossible.  The same is true for
+curl_clean_state.
+
+Reported-by: Kun Wei <kuwei@redhat.com>
+Tested-by: Richard W.M. Jones <rjones@redhat.com>
+Cc: qemu-stable@nongnu.org
+Cc: Jeff Cody <jcody@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- block/curl.c | 44 ++++++++++++++++++++++----------------------
- 1 file changed, 22 insertions(+), 22 deletions(-)
+        v2->v3: add missing qemu_mutex_destroy on failure case
+
+ block/curl.c | 14 +++++++++++++-
+ 1 file changed, 13 insertions(+), 1 deletion(-)
 
 diff --git a/block/curl.c b/block/curl.c
-index 29132ab835..401a1b1015 100644
+index 924c2a2088..5e6ddf3a34 100644
 --- a/block/curl.c
 +++ b/block/curl.c
-@@ -96,8 +96,8 @@ typedef struct CURLAIOCB {
-     BlockAIOCB common;
-     QEMUIOVector *qiov;
- 
--    int64_t sector_num;
--    int nb_sectors;
-+    uint64_t offset;
-+    uint64_t bytes;
- 
-     size_t start;
-     size_t end;
-@@ -115,7 +115,7 @@ typedef struct CURLState
-     CURL *curl;
-     QLIST_HEAD(, CURLSocket) sockets;
-     char *orig_buf;
--    size_t buf_start;
-+    uint64_t buf_start;
-     size_t buf_off;
-     size_t buf_len;
-     char range[128];
-@@ -126,7 +126,7 @@ typedef struct CURLState
- typedef struct BDRVCURLState {
-     CURLM *multi;
-     QEMUTimer timer;
--    size_t len;
-+    uint64_t len;
-     CURLState states[CURL_NUM_STATES];
-     char *url;
-     size_t readahead_size;
-@@ -257,7 +257,7 @@ static size_t curl_read_cb(void *ptr, size_t size, size_t nmemb, void *opaque)
-             continue;
- 
-         if ((s->buf_off >= acb->end)) {
--            size_t request_length = acb->nb_sectors * BDRV_SECTOR_SIZE;
-+            size_t request_length = acb->bytes;
- 
-             qemu_iovec_from_buf(acb->qiov, 0, s->orig_buf + acb->start,
-                                 acb->end - acb->start);
-@@ -282,18 +282,18 @@ read_end:
+@@ -281,6 +281,7 @@ read_end:
+     return size * nmemb;
  }
  
- /* Called with s->mutex held.  */
--static int curl_find_buf(BDRVCURLState *s, size_t start, size_t len,
-+static int curl_find_buf(BDRVCURLState *s, uint64_t start, uint64_t len,
++/* Called with s->mutex held.  */
+ static int curl_find_buf(BDRVCURLState *s, size_t start, size_t len,
                           CURLAIOCB *acb)
  {
-     int i;
--    size_t end = start + len;
--    size_t clamped_end = MIN(end, s->len);
--    size_t clamped_len = clamped_end - start;
-+    uint64_t end = start + len;
-+    uint64_t clamped_end = MIN(end, s->len);
-+    uint64_t clamped_len = clamped_end - start;
- 
-     for (i=0; i<CURL_NUM_STATES; i++) {
-         CURLState *state = &s->states[i];
--        size_t buf_end = (state->buf_start + state->buf_off);
--        size_t buf_fend = (state->buf_start + state->buf_len);
-+        uint64_t buf_end = (state->buf_start + state->buf_off);
-+        uint64_t buf_fend = (state->buf_start + state->buf_len);
- 
-         if (!state->orig_buf)
-             continue;
-@@ -788,7 +788,7 @@ static int curl_open(BlockDriverState *bs, QDict *options, int flags,
-     }
+@@ -453,6 +454,7 @@ static void curl_multi_timeout_do(void *arg)
  #endif
+ }
  
--    s->len = (size_t)d;
-+    s->len = d;
++/* Called with s->mutex held.  */
+ static CURLState *curl_init_state(BlockDriverState *bs, BDRVCURLState *s)
+ {
+     CURLState *state = NULL;
+@@ -471,7 +473,9 @@ static CURLState *curl_init_state(BlockDriverState *bs, BDRVCURLState *s)
+             break;
+         }
+         if (!state) {
++            qemu_mutex_unlock(&s->mutex);
+             aio_poll(bdrv_get_aio_context(bs), true);
++            qemu_mutex_lock(&s->mutex);
+         }
+     } while(!state);
  
-     if ((!strncasecmp(s->url, "http://", strlen("http://"))
-         || !strncasecmp(s->url, "https://", strlen("https://")))
-@@ -797,7 +797,7 @@ static int curl_open(BlockDriverState *bs, QDict *options, int flags,
-                 "Server does not support 'range' (byte ranges).");
-         goto out;
-     }
--    DPRINTF("CURL: Size = %zd\n", s->len);
-+    DPRINTF("CURL: Size = %" PRIu64 "\n", s->len);
+@@ -534,6 +538,7 @@ static CURLState *curl_init_state(BlockDriverState *bs, BDRVCURLState *s)
+     return state;
+ }
  
-     qemu_mutex_lock(&s->mutex);
-     curl_clean_state(state);
-@@ -837,14 +837,14 @@ static void curl_readv_bh_cb(void *p)
-     BlockDriverState *bs = acb->common.bs;
++/* Called with s->mutex held.  */
+ static void curl_clean_state(CURLState *s)
+ {
+     int j;
+@@ -565,6 +570,7 @@ static void curl_detach_aio_context(BlockDriverState *bs)
      BDRVCURLState *s = bs->opaque;
+     int i;
  
--    size_t start = acb->sector_num * BDRV_SECTOR_SIZE;
--    size_t end;
-+    uint64_t start = acb->offset;
-+    uint64_t end;
++    qemu_mutex_lock(&s->mutex);
+     for (i = 0; i < CURL_NUM_STATES; i++) {
+         if (s->states[i].in_use) {
+             curl_clean_state(&s->states[i]);
+@@ -580,6 +586,7 @@ static void curl_detach_aio_context(BlockDriverState *bs)
+         curl_multi_cleanup(s->multi);
+         s->multi = NULL;
+     }
++    qemu_mutex_unlock(&s->mutex);
  
-     qemu_mutex_lock(&s->mutex);
- 
-     // In case we have the requested data already (e.g. read-ahead),
-     // we can just call the callback and be done.
--    switch (curl_find_buf(s, start, acb->nb_sectors * BDRV_SECTOR_SIZE, acb)) {
-+    switch (curl_find_buf(s, start, acb->bytes, acb)) {
-         case FIND_RET_OK:
-             ret = 0;
-             goto out;
-@@ -872,7 +872,7 @@ static void curl_readv_bh_cb(void *p)
+     timer_del(&s->timer);
+ }
+@@ -677,6 +684,7 @@ static int curl_open(BlockDriverState *bs, QDict *options, int flags,
+         return -EROFS;
      }
  
-     acb->start = 0;
--    acb->end = MIN(acb->nb_sectors * BDRV_SECTOR_SIZE, s->len - start);
-+    acb->end = MIN(acb->bytes, s->len - start);
++    qemu_mutex_init(&s->mutex);
+     opts = qemu_opts_create(&runtime_opts, NULL, 0, &error_abort);
+     qemu_opts_absorb_qdict(opts, options, &local_err);
+     if (local_err) {
+@@ -747,7 +755,9 @@ static int curl_open(BlockDriverState *bs, QDict *options, int flags,
+     DPRINTF("CURL: Opening %s\n", file);
+     s->aio_context = bdrv_get_aio_context(bs);
+     s->url = g_strdup(file);
++    qemu_mutex_lock(&s->mutex);
+     state = curl_init_state(bs, s);
++    qemu_mutex_unlock(&s->mutex);
+     if (!state)
+         goto out_noclean;
  
-     state->buf_off = 0;
-     g_free(state->orig_buf);
-@@ -887,9 +887,9 @@ static void curl_readv_bh_cb(void *p)
+@@ -791,11 +801,12 @@ static int curl_open(BlockDriverState *bs, QDict *options, int flags,
      }
-     state->acb[0] = acb;
+     DPRINTF("CURL: Size = %zd\n", s->len);
  
--    snprintf(state->range, 127, "%zd-%zd", start, end);
--    DPRINTF("CURL (AIO): Reading %llu at %zd (%s)\n",
--            (acb->nb_sectors * BDRV_SECTOR_SIZE), start, state->range);
-+    snprintf(state->range, 127, "%" PRIu64 "-%" PRIu64, start, end);
-+    DPRINTF("CURL (AIO): Reading %" PRIu64 " at %" PRIu64 " (%s)\n",
-+            acb->bytes, start, state->range);
-     curl_easy_setopt(state->curl, CURLOPT_RANGE, state->range);
++    qemu_mutex_lock(&s->mutex);
+     curl_clean_state(state);
++    qemu_mutex_unlock(&s->mutex);
+     curl_easy_cleanup(state->curl);
+     state->curl = NULL;
  
-     curl_multi_add_handle(s->multi, state->curl);
-@@ -914,8 +914,8 @@ static BlockAIOCB *curl_aio_readv(BlockDriverState *bs,
-     acb = qemu_aio_get(&curl_aiocb_info, bs, cb, opaque);
+-    qemu_mutex_init(&s->mutex);
+     curl_attach_aio_context(bs, bdrv_get_aio_context(bs));
  
-     acb->qiov = qiov;
--    acb->sector_num = sector_num;
--    acb->nb_sectors = nb_sectors;
-+    acb->offset = sector_num * BDRV_SECTOR_SIZE;
-+    acb->bytes = nb_sectors * BDRV_SECTOR_SIZE;
- 
-     aio_bh_schedule_oneshot(bdrv_get_aio_context(bs), curl_readv_bh_cb, acb);
-     return &acb->common;
+     qemu_opts_del(opts);
+@@ -806,6 +817,7 @@ out:
+     curl_easy_cleanup(state->curl);
+     state->curl = NULL;
+ out_noclean:
++    qemu_mutex_destroy(&s->mutex);
+     g_free(s->cookie);
+     g_free(s->url);
+     qemu_opts_del(opts);
 -- 
 2.12.2
