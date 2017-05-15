@@ -1,32 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45898)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46252)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dAPUu-0000VH-M4
-	for qemu-devel@nongnu.org; Mon, 15 May 2017 19:33:53 -0400
+	id 1dAPWz-0001GI-LV
+	for qemu-devel@nongnu.org; Mon, 15 May 2017 19:36:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dAPUr-0007sT-Jo
-	for qemu-devel@nongnu.org; Mon, 15 May 2017 19:33:52 -0400
-Received: from mail-qk0-x244.google.com ([2607:f8b0:400d:c09::244]:34920)
+	id 1dAPWw-00005v-Il
+	for qemu-devel@nongnu.org; Mon, 15 May 2017 19:36:01 -0400
+Received: from mail-qt0-x243.google.com ([2607:f8b0:400d:c0d::243]:32769)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dAPUr-0007sI-Dq
-	for qemu-devel@nongnu.org; Mon, 15 May 2017 19:33:49 -0400
-Received: by mail-qk0-x244.google.com with SMTP id k74so20097571qke.2
-	for <qemu-devel@nongnu.org>; Mon, 15 May 2017 16:33:49 -0700 (PDT)
+	id 1dAPWw-00005m-Ds
+	for qemu-devel@nongnu.org; Mon, 15 May 2017 19:35:58 -0400
+Received: by mail-qt0-x243.google.com with SMTP id a46so18308101qte.0
+	for <qemu-devel@nongnu.org>; Mon, 15 May 2017 16:35:58 -0700 (PDT)
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 References: <1494860396-24930-1-git-send-email-Milos.Stojanovic@rt-rk.com>
-	<1494860396-24930-2-git-send-email-Milos.Stojanovic@rt-rk.com>
+	<1494860396-24930-6-git-send-email-Milos.Stojanovic@rt-rk.com>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <1e44a26c-ff7f-1865-bcc8-8d3282173d52@amsat.org>
-Date: Mon, 15 May 2017 20:33:44 -0300
+Message-ID: <ff06e3de-e330-9e52-39b6-11324eafe92b@amsat.org>
+Date: Mon, 15 May 2017 20:35:53 -0300
 MIME-Version: 1.0
-In-Reply-To: <1494860396-24930-2-git-send-email-Milos.Stojanovic@rt-rk.com>
+In-Reply-To: <1494860396-24930-6-git-send-email-Milos.Stojanovic@rt-rk.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v2 01/16] linux-user: add strace for
- getuid(), gettid(), getppid(), geteuid()
+Subject: Re: [Qemu-devel] [PATCH v2 05/16] linux-user: fix argument type
+ declaration of rt_sigqueinfo() syscall
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,79 +39,30 @@ To: =?UTF-8?B?TWlsb8WhIFN0b2phbm92acSH?= <Milos.Stojanovic@rt-rk.com>, qemu-deve
 Cc: Miodrag.Dinic@rt-rk.com, laurent@vivier.eu, Petar.Jovanovic@rt-rk.com, Aleksandar.Markovic@rt-rk.com, yongbok.kim@imgtec.com
 
 On 05/15/2017 11:59 AM, Miloš Stojanović wrote:
-> Improve strace support for syscalls getuid(), gettid(), getppid()
-> and geteuid(). Since these system calls don't have arguments, "%s()"
-> is added in the corresponding strace.list entry so that no arguments
-> are printed.
+> Change the type of the first argument of rt_sigqueinfo() from int to pid_t
+> in the syscall declaration to match specifications of the system call.
 >
-> getuid:
-> Prior to this commit, typical strace output used to look like this:
-> 4894 getuid(4894,0,0,274886293296,-3689348814741910323,4832615904) = 1000
-> After this commit, it looks like this:
-> 4894 getuid() = 1000
->
-> gettid:
-> Prior to this commit, typical strace output used to look like this:
-> 8307 gettid(0,0,64,0,4832630528,4832615840) = 8307
-> After this commit, it looks like this:
-> 8307 gettid() = 8307
->
-> getppid:
-> Prior to this commit, typical strace output used to look like this:
-> 20588 getppid(20588,64,0,4832630528,4832615888,0) = 20625
-> After this commit, it looks like this:
-> 20588 getppid() = 20625
->
-> geteuid:
-> Prior to this commit, typical strace output used to look like this:
-> 20588 geteuid(64,0,0,4832615888,0,-9151031864016699136) = 1000
-> After this commit, it looks like this:
-> 20588 geteuid() = 1000
+> Proper spacing is added to satisfy checkpatch.pl.
 >
 > Signed-off-by: Miloš Stojanović <Milos.Stojanovic@rt-rk.com>
 
 Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
 > ---
->  linux-user/strace.list | 8 ++++----
->  1 file changed, 4 insertions(+), 4 deletions(-)
+>  linux-user/syscall.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 >
-> diff --git a/linux-user/strace.list b/linux-user/strace.list
-> index 3b1282e..6e33788 100644
-> --- a/linux-user/strace.list
-> +++ b/linux-user/strace.list
-> @@ -290,7 +290,7 @@
->  { TARGET_NR_getegid32, "getegid32" , NULL, NULL, NULL },
+> diff --git a/linux-user/syscall.c b/linux-user/syscall.c
+> index ff03e1a..9ec7ccd 100644
+> --- a/linux-user/syscall.c
+> +++ b/linux-user/syscall.c
+> @@ -274,7 +274,7 @@ _syscall3(int, sys_getdents64, uint, fd, struct linux_dirent64 *, dirp, uint, co
+>  _syscall5(int, _llseek,  uint,  fd, ulong, hi, ulong, lo,
+>            loff_t *, res, uint, wh);
 >  #endif
->  #ifdef TARGET_NR_geteuid
-> -{ TARGET_NR_geteuid, "geteuid" , NULL, NULL, NULL },
-> +{ TARGET_NR_geteuid, "geteuid" , "%s()", NULL, NULL },
->  #endif
->  #ifdef TARGET_NR_geteuid32
->  { TARGET_NR_geteuid32, "geteuid32" , NULL, NULL, NULL },
-> @@ -338,7 +338,7 @@
->  { TARGET_NR_getpmsg, "getpmsg" , NULL, NULL, NULL },
->  #endif
->  #ifdef TARGET_NR_getppid
-> -{ TARGET_NR_getppid, "getppid" , NULL, NULL, NULL },
-> +{ TARGET_NR_getppid, "getppid" , "%s()", NULL, NULL },
->  #endif
->  #ifdef TARGET_NR_getpriority
->  { TARGET_NR_getpriority, "getpriority", "%s(%#x,%#x)", NULL, NULL },
-> @@ -381,13 +381,13 @@
->    NULL, NULL },
->  #endif
->  #ifdef TARGET_NR_gettid
-> -{ TARGET_NR_gettid, "gettid" , NULL, NULL, NULL },
-> +{ TARGET_NR_gettid, "gettid" , "%s()", NULL, NULL },
->  #endif
->  #ifdef TARGET_NR_gettimeofday
->  { TARGET_NR_gettimeofday, "gettimeofday" , NULL, NULL, NULL },
->  #endif
->  #ifdef TARGET_NR_getuid
-> -{ TARGET_NR_getuid, "getuid" , NULL, NULL, NULL },
-> +{ TARGET_NR_getuid, "getuid" , "%s()", NULL, NULL },
->  #endif
->  #ifdef TARGET_NR_getuid32
->  { TARGET_NR_getuid32, "getuid32" , NULL, NULL, NULL },
+> -_syscall3(int,sys_rt_sigqueueinfo,int,pid,int,sig,siginfo_t *,uinfo)
+> +_syscall3(int, sys_rt_sigqueueinfo, pid_t, pid, int, sig, siginfo_t *, uinfo)
+>  _syscall3(int,sys_syslog,int,type,char*,bufp,int,len)
+>  #ifdef __NR_exit_group
+>  _syscall1(int,exit_group,int,error_code)
 >
