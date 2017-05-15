@@ -1,33 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45444)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46056)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1dACVD-0002wi-R3
-	for qemu-devel@nongnu.org; Mon, 15 May 2017 05:41:20 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1dACXi-0004DU-S5
+	for qemu-devel@nongnu.org; Mon, 15 May 2017 05:43:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1dACV8-0005JR-V7
-	for qemu-devel@nongnu.org; Mon, 15 May 2017 05:41:19 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60554)
+	(envelope-from <vsementsov@virtuozzo.com>) id 1dACXf-0006rc-Pp
+	for qemu-devel@nongnu.org; Mon, 15 May 2017 05:43:54 -0400
+Received: from mailhub.sw.ru ([195.214.232.25]:3993 helo=relay.sw.ru)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1dACV8-0005Iu-PC
-	for qemu-devel@nongnu.org; Mon, 15 May 2017 05:41:14 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 8C23637E65
-	for <qemu-devel@nongnu.org>; Mon, 15 May 2017 09:41:12 +0000 (UTC)
-From: Juan Quintela <quintela@redhat.com>
-In-Reply-To: <0bbb5f93-83bb-47b9-e7dd-d0824f3d8b61@redhat.com> (Eric Blake's
-	message of "Fri, 12 May 2017 14:52:14 -0500")
-References: <20170511163228.6666-1-quintela@redhat.com>
-	<20170511163228.6666-2-quintela@redhat.com>
-	<0bbb5f93-83bb-47b9-e7dd-d0824f3d8b61@redhat.com>
-Reply-To: quintela@redhat.com
-Date: Mon, 15 May 2017 11:41:07 +0200
-Message-ID: <87pofafoek.fsf@secure.mitica>
+	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
+	id 1dACXf-0006pm-En
+	for qemu-devel@nongnu.org; Mon, 15 May 2017 05:43:51 -0400
+References: <20170512141702.12423-1-vsementsov@virtuozzo.com>
+	<8c231084-8eaa-fe66-43cd-4c85f1e45272@redhat.com>
+	<005ea4a3-6565-6a56-75de-b6464bcae8fd@virtuozzo.com>
+	<0fcdd582-47d1-0206-1c66-d8db615f1174@redhat.com>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <858a4c56-1f9c-b7a3-fd73-34e4c8b59953@virtuozzo.com>
+Date: Mon, 15 May 2017 12:43:45 +0300
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH 1/3] migration: Create block capabilities
- for shared and enable
+In-Reply-To: <0fcdd582-47d1-0206-1c66-d8db615f1174@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] nbd: strict nbd_wr_syncv
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,35 +30,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: qemu-devel@nongnu.org, lvivier@redhat.com, dgilbert@redhat.com, peterx@redhat.com
+To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+Cc: den@openvz.org
 
-Eric Blake <eblake@redhat.com> wrote:
-> On 05/11/2017 11:32 AM, Juan Quintela wrote:
->> Those two capabilities were added through the command line.  Notice that
->> we just created them.  This is just the boilerplate.
->> 
->> Signed-off-by: Juan Quintela <quintela@redhat.com>
->> Reviewed-by: Eric Blake <eblake@redhat.com>
->> 
->> --
->> 
->> Make migrate_set_block_* take a boolean argument.
+12.05.2017 19:30, Paolo Bonzini wrote:
 >
-> Question - do we support the orthogonal selection of all 4 combinations
-> under HMP 'migrate' (no argument, -b alone, -i alone, -b and -i
-> together), or are there only 3 actual states? If the latter, should we
-> represent this as a single enum-valued property, rather than as two
-> independent boolean properties?
+> On 12/05/2017 17:57, Vladimir Sementsov-Ogievskiy wrote:
+>> 12.05.2017 18:46, Paolo Bonzini wrote:
+>>> On 12/05/2017 16:17, Vladimir Sementsov-Ogievskiy wrote:
+>>>> nbd_wr_syncv is called either from coroutine or from client negotiation
+>>>> code, when socket is in blocking mode. So, -EAGAIN is impossible.
+>>>>
+>>>> Furthermore, EAGAIN is confusing, as, what to read/write again? With
+>>>> EAGAIN as a return code we don't know how much data is already
+>>>> read or written by the function, so in case of EAGAIN the whole
+>>>> communication is broken.
+>>>>
+>>>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+>>>> ---
+>>>>
+>>>> Hi all!
+>>>>
+>>>> If I understand right, nbd_wr_syncv is called either from coroutine
+>>>> or from client negotiation code, when socket is in blocking mode.
+>>>> So, some thoughts
+>>>>
+>>>> 1. let's establish this with an assert, because returning EAGAIN is
+>>>>      confusing (see above)
+>>> Yes, this seems like a good idea.
+>>>
+>>>> 2. should we in case of non-coroutine context start this coroutine in
+>>>>      nbd_wr_syncv, like in bdrv_prwv_co, and use non-blocking mode?
+>>>> 3. is there any problems or disadvantages of moving  client negotiation
+>>>>      to coroutine too?
+>>> When you move code to coroutines you need to be aware of what code can
+>>> now run concurrently, for example the monitor.  I'm not sure that it's
+>>> possible to do this.
+>> Hmm, can you please give some example of a problem? qcow2_open starts
+>> coroutines to read it's header, why nbd_open can't start
+>> coroutine/coroutines to read/write some negotiation data?
+> Ah, it's not a problem if you use synchronous I/O (aio_poll) within the
+> coroutines.  But then it's still blocking I/O in every way (except
+> you've fcntl-ed the descriptor to make it non-blocking); it's simply
+> hidden underneath coroutines and aio_poll.
 
-{ 'enum': 'MigrationCapability',
-  'data': ['xbzrle', 'rdma-pin-all', 'auto-converge', 'zero-blocks',
-           'compress', 'events', 'postcopy-ram', 'x-colo', 'release-ram'] }
+I mean, make negotiation behave like normal nbd communication, 
+non-blocking socket + yield.. So, some other coroutines may do their 
+work, while nbd-negotiation coroutine waits for io..
+
+>
+> Paolo
 
 
-My understanding is that we can only have boolean capabilities here.
-Or, how could we put a non-boolean capability?
-
-There are three states as far as I can see.
-
-Later, Juan.
+-- 
+Best regards,
+Vladimir
