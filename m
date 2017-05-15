@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52722)
-	by lists.gnu.org with esmtp (Exim 4.71) (envelope-from <n54@gmx.com>)
-	id 1dAGdV-0004no-8k
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52743)
+	by lists.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <pbonzini@redhat.com>) id 1dAGdX-0004pr-S9
 	for qemu-devel@nongnu.org; Mon, 15 May 2017 10:06:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <n54@gmx.com>) id 1dAGdS-00033l-3q
-	for qemu-devel@nongnu.org; Mon, 15 May 2017 10:06:09 -0400
-Received: from mout.gmx.net ([212.227.15.19]:62243)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <n54@gmx.com>) id 1dAGdR-00032u-OV
-	for qemu-devel@nongnu.org; Mon, 15 May 2017 10:06:06 -0400
-References: <20170513015449.24061-1-n54@gmx.com>
-	<91e1cbd3-88e6-2b7a-c4e4-824c54f34c52@amsat.org>
-	<4245846f-2977-6f1b-a5a0-80d92bfe42d4@redhat.com>
-From: Kamil Rytarowski <n54@gmx.com>
-Message-ID: <2d7184c3-1523-c470-3930-63a8d0cfe448@gmx.com>
-Date: Mon, 15 May 2017 15:57:39 +0200
+	(envelope-from <pbonzini@redhat.com>) id 1dAGdW-00035J-LB
+	for qemu-devel@nongnu.org; Mon, 15 May 2017 10:06:11 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42170)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1dAGdW-000354-CQ
+	for qemu-devel@nongnu.org; Mon, 15 May 2017 10:06:10 -0400
+References: <20170512233843.27713-1-f4bug@amsat.org>
+	<20170512233843.27713-2-f4bug@amsat.org>
+	<b5660d99-c854-1930-8806-5989c69f90d1@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <27c7761e-48c8-9398-ea89-b1fb67602cef@redhat.com>
+Date: Mon, 15 May 2017 16:06:04 +0200
 MIME-Version: 1.0
-In-Reply-To: <4245846f-2977-6f1b-a5a0-80d92bfe42d4@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="o4TCqhMHMTIj6PbgoC0q2kVofMtIjR5nu"
-Subject: Re: [Qemu-devel] [PATCH] libvixl: Correct ordering of includes and
- fix NetBSD build
+In-Reply-To: <b5660d99-c854-1930-8806-5989c69f90d1@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [RFC PATCH v4 1/6] coccinelle: add a script to
+ optimize tcg op using tcg_gen_extract()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,67 +30,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, claudio.fontana@gmail.com
+To: Eric Blake <eblake@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, Aurelien Jarno <aurelien@aurel32.net>, Richard Henderson <rth@twiddle.net>, Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>, Markus Armbruster <armbru@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Michael Tokarev <mjt@tls.msk.ru>, Eduardo Habkost <ehabkost@redhat.com>
+Cc: Markus Elfring <elfring@users.sourceforge.net>, Julia Lawall <julia.lawall@lip6.fr>, Nicolas Palix <nicolas.palix@imag.fr>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---o4TCqhMHMTIj6PbgoC0q2kVofMtIjR5nu
-From: Kamil Rytarowski <n54@gmx.com>
-To: Eric Blake <eblake@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?=
- <f4bug@amsat.org>, qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, claudio.fontana@gmail.com
-Message-ID: <2d7184c3-1523-c470-3930-63a8d0cfe448@gmx.com>
-Subject: Re: [Qemu-devel] [PATCH] libvixl: Correct ordering of includes and
- fix NetBSD build
-References: <20170513015449.24061-1-n54@gmx.com>
- <91e1cbd3-88e6-2b7a-c4e4-824c54f34c52@amsat.org>
- <4245846f-2977-6f1b-a5a0-80d92bfe42d4@redhat.com>
-In-Reply-To: <4245846f-2977-6f1b-a5a0-80d92bfe42d4@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
 
-On 15.05.2017 15:57, Eric Blake wrote:
-> On 05/13/2017 05:04 PM, Philippe Mathieu-Daud=C3=A9 wrote:
->> Hi Kamil,
+
+On 15/05/2017 16:04, Eric Blake wrote:
+> On 05/12/2017 06:38 PM, Philippe Mathieu-Daud=C3=A9 wrote:
+>> If you have coccinelle installed you can apply this script using:
 >>
->> I think it is safer to add it in disas/libvixl/Makefile.objs where
->> QEMU_CFLAGS are tuned for libvixl.
->> This way you don't need to modify upstream libvixl.
+>>     $ spatch \
+>>         --macro-file scripts/cocci-macro-file.h \
+>>         --dir target --in-place
 >>
+>> You can also use directly Peter Senna Tschudin docker image (easier):
+>>
+>>     $ docker run -v `pwd`:`pwd` -w `pwd` petersenna/coccinelle \
+>>         --sp-file scripts/coccinelle/tcg_gen_extract.cocci \
+>>         --macro-file scripts/cocci-macro-file.h \
+>>         --dir target --in-place
+>>
+>> Then verified that no manual touchups are required.
+>>
+>> The following thread was helpful while writing this script:
+>>
+>>     https://github.com/coccinelle/coccinelle/issues/86
+>>
+>> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+>> ---
+>>  scripts/coccinelle/tcg_gen_extract.cocci | 103 ++++++++++++++++++++++=
++++++++++
+>>  1 file changed, 103 insertions(+)
+>>  create mode 100644 scripts/coccinelle/tcg_gen_extract.cocci
 >=20
-> Ah, right. disas/libvixl is one of the directories exempt from our
-> normal rules of including osdep.h first (otherwise I would have said
-> that including stdint.h first should be the job of osdep.h).
+> It's still not obvious to me whether we want this script in the tree (a=
+s
+> something we plan to rerun regularly to check for regressions), or just
+> in the commit message (useful for the one-time location of spots to
+> optimize, but something we don't anticipate repeating).
+
+I think it's useful.  New backends can have this issue, plus it shows
+some advanced Coccinelle techniques.
+
+Paolo
+
 >=20
-> But indeed, that's because we are trying to leave libvixl as untouched
-> as possible, so if there IS a solution that can be done through
-> makefiles rather than direct file editing, it is worth considering.
 >=20
-
-http://lists.nongnu.org/archive/html/qemu-devel/2017-05/msg03321.html
-
-
---o4TCqhMHMTIj6PbgoC0q2kVofMtIjR5nu
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-
-iQIcBAEBCAAGBQJZGbPbAAoJEEuzCOmwLnZsPikP/03i0nzYRrFGiISNDU9KmpzH
-4iIhLqc7RnnsGZX2csUOeDE+9EH2rGDmyNeCJin/hjCa3sQZgQnh07d3fJRmUShe
-I2jNl/7ekoc/+vBOC45ddKLP+ZJ7P5hr4f7JIO4DviPYnOIlmgeR/nWgzuO4X9ab
-v+DBq6M0QyJ1tc6iwZ+u9mlwjGQOq65hGWyg0ll+/7II324EXNvBmuuXuuBaOyK2
-f1+fNEXVutnSWWB6bSI3PsxtU/LDQ0OL9VG4VB3DAmayK+ADi557I+RUFa94n288
-SHQxbAx8fNujzdkviMq3sIZBVaFQoS6zdI0ofXCSFvQ0yeYc6hLO5OyUJFyugGuB
-+BesZjULy46iUblJe4QdM3OTRkfwm1oXKJlrXgbAkP1uQooLTMR32MS7yPeFq62Y
-pxMR7YcoT/WPzmgJGmyaUXANOKuF/AviWnxY5ErK/yaBmQz8OpBpcsGdbdt+T7bD
-CYUIfficxB0QjhDGHMbiqdQcGhtSJpNP5y7PUfKmDHfOkrWH6Ziux6aaPdx7Ugiz
-11+S3GFKt66e4zAMUkvjJhvVLhcIfpCaezJEoB0bL+rXxS87Jxdvq//+EGesiMzQ
-Mg/nzAtZ/agJo3n7snbP4//QHHrkkrtkcJ69Xu+5ZgHU7l7Xs4lgq1Bom6likfnD
-R26WRWVCVXfekYUIvCMu
-=59pz
------END PGP SIGNATURE-----
-
---o4TCqhMHMTIj6PbgoC0q2kVofMtIjR5nu--
+>> +@@
+>> +import sys
+>> +fd =3D sys.stderr
+>> +def debug(msg=3D"", trailer=3D"\n"):
+>> +    fd.write("[DBG] " + msg + trailer)
+>> +def low_bits_count(value):
+>> +    bits_count =3D 0
+>> +    while (value & (1 << bits_count)):
+>> +        bits_count +=3D 1
+>=20
+> Surely python has a faster method than this (after all, we have ctz and
+> friends in C code)?  But my python is limited enough that I don't know
+> of one off-hand.
+>=20
+>> +    return bits_count
+>> +def Mn(order): # Mersenne number
+>> +    return (1 << order) - 1
+>=20
+> Correct name...
+>=20
+>=20
+>> +else:
+>> +    debug("candidate at %s:%s" % (shr_p[0].file, shr_p[0].line))
+>> +    try: # only eval integer, no #define like 'SR_M' (cpp did this, e=
+lse some headers are missing).
+>> +        msk_v =3D long(msk_s.strip("UL"), 0)
+>> +        msk_b =3D low_bits_count(msk_v)
+>> +        if msk_b =3D=3D 0:
+>> +            debug("  value: 0x%x low_bits: %d" % (msk_v, msk_b))
+>> +        else:
+>> +            debug("  value: 0x%x low_bits: %d [Mersenne prime: 0x%x]"=
+ % (msk_v, msk_b, Mn(msk_b)))
+>=20
+> ...but this name is still wrong.
+>=20
