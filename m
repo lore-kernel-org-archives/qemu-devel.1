@@ -1,31 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57523)
-	by lists.gnu.org with esmtp (Exim 4.71) (envelope-from <pl@kamp.de>)
-	id 1dAGuk-0006PW-IJ
-	for qemu-devel@nongnu.org; Mon, 15 May 2017 10:23:59 -0400
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57797)
+	by lists.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <eblake@redhat.com>) id 1dAGvy-0007ID-Jd
+	for qemu-devel@nongnu.org; Mon, 15 May 2017 10:25:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pl@kamp.de>) id 1dAGuf-0004i7-I6
-	for qemu-devel@nongnu.org; Mon, 15 May 2017 10:23:58 -0400
-Received: from mx-v6.kamp.de ([2a02:248:0:51::16]:60980 helo=mx01.kamp.de)
+	(envelope-from <eblake@redhat.com>) id 1dAGvt-00056s-UA
+	for qemu-devel@nongnu.org; Mon, 15 May 2017 10:25:14 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:50334)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pl@kamp.de>) id 1dAGuf-0004hv-8K
-	for qemu-devel@nongnu.org; Mon, 15 May 2017 10:23:53 -0400
-References: <1494842563-6534-1-git-send-email-pl@kamp.de>
-	<20170515105032.GD23262@lemon.lan>
-	<26b2441d-e80c-eeef-fba1-67b2529e9287@kamp.de>
-	<20170515115318.GA7305@lemon.lan>
-	<243331f2-3822-3c0e-b4a5-9f3de2302fe4@kamp.de>
-	<20170515122802.GB7305@lemon.lan>
-	<b850c6d3-c104-b171-0e7d-40ebf6780d6e@kamp.de>
-	<20170515125202.GC7305@lemon.lan>
-	<20170515130221.GA4018@noname.redhat.com>
-From: Peter Lieven <pl@kamp.de>
-Message-ID: <41ef7aaf-68ea-738e-498a-6f2c3526b873@kamp.de>
-Date: Mon, 15 May 2017 16:23:48 +0200
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dAGvt-000567-Ks
+	for qemu-devel@nongnu.org; Mon, 15 May 2017 10:25:09 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id A3B3DC04B316
+	for <qemu-devel@nongnu.org>; Mon, 15 May 2017 14:25:08 +0000 (UTC)
+References: <20170511163228.6666-1-quintela@redhat.com>
+	<20170511163228.6666-2-quintela@redhat.com>
+	<0bbb5f93-83bb-47b9-e7dd-d0824f3d8b61@redhat.com>
+	<87pofafoek.fsf@secure.mitica> <20170515094655.GC2089@work-vm>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <6ad3d1a1-ae63-b01d-b6a0-72a017b343aa@redhat.com>
+Date: Mon, 15 May 2017 09:24:56 -0500
 MIME-Version: 1.0
-In-Reply-To: <20170515130221.GA4018@noname.redhat.com>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC PATCH] qemu-io: add drain/undrain cmd
+In-Reply-To: <20170515094655.GC2089@work-vm>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="qdVrx6gEU5sb1BJHXXIUDcrEHjHiaaaf2"
+Subject: Re: [Qemu-devel] [PATCH 1/3] migration: Create block capabilities
+ for shared and enable
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,83 +37,99 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <famz@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, mreitz@redhat.com
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Juan Quintela <quintela@redhat.com>
+Cc: qemu-devel@nongnu.org, lvivier@redhat.com, peterx@redhat.com
 
-Am 15.05.2017 um 15:02 schrieb Kevin Wolf:
-> Am 15.05.2017 um 14:52 hat Fam Zheng geschrieben:
->> On Mon, 05/15 14:32, Peter Lieven wrote:
->>> Am 15.05.2017 um 14:28 schrieb Fam Zheng:
->>>> On Mon, 05/15 13:58, Peter Lieven wrote:
->>>>> Am 15.05.2017 um 13:53 schrieb Fam Zheng:
->>>>>> On Mon, 05/15 13:26, Peter Lieven wrote:
->>>>>>> Am 15.05.2017 um 12:50 schrieb Fam Zheng:
->>>>>>>> On Mon, 05/15 12:02, Peter Lieven wrote:
->>>>>>>>> Hi Block developers,
->>>>>>>>>
->>>>>>>>> I would like to add a feature to Qemu to drain all traffic from a block so that
->>>>>>>>> I can take external snaphosts without the risk to that in the middle of a write
->>>>>>>>> operation. Its meant for cases where where QGA freeze/thaw is not available.
->>>>>>>>>
->>>>>>>>> For me its enough to have this through qemu-io, but Kevin asked me to check
->>>>>>>>> if its not worth to have a stable API for it and present it via QMP/HMP.
->>>>>>>>>
->>>>>>>>> What are your thoughts?
->>>>>>>> For debugging purpose or a "hacky" usage where you know what you are doing, it
->>>>>>>> may be fine to have this. The only issue is it should be a separate flag, like
->>>>>>>> BlockJob.user_paused.
->>>>>>> How can I add, remove such a flag?
->>>>>> Like bs->user_drained. Set it in "drain" command, then increment
->>>>>> bs->quiesce_counter if toggled; vise versa.
->>>>> Ah okay. You wouldn't use bdrv_drained_begin/end? Because in these functions
->>>>> the counter is incremented already.
->>>> You're right, calling bdrv_drained_begin() is better.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--qdVrx6gEU5sb1BJHXXIUDcrEHjHiaaaf2
+From: Eric Blake <eblake@redhat.com>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Juan Quintela <quintela@redhat.com>
+Cc: qemu-devel@nongnu.org, lvivier@redhat.com, peterx@redhat.com
+Message-ID: <6ad3d1a1-ae63-b01d-b6a0-72a017b343aa@redhat.com>
+Subject: Re: [PATCH 1/3] migration: Create block capabilities for shared and
+ enable
+References: <20170511163228.6666-1-quintela@redhat.com>
+ <20170511163228.6666-2-quintela@redhat.com>
+ <0bbb5f93-83bb-47b9-e7dd-d0824f3d8b61@redhat.com>
+ <87pofafoek.fsf@secure.mitica> <20170515094655.GC2089@work-vm>
+In-Reply-To: <20170515094655.GC2089@work-vm>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 05/15/2017 04:46 AM, Dr. David Alan Gilbert wrote:
+> * Juan Quintela (quintela@redhat.com) wrote:
+>> Eric Blake <eblake@redhat.com> wrote:
+>>> On 05/11/2017 11:32 AM, Juan Quintela wrote:
+>>>> Those two capabilities were added through the command line.  Notice =
+that
+>>>> we just created them.  This is just the boilerplate.
 >>>>
->>>>>
->>>>>>>> What happens from guest perspective? In the case of virtio, the request queue is
->>>>>>>> not handled and -ETIMEDOUT may happen. With IDE, I/O commands are still handled,
->>>>>>>> the command is not effective (or rather the implementation is not complete).
->>>>>>> That it only works with virtio is fine. However, the thing it does not work correctly
->>>>>>> apply then also to all other users of the drained_begin/end functions, right?
->>>>>>> As for the timeout I only plan to drain the device for about 1 second.
->>>>>> It didn't matter because for IDE, the invariant (staying quiesced as long as
->>>>>> necessary) is already ensured by BQL.  Virtio is different because it supports
->>>>>> ioeventfd and data plane.
->>>>> Okay understood. So my use of bdrv_drained_begin/end is more an abuse of
->>>>> these functions?
->>>> Sort of. But it's not unreasonable to "extend" bdrv_drained_begin/end to cover
->>>> IDE, I just haven't thought about "how".
+>>>> Signed-off-by: Juan Quintela <quintela@redhat.com>
+>>>> Reviewed-by: Eric Blake <eblake@redhat.com>
 >>>>
->>>>> Do you have another idea how to achieve what I want? I was thinking of throttle
->>>>> the I/O to zero. It would be enough to do this for writes, reading doesn't hurt in
->>>>> my case.
->>>> Maybe add a block filter on top of the drained node, drain it when doing so,
->>>> then queue all further requests with a CoQueue until "undrain".  (It is then not
->>>> quite to "drain" but to "halt" or "pause", though.)
->>> To get the drain for free was why I was looking at this approach. If I read correctly
->>> if I keep using bdrv_drained_begin/end its too hacky to implement it in QMP?
->> I think so.
+>>>> --
+>>>>
+>>>> Make migrate_set_block_* take a boolean argument.
+>>>
+>>> Question - do we support the orthogonal selection of all 4 combinatio=
+ns
+>>> under HMP 'migrate' (no argument, -b alone, -i alone, -b and -i
+>>> together), or are there only 3 actual states? If the latter, should w=
+e
+>>> represent this as a single enum-valued property, rather than as two
+>>> independent boolean properties?
 >>
->>> If yes, would support adding it to qemu-io?
->> I'm under the impression that you are looking to a real use case, I don't think
->> I like the idea. Also, accessing the image from other processes while QEMU is
->> using it is strongly discouraged, and there is the coming image locking
->> mechanism to prevent this from happening.
-> Thinking a bit more about this, it looks to me as if what we really want
-> is inactivating the image. Should we add an option to the 'stop' command
-> (or introduce another command to be used on an already stopped VM) that
-> inactivates all/some images? And then 'cont' regains control over the
-> images, just like after migration.
->
-> Automatically stopping the VM while the snapshot is taken also makes it
-> work with IDE and prevents guests running into timeouts, which makes it
-> look much more like a proper solution to me.
->
-> But then, stop/cont would already achieve something very similar today
-> (as 'stop' calls bdrv_drain_all(); just the locking part wouldn't be
-> covered), so maybe there is a reason not to use it in your case, Peter?
+>> { 'enum': 'MigrationCapability',
+>>   'data': ['xbzrle', 'rdma-pin-all', 'auto-converge', 'zero-blocks',
+>>            'compress', 'events', 'postcopy-ram', 'x-colo', 'release-ra=
+m'] }
+>>
+>>
+>> My understanding is that we can only have boolean capabilities here.
+>> Or, how could we put a non-boolean capability?
 
-Maybe this indeed is the best solution. Locking won't work for my case I don't
-use a posix file in the backend. Clever solution, thanks Kevin.
+If we want a non-boolean, then we make it a migration parameter rather
+than a migration capability.  There may be other advantages to using
+MigrationParameter instead of MigrationCapability (such as making it
+easier to figure out whether the parameter settings are persistent or
+apply per-migration).
 
-Peter
+>=20
+> Lets keep this simple and stick with the booleans.
+>=20
+> Dave
+>=20
+>> There are three states as far as I can see.
+
+I'll leave it up to you as maintainers which way you prefer, I'm just
+offering the potential design tradeoffs for simplicity of booleans (but
+complexity in an unused state) vs. simplicity of design (but complexity
+in code).
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--qdVrx6gEU5sb1BJHXXIUDcrEHjHiaaaf2
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEcBAEBCAAGBQJZGbo5AAoJEKeha0olJ0NqVm4H/0PsOE6XxJ5cv3wUW9HYEEcj
+SJFyG+S9Uwj81GCbuEafCaAxuJZmFNVhiNwQA6/APgmZ/pE5wL1blP2bhBPxkTGV
+u4ggqnMeK6hC49QbfxGLipsa7vfUX9vRHKCkpg7CxKdxL/LW1rLqn6mZD6oCAorJ
+5vWKLhSKYQP5fjq9wjYmiS+ED6jckmhLW8Qtvtimxz9W25klWqeyPue3oHFGs4mA
+SPKm+ioVdthRuXL3GRa48XWsIPK9H65rDTYBLJDAZ4UM7+aDJv45TtilVCL93LlT
+1U0WlMAoB4T/O8tyfKNtZuN9q9H+qx6E7ALICsypAZ3xAzWtjOh00AE7f1XUMPc=
+=S3t9
+-----END PGP SIGNATURE-----
+
+--qdVrx6gEU5sb1BJHXXIUDcrEHjHiaaaf2--
