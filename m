@@ -1,25 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58254)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58472)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1dAFNI-0006Re-55
-	for qemu-devel@nongnu.org; Mon, 15 May 2017 08:45:21 -0400
+	(envelope-from <berto@igalia.com>) id 1dAFOJ-00073O-AB
+	for qemu-devel@nongnu.org; Mon, 15 May 2017 08:46:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1dAFNF-0008CI-3Z
-	for qemu-devel@nongnu.org; Mon, 15 May 2017 08:45:20 -0400
-Received: from szxga03-in.huawei.com ([45.249.212.189]:3867)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1dAFNE-000857-Hy
-	for qemu-devel@nongnu.org; Mon, 15 May 2017 08:45:17 -0400
-References: <20170512160055.9081-1-quintela@redhat.com>
-	<20170512160055.9081-6-quintela@redhat.com>
-	<20170512175105.GI2069@work-vm> <87h90mfkjf.fsf@secure.mitica>
-From: Hailiang Zhang <zhang.zhanghailiang@huawei.com>
-Message-ID: <5919A2B8.5040005@huawei.com>
-Date: Mon, 15 May 2017 20:44:40 +0800
+	(envelope-from <berto@igalia.com>) id 1dAFOI-0000CO-Gw
+	for qemu-devel@nongnu.org; Mon, 15 May 2017 08:46:23 -0400
+From: Alberto Garcia <berto@igalia.com>
+In-Reply-To: <1494851980-6831-1-git-send-email-kwolf@redhat.com>
+References: <1494851980-6831-1-git-send-email-kwolf@redhat.com>
+Date: Mon, 15 May 2017 14:46:15 +0200
+Message-ID: <w51shk6s2y0.fsf@maestria.local.igalia.com>
 MIME-Version: 1.0
-In-Reply-To: <87h90mfkjf.fsf@secure.mitica>
-Content-Type: text/plain; charset="windows-1252"; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 05/12] migration: Move colo.h to migration/
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH] qemu-iotests: Test streaming with missing
+ job ID
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,33 +22,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: quintela@redhat.com, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Tkid <zhangchen.fnst@cn.fujitsu.com>
-Cc: lvivier@redhat.com, qemu-devel@nongnu.org, peterx@redhat.com
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: kchamart@redhat.com, qemu-devel@nongnu.org
 
-On 2017/5/15 19:04, Juan Quintela wrote:
-> "Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
-> D> * Juan Quintela (quintela@redhat.com) wrote:
->>> There are functions only used by migration code.
->> That's only mostly true; see the current 'integrate colo frame with
->> block replication and net compare' series (posted 22nd April).
->> That adds colo_handle_shutdown to this header and calls it from vl.c
->> ( https://lists.gnu.org/archive/html/qemu-devel/2017-04/msg03901.html )
->> where should that go?
-> Dropped.
+On Mon 15 May 2017 02:39:40 PM CEST, Kevin Wolf wrote:
+> This adds a small test for the image streaming error path for failing
+> block_job_create(), which would have found the null pointer dereference
+> in commit a170a91f.
 >
-> It compiled, but who knows O:-)
+> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> ---
+>  tests/qemu-iotests/030     | 4 ++++
+>  tests/qemu-iotests/030.out | 4 ++--
+>  2 files changed, 6 insertions(+), 2 deletions(-)
 >
->> There's also a net/colo.h as well, so using the
->>    #include "colo.h" in migration is correct but that's
->> really scary when there are two files of the same name.
+> diff --git a/tests/qemu-iotests/030 b/tests/qemu-iotests/030
+> index e00c11b..feee861 100755
+> --- a/tests/qemu-iotests/030
+> +++ b/tests/qemu-iotests/030
+> @@ -147,6 +147,10 @@ class TestSingleDrive(iotests.QMPTestCase):
+>          result = self.vm.qmp('block-stream', device='nonexistent')
+>          self.assert_qmp(result, 'error/class', 'GenericError')
+>  
+> +    def test_job_id_missing(self):
+> +        result = self.vm.qmp('block-stream', device='mid')
+> +        self.assert_qmp(result, 'error/class', 'GenericError')
 
-Ha, I'd like to suggest it be renamed as colo-proxy.h (colo-net.h ? ) for net/colo.h,
-which is saner,  hmm, together with colo.c, colo-proxy.c ? colo-net.c ? Or any other proper name ?
-( I didn't notice that until it went into upstream.  O:-) )
+Mmm... but does that trigger the bug?
 
-Cc:  Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
+The bug happens if the user tries to create a stream job on a BDS that:
 
-> Yeap, it is scary ...
->
->
->
+a) exists
+b) is not the active node (i.e. needs reopening in read-write mode)
+c) its node name is not valid for a block job (e.g. it contains a '#')
+
+Berto
