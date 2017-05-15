@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35149)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36535)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dAHMT-0005cu-PW
-	for qemu-devel@nongnu.org; Mon, 15 May 2017 10:52:38 -0400
+	(envelope-from <bobby.prani@gmail.com>) id 1dAHT3-00073B-3S
+	for qemu-devel@nongnu.org; Mon, 15 May 2017 10:59:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dAHMQ-00013r-Lm
-	for qemu-devel@nongnu.org; Mon, 15 May 2017 10:52:37 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:36513)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dAHMQ-00013N-DK
-	for qemu-devel@nongnu.org; Mon, 15 May 2017 10:52:34 -0400
-References: <20170512155249.8853-1-quintela@redhat.com>
-	<20170515135848.GL1201@stefanha-x1.localdomain>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <feb33c55-a56e-2a87-eafd-fbbe1f3c982b@redhat.com>
-Date: Mon, 15 May 2017 09:52:03 -0500
+	(envelope-from <bobby.prani@gmail.com>) id 1dAHT2-0003km-7C
+	for qemu-devel@nongnu.org; Mon, 15 May 2017 10:59:25 -0400
+Received: from mail-yb0-x22c.google.com ([2607:f8b0:4002:c09::22c]:33200)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bobby.prani@gmail.com>)
+	id 1dAHT1-0003ke-Re
+	for qemu-devel@nongnu.org; Mon, 15 May 2017 10:59:24 -0400
+Received: by mail-yb0-x22c.google.com with SMTP id j17so28224654ybj.0
+	for <qemu-devel@nongnu.org>; Mon, 15 May 2017 07:59:23 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20170515135848.GL1201@stefanha-x1.localdomain>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="JLPuKALgw3F7HjG4lXLKxAx3Nujhd9KFH"
-Subject: Re: [Qemu-devel] [PULL 0/5] Migration pull request
+In-Reply-To: <a4f70b68-ec18-4237-79fa-b106bc3e29d0@twiddle.net>
+References: <20170513155816.17294-1-bobby.prani@gmail.com>
+	<a4f70b68-ec18-4237-79fa-b106bc3e29d0@twiddle.net>
+From: Pranith Kumar <bobby.prani@gmail.com>
+Date: Mon, 15 May 2017 10:58:52 -0400
+Message-ID: <CAJhHMCC+1UA10c+2xT_BWhK-Aw6W2Z+5tTbtXyJG4rwBkY4MZw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH] tcg/i386: 'nop' instruction with 'lock'
+ prefix is illegal
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,60 +30,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@gmail.com>, Juan Quintela <quintela@redhat.com>
-Cc: lvivier@redhat.com, qemu-devel@nongnu.org, peterx@redhat.com, dgilbert@redhat.com
+To: Richard Henderson <rth@twiddle.net>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, "open list:All patches CC here" <qemu-devel@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---JLPuKALgw3F7HjG4lXLKxAx3Nujhd9KFH
-From: Eric Blake <eblake@redhat.com>
-To: Stefan Hajnoczi <stefanha@gmail.com>, Juan Quintela <quintela@redhat.com>
-Cc: lvivier@redhat.com, qemu-devel@nongnu.org, peterx@redhat.com,
- dgilbert@redhat.com
-Message-ID: <feb33c55-a56e-2a87-eafd-fbbe1f3c982b@redhat.com>
-Subject: Re: [Qemu-devel] [PULL 0/5] Migration pull request
-References: <20170512155249.8853-1-quintela@redhat.com>
- <20170515135848.GL1201@stefanha-x1.localdomain>
-In-Reply-To: <20170515135848.GL1201@stefanha-x1.localdomain>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On Sun, May 14, 2017 at 5:12 PM, Richard Henderson <rth@twiddle.net> wrote:
+>>
+> Surely you'd also want to make this change for 0x11a and 0x11b.  Which would
+> also simplify that code a bit.
+>
+> That said, there's *lots* of missing LOCK prefix checks.  What brings this
+> one in particular to your attention?
+>
 
-On 05/15/2017 08:58 AM, Stefan Hajnoczi wrote:
+The motivation for this change is here:
+https://github.com/aquynh/capstone/issues/915
 
->> ----------------------------------------------------------------
->> Juan Quintela (5):
->>       migration: Fix regression with compression threads
->>       migration: Pass Error ** argument to {save,load}_vmstate
->>       ram: Rename RAM_SAVE_FLAG_COMPRESS to RAM_SAVE_FLAG_ZERO
->>       migration: Create block capabilities for shared and enable
+Apparently LLVM generates it in certain scenarios when padding with
+multi-byte nop (it shouldn't).
 
-We may still end up changing our representation of these capabilities (I
-don't think the design discussion has completed) - but as long as we get
-it done before 2.10, I don't see a reason to have to unstage the pull
-request.
+>From what I understand, a proper instruction like "lock; <valid inst>"
+is converted to "lock; multi-byte nop; <valid inst>" due to code
+alignment.
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+There were bugs reported regarding this:
+https://bugs.chromium.org/p/nativeclient/issues/detail?id=3929
 
+I am not sure we want to fix this, but I thought it would be easy
+enough to cover this case.
 
---JLPuKALgw3F7HjG4lXLKxAx3Nujhd9KFH
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEcBAEBCAAGBQJZGcCTAAoJEKeha0olJ0NqWIQH/3w2E7/PhawYQmH4ehbTuZfT
-p7qwKTp0zHqQdcNuWazDwY+rqBm70SmCw6SOFZctbf5pFuDuc/U7NF2FpDNyDqao
-ku8ZcbOhRSOSdAqjjiek/cub38qBDVJrXXZ5miqKy37e46p3y5yFj6OAL/4fJ3Gw
-uCBTRqUjHG7qnqMLmQH9Qii8pmgK6Qhxn2aR4bh7u5dyWEgd/2Kr/l3LP/0jJNmM
-RcoiVwU6RDg7zteKC+Lpau6cz3VYbQubjajeEwSj0Ne85yDwOfDnm7s+tBNAKBiJ
-oBQKLDjEKXrPgKHPtfZmYsEHWfkKTlPlx91huddjSwIcikLlhSrZx9X/IcfjEPk=
-=L8IK
------END PGP SIGNATURE-----
-
---JLPuKALgw3F7HjG4lXLKxAx3Nujhd9KFH--
+Thanks,
+-- 
+Pranith
