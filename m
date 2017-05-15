@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55747)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56082)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dmitry@daynix.com>) id 1dAIcQ-00073I-TI
-	for qemu-devel@nongnu.org; Mon, 15 May 2017 12:13:13 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1dAIe7-0007c8-M6
+	for qemu-devel@nongnu.org; Mon, 15 May 2017 12:14:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dmitry@daynix.com>) id 1dAIcL-0002xP-S7
-	for qemu-devel@nongnu.org; Mon, 15 May 2017 12:13:10 -0400
-Received: from mail-wm0-x22a.google.com ([2a00:1450:400c:c09::22a]:37073)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <dmitry@daynix.com>) id 1dAIcL-0002x2-De
-	for qemu-devel@nongnu.org; Mon, 15 May 2017 12:13:05 -0400
-Received: by mail-wm0-x22a.google.com with SMTP id d127so82040793wmf.0
-	for <qemu-devel@nongnu.org>; Mon, 15 May 2017 09:13:05 -0700 (PDT)
-Mime-Version: 1.0 (1.0)
-From: Dmitry Fleytman <dmitry@daynix.com>
-In-Reply-To: <20170515092251.GB2089@work-vm>
-Date: Mon, 15 May 2017 19:13:00 +0300
-Message-Id: <6F78534C-7A67-43F4-A9E8-E532BCD16976@daynix.com>
+	(envelope-from <dgilbert@redhat.com>) id 1dAIe2-0003jB-Jo
+	for qemu-devel@nongnu.org; Mon, 15 May 2017 12:14:55 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:48902)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dAIe2-0003j6-AG
+	for qemu-devel@nongnu.org; Mon, 15 May 2017 12:14:50 -0400
+Date: Mon, 15 May 2017 17:14:46 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170515161445.GA2324@work-vm>
 References: <20170511123639.GE2078@work-vm>
 	<225AC0F4-5672-456F-9032-F2C1C86342E5@daynix.com>
 	<20170515092251.GB2089@work-vm>
-Content-Type: text/plain;
-	charset=windows-1251
+	<6F78534C-7A67-43F4-A9E8-E532BCD16976@daynix.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <6F78534C-7A67-43F4-A9E8-E532BCD16976@daynix.com>
 Content-Transfer-Encoding: quoted-printable
 Subject: Re: [Qemu-devel] e1000e migration
 List-Id: <qemu-devel.nongnu.org>
@@ -31,190 +30,202 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Dmitry Fleytman <dmitry@daynix.com>
 Cc: qemu-devel@nongnu.org
 
-Hello Dave,
+* Dmitry Fleytman (dmitry@daynix.com) wrote:
+> Hello Dave,
+>=20
+> It looks like we identified the problem.
+>=20
+> We are working on fix and will send it as soon as it is ready.
 
-It looks like we identified the problem.
+Thanks!
 
-We are working on fix and will send it as soon as it is ready.
+Dave
 
-~Dmitry.
-
-Sent from my iPhone
-
-> On 15 May 2017, at 12:22, Dr. David Alan Gilbert <dgilbert@redhat.com> wro=
-te:
+> ~Dmitry.
 >=20
-> * Dmitry Fleytman (dmitry@daynix.com) wrote:
->> Hello Dave,
+> Sent from my iPhone
 >=20
-> Hi Dmitry,
->  Thanks for the reply.
->=20
->> We are trying to reproduce this issue on our systems but with no luck so f=
-ar=85
->=20
-> Note our QE hit this with both a Win8.1 and a win2012r2 guest - although
-> the 2012r2 is reported to have recoverd after a few minutes.
-> 2016 apparently works OK.
->=20
->> =46rom what you describe it looks like some bit in ICR is not being clear=
-ed by the driver.
->> This usually means that this bit should never be set in that specific int=
-errupt mode.
->>=20
->> Could you please check which bit is not cleared and who sets it?
->=20
-> The full set of e1000e_irq_pending_interrupts after migration is:
-> 23004@1494519346.673905:e1000e_irq_pending_interrupts ICR PENDING: 0x10000=
-0 (ICR: 0x80100082, IMS: 0x1f00004)
-> 23004@1494519346.674787:e1000e_irq_pending_interrupts ICR PENDING: 0x0 (IC=
-R: 0x80100082, IMS: 0x1e00004)
-> 23004@1494519346.674946:e1000e_irq_pending_interrupts ICR PENDING: 0x0 (IC=
-R: 0x80100082, IMS: 0x1e00004)
-> 23004@1494519346.675119:e1000e_irq_pending_interrupts ICR PENDING: 0x20000=
-0 (ICR: 0x80300082, IMS: 0x1e00004)
-> 23004@1494519346.675302:e1000e_irq_pending_interrupts ICR PENDING: 0x0 (IC=
-R: 0x80100082, IMS: 0x1c00004)
->  <repeated lots>
-> 23004@1494519346.716279:e1000e_irq_pending_interrupts ICR PENDING: 0x0 (IC=
-R: 0x80300082, IMS: 0x1c00004)
-> 23004@1494519346.716380:e1000e_irq_pending_interrupts ICR PENDING: 0x10000=
-00 (ICR: 0x813000c2, IMS: 0x1c00004)
-> 23004@1494519346.717040:e1000e_irq_pending_interrupts ICR PENDING: 0x10000=
-00 (ICR: 0x813000c2, IMS: 0x1400004)
-> 23004@1494519346.717276:e1000e_irq_pending_interrupts ICR PENDING: 0x10000=
-00 (ICR: 0x813000c2, IMS: 0x1000004)
-> 23004@1494519346.717443:e1000e_irq_pending_interrupts ICR PENDING: 0x0 (IC=
-R: 0x813000c2, IMS: 0x4)
-> 23004@1494519346.717567:e1000e_irq_pending_interrupts ICR PENDING: 0x0 (IC=
-R: 0x813000c2, IMS: 0x4)
-> 23004@1494519346.717782:e1000e_irq_pending_interrupts ICR PENDING: 0x0 (IC=
-R: 0x813000c2, IMS: 0x4)
-> 23004@1494519346.717918:e1000e_irq_pending_interrupts ICR PENDING: 0x0 (IC=
-R: 0x813000c2, IMS: 0x4)
-> 23004@1494519346.718319:e1000e_irq_pending_interrupts ICR PENDING: 0x0 (IC=
-R: 0x813000c2, IMS: 0x4)
-> 23004@1494519346.718523:e1000e_irq_pending_interrupts ICR PENDING: 0x20000=
-0 (ICR: 0x813000c2, IMS: 0xa00004)
-> 23004@1494519346.718684:e1000e_irq_pending_interrupts ICR PENDING: 0x0 (IC=
-R: 0x811000c2, IMS: 0x4)
-> 23004@1494519346.718890:e1000e_irq_pending_interrupts ICR PENDING: 0x0 (IC=
-R: 0x811000c2, IMS: 0x4)
-> 23004@1494519346.719034:e1000e_irq_pending_interrupts ICR PENDING: 0x0 (IC=
-R: 0x811000c2, IMS: 0xa00004)
-> 23004@1494519346.719130:e1000e_irq_pending_interrupts ICR PENDING: 0x0 (IC=
-R: 0x811000c2, IMS: 0xa00004)
->  <repeats>
-> 23004@1494519346.722699:e1000e_irq_pending_interrupts ICR PENDING: 0x0 (IC=
-R: 0x811000c2, IMS: 0xa00004)
-> 23004@1494519346.722868:e1000e_irq_pending_interrupts ICR PENDING: 0x20000=
-0 (ICR: 0x813000c2, IMS: 0xa00004)
-> 23004@1494519346.723068:e1000e_irq_pending_interrupts ICR PENDING: 0x0 (IC=
-R: 0x811000c2, IMS: 0x800004)
->  <repeats>
-> 23004@1494519346.731198:e1000e_irq_pending_interrupts ICR PENDING: 0x0 (IC=
-R: 0x813000c2, IMS: 0x800004)
-> 23004@1494519346.731422:e1000e_irq_pending_interrupts ICR PENDING: 0x0 (IC=
-R: 0x813000c2, IMS: 0x4)
-> 23004@1494519346.731930:e1000e_irq_pending_interrupts ICR PENDING: 0x20000=
-0 (ICR: 0x813000c2, IMS: 0xa00004)
-> 23004@1494519346.732082:e1000e_irq_pending_interrupts ICR PENDING: 0x0 (IC=
-R: 0x811000c2, IMS: 0x4)
-> 23004@1494519346.732274:e1000e_irq_pending_interrupts ICR PENDING: 0x0 (IC=
-R: 0x811000c2, IMS: 0x4)
-> 23004@1494519346.732404:e1000e_irq_pending_interrupts ICR PENDING: 0x0 (IC=
-R: 0x811000c2, IMS: 0xa00004)
-> 23004@1494519346.732504:e1000e_irq_pending_interrupts ICR PENDING: 0x0 (IC=
-R: 0x811000c2, IMS: 0xa00004)
-> 23004@1494519346.784150:e1000e_irq_pending_interrupts ICR PENDING: 0x0 (IC=
-R: 0x815000c2, IMS: 0xa00004)
-> 23004@1494519346.786506:e1000e_irq_pending_interrupts ICR PENDING: 0x0 (IC=
-R: 0x815000c2, IMS: 0xa00004)
-> 23004@1494519346.786534:e1000e_irq_pending_interrupts ICR PENDING: 0x0 (IC=
-R: 0x815000c2, IMS: 0xa00004)
-> 23004@1494519346.789644:e1000e_irq_pending_interrupts ICR PENDING: 0x10000=
-00 (ICR: 0x815000c2, IMS: 0x1a00004)
-> 23004@1494519346.789864:e1000e_irq_pending_interrupts ICR PENDING: 0x0 (IC=
-R: 0x815000c2, IMS: 0xa00004)
-> 23004@1494519346.789992:e1000e_irq_pending_interrupts ICR PENDING: 0x0 (IC=
-R: 0x815000c2, IMS: 0xa00004)
-> 23004@1494519346.790413:e1000e_irq_pending_interrupts ICR PENDING: 0x0 (IC=
-R: 0x815000c2, IMS: 0xa00004)
-> 23004@1494519346.790539:e1000e_irq_pending_interrupts ICR PENDING: 0x0 (IC=
-R: 0x815000c2, IMS: 0xa00004)
-> 23004@1494519346.792593:e1000e_irq_pending_interrupts ICR PENDING: 0x0 (IC=
-R: 0x815000c2, IMS: 0xa00004)
-> 23004@1494519346.792620:e1000e_irq_pending_interrupts ICR PENDING: 0x0 (IC=
-R: 0x815000c2, IMS: 0xa00004)
-> 23004@1494519346.795943:e1000e_irq_pending_interrupts ICR PENDING: 0x10000=
-00 (ICR: 0x815000c2, IMS: 0x1a00004)
->=20
-> and then I think we get stuck in this cycle of this one always being the
-> one that fires repeatedly.  I think that's the 'other' firing, I think
-> because of the receive-overrun.  One thing I've not
-> figured out is why the receive overrun happens - is that because we
-> really have a very heavy packet rate or is it because something has
-> stopped receiving them.
-> The network I'm testing on does have a fair amount of broadcast traffic
-> on.
->=20
-> Dave
->=20
->> Regards,
->> Dmitry
->>=20
->>> On 11 May 2017, at 15:36 PM, Dr. David Alan Gilbert <dgilbert@redhat.com=
+> > On 15 May 2017, at 12:22, Dr. David Alan Gilbert <dgilbert@redhat.com=
 > wrote:
->>>=20
->>> Hi Dmitry,
->>> Have you seen any problems with e1000e migration under windows?
->>> I've got a repeatable case where after migration with e1000e windows
->>> hangs/almost hangs.
->>> I'm seeing the e1000e generate interrupts at a very very high
->>> rate (maybe ~1000 second ish?) after migration.
->>>=20
->>> Some versions of qemu do it and some dont, but my attempts
->>> at bisection lead me to code that should be irrelevant.
->>>=20
->>> Prior to migration I see:
->>>=20
->>> 36461@1494504466.711929:e1000e_irq_pending_interrupts ICR PENDING: 0x100=
-000 (ICR: 0x80100082, IMS: 0x1f00004)
->>> 36461@1494504466.711992:e1000e_irq_pending_interrupts ICR PENDING: 0x0 (=
-ICR: 0x80000082, IMS: 0x1a00004)
->>> 36461@1494504466.712076:e1000e_irq_pending_interrupts ICR PENDING: 0x0 (=
-ICR: 0x80000082, IMS: 0x1f00004)
->>> 36461@1494504466.712245:e1000e_irq_pending_interrupts ICR PENDING: 0x0 (=
-ICR: 0x80000082, IMS: 0x1a00004)
->>> 36461@1494504466.712332:e1000e_irq_pending_interrupts ICR PENDING: 0x0 (=
-ICR: 0x80000082, IMS: 0x1f00004)
->>>=20
->>> which I think the ICR means:
->>>     31 - int asserted
->>>     20 - RxQ0 - receive queue 0 interrupt
->>>     7  - RXT0 - receiver timer interrupt
->>>     1  - TXQE - Transmit Queue empty
->>>=20
->>> after migration it varies more, I'm seeing mostly:
->>> 21977@1494504516.320707:e1000e_irq_pending_interrupts ICR PENDING: 0x100=
-0000 (ICR: 0x815000c2, IMS: 0x1a00004)
->>>     31 - int asserted
->>>     24 - 'Other'
->>>     22 - TxQ0 interrupt
->>>     20 - RxQ0 interrupt
->>>     07 - RXT0 Receiver timer interrupt
->>>     06 - RX0 - Receiver overrun
->>>     01 - TXQE - Transmit queue empty
->>>=20
->>> For reference this is https://bugzilla.redhat.com/show_bug.cgi?id=3D1447=
-935
->>>=20
->>> Dave
->>> --
->>> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
->>=20
-> --
-> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> >=20
+> > * Dmitry Fleytman (dmitry@daynix.com) wrote:
+> >> Hello Dave,
+> >=20
+> > Hi Dmitry,
+> >  Thanks for the reply.
+> >=20
+> >> We are trying to reproduce this issue on our systems but with no luc=
+k so far=E2=80=A6
+> >=20
+> > Note our QE hit this with both a Win8.1 and a win2012r2 guest - altho=
+ugh
+> > the 2012r2 is reported to have recoverd after a few minutes.
+> > 2016 apparently works OK.
+> >=20
+> >> From what you describe it looks like some bit in ICR is not being cl=
+eared by the driver.
+> >> This usually means that this bit should never be set in that specifi=
+c interrupt mode.
+> >>=20
+> >> Could you please check which bit is not cleared and who sets it?
+> >=20
+> > The full set of e1000e_irq_pending_interrupts after migration is:
+> > 23004@1494519346.673905:e1000e_irq_pending_interrupts ICR PENDING: 0x=
+100000 (ICR: 0x80100082, IMS: 0x1f00004)
+> > 23004@1494519346.674787:e1000e_irq_pending_interrupts ICR PENDING: 0x=
+0 (ICR: 0x80100082, IMS: 0x1e00004)
+> > 23004@1494519346.674946:e1000e_irq_pending_interrupts ICR PENDING: 0x=
+0 (ICR: 0x80100082, IMS: 0x1e00004)
+> > 23004@1494519346.675119:e1000e_irq_pending_interrupts ICR PENDING: 0x=
+200000 (ICR: 0x80300082, IMS: 0x1e00004)
+> > 23004@1494519346.675302:e1000e_irq_pending_interrupts ICR PENDING: 0x=
+0 (ICR: 0x80100082, IMS: 0x1c00004)
+> >  <repeated lots>
+> > 23004@1494519346.716279:e1000e_irq_pending_interrupts ICR PENDING: 0x=
+0 (ICR: 0x80300082, IMS: 0x1c00004)
+> > 23004@1494519346.716380:e1000e_irq_pending_interrupts ICR PENDING: 0x=
+1000000 (ICR: 0x813000c2, IMS: 0x1c00004)
+> > 23004@1494519346.717040:e1000e_irq_pending_interrupts ICR PENDING: 0x=
+1000000 (ICR: 0x813000c2, IMS: 0x1400004)
+> > 23004@1494519346.717276:e1000e_irq_pending_interrupts ICR PENDING: 0x=
+1000000 (ICR: 0x813000c2, IMS: 0x1000004)
+> > 23004@1494519346.717443:e1000e_irq_pending_interrupts ICR PENDING: 0x=
+0 (ICR: 0x813000c2, IMS: 0x4)
+> > 23004@1494519346.717567:e1000e_irq_pending_interrupts ICR PENDING: 0x=
+0 (ICR: 0x813000c2, IMS: 0x4)
+> > 23004@1494519346.717782:e1000e_irq_pending_interrupts ICR PENDING: 0x=
+0 (ICR: 0x813000c2, IMS: 0x4)
+> > 23004@1494519346.717918:e1000e_irq_pending_interrupts ICR PENDING: 0x=
+0 (ICR: 0x813000c2, IMS: 0x4)
+> > 23004@1494519346.718319:e1000e_irq_pending_interrupts ICR PENDING: 0x=
+0 (ICR: 0x813000c2, IMS: 0x4)
+> > 23004@1494519346.718523:e1000e_irq_pending_interrupts ICR PENDING: 0x=
+200000 (ICR: 0x813000c2, IMS: 0xa00004)
+> > 23004@1494519346.718684:e1000e_irq_pending_interrupts ICR PENDING: 0x=
+0 (ICR: 0x811000c2, IMS: 0x4)
+> > 23004@1494519346.718890:e1000e_irq_pending_interrupts ICR PENDING: 0x=
+0 (ICR: 0x811000c2, IMS: 0x4)
+> > 23004@1494519346.719034:e1000e_irq_pending_interrupts ICR PENDING: 0x=
+0 (ICR: 0x811000c2, IMS: 0xa00004)
+> > 23004@1494519346.719130:e1000e_irq_pending_interrupts ICR PENDING: 0x=
+0 (ICR: 0x811000c2, IMS: 0xa00004)
+> >  <repeats>
+> > 23004@1494519346.722699:e1000e_irq_pending_interrupts ICR PENDING: 0x=
+0 (ICR: 0x811000c2, IMS: 0xa00004)
+> > 23004@1494519346.722868:e1000e_irq_pending_interrupts ICR PENDING: 0x=
+200000 (ICR: 0x813000c2, IMS: 0xa00004)
+> > 23004@1494519346.723068:e1000e_irq_pending_interrupts ICR PENDING: 0x=
+0 (ICR: 0x811000c2, IMS: 0x800004)
+> >  <repeats>
+> > 23004@1494519346.731198:e1000e_irq_pending_interrupts ICR PENDING: 0x=
+0 (ICR: 0x813000c2, IMS: 0x800004)
+> > 23004@1494519346.731422:e1000e_irq_pending_interrupts ICR PENDING: 0x=
+0 (ICR: 0x813000c2, IMS: 0x4)
+> > 23004@1494519346.731930:e1000e_irq_pending_interrupts ICR PENDING: 0x=
+200000 (ICR: 0x813000c2, IMS: 0xa00004)
+> > 23004@1494519346.732082:e1000e_irq_pending_interrupts ICR PENDING: 0x=
+0 (ICR: 0x811000c2, IMS: 0x4)
+> > 23004@1494519346.732274:e1000e_irq_pending_interrupts ICR PENDING: 0x=
+0 (ICR: 0x811000c2, IMS: 0x4)
+> > 23004@1494519346.732404:e1000e_irq_pending_interrupts ICR PENDING: 0x=
+0 (ICR: 0x811000c2, IMS: 0xa00004)
+> > 23004@1494519346.732504:e1000e_irq_pending_interrupts ICR PENDING: 0x=
+0 (ICR: 0x811000c2, IMS: 0xa00004)
+> > 23004@1494519346.784150:e1000e_irq_pending_interrupts ICR PENDING: 0x=
+0 (ICR: 0x815000c2, IMS: 0xa00004)
+> > 23004@1494519346.786506:e1000e_irq_pending_interrupts ICR PENDING: 0x=
+0 (ICR: 0x815000c2, IMS: 0xa00004)
+> > 23004@1494519346.786534:e1000e_irq_pending_interrupts ICR PENDING: 0x=
+0 (ICR: 0x815000c2, IMS: 0xa00004)
+> > 23004@1494519346.789644:e1000e_irq_pending_interrupts ICR PENDING: 0x=
+1000000 (ICR: 0x815000c2, IMS: 0x1a00004)
+> > 23004@1494519346.789864:e1000e_irq_pending_interrupts ICR PENDING: 0x=
+0 (ICR: 0x815000c2, IMS: 0xa00004)
+> > 23004@1494519346.789992:e1000e_irq_pending_interrupts ICR PENDING: 0x=
+0 (ICR: 0x815000c2, IMS: 0xa00004)
+> > 23004@1494519346.790413:e1000e_irq_pending_interrupts ICR PENDING: 0x=
+0 (ICR: 0x815000c2, IMS: 0xa00004)
+> > 23004@1494519346.790539:e1000e_irq_pending_interrupts ICR PENDING: 0x=
+0 (ICR: 0x815000c2, IMS: 0xa00004)
+> > 23004@1494519346.792593:e1000e_irq_pending_interrupts ICR PENDING: 0x=
+0 (ICR: 0x815000c2, IMS: 0xa00004)
+> > 23004@1494519346.792620:e1000e_irq_pending_interrupts ICR PENDING: 0x=
+0 (ICR: 0x815000c2, IMS: 0xa00004)
+> > 23004@1494519346.795943:e1000e_irq_pending_interrupts ICR PENDING: 0x=
+1000000 (ICR: 0x815000c2, IMS: 0x1a00004)
+> >=20
+> > and then I think we get stuck in this cycle of this one always being =
+the
+> > one that fires repeatedly.  I think that's the 'other' firing, I thin=
+k
+> > because of the receive-overrun.  One thing I've not
+> > figured out is why the receive overrun happens - is that because we
+> > really have a very heavy packet rate or is it because something has
+> > stopped receiving them.
+> > The network I'm testing on does have a fair amount of broadcast traff=
+ic
+> > on.
+> >=20
+> > Dave
+> >=20
+> >> Regards,
+> >> Dmitry
+> >>=20
+> >>> On 11 May 2017, at 15:36 PM, Dr. David Alan Gilbert <dgilbert@redha=
+t.com> wrote:
+> >>>=20
+> >>> Hi Dmitry,
+> >>> Have you seen any problems with e1000e migration under windows?
+> >>> I've got a repeatable case where after migration with e1000e window=
+s
+> >>> hangs/almost hangs.
+> >>> I'm seeing the e1000e generate interrupts at a very very high
+> >>> rate (maybe ~1000 second ish?) after migration.
+> >>>=20
+> >>> Some versions of qemu do it and some dont, but my attempts
+> >>> at bisection lead me to code that should be irrelevant.
+> >>>=20
+> >>> Prior to migration I see:
+> >>>=20
+> >>> 36461@1494504466.711929:e1000e_irq_pending_interrupts ICR PENDING: =
+0x100000 (ICR: 0x80100082, IMS: 0x1f00004)
+> >>> 36461@1494504466.711992:e1000e_irq_pending_interrupts ICR PENDING: =
+0x0 (ICR: 0x80000082, IMS: 0x1a00004)
+> >>> 36461@1494504466.712076:e1000e_irq_pending_interrupts ICR PENDING: =
+0x0 (ICR: 0x80000082, IMS: 0x1f00004)
+> >>> 36461@1494504466.712245:e1000e_irq_pending_interrupts ICR PENDING: =
+0x0 (ICR: 0x80000082, IMS: 0x1a00004)
+> >>> 36461@1494504466.712332:e1000e_irq_pending_interrupts ICR PENDING: =
+0x0 (ICR: 0x80000082, IMS: 0x1f00004)
+> >>>=20
+> >>> which I think the ICR means:
+> >>>     31 - int asserted
+> >>>     20 - RxQ0 - receive queue 0 interrupt
+> >>>     7  - RXT0 - receiver timer interrupt
+> >>>     1  - TXQE - Transmit Queue empty
+> >>>=20
+> >>> after migration it varies more, I'm seeing mostly:
+> >>> 21977@1494504516.320707:e1000e_irq_pending_interrupts ICR PENDING: =
+0x1000000 (ICR: 0x815000c2, IMS: 0x1a00004)
+> >>>     31 - int asserted
+> >>>     24 - 'Other'
+> >>>     22 - TxQ0 interrupt
+> >>>     20 - RxQ0 interrupt
+> >>>     07 - RXT0 Receiver timer interrupt
+> >>>     06 - RX0 - Receiver overrun
+> >>>     01 - TXQE - Transmit queue empty
+> >>>=20
+> >>> For reference this is https://bugzilla.redhat.com/show_bug.cgi?id=3D=
+1447935
+> >>>=20
+> >>> Dave
+> >>> --
+> >>> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> >>=20
+> > --
+> > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
