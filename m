@@ -1,43 +1,36 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39376)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45086)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pasic@linux.vnet.ibm.com>) id 1dAknL-0004Kl-Oz
-	for qemu-devel@nongnu.org; Tue, 16 May 2017 18:18:21 -0400
+	(envelope-from <anthony.xu@intel.com>) id 1dAl7k-0000PD-P7
+	for qemu-devel@nongnu.org; Tue, 16 May 2017 18:39:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pasic@linux.vnet.ibm.com>) id 1dAknG-00022T-Q9
-	for qemu-devel@nongnu.org; Tue, 16 May 2017 18:18:19 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:37241)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pasic@linux.vnet.ibm.com>)
-	id 1dAknG-000229-GH
-	for qemu-devel@nongnu.org; Tue, 16 May 2017 18:18:14 -0400
-Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v4GMDWEJ053860
-	for <qemu-devel@nongnu.org>; Tue, 16 May 2017 18:18:11 -0400
-Received: from e06smtp15.uk.ibm.com (e06smtp15.uk.ibm.com [195.75.94.111])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2ag6nygru7-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 16 May 2017 18:18:11 -0400
-Received: from localhost
-	by e06smtp15.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <pasic@linux.vnet.ibm.com>;
-	Tue, 16 May 2017 23:18:08 +0100
-References: <1494243504-127980-1-git-send-email-arei.gonglei@huawei.com>
-	<1494243504-127980-7-git-send-email-arei.gonglei@huawei.com>
-	<520f45d4-33d7-8836-3140-a92ee5d15421@linux.vnet.ibm.com>
-	<33183CC9F5247A488A2544077AF19020DA278AA0@DGGEMA505-MBS.china.huawei.com>
-	<1963bfa1-c0ea-156a-59f7-aed744ca49a3@linux.vnet.ibm.com>
-	<33183CC9F5247A488A2544077AF19020DA29A0B5@DGGEMA505-MBS.china.huawei.com>
-From: Halil Pasic <pasic@linux.vnet.ibm.com>
-Date: Wed, 17 May 2017 00:18:02 +0200
+	(envelope-from <anthony.xu@intel.com>) id 1dAl7g-0002ZG-Rc
+	for qemu-devel@nongnu.org; Tue, 16 May 2017 18:39:24 -0400
+Received: from mga14.intel.com ([192.55.52.115]:47485)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <anthony.xu@intel.com>)
+	id 1dAl7g-0002Z8-IR
+	for qemu-devel@nongnu.org; Tue, 16 May 2017 18:39:20 -0400
+From: "Xu, Anthony" <anthony.xu@intel.com>
+Date: Tue, 16 May 2017 22:39:17 +0000
+Message-ID: <4712D8F4B26E034E80552F30A67BE0B1AB9F97@ORSMSX112.amr.corp.intel.com>
+References: <4712D8F4B26E034E80552F30A67BE0B1AB61D5@ORSMSX112.amr.corp.intel.com>
+	<ff74288a-d26d-b037-2b55-7dac459aa4ec@redhat.com>
+	<4712D8F4B26E034E80552F30A67BE0B1AB6AA2@ORSMSX112.amr.corp.intel.com>
+	<f9c33614-be36-e789-b72b-b4ffcc8bb6a8@redhat.com>
+	<20170512193840.GA22454@morn.lan>
+	<4712D8F4B26E034E80552F30A67BE0B1AB6CBF@ORSMSX112.amr.corp.intel.com>
+	<20170513000141.GA542@morn.lan>
+	<4712D8F4B26E034E80552F30A67BE0B1AB6DEF@ORSMSX112.amr.corp.intel.com>
+	<20170516162442.GA4177@morn.lan>
+	<4712D8F4B26E034E80552F30A67BE0B1AB8B3D@ORSMSX112.amr.corp.intel.com>
+	<20170516214211.GA21896@morn.lan>
+In-Reply-To: <20170516214211.GA21896@morn.lan>
+Content-Language: en-US
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-In-Reply-To: <33183CC9F5247A488A2544077AF19020DA29A0B5@DGGEMA505-MBS.china.huawei.com>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 8bit
-Message-Id: <b7c20d5f-026e-edf1-6703-6b64ceed375f@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [RFC v1 6/9] virtio-crypto: rework
- virtio_crypto_handle_request
+Subject: Re: [Qemu-devel] [PATCH] target/i386: enable A20 automatically in
+ system management mode
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -46,220 +39,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Gonglei (Arei)" <arei.gonglei@huawei.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "mst@redhat.com" <mst@redhat.com>, "Huangweidong (C)" <weidong.huang@huawei.com>, "stefanha@redhat.com" <stefanha@redhat.com>, Luonengjun <luonengjun@huawei.com>, "cornelia.huck@de.ibm.com" <cornelia.huck@de.ibm.com>, Linqiangmin <linqiangmin@huawei.com>, "xin.zeng@intel.com" <xin.zeng@intel.com>, "Wubin (H)" <wu.wubin@huawei.com>
+To: Kevin O'Connor <kevin@koconnor.net>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+
+> > > > With the above change,   I got below data
+> > > >
+> > > > Platform	accel		count of restoring A20 to 0
+> > > > Q35		kvm		96
+> > > > Q35		tcg		271
+> > > > PC		kvm		3
+> > > > PC		tcg		3
+> > >
+> > > Okay, thanks.  I think the number of a20 switches is due to
+> > > differences in option rom execution interacting with the fact that
+> > > some mode switches were occurring before SeaBIOS set
+> > > call16_override().
+> > >
+> > > > But I still see a lot of PORT_A20 accesses in QEMU as I expected
+> > >
+> > > Yes, but it should be possible to significantly reduce the number of
+> > > outb() calls by limiting them to when A20 changes.  This should also
+> > > be useful to reduce the number of outb() calls needed to disable NMIs=
+.
+> > > I sent a patch series to the seabios mailing list to demonstrate the
+> > > idea.
+> >
+> > If both TCG and KVM work by ignoring A20,  why not remove all PORT_A20
+> > access in SeaBios when CONFIG_DISABLE_A20 is not defined?
+> > Do you see any impact?
+>=20
+> The SeaBIOS CONFIG_DISABLE_A20 build option does not mean "disable
+> support for A20"; it means "start the initial operating system
+> bootloader with A20 disabled".  CONFIG_DISABLE_A20=3Dy is a
+> pessimization, not an optimization.
+Make sense, Thanks for explanation,=20
+
+>=20
+> As for adding a new SeaBIOS build option to compile out support for
+> A20 - that seems like a very small optimization that would risk memory
+> corruption and hard to diagnose crashes.  SeaBIOS runs natively on
+> real hardware (with coreboot and as a CSM on UEFI) as well as on
+> QEMU/KVM.
+I heard new platform doesn't support A20.
+What's the hardware SeaBIOS runs natively on needs A20 support?
+
+It is just a build option, we can disable A20 support for QEMU/KVM and
+enable A20 support for real hardware. Any concerns here?
+
+BTW QEMU/KVM ignores A20 even SeaBIOS supports A20.
+
+Or, we can add some logic in SeaBIOS to check if the platform supports A20,
+if it doesn't support A20, SeaBIOS won't access PORT_A20 anymore.
+
+The check logic is like,
+write 0x55 to 0x00:0xeff0 (or other unused address)
+disable A20
+write 0xaa to 0xffff:0xf000
+read from 0x00:0xeff0,
+If the return value is 0x55, A20 is not supported by this platform.
 
 
-
-On 05/16/2017 04:52 AM, Gonglei (Arei) wrote:
->>
->> On 05/13/2017 03:16 AM, Gonglei (Arei) wrote:
->>>
->>>> From: Halil Pasic [mailto:pasic@linux.vnet.ibm.com]
->>>> Sent: Friday, May 12, 2017 7:02 PM
->>>>
->>>>
->>>> On 05/08/2017 01:38 PM, Gonglei wrote:
->>>>> According to the new spec, we should use different
->>>>> requst structure to store the data request based
->>>>> on whether VIRTIO_CRYPTO_F_MUX_MODE feature bit is
->>>>> negotiated or not.
->>>>>
->>>>> In this patch, we havn't supported stateless mode
->>>>> yet. The device reportes an error if both
->>>>> VIRTIO_CRYPTO_F_MUX_MODE and
->>>> VIRTIO_CRYPTO_F_CIPHER_STATELESS_MODE
->>>>> are negotiated, meanwhile the header.flag doesn't set
->>>>> to VIRTIO_CRYPTO_FLAG_SESSION_MODE.
->>>>>
->>>>> Let's handle this scenario in the following patches.
->>>>>
->>>>> Signed-off-by: Gonglei <arei.gonglei@huawei.com>
->>>>> ---
->>>>>  hw/virtio/virtio-crypto.c | 83
->>>> ++++++++++++++++++++++++++++++++++++++++-------
->>>>>  1 file changed, 71 insertions(+), 12 deletions(-)
->>>>>
->>>>> diff --git a/hw/virtio/virtio-crypto.c b/hw/virtio/virtio-crypto.c
->>>>> index 0353eb6..c4b8a2c 100644
->>>>> --- a/hw/virtio/virtio-crypto.c
->>>>> +++ b/hw/virtio/virtio-crypto.c
->>>>> @@ -577,6 +577,7 @@ virtio_crypto_handle_request(VirtIOCryptoReq
->>>> *request)
->>>>>      VirtQueueElement *elem = &request->elem;
->>>>>      int queue_index =
->>>> virtio_crypto_vq2q(virtio_get_queue_index(request->vq));
->>>>>      struct virtio_crypto_op_data_req req;
->>>>> +    struct virtio_crypto_op_data_req_mux req_mux;
->>>>>      int ret;
->>>>>      struct iovec *in_iov;
->>>>>      struct iovec *out_iov;
->>>>> @@ -587,6 +588,9 @@ virtio_crypto_handle_request(VirtIOCryptoReq
->>>> *request)
->>>>>      uint64_t session_id;
->>>>>      CryptoDevBackendSymOpInfo *sym_op_info = NULL;
->>>>>      Error *local_err = NULL;
->>>>> +    bool mux_mode_is_negotiated;
->>>>> +    struct virtio_crypto_op_header *header;
->>>>> +    bool is_stateless_req = false;
->>>>>
->>>>>      if (elem->out_num < 1 || elem->in_num < 1) {
->>>>>          virtio_error(vdev, "virtio-crypto dataq missing headers");
->>>>> @@ -597,12 +601,28 @@ virtio_crypto_handle_request(VirtIOCryptoReq
->>>> *request)
->>>>>      out_iov = elem->out_sg;
->>>>>      in_num = elem->in_num;
->>>>>      in_iov = elem->in_sg;
->>>>> -    if (unlikely(iov_to_buf(out_iov, out_num, 0, &req, sizeof(req))
->>>>> -                != sizeof(req))) {
->>>>> -        virtio_error(vdev, "virtio-crypto request outhdr too short");
->>>>> -        return -1;
->>>>> +
->>>>> +    mux_mode_is_negotiated =
->>>>> +        virtio_vdev_has_feature(vdev,
->> VIRTIO_CRYPTO_F_MUX_MODE);
->>>>> +    if (!mux_mode_is_negotiated) {
->>>>> +        if (unlikely(iov_to_buf(out_iov, out_num, 0, &req, sizeof(req))
->>>>> +                    != sizeof(req))) {
->>>>> +            virtio_error(vdev, "virtio-crypto request outhdr too short");
->>>>> +            return -1;
->>>>> +        }
->>>>> +        iov_discard_front(&out_iov, &out_num, sizeof(req));
->>>>> +
->>>>> +        header = &req.header;
->>>>> +    } else {
->>>>> +        if (unlikely(iov_to_buf(out_iov, out_num, 0, &req_mux,
->>>>> +                sizeof(req_mux)) != sizeof(req_mux))) {
->>>>> +            virtio_error(vdev, "virtio-crypto request outhdr too short");
->>>>> +            return -1;
->>>>> +        }
->>>>> +        iov_discard_front(&out_iov, &out_num, sizeof(req_mux));
->>>>> +
->>>>> +        header = &req_mux.header;
->>>>
->>>> I wonder if this request length checking logic is conform to the
->>>> most recent spec draft on the list ("[PATCH v18 0/2] virtio-crypto:
->>>> virtio crypto device specification").
->>>>
->>> Sure. Please see below normative formulation:
->>>
->>> '''
->>> \drivernormative{\paragraph}{Symmetric algorithms Operation}{Device Types
->> / Crypto Device / Device Operation / Symmetric algorithms Operation}
->>> ...
->>> \item If the VIRTIO_CRYPTO_F_MUX_MODE feature bit is negotiated, the
->> driver MUST use struct virtio_crypto_op_data_req_mux to wrap crypto
->> requests.
->>> Otherwise, the driver MUST use struct virtio_crypto_op_data_req.
->>> ...
->>> '''
->>>
->>
->> As far as I can remember, we have already agreed that in terms of the
->> spec sizeof(struct virtio_crypto_op_data_req) makes no sense! In your
-> 
-> Sorry, I don't think so. :(
-> 
->> code you have a substantially different struct virtio_crypto_op_data_req
->> than in your spec! For instance in the spec virtio_crypto_op_data_req is
->> the full request and contains the data buffers (src_data and the
->> dest_data), while in your code it's effectively just a header and does
->> not contain any data buffers.
->>
-> I said struct virtio_crypto_op_data_req in the spec is just a symbol.
-> I didn't find a better way to express the src_data and dst_data etc. So
-> I used u8[len] xxx_data to occupy a sit in the request.
-> 
-
-OK, tell me how is the reader/implementer of the spec supposed to figure
-out that a 124 byte padded "header" needs to be precede any "data"?
-
-Besides if you look at
-
-+Stateless mode HASH service requests are as follows:
-+
-+\begin{lstlisting}
-+struct virtio_crypto_hash_para_statelesss {
-+    struct {
-+        /* See VIRTIO_CRYPTO_HASH_* above */
-+        le32 algo;
-+    } sess_para;
-+
-+    /* length of source data */
-+    le32 src_data_len;
-+    /* hash result length */
-+    le32 hash_result_len;
-+    le32 reserved;
-+};
-+struct virtio_crypto_hash_data_req_stateless {
-+    /* Device-readable part */
-+    struct virtio_crypto_hash_para_stateless para;
-+    /* Source data */
-+    u8 src_data[src_data_len];
-+
-+    /* Device-writable part */
-+    /* Hash result data */
-+    u8 hash_result[hash_result_len];
-+    struct virtio_crypto_inhdr inhdr;
-+};
-+\end{lstlisting}
-+
-
-from the "[PATCH v18 1/2] virtio-crypto: Add virtio crypto device
-specification". You need the padding to 128 bytes after
-virtio_crypto_hash_para_stateless para, but before src_data. But there is
-no indication in the definition of virtio_crypto_hash_data_req_stateless
-nor somewhere in the spec about that. On the contrary based on this
-one would expect para.reserved and src_data being pretty adjecent.
-
-Thus the normative statement you quoted is (IMHO) ill suited and
-insufficient to express what you have been trying to express.
-
->>
->>>> AFAIU here you allow only requests of two sizes: one fixed size
->>>> for VIRTIO_CRYPTO_F_MUX_MODE and one without that feature. This
->>>> means that some requests need quite some padding between what
->>>> you call the 'request' and the actual data on which the crypto
->>>> operation dictated by the 'request' needs to be performed.
->>>
->>> Yes, that's true.
->>>
->>
->> This implies that should we need more than 128 bytes for a request,
->> we will need to introduce jet another request format and negotiate it
->> via feature bits.
->>
-> Why do we need other feature bits?
-
-Because assume you have something that needs more that 128 bytes for
-its request, how do you solve the problem without new format end new
-feature bit?
-
-> 
->> By the way, I'm having a hard time understing how is the requirement form
->> http://docs.oasis-open.org/virtio/virtio/v1.0/cs04/virtio-v1.0-cs04.html#x1-260
->> 004
->> (2.4.4 Message Framing) satisfied by this code. Could you explain this
->> to me please?
->>
-> Sorry for my bad English, 
-> I don't know which normative formulation the code violates?
-
-I'm not sure it's actually violated, but I'm concerned about the following
-normative statement: "The device MUST NOT make assumptions about the particular
-arrangement of descriptors. The device MAY have a reasonable limit of
-descriptors it will allow in a chain." 
-
-Please also read the explanatory part I've linked, because the normative
-statement is pretty abstract.
-
-In my understanding, the spec says, that e.g. the virti-crypto device
-should not fail if a single request is split up into let's say two chunks
-and transmitted by the means of two top level descriptors.
-
-Do you agree with my reading of the spec? 
-
-What does the virtio-crypto device do if it encounters such a situation?
-
-Regards,
-Halil
+Anthony
