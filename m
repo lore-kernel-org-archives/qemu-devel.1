@@ -1,29 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58024)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33658)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <arei.gonglei@huawei.com>) id 1dASbZ-0006k7-7m
-	for qemu-devel@nongnu.org; Mon, 15 May 2017 22:52:58 -0400
+	(envelope-from <peterx@redhat.com>) id 1dASt6-0001F1-1F
+	for qemu-devel@nongnu.org; Mon, 15 May 2017 23:11:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <arei.gonglei@huawei.com>) id 1dASbV-00046d-96
-	for qemu-devel@nongnu.org; Mon, 15 May 2017 22:52:57 -0400
-Received: from szxga02-in.huawei.com ([45.249.212.188]:3926)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <arei.gonglei@huawei.com>) id 1dASbU-00042K-E6
-	for qemu-devel@nongnu.org; Mon, 15 May 2017 22:52:53 -0400
-From: "Gonglei (Arei)" <arei.gonglei@huawei.com>
-Date: Tue, 16 May 2017 02:52:20 +0000
-Message-ID: <33183CC9F5247A488A2544077AF19020DA29A0B5@DGGEMA505-MBS.china.huawei.com>
-References: <1494243504-127980-1-git-send-email-arei.gonglei@huawei.com>
-	<1494243504-127980-7-git-send-email-arei.gonglei@huawei.com>
-	<520f45d4-33d7-8836-3140-a92ee5d15421@linux.vnet.ibm.com>
-	<33183CC9F5247A488A2544077AF19020DA278AA0@DGGEMA505-MBS.china.huawei.com>
-	<1963bfa1-c0ea-156a-59f7-aed744ca49a3@linux.vnet.ibm.com>
-In-Reply-To: <1963bfa1-c0ea-156a-59f7-aed744ca49a3@linux.vnet.ibm.com>
-Content-Language: zh-CN
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	(envelope-from <peterx@redhat.com>) id 1dASt2-0003gm-Pc
+	for qemu-devel@nongnu.org; Mon, 15 May 2017 23:11:03 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54394)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1dASt2-0003gK-G2
+	for qemu-devel@nongnu.org; Mon, 15 May 2017 23:11:00 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 29F2A368E7
+	for <qemu-devel@nongnu.org>; Tue, 16 May 2017 03:10:59 +0000 (UTC)
+Date: Tue, 16 May 2017 11:10:52 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20170516031052.GE31572@pxdev.xzpeter.org>
+References: <20170512155436.8936-1-quintela@redhat.com>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [RFC v1 6/9] virtio-crypto: rework
- virtio_crypto_handle_request
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20170512155436.8936-1-quintela@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2] migration: Move check_migratable() into
+ qdev.c
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,174 +33,219 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Halil Pasic <pasic@linux.vnet.ibm.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "mst@redhat.com" <mst@redhat.com>, "Huangweidong (C)" <weidong.huang@huawei.com>, "stefanha@redhat.com" <stefanha@redhat.com>, Luonengjun <luonengjun@huawei.com>, "cornelia.huck@de.ibm.com" <cornelia.huck@de.ibm.com>, Linqiangmin <linqiangmin@huawei.com>, "xin.zeng@intel.com" <xin.zeng@intel.com>, "Wubin (H)" <wu.wubin@huawei.com>
+To: Juan Quintela <quintela@redhat.com>
+Cc: qemu-devel@nongnu.org, dgilbert@redhat.com, lvivier@redhat.com
 
->=20
-> On 05/13/2017 03:16 AM, Gonglei (Arei) wrote:
-> >
-> >> From: Halil Pasic [mailto:pasic@linux.vnet.ibm.com]
-> >> Sent: Friday, May 12, 2017 7:02 PM
-> >>
-> >>
-> >> On 05/08/2017 01:38 PM, Gonglei wrote:
-> >>> According to the new spec, we should use different
-> >>> requst structure to store the data request based
-> >>> on whether VIRTIO_CRYPTO_F_MUX_MODE feature bit is
-> >>> negotiated or not.
-> >>>
-> >>> In this patch, we havn't supported stateless mode
-> >>> yet. The device reportes an error if both
-> >>> VIRTIO_CRYPTO_F_MUX_MODE and
-> >> VIRTIO_CRYPTO_F_CIPHER_STATELESS_MODE
-> >>> are negotiated, meanwhile the header.flag doesn't set
-> >>> to VIRTIO_CRYPTO_FLAG_SESSION_MODE.
-> >>>
-> >>> Let's handle this scenario in the following patches.
-> >>>
-> >>> Signed-off-by: Gonglei <arei.gonglei@huawei.com>
-> >>> ---
-> >>>  hw/virtio/virtio-crypto.c | 83
-> >> ++++++++++++++++++++++++++++++++++++++++-------
-> >>>  1 file changed, 71 insertions(+), 12 deletions(-)
-> >>>
-> >>> diff --git a/hw/virtio/virtio-crypto.c b/hw/virtio/virtio-crypto.c
-> >>> index 0353eb6..c4b8a2c 100644
-> >>> --- a/hw/virtio/virtio-crypto.c
-> >>> +++ b/hw/virtio/virtio-crypto.c
-> >>> @@ -577,6 +577,7 @@ virtio_crypto_handle_request(VirtIOCryptoReq
-> >> *request)
-> >>>      VirtQueueElement *elem =3D &request->elem;
-> >>>      int queue_index =3D
-> >> virtio_crypto_vq2q(virtio_get_queue_index(request->vq));
-> >>>      struct virtio_crypto_op_data_req req;
-> >>> +    struct virtio_crypto_op_data_req_mux req_mux;
-> >>>      int ret;
-> >>>      struct iovec *in_iov;
-> >>>      struct iovec *out_iov;
-> >>> @@ -587,6 +588,9 @@ virtio_crypto_handle_request(VirtIOCryptoReq
-> >> *request)
-> >>>      uint64_t session_id;
-> >>>      CryptoDevBackendSymOpInfo *sym_op_info =3D NULL;
-> >>>      Error *local_err =3D NULL;
-> >>> +    bool mux_mode_is_negotiated;
-> >>> +    struct virtio_crypto_op_header *header;
-> >>> +    bool is_stateless_req =3D false;
-> >>>
-> >>>      if (elem->out_num < 1 || elem->in_num < 1) {
-> >>>          virtio_error(vdev, "virtio-crypto dataq missing headers");
-> >>> @@ -597,12 +601,28 @@ virtio_crypto_handle_request(VirtIOCryptoReq
-> >> *request)
-> >>>      out_iov =3D elem->out_sg;
-> >>>      in_num =3D elem->in_num;
-> >>>      in_iov =3D elem->in_sg;
-> >>> -    if (unlikely(iov_to_buf(out_iov, out_num, 0, &req, sizeof(req))
-> >>> -                !=3D sizeof(req))) {
-> >>> -        virtio_error(vdev, "virtio-crypto request outhdr too short")=
-;
-> >>> -        return -1;
-> >>> +
-> >>> +    mux_mode_is_negotiated =3D
-> >>> +        virtio_vdev_has_feature(vdev,
-> VIRTIO_CRYPTO_F_MUX_MODE);
-> >>> +    if (!mux_mode_is_negotiated) {
-> >>> +        if (unlikely(iov_to_buf(out_iov, out_num, 0, &req, sizeof(re=
-q))
-> >>> +                    !=3D sizeof(req))) {
-> >>> +            virtio_error(vdev, "virtio-crypto request outhdr too sho=
-rt");
-> >>> +            return -1;
-> >>> +        }
-> >>> +        iov_discard_front(&out_iov, &out_num, sizeof(req));
-> >>> +
-> >>> +        header =3D &req.header;
-> >>> +    } else {
-> >>> +        if (unlikely(iov_to_buf(out_iov, out_num, 0, &req_mux,
-> >>> +                sizeof(req_mux)) !=3D sizeof(req_mux))) {
-> >>> +            virtio_error(vdev, "virtio-crypto request outhdr too sho=
-rt");
-> >>> +            return -1;
-> >>> +        }
-> >>> +        iov_discard_front(&out_iov, &out_num, sizeof(req_mux));
-> >>> +
-> >>> +        header =3D &req_mux.header;
-> >>
-> >> I wonder if this request length checking logic is conform to the
-> >> most recent spec draft on the list ("[PATCH v18 0/2] virtio-crypto:
-> >> virtio crypto device specification").
-> >>
-> > Sure. Please see below normative formulation:
-> >
-> > '''
-> > \drivernormative{\paragraph}{Symmetric algorithms Operation}{Device Typ=
-es
-> / Crypto Device / Device Operation / Symmetric algorithms Operation}
-> > ...
-> > \item If the VIRTIO_CRYPTO_F_MUX_MODE feature bit is negotiated, the
-> driver MUST use struct virtio_crypto_op_data_req_mux to wrap crypto
-> requests.
-> > Otherwise, the driver MUST use struct virtio_crypto_op_data_req.
-> > ...
-> > '''
-> >
->=20
-> As far as I can remember, we have already agreed that in terms of the
-> spec sizeof(struct virtio_crypto_op_data_req) makes no sense! In your
+On Fri, May 12, 2017 at 05:54:36PM +0200, Juan Quintela wrote:
+> The function is only used once, and nothing else in migration knows
+> about objects.  Create the function vmstate_device_is_migratable() in
+> savem.c that really do the bit that is related with migration.
 
-Sorry, I don't think so. :(
+(may need to touch up the commit message as well, since we don't have
+ vmstate_device_is_migratable() now)
 
-> code you have a substantially different struct virtio_crypto_op_data_req
-> than in your spec! For instance in the spec virtio_crypto_op_data_req is
-> the full request and contains the data buffers (src_data and the
-> dest_data), while in your code it's effectively just a header and does
-> not contain any data buffers.
->=20
-I said struct virtio_crypto_op_data_req in the spec is just a symbol.
-I didn't find a better way to express the src_data and dst_data etc. So
-I used u8[len] xxx_data to occupy a sit in the request.
+> 
+> Signed-off-by: Juan Quintela <quintela@redhat.com>
 
->=20
-> >> AFAIU here you allow only requests of two sizes: one fixed size
-> >> for VIRTIO_CRYPTO_F_MUX_MODE and one without that feature. This
-> >> means that some requests need quite some padding between what
-> >> you call the 'request' and the actual data on which the crypto
-> >> operation dictated by the 'request' needs to be performed.
-> >
-> > Yes, that's true.
-> >
->=20
-> This implies that should we need more than 128 bytes for a request,
-> we will need to introduce jet another request format and negotiate it
-> via feature bits.
->=20
-Why do we need other feature bits?
+For the build error for linux-user on previous v1, not sure defining
+one only_migratable in stubs/vmstate.c can work. Anyway, I think
+current patch is okay as well (considering that our goal is to cleanup
+the header "#include"s). So, best with the commit message touched up:
 
-> By the way, I'm having a hard time understing how is the requirement form
-> http://docs.oasis-open.org/virtio/virtio/v1.0/cs04/virtio-v1.0-cs04.html#=
-x1-260
-> 004
-> (2.4.4 Message Framing) satisfied by this code. Could you explain this
-> to me please?
->=20
-Sorry for my bad English,=20
-I don't know which normative formulation the code violates?
+Reviewed-by: Peter Xu <peterx@redhat.com>
 
-Thanks
--Gonglei
->=20
-> >> What are the benefits of this approach?
-> >>
-> > We could unify the request for all algorithms, both symmetric algos and
-> asymmetric algos,
-> > which is very convenient for handling tens of hundreds of different alg=
-orithm
-> requests.
-> >
->=20
-> AFAIU the reason is ease of implementation. If everybody else is fine
-> with this, I won't object either.
->=20
-> >
-> > Thanks,
-> > -Gonglei
-> >
+Thanks,
+
+> ---
+> 
+> - move only_migrateble use back to savevm.c to fix linux-user compilation.
+> 
+> 
+>  hw/core/qdev.c                | 20 ++++++++++++++++----
+>  include/migration/migration.h |  6 ------
+>  include/migration/vmstate.h   |  2 ++
+>  include/sysemu/sysemu.h       |  2 +-
+>  migration/migration.c         | 15 ---------------
+>  migration/savevm.c            | 10 ++++++++++
+>  stubs/vmstate.c               |  5 ++---
+>  7 files changed, 31 insertions(+), 29 deletions(-)
+> 
+> diff --git a/hw/core/qdev.c b/hw/core/qdev.c
+> index 02b632f..6f1b070 100644
+> --- a/hw/core/qdev.c
+> +++ b/hw/core/qdev.c
+> @@ -37,7 +37,7 @@
+>  #include "hw/boards.h"
+>  #include "hw/sysbus.h"
+>  #include "qapi-event.h"
+> -#include "migration/migration.h"
+> +#include "migration/vmstate.h"
+>  
+>  bool qdev_hotplug = false;
+>  static bool qdev_hot_added = false;
+> @@ -861,6 +861,20 @@ static bool device_get_realized(Object *obj, Error **errp)
+>      return dev->realized;
+>  }
+>  
+> +static bool check_only_migratable(Object *obj, Error **err)
+> +{
+> +    DeviceClass *dc = DEVICE_GET_CLASS(obj);
+> +
+> +    if (!vmstate_check_only_migratable(dc->vmsd)) {
+> +        error_setg(err, "Device %s is not migratable, but "
+> +                   "--only-migratable was specified",
+> +                   object_get_typename(obj));
+> +        return false;
+> +    }
+> +
+> +    return true;
+> +}
+> +
+>  static void device_set_realized(Object *obj, bool value, Error **errp)
+>  {
+>      DeviceState *dev = DEVICE(obj);
+> @@ -870,7 +884,6 @@ static void device_set_realized(Object *obj, bool value, Error **errp)
+>      Error *local_err = NULL;
+>      bool unattached_parent = false;
+>      static int unattached_count;
+> -    int ret;
+>  
+>      if (dev->hotplugged && !dc->hotpluggable) {
+>          error_setg(errp, QERR_DEVICE_NO_HOTPLUG, object_get_typename(obj));
+> @@ -878,8 +891,7 @@ static void device_set_realized(Object *obj, bool value, Error **errp)
+>      }
+>  
+>      if (value && !dev->realized) {
+> -        ret = check_migratable(obj, &local_err);
+> -        if (ret < 0) {
+> +        if (!check_only_migratable(obj, &local_err)) {
+>              goto fail;
+>          }
+>  
+> diff --git a/include/migration/migration.h b/include/migration/migration.h
+> index 1e23536..7ce3a7e 100644
+> --- a/include/migration/migration.h
+> +++ b/include/migration/migration.h
+> @@ -22,7 +22,6 @@
+>  #include "qapi-types.h"
+>  #include "exec/cpu-common.h"
+>  #include "qemu/coroutine_int.h"
+> -#include "qom/object.h"
+>  
+>  #define QEMU_VM_FILE_MAGIC           0x5145564d
+>  #define QEMU_VM_FILE_VERSION_COMPAT  0x00000002
+> @@ -39,9 +38,6 @@
+>  #define QEMU_VM_COMMAND              0x08
+>  #define QEMU_VM_SECTION_FOOTER       0x7e
+>  
+> -/* for vl.c */
+> -extern int only_migratable;
+> -
+>  /* Messages sent on the return path from destination to source */
+>  enum mig_rp_message_type {
+>      MIG_RP_MSG_INVALID = 0,  /* Must be 0 */
+> @@ -268,8 +264,6 @@ int ram_discard_range(const char *block_name, uint64_t start, size_t length);
+>  int ram_postcopy_incoming_init(MigrationIncomingState *mis);
+>  void ram_postcopy_migrated_memory_release(MigrationState *ms);
+>  
+> -int check_migratable(Object *obj, Error **err);
+> -
+>  bool migrate_release_ram(void);
+>  bool migrate_postcopy_ram(void);
+>  bool migrate_zero_blocks(void);
+> diff --git a/include/migration/vmstate.h b/include/migration/vmstate.h
+> index 81af5fb..dacb052 100644
+> --- a/include/migration/vmstate.h
+> +++ b/include/migration/vmstate.h
+> @@ -1066,4 +1066,6 @@ int64_t self_announce_delay(int round)
+>  
+>  void dump_vmstate_json_to_file(FILE *out_fp);
+>  
+> +bool vmstate_check_only_migratable(const VMStateDescription *vmsd);
+> +
+>  #endif
+> diff --git a/include/sysemu/sysemu.h b/include/sysemu/sysemu.h
+> index 3340202..83ecd13 100644
+> --- a/include/sysemu/sysemu.h
+> +++ b/include/sysemu/sysemu.h
+> @@ -15,7 +15,7 @@
+>  /* vl.c */
+>  
+>  extern const char *bios_name;
+> -
+> +extern int only_migratable;
+>  extern const char *qemu_name;
+>  extern QemuUUID qemu_uuid;
+>  extern bool qemu_uuid_set;
+> diff --git a/migration/migration.c b/migration/migration.c
+> index a6a9922..55c3958 100644
+> --- a/migration/migration.c
+> +++ b/migration/migration.c
+> @@ -1162,21 +1162,6 @@ void migrate_del_blocker(Error *reason)
+>      migration_blockers = g_slist_remove(migration_blockers, reason);
+>  }
+>  
+> -int check_migratable(Object *obj, Error **err)
+> -{
+> -    DeviceClass *dc = DEVICE_GET_CLASS(obj);
+> -    if (only_migratable && dc->vmsd) {
+> -        if (dc->vmsd->unmigratable) {
+> -            error_setg(err, "Device %s is not migratable, but "
+> -                       "--only-migratable was specified",
+> -                       object_get_typename(obj));
+> -            return -1;
+> -        }
+> -    }
+> -
+> -    return 0;
+> -}
+> -
+>  void qmp_migrate_incoming(const char *uri, Error **errp)
+>  {
+>      Error *local_err = NULL;
+> diff --git a/migration/savevm.c b/migration/savevm.c
+> index b24946f..de85e06 100644
+> --- a/migration/savevm.c
+> +++ b/migration/savevm.c
+> @@ -2310,3 +2310,13 @@ void vmstate_register_ram_global(MemoryRegion *mr)
+>  {
+>      vmstate_register_ram(mr, NULL);
+>  }
+> +
+> +bool vmstate_check_only_migratable(const VMStateDescription *vmsd)
+> +{
+> +    /* check needed if --only-migratable is specified */
+> +    if (!only_migratable) {
+> +        return true;
+> +    }
+> +
+> +    return !(vmsd && vmsd->unmigratable);
+> +}
+> diff --git a/stubs/vmstate.c b/stubs/vmstate.c
+> index 6d52f29..6399474 100644
+> --- a/stubs/vmstate.c
+> +++ b/stubs/vmstate.c
+> @@ -1,7 +1,6 @@
+>  #include "qemu/osdep.h"
+>  #include "qemu-common.h"
+>  #include "migration/vmstate.h"
+> -#include "migration/migration.h"
+>  
+>  const VMStateDescription vmstate_dummy = {};
+>  
+> @@ -21,7 +20,7 @@ void vmstate_unregister(DeviceState *dev,
+>  {
+>  }
+>  
+> -int check_migratable(Object *obj, Error **err)
+> +bool vmstate_check_only_migratable(const VMStateDescription *vmsd)
+>  {
+> -    return 0;
+> +    return true;
+>  }
+> -- 
+> 2.9.3
+> 
+
+-- 
+Peter Xu
