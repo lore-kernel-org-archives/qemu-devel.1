@@ -1,27 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51794)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51909)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1dAaOM-0000DC-N2
-	for qemu-devel@nongnu.org; Tue, 16 May 2017 07:11:51 -0400
+	(envelope-from <you-hero@126.com>) id 1dAaOs-0000o5-14
+	for qemu-devel@nongnu.org; Tue, 16 May 2017 07:12:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1dAaOL-00036W-K9
-	for qemu-devel@nongnu.org; Tue, 16 May 2017 07:11:50 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:55340)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1dAaOL-00031y-Bs
-	for qemu-devel@nongnu.org; Tue, 16 May 2017 07:11:49 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 9AB70C04B939
-	for <qemu-devel@nongnu.org>; Tue, 16 May 2017 11:11:37 +0000 (UTC)
-From: Juan Quintela <quintela@redhat.com>
-Date: Tue, 16 May 2017 13:11:21 +0200
-Message-Id: <20170516111123.17692-4-quintela@redhat.com>
-In-Reply-To: <20170516111123.17692-1-quintela@redhat.com>
-References: <20170516111123.17692-1-quintela@redhat.com>
-Subject: [Qemu-devel] [PATCH 3/5] migration: Remove use of old
- MigrationParams
+	(envelope-from <you-hero@126.com>) id 1dAaOq-0003Ke-R6
+	for qemu-devel@nongnu.org; Tue, 16 May 2017 07:12:22 -0400
+Date: Tue, 16 May 2017 18:41:19 +0800 (CST)
+From: =?GBK?B?zuLWvtPC?= <you-hero@126.com>
+In-Reply-To: <1492005921-15664-1-git-send-email-zhang.zhanghailiang@huawei.com>
+References: <1492005921-15664-1-git-send-email-zhang.zhanghailiang@huawei.com>
+MIME-Version: 1.0
+Message-ID: <1ebb7cca.a83b.15c10d90dcc.Coremail.you-hero@126.com>
+Content-Type: text/plain; charset=GBK
+Content-Transfer-Encoding: base64
+Subject: Re: [Qemu-devel] [PATCH v4 0/6] COLO block replication supports
+ shared disk case
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,149 +23,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: dgilbert@redhat.com, lvivier@redhat.com, peterx@redhat.com, eblake@redhat.com, armbru@redhat.com
+To: zhanghailiang <zhang.zhanghailiang@huawei.com>
+Cc: stefanha@redhat.com, qemu-devel@nongnu.org, kwolf@redhat.com, xiecl.fnst@cn.fujitsu.com, qemu-block@nongnu.org, zhangchen.fnst@cn.fujitsu.com, eddie.dong@intel.com, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
 
-We have change in the previous patch to use migration capabilities for
-it.  Notice that we continue using the old command line flags from
-migrate command from the time being.  Remove the set_params method as
-now it is empty.
-
-Signed-off-by: Juan Quintela <quintela@redhat.com>
-
----
-- Maintain shared/enabled dependency (Xu suggestion)
-- Now we maintain the dependency on the setter functions
----
- include/migration/migration.h |  3 +--
- migration/block.c             | 17 ++---------------
- migration/colo.c              |  4 ++--
- migration/migration.c         |  3 ---
- migration/savevm.c            |  8 ++++++--
- 5 files changed, 11 insertions(+), 24 deletions(-)
-
-diff --git a/include/migration/migration.h b/include/migration/migration.h
-index adcb8f6..1277226 100644
---- a/include/migration/migration.h
-+++ b/include/migration/migration.h
-@@ -43,8 +43,7 @@
- extern int only_migratable;
- 
- struct MigrationParams {
--    bool blk;
--    bool shared;
-+    bool unused; /* C doesn't allow empty structs */
- };
- 
- /* Messages sent on the return path from destination to source */
-diff --git a/migration/block.c b/migration/block.c
-index 060087f..5d22926 100644
---- a/migration/block.c
-+++ b/migration/block.c
-@@ -94,9 +94,6 @@ typedef struct BlkMigBlock {
- } BlkMigBlock;
- 
- typedef struct BlkMigState {
--    /* Written during setup phase.  Can be read without a lock.  */
--    int blk_enable;
--    int shared_base;
-     QSIMPLEQ_HEAD(bmds_list, BlkMigDevState) bmds_list;
-     int64_t total_sector_sum;
-     bool zero_blocks;
-@@ -425,7 +422,7 @@ static int init_blk_migration(QEMUFile *f)
-         bmds->bulk_completed = 0;
-         bmds->total_sectors = sectors;
-         bmds->completed_sectors = 0;
--        bmds->shared_base = block_mig_state.shared_base;
-+        bmds->shared_base = migrate_use_block_incremental();
- 
-         assert(i < num_bs);
-         bmds_bs[i].bmds = bmds;
-@@ -994,22 +991,12 @@ static int block_load(QEMUFile *f, void *opaque, int version_id)
-     return 0;
- }
- 
--static void block_set_params(const MigrationParams *params, void *opaque)
--{
--    block_mig_state.blk_enable = params->blk;
--    block_mig_state.shared_base = params->shared;
--
--    /* shared base means that blk_enable = 1 */
--    block_mig_state.blk_enable |= params->shared;
--}
--
- static bool block_is_active(void *opaque)
- {
--    return block_mig_state.blk_enable == 1;
-+    return migrate_use_block();
- }
- 
- static SaveVMHandlers savevm_block_handlers = {
--    .set_params = block_set_params,
-     .save_live_setup = block_save_setup,
-     .save_live_iterate = block_save_iterate,
-     .save_live_complete_precopy = block_save_complete,
-diff --git a/migration/colo.c b/migration/colo.c
-index 963c802..8c86892 100644
---- a/migration/colo.c
-+++ b/migration/colo.c
-@@ -14,6 +14,7 @@
- #include "qemu/timer.h"
- #include "sysemu/sysemu.h"
- #include "migration/colo.h"
-+#include "migration/block.h"
- #include "io/channel-buffer.h"
- #include "trace.h"
- #include "qemu/error-report.h"
-@@ -345,8 +346,7 @@ static int colo_do_checkpoint_transaction(MigrationState *s,
-     }
- 
-     /* Disable block migration */
--    s->params.blk = 0;
--    s->params.shared = 0;
-+    migrate_set_block_enabled(false, &local_err);
-     qemu_savevm_state_header(fb);
-     qemu_savevm_state_begin(fb, &s->params);
-     qemu_mutex_lock_iothread();
-diff --git a/migration/migration.c b/migration/migration.c
-index 03f96df..c03f34e 100644
---- a/migration/migration.c
-+++ b/migration/migration.c
-@@ -1249,9 +1249,6 @@ void qmp_migrate(const char *uri, bool has_blk, bool blk,
-     bool block_enabled = false;
-     const char *p;
- 
--    params.blk = has_blk && blk;
--    params.shared = has_inc && inc;
--
-     if (migration_is_setup_or_active(s->state) ||
-         s->state == MIGRATION_STATUS_CANCELLING ||
-         s->state == MIGRATION_STATUS_COLO) {
-diff --git a/migration/savevm.c b/migration/savevm.c
-index b4f736f..5fc10ab 100644
---- a/migration/savevm.c
-+++ b/migration/savevm.c
-@@ -1233,8 +1233,6 @@ static int qemu_savevm_state(QEMUFile *f, Error **errp)
- {
-     int ret;
-     MigrationParams params = {
--        .blk = 0,
--        .shared = 0
-     };
-     MigrationState *ms = migrate_init(&params);
-     MigrationStatus status;
-@@ -1245,6 +1243,12 @@ static int qemu_savevm_state(QEMUFile *f, Error **errp)
-         goto done;
-     }
- 
-+    if (migrate_use_block()) {
-+        error_setg(errp, "Block migration and snapshots are incompatible");
-+        ret = -EINVAL;
-+        goto done;
-+    }
-+
-     qemu_mutex_unlock_iothread();
-     qemu_savevm_state_header(f);
-     qemu_savevm_state_begin(f, &params);
--- 
-2.9.3
+SEmjrCBIYWkgTGlhbmcKCgpJcyB0aGVyZSByZWNlbnRseSBhbnkgcGxhbiB0byBwb3N0IGxpYnZp
+cnQgc3VwcG9ydCBmb3IgQ09MTyBmZWF0dXJlPwoKClJlZ2FyZHMsCgoKWmhpIFlvbmcgV3UKCgpB
+dCAyMDE3LTA0LTEyIDIyOjA1OjE1LCAiemhhbmdoYWlsaWFuZyIgPHpoYW5nLnpoYW5naGFpbGlh
+bmdAaHVhd2VpLmNvbT4gd3JvdGU6Cj5DT0xPIGJsb2NrIHJlcGxpY2F0aW9uIGRvZXNuJ3Qgc3Vw
+cG9ydCB0aGUgc2hhcmVkIGRpc2sgY2FzZSwKPkhlcmUgd2UgdHJ5IHRvIGltcGxlbWVudCBpdCBh
+bmQgdGhpcyBpcyB0aGUgNHRoIHZlcnNpb24uCj4KPlBsZWFzZSByZXZpZXcgYW5kIGFueSBjb21t
+aXRzIGFyZSB3ZWxjb21lZC4KPgo+Q2M6IERyLiBEYXZpZCBBbGFuIEdpbGJlcnQgKGdpdCkgPGRn
+aWxiZXJ0QHJlZGhhdC5jb20+Cj5DYzogZWRkaWUuZG9uZ0BpbnRlbC5jb20KPgo+djQ6Cj4tIEFk
+ZCBwcm9wZXIgY29tbWVudCBmb3IgcHJpbWFyeV9kaXNrIGluIHBhdGNoIDIgKFN0ZWZhbikKPi0g
+Q2FsbCBiZHJ2X2ludmFsaWRhdGVfY2FjaGUoKSB3aGlsZSBkbyBjaGVja3BvaW50IGZvciBzaGFy
+ZWQgZGlzayBpbiBwYXRjaCA1Cj4KPnYzOgo+LSBGaXggc29tZSBjb21tZW50cyBmcm9tIFN0ZWZh
+biBhbmQgRXJpYwo+Cj52MjoKPi0gRHJvcCB0aGUgcGF0Y2ggd2hpY2ggYWRkIGEgYmxrX3Jvb3Qo
+KSBoZWxwZXIKPi0gRml4IHNvbWUgY29tbWVudHMgZnJvbSBDaGFuZ2xvbmcKPgo+emhhbmdoYWls
+aWFuZyAoNik6Cj4gIGRvY3MvYmxvY2stcmVwbGljYXRpb246IEFkZCBkZXNjcmlwdGlvbiBmb3Ig
+c2hhcmVkLWRpc2sgY2FzZQo+ICByZXBsaWNhdGlvbjogYWRkIHNoYXJlZC1kaXNrIGFuZCBzaGFy
+ZWQtZGlzay1pZCBvcHRpb25zCj4gIHJlcGxpY2F0aW9uOiBTcGxpdCBvdXQgYmFja3VwX2RvX2No
+ZWNrcG9pbnQoKSBmcm9tCj4gICAgc2Vjb25kYXJ5X2RvX2NoZWNrcG9pbnQoKQo+ICByZXBsaWNh
+dGlvbjogZml4IGNvZGUgbG9naWMgd2l0aCB0aGUgbmV3IHNoYXJlZF9kaXNrIG9wdGlvbgo+ICBy
+ZXBsaWNhdGlvbjogSW1wbGVtZW50IGJsb2NrIHJlcGxpY2F0aW9uIGZvciBzaGFyZWQgZGlzayBj
+YXNlCj4gIG5iZC9yZXBsaWNhdGlvbjogaW1wbGVtZW50IC5iZHJ2X2dldF9pbmZvKCkgZm9yIG5i
+ZCBhbmQgcmVwbGljYXRpb24KPiAgICBkcml2ZXIKPgo+IGJsb2NrL25iZC5jICAgICAgICAgICAg
+ICAgIHwgIDEyICsrKwo+IGJsb2NrL3JlcGxpY2F0aW9uLmMgICAgICAgIHwgMTk4ICsrKysrKysr
+KysrKysrKysrKysrKysrKysrKysrKysrKystLS0tLS0tLS0tLQo+IGRvY3MvYmxvY2stcmVwbGlj
+YXRpb24udHh0IHwgMTM5ICsrKysrKysrKysrKysrKysrKysrKysrKysrKysrKy0KPiBxYXBpL2Js
+b2NrLWNvcmUuanNvbiAgICAgICB8ICAxMCArKy0KPiA0IGZpbGVzIGNoYW5nZWQsIDMwNiBpbnNl
+cnRpb25zKCspLCA1MyBkZWxldGlvbnMoLSkKPgo+LS0gCj4xLjguMy4xCj4KPgo+Cg==
