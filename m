@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46779)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46796)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1dAeoC-0003U8-CC
-	for qemu-devel@nongnu.org; Tue, 16 May 2017 11:54:49 -0400
+	(envelope-from <jcody@redhat.com>) id 1dAeoC-0003UX-Tg
+	for qemu-devel@nongnu.org; Tue, 16 May 2017 11:54:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1dAeoB-0001dU-C7
+	(envelope-from <jcody@redhat.com>) id 1dAeoB-0001dt-Tl
 	for qemu-devel@nongnu.org; Tue, 16 May 2017 11:54:48 -0400
 From: Jeff Cody <jcody@redhat.com>
-Date: Tue, 16 May 2017 11:54:15 -0400
-Message-Id: <20170516155420.10106-4-jcody@redhat.com>
+Date: Tue, 16 May 2017 11:54:16 -0400
+Message-Id: <20170516155420.10106-5-jcody@redhat.com>
 In-Reply-To: <20170516155420.10106-1-jcody@redhat.com>
 References: <20170516155420.10106-1-jcody@redhat.com>
-Subject: [Qemu-devel] [PULL 3/8] curl: never invoke callbacks with s->mutex
- held
+Subject: [Qemu-devel] [PULL 4/8] curl: avoid recursive locking of
+ BDRVCURLState mutex
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,88 +25,127 @@ Cc: peter.maydell@linaro.org, jcody@redhat.com, qemu-devel@nongnu.org, Paolo Bon
 
 From: Paolo Bonzini <pbonzini@redhat.com>
 
-All curl callbacks go through curl_multi_do, and hence are called with
-s->mutex held.  Note that with comments, and make curl_read_cb drop the
-lock before invoking the callback.
+The curl driver has a ugly hack where, if it cannot find an empty CURLState,
+it just uses aio_poll to wait for one to be empty.  This is probably
+buggy when used together with dataplane, and the simplest way to fix it
+is to use coroutines instead.
 
-Likewise for curl_find_buf, where the callback can be invoked by the
-caller.
+A more immediate effect of the bug however is that it can cause a
+recursive call to curl_readv_bh_cb and recursively taking the
+BDRVCURLState mutex.  This causes a deadlock.
 
-Cc: qemu-stable@nongnu.org
+The fix is to unlock the mutex around aio_poll, but for cleanliness we
+should also take the mutex around all calls to curl_init_state, even if
+reaching the unlock/lock pair is impossible.  The same is true for
+curl_clean_state.
+
+Reported-by: Kun Wei <kuwei@redhat.com>
+Tested-by: Richard W.M. Jones <rjones@redhat.com>
+Reviewed-by: Max Reitz <mreitz@redhat.com>
 Reviewed-by: Jeff Cody <jcody@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-Reviewed-by: Max Reitz <mreitz@redhat.com>
-Message-id: 20170515100059.15795-3-pbonzini@redhat.com
+Message-id: 20170515100059.15795-4-pbonzini@redhat.com
+Cc: qemu-stable@nongnu.org
+Cc: Jeff Cody <jcody@redhat.com>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 Signed-off-by: Jeff Cody <jcody@redhat.com>
 ---
- block/curl.c | 12 ++++++++----
- 1 file changed, 8 insertions(+), 4 deletions(-)
+ block/curl.c | 14 +++++++++++++-
+ 1 file changed, 13 insertions(+), 1 deletion(-)
 
 diff --git a/block/curl.c b/block/curl.c
-index 562340f..18b82bc 100644
+index 18b82bc..c160810 100644
 --- a/block/curl.c
 +++ b/block/curl.c
-@@ -148,6 +148,7 @@ static void curl_multi_do(void *arg);
- static void curl_multi_read(void *arg);
- 
- #ifdef NEED_CURL_TIMER_CALLBACK
-+/* Called from curl_multi_do_locked, with s->mutex held.  */
- static int curl_timer_cb(CURLM *multi, long timeout_ms, void *opaque)
- {
-     BDRVCURLState *s = opaque;
-@@ -164,6 +165,7 @@ static int curl_timer_cb(CURLM *multi, long timeout_ms, void *opaque)
+@@ -282,6 +282,7 @@ read_end:
+     return size * nmemb;
  }
+ 
++/* Called with s->mutex held.  */
+ static int curl_find_buf(BDRVCURLState *s, size_t start, size_t len,
+                          CURLAIOCB *acb)
+ {
+@@ -454,6 +455,7 @@ static void curl_multi_timeout_do(void *arg)
  #endif
- 
-+/* Called from curl_multi_do_locked, with s->mutex held.  */
- static int curl_sock_cb(CURL *curl, curl_socket_t fd, int action,
-                         void *userp, void *sp)
- {
-@@ -213,6 +215,7 @@ static int curl_sock_cb(CURL *curl, curl_socket_t fd, int action,
-     return 0;
  }
  
-+/* Called from curl_multi_do_locked, with s->mutex held.  */
- static size_t curl_header_cb(void *ptr, size_t size, size_t nmemb, void *opaque)
++/* Called with s->mutex held.  */
+ static CURLState *curl_init_state(BlockDriverState *bs, BDRVCURLState *s)
  {
-     BDRVCURLState *s = opaque;
-@@ -227,6 +230,7 @@ static size_t curl_header_cb(void *ptr, size_t size, size_t nmemb, void *opaque)
-     return realsize;
+     CURLState *state = NULL;
+@@ -472,7 +474,9 @@ static CURLState *curl_init_state(BlockDriverState *bs, BDRVCURLState *s)
+             break;
+         }
+         if (!state) {
++            qemu_mutex_unlock(&s->mutex);
+             aio_poll(bdrv_get_aio_context(bs), true);
++            qemu_mutex_lock(&s->mutex);
+         }
+     } while(!state);
+ 
+@@ -535,6 +539,7 @@ static CURLState *curl_init_state(BlockDriverState *bs, BDRVCURLState *s)
+     return state;
  }
  
-+/* Called from curl_multi_do_locked, with s->mutex held.  */
- static size_t curl_read_cb(void *ptr, size_t size, size_t nmemb, void *opaque)
++/* Called with s->mutex held.  */
+ static void curl_clean_state(CURLState *s)
  {
-     CURLState *s = ((CURLState*)opaque);
-@@ -265,7 +269,9 @@ static size_t curl_read_cb(void *ptr, size_t size, size_t nmemb, void *opaque)
-                                   request_length - offset);
-             }
+     int j;
+@@ -566,6 +571,7 @@ static void curl_detach_aio_context(BlockDriverState *bs)
+     BDRVCURLState *s = bs->opaque;
+     int i;
  
-+            qemu_mutex_unlock(&s->s->mutex);
-             acb->common.cb(acb->common.opaque, 0);
-+            qemu_mutex_lock(&s->s->mutex);
-             qemu_aio_unref(acb);
-             s->acb[i] = NULL;
-         }
-@@ -306,8 +312,6 @@ static int curl_find_buf(BDRVCURLState *s, size_t start, size_t len,
-             if (clamped_len < len) {
-                 qemu_iovec_memset(acb->qiov, clamped_len, 0, len - clamped_len);
-             }
--            acb->common.cb(acb->common.opaque, 0);
--
-             return FIND_RET_OK;
-         }
++    qemu_mutex_lock(&s->mutex);
+     for (i = 0; i < CURL_NUM_STATES; i++) {
+         if (s->states[i].in_use) {
+             curl_clean_state(&s->states[i]);
+@@ -581,6 +587,7 @@ static void curl_detach_aio_context(BlockDriverState *bs)
+         curl_multi_cleanup(s->multi);
+         s->multi = NULL;
+     }
++    qemu_mutex_unlock(&s->mutex);
  
-@@ -854,8 +858,8 @@ static void curl_readv_bh_cb(void *p)
-     // we can just call the callback and be done.
-     switch (curl_find_buf(s, start, acb->nb_sectors * BDRV_SECTOR_SIZE, acb)) {
-         case FIND_RET_OK:
--            qemu_aio_unref(acb);
--            // fall through
-+            ret = 0;
-+            goto out;
-         case FIND_RET_WAIT:
-             goto out;
-         default:
+     timer_del(&s->timer);
+ }
+@@ -684,6 +691,7 @@ static int curl_open(BlockDriverState *bs, QDict *options, int flags,
+         return -EROFS;
+     }
+ 
++    qemu_mutex_init(&s->mutex);
+     opts = qemu_opts_create(&runtime_opts, NULL, 0, &error_abort);
+     qemu_opts_absorb_qdict(opts, options, &local_err);
+     if (local_err) {
+@@ -769,7 +777,9 @@ static int curl_open(BlockDriverState *bs, QDict *options, int flags,
+     DPRINTF("CURL: Opening %s\n", file);
+     s->aio_context = bdrv_get_aio_context(bs);
+     s->url = g_strdup(file);
++    qemu_mutex_lock(&s->mutex);
+     state = curl_init_state(bs, s);
++    qemu_mutex_unlock(&s->mutex);
+     if (!state)
+         goto out_noclean;
+ 
+@@ -813,11 +823,12 @@ static int curl_open(BlockDriverState *bs, QDict *options, int flags,
+     }
+     DPRINTF("CURL: Size = %zd\n", s->len);
+ 
++    qemu_mutex_lock(&s->mutex);
+     curl_clean_state(state);
++    qemu_mutex_unlock(&s->mutex);
+     curl_easy_cleanup(state->curl);
+     state->curl = NULL;
+ 
+-    qemu_mutex_init(&s->mutex);
+     curl_attach_aio_context(bs, bdrv_get_aio_context(bs));
+ 
+     qemu_opts_del(opts);
+@@ -828,6 +839,7 @@ out:
+     curl_easy_cleanup(state->curl);
+     state->curl = NULL;
+ out_noclean:
++    qemu_mutex_destroy(&s->mutex);
+     g_free(s->cookie);
+     g_free(s->url);
+     qemu_opts_del(opts);
 -- 
 2.9.3
