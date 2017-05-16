@@ -1,26 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42888)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43265)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1dAebW-0004PQ-0Q
-	for qemu-devel@nongnu.org; Tue, 16 May 2017 11:41:43 -0400
+	(envelope-from <jcody@redhat.com>) id 1dAech-0005pY-Ik
+	for qemu-devel@nongnu.org; Tue, 16 May 2017 11:42:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1dAebS-0002iN-2G
-	for qemu-devel@nongnu.org; Tue, 16 May 2017 11:41:42 -0400
-Resent-Message-Id: <E1dAebS-0002iN-2G@eggs.gnu.org>
-Received: from sender-of-o52.zoho.com ([135.84.80.217]:21353)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1dAebR-0002hZ-PN
-	for qemu-devel@nongnu.org; Tue, 16 May 2017 11:41:37 -0400
-In-Reply-To: <1494947277-26158-1-git-send-email-thuth@redhat.com>
-Message-ID: <149494925235.540.4484199488163613007@c05f1edc8ed1>
-Reply-To: <qemu-devel@nongnu.org>
+	(envelope-from <jcody@redhat.com>) id 1dAecf-0003Y6-W0
+	for qemu-devel@nongnu.org; Tue, 16 May 2017 11:42:55 -0400
+Date: Tue, 16 May 2017 11:42:37 -0400
+From: Jeff Cody <jcody@redhat.com>
+Message-ID: <20170516154237.GK19824@localhost.localdomain>
+References: <20170515191136.24314-1-ndevos@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Tue, 16 May 2017 08:40:52 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH] Add a blog post with links to the
- presentations from the DevConf 2017
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170515191136.24314-1-ndevos@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] gluster: add support for
+ PREALLOC_MODE_FALLOC
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,37 +23,146 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: thuth@redhat.com
-Cc: famz@redhat.com, qemu-devel@nongnu.org, pbonzini@redhat.com
+To: Niels de Vos <ndevos@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKTWVzc2FnZS1pZDogMTQ5
-NDk0NzI3Ny0yNjE1OC0xLWdpdC1zZW5kLWVtYWlsLXRodXRoQHJlZGhhdC5jb20KVHlwZTogc2Vy
-aWVzClN1YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0hdIEFkZCBhIGJsb2cgcG9zdCB3aXRoIGxp
-bmtzIHRvIHRoZSBwcmVzZW50YXRpb25zIGZyb20gdGhlIERldkNvbmYgMjAxNwoKPT09IFRFU1Qg
-U0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaAoKQkFTRT1iYXNlCm49MQp0b3RhbD0kKGdpdCBs
-b2cgLS1vbmVsaW5lICRCQVNFLi4gfCB3YyAtbCkKZmFpbGVkPTAKCmdpdCBjb25maWcgLS1sb2Nh
-bCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVl
-Cgpjb21taXRzPSIkKGdpdCBsb2cgLS1mb3JtYXQ9JUggLS1yZXZlcnNlICRCQVNFLi4pIgpmb3Ig
-YyBpbiAkY29tbWl0czsgZG8KICAgIGVjaG8gIkNoZWNraW5nIFBBVENIICRuLyR0b3RhbDogJChn
-aXQgbG9nIC1uIDEgLS1mb3JtYXQ9JXMgJGMpLi4uIgogICAgaWYgISBnaXQgc2hvdyAkYyAtLWZv
-cm1hdD1lbWFpbCB8IC4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgLTsgdGhlbgog
-ICAgICAgIGZhaWxlZD0xCiAgICAgICAgZWNobwogICAgZmkKICAgIG49JCgobisxKSkKZG9uZQoK
-ZXhpdCAkZmFpbGVkCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMy
-MWZmODc4MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0CkZyb20gaHR0cHM6Ly9naXRodWIuY29tL3Bh
-dGNoZXctcHJvamVjdC9xZW11CiAtIFt0YWcgdXBkYXRlXSAgICAgIHBhdGNoZXcvMjAxNzA1MTEx
-NDQyMDguMjQwNzUtMS1wYm9uemluaUByZWRoYXQuY29tIC0+IHBhdGNoZXcvMjAxNzA1MTExNDQy
-MDguMjQwNzUtMS1wYm9uemluaUByZWRoYXQuY29tClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAn
-dGVzdCcKMGFhNmM1YiBBZGQgYSBibG9nIHBvc3Qgd2l0aCBsaW5rcyB0byB0aGUgcHJlc2VudGF0
-aW9ucyBmcm9tIHRoZSBEZXZDb25mIDIwMTcKCj09PSBPVVRQVVQgQkVHSU4gPT09CkNoZWNraW5n
-IFBBVENIIDEvMTogQWRkIGEgYmxvZyBwb3N0IHdpdGggbGlua3MgdG8gdGhlIHByZXNlbnRhdGlv
-bnMgZnJvbSB0aGUgRGV2Q29uZiAyMDE3Li4uCkVSUk9SOiB0cmFpbGluZyB3aGl0ZXNwYWNlCiM0
-MTogRklMRTogX3Bvc3RzLzIwMTctMDUtMTYtZGV2Y29uZi1wcmVzZW50YXRpb25zLm1kOjIzOgor
-ICBieSBSYWRpbSBLcsSNbcOhxZkgJAoKdG90YWw6IDEgZXJyb3JzLCAwIHdhcm5pbmdzLCA0NyBs
-aW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmll
-dy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhl
-bSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgo9PT0g
-T1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoKLS0tCkVt
-YWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHA6Ly9wYXRjaGV3Lm9y
-Zy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAZnJlZWxpc3Rz
-Lm9yZw==
+On Mon, May 15, 2017 at 09:11:36PM +0200, Niels de Vos wrote:
+> Add missing support for "preallocation=falloc" to the Gluster block
+> driver. This change bases its logic on that of block/file-posix.c and
+> removed the gluster_supports_zerofill() function in favour of an #ifdef
+> check in an easy to read switch-statement.
+> 
+> Reported-by: Satheesaran Sundaramoorthi <sasundar@redhat.com>
+> URL: https://bugzilla.redhat.com/1450759
+> Signed-off-by: Niels de Vos <ndevos@redhat.com>
+> ---
+>  block/gluster.c | 61 +++++++++++++++++++++++++++++++++++----------------------
+>  1 file changed, 38 insertions(+), 23 deletions(-)
+> 
+> diff --git a/block/gluster.c b/block/gluster.c
+> index 7c76cd0..566166f 100644
+> --- a/block/gluster.c
+> +++ b/block/gluster.c
+> @@ -965,11 +965,6 @@ static coroutine_fn int qemu_gluster_co_pwrite_zeroes(BlockDriverState *bs,
+>      return acb.ret;
+>  }
+>  
+> -static inline bool gluster_supports_zerofill(void)
+> -{
+> -    return 1;
+> -}
+> -
+>  static inline int qemu_gluster_zerofill(struct glfs_fd *fd, int64_t offset,
+>                                          int64_t size)
+>  {
+> @@ -977,11 +972,6 @@ static inline int qemu_gluster_zerofill(struct glfs_fd *fd, int64_t offset,
+>  }
+>  
+>  #else
+> -static inline bool gluster_supports_zerofill(void)
+> -{
+> -    return 0;
+> -}
+> -
+>  static inline int qemu_gluster_zerofill(struct glfs_fd *fd, int64_t offset,
+>                                          int64_t size)
+>  {
+> @@ -996,9 +986,10 @@ static int qemu_gluster_create(const char *filename,
+>      struct glfs *glfs;
+>      struct glfs_fd *fd;
+>      int ret = 0;
+> -    int prealloc = 0;
+> +    PreallocMode prealloc;
+>      int64_t total_size = 0;
+>      char *tmp = NULL;
+> +    Error *local_err = NULL;
+>  
+>      gconf = g_new0(BlockdevOptionsGluster, 1);
+>      gconf->debug = qemu_opt_get_number_del(opts, GLUSTER_OPT_DEBUG,
+> @@ -1026,13 +1017,12 @@ static int qemu_gluster_create(const char *filename,
+>                            BDRV_SECTOR_SIZE);
+>  
+>      tmp = qemu_opt_get_del(opts, BLOCK_OPT_PREALLOC);
+> -    if (!tmp || !strcmp(tmp, "off")) {
+> -        prealloc = 0;
+> -    } else if (!strcmp(tmp, "full") && gluster_supports_zerofill()) {
+> -        prealloc = 1;
+> -    } else {
+> -        error_setg(errp, "Invalid preallocation mode: '%s'"
+> -                         " or GlusterFS doesn't support zerofill API", tmp);
+> +    prealloc = qapi_enum_parse(PreallocMode_lookup, tmp,
+> +                               PREALLOC_MODE__MAX, PREALLOC_MODE_OFF,
+> +                               &local_err);
+> +    g_free(tmp);
+> +    if (local_err) {
+> +        error_propagate(errp, local_err);
+>          ret = -EINVAL;
+>          goto out;
+>      }
+> @@ -1041,21 +1031,46 @@ static int qemu_gluster_create(const char *filename,
+>                      O_WRONLY | O_CREAT | O_TRUNC | O_BINARY, S_IRUSR | S_IWUSR);
+>      if (!fd) {
+>          ret = -errno;
+> -    } else {
+> +        goto out;
+> +    }
+> +
+> +    switch (prealloc) {
+> +    case PREALLOC_MODE_FALLOC:
+> +        if (!glfs_fallocate(fd, 0, 0, total_size)) {
+> +            error_setg(errp, "Could not preallocate data for the new file");
+> +            ret = -errno;
+> +        }
+
+Both glfs_fallocate() and glfs_zerofill() are from the same release version,
+right?  I think we need a CONFIG_GLUSTER_FALLOC around the
+PREALLOC_MODE_FALLOC case, just like CONFIG_GLUSTERFS_ZEROFILL.
+
+> +        break;
+> +#ifdef CONFIG_GLUSTERFS_ZEROFILL
+> +    case PREALLOC_MODE_FULL:
+>          if (!glfs_ftruncate(fd, total_size)) {
+> -            if (prealloc && qemu_gluster_zerofill(fd, 0, total_size)) {
+> +            if (qemu_gluster_zerofill(fd, 0, total_size)) {
+
+If using the CONFIG_GLUSTER_ZEROFILL here, then please get rid of the
+qemu_gluster_zerofill() wrapper, which is in place for the same reason as
+this ifdef.  We can just call glfs_zerofill() here directly.
+
+> +                error_setg(errp, "Could not zerofill the new file");
+>                  ret = -errno;
+>              }
+>          } else {
+> +            error_setg(errp, "Could not resize file");
+>              ret = -errno;
+>          }
+> -
+> -        if (glfs_close(fd) != 0) {
+> +        break;
+> +#endif /* CONFIG_GLUSTERFS_ZEROFILL */
+> +    case PREALLOC_MODE_OFF:
+> +        if (glfs_ftruncate(fd, total_size) != 0) {
+>              ret = -errno;
+> +            error_setg(errp, "Could not resize file");
+>          }
+> +        break;
+> +    default:
+> +        ret = -EINVAL;
+> +        error_setg(errp, "Unsupported preallocation mode: %s",
+> +                   PreallocMode_lookup[prealloc]);
+> +        break;
+> +    }
+> +
+> +    if (glfs_close(fd) != 0) {
+> +        ret = -errno;
+>      }
+>  out:
+> -    g_free(tmp);
+>      qapi_free_BlockdevOptionsGluster(gconf);
+>      glfs_clear_preopened(glfs);
+
+A question that doesn't have to do with this patch: is it safe to call
+glfs_clear_preopened(NULL)?
+
+
+-Jeff
