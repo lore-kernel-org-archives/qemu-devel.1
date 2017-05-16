@@ -1,20 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52736)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54619)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1dAaRV-00036G-91
-	for qemu-devel@nongnu.org; Tue, 16 May 2017 07:15:06 -0400
+	(envelope-from <armbru@redhat.com>) id 1dAaXT-00063A-JU
+	for qemu-devel@nongnu.org; Tue, 16 May 2017 07:21:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1dAaRS-00056Y-Kk
-	for qemu-devel@nongnu.org; Tue, 16 May 2017 07:15:05 -0400
-References: <20170516094533.6160-1-vsementsov@virtuozzo.com>
-	<f2465a29-a1d2-24de-b765-fe1106640144@redhat.com>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <5eb45a78-c0f0-c24b-ef58-c21289926270@virtuozzo.com>
-Date: Tue, 16 May 2017 14:15:00 +0300
+	(envelope-from <armbru@redhat.com>) id 1dAaXP-0008Nm-G4
+	for qemu-devel@nongnu.org; Tue, 16 May 2017 07:21:15 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:57466)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dAaXP-0008NC-A5
+	for qemu-devel@nongnu.org; Tue, 16 May 2017 07:21:11 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <149373610338.5144.9635049015143453288.stgit@bahia.lan>
+Date: Tue, 16 May 2017 13:21:07 +0200
+In-Reply-To: <149373610338.5144.9635049015143453288.stgit@bahia.lan> (Greg
+	Kurz's message of "Tue, 02 May 2017 16:41:43 +0200")
+Message-ID: <87r2zpm4ik.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <f2465a29-a1d2-24de-b765-fe1106640144@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 0/5] nbd: error path refactoring
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH] scripts/qmp/qom-set: fix the value
+ argument passed to srv.command()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,64 +27,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: mreitz@redhat.com, kwolf@redhat.com, den@openvz.org
+To: Greg Kurz <groug@kaod.org>
+Cc: qemu-devel@nongnu.org
 
-16.05.2017 13:00, Paolo Bonzini wrote:
+Greg Kurz <groug@kaod.org> writes:
+
+> When invoking the script with -s, we end up passing a bogus value
+> to QEMU:
 >
-> On 16/05/2017 11:45, Vladimir Sementsov-Ogievskiy wrote:
->> Hi all. There are several patches, as preparation for v2 of my
->> NBD BLOCK_STATUS series.
->>
->> patch 0001 was sent earlier and unchanged here.
-> Thanks, applied.  I suppose that if we can remove
-> nbd_negotiate_read/write/drop it's also easy to change from LOG to
-> error_report_err in nbd/server.c.
-
-Thank you and sorry for build error =(. I've sent updated last patch - 
-"[PATCH v2] nbd/client.c: use errp instead of LOG", with following 
-changes amended:
-
-diff --git a/nbd/client.c b/nbd/client.c
-index e41b4fd935..f9e1d75be4 100644
---- a/nbd/client.c
-+++ b/nbd/client.c
-@@ -725,8 +725,10 @@ int nbd_disconnect(int fd)
-  }
-
-  #else
--int nbd_init(int fd, QIOChannelSocket *ioc, uint16_t flags, off_t size)
-+int nbd_init(int fd, QIOChannelSocket *ioc, uint16_t flags, off_t size,
-+             Error **errp)
-  {
-+    error_setg(errp, "nbd_init is not supported");
-      return -ENOTSUP;
-  }
-
-
-
-
+> $ ./scripts/qmp/qom-set -s /var/tmp/qmp-sock-exp /machine.accel kvm
+> {}
+> $ ./scripts/qmp/qom-get -s /var/tmp/qmp-sock-exp /machine.accel
+> /var/tmp/qmp-sock-exp
 >
-> Paolo
+> This happens because sys.argv[2] isn't necessarily the command line
+> argument that holds the value. It is sys.argv[4] when -s was also
+> passed.
 >
->> Vladimir Sementsov-Ogievskiy (5):
->>    nbd: strict nbd_wr_syncv
->>    nbd: read_sync and friends: return 0 on success
->>    nbd: add errp parameter to nbd_wr_syncv()
->>    nbd: add errp to read_sync, write_sync and drop_sync
->>    nbd/client.c: use errp instead of LOG
->>
->>   block/nbd-client.c  |  11 +++--
->>   include/block/nbd.h |   8 ++--
->>   nbd/client.c        | 121 ++++++++++++++++++++++++----------------------------
->>   nbd/common.c        |  23 +++++-----
->>   nbd/nbd-internal.h  |  40 ++++++++++++++---
->>   nbd/server.c        |  92 ++++++++++++++++-----------------------
->>   qemu-nbd.c          |   3 +-
->>   7 files changed, 153 insertions(+), 145 deletions(-)
->>
+> Actually, the code already has a variable to handle that. This patch
+> simply uses it.
+>
+> Signed-off-by: Greg Kurz <groug@kaod.org>
 
-
--- 
-Best regards,
-Vladimir
+Applied to qapi-next, thanks!
