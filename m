@@ -1,20 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:32863)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33837)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1dAe65-0007x1-KT
-	for qemu-devel@nongnu.org; Tue, 16 May 2017 11:09:16 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1dAe9C-0001cg-97
+	for qemu-devel@nongnu.org; Tue, 16 May 2017 11:12:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1dAe64-0001px-Mu
-	for qemu-devel@nongnu.org; Tue, 16 May 2017 11:09:13 -0400
-Date: Tue, 16 May 2017 16:08:50 +0100
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20170516150850.GQ8498@stefanha-x1.localdomain>
-References: <20170511144208.24075-1-pbonzini@redhat.com>
+	(envelope-from <pbonzini@redhat.com>) id 1dAe99-0002sQ-3B
+	for qemu-devel@nongnu.org; Tue, 16 May 2017 11:12:26 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:59634)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1dAe98-0002sD-QO
+	for qemu-devel@nongnu.org; Tue, 16 May 2017 11:12:23 -0400
+Received: from int-mx14.intmail.prod.int.phx2.redhat.com
+	(int-mx14.intmail.prod.int.phx2.redhat.com [10.5.11.27])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 9785861E4B
+	for <qemu-devel@nongnu.org>; Tue, 16 May 2017 15:11:56 +0000 (UTC)
+References: <1494947277-26158-1-git-send-email-thuth@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <a30173fd-a272-30d6-9f6e-873e6a6bac40@redhat.com>
+Date: Tue, 16 May 2017 17:11:50 +0200
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="Mh8CTEa8Ax54aLHp"
-Content-Disposition: inline
-In-Reply-To: <20170511144208.24075-1-pbonzini@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 00/18] Block layer thread safety, part 1
+In-Reply-To: <1494947277-26158-1-git-send-email-thuth@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] Add a blog post with links to the
+ presentations from the DevConf 2017
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,98 +34,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: qemu-devel@nongnu.org, famz@redhat.com, qemu-block@nongnu.org
+To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
 
 
---Mh8CTEa8Ax54aLHp
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
 
-On Thu, May 11, 2017 at 04:41:50PM +0200, Paolo Bonzini wrote:
-> This series uses mutexes or atomic operations around core block layer
-> operations.  The remaining parts include:
+On 16/05/2017 17:07, Thomas Huth wrote:
+> This post provides links to the talks from the virtualization
+> track at the DevConf 2017 in Brno.
 >=20
-> I've removed the failing assertion in bdrv_aligned_pwritev in order to
-> test block migration.
->=20
-> Paolo
->=20
-> v1->v2: add missing comment for 'wakeup' member [Fam]
->         rewrite throttle-groups part [Stefan]
->         rename ThrottleState CoMutex [Fam]
->         minor stats64 changes [Fam, Roman, me]
->         fixed bdrv_flush [Fam, me]
->         dropped request spinlock optimization for now [Stefan]
->         avoid global dirty bitmap mutex [Fam]
->         avoid introducing unlocked bdrv_get_dirty API [Stefan]
->         replaced spinlock with mutex for accounting [Stefan]
->        =20
->=20
-> Paolo Bonzini (18):
->   block: access copy_on_read with atomic ops
->   block: access quiesce_counter with atomic ops
->   block: access io_limits_disabled with atomic ops
->   block: access serialising_in_flight with atomic ops
->   block: access wakeup with atomic ops
->   block: access io_plugged with atomic ops
->   throttle-groups: only start one coroutine from drained_begin
->   throttle-groups: do not use qemu_co_enter_next
->   throttle-groups: protect throttled requests with a CoMutex
->   util: add stats64 module
->   block: use Stat64 for wr_highest_offset
->   block: access write_gen with atomics
->   block: protect tracked_requests and flush_queue with reqs_lock
->   block: introduce dirty_bitmap_mutex
->   migration/block: reset dirty bitmap before reading
->   block: protect modification of dirty bitmaps with a mutex
->   block: introduce block_account_one_io
->   block: make accounting thread-safe
->=20
->  block.c                        |   9 +-
->  block/accounting.c             |  64 ++++++++------
->  block/block-backend.c          |   5 +-
->  block/dirty-bitmap.c           | 112 ++++++++++++++++++++++--
->  block/io.c                     |  51 ++++++-----
->  block/mirror.c                 |  14 ++-
->  block/nfs.c                    |   4 +-
->  block/qapi.c                   |   2 +-
->  block/sheepdog.c               |   3 +-
->  block/throttle-groups.c        |  91 ++++++++++++++-----
->  blockdev.c                     |  46 ++--------
->  include/block/accounting.h     |   8 +-
->  include/block/block.h          |   5 +-
->  include/block/block_int.h      |  61 ++++++++-----
->  include/block/dirty-bitmap.h   |  25 ++++--
->  include/qemu/stats64.h         | 193 +++++++++++++++++++++++++++++++++++=
-++++++
->  include/sysemu/block-backend.h |  10 +--
->  migration/block.c              |  17 ++--
->  util/Makefile.objs             |   1 +
->  util/stats64.c                 | 136 +++++++++++++++++++++++++++++
->  20 files changed, 679 insertions(+), 178 deletions(-)
->  create mode 100644 include/qemu/stats64.h
->  create mode 100644 util/stats64.c
->=20
-> --=20
-> 2.12.2
->=20
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> ---
+>  Note: I've added links to all presentations from the virtualization
+>  track ... not all of them are really related to QEMU, so not sure
+>  whether this is appropriate for the QEMU blog ... but I thought it
+>  would be nice to have a collection with all links, so I included all
+>  of them here.
 
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+Cool!  Pushed, thanks.
 
---Mh8CTEa8Ax54aLHp
-Content-Type: application/pgp-signature; name="signature.asc"
+Paolo
 
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJZGxYCAAoJEJykq7OBq3PIrUgH/RFpzydPPmG/5RCbkMoY9kv7
-pz5vUaCahFxu36U8TMxaxweTZ9x+vPGCxgM+SZ+QhY5ccnGOtdGSPjCQnh/IdEjj
-KNGx8RhYo4a6SbaivMIUwf1htjWg/tNaCuk3NktiXQZ6ZpwjTR2Dfad4I2mYJjsa
-8xG2JPSYzEmsAs/9kMBgNj6Fs585l2so9wFc3xz/Xy2e0bg3XawsScnu7sXvE+J+
-i7g55IPO5g9vozWsjNVvoVfQ/WG9qEsm2Etm2CSSRSABkKtMV93e5OvCLy4uy1Qz
-mZa4zfJF58zspuHcOo+kaMR20GuXnxOkCxDM1M9aKQqGrM78Uar7F8WZv4KjDqI=
-=eR3v
------END PGP SIGNATURE-----
-
---Mh8CTEa8Ax54aLHp--
+>  _posts/2017-05-16-devconf-presentations.md | 47 ++++++++++++++++++++++=
+++++++++
+>  1 file changed, 47 insertions(+)
+>  create mode 100644 _posts/2017-05-16-devconf-presentations.md
+>=20
+> diff --git a/_posts/2017-05-16-devconf-presentations.md b/_posts/2017-0=
+5-16-devconf-presentations.md
+> new file mode 100644
+> index 0000000..1c67bd5
+> --- /dev/null
+> +++ b/_posts/2017-05-16-devconf-presentations.md
+> @@ -0,0 +1,47 @@
+> +---
+> +layout: post
+> +title:  "Presentations from DevConf 2017"
+> +date:   2017-05-16 16:00:00 +0200
+> +author: Thomas Huth
+> +categories: presentations
+> +---
+> +There were a couple of QEMU / virtualization related talks at the
+> +[DevConf 2017](https://devconf.cz/2017/) conference that took place at=
+ the
+> +end of January already, but so far we missed to gather the links to th=
+e
+> +recordings of these talks. So here is now the list:
+> +
+> +* [How to write a legacy storage device
+> +   emulator](https://www.youtube.com/watch?v=3DnnMso6RmiOU&t=3D258)
+> +  by John Snow
+> +
+> +* [GPU Passthrough using GNOME
+> +   Boxes](https://www.youtube.com/watch?v=3DO33s1paYuYg&t=3D75)
+> +  by Felipe Borges
+> +
+> +* [Self-virtualizing Linux on
+> +   x86](https://www.youtube.com/watch?v=3DGn7Bdq9_cUA&t=3D118)
+> +  by Radim Kr=C4=8Dm=C3=A1=C5=99=20
+> +
+> +* [New ways to remote desktops with GStreamer
+> +   integration](https://www.youtube.com/watch?v=3DC5ox_M-k63w)
+> +  by Victor Toso de Carvalho and Pavel Grunt
+> +
+> +* [Can VMs networking benefit from
+> +   DPDK](https://www.youtube.com/watch?v=3Dcbm30mPp0hE&t=3D210)
+> +  by Maxime Coquelin and Victor Kaplansky
+> +
+> +* [Windows VMs on KVM: The Good, the Bad and the
+> +   Ugly](https://www.youtube.com/watch?v=3Do3TBT68xCm8&t=3D92)
+> +  by Ladi Prosek
+> +
+> +* [Pet VMs in Kubernetes?
+> +   WTH](https://www.youtube.com/watch?v=3D_w4roI9T7VE&t=3D85)
+> +  by Fabian Deutsch
+> +
+> +* [Virtualization development improved with
+> +   Lago](https://www.youtube.com/watch?v=3DChtZaG_60AQ&t=3D48)
+> +  by Rafael Martins
+> +
+> +* [An ARMful of guests: virtualization on 64-bit
+> +   ARM](https://www.youtube.com/watch?v=3Dx1a_f_2IMG8)
+> +  by Andrea Bolognani
+>=20
