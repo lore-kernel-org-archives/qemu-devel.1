@@ -1,19 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54683)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58298)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sw@weilnetz.de>) id 1dAV1E-00076G-Cm
-	for qemu-devel@nongnu.org; Tue, 16 May 2017 01:27:37 -0400
+	(envelope-from <groug@kaod.org>) id 1dAVT1-0001h4-GZ
+	for qemu-devel@nongnu.org; Tue, 16 May 2017 01:56:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sw@weilnetz.de>) id 1dAV1A-0000vx-Ej
-	for qemu-devel@nongnu.org; Tue, 16 May 2017 01:27:36 -0400
-References: <20170516052439.16214-1-kraxel@redhat.com>
-From: Stefan Weil <sw@weilnetz.de>
-Message-ID: <ed22959a-4ca8-0556-6ea7-f7866a20fe7d@weilnetz.de>
-Date: Tue, 16 May 2017 07:27:28 +0200
+	(envelope-from <groug@kaod.org>) id 1dAVSy-00057h-Dg
+	for qemu-devel@nongnu.org; Tue, 16 May 2017 01:56:19 -0400
+Received: from 9.mo69.mail-out.ovh.net ([46.105.56.78]:43011)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1dAVSy-000577-89
+	for qemu-devel@nongnu.org; Tue, 16 May 2017 01:56:16 -0400
+Received: from player699.ha.ovh.net (b9.ovh.net [213.186.33.59])
+	by mo69.mail-out.ovh.net (Postfix) with ESMTP id 36B111F97E
+	for <qemu-devel@nongnu.org>; Tue, 16 May 2017 07:56:14 +0200 (CEST)
+Date: Tue, 16 May 2017 07:56:05 +0200
+From: Greg Kurz <groug@kaod.org>
+Message-ID: <20170516075605.69ba2b95@bahia>
+In-Reply-To: <20170516043555.GE30022@umbus.fritz.box>
+References: <149484833874.20089.4164801378197848306.stgit@bahia.lan>
+	<149484836649.20089.8174753739169885859.stgit@bahia.lan>
+	<20170516043555.GE30022@umbus.fritz.box>
 MIME-Version: 1.0
-In-Reply-To: <20170516052439.16214-1-kraxel@redhat.com>
-Content-Type: text/plain; charset=iso-8859-15; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] fix mingw build failure
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	boundary="Sig_/aefDyXvard1fOZidPF8hnjG";
+	protocol="application/pgp-signature"
+Subject: Re: [Qemu-devel] [PATCH 2/6] spapr: fix error path of required
+ kernel-irqchip
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,31 +33,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org, QEMU Trivial <qemu-trivial@nongnu.org>
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Bharata B Rao <bharata@linux.vnet.ibm.com>, Cedric Le Goater <clg@kaod.org>
 
-Am 16.05.2017 um 07:24 schrieb Gerd Hoffmann:
-> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
-> ---
->  crypto/random-platform.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/crypto/random-platform.c b/crypto/random-platform.c
-> index 0eddb915b7..92eed0ee78 100644
-> --- a/crypto/random-platform.c
-> +++ b/crypto/random-platform.c
-> @@ -23,7 +23,7 @@
->  #include "crypto/random.h"
->
->  #ifdef _WIN32
-> -#include <Wincrypt.h>
-> +#include <wincrypt.h>
->  static HCRYPTPROV hCryptProv;
->  #else
->  static int fd; /* a file handle to either /dev/urandom or /dev/random */
->
+--Sig_/aefDyXvard1fOZidPF8hnjG
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-Thank you.
+On Tue, 16 May 2017 14:35:55 +1000
+David Gibson <david@gibson.dropbear.id.au> wrote:
 
-Reviewed-by: Stefan Weil <sw@weilnetz.de>
+> On Mon, May 15, 2017 at 01:39:26PM +0200, Greg Kurz wrote:
+> > QEMU should exit if the user explicitely asked for kernel-irqchip suppo=
+rt
+> > and "xics-kvm" initialization fails.
+> >=20
+> > The changelog of commit 34f2af3d3edf ("spapr: Clean up misuse of qdev_i=
+nit()
+> > in xics-kvm creation") reads:
+> >=20
+> >     While there, improve the error message when we can't satisfy an
+> >     explicit user request for "xics-kvm", and exit(1) instead of abort(=
+).
+> >     Simplify the abort when we can't create "xics".
+> >=20
+> > This patch adds the missing call to exit().
+> >=20
+> > Signed-off-by: Greg Kurz <groug@kaod.org>
+> > ---
+> >  hw/ppc/spapr.c |    1 +
+> >  1 file changed, 1 insertion(+)
+> >=20
+> > diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> > index abfb99b71b7d..f477d7b8a210 100644
+> > --- a/hw/ppc/spapr.c
+> > +++ b/hw/ppc/spapr.c
+> > @@ -133,6 +133,7 @@ static void xics_system_init(MachineState *machine,=
+ int nr_irqs, Error **errp)
+> >          if (machine_kernel_irqchip_required(machine) && !spapr->ics) {
+> >              error_reportf_err(err,
+> >                                "kernel_irqchip requested but unavailabl=
+e: ");
+> > +            exit(EXIT_FAILURE);
+> >          } else {
+> >              error_free(err);
+> >          }
+> >  =20
+>=20
+>=20
+> This doesn't look right.  We have an errp pointer in the caller.  So
+> on failure we should error_propagate(), rather than deciding for
+> ourselves that exiting is the right course of action.
+>=20
 
-cc`ing qemu-trivial.
+I generally agree with that but can the caller cope with the fact that
+the user passed -machine accel=3Dkvm,kernel_irqchip=3Don and this cannot
+be satisfied ?
+
+--Sig_/aefDyXvard1fOZidPF8hnjG
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iEYEARECAAYFAlkalHUACgkQAvw66wEB28LDSwCgp3XppGjeYhWjESAlodE06TYP
+2vYAnjAkTIyvHmx8MLtrRmlGxCTxEZn1
+=PVu1
+-----END PGP SIGNATURE-----
+
+--Sig_/aefDyXvard1fOZidPF8hnjG--
