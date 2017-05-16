@@ -1,24 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48117)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50072)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sstabellini@kernel.org>) id 1dAPkH-0004DY-1Y
-	for qemu-devel@nongnu.org; Mon, 15 May 2017 19:49:45 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dAPwR-0006hp-I8
+	for qemu-devel@nongnu.org; Mon, 15 May 2017 20:02:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sstabellini@kernel.org>) id 1dAPkE-0005oc-0K
-	for qemu-devel@nongnu.org; Mon, 15 May 2017 19:49:45 -0400
-Received: from mail.kernel.org ([198.145.29.99]:57346)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <sstabellini@kernel.org>)
-	id 1dAPkD-0005nM-Pp
-	for qemu-devel@nongnu.org; Mon, 15 May 2017 19:49:41 -0400
-Date: Mon, 15 May 2017 16:49:38 -0700 (PDT)
-From: Stefano Stabellini <sstabellini@kernel.org>
-In-Reply-To: <20170511113542.16682-1-anthony.perard@citrix.com>
-Message-ID: <alpine.DEB.2.10.1705151649320.2898@sstabellini-ThinkPad-X260>
-References: <20170511113542.16682-1-anthony.perard@citrix.com>
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dAPwQ-0002oh-NY
+	for qemu-devel@nongnu.org; Mon, 15 May 2017 20:02:19 -0400
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20170512233843.27713-1-f4bug@amsat.org>
+	<20170512233843.27713-6-f4bug@amsat.org>
+	<20170515041258.GA11105@umbus.fritz.box>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <9dcb2dae-8320-31d0-29c1-34eefe5be2b0@amsat.org>
+Date: Mon, 15 May 2017 21:02:08 -0300
 MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
-Subject: Re: [Qemu-devel] [PATCH] configure: Remove -lxencall for Xen
- detection
+In-Reply-To: <20170515041258.GA11105@umbus.fritz.box>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v4 5/6] target/ppc: optimize various
+ functions using extract op
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,36 +29,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Anthony PERARD <anthony.perard@citrix.com>
-Cc: qemu-devel@nongnu.org, Stefano Stabellini <sstabellini@kernel.org>
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-devel@nongnu.org, Aurelien Jarno <aurelien@aurel32.net>, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>, qemu-ppc@nongnu.org
 
-On Thu, 11 May 2017, Anthony PERARD wrote:
-> QEMU does not depends on libxencall, it was added because it was a
-> missing link dependency of libxendevicemodel, but now the later should
-> be built properly.
-> 
-> Signed-off-by: Anthony PERARD <anthony.perard@citrix.com>
+Hi David,
 
-Reviewed-by: Stefano Stabellini <sstabellini@kernel.org>
+On 05/15/2017 01:12 AM, David Gibson wrote:
+> On Fri, May 12, 2017 at 08:38:42PM -0300, Philippe Mathieu-Daudé wrote:
+>> Patch created mechanically using Coccinelle script via:
+>>
+>>     $ spatch --macro-file scripts/cocci-macro-file.h --in-place \
+>>         --sp-file scripts/coccinelle/tcg_gen_extract.cocci --dir target
+>>
+>> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+>
+> Acked-by: David Gibson <david@gibson.dropbear.id.au>
+>
+> Do you want me to merge this via my ppc tree, or is the whole set
+> going in via some other path?
 
+Thank for the review!
 
-> ---
->  configure | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/configure b/configure
-> index 7c020c076b..fa3522d18a 100755
-> --- a/configure
-> +++ b/configure
-> @@ -2014,7 +2014,7 @@ if test "$xen" != "no" ; then
->    else
->  
->      xen_libs="-lxenstore -lxenctrl -lxenguest"
-> -    xen_stable_libs="-lxencall -lxenforeignmemory -lxengnttab -lxenevtchn"
-> +    xen_stable_libs="-lxenforeignmemory -lxengnttab -lxenevtchn"
->  
->      # First we test whether Xen headers and libraries are available.
->      # If no, we are done and there is no Xen support.
-> -- 
-> Anthony PERARD
-> 
+As you wish, I think it makes sens this serie goes altogether via 
+Richard's tree, once I finish correcting few details.
+
+Regards,
+
+Phil.
