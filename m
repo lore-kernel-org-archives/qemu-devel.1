@@ -1,32 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33342)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34345)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1dAVsi-0005Vl-Ra
-	for qemu-devel@nongnu.org; Tue, 16 May 2017 02:22:54 -0400
+	(envelope-from <groug@kaod.org>) id 1dAVyS-0006Zb-HZ
+	for qemu-devel@nongnu.org; Tue, 16 May 2017 02:28:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1dAVsf-0006Ou-OX
-	for qemu-devel@nongnu.org; Tue, 16 May 2017 02:22:52 -0400
-Received: from 10.mo69.mail-out.ovh.net ([46.105.73.241]:49655)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1dAVsf-0006Oc-IQ
-	for qemu-devel@nongnu.org; Tue, 16 May 2017 02:22:49 -0400
-Received: from player699.ha.ovh.net (b9.ovh.net [213.186.33.59])
-	by mo69.mail-out.ovh.net (Postfix) with ESMTP id A2F291DC31
-	for <qemu-devel@nongnu.org>; Tue, 16 May 2017 08:22:47 +0200 (CEST)
-Date: Tue, 16 May 2017 08:22:40 +0200
+	(envelope-from <groug@kaod.org>) id 1dAVyP-0008UG-F3
+	for qemu-devel@nongnu.org; Tue, 16 May 2017 02:28:48 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:34158)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1dAVyP-0008SB-3o
+	for qemu-devel@nongnu.org; Tue, 16 May 2017 02:28:45 -0400
+Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v4G6QuD3097373
+	for <qemu-devel@nongnu.org>; Tue, 16 May 2017 02:28:43 -0400
+Received: from e06smtp10.uk.ibm.com (e06smtp10.uk.ibm.com [195.75.94.106])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2afs4s7dh1-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Tue, 16 May 2017 02:28:43 -0400
+Received: from localhost
+	by e06smtp10.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <groug@kaod.org>;
+	Tue, 16 May 2017 07:28:40 +0100
 From: Greg Kurz <groug@kaod.org>
-Message-ID: <20170516082240.4465933d@bahia>
-In-Reply-To: <20170516060846.GK30022@umbus.fritz.box>
-References: <149484833874.20089.4164801378197848306.stgit@bahia.lan>
-	<149484836649.20089.8174753739169885859.stgit@bahia.lan>
-	<20170516043555.GE30022@umbus.fritz.box>
-	<20170516075605.69ba2b95@bahia>
-	<20170516060846.GK30022@umbus.fritz.box>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	boundary="Sig_/A5AihXlKKuNQxbWcHT=q5f0";
-	protocol="application/pgp-signature"
-Subject: Re: [Qemu-devel] [PATCH 2/6] spapr: fix error path of required
- kernel-irqchip
+Date: Tue, 16 May 2017 08:28:22 +0200
+Message-Id: <1494916103-32207-1-git-send-email-groug@kaod.org>
+Subject: [Qemu-devel] [PULL] 9p security fix for 2.10 (CVE-2017-7493)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,84 +34,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Bharata B Rao <bharata@linux.vnet.ibm.com>, Cedric Le Goater <clg@kaod.org>
+To: qemu-devel@nongnu.org
+Cc: Stefan Hajnoczi <stefanha@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Greg Kurz <groug@kaod.org>
 
---Sig_/A5AihXlKKuNQxbWcHT=q5f0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+The following changes since commit 3a8760664d5c1a1a93c9012bdb8ac07ab8fd4b0d:
 
-On Tue, 16 May 2017 16:08:46 +1000
-David Gibson <david@gibson.dropbear.id.au> wrote:
+  Merge tag 'tracing-pull-request' into staging (2017-05-12 10:39:35 -0400)
 
-> On Tue, May 16, 2017 at 07:56:05AM +0200, Greg Kurz wrote:
-> > On Tue, 16 May 2017 14:35:55 +1000
-> > David Gibson <david@gibson.dropbear.id.au> wrote:
-> >  =20
-> > > On Mon, May 15, 2017 at 01:39:26PM +0200, Greg Kurz wrote: =20
-> > > > QEMU should exit if the user explicitely asked for kernel-irqchip s=
-upport
-> > > > and "xics-kvm" initialization fails.
-> > > >=20
-> > > > The changelog of commit 34f2af3d3edf ("spapr: Clean up misuse of qd=
-ev_init()
-> > > > in xics-kvm creation") reads:
-> > > >=20
-> > > >     While there, improve the error message when we can't satisfy an
-> > > >     explicit user request for "xics-kvm", and exit(1) instead of ab=
-ort().
-> > > >     Simplify the abort when we can't create "xics".
-> > > >=20
-> > > > This patch adds the missing call to exit().
-> > > >=20
-> > > > Signed-off-by: Greg Kurz <groug@kaod.org>
-> > > > ---
-> > > >  hw/ppc/spapr.c |    1 +
-> > > >  1 file changed, 1 insertion(+)
-> > > >=20
-> > > > diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> > > > index abfb99b71b7d..f477d7b8a210 100644
-> > > > --- a/hw/ppc/spapr.c
-> > > > +++ b/hw/ppc/spapr.c
-> > > > @@ -133,6 +133,7 @@ static void xics_system_init(MachineState *mach=
-ine, int nr_irqs, Error **errp)
-> > > >          if (machine_kernel_irqchip_required(machine) && !spapr->ic=
-s) {
-> > > >              error_reportf_err(err,
-> > > >                                "kernel_irqchip requested but unavai=
-lable: ");
-> > > > +            exit(EXIT_FAILURE);
-> > > >          } else {
-> > > >              error_free(err);
-> > > >          }
-> > > >    =20
-> > >=20
-> > >=20
-> > > This doesn't look right.  We have an errp pointer in the caller.  So
-> > > on failure we should error_propagate(), rather than deciding for
-> > > ourselves that exiting is the right course of action.
-> > >  =20
-> >=20
-> > I generally agree with that but can the caller cope with the fact that
-> > the user passed -machine accel=3Dkvm,kernel_irqchip=3Don and this cannot
-> > be satisfied ? =20
->=20
-> AFAICT the only caller passes &error_fatal, so, yes..
->=20
+are available in the git repository at:
 
-Ok, then I'll rewrite xics_system_init() so that it propagates the error
-message instead of printing it to the monitor.
+  https://github.com/gkurz/qemu.git tags/security-fix-for-2.10
 
---Sig_/A5AihXlKKuNQxbWcHT=q5f0
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
+for you to fetch changes up to 7a95434e0ca8a037fd8aa1a2e2461f92585eb77b:
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
+  9pfs: local: forbid client access to metadata (CVE-2017-7493) (2017-05-15 15:20:57 +0200)
 
-iEYEARECAAYFAlkamrAACgkQAvw66wEB28LrSACdEI2lDaKqRLINlVT2dEINyCGN
-5oUAoI8YLSETjCrvrd5pAylJWLKqXofJ
-=S/HI
------END PGP SIGNATURE-----
+----------------------------------------------------------------
+Fix for CVE-2017-7493.
 
---Sig_/A5AihXlKKuNQxbWcHT=q5f0--
+----------------------------------------------------------------
+Greg Kurz (1):
+      9pfs: local: forbid client access to metadata (CVE-2017-7493)
+
+ hw/9pfs/9p-local.c | 58 ++++++++++++++++++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 56 insertions(+), 2 deletions(-)
+-- 
+2.7.4
