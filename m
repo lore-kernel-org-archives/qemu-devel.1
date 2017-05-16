@@ -1,25 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35381)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36281)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dAY4i-000480-Iu
-	for qemu-devel@nongnu.org; Tue, 16 May 2017 04:43:25 -0400
+	(envelope-from <armbru@redhat.com>) id 1dAY8b-0005RQ-UX
+	for qemu-devel@nongnu.org; Tue, 16 May 2017 04:47:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dAY4f-0001Ch-AR
-	for qemu-devel@nongnu.org; Tue, 16 May 2017 04:43:24 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53070)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dAY4f-0001CQ-45
-	for qemu-devel@nongnu.org; Tue, 16 May 2017 04:43:21 -0400
+	(envelope-from <armbru@redhat.com>) id 1dAY8Y-0002Sy-3o
+	for qemu-devel@nongnu.org; Tue, 16 May 2017 04:47:26 -0400
 From: Markus Armbruster <armbru@redhat.com>
 References: <20170515214114.15442-1-eblake@redhat.com>
-	<20170515214114.15442-4-eblake@redhat.com>
-Date: Tue, 16 May 2017 10:43:17 +0200
-In-Reply-To: <20170515214114.15442-4-eblake@redhat.com> (Eric Blake's message
-	of "Mon, 15 May 2017 16:41:12 -0500")
-Message-ID: <8737c5gpju.fsf@dusky.pond.sub.org>
+	<20170515214114.15442-5-eblake@redhat.com>
+Date: Tue, 16 May 2017 10:46:57 +0200
+In-Reply-To: <20170515214114.15442-5-eblake@redhat.com> (Eric Blake's message
+	of "Mon, 15 May 2017 16:41:13 -0500")
+Message-ID: <87y3txfata.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v9 3/5] shutdown: Preserve shutdown cause
- through replay
+Subject: Re: [Qemu-devel] [PATCH v9 4/5] shutdown: Add source information to
+ SHUTDOWN and RESET
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,29 +25,32 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Eric Blake <eblake@redhat.com>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>, alistair.francis@xilinx.com
+Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, "open list:Overall" <kvm@vger.kernel.org>, "Michael S. Tsirkin" <mst@redhat.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Alexander Graf <agraf@suse.de>, Yongbok Kim <yongbok.kim@imgtec.com>, Gerd Hoffmann <kraxel@redhat.com>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Rob Herring <robh@kernel.org>, Stefano Stabellini <sstabellini@kernel.org>, Magnus Damm <magnus.damm@gmail.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Anthony Perard <anthony.perard@citrix.com>, "open list:X86" <xen-devel@lists.xenproject.org>, Richard Henderson <rth@twiddle.net>, Artyom Tarasenko <atar4qemu@gmail.com>, Eduardo Habkost <ehabkost@redhat.com>, Stefan Weil <sw@weilnetz.de>, alistair.francis@xilinx.com, "open list:Calxeda Highbank" <qemu-arm@nongnu.org>, Jan Kiszka <jan.kiszka@web.de>, Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>, Igor Mammedov <imammedo@redhat.com>, Cornelia Huck <cornelia.huck@de.ibm.com>, David Gibson <david@gibson.dropbear.id.au>, Paul Burton <paul.burton@imgtec.com>, Max Filippov <jcmvbkbc@gmail.com>, Marcelo Tosatti <mtosatti@redhat.com>, Michael Walle <michael@walle.cc>, "open list:Old World" <qemu-ppc@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>
 
 Eric Blake <eblake@redhat.com> writes:
 
-> With the recent addition of ShutdownCause, we want to be able to pass
-> a cause through any shutdown request, and then faithfully replay that
-> cause when later replaying the same sequence.  The easiest way is to
-> expand the reply event mechanism to track a series of values for
-> EVENT_SHUTDOWN, one corresponding to each value of ShutdownCause.
+> Time to wire up all the call sites that request a shutdown or
+> reset to use the enum added in the previous patch.
 >
-> We are free to change the replay stream as needed, since there are
-> already no guarantees about being able to use a replay stream by
-> any other version of qemu than the one that generated it.
+> It would have been less churn to keep the common case with no
+> arguments as meaning guest-triggered, and only modified the
+> host-triggered code paths, via a wrapper function, but then we'd
+> still have to audit that I didn't miss any host-triggered spots;
+> changing the signature forces us to double-check that I correctly
+> categorized all callers.
 >
-> The cause is not actually fed back until the next patch changes the
-> signature for requesting a shutdown; a TODO marks that upcoming change.
+> Since command line options can change whether a guest reset request
+> causes an actual reset vs. a shutdown, it's easy to also add the
+> information to reset requests.
 >
-> Yes, this uses the gcc/clang extension of a ranged case label,
-> but this is not the first time we've used non-C99 constructs.
-
-Not even *this* construct, as git-grep shows.
-
 > Signed-off-by: Eric Blake <eblake@redhat.com>
-> Reviewed-by: Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
+> Acked-by: David Gibson <david@gibson.dropbear.id.au> [ppc parts]
+> Reviewed-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk> [SPARC part]
+> Reviewed-by: Cornelia Huck <cornelia.huck@de.ibm.com> [s390x parts]
+>
+> ---
+> v8: rebase later in series
+
+That turned out nicely.  Thanks!
 
 Reviewed-by: Markus Armbruster <armbru@redhat.com>
