@@ -1,21 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37161)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39196)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dAYAu-0006X6-1r
-	for qemu-devel@nongnu.org; Tue, 16 May 2017 04:49:54 -0400
+	(envelope-from <gm.ijewski@web.de>) id 1dAYHH-0007qr-HN
+	for qemu-devel@nongnu.org; Tue, 16 May 2017 04:56:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dAYAt-0003f6-0V
-	for qemu-devel@nongnu.org; Tue, 16 May 2017 04:49:48 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <20170515214114.15442-1-eblake@redhat.com>
-	<20170515214114.15442-6-eblake@redhat.com>
-Date: Tue, 16 May 2017 10:49:23 +0200
-In-Reply-To: <20170515214114.15442-6-eblake@redhat.com> (Eric Blake's message
-	of "Mon, 15 May 2017 16:41:14 -0500")
-Message-ID: <87tw4lfap8.fsf@dusky.pond.sub.org>
+	(envelope-from <gm.ijewski@web.de>) id 1dAYHG-0006tC-9F
+	for qemu-devel@nongnu.org; Tue, 16 May 2017 04:56:23 -0400
+References: <757990479.60759.1494722527715.ref@mail.yahoo.com>
+	<757990479.60759.1494722527715@mail.yahoo.com>
+	<CAKmqyKPy35OuMkixGnDXOvApAu82uXrtQStSz4GzHNRStdFFNA@mail.gmail.com>
+	<1337329283.3100470.1494870647989@mail.yahoo.com>
+	<90703952-bc99-ecfe-96c7-810bb1784dce@amsat.org>
+	<1901691584.9094.1494892886522@mail.yahoo.com>
+From: Geert Martin Ijewski <gm.ijewski@web.de>
+Message-ID: <96776f9a-ab8c-b92a-fd07-f69f495d0381@web.de>
+Date: Tue, 16 May 2017 10:55:18 +0200
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v9 5/5] shutdown: Expose bool cause in
- SHUTDOWN and RESET events
+In-Reply-To: <1901691584.9094.1494892886522@mail.yahoo.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [Qemu-arm] Changes to Broadcom(BCM) files and
+ Raspberry Pi files. Addition of PanelEmu
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,54 +28,204 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, "open list:Block layer core" <qemu-block@nongnu.org>, Max Reitz <mreitz@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, alistair.francis@xilinx.com
+To: John Bradley <flypie1@yahoo.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Alistair Francis <alistair.francis@xilinx.com>
+Cc: Laurent Vivier <lvivier@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, John Bradley <flypie@rocketmail.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Markus Armbruster <armbru@redhat.com>, "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>
 
-Eric Blake <eblake@redhat.com> writes:
+Am 16.05.2017 um 02:01 schrieb John Bradley via Qemu-devel:
+> Hi,
+> The XML files in the base are not in the patch. They where net beans files. I can easily get it into 3 files, one large at 91KB but contains only new files and so is easy to read. Could be smaller but seems pointless.
+>
+I think what Alistar meant was something along the lines of:
+patch/commit 1) add the remaining bcm2835 devices from Markus 
+Armbruster's code to QEMU (btw: any reason why that hasn't been done? 
+The USB stuff does seem nice to have)
+-- with a more meaningful commit title
+2) add utils/panelemu.c and the include
+3) bcm2835 now uses the emupanel
+and then your other commits e.g.
+4) USB CDC Ethernet driver dropped packets
+5) emupanel: fixed compilation errors on linux
+6) emupanel: removed last blocking I/O
 
-> Libvirt would like to be able to distinguish between a SHUTDOWN
-> event triggered solely by guest request and one triggered by a
-> SIGTERM or other action on the host.  While qemu_kill_report() was
-> already able to give different output to stderr based on whether a
-> shutdown was triggered by a host signal (but NOT by a host UI event,
-> such as clicking the X on the window), that information was then
-> lost to management.  The previous patches improved things to use an
-> enum throughout all callsites, so now we have something ready to
-> expose through QMP.
->
-> Note that for now, the decision was to expose ONLY a boolean,
-> rather than promoting ShutdownCause to a QAPI enum; this is because
-> libvirt has not expressed an interest in anything finer-grained.
-> We can still add additional details, in a backwards-compatible
-> manner, if a need later arises (if the addition happens before 2.10,
-> we can replace the bool with an enum; otherwise, the enum will have
-> to be in addition to the bool); this patch merely adds a helper
-> shutdown_caused_by_guest() to map the internal enum into the
-> external boolean.
->
-> Update expected iotest outputs to match the new data (complete
-> coverage of the affected tests is obtained by -raw, -qcow2, and -nbd).
->
-> Here is output from 'virsh qemu-monitor-event --loop' with the
-> patch installed:
->
-> event SHUTDOWN at 1492639680.731251 for domain fedora_13: {"guest":true}
-> event STOP at 1492639680.732116 for domain fedora_13: <null>
-> event SHUTDOWN at 1492639680.732830 for domain fedora_13: {"guest":false}
->
-> Note that libvirt runs qemu with -no-shutdown: the first SHUTDOWN event
-> was triggered by an action I took directly in the guest (shutdown -h),
-> at which point qemu stops the vcpus and waits for libvirt to do any
-> final cleanups; the second SHUTDOWN event is the result of libvirt
-> sending SIGTERM now that it has completed cleanup.  Libvirt is already
-> smart enough to only feed the first qemu SHUTDOWN event to the end user
-> (remember, virsh qemu-monitor-event is a low-level debugging interface
-> that is explicitly unsupported by libvirt, so it sees things that normal
-> end users do not); changing qemu to emit SHUTDOWN only once is outside
-> the scope of this series.
->
-> See also https://bugzilla.redhat.com/1384007
->
-> Signed-off-by: Eric Blake <eblake@redhat.com>
+Along the way you also seem to fix indentation in other code a lot, that 
+makes following the patches more confusing than they need to be.
+It's harder to gauge at a quick glance whether you changed something 
+meaingul or not.
 
-Reviewed-by: Markus Armbruster <armbru@redhat.com>
+Maybe even send a RFC just detailing the protocol, because it's probably 
+important to get that right from the start.
+
+Geert
+> another which is about 19KB of quite simple changes to mostly make files.
+> Then one 15KB which quite straight forward when you look at it. Applying them in that order should allow step wise addition. I've uploaded them to a share if anyone wants to comment.
+>
+> The 3 files are new.patch
+>
+> |
+> |
+> |
+> |   |    |
+>
+>    |
+>
+>   |
+> |
+> |    |
+> new.patch
+>  Shared with Dropbox  |   |
+>
+>   |
+>
+>   |
+>
+>
+>  mod1.patch
+>
+>
+> |
+> |
+> |
+> |   |    |
+>
+>    |
+>
+>   |
+> |
+> |    |
+> mod1.patch
+>  Shared with Dropbox  |   |
+>
+>   |
+>
+>   |
+>
+>
+>
+> and
+>  a_hw_gpio_bcm2835_gpio.c.patch
+>
+> |
+> |
+> |
+> |   |    |
+>
+>    |
+>
+>   |
+> |
+> |    |
+> a_hw_gpio_bcm2835_gpio.c.patch
+>  Shared with Dropbox  |   |
+>
+>   |
+>
+>   |
+>
+>
+>
+>
+>
+> John BradleyTel: 07896 839635Skype: flypie125 125B Grove StreetEdge Hill Liverpool L7 7AF
+>
+>     On Tuesday, 16 May 2017, 0:20, Philippe Mathieu-Daudé <f4bug@amsat.org> wrote:
+>
+>
+>  Hi John,
+>
+>> That is going to be very difficult as a lot of the changes are
+>> interlinked the vast majority of the patch is new files.
+>
+> I rebased your branch on latest qemu/master here:
+>
+> https://github.com/philmd/qemu/tree/flypie-GDummyPanel-rebased
+>
+> It is much easier to follow now, the big XML files you added/removed
+> also disappeared (gitk was crashing 'Out Of Memory' trying to look at
+> your tree).
+>
+> I hope it can help you to continue reordering in smaller patches.
+>
+> Regards,
+>
+> Phil.
+>
+> On 05/15/2017 01:46 PM, Alistair Francis wrote:
+>>
+>> Hey John,
+>>
+>> Thanks for the patch!
+>>
+>> Unfortunately this patch is too long to review, you need to split the
+>> patch up into shorter more readable patches. Otherwise it's too hard
+>> to people to understand what you are changing and why.
+>>
+>> There are some details here:
+>> http://wiki.qemu.org/Contribute/SubmitAPatch
+>> <http://wiki.qemu.org/Contribute/SubmitAPatch>about how to split up
+>> patches. Each patch applied in order shouldn't break any compilation
+>> or runtime. Generally the flow is to add the logic in earlier patches
+>> and then connect it and switch it on in the later patches.
+>>
+>> Try splitting up adding/editing each individual device and send that
+>> our first. That is generally the easiest to review/accept.
+>>
+>> Thanks,
+>>
+>> Alistair
+>>
+>>> ---
+>>> .gitignore                          |  54 ++
+>>> hw/arm/Makefile.objs                |    2 +-
+>>> hw/arm/bcm2835.c                    |  114 ++++
+>>> hw/arm/bcm2835_peripherals.c        |  104 ++++
+>>> hw/arm/bcm2836.c                    |    3 +-
+>>> hw/arm/raspi.c                      |  77 ++-
+>>> hw/gpio/bcm2835_gpio.c              |  333 ++++++-----
+>>> hw/misc/Makefile.objs                |    2 +
+>>> hw/misc/bcm2835_mphi.c              |  163 ++++++
+>>> hw/misc/bcm2835_power.c              |  106 ++++
+>>> hw/timer/Makefile.objs              |    2 +
+>>> hw/timer/bcm2835_st.c                |  202 +++++++
+>>> hw/timer/bcm2835_timer.c            |  224 +++++++
+>>> hw/usb/Makefile.objs                |    4 +-
+>>> hw/usb/bcm2835_usb.c                |  604 +++++++++++++++++++
+>>> hw/usb/bcm2835_usb_regs.h            | 1061
+>> ++++++++++++++++++++++++++++++++++
+>>> hw/usb/dev-network.c                |    2 +-
+>>> include/hw/arm/bcm2835.h            |  37 ++
+>>> include/hw/arm/bcm2835_peripherals.h |  10 +
+>>> include/hw/gpio/bcm2835_gpio.h      |    5 +
+>>> include/hw/intc/bcm2835_control.h    |  53 ++
+>>> include/hw/intc/bcm2836_control.h    |    2 +
+>>> include/hw/misc/bcm2835_mphi.h      |  28 +
+>>> include/hw/misc/bcm2835_power.h      |  22 +
+>>> include/hw/timer/bcm2835_st.h        |  25 +
+>>> include/hw/timer/bcm2835_timer.h    |  32 +
+>>> include/hw/usb/bcm2835_usb.h        |  78 +++
+>>> include/qemu/PanelEmu.h              |  53 ++
+>>> util/Makefile.objs                  |    1 +
+>>> util/PanelEmu.c                      |  293 ++++++++++
+>>> 30 files changed, 3547 insertions(+), 149 deletions(-)
+>>> create mode 100644 hw/arm/bcm2835.c
+>>> create mode 100644 hw/misc/bcm2835_mphi.c
+>>> create mode 100644 hw/misc/bcm2835_power.c
+>>> create mode 100644 hw/timer/bcm2835_st.c
+>>> create mode 100644 hw/timer/bcm2835_timer.c
+>>> create mode 100644 hw/usb/bcm2835_usb.c
+>>> create mode 100644 hw/usb/bcm2835_usb_regs.h
+>>> create mode 100644 include/hw/arm/bcm2835.h
+>>> create mode 100644 include/hw/intc/bcm2835_control.h
+>>> create mode 100644 include/hw/misc/bcm2835_mphi.h
+>>> create mode 100644 include/hw/misc/bcm2835_power.h
+>>> create mode 100644 include/hw/timer/bcm2835_st.h
+>>> create mode 100644 include/hw/timer/bcm2835_timer.h
+>>> create mode 100644 include/hw/usb/bcm2835_usb.h
+>>> create mode 100644 include/qemu/PanelEmu.h
+>>> create mode 100644 util/PanelEmu.c
+>>>
+>>
+>>
+>
+>
+>
+>
