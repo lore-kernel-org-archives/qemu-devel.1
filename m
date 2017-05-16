@@ -1,15 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42101)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42108)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sundeep.lkml@gmail.com>) id 1dAeZP-0002UK-0Q
-	for qemu-devel@nongnu.org; Tue, 16 May 2017 11:39:32 -0400
+	(envelope-from <sundeep.lkml@gmail.com>) id 1dAeZP-0002UM-Gt
+	for qemu-devel@nongnu.org; Tue, 16 May 2017 11:39:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sundeep.lkml@gmail.com>) id 1dAeZL-0001Vu-2M
+	(envelope-from <sundeep.lkml@gmail.com>) id 1dAeZN-0001WP-MV
 	for qemu-devel@nongnu.org; Tue, 16 May 2017 11:39:31 -0400
 From: Subbaraya Sundeep <sundeep.lkml@gmail.com>
-Date: Tue, 16 May 2017 21:08:48 +0530
-Message-Id: <1494949133-2202-1-git-send-email-sundeep.lkml@gmail.com>
-Subject: [Qemu-devel] [Qemu devel v5 PATCH 0/5] Add support for Smartfusion2
- SoC
+Date: Tue, 16 May 2017 21:08:50 +0530
+Message-Id: <1494949133-2202-3-git-send-email-sundeep.lkml@gmail.com>
+In-Reply-To: <1494949133-2202-1-git-send-email-sundeep.lkml@gmail.com>
+References: <1494949133-2202-1-git-send-email-sundeep.lkml@gmail.com>
+Subject: [Qemu-devel] [Qemu devel v5 PATCH 2/5] msf2: Microsemi Smartfusion2
+ System Register block.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,87 +23,279 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, qemu-arm@nongnu.org
 Cc: peter.maydell@linaro.org, crosthwaite.peter@gmail.com, alistair23@gmail.com, f4bug@amsat.org, Subbaraya Sundeep <sundeep.lkml@gmail.com>
 
-Hi Qemu-devel,
+Added Sytem register block of Smartfusion2.
+This block has PLL registers which are accessed by guest.
 
-I am trying to add Smartfusion2 SoC.
-SoC is from Microsemi and System on Module(SOM)
-board is from Emcraft systems. Smartfusion2 has hardened
-Microcontroller(Cortex-M3)based Sub System and FPGA fabric.
-At the moment only system timer, sysreg and SPI
-controller are modelled.
-
-Testing:
-./arm-softmmu/qemu-system-arm -M smartfusion2-som -serial mon:stdio \
--kernel u-boot.bin -display none -drive file=spi.bin,if=mtd,format=raw
-
-Binaries u-boot.bin and spi.bin are at:
-https://github.com/Subbaraya-Sundeep/qemu-test-binaries.git
-
-U-boot is from Emcraft with modified
-    - SPI driver not to use PDMA.
-    - ugly hack to pass dtb to kernel in r1.
-@
-https://github.com/Subbaraya-Sundeep/emcraft-uboot-sf2.git
-
-Linux is 4.5 linux with Smartfusion2 SoC dts and clocksource
-driver added by myself @
-https://github.com/Subbaraya-Sundeep/linux.git
-
-v5
-    As per Philippe comments:
-        Added abort in Sysreg if guest tries to remap memory
-        other than default mapping.
-        Use of CONFIG_MSF2 in Makefile for soc.c
-        Fixed incorrect logic in timer model.
-        Renamed msf2-timer.c -> mss-timer.c
-                msf2-spi.c -> mss-spi.c also type names
-        Renamed function msf2_init->emcraft_sf2_init in msf2-som.c
-        Added part-name,eNVM-size,eSRAM-size,pclk0 and pclk1
-            properties to soc.
-        Pass soc part-name,memory size and clock rate properties from som.
-v4:
-    Fixed build failure by using PRIx macros.
-v3:
-    Added SoC file and board file as per Alistair comments.
-v2:
-    Added SPI controller so that u-boot loads kernel from spi flash.
-v1:
-    Initial patch set with timer and sysreg
-
-Thanks,
-Sundeep
-
-Subbaraya Sundeep (5):
-  msf2: Add Smartfusion2 System timer
-  msf2: Microsemi Smartfusion2 System Register block.
-  msf2: Add Smartfusion2 SPI controller
-  msf2: Add Smartfusion2 SoC.
-  msf2: Add Emcraft's Smartfusion2 SOM kit.
-
- default-configs/arm-softmmu.mak |   1 +
- hw/arm/Makefile.objs            |   2 +
- hw/arm/msf2-soc.c               | 201 +++++++++++++++++++++
- hw/arm/msf2-som.c               |  89 ++++++++++
- hw/misc/Makefile.objs           |   1 +
- hw/misc/msf2-sysreg.c           | 161 +++++++++++++++++
- hw/ssi/Makefile.objs            |   1 +
- hw/ssi/mss-spi.c                | 378 ++++++++++++++++++++++++++++++++++++++++
- hw/timer/Makefile.objs          |   1 +
- hw/timer/mss-timer.c            | 249 ++++++++++++++++++++++++++
- include/hw/arm/msf2-soc.h       |  69 ++++++++
- include/hw/misc/msf2-sysreg.h   |  80 +++++++++
- include/hw/ssi/mss-spi.h        | 104 +++++++++++
- include/hw/timer/mss-timer.h    |  80 +++++++++
- 14 files changed, 1417 insertions(+)
- create mode 100644 hw/arm/msf2-soc.c
- create mode 100644 hw/arm/msf2-som.c
+Signed-off-by: Subbaraya Sundeep <sundeep.lkml@gmail.com>
+---
+ hw/misc/Makefile.objs         |   1 +
+ hw/misc/msf2-sysreg.c         | 161 ++++++++++++++++++++++++++++++++++++++++++
+ include/hw/misc/msf2-sysreg.h |  80 +++++++++++++++++++++
+ 3 files changed, 242 insertions(+)
  create mode 100644 hw/misc/msf2-sysreg.c
- create mode 100644 hw/ssi/mss-spi.c
- create mode 100644 hw/timer/mss-timer.c
- create mode 100644 include/hw/arm/msf2-soc.h
  create mode 100644 include/hw/misc/msf2-sysreg.h
- create mode 100644 include/hw/ssi/mss-spi.h
- create mode 100644 include/hw/timer/mss-timer.h
 
+diff --git a/hw/misc/Makefile.objs b/hw/misc/Makefile.objs
+index c8b4893..0f52354 100644
+--- a/hw/misc/Makefile.objs
++++ b/hw/misc/Makefile.objs
+@@ -56,3 +56,4 @@ obj-$(CONFIG_EDU) += edu.o
+ obj-$(CONFIG_HYPERV_TESTDEV) += hyperv_testdev.o
+ obj-$(CONFIG_AUX) += auxbus.o
+ obj-$(CONFIG_ASPEED_SOC) += aspeed_scu.o aspeed_sdmc.o
++obj-$(CONFIG_MSF2) += msf2-sysreg.o
+diff --git a/hw/misc/msf2-sysreg.c b/hw/misc/msf2-sysreg.c
+new file mode 100644
+index 0000000..8d3118f
+--- /dev/null
++++ b/hw/misc/msf2-sysreg.c
+@@ -0,0 +1,161 @@
++/*
++ * System Register block model of Microsemi SmartFusion2.
++ *
++ * Copyright (c) 2017 Subbaraya Sundeep <sundeep.lkml@gmail.com>
++ *
++ * This program is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU General Public License
++ * as published by the Free Software Foundation; either version
++ * 2 of the License, or (at your option) any later version.
++ *
++ * You should have received a copy of the GNU General Public License along
++ * with this program; if not, see <http://www.gnu.org/licenses/>.
++ */
++
++#include "hw/misc/msf2-sysreg.h"
++
++#ifndef MSF2_SYSREG_ERR_DEBUG
++#define MSF2_SYSREG_ERR_DEBUG  0
++#endif
++
++#define DB_PRINT_L(lvl, fmt, args...) do { \
++    if (MSF2_SYSREG_ERR_DEBUG >= lvl) { \
++        qemu_log("%s: " fmt, __func__, ## args); \
++    } \
++} while (0);
++
++#define DB_PRINT(fmt, args...) DB_PRINT_L(1, fmt, ## args)
++
++static void msf2_sysreg_reset(DeviceState *d)
++{
++    MSF2SysregState *s = MSF2_SYSREG(d);
++
++    DB_PRINT("RESET\n");
++
++    s->regs[MSSDDR_PLL_STATUS_LOW_CR] = 0x021A2358;
++    s->regs[MSSDDR_FACC1_CR] = 0x0B800124;
++    s->regs[MSSDDR_PLL_STATUS] = 0x3;
++}
++
++static uint64_t msf2_sysreg_read(void *opaque, hwaddr offset,
++    unsigned size)
++{
++    MSF2SysregState *s = opaque;
++    offset /= 4;
++    uint32_t ret = 0;
++
++    if (offset < ARRAY_SIZE(s->regs)) {
++        ret = s->regs[offset];
++        DB_PRINT("addr: 0x%08" HWADDR_PRIx " data: 0x%08" PRIx32 "\n",
++                    offset * 4, ret);
++    } else {
++        qemu_log_mask(LOG_GUEST_ERROR,
++                    "%s: Bad offset 0x%08" HWADDR_PRIx "\n", __func__,
++                    offset * 4);
++    }
++
++    return ret;
++}
++
++static void msf2_sysreg_write(void *opaque, hwaddr offset,
++                          uint64_t val, unsigned size)
++{
++    MSF2SysregState *s = (MSF2SysregState *)opaque;
++    uint32_t newval = val;
++    uint32_t oldval;
++
++    offset /= 4;
++
++    DB_PRINT("addr: 0x%08" HWADDR_PRIx " data: 0x%08" PRIx64 "\n",
++            offset * 4, val);
++
++    switch (offset) {
++    case MSSDDR_PLL_STATUS:
++        break;
++
++    case ESRAM_CR:
++        oldval = s->regs[ESRAM_CR];
++        if (oldval ^ newval) {
++            qemu_log_mask(LOG_GUEST_ERROR,
++                       TYPE_MSF2_SYSREG": eSRAM remapping not supported\n");
++            abort();
++        }
++        break;
++
++    case DDR_CR:
++        oldval = s->regs[DDR_CR];
++        if (oldval ^ newval) {
++            qemu_log_mask(LOG_GUEST_ERROR,
++                       TYPE_MSF2_SYSREG": DDR remapping not supported\n");
++            abort();
++        }
++        break;
++
++    case ENVM_REMAP_BASE_CR:
++        oldval = s->regs[ENVM_REMAP_BASE_CR];
++        if (oldval ^ newval) {
++            qemu_log_mask(LOG_GUEST_ERROR,
++                       TYPE_MSF2_SYSREG": eNVM remapping not supported\n");
++            abort();
++        }
++        break;
++
++    default:
++        if (offset < ARRAY_SIZE(s->regs)) {
++            s->regs[offset] = val;
++        } else {
++            qemu_log_mask(LOG_GUEST_ERROR,
++                        "%s: Bad offset 0x%08" HWADDR_PRIx "\n", __func__,
++                        offset * 4);
++        }
++        break;
++    }
++}
++
++static const MemoryRegionOps sysreg_ops = {
++    .read = msf2_sysreg_read,
++    .write = msf2_sysreg_write,
++    .endianness = DEVICE_NATIVE_ENDIAN,
++};
++
++static void msf2_sysreg_init(Object *obj)
++{
++    MSF2SysregState *s = MSF2_SYSREG(obj);
++
++    memory_region_init_io(&s->iomem, obj, &sysreg_ops, s, TYPE_MSF2_SYSREG,
++                          MSF2_SYSREG_MMIO_SIZE);
++    sysbus_init_mmio(SYS_BUS_DEVICE(obj), &s->iomem);
++}
++
++static const VMStateDescription vmstate_msf2_sysreg = {
++    .name = TYPE_MSF2_SYSREG,
++    .version_id = 1,
++    .minimum_version_id = 1,
++    .fields = (VMStateField[]) {
++        VMSTATE_UINT32_ARRAY(regs, MSF2SysregState, MSF2_SYSREG_NUM_REGS),
++        VMSTATE_END_OF_LIST()
++    }
++};
++
++static void msf2_sysreg_class_init(ObjectClass *klass, void *data)
++{
++    DeviceClass *dc = DEVICE_CLASS(klass);
++
++    dc->vmsd = &vmstate_msf2_sysreg;
++    dc->reset = msf2_sysreg_reset;
++}
++
++static const TypeInfo msf2_sysreg_info = {
++    .name  = TYPE_MSF2_SYSREG,
++    .parent = TYPE_SYS_BUS_DEVICE,
++    .class_init = msf2_sysreg_class_init,
++    .instance_size  = sizeof(MSF2SysregState),
++    .instance_init = msf2_sysreg_init,
++};
++
++static void msf2_sysreg_register_types(void)
++{
++    type_register_static(&msf2_sysreg_info);
++}
++
++type_init(msf2_sysreg_register_types)
+diff --git a/include/hw/misc/msf2-sysreg.h b/include/hw/misc/msf2-sysreg.h
+new file mode 100644
+index 0000000..a485ed6
+--- /dev/null
++++ b/include/hw/misc/msf2-sysreg.h
+@@ -0,0 +1,80 @@
++/*
++ * Microsemi SmartFusion2 SYSREG
++ *
++ * Copyright (c) 2017 Subbaraya Sundeep <sundeep.lkml@gmail.com>
++ *
++ * Permission is hereby granted, free of charge, to any person obtaining a copy
++ * of this software and associated documentation files (the "Software"), to deal
++ * in the Software without restriction, including without limitation the rights
++ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
++ * copies of the Software, and to permit persons to whom the Software is
++ * furnished to do so, subject to the following conditions:
++ *
++ * The above copyright notice and this permission notice shall be included in
++ * all copies or substantial portions of the Software.
++ *
++ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
++ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
++ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
++ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
++ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
++ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
++ * THE SOFTWARE.
++ */
++
++#ifndef HW_MSF2_SYSREG_H
++#define HW_MSF2_SYSREG_H
++
++#include "qemu/osdep.h"
++#include "hw/sysbus.h"
++#include "hw/hw.h"
++#include "sysemu/sysemu.h"
++#include "qemu/log.h"
++
++enum {
++    ESRAM_CR        = 0x00 / 4,
++    ESRAM_MAX_LAT,
++    DDR_CR,
++    ENVM_CR,
++    ENVM_REMAP_BASE_CR,
++    ENVM_REMAP_FAB_CR,
++    CC_CR,
++    CC_REGION_CR,
++    CC_LOCK_BASE_ADDR_CR,
++    CC_FLUSH_INDX_CR,
++    DDRB_BUF_TIMER_CR,
++    DDRB_NB_ADDR_CR,
++    DDRB_NB_SIZE_CR,
++    DDRB_CR,
++
++    SOFT_RESET_CR  = 0x48 / 4,
++    M3_CR,
++
++    GPIO_SYSRESET_SEL_CR = 0x58 / 4,
++
++    MDDR_CR = 0x60 / 4,
++
++    MSSDDR_PLL_STATUS_LOW_CR = 0x90 / 4,
++    MSSDDR_PLL_STATUS_HIGH_CR,
++    MSSDDR_FACC1_CR,
++    MSSDDR_FACC2_CR,
++
++    MSSDDR_PLL_STATUS = 0x150 / 4,
++
++};
++
++#define MSF2_SYSREG_MMIO_SIZE     0x300
++#define MSF2_SYSREG_NUM_REGS      (MSF2_SYSREG_MMIO_SIZE / 4)
++
++#define TYPE_MSF2_SYSREG          "msf2-sysreg"
++#define MSF2_SYSREG(obj)  OBJECT_CHECK(MSF2SysregState, (obj), TYPE_MSF2_SYSREG)
++
++typedef struct MSF2SysregState {
++    SysBusDevice parent_obj;
++
++    MemoryRegion iomem;
++
++    uint32_t regs[MSF2_SYSREG_NUM_REGS];
++} MSF2SysregState;
++
++#endif /* HW_MSF2_SYSREG_H */
 -- 
 2.5.0
