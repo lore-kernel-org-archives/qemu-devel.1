@@ -1,42 +1,40 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39794)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39800)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1dB14I-0002kV-Ac
-	for qemu-devel@nongnu.org; Wed, 17 May 2017 11:40:55 -0400
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1dB14I-0002kg-G0
+	for qemu-devel@nongnu.org; Wed, 17 May 2017 11:40:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1dB14D-0005qX-Ct
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1dB14D-0005qG-7b
 	for qemu-devel@nongnu.org; Wed, 17 May 2017 11:40:54 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:35437
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:53483
 	helo=mx0a-001b2d01.pphosted.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <mdroth@linux.vnet.ibm.com>)
-	id 1dB14D-0005q4-7p
+	id 1dB14D-0005px-1p
 	for qemu-devel@nongnu.org; Wed, 17 May 2017 11:40:49 -0400
-Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
+Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
 	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v4HFcqUK130312
+	v4HFcshl088710
 	for <qemu-devel@nongnu.org>; Wed, 17 May 2017 11:40:48 -0400
-Received: from e34.co.us.ibm.com (e34.co.us.ibm.com [32.97.110.152])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2agq0k8k4h-1
+Received: from e19.ny.us.ibm.com (e19.ny.us.ibm.com [129.33.205.209])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2agnprcprw-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 17 May 2017 11:40:47 -0400
+	for <qemu-devel@nongnu.org>; Wed, 17 May 2017 11:40:48 -0400
 Received: from localhost
-	by e34.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	by e19.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
 	Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <mdroth@linux.vnet.ibm.com>;
-	Wed, 17 May 2017 09:40:47 -0600
+	Wed, 17 May 2017 11:40:47 -0400
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 From: Michael Roth <mdroth@linux.vnet.ibm.com>
-In-Reply-To: <8ee42025-7ba2-1b30-fff1-47f9df699052@linux.vnet.ibm.com>
-References: <20170505204746.14116-1-danielhb@linux.vnet.ibm.com>
-	<20170505204746.14116-5-danielhb@linux.vnet.ibm.com>
-	<20170512061224.GH12908@umbus.fritz.box>
-	<8ee42025-7ba2-1b30-fff1-47f9df699052@linux.vnet.ibm.com>
-Date: Mon, 15 May 2017 22:02:28 -0500
-Message-Id: <149490374808.29340.16071835944145654917@loki>
-Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH v9 4/6] hw/ppc/spapr.c: migrate
- pending_dimm_unplugs of spapr state
+In-Reply-To: <20170515131052.23457-2-danielhb@linux.vnet.ibm.com>
+References: <20170515131052.23457-1-danielhb@linux.vnet.ibm.com>
+	<20170515131052.23457-2-danielhb@linux.vnet.ibm.com>
+Date: Mon, 15 May 2017 22:22:49 -0500
+Message-Id: <149490496947.29340.9833975295117328739@loki>
+Subject: Re: [Qemu-devel] [PATCH v10] migration: spapr: migrate
+ pending_events of spapr state
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -45,179 +43,252 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>, David Gibson <david@gibson.dropbear.id.au>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+To: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>, qemu-devel@nongnu.org
+Cc: qemu-ppc@nongnu.org, david@gibson.dropbear.id.au
 
-Quoting Daniel Henrique Barboza (2017-05-12 14:54:57)
+Quoting Daniel Henrique Barboza (2017-05-15 08:10:52)
+> From: Jianjun Duan <duanj@linux.vnet.ibm.com>
 > =
 
+> In racing situations between hotplug events and migration operation,
+> a rtas hotplug event could have not yet be delivered to the source
+> guest when migration is started. In this case the pending_events of
+> spapr state need be transmitted to the target so that the hotplug
+> event can be finished on the target.
 > =
 
-> On 05/12/2017 03:12 AM, David Gibson wrote:
-> > On Fri, May 05, 2017 at 05:47:44PM -0300, Daniel Henrique Barboza wrote:
-> >> To allow for a DIMM unplug event to resume its work if a migration
-> >> occurs in the middle of it, this patch migrates the non-empty
-> >> pending_dimm_unplugs QTAILQ that stores the DIMM information
-> >> that the spapr_lmb_release() callback uses.
-> >>
-> >> It was considered an apprach where the DIMM states would be restored
-> >> on the post-_load after a migration. The problem is that there is
-> >> no way of knowing, from the sPAPRMachineState, if a given DIMM is going
-> >> through an unplug process and the callback needs the updated DIMM Stat=
-e.
-> >>
-> >> We could migrate a flag indicating that there is an unplug event going
-> >> on for a certain DIMM, fetching this information from the start of the
-> >> spapr_del_lmbs call. But this would also require a scan on post_load to
-> >> figure out how many nr_lmbs are left. At this point we can just
-> >> migrate the nr_lmbs information as well, given that it is being calcul=
-ated
-> >> at spapr_del_lmbs already, and spare a scanning/discovery in the
-> >> post-load. All that we need is inside the sPAPRDIMMState structure
-> >> that is added to the pending_dimm_unplugs queue at the start of the
-> >> spapr_del_lmbs, so it's convenient to just migrated this queue it if i=
-t's
-> >> not empty.
-> >>
-> >> Signed-off-by: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
-> > NACK.
-> >
-> > As I believe I suggested previously, you can reconstruct this state on
-> > the receiving side by doing a full scan of the DIMM and LMB DRC states.
+> All the different fields of the events are encoded as defined by
+> PAPR. We can migrate them as uint8_t binary stream without any
+> concerns about data padding or endianess.
 > =
 
-> Just had an idea that I think it's in the line of what you're =
-
-> suggesting. Given
-> that the information we need is only created in the spapr_del_lmbs
-> (as per patch 1), we can use the absence of this information in the
-> release callback as a sort of a flag, an indication that a migration got
-> in the way and we need to reconstruct the nr_lmbs states again, using
-> the same scanning function I've used in v8.
+> pending_events is put in a subsection in the spapr state VMSD to make
+> sure migration across different versions is not broken.
 > =
 
-> The flow would be like this (considering the changes in the
-> previous 3 patches so far):
+> Signed-off-by: Jianjun Duan <duanj@linux.vnet.ibm.com>
+> Signed-off-by: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
+
+I think you might've missed some of the review comments David made in
+v9.
+
+> ---
+>  hw/ppc/spapr.c         | 33 +++++++++++++++++++++++++++++++++
+>  hw/ppc/spapr_events.c  | 24 +++++++++++++-----------
+>  include/hw/ppc/spapr.h |  3 ++-
+>  3 files changed, 48 insertions(+), 12 deletions(-)
 > =
 
-> ------------
+> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> index 80d12d0..8cfdc71 100644
+> --- a/hw/ppc/spapr.c
+> +++ b/hw/ppc/spapr.c
+> @@ -1437,6 +1437,38 @@ static bool version_before_3(void *opaque, int ver=
+sion_id)
+>      return version_id < 3;
+>  }
 > =
 
-> /* Callback to be called during DRC release. */
-> void spapr_lmb_release(DeviceState *dev)
-> {
->       HotplugHandler *hotplug_ctrl;
+> +static bool spapr_pending_events_needed(void *opaque)
+> +{
+> +    sPAPRMachineState *spapr =3D (sPAPRMachineState *)opaque;
+> +    return !QTAILQ_EMPTY(&spapr->pending_events);
+> +}
+> +
+> +static const VMStateDescription vmstate_spapr_event_entry =3D {
+> +    .name =3D "spapr_event_log_entry",
+> +    .version_id =3D 1,
+> +    .minimum_version_id =3D 1,
+> +    .fields =3D (VMStateField[]) {
+> +        VMSTATE_INT32(log_type, sPAPREventLogEntry),
+> +        VMSTATE_BOOL(exception, sPAPREventLogEntry),
+> +        VMSTATE_UINT32(data_size, sPAPREventLogEntry),
+> +        VMSTATE_VARRAY_UINT32_ALLOC(data, sPAPREventLogEntry, data_size,
+> +                                    0, vmstate_info_uint8, uint8_t),
+> +        VMSTATE_END_OF_LIST()
+> +    },
+> +};
+> +
+> +static const VMStateDescription vmstate_spapr_pending_events =3D {
+> +    .name =3D "spapr_pending_events",
+> +    .version_id =3D 1,
+> +    .minimum_version_id =3D 1,
+> +    .needed =3D spapr_pending_events_needed,
+> +    .fields =3D (VMStateField[]) {
+> +        VMSTATE_QTAILQ_V(pending_events, sPAPRMachineState, 1,
+> +                         vmstate_spapr_event_entry, sPAPREventLogEntry, =
+next),
+> +        VMSTATE_END_OF_LIST()
+> +    },
+> +};
+> +
+>  static bool spapr_ov5_cas_needed(void *opaque)
+>  {
+>      sPAPRMachineState *spapr =3D opaque;
+> @@ -1535,6 +1567,7 @@ static const VMStateDescription vmstate_spapr =3D {
+>      .subsections =3D (const VMStateDescription*[]) {
+>          &vmstate_spapr_ov5_cas,
+>          &vmstate_spapr_patb_entry,
+> +        &vmstate_spapr_pending_events,
+>          NULL
+>      }
+>  };
+> diff --git a/hw/ppc/spapr_events.c b/hw/ppc/spapr_events.c
+> index f0b28d8..70c7cfc 100644
+> --- a/hw/ppc/spapr_events.c
+> +++ b/hw/ppc/spapr_events.c
+> @@ -342,7 +342,8 @@ static int rtas_event_log_to_irq(sPAPRMachineState *s=
+papr, int log_type)
+>      return source->irq;
+>  }
 > =
 
->       uint64_t addr =3D spapr_dimm_get_address(PC_DIMM(dev));
->       sPAPRMachineState *spapr =3D SPAPR_MACHINE(qdev_get_machine());
->       sPAPRDIMMState *ds =3D spapr_pending_dimm_unplugs_find(spapr, addr);
+> -static void rtas_event_log_queue(int log_type, void *data, bool exceptio=
+n)
+> +static void rtas_event_log_queue(int log_type, void *data, bool exceptio=
+n,
+> +                                 int data_size)
+>  {
+>      sPAPRMachineState *spapr =3D SPAPR_MACHINE(qdev_get_machine());
+>      sPAPREventLogEntry *entry =3D g_new(sPAPREventLogEntry, 1);
+> @@ -351,6 +352,7 @@ static void rtas_event_log_queue(int log_type, void *=
+data, bool exception)
+>      entry->log_type =3D log_type;
+>      entry->exception =3D exception;
+>      entry->data =3D data;
+> +    entry->data_size =3D data_size;
+>      QTAILQ_INSERT_TAIL(&spapr->pending_events, entry, next);
+>  }
 > =
 
->      // no DIMM state found in spapr - re-create it to find out how may =
+> @@ -445,6 +447,7 @@ static void spapr_powerdown_req(Notifier *n, void *op=
+aque)
+>      struct rtas_event_log_v6_mainb *mainb;
+>      struct rtas_event_log_v6_epow *epow;
+>      struct epow_log_full *new_epow;
+> +    uint32_t data_size;
+> =
 
-> LMBs are left
->      if (ds =3D=3D NULL) {
->          uint32 nr_lmbs  =3D ***call_scanning_LMB_DRCs_function(dev)***
->          // recreate the sPAPRDIMMState element and add it back to spapr
+>      new_epow =3D g_malloc0(sizeof(*new_epow));
+>      hdr =3D &new_epow->hdr;
+> @@ -453,14 +456,13 @@ static void spapr_powerdown_req(Notifier *n, void *=
+opaque)
+>      mainb =3D &new_epow->mainb;
+>      epow =3D &new_epow->epow;
+> =
+
+> +    data_size =3D sizeof(*new_epow);
+>      hdr->summary =3D cpu_to_be32(RTAS_LOG_VERSION_6
+>                                 | RTAS_LOG_SEVERITY_EVENT
+>                                 | RTAS_LOG_DISPOSITION_NOT_RECOVERED
+>                                 | RTAS_LOG_OPTIONAL_PART_PRESENT
+>                                 | RTAS_LOG_TYPE_EPOW);
+> -    hdr->extended_length =3D cpu_to_be32(sizeof(*new_epow)
+> -                                       - sizeof(new_epow->hdr));
+> -
+> +    hdr->extended_length =3D cpu_to_be32(data_size - sizeof(new_epow->hd=
+r));
+>      spapr_init_v6hdr(v6hdr);
+>      spapr_init_maina(maina, 3 /* Main-A, Main-B and EPOW */);
+> =
+
+> @@ -479,7 +481,7 @@ static void spapr_powerdown_req(Notifier *n, void *op=
+aque)
+>      epow->event_modifier =3D RTAS_LOG_V6_EPOW_MODIFIER_NORMAL;
+>      epow->extended_modifier =3D RTAS_LOG_V6_EPOW_XMODIFIER_PARTITION_SPE=
+CIFIC;
+> =
+
+> -    rtas_event_log_queue(RTAS_LOG_TYPE_EPOW, new_epow, true);
+> +    rtas_event_log_queue(RTAS_LOG_TYPE_EPOW, new_epow, true, data_size);
+> =
+
+>      qemu_irq_pulse(xics_get_qirq(XICS_FABRIC(spapr),
+>                                   rtas_event_log_to_irq(spapr,
+> @@ -504,6 +506,7 @@ static void spapr_hotplug_req_event(uint8_t hp_id, ui=
+nt8_t hp_action,
+>      struct rtas_event_log_v6_maina *maina;
+>      struct rtas_event_log_v6_mainb *mainb;
+>      struct rtas_event_log_v6_hp *hp;
+> +    uint32_t data_size;
+> =
+
+>      new_hp =3D g_malloc0(sizeof(struct hp_log_full));
+>      hdr =3D &new_hp->hdr;
+> @@ -512,14 +515,14 @@ static void spapr_hotplug_req_event(uint8_t hp_id, =
+uint8_t hp_action,
+>      mainb =3D &new_hp->mainb;
+>      hp =3D &new_hp->hp;
+> =
+
+> +    data_size =3D sizeof(*new_hp);
+>      hdr->summary =3D cpu_to_be32(RTAS_LOG_VERSION_6
+>                                 | RTAS_LOG_SEVERITY_EVENT
+>                                 | RTAS_LOG_DISPOSITION_NOT_RECOVERED
+>                                 | RTAS_LOG_OPTIONAL_PART_PRESENT
+>                                 | RTAS_LOG_INITIATOR_HOTPLUG
+>                                 | RTAS_LOG_TYPE_HOTPLUG);
+> -    hdr->extended_length =3D cpu_to_be32(sizeof(*new_hp)
+> -                                       - sizeof(new_hp->hdr));
+> +    hdr->extended_length =3D cpu_to_be32(data_size - sizeof(new_hp->hdr)=
+);
+> =
+
+>      spapr_init_v6hdr(v6hdr);
+>      spapr_init_maina(maina, 3 /* Main-A, Main-B, HP */);
+> @@ -572,7 +575,7 @@ static void spapr_hotplug_req_event(uint8_t hp_id, ui=
+nt8_t hp_action,
+>              cpu_to_be32(drc_id->count_indexed.index);
 >      }
 > =
 
->      ( resume callback as usual )
+> -    rtas_event_log_queue(RTAS_LOG_TYPE_HOTPLUG, new_hp, true);
+> +    rtas_event_log_queue(RTAS_LOG_TYPE_HOTPLUG, new_hp, true, data_size);
 > =
 
-> -----------
+>      qemu_irq_pulse(xics_get_qirq(XICS_FABRIC(spapr),
+>                                   rtas_event_log_to_irq(spapr,
+> @@ -671,8 +674,7 @@ static void check_exception(PowerPCCPU *cpu, sPAPRMac=
+hineState *spapr,
+>      if (!event) {
+>          goto out_no_events;
+>      }
+> -
+> -    hdr =3D event->data;
+> +    hdr =3D (struct rtas_error_log *)event->data;
+>      event_len =3D be32_to_cpu(hdr->extended_length) + sizeof(*hdr);
 > =
 
-> Is this approach be adequate? Another alternative would be to use another
-
-Seems reasonable to me.
-
-> way of detecting if an LMB unplug is happening and, if positive, do the s=
-ame
-> process in the post_load(). In this case I'll need to take a look in the =
-
-> code and
-> see how we can detect an ongoing unplug besides what I've said above.
-
-You could scan DRCs/LMBs for each DIMM and generate an sPAPRDIMMState for a=
-ny
-case where DRCs/LMBs are not all present. But doing it the way you've
-proposed above lets us re-generate them as needed and avoid the exhaustive
-scan. I'd be sure to document it in the comments as a migration-specific ho=
-ok
-though since you lose that understanding by moving it out of postload and
-future refactorings might forget why we have a hook that regenerates it
-even though spapr_del_lmbs always sets it initially.
-
+>      if (event_len < len) {
+> @@ -728,7 +730,7 @@ static void event_scan(PowerPCCPU *cpu, sPAPRMachineS=
+tate *spapr,
+>          goto out_no_events;
+>      }
 > =
 
+> -    hdr =3D event->data;
+> +    hdr =3D (struct rtas_error_log *)event->data;
+>      event_len =3D be32_to_cpu(hdr->extended_length) + sizeof(*hdr);
 > =
 
-> Thanks,
+>      if (event_len < len) {
+> diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
+> index 5802f88..fbe1d93 100644
+> --- a/include/hw/ppc/spapr.h
+> +++ b/include/hw/ppc/spapr.h
+> @@ -599,7 +599,8 @@ sPAPRTCETable *spapr_tce_find_by_liobn(target_ulong l=
+iobn);
+>  struct sPAPREventLogEntry {
+>      int log_type;
+>      bool exception;
+> -    void *data;
+> +    uint8_t *data;
+> +    uint32_t data_size;
+>      QTAILQ_ENTRY(sPAPREventLogEntry) next;
+>  };
 > =
 
-> =
+> -- =
 
-> Daniel
-> =
-
-> >
-> >> ---
-> >>   hw/ppc/spapr.c | 31 +++++++++++++++++++++++++++++++
-> >>   1 file changed, 31 insertions(+)
-> >>
-> >> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> >> index e190eb9..30f0b7b 100644
-> >> --- a/hw/ppc/spapr.c
-> >> +++ b/hw/ppc/spapr.c
-> >> @@ -1437,6 +1437,36 @@ static bool version_before_3(void *opaque, int =
-version_id)
-> >>       return version_id < 3;
-> >>   }
-> >>   =
-
-> >> +static bool spapr_pending_dimm_unplugs_needed(void *opaque)
-> >> +{
-> >> +    sPAPRMachineState *spapr =3D (sPAPRMachineState *)opaque;
-> >> +    return !QTAILQ_EMPTY(&spapr->pending_dimm_unplugs);
-> >> +}
-> >> +
-> >> +static const VMStateDescription vmstate_spapr_dimmstate =3D {
-> >> +    .name =3D "spapr_dimm_state",
-> >> +    .version_id =3D 1,
-> >> +    .minimum_version_id =3D 1,
-> >> +    .fields =3D (VMStateField[]) {
-> >> +        VMSTATE_UINT64(addr, sPAPRDIMMState),
-> >> +        VMSTATE_UINT32(nr_lmbs, sPAPRDIMMState),
-> >> +        VMSTATE_END_OF_LIST()
-> >> +    },
-> >> +};
-> >> +
-> >> +static const VMStateDescription vmstate_spapr_pending_dimm_unplugs =
-=3D {
-> >> +    .name =3D "spapr_pending_dimm_unplugs",
-> >> +    .version_id =3D 1,
-> >> +    .minimum_version_id =3D 1,
-> >> +    .needed =3D spapr_pending_dimm_unplugs_needed,
-> >> +    .fields =3D (VMStateField[]) {
-> >> +        VMSTATE_QTAILQ_V(pending_dimm_unplugs, sPAPRMachineState, 1,
-> >> +                         vmstate_spapr_dimmstate, sPAPRDIMMState,
-> >> +                         next),
-> >> +        VMSTATE_END_OF_LIST()
-> >> +    },
-> >> +};
-> >> +
-> >>   static bool spapr_ov5_cas_needed(void *opaque)
-> >>   {
-> >>       sPAPRMachineState *spapr =3D opaque;
-> >> @@ -1535,6 +1565,7 @@ static const VMStateDescription vmstate_spapr =
-=3D {
-> >>       .subsections =3D (const VMStateDescription*[]) {
-> >>           &vmstate_spapr_ov5_cas,
-> >>           &vmstate_spapr_patb_entry,
-> >> +        &vmstate_spapr_pending_dimm_unplugs,
-> >>           NULL
-> >>       }
-> >>   };
+> 2.9.3
 >=20
