@@ -1,21 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48949)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49049)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dAdZR-0007El-Uc
-	for qemu-devel@nongnu.org; Tue, 16 May 2017 10:35:30 -0400
+	(envelope-from <stefanha@gmail.com>) id 1dAdZo-0007WV-Kd
+	for qemu-devel@nongnu.org; Tue, 16 May 2017 10:35:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dAdZN-00051N-OE
-	for qemu-devel@nongnu.org; Tue, 16 May 2017 10:35:29 -0400
-References: <20170516001150.11508-1-f4bug@amsat.org>
-	<20170516001150.11508-2-f4bug@amsat.org>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <79ae9877-afd9-50a7-c9f2-a12d294ff1ac@redhat.com>
-Date: Tue, 16 May 2017 09:35:07 -0500
+	(envelope-from <stefanha@gmail.com>) id 1dAdZn-0005Bd-LM
+	for qemu-devel@nongnu.org; Tue, 16 May 2017 10:35:52 -0400
+Received: from mail-wm0-x234.google.com ([2a00:1450:400c:c09::234]:34909)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1dAdZn-0005At-Ek
+	for qemu-devel@nongnu.org; Tue, 16 May 2017 10:35:51 -0400
+Received: by mail-wm0-x234.google.com with SMTP id b84so136441046wmh.0
+	for <qemu-devel@nongnu.org>; Tue, 16 May 2017 07:35:51 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20170516001150.11508-2-f4bug@amsat.org>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="2nSjV1s54Lmm76rN8I5d4eB6xc3NSRwup"
-Subject: Re: [Qemu-devel] [PATCH] coccinelle: fix typo in comment
+In-Reply-To: <20170512155249.8853-1-quintela@redhat.com>
+References: <20170512155249.8853-1-quintela@redhat.com>
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Date: Tue, 16 May 2017 15:35:49 +0100
+Message-ID: <CAJSP0QXO=-srhAdVvvF5f9Q=OtU7qbRwEmfrAfRxp4DiJgxwqg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL 0/5] Migration pull request
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,72 +27,21 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, qemu-trivial@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, Markus Armbruster <armbru@redhat.com>
+To: Juan Quintela <quintela@redhat.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, Laurent Vivier <lvivier@redhat.com>, Dave Gilbert <dgilbert@redhat.com>, peterx@redhat.com
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---2nSjV1s54Lmm76rN8I5d4eB6xc3NSRwup
-From: Eric Blake <eblake@redhat.com>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
- qemu-devel@nongnu.org, qemu-trivial@nongnu.org,
- Eduardo Habkost <ehabkost@redhat.com>, Markus Armbruster <armbru@redhat.com>
-Message-ID: <79ae9877-afd9-50a7-c9f2-a12d294ff1ac@redhat.com>
-Subject: Re: [PATCH] coccinelle: fix typo in comment
-References: <20170516001150.11508-1-f4bug@amsat.org>
- <20170516001150.11508-2-f4bug@amsat.org>
-In-Reply-To: <20170516001150.11508-2-f4bug@amsat.org>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On Fri, May 12, 2017 at 4:52 PM, Juan Quintela <quintela@redhat.com> wrote:
+> Hi
+>
+> This pull contains:
+> - Fix regression with compression threads (mea culpa)
+> - start of includes migration (creating of blocker.h header)
+> - Use Error** correctly after several iterations
+> - Rename of RAM_SAVE_FLAG_COMPRESS
+> - Create block capabilities for shared and enable
+>
+> Please, apply.
 
-On 05/15/2017 07:11 PM, Philippe Mathieu-Daud=C3=A9 wrote:
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-> ---
->  scripts/coccinelle/return_directly.cocci | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+I have reverted the pull request at Juan's request.
 
-Did you intend for this to be threaded with your other 'oslib: strip
-trailing '\n'...' patch? If so, where's the 0/2 cover letter and proper
-subject lines?
-
-At any rate,
-Reviewed-by: Eric Blake <eblake@redhat.com>
-
->=20
-> diff --git a/scripts/coccinelle/return_directly.cocci b/scripts/coccine=
-lle/return_directly.cocci
-> index 48680f2c2a..4cf50e75ea 100644
-> --- a/scripts/coccinelle/return_directly.cocci
-> +++ b/scripts/coccinelle/return_directly.cocci
-> @@ -1,4 +1,4 @@
-> -// replace 'R =3D X; return R;' with 'return R;'
-> +// replace 'R =3D X; return R;' with 'return X;'
->  @@
->  identifier VAR;
->  expression E;
->=20
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---2nSjV1s54Lmm76rN8I5d4eB6xc3NSRwup
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEcBAEBCAAGBQJZGw4bAAoJEKeha0olJ0NqX3MIAJDE3z4GYtwXE7vCUtQeocJ1
-H+Xo1vMRW2nuibw8pTQc1tva6LiJK8EbX2M3bDX4t9pjW7xytM1OWNP5TRcGyl3Q
-oGn1tFX8ysEXro7xwk1BXIOTc7I5ziyp1QB6uX+H4wvSjrh2RwXivLjVmWiYkfpy
-1INmbxZb5wypoDrsaA0BgKT69MAXsY1nUKp9UIJC198Pox64s9S5Z/12wGeRWjU+
-rtNw+zEbUQ3kohGk0Vyz2fclyquP/lBMHoX3VYAVHvBUIWSstTYYgwoarF1U90CJ
-ZJafwm7RlcUlda5/KMwv7MJV9AIXMy5O63orZ3k8fcc5lezDw016w/hIc1AegTU=
-=4LfI
------END PGP SIGNATURE-----
-
---2nSjV1s54Lmm76rN8I5d4eB6xc3NSRwup--
+Stefan
