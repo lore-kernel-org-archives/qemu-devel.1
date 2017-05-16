@@ -1,29 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39800)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39964)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1dB14I-0002kg-G0
-	for qemu-devel@nongnu.org; Wed, 17 May 2017 11:40:56 -0400
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1dB14T-0002uo-PB
+	for qemu-devel@nongnu.org; Wed, 17 May 2017 11:41:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1dB14D-0005qG-7b
-	for qemu-devel@nongnu.org; Wed, 17 May 2017 11:40:54 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:53483
-	helo=mx0a-001b2d01.pphosted.com)
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1dB14O-0005yD-NP
+	for qemu-devel@nongnu.org; Wed, 17 May 2017 11:41:05 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:46053)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <mdroth@linux.vnet.ibm.com>)
-	id 1dB14D-0005px-1p
-	for qemu-devel@nongnu.org; Wed, 17 May 2017 11:40:49 -0400
-Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v4HFcshl088710
-	for <qemu-devel@nongnu.org>; Wed, 17 May 2017 11:40:48 -0400
-Received: from e19.ny.us.ibm.com (e19.ny.us.ibm.com [129.33.205.209])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2agnprcprw-1
+	id 1dB14O-0005wJ-9A
+	for qemu-devel@nongnu.org; Wed, 17 May 2017 11:41:00 -0400
+Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v4HFcr1p125612
+	for <qemu-devel@nongnu.org>; Wed, 17 May 2017 11:40:58 -0400
+Received: from e11.ny.us.ibm.com (e11.ny.us.ibm.com [129.33.205.201])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2agb8x89mt-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 17 May 2017 11:40:48 -0400
+	for <qemu-devel@nongnu.org>; Wed, 17 May 2017 11:40:58 -0400
 Received: from localhost
-	by e19.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	by e11.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
 	Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <mdroth@linux.vnet.ibm.com>;
-	Wed, 17 May 2017 11:40:47 -0400
+	Wed, 17 May 2017 11:40:57 -0400
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
@@ -31,8 +30,8 @@ From: Michael Roth <mdroth@linux.vnet.ibm.com>
 In-Reply-To: <20170515131052.23457-2-danielhb@linux.vnet.ibm.com>
 References: <20170515131052.23457-1-danielhb@linux.vnet.ibm.com>
 	<20170515131052.23457-2-danielhb@linux.vnet.ibm.com>
-Date: Mon, 15 May 2017 22:22:49 -0500
-Message-Id: <149490496947.29340.9833975295117328739@loki>
+Date: Mon, 15 May 2017 22:26:46 -0500
+Message-Id: <149490520655.29340.6582819494653467488@loki>
 Subject: Re: [Qemu-devel] [PATCH v10] migration: spapr: migrate
  pending_events of spapr state
 List-Id: <qemu-devel.nongnu.org>
@@ -69,8 +68,10 @@ Quoting Daniel Henrique Barboza (2017-05-15 08:10:52)
 > Signed-off-by: Jianjun Duan <duanj@linux.vnet.ibm.com>
 > Signed-off-by: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
 
-I think you might've missed some of the review comments David made in
-v9.
+I'd also be a little weary of treating this patch as totally standalone.
+There's pros/cons, but, without migrated DRC state, migrated hotplug
+events won't necessarilly be handled better than the current behavior of
+just dropping them.
 
 > ---
 >  hw/ppc/spapr.c         | 33 +++++++++++++++++++++++++++++++++
