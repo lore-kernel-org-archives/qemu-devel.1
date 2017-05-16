@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37659)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37904)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1dAWF8-0002di-39
-	for qemu-devel@nongnu.org; Tue, 16 May 2017 02:46:06 -0400
+	(envelope-from <jasowang@redhat.com>) id 1dAWG3-00032m-AW
+	for qemu-devel@nongnu.org; Tue, 16 May 2017 02:47:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1dAWF4-00071I-W6
-	for qemu-devel@nongnu.org; Tue, 16 May 2017 02:46:02 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60616)
+	(envelope-from <jasowang@redhat.com>) id 1dAWG2-0007CT-BH
+	for qemu-devel@nongnu.org; Tue, 16 May 2017 02:46:59 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54168)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1dAWF4-000715-Mk
-	for qemu-devel@nongnu.org; Tue, 16 May 2017 02:45:58 -0400
-References: <20170512083556.22539-1-maozy.fnst@cn.fujitsu.com>
+	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1dAWG2-0007CA-1p
+	for qemu-devel@nongnu.org; Tue, 16 May 2017 02:46:58 -0400
+References: <1494578148-102868-1-git-send-email-wei.w.wang@intel.com>
 From: Jason Wang <jasowang@redhat.com>
-Message-ID: <2ac2c29a-f6b0-401a-2355-357c490ef14b@redhat.com>
-Date: Tue, 16 May 2017 14:45:50 +0800
+Message-ID: <a3f2cae3-5d3d-f620-4a8d-bb11470c0b08@redhat.com>
+Date: Tue, 16 May 2017 14:46:49 +0800
 MIME-Version: 1.0
-In-Reply-To: <20170512083556.22539-1-maozy.fnst@cn.fujitsu.com>
+In-Reply-To: <1494578148-102868-1-git-send-email-wei.w.wang@intel.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] hw/net/rocker/rocker: Convert pci device
- .init() to .realize()
+Subject: Re: [Qemu-devel] [PATCH v2 00/16] Vhost-pci for inter-VM
+ communication
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,165 +27,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>, qemu-devel@nongnu.org
-Cc: jiri@resnulli.us
+To: Wei Wang <wei.w.wang@intel.com>, stefanha@gmail.com, marcandre.lureau@gmail.com, mst@redhat.com, pbonzini@redhat.com, virtio-dev@lists.oasis-open.org, qemu-devel@nongnu.org
 
 
 
-On 2017=E5=B9=B405=E6=9C=8812=E6=97=A5 16:35, Mao Zhongyi wrote:
-> Convert pci device .init() to .realize(). Also improve -device rocker
-> error reporting. Because when -device rocker fails, it first reports
-> a specific error, then a generic one, like this:
+On 2017=E5=B9=B405=E6=9C=8812=E6=97=A5 16:35, Wei Wang wrote:
+> This patch series implements vhost-pci, which is a point-to-point based
+> inter-vm communication solution. The QEMU side implementation includes =
+the
+> vhost-user extension, vhost-pci device emulation and management, and in=
+ter-VM
+> notification.
 >
->      $ x86_64-softmmu/qemu-system-x86_64 -device rocker,name=3Dqemu-roc=
-ker
->      rocker: name too long; please shorten to at most 9 chars
->      qemu-system-x86_64: -device rocker,name=3Dqemu-rocker: Device init=
-ialization failed
+> v1->v2 changes:
+> 1) inter-VM notification support;
+> 2) vhost-pci-net ctrlq message format change;
+> 3) patch re-org and code cleanup.
 >
-> Convert pci_rocker_init() to Error to get rid of the unwanted second
-> error message.
+> Wei Wang (16):
+>    vhost-user: share the vhost-user protocol related structures
+>    vl: add the vhost-pci-slave command line option
+>    vhost-pci-slave: create a vhost-user slave to support vhost-pci
+>    vhost-pci-net: add vhost-pci-net
+>    vhost-pci-net-pci: add vhost-pci-net-pci
+>    virtio: add inter-vm notification support
+>    vhost-user: send device id to the slave
+>    vhost-user: send guest physical address of virtqueues to the slave
+>    vhost-user: send VHOST_USER_SET_VHOST_PCI_START/STOP
+>    vhost-pci-net: send the negotiated feature bits to the master
+>    vhost-user: add asynchronous read for the vhost-user master
+>    vhost-user: handling VHOST_USER_SET_FEATURES
+>    vhost-pci-slave: add "reset_virtio"
+>    vhost-pci-slave: add support to delete a vhost-pci device
+>    vhost-pci-net: tell the driver that it is ready to send packets
+>    vl: enable vhost-pci-slave
 >
-> Cc: jiri@resnulli.us
-> Cc: jasowang@redhat.com
-> Signed-off-by: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
-> ---
->   hw/net/rocker/rocker.c | 31 +++++++++++++------------------
->   1 file changed, 13 insertions(+), 18 deletions(-)
+>   hw/net/Makefile.objs                           |   2 +-
+>   hw/net/vhost-pci-net.c                         | 364 +++++++++++++
+>   hw/net/vhost_net.c                             |  39 ++
+>   hw/virtio/Makefile.objs                        |   7 +-
+>   hw/virtio/vhost-pci-slave.c                    | 676 ++++++++++++++++=
++++++++++
+>   hw/virtio/vhost-stub.c                         |  22 +
+>   hw/virtio/vhost-user.c                         | 192 +++----
+>   hw/virtio/vhost.c                              |  63 ++-
+>   hw/virtio/virtio-bus.c                         |  19 +-
+>   hw/virtio/virtio-pci.c                         |  96 +++-
+>   hw/virtio/virtio-pci.h                         |  16 +
+>   hw/virtio/virtio.c                             |  32 +-
+>   include/hw/pci/pci.h                           |   1 +
+>   include/hw/virtio/vhost-backend.h              |   2 +
+>   include/hw/virtio/vhost-pci-net.h              |  40 ++
+>   include/hw/virtio/vhost-pci-slave.h            |  64 +++
+>   include/hw/virtio/vhost-user.h                 | 110 ++++
+>   include/hw/virtio/vhost.h                      |   3 +
+>   include/hw/virtio/virtio.h                     |   2 +
+>   include/net/vhost-user.h                       |  22 +-
+>   include/net/vhost_net.h                        |   2 +
+>   include/standard-headers/linux/vhost_pci_net.h |  74 +++
+>   include/standard-headers/linux/virtio_ids.h    |   1 +
+>   net/vhost-user.c                               |  37 +-
+>   qemu-options.hx                                |   4 +
+>   vl.c                                           |  46 ++
+>   26 files changed, 1796 insertions(+), 140 deletions(-)
+>   create mode 100644 hw/net/vhost-pci-net.c
+>   create mode 100644 hw/virtio/vhost-pci-slave.c
+>   create mode 100644 include/hw/virtio/vhost-pci-net.h
+>   create mode 100644 include/hw/virtio/vhost-pci-slave.h
+>   create mode 100644 include/hw/virtio/vhost-user.h
+>   create mode 100644 include/standard-headers/linux/vhost_pci_net.h
 >
-> diff --git a/hw/net/rocker/rocker.c b/hw/net/rocker/rocker.c
-> index 6e70fdd..2cebc31 100644
-> --- a/hw/net/rocker/rocker.c
-> +++ b/hw/net/rocker/rocker.c
-> @@ -1252,20 +1252,18 @@ rollback:
->       return err;
->   }
->  =20
-> -static int rocker_msix_init(Rocker *r)
-> +static int rocker_msix_init(Rocker *r, Error **errp)
->   {
->       PCIDevice *dev =3D PCI_DEVICE(r);
->       int err;
-> -    Error *local_err =3D NULL;
->  =20
->       err =3D msix_init(dev, ROCKER_MSIX_VEC_COUNT(r->fp_ports),
->                       &r->msix_bar,
->                       ROCKER_PCI_MSIX_BAR_IDX, ROCKER_PCI_MSIX_TABLE_OF=
-FSET,
->                       &r->msix_bar,
->                       ROCKER_PCI_MSIX_BAR_IDX, ROCKER_PCI_MSIX_PBA_OFFS=
-ET,
-> -                    0, &local_err);
-> +                    0, errp);
->       if (err) {
-> -        error_report_err(local_err);
->           return err;
->       }
->  =20
-> @@ -1301,7 +1299,7 @@ static World *rocker_world_type_by_name(Rocker *r=
-, const char *name)
->       return NULL;
->   }
->  =20
-> -static int pci_rocker_init(PCIDevice *dev)
-> +static void pci_rocker_realize(PCIDevice *dev, Error **errp)
->   {
->       Rocker *r =3D to_rocker(dev);
->       const MACAddr zero =3D { .a =3D { 0, 0, 0, 0, 0, 0 } };
-> @@ -1315,7 +1313,7 @@ static int pci_rocker_init(PCIDevice *dev)
->  =20
->       for (i =3D 0; i < ROCKER_WORLD_TYPE_MAX; i++) {
->           if (!r->worlds[i]) {
-> -            err =3D -ENOMEM;
-> +            error_setg(errp, "allocate worlds failed");
->               goto err_world_alloc;
->           }
->       }
-> @@ -1326,10 +1324,9 @@ static int pci_rocker_init(PCIDevice *dev)
->  =20
->       r->world_dflt =3D rocker_world_type_by_name(r, r->world_name);
->       if (!r->world_dflt) {
-> -        fprintf(stderr,
-> -                "rocker: requested world \"%s\" does not exist\n",
-> +        error_setg(errp,
-> +                "rocker: invalid argument, requested world %s does not=
- exist",
->                   r->world_name);
-> -        err =3D -EINVAL;
->           goto err_world_type_by_name;
->       }
->  =20
-> @@ -1349,7 +1346,7 @@ static int pci_rocker_init(PCIDevice *dev)
->  =20
->       /* MSI-X init */
->  =20
-> -    err =3D rocker_msix_init(r);
-> +    err =3D rocker_msix_init(r, errp);
->       if (err) {
->           goto err_msix_init;
->       }
-> @@ -1361,7 +1358,7 @@ static int pci_rocker_init(PCIDevice *dev)
->       }
->  =20
->       if (rocker_find(r->name)) {
-> -        err =3D -EEXIST;
-> +        error_setg(errp, "rocker %s already exists", r->name);
->           goto err_duplicate;
->       }
->  =20
-> @@ -1375,10 +1372,10 @@ static int pci_rocker_init(PCIDevice *dev)
->   #define ROCKER_IFNAMSIZ 16
->   #define MAX_ROCKER_NAME_LEN  (ROCKER_IFNAMSIZ - 1 - 3 - 3)
->       if (strlen(r->name) > MAX_ROCKER_NAME_LEN) {
-> -        fprintf(stderr,
-> -                "rocker: name too long; please shorten to at most %d c=
-hars\n",
-> +        error_setg(errp,
-> +                "rocker: name too long; please shorten to at most %d c=
-hars",
->                   MAX_ROCKER_NAME_LEN);
-> -        return -EINVAL;
-> +        return;
->       }
->  =20
->       if (memcmp(&r->fp_start_macaddr, &zero, sizeof(zero)) =3D=3D 0) {
-> @@ -1410,7 +1407,6 @@ static int pci_rocker_init(PCIDevice *dev)
->        * .....
->        */
->  =20
-> -    err =3D -ENOMEM;
->       for (i =3D 0; i < rocker_pci_ring_count(r); i++) {
->           DescRing *ring =3D desc_ring_alloc(r, i);
 
-Do you need to call error_setg() for the failure below too?
+Hi:
+
+Care to post the driver codes too?
 
 Thanks
-
->  =20
-> @@ -1447,7 +1443,7 @@ static int pci_rocker_init(PCIDevice *dev)
->  =20
->       QLIST_INSERT_HEAD(&rockers, r, next);
->  =20
-> -    return 0;
-> +    return;
->  =20
->   err_port_alloc:
->       for (--i; i >=3D 0; i--) {
-> @@ -1473,7 +1469,6 @@ err_world_alloc:
->               world_free(r->worlds[i]);
->           }
->       }
-> -    return err;
->   }
->  =20
->   static void pci_rocker_uninit(PCIDevice *dev)
-> @@ -1558,7 +1553,7 @@ static void rocker_class_init(ObjectClass *klass,=
- void *data)
->       DeviceClass *dc =3D DEVICE_CLASS(klass);
->       PCIDeviceClass *k =3D PCI_DEVICE_CLASS(klass);
->  =20
-> -    k->init =3D pci_rocker_init;
-> +    k->realize =3D pci_rocker_realize;
->       k->exit =3D pci_rocker_uninit;
->       k->vendor_id =3D PCI_VENDOR_ID_REDHAT;
->       k->device_id =3D PCI_DEVICE_ID_REDHAT_ROCKER;
