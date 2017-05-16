@@ -1,26 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38138)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38585)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sstabellini@kernel.org>) id 1dAhaz-0001zT-49
-	for qemu-devel@nongnu.org; Tue, 16 May 2017 14:53:21 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1dAhcY-0002yd-Q1
+	for qemu-devel@nongnu.org; Tue, 16 May 2017 14:54:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sstabellini@kernel.org>) id 1dAhau-0003KL-A8
-	for qemu-devel@nongnu.org; Tue, 16 May 2017 14:53:21 -0400
-Received: from mail.kernel.org ([198.145.29.99]:47020)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <sstabellini@kernel.org>)
-	id 1dAhau-0003K9-3h
-	for qemu-devel@nongnu.org; Tue, 16 May 2017 14:53:16 -0400
-Date: Tue, 16 May 2017 11:53:11 -0700 (PDT)
-From: Stefano Stabellini <sstabellini@kernel.org>
-In-Reply-To: <a2b87b82-8ae2-20bf-dc08-aa32a8fda23f@redhat.com>
-Message-ID: <alpine.DEB.2.10.1705161152440.4103@sstabellini-ThinkPad-X260>
-References: <1494356693-13190-1-git-send-email-sstabellini@kernel.org>
-	<1494356693-13190-2-git-send-email-sstabellini@kernel.org>
-	<a2b87b82-8ae2-20bf-dc08-aa32a8fda23f@redhat.com>
+	(envelope-from <ehabkost@redhat.com>) id 1dAhcU-0003zI-0B
+	for qemu-devel@nongnu.org; Tue, 16 May 2017 14:54:58 -0400
+Date: Tue, 16 May 2017 15:54:35 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20170516185435.GB22043@thinpad.lan.raisama.net>
+References: <20170508205735.23444-1-ehabkost@redhat.com>
 MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
-Subject: Re: [Qemu-devel] [PATCH v2 2/3] Check the return value of fcntl in
- qemu_set_cloexec
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170508205735.23444-1-ehabkost@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v3 0/3] arch_init: Move soundhw code to
+ hw/audio/soundhw.c
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,49 +23,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Stefano Stabellini <sstabellini@kernel.org>, qemu-devel@nongnu.org, xen-devel@lists.xen.org, groug@kaod.org, Eric Blake <eblake@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: hpoussin@reactos.org, agraf@suse.de, qemu-ppc@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>, david@gibson.dropbear.id.au
 
-On Thu, 11 May 2017, Paolo Bonzini wrote:
-> On 09/05/2017 21:04, Stefano Stabellini wrote:
-> > Assert that the return value is not an error. This issue was found by
-> > Coverity.
-> > 
-> > CID: 1374831
-> > 
-> > Signed-off-by: Stefano Stabellini <sstabellini@kernel.org>
-> > CC: groug@kaod.org
-> > CC: pbonzini@redhat.com
-> > CC: Eric Blake <eblake@redhat.com>
+Ping?
+
+On Mon, May 08, 2017 at 05:57:32PM -0300, Eduardo Habkost wrote:
+> Changes v2 -> v3:
+> * Build fix: update hw/ppc/prep.c too
 > 
-> Queued, thanks.
-
-I am about to send a pull request with the rest of the series, but I'll
-leave this one to you.
-
-Cheers,
-
-Stefano
-
-
-> > ---
-> >  util/oslib-posix.c | 4 +++-
-> >  1 file changed, 3 insertions(+), 1 deletion(-)
-> > 
-> > diff --git a/util/oslib-posix.c b/util/oslib-posix.c
-> > index 4d9189e..16894ad 100644
-> > --- a/util/oslib-posix.c
-> > +++ b/util/oslib-posix.c
-> > @@ -182,7 +182,9 @@ void qemu_set_cloexec(int fd)
-> >  {
-> >      int f;
-> >      f = fcntl(fd, F_GETFD);
-> > -    fcntl(fd, F_SETFD, f | FD_CLOEXEC);
-> > +    assert(f != -1);
-> > +    f = fcntl(fd, F_SETFD, f | FD_CLOEXEC);
-> > +    assert(f != -1);
-> >  }
-> >  
-> >  /*
-> > 
+> Changes v1 -> v2:
+> * Rebase to latest qemu.git master
 > 
+> This moves the arch_init.c soundhw code to its own file, renames
+> audio_init() to soundhw_init(), and renames hw/audio/audio.h to
+> hw/audio/soundhw.h.
+> 
+> Eduardo Habkost (3):
+>   audio: Move arch_init audio code to hw/audio/soundhw.c
+>   audio: Rename audio_init() to soundhw_init()
+>   audio: Rename hw/audio/audio.h to hw/audio/soundhw.h
+> 
+>  include/hw/audio/{audio.h => soundhw.h} |   3 +
+>  include/sysemu/arch_init.h              |   2 -
+>  arch_init.c                             | 126 +-------------------------
+>  hw/audio/ac97.c                         |   2 +-
+>  hw/audio/adlib.c                        |   2 +-
+>  hw/audio/cs4231a.c                      |   2 +-
+>  hw/audio/es1370.c                       |   2 +-
+>  hw/audio/gus.c                          |   2 +-
+>  hw/audio/intel-hda.c                    |   2 +-
+>  hw/audio/pcspk.c                        |   2 +-
+>  hw/audio/sb16.c                         |   2 +-
+>  hw/audio/soundhw.c                      | 156 ++++++++++++++++++++++++++++++++
+>  hw/ppc/prep.c                           |   3 +-
+>  vl.c                                    |   3 +-
+>  hw/audio/Makefile.objs                  |   2 +
+>  15 files changed, 174 insertions(+), 137 deletions(-)
+>  rename include/hw/audio/{audio.h => soundhw.h} (81%)
+>  create mode 100644 hw/audio/soundhw.c
+> 
+> -- 
+> 2.11.0.259.g40922b1
+> 
+> 
+
+-- 
+Eduardo
