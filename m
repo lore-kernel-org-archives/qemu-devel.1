@@ -1,27 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48882)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48949)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1dAdZG-00078Z-Cg
-	for qemu-devel@nongnu.org; Tue, 16 May 2017 10:35:19 -0400
+	(envelope-from <eblake@redhat.com>) id 1dAdZR-0007El-Uc
+	for qemu-devel@nongnu.org; Tue, 16 May 2017 10:35:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1dAdZC-0004zq-Fu
-	for qemu-devel@nongnu.org; Tue, 16 May 2017 10:35:18 -0400
-Received: from mail-lf0-x243.google.com ([2a00:1450:4010:c07::243]:36032)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1dAdZC-0004zh-8n
-	for qemu-devel@nongnu.org; Tue, 16 May 2017 10:35:14 -0400
-Received: by mail-lf0-x243.google.com with SMTP id h4so3509871lfj.3
-	for <qemu-devel@nongnu.org>; Tue, 16 May 2017 07:35:14 -0700 (PDT)
-Date: Tue, 16 May 2017 15:35:10 +0100
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20170516143510.GE27093@stefanha-x1.localdomain>
-References: <20170513022143.2838-1-n54@gmx.com>
+	(envelope-from <eblake@redhat.com>) id 1dAdZN-00051N-OE
+	for qemu-devel@nongnu.org; Tue, 16 May 2017 10:35:29 -0400
+References: <20170516001150.11508-1-f4bug@amsat.org>
+	<20170516001150.11508-2-f4bug@amsat.org>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <79ae9877-afd9-50a7-c9f2-a12d294ff1ac@redhat.com>
+Date: Tue, 16 May 2017 09:35:07 -0500
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="6Vw0j8UKbyX0bfpA"
-Content-Disposition: inline
-In-Reply-To: <20170513022143.2838-1-n54@gmx.com>
-Subject: Re: [Qemu-devel] [PATCH] maintainers: Add myself as a NetBSD
- reviewer
+In-Reply-To: <20170516001150.11508-2-f4bug@amsat.org>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="2nSjV1s54Lmm76rN8I5d4eB6xc3NSRwup"
+Subject: Re: [Qemu-devel] [PATCH] coccinelle: fix typo in comment
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,46 +24,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kamil Rytarowski <n54@gmx.com>
-Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, qemu-trivial@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, Markus Armbruster <armbru@redhat.com>
 
-
---6Vw0j8UKbyX0bfpA
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--2nSjV1s54Lmm76rN8I5d4eB6xc3NSRwup
+From: Eric Blake <eblake@redhat.com>
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
+ qemu-devel@nongnu.org, qemu-trivial@nongnu.org,
+ Eduardo Habkost <ehabkost@redhat.com>, Markus Armbruster <armbru@redhat.com>
+Message-ID: <79ae9877-afd9-50a7-c9f2-a12d294ff1ac@redhat.com>
+Subject: Re: [PATCH] coccinelle: fix typo in comment
+References: <20170516001150.11508-1-f4bug@amsat.org>
+ <20170516001150.11508-2-f4bug@amsat.org>
+In-Reply-To: <20170516001150.11508-2-f4bug@amsat.org>
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On Sat, May 13, 2017 at 04:21:43AM +0200, Kamil Rytarowski wrote:
-> I volunteer to review NetBSD patches.
-> Adding myself will help to not miss some of them.
->=20
-> Restore NetBSD as a maintained host.
->=20
-> All patches to make qemu/pkgsrc building have been emitted to review.
->=20
-> Signed-off-by: Kamil Rytarowski <n54@gmx.com>
+On 05/15/2017 07:11 PM, Philippe Mathieu-Daud=C3=A9 wrote:
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 > ---
->  MAINTAINERS | 6 ++++++
->  configure   | 1 +
->  2 files changed, 7 insertions(+)
+>  scripts/coccinelle/return_directly.cocci | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 
-Thanks, applied to my staging tree:
-https://github.com/stefanha/qemu/commits/staging
+Did you intend for this to be threaded with your other 'oslib: strip
+trailing '\n'...' patch? If so, where's the 0/2 cover letter and proper
+subject lines?
 
-Stefan
+At any rate,
+Reviewed-by: Eric Blake <eblake@redhat.com>
 
---6Vw0j8UKbyX0bfpA
+>=20
+> diff --git a/scripts/coccinelle/return_directly.cocci b/scripts/coccine=
+lle/return_directly.cocci
+> index 48680f2c2a..4cf50e75ea 100644
+> --- a/scripts/coccinelle/return_directly.cocci
+> +++ b/scripts/coccinelle/return_directly.cocci
+> @@ -1,4 +1,4 @@
+> -// replace 'R =3D X; return R;' with 'return R;'
+> +// replace 'R =3D X; return R;' with 'return X;'
+>  @@
+>  identifier VAR;
+>  expression E;
+>=20
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--2nSjV1s54Lmm76rN8I5d4eB6xc3NSRwup
 Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQEcBAEBAgAGBQJZGw4eAAoJEJykq7OBq3PIoXQH/jlGyqYaTDNA9KAuSokoshok
-hBNCNxT32fGn1lHxp1p4/AUcmjpCpX+z/I1wVxE2XG3CeAJxDgCxwEa81u9RQETJ
-wt031NnWO4fX/cmMFJNrvkn3p/mCZqVeaAFAUhtSPeNrGK0A8dYi2QsmuNuETuS6
-/ggW79ulZONk0rQeu0pQXDk1ChqffSiA2SSRhe76QYvIT25YCB8on6oVVpf2bTJr
-PDtNp5SpDnJ9u8Jdl0nD4dbtduFWTwzrhcQF8GiRZr7UhHo6NwwSM3XAsu0KysLv
-KXUFpxv6gkCFUpJ4FsVnrF0q5AIK0knZ+X1LpIzeeUefC2jRpG6yxwcCFSmQFP0=
-=ioAz
+iQEcBAEBCAAGBQJZGw4bAAoJEKeha0olJ0NqX3MIAJDE3z4GYtwXE7vCUtQeocJ1
+H+Xo1vMRW2nuibw8pTQc1tva6LiJK8EbX2M3bDX4t9pjW7xytM1OWNP5TRcGyl3Q
+oGn1tFX8ysEXro7xwk1BXIOTc7I5ziyp1QB6uX+H4wvSjrh2RwXivLjVmWiYkfpy
+1INmbxZb5wypoDrsaA0BgKT69MAXsY1nUKp9UIJC198Pox64s9S5Z/12wGeRWjU+
+rtNw+zEbUQ3kohGk0Vyz2fclyquP/lBMHoX3VYAVHvBUIWSstTYYgwoarF1U90CJ
+ZJafwm7RlcUlda5/KMwv7MJV9AIXMy5O63orZ3k8fcc5lezDw016w/hIc1AegTU=
+=4LfI
 -----END PGP SIGNATURE-----
 
---6Vw0j8UKbyX0bfpA--
+--2nSjV1s54Lmm76rN8I5d4eB6xc3NSRwup--
