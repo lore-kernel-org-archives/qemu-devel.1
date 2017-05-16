@@ -1,26 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48356)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48523)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1dAdXe-00067n-5s
-	for qemu-devel@nongnu.org; Tue, 16 May 2017 10:33:41 -0400
+	(envelope-from <eblake@redhat.com>) id 1dAdXv-0006IV-Fm
+	for qemu-devel@nongnu.org; Tue, 16 May 2017 10:33:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1dAdXa-0003xE-8A
-	for qemu-devel@nongnu.org; Tue, 16 May 2017 10:33:38 -0400
-Received: from mail-lf0-x229.google.com ([2a00:1450:4010:c07::229]:33464)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1dAdXa-0003wU-1P
-	for qemu-devel@nongnu.org; Tue, 16 May 2017 10:33:34 -0400
-Received: by mail-lf0-x229.google.com with SMTP id m18so12862365lfj.0
-	for <qemu-devel@nongnu.org>; Tue, 16 May 2017 07:33:33 -0700 (PDT)
-Date: Tue, 16 May 2017 15:33:30 +0100
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20170516143330.GB18270@stefanha-x1.localdomain>
-References: <20170516052439.16214-1-kraxel@redhat.com>
+	(envelope-from <eblake@redhat.com>) id 1dAdXr-00049D-JF
+	for qemu-devel@nongnu.org; Tue, 16 May 2017 10:33:55 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55046)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dAdXr-00045J-A5
+	for qemu-devel@nongnu.org; Tue, 16 May 2017 10:33:51 -0400
+References: <87pof9vi6o.fsf@gmail.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <f015e6f2-e00d-1d89-a4e2-b28b795b5aef@redhat.com>
+Date: Tue, 16 May 2017 09:33:41 -0500
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="PmA2V3Z32TCmWXqI"
-Content-Disposition: inline
-In-Reply-To: <20170516052439.16214-1-kraxel@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] fix mingw build failure
+In-Reply-To: <87pof9vi6o.fsf@gmail.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="jO8CDTAHpi6kT9kWTO7lclaq5BwaUvhOT"
+Subject: Re: [Qemu-devel] Where did my previous post go?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,37 +27,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: "jenia.ivlev" <jenia.ivlev@gmail.com>, qemu-devel@nongnu.org
+
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--jO8CDTAHpi6kT9kWTO7lclaq5BwaUvhOT
+From: Eric Blake <eblake@redhat.com>
+To: "jenia.ivlev" <jenia.ivlev@gmail.com>, qemu-devel@nongnu.org
+Message-ID: <f015e6f2-e00d-1d89-a4e2-b28b795b5aef@redhat.com>
+Subject: Re: [Qemu-devel] Where did my previous post go?
+References: <87pof9vi6o.fsf@gmail.com>
+In-Reply-To: <87pof9vi6o.fsf@gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 05/15/2017 06:01 PM, jenia.ivlev wrote:
+>=20
+>=20
+> Hello.
+>=20
+> I made a post in this group (QEMU). Then I received an email:
+>=20
+>     Re: [Qemu-devel] Installing Windows with virtio (was: QEMU, increas=
+e
+>     graphics memory)
+>=20
+>=20
+>=20
+> There is no Qemu-devel group in gmane as far as I can see.
+>=20
+> How can I find my post and reply to it (to the replies it received ;) )=
 
 
---PmA2V3Z32TCmWXqI
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Qemu's own mail archives are here:
+https://lists.gnu.org/archive/html/qemu-devel/
 
-On Tue, May 16, 2017 at 07:24:39AM +0200, Gerd Hoffmann wrote:
-> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
-> ---
->  crypto/random-platform.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+There are plenty of other available web archives, if you insist on using
+web archives instead of direct subscription.
 
-Thanks, applied to my staging tree:
-https://github.com/stefanha/qemu/commits/staging
+Gmane is not what it used to be after last year's shutdown and transfer
+of ownership; this used to be the archive on gmane:
+http://dir.gmane.org/gmane.comp.emulators.qemu
+although you are correct that it doesn't really work now.
 
-Stefan
+As for posting: ALL first-time posts (whether or not you subscribe) are
+held for human moderation; once your first post goes through, your email
+is whitelisted so you can make further posts without delay, whether or
+not you subscribe.
 
---PmA2V3Z32TCmWXqI
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--jO8CDTAHpi6kT9kWTO7lclaq5BwaUvhOT
 Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQEcBAEBAgAGBQJZGw26AAoJEJykq7OBq3PIcD4H/R9CjnPkzNA3QZk1LLRTsGtA
-9MolSFuzfJ5reLit/9r0BDylTPOPhIElQgcq1KUc/4obQFuaFgEbzJrvUH99AUry
-eK1un/OErXPpJ1cyFAJlHr9vZF4/fbK2e3+LbLQbE6v/HxXEpaIXvFJXOMrglRZs
-BzKp1SP8k/Ff1JhDeA9E1bn6kohkHq1rh1+v42yCwsFmsFdqYKBHTyuFNR8qogN3
-5M8laT92oJUcZYhErxI3xek1LdKq/v9Ao+cTB4O1tW2Is1KiVHMCsw3j7TwgCxks
-/yUEpzF28FoxdzKYMGPTjuGLEchIjcn/FfPpxU6ymJbozSU3kLH7OXFJe8gNhpY=
-=wdP0
+iQEcBAEBCAAGBQJZGw3FAAoJEKeha0olJ0NqA3EH/jX4xmGV0narBnyBmohGqRd6
+Kns/VFcI2Ir0rH0ALM2aYIYqGB0Qx1IVF4DWze4/BcnLNUfS0b5sQBdeZXhOqptd
+aGVz6IISvMdd71vbO4QJXFHe0RUVPwzEwB02Ar194sZ3w4vOzTZeVDxsf4vLNk0l
+5a3F/qpFWHbkugvv7j2ULAzk63hgLtqdaN7z9Xy2XGyGRGFo4TocrfjBqUbWML5P
+lNIursM7OZfueQBBtbLhFVOYq3ou29WG/tIgXYmFxOZaIAr4TMWAPu3PsNWlX5tk
+cGQvE3WB5eIhGs8fOkzTVgPiIsTWDYjsDmNhJCawWdfV8RcPA88mUP7v+PBegYg=
+=f69l
 -----END PGP SIGNATURE-----
 
---PmA2V3Z32TCmWXqI--
+--jO8CDTAHpi6kT9kWTO7lclaq5BwaUvhOT--
