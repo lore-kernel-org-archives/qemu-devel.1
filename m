@@ -1,26 +1,38 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35427)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36122)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aurelien@aurel32.net>) id 1dAcjy-0001op-Cz
-	for qemu-devel@nongnu.org; Tue, 16 May 2017 09:42:19 -0400
+	(envelope-from <borntraeger@de.ibm.com>) id 1dAcmX-0002qW-U7
+	for qemu-devel@nongnu.org; Tue, 16 May 2017 09:44:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aurelien@aurel32.net>) id 1dAcjx-0006oP-BV
-	for qemu-devel@nongnu.org; Tue, 16 May 2017 09:42:18 -0400
-Received: from hall.aurel32.net ([2001:bc8:30d7:100::1]:41612)
+	(envelope-from <borntraeger@de.ibm.com>) id 1dAcmT-0007hZ-1h
+	for qemu-devel@nongnu.org; Tue, 16 May 2017 09:44:57 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:50146)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <aurelien@aurel32.net>)
-	id 1dAcjx-0006nW-5H
-	for qemu-devel@nongnu.org; Tue, 16 May 2017 09:42:17 -0400
-Date: Tue, 16 May 2017 15:42:02 +0200
-From: Aurelien Jarno <aurelien@aurel32.net>
-Message-ID: <20170516134202.boib4gasiq5itt56@aurel32.net>
-References: <1494926884-10118-1-git-send-email-thuth@redhat.com>
+	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
+	id 1dAcmS-0007hA-OP
+	for qemu-devel@nongnu.org; Tue, 16 May 2017 09:44:52 -0400
+Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v4GDhfei077588
+	for <qemu-devel@nongnu.org>; Tue, 16 May 2017 09:44:50 -0400
+Received: from e13.ny.us.ibm.com (e13.ny.us.ibm.com [129.33.205.203])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2ag1gjbf6b-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Tue, 16 May 2017 09:44:50 -0400
+Received: from localhost
+	by e13.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
+	Tue, 16 May 2017 09:44:48 -0400
+References: <20170510155359.32727-1-farman@linux.vnet.ibm.com>
+From: Christian Borntraeger <borntraeger@de.ibm.com>
+Date: Tue, 16 May 2017 15:44:43 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-In-Reply-To: <1494926884-10118-1-git-send-email-thuth@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v1] target/s390x: Add support for the TEST
- BLOCK instruction
+In-Reply-To: <20170510155359.32727-1-farman@linux.vnet.ibm.com>
+Content-Type: text/plain; charset=iso-8859-15
+Content-Transfer-Encoding: 7bit
+Message-Id: <d0fbd984-318a-4064-f50c-6db335168763@de.ibm.com>
+Subject: Re: [Qemu-devel] [RFC PATCH v2 0/8] s390x: Enable virtio-scsi boot
+ from /dev/sgX
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,76 +41,93 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>, mmarek@suse.com, mbenes@suse.cz, David Hildenbrand <david@redhat.com>
+To: Eric Farman <farman@linux.vnet.ibm.com>, qemu-devel@nongnu.org
+Cc: Cornelia Huck <cornelia.huck@de.ibm.com>, Alexander Graf <agraf@suse.de>, Paolo Bonzini <pbonzini@redhat.com>, Fam Zheng <famz@redhat.com>
 
-On 2017-05-16 11:28, Thomas Huth wrote:
-> TEST BLOCK was likely once used to execute basic memory
-> tests, but nowadays it's just a (slow) way to clear a page.
->=20
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
-> ---
->  target/s390x/helper.h      |  1 +
->  target/s390x/insn-data.def |  2 ++
->  target/s390x/mem_helper.c  | 12 ++++++++++++
->  target/s390x/translate.c   | 10 ++++++++++
->  4 files changed, 25 insertions(+)
->=20
-> diff --git a/target/s390x/helper.h b/target/s390x/helper.h
-> index 9102071..a5a3705 100644
-> --- a/target/s390x/helper.h
-> +++ b/target/s390x/helper.h
-> @@ -99,6 +99,7 @@ DEF_HELPER_FLAGS_4(lctl, TCG_CALL_NO_WG, void, env, i32=
-, i64, i32)
->  DEF_HELPER_FLAGS_4(lctlg, TCG_CALL_NO_WG, void, env, i32, i64, i32)
->  DEF_HELPER_FLAGS_4(stctl, TCG_CALL_NO_WG, void, env, i32, i64, i32)
->  DEF_HELPER_FLAGS_4(stctg, TCG_CALL_NO_WG, void, env, i32, i64, i32)
-> +DEF_HELPER_2(testblock, void, env, i64)
->  DEF_HELPER_FLAGS_2(tprot, TCG_CALL_NO_RWG, i32, i64, i64)
->  DEF_HELPER_FLAGS_2(iske, TCG_CALL_NO_RWG_SE, i64, env, i64)
->  DEF_HELPER_FLAGS_3(sske, TCG_CALL_NO_RWG, void, env, i64, i64)
-> diff --git a/target/s390x/insn-data.def b/target/s390x/insn-data.def
-> index 075ff59..a6aba54 100644
-> --- a/target/s390x/insn-data.def
-> +++ b/target/s390x/insn-data.def
-> @@ -912,6 +912,8 @@
->  /* STORE USING REAL ADDRESS */
->      C(0xb246, STURA,   RRE,   Z,   r1_o, r2_o, 0, 0, stura, 0)
->      C(0xb925, STURG,   RRE,   Z,   r1_o, r2_o, 0, 0, sturg, 0)
-> +/* TEST BLOCK */
-> +    C(0xb22c, TB,      RRE,   Z,   0, r2_o, 0, 0, testblock, 0)
->  /* TEST PROTECTION */
->      C(0xe501, TPROT,   SSE,   Z,   la1, a2, 0, 0, tprot, 0)
-> =20
-> diff --git a/target/s390x/mem_helper.c b/target/s390x/mem_helper.c
-> index 675aba2..0349c10 100644
-> --- a/target/s390x/mem_helper.c
-> +++ b/target/s390x/mem_helper.c
-> @@ -933,6 +933,18 @@ void HELPER(stctl)(CPUS390XState *env, uint32_t r1, =
-uint64_t a2, uint32_t r3)
->      }
->  }
-> =20
-> +void HELPER(testblock)(CPUS390XState *env, uint64_t addr)
-> +{
-> +    CPUState *cs =3D CPU(s390_env_get_cpu(env));
-> +    int i;
-> +
-> +    addr =3D get_address(env, 0, 0, addr) & ~0xfffULL;
+On 05/10/2017 05:53 PM, Eric Farman wrote:
+> Today, trying to boot a guest from a SCSI LUN on s390x yields the following:
+> 
+>   virtio-blk               = OK
+>   virtio-scsi and /dev/sdX = OK
+>   virtio-scsi and /dev/sgX = FAIL
+> 
+> Example of the failing scenario:
+> 
+>   /usr/bin/qemu-system-s390x ...
+>     -device virtio-scsi-ccw,id=scsi0,devno=fe.0.0001
+>     -drive file=/dev/sg2,if=none,id=drive0,format=raw
+>     -device scsi-generic,bus=scsi0.0,channel=0,scsi-id=0,drive=drive0,id=disk0
+>   LOADPARM=[........]
+>   Using virtio-scsi.
+>   Using SCSI scheme.
+>   ..
+>   ! virtio-scsi:read_many: STATUS=02 RSPN=70 KEY=0b CODE=00 QLFR=06, sure !
+> 
+> Why do we care?  Well, libvirt converts a virtio-scsi device from the host
+> SCSI address (host:bus:target:lun) into the associated /dev/sgX device,
+> which means we can't boot from virtio-scsi and have to rely on virtio-blk
+> for this action.
+> 
+> The short version of what happens is the host block device driver rejects our
+> requests because the transfer lengths are too long for it to satisfy.
+> A virtio-scsi disk connected via scsi-generic is fine as a non-boot device
+> because the guest kernel is able to break up the requests for us.  So we just
+> need to handle this situation for the boot process.
+> 
+> Patches 1-3 read the max_sectors parameter for the virtio-scsi controller,
+> and break up the READ(10) I/Os into something that the host will accept.
+> If not specified, max_sectors defaults to 65535, but could look like this:
+> 
+>   qemu-system-s390x ...
+>     -device virtio-scsi-ccw,id=scsi0,devno=fe.0.0001,max_sectors=2048
+> 
+> Patches 4-6 read the max_io_size parameter for the virtio-scsi disk device,
+> and use the minimum of it and the max_sectors from the controller for breaking
+> up the READ(10) I/Os.  If not specified, max_io_size defaults to 2147483647
+> but could look like this:
+> 
+>   qemu-system-s390x ...
+>     -drive file=/dev/sda,if=none,id=drive0,format=raw ...
+>     -device scsi-hd,bus=scsi0.0,channel=0,scsi-id=0,
+>             drive=drive0,id=disk0,max_io_size=1048576
+> 
+> In the two examples above, the maximum parameters are equivalent due to the
+> controller parameter measuring 512-byte blocks, and the disk measuring bytes.
+> 
+> Patch 7 establishes a workable default, in case neither the controller nor
+> the disk have the parameters specified (and thus the overly large defaults
+> are taken), or if they are set to something beyond what we can boot from.
+> 
+> Patch 8 rebuilds the s390-ccw BIOS with this entire patch set.
+> 
+> Changelog:
+> 
+> RFC v2:
+>  - Dropped patch outside the pc-bios/s390-ccw/ tree
+>  - Added Christian's r-b to patch 1 (formerly patch 2)
+>  - Added EVPD Inquiry calls to retrieve Block Limits page if supported
+>  - Added a default if Block Limits page is not supported, or response is
+>    still way to big to allow boot
+> RFC v1:
+>  - https://lists.nongnu.org/archive/html/qemu-devel/2017-04/msg05121.html
+> 
+> Eric Farman (8):
+>   pc-bios/s390-ccw: Remove duplicate blk_factor adjustment
+>   pc-bios/s390-ccw: Move SCSI block factor to outer read
+>   pc-bios/s390-ccw: Break up virtio-scsi read into multiples
+>   pc-bios/s390-ccw: Refactor scsi_inquiry function
+>   pc-bios/s390-ccw: Get list of supported VPD pages
+>   pc-bios/s390-ccw: Get Block Limits VPD device data
+>   pc-bios/s390-ccw: Build a reasonable max_sectors limit
+>   pc-bios/s390-ccw.img: rebuild image
+> 
+>  pc-bios/s390-ccw.img           | Bin 26472 -> 26480 bytes
+>  pc-bios/s390-ccw/s390-ccw.h    |   7 ++++
+>  pc-bios/s390-ccw/scsi.h        |  30 +++++++++++++++
+>  pc-bios/s390-ccw/virtio-scsi.c |  85 +++++++++++++++++++++++++++++++++++------
+>  pc-bios/s390-ccw/virtio-scsi.h |   2 +
+>  pc-bios/s390-ccw/virtio.h      |   1 +
+>  6 files changed, 114 insertions(+), 11 deletions(-)
+> 
 
-I guess you want to use ~TARGET_PAGE_MASK here.
-
-> +    for (i =3D 0; i < TARGET_PAGE_SIZE; i +=3D 8) {
-> +        stq_phys(cs->as, addr + i, 0);
-> +    }
-> +    env->cc_op =3D 0;
-> +}
-> +
-
-=46rom what I understand the resulting condition code should depends if
-the block is usable or not. Shouldn't there be a check to see if the
-address actually targets the RAM?
-
---=20
-Aurelien Jarno                          GPG: 4096R/1DDD8C9B
-aurelien@aurel32.net                 http://www.aurel32.net
+Patch set looks good. Conny, can you apply the series?
