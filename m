@@ -1,20 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49653)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51099)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sw@weilnetz.de>) id 1dAXHG-00010O-Bf
-	for qemu-devel@nongnu.org; Tue, 16 May 2017 03:52:19 -0400
+	(envelope-from <amarnath.valluri@intel.com>) id 1dAXNK-0002pq-2d
+	for qemu-devel@nongnu.org; Tue, 16 May 2017 03:58:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sw@weilnetz.de>) id 1dAXHF-0001tz-Fw
-	for qemu-devel@nongnu.org; Tue, 16 May 2017 03:52:18 -0400
-References: <20170516074256.24731-1-kraxel@redhat.com>
-From: Stefan Weil <sw@weilnetz.de>
-Message-ID: <2c224267-32ec-ccf7-ae80-113ebfdce1e2@weilnetz.de>
-Date: Tue, 16 May 2017 09:52:07 +0200
-MIME-Version: 1.0
-In-Reply-To: <20170516074256.24731-1-kraxel@redhat.com>
-Content-Type: text/plain; charset=iso-8859-15; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] block/win32: fix 'ret not initialized'
- warning
+	(envelope-from <amarnath.valluri@intel.com>) id 1dAXNI-00052b-Mr
+	for qemu-devel@nongnu.org; Tue, 16 May 2017 03:58:34 -0400
+Received: from mga03.intel.com ([134.134.136.65]:53899)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <amarnath.valluri@intel.com>)
+	id 1dAXNI-00050s-ED
+	for qemu-devel@nongnu.org; Tue, 16 May 2017 03:58:32 -0400
+From: Amarnath Valluri <amarnath.valluri@intel.com>
+Date: Tue, 16 May 2017 10:58:07 +0300
+Message-Id: <1494921494-33717-2-git-send-email-amarnath.valluri@intel.com>
+In-Reply-To: <1494921494-33717-1-git-send-email-amarnath.valluri@intel.com>
+References: <1494921494-33717-1-git-send-email-amarnath.valluri@intel.com>
+Subject: [Qemu-devel] [PATCH v4 1/8] tpm-backend: Remove unneeded member
+ variable from backend class
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,28 +25,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, "open list:raw" <qemu-block@nongnu.org>, QEMU Trivial <qemu-trivial@nongnu.org>, Fam Zheng <famz@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: Amarnath Valluri <amarnath.valluri@intel.com>
 
-Am 16.05.2017 um 09:42 schrieb Gerd Hoffmann:
-> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
-> ---
->  block/file-win32.c | 1 +
->  1 file changed, 1 insertion(+)
->
-> diff --git a/block/file-win32.c b/block/file-win32.c
-> index 1a35dbabf2..8f14f0bdcd 100644
-> --- a/block/file-win32.c
-> +++ b/block/file-win32.c
-> @@ -346,6 +346,7 @@ static int raw_open(BlockDriverState *bs, QDict *options, int flags,
->
->      if (qdict_get_try_bool(options, "locking", false)) {
->          error_setg(errp, "locking=on is not supported on Windows");
-> +        ret = -EINVAL;
->          goto fail;
->      }
+TPMDriverOps inside TPMBackend is not required, as it is supposed to be a class
+member. The only possible reason for keeping in TPMBackend was, to get the
+backend type in tpm.c where dedicated backend api, tpm_backend_get_type() is
+present.
 
+Signed-off-by: Amarnath Valluri <amarnath.valluri@intel.com>
+---
+ hw/tpm/tpm_passthrough.c     | 4 ----
+ include/sysemu/tpm_backend.h | 1 -
+ tpm.c                        | 2 +-
+ 3 files changed, 1 insertion(+), 6 deletions(-)
 
-This is a bug fix for commit 1c3a555c.
-
-Reviewed-by: Stefan Weil <sw@weilnetz.de>
+diff --git a/hw/tpm/tpm_passthrough.c b/hw/tpm/tpm_passthrough.c
+index 9234eb3..a0baf5f 100644
+--- a/hw/tpm/tpm_passthrough.c
++++ b/hw/tpm/tpm_passthrough.c
+@@ -46,8 +46,6 @@
+ #define TPM_PASSTHROUGH(obj) \
+     OBJECT_CHECK(TPMPassthruState, (obj), TYPE_TPM_PASSTHROUGH)
+ 
+-static const TPMDriverOps tpm_passthrough_driver;
+-
+ /* data structures */
+ typedef struct TPMPassthruThreadParams {
+     TPMState *tpm_state;
+@@ -462,8 +460,6 @@ static TPMBackend *tpm_passthrough_create(QemuOpts *opts, const char *id)
+     /* let frontend set the fe_model to proper value */
+     tb->fe_model = -1;
+ 
+-    tb->ops = &tpm_passthrough_driver;
+-
+     if (tpm_passthrough_handle_device_opts(opts, tb)) {
+         goto err_exit;
+     }
+diff --git a/include/sysemu/tpm_backend.h b/include/sysemu/tpm_backend.h
+index b58f52d..e7f590d 100644
+--- a/include/sysemu/tpm_backend.h
++++ b/include/sysemu/tpm_backend.h
+@@ -50,7 +50,6 @@ struct TPMBackend {
+     enum TpmModel fe_model;
+     char *path;
+     char *cancel_path;
+-    const TPMDriverOps *ops;
+ 
+     QLIST_ENTRY(TPMBackend) list;
+ };
+diff --git a/tpm.c b/tpm.c
+index 9a7c711..0ee021a 100644
+--- a/tpm.c
++++ b/tpm.c
+@@ -258,7 +258,7 @@ static TPMInfo *qmp_query_tpm_inst(TPMBackend *drv)
+     res->model = drv->fe_model;
+     res->options = g_new0(TpmTypeOptions, 1);
+ 
+-    switch (drv->ops->type) {
++    switch (tpm_backend_get_type(drv)) {
+     case TPM_TYPE_PASSTHROUGH:
+         res->options->type = TPM_TYPE_OPTIONS_KIND_PASSTHROUGH;
+         tpo = g_new0(TPMPassthroughOptions, 1);
+-- 
+2.7.4
