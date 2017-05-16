@@ -1,28 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48354)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49635)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1dAUOR-0006rO-EH
-	for qemu-devel@nongnu.org; Tue, 16 May 2017 00:47:32 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1dAUTh-0000Jq-CO
+	for qemu-devel@nongnu.org; Tue, 16 May 2017 00:52:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1dAUOO-0000x7-C7
-	for qemu-devel@nongnu.org; Tue, 16 May 2017 00:47:31 -0400
-Received: from mga01.intel.com ([192.55.52.88]:17887)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <wei.w.wang@intel.com>)
-	id 1dAUOO-0000wn-2K
-	for qemu-devel@nongnu.org; Tue, 16 May 2017 00:47:28 -0400
-Message-ID: <591A84D4.1030006@intel.com>
-Date: Tue, 16 May 2017 12:49:24 +0800
-From: Wei Wang <wei.w.wang@intel.com>
+	(envelope-from <dgibson@ozlabs.org>) id 1dAUTg-0003VO-1y
+	for qemu-devel@nongnu.org; Tue, 16 May 2017 00:52:57 -0400
+Date: Tue, 16 May 2017 14:35:55 +1000
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20170516043555.GE30022@umbus.fritz.box>
+References: <149484833874.20089.4164801378197848306.stgit@bahia.lan>
+	<149484836649.20089.8174753739169885859.stgit@bahia.lan>
 MIME-Version: 1.0
-References: <1494478641-24549-1-git-send-email-wei.w.wang@intel.com>
-	<591974EB.2010409@intel.com>
-	<20170515174044-mutt-send-email-mst@kernel.org>
-	<591A7FCE.1010703@intel.com>
-In-Reply-To: <591A7FCE.1010703@intel.com>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [virtio-dev] Re: [PATCH] virtio-net: keep the
- packet layout intact
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="cYtjc4pxslFTELvY"
+Content-Disposition: inline
+In-Reply-To: <149484836649.20089.8174753739169885859.stgit@bahia.lan>
+Subject: Re: [Qemu-devel] [PATCH 2/6] spapr: fix error path of required
+ kernel-irqchip
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,59 +25,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: jasowang@redhat.com, stefanha@gmail.com, marcandre.lureau@gmail.com, pbonzini@redhat.com, virtio-dev@lists.oasis-open.org, qemu-devel@nongnu.org, jan.scheurich@ericsson.com
-
-On 05/16/2017 12:27 PM, Wei Wang wrote:
-> On 05/15/2017 10:46 PM, Michael S. Tsirkin wrote:
->> On Mon, May 15, 2017 at 05:29:15PM +0800, Wei Wang wrote:
->>> Ping for comments, thanks.
->>>
->>> On 05/11/2017 12:57 PM, Wei Wang wrote:
->>>> The current implementation may change the packet layout when
->>>> vnet_hdr needs an endianness swap. The layout change causes
->>>> one more iov to be added to the iov[] passed from the guest, which
->>>> is a barrier to making the TX queue size 1024 due to the possible
->>>> off-by-one issue.
->> It blocks making it 512 but I don't think we can make it 1024
->> as entries might cross page boundaries and get split.
->>
->
-> I agree with the performance lose issue you mentioned
-> below, thanks. To understand more here, could you please
-> shed some light on "entries can't cross page boundaries"?
->
-> Seems the virtio spec doesn't mention that vring_desc entries
-> shouldn't be in two physically continuous pages. Also didn't
-> find an issue from the implementation.
-> On the device side, the writev manual does 
-typo - "does" -> "doesn't"
+To: Greg Kurz <groug@kaod.org>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Bharata B Rao <bharata@linux.vnet.ibm.com>, Cedric Le Goater <clg@kaod.org>
 
 
-> require the iov[]
-> array to be in one page only, and the limit to iovcnt is 1024.
->
->
->>>> This patch changes the implementation to remain the packet layout
->>>> intact. In this case, the number of iov[] passed to writev will be
->>>> equal to the number obtained from the guest.
->>>>
->>>> Signed-off-by: Wei Wang <wei.w.wang@intel.com>
->> As this is at the cost of a full data copy, I don't think
->> this makes sense. We could limit this when sg list does not fit
->> in 1024.
->
-> Yes, this would cause a performance loss with the layout that data
-> is adjacent with vnet_hdr. Since you prefer another solution below,
-> I will skip and not discuss my ideas to avoid that copy.
->
->> But I really think we should just add a max s/g field to virtio
->> and then we'll be free to increase the ring size.
->
-> Yes, that's also a good way to solve it. So, add a new device
-> property, "max_chain_size" and a feature bit to detect it?
->
->
+--cYtjc4pxslFTELvY
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Best,
-Wei
+On Mon, May 15, 2017 at 01:39:26PM +0200, Greg Kurz wrote:
+> QEMU should exit if the user explicitely asked for kernel-irqchip support
+> and "xics-kvm" initialization fails.
+>=20
+> The changelog of commit 34f2af3d3edf ("spapr: Clean up misuse of qdev_ini=
+t()
+> in xics-kvm creation") reads:
+>=20
+>     While there, improve the error message when we can't satisfy an
+>     explicit user request for "xics-kvm", and exit(1) instead of abort().
+>     Simplify the abort when we can't create "xics".
+>=20
+> This patch adds the missing call to exit().
+>=20
+> Signed-off-by: Greg Kurz <groug@kaod.org>
+> ---
+>  hw/ppc/spapr.c |    1 +
+>  1 file changed, 1 insertion(+)
+>=20
+> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> index abfb99b71b7d..f477d7b8a210 100644
+> --- a/hw/ppc/spapr.c
+> +++ b/hw/ppc/spapr.c
+> @@ -133,6 +133,7 @@ static void xics_system_init(MachineState *machine, i=
+nt nr_irqs, Error **errp)
+>          if (machine_kernel_irqchip_required(machine) && !spapr->ics) {
+>              error_reportf_err(err,
+>                                "kernel_irqchip requested but unavailable:=
+ ");
+> +            exit(EXIT_FAILURE);
+>          } else {
+>              error_free(err);
+>          }
+>=20
+
+
+This doesn't look right.  We have an errp pointer in the caller.  So
+on failure we should error_propagate(), rather than deciding for
+ourselves that exiting is the right course of action.
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--cYtjc4pxslFTELvY
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iQIcBAEBCAAGBQJZGoGrAAoJEGw4ysog2bOSjSgP/jGfLPQ9yiUSxAIVkoYdY/v5
+or8eib8Na4iT+CLa5fYeZKj0DauL7P/FFJ+nTNKF94q0QGlnmV4IKHUYUBz16bzq
+GKcVm/IJKpbDkiRAMBFRIZ7Lvkc8THDq6QkXxyhHlG1gF4iv1t2jLXM1X6DQT7le
+Nx+ssX+G8tAMzl2xFc7Suzlm9sRfPV2l/sxImhHB7KC+EOF2vK+5nD7A6ewKzTOd
+vF8ZIsExd4tnRGuC5F5ensdy7V69X4uJDvqGErPU7gXffG+AsI5Q0j4Nxr6fjilX
+9T8BF5/CO6vIVNS2PgBIlnxGew5+W6D+wMyMJtYbHtB29NDCyC9Iy7Y9mcK70nxh
+IgblK8KZtRFrTB9khBLoL8ltscixDtzvfDNuGZKrFi35aIR1nQPBHmglXrLJY3EX
+TmPCp6JCIXxXY0gkqCQ2lFbfpulRlMtpdqxdlt5hnpQUYIS+8kdA9KpC9BMtLzs7
+0TXqbSOALGa0RK3Asgwb+ykrUkYNT2XPPuBtgk1ov9IqhrjssmwpE0I0rHYEdHkm
+ZYrLVmRtmL60xSubdBx7lG0fvbLm9McItZEu/jONBJhK6c/E+H81xDTUgGp86WL+
+kFgrXwvCM/QaiRLW2wks3Su+W/Umkn1UzZrXach/ailQdOh/Wi3Sm1hR6qBDz0JA
+nCN4q3v4wukt8Fi5SKOI
+=RKTj
+-----END PGP SIGNATURE-----
+
+--cYtjc4pxslFTELvY--
