@@ -1,30 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45384)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45796)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dAdL8-0001CO-N7
-	for qemu-devel@nongnu.org; Tue, 16 May 2017 10:20:44 -0400
+	(envelope-from <armbru@redhat.com>) id 1dAdMt-0002O2-2v
+	for qemu-devel@nongnu.org; Tue, 16 May 2017 10:22:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dAdL3-00083b-OB
-	for qemu-devel@nongnu.org; Tue, 16 May 2017 10:20:42 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:41982)
+	(envelope-from <armbru@redhat.com>) id 1dAdMo-0008Mq-4y
+	for qemu-devel@nongnu.org; Tue, 16 May 2017 10:22:31 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46331)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dAdL3-000837-Ee
-	for qemu-devel@nongnu.org; Tue, 16 May 2017 10:20:37 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dAdMn-0008Mb-SB
+	for qemu-devel@nongnu.org; Tue, 16 May 2017 10:22:26 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 28CC84DD7C
-	for <qemu-devel@nongnu.org>; Tue, 16 May 2017 14:20:16 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id A5C6A7F4A7
+	for <qemu-devel@nongnu.org>; Tue, 16 May 2017 14:22:19 +0000 (UTC)
 From: Markus Armbruster <armbru@redhat.com>
 References: <20170516111123.17692-1-quintela@redhat.com>
-	<20170516111123.17692-3-quintela@redhat.com>
-Date: Tue, 16 May 2017 16:20:12 +0200
-In-Reply-To: <20170516111123.17692-3-quintela@redhat.com> (Juan Quintela's
-	message of "Tue, 16 May 2017 13:11:20 +0200")
-Message-ID: <87shk4g9yb.fsf@dusky.pond.sub.org>
+	<20170516111123.17692-4-quintela@redhat.com>
+Date: Tue, 16 May 2017 16:22:04 +0200
+In-Reply-To: <20170516111123.17692-4-quintela@redhat.com> (Juan Quintela's
+	message of "Tue, 16 May 2017 13:11:21 +0200")
+Message-ID: <87o9usg9v7.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH 2/5] migration: Create block capability
+Subject: Re: [Qemu-devel] [PATCH 3/5] migration: Remove use of old
+ MigrationParams
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,339 +39,147 @@ Cc: qemu-devel@nongnu.org, lvivier@redhat.com, dgilbert@redhat.com, peterx@redha
 
 Juan Quintela <quintela@redhat.com> writes:
 
-> Create one capability for block migration and one parameter for
-> incremental block migration.
+> We have change in the previous patch to use migration capabilities for
+> it.  Notice that we continue using the old command line flags from
+> migrate command from the time being.  Remove the set_params method as
+> now it is empty.
 >
 > Signed-off-by: Juan Quintela <quintela@redhat.com>
-> ---
->  hmp.c                         | 13 +++++++
->  include/migration/block.h     |  2 +
->  include/migration/migration.h |  7 ++++
->  migration/migration.c         | 88 +++++++++++++++++++++++++++++++++++++++++++
->  qapi-schema.json              | 14 +++++--
->  5 files changed, 121 insertions(+), 3 deletions(-)
 >
-> diff --git a/hmp.c b/hmp.c
-> index acbbc5c..208154c 100644
-> --- a/hmp.c
-> +++ b/hmp.c
-> @@ -326,6 +326,10 @@ void hmp_info_migrate_parameters(Monitor *mon, const QDict *qdict)
->          monitor_printf(mon, "%s: %" PRId64 "\n",
->              MigrationParameter_lookup[MIGRATION_PARAMETER_X_CHECKPOINT_DELAY],
->              params->x_checkpoint_delay);
-> +        assert(params->has_block_incremental);
-> +        monitor_printf(mon, "%s: %s\n",
-> +            MigrationParameter_lookup[MIGRATION_PARAMETER_BLOCK_INCREMENTAL],
-> +                       params->block_incremental ? "on" : "off");
->      }
->  
->      qapi_free_MigrationParameters(params);
-> @@ -1527,6 +1531,7 @@ void hmp_migrate_set_parameter(Monitor *mon, const QDict *qdict)
->      Visitor *v = string_input_visitor_new(valuestr);
->      uint64_t valuebw = 0;
->      int64_t valueint = 0;
-> +    bool valuebool = false;
->      Error *err = NULL;
->      bool use_int_value = false;
->      int i, ret;
-> @@ -1581,6 +1586,14 @@ void hmp_migrate_set_parameter(Monitor *mon, const QDict *qdict)
->                  p.has_x_checkpoint_delay = true;
->                  use_int_value = true;
->                  break;
-> +            case MIGRATION_PARAMETER_BLOCK_INCREMENTAL:
-> +                p.has_block_incremental = true;
-> +                visit_type_bool(v, param, &valuebool, &err);
-> +                if (err) {
-> +                    goto cleanup;
-> +                }
-> +                p.block_incremental = valuebool;
-> +                break;
->              }
->  
->              if (use_int_value) {
-> diff --git a/include/migration/block.h b/include/migration/block.h
-> index 41a1ac8..5225af9 100644
-> --- a/include/migration/block.h
-> +++ b/include/migration/block.h
-> @@ -20,4 +20,6 @@ uint64_t blk_mig_bytes_transferred(void);
->  uint64_t blk_mig_bytes_remaining(void);
->  uint64_t blk_mig_bytes_total(void);
->  
-> +void migrate_set_block_enabled(bool value, Error **errp);
-> +
->  #endif /* MIGRATION_BLOCK_H */
+> ---
+> - Maintain shared/enabled dependency (Xu suggestion)
+> - Now we maintain the dependency on the setter functions
+> ---
+>  include/migration/migration.h |  3 +--
+>  migration/block.c             | 17 ++---------------
+>  migration/colo.c              |  4 ++--
+>  migration/migration.c         |  3 ---
+>  migration/savevm.c            |  8 ++++++--
+>  5 files changed, 11 insertions(+), 24 deletions(-)
+>
 > diff --git a/include/migration/migration.h b/include/migration/migration.h
-> index 47262bd..adcb8f6 100644
+> index adcb8f6..1277226 100644
 > --- a/include/migration/migration.h
 > +++ b/include/migration/migration.h
-> @@ -179,6 +179,10 @@ struct MigrationState
+> @@ -43,8 +43,7 @@
+>  extern int only_migratable;
 >  
->      /* The last error that occurred */
->      Error *error;
-> +    /* Do we have to clean up -b/-i from old migrate paramteres */
-
-parameters
-
-> +    /* This feature is deprecated and will be removed */
-> +    bool must_remove_block;
-> +    bool must_remove_block_incremental;
+>  struct MigrationParams {
+> -    bool blk;
+> -    bool shared;
+> +    bool unused; /* C doesn't allow empty structs */
 >  };
 >  
->  void migrate_set_state(int *state, int old_state, int new_state);
-> @@ -293,6 +297,9 @@ bool migrate_colo_enabled(void);
+>  /* Messages sent on the return path from destination to source */
+> diff --git a/migration/block.c b/migration/block.c
+> index 060087f..5d22926 100644
+> --- a/migration/block.c
+> +++ b/migration/block.c
+> @@ -94,9 +94,6 @@ typedef struct BlkMigBlock {
+>  } BlkMigBlock;
 >  
->  int64_t xbzrle_cache_resize(int64_t new_size);
+>  typedef struct BlkMigState {
+> -    /* Written during setup phase.  Can be read without a lock.  */
+> -    int blk_enable;
+> -    int shared_base;
+>      QSIMPLEQ_HEAD(bmds_list, BlkMigDevState) bmds_list;
+>      int64_t total_sector_sum;
+>      bool zero_blocks;
+> @@ -425,7 +422,7 @@ static int init_blk_migration(QEMUFile *f)
+>          bmds->bulk_completed = 0;
+>          bmds->total_sectors = sectors;
+>          bmds->completed_sectors = 0;
+> -        bmds->shared_base = block_mig_state.shared_base;
+> +        bmds->shared_base = migrate_use_block_incremental();
 >  
-> +bool migrate_use_block(void);
-> +bool migrate_use_block_incremental(void);
-> +
->  bool migrate_use_compression(void);
->  int migrate_compress_level(void);
->  int migrate_compress_threads(void);
+>          assert(i < num_bs);
+>          bmds_bs[i].bmds = bmds;
+> @@ -994,22 +991,12 @@ static int block_load(QEMUFile *f, void *opaque, int version_id)
+>      return 0;
+>  }
+>  
+> -static void block_set_params(const MigrationParams *params, void *opaque)
+> -{
+> -    block_mig_state.blk_enable = params->blk;
+> -    block_mig_state.shared_base = params->shared;
+> -
+> -    /* shared base means that blk_enable = 1 */
+> -    block_mig_state.blk_enable |= params->shared;
+> -}
+> -
+>  static bool block_is_active(void *opaque)
+>  {
+> -    return block_mig_state.blk_enable == 1;
+> +    return migrate_use_block();
+>  }
+>  
+>  static SaveVMHandlers savevm_block_handlers = {
+> -    .set_params = block_set_params,
+>      .save_live_setup = block_save_setup,
+>      .save_live_iterate = block_save_iterate,
+>      .save_live_complete_precopy = block_save_complete,
+> diff --git a/migration/colo.c b/migration/colo.c
+> index 963c802..8c86892 100644
+> --- a/migration/colo.c
+> +++ b/migration/colo.c
+> @@ -14,6 +14,7 @@
+>  #include "qemu/timer.h"
+>  #include "sysemu/sysemu.h"
+>  #include "migration/colo.h"
+> +#include "migration/block.h"
+>  #include "io/channel-buffer.h"
+>  #include "trace.h"
+>  #include "qemu/error-report.h"
+> @@ -345,8 +346,7 @@ static int colo_do_checkpoint_transaction(MigrationState *s,
+>      }
+>  
+>      /* Disable block migration */
+> -    s->params.blk = 0;
+> -    s->params.shared = 0;
+> +    migrate_set_block_enabled(false, &local_err);
+>      qemu_savevm_state_header(fb);
+>      qemu_savevm_state_begin(fb, &s->params);
+>      qemu_mutex_lock_iothread();
 > diff --git a/migration/migration.c b/migration/migration.c
-> index 5c92851..03f96df 100644
+> index 03f96df..c03f34e 100644
 > --- a/migration/migration.c
 > +++ b/migration/migration.c
-> @@ -599,6 +599,8 @@ MigrationParameters *qmp_query_migrate_parameters(Error **errp)
->      params->downtime_limit = s->parameters.downtime_limit;
->      params->has_x_checkpoint_delay = true;
->      params->x_checkpoint_delay = s->parameters.x_checkpoint_delay;
-> +    params->has_block_incremental = true;
-> +    params->block_incremental = s->parameters.block_incremental;
->  
->      return params;
->  }
-> @@ -907,6 +909,9 @@ void qmp_migrate_set_parameters(MigrationParameters *params, Error **errp)
->              colo_checkpoint_notify(s);
->          }
->      }
-> +    if (params->has_block_incremental) {
-> +        s->parameters.block_incremental = params->block_incremental;
-> +    }
->  }
->  
->  
-> @@ -942,6 +947,35 @@ void migrate_set_state(int *state, int old_state, int new_state)
->      }
->  }
->  
-> +void migrate_set_block_enabled(bool value, Error **errp)
-> +{
-> +    MigrationCapabilityStatusList *cap;
-> +
-> +    cap = g_malloc0(sizeof(*cap));
-> +    cap->value = g_malloc(sizeof(*cap->value));
-
-I prefer g_new() for extra type checking.  Your choice.
-
-> +    cap->value->capability = MIGRATION_CAPABILITY_BLOCK;
-> +    cap->value->state = value;
-> +    qmp_migrate_set_capabilities(cap, errp);
-> +    qapi_free_MigrationCapabilityStatusList(cap);
-> +}
-
-The objective is to set one bit.  The means is building a
-MigrationCapabilityStatusList.  When you have to build an elaborate data
-structure just so you can set one bit, your interfaces are likely
-deficient.  Observation, not change request.
-
-> +
-> +static void migrate_set_block_incremental(MigrationState *s, bool value)
-> +{
-> +    s->parameters.block_incremental = value;
-> +}
-
-This is how setting one bit should look like.
-
-> +
-> +static void block_cleanup_parameters(MigrationState *s)
-> +{
-> +    if (s->must_remove_block) {
-> +        migrate_set_block_enabled(false, NULL);
-
-NULL ignores errors.  If an error happens, and we ignore it, we're
-screwed, aren't we?  I suspect we want &error_abort here.
-
-> +        s->must_remove_block = false;
-> +    }
-> +    if (s->must_remove_block_incremental) {
-> +        migrate_set_block_incremental(s, false);
-> +        s->must_remove_block_incremental = false;
-> +    }
-> +}
-> +
->  static void migrate_fd_cleanup(void *opaque)
->  {
->      MigrationState *s = opaque;
-> @@ -974,6 +1008,7 @@ static void migrate_fd_cleanup(void *opaque)
->      }
->  
->      notifier_list_notify(&migration_state_notifiers, s);
-> +    block_cleanup_parameters(s);
->  }
->  
->  void migrate_fd_error(MigrationState *s, const Error *error)
-> @@ -986,6 +1021,7 @@ void migrate_fd_error(MigrationState *s, const Error *error)
->          s->error = error_copy(error);
->      }
->      notifier_list_notify(&migration_state_notifiers, s);
-> +    block_cleanup_parameters(s);
->  }
->  
->  static void migrate_fd_cancel(MigrationState *s)
-> @@ -1027,6 +1063,7 @@ static void migrate_fd_cancel(MigrationState *s)
->              s->block_inactive = false;
->          }
->      }
-> +    block_cleanup_parameters(s);
->  }
->  
->  void add_migration_state_change_notifier(Notifier *notify)
-> @@ -1209,6 +1246,7 @@ void qmp_migrate(const char *uri, bool has_blk, bool blk,
->      Error *local_err = NULL;
->      MigrationState *s = migrate_get_current();
->      MigrationParams params;
-> +    bool block_enabled = false;
+> @@ -1249,9 +1249,6 @@ void qmp_migrate(const char *uri, bool has_blk, bool blk,
+>      bool block_enabled = false;
 >      const char *p;
 >  
->      params.blk = has_blk && blk;
-> @@ -1229,6 +1267,38 @@ void qmp_migrate(const char *uri, bool has_blk, bool blk,
->          return;
+> -    params.blk = has_blk && blk;
+> -    params.shared = has_inc && inc;
+> -
+>      if (migration_is_setup_or_active(s->state) ||
+>          s->state == MIGRATION_STATUS_CANCELLING ||
+>          s->state == MIGRATION_STATUS_COLO) {
+> diff --git a/migration/savevm.c b/migration/savevm.c
+> index b4f736f..5fc10ab 100644
+> --- a/migration/savevm.c
+> +++ b/migration/savevm.c
+> @@ -1233,8 +1233,6 @@ static int qemu_savevm_state(QEMUFile *f, Error **errp)
+>  {
+>      int ret;
+>      MigrationParams params = {
+> -        .blk = 0,
+> -        .shared = 0
+>      };
+>      MigrationState *ms = migrate_init(&params);
+>      MigrationStatus status;
+> @@ -1245,6 +1243,12 @@ static int qemu_savevm_state(QEMUFile *f, Error **errp)
+>          goto done;
 >      }
 >  
-> +    if (has_blk && blk) {
-> +        if (migrate_use_block() || migrate_use_block_incremental()) {
-> +            error_setg(errp, "You can't use block capability and -b/i");
-
-Error message assumes HMP.  In QMP, the thing is called 'blk', not -b.
-Perhaps we can sidestep the issue like this: "Command options are
-incompatible with current migration capabilities".
-
-> +            return;
-> +        }
-> +        migrate_set_block_enabled(true, &local_err);
-> +        if (local_err) {
-> +            error_propagate(errp, local_err);
-> +            return;
-> +        }
-> +        block_enabled = true;
-> +        s->must_remove_block = true;
+> +    if (migrate_use_block()) {
+> +        error_setg(errp, "Block migration and snapshots are incompatible");
+> +        ret = -EINVAL;
+> +        goto done;
 > +    }
 > +
-> +    if (has_inc && inc) {
-> +        if ((migrate_use_block() && !block_enabled)
-> +            || migrate_use_block_incremental()) {
-> +            error_setg(errp, "You can't use block capability and -b/i");
+>      qemu_mutex_unlock_iothread();
+>      qemu_savevm_state_header(f);
+>      qemu_savevm_state_begin(f, &params);
 
-Likewise.
-
-The condition would be slightly simpler if you completed error checking
-before changing global state.  Matter of taste.
-
-> +            return;
-> +        }
-> +        if (!block_enabled) {
-> +            migrate_set_block_enabled(true, &local_err);
-> +            if (local_err) {
-> +                error_propagate(errp, local_err);
-> +                return;
-> +            }
-> +            s->must_remove_block = true;
-> +        }
-> +        migrate_set_block_incremental(s, true);
-> +        s->must_remove_block_incremental = true;
-> +    }
-> +
->      s = migrate_init(&params);
->  
->      if (strstart(uri, "tcp:", &p)) {
-> @@ -1426,6 +1496,24 @@ int64_t migrate_xbzrle_cache_size(void)
->      return s->xbzrle_cache_size;
->  }
->  
-> +bool migrate_use_block(void)
-> +{
-> +    MigrationState *s;
-> +
-> +    s = migrate_get_current();
-> +
-> +    return s->enabled_capabilities[MIGRATION_CAPABILITY_BLOCK];
-> +}
-> +
-> +bool migrate_use_block_incremental(void)
-> +{
-> +    MigrationState *s;
-> +
-> +    s = migrate_get_current();
-> +
-> +    return s->parameters.block_incremental;
-> +}
-> +
->  /* migration thread support */
->  /*
->   * Something bad happened to the RP stream, mark an error
-> diff --git a/qapi-schema.json b/qapi-schema.json
-> index 5728b7f..62246bc 100644
-> --- a/qapi-schema.json
-> +++ b/qapi-schema.json
-> @@ -894,11 +894,14 @@
->  # @release-ram: if enabled, qemu will free the migrated ram pages on the source
->  #        during postcopy-ram migration. (since 2.9)
->  #
-> +# @block: enable block migration (Since 2.10)
-> +#
-
-What's "block migration" and why should I care?
-
->  # Since: 1.2
->  ##
->  { 'enum': 'MigrationCapability',
->    'data': ['xbzrle', 'rdma-pin-all', 'auto-converge', 'zero-blocks',
-> -           'compress', 'events', 'postcopy-ram', 'x-colo', 'release-ram'] }
-> +           'compress', 'events', 'postcopy-ram', 'x-colo', 'release-ram',
-> +           'block' ] }
->  
->  ##
->  # @MigrationCapabilityStatus:
-> @@ -1009,13 +1012,15 @@
->  # @x-checkpoint-delay: The delay time (in ms) between two COLO checkpoints in
->  #          periodic mode. (Since 2.8)
->  #
-> +# @block-incremental: enable block incremental migration (Since 2.10)
-> +#
-
-What's "block incremental migration" and why should I care?
-
->  # Since: 2.4
->  ##
->  { 'enum': 'MigrationParameter',
->    'data': ['compress-level', 'compress-threads', 'decompress-threads',
->             'cpu-throttle-initial', 'cpu-throttle-increment',
->             'tls-creds', 'tls-hostname', 'max-bandwidth',
-> -           'downtime-limit', 'x-checkpoint-delay' ] }
-> +           'downtime-limit', 'x-checkpoint-delay', 'block-incremental' ] }
->  
->  ##
->  # @migrate-set-parameters:
-> @@ -1082,6 +1087,8 @@
->  #
->  # @x-checkpoint-delay: the delay time between two COLO checkpoints. (Since 2.8)
->  #
-> +# @block-incremental: enable block incremental migration (Since 2.10)
-> +#
->  # Since: 2.4
->  ##
->  { 'struct': 'MigrationParameters',
-> @@ -1094,7 +1101,8 @@
->              '*tls-hostname': 'str',
->              '*max-bandwidth': 'int',
->              '*downtime-limit': 'int',
-> -            '*x-checkpoint-delay': 'int'} }
-> +            '*x-checkpoint-delay': 'int',
-> +            '*block-incremental': 'bool' } }
->  
->  ##
->  # @query-migrate-parameters:
-
-Can't say I like the split between MigrationCapability and
-MigrationParameters, but we got to work with what we have.
+New error that isn't mentioned in the commit message.  Does it belong
+here?
