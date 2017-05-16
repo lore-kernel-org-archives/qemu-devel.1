@@ -1,37 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51645)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52457)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1dAXPQ-0004eh-JW
-	for qemu-devel@nongnu.org; Tue, 16 May 2017 04:00:50 -0400
+	(envelope-from <famz@redhat.com>) id 1dAXSL-00075e-Fz
+	for qemu-devel@nongnu.org; Tue, 16 May 2017 04:03:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1dAXPN-0006Yz-GO
-	for qemu-devel@nongnu.org; Tue, 16 May 2017 04:00:44 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:49556)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1dAXPN-0006Yl-71
-	for qemu-devel@nongnu.org; Tue, 16 May 2017 04:00:41 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id AC706C00359B
-	for <qemu-devel@nongnu.org>; Tue, 16 May 2017 08:00:24 +0000 (UTC)
-From: Juan Quintela <quintela@redhat.com>
-In-Reply-To: <871srpjm9p.fsf@dusky.pond.sub.org> (Markus Armbruster's message
-	of "Tue, 16 May 2017 09:25:54 +0200")
-References: <20170511163228.6666-1-quintela@redhat.com>
-	<20170511163228.6666-3-quintela@redhat.com>
-	<20170512034033.GN28293@pxdev.xzpeter.org>
-	<877f1mgx9h.fsf@secure.mitica>
-	<5bab598f-30eb-fcf6-9d06-8f683b466414@redhat.com>
-	<87lgpyfo28.fsf@secure.mitica> <87k25iqf4m.fsf@dusky.pond.sub.org>
-	<87efvqdqqj.fsf@secure.mitica> <871srpjm9p.fsf@dusky.pond.sub.org>
-Reply-To: quintela@redhat.com
-Date: Tue, 16 May 2017 10:00:20 +0200
-Message-ID: <87shk5cju3.fsf@secure.mitica>
+	(envelope-from <famz@redhat.com>) id 1dAXSK-0007lJ-QI
+	for qemu-devel@nongnu.org; Tue, 16 May 2017 04:03:45 -0400
+Date: Tue, 16 May 2017 16:03:32 +0800
+From: Fam Zheng <famz@redhat.com>
+Message-ID: <20170516080332.GA27669@lemon.lan>
+References: <20170516074256.24731-1-kraxel@redhat.com>
+	<2c224267-32ec-ccf7-ae80-113ebfdce1e2@weilnetz.de>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH 2/3] migration: Remove use of old
- MigrationParams
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <2c224267-32ec-ccf7-ae80-113ebfdce1e2@weilnetz.de>
+Subject: Re: [Qemu-devel] [PATCH] block/win32: fix 'ret not initialized'
+ warning
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -40,102 +24,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: lvivier@redhat.com, qemu-devel@nongnu.org, Peter Xu <peterx@redhat.com>, dgilbert@redhat.com
+To: Stefan Weil <sw@weilnetz.de>
+Cc: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, QEMU Trivial <qemu-trivial@nongnu.org>, "open list:raw" <qemu-block@nongnu.org>, Max Reitz <mreitz@redhat.com>
 
-Markus Armbruster <armbru@redhat.com> wrote:
-> Juan Quintela <quintela@redhat.com> writes:
+On Tue, 05/16 09:52, Stefan Weil wrote:
+> Am 16.05.2017 um 09:42 schrieb Gerd Hoffmann:
+> > Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+> > ---
+> >  block/file-win32.c | 1 +
+> >  1 file changed, 1 insertion(+)
+> > 
+> > diff --git a/block/file-win32.c b/block/file-win32.c
+> > index 1a35dbabf2..8f14f0bdcd 100644
+> > --- a/block/file-win32.c
+> > +++ b/block/file-win32.c
+> > @@ -346,6 +346,7 @@ static int raw_open(BlockDriverState *bs, QDict *options, int flags,
+> > 
+> >      if (qdict_get_try_bool(options, "locking", false)) {
+> >          error_setg(errp, "locking=on is not supported on Windows");
+> > +        ret = -EINVAL;
+> >          goto fail;
+> >      }
+> 
+> 
+> This is a bug fix for commit 1c3a555c.
+> 
+> Reviewed-by: Stefan Weil <sw@weilnetz.de>
+> 
+> 
 
-...
+Thank you!
 
->> As qmp command is asynchronous, you can think that -d is *always* on in
->> QMP O:-)
->
-> Yes.  The existence of "detach" in QMP is owed to limitations of early
-> QMP infrastructure.  It's flagged as "invalid" and "should not be
-> used" since 2010.
->
-> Perhaps we should start a section on QMP in
-> <http://wiki.qemu.org/Features/LegacyRemoval>.  But I'd like to first
-> have a way to communicate "you're using a deprecated feature" warnings
-> via QMP.
-
-+1
-
->> Tristates will complicate it.  I still think that:
->>
->> - capability: block_migration
->> - parameter: block_shared
->>
->> Makes more sense, no?
->>
->> If block_migration is not enabled, we ignore the shared parameter.  We
->> already do that for other parameters.
->
-> My impression as a superficial reader is that migration configuration is
-> a historically grown mess.  Perhaps we shouldn't try to interpret too
-> much intent into it :)
->
-> If we redo migration as an instance of the "job" abstraction once we
-> have it, then migration configuration & control should become more less
-> messy.  Of course, the old messes will stay with us for a while in the
-> form of backward compatibility messes.
->
-> I'm not too particular on how we do the tri-state now, as long as it
-> reasonably fits what we have, and is documented clearly.
-
->>> If the new interface isn't used, the old one still needs to work.  If it
->>> is used, the old one either has to do "the right thing", or fail
->>> cleanly.
->>>
->>> We approximate "new interface isn't used" by "block migration is off in
->>> global state".  When it is off, the migration command needs to honor its
->>> two flags for compatibility.  It must leave block migration off in
->>> global state.  Yes, this will complicate the implementation until we
->>> actually remove the deprecated flags.  Par for the backward compatility
->>> course.
->>>
->>> When block migration isn't off in global state, we can either
->>>
->>> * let the flags take precedence over the global state (one
->>>   interpretation of "do the right thing"), or
->>>
->>> * reject flags that conflict with global state (another interpretation),
->>>   or
->>>
->>> * reject *all* flags (fail cleanly).
->>>
->>> The last one looks perfectly servicable to me.
->>
->> Yeap,  I think that makes sense.  If you use capabilities, parameters,
->> old interface don't work at all.
->>
->> We still have a problem that is what happens if the user does:
->>
->> migrate -b <foo>
->> migrate_cancel (or error)
->> migrate <bar> (without -b)
->>
->> With current patches, it will still use -b.  Fixing it requires still
->> anding more code.  But I think that this use case is so weird what we
->> should not even care about it.
->
-> It's a compatibility break.  Whether it's tolerable is a judgement call,
-> and not for me to make.
->
-> Compatibility breaks need documentation, including release notes.
->
-> Say you run migrate with -b by accident (say by recalling a prior
-> command from persistent command history, such as qmp-shell's or rlwrap's
-> or socat READLINE's), immediately realize what you've done and cancel
-> the migration.  Are you then stuck with -b forever?
-
-migrate_set_capability block off
-
-and you are done.
-
-
-But I think that adding documentation would be longer that just adding
-the code to clean it.
-
-Later, Juan.
+Reviewed-by: Fam Zheng <famz@redhat.com>
