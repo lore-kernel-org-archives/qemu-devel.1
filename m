@@ -1,29 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38745)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40205)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <maxime.coquelin@redhat.com>) id 1dAfqg-0004KO-La
-	for qemu-devel@nongnu.org; Tue, 16 May 2017 13:01:27 -0400
+	(envelope-from <armbru@redhat.com>) id 1dAfwe-0005Xq-3L
+	for qemu-devel@nongnu.org; Tue, 16 May 2017 13:07:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <maxime.coquelin@redhat.com>) id 1dAfqd-0008Fh-8G
-	for qemu-devel@nongnu.org; Tue, 16 May 2017 13:01:26 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47092)
+	(envelope-from <armbru@redhat.com>) id 1dAfwZ-00012o-6S
+	for qemu-devel@nongnu.org; Tue, 16 May 2017 13:07:36 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:39358)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <maxime.coquelin@redhat.com>)
-	id 1dAfqd-0008FY-2L
-	for qemu-devel@nongnu.org; Tue, 16 May 2017 13:01:23 -0400
-References: <1494838260-30439-1-git-send-email-peterx@redhat.com>
-	<9a93009b-f909-3142-5bc5-915b9a10ed20@redhat.com>
-	<f69dcf32-b6a2-fb59-2b54-61fd7b52e66e@redhat.com>
-	<28bdbe39-7520-28c1-e58e-ec9f7ed69bde@redhat.com>
-From: Maxime Coquelin <maxime.coquelin@redhat.com>
-Message-ID: <b7b69a7c-b3b3-ef65-b17c-40007e21243d@redhat.com>
-Date: Tue, 16 May 2017 19:01:10 +0200
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dAfwZ-00012Y-0H
+	for qemu-devel@nongnu.org; Tue, 16 May 2017 13:07:31 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id C30663DBED
+	for <qemu-devel@nongnu.org>; Tue, 16 May 2017 17:07:29 +0000 (UTC)
+From: Markus Armbruster <armbru@redhat.com>
+References: <20170516111123.17692-1-quintela@redhat.com>
+	<20170516111123.17692-3-quintela@redhat.com>
+	<87shk4g9yb.fsf@dusky.pond.sub.org> <87o9usdg6e.fsf@secure.mitica>
+	<87h90kbxmd.fsf@dusky.pond.sub.org>
+	<09f00bd1-df05-c6b3-8423-cb790feddcc2@redhat.com>
+	<87k25g92i8.fsf@dusky.pond.sub.org>
+	<24a363d9-a395-325c-ff6c-f79211c773fb@redhat.com>
+Date: Tue, 16 May 2017 19:07:25 +0200
+In-Reply-To: <24a363d9-a395-325c-ff6c-f79211c773fb@redhat.com> (Eric Blake's
+	message of "Tue, 16 May 2017 11:48:01 -0500")
+Message-ID: <87a86c7msy.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <28bdbe39-7520-28c1-e58e-ec9f7ed69bde@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 0/4] exec: address space translation
- cleanups
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH 2/5] migration: Create block capability
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,38 +38,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, Peter Xu <peterx@redhat.com>, qemu-devel@nongnu.org
-Cc: Jason Wang <jasowang@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, David Gibson <david@gibson.dropbear.id.au>
+To: Eric Blake <eblake@redhat.com>
+Cc: lvivier@redhat.com, dgilbert@redhat.com, qemu-devel@nongnu.org, peterx@redhat.com, Juan Quintela <quintela@redhat.com>
 
+Eric Blake <eblake@redhat.com> writes:
 
-
-On 05/16/2017 06:54 PM, Paolo Bonzini wrote:
-> 
-> 
-> On 16/05/2017 18:51, Maxime Coquelin wrote:
+> On 05/16/2017 11:42 AM, Markus Armbruster wrote:
+>
+>>>> Well, to suggest something, I'd first have to figure out WTF incremental
+>>>> block migration does.  Your text helps me some, but not enough.  What
+>>>> exactly is being migrated, and what exactly is assumed to be shared
+>>>> between source and destination?
+>>>>
+>>>> Block migration is scandalously underdocumented.
 >>>
->>> I faced the problem the old patch fixes when declaring and attaching
->>> an IOMMU device, but booting the kernel with intel_iommu=off.
->>>
->>> I tested again with patches 1 & 4 of your series, and I confirm it
->>> fixes the issue:
->>> Tested-by: Maxime Coquelin <maxime.coquelin@redhat.com>
->>
->> I did some more testing with my "vhost-user IOMMU" setup, and the series
->> actually breaks with IOMMU device attached, and intel_iommu=on.
->>
->> The main difference with the previous passing test is the guest RAM
->> size. In the working setup, it is 2G of 2M hugepages, vs. 4G of 2M
->> hugepages in the failing one. Note that I also reproduce with
->> vhost-kernel backend.
->>
->> The error happens in the first vhost_device_iotlb_miss() call:
->> qemu-system-x86_64: Fail to lookup the translated address b5d7c000
->>
->> I don't have the root cause yet, I'll keep you updated.
-> 
-> I suppose it is patch 4?
+>
+>> Can you draft a documentation comment for @block-incremental?
+>
+> How about:
+>
+> @block-incremental: Affects how much storage is migrated when the block
+> migration capability is enabled.  When false, the entire storage backing
+> chain is migrated into a flattened image at the destination; when true,
+> only the active qcow2 layer is migrated and the destination must already
+> have access to the same backing chain as was used on the source.
+> (since 2.10)
 
-Yes it is.
-
-Maxime
+Works for me, thanks!
