@@ -1,32 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37269)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40079)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dAZZw-00055t-7f
-	for qemu-devel@nongnu.org; Tue, 16 May 2017 06:19:45 -0400
+	(envelope-from <bounces@canonical.com>) id 1dAZf5-000733-VY
+	for qemu-devel@nongnu.org; Tue, 16 May 2017 06:25:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dAZZr-0004bl-68
-	for qemu-devel@nongnu.org; Tue, 16 May 2017 06:19:44 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:44322)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1dAZZq-0004b8-TJ
-	for qemu-devel@nongnu.org; Tue, 16 May 2017 06:19:39 -0400
-References: <20170512141702.12423-1-vsementsov@virtuozzo.com>
-	<8c231084-8eaa-fe66-43cd-4c85f1e45272@redhat.com>
-	<005ea4a3-6565-6a56-75de-b6464bcae8fd@virtuozzo.com>
-	<0fcdd582-47d1-0206-1c66-d8db615f1174@redhat.com>
-	<858a4c56-1f9c-b7a3-fd73-34e4c8b59953@virtuozzo.com>
-	<e86ebf22-66ac-759c-c726-390daa2933c2@virtuozzo.com>
-	<75da073d-62e8-81ac-990c-aa60aa88dc54@virtuozzo.com>
-	<a6f0288b-fe7f-3439-e3e0-5fcf1812201c@redhat.com>
-	<a746364c-2c7c-9cb6-b7e2-b27d42e035b3@virtuozzo.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <ea800bcc-858e-b5cd-dd25-f3241d1f2c0a@redhat.com>
-Date: Tue, 16 May 2017 12:19:32 +0200
+	(envelope-from <bounces@canonical.com>) id 1dAZf0-00073N-V6
+	for qemu-devel@nongnu.org; Tue, 16 May 2017 06:25:03 -0400
+Received: from indium.canonical.com ([91.189.90.7]:42429)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1dAZf0-000737-PF
+	for qemu-devel@nongnu.org; Tue, 16 May 2017 06:24:58 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1dAZex-0005fs-QD
+	for <qemu-devel@nongnu.org>; Tue, 16 May 2017 10:24:55 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id A81A22E80C4
+	for <qemu-devel@nongnu.org>; Tue, 16 May 2017 10:24:55 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <a746364c-2c7c-9cb6-b7e2-b27d42e035b3@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] nbd: strict nbd_wr_syncv
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 16 May 2017 10:12:49 -0000
+From: Thomas Huth <1286253@bugs.launchpad.net>
+Reply-To: Bug 1286253 <1286253@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20140228174019.12875.25127.malonedeb@wampee.canonical.com>
+Message-Id: <149492956905.8782.10164928502790473342.malone@wampee.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1286253] Re: virtio-net acceleration features not
+ set when plugged into backend dynamically
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,57 +37,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org
-Cc: den@openvz.org
+To: qemu-devel@nongnu.org
 
+Which version of QEMU did you use here? Can you still reproduce this
+problem with the latest version of QEMU (currently v2.9)?
 
+** Changed in: qemu
+       Status: New =3D> Incomplete
 
-On 16/05/2017 12:16, Vladimir Sementsov-Ogievskiy wrote:
-> 16.05.2017 12:51, Paolo Bonzini wrote:
->>
->> On 16/05/2017 11:32, Vladimir Sementsov-Ogievskiy wrote:
->>> 16.05.2017 12:10, Vladimir Sementsov-Ogievskiy wrote:
->>>> 15.05.2017 12:43, Vladimir Sementsov-Ogievskiy wrote:
->>>>> I mean, make negotiation behave like normal nbd communication,
->>>>> non-blocking socket + yield.. So, some other coroutines may do their
->>>>> work, while nbd-negotiation coroutine waits for io..
->> Some callers of bdrv_open may not allow reentrancy.  For example:
->>
->>     handle_qmp_command
->>     -> qmp_dispatch
->>     -> do_qmp_dispatch
->>     -> qmp_marshal_blockdev_add
->>     -> qmp_blockdev_add
->>     -> bds_tree_init
->>     -> bdrv_open
->>
->> You cannot return to the monitor before qmp_blockdev_add is done,
->> otherwise you don't have a return value for handle_qmp_command to pass
->> to monitor_json_emitter.
-> 
-> Hmm. What about something like bdrv_pread (finally, bdrv_prwv_co) for
-> non-coroutine, ie, calling aio_poll in a while loop, until coroutine
-> finishes?
+-- =
 
-Yes, of course that would work: you create a coroutine, and wrap it with
-aio_poll until it completes.
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1286253
 
-Paolo
+Title:
+  virtio-net acceleration features not set when plugged into backend
+  dynamically
 
->>
->>>> Also, one more question here: in nbd_negotiate_write(), why do we need
->>>> qio_channel_add_watch? write_sync will yield with qio_channel_yield()
->>>> until io complete, why to use 2 mechanisms to wake up a coroutine?
->>> Hmm, these nbd_negotiate_* functions was introduced in 1a6245a5b, when
->>> nbd_wr_syncv was working through qemu_co_sendv_recvv, which just yields,
->>> without setting any handlers. But now, nbd_wr_syncv works through
->>> qio_channel_yield() which sets handlers, so the code with extra watchers
->>> looks wrong.
->> Yes, I think you're right about that.
-> 
-> Ok, I'll make a patch for it and finish LOG->errp conversion.
-> 
->>
->> Paolo
-> 
-> 
+Status in QEMU:
+  Incomplete
+
+Bug description:
+  When using indpendent transport and backend in this case virtio-net-
+  device transport, none of the acceleration features are set after
+  guest probes the transport the backend is plugged into. For virtio-net
+  this leads to low throughput/performance.  This holds true for
+  virtio-mmio, PCI transports and most likely for others as well (CCW,
+  S390) and other backends
+
+  Command to run:
+  ./qemu-system-arm -enable-kvm -smp 2 -kernel zImage -dtb ./guest-a15.dtb =
+-m 512 -M vexpress-a15 -cpu cortex-a15 -nographic \
+        -append "root=3D/dev/vda rw console=3DttyAMA0 rootwait" -drive if=
+=3Dnone,file=3D/mnt/gauss.root,id=3Dvm1 \
+        -device virtio-blk-device,drive=3Dvm1 -netdev type=3Dtap,id=3Dnet0,=
+ifname=3Dtap0 \
+        -device virtio-net-device,netdev=3Dnet0,mac=3D"52:54:00:12:34:58"
+
+  For x86 same virtio command for network.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1286253/+subscriptions
