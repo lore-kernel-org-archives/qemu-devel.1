@@ -1,17 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42264)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42888)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sundeep.lkml@gmail.com>) id 1dAeZZ-0002ch-AT
-	for qemu-devel@nongnu.org; Tue, 16 May 2017 11:39:42 -0400
+	(envelope-from <no-reply@patchew.org>) id 1dAebW-0004PQ-0Q
+	for qemu-devel@nongnu.org; Tue, 16 May 2017 11:41:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sundeep.lkml@gmail.com>) id 1dAeZW-0001bu-5Y
-	for qemu-devel@nongnu.org; Tue, 16 May 2017 11:39:41 -0400
-From: Subbaraya Sundeep <sundeep.lkml@gmail.com>
-Date: Tue, 16 May 2017 21:08:53 +0530
-Message-Id: <1494949133-2202-6-git-send-email-sundeep.lkml@gmail.com>
-In-Reply-To: <1494949133-2202-1-git-send-email-sundeep.lkml@gmail.com>
-References: <1494949133-2202-1-git-send-email-sundeep.lkml@gmail.com>
-Subject: [Qemu-devel] [Qemu devel v5 PATCH 5/5] msf2: Add Emcraft's
- Smartfusion2 SOM kit.
+	(envelope-from <no-reply@patchew.org>) id 1dAebS-0002iN-2G
+	for qemu-devel@nongnu.org; Tue, 16 May 2017 11:41:42 -0400
+Resent-Message-Id: <E1dAebS-0002iN-2G@eggs.gnu.org>
+Received: from sender-of-o52.zoho.com ([135.84.80.217]:21353)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1dAebR-0002hZ-PN
+	for qemu-devel@nongnu.org; Tue, 16 May 2017 11:41:37 -0400
+In-Reply-To: <1494947277-26158-1-git-send-email-thuth@redhat.com>
+Message-ID: <149494925235.540.4484199488163613007@c05f1edc8ed1>
+Reply-To: <qemu-devel@nongnu.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Tue, 16 May 2017 08:40:52 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PATCH] Add a blog post with links to the
+ presentations from the DevConf 2017
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,125 +29,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, qemu-arm@nongnu.org
-Cc: peter.maydell@linaro.org, crosthwaite.peter@gmail.com, alistair23@gmail.com, f4bug@amsat.org, Subbaraya Sundeep <sundeep.lkml@gmail.com>
+To: thuth@redhat.com
+Cc: famz@redhat.com, qemu-devel@nongnu.org, pbonzini@redhat.com
 
-Emulated Emcraft's Smartfusion2 System On Module starter
-kit.
-
-Signed-off-by: Subbaraya Sundeep <sundeep.lkml@gmail.com>
----
- hw/arm/Makefile.objs |  1 +
- hw/arm/msf2-som.c    | 89 ++++++++++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 90 insertions(+)
- create mode 100644 hw/arm/msf2-som.c
-
-diff --git a/hw/arm/Makefile.objs b/hw/arm/Makefile.objs
-index c828061..4b02093 100644
---- a/hw/arm/Makefile.objs
-+++ b/hw/arm/Makefile.objs
-@@ -5,6 +5,7 @@ obj-y += omap_sx1.o palm.o realview.o spitz.o stellaris.o
- obj-y += tosa.o versatilepb.o vexpress.o virt.o xilinx_zynq.o z2.o
- obj-$(CONFIG_ACPI) += virt-acpi-build.o
- obj-y += netduino2.o
-+obj-y += msf2-som.o
- obj-y += sysbus-fdt.o
- 
- obj-y += armv7m.o exynos4210.o pxa2xx.o pxa2xx_gpio.o pxa2xx_pic.o
-diff --git a/hw/arm/msf2-som.c b/hw/arm/msf2-som.c
-new file mode 100644
-index 0000000..cd2b759
---- /dev/null
-+++ b/hw/arm/msf2-som.c
-@@ -0,0 +1,89 @@
-+/*
-+ * SmartFusion2 SOM starter kit(from Emcraft) emulation.
-+ *
-+ * Copyright (c) 2017 Subbaraya Sundeep <sundeep.lkml@gmail.com>
-+ *
-+ * Permission is hereby granted, free of charge, to any person obtaining a copy
-+ * of this software and associated documentation files (the "Software"), to deal
-+ * in the Software without restriction, including without limitation the rights
-+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-+ * copies of the Software, and to permit persons to whom the Software is
-+ * furnished to do so, subject to the following conditions:
-+ *
-+ * The above copyright notice and this permission notice shall be included in
-+ * all copies or substantial portions of the Software.
-+ *
-+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
-+ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-+ * THE SOFTWARE.
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "qapi/error.h"
-+#include "hw/boards.h"
-+#include "hw/arm/msf2-soc.h"
-+#include "hw/arm/arm.h"
-+#include "exec/address-spaces.h"
-+
-+#define DDR_BASE_ADDRESS      0xA0000000
-+#define DDR_SIZE              (64 * M_BYTE)
-+
-+static void emcraft_sf2_init(MachineState *machine)
-+{
-+    DeviceState *dev;
-+    DeviceState *spi_flash;
-+    MSF2State *soc;
-+    DriveInfo *dinfo = drive_get_next(IF_MTD);
-+    qemu_irq cs_line;
-+    SSIBus *spi_bus;
-+    MemoryRegion *sysmem = get_system_memory();
-+    MemoryRegion *ddr = g_new(MemoryRegion, 1);
-+
-+    memory_region_init_ram(ddr, NULL, "ddr-ram", DDR_SIZE,
-+                           &error_fatal);
-+    vmstate_register_ram_global(ddr);
-+    memory_region_add_subregion(sysmem, DDR_BASE_ADDRESS, ddr);
-+
-+    dev = qdev_create(NULL, TYPE_MSF2_SOC);
-+    qdev_prop_set_string(dev, "part-name", "M2S010");
-+    qdev_prop_set_uint64(dev, "eNVM-size", M2S010_ENVM_SIZE);
-+    qdev_prop_set_uint64(dev, "eSRAM-size", M2S010_ESRAM_SIZE);
-+
-+    /*
-+     * pclk0 and pclk1 are configurable in Libero.
-+     * Emcraft's SoM kit comes with these settings by default.
-+     */
-+    qdev_prop_set_uint32(dev, "pclk0", 71 * 1000000);
-+    qdev_prop_set_uint32(dev, "pclk1", 71 * 1000000);
-+
-+    object_property_set_bool(OBJECT(dev), true, "realized", &error_fatal);
-+
-+    soc = MSF2_SOC(dev);
-+
-+    /* Attach SPI flash to SPI0 controller */
-+    spi_bus = (SSIBus *)qdev_get_child_bus(dev, "spi0");
-+    spi_flash = ssi_create_slave_no_init(spi_bus, "s25sl12801");
-+    qdev_prop_set_uint8(spi_flash, "spansion-cr2nv", 1);
-+    if (dinfo) {
-+        qdev_prop_set_drive(spi_flash, "drive", blk_by_legacy_dinfo(dinfo),
-+                                    &error_fatal);
-+    }
-+    qdev_init_nofail(spi_flash);
-+    cs_line = qdev_get_gpio_in_named(spi_flash, SSI_GPIO_CS, 0);
-+    sysbus_connect_irq(SYS_BUS_DEVICE(&soc->spi[0]), 1, cs_line);
-+
-+    armv7m_load_kernel(ARM_CPU(first_cpu), machine->kernel_filename,
-+                       soc->envm_size);
-+}
-+
-+static void emcraft_sf2_machine_init(MachineClass *mc)
-+{
-+    mc->desc = "SmartFusion2 SOM kit from Emcraft";
-+    mc->init = emcraft_sf2_init;
-+}
-+
-+DEFINE_MACHINE("smartfusion2-som", emcraft_sf2_machine_init)
--- 
-2.5.0
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKTWVzc2FnZS1pZDogMTQ5
+NDk0NzI3Ny0yNjE1OC0xLWdpdC1zZW5kLWVtYWlsLXRodXRoQHJlZGhhdC5jb20KVHlwZTogc2Vy
+aWVzClN1YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0hdIEFkZCBhIGJsb2cgcG9zdCB3aXRoIGxp
+bmtzIHRvIHRoZSBwcmVzZW50YXRpb25zIGZyb20gdGhlIERldkNvbmYgMjAxNwoKPT09IFRFU1Qg
+U0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaAoKQkFTRT1iYXNlCm49MQp0b3RhbD0kKGdpdCBs
+b2cgLS1vbmVsaW5lICRCQVNFLi4gfCB3YyAtbCkKZmFpbGVkPTAKCmdpdCBjb25maWcgLS1sb2Nh
+bCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVl
+Cgpjb21taXRzPSIkKGdpdCBsb2cgLS1mb3JtYXQ9JUggLS1yZXZlcnNlICRCQVNFLi4pIgpmb3Ig
+YyBpbiAkY29tbWl0czsgZG8KICAgIGVjaG8gIkNoZWNraW5nIFBBVENIICRuLyR0b3RhbDogJChn
+aXQgbG9nIC1uIDEgLS1mb3JtYXQ9JXMgJGMpLi4uIgogICAgaWYgISBnaXQgc2hvdyAkYyAtLWZv
+cm1hdD1lbWFpbCB8IC4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgLTsgdGhlbgog
+ICAgICAgIGZhaWxlZD0xCiAgICAgICAgZWNobwogICAgZmkKICAgIG49JCgobisxKSkKZG9uZQoK
+ZXhpdCAkZmFpbGVkCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMy
+MWZmODc4MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0CkZyb20gaHR0cHM6Ly9naXRodWIuY29tL3Bh
+dGNoZXctcHJvamVjdC9xZW11CiAtIFt0YWcgdXBkYXRlXSAgICAgIHBhdGNoZXcvMjAxNzA1MTEx
+NDQyMDguMjQwNzUtMS1wYm9uemluaUByZWRoYXQuY29tIC0+IHBhdGNoZXcvMjAxNzA1MTExNDQy
+MDguMjQwNzUtMS1wYm9uemluaUByZWRoYXQuY29tClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAn
+dGVzdCcKMGFhNmM1YiBBZGQgYSBibG9nIHBvc3Qgd2l0aCBsaW5rcyB0byB0aGUgcHJlc2VudGF0
+aW9ucyBmcm9tIHRoZSBEZXZDb25mIDIwMTcKCj09PSBPVVRQVVQgQkVHSU4gPT09CkNoZWNraW5n
+IFBBVENIIDEvMTogQWRkIGEgYmxvZyBwb3N0IHdpdGggbGlua3MgdG8gdGhlIHByZXNlbnRhdGlv
+bnMgZnJvbSB0aGUgRGV2Q29uZiAyMDE3Li4uCkVSUk9SOiB0cmFpbGluZyB3aGl0ZXNwYWNlCiM0
+MTogRklMRTogX3Bvc3RzLzIwMTctMDUtMTYtZGV2Y29uZi1wcmVzZW50YXRpb25zLm1kOjIzOgor
+ICBieSBSYWRpbSBLcsSNbcOhxZkgJAoKdG90YWw6IDEgZXJyb3JzLCAwIHdhcm5pbmdzLCA0NyBs
+aW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmll
+dy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhl
+bSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgo9PT0g
+T1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoKLS0tCkVt
+YWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHA6Ly9wYXRjaGV3Lm9y
+Zy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAZnJlZWxpc3Rz
+Lm9yZw==
