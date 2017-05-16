@@ -1,34 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42189)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42196)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dAeZV-0002Y1-2N
-	for qemu-devel@nongnu.org; Tue, 16 May 2017 11:39:38 -0400
+	(envelope-from <sundeep.lkml@gmail.com>) id 1dAeZV-0002Yc-HT
+	for qemu-devel@nongnu.org; Tue, 16 May 2017 11:39:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dAeZT-0001Zq-If
+	(envelope-from <sundeep.lkml@gmail.com>) id 1dAeZT-0001Zg-Gj
 	for qemu-devel@nongnu.org; Tue, 16 May 2017 11:39:37 -0400
-Received: from indium.canonical.com ([91.189.90.7]:48884)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1dAeZT-0001ZC-Cj
-	for qemu-devel@nongnu.org; Tue, 16 May 2017 11:39:35 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1dAeZR-000220-6p
-	for <qemu-devel@nongnu.org>; Tue, 16 May 2017 15:39:33 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id E39272E80C4
-	for <qemu-devel@nongnu.org>; Tue, 16 May 2017 15:39:32 +0000 (UTC)
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 16 May 2017 15:28:10 -0000
-From: Launchpad Bug Tracker <1581936@bugs.launchpad.net>
-Reply-To: Bug 1581936 <1581936@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20160515095432.8440.97382.malonedeb@soybean.canonical.com>
-Message-Id: <20170516152815.17060.68912.malone@ackee.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1581936] Re: Frozen Windows 7 VMs with VGA
- CVE-2016-3712 fix (2.6.0 and 2.5.1.1)
+From: Subbaraya Sundeep <sundeep.lkml@gmail.com>
+Date: Tue, 16 May 2017 21:08:52 +0530
+Message-Id: <1494949133-2202-5-git-send-email-sundeep.lkml@gmail.com>
+In-Reply-To: <1494949133-2202-1-git-send-email-sundeep.lkml@gmail.com>
+References: <1494949133-2202-1-git-send-email-sundeep.lkml@gmail.com>
+Subject: [Qemu-devel] [Qemu devel v5 PATCH 4/5] msf2: Add Smartfusion2 SoC.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,159 +19,322 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org, qemu-arm@nongnu.org
+Cc: peter.maydell@linaro.org, crosthwaite.peter@gmail.com, alistair23@gmail.com, f4bug@amsat.org, Subbaraya Sundeep <sundeep.lkml@gmail.com>
 
-This bug was fixed in the package qemu - 1:2.5+dfsg-5ubuntu10.14
+Smartfusion2 SoC has hardened Microcontroller subsystem
+and flash based FPGA fabric. This patch adds support for
+Microcontroller subsystem in the SoC.
 
----------------
-qemu (1:2.5+dfsg-5ubuntu10.14) xenial-security; urgency=3Dmedium
+Signed-off-by: Subbaraya Sundeep <sundeep.lkml@gmail.com>
+---
+ default-configs/arm-softmmu.mak |   1 +
+ hw/arm/Makefile.objs            |   1 +
+ hw/arm/msf2-soc.c               | 201 ++++++++++++++++++++++++++++++++++++++++
+ include/hw/arm/msf2-soc.h       |  69 ++++++++++++++
+ 4 files changed, 272 insertions(+)
+ create mode 100644 hw/arm/msf2-soc.c
+ create mode 100644 include/hw/arm/msf2-soc.h
 
-  * SECURITY UPDATE: denial of service via leak in virtFS
-    - debian/patches/CVE-2017-7377.patch: fix file descriptor leak in
-      hw/9pfs/virtio-9p.c.
-    - CVE-2017-7377
-  * SECURITY UPDATE: denial of service in cirrus_vga
-    - debian/patches/CVE-2017-7718.patch: check parameters in
-      hw/display/cirrus_vga_rop.h.
-    - CVE-2017-7718
-  * SECURITY UPDATE: code execution via cirrus_vga OOB r/w
-    - debian/patches/CVE-2017-7980-1.patch: handle negative pitch in
-      hw/display/cirrus_vga.c.
-    - debian/patches/CVE-2017-7980-2.patch: allow zero source pitch in
-      hw/display/cirrus_vga.c.
-    - debian/patches/CVE-2017-7980-3.patch: fix blit address mask handling
-      in hw/display/cirrus_vga.c.
-    - debian/patches/CVE-2017-7980-4.patch: fix patterncopy checks in
-      hw/display/cirrus_vga.c.
-    - debian/patches/CVE-2017-7980-5.patch: revert allow zero source pitch
-      in hw/display/cirrus_vga.c.
-    - debian/patches/CVE-2017-7980-6.patch: stop passing around dst
-      pointers in hw/display/cirrus_vga.c, hw/display/cirrus_vga_rop.h,
-      hw/display/cirrus_vga_rop2.h.
-    - debian/patches/CVE-2017-7980-7.patch: stop passing around src
-      pointers in hw/display/cirrus_vga.c, hw/display/cirrus_vga_rop.h,
-      hw/display/cirrus_vga_rop2.h.
-    - debian/patches/CVE-2017-7980-8.patch: fix off-by-one in
-      hw/display/cirrus_vga_rop.h.
-    - debian/patches/CVE-2017-7980-9.patch: fix cirrus_invalidate_region in
-      hw/display/cirrus_vga.c.
-    - CVE-2017-7980
-  * SECURITY UPDATE: denial of service via memory leak in virtFS
-    - debian/patches/CVE-2017-8086.patch: fix leak in
-      hw/9pfs/virtio-9p-xattr.c.
-    - CVE-2017-8086
-  * SECURITY UPDATE: denial of service via leak in audio
-    - debian/patches/CVE-2017-8309.patch: release capture buffers in
-      audio/audio.c.
-    - CVE-2017-8309
-  * SECURITY UPDATE: denial of service via leak in keyboard
-    - debian/patches/CVE-2017-8379-1.patch: limit kbd queue depth in
-      ui/input.c.
-    - debian/patches/CVE-2017-8379-2.patch: don't queue delay if paused in
-      ui/input.c.
-    - CVE-2017-8379
-  * SECURITY REGRESSION: Windows 7 VGA compatibility issue (LP: #1581936)
-    - debian/patches/lp1581936.patch: add sr_vbe register set to
-      hw/display/vga.c, hw/display/vga_int.h.
-
- -- Marc Deslauriers <marc.deslauriers@ubuntu.com>  Wed, 10 May 2017
-10:09:29 -0400
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1581936
-
-Title:
-  Frozen Windows 7 VMs with VGA CVE-2016-3712 fix (2.6.0 and 2.5.1.1)
-
-Status in QEMU:
-  Fix Released
-Status in qemu package in Ubuntu:
-  Fix Released
-Status in qemu source package in Trusty:
-  Fix Released
-Status in qemu source package in Xenial:
-  Fix Released
-
-Bug description:
-  Hi,
-
-  As already posted on the QEMU devel list [1] I stumbled upon a problem
-  with QEMU in version 2.5.1.1 and 2.6.0.
-
-  the VM shows Windows loading
-  files for the installation, then the "Starting Windows" screen appears
-  here it hangs and never continues.
-
-  Changing the "-vga" option to cirrus solves this, the installation can
-  proceed and finish. When changing back to std (or also qxl, vmware) the
-  installed VM also hangs on the "Starting Windows" screen while qemu
-  showing a little but no excessive load.
-
-  This phenomena appears also with QEMU 2.6.0 but not with 2.6.0-rc4, a
-  git bisect shows fd3c136b3e1482cd0ec7285d6bc2a3e6a62c38d7 (vga: make
-  sure vga register setup for vbe stays intact (CVE-2016-3712)) as the
-  culprit for this regression, as its a fix for a DoS its not an option to
-  just revert it, I guess.
-
-  The bisect log is:
-
-  git bisect start
-  # bad: [bfc766d38e1fae5767d43845c15c79ac8fa6d6af] Update version for v2.6=
-.0 release
-  git bisect bad bfc766d38e1fae5767d43845c15c79ac8fa6d6af
-  # good: [975eb6a547f809608ccb08c221552f666611af25] Update version for v2.=
-6.0-rc4 release
-  git bisect good 975eb6a547f809608ccb08c221552f666611af25
-  # good: [2068192dcccd8a80dddfcc8df6164cf9c26e0fc4] vga: update vga regist=
-er setup on vbe changes
-  git bisect good 2068192dcccd8a80dddfcc8df6164cf9c26e0fc4
-  # bad: [53db932604dfa7bb9241d132e0173894cf54261c] Merge remote-tracking b=
-ranch 'remotes/kraxel/tags/pull-vga-20160509-1' into staging
-  git bisect bad 53db932604dfa7bb9241d132e0173894cf54261c
-  # bad: [fd3c136b3e1482cd0ec7285d6bc2a3e6a62c38d7] vga: make sure vga regi=
-ster setup for vbe stays intact (CVE-2016-3712).
-  git bisect bad fd3c136b3e1482cd0ec7285d6bc2a3e6a62c38d7
-  # first bad commit: [fd3c136b3e1482cd0ec7285d6bc2a3e6a62c38d7] vga: make =
-sure vga register setup for vbe stays intact (CVE-2016-3712).
-
-  =
-
-  I could reproduce that with QEMU 2.5.1 and QEMU 2.6 on a Debian derivate
-  (Promox VE) with 4.4 Kernel and also with QEMU 2.6 on an Arch Linux
-  System with a 4.5 Kernel, so it should not be host distro depended. Both
-  machines have Intel x86_64 processors.
-  The problem should be reproducible with said Versions or a build from
-  git including the above mentioned commit (fd3c136) by starting a VM with
-  an Windows 7 ISO, e.g.:
-
-  Freezing installation (as vga defaults to std I marked it as optional):
-  ./x86_64-softmmu/qemu-system-x86_64 -boot d -cdrom win7.iso -m 1024 [-vga=
- (std|qxl|vmware)]
-
-  Working installation:
-  ./x86_64-softmmu/qemu-system-x86_64 -boot d -cdrom win7.iso -m 1024 -vga =
-cirrus
-
-  If someone has already an installed Windows 7 VM this behaviour should be
-  also observable when trying to start it with the new versions of QEMU.
-
-  Noteworthy may be that Windows 10 is working, I do not had time to get
-  other Windows versions and test them, I'll do that as soon as possible.
-  Various Linux system also seems do work fine, at least I did not ran
-  into an issue there yet.
-
-  I also tried testing with SeaBIOS and OVMF as firmware, as initially I
-  had no idea what broke, both lead to the same result - without the =
-
-  CVE-2016-3712 fix they both work, with not.
-  Further, KVM enabled and disabled does not make any difference.
-
-  =
-
-  [1] http://lists.nongnu.org/archive/html/qemu-devel/2016-05/msg02416.html
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1581936/+subscriptions
+diff --git a/default-configs/arm-softmmu.mak b/default-configs/arm-softmmu.mak
+index 78d7af0..7062512 100644
+--- a/default-configs/arm-softmmu.mak
++++ b/default-configs/arm-softmmu.mak
+@@ -122,3 +122,4 @@ CONFIG_ACPI=y
+ CONFIG_SMBIOS=y
+ CONFIG_ASPEED_SOC=y
+ CONFIG_GPIO_KEY=y
++CONFIG_MSF2=y
+diff --git a/hw/arm/Makefile.objs b/hw/arm/Makefile.objs
+index 4c5c4ee..c828061 100644
+--- a/hw/arm/Makefile.objs
++++ b/hw/arm/Makefile.objs
+@@ -18,3 +18,4 @@ obj-$(CONFIG_FSL_IMX25) += fsl-imx25.o imx25_pdk.o
+ obj-$(CONFIG_FSL_IMX31) += fsl-imx31.o kzm.o
+ obj-$(CONFIG_FSL_IMX6) += fsl-imx6.o sabrelite.o
+ obj-$(CONFIG_ASPEED_SOC) += aspeed_soc.o aspeed.o
++obj-$(CONFIG_MSF2) += msf2-soc.o
+diff --git a/hw/arm/msf2-soc.c b/hw/arm/msf2-soc.c
+new file mode 100644
+index 0000000..329e30c
+--- /dev/null
++++ b/hw/arm/msf2-soc.c
+@@ -0,0 +1,201 @@
++/*
++ * SmartFusion2 SoC emulation.
++ *
++ * Copyright (c) 2017 Subbaraya Sundeep <sundeep.lkml@gmail.com>
++ *
++ * Permission is hereby granted, free of charge, to any person obtaining a copy
++ * of this software and associated documentation files (the "Software"), to deal
++ * in the Software without restriction, including without limitation the rights
++ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
++ * copies of the Software, and to permit persons to whom the Software is
++ * furnished to do so, subject to the following conditions:
++ *
++ * The above copyright notice and this permission notice shall be included in
++ * all copies or substantial portions of the Software.
++ *
++ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
++ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
++ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
++ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
++ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
++ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
++ * THE SOFTWARE.
++ */
++
++#include "qemu/osdep.h"
++#include "qapi/error.h"
++#include "qemu-common.h"
++#include "hw/arm/arm.h"
++#include "exec/address-spaces.h"
++#include "hw/char/serial.h"
++#include "hw/boards.h"
++#include "sysemu/block-backend.h"
++#include "hw/arm/msf2-soc.h"
++
++#define MSF2_TIMER_BASE     0x40004000
++#define MSF2_SYSREG_BASE    0x40038000
++
++#define MSF2_TIMER_IRQ0     14
++#define MSF2_TIMER_IRQ1     15
++
++static const uint32_t spi_addr[MSF2_NUM_SPIS] = { 0x40001000 , 0x40011000 };
++static const uint32_t uart_addr[MSF2_NUM_UARTS] = { 0x40000000 , 0x40010000 };
++
++static const int spi_irq[MSF2_NUM_SPIS] = { 2, 3 };
++static const int uart_irq[MSF2_NUM_UARTS] = { 10, 11 };
++
++static void m2sxxx_soc_initfn(Object *obj)
++{
++    MSF2State *s = MSF2_SOC(obj);
++    int i;
++
++    object_initialize(&s->armv7m, sizeof(s->armv7m), TYPE_ARMV7M);
++    qdev_set_parent_bus(DEVICE(&s->armv7m), sysbus_get_default());
++
++    object_initialize(&s->sysreg, sizeof(s->sysreg), TYPE_MSF2_SYSREG);
++    qdev_set_parent_bus(DEVICE(&s->sysreg), sysbus_get_default());
++
++    object_initialize(&s->timer, sizeof(s->timer), TYPE_MSS_TIMER);
++    qdev_set_parent_bus(DEVICE(&s->timer), sysbus_get_default());
++
++    for (i = 0; i < MSF2_NUM_SPIS; i++) {
++        object_initialize(&s->spi[i], sizeof(s->spi[i]),
++                          TYPE_MSS_SPI);
++        qdev_set_parent_bus(DEVICE(&s->spi[i]), sysbus_get_default());
++    }
++}
++
++static void m2sxxx_soc_realize(DeviceState *dev_soc, Error **errp)
++{
++    MSF2State *s = MSF2_SOC(dev_soc);
++    DeviceState *dev, *armv7m;
++    SysBusDevice *busdev;
++    Error *err = NULL;
++    int i;
++
++    MemoryRegion *system_memory = get_system_memory();
++    MemoryRegion *nvm = g_new(MemoryRegion, 1);
++    MemoryRegion *nvm_alias = g_new(MemoryRegion, 1);
++    MemoryRegion *sram = g_new(MemoryRegion, 1);
++
++    memory_region_init_ram(nvm, NULL, "MSF2.eNVM", s->envm_size,
++                           &error_fatal);
++
++    /*
++     * On power-on, the eNVM region 0x60000000 is automatically
++     * remapped to the Cortex-M3 processor executable region
++     * start address (0x0). We do not support remapping other eNVM,
++     * eSRAM and DDR regions by guest(via Sysreg) currently.
++     */
++    memory_region_init_alias(nvm_alias, NULL, "MSF2.eNVM.alias",
++                             nvm, 0, s->envm_size);
++    vmstate_register_ram_global(nvm);
++
++    memory_region_set_readonly(nvm, true);
++    memory_region_set_readonly(nvm_alias, true);
++
++    memory_region_add_subregion(system_memory, ENVM_BASE_ADDRESS, nvm);
++    memory_region_add_subregion(system_memory, 0, nvm_alias);
++
++    memory_region_init_ram(sram, NULL, "MSF2.eSRAM", s->esram_size,
++                           &error_fatal);
++    vmstate_register_ram_global(sram);
++    memory_region_add_subregion(system_memory, SRAM_BASE_ADDRESS, sram);
++
++    armv7m = DEVICE(&s->armv7m);
++    qdev_prop_set_uint32(armv7m, "num-irq", 81);
++    qdev_prop_set_string(armv7m, "cpu-model", "cortex-m3");
++    object_property_set_link(OBJECT(&s->armv7m), OBJECT(get_system_memory()),
++                                     "memory", &error_abort);
++    object_property_set_bool(OBJECT(&s->armv7m), true, "realized", &err);
++    if (err != NULL) {
++        error_propagate(errp, err);
++        return;
++    }
++
++    for (i = 0; i < MSF2_NUM_UARTS; i++) {
++        if (serial_hds[i]) {
++            serial_mm_init(get_system_memory(), uart_addr[i], 2,
++                           qdev_get_gpio_in(armv7m, uart_irq[i]),
++                           115200, serial_hds[i], DEVICE_NATIVE_ENDIAN);
++        }
++    }
++
++    dev = DEVICE(&s->timer);
++    /* pclk0 is the timer input clock */
++    qdev_prop_set_uint32(dev, "clock-frequency", s->pclk0);
++    object_property_set_bool(OBJECT(&s->timer), true, "realized", &err);
++    if (err != NULL) {
++        error_propagate(errp, err);
++        return;
++    }
++    busdev = SYS_BUS_DEVICE(dev);
++    sysbus_mmio_map(busdev, 0, MSF2_TIMER_BASE);
++    sysbus_connect_irq(busdev, 0,
++                           qdev_get_gpio_in(armv7m, MSF2_TIMER_IRQ0));
++    sysbus_connect_irq(busdev, 1,
++                           qdev_get_gpio_in(armv7m, MSF2_TIMER_IRQ1));
++
++    dev = DEVICE(&s->sysreg);
++    object_property_set_bool(OBJECT(&s->sysreg), true, "realized", &err);
++    if (err != NULL) {
++        error_propagate(errp, err);
++        return;
++    }
++    busdev = SYS_BUS_DEVICE(dev);
++    sysbus_mmio_map(busdev, 0, MSF2_SYSREG_BASE);
++
++    for (i = 0; i < MSF2_NUM_SPIS; i++) {
++        gchar *bus_name = g_strdup_printf("spi%d", i);
++
++        object_property_set_bool(OBJECT(&s->spi[i]), true, "realized", &err);
++        if (err != NULL) {
++            g_free(bus_name);
++            error_propagate(errp, err);
++            return;
++        }
++
++        sysbus_mmio_map(SYS_BUS_DEVICE(&s->spi[i]), 0, spi_addr[i]);
++        sysbus_connect_irq(SYS_BUS_DEVICE(&s->spi[i]), 0,
++                           qdev_get_gpio_in(armv7m, spi_irq[i]));
++
++        /* Alias controller SPI bus to the SoC itself */
++        object_property_add_alias(OBJECT(s), bus_name,
++                                  OBJECT(&s->spi[i]), "spi0",
++                                  &error_abort);
++        g_free(bus_name);
++    }
++}
++
++static Property m2sxxx_soc_properties[] = {
++    DEFINE_PROP_STRING("part-name", MSF2State, part_name),
++    DEFINE_PROP_UINT64("eNVM-size", MSF2State, envm_size, MSF2_ENVM_SIZE),
++    DEFINE_PROP_UINT64("eSRAM-size", MSF2State, esram_size, MSF2_ESRAM_SIZE),
++    /* Libero GUI shows 100Mhz as default for clocks */
++    DEFINE_PROP_UINT32("pclk0", MSF2State, pclk0, 100 * 1000000),
++    DEFINE_PROP_UINT32("pclk1", MSF2State, pclk1, 100 * 1000000),
++    DEFINE_PROP_END_OF_LIST(),
++};
++
++static void m2sxxx_soc_class_init(ObjectClass *klass, void *data)
++{
++    DeviceClass *dc = DEVICE_CLASS(klass);
++
++    dc->realize = m2sxxx_soc_realize;
++    dc->props = m2sxxx_soc_properties;
++}
++
++static const TypeInfo m2sxxx_soc_info = {
++    .name          = TYPE_MSF2_SOC,
++    .parent        = TYPE_SYS_BUS_DEVICE,
++    .instance_size = sizeof(MSF2State),
++    .instance_init = m2sxxx_soc_initfn,
++    .class_init    = m2sxxx_soc_class_init,
++};
++
++static void m2sxxx_soc_types(void)
++{
++    type_register_static(&m2sxxx_soc_info);
++}
++
++type_init(m2sxxx_soc_types)
+diff --git a/include/hw/arm/msf2-soc.h b/include/hw/arm/msf2-soc.h
+new file mode 100644
+index 0000000..67adddb
+--- /dev/null
++++ b/include/hw/arm/msf2-soc.h
+@@ -0,0 +1,69 @@
++/*
++ * Microsemi Smartfusion2 SoC
++ *
++ * Copyright (c) 2017 Subbaraya Sundeep <sundeep.lkml@gmail.com>
++ *
++ * Permission is hereby granted, free of charge, to any person obtaining a copy
++ * of this software and associated documentation files (the "Software"), to deal
++ * in the Software without restriction, including without limitation the rights
++ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
++ * copies of the Software, and to permit persons to whom the Software is
++ * furnished to do so, subject to the following conditions:
++ *
++ * The above copyright notice and this permission notice shall be included in
++ * all copies or substantial portions of the Software.
++ *
++ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
++ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
++ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
++ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
++ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
++ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
++ * THE SOFTWARE.
++ */
++
++#ifndef HW_ARM_MSF2_SOC_H
++#define HW_ARM_MSF2_SOC_H
++
++#include "hw/misc/msf2-sysreg.h"
++#include "hw/timer/mss-timer.h"
++#include "hw/ssi/mss-spi.h"
++#include "hw/arm/armv7m.h"
++#include "qemu/cutils.h"
++
++#define TYPE_MSF2_SOC     "msf2-soc"
++#define MSF2_SOC(obj)     OBJECT_CHECK(MSF2State, (obj), TYPE_MSF2_SOC)
++
++#define MSF2_NUM_SPIS         2
++#define MSF2_NUM_UARTS        2
++
++#define ENVM_BASE_ADDRESS     0x60000000
++
++#define SRAM_BASE_ADDRESS     0x20000000
++
++#define MSF2_ENVM_SIZE        (512 * K_BYTE)
++#define MSF2_ESRAM_SIZE       (64 * K_BYTE)
++
++#define M2S010_ENVM_SIZE      (256 * K_BYTE)
++#define M2S010_ESRAM_SIZE     (64 * K_BYTE)
++
++typedef struct MSF2State {
++    /*< private >*/
++    SysBusDevice parent_obj;
++    /*< public >*/
++
++    ARMv7MState armv7m;
++
++    char *part_name;
++    uint64_t envm_size;
++    uint64_t esram_size;
++
++    uint32_t pclk0;
++    uint32_t pclk1;
++
++    MSF2SysregState sysreg;
++    MSSTimerState timer;
++    MSSSpiState spi[MSF2_NUM_SPIS];
++} MSF2State;
++
++#endif
+-- 
+2.5.0
