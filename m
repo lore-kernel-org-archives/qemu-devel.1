@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60304)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34598)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1dAXtd-00018O-LG
-	for qemu-devel@nongnu.org; Tue, 16 May 2017 04:31:58 -0400
+	(envelope-from <armbru@redhat.com>) id 1dAY24-0003QT-Ji
+	for qemu-devel@nongnu.org; Tue, 16 May 2017 04:40:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1dAXta-0004XC-HV
-	for qemu-devel@nongnu.org; Tue, 16 May 2017 04:31:57 -0400
-Received: from [59.151.112.132] (port=57149 helo=heian.cn.fujitsu.com)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1dAXtZ-0004T6-9m
-	for qemu-devel@nongnu.org; Tue, 16 May 2017 04:31:54 -0400
-References: <20170512083556.22539-1-maozy.fnst@cn.fujitsu.com>
-	<2ac2c29a-f6b0-401a-2355-357c490ef14b@redhat.com>
-From: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
-Message-ID: <280028ee-1449-ea0e-19cc-e96608c6ee08@cn.fujitsu.com>
-Date: Tue, 16 May 2017 16:31:19 +0800
+	(envelope-from <armbru@redhat.com>) id 1dAY21-0000UF-6V
+	for qemu-devel@nongnu.org; Tue, 16 May 2017 04:40:40 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:57700)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dAY20-0000Tw-Tw
+	for qemu-devel@nongnu.org; Tue, 16 May 2017 04:40:37 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <20170515214114.15442-1-eblake@redhat.com>
+	<20170515214114.15442-3-eblake@redhat.com>
+Date: Tue, 16 May 2017 10:40:04 +0200
+In-Reply-To: <20170515214114.15442-3-eblake@redhat.com> (Eric Blake's message
+	of "Mon, 15 May 2017 16:41:11 -0500")
+Message-ID: <877f1hgpp7.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <2ac2c29a-f6b0-401a-2355-357c490ef14b@redhat.com>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH] hw/net/rocker/rocker: Convert pci device
- .init() to .realize()
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v9 2/5] shutdown: Prepare for use of an
+ enum in reset/shutdown_request
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,159 +28,97 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jason Wang <jasowang@redhat.com>, qemu-devel@nongnu.org
-Cc: jiri@resnulli.us
+To: Eric Blake <eblake@redhat.com>
+Cc: qemu-devel@nongnu.org, Stefano Stabellini <sstabellini@kernel.org>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Juan Quintela <quintela@redhat.com>, alistair.francis@xilinx.com, zhanghailiang <zhang.zhanghailiang@huawei.com>, "open list:X86" <xen-devel@lists.xenproject.org>, Anthony Perard <anthony.perard@citrix.com>, Paolo Bonzini <pbonzini@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-Hi, Jason
+Eric Blake <eblake@redhat.com> writes:
 
-
-On 05/16/2017 02:45 PM, Jason Wang wrote:
+> We want to track why a guest was shutdown; in particular, being able
+> to tell the difference between a guest request (such as ACPI request)
+> and host request (such as SIGINT) will prove useful to libvirt.
+> Since all requests eventually end up changing shutdown_requested in
+> vl.c, the logical change is to make that value track the reason,
+> rather than its current 0/1 contents.
 >
+> Since command-line options control whether a reset request is turned
+> into a shutdown request instead, the same treatment is given to
+> reset_requested.
 >
-> On 2017年05月12日 16:35, Mao Zhongyi wrote:
->> Convert pci device .init() to .realize(). Also improve -device rocker
->> error reporting. Because when -device rocker fails, it first reports
->> a specific error, then a generic one, like this:
->>
->>      $ x86_64-softmmu/qemu-system-x86_64 -device rocker,name=qemu-rocker
->>      rocker: name too long; please shorten to at most 9 chars
->>      qemu-system-x86_64: -device rocker,name=qemu-rocker: Device
->> initialization failed
->>
->> Convert pci_rocker_init() to Error to get rid of the unwanted second
->> error message.
->>
->> Cc: jiri@resnulli.us
->> Cc: jasowang@redhat.com
->> Signed-off-by: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
->> ---
->>   hw/net/rocker/rocker.c | 31 +++++++++++++------------------
->>   1 file changed, 13 insertions(+), 18 deletions(-)
->>
->> diff --git a/hw/net/rocker/rocker.c b/hw/net/rocker/rocker.c
->> index 6e70fdd..2cebc31 100644
->> --- a/hw/net/rocker/rocker.c
->> +++ b/hw/net/rocker/rocker.c
->> @@ -1252,20 +1252,18 @@ rollback:
->>       return err;
->>   }
->>   -static int rocker_msix_init(Rocker *r)
->> +static int rocker_msix_init(Rocker *r, Error **errp)
->>   {
->>       PCIDevice *dev = PCI_DEVICE(r);
->>       int err;
->> -    Error *local_err = NULL;
->>         err = msix_init(dev, ROCKER_MSIX_VEC_COUNT(r->fp_ports),
->>                       &r->msix_bar,
->>                       ROCKER_PCI_MSIX_BAR_IDX,
->> ROCKER_PCI_MSIX_TABLE_OFFSET,
->>                       &r->msix_bar,
->>                       ROCKER_PCI_MSIX_BAR_IDX,
->> ROCKER_PCI_MSIX_PBA_OFFSET,
->> -                    0, &local_err);
->> +                    0, errp);
->>       if (err) {
->> -        error_report_err(local_err);
->>           return err;
->>       }
->>   @@ -1301,7 +1299,7 @@ static World *rocker_world_type_by_name(Rocker
->> *r, const char *name)
->>       return NULL;
->>   }
->>   -static int pci_rocker_init(PCIDevice *dev)
->> +static void pci_rocker_realize(PCIDevice *dev, Error **errp)
->>   {
->>       Rocker *r = to_rocker(dev);
->>       const MACAddr zero = { .a = { 0, 0, 0, 0, 0, 0 } };
->> @@ -1315,7 +1313,7 @@ static int pci_rocker_init(PCIDevice *dev)
->>         for (i = 0; i < ROCKER_WORLD_TYPE_MAX; i++) {
->>           if (!r->worlds[i]) {
->> -            err = -ENOMEM;
->> +            error_setg(errp, "allocate worlds failed");
->>               goto err_world_alloc;
->>           }
->>       }
->> @@ -1326,10 +1324,9 @@ static int pci_rocker_init(PCIDevice *dev)
->>         r->world_dflt = rocker_world_type_by_name(r, r->world_name);
->>       if (!r->world_dflt) {
->> -        fprintf(stderr,
->> -                "rocker: requested world \"%s\" does not exist\n",
->> +        error_setg(errp,
->> +                "rocker: invalid argument, requested world %s does
->> not exist",
->>                   r->world_name);
->> -        err = -EINVAL;
->>           goto err_world_type_by_name;
->>       }
->>   @@ -1349,7 +1346,7 @@ static int pci_rocker_init(PCIDevice *dev)
->>         /* MSI-X init */
->>   -    err = rocker_msix_init(r);
->> +    err = rocker_msix_init(r, errp);
->>       if (err) {
->>           goto err_msix_init;
->>       }
->> @@ -1361,7 +1358,7 @@ static int pci_rocker_init(PCIDevice *dev)
->>       }
->>         if (rocker_find(r->name)) {
->> -        err = -EEXIST;
->> +        error_setg(errp, "rocker %s already exists", r->name);
->>           goto err_duplicate;
->>       }
->>   @@ -1375,10 +1372,10 @@ static int pci_rocker_init(PCIDevice *dev)
->>   #define ROCKER_IFNAMSIZ 16
->>   #define MAX_ROCKER_NAME_LEN  (ROCKER_IFNAMSIZ - 1 - 3 - 3)
->>       if (strlen(r->name) > MAX_ROCKER_NAME_LEN) {
->> -        fprintf(stderr,
->> -                "rocker: name too long; please shorten to at most %d
->> chars\n",
->> +        error_setg(errp,
->> +                "rocker: name too long; please shorten to at most %d
->> chars",
->>                   MAX_ROCKER_NAME_LEN);
->> -        return -EINVAL;
->> +        return;
->>       }
->>         if (memcmp(&r->fp_start_macaddr, &zero, sizeof(zero)) == 0) {
->> @@ -1410,7 +1407,6 @@ static int pci_rocker_init(PCIDevice *dev)
->>        * .....
->>        */
->>   -    err = -ENOMEM;
->>       for (i = 0; i < rocker_pci_ring_count(r); i++) {
->>           DescRing *ring = desc_ring_alloc(r, i);
+> This patch adds an internal enum ShutdownCause that describes reasons
+> that a shutdown can be requested, and changes qemu_system_reset() to
+> pass the reason through, although for now nothing is actually changed
+> with regards to what gets reported.  The enum could be exported via
+> QAPI at a later date, if deemed necessary, but for now, there has not
+> been a request to expose that much detail to end clients.
 >
-> Do you need to call error_setg() for the failure below too?
+> For the most part, we turn 0 into SHUTDOWN_CAUSE_NONE, and 1 into
+> SHUTDOWN_CAUSE_HOST_ERROR; the only specific case where we have enough
+> information right now to use a different value is when we are reacting
+> to a host signal.  It will take a further patch to edit all call-sites
+> that can trigger a reset or shutdown request to properly pass in any
+> other reasons; this patch includes TODOs to point such places out.
 >
-> Thanks
+> qemu_system_reset() trades its 'bool report' parameter for a
+> 'ShutdownCause reason', with all non-zero values having the same
+> effect; this lets us get rid of the weird #defines for VMRESET_*
+> as synonyms for bools.
 
-OK, I see. I will add suitable err msg to each err site in the v3.
-
-Thanks
-Mao
+This paragraph could perhaps be merged with the other one on
+qemu_system_reset(), but it's not worth a respin.
 
 >
->>   @@ -1447,7 +1443,7 @@ static int pci_rocker_init(PCIDevice *dev)
->>         QLIST_INSERT_HEAD(&rockers, r, next);
->>   -    return 0;
->> +    return;
->>     err_port_alloc:
->>       for (--i; i >= 0; i--) {
->> @@ -1473,7 +1469,6 @@ err_world_alloc:
->>               world_free(r->worlds[i]);
->>           }
->>       }
->> -    return err;
->>   }
->>     static void pci_rocker_uninit(PCIDevice *dev)
->> @@ -1558,7 +1553,7 @@ static void rocker_class_init(ObjectClass
->> *klass, void *data)
->>       DeviceClass *dc = DEVICE_CLASS(klass);
->>       PCIDeviceClass *k = PCI_DEVICE_CLASS(klass);
->>   -    k->init = pci_rocker_init;
->> +    k->realize = pci_rocker_realize;
->>       k->exit = pci_rocker_uninit;
->>       k->vendor_id = PCI_VENDOR_ID_REDHAT;
->>       k->device_id = PCI_DEVICE_ID_REDHAT_ROCKER;
+> Signed-off-by: Eric Blake <eblake@redhat.com>
 >
+> ---
+> v9: one more stray FIXME
+> v8: s/FIXME/TODO/, include SHUTDOWN_CAUSE__MAX now rather than later,
+> tweak comment on GUEST_SHUTDOWN to mention suspend
+> v7: drop 'bool report' from qemu_system_reset(), reorder enum to put
+> HOST_ERROR == 1, improve commit message
+> v6: make ShutdownCause internal-only, add SHUTDOWN_CAUSE_NONE so that
+> comparison to 0 still works, tweak initial FIXME values
+> v5: no change
+> v4: s/ShutdownType/ShutdownCause/, no thanks to mingw header pollution
+> v3: new patch
+> ---
+>  include/sysemu/sysemu.h | 23 ++++++++++++++++-----
+>  vl.c                    | 53 ++++++++++++++++++++++++++++++-------------------
+>  hw/i386/xen/xen-hvm.c   |  7 +++++--
+>  migration/colo.c        |  2 +-
+>  migration/savevm.c      |  2 +-
+>  5 files changed, 58 insertions(+), 29 deletions(-)
 >
+> diff --git a/include/sysemu/sysemu.h b/include/sysemu/sysemu.h
+> index 15656b7..52102fd 100644
+> --- a/include/sysemu/sysemu.h
+> +++ b/include/sysemu/sysemu.h
+> @@ -33,8 +33,21 @@ VMChangeStateEntry *qemu_add_vm_change_state_handler(VMChangeStateHandler *cb,
+>  void qemu_del_vm_change_state_handler(VMChangeStateEntry *e);
+>  void vm_state_notify(int running, RunState state);
 >
+> -#define VMRESET_SILENT   false
+> -#define VMRESET_REPORT   true
+> +/* Enumeration of various causes for shutdown. */
+> +typedef enum ShutdownCause {
+> +    SHUTDOWN_CAUSE_NONE,          /* No shutdown request pending */
+> +    SHUTDOWN_CAUSE_HOST_ERROR,    /* An error prevents further use of guest */
+> +    SHUTDOWN_CAUSE_HOST_QMP,      /* Reaction to a QMP command, like 'quit' */
+> +    SHUTDOWN_CAUSE_HOST_SIGNAL,   /* Reaction to a signal, such as SIGINT */
+> +    SHUTDOWN_CAUSE_HOST_UI,       /* Reaction to UI event, like window close */
+> +    SHUTDOWN_CAUSE_GUEST_SHUTDOWN,/* Guest shutdown/suspend request, via
+> +                                     ACPI or other hardware-specific means */
+> +    SHUTDOWN_CAUSE_GUEST_RESET,   /* Guest reset request, and command line
+> +                                     turns that into a shutdown */
+> +    SHUTDOWN_CAUSE_GUEST_PANIC,   /* Guest panicked, and command line turns
+> +                                     that into a shutdown */
+> +    SHUTDOWN_CAUSE__MAX,
+
+The __ is a bit odd for handwritten code, but it matches QAPI-generated
+code.  Okay.
+
+> +} ShutdownCause;
 >
+>  void vm_start(void);
+>  int vm_prepare_start(void);
+
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
