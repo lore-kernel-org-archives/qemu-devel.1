@@ -1,27 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39312)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39346)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <flypie1@yahoo.com>) id 1dAcwx-00075e-Ut
-	for qemu-devel@nongnu.org; Tue, 16 May 2017 09:55:45 -0400
+	(envelope-from <kraxel@redhat.com>) id 1dAcx9-0007DO-FF
+	for qemu-devel@nongnu.org; Tue, 16 May 2017 09:55:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <flypie1@yahoo.com>) id 1dAcwu-0004ZT-17
-	for qemu-devel@nongnu.org; Tue, 16 May 2017 09:55:44 -0400
-Received: from sonic303-47.consmr.mail.ir2.yahoo.com ([77.238.178.228]:38547)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <flypie1@yahoo.com>) id 1dAcwt-0004YQ-KL
-	for qemu-devel@nongnu.org; Tue, 16 May 2017 09:55:39 -0400
-Date: Tue, 16 May 2017 13:51:36 +0000 (UTC)
-From: John Bradley <flypie1@yahoo.com>
-Reply-To: John Bradley <flypie1@yahoo.com>
-Message-ID: <1288208690.891235.1494942696952@mail.yahoo.com>
-In-Reply-To: <79d5c7a2-c5be-a4b3-3cc3-85c3e572d062@web.de>
-References: <757990479.60759.1494722527715.ref@mail.yahoo.com>
-	<757990479.60759.1494722527715@mail.yahoo.com>
-	<79d5c7a2-c5be-a4b3-3cc3-85c3e572d062@web.de>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+	(envelope-from <kraxel@redhat.com>) id 1dAcx5-0004jR-Ao
+	for qemu-devel@nongnu.org; Tue, 16 May 2017 09:55:55 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:33460)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1dAcx5-0004iz-3o
+	for qemu-devel@nongnu.org; Tue, 16 May 2017 09:55:51 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id B83C280C18
+	for <qemu-devel@nongnu.org>; Tue, 16 May 2017 13:55:39 +0000 (UTC)
+Message-ID: <1494942935.29008.52.camel@redhat.com>
+From: Gerd Hoffmann <kraxel@redhat.com>
+Date: Tue, 16 May 2017 15:55:35 +0200
+In-Reply-To: <20170516133516.GC16341@redhat.com>
+References: <20170428121553.22408-1-berrange@redhat.com>
+	<20170516123951.GB16341@redhat.com>
+	<1494941391.29008.49.camel@redhat.com>
+	<20170516133516.GC16341@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] Changes to Broadcom(BCM) files and Raspberry Pi
- files. Addition of PanelEmu
+Mime-Version: 1.0
+Subject: Re: [Qemu-devel] [PATCH] sockets: ensure we can bind to both ipv4 &
+ ipv6 separately
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,153 +36,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Geert Martin Ijewski <gm.ijewski@web.de>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: John Bradley <flypie@rocketmail.com>, Laurent Vivier <lvivier@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>, Markus Armbruster <armbru@redhat.com>, Alistair Francis <alistair.francis@xilinx.com>
+To: "Daniel P. Berrange" <berrange@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
 
-"I think that should be #ifdef _WIN32.
-Maybe in the far future QEMU could also be compiled with Visual Studio=20
-or any other windows compiler"
-The reason for doing it this way is that MINGW64, which is the dev platform=
- I uses on Windows10, does not include a port of the GNU Socket library so =
-I have to use the native Win Sock Library.
-=C2=A0
-"Why not something like
-typedef struct
-{
-=C2=A0 =C2=A0 uint8_t len;
-=C2=A0 =C2=A0 uint8_t type;
-=C2=A0 =C2=A0 union {
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 struct {
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 uint8_t cnt;
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 } pinCount;
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 struct {
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 uint16_t pin0to15;
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 uint16_t pin16to31;
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 uint16_t pin32to47;
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 uint16_t pin48to63;
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 } dataUpdate;
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 /* todo: other packet types */
-=C2=A0 =C2=A0 };
-} CommandPacket;"
+On Di, 2017-05-16 at 14:35 +0100, Daniel P. Berrange wrote:
+> On Tue, May 16, 2017 at 03:29:51PM +0200, Gerd Hoffmann wrote:
+> >   Hi,
+> >=20
+> > > Separately from this patch, I noticed one further possible
+> > > problem,=20
+> > >=20
+> > > Currently, the ipv4=3Don|off/ipv6=3Don|off settings are only
+> > > used to determine what getaddrinfo results we request/use.
+> > >=20
+> > > This leads to the somewhat odd situation where if you set
+> > > ipv4=3Doff,ipv6=3Don, QEMU won't be listening on an IPv4
+> > > socket, but *will still* accept IPv4 clients over the IPv6
+> > > socket due to our use of IPV6_V6ONLY=3Doff.
+> >=20
+> > Hmm, maybe we should just use IPV6_V6ONLY=3Don unconditionally?
+>=20
+> This would certainly be my long term desire...
+>=20
+> > Now that qemu finally supports multiple listening sockets we should be
+> > able to do the switch without regressions, and it also should remove al=
+l
+> > those nasty corner cases ...
+>=20
+> ...but we can't do it yet - only the VNC server code has been reworked
+> to support multiple listening sockets. We'd still have work todo on the
+> NBD server, chardevs, migration, network socket backend and guest agent
+> to support multiple listeners.
 
-The problem with that is packing. I tried to do it that way but the differe=
-nt compilers I am using for QEMU and GDummyPanel pack and align in differen=
-t way and no collection of pragmas and directives could make them pack the =
-same. While writing this I have also noticed I have made an implicit assump=
-tion about the endedness of the data, which is not good. Also keep in mind =
-someone may write a client in any language from Fortran, Forth to Python.
+Ah, ok.
 
-"what's the use of this pointer aritmethic instead of just 6?"
+I guess then I would not worry too much that we break stuff in case
+ipv4=3Doff actually does what it is supposed to do ...
 
-This is a similar attempt at robustness across compilers.
-
-John BradleyTel: 07896 839635Skype: flypie125 125B Grove StreetEdge Hill Li=
-verpool L7 7AF=20
-
-    On Tuesday, 16 May 2017, 9:56, Geert Martin Ijewski <gm.ijewski@web.de>=
- wrote:
-=20
-
- Am 14.05.2017 um 02:42 schrieb John Bradley via Qemu-devel:
->>From 7f74f048f135d9c9c230a9e90f72451c841c6d35 Mon Sep 17 00:00:00 2001
-> From: John Bradley <flypie@rocketmail.com>
-> Date: Sat, 13 May 2017 23:07:47 +0100
-> Subject: [PATCH] Changes to Broadcom(BCM) files and Raspberry Pi files.
-> Addition of PanelEmu
->
-> The files add the ability to attach, via TCP, a panel emulator
-> The include a unification of several PD Raspberry PI additions
-> A modification to dev-network to all circle SDK WWW client to work
-> The DummyPanel is not included but available at
-> https://github.com/flypie/GDummyPanel.git
->
-> Signed-off-by: John Bradley <flypie@rocketmail.com>
-> ---
-> [ ... snip ... ]
-> diff --git a/util/PanelEmu.c b/util/PanelEmu.c
-> new file mode 100644
-> index 0000000000..59c87d2747
-> --- /dev/null
-> +++ b/util/PanelEmu.c
-> @@ -0,0 +1,293 @@
-> +/*
-> + * Emulation for Rasp PI GPIO via Server connected to via Socket
-> + *
-> + */
-> +#include "qemu/osdep.h"
-> +
-> +#include <stdio.h>
-> +#include <stdlib.h>
-> +#include <memory.h>
-> +#include <errno.h>
-> +#include <string.h>
-> +#include <sys/types.h>
-> +#ifdef __MINGW32__
-I think that should be #ifdef _WIN32.
-Maybe in the far future QEMU could also be compiled with Visual Studio=20
-or any other windows compiler
-> +#include <winsock2.h>
-> +#else
-> +#include <sys/socket.h>
-> +#include <arpa/inet.h>
-> +#include <netinet/in.h>
-> +#endif
-> +
-> +
-> +#include "qemu/PanelEmu.h"
-> +
-> +typedef enum
-> +{
-> +=C2=A0 =C2=A0 MACHINEDESC =3D 0,
-> +=C2=A0 =C2=A0 PINSTOPANEL =3D 1,
-> +=C2=A0 =C2=A0 READREQ =3D 2,
-> +=C2=A0 =C2=A0 PINCOUNT =3D 3,
-> +=C2=A0 =C2=A0 ENABLEMAP =3D 4,
-> +=C2=A0 =C2=A0 INPUTMAP =3D 5,
-> +=C2=A0 =C2=A0 OUTPUTMAP =3D 6,
-> +=C2=A0 =C2=A0 PINSTOQEMU =3D 7
-> +} PacketType;
-> +
-> +#define MAXPACKET=C2=A0 255
-> +
-> +#define PACKETLEN=C2=A0 0=C2=A0 //Includes Packet Length
-> +#define PACKETTYPE=C2=A0 1
-> +
-> +typedef struct
-> +{
-> +=C2=A0 =C2=A0 unsigned short int Data[MAXPACKET];
-> +} CommandPacket;
-
-Why not something like
-typedef struct
-{
-=C2=A0 =C2=A0 uint8_t len;
-=C2=A0 =C2=A0 uint8_t type;
-=C2=A0 =C2=A0 union {
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 struct {
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 uint8_t cnt;
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 } pinCount;
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 struct {
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 uint16_t pin0to15;
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 uint16_t pin16to31;
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 uint16_t pin32to47;
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 uint16_t pin48to63;
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 } dataUpdate;
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 /* todo: other packet types */
-=C2=A0 =C2=A0 };
-} CommandPacket;
-> [ ... snip ... ]
-> +/* Set a pin to a specified value */
-> +void senddatatopanel(panel_connection_t* h, uint64_t pin, bool val)
-> +{
-> +=C2=A0 =C2=A0 CommandPacket Pkt;
-> +
-> +=C2=A0 =C2=A0 Pkt.Data[PACKETLEN] =3D (char *) &Pkt.Data[6 + 1]-(char *)=
- &Pkt.Data[0];
-what's the use of this pointer aritmethic instead of just 6?
-
-Geert
-
-
-
-  =20
+cheers,
+  Gerd
