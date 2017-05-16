@@ -1,21 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46787)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47285)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sstabellini@kernel.org>) id 1dAi0K-0002Tm-Jc
-	for qemu-devel@nongnu.org; Tue, 16 May 2017 15:19:33 -0400
+	(envelope-from <sstabellini@kernel.org>) id 1dAi2h-0003Kd-GQ
+	for qemu-devel@nongnu.org; Tue, 16 May 2017 15:22:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sstabellini@kernel.org>) id 1dAi0H-0007C4-D7
-	for qemu-devel@nongnu.org; Tue, 16 May 2017 15:19:32 -0400
-Received: from mail.kernel.org ([198.145.29.99]:50322)
+	(envelope-from <sstabellini@kernel.org>) id 1dAi2f-0007nr-38
+	for qemu-devel@nongnu.org; Tue, 16 May 2017 15:21:59 -0400
+Received: from mail.kernel.org ([198.145.29.99]:50542)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <sstabellini@kernel.org>)
-	id 1dAi0H-0007Bi-6a
-	for qemu-devel@nongnu.org; Tue, 16 May 2017 15:19:29 -0400
-Date: Tue, 16 May 2017 12:19:26 -0700 (PDT)
+	id 1dAi2e-0007nU-Si
+	for qemu-devel@nongnu.org; Tue, 16 May 2017 15:21:56 -0400
 From: Stefano Stabellini <sstabellini@kernel.org>
-Message-ID: <alpine.DEB.2.10.1705161157280.4103@sstabellini-ThinkPad-X260>
-MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
-Subject: [Qemu-devel] [PULL 0/4] please pull xen-20170516-tag
+Date: Tue, 16 May 2017 12:21:51 -0700
+Message-Id: <1494962512-4831-3-git-send-email-sstabellini@kernel.org>
+In-Reply-To: <1494962512-4831-1-git-send-email-sstabellini@kernel.org>
+References: <alpine.DEB.2.10.1705161157280.4103@sstabellini-ThinkPad-X260>
+	<1494962512-4831-1-git-send-email-sstabellini@kernel.org>
+Subject: [Qemu-devel] [PULL 3/4] xen/9pfs: fix two resource leaks on error
+ paths, discovered by Coverity
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,36 +27,38 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org, stefanha@gmail.com
-Cc: sstabellini@kernel.org, stefanha@redhat.com, anthony.perard@citrix.com, xen-devel@lists.xenproject.org, qemu-devel@nongnu.org
+Cc: sstabellini@kernel.org, stefanha@redhat.com, anthony.perard@citrix.com, xen-devel@lists.xenproject.org, qemu-devel@nongnu.org, groug@kaod.org, aneesh.kumar@linux.vnet.ibm.com
 
-The following changes since commit cdece0467c00007cf8e3f4b3c3f0b13bf2c4fea9:
+CID: 1374836
 
-  block/win32: fix 'ret not initialized' warning (2017-05-16 15:34:18 +0100)
+Signed-off-by: Stefano Stabellini <sstabellini@kernel.org>
+Reviewed-by: Eric Blake <eblake@redhat.com>
+Reviewed-by: Greg Kurz <groug@kaod.org>
+CC: anthony.perard@citrix.com
+CC: groug@kaod.org
+CC: aneesh.kumar@linux.vnet.ibm.com
+---
+ hw/9pfs/xen-9p-backend.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-are available in the git repository at:
-
-  git://xenbits.xen.org/people/sstabellini/qemu-dm.git tags/xen-20170516-tag
-
-for you to fetch changes up to 01cd90b641e1aed40cf13a577e6a737af94d55e7:
-
-  xen: call qemu_set_cloexec instead of fcntl (2017-05-16 11:51:25 -0700)
-
-----------------------------------------------------------------
-Xen 2017/05/16
-
-----------------------------------------------------------------
-Anthony PERARD (1):
-      configure: Remove -lxencall for Xen detection
-
-Stefano Stabellini (3):
-      xen/mapcache: store dma information in revmapcache entries for debugging
-      xen/9pfs: fix two resource leaks on error paths, discovered by Coverity
-      xen: call qemu_set_cloexec instead of fcntl
-
- configure                     |  2 +-
- exec.c                        |  8 ++++----
- hw/9pfs/xen-9p-backend.c      |  4 +++-
- hw/i386/xen/xen-mapcache.c    | 15 ++++++++++-----
- hw/xen/xen_backend.c          |  2 +-
- include/sysemu/xen-mapcache.h |  5 +++--
- 6 files changed, 22 insertions(+), 14 deletions(-)
+diff --git a/hw/9pfs/xen-9p-backend.c b/hw/9pfs/xen-9p-backend.c
+index 9c7f41a..a1fdede 100644
+--- a/hw/9pfs/xen-9p-backend.c
++++ b/hw/9pfs/xen-9p-backend.c
+@@ -332,12 +332,14 @@ static int xen_9pfs_connect(struct XenDevice *xendev)
+         str = g_strdup_printf("ring-ref%u", i);
+         if (xenstore_read_fe_int(&xen_9pdev->xendev, str,
+                                  &xen_9pdev->rings[i].ref) == -1) {
++            g_free(str);
+             goto out;
+         }
+         g_free(str);
+         str = g_strdup_printf("event-channel-%u", i);
+         if (xenstore_read_fe_int(&xen_9pdev->xendev, str,
+                                  &xen_9pdev->rings[i].evtchn) == -1) {
++            g_free(str);
+             goto out;
+         }
+         g_free(str);
+-- 
+1.9.1
