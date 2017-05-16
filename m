@@ -1,27 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50140)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51264)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dAaIK-0006y3-3W
-	for qemu-devel@nongnu.org; Tue, 16 May 2017 07:05:37 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1dAaLl-0007xz-Ih
+	for qemu-devel@nongnu.org; Tue, 16 May 2017 07:09:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dAaIH-0000zU-EN
-	for qemu-devel@nongnu.org; Tue, 16 May 2017 07:05:36 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:52776)
+	(envelope-from <vsementsov@virtuozzo.com>) id 1dAaLi-0002TS-MQ
+	for qemu-devel@nongnu.org; Tue, 16 May 2017 07:09:09 -0400
+Received: from mailhub.sw.ru ([195.214.232.25]:34963 helo=relay.sw.ru)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dAaIH-0000zI-5E
-	for qemu-devel@nongnu.org; Tue, 16 May 2017 07:05:33 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <20170515134753.28412-1-stefanha@redhat.com>
-	<87a86erypz.fsf@linaro.org>
-	<20170516104556.GD27093@stefanha-x1.localdomain>
-Date: Tue, 16 May 2017 13:05:23 +0200
-In-Reply-To: <20170516104556.GD27093@stefanha-x1.localdomain> (Stefan
-	Hajnoczi's message of "Tue, 16 May 2017 11:45:56 +0100")
-Message-ID: <87o9ut6ozw.fsf@dusky.pond.sub.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] .gdbinit: load QEMU sub-commands when gdb
- starts
+	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
+	id 1dAaLi-0002T6-5C
+	for qemu-devel@nongnu.org; Tue, 16 May 2017 07:09:06 -0400
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Tue, 16 May 2017 14:09:01 +0300
+Message-Id: <20170516110901.35201-1-vsementsov@virtuozzo.com>
+In-Reply-To: <20170516094533.6160-6-vsementsov@virtuozzo.com>
+References: <20170516094533.6160-6-vsementsov@virtuozzo.com>
+Subject: [Qemu-devel] [PATCH v2] nbd/client.c: use errp instead of LOG
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,73 +24,198 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Cc: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: den@openvz.org, vsementsov@virtuozzo.com, pbonzini@redhat.com
 
-Stefan Hajnoczi <stefanha@redhat.com> writes:
+Move to modern errp scheme from just LOGging errors.
 
-> On Mon, May 15, 2017 at 03:17:28PM +0100, Alex Benn=C3=A9e wrote:
->>=20
->> Stefan Hajnoczi <stefanha@redhat.com> writes:
->>=20
->> > The scripts/qemu-gdb.py file is not easily discoverable.  Add a .gdbin=
-it
->> > file so GDB either loads qemu-gdb.py automatically or prints a message
->> > informing the user how to enable them (some systems disable ./.gdbinit
->> > loading for security reasons).
->> >
->> > Suggested-by: Eric Blake <eblake@redhat.com>
->> > Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
->> > ---
->> >  .gdbinit | 8 ++++++++
->> >  1 file changed, 8 insertions(+)
->> >  create mode 100644 .gdbinit
->> >
->> > diff --git a/.gdbinit b/.gdbinit
->> > new file mode 100644
->> > index 0000000..9d322fc
->> > --- /dev/null
->> > +++ b/.gdbinit
->> > @@ -0,0 +1,8 @@
->> > +# GDB may have ./.gdbinit loading disabled by default.  In that case =
-you can
->> > +# follow the instructions it prints.  They boil down to adding the fo=
-llowing to
->> > +# your home directory's ~/.gdbinit file:
->> > +#
->> > +#   add-auto-load-safe-path /path/to/qemu/.gdbinit
->> > +
->> > +# Load QEMU-specific sub-commands and settings
->> > +source scripts/qemu-gdb.py
->>=20
->> While this works well enough you might as well just comment the helper
->> script itself.
->
-> People don't know scripts/qemu-gdb.py exists so adding a comment there
-> doesn't help.
->
->> Would this script take precedence over a users ~/.gdbinit?
->
-> All gdbinit files are loaded.  The order in which they are loaded is:
->
-> 1. System-wide
-> 2. Home directory
-> 3. Current directory
->
-> https://sourceware.org/gdb/onlinedocs/gdb/Startup.html#Startup
->
->> How would it work for out-of-tree builds?
->
-> ./.gdbinit assumes your current working directory is the root of the
-> QEMU source tree.  If gdb is launched outside this directory then
-> nothing will happen (e.g. from arm-softmmu/ or from an out-of-tree
-> build).
->
-> I'm not sure if there is a simple way of making ./.gdbinit work from
-> out-of-tree build directories.
+Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+---
 
-Worth a try: ln -s $(SRC_PATH)/.gdbinit
+v2: fix automatic build test. fix nbd_init stub when __linux__ macro is
+    not defined
 
-If it works, we could have make create the link automatically.
 
-[...]
+ block/nbd-client.c  |  7 ++++++-
+ include/block/nbd.h |  5 +++--
+ nbd/client.c        | 30 +++++++++++++++++-------------
+ qemu-nbd.c          |  3 ++-
+ 4 files changed, 28 insertions(+), 17 deletions(-)
+
+diff --git a/block/nbd-client.c b/block/nbd-client.c
+index 538d95e031..073032bac5 100644
+--- a/block/nbd-client.c
++++ b/block/nbd-client.c
+@@ -28,6 +28,7 @@
+  */
+ 
+ #include "qemu/osdep.h"
++#include "qapi/error.h"
+ #include "nbd-client.h"
+ 
+ #define HANDLE_TO_INDEX(bs, handle) ((handle) ^ ((uint64_t)(intptr_t)bs))
+@@ -70,10 +71,14 @@ static coroutine_fn void nbd_read_reply_entry(void *opaque)
+     NBDClientSession *s = opaque;
+     uint64_t i;
+     int ret;
++    Error *local_err;
+ 
+     for (;;) {
+         assert(s->reply.handle == 0);
+-        ret = nbd_receive_reply(s->ioc, &s->reply);
++        ret = nbd_receive_reply(s->ioc, &s->reply, &local_err);
++        if (ret < 0) {
++            error_report_err(local_err);
++        }
+         if (ret <= 0) {
+             break;
+         }
+diff --git a/include/block/nbd.h b/include/block/nbd.h
+index a96fb5fceb..e0c64e4981 100644
+--- a/include/block/nbd.h
++++ b/include/block/nbd.h
+@@ -133,9 +133,10 @@ int nbd_receive_negotiate(QIOChannel *ioc, const char *name, uint16_t *flags,
+                           QCryptoTLSCreds *tlscreds, const char *hostname,
+                           QIOChannel **outioc,
+                           off_t *size, Error **errp);
+-int nbd_init(int fd, QIOChannelSocket *sioc, uint16_t flags, off_t size);
++int nbd_init(int fd, QIOChannelSocket *sioc, uint16_t flags, off_t size,
++             Error **errp);
+ ssize_t nbd_send_request(QIOChannel *ioc, NBDRequest *request);
+-ssize_t nbd_receive_reply(QIOChannel *ioc, NBDReply *reply);
++ssize_t nbd_receive_reply(QIOChannel *ioc, NBDReply *reply, Error **errp);
+ int nbd_client(int fd);
+ int nbd_disconnect(int fd);
+ 
+diff --git a/nbd/client.c b/nbd/client.c
+index f102375504..f9e1d75be4 100644
+--- a/nbd/client.c
++++ b/nbd/client.c
+@@ -627,11 +627,13 @@ fail:
+ }
+ 
+ #ifdef __linux__
+-int nbd_init(int fd, QIOChannelSocket *sioc, uint16_t flags, off_t size)
++int nbd_init(int fd, QIOChannelSocket *sioc, uint16_t flags, off_t size,
++             Error **errp)
+ {
+     unsigned long sectors = size / BDRV_SECTOR_SIZE;
+     if (size / BDRV_SECTOR_SIZE != sectors) {
+-        LOG("Export size %lld too large for 32-bit kernel", (long long) size);
++        error_setg(errp, "Export size %lld too large for 32-bit kernel",
++                   (long long) size);
+         return -E2BIG;
+     }
+ 
+@@ -639,7 +641,7 @@ int nbd_init(int fd, QIOChannelSocket *sioc, uint16_t flags, off_t size)
+ 
+     if (ioctl(fd, NBD_SET_SOCK, (unsigned long) sioc->fd) < 0) {
+         int serrno = errno;
+-        LOG("Failed to set NBD socket");
++        error_setg(errp, "Failed to set NBD socket");
+         return -serrno;
+     }
+ 
+@@ -647,7 +649,7 @@ int nbd_init(int fd, QIOChannelSocket *sioc, uint16_t flags, off_t size)
+ 
+     if (ioctl(fd, NBD_SET_BLKSIZE, (unsigned long)BDRV_SECTOR_SIZE) < 0) {
+         int serrno = errno;
+-        LOG("Failed setting NBD block size");
++        error_setg(errp, "Failed setting NBD block size");
+         return -serrno;
+     }
+ 
+@@ -659,7 +661,7 @@ int nbd_init(int fd, QIOChannelSocket *sioc, uint16_t flags, off_t size)
+ 
+     if (ioctl(fd, NBD_SET_SIZE_BLOCKS, sectors) < 0) {
+         int serrno = errno;
+-        LOG("Failed setting size (in blocks)");
++        error_setg(errp, "Failed setting size (in blocks)");
+         return -serrno;
+     }
+ 
+@@ -670,12 +672,12 @@ int nbd_init(int fd, QIOChannelSocket *sioc, uint16_t flags, off_t size)
+ 
+             if (ioctl(fd, BLKROSET, (unsigned long) &read_only) < 0) {
+                 int serrno = errno;
+-                LOG("Failed setting read-only attribute");
++                error_setg(errp, "Failed setting read-only attribute");
+                 return -serrno;
+             }
+         } else {
+             int serrno = errno;
+-            LOG("Failed setting flags");
++            error_setg(errp, "Failed setting flags");
+             return -serrno;
+         }
+     }
+@@ -723,8 +725,10 @@ int nbd_disconnect(int fd)
+ }
+ 
+ #else
+-int nbd_init(int fd, QIOChannelSocket *ioc, uint16_t flags, off_t size)
++int nbd_init(int fd, QIOChannelSocket *ioc, uint16_t flags, off_t size,
++             Error **errp)
+ {
++    error_setg(errp, "nbd_init is not supported");
+     return -ENOTSUP;
+ }
+ 
+@@ -758,19 +762,19 @@ ssize_t nbd_send_request(QIOChannel *ioc, NBDRequest *request)
+     return write_sync(ioc, buf, sizeof(buf), NULL);
+ }
+ 
+-ssize_t nbd_receive_reply(QIOChannel *ioc, NBDReply *reply)
++ssize_t nbd_receive_reply(QIOChannel *ioc, NBDReply *reply, Error **errp)
+ {
+     uint8_t buf[NBD_REPLY_SIZE];
+     uint32_t magic;
+     ssize_t ret;
+ 
+-    ret = read_sync_eof(ioc, buf, sizeof(buf), NULL);
++    ret = read_sync_eof(ioc, buf, sizeof(buf), errp);
+     if (ret <= 0) {
+         return ret;
+     }
+ 
+     if (ret != sizeof(buf)) {
+-        LOG("read failed");
++        error_setg(errp, "read failed");
+         return -EINVAL;
+     }
+ 
+@@ -788,7 +792,7 @@ ssize_t nbd_receive_reply(QIOChannel *ioc, NBDReply *reply)
+ 
+     if (reply->error == ESHUTDOWN) {
+         /* This works even on mingw which lacks a native ESHUTDOWN */
+-        LOG("server shutting down");
++        error_setg(errp, "server shutting down");
+         return -EINVAL;
+     }
+     TRACE("Got reply: { magic = 0x%" PRIx32 ", .error = % " PRId32
+@@ -796,7 +800,7 @@ ssize_t nbd_receive_reply(QIOChannel *ioc, NBDReply *reply)
+           magic, reply->error, reply->handle);
+ 
+     if (magic != NBD_REPLY_MAGIC) {
+-        LOG("invalid magic (got 0x%" PRIx32 ")", magic);
++        error_setg(errp, "invalid magic (got 0x%" PRIx32 ")", magic);
+         return -EINVAL;
+     }
+     return sizeof(buf);
+diff --git a/qemu-nbd.c b/qemu-nbd.c
+index e080fb7c75..83b8b3e1d9 100644
+--- a/qemu-nbd.c
++++ b/qemu-nbd.c
+@@ -288,8 +288,9 @@ static void *nbd_client_thread(void *arg)
+         goto out_socket;
+     }
+ 
+-    ret = nbd_init(fd, sioc, nbdflags, size);
++    ret = nbd_init(fd, sioc, nbdflags, size, &local_error);
+     if (ret < 0) {
++        error_report_err(local_error);
+         goto out_fd;
+     }
+ 
+-- 
+2.11.1
