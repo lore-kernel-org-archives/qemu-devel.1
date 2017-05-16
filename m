@@ -1,36 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48100)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49029)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1dAgQ7-00059W-01
-	for qemu-devel@nongnu.org; Tue, 16 May 2017 13:38:03 -0400
+	(envelope-from <armbru@redhat.com>) id 1dAgTO-0006gH-MV
+	for qemu-devel@nongnu.org; Tue, 16 May 2017 13:41:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1dAgQ2-0006QY-4M
-	for qemu-devel@nongnu.org; Tue, 16 May 2017 13:38:03 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:40676)
+	(envelope-from <armbru@redhat.com>) id 1dAgTJ-00082m-Hx
+	for qemu-devel@nongnu.org; Tue, 16 May 2017 13:41:26 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:48720)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1dAgQ1-0006QF-Tw
-	for qemu-devel@nongnu.org; Tue, 16 May 2017 13:37:58 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dAgTJ-00081U-9V
+	for qemu-devel@nongnu.org; Tue, 16 May 2017 13:41:21 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id C70F765982
-	for <qemu-devel@nongnu.org>; Tue, 16 May 2017 17:37:51 +0000 (UTC)
-From: Juan Quintela <quintela@redhat.com>
-In-Reply-To: <24a363d9-a395-325c-ff6c-f79211c773fb@redhat.com> (Eric Blake's
-	message of "Tue, 16 May 2017 11:48:01 -0500")
-References: <20170516111123.17692-1-quintela@redhat.com>
-	<20170516111123.17692-3-quintela@redhat.com>
-	<87shk4g9yb.fsf@dusky.pond.sub.org> <87o9usdg6e.fsf@secure.mitica>
-	<87h90kbxmd.fsf@dusky.pond.sub.org>
-	<09f00bd1-df05-c6b3-8423-cb790feddcc2@redhat.com>
-	<87k25g92i8.fsf@dusky.pond.sub.org>
-	<24a363d9-a395-325c-ff6c-f79211c773fb@redhat.com>
-Reply-To: quintela@redhat.com
-Date: Tue, 16 May 2017 19:37:47 +0200
-Message-ID: <87efvod7o4.fsf@secure.mitica>
+	by mx1.redhat.com (Postfix) with ESMTPS id 0415CC05FFCB
+	for <qemu-devel@nongnu.org>; Tue, 16 May 2017 17:41:20 +0000 (UTC)
+From: Markus Armbruster <armbru@redhat.com>
+References: <20170509173559.31598-1-marcandre.lureau@redhat.com>
+	<20170509173559.31598-11-marcandre.lureau@redhat.com>
+Date: Tue, 16 May 2017 19:41:13 +0200
+In-Reply-To: <20170509173559.31598-11-marcandre.lureau@redhat.com>
+	(=?utf-8?Q?=22Marc-Andr=C3=A9?= Lureau"'s message of "Tue, 9 May 2017
+	20:35:52 +0300")
+Message-ID: <87fug466o6.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH 2/5] migration: Create block capability
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 10/17] object: add uint property
+ setter/getter
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,29 +36,104 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: Markus Armbruster <armbru@redhat.com>, lvivier@redhat.com, qemu-devel@nongnu.org, peterx@redhat.com, dgilbert@redhat.com
+To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
+Cc: qemu-devel@nongnu.org
 
-Eric Blake <eblake@redhat.com> wrote:
-> On 05/16/2017 11:42 AM, Markus Armbruster wrote:
->
->>>> Well, to suggest something, I'd first have to figure out WTF incremental
->>>> block migration does.  Your text helps me some, but not enough.  What
->>>> exactly is being migrated, and what exactly is assumed to be shared
->>>> between source and destination?
->>>>
->>>> Block migration is scandalously underdocumented.
->>>
->
->> Can you draft a documentation comment for @block-incremental?
->
-> How about:
->
-> @block-incremental: Affects how much storage is migrated when the block
-> migration capability is enabled.  When false, the entire storage backing
-> chain is migrated into a flattened image at the destination; when true,
-> only the active qcow2 layer is migrated and the destination must already
-> have access to the same backing chain as was used on the source.
-> (since 2.10)
+Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
 
-Changed.  Thanks.
+> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> ---
+>  include/qom/object.h | 23 +++++++++++++++++++++++
+>  qom/object.c         | 33 +++++++++++++++++++++++++++++++++
+>  2 files changed, 56 insertions(+)
+>
+> diff --git a/include/qom/object.h b/include/qom/object.h
+> index cd0f412ce9..abaeb8cf4e 100644
+> --- a/include/qom/object.h
+> +++ b/include/qom/object.h
+> @@ -1094,6 +1094,29 @@ int64_t object_property_get_int(Object *obj, const=
+ char *name,
+>                                  Error **errp);
+>=20=20
+>  /**
+> + * object_property_set_uint:
+> + * @value: the value to be written to the property
+> + * @name: the name of the property
+> + * @errp: returns an error if this function fails
+> + *
+> + * Writes an unsigned integer value to a property.
+> + */
+> +void object_property_set_uint(Object *obj, uint64_t value,
+> +                              const char *name, Error **errp);
+> +
+> +/**
+> + * object_property_get_uint:
+> + * @obj: the object
+> + * @name: the name of the property
+> + * @errp: returns an error if this function fails
+> + *
+> + * Returns: the value of the property, converted to an unsigned integer,=
+ or 0
+> + * an error occurs (including when the property value is not an integer).
+> + */
+> +uint64_t object_property_get_uint(Object *obj, const char *name,
+> +                                  Error **errp);
+> +
+> +/**
+>   * object_property_get_enum:
+>   * @obj: the object
+>   * @name: the name of the property
+> diff --git a/qom/object.c b/qom/object.c
+> index c1644dbcb7..a9259e330d 100644
+> --- a/qom/object.c
+> +++ b/qom/object.c
+> @@ -1221,6 +1221,39 @@ int64_t object_property_get_int(Object *obj, const=
+ char *name,
+>      return retval;
+>  }
+>=20=20
+> +void object_property_set_uint(Object *obj, uint64_t value,
+> +                             const char *name, Error **errp)
+> +{
+> +    QNum *qn =3D qnum_from_uint(value);
+
+Please call the variable @qnum, to match object_property_set_int() and
+object_property_get_uint().
+
+Blank line here.
+
+> +    object_property_set_qobject(obj, QOBJECT(qn), name, errp);
+> +    QDECREF(qn);
+> +}
+> +
+> +uint64_t object_property_get_uint(Object *obj, const char *name,
+> +                                  Error **errp)
+> +{
+> +    QObject *ret =3D object_property_get_qobject(obj, name, errp);
+> +    Error *err =3D NULL;
+> +    QNum *qnum;
+> +    uint64_t retval;
+> +
+> +    if (!ret) {
+> +        return 0;
+> +    }
+> +    qnum =3D qobject_to_qnum(ret);
+> +    if (qnum) {
+> +        retval =3D qnum_get_uint(qnum, &err);
+> +    }
+> +
+> +    if (!qnum || err) {
+> +        error_setg(errp, QERR_INVALID_PARAMETER_TYPE, name, "uint");
+> +        retval =3D 0;
+> +    }
+> +
+> +    qobject_decref(ret);
+> +    return retval;
+> +}
+> +
+>  typedef struct EnumProperty {
+>      const char * const *strings;
+>      int (*get)(Object *, Error **);
+
+With the nits touched up:
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
