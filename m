@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42184)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42189)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dAeZU-0002Xh-PU
+	(envelope-from <bounces@canonical.com>) id 1dAeZV-0002Y1-2N
 	for qemu-devel@nongnu.org; Tue, 16 May 2017 11:39:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dAeZQ-0001Xh-OU
-	for qemu-devel@nongnu.org; Tue, 16 May 2017 11:39:36 -0400
-Received: from indium.canonical.com ([91.189.90.7]:48788)
+	(envelope-from <bounces@canonical.com>) id 1dAeZT-0001Zq-If
+	for qemu-devel@nongnu.org; Tue, 16 May 2017 11:39:37 -0400
+Received: from indium.canonical.com ([91.189.90.7]:48884)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1dAeZQ-0001XC-Ff
-	for qemu-devel@nongnu.org; Tue, 16 May 2017 11:39:32 -0400
+	id 1dAeZT-0001ZC-Cj
+	for qemu-devel@nongnu.org; Tue, 16 May 2017 11:39:35 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1dAeZO-00021V-JY
-	for <qemu-devel@nongnu.org>; Tue, 16 May 2017 15:39:30 +0000
+	id 1dAeZR-000220-6p
+	for <qemu-devel@nongnu.org>; Tue, 16 May 2017 15:39:33 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 4E0822E80C8
-	for <qemu-devel@nongnu.org>; Tue, 16 May 2017 15:39:30 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id E39272E80C4
+	for <qemu-devel@nongnu.org>; Tue, 16 May 2017 15:39:32 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Tue, 16 May 2017 15:28:06 -0000
+Date: Tue, 16 May 2017 15:28:10 -0000
 From: Launchpad Bug Tracker <1581936@bugs.launchpad.net>
 Reply-To: Bug 1581936 <1581936@bugs.launchpad.net>
 Sender: bounces@canonical.com
 References: <20160515095432.8440.97382.malonedeb@soybean.canonical.com>
-Message-Id: <20170516152810.17062.23306.malone@ackee.canonical.com>
+Message-Id: <20170516152815.17060.68912.malone@ackee.canonical.com>
 Errors-To: bounces@canonical.com
 Subject: [Qemu-devel] [Bug 1581936] Re: Frozen Windows 7 VMs with VGA
  CVE-2016-3712 fix (2.6.0 and 2.5.1.1)
@@ -39,10 +39,10 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-This bug was fixed in the package qemu - 2.0.0+dfsg-2ubuntu1.34
+This bug was fixed in the package qemu - 1:2.5+dfsg-5ubuntu10.14
 
 ---------------
-qemu (2.0.0+dfsg-2ubuntu1.34) trusty-security; urgency=3Dmedium
+qemu (1:2.5+dfsg-5ubuntu10.14) xenial-security; urgency=3Dmedium
 
   * SECURITY UPDATE: denial of service via leak in virtFS
     - debian/patches/CVE-2017-7377.patch: fix file descriptor leak in
@@ -93,31 +93,7 @@ qemu (2.0.0+dfsg-2ubuntu1.34) trusty-security; urgency=3Dmedium
       hw/display/vga.c, hw/display/vga_int.h.
 
  -- Marc Deslauriers <marc.deslauriers@ubuntu.com>  Wed, 10 May 2017
-15:50:30 -0400
-
-** Changed in: qemu (Ubuntu Trusty)
-       Status: Triaged =3D> Fix Released
-
-** CVE added: http://www.cve.mitre.org/cgi-
-bin/cvename.cgi?name=3D2017-7377
-
-** CVE added: http://www.cve.mitre.org/cgi-
-bin/cvename.cgi?name=3D2017-7718
-
-** CVE added: http://www.cve.mitre.org/cgi-
-bin/cvename.cgi?name=3D2017-7980
-
-** CVE added: http://www.cve.mitre.org/cgi-
-bin/cvename.cgi?name=3D2017-8086
-
-** CVE added: http://www.cve.mitre.org/cgi-
-bin/cvename.cgi?name=3D2017-8309
-
-** CVE added: http://www.cve.mitre.org/cgi-
-bin/cvename.cgi?name=3D2017-8379
-
-** Changed in: qemu (Ubuntu Xenial)
-       Status: Triaged =3D> Fix Released
+10:09:29 -0400
 
 -- =
 
