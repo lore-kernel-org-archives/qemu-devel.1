@@ -1,30 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55584)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56394)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1dAfC2-0001OL-PN
-	for qemu-devel@nongnu.org; Tue, 16 May 2017 12:19:27 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1dAfFV-0002an-OA
+	for qemu-devel@nongnu.org; Tue, 16 May 2017 12:23:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1dAfBy-0000ye-RM
-	for qemu-devel@nongnu.org; Tue, 16 May 2017 12:19:26 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:40938)
+	(envelope-from <pbonzini@redhat.com>) id 1dAfFR-0002Nc-PF
+	for qemu-devel@nongnu.org; Tue, 16 May 2017 12:23:01 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:59910)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jcody@redhat.com>) id 1dAfBy-0000yM-IY
-	for qemu-devel@nongnu.org; Tue, 16 May 2017 12:19:22 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 3072D8E6EC
-	for <qemu-devel@nongnu.org>; Tue, 16 May 2017 16:19:11 +0000 (UTC)
-Date: Tue, 16 May 2017 12:19:07 -0400
-From: Jeff Cody <jcody@redhat.com>
-Message-ID: <20170516161907.GM19824@localhost.localdomain>
-References: <20170515140529.23264-1-dgilbert@redhat.com>
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1dAfFR-0002NP-Gd
+	for qemu-devel@nongnu.org; Tue, 16 May 2017 12:22:57 -0400
+References: <58A4707602000062000D0393@prv-mh.provo.novell.com>
+	<58A5C23202000062000D0FCB@prv-mh.provo.novell.com>
+	<b50ed69e-ce2f-36d9-797b-5f6a5cf7850d@redhat.com>
+	<154b3902-d891-f77a-3d59-09d80596ddff@suse.de>
+	<58ADBA0302000062000D3EA6@prv-mh.provo.novell.com>
+	<1fcf2e94-fc86-4bd7-07a0-8ab2dc72429f@suse.de>
+	<da24d7e2-e81c-8a1c-c277-c8e1b08fc3f7@redhat.com>
+	<5c410c0e-f0b0-a049-84ed-7e31eb4e1dab@suse.de>
+	<1282321742.7961608.1494922767010.JavaMail.zimbra@redhat.com>
+	<efdd2565-025d-b5f8-bcac-32baeaecdc3a@suse.de>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <92e310cd-f77a-61f3-82a2-aca8ea901dbc@redhat.com>
+Date: Tue, 16 May 2017 18:22:17 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170515140529.23264-1-dgilbert@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2] block migration: Allow compile time
- disable
+In-Reply-To: <efdd2565-025d-b5f8-bcac-32baeaecdc3a@suse.de>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel]
+ =?utf-8?b?562U5aSN77yaIFJlOiBbUkZDXSB2aXJ0aW8tZmM6?=
+ =?utf-8?q?_draft_idea_of_virtual_fibre_channel_HBA?=
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,157 +38,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Cc: qemu-devel@nongnu.org, quintela@redhat.com, kashyap@redhat.com, eblake@redhat.com, kwolf@redhat.com
+To: Hannes Reinecke <hare@suse.de>
+Cc: Lin Ma <lma@suse.com>, Stefan Hajnoczi <stefanha@gmail.com>, Zhiqiang Zhou <ZZhou@suse.com>, Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org, stefanha@redhat.com, mst@redhat.com
 
-On Mon, May 15, 2017 at 03:05:29PM +0100, Dr. David Alan Gilbert (git) wrote:
-> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-> 
-> Many users now prefer to use drive_mirror over NBD as an
-> alternative to the older migrate -b option; drive_mirror is
-> more complex to setup but gives you more options (e.g. only
-> migrating some of the disks if some of them are shared).
-> 
-> Allow the large chunk of block migration code to be compiled
-> out for those who don't use it.
-> 
-> Based on a downstream-patch we've had for a while by Jeff Cody.
-> 
-> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Pruning to sort out the basic disagreements.
 
-Reviewed-by: Jeff Cody <jcody@redhat.com>
+On 16/05/2017 17:22, Hannes Reinecke wrote:
+>> That depends on how you would like to do controller passthrough in
+>> general.  iSCSI doesn't have the 64-bit target ID, and doesn't have
+>> (AFAIK) hot-plug/hot-unplug support, so it's less important than FC.
+>>
+> iSCSI has its 'iqn' string, which is defined to be a 256-byte string.
+> Hence the number=20
+> And if we're updating virtio anyway, we could as well update it to carr=
+y
+> _all_ possible scsi IDs.
 
-> ---
->  configure                 | 11 +++++++++++
->  include/migration/block.h | 23 +++++++++++++++++++++++
->  migration/Makefile.objs   |  2 +-
->  migration/migration.c     |  9 +++++++++
->  4 files changed, 44 insertions(+), 1 deletion(-)
-> 
-> v2
->   use error_append_hint, remove a '.' - Eric
->   Move ifdef's to block.h header - Juan
->   Explicitly state the blk/-b inc/-i in the message - Kashyap
-> 
-> diff --git a/configure b/configure
-> index 39e727ef7e..29f5f626d7 100755
-> --- a/configure
-> +++ b/configure
-> @@ -316,6 +316,7 @@ vte=""
->  virglrenderer=""
->  tpm="yes"
->  libssh2=""
-> +live_block_migration="yes"
->  numa=""
->  tcmalloc="no"
->  jemalloc="no"
-> @@ -1168,6 +1169,10 @@ for opt do
->    ;;
->    --enable-libssh2) libssh2="yes"
->    ;;
-> +  --disable-live-block-migration) live_block_migration="no"
-> +  ;;
-> +  --enable-live-block-migration) live_block_migration="yes"
-> +  ;;
->    --disable-numa) numa="no"
->    ;;
->    --enable-numa) numa="yes"
-> @@ -1400,6 +1405,7 @@ disabled with --disable-FEATURE, default is enabled if available:
->    libnfs          nfs support
->    smartcard       smartcard support (libcacard)
->    libusb          libusb (for usb passthrough)
-> +  live-block-migration   Block migration in the main migration stream
->    usb-redir       usb network redirection support
->    lzo             support of lzo compression library
->    snappy          support of snappy compression library
-> @@ -5215,6 +5221,7 @@ echo "TPM support       $tpm"
->  echo "libssh2 support   $libssh2"
->  echo "TPM passthrough   $tpm_passthrough"
->  echo "QOM debugging     $qom_cast_debug"
-> +echo "Live block migration $live_block_migration"
->  echo "lzo support       $lzo"
->  echo "snappy support    $snappy"
->  echo "bzip2 support     $bzip2"
-> @@ -5781,6 +5788,10 @@ if test "$libssh2" = "yes" ; then
->    echo "LIBSSH2_LIBS=$libssh2_libs" >> $config_host_mak
->  fi
->  
-> +if test "$live_block_migration" = "yes" ; then
-> +  echo "CONFIG_LIVE_BLOCK_MIGRATION=y" >> $config_host_mak
-> +fi
-> +
->  # USB host support
->  if test "$libusb" = "yes"; then
->    echo "HOST_USB=libusb legacy" >> $config_host_mak
-> diff --git a/include/migration/block.h b/include/migration/block.h
-> index 41a1ac8f79..1a096e3978 100644
-> --- a/include/migration/block.h
-> +++ b/include/migration/block.h
-> @@ -14,10 +14,33 @@
->  #ifndef MIGRATION_BLOCK_H
->  #define MIGRATION_BLOCK_H
->  
-> +#ifdef CONFIG_LIVE_BLOCK_MIGRATION
->  void blk_mig_init(void);
->  int blk_mig_active(void);
->  uint64_t blk_mig_bytes_transferred(void);
->  uint64_t blk_mig_bytes_remaining(void);
->  uint64_t blk_mig_bytes_total(void);
->  
-> +#else
-> +static inline void blk_mig_init(void) { };
-> +static inline int blk_mig_active(void)
-> +{
-> +    return false;
-> +}
-> +static inline uint64_t blk_mig_bytes_transferred(void)
-> +{
-> +    return 0;
-> +}
-> +
-> +static inline uint64_t blk_mig_bytes_remaining(void)
-> +{
-> +    return 0;
-> +}
-> +
-> +static inline uint64_t blk_mig_bytes_total(void)
-> +{
-> +    return 0;
-> +}
-> +#endif /* CONFIG_LIVE_BLOCK_MIGRATION */
-> +
->  #endif /* MIGRATION_BLOCK_H */
-> diff --git a/migration/Makefile.objs b/migration/Makefile.objs
-> index 480dd493a9..200b5e0c67 100644
-> --- a/migration/Makefile.objs
-> +++ b/migration/Makefile.objs
-> @@ -9,5 +9,5 @@ common-obj-y += qjson.o
->  
->  common-obj-$(CONFIG_RDMA) += rdma.o
->  
-> -common-obj-y += block.o
-> +common-obj-$(CONFIG_LIVE_BLOCK_MIGRATION) += block.o
->  
-> diff --git a/migration/migration.c b/migration/migration.c
-> index a5ade23e24..457f0b92df 100644
-> --- a/migration/migration.c
-> +++ b/migration/migration.c
-> @@ -1213,6 +1213,15 @@ void qmp_migrate(const char *uri, bool has_blk, bool blk,
->      params.blk = has_blk && blk;
->      params.shared = has_inc && inc;
->  
-> +#ifndef CONFIG_LIVE_BLOCK_MIGRATION
-> +    if (params.blk || params.shared) {
-> +        error_setg(errp, "QEMU compiled without old-style (blk/-b, inc/-i) "
-> +                         "block migration");
-> +        error_append_hint(errp, "Use drive_mirror+NBD instead.\n");
-> +        return;
-> +    }
-> +#endif
-> +
->      if (migration_is_setup_or_active(s->state) ||
->          s->state == MIGRATION_STATUS_CANCELLING ||
->          s->state == MIGRATION_STATUS_COLO) {
-> -- 
-> 2.13.0
-> 
+Yes, but one iSCSI connection maps to one initiator and target IQN.
+It's not like FC where each frame can specify its own initiator ID.
+
+>>> (3) would be feasible, as it would effectively mean 'just' to update =
+the
+>>> current NPIV mechanism. However, this would essentially lock us in fo=
+r
+>>> FC; any other types (think NVMe) will require yet another solution.
+>> An FC-NVMe driver could also expose the same vhost interface, couldn't=
+ it?
+>> FC-NVMe doesn't have to share the Linux code; but sharing the virtio s=
+tandard
+>> and the userspace ABI would be great.
+>>
+>> In fact, the main advantage of virtio-fc would be that (if we define i=
+t properly)
+>> it could be reused for FC-NVMe instead of having to extend e.g. virtio=
+-blk.
+>> For example virtio-scsi has request, to-device payload, response, from=
+-device
+>> payload.  virtio-fc's request format could be the initiator and target=
+ port
+>> identifiers, followed by FCP_CMD, to-device payload, FCP_RSP, from-dev=
+ice
+>> payload.
+>>
+> As already said: We do _not_ have access to the FCP frames.
+> So designing a virtio-fc protocol will only work for libfc-based HBAs,
+> namely fnic, bnx2fc, and fcoe.
+> Given that the future of FCoE is somewhat unclear I doubt it's a good
+> idea to restrict ourselves to that.
+
+I understand that.  It doesn't have to be a 1:1 match with FCP frames or
+even IUs; in fact the above minimal example is not (no OXID/RXID and no
+FCP_XFER_RDY IU are just the first two things that come to mind).
+
+The only purpose is to have a *transport* that is (roughly speaking)
+flexible enough to support future NPIV usecases which will certainly
+include FC-NVMe.  In other words: I'm inventing my own cooked FCP
+format, but I might as well base it on FCP itself as much as possible.
+
+Likewise, I'm not going to even mention ELS, but we would need _some_
+kind of protocol to query name servers, receive state change
+notifications, and get service parameters.  No idea yet how to do that,
+probably something similar to virtio-scsi control and event queues, but
+why not make the requests/responses look a little like PLOGI and PRLI?
+
+Thanks,
+
+Paolo
