@@ -1,26 +1,41 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46183)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49388)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1dAZzQ-0003Ky-2B
-	for qemu-devel@nongnu.org; Tue, 16 May 2017 06:46:05 -0400
+	(envelope-from <pasic@linux.vnet.ibm.com>) id 1dAaE9-0005Sw-ES
+	for qemu-devel@nongnu.org; Tue, 16 May 2017 07:01:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1dAZzM-0000Ml-Qr
-	for qemu-devel@nongnu.org; Tue, 16 May 2017 06:46:04 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:54114)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1dAZzM-0000LH-8c
-	for qemu-devel@nongnu.org; Tue, 16 May 2017 06:46:00 -0400
-Date: Tue, 16 May 2017 11:45:56 +0100
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20170516104556.GD27093@stefanha-x1.localdomain>
-References: <20170515134753.28412-1-stefanha@redhat.com>
-	<87a86erypz.fsf@linaro.org>
+	(envelope-from <pasic@linux.vnet.ibm.com>) id 1dAaE6-00081m-TH
+	for qemu-devel@nongnu.org; Tue, 16 May 2017 07:01:17 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:58146)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pasic@linux.vnet.ibm.com>)
+	id 1dAaE6-00081K-KW
+	for qemu-devel@nongnu.org; Tue, 16 May 2017 07:01:14 -0400
+Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v4GAxRZo140473
+	for <qemu-devel@nongnu.org>; Tue, 16 May 2017 07:01:12 -0400
+Received: from e06smtp10.uk.ibm.com (e06smtp10.uk.ibm.com [195.75.94.106])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2afxk1w77f-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Tue, 16 May 2017 07:01:12 -0400
+Received: from localhost
+	by e06smtp10.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <pasic@linux.vnet.ibm.com>;
+	Tue, 16 May 2017 12:00:58 +0100
+References: <1492842231-223720-1-git-send-email-arei.gonglei@huawei.com>
+	<1492842231-223720-2-git-send-email-arei.gonglei@huawei.com>
+	<1e56f82e-6afb-af30-acb9-6f66373c7bc2@linux.vnet.ibm.com>
+	<33183CC9F5247A488A2544077AF19020DA29A11A@DGGEMA505-MBS.china.huawei.com>
+From: Halil Pasic <pasic@linux.vnet.ibm.com>
+Date: Tue, 16 May 2017 13:00:39 +0200
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="rqzD5py0kzyFAOWN"
-Content-Disposition: inline
-In-Reply-To: <87a86erypz.fsf@linaro.org>
-Subject: Re: [Qemu-devel] [PATCH] .gdbinit: load QEMU sub-commands when gdb
- starts
+In-Reply-To: <33183CC9F5247A488A2544077AF19020DA29A11A@DGGEMA505-MBS.china.huawei.com>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 8bit
+Message-Id: <1bd450f1-66f0-2603-7ac1-6dd99c74d49a@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH v18 1/2] virtio-crypto: Add virtio crypto
+ device specification
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,96 +44,130 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
-Cc: qemu-devel@nongnu.org
+To: "Gonglei (Arei)" <arei.gonglei@huawei.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "virtio-dev@lists.oasis-open.org" <virtio-dev@lists.oasis-open.org>
+Cc: "Huangweidong (C)" <weidong.huang@huawei.com>, "mst@redhat.com" <mst@redhat.com>, "jasowang@redhat.com" <jasowang@redhat.com>, "john.griffin@intel.com" <john.griffin@intel.com>, "Zhanghuimin (Amy)" <amy.zhanghuimin@huawei.com>, "Varun.Sethi@freescale.com" <Varun.Sethi@freescale.com>, "denglingli@chinamobile.com" <denglingli@chinamobile.com>, "arei.gonglei@hotmail.com" <arei.gonglei@hotmail.com>, "agraf@suse.de" <agraf@suse.de>, "nmorey@kalray.eu" <nmorey@kalray.eu>, "lixiao (H)" <lixiao91@huawei.com>, "vincent.jardin@6wind.com" <vincent.jardin@6wind.com>, "Ola.Liljedahl@arm.com" <Ola.Liljedahl@arm.com>, Zhbzg <zhbzg@huawei.com>, Luonengjun <luonengjun@huawei.com>, "xin.zeng@intel.com" <xin.zeng@intel.com>, Linqiangmin <linqiangmin@huawei.com>, "liang.j.ma@intel.com" <liang.j.ma@intel.com>, "stefanha@redhat.com" <stefanha@redhat.com>, "cornelia.huck@de.ibm.com" <cornelia.huck@de.ibm.com>, Jani Kokkonen <Jani.Kokkonen@huawei.com>, "Chenshanxi (Eety Chen, Euler)" <eety.chen@huawei.com>, "brian.a.keating@intel.com" <brian.a.keating@intel.com>, "mike.caraman@nxp.com" <mike.caraman@nxp.com>, "Wubin (H)" <wu.wubin@huawei.com>
 
 
---rqzD5py0kzyFAOWN
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
 
-On Mon, May 15, 2017 at 03:17:28PM +0100, Alex Benn=E9e wrote:
->=20
-> Stefan Hajnoczi <stefanha@redhat.com> writes:
->=20
-> > The scripts/qemu-gdb.py file is not easily discoverable.  Add a .gdbinit
-> > file so GDB either loads qemu-gdb.py automatically or prints a message
-> > informing the user how to enable them (some systems disable ./.gdbinit
-> > loading for security reasons).
-> >
-> > Suggested-by: Eric Blake <eblake@redhat.com>
-> > Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
-> > ---
-> >  .gdbinit | 8 ++++++++
-> >  1 file changed, 8 insertions(+)
-> >  create mode 100644 .gdbinit
-> >
-> > diff --git a/.gdbinit b/.gdbinit
-> > new file mode 100644
-> > index 0000000..9d322fc
-> > --- /dev/null
-> > +++ b/.gdbinit
-> > @@ -0,0 +1,8 @@
-> > +# GDB may have ./.gdbinit loading disabled by default.  In that case y=
-ou can
-> > +# follow the instructions it prints.  They boil down to adding the fol=
-lowing to
-> > +# your home directory's ~/.gdbinit file:
-> > +#
-> > +#   add-auto-load-safe-path /path/to/qemu/.gdbinit
-> > +
-> > +# Load QEMU-specific sub-commands and settings
-> > +source scripts/qemu-gdb.py
->=20
-> While this works well enough you might as well just comment the helper
-> script itself.
+On 05/16/2017 05:48 AM, Gonglei (Arei) wrote:
 
-People don't know scripts/qemu-gdb.py exists so adding a comment there
-doesn't help.
+[..]
+>>> +\begin{itemize*}
+>>> +\item The device MUST set the \field{session_id} field to a unique session
+>> identifier when the device finishes processing session creation.
+>>
+>> I guess only if successfull (that is status == VIRTIO_CRYPTO_OK).
+>>
+> Sure. Let me add the condition.
+> 
+>>> +\item The device MUST set the \field{status} field to one of the values of
+>> enum VIRTIO_CRYPTO_STATUS.
+>>
+>> Maybe put this one first. The formulation could be more fortunate in
+>> a sense that it's required to set the right status (_OK if successs,
+>> _NOTSUPP if ...).
+>>
+>> What shall happen if the operation fails, e.g. becasue of out of resources?
+>>
+> That means the driver can't create session, and the following crypto
+> operation are forbidden.
+> 
 
-> Would this script take precedence over a users ~/.gdbinit?
+I wanted to ask which status code has to be used in what case? Is it always
+_ERR or _NOTSUPP?
 
-All gdbinit files are loaded.  The order in which they are loaded is:
+>> Is there some sort of limit for the amount of live sessions (related to
+>> the previous question)? Obviously the device needs storage for the
+>> session data. Can the guest DOS attack the host by creating an absurd number
+>> of sessions?
+>>
+> Good question. It's true that the guest can trigger DoS attack.
+> What's your opinion about the limit in the spec? Add a new feature?
+> 
 
-1. System-wide
-2. Home directory
-3. Current directory
+Adding a new feature does not seem like a good idea to me, because
+if the guest can turn of the safety mechanism (not negotiate the
+corresponding feature), then we are almost back to where we started.
 
-https://sourceware.org/gdb/onlinedocs/gdb/Startup.html#Startup
+My idea would be to specify how is the device (and maybe also the driver,
+I can't tell) supposed to fail if max_session is reached. The device should
+just set some proper status for the request I guess. We could also
+make the maximal number of sessions an implementation defined property
+of the device, and expose it via configuration space.
 
-> How would it work for out-of-tree builds?
+Hard limit in the spec is also viable, but in that case we also need
+to specify what happens if the limit is reached.
 
-=2E/.gdbinit assumes your current working directory is the root of the
-QEMU source tree.  If gdb is launched outside this directory then
-nothing will happen (e.g. from arm-softmmu/ or from an out-of-tree
-build).
+[..]
 
-I'm not sure if there is a simple way of making ./.gdbinit work from
-out-of-tree build directories.
+>>> +\subsubsection{Data Virtqueue}\label{sec:Device Types / Crypto Device /
+>> Device Operation / Data Virtqueue}
+>>> +
+>>> +The driver uses the data virtqueue to transmit crypto operation requests to
+s/virtqueue/virtqueues
+We may have more than one dataq
 
-> GDB does have a mechanism for autoloading extensions by way of adding
-> ELF sections:
->=20
->   https://sourceware.org/gdb/current/onlinedocs/gdb/dotdebug_005fgdb_005f=
-scripts-section.html#dotdebug_005fgdb_005fscripts-section
+>> the device,
+>>> +and completes the crypto operations.
+>>> +
+>>> +Session mode dataq requests are as follows:
+>>> +
+>>> +\begin{lstlisting}
+>>> +struct virtio_crypto_op_data_req {
+>>> +    struct virtio_crypto_op_header header;
+>>> +
+>>> +    union {
+>>> +        struct virtio_crypto_sym_data_req   sym_req;
+>>> +        struct virtio_crypto_hash_data_req  hash_req;
+>>> +        struct virtio_crypto_mac_data_req   mac_req;
+>>> +        struct virtio_crypto_aead_data_req  aead_req;
+>>> +    } u;
+>>> +};
+>>> +\end{lstlisting}
+>>> +
+>>> +Dataq requests for both session and stateless modes are as follows:
+>>
+>> This ain't very nice, I mean the 'both session and stateless modes' together
+> 
+> So what's your idea?
+> 
 
-Hmm...this still requires the user to configure auto-load safe paths and
-it hardcodes a path into the QEMU binary (execute in-place vs make
-install generally wouldn't work with the same binary).
+As I have pointed out while reviewing the QEMU implementation of the stateless
+mode I'm not satisfied with the description of the request format(s).
 
---rqzD5py0kzyFAOWN
-Content-Type: application/pgp-signature; name="signature.asc"
+This here is rather a  cosmetic issue, and my idea was to replace
+'Session mode dataq requests' with 'If MUX_MODE feature bit is not
+negotiated the dataq requests'. And also replace 'Dataq requests for both
+session and stateless modes are' with 'If MUX_MODE feature bit is
+negotiated the dataq requests are'.
 
------BEGIN PGP SIGNATURE-----
+In my eyes, how these requests are described is a much bigger problem.
 
-iQEcBAEBAgAGBQJZGthkAAoJEJykq7OBq3PIFGgH/37FH90sCUZQJ3CKZ1eXabk3
-4lgX7yEpB6WKNT+E901/r73TC/h/8lXy1/8azTxck5Ar2W6+GMa8JbmtTD4Om2UY
-DjhHt3GqvW0pWrcngdl++Rq3vjBJ5JE3sPMcnfTzI6K02qCf7V9xgj0amQPFuMqB
-hc2mlr17kGabea39DGetbqH8W+o/iuiSBkazUEsbWTtl2m5My0F1UH4rsapSSQVc
-PpXkw3OyYCz2c7dKrtgl2+u12pBXrFWHOaeTesERPXTUSN9FAP/17jCbu5lGsMT0
-xHIWo7/SY6pPpmxCdq8u8UZOeBTuahZal+63yJvTg4SQBoQP/ttQXpd8bCtV0ZU=
-=UlcU
------END PGP SIGNATURE-----
+>> with the above 'session mode dataq requests are'. In the meanwhile I know
+>> what
+>> you mean: if the SESSION_MODE feature bit was negotiated.
+>>
+> Yes, that's what I want. If the MUX_MODE feature bit is negotiated, the
+> driver MUST use struct virtio_crypto_op_data_req_mux for requests.
+> 
+> 
+[..]
+>>
+>> OK, I have read this to the end and I don't think there is anything which requires
+>> a comment at this stage. I would like to concentrate on your QEMU patches
+>> first,
+>> and I think we have enough questions/issues already.
+>>
+> 
+> Great thanks for your comments. Pls go ahead. :)
 
---rqzD5py0kzyFAOWN--
+Your are welcome.
+
+Regards,
+Halil
+
+> 
+> Thanks,
+> -Gonglei
+> 
+> 
