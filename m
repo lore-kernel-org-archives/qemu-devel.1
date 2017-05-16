@@ -1,30 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57053)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57549)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dAXjB-0006Co-UO
-	for qemu-devel@nongnu.org; Tue, 16 May 2017 04:21:10 -0400
+	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1dAXl1-0007fl-ND
+	for qemu-devel@nongnu.org; Tue, 16 May 2017 04:23:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dAXj7-00081D-W8
-	for qemu-devel@nongnu.org; Tue, 16 May 2017 04:21:09 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:42926)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1dAXj7-00080K-Pb
-	for qemu-devel@nongnu.org; Tue, 16 May 2017 04:21:05 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id A71CEC04B93B
-	for <qemu-devel@nongnu.org>; Tue, 16 May 2017 08:21:04 +0000 (UTC)
-Date: Tue, 16 May 2017 09:20:52 +0100
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170516082052.GC9105@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <20170516052439.16214-1-kraxel@redhat.com>
+	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1dAXkw-0000LL-Ow
+	for qemu-devel@nongnu.org; Tue, 16 May 2017 04:23:03 -0400
+Received: from [59.151.112.132] (port=13954 helo=heian.cn.fujitsu.com)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1dAXkw-0000Fa-CP
+	for qemu-devel@nongnu.org; Tue, 16 May 2017 04:22:58 -0400
+References: <1494829102-1812-1-git-send-email-zhangchen.fnst@cn.fujitsu.com>
+	<48435f6e-a33e-f245-165e-611db0b9105b@redhat.com>
+From: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
+Message-ID: <5cf0fe20-11b6-d16b-dc60-98523075960d@cn.fujitsu.com>
+Date: Tue, 16 May 2017 16:22:58 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20170516052439.16214-1-kraxel@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] fix mingw build failure
+In-Reply-To: <48435f6e-a33e-f245-165e-611db0b9105b@redhat.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH RESEND V2 0/3] Optimize filter-mirror and
+ filter-rewriter
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,35 +28,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Cc: qemu-devel@nongnu.org
-
-On Tue, May 16, 2017 at 07:24:39AM +0200, Gerd Hoffmann wrote:
-> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
-> ---
->  crypto/random-platform.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/crypto/random-platform.c b/crypto/random-platform.c
-> index 0eddb915b7..92eed0ee78 100644
-> --- a/crypto/random-platform.c
-> +++ b/crypto/random-platform.c
-> @@ -23,7 +23,7 @@
->  #include "crypto/random.h"
->  
->  #ifdef _WIN32
-> -#include <Wincrypt.h>
-> +#include <wincrypt.h>
->  static HCRYPTPROV hCryptProv;
->  #else
->  static int fd; /* a file handle to either /dev/urandom or /dev/random */
-
-Reviewed-by: Daniel P. Berrange <berrange@redhat.com>
+To: Jason Wang <jasowang@redhat.com>, qemu devel <qemu-devel@nongnu.org>
+Cc: zhangchen.fnst@cn.fujitsu.com, zhanghailiang <zhang.zhanghailiang@huawei.com>
 
 
-Regards,
-Daniel
+
+On 05/16/2017 02:48 PM, Jason Wang wrote:
+>
+>
+> On 2017年05月15日 14:18, Zhang Chen wrote:
+>> Fix some duplicate codes and remove unused codes.
+>>
+>> v2: Address Eric's comment on patch 3.
+>>
+>> Zhang Chen (3):
+>>    net/filter-mirror.c: Remove duplicate check code.
+>>    net/filter-mirror.c: Rename filter_mirror_send() and fix codestyle
+>>    net/filter-rewriter: Remove unused option in filter-rewriter
+>>
+>>   net/filter-mirror.c | 35 ++++++++++++++++-------------------
+>>   qemu-options.hx     |  2 +-
+>>   2 files changed, 17 insertions(+), 20 deletions(-)
+>>
+>
+> Hi:
+>
+> What's the difference compared with V2? I think I should apply this 
+> series?
+
+In V2 I forgot remove "," in patch 3/3, Yes, please apply this series.
+
+>
+> Thanks
+>
+>
+>
+
 -- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+Thanks
+Zhang Chen
