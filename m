@@ -1,31 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35957)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36292)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1dAeFI-0003MT-Pw
-	for qemu-devel@nongnu.org; Tue, 16 May 2017 11:18:46 -0400
+	(envelope-from <a.perevalov@samsung.com>) id 1dAeGC-0003lo-Cb
+	for qemu-devel@nongnu.org; Tue, 16 May 2017 11:19:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1dAeFD-0005E8-Qf
-	for qemu-devel@nongnu.org; Tue, 16 May 2017 11:18:44 -0400
-Received: from 20.mo3.mail-out.ovh.net ([178.33.47.94]:42920)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1dAeFD-0005Dc-GL
-	for qemu-devel@nongnu.org; Tue, 16 May 2017 11:18:39 -0400
-Received: from player693.ha.ovh.net (b9.ovh.net [213.186.33.59])
-	by mo3.mail-out.ovh.net (Postfix) with ESMTP id 09C80D273F
-	for <qemu-devel@nongnu.org>; Tue, 16 May 2017 17:18:37 +0200 (CEST)
-References: <20170426070034.10727-1-david@gibson.dropbear.id.au>
-	<20170426070034.10727-20-david@gibson.dropbear.id.au>
-	<0b2e2d1c-d7ba-7d43-42b5-04ba592bf3e8@redhat.com>
-	<1a7e5576-6464-6d5b-f4a8-44dceb8a17af@kaod.org>
-	<0dc5ffde-39b7-6fd4-dc88-d66789414e4e@redhat.com>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <45db5bad-e1f3-d2d0-7014-878391638f6d@kaod.org>
-Date: Tue, 16 May 2017 17:18:27 +0200
-MIME-Version: 1.0
-In-Reply-To: <0dc5ffde-39b7-6fd4-dc88-d66789414e4e@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PULL 19/48] spapr: allocate the ICPState object
- from under sPAPRCPUCore
+	(envelope-from <a.perevalov@samsung.com>) id 1dAeG7-0005fL-Ay
+	for qemu-devel@nongnu.org; Tue, 16 May 2017 11:19:40 -0400
+Received: from mailout4.w1.samsung.com ([210.118.77.14]:57239)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <a.perevalov@samsung.com>)
+	id 1dAeG7-0005dp-1l
+	for qemu-devel@nongnu.org; Tue, 16 May 2017 11:19:35 -0400
+Received: from eucas1p1.samsung.com (unknown [182.198.249.206])
+	by mailout4.w1.samsung.com
+	(Oracle Communications Messaging Server 7.0.5.31.0 64bit (built May 5
+	2014)) with ESMTP id <0OQ1005KPX8IBM90@mailout4.w1.samsung.com> for
+	qemu-devel@nongnu.org; Tue, 16 May 2017 16:19:30 +0100 (BST)
+Date: Tue, 16 May 2017 18:19:27 +0300
+From: Alexey <a.perevalov@samsung.com>
+Message-id: <20170516151926.GA15848@aperevalov-ubuntu>
+MIME-version: 1.0
+Content-type: text/plain; charset=us-ascii
+Content-disposition: inline
+In-reply-to: <20170516113416.GD2839@work-vm>
+References: <1494595886-30912-1-git-send-email-a.perevalov@samsung.com>
+	<CGME20170512133147eucas1p1eaa21aac3a0b9d45be0ef8ea903b6824@eucas1p1.samsung.com>
+	<1494595886-30912-8-git-send-email-a.perevalov@samsung.com>
+	<20170516113416.GD2839@work-vm>
+Subject: Re: [Qemu-devel] [PATCH V5 7/9] migration: calculate vCPU blocktime
+ on dst side
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,153 +36,278 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laurent Vivier <lvivier@redhat.com>
-Cc: David Gibson <david@gibson.dropbear.id.au>, mdroth@linux.vnet.ibm.com, aik@ozlabs.ru, qemu-devel@nongnu.org, agraf@suse.de, qemu-ppc@nongnu.org, Greg Kurz <groug@kaod.org>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: i.maximets@samsung.com, qemu-devel@nongnu.org, peterx@redhat.com
 
-On 05/16/2017 02:55 PM, Laurent Vivier wrote:
-> On 16/05/2017 14:50, C=C3=A9dric Le Goater wrote:
->> On 05/16/2017 02:03 PM, Laurent Vivier wrote:
->>> On 26/04/2017 09:00, David Gibson wrote:
->>>> From: C=C3=A9dric Le Goater <clg@kaod.org>
->>>>
->>>> Today, all the ICPs are created before the CPUs, stored in an array
->>>> under the sPAPR machine and linked to the CPU when the core threads
->>>> are realized. This modeling brings some complexity when a lookup in
->>>> the array is required and it can be simplified by allocating the ICP=
-s
->>>> when the CPUs are.
->>>>
->>>> This is the purpose of this proposal which introduces a new 'icp_typ=
-e'
->>>> field under the machine and creates the ICP objects of the right typ=
-e
->>>> (KVM or not) before the PowerPCCPU object are.
->>>>
->>>> This change allows more cleanups : the removal of the icps array und=
-er
->>>> the sPAPR machine and the removal of the xics_get_cpu_index_by_dt_id=
-()
->>>> helper.
->>>>
->>>> Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
->>>> Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
->>>> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
->>>> ---
->>>>  hw/intc/xics.c          | 11 -----------
->>>>  hw/ppc/spapr.c          | 47 ++++++++++++++------------------------=
----------
->>>>  hw/ppc/spapr_cpu_core.c | 18 ++++++++++++++----
->>>>  include/hw/ppc/spapr.h  |  2 +-
->>>>  include/hw/ppc/xics.h   |  2 --
->>>>  5 files changed, 29 insertions(+), 51 deletions(-)
->>>>
->>>
->>> This commit breaks CPU re-hotplugging with KVM
->>>
->>> the sequence "device_add, device_del, device_add" brings to the
->>> following error message:
->>>
->>>     Unable to connect CPUx to kernel XICS: Device or resource busy
->>>
->>> It comes from icp_kvm_cpu_setup():
->>>
->>> ...
->>>     ret =3D kvm_vcpu_enable_cap(cs, KVM_CAP_IRQ_XICS, 0, kernel_xics_=
-fd,
->>>                               kvm_arch_vcpu_id(cs));
->>>     if (ret < 0) {
->>>         error_report("Unable to connect CPU%ld to kernel XICS: %s",
->>>                      kvm_arch_vcpu_id(cs), strerror(errno));
->>>         exit(1);
->>>     }
->>> ..
->>>
->>> It should be protected by cap_irq_xics_enabled:
->>>
->>> ...
->>>     /*
->>>      * If we are reusing a parked vCPU fd corresponding to the CPU
->>>      * which was hot-removed earlier we don't have to renable
->>>      * KVM_CAP_IRQ_XICS capability again.
->>>      */
->>>     if (icp->cap_irq_xics_enabled) {
->>>         return;
->>>     }
->>>
->>> ...
->>>     ret =3D kvm_vcpu_enable_cap(...);
->>> ...
->>>     icp->cap_irq_xics_enabled =3D true;
->>> ...
->>>
->>> But since this commit, "icp" is a new object on each call:
->>>
->>> spapr_cpu_core_realize_child()
->>> ...
->>>     obj =3D object_new(spapr->icp_type);
->>> ...
->>>     xics_cpu_setup(XICS_FABRIC(spapr), cpu, ICP(obj));
->>>     ...
->>>             icpc->cpu_setup(icp, cpu); -> icp_kvm_cpu_setup()
->>>     ...
->>> ...
->>>
->>> and "cap_irq_xics_enabled" is reinitialized.
->>>
->>> Any idea how to fix that?
->>
->> it seems that a cleanup is not done in the kernel. We are missing
->> a way to call kvmppc_xics_free_icp() from QEMU. Today the only
->> way is to destroy the vcpu.=20
->=20
-> The commit introducing this hack, for reference:
->=20
-> commit a45863bda90daa8ec39e5a312b9734fd4665b016
-> Author: Bharata B Rao <bharata@linux.vnet.ibm.com>
-> Date:   Thu Jul 2 16:23:20 2015 +1000
->=20
->     xics_kvm: Don't enable KVM_CAP_IRQ_XICS if already enabled
->    =20
->     When supporting CPU hot removal by parking the vCPU fd and reusing
->     it during hotplug again, there can be cases where we try to reenabl=
-e
->     KVM_CAP_IRQ_XICS CAP for the vCPU for which it was already enabled.
->     Introduce a boolean member in ICPState to track this and don't
->     reenable the CAP if it was already enabled earlier.
->    =20
->     Re-enabling this CAP should ideally work, but currently it results =
-in
->     kernel trying to create and associate ICP with this vCPU and that
->     fails since there is already an ICP associated with it. Hence this
->     patch is needed to work around this problem in the kernel.
->    =20
->     This change allows CPU hot removal to work for sPAPR.
->    =20
->     Signed-off-by: Bharata B Rao <bharata@linux.vnet.ibm.com>
->     Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
->     Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
->     Signed-off-by: Alexander Graf <agraf@suse.de>
+On Tue, May 16, 2017 at 12:34:16PM +0100, Dr. David Alan Gilbert wrote:
+> * Alexey Perevalov (a.perevalov@samsung.com) wrote:
+> > This patch provides blocktime calculation per vCPU,
+> > as a summary and as a overlapped value for all vCPUs.
+> > 
+> > This approach was suggested by Peter Xu, as an improvements of
+> > previous approch where QEMU kept tree with faulted page address and cpus bitmask
+> > in it. Now QEMU is keeping array with faulted page address as value and vCPU
+> > as index. It helps to find proper vCPU at UFFD_COPY time. Also it keeps
+> > list for blocktime per vCPU (could be traced with page_fault_addr)
+> > 
+> > Blocktime will not calculated if postcopy_blocktime field of
+> > MigrationIncomingState wasn't initialized.
+> > 
+> > Signed-off-by: Alexey Perevalov <a.perevalov@samsung.com>
+> 
+> I have some multi-threading/ordering worries still.
+> 
+> The fault thread receives faults over the ufd and calls
+> mark_postcopy_blocktime_being.  That's fine.
+> 
+> The receiving thread receives pages, calls place page, and
+> calls mark_postcopy_blocktime_end.  That's also fine.
+> 
+> However, remember that we send pages from the source without
+> them being requested as background transfers; consider:
+> 
+> 
+>     Source           receive-thread          fault-thread
+> 
+>   1  Send A
+>   2                  Receive A
+>   3                                            Access A
+>   4                                            Report on UFD
+>   5                  Place
+>   6                                            Read UFD entry
+> 
+> 
+>  Placing and reading UFD race - and up till now that's been fine;
+> so we can read off the ufd an address that's already on it's way from
+> the source, and which we might just be receiving, or that we might
+> have already placed.
+> 
+> In this code at (6) won't you call mark_postcopy_blocktime_start
+> even though it's already been placed at (5) ? Then that blocktime
+> will stay set until the end of the run?
+Could you clarify, what does it mean "Read UFD entry",
+Place - it's postcopy_place_page.
 
-OK.=20
 
-Greg is looking at re-adding the ICPState array because of a=20
-migration issue with older machines. We might need to do so=20
-unconditionally ...
+> 
+> Perhaps that's not a problem; if mark_postcopy_blocktime_end is called
+> for a different address it wont count the blocktime; and when
+> mark_postcopy_blocktime_start is called for a different address it'll
+> remove the addres that was a problem above - so perhaps that's fine?
+mark_postcopy_blocktime_begin doesn't clear state, it only sets the
+state.
 
-But for that specific issue, I think it would have been better=20
-to clean up the kernel state. Is that possible ?=20
+Looks like I imaging the race nature:
+kernel reports about pagefault for page, which are in the middle of the copying
+process, so we will never copy it again, and there is a chance it will
+be in vcpu_addr forever.
 
-Thanks,
 
-C.
-=20
+     Source           receive-thread          fault-thread
+ 
+   4                                            Report on UFD
+   5                   Place ioctl(UFFD_COPY)
+   5.1                 mark_postcopy_blocktime_end
+   4.1						mark_postcopy_blocktime_begin
 
->> Else we need to reintroduce the array of icps (again) to keep some=20
->> xics state ... but that just sucks :/ Let me think about it.=20
->>
->=20
-> Thanks,
-> Laurent
->> C.
->>
->=20
+I think that possible, but probability is too low, probability is increasing
+for small page size such as 4K pages, ioctl(UFFD_COPY) copies memory
+like memcpy doing, so time complexity of copying inside ioctl depends on page
+size.
+I think to add logic to check *_blocktime_begin in case of 
+*_blocktime_end for that page before. Just for not keeping addr in the
+vcpu_addr forever.
+
+> 
+> 
+> > ---
+> >  migration/postcopy-ram.c | 87 +++++++++++++++++++++++++++++++++++++++++++++++-
+> >  migration/trace-events   |  5 ++-
+> >  2 files changed, 90 insertions(+), 2 deletions(-)
+> > 
+> > diff --git a/migration/postcopy-ram.c b/migration/postcopy-ram.c
+> > index a1f1705..e2660ae 100644
+> > --- a/migration/postcopy-ram.c
+> > +++ b/migration/postcopy-ram.c
+> > @@ -23,6 +23,7 @@
+> >  #include "migration/postcopy-ram.h"
+> >  #include "sysemu/sysemu.h"
+> >  #include "sysemu/balloon.h"
+> > +#include <sys/param.h>
+> >  #include "qemu/error-report.h"
+> >  #include "trace.h"
+> >  
+> > @@ -542,6 +543,86 @@ static int ram_block_enable_notify(const char *block_name, void *host_addr,
+> >      return 0;
+> >  }
+> >  
+> > +static int get_mem_fault_cpu_index(uint32_t pid)
+> > +{
+> > +    CPUState *cpu_iter;
+> > +
+> > +    CPU_FOREACH(cpu_iter) {
+> > +        if (cpu_iter->thread_id == pid) {
+> > +            return cpu_iter->cpu_index;
+> > +        }
+> > +    }
+> > +    trace_get_mem_fault_cpu_index(pid);
+> > +    return -1;
+> > +}
+> > +
+> > +static void mark_postcopy_blocktime_begin(uint64_t addr, int cpu)
+> > +{
+> > +    MigrationIncomingState *mis = migration_incoming_get_current();
+> > +    PostcopyBlocktimeContext *dc;
+> > +    int64_t now_ms;
+> > +    if (!mis->blocktime_ctx || cpu < 0) {
+> > +        return;
+> > +    }
+> 
+> You might consider:
+> 
+>  PostcopyBlocktimeContext *dc = mis->blocktime_ctx;
+>  int64_t now_ms;
+>  if (!dc || cpu < 0) {
+>      return;
+>  }
+> 
+> it gets rid of the two reads of mis->blocktime_ctx
+> (You do something similar in a few places)
+> 
+> > +    now_ms = qemu_clock_get_ms(QEMU_CLOCK_REALTIME);
+> > +    dc = mis->blocktime_ctx;
+> > +    if (dc->vcpu_addr[cpu] == 0) {
+> > +        atomic_inc(&dc->smp_cpus_down);
+> > +    }
+> > +
+> > +    atomic_xchg__nocheck(&dc->vcpu_addr[cpu], addr);
+> > +    atomic_xchg__nocheck(&dc->last_begin, now_ms);
+> > +    atomic_xchg__nocheck(&dc->page_fault_vcpu_time[cpu], now_ms);
+> > +
+> > +    trace_mark_postcopy_blocktime_begin(addr, dc, dc->page_fault_vcpu_time[cpu],
+> > +            cpu);
+> > +}
+> > +
+> > +static void mark_postcopy_blocktime_end(uint64_t addr)
+> > +{
+> > +    MigrationIncomingState *mis = migration_incoming_get_current();
+> > +    PostcopyBlocktimeContext *dc;
+> > +    int i, affected_cpu = 0;
+> > +    int64_t now_ms;
+> > +    bool vcpu_total_blocktime = false;
+> > +
+> > +    if (!mis->blocktime_ctx) {
+> > +        return;
+> > +    }
+> > +    dc = mis->blocktime_ctx;
+> > +    now_ms = qemu_clock_get_ms(QEMU_CLOCK_REALTIME);
+> > +
+> > +    /* lookup cpu, to clear it,
+> > +     * that algorithm looks straighforward, but it's not
+> > +     * optimal, more optimal algorithm is keeping tree or hash
+> > +     * where key is address value is a list of  */
+> > +    for (i = 0; i < smp_cpus; i++) {
+> > +        uint64_t vcpu_blocktime = 0;
+> > +        if (atomic_fetch_add(&dc->vcpu_addr[i], 0) != addr) {
+> > +            continue;
+> > +        }
+> > +        atomic_xchg__nocheck(&dc->vcpu_addr[i], 0);
+> > +        vcpu_blocktime = now_ms -
+> > +            atomic_fetch_add(&dc->page_fault_vcpu_time[i], 0);
+> > +        affected_cpu += 1;
+> > +        /* we need to know is that mark_postcopy_end was due to
+> > +         * faulted page, another possible case it's prefetched
+> > +         * page and in that case we shouldn't be here */
+> > +        if (!vcpu_total_blocktime &&
+> > +            atomic_fetch_add(&dc->smp_cpus_down, 0) == smp_cpus) {
+> > +            vcpu_total_blocktime = true;
+> > +        }
+> > +        /* continue cycle, due to one page could affect several vCPUs */
+> > +        dc->vcpu_blocktime[i] += vcpu_blocktime;
+> > +    }
+> > +
+> > +    atomic_sub(&dc->smp_cpus_down, affected_cpu);
+> > +    if (vcpu_total_blocktime) {
+> > +        dc->total_blocktime += now_ms - atomic_fetch_add(&dc->last_begin, 0);
+> 
+> This total_blocktime calculation is a little odd; the 'last_begin' is
+> not necessarily related to the same CPU or same block.
+last_begin should not be related to the same vCPU, vCPU doesn't
+matter in this case, due to last_begin is a time when
+mark_postcopy_blocktime_begin was called (last pagefault),
+so if we 100% sure here all vCPU is blocked, the time interval since it
+was blocked starts at last_begin time, even that last_begin was on
+another vCPU.
+
+> 
+> Dave
+> 
+> > +    }
+> > +    trace_mark_postcopy_blocktime_end(addr, dc, dc->total_blocktime);
+> > +}
+> > +
+> >  /*
+> >   * Handle faults detected by the USERFAULT markings
+> >   */
+> > @@ -619,8 +700,11 @@ static void *postcopy_ram_fault_thread(void *opaque)
+> >          rb_offset &= ~(qemu_ram_pagesize(rb) - 1);
+> >          trace_postcopy_ram_fault_thread_request(msg.arg.pagefault.address,
+> >                                                  qemu_ram_get_idstr(rb),
+> > -                                                rb_offset);
+> > +                                                rb_offset,
+> > +                                                msg.arg.pagefault.feat.ptid);
+> >  
+> > +        mark_postcopy_blocktime_begin((uintptr_t)(msg.arg.pagefault.address),
+> > +                         get_mem_fault_cpu_index(msg.arg.pagefault.feat.ptid));
+> >          /*
+> >           * Send the request to the source - we want to request one
+> >           * of our host page sizes (which is >= TPS)
+> > @@ -715,6 +799,7 @@ int postcopy_place_page(MigrationIncomingState *mis, void *host, void *from,
+> >  
+> >          return -e;
+> >      }
+> > +    mark_postcopy_blocktime_end((uint64_t)(uintptr_t)host);
+> >  
+> >      trace_postcopy_place_page(host);
+> >      return 0;
+> > diff --git a/migration/trace-events b/migration/trace-events
+> > index b8f01a2..9424e3e 100644
+> > --- a/migration/trace-events
+> > +++ b/migration/trace-events
+> > @@ -110,6 +110,8 @@ process_incoming_migration_co_end(int ret, int ps) "ret=%d postcopy-state=%d"
+> >  process_incoming_migration_co_postcopy_end_main(void) ""
+> >  migration_set_incoming_channel(void *ioc, const char *ioctype) "ioc=%p ioctype=%s"
+> >  migration_set_outgoing_channel(void *ioc, const char *ioctype, const char *hostname)  "ioc=%p ioctype=%s hostname=%s"
+> > +mark_postcopy_blocktime_begin(uint64_t addr, void *dd, int64_t time, int cpu) "addr 0x%" PRIx64 " dd %p time %" PRId64 " cpu %d"
+> > +mark_postcopy_blocktime_end(uint64_t addr, void *dd, int64_t time) "addr 0x%" PRIx64 " dd %p time %" PRId64
+> >  
+> >  # migration/rdma.c
+> >  qemu_rdma_accept_incoming_migration(void) ""
+> > @@ -186,7 +188,7 @@ postcopy_ram_enable_notify(void) ""
+> >  postcopy_ram_fault_thread_entry(void) ""
+> >  postcopy_ram_fault_thread_exit(void) ""
+> >  postcopy_ram_fault_thread_quit(void) ""
+> > -postcopy_ram_fault_thread_request(uint64_t hostaddr, const char *ramblock, size_t offset) "Request for HVA=%" PRIx64 " rb=%s offset=%zx"
+> > +postcopy_ram_fault_thread_request(uint64_t hostaddr, const char *ramblock, size_t offset, uint32_t pid) "Request for HVA=%" PRIx64 " rb=%s offset=%zx %u"
+> >  postcopy_ram_incoming_cleanup_closeuf(void) ""
+> >  postcopy_ram_incoming_cleanup_entry(void) ""
+> >  postcopy_ram_incoming_cleanup_exit(void) ""
+> > @@ -195,6 +197,7 @@ save_xbzrle_page_skipping(void) ""
+> >  save_xbzrle_page_overflow(void) ""
+> >  ram_save_iterate_big_wait(uint64_t milliconds, int iterations) "big wait: %" PRIu64 " milliseconds, %d iterations"
+> >  ram_load_complete(int ret, uint64_t seq_iter) "exit_code %d seq iteration %" PRIu64
+> > +get_mem_fault_cpu_index(uint32_t pid) "pid %u is not vCPU"
+> >  
+> >  # migration/exec.c
+> >  migration_exec_outgoing(const char *cmd) "cmd=%s"
+> > -- 
+> > 1.9.1
+> > 
+> --
+> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> 
+
+-- 
+
+BR
+Alexey
