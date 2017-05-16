@@ -1,31 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39717)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44196)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <flypie1@yahoo.com>) id 1dAczH-0000fq-52
-	for qemu-devel@nongnu.org; Tue, 16 May 2017 09:58:09 -0400
+	(envelope-from <kwolf@redhat.com>) id 1dAdH3-0006IK-EZ
+	for qemu-devel@nongnu.org; Tue, 16 May 2017 10:16:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <flypie1@yahoo.com>) id 1dAczB-0005rL-Nr
-	for qemu-devel@nongnu.org; Tue, 16 May 2017 09:58:07 -0400
-Received: from sonic311-57.consmr.mail.ir2.yahoo.com ([77.238.176.189]:44136)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <flypie1@yahoo.com>) id 1dAczB-0005r7-Bx
-	for qemu-devel@nongnu.org; Tue, 16 May 2017 09:58:01 -0400
-Date: Tue, 16 May 2017 13:53:56 +0000 (UTC)
-From: John Bradley <flypie1@yahoo.com>
-Reply-To: John Bradley <flypie1@yahoo.com>
-Message-ID: <290007707.907996.1494942836719@mail.yahoo.com>
-In-Reply-To: <96776f9a-ab8c-b92a-fd07-f69f495d0381@web.de>
-References: <757990479.60759.1494722527715.ref@mail.yahoo.com>
-	<757990479.60759.1494722527715@mail.yahoo.com>
-	<CAKmqyKPy35OuMkixGnDXOvApAu82uXrtQStSz4GzHNRStdFFNA@mail.gmail.com>
-	<1337329283.3100470.1494870647989@mail.yahoo.com>
-	<90703952-bc99-ecfe-96c7-810bb1784dce@amsat.org>
-	<1901691584.9094.1494892886522@mail.yahoo.com>
-	<96776f9a-ab8c-b92a-fd07-f69f495d0381@web.de>
+	(envelope-from <kwolf@redhat.com>) id 1dAdH1-00058G-Gn
+	for qemu-devel@nongnu.org; Tue, 16 May 2017 10:16:29 -0400
+Date: Tue, 16 May 2017 16:16:02 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20170516141602.GE4438@noname.redhat.com>
+References: <20170515203114.9477-1-hpoussin@reactos.org>
+	<20170515203114.9477-6-hpoussin@reactos.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <20170515203114.9477-6-hpoussin@reactos.org>
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [Qemu-arm] Changes to Broadcom(BCM) files and
- Raspberry Pi files. Addition of PanelEmu
+Subject: Re: [Qemu-devel] [PATCH 05/13] vvfat: introduce
+ offset_to_bootsector, offset_to_fat and offset_to_root_dir
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,246 +25,270 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Geert Martin Ijewski <gm.ijewski@web.de>, =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Alistair Francis <alistair.francis@xilinx.com>
-Cc: Laurent Vivier <lvivier@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, John Bradley <flypie@rocketmail.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Markus Armbruster <armbru@redhat.com>, "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>
+To: =?iso-8859-1?Q?Herv=E9?= Poussineau <hpoussin@reactos.org>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 
-The idea of an RFC is good, but with it I would like to have a demo. Someth=
-ing with no mass implementation to worry about and this would be it.=20
-I should also add a version number to the initialisation of the protocol to=
- increase robustness, between versions. I'll call this one V 0.
-=C2=A0John BradleyTel: 07896 839635Skype: flypie125 125B Grove StreetEdge H=
-ill Liverpool L7 7AF=20
+Am 15.05.2017 um 22:31 hat Herv=E9 Poussineau geschrieben:
+> - offset_to_bootsector is the number of sectors up to FAT bootsector
+> - offset_to_fat is the number of sectors up to first File Allocation Ta=
+ble
+> - offset_to_root_dir is the number of sectors up to root directory sect=
+or
 
-    On Tuesday, 16 May 2017, 9:56, Geert Martin Ijewski <gm.ijewski@web.de>=
- wrote:
-=20
+Hm... These names make me think of byte offsets. Not completely opposed
+to them, but if anyone can think of something better...?
 
- Am 16.05.2017 um 02:01 schrieb John Bradley via Qemu-devel:
-> Hi,
-> The XML files in the base are not in the patch. They where net beans file=
-s. I can easily get it into 3 files, one large at 91KB but contains only ne=
-w files and so is easy to read. Could be smaller but seems pointless.
->
-I think what Alistar meant was something along the lines of:
-patch/commit 1) add the remaining bcm2835 devices from Markus=20
-Armbruster's code to QEMU (btw: any reason why that hasn't been done?=20
-The USB stuff does seem nice to have)
--- with a more meaningful commit title
-2) add utils/panelemu.c and the include
-3) bcm2835 now uses the emupanel
-and then your other commits e.g.
-4) USB CDC Ethernet driver dropped packets
-5) emupanel: fixed compilation errors on linux
-6) emupanel: removed last blocking I/O
+> Replace first_sectors_number - 1 by offset_to_bootsector.
+> Replace first_sectors_number by offset_to_fat.
+> Replace faked_sectors by offset_to_rootdir.
+>=20
+> Signed-off-by: Herv=E9 Poussineau <hpoussin@reactos.org>
+> ---
+>  block/vvfat.c | 67 +++++++++++++++++++++++++++++++++++----------------=
+--------
+>  1 file changed, 40 insertions(+), 27 deletions(-)
+>=20
+> diff --git a/block/vvfat.c b/block/vvfat.c
+> index 4f4a63c03f..f60d2a3889 100644
+> --- a/block/vvfat.c
+> +++ b/block/vvfat.c
+> @@ -320,22 +320,24 @@ static void print_mapping(const struct mapping_t*=
+ mapping);
+>  typedef struct BDRVVVFATState {
+>      CoMutex lock;
+>      BlockDriverState* bs; /* pointer to parent */
+> -    unsigned int first_sectors_number; /* 1 for a single partition, 0x=
+40 for a disk with partition table */
+>      unsigned char first_sectors[0x40*0x200];
+> =20
+>      int fat_type; /* 16 or 32 */
+>      array_t fat,directory,mapping;
+>      char volume_label[11];
+> =20
+> +    uint32_t offset_to_bootsector; /* 0 for floppy, 0x3f for disk */
+> +
+>      unsigned int cluster_size;
+>      unsigned int sectors_per_cluster;
+>      unsigned int sectors_per_fat;
+>      unsigned int sectors_of_root_directory;
+>      uint32_t last_cluster_of_root_directory;
+> -    unsigned int faked_sectors; /* how many sectors are faked before f=
+ile data */
+>      uint32_t sector_count; /* total number of sectors of the partition=
+ */
+>      uint32_t cluster_count; /* total number of clusters of this partit=
+ion */
+>      uint32_t max_fat_value;
+> +    uint32_t offset_to_fat;
+> +    uint32_t offset_to_root_dir;
+> =20
+>      int current_fd;
+>      mapping_t* current_mapping;
+> @@ -394,15 +396,15 @@ static void init_mbr(BDRVVVFATState *s, int cyls,=
+ int heads, int secs)
+>      partition->attributes=3D0x80; /* bootable */
+> =20
+>      /* LBA is used when partition is outside the CHS geometry */
+> -    lba  =3D sector2CHS(&partition->start_CHS, s->first_sectors_number=
+ - 1,
+> +    lba  =3D sector2CHS(&partition->start_CHS, s->offset_to_bootsector=
+,
+>                       cyls, heads, secs);
+>      lba |=3D sector2CHS(&partition->end_CHS,   s->bs->total_sectors - =
+1,
+>                       cyls, heads, secs);
+> =20
+>      /*LBA partitions are identified only by start/length_sector_long n=
+ot by CHS*/
+> -    partition->start_sector_long  =3D cpu_to_le32(s->first_sectors_num=
+ber - 1);
+> +    partition->start_sector_long  =3D cpu_to_le32(s->offset_to_bootsec=
+tor);
+>      partition->length_sector_long =3D cpu_to_le32(s->bs->total_sectors
+> -                                                - s->first_sectors_num=
+ber + 1);
+> +                                                - s->offset_to_bootsec=
+tor);
+> =20
+>      /* FAT12/FAT16/FAT32 */
+>      /* DOS uses different types when partition is LBA,
+> @@ -823,12 +825,12 @@ static int read_directory(BDRVVVFATState* s, int =
+mapping_index)
+> =20
+>  static inline uint32_t sector2cluster(BDRVVVFATState* s,off_t sector_n=
+um)
+>  {
+> -    return (sector_num-s->faked_sectors)/s->sectors_per_cluster;
+> +    return (sector_num - s->offset_to_root_dir) / s->sectors_per_clust=
+er;
+>  }
+> =20
+>  static inline off_t cluster2sector(BDRVVVFATState* s, uint32_t cluster=
+_num)
+>  {
+> -    return s->faked_sectors + s->sectors_per_cluster * cluster_num;
+> +    return s->offset_to_root_dir + s->sectors_per_cluster * cluster_nu=
+m;
+>  }
+> =20
+>  static int init_directories(BDRVVVFATState* s,
+> @@ -855,6 +857,9 @@ static int init_directories(BDRVVVFATState* s,
+>      i =3D 1+s->sectors_per_cluster*0x200*8/s->fat_type;
+>      s->sectors_per_fat=3D(s->sector_count+i)/i; /* round up */
+> =20
+> +    s->offset_to_fat =3D s->offset_to_bootsector + 1;
+> +    s->offset_to_root_dir =3D s->offset_to_fat + s->sectors_per_fat * =
+2;
+> +
+>      array_init(&(s->mapping),sizeof(mapping_t));
+>      array_init(&(s->directory),sizeof(direntry_t));
+> =20
+> @@ -868,7 +873,6 @@ static int init_directories(BDRVVVFATState* s,
+>      /* Now build FAT, and write back information into directory */
+>      init_fat(s);
+> =20
+> -    s->faked_sectors=3Ds->first_sectors_number+s->sectors_per_fat*2;
+>      s->cluster_count=3Dsector2cluster(s, s->sector_count);
+> =20
+>      mapping =3D array_get_next(&(s->mapping));
+> @@ -946,7 +950,8 @@ static int init_directories(BDRVVVFATState* s,
+> =20
+>      s->current_mapping =3D NULL;
+> =20
+> -    bootsector=3D(bootsector_t*)(s->first_sectors+(s->first_sectors_nu=
+mber-1)*0x200);
+> +    bootsector =3D (bootsector_t *)(s->first_sectors
+> +                                  + s->offset_to_bootsector * 0x200);
+>      bootsector->jump[0]=3D0xeb;
+>      bootsector->jump[1]=3D0x3e;
+>      bootsector->jump[2]=3D0x90;
+> @@ -957,16 +962,16 @@ static int init_directories(BDRVVVFATState* s,
+>      bootsector->number_of_fats=3D0x2; /* number of FATs */
+>      bootsector->root_entries=3Dcpu_to_le16(s->sectors_of_root_director=
+y*0x10);
+>      bootsector->total_sectors16=3Ds->sector_count>0xffff?0:cpu_to_le16=
+(s->sector_count);
+> -    bootsector->media_type=3D(s->first_sectors_number>1?0xf8:0xf0); /*=
+ media descriptor (f8=3Dhd, f0=3D3.5 fd)*/
+> +    bootsector->media_type =3D (s->offset_to_bootsector > 0 ? 0xf8 : 0=
+xf0);
 
-Along the way you also seem to fix indentation in other code a lot, that=20
-makes following the patches more confusing than they need to be.
-It's harder to gauge at a quick glance whether you changed something=20
-meaingul or not.
+Please keep the comment. I don't mind if you want to move it to its own
+line, but it's better to have magic numbers like 0xf8 and 0xf0 explained
+somewhere. (Or you could introduce descriptive #defines for them.)
 
-Maybe even send a RFC just detailing the protocol, because it's probably=20
-important to get that right from the start.
+>      s->fat.pointer[0] =3D bootsector->media_type;
+>      bootsector->sectors_per_fat=3Dcpu_to_le16(s->sectors_per_fat);
+>      bootsector->sectors_per_track =3D cpu_to_le16(secs);
+>      bootsector->number_of_heads =3D cpu_to_le16(heads);
+> -    bootsector->hidden_sectors=3Dcpu_to_le32(s->first_sectors_number=3D=
+=3D1?0:0x3f);
+> +    bootsector->hidden_sectors =3D cpu_to_le32(s->offset_to_bootsector=
+);
+>      bootsector->total_sectors=3Dcpu_to_le32(s->sector_count>0xffff?s->=
+sector_count:0);
 
-Geert
-> another which is about 19KB of quite simple changes to mostly make files.
-> Then one 15KB which quite straight forward when you look at it. Applying =
-them in that order should allow step wise addition. I've uploaded them to a=
- share if anyone wants to comment.
->
-> The 3 files are new.patch
->
-> |
-> |
-> |
-> |=C2=A0 |=C2=A0 =C2=A0 |
->
->=C2=A0 =C2=A0 |
->
->=C2=A0 |
-> |
-> |=C2=A0 =C2=A0 |
-> new.patch
->=C2=A0 Shared with Dropbox=C2=A0 |=C2=A0 |
->
->=C2=A0 |
->
->=C2=A0 |
->
->
->=C2=A0 mod1.patch
->
->
-> |
-> |
-> |
-> |=C2=A0 |=C2=A0 =C2=A0 |
->
->=C2=A0 =C2=A0 |
->
->=C2=A0 |
-> |
-> |=C2=A0 =C2=A0 |
-> mod1.patch
->=C2=A0 Shared with Dropbox=C2=A0 |=C2=A0 |
->
->=C2=A0 |
->
->=C2=A0 |
->
->
->
-> and
->=C2=A0 a_hw_gpio_bcm2835_gpio.c.patch
->
-> |
-> |
-> |
-> |=C2=A0 |=C2=A0 =C2=A0 |
->
->=C2=A0 =C2=A0 |
->
->=C2=A0 |
-> |
-> |=C2=A0 =C2=A0 |
-> a_hw_gpio_bcm2835_gpio.c.patch
->=C2=A0 Shared with Dropbox=C2=A0 |=C2=A0 |
->
->=C2=A0 |
->
->=C2=A0 |
->
->
->
->
->
-> John BradleyTel: 07896 839635Skype: flypie125 125B Grove StreetEdge Hill =
-Liverpool L7 7AF
->
->=C2=A0 =C2=A0 On Tuesday, 16 May 2017, 0:20, Philippe Mathieu-Daud=C3=A9 <=
-f4bug@amsat.org> wrote:
->
->
->=C2=A0 Hi John,
->
->> That is going to be very difficult as a lot of the changes are
->> interlinked the vast majority of the patch is new files.
->
-> I rebased your branch on latest qemu/master here:
->
-> https://github.com/philmd/qemu/tree/flypie-GDummyPanel-rebased
->
-> It is much easier to follow now, the big XML files you added/removed
-> also disappeared (gitk was crashing 'Out Of Memory' trying to look at
-> your tree).
->
-> I hope it can help you to continue reordering in smaller patches.
->
-> Regards,
->
-> Phil.
->
-> On 05/15/2017 01:46 PM, Alistair Francis wrote:
->>
->> Hey John,
->>
->> Thanks for the patch!
->>
->> Unfortunately this patch is too long to review, you need to split the
->> patch up into shorter more readable patches. Otherwise it's too hard
->> to people to understand what you are changing and why.
->>
->> There are some details here:
->> http://wiki.qemu.org/Contribute/SubmitAPatch
->> <http://wiki.qemu.org/Contribute/SubmitAPatch>about how to split up
->> patches. Each patch applied in order shouldn't break any compilation
->> or runtime. Generally the flow is to add the logic in earlier patches
->> and then connect it and switch it on in the later patches.
->>
->> Try splitting up adding/editing each individual device and send that
->> our first. That is generally the easiest to review/accept.
->>
->> Thanks,
->>
->> Alistair
->>
->>> ---
->>> .gitignore=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 |=C2=A0 54 ++
->>> hw/arm/Makefile.objs=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 |=C2=A0 =C2=A0 2 +-
->>> hw/arm/bcm2835.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0 =C2=A0 |=C2=A0 114 ++++
->>> hw/arm/bcm2835_peripherals.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 |=C2=A0 104 +++=
-+
->>> hw/arm/bcm2836.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0 =C2=A0 |=C2=A0 =C2=A0 3 +-
->>> hw/arm/raspi.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 =C2=A0 =C2=A0 |=C2=A0 77 ++-
->>> hw/gpio/bcm2835_gpio.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-|=C2=A0 333 ++++++-----
->>> hw/misc/Makefile.objs=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 |=C2=A0 =C2=A0 2 +
->>> hw/misc/bcm2835_mphi.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-|=C2=A0 163 ++++++
->>> hw/misc/bcm2835_power.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- |=C2=A0 106 ++++
->>> hw/timer/Makefile.objs=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-|=C2=A0 =C2=A0 2 +
->>> hw/timer/bcm2835_st.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 |=C2=A0 202 +++++++
->>> hw/timer/bcm2835_timer.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 |=C2=
-=A0 224 +++++++
->>> hw/usb/Makefile.objs=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 |=C2=A0 =C2=A0 4 +-
->>> hw/usb/bcm2835_usb.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 |=C2=A0 604 +++++++++++++++++++
->>> hw/usb/bcm2835_usb_regs.h=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 | 10=
-61
->> ++++++++++++++++++++++++++++++++++
->>> hw/usb/dev-network.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 |=C2=A0 =C2=A0 2 +-
->>> include/hw/arm/bcm2835.h=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 |=C2=
-=A0 37 ++
->>> include/hw/arm/bcm2835_peripherals.h |=C2=A0 10 +
->>> include/hw/gpio/bcm2835_gpio.h=C2=A0 =C2=A0 =C2=A0 |=C2=A0 =C2=A0 5 +
->>> include/hw/intc/bcm2835_control.h=C2=A0 =C2=A0 |=C2=A0 53 ++
->>> include/hw/intc/bcm2836_control.h=C2=A0 =C2=A0 |=C2=A0 =C2=A0 2 +
->>> include/hw/misc/bcm2835_mphi.h=C2=A0 =C2=A0 =C2=A0 |=C2=A0 28 +
->>> include/hw/misc/bcm2835_power.h=C2=A0 =C2=A0 =C2=A0 |=C2=A0 22 +
->>> include/hw/timer/bcm2835_st.h=C2=A0 =C2=A0 =C2=A0 =C2=A0 |=C2=A0 25 +
->>> include/hw/timer/bcm2835_timer.h=C2=A0 =C2=A0 |=C2=A0 32 +
->>> include/hw/usb/bcm2835_usb.h=C2=A0 =C2=A0 =C2=A0 =C2=A0 |=C2=A0 78 +++
->>> include/qemu/PanelEmu.h=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- |=C2=A0 53 ++
->>> util/Makefile.objs=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 |=C2=A0 =C2=A0 1 +
->>> util/PanelEmu.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 =C2=A0 =C2=A0 |=C2=A0 293 ++++++++++
->>> 30 files changed, 3547 insertions(+), 149 deletions(-)
->>> create mode 100644 hw/arm/bcm2835.c
->>> create mode 100644 hw/misc/bcm2835_mphi.c
->>> create mode 100644 hw/misc/bcm2835_power.c
->>> create mode 100644 hw/timer/bcm2835_st.c
->>> create mode 100644 hw/timer/bcm2835_timer.c
->>> create mode 100644 hw/usb/bcm2835_usb.c
->>> create mode 100644 hw/usb/bcm2835_usb_regs.h
->>> create mode 100644 include/hw/arm/bcm2835.h
->>> create mode 100644 include/hw/intc/bcm2835_control.h
->>> create mode 100644 include/hw/misc/bcm2835_mphi.h
->>> create mode 100644 include/hw/misc/bcm2835_power.h
->>> create mode 100644 include/hw/timer/bcm2835_st.h
->>> create mode 100644 include/hw/timer/bcm2835_timer.h
->>> create mode 100644 include/hw/usb/bcm2835_usb.h
->>> create mode 100644 include/qemu/PanelEmu.h
->>> create mode 100644 util/PanelEmu.c
->>>
->>
->>
->
->
->
->
+Nice simplification. :-)
 
+>      /* LATER TODO: if FAT32, this is wrong */
+> -    bootsector->u.fat16.drive_number=3Ds->first_sectors_number=3D=3D1?=
+0:0x80; /* fda=3D0, hda=3D0x80 */
+> +    bootsector->u.fat16.drive_number =3D s->offset_to_bootsector =3D=3D=
+ 0 ? 0 : 0x80;
 
+Here I would like the comment to be preserved again.
 
-  =20
+>      bootsector->u.fat16.current_head=3D0;
+>      bootsector->u.fat16.signature=3D0x29;
+>      bootsector->u.fat16.id=3Dcpu_to_le32(0xfabe1afd);
+> @@ -1123,7 +1128,6 @@ static int vvfat_open(BlockDriverState *bs, QDict=
+ *options, int flags,
+>              secs =3D s->fat_type =3D=3D 12 ? 18 : 36;
+>              s->sectors_per_cluster =3D 1;
+>          }
+> -        s->first_sectors_number =3D 1;
+>          cyls =3D 80;
+>          heads =3D 2;
+>      } else {
+> @@ -1131,7 +1135,7 @@ static int vvfat_open(BlockDriverState *bs, QDict=
+ *options, int flags,
+>          if (!s->fat_type) {
+>              s->fat_type =3D 16;
+>          }
+> -        s->first_sectors_number =3D 0x40;
+> +        s->offset_to_bootsector =3D 0x3f;
+>          cyls =3D s->fat_type =3D=3D 12 ? 64 : 1024;
+>          heads =3D 16;
+>          secs =3D 63;
+> @@ -1169,7 +1173,7 @@ static int vvfat_open(BlockDriverState *bs, QDict=
+ *options, int flags,
+>      fprintf(stderr, "vvfat %s chs %d,%d,%d\n",
+>              dirname, cyls, heads, secs);
+> =20
+> -    s->sector_count =3D cyls * heads * secs - (s->first_sectors_number=
+ - 1);
+> +    s->sector_count =3D cyls * heads * secs - s->offset_to_bootsector;
+> =20
+>      if (qemu_opt_get_bool(opts, "rw", false)) {
+>          ret =3D enable_write_target(bs, errp);
+> @@ -1186,7 +1190,8 @@ static int vvfat_open(BlockDriverState *bs, QDict=
+ *options, int flags,
+>          goto fail;
+>      }
+> =20
+> -    s->sector_count =3D s->faked_sectors + s->sectors_per_cluster*s->c=
+luster_count;
+> +    s->sector_count =3D s->offset_to_root_dir
+> +                    + s->sectors_per_cluster * s->cluster_count;
+> =20
+>      /* Disable migration when vvfat is used rw */
+>      if (s->qcow) {
+> @@ -1202,7 +1207,7 @@ static int vvfat_open(BlockDriverState *bs, QDict=
+ *options, int flags,
+>          }
+>      }
+> =20
+> -    if (s->first_sectors_number =3D=3D 0x40) {
+> +    if (s->offset_to_bootsector > 0) {
+>          init_mbr(s, cyls, heads, secs);
+>      }
+> =20
+> @@ -1415,15 +1420,23 @@ static int vvfat_read(BlockDriverState *bs, int=
+64_t sector_num,
+>              }
+>  DLOG(fprintf(stderr, "sector %d not allocated\n", (int)sector_num));
+>          }
+> -        if(sector_num<s->faked_sectors) {
+> -            if(sector_num<s->first_sectors_number)
+> -                memcpy(buf+i*0x200,&(s->first_sectors[sector_num*0x200=
+]),0x200);
+> -            else if(sector_num-s->first_sectors_number<s->sectors_per_=
+fat)
+> -                memcpy(buf+i*0x200,&(s->fat.pointer[(sector_num-s->fir=
+st_sectors_number)*0x200]),0x200);
+> -            else if(sector_num-s->first_sectors_number-s->sectors_per_=
+fat<s->sectors_per_fat)
+> -                memcpy(buf+i*0x200,&(s->fat.pointer[(sector_num-s->fir=
+st_sectors_number-s->sectors_per_fat)*0x200]),0x200);
+> +        if (sector_num < s->offset_to_root_dir) {
+> +            if (sector_num < s->offset_to_fat)
+> +                memcpy(buf + i * 0x200,
+> +                       &(s->first_sectors[sector_num * 0x200]),
+> +                       0x200);
+> +            else if (sector_num < s->offset_to_fat + s->sectors_per_fa=
+t)
+> +                memcpy(buf + i * 0x200,
+> +                       &(s->fat.pointer[(sector_num
+> +                                       - s->offset_to_fat) * 0x200]),
+> +                       0x200);
+> +            else if (sector_num < s->offset_to_root_dir)
+> +                memcpy(buf + i * 0x200,
+> +                       &(s->fat.pointer[(sector_num - s->offset_to_fat
+> +                                       - s->sectors_per_fat) * 0x200])=
+,
+> +                       0x200);
+
+The QEMU coding style requires braces for all branches of this if
+statement.
+
+Kevin
