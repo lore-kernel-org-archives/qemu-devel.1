@@ -1,26 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58776)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34729)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dAZJP-0000ga-WB
-	for qemu-devel@nongnu.org; Tue, 16 May 2017 06:02:40 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1dAZXI-0003XW-RG
+	for qemu-devel@nongnu.org; Tue, 16 May 2017 06:17:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dAZJJ-0004hD-Tl
-	for qemu-devel@nongnu.org; Tue, 16 May 2017 06:02:40 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47150)
+	(envelope-from <vsementsov@virtuozzo.com>) id 1dAZXD-0001xm-Q2
+	for qemu-devel@nongnu.org; Tue, 16 May 2017 06:17:00 -0400
+Received: from mailhub.sw.ru ([195.214.232.25]:43244 helo=relay.sw.ru)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1dAZJJ-0004gr-KV
-	for qemu-devel@nongnu.org; Tue, 16 May 2017 06:02:33 -0400
-References: <1494838260-30439-1-git-send-email-peterx@redhat.com>
-	<1494838260-30439-2-git-send-email-peterx@redhat.com>
-	<20170516025300.GA30022@umbus.fritz.box>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <41cd420c-3a07-34a0-c0da-286a152eb70c@redhat.com>
-Date: Tue, 16 May 2017 12:02:07 +0200
+	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
+	id 1dAZXD-0001wH-EW
+	for qemu-devel@nongnu.org; Tue, 16 May 2017 06:16:55 -0400
+References: <20170512141702.12423-1-vsementsov@virtuozzo.com>
+	<8c231084-8eaa-fe66-43cd-4c85f1e45272@redhat.com>
+	<005ea4a3-6565-6a56-75de-b6464bcae8fd@virtuozzo.com>
+	<0fcdd582-47d1-0206-1c66-d8db615f1174@redhat.com>
+	<858a4c56-1f9c-b7a3-fd73-34e4c8b59953@virtuozzo.com>
+	<e86ebf22-66ac-759c-c726-390daa2933c2@virtuozzo.com>
+	<75da073d-62e8-81ac-990c-aa60aa88dc54@virtuozzo.com>
+	<a6f0288b-fe7f-3439-e3e0-5fcf1812201c@redhat.com>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <a746364c-2c7c-9cb6-b7e2-b27d42e035b3@virtuozzo.com>
+Date: Tue, 16 May 2017 13:16:51 +0300
 MIME-Version: 1.0
-In-Reply-To: <20170516025300.GA30022@umbus.fritz.box>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="GWfH9IIDGt4wnpKhXUEg9SA4FWxJWCIi6"
-Subject: Re: [Qemu-devel] [PATCH 1/4] exec: simplify phys_page_find() params
+In-Reply-To: <a6f0288b-fe7f-3439-e3e0-5fcf1812201c@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] nbd: strict nbd_wr_syncv
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,109 +34,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>, Peter Xu <peterx@redhat.com>
-Cc: Jason Wang <jasowang@redhat.com>, qemu-devel@nongnu.org, "Michael S . Tsirkin" <mst@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+Cc: den@openvz.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---GWfH9IIDGt4wnpKhXUEg9SA4FWxJWCIi6
-From: Paolo Bonzini <pbonzini@redhat.com>
-To: David Gibson <david@gibson.dropbear.id.au>, Peter Xu <peterx@redhat.com>
-Cc: Jason Wang <jasowang@redhat.com>, qemu-devel@nongnu.org,
- "Michael S . Tsirkin" <mst@redhat.com>
-Message-ID: <41cd420c-3a07-34a0-c0da-286a152eb70c@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 1/4] exec: simplify phys_page_find() params
-References: <1494838260-30439-1-git-send-email-peterx@redhat.com>
- <1494838260-30439-2-git-send-email-peterx@redhat.com>
- <20170516025300.GA30022@umbus.fritz.box>
-In-Reply-To: <20170516025300.GA30022@umbus.fritz.box>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: quoted-printable
+16.05.2017 12:51, Paolo Bonzini wrote:
+>
+> On 16/05/2017 11:32, Vladimir Sementsov-Ogievskiy wrote:
+>> 16.05.2017 12:10, Vladimir Sementsov-Ogievskiy wrote:
+>>> 15.05.2017 12:43, Vladimir Sementsov-Ogievskiy wrote:
+>>>> I mean, make negotiation behave like normal nbd communication,
+>>>> non-blocking socket + yield.. So, some other coroutines may do their
+>>>> work, while nbd-negotiation coroutine waits for io..
+> Some callers of bdrv_open may not allow reentrancy.  For example:
+>
+> 	handle_qmp_command
+> 	-> qmp_dispatch
+> 	-> do_qmp_dispatch
+> 	-> qmp_marshal_blockdev_add
+> 	-> qmp_blockdev_add
+> 	-> bds_tree_init
+> 	-> bdrv_open
+>
+> You cannot return to the monitor before qmp_blockdev_add is done,
+> otherwise you don't have a return value for handle_qmp_command to pass
+> to monitor_json_emitter.
 
+Hmm. What about something like bdrv_pread (finally, bdrv_prwv_co) for 
+non-coroutine, ie, calling aio_poll in a while loop, until coroutine 
+finishes?
 
+>
+>>> Also, one more question here: in nbd_negotiate_write(), why do we need
+>>> qio_channel_add_watch? write_sync will yield with qio_channel_yield()
+>>> until io complete, why to use 2 mechanisms to wake up a coroutine?
+>> Hmm, these nbd_negotiate_* functions was introduced in 1a6245a5b, when
+>> nbd_wr_syncv was working through qemu_co_sendv_recvv, which just yields,
+>> without setting any handlers. But now, nbd_wr_syncv works through
+>> qio_channel_yield() which sets handlers, so the code with extra watchers
+>> looks wrong.
+> Yes, I think you're right about that.
 
-On 16/05/2017 04:53, David Gibson wrote:
-> On Mon, May 15, 2017 at 04:50:57PM +0800, Peter Xu wrote:
->> It really only plays with the dispatchers, so the parameter list does
->> not need that complexity. This helps for readability at least.
->>
->> Signed-off-by: Peter Xu <peterx@redhat.com>
->=20
-> Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
+Ok, I'll make a patch for it and finish LOG->errp conversion.
 
-Queued, thanks.
-
-Paolo
-
->=20
->> ---
->>  exec.c | 13 ++++++-------
->>  1 file changed, 6 insertions(+), 7 deletions(-)
->>
->> diff --git a/exec.c b/exec.c
->> index eac6085..1d76c63 100644
->> --- a/exec.c
->> +++ b/exec.c
->> @@ -371,10 +371,11 @@ static inline bool section_covers_addr(const Mem=
-oryRegionSection *section,
->>                               int128_getlo(section->size), addr);
->>  }
->> =20
->> -static MemoryRegionSection *phys_page_find(PhysPageEntry lp, hwaddr a=
-ddr,
->> -                                           Node *nodes, MemoryRegionS=
-ection *sections)
->> +static MemoryRegionSection *phys_page_find(AddressSpaceDispatch *d, h=
-waddr addr)
->>  {
->> -    PhysPageEntry *p;
->> +    PhysPageEntry lp =3D d->phys_map, *p;
->> +    Node *nodes =3D d->map.nodes;
->> +    MemoryRegionSection *sections =3D d->map.sections;
->>      hwaddr index =3D addr >> TARGET_PAGE_BITS;
->>      int i;
->> =20
->> @@ -412,8 +413,7 @@ static MemoryRegionSection *address_space_lookup_r=
-egion(AddressSpaceDispatch *d,
->>          section_covers_addr(section, addr)) {
->>          update =3D false;
->>      } else {
->> -        section =3D phys_page_find(d->phys_map, addr, d->map.nodes,
->> -                                 d->map.sections);
->> +        section =3D phys_page_find(d, addr);
->>          update =3D true;
->>      }
->>      if (resolve_subpage && section->mr->subpage) {
->> @@ -1246,8 +1246,7 @@ static void register_subpage(AddressSpaceDispatc=
-h *d, MemoryRegionSection *secti
->>      subpage_t *subpage;
->>      hwaddr base =3D section->offset_within_address_space
->>          & TARGET_PAGE_MASK;
->> -    MemoryRegionSection *existing =3D phys_page_find(d->phys_map, bas=
-e,
->> -                                                   d->map.nodes, d->m=
-ap.sections);
->> +    MemoryRegionSection *existing =3D phys_page_find(d, base);
->>      MemoryRegionSection subsection =3D {
->>          .offset_within_address_space =3D base,
->>          .size =3D int128_make64(TARGET_PAGE_SIZE),
->=20
+>
+> Paolo
 
 
---GWfH9IIDGt4wnpKhXUEg9SA4FWxJWCIi6
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEE8TM4V0tmI4mGbHaCv/vSX3jHroMFAlkaziUACgkQv/vSX3jH
-roN6+Qf+Pl5wsry7HPw4SBxLRpgouSUXJwoA1/XUZpAO+BMFQMryS4FCahuu9itn
-hGLMil9udIq5+uQ9mUhaSdHpz75TMTua+iHJzhUgPoANhD7MMP4esPPGUbqUI6/D
-1E6LkOemYmf+OtdxHCnJTjk+qJ9FlwGTOqybnfw57cpPckX6FXTV7eh8RuYEDimW
-rWh4p9f4XnEszqbm6+Ila//vkgBnRv1QEdzPVG5ch5cFnLTvL5LbRNED/Y+L34oQ
-WXlNhQucpLwfjsn/u+R8KgVIjvR4duA53lTbZXe42ww9KHsC8VWiak5HcOMEU2yS
-OD+2OpdVcU+s/W0LRPbOzRCzjnYLbQ==
-=acab
------END PGP SIGNATURE-----
-
---GWfH9IIDGt4wnpKhXUEg9SA4FWxJWCIi6--
+-- 
+Best regards,
+Vladimir
