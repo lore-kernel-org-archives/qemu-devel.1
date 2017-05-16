@@ -1,30 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48203)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48356)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1dAdXD-0005re-11
-	for qemu-devel@nongnu.org; Tue, 16 May 2017 10:33:12 -0400
+	(envelope-from <stefanha@gmail.com>) id 1dAdXe-00067n-5s
+	for qemu-devel@nongnu.org; Tue, 16 May 2017 10:33:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1dAdX5-0003l0-2X
-	for qemu-devel@nongnu.org; Tue, 16 May 2017 10:33:07 -0400
-Received: from mail-wm0-x243.google.com ([2a00:1450:400c:c09::243]:33709)
+	(envelope-from <stefanha@gmail.com>) id 1dAdXa-0003xE-8A
+	for qemu-devel@nongnu.org; Tue, 16 May 2017 10:33:38 -0400
+Received: from mail-lf0-x229.google.com ([2a00:1450:4010:c07::229]:33464)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1dAdX4-0003k5-Su
-	for qemu-devel@nongnu.org; Tue, 16 May 2017 10:33:03 -0400
-Received: by mail-wm0-x243.google.com with SMTP id y10so38876747wmh.0
-	for <qemu-devel@nongnu.org>; Tue, 16 May 2017 07:33:02 -0700 (PDT)
-Date: Tue, 16 May 2017 15:32:59 +0100
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1dAdXa-0003wU-1P
+	for qemu-devel@nongnu.org; Tue, 16 May 2017 10:33:34 -0400
+Received: by mail-lf0-x229.google.com with SMTP id m18so12862365lfj.0
+	for <qemu-devel@nongnu.org>; Tue, 16 May 2017 07:33:33 -0700 (PDT)
+Date: Tue, 16 May 2017 15:33:30 +0100
 From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20170516143259.GA18270@stefanha-x1.localdomain>
-References: <20170513022143.2838-1-n54@gmx.com>
-	<20170515141348.GN1201@stefanha-x1.localdomain>
-	<b299b025-720c-f2c0-1d63-8baf9b96d8b5@gmx.com>
-	<296a3be1-ded2-2fd9-5ea2-86b1e786d5b7@redhat.com>
+Message-ID: <20170516143330.GB18270@stefanha-x1.localdomain>
+References: <20170516052439.16214-1-kraxel@redhat.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="ZGiS0Q5IWpPtfppv"
+	protocol="application/pgp-signature"; boundary="PmA2V3Z32TCmWXqI"
 Content-Disposition: inline
-In-Reply-To: <296a3be1-ded2-2fd9-5ea2-86b1e786d5b7@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] maintainers: Add myself as a NetBSD
- reviewer
+In-Reply-To: <20170516052439.16214-1-kraxel@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] fix mingw build failure
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,64 +29,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Kamil Rytarowski <n54@gmx.com>, peter.maydell@linaro.org, qemu-devel@nongnu.org
+To: Gerd Hoffmann <kraxel@redhat.com>
+Cc: qemu-devel@nongnu.org
 
 
---ZGiS0Q5IWpPtfppv
+--PmA2V3Z32TCmWXqI
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
 
-On Mon, May 15, 2017 at 04:43:41PM +0200, Paolo Bonzini wrote:
->=20
->=20
-> On 15/05/2017 16:22, Kamil Rytarowski wrote:
-> > On 15.05.2017 16:13, Stefan Hajnoczi wrote:
-> >> On Sat, May 13, 2017 at 04:21:43AM +0200, Kamil Rytarowski wrote:
-> >>> I volunteer to review NetBSD patches.
-> >>> Adding myself will help to not miss some of them.
-> >>>
-> >>> Restore NetBSD as a maintained host.
-> >>>
-> >>> All patches to make qemu/pkgsrc building have been emitted to review.
-> >>>
-> >>> Signed-off-by: Kamil Rytarowski <n54@gmx.com>
-> >>> ---
-> >>>  MAINTAINERS | 6 ++++++
-> >>>  configure   | 1 +
-> >>>  2 files changed, 7 insertions(+)
-> >>
-> >> Will you maintain a patch queue (git repo) so you can send pull
-> >> requests?  If yes, please add a T: field.
-> >>
-> >=20
-> > I don't think that there is a need for an additional patch queue, at
-> > least in the maintained mode as a volunteer in spare time.
-> >=20
-> > If there would be more BSD people, we could share a dedicated queue of
-> > patches.
->=20
-> How would patches be sent to the committer then?
+On Tue, May 16, 2017 at 07:24:39AM +0200, Gerd Hoffmann wrote:
+> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+> ---
+>  crypto/random-platform.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 
-After discussing on IRC it seems likely that NetBSD patches will go via
-subsystem maintainers.  Therefore Kamil does not plan to send pull
-requests directly.
+Thanks, applied to my staging tree:
+https://github.com/stefanha/qemu/commits/staging
 
 Stefan
 
---ZGiS0Q5IWpPtfppv
+--PmA2V3Z32TCmWXqI
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEcBAEBAgAGBQJZGw2bAAoJEJykq7OBq3PIvCoIAJXXICmgNR6rEOtNvSmdnHwF
-uzMsH4+lSrnbavQ2qjDbkamIeYDhHSwic1qyYiUP43m+p1vdBDB84nvWxW9qRCeP
-wjM1jKoB3cwsoLSrtg1SfZbMozihwCoW3pBFdkiedbpZjYe4Bng7Sj8lqNhGwnNc
-r4+zuJ22irGjWrigJ5J/d2bV64My10V4aEXir71juXdSeL+r8hkYbnDaEguGMp47
-TdjrXyUdS94pXMfVU/vOW+xzmUJBNDopHMTe+U7nmwltd+lCubCkqZh5BSeFCfpz
-klj//I4ApNCj3zEz1AabsslDcXkVBwbKjCu7TqCP/fWzt/62kr55nrA6ygfeyQE=
-=BcxY
+iQEcBAEBAgAGBQJZGw26AAoJEJykq7OBq3PIcD4H/R9CjnPkzNA3QZk1LLRTsGtA
+9MolSFuzfJ5reLit/9r0BDylTPOPhIElQgcq1KUc/4obQFuaFgEbzJrvUH99AUry
+eK1un/OErXPpJ1cyFAJlHr9vZF4/fbK2e3+LbLQbE6v/HxXEpaIXvFJXOMrglRZs
+BzKp1SP8k/Ff1JhDeA9E1bn6kohkHq1rh1+v42yCwsFmsFdqYKBHTyuFNR8qogN3
+5M8laT92oJUcZYhErxI3xek1LdKq/v9Ao+cTB4O1tW2Is1KiVHMCsw3j7TwgCxks
+/yUEpzF28FoxdzKYMGPTjuGLEchIjcn/FfPpxU6ymJbozSU3kLH7OXFJe8gNhpY=
+=wdP0
 -----END PGP SIGNATURE-----
 
---ZGiS0Q5IWpPtfppv--
+--PmA2V3Z32TCmWXqI--
