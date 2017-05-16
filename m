@@ -1,24 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50856)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56176)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lvivier@redhat.com>) id 1dAc0z-0002tf-1L
-	for qemu-devel@nongnu.org; Tue, 16 May 2017 08:55:50 -0400
+	(envelope-from <kwolf@redhat.com>) id 1dAcMH-0007rk-T7
+	for qemu-devel@nongnu.org; Tue, 16 May 2017 09:17:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lvivier@redhat.com>) id 1dAc0v-0002JS-4x
-	for qemu-devel@nongnu.org; Tue, 16 May 2017 08:55:49 -0400
-References: <20170426070034.10727-1-david@gibson.dropbear.id.au>
-	<20170426070034.10727-20-david@gibson.dropbear.id.au>
-	<0b2e2d1c-d7ba-7d43-42b5-04ba592bf3e8@redhat.com>
-	<1a7e5576-6464-6d5b-f4a8-44dceb8a17af@kaod.org>
-From: Laurent Vivier <lvivier@redhat.com>
-Message-ID: <0dc5ffde-39b7-6fd4-dc88-d66789414e4e@redhat.com>
-Date: Tue, 16 May 2017 14:55:38 +0200
+	(envelope-from <kwolf@redhat.com>) id 1dAcME-0004Cj-Pc
+	for qemu-devel@nongnu.org; Tue, 16 May 2017 09:17:49 -0400
+Date: Tue, 16 May 2017 15:17:16 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20170516131716.GC4438@noname.redhat.com>
+References: <20170515203114.9477-1-hpoussin@reactos.org>
+	<20170515203114.9477-2-hpoussin@reactos.org>
+	<77e136d2-34f0-87db-914c-84d3990269b9@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <1a7e5576-6464-6d5b-f4a8-44dceb8a17af@kaod.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PULL 19/48] spapr: allocate the ICPState object
- from under sPAPRCPUCore
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="f2QGlHpHGjS2mn6Y"
+Content-Disposition: inline
+In-Reply-To: <77e136d2-34f0-87db-914c-84d3990269b9@redhat.com>
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 01/13] vvfat: fix qemu-img map
+ and qemu-img convert
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,133 +26,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Cc: David Gibson <david@gibson.dropbear.id.au>, mdroth@linux.vnet.ibm.com, aik@ozlabs.ru, qemu-devel@nongnu.org, agraf@suse.de, qemu-ppc@nongnu.org
+To: Eric Blake <eblake@redhat.com>
+Cc: =?iso-8859-1?Q?Herv=E9?= Poussineau <hpoussin@reactos.org>, qemu-devel@nongnu.org, qemu-stable <qemu-stable@nongnu.org>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 
-On 16/05/2017 14:50, C=C3=A9dric Le Goater wrote:
-> On 05/16/2017 02:03 PM, Laurent Vivier wrote:
->> On 26/04/2017 09:00, David Gibson wrote:
->>> From: C=C3=A9dric Le Goater <clg@kaod.org>
->>>
->>> Today, all the ICPs are created before the CPUs, stored in an array
->>> under the sPAPR machine and linked to the CPU when the core threads
->>> are realized. This modeling brings some complexity when a lookup in
->>> the array is required and it can be simplified by allocating the ICPs
->>> when the CPUs are.
->>>
->>> This is the purpose of this proposal which introduces a new 'icp_type=
-'
->>> field under the machine and creates the ICP objects of the right type
->>> (KVM or not) before the PowerPCCPU object are.
->>>
->>> This change allows more cleanups : the removal of the icps array unde=
-r
->>> the sPAPR machine and the removal of the xics_get_cpu_index_by_dt_id(=
-)
->>> helper.
->>>
->>> Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
->>> Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
->>> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
->>> ---
->>>  hw/intc/xics.c          | 11 -----------
->>>  hw/ppc/spapr.c          | 47 ++++++++++++++-------------------------=
---------
->>>  hw/ppc/spapr_cpu_core.c | 18 ++++++++++++++----
->>>  include/hw/ppc/spapr.h  |  2 +-
->>>  include/hw/ppc/xics.h   |  2 --
->>>  5 files changed, 29 insertions(+), 51 deletions(-)
->>>
->>
->> This commit breaks CPU re-hotplugging with KVM
->>
->> the sequence "device_add, device_del, device_add" brings to the
->> following error message:
->>
->>     Unable to connect CPUx to kernel XICS: Device or resource busy
->>
->> It comes from icp_kvm_cpu_setup():
->>
->> ...
->>     ret =3D kvm_vcpu_enable_cap(cs, KVM_CAP_IRQ_XICS, 0, kernel_xics_f=
-d,
->>                               kvm_arch_vcpu_id(cs));
->>     if (ret < 0) {
->>         error_report("Unable to connect CPU%ld to kernel XICS: %s",
->>                      kvm_arch_vcpu_id(cs), strerror(errno));
->>         exit(1);
->>     }
->> ..
->>
->> It should be protected by cap_irq_xics_enabled:
->>
->> ...
->>     /*
->>      * If we are reusing a parked vCPU fd corresponding to the CPU
->>      * which was hot-removed earlier we don't have to renable
->>      * KVM_CAP_IRQ_XICS capability again.
->>      */
->>     if (icp->cap_irq_xics_enabled) {
->>         return;
->>     }
->>
->> ...
->>     ret =3D kvm_vcpu_enable_cap(...);
->> ...
->>     icp->cap_irq_xics_enabled =3D true;
->> ...
->>
->> But since this commit, "icp" is a new object on each call:
->>
->> spapr_cpu_core_realize_child()
->> ...
->>     obj =3D object_new(spapr->icp_type);
->> ...
->>     xics_cpu_setup(XICS_FABRIC(spapr), cpu, ICP(obj));
->>     ...
->>             icpc->cpu_setup(icp, cpu); -> icp_kvm_cpu_setup()
->>     ...
->> ...
->>
->> and "cap_irq_xics_enabled" is reinitialized.
->>
->> Any idea how to fix that?
+
+--f2QGlHpHGjS2mn6Y
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+Am 15.05.2017 um 22:42 hat Eric Blake geschrieben:
+> On 05/15/2017 03:31 PM, Herv=E9 Poussineau wrote:
+> > - bs->total_sectors is the number of sectors of the whole disk
+> > - s->sector_count is the number of sectors of the FAT partition
+
+I wonder if we should rename s->sector_count into something like
+s->part_sectors that makes this difference clearer.
+
+> > This fixes the following assert in qemu-img map:
+> > qemu-img.c:2641: get_block_status: Assertion `nb_sectors' failed.
+> >=20
+> > This also fixes an infinite loop in qemu-img convert.
+> >=20
+> > Fixes: 4480e0f924a42e1db8b8cfcac4d0634dd1bb27a0
 >=20
-> it seems that a cleanup is not done in the kernel. We are missing
-> a way to call kvmppc_xics_free_icp() from QEMU. Today the only
-> way is to destroy the vcpu.=20
+> Wow - broken since 1.2? Not many vvfat users, are there.
 
-The commit introducing this hack, for reference:
+Probably vvfat and bdrv_get_block_status() aren't used much together.
+When I use vvfat, it's simple read/write from a guest usually and no
+complicated operations like block jobs that would look at the block
+status.
 
-commit a45863bda90daa8ec39e5a312b9734fd4665b016
-Author: Bharata B Rao <bharata@linux.vnet.ibm.com>
-Date:   Thu Jul 2 16:23:20 2015 +1000
+> Herv=E9, you might want to work out with Kevin whether to take
+> co-maintainership over vvfat, in addition to your other areas.
 
-    xics_kvm: Don't enable KVM_CAP_IRQ_XICS if already enabled
-   =20
-    When supporting CPU hot removal by parking the vCPU fd and reusing
-    it during hotplug again, there can be cases where we try to reenable
-    KVM_CAP_IRQ_XICS CAP for the vCPU for which it was already enabled.
-    Introduce a boolean member in ICPState to track this and don't
-    reenable the CAP if it was already enabled earlier.
-   =20
-    Re-enabling this CAP should ideally work, but currently it results in
-    kernel trying to create and associate ICP with this vCPU and that
-    fails since there is already an ICP associated with it. Hence this
-    patch is needed to work around this problem in the kernel.
-   =20
-    This change allows CPU hot removal to work for sPAPR.
-   =20
-    Signed-off-by: Bharata B Rao <bharata@linux.vnet.ibm.com>
-    Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
-    Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-    Signed-off-by: Alexander Graf <agraf@suse.de>
+I don't mind either way. If Herv=E9 is planning to spend more on time on
+vvfat, it could make sense.
 
-> Else we need to reintroduce the array of icps (again) to keep some=20
-> xics state ... but that just sucks :/ Let me think about it.=20
->=20
+Kevin
 
-Thanks,
-Laurent
-> C.
->=20
+--f2QGlHpHGjS2mn6Y
+Content-Type: application/pgp-signature
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2.0.22 (GNU/Linux)
+
+iQIcBAEBAgAGBQJZGvvcAAoJEH8JsnLIjy/W71UQAMhOzr0zqqqEN7M3mDsMPQ0t
+1ums4zr6+9CuKLIOJOUQVltuiis6lnR91eBRdNcZnMsy04Ba8lAk/NmV8c0pHu6E
+Eu57rvF8L0gsMQlJlAueTmbByEGSs9i8ZXsDZfahOktDkg2bjrmPacQsbIp1dDao
+Acoa7A2y/XBorEaY0qgZA0f/uJyb1gRbtT4KerrmRn3Tbo/94Zc2W1A6pT8kO1nK
+Qni6v+IwG/+VHWSkN9Hu+B29CGT07Sijk0TaGnIgeh6HXFDrpYsKVZYa5cFMMOww
+eVHGaSe38Z5F0hqoSEGqmbVScH8oSZ9r86jj+fbzhUxoNJk0a+ZjCYma7ae5n3VN
+i38ru/+21C5z9jx5sVnwO4RBwMwkpIjkcdFJrr3k8jSs1YTCCVAy78LKWTT2z05Q
+IplT0YBzbCiLCsuKjpq6EZE7twX+pDrJnxzNaSDGakq3oDbw83dNhVkLVmZt10nx
+nibbh29+fgbSbcPIBEwHZVhCCCk0clUaBE4VyA9fB1+KTswjFy90e1STAx1zOfGU
+wAai/Q9Lv/zqJDRjtNW07JtMdMrK6SyTEpJPDkX2jItFbfR/Fy1Va7wDhvkWY6e5
+5ywlrDeNlX26KWRXH35Sad28nK1MkCY+09cZhJSm5tVjjVDOImi5rE1BRQK6KdJd
+fYOdi+GBA/i7LvHFO+Oq
+=RebR
+-----END PGP SIGNATURE-----
+
+--f2QGlHpHGjS2mn6Y--
