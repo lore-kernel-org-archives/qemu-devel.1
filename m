@@ -1,20 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49236)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49292)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1dAdaK-0007uV-JP
-	for qemu-devel@nongnu.org; Tue, 16 May 2017 10:36:25 -0400
+	(envelope-from <quintela@redhat.com>) id 1dAdaX-00084g-7K
+	for qemu-devel@nongnu.org; Tue, 16 May 2017 10:36:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1dAdaG-0005dr-4V
-	for qemu-devel@nongnu.org; Tue, 16 May 2017 10:36:24 -0400
-Date: Tue, 16 May 2017 10:35:59 -0400
-From: Jeff Cody <jcody@redhat.com>
-Message-ID: <20170516143559.GJ19824@localhost.localdomain>
-References: <20170515100059.15795-1-pbonzini@redhat.com>
+	(envelope-from <quintela@redhat.com>) id 1dAdaT-0005jw-AN
+	for qemu-devel@nongnu.org; Tue, 16 May 2017 10:36:37 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:38704)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1dAdaT-0005jX-4f
+	for qemu-devel@nongnu.org; Tue, 16 May 2017 10:36:33 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id F213B804F6
+	for <qemu-devel@nongnu.org>; Tue, 16 May 2017 14:36:21 +0000 (UTC)
+From: Juan Quintela <quintela@redhat.com>
+In-Reply-To: <87o9usg9v7.fsf@dusky.pond.sub.org> (Markus Armbruster's message
+	of "Tue, 16 May 2017 16:22:04 +0200")
+References: <20170516111123.17692-1-quintela@redhat.com>
+	<20170516111123.17692-4-quintela@redhat.com>
+	<87o9usg9v7.fsf@dusky.pond.sub.org>
+Reply-To: quintela@redhat.com
+Date: Tue, 16 May 2017 16:36:10 +0200
+Message-ID: <87inl0dg2t.fsf@secure.mitica>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170515100059.15795-1-pbonzini@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v3 0/7] curl: locking cleanups/fixes,
- coroutine conversion, remove aio_poll
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH 3/5] migration: Remove use of old
+ MigrationParams
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,37 +36,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: qemu-devel@nongnu.org, rjones@redhat.com, qemu-block@nongnu.org
+To: Markus Armbruster <armbru@redhat.com>
+Cc: qemu-devel@nongnu.org, lvivier@redhat.com, dgilbert@redhat.com, peterx@redhat.com
 
-On Mon, May 15, 2017 at 12:00:52PM +0200, Paolo Bonzini wrote:
-> Compared to v2, this silences checkpatch and correctly destroy the mutex on
-> exiting from curl_open with an error.
-> 
-> Paolo
-> 
-> Paolo Bonzini (7):
->   curl: strengthen assertion in curl_clean_state
->   curl: never invoke callbacks with s->mutex held
->   curl: avoid recursive locking of BDRVCURLState mutex
->   curl: split curl_find_state/curl_init_state
->   curl: convert CURLAIOCB to byte values
->   curl: convert readv to coroutines
->   curl: do not do aio_poll when waiting for a free CURLState
-> 
->  block/curl.c | 217 +++++++++++++++++++++++++++++++++--------------------------
->  1 file changed, 121 insertions(+), 96 deletions(-)
-> 
-> -- 
-> 2.12.2
-> 
+Markus Armbruster <armbru@redhat.com> wrote:
+> Juan Quintela <quintela@redhat.com> writes:
+>
+>> We have change in the previous patch to use migration capabilities for
+>> it.  Notice that we continue using the old command line flags from
+>> migrate command from the time being.  Remove the set_params method as
+>> now it is empty.
+>>
+>> Signed-off-by: Juan Quintela <quintela@redhat.com>
 
-Thanks,
+>> diff --git a/migration/savevm.c b/migration/savevm.c
+>> index b4f736f..5fc10ab 100644
+>> --- a/migration/savevm.c
+>> +++ b/migration/savevm.c
+>> @@ -1233,8 +1233,6 @@ static int qemu_savevm_state(QEMUFile *f, Error **errp)
+>>  {
+>>      int ret;
+>>      MigrationParams params = {
+>> -        .blk = 0,
+>> -        .shared = 0
+>>      };
+>>      MigrationState *ms = migrate_init(&params);
+>>      MigrationStatus status;
+>> @@ -1245,6 +1243,12 @@ static int qemu_savevm_state(QEMUFile *f, Error **errp)
+>>          goto done;
+>>      }
+>>  
+>> +    if (migrate_use_block()) {
+>> +        error_setg(errp, "Block migration and snapshots are incompatible");
+>> +        ret = -EINVAL;
+>> +        goto done;
+>> +    }
+>> +
+>>      qemu_mutex_unlock_iothread();
+>>      qemu_savevm_state_header(f);
+>>      qemu_savevm_state_begin(f, &params);
+>
+> New error that isn't mentioned in the commit message.  Does it belong
+> here?
 
-I fixed up the coding styling issues in patch 1 and 4.
+It is the equivalent of the previous chunk.
 
-Applied to my block branch:
+If you do a savevm, you can't do a:
 
-git://github.com/codyprime/qemu-kvm-jtc block
+savevm -b/-i foo
 
--Jeff
+but now you can do:
+
+migrate_set_capability block on
+savevm foo
+
+And we can't use block migration.  If you preffer, I can disable the
+feature unconditionally, but I am not sure that it is much better.
+
+Later, Juan.
