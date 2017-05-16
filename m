@@ -1,27 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45694)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46601)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1dAU3i-0002cU-KG
-	for qemu-devel@nongnu.org; Tue, 16 May 2017 00:26:08 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1dAUCA-00050j-7W
+	for qemu-devel@nongnu.org; Tue, 16 May 2017 00:34:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1dAU3f-00081l-Ga
-	for qemu-devel@nongnu.org; Tue, 16 May 2017 00:26:06 -0400
-Received: from mga14.intel.com ([192.55.52.115]:63828)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <wei.w.wang@intel.com>)
-	id 1dAU3f-00080s-77
-	for qemu-devel@nongnu.org; Tue, 16 May 2017 00:26:03 -0400
-Message-ID: <591A7FCE.1010703@intel.com>
-Date: Tue, 16 May 2017 12:27:58 +0800
-From: Wei Wang <wei.w.wang@intel.com>
+	(envelope-from <dgibson@ozlabs.org>) id 1dAUC6-0002qm-SR
+	for qemu-devel@nongnu.org; Tue, 16 May 2017 00:34:50 -0400
+Date: Tue, 16 May 2017 14:30:03 +1000
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20170516043003.GD30022@umbus.fritz.box>
+References: <149484833874.20089.4164801378197848306.stgit@bahia.lan>
+	<149484835694.20089.2114938170632779266.stgit@bahia.lan>
 MIME-Version: 1.0
-References: <1494478641-24549-1-git-send-email-wei.w.wang@intel.com>
-	<591974EB.2010409@intel.com>
-	<20170515174044-mutt-send-email-mst@kernel.org>
-In-Reply-To: <20170515174044-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [virtio-dev] Re: [PATCH] virtio-net: keep the
- packet layout intact
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="tNQTSEo8WG/FKZ8E"
+Content-Disposition: inline
+In-Reply-To: <149484835694.20089.2114938170632779266.stgit@bahia.lan>
+Subject: Re: [Qemu-devel] [PATCH 1/6] ppc/xics: simplify prototype of
+ xics_spapr_init()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,53 +25,107 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: jasowang@redhat.com, stefanha@gmail.com, marcandre.lureau@gmail.com, pbonzini@redhat.com, virtio-dev@lists.oasis-open.org, qemu-devel@nongnu.org, jan.scheurich@ericsson.com
-
-On 05/15/2017 10:46 PM, Michael S. Tsirkin wrote:
-> On Mon, May 15, 2017 at 05:29:15PM +0800, Wei Wang wrote:
->> Ping for comments, thanks.
->>
->> On 05/11/2017 12:57 PM, Wei Wang wrote:
->>> The current implementation may change the packet layout when
->>> vnet_hdr needs an endianness swap. The layout change causes
->>> one more iov to be added to the iov[] passed from the guest, which
->>> is a barrier to making the TX queue size 1024 due to the possible
->>> off-by-one issue.
-> It blocks making it 512 but I don't think we can make it 1024
-> as entries might cross page boundaries and get split.
->
-
-I agree with the performance lose issue you mentioned
-below, thanks. To understand more here, could you please
-shed some light on "entries can't cross page boundaries"?
-
-Seems the virtio spec doesn't mention that vring_desc entries
-shouldn't be in two physically continuous pages. Also didn't
-find an issue from the implementation.
-On the device side, the writev manual does require the iov[]
-array to be in one page only, and the limit to iovcnt is 1024.
+To: Greg Kurz <groug@kaod.org>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Bharata B Rao <bharata@linux.vnet.ibm.com>, Cedric Le Goater <clg@kaod.org>
 
 
->>> This patch changes the implementation to remain the packet layout
->>> intact. In this case, the number of iov[] passed to writev will be
->>> equal to the number obtained from the guest.
->>>
->>> Signed-off-by: Wei Wang <wei.w.wang@intel.com>
-> As this is at the cost of a full data copy, I don't think
-> this makes sense. We could limit this when sg list does not fit
-> in 1024.
+--tNQTSEo8WG/FKZ8E
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Yes, this would cause a performance loss with the layout that data
-is adjacent with vnet_hdr. Since you prefer another solution below,
-I will skip and not discuss my ideas to avoid that copy.
+On Mon, May 15, 2017 at 01:39:16PM +0200, Greg Kurz wrote:
+> This function only does hypercall and RTAS-call registration, and thus
+> never returns an error. This patch adapt the prototype to reflect that.
+>=20
+> Signed-off-by: Greg Kurz <groug@kaod.org>
 
-> But I really think we should just add a max s/g field to virtio
-> and then we'll be free to increase the ring size.
+Applied to ppc-for-2.10, thanks.
 
-Yes, that's also a good way to solve it. So, add a new device
-property, "max_chain_size" and a feature bit to detect it?
+> ---
+>  hw/intc/xics_spapr.c  |    3 +--
+>  hw/ppc/spapr.c        |    2 +-
+>  include/hw/ppc/xics.h |    2 +-
+>  3 files changed, 3 insertions(+), 4 deletions(-)
+>=20
+> diff --git a/hw/intc/xics_spapr.c b/hw/intc/xics_spapr.c
+> index f05308b897f2..d98ea8b13068 100644
+> --- a/hw/intc/xics_spapr.c
+> +++ b/hw/intc/xics_spapr.c
+> @@ -229,7 +229,7 @@ static void rtas_int_on(PowerPCCPU *cpu, sPAPRMachine=
+State *spapr,
+>      rtas_st(rets, 0, RTAS_OUT_SUCCESS);
+>  }
+> =20
+> -int xics_spapr_init(sPAPRMachineState *spapr, Error **errp)
+> +void xics_spapr_init(sPAPRMachineState *spapr)
+>  {
+>      /* Registration of global state belongs into realize */
+>      spapr_rtas_register(RTAS_IBM_SET_XIVE, "ibm,set-xive", rtas_set_xive=
+);
+> @@ -243,7 +243,6 @@ int xics_spapr_init(sPAPRMachineState *spapr, Error *=
+*errp)
+>      spapr_register_hypercall(H_XIRR_X, h_xirr_x);
+>      spapr_register_hypercall(H_EOI, h_eoi);
+>      spapr_register_hypercall(H_IPOLL, h_ipoll);
+> -    return 0;
+>  }
+> =20
+>  #define ICS_IRQ_FREE(ics, srcno)   \
+> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> index 1b7cadab0cdf..abfb99b71b7d 100644
+> --- a/hw/ppc/spapr.c
+> +++ b/hw/ppc/spapr.c
+> @@ -139,7 +139,7 @@ static void xics_system_init(MachineState *machine, i=
+nt nr_irqs, Error **errp)
+>      }
+> =20
+>      if (!spapr->ics) {
+> -        xics_spapr_init(spapr, errp);
+> +        xics_spapr_init(spapr);
+>          spapr->icp_type =3D TYPE_ICP;
+>          spapr->ics =3D spapr_ics_create(spapr, TYPE_ICS_SIMPLE, nr_irqs,=
+ errp);
+>      }
+> diff --git a/include/hw/ppc/xics.h b/include/hw/ppc/xics.h
+> index 05e6acbb3533..d6cb51f3ad5d 100644
+> --- a/include/hw/ppc/xics.h
+> +++ b/include/hw/ppc/xics.h
+> @@ -206,6 +206,6 @@ void icp_resend(ICPState *ss);
+>  typedef struct sPAPRMachineState sPAPRMachineState;
+> =20
+>  int xics_kvm_init(sPAPRMachineState *spapr, Error **errp);
+> -int xics_spapr_init(sPAPRMachineState *spapr, Error **errp);
+> +void xics_spapr_init(sPAPRMachineState *spapr);
+> =20
+>  #endif /* XICS_H */
+>=20
 
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
 
-Best,
-Wei
+--tNQTSEo8WG/FKZ8E
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iQIcBAEBCAAGBQJZGoBLAAoJEGw4ysog2bOS/nkQALYi6AE3VbPcByZ3P8ZQHgzV
+XBUv/jK4q8ljMnBY1vGV8/GjLTIOJvCE70SiUjYNuMgnCaUrKr/z80K3W2xyLRDo
+sAUms4Yb+b84cIIYK8D8GKuZ+LS9ZQq4iPSStYmmrBLiW5biWHPPR1W0d83Wdb2F
+xWE92xF0iPwX63essAgy2XQoZ5KtPNI+GUgAfZdSGcxdQzgiFer0gL2AR7zKqp3S
+IF48cgkZfUlj5o18CquKb+bj3+8PVIN2JybEnsuEbLCZtz0+pPy/H5+JWulnC4np
+dwL4+PRSG34ydLomMIrEOSWMkoUSizq88nLO8H2cGm/MZIG1eW0AgknX9yG5HT2S
+LldV3qPzHgJWsXXs25R6aV6X9xPt7JNyUy6/q8IRx9t/6zclddnKt+wS5HmtSi4X
+Er4ONwIWUWdAfP77eM5GZa6UkKDNqfymlaVY5wGQlezkWYZFTAWtOiWqV7qXTzmp
+yrRQc0OLpofNsHONPzYdqs58/wfddjqmp/9CP5vXl5ktZT0Ya9/yXTbHpsbZ/P9g
+AP6gXTDC2QB6fVVoi5RzgxZV0zqdRyDi/WqWQq254bPiVwxqsyZFWABoQavhJp0Y
+BI+WCJYYjX4FM9MtGzg9398aBLxTEILf0JCFm7wS8VSKn9a7QhG7HTAW/fj4T7B0
+jL2r0Ed2DE8wQMih35J/
+=KsRO
+-----END PGP SIGNATURE-----
+
+--tNQTSEo8WG/FKZ8E--
