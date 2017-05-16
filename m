@@ -1,22 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45948)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47050)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dAYhL-0005GN-4K
-	for qemu-devel@nongnu.org; Tue, 16 May 2017 05:23:20 -0400
+	(envelope-from <thuth@redhat.com>) id 1dAYmB-0006P0-Mv
+	for qemu-devel@nongnu.org; Tue, 16 May 2017 05:28:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dAYhI-0002XN-03
-	for qemu-devel@nongnu.org; Tue, 16 May 2017 05:23:19 -0400
-References: <20170516072414.19025-1-famz@redhat.com>
-	<20170516080737.GB27669@lemon.lan>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <e780d3d8-43f1-f46d-2858-7554a334246b@redhat.com>
-Date: Tue, 16 May 2017 11:23:06 +0200
-MIME-Version: 1.0
-In-Reply-To: <20170516080737.GB27669@lemon.lan>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2] virtio: Move memory_listener_unregister
- to .unrealize
+	(envelope-from <thuth@redhat.com>) id 1dAYm8-0004VC-JI
+	for qemu-devel@nongnu.org; Tue, 16 May 2017 05:28:19 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49309)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1dAYm8-0004Ux-AE
+	for qemu-devel@nongnu.org; Tue, 16 May 2017 05:28:16 -0400
+From: Thomas Huth <thuth@redhat.com>
+Date: Tue, 16 May 2017 11:28:04 +0200
+Message-Id: <1494926884-10118-1-git-send-email-thuth@redhat.com>
+Subject: [Qemu-devel] [PATCH v1] target/s390x: Add support for the TEST
+ BLOCK instruction
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,32 +22,95 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
-Cc: Jason Wang <jasowang@redhat.com>, qemu-stable@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>
+To: qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>
+Cc: David Hildenbrand <david@redhat.com>, mmarek@suse.com, mbenes@suse.cz
 
+TEST BLOCK was likely once used to execute basic memory
+tests, but nowadays it's just a (slow) way to clear a page.
 
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+---
+ target/s390x/helper.h      |  1 +
+ target/s390x/insn-data.def |  2 ++
+ target/s390x/mem_helper.c  | 12 ++++++++++++
+ target/s390x/translate.c   | 10 ++++++++++
+ 4 files changed, 25 insertions(+)
 
-On 16/05/2017 10:07, Fam Zheng wrote:
-> On Tue, 05/16 15:24, Fam Zheng wrote:
->> The root cause of the crash is not obvious here, but the change
->> regardlessly makes sense so it's proposed here: the listener was
->> registered in .realize(), so do the cleanup in the matching .unrealize()
->> rather than the .finalize() callback.
-
-This is not entirely true.
-
-Unrealize is the point where the device doesn't get any more requests.
-Instance finalize is the point where there are no references anymore.
-If a pending request has a reference to X, instance finalize is the
-right place to free X.
-
-However, in this case using .unrealize() should be fine.
-
-> Actually it seem calling memory_listener_unregister in .instance_finalize is not
-> safe because it can be in the RCU thread.  This race is what caused the
-> corruption of the listener lists.
-
-RCU callbacks are called with BQL held, so that shouldn't be it.  But
-the patch should be okay anyway.
-
-Paolo
+diff --git a/target/s390x/helper.h b/target/s390x/helper.h
+index 9102071..a5a3705 100644
+--- a/target/s390x/helper.h
++++ b/target/s390x/helper.h
+@@ -99,6 +99,7 @@ DEF_HELPER_FLAGS_4(lctl, TCG_CALL_NO_WG, void, env, i32, i64, i32)
+ DEF_HELPER_FLAGS_4(lctlg, TCG_CALL_NO_WG, void, env, i32, i64, i32)
+ DEF_HELPER_FLAGS_4(stctl, TCG_CALL_NO_WG, void, env, i32, i64, i32)
+ DEF_HELPER_FLAGS_4(stctg, TCG_CALL_NO_WG, void, env, i32, i64, i32)
++DEF_HELPER_2(testblock, void, env, i64)
+ DEF_HELPER_FLAGS_2(tprot, TCG_CALL_NO_RWG, i32, i64, i64)
+ DEF_HELPER_FLAGS_2(iske, TCG_CALL_NO_RWG_SE, i64, env, i64)
+ DEF_HELPER_FLAGS_3(sske, TCG_CALL_NO_RWG, void, env, i64, i64)
+diff --git a/target/s390x/insn-data.def b/target/s390x/insn-data.def
+index 075ff59..a6aba54 100644
+--- a/target/s390x/insn-data.def
++++ b/target/s390x/insn-data.def
+@@ -912,6 +912,8 @@
+ /* STORE USING REAL ADDRESS */
+     C(0xb246, STURA,   RRE,   Z,   r1_o, r2_o, 0, 0, stura, 0)
+     C(0xb925, STURG,   RRE,   Z,   r1_o, r2_o, 0, 0, sturg, 0)
++/* TEST BLOCK */
++    C(0xb22c, TB,      RRE,   Z,   0, r2_o, 0, 0, testblock, 0)
+ /* TEST PROTECTION */
+     C(0xe501, TPROT,   SSE,   Z,   la1, a2, 0, 0, tprot, 0)
+ 
+diff --git a/target/s390x/mem_helper.c b/target/s390x/mem_helper.c
+index 675aba2..0349c10 100644
+--- a/target/s390x/mem_helper.c
++++ b/target/s390x/mem_helper.c
+@@ -933,6 +933,18 @@ void HELPER(stctl)(CPUS390XState *env, uint32_t r1, uint64_t a2, uint32_t r3)
+     }
+ }
+ 
++void HELPER(testblock)(CPUS390XState *env, uint64_t addr)
++{
++    CPUState *cs = CPU(s390_env_get_cpu(env));
++    int i;
++
++    addr = get_address(env, 0, 0, addr) & ~0xfffULL;
++    for (i = 0; i < TARGET_PAGE_SIZE; i += 8) {
++        stq_phys(cs->as, addr + i, 0);
++    }
++    env->cc_op = 0;
++}
++
+ uint32_t HELPER(tprot)(uint64_t a1, uint64_t a2)
+ {
+     /* XXX implement */
+diff --git a/target/s390x/translate.c b/target/s390x/translate.c
+index 01c6217..f48c899 100644
+--- a/target/s390x/translate.c
++++ b/target/s390x/translate.c
+@@ -4016,6 +4016,15 @@ static ExitStatus op_tcxb(DisasContext *s, DisasOps *o)
+ }
+ 
+ #ifndef CONFIG_USER_ONLY
++
++static ExitStatus op_testblock(DisasContext *s, DisasOps *o)
++{
++    check_privileged(s);
++    gen_helper_testblock(cpu_env, o->in2);
++    set_cc_static(s);
++    return NO_EXIT;
++}
++
+ static ExitStatus op_tprot(DisasContext *s, DisasOps *o)
+ {
+     potential_page_fault(s);
+@@ -4023,6 +4032,7 @@ static ExitStatus op_tprot(DisasContext *s, DisasOps *o)
+     set_cc_static(s);
+     return NO_EXIT;
+ }
++
+ #endif
+ 
+ static ExitStatus op_tr(DisasContext *s, DisasOps *o)
+-- 
+1.8.3.1
