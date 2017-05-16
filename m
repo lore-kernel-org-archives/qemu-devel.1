@@ -1,31 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44650)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46799)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dAbbg-0004oF-Mt
-	for qemu-devel@nongnu.org; Tue, 16 May 2017 08:29:41 -0400
+	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1dAbkF-0006Av-RR
+	for qemu-devel@nongnu.org; Tue, 16 May 2017 08:38:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dAbbd-0006hG-JK
-	for qemu-devel@nongnu.org; Tue, 16 May 2017 08:29:40 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43654)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dAbbd-0006gk-9h
-	for qemu-devel@nongnu.org; Tue, 16 May 2017 08:29:37 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 2186C3B71C
-	for <qemu-devel@nongnu.org>; Tue, 16 May 2017 12:29:36 +0000 (UTC)
-From: Markus Armbruster <armbru@redhat.com>
-References: <20170516111123.17692-1-quintela@redhat.com>
-	<20170516111123.17692-2-quintela@redhat.com>
-Date: Tue, 16 May 2017 14:29:32 +0200
-In-Reply-To: <20170516111123.17692-2-quintela@redhat.com> (Juan Quintela's
-	message of "Tue, 16 May 2017 13:11:19 +0200")
-Message-ID: <87o9uthtn7.fsf@dusky.pond.sub.org>
+	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1dAbkB-0002y8-PS
+	for qemu-devel@nongnu.org; Tue, 16 May 2017 08:38:31 -0400
+Received: from [59.151.112.132] (port=24045 helo=heian.cn.fujitsu.com)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1dAbk9-0002vs-U4
+	for qemu-devel@nongnu.org; Tue, 16 May 2017 08:38:27 -0400
+From: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
+Date: Tue, 16 May 2017 20:37:43 +0800
+Message-ID: <22f56a33f9774a678c72dc5c0920a5c562cc6ea2.1494937835.git.maozy.fnst@cn.fujitsu.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH 1/5] hmp: Use visitor api for
- hmp_migrate_set_parameter()
+Subject: [Qemu-devel] [PATCH v3] net/rocker: Convert to realize
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,80 +23,184 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Juan Quintela <quintela@redhat.com>
-Cc: qemu-devel@nongnu.org, lvivier@redhat.com, dgilbert@redhat.com, peterx@redhat.com
+To: qemu-devel@nongnu.org
+Cc: jiri@resnulli.us, jasowang@redhat.com, f4bug@amsat.org
 
-Juan Quintela <quintela@redhat.com> writes:
+The rocker device still implements the old PCIDeviceClass .init()
+instead of the new .realize(). All devices need to be converted to
+.realize().
 
-> We only use it for int64 at this point, I am not able to find a way to
-> parse an int with MiB units.
+.init() reports errors with fprintf() and return 0 on success, negative
+number on failure. Meanwhile, when -device rocker fails, it first report
+a specific error, then a generic one, like this:
 
-Use the string input visitor and visit_type_size() to parse with unit
-suffixes.  The problem is hmp_migrate_set_parameter() wants "no suffix"
-to mean "mebibytes", which the string input visitor can't do.  Good for
-new code, because it helps keeping things consistent.  Not so good for
-converting existing code.
+    $ x86_64-softmmu/qemu-system-x86_64 -device rocker,name=qemu-rocker
+    rocker: name too long; please shorten to at most 9 chars
+    qemu-system-x86_64: -device rocker,name=qemu-rocker: Device initialization failed
 
-> Signed-off-by: Juan Quintela <quintela@redhat.com>
-> ---
->  hmp.c | 10 ++++++----
->  1 file changed, 6 insertions(+), 4 deletions(-)
->
-> diff --git a/hmp.c b/hmp.c
-> index b9dd933..acbbc5c 100644
-> --- a/hmp.c
-> +++ b/hmp.c
-> @@ -29,6 +29,7 @@
->  #include "monitor/qdev.h"
->  #include "qapi/opts-visitor.h"
->  #include "qapi/qmp/qerror.h"
-> +#include "qapi/string-input-visitor.h"
->  #include "qapi/string-output-visitor.h"
->  #include "qapi/util.h"
->  #include "qapi-visit.h"
-> @@ -1523,8 +1524,9 @@ void hmp_migrate_set_parameter(Monitor *mon, const QDict *qdict)
->  {
->      const char *param = qdict_get_str(qdict, "parameter");
->      const char *valuestr = qdict_get_str(qdict, "value");
-> +    Visitor *v = string_input_visitor_new(valuestr);
->      uint64_t valuebw = 0;
-> -    long valueint = 0;
-> +    int64_t valueint = 0;
->      Error *err = NULL;
->      bool use_int_value = false;
->      int i, ret;
-> @@ -1582,9 +1584,8 @@ void hmp_migrate_set_parameter(Monitor *mon, const QDict *qdict)
->              }
->  
->              if (use_int_value) {
-> -                if (qemu_strtol(valuestr, NULL, 10, &valueint) < 0) {
-> -                    error_setg(&err, "Unable to parse '%s' as an int",
-> -                               valuestr);
-> +                visit_type_int(v, param, &valueint, &err);
+Now, convert it to .realize() that passes errors to its callers via its
+errp argument. Also avoid the superfluous second error message.
 
-I figure the error message changes from
+Cc: jiri@resnulli.us
+Cc: jasowang@redhat.com
+Cc: f4bug@amsat.org
+Signed-off-by: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
+---
+ hw/net/rocker/rocker.c | 35 +++++++++++++++++------------------
+ 1 file changed, 17 insertions(+), 18 deletions(-)
 
-    Unable to parse 'PARAM' as an int
-
-to
-
-    Parameter 'PARAM' expects an int64 value or range
-
-The "or range" part is due to the string input visitor's support for
-integer list, which is basically horrible.
-
-
-> +                if (err) {
->                      goto cleanup;
->                  }
->                  /* Set all integers; only one has_FOO will be set, and
-> @@ -1608,6 +1609,7 @@ void hmp_migrate_set_parameter(Monitor *mon, const QDict *qdict)
->      }
->  
->   cleanup:
-> +    visit_free(v);
->      if (err) {
->          error_report_err(err);
->      }
-
-Reviewed-by: Markus Armbruster <armbru@redhat.com>
+diff --git a/hw/net/rocker/rocker.c b/hw/net/rocker/rocker.c
+index 6e70fdd..c446cda 100644
+--- a/hw/net/rocker/rocker.c
++++ b/hw/net/rocker/rocker.c
+@@ -1252,20 +1252,18 @@ rollback:
+     return err;
+ }
+ 
+-static int rocker_msix_init(Rocker *r)
++static int rocker_msix_init(Rocker *r, Error **errp)
+ {
+     PCIDevice *dev = PCI_DEVICE(r);
+     int err;
+-    Error *local_err = NULL;
+ 
+     err = msix_init(dev, ROCKER_MSIX_VEC_COUNT(r->fp_ports),
+                     &r->msix_bar,
+                     ROCKER_PCI_MSIX_BAR_IDX, ROCKER_PCI_MSIX_TABLE_OFFSET,
+                     &r->msix_bar,
+                     ROCKER_PCI_MSIX_BAR_IDX, ROCKER_PCI_MSIX_PBA_OFFSET,
+-                    0, &local_err);
++                    0, errp);
+     if (err) {
+-        error_report_err(local_err);
+         return err;
+     }
+ 
+@@ -1301,7 +1299,7 @@ static World *rocker_world_type_by_name(Rocker *r, const char *name)
+     return NULL;
+ }
+ 
+-static int pci_rocker_init(PCIDevice *dev)
++static void pci_rocker_realize(PCIDevice *dev, Error **errp)
+ {
+     Rocker *r = to_rocker(dev);
+     const MACAddr zero = { .a = { 0, 0, 0, 0, 0, 0 } };
+@@ -1315,7 +1313,7 @@ static int pci_rocker_init(PCIDevice *dev)
+ 
+     for (i = 0; i < ROCKER_WORLD_TYPE_MAX; i++) {
+         if (!r->worlds[i]) {
+-            err = -ENOMEM;
++            error_setg(errp, "rocker: memory allocation for worlds failed");
+             goto err_world_alloc;
+         }
+     }
+@@ -1326,10 +1324,9 @@ static int pci_rocker_init(PCIDevice *dev)
+ 
+     r->world_dflt = rocker_world_type_by_name(r, r->world_name);
+     if (!r->world_dflt) {
+-        fprintf(stderr,
+-                "rocker: requested world \"%s\" does not exist\n",
++        error_setg(errp,
++                "rocker: invalid argument, requested world %s does not exist",
+                 r->world_name);
+-        err = -EINVAL;
+         goto err_world_type_by_name;
+     }
+ 
+@@ -1349,7 +1346,7 @@ static int pci_rocker_init(PCIDevice *dev)
+ 
+     /* MSI-X init */
+ 
+-    err = rocker_msix_init(r);
++    err = rocker_msix_init(r, errp);
+     if (err) {
+         goto err_msix_init;
+     }
+@@ -1361,7 +1358,7 @@ static int pci_rocker_init(PCIDevice *dev)
+     }
+ 
+     if (rocker_find(r->name)) {
+-        err = -EEXIST;
++        error_setg(errp, "rocker: %s already exists", r->name);
+         goto err_duplicate;
+     }
+ 
+@@ -1375,10 +1372,10 @@ static int pci_rocker_init(PCIDevice *dev)
+ #define ROCKER_IFNAMSIZ 16
+ #define MAX_ROCKER_NAME_LEN  (ROCKER_IFNAMSIZ - 1 - 3 - 3)
+     if (strlen(r->name) > MAX_ROCKER_NAME_LEN) {
+-        fprintf(stderr,
+-                "rocker: name too long; please shorten to at most %d chars\n",
++        error_setg(errp,
++                "rocker: name too long; please shorten to at most %d chars",
+                 MAX_ROCKER_NAME_LEN);
+-        return -EINVAL;
++        goto err_name_too_long;
+     }
+ 
+     if (memcmp(&r->fp_start_macaddr, &zero, sizeof(zero)) == 0) {
+@@ -1397,6 +1394,7 @@ static int pci_rocker_init(PCIDevice *dev)
+ 
+     r->rings = g_new(DescRing *, rocker_pci_ring_count(r));
+     if (!r->rings) {
++        error_setg(errp, "rocker: memory allocation for rings failed");
+         goto err_rings_alloc;
+     }
+ 
+@@ -1410,11 +1408,11 @@ static int pci_rocker_init(PCIDevice *dev)
+      * .....
+      */
+ 
+-    err = -ENOMEM;
+     for (i = 0; i < rocker_pci_ring_count(r); i++) {
+         DescRing *ring = desc_ring_alloc(r, i);
+ 
+         if (!ring) {
++            error_setg(errp, "rocker: memory allocation for ring failed");
+             goto err_ring_alloc;
+         }
+ 
+@@ -1438,6 +1436,7 @@ static int pci_rocker_init(PCIDevice *dev)
+                           i, &r->fp_ports_peers[i]);
+ 
+         if (!port) {
++            error_setg(errp, "rocker: memory allocation for port failed");
+             goto err_port_alloc;
+         }
+ 
+@@ -1447,7 +1446,7 @@ static int pci_rocker_init(PCIDevice *dev)
+ 
+     QLIST_INSERT_HEAD(&rockers, r, next);
+ 
+-    return 0;
++    return;
+ 
+ err_port_alloc:
+     for (--i; i >= 0; i--) {
+@@ -1461,6 +1460,7 @@ err_ring_alloc:
+     }
+     g_free(r->rings);
+ err_rings_alloc:
++err_name_too_long:
+ err_duplicate:
+     rocker_msix_uninit(r);
+ err_msix_init:
+@@ -1473,7 +1473,6 @@ err_world_alloc:
+             world_free(r->worlds[i]);
+         }
+     }
+-    return err;
+ }
+ 
+ static void pci_rocker_uninit(PCIDevice *dev)
+@@ -1558,7 +1557,7 @@ static void rocker_class_init(ObjectClass *klass, void *data)
+     DeviceClass *dc = DEVICE_CLASS(klass);
+     PCIDeviceClass *k = PCI_DEVICE_CLASS(klass);
+ 
+-    k->init = pci_rocker_init;
++    k->realize = pci_rocker_realize;
+     k->exit = pci_rocker_uninit;
+     k->vendor_id = PCI_VENDOR_ID_REDHAT;
+     k->device_id = PCI_DEVICE_ID_REDHAT_ROCKER;
+-- 
+2.9.3
