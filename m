@@ -1,20 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38013)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41035)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <keith.busch@intel.com>) id 1dAjCe-0006IC-3y
-	for qemu-devel@nongnu.org; Tue, 16 May 2017 16:36:21 -0400
+	(envelope-from <eblake@redhat.com>) id 1dAjNb-0002Nh-EK
+	for qemu-devel@nongnu.org; Tue, 16 May 2017 16:47:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <keith.busch@intel.com>) id 1dAjCd-0007E6-E0
-	for qemu-devel@nongnu.org; Tue, 16 May 2017 16:36:20 -0400
-Date: Tue, 16 May 2017 16:43:28 -0400
-From: Keith Busch <keith.busch@intel.com>
-Message-ID: <20170516204327.GB28520@localhost.localdomain>
-References: <1494961859-14833-1-git-send-email-sbates@raithlin.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1494961859-14833-1-git-send-email-sbates@raithlin.com>
-Subject: Re: [Qemu-devel] [PATCH] nvme: Add support for Controller Memory
- Buffers
+	(envelope-from <eblake@redhat.com>) id 1dAjNa-0003On-Nt
+	for qemu-devel@nongnu.org; Tue, 16 May 2017 16:47:39 -0400
+From: Eric Blake <eblake@redhat.com>
+Date: Tue, 16 May 2017 15:47:13 -0500
+Message-Id: <20170516204724.1617-2-eblake@redhat.com>
+In-Reply-To: <20170516204724.1617-1-eblake@redhat.com>
+References: <20170516204724.1617-1-eblake@redhat.com>
+Subject: [Qemu-devel] [PATCH v2 01/12] dirty-bitmap: Report
+ BlockDirtyInfo.count in bytes, as documented
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,20 +20,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: sbates@raithlin.com
-Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, kwolf@redhat.com, mreitz@redhat.com
+To: qemu-devel@nongnu.org
+Cc: jsnow@redhat.com, qemu-block@nongnu.org, qemu-stable@nongnu.org, Fam Zheng <famz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
 
-On Tue, May 16, 2017 at 01:10:59PM -0600, sbates@raithlin.com wrote:
-> From: Stephen Bates <sbates@raithlin.com>
-> 
-> Implement NVMe Controller Memory Buffers (CMBs) which were added in
-> version 1.2 of the NVMe Specification. This patch adds an optional
-> argument (cmb_size_mb) which indicates the size of the CMB (in
-> MB). Currently only the Submission Queue Support (SQS) is enabled
-> which aligns with the current Linux driver for NVMe.
-> 
-> Signed-off-by: Stephen Bates <sbates@raithlin.com>
+We've been documenting the value in bytes since its introduction
+in commit b9a9b3a4 (v1.3), where it was actually reported in bytes.
 
-Awesome, this looks great!
+Commit e4654d2 (v2.0) then removed things from block/qapi.c, in
+preparation for a rewrite to a list of dirty sectors in the next
+commit 21b5683 in block.c, but the new code mistakenly started
+reporting in sectors.
 
-Acked-by: Keith Busch <keith.busch@intel.com>
+Fixes: https://bugzilla.redhat.com/1441460
+
+CC: qemu-stable@nongnu.org
+Signed-off-by: Eric Blake <eblake@redhat.com>
+Reviewed-by: John Snow <jsnow@redhat.com>
+
+---
+Too late for 2.9, since the regression has been unnoticed for
+nine releases. But worth putting in 2.9.1.
+
+v2: no change
+---
+ block/dirty-bitmap.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/block/dirty-bitmap.c b/block/dirty-bitmap.c
+index 519737c..6d8ce5f 100644
+--- a/block/dirty-bitmap.c
++++ b/block/dirty-bitmap.c
+@@ -345,7 +345,7 @@ BlockDirtyInfoList *bdrv_query_dirty_bitmaps(BlockDriverState *bs)
+     QLIST_FOREACH(bm, &bs->dirty_bitmaps, list) {
+         BlockDirtyInfo *info = g_new0(BlockDirtyInfo, 1);
+         BlockDirtyInfoList *entry = g_new0(BlockDirtyInfoList, 1);
+-        info->count = bdrv_get_dirty_count(bm);
++        info->count = bdrv_get_dirty_count(bm) << BDRV_SECTOR_BITS;
+         info->granularity = bdrv_dirty_bitmap_granularity(bm);
+         info->has_name = !!bm->name;
+         info->name = g_strdup(bm->name);
+-- 
+2.9.4
