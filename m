@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49629)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49668)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dAUTh-0000Jo-0p
-	for qemu-devel@nongnu.org; Tue, 16 May 2017 00:52:58 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1dAUTj-0000K8-2f
+	for qemu-devel@nongnu.org; Tue, 16 May 2017 00:53:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dAUTg-0003VN-1X
-	for qemu-devel@nongnu.org; Tue, 16 May 2017 00:52:57 -0400
-Date: Tue, 16 May 2017 14:41:13 +1000
+	(envelope-from <dgibson@ozlabs.org>) id 1dAUTg-0003VB-0y
+	for qemu-devel@nongnu.org; Tue, 16 May 2017 00:52:59 -0400
+Date: Tue, 16 May 2017 14:39:34 +1000
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20170516044113.GI30022@umbus.fritz.box>
+Message-ID: <20170516043934.GH30022@umbus.fritz.box>
 References: <149484833874.20089.4164801378197848306.stgit@bahia.lan>
-	<149484839512.20089.2730407279712230463.stgit@bahia.lan>
+	<149484838558.20089.5029926585755792842.stgit@bahia.lan>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="MPkR1dXiUZqK+927"
+	protocol="application/pgp-signature"; boundary="h3LYUU6HlUDSAOzy"
 Content-Disposition: inline
-In-Reply-To: <149484839512.20089.2730407279712230463.stgit@bahia.lan>
-Subject: Re: [Qemu-devel] [PATCH 5/6] spapr-cpu-core: release ICP object
- when realization fails
+In-Reply-To: <149484838558.20089.5029926585755792842.stgit@bahia.lan>
+Subject: Re: [Qemu-devel] [PATCH 4/6] spapr: sanitize error handling in
+ spapr_ics_create()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,62 +29,68 @@ To: Greg Kurz <groug@kaod.org>
 Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Bharata B Rao <bharata@linux.vnet.ibm.com>, Cedric Le Goater <clg@kaod.org>
 
 
---MPkR1dXiUZqK+927
+--h3LYUU6HlUDSAOzy
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, May 15, 2017 at 01:39:55PM +0200, Greg Kurz wrote:
-> While here we introduce a single error path to avoid code duplication.
+On Mon, May 15, 2017 at 01:39:45PM +0200, Greg Kurz wrote:
+> The spapr_ics_create() function handles errors in a rather convoluted
+> way, with two local Error * variables. Moreover, failing to parent the
+> ICS object to the machine should be considered as a bug but it is
+> currently ignored.
+>=20
+> This patch addresses both issues.
 >=20
 > Signed-off-by: Greg Kurz <groug@kaod.org>
 
-Applied to ppc=3Dfor-2.10.
+Applied to ppc-for-2.10
 
 > ---
->  hw/ppc/spapr_cpu_core.c |   16 ++++++++--------
->  1 file changed, 8 insertions(+), 8 deletions(-)
+>  hw/ppc/spapr.c |   19 ++++++++++++-------
+>  1 file changed, 12 insertions(+), 7 deletions(-)
 >=20
-> diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
-> index 4389ef4c2aef..63d160f7e010 100644
-> --- a/hw/ppc/spapr_cpu_core.c
-> +++ b/hw/ppc/spapr_cpu_core.c
-> @@ -147,25 +147,25 @@ static void spapr_cpu_core_realize_child(Object *ch=
-ild, Error **errp)
+> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> index 44f7dc7f40e9..c53989bb10b1 100644
+> --- a/hw/ppc/spapr.c
+> +++ b/hw/ppc/spapr.c
+> @@ -101,21 +101,26 @@ static ICSState *spapr_ics_create(sPAPRMachineState=
+ *spapr,
+>                                    const char *type_ics,
+>                                    int nr_irqs, Error **errp)
+>  {
+> -    Error *err =3D NULL, *local_err =3D NULL;
+> +    Error *local_err =3D NULL;
+>      Object *obj;
+> =20
+>      obj =3D object_new(type_ics);
+> -    object_property_add_child(OBJECT(spapr), "ics", obj, NULL);
+> +    object_property_add_child(OBJECT(spapr), "ics", obj, &error_abort);
 >      object_property_add_const_link(obj, "xics", OBJECT(spapr), &error_ab=
 ort);
+> -    object_property_set_int(obj, nr_irqs, "nr-irqs", &err);
+> +    object_property_set_int(obj, nr_irqs, "nr-irqs", &local_err);
+> +    if (local_err) {
+> +        goto error;
+> +    }
 >      object_property_set_bool(obj, true, "realized", &local_err);
->      if (local_err) {
-> -        error_propagate(errp, local_err);
-> -        return;
+> -    error_propagate(&err, local_err);
+> -    if (err) {
+> -        error_propagate(errp, err);
+> -        return NULL;
+> +    if (local_err) {
 > +        goto error;
 >      }
 > =20
->      object_property_set_bool(child, true, "realized", &local_err);
->      if (local_err) {
-> -        object_unparent(obj);
-> -        error_propagate(errp, local_err);
-> -        return;
-> +        goto error;
->      }
-> =20
->      spapr_cpu_init(spapr, cpu, &local_err);
->      if (local_err) {
-> -        object_unparent(obj);
-> -        error_propagate(errp, local_err);
-> -        return;
-> +        goto error;
->      }
-> =20
->      xics_cpu_setup(XICS_FABRIC(spapr), cpu, ICP(obj));
-> +    return;
+>      return ICS_SIMPLE(obj);
 > +
 > +error:
-> +    object_unparent(obj);
 > +    error_propagate(errp, local_err);
+> +    return NULL;
 >  }
 > =20
->  static void spapr_cpu_core_realize(DeviceState *dev, Error **errp)
+>  static void xics_system_init(MachineState *machine, int nr_irqs, Error *=
+*errp)
 >=20
 
 --=20
@@ -93,25 +99,25 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---MPkR1dXiUZqK+927
+--h3LYUU6HlUDSAOzy
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v2
 
-iQIcBAEBCAAGBQJZGoLpAAoJEGw4ysog2bOSE/AP/A45CgKkHdjT055+VUyWYbZ6
-lUGHzDrR/qcmM2wTem+Tf2EuO8ea0JLd4O1NBGVSswP1BWFeYpejDE1gi8DaI1g/
-R2djYkKFTJYHS92ZX9Wy+wQoV10aHQpGn4B6d0AQRUdH/XmbQZ9ryHp0sRtFhj5V
-8e8C61P2C7ZZv2A3hwGm17UmD639TvdaPfGrDlx3suuIFmL+DsQJ3VS1HpnotVBs
-BOzlaQeAxOOlERG+N6WtIF2hk7/ENFAvU9zplE+KmEXLdfQnWQfPr9bM+DXFGJi3
-tN/+ct7J+7aJDzUZ6NKTpDVFOe5izE8grAMKS9UEc99cM/A/KYlbDBnfJqykYOeb
-cVTnrAzu75XRLD1+UFjgYQ+Z+pLFTPLRj3uS1Nyzrm6R7H7V7mp5D95PjD6EXDhk
-GPIvkwO0KHNzzp588S10rW6xoU2FHyp8yl8XObMABPGkDanpboMtQfh9QRxlraKk
-/1ztkcphtOr3/mL6OeUMnFsMZLZxDlr5M80Z7R6CI2Lbor6LyPgGfxrDoE1NLFbN
-vNPj4MGvNnfhprluJI8zBV/ZqT+gY6JV3ApUXOVlQuB+3UdQ9YuZ8Ui4YeMBlltp
-1scl3oT1A0QXMUPWjiteaFE4Db9PlRHtswp6IQWFxYOGzwt/0bqODGUlVxXPf/8h
-iywrtnzz+OsRgSrf9cvJ
-=672n
+iQIcBAEBCAAGBQJZGoKGAAoJEGw4ysog2bOSD1UQANdUvAIFeJOoJbHrkCpkIzb3
+69v7r15+zpqUxqMIyJy9FMTG5+aE2eD/GXxFfj+O7bCrJcKcKec7Fkm3MvVpu6S/
+lBHS0Y2eqZ4Keb09fL6b6yDCF1IvLa4tJmuAqa+1GIQUxJZ8gFf+fyLFF5L05axS
+bT8txbq1dsJt0gZfVe266JgZ8rTBmTqnj5p1620kgg+VlLoPQbLHDZkmJQsn5BVS
+5QulFVK4F2Z//bLVH/Q1W4nG5PUOrqAb3UPhjF4xXmMKIjLI+cXQaNrFrhI8q1u5
+q3PhP4+hAkWoVlTFreGKM7tdJtI3rposmhWQWRyJeKGbWfkB9Xg718bsvoM3SoAp
+Yf2DDN9eihscLOlZold/tpz7w98lnyq62tZ28w+rBew7iphBZcbSYo6tu4LO9cZL
+ke3EPznlFIGB2xHLqcnA53/HNmZ6CRoUbsFfQZI75v85yg5BVWNpf3CTopFwjH8v
+r6lp5nZJ1xh0Gwr1wG53/0+TMnivj15S+A7CYjkIdULh8u/TCgq7Ft0trET9Rhad
+o0z6Rk5QgJE8XkfCXDSDjJlZSYX/NtizznaSZGVilN4nwg4IYaRYJ+hWyppLM0Zl
+lu5imogfgZI4UkzBVNOz3bzVkp4w6uq2lszVg7cdj1m30vTPhze0AtiT5gMNRuZe
+bz58vFOaktVzOO8446+U
+=BPlT
 -----END PGP SIGNATURE-----
 
---MPkR1dXiUZqK+927--
+--h3LYUU6HlUDSAOzy--
