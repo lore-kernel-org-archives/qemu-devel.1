@@ -1,29 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49437)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54406)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1dAYqP-0007WR-81
-	for qemu-devel@nongnu.org; Tue, 16 May 2017 05:32:42 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1dAZ3I-0001VF-UU
+	for qemu-devel@nongnu.org; Tue, 16 May 2017 05:46:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1dAYqK-0006tS-Bd
-	for qemu-devel@nongnu.org; Tue, 16 May 2017 05:32:41 -0400
-Received: from mailhub.sw.ru ([195.214.232.25]:35148 helo=relay.sw.ru)
+	(envelope-from <vsementsov@virtuozzo.com>) id 1dAZ3F-0004wD-9T
+	for qemu-devel@nongnu.org; Tue, 16 May 2017 05:46:00 -0400
+Received: from mailhub.sw.ru ([195.214.232.25]:44396 helo=relay.sw.ru)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
-	id 1dAYqJ-0006sL-VY
-	for qemu-devel@nongnu.org; Tue, 16 May 2017 05:32:36 -0400
-References: <20170512141702.12423-1-vsementsov@virtuozzo.com>
-	<8c231084-8eaa-fe66-43cd-4c85f1e45272@redhat.com>
-	<005ea4a3-6565-6a56-75de-b6464bcae8fd@virtuozzo.com>
-	<0fcdd582-47d1-0206-1c66-d8db615f1174@redhat.com>
-	<858a4c56-1f9c-b7a3-fd73-34e4c8b59953@virtuozzo.com>
-	<e86ebf22-66ac-759c-c726-390daa2933c2@virtuozzo.com>
+	id 1dAZ3E-0004u4-Rc
+	for qemu-devel@nongnu.org; Tue, 16 May 2017 05:45:57 -0400
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <75da073d-62e8-81ac-990c-aa60aa88dc54@virtuozzo.com>
-Date: Tue, 16 May 2017 12:32:33 +0300
-MIME-Version: 1.0
-In-Reply-To: <e86ebf22-66ac-759c-c726-390daa2933c2@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] nbd: strict nbd_wr_syncv
+Date: Tue, 16 May 2017 12:45:29 +0300
+Message-Id: <20170516094533.6160-2-vsementsov@virtuozzo.com>
+In-Reply-To: <20170516094533.6160-1-vsementsov@virtuozzo.com>
+References: <20170516094533.6160-1-vsementsov@virtuozzo.com>
+Subject: [Qemu-devel] [PATCH 1/5] nbd: strict nbd_wr_syncv
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,80 +24,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
-Cc: den@openvz.org
+To: qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: mreitz@redhat.com, kwolf@redhat.com, pbonzini@redhat.com, den@openvz.org, vsementsov@virtuozzo.com
 
-16.05.2017 12:10, Vladimir Sementsov-Ogievskiy wrote:
-> 15.05.2017 12:43, Vladimir Sementsov-Ogievskiy wrote:
->> 12.05.2017 19:30, Paolo Bonzini wrote:
->>>
->>> On 12/05/2017 17:57, Vladimir Sementsov-Ogievskiy wrote:
->>>> 12.05.2017 18:46, Paolo Bonzini wrote:
->>>>> On 12/05/2017 16:17, Vladimir Sementsov-Ogievskiy wrote:
->>>>>> nbd_wr_syncv is called either from coroutine or from client 
->>>>>> negotiation
->>>>>> code, when socket is in blocking mode. So, -EAGAIN is impossible.
->>>>>>
->>>>>> Furthermore, EAGAIN is confusing, as, what to read/write again? With
->>>>>> EAGAIN as a return code we don't know how much data is already
->>>>>> read or written by the function, so in case of EAGAIN the whole
->>>>>> communication is broken.
->>>>>>
->>>>>> Signed-off-by: Vladimir Sementsov-Ogievskiy 
->>>>>> <vsementsov@virtuozzo.com>
->>>>>> ---
->>>>>>
->>>>>> Hi all!
->>>>>>
->>>>>> If I understand right, nbd_wr_syncv is called either from coroutine
->>>>>> or from client negotiation code, when socket is in blocking mode.
->>>>>> So, some thoughts
->>>>>>
->>>>>> 1. let's establish this with an assert, because returning EAGAIN is
->>>>>>      confusing (see above)
->>>>> Yes, this seems like a good idea.
->>>>>
->>>>>> 2. should we in case of non-coroutine context start this 
->>>>>> coroutine in
->>>>>>      nbd_wr_syncv, like in bdrv_prwv_co, and use non-blocking mode?
->>>>>> 3. is there any problems or disadvantages of moving client 
->>>>>> negotiation
->>>>>>      to coroutine too?
->>>>> When you move code to coroutines you need to be aware of what code 
->>>>> can
->>>>> now run concurrently, for example the monitor.  I'm not sure that 
->>>>> it's
->>>>> possible to do this.
->>>> Hmm, can you please give some example of a problem? qcow2_open starts
->>>> coroutines to read it's header, why nbd_open can't start
->>>> coroutine/coroutines to read/write some negotiation data?
->>> Ah, it's not a problem if you use synchronous I/O (aio_poll) within the
->>> coroutines.  But then it's still blocking I/O in every way (except
->>> you've fcntl-ed the descriptor to make it non-blocking); it's simply
->>> hidden underneath coroutines and aio_poll.
->>
->> I mean, make negotiation behave like normal nbd communication, 
->> non-blocking socket + yield.. So, some other coroutines may do their 
->> work, while nbd-negotiation coroutine waits for io..
->>
->>>
->>> Paolo
->>
->>
->
-> Also, one more question here: in nbd_negotiate_write(), why do we need 
-> qio_channel_add_watch? write_sync will yield with qio_channel_yield() 
-> until io complete, why to use 2 mechanisms to wake up a coroutine?
->
->
+nbd_wr_syncv is called either from coroutine or from client negotiation
+code, when socket is in blocking mode. So, -EAGAIN is impossible.
 
-Hmm, these nbd_negotiate_* functions was introduced in 1a6245a5b, when 
-nbd_wr_syncv was working through qemu_co_sendv_recvv, which just yields, 
-without setting any handlers. But now, nbd_wr_syncv works through 
-qio_channel_yield() which sets handlers, so the code with extra watchers 
-looks wrong.
+Furthermore, EAGAIN is confusing, as, what to read/write again? With
+EAGAIN as a return code we don't know how much data is already
+read or written by the function, so in case of EAGAIN the whole
+communication is broken.
 
+Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+---
+ nbd/common.c | 11 ++++++-----
+ 1 file changed, 6 insertions(+), 5 deletions(-)
 
+diff --git a/nbd/common.c b/nbd/common.c
+index dccbb8e9de..4db45b3ede 100644
+--- a/nbd/common.c
++++ b/nbd/common.c
+@@ -20,6 +20,10 @@
+ #include "qapi/error.h"
+ #include "nbd-internal.h"
+ 
++/* nbd_wr_syncv
++ * The function may be called from coroutine or from non-coroutine context.
++ * When called from non-coroutine context @ioc must be in blocking mode.
++ */
+ ssize_t nbd_wr_syncv(QIOChannel *ioc,
+                      struct iovec *iov,
+                      size_t niov,
+@@ -42,11 +46,8 @@ ssize_t nbd_wr_syncv(QIOChannel *ioc,
+             len = qio_channel_writev(ioc, local_iov, nlocal_iov, &local_err);
+         }
+         if (len == QIO_CHANNEL_ERR_BLOCK) {
+-            if (qemu_in_coroutine()) {
+-                qio_channel_yield(ioc, do_read ? G_IO_IN : G_IO_OUT);
+-            } else {
+-                return -EAGAIN;
+-            }
++            assert(qemu_in_coroutine());
++            qio_channel_yield(ioc, do_read ? G_IO_IN : G_IO_OUT);
+             continue;
+         }
+         if (len < 0) {
 -- 
-Best regards,
-Vladimir
+2.11.1
