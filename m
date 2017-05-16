@@ -1,31 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33055)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34280)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1dAcY7-0006nZ-Rx
-	for qemu-devel@nongnu.org; Tue, 16 May 2017 09:30:04 -0400
+	(envelope-from <stefanha@redhat.com>) id 1dAcdG-0000Eq-0B
+	for qemu-devel@nongnu.org; Tue, 16 May 2017 09:35:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1dAcY4-0001P5-PN
-	for qemu-devel@nongnu.org; Tue, 16 May 2017 09:30:03 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:38584)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1dAcY4-0001Mw-JM
-	for qemu-devel@nongnu.org; Tue, 16 May 2017 09:30:00 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 830563B46C
-	for <qemu-devel@nongnu.org>; Tue, 16 May 2017 13:29:57 +0000 (UTC)
-Message-ID: <1494941391.29008.49.camel@redhat.com>
-From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Tue, 16 May 2017 15:29:51 +0200
-In-Reply-To: <20170516123951.GB16341@redhat.com>
-References: <20170428121553.22408-1-berrange@redhat.com>
-	<20170516123951.GB16341@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Mime-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH] sockets: ensure we can bind to both ipv4 &
- ipv6 separately
+	(envelope-from <stefanha@redhat.com>) id 1dAcdF-0003HM-8N
+	for qemu-devel@nongnu.org; Tue, 16 May 2017 09:35:22 -0400
+Date: Tue, 16 May 2017 14:34:58 +0100
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20170516133458.GE8498@stefanha-x1.localdomain>
+References: <20170511144208.24075-1-pbonzini@redhat.com>
+	<20170511144208.24075-2-pbonzini@redhat.com>
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="9l24NVCWtSuIVIod"
+Content-Disposition: inline
+In-Reply-To: <20170511144208.24075-2-pbonzini@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 01/18] block: access copy_on_read with
+ atomic ops
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,27 +25,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-devel@nongnu.org, famz@redhat.com, qemu-block@nongnu.org
 
-  Hi,
 
-> Separately from this patch, I noticed one further possible
-> problem,=20
+--9l24NVCWtSuIVIod
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Thu, May 11, 2017 at 04:41:51PM +0200, Paolo Bonzini wrote:
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> ---
+>         v1->v2: use atomic_fetch_dec [Stefan]
 >=20
-> Currently, the ipv4=3Don|off/ipv6=3Don|off settings are only
-> used to determine what getaddrinfo results we request/use.
->=20
-> This leads to the somewhat odd situation where if you set
-> ipv4=3Doff,ipv6=3Don, QEMU won't be listening on an IPv4
-> socket, but *will still* accept IPv4 clients over the IPv6
-> socket due to our use of IPV6_V6ONLY=3Doff.
+>  block.c                   |  6 ++++--
+>  block/io.c                |  8 ++++----
+>  blockdev.c                |  2 +-
+>  include/block/block_int.h | 11 ++++++-----
+>  4 files changed, 15 insertions(+), 12 deletions(-)
 
-Hmm, maybe we should just use IPV6_V6ONLY=3Don unconditionally?
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 
-Now that qemu finally supports multiple listening sockets we should be
-able to do the switch without regressions, and it also should remove all
-those nasty corner cases ...
+--9l24NVCWtSuIVIod
+Content-Type: application/pgp-signature; name="signature.asc"
 
-cheers,
-  Gerd
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJZGwACAAoJEJykq7OBq3PISHAIAMP0ZdFYivPVv9iGhKLwzfST
+RLU1tqINtiUwrvfBtEZcm1Ok5mp1p0TWRLET3h4TjOl7TdnrOc+Nj5FYzzBqYoaK
+JzEaOH+fHtEtmd97oHzRtJTXT7yEZHH+GZ3kW91AI0RwQqg/diyeEhrUPvUiCq4b
+B/xkp5qckZ8R7WHkbUloWPyqCgyTv40RVWR2unGm4bOXC0aN1YNqbvXP45a59ioy
+So4xeDjRIW7nC7J4sPWgxHLVYs18ZJKW7DTZfFrXw2pBfszIhjx+QKHfEZQWeQ8T
+Qql7Bo/5M/L9ebfXa8mljo0Ws5Lxs0y4/UZY0OhGauJDlQkI4dTVji4/R744AKY=
+=RoLc
+-----END PGP SIGNATURE-----
+
+--9l24NVCWtSuIVIod--
