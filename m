@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42804)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42841)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1dB1BT-0000B4-Oa
-	for qemu-devel@nongnu.org; Wed, 17 May 2017 11:48:20 -0400
+	(envelope-from <quintela@redhat.com>) id 1dB1BX-0000Ej-7r
+	for qemu-devel@nongnu.org; Wed, 17 May 2017 11:48:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1dB1BP-0000n7-NI
-	for qemu-devel@nongnu.org; Wed, 17 May 2017 11:48:19 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46628)
+	(envelope-from <quintela@redhat.com>) id 1dB1BW-0000r5-6L
+	for qemu-devel@nongnu.org; Wed, 17 May 2017 11:48:23 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40816)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1dB1BP-0000ms-Hi
-	for qemu-devel@nongnu.org; Wed, 17 May 2017 11:48:15 -0400
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1dB1BV-0000qY-TO
+	for qemu-devel@nongnu.org; Wed, 17 May 2017 11:48:22 -0400
 Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
 	[10.5.11.12])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 7D7B17F6B3
-	for <qemu-devel@nongnu.org>; Wed, 17 May 2017 15:48:14 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id CAFF3659B3
+	for <qemu-devel@nongnu.org>; Wed, 17 May 2017 15:48:20 +0000 (UTC)
 From: Juan Quintela <quintela@redhat.com>
-Date: Wed, 17 May 2017 17:47:52 +0200
-Message-Id: <20170517154756.22079-6-quintela@redhat.com>
+Date: Wed, 17 May 2017 17:47:54 +0200
+Message-Id: <20170517154756.22079-8-quintela@redhat.com>
 In-Reply-To: <20170517154756.22079-1-quintela@redhat.com>
 References: <20170517154756.22079-1-quintela@redhat.com>
-Subject: [Qemu-devel] [PATCH 5/9] migration: Move qjson.h to migration/
+Subject: [Qemu-devel] [PATCH 7/9] migration: Remove qemu-file.h from
+ vmstate.h
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,45 +33,109 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: dgilbert@redhat.com, lvivier@redhat.com, peterx@redhat.com
 
-It is only used for migration code.
+Signed-off-by: Juan Quintela <quintela@redhat.com>
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+
+--
+
+minor rearangements due to the rebase
 
 Signed-off-by: Juan Quintela <quintela@redhat.com>
 ---
- migration/qjson.c                        | 2 +-
- {include/migration => migration}/qjson.h | 0
- migration/vmstate.c                      | 2 +-
- 3 files changed, 2 insertions(+), 2 deletions(-)
- rename {include/migration => migration}/qjson.h (100%)
+ include/hw/hw.h             | 1 +
+ include/migration/vmstate.h | 3 ---
+ migration/block.c           | 1 +
+ migration/colo.c            | 1 +
+ migration/postcopy-ram.c    | 1 +
+ migration/ram.c             | 1 +
+ tests/test-vmstate.c        | 1 +
+ 7 files changed, 6 insertions(+), 3 deletions(-)
 
-diff --git a/migration/qjson.c b/migration/qjson.c
-index f345904..9d7f6eb 100644
---- a/migration/qjson.c
-+++ b/migration/qjson.c
-@@ -25,7 +25,7 @@
+diff --git a/include/hw/hw.h b/include/hw/hw.h
+index e22d4ce..af9eae1 100644
+--- a/include/hw/hw.h
++++ b/include/hw/hw.h
+@@ -11,6 +11,7 @@
+ #include "exec/memory.h"
+ #include "hw/irq.h"
+ #include "migration/vmstate.h"
++#include "migration/qemu-file.h"
+ #include "qemu/module.h"
+ #include "sysemu/reset.h"
  
- #include "qemu/osdep.h"
- #include "qapi/qmp/qstring.h"
--#include "migration/qjson.h"
-+#include "qjson.h"
+diff --git a/include/migration/vmstate.h b/include/migration/vmstate.h
+index dacb052..f97411d 100644
+--- a/include/migration/vmstate.h
++++ b/include/migration/vmstate.h
+@@ -27,9 +27,6 @@
+ #ifndef QEMU_VMSTATE_H
+ #define QEMU_VMSTATE_H
  
- struct QJSON {
-     QString *str;
-diff --git a/include/migration/qjson.h b/migration/qjson.h
-similarity index 100%
-rename from include/migration/qjson.h
-rename to migration/qjson.h
-diff --git a/migration/vmstate.c b/migration/vmstate.c
-index 7b4a607..66c50ee 100644
---- a/migration/vmstate.c
-+++ b/migration/vmstate.c
-@@ -7,7 +7,7 @@
- #include "qemu/error-report.h"
- #include "qemu/queue.h"
- #include "trace.h"
--#include "migration/qjson.h"
-+#include "qjson.h"
+-#ifndef CONFIG_USER_ONLY
+-#include "migration/qemu-file.h"
+-#endif
+ #include "migration/qjson.h"
  
- static void vmstate_subsection_save(QEMUFile *f, const VMStateDescription *vmsd,
-                                     void *opaque, QJSON *vmdesc);
+ typedef void SaveStateHandler(QEMUFile *f, void *opaque);
+diff --git a/migration/block.c b/migration/block.c
+index 5d22926..5baf46d 100644
+--- a/migration/block.c
++++ b/migration/block.c
+@@ -26,6 +26,7 @@
+ #include "migration/block.h"
+ #include "migration/migration.h"
+ #include "sysemu/blockdev.h"
++#include "migration/qemu-file.h"
+ #include "sysemu/block-backend.h"
+ 
+ #define BLOCK_SIZE                       (1 << 20)
+diff --git a/migration/colo.c b/migration/colo.c
+index 73ebd64..929b31c 100644
+--- a/migration/colo.c
++++ b/migration/colo.c
+@@ -15,6 +15,7 @@
+ #include "sysemu/sysemu.h"
+ #include "qemu-file-channel.h"
+ #include "migration/migration.h"
++#include "migration/qemu-file.h"
+ #include "migration/colo.h"
+ #include "migration/block.h"
+ #include "io/channel-buffer.h"
+diff --git a/migration/postcopy-ram.c b/migration/postcopy-ram.c
+index a0489f6..64f09e1 100644
+--- a/migration/postcopy-ram.c
++++ b/migration/postcopy-ram.c
+@@ -20,6 +20,7 @@
+ 
+ #include "qemu-common.h"
+ #include "migration/migration.h"
++#include "migration/qemu-file.h"
+ #include "postcopy-ram.h"
+ #include "sysemu/sysemu.h"
+ #include "sysemu/balloon.h"
+diff --git a/migration/ram.c b/migration/ram.c
+index 2564c00..04667de 100644
+--- a/migration/ram.c
++++ b/migration/ram.c
+@@ -37,6 +37,7 @@
+ #include "qemu/main-loop.h"
+ #include "xbzrle.h"
+ #include "migration/migration.h"
++#include "migration/qemu-file.h"
+ #include "postcopy-ram.h"
+ #include "exec/address-spaces.h"
+ #include "migration/page_cache.h"
+diff --git a/tests/test-vmstate.c b/tests/test-vmstate.c
+index 1c13570..25389bc 100644
+--- a/tests/test-vmstate.c
++++ b/tests/test-vmstate.c
+@@ -27,6 +27,7 @@
+ #include "qemu-common.h"
+ #include "migration/migration.h"
+ #include "migration/vmstate.h"
++#include "migration/qemu-file.h"
+ #include "../migration/qemu-file-channel.h"
+ #include "qemu/coroutine.h"
+ #include "io/channel-file.h"
 -- 
 2.9.3
