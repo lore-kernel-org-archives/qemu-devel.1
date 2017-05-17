@@ -1,32 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56763)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58866)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kernellwp@gmail.com>) id 1dAuTX-0007E1-0K
-	for qemu-devel@nongnu.org; Wed, 17 May 2017 04:38:32 -0400
+	(envelope-from <bounces@canonical.com>) id 1dAubp-0000ws-4v
+	for qemu-devel@nongnu.org; Wed, 17 May 2017 04:47:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kernellwp@gmail.com>) id 1dAuTV-0002yE-Uc
-	for qemu-devel@nongnu.org; Wed, 17 May 2017 04:38:31 -0400
-Received: from mail-oi0-x242.google.com ([2607:f8b0:4003:c06::242]:35193)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <kernellwp@gmail.com>) id 1dAuTV-0002y9-O8
-	for qemu-devel@nongnu.org; Wed, 17 May 2017 04:38:29 -0400
-Received: by mail-oi0-x242.google.com with SMTP id m17so958565oik.2
-	for <qemu-devel@nongnu.org>; Wed, 17 May 2017 01:38:29 -0700 (PDT)
+	(envelope-from <bounces@canonical.com>) id 1dAubl-0005aj-V8
+	for qemu-devel@nongnu.org; Wed, 17 May 2017 04:47:05 -0400
+Received: from indium.canonical.com ([91.189.90.7]:34533)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1dAubl-0005aV-Pk
+	for qemu-devel@nongnu.org; Wed, 17 May 2017 04:47:01 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1dAubj-0002jy-8g
+	for <qemu-devel@nongnu.org>; Wed, 17 May 2017 08:46:59 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 403532E80CF
+	for <qemu-devel@nongnu.org>; Wed, 17 May 2017 08:46:59 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <1280755991.8446336.1495007019282.JavaMail.zimbra@redhat.com>
-References: <830bfc39-56c7-a901-9ebb-77d6e7a5614c@huawei.com>
-	<874lxeovrg.fsf@secure.mitica>
-	<7cd332ec-48d4-1feb-12e2-97b50b04e028@huawei.com>
-	<20170424164244.GJ2362@work-vm>
-	<B2D15215269B544CADD246097EACE747395AD759@dggeml511-mbx.china.huawei.com>
-	<85e3a0dd-20c8-8ff2-37ce-bfdf543e7787@redhat.com>
-	<CANRm+CzvNpLGqH5KuqqO7Wh7UabSkMBbxuTymbM0CZPgpQOwCg@mail.gmail.com>
-	<B2D15215269B544CADD246097EACE747395C283F@dggeml511-mbx.china.huawei.com>
-	<1280755991.8446336.1495007019282.JavaMail.zimbra@redhat.com>
-From: Wanpeng Li <kernellwp@gmail.com>
-Date: Wed, 17 May 2017 16:38:28 +0800
-Message-ID: <CANRm+CwbTaoxq35zyfNF1BP3d5GqRmtq0sY+aRKRaOsFwGB1Mw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] About QEMU BQL and dirty log switch in Migration
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 17 May 2017 08:27:54 -0000
+From: Thomas Huth <1181796@bugs.launchpad.net>
+Reply-To: Bug 1181796 <1181796@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20130519164858.7560.43164.malonedeb@wampee.canonical.com>
+Message-Id: <149500967422.5017.2790836972592441281.malone@chaenomeles.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1181796] Re: Qemu locks up when incoming serial
+ fills up
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,51 +37,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: "Zhoujian (jay)" <jianjay.zhou@huawei.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, yanghongyang <yanghongyang@huawei.com>, Juan Quintela <quintela@redhat.com>, "wangxin (U)" <wangxinxin.wang@huawei.com>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, "Gonglei (Arei)" <arei.gonglei@huawei.com>, Huangzhichao <huangzhichao@huawei.com>, Zhanghailiang <zhang.zhanghailiang@huawei.com>, "Herongguang (Stephen)" <herongguang.he@huawei.com>, Xiao Guangrong <xiaoguangrong@tencent.com>, "Huangweidong (C)" <weidong.huang@huawei.com>
+To: qemu-devel@nongnu.org
 
-2017-05-17 15:43 GMT+08:00 Paolo Bonzini <pbonzini@redhat.com>:
->> Recently, I have tested the performance before migration and after migration failure
->> using spec cpu2006 https://www.spec.org/cpu2006/, which is a standard performance
->> evaluation tool.
->>
->> These are the steps:
->> ======
->>  (1) the version of kmod is 4.4.11(with slightly modified) and the version of
->>  qemu is 2.6.0
->>     (with slightly modified), the kmod is applied with the following patch
->>
->> diff --git a/source/x86/x86.c b/source/x86/x86.c
->> index 054a7d3..75a4bb3 100644
->> --- a/source/x86/x86.c
->> +++ b/source/x86/x86.c
->> @@ -8550,8 +8550,10 @@ void kvm_arch_commit_memory_region(struct kvm *kvm,
->>          */
->>         if ((change != KVM_MR_DELETE) &&
->>                 (old->flags & KVM_MEM_LOG_DIRTY_PAGES) &&
->> -               !(new->flags & KVM_MEM_LOG_DIRTY_PAGES))
->> -               kvm_mmu_zap_collapsible_sptes(kvm, new);
->> +               !(new->flags & KVM_MEM_LOG_DIRTY_PAGES)) {
->> +               printk(KERN_ERR "zj make KVM_REQ_MMU_RELOAD request\n");
->> +               kvm_make_all_cpus_request(kvm, KVM_REQ_MMU_RELOAD);
->> +       }
->>
->>         /*
->>          * Set up write protection and/or dirty logging for the new slot.
->
-> Try these modifications to the setup:
->
-> 1) set up 1G hugetlbfs hugepages and use those for the guest's memory
->
-> 2) test both without and with the above patch.
->
+I think there have been quite a lot of fixes during the last releases of
+QEMU in this area ... could you please try again to see whether you can
+still reproduce this problem with the latest version of QEMU (currently
+v2.9.0)?
 
-In addition, we can compare /sys/kernel/debug/kvm/largepages w/ and
-w/o the patch. IIRC, /sys/kernel/debug/kvm/largepages will drop during
-live migration, it will keep a small value if live migration fails and
-w/o "lazy collapse small sptes into large sptes" codes, however, it
-will increase gradually if w/ the "lazy collapse small sptes into
-large sptes" codes.
+** Changed in: qemu
+       Status: New =3D> Incomplete
 
-Regards,
-Wanpeng Li
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1181796
+
+Title:
+  Qemu locks up when incoming serial fills up
+
+Status in QEMU:
+  Incomplete
+
+Bug description:
+  I'm using Windows, I'm not sure if this happens on Linux, but for all
+  I know it does. To repro, fire up any image (ideally one that does
+  almost nothing, and doesn't read the serial port), and use the option
+  "-serial pipe:mypipe". Then use Putty or something else to connect to
+  that named pipe so Qemu starts up. Now start typing into Putty. For a
+  VM image that never reads the serial port, upon typing the 16th
+  character Qemu stops executing instructions in the guest (as evidenced
+  either by being unable to step in gdb, seeing that "info registers" in
+  the monitor always reports the same value, or just by observing that
+  the guest is hung). For OS images that do regularly read the serial
+  port, this may require pasting >16 bytes into Putty at once. This
+  occurs with more than just Putty, use anything that can write at a
+  named pipe.
+
+  I would have expected that bytes get dropped, or even more ideally
+  blocked at the sender's side of the named pipe. I would not expect
+  that the entire VM stops. You seem to be able to unwedge the VM by
+  switching to the monitor and running "i /1c 0x3f8" until you've pulled
+  enough out of buffer that it's happy to run again. Interestingly, all
+  bytes seem to come through (more than just the 16) when read from the
+  monitor.
+
+  I haven't been able to get a source environment set up, but I have
+  tried a few of the Windows binaries. This repros in 1.4.1, 1.3.0, 1.2,
+  and 1.0, the most recent build I found that did not have this behavior
+  was 0.15.0.
+
+  Maybe I'm missing something very obvious, and if so, I apologize in
+  advance. I'm also happy to create an OS image that highlights this
+  problem if it would help.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1181796/+subscriptions
