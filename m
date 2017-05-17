@@ -1,33 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50062)
-	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dB2y4-000134-6C
-	for qemu-devel@nongnu.org; Wed, 17 May 2017 13:42:37 -0400
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52670)
+	by lists.gnu.org with esmtp (Exim 4.71) (envelope-from <n54@gmx.com>)
+	id 1dB3Bs-0003SH-H8
+	for qemu-devel@nongnu.org; Wed, 17 May 2017 13:56:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dB2y1-00085S-1o
-	for qemu-devel@nongnu.org; Wed, 17 May 2017 13:42:36 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46928)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dB2y0-00085M-Oc
-	for qemu-devel@nongnu.org; Wed, 17 May 2017 13:42:32 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 4C63D448D70
-	for <qemu-devel@nongnu.org>; Wed, 17 May 2017 17:42:31 +0000 (UTC)
-From: Markus Armbruster <armbru@redhat.com>
-References: <20170509173559.31598-1-marcandre.lureau@redhat.com>
-	<20170509173559.31598-14-marcandre.lureau@redhat.com>
-Date: Wed, 17 May 2017 19:42:25 +0200
-In-Reply-To: <20170509173559.31598-14-marcandre.lureau@redhat.com>
-	(=?utf-8?Q?=22Marc-Andr=C3=A9?= Lureau"'s message of "Tue, 9 May 2017
-	20:35:55 +0300")
-Message-ID: <87inkzxtvi.fsf@dusky.pond.sub.org>
+	(envelope-from <n54@gmx.com>) id 1dB3Bn-0006rI-Fr
+	for qemu-devel@nongnu.org; Wed, 17 May 2017 13:56:52 -0400
+Received: from mout.gmx.net ([212.227.17.20]:61674)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <n54@gmx.com>) id 1dB3BW-0006iD-Ae
+	for qemu-devel@nongnu.org; Wed, 17 May 2017 13:56:47 -0400
+References: <149500755798.25192.15465936284699398425.malonedeb@gac.canonical.com>
+	<f3f455ae-756d-ae8a-c551-09fb6c095116@redhat.com>
+From: Kamil Rytarowski <n54@gmx.com>
+Message-ID: <8181e90f-99a2-18b3-8dfd-6e404f8cdef6@gmx.com>
+Date: Wed, 17 May 2017 19:58:08 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 13/17] qdev: use appropriate getter/setters
- type
+In-Reply-To: <f3f455ae-756d-ae8a-c551-09fb6c095116@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="049eP9UrvPR6OMAbkuutGXJ3HOjCHoDa2"
+Subject: Re: [Qemu-devel] [Bug 1691379] [NEW] NetBSD evbmips64el port
+ installation doesn't work with qemu-system-mips64el.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,219 +29,161 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: Thomas Huth <thuth@redhat.com>, Bug 1691379 <1691379@bugs.launchpad.net>, qemu-devel@nongnu.org
+Cc: Yongbok Kim <yongbok.kim@imgtec.com>, Kamil Rytarowski <kamil@netbsd.org>, Aurelien Jarno <aurelien@aurel32.net>
 
-Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--049eP9UrvPR6OMAbkuutGXJ3HOjCHoDa2
+From: Kamil Rytarowski <n54@gmx.com>
+To: Thomas Huth <thuth@redhat.com>, Bug 1691379 <1691379@bugs.launchpad.net>,
+ qemu-devel@nongnu.org
+Cc: Yongbok Kim <yongbok.kim@imgtec.com>, Kamil Rytarowski
+ <kamil@netbsd.org>, Aurelien Jarno <aurelien@aurel32.net>
+Message-ID: <8181e90f-99a2-18b3-8dfd-6e404f8cdef6@gmx.com>
+Subject: Re: [Qemu-devel] [Bug 1691379] [NEW] NetBSD evbmips64el port
+ installation doesn't work with qemu-system-mips64el.
+References: <149500755798.25192.15465936284699398425.malonedeb@gac.canonical.com>
+ <f3f455ae-756d-ae8a-c551-09fb6c095116@redhat.com>
+In-Reply-To: <f3f455ae-756d-ae8a-c551-09fb6c095116@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-> Based on underlying property type, use the appropriate getters/setters.
+On 17.05.2017 10:10, Thomas Huth wrote:
+> On 17.05.2017 09:52, Utkarsh Anand wrote:
+>> Public bug reported:
+>>
+>> I successfully installed the NetBSD evbmips64el port on gxemul but was=
 
-How did you find the ones that need changing?
+>> unable to install it on qemu. Trying to boot it on qemu takes me to th=
+e
+>> 'db>' prompt. Here's the output and backtrace:
+>>
+>> panic: pcib_isa_intr_string: bogus isa irq 0x0
+>> kernel: breakpoint trap
+>> Stopped in pid 0.1 (system) at  netbsd:cpu_Debugger+0x4:        jr    =
+  ra
+>>                 bdslot: nop
+>> db> bt
+>> 0xffffffff805977f0: cpu_Debugger+4 (63061,90000000180003f8,6,ffffffff8=
+04c2290) ra ffffffff8030acd0 sz 0
+>> 0xffffffff805977f0: vpanic+158 (63061,90000000180003f8,6,ffffffff804c2=
+290) ra ffffffff8030ad7c sz 64
+>> 0xffffffff80597830: panic+34 (63061,ffffffff803d65b0,0,40) ra ffffffff=
+80109784 sz 96
+>> 0xffffffff80597890: pcib_isa_intr_string+6c (63061,ffffffff803d65b0,0,=
+40) ra ffffffff80149bfc sz 16
+>> 0xffffffff805978a0: uhci_pci_attach+16c (63061,ffffffff803d65b0,0,40) =
+ra ffffffff802f0400 sz 176
+>> 0xffffffff80597950: config_attach_loc+1c8 (63061,ffffffff803d65b0,0,40=
+) ra ffffffff802f053c sz 64
+>> 0xffffffff80597990: config_found_sm_loc+5c (63061,ffffffff803d65b0,0,4=
+0) ra ffffffff80121354 sz 64
+>> 0xffffffff805979d0: pci_probe_device+524 (63061,ffffffff803d65b0,0,0) =
+ra ffffffff80121548 sz 288
+>> 0xffffffff80597af0: pci_enumerate_bus+1d0 (63061,ffffffff803d65b0,0,0)=
+ ra ffffffff8012167c sz 160
+>> 0xffffffff80597b90: pcirescan+5c (63061,ffffffff803d65b0,0,0) ra fffff=
+fff801218c4 sz 32
+>> 0xffffffff80597bb0: pciattach+19c (63061,ffffffff803d65b0,0,0) ra ffff=
+ffff802f0400 sz 80
+>> 0xffffffff80597c00: config_attach_loc+1c8 (63061,ffffffff803d65b0,0,0)=
+ ra ffffffff802f053c sz 64
+>> 0xffffffff80597c40: config_found_sm_loc+5c (63061,ffffffff803d65b0,0,0=
+) ra ffffffff80108934 sz 64
+>> 0xffffffff80597c80: gt_attach+7c (63061,ffffffff803d65b0,0,0) ra fffff=
+fff802f0400 sz 112  =20
+>> 0xffffffff80597cf0: config_attach_loc+1c8 (63061,ffffffff803d65b0,0,0)=
+ ra ffffffff802f053c sz 64
+>> 0xffffffff80597d30: config_found_sm_loc+5c (63061,ffffffff803d65b0,0,0=
+) ra ffffffff801086ac sz 64
+>> 0xffffffff80597d70: mainbus_attach+dc (63061,ffffffff803d65b0,0,0) ra =
+ffffffff802f0400 sz 96
+>> 0xffffffff80597dd0: config_attach_loc+1c8 (63061,ffffffff803d65b0,0,0)=
+ ra ffffffff80104bf8 sz 64
+>> 0xffffffff80597e10: cpu_configure+28 (63061,ffffffff803d65b0,0,0) ra f=
+fffffff803d5f30 sz 16
+>> 0xffffffff80597e20: main+3a0 (63061,ffffffff803d65b0,0,0) ra ffffffff8=
+01000dc sz 128      =20
+>> 0xffffffff80597ea0: kernel_text+dc (63061,ffffffff803d65b0,0,0) ra 0 s=
+z 0
+>> User-level: pid 0.1
+>>
+>> Here's the command that I used:
+>>
+>> Build evbmips64el from source and then launch it from qemu (replace th=
+e
+>> paths relative to your system):
+>>
+>> qemu-system-mips64el -cdrom
+>> /extra/evbmips64/distrib/evbmips/cdroms/installcd/NetBSD-7.99.71
+>> -evbmips-mips64el.iso -hda /extra/evbmips64.img -kernel
+>> /extra/evbmips64/releasedir/evbmips/installation/netbsd-INSTALL_MALTA6=
+4
+>> -nographic -M malta
+>>
+>> (I've decompressed the kernel)
+>>
+>> Here's the output for qemu-system-mips64el --version :
+>>
+>> QEMU emulator version 2.7.1(qemu-2.7.1-6.fc25), Copyright (c) 2003-201=
+6
+>> Fabrice Bellard and the QEMU Project developers
+>>
+>> This doesn't look like a NetBSD bug. I've attached a screenshot of the=
 
-> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> ---
->  hw/i386/acpi-build.c      | 12 ++++++------
->  hw/pci-host/gpex.c        |  2 +-
->  hw/pci-host/q35.c         |  2 +-
->  hw/pci-host/xilinx-pcie.c |  2 +-
->  target/i386/cpu.c         |  2 +-
->  5 files changed, 10 insertions(+), 10 deletions(-)
->
-> diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
-> index 767da5d78e..1707fae9bf 100644
-> --- a/hw/i386/acpi-build.c
-> +++ b/hw/i386/acpi-build.c
-> @@ -149,21 +149,21 @@ static void acpi_get_pm_info(AcpiPmInfo *pm)
->      /* Fill in optional s3/s4 related properties */
->      o =3D object_property_get_qobject(obj, ACPI_PM_PROP_S3_DISABLED, NUL=
-L);
->      if (o) {
-> -        pm->s3_disabled =3D qnum_get_int(qobject_to_qnum(o), &error_abor=
-t);
-> +        pm->s3_disabled =3D qnum_get_uint(qobject_to_qnum(o), &error_abo=
-rt);
->      } else {
->          pm->s3_disabled =3D false;
->      }
->      qobject_decref(o);
->      o =3D object_property_get_qobject(obj, ACPI_PM_PROP_S4_DISABLED, NUL=
-L);
->      if (o) {
-> -        pm->s4_disabled =3D qnum_get_int(qobject_to_qnum(o), &error_abor=
-t);
-> +        pm->s4_disabled =3D qnum_get_uint(qobject_to_qnum(o), &error_abo=
-rt);
->      } else {
->          pm->s4_disabled =3D false;
->      }
->      qobject_decref(o);
->      o =3D object_property_get_qobject(obj, ACPI_PM_PROP_S4_VAL, NULL);
->      if (o) {
-> -        pm->s4_val =3D qnum_get_int(qobject_to_qnum(o), &error_abort);
-> +        pm->s4_val =3D qnum_get_uint(qobject_to_qnum(o), &error_abort);
->      } else {
->          pm->s4_val =3D false;
->      }
+>> working installation using gxemul in the attachments.
+>=20
+> When reporting such issues, please always use the latest release of QEM=
+U
+> first, so could you please try again with the latest upstream release o=
+f
+> QEMU (currently v2.9.0)? Thanks!
+>=20
+>  Thomas
+>=20
 
-The getter and setter of properties ACPI_PM_PROP_S3_DISABLED,
-ACPI_PM_PROP_S4_DISABLED and ACPI_PM_PROP_S4_VAL use visit_type_uint8().
+7.99.71 is the most recent kernel ABI version (NetBSD-current).
 
-object_property_get_qobject() uses this getter below the hood with a
-QObject output visitor, to get the value into a QObject.  Since the
-getter uses visit_type_uint8(), the QObject is a QNum with QNUM_U64.
+Release engineering builds of NetBSD-current are hosted on nyftp.netbsd.o=
+rg.
 
-The appropriate way to extract the QNum's value is qnum_get_uint().
+kernel:
 
-Okay.
+http://nyftp.netbsd.org/pub/NetBSD-daily/HEAD/201705170540Z/evbmips-mips6=
+4el/installation/
 
-> @@ -499,7 +499,7 @@ static void build_append_pci_bus_devices(Aml *parent_=
-scope, PCIBus *bus,
->=20=20
->      bsel =3D object_property_get_qobject(OBJECT(bus), ACPI_PCIHP_PROP_BS=
-EL, NULL);
->      if (bsel) {
-> -        int64_t bsel_val =3D qnum_get_int(qobject_to_qnum(bsel), &error_=
-abort);
-> +        uint64_t bsel_val =3D qnum_get_uint(qobject_to_qnum(bsel), &erro=
-r_abort);
->=20=20
->          aml_append(parent_scope, aml_name_decl("BSEL", aml_int(bsel_val)=
-));
->          notify_method =3D aml_method("DVNT", 2, AML_NOTSERIALIZED);
+installation medium:
 
-Similar argument, only slightly more tricky, as the getter dereferences
-a pointer.
+http://nyftp.netbsd.org/pub/NetBSD-daily/HEAD/201705170540Z/images/
 
-> @@ -609,7 +609,7 @@ static void build_append_pci_bus_devices(Aml *parent_=
-scope, PCIBus *bus,
->=20=20
->      /* If bus supports hotplug select it and notify about local events */
->      if (bsel) {
-> -        int64_t bsel_val =3D qnum_get_int(qobject_to_qnum(bsel), &error_=
-abort);
-> +        uint64_t bsel_val =3D qnum_get_uint(qobject_to_qnum(bsel), &erro=
-r_abort);
->          aml_append(method, aml_store(aml_int(bsel_val), aml_name("BNUM")=
-));
->          aml_append(method,
->              aml_call2("DVNT", aml_name("PCIU"), aml_int(1) /* Device Che=
-ck */)
+[In future there will be need to switch 201705170540Z to a newer
+snapshot, as this one will be removed.]
 
-Likewise (@bsel is the same as above).
+I will have to a look tonight and try to reproduce locally (and take
+MIPS 64-bit crash course).
 
-> @@ -2590,7 +2590,7 @@ static bool acpi_get_mcfg(AcpiMcfgInfo *mcfg)
->=20=20
->      o =3D object_property_get_qobject(pci_host, PCIE_HOST_MCFG_SIZE, NUL=
-L);
->      assert(o);
-> -    mcfg->mcfg_size =3D qnum_get_int(qobject_to_qnum(o), &error_abort);
-> +    mcfg->mcfg_size =3D qnum_get_uint(qobject_to_qnum(o), &error_abort);
->      qobject_decref(o);
->      return true;
->  }
 
-Similar argument.
+--049eP9UrvPR6OMAbkuutGXJ3HOjCHoDa2
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-I suspect the hunk I challenged in PATCH 09 actually belongs here.
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
 
-> diff --git a/hw/pci-host/gpex.c b/hw/pci-host/gpex.c
-> index 66055ee5cc..8d3a64008c 100644
-> --- a/hw/pci-host/gpex.c
-> +++ b/hw/pci-host/gpex.c
-> @@ -94,7 +94,7 @@ static void gpex_host_initfn(Object *obj)
->=20=20
->      object_initialize(root, sizeof(*root), TYPE_GPEX_ROOT_DEVICE);
->      object_property_add_child(obj, "gpex_root", OBJECT(root), NULL);
-> -    qdev_prop_set_uint32(DEVICE(root), "addr", PCI_DEVFN(0, 0));
-> +    qdev_prop_set_int32(DEVICE(root), "addr", PCI_DEVFN(0, 0));
->      qdev_prop_set_bit(DEVICE(root), "multifunction", false);
->  }
->=20=20
+iQIcBAEBCAAGBQJZHI82AAoJEEuzCOmwLnZsIMoQAItZedT2fYXbF0C/9YlaV3P7
+0Zv11c/uNp7uiowQKSTxUfUHLDPQbE4j4ktoJQg3qzh05/9gyAOBxE9/hohu4ZtJ
+7YpJgxsBqmpGwlt4fMVGf3Iudq5zvHTydRCfChctNC4jD7Xr2WfNnvrXz2ewhnPU
+zaUYHjVwYrng1LjbjucPYmDoap392wBKSYrFVCdvcfda3xHRhRB52Ll3qtahE06C
+pQAhZYsQv3mt9IBd7LRLfacCQI/DehHhyKsjTiJ7u9SQn/i2LSAJQXwS1hvwAr1Q
+W80q0oKYF5JkDsqF/Pck4gJDISjijrxiW0pGpckOhVTMg0a/4wLNhpT+zZ7WuOlf
+Jz/+m9moBcLzKjGgNXD33hlCCnVxCxm04GdscNRMv2KKyHpLY70qU9WgbwnnyU8X
+6bfe772CR6+vmF5aODzDFeQSuirrI7gQwqTALi1n3XXqDr12oSUX7HnT1nBf+tRW
+EnhjrFb6Yd86TqNMU6GtucTTXqoLI8bdKwI9/U1KMDS0c+fiV8xUOcuO+NWpoPt2
+Iyp2HVcHIz9Hd1ywHjN4prSSZota56OoQWvklZ1AFjlxJuVzKcH3/Tghal9+IURR
+QWT2R50bOWKA5oYBE4Gh9nTjFqJmsfTAwfNvYUsh3/1lAGUCddH2Grnb5fa8/Fbh
+OLhqja9IeW2JUecnWZCI
+=AcS1
+-----END PGP SIGNATURE-----
 
-"addr" is a property of TYPE_PCI_DEVICE, defined with
-DEFINE_PROP_PCI_DEVFN().  It's int32_t, even though only 8 bits are
-used.  Okay.
-
-> diff --git a/hw/pci-host/q35.c b/hw/pci-host/q35.c
-> index 5438be8253..3cbe8cfcea 100644
-> --- a/hw/pci-host/q35.c
-> +++ b/hw/pci-host/q35.c
-> @@ -173,7 +173,7 @@ static void q35_host_initfn(Object *obj)
->=20=20
->      object_initialize(&s->mch, sizeof(s->mch), TYPE_MCH_PCI_DEVICE);
->      object_property_add_child(OBJECT(s), "mch", OBJECT(&s->mch), NULL);
-> -    qdev_prop_set_uint32(DEVICE(&s->mch), "addr", PCI_DEVFN(0, 0));
-> +    qdev_prop_set_int32(DEVICE(&s->mch), "addr", PCI_DEVFN(0, 0));
->      qdev_prop_set_bit(DEVICE(&s->mch), "multifunction", false);
->=20=20
->      object_property_add(obj, PCI_HOST_PROP_PCI_HOLE_START, "uint32",
-
-Likewise.
-
-> diff --git a/hw/pci-host/xilinx-pcie.c b/hw/pci-host/xilinx-pcie.c
-> index 8b71e2d950..461ed41151 100644
-> --- a/hw/pci-host/xilinx-pcie.c
-> +++ b/hw/pci-host/xilinx-pcie.c
-> @@ -150,7 +150,7 @@ static void xilinx_pcie_host_init(Object *obj)
->=20=20
->      object_initialize(root, sizeof(*root), TYPE_XILINX_PCIE_ROOT);
->      object_property_add_child(obj, "root", OBJECT(root), NULL);
-> -    qdev_prop_set_uint32(DEVICE(root), "addr", PCI_DEVFN(0, 0));
-> +    qdev_prop_set_int32(DEVICE(root), "addr", PCI_DEVFN(0, 0));
->      qdev_prop_set_bit(DEVICE(root), "multifunction", false);
->  }
->=20=20
-
-Likewise.
-
-> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-> index 1e8a5b55c0..5bb8131bb8 100644
-> --- a/target/i386/cpu.c
-> +++ b/target/i386/cpu.c
-> @@ -3191,7 +3191,7 @@ static void x86_cpu_apic_create(X86CPU *cpu, Error =
-**errp)
->                                OBJECT(cpu->apic_state), &error_abort);
->      object_unref(OBJECT(cpu->apic_state));
->=20=20
-> -    qdev_prop_set_uint32(cpu->apic_state, "id", cpu->apic_id);
-> +    qdev_prop_set_int32(cpu->apic_state, "id", cpu->apic_id);
->      /* TODO: convert to link<> */
->      apic =3D APIC_COMMON(cpu->apic_state);
->      apic->cpu =3D cpu;
-
-This one's a bit of a mess.
-
-The getter and setter of TYPE_APIC_COMMON property "id" are
-apic_common_get_id() and apic_common_set_id().
-
-apic_common_get_id() reads either APICCommonState member uint32_t
-initial_apic_id or uint8_t id into an int64_t local variable.  It then
-passes this variable to visit_type_int().
-
-apic_common_set_id() uses visit_type_int() to read the value into a
-local variable, which it then assigns both to initial_apic_id and id.
-
-While the state backing the property is two unsigned members, 8 and 32
-bits wide, the actual visitor is 64 bits signed.
-
-cpu->apic_id is uint32_t.
-
-qdev_prop_set_uint32() isn't really wrong, because any uint32_t value is
-also a valid int64_t value.
-
-qdev_prop_set_int32() is implicitly converts cpu->apic_id from uint32_t
-to int32_t.  Perhaps that's even okay, but I don't care, I want this
-mess cleaned up :)
-
-Two possible ways to clean up:
-
-1. Use qdev_prop_set_int().  Then the members get converted to
-int64_t and back.  Looks safe to me.
-
-2. Change getter and setter to use visit_type_uint32().  Then
-everything's uint32_t, except for @id.
-
-I prefer 2.
-
-This getter and setter business drives me nuts.  Them mixing up
-signedness and width doesn't help.
+--049eP9UrvPR6OMAbkuutGXJ3HOjCHoDa2--
