@@ -1,41 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39766)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40096)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bharata@linux.vnet.ibm.com>) id 1dAtF3-0001mz-1w
-	for qemu-devel@nongnu.org; Wed, 17 May 2017 03:19:30 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1dAtGf-0002ij-0v
+	for qemu-devel@nongnu.org; Wed, 17 May 2017 03:21:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bharata@linux.vnet.ibm.com>) id 1dAtEu-0003Ih-1h
-	for qemu-devel@nongnu.org; Wed, 17 May 2017 03:19:29 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:45899)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bharata@linux.vnet.ibm.com>)
-	id 1dAtEt-0003I3-OQ
-	for qemu-devel@nongnu.org; Wed, 17 May 2017 03:19:19 -0400
-Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v4H7Ilvo124582
-	for <qemu-devel@nongnu.org>; Wed, 17 May 2017 03:19:18 -0400
-Received: from e23smtp04.au.ibm.com (e23smtp04.au.ibm.com [202.81.31.146])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2agfgbebry-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 17 May 2017 03:19:18 -0400
-Received: from localhost
-	by e23smtp04.au.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <bharata@linux.vnet.ibm.com>;
-	Wed, 17 May 2017 17:19:15 +1000
-Date: Wed, 17 May 2017 12:48:21 +0530
-From: Bharata B Rao <bharata@linux.vnet.ibm.com>
-Reply-To: bharata@linux.vnet.ibm.com
+	(envelope-from <dgibson@ozlabs.org>) id 1dAtGa-0003uK-Ql
+	for qemu-devel@nongnu.org; Wed, 17 May 2017 03:21:09 -0400
+Date: Wed, 17 May 2017 17:20:31 +1000
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20170517072031.GO15596@umbus.fritz.box>
 References: <1494992962-6929-1-git-send-email-bharata@linux.vnet.ibm.com>
-	<1494992962-6929-6-git-send-email-bharata@linux.vnet.ibm.com>
-	<20170517065933.GM15596@umbus.fritz.box>
+	<1494992962-6929-7-git-send-email-bharata@linux.vnet.ibm.com>
+	<20170517070049.GN15596@umbus.fritz.box>
+	<20170517071539.GB3446@in.ibm.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="H83aLI5Lttn3Hg7B"
 Content-Disposition: inline
-In-Reply-To: <20170517065933.GM15596@umbus.fritz.box>
-Message-Id: <20170517071821.GC3446@in.ibm.com>
-Subject: Re: [Qemu-devel] [RFC PATCH v1 5/6] spapr: Unregister HPT savevm
- handlers for radix guests
+In-Reply-To: <20170517071539.GB3446@in.ibm.com>
+Subject: Re: [Qemu-devel] [RFC PATCH v1 6/6] spapr: Fix migration of Radix
+ guests
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -44,56 +27,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
+To: Bharata B Rao <bharata@linux.vnet.ibm.com>
 Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, sam.bobroff@au1.ibm.com, rnsastry@linux.vnet.ibm.com
 
-On Wed, May 17, 2017 at 04:59:33PM +1000, David Gibson wrote:
-> On Wed, May 17, 2017 at 09:19:21AM +0530, Bharata B Rao wrote:
-> > HPT gets created by default and later when the guest turns out to be
-> > a radix guest, the HPT is destroyed when guest does H_REGISTER_PROC_TBL
-> > hcall.
-> 
-> I don't think that's entirely accurate.  At least in some KVM
-> configurations, we assume radix first, and only allocate the HPT once
-> the guest confirms it is doing hash.
 
-Right, that statement is true for TCG radix guests, will rephrase it.
+--H83aLI5Lttn3Hg7B
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-> 
-> > Let HTAB savevm handlers registration and unregistration follow
-> > the same model so that we don't end up having unrequired HTAB savevm
-> > handlers for radix guests.
-> > 
-> > This also ensures that HTAB savevm handlers seemlessly get destroyed and
-> > recreated like HTAB itself when hash guest reboots.
-> > 
-> > Signed-off-by: Bharata B Rao <bharata@linux.vnet.ibm.com>
-> > ---
-> >  hw/ppc/spapr.c         | 15 +++++++++++++--
-> >  hw/ppc/spapr_hcall.c   |  1 +
-> >  include/hw/ppc/spapr.h |  2 ++
-> >  3 files changed, 16 insertions(+), 2 deletions(-)
-> > 
-> > diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> > index 521eef1..05abfc1 100644
-> > --- a/hw/ppc/spapr.c
-> > +++ b/hw/ppc/spapr.c
-> > @@ -1237,6 +1237,7 @@ static void spapr_reallocate_hpt(sPAPRMachineState *spapr, int shift,
-> >  
-> >      /* Clean up any HPT info from a previous boot */
-> >      spapr_free_hpt(spapr);
-> > +    spapr_htab_savevm_unregister(spapr);
-> 
-> I'd prefer that the unregister be folded into spapr_free_hpt().
-> Basically we want calls that create or remove the HPT and handle
-> everything - allocation/freeing if necessary, informing KVM if
-> necessary, and registering/deregistering the savevm handlers if
-> necesary.
-> 
-> I think that will also remove the need for the trivial
-> spapr_htab_savevm_{un,}register() wrappers.
+On Wed, May 17, 2017 at 12:45:39PM +0530, Bharata B Rao wrote:
+> On Wed, May 17, 2017 at 05:00:49PM +1000, David Gibson wrote:
+> > On Wed, May 17, 2017 at 09:19:22AM +0530, Bharata B Rao wrote:
+> > > Fix migration of radix guests by ensuring that we issue
+> > > KVM_PPC_CONFIGURE_V3_MMU for radix case post migration.
+> > >=20
+> > > Reported-by: Nageswara R Sastry <rnsastry@linux.vnet.ibm.com>
+> > > Signed-off-by: Bharata B Rao <bharata@linux.vnet.ibm.com>
+> > > ---
+> > >  hw/ppc/spapr.c         | 15 +++++++++++++++
+> > >  hw/ppc/spapr_hcall.c   |  1 +
+> > >  include/hw/ppc/spapr.h |  1 +
+> > >  3 files changed, 17 insertions(+)
+> > >=20
+> > > diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> > > index 05abfc1..dd1d687 100644
+> > > --- a/hw/ppc/spapr.c
+> > > +++ b/hw/ppc/spapr.c
+> > > @@ -1443,6 +1443,20 @@ static int spapr_post_load(void *opaque, int v=
+ersion_id)
+> > >          err =3D spapr_rtc_import_offset(&spapr->rtc, spapr->rtc_offs=
+et);
+> > >      }
+> > > =20
+> > > +    if (spapr->patb_entry) {
+> > > +        if (kvmppc_has_cap_mmu_radix() && kvm_enabled()) {
+> > > +            err =3D kvmppc_configure_v3_mmu(POWERPC_CPU(first_cpu),
+> > > +                                          spapr->patb_flags &
+> > > +                                          SPAPR_PROC_TABLE_RADIX,
+> > > +                                          spapr->patb_flags &
+> > > +                                          SPAPR_PROC_TABLE_GTSE,
+> >=20
+> > You should be able to work out the things you need here from
+> > patb_entry without adding the new patb_flags field.
+>=20
+> kvmppc_configure_v3_mmu() needs two bools: radix and gtse. The radix
+> bit can be implied from patb_entry, I needed patb_flags to get the
+> gtse value. Not immediately obvious of how to get gtse bit from patb_entr=
+y,
+> but let me take a relook.
 
-Sure, will consolidate this in the next version.
+Oh, sorry, you can't get GTSE from the patb_entry, but you can get it
+=66rom the LPCR.
 
-Regards,
-Bharata.
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--H83aLI5Lttn3Hg7B
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iQIcBAEBCAAGBQJZG/m9AAoJEGw4ysog2bOSkuUQAJdI/DkB8WCkaaEGV+LH+oVc
+0wt4PKdVtC21tvMmByeFFsUdZ3bcbUzaykTz5k0R0+gG51EZtRcWQwB2yo5IXocQ
+ZbyQvkCQ1BQkXskdZ0bwOeE2gxcOvW3bUN9fAC6D1zsJtaLMP/J5hsA5i4bTH/xN
+5E83lrXvQWz82FG96p4C89jvsFVawKQO6/YBMPbSZCr9iPWR94Ml/hZEQYcn00ye
+XnGBK8w5LTqvXbmiFbpx+NSdS4OkQXRN6MvmJsT/KGAsLe+83PlNg0OENVT6yV5a
+7pHrGGJG1/tlsTCRiRtWc6nrfi+inomUiF10FYnmbkRiHmr6rXr8xH+Ukmlh8FVR
+OvdF6A9k/RpuNSCXbfBoRQNMbqGJlAzmK+NL9PModKMfqR4ofuLr3bBwn8CiySGX
+NabN3GDSgmORs69PidUEtdWV5jeR6aLNqgKP9Pv6f1Z1fvVRh+VCMt9bWiPflK9w
+e9C9Kk7GkrxpfFX1qIsAg9vYChk7/ahW9pntHO2QqaUlaGvrKh9qPOgns5DcBaUa
+ICteCK/fkYICWTKUvsa0upt1Zj2MulkmUeAsr8ZjFuq3Ruy0FC+G+x7PMOc6KlmH
+8pkobo8j2MK9lm+RFVwqH9NjbTN0k+/T03c1bYkQj0nNDji9WK8u6ZGZez1O6ks/
+lETSPGE5Bc/5V9aijcIG
+=Hdj/
+-----END PGP SIGNATURE-----
+
+--H83aLI5Lttn3Hg7B--
