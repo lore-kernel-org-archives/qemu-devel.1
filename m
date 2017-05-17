@@ -1,22 +1,43 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57637)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59206)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dB5VN-0001px-B8
-	for qemu-devel@nongnu.org; Wed, 17 May 2017 16:25:10 -0400
+	(envelope-from <danielhb@linux.vnet.ibm.com>) id 1dB5c0-0003hq-BV
+	for qemu-devel@nongnu.org; Wed, 17 May 2017 16:32:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dB5VM-0000q4-CL
-	for qemu-devel@nongnu.org; Wed, 17 May 2017 16:25:09 -0400
-References: <20170517170941.25850-1-stefanha@redhat.com>
-	<20170517170941.25850-4-stefanha@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <455ebb50-8f37-72b4-eef4-87c4a7c5c6d5@redhat.com>
-Date: Wed, 17 May 2017 15:24:55 -0500
+	(envelope-from <danielhb@linux.vnet.ibm.com>) id 1dB5bx-0003qA-3K
+	for qemu-devel@nongnu.org; Wed, 17 May 2017 16:32:00 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:40714
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <danielhb@linux.vnet.ibm.com>)
+	id 1dB5bw-0003pI-Sz
+	for qemu-devel@nongnu.org; Wed, 17 May 2017 16:31:57 -0400
+Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v4HKTQkR031460
+	for <qemu-devel@nongnu.org>; Wed, 17 May 2017 16:31:54 -0400
+Received: from e24smtp04.br.ibm.com (e24smtp04.br.ibm.com [32.104.18.25])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2aggdfyhqs-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Wed, 17 May 2017 16:31:54 -0400
+Received: from localhost
+	by e24smtp04.br.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <danielhb@linux.vnet.ibm.com>;
+	Wed, 17 May 2017 17:31:52 -0300
+From: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
+References: <20170515131052.23457-1-danielhb@linux.vnet.ibm.com>
+	<20170515131052.23457-2-danielhb@linux.vnet.ibm.com>
+	<20170516042501.GC30022@umbus.fritz.box>
+	<a7f35543-18f9-f1d0-67e8-d1d3b3a20be8@linux.vnet.ibm.com>
+Date: Wed, 17 May 2017 17:31:44 -0300
 MIME-Version: 1.0
-In-Reply-To: <20170517170941.25850-4-stefanha@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="kngn0jRVmO5EgwWDc9FXjknFGPKKaVAUx"
-Subject: Re: [Qemu-devel] [PATCH 3/3] migration: avoid recursive AioContext
- locking in save_vmstate()
+In-Reply-To: <a7f35543-18f9-f1d0-67e8-d1d3b3a20be8@linux.vnet.ibm.com>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+Message-Id: <b8f1d3bf-3656-802c-21c7-26de6146240a@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH v10] migration: spapr: migrate
+ pending_events of spapr state
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,78 +46,284 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Fam Zheng <famz@redhat.com>, qemu-block@nongnu.org
-
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---kngn0jRVmO5EgwWDc9FXjknFGPKKaVAUx
-From: Eric Blake <eblake@redhat.com>
-To: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Fam Zheng <famz@redhat.com>, qemu-block@nongnu.org
-Message-ID: <455ebb50-8f37-72b4-eef4-87c4a7c5c6d5@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 3/3] migration: avoid recursive AioContext
- locking in save_vmstate()
-References: <20170517170941.25850-1-stefanha@redhat.com>
- <20170517170941.25850-4-stefanha@redhat.com>
-In-Reply-To: <20170517170941.25850-4-stefanha@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 05/17/2017 12:09 PM, Stefan Hajnoczi wrote:
-> AioContext was designed to allow nested acquire/release calls.  It uses=
-
-> a recursive mutex so callers don't need to worry about nesting...or so
-> we thought.
->=20
-> BDRV_POLL_WHILE() is used to wait for block I/O requests.  It releases
-> the AioContext temporarily around aio_poll().  This gives IOThreads a
-> chance to acquire the AioContext to process I/O completions.
->=20
-> It turns out that recursive locking and BDRV_POLL_WHILE() don't mix.
-> BDRV_POLL_WHILE() only releases the AioContext once, so the IOThread
-> will not be able to acquire the AioContext if it was acquired
-> multiple times.
->=20
-> Instead of trying to release AioContext n times in BDRV_POLL_WHILE(),
-> this patch simply avoids nested locking in save_vmstate().  It's the
-> simplest fix and we should step back to consider the big picture with
-> all the recent changes to block layer threading.
->=20
-> This patch is the final fix to solve 'savevm' hanging with -object
-> iothread.
->=20
-> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
-> ---
->  migration/savevm.c | 12 +++++++++++-
->  1 file changed, 11 insertions(+), 1 deletion(-)
->=20
-
-Reviewed-by: Eric Blake <eblake@redhat.com>
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, mdroth@linux.vnet.ibm.com
 
 
---kngn0jRVmO5EgwWDc9FXjknFGPKKaVAUx
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+On 05/16/2017 09:04 AM, Daniel Henrique Barboza wrote:
+>
+>
+> On 05/16/2017 01:25 AM, David Gibson wrote:
+>> On Mon, May 15, 2017 at 10:10:52AM -0300, Daniel Henrique Barboza wrote:
+>>> From: Jianjun Duan <duanj@linux.vnet.ibm.com>
+>>>
+>>> In racing situations between hotplug events and migration operation,
+>>> a rtas hotplug event could have not yet be delivered to the source
+>>> guest when migration is started. In this case the pending_events of
+>>> spapr state need be transmitted to the target so that the hotplug
+>>> event can be finished on the target.
+>>>
+>>> All the different fields of the events are encoded as defined by
+>>> PAPR. We can migrate them as uint8_t binary stream without any
+>>> concerns about data padding or endianess.
+>>>
+>>> pending_events is put in a subsection in the spapr state VMSD to make
+>>> sure migration across different versions is not broken.
+>>>
+>>> Signed-off-by: Jianjun Duan <duanj@linux.vnet.ibm.com>
+>>> Signed-off-by: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
+>> Ok, thanks for splitting this out, but you don't seem to have
+>> addressed the other comments I had on this patch as presented before.
+>
+> Sorry, I haven't noticed you had previous comments on this patch. I'll 
+> address
+> them and re-send.
+>
+>
+> Daniel
+>
+>>
+>>> ---
+>>>   hw/ppc/spapr.c         | 33 +++++++++++++++++++++++++++++++++
+>>>   hw/ppc/spapr_events.c  | 24 +++++++++++++-----------
+>>>   include/hw/ppc/spapr.h |  3 ++-
+>>>   3 files changed, 48 insertions(+), 12 deletions(-)
+>>>
+>>> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+>>> index 80d12d0..8cfdc71 100644
+>>> --- a/hw/ppc/spapr.c
+>>> +++ b/hw/ppc/spapr.c
+>>> @@ -1437,6 +1437,38 @@ static bool version_before_3(void *opaque, 
+>>> int version_id)
+>>>       return version_id < 3;
+>>>   }
+>>>   +static bool spapr_pending_events_needed(void *opaque)
+>>> +{
+>>> +    sPAPRMachineState *spapr = (sPAPRMachineState *)opaque;
+>>> +    return !QTAILQ_EMPTY(&spapr->pending_events);
+>>> +}
+>>> +
+>>> +static const VMStateDescription vmstate_spapr_event_entry = {
+>>> +    .name = "spapr_event_log_entry",
+>>> +    .version_id = 1,
+>>> +    .minimum_version_id = 1,
+>>> +    .fields = (VMStateField[]) {
+>>> +        VMSTATE_INT32(log_type, sPAPREventLogEntry),
+>>> +        VMSTATE_BOOL(exception, sPAPREventLogEntry),
+>> I'd like some more information to convince me there isn't redundant
+>> data here.
+I'll quote David's v9 review here for reference:
 
-iQEcBAEBCAAGBQJZHLGXAAoJEKeha0olJ0NqeigIAIZaxExAWMZGLLLf2TmRZfY3
-hmePNTrxARKk5z9q18wWnBDz7Pm6MzcUxpQIqZBwwkxG/j5J2/QFrgTjTK9AaqHM
-dOkAWTiVWL7tXUiF1d//ksftIXtyhYzELjxW5Z19JvRroC/7870H9vd0SGIEkxZj
-mKBAEyi/4pY4nGLreoRcMnQ0vuQEKgQ9fLJiPpzwt8OKLyllxufab2Hql3gOyJPi
-/STfTlmfyHekKHV2k/wBK/vMNDZ2LVN7ChMSc7uQ6ezmyhPtrtcsvGuBqJBO5YI5
-G+3A/CVeVl+DT2n+x0KJRGt2qpvv0nISxlJwLT02uAfGZYdz3K1L5N/DMqq+isI=
-=kdXb
------END PGP SIGNATURE-----
+"So, at the moment, AFAICT every event is marked as exception == true,
+so this doesn't actually tell us anything.   If that becomes not the
+case in future, can the exception flag be derived from the log_type or
+information in the even buffer? "
 
---kngn0jRVmO5EgwWDc9FXjknFGPKKaVAUx--
+I've checked the code and we're just using exception == true.  The two
+event logs that we currently support are RTAS_LOG_TYPE_EPOW and
+RTAS_LOG_TYPE_HOTPLUG, both are being added in the queue by
+calling rtas_event_log_queue() with exception == true.
+
+This boolean is passed as a parameter in the functions 
+rtas_event_log_contains
+and rtas_event_log_dequeue. The former is called once with exception=true
+inside check_exception, the latter is called once with exception=true in 
+check_exception
+and exception=false in event_scan.
+
+I didn't find anywhere in the code where, once set as true, we change 
+this boolean
+to false. So in my opinion we can discard this boolean from the 
+migration and,
+in post_load, set it to true if log_type is RTAS_LOG_TYPE_EPOW or
+RTAS_LOG_TYPE_HOTPLUG. This would mean that when we implement more event
+log types we will need to also change the post_load to reflect the change.
+
+
+
+PS: I've read the LoPAPR document [1] and it says in section 10.2.3 page 
+289:
+
+"Hot Plug Events, when implemented, are reported through the event-scan 
+RTAS call."
+
+Why are we setting the RTAS_LOG_TYPE_HOTPLUG as exception==true and 
+therefore
+reporting it in check_exception instead? Does the sPAPR spec differ from 
+the LoPAPR
+in this regard?
+
+[1] 
+https://openpowerfoundation.org/wp-content/uploads/2016/05/LoPAPR_DRAFT_v11_24March2016_cmt1.pdf
+
+
+Thanks,
+
+Daniel
+
+>>> +        VMSTATE_UINT32(data_size, sPAPREventLogEntry),
+>>> +        VMSTATE_VARRAY_UINT32_ALLOC(data, sPAPREventLogEntry, 
+>>> data_size,
+>>> +                                    0, vmstate_info_uint8, uint8_t),
+>> And I think this should be VBUFFER rather than VARRAY to avoid the
+>> data type change.
+>>
+>>> +        VMSTATE_END_OF_LIST()
+>>> +    },
+>>> +};
+>>> +
+>>> +static const VMStateDescription vmstate_spapr_pending_events = {
+>>> +    .name = "spapr_pending_events",
+>>> +    .version_id = 1,
+>>> +    .minimum_version_id = 1,
+>>> +    .needed = spapr_pending_events_needed,
+>>> +    .fields = (VMStateField[]) {
+>>> +        VMSTATE_QTAILQ_V(pending_events, sPAPRMachineState, 1,
+>>> +                         vmstate_spapr_event_entry, 
+>>> sPAPREventLogEntry, next),
+>>> +        VMSTATE_END_OF_LIST()
+>>> +    },
+>>> +};
+>>> +
+>>>   static bool spapr_ov5_cas_needed(void *opaque)
+>>>   {
+>>>       sPAPRMachineState *spapr = opaque;
+>>> @@ -1535,6 +1567,7 @@ static const VMStateDescription vmstate_spapr = {
+>>>       .subsections = (const VMStateDescription*[]) {
+>>>           &vmstate_spapr_ov5_cas,
+>>>           &vmstate_spapr_patb_entry,
+>>> +        &vmstate_spapr_pending_events,
+>>>           NULL
+>>>       }
+>>>   };
+>>> diff --git a/hw/ppc/spapr_events.c b/hw/ppc/spapr_events.c
+>>> index f0b28d8..70c7cfc 100644
+>>> --- a/hw/ppc/spapr_events.c
+>>> +++ b/hw/ppc/spapr_events.c
+>>> @@ -342,7 +342,8 @@ static int 
+>>> rtas_event_log_to_irq(sPAPRMachineState *spapr, int log_type)
+>>>       return source->irq;
+>>>   }
+>>>   -static void rtas_event_log_queue(int log_type, void *data, bool 
+>>> exception)
+>>> +static void rtas_event_log_queue(int log_type, void *data, bool 
+>>> exception,
+>>   +                                 int data_size)
+>>
+>> This could derive data_size from the header passed in.
+>>
+>>>   {
+>>>       sPAPRMachineState *spapr = SPAPR_MACHINE(qdev_get_machine());
+>>>       sPAPREventLogEntry *entry = g_new(sPAPREventLogEntry, 1);
+>>> @@ -351,6 +352,7 @@ static void rtas_event_log_queue(int log_type, 
+>>> void *data, bool exception)
+>>>       entry->log_type = log_type;
+>>>       entry->exception = exception;
+>>>       entry->data = data;
+>>> +    entry->data_size = data_size;
+>>>       QTAILQ_INSERT_TAIL(&spapr->pending_events, entry, next);
+>>>   }
+>>>   @@ -445,6 +447,7 @@ static void spapr_powerdown_req(Notifier *n, 
+>>> void *opaque)
+>>>       struct rtas_event_log_v6_mainb *mainb;
+>>>       struct rtas_event_log_v6_epow *epow;
+>>>       struct epow_log_full *new_epow;
+>>> +    uint32_t data_size;
+>>>         new_epow = g_malloc0(sizeof(*new_epow));
+>>>       hdr = &new_epow->hdr;
+>>> @@ -453,14 +456,13 @@ static void spapr_powerdown_req(Notifier *n, 
+>>> void *opaque)
+>>>       mainb = &new_epow->mainb;
+>>>       epow = &new_epow->epow;
+>>>   +    data_size = sizeof(*new_epow);
+>>>       hdr->summary = cpu_to_be32(RTAS_LOG_VERSION_6
+>>>                                  | RTAS_LOG_SEVERITY_EVENT
+>>>                                  | RTAS_LOG_DISPOSITION_NOT_RECOVERED
+>>>                                  | RTAS_LOG_OPTIONAL_PART_PRESENT
+>>>                                  | RTAS_LOG_TYPE_EPOW);
+>>> -    hdr->extended_length = cpu_to_be32(sizeof(*new_epow)
+>>> -                                       - sizeof(new_epow->hdr));
+>>> -
+>>> +    hdr->extended_length = cpu_to_be32(data_size - 
+>>> sizeof(new_epow->hdr));
+>>>       spapr_init_v6hdr(v6hdr);
+>>>       spapr_init_maina(maina, 3 /* Main-A, Main-B and EPOW */);
+>>>   @@ -479,7 +481,7 @@ static void spapr_powerdown_req(Notifier *n, 
+>>> void *opaque)
+>>>       epow->event_modifier = RTAS_LOG_V6_EPOW_MODIFIER_NORMAL;
+>>>       epow->extended_modifier = 
+>>> RTAS_LOG_V6_EPOW_XMODIFIER_PARTITION_SPECIFIC;
+>>>   -    rtas_event_log_queue(RTAS_LOG_TYPE_EPOW, new_epow, true);
+>>> +    rtas_event_log_queue(RTAS_LOG_TYPE_EPOW, new_epow, true, 
+>>> data_size);
+>>>         qemu_irq_pulse(xics_get_qirq(XICS_FABRIC(spapr),
+>>> rtas_event_log_to_irq(spapr,
+>>> @@ -504,6 +506,7 @@ static void spapr_hotplug_req_event(uint8_t 
+>>> hp_id, uint8_t hp_action,
+>>>       struct rtas_event_log_v6_maina *maina;
+>>>       struct rtas_event_log_v6_mainb *mainb;
+>>>       struct rtas_event_log_v6_hp *hp;
+>>> +    uint32_t data_size;
+>>>         new_hp = g_malloc0(sizeof(struct hp_log_full));
+>>>       hdr = &new_hp->hdr;
+>>> @@ -512,14 +515,14 @@ static void spapr_hotplug_req_event(uint8_t 
+>>> hp_id, uint8_t hp_action,
+>>>       mainb = &new_hp->mainb;
+>>>       hp = &new_hp->hp;
+>>>   +    data_size = sizeof(*new_hp);
+>>>       hdr->summary = cpu_to_be32(RTAS_LOG_VERSION_6
+>>>                                  | RTAS_LOG_SEVERITY_EVENT
+>>>                                  | RTAS_LOG_DISPOSITION_NOT_RECOVERED
+>>>                                  | RTAS_LOG_OPTIONAL_PART_PRESENT
+>>>                                  | RTAS_LOG_INITIATOR_HOTPLUG
+>>>                                  | RTAS_LOG_TYPE_HOTPLUG);
+>>> -    hdr->extended_length = cpu_to_be32(sizeof(*new_hp)
+>>> -                                       - sizeof(new_hp->hdr));
+>>> +    hdr->extended_length = cpu_to_be32(data_size - 
+>>> sizeof(new_hp->hdr));
+>>>         spapr_init_v6hdr(v6hdr);
+>>>       spapr_init_maina(maina, 3 /* Main-A, Main-B, HP */);
+>>> @@ -572,7 +575,7 @@ static void spapr_hotplug_req_event(uint8_t 
+>>> hp_id, uint8_t hp_action,
+>>>               cpu_to_be32(drc_id->count_indexed.index);
+>>>       }
+>>>   -    rtas_event_log_queue(RTAS_LOG_TYPE_HOTPLUG, new_hp, true);
+>>> +    rtas_event_log_queue(RTAS_LOG_TYPE_HOTPLUG, new_hp, true, 
+>>> data_size);
+>>>         qemu_irq_pulse(xics_get_qirq(XICS_FABRIC(spapr),
+>>> rtas_event_log_to_irq(spapr,
+>>> @@ -671,8 +674,7 @@ static void check_exception(PowerPCCPU *cpu, 
+>>> sPAPRMachineState *spapr,
+>>>       if (!event) {
+>>>           goto out_no_events;
+>>>       }
+>>> -
+>>> -    hdr = event->data;
+>>> +    hdr = (struct rtas_error_log *)event->data;
+>>>       event_len = be32_to_cpu(hdr->extended_length) + sizeof(*hdr);
+>>>         if (event_len < len) {
+>>> @@ -728,7 +730,7 @@ static void event_scan(PowerPCCPU *cpu, 
+>>> sPAPRMachineState *spapr,
+>>>           goto out_no_events;
+>>>       }
+>>>   -    hdr = event->data;
+>>> +    hdr = (struct rtas_error_log *)event->data;
+>>>       event_len = be32_to_cpu(hdr->extended_length) + sizeof(*hdr);
+>>>         if (event_len < len) {
+>>> diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
+>>> index 5802f88..fbe1d93 100644
+>>> --- a/include/hw/ppc/spapr.h
+>>> +++ b/include/hw/ppc/spapr.h
+>>> @@ -599,7 +599,8 @@ sPAPRTCETable 
+>>> *spapr_tce_find_by_liobn(target_ulong liobn);
+>>>   struct sPAPREventLogEntry {
+>>>       int log_type;
+>>>       bool exception;
+>>> -    void *data;
+>>> +    uint8_t *data;
+>>> +    uint32_t data_size;
+>>>       QTAILQ_ENTRY(sPAPREventLogEntry) next;
+>>>   };
+>
+>
