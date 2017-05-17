@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52107)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52105)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dAoKr-000082-Fn
-	for qemu-devel@nongnu.org; Tue, 16 May 2017 22:05:10 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1dAoKr-00007z-F9
+	for qemu-devel@nongnu.org; Tue, 16 May 2017 22:05:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dAoKo-0003Ye-AL
+	(envelope-from <dgibson@ozlabs.org>) id 1dAoKo-0003Yj-B2
 	for qemu-devel@nongnu.org; Tue, 16 May 2017 22:05:09 -0400
-Date: Wed, 17 May 2017 11:41:04 +1000
+Date: Wed, 17 May 2017 11:42:58 +1000
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20170517014104.GA15596@umbus.fritz.box>
+Message-ID: <20170517014258.GB15596@umbus.fritz.box>
 References: <20170505204746.14116-1-danielhb@linux.vnet.ibm.com>
-	<20170505204746.14116-5-danielhb@linux.vnet.ibm.com>
-	<20170512061224.GH12908@umbus.fritz.box>
-	<8ee42025-7ba2-1b30-fff1-47f9df699052@linux.vnet.ibm.com>
+	<20170505204746.14116-4-danielhb@linux.vnet.ibm.com>
+	<20170512061128.GG12908@umbus.fritz.box>
+	<14ee61c8-b94c-9029-5c2b-0cba869f7972@linux.vnet.ibm.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="2oS5YaxWCcQjTEyO"
+	protocol="application/pgp-signature"; boundary="LpQ9ahxlCli8rRTG"
 Content-Disposition: inline
-In-Reply-To: <8ee42025-7ba2-1b30-fff1-47f9df699052@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH v9 4/6] hw/ppc/spapr.c: migrate
- pending_dimm_unplugs of spapr state
+In-Reply-To: <14ee61c8-b94c-9029-5c2b-0cba869f7972@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH v9 3/6] hw/ppc: migrating the
+ DRC state of hotplugged devices
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,155 +31,209 @@ To: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
 Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, mdroth@linux.vnet.ibm.com
 
 
---2oS5YaxWCcQjTEyO
+--LpQ9ahxlCli8rRTG
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, May 12, 2017 at 04:54:57PM -0300, Daniel Henrique Barboza wrote:
+On Tue, May 16, 2017 at 10:46:23AM -0300, Daniel Henrique Barboza wrote:
 >=20
 >=20
-> On 05/12/2017 03:12 AM, David Gibson wrote:
-> > On Fri, May 05, 2017 at 05:47:44PM -0300, Daniel Henrique Barboza wrote:
-> > > To allow for a DIMM unplug event to resume its work if a migration
-> > > occurs in the middle of it, this patch migrates the non-empty
-> > > pending_dimm_unplugs QTAILQ that stores the DIMM information
-> > > that the spapr_lmb_release() callback uses.
+> On 05/12/2017 03:11 AM, David Gibson wrote:
+> > On Fri, May 05, 2017 at 05:47:43PM -0300, Daniel Henrique Barboza wrote:
+> > > In pseries, a firmware abstraction called Dynamic Reconfiguration
+> > > Connector (DRC) is used to assign a particular dynamic resource
+> > > to the guest and provide an interface to manage configuration/removal
+> > > of the resource associated with it. In other words, DRC is the
+> > > 'plugged state' of a device.
 > > >=20
-> > > It was considered an apprach where the DIMM states would be restored
-> > > on the post-_load after a migration. The problem is that there is
-> > > no way of knowing, from the sPAPRMachineState, if a given DIMM is goi=
-ng
-> > > through an unplug process and the callback needs the updated DIMM Sta=
-te.
+> > > Before this patch, DRC wasn't being migrated. This causes
+> > > post-migration problems due to DRC state mismatch between source and
+> > > target. The DRC state of a device X in the source might
+> > > change, while in the target the DRC state of X is still fresh. When
+> > > migrating the guest, X will not have the same hotplugged state as it
+> > > did in the source. This means that we can't hot unplug X in the
+> > > target after migration is completed because its DRC state is not cons=
+istent.
+> > > https://bugs.launchpad.net/ubuntu/+source/qemu/+bug/1677552 is one
+> > > bug that is caused by this DRC state mismatch between source and
+> > > target.
 > > >=20
-> > > We could migrate a flag indicating that there is an unplug event going
-> > > on for a certain DIMM, fetching this information from the start of the
-> > > spapr_del_lmbs call. But this would also require a scan on post_load =
-to
-> > > figure out how many nr_lmbs are left. At this point we can just
-> > > migrate the nr_lmbs information as well, given that it is being calcu=
-lated
-> > > at spapr_del_lmbs already, and spare a scanning/discovery in the
-> > > post-load. All that we need is inside the sPAPRDIMMState structure
-> > > that is added to the pending_dimm_unplugs queue at the start of the
-> > > spapr_del_lmbs, so it's convenient to just migrated this queue it if =
-it's
-> > > not empty.
+> > > To migrate the DRC state, we defined the VMStateDescription struct for
+> > > spapr_drc to enable the transmission of spapr_drc state in migration.
+> > > Not all the elements in the DRC state are migrated - only those
+> > > that can be modified by guest actions or device add/remove
+> > > operations:
+> > >=20
+> > > - 'isolation_state', 'allocation_state' and 'indicator_state'
+> > > are involved in the DR state transition diagram from
+> > > PAPR+ 2.7, 13.4;
+> > >=20
+> > > - 'configured', 'signalled', 'awaiting_release' and 'awaiting_allocat=
+ion'
+> > > are needed in attaching and detaching devices;
+> > >=20
+> > > - 'indicator_state' provides users with hardware state information.
+> > >=20
+> > > These are the DRC elements that are migrated.
+> > >=20
+> > > In this patch the DRC state is migrated for PCI, LMB and CPU
+> > > connector types. At this moment there is no support to migrate
+> > > DRC for the PHB (PCI Host Bridge) type.
+> > >=20
+> > > In the 'realize' function the DRC is registered using vmstate_registe=
+r,
+> > > similar to what hw/ppc/spapr_iommu.c does in 'spapr_tce_table_realize=
+'.
+> > > This approach works because  DRCs are bus-less and do not sit
+> > > on a BusClass that implements bc->get_dev_path, so as a fallback the
+> > > VMSD gets identified via "spapr_drc"/get_index(drc).
 > > >=20
 > > > Signed-off-by: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
-> > NACK.
+> > > ---
+> > >   hw/ppc/spapr_drc.c | 61 +++++++++++++++++++++++++++++++++++++++++++=
++++++++++++
+> > >   1 file changed, 61 insertions(+)
+> > >=20
+> > > diff --git a/hw/ppc/spapr_drc.c b/hw/ppc/spapr_drc.c
+> > > index 1c72160..926b945 100644
+> > > --- a/hw/ppc/spapr_drc.c
+> > > +++ b/hw/ppc/spapr_drc.c
+> > > @@ -519,6 +519,65 @@ static void reset(DeviceState *d)
+> > >       }
+> > >   }
+> > > +static bool spapr_drc_needed(void *opaque)
+> > > +{
+> > > +    sPAPRDRConnector *drc =3D (sPAPRDRConnector *)opaque;
+> > > +    sPAPRDRConnectorClass *drck =3D SPAPR_DR_CONNECTOR_GET_CLASS(drc=
+);
+> > > +    bool rc =3D false;
+> > > +    sPAPRDREntitySense value;
+> > Blank line after the declarations, please.
 > >=20
-> > As I believe I suggested previously, you can reconstruct this state on
-> > the receiving side by doing a full scan of the DIMM and LMB DRC states.
+> > > +    drck->entity_sense(drc, &value);
+> > > +    /* If no dev is plugged in there is no need to migrate the DRC s=
+tate */
+> > > +    if (value !=3D SPAPR_DR_ENTITY_SENSE_PRESENT) {
+> > > +        return false;
+> > > +    }
+> > > +
+> > > +    /*
+> > > +     * If there is dev plugged in, we need to migrate the DRC state =
+when
+> > > +     * it is different from cold-plugged state
+> > > +     */
+> > > +    switch (drc->type) {
+> > > +
+> > No blank line here please.
+> >=20
+> > > +    case SPAPR_DR_CONNECTOR_TYPE_PCI:
+> > > +        rc =3D !((drc->isolation_state =3D=3D SPAPR_DR_ISOLATION_STA=
+TE_UNISOLATED) &&
+> > > +               (drc->allocation_state =3D=3D SPAPR_DR_ALLOCATION_STA=
+TE_USABLE) &&
+> > > +               drc->configured && drc->signalled && !drc->awaiting_r=
+elease);
+> > You don't do any more manipulation of the rc value, so you might as
+> > well just 'return' directly here.
+> >=20
+> >=20
+> > > +        break;
+> > > +
+> > > +    case SPAPR_DR_CONNECTOR_TYPE_LMB:
+> > > +        rc =3D !((drc->isolation_state =3D=3D SPAPR_DR_ISOLATION_STA=
+TE_ISOLATED) &&
+> > > +               (drc->allocation_state =3D=3D SPAPR_DR_ALLOCATION_STA=
+TE_UNUSABLE) &&
+> > > +               drc->configured && drc->signalled && !drc->awaiting_r=
+elease);
+> > > +        break;
+> > > +
+> > > +    case SPAPR_DR_CONNECTOR_TYPE_CPU:
+> > > +        rc =3D !((drc->isolation_state =3D=3D SPAPR_DR_ISOLATION_STA=
+TE_ISOLATED) &&
+> > > +               (drc->allocation_state =3D=3D SPAPR_DR_ALLOCATION_STA=
+TE_UNUSABLE) &&
+> > > +                drc->configured && drc->signalled && !drc->awaiting_=
+release);
+> > > +        break;
+> > > +
+> > > +    default:
+> > > +        ;
+> > This should probably assert().
+> >=20
+> > > +    }
+> > > +    return rc;
+> > > +}
+> > > +
+> > > +static const VMStateDescription vmstate_spapr_drc =3D {
+> > > +    .name =3D "spapr_drc",
+> > > +    .version_id =3D 1,
+> > > +    .minimum_version_id =3D 1,
+> > > +    .needed =3D spapr_drc_needed,
+> > > +    .fields  =3D (VMStateField []) {
+> > > +        VMSTATE_UINT32(isolation_state, sPAPRDRConnector),
+> > > +        VMSTATE_UINT32(allocation_state, sPAPRDRConnector),
+> > > +        VMSTATE_UINT32(indicator_state, sPAPRDRConnector),
+> > > +        VMSTATE_BOOL(configured, sPAPRDRConnector),
+> > > +        VMSTATE_BOOL(awaiting_release, sPAPRDRConnector),
+> > > +        VMSTATE_BOOL(awaiting_allocation, sPAPRDRConnector),
+> > > +        VMSTATE_BOOL(signalled, sPAPRDRConnector),
+> > Hrm.  I'm happy translation the 3 state integers, since their meaning
+> > is in the PAPR spec.  The others are qemu local information, so it's
+> > not as clear that they'll have a stable meaning.  Are you absolutely
+> > sure you need all of them?
 >=20
-> Just had an idea that I think it's in the line of what you're suggesting.
-> Given
-> that the information we need is only created in the spapr_del_lmbs
-> (as per patch 1), we can use the absence of this information in the
-> release callback as a sort of a flag, an indication that a migration got
-> in the way and we need to reconstruct the nr_lmbs states again, using
-> the same scanning function I've used in v8.
->=20
-> The flow would be like this (considering the changes in the
-> previous 3 patches so far):
->=20
-> ------------
->=20
-> /* Callback to be called during DRC release. */
-> void spapr_lmb_release(DeviceState *dev)
-> {
->      HotplugHandler *hotplug_ctrl;
->=20
->      uint64_t addr =3D spapr_dimm_get_address(PC_DIMM(dev));
->      sPAPRMachineState *spapr =3D SPAPR_MACHINE(qdev_get_machine());
->      sPAPRDIMMState *ds =3D spapr_pending_dimm_unplugs_find(spapr, addr);
->=20
->     // no DIMM state found in spapr - re-create it to find out how may LM=
-Bs
-> are left
->     if (ds =3D=3D NULL) {
->         uint32 nr_lmbs  =3D ***call_scanning_LMB_DRCs_function(dev)***
->         // recreate the sPAPRDIMMState element and add it back to spapr
->     }
->=20
->     ( resume callback as usual )
->=20
-> -----------
+> The first time I saw this code (originally from Jianjun) I've tried to
+> simplify/cut
+> some of these values in the hope that they could be deduced later in the
+> post_load. Unfortunately I've reached the same conclusion as him: these q=
+emu
+> state information isn't easily deduced in the post_load stage today and
+> removing
+> any of them from migration will break the unplug process afterwards.
 
-Yes, the above seems like a reasonable plan.
+Ok.
 
-> Is this approach be adequate? Another alternative would be to use another
-> way of detecting if an LMB unplug is happening and, if positive, do the s=
-ame
-> process in the post_load(). In this case I'll need to take a look in the
-> code and
-> see how we can detect an ongoing unplug besides what I've said above.
+> This doesn't mean that we can't simplify it in the future though. I have
+> some ideas
+> of how we can simplify the DRC code (splitting the logic into LogicalDRC =
+and
+> PhysicalDRC
+> for example) that can help simplify all this DRC logic altogether.
 
-You could, but I think the lazy approach above is preferable.
+Ok.  I like that idea in principle, but bear in mind that refactoring
+the data in the DRC is likely to mean a bunch of complicated
+compatibility code to handle migrations.
 
->=20
-> Thanks,
+> I'm also
+> thinking about
+> adding unit tests for this DRC code too - it would help us to make a
+> redesign without
+> worrying too much about unintended bugs.
+
+That sounds great.
 >=20
 >=20
 > Daniel
 >=20
 > >=20
-> > > ---
-> > >   hw/ppc/spapr.c | 31 +++++++++++++++++++++++++++++++
-> > >   1 file changed, 31 insertions(+)
-> > >=20
-> > > diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> > > index e190eb9..30f0b7b 100644
-> > > --- a/hw/ppc/spapr.c
-> > > +++ b/hw/ppc/spapr.c
-> > > @@ -1437,6 +1437,36 @@ static bool version_before_3(void *opaque, int=
- version_id)
-> > >       return version_id < 3;
-> > >   }
-> > > +static bool spapr_pending_dimm_unplugs_needed(void *opaque)
-> > > +{
-> > > +    sPAPRMachineState *spapr =3D (sPAPRMachineState *)opaque;
-> > > +    return !QTAILQ_EMPTY(&spapr->pending_dimm_unplugs);
-> > > +}
-> > > +
-> > > +static const VMStateDescription vmstate_spapr_dimmstate =3D {
-> > > +    .name =3D "spapr_dimm_state",
-> > > +    .version_id =3D 1,
-> > > +    .minimum_version_id =3D 1,
-> > > +    .fields =3D (VMStateField[]) {
-> > > +        VMSTATE_UINT64(addr, sPAPRDIMMState),
-> > > +        VMSTATE_UINT32(nr_lmbs, sPAPRDIMMState),
 > > > +        VMSTATE_END_OF_LIST()
-> > > +    },
+> > > +    }
 > > > +};
 > > > +
-> > > +static const VMStateDescription vmstate_spapr_pending_dimm_unplugs =
-=3D {
-> > > +    .name =3D "spapr_pending_dimm_unplugs",
-> > > +    .version_id =3D 1,
-> > > +    .minimum_version_id =3D 1,
-> > > +    .needed =3D spapr_pending_dimm_unplugs_needed,
-> > > +    .fields =3D (VMStateField[]) {
-> > > +        VMSTATE_QTAILQ_V(pending_dimm_unplugs, sPAPRMachineState, 1,
-> > > +                         vmstate_spapr_dimmstate, sPAPRDIMMState,
-> > > +                         next),
-> > > +        VMSTATE_END_OF_LIST()
-> > > +    },
-> > > +};
-> > > +
-> > >   static bool spapr_ov5_cas_needed(void *opaque)
+> > >   static void realize(DeviceState *d, Error **errp)
 > > >   {
-> > >       sPAPRMachineState *spapr =3D opaque;
-> > > @@ -1535,6 +1565,7 @@ static const VMStateDescription vmstate_spapr =
-=3D {
-> > >       .subsections =3D (const VMStateDescription*[]) {
-> > >           &vmstate_spapr_ov5_cas,
-> > >           &vmstate_spapr_patb_entry,
-> > > +        &vmstate_spapr_pending_dimm_unplugs,
-> > >           NULL
+> > >       sPAPRDRConnector *drc =3D SPAPR_DR_CONNECTOR(d);
+> > > @@ -547,6 +606,8 @@ static void realize(DeviceState *d, Error **errp)
+> > >           object_unref(OBJECT(drc));
 > > >       }
-> > >   };
+> > >       g_free(child_name);
+> > > +    vmstate_register(DEVICE(drc), drck->get_index(drc), &vmstate_spa=
+pr_drc,
+> > > +                     drc);
+> > >       trace_spapr_drc_realize_complete(drck->get_index(drc));
+> > >   }
 >=20
 
 --=20
@@ -188,25 +242,25 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---2oS5YaxWCcQjTEyO
+--LpQ9ahxlCli8rRTG
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v2
 
-iQIcBAEBCAAGBQJZG6owAAoJEGw4ysog2bOSf0MQANhZ/IoGAUQaLiIkW1aTiqRr
-mvnTmc7jNkkam9WyN6kmOBXDYTldulX7GIZLnf9HcHzjphHz2vW2HX6+xeRMj3Ec
-t7zz30hR/iD9Nor2z+2GhqZBkQcAz35MCVVZ8hg/ftxPsZBnLhsAUjMGzouxtokw
-ZpXjlZFY/uTKIit43CFw8nvTCigs6FwsWHr++0yqGb+uLSLDwiGkAI+7oPX4F7EI
-4yV7Jc2WmxJCbTau+j0ty7G3LXnxwcTwsmGiykS9ZaRp6FiMQfsRPdyPQvcmImYv
-PpliYCODijAkhUWt34uM8Q/zDgCaps9kszF+jfEJalAVS4tooYyv7tTG+gA+KatE
-9G8Tcf2NGnqSyDyArL8HPvMI6FHOqJkQqYLIqf235lGWABLO76nyhp0TSGe2wZS0
-dnNFYyPgn8TtTzZcogc72YGKHBdVx1/cgFpiJ+GOp/vpCHKBYtOkDvz0Z/Czbav5
-tIU+3kq7AUSb5xL2Muugw9W4KiNvGblgE5BmZe1V3j/nnzeR52fUnxPc8T+TTK5h
-LUj+aTyZ/EK8ddbdn0e3Ywph0MrMP1E/0kCK7iMnng6rYZfbR7tqS8SoIHuvcKLG
-ZcDEBc5TADmTe2+jGDycegCBixqx3sU8sMEyhG8DM34nksebx4KyhSJ3LFdie2vr
-kZK7CReC3iZFWgNF1iZN
-=dMQN
+iQIcBAEBCAAGBQJZG6qiAAoJEGw4ysog2bOSLg8P/3pHeou3Zqs7f503vgNRfcm6
+uydIi9GETXxEwIXa1KWcvNwmE2JnN3u+SJoW6slqfzMGSJTVny8GLdnqSHOl8Nn7
+WAf+y2D0cL832KJTY0LnxlZiYuhjj1aPVVT4LUUT/0wp2Ihz+b1gZVjEaxpVQt/W
+j6uKbiGnAjp2ncppus/tSjEvmQvwhReJgovAwOeIHW5u8TvwXun7Cp3HJL2W6Lc4
+GUOvcB6YzhI616VOQyvk3vaoFPODCmvBMGqZinQ7TpmPk6Inur93Puqr1vjc3B7w
+l9F075XTJ/mGuQelHgOhjyaHXdtHgdKumHS+LY3LLqz14tujH/lHJM3+iE9ScxMD
+BPNy5dOhS/YoeW1uJqhQTezvKkP4BkAEoAoDYwrQfqCF99iv41ibcFGLLTvhutsT
+gCDmtFbuZD2BzrgPiwbVsQiUEpYrGZ6nnAda2sN49EVmQToqs87nGKrFG14pCosz
+/CbYW22yUFwZRlsdWbolds2ykwxLjXoAZ8NA6KNMiKLXGe91ufdsy3lR1rqr31WC
+NtUxutc7loBLbkfhb3NNHZn6jvGPIzjH92r+XiQfWxj7kHRPHbVQLgGDRwv7Lu8d
+r1Bc1eQLZpe58eiEbQsLrnRUDrCitRCuVV+my45oUFFPMMposwInroUgoXGPmz6+
+MhgDlGdxsmJYRt/D/KTS
+=6S9b
 -----END PGP SIGNATURE-----
 
---2oS5YaxWCcQjTEyO--
+--LpQ9ahxlCli8rRTG--
