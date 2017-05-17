@@ -1,21 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40851)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42176)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1dB4FC-0008EA-I7
-	for qemu-devel@nongnu.org; Wed, 17 May 2017 15:04:23 -0400
+	(envelope-from <eblake@redhat.com>) id 1dB4ML-0001GA-A1
+	for qemu-devel@nongnu.org; Wed, 17 May 2017 15:11:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1dB4FB-0005ui-Hs
-	for qemu-devel@nongnu.org; Wed, 17 May 2017 15:04:22 -0400
+	(envelope-from <eblake@redhat.com>) id 1dB4MK-0008FN-76
+	for qemu-devel@nongnu.org; Wed, 17 May 2017 15:11:45 -0400
 References: <684185116.2952708.1495044580181.ref@mail.yahoo.com>
 	<684185116.2952708.1495044580181@mail.yahoo.com>
 	<3293e70a-71ac-2e6d-433f-06346ad253c9@redhat.com>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <e3ea0ce5-5977-b6c7-ace4-ea5f1caa540f@redhat.com>
-Date: Wed, 17 May 2017 15:04:13 -0400
+	<107015620.2969780.1495046091978@mail.yahoo.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <5a2b9e50-1444-af4a-dc89-021a4beca0f4@redhat.com>
+Date: Wed, 17 May 2017 14:11:29 -0500
 MIME-Version: 1.0
-In-Reply-To: <3293e70a-71ac-2e6d-433f-06346ad253c9@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <107015620.2969780.1495046091978@mail.yahoo.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="DPfjjcQ19wK2mihQNMBcmAl6d2EMNkmG1"
 Subject: Re: [Qemu-devel] Add Markus Armbrusters code for Broadcom
  Perhiperals for ARM.
 List-Id: <qemu-devel.nongnu.org>
@@ -26,90 +27,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, John Bradley <flypie1@yahoo.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: Laurent Vivier <lvivier@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Geert Martin Ijewski <gm.ijewski@web.de>, John Bradley <flypie@rocketmail.com>, Markus Armbruster <armbru@redhat.com>, Alistair Francis <alistair.francis@xilinx.com>, "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+To: John Bradley <flypie1@yahoo.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: John Bradley <flypie@rocketmail.com>, Laurent Vivier <lvivier@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Geert Martin Ijewski <gm.ijewski@web.de>, Markus Armbruster <armbru@redhat.com>, Alistair Francis <alistair.francis@xilinx.com>, "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--DPfjjcQ19wK2mihQNMBcmAl6d2EMNkmG1
+From: Eric Blake <eblake@redhat.com>
+To: John Bradley <flypie1@yahoo.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: John Bradley <flypie@rocketmail.com>, Laurent Vivier
+ <lvivier@redhat.com>, Peter Maydell <peter.maydell@linaro.org>,
+ Geert Martin Ijewski <gm.ijewski@web.de>,
+ Markus Armbruster <armbru@redhat.com>,
+ Alistair Francis <alistair.francis@xilinx.com>,
+ "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <5a2b9e50-1444-af4a-dc89-021a4beca0f4@redhat.com>
+Subject: Re: [Qemu-devel] Add Markus Armbrusters code for Broadcom Perhiperals
+ for ARM.
+References: <684185116.2952708.1495044580181.ref@mail.yahoo.com>
+ <684185116.2952708.1495044580181@mail.yahoo.com>
+ <3293e70a-71ac-2e6d-433f-06346ad253c9@redhat.com>
+ <107015620.2969780.1495046091978@mail.yahoo.com>
+In-Reply-To: <107015620.2969780.1495046091978@mail.yahoo.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 05/17/2017 01:34 PM, John Bradley wrote:
+> This is especial true as I meant Andrew Baumann 0xabu (Andrew Baumann)
+
+Top-posting is not nice on technical lists.
+
+> 0xabu (Andrew Baumann)
+>  0xabu has 3 repositories available. Follow their code on GitHub.  |   =
+|
+
+Using github requires the use of non-free (as in freedom) Javascript.
+That's why this list prefers that all patches be sent through the list
+as emails, not as github pull requests.  I'm not going to look at what
+0xabu's repository contains, but rather at what you send through the
+list. But part of the contract of Signed-off-by is that you have
+permission to post the patch and agree to the license in use - which
+means that if your work is a modified version of Andrew Baumann's work,
+then you need Andrew Baumann's sign-off before you can add yours.
+
+Other hints for better patch submission may be found here:
+http://wiki.qemu.org/Contribute/SubmitAPatch
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
 
 
+--DPfjjcQ19wK2mihQNMBcmAl6d2EMNkmG1
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-On 05/17/2017 02:27 PM, Eric Blake wrote:
-> On 05/17/2017 01:09 PM, John Bradley via Qemu-devel wrote:
->> Also available at 
->>
->> https://www.dropbox.com/s/gwuquw0kirstw7a/0001-Add-Markus-Armbrusters-code-for-Broadcom-Perhiperals.patch?dl=0
-> 
-> This content belongs...
-> 
->>
->> Following suggestions split my original patch up. This the largest monolithic chunk is 
->> additional BCM device support from Markus Armbruster.
->>
->>
->> >From 0b39a04030d5a2cea4fcd2159d365580ca155b78 Mon Sep 17 00:00:00 2001
->> From: John Bradley <flypie@rocketmail.com>
->> Date: Wed, 17 May 2017 18:57:21 +0100
->> Subject: [PATCH] Add Markus Armbrusters code for Broadcom Perhiperals for ARM.
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-Also, though your patch body says `Subject: [PATCH]`, your actual email
-subject does not. It should so that the build bot and maintenance tools
-can find it appropriately.
+iQEcBAEBCAAGBQJZHKBkAAoJEKeha0olJ0NqwzEH/iIb0gbYYFT++9USJ+jM5Bj5
+HXtxwI5vB3fvVjTxDM34Y+NtrnlUtebna6D57xdhaLQaiakR/EcGyWHhmQ6NbevF
+ZlmDpNLqHSAd87ZHJ5gFiFLz9QWxNOTdORip7qdRnxzu3fu4mHvnRTNQ+4zNIIKH
+nHxRPDLmg4s6KiSq4s5jPid5GmuKmECiT9eNo+/SWvnpdBOjl7EaR6AujbtI9xE1
+4l5IsFjPZOQUBz38EYd1k87jrs2NAv4lMuuaV5VqPR/5VElTgWb5611Q77wEQx3D
+4inuMiLhcs1btvKuAxuoWX76NQnnFo58OeRgVOZKXA5Fzxi3OX9QOEh+tcPESOg=
+=MTMB
+-----END PGP SIGNATURE-----
 
-The next version of this that gets sent should also carry the 'v2' tag.
-
---js
-
->>
->> Signed-off-by: John Bradley <flypie@rocketmail.com>
-> 
-> I would expect that if some of this code was written by Markus, then it
-> would carry his Signed-off-by.  Or, maybe you just mean that you are
-> splitting your patch according to the device Markus gave (in which case,
-> a Suggested-by: tag may be appropriate).  Either way, I don't see why
-> Markus' name has to be in the subject line (the patch subject should be
-> WHAT changed, not WHO suggested the change).
-> 
->> ---
-> 
-> ...here, after the --- separator.  It is useful to reviewers, but should
-> not end up as part of the actual commit message.
-> 
->> hw/arm/Makefile.objs                 |    2 +-
->> hw/arm/bcm2835.c                     |  114 ++++
->> hw/arm/bcm2835_peripherals.c         |  104 ++++
->> hw/misc/Makefile.objs                |    2 +
->> hw/misc/bcm2835_mphi.c               |  163 ++++++
->> hw/misc/bcm2835_power.c              |  106 ++++
->> hw/timer/Makefile.objs               |    2 +
->> hw/timer/bcm2835_st.c                |  202 +++++++
->> hw/timer/bcm2835_timer.c             |  224 +++++++
->> hw/usb/Makefile.objs                 |    4 +-
->> hw/usb/bcm2835_usb.c                 |  604 +++++++++++++++++++
->> hw/usb/bcm2835_usb_regs.h            | 1061 ++++++++++++++++++++++++++++++++++
-> 
-> That's still rather large to review in one chunk, especially while
-> touching other files.   It can probably still be split up further.
-> 
->> include/hw/arm/bcm2835.h             |   37 ++
->> include/hw/arm/bcm2835_peripherals.h |   10 +
->> include/hw/intc/bcm2835_control.h    |   53 ++
->> include/hw/misc/bcm2835_mphi.h       |   28 +
->> include/hw/misc/bcm2835_power.h      |   22 +
->> include/hw/timer/bcm2835_st.h        |   25 +
->> include/hw/timer/bcm2835_timer.h     |   32 +
->> include/hw/usb/bcm2835_usb.h         |   78 +++
->> 20 files changed, 2871 insertions(+), 2 deletions(-)
->> create mode 100644 hw/arm/bcm2835.c
->> create mode 100644 hw/misc/bcm2835_mphi.c
->> create mode 100644 hw/misc/bcm2835_power.c
->> create mode 100644 hw/timer/bcm2835_st.c
->> create mode 100644 hw/timer/bcm2835_timer.c
->> create mode 100644 hw/usb/bcm2835_usb.c
->> create mode 100644 hw/usb/bcm2835_usb_regs.h
->> create mode 100644 include/hw/arm/bcm2835.h
->> create mode 100644 include/hw/intc/bcm2835_control.h
->> create mode 100644 include/hw/misc/bcm2835_mphi.h
->> create mode 100644 include/hw/misc/bcm2835_power.h
->> create mode 100644 include/hw/timer/bcm2835_st.h
->> create mode 100644 include/hw/timer/bcm2835_timer.h
->> create mode 100644 include/hw/usb/bcm2835_usb.h
->>
-> 
+--DPfjjcQ19wK2mihQNMBcmAl6d2EMNkmG1--
