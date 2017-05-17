@@ -1,27 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58226)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34249)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dmitry@daynix.com>) id 1dAxqu-0000r4-Px
-	for qemu-devel@nongnu.org; Wed, 17 May 2017 08:15:23 -0400
+	(envelope-from <berrange@redhat.com>) id 1dAxsk-0002U0-KM
+	for qemu-devel@nongnu.org; Wed, 17 May 2017 08:16:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dmitry@daynix.com>) id 1dAxqa-00073c-46
-	for qemu-devel@nongnu.org; Wed, 17 May 2017 08:14:52 -0400
-Received: from mail-wm0-x242.google.com ([2a00:1450:400c:c09::242]:36754)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <dmitry@daynix.com>) id 1dAxqZ-0006yL-HW
-	for qemu-devel@nongnu.org; Wed, 17 May 2017 08:14:31 -0400
-Received: by mail-wm0-x242.google.com with SMTP id k15so1750760wmh.3
-	for <qemu-devel@nongnu.org>; Wed, 17 May 2017 05:14:31 -0700 (PDT)
-From: Dmitry Fleytman <dmitry@daynix.com>
-Message-Id: <F260F33C-CF9A-4BBA-B19B-00DCFE598E86@daynix.com>
-Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
-Date: Wed, 17 May 2017 15:14:27 +0300
-In-Reply-To: <1495021572-20852-1-git-send-email-sameeh@daynix.com>
-References: <1495021572-20852-1-git-send-email-sameeh@daynix.com>
-Content-Type: text/plain;
-	charset=us-ascii
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] e1000e: Fix a bug where guest hangs upon
- migration
+	(envelope-from <berrange@redhat.com>) id 1dAxsZ-0000gK-0h
+	for qemu-devel@nongnu.org; Wed, 17 May 2017 08:16:46 -0400
+Date: Wed, 17 May 2017 13:15:23 +0100
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20170517121523.GG970@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <20170505102153.758-1-famz@redhat.com>
+	<20170517021302.GF27669@lemon.lan>
+	<20170517115932.GC4856@noname.redhat.com>
+	<20170517121051.GC17629@lemon.lan>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20170517121051.GC17629@lemon.lan>
+Subject: Re: [Qemu-devel] [PATCH] iotests: 147: Don't test inet6 if not
+ available
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,109 +27,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Sameeh Jubran <sameeh@daynix.com>
-Cc: Qemu Developers <qemu-devel@nongnu.org>, Jason Wang <jasowang@redhat.com>, Yan Vugenfirer <yan@daynix.com>
+To: Fam Zheng <famz@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 
+On Wed, May 17, 2017 at 08:10:51PM +0800, Fam Zheng wrote:
+> On Wed, 05/17 13:59, Kevin Wolf wrote:
+> > Am 17.05.2017 um 04:13 hat Fam Zheng geschrieben:
+> > > On Fri, 05/05 18:21, Fam Zheng wrote:
+> > > > This is the case in our docker tests, as we use --net=none there. Skip
+> > > > this method.
+> > > 
+> > > Ping. Is this patch okay?
+> > 
+> > I thought you might want to respond to Dan's comment. If you don't plan
+> > to make the change he suggests, let me know and I'll queue the patch as
+> > it is.
+> 
+> This check is enough for me and I think it's good to go.
 
-> On 17 May 2017, at 14:46 PM, Sameeh Jubran <sameeh@daynix.com> wrote:
->=20
-> The bug was caused by the "receive overrun" (bit #6 of the ICR =
-register) interrupt
-> which would be triggered post migration in a heavy traffic =
-environment. Even though the
-> "receive overrun" bit (#6) is masked out by the IMS register (refer to =
-the log below)
-> the driver still receives an interrupt as the "receive overrun" bit =
-(#6) causes the
-> "Other" - bit #24 of the ICR register - bit to be set as documented =
-below. The driver
-> handles the interrupt and clears the "Other" bit (#24) but doesn't =
-clear the
-> "receive overrun" bit (#6) which leads to an infinite loop. Apparently =
-the Windows
-> driver expects that the "receive overrun" bit and other ones - =
-documented below - to be
-> cleared when the "Other" bit (#24) is cleared.
->=20
-> So to sum that up:
-> 1. Bit #6 of the ICR register is set by heavy traffic
-> 2. As a results of setting bit #6, bit #24 is set
-> 3. The driver receives an interrupt for bit 24 (it doesn't receieve an =
-interrupt for bit #6 as it is masked out by IMS)
-> 4. The driver handles and clears the interrupt of bit #24
-> 5. Bit #6 is still set.
-> 6. 2 happens all over again
->=20
-> The Interrupt Cause Read - ICR register:
->=20
-> The ICR has the "Other" bit - bit #24 - that is set when one or more =
-of the following
-> ICR register's bits are set:
->=20
-> LSC - bit #2, RXO - bit #6, MDAC - bit #9, SRPD - bit #16, ACK - bit =
-#17, MNG - bit #18
->=20
-> Log sample of the storm:
->=20
-> 27563@1494850819.411877:e1000e_irq_pending_interrupts ICR PENDING: =
-0x1000000 (ICR: 0x815000c2, IMS: 0x1a00004)
-> 27563@1494850819.411900:e1000e_irq_pending_interrupts ICR PENDING: 0x0 =
-(ICR: 0x815000c2, IMS: 0xa00004)
-> 27563@1494850819.411915:e1000e_irq_pending_interrupts ICR PENDING: 0x0 =
-(ICR: 0x815000c2, IMS: 0xa00004)
-> 27563@1494850819.412380:e1000e_irq_pending_interrupts ICR PENDING: 0x0 =
-(ICR: 0x815000c2, IMS: 0xa00004)
-> 27563@1494850819.412395:e1000e_irq_pending_interrupts ICR PENDING: 0x0 =
-(ICR: 0x815000c2, IMS: 0xa00004)
-> 27563@1494850819.412436:e1000e_irq_pending_interrupts ICR PENDING: 0x0 =
-(ICR: 0x815000c2, IMS: 0xa00004)
-> 27563@1494850819.412441:e1000e_irq_pending_interrupts ICR PENDING: 0x0 =
-(ICR: 0x815000c2, IMS: 0xa00004)
-> 27563@1494850819.412998:e1000e_irq_pending_interrupts ICR PENDING: =
-0x1000000 (ICR: 0x815000c2, IMS: 0x1a00004)
->=20
-> This commit solves:
-> https://bugzilla.redhat.com/show_bug.cgi?id=3D1447935
-> https://bugzilla.redhat.com/show_bug.cgi?id=3D1449490 =
-<https://bugzilla.redhat.com/show_bug.cgi?id=3D1449490>
+That's fine with me - i didn't intend my comments to be a blocker. In
+general getaddrinfo should only return IPv6 addrs, if IPv6 is actually
+usable.
 
-
-Reviewed-by: Dmitry Fleytman <dmitry@daynix.com>
-
-
->=20
-> Signed-off-by: Sameeh Jubran <sjubran@redhat.com>
-> ---
-> hw/net/e1000e_core.c | 7 +++++--
-> 1 file changed, 5 insertions(+), 2 deletions(-)
->=20
-> diff --git a/hw/net/e1000e_core.c b/hw/net/e1000e_core.c
-> index 28c5be1..8174b53 100644
-> --- a/hw/net/e1000e_core.c
-> +++ b/hw/net/e1000e_core.c
-> @@ -2454,14 +2454,17 @@ e1000e_set_ics(E1000ECore *core, int index, =
-uint32_t val)
-> static void
-> e1000e_set_icr(E1000ECore *core, int index, uint32_t val)
-> {
-> +    uint32_t icr =3D 0;
->     if ((core->mac[ICR] & E1000_ICR_ASSERTED) &&
->         (core->mac[CTRL_EXT] & E1000_CTRL_EXT_IAME)) {
->         trace_e1000e_irq_icr_process_iame();
->         e1000e_clear_ims_bits(core, core->mac[IAM]);
->     }
->=20
-> -    trace_e1000e_irq_icr_write(val, core->mac[ICR], core->mac[ICR] & =
-~val);
-> -    core->mac[ICR] &=3D ~val;
-> +    icr =3D core->mac[ICR] & ~val;
-> +    icr =3D (val & E1000_ICR_OTHER) ? (icr & ~E1000_ICR_OTHER_CAUSES) =
-: icr;
-> +    trace_e1000e_irq_icr_write(val, core->mac[ICR], icr);
-> +    core->mac[ICR] =3D icr;
->     e1000e_update_interrupt_state(core);
-> }
->=20
-> --=20
-> 2.8.1.185.gdc0db2c
->=20
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
