@@ -1,17 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58565)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58658)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dAzCB-0004WH-SS
-	for qemu-devel@nongnu.org; Wed, 17 May 2017 09:40:56 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1dAzCL-0004dv-SM
+	for qemu-devel@nongnu.org; Wed, 17 May 2017 09:41:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dAzC8-0003cW-VO
-	for qemu-devel@nongnu.org; Wed, 17 May 2017 09:40:55 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1dAzCK-0003hN-Uk
+	for qemu-devel@nongnu.org; Wed, 17 May 2017 09:41:05 -0400
 From: Eduardo Habkost <ehabkost@redhat.com>
-Date: Wed, 17 May 2017 10:39:46 -0300
-Message-Id: <20170517134003.17110-6-ehabkost@redhat.com>
+Date: Wed, 17 May 2017 10:39:47 -0300
+Message-Id: <20170517134003.17110-7-ehabkost@redhat.com>
 In-Reply-To: <20170517134003.17110-1-ehabkost@redhat.com>
 References: <20170517134003.17110-1-ehabkost@redhat.com>
-Subject: [Qemu-devel] [PULL 05/22] fdc: Remove user_creatable flag from
- sysbus-fdc & SUNW, fdtwo
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL 06/22] pflash_cfi01: Remove user_creatable flag
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,55 +23,44 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Peter Maydell <peter.maydell@linaro.org>, Stefan Hajnoczi <stefanha@redhat.com>
-Cc: qemu-devel@nongnu.org, John Snow <jsnow@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org, Thomas Huth <thuth@redhat.com>
+Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org, Laszlo Ersek <lersek@redhat.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Marcel Apfelbaum <marcel@redhat.com>
 
-sysbus-fdc and SUNW,fdtwo devices need IRQs to be wired and mmio
-to be mapped, and can't be used with -device. Unset
-user_creatable on their device classes.
+TYPE_CFI_PFLASH01 devices need to be mapped by
+pflash_cfi01_register() (or equivalent) and can't be used with
+-device. Remove user_creatable from the device class.
 
-Cc: John Snow <jsnow@redhat.com>
 Cc: Kevin Wolf <kwolf@redhat.com>
-Cc: Marcel Apfelbaum <marcel@redhat.com>
 Cc: Max Reitz <mreitz@redhat.com>
 Cc: qemu-block@nongnu.org
-Cc: Thomas Huth <thuth@redhat.com>
-Acked-by: John Snow <jsnow@redhat.com>
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+Cc: Laszlo Ersek <lersek@redhat.com>
+Cc: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+Cc: Marcel Apfelbaum <marcel@redhat.com>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+Reviewed-by: Laszlo Ersek <lersek@redhat.com>
 Acked-by: Marcel Apfelbaum <marcel@redhat.com>
 Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
-Message-Id: <20170503203604.31462-6-ehabkost@redhat.com>
+Message-Id: <20170503203604.31462-7-ehabkost@redhat.com>
 Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 ---
- hw/block/fdc.c | 10 ----------
- 1 file changed, 10 deletions(-)
+ hw/block/pflash_cfi01.c | 5 -----
+ 1 file changed, 5 deletions(-)
 
-diff --git a/hw/block/fdc.c b/hw/block/fdc.c
-index 5c28a0b0ad..2e629b398b 100644
---- a/hw/block/fdc.c
-+++ b/hw/block/fdc.c
-@@ -2880,11 +2880,6 @@ static void sysbus_fdc_class_init(ObjectClass *klass, void *data)
- 
-     dc->props = sysbus_fdc_properties;
+diff --git a/hw/block/pflash_cfi01.c b/hw/block/pflash_cfi01.c
+index ef71956433..594d4cf6fe 100644
+--- a/hw/block/pflash_cfi01.c
++++ b/hw/block/pflash_cfi01.c
+@@ -927,11 +927,6 @@ static void pflash_cfi01_class_init(ObjectClass *kla=
+ss, void *data)
+     dc->props =3D pflash_cfi01_properties;
+     dc->vmsd =3D &vmstate_pflash;
      set_bit(DEVICE_CATEGORY_STORAGE, dc->categories);
 -    /*
 -     * FIXME: Set only because we are not sure yet if this device
 -     * will be outside the q35 sysbus whitelist.
 -     */
--    dc->user_creatable = true;
+-    dc->user_creatable =3D true;
  }
- 
- static const TypeInfo sysbus_fdc_info = {
-@@ -2911,11 +2906,6 @@ static void sun4m_fdc_class_init(ObjectClass *klass, void *data)
- 
-     dc->props = sun4m_fdc_properties;
-     set_bit(DEVICE_CATEGORY_STORAGE, dc->categories);
--    /*
--     * FIXME: Set only because we are not sure yet if this device
--     * will be outside the q35 sysbus whitelist.
--     */
--    dc->user_creatable = true;
- }
- 
- static const TypeInfo sun4m_fdc_info = {
--- 
+=20
+=20
+--=20
 2.11.0.259.g40922b1
