@@ -1,27 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36771)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38668)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1dB2Lu-0004Hs-9U
-	for qemu-devel@nongnu.org; Wed, 17 May 2017 13:03:11 -0400
+	(envelope-from <eblake@redhat.com>) id 1dB2SD-0005so-TB
+	for qemu-devel@nongnu.org; Wed, 17 May 2017 13:09:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1dB2Lt-0002iW-2R
-	for qemu-devel@nongnu.org; Wed, 17 May 2017 13:03:10 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:49750)
+	(envelope-from <eblake@redhat.com>) id 1dB2S9-0004sH-7W
+	for qemu-devel@nongnu.org; Wed, 17 May 2017 13:09:41 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:45928)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <david@redhat.com>) id 1dB2Ls-0002iE-SG
-	for qemu-devel@nongnu.org; Wed, 17 May 2017 13:03:08 -0400
-References: <1494926884-10118-1-git-send-email-thuth@redhat.com>
-	<24feaa40-93e3-600e-fa00-0d1e00117c41@twiddle.net>
-	<53fcf39a-026c-bd18-da5d-48442b6570b9@redhat.com>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <ac695417-b287-d0cc-a90a-4cb49bfcb79a@redhat.com>
-Date: Wed, 17 May 2017 19:03:05 +0200
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dB2S8-0004sB-UE
+	for qemu-devel@nongnu.org; Wed, 17 May 2017 13:09:37 -0400
+References: <1494405683-20877-1-git-send-email-pradeep.jagadeesh@huawei.com>
+	<1494405683-20877-5-git-send-email-pradeep.jagadeesh@huawei.com>
+	<6a035cd9-34f9-c1f5-e986-404daf941641@redhat.com>
+	<57a24e21-0864-16d3-1bce-ad801875ea9f@huawei.com>
+	<2c0e99ce-f3cb-90e8-baed-8fad9d39455b@redhat.com>
+	<20170517182938.0c7f366e@bahia.lan>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <6df407d5-4145-2e90-a7eb-b047819ceb75@redhat.com>
+Date: Wed, 17 May 2017 12:09:33 -0500
 MIME-Version: 1.0
-In-Reply-To: <53fcf39a-026c-bd18-da5d-48442b6570b9@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v1] target/s390x: Add support for the TEST
- BLOCK instruction
+In-Reply-To: <20170517182938.0c7f366e@bahia.lan>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="Hc6qlqBd8lBwdAdEu91Gb4BivcTQ94BwV"
+Subject: Re: [Qemu-devel] [PATCH v4 4/4] fsdev: QMP interface for throttling
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,37 +32,99 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, Richard Henderson <rth@twiddle.net>, qemu-devel@nongnu.org, Alexander Graf <agraf@suse.de>
-Cc: mmarek@suse.com, mbenes@suse.cz
+To: Greg Kurz <groug@kaod.org>
+Cc: Pradeep Jagadeesh <pradeep.jagadeesh@huawei.com>, Pradeep Jagadeesh <pradeepkiruvale@gmail.com>, alberto garcia <berto@igalia.com>, jani kokkonen <jani.kokkonen@huawei.com>, qemu-devel@nongnu.org
 
-On 17.05.2017 18:05, Thomas Huth wrote:
-> On 16.05.2017 21:06, Richard Henderson wrote:
->> On 05/16/2017 02:28 AM, Thomas Huth wrote:
->>> +void HELPER(testblock)(CPUS390XState *env, uint64_t addr)
->>> +{
->>> +    CPUState *cs = CPU(s390_env_get_cpu(env));
->>> +    int i;
->>> +
->>> +    addr = get_address(env, 0, 0, addr) & ~0xfffULL;
->>> +    for (i = 0; i < TARGET_PAGE_SIZE; i += 8) {
->>> +        stq_phys(cs->as, addr + i, 0);
->>> +    }
->>> +    env->cc_op = 0;
->>> +}
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--Hc6qlqBd8lBwdAdEu91Gb4BivcTQ94BwV
+From: Eric Blake <eblake@redhat.com>
+To: Greg Kurz <groug@kaod.org>
+Cc: Pradeep Jagadeesh <pradeep.jagadeesh@huawei.com>,
+ Pradeep Jagadeesh <pradeepkiruvale@gmail.com>,
+ alberto garcia <berto@igalia.com>, jani kokkonen <jani.kokkonen@huawei.com>,
+ qemu-devel@nongnu.org
+Message-ID: <6df407d5-4145-2e90-a7eb-b047819ceb75@redhat.com>
+Subject: Re: [PATCH v4 4/4] fsdev: QMP interface for throttling
+References: <1494405683-20877-1-git-send-email-pradeep.jagadeesh@huawei.com>
+ <1494405683-20877-5-git-send-email-pradeep.jagadeesh@huawei.com>
+ <6a035cd9-34f9-c1f5-e986-404daf941641@redhat.com>
+ <57a24e21-0864-16d3-1bce-ad801875ea9f@huawei.com>
+ <2c0e99ce-f3cb-90e8-baed-8fad9d39455b@redhat.com>
+ <20170517182938.0c7f366e@bahia.lan>
+In-Reply-To: <20170517182938.0c7f366e@bahia.lan>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 05/17/2017 11:29 AM, Greg Kurz wrote:
+
 >>
->> This needs several changes: check that the physical page does indeed
->> exist, "low address protection", return the cc code.
-> 
-> Ok, ... but if we care about "low address protection", shouldn't we also
-> add that to the other CPU instructions, too? (As far as I can see, it is
-> not supported by the TCG code at all yet)
+>> First point: is fsdev a Linux-only feature, or can it be compiled on
+>> BSD?  If it is Linux-only, then compiling a stub for Windows will stil=
+l
+>> leave BSD broken, and your #ifdef is wrong.  Fixing compilation on min=
+gw
+>> is nice, but not the only platform to worry about.
+>>
+>=20
+> fsdev compilation currently depends on CONFIG_VIRTFS which is a Linux-o=
+nly
+> feature for the moment. There was a tentative to support it on Windows =
+hosts
+> two years ago but it stayed at the RFC stage.
+>=20
+> But even on Linux hosts, the current fsdev implementation also depends =
+on
+> the target supporting PCI and VIRTIO. We have a fsdev/qemu-fsdev-dummy.=
+c
+> file to put stubs so that we don't pull all the code for such targets.
+>=20
+> Maybe this could be reused for the above stubs as well ?
 
-The same should be true for storage key checks, right? I think there are
-a lot of such checks missing.
+That helps.  The stub should live in qemu-fsdev-dummy.c (where it
+shouldn't need any #ifdef, because that file is only compiled when the
+condition is false), and...
+
+>=20
+>> Second point: if fsdev is indeed a platform-specific feature, then we
+>> don't want to advertise the QMP commands that are useless when running=
+
+>> on a platform that doesn't support it. Anywhere you have to add a stub=
+
+>> for compilation means you ALSO need to patch monitor.c to unregister t=
+he
+>> command from being advertised as a valid QMP command.  (If you used
+>> #ifdef __LINUX__ to guard the working version, and #ifndef __LINUX__ t=
+o
+>> declare the stub, then the monitor.c needs an #ifndef section within
+>> qmp_unregister_commands_hack() to tell QMP to not advertise the stubs.=
+)
+
+monitor.c should wrap the unregister under #ifndef CONFIG_VIRTFS (rather
+than a particular platform name).
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
 
 
--- 
+--Hc6qlqBd8lBwdAdEu91Gb4BivcTQ94BwV
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-Thanks,
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-David
+iQEcBAEBCAAGBQJZHIPNAAoJEKeha0olJ0NqiOgH/2+Iuqp1BTOw44Hfr1vz8yuo
+yAlmux/MsU3RQQLrsxZqo8noiVioeXN1qKTq56KEYrkNp7BgbnWubDYwVDj98Hqj
+gZfjkvV7fC3xM+4fihvPX2aYPW04g8Qxyv9It3tVmpKtD/UEGvv1IFiQhVY+ELHB
+IOfv9lXsf+VT6igUdCbm4VxdoA5oAn+7VVrPfoMui9zxJt95vuwHga9YMOsVww+3
+zud5/iOXYdiuUtTrjldYQObOTtq2DOPdM93L9SvrkIWonX5S1/2XFdZ4dPVqW4jH
+TCGvJXEF9b7T6oFOpwZopfjyvGBwEpT62c3iYqN26wdzNqLTNZHQsbrqdC8kMFA=
+=upyb
+-----END PGP SIGNATURE-----
+
+--Hc6qlqBd8lBwdAdEu91Gb4BivcTQ94BwV--
