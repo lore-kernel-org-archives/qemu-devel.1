@@ -1,31 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53526)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53972)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dAnJr-00036W-Sd
-	for qemu-devel@nongnu.org; Tue, 16 May 2017 21:00:04 -0400
+	id 1dAnL7-00044l-N4
+	for qemu-devel@nongnu.org; Tue, 16 May 2017 21:01:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dAnJn-0006oB-9X
-	for qemu-devel@nongnu.org; Tue, 16 May 2017 21:00:03 -0400
-Received: from mail-qt0-x242.google.com ([2607:f8b0:400d:c0d::242]:36845)
+	id 1dAnL3-0007Ay-3M
+	for qemu-devel@nongnu.org; Tue, 16 May 2017 21:01:21 -0400
+Received: from mail-qk0-x244.google.com ([2607:f8b0:400d:c09::244]:34412)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dAnJn-0006o1-4q
-	for qemu-devel@nongnu.org; Tue, 16 May 2017 20:59:59 -0400
-Received: by mail-qt0-x242.google.com with SMTP id j13so23039696qta.3
-	for <qemu-devel@nongnu.org>; Tue, 16 May 2017 17:59:58 -0700 (PDT)
+	id 1dAnL2-0007Am-Vm
+	for qemu-devel@nongnu.org; Tue, 16 May 2017 21:01:17 -0400
+Received: by mail-qk0-x244.google.com with SMTP id u75so25165123qka.1
+	for <qemu-devel@nongnu.org>; Tue, 16 May 2017 18:01:16 -0700 (PDT)
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
-References: <20170516230159.4195-1-aurelien@aurel32.net>
-	<20170516230159.4195-4-aurelien@aurel32.net>
+References: <20170516224721.13832-1-aurelien@aurel32.net>
+	<20170516224721.13832-2-aurelien@aurel32.net>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <b84e9237-3b91-0b80-8b10-d94c7d6c931d@amsat.org>
-Date: Tue, 16 May 2017 21:59:54 -0300
+Message-ID: <0e4f8f4e-4d19-8dd1-8a0e-f9aebdffa7d8@amsat.org>
+Date: Tue, 16 May 2017 22:01:13 -0300
 MIME-Version: 1.0
-In-Reply-To: <20170516230159.4195-4-aurelien@aurel32.net>
+In-Reply-To: <20170516224721.13832-2-aurelien@aurel32.net>
 Content-Type: text/plain; charset=windows-1252; format=flowed
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 3/4] target/cris: optimize swap
+Subject: Re: [Qemu-devel] [PATCH 1/5] target/sh4: log unauthorized accesses
+ using qemu_log_mask
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,53 +36,29 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Aurelien Jarno <aurelien@aurel32.net>, qemu-devel@nongnu.org
-Cc: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Richard Henderson <rth@twiddle.net>
 
-On 05/16/2017 08:01 PM, Aurelien Jarno wrote:
-> Use the same mask to avoid having to load two different constants, as
-> suggest by Richard Henderson. Also use one less temp.
+On 05/16/2017 07:47 PM, Aurelien Jarno wrote:
+> qemu_log_mask() is preferred over fprintf() for logging errors.
 >
 > Signed-off-by: Aurelien Jarno <aurelien@aurel32.net>
-> ---
->  target/cris/translate.c | 15 +++++++--------
->  1 file changed, 7 insertions(+), 8 deletions(-)
->
-> diff --git a/target/cris/translate.c b/target/cris/translate.c
-> index 0ee05ca02d..103b214233 100644
-> --- a/target/cris/translate.c
-> +++ b/target/cris/translate.c
-> @@ -433,20 +433,19 @@ static inline void t_gen_subx_carry(DisasContext *dc, TCGv d)
->     T0 = ((T0 << 8) & 0xff00ff00) | ((T0 >> 8) & 0x00ff00ff)  */
->  static inline void t_gen_swapb(TCGv d, TCGv s)
->  {
-> -    TCGv t, org_s;
-> +    TCGv t, m;
->
->      t = tcg_temp_new();
-> -    org_s = tcg_temp_new();
-> +    m = tcg_const_tl(0x00ff00ff);
->
->      /* d and s may refer to the same object.  */
-> -    tcg_gen_mov_tl(org_s, s);
-> -    tcg_gen_shli_tl(t, org_s, 8);
-> -    tcg_gen_andi_tl(d, t, 0xff00ff00);
-> -    tcg_gen_shri_tl(t, org_s, 8);
-> -    tcg_gen_andi_tl(t, t, 0x00ff00ff);
-> +    tcg_gen_shri_tl(t, s, 8);
-> +    tcg_gen_and_tl(t, t, m);
-> +    tcg_gen_and_tl(d, s, m);
 
-Eventually add a comment /* set d 0xff00ff00 */
-
-Anyway,
 Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
-> +    tcg_gen_shli_tl(d, d, 8);
->      tcg_gen_or_tl(d, d, t);
-> +    tcg_temp_free(m);
->      tcg_temp_free(t);
-> -    tcg_temp_free(org_s);
->  }
+> ---
+>  target/sh4/helper.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 >
->  /* Swap the halfwords of the s operand.  */
+> diff --git a/target/sh4/helper.c b/target/sh4/helper.c
+> index 8f8ce81401..4c024f9529 100644
+> --- a/target/sh4/helper.c
+> +++ b/target/sh4/helper.c
+> @@ -420,7 +420,7 @@ static int get_physical_address(CPUSH4State * env, target_ulong * physical,
+>          if (!(env->sr & (1u << SR_MD))
+>  	    && (address < 0xe0000000 || address >= 0xe4000000)) {
+>  	    /* Unauthorized access in user mode (only store queues are available) */
+> -	    fprintf(stderr, "Unauthorized access\n");
+> +            qemu_log_mask(LOG_GUEST_ERROR, "Unauthorized access\n");
+>  	    if (rw == 0)
+>  		return MMU_DADDR_ERROR_READ;
+>  	    else if (rw == 1)
 >
