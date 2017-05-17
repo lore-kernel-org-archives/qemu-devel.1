@@ -1,28 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47919)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48661)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dAyR9-0006gk-Ov
-	for qemu-devel@nongnu.org; Wed, 17 May 2017 08:52:20 -0400
+	(envelope-from <stefanha@gmail.com>) id 1dAyTx-00081y-5r
+	for qemu-devel@nongnu.org; Wed, 17 May 2017 08:55:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dAyR6-0005zr-MJ
-	for qemu-devel@nongnu.org; Wed, 17 May 2017 08:52:19 -0400
-References: <20170516072414.19025-1-famz@redhat.com>
-	<20170516080737.GB27669@lemon.lan>
-	<e780d3d8-43f1-f46d-2858-7554a334246b@redhat.com>
-	<20170516122528.GC27669@lemon.lan>
-	<3799c1f5-5b22-fe05-4c98-4cd76c716551@redhat.com>
-	<20170517015530.GD27669@lemon.lan>
-	<2070505842.8419962.1495004335579.JavaMail.zimbra@redhat.com>
-	<20170517120041.GA17629@lemon.lan>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <d575d0cc-9082-13ec-8903-6ae5dd1628cd@redhat.com>
-Date: Wed, 17 May 2017 14:52:02 +0200
+	(envelope-from <stefanha@gmail.com>) id 1dAyTt-0007ET-8G
+	for qemu-devel@nongnu.org; Wed, 17 May 2017 08:55:13 -0400
+Date: Wed, 17 May 2017 13:55:01 +0100
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20170517125501.GG8260@stefanha-x1.localdomain>
+References: <20170516155420.10106-1-jcody@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20170517120041.GA17629@lemon.lan>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2] virtio: Move memory_listener_unregister
- to .unrealize
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="1XWsVB21DFCvn2e8"
+Content-Disposition: inline
+In-Reply-To: <20170516155420.10106-1-jcody@redhat.com>
+Subject: Re: [Qemu-devel] [Qemu-block] [PULL 0/8] Block patches for curl
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,43 +23,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>
-Cc: Jason Wang <jasowang@redhat.com>, qemu-stable@nongnu.org, qemu-devel@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>
+To: Jeff Cody <jcody@redhat.com>
+Cc: qemu-block@nongnu.org, peter.maydell@linaro.org, qemu-devel@nongnu.org
 
 
+--1XWsVB21DFCvn2e8
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-On 17/05/2017 14:00, Fam Zheng wrote:
-> On Wed, 05/17 02:58, Paolo Bonzini wrote:
->> The child property is deleted when bus_unparent calls object_unparent:
->>
->>     while ((kid = QTAILQ_FIRST(&bus->children)) != NULL) {
->>         DeviceState *dev = kid->child;
->>         object_unparent(OBJECT(dev));
->>     }
->>
->> and in turn bus_unparent is called by the VirtIOSCSIPCI's unparent
->> callback (device_unparent):
->>
->>     while (dev->num_child_bus) {
->>         bus = QLIST_FIRST(&dev->child_bus);
->>         object_unparent(OBJECT(bus));
->>     }
-> 
-> OK, sorry for being dumb, these are way over my head. Let me try again:
-> 
-> I count three references before unplug:
-> 
-> a.1) object_property_add_child in virtio_instance_init_common as virtio-backend
-> a.2) qdev_set_parent_bus in virtio_scsi_pci_realize by virtio-pci-bus
-> a.3) qbus_set_hotplug_handler in virtio_scsi_device_realize for 
-> 
-> Only two object_unref()'s happen in unplug, respectively:
-> 
-> b.1) object_finalize_child_property, matches a.1)
-> b.2) bus_remove_child, matches a.2)
-> 
-> Do we need cleanup for a.3) ? The patch below does fix the crash for me.
+On Tue, May 16, 2017 at 11:54:12AM -0400, Jeff Cody wrote:
+> The following changes since commit 3a8760664d5c1a1a93c9012bdb8ac07ab8fd4b=
+0d:
+>=20
+>   Merge tag 'tracing-pull-request' into staging (2017-05-12 10:39:35 -040=
+0)
+>=20
+> are available in the git repository at:
+>=20
+>   git://github.com/codyprime/qemu-kvm-jtc.git tags/block-pull-request
+>=20
+> for you to fetch changes up to 2bb5c936c5827e1d831002f7a7517cb8c2c2201d:
+>=20
+>   curl: do not do aio_poll when waiting for a free CURLState (2017-05-16 =
+10:34:50 -0400)
+>=20
+> ----------------------------------------------------------------
+> Curl patches
+> ----------------------------------------------------------------
+>=20
+> Paolo Bonzini (7):
+>   curl: strengthen assertion in curl_clean_state
+>   curl: never invoke callbacks with s->mutex held
+>   curl: avoid recursive locking of BDRVCURLState mutex
+>   curl: split curl_find_state/curl_init_state
+>   curl: convert CURLAIOCB to byte values
+>   curl: convert readv to coroutines
+>   curl: do not do aio_poll when waiting for a free CURLState
+>=20
+> Peter Krempa (1):
+>   block: curl: Allow passing cookies via QCryptoSecret
+>=20
+>  block/curl.c         | 239 ++++++++++++++++++++++++++++++---------------=
+------
+>  qapi/block-core.json |  12 ++-
+>  2 files changed, 153 insertions(+), 98 deletions(-)
+>=20
+> --=20
+> 2.9.3
+>=20
+>=20
 
-Yes, good catch.  Either there, or in bus_unparent.
+Thanks, applied to my staging tree:
+https://github.com/stefanha/qemu/commits/staging
 
-Paolo
+Stefan
+
+--1XWsVB21DFCvn2e8
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJZHEglAAoJEJykq7OBq3PIQ4UH/2dWaaF3Wl0yKeQkl3drYjir
+NJJvzHFmC81jM2QspPzdTsdlpU6u5MX1LIZuzzSkZHNU2ouhicWqoD8Xnll4oMBj
+O7aoKdf75Dbi4TyWiBBS2fu3lScfJWHqdXgH/CWzVMctB8JJ5QKYhr94z971qjnY
+QU3vfkUdg22rvnehwi0KYHXF7tU4UWaSJbXXK5igFV3AY8BDvjEvj/R+hQebC/B1
+zv0C91Hv+1Jb2hRoAlCesDd+qxEGCCFIeUO14uIE1PH/mLpfa1JK91hoPcYSVOWR
+gw8YMxkRqPkvIlGvPcjBvXsdDln6JTR3hcWPVUgp8AFVETVQ6TRvlqEW3qO8Kv4=
+=9MS1
+-----END PGP SIGNATURE-----
+
+--1XWsVB21DFCvn2e8--
