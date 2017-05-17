@@ -1,34 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58866)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59280)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dAubp-0000ws-4v
-	for qemu-devel@nongnu.org; Wed, 17 May 2017 04:47:06 -0400
+	(envelope-from <arei.gonglei@huawei.com>) id 1dAudk-0001o7-B1
+	for qemu-devel@nongnu.org; Wed, 17 May 2017 04:49:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dAubl-0005aj-V8
-	for qemu-devel@nongnu.org; Wed, 17 May 2017 04:47:05 -0400
-Received: from indium.canonical.com ([91.189.90.7]:34533)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1dAubl-0005aV-Pk
-	for qemu-devel@nongnu.org; Wed, 17 May 2017 04:47:01 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1dAubj-0002jy-8g
-	for <qemu-devel@nongnu.org>; Wed, 17 May 2017 08:46:59 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 403532E80CF
-	for <qemu-devel@nongnu.org>; Wed, 17 May 2017 08:46:59 +0000 (UTC)
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+	(envelope-from <arei.gonglei@huawei.com>) id 1dAudg-0006Oy-Oj
+	for qemu-devel@nongnu.org; Wed, 17 May 2017 04:49:04 -0400
+Received: from szxga03-in.huawei.com ([45.249.212.189]:3869)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
+	(envelope-from <arei.gonglei@huawei.com>) id 1dAudf-0006NL-RY
+	for qemu-devel@nongnu.org; Wed, 17 May 2017 04:49:00 -0400
+From: "Gonglei (Arei)" <arei.gonglei@huawei.com>
+Date: Wed, 17 May 2017 08:48:33 +0000
+Message-ID: <33183CC9F5247A488A2544077AF19020DA29B1CF@DGGEMA505-MBS.china.huawei.com>
+References: <1494243504-127980-1-git-send-email-arei.gonglei@huawei.com>
+	<1494243504-127980-6-git-send-email-arei.gonglei@huawei.com>
+	<20170516154317.GS8498@stefanha-x1.localdomain>
+In-Reply-To: <20170516154317.GS8498@stefanha-x1.localdomain>
+Content-Language: zh-CN
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: quoted-printable
-Date: Wed, 17 May 2017 08:27:54 -0000
-From: Thomas Huth <1181796@bugs.launchpad.net>
-Reply-To: Bug 1181796 <1181796@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20130519164858.7560.43164.malonedeb@wampee.canonical.com>
-Message-Id: <149500967422.5017.2790836972592441281.malone@chaenomeles.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1181796] Re: Qemu locks up when incoming serial
- fills up
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [RFC v1 5/9] virtio-crypto: update header file
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,59 +29,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Stefan Hajnoczi <stefanha@redhat.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "mst@redhat.com" <mst@redhat.com>, "Huangweidong (C)" <weidong.huang@huawei.com>, "pasic@linux.vnet.ibm.com" <pasic@linux.vnet.ibm.com>, Luonengjun <luonengjun@huawei.com>, "cornelia.huck@de.ibm.com" <cornelia.huck@de.ibm.com>, Linqiangmin <linqiangmin@huawei.com>, "xin.zeng@intel.com" <xin.zeng@intel.com>, "Wubin (H)" <wu.wubin@huawei.com>
 
-I think there have been quite a lot of fixes during the last releases of
-QEMU in this area ... could you please try again to see whether you can
-still reproduce this problem with the latest version of QEMU (currently
-v2.9.0)?
+>
+> -----Original Message-----
+> From: Stefan Hajnoczi [mailto:stefanha@redhat.com]
+> Sent: Tuesday, May 16, 2017 11:43 PM
+> To: Gonglei (Arei)
+> Cc: qemu-devel@nongnu.org; mst@redhat.com; Huangweidong (C);
+> pasic@linux.vnet.ibm.com; Luonengjun; cornelia.huck@de.ibm.com;
+> Linqiangmin; xin.zeng@intel.com; Wubin (H)
+> Subject: Re: [RFC v1 5/9] virtio-crypto: update header file
+>=20
+> On Mon, May 08, 2017 at 07:38:20PM +0800, Gonglei wrote:
+> > @@ -166,8 +175,8 @@ struct virtio_crypto_aead_session_para {
+> >  	uint32_t algo;
+> >  	/* length of key */
+> >  	uint32_t key_len;
+> > -	/* hash result length */
+> > -	uint32_t hash_result_len;
+> > +	/* Authentication tag length */
+> > +	uint32_t tag_len;
+>=20
+> Why is this field being renamed?
 
-** Changed in: qemu
-       Status: New =3D> Incomplete
+Oh, I just think the latter name ' tag_len' is more proper than 'hash_resul=
+t_len',
+and the current code don't touch this field.
 
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1181796
-
-Title:
-  Qemu locks up when incoming serial fills up
-
-Status in QEMU:
-  Incomplete
-
-Bug description:
-  I'm using Windows, I'm not sure if this happens on Linux, but for all
-  I know it does. To repro, fire up any image (ideally one that does
-  almost nothing, and doesn't read the serial port), and use the option
-  "-serial pipe:mypipe". Then use Putty or something else to connect to
-  that named pipe so Qemu starts up. Now start typing into Putty. For a
-  VM image that never reads the serial port, upon typing the 16th
-  character Qemu stops executing instructions in the guest (as evidenced
-  either by being unable to step in gdb, seeing that "info registers" in
-  the monitor always reports the same value, or just by observing that
-  the guest is hung). For OS images that do regularly read the serial
-  port, this may require pasting >16 bytes into Putty at once. This
-  occurs with more than just Putty, use anything that can write at a
-  named pipe.
-
-  I would have expected that bytes get dropped, or even more ideally
-  blocked at the sender's side of the named pipe. I would not expect
-  that the entire VM stops. You seem to be able to unwedge the VM by
-  switching to the monitor and running "i /1c 0x3f8" until you've pulled
-  enough out of buffer that it's happy to run again. Interestingly, all
-  bytes seem to come through (more than just the 16) when read from the
-  monitor.
-
-  I haven't been able to get a source environment set up, but I have
-  tried a few of the Windows binaries. This repros in 1.4.1, 1.3.0, 1.2,
-  and 1.0, the most recent build I found that did not have this behavior
-  was 0.15.0.
-
-  Maybe I'm missing something very obvious, and if so, I apologize in
-  advance. I'm also happy to create an OS image that highlights this
-  problem if it would help.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1181796/+subscriptions
+Thanks,
+-Gonglei
