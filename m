@@ -1,21 +1,46 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41829)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44799)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sundeep.lkml@gmail.com>) id 1dAvQT-0006sF-Fv
-	for qemu-devel@nongnu.org; Wed, 17 May 2017 05:39:27 -0400
+	(envelope-from <pasic@linux.vnet.ibm.com>) id 1dAvbr-0000qe-Gf
+	for qemu-devel@nongnu.org; Wed, 17 May 2017 05:51:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sundeep.lkml@gmail.com>) id 1dAvQR-00053v-4l
-	for qemu-devel@nongnu.org; Wed, 17 May 2017 05:39:25 -0400
+	(envelope-from <pasic@linux.vnet.ibm.com>) id 1dAvbo-0008PC-F1
+	for qemu-devel@nongnu.org; Wed, 17 May 2017 05:51:11 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:46709
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pasic@linux.vnet.ibm.com>)
+	id 1dAvbo-0008Ow-9t
+	for qemu-devel@nongnu.org; Wed, 17 May 2017 05:51:08 -0400
+Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v4H9nPt4000567
+	for <qemu-devel@nongnu.org>; Wed, 17 May 2017 05:51:07 -0400
+Received: from e06smtp14.uk.ibm.com (e06smtp14.uk.ibm.com [195.75.94.110])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2aggdf2n67-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Wed, 17 May 2017 05:51:06 -0400
+Received: from localhost
+	by e06smtp14.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <pasic@linux.vnet.ibm.com>;
+	Wed, 17 May 2017 10:51:05 +0100
+References: <1494243504-127980-1-git-send-email-arei.gonglei@huawei.com>
+	<1494243504-127980-7-git-send-email-arei.gonglei@huawei.com>
+	<520f45d4-33d7-8836-3140-a92ee5d15421@linux.vnet.ibm.com>
+	<33183CC9F5247A488A2544077AF19020DA278AA0@DGGEMA505-MBS.china.huawei.com>
+	<1963bfa1-c0ea-156a-59f7-aed744ca49a3@linux.vnet.ibm.com>
+	<33183CC9F5247A488A2544077AF19020DA29A0B5@DGGEMA505-MBS.china.huawei.com>
+	<b7c20d5f-026e-edf1-6703-6b64ceed375f@linux.vnet.ibm.com>
+	<33183CC9F5247A488A2544077AF19020DA29B209@DGGEMA505-MBS.china.huawei.com>
+From: Halil Pasic <pasic@linux.vnet.ibm.com>
+Date: Wed, 17 May 2017 11:51:01 +0200
 MIME-Version: 1.0
-In-Reply-To: <d403f33f-647e-a142-4265-7d856d8be6aa@amsat.org>
-References: <1494949133-2202-1-git-send-email-sundeep.lkml@gmail.com>
-	<d403f33f-647e-a142-4265-7d856d8be6aa@amsat.org>
-From: sundeep subbaraya <sundeep.lkml@gmail.com>
-Date: Wed, 17 May 2017 15:09:21 +0530
-Message-ID: <CALHRZur8Uh0JCnOoY-_mUU_fyzbUgxbmWKtfOoB-GTYR5UcEnQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [Qemu devel v5 PATCH 0/5] Add support for
- Smartfusion2 SoC
+In-Reply-To: <33183CC9F5247A488A2544077AF19020DA29B209@DGGEMA505-MBS.china.huawei.com>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+Message-Id: <a8b185ca-4b8d-e913-cfb3-454d61dbce78@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [RFC v1 6/9] virtio-crypto: rework
+ virtio_crypto_handle_request
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,145 +49,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Alistair Francis <alistair23@gmail.com>
-
-Hi Philippe,
-
-On Wed, May 17, 2017 at 9:57 AM, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.o=
-rg>
-wrote:
-
-> Hi Sundeep,
->
-> This patchset is way cleaner!
-> I had a fast look and I like it, I'll try to make some time soon to revie=
-w
-> details and test it.
+To: "Gonglei (Arei)" <arei.gonglei@huawei.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "mst@redhat.com" <mst@redhat.com>, "Huangweidong (C)" <weidong.huang@huawei.com>, "stefanha@redhat.com" <stefanha@redhat.com>, Luonengjun <luonengjun@huawei.com>, "cornelia.huck@de.ibm.com" <cornelia.huck@de.ibm.com>, Linqiangmin <linqiangmin@huawei.com>, "xin.zeng@intel.com" <xin.zeng@intel.com>, "Wubin (H)" <wu.wubin@huawei.com>
 
 
-Thank you
 
->
-
-
-> Is your work interested on U-Boot or more focused in Linux kernel?
->
-
-I am interested more in kernel. I had to look into u-boot for first time
-for Qemu only.
-I worked only on FPGAs(load kernel with debugger) till now so never got a
-chance to look into u-boot.
-
->
-> If you compile QEMU with libfdt support you can use the -dtb option to
-> pass the blob to the kernel directly, bypassing the bootloader.
->
-> Yeah for armv7m I could not find any thing like that in tree.
-
-
-> If you need a bootloader you may give a look at coreboot which supports
-> dts well, see how Vladimir Serbinenko used Linux's dt to boot a QEMU
-> Versatile Express board:
-> https://mail.coreboot.org/pipermail/coreboot-gerrit/2016-
-> February/040899.html
->
-> Cool. I will look into it.
-
-Thanks,
-Sundeep
-
-
-> Regards,
->
-> Phil.
->
->
-> On 05/16/2017 12:38 PM, Subbaraya Sundeep wrote:
->
->> Hi Qemu-devel,
+On 05/17/2017 11:12 AM, Gonglei (Arei) wrote:
+>>>> By the way, I'm having a hard time understing how is the requirement form
+>>>>
+>> http://docs.oasis-open.org/virtio/virtio/v1.0/cs04/virtio-v1.0-cs04.html#x1-260
+>>>> 004
+>>>> (2.4.4 Message Framing) satisfied by this code. Could you explain this
+>>>> to me please?
+>>>>
+>>> Sorry for my bad English,
+>>> I don't know which normative formulation the code violates?
+>> I'm not sure it's actually violated, but I'm concerned about the following
+>> normative statement: "The device MUST NOT make assumptions about the
+>> particular
+>> arrangement of descriptors. The device MAY have a reasonable limit of
+>> descriptors it will allow in a chain."
 >>
->> I am trying to add Smartfusion2 SoC.
->> SoC is from Microsemi and System on Module(SOM)
->> board is from Emcraft systems. Smartfusion2 has hardened
->> Microcontroller(Cortex-M3)based Sub System and FPGA fabric.
->> At the moment only system timer, sysreg and SPI
->> controller are modelled.
+>> Please also read the explanatory part I've linked, because the normative
+>> statement is pretty abstract.
 >>
->> Testing:
->> ./arm-softmmu/qemu-system-arm -M smartfusion2-som -serial mon:stdio \
->> -kernel u-boot.bin -display none -drive file=3Dspi.bin,if=3Dmtd,format=
-=3Draw
+>> In my understanding, the spec says, that e.g. the virti-crypto device
+>> should not fail if a single request is split up into let's say two chunks
+>> and transmitted by the means of two top level descriptors.
 >>
->> Binaries u-boot.bin and spi.bin are at:
->> https://github.com/Subbaraya-Sundeep/qemu-test-binaries.git
+>> Do you agree with my reading of the spec?
 >>
->> U-boot is from Emcraft with modified
->>     - SPI driver not to use PDMA.
->>     - ugly hack to pass dtb to kernel in r1.
->> @
->> https://github.com/Subbaraya-Sundeep/emcraft-uboot-sf2.git
+> Yes, I agree. But what's the relationship about the request here?
+> We don't assume the request have to use one desc entity, it can
+> use scatter-gather list for one request header. 
+> The device can cover the situation in the QEMU. 
+> 
+>> What does the virtio-crypto device do if it encounters such a situation?
 >>
->> Linux is 4.5 linux with Smartfusion2 SoC dts and clocksource
->> driver added by myself @
->> https://github.com/Subbaraya-Sundeep/linux.git
->>
->> v5
->>     As per Philippe comments:
->>         Added abort in Sysreg if guest tries to remap memory
->>         other than default mapping.
->>         Use of CONFIG_MSF2 in Makefile for soc.c
->>         Fixed incorrect logic in timer model.
->>         Renamed msf2-timer.c -> mss-timer.c
->>                 msf2-spi.c -> mss-spi.c also type names
->>         Renamed function msf2_init->emcraft_sf2_init in msf2-som.c
->>         Added part-name,eNVM-size,eSRAM-size,pclk0 and pclk1
->>             properties to soc.
->>         Pass soc part-name,memory size and clock rate properties from so=
-m.
->> v4:
->>     Fixed build failure by using PRIx macros.
->> v3:
->>     Added SoC file and board file as per Alistair comments.
->> v2:
->>     Added SPI controller so that u-boot loads kernel from spi flash.
->> v1:
->>     Initial patch set with timer and sysreg
->>
->> Thanks,
->> Sundeep
->>
->> Subbaraya Sundeep (5):
->>   msf2: Add Smartfusion2 System timer
->>   msf2: Microsemi Smartfusion2 System Register block.
->>   msf2: Add Smartfusion2 SPI controller
->>   msf2: Add Smartfusion2 SoC.
->>   msf2: Add Emcraft's Smartfusion2 SOM kit.
->>
->>  default-configs/arm-softmmu.mak |   1 +
->>  hw/arm/Makefile.objs            |   2 +
->>  hw/arm/msf2-soc.c               | 201 +++++++++++++++++++++
->>  hw/arm/msf2-som.c               |  89 ++++++++++
->>  hw/misc/Makefile.objs           |   1 +
->>  hw/misc/msf2-sysreg.c           | 161 +++++++++++++++++
->>  hw/ssi/Makefile.objs            |   1 +
->>  hw/ssi/mss-spi.c                | 378 ++++++++++++++++++++++++++++++
->> ++++++++++
->>  hw/timer/Makefile.objs          |   1 +
->>  hw/timer/mss-timer.c            | 249 ++++++++++++++++++++++++++
->>  include/hw/arm/msf2-soc.h       |  69 ++++++++
->>  include/hw/misc/msf2-sysreg.h   |  80 +++++++++
->>  include/hw/ssi/mss-spi.h        | 104 +++++++++++
->>  include/hw/timer/mss-timer.h    |  80 +++++++++
->>  14 files changed, 1417 insertions(+)
->>  create mode 100644 hw/arm/msf2-soc.c
->>  create mode 100644 hw/arm/msf2-som.c
->>  create mode 100644 hw/misc/msf2-sysreg.c
->>  create mode 100644 hw/ssi/mss-spi.c
->>  create mode 100644 hw/timer/mss-timer.c
->>  create mode 100644 include/hw/arm/msf2-soc.h
->>  create mode 100644 include/hw/misc/msf2-sysreg.h
->>  create mode 100644 include/hw/ssi/mss-spi.h
->>  create mode 100644 include/hw/timer/mss-timer.h
->>
->>
+> This isn't a problem. Pls see blow code segment:
+> 
+> virtio_crypto_handle_request()
+> {...
+> if (unlikely(iov_to_buf(out_iov, out_num, 0, &req, sizeof(req))
+>                 != sizeof(req))) {
+>     virtio_error(vdev, "virtio-crypto request outhdr too short");
+>     return -1;
+> }
+> iov_discard_front(&out_iov, &out_num, sizeof(req));
+> ...
+> 
+
+Thats exactly what worries me. I see a call to virtio_error there...
+
+
+void GCC_FMT_ATTR(2, 3) virtio_error(VirtIODevice *vdev, const char *fmt, ...)
+{
+    va_list ap;
+
+    va_start(ap, fmt);
+    error_vreport(fmt, ap);
+    va_end(ap);
+
+    vdev->broken = true;
+
+    if (virtio_vdev_has_feature(vdev, VIRTIO_F_VERSION_1)) {
+        virtio_set_status(vdev, vdev->status | VIRTIO_CONFIG_S_NEEDS_RESET);
+        virtio_notify_config(vdev);
+    }
+}
+
+This however seems to make the device 'broken'. Or am I missing something?
+
+Halil
+
+> 
+> Thanks,
+> -Gonglei
+> 
