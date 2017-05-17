@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48252)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48254)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1dB6l8-0000y7-AA
+	(envelope-from <mst@redhat.com>) id 1dB6l8-0000y9-AO
 	for qemu-devel@nongnu.org; Wed, 17 May 2017 17:45:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1dB6l6-0005QM-5W
+	(envelope-from <mst@redhat.com>) id 1dB6l3-0005PL-B5
 	for qemu-devel@nongnu.org; Wed, 17 May 2017 17:45:30 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:48230)
+Received: from mx1.redhat.com ([209.132.183.28]:46728)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1dB6l5-0005Q7-SB
-	for qemu-devel@nongnu.org; Wed, 17 May 2017 17:45:28 -0400
-Date: Thu, 18 May 2017 00:45:25 +0300
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1dB6l3-0005P2-1K
+	for qemu-devel@nongnu.org; Wed, 17 May 2017 17:45:25 -0400
+Date: Thu, 18 May 2017 00:45:21 +0300
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <1495057396-13387-10-git-send-email-mst@redhat.com>
+Message-ID: <1495057396-13387-7-git-send-email-mst@redhat.com>
 References: <1495057396-13387-1-git-send-email-mst@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 In-Reply-To: <1495057396-13387-1-git-send-email-mst@redhat.com>
-Subject: [Qemu-devel] [PULL 09/13] acpi-defs: clean up open brace usage
+Subject: [Qemu-devel] [PULL 06/13] pc: add 2.10 machine type
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,132 +27,110 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Igor Mammedov <imammedo@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Peter Xu <peterx@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>
 
-patchew has been saying:
-ERROR: open brace '{' following struct go on the same line
+From: Peter Xu <peterx@redhat.com>
 
-Fix up acpi-defs.h to follow this rule.
-
+CC: "Michael S. Tsirkin" <mst@redhat.com>
+CC: Paolo Bonzini <pbonzini@redhat.com>
+CC: Richard Henderson <rth@twiddle.net>
+CC: Eduardo Habkost <ehabkost@redhat.com>
+Signed-off-by: Peter Xu <peterx@redhat.com>
+Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
+Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 ---
- include/hw/acpi/acpi-defs.h | 34 ++++++++++++----------------------
- 1 file changed, 12 insertions(+), 22 deletions(-)
+ include/hw/i386/pc.h |  3 +++
+ hw/i386/pc_piix.c    | 15 ++++++++++++---
+ hw/i386/pc_q35.c     | 13 +++++++++++--
+ 3 files changed, 26 insertions(+), 5 deletions(-)
 
-diff --git a/include/hw/acpi/acpi-defs.h b/include/hw/acpi/acpi-defs.h
-index 91bae7f..72be675 100644
---- a/include/hw/acpi/acpi-defs.h
-+++ b/include/hw/acpi/acpi-defs.h
-@@ -81,8 +81,8 @@ typedef struct AcpiRsdpDescriptor AcpiRsdpDescriptor;
-     uint32_t asl_compiler_revision;  /* ASL compiler revision number */
+diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
+index d0183c4..e447f5d 100644
+--- a/include/hw/i386/pc.h
++++ b/include/hw/i386/pc.h
+@@ -382,6 +382,9 @@ int e820_add_entry(uint64_t, uint64_t, uint32_t);
+ int e820_get_num_entries(void);
+ bool e820_get_entry(int, uint32_t, uint64_t *, uint64_t *);
  
++#define PC_COMPAT_2_9 \
++    HW_COMPAT_2_9 \
++
+ #define PC_COMPAT_2_8 \
+     HW_COMPAT_2_8 \
+     {\
+diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
+index a11190b..8f3d85c 100644
+--- a/hw/i386/pc_piix.c
++++ b/hw/i386/pc_piix.c
+@@ -437,21 +437,30 @@ static void pc_i440fx_machine_options(MachineClass *m)
+     m->default_display = "std";
+ }
  
--struct AcpiTableHeader         /* ACPI common table header */
--{
-+/* ACPI common table header */
-+struct AcpiTableHeader {
-     ACPI_TABLE_HEADER_DEF
- } QEMU_PACKED;
- typedef struct AcpiTableHeader AcpiTableHeader;
-@@ -224,8 +224,7 @@ typedef struct AcpiSerialPortConsoleRedirection
- /*
-  * ACPI 1.0 Root System Description Table (RSDT)
-  */
--struct AcpiRsdtDescriptorRev1
--{
-+struct AcpiRsdtDescriptorRev1 {
-     ACPI_TABLE_HEADER_DEF       /* ACPI common table header */
-     uint32_t table_offset_entry[0];  /* Array of pointers to other */
-     /* ACPI tables */
-@@ -235,8 +234,7 @@ typedef struct AcpiRsdtDescriptorRev1 AcpiRsdtDescriptorRev1;
- /*
-  * ACPI 2.0 eXtended System Description Table (XSDT)
-  */
--struct AcpiXsdtDescriptorRev2
--{
-+struct AcpiXsdtDescriptorRev2 {
-     ACPI_TABLE_HEADER_DEF       /* ACPI common table header */
-     uint64_t table_offset_entry[0];  /* Array of pointers to other */
-     /* ACPI tables */
-@@ -246,8 +244,7 @@ typedef struct AcpiXsdtDescriptorRev2 AcpiXsdtDescriptorRev2;
- /*
-  * ACPI 1.0 Firmware ACPI Control Structure (FACS)
-  */
--struct AcpiFacsDescriptorRev1
--{
-+struct AcpiFacsDescriptorRev1 {
-     uint32_t signature;           /* ACPI Signature */
-     uint32_t length;                 /* Length of structure, in bytes */
-     uint32_t hardware_signature;     /* Hardware configuration signature */
-@@ -273,8 +270,7 @@ typedef struct AcpiFacsDescriptorRev1 AcpiFacsDescriptorRev1;
+-static void pc_i440fx_2_9_machine_options(MachineClass *m)
++static void pc_i440fx_2_10_machine_options(MachineClass *m)
+ {
+     pc_i440fx_machine_options(m);
+     m->alias = "pc";
+     m->is_default = 1;
+ }
  
- /* Master MADT */
++DEFINE_I440FX_MACHINE(v2_10, "pc-i440fx-2.10", NULL,
++                      pc_i440fx_2_10_machine_options);
++
++static void pc_i440fx_2_9_machine_options(MachineClass *m)
++{
++    pc_i440fx_2_10_machine_options(m);
++    m->is_default = 0;
++    m->alias = NULL;
++    SET_MACHINE_COMPAT(m, PC_COMPAT_2_9);
++}
++
+ DEFINE_I440FX_MACHINE(v2_9, "pc-i440fx-2.9", NULL,
+                       pc_i440fx_2_9_machine_options);
  
--struct AcpiMultipleApicTable
--{
-+struct AcpiMultipleApicTable {
-     ACPI_TABLE_HEADER_DEF     /* ACPI common table header */
-     uint32_t local_apic_address;     /* Physical address of local APIC */
-     uint32_t flags;
-@@ -310,8 +306,7 @@ typedef struct AcpiMultipleApicTable AcpiMultipleApicTable;
+ static void pc_i440fx_2_8_machine_options(MachineClass *m)
+ {
+     pc_i440fx_2_9_machine_options(m);
+-    m->is_default = 0;
+-    m->alias = NULL;
+     SET_MACHINE_COMPAT(m, PC_COMPAT_2_8);
+ }
  
- /* Sub-structures for MADT */
+diff --git a/hw/i386/pc_q35.c b/hw/i386/pc_q35.c
+index 0a61a20..cf9a788 100644
+--- a/hw/i386/pc_q35.c
++++ b/hw/i386/pc_q35.c
+@@ -301,19 +301,28 @@ static void pc_q35_machine_options(MachineClass *m)
+     m->max_cpus = 288;
+ }
  
--struct AcpiMadtProcessorApic
--{
-+struct AcpiMadtProcessorApic {
-     ACPI_SUB_HEADER_DEF
-     uint8_t  processor_id;           /* ACPI processor id */
-     uint8_t  local_apic_id;          /* Processor's local APIC id */
-@@ -319,8 +314,7 @@ struct AcpiMadtProcessorApic
- } QEMU_PACKED;
- typedef struct AcpiMadtProcessorApic AcpiMadtProcessorApic;
+-static void pc_q35_2_9_machine_options(MachineClass *m)
++static void pc_q35_2_10_machine_options(MachineClass *m)
+ {
+     pc_q35_machine_options(m);
+     m->alias = "q35";
+ }
  
--struct AcpiMadtIoApic
--{
-+struct AcpiMadtIoApic {
-     ACPI_SUB_HEADER_DEF
-     uint8_t  io_apic_id;             /* I/O APIC ID */
-     uint8_t  reserved;               /* Reserved - must be zero */
-@@ -473,8 +467,7 @@ typedef struct Acpi20Hpet Acpi20Hpet;
-  * SRAT (NUMA topology description) table
-  */
++DEFINE_Q35_MACHINE(v2_10, "pc-q35-2.10", NULL,
++                   pc_q35_2_10_machine_options);
++
++static void pc_q35_2_9_machine_options(MachineClass *m)
++{
++    pc_q35_2_10_machine_options(m);
++    m->alias = NULL;
++    SET_MACHINE_COMPAT(m, PC_COMPAT_2_9);
++}
++
+ DEFINE_Q35_MACHINE(v2_9, "pc-q35-2.9", NULL,
+                    pc_q35_2_9_machine_options);
  
--struct AcpiSystemResourceAffinityTable
--{
-+struct AcpiSystemResourceAffinityTable {
-     ACPI_TABLE_HEADER_DEF
-     uint32_t    reserved1;
-     uint32_t    reserved2[2];
-@@ -486,8 +479,7 @@ typedef struct AcpiSystemResourceAffinityTable AcpiSystemResourceAffinityTable;
- #define ACPI_SRAT_PROCESSOR_x2APIC   2
- #define ACPI_SRAT_PROCESSOR_GICC     3
+ static void pc_q35_2_8_machine_options(MachineClass *m)
+ {
+     pc_q35_2_9_machine_options(m);
+-    m->alias = NULL;
+     SET_MACHINE_COMPAT(m, PC_COMPAT_2_8);
+ }
  
--struct AcpiSratProcessorAffinity
--{
-+struct AcpiSratProcessorAffinity {
-     ACPI_SUB_HEADER_DEF
-     uint8_t     proximity_lo;
-     uint8_t     local_apic_id;
-@@ -509,8 +501,7 @@ struct AcpiSratProcessorX2ApicAffinity {
- } QEMU_PACKED;
- typedef struct AcpiSratProcessorX2ApicAffinity AcpiSratProcessorX2ApicAffinity;
- 
--struct AcpiSratMemoryAffinity
--{
-+struct AcpiSratMemoryAffinity {
-     ACPI_SUB_HEADER_DEF
-     uint32_t    proximity;
-     uint16_t    reserved1;
-@@ -522,8 +513,7 @@ struct AcpiSratMemoryAffinity
- } QEMU_PACKED;
- typedef struct AcpiSratMemoryAffinity AcpiSratMemoryAffinity;
- 
--struct AcpiSratProcessorGiccAffinity
--{
-+struct AcpiSratProcessorGiccAffinity {
-     ACPI_SUB_HEADER_DEF
-     uint32_t    proximity;
-     uint32_t    acpi_processor_uid;
 -- 
 MST
