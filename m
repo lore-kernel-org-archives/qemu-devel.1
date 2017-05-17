@@ -1,27 +1,36 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52818)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53600)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1dAryQ-0005rH-Ai
-	for qemu-devel@nongnu.org; Wed, 17 May 2017 01:58:15 -0400
+	(envelope-from <hare@suse.de>) id 1dAs1P-0006ej-CN
+	for qemu-devel@nongnu.org; Wed, 17 May 2017 02:01:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1dAryN-0007YK-9w
-	for qemu-devel@nongnu.org; Wed, 17 May 2017 01:58:14 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:48016)
+	(envelope-from <hare@suse.de>) id 1dAs1H-0000FZ-RG
+	for qemu-devel@nongnu.org; Wed, 17 May 2017 02:01:19 -0400
+Received: from mx2.suse.de ([195.135.220.15]:48803 helo=mx1.suse.de)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1dAryN-0007XW-1q
-	for qemu-devel@nongnu.org; Wed, 17 May 2017 01:58:11 -0400
-Date: Wed, 17 May 2017 13:57:56 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20170517055756.GA31206@pxdev.xzpeter.org>
-References: <1494838260-30439-1-git-send-email-peterx@redhat.com>
-	<9a93009b-f909-3142-5bc5-915b9a10ed20@redhat.com>
-	<f69dcf32-b6a2-fb59-2b54-61fd7b52e66e@redhat.com>
-	<20170517042342.GA9921@pxdev.xzpeter.org>
+	(Exim 4.71) (envelope-from <hare@suse.de>) id 1dAs1H-0000En-H8
+	for qemu-devel@nongnu.org; Wed, 17 May 2017 02:01:11 -0400
+References: <58A4707602000062000D0393@prv-mh.provo.novell.com>
+	<58A5C23202000062000D0FCB@prv-mh.provo.novell.com>
+	<b50ed69e-ce2f-36d9-797b-5f6a5cf7850d@redhat.com>
+	<154b3902-d891-f77a-3d59-09d80596ddff@suse.de>
+	<58ADBA0302000062000D3EA6@prv-mh.provo.novell.com>
+	<1fcf2e94-fc86-4bd7-07a0-8ab2dc72429f@suse.de>
+	<da24d7e2-e81c-8a1c-c277-c8e1b08fc3f7@redhat.com>
+	<5c410c0e-f0b0-a049-84ed-7e31eb4e1dab@suse.de>
+	<1282321742.7961608.1494922767010.JavaMail.zimbra@redhat.com>
+	<efdd2565-025d-b5f8-bcac-32baeaecdc3a@suse.de>
+	<92e310cd-f77a-61f3-82a2-aca8ea901dbc@redhat.com>
+From: Hannes Reinecke <hare@suse.de>
+Message-ID: <02a2668e-82e3-afd3-c99a-9b08bb85a36b@suse.de>
+Date: Wed, 17 May 2017 08:01:09 +0200
 MIME-Version: 1.0
+In-Reply-To: <92e310cd-f77a-61f3-82a2-aca8ea901dbc@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20170517042342.GA9921@pxdev.xzpeter.org>
-Subject: Re: [Qemu-devel] [PATCH 0/4] exec: address space translation
- cleanups
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel]
+ =?utf-8?b?562U5aSN77yaIFJlOiBbUkZDXSB2aXJ0aW8tZmM6?=
+ =?utf-8?q?_draft_idea_of_virtual_fibre_channel_HBA?=
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,83 +39,99 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Maxime Coquelin <maxime.coquelin@redhat.com>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Jason Wang <jasowang@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, David Gibson <david@gibson.dropbear.id.au>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Lin Ma <lma@suse.com>, Stefan Hajnoczi <stefanha@gmail.com>, Zhiqiang Zhou <ZZhou@suse.com>, Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org, stefanha@redhat.com, mst@redhat.com
 
-On Wed, May 17, 2017 at 12:23:42PM +0800, Peter Xu wrote:
-> On Tue, May 16, 2017 at 06:51:03PM +0200, Maxime Coquelin wrote:
-> > Hi Peter,
-> > 
-> > On 05/16/2017 03:24 PM, Maxime Coquelin wrote:
-> > >
-> > >
-> > >On 05/15/2017 10:50 AM, Peter Xu wrote:
-> > >>The problem is that, address_space_get_iotlb_entry() shares a lot with
-> > >>address_space_translate(). This patch tries to abstract the
-> > >>shared elements.
-> > >>
-> > >>Originally, this work is derived from discussion from VT-d passthrough
-> > >>series discussions [1]. But for sure we can just see this series as a
-> > >>standalone cleanup. So I posted it separately here.
-> > >>
-> > >>Smoke tests are done with general VM boots, IOs, especially with vhost
-> > >>dmar configurations.
-> > >>
-> > >>I believe with current series I can throw away the old patch [1],
-> > >>which may be good. But before that, please kindly review. Thanks.
-> > >
-> > >I faced the problem the old patch fixes when declaring and attaching an
-> > >IOMMU device, but booting the kernel with intel_iommu=off.
-> > >
-> > >I tested again with patches 1 & 4 of your series, and I confirm it fixes
-> > >the issue:
-> > >Tested-by: Maxime Coquelin <maxime.coquelin@redhat.com>
-> > 
-> > I did some more testing with my "vhost-user IOMMU" setup, and the series
-> > actually breaks with IOMMU device attached, and intel_iommu=on.
-> > 
-> > The main difference with the previous passing test is the guest RAM
-> > size. In the working setup, it is 2G of 2M hugepages, vs. 4G of 2M
-> > hugepages in the failing one. Note that I also reproduce with vhost-kernel
-> > backend.
-> > 
-> > The error happens in the first vhost_device_iotlb_miss() call:
-> > qemu-system-x86_64: Fail to lookup the translated address b5d7c000
-> > 
-> > I don't have the root cause yet, I'll keep you updated.
-> 
-> Maxime,
-> 
-> Thanks a lot for help testing this series!
-> 
-> I reproduced this problem, and this is not a problem obvious enough
-> for me. Let me investigate as well.
-> 
-> -- 
-> Peter Xu
+On 05/16/2017 06:22 PM, Paolo Bonzini wrote:
+> Pruning to sort out the basic disagreements.
+>=20
+> On 16/05/2017 17:22, Hannes Reinecke wrote:
+>>> That depends on how you would like to do controller passthrough in
+>>> general.  iSCSI doesn't have the 64-bit target ID, and doesn't have
+>>> (AFAIK) hot-plug/hot-unplug support, so it's less important than FC.
+>>>
+>> iSCSI has its 'iqn' string, which is defined to be a 256-byte string.
+>> Hence the number=20
+>> And if we're updating virtio anyway, we could as well update it to car=
+ry
+>> _all_ possible scsi IDs.
+>=20
+> Yes, but one iSCSI connection maps to one initiator and target IQN.
+> It's not like FC where each frame can specify its own initiator ID.
+>=20
+Sure. But updating the format to hold _any_ SCSI Name would allow us to
+reflect the actual initiator port name used by the host.
+So the guest could be
+>>>> (3) would be feasible, as it would effectively mean 'just' to update=
+ the
+>>>> current NPIV mechanism. However, this would essentially lock us in f=
+or
+>>>> FC; any other types (think NVMe) will require yet another solution.
+>>> An FC-NVMe driver could also expose the same vhost interface, couldn'=
+t it?
+>>> FC-NVMe doesn't have to share the Linux code; but sharing the virtio =
+standard
+>>> and the userspace ABI would be great.
+>>>
+>>> In fact, the main advantage of virtio-fc would be that (if we define =
+it properly)
+>>> it could be reused for FC-NVMe instead of having to extend e.g. virti=
+o-blk.
+>>> For example virtio-scsi has request, to-device payload, response, fro=
+m-device
+>>> payload.  virtio-fc's request format could be the initiator and targe=
+t port
+>>> identifiers, followed by FCP_CMD, to-device payload, FCP_RSP, from-de=
+vice
+>>> payload.
+>>>
+>> As already said: We do _not_ have access to the FCP frames.
+>> So designing a virtio-fc protocol will only work for libfc-based HBAs,
+>> namely fnic, bnx2fc, and fcoe.
+>> Given that the future of FCoE is somewhat unclear I doubt it's a good
+>> idea to restrict ourselves to that.
+>=20
+> I understand that.  It doesn't have to be a 1:1 match with FCP frames o=
+r
+> even IUs; in fact the above minimal example is not (no OXID/RXID and no
+> FCP_XFER_RDY IU are just the first two things that come to mind).
+>=20
+> The only purpose is to have a *transport* that is (roughly speaking)
+> flexible enough to support future NPIV usecases which will certainly
+> include FC-NVMe.  In other words: I'm inventing my own cooked FCP
+> format, but I might as well base it on FCP itself as much as possible.
+>=20
+Weeelll ... I don't want to go into nit-picking here, but FC-NVMe is
+_NOT_ FCP. In fact, it's a different FC-4 provider with its own set of
+FC-4 commands etc.
 
-Maxime,
+> Likewise, I'm not going to even mention ELS, but we would need _some_
+> kind of protocol to query name servers, receive state change
+> notifications, and get service parameters.  No idea yet how to do that,
+> probably something similar to virtio-scsi control and event queues, but
+> why not make the requests/responses look a little like PLOGI and PRLI?
+>=20
+And my idea here is to keep virtio-scsi as the basic mode of (command)
+transfer, but add a set of transport management commands which would
+allow us to do things like:
+- port discovery / scan
+- port instantiation / login
+- port reset
+- transport link notification / status check
+- transport reset
 
-Could you help try adding this change upon current to see whether
-problem solved?
+Those could be defined transport independently; and the neat thing is
+they could even be made to work with the current NPIV implementation
+with some tooling.
+And we could define things such that all current transport protocols can
+be mapped onto it.
 
-diff --git a/exec.c b/exec.c
-index 697d902..68576a2 100644
---- a/exec.c
-+++ b/exec.c
-@@ -521,6 +521,10 @@ IOMMUTLBEntry address_space_get_iotlb_entry(AddressSpace *as, hwaddr addr,
-         goto iotlb_fail;
-     }
- 
-+    /* Convert memory region offset into address space offset */
-+    xlat += section.offset_within_address_space -
-+        section.offset_within_region;
-+
-     if (plen == (hwaddr)-1) {
-         /*
-          * We use default page size here. Logically it only happens
+Cheers,
 
-Thanks in advance,
-
--- 
-Peter Xu
+Hannes
+--=20
+Dr. Hannes Reinecke		   Teamlead Storage & Networking
+hare@suse.de			               +49 911 74053 688
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 N=C3=BCrnberg
+GF: F. Imend=C3=B6rffer, J. Smithard, J. Guild, D. Upmanyu, G. Norton
+HRB 21284 (AG N=C3=BCrnberg)
