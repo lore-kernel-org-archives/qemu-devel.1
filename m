@@ -1,32 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45553)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54407)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1dB4dK-0005tk-3s
-	for qemu-devel@nongnu.org; Wed, 17 May 2017 15:29:18 -0400
+	(envelope-from <eblake@redhat.com>) id 1dB5H0-0006Kb-F5
+	for qemu-devel@nongnu.org; Wed, 17 May 2017 16:10:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1dB4dG-0006h7-68
-	for qemu-devel@nongnu.org; Wed, 17 May 2017 15:29:18 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58424)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1dB4dF-0006gt-Vi
-	for qemu-devel@nongnu.org; Wed, 17 May 2017 15:29:14 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 75DF1C057FA4
-	for <qemu-devel@nongnu.org>; Wed, 17 May 2017 19:29:12 +0000 (UTC)
-From: Juan Quintela <quintela@redhat.com>
-In-Reply-To: <20170517165810.18164-3-dgilbert@redhat.com> (David Alan
-	Gilbert's message of "Wed, 17 May 2017 17:58:10 +0100")
-References: <20170517165810.18164-1-dgilbert@redhat.com>
-	<20170517165810.18164-3-dgilbert@redhat.com>
-Reply-To: quintela@redhat.com
-Date: Wed, 17 May 2017 21:29:09 +0200
-Message-ID: <87bmqrb7ui.fsf@secure.mitica>
+	(envelope-from <eblake@redhat.com>) id 1dB5Gz-00044V-Jl
+	for qemu-devel@nongnu.org; Wed, 17 May 2017 16:10:18 -0400
+References: <20170517170941.25850-1-stefanha@redhat.com>
+	<20170517170941.25850-2-stefanha@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <5c53489e-56ac-1f35-f511-e67c7f069a56@redhat.com>
+Date: Wed, 17 May 2017 15:09:51 -0500
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH 2/2] postcopy: Require RAMBlocks that are
- whole pages
+In-Reply-To: <20170517170941.25850-2-stefanha@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="7adxxepQW3Ow10hJx4arAFC10BjhLe71s"
+Subject: Re: [Qemu-devel] [PATCH 1/3] block: count bdrv_co_rw_vmstate()
+ requests
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,33 +25,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Cc: qemu-devel@nongnu.org, peterx@redhat.com, lvivier@redhat.com
+To: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Fam Zheng <famz@redhat.com>, qemu-block@nongnu.org
 
-"Dr. David Alan Gilbert (git)" <dgilbert@redhat.com> wrote:
-> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
->
-> It turns out that it's legal to create a VM with RAMBlocks that aren't
-> a multiple of the pagesize in use; e.g. a 1025M main memory using
-> 2M host pages.  That breaks postcopy's atomic placement of pages,
-> so disallow it.
->
-> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--7adxxepQW3Ow10hJx4arAFC10BjhLe71s
+From: Eric Blake <eblake@redhat.com>
+To: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Fam Zheng <famz@redhat.com>, qemu-block@nongnu.org
+Message-ID: <5c53489e-56ac-1f35-f511-e67c7f069a56@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 1/3] block: count bdrv_co_rw_vmstate()
+ requests
+References: <20170517170941.25850-1-stefanha@redhat.com>
+ <20170517170941.25850-2-stefanha@redhat.com>
+In-Reply-To: <20170517170941.25850-2-stefanha@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Reviewed-by: Juan Quintela <quintela@redhat.com>
+On 05/17/2017 12:09 PM, Stefan Hajnoczi wrote:
+> Call bdrv_inc/dec_in_flight() for vmstate reads/writes.  This seems
+> unnecessary at first glance because vmstate reads/writes are done
+> synchronously while the guest is stopped.  But we need the bdrv_wakeup(=
+)
+> in bdrv_dec_in_flight() so the main loop sees request completion.
+> Besides, it's cleaner to count vmstate reads/writes like ordinary
+> read/write requests.
+>=20
+> The bdrv_wakeup() partially fixes a 'savevm' hang with -object iothread=
+=2E
+>=20
+> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+> ---
+>  block/io.c | 17 ++++++++++++-----
+>  1 file changed, 12 insertions(+), 5 deletions(-)
+
+Reviewed-by: Eric Blake <eblake@redhat.com>
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
 
 
->      }
->  
->      /* We don't support postcopy with shared RAM yet */
-> -    if (qemu_ram_foreach_block(test_range_shared, NULL)) {
-> +    if (qemu_ram_foreach_block(test_ramblock_postcopiable, NULL)) {
+--7adxxepQW3Ow10hJx4arAFC10BjhLe71s
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-When I was looking at this code, I still don't know why
-qemu_ram_foreach_block() don't pass the block directly.  It needs it
-almost all callers.
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-When I saw it I was about to change it, but got sidetracked on other
-things :-p
+iQEcBAEBCAAGBQJZHK4PAAoJEKeha0olJ0NqC0oH/1DWOlRAb5/GQPyM0An+mBHb
+j1eAF0SdkW6dEyysrx55vqtFozS4vhTospSOHMdWtaXR0zoVn7RKFpDf/mrU5gOD
+u6fv2Pu2HQ/Wr6sIbtXnb2hfI49zy2pjU1ZAusIfCcg9fFMex6zYPrUMBNfWWM4f
+SYb09BpHjvJGLOY+I9CPXHVnndMkyJmTvuRngN3hjRl9uwXLlftpM4KFSgqIHpHM
++WyfiPMYfJaNlVnV5RCYduyOJCnY9g8dL4uULCG7SSdDcsAbgGe+FeUzZdUNVZsf
+1tuTnGKyrVR5vuherOs4xPwwy4IqgiNBWFXcqD3k7xnVipYe7d/vaaUgqfETCjU=
+=dW0y
+-----END PGP SIGNATURE-----
 
-Later, Juan.
+--7adxxepQW3Ow10hJx4arAFC10BjhLe71s--
