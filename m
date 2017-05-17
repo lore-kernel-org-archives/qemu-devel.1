@@ -1,21 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53556)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58226)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1dAxo7-0006Sd-BN
-	for qemu-devel@nongnu.org; Wed, 17 May 2017 08:12:00 -0400
+	(envelope-from <dmitry@daynix.com>) id 1dAxqu-0000r4-Px
+	for qemu-devel@nongnu.org; Wed, 17 May 2017 08:15:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1dAxo6-0004gP-Kg
-	for qemu-devel@nongnu.org; Wed, 17 May 2017 08:11:59 -0400
-Date: Wed, 17 May 2017 13:11:53 +0100
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20170517121153.GE8260@stefanha-x1.localdomain>
-References: <1494851980-6831-1-git-send-email-kwolf@redhat.com>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="y2zxS2PfCDLh6JVG"
-Content-Disposition: inline
-In-Reply-To: <1494851980-6831-1-git-send-email-kwolf@redhat.com>
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH] qemu-iotests: Test streaming
- with missing job ID
+	(envelope-from <dmitry@daynix.com>) id 1dAxqa-00073c-46
+	for qemu-devel@nongnu.org; Wed, 17 May 2017 08:14:52 -0400
+Received: from mail-wm0-x242.google.com ([2a00:1450:400c:c09::242]:36754)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <dmitry@daynix.com>) id 1dAxqZ-0006yL-HW
+	for qemu-devel@nongnu.org; Wed, 17 May 2017 08:14:31 -0400
+Received: by mail-wm0-x242.google.com with SMTP id k15so1750760wmh.3
+	for <qemu-devel@nongnu.org>; Wed, 17 May 2017 05:14:31 -0700 (PDT)
+From: Dmitry Fleytman <dmitry@daynix.com>
+Message-Id: <F260F33C-CF9A-4BBA-B19B-00DCFE598E86@daynix.com>
+Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
+Date: Wed, 17 May 2017 15:14:27 +0300
+In-Reply-To: <1495021572-20852-1-git-send-email-sameeh@daynix.com>
+References: <1495021572-20852-1-git-send-email-sameeh@daynix.com>
+Content-Type: text/plain;
+	charset=us-ascii
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] e1000e: Fix a bug where guest hangs upon
+ migration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,40 +30,109 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org
+To: Sameeh Jubran <sameeh@daynix.com>
+Cc: Qemu Developers <qemu-devel@nongnu.org>, Jason Wang <jasowang@redhat.com>, Yan Vugenfirer <yan@daynix.com>
 
 
---y2zxS2PfCDLh6JVG
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Mon, May 15, 2017 at 02:39:40PM +0200, Kevin Wolf wrote:
-> This adds a small test for the image streaming error path for failing
-> block_job_create(), which would have found the null pointer dereference
-> in commit a170a91f.
+> On 17 May 2017, at 14:46 PM, Sameeh Jubran <sameeh@daynix.com> wrote:
 >=20
-> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> The bug was caused by the "receive overrun" (bit #6 of the ICR =
+register) interrupt
+> which would be triggered post migration in a heavy traffic =
+environment. Even though the
+> "receive overrun" bit (#6) is masked out by the IMS register (refer to =
+the log below)
+> the driver still receives an interrupt as the "receive overrun" bit =
+(#6) causes the
+> "Other" - bit #24 of the ICR register - bit to be set as documented =
+below. The driver
+> handles the interrupt and clears the "Other" bit (#24) but doesn't =
+clear the
+> "receive overrun" bit (#6) which leads to an infinite loop. Apparently =
+the Windows
+> driver expects that the "receive overrun" bit and other ones - =
+documented below - to be
+> cleared when the "Other" bit (#24) is cleared.
+>=20
+> So to sum that up:
+> 1. Bit #6 of the ICR register is set by heavy traffic
+> 2. As a results of setting bit #6, bit #24 is set
+> 3. The driver receives an interrupt for bit 24 (it doesn't receieve an =
+interrupt for bit #6 as it is masked out by IMS)
+> 4. The driver handles and clears the interrupt of bit #24
+> 5. Bit #6 is still set.
+> 6. 2 happens all over again
+>=20
+> The Interrupt Cause Read - ICR register:
+>=20
+> The ICR has the "Other" bit - bit #24 - that is set when one or more =
+of the following
+> ICR register's bits are set:
+>=20
+> LSC - bit #2, RXO - bit #6, MDAC - bit #9, SRPD - bit #16, ACK - bit =
+#17, MNG - bit #18
+>=20
+> Log sample of the storm:
+>=20
+> 27563@1494850819.411877:e1000e_irq_pending_interrupts ICR PENDING: =
+0x1000000 (ICR: 0x815000c2, IMS: 0x1a00004)
+> 27563@1494850819.411900:e1000e_irq_pending_interrupts ICR PENDING: 0x0 =
+(ICR: 0x815000c2, IMS: 0xa00004)
+> 27563@1494850819.411915:e1000e_irq_pending_interrupts ICR PENDING: 0x0 =
+(ICR: 0x815000c2, IMS: 0xa00004)
+> 27563@1494850819.412380:e1000e_irq_pending_interrupts ICR PENDING: 0x0 =
+(ICR: 0x815000c2, IMS: 0xa00004)
+> 27563@1494850819.412395:e1000e_irq_pending_interrupts ICR PENDING: 0x0 =
+(ICR: 0x815000c2, IMS: 0xa00004)
+> 27563@1494850819.412436:e1000e_irq_pending_interrupts ICR PENDING: 0x0 =
+(ICR: 0x815000c2, IMS: 0xa00004)
+> 27563@1494850819.412441:e1000e_irq_pending_interrupts ICR PENDING: 0x0 =
+(ICR: 0x815000c2, IMS: 0xa00004)
+> 27563@1494850819.412998:e1000e_irq_pending_interrupts ICR PENDING: =
+0x1000000 (ICR: 0x815000c2, IMS: 0x1a00004)
+>=20
+> This commit solves:
+> https://bugzilla.redhat.com/show_bug.cgi?id=3D1447935
+> https://bugzilla.redhat.com/show_bug.cgi?id=3D1449490 =
+<https://bugzilla.redhat.com/show_bug.cgi?id=3D1449490>
+
+
+Reviewed-by: Dmitry Fleytman <dmitry@daynix.com>
+
+
+>=20
+> Signed-off-by: Sameeh Jubran <sjubran@redhat.com>
 > ---
->  tests/qemu-iotests/030     | 4 ++++
->  tests/qemu-iotests/030.out | 4 ++--
->  2 files changed, 6 insertions(+), 2 deletions(-)
-
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-
---y2zxS2PfCDLh6JVG
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJZHD4JAAoJEJykq7OBq3PIChIH/3MSwTIe/wX+2eG3goT81/5/
-zwd5J/qdmrlARGV+7eHosDLpvdUwE9JQjnTDNSpDKOfS0MLIAkW2x7SWMqVQmOa2
-1bWhRVANLycrvS0EF/shascy6ytY/bBkLlWC5Z1LHkMHHUl1VTwu95RjMo5qFeTH
-ggO1PwguMyx8iCeihl2GEtcK7LtkwdvIMg3xkYygUZsh4vEVvMgvCuVnMoaPNhnF
-y5sqrcfiaeuNmNqRG4cMe3QlZ5Q56cEpkbhlC6BrtU4cixZaeoWFcHMdo8D7+qMo
-fWJNZem+Srp8ewVrSZMmA9/PFqc3xiJxRQCBxcjZD+8/ZNXPQn3PWqHPKOvrwW4=
-=710b
------END PGP SIGNATURE-----
-
---y2zxS2PfCDLh6JVG--
+> hw/net/e1000e_core.c | 7 +++++--
+> 1 file changed, 5 insertions(+), 2 deletions(-)
+>=20
+> diff --git a/hw/net/e1000e_core.c b/hw/net/e1000e_core.c
+> index 28c5be1..8174b53 100644
+> --- a/hw/net/e1000e_core.c
+> +++ b/hw/net/e1000e_core.c
+> @@ -2454,14 +2454,17 @@ e1000e_set_ics(E1000ECore *core, int index, =
+uint32_t val)
+> static void
+> e1000e_set_icr(E1000ECore *core, int index, uint32_t val)
+> {
+> +    uint32_t icr =3D 0;
+>     if ((core->mac[ICR] & E1000_ICR_ASSERTED) &&
+>         (core->mac[CTRL_EXT] & E1000_CTRL_EXT_IAME)) {
+>         trace_e1000e_irq_icr_process_iame();
+>         e1000e_clear_ims_bits(core, core->mac[IAM]);
+>     }
+>=20
+> -    trace_e1000e_irq_icr_write(val, core->mac[ICR], core->mac[ICR] & =
+~val);
+> -    core->mac[ICR] &=3D ~val;
+> +    icr =3D core->mac[ICR] & ~val;
+> +    icr =3D (val & E1000_ICR_OTHER) ? (icr & ~E1000_ICR_OTHER_CAUSES) =
+: icr;
+> +    trace_e1000e_irq_icr_write(val, core->mac[ICR], icr);
+> +    core->mac[ICR] =3D icr;
+>     e1000e_update_interrupt_state(core);
+> }
+>=20
+> --=20
+> 2.8.1.185.gdc0db2c
+>=20
