@@ -1,30 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56735)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56763)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1dAuTO-0007CE-J4
-	for qemu-devel@nongnu.org; Wed, 17 May 2017 04:38:24 -0400
+	(envelope-from <kernellwp@gmail.com>) id 1dAuTX-0007E1-0K
+	for qemu-devel@nongnu.org; Wed, 17 May 2017 04:38:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1dAuTL-0002xA-Ab
-	for qemu-devel@nongnu.org; Wed, 17 May 2017 04:38:22 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47126)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1dAuTL-0002x3-1m
-	for qemu-devel@nongnu.org; Wed, 17 May 2017 04:38:19 -0400
-Date: Wed, 17 May 2017 16:38:02 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20170517083802.GB31206@pxdev.xzpeter.org>
-References: <1494838260-30439-1-git-send-email-peterx@redhat.com>
-	<9a93009b-f909-3142-5bc5-915b9a10ed20@redhat.com>
-	<f69dcf32-b6a2-fb59-2b54-61fd7b52e66e@redhat.com>
-	<20170517042342.GA9921@pxdev.xzpeter.org>
-	<20170517055756.GA31206@pxdev.xzpeter.org>
-	<19720c24-aa9a-50e6-2ea1-32ee86ae3591@redhat.com>
-	<70f733e3-9ade-ee36-0384-2bac8d3d9788@redhat.com>
+	(envelope-from <kernellwp@gmail.com>) id 1dAuTV-0002yE-Uc
+	for qemu-devel@nongnu.org; Wed, 17 May 2017 04:38:31 -0400
+Received: from mail-oi0-x242.google.com ([2607:f8b0:4003:c06::242]:35193)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <kernellwp@gmail.com>) id 1dAuTV-0002y9-O8
+	for qemu-devel@nongnu.org; Wed, 17 May 2017 04:38:29 -0400
+Received: by mail-oi0-x242.google.com with SMTP id m17so958565oik.2
+	for <qemu-devel@nongnu.org>; Wed, 17 May 2017 01:38:29 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <70f733e3-9ade-ee36-0384-2bac8d3d9788@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 0/4] exec: address space translation
- cleanups
+In-Reply-To: <1280755991.8446336.1495007019282.JavaMail.zimbra@redhat.com>
+References: <830bfc39-56c7-a901-9ebb-77d6e7a5614c@huawei.com>
+	<874lxeovrg.fsf@secure.mitica>
+	<7cd332ec-48d4-1feb-12e2-97b50b04e028@huawei.com>
+	<20170424164244.GJ2362@work-vm>
+	<B2D15215269B544CADD246097EACE747395AD759@dggeml511-mbx.china.huawei.com>
+	<85e3a0dd-20c8-8ff2-37ce-bfdf543e7787@redhat.com>
+	<CANRm+CzvNpLGqH5KuqqO7Wh7UabSkMBbxuTymbM0CZPgpQOwCg@mail.gmail.com>
+	<B2D15215269B544CADD246097EACE747395C283F@dggeml511-mbx.china.huawei.com>
+	<1280755991.8446336.1495007019282.JavaMail.zimbra@redhat.com>
+From: Wanpeng Li <kernellwp@gmail.com>
+Date: Wed, 17 May 2017 16:38:28 +0800
+Message-ID: <CANRm+CwbTaoxq35zyfNF1BP3d5GqRmtq0sY+aRKRaOsFwGB1Mw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] About QEMU BQL and dirty log switch in Migration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,86 +36,50 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Maxime Coquelin <maxime.coquelin@redhat.com>, qemu-devel@nongnu.org, Jason Wang <jasowang@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, David Gibson <david@gibson.dropbear.id.au>
+Cc: "Zhoujian (jay)" <jianjay.zhou@huawei.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, yanghongyang <yanghongyang@huawei.com>, Juan Quintela <quintela@redhat.com>, "wangxin (U)" <wangxinxin.wang@huawei.com>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, "Gonglei (Arei)" <arei.gonglei@huawei.com>, Huangzhichao <huangzhichao@huawei.com>, Zhanghailiang <zhang.zhanghailiang@huawei.com>, "Herongguang (Stephen)" <herongguang.he@huawei.com>, Xiao Guangrong <xiaoguangrong@tencent.com>, "Huangweidong (C)" <weidong.huang@huawei.com>
 
-On Wed, May 17, 2017 at 09:26:25AM +0200, Paolo Bonzini wrote:
-> 
-> 
-> On 17/05/2017 09:17, Maxime Coquelin wrote:
-> > 
-> > 
-> > On 05/17/2017 07:57 AM, Peter Xu wrote:
-> >> On Wed, May 17, 2017 at 12:23:42PM +0800, Peter Xu wrote:
-> >>> On Tue, May 16, 2017 at 06:51:03PM +0200, Maxime Coquelin wrote:
-> >>>> Hi Peter,
-> >>>>
-> >>>> On 05/16/2017 03:24 PM, Maxime Coquelin wrote:
-> >>>>>
-> >>>>>
-> >>>>> On 05/15/2017 10:50 AM, Peter Xu wrote:
-> >>>>>> The problem is that, address_space_get_iotlb_entry() shares a lot
-> >>>>>> with
-> >>>>>> address_space_translate(). This patch tries to abstract the
-> >>>>>> shared elements.
-> >>>>>>
-> >>>>>> Originally, this work is derived from discussion from VT-d
-> >>>>>> passthrough
-> >>>>>> series discussions [1]. But for sure we can just see this series as a
-> >>>>>> standalone cleanup. So I posted it separately here.
-> >>>>>>
-> >>>>>> Smoke tests are done with general VM boots, IOs, especially with
-> >>>>>> vhost
-> >>>>>> dmar configurations.
-> >>>>>>
-> >>>>>> I believe with current series I can throw away the old patch [1],
-> >>>>>> which may be good. But before that, please kindly review. Thanks.
-> >>>>>
-> >>>>> I faced the problem the old patch fixes when declaring and
-> >>>>> attaching an
-> >>>>> IOMMU device, but booting the kernel with intel_iommu=off.
-> >>>>>
-> >>>>> I tested again with patches 1 & 4 of your series, and I confirm it
-> >>>>> fixes
-> >>>>> the issue:
-> >>>>> Tested-by: Maxime Coquelin <maxime.coquelin@redhat.com>
-> >>>>
-> >>>> I did some more testing with my "vhost-user IOMMU" setup, and the
-> >>>> series
-> >>>> actually breaks with IOMMU device attached, and intel_iommu=on.
-> >>>>
-> >>>> The main difference with the previous passing test is the guest RAM
-> >>>> size. In the working setup, it is 2G of 2M hugepages, vs. 4G of 2M
-> >>>> hugepages in the failing one. Note that I also reproduce with
-> >>>> vhost-kernel
-> >>>> backend.
-> >>>>
-> >>>> The error happens in the first vhost_device_iotlb_miss() call:
-> >>>> qemu-system-x86_64: Fail to lookup the translated address b5d7c000
-> >>>>
-> >>>> I don't have the root cause yet, I'll keep you updated.
-> >>>
-> >>> Maxime,
-> >>>
-> >>> Thanks a lot for help testing this series!
-> >>>
-> >>> I reproduced this problem, and this is not a problem obvious enough
-> >>> for me. Let me investigate as well.
-> >>>
-> >>> -- 
-> >>> Peter Xu
-> >>
-> >> Maxime,
-> >>
-> >> Could you help try adding this change upon current to see whether
-> >> problem solved?
-> > 
-> > Hi Peter,
-> > 
-> > Yes, problem is solved with below change.
-> 
-> Cool---Peter, please send the new patch 4 as toplevel message!
+2017-05-17 15:43 GMT+08:00 Paolo Bonzini <pbonzini@redhat.com>:
+>> Recently, I have tested the performance before migration and after migration failure
+>> using spec cpu2006 https://www.spec.org/cpu2006/, which is a standard performance
+>> evaluation tool.
+>>
+>> These are the steps:
+>> ======
+>>  (1) the version of kmod is 4.4.11(with slightly modified) and the version of
+>>  qemu is 2.6.0
+>>     (with slightly modified), the kmod is applied with the following patch
+>>
+>> diff --git a/source/x86/x86.c b/source/x86/x86.c
+>> index 054a7d3..75a4bb3 100644
+>> --- a/source/x86/x86.c
+>> +++ b/source/x86/x86.c
+>> @@ -8550,8 +8550,10 @@ void kvm_arch_commit_memory_region(struct kvm *kvm,
+>>          */
+>>         if ((change != KVM_MR_DELETE) &&
+>>                 (old->flags & KVM_MEM_LOG_DIRTY_PAGES) &&
+>> -               !(new->flags & KVM_MEM_LOG_DIRTY_PAGES))
+>> -               kvm_mmu_zap_collapsible_sptes(kvm, new);
+>> +               !(new->flags & KVM_MEM_LOG_DIRTY_PAGES)) {
+>> +               printk(KERN_ERR "zj make KVM_REQ_MMU_RELOAD request\n");
+>> +               kvm_make_all_cpus_request(kvm, KVM_REQ_MMU_RELOAD);
+>> +       }
+>>
+>>         /*
+>>          * Set up write protection and/or dirty logging for the new slot.
+>
+> Try these modifications to the setup:
+>
+> 1) set up 1G hugetlbfs hugepages and use those for the guest's memory
+>
+> 2) test both without and with the above patch.
+>
 
-Will do. Thanks!
+In addition, we can compare /sys/kernel/debug/kvm/largepages w/ and
+w/o the patch. IIRC, /sys/kernel/debug/kvm/largepages will drop during
+live migration, it will keep a small value if live migration fails and
+w/o "lazy collapse small sptes into large sptes" codes, however, it
+will increase gradually if w/ the "lazy collapse small sptes into
+large sptes" codes.
 
--- 
-Peter Xu
+Regards,
+Wanpeng Li
