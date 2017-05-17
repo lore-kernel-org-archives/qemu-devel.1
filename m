@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50702)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50772)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1dB0J8-0001iz-Jn
-	for qemu-devel@nongnu.org; Wed, 17 May 2017 10:52:12 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1dB0JA-0001nb-Qe
+	for qemu-devel@nongnu.org; Wed, 17 May 2017 10:52:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1dB0J5-0004eh-QH
-	for qemu-devel@nongnu.org; Wed, 17 May 2017 10:52:10 -0400
-Received: from mail-wr0-x22d.google.com ([2a00:1450:400c:c0c::22d]:33945)
+	(envelope-from <alex.bennee@linaro.org>) id 1dB0J9-0004gL-8V
+	for qemu-devel@nongnu.org; Wed, 17 May 2017 10:52:12 -0400
+Received: from mail-wm0-x22e.google.com ([2a00:1450:400c:c09::22e]:36130)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1dB0J5-0004eI-Gy
-	for qemu-devel@nongnu.org; Wed, 17 May 2017 10:52:07 -0400
-Received: by mail-wr0-x22d.google.com with SMTP id l9so12460518wre.1
-	for <qemu-devel@nongnu.org>; Wed, 17 May 2017 07:52:07 -0700 (PDT)
+	id 1dB0J9-0004fZ-0P
+	for qemu-devel@nongnu.org; Wed, 17 May 2017 10:52:11 -0400
+Received: by mail-wm0-x22e.google.com with SMTP id 70so13262455wmq.1
+	for <qemu-devel@nongnu.org>; Wed, 17 May 2017 07:52:10 -0700 (PDT)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Wed, 17 May 2017 15:52:54 +0100
-Message-Id: <20170517145259.28979-2-alex.bennee@linaro.org>
+Date: Wed, 17 May 2017 15:52:58 +0100
+Message-Id: <20170517145259.28979-6-alex.bennee@linaro.org>
 In-Reply-To: <20170517145259.28979-1-alex.bennee@linaro.org>
 References: <20170517145259.28979-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v2 1/6] scripts/replay-dump.py: replay log
- dumper
+Subject: [Qemu-devel] [PATCH v2 5/6] cputlb: add trace events
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,299 +30,227 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: pbonzini@redhat.com, stefanha@redhat.com
-Cc: cota@braap.org, qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Cc: cota@braap.org, qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Richard Henderson <rth@twiddle.net>
 
-This script is a debugging tool for looking through the contents of a
-replay log file. It is incomplete but should fail gracefully at events
-it doesn't understand.
+Given the range of costs for various SoftMMU TLB operations from
+deferring work for the currently running vCPU to bring the whole
+emulated machine to a stop for synchronised updates simple counters
+are less useful. Instead we log events via the trace infrastructure
+and we can then post-process the data in a range of ways.
 
-It currently understands two different log formats as the audio
-record/replay support was merged during since MTTCG. It was written to
-help debug what has caused the BQL changes to break replay support.
+  tlb_flush_self - the vCPU flushed its own TLB
+  tlb_flush_async_schedule - work was scheduled and the vCPU kicked
+  tlb_flush_synced_schedule - exclusive work was scheduled on a vCPU
+  tlb_flush_work - scheduled work was done
+
+We can use the difference between the work being scheduled and
+tlb_flush_work to calculate the latency introduced.
 
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 ---
- scripts/replay-dump.py | 272 +++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 272 insertions(+)
- create mode 100755 scripts/replay-dump.py
+ cputlb.c     | 34 +++++++++++++++++++++++++++++++++-
+ trace-events |  7 +++++++
+ 2 files changed, 40 insertions(+), 1 deletion(-)
 
-diff --git a/scripts/replay-dump.py b/scripts/replay-dump.py
-new file mode 100755
-index 0000000000..fdd178aba0
---- /dev/null
-+++ b/scripts/replay-dump.py
-@@ -0,0 +1,272 @@
-+#!/usr/bin/env python
-+# -*- coding: utf-8 -*-
-+#
-+# Dump the contents of a recorded execution stream
-+#
-+#  Copyright (c) 2017 Alex Bennée <alex.bennee@linaro.org>
-+#
-+# This library is free software; you can redistribute it and/or
-+# modify it under the terms of the GNU Lesser General Public
-+# License as published by the Free Software Foundation; either
-+# version 2 of the License, or (at your option) any later version.
-+#
-+# This library is distributed in the hope that it will be useful,
-+# but WITHOUT ANY WARRANTY; without even the implied warranty of
-+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+# Lesser General Public License for more details.
-+#
-+# You should have received a copy of the GNU Lesser General Public
-+# License along with this library; if not, see <http://www.gnu.org/licenses/>.
+diff --git a/cputlb.c b/cputlb.c
+index d1859c3f37..b2490863e4 100644
+--- a/cputlb.c
++++ b/cputlb.c
+@@ -127,6 +127,7 @@ static void tlb_flush_nocheck(CPUState *cpu)
+ 
+ static void tlb_flush_global_async_work(CPUState *cpu, run_on_cpu_data data)
+ {
++    trace_tlb_flush_work(__func__, cpu->cpu_index);
+     tlb_flush_nocheck(cpu);
+ }
+ 
+@@ -135,17 +136,22 @@ void tlb_flush(CPUState *cpu)
+     if (cpu->created && !qemu_cpu_is_self(cpu)) {
+         if (atomic_mb_read(&cpu->pending_tlb_flush) != ALL_MMUIDX_BITS) {
+             atomic_mb_set(&cpu->pending_tlb_flush, ALL_MMUIDX_BITS);
++            trace_tlb_flush_async_schedule(__func__, current_cpu ?
++                                           current_cpu->cpu_index :
++                                           cpu->cpu_index, cpu->cpu_index);
+             async_run_on_cpu(cpu, tlb_flush_global_async_work,
+                              RUN_ON_CPU_NULL);
+         }
+     } else {
+-        tlb_flush_nocheck(cpu);
++        trace_tlb_flush_self(__func__, cpu->cpu_index);
++        tlb_flush_global_async_work(cpu, RUN_ON_CPU_NULL);
+     }
+ }
+ 
+ void tlb_flush_all_cpus(CPUState *src_cpu)
+ {
+     const run_on_cpu_func fn = tlb_flush_global_async_work;
++    trace_tlb_flush_async_schedule(__func__, src_cpu->cpu_index, -1);
+     flush_all_helper(src_cpu, fn, RUN_ON_CPU_NULL);
+     fn(src_cpu, RUN_ON_CPU_NULL);
+ }
+@@ -153,6 +159,7 @@ void tlb_flush_all_cpus(CPUState *src_cpu)
+ void tlb_flush_all_cpus_synced(CPUState *src_cpu)
+ {
+     const run_on_cpu_func fn = tlb_flush_global_async_work;
++    trace_tlb_flush_synced_schedule(__func__, src_cpu->cpu_index, -1);
+     flush_all_helper(src_cpu, fn, RUN_ON_CPU_NULL);
+     async_safe_run_on_cpu(src_cpu, fn, RUN_ON_CPU_NULL);
+ }
+@@ -163,6 +170,8 @@ static void tlb_flush_by_mmuidx_async_work(CPUState *cpu, run_on_cpu_data data)
+     unsigned long mmu_idx_bitmask = data.host_int;
+     int mmu_idx;
+ 
++    trace_tlb_flush_work(__func__, cpu->cpu_index);
 +
-+import argparse
-+import struct
-+from collections import namedtuple
+     assert_cpu_is_self(cpu);
+ 
+     tb_lock();
+@@ -196,12 +205,16 @@ void tlb_flush_by_mmuidx(CPUState *cpu, uint16_t idxmap)
+ 
+         if (pending_flushes) {
+             tlb_debug("reduced mmu_idx: 0x%" PRIx16 "\n", pending_flushes);
++            trace_tlb_flush_async_schedule(__func__,
++                                           current_cpu->cpu_index,
++                                           cpu->cpu_index);
+ 
+             atomic_or(&cpu->pending_tlb_flush, pending_flushes);
+             async_run_on_cpu(cpu, tlb_flush_by_mmuidx_async_work,
+                              RUN_ON_CPU_HOST_INT(pending_flushes));
+         }
+     } else {
++        trace_tlb_flush_self(__func__, cpu->cpu_index);
+         tlb_flush_by_mmuidx_async_work(cpu,
+                                        RUN_ON_CPU_HOST_INT(idxmap));
+     }
+@@ -212,6 +225,7 @@ void tlb_flush_by_mmuidx_all_cpus(CPUState *src_cpu, uint16_t idxmap)
+     const run_on_cpu_func fn = tlb_flush_by_mmuidx_async_work;
+ 
+     tlb_debug("mmu_idx: 0x%"PRIx16"\n", idxmap);
++    trace_tlb_flush_async_schedule(__func__, src_cpu->cpu_index, -1);
+ 
+     flush_all_helper(src_cpu, fn, RUN_ON_CPU_HOST_INT(idxmap));
+     fn(src_cpu, RUN_ON_CPU_HOST_INT(idxmap));
+@@ -223,6 +237,7 @@ void tlb_flush_by_mmuidx_all_cpus_synced(CPUState *src_cpu,
+     const run_on_cpu_func fn = tlb_flush_by_mmuidx_async_work;
+ 
+     tlb_debug("mmu_idx: 0x%"PRIx16"\n", idxmap);
++    trace_tlb_flush_synced_schedule(__func__, src_cpu->cpu_index, -1);
+ 
+     flush_all_helper(src_cpu, fn, RUN_ON_CPU_HOST_INT(idxmap));
+     async_safe_run_on_cpu(src_cpu, fn, RUN_ON_CPU_HOST_INT(idxmap));
+@@ -252,6 +267,7 @@ static void tlb_flush_page_async_work(CPUState *cpu, run_on_cpu_data data)
+     assert_cpu_is_self(cpu);
+ 
+     tlb_debug("page :" TARGET_FMT_lx "\n", addr);
++    trace_tlb_flush_work(__func__, cpu->cpu_index);
+ 
+     /* Check if we need to flush due to large pages.  */
+     if ((addr & env->tlb_flush_mask) == env->tlb_flush_addr) {
+@@ -285,9 +301,12 @@ void tlb_flush_page(CPUState *cpu, target_ulong addr)
+     tlb_debug("page :" TARGET_FMT_lx "\n", addr);
+ 
+     if (!qemu_cpu_is_self(cpu)) {
++        trace_tlb_flush_async_schedule(__func__, current_cpu->cpu_index,
++                                       cpu->cpu_index);
+         async_run_on_cpu(cpu, tlb_flush_page_async_work,
+                          RUN_ON_CPU_TARGET_PTR(addr));
+     } else {
++        trace_tlb_flush_self(__func__, cpu->cpu_index);
+         tlb_flush_page_async_work(cpu, RUN_ON_CPU_TARGET_PTR(addr));
+     }
+ }
+@@ -312,6 +331,7 @@ static void tlb_flush_page_by_mmuidx_async_work(CPUState *cpu,
+ 
+     tlb_debug("page:%d addr:"TARGET_FMT_lx" mmu_idx:0x%lx\n",
+               page, addr, mmu_idx_bitmap);
++    trace_tlb_flush_work(__func__, cpu->cpu_index);
+ 
+     for (mmu_idx = 0; mmu_idx < NB_MMU_MODES; mmu_idx++) {
+         if (test_bit(mmu_idx, &mmu_idx_bitmap)) {
+@@ -336,6 +356,7 @@ static void tlb_check_page_and_flush_by_mmuidx_async_work(CPUState *cpu,
+     unsigned long mmu_idx_bitmap = addr_and_mmuidx & ALL_MMUIDX_BITS;
+ 
+     tlb_debug("addr:"TARGET_FMT_lx" mmu_idx: %04lx\n", addr, mmu_idx_bitmap);
++    trace_tlb_flush_work(__func__, cpu->cpu_index);
+ 
+     /* Check if we need to flush due to large pages.  */
+     if ((addr & env->tlb_flush_mask) == env->tlb_flush_addr) {
+@@ -343,9 +364,11 @@ static void tlb_check_page_and_flush_by_mmuidx_async_work(CPUState *cpu,
+                   TARGET_FMT_lx "/" TARGET_FMT_lx ")\n",
+                   env->tlb_flush_addr, env->tlb_flush_mask);
+ 
++        trace_tlb_flush_self(__func__, cpu->cpu_index);
+         tlb_flush_by_mmuidx_async_work(cpu,
+                                        RUN_ON_CPU_HOST_INT(mmu_idx_bitmap));
+     } else {
++        trace_tlb_flush_self(__func__, cpu->cpu_index);
+         tlb_flush_page_by_mmuidx_async_work(cpu, data);
+     }
+ }
+@@ -361,9 +384,12 @@ void tlb_flush_page_by_mmuidx(CPUState *cpu, target_ulong addr, uint16_t idxmap)
+     addr_and_mmu_idx |= idxmap;
+ 
+     if (!qemu_cpu_is_self(cpu)) {
++        trace_tlb_flush_async_schedule(__func__, current_cpu->cpu_index,
++                                       cpu->cpu_index);
+         async_run_on_cpu(cpu, tlb_check_page_and_flush_by_mmuidx_async_work,
+                          RUN_ON_CPU_TARGET_PTR(addr_and_mmu_idx));
+     } else {
++        trace_tlb_flush_self(__func__, cpu->cpu_index);
+         tlb_check_page_and_flush_by_mmuidx_async_work(
+             cpu, RUN_ON_CPU_TARGET_PTR(addr_and_mmu_idx));
+     }
+@@ -376,6 +402,7 @@ void tlb_flush_page_by_mmuidx_all_cpus(CPUState *src_cpu, target_ulong addr,
+     target_ulong addr_and_mmu_idx;
+ 
+     tlb_debug("addr: "TARGET_FMT_lx" mmu_idx:%"PRIx16"\n", addr, idxmap);
++    trace_tlb_flush_async_schedule(__func__, src_cpu->cpu_index, -1);
+ 
+     /* This should already be page aligned */
+     addr_and_mmu_idx = addr & TARGET_PAGE_MASK;
+@@ -393,6 +420,7 @@ void tlb_flush_page_by_mmuidx_all_cpus_synced(CPUState *src_cpu,
+     target_ulong addr_and_mmu_idx;
+ 
+     tlb_debug("addr: "TARGET_FMT_lx" mmu_idx:%"PRIx16"\n", addr, idxmap);
++    trace_tlb_flush_synced_schedule(__func__, src_cpu->cpu_index, -1);
+ 
+     /* This should already be page aligned */
+     addr_and_mmu_idx = addr & TARGET_PAGE_MASK;
+@@ -406,6 +434,8 @@ void tlb_flush_page_all_cpus(CPUState *src, target_ulong addr)
+ {
+     const run_on_cpu_func fn = tlb_flush_page_async_work;
+ 
++    trace_tlb_flush_async_schedule(__func__, src->cpu_index, -1);
 +
-+# This mirrors some of the global replay state which some of the
-+# stream loading refers to. Some decoders may read the next event so
-+# we need handle that case. Calling reuse_event will ensure the next
-+# event is read from the cache rather than advancing the file.
+     flush_all_helper(src, fn, RUN_ON_CPU_TARGET_PTR(addr));
+     fn(src, RUN_ON_CPU_TARGET_PTR(addr));
+ }
+@@ -415,6 +445,8 @@ void tlb_flush_page_all_cpus_synced(CPUState *src,
+ {
+     const run_on_cpu_func fn = tlb_flush_page_async_work;
+ 
++    trace_tlb_flush_synced_schedule(__func__, src->cpu_index, -1);
 +
-+class ReplayState(object):
-+    def __init__(self):
-+        self.event = -1
-+        self.event_count = 0
-+        self.already_read = False
-+        self.current_checkpoint = 0
-+        self.checkpoint = 0
+     flush_all_helper(src, fn, RUN_ON_CPU_TARGET_PTR(addr));
+     async_safe_run_on_cpu(src, fn, RUN_ON_CPU_TARGET_PTR(addr));
+ }
+diff --git a/trace-events b/trace-events
+index e582d6315d..500f84b8c4 100644
+--- a/trace-events
++++ b/trace-events
+@@ -78,6 +78,13 @@ disable exec_tb(void *tb, uintptr_t pc) "tb:%p pc=0x%"PRIxPTR
+ disable exec_tb_nocache(void *tb, uintptr_t pc) "tb:%p pc=0x%"PRIxPTR
+ disable exec_tb_exit(void *last_tb, unsigned int flags) "tb:%p flags=%x"
+ 
++# SoftMMU TLB flushes
++#   - setting to=-1 indicates work scheduled on all vCPUs
++tlb_flush_self(const char *fn, int vcpu) "%s: cpu %d"
++tlb_flush_async_schedule(const char *fn, int from, int to) "%s: from_cpu=%d to_cpu=%d"
++tlb_flush_synced_schedule(const char *fn, int from, int to) "%s: from_cpu=%d to_cpu=%d"
++tlb_flush_work(const char *fn, int vcpu) "%s: cpu %d"
 +
-+    def set_event(self, ev):
-+        self.event = ev
-+        self.event_count += 1
-+
-+    def get_event(self):
-+        self.already_read = False
-+        return self.event
-+
-+    def reuse_event(self, ev):
-+        self.event = ev
-+        self.already_read = True
-+
-+    def set_checkpoint(self):
-+        self.checkpoint = self.event - self.checkpoint_start
-+
-+    def get_checkpoint(self):
-+        return self.checkpoint
-+
-+replay_state = ReplayState()
-+
-+# Simple read functions that mirror replay-internal.c
-+# The file-stream is big-endian and manually written out a byte at a time.
-+
-+def read_byte(fin):
-+    "Read a single byte"
-+    return struct.unpack('>B', fin.read(1))[0]
-+
-+def read_event(fin):
-+    "Read a single byte event, but save some state"
-+    if replay_state.already_read:
-+        return replay_state.get_event()
-+    else:
-+        replay_state.set_event(read_byte(fin))
-+        return replay_state.event
-+
-+def read_word(fin):
-+    "Read a 16 bit word"
-+    return struct.unpack('>H', fin.read(2))[0]
-+
-+def read_dword(fin):
-+    "Read a 32 bit word"
-+    return struct.unpack('>I', fin.read(4))[0]
-+
-+def read_qword(fin):
-+    "Read a 64 bit word"
-+    return struct.unpack('>Q', fin.read(8))[0]
-+
-+# Generic decoder structure
-+Decoder = namedtuple("Decoder", "eid name fn")
-+
-+def call_decode(table, index, dumpfile):
-+    "Search decode table for next step"
-+    decoder = next((d for d in table if d.eid == index), None)
-+    if not decoder:
-+        print "Could not decode index: %d" % (index)
-+        print "Entry is: %s" % (decoder)
-+        print "Decode Table is:\n%s" % (table)
-+        return False
-+    else:
-+        return decoder.fn(decoder.eid, decoder.name, dumpfile)
-+
-+# Print event
-+def print_event(eid, name, string=None, event_count=None):
-+    "Print event with count"
-+    if not event_count:
-+        event_count = replay_state.event_count
-+
-+    if string:
-+        print "%d:%s(%d) %s" % (event_count, name, eid, string)
-+    else:
-+        print "%d:%s(%d)" % (event_count, name, eid)
-+
-+
-+# Decoders for each event type
-+
-+def decode_unimp(eid, name, _unused_dumpfile):
-+    "Unimplimented decoder, will trigger exit"
-+    print "%s not handled - will now stop" % (name)
-+    return False
-+
-+# Checkpoint decoder
-+def swallow_async_qword(eid, name, dumpfile):
-+    "Swallow a qword of data without looking at it"
-+    step_id = read_qword(dumpfile)
-+    print "  %s(%d) @ %d" % (name, eid, step_id)
-+    return True
-+
-+async_decode_table = [ Decoder(0, "REPLAY_ASYNC_EVENT_BH", swallow_async_qword),
-+                       Decoder(1, "REPLAY_ASYNC_INPUT", decode_unimp),
-+                       Decoder(2, "REPLAY_ASYNC_INPUT_SYNC", decode_unimp),
-+                       Decoder(3, "REPLAY_ASYNC_CHAR_READ", decode_unimp),
-+                       Decoder(4, "REPLAY_ASYNC_EVENT_BLOCK", decode_unimp),
-+                       Decoder(5, "REPLAY_ASYNC_EVENT_NET", decode_unimp),
-+]
-+# See replay_read_events/replay_read_event
-+def decode_async(eid, name, dumpfile):
-+    """Decode an ASYNC event"""
-+
-+    print_event(eid, name)
-+
-+    async_event_kind = read_byte(dumpfile)
-+    async_event_checkpoint = read_byte(dumpfile)
-+
-+    if async_event_checkpoint != replay_state.current_checkpoint:
-+        print "  mismatch between checkpoint %d and async data %d" % (
-+            replay_state.current_checkpoint, async_event_checkpoint)
-+        return True
-+
-+    return call_decode(async_decode_table, async_event_kind, dumpfile)
-+
-+
-+def decode_instruction(eid, name, dumpfile):
-+    ins_diff = read_dword(dumpfile)
-+    print_event(eid, name, "0x%x" % (ins_diff))
-+    return True
-+
-+def decode_audio_out(eid, name, dumpfile):
-+    audio_data = read_dword(dumpfile)
-+    print_event(eid, name, "%d" % (audio_data))
-+    return True
-+
-+def decode_checkpoint(eid, name, dumpfile):
-+    """Decode a checkpoint.
-+
-+    Checkpoints contain a series of async events with their own specific data.
-+    """
-+    replay_state.set_checkpoint()
-+    # save event count as we peek ahead
-+    event_number = replay_state.event_count
-+    next_event = read_event(dumpfile)
-+
-+    # if the next event is EVENT_ASYNC there are a bunch of
-+    # async events to read, otherwise we are done
-+    if next_event != 3:
-+        print_event(eid, name, "no additional data", event_number)
-+    else:
-+        print_event(eid, name, "more data follows", event_number)
-+
-+    replay_state.reuse_event(next_event)
-+    return True
-+
-+def decode_checkpoint_init(eid, name, dumpfile):
-+    print_event(eid, name)
-+    return True
-+
-+def decode_interrupt(eid, name, dumpfile):
-+    print_event(eid, name)
-+    return True
-+
-+def decode_clock(eid, name, dumpfile):
-+    clock_data = read_qword(dumpfile)
-+    print_event(eid, name, "0x%x" % (clock_data))
-+    return True
-+
-+
-+# pre-MTTCG merge
-+v5_event_table = [Decoder(0, "EVENT_INSTRUCTION", decode_instruction),
-+                  Decoder(1, "EVENT_INTERRUPT", decode_interrupt),
-+                  Decoder(2, "EVENT_EXCEPTION", decode_unimp),
-+                  Decoder(3, "EVENT_ASYNC", decode_async),
-+                  Decoder(4, "EVENT_SHUTDOWN", decode_unimp),
-+                  Decoder(5, "EVENT_CHAR_WRITE", decode_unimp),
-+                  Decoder(6, "EVENT_CHAR_READ_ALL", decode_unimp),
-+                  Decoder(7, "EVENT_CHAR_READ_ALL_ERROR", decode_unimp),
-+                  Decoder(8, "EVENT_CLOCK_HOST", decode_clock),
-+                  Decoder(9, "EVENT_CLOCK_VIRTUAL_RT", decode_clock),
-+                  Decoder(10, "EVENT_CP_CLOCK_WARP_START", decode_checkpoint),
-+                  Decoder(11, "EVENT_CP_CLOCK_WARP_ACCOUNT", decode_checkpoint),
-+                  Decoder(12, "EVENT_CP_RESET_REQUESTED", decode_checkpoint),
-+                  Decoder(13, "EVENT_CP_SUSPEND_REQUESTED", decode_checkpoint),
-+                  Decoder(14, "EVENT_CP_CLOCK_VIRTUAL", decode_checkpoint),
-+                  Decoder(15, "EVENT_CP_CLOCK_HOST", decode_checkpoint),
-+                  Decoder(16, "EVENT_CP_CLOCK_VIRTUAL_RT", decode_checkpoint),
-+                  Decoder(17, "EVENT_CP_INIT", decode_checkpoint_init),
-+                  Decoder(18, "EVENT_CP_RESET", decode_checkpoint),
-+]
-+
-+# post-MTTCG merge, AUDIO support added
-+v6_event_table = [Decoder(0, "EVENT_INSTRUCTION", decode_instruction),
-+                  Decoder(1, "EVENT_INTERRUPT", decode_interrupt),
-+                  Decoder(2, "EVENT_EXCEPTION", decode_unimp),
-+                  Decoder(3, "EVENT_ASYNC", decode_async),
-+                  Decoder(4, "EVENT_SHUTDOWN", decode_unimp),
-+                  Decoder(5, "EVENT_CHAR_WRITE", decode_unimp),
-+                  Decoder(6, "EVENT_CHAR_READ_ALL", decode_unimp),
-+                  Decoder(7, "EVENT_CHAR_READ_ALL_ERROR", decode_unimp),
-+                  Decoder(8, "EVENT_AUDIO_OUT", decode_audio_out),
-+                  Decoder(9, "EVENT_AUDIO_IN", decode_unimp),
-+                  Decoder(10, "EVENT_CLOCK_HOST", decode_clock),
-+                  Decoder(11, "EVENT_CLOCK_VIRTUAL_RT", decode_clock),
-+                  Decoder(12, "EVENT_CP_CLOCK_WARP_START", decode_checkpoint),
-+                  Decoder(13, "EVENT_CP_CLOCK_WARP_ACCOUNT", decode_checkpoint),
-+                  Decoder(14, "EVENT_CP_RESET_REQUESTED", decode_checkpoint),
-+                  Decoder(15, "EVENT_CP_SUSPEND_REQUESTED", decode_checkpoint),
-+                  Decoder(16, "EVENT_CP_CLOCK_VIRTUAL", decode_checkpoint),
-+                  Decoder(17, "EVENT_CP_CLOCK_HOST", decode_checkpoint),
-+                  Decoder(18, "EVENT_CP_CLOCK_VIRTUAL_RT", decode_checkpoint),
-+                  Decoder(19, "EVENT_CP_INIT", decode_checkpoint_init),
-+                  Decoder(20, "EVENT_CP_RESET", decode_checkpoint),
-+]
-+
-+def parse_arguments():
-+    "Grab arguments for script"
-+    parser = argparse.ArgumentParser()
-+    parser.add_argument("-f", "--file", help='record/replay dump to read from',
-+                        required=True)
-+    return parser.parse_args()
-+
-+def decode_file(filename):
-+    "Decode a record/replay dump"
-+    dumpfile = open(filename, "rb")
-+
-+    # read and throwaway the header
-+    version = read_dword(dumpfile)
-+    junk = read_qword(dumpfile)
-+
-+    print "HEADER: version 0x%x" % (version)
-+    if version == 0xe02006:
-+        event_decode_table = v6_event_table
-+        replay_state.checkpoint_start = 12
-+    else:
-+        event_decode_table = v5_event_table
-+        replay_state.checkpoint_start = 10
-+
-+    try:
-+        decode_ok = True
-+        while decode_ok:
-+            event = read_event(dumpfile)
-+            decode_ok = call_decode(event_decode_table, event, dumpfile)
-+    finally:
-+        dumpfile.close()
-+
-+if __name__ == "__main__":
-+    args = parse_arguments()
-+    decode_file(args.file)
+ # translate-all.c
+ translate_block(void *tb, uintptr_t pc, uint8_t *tb_code) "tb:%p, pc:0x%"PRIxPTR", tb_code:%p"
+ 
 -- 
 2.11.0
