@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36680)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36703)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1dAwuC-0002Mx-S6
-	for qemu-devel@nongnu.org; Wed, 17 May 2017 07:14:16 -0400
+	(envelope-from <quintela@redhat.com>) id 1dAwuG-0002QH-De
+	for qemu-devel@nongnu.org; Wed, 17 May 2017 07:14:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1dAwuB-0002FB-J0
-	for qemu-devel@nongnu.org; Wed, 17 May 2017 07:14:12 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:48122)
+	(envelope-from <quintela@redhat.com>) id 1dAwuF-0002Ii-3k
+	for qemu-devel@nongnu.org; Wed, 17 May 2017 07:14:16 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54502)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1dAwuB-0002Ei-9i
-	for qemu-devel@nongnu.org; Wed, 17 May 2017 07:14:11 -0400
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1dAwuE-0002Hu-R3
+	for qemu-devel@nongnu.org; Wed, 17 May 2017 07:14:15 -0400
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
 	[10.5.11.15])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 5268FC0B39C4
-	for <qemu-devel@nongnu.org>; Wed, 17 May 2017 11:14:10 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id BEC76CED7
+	for <qemu-devel@nongnu.org>; Wed, 17 May 2017 11:14:08 +0000 (UTC)
 From: Juan Quintela <quintela@redhat.com>
-Date: Wed, 17 May 2017 13:13:46 +0200
-Message-Id: <20170517111346.21450-8-quintela@redhat.com>
+Date: Wed, 17 May 2017 13:13:45 +0200
+Message-Id: <20170517111346.21450-7-quintela@redhat.com>
 In-Reply-To: <20170517111346.21450-1-quintela@redhat.com>
 References: <20170517111346.21450-1-quintela@redhat.com>
-Subject: [Qemu-devel] [PULL 7/7] migration: Move check_migratable() into
- qdev.c
+Subject: [Qemu-devel] [PULL 6/7] migration: Move postcopy stuff to
+ postcopy-ram.c
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,194 +33,159 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: dgilbert@redhat.com, lvivier@redhat.com, peterx@redhat.com
 
-The function is only used once, and nothing else in migration knows
-about objects.  Create the function vmstate_device_is_migratable() in
-savem.c that really do the bit that is related with migration.
+Yes, we don't have a good place to put that stuff.
 
 Signed-off-by: Juan Quintela <quintela@redhat.com>
-Reviewed-by: Peter Xu <peterx@redhat.com>
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 ---
- hw/core/qdev.c                | 20 ++++++++++++++++----
- include/migration/migration.h |  6 ------
- include/migration/vmstate.h   |  2 ++
- include/sysemu/sysemu.h       |  2 +-
- migration/migration.c         | 15 ---------------
- migration/savevm.c            | 10 ++++++++++
- stubs/vmstate.c               |  5 ++---
- 7 files changed, 31 insertions(+), 29 deletions(-)
+ include/migration/migration.h | 26 --------------------------
+ migration/migration.c         | 18 ------------------
+ migration/postcopy-ram.c      | 18 ++++++++++++++++++
+ migration/postcopy-ram.h      | 26 ++++++++++++++++++++++++++
+ 4 files changed, 44 insertions(+), 44 deletions(-)
 
-diff --git a/hw/core/qdev.c b/hw/core/qdev.c
-index 02b632f..6f1b070 100644
---- a/hw/core/qdev.c
-+++ b/hw/core/qdev.c
-@@ -37,7 +37,7 @@
- #include "hw/boards.h"
- #include "hw/sysbus.h"
- #include "qapi-event.h"
--#include "migration/migration.h"
-+#include "migration/vmstate.h"
- 
- bool qdev_hotplug = false;
- static bool qdev_hot_added = false;
-@@ -861,6 +861,20 @@ static bool device_get_realized(Object *obj, Error **errp)
-     return dev->realized;
- }
- 
-+static bool check_only_migratable(Object *obj, Error **err)
-+{
-+    DeviceClass *dc = DEVICE_GET_CLASS(obj);
-+
-+    if (!vmstate_check_only_migratable(dc->vmsd)) {
-+        error_setg(err, "Device %s is not migratable, but "
-+                   "--only-migratable was specified",
-+                   object_get_typename(obj));
-+        return false;
-+    }
-+
-+    return true;
-+}
-+
- static void device_set_realized(Object *obj, bool value, Error **errp)
- {
-     DeviceState *dev = DEVICE(obj);
-@@ -870,7 +884,6 @@ static void device_set_realized(Object *obj, bool value, Error **errp)
-     Error *local_err = NULL;
-     bool unattached_parent = false;
-     static int unattached_count;
--    int ret;
- 
-     if (dev->hotplugged && !dc->hotpluggable) {
-         error_setg(errp, QERR_DEVICE_NO_HOTPLUG, object_get_typename(obj));
-@@ -878,8 +891,7 @@ static void device_set_realized(Object *obj, bool value, Error **errp)
-     }
- 
-     if (value && !dev->realized) {
--        ret = check_migratable(obj, &local_err);
--        if (ret < 0) {
-+        if (!check_only_migratable(obj, &local_err)) {
-             goto fail;
-         }
- 
 diff --git a/include/migration/migration.h b/include/migration/migration.h
-index 97e78ba..49ec501 100644
+index 47262bd..97e78ba 100644
 --- a/include/migration/migration.h
 +++ b/include/migration/migration.h
-@@ -22,7 +22,6 @@
- #include "qapi-types.h"
- #include "exec/cpu-common.h"
- #include "qemu/coroutine_int.h"
--#include "qom/object.h"
+@@ -61,28 +61,6 @@ enum mig_rp_message_type {
  
- #define QEMU_VM_FILE_MAGIC           0x5145564d
- #define QEMU_VM_FILE_VERSION_COMPAT  0x00000002
-@@ -39,9 +38,6 @@
- #define QEMU_VM_COMMAND              0x08
- #define QEMU_VM_SECTION_FOOTER       0x7e
+ typedef QLIST_HEAD(, LoadStateEntry) LoadStateEntry_Head;
  
--/* for vl.c */
--extern int only_migratable;
+-/* The current postcopy state is read/set by postcopy_state_get/set
+- * which update it atomically.
+- * The state is updated as postcopy messages are received, and
+- * in general only one thread should be writing to the state at any one
+- * time, initially the main thread and then the listen thread;
+- * Corner cases are where either thread finishes early and/or errors.
+- * The state is checked as messages are received to ensure that
+- * the source is sending us messages in the correct order.
+- * The state is also used by the RAM reception code to know if it
+- * has to place pages atomically, and the cleanup code at the end of
+- * the main thread to know if it has to delay cleanup until the end
+- * of postcopy.
+- */
+-typedef enum {
+-    POSTCOPY_INCOMING_NONE = 0,  /* Initial state - no postcopy */
+-    POSTCOPY_INCOMING_ADVISE,
+-    POSTCOPY_INCOMING_DISCARD,
+-    POSTCOPY_INCOMING_LISTENING,
+-    POSTCOPY_INCOMING_RUNNING,
+-    POSTCOPY_INCOMING_END
+-} PostcopyState;
 -
- struct MigrationParams {
-     bool blk;
-     bool shared;
-@@ -253,8 +249,6 @@ int ram_discard_range(const char *block_name, uint64_t start, size_t length);
- int ram_postcopy_incoming_init(MigrationIncomingState *mis);
- void ram_postcopy_migrated_memory_release(MigrationState *ms);
- 
--int check_migratable(Object *obj, Error **err);
+ /* State for the incoming migration */
+ struct MigrationIncomingState {
+     QEMUFile *from_src_file;
+@@ -339,8 +317,4 @@ void global_state_store_running(void);
+ void migration_page_queue_free(void);
+ int ram_save_queue_pages(const char *rbname, ram_addr_t start, ram_addr_t len);
+ uint64_t ram_pagesize_summary(void);
 -
- bool migrate_release_ram(void);
- bool migrate_postcopy_ram(void);
- bool migrate_zero_blocks(void);
-diff --git a/include/migration/vmstate.h b/include/migration/vmstate.h
-index f4bf3f1..8489659 100644
---- a/include/migration/vmstate.h
-+++ b/include/migration/vmstate.h
-@@ -1067,4 +1067,6 @@ int64_t self_announce_delay(int round)
- 
- void dump_vmstate_json_to_file(FILE *out_fp);
- 
-+bool vmstate_check_only_migratable(const VMStateDescription *vmsd);
-+
+-PostcopyState postcopy_state_get(void);
+-/* Set the state and return the old state */
+-PostcopyState postcopy_state_set(PostcopyState new_state);
  #endif
-diff --git a/include/sysemu/sysemu.h b/include/sysemu/sysemu.h
-index 282f6bc..83c1ceb 100644
---- a/include/sysemu/sysemu.h
-+++ b/include/sysemu/sysemu.h
-@@ -15,7 +15,7 @@
- /* vl.c */
- 
- extern const char *bios_name;
--
-+extern int only_migratable;
- extern const char *qemu_name;
- extern QemuUUID qemu_uuid;
- extern bool qemu_uuid_set;
 diff --git a/migration/migration.c b/migration/migration.c
-index ed11c1f..0304c01 100644
+index 5c92851..ed11c1f 100644
 --- a/migration/migration.c
 +++ b/migration/migration.c
-@@ -1143,21 +1143,6 @@ void migrate_del_blocker(Error *reason)
-     migration_blockers = g_slist_remove(migration_blockers, reason);
+@@ -78,13 +78,6 @@ static NotifierList migration_state_notifiers =
+ 
+ static bool deferred_incoming;
+ 
+-/*
+- * Current state of incoming postcopy; note this is not part of
+- * MigrationIncomingState since it's state is used during cleanup
+- * at the end as MIS is being freed.
+- */
+-static PostcopyState incoming_postcopy_state;
+-
+ /* When we add fault tolerance, we could have several
+    migrations at once.  For now we don't need to add
+    dynamic creation of migration */
+@@ -2098,14 +2091,3 @@ void migrate_fd_connect(MigrationState *s)
+     s->migration_thread_running = true;
  }
  
--int check_migratable(Object *obj, Error **err)
+-PostcopyState  postcopy_state_get(void)
 -{
--    DeviceClass *dc = DEVICE_GET_CLASS(obj);
--    if (only_migratable && dc->vmsd) {
--        if (dc->vmsd->unmigratable) {
--            error_setg(err, "Device %s is not migratable, but "
--                       "--only-migratable was specified",
--                       object_get_typename(obj));
--            return -1;
--        }
--    }
--
--    return 0;
+-    return atomic_mb_read(&incoming_postcopy_state);
 -}
 -
- void qmp_migrate_incoming(const char *uri, Error **errp)
- {
-     Error *local_err = NULL;
-diff --git a/migration/savevm.c b/migration/savevm.c
-index b4f736f..f5e8194 100644
---- a/migration/savevm.c
-+++ b/migration/savevm.c
-@@ -2317,3 +2317,13 @@ void vmstate_register_ram_global(MemoryRegion *mr)
- {
-     vmstate_register_ram(mr, NULL);
+-/* Set the state and return the old state */
+-PostcopyState postcopy_state_set(PostcopyState new_state)
+-{
+-    return atomic_xchg(&incoming_postcopy_state, new_state);
+-}
+-
+diff --git a/migration/postcopy-ram.c b/migration/postcopy-ram.c
+index cdadaf6..a0489f6 100644
+--- a/migration/postcopy-ram.c
++++ b/migration/postcopy-ram.c
+@@ -784,3 +784,21 @@ void postcopy_discard_send_finish(MigrationState *ms, PostcopyDiscardState *pds)
+ 
+     g_free(pds);
  }
 +
-+bool vmstate_check_only_migratable(const VMStateDescription *vmsd)
++/*
++ * Current state of incoming postcopy; note this is not part of
++ * MigrationIncomingState since it's state is used during cleanup
++ * at the end as MIS is being freed.
++ */
++static PostcopyState incoming_postcopy_state;
++
++PostcopyState  postcopy_state_get(void)
 +{
-+    /* check needed if --only-migratable is specified */
-+    if (!only_migratable) {
-+        return true;
-+    }
-+
-+    return !(vmsd && vmsd->unmigratable);
++    return atomic_mb_read(&incoming_postcopy_state);
 +}
-diff --git a/stubs/vmstate.c b/stubs/vmstate.c
-index 6d52f29..6399474 100644
---- a/stubs/vmstate.c
-+++ b/stubs/vmstate.c
-@@ -1,7 +1,6 @@
- #include "qemu/osdep.h"
- #include "qemu-common.h"
- #include "migration/vmstate.h"
--#include "migration/migration.h"
++
++/* Set the state and return the old state */
++PostcopyState postcopy_state_set(PostcopyState new_state)
++{
++    return atomic_xchg(&incoming_postcopy_state, new_state);
++}
+diff --git a/migration/postcopy-ram.h b/migration/postcopy-ram.h
+index 4c25f03..52d51e8 100644
+--- a/migration/postcopy-ram.h
++++ b/migration/postcopy-ram.h
+@@ -81,6 +81,28 @@ int postcopy_place_page(MigrationIncomingState *mis, void *host, void *from,
+ int postcopy_place_page_zero(MigrationIncomingState *mis, void *host,
+                              size_t pagesize);
  
- const VMStateDescription vmstate_dummy = {};
++/* The current postcopy state is read/set by postcopy_state_get/set
++ * which update it atomically.
++ * The state is updated as postcopy messages are received, and
++ * in general only one thread should be writing to the state at any one
++ * time, initially the main thread and then the listen thread;
++ * Corner cases are where either thread finishes early and/or errors.
++ * The state is checked as messages are received to ensure that
++ * the source is sending us messages in the correct order.
++ * The state is also used by the RAM reception code to know if it
++ * has to place pages atomically, and the cleanup code at the end of
++ * the main thread to know if it has to delay cleanup until the end
++ * of postcopy.
++ */
++typedef enum {
++    POSTCOPY_INCOMING_NONE = 0,  /* Initial state - no postcopy */
++    POSTCOPY_INCOMING_ADVISE,
++    POSTCOPY_INCOMING_DISCARD,
++    POSTCOPY_INCOMING_LISTENING,
++    POSTCOPY_INCOMING_RUNNING,
++    POSTCOPY_INCOMING_END
++} PostcopyState;
++
+ /*
+  * Allocate a page of memory that can be mapped at a later point in time
+  * using postcopy_place_page
+@@ -88,4 +110,8 @@ int postcopy_place_page_zero(MigrationIncomingState *mis, void *host,
+  */
+ void *postcopy_get_tmp_page(MigrationIncomingState *mis);
  
-@@ -21,7 +20,7 @@ void vmstate_unregister(DeviceState *dev,
- {
- }
- 
--int check_migratable(Object *obj, Error **err)
-+bool vmstate_check_only_migratable(const VMStateDescription *vmsd)
- {
--    return 0;
-+    return true;
- }
++PostcopyState postcopy_state_get(void);
++/* Set the state and return the old state */
++PostcopyState postcopy_state_set(PostcopyState new_state);
++
+ #endif
 -- 
 2.9.3
