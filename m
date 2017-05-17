@@ -1,24 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50687)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50701)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1dB0J7-0001fu-Qf
-	for qemu-devel@nongnu.org; Wed, 17 May 2017 10:52:10 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1dB0J8-0001iy-Je
+	for qemu-devel@nongnu.org; Wed, 17 May 2017 10:52:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1dB0J3-0004dg-Op
-	for qemu-devel@nongnu.org; Wed, 17 May 2017 10:52:09 -0400
-Received: from mail-wm0-x233.google.com ([2a00:1450:400c:c09::233]:38537)
+	(envelope-from <alex.bennee@linaro.org>) id 1dB0J6-0004ew-HB
+	for qemu-devel@nongnu.org; Wed, 17 May 2017 10:52:10 -0400
+Received: from mail-wm0-x22e.google.com ([2a00:1450:400c:c09::22e]:37469)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1dB0J3-0004dD-ID
-	for qemu-devel@nongnu.org; Wed, 17 May 2017 10:52:05 -0400
-Received: by mail-wm0-x233.google.com with SMTP id v15so19205705wmv.1
-	for <qemu-devel@nongnu.org>; Wed, 17 May 2017 07:52:05 -0700 (PDT)
+	id 1dB0J6-0004ec-B9
+	for qemu-devel@nongnu.org; Wed, 17 May 2017 10:52:08 -0400
+Received: by mail-wm0-x22e.google.com with SMTP id d127so19125370wmf.0
+	for <qemu-devel@nongnu.org>; Wed, 17 May 2017 07:52:08 -0700 (PDT)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Wed, 17 May 2017 15:52:53 +0100
-Message-Id: <20170517145259.28979-1-alex.bennee@linaro.org>
+Date: Wed, 17 May 2017 15:52:55 +0100
+Message-Id: <20170517145259.28979-3-alex.bennee@linaro.org>
+In-Reply-To: <20170517145259.28979-1-alex.bennee@linaro.org>
+References: <20170517145259.28979-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v2 0/6] gdb updates and cputlb traces
+Subject: [Qemu-devel] [PATCH v2 2/6] scripts/qemu-gdb/timers.py: new helper
+ to dump timer state
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,36 +33,97 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: pbonzini@redhat.com, stefanha@redhat.com
 Cc: cota@braap.org, qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 
-Hi,
+This introduces the qemu-gdb command "qemu timers" which will dump the
+state of the main timers in the system.
 
-Here is an update to the cputlb tracing and also a number of gdbstub
-updates. The main changes to the cputlb tracing are making each flush
-an explicit event instead of just dumping counts. This means you can
-so analysis on the delay from queuing work to scheduling at the cost
-of losing the raw count in the MMI interface.
-
-Alex Bennée (6):
-  scripts/replay-dump.py: replay log dumper
-  scripts/qemu-gdb/timers.py: new helper to dump timer state
-  scripts/qemu-gdb/tcg: new helper to dump tcg state
-  cputlb: remove tlb_flush_count
-  cputlb: add trace events
-  new script/analyse-tlb-flushes-simpletrace.py
-
- cputlb.c                                   |  38 +++-
- include/exec/cputlb.h                      |   1 -
- scripts/analyse-tlb-flushes-simpletrace.py | 144 +++++++++++++++
- scripts/qemu-gdb.py                        |   4 +-
- scripts/qemugdb/tcg.py                     |  46 +++++
- scripts/qemugdb/timers.py                  |  54 ++++++
- scripts/replay-dump.py                     | 272 +++++++++++++++++++++++++++++
- trace-events                               |   7 +
- translate-all.c                            |   1 -
- 9 files changed, 559 insertions(+), 8 deletions(-)
- create mode 100755 scripts/analyse-tlb-flushes-simpletrace.py
- create mode 100644 scripts/qemugdb/tcg.py
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+---
+ scripts/qemu-gdb.py       |  3 ++-
+ scripts/qemugdb/timers.py | 54 +++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 56 insertions(+), 1 deletion(-)
  create mode 100644 scripts/qemugdb/timers.py
- create mode 100755 scripts/replay-dump.py
 
+diff --git a/scripts/qemu-gdb.py b/scripts/qemu-gdb.py
+index b3f8e04f77..3e7adb87dc 100644
+--- a/scripts/qemu-gdb.py
++++ b/scripts/qemu-gdb.py
+@@ -26,7 +26,7 @@ import os, sys
+ 
+ sys.path.append(os.path.dirname(__file__))
+ 
+-from qemugdb import aio, mtree, coroutine
++from qemugdb import aio, mtree, coroutine, timers
+ 
+ class QemuCommand(gdb.Command):
+     '''Prefix for QEMU debug support commands'''
+@@ -38,6 +38,7 @@ QemuCommand()
+ coroutine.CoroutineCommand()
+ mtree.MtreeCommand()
+ aio.HandlersCommand()
++timers.TimersCommand()
+ 
+ coroutine.CoroutineSPFunction()
+ coroutine.CoroutinePCFunction()
+diff --git a/scripts/qemugdb/timers.py b/scripts/qemugdb/timers.py
+new file mode 100644
+index 0000000000..be71a001e3
+--- /dev/null
++++ b/scripts/qemugdb/timers.py
+@@ -0,0 +1,54 @@
++#!/usr/bin/python
++# GDB debugging support
++#
++# Copyright 2017 Linaro Ltd
++#
++# Author: Alex Bennée <alex.bennee@linaro.org>
++#
++# This work is licensed under the terms of the GNU GPL, version 2.  See
++# the COPYING file in the top-level directory.
++
++# 'qemu timers' -- display the current timerlists
++
++import gdb
++
++class TimersCommand(gdb.Command):
++    '''Display the current QEMU timers'''
++
++    def __init__(self):
++        'Register the class as a gdb command'
++        gdb.Command.__init__(self, 'qemu timers', gdb.COMMAND_DATA,
++                             gdb.COMPLETE_NONE)
++
++    def dump_timers(self, timer):
++        "Follow a timer and recursively dump each one in the list."
++        # timer should be of type QemuTimer
++        gdb.write("    timer %s/%s (cb:%s,opq:%s)\n" % (
++            timer['expire_time'],
++            timer['scale'],
++            timer['cb'],
++            timer['opaque']))
++
++        if int(timer['next']) > 0:
++            self.dump_timers(timer['next'])
++
++
++    def process_timerlist(self, tlist, ttype):
++        gdb.write("Processing %s timers\n" % (ttype))
++        gdb.write("  clock %s is enabled:%s, last:%s\n" % (
++            tlist['clock']['type'],
++            tlist['clock']['enabled'],
++            tlist['clock']['last']))
++        if int(tlist['active_timers']) > 0:
++            self.dump_timers(tlist['active_timers'])
++
++
++    def invoke(self, arg, from_tty):
++        'Run the command'
++        main_timers = gdb.parse_and_eval("main_loop_tlg")
++
++        # This will break if QEMUClockType in timer.h is redfined
++        self.process_timerlist(main_timers['tl'][0], "Realtime")
++        self.process_timerlist(main_timers['tl'][1], "Virtual")
++        self.process_timerlist(main_timers['tl'][2], "Host")
++        self.process_timerlist(main_timers['tl'][3], "Virtual RT")
 -- 
 2.11.0
