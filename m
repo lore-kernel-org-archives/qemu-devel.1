@@ -1,30 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39377)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39708)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <maxime.coquelin@redhat.com>) id 1dAtDM-000121-9e
-	for qemu-devel@nongnu.org; Wed, 17 May 2017 03:17:45 -0400
+	(envelope-from <thuth@redhat.com>) id 1dAtEm-0001hh-5V
+	for qemu-devel@nongnu.org; Wed, 17 May 2017 03:19:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <maxime.coquelin@redhat.com>) id 1dAtDJ-0002vi-1b
-	for qemu-devel@nongnu.org; Wed, 17 May 2017 03:17:44 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:52734)
+	(envelope-from <thuth@redhat.com>) id 1dAtEl-0003Dl-3i
+	for qemu-devel@nongnu.org; Wed, 17 May 2017 03:19:12 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37386)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <maxime.coquelin@redhat.com>)
-	id 1dAtDI-0002vT-OY
-	for qemu-devel@nongnu.org; Wed, 17 May 2017 03:17:40 -0400
-References: <1494838260-30439-1-git-send-email-peterx@redhat.com>
-	<9a93009b-f909-3142-5bc5-915b9a10ed20@redhat.com>
-	<f69dcf32-b6a2-fb59-2b54-61fd7b52e66e@redhat.com>
-	<20170517042342.GA9921@pxdev.xzpeter.org>
-	<20170517055756.GA31206@pxdev.xzpeter.org>
-From: Maxime Coquelin <maxime.coquelin@redhat.com>
-Message-ID: <19720c24-aa9a-50e6-2ea1-32ee86ae3591@redhat.com>
-Date: Wed, 17 May 2017 09:17:31 +0200
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1dAtEk-0003Dh-RC
+	for qemu-devel@nongnu.org; Wed, 17 May 2017 03:19:11 -0400
+References: <1494926884-10118-1-git-send-email-thuth@redhat.com>
+	<20170516134202.boib4gasiq5itt56@aurel32.net>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <0162f2c6-cb77-91ff-f77a-f03b27a7c1d1@redhat.com>
+Date: Wed, 17 May 2017 09:18:47 +0200
 MIME-Version: 1.0
-In-Reply-To: <20170517055756.GA31206@pxdev.xzpeter.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <20170516134202.boib4gasiq5itt56@aurel32.net>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 0/4] exec: address space translation
- cleanups
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v1] target/s390x: Add support for the TEST
+ BLOCK instruction
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,91 +29,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Jason Wang <jasowang@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, David Gibson <david@gibson.dropbear.id.au>
+To: Aurelien Jarno <aurelien@aurel32.net>
+Cc: qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>, mmarek@suse.com, mbenes@suse.cz, David Hildenbrand <david@redhat.com>
 
-
-
-On 05/17/2017 07:57 AM, Peter Xu wrote:
-> On Wed, May 17, 2017 at 12:23:42PM +0800, Peter Xu wrote:
->> On Tue, May 16, 2017 at 06:51:03PM +0200, Maxime Coquelin wrote:
->>> Hi Peter,
->>>
->>> On 05/16/2017 03:24 PM, Maxime Coquelin wrote:
->>>>
->>>>
->>>> On 05/15/2017 10:50 AM, Peter Xu wrote:
->>>>> The problem is that, address_space_get_iotlb_entry() shares a lot with
->>>>> address_space_translate(). This patch tries to abstract the
->>>>> shared elements.
->>>>>
->>>>> Originally, this work is derived from discussion from VT-d passthrough
->>>>> series discussions [1]. But for sure we can just see this series as a
->>>>> standalone cleanup. So I posted it separately here.
->>>>>
->>>>> Smoke tests are done with general VM boots, IOs, especially with vhost
->>>>> dmar configurations.
->>>>>
->>>>> I believe with current series I can throw away the old patch [1],
->>>>> which may be good. But before that, please kindly review. Thanks.
->>>>
->>>> I faced the problem the old patch fixes when declaring and attaching an
->>>> IOMMU device, but booting the kernel with intel_iommu=off.
->>>>
->>>> I tested again with patches 1 & 4 of your series, and I confirm it fixes
->>>> the issue:
->>>> Tested-by: Maxime Coquelin <maxime.coquelin@redhat.com>
->>>
->>> I did some more testing with my "vhost-user IOMMU" setup, and the series
->>> actually breaks with IOMMU device attached, and intel_iommu=on.
->>>
->>> The main difference with the previous passing test is the guest RAM
->>> size. In the working setup, it is 2G of 2M hugepages, vs. 4G of 2M
->>> hugepages in the failing one. Note that I also reproduce with vhost-kernel
->>> backend.
->>>
->>> The error happens in the first vhost_device_iotlb_miss() call:
->>> qemu-system-x86_64: Fail to lookup the translated address b5d7c000
->>>
->>> I don't have the root cause yet, I'll keep you updated.
+On 16.05.2017 15:42, Aurelien Jarno wrote:
+> On 2017-05-16 11:28, Thomas Huth wrote:
+>> TEST BLOCK was likely once used to execute basic memory
+>> tests, but nowadays it's just a (slow) way to clear a page.
 >>
->> Maxime,
+>> Signed-off-by: Thomas Huth <thuth@redhat.com>
+>> ---
+>>  target/s390x/helper.h      |  1 +
+>>  target/s390x/insn-data.def |  2 ++
+>>  target/s390x/mem_helper.c  | 12 ++++++++++++
+>>  target/s390x/translate.c   | 10 ++++++++++
+>>  4 files changed, 25 insertions(+)
 >>
->> Thanks a lot for help testing this series!
->>
->> I reproduced this problem, and this is not a problem obvious enough
->> for me. Let me investigate as well.
->>
->> -- 
->> Peter Xu
-> 
-> Maxime,
-> 
-> Could you help try adding this change upon current to see whether
-> problem solved?
+>> diff --git a/target/s390x/helper.h b/target/s390x/helper.h
+>> index 9102071..a5a3705 100644
+>> --- a/target/s390x/helper.h
+>> +++ b/target/s390x/helper.h
+>> @@ -99,6 +99,7 @@ DEF_HELPER_FLAGS_4(lctl, TCG_CALL_NO_WG, void, env, =
+i32, i64, i32)
+>>  DEF_HELPER_FLAGS_4(lctlg, TCG_CALL_NO_WG, void, env, i32, i64, i32)
+>>  DEF_HELPER_FLAGS_4(stctl, TCG_CALL_NO_WG, void, env, i32, i64, i32)
+>>  DEF_HELPER_FLAGS_4(stctg, TCG_CALL_NO_WG, void, env, i32, i64, i32)
+>> +DEF_HELPER_2(testblock, void, env, i64)
+>>  DEF_HELPER_FLAGS_2(tprot, TCG_CALL_NO_RWG, i32, i64, i64)
+>>  DEF_HELPER_FLAGS_2(iske, TCG_CALL_NO_RWG_SE, i64, env, i64)
+>>  DEF_HELPER_FLAGS_3(sske, TCG_CALL_NO_RWG, void, env, i64, i64)
+>> diff --git a/target/s390x/insn-data.def b/target/s390x/insn-data.def
+>> index 075ff59..a6aba54 100644
+>> --- a/target/s390x/insn-data.def
+>> +++ b/target/s390x/insn-data.def
+>> @@ -912,6 +912,8 @@
+>>  /* STORE USING REAL ADDRESS */
+>>      C(0xb246, STURA,   RRE,   Z,   r1_o, r2_o, 0, 0, stura, 0)
+>>      C(0xb925, STURG,   RRE,   Z,   r1_o, r2_o, 0, 0, sturg, 0)
+>> +/* TEST BLOCK */
+>> +    C(0xb22c, TB,      RRE,   Z,   0, r2_o, 0, 0, testblock, 0)
+>>  /* TEST PROTECTION */
+>>      C(0xe501, TPROT,   SSE,   Z,   la1, a2, 0, 0, tprot, 0)
+>> =20
+>> diff --git a/target/s390x/mem_helper.c b/target/s390x/mem_helper.c
+>> index 675aba2..0349c10 100644
+>> --- a/target/s390x/mem_helper.c
+>> +++ b/target/s390x/mem_helper.c
+>> @@ -933,6 +933,18 @@ void HELPER(stctl)(CPUS390XState *env, uint32_t r=
+1, uint64_t a2, uint32_t r3)
+>>      }
+>>  }
+>> =20
+>> +void HELPER(testblock)(CPUS390XState *env, uint64_t addr)
+>> +{
+>> +    CPUState *cs =3D CPU(s390_env_get_cpu(env));
+>> +    int i;
+>> +
+>> +    addr =3D get_address(env, 0, 0, addr) & ~0xfffULL;
+>=20
+> I guess you want to use ~TARGET_PAGE_MASK here.
 
-Hi Peter,
+Yes, that's better, thanks!
 
-Yes, problem is solved with below change.
+>> +    for (i =3D 0; i < TARGET_PAGE_SIZE; i +=3D 8) {
+>> +        stq_phys(cs->as, addr + i, 0);
+>> +    }
+>> +    env->cc_op =3D 0;
+>> +}
+>> +
+>=20
+> From what I understand the resulting condition code should depends if
+> the block is usable or not. Shouldn't there be a check to see if the
+> address actually targets the RAM?
 
-Thanks!
-Maxime
+I just tried it under z/VM and KVM, and in case you specify an address
+that does not point to valid RAM, you get an addressing exception
+instead. So the CC=3D1 case was rather meant for memory blocks of valid
+RAM which contain uncorrectable bit flip errors or something like that.
+That does not make much sense for emulation, so CC=3D0 is the only useful
+code that we can return here. But of course I've also got to add a check
+for valid RAM and return an addressing exception here now, too...
 
-> diff --git a/exec.c b/exec.c
-> index 697d902..68576a2 100644
-> --- a/exec.c
-> +++ b/exec.c
-> @@ -521,6 +521,10 @@ IOMMUTLBEntry address_space_get_iotlb_entry(AddressSpace *as, hwaddr addr,
->           goto iotlb_fail;
->       }
->   
-> +    /* Convert memory region offset into address space offset */
-> +    xlat += section.offset_within_address_space -
-> +        section.offset_within_region;
-> +
->       if (plen == (hwaddr)-1) {
->           /*
->            * We use default page size here. Logically it only happens
-> 
-> Thanks in advance,
-> 
+ Thomas
