@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42672)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42673)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1dB1BI-0008VW-H0
+	(envelope-from <quintela@redhat.com>) id 1dB1BI-0008VX-HD
 	for qemu-devel@nongnu.org; Wed, 17 May 2017 11:48:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1dB1BF-0000iq-Np
+	(envelope-from <quintela@redhat.com>) id 1dB1BD-0000iQ-HT
 	for qemu-devel@nongnu.org; Wed, 17 May 2017 11:48:08 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:52568)
+Received: from mx1.redhat.com ([209.132.183.28]:46270)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1dB1BF-0000ic-Ex
-	for qemu-devel@nongnu.org; Wed, 17 May 2017 11:48:05 -0400
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1dB1BD-0000iG-8F
+	for qemu-devel@nongnu.org; Wed, 17 May 2017 11:48:03 -0400
 Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
 	[10.5.11.12])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 61DDA19CBE9
-	for <qemu-devel@nongnu.org>; Wed, 17 May 2017 15:48:04 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 327ED796E5
+	for <qemu-devel@nongnu.org>; Wed, 17 May 2017 15:48:02 +0000 (UTC)
 From: Juan Quintela <quintela@redhat.com>
-Date: Wed, 17 May 2017 17:47:48 +0200
-Message-Id: <20170517154756.22079-2-quintela@redhat.com>
-In-Reply-To: <20170517154756.22079-1-quintela@redhat.com>
-References: <20170517154756.22079-1-quintela@redhat.com>
-Subject: [Qemu-devel] [PATCH 1/9] migration: Create migration/xbzrle.h
+Date: Wed, 17 May 2017 17:47:47 +0200
+Message-Id: <20170517154756.22079-1-quintela@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v4 0/9] Migration mini-cleanup
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,95 +33,95 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: dgilbert@redhat.com, lvivier@redhat.com, peterx@redhat.com
 
-Signed-off-by: Juan Quintela <quintela@redhat.com>
----
- include/migration/migration.h |  4 ----
- migration/ram.c               |  1 +
- migration/xbzrle.c            |  2 +-
- migration/xbzrle.h            | 21 +++++++++++++++++++++
- tests/test-xbzrle.c           |  2 +-
- 5 files changed, 24 insertions(+), 6 deletions(-)
+Hi
+
+Changes from v3
+
+- dropped movement of colo*h headers
+  they are used in other palaces in patches outside the tree
+- Change the license of vmstate*c files to GPL v2+
+  Dave noted that I was using the wrong text
+- page_cache.c movement was already reviewd and it has no conflicts,
+  moved to pull request.
+
+Please, review
+
+Thanks, Juan.
+
+
+[v3]
+Due to popular demand, and to make reviews easier, I just split the
+big cleanup series (41 patches) in small chunks.  This chunk just
+include the easy patches:
+
+- create several include files foo.h for functcions exported from foo.c
+- split channel operations in channel.c
+- move colo headers to migration/
+- split vmstate-types.c from vmstate.c (now it only contains the interpre=
+ter)
+- untangle qemu-file.h, vmstate.h and migration.h.  Now none include the =
+other
+  fix all callers.
+- Remove uses of migration.h that are not needed
+
+
+Juan Quintela (9):
+  migration: Create migration/xbzrle.h
+  migration: Split migration/channel.c for channel operations
+  migration: Export qemu-file-channel.c functions in its own file
+  migration: Remove migration.h from colo.h
+  migration: Move qjson.h to migration/
+  migration: Split vmstate-types.c from vmstate.c
+  migration: Remove qemu-file.h from vmstate.h
+  migration: Remove vmstate.h from migration.h
+  migration: migration.h was not needed
+
+ block/qed.c                              |   1 -
+ hw/i386/pc_q35.c                         |   1 -
+ hw/virtio/vhost-user.c                   |   1 -
+ hw/virtio/vhost-vsock.c                  |   1 -
+ hw/virtio/virtio.c                       |   1 -
+ include/hw/hw.h                          |   1 +
+ include/migration/colo.h                 |   1 -
+ include/migration/migration.h            |  13 +-
+ include/migration/qemu-file.h            |   4 -
+ include/migration/vmstate.h              |   3 -
+ migration/Makefile.objs                  |   4 +-
+ migration/block.c                        |   2 +
+ migration/channel.c                      |  70 ++++
+ migration/channel.h                      |  25 ++
+ migration/colo-comm.c                    |   4 +-
+ migration/colo.c                         |   3 +
+ migration/exec.c                         |   1 +
+ migration/fd.c                           |   1 +
+ migration/migration.c                    |  52 +--
+ migration/postcopy-ram.c                 |   1 +
+ migration/qemu-file-channel.c            |   1 +
+ migration/qemu-file-channel.h            |  21 +
+ migration/qjson.c                        |   2 +-
+ {include/migration =3D> migration}/qjson.h |   0
+ migration/ram.c                          |   3 +
+ migration/rdma.c                         |   1 +
+ migration/savevm.c                       |   1 +
+ migration/socket.c                       |   1 +
+ migration/tls.c                          |   1 +
+ migration/vmstate-types.c                | 661 +++++++++++++++++++++++++=
+++++++
+ migration/vmstate.c                      | 656 +------------------------=
+-----
+ migration/xbzrle.c                       |   2 +-
+ migration/xbzrle.h                       |  21 +
+ monitor.c                                |   1 -
+ tests/Makefile.include                   |   2 +-
+ tests/test-vmstate.c                     |   2 +
+ tests/test-xbzrle.c                      |   2 +-
+ 37 files changed, 842 insertions(+), 726 deletions(-)
+ create mode 100644 migration/channel.c
+ create mode 100644 migration/channel.h
+ create mode 100644 migration/qemu-file-channel.h
+ rename {include/migration =3D> migration}/qjson.h (100%)
+ create mode 100644 migration/vmstate-types.c
  create mode 100644 migration/xbzrle.h
 
-diff --git a/include/migration/migration.h b/include/migration/migration.h
-index b80a6ed..7d1eef7 100644
---- a/include/migration/migration.h
-+++ b/include/migration/migration.h
-@@ -251,10 +251,6 @@ bool migrate_zero_blocks(void);
- 
- bool migrate_auto_converge(void);
- 
--int xbzrle_encode_buffer(uint8_t *old_buf, uint8_t *new_buf, int slen,
--                         uint8_t *dst, int dlen);
--int xbzrle_decode_buffer(uint8_t *src, int slen, uint8_t *dst, int dlen);
--
- int migrate_use_xbzrle(void);
- int64_t migrate_xbzrle_cache_size(void);
- bool migrate_colo_enabled(void);
-diff --git a/migration/ram.c b/migration/ram.c
-index 76c118c..2564c00 100644
---- a/migration/ram.c
-+++ b/migration/ram.c
-@@ -35,6 +35,7 @@
- #include "qemu/bitmap.h"
- #include "qemu/timer.h"
- #include "qemu/main-loop.h"
-+#include "xbzrle.h"
- #include "migration/migration.h"
- #include "postcopy-ram.h"
- #include "exec/address-spaces.h"
-diff --git a/migration/xbzrle.c b/migration/xbzrle.c
-index c858339..1ba482d 100644
---- a/migration/xbzrle.c
-+++ b/migration/xbzrle.c
-@@ -12,7 +12,7 @@
-  */
- #include "qemu/osdep.h"
- #include "qemu/cutils.h"
--#include "include/migration/migration.h"
-+#include "xbzrle.h"
- 
- /*
-   page = zrun nzrun
-diff --git a/migration/xbzrle.h b/migration/xbzrle.h
-new file mode 100644
-index 0000000..a0db507
---- /dev/null
-+++ b/migration/xbzrle.h
-@@ -0,0 +1,21 @@
-+/*
-+ * QEMU live migration
-+ *
-+ * Copyright IBM, Corp. 2008
-+ *
-+ * Authors:
-+ *  Anthony Liguori   <aliguori@us.ibm.com>
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2.  See
-+ * the COPYING file in the top-level directory.
-+ *
-+ */
-+
-+#ifndef QEMU_MIGRATION_XBZRLE_H
-+#define QEMU_MIGRATION_XBZRLE_H
-+
-+int xbzrle_encode_buffer(uint8_t *old_buf, uint8_t *new_buf, int slen,
-+                         uint8_t *dst, int dlen);
-+
-+int xbzrle_decode_buffer(uint8_t *src, int slen, uint8_t *dst, int dlen);
-+#endif
-diff --git a/tests/test-xbzrle.c b/tests/test-xbzrle.c
-index 49f6419..f5e08de 100644
---- a/tests/test-xbzrle.c
-+++ b/tests/test-xbzrle.c
-@@ -13,7 +13,7 @@
- #include "qemu/osdep.h"
- #include "qemu-common.h"
- #include "qemu/cutils.h"
--#include "include/migration/migration.h"
-+#include "../migration/xbzrle.h"
- 
- #define PAGE_SIZE 4096
- 
--- 
+--=20
 2.9.3
