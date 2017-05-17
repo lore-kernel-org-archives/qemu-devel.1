@@ -1,31 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54764)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55829)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dB7IL-0006Mq-Vb
-	for qemu-devel@nongnu.org; Wed, 17 May 2017 18:19:50 -0400
+	(envelope-from <no-reply@patchew.org>) id 1dB7Rz-00086i-9B
+	for qemu-devel@nongnu.org; Wed, 17 May 2017 18:29:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dB7II-0001rq-Qw
-	for qemu-devel@nongnu.org; Wed, 17 May 2017 18:19:49 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:45970)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1dB7II-0001rl-Hw
-	for qemu-devel@nongnu.org; Wed, 17 May 2017 18:19:46 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 420C4C04B326
-	for <qemu-devel@nongnu.org>; Wed, 17 May 2017 22:19:45 +0000 (UTC)
-Date: Wed, 17 May 2017 19:19:41 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20170517221941.GK4748@thinpad.lan.raisama.net>
-References: <20170517212547.4767-1-ehabkost@redhat.com>
-	<8873ed46-aa36-aae3-1f74-90f247094fab@redhat.com>
+	(envelope-from <no-reply@patchew.org>) id 1dB7Rw-0004m7-4F
+	for qemu-devel@nongnu.org; Wed, 17 May 2017 18:29:47 -0400
+Resent-Message-Id: <E1dB7Rw-0004m7-4F@eggs.gnu.org>
+Received: from sender-of-o52.zoho.com ([135.84.80.217]:21366)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1dB7Rv-0004lj-SH
+	for qemu-devel@nongnu.org; Wed, 17 May 2017 18:29:44 -0400
+In-Reply-To: <1495057396-13387-1-git-send-email-mst@redhat.com>
+Message-ID: <149506017263.588.6063103635211388415@c05f1edc8ed1>
+Reply-To: <qemu-devel@nongnu.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <8873ed46-aa36-aae3-1f74-90f247094fab@redhat.com>
-Subject: Re: [Qemu-devel] [RFC] qmp: Return 'user_creatable' &
- 'hotpluggable' fields on qom-list-types
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Wed, 17 May 2017 15:29:33 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PULL 00/13] pci, virtio, vhost: fixes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,71 +28,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>
+To: mst@redhat.com
+Cc: famz@redhat.com, qemu-devel@nongnu.org, peter.maydell@linaro.org
 
-On Wed, May 17, 2017 at 05:00:29PM -0500, Eric Blake wrote:
-> On 05/17/2017 04:25 PM, Eduardo Habkost wrote:
-> > Currently there's no way for QMP clients to get a list of device types
-> > that are really usable with -device.  This information would be useful
-> > for management software and test scripts (like the device-crash-test
-> > script I have submitted recently).  Interestingly, the "info qdm" HMP
-> > command provides this information, but no QMP command does.
-> > 
-> > Add two new fields to the return value of qom-list-types:
-> > "user-creatable-device" and "hotpluggable-device".  Also, add extra
-> > arguments for filtering the list of types based on the new fields.
-> > 
-> > I'm not sure about the naming of the new command arguments.  Maybe the
-> > names are too long, but I believe that "user-creatable-devices-only=false"
-> > would have more obvious semantics than "user-creatable-devices=false"
-> > (the latter looks ambiguous: it could mean "return only
-> > non-user-creatable devices" or "return all devices").
-> 
-> Since this is still RFC, here's a bikeshed idea:
-> 
-> "just-user-creatable":false
-> 
-> is shorter, and still conveys whether we care about just user_creatable
-> devices or all devices.
-> 
-
-We have a "user-creatable" QOM type name for backend object
-types, so I believe the -device suffix is important here.
-
-> > +++ b/qapi-schema.json
-> > @@ -3034,12 +3034,24 @@
-> >  #
-> >  # @name: the type name found in the search
-> >  #
-> > +# @user-creatable-device: If true, the type is a user-creatable device that
-> > +#                         can be used with the "-device" command-line option.
-> > +#                         Note that this does not guarantee that the device
-> > +#                         is going to be accepted by all machine-types.
-> > +#                         (since 2.10)
-> > +#
-> > +# @hotpluggable-device: If true, the type is a hotpluggable device that can
-> > +#                       be plugged using the "device_add" monitor command.
-> > +#                       Note that this does not guarantee that the device can
-> > +#                       be hotplugged on any machine-type. (since 2.10)
-> 
-> Do we need the '-device' suffix in both names?  I'm not opposed to it,
-> but don't know if it is adding any useful information.
-
-If we keep the -device suffix in "user-creatable-device", adding
-the suffix to "hotpluggable" would make it more consistent.
-
-> 
-> 
-> >  ##
-> >  { 'command': 'qom-list-types',
-> > -  'data': { '*implements': 'str', '*abstract': 'bool' },
-> > +  'data': { '*implements': 'str', '*abstract': 'bool',
-> > +            '*user-creatable-devices-only': 'bool', '*hotpluggable-devices-only': 'bool' },
-> 
-> Long line, try to keep it under 80 columns.
-
-I will fix it. Thanks.
-
--- 
-Eduardo
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKTWVzc2FnZS1pZDogMTQ5
+NTA1NzM5Ni0xMzM4Ny0xLWdpdC1zZW5kLWVtYWlsLW1zdEByZWRoYXQuY29tClN1YmplY3Q6IFtR
+ZW11LWRldmVsXSBbUFVMTCAwMC8xM10gcGNpLCB2aXJ0aW8sIHZob3N0OiBmaXhlcwpUeXBlOiBz
+ZXJpZXMKCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKCkJBU0U9YmFzZQpu
+PTEKdG90YWw9JChnaXQgbG9nIC0tb25lbGluZSAkQkFTRS4uIHwgd2MgLWwpCmZhaWxlZD0wCgpn
+aXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2NhbCBk
+aWZmLnJlbmFtZXMgVHJ1ZQoKY29tbWl0cz0iJChnaXQgbG9nIC0tZm9ybWF0PSVIIC0tcmV2ZXJz
+ZSAkQkFTRS4uKSIKZm9yIGMgaW4gJGNvbW1pdHM7IGRvCiAgICBlY2hvICJDaGVja2luZyBQQVRD
+SCAkbi8kdG90YWw6ICQoZ2l0IGxvZyAtbiAxIC0tZm9ybWF0PSVzICRjKS4uLiIKICAgIGlmICEg
+Z2l0IHNob3cgJGMgLS1mb3JtYXQ9ZW1haWwgfCAuL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1h
+aWxiYWNrIC07IHRoZW4KICAgICAgICBmYWlsZWQ9MQogICAgICAgIGVjaG8KICAgIGZpCiAgICBu
+PSQoKG4rMSkpCmRvbmUKCmV4aXQgJGZhaWxlZAo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBk
+YXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApTd2l0Y2hlZCB0
+byBhIG5ldyBicmFuY2ggJ3Rlc3QnCjE3YmZiY2EgZXhlYzogYWJzdHJhY3QgYWRkcmVzc19zcGFj
+ZV9kb190cmFuc2xhdGUoKQo4YmIwMmU3IHBjaTogZGVhc3NlcnQgaW50eCB3aGVuIHBjaSBkZXZp
+Y2UgdW5yZWFsaXplCjFlMTQyNzggdmlydGlvOiBhbGxvdyBicm9rZW4gZGV2aWNlIHRvIG5vdGlm
+eSBndWVzdApkYzI5YTc0IFJldmVydCAiaHcvcGNpOiBkaXNhYmxlIHBjaS1icmlkZ2UncyBzaHBj
+IGJ5IGRlZmF1bHQiCjMzOTgxMjMgYWNwaS1kZWZzOiBjbGVhbiB1cCBvcGVuIGJyYWNlIHVzYWdl
+CmMyNWIzMDkgQUNQSTogZG9uJ3QgY2FsbCBhY3BpX3BjaWhwX2RldmljZV9wbHVnX2NiIG9uIHhl
+bgowMmQ4MzNjIGlvbW11OiBEb24ndCBjcmFzaCBpZiBtYWNoaW5lIGlzIG5vdCBQQ19NQUNISU5F
+CjAxM2I2ZjcgcGM6IGFkZCAyLjEwIG1hY2hpbmUgdHlwZQpmOGRmNGI5IHBjL2Z3Y2ZnOiB1bmJy
+ZWFrIG1pZ3JhdGlvbiBmcm9tIHFlbXUtMi41IGFuZCBxZW11LTIuNiBkdXJpbmcgZmlybXdhcmUg
+Ym9vdAozOWZiZmFiIGxpYnZob3N0LXVzZXI6IGZpeCBjcmFzaCB3aGVuIHJpbmdzIGFyZW4ndCBy
+ZWFkeQoxYjlmNjFkIGh3L3ZpcnRpbzogZml4IHZob3N0IHVzZXIgZmFpbHMgdG8gc3RhcnR1cCB3
+aGVuIE1RCmUwM2Y2MGEgaHcvYXJtL3ZpcnQ6IGdlbmVyYXRlIDY0LWJpdCBhZGRyZXNzYWJsZSBB
+Q1BJIG9iamVjdHMKNmZjNDIzOCBody9hY3BpLWRlZnM6IHJlcGxhY2UgbGVhZGluZyBYIHdpdGgg
+eF8gaW4gRkFEVCBmaWVsZCBuYW1lcwoKPT09IE9VVFBVVCBCRUdJTiA9PT0KQ2hlY2tpbmcgUEFU
+Q0ggMS8xMzogaHcvYWNwaS1kZWZzOiByZXBsYWNlIGxlYWRpbmcgWCB3aXRoIHhfIGluIEZBRFQg
+ZmllbGQgbmFtZXMuLi4KQ2hlY2tpbmcgUEFUQ0ggMi8xMzogaHcvYXJtL3ZpcnQ6IGdlbmVyYXRl
+IDY0LWJpdCBhZGRyZXNzYWJsZSBBQ1BJIG9iamVjdHMuLi4KRVJST1I6IG9wZW4gYnJhY2UgJ3sn
+IGZvbGxvd2luZyBzdHJ1Y3QgZ28gb24gdGhlIHNhbWUgbGluZQojMTU3OiBGSUxFOiBpbmNsdWRl
+L2h3L2FjcGkvYWNwaS1kZWZzLmg6MjM5Ogorc3RydWN0IEFjcGlYc2R0RGVzY3JpcHRvclJldjIK
+K3sKCnRvdGFsOiAxIGVycm9ycywgMCB3YXJuaW5ncywgMTI1IGxpbmVzIGNoZWNrZWQKCllvdXIg
+cGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNl
+IGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVy
+LCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCkNoZWNraW5nIFBBVENIIDMvMTM6IGh3
+L3ZpcnRpbzogZml4IHZob3N0IHVzZXIgZmFpbHMgdG8gc3RhcnR1cCB3aGVuIE1RLi4uCkNoZWNr
+aW5nIFBBVENIIDQvMTM6IGxpYnZob3N0LXVzZXI6IGZpeCBjcmFzaCB3aGVuIHJpbmdzIGFyZW4n
+dCByZWFkeS4uLgpDaGVja2luZyBQQVRDSCA1LzEzOiBwYy9md2NmZzogdW5icmVhayBtaWdyYXRp
+b24gZnJvbSBxZW11LTIuNSBhbmQgcWVtdS0yLjYgZHVyaW5nIGZpcm13YXJlIGJvb3QuLi4KQ2hl
+Y2tpbmcgUEFUQ0ggNi8xMzogcGM6IGFkZCAyLjEwIG1hY2hpbmUgdHlwZS4uLgpDaGVja2luZyBQ
+QVRDSCA3LzEzOiBpb21tdTogRG9uJ3QgY3Jhc2ggaWYgbWFjaGluZSBpcyBub3QgUENfTUFDSElO
+RS4uLgpDaGVja2luZyBQQVRDSCA4LzEzOiBBQ1BJOiBkb24ndCBjYWxsIGFjcGlfcGNpaHBfZGV2
+aWNlX3BsdWdfY2Igb24geGVuLi4uCkNoZWNraW5nIFBBVENIIDkvMTM6IGFjcGktZGVmczogY2xl
+YW4gdXAgb3BlbiBicmFjZSB1c2FnZS4uLgpDaGVja2luZyBQQVRDSCAxMC8xMzogUmV2ZXJ0ICJo
+dy9wY2k6IGRpc2FibGUgcGNpLWJyaWRnZSdzIHNocGMgYnkgZGVmYXVsdCIuLi4KQ2hlY2tpbmcg
+UEFUQ0ggMTEvMTM6IHZpcnRpbzogYWxsb3cgYnJva2VuIGRldmljZSB0byBub3RpZnkgZ3Vlc3Qu
+Li4KQ2hlY2tpbmcgUEFUQ0ggMTIvMTM6IHBjaTogZGVhc3NlcnQgaW50eCB3aGVuIHBjaSBkZXZp
+Y2UgdW5yZWFsaXplLi4uCkNoZWNraW5nIFBBVENIIDEzLzEzOiBleGVjOiBhYnN0cmFjdCBhZGRy
+ZXNzX3NwYWNlX2RvX3RyYW5zbGF0ZSgpLi4uCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0
+ZXJzCiM0NjogRklMRTogZXhlYy5jOjQ3OToKKyAgICAgICAgc2VjdGlvbiA9IGFkZHJlc3Nfc3Bh
+Y2VfdHJhbnNsYXRlX2ludGVybmFsKGQsIGFkZHIsICZhZGRyLCBwbGVuLCBpc19tbWlvKTsKCnRv
+dGFsOiAwIGVycm9ycywgMSB3YXJuaW5ncywgMTQyIGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2gg
+aGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9y
+cwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUK
+Q0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1h
+bmQgZXhpdGVkIHdpdGggY29kZTogMQoKCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxs
+eSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVk
+YmFjayB0byBwYXRjaGV3LWRldmVsQGZyZWVsaXN0cy5vcmc=
