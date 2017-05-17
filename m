@@ -1,36 +1,41 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48584)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49277)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1dAvuN-0004cw-Ke
-	for qemu-devel@nongnu.org; Wed, 17 May 2017 06:10:20 -0400
+	(envelope-from <bharata@linux.vnet.ibm.com>) id 1dAvx7-0005YN-TE
+	for qemu-devel@nongnu.org; Wed, 17 May 2017 06:13:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1dAvuM-0005HG-PI
-	for qemu-devel@nongnu.org; Wed, 17 May 2017 06:10:19 -0400
-Received: from 11.mo3.mail-out.ovh.net ([87.98.184.158]:57649)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1dAvuM-0005H7-JC
-	for qemu-devel@nongnu.org; Wed, 17 May 2017 06:10:18 -0400
-Received: from player797.ha.ovh.net (b9.ovh.net [213.186.33.59])
-	by mo3.mail-out.ovh.net (Postfix) with ESMTP id 66502D2254
-	for <qemu-devel@nongnu.org>; Wed, 17 May 2017 12:10:17 +0200 (CEST)
-Date: Wed, 17 May 2017 12:10:09 +0200
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20170517121009.248fb4bc@bahia.lan>
-In-Reply-To: <20170517063752.GI15596@umbus.fritz.box>
-References: <20170426070034.10727-1-david@gibson.dropbear.id.au>
-	<20170426070034.10727-20-david@gibson.dropbear.id.au>
-	<0b2e2d1c-d7ba-7d43-42b5-04ba592bf3e8@redhat.com>
-	<1a7e5576-6464-6d5b-f4a8-44dceb8a17af@kaod.org>
-	<0dc5ffde-39b7-6fd4-dc88-d66789414e4e@redhat.com>
-	<45db5bad-e1f3-d2d0-7014-878391638f6d@kaod.org>
-	<20170516181004.624cf441@bahia.lan>
-	<d8354004-1a76-bc67-cd9c-55a2b95ae142@kaod.org>
-	<20170517063752.GI15596@umbus.fritz.box>
+	(envelope-from <bharata@linux.vnet.ibm.com>) id 1dAvx3-0005zm-2W
+	for qemu-devel@nongnu.org; Wed, 17 May 2017 06:13:09 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:52212)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bharata@linux.vnet.ibm.com>)
+	id 1dAvx2-0005zY-OE
+	for qemu-devel@nongnu.org; Wed, 17 May 2017 06:13:04 -0400
+Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v4HA9sPU000973
+	for <qemu-devel@nongnu.org>; Wed, 17 May 2017 06:13:03 -0400
+Received: from e23smtp07.au.ibm.com (e23smtp07.au.ibm.com [202.81.31.140])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2agkwvhskn-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Wed, 17 May 2017 06:13:02 -0400
+Received: from localhost
+	by e23smtp07.au.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <bharata@linux.vnet.ibm.com>;
+	Wed, 17 May 2017 20:13:00 +1000
+Date: Wed, 17 May 2017 15:42:04 +0530
+From: Bharata B Rao <bharata@linux.vnet.ibm.com>
+Reply-To: bharata@linux.vnet.ibm.com
+References: <1494992962-6929-1-git-send-email-bharata@linux.vnet.ibm.com>
+	<1494992962-6929-2-git-send-email-bharata@linux.vnet.ibm.com>
+	<20170517064300.GJ15596@umbus.fritz.box>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	boundary="Sig_/tnGTLWUtdA3Su=M9rBZj_19";
-	protocol="application/pgp-signature"
-Subject: Re: [Qemu-devel] [Qemu-ppc] [PULL 19/48] spapr: allocate the
- ICPState object from under sPAPRCPUCore
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170517064300.GJ15596@umbus.fritz.box>
+Message-Id: <20170517101204.GE3446@in.ibm.com>
+Subject: Re: [Qemu-devel] [RFC PATCH v1 1/6] migration: Fix
+ unregister_savevm()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -40,51 +45,20 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: David Gibson <david@gibson.dropbear.id.au>
-Cc: =?UTF-8?B?Q8OpZHJpYw==?= Le Goater <clg@kaod.org>, Laurent Vivier <lvivier@redhat.com>, mdroth@linux.vnet.ibm.com, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Bharata B Rao <bharata@linux.vnet.ibm.com>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, sam.bobroff@au1.ibm.com, rnsastry@linux.vnet.ibm.com
 
---Sig_/tnGTLWUtdA3Su=M9rBZj_19
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+On Wed, May 17, 2017 at 04:43:00PM +1000, David Gibson wrote:
+> On Wed, May 17, 2017 at 09:19:17AM +0530, Bharata B Rao wrote:
+> > In unregister_savevm(), free se->compat only if it was allocated earlier.
+> > 
+> > Signed-off-by: Bharata B Rao <bharata@linux.vnet.ibm.com>
+> 
+> I don't think this is necessary.  If se->compat was never allocated,
+> then it should be NULL (since se is allocated with g_new0()).
+> g_free() is explicitly safe to call on NULL, and we already rely on
+> that in qemu.
 
-On Wed, 17 May 2017 16:37:52 +1000
-David Gibson <david@gibson.dropbear.id.au> wrote:
-[...]
-> > >>
-> > >> Greg is looking at re-adding the ICPState array because of a=20
-> > >> migration issue with older machines. We might need to do so=20
-> > >> unconditionally ...
-> > >> =20
-> > >=20
-> > > That would be a pity to carry on with the pre-allocated ICPStates for
-> > > new machine types just because of that... What about keeping track
-> > > of all the cap_irq_xics_enabled flags in a separate max_cpus sized
-> > > static array ? =20
-> >=20
-> > Could we use 'cpu->unplug' instead ? =20
->=20
-> I've only half followed this discussion, but fwiw I prefer the idea of
-> "parking" in-kernel ICP objects, similarly to the way we do for
-> removed VCPUs, rather than going back to keeping ICP objects around
-> indefinitely and unconditionally.
->=20
+Yeah, this is not necessary, will get rid of this in the next iteration.
 
-I'll give a try.
-
-Cheers,
-
---
-Greg
-
---Sig_/tnGTLWUtdA3Su=M9rBZj_19
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-
-iEYEARECAAYFAlkcIYEACgkQAvw66wEB28JTlACeJxKDfaEK5LJ1BzV3F5gGdpQQ
-pMIAnjkm/0F8QPOslbExU3klUDM+7mCL
-=EZyS
------END PGP SIGNATURE-----
-
---Sig_/tnGTLWUtdA3Su=M9rBZj_19--
+Regards.,
+Bharata.
