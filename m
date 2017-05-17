@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40924)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41736)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dB6I7-00083Z-Js
-	for qemu-devel@nongnu.org; Wed, 17 May 2017 17:15:32 -0400
+	(envelope-from <eblake@redhat.com>) id 1dB6MU-0000hb-WA
+	for qemu-devel@nongnu.org; Wed, 17 May 2017 17:20:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dB6I6-00031T-D9
-	for qemu-devel@nongnu.org; Wed, 17 May 2017 17:15:31 -0400
-References: <684185116.2952708.1495044580181.ref@mail.yahoo.com>
-	<684185116.2952708.1495044580181@mail.yahoo.com>
-	<3293e70a-71ac-2e6d-433f-06346ad253c9@redhat.com>
-	<107015620.2969780.1495046091978@mail.yahoo.com>
-	<5a2b9e50-1444-af4a-dc89-021a4beca0f4@redhat.com>
-	<1832071588.99743.1495054408073@mail.yahoo.com>
+	(envelope-from <eblake@redhat.com>) id 1dB6MQ-00048y-VJ
+	for qemu-devel@nongnu.org; Wed, 17 May 2017 17:20:02 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42120)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dB6MQ-00048e-Lf
+	for qemu-devel@nongnu.org; Wed, 17 May 2017 17:19:58 -0400
+References: <218478942.134698.1495055111655.ref@mail.yahoo.com>
+	<218478942.134698.1495055111655@mail.yahoo.com>
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <bcff9cd4-3ec2-0757-02e0-96f0e0a7747e@redhat.com>
-Date: Wed, 17 May 2017 16:15:20 -0500
+Message-ID: <044ef9e7-ffea-f096-69f6-a390c48b4970@redhat.com>
+Date: Wed, 17 May 2017 16:19:55 -0500
 MIME-Version: 1.0
-In-Reply-To: <1832071588.99743.1495054408073@mail.yahoo.com>
+In-Reply-To: <218478942.134698.1495055111655@mail.yahoo.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="g2p7tSP9KIq00pA8heec073LSiF2DgKp8"
-Subject: Re: [Qemu-devel] Add Markus Armbrusters code for Broadcom
- Perhiperals for ARM.
+	boundary="r4D1ocXILU6cmsF9jB6PLePvNCDwj3Q6S"
+Subject: Re: [Qemu-devel] [PATCH] Add BCM2835 devices to Arm hardware.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,77 +29,61 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: John Bradley <flypie1@yahoo.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: John Bradley <flypie@rocketmail.com>, Laurent Vivier <lvivier@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Geert Martin Ijewski <gm.ijewski@web.de>, Markus Armbruster <armbru@redhat.com>, Alistair Francis <alistair.francis@xilinx.com>, "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Cc: John Bradley <flypie@rocketmail.com>, Laurent Vivier <lvivier@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Geert Martin Ijewski <gm.ijewski@web.de>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, "qemu-website@weilnetz.de" <qemu-website@weilnetz.de>, Alistair Francis <alistair.francis@xilinx.com>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---g2p7tSP9KIq00pA8heec073LSiF2DgKp8
+--r4D1ocXILU6cmsF9jB6PLePvNCDwj3Q6S
 From: Eric Blake <eblake@redhat.com>
 To: John Bradley <flypie1@yahoo.com>,
  "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 Cc: John Bradley <flypie@rocketmail.com>, Laurent Vivier
  <lvivier@redhat.com>, Peter Maydell <peter.maydell@linaro.org>,
  Geert Martin Ijewski <gm.ijewski@web.de>,
- Markus Armbruster <armbru@redhat.com>,
- Alistair Francis <alistair.francis@xilinx.com>,
- "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <bcff9cd4-3ec2-0757-02e0-96f0e0a7747e@redhat.com>
-Subject: Re: [Qemu-devel] Add Markus Armbrusters code for Broadcom Perhiperals
- for ARM.
-References: <684185116.2952708.1495044580181.ref@mail.yahoo.com>
- <684185116.2952708.1495044580181@mail.yahoo.com>
- <3293e70a-71ac-2e6d-433f-06346ad253c9@redhat.com>
- <107015620.2969780.1495046091978@mail.yahoo.com>
- <5a2b9e50-1444-af4a-dc89-021a4beca0f4@redhat.com>
- <1832071588.99743.1495054408073@mail.yahoo.com>
-In-Reply-To: <1832071588.99743.1495054408073@mail.yahoo.com>
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
+ "qemu-website@weilnetz.de" <qemu-website@weilnetz.de>,
+ Alistair Francis <alistair.francis@xilinx.com>
+Message-ID: <044ef9e7-ffea-f096-69f6-a390c48b4970@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] Add BCM2835 devices to Arm hardware.
+References: <218478942.134698.1495055111655.ref@mail.yahoo.com>
+ <218478942.134698.1495055111655@mail.yahoo.com>
+In-Reply-To: <218478942.134698.1495055111655@mail.yahoo.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On 05/17/2017 03:53 PM, John Bradley wrote:
-> Andrew Baumann has and others have release the code under GNU General P=
-ublic License version 2 (GPLv2), the same as QEMU that allows me to added=
- it to QEMU as it is under the same license, by signing it off this is wh=
-at I am certifying.=20
-
-See this document linked from the SubmitAPatch link (it describes the
-kernel meaning of S-o-b tags, although the qemu meaning is the same):
-
-https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/D=
-ocumentation/SubmittingPatches?id=3Df6f94e2ab1b33f0082ac22d71f66385a60d81=
-57f#n297
-
-Yes, your Signed-off-by: asserts that you are okay releasing your
-portions of the patch (bullets a, d) and that you chased down that
-portions that you did not write are properly licensed (bullet b), but
-what you are missing is that when you modify someone else's patch, we
-also need that someone's assertion of intent that their work (whether or
-not modified by you) meets the same standards (bullet c).  In other
-words, when modifying a patch, S-o-b lines should be additive in nature,
-rather than replacing his by yours (or, if his is missing in the source
-you originally copied from, then we really need to Andrew to chime in
-and add one); this is so that there is a full chain of custody on who
-wrote portions of the commit.
-
-
->  John BradleyTel: 07896 839635Skype: flypie125 125B Grove StreetEdge Hi=
-ll Liverpool L7 7AF=20
-
-Your mailer is sending very poor formatting when rendered as plain text
-(and we frown on html mail on this list).
-
+On 05/17/2017 04:05 PM, John Bradley via Qemu-devel wrote:
+>>From 0b39a04030d5a2cea4fcd2159d365580ca155b78 Mon Sep 17 00:00:00 2001
+> From: John Bradley <flypie@rocketmail.com>
+> Date: Wed, 17 May 2017 18:57:21 +0100
+> Subject: [PATCH] Add BCM2835 devices to Arm hardware.
 >=20
->     On Wednesday, 17 May 2017, 20:11, Eric Blake <eblake@redhat.com> wr=
-ote:
-> =20
+> Signed-off-by: John Bradley <flypie@rocketmail.com>
+> ---
+> hw/arm/bcm2835.c | 114 ++++++++++++++++++++++++++++++++++++++++++++++++=
++++++++
+> 1 file changed, 114 insertions(+)
 >=20
->  On 05/17/2017 01:34 PM, John Bradley wrote:
->> This is especial true as I meant Andrew Baumann 0xabu (Andrew Baumann)=
 
->=20
-> Top-posting is not nice on technical lists.
+> +#include "qemu/osdep.h"
+> +#include "cpu.h"
+> +#include "hw/arm/bcm2835.h"
 
-And yet, in spite of me mentioning it, you still top-posted. :(
+This file does not exist in master. Since it is obvious that this patch
+depends on other patches you have pending, you should submit everything
+as a patch series (where the patch adding bcm2835.h would be labeled
+1/2, and this patch labeled 2/2, as well as with a 0/2 cover letter - or
+0/N for however many N patches you plan to submit).  Posting each
+dependent patch as a top-level thread with no documentation on how they
+interrelate is just going to waste reviewer's time, as well as trigger
+more bot-related compile failure messages to you, that could have been
+prevented if it had been properly submitted as a series.
+
+It looks like you are not using 'git send-email' to send your patches.
+That makes it highly likely that your patches will be corrupted to the
+point that they cannot be applied by automated tooling.  While a one-off
+patch submission can usually be manually beaten into correct form by the
+maintainer, it is much harder to offload this burden onto others when
+you plan to submit a series - so you should really fix your workflow to
+get 'git send-email' working properly.
 
 --=20
 Eric Blake, Principal Software Engineer
@@ -108,7 +91,7 @@ Red Hat, Inc.           +1-919-301-3266
 Virtualization:  qemu.org | libvirt.org
 
 
---g2p7tSP9KIq00pA8heec073LSiF2DgKp8
+--r4D1ocXILU6cmsF9jB6PLePvNCDwj3Q6S
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
@@ -118,13 +101,13 @@ Version: GnuPG v2
 Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
 Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQEcBAEBCAAGBQJZHL1oAAoJEKeha0olJ0NqPJwH/RVEkX33BLb2V2yrHcYzT7fw
-2dcUHFKsllClAAxli/b+zesgraH08zxGRYcLEmgBtqmR1ptvx+EIhEm824n8kRXa
-BWvJ+KABJRTZ1mMWSt6o2vcexKL6GMKlDmU5iocyjb7TDkLIcvqf7JA0S22T6C20
-qnt69lO4u8DsWvRCOGZ8QlVh4z8Nc9+Q38CbOJItifjq0k8Fs2oafg6x+0jtVUIW
-O0WBqeC3GOTBEMzPIF8IRs68cFkzkP7cRL0hRgm4XO+hF6UVEXd8fYKUl9IZuc7e
-1PiKLNn188yxQuWddFEMoM6jAr22rnDPyh2OEnRcq+P3GBJ0Whzy8FrnPsGBtVM=
-=4uUx
+iQEcBAEBCAAGBQJZHL57AAoJEKeha0olJ0Nqnt8IAKYKRQsWGNqqDbSt/GN/N40/
+xx4wJaIRe/Fpp9UvmRPekLiXFYMPV07SHEPHldCHLq/Q6RujFb5TpxQWN5eMcqx0
+v3UcQvHNV4DVZK0zAbE/vTtAfddrj4gqbHJJqB+iTCkR/PXgMUZetYcwX9CBMmGE
+e8khBSto9JSneJxLr1IIlft5DMgsYcbVBeAzWk6IrB4HZnfObgY/wr68YT76xajQ
+n5UFzFApq23UPXW+evfTcExglwYKSLFssjMicvO8wf9ryjTWBXIE2PASrT0fh7E8
+dsRi6zg4PQbn2ASVdUqeHpBRZXcvlROodCFNQ24XPIKI9yDWS9khDzJbQiKQTuo=
+=4+Lx
 -----END PGP SIGNATURE-----
 
---g2p7tSP9KIq00pA8heec073LSiF2DgKp8--
+--r4D1ocXILU6cmsF9jB6PLePvNCDwj3Q6S--
