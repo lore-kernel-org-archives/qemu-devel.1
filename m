@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55721)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57637)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dB5Mu-0007sS-D0
-	for qemu-devel@nongnu.org; Wed, 17 May 2017 16:16:25 -0400
+	(envelope-from <eblake@redhat.com>) id 1dB5VN-0001px-B8
+	for qemu-devel@nongnu.org; Wed, 17 May 2017 16:25:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dB5Ms-0005wb-TC
-	for qemu-devel@nongnu.org; Wed, 17 May 2017 16:16:24 -0400
+	(envelope-from <eblake@redhat.com>) id 1dB5VM-0000q4-CL
+	for qemu-devel@nongnu.org; Wed, 17 May 2017 16:25:09 -0400
 References: <20170517170941.25850-1-stefanha@redhat.com>
-	<20170517170941.25850-3-stefanha@redhat.com>
+	<20170517170941.25850-4-stefanha@redhat.com>
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <e6d9417e-87bb-a88f-4f55-0a72aae0a212@redhat.com>
-Date: Wed, 17 May 2017 15:16:08 -0500
+Message-ID: <455ebb50-8f37-72b4-eef4-87c4a7c5c6d5@redhat.com>
+Date: Wed, 17 May 2017 15:24:55 -0500
 MIME-Version: 1.0
-In-Reply-To: <20170517170941.25850-3-stefanha@redhat.com>
+In-Reply-To: <20170517170941.25850-4-stefanha@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="6QA4EoORie5QUW2POQtjVinsJ6I5jC81J"
-Subject: Re: [Qemu-devel] [PATCH 2/3] block: use BDRV_POLL_WHILE() in
- bdrv_rw_vmstate()
+	boundary="kngn0jRVmO5EgwWDc9FXjknFGPKKaVAUx"
+Subject: Re: [Qemu-devel] [PATCH 3/3] migration: avoid recursive AioContext
+ locking in save_vmstate()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,68 +29,50 @@ To: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
 Cc: Kevin Wolf <kwolf@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Fam Zheng <famz@redhat.com>, qemu-block@nongnu.org
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---6QA4EoORie5QUW2POQtjVinsJ6I5jC81J
+--kngn0jRVmO5EgwWDc9FXjknFGPKKaVAUx
 From: Eric Blake <eblake@redhat.com>
 To: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
 Cc: Kevin Wolf <kwolf@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
  Fam Zheng <famz@redhat.com>, qemu-block@nongnu.org
-Message-ID: <e6d9417e-87bb-a88f-4f55-0a72aae0a212@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 2/3] block: use BDRV_POLL_WHILE() in
- bdrv_rw_vmstate()
+Message-ID: <455ebb50-8f37-72b4-eef4-87c4a7c5c6d5@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 3/3] migration: avoid recursive AioContext
+ locking in save_vmstate()
 References: <20170517170941.25850-1-stefanha@redhat.com>
- <20170517170941.25850-3-stefanha@redhat.com>
-In-Reply-To: <20170517170941.25850-3-stefanha@redhat.com>
+ <20170517170941.25850-4-stefanha@redhat.com>
+In-Reply-To: <20170517170941.25850-4-stefanha@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
 On 05/17/2017 12:09 PM, Stefan Hajnoczi wrote:
-> Calling aio_poll() directly may have been fine previously, but this is
-> the future, man!
+> AioContext was designed to allow nested acquire/release calls.  It uses=
 
-lol
-
->  The difference between an aio_poll() loop and
-> BDRV_POLL_WHILE() is that BDRV_POLL_WHILE() releases the AioContext
-> around aio_poll().
+> a recursive mutex so callers don't need to worry about nesting...or so
+> we thought.
 >=20
-> This allows the IOThread to run fd handlers or BHs to complete the
-> request.  Failure to release the AioContext causes deadlocks.
+> BDRV_POLL_WHILE() is used to wait for block I/O requests.  It releases
+> the AioContext temporarily around aio_poll().  This gives IOThreads a
+> chance to acquire the AioContext to process I/O completions.
 >=20
-> Using BDRV_POLL_WHILE() partially fixes a 'savevm' hang with -object
+> It turns out that recursive locking and BDRV_POLL_WHILE() don't mix.
+> BDRV_POLL_WHILE() only releases the AioContext once, so the IOThread
+> will not be able to acquire the AioContext if it was acquired
+> multiple times.
+>=20
+> Instead of trying to release AioContext n times in BDRV_POLL_WHILE(),
+> this patch simply avoids nested locking in save_vmstate().  It's the
+> simplest fix and we should step back to consider the big picture with
+> all the recent changes to block layer threading.
+>=20
+> This patch is the final fix to solve 'savevm' hanging with -object
 > iothread.
-
-I'm surprised at how many separate hangs we actually had!
-
 >=20
 > Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
 > ---
->  block/io.c | 4 +---
->  1 file changed, 1 insertion(+), 3 deletions(-)
+>  migration/savevm.c | 12 +++++++++++-
+>  1 file changed, 11 insertions(+), 1 deletion(-)
+>=20
 
 Reviewed-by: Eric Blake <eblake@redhat.com>
-
->=20
-> diff --git a/block/io.c b/block/io.c
-> index cc56e90..f0041cd 100644
-> --- a/block/io.c
-> +++ b/block/io.c
-> @@ -2031,9 +2031,7 @@ bdrv_rw_vmstate(BlockDriverState *bs, QEMUIOVecto=
-r *qiov, int64_t pos,
->          Coroutine *co =3D qemu_coroutine_create(bdrv_co_rw_vmstate_ent=
-ry, &data);
-> =20
->          bdrv_coroutine_enter(bs, co);
-> -        while (data.ret =3D=3D -EINPROGRESS) {
-> -            aio_poll(bdrv_get_aio_context(bs), true);
-> -        }
-> +        BDRV_POLL_WHILE(bs, data.ret =3D=3D -EINPROGRESS);
->          return data.ret;
->      }
-
-Do we have other culprits (not necessarily for vmsave, but for other
-situations), where we should be using BDRV_POLL_WHILE in separate
-patches? For example, a quick grep show that at least hw/9pfs/9p.c makes
-a direct call to aio_poll(,true) in a while loop.
 
 --=20
 Eric Blake, Principal Software Engineer
@@ -98,7 +80,7 @@ Red Hat, Inc.           +1-919-301-3266
 Virtualization:  qemu.org | libvirt.org
 
 
---6QA4EoORie5QUW2POQtjVinsJ6I5jC81J
+--kngn0jRVmO5EgwWDc9FXjknFGPKKaVAUx
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
@@ -108,13 +90,13 @@ Version: GnuPG v2
 Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
 Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQEcBAEBCAAGBQJZHK+IAAoJEKeha0olJ0NqDyEIAIAedoCQh6mMAjEZAIz4Zs2I
-1/IRb0JopYhXlYYWd1byYs+26IE4lSRoNLSMKwGnQFS9HaQaNYMt2LFLCijl5f3z
-b6ZPS7c/3YbfDVNWQawiCmA+rfxVFv45MbcZslC8Yaj40y5z51GJE003jJDNBRGK
-bYwNIfTF5RxIAKZVzXk2fhw8gNbKjhqJW7vHYbed5gR1+VYNHyJ4qFipA5Y9wXfS
-CGYhaZd7AkL01nVt2znSBmnM3EWRrWnk1mw1RlvQlzmQbO32nyRqZm8SrPYNVSBS
-GHj6oXPe8FjgJ0xXzGCAcwdJhrhaeYxMN99i07pXY1o2Kk2uu9kevd4AnFHaJOc=
-=5Nz3
+iQEcBAEBCAAGBQJZHLGXAAoJEKeha0olJ0NqeigIAIZaxExAWMZGLLLf2TmRZfY3
+hmePNTrxARKk5z9q18wWnBDz7Pm6MzcUxpQIqZBwwkxG/j5J2/QFrgTjTK9AaqHM
+dOkAWTiVWL7tXUiF1d//ksftIXtyhYzELjxW5Z19JvRroC/7870H9vd0SGIEkxZj
+mKBAEyi/4pY4nGLreoRcMnQ0vuQEKgQ9fLJiPpzwt8OKLyllxufab2Hql3gOyJPi
+/STfTlmfyHekKHV2k/wBK/vMNDZ2LVN7ChMSc7uQ6ezmyhPtrtcsvGuBqJBO5YI5
+G+3A/CVeVl+DT2n+x0KJRGt2qpvv0nISxlJwLT02uAfGZYdz3K1L5N/DMqq+isI=
+=kdXb
 -----END PGP SIGNATURE-----
 
---6QA4EoORie5QUW2POQtjVinsJ6I5jC81J--
+--kngn0jRVmO5EgwWDc9FXjknFGPKKaVAUx--
