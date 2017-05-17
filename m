@@ -1,31 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55864)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56413)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1dB1pl-0008Lh-KW
-	for qemu-devel@nongnu.org; Wed, 17 May 2017 12:29:58 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1dB1ri-0000Y2-Il
+	for qemu-devel@nongnu.org; Wed, 17 May 2017 12:31:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1dB1ph-0000EC-NN
-	for qemu-devel@nongnu.org; Wed, 17 May 2017 12:29:57 -0400
-Received: from 5.mo3.mail-out.ovh.net ([87.98.178.36]:46421)
+	(envelope-from <dgilbert@redhat.com>) id 1dB1re-0000jM-NG
+	for qemu-devel@nongnu.org; Wed, 17 May 2017 12:31:58 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37382)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1dB1ph-0000Cf-GL
-	for qemu-devel@nongnu.org; Wed, 17 May 2017 12:29:53 -0400
-Received: from player797.ha.ovh.net (b9.ovh.net [213.186.33.59])
-	by mo3.mail-out.ovh.net (Postfix) with ESMTP id A214ACF501
-	for <qemu-devel@nongnu.org>; Wed, 17 May 2017 18:29:45 +0200 (CEST)
-Date: Wed, 17 May 2017 18:29:38 +0200
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20170517182938.0c7f366e@bahia.lan>
-In-Reply-To: <2c0e99ce-f3cb-90e8-baed-8fad9d39455b@redhat.com>
-References: <1494405683-20877-1-git-send-email-pradeep.jagadeesh@huawei.com>
-	<1494405683-20877-5-git-send-email-pradeep.jagadeesh@huawei.com>
-	<6a035cd9-34f9-c1f5-e986-404daf941641@redhat.com>
-	<57a24e21-0864-16d3-1bce-ad801875ea9f@huawei.com>
-	<2c0e99ce-f3cb-90e8-baed-8fad9d39455b@redhat.com>
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dB1re-0000jB-Gh
+	for qemu-devel@nongnu.org; Wed, 17 May 2017 12:31:54 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 51B5F80F90
+	for <qemu-devel@nongnu.org>; Wed, 17 May 2017 16:31:53 +0000 (UTC)
+Date: Wed, 17 May 2017 17:31:47 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170517163146.GD2444@work-vm>
+References: <1494562661-9063-1-git-send-email-peterx@redhat.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	boundary="Sig_//xD.g4qEpZG5ziA.e1Km73t";
-	protocol="application/pgp-signature"
-Subject: Re: [Qemu-devel] [PATCH v4 4/4] fsdev: QMP interface for throttling
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1494562661-9063-1-git-send-email-peterx@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v8 0/3] ramblock: add hmp command "info
+ ramblock"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,78 +33,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: Pradeep Jagadeesh <pradeep.jagadeesh@huawei.com>, Pradeep Jagadeesh <pradeepkiruvale@gmail.com>, alberto garcia <berto@igalia.com>, jani kokkonen <jani.kokkonen@huawei.com>, qemu-devel@nongnu.org
+To: Peter Xu <peterx@redhat.com>
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>
 
---Sig_//xD.g4qEpZG5ziA.e1Km73t
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+* Peter Xu (peterx@redhat.com) wrote:
+> v8:
 
-On Wed, 17 May 2017 10:28:33 -0500
-Eric Blake <eblake@redhat.com> wrote:
-
-> On 05/17/2017 09:53 AM, Pradeep Jagadeesh wrote:
->=20
-> >>> +#ifdef _WIN64
-> >>> +
-> >>> +void qmp_fsdev_set_io_throttle(IOThrottle *arg, Error **errp)
-> >>> +{
-> >>> +  return;
-> >>> +}
-> >>> +
-> >>> +IOThrottleList *qmp_query_fsdev_io_throttle(Error **errp)
-> >>> +{
-> >>> +    abort();
-> >>> +}
-> >>> +
-> >>> +#endif =20
-> >>
-> >> I think you're missing an addition to monitor.c
-> >> qmp_unregister_commands_hack() if you intend for this command to be
-> >> available only on non-windows platforms (and is your #ifdef the correct
-> >> name, or is this a Linux-only feature rather than a non-windows featur=
-e). =20
-> > I had to add this one here because, I was getting some error when I
-> > cross compile for Windows. But I do not have any idea about, do I need
-> > to add in monitor.c or not. =20
->=20
-> First point: is fsdev a Linux-only feature, or can it be compiled on
-> BSD?  If it is Linux-only, then compiling a stub for Windows will still
-> leave BSD broken, and your #ifdef is wrong.  Fixing compilation on mingw
-> is nice, but not the only platform to worry about.
->=20
-
-fsdev compilation currently depends on CONFIG_VIRTFS which is a Linux-only
-feature for the moment. There was a tentative to support it on Windows hosts
-two years ago but it stayed at the RFC stage.
-
-But even on Linux hosts, the current fsdev implementation also depends on
-the target supporting PCI and VIRTIO. We have a fsdev/qemu-fsdev-dummy.c
-file to put stubs so that we don't pull all the code for such targets.
-
-Maybe this could be reused for the above stubs as well ?
-
-> Second point: if fsdev is indeed a platform-specific feature, then we
-> don't want to advertise the QMP commands that are useless when running
-> on a platform that doesn't support it. Anywhere you have to add a stub
-> for compilation means you ALSO need to patch monitor.c to unregister the
-> command from being advertised as a valid QMP command.  (If you used
-> #ifdef __LINUX__ to guard the working version, and #ifndef __LINUX__ to
-> declare the stub, then the monitor.c needs an #ifndef section within
-> qmp_unregister_commands_hack() to tell QMP to not advertise the stubs.)
->=20
+Queued for HMP
 
 
---Sig_//xD.g4qEpZG5ziA.e1Km73t
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-
-iEYEARECAAYFAlkcenIACgkQAvw66wEB28KsEQCfbue3vYU9ztzvPrc5Sb+DKj0J
-IngAn3lyX6EW+RP5EbjGFPiD3LNWv6yy
-=f5cI
------END PGP SIGNATURE-----
-
---Sig_//xD.g4qEpZG5ziA.e1Km73t--
+> - patch 1: add r-b for Dave
+> - patch 2: use "uint64_t" for size_to_str() parameter, remove assert()
+>   since it's useless now [Dave]
+> - drop patch 4
+> 
+> v7:
+> - patch 1: removed Dave's r-b since the patch conflicted during rebase
+> - patch 2: add r-b for Markus, with the nice function comment that
+>   provided [Markus]
+> - patch 3: add r-b for Dave
+> - patch 4 (new): added new patch to remove assert in size_to_str(),
+>   assuming that would be better.
+> 
+> v6
+> - patch 2: instead of create a new size_to_str(), abstract the logic
+>   out from print_type_size(), refactor it, to make sure
+>   print_type_size() dumps exactly the same thing as before. (a simple
+>   test with info qtree is done)
+> - let suffixes be an array of strings [Markus]
+> 
+> v5
+> - add r-b for Dave on first patch (which I forgot in v4, so I got it
+>   again)
+> - add one more patch to introduce size_to_str() as patch 2 [Dave]
+> - let the last patch use the new interface
+> 
+> v4:
+> - move page_size_to_str() into util/cutil.c [Dave]
+> 
+> v3:
+> - cast the three PRIx64 addresses using (uint64_t) [Fam]
+> - add more comment in patch 2 to emphasize that this command is only
+>   suitable for HMP, not QMP [Markus]
+> 
+> v2:
+> - replace "lx" with "PRIx64" in three places
+> 
+> Sometimes I would like to know ramblock info for a VM. This command
+> would help. It provides a way to dump ramblock info. Currently the
+> list is by default sorted by size, though I think it's good enough.
+> 
+> Please review, thanks.
+> 
+> Peter Xu (3):
+>   ramblock: add RAMBLOCK_FOREACH()
+>   utils: provide size_to_str()
+>   ramblock: add new hmp command "info ramblock"
+> 
+>  exec.c                       | 44 +++++++++++++++++++++++++++++++++-----------
+>  hmp-commands-info.hx         | 14 ++++++++++++++
+>  hmp.c                        |  6 ++++++
+>  hmp.h                        |  1 +
+>  include/exec/ramlist.h       |  6 ++++++
+>  include/qemu-common.h        |  1 +
+>  migration/ram.c              | 13 +++++++------
+>  qapi/string-output-visitor.c | 22 ++++++----------------
+>  util/cutils.c                | 25 +++++++++++++++++++++++++
+>  9 files changed, 99 insertions(+), 33 deletions(-)
+> 
+> -- 
+> 2.7.4
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
