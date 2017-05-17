@@ -1,31 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44266)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45196)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dB1FT-0003HB-0B
-	for qemu-devel@nongnu.org; Wed, 17 May 2017 11:52:28 -0400
+	(envelope-from <eblake@redhat.com>) id 1dB1Ho-000545-2b
+	for qemu-devel@nongnu.org; Wed, 17 May 2017 11:54:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dB1FP-0002KL-Rm
-	for qemu-devel@nongnu.org; Wed, 17 May 2017 11:52:27 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:35388)
+	(envelope-from <eblake@redhat.com>) id 1dB1Hl-0003TH-25
+	for qemu-devel@nongnu.org; Wed, 17 May 2017 11:54:52 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34172)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dB1FP-0002K9-Ii
-	for qemu-devel@nongnu.org; Wed, 17 May 2017 11:52:23 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dB1Hk-0003Sz-P7
+	for qemu-devel@nongnu.org; Wed, 17 May 2017 11:54:48 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 5413B6556
-	for <qemu-devel@nongnu.org>; Wed, 17 May 2017 15:52:22 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id ADC3A23E6D8
+	for <qemu-devel@nongnu.org>; Wed, 17 May 2017 15:54:47 +0000 (UTC)
 References: <20170517153812.21993-1-quintela@redhat.com>
-	<20170517153812.21993-3-quintela@redhat.com>
+	<20170517153812.21993-4-quintela@redhat.com>
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <2c957f44-3318-0f99-6f6e-936df2bce154@redhat.com>
-Date: Wed, 17 May 2017 10:52:11 -0500
+Message-ID: <ca163777-4ffe-4361-eace-98eab28d6781@redhat.com>
+Date: Wed, 17 May 2017 10:54:44 -0500
 MIME-Version: 1.0
-In-Reply-To: <20170517153812.21993-3-quintela@redhat.com>
+In-Reply-To: <20170517153812.21993-4-quintela@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="CiwkIB1Q6uLWBRbMdsaXLkuPmebDjr6Xc"
-Subject: Re: [Qemu-devel] [PATCH 2/5] migration: Create block capability
+	boundary="wDrp00mqtKqccrdEjgG4mn7FvlvsVAmQa"
+Subject: Re: [Qemu-devel] [PATCH 3/5] migration: Remove use of old
+ MigrationParams
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,103 +39,49 @@ To: Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org
 Cc: dgilbert@redhat.com, lvivier@redhat.com, peterx@redhat.com, armbru@redhat.com
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---CiwkIB1Q6uLWBRbMdsaXLkuPmebDjr6Xc
+--wDrp00mqtKqccrdEjgG4mn7FvlvsVAmQa
 From: Eric Blake <eblake@redhat.com>
 To: Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org
 Cc: dgilbert@redhat.com, lvivier@redhat.com, peterx@redhat.com,
  armbru@redhat.com
-Message-ID: <2c957f44-3318-0f99-6f6e-936df2bce154@redhat.com>
-Subject: Re: [PATCH 2/5] migration: Create block capability
+Message-ID: <ca163777-4ffe-4361-eace-98eab28d6781@redhat.com>
+Subject: Re: [PATCH 3/5] migration: Remove use of old MigrationParams
 References: <20170517153812.21993-1-quintela@redhat.com>
- <20170517153812.21993-3-quintela@redhat.com>
-In-Reply-To: <20170517153812.21993-3-quintela@redhat.com>
+ <20170517153812.21993-4-quintela@redhat.com>
+In-Reply-To: <20170517153812.21993-4-quintela@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
 On 05/17/2017 10:38 AM, Juan Quintela wrote:
-> Create one capability for block migration and one parameter for
-> incremental block migration.
+> We have change in the previous patch to use migration capabilities for
+> it.  Notice that we continue using the old command line flags from
+> migrate command from the time being.  Remove the set_params method as
+> now it is empty.
+>=20
+> For savevm, one can't do a:
+>=20
+> savevm -b/-i foo
+>=20
+> but now one can do:
+>=20
+> migrate_set_capability block on
+> savevm foo
+>=20
+> And we can't use block migration. We could disable block capability
+> unconditionally, but it would not be much better.
 >=20
 > Signed-off-by: Juan Quintela <quintela@redhat.com>
 >=20
 > ---
+> - Maintain shared/enabled dependency (Xu suggestion)
+> - Now we maintain the dependency on the setter functions
+> - improve error messages
 >=20
-> @@ -1207,6 +1242,26 @@ void qmp_migrate(const char *uri, bool has_blk, =
-bool blk,
->          return;
->      }
-> =20
-> +    if (((has_blk && blk) || (has_inc && inc))
-> +        && (migrate_use_block() || migrate_use_block_incremental())) {=
+> Signed-off-by: Juan Quintela <quintela@redhat.com>
 
-> +        error_setg(errp, "Command options are incompatible with curren=
-t "
-> +                   "migration capabilities");
-> +        return;
-> +    }
-> +
-> +    if ((has_blk && blk) || (has_inc & inc)) {
-> +        migrate_set_block_enabled(true, &local_err);
-> +        if (local_err) {
-> +            error_propagate(errp, local_err);
-> +            return;
-> +        }
-> +        s->must_remove_block_options =3D true;
-> +    }
-
-You wrote:
-if (A && B) {
-  error;
-}
-if (A) {
-  stuff;
-}
-
-I might have done:
-
-if (A) {
-  if (B) {
-    error;
-  }
-  stuff;
-}
-
-but it's the same either way.
-
-
-> +++ b/qapi-schema.json
-> @@ -894,11 +894,18 @@
->  # @release-ram: if enabled, qemu will free the migrated ram pages on t=
-he source
->  #        during postcopy-ram migration. (since 2.9)
->  #
-> +# @block: If enabled, QEMU will also migrate the contents of all block=
-
-> +#          devices.  Default is disabled.  A possible alternative are
-
-s/are/uses/
-
-> +#          mirror jobs to a builtin NBD server on the destination, whi=
-ch
-> +#          are more flexible.
-
-s/are more flexible/offers more flexibility/
-
-> +#          (Since 2.10)
-> +#
->  # Since: 1.2
->  ##
->  { 'enum': 'MigrationCapability',
->    'data': ['xbzrle', 'rdma-pin-all', 'auto-converge', 'zero-blocks',
-> -           'compress', 'events', 'postcopy-ram', 'x-colo', 'release-ra=
-m'] }
-> +           'compress', 'events', 'postcopy-ram', 'x-colo', 'release-ra=
-m',
-> +           'block' ] }
-> =20
-
-The grammar touchups can be done in preparing the pull request, if there
-is no other reason for a respin.
+This second S-o-b gets stripped, but the one that counts is in place
+(I've made the same mistake before, as well - doing 'git commit --amend
+-s' on a commit where I already had a --- separator)
 
 Reviewed-by: Eric Blake <eblake@redhat.com>
 
@@ -144,7 +91,7 @@ Red Hat, Inc.           +1-919-301-3266
 Virtualization:  qemu.org | libvirt.org
 
 
---CiwkIB1Q6uLWBRbMdsaXLkuPmebDjr6Xc
+--wDrp00mqtKqccrdEjgG4mn7FvlvsVAmQa
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
@@ -154,13 +101,13 @@ Version: GnuPG v2
 Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
 Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQEcBAEBCAAGBQJZHHGrAAoJEKeha0olJ0NqdFUIAIWF8/+IJA1DY9bwRDxV+PJL
-1BrCp6xJAYNnzv1oCFXCdXUD9dEA7qn+gajbIIHjvMP1YVMkKG8hUeZX2h7yKDFQ
-Qw2zyG+p+Igw/PJ4XSSSOknljbsz+01Y04chMx7T8yag2vtjv9aeJPsl8Z8xKMUi
-0dCFsTV59db39087X8VLo4+AxO6xxXHpkmHo655whnaHLTt/qsFe3PRwUxuroyTP
-Ih01xPUsAiDycd8pAgtAxCmNz5tpB9nHYQtw7lsLyjV+4yLonPHKM0jKqcF/xBMP
-gj5JGq2dChie4HjIUDaYPcSg1E4WMNQ0ytdwOoVy1LTriLRecZ5KlDTKm4t9e0s=
-=HOaz
+iQEcBAEBCAAGBQJZHHJEAAoJEKeha0olJ0Nqf0EIAIBOsJjGx6XOsCcYM+OZlIqd
+BU9gO8X3fp+oZyZ/5UH3KUQvIVZCKaZ/qwHHM4gNjzEftK2m2HQJU7oFGIZ1e+LF
+YagmgJxSOf1nH3Asoh+nn5SU7TCtHDzZX/Empxv7ruRwjpov/h65iMza2/jOA47B
+ZNMOWjWEUjAH2m987SmK/ATJ9OA6ElQFUNhX/ynxIdNd+uHWb9zMqS2T93Wmot6D
+IL7C5xPJ6B7+rZkQDYjM6O9elkeQJE0B+I8CaL/Z+FznUxM/h4ldXea8Fdf9cTPz
+e3GKhkebbc9HXQ1U/16MLUQQJpi70R2vWvyVLA6A/QcP4F02w6dGlDspRcLjrcs=
+=ZF6S
 -----END PGP SIGNATURE-----
 
---CiwkIB1Q6uLWBRbMdsaXLkuPmebDjr6Xc--
+--wDrp00mqtKqccrdEjgG4mn7FvlvsVAmQa--
