@@ -1,21 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33600)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34455)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lvivier@redhat.com>) id 1dB0oQ-0004kg-Hm
-	for qemu-devel@nongnu.org; Wed, 17 May 2017 11:24:31 -0400
+	(envelope-from <maxime.coquelin@redhat.com>) id 1dB0rv-0005q2-Hk
+	for qemu-devel@nongnu.org; Wed, 17 May 2017 11:28:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lvivier@redhat.com>) id 1dB0oN-0000k4-BY
-	for qemu-devel@nongnu.org; Wed, 17 May 2017 11:24:30 -0400
-From: Laurent Vivier <lvivier@redhat.com>
-References: <149503190026.11264.1637374942003022823.stgit@bahia.lan>
-	<b1400dd4-ee4a-fa5e-a7b3-d2c5185d58ca@redhat.com>
-Message-ID: <a464cc50-650a-9aa9-ffe6-aa96582b1e3e@redhat.com>
-Date: Wed, 17 May 2017 17:24:23 +0200
+	(envelope-from <maxime.coquelin@redhat.com>) id 1dB0rs-0001wo-Ab
+	for qemu-devel@nongnu.org; Wed, 17 May 2017 11:28:07 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:56910)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <maxime.coquelin@redhat.com>)
+	id 1dB0rs-0001wj-4N
+	for qemu-devel@nongnu.org; Wed, 17 May 2017 11:28:04 -0400
+References: <20170511123246.31308-1-maxime.coquelin@redhat.com>
+	<20170511123246.31308-7-maxime.coquelin@redhat.com>
+	<20170511203345-mutt-send-email-mst@kernel.org>
+	<62516ce5-9d4c-d021-c4ab-a767c7f07b31@redhat.com>
+	<20170513025938-mutt-send-email-mst@kernel.org>
+From: Maxime Coquelin <maxime.coquelin@redhat.com>
+Message-ID: <f6b666ca-594c-e5ef-2b62-d88a10fab066@redhat.com>
+Date: Wed, 17 May 2017 17:27:53 +0200
 MIME-Version: 1.0
-In-Reply-To: <b1400dd4-ee4a-fa5e-a7b3-d2c5185d58ca@redhat.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20170513025938-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] xics_kvm: cache already enabled vCPU ids
+Subject: Re: [Qemu-devel] [PATCH 6/6] spec/vhost-user spec: Add IOMMU support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,34 +32,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org
-Cc: David Gibson <david@gibson.dropbear.id.au>, qemu-ppc@nongnu.org, Cedric Le Goater <clg@kaod.org>, Bharata B Rao <bharata@linux.vnet.ibm.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: peterx@redhat.com, marcandre.lureau@gmail.com, vkaplans@redhat.com, jasowang@redhat.com, wexu@redhat.com, yuanhan.liu@linux.intel.com, qemu-devel@nongnu.org, jfreiman@redhat.com
 
-On 17/05/2017 17:18, Laurent Vivier wrote:
-> On 17/05/2017 16:38, Greg Kurz wrote:
->> Since commit a45863bda90d ("xics_kvm: Don't enable KVM_CAP_IRQ_XICS if
->> already enabled"), we were able to re-hotplug a vCPU that had been hot-
->> unplugged ealier, thanks to a boolean flag in ICPState that we set when
->> enabling KVM_CAP_IRQ_XICS.
->>
->> This could work because the lifecycle of all ICPState objects was the
->> same as the machine. Commit 5bc8d26de20c ("spapr: allocate the ICPState
->> object from under sPAPRCPUCore") broke this assumption and now we always
->> pass a freshly allocated ICPState object (ie, with the flag unset) to
->> icp_kvm_cpu_setup().
->>
->> This cause re-hotplug to fail with:
->>
->> Unable to connect CPU8 to kernel XICS: Device or resource busy
->>
->> Let's fix this by caching all the vCPU ids for which KVM_CAP_IRQ_XICS was
->> enabled. This also drops the now useless boolean flag from ICPState.
->>
->> Reported-by: Laurent Vivier <lvivier@redhat.com>
->> Signed-off-by: Greg Kurz <groug@kaod.org>
-> 
-> Tested-by: Laurent Vivier <lvivier@redhat.com>
 
-and:
 
-Reviewed-by: Laurent Vivier <lvivier@redhat.com>
+On 05/13/2017 02:02 AM, Michael S. Tsirkin wrote:
+>>>> @@ -253,6 +271,31 @@ Once the source has finished migration, rings will be stopped by
+>>>>    the source. No further update must be done before rings are
+>>>>    restarted.
+>>>> +IOMMU support
+>>>> +-------------
+>>>> +
+>>>> +When the VIRTIO_F_IOMMU_PLATFORM feature has been negotiated, the master has
+>>>> +to send IOTLB entries update & invalidation by sending VHOST_USER_IOTLB_MSG
+>>>> +requests to the slave with a struct vhost_iotlb_msg payload.
+>>> Always? This seems a bit strange since iommu can be enabled/disabled
+>>> dynamically.
+>> Ok, what about:
+>>
+>> When the VIRTIO_F_IOMMU_PLATFORM feature has been negotiated and iommu
+>> is enbaled, the master sends IOTLB entries update & invalidation via
+>> VHOST_USER_IOTLB_MSG requests to the slave with a struct vhost_iotlb_msg
+>> payload.
+>>
+>>
+>>> Closing channel seems like a wrong thing to do for this.
+>> Sorry, I'm not sure to get your comment.
+> What happens when guest disables the IOMMU?
+
+I think you mean for example when rebooting the guest with IOMMU
+disabled. In this case, I think that the user backend should clean its
+IOTLB cache on the next SET_FEATURE call, as the kernel backend does.
+
+Note that I was wrong when stating:
+"When the VIRTIO_F_IOMMU_PLATFORM feature has been negotiated and iommu
+is enabled..."
+
+Actually, VIRTIO_F_IOMMU_PLATFORM is negotiated if both supported by the
+backend and the guest, and if an iommu device is attached. If the guest
+kernel doesn't enable the IOMMU (e.g. intel_iommu=off in kernel
+cmdline), the master replies to IOTLB misses with identity IOTLB
+entries updates (Passthrough) (it requires recent fixes from Peter to
+work[0]).
+
+Maxime
+
+[0]: http://patchwork.ozlabs.org/patch/763379/
