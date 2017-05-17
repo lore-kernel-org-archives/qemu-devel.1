@@ -1,27 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37857)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38273)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <arei.gonglei@huawei.com>) id 1dAv7D-00032n-1Q
-	for qemu-devel@nongnu.org; Wed, 17 May 2017 05:19:32 -0400
+	(envelope-from <lvivier@redhat.com>) id 1dAv9O-0003jX-VP
+	for qemu-devel@nongnu.org; Wed, 17 May 2017 05:21:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <arei.gonglei@huawei.com>) id 1dAv79-0007i2-Me
-	for qemu-devel@nongnu.org; Wed, 17 May 2017 05:19:31 -0400
-Received: from szxga02-in.huawei.com ([45.249.212.188]:3928)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <arei.gonglei@huawei.com>) id 1dAv78-0007hg-R1
-	for qemu-devel@nongnu.org; Wed, 17 May 2017 05:19:27 -0400
-From: "Gonglei (Arei)" <arei.gonglei@huawei.com>
-Date: Wed, 17 May 2017 09:18:38 +0000
-Message-ID: <33183CC9F5247A488A2544077AF19020DA29B247@DGGEMA505-MBS.china.huawei.com>
-References: <1492842231-223720-1-git-send-email-arei.gonglei@huawei.com>
-	<1492842231-223720-2-git-send-email-arei.gonglei@huawei.com>
-	<20170516153348.GR8498@stefanha-x1.localdomain>
-In-Reply-To: <20170516153348.GR8498@stefanha-x1.localdomain>
-Content-Language: zh-CN
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	(envelope-from <lvivier@redhat.com>) id 1dAv9L-000863-Iu
+	for qemu-devel@nongnu.org; Wed, 17 May 2017 05:21:46 -0400
+References: <20170517063547.23876-1-david@gibson.dropbear.id.au>
+	<20170517063547.23876-3-david@gibson.dropbear.id.au>
+From: Laurent Vivier <lvivier@redhat.com>
+Message-ID: <6aada930-70e9-e82d-0b1a-174629b27dc6@redhat.com>
+Date: Wed, 17 May 2017 11:21:26 +0200
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [virtio-dev] [PATCH v18 1/2] virtio-crypto: Add
- virtio crypto device specification
+In-Reply-To: <20170517063547.23876-3-david@gibson.dropbear.id.au>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC 2/2] pseries: Restore PVR negotiation logic
+ for pre-2.9 machine types
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,100 +25,142 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "virtio-dev@lists.oasis-open.org" <virtio-dev@lists.oasis-open.org>, Luonengjun <luonengjun@huawei.com>, "mst@redhat.com" <mst@redhat.com>, "cornelia.huck@de.ibm.com" <cornelia.huck@de.ibm.com>, "denglingli@chinamobile.com" <denglingli@chinamobile.com>, Jani Kokkonen <Jani.Kokkonen@huawei.com>, "Ola.Liljedahl@arm.com" <Ola.Liljedahl@arm.com>, "Varun.Sethi@freescale.com" <Varun.Sethi@freescale.com>, "xin.zeng@intel.com" <xin.zeng@intel.com>, "brian.a.keating@intel.com" <brian.a.keating@intel.com>, "liang.j.ma@intel.com" <liang.j.ma@intel.com>, "john.griffin@intel.com" <john.griffin@intel.com>, "Huangweidong (C)" <weidong.huang@huawei.com>, "mike.caraman@nxp.com" <mike.caraman@nxp.com>, "agraf@suse.de" <agraf@suse.de>, "jasowang@redhat.com" <jasowang@redhat.com>, "nmorey@kalray.eu" <nmorey@kalray.eu>, "vincent.jardin@6wind.com" <vincent.jardin@6wind.com>, "Wubin (H)" <wu.wubin@huawei.com>, "arei.gonglei@hotmail.com" <arei.gonglei@hotmail.com>, "pasic@linux.vnet.ibm.com" <pasic@linux.vnet.ibm.com>, Linqiangmin <linqiangmin@huawei.com>, Zhbzg <zhbzg@huawei.com>, "Chenshanxi (Eety Chen,
-	Euler)" <eety.chen@huawei.com>, "Zhanghuimin (Amy)" <amy.zhanghuimin@huawei.com>, "lixiao (H)" <lixiao91@huawei.com>
+To: David Gibson <david@gibson.dropbear.id.au>, abologna@redhat.com, thuth@redhat.com
+Cc: mdroth@linux.vnet.ibm.com, aik@ozlabs.ru, bharata@linux.vnet.ibm.com, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 
->
->=20
-> On Sat, Apr 22, 2017 at 02:23:50PM +0800, Gonglei wrote:
-> > +Dataq requests for both session and stateless modes are as follows:
-> > +
-> > +\begin{lstlisting}
-> > +struct virtio_crypto_op_data_req_mux {
-> > +    struct virtio_crypto_op_header header;
-> > +
-> > +    union {
-> > +        struct virtio_crypto_sym_data_req   sym_req;
-> > +        struct virtio_crypto_hash_data_req  hash_req;
-> > +        struct virtio_crypto_mac_data_req   mac_req;
-> > +        struct virtio_crypto_aead_data_req  aead_req;
-> > +        struct virtio_crypto_sym_data_req_stateless
-> sym_stateless_req;
-> > +        struct virtio_crypto_hash_data_req_stateless
-> hash_stateless_req;
-> > +        struct virtio_crypto_mac_data_req_stateless
-> mac_stateless_req;
-> > +        struct virtio_crypto_aead_data_req_stateless
-> aead_stateless_req;
-> > +    } u;
-> > +};
-> > +\end{lstlisting}
->=20
-> Halil touched on this in the discussion: this spec uses a C-like struct
-> syntax but does not define whether unions really affect sizeof(mystruct)
-> like they would in C or whether you just mean that any of the union
-> fields can be used.  This distinction is important so device and driver
-> authors understand the exact memory layout of requests and responses.
->=20
-> Please include an explanation about the meaning of "union" in the text.
->=20
-Halil has different opinion in other thread, I replied.
+On 17/05/2017 08:35, David Gibson wrote:
+> "pseries" guests go through a hypervisor<->guest feature negotiation during
+> early boot.  Part of this is finding a CPU compatibility mode which works
+> for both.
+> 
+> In 152ef80 "pseries: Rewrite CAS PVR compatibility logic" this logic was
+> changed to strongly prefer architecture defined CPU compatibility modes,
+> rather than CPU "raw" modes.  However, this change was made universally,
+> which introduces a guest visible change for the previously existing machine
+> types (pseries-2.8 and earlier).  That's never supposed to happen.
+> 
+> This corrects the behaviour, reverting to the old PVR negotiation logic
+> for machine types prior to pseries-2.9.
+> 
+> Fixes: 152ef803ceb1959e2380a1da7736b935b109222e
+> Reported-by: Andrea Bolognani <abologna@redhat.com>
+> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+> ---
+>  hw/ppc/spapr.c         |  3 ++
+>  hw/ppc/spapr_hcall.c   | 90 +++++++++++++++++++++++++++++++++++++++++++++++++-
+>  include/hw/ppc/spapr.h |  1 +
+>  3 files changed, 93 insertions(+), 1 deletion(-)
+> 
+> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> index a9471b9..913355f 100644
+> --- a/hw/ppc/spapr.c
+> +++ b/hw/ppc/spapr.c
+> @@ -3308,9 +3308,12 @@ static void spapr_machine_2_8_instance_options(MachineState *machine)
+>  
+>  static void spapr_machine_2_8_class_options(MachineClass *mc)
+>  {
+> +    sPAPRMachineClass *smc = SPAPR_MACHINE_CLASS(mc);
+> +
+>      spapr_machine_2_9_class_options(mc);
+>      SET_MACHINE_COMPAT(mc, SPAPR_COMPAT_2_8);
+>      mc->numa_mem_align_shift = 23;
+> +    smc->pre_2_9_cas_pvr = true;
+>  }
+>  
+>  DEFINE_SPAPR_MACHINE(2_8, "2.8", false);
+> diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
+> index 007ae8d..4937019 100644
+> --- a/hw/ppc/spapr_hcall.c
+> +++ b/hw/ppc/spapr_hcall.c
+> @@ -1047,6 +1047,89 @@ static target_ulong h_signal_sys_reset(PowerPCCPU *cpu,
+>      }
+>  }
+>  
+> +/*
+> + * Old logic for PVR negotiation, used old <2.9 machine types for
+> + * compatibility with old qemu versions
+> + */
+> +#define get_compat_level(cpuver) (                  \
+> +        ((cpuver) == CPU_POWERPC_LOGICAL_2_05) ? 2050 : \
+> +        ((cpuver) == CPU_POWERPC_LOGICAL_2_06) ? 2060 :  \
+> +        ((cpuver) == CPU_POWERPC_LOGICAL_2_06_PLUS) ? 2061 :    \
+> +        ((cpuver) == CPU_POWERPC_LOGICAL_2_07) ? 2070 : 0)
+> +
+> +static void cas_handle_compat_cpu(PowerPCCPUClass *pcc, uint32_t pvr,
+> +                                  unsigned max_lvl, unsigned *compat_lvl,
+> +                                  unsigned *compat_pvr)
+> +{
+> +    unsigned lvl = get_compat_level(pvr);
+> +    bool is205, is206, is207;
+> +
+> +    if (!lvl) {
+> +        return;
+> +    }
+> +
+> +    /* If it is a logical PVR, try to determine the highest level */
+> +    is205 = (pcc->pcr_supported & PCR_COMPAT_2_05) &&
+> +        (lvl == get_compat_level(CPU_POWERPC_LOGICAL_2_05));
+> +    is206 = (pcc->pcr_supported & PCR_COMPAT_2_06) &&
+> +        ((lvl == get_compat_level(CPU_POWERPC_LOGICAL_2_06)) ||
+> +         (lvl == get_compat_level(CPU_POWERPC_LOGICAL_2_06_PLUS)));
+> +    is207 = (pcc->pcr_supported & PCR_COMPAT_2_07) &&
+> +        (lvl == get_compat_level(CPU_POWERPC_LOGICAL_2_07));
+> +
+> +    if (is205 || is206 || is207) {
+> +        if (!max_lvl) {
+> +            /* User did not set the level, choose the highest */
+> +            if (*compat_lvl <= lvl) {
+> +                *compat_lvl = lvl;
+> +                *compat_pvr = pvr;
+> +            }
+> +        } else if (max_lvl >= lvl) {
+> +            /* User chose the level, don't set higher than this */
+> +            *compat_lvl = lvl;
+> +            *compat_pvr = pvr;
+> +        }
+> +    }
+> +}
+> +
+> +static uint32_t cas_check_pvr_pre_2_9(PowerPCCPU *cpu, target_ulong list,
+> +                                      Error **errp)
+> +{
+> +    PowerPCCPUClass *pcc = POWERPC_CPU_GET_CLASS(cpu);
+> +    int counter;
+> +    unsigned max_lvl = get_compat_level(cpu->max_compat);
+> +    bool cpu_match = false;
+> +    unsigned compat_lvl = 0, compat_pvr = 0;
+> +
+> +    for (counter = 0; counter < 512; ++counter) {
+> +        uint32_t pvr, pvr_mask;
+> +
+> +        pvr_mask = ldl_be_phys(&address_space_memory, list);
+> +        pvr = ldl_be_phys(&address_space_memory, list + 4);
+> +        list += 8;
+> +
+> +        if (~pvr_mask & pvr) {
+> +            break; /* Terminator record */
+> +        }
+> +
+> +        trace_spapr_cas_pvr_try(pvr);
+> +        if (!max_lvl &&
+> +            ((cpu->env.spr[SPR_PVR] & pvr_mask) == (pvr & pvr_mask))) {
+> +            cpu_match = true;
+> +            compat_pvr = 0;
+> +        } else if (pvr == cpu->compat_pvr) {
+> +            cpu_match = true;
+> +            compat_pvr = cpu->compat_pvr;
+> +        } else if (!cpu_match) {
+> +            cas_handle_compat_cpu(pcc, pvr, max_lvl, &compat_lvl, &compat_pvr);
+> +        }
+> +    }
+> +
+> +    trace_spapr_cas_pvr(cpu->compat_pvr, cpu_match, compat_pvr);
 
-I'll wait for his new response about it. Thanks!
+Perhaps you can add a new function or a parameter to show which path
+(pre_2_9 or not) we use to compute the CAS PVR?
 
-> > +Session mode MAC service requests are as follows:
-> > +
-> > +\begin{lstlisting}
-> > +struct virtio_crypto_mac_para {
-> > +    struct virtio_crypto_hash_para hash;
-> > +};
-> > +
-> > +struct virtio_crypto_mac_data_req {
-> > +    /* Device-readable part */
-> > +    struct virtio_crypto_mac_para para;
-> > +    /* Source data */
-> > +    u8 src_data[src_data_len];
-> > +
-> > +    /* Device-writable part */
-> > +    /* Hash result data */
-> > +    u8 hash_result[hash_result_len];
-> > +    struct virtio_crypto_inhdr inhdr;
-> > +};
-> > +\end{lstlisting}
-> > +
-> > +Each data request uses virtio_crypto_mac_data_req structure to store
-> information
->=20
-> "Each request uses the virtio_crypto_mac_data_req structure to store
-> information"
->=20
-OK.
+anyway:
 
-> > +Session mode requests of symmetric algorithm are as follows:
-> > +
-> > +\begin{lstlisting}
-> > +struct virtio_crypto_sym_data_req {
-> > +    union {
-> > +        struct virtio_crypto_cipher_data_req cipher;
-> > +        struct virtio_crypto_alg_chain_data_req chain;
-> > +    } u;
-> > +
-> > +    /* Device-readable part */
-> > +
-> > +    /* See above VIRTIO_CRYPTO_SYM_OP_* */
-> > +    le32 op_type;
-> > +    le32 padding;
-> > +};
-> > +\end{lstlisting}
-> > +
-> > +Each data request uses virtio_crypto_sym_data_req structure to store
-> information
->=20
-> s/virtio_crypto_sym_data_req structure/the virtio_crypto_sym_data_req
-> structure/
+Reviewed-by: Laurent Vivier <lvivier@redhat.com>
 
-OK.
-
-Thanks,
--Gonglei
+Laurent
