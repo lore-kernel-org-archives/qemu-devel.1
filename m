@@ -1,48 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54090)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35532)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pasic@linux.vnet.ibm.com>) id 1dAwGs-0002Nb-5I
-	for qemu-devel@nongnu.org; Wed, 17 May 2017 06:33:35 -0400
+	(envelope-from <armbru@redhat.com>) id 1dAwqD-0008R5-Ko
+	for qemu-devel@nongnu.org; Wed, 17 May 2017 07:10:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pasic@linux.vnet.ibm.com>) id 1dAwGp-00046x-1Z
-	for qemu-devel@nongnu.org; Wed, 17 May 2017 06:33:34 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:38900
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pasic@linux.vnet.ibm.com>)
-	id 1dAwGo-00046k-SD
-	for qemu-devel@nongnu.org; Wed, 17 May 2017 06:33:30 -0400
-Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v4HATrOs073950
-	for <qemu-devel@nongnu.org>; Wed, 17 May 2017 06:33:29 -0400
-Received: from e06smtp10.uk.ibm.com (e06smtp10.uk.ibm.com [195.75.94.106])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2agmca1c28-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 17 May 2017 06:33:29 -0400
-Received: from localhost
-	by e06smtp10.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <pasic@linux.vnet.ibm.com>;
-	Wed, 17 May 2017 11:33:25 +0100
-References: <1494243504-127980-1-git-send-email-arei.gonglei@huawei.com>
-	<1494243504-127980-7-git-send-email-arei.gonglei@huawei.com>
-	<520f45d4-33d7-8836-3140-a92ee5d15421@linux.vnet.ibm.com>
-	<33183CC9F5247A488A2544077AF19020DA278AA0@DGGEMA505-MBS.china.huawei.com>
-	<1963bfa1-c0ea-156a-59f7-aed744ca49a3@linux.vnet.ibm.com>
-	<33183CC9F5247A488A2544077AF19020DA29A0B5@DGGEMA505-MBS.china.huawei.com>
-	<b7c20d5f-026e-edf1-6703-6b64ceed375f@linux.vnet.ibm.com>
-	<33183CC9F5247A488A2544077AF19020DA29B209@DGGEMA505-MBS.china.huawei.com>
-	<a8b185ca-4b8d-e913-cfb3-454d61dbce78@linux.vnet.ibm.com>
-	<33183CC9F5247A488A2544077AF19020DA29B2BF@DGGEMA505-MBS.china.huawei.com>
-From: Halil Pasic <pasic@linux.vnet.ibm.com>
-Date: Wed, 17 May 2017 12:33:20 +0200
+	(envelope-from <armbru@redhat.com>) id 1dAwq8-000121-Ml
+	for qemu-devel@nongnu.org; Wed, 17 May 2017 07:10:04 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:56405)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dAwq8-00010y-DB
+	for qemu-devel@nongnu.org; Wed, 17 May 2017 07:10:00 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id E407861976
+	for <qemu-devel@nongnu.org>; Wed, 17 May 2017 11:09:58 +0000 (UTC)
+From: Markus Armbruster <armbru@redhat.com>
+References: <20170509173559.31598-1-marcandre.lureau@redhat.com>
+	<20170509173559.31598-13-marcandre.lureau@redhat.com>
+Date: Wed, 17 May 2017 13:09:54 +0200
+In-Reply-To: <20170509173559.31598-13-marcandre.lureau@redhat.com>
+	(=?utf-8?Q?=22Marc-Andr=C3=A9?= Lureau"'s message of "Tue, 9 May 2017
+	20:35:54 +0300")
+Message-ID: <87h90j3fjx.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <33183CC9F5247A488A2544077AF19020DA29B2BF@DGGEMA505-MBS.china.huawei.com>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 8bit
-Message-Id: <de319d04-a424-5b88-6ddb-a25b4053aa18@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [RFC v1 6/9] virtio-crypto: rework
- virtio_crypto_handle_request
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 12/17] qdev: use int and uint properties as
+ appropriate
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -51,99 +36,418 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Gonglei (Arei)" <arei.gonglei@huawei.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "mst@redhat.com" <mst@redhat.com>, "Huangweidong (C)" <weidong.huang@huawei.com>, "stefanha@redhat.com" <stefanha@redhat.com>, Luonengjun <luonengjun@huawei.com>, "cornelia.huck@de.ibm.com" <cornelia.huck@de.ibm.com>, Linqiangmin <linqiangmin@huawei.com>, "xin.zeng@intel.com" <xin.zeng@intel.com>, "Wubin (H)" <wu.wubin@huawei.com>
+To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
+Cc: qemu-devel@nongnu.org
 
+Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
 
+> Use unsigned type for various properties.
+>
+> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> ---
+>  include/hw/qdev-core.h       |  5 +++-
+>  include/hw/qdev-properties.h | 67 ++++++++++++++++++++++++++------------=
+------
+>  hw/block/fdc.c               | 54 +++++++++++++++++------------------
+>  hw/core/qdev-properties.c    |  8 +++---
+>  hw/core/qdev.c               | 24 ++++++++++------
+>  hw/net/e1000e.c              | 14 ++++-----
+>  6 files changed, 96 insertions(+), 76 deletions(-)
+>
+> diff --git a/include/hw/qdev-core.h b/include/hw/qdev-core.h
+> index 0f21a500cd..ac10458650 100644
+> --- a/include/hw/qdev-core.h
+> +++ b/include/hw/qdev-core.h
+> @@ -225,7 +225,10 @@ struct Property {
+>      PropertyInfo *info;
+>      ptrdiff_t    offset;
+>      uint8_t      bitnr;
+> -    int64_t      defval;
+> +    union {
+> +        int64_t i;
+> +        uint64_t u;
+> +    } defval;
 
-On 05/17/2017 12:13 PM, Gonglei (Arei) wrote:
->>
->> On 05/17/2017 11:12 AM, Gonglei (Arei) wrote:
->>>>>> By the way, I'm having a hard time understing how is the requirement
->> form
->>>>>>
->>>>
->> http://docs.oasis-open.org/virtio/virtio/v1.0/cs04/virtio-v1.0-cs04.html#x1-260
->>>>>> 004
->>>>>> (2.4.4 Message Framing) satisfied by this code. Could you explain this
->>>>>> to me please?
->>>>>>
->>>>> Sorry for my bad English,
->>>>> I don't know which normative formulation the code violates?
->>>> I'm not sure it's actually violated, but I'm concerned about the following
->>>> normative statement: "The device MUST NOT make assumptions about the
->>>> particular
->>>> arrangement of descriptors. The device MAY have a reasonable limit of
->>>> descriptors it will allow in a chain."
->>>>
->>>> Please also read the explanatory part I've linked, because the normative
->>>> statement is pretty abstract.
->>>>
->>>> In my understanding, the spec says, that e.g. the virti-crypto device
->>>> should not fail if a single request is split up into let's say two chunks
->>>> and transmitted by the means of two top level descriptors.
->>>>
->>>> Do you agree with my reading of the spec?
->>>>
->>> Yes, I agree. But what's the relationship about the request here?
->>> We don't assume the request have to use one desc entity, it can
->>> use scatter-gather list for one request header.
->>> The device can cover the situation in the QEMU.
->>>
->>>> What does the virtio-crypto device do if it encounters such a situation?
->>>>
->>> This isn't a problem. Pls see blow code segment:
->>>
->>> virtio_crypto_handle_request()
->>> {...
->>> if (unlikely(iov_to_buf(out_iov, out_num, 0, &req, sizeof(req))
->>>                 != sizeof(req))) {
->>>     virtio_error(vdev, "virtio-crypto request outhdr too short");
->>>     return -1;
->>> }
->>> iov_discard_front(&out_iov, &out_num, sizeof(req));
->>> ...
->>>
->>
->> Thats exactly what worries me. I see a call to virtio_error there...
->>
->>
->> void GCC_FMT_ATTR(2, 3) virtio_error(VirtIODevice *vdev, const char *fmt, ...)
->> {
->>     va_list ap;
->>
->>     va_start(ap, fmt);
->>     error_vreport(fmt, ap);
->>     va_end(ap);
->>
->>     vdev->broken = true;
->>
->>     if (virtio_vdev_has_feature(vdev, VIRTIO_F_VERSION_1)) {
->>         virtio_set_status(vdev, vdev->status |
->> VIRTIO_CONFIG_S_NEEDS_RESET);
->>         virtio_notify_config(vdev);
->>     }
->> }
->>
->> This however seems to make the device 'broken'. Or am I missing something?
->>
-> Yes, if the parse process failed, the device will broke. 
-> But This is a exception scenario IMHO, which is the same situation
-> with other virtio devices. 
+Could also simply make it uint64_t.  Converting a negative integer to
+uint64_t adds 2^64 (See ISO/IEC 9899:1999 =C2=A76.3.1.3).  Converting back =
+is
+implementation-defined (ibid.), but in practice it yields the same
+signed integer (loads of code relies on that).  Matter of taste.
 
-I know that virtio-blk does the same. I'm not sure my reading of the
-spec is correct. Maybe Stefan, Michael or Connie can clarify this
-for us!
+>      int          arrayoffset;
+>      PropertyInfo *arrayinfo;
+>      int          arrayfieldsize;
+> diff --git a/include/hw/qdev-properties.h b/include/hw/qdev-properties.h
+> index 16d5d0629b..ca9c550fa3 100644
+> --- a/include/hw/qdev-properties.h
+> +++ b/include/hw/qdev-properties.h
+> @@ -37,36 +37,47 @@ extern PropertyInfo qdev_prop_arraylen;
+>          .offset    =3D offsetof(_state, _field)                    \
+>              + type_check(_type, typeof_field(_state, _field)),   \
+>          }
+> -#define DEFINE_PROP_DEFAULT(_name, _state, _field, _defval, _prop, _type=
+) { \
+> +
+> +#define DEFINE_PROP_INT(_name, _state, _field, _defval, _prop, _type) { \
+>          .name      =3D (_name),                                         =
+  \
+>          .info      =3D &(_prop),                                        =
+  \
+>          .offset    =3D offsetof(_state, _field)                         =
+  \
+>              + type_check(_type,typeof_field(_state, _field)),           \
+> -        .defval    =3D (_type)_defval,                                  =
+  \
+> +        .defval.i  =3D (_type)_defval,                                  =
+  \
+>          }
 
-By the way for virtio-blk the current handling was introduced by
-commit 20ea686a0 (by Greg Kurz), but before we were failing even harder.
+Doing the rename in a separate patch would make review a bit easier.
+Not worth splitting now, but consider it next time.
 
-Regards,
-Halil
-
-> 
-> Stefan introduced the virtio_error().
-> 
-> Thanks,
-> -Gonglei
-> 
+> -#define DEFINE_PROP_BIT(_name, _state, _field, _bit, _defval) {  \
+> -        .name      =3D (_name),                                    \
+> -        .info      =3D &(qdev_prop_bit),                           \
+> -        .bitnr    =3D (_bit),                                      \
+> -        .offset    =3D offsetof(_state, _field)                    \
+> -            + type_check(uint32_t,typeof_field(_state, _field)), \
+> -        .defval    =3D (bool)_defval,                              \
+> +
+> +#define DEFINE_PROP_BIT(_name, _state, _field, _bit, _defval) {         \
+> +        .name      =3D (_name),                                         =
+  \
+> +        .info      =3D &(qdev_prop_bit),                                =
+  \
+> +        .bitnr    =3D (_bit),                                           =
+  \
+> +        .offset    =3D offsetof(_state, _field)                         =
+  \
+> +            + type_check(uint32_t, typeof_field(_state, _field)),       =
+ \
+> +        .defval.u   =3D (bool)_defval,                                  =
+  \
+>          }
+> +
+> +#define DEFINE_PROP_UINT(_name, _state, _field, _defval, _prop, _type) {=
+ \
+> +        .name      =3D (_name),                                         =
+  \
+> +        .info      =3D &(_prop),                                        =
+  \
+> +        .offset    =3D offsetof(_state, _field)                         =
+  \
+> +            + type_check(_type, typeof_field(_state, _field)),          \
+> +        .defval.u  =3D (_type)_defval,                                  =
+  \
+> +        }
+> +
+>  #define DEFINE_PROP_BIT64(_name, _state, _field, _bit, _defval) {       \
+>          .name      =3D (_name),                                         =
+  \
+>          .info      =3D &(qdev_prop_bit64),                              =
+  \
+>          .bitnr    =3D (_bit),                                           =
+  \
+>          .offset    =3D offsetof(_state, _field)                         =
+  \
+>              + type_check(uint64_t, typeof_field(_state, _field)),       \
+> -        .defval    =3D (bool)_defval,                                   =
+  \
+> +        .defval.u  =3D (bool)_defval,                                   =
+  \
+>          }
+>=20=20
+> -#define DEFINE_PROP_BOOL(_name, _state, _field, _defval) {       \
+> -        .name      =3D (_name),                                    \
+> -        .info      =3D &(qdev_prop_bool),                          \
+> -        .offset    =3D offsetof(_state, _field)                    \
+> -            + type_check(bool, typeof_field(_state, _field)),    \
+> -        .defval    =3D (bool)_defval,                              \
+> +#define DEFINE_PROP_BOOL(_name, _state, _field, _defval) {      \
+> +        .name      =3D (_name),                                   \
+> +        .info      =3D &(qdev_prop_bool),                         \
+> +        .offset    =3D offsetof(_state, _field)                   \
+> +            + type_check(bool, typeof_field(_state, _field)),   \
+> +        .defval.u    =3D (bool)_defval,                           \
+>          }
+>=20=20
+>  #define PROP_ARRAY_LEN_PREFIX "len-"
+> @@ -107,19 +118,19 @@ extern PropertyInfo qdev_prop_arraylen;
+>          }
+>=20=20
+>  #define DEFINE_PROP_UINT8(_n, _s, _f, _d)                       \
+> -    DEFINE_PROP_DEFAULT(_n, _s, _f, _d, qdev_prop_uint8, uint8_t)
+> +    DEFINE_PROP_UINT(_n, _s, _f, _d, qdev_prop_uint8, uint8_t)
+>  #define DEFINE_PROP_UINT16(_n, _s, _f, _d)                      \
+> -    DEFINE_PROP_DEFAULT(_n, _s, _f, _d, qdev_prop_uint16, uint16_t)
+> +    DEFINE_PROP_UINT(_n, _s, _f, _d, qdev_prop_uint16, uint16_t)
+>  #define DEFINE_PROP_UINT32(_n, _s, _f, _d)                      \
+> -    DEFINE_PROP_DEFAULT(_n, _s, _f, _d, qdev_prop_uint32, uint32_t)
+> +    DEFINE_PROP_UINT(_n, _s, _f, _d, qdev_prop_uint32, uint32_t)
+>  #define DEFINE_PROP_INT32(_n, _s, _f, _d)                      \
+> -    DEFINE_PROP_DEFAULT(_n, _s, _f, _d, qdev_prop_int32, int32_t)
+> +    DEFINE_PROP_INT(_n, _s, _f, _d, qdev_prop_int32, int32_t)
+>  #define DEFINE_PROP_UINT64(_n, _s, _f, _d)                      \
+> -    DEFINE_PROP_DEFAULT(_n, _s, _f, _d, qdev_prop_uint64, uint64_t)
+> +    DEFINE_PROP_UINT(_n, _s, _f, _d, qdev_prop_uint64, uint64_t)
+>  #define DEFINE_PROP_SIZE(_n, _s, _f, _d)                       \
+> -    DEFINE_PROP_DEFAULT(_n, _s, _f, _d, qdev_prop_size, uint64_t)
+> +    DEFINE_PROP_UINT(_n, _s, _f, _d, qdev_prop_size, uint64_t)
+>  #define DEFINE_PROP_PCI_DEVFN(_n, _s, _f, _d)                   \
+> -    DEFINE_PROP_DEFAULT(_n, _s, _f, _d, qdev_prop_pci_devfn, int32_t)
+> +    DEFINE_PROP_INT(_n, _s, _f, _d, qdev_prop_pci_devfn, int32_t)
+>=20=20
+>  /*
+>   * Please avoid pointer properties.  If you must use them, you must
+> @@ -153,17 +164,17 @@ extern PropertyInfo qdev_prop_arraylen;
+>  #define DEFINE_PROP_MACADDR(_n, _s, _f)         \
+>      DEFINE_PROP(_n, _s, _f, qdev_prop_macaddr, MACAddr)
+>  #define DEFINE_PROP_ON_OFF_AUTO(_n, _s, _f, _d) \
+> -    DEFINE_PROP_DEFAULT(_n, _s, _f, _d, qdev_prop_on_off_auto, OnOffAuto)
+> +    DEFINE_PROP_INT(_n, _s, _f, _d, qdev_prop_on_off_auto, OnOffAuto)
+>  #define DEFINE_PROP_LOSTTICKPOLICY(_n, _s, _f, _d) \
+> -    DEFINE_PROP_DEFAULT(_n, _s, _f, _d, qdev_prop_losttickpolicy, \
+> +    DEFINE_PROP_INT(_n, _s, _f, _d, qdev_prop_losttickpolicy, \
+>                          LostTickPolicy)
+>  #define DEFINE_PROP_BLOCKDEV_ON_ERROR(_n, _s, _f, _d) \
+> -    DEFINE_PROP_DEFAULT(_n, _s, _f, _d, qdev_prop_blockdev_on_error, \
+> +    DEFINE_PROP_INT(_n, _s, _f, _d, qdev_prop_blockdev_on_error, \
+>                          BlockdevOnError)
+>  #define DEFINE_PROP_BIOS_CHS_TRANS(_n, _s, _f, _d) \
+> -    DEFINE_PROP_DEFAULT(_n, _s, _f, _d, qdev_prop_bios_chs_trans, int)
+> +    DEFINE_PROP_INT(_n, _s, _f, _d, qdev_prop_bios_chs_trans, int)
+>  #define DEFINE_PROP_BLOCKSIZE(_n, _s, _f) \
+> -    DEFINE_PROP_DEFAULT(_n, _s, _f, 0, qdev_prop_blocksize, uint16_t)
+> +    DEFINE_PROP_UINT(_n, _s, _f, 0, qdev_prop_blocksize, uint16_t)
+>  #define DEFINE_PROP_PCI_HOST_DEVADDR(_n, _s, _f) \
+>      DEFINE_PROP(_n, _s, _f, qdev_prop_pci_host_devaddr, PCIHostDeviceAdd=
+ress)
+>=20=20
+> diff --git a/hw/block/fdc.c b/hw/block/fdc.c
+> index 2e629b398b..07ce4a0d20 100644
+> --- a/hw/block/fdc.c
+> +++ b/hw/block/fdc.c
+> @@ -511,9 +511,9 @@ typedef struct FloppyDrive {
+>  static Property floppy_drive_properties[] =3D {
+>      DEFINE_PROP_UINT32("unit", FloppyDrive, unit, -1),
+>      DEFINE_BLOCK_PROPERTIES(FloppyDrive, conf),
+> -    DEFINE_PROP_DEFAULT("drive-type", FloppyDrive, type,
+> -                        FLOPPY_DRIVE_TYPE_AUTO, qdev_prop_fdc_drive_type,
+> -                        FloppyDriveType),
+> +    DEFINE_PROP_INT("drive-type", FloppyDrive, type,
+> +                    FLOPPY_DRIVE_TYPE_AUTO, qdev_prop_fdc_drive_type,
+> +                    FloppyDriveType),
+>      DEFINE_PROP_END_OF_LIST(),
+>  };
+>=20=20
+> @@ -2805,15 +2805,15 @@ static Property isa_fdc_properties[] =3D {
+>      DEFINE_PROP_DRIVE("driveB", FDCtrlISABus, state.qdev_for_drives[1].b=
+lk),
+>      DEFINE_PROP_BIT("check_media_rate", FDCtrlISABus, state.check_media_=
+rate,
+>                      0, true),
+> -    DEFINE_PROP_DEFAULT("fdtypeA", FDCtrlISABus, state.qdev_for_drives[0=
+].type,
+> -                        FLOPPY_DRIVE_TYPE_AUTO, qdev_prop_fdc_drive_type,
+> -                        FloppyDriveType),
+> -    DEFINE_PROP_DEFAULT("fdtypeB", FDCtrlISABus, state.qdev_for_drives[1=
+].type,
+> -                        FLOPPY_DRIVE_TYPE_AUTO, qdev_prop_fdc_drive_type,
+> -                        FloppyDriveType),
+> -    DEFINE_PROP_DEFAULT("fallback", FDCtrlISABus, state.fallback,
+> -                        FLOPPY_DRIVE_TYPE_288, qdev_prop_fdc_drive_type,
+> -                        FloppyDriveType),
+> +    DEFINE_PROP_INT("fdtypeA", FDCtrlISABus, state.qdev_for_drives[0].ty=
+pe,
+> +                    FLOPPY_DRIVE_TYPE_AUTO, qdev_prop_fdc_drive_type,
+> +                    FloppyDriveType),
+> +    DEFINE_PROP_INT("fdtypeB", FDCtrlISABus, state.qdev_for_drives[1].ty=
+pe,
+> +                    FLOPPY_DRIVE_TYPE_AUTO, qdev_prop_fdc_drive_type,
+> +                    FloppyDriveType),
+> +    DEFINE_PROP_INT("fallback", FDCtrlISABus, state.fallback,
+> +                    FLOPPY_DRIVE_TYPE_288, qdev_prop_fdc_drive_type,
+> +                    FloppyDriveType),
+>      DEFINE_PROP_END_OF_LIST(),
+>  };
+>=20=20
+> @@ -2862,15 +2862,15 @@ static const VMStateDescription vmstate_sysbus_fd=
+c =3D{
+>  static Property sysbus_fdc_properties[] =3D {
+>      DEFINE_PROP_DRIVE("driveA", FDCtrlSysBus, state.qdev_for_drives[0].b=
+lk),
+>      DEFINE_PROP_DRIVE("driveB", FDCtrlSysBus, state.qdev_for_drives[1].b=
+lk),
+> -    DEFINE_PROP_DEFAULT("fdtypeA", FDCtrlSysBus, state.qdev_for_drives[0=
+].type,
+> -                        FLOPPY_DRIVE_TYPE_AUTO, qdev_prop_fdc_drive_type,
+> -                        FloppyDriveType),
+> -    DEFINE_PROP_DEFAULT("fdtypeB", FDCtrlSysBus, state.qdev_for_drives[1=
+].type,
+> -                        FLOPPY_DRIVE_TYPE_AUTO, qdev_prop_fdc_drive_type,
+> -                        FloppyDriveType),
+> -    DEFINE_PROP_DEFAULT("fallback", FDCtrlISABus, state.fallback,
+> -                        FLOPPY_DRIVE_TYPE_144, qdev_prop_fdc_drive_type,
+> -                        FloppyDriveType),
+> +    DEFINE_PROP_INT("fdtypeA", FDCtrlSysBus, state.qdev_for_drives[0].ty=
+pe,
+> +                    FLOPPY_DRIVE_TYPE_AUTO, qdev_prop_fdc_drive_type,
+> +                    FloppyDriveType),
+> +    DEFINE_PROP_INT("fdtypeB", FDCtrlSysBus, state.qdev_for_drives[1].ty=
+pe,
+> +                    FLOPPY_DRIVE_TYPE_AUTO, qdev_prop_fdc_drive_type,
+> +                    FloppyDriveType),
+> +    DEFINE_PROP_INT("fallback", FDCtrlISABus, state.fallback,
+> +                    FLOPPY_DRIVE_TYPE_144, qdev_prop_fdc_drive_type,
+> +                    FloppyDriveType),
+>      DEFINE_PROP_END_OF_LIST(),
+>  };
+>=20=20
+> @@ -2891,12 +2891,12 @@ static const TypeInfo sysbus_fdc_info =3D {
+>=20=20
+>  static Property sun4m_fdc_properties[] =3D {
+>      DEFINE_PROP_DRIVE("drive", FDCtrlSysBus, state.qdev_for_drives[0].bl=
+k),
+> -    DEFINE_PROP_DEFAULT("fdtype", FDCtrlSysBus, state.qdev_for_drives[0]=
+.type,
+> -                        FLOPPY_DRIVE_TYPE_AUTO, qdev_prop_fdc_drive_type,
+> -                        FloppyDriveType),
+> -    DEFINE_PROP_DEFAULT("fallback", FDCtrlISABus, state.fallback,
+> -                        FLOPPY_DRIVE_TYPE_144, qdev_prop_fdc_drive_type,
+> -                        FloppyDriveType),
+> +    DEFINE_PROP_INT("fdtype", FDCtrlSysBus, state.qdev_for_drives[0].typ=
+e,
+> +                    FLOPPY_DRIVE_TYPE_AUTO, qdev_prop_fdc_drive_type,
+> +                    FloppyDriveType),
+> +    DEFINE_PROP_INT("fallback", FDCtrlISABus, state.fallback,
+> +                    FLOPPY_DRIVE_TYPE_144, qdev_prop_fdc_drive_type,
+> +                    FloppyDriveType),
+>      DEFINE_PROP_END_OF_LIST(),
+>  };
+>=20=20
+> diff --git a/hw/core/qdev-properties.c b/hw/core/qdev-properties.c
+> index fa3617db2d..f87327b132 100644
+> --- a/hw/core/qdev-properties.c
+> +++ b/hw/core/qdev-properties.c
+> @@ -982,17 +982,17 @@ void qdev_prop_set_bit(DeviceState *dev, const char=
+ *name, bool value)
+>=20=20
+>  void qdev_prop_set_uint8(DeviceState *dev, const char *name, uint8_t val=
+ue)
+>  {
+> -    object_property_set_int(OBJECT(dev), value, name, &error_abort);
+> +    object_property_set_uint(OBJECT(dev), value, name, &error_abort);
+>  }
+>=20=20
+>  void qdev_prop_set_uint16(DeviceState *dev, const char *name, uint16_t v=
+alue)
+>  {
+> -    object_property_set_int(OBJECT(dev), value, name, &error_abort);
+> +    object_property_set_uint(OBJECT(dev), value, name, &error_abort);
+>  }
+>=20=20
+>  void qdev_prop_set_uint32(DeviceState *dev, const char *name, uint32_t v=
+alue)
+>  {
+> -    object_property_set_int(OBJECT(dev), value, name, &error_abort);
+> +    object_property_set_uint(OBJECT(dev), value, name, &error_abort);
+>  }
+>=20=20
+>  void qdev_prop_set_int32(DeviceState *dev, const char *name, int32_t val=
+ue)
+> @@ -1002,7 +1002,7 @@ void qdev_prop_set_int32(DeviceState *dev, const ch=
+ar *name, int32_t value)
+>=20=20
+>  void qdev_prop_set_uint64(DeviceState *dev, const char *name, uint64_t v=
+alue)
+>  {
+> -    object_property_set_int(OBJECT(dev), value, name, &error_abort);
+> +    object_property_set_uint(OBJECT(dev), value, name, &error_abort);
+>  }
+>=20=20
+>  void qdev_prop_set_string(DeviceState *dev, const char *name, const char=
+ *value)
+> diff --git a/hw/core/qdev.c b/hw/core/qdev.c
+> index 83b0297755..b9313546f7 100644
+> --- a/hw/core/qdev.c
+> +++ b/hw/core/qdev.c
+> @@ -764,17 +764,21 @@ static bool prop_info_is_bool(const PropertyInfo *i=
+nfo)
+>=20=20
+>  static bool prop_info_is_int(const PropertyInfo *info)
+>  {
+> +    return info =3D=3D &qdev_prop_int32
+> +        || info =3D=3D &qdev_prop_pci_devfn
+> +        || info =3D=3D &qdev_prop_on_off_auto
+> +        || info =3D=3D &qdev_prop_losttickpolicy
+> +        || info =3D=3D &qdev_prop_blockdev_on_error
+> +        || info =3D=3D &qdev_prop_bios_chs_trans;
+> +}
+> +
+> +static bool prop_info_is_uint(const PropertyInfo *info)
+> +{
+>      return info =3D=3D &qdev_prop_uint8
+>          || info =3D=3D &qdev_prop_uint16
+>          || info =3D=3D &qdev_prop_uint32
+> -        || info =3D=3D &qdev_prop_int32
+>          || info =3D=3D &qdev_prop_uint64
+>          || info =3D=3D &qdev_prop_size
+> -        || info =3D=3D &qdev_prop_pci_devfn
+> -        || info =3D=3D &qdev_prop_on_off_auto
+> -        || info =3D=3D &qdev_prop_losttickpolicy
+> -        || info =3D=3D &qdev_prop_blockdev_on_error
+> -        || info =3D=3D &qdev_prop_bios_chs_trans
+>          || info =3D=3D &qdev_prop_blocksize
+>          || info =3D=3D &qdev_prop_arraylen;
+>  }
+> @@ -819,12 +823,14 @@ void qdev_property_add_static(DeviceState *dev, Pro=
+perty *prop,
+>                                      &error_abort);
+>=20=20
+>      if (prop_info_is_bool(prop->info)) {
+> -        object_property_set_bool(obj, prop->defval, prop->name, &error_a=
+bort);
+> +        object_property_set_bool(obj, prop->defval.u, prop->name, &error=
+_abort);
+>      } else if (prop->info->enum_table) {
+> -        object_property_set_str(obj, prop->info->enum_table[prop->defval=
+],
+> +        object_property_set_str(obj, prop->info->enum_table[prop->defval=
+.i],
+>                                  prop->name, &error_abort);
+>      } else if (prop_info_is_int(prop->info)) {
+> -        object_property_set_int(obj, prop->defval, prop->name, &error_ab=
+ort);
+> +        object_property_set_int(obj, prop->defval.i, prop->name, &error_=
+abort);
+> +    } else if (prop_info_is_uint(prop->info)) {
+> +        object_property_set_uint(obj, prop->defval.u, prop->name, &error=
+_abort);
+>      }
+>  }
+>=20=20
+> diff --git a/hw/net/e1000e.c b/hw/net/e1000e.c
+> index 6e234938db..4e4cc9b52f 100644
+> --- a/hw/net/e1000e.c
+> +++ b/hw/net/e1000e.c
+> @@ -645,13 +645,13 @@ static PropertyInfo e1000e_prop_disable_vnet,
+>=20=20
+>  static Property e1000e_properties[] =3D {
+>      DEFINE_NIC_PROPERTIES(E1000EState, conf),
+> -    DEFINE_PROP_DEFAULT("disable_vnet_hdr", E1000EState, disable_vnet, f=
+alse,
+> -                        e1000e_prop_disable_vnet, bool),
+> -    DEFINE_PROP_DEFAULT("subsys_ven", E1000EState, subsys_ven,
+> -                        PCI_VENDOR_ID_INTEL,
+> -                        e1000e_prop_subsys_ven, uint16_t),
+> -    DEFINE_PROP_DEFAULT("subsys", E1000EState, subsys, 0,
+> -                        e1000e_prop_subsys, uint16_t),
+> +    DEFINE_PROP_INT("disable_vnet_hdr", E1000EState, disable_vnet, false,
+> +                    e1000e_prop_disable_vnet, bool),
+> +    DEFINE_PROP_INT("subsys_ven", E1000EState, subsys_ven,
+> +                    PCI_VENDOR_ID_INTEL,
+> +                    e1000e_prop_subsys_ven, uint16_t),
+> +    DEFINE_PROP_INT("subsys", E1000EState, subsys, 0,
+> +                    e1000e_prop_subsys, uint16_t),
+>      DEFINE_PROP_END_OF_LIST(),
+>  };
