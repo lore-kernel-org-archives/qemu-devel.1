@@ -1,46 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44799)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48288)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pasic@linux.vnet.ibm.com>) id 1dAvbr-0000qe-Gf
-	for qemu-devel@nongnu.org; Wed, 17 May 2017 05:51:12 -0400
+	(envelope-from <groug@kaod.org>) id 1dAvsr-0003rH-JV
+	for qemu-devel@nongnu.org; Wed, 17 May 2017 06:08:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pasic@linux.vnet.ibm.com>) id 1dAvbo-0008PC-F1
-	for qemu-devel@nongnu.org; Wed, 17 May 2017 05:51:11 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:46709
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pasic@linux.vnet.ibm.com>)
-	id 1dAvbo-0008Ow-9t
-	for qemu-devel@nongnu.org; Wed, 17 May 2017 05:51:08 -0400
-Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v4H9nPt4000567
-	for <qemu-devel@nongnu.org>; Wed, 17 May 2017 05:51:07 -0400
-Received: from e06smtp14.uk.ibm.com (e06smtp14.uk.ibm.com [195.75.94.110])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2aggdf2n67-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 17 May 2017 05:51:06 -0400
-Received: from localhost
-	by e06smtp14.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <pasic@linux.vnet.ibm.com>;
-	Wed, 17 May 2017 10:51:05 +0100
-References: <1494243504-127980-1-git-send-email-arei.gonglei@huawei.com>
-	<1494243504-127980-7-git-send-email-arei.gonglei@huawei.com>
-	<520f45d4-33d7-8836-3140-a92ee5d15421@linux.vnet.ibm.com>
-	<33183CC9F5247A488A2544077AF19020DA278AA0@DGGEMA505-MBS.china.huawei.com>
-	<1963bfa1-c0ea-156a-59f7-aed744ca49a3@linux.vnet.ibm.com>
-	<33183CC9F5247A488A2544077AF19020DA29A0B5@DGGEMA505-MBS.china.huawei.com>
-	<b7c20d5f-026e-edf1-6703-6b64ceed375f@linux.vnet.ibm.com>
-	<33183CC9F5247A488A2544077AF19020DA29B209@DGGEMA505-MBS.china.huawei.com>
-From: Halil Pasic <pasic@linux.vnet.ibm.com>
-Date: Wed, 17 May 2017 11:51:01 +0200
+	(envelope-from <groug@kaod.org>) id 1dAvsm-0004xT-JS
+	for qemu-devel@nongnu.org; Wed, 17 May 2017 06:08:45 -0400
+Received: from 11.mo3.mail-out.ovh.net ([87.98.184.158]:35098)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1dAvsm-0004x8-97
+	for qemu-devel@nongnu.org; Wed, 17 May 2017 06:08:40 -0400
+Received: from player797.ha.ovh.net (b9.ovh.net [213.186.33.59])
+	by mo3.mail-out.ovh.net (Postfix) with ESMTP id 420BED322E
+	for <qemu-devel@nongnu.org>; Wed, 17 May 2017 12:08:38 +0200 (CEST)
+Date: Wed, 17 May 2017 12:08:26 +0200
+From: Greg Kurz <groug@kaod.org>
+Message-ID: <20170517120826.35dd4320@bahia.lan>
+In-Reply-To: <d8354004-1a76-bc67-cd9c-55a2b95ae142@kaod.org>
+References: <20170426070034.10727-1-david@gibson.dropbear.id.au>
+	<20170426070034.10727-20-david@gibson.dropbear.id.au>
+	<0b2e2d1c-d7ba-7d43-42b5-04ba592bf3e8@redhat.com>
+	<1a7e5576-6464-6d5b-f4a8-44dceb8a17af@kaod.org>
+	<0dc5ffde-39b7-6fd4-dc88-d66789414e4e@redhat.com>
+	<45db5bad-e1f3-d2d0-7014-878391638f6d@kaod.org>
+	<20170516181004.624cf441@bahia.lan>
+	<d8354004-1a76-bc67-cd9c-55a2b95ae142@kaod.org>
 MIME-Version: 1.0
-In-Reply-To: <33183CC9F5247A488A2544077AF19020DA29B209@DGGEMA505-MBS.china.huawei.com>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Message-Id: <a8b185ca-4b8d-e913-cfb3-454d61dbce78@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [RFC v1 6/9] virtio-crypto: rework
- virtio_crypto_handle_request
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	boundary="Sig_/3GxfRQ1H6bP9q6ogPfPvYky";
+	protocol="application/pgp-signature"
+Subject: Re: [Qemu-devel] [PULL 19/48] spapr: allocate the ICPState object
+ from under sPAPRCPUCore
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -49,80 +38,208 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Gonglei (Arei)" <arei.gonglei@huawei.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "mst@redhat.com" <mst@redhat.com>, "Huangweidong (C)" <weidong.huang@huawei.com>, "stefanha@redhat.com" <stefanha@redhat.com>, Luonengjun <luonengjun@huawei.com>, "cornelia.huck@de.ibm.com" <cornelia.huck@de.ibm.com>, Linqiangmin <linqiangmin@huawei.com>, "xin.zeng@intel.com" <xin.zeng@intel.com>, "Wubin (H)" <wu.wubin@huawei.com>
+To: =?UTF-8?B?Q8OpZHJpYw==?= Le Goater <clg@kaod.org>
+Cc: Laurent Vivier <lvivier@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, mdroth@linux.vnet.ibm.com, aik@ozlabs.ru, qemu-devel@nongnu.org, agraf@suse.de, qemu-ppc@nongnu.org, Bharata B Rao <bharata@linux.vnet.ibm.com>
+
+--Sig_/3GxfRQ1H6bP9q6ogPfPvYky
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+
+On Wed, 17 May 2017 07:50:42 +0200
+C=C3=A9dric Le Goater <clg@kaod.org> wrote:
+
+> On 05/16/2017 06:10 PM, Greg Kurz wrote:
+> > On Tue, 16 May 2017 17:18:27 +0200
+> > C=C3=A9dric Le Goater <clg@kaod.org> wrote:
+> >  =20
+> >> On 05/16/2017 02:55 PM, Laurent Vivier wrote: =20
+> >>> On 16/05/2017 14:50, C=C3=A9dric Le Goater wrote:   =20
+> >>>> On 05/16/2017 02:03 PM, Laurent Vivier wrote:   =20
+> >>>>> On 26/04/2017 09:00, David Gibson wrote:   =20
+> >>>>>> From: C=C3=A9dric Le Goater <clg@kaod.org>
+> >>>>>>
+> >>>>>> Today, all the ICPs are created before the CPUs, stored in an array
+> >>>>>> under the sPAPR machine and linked to the CPU when the core threads
+> >>>>>> are realized. This modeling brings some complexity when a lookup in
+> >>>>>> the array is required and it can be simplified by allocating the I=
+CPs
+> >>>>>> when the CPUs are.
+> >>>>>>
+> >>>>>> This is the purpose of this proposal which introduces a new 'icp_t=
+ype'
+> >>>>>> field under the machine and creates the ICP objects of the right t=
+ype
+> >>>>>> (KVM or not) before the PowerPCCPU object are.
+> >>>>>>
+> >>>>>> This change allows more cleanups : the removal of the icps array u=
+nder
+> >>>>>> the sPAPR machine and the removal of the xics_get_cpu_index_by_dt_=
+id()
+> >>>>>> helper.
+> >>>>>>
+> >>>>>> Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
+> >>>>>> Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
+> >>>>>> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+> >>>>>> ---
+> >>>>>>  hw/intc/xics.c          | 11 -----------
+> >>>>>>  hw/ppc/spapr.c          | 47 ++++++++++++++----------------------=
+-----------
+> >>>>>>  hw/ppc/spapr_cpu_core.c | 18 ++++++++++++++----
+> >>>>>>  include/hw/ppc/spapr.h  |  2 +-
+> >>>>>>  include/hw/ppc/xics.h   |  2 --
+> >>>>>>  5 files changed, 29 insertions(+), 51 deletions(-)
+> >>>>>>   =20
+> >>>>>
+> >>>>> This commit breaks CPU re-hotplugging with KVM
+> >>>>>
+> >>>>> the sequence "device_add, device_del, device_add" brings to the
+> >>>>> following error message:
+> >>>>>
+> >>>>>     Unable to connect CPUx to kernel XICS: Device or resource busy
+> >>>>>
+> >>>>> It comes from icp_kvm_cpu_setup():
+> >>>>>
+> >>>>> ...
+> >>>>>     ret =3D kvm_vcpu_enable_cap(cs, KVM_CAP_IRQ_XICS, 0, kernel_xic=
+s_fd,
+> >>>>>                               kvm_arch_vcpu_id(cs));
+> >>>>>     if (ret < 0) {
+> >>>>>         error_report("Unable to connect CPU%ld to kernel XICS: %s",
+> >>>>>                      kvm_arch_vcpu_id(cs), strerror(errno));
+> >>>>>         exit(1);
+> >>>>>     }
+> >>>>> ..
+> >>>>>
+> >>>>> It should be protected by cap_irq_xics_enabled:
+> >>>>>
+> >>>>> ...
+> >>>>>     /*
+> >>>>>      * If we are reusing a parked vCPU fd corresponding to the CPU
+> >>>>>      * which was hot-removed earlier we don't have to renable
+> >>>>>      * KVM_CAP_IRQ_XICS capability again.
+> >>>>>      */
+> >>>>>     if (icp->cap_irq_xics_enabled) {
+> >>>>>         return;
+> >>>>>     }
+> >>>>>
+> >>>>> ...
+> >>>>>     ret =3D kvm_vcpu_enable_cap(...);
+> >>>>> ...
+> >>>>>     icp->cap_irq_xics_enabled =3D true;
+> >>>>> ...
+> >>>>>
+> >>>>> But since this commit, "icp" is a new object on each call:
+> >>>>>
+> >>>>> spapr_cpu_core_realize_child()
+> >>>>> ...
+> >>>>>     obj =3D object_new(spapr->icp_type);
+> >>>>> ...
+> >>>>>     xics_cpu_setup(XICS_FABRIC(spapr), cpu, ICP(obj));
+> >>>>>     ...
+> >>>>>             icpc->cpu_setup(icp, cpu); -> icp_kvm_cpu_setup()
+> >>>>>     ...
+> >>>>> ...
+> >>>>>
+> >>>>> and "cap_irq_xics_enabled" is reinitialized.
+> >>>>>
+> >>>>> Any idea how to fix that?   =20
+> >>>>
+> >>>> it seems that a cleanup is not done in the kernel. We are missing
+> >>>> a way to call kvmppc_xics_free_icp() from QEMU. Today the only
+> >>>> way is to destroy the vcpu.    =20
+> >>>
+> >>> The commit introducing this hack, for reference:
+> >>>
+> >>> commit a45863bda90daa8ec39e5a312b9734fd4665b016
+> >>> Author: Bharata B Rao <bharata@linux.vnet.ibm.com>
+> >>> Date:   Thu Jul 2 16:23:20 2015 +1000
+> >>>
+> >>>     xics_kvm: Don't enable KVM_CAP_IRQ_XICS if already enabled
+> >>>    =20
+> >>>     When supporting CPU hot removal by parking the vCPU fd and reusing
+> >>>     it during hotplug again, there can be cases where we try to reena=
+ble
+> >>>     KVM_CAP_IRQ_XICS CAP for the vCPU for which it was already enable=
+d.
+> >>>     Introduce a boolean member in ICPState to track this and don't
+> >>>     reenable the CAP if it was already enabled earlier.
+> >>>    =20
+> >>>     Re-enabling this CAP should ideally work, but currently it result=
+s in
+> >>>     kernel trying to create and associate ICP with this vCPU and that
+> >>>     fails since there is already an ICP associated with it. Hence this
+> >>>     patch is needed to work around this problem in the kernel.
+> >>>    =20
+> >>>     This change allows CPU hot removal to work for sPAPR.
+> >>>    =20
+> >>>     Signed-off-by: Bharata B Rao <bharata@linux.vnet.ibm.com>
+> >>>     Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
+> >>>     Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+> >>>     Signed-off-by: Alexander Graf <agraf@suse.de>   =20
+> >>
+> >> OK.=20
+> >>
+> >> Greg is looking at re-adding the ICPState array because of a=20
+> >> migration issue with older machines. We might need to do so=20
+> >> unconditionally ...
+> >> =20
+> >=20
+> > That would be a pity to carry on with the pre-allocated ICPStates for
+> > new machine types just because of that... What about keeping track
+> > of all the cap_irq_xics_enabled flags in a separate max_cpus sized
+> > static array ? =20
+>=20
+> Could we use 'cpu->unplug' instead ?=20
+>=20
+
+No we can't because we only park the vCPU fd actually and we always pass
+a freshly allocated CPUState with @unplug =3D=3D false to xics_cpu_setup().
+
+> C.=20
+>=20
+>=20
+> >> But for that specific issue, I think it would have been better=20
+> >> to clean up the kernel state. Is that possible ?=20
+> >> =20
+> >=20
+> > Commit 4c055ab54fae ("cpu: Reclaim vCPU objects") gives some more detai=
+ls
+> > on why we don't destroy the vCPU in KVM on unplug, but rather park the =
+vCPU
+> > fd for later use... so I'm not sure we can clean up the kernel state.
+> >=20
+> > But since the vCPU is still present, maybe we can find a way to tell KVM
+> > that we want to reuse an already present ICP ?
+> >  =20
+> >> Thanks,
+> >>
+> >> C.
+> >> =20
+> >> =20
+> >>>> Else we need to reintroduce the array of icps (again) to keep some=20
+> >>>> xics state ... but that just sucks :/ Let me think about it.=20
+> >>>>   =20
+> >>>
+> >>> Thanks,
+> >>> Laurent   =20
+> >>>> C.
+> >>>>   =20
+> >>>    =20
+> >> =20
+> >  =20
+>=20
 
 
+--Sig_/3GxfRQ1H6bP9q6ogPfPvYky
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
 
-On 05/17/2017 11:12 AM, Gonglei (Arei) wrote:
->>>> By the way, I'm having a hard time understing how is the requirement form
->>>>
->> http://docs.oasis-open.org/virtio/virtio/v1.0/cs04/virtio-v1.0-cs04.html#x1-260
->>>> 004
->>>> (2.4.4 Message Framing) satisfied by this code. Could you explain this
->>>> to me please?
->>>>
->>> Sorry for my bad English,
->>> I don't know which normative formulation the code violates?
->> I'm not sure it's actually violated, but I'm concerned about the following
->> normative statement: "The device MUST NOT make assumptions about the
->> particular
->> arrangement of descriptors. The device MAY have a reasonable limit of
->> descriptors it will allow in a chain."
->>
->> Please also read the explanatory part I've linked, because the normative
->> statement is pretty abstract.
->>
->> In my understanding, the spec says, that e.g. the virti-crypto device
->> should not fail if a single request is split up into let's say two chunks
->> and transmitted by the means of two top level descriptors.
->>
->> Do you agree with my reading of the spec?
->>
-> Yes, I agree. But what's the relationship about the request here?
-> We don't assume the request have to use one desc entity, it can
-> use scatter-gather list for one request header. 
-> The device can cover the situation in the QEMU. 
-> 
->> What does the virtio-crypto device do if it encounters such a situation?
->>
-> This isn't a problem. Pls see blow code segment:
-> 
-> virtio_crypto_handle_request()
-> {...
-> if (unlikely(iov_to_buf(out_iov, out_num, 0, &req, sizeof(req))
->                 != sizeof(req))) {
->     virtio_error(vdev, "virtio-crypto request outhdr too short");
->     return -1;
-> }
-> iov_discard_front(&out_iov, &out_num, sizeof(req));
-> ...
-> 
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
 
-Thats exactly what worries me. I see a call to virtio_error there...
+iEYEARECAAYFAlkcIRoACgkQAvw66wEB28JUsQCbBmiP9310aPGf0PPKtpiUobtA
+mV8An2Lidctny2LfxHr5IlD2nKH+cDTG
+=liVR
+-----END PGP SIGNATURE-----
 
-
-void GCC_FMT_ATTR(2, 3) virtio_error(VirtIODevice *vdev, const char *fmt, ...)
-{
-    va_list ap;
-
-    va_start(ap, fmt);
-    error_vreport(fmt, ap);
-    va_end(ap);
-
-    vdev->broken = true;
-
-    if (virtio_vdev_has_feature(vdev, VIRTIO_F_VERSION_1)) {
-        virtio_set_status(vdev, vdev->status | VIRTIO_CONFIG_S_NEEDS_RESET);
-        virtio_notify_config(vdev);
-    }
-}
-
-This however seems to make the device 'broken'. Or am I missing something?
-
-Halil
-
-> 
-> Thanks,
-> -Gonglei
-> 
+--Sig_/3GxfRQ1H6bP9q6ogPfPvYky--
