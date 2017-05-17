@@ -1,29 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45835)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47422)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1dB1K5-0006l1-90
-	for qemu-devel@nongnu.org; Wed, 17 May 2017 11:57:14 -0400
+	(envelope-from <eblake@redhat.com>) id 1dB1Ob-0001dy-KQ
+	for qemu-devel@nongnu.org; Wed, 17 May 2017 12:01:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1dB1K2-0003zK-6n
-	for qemu-devel@nongnu.org; Wed, 17 May 2017 11:57:13 -0400
-Received: from 5.mo3.mail-out.ovh.net ([87.98.178.36]:34496)
+	(envelope-from <eblake@redhat.com>) id 1dB1OY-0005gE-IV
+	for qemu-devel@nongnu.org; Wed, 17 May 2017 12:01:53 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:41484)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1dB1K1-0003yf-U9
-	for qemu-devel@nongnu.org; Wed, 17 May 2017 11:57:10 -0400
-Received: from player797.ha.ovh.net (b9.ovh.net [213.186.33.59])
-	by mo3.mail-out.ovh.net (Postfix) with ESMTP id 52BEBD2C24
-	for <qemu-devel@nongnu.org>; Wed, 17 May 2017 17:57:08 +0200 (CEST)
-Date: Wed, 17 May 2017 17:56:57 +0200
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20170517175657.0c0f7666@bahia.lan>
-In-Reply-To: <20170517063547.23876-2-david@gibson.dropbear.id.au>
-References: <20170517063547.23876-1-david@gibson.dropbear.id.au>
-	<20170517063547.23876-2-david@gibson.dropbear.id.au>
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dB1OY-0005fa-AH
+	for qemu-devel@nongnu.org; Wed, 17 May 2017 12:01:50 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 0F4C27F4A0
+	for <qemu-devel@nongnu.org>; Wed, 17 May 2017 16:01:48 +0000 (UTC)
+References: <20170517153812.21993-1-quintela@redhat.com>
+	<20170517153812.21993-6-quintela@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <8d6af160-aba9-c73d-90fb-5e0433638244@redhat.com>
+Date: Wed, 17 May 2017 11:01:39 -0500
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	boundary="Sig_/3uPbAmmRb09YrlEWu78vAxg";
-	protocol="application/pgp-signature"
-Subject: Re: [Qemu-devel] [Qemu-ppc] [RFC 1/2] pseries: Split CAS PVR
- negotiation out into a separate function
+In-Reply-To: <20170517153812.21993-6-quintela@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="JneLDmacX9c6GA8isPAkXxo1B9FHPgvxO"
+Subject: Re: [Qemu-devel] [PATCH 5/5] block migration: Allow compile time
+ disable
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,140 +35,98 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: abologna@redhat.com, thuth@redhat.com, lvivier@redhat.com, qemu-devel@nongnu.org, mdroth@linux.vnet.ibm.com, qemu-ppc@nongnu.org, bharata@linux.vnet.ibm.com
+To: Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org
+Cc: dgilbert@redhat.com, lvivier@redhat.com, peterx@redhat.com, armbru@redhat.com
 
---Sig_/3uPbAmmRb09YrlEWu78vAxg
-Content-Type: text/plain; charset=US-ASCII
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--JneLDmacX9c6GA8isPAkXxo1B9FHPgvxO
+From: Eric Blake <eblake@redhat.com>
+To: Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org
+Cc: dgilbert@redhat.com, lvivier@redhat.com, peterx@redhat.com,
+ armbru@redhat.com
+Message-ID: <8d6af160-aba9-c73d-90fb-5e0433638244@redhat.com>
+Subject: Re: [PATCH 5/5] block migration: Allow compile time disable
+References: <20170517153812.21993-1-quintela@redhat.com>
+ <20170517153812.21993-6-quintela@redhat.com>
+In-Reply-To: <20170517153812.21993-6-quintela@redhat.com>
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, 17 May 2017 16:35:46 +1000
-David Gibson <david@gibson.dropbear.id.au> wrote:
-
-> Guests of the qemu machine type go through a feature negotiation process
-> known as "client architecture support" (CAS) during early boot.  This does
-> a number of things, one of which is finding a CPU compatibility mode which
-> can be supported by both guest and host.
+On 05/17/2017 10:38 AM, Juan Quintela wrote:
+> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 >=20
-> In fact the CPU negotiation is probably the single most complex part of t=
-he
-> CAS process, so this splits it out into a helper function.  We've recently
-> made some mistakes in maintaining backward compatibility for old machine
-> types here.  Splitting this out will also make it easier to fix this.
+> Many users now prefer to use drive_mirror over NBD as an
+> alternative to the older migrate -b option; drive_mirror is
+> more complex to setup but gives you more options (e.g. only
+> migrating some of the disks if some of them are shared).
 >=20
-> This also adds a possibly useful error message if the negotiation fails
-> (i.e. if there is CPU mode that's suitable for both guest and host).
-
-s/if there is/if there isn't a/ ?
-
+> Allow the large chunk of block migration code to be compiled
+> out for those who don't use it.
 >=20
-> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+> Based on a downstream-patch we've had for a while by Jeff Cody.
+>=20
+> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> Signed-off-by: Juan Quintela <quintela@redhat.com>
 > ---
->  hw/ppc/spapr_hcall.c | 43 +++++++++++++++++++++++++++----------------
->  1 file changed, 27 insertions(+), 16 deletions(-)
->=20
-> diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
-> index 0d608d6..007ae8d 100644
-> --- a/hw/ppc/spapr_hcall.c
-> +++ b/hw/ppc/spapr_hcall.c
-> @@ -1047,19 +1047,13 @@ static target_ulong h_signal_sys_reset(PowerPCCPU=
- *cpu,
->      }
->  }
-> =20
-> -static target_ulong h_client_architecture_support(PowerPCCPU *cpu,
-> -                                                  sPAPRMachineState *spa=
-pr,
-> -                                                  target_ulong opcode,
-> -                                                  target_ulong *args)
-> +static uint32_t cas_check_pvr(PowerPCCPU *cpu, target_ulong list,
-> +                              Error **errp)
->  {
-> -    target_ulong list =3D ppc64_phys_to_real(args[0]);
-> -    target_ulong ov_table;
->      bool explicit_match =3D false; /* Matched the CPU's real PVR */
->      uint32_t max_compat =3D cpu->max_compat;
->      uint32_t best_compat =3D 0;
->      int i;
-> -    sPAPROptionVector *ov1_guest, *ov5_guest, *ov5_cas_old, *ov5_updates;
-> -    bool guest_radix;
-> =20
->      /*
->       * We scan the supplied table of PVRs looking for two things
-> @@ -1090,26 +1084,43 @@ static target_ulong h_client_architecture_support=
-(PowerPCCPU *cpu,
->          /* We couldn't find a suitable compatibility mode, and either
->           * the guest doesn't support "raw" mode for this CPU, or raw
->           * mode is disabled because a maximum compat mode is set */
-> -        return H_HARDWARE;
-> +        error_setg(errp, "Couldn't negotiate a suitable PVR during CAS");
-> +        return 0;
+>  configure                 | 11 +++++++++++
+>  include/migration/block.h | 24 +++++++++++++++++++++++-
+>  migration/Makefile.objs   |  2 +-
+>  migration/migration.c     | 13 +++++++++++++
+>  4 files changed, 48 insertions(+), 2 deletions(-)
+
+> @@ -763,6 +768,14 @@ void qmp_migrate_set_capabilities(MigrationCapabil=
+ityStatusList *params,
 >      }
 > =20
->      /* Parsing finished */
->      trace_spapr_cas_pvr(cpu->compat_pvr, explicit_match, best_compat);
-> =20
-> -    /* Update CPUs */
-> -    if (cpu->compat_pvr !=3D best_compat) {
-> -        Error *local_err =3D NULL;
-> +    return best_compat;
-> +}
-> +
-> +static target_ulong h_client_architecture_support(PowerPCCPU *cpu,
-> +                                                  sPAPRMachineState *spa=
-pr,
-> +                                                  target_ulong opcode,
-> +                                                  target_ulong *args)
-> +{
-> +    /* @ov_table points to the first option vector */
-> +    target_ulong ov_table =3D ppc64_phys_to_real(args[0]);
-> +    uint32_t cas_pvr;
-> +    sPAPROptionVector *ov1_guest, *ov5_guest, *ov5_cas_old, *ov5_updates;
-> +    bool guest_radix;
-> +    Error *local_err =3D NULL;
-> =20
-> -        ppc_set_compat_all(best_compat, &local_err);
-> +    cas_pvr =3D cas_check_pvr(cpu, ov_table, &local_err);
+>      for (cap =3D params; cap; cap =3D cap->next) {
+> +#ifndef CONFIG_LIVE_BLOCK_MIGRATION
+> +        if (cap->value->capability =3D=3D MIGRATION_CAPABILITY_BLOCK) =
+{
+> +            error_setg(errp, "QEMU compiled without old-style (blk/-b,=
+ inc/-i) "
+> +                       "block migration");
+> +            error_append_hint(errp, "Use drive_mirror+NBD instead.\n")=
+;
+> +            continue;
+> +        }
+> +#endif
 
-Shouldn't cas_check_pvr() take a target_ulong * so that we can get
-the address of the first option vector...
+If I'm not mistaken, this will cause an unconditional error even if I do
+the QMP { "command":"migrate", "arguments":{"uri":"...", "blk":false} }
 
-> +    if (local_err) {
-> +        error_report_err(local_err);
-> +        return H_HARDWARE;
-> +    }
-> +
-> +    /* Update CPUs */
-> +    if (cpu->compat_pvr !=3D cas_pvr) {
-> +        ppc_set_compat_all(cas_pvr, &local_err);
->          if (local_err) {
->              error_report_err(local_err);
->              return H_HARDWARE;
->          }
->      }
-> =20
-> -    /* For the future use: here @ov_table points to the first option vec=
-tor */
-> -    ov_table =3D list;
-> -
+Wouldn't it be better to make the conditional:
 
-... and address Laurent's comment ?
+if (cap->value->capability =3D=3D MIGRATION_CAPABILITY_BLOCK &&
+cap->value->state) {
 
->      ov1_guest =3D spapr_ovec_parse_vector(ov_table, 1);
->      ov5_guest =3D spapr_ovec_parse_vector(ov_table, 5);
->      if (spapr_ovec_test(ov5_guest, OV5_MMU_BOTH)) {
+so that I can pass an explicit false, and the error only happens when
+trying to set the optional parameter to true?  I ask, because libvirt
+(currently) ALWAYS passes the "inc" and "blk" QMP parameters, but
+generally to an explicit false when it uses NBD+mirror.
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
 
 
---Sig_/3uPbAmmRb09YrlEWu78vAxg
-Content-Type: application/pgp-signature
+--JneLDmacX9c6GA8isPAkXxo1B9FHPgvxO
+Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iEYEARECAAYFAlkccsoACgkQAvw66wEB28JUZQCdEl3H2cTK1ETFnVEqoBynFokk
-D/0An05FRZh8PMQfpGZronCOB9hgl+1f
-=sH6E
+iQEcBAEBCAAGBQJZHHPjAAoJEKeha0olJ0NqSooH/3m/L6epVCBgtZUVXXQXf74v
+OTl16EWEd1dRPty6JVguJYIMwUE2h81N6DmBKledG228wA9yr9NieGoS3Am0P/Xq
+1cHDLiiH1o3dlQtH+mYZPz86wUCnPeu9KoV48B1HKLDwCSaz4eeWICaajVC21AJT
+rIeEymQ3reKw2I28OnG5P7kJ2hfAmXm0xeLIrD80Zl4SaeDaJ6jzLSrFNjxU0i1y
+tr+eRXN4H7dD9Xhr8vPgnNVrE0ElVDyguNOqGnQYa6ZrroW/4SEoyz0+Pv2q8ndA
+xIw/AY8y7/Xv2/mHMtb3QJxVDKsacYYMBun6gz6+xwkcyzzgS2x5wmQfF2SfVBU=
+=9D7+
 -----END PGP SIGNATURE-----
 
---Sig_/3uPbAmmRb09YrlEWu78vAxg--
+--JneLDmacX9c6GA8isPAkXxo1B9FHPgvxO--
