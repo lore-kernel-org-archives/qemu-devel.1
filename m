@@ -1,20 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43670)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44886)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kchamart@redhat.com>) id 1dAtYX-0000mm-RW
-	for qemu-devel@nongnu.org; Wed, 17 May 2017 03:39:38 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1dAtcY-0001cs-EL
+	for qemu-devel@nongnu.org; Wed, 17 May 2017 03:43:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kchamart@redhat.com>) id 1dAtYX-00018s-27
-	for qemu-devel@nongnu.org; Wed, 17 May 2017 03:39:37 -0400
-Date: Wed, 17 May 2017 09:39:25 +0200
-From: Kashyap Chamarthy <kchamart@redhat.com>
-Message-ID: <20170517073925.nd5cledugl2bjsk5@eukaryote>
-References: <1494851980-6831-1-git-send-email-kwolf@redhat.com>
+	(envelope-from <pbonzini@redhat.com>) id 1dAtcU-00038B-Fk
+	for qemu-devel@nongnu.org; Wed, 17 May 2017 03:43:46 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47326)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1dAtcU-00037q-6b
+	for qemu-devel@nongnu.org; Wed, 17 May 2017 03:43:42 -0400
+Date: Wed, 17 May 2017 03:43:39 -0400 (EDT)
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <1280755991.8446336.1495007019282.JavaMail.zimbra@redhat.com>
+In-Reply-To: <B2D15215269B544CADD246097EACE747395C283F@dggeml511-mbx.china.huawei.com>
+References: <830bfc39-56c7-a901-9ebb-77d6e7a5614c@huawei.com>
+	<874lxeovrg.fsf@secure.mitica>
+	<7cd332ec-48d4-1feb-12e2-97b50b04e028@huawei.com>
+	<20170424164244.GJ2362@work-vm>
+	<B2D15215269B544CADD246097EACE747395AD759@dggeml511-mbx.china.huawei.com>
+	<85e3a0dd-20c8-8ff2-37ce-bfdf543e7787@redhat.com>
+	<CANRm+CzvNpLGqH5KuqqO7Wh7UabSkMBbxuTymbM0CZPgpQOwCg@mail.gmail.com>
+	<B2D15215269B544CADD246097EACE747395C283F@dggeml511-mbx.china.huawei.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1494851980-6831-1-git-send-email-kwolf@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] qemu-iotests: Test streaming with missing
- job ID
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] About QEMU BQL and dirty log switch in Migration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,40 +33,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: qemu-block@nongnu.org, berto@igalia.com, qemu-devel@nongnu.org
+To: "Zhoujian (jay)" <jianjay.zhou@huawei.com>
+Cc: Wanpeng Li <kernellwp@gmail.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, yanghongyang <yanghongyang@huawei.com>, quintela@redhat.com, "wangxin (U)" <wangxinxin.wang@huawei.com>, qemu-devel@nongnu.org, "Gonglei (Arei)" <arei.gonglei@huawei.com>, Huangzhichao <huangzhichao@huawei.com>, Zhanghailiang <zhang.zhanghailiang@huawei.com>, "Herongguang (Stephen)" <herongguang.he@huawei.com>, Xiao Guangrong <xiaoguangrong@tencent.com>, "Huangweidong (C)" <weidong.huang@huawei.com>
 
-On Mon, May 15, 2017 at 02:39:40PM +0200, Kevin Wolf wrote:
-> This adds a small test for the image streaming error path for failing
-> block_job_create(), which would have found the null pointer dereference
-> in commit a170a91f.
+> Recently, I have tested the performance before migration and after migration failure
+> using spec cpu2006 https://www.spec.org/cpu2006/, which is a standard performance
+> evaluation tool.
+>
+> These are the steps:
+> ======
+>  (1) the version of kmod is 4.4.11(with slightly modified) and the version of
+>  qemu is 2.6.0
+>     (with slightly modified), the kmod is applied with the following patch
 > 
-> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-> ---
->  tests/qemu-iotests/030     | 4 ++++
->  tests/qemu-iotests/030.out | 4 ++--
->  2 files changed, 6 insertions(+), 2 deletions(-)
-> 
-> diff --git a/tests/qemu-iotests/030 b/tests/qemu-iotests/030
-> index e00c11b..feee861 100755
-> --- a/tests/qemu-iotests/030
-> +++ b/tests/qemu-iotests/030
-> @@ -147,6 +147,10 @@ class TestSingleDrive(iotests.QMPTestCase):
->          result = self.vm.qmp('block-stream', device='nonexistent')
->          self.assert_qmp(result, 'error/class', 'GenericError')
+> diff --git a/source/x86/x86.c b/source/x86/x86.c
+> index 054a7d3..75a4bb3 100644
+> --- a/source/x86/x86.c
+> +++ b/source/x86/x86.c
+> @@ -8550,8 +8550,10 @@ void kvm_arch_commit_memory_region(struct kvm *kvm,
+>          */
+>         if ((change != KVM_MR_DELETE) &&
+>                 (old->flags & KVM_MEM_LOG_DIRTY_PAGES) &&
+> -               !(new->flags & KVM_MEM_LOG_DIRTY_PAGES))
+> -               kvm_mmu_zap_collapsible_sptes(kvm, new);
+> +               !(new->flags & KVM_MEM_LOG_DIRTY_PAGES)) {
+> +               printk(KERN_ERR "zj make KVM_REQ_MMU_RELOAD request\n");
+> +               kvm_make_all_cpus_request(kvm, KVM_REQ_MMU_RELOAD);
+> +       }
 >  
-> +    def test_job_id_missing(self):
-> +        result = self.vm.qmp('block-stream', device='mid')
-> +        self.assert_qmp(result, 'error/class', 'GenericError')
-> +
+>         /*
+>          * Set up write protection and/or dirty logging for the new slot.
 
-Thanks.
+Try these modifications to the setup:
 
-FWIW:
+1) set up 1G hugetlbfs hugepages and use those for the guest's memory
 
-Reviewed-by: Kashyap Chamarthy <kchamart@redhat.com>
+2) test both without and with the above patch.
 
-[...]
+Thanks,
 
--- 
-/kashyap
+Paolo
