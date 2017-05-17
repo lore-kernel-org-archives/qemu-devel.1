@@ -1,30 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41395)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41911)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dAtMJ-00055r-06
-	for qemu-devel@nongnu.org; Wed, 17 May 2017 03:26:59 -0400
+	(envelope-from <armbru@redhat.com>) id 1dAtOI-00062g-TD
+	for qemu-devel@nongnu.org; Wed, 17 May 2017 03:29:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dAtME-00053A-2q
-	for qemu-devel@nongnu.org; Wed, 17 May 2017 03:26:58 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:59866)
+	(envelope-from <armbru@redhat.com>) id 1dAtOE-0005tJ-Cu
+	for qemu-devel@nongnu.org; Wed, 17 May 2017 03:29:02 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:33770)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1dAtMC-00052R-SF
-	for qemu-devel@nongnu.org; Wed, 17 May 2017 03:26:54 -0400
-References: <1494838260-30439-1-git-send-email-peterx@redhat.com>
-	<9a93009b-f909-3142-5bc5-915b9a10ed20@redhat.com>
-	<f69dcf32-b6a2-fb59-2b54-61fd7b52e66e@redhat.com>
-	<20170517042342.GA9921@pxdev.xzpeter.org>
-	<20170517055756.GA31206@pxdev.xzpeter.org>
-	<19720c24-aa9a-50e6-2ea1-32ee86ae3591@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <70f733e3-9ade-ee36-0384-2bac8d3d9788@redhat.com>
-Date: Wed, 17 May 2017 09:26:25 +0200
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dAtOE-0005t4-4J
+	for qemu-devel@nongnu.org; Wed, 17 May 2017 03:28:58 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <20170513004616.25749-1-n54@gmx.com>
+Date: Wed, 17 May 2017 09:28:47 +0200
+In-Reply-To: <20170513004616.25749-1-n54@gmx.com> (Kamil Rytarowski's message
+	of "Sat, 13 May 2017 02:46:16 +0200")
+Message-ID: <87a86crlg0.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <19720c24-aa9a-50e6-2ea1-32ee86ae3591@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 0/4] exec: address space translation
- cleanups
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH] ivshmem-server: Detect and use if there is
+ required -lrt linking
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,85 +27,100 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Maxime Coquelin <maxime.coquelin@redhat.com>, Peter Xu <peterx@redhat.com>
-Cc: qemu-devel@nongnu.org, Jason Wang <jasowang@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, David Gibson <david@gibson.dropbear.id.au>
+To: Kamil Rytarowski <n54@gmx.com>
+Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org
 
+Kamil Rytarowski <n54@gmx.com> writes:
 
+> ivshmem-server makes use of the POSIX shared memory object interfaces.
+> This library is provided on NetBSD in -lrt (POSIX Real-time Library).
+> Add ./configure check if there is needed -lrt linking for shm_open()
+> and if so use it. Introduce new configure generated variable LIBS_SHMLIB.
+>
+> This fixes build issue on NetBSD.
+>
+> Signed-off-by: Kamil Rytarowski <n54@gmx.com>
+> ---
+>  Makefile  |  1 +
+>  configure | 20 ++++++++++++++++++++
+>  2 files changed, 21 insertions(+)
+>
+> diff --git a/Makefile b/Makefile
+> index 31d41a7eae..3248cb53d7 100644
+> --- a/Makefile
+> +++ b/Makefile
+> @@ -473,6 +473,7 @@ ivshmem-client$(EXESUF): $(ivshmem-client-obj-y) $(COMMON_LDADDS)
+>  	$(call LINK, $^)
+>  ivshmem-server$(EXESUF): $(ivshmem-server-obj-y) $(COMMON_LDADDS)
+>  	$(call LINK, $^)
+> +ivshmem-server$(EXESUF): LIBS += $(LIBS_SHMLIB)
+>  
+>  module_block.h: $(SRC_PATH)/scripts/modules/module_block.py config-host.mak
+>  	$(call quiet-command,$(PYTHON) $< $@ \
+> diff --git a/configure b/configure
+> index 7c020c076b..50c3aee746 100755
+> --- a/configure
+> +++ b/configure
+> @@ -179,6 +179,7 @@ audio_pt_int=""
+>  audio_win_int=""
+>  cc_i386=i386-pc-linux-gnu-gcc
+>  libs_qga=""
+> +libs_shmlib=""
+>  debug_info="yes"
+>  stack_protector=""
+>  
+> @@ -4133,6 +4134,24 @@ elif compile_prog "" "$pthread_lib -lrt" ; then
+>    libs_qga="$libs_qga -lrt"
+>  fi
+>  
+> +##########################################
+> +# Do we need librt for shm_open()
+> +cat > $TMPC <<EOF
+> +#include <sys/mman.h>
+> +#include <sys/stat.h>
+> +#include <fcntl.h>
+> +#include <stddef.h>
+> +int main(void) {
+> +  return shm_open(NULL, O_RDWR, 0644);
+> +}
+> +EOF
+> +
+> +if compile_prog "" "" ; then
+> +  :
+> +elif compile_prog "" "-lrt" ; then
+> +  libs_shmlib="$libs_shmlib -lrt"
+> +fi
+> +
+>  if test "$darwin" != "yes" -a "$mingw32" != "yes" -a "$solaris" != yes -a \
+>          "$aix" != "yes" -a "$haiku" != "yes" ; then
+>      libs_softmmu="-lutil $libs_softmmu"
+> @@ -5949,6 +5968,7 @@ echo "EXESUF=$EXESUF" >> $config_host_mak
+>  echo "DSOSUF=$DSOSUF" >> $config_host_mak
+>  echo "LDFLAGS_SHARED=$LDFLAGS_SHARED" >> $config_host_mak
+>  echo "LIBS_QGA+=$libs_qga" >> $config_host_mak
+> +echo "LIBS_SHMLIB+=$libs_shmlib" >> $config_host_mak
+>  echo "TASN1_LIBS=$tasn1_libs" >> $config_host_mak
+>  echo "TASN1_CFLAGS=$tasn1_cflags" >> $config_host_mak
+>  echo "POD2MAN=$POD2MAN" >> $config_host_mak
 
-On 17/05/2017 09:17, Maxime Coquelin wrote:
-> 
-> 
-> On 05/17/2017 07:57 AM, Peter Xu wrote:
->> On Wed, May 17, 2017 at 12:23:42PM +0800, Peter Xu wrote:
->>> On Tue, May 16, 2017 at 06:51:03PM +0200, Maxime Coquelin wrote:
->>>> Hi Peter,
->>>>
->>>> On 05/16/2017 03:24 PM, Maxime Coquelin wrote:
->>>>>
->>>>>
->>>>> On 05/15/2017 10:50 AM, Peter Xu wrote:
->>>>>> The problem is that, address_space_get_iotlb_entry() shares a lot
->>>>>> with
->>>>>> address_space_translate(). This patch tries to abstract the
->>>>>> shared elements.
->>>>>>
->>>>>> Originally, this work is derived from discussion from VT-d
->>>>>> passthrough
->>>>>> series discussions [1]. But for sure we can just see this series as a
->>>>>> standalone cleanup. So I posted it separately here.
->>>>>>
->>>>>> Smoke tests are done with general VM boots, IOs, especially with
->>>>>> vhost
->>>>>> dmar configurations.
->>>>>>
->>>>>> I believe with current series I can throw away the old patch [1],
->>>>>> which may be good. But before that, please kindly review. Thanks.
->>>>>
->>>>> I faced the problem the old patch fixes when declaring and
->>>>> attaching an
->>>>> IOMMU device, but booting the kernel with intel_iommu=off.
->>>>>
->>>>> I tested again with patches 1 & 4 of your series, and I confirm it
->>>>> fixes
->>>>> the issue:
->>>>> Tested-by: Maxime Coquelin <maxime.coquelin@redhat.com>
->>>>
->>>> I did some more testing with my "vhost-user IOMMU" setup, and the
->>>> series
->>>> actually breaks with IOMMU device attached, and intel_iommu=on.
->>>>
->>>> The main difference with the previous passing test is the guest RAM
->>>> size. In the working setup, it is 2G of 2M hugepages, vs. 4G of 2M
->>>> hugepages in the failing one. Note that I also reproduce with
->>>> vhost-kernel
->>>> backend.
->>>>
->>>> The error happens in the first vhost_device_iotlb_miss() call:
->>>> qemu-system-x86_64: Fail to lookup the translated address b5d7c000
->>>>
->>>> I don't have the root cause yet, I'll keep you updated.
->>>
->>> Maxime,
->>>
->>> Thanks a lot for help testing this series!
->>>
->>> I reproduced this problem, and this is not a problem obvious enough
->>> for me. Let me investigate as well.
->>>
->>> -- 
->>> Peter Xu
->>
->> Maxime,
->>
->> Could you help try adding this change upon current to see whether
->> problem solved?
-> 
-> Hi Peter,
-> 
-> Yes, problem is solved with below change.
+We already have a test for -lrt.  It looks for timer_create() and
+clock_gettime().  If we need -lrt, we add it to LIBS and to LIBS_QGA.
+The latter because we don't use LIBS for qemu-ga:
 
-Cool---Peter, please send the new patch 4 as toplevel message!
+    qemu-ga$(EXESUF): LIBS = $(LIBS_QGA)
 
-Thanks,
+This patch adds a second test for -lrt, to look for shm_open().  It adds
+-lrt to new variable LIBS_SHMLIB, which gets used only for
+ivshmem-server:
 
-Paolo
+    ivshmem-server$(EXESUF): LIBS += $(LIBS_SHMLIB)
+
+Note that ivshmem-server already uses LIBS.
+
+Shouldn't we instead widen the existing test for -lrt to cover
+shm_open()?
+
+Can you confirm that the existing test does not add -lrt to LIBS on
+NetBSD?
+
+tests/ivshmem-test.c also calls shm_open().  Does it work on NetBSD?
