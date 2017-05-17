@@ -1,23 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56073)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57396)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1dAsGK-0000T2-FT
-	for qemu-devel@nongnu.org; Wed, 17 May 2017 02:16:45 -0400
+	(envelope-from <jasowang@redhat.com>) id 1dAsMX-0002UT-1E
+	for qemu-devel@nongnu.org; Wed, 17 May 2017 02:23:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1dAsGH-0005ZM-AV
-	for qemu-devel@nongnu.org; Wed, 17 May 2017 02:16:44 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:35132)
+	(envelope-from <jasowang@redhat.com>) id 1dAsMS-00075K-KA
+	for qemu-devel@nongnu.org; Wed, 17 May 2017 02:23:09 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37724)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1dAsGH-0005Z3-3e
-	for qemu-devel@nongnu.org; Wed, 17 May 2017 02:16:41 -0400
+	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1dAsMS-00075B-DV
+	for qemu-devel@nongnu.org; Wed, 17 May 2017 02:23:04 -0400
 References: <1494578148-102868-1-git-send-email-wei.w.wang@intel.com>
 	<a3f2cae3-5d3d-f620-4a8d-bb11470c0b08@redhat.com>
 	<591AA65F.8080608@intel.com>
+	<d6eb1d73-c791-b8d3-7ef3-a7653aef00d6@redhat.com>
 From: Jason Wang <jasowang@redhat.com>
-Message-ID: <d6eb1d73-c791-b8d3-7ef3-a7653aef00d6@redhat.com>
-Date: Wed, 17 May 2017 14:16:31 +0800
+Message-ID: <7e1b48d5-83e6-a0ae-5d91-696d8db09d7c@redhat.com>
+Date: Wed, 17 May 2017 14:22:53 +0800
 MIME-Version: 1.0
-In-Reply-To: <591AA65F.8080608@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+In-Reply-To: <d6eb1d73-c791-b8d3-7ef3-a7653aef00d6@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: quoted-printable
 Subject: Re: [Qemu-devel] [virtio-dev] Re: [PATCH v2 00/16] Vhost-pci for
  inter-VM communication
@@ -33,26 +34,35 @@ To: Wei Wang <wei.w.wang@intel.com>, stefanha@gmail.com, marcandre.lureau@gmail.
 
 
 
-On 2017=E5=B9=B405=E6=9C=8816=E6=97=A5 15:12, Wei Wang wrote:
->>>
->>
->> Hi:
->>
->> Care to post the driver codes too?
->>
-> OK. It may take some time to clean up the driver code before post it=20
-> out. You can first
-> have a check of the draft at the repo here:
-> https://github.com/wei-w-wang/vhost-pci-driver
+On 2017=E5=B9=B405=E6=9C=8817=E6=97=A5 14:16, Jason Wang wrote:
 >
-> Best,
-> Wei
+>
+> On 2017=E5=B9=B405=E6=9C=8816=E6=97=A5 15:12, Wei Wang wrote:
+>>>>
+>>>
+>>> Hi:
+>>>
+>>> Care to post the driver codes too?
+>>>
+>> OK. It may take some time to clean up the driver code before post it=20
+>> out. You can first
+>> have a check of the draft at the repo here:
+>> https://github.com/wei-w-wang/vhost-pci-driver
+>>
+>> Best,
+>> Wei
+>
+> Interesting, looks like there's one copy on tx side. We used to have=20
+> zerocopy support for tun for VM2VM traffic. Could you please try to=20
+> compare it with your vhost-pci-net by:
+>
+> - make sure zerocopy is enabled for vhost_net
+> - comment skb_orphan_frags() in tun_net_xmit()
+>
+> Thanks
+>
 
-Interesting, looks like there's one copy on tx side. We used to have=20
-zerocopy support for tun for VM2VM traffic. Could you please try to=20
-compare it with your vhost-pci-net by:
-
-- make sure zerocopy is enabled for vhost_net
-- comment skb_orphan_frags() in tun_net_xmit()
+You can even enable tx batching for tun by ethtool -C tap0 rx-frames N.=20
+This will greatly improve the performance according to my test.
 
 Thanks
