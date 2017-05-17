@@ -1,22 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60815)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33117)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lvivier@redhat.com>) id 1dAukS-0005G4-Ro
-	for qemu-devel@nongnu.org; Wed, 17 May 2017 04:56:01 -0400
+	(envelope-from <peterx@redhat.com>) id 1dAuml-0006Vo-Iu
+	for qemu-devel@nongnu.org; Wed, 17 May 2017 04:58:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lvivier@redhat.com>) id 1dAukP-0008A3-Tf
-	for qemu-devel@nongnu.org; Wed, 17 May 2017 04:56:00 -0400
-References: <20170517063547.23876-1-david@gibson.dropbear.id.au>
-	<20170517063547.23876-2-david@gibson.dropbear.id.au>
-From: Laurent Vivier <lvivier@redhat.com>
-Message-ID: <7252247d-ce4d-0e7d-7078-5d0d4af2d658@redhat.com>
-Date: Wed, 17 May 2017 10:55:52 +0200
-MIME-Version: 1.0
-In-Reply-To: <20170517063547.23876-2-david@gibson.dropbear.id.au>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC 1/2] pseries: Split CAS PVR negotiation out
- into a separate function
+	(envelope-from <peterx@redhat.com>) id 1dAumi-0000ob-Qq
+	for qemu-devel@nongnu.org; Wed, 17 May 2017 04:58:23 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:38814)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1dAumi-0000o6-IF
+	for qemu-devel@nongnu.org; Wed, 17 May 2017 04:58:20 -0400
+From: Peter Xu <peterx@redhat.com>
+Date: Wed, 17 May 2017 16:57:42 +0800
+Message-Id: <1495011462-8735-1-git-send-email-peterx@redhat.com>
+Subject: [Qemu-devel] [PATCH v2] exec: abstract address_space_do_translate()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,110 +21,175 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>, abologna@redhat.com, thuth@redhat.com
-Cc: mdroth@linux.vnet.ibm.com, aik@ozlabs.ru, bharata@linux.vnet.ibm.com, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: David Gibson <david@gibson.dropbear.id.au>, Paolo Bonzini <pbonzini@redhat.com>, Maxime Coquelin <maxime.coquelin@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, peterx@redhat.com, Jason Wang <jasowang@redhat.com>
 
-On 17/05/2017 08:35, David Gibson wrote:
-> Guests of the qemu machine type go through a feature negotiation process
-> known as "client architecture support" (CAS) during early boot.  This does
-> a number of things, one of which is finding a CPU compatibility mode which
-> can be supported by both guest and host.
-> 
-> In fact the CPU negotiation is probably the single most complex part of the
-> CAS process, so this splits it out into a helper function.  We've recently
-> made some mistakes in maintaining backward compatibility for old machine
-> types here.  Splitting this out will also make it easier to fix this.
-> 
-> This also adds a possibly useful error message if the negotiation fails
-> (i.e. if there is CPU mode that's suitable for both guest and host).
-> 
-> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-> ---
->  hw/ppc/spapr_hcall.c | 43 +++++++++++++++++++++++++++----------------
->  1 file changed, 27 insertions(+), 16 deletions(-)
-> 
-> diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
-> index 0d608d6..007ae8d 100644
-> --- a/hw/ppc/spapr_hcall.c
-> +++ b/hw/ppc/spapr_hcall.c
-> @@ -1047,19 +1047,13 @@ static target_ulong h_signal_sys_reset(PowerPCCPU *cpu,
->      }
->  }
->  
-> -static target_ulong h_client_architecture_support(PowerPCCPU *cpu,
-> -                                                  sPAPRMachineState *spapr,
-> -                                                  target_ulong opcode,
-> -                                                  target_ulong *args)
-> +static uint32_t cas_check_pvr(PowerPCCPU *cpu, target_ulong list,
-> +                              Error **errp)
->  {
-> -    target_ulong list = ppc64_phys_to_real(args[0]);
-> -    target_ulong ov_table;
->      bool explicit_match = false; /* Matched the CPU's real PVR */
->      uint32_t max_compat = cpu->max_compat;
->      uint32_t best_compat = 0;
->      int i;
-> -    sPAPROptionVector *ov1_guest, *ov5_guest, *ov5_cas_old, *ov5_updates;
-> -    bool guest_radix;
->  
->      /*
->       * We scan the supplied table of PVRs looking for two things
-> @@ -1090,26 +1084,43 @@ static target_ulong h_client_architecture_support(PowerPCCPU *cpu,
->          /* We couldn't find a suitable compatibility mode, and either
->           * the guest doesn't support "raw" mode for this CPU, or raw
->           * mode is disabled because a maximum compat mode is set */
-> -        return H_HARDWARE;
-> +        error_setg(errp, "Couldn't negotiate a suitable PVR during CAS");
-> +        return 0;
->      }
->  
->      /* Parsing finished */
->      trace_spapr_cas_pvr(cpu->compat_pvr, explicit_match, best_compat);
->  
-> -    /* Update CPUs */
-> -    if (cpu->compat_pvr != best_compat) {
-> -        Error *local_err = NULL;
-> +    return best_compat;
-> +}
-> +
-> +static target_ulong h_client_architecture_support(PowerPCCPU *cpu,
-> +                                                  sPAPRMachineState *spapr,
-> +                                                  target_ulong opcode,
-> +                                                  target_ulong *args)
-> +{
-> +    /* @ov_table points to the first option vector */
-> +    target_ulong ov_table = ppc64_phys_to_real(args[0]);
-> +    uint32_t cas_pvr;
-> +    sPAPROptionVector *ov1_guest, *ov5_guest, *ov5_cas_old, *ov5_updates;
-> +    bool guest_radix;
-> +    Error *local_err = NULL;
->  
-> -        ppc_set_compat_all(best_compat, &local_err);
-> +    cas_pvr = cas_check_pvr(cpu, ov_table, &local_err);
-> +    if (local_err) {
-> +        error_report_err(local_err);
-> +        return H_HARDWARE;
-> +    }
-> +
-> +    /* Update CPUs */
-> +    if (cpu->compat_pvr != cas_pvr) {
-> +        ppc_set_compat_all(cas_pvr, &local_err);
->          if (local_err) {
->              error_report_err(local_err);
->              return H_HARDWARE;
->          }
->      }
->  
-> -    /* For the future use: here @ov_table points to the first option vector */
-> -    ov_table = list;
-> -
+This function is an abstraction helper for address_space_translate() and
+address_space_get_iotlb_entry(). It does the lookup of address into
+memory region section, then do proper IOMMU translation if necessary.
+With that, refactor the two existing functions a bit to use it.
 
-I think there is a change here: now ov_table is always
-ppc64_phys_to_real(args[0]), as it is not updated by cas_check() as list
-was by h_client_architecture_support().
+This fixes a potential vhost dmar issue when with IOMMU passthrough
+mode.
 
->      ov1_guest = spapr_ovec_parse_vector(ov_table, 1);
->      ov5_guest = spapr_ovec_parse_vector(ov_table, 5);
->      if (spapr_ovec_test(ov5_guest, OV5_MMU_BOTH)) {
+Tested-by: Maxime Coquelin <maxime.coquelin@redhat.com>
+Signed-off-by: Peter Xu <peterx@redhat.com>
+---
+v2:
+- added the lines to fix issue reported by Maxime [Maxime]
+- considering that what Maxime tested is exactly this patch after
+  applying the change, add t-b line for Maxime
+---
+ exec.c | 103 +++++++++++++++++++++++++++++++++++++++++++----------------------
+ 1 file changed, 69 insertions(+), 34 deletions(-)
 
-Laurent
+diff --git a/exec.c b/exec.c
+index eac6085..f942eb2 100644
+--- a/exec.c
++++ b/exec.c
+@@ -463,18 +463,20 @@ address_space_translate_internal(AddressSpaceDispatch *d, hwaddr addr, hwaddr *x
+ }
+ 
+ /* Called from RCU critical section */
+-IOMMUTLBEntry address_space_get_iotlb_entry(AddressSpace *as, hwaddr addr,
+-                                            bool is_write)
++static MemoryRegionSection address_space_do_translate(AddressSpace *as,
++                                                      hwaddr addr,
++                                                      hwaddr *xlat,
++                                                      hwaddr *plen,
++                                                      bool is_write,
++                                                      bool is_mmio)
+ {
+-    IOMMUTLBEntry iotlb = {0};
++    IOMMUTLBEntry iotlb;
+     MemoryRegionSection *section;
+     MemoryRegion *mr;
+ 
+     for (;;) {
+         AddressSpaceDispatch *d = atomic_rcu_read(&as->dispatch);
+-        section = address_space_lookup_region(d, addr, false);
+-        addr = addr - section->offset_within_address_space
+-               + section->offset_within_region;
++        section = address_space_translate_internal(d, addr, &addr, plen, is_mmio);
+         mr = section->mr;
+ 
+         if (!mr->iommu_ops) {
+@@ -482,55 +484,88 @@ IOMMUTLBEntry address_space_get_iotlb_entry(AddressSpace *as, hwaddr addr,
+         }
+ 
+         iotlb = mr->iommu_ops->translate(mr, addr, is_write);
++        addr = ((iotlb.translated_addr & ~iotlb.addr_mask)
++                | (addr & iotlb.addr_mask));
++        *plen = MIN(*plen, (addr | iotlb.addr_mask) - addr + 1);
+         if (!(iotlb.perm & (1 << is_write))) {
+-            iotlb.target_as = NULL;
+-            break;
++            goto translate_fail;
+         }
+ 
+-        addr = ((iotlb.translated_addr & ~iotlb.addr_mask)
+-                | (addr & iotlb.addr_mask));
+         as = iotlb.target_as;
+     }
+ 
+-    return iotlb;
++    *xlat = addr;
++
++    return *section;
++
++translate_fail:
++    return (MemoryRegionSection) { .mr = &io_mem_unassigned };
+ }
+ 
+ /* Called from RCU critical section */
+-MemoryRegion *address_space_translate(AddressSpace *as, hwaddr addr,
+-                                      hwaddr *xlat, hwaddr *plen,
+-                                      bool is_write)
++IOMMUTLBEntry address_space_get_iotlb_entry(AddressSpace *as, hwaddr addr,
++                                            bool is_write)
+ {
+-    IOMMUTLBEntry iotlb;
+-    MemoryRegionSection *section;
+-    MemoryRegion *mr;
++    MemoryRegionSection section;
++    hwaddr xlat, plen;
+ 
+-    for (;;) {
+-        AddressSpaceDispatch *d = atomic_rcu_read(&as->dispatch);
+-        section = address_space_translate_internal(d, addr, &addr, plen, true);
+-        mr = section->mr;
++    /* Try to get maximum page mask during translation. */
++    plen = (hwaddr)-1;
+ 
+-        if (!mr->iommu_ops) {
+-            break;
+-        }
++    /* This can never be MMIO. */
++    section = address_space_do_translate(as, addr, &xlat, &plen,
++                                         is_write, false);
+ 
+-        iotlb = mr->iommu_ops->translate(mr, addr, is_write);
+-        addr = ((iotlb.translated_addr & ~iotlb.addr_mask)
+-                | (addr & iotlb.addr_mask));
+-        *plen = MIN(*plen, (addr | iotlb.addr_mask) - addr + 1);
+-        if (!(iotlb.perm & (1 << is_write))) {
+-            mr = &io_mem_unassigned;
+-            break;
+-        }
++    /* Illegal translation */
++    if (section.mr == &io_mem_unassigned) {
++        goto iotlb_fail;
++    }
+ 
+-        as = iotlb.target_as;
++    /* Convert memory region offset into address space offset */
++    xlat += section.offset_within_address_space -
++        section.offset_within_region;
++
++    if (plen == (hwaddr)-1) {
++        /*
++         * We use default page size here. Logically it only happens
++         * for identity mappings.
++         */
++        plen = TARGET_PAGE_SIZE;
+     }
+ 
++    /* Convert to address mask */
++    plen -= 1;
++
++    return (IOMMUTLBEntry) {
++        .target_as = section.address_space,
++        .iova = addr & ~plen,
++        .translated_addr = xlat & ~plen,
++        .addr_mask = plen,
++        /* IOTLBs are for DMAs, and DMA only allows on RAMs. */
++        .perm = IOMMU_RW,
++    };
++
++iotlb_fail:
++    return (IOMMUTLBEntry) {0};
++}
++
++/* Called from RCU critical section */
++MemoryRegion *address_space_translate(AddressSpace *as, hwaddr addr,
++                                      hwaddr *xlat, hwaddr *plen,
++                                      bool is_write)
++{
++    MemoryRegion *mr;
++    MemoryRegionSection section;
++
++    /* This can be MMIO, so setup MMIO bit. */
++    section = address_space_do_translate(as, addr, xlat, plen, is_write, true);
++    mr = section.mr;
++
+     if (xen_enabled() && memory_access_is_direct(mr, is_write)) {
+         hwaddr page = ((addr & TARGET_PAGE_MASK) + TARGET_PAGE_SIZE) - addr;
+         *plen = MIN(page, *plen);
+     }
+ 
+-    *xlat = addr;
+     return mr;
+ }
+ 
+-- 
+2.7.4
