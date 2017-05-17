@@ -1,20 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55462)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58344)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dAoSk-0004ev-Bd
-	for qemu-devel@nongnu.org; Tue, 16 May 2017 22:13:19 -0400
+	(envelope-from <jianjay.zhou@huawei.com>) id 1dAoa3-0006Hl-G1
+	for qemu-devel@nongnu.org; Tue, 16 May 2017 22:20:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dAoSj-0000Fu-6N
-	for qemu-devel@nongnu.org; Tue, 16 May 2017 22:13:18 -0400
-Date: Wed, 17 May 2017 10:13:02 +0800
-From: Fam Zheng <famz@redhat.com>
-Message-ID: <20170517021302.GF27669@lemon.lan>
-References: <20170505102153.758-1-famz@redhat.com>
+	(envelope-from <jianjay.zhou@huawei.com>) id 1dAoZy-0003MY-Jp
+	for qemu-devel@nongnu.org; Tue, 16 May 2017 22:20:51 -0400
+Received: from szxga02-in.huawei.com ([45.249.212.188]:3927)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
+	(envelope-from <jianjay.zhou@huawei.com>) id 1dAoZx-0003KR-NN
+	for qemu-devel@nongnu.org; Tue, 16 May 2017 22:20:46 -0400
+From: "Zhoujian (jay)" <jianjay.zhou@huawei.com>
+Date: Wed, 17 May 2017 02:20:22 +0000
+Message-ID: <B2D15215269B544CADD246097EACE747395C283F@dggeml511-mbx.china.huawei.com>
+References: <830bfc39-56c7-a901-9ebb-77d6e7a5614c@huawei.com>
+	<874lxeovrg.fsf@secure.mitica>
+	<7cd332ec-48d4-1feb-12e2-97b50b04e028@huawei.com>
+	<20170424164244.GJ2362@work-vm>
+	<B2D15215269B544CADD246097EACE747395AD759@dggeml511-mbx.china.huawei.com>
+	<85e3a0dd-20c8-8ff2-37ce-bfdf543e7787@redhat.com>
+	<CANRm+CzvNpLGqH5KuqqO7Wh7UabSkMBbxuTymbM0CZPgpQOwCg@mail.gmail.com>
+In-Reply-To: <CANRm+CzvNpLGqH5KuqqO7Wh7UabSkMBbxuTymbM0CZPgpQOwCg@mail.gmail.com>
+Content-Language: zh-CN
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170505102153.758-1-famz@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] iotests: 147: Don't test inet6 if not
- available
+Subject: Re: [Qemu-devel] About QEMU BQL and dirty log switch in Migration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,40 +33,97 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
+To: Wanpeng Li <kernellwp@gmail.com>
+Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, yanghongyang <yanghongyang@huawei.com>, "quintela@redhat.com" <quintela@redhat.com>, "wangxin (U)" <wangxinxin.wang@huawei.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "Gonglei (Arei)" <arei.gonglei@huawei.com>, Huangzhichao <huangzhichao@huawei.com>, Zhanghailiang <zhang.zhanghailiang@huawei.com>, "Herongguang (Stephen)" <herongguang.he@huawei.com>, Xiao Guangrong <xiaoguangrong@tencent.com>, Paolo Bonzini <pbonzini@redhat.com>, "Huangweidong (C)" <weidong.huang@huawei.com>
 
-On Fri, 05/05 18:21, Fam Zheng wrote:
-> This is the case in our docker tests, as we use --net=none there. Skip
-> this method.
-
-Ping. Is this patch okay?
-
-> 
-> Signed-off-by: Fam Zheng <famz@redhat.com>
-> ---
->  tests/qemu-iotests/147 | 7 +++++++
->  1 file changed, 7 insertions(+)
-> 
-> diff --git a/tests/qemu-iotests/147 b/tests/qemu-iotests/147
-> index 32afea6..db34838 100755
-> --- a/tests/qemu-iotests/147
-> +++ b/tests/qemu-iotests/147
-> @@ -147,6 +147,13 @@ class BuiltinNBD(NBDBlockdevAddBase):
->          self._server_down()
->  
->      def test_inet6(self):
-> +        try:
-> +            socket.getaddrinfo("::0", "0", socket.AF_INET6,
-> +                               socket.SOCK_STREAM, socket.IPPROTO_TCP,
-> +                               socket.AI_ADDRCONFIG | socket.AI_CANONNAME)
-> +        except socket.gaierror:
-> +            # IPv6 not available, skip
-> +            return
->          address = { 'type': 'inet',
->                      'data': {
->                          'host': '::1',
-> -- 
-> 2.9.3
-> 
-> 
+SGkgV2FucGVuZywNCg0KPiA+IE9uIDExLzA1LzIwMTcgMTQ6MDcsIFpob3VqaWFuIChqYXkpIHdy
+b3RlOg0KPiA+PiAtICAgICAgICAqIFNjYW4gc3B0ZXMgaWYgZGlydHkgbG9nZ2luZyBoYXMgYmVl
+biBzdG9wcGVkLCBkcm9wcGluZyB0aG9zZQ0KPiA+PiAtICAgICAgICAqIHdoaWNoIGNhbiBiZSBj
+b2xsYXBzZWQgaW50byBhIHNpbmdsZSBsYXJnZS1wYWdlIHNwdGUuICBMYXRlcg0KPiA+PiAtICAg
+ICAgICAqIHBhZ2UgZmF1bHRzIHdpbGwgY3JlYXRlIHRoZSBsYXJnZS1wYWdlIHNwdGVzLg0KPiA+
+PiArICAgICAgICAqIFJlc2V0IGVhY2ggdmNwdSdzIG1tdSwgdGhlbiBwYWdlIGZhdWx0cyB3aWxs
+IGNyZWF0ZSB0aGUNCj4gbGFyZ2UtcGFnZQ0KPiA+PiArICAgICAgICAqIHNwdGVzIGxhdGVyLg0K
+PiA+PiAgICAgICAgICAqLw0KPiA+PiAgICAgICAgIGlmICgoY2hhbmdlICE9IEtWTV9NUl9ERUxF
+VEUpICYmDQo+ID4+ICAgICAgICAgICAgICAgICAob2xkLT5mbGFncyAmIEtWTV9NRU1fTE9HX0RJ
+UlRZX1BBR0VTKSAmJg0KPiA+PiAtICAgICAgICAgICAgICAgIShuZXctPmZsYWdzICYgS1ZNX01F
+TV9MT0dfRElSVFlfUEFHRVMpKQ0KPiA+PiAtICAgICAgICAgICAgICAga3ZtX21tdV96YXBfY29s
+bGFwc2libGVfc3B0ZXMoa3ZtLCBuZXcpOw0KPiANCj4gVGhpcyBpcyBhbiB1bmxpa2VseSBicmFu
+Y2godW5sZXNzIGd1ZXN0IGxpdmUgbWlncmF0aW9uIGZhaWxzIGFuZCBjb250aW51ZQ0KPiB0byBy
+dW4gb24gdGhlIHNvdXJjZSBtYWNoaW5lKSBpbnN0ZWFkIG9mIGhvdCBwYXRoLCBkbyB5b3UgaGF2
+ZSBhbnkNCj4gcGVyZm9ybWFuY2UgbnVtYmVyIGZvciB5b3VyIHJlYWwgd29ya2xvYWRzPw0KPiAN
+Cg0KU29ycnkgdG8gYm90aGVyIHlvdSBhZ2Fpbi4NCg0KUmVjZW50bHksIEkgaGF2ZSB0ZXN0ZWQg
+dGhlIHBlcmZvcm1hbmNlIGJlZm9yZSBtaWdyYXRpb24gYW5kIGFmdGVyIG1pZ3JhdGlvbiBmYWls
+dXJlDQp1c2luZyBzcGVjIGNwdTIwMDYgaHR0cHM6Ly93d3cuc3BlYy5vcmcvY3B1MjAwNi8sIHdo
+aWNoIGlzIGEgc3RhbmRhcmQgcGVyZm9ybWFuY2UNCmV2YWx1YXRpb24gdG9vbC4NCg0KVGhlc2Ug
+YXJlIHRoZSByZXN1bHRzOg0KKioqKioqDQogICAgQmVmb3JlIG1pZ3JhdGlvbiB0aGUgc2NvcmUg
+aXMgMTUzLCBhbmQgdGhlIFRMQiBtaXNzIHN0YXRpc3RpY3Mgb2YgdGhlIHFlbXUgcHJvY2VzcyBp
+czoNCiAgICBsaW51eC1zanJmYWM6L21udC96aG91amlhbiAjIHBlcmYgc3RhdCAtZSBkVExCLWxv
+YWQtbWlzc2VzLGRUTEItbG9hZHMsZFRMQi1zdG9yZS1taXNzZXMsIFwNCiAgICBkVExCLXN0b3Jl
+cyxpVExCLWxvYWQtbWlzc2VzLGlUTEItbG9hZHMgLXAgMjY0NjMgc2xlZXAgMTANCg0KICAgIFBl
+cmZvcm1hbmNlIGNvdW50ZXIgc3RhdHMgZm9yIHByb2Nlc3MgaWQgJzI2NDYzJzoNCg0KICAgICAg
+ICAgICA2OTgsOTM4ICAgICAgZFRMQi1sb2FkLW1pc3NlcyAgICAgICAgICAjICAgIDAuMTMlIG9m
+IGFsbCBkVExCIGNhY2hlIGhpdHMgICAoNTAuNDYlKQ0KICAgICAgIDU0MywzMDMsODc1ICAgICAg
+ZFRMQi1sb2FkcyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAoNTAuNDMlKQ0KICAgICAgICAgICAxOTksNTk3ICAgICAgZFRMQi1zdG9yZS1taXNzZXMg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAoMTYuNTElKQ0KICAg
+ICAgICA2MCwxMjgsNTYxICAgICAgZFRMQi1zdG9yZXMgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAoMTYuNjclKQ0KICAgICAgICAgICAgNjksOTg2ICAg
+ICAgaVRMQi1sb2FkLW1pc3NlcyAgICAgICAgICAjICAgIDYuMTclIG9mIGFsbCBpVExCIGNhY2hl
+IGhpdHMgICAoMTYuNjclKQ0KICAgICAgICAgMSwxMzQsMDk3ICAgICAgaVRMQi1sb2FkcyAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAoMzMuMzMlKQ0K
+DQogICAgICAxMC4wMDA2ODQwNjQgc2Vjb25kcyB0aW1lIGVsYXBzZWQNCg0KICAgIEFmdGVyIG1p
+Z3JhdGlvbiBmYWlsdXJlIHRoZSBzY29yZSBpcyAxNDksIGFuZCB0aGUgVExCIG1pc3Mgc3RhdGlz
+dGljcyBvZiB0aGUgcWVtdSBwcm9jZXNzIGlzOg0KICAgIGxpbnV4LXNqcmZhYzovbW50L3pob3Vq
+aWFuICMgcGVyZiBzdGF0IC1lIGRUTEItbG9hZC1taXNzZXMsZFRMQi1sb2FkcyxkVExCLXN0b3Jl
+LW1pc3NlcywgXA0KICAgIGRUTEItc3RvcmVzLGlUTEItbG9hZC1taXNzZXMsaVRMQi1sb2FkcyAt
+cCAyNjQ2MyBzbGVlcCAxMA0KDQogICAgUGVyZm9ybWFuY2UgY291bnRlciBzdGF0cyBmb3IgcHJv
+Y2VzcyBpZCAnMjY0NjMnOg0KDQogICAgICAgICAgIDc2NSw0MDAgICAgICBkVExCLWxvYWQtbWlz
+c2VzICAgICAgICAgICMgICAgMC4xNCUgb2YgYWxsIGRUTEIgY2FjaGUgaGl0cyAgICg1MC41MCUp
+DQogICAgICAgNTQwLDk3MiwxNDQgICAgICBkVExCLWxvYWRzICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICg1MC40NyUpDQogICAgICAgICAgIDIwNyw2
+NzAgICAgICBkVExCLXN0b3JlLW1pc3NlcyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICgxNi41MCUpDQogICAgICAgIDU4LDM2Myw3ODcgICAgICBkVExCLXN0b3Jl
+cyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICgxNi42
+NyUpDQogICAgICAgICAgIDEwOSw3NzIgICAgICBpVExCLWxvYWQtbWlzc2VzICAgICAgICAgICMg
+ICAgOS41MiUgb2YgYWxsIGlUTEIgY2FjaGUgaGl0cyAgICgxNi42NyUpDQogICAgICAgICAxLDE1
+Miw3ODQgICAgICBpVExCLWxvYWRzICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICgzMy4zMiUpDQoNCiAgICAgIDEwLjAwMDcwMzA3OCBzZWNvbmRzIHRp
+bWUgZWxhcHNlZA0KKioqKioqDQoNClRoZXNlIGFyZSB0aGUgc3RlcHM6DQo9PT09PT0NCiAoMSkg
+dGhlIHZlcnNpb24gb2Yga21vZCBpcyA0LjQuMTEod2l0aCBzbGlnaHRseSBtb2RpZmllZCkgYW5k
+IHRoZSB2ZXJzaW9uIG9mIHFlbXUgaXMgMi42LjANCiAgICAod2l0aCBzbGlnaHRseSBtb2RpZmll
+ZCksIHRoZSBrbW9kIGlzIGFwcGxpZWQgd2l0aCB0aGUgZm9sbG93aW5nIHBhdGNoIGFjY29yZGlu
+ZyB0bw0KICAgIFBhb2xvJ3MgYWR2aWNlOg0KDQpkaWZmIC0tZ2l0IGEvc291cmNlL3g4Ni94ODYu
+YyBiL3NvdXJjZS94ODYveDg2LmMNCmluZGV4IDA1NGE3ZDMuLjc1YTRiYjMgMTAwNjQ0DQotLS0g
+YS9zb3VyY2UveDg2L3g4Ni5jDQorKysgYi9zb3VyY2UveDg2L3g4Ni5jDQpAQCAtODU1MCw4ICs4
+NTUwLDEwIEBAIHZvaWQga3ZtX2FyY2hfY29tbWl0X21lbW9yeV9yZWdpb24oc3RydWN0IGt2bSAq
+a3ZtLA0KICAgICAgICAgKi8NCiAgICAgICAgaWYgKChjaGFuZ2UgIT0gS1ZNX01SX0RFTEVURSkg
+JiYNCiAgICAgICAgICAgICAgICAob2xkLT5mbGFncyAmIEtWTV9NRU1fTE9HX0RJUlRZX1BBR0VT
+KSAmJg0KLSAgICAgICAgICAgICAgICEobmV3LT5mbGFncyAmIEtWTV9NRU1fTE9HX0RJUlRZX1BB
+R0VTKSkNCi0gICAgICAgICAgICAgICBrdm1fbW11X3phcF9jb2xsYXBzaWJsZV9zcHRlcyhrdm0s
+IG5ldyk7DQorICAgICAgICAgICAgICAgIShuZXctPmZsYWdzICYgS1ZNX01FTV9MT0dfRElSVFlf
+UEFHRVMpKSB7DQorICAgICAgICAgICAgICAgcHJpbnRrKEtFUk5fRVJSICJ6aiBtYWtlIEtWTV9S
+RVFfTU1VX1JFTE9BRCByZXF1ZXN0XG4iKTsNCisgICAgICAgICAgICAgICBrdm1fbWFrZV9hbGxf
+Y3B1c19yZXF1ZXN0KGt2bSwgS1ZNX1JFUV9NTVVfUkVMT0FEKTsNCisgICAgICAgfQ0KIA0KICAg
+ICAgICAvKg0KICAgICAgICAgKiBTZXQgdXAgd3JpdGUgcHJvdGVjdGlvbiBhbmQvb3IgZGlydHkg
+bG9nZ2luZyBmb3IgdGhlIG5ldyBzbG90Lg0KDQooMikgSSBzdGFydGVkIHVwIGEgbWVtb3J5IHBy
+ZW9jY3VwaWVkIDEwRyBWTShzdXNlMTFzcDMpLCB3aGljaCBtZWFucyBpdHMgIlJFUyBjb2x1bW4i
+IGluIHRvcCBpcyAxMEcsDQogICAgaW4gb3JkZXIgdG8gc2V0IHVwIHRoZSBFUFQgdGFibGUgaW4g
+YWR2YW5jZS4NCigzKSBBbmQgdGhlbiwgSSBydW4gdGhlIHRlc3QgY2FzZSA0MjkubWNmIG9mIHNw
+ZWMgY3B1MjAwNiBiZWZvcmUgbWlncmF0aW9uIGFuZCBhZnRlciBtaWdyYXRpb24gZmFpbHVyZS4N
+CiAgICBUaGUgNDI5Lm1jZiBpcyBhIG1lbW9yeSBpbnRlbnNpdmUgd29ya2xvYWQsIGFuZCB0aGUg
+bWlncmF0aW9uIGZhaWx1cmUgaXMgY29uc3RydWN0ZWQgZGVsaWJlcmF0ZWx5DQogICAgd2l0aCB0
+aGUgZm9sbG93aW5nIHBhdGNoIG9mIHFlbXU6DQoNCmRpZmYgLS1naXQgYS9taWdyYXRpb24vbWln
+cmF0aW9uLmMgYi9taWdyYXRpb24vbWlncmF0aW9uLmMNCmluZGV4IDVkNzI1ZDAuLjg4ZGZjNTkg
+MTAwNjQ0DQotLS0gYS9taWdyYXRpb24vbWlncmF0aW9uLmMNCisrKyBiL21pZ3JhdGlvbi9taWdy
+YXRpb24uYw0KQEAgLTYyNSw2ICs2MjUsOSBAQCBzdGF0aWMgdm9pZCBwcm9jZXNzX2luY29taW5n
+X21pZ3JhdGlvbl9jbyh2b2lkICpvcGFxdWUpDQogICAgICAgICAgICAgICAgICAgICAgIE1JR1JB
+VElPTl9TVEFUVVNfQUNUSVZFKTsNCiAgICAgcmV0ID0gcWVtdV9sb2Fkdm1fc3RhdGUoZik7DQog
+DQorICAgIC8vIGRlbGliZXJhdGVseSBjb25zdHJ1Y3QgdGhlIG1pZ3JhdGlvbiBmYWlsdXJlDQor
+ICAgIGV4aXQoRVhJVF9GQUlMVVJFKTsgDQorDQogICAgIHBzID0gcG9zdGNvcHlfc3RhdGVfZ2V0
+KCk7DQogICAgIHRyYWNlX3Byb2Nlc3NfaW5jb21pbmdfbWlncmF0aW9uX2NvX2VuZChyZXQsIHBz
+KTsNCiAgICAgaWYgKHBzICE9IFBPU1RDT1BZX0lOQ09NSU5HX05PTkUpIHsNCj09PT09PQ0KDQoN
+ClJlc3VsdHMgb2YgdGhlIHNjb3JlIGFuZCBUTEIgbWlzcyByYXRlIGFyZSBhbG1vc3QgdGhlIHNh
+bWUsIGFuZCBJIGFtIGNvbmZ1c2VkLg0KTWF5IEkgYXNrIHdoaWNoIHRvb2wgZG8geW91IHVzZSB0
+byBldmFsdWF0ZSB0aGUgcGVyZm9ybWFuY2U/DQpBbmQgaWYgbXkgdGVzdCBzdGVwcyBhcmUgd3Jv
+bmcsIHBsZWFzZSBsZXQgbWUga25vdywgdGhhbmsgeW91Lg0KDQpSZWdhcmRzLA0KSmF5IFpob3UN
+Cg0KDQoNCg0KDQo=
