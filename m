@@ -1,24 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55829)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56636)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1dB7Rz-00086i-9B
-	for qemu-devel@nongnu.org; Wed, 17 May 2017 18:29:48 -0400
+	(envelope-from <mst@redhat.com>) id 1dB7XB-000131-60
+	for qemu-devel@nongnu.org; Wed, 17 May 2017 18:35:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1dB7Rw-0004m7-4F
-	for qemu-devel@nongnu.org; Wed, 17 May 2017 18:29:47 -0400
-Resent-Message-Id: <E1dB7Rw-0004m7-4F@eggs.gnu.org>
-Received: from sender-of-o52.zoho.com ([135.84.80.217]:21366)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1dB7Rv-0004lj-SH
-	for qemu-devel@nongnu.org; Wed, 17 May 2017 18:29:44 -0400
-In-Reply-To: <1495057396-13387-1-git-send-email-mst@redhat.com>
-Message-ID: <149506017263.588.6063103635211388415@c05f1edc8ed1>
-Reply-To: <qemu-devel@nongnu.org>
+	(envelope-from <mst@redhat.com>) id 1dB7X8-0006Ux-3e
+	for qemu-devel@nongnu.org; Wed, 17 May 2017 18:35:09 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:51872)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1dB7X7-0006Un-Qg
+	for qemu-devel@nongnu.org; Wed, 17 May 2017 18:35:06 -0400
+Date: Thu, 18 May 2017 01:34:48 +0300
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20170518013348-mutt-send-email-mst@kernel.org>
+References: <1495057396-13387-1-git-send-email-mst@redhat.com>
+	<149506017263.588.6063103635211388415@c05f1edc8ed1>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Wed, 17 May 2017 15:29:33 -0700 (PDT)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <149506017263.588.6063103635211388415@c05f1edc8ed1>
 Subject: Re: [Qemu-devel] [PULL 00/13] pci, virtio, vhost: fixes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -28,66 +27,100 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: mst@redhat.com
-Cc: famz@redhat.com, qemu-devel@nongnu.org, peter.maydell@linaro.org
+To: qemu-devel@nongnu.org
+Cc: famz@redhat.com, peter.maydell@linaro.org
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKTWVzc2FnZS1pZDogMTQ5
-NTA1NzM5Ni0xMzM4Ny0xLWdpdC1zZW5kLWVtYWlsLW1zdEByZWRoYXQuY29tClN1YmplY3Q6IFtR
-ZW11LWRldmVsXSBbUFVMTCAwMC8xM10gcGNpLCB2aXJ0aW8sIHZob3N0OiBmaXhlcwpUeXBlOiBz
-ZXJpZXMKCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKCkJBU0U9YmFzZQpu
-PTEKdG90YWw9JChnaXQgbG9nIC0tb25lbGluZSAkQkFTRS4uIHwgd2MgLWwpCmZhaWxlZD0wCgpn
-aXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2NhbCBk
-aWZmLnJlbmFtZXMgVHJ1ZQoKY29tbWl0cz0iJChnaXQgbG9nIC0tZm9ybWF0PSVIIC0tcmV2ZXJz
-ZSAkQkFTRS4uKSIKZm9yIGMgaW4gJGNvbW1pdHM7IGRvCiAgICBlY2hvICJDaGVja2luZyBQQVRD
-SCAkbi8kdG90YWw6ICQoZ2l0IGxvZyAtbiAxIC0tZm9ybWF0PSVzICRjKS4uLiIKICAgIGlmICEg
-Z2l0IHNob3cgJGMgLS1mb3JtYXQ9ZW1haWwgfCAuL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1h
-aWxiYWNrIC07IHRoZW4KICAgICAgICBmYWlsZWQ9MQogICAgICAgIGVjaG8KICAgIGZpCiAgICBu
-PSQoKG4rMSkpCmRvbmUKCmV4aXQgJGZhaWxlZAo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBk
-YXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApTd2l0Y2hlZCB0
-byBhIG5ldyBicmFuY2ggJ3Rlc3QnCjE3YmZiY2EgZXhlYzogYWJzdHJhY3QgYWRkcmVzc19zcGFj
-ZV9kb190cmFuc2xhdGUoKQo4YmIwMmU3IHBjaTogZGVhc3NlcnQgaW50eCB3aGVuIHBjaSBkZXZp
-Y2UgdW5yZWFsaXplCjFlMTQyNzggdmlydGlvOiBhbGxvdyBicm9rZW4gZGV2aWNlIHRvIG5vdGlm
-eSBndWVzdApkYzI5YTc0IFJldmVydCAiaHcvcGNpOiBkaXNhYmxlIHBjaS1icmlkZ2UncyBzaHBj
-IGJ5IGRlZmF1bHQiCjMzOTgxMjMgYWNwaS1kZWZzOiBjbGVhbiB1cCBvcGVuIGJyYWNlIHVzYWdl
-CmMyNWIzMDkgQUNQSTogZG9uJ3QgY2FsbCBhY3BpX3BjaWhwX2RldmljZV9wbHVnX2NiIG9uIHhl
-bgowMmQ4MzNjIGlvbW11OiBEb24ndCBjcmFzaCBpZiBtYWNoaW5lIGlzIG5vdCBQQ19NQUNISU5F
-CjAxM2I2ZjcgcGM6IGFkZCAyLjEwIG1hY2hpbmUgdHlwZQpmOGRmNGI5IHBjL2Z3Y2ZnOiB1bmJy
-ZWFrIG1pZ3JhdGlvbiBmcm9tIHFlbXUtMi41IGFuZCBxZW11LTIuNiBkdXJpbmcgZmlybXdhcmUg
-Ym9vdAozOWZiZmFiIGxpYnZob3N0LXVzZXI6IGZpeCBjcmFzaCB3aGVuIHJpbmdzIGFyZW4ndCBy
-ZWFkeQoxYjlmNjFkIGh3L3ZpcnRpbzogZml4IHZob3N0IHVzZXIgZmFpbHMgdG8gc3RhcnR1cCB3
-aGVuIE1RCmUwM2Y2MGEgaHcvYXJtL3ZpcnQ6IGdlbmVyYXRlIDY0LWJpdCBhZGRyZXNzYWJsZSBB
-Q1BJIG9iamVjdHMKNmZjNDIzOCBody9hY3BpLWRlZnM6IHJlcGxhY2UgbGVhZGluZyBYIHdpdGgg
-eF8gaW4gRkFEVCBmaWVsZCBuYW1lcwoKPT09IE9VVFBVVCBCRUdJTiA9PT0KQ2hlY2tpbmcgUEFU
-Q0ggMS8xMzogaHcvYWNwaS1kZWZzOiByZXBsYWNlIGxlYWRpbmcgWCB3aXRoIHhfIGluIEZBRFQg
-ZmllbGQgbmFtZXMuLi4KQ2hlY2tpbmcgUEFUQ0ggMi8xMzogaHcvYXJtL3ZpcnQ6IGdlbmVyYXRl
-IDY0LWJpdCBhZGRyZXNzYWJsZSBBQ1BJIG9iamVjdHMuLi4KRVJST1I6IG9wZW4gYnJhY2UgJ3sn
-IGZvbGxvd2luZyBzdHJ1Y3QgZ28gb24gdGhlIHNhbWUgbGluZQojMTU3OiBGSUxFOiBpbmNsdWRl
-L2h3L2FjcGkvYWNwaS1kZWZzLmg6MjM5Ogorc3RydWN0IEFjcGlYc2R0RGVzY3JpcHRvclJldjIK
-K3sKCnRvdGFsOiAxIGVycm9ycywgMCB3YXJuaW5ncywgMTI1IGxpbmVzIGNoZWNrZWQKCllvdXIg
-cGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNl
-IGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVy
-LCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCkNoZWNraW5nIFBBVENIIDMvMTM6IGh3
-L3ZpcnRpbzogZml4IHZob3N0IHVzZXIgZmFpbHMgdG8gc3RhcnR1cCB3aGVuIE1RLi4uCkNoZWNr
-aW5nIFBBVENIIDQvMTM6IGxpYnZob3N0LXVzZXI6IGZpeCBjcmFzaCB3aGVuIHJpbmdzIGFyZW4n
-dCByZWFkeS4uLgpDaGVja2luZyBQQVRDSCA1LzEzOiBwYy9md2NmZzogdW5icmVhayBtaWdyYXRp
-b24gZnJvbSBxZW11LTIuNSBhbmQgcWVtdS0yLjYgZHVyaW5nIGZpcm13YXJlIGJvb3QuLi4KQ2hl
-Y2tpbmcgUEFUQ0ggNi8xMzogcGM6IGFkZCAyLjEwIG1hY2hpbmUgdHlwZS4uLgpDaGVja2luZyBQ
-QVRDSCA3LzEzOiBpb21tdTogRG9uJ3QgY3Jhc2ggaWYgbWFjaGluZSBpcyBub3QgUENfTUFDSElO
-RS4uLgpDaGVja2luZyBQQVRDSCA4LzEzOiBBQ1BJOiBkb24ndCBjYWxsIGFjcGlfcGNpaHBfZGV2
-aWNlX3BsdWdfY2Igb24geGVuLi4uCkNoZWNraW5nIFBBVENIIDkvMTM6IGFjcGktZGVmczogY2xl
-YW4gdXAgb3BlbiBicmFjZSB1c2FnZS4uLgpDaGVja2luZyBQQVRDSCAxMC8xMzogUmV2ZXJ0ICJo
-dy9wY2k6IGRpc2FibGUgcGNpLWJyaWRnZSdzIHNocGMgYnkgZGVmYXVsdCIuLi4KQ2hlY2tpbmcg
-UEFUQ0ggMTEvMTM6IHZpcnRpbzogYWxsb3cgYnJva2VuIGRldmljZSB0byBub3RpZnkgZ3Vlc3Qu
-Li4KQ2hlY2tpbmcgUEFUQ0ggMTIvMTM6IHBjaTogZGVhc3NlcnQgaW50eCB3aGVuIHBjaSBkZXZp
-Y2UgdW5yZWFsaXplLi4uCkNoZWNraW5nIFBBVENIIDEzLzEzOiBleGVjOiBhYnN0cmFjdCBhZGRy
-ZXNzX3NwYWNlX2RvX3RyYW5zbGF0ZSgpLi4uCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0
-ZXJzCiM0NjogRklMRTogZXhlYy5jOjQ3OToKKyAgICAgICAgc2VjdGlvbiA9IGFkZHJlc3Nfc3Bh
-Y2VfdHJhbnNsYXRlX2ludGVybmFsKGQsIGFkZHIsICZhZGRyLCBwbGVuLCBpc19tbWlvKTsKCnRv
-dGFsOiAwIGVycm9ycywgMSB3YXJuaW5ncywgMTQyIGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2gg
-aGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9y
-cwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUK
-Q0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1h
-bmQgZXhpdGVkIHdpdGggY29kZTogMQoKCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxs
-eSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVk
-YmFjayB0byBwYXRjaGV3LWRldmVsQGZyZWVsaXN0cy5vcmc=
+On Wed, May 17, 2017 at 03:29:33PM -0700, no-reply@patchew.org wrote:
+> Hi,
+> 
+> This series seems to have some coding style problems. See output below for
+> more information:
+> 
+> Message-id: 1495057396-13387-1-git-send-email-mst@redhat.com
+> Subject: [Qemu-devel] [PULL 00/13] pci, virtio, vhost: fixes
+> Type: series
+> 
+> === TEST SCRIPT BEGIN ===
+> #!/bin/bash
+> 
+> BASE=base
+> n=1
+> total=$(git log --oneline $BASE.. | wc -l)
+> failed=0
+> 
+> git config --local diff.renamelimit 0
+> git config --local diff.renames True
+> 
+> commits="$(git log --format=%H --reverse $BASE..)"
+> for c in $commits; do
+>     echo "Checking PATCH $n/$total: $(git log -n 1 --format=%s $c)..."
+>     if ! git show $c --format=email | ./scripts/checkpatch.pl --mailback -; then
+>         failed=1
+>         echo
+>     fi
+>     n=$((n+1))
+> done
+> 
+> exit $failed
+> === TEST SCRIPT END ===
+> 
+> Updating 3c8cf5a9c21ff8782164d1def7f44bd888713384
+> Switched to a new branch 'test'
+> 17bfbca exec: abstract address_space_do_translate()
+> 8bb02e7 pci: deassert intx when pci device unrealize
+> 1e14278 virtio: allow broken device to notify guest
+> dc29a74 Revert "hw/pci: disable pci-bridge's shpc by default"
+> 3398123 acpi-defs: clean up open brace usage
+> c25b309 ACPI: don't call acpi_pcihp_device_plug_cb on xen
+> 02d833c iommu: Don't crash if machine is not PC_MACHINE
+> 013b6f7 pc: add 2.10 machine type
+> f8df4b9 pc/fwcfg: unbreak migration from qemu-2.5 and qemu-2.6 during firmware boot
+> 39fbfab libvhost-user: fix crash when rings aren't ready
+> 1b9f61d hw/virtio: fix vhost user fails to startup when MQ
+> e03f60a hw/arm/virt: generate 64-bit addressable ACPI objects
+> 6fc4238 hw/acpi-defs: replace leading X with x_ in FADT field names
+> 
+> === OUTPUT BEGIN ===
+> Checking PATCH 1/13: hw/acpi-defs: replace leading X with x_ in FADT field names...
+> Checking PATCH 2/13: hw/arm/virt: generate 64-bit addressable ACPI objects...
+> ERROR: open brace '{' following struct go on the same line
+> #157: FILE: include/hw/acpi/acpi-defs.h:239:
+> +struct AcpiXsdtDescriptorRev2
+> +{
+> 
+> total: 1 errors, 0 warnings, 125 lines checked
+> 
+> Your patch has style problems, please review.  If any of these errors
+> are false positives report them to the maintainer, see
+> CHECKPATCH in MAINTAINERS.
+> 
+> Checking PATCH 3/13: hw/virtio: fix vhost user fails to startup when MQ...
+> Checking PATCH 4/13: libvhost-user: fix crash when rings aren't ready...
+> Checking PATCH 5/13: pc/fwcfg: unbreak migration from qemu-2.5 and qemu-2.6 during firmware boot...
+> Checking PATCH 6/13: pc: add 2.10 machine type...
+> Checking PATCH 7/13: iommu: Don't crash if machine is not PC_MACHINE...
+> Checking PATCH 8/13: ACPI: don't call acpi_pcihp_device_plug_cb on xen...
+> Checking PATCH 9/13: acpi-defs: clean up open brace usage...
+> Checking PATCH 10/13: Revert "hw/pci: disable pci-bridge's shpc by default"...
+> Checking PATCH 11/13: virtio: allow broken device to notify guest...
+> Checking PATCH 12/13: pci: deassert intx when pci device unrealize...
+> Checking PATCH 13/13: exec: abstract address_space_do_translate()...
+> WARNING: line over 80 characters
+> #46: FILE: exec.c:479:
+> +        section = address_space_translate_internal(d, addr, &addr, plen, is_mmio);
+> 
+> total: 0 errors, 1 warnings, 142 lines checked
+
+Not by a lot, and seems much clearer this way, so I think it's ok to ignore.
+
+> Your patch has style problems, please review.  If any of these errors
+> are false positives report them to the maintainer, see
+> CHECKPATCH in MAINTAINERS.
+> === OUTPUT END ===
+> 
+> Test command exited with code: 1
+> 
+> 
+> ---
+> Email generated automatically by Patchew [http://patchew.org/].
+> Please send your feedback to patchew-devel@freelists.org
