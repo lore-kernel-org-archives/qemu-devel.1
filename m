@@ -1,39 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39964)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41241)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1dB14T-0002uo-PB
-	for qemu-devel@nongnu.org; Wed, 17 May 2017 11:41:07 -0400
+	(envelope-from <stefanha@redhat.com>) id 1dB17G-0005if-Ew
+	for qemu-devel@nongnu.org; Wed, 17 May 2017 11:43:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1dB14O-0005yD-NP
-	for qemu-devel@nongnu.org; Wed, 17 May 2017 11:41:05 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:46053)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mdroth@linux.vnet.ibm.com>)
-	id 1dB14O-0005wJ-9A
-	for qemu-devel@nongnu.org; Wed, 17 May 2017 11:41:00 -0400
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v4HFcr1p125612
-	for <qemu-devel@nongnu.org>; Wed, 17 May 2017 11:40:58 -0400
-Received: from e11.ny.us.ibm.com (e11.ny.us.ibm.com [129.33.205.201])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2agb8x89mt-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 17 May 2017 11:40:58 -0400
-Received: from localhost
-	by e11.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <mdroth@linux.vnet.ibm.com>;
-	Wed, 17 May 2017 11:40:57 -0400
-Content-Type: text/plain; charset="utf-8"
+	(envelope-from <stefanha@redhat.com>) id 1dB17C-0007Yq-4U
+	for qemu-devel@nongnu.org; Wed, 17 May 2017 11:43:58 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:39834)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1dB17B-0007Y4-Qv
+	for qemu-devel@nongnu.org; Wed, 17 May 2017 11:43:54 -0400
+Date: Wed, 17 May 2017 16:43:47 +0100
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20170517154347.GA16710@stefanha-x1.localdomain>
+References: <20170517134003.17110-1-ehabkost@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-From: Michael Roth <mdroth@linux.vnet.ibm.com>
-In-Reply-To: <20170515131052.23457-2-danielhb@linux.vnet.ibm.com>
-References: <20170515131052.23457-1-danielhb@linux.vnet.ibm.com>
-	<20170515131052.23457-2-danielhb@linux.vnet.ibm.com>
-Date: Mon, 15 May 2017 22:26:46 -0500
-Message-Id: <149490520655.29340.6582819494653467488@loki>
-Subject: Re: [Qemu-devel] [PATCH v10] migration: spapr: migrate
- pending_events of spapr state
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="M9NhX3UHpAaciwkO"
+Content-Disposition: inline
+In-Reply-To: <20170517134003.17110-1-ehabkost@redhat.com>
+Subject: Re: [Qemu-devel] [PULL 00/22] x86 and machine queue, 2017-05-17
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -42,254 +27,150 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>, qemu-devel@nongnu.org
-Cc: qemu-ppc@nongnu.org, david@gibson.dropbear.id.au
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
 
-Quoting Daniel Henrique Barboza (2017-05-15 08:10:52)
-> From: Jianjun Duan <duanj@linux.vnet.ibm.com>
-> =
 
-> In racing situations between hotplug events and migration operation,
-> a rtas hotplug event could have not yet be delivered to the source
-> guest when migration is started. In this case the pending_events of
-> spapr state need be transmitted to the target so that the hotplug
-> event can be finished on the target.
-> =
+--M9NhX3UHpAaciwkO
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-> All the different fields of the events are encoded as defined by
-> PAPR. We can migrate them as uint8_t binary stream without any
-> concerns about data padding or endianess.
-> =
-
-> pending_events is put in a subsection in the spapr state VMSD to make
-> sure migration across different versions is not broken.
-> =
-
-> Signed-off-by: Jianjun Duan <duanj@linux.vnet.ibm.com>
-> Signed-off-by: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
-
-I'd also be a little weary of treating this patch as totally standalone.
-There's pros/cons, but, without migrated DRC state, migrated hotplug
-events won't necessarilly be handled better than the current behavior of
-just dropping them.
-
-> ---
->  hw/ppc/spapr.c         | 33 +++++++++++++++++++++++++++++++++
->  hw/ppc/spapr_events.c  | 24 +++++++++++++-----------
->  include/hw/ppc/spapr.h |  3 ++-
->  3 files changed, 48 insertions(+), 12 deletions(-)
-> =
-
-> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> index 80d12d0..8cfdc71 100644
-> --- a/hw/ppc/spapr.c
-> +++ b/hw/ppc/spapr.c
-> @@ -1437,6 +1437,38 @@ static bool version_before_3(void *opaque, int ver=
-sion_id)
->      return version_id < 3;
->  }
-> =
-
-> +static bool spapr_pending_events_needed(void *opaque)
-> +{
-> +    sPAPRMachineState *spapr =3D (sPAPRMachineState *)opaque;
-> +    return !QTAILQ_EMPTY(&spapr->pending_events);
-> +}
-> +
-> +static const VMStateDescription vmstate_spapr_event_entry =3D {
-> +    .name =3D "spapr_event_log_entry",
-> +    .version_id =3D 1,
-> +    .minimum_version_id =3D 1,
-> +    .fields =3D (VMStateField[]) {
-> +        VMSTATE_INT32(log_type, sPAPREventLogEntry),
-> +        VMSTATE_BOOL(exception, sPAPREventLogEntry),
-> +        VMSTATE_UINT32(data_size, sPAPREventLogEntry),
-> +        VMSTATE_VARRAY_UINT32_ALLOC(data, sPAPREventLogEntry, data_size,
-> +                                    0, vmstate_info_uint8, uint8_t),
-> +        VMSTATE_END_OF_LIST()
-> +    },
-> +};
-> +
-> +static const VMStateDescription vmstate_spapr_pending_events =3D {
-> +    .name =3D "spapr_pending_events",
-> +    .version_id =3D 1,
-> +    .minimum_version_id =3D 1,
-> +    .needed =3D spapr_pending_events_needed,
-> +    .fields =3D (VMStateField[]) {
-> +        VMSTATE_QTAILQ_V(pending_events, sPAPRMachineState, 1,
-> +                         vmstate_spapr_event_entry, sPAPREventLogEntry, =
-next),
-> +        VMSTATE_END_OF_LIST()
-> +    },
-> +};
-> +
->  static bool spapr_ov5_cas_needed(void *opaque)
->  {
->      sPAPRMachineState *spapr =3D opaque;
-> @@ -1535,6 +1567,7 @@ static const VMStateDescription vmstate_spapr =3D {
->      .subsections =3D (const VMStateDescription*[]) {
->          &vmstate_spapr_ov5_cas,
->          &vmstate_spapr_patb_entry,
-> +        &vmstate_spapr_pending_events,
->          NULL
->      }
->  };
-> diff --git a/hw/ppc/spapr_events.c b/hw/ppc/spapr_events.c
-> index f0b28d8..70c7cfc 100644
-> --- a/hw/ppc/spapr_events.c
-> +++ b/hw/ppc/spapr_events.c
-> @@ -342,7 +342,8 @@ static int rtas_event_log_to_irq(sPAPRMachineState *s=
-papr, int log_type)
->      return source->irq;
->  }
-> =
-
-> -static void rtas_event_log_queue(int log_type, void *data, bool exceptio=
-n)
-> +static void rtas_event_log_queue(int log_type, void *data, bool exceptio=
-n,
-> +                                 int data_size)
->  {
->      sPAPRMachineState *spapr =3D SPAPR_MACHINE(qdev_get_machine());
->      sPAPREventLogEntry *entry =3D g_new(sPAPREventLogEntry, 1);
-> @@ -351,6 +352,7 @@ static void rtas_event_log_queue(int log_type, void *=
-data, bool exception)
->      entry->log_type =3D log_type;
->      entry->exception =3D exception;
->      entry->data =3D data;
-> +    entry->data_size =3D data_size;
->      QTAILQ_INSERT_TAIL(&spapr->pending_events, entry, next);
->  }
-> =
-
-> @@ -445,6 +447,7 @@ static void spapr_powerdown_req(Notifier *n, void *op=
-aque)
->      struct rtas_event_log_v6_mainb *mainb;
->      struct rtas_event_log_v6_epow *epow;
->      struct epow_log_full *new_epow;
-> +    uint32_t data_size;
-> =
-
->      new_epow =3D g_malloc0(sizeof(*new_epow));
->      hdr =3D &new_epow->hdr;
-> @@ -453,14 +456,13 @@ static void spapr_powerdown_req(Notifier *n, void *=
-opaque)
->      mainb =3D &new_epow->mainb;
->      epow =3D &new_epow->epow;
-> =
-
-> +    data_size =3D sizeof(*new_epow);
->      hdr->summary =3D cpu_to_be32(RTAS_LOG_VERSION_6
->                                 | RTAS_LOG_SEVERITY_EVENT
->                                 | RTAS_LOG_DISPOSITION_NOT_RECOVERED
->                                 | RTAS_LOG_OPTIONAL_PART_PRESENT
->                                 | RTAS_LOG_TYPE_EPOW);
-> -    hdr->extended_length =3D cpu_to_be32(sizeof(*new_epow)
-> -                                       - sizeof(new_epow->hdr));
-> -
-> +    hdr->extended_length =3D cpu_to_be32(data_size - sizeof(new_epow->hd=
-r));
->      spapr_init_v6hdr(v6hdr);
->      spapr_init_maina(maina, 3 /* Main-A, Main-B and EPOW */);
-> =
-
-> @@ -479,7 +481,7 @@ static void spapr_powerdown_req(Notifier *n, void *op=
-aque)
->      epow->event_modifier =3D RTAS_LOG_V6_EPOW_MODIFIER_NORMAL;
->      epow->extended_modifier =3D RTAS_LOG_V6_EPOW_XMODIFIER_PARTITION_SPE=
-CIFIC;
-> =
-
-> -    rtas_event_log_queue(RTAS_LOG_TYPE_EPOW, new_epow, true);
-> +    rtas_event_log_queue(RTAS_LOG_TYPE_EPOW, new_epow, true, data_size);
-> =
-
->      qemu_irq_pulse(xics_get_qirq(XICS_FABRIC(spapr),
->                                   rtas_event_log_to_irq(spapr,
-> @@ -504,6 +506,7 @@ static void spapr_hotplug_req_event(uint8_t hp_id, ui=
-nt8_t hp_action,
->      struct rtas_event_log_v6_maina *maina;
->      struct rtas_event_log_v6_mainb *mainb;
->      struct rtas_event_log_v6_hp *hp;
-> +    uint32_t data_size;
-> =
-
->      new_hp =3D g_malloc0(sizeof(struct hp_log_full));
->      hdr =3D &new_hp->hdr;
-> @@ -512,14 +515,14 @@ static void spapr_hotplug_req_event(uint8_t hp_id, =
-uint8_t hp_action,
->      mainb =3D &new_hp->mainb;
->      hp =3D &new_hp->hp;
-> =
-
-> +    data_size =3D sizeof(*new_hp);
->      hdr->summary =3D cpu_to_be32(RTAS_LOG_VERSION_6
->                                 | RTAS_LOG_SEVERITY_EVENT
->                                 | RTAS_LOG_DISPOSITION_NOT_RECOVERED
->                                 | RTAS_LOG_OPTIONAL_PART_PRESENT
->                                 | RTAS_LOG_INITIATOR_HOTPLUG
->                                 | RTAS_LOG_TYPE_HOTPLUG);
-> -    hdr->extended_length =3D cpu_to_be32(sizeof(*new_hp)
-> -                                       - sizeof(new_hp->hdr));
-> +    hdr->extended_length =3D cpu_to_be32(data_size - sizeof(new_hp->hdr)=
-);
-> =
-
->      spapr_init_v6hdr(v6hdr);
->      spapr_init_maina(maina, 3 /* Main-A, Main-B, HP */);
-> @@ -572,7 +575,7 @@ static void spapr_hotplug_req_event(uint8_t hp_id, ui=
-nt8_t hp_action,
->              cpu_to_be32(drc_id->count_indexed.index);
->      }
-> =
-
-> -    rtas_event_log_queue(RTAS_LOG_TYPE_HOTPLUG, new_hp, true);
-> +    rtas_event_log_queue(RTAS_LOG_TYPE_HOTPLUG, new_hp, true, data_size);
-> =
-
->      qemu_irq_pulse(xics_get_qirq(XICS_FABRIC(spapr),
->                                   rtas_event_log_to_irq(spapr,
-> @@ -671,8 +674,7 @@ static void check_exception(PowerPCCPU *cpu, sPAPRMac=
-hineState *spapr,
->      if (!event) {
->          goto out_no_events;
->      }
-> -
-> -    hdr =3D event->data;
-> +    hdr =3D (struct rtas_error_log *)event->data;
->      event_len =3D be32_to_cpu(hdr->extended_length) + sizeof(*hdr);
-> =
-
->      if (event_len < len) {
-> @@ -728,7 +730,7 @@ static void event_scan(PowerPCCPU *cpu, sPAPRMachineS=
-tate *spapr,
->          goto out_no_events;
->      }
-> =
-
-> -    hdr =3D event->data;
-> +    hdr =3D (struct rtas_error_log *)event->data;
->      event_len =3D be32_to_cpu(hdr->extended_length) + sizeof(*hdr);
-> =
-
->      if (event_len < len) {
-> diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
-> index 5802f88..fbe1d93 100644
-> --- a/include/hw/ppc/spapr.h
-> +++ b/include/hw/ppc/spapr.h
-> @@ -599,7 +599,8 @@ sPAPRTCETable *spapr_tce_find_by_liobn(target_ulong l=
-iobn);
->  struct sPAPREventLogEntry {
->      int log_type;
->      bool exception;
-> -    void *data;
-> +    uint8_t *data;
-> +    uint32_t data_size;
->      QTAILQ_ENTRY(sPAPREventLogEntry) next;
->  };
-> =
-
-> -- =
-
-> 2.9.3
+On Wed, May 17, 2017 at 10:39:41AM -0300, Eduardo Habkost wrote:
+> The following changes since commit 599c9cb641cc484876d5bb92189d09ba27bbfd=
+fd:
 >=20
+>   Merge remote-tracking branch 'sstabellini/tags/xen-20170516-tag' into s=
+taging (2017-05-17 14:03:35 +0100)
+>=20
+> are available in the git repository at:
+>=20
+>   git://github.com/ehabkost/qemu.git tags/x86-and-machine-pull-request
+>=20
+> for you to fetch changes up to 17e8f541263fd771aef58e9818a2060b81904c3f:
+>=20
+>   tests: Add [+-]feature and feature=3Don|off test cases (2017-05-17 10:3=
+7:15 -0300)
+>=20
+> ----------------------------------------------------------------
+> x86 and machine queue, 2017-05-17
+>=20
+> ----------------------------------------------------------------
+>=20
+> Eduardo Habkost (22):
+>   qdev: Replace cannot_instantiate_with_device_add_yet with
+>     !user_creatable
+>   sysbus: Set user_creatable=3Dfalse by default on TYPE_SYS_BUS_DEVICE
+>   xen-backend: Remove FIXME comment about user_creatable flag
+>   iommu: Remove FIXME comment about user_creatable=3Dtrue
+>   fdc: Remove user_creatable flag from sysbus-fdc & SUNW,fdtwo
+>   pflash_cfi01: Remove user_creatable flag
+>   kvmclock: Remove user_creatable flag
+>   ioapic: Remove user_creatable flag
+>   kvmvapic: Remove user_creatable flag
+>   sysbus-ahci: Remove user_creatable flag
+>   allwinner-ahci: Remove user_creatable flag
+>   isabus-bridge: Remove user_creatable flag
+>   unimplemented-device: Remove user_creatable flag
+>   fw_cfg: Remove user_creatable flag
+>   esp: Remove user_creatable flag
+>   generic-sdhci: Remove user_creatable flag
+>   hpet: Remove user_creatable flag
+>   sysbus-ohci: Remove user_creatable flag
+>   virtio-mmio: Remove user_creatable flag
+>   xen-sysdev: Remove user_creatable flag
+>   s390-pcibus: No need to set user_creatable=3Dfalse explicitly
+>   tests: Add [+-]feature and feature=3Don|off test cases
+>=20
+>  include/hw/qdev-core.h              |   9 +--
+>  include/hw/qdev-properties.h        |   4 +-
+>  hw/acpi/piix4.c                     |   2 +-
+>  hw/arm/spitz.c                      |   2 +-
+>  hw/audio/marvell_88w8618.c          |   2 +-
+>  hw/audio/pcspk.c                    |   2 +-
+>  hw/core/or-irq.c                    |   2 +-
+>  hw/core/qdev.c                      |   1 +
+>  hw/core/register.c                  |   2 +-
+>  hw/core/sysbus.c                    |  11 ++++
+>  hw/dma/i8257.c                      |   2 +-
+>  hw/dma/sparc32_dma.c                |   2 +-
+>  hw/gpio/omap_gpio.c                 |   4 +-
+>  hw/i2c/omap_i2c.c                   |   2 +-
+>  hw/i2c/smbus_eeprom.c               |   2 +-
+>  hw/i2c/smbus_ich9.c                 |   2 +-
+>  hw/i386/amd_iommu.c                 |   2 +
+>  hw/i386/intel_iommu.c               |   2 +
+>  hw/i386/pc.c                        |   2 +-
+>  hw/input/vmmouse.c                  |   2 +-
+>  hw/intc/apic_common.c               |   2 +-
+>  hw/intc/etraxfs_pic.c               |   2 +-
+>  hw/intc/grlib_irqmp.c               |   2 +-
+>  hw/intc/i8259_common.c              |   2 +-
+>  hw/intc/nios2_iic.c                 |   2 +-
+>  hw/intc/omap_intc.c                 |   4 +-
+>  hw/isa/lpc_ich9.c                   |   2 +-
+>  hw/isa/piix4.c                      |   2 +-
+>  hw/isa/vt82c686.c                   |   2 +-
+>  hw/mips/gt64xxx_pci.c               |   2 +-
+>  hw/misc/vmport.c                    |   2 +-
+>  hw/net/dp8393x.c                    |   2 +-
+>  hw/net/etraxfs_eth.c                |   2 +-
+>  hw/net/fsl_etsec/etsec.c            |   2 +
+>  hw/net/lance.c                      |   2 +-
+>  hw/pci-bridge/dec.c                 |   2 +-
+>  hw/pci-bridge/pci_expander_bridge.c |   2 +-
+>  hw/pci-host/apb.c                   |   2 +-
+>  hw/pci-host/bonito.c                |   2 +-
+>  hw/pci-host/gpex.c                  |   2 +-
+>  hw/pci-host/grackle.c               |   2 +-
+>  hw/pci-host/piix.c                  |   6 +-
+>  hw/pci-host/ppce500.c               |   2 +-
+>  hw/pci-host/prep.c                  |   2 +-
+>  hw/pci-host/q35.c                   |   4 +-
+>  hw/pci-host/uninorth.c              |   8 +--
+>  hw/pci-host/versatile.c             |   2 +-
+>  hw/pci-host/xilinx-pcie.c           |   2 +-
+>  hw/ppc/ppc4xx_pci.c                 |   2 +-
+>  hw/ppc/spapr_drc.c                  |   2 +-
+>  hw/ppc/spapr_pci.c                  |   2 +
+>  hw/s390x/s390-pci-bus.c             |   1 -
+>  hw/sd/milkymist-memcard.c           |   2 +-
+>  hw/sd/pl181.c                       |   2 +-
+>  hw/sh4/sh_pci.c                     |   2 +-
+>  hw/timer/i8254_common.c             |   2 +-
+>  hw/timer/mc146818rtc.c              |   2 +-
+>  hw/vfio/amd-xgbe.c                  |   2 +
+>  hw/vfio/calxeda-xgmac.c             |   2 +
+>  hw/xen/xen_backend.c                |   2 +
+>  monitor.c                           |   2 +-
+>  qdev-monitor.c                      |   6 +-
+>  qom/cpu.c                           |   2 +-
+>  target/i386/cpu.c                   |   2 +-
+>  tests/test-x86-cpuid-compat.c       | 111 ++++++++++++++++++++++++++++++=
+++++++
+>  65 files changed, 206 insertions(+), 69 deletions(-)
+>=20
+> --=20
+> 2.11.0.259.g40922b1
+>=20
+
+Thanks, applied to my staging tree:
+https://github.com/stefanha/qemu/commits/staging
+
+Stefan
+
+--M9NhX3UHpAaciwkO
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJZHG+zAAoJEJykq7OBq3PIHnUIAK/QqTCXR8cPzg1LePb8very
+ySOQkVfiKri+S9+EcrVOQqtF17YQQhqJiV2Q45vaKinzynDcj/7oyoX4CeVt97p8
+KH7xpdUchwgDrliZxG4oh/gBs4/9Ft/Gc4mn9Jvqcoc5n4JeOK6fMZx23stpjPFN
+4SRMEQfpVRH3rvB2iQk1naH0YHJgusazS1veNKuKVhq3PsO+S9no46BB4rFKy1wG
+w8+QPveK+Z/j331VOc9D7+j6Creny+ZMWuxUro/eA2044t0kJQhYgNhjLkDAS+y4
+wusjm8FkLOay6g3CMx7/ezacbZbLoDZxCAsyidaTL+ZUW770974nI8MGslXn0EE=
+=xhfl
+-----END PGP SIGNATURE-----
+
+--M9NhX3UHpAaciwkO--
