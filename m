@@ -1,29 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38668)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38715)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dB2SD-0005so-TB
-	for qemu-devel@nongnu.org; Wed, 17 May 2017 13:09:43 -0400
+	(envelope-from <stefanha@redhat.com>) id 1dB2SS-0005za-MQ
+	for qemu-devel@nongnu.org; Wed, 17 May 2017 13:09:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dB2S9-0004sH-7W
-	for qemu-devel@nongnu.org; Wed, 17 May 2017 13:09:41 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:45928)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dB2S8-0004sB-UE
-	for qemu-devel@nongnu.org; Wed, 17 May 2017 13:09:37 -0400
-References: <1494405683-20877-1-git-send-email-pradeep.jagadeesh@huawei.com>
-	<1494405683-20877-5-git-send-email-pradeep.jagadeesh@huawei.com>
-	<6a035cd9-34f9-c1f5-e986-404daf941641@redhat.com>
-	<57a24e21-0864-16d3-1bce-ad801875ea9f@huawei.com>
-	<2c0e99ce-f3cb-90e8-baed-8fad9d39455b@redhat.com>
-	<20170517182938.0c7f366e@bahia.lan>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <6df407d5-4145-2e90-a7eb-b047819ceb75@redhat.com>
-Date: Wed, 17 May 2017 12:09:33 -0500
-MIME-Version: 1.0
-In-Reply-To: <20170517182938.0c7f366e@bahia.lan>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="Hc6qlqBd8lBwdAdEu91Gb4BivcTQ94BwV"
-Subject: Re: [Qemu-devel] [PATCH v4 4/4] fsdev: QMP interface for throttling
+	(envelope-from <stefanha@redhat.com>) id 1dB2SR-00051d-Rb
+	for qemu-devel@nongnu.org; Wed, 17 May 2017 13:09:56 -0400
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Date: Wed, 17 May 2017 18:09:38 +0100
+Message-Id: <20170517170941.25850-1-stefanha@redhat.com>
+Subject: [Qemu-devel] [PATCH 0/3] block: fix 'savevm' hang with -object
+ iothread
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,99 +18,21 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>
-Cc: Pradeep Jagadeesh <pradeep.jagadeesh@huawei.com>, Pradeep Jagadeesh <pradeepkiruvale@gmail.com>, alberto garcia <berto@igalia.com>, jani kokkonen <jani.kokkonen@huawei.com>, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Fam Zheng <famz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---Hc6qlqBd8lBwdAdEu91Gb4BivcTQ94BwV
-From: Eric Blake <eblake@redhat.com>
-To: Greg Kurz <groug@kaod.org>
-Cc: Pradeep Jagadeesh <pradeep.jagadeesh@huawei.com>,
- Pradeep Jagadeesh <pradeepkiruvale@gmail.com>,
- alberto garcia <berto@igalia.com>, jani kokkonen <jani.kokkonen@huawei.com>,
- qemu-devel@nongnu.org
-Message-ID: <6df407d5-4145-2e90-a7eb-b047819ceb75@redhat.com>
-Subject: Re: [PATCH v4 4/4] fsdev: QMP interface for throttling
-References: <1494405683-20877-1-git-send-email-pradeep.jagadeesh@huawei.com>
- <1494405683-20877-5-git-send-email-pradeep.jagadeesh@huawei.com>
- <6a035cd9-34f9-c1f5-e986-404daf941641@redhat.com>
- <57a24e21-0864-16d3-1bce-ad801875ea9f@huawei.com>
- <2c0e99ce-f3cb-90e8-baed-8fad9d39455b@redhat.com>
- <20170517182938.0c7f366e@bahia.lan>
-In-Reply-To: <20170517182938.0c7f366e@bahia.lan>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+The 'savevm' command hangs when -object iothread is used.  See patches for
+details, but basically the vmstate read/write code didn't conform to the latest
+block layer locking rules.
 
-On 05/17/2017 11:29 AM, Greg Kurz wrote:
+Stefan Hajnoczi (3):
+  block: count bdrv_co_rw_vmstate() requests
+  block: use BDRV_POLL_WHILE() in bdrv_rw_vmstate()
+  migration: avoid recursive AioContext locking in save_vmstate()
 
->>
->> First point: is fsdev a Linux-only feature, or can it be compiled on
->> BSD?  If it is Linux-only, then compiling a stub for Windows will stil=
-l
->> leave BSD broken, and your #ifdef is wrong.  Fixing compilation on min=
-gw
->> is nice, but not the only platform to worry about.
->>
->=20
-> fsdev compilation currently depends on CONFIG_VIRTFS which is a Linux-o=
-nly
-> feature for the moment. There was a tentative to support it on Windows =
-hosts
-> two years ago but it stayed at the RFC stage.
->=20
-> But even on Linux hosts, the current fsdev implementation also depends =
-on
-> the target supporting PCI and VIRTIO. We have a fsdev/qemu-fsdev-dummy.=
-c
-> file to put stubs so that we don't pull all the code for such targets.
->=20
-> Maybe this could be reused for the above stubs as well ?
+ block/io.c         | 21 +++++++++++++--------
+ migration/savevm.c | 12 +++++++++++-
+ 2 files changed, 24 insertions(+), 9 deletions(-)
 
-That helps.  The stub should live in qemu-fsdev-dummy.c (where it
-shouldn't need any #ifdef, because that file is only compiled when the
-condition is false), and...
-
->=20
->> Second point: if fsdev is indeed a platform-specific feature, then we
->> don't want to advertise the QMP commands that are useless when running=
-
->> on a platform that doesn't support it. Anywhere you have to add a stub=
-
->> for compilation means you ALSO need to patch monitor.c to unregister t=
-he
->> command from being advertised as a valid QMP command.  (If you used
->> #ifdef __LINUX__ to guard the working version, and #ifndef __LINUX__ t=
-o
->> declare the stub, then the monitor.c needs an #ifndef section within
->> qmp_unregister_commands_hack() to tell QMP to not advertise the stubs.=
-)
-
-monitor.c should wrap the unregister under #ifndef CONFIG_VIRTFS (rather
-than a particular platform name).
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---Hc6qlqBd8lBwdAdEu91Gb4BivcTQ94BwV
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEcBAEBCAAGBQJZHIPNAAoJEKeha0olJ0NqiOgH/2+Iuqp1BTOw44Hfr1vz8yuo
-yAlmux/MsU3RQQLrsxZqo8noiVioeXN1qKTq56KEYrkNp7BgbnWubDYwVDj98Hqj
-gZfjkvV7fC3xM+4fihvPX2aYPW04g8Qxyv9It3tVmpKtD/UEGvv1IFiQhVY+ELHB
-IOfv9lXsf+VT6igUdCbm4VxdoA5oAn+7VVrPfoMui9zxJt95vuwHga9YMOsVww+3
-zud5/iOXYdiuUtTrjldYQObOTtq2DOPdM93L9SvrkIWonX5S1/2XFdZ4dPVqW4jH
-TCGvJXEF9b7T6oFOpwZopfjyvGBwEpT62c3iYqN26wdzNqLTNZHQsbrqdC8kMFA=
-=upyb
------END PGP SIGNATURE-----
-
---Hc6qlqBd8lBwdAdEu91Gb4BivcTQ94BwV--
+-- 
+2.9.3
