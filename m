@@ -1,17 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59435)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35307)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dAsYz-0005PZ-Vt
-	for qemu-devel@nongnu.org; Wed, 17 May 2017 02:36:03 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1dAsvJ-0001w3-B9
+	for qemu-devel@nongnu.org; Wed, 17 May 2017 02:59:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dAsYw-0005AZ-2k
-	for qemu-devel@nongnu.org; Wed, 17 May 2017 02:36:02 -0400
-From: David Gibson <david@gibson.dropbear.id.au>
-Date: Wed, 17 May 2017 16:35:47 +1000
-Message-Id: <20170517063547.23876-3-david@gibson.dropbear.id.au>
-In-Reply-To: <20170517063547.23876-1-david@gibson.dropbear.id.au>
-References: <20170517063547.23876-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [RFC 2/2] pseries: Restore PVR negotiation logic for
- pre-2.9 machine types
+	(envelope-from <pbonzini@redhat.com>) id 1dAsvF-0003Tk-W0
+	for qemu-devel@nongnu.org; Wed, 17 May 2017 02:59:05 -0400
+Date: Wed, 17 May 2017 02:58:55 -0400 (EDT)
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <2070505842.8419962.1495004335579.JavaMail.zimbra@redhat.com>
+In-Reply-To: <20170517015530.GD27669@lemon.lan>
+References: <20170516072414.19025-1-famz@redhat.com>
+	<20170516080737.GB27669@lemon.lan>
+	<e780d3d8-43f1-f46d-2858-7554a334246b@redhat.com>
+	<20170516122528.GC27669@lemon.lan>
+	<3799c1f5-5b22-fe05-4c98-4cd76c716551@redhat.com>
+	<20170517015530.GD27669@lemon.lan>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2] virtio: Move memory_listener_unregister
+ to .unrealize
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,174 +28,135 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: abologna@redhat.com, thuth@redhat.com, lvivier@redhat.com
-Cc: mdroth@linux.vnet.ibm.com, aik@ozlabs.ru, bharata@linux.vnet.ibm.com, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
+To: Fam Zheng <famz@redhat.com>
+Cc: Jason Wang <jasowang@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org, qemu-stable@nongnu.org
 
-"pseries" guests go through a hypervisor<->guest feature negotiation during
-early boot.  Part of this is finding a CPU compatibility mode which works
-for both.
 
-In 152ef80 "pseries: Rewrite CAS PVR compatibility logic" this logic was
-changed to strongly prefer architecture defined CPU compatibility modes,
-rather than CPU "raw" modes.  However, this change was made universally,
-which introduces a guest visible change for the previously existing machine
-types (pseries-2.8 and earlier).  That's never supposed to happen.
+> On Tue, 05/16 14:44, Paolo Bonzini wrote:
+> > On 16/05/2017 14:25, Fam Zheng wrote:
+> > > You are right. Having had another look, I think it's because of this:
+> > > VirtIODevice is an embeded member of VirtIOSCSIPCI therefore it is never
+> > > "finalized" through QOM reference directly.  Am I right?
+> > 
+> > What I would expect is:
+> > 
+> > virtio_instance_init_common:
+> > - create the VirtIODevice with refcount 1
+> > - create a child property for the VirtIODevice (refcount is now 2)
+> > - unref the VirtIODevice (refcount is again 1)
+> > 
+> > virtio_pci_realize:
+> > - virtio_pci_bus_new creates the virtio bus
+> > - the virtio bus is added as a child property
+> > 
+> > virtio_scsi_pci_realize:
+> > - qdev_set_parent_bus links the device to the bus (bus and VirtIODevice
+> > refcounts are now 3)
+> > - the VirtIODevice is realized
+> > 
+> > ...
+> > at hot-unplug time:
+> > - the device is unrealized
+> > - the bus is unparented (calling bus_unparent)
+> >   - the device is unparented (calling device_unparent)
+> >     - bus_remove_child is called (bus and VirtIODevice refcounts are now 1)
+> >     - the VirtIODevice child property is deleted by object_unparent and
+> > the VirtIODevice is finalized
+> >   - the bus child property is deleted by object_unparent and the
+> > VirtIODevice is finalized
+> 
+> Sorry I don't understand. From my debugging, VirtIODevice is not finalized,
+> because it is embeded as VirtIOSCSIPCI.vdev.parent_obj.parent_obj, in
+> non-zero offset.
 
-This corrects the behaviour, reverting to the old PVR negotiation logic
-for machine types prior to pseries-2.9.
+It is correct that it's embedded.  But it is added as a child property,
+and when the child property is deleted the refcount should go to zero and
+the VirtIODevice should be deleted too.
 
-Fixes: 152ef803ceb1959e2380a1da7736b935b109222e
-Reported-by: Andrea Bolognani <abologna@redhat.com>
-Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
----
- hw/ppc/spapr.c         |  3 ++
- hw/ppc/spapr_hcall.c   | 90 +++++++++++++++++++++++++++++++++++++++++++++++++-
- include/hw/ppc/spapr.h |  1 +
- 3 files changed, 93 insertions(+), 1 deletion(-)
+The child property is deleted when bus_unparent calls object_unparent:
 
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index a9471b9..913355f 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -3308,9 +3308,12 @@ static void spapr_machine_2_8_instance_options(MachineState *machine)
- 
- static void spapr_machine_2_8_class_options(MachineClass *mc)
- {
-+    sPAPRMachineClass *smc = SPAPR_MACHINE_CLASS(mc);
-+
-     spapr_machine_2_9_class_options(mc);
-     SET_MACHINE_COMPAT(mc, SPAPR_COMPAT_2_8);
-     mc->numa_mem_align_shift = 23;
-+    smc->pre_2_9_cas_pvr = true;
- }
- 
- DEFINE_SPAPR_MACHINE(2_8, "2.8", false);
-diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
-index 007ae8d..4937019 100644
---- a/hw/ppc/spapr_hcall.c
-+++ b/hw/ppc/spapr_hcall.c
-@@ -1047,6 +1047,89 @@ static target_ulong h_signal_sys_reset(PowerPCCPU *cpu,
-     }
- }
- 
-+/*
-+ * Old logic for PVR negotiation, used old <2.9 machine types for
-+ * compatibility with old qemu versions
-+ */
-+#define get_compat_level(cpuver) (                  \
-+        ((cpuver) == CPU_POWERPC_LOGICAL_2_05) ? 2050 : \
-+        ((cpuver) == CPU_POWERPC_LOGICAL_2_06) ? 2060 :  \
-+        ((cpuver) == CPU_POWERPC_LOGICAL_2_06_PLUS) ? 2061 :    \
-+        ((cpuver) == CPU_POWERPC_LOGICAL_2_07) ? 2070 : 0)
-+
-+static void cas_handle_compat_cpu(PowerPCCPUClass *pcc, uint32_t pvr,
-+                                  unsigned max_lvl, unsigned *compat_lvl,
-+                                  unsigned *compat_pvr)
-+{
-+    unsigned lvl = get_compat_level(pvr);
-+    bool is205, is206, is207;
-+
-+    if (!lvl) {
-+        return;
-+    }
-+
-+    /* If it is a logical PVR, try to determine the highest level */
-+    is205 = (pcc->pcr_supported & PCR_COMPAT_2_05) &&
-+        (lvl == get_compat_level(CPU_POWERPC_LOGICAL_2_05));
-+    is206 = (pcc->pcr_supported & PCR_COMPAT_2_06) &&
-+        ((lvl == get_compat_level(CPU_POWERPC_LOGICAL_2_06)) ||
-+         (lvl == get_compat_level(CPU_POWERPC_LOGICAL_2_06_PLUS)));
-+    is207 = (pcc->pcr_supported & PCR_COMPAT_2_07) &&
-+        (lvl == get_compat_level(CPU_POWERPC_LOGICAL_2_07));
-+
-+    if (is205 || is206 || is207) {
-+        if (!max_lvl) {
-+            /* User did not set the level, choose the highest */
-+            if (*compat_lvl <= lvl) {
-+                *compat_lvl = lvl;
-+                *compat_pvr = pvr;
-+            }
-+        } else if (max_lvl >= lvl) {
-+            /* User chose the level, don't set higher than this */
-+            *compat_lvl = lvl;
-+            *compat_pvr = pvr;
-+        }
-+    }
-+}
-+
-+static uint32_t cas_check_pvr_pre_2_9(PowerPCCPU *cpu, target_ulong list,
-+                                      Error **errp)
-+{
-+    PowerPCCPUClass *pcc = POWERPC_CPU_GET_CLASS(cpu);
-+    int counter;
-+    unsigned max_lvl = get_compat_level(cpu->max_compat);
-+    bool cpu_match = false;
-+    unsigned compat_lvl = 0, compat_pvr = 0;
-+
-+    for (counter = 0; counter < 512; ++counter) {
-+        uint32_t pvr, pvr_mask;
-+
-+        pvr_mask = ldl_be_phys(&address_space_memory, list);
-+        pvr = ldl_be_phys(&address_space_memory, list + 4);
-+        list += 8;
-+
-+        if (~pvr_mask & pvr) {
-+            break; /* Terminator record */
-+        }
-+
-+        trace_spapr_cas_pvr_try(pvr);
-+        if (!max_lvl &&
-+            ((cpu->env.spr[SPR_PVR] & pvr_mask) == (pvr & pvr_mask))) {
-+            cpu_match = true;
-+            compat_pvr = 0;
-+        } else if (pvr == cpu->compat_pvr) {
-+            cpu_match = true;
-+            compat_pvr = cpu->compat_pvr;
-+        } else if (!cpu_match) {
-+            cas_handle_compat_cpu(pcc, pvr, max_lvl, &compat_lvl, &compat_pvr);
-+        }
-+    }
-+
-+    trace_spapr_cas_pvr(cpu->compat_pvr, cpu_match, compat_pvr);
-+
-+    return compat_pvr;
-+}
-+
- static uint32_t cas_check_pvr(PowerPCCPU *cpu, target_ulong list,
-                               Error **errp)
- {
-@@ -1099,6 +1182,7 @@ static target_ulong h_client_architecture_support(PowerPCCPU *cpu,
-                                                   target_ulong opcode,
-                                                   target_ulong *args)
- {
-+    sPAPRMachineClass *smc = SPAPR_MACHINE_GET_CLASS(spapr);
-     /* @ov_table points to the first option vector */
-     target_ulong ov_table = ppc64_phys_to_real(args[0]);
-     uint32_t cas_pvr;
-@@ -1106,7 +1190,11 @@ static target_ulong h_client_architecture_support(PowerPCCPU *cpu,
-     bool guest_radix;
-     Error *local_err = NULL;
- 
--    cas_pvr = cas_check_pvr(cpu, ov_table, &local_err);
-+    if (smc->pre_2_9_cas_pvr) {
-+        cas_pvr = cas_check_pvr_pre_2_9(cpu, ov_table, &local_err);
-+    } else {
-+        cas_pvr = cas_check_pvr(cpu, ov_table, &local_err);
-+    }
-     if (local_err) {
-         error_report_err(local_err);
-         return H_HARDWARE;
-diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
-index 5802f88..0863a41 100644
---- a/include/hw/ppc/spapr.h
-+++ b/include/hw/ppc/spapr.h
-@@ -52,6 +52,7 @@ struct sPAPRMachineClass {
-     /*< public >*/
-     bool dr_lmb_enabled;       /* enable dynamic-reconfig/hotplug of LMBs */
-     bool use_ohci_by_default;  /* use USB-OHCI instead of XHCI */
-+    bool pre_2_9_cas_pvr;      /* Use old logic for PVR compat negotiation */
-     const char *tcg_default_cpu; /* which (TCG) CPU to simulate by default */
-     void (*phb_placement)(sPAPRMachineState *spapr, uint32_t index,
-                           uint64_t *buid, hwaddr *pio, 
--- 
-2.9.4
+    while ((kid = QTAILQ_FIRST(&bus->children)) != NULL) {
+        DeviceState *dev = kid->child;
+        object_unparent(OBJECT(dev));
+    }
+
+and in turn bus_unparent is called by the VirtIOSCSIPCI's unparent
+callback (device_unparent):
+
+    while (dev->num_child_bus) {
+        bus = QLIST_FIRST(&dev->child_bus);
+        object_unparent(OBJECT(bus));
+    }
+
+Thanks,
+
+Paolo
+
+
+> 
+> As I understand it, it's the VirtIOSCSIPCI instance that is being finalized,
+> but
+> not VirtIODevice. Because the object_unparent is actually called on the
+> containing object:
+> 
+> Thread 4 "qemu-system-x86" hit Breakpoint 1, device_unparent
+> (obj=0x559449824f40) at /stor/work/qemu/hw/core/qdev.c:1078
+> 1078	    DeviceState *dev = DEVICE(obj);
+> (gdb) bt
+> #0  0x00005594455f11df in device_unparent (obj=0x559449824f40) at
+> /stor/work/qemu/hw/core/qdev.c:1078
+> #1  0x00005594457be582 in object_finalize_child_property (obj=0x559447f0d320,
+> name=0x5594498306e0 "scsi1", opaque=0x559449824f40) at
+> /stor/work/qemu/qom/object.c:1369
+> #2  0x00005594457bc34a in object_property_del_child (obj=0x559447f0d320,
+> child=0x559449824f40, errp=0x0) at /stor/work/qemu/qom/object.c:428
+> #3  0x00005594457bc42a in object_unparent (obj=0x559449824f40) at
+> /stor/work/qemu/qom/object.c:447
+> #4  0x00005594455acf19 in acpi_pcihp_eject_slot (s=0x55944967c440, bsel=0,
+> slots=16) at /stor/work/qemu/hw/acpi/pcihp.c:138
+> #5  0x00005594455ad542 in pci_write (opaque=0x55944967c440, addr=8, data=16,
+> size=4) at /stor/work/qemu/hw/acpi/pcihp.c:272
+> #6  0x0000559445437667 in memory_region_write_accessor (mr=0x55944967d050,
+> addr=8, value=0x7fdfa7569838, size=4, shift=0, mask=4294967295, attrs=...)
+>     at /stor/work/qemu/memory.c:526
+> #7  0x000055944543787f in access_with_adjusted_size (addr=8,
+> value=0x7fdfa7569838, size=4, access_size_min=1, access_size_max=4, access=
+>     0x55944543757d <memory_region_write_accessor>, mr=0x55944967d050,
+>     attrs=...) at /stor/work/qemu/memory.c:592
+> #8  0x0000559445439fdb in memory_region_dispatch_write (mr=0x55944967d050,
+> addr=8, data=16, size=4, attrs=...) at /stor/work/qemu/memory.c:1319
+> #9  0x00005594453dfa77 in address_space_write_continue (as=0x559445f1fce0
+> <address_space_io>, addr=44552, attrs=..., buf=0x7fdfb77d2000 "\020", len=4,
+> addr1=8, l=4, mr=0x55944967d050) at /stor/work/qemu/exec.c:2822
+> #10 0x00005594453dfc31 in address_space_write (as=0x559445f1fce0
+> <address_space_io>, addr=44552, attrs=..., buf=0x7fdfb77d2000 "\020", len=4)
+> at /stor/work/qemu/exec.c:2879
+> #11 0x00005594453dffbd in address_space_rw (as=0x559445f1fce0
+> <address_space_io>, addr=44552, attrs=..., buf=0x7fdfb77d2000 "\020", len=4,
+> is_write=true)
+>     at /stor/work/qemu/exec.c:2981
+> #12 0x0000559445433797 in kvm_handle_io (port=44552, attrs=...,
+> data=0x7fdfb77d2000, direction=1, size=4, count=1) at
+> /stor/work/qemu/kvm-all.c:1803
+> #13 0x0000559445433e87 in kvm_cpu_exec (cpu=0x559447f0d560) at
+> /stor/work/qemu/kvm-all.c:2032
+> #14 0x0000559445419cc6 in qemu_kvm_cpu_thread_fn (arg=0x559447f0d560) at
+> /stor/work/qemu/cpus.c:1118
+> #15 0x00007fdfb56ba6ca in start_thread () at /lib64/libpthread.so.0
+> #16 0x00007fdfb1382f7f in clone () at /lib64/libc.so.6
+> (gdb) p *obj.class.type
+> $1 = {name = 0x559447e57a20 "virtio-scsi-pci", class_size = 280,
+> instance_size = 34688, class_init = 0x55944573573e
+> <virtio_scsi_pci_class_init>, class_base_init = 0x0,
+>   class_finalize = 0x0, class_data = 0x0, instance_init = 0x559445735837
+>   <virtio_scsi_pci_instance_init>, instance_post_init = 0x0,
+>   instance_finalize = 0x0,
+>   abstract = false, parent = 0x559447e57a40 "virtio-pci", parent_type =
+>   0x559447e57520, class = 0x559447e7add0, num_interfaces = 0, interfaces =
+>   {{
+>       typename = 0x0} <repeats 32 times>}}
+> 
+> Am I missing something?
+> 
+> Fam
+> 
