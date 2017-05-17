@@ -1,30 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56413)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56474)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dB1ri-0000Y2-Il
-	for qemu-devel@nongnu.org; Wed, 17 May 2017 12:31:59 -0400
+	(envelope-from <aurelien@aurel32.net>) id 1dB1s0-0000hT-DK
+	for qemu-devel@nongnu.org; Wed, 17 May 2017 12:32:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dB1re-0000jM-NG
-	for qemu-devel@nongnu.org; Wed, 17 May 2017 12:31:58 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:37382)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dB1re-0000jB-Gh
-	for qemu-devel@nongnu.org; Wed, 17 May 2017 12:31:54 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 51B5F80F90
-	for <qemu-devel@nongnu.org>; Wed, 17 May 2017 16:31:53 +0000 (UTC)
-Date: Wed, 17 May 2017 17:31:47 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170517163146.GD2444@work-vm>
-References: <1494562661-9063-1-git-send-email-peterx@redhat.com>
+	(envelope-from <aurelien@aurel32.net>) id 1dB1rw-0000md-Gw
+	for qemu-devel@nongnu.org; Wed, 17 May 2017 12:32:16 -0400
+Received: from hall.aurel32.net ([2001:bc8:30d7:100::1]:51688)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <aurelien@aurel32.net>)
+	id 1dB1rw-0000lY-AG
+	for qemu-devel@nongnu.org; Wed, 17 May 2017 12:32:12 -0400
+Date: Wed, 17 May 2017 18:26:42 +0200
+From: Aurelien Jarno <aurelien@aurel32.net>
+Message-ID: <20170517162642.ebmrhawmfdde5vsz@aurel32.net>
+References: <1495035337-13337-1-git-send-email-thuth@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1494562661-9063-1-git-send-email-peterx@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v8 0/3] ramblock: add hmp command "info
- ramblock"
+In-Reply-To: <1495035337-13337-1-git-send-email-thuth@redhat.com>
+Subject: Re: [Qemu-devel] [RFC PATCH] target/s390x/cpu_models: Set some
+ additional feature bits for the "qemu" CPU
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,76 +28,104 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>
+To: Thomas Huth <thuth@redhat.com>
+Cc: qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>, David Hildenbrand <david@redhat.com>, mmarek@suse.com, mbenes@suse.cz
 
-* Peter Xu (peterx@redhat.com) wrote:
-> v8:
+On 2017-05-17 17:35, Thomas Huth wrote:
+> Currently we only present the plain z900 feature bits to the guest,
+> but QEMU already emulates some additional features (but not all of
+> the next CPU generation, so we can not use the next CPU level as
+> default yet). Since newer Linux kernels are checking the feature bits
+> and refuse to work if a required feature is missing, we should present
+> as much of the supported features as possible when we are running
+> with the default "qemu" CPU.
+> This patch now adds the "stfle", "extended immediate" and "stckf"
+> facility bits to the "qemu" CPU, which are already supported facilities.
+> It is unfortunately still not enough to run e.g. recent Fedora kernels,
+> but at least it's a first step into the right direction.
 
-Queued for HMP
+This indeed looks like a step in a good direction. At least it makes the
+recently added STFLE emulation useful :-).
 
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> ---
+>  target/s390x/cpu_models.c | 29 ++++++++++++++++++++++++++---
+>  1 file changed, 26 insertions(+), 3 deletions(-)
+> 
+> diff --git a/target/s390x/cpu_models.c b/target/s390x/cpu_models.c
+> index 8d27363..18789ab 100644
+> --- a/target/s390x/cpu_models.c
+> +++ b/target/s390x/cpu_models.c
+> @@ -658,6 +658,24 @@ static void check_compatibility(const S390CPUModel *max_model,
+>                    "available in the configuration: ");
+>  }
+>  
+> +/**
+> + * The base TCG CPU model "qemu" is based on the z900. However, we already
+> + * can also emulate some additional features of later CPU generations, so
+> + * we add these additional feature bits here.
+> + */
+> +static void add_qemu_cpu_model_features(S390FeatBitmap fbm)
+> +{
+> +    int i, feats[] = {
+> +        S390_FEAT_STFLE,
+> +        S390_FEAT_EXTENDED_IMMEDIATE,
+> +        S390_FEAT_STORE_CLOCK_FAST
 
-> - patch 1: add r-b for Dave
-> - patch 2: use "uint64_t" for size_to_str() parameter, remove assert()
->   since it's useless now [Dave]
-> - drop patch 4
-> 
-> v7:
-> - patch 1: removed Dave's r-b since the patch conflicted during rebase
-> - patch 2: add r-b for Markus, with the nice function comment that
->   provided [Markus]
-> - patch 3: add r-b for Dave
-> - patch 4 (new): added new patch to remove assert in size_to_str(),
->   assuming that would be better.
-> 
-> v6
-> - patch 2: instead of create a new size_to_str(), abstract the logic
->   out from print_type_size(), refactor it, to make sure
->   print_type_size() dumps exactly the same thing as before. (a simple
->   test with info qtree is done)
-> - let suffixes be an array of strings [Markus]
-> 
-> v5
-> - add r-b for Dave on first patch (which I forgot in v4, so I got it
->   again)
-> - add one more patch to introduce size_to_str() as patch 2 [Dave]
-> - let the last patch use the new interface
-> 
-> v4:
-> - move page_size_to_str() into util/cutil.c [Dave]
-> 
-> v3:
-> - cast the three PRIx64 addresses using (uint64_t) [Fam]
-> - add more comment in patch 2 to emphasize that this command is only
->   suitable for HMP, not QMP [Markus]
-> 
-> v2:
-> - replace "lx" with "PRIx64" in three places
-> 
-> Sometimes I would like to know ramblock info for a VM. This command
-> would help. It provides a way to dump ramblock info. Currently the
-> list is by default sorted by size, though I think it's good enough.
-> 
-> Please review, thanks.
-> 
-> Peter Xu (3):
->   ramblock: add RAMBLOCK_FOREACH()
->   utils: provide size_to_str()
->   ramblock: add new hmp command "info ramblock"
-> 
->  exec.c                       | 44 +++++++++++++++++++++++++++++++++-----------
->  hmp-commands-info.hx         | 14 ++++++++++++++
->  hmp.c                        |  6 ++++++
->  hmp.h                        |  1 +
->  include/exec/ramlist.h       |  6 ++++++
->  include/qemu-common.h        |  1 +
->  migration/ram.c              | 13 +++++++------
->  qapi/string-output-visitor.c | 22 ++++++----------------
->  util/cutils.c                | 25 +++++++++++++++++++++++++
->  9 files changed, 99 insertions(+), 33 deletions(-)
-> 
-> -- 
-> 2.7.4
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+According to my list, QEMU also fully implements the following
+facilities:
+
+S390_FEAT_LONG_DISPLACEMENT
+S390_FEAT_GENERAL_INSTRUCTIONS_EXT
+S390_FEAT_EXECUTE_EXT
+S390_FEAT_STFLE_45
+
+> +    };
+> +
+> +    for (i = 0; i < ARRAY_SIZE(feats); i++) {
+> +        set_bit(feats[i], fbm);
+> +    }
+> +}
+> +
+>  static S390CPUModel *get_max_cpu_model(Error **errp)
+>  {
+>      static S390CPUModel max_model;
+> @@ -670,10 +688,11 @@ static S390CPUModel *get_max_cpu_model(Error **errp)
+>      if (kvm_enabled()) {
+>          kvm_s390_get_host_cpu_model(&max_model, errp);
+>      } else {
+> -        /* TCG emulates a z900 */
+> +        /* TCG emulates a z900 (with some additional features) */
+>          max_model.def = &s390_cpu_defs[0];
+>          bitmap_copy(max_model.features, max_model.def->default_feat,
+>                      S390_FEAT_MAX);
+> +        add_qemu_cpu_model_features(max_model.features);
+>      }
+>      if (!*errp) {
+>          cached = true;
+> @@ -925,11 +944,15 @@ static void s390_host_cpu_model_initfn(Object *obj)
+>  
+>  static void s390_qemu_cpu_model_initfn(Object *obj)
+>  {
+> +    static S390CPUDef s390_qemu_cpu_defs;
+>      S390CPU *cpu = S390_CPU(obj);
+>  
+>      cpu->model = g_malloc0(sizeof(*cpu->model));
+> -    /* TCG emulates a z900 */
+> -    cpu->model->def = &s390_cpu_defs[0];
+> +    /* TCG emulates a z900 (with some additional features) */
+> +    memcpy(&s390_qemu_cpu_defs, &s390_cpu_defs[0], sizeof(s390_qemu_cpu_defs));
+> +    add_qemu_cpu_model_features(s390_qemu_cpu_defs.default_feat);
+> +    add_qemu_cpu_model_features(s390_qemu_cpu_defs.full_feat);
+> +    cpu->model->def = &s390_qemu_cpu_defs;
+>      bitmap_copy(cpu->model->features, cpu->model->def->default_feat,
+>                  S390_FEAT_MAX);
+>  }
+
+Otherwise it looks fine to me.
+
+Reviewed-by: Aurelien Jarno <aurelien@aurel32.net>
+
+-- 
+Aurelien Jarno                          GPG: 4096R/1DDD8C9B
+aurelien@aurel32.net                 http://www.aurel32.net
