@@ -1,17 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38803)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42771)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1dB2Sd-00068i-GY
-	for qemu-devel@nongnu.org; Wed, 17 May 2017 13:10:08 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dB2el-00030Y-RR
+	for qemu-devel@nongnu.org; Wed, 17 May 2017 13:22:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1dB2Sc-00055u-Hl
-	for qemu-devel@nongnu.org; Wed, 17 May 2017 13:10:07 -0400
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Date: Wed, 17 May 2017 18:09:41 +0100
-Message-Id: <20170517170941.25850-4-stefanha@redhat.com>
-In-Reply-To: <20170517170941.25850-1-stefanha@redhat.com>
-References: <20170517170941.25850-1-stefanha@redhat.com>
-Subject: [Qemu-devel] [PATCH 3/3] migration: avoid recursive AioContext
- locking in save_vmstate()
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dB2eh-0000bn-Sy
+	for qemu-devel@nongnu.org; Wed, 17 May 2017 13:22:39 -0400
+Received: from mail-qt0-x243.google.com ([2607:f8b0:400d:c0d::243]:33070)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dB2eh-0000be-Nl
+	for qemu-devel@nongnu.org; Wed, 17 May 2017 13:22:35 -0400
+Received: by mail-qt0-x243.google.com with SMTP id a46so2433895qte.0
+	for <qemu-devel@nongnu.org>; Wed, 17 May 2017 10:22:35 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <cover.1495018956.git.maozy.fnst@cn.fujitsu.com>
+	<c1f2bc8f51ab57ad99e103af6b36320ba8980fe2.1495018956.git.maozy.fnst@cn.fujitsu.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <5e8882a9-d442-b306-3468-8a2f1b33f424@amsat.org>
+Date: Wed, 17 May 2017 14:22:27 -0300
+MIME-Version: 1.0
+In-Reply-To: <c1f2bc8f51ab57ad99e103af6b36320ba8980fe2.1495018956.git.maozy.fnst@cn.fujitsu.com>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v4 2/3] net/rocker: Plug memory leak in
+ pci_rocker_init()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,64 +35,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Fam Zheng <famz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
+To: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>, qemu-devel@nongnu.org
+Cc: jasowang@redhat.com, jiri@resnulli.us, armbru@redhat.com
 
-AioContext was designed to allow nested acquire/release calls.  It uses
-a recursive mutex so callers don't need to worry about nesting...or so
-we thought.
+Hi Mao,
 
-BDRV_POLL_WHILE() is used to wait for block I/O requests.  It releases
-the AioContext temporarily around aio_poll().  This gives IOThreads a
-chance to acquire the AioContext to process I/O completions.
+On 05/17/2017 08:12 AM, Mao Zhongyi wrote:
+> pci_rocker_init() leaks a World when the name more than 9 chars,
+> then return a negative value directly, doesn't make a correct
+> cleanup. So add a new goto label to fix it.
+>
+> Cc: jasowang@redhat.com
+> Cc: jiri@resnulli.us
+> Cc: f4bug@amsat.org
+> Cc: armbru@redhat.com
+> Signed-off-by: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
+> ---
+>  hw/net/rocker/rocker.c | 4 +++-
+>  1 file changed, 3 insertions(+), 1 deletion(-)
+>
+> diff --git a/hw/net/rocker/rocker.c b/hw/net/rocker/rocker.c
+> index b2b6dc7..a382a6f 100644
+> --- a/hw/net/rocker/rocker.c
+> +++ b/hw/net/rocker/rocker.c
+> @@ -1371,7 +1371,8 @@ static int pci_rocker_init(PCIDevice *dev)
+>          fprintf(stderr,
 
-It turns out that recursive locking and BDRV_POLL_WHILE() don't mix.
-BDRV_POLL_WHILE() only releases the AioContext once, so the IOThread
-will not be able to acquire the AioContext if it was acquired
-multiple times.
+While here can you update fprintf -> qemu_log_mask?
 
-Instead of trying to release AioContext n times in BDRV_POLL_WHILE(),
-this patch simply avoids nested locking in save_vmstate().  It's the
-simplest fix and we should step back to consider the big picture with
-all the recent changes to block layer threading.
-
-This patch is the final fix to solve 'savevm' hanging with -object
-iothread.
-
-Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
----
- migration/savevm.c | 12 +++++++++++-
- 1 file changed, 11 insertions(+), 1 deletion(-)
-
-diff --git a/migration/savevm.c b/migration/savevm.c
-index 7f66d58..a70ba20 100644
---- a/migration/savevm.c
-+++ b/migration/savevm.c
-@@ -2153,6 +2153,14 @@ int save_vmstate(const char *name)
-         goto the_end;
-     }
- 
-+    /* The bdrv_all_create_snapshot() call that follows acquires the AioContext
-+     * for itself.  BDRV_POLL_WHILE() does not support nested locking because
-+     * it only releases the lock once.  Therefore synchronous I/O will deadlock
-+     * unless we release the AioContext before bdrv_all_create_snapshot().
-+     */
-+    aio_context_release(aio_context);
-+    aio_context = NULL;
-+
-     ret = bdrv_all_create_snapshot(sn, bs, vm_state_size, &bs);
-     if (ret < 0) {
-         error_report("Error while creating snapshot on '%s'",
-@@ -2163,7 +2171,9 @@ int save_vmstate(const char *name)
-     ret = 0;
- 
-  the_end:
--    aio_context_release(aio_context);
-+    if (aio_context) {
-+        aio_context_release(aio_context);
-+    }
-     if (saved_vm_running) {
-         vm_start();
-     }
--- 
-2.9.3
+>                  "rocker: name too long; please shorten to at most %d chars\n",
+>                  MAX_ROCKER_NAME_LEN);
+> -        return -EINVAL;
+> +        err = -EINVAL;
+> +        goto err_name_too_long;
+>      }
+>
+>      if (memcmp(&r->fp_start_macaddr, &zero, sizeof(zero)) == 0) {
+> @@ -1430,6 +1431,7 @@ static int pci_rocker_init(PCIDevice *dev)
+>
+>      return 0;
+>
+> +err_name_too_long:
+>  err_duplicate:
+>      rocker_msix_uninit(r);
+>  err_msix_init:
+>
