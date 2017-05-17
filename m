@@ -1,27 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34357)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39477)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1dAzPR-0007MB-AT
-	for qemu-devel@nongnu.org; Wed, 17 May 2017 09:54:38 -0400
+	(envelope-from <maxime.coquelin@redhat.com>) id 1dAzff-0007uN-3c
+	for qemu-devel@nongnu.org; Wed, 17 May 2017 10:11:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1dAzPL-0000Qa-K1
-	for qemu-devel@nongnu.org; Wed, 17 May 2017 09:54:37 -0400
-Received: from mail-wr0-x22c.google.com ([2a00:1450:400c:c0c::22c]:36695)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1dAzPL-0000QJ-BS
-	for qemu-devel@nongnu.org; Wed, 17 May 2017 09:54:31 -0400
-Received: by mail-wr0-x22c.google.com with SMTP id l50so10587041wrc.3
-	for <qemu-devel@nongnu.org>; Wed, 17 May 2017 06:54:30 -0700 (PDT)
-References: <20170517124042.1430-1-stefanha@redhat.com>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <20170517124042.1430-1-stefanha@redhat.com>
-Date: Wed, 17 May 2017 14:55:24 +0100
-Message-ID: <87lgpv37w3.fsf@linaro.org>
+	(envelope-from <maxime.coquelin@redhat.com>) id 1dAzfb-0007eM-3I
+	for qemu-devel@nongnu.org; Wed, 17 May 2017 10:11:23 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:56784)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <maxime.coquelin@redhat.com>)
+	id 1dAzfa-0007e9-QM
+	for qemu-devel@nongnu.org; Wed, 17 May 2017 10:11:19 -0400
+References: <20170511123246.31308-1-maxime.coquelin@redhat.com>
+	<20170511123246.31308-7-maxime.coquelin@redhat.com>
+	<20170511203345-mutt-send-email-mst@kernel.org>
+	<62516ce5-9d4c-d021-c4ab-a767c7f07b31@redhat.com>
+	<20170513025938-mutt-send-email-mst@kernel.org>
+	<9f030e52-60ec-0b42-e0d0-6158eebf99d4@redhat.com>
+	<20170516181455-mutt-send-email-mst@kernel.org>
+	<c59af526-a290-1f11-2d34-6fad817a03d1@redhat.com>
+From: Maxime Coquelin <maxime.coquelin@redhat.com>
+Message-ID: <779cdcfc-80df-373a-e772-3b14cd49a2ff@redhat.com>
+Date: Wed, 17 May 2017 16:10:46 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v2] .gdbinit: load QEMU sub-commands when
- gdb starts
+In-Reply-To: <c59af526-a290-1f11-2d34-6fad817a03d1@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 6/6] spec/vhost-user spec: Add IOMMU support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,62 +35,114 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Cc: qemu-devel@nongnu.org, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, Daniel Berrange <berrange@redhat.com>
+To: Jason Wang <jasowang@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
+Cc: yuanhan.liu@linux.intel.com, qemu-devel@nongnu.org, peterx@redhat.com, marcandre.lureau@gmail.com, wexu@redhat.com, vkaplans@redhat.com, jfreiman@redhat.com
 
 
-Stefan Hajnoczi <stefanha@redhat.com> writes:
 
-> The scripts/qemu-gdb.py file is not easily discoverable.  Add a .gdbinit
-> file so GDB either loads qemu-gdb.py automatically or prints a message
-> informing the user how to enable them (some systems disable ./.gdbinit
-> loading for security reasons).
->
-> Symlink .gdbinit and the scripts directory in order to make out-of-tree
-> builds work.  The scripts directory is used to find the qemu-gdb.py file
-> specified by a relative path in .gdbinit.
->
-> Suggested-by: Eric Blake <eblake@redhat.com>
-> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+On 05/17/2017 04:53 AM, Jason Wang wrote:
+>=20
+>=20
+> On 2017=E5=B9=B405=E6=9C=8816=E6=97=A5 23:16, Michael S. Tsirkin wrote:
+>> On Mon, May 15, 2017 at 01:45:28PM +0800, Jason Wang wrote:
+>>>
+>>> On 2017=E5=B9=B405=E6=9C=8813=E6=97=A5 08:02, Michael S. Tsirkin wrot=
+e:
+>>>> On Fri, May 12, 2017 at 04:21:58PM +0200, Maxime Coquelin wrote:
+>>>>> On 05/11/2017 08:25 PM, Michael S. Tsirkin wrote:
+>>>>>> On Thu, May 11, 2017 at 02:32:46PM +0200, Maxime Coquelin wrote:
+>>>>>>> This patch specifies and implements the master/slave communicatio=
+n
+>>>>>>> to support device IOTLB in slave.
+>>>>>>>
+>>>>>>> The vhost_iotlb_msg structure introduced for kernel backends is
+>>>>>>> re-used, making the design close between the two backends.
+>>>>>>>
+>>>>>>> An exception is the use of the secondary channel to enable the
+>>>>>>> slave to send IOTLB miss requests to the master.
+>>>>>>>
+>>>>>>> Signed-off-by: Maxime Coquelin <maxime.coquelin@redhat.com>
+>>>>>>> ---
+>>>>>>>     docs/specs/vhost-user.txt | 75=20
+>>>>>>> +++++++++++++++++++++++++++++++++++++++++++++++
+>>>>>>>     hw/virtio/vhost-user.c    | 31 ++++++++++++++++++++
+>>>>>>>     2 files changed, 106 insertions(+)
+>>>>>>>
+>>>>>>> diff --git a/docs/specs/vhost-user.txt b/docs/specs/vhost-user.tx=
+t
+>>>>>>> index 5fa7016..4a1f0c3 100644
+>>>>>>> --- a/docs/specs/vhost-user.txt
+>>>>>>> +++ b/docs/specs/vhost-user.txt
+>>>>>>> @@ -97,6 +97,23 @@ Depending on the request type, payload can be:
+>>>>>>>        log offset: offset from start of supplied file descriptor
+>>>>>>>            where logging starts (i.e. where guest address 0 would=
+=20
+>>>>>>> be logged)
+>>>>>>> + * An IOTLB message
+>>>>>>> +   ---------------------------------------------------------
+>>>>>>> +   | iova | size | user address | permissions flags | type |
+>>>>>>> +   ---------------------------------------------------------
+>>>>>>> +
+>>>>>>> +   IOVA: a 64-bit guest I/O virtual address
+>>>>>> guest -> VM
+>>>>> Ok.
+>>>>>
+>>>>>>> +   Size: a 64-bit size
+>>>>>> How do you specify "all memory"? give special meaning to size 0?
+>>>>> Good point, it does not support all memory currently.
+>>>>> It is not vhost-user specific, but general to the vhost=20
+>>>>> implementation.
+>>>> But iommu needs it to support passthrough.
+>>> Probably not, we will just pass the mappings in vhost_memory_region t=
+o
+>>> vhost. Its memory_size is also a __u64.
+>>>
+>>> Thanks
+>> That's different since that's chunks of qemu virtual memory.
+>>
+>> IOMMU maps IOVA to GPA.
+>>
+>=20
+> But we're in fact cache IOVA -> HVA mapping in the remote IOTLB. When=20
+> passthrough mode is enabled, IOVA =3D=3D GPA, so passing mappings in=20
+> vhost_memory_region should be fine.
 
-Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
+Not sure this is a good idea, because when configured in passthrough,
+QEMU will see the IOMMU as enabled, so the the VIRTIO_F_IOMMU_PLATFORM
+feature will be negotiated if both guest and backend support it.
+So how the backend will know whether it should directly pick the
+translation directly into the vhost_memory_region, or translate it
+through the device IOTLB?
 
-> ---
-> v2:
->  * Support out-of-tree builds [Daniel, Markus]
->
->  configure | 1 +
->  .gdbinit  | 8 ++++++++
->  2 files changed, 9 insertions(+)
->  create mode 100644 .gdbinit
->
-> diff --git a/configure b/configure
-> index 57b5ae6..04f7272 100755
-> --- a/configure
-> +++ b/configure
-> @@ -6382,6 +6382,7 @@ FILES="$FILES pc-bios/spapr-rtas/Makefile"
->  FILES="$FILES pc-bios/s390-ccw/Makefile"
->  FILES="$FILES roms/seabios/Makefile roms/vgabios/Makefile"
->  FILES="$FILES pc-bios/qemu-icon.bmp"
-> +FILES="$FILES .gdbinit scripts" # scripts needed by relative path in .gdbinit
->  for bios_file in \
->      $source_path/pc-bios/*.bin \
->      $source_path/pc-bios/*.lid \
-> diff --git a/.gdbinit b/.gdbinit
-> new file mode 100644
-> index 0000000..9d322fc
-> --- /dev/null
-> +++ b/.gdbinit
-> @@ -0,0 +1,8 @@
-> +# GDB may have ./.gdbinit loading disabled by default.  In that case you can
-> +# follow the instructions it prints.  They boil down to adding the following to
-> +# your home directory's ~/.gdbinit file:
-> +#
-> +#   add-auto-load-safe-path /path/to/qemu/.gdbinit
-> +
-> +# Load QEMU-specific sub-commands and settings
-> +source scripts/qemu-gdb.py
+Maybe the solution would be for QEMU to wrap "all memory" IOTLB updates
+& invalidations to vhost_memory_regions, since the backend won't anyway
+be able to perform accesses outside these regions?
 
+> The only possible "issue" with "all memory" is if you can not use a=20
+> single TLB invalidation to invalidate all caches in remote TLB.
 
---
-Alex Bennée
+If needed, maybe we could introduce a new VHOST_IOTLB_INVALIDATE message
+type?
+For older kernel backend that doesn't support it, -EINVAL will be
+returned, so QEMU could handle it another way in this case.
+
+> But this=20
+> is only theoretical problem since it only happen when we have a 1 byte=20
+> mapping [2^64 - 1, 2^64) cached in remote TLB. Consider:
+>=20
+> - E.g intel IOMMU has a range limitation for invalidation (1G currently=
+)
+> - Looks like all existed IOMMU use page aligned mappings
+>=20
+> It was probably not a big issue. And for safety we could use two=20
+> invalidations to make sure all caches were flushed remotely. Or just=20
+> change the protocol from start, size to start, end. Vhost-kernel is=20
+> probably too late for this change, but I'm still not quite sure it is=20
+> worthwhile.
+
+I'm not for diverging the protocol between kernel & user backends.
+
+Thanks,
+Maxime
+
+> Thanks
