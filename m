@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50701)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50706)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1dB0J8-0001iy-Je
+	(envelope-from <alex.bennee@linaro.org>) id 1dB0J8-0001jL-Ma
 	for qemu-devel@nongnu.org; Wed, 17 May 2017 10:52:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1dB0J6-0004ew-HB
+	(envelope-from <alex.bennee@linaro.org>) id 1dB0J7-0004fA-Hv
 	for qemu-devel@nongnu.org; Wed, 17 May 2017 10:52:10 -0400
-Received: from mail-wm0-x22e.google.com ([2a00:1450:400c:c09::22e]:37469)
+Received: from mail-wm0-x22f.google.com ([2a00:1450:400c:c09::22f]:36111)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1dB0J6-0004ec-B9
-	for qemu-devel@nongnu.org; Wed, 17 May 2017 10:52:08 -0400
-Received: by mail-wm0-x22e.google.com with SMTP id d127so19125370wmf.0
-	for <qemu-devel@nongnu.org>; Wed, 17 May 2017 07:52:08 -0700 (PDT)
+	id 1dB0J7-0004f2-Bb
+	for qemu-devel@nongnu.org; Wed, 17 May 2017 10:52:09 -0400
+Received: by mail-wm0-x22f.google.com with SMTP id 70so13261416wmq.1
+	for <qemu-devel@nongnu.org>; Wed, 17 May 2017 07:52:09 -0700 (PDT)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Wed, 17 May 2017 15:52:55 +0100
-Message-Id: <20170517145259.28979-3-alex.bennee@linaro.org>
+Date: Wed, 17 May 2017 15:52:56 +0100
+Message-Id: <20170517145259.28979-4-alex.bennee@linaro.org>
 In-Reply-To: <20170517145259.28979-1-alex.bennee@linaro.org>
 References: <20170517145259.28979-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v2 2/6] scripts/qemu-gdb/timers.py: new helper
- to dump timer state
+Subject: [Qemu-devel] [PATCH v2 3/6] scripts/qemu-gdb/tcg: new helper to
+ dump tcg state
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,97 +33,87 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: pbonzini@redhat.com, stefanha@redhat.com
 Cc: cota@braap.org, qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 
-This introduces the qemu-gdb command "qemu timers" which will dump the
-state of the main timers in the system.
+This adds a simple helper to dump lock state within TCG.
 
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- scripts/qemu-gdb.py       |  3 ++-
- scripts/qemugdb/timers.py | 54 +++++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 56 insertions(+), 1 deletion(-)
- create mode 100644 scripts/qemugdb/timers.py
+ scripts/qemu-gdb.py    |  3 ++-
+ scripts/qemugdb/tcg.py | 46 ++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 48 insertions(+), 1 deletion(-)
+ create mode 100644 scripts/qemugdb/tcg.py
 
 diff --git a/scripts/qemu-gdb.py b/scripts/qemu-gdb.py
-index b3f8e04f77..3e7adb87dc 100644
+index 3e7adb87dc..91e928f6af 100644
 --- a/scripts/qemu-gdb.py
 +++ b/scripts/qemu-gdb.py
 @@ -26,7 +26,7 @@ import os, sys
  
  sys.path.append(os.path.dirname(__file__))
  
--from qemugdb import aio, mtree, coroutine
-+from qemugdb import aio, mtree, coroutine, timers
+-from qemugdb import aio, mtree, coroutine, timers
++from qemugdb import aio, mtree, coroutine, timers, tcg
  
  class QemuCommand(gdb.Command):
      '''Prefix for QEMU debug support commands'''
-@@ -38,6 +38,7 @@ QemuCommand()
- coroutine.CoroutineCommand()
+@@ -39,6 +39,7 @@ coroutine.CoroutineCommand()
  mtree.MtreeCommand()
  aio.HandlersCommand()
-+timers.TimersCommand()
+ timers.TimersCommand()
++tcg.TCGLockStatusCommand()
  
  coroutine.CoroutineSPFunction()
  coroutine.CoroutinePCFunction()
-diff --git a/scripts/qemugdb/timers.py b/scripts/qemugdb/timers.py
+diff --git a/scripts/qemugdb/tcg.py b/scripts/qemugdb/tcg.py
 new file mode 100644
-index 0000000000..be71a001e3
+index 0000000000..8c7f1d7454
 --- /dev/null
-+++ b/scripts/qemugdb/timers.py
-@@ -0,0 +1,54 @@
++++ b/scripts/qemugdb/tcg.py
+@@ -0,0 +1,46 @@
 +#!/usr/bin/python
-+# GDB debugging support
++# -*- coding: utf-8 -*-
 +#
-+# Copyright 2017 Linaro Ltd
++# GDB debugging support, TCG status
 +#
-+# Author: Alex Bennée <alex.bennee@linaro.org>
++# Copyright 2016 Linaro Ltd
++#
++# Authors:
++#  Alex Bennée <alex.bennee@linaro.org>
 +#
 +# This work is licensed under the terms of the GNU GPL, version 2.  See
 +# the COPYING file in the top-level directory.
++#
++# Contributions after 2012-01-13 are licensed under the terms of the
++# GNU GPL, version 2 or (at your option) any later version.
 +
-+# 'qemu timers' -- display the current timerlists
++# 'qemu tcg-lock-status' -- display the TCG lock status across threads
 +
 +import gdb
 +
-+class TimersCommand(gdb.Command):
-+    '''Display the current QEMU timers'''
-+
++class TCGLockStatusCommand(gdb.Command):
++    '''Display TCG Execution Status'''
 +    def __init__(self):
-+        'Register the class as a gdb command'
-+        gdb.Command.__init__(self, 'qemu timers', gdb.COMMAND_DATA,
++        gdb.Command.__init__(self, 'qemu tcg-lock-status', gdb.COMMAND_DATA,
 +                             gdb.COMPLETE_NONE)
 +
-+    def dump_timers(self, timer):
-+        "Follow a timer and recursively dump each one in the list."
-+        # timer should be of type QemuTimer
-+        gdb.write("    timer %s/%s (cb:%s,opq:%s)\n" % (
-+            timer['expire_time'],
-+            timer['scale'],
-+            timer['cb'],
-+            timer['opaque']))
-+
-+        if int(timer['next']) > 0:
-+            self.dump_timers(timer['next'])
-+
-+
-+    def process_timerlist(self, tlist, ttype):
-+        gdb.write("Processing %s timers\n" % (ttype))
-+        gdb.write("  clock %s is enabled:%s, last:%s\n" % (
-+            tlist['clock']['type'],
-+            tlist['clock']['enabled'],
-+            tlist['clock']['last']))
-+        if int(tlist['active_timers']) > 0:
-+            self.dump_timers(tlist['active_timers'])
-+
-+
 +    def invoke(self, arg, from_tty):
-+        'Run the command'
-+        main_timers = gdb.parse_and_eval("main_loop_tlg")
++        gdb.write("Thread, BQL (iothread_mutex), Replay, Blocked?\n")
++        for thread in gdb.inferiors()[0].threads():
++            thread.switch()
 +
-+        # This will break if QEMUClockType in timer.h is redfined
-+        self.process_timerlist(main_timers['tl'][0], "Realtime")
-+        self.process_timerlist(main_timers['tl'][1], "Virtual")
-+        self.process_timerlist(main_timers['tl'][2], "Host")
-+        self.process_timerlist(main_timers['tl'][3], "Virtual RT")
++            iothread = gdb.parse_and_eval("iothread_locked")
++            replay = gdb.parse_and_eval("replay_locked")
++
++            frame = gdb.selected_frame()
++            if frame.name() == "__lll_lock_wait":
++                frame.older().select()
++                mutex = gdb.parse_and_eval("mutex")
++                owner = gdb.parse_and_eval("mutex->__data.__owner")
++                blocked = ("__lll_lock_wait waiting on %s from %d" %
++                           (mutex, owner))
++            else:
++                blocked = "not blocked"
++
++            gdb.write("%d/%d, %s, %s, %s\n" % (thread.num, thread.ptid[1],
++                                               iothread, replay, blocked))
 -- 
 2.11.0
