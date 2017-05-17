@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48251)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48199)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1dB6l8-0000y6-A9
-	for qemu-devel@nongnu.org; Wed, 17 May 2017 17:45:31 -0400
+	(envelope-from <mst@redhat.com>) id 1dB6l1-0000sF-LS
+	for qemu-devel@nongnu.org; Wed, 17 May 2017 17:45:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1dB6l5-0005QD-LV
-	for qemu-devel@nongnu.org; Wed, 17 May 2017 17:45:30 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:48202)
+	(envelope-from <mst@redhat.com>) id 1dB6l0-0005O9-Ai
+	for qemu-devel@nongnu.org; Wed, 17 May 2017 17:45:23 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:35812)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1dB6l5-0005Pp-CW
-	for qemu-devel@nongnu.org; Wed, 17 May 2017 17:45:27 -0400
-Date: Thu, 18 May 2017 00:45:23 +0300
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1dB6l0-0005Nu-24
+	for qemu-devel@nongnu.org; Wed, 17 May 2017 17:45:22 -0400
+Date: Thu, 18 May 2017 00:45:18 +0300
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <1495057396-13387-8-git-send-email-mst@redhat.com>
+Message-ID: <1495057396-13387-6-git-send-email-mst@redhat.com>
 References: <1495057396-13387-1-git-send-email-mst@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 In-Reply-To: <1495057396-13387-1-git-send-email-mst@redhat.com>
-Subject: [Qemu-devel] [PULL 07/13] iommu: Don't crash if machine is not
- PC_MACHINE
+Subject: [Qemu-devel] [PULL 05/13] pc/fwcfg: unbreak migration from qemu-2.5
+ and qemu-2.6 during firmware boot
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,98 +28,135 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Eduardo Habkost <ehabkost@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Igor Mammedov <imammedo@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Laszlo Ersek <lersek@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-From: Eduardo Habkost <ehabkost@redhat.com>
+From: Igor Mammedov <imammedo@redhat.com>
 
-Currently it's possible to crash QEMU using "-device *-iommu" and
-"-machine none":
+Since 2.7 commit (b2a575a Add optionrom compatible with fw_cfg DMA version)
+regressed migration during firmware exection time by
+abusing fwcfg.dma_enabled property to decide loading
+dma version of option rom AND by mistake disabling DMA
+for 2.6 and earlier globally instead of only for option rom.
 
-  $ qemu-system-x86_64 -machine none -device amd-iommu
-  qemu/hw/i386/amd_iommu.c:1140:amdvi_realize: Object 0x55627dafbc90 is not an instance of type generic-pc-machine
-  Aborted (core dumped)
-  $ qemu-system-x86_64 -machine none -device intel-iommu
-  qemu/hw/i386/intel_iommu.c:2972:vtd_realize: Object 0x56292ec0bc90 is not an instance of type generic-pc-machine
-  Aborted (core dumped)
+so 2.6 machine type guest is broken when it already runs
+firmware in DMA mode but migrated to qemu-2.7(pc-2.6)
+at that time;
 
-Fix amd-iommu and intel-iommu to ensure the current machine is really a
-TYPE_PC_MACHINE instance at their realize methods.
+a) qemu-2.6:pc2.6 (fwcfg.dma=on,firmware=dma,oprom=ioport)
+b) qemu-2.7:pc2.6 (fwcfg.dma=off,firmware=ioport,oprom=ioport)
 
-Resulting error messages:
+  to:   a     b
+from
+a       OK   FAIL
+b       OK   OK
 
-  $ qemu-system-x86_64 -machine none -device amd-iommu
-  qemu-system-x86_64: -device amd-iommu: Machine-type 'none' not supported by amd-iommu
-  $ qemu-system-x86_64 -machine none -device intel-iommu
-  qemu-system-x86_64: -device intel-iommu: Machine-type 'none' not supported by intel-iommu
+So we currently have broken forward migration from
+qemu-2.6 to qemu-2.[789] that however could be fixed
+for 2.10 by re-enabling DMA for 2.[56] machine types
+and allowing dma capable option rom only since 2.7.
+As result qemu should end up with:
 
-Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+c) qemu-2.10:pc2.6 (fwcfg.dma=on,firmware=dma,oprom=ioport)
+
+   to:  a     b    c
+from
+a      OK   FAIL  OK
+b      OK   OK    OK
+c      OK   FAIL  OK
+
+where forward migration from qemu-2.6 to qemu-2.10 should
+work again leaving only qemu-2.[789]:pc-2.6 broken.
+
+Reported-by: Eduardo Habkost <ehabkost@redhat.com>
+Analyzed-by: Laszlo Ersek <lersek@redhat.com>
+Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+Reviewed-by: Laszlo Ersek <lersek@redhat.com>
+Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
 Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 ---
- hw/i386/amd_iommu.c   | 15 ++++++++++++++-
- hw/i386/intel_iommu.c | 14 ++++++++++++--
- 2 files changed, 26 insertions(+), 3 deletions(-)
+ include/hw/i386/pc.h | 7 +++----
+ hw/i386/pc.c         | 9 ++++-----
+ hw/i386/pc_piix.c    | 1 +
+ hw/i386/pc_q35.c     | 1 +
+ 4 files changed, 9 insertions(+), 9 deletions(-)
 
-diff --git a/hw/i386/amd_iommu.c b/hw/i386/amd_iommu.c
-index f86a40a..516ebae 100644
---- a/hw/i386/amd_iommu.c
-+++ b/hw/i386/amd_iommu.c
-@@ -21,6 +21,7 @@
-  */
- #include "qemu/osdep.h"
- #include "hw/i386/amd_iommu.h"
-+#include "qapi/error.h"
- #include "qemu/error-report.h"
- #include "trace.h"
- 
-@@ -1137,7 +1138,19 @@ static void amdvi_realize(DeviceState *dev, Error **err)
-     int ret = 0;
-     AMDVIState *s = AMD_IOMMU_DEVICE(dev);
-     X86IOMMUState *x86_iommu = X86_IOMMU_DEVICE(dev);
--    PCIBus *bus = PC_MACHINE(qdev_get_machine())->bus;
-+    MachineState *ms = MACHINE(qdev_get_machine());
-+    MachineClass *mc = MACHINE_GET_CLASS(ms);
-+    PCMachineState *pcms =
-+        PC_MACHINE(object_dynamic_cast(OBJECT(ms), TYPE_PC_MACHINE));
-+    PCIBus *bus;
+diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
+index 416aaa5..d0183c4 100644
+--- a/include/hw/i386/pc.h
++++ b/include/hw/i386/pc.h
+@@ -151,6 +151,9 @@ struct PCMachineClass {
+     bool save_tsc_khz;
+     /* generate legacy CPU hotplug AML */
+     bool legacy_cpu_hotplug;
 +
-+    if (!pcms) {
-+        error_setg(err, "Machine-type '%s' not supported by amd-iommu",
-+                   mc->name);
-+        return;
-+    }
-+
-+    bus = pcms->bus;
-     s->iotlb = g_hash_table_new_full(amdvi_uint64_hash,
-                                      amdvi_uint64_equal, g_free, g_free);
++    /* use DMA capable linuxboot option rom */
++    bool linuxboot_dma_enabled;
+ };
  
-diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
-index 02f047c..a12b176 100644
---- a/hw/i386/intel_iommu.c
-+++ b/hw/i386/intel_iommu.c
-@@ -2969,11 +2969,21 @@ static bool vtd_decide_config(IntelIOMMUState *s, Error **errp)
+ #define TYPE_PC_MACHINE "generic-pc-machine"
+@@ -438,10 +441,6 @@ bool e820_get_entry(int, uint32_t, uint64_t *, uint64_t *);
+ #define PC_COMPAT_2_6 \
+     HW_COMPAT_2_6 \
+     {\
+-        .driver   = "fw_cfg_io",\
+-        .property = "dma_enabled",\
+-        .value    = "off",\
+-    },{\
+         .driver   = TYPE_X86_CPU,\
+         .property = "cpuid-0xb",\
+         .value    = "off",\
+diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+index f3b372a..8063241 100644
+--- a/hw/i386/pc.c
++++ b/hw/i386/pc.c
+@@ -1047,12 +1047,10 @@ static void load_linux(PCMachineState *pcms,
+     fw_cfg_add_i32(fw_cfg, FW_CFG_SETUP_SIZE, setup_size);
+     fw_cfg_add_bytes(fw_cfg, FW_CFG_SETUP_DATA, setup, setup_size);
  
- static void vtd_realize(DeviceState *dev, Error **errp)
- {
--    PCMachineState *pcms = PC_MACHINE(qdev_get_machine());
--    PCIBus *bus = pcms->bus;
-+    MachineState *ms = MACHINE(qdev_get_machine());
-+    MachineClass *mc = MACHINE_GET_CLASS(ms);
-+    PCMachineState *pcms =
-+        PC_MACHINE(object_dynamic_cast(OBJECT(ms), TYPE_PC_MACHINE));
-+    PCIBus *bus;
-     IntelIOMMUState *s = INTEL_IOMMU_DEVICE(dev);
-     X86IOMMUState *x86_iommu = X86_IOMMU_DEVICE(dev);
+-    if (fw_cfg_dma_enabled(fw_cfg)) {
++    option_rom[nb_option_roms].bootindex = 0;
++    option_rom[nb_option_roms].name = "linuxboot.bin";
++    if (pcmc->linuxboot_dma_enabled && fw_cfg_dma_enabled(fw_cfg)) {
+         option_rom[nb_option_roms].name = "linuxboot_dma.bin";
+-        option_rom[nb_option_roms].bootindex = 0;
+-    } else {
+-        option_rom[nb_option_roms].name = "linuxboot.bin";
+-        option_rom[nb_option_roms].bootindex = 0;
+     }
+     nb_option_roms++;
+ }
+@@ -2321,6 +2319,7 @@ static void pc_machine_class_init(ObjectClass *oc, void *data)
+      * to be used at the moment, 32K should be enough for a while.  */
+     pcmc->acpi_data_size = 0x20000 + 0x8000;
+     pcmc->save_tsc_khz = true;
++    pcmc->linuxboot_dma_enabled = true;
+     mc->get_hotplug_handler = pc_get_hotpug_handler;
+     mc->cpu_index_to_socket_id = pc_cpu_index_to_socket_id;
+     mc->possible_cpu_arch_ids = pc_possible_cpu_arch_ids;
+diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
+index 9f102aa..a11190b 100644
+--- a/hw/i386/pc_piix.c
++++ b/hw/i386/pc_piix.c
+@@ -474,6 +474,7 @@ static void pc_i440fx_2_6_machine_options(MachineClass *m)
+     PCMachineClass *pcmc = PC_MACHINE_CLASS(m);
+     pc_i440fx_2_7_machine_options(m);
+     pcmc->legacy_cpu_hotplug = true;
++    pcmc->linuxboot_dma_enabled = false;
+     SET_MACHINE_COMPAT(m, PC_COMPAT_2_6);
+ }
  
-+    if (!pcms) {
-+        error_setg(errp, "Machine-type '%s' not supported by intel-iommu",
-+                   mc->name);
-+        return;
-+    }
-+
-+    bus = pcms->bus;
-     VTD_DPRINTF(GENERAL, "");
-     x86_iommu->type = TYPE_INTEL;
+diff --git a/hw/i386/pc_q35.c b/hw/i386/pc_q35.c
+index dd792a8..0a61a20 100644
+--- a/hw/i386/pc_q35.c
++++ b/hw/i386/pc_q35.c
+@@ -335,6 +335,7 @@ static void pc_q35_2_6_machine_options(MachineClass *m)
+     PCMachineClass *pcmc = PC_MACHINE_CLASS(m);
+     pc_q35_2_7_machine_options(m);
+     pcmc->legacy_cpu_hotplug = true;
++    pcmc->linuxboot_dma_enabled = false;
+     SET_MACHINE_COMPAT(m, PC_COMPAT_2_6);
+ }
  
 -- 
 MST
