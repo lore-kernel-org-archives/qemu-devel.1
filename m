@@ -1,25 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56474)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56635)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aurelien@aurel32.net>) id 1dB1s0-0000hT-DK
-	for qemu-devel@nongnu.org; Wed, 17 May 2017 12:32:17 -0400
+	(envelope-from <groug@kaod.org>) id 1dB1sU-0001O5-LQ
+	for qemu-devel@nongnu.org; Wed, 17 May 2017 12:32:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aurelien@aurel32.net>) id 1dB1rw-0000md-Gw
-	for qemu-devel@nongnu.org; Wed, 17 May 2017 12:32:16 -0400
-Received: from hall.aurel32.net ([2001:bc8:30d7:100::1]:51688)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <aurelien@aurel32.net>)
-	id 1dB1rw-0000lY-AG
-	for qemu-devel@nongnu.org; Wed, 17 May 2017 12:32:12 -0400
-Date: Wed, 17 May 2017 18:26:42 +0200
-From: Aurelien Jarno <aurelien@aurel32.net>
-Message-ID: <20170517162642.ebmrhawmfdde5vsz@aurel32.net>
-References: <1495035337-13337-1-git-send-email-thuth@redhat.com>
+	(envelope-from <groug@kaod.org>) id 1dB1sQ-0000xj-Mv
+	for qemu-devel@nongnu.org; Wed, 17 May 2017 12:32:46 -0400
+Received: from 4.mo3.mail-out.ovh.net ([178.33.46.10]:44801)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1dB1sQ-0000w3-DN
+	for qemu-devel@nongnu.org; Wed, 17 May 2017 12:32:42 -0400
+Received: from player797.ha.ovh.net (b9.ovh.net [213.186.33.59])
+	by mo3.mail-out.ovh.net (Postfix) with ESMTP id DB73DD2C04
+	for <qemu-devel@nongnu.org>; Wed, 17 May 2017 18:32:40 +0200 (CEST)
+Date: Wed, 17 May 2017 18:32:30 +0200
+From: Greg Kurz <groug@kaod.org>
+Message-ID: <20170517183230.5b599765@bahia.lan>
+In-Reply-To: <20170517063547.23876-3-david@gibson.dropbear.id.au>
+References: <20170517063547.23876-1-david@gibson.dropbear.id.au>
+	<20170517063547.23876-3-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1495035337-13337-1-git-send-email-thuth@redhat.com>
-Subject: Re: [Qemu-devel] [RFC PATCH] target/s390x/cpu_models: Set some
- additional feature bits for the "qemu" CPU
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	boundary="Sig_/CqC0qQ+gfsl+Zz=Xy/DoWlt";
+	protocol="application/pgp-signature"
+Subject: Re: [Qemu-devel] [Qemu-ppc] [RFC 2/2] pseries: Restore PVR
+ negotiation logic for pre-2.9 machine types
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,104 +32,212 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>, David Hildenbrand <david@redhat.com>, mmarek@suse.com, mbenes@suse.cz
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: abologna@redhat.com, thuth@redhat.com, lvivier@redhat.com, qemu-devel@nongnu.org, mdroth@linux.vnet.ibm.com, qemu-ppc@nongnu.org, bharata@linux.vnet.ibm.com
 
-On 2017-05-17 17:35, Thomas Huth wrote:
-> Currently we only present the plain z900 feature bits to the guest,
-> but QEMU already emulates some additional features (but not all of
-> the next CPU generation, so we can not use the next CPU level as
-> default yet). Since newer Linux kernels are checking the feature bits
-> and refuse to work if a required feature is missing, we should present
-> as much of the supported features as possible when we are running
-> with the default "qemu" CPU.
-> This patch now adds the "stfle", "extended immediate" and "stckf"
-> facility bits to the "qemu" CPU, which are already supported facilities.
-> It is unfortunately still not enough to run e.g. recent Fedora kernels,
-> but at least it's a first step into the right direction.
+--Sig_/CqC0qQ+gfsl+Zz=Xy/DoWlt
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-This indeed looks like a step in a good direction. At least it makes the
-recently added STFLE emulation useful :-).
+On Wed, 17 May 2017 16:35:47 +1000
+David Gibson <david@gibson.dropbear.id.au> wrote:
 
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> "pseries" guests go through a hypervisor<->guest feature negotiation duri=
+ng
+> early boot.  Part of this is finding a CPU compatibility mode which works
+> for both.
+>=20
+> In 152ef80 "pseries: Rewrite CAS PVR compatibility logic" this logic was
+> changed to strongly prefer architecture defined CPU compatibility modes,
+> rather than CPU "raw" modes.  However, this change was made universally,
+> which introduces a guest visible change for the previously existing machi=
+ne
+> types (pseries-2.8 and earlier).  That's never supposed to happen.
+>=20
+> This corrects the behaviour, reverting to the old PVR negotiation logic
+> for machine types prior to pseries-2.9.
+>=20
+> Fixes: 152ef803ceb1959e2380a1da7736b935b109222e
+> Reported-by: Andrea Bolognani <abologna@redhat.com>
+> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 > ---
->  target/s390x/cpu_models.c | 29 ++++++++++++++++++++++++++---
->  1 file changed, 26 insertions(+), 3 deletions(-)
-> 
-> diff --git a/target/s390x/cpu_models.c b/target/s390x/cpu_models.c
-> index 8d27363..18789ab 100644
-> --- a/target/s390x/cpu_models.c
-> +++ b/target/s390x/cpu_models.c
-> @@ -658,6 +658,24 @@ static void check_compatibility(const S390CPUModel *max_model,
->                    "available in the configuration: ");
->  }
->  
-> +/**
-> + * The base TCG CPU model "qemu" is based on the z900. However, we already
-> + * can also emulate some additional features of later CPU generations, so
-> + * we add these additional feature bits here.
-> + */
-> +static void add_qemu_cpu_model_features(S390FeatBitmap fbm)
-> +{
-> +    int i, feats[] = {
-> +        S390_FEAT_STFLE,
-> +        S390_FEAT_EXTENDED_IMMEDIATE,
-> +        S390_FEAT_STORE_CLOCK_FAST
-
-According to my list, QEMU also fully implements the following
-facilities:
-
-S390_FEAT_LONG_DISPLACEMENT
-S390_FEAT_GENERAL_INSTRUCTIONS_EXT
-S390_FEAT_EXECUTE_EXT
-S390_FEAT_STFLE_45
-
-> +    };
+>  hw/ppc/spapr.c         |  3 ++
+>  hw/ppc/spapr_hcall.c   | 90 ++++++++++++++++++++++++++++++++++++++++++++=
++++++-
+>  include/hw/ppc/spapr.h |  1 +
+>  3 files changed, 93 insertions(+), 1 deletion(-)
+>=20
+> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> index a9471b9..913355f 100644
+> --- a/hw/ppc/spapr.c
+> +++ b/hw/ppc/spapr.c
+> @@ -3308,9 +3308,12 @@ static void spapr_machine_2_8_instance_options(Mac=
+hineState *machine)
+> =20
+>  static void spapr_machine_2_8_class_options(MachineClass *mc)
+>  {
+> +    sPAPRMachineClass *smc =3D SPAPR_MACHINE_CLASS(mc);
 > +
-> +    for (i = 0; i < ARRAY_SIZE(feats); i++) {
-> +        set_bit(feats[i], fbm);
+>      spapr_machine_2_9_class_options(mc);
+>      SET_MACHINE_COMPAT(mc, SPAPR_COMPAT_2_8);
+>      mc->numa_mem_align_shift =3D 23;
+> +    smc->pre_2_9_cas_pvr =3D true;
+>  }
+> =20
+>  DEFINE_SPAPR_MACHINE(2_8, "2.8", false);
+> diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
+> index 007ae8d..4937019 100644
+> --- a/hw/ppc/spapr_hcall.c
+> +++ b/hw/ppc/spapr_hcall.c
+> @@ -1047,6 +1047,89 @@ static target_ulong h_signal_sys_reset(PowerPCCPU =
+*cpu,
+>      }
+>  }
+> =20
+> +/*
+> + * Old logic for PVR negotiation, used old <2.9 machine types for
+
+s/used old/used by old/
+
+> + * compatibility with old qemu versions
+> + */
+> +#define get_compat_level(cpuver) (                  \
+> +        ((cpuver) =3D=3D CPU_POWERPC_LOGICAL_2_05) ? 2050 : \
+> +        ((cpuver) =3D=3D CPU_POWERPC_LOGICAL_2_06) ? 2060 :  \
+> +        ((cpuver) =3D=3D CPU_POWERPC_LOGICAL_2_06_PLUS) ? 2061 :    \
+> +        ((cpuver) =3D=3D CPU_POWERPC_LOGICAL_2_07) ? 2070 : 0)
+> +
+> +static void cas_handle_compat_cpu(PowerPCCPUClass *pcc, uint32_t pvr,
+> +                                  unsigned max_lvl, unsigned *compat_lvl,
+> +                                  unsigned *compat_pvr)
+> +{
+> +    unsigned lvl =3D get_compat_level(pvr);
+> +    bool is205, is206, is207;
+> +
+> +    if (!lvl) {
+> +        return;
+> +    }
+> +
+> +    /* If it is a logical PVR, try to determine the highest level */
+> +    is205 =3D (pcc->pcr_supported & PCR_COMPAT_2_05) &&
+> +        (lvl =3D=3D get_compat_level(CPU_POWERPC_LOGICAL_2_05));
+> +    is206 =3D (pcc->pcr_supported & PCR_COMPAT_2_06) &&
+> +        ((lvl =3D=3D get_compat_level(CPU_POWERPC_LOGICAL_2_06)) ||
+> +         (lvl =3D=3D get_compat_level(CPU_POWERPC_LOGICAL_2_06_PLUS)));
+> +    is207 =3D (pcc->pcr_supported & PCR_COMPAT_2_07) &&
+> +        (lvl =3D=3D get_compat_level(CPU_POWERPC_LOGICAL_2_07));
+> +
+> +    if (is205 || is206 || is207) {
+> +        if (!max_lvl) {
+> +            /* User did not set the level, choose the highest */
+> +            if (*compat_lvl <=3D lvl) {
+> +                *compat_lvl =3D lvl;
+> +                *compat_pvr =3D pvr;
+> +            }
+> +        } else if (max_lvl >=3D lvl) {
+> +            /* User chose the level, don't set higher than this */
+> +            *compat_lvl =3D lvl;
+> +            *compat_pvr =3D pvr;
+> +        }
 > +    }
 > +}
 > +
->  static S390CPUModel *get_max_cpu_model(Error **errp)
+> +static uint32_t cas_check_pvr_pre_2_9(PowerPCCPU *cpu, target_ulong list,
+
+Same remark as for cas_check_pvr() in patch 1.
+
+> +                                      Error **errp)
+> +{
+> +    PowerPCCPUClass *pcc =3D POWERPC_CPU_GET_CLASS(cpu);
+> +    int counter;
+> +    unsigned max_lvl =3D get_compat_level(cpu->max_compat);
+> +    bool cpu_match =3D false;
+> +    unsigned compat_lvl =3D 0, compat_pvr =3D 0;
+> +
+> +    for (counter =3D 0; counter < 512; ++counter) {
+> +        uint32_t pvr, pvr_mask;
+> +
+> +        pvr_mask =3D ldl_be_phys(&address_space_memory, list);
+> +        pvr =3D ldl_be_phys(&address_space_memory, list + 4);
+> +        list +=3D 8;
+> +
+> +        if (~pvr_mask & pvr) {
+> +            break; /* Terminator record */
+> +        }
+> +
+> +        trace_spapr_cas_pvr_try(pvr);
+> +        if (!max_lvl &&
+> +            ((cpu->env.spr[SPR_PVR] & pvr_mask) =3D=3D (pvr & pvr_mask))=
+) {
+> +            cpu_match =3D true;
+> +            compat_pvr =3D 0;
+> +        } else if (pvr =3D=3D cpu->compat_pvr) {
+> +            cpu_match =3D true;
+> +            compat_pvr =3D cpu->compat_pvr;
+> +        } else if (!cpu_match) {
+> +            cas_handle_compat_cpu(pcc, pvr, max_lvl, &compat_lvl, &compa=
+t_pvr);
+> +        }
+> +    }
+> +
+> +    trace_spapr_cas_pvr(cpu->compat_pvr, cpu_match, compat_pvr);
+> +
+> +    return compat_pvr;
+> +}
+> +
+>  static uint32_t cas_check_pvr(PowerPCCPU *cpu, target_ulong list,
+>                                Error **errp)
 >  {
->      static S390CPUModel max_model;
-> @@ -670,10 +688,11 @@ static S390CPUModel *get_max_cpu_model(Error **errp)
->      if (kvm_enabled()) {
->          kvm_s390_get_host_cpu_model(&max_model, errp);
->      } else {
-> -        /* TCG emulates a z900 */
-> +        /* TCG emulates a z900 (with some additional features) */
->          max_model.def = &s390_cpu_defs[0];
->          bitmap_copy(max_model.features, max_model.def->default_feat,
->                      S390_FEAT_MAX);
-> +        add_qemu_cpu_model_features(max_model.features);
->      }
->      if (!*errp) {
->          cached = true;
-> @@ -925,11 +944,15 @@ static void s390_host_cpu_model_initfn(Object *obj)
->  
->  static void s390_qemu_cpu_model_initfn(Object *obj)
+> @@ -1099,6 +1182,7 @@ static target_ulong h_client_architecture_support(P=
+owerPCCPU *cpu,
+>                                                    target_ulong opcode,
+>                                                    target_ulong *args)
 >  {
-> +    static S390CPUDef s390_qemu_cpu_defs;
->      S390CPU *cpu = S390_CPU(obj);
->  
->      cpu->model = g_malloc0(sizeof(*cpu->model));
-> -    /* TCG emulates a z900 */
-> -    cpu->model->def = &s390_cpu_defs[0];
-> +    /* TCG emulates a z900 (with some additional features) */
-> +    memcpy(&s390_qemu_cpu_defs, &s390_cpu_defs[0], sizeof(s390_qemu_cpu_defs));
-> +    add_qemu_cpu_model_features(s390_qemu_cpu_defs.default_feat);
-> +    add_qemu_cpu_model_features(s390_qemu_cpu_defs.full_feat);
-> +    cpu->model->def = &s390_qemu_cpu_defs;
->      bitmap_copy(cpu->model->features, cpu->model->def->default_feat,
->                  S390_FEAT_MAX);
->  }
+> +    sPAPRMachineClass *smc =3D SPAPR_MACHINE_GET_CLASS(spapr);
+>      /* @ov_table points to the first option vector */
+>      target_ulong ov_table =3D ppc64_phys_to_real(args[0]);
+>      uint32_t cas_pvr;
+> @@ -1106,7 +1190,11 @@ static target_ulong h_client_architecture_support(=
+PowerPCCPU *cpu,
+>      bool guest_radix;
+>      Error *local_err =3D NULL;
+> =20
+> -    cas_pvr =3D cas_check_pvr(cpu, ov_table, &local_err);
+> +    if (smc->pre_2_9_cas_pvr) {
+> +        cas_pvr =3D cas_check_pvr_pre_2_9(cpu, ov_table, &local_err);
+> +    } else {
+> +        cas_pvr =3D cas_check_pvr(cpu, ov_table, &local_err);
+> +    }
+>      if (local_err) {
+>          error_report_err(local_err);
+>          return H_HARDWARE;
+> diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
+> index 5802f88..0863a41 100644
+> --- a/include/hw/ppc/spapr.h
+> +++ b/include/hw/ppc/spapr.h
+> @@ -52,6 +52,7 @@ struct sPAPRMachineClass {
+>      /*< public >*/
+>      bool dr_lmb_enabled;       /* enable dynamic-reconfig/hotplug of LMB=
+s */
+>      bool use_ohci_by_default;  /* use USB-OHCI instead of XHCI */
+> +    bool pre_2_9_cas_pvr;      /* Use old logic for PVR compat negotiati=
+on */
+>      const char *tcg_default_cpu; /* which (TCG) CPU to simulate by defau=
+lt */
+>      void (*phb_placement)(sPAPRMachineState *spapr, uint32_t index,
+>                            uint64_t *buid, hwaddr *pio,=20
 
-Otherwise it looks fine to me.
 
-Reviewed-by: Aurelien Jarno <aurelien@aurel32.net>
+--Sig_/CqC0qQ+gfsl+Zz=Xy/DoWlt
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
 
--- 
-Aurelien Jarno                          GPG: 4096R/1DDD8C9B
-aurelien@aurel32.net                 http://www.aurel32.net
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iEYEARECAAYFAlkcex4ACgkQAvw66wEB28ILNQCfRa3EPa2Wj886ao1etPU06n7s
+WHMAn3W2EqPnx1ad1CZyXcFv3rAZArjd
+=dnUd
+-----END PGP SIGNATURE-----
+
+--Sig_/CqC0qQ+gfsl+Zz=Xy/DoWlt--
