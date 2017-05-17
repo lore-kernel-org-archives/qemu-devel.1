@@ -1,33 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55114)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55864)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dB1mR-0007BC-K9
-	for qemu-devel@nongnu.org; Wed, 17 May 2017 12:26:32 -0400
+	(envelope-from <groug@kaod.org>) id 1dB1pl-0008Lh-KW
+	for qemu-devel@nongnu.org; Wed, 17 May 2017 12:29:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dB1mN-0006wt-LD
-	for qemu-devel@nongnu.org; Wed, 17 May 2017 12:26:31 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:48876)
+	(envelope-from <groug@kaod.org>) id 1dB1ph-0000EC-NN
+	for qemu-devel@nongnu.org; Wed, 17 May 2017 12:29:57 -0400
+Received: from 5.mo3.mail-out.ovh.net ([87.98.178.36]:46421)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dB1mN-0006wC-CZ
-	for qemu-devel@nongnu.org; Wed, 17 May 2017 12:26:27 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 4A92213A60
-	for <qemu-devel@nongnu.org>; Wed, 17 May 2017 16:26:26 +0000 (UTC)
-From: Markus Armbruster <armbru@redhat.com>
-References: <20170509173559.31598-1-marcandre.lureau@redhat.com>
-	<20170509173559.31598-9-marcandre.lureau@redhat.com>
-	<87pof86750.fsf@dusky.pond.sub.org>
-Date: Wed, 17 May 2017 18:26:22 +0200
-In-Reply-To: <87pof86750.fsf@dusky.pond.sub.org> (Markus Armbruster's message
-	of "Tue, 16 May 2017 19:31:07 +0200")
-Message-ID: <87d1b71mc1.fsf@dusky.pond.sub.org>
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1dB1ph-0000Cf-GL
+	for qemu-devel@nongnu.org; Wed, 17 May 2017 12:29:53 -0400
+Received: from player797.ha.ovh.net (b9.ovh.net [213.186.33.59])
+	by mo3.mail-out.ovh.net (Postfix) with ESMTP id A214ACF501
+	for <qemu-devel@nongnu.org>; Wed, 17 May 2017 18:29:45 +0200 (CEST)
+Date: Wed, 17 May 2017 18:29:38 +0200
+From: Greg Kurz <groug@kaod.org>
+Message-ID: <20170517182938.0c7f366e@bahia.lan>
+In-Reply-To: <2c0e99ce-f3cb-90e8-baed-8fad9d39455b@redhat.com>
+References: <1494405683-20877-1-git-send-email-pradeep.jagadeesh@huawei.com>
+	<1494405683-20877-5-git-send-email-pradeep.jagadeesh@huawei.com>
+	<6a035cd9-34f9-c1f5-e986-404daf941641@redhat.com>
+	<57a24e21-0864-16d3-1bce-ad801875ea9f@huawei.com>
+	<2c0e99ce-f3cb-90e8-baed-8fad9d39455b@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 08/17] qapi: update the qobject visitor to
- use QUInt
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	boundary="Sig_//xD.g4qEpZG5ziA.e1Km73t";
+	protocol="application/pgp-signature"
+Subject: Re: [Qemu-devel] [PATCH v4 4/4] fsdev: QMP interface for throttling
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,98 +34,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
-Cc: qemu-devel@nongnu.org, Eric Blake <eblake@redhat.com>
+To: Eric Blake <eblake@redhat.com>
+Cc: Pradeep Jagadeesh <pradeep.jagadeesh@huawei.com>, Pradeep Jagadeesh <pradeepkiruvale@gmail.com>, alberto garcia <berto@igalia.com>, jani kokkonen <jani.kokkonen@huawei.com>, qemu-devel@nongnu.org
 
-Markus Armbruster <armbru@redhat.com> writes:
+--Sig_//xD.g4qEpZG5ziA.e1Km73t
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-> On the subject: there is no such thing as "QUInt".  I guess you mean
-> "uint type" (like in PATCH 06's subject).  Could also say "QNUM_U64".
->
-> Apropos subject: humor me, and start your subjects with a capital
-> letter, like this:
->
->     qapi: Update the qobject visitor ...
->
-> Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
->
->> Switch to use QNum/uint where appropriate to remove i64 limitation.
->>
->> The input visitor will cast i64 input to u64 for compatibility
->> reasons (existing json QMP client already use negative i64 for large
->> u64, and expect an implicit cast in qemu).
->>
->> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
->> ---
->>  qapi/qobject-input-visitor.c        | 13 +++++++++++--
->>  qapi/qobject-output-visitor.c       |  3 +--
->>  tests/test-qobject-output-visitor.c | 21 ++++++++++++++++-----
->>  3 files changed, 28 insertions(+), 9 deletions(-)
->>
->> diff --git a/qapi/qobject-input-visitor.c b/qapi/qobject-input-visitor.c
->> index 785949ebab..72cefcf677 100644
->> --- a/qapi/qobject-input-visitor.c
->> +++ b/qapi/qobject-input-visitor.c
->> @@ -420,9 +420,9 @@ static void qobject_input_type_int64_keyval(Visitor =
-*v, const char *name,
->>  static void qobject_input_type_uint64(Visitor *v, const char *name,
->>                                        uint64_t *obj, Error **errp)
->>  {
->> -    /* FIXME: qobject_to_qnum mishandles values over INT64_MAX */
->>      QObjectInputVisitor *qiv =3D to_qiv(v);
->>      QObject *qobj =3D qobject_input_get_object(qiv, name, true, errp);
->> +    Error *err =3D NULL;
->>      QNum *qnum;
->>=20=20
->>      if (!qobj) {
->> @@ -435,7 +435,16 @@ static void qobject_input_type_uint64(Visitor *v, c=
-onst char *name,
->>          return;
->>      }
->>=20=20
->> -    *obj =3D qnum_get_int(qnum, errp);
->> +    /* XXX: compatibility case, accept negative values as u64 */
->
-> What does "XXX" signify?
->
->> +    *obj =3D qnum_get_int(qnum, &err);
->> +
->
-> Shouldn't the comment go right here?
+On Wed, 17 May 2017 10:28:33 -0500
+Eric Blake <eblake@redhat.com> wrote:
 
-Nope, I misread the code.
+> On 05/17/2017 09:53 AM, Pradeep Jagadeesh wrote:
+>=20
+> >>> +#ifdef _WIN64
+> >>> +
+> >>> +void qmp_fsdev_set_io_throttle(IOThrottle *arg, Error **errp)
+> >>> +{
+> >>> +  return;
+> >>> +}
+> >>> +
+> >>> +IOThrottleList *qmp_query_fsdev_io_throttle(Error **errp)
+> >>> +{
+> >>> +    abort();
+> >>> +}
+> >>> +
+> >>> +#endif =20
+> >>
+> >> I think you're missing an addition to monitor.c
+> >> qmp_unregister_commands_hack() if you intend for this command to be
+> >> available only on non-windows platforms (and is your #ifdef the correct
+> >> name, or is this a Linux-only feature rather than a non-windows featur=
+e). =20
+> > I had to add this one here because, I was getting some error when I
+> > cross compile for Windows. But I do not have any idea about, do I need
+> > to add in monitor.c or not. =20
+>=20
+> First point: is fsdev a Linux-only feature, or can it be compiled on
+> BSD?  If it is Linux-only, then compiling a stub for Windows will still
+> leave BSD broken, and your #ifdef is wrong.  Fixing compilation on mingw
+> is nice, but not the only platform to worry about.
+>=20
 
-We first try qnum_get_int().  Works for integers between -2^63 and
-2^63-1.  The assignment to *obj adds 2^64 to negative ones.
+fsdev compilation currently depends on CONFIG_VIRTFS which is a Linux-only
+feature for the moment. There was a tentative to support it on Windows hosts
+two years ago but it stayed at the RFC stage.
 
-When it doesn't work, we try qnum_get_uint().  Works for integers
-between 0 and 2^64-1, but only integers between 2^63 and 2^64-1 can
-occur.
+But even on Linux hosts, the current fsdev implementation also depends on
+the target supporting PCI and VIRTIO. We have a fsdev/qemu-fsdev-dummy.c
+file to put stubs so that we don't pull all the code for such targets.
 
->> +    if (err) {
->> +        error_free(err);
->> +        err =3D NULL;
->> +        *obj =3D qnum_get_uint(qnum, &err);
->> +    }
->> +
->> +    error_propagate(errp, err);
->>  }
+Maybe this could be reused for the above stubs as well ?
 
-Let's do this the other way round:
+> Second point: if fsdev is indeed a platform-specific feature, then we
+> don't want to advertise the QMP commands that are useless when running
+> on a platform that doesn't support it. Anywhere you have to add a stub
+> for compilation means you ALSO need to patch monitor.c to unregister the
+> command from being advertised as a valid QMP command.  (If you used
+> #ifdef __LINUX__ to guard the working version, and #ifndef __LINUX__ to
+> declare the stub, then the monitor.c needs an #ifndef section within
+> qmp_unregister_commands_hack() to tell QMP to not advertise the stubs.)
+>=20
 
-    *obj =3D qnum_get_uint(qnum, &err);
-    if (err) {
-        /* Need to accept negative values for backward compatibility */
-        error_free(err);
-        err =3D NULL;
-        *obj =3D qnum_get_int(qnum, &err);
-    }
 
-    error_propagate(errp, err);
+--Sig_//xD.g4qEpZG5ziA.e1Km73t
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
 
-This way, the backward compatibility code is entirely contained in the
-conditional.
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
 
-It's also how I misread the code :)
+iEYEARECAAYFAlkcenIACgkQAvw66wEB28KsEQCfbue3vYU9ztzvPrc5Sb+DKj0J
+IngAn3lyX6EW+RP5EbjGFPiD3LNWv6yy
+=f5cI
+-----END PGP SIGNATURE-----
 
-[...]
+--Sig_//xD.g4qEpZG5ziA.e1Km73t--
