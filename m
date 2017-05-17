@@ -1,25 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35307)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35695)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dAsvJ-0001w3-B9
-	for qemu-devel@nongnu.org; Wed, 17 May 2017 02:59:06 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1dAsxE-0002jP-0n
+	for qemu-devel@nongnu.org; Wed, 17 May 2017 03:01:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dAsvF-0003Tk-W0
-	for qemu-devel@nongnu.org; Wed, 17 May 2017 02:59:05 -0400
-Date: Wed, 17 May 2017 02:58:55 -0400 (EDT)
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <2070505842.8419962.1495004335579.JavaMail.zimbra@redhat.com>
-In-Reply-To: <20170517015530.GD27669@lemon.lan>
-References: <20170516072414.19025-1-famz@redhat.com>
-	<20170516080737.GB27669@lemon.lan>
-	<e780d3d8-43f1-f46d-2858-7554a334246b@redhat.com>
-	<20170516122528.GC27669@lemon.lan>
-	<3799c1f5-5b22-fe05-4c98-4cd76c716551@redhat.com>
-	<20170517015530.GD27669@lemon.lan>
+	(envelope-from <dgibson@ozlabs.org>) id 1dAsxC-00049H-Bi
+	for qemu-devel@nongnu.org; Wed, 17 May 2017 03:01:04 -0400
+Date: Wed, 17 May 2017 16:37:52 +1000
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20170517063752.GI15596@umbus.fritz.box>
+References: <20170426070034.10727-1-david@gibson.dropbear.id.au>
+	<20170426070034.10727-20-david@gibson.dropbear.id.au>
+	<0b2e2d1c-d7ba-7d43-42b5-04ba592bf3e8@redhat.com>
+	<1a7e5576-6464-6d5b-f4a8-44dceb8a17af@kaod.org>
+	<0dc5ffde-39b7-6fd4-dc88-d66789414e4e@redhat.com>
+	<45db5bad-e1f3-d2d0-7014-878391638f6d@kaod.org>
+	<20170516181004.624cf441@bahia.lan>
+	<d8354004-1a76-bc67-cd9c-55a2b95ae142@kaod.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2] virtio: Move memory_listener_unregister
- to .unrealize
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="CNK/L7dwKXQ4Ub8J"
+Content-Disposition: inline
+In-Reply-To: <d8354004-1a76-bc67-cd9c-55a2b95ae142@kaod.org>
+Subject: Re: [Qemu-devel] [PULL 19/48] spapr: allocate the ICPState object
+ from under sPAPRCPUCore
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,135 +31,189 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>
-Cc: Jason Wang <jasowang@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org, qemu-stable@nongnu.org
+To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
+Cc: Greg Kurz <groug@kaod.org>, Laurent Vivier <lvivier@redhat.com>, mdroth@linux.vnet.ibm.com, aik@ozlabs.ru, qemu-devel@nongnu.org, agraf@suse.de, qemu-ppc@nongnu.org, Bharata B Rao <bharata@linux.vnet.ibm.com>
 
 
-> On Tue, 05/16 14:44, Paolo Bonzini wrote:
-> > On 16/05/2017 14:25, Fam Zheng wrote:
-> > > You are right. Having had another look, I think it's because of this:
-> > > VirtIODevice is an embeded member of VirtIOSCSIPCI therefore it is never
-> > > "finalized" through QOM reference directly.  Am I right?
-> > 
-> > What I would expect is:
-> > 
-> > virtio_instance_init_common:
-> > - create the VirtIODevice with refcount 1
-> > - create a child property for the VirtIODevice (refcount is now 2)
-> > - unref the VirtIODevice (refcount is again 1)
-> > 
-> > virtio_pci_realize:
-> > - virtio_pci_bus_new creates the virtio bus
-> > - the virtio bus is added as a child property
-> > 
-> > virtio_scsi_pci_realize:
-> > - qdev_set_parent_bus links the device to the bus (bus and VirtIODevice
-> > refcounts are now 3)
-> > - the VirtIODevice is realized
-> > 
-> > ...
-> > at hot-unplug time:
-> > - the device is unrealized
-> > - the bus is unparented (calling bus_unparent)
-> >   - the device is unparented (calling device_unparent)
-> >     - bus_remove_child is called (bus and VirtIODevice refcounts are now 1)
-> >     - the VirtIODevice child property is deleted by object_unparent and
-> > the VirtIODevice is finalized
-> >   - the bus child property is deleted by object_unparent and the
-> > VirtIODevice is finalized
-> 
-> Sorry I don't understand. From my debugging, VirtIODevice is not finalized,
-> because it is embeded as VirtIOSCSIPCI.vdev.parent_obj.parent_obj, in
-> non-zero offset.
+--CNK/L7dwKXQ4Ub8J
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-It is correct that it's embedded.  But it is added as a child property,
-and when the child property is deleted the refcount should go to zero and
-the VirtIODevice should be deleted too.
+On Wed, May 17, 2017 at 07:50:42AM +0200, C=E9dric Le Goater wrote:
+> On 05/16/2017 06:10 PM, Greg Kurz wrote:
+> > On Tue, 16 May 2017 17:18:27 +0200
+> > C=E9dric Le Goater <clg@kaod.org> wrote:
+> >=20
+> >> On 05/16/2017 02:55 PM, Laurent Vivier wrote:
+> >>> On 16/05/2017 14:50, C=E9dric Le Goater wrote: =20
+> >>>> On 05/16/2017 02:03 PM, Laurent Vivier wrote: =20
+> >>>>> On 26/04/2017 09:00, David Gibson wrote: =20
+> >>>>>> From: C=E9dric Le Goater <clg@kaod.org>
+> >>>>>>
+> >>>>>> Today, all the ICPs are created before the CPUs, stored in an array
+> >>>>>> under the sPAPR machine and linked to the CPU when the core threads
+> >>>>>> are realized. This modeling brings some complexity when a lookup in
+> >>>>>> the array is required and it can be simplified by allocating the I=
+CPs
+> >>>>>> when the CPUs are.
+> >>>>>>
+> >>>>>> This is the purpose of this proposal which introduces a new 'icp_t=
+ype'
+> >>>>>> field under the machine and creates the ICP objects of the right t=
+ype
+> >>>>>> (KVM or not) before the PowerPCCPU object are.
+> >>>>>>
+> >>>>>> This change allows more cleanups : the removal of the icps array u=
+nder
+> >>>>>> the sPAPR machine and the removal of the xics_get_cpu_index_by_dt_=
+id()
+> >>>>>> helper.
+> >>>>>>
+> >>>>>> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
+> >>>>>> Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
+> >>>>>> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+> >>>>>> ---
+> >>>>>>  hw/intc/xics.c          | 11 -----------
+> >>>>>>  hw/ppc/spapr.c          | 47 ++++++++++++++----------------------=
+-----------
+> >>>>>>  hw/ppc/spapr_cpu_core.c | 18 ++++++++++++++----
+> >>>>>>  include/hw/ppc/spapr.h  |  2 +-
+> >>>>>>  include/hw/ppc/xics.h   |  2 --
+> >>>>>>  5 files changed, 29 insertions(+), 51 deletions(-)
+> >>>>>> =20
+> >>>>>
+> >>>>> This commit breaks CPU re-hotplugging with KVM
+> >>>>>
+> >>>>> the sequence "device_add, device_del, device_add" brings to the
+> >>>>> following error message:
+> >>>>>
+> >>>>>     Unable to connect CPUx to kernel XICS: Device or resource busy
+> >>>>>
+> >>>>> It comes from icp_kvm_cpu_setup():
+> >>>>>
+> >>>>> ...
+> >>>>>     ret =3D kvm_vcpu_enable_cap(cs, KVM_CAP_IRQ_XICS, 0, kernel_xic=
+s_fd,
+> >>>>>                               kvm_arch_vcpu_id(cs));
+> >>>>>     if (ret < 0) {
+> >>>>>         error_report("Unable to connect CPU%ld to kernel XICS: %s",
+> >>>>>                      kvm_arch_vcpu_id(cs), strerror(errno));
+> >>>>>         exit(1);
+> >>>>>     }
+> >>>>> ..
+> >>>>>
+> >>>>> It should be protected by cap_irq_xics_enabled:
+> >>>>>
+> >>>>> ...
+> >>>>>     /*
+> >>>>>      * If we are reusing a parked vCPU fd corresponding to the CPU
+> >>>>>      * which was hot-removed earlier we don't have to renable
+> >>>>>      * KVM_CAP_IRQ_XICS capability again.
+> >>>>>      */
+> >>>>>     if (icp->cap_irq_xics_enabled) {
+> >>>>>         return;
+> >>>>>     }
+> >>>>>
+> >>>>> ...
+> >>>>>     ret =3D kvm_vcpu_enable_cap(...);
+> >>>>> ...
+> >>>>>     icp->cap_irq_xics_enabled =3D true;
+> >>>>> ...
+> >>>>>
+> >>>>> But since this commit, "icp" is a new object on each call:
+> >>>>>
+> >>>>> spapr_cpu_core_realize_child()
+> >>>>> ...
+> >>>>>     obj =3D object_new(spapr->icp_type);
+> >>>>> ...
+> >>>>>     xics_cpu_setup(XICS_FABRIC(spapr), cpu, ICP(obj));
+> >>>>>     ...
+> >>>>>             icpc->cpu_setup(icp, cpu); -> icp_kvm_cpu_setup()
+> >>>>>     ...
+> >>>>> ...
+> >>>>>
+> >>>>> and "cap_irq_xics_enabled" is reinitialized.
+> >>>>>
+> >>>>> Any idea how to fix that? =20
+> >>>>
+> >>>> it seems that a cleanup is not done in the kernel. We are missing
+> >>>> a way to call kvmppc_xics_free_icp() from QEMU. Today the only
+> >>>> way is to destroy the vcpu.  =20
+> >>>
+> >>> The commit introducing this hack, for reference:
+> >>>
+> >>> commit a45863bda90daa8ec39e5a312b9734fd4665b016
+> >>> Author: Bharata B Rao <bharata@linux.vnet.ibm.com>
+> >>> Date:   Thu Jul 2 16:23:20 2015 +1000
+> >>>
+> >>>     xics_kvm: Don't enable KVM_CAP_IRQ_XICS if already enabled
+> >>>    =20
+> >>>     When supporting CPU hot removal by parking the vCPU fd and reusing
+> >>>     it during hotplug again, there can be cases where we try to reena=
+ble
+> >>>     KVM_CAP_IRQ_XICS CAP for the vCPU for which it was already enable=
+d.
+> >>>     Introduce a boolean member in ICPState to track this and don't
+> >>>     reenable the CAP if it was already enabled earlier.
+> >>>    =20
+> >>>     Re-enabling this CAP should ideally work, but currently it result=
+s in
+> >>>     kernel trying to create and associate ICP with this vCPU and that
+> >>>     fails since there is already an ICP associated with it. Hence this
+> >>>     patch is needed to work around this problem in the kernel.
+> >>>    =20
+> >>>     This change allows CPU hot removal to work for sPAPR.
+> >>>    =20
+> >>>     Signed-off-by: Bharata B Rao <bharata@linux.vnet.ibm.com>
+> >>>     Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
+> >>>     Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+> >>>     Signed-off-by: Alexander Graf <agraf@suse.de> =20
+> >>
+> >> OK.=20
+> >>
+> >> Greg is looking at re-adding the ICPState array because of a=20
+> >> migration issue with older machines. We might need to do so=20
+> >> unconditionally ...
+> >>
+> >=20
+> > That would be a pity to carry on with the pre-allocated ICPStates for
+> > new machine types just because of that... What about keeping track
+> > of all the cap_irq_xics_enabled flags in a separate max_cpus sized
+> > static array ?
+>=20
+> Could we use 'cpu->unplug' instead ?
 
-The child property is deleted when bus_unparent calls object_unparent:
+I've only half followed this discussion, but fwiw I prefer the idea of
+"parking" in-kernel ICP objects, similarly to the way we do for
+removed VCPUs, rather than going back to keeping ICP objects around
+indefinitely and unconditionally.
 
-    while ((kid = QTAILQ_FIRST(&bus->children)) != NULL) {
-        DeviceState *dev = kid->child;
-        object_unparent(OBJECT(dev));
-    }
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
 
-and in turn bus_unparent is called by the VirtIOSCSIPCI's unparent
-callback (device_unparent):
+--CNK/L7dwKXQ4Ub8J
+Content-Type: application/pgp-signature; name="signature.asc"
 
-    while (dev->num_child_bus) {
-        bus = QLIST_FIRST(&dev->child_bus);
-        object_unparent(OBJECT(bus));
-    }
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
 
-Thanks,
+iQIcBAEBCAAGBQJZG+++AAoJEGw4ysog2bOSxLwP/2o+f05GSPfVKZbN+G7SXFXi
+NRin28Y4WEKov72RdnwTHdaGnvYssAcj1YDK+hkszqNAPR3Jo0UW7jAjvfcl+wd8
+0cmZoB8c9Dc4aAeGV/5voql0gUJfVOkwK2f3zWrE8R/vVZeSeNVSG6GTg91hgi5E
+eWVUq7F//M1NUWQAOPrS/BdL8+Dl7gMGhm9+SWhBxcDMm5NvMynUvWnjPYNl3S0x
+q21JD9vIJCti7u9zxmdDIcCsy/1GaRDB4zfQBbxDR42rQoUhZYiAKdbY74YDqgxh
+hOosF5Oa/LUH1g8eWsaCB83uhuFfOOgTf98u8k8PZffp8iWqhY00e8f/NVShmGtL
+3rkrENQV6C5c3JlrI3JrxHwW+/XzQD9Ux50di1DLp1ndsvwXkY0CvnK4GyWSf94J
+8+7GCuPtOjIWKpVcU2SofN8WGbDEcsQ74x/saGs1ESLgtuTIshvUI5RH7Y1JxkCU
+zQ8B/Igzj3BNJwfIEp/nyNlTiW+Er/RUcT+6sX78f39fQPgjz/YD/yyHQlIXX72N
+vjAKvCWi+tk/fbw/ttZVHb7eKnR9QI1g/lt+Lu83miwXVgQfJF0AC6PCG+nCwlN5
+zq0oFnp3RCX/LTqcef2OOqMHRrFOlCQfE7pblD2YR/5OV/kIsFg+hjuBksBL61bW
+RTtDmRIHSxIXkjsYkB7Z
+=BZ0Z
+-----END PGP SIGNATURE-----
 
-Paolo
-
-
-> 
-> As I understand it, it's the VirtIOSCSIPCI instance that is being finalized,
-> but
-> not VirtIODevice. Because the object_unparent is actually called on the
-> containing object:
-> 
-> Thread 4 "qemu-system-x86" hit Breakpoint 1, device_unparent
-> (obj=0x559449824f40) at /stor/work/qemu/hw/core/qdev.c:1078
-> 1078	    DeviceState *dev = DEVICE(obj);
-> (gdb) bt
-> #0  0x00005594455f11df in device_unparent (obj=0x559449824f40) at
-> /stor/work/qemu/hw/core/qdev.c:1078
-> #1  0x00005594457be582 in object_finalize_child_property (obj=0x559447f0d320,
-> name=0x5594498306e0 "scsi1", opaque=0x559449824f40) at
-> /stor/work/qemu/qom/object.c:1369
-> #2  0x00005594457bc34a in object_property_del_child (obj=0x559447f0d320,
-> child=0x559449824f40, errp=0x0) at /stor/work/qemu/qom/object.c:428
-> #3  0x00005594457bc42a in object_unparent (obj=0x559449824f40) at
-> /stor/work/qemu/qom/object.c:447
-> #4  0x00005594455acf19 in acpi_pcihp_eject_slot (s=0x55944967c440, bsel=0,
-> slots=16) at /stor/work/qemu/hw/acpi/pcihp.c:138
-> #5  0x00005594455ad542 in pci_write (opaque=0x55944967c440, addr=8, data=16,
-> size=4) at /stor/work/qemu/hw/acpi/pcihp.c:272
-> #6  0x0000559445437667 in memory_region_write_accessor (mr=0x55944967d050,
-> addr=8, value=0x7fdfa7569838, size=4, shift=0, mask=4294967295, attrs=...)
->     at /stor/work/qemu/memory.c:526
-> #7  0x000055944543787f in access_with_adjusted_size (addr=8,
-> value=0x7fdfa7569838, size=4, access_size_min=1, access_size_max=4, access=
->     0x55944543757d <memory_region_write_accessor>, mr=0x55944967d050,
->     attrs=...) at /stor/work/qemu/memory.c:592
-> #8  0x0000559445439fdb in memory_region_dispatch_write (mr=0x55944967d050,
-> addr=8, data=16, size=4, attrs=...) at /stor/work/qemu/memory.c:1319
-> #9  0x00005594453dfa77 in address_space_write_continue (as=0x559445f1fce0
-> <address_space_io>, addr=44552, attrs=..., buf=0x7fdfb77d2000 "\020", len=4,
-> addr1=8, l=4, mr=0x55944967d050) at /stor/work/qemu/exec.c:2822
-> #10 0x00005594453dfc31 in address_space_write (as=0x559445f1fce0
-> <address_space_io>, addr=44552, attrs=..., buf=0x7fdfb77d2000 "\020", len=4)
-> at /stor/work/qemu/exec.c:2879
-> #11 0x00005594453dffbd in address_space_rw (as=0x559445f1fce0
-> <address_space_io>, addr=44552, attrs=..., buf=0x7fdfb77d2000 "\020", len=4,
-> is_write=true)
->     at /stor/work/qemu/exec.c:2981
-> #12 0x0000559445433797 in kvm_handle_io (port=44552, attrs=...,
-> data=0x7fdfb77d2000, direction=1, size=4, count=1) at
-> /stor/work/qemu/kvm-all.c:1803
-> #13 0x0000559445433e87 in kvm_cpu_exec (cpu=0x559447f0d560) at
-> /stor/work/qemu/kvm-all.c:2032
-> #14 0x0000559445419cc6 in qemu_kvm_cpu_thread_fn (arg=0x559447f0d560) at
-> /stor/work/qemu/cpus.c:1118
-> #15 0x00007fdfb56ba6ca in start_thread () at /lib64/libpthread.so.0
-> #16 0x00007fdfb1382f7f in clone () at /lib64/libc.so.6
-> (gdb) p *obj.class.type
-> $1 = {name = 0x559447e57a20 "virtio-scsi-pci", class_size = 280,
-> instance_size = 34688, class_init = 0x55944573573e
-> <virtio_scsi_pci_class_init>, class_base_init = 0x0,
->   class_finalize = 0x0, class_data = 0x0, instance_init = 0x559445735837
->   <virtio_scsi_pci_instance_init>, instance_post_init = 0x0,
->   instance_finalize = 0x0,
->   abstract = false, parent = 0x559447e57a40 "virtio-pci", parent_type =
->   0x559447e57520, class = 0x559447e7add0, num_interfaces = 0, interfaces =
->   {{
->       typename = 0x0} <repeats 32 times>}}
-> 
-> Am I missing something?
-> 
-> Fam
-> 
+--CNK/L7dwKXQ4Ub8J--
