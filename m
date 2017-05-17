@@ -1,24 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48199)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48173)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1dB6l1-0000sF-LS
-	for qemu-devel@nongnu.org; Wed, 17 May 2017 17:45:24 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1dB6l0-0005O9-Ai
+	(envelope-from <mst@redhat.com>) id 1dB6l0-0000qz-6v
 	for qemu-devel@nongnu.org; Wed, 17 May 2017 17:45:23 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:35812)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1dB6l0-0005Nu-24
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <mst@redhat.com>) id 1dB6ky-0005NR-N0
 	for qemu-devel@nongnu.org; Wed, 17 May 2017 17:45:22 -0400
-Date: Thu, 18 May 2017 00:45:18 +0300
+Date: Thu, 18 May 2017 00:45:01 +0300
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <1495057396-13387-6-git-send-email-mst@redhat.com>
+Message-ID: <1495057396-13387-3-git-send-email-mst@redhat.com>
 References: <1495057396-13387-1-git-send-email-mst@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 In-Reply-To: <1495057396-13387-1-git-send-email-mst@redhat.com>
-Subject: [Qemu-devel] [PULL 05/13] pc/fwcfg: unbreak migration from qemu-2.5
- and qemu-2.6 during firmware boot
+Subject: [Qemu-devel] [PULL 02/13] hw/arm/virt: generate 64-bit addressable
+ ACPI objects
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,135 +24,190 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Igor Mammedov <imammedo@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Laszlo Ersek <lersek@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Andrew Jones <drjones@redhat.com>, Laszlo Ersek <lersek@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Shannon Zhao <zhaoshenglong@huawei.com>, qemu-arm@nongnu.org
 
-From: Igor Mammedov <imammedo@redhat.com>
+From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 
-Since 2.7 commit (b2a575a Add optionrom compatible with fw_cfg DMA version)
-regressed migration during firmware exection time by
-abusing fwcfg.dma_enabled property to decide loading
-dma version of option rom AND by mistake disabling DMA
-for 2.6 and earlier globally instead of only for option rom.
+Our current ACPI table generation code limits the placement of ACPI
+tables to 32-bit addressable memory, in order to be able to emit the
+root pointer (RSDP) and root table (RSDT) using table types from the
+ACPI 1.0 days.
 
-so 2.6 machine type guest is broken when it already runs
-firmware in DMA mode but migrated to qemu-2.7(pc-2.6)
-at that time;
+Since ARM was not supported by ACPI before version 5.0, it makes sense
+to lift this restriction. This is not crucial for mach-virt, which is
+guaranteed to have some memory available below the 4 GB mark, but it
+is a nice to have for QEMU machines that do not have any 32-bit
+addressable memory, which is not uncommon for real world 64-bit ARM
+systems.
 
-a) qemu-2.6:pc2.6 (fwcfg.dma=on,firmware=dma,oprom=ioport)
-b) qemu-2.7:pc2.6 (fwcfg.dma=off,firmware=ioport,oprom=ioport)
+Since we already emit a version of the RSDP root pointer that has a
+secondary 64-bit wide address field for the 64-bit root table (XSDT),
+all we need to do is replace the RSDT generation with the generation
+of an XSDT table, and use a different slot in the FADT table to refer
+to the DSDT.
 
-  to:   a     b
-from
-a       OK   FAIL
-b       OK   OK
-
-So we currently have broken forward migration from
-qemu-2.6 to qemu-2.[789] that however could be fixed
-for 2.10 by re-enabling DMA for 2.[56] machine types
-and allowing dma capable option rom only since 2.7.
-As result qemu should end up with:
-
-c) qemu-2.10:pc2.6 (fwcfg.dma=on,firmware=dma,oprom=ioport)
-
-   to:  a     b    c
-from
-a      OK   FAIL  OK
-b      OK   OK    OK
-c      OK   FAIL  OK
-
-where forward migration from qemu-2.6 to qemu-2.10 should
-work again leaving only qemu-2.[789]:pc-2.6 broken.
-
-Reported-by: Eduardo Habkost <ehabkost@redhat.com>
-Analyzed-by: Laszlo Ersek <lersek@redhat.com>
-Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-Reviewed-by: Laszlo Ersek <lersek@redhat.com>
-Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
+Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Reviewed-by: Andrew Jones <drjones@redhat.com>
+Acked-by: Laszlo Ersek <lersek@redhat.com>
 Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+Acked-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- include/hw/i386/pc.h | 7 +++----
- hw/i386/pc.c         | 9 ++++-----
- hw/i386/pc_piix.c    | 1 +
- hw/i386/pc_q35.c     | 1 +
- 4 files changed, 9 insertions(+), 9 deletions(-)
+ include/hw/acpi/acpi-defs.h | 11 +++++++++++
+ include/hw/acpi/aml-build.h |  3 +++
+ hw/acpi/aml-build.c         | 27 +++++++++++++++++++++++++++
+ hw/arm/virt-acpi-build.c    | 26 +++++++++++++-------------
+ 4 files changed, 54 insertions(+), 13 deletions(-)
 
-diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
-index 416aaa5..d0183c4 100644
---- a/include/hw/i386/pc.h
-+++ b/include/hw/i386/pc.h
-@@ -151,6 +151,9 @@ struct PCMachineClass {
-     bool save_tsc_khz;
-     /* generate legacy CPU hotplug AML */
-     bool legacy_cpu_hotplug;
+diff --git a/include/hw/acpi/acpi-defs.h b/include/hw/acpi/acpi-defs.h
+index 93e1eba..91bae7f 100644
+--- a/include/hw/acpi/acpi-defs.h
++++ b/include/hw/acpi/acpi-defs.h
+@@ -233,6 +233,17 @@ struct AcpiRsdtDescriptorRev1
+ typedef struct AcpiRsdtDescriptorRev1 AcpiRsdtDescriptorRev1;
+ 
+ /*
++ * ACPI 2.0 eXtended System Description Table (XSDT)
++ */
++struct AcpiXsdtDescriptorRev2
++{
++    ACPI_TABLE_HEADER_DEF       /* ACPI common table header */
++    uint64_t table_offset_entry[0];  /* Array of pointers to other */
++    /* ACPI tables */
++} QEMU_PACKED;
++typedef struct AcpiXsdtDescriptorRev2 AcpiXsdtDescriptorRev2;
 +
-+    /* use DMA capable linuxboot option rom */
-+    bool linuxboot_dma_enabled;
- };
++/*
+  * ACPI 1.0 Firmware ACPI Control Structure (FACS)
+  */
+ struct AcpiFacsDescriptorRev1
+diff --git a/include/hw/acpi/aml-build.h b/include/hw/acpi/aml-build.h
+index 00c21f1..eb07c2d 100644
+--- a/include/hw/acpi/aml-build.h
++++ b/include/hw/acpi/aml-build.h
+@@ -381,6 +381,9 @@ void acpi_build_tables_cleanup(AcpiBuildTables *tables, bool mfre);
+ void
+ build_rsdt(GArray *table_data, BIOSLinker *linker, GArray *table_offsets,
+            const char *oem_id, const char *oem_table_id);
++void
++build_xsdt(GArray *table_data, BIOSLinker *linker, GArray *table_offsets,
++           const char *oem_id, const char *oem_table_id);
  
- #define TYPE_PC_MACHINE "generic-pc-machine"
-@@ -438,10 +441,6 @@ bool e820_get_entry(int, uint32_t, uint64_t *, uint64_t *);
- #define PC_COMPAT_2_6 \
-     HW_COMPAT_2_6 \
-     {\
--        .driver   = "fw_cfg_io",\
--        .property = "dma_enabled",\
--        .value    = "off",\
--    },{\
-         .driver   = TYPE_X86_CPU,\
-         .property = "cpuid-0xb",\
-         .value    = "off",\
-diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-index f3b372a..8063241 100644
---- a/hw/i386/pc.c
-+++ b/hw/i386/pc.c
-@@ -1047,12 +1047,10 @@ static void load_linux(PCMachineState *pcms,
-     fw_cfg_add_i32(fw_cfg, FW_CFG_SETUP_SIZE, setup_size);
-     fw_cfg_add_bytes(fw_cfg, FW_CFG_SETUP_DATA, setup, setup_size);
+ int
+ build_append_named_dword(GArray *array, const char *name_format, ...)
+diff --git a/hw/acpi/aml-build.c b/hw/acpi/aml-build.c
+index c6f2032..4ddfb68 100644
+--- a/hw/acpi/aml-build.c
++++ b/hw/acpi/aml-build.c
+@@ -1599,6 +1599,33 @@ build_rsdt(GArray *table_data, BIOSLinker *linker, GArray *table_offsets,
+                  (void *)rsdt, "RSDT", rsdt_len, 1, oem_id, oem_table_id);
+ }
  
--    if (fw_cfg_dma_enabled(fw_cfg)) {
-+    option_rom[nb_option_roms].bootindex = 0;
-+    option_rom[nb_option_roms].name = "linuxboot.bin";
-+    if (pcmc->linuxboot_dma_enabled && fw_cfg_dma_enabled(fw_cfg)) {
-         option_rom[nb_option_roms].name = "linuxboot_dma.bin";
--        option_rom[nb_option_roms].bootindex = 0;
--    } else {
--        option_rom[nb_option_roms].name = "linuxboot.bin";
--        option_rom[nb_option_roms].bootindex = 0;
++/* Build xsdt table */
++void
++build_xsdt(GArray *table_data, BIOSLinker *linker, GArray *table_offsets,
++           const char *oem_id, const char *oem_table_id)
++{
++    int i;
++    unsigned xsdt_entries_offset;
++    AcpiXsdtDescriptorRev2 *xsdt;
++    const unsigned table_data_len = (sizeof(uint64_t) * table_offsets->len);
++    const unsigned xsdt_entry_size = sizeof(xsdt->table_offset_entry[0]);
++    const size_t xsdt_len = sizeof(*xsdt) + table_data_len;
++
++    xsdt = acpi_data_push(table_data, xsdt_len);
++    xsdt_entries_offset = (char *)xsdt->table_offset_entry - table_data->data;
++    for (i = 0; i < table_offsets->len; ++i) {
++        uint64_t ref_tbl_offset = g_array_index(table_offsets, uint32_t, i);
++        uint64_t xsdt_entry_offset = xsdt_entries_offset + xsdt_entry_size * i;
++
++        /* xsdt->table_offset_entry to be filled by Guest linker */
++        bios_linker_loader_add_pointer(linker,
++            ACPI_BUILD_TABLE_FILE, xsdt_entry_offset, xsdt_entry_size,
++            ACPI_BUILD_TABLE_FILE, ref_tbl_offset);
++    }
++    build_header(linker, table_data,
++                 (void *)xsdt, "XSDT", xsdt_len, 1, oem_id, oem_table_id);
++}
++
+ void build_srat_memory(AcpiSratMemoryAffinity *numamem, uint64_t base,
+                        uint64_t len, int node, MemoryAffinityFlags flags)
+ {
+diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
+index 0835e59..6e5f339 100644
+--- a/hw/arm/virt-acpi-build.c
++++ b/hw/arm/virt-acpi-build.c
+@@ -364,12 +364,12 @@ static void acpi_dsdt_add_power_button(Aml *scope)
+ 
+ /* RSDP */
+ static GArray *
+-build_rsdp(GArray *rsdp_table, BIOSLinker *linker, unsigned rsdt_tbl_offset)
++build_rsdp(GArray *rsdp_table, BIOSLinker *linker, unsigned xsdt_tbl_offset)
+ {
+     AcpiRsdpDescriptor *rsdp = acpi_data_push(rsdp_table, sizeof *rsdp);
+-    unsigned rsdt_pa_size = sizeof(rsdp->rsdt_physical_address);
+-    unsigned rsdt_pa_offset =
+-        (char *)&rsdp->rsdt_physical_address - rsdp_table->data;
++    unsigned xsdt_pa_size = sizeof(rsdp->xsdt_physical_address);
++    unsigned xsdt_pa_offset =
++        (char *)&rsdp->xsdt_physical_address - rsdp_table->data;
+ 
+     bios_linker_loader_alloc(linker, ACPI_BUILD_RSDP_FILE, rsdp_table, 16,
+                              true /* fseg memory */);
+@@ -381,8 +381,8 @@ build_rsdp(GArray *rsdp_table, BIOSLinker *linker, unsigned rsdt_tbl_offset)
+ 
+     /* Address to be filled by Guest linker */
+     bios_linker_loader_add_pointer(linker,
+-        ACPI_BUILD_RSDP_FILE, rsdt_pa_offset, rsdt_pa_size,
+-        ACPI_BUILD_TABLE_FILE, rsdt_tbl_offset);
++        ACPI_BUILD_RSDP_FILE, xsdt_pa_offset, xsdt_pa_size,
++        ACPI_BUILD_TABLE_FILE, xsdt_tbl_offset);
+ 
+     /* Checksum to be filled by Guest linker */
+     bios_linker_loader_add_checksum(linker, ACPI_BUILD_RSDP_FILE,
+@@ -659,7 +659,7 @@ static void build_fadt(GArray *table_data, BIOSLinker *linker,
+                        VirtMachineState *vms, unsigned dsdt_tbl_offset)
+ {
+     AcpiFadtDescriptorRev5_1 *fadt = acpi_data_push(table_data, sizeof(*fadt));
+-    unsigned dsdt_entry_offset = (char *)&fadt->dsdt - table_data->data;
++    unsigned xdsdt_entry_offset = (char *)&fadt->x_dsdt - table_data->data;
+     uint16_t bootflags;
+ 
+     switch (vms->psci_conduit) {
+@@ -685,7 +685,7 @@ static void build_fadt(GArray *table_data, BIOSLinker *linker,
+ 
+     /* DSDT address to be filled by Guest linker */
+     bios_linker_loader_add_pointer(linker,
+-        ACPI_BUILD_TABLE_FILE, dsdt_entry_offset, sizeof(fadt->dsdt),
++        ACPI_BUILD_TABLE_FILE, xdsdt_entry_offset, sizeof(fadt->x_dsdt),
+         ACPI_BUILD_TABLE_FILE, dsdt_tbl_offset);
+ 
+     build_header(linker, table_data,
+@@ -748,7 +748,7 @@ void virt_acpi_build(VirtMachineState *vms, AcpiBuildTables *tables)
+ {
+     VirtMachineClass *vmc = VIRT_MACHINE_GET_CLASS(vms);
+     GArray *table_offsets;
+-    unsigned dsdt, rsdt;
++    unsigned dsdt, xsdt;
+     GArray *tables_blob = tables->table_data;
+ 
+     table_offsets = g_array_new(false, true /* clear */,
+@@ -788,12 +788,12 @@ void virt_acpi_build(VirtMachineState *vms, AcpiBuildTables *tables)
+         build_iort(tables_blob, tables->linker);
      }
-     nb_option_roms++;
- }
-@@ -2321,6 +2319,7 @@ static void pc_machine_class_init(ObjectClass *oc, void *data)
-      * to be used at the moment, 32K should be enough for a while.  */
-     pcmc->acpi_data_size = 0x20000 + 0x8000;
-     pcmc->save_tsc_khz = true;
-+    pcmc->linuxboot_dma_enabled = true;
-     mc->get_hotplug_handler = pc_get_hotpug_handler;
-     mc->cpu_index_to_socket_id = pc_cpu_index_to_socket_id;
-     mc->possible_cpu_arch_ids = pc_possible_cpu_arch_ids;
-diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
-index 9f102aa..a11190b 100644
---- a/hw/i386/pc_piix.c
-+++ b/hw/i386/pc_piix.c
-@@ -474,6 +474,7 @@ static void pc_i440fx_2_6_machine_options(MachineClass *m)
-     PCMachineClass *pcmc = PC_MACHINE_CLASS(m);
-     pc_i440fx_2_7_machine_options(m);
-     pcmc->legacy_cpu_hotplug = true;
-+    pcmc->linuxboot_dma_enabled = false;
-     SET_MACHINE_COMPAT(m, PC_COMPAT_2_6);
- }
  
-diff --git a/hw/i386/pc_q35.c b/hw/i386/pc_q35.c
-index dd792a8..0a61a20 100644
---- a/hw/i386/pc_q35.c
-+++ b/hw/i386/pc_q35.c
-@@ -335,6 +335,7 @@ static void pc_q35_2_6_machine_options(MachineClass *m)
-     PCMachineClass *pcmc = PC_MACHINE_CLASS(m);
-     pc_q35_2_7_machine_options(m);
-     pcmc->legacy_cpu_hotplug = true;
-+    pcmc->linuxboot_dma_enabled = false;
-     SET_MACHINE_COMPAT(m, PC_COMPAT_2_6);
- }
+-    /* RSDT is pointed to by RSDP */
+-    rsdt = tables_blob->len;
+-    build_rsdt(tables_blob, tables->linker, table_offsets, NULL, NULL);
++    /* XSDT is pointed to by RSDP */
++    xsdt = tables_blob->len;
++    build_xsdt(tables_blob, tables->linker, table_offsets, NULL, NULL);
  
+     /* RSDP is in FSEG memory, so allocate it separately */
+-    build_rsdp(tables->rsdp, tables->linker, rsdt);
++    build_rsdp(tables->rsdp, tables->linker, xsdt);
+ 
+     /* Cleanup memory that's no longer used. */
+     g_array_free(table_offsets, true);
 -- 
 MST
