@@ -1,36 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53600)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56073)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <hare@suse.de>) id 1dAs1P-0006ej-CN
-	for qemu-devel@nongnu.org; Wed, 17 May 2017 02:01:20 -0400
+	(envelope-from <jasowang@redhat.com>) id 1dAsGK-0000T2-FT
+	for qemu-devel@nongnu.org; Wed, 17 May 2017 02:16:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <hare@suse.de>) id 1dAs1H-0000FZ-RG
-	for qemu-devel@nongnu.org; Wed, 17 May 2017 02:01:19 -0400
-Received: from mx2.suse.de ([195.135.220.15]:48803 helo=mx1.suse.de)
+	(envelope-from <jasowang@redhat.com>) id 1dAsGH-0005ZM-AV
+	for qemu-devel@nongnu.org; Wed, 17 May 2017 02:16:44 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:35132)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <hare@suse.de>) id 1dAs1H-0000En-H8
-	for qemu-devel@nongnu.org; Wed, 17 May 2017 02:01:11 -0400
-References: <58A4707602000062000D0393@prv-mh.provo.novell.com>
-	<58A5C23202000062000D0FCB@prv-mh.provo.novell.com>
-	<b50ed69e-ce2f-36d9-797b-5f6a5cf7850d@redhat.com>
-	<154b3902-d891-f77a-3d59-09d80596ddff@suse.de>
-	<58ADBA0302000062000D3EA6@prv-mh.provo.novell.com>
-	<1fcf2e94-fc86-4bd7-07a0-8ab2dc72429f@suse.de>
-	<da24d7e2-e81c-8a1c-c277-c8e1b08fc3f7@redhat.com>
-	<5c410c0e-f0b0-a049-84ed-7e31eb4e1dab@suse.de>
-	<1282321742.7961608.1494922767010.JavaMail.zimbra@redhat.com>
-	<efdd2565-025d-b5f8-bcac-32baeaecdc3a@suse.de>
-	<92e310cd-f77a-61f3-82a2-aca8ea901dbc@redhat.com>
-From: Hannes Reinecke <hare@suse.de>
-Message-ID: <02a2668e-82e3-afd3-c99a-9b08bb85a36b@suse.de>
-Date: Wed, 17 May 2017 08:01:09 +0200
+	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1dAsGH-0005Z3-3e
+	for qemu-devel@nongnu.org; Wed, 17 May 2017 02:16:41 -0400
+References: <1494578148-102868-1-git-send-email-wei.w.wang@intel.com>
+	<a3f2cae3-5d3d-f620-4a8d-bb11470c0b08@redhat.com>
+	<591AA65F.8080608@intel.com>
+From: Jason Wang <jasowang@redhat.com>
+Message-ID: <d6eb1d73-c791-b8d3-7ef3-a7653aef00d6@redhat.com>
+Date: Wed, 17 May 2017 14:16:31 +0800
 MIME-Version: 1.0
-In-Reply-To: <92e310cd-f77a-61f3-82a2-aca8ea901dbc@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+In-Reply-To: <591AA65F.8080608@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel]
- =?utf-8?b?562U5aSN77yaIFJlOiBbUkZDXSB2aXJ0aW8tZmM6?=
- =?utf-8?q?_draft_idea_of_virtual_fibre_channel_HBA?=
+Subject: Re: [Qemu-devel] [virtio-dev] Re: [PATCH v2 00/16] Vhost-pci for
+ inter-VM communication
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,99 +29,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Lin Ma <lma@suse.com>, Stefan Hajnoczi <stefanha@gmail.com>, Zhiqiang Zhou <ZZhou@suse.com>, Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org, stefanha@redhat.com, mst@redhat.com
+To: Wei Wang <wei.w.wang@intel.com>, stefanha@gmail.com, marcandre.lureau@gmail.com, mst@redhat.com, pbonzini@redhat.com, virtio-dev@lists.oasis-open.org, qemu-devel@nongnu.org
 
-On 05/16/2017 06:22 PM, Paolo Bonzini wrote:
-> Pruning to sort out the basic disagreements.
->=20
-> On 16/05/2017 17:22, Hannes Reinecke wrote:
->>> That depends on how you would like to do controller passthrough in
->>> general.  iSCSI doesn't have the 64-bit target ID, and doesn't have
->>> (AFAIK) hot-plug/hot-unplug support, so it's less important than FC.
+
+
+On 2017=E5=B9=B405=E6=9C=8816=E6=97=A5 15:12, Wei Wang wrote:
 >>>
->> iSCSI has its 'iqn' string, which is defined to be a 256-byte string.
->> Hence the number=20
->> And if we're updating virtio anyway, we could as well update it to car=
-ry
->> _all_ possible scsi IDs.
->=20
-> Yes, but one iSCSI connection maps to one initiator and target IQN.
-> It's not like FC where each frame can specify its own initiator ID.
->=20
-Sure. But updating the format to hold _any_ SCSI Name would allow us to
-reflect the actual initiator port name used by the host.
-So the guest could be
->>>> (3) would be feasible, as it would effectively mean 'just' to update=
- the
->>>> current NPIV mechanism. However, this would essentially lock us in f=
-or
->>>> FC; any other types (think NVMe) will require yet another solution.
->>> An FC-NVMe driver could also expose the same vhost interface, couldn'=
-t it?
->>> FC-NVMe doesn't have to share the Linux code; but sharing the virtio =
-standard
->>> and the userspace ABI would be great.
->>>
->>> In fact, the main advantage of virtio-fc would be that (if we define =
-it properly)
->>> it could be reused for FC-NVMe instead of having to extend e.g. virti=
-o-blk.
->>> For example virtio-scsi has request, to-device payload, response, fro=
-m-device
->>> payload.  virtio-fc's request format could be the initiator and targe=
-t port
->>> identifiers, followed by FCP_CMD, to-device payload, FCP_RSP, from-de=
-vice
->>> payload.
->>>
->> As already said: We do _not_ have access to the FCP frames.
->> So designing a virtio-fc protocol will only work for libfc-based HBAs,
->> namely fnic, bnx2fc, and fcoe.
->> Given that the future of FCoE is somewhat unclear I doubt it's a good
->> idea to restrict ourselves to that.
->=20
-> I understand that.  It doesn't have to be a 1:1 match with FCP frames o=
-r
-> even IUs; in fact the above minimal example is not (no OXID/RXID and no
-> FCP_XFER_RDY IU are just the first two things that come to mind).
->=20
-> The only purpose is to have a *transport* that is (roughly speaking)
-> flexible enough to support future NPIV usecases which will certainly
-> include FC-NVMe.  In other words: I'm inventing my own cooked FCP
-> format, but I might as well base it on FCP itself as much as possible.
->=20
-Weeelll ... I don't want to go into nit-picking here, but FC-NVMe is
-_NOT_ FCP. In fact, it's a different FC-4 provider with its own set of
-FC-4 commands etc.
+>>
+>> Hi:
+>>
+>> Care to post the driver codes too?
+>>
+> OK. It may take some time to clean up the driver code before post it=20
+> out. You can first
+> have a check of the draft at the repo here:
+> https://github.com/wei-w-wang/vhost-pci-driver
+>
+> Best,
+> Wei
 
-> Likewise, I'm not going to even mention ELS, but we would need _some_
-> kind of protocol to query name servers, receive state change
-> notifications, and get service parameters.  No idea yet how to do that,
-> probably something similar to virtio-scsi control and event queues, but
-> why not make the requests/responses look a little like PLOGI and PRLI?
->=20
-And my idea here is to keep virtio-scsi as the basic mode of (command)
-transfer, but add a set of transport management commands which would
-allow us to do things like:
-- port discovery / scan
-- port instantiation / login
-- port reset
-- transport link notification / status check
-- transport reset
+Interesting, looks like there's one copy on tx side. We used to have=20
+zerocopy support for tun for VM2VM traffic. Could you please try to=20
+compare it with your vhost-pci-net by:
 
-Those could be defined transport independently; and the neat thing is
-they could even be made to work with the current NPIV implementation
-with some tooling.
-And we could define things such that all current transport protocols can
-be mapped onto it.
+- make sure zerocopy is enabled for vhost_net
+- comment skb_orphan_frags() in tun_net_xmit()
 
-Cheers,
-
-Hannes
---=20
-Dr. Hannes Reinecke		   Teamlead Storage & Networking
-hare@suse.de			               +49 911 74053 688
-SUSE LINUX GmbH, Maxfeldstr. 5, 90409 N=C3=BCrnberg
-GF: F. Imend=C3=B6rffer, J. Smithard, J. Guild, D. Upmanyu, G. Norton
-HRB 21284 (AG N=C3=BCrnberg)
+Thanks
