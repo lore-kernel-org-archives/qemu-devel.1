@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48088)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48152)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1dB6kp-0000gq-9m
-	for qemu-devel@nongnu.org; Wed, 17 May 2017 17:45:12 -0400
+	(envelope-from <mst@redhat.com>) id 1dB6kz-0000ps-6M
+	for qemu-devel@nongnu.org; Wed, 17 May 2017 17:45:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1dB6kh-0005G3-5x
-	for qemu-devel@nongnu.org; Wed, 17 May 2017 17:45:06 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46104)
+	(envelope-from <mst@redhat.com>) id 1dB6ky-0005N6-1R
+	for qemu-devel@nongnu.org; Wed, 17 May 2017 17:45:21 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:58562)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1dB6kg-0005Fu-TF
-	for qemu-devel@nongnu.org; Wed, 17 May 2017 17:45:03 -0400
-Date: Thu, 18 May 2017 00:45:00 +0300
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1dB6kx-0005Mn-OB
+	for qemu-devel@nongnu.org; Wed, 17 May 2017 17:45:19 -0400
+Date: Thu, 18 May 2017 00:45:15 +0300
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <1495057396-13387-2-git-send-email-mst@redhat.com>
+Message-ID: <1495057396-13387-5-git-send-email-mst@redhat.com>
 References: <1495057396-13387-1-git-send-email-mst@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 In-Reply-To: <1495057396-13387-1-git-send-email-mst@redhat.com>
-Subject: [Qemu-devel] [PULL 01/13] hw/acpi-defs: replace leading X with x_
- in FADT field names
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL 04/13] libvhost-user: fix crash when rings
+ aren't ready
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,75 +29,149 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Laszlo Ersek <lersek@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Felipe Franciosi <felipe@nutanix.com>, Eric Blake <eblake@redhat.com>
 
-From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
-At the request of Michael, replace the leading capital X in the FADT
-field name Xfacs and Xdsdt with lower case x + underscore.
+Calling libvhost-user functions like vu_queue_get_avail_bytes() when the
+queue doesn't yet have addresses will result in the crashes like the
+following:
 
-Cc: Michael S. Tsirkin <mst@redhat.com>
-Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Reviewed-by: Laszlo Ersek <lersek@redhat.com>
+Program received signal SIGSEGV, Segmentation fault.
+0x000055c414112ce4 in vring_avail_idx (vq=3D0x55c41582fd68, vq=3D0x55c415=
+82fd68)
+    at /home/dgilbert/git/qemu/contrib/libvhost-user/libvhost-user.c:940
+940            vq->shadow_avail_idx =3D vq->vring.avail->idx;
+(gdb) p vq
+$1 =3D (VuVirtq *) 0x55c41582fd68
+(gdb) p vq->vring
+$2 =3D {num =3D 0, desc =3D 0x0, avail =3D 0x0, used =3D 0x0, log_guest_a=
+ddr =3D 0, flags =3D 0}
+
+    at /home/dgilbert/git/qemu/contrib/libvhost-user/libvhost-user.c:940
+No locals.
+    at /home/dgilbert/git/qemu/contrib/libvhost-user/libvhost-user.c:960
+        num_heads =3D <optimized out>
+    out_bytes=3Dout_bytes@entry=3D0x7fffd035d7c4, max_in_bytes=3Dmax_in_b=
+ytes@entry=3D0,
+    max_out_bytes=3Dmax_out_bytes@entry=3D0) at /home/dgilbert/git/qemu/c=
+ontrib/libvhost-user/libvhost-user.c:1034
+
+Add a pre-condition checks on vring.avail before accessing it.
+
+Fix documentation and return type of vu_queue_empty() while at it.
+
+Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Tested-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 ---
- include/hw/acpi/acpi-defs.h | 4 ++--
- hw/i386/acpi-build.c        | 4 ++--
- tests/bios-tables-test.c    | 4 ++--
- 3 files changed, 6 insertions(+), 6 deletions(-)
+ contrib/libvhost-user/libvhost-user.h |  6 +++---
+ contrib/libvhost-user/libvhost-user.c | 26 ++++++++++++++++++++------
+ 2 files changed, 23 insertions(+), 9 deletions(-)
 
-diff --git a/include/hw/acpi/acpi-defs.h b/include/hw/acpi/acpi-defs.h
-index 293ee45..93e1eba 100644
---- a/include/hw/acpi/acpi-defs.h
-+++ b/include/hw/acpi/acpi-defs.h
-@@ -144,8 +144,8 @@ typedef struct AcpiTableHeader AcpiTableHeader;
-     /* ARM-Specific Boot Flags (see below for individual flags) (ACPI 5.1) */ \
-     uint16_t arm_boot_flags; \
-     uint8_t minor_revision;  /* FADT Minor Revision (ACPI 5.1) */ \
--    uint64_t Xfacs;          /* 64-bit physical address of FACS */ \
--    uint64_t Xdsdt;          /* 64-bit physical address of DSDT */ \
-+    uint64_t x_facs;          /* 64-bit physical address of FACS */ \
-+    uint64_t x_dsdt;          /* 64-bit physical address of DSDT */ \
-     /* 64-bit Extended Power Mgt 1a Event Reg Blk address */ \
-     struct AcpiGenericAddress xpm1a_event_block; \
-     /* 64-bit Extended Power Mgt 1b Event Reg Blk address */ \
-diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
-index 1d8c645..c75f73e 100644
---- a/hw/i386/acpi-build.c
-+++ b/hw/i386/acpi-build.c
-@@ -341,7 +341,7 @@ build_fadt(GArray *table_data, BIOSLinker *linker, AcpiPmInfo *pm,
-     AcpiFadtDescriptorRev3 *fadt = acpi_data_push(table_data, sizeof(*fadt));
-     unsigned fw_ctrl_offset = (char *)&fadt->firmware_ctrl - table_data->data;
-     unsigned dsdt_entry_offset = (char *)&fadt->dsdt - table_data->data;
--    unsigned xdsdt_entry_offset = (char *)&fadt->Xdsdt - table_data->data;
-+    unsigned xdsdt_entry_offset = (char *)&fadt->x_dsdt - table_data->data;
- 
-     /* FACS address to be filled by Guest linker */
-     bios_linker_loader_add_pointer(linker,
-@@ -354,7 +354,7 @@ build_fadt(GArray *table_data, BIOSLinker *linker, AcpiPmInfo *pm,
-         ACPI_BUILD_TABLE_FILE, dsdt_entry_offset, sizeof(fadt->dsdt),
-         ACPI_BUILD_TABLE_FILE, dsdt_tbl_offset);
-     bios_linker_loader_add_pointer(linker,
--        ACPI_BUILD_TABLE_FILE, xdsdt_entry_offset, sizeof(fadt->Xdsdt),
-+        ACPI_BUILD_TABLE_FILE, xdsdt_entry_offset, sizeof(fadt->x_dsdt),
-         ACPI_BUILD_TABLE_FILE, dsdt_tbl_offset);
- 
-     build_header(linker, table_data,
-diff --git a/tests/bios-tables-test.c b/tests/bios-tables-test.c
-index 9c96a67..bdef3b9 100644
---- a/tests/bios-tables-test.c
-+++ b/tests/bios-tables-test.c
-@@ -175,8 +175,8 @@ static void test_acpi_fadt_table(test_data *data)
-     ACPI_READ_FIELD(fadt_table->reset_value, addr);
-     ACPI_READ_FIELD(fadt_table->arm_boot_flags, addr);
-     ACPI_READ_FIELD(fadt_table->minor_revision, addr);
--    ACPI_READ_FIELD(fadt_table->Xfacs, addr);
--    ACPI_READ_FIELD(fadt_table->Xdsdt, addr);
-+    ACPI_READ_FIELD(fadt_table->x_facs, addr);
-+    ACPI_READ_FIELD(fadt_table->x_dsdt, addr);
-     ACPI_READ_GENERIC_ADDRESS(fadt_table->xpm1a_event_block, addr);
-     ACPI_READ_GENERIC_ADDRESS(fadt_table->xpm1b_event_block, addr);
-     ACPI_READ_GENERIC_ADDRESS(fadt_table->xpm1a_control_block, addr);
--- 
+diff --git a/contrib/libvhost-user/libvhost-user.h b/contrib/libvhost-use=
+r/libvhost-user.h
+index 156b50e..af02a31 100644
+--- a/contrib/libvhost-user/libvhost-user.h
++++ b/contrib/libvhost-user/libvhost-user.h
+@@ -327,13 +327,13 @@ void vu_queue_set_notification(VuDev *dev, VuVirtq =
+*vq, int enable);
+ bool vu_queue_enabled(VuDev *dev, VuVirtq *vq);
+=20
+ /**
+- * vu_queue_enabled:
++ * vu_queue_empty:
+  * @dev: a VuDev context
+  * @vq: a VuVirtq queue
+  *
+- * Returns: whether the queue is empty.
++ * Returns: true if the queue is empty or not ready.
+  */
+-int vu_queue_empty(VuDev *dev, VuVirtq *vq);
++bool vu_queue_empty(VuDev *dev, VuVirtq *vq);
+=20
+ /**
+  * vu_queue_notify:
+diff --git a/contrib/libvhost-user/libvhost-user.c b/contrib/libvhost-use=
+r/libvhost-user.c
+index 61e1657..9efb9da 100644
+--- a/contrib/libvhost-user/libvhost-user.c
++++ b/contrib/libvhost-user/libvhost-user.c
+@@ -1031,6 +1031,11 @@ vu_queue_get_avail_bytes(VuDev *dev, VuVirtq *vq, =
+unsigned int *in_bytes,
+     idx =3D vq->last_avail_idx;
+=20
+     total_bufs =3D in_total =3D out_total =3D 0;
++    if (unlikely(dev->broken) ||
++        unlikely(!vq->vring.avail)) {
++        goto done;
++    }
++
+     while ((rc =3D virtqueue_num_heads(dev, vq, idx)) > 0) {
+         unsigned int max, num_bufs, indirect =3D 0;
+         struct vring_desc *desc;
+@@ -1121,11 +1126,16 @@ vu_queue_avail_bytes(VuDev *dev, VuVirtq *vq, uns=
+igned int in_bytes,
+=20
+ /* Fetch avail_idx from VQ memory only when we really need to know if
+  * guest has added some buffers. */
+-int
++bool
+ vu_queue_empty(VuDev *dev, VuVirtq *vq)
+ {
++    if (unlikely(dev->broken) ||
++        unlikely(!vq->vring.avail)) {
++        return true;
++    }
++
+     if (vq->shadow_avail_idx !=3D vq->last_avail_idx) {
+-        return 0;
++        return false;
+     }
+=20
+     return vring_avail_idx(vq) =3D=3D vq->last_avail_idx;
+@@ -1174,7 +1184,8 @@ vring_notify(VuDev *dev, VuVirtq *vq)
+ void
+ vu_queue_notify(VuDev *dev, VuVirtq *vq)
+ {
+-    if (unlikely(dev->broken)) {
++    if (unlikely(dev->broken) ||
++        unlikely(!vq->vring.avail)) {
+         return;
+     }
+=20
+@@ -1291,7 +1302,8 @@ vu_queue_pop(VuDev *dev, VuVirtq *vq, size_t sz)
+     struct vring_desc *desc;
+     int rc;
+=20
+-    if (unlikely(dev->broken)) {
++    if (unlikely(dev->broken) ||
++        unlikely(!vq->vring.avail)) {
+         return NULL;
+     }
+=20
+@@ -1445,7 +1457,8 @@ vu_queue_fill(VuDev *dev, VuVirtq *vq,
+ {
+     struct vring_used_elem uelem;
+=20
+-    if (unlikely(dev->broken)) {
++    if (unlikely(dev->broken) ||
++        unlikely(!vq->vring.avail)) {
+         return;
+     }
+=20
+@@ -1474,7 +1487,8 @@ vu_queue_flush(VuDev *dev, VuVirtq *vq, unsigned in=
+t count)
+ {
+     uint16_t old, new;
+=20
+-    if (unlikely(dev->broken)) {
++    if (unlikely(dev->broken) ||
++        unlikely(!vq->vring.avail)) {
+         return;
+     }
+=20
+--=20
 MST
