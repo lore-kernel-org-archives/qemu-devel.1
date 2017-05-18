@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35548)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36475)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dBAfA-0005CL-6k
-	for qemu-devel@nongnu.org; Wed, 17 May 2017 21:55:37 -0400
+	(envelope-from <thuth@redhat.com>) id 1dBAl0-0006Oo-Mj
+	for qemu-devel@nongnu.org; Wed, 17 May 2017 22:01:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dBAf6-0005bc-AX
-	for qemu-devel@nongnu.org; Wed, 17 May 2017 21:55:36 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:44826)
+	(envelope-from <thuth@redhat.com>) id 1dBAkw-00073r-Pu
+	for qemu-devel@nongnu.org; Wed, 17 May 2017 22:01:38 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47778)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1dBAf6-0005bY-2P
-	for qemu-devel@nongnu.org; Wed, 17 May 2017 21:55:32 -0400
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1dBAkw-00073h-GB
+	for qemu-devel@nongnu.org; Wed, 17 May 2017 22:01:34 -0400
 References: <1495035337-13337-1-git-send-email-thuth@redhat.com>
-	<0721f18a-fc66-0be3-7462-76eb60de7f55@redhat.com>
+	<20170517162642.ebmrhawmfdde5vsz@aurel32.net>
 From: Thomas Huth <thuth@redhat.com>
-Message-ID: <394772e4-949a-b92f-6879-7b9e343e10d3@redhat.com>
-Date: Thu, 18 May 2017 03:55:25 +0200
+Message-ID: <4d64a1a0-71dd-5ea0-6d2f-e2fa547cfbe3@redhat.com>
+Date: Thu, 18 May 2017 04:01:27 +0200
 MIME-Version: 1.0
-In-Reply-To: <0721f18a-fc66-0be3-7462-76eb60de7f55@redhat.com>
+In-Reply-To: <20170517162642.ebmrhawmfdde5vsz@aurel32.net>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 7bit
 Subject: Re: [Qemu-devel] [RFC PATCH] target/s390x/cpu_models: Set some
  additional feature bits for the "qemu" CPU
 List-Id: <qemu-devel.nongnu.org>
@@ -29,11 +29,11 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>
-Cc: mmarek@suse.com, mbenes@suse.cz, Aurelien Jarno <aurelien@aurel32.net>
+To: Aurelien Jarno <aurelien@aurel32.net>
+Cc: qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>, David Hildenbrand <david@redhat.com>, mmarek@suse.com, mbenes@suse.cz
 
-On 17.05.2017 18:49, David Hildenbrand wrote:
-> On 17.05.2017 17:35, Thomas Huth wrote:
+On 17.05.2017 18:26, Aurelien Jarno wrote:
+> On 2017-05-17 17:35, Thomas Huth wrote:
 >> Currently we only present the plain z900 feature bits to the guest,
 >> but QEMU already emulates some additional features (but not all of
 >> the next CPU generation, so we can not use the next CPU level as
@@ -42,85 +42,94 @@ On 17.05.2017 18:49, David Hildenbrand wrote:
 >> as much of the supported features as possible when we are running
 >> with the default "qemu" CPU.
 >> This patch now adds the "stfle", "extended immediate" and "stckf"
->> facility bits to the "qemu" CPU, which are already supported facilitie=
-s.
->> It is unfortunately still not enough to run e.g. recent Fedora kernels=
-,
+>> facility bits to the "qemu" CPU, which are already supported facilities.
+>> It is unfortunately still not enough to run e.g. recent Fedora kernels,
 >> but at least it's a first step into the right direction.
+> 
+> This indeed looks like a step in a good direction. At least it makes the
+> recently added STFLE emulation useful :-).
+> 
+>> Signed-off-by: Thomas Huth <thuth@redhat.com>
+>> ---
+>>  target/s390x/cpu_models.c | 29 ++++++++++++++++++++++++++---
+>>  1 file changed, 26 insertions(+), 3 deletions(-)
 >>
->=20
-> Three things:
->=20
-> 1. Should we care about backwards compatibility? I think so. This shoul=
-d
-> be fixed up using compat machine properties. (qemu model is a
-> migration-safe model and could e.g. be used in KVM setups, too).
+>> diff --git a/target/s390x/cpu_models.c b/target/s390x/cpu_models.c
+>> index 8d27363..18789ab 100644
+>> --- a/target/s390x/cpu_models.c
+>> +++ b/target/s390x/cpu_models.c
+>> @@ -658,6 +658,24 @@ static void check_compatibility(const S390CPUModel *max_model,
+>>                    "available in the configuration: ");
+>>  }
+>>  
+>> +/**
+>> + * The base TCG CPU model "qemu" is based on the z900. However, we already
+>> + * can also emulate some additional features of later CPU generations, so
+>> + * we add these additional feature bits here.
+>> + */
+>> +static void add_qemu_cpu_model_features(S390FeatBitmap fbm)
+>> +{
+>> +    int i, feats[] = {
+>> +        S390_FEAT_STFLE,
+>> +        S390_FEAT_EXTENDED_IMMEDIATE,
+>> +        S390_FEAT_STORE_CLOCK_FAST
+> 
+> According to my list, QEMU also fully implements the following
+> facilities:
+> 
+> S390_FEAT_LONG_DISPLACEMENT
+> S390_FEAT_GENERAL_INSTRUCTIONS_EXT
+> S390_FEAT_EXECUTE_EXT
+> S390_FEAT_STFLE_45
 
-Theoretically, I agree, but do we really care about backwards
-compatibility at this point in time? All major distro kernels (except
-Debian, I think) currently do not work in QEMU, so there is currently
-not that much that can be migrated...
-And currently, the "qemu" CPU is the very same as the "z900" CPU, so you
-might also get along with simply using "-cpu z900" on the destination
-instead, I guess.
+Ok, thanks, I'll respin and add them to the list!
 
-> 2. I would recommend to not enable STFLE for now. Why?
->=20
-> It is/was an indication that the system is running on a z9 (and
-> implicitly has the basic features). This was not only done because
-> people were lazy, but because this bit was implicitly connected to othe=
-r
-> machine properties.
+>> +    };
+>> +
+>> +    for (i = 0; i < ARRAY_SIZE(feats); i++) {
+>> +        set_bit(feats[i], fbm);
+>> +    }
+>> +}
+>> +
+>>  static S390CPUModel *get_max_cpu_model(Error **errp)
+>>  {
+>>      static S390CPUModel max_model;
+>> @@ -670,10 +688,11 @@ static S390CPUModel *get_max_cpu_model(Error **errp)
+>>      if (kvm_enabled()) {
+>>          kvm_s390_get_host_cpu_model(&max_model, errp);
+>>      } else {
+>> -        /* TCG emulates a z900 */
+>> +        /* TCG emulates a z900 (with some additional features) */
+>>          max_model.def = &s390_cpu_defs[0];
+>>          bitmap_copy(max_model.features, max_model.def->default_feat,
+>>                      S390_FEAT_MAX);
+>> +        add_qemu_cpu_model_features(max_model.features);
+>>      }
+>>      if (!*errp) {
+>>          cached = true;
+>> @@ -925,11 +944,15 @@ static void s390_host_cpu_model_initfn(Object *obj)
+>>  
+>>  static void s390_qemu_cpu_model_initfn(Object *obj)
+>>  {
+>> +    static S390CPUDef s390_qemu_cpu_defs;
+>>      S390CPU *cpu = S390_CPU(obj);
+>>  
+>>      cpu->model = g_malloc0(sizeof(*cpu->model));
+>> -    /* TCG emulates a z900 */
+>> -    cpu->model->def = &s390_cpu_defs[0];
+>> +    /* TCG emulates a z900 (with some additional features) */
+>> +    memcpy(&s390_qemu_cpu_defs, &s390_cpu_defs[0], sizeof(s390_qemu_cpu_defs));
+>> +    add_qemu_cpu_model_features(s390_qemu_cpu_defs.default_feat);
+>> +    add_qemu_cpu_model_features(s390_qemu_cpu_defs.full_feat);
+>> +    cpu->model->def = &s390_qemu_cpu_defs;
+>>      bitmap_copy(cpu->model->features, cpu->model->def->default_feat,
+>>                  S390_FEAT_MAX);
+>>  }
+> 
+> Otherwise it looks fine to me.
+> 
+> Reviewed-by: Aurelien Jarno <aurelien@aurel32.net>
 
-Uh, that's ugly!
-
-> One popular example is the "DAT-enhancement facility 2". It introduced
-> the "LOAD PAGE TABLE ENTRY ADDRESS" instruction, but no facility bit wa=
-s
-> introduced. SO there is no way to check if the instruction is available
-> and actually working.
-
-Does the Linux kernel use this instruction at all? I just grep'ed
-through the kernel sources and did not find it. If the Linux kernel does
-not use it, I think we should ignore this interdependency and just
-provide the STFLE feature bit to the guest - since recent Linux kernels
-depend on it.
-
-> Please note that we added a feature representation for this facility,
-> because this would allow us later on to at least model removal of such =
-a
-> facility (if HW actually would drop it) on a CPU model level.
-
-What about STFLE bit 78, according to my version of the POP, it says:
-
-"The enhanced-DAT facility 2 is installed in the
- z/Architecture architectural mode."
-
-?
-
-> 3. This introduces some inconsistency. s390x/cpu_models.c:set_feature()
-> explicitly tests for such inconsistencies.
->=20
-> So your QEMU CPU model would have a feature, but you would not be able
-> to run that model using QEMU when manually specifying it on the command
-> line. Especially, expanding the "qemu" model and feeding it back to QEM=
-U
-> will fail.
-
-I've checked that I can also successfully disable the features again at
-the command line, using "-cpu qemu,eimm=3Dfalse" for example, so not sure
-what exactly you're talking about here. Could you please elaborate?
-
-> So I am not sure if we should introduce such inconsistencies at that
-> point. Rather fix up the basics and then move the CPU model to a
-> consistent model.
-
-I think we're very far away from being able to use the next official CPU
-model generation in QEMU TCG, so having at least something that let's us
-run other recent distro kernels apart from the Debian ones would be very
-helpful. I also understand the "qemu" CPU this way: "Simply give me the
-best CPU features that TCG currently can provide". If you want to have a
-"consistent" CPU state, you can simply use an official model like "z900"
-instead.
+Thanks!
 
  Thomas
