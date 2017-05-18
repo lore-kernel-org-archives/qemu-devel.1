@@ -1,35 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51950)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53854)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1dBLww-0001DX-Ml
-	for qemu-devel@nongnu.org; Thu, 18 May 2017 09:58:43 -0400
+	(envelope-from <thuth@redhat.com>) id 1dBM3W-0002yG-7l
+	for qemu-devel@nongnu.org; Thu, 18 May 2017 10:05:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1dBLws-00006P-Oj
-	for qemu-devel@nongnu.org; Thu, 18 May 2017 09:58:42 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:35343)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1dBLws-00005k-Dl
-	for qemu-devel@nongnu.org; Thu, 18 May 2017 09:58:38 -0400
-Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v4IDrfsL024985
-	for <qemu-devel@nongnu.org>; Thu, 18 May 2017 09:58:36 -0400
-Received: from e36.co.us.ibm.com (e36.co.us.ibm.com [32.97.110.154])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2ahbsfktgy-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Thu, 18 May 2017 09:58:36 -0400
-Received: from localhost
-	by e36.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <groug@kaod.org>;
-	Thu, 18 May 2017 07:58:35 -0600
-From: Greg Kurz <groug@kaod.org>
-Date: Thu, 18 May 2017 15:58:31 +0200
+	(envelope-from <thuth@redhat.com>) id 1dBM3S-0003rF-5j
+	for qemu-devel@nongnu.org; Thu, 18 May 2017 10:05:30 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:60593)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1dBM3R-0003r3-Sq
+	for qemu-devel@nongnu.org; Thu, 18 May 2017 10:05:26 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 69192C04B95D
+	for <qemu-devel@nongnu.org>; Thu, 18 May 2017 14:05:24 +0000 (UTC)
+References: <20170512122158.32032-1-kraxel@redhat.com>
+	<20170512122158.32032-7-kraxel@redhat.com>
+	<a4f99c9b-1fb4-8a0c-ec3b-0cadc7dfd382@redhat.com>
+	<728dca25-a9ef-a061-dee7-c5b4309ca8dc@redhat.com>
+	<6d9941a5-268c-9bc2-4122-64f023dfaa51@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <7d426658-c6ff-5eb0-025a-e421c5773703@redhat.com>
+Date: Thu, 18 May 2017 16:05:18 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <6d9941a5-268c-9bc2-4122-64f023dfaa51@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Message-Id: <149511591185.8828.11947901967942107196.stgit@bahia.lab.toulouse-stg.fr.ibm.com>
-Subject: [Qemu-devel] [PATCH] spapr: ensure core_slot isn't NULL in
- spapr_core_unplug()
+Subject: Re: [Qemu-devel] [PULL 6/6] hw/usb/dev-serial: Do not try to set
+ vendorid or productid properties
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,31 +38,102 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
+To: Paolo Bonzini <pbonzini@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org
 
-If we go that far on the path of hot-removing a core and we find out that
-the core-id is invalid, then we have a serious bug.
+On 18.05.2017 15:35, Paolo Bonzini wrote:
+> 
+> 
+> On 18/05/2017 15:22, Thomas Huth wrote:
+>> On 18.05.2017 14:00, Paolo Bonzini wrote:
+>>>
+>>>
+>>> On 12/05/2017 14:21, Gerd Hoffmann wrote:
+>>>> From: Thomas Huth <thuth@redhat.com>
+>>>>
+>>>> When starting QEMU with the legacy USB serial device like this:
+>>>>
+>>>>  qemu-system-x86_64 -usbdevice serial:vendorid=0x1234:stdio
+>>>>
+>>>> it currently aborts since the vendorid property does not exist
+>>>> anymore (it has been removed by commit f29783f72ea77dfbd7ea0c9):
+>>>>
+>>>>  Unexpected error in object_property_find() at qemu/qom/object.c:1008:
+>>>>  qemu-system-x86_64: -usbdevice serial:vendorid=0x1234:stdio: Property
+>>>>                      '.vendorid' not found
+>>>>  Aborted (core dumped)
+>>>>
+>>>> Fix this crash by issuing a more friendly error message instead
+>>>> (and simplify the code also a little bit this way).
+>>>>
+>>>> Signed-off-by: Thomas Huth <thuth@redhat.com>
+>>>> Message-id: 1493883704-27604-1-git-send-email-thuth@redhat.com
+>>>> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+>>>> ---
+>>>>  hw/usb/dev-serial.c | 24 ++++++------------------
+>>>>  1 file changed, 6 insertions(+), 18 deletions(-)
+>>>>
+>>>> diff --git a/hw/usb/dev-serial.c b/hw/usb/dev-serial.c
+>>>> index 6d5137383b..83a4f0e6fb 100644
+>>>> --- a/hw/usb/dev-serial.c
+>>>> +++ b/hw/usb/dev-serial.c
+>>>> @@ -513,27 +513,18 @@ static USBDevice *usb_serial_init(USBBus *bus, const char *filename)
+>>>>  {
+>>>>      USBDevice *dev;
+>>>>      Chardev *cdrv;
+>>>> -    uint32_t vendorid = 0, productid = 0;
+>>>>      char label[32];
+>>>>      static int index;
+>>>>  
+>>>>      while (*filename && *filename != ':') {
+>>>>          const char *p;
+>>>> -        char *e;
+>>>> +
+>>>>          if (strstart(filename, "vendorid=", &p)) {
+>>>> -            vendorid = strtol(p, &e, 16);
+>>>> -            if (e == p || (*e && *e != ',' && *e != ':')) {
+>>>> -                error_report("bogus vendor ID %s", p);
+>>>> -                return NULL;
+>>>> -            }
+>>>> -            filename = e;
+>>>> +            error_report("vendorid is not supported anymore");
+>>>> +            return NULL;
+>>>>          } else if (strstart(filename, "productid=", &p)) {
+>>>> -            productid = strtol(p, &e, 16);
+>>>> -            if (e == p || (*e && *e != ',' && *e != ':')) {
+>>>> -                error_report("bogus product ID %s", p);
+>>>> -                return NULL;
+>>>> -            }
+>>>> -            filename = e;
+>>>> +            error_report("productid is not supported anymore");
+>>>> +            return NULL;
+>>>>          } else {
+>>>>              error_report("unrecognized serial USB option %s", filename);
+>>>>              return NULL;
+>>>
+>>> All breanches of the "if" now return NULL, so the "while" loop in turn
+>>> can become an
+>>>
+>>>     if (*filename && *filename != ':') {
+>>>     }
+>>>
+>>> and the "while (*filename == ',')" subloop can go away, replaced by just
+>>> "return NULL".
+>>>
+>>> Even better, the "if (!*filename)" if just below can be moved first.
+>>
+>> Feel free to send an additional cleanup patch ... otherwise, I'd say let
+>> it bitrot for another year and we then remove it completely together
+>> with all the other "-usbdevice" functions...
+> 
+> Well, Coverity reports it so I'd rather keep it clean...
 
-Let's make it explicit with an assert() instead of dereferencing a NULL
-pointer.
+Hmm, maybe we should simply remove "-usbdevice serial" right now already
+... ? The vendorid/productid parameter handling has been broken since
+QEMU v0.14 already and nobody ever complained, so I guess hardly anybody
+is using "-usbdevice serial" anymore ... so I tend to simply remove it
+directly instead of going through the typical "mark-as-deprecated ->
+wait-two-release-cycles -> finally-remove-it" process here...
 
-This fixes Coverity issue CID 1375404.
+Paolo, Gerd, what do you think?
 
-Signed-off-by: Greg Kurz <groug@kaod.org>
----
- hw/ppc/spapr.c |    1 +
- 1 file changed, 1 insertion(+)
-
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index 0980d733cd7a..1c5b814fc0bf 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -2715,6 +2715,7 @@ static void spapr_core_unplug(HotplugHandler *hotplug_dev, DeviceState *dev,
-     CPUCore *cc = CPU_CORE(dev);
-     CPUArchId *core_slot = spapr_find_cpu_slot(ms, cc->core_id, NULL);
- 
-+    assert(core_slot);
-     core_slot->cpu = NULL;
-     object_unparent(OBJECT(dev));
- }
+ Thomas
