@@ -1,17 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44651)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44580)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dBEFk-00084g-5b
-	for qemu-devel@nongnu.org; Thu, 18 May 2017 01:45:37 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1dBEFh-00084C-Jr
+	for qemu-devel@nongnu.org; Thu, 18 May 2017 01:45:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dBEFi-0003S5-L0
-	for qemu-devel@nongnu.org; Thu, 18 May 2017 01:45:36 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1dBEFf-0003Qs-RI
+	for qemu-devel@nongnu.org; Thu, 18 May 2017 01:45:33 -0400
+Date: Thu, 18 May 2017 14:37:19 +1000
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Thu, 18 May 2017 15:45:21 +1000
-Message-Id: <20170518054522.13141-3-david@gibson.dropbear.id.au>
-In-Reply-To: <20170518054522.13141-1-david@gibson.dropbear.id.au>
-References: <20170518054522.13141-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [PATCH 2/3] pseries: Restore PVR negotiation logic for
- pre-2.9 machine types
+Message-ID: <20170518043719.GS15596@umbus.fritz.box>
+References: <20170517063547.23876-1-david@gibson.dropbear.id.au>
+	<20170517063547.23876-2-david@gibson.dropbear.id.au>
+	<20170517175657.0c0f7666@bahia.lan>
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="nSQp8DZZn7gZbDHt"
+Content-Disposition: inline
+In-Reply-To: <20170517175657.0c0f7666@bahia.lan>
+Subject: Re: [Qemu-devel] [Qemu-ppc] [RFC 1/2] pseries: Split CAS PVR
+ negotiation out into a separate function
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,175 +26,173 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: abologna@redhat.com, thuth@redhat.com, lvivier@redhat.com
-Cc: mdroth@linux.vnet.ibm.com, groug@kaod.org, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
+To: Greg Kurz <groug@kaod.org>
+Cc: abologna@redhat.com, thuth@redhat.com, lvivier@redhat.com, qemu-devel@nongnu.org, mdroth@linux.vnet.ibm.com, qemu-ppc@nongnu.org, bharata@linux.vnet.ibm.com
 
-"pseries" guests go through a hypervisor<->guest feature negotiation during
-early boot.  Part of this is finding a CPU compatibility mode which works
-for both.
 
-In 152ef80 "pseries: Rewrite CAS PVR compatibility logic" this logic was
-changed to strongly prefer architecture defined CPU compatibility modes,
-rather than CPU "raw" modes.  However, this change was made universally,
-which introduces a guest visible change for the previously existing machine
-types (pseries-2.8 and earlier).  That's never supposed to happen.
+--nSQp8DZZn7gZbDHt
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-This corrects the behaviour, reverting to the old PVR negotiation logic
-for machine types prior to pseries-2.9.
+On Wed, May 17, 2017 at 05:56:57PM +0200, Greg Kurz wrote:
+> On Wed, 17 May 2017 16:35:46 +1000
+> David Gibson <david@gibson.dropbear.id.au> wrote:
+>=20
+> > Guests of the qemu machine type go through a feature negotiation process
+> > known as "client architecture support" (CAS) during early boot.  This d=
+oes
+> > a number of things, one of which is finding a CPU compatibility mode wh=
+ich
+> > can be supported by both guest and host.
+> >=20
+> > In fact the CPU negotiation is probably the single most complex part of=
+ the
+> > CAS process, so this splits it out into a helper function.  We've recen=
+tly
+> > made some mistakes in maintaining backward compatibility for old machine
+> > types here.  Splitting this out will also make it easier to fix this.
+> >=20
+> > This also adds a possibly useful error message if the negotiation fails
+> > (i.e. if there is CPU mode that's suitable for both guest and host).
+>=20
+> s/if there is/if there isn't a/ ?
 
-Fixes: 152ef803ceb1959e2380a1da7736b935b109222e
-Reported-by: Andrea Bolognani <abologna@redhat.com>
-Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-Reviewed-by: Laurent Vivier <lvivier@redhat.com>
----
- hw/ppc/spapr.c         |  3 ++
- hw/ppc/spapr_hcall.c   | 90 +++++++++++++++++++++++++++++++++++++++++++++++++-
- include/hw/ppc/spapr.h |  1 +
- 3 files changed, 93 insertions(+), 1 deletion(-)
+Oops, I'll correct that.
 
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index 35dceb0..ad8ddf2 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -3313,9 +3313,12 @@ static void spapr_machine_2_8_instance_options(MachineState *machine)
- 
- static void spapr_machine_2_8_class_options(MachineClass *mc)
- {
-+    sPAPRMachineClass *smc = SPAPR_MACHINE_CLASS(mc);
-+
-     spapr_machine_2_9_class_options(mc);
-     SET_MACHINE_COMPAT(mc, SPAPR_COMPAT_2_8);
-     mc->numa_mem_align_shift = 23;
-+    smc->pre_2_9_cas_pvr = true;
- }
- 
- DEFINE_SPAPR_MACHINE(2_8, "2.8", false);
-diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
-index 77d2d66..a790da7 100644
---- a/hw/ppc/spapr_hcall.c
-+++ b/hw/ppc/spapr_hcall.c
-@@ -1044,6 +1044,89 @@ static target_ulong h_signal_sys_reset(PowerPCCPU *cpu,
-     }
- }
- 
-+/*
-+ * Old logic for PVR negotiation, used old <2.9 machine types for
-+ * compatibility with old qemu versions
-+ */
-+#define get_compat_level(cpuver) (                  \
-+        ((cpuver) == CPU_POWERPC_LOGICAL_2_05) ? 2050 : \
-+        ((cpuver) == CPU_POWERPC_LOGICAL_2_06) ? 2060 :  \
-+        ((cpuver) == CPU_POWERPC_LOGICAL_2_06_PLUS) ? 2061 :    \
-+        ((cpuver) == CPU_POWERPC_LOGICAL_2_07) ? 2070 : 0)
-+
-+static void cas_handle_compat_cpu(PowerPCCPUClass *pcc, uint32_t pvr,
-+                                  unsigned max_lvl, unsigned *compat_lvl,
-+                                  unsigned *compat_pvr)
-+{
-+    unsigned lvl = get_compat_level(pvr);
-+    bool is205, is206, is207;
-+
-+    if (!lvl) {
-+        return;
-+    }
-+
-+    /* If it is a logical PVR, try to determine the highest level */
-+    is205 = (pcc->pcr_supported & PCR_COMPAT_2_05) &&
-+        (lvl == get_compat_level(CPU_POWERPC_LOGICAL_2_05));
-+    is206 = (pcc->pcr_supported & PCR_COMPAT_2_06) &&
-+        ((lvl == get_compat_level(CPU_POWERPC_LOGICAL_2_06)) ||
-+         (lvl == get_compat_level(CPU_POWERPC_LOGICAL_2_06_PLUS)));
-+    is207 = (pcc->pcr_supported & PCR_COMPAT_2_07) &&
-+        (lvl == get_compat_level(CPU_POWERPC_LOGICAL_2_07));
-+
-+    if (is205 || is206 || is207) {
-+        if (!max_lvl) {
-+            /* User did not set the level, choose the highest */
-+            if (*compat_lvl <= lvl) {
-+                *compat_lvl = lvl;
-+                *compat_pvr = pvr;
-+            }
-+        } else if (max_lvl >= lvl) {
-+            /* User chose the level, don't set higher than this */
-+            *compat_lvl = lvl;
-+            *compat_pvr = pvr;
-+        }
-+    }
-+}
-+
-+static uint32_t cas_check_pvr_pre_2_9(PowerPCCPU *cpu, target_ulong *addr,
-+                                      Error **errp)
-+{
-+    PowerPCCPUClass *pcc = POWERPC_CPU_GET_CLASS(cpu);
-+    int counter;
-+    unsigned max_lvl = get_compat_level(cpu->max_compat);
-+    bool cpu_match = false;
-+    unsigned compat_lvl = 0, compat_pvr = 0;
-+
-+    for (counter = 0; counter < 512; ++counter) {
-+        uint32_t pvr, pvr_mask;
-+
-+        pvr_mask = ldl_be_phys(&address_space_memory, *addr);
-+        pvr = ldl_be_phys(&address_space_memory, *addr + 4);
-+        *addr += 8;
-+
-+        if (~pvr_mask & pvr) {
-+            break; /* Terminator record */
-+        }
-+
-+        trace_spapr_cas_pvr_try(pvr);
-+        if (!max_lvl &&
-+            ((cpu->env.spr[SPR_PVR] & pvr_mask) == (pvr & pvr_mask))) {
-+            cpu_match = true;
-+            compat_pvr = 0;
-+        } else if (pvr == cpu->compat_pvr) {
-+            cpu_match = true;
-+            compat_pvr = cpu->compat_pvr;
-+        } else if (!cpu_match) {
-+            cas_handle_compat_cpu(pcc, pvr, max_lvl, &compat_lvl, &compat_pvr);
-+        }
-+    }
-+
-+    trace_spapr_cas_pvr(cpu->compat_pvr, cpu_match, compat_pvr);
-+
-+    return compat_pvr;
-+}
-+
- static uint32_t cas_check_pvr(PowerPCCPU *cpu, target_ulong *addr,
-                               Error **errp)
- {
-@@ -1096,6 +1179,7 @@ static target_ulong h_client_architecture_support(PowerPCCPU *cpu,
-                                                   target_ulong opcode,
-                                                   target_ulong *args)
- {
-+    sPAPRMachineClass *smc = SPAPR_MACHINE_GET_CLASS(spapr);
-     /* Working address in data buffer */
-     target_ulong addr = ppc64_phys_to_real(args[0]);
-     target_ulong ov_table;
-@@ -1104,7 +1188,11 @@ static target_ulong h_client_architecture_support(PowerPCCPU *cpu,
-     bool guest_radix;
-     Error *local_err = NULL;
- 
--    cas_pvr = cas_check_pvr(cpu, &addr, &local_err);
-+    if (smc->pre_2_9_cas_pvr) {
-+        cas_pvr = cas_check_pvr_pre_2_9(cpu, &addr, &local_err);
-+    } else {
-+        cas_pvr = cas_check_pvr(cpu, &addr, &local_err);
-+    }
-     if (local_err) {
-         error_report_err(local_err);
-         return H_HARDWARE;
-diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
-index 93c4cfc..f875dc4 100644
---- a/include/hw/ppc/spapr.h
-+++ b/include/hw/ppc/spapr.h
-@@ -52,6 +52,7 @@ struct sPAPRMachineClass {
-     /*< public >*/
-     bool dr_lmb_enabled;       /* enable dynamic-reconfig/hotplug of LMBs */
-     bool use_ohci_by_default;  /* use USB-OHCI instead of XHCI */
-+    bool pre_2_9_cas_pvr;      /* Use old logic for PVR compat negotiation */
-     const char *tcg_default_cpu; /* which (TCG) CPU to simulate by default */
-     void (*phb_placement)(sPAPRMachineState *spapr, uint32_t index,
-                           uint64_t *buid, hwaddr *pio, 
--- 
-2.9.4
+>=20
+> >=20
+> > Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+> > ---
+> >  hw/ppc/spapr_hcall.c | 43 +++++++++++++++++++++++++++----------------
+> >  1 file changed, 27 insertions(+), 16 deletions(-)
+> >=20
+> > diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
+> > index 0d608d6..007ae8d 100644
+> > --- a/hw/ppc/spapr_hcall.c
+> > +++ b/hw/ppc/spapr_hcall.c
+> > @@ -1047,19 +1047,13 @@ static target_ulong h_signal_sys_reset(PowerPCC=
+PU *cpu,
+> >      }
+> >  }
+> > =20
+> > -static target_ulong h_client_architecture_support(PowerPCCPU *cpu,
+> > -                                                  sPAPRMachineState *s=
+papr,
+> > -                                                  target_ulong opcode,
+> > -                                                  target_ulong *args)
+> > +static uint32_t cas_check_pvr(PowerPCCPU *cpu, target_ulong list,
+> > +                              Error **errp)
+> >  {
+> > -    target_ulong list =3D ppc64_phys_to_real(args[0]);
+> > -    target_ulong ov_table;
+> >      bool explicit_match =3D false; /* Matched the CPU's real PVR */
+> >      uint32_t max_compat =3D cpu->max_compat;
+> >      uint32_t best_compat =3D 0;
+> >      int i;
+> > -    sPAPROptionVector *ov1_guest, *ov5_guest, *ov5_cas_old, *ov5_updat=
+es;
+> > -    bool guest_radix;
+> > =20
+> >      /*
+> >       * We scan the supplied table of PVRs looking for two things
+> > @@ -1090,26 +1084,43 @@ static target_ulong h_client_architecture_suppo=
+rt(PowerPCCPU *cpu,
+> >          /* We couldn't find a suitable compatibility mode, and either
+> >           * the guest doesn't support "raw" mode for this CPU, or raw
+> >           * mode is disabled because a maximum compat mode is set */
+> > -        return H_HARDWARE;
+> > +        error_setg(errp, "Couldn't negotiate a suitable PVR during CAS=
+");
+> > +        return 0;
+> >      }
+> > =20
+> >      /* Parsing finished */
+> >      trace_spapr_cas_pvr(cpu->compat_pvr, explicit_match, best_compat);
+> > =20
+> > -    /* Update CPUs */
+> > -    if (cpu->compat_pvr !=3D best_compat) {
+> > -        Error *local_err =3D NULL;
+> > +    return best_compat;
+> > +}
+> > +
+> > +static target_ulong h_client_architecture_support(PowerPCCPU *cpu,
+> > +                                                  sPAPRMachineState *s=
+papr,
+> > +                                                  target_ulong opcode,
+> > +                                                  target_ulong *args)
+> > +{
+> > +    /* @ov_table points to the first option vector */
+> > +    target_ulong ov_table =3D ppc64_phys_to_real(args[0]);
+> > +    uint32_t cas_pvr;
+> > +    sPAPROptionVector *ov1_guest, *ov5_guest, *ov5_cas_old, *ov5_updat=
+es;
+> > +    bool guest_radix;
+> > +    Error *local_err =3D NULL;
+> > =20
+> > -        ppc_set_compat_all(best_compat, &local_err);
+> > +    cas_pvr =3D cas_check_pvr(cpu, ov_table, &local_err);
+>=20
+> Shouldn't cas_check_pvr() take a target_ulong * so that we can get
+> the address of the first option vector...
+>=20
+> > +    if (local_err) {
+> > +        error_report_err(local_err);
+> > +        return H_HARDWARE;
+> > +    }
+> > +
+> > +    /* Update CPUs */
+> > +    if (cpu->compat_pvr !=3D cas_pvr) {
+> > +        ppc_set_compat_all(cas_pvr, &local_err);
+> >          if (local_err) {
+> >              error_report_err(local_err);
+> >              return H_HARDWARE;
+> >          }
+> >      }
+> > =20
+> > -    /* For the future use: here @ov_table points to the first option v=
+ector */
+> > -    ov_table =3D list;
+> > -
+>=20
+> ... and address Laurent's comment ?
+
+Yes, I completely misread what was happening with the pvr_list vs. the
+option vectors.  I'll correct that.
+
+>=20
+> >      ov1_guest =3D spapr_ovec_parse_vector(ov_table, 1);
+> >      ov5_guest =3D spapr_ovec_parse_vector(ov_table, 5);
+> >      if (spapr_ovec_test(ov5_guest, OV5_MMU_BOTH)) {
+>=20
+
+
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--nSQp8DZZn7gZbDHt
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iQIcBAEBCAAGBQJZHST/AAoJEGw4ysog2bOSnAYQAMzuk3ZBa3jj4YdCHmYvmPym
+//72SZpVUx4k/M0JaiL4lB9cvmkReo7h4ep+R+xhn/Y2LVBrXeD1uWyJ7/Lq2whl
+Ghn+rhq7zQSWQLr/tg4kpwrsujOW4SB1KPNerEh7amDUdNKWAxIZIjcr8+PM48aA
+nItmlMQ0X7jBfDKm9AIyd2eSijX+vgSGB6l9ThTnCHFzuApqSSQ2IYOn3Q4AJWE9
+zZtdp/GXS8KkQfNb2Sr7orFuYqD5sCg3kpv0EzpCCC6vulZKS5WmRnZTpF6qLwQz
+xFNFOnS3IvLY9o0rxLeSXh1wDQlih1L86ZJH+iusVVMLUFW2uHPJ6upJWR4VjXjW
+KbMh/12S/sgWvUpkBZJn/DC/RZCnahiuB/JbXS6oFfRuJA4nTiUAsfv+PdwhBBVE
+5ALxPy5HIzt25FSr9vng9P9jPeIxeu3D84AcRZSk98WfL/CJbqTFgbdGHJHT1buD
+hekKWPVg8dBz6Smz4xB3S/EbFmyUYj0PfPAx4AlbCFAmfIa12mHgaJ2EGNIiSj/c
+wvJOhqmsXQham3pLObzKzbKnmrc9wDmB9LWR7+hRdZwQtxUFxq84DKWkJT6mYFof
+N4/qNyIEuG52DyKJbax70GuYlmlJnVVt+ln/RBBIimGcuoSyddzVAnd2qWaqm/LL
+2THkbASi7YnAG0AF7wXK
+=js+n
+-----END PGP SIGNATURE-----
+
+--nSQp8DZZn7gZbDHt--
