@@ -1,35 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33597)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34860)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1dBO2J-0002WL-Ag
-	for qemu-devel@nongnu.org; Thu, 18 May 2017 12:12:25 -0400
+	(envelope-from <quintela@redhat.com>) id 1dBO6t-0003dB-Nh
+	for qemu-devel@nongnu.org; Thu, 18 May 2017 12:17:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1dBO2F-0005HI-B1
-	for qemu-devel@nongnu.org; Thu, 18 May 2017 12:12:23 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:51324)
+	(envelope-from <quintela@redhat.com>) id 1dBO6p-0006pZ-OV
+	for qemu-devel@nongnu.org; Thu, 18 May 2017 12:17:07 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:57868)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1dBO2F-0005HC-52
-	for qemu-devel@nongnu.org; Thu, 18 May 2017 12:12:19 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1dBO6p-0006pJ-Ej
+	for qemu-devel@nongnu.org; Thu, 18 May 2017 12:17:03 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id B9E9B8050D
-	for <qemu-devel@nongnu.org>; Thu, 18 May 2017 16:12:17 +0000 (UTC)
-Message-ID: <1495123936.627.27.camel@redhat.com>
-From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Thu, 18 May 2017 18:12:16 +0200
-In-Reply-To: <7d426658-c6ff-5eb0-025a-e421c5773703@redhat.com>
-References: <20170512122158.32032-1-kraxel@redhat.com>
-	<20170512122158.32032-7-kraxel@redhat.com>
-	<a4f99c9b-1fb4-8a0c-ec3b-0cadc7dfd382@redhat.com>
-	<728dca25-a9ef-a061-dee7-c5b4309ca8dc@redhat.com>
-	<6d9941a5-268c-9bc2-4122-64f023dfaa51@redhat.com>
-	<7d426658-c6ff-5eb0-025a-e421c5773703@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
+	by mx1.redhat.com (Postfix) with ESMTPS id 78C3BC056784
+	for <qemu-devel@nongnu.org>; Thu, 18 May 2017 16:17:02 +0000 (UTC)
+From: Juan Quintela <quintela@redhat.com>
+Date: Thu, 18 May 2017 18:16:46 +0200
+Message-Id: <20170518161655.30311-1-quintela@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Mime-Version: 1.0
-Subject: Re: [Qemu-devel] [PULL 6/6] hw/usb/dev-serial: Do not try to set
- vendorid or productid properties
+Subject: [Qemu-devel] [PATCH v5 0/9] Migration mini-cleanup
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,44 +30,204 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: dgilbert@redhat.com, lvivier@redhat.com, peterx@redhat.com
 
-  Hi,
+Hi
 
-> >> Feel free to send an additional cleanup patch ... otherwise, I'd say l=
-et
-> >> it bitrot for another year and we then remove it completely together
-> >> with all the other "-usbdevice" functions...
-> >=20
-> > Well, Coverity reports it so I'd rather keep it clean...
 
-It will be clean once removed, I likewise wouldn't put too much effort
-into code which is scheduled for removal anyway, especially for more or
-less cosmetic issues like unreachable code.
+Changes from v3
 
-> Hmm, maybe we should simply remove "-usbdevice serial" right now already
-> ... ? The vendorid/productid parameter handling has been broken since
-> QEMU v0.14 already and nobody ever complained, so I guess hardly anybody
-> is using "-usbdevice serial" anymore ... so I tend to simply remove it
-> directly instead of going through the typical "mark-as-deprecated ->
-> wait-two-release-cycles -> finally-remove-it" process here...
+Only copyright notices:
+included the diff to make it easier to see:
+- channel.{c,h} -> goes to Daniel Berrange
+- qemu-file-channel.h -> same one than qemu-file-channel.c
 
-Hmm, there is little reason to set vendorid + productid, so that alone
-is no strong indication that -usbdevice serial is unused.  But
-nevertheless I think it usb-serial is one of the rarely used devices, so
-we could try ...
+I hope this is ok now.
 
-Order is probably along these lines:
+Thanks, Juan.
 
-usb hid devices are used alot (tablet on x86, all on !x86).
-usb-storage comes next I guess.
-usb-host (aka pass-through) is important too of course.
 
-Everything else (serial, net, bluetooth) is largely unused I guess.
+diff --git a/migration/channel.c b/migration/channel.c
+index fed8563..124857d 100644
+--- a/migration/channel.c
++++ b/migration/channel.c
+@@ -1,10 +1,10 @@
+ /*
+- * QEMU live migration
++ * QEMU live migration channel operations
+  *
+- * Copyright IBM, Corp. 2008
++ * Copyright Red Hat, Inc. 2016
+  *
+  * Authors:
+- *  Anthony Liguori   <aliguori@us.ibm.com>
++ *  Daniel P. Berrange <berrange@redhat.com>
+  *
+  * This work is licensed under the terms of the GNU GPL, version 2.  See
+  * the COPYING file in the top-level directory.
+diff --git a/migration/channel.h b/migration/channel.h
+index 618acb7..2e0a7e3 100644
+--- a/migration/channel.h
++++ b/migration/channel.h
+@@ -1,14 +1,16 @@
+ /*
+- * QEMU live migration channel functions
++ * QEMU live migration channel operations
+  *
+- * Copyright IBM, Corp. 2008
++ * Copyright Red Hat, Inc. 2016
+  *
+  * Authors:
+- *  Anthony Liguori   <aliguori@us.ibm.com>
++ *  Daniel P. Berrange <berrange@redhat.com>
+  *
+  * This work is licensed under the terms of the GNU GPL, version 2.  See
+  * the COPYING file in the top-level directory.
+  *
++ * Contributions after 2012-01-13 are licensed under the terms of the
++ * GNU GPL, version 2 or (at your option) any later version.
+  */
+=20
+ #ifndef QEMU_MIGRATION_CHANNEL_H
+diff --git a/migration/qemu-file-channel.h b/migration/qemu-file-channel.=
+h
+index d1bd5ff..0028a09 100644
+--- a/migration/qemu-file-channel.h
++++ b/migration/qemu-file-channel.h
+@@ -1,14 +1,25 @@
+ /*
+- * QEMU migration file channel operations
++ * QEMUFile backend for QIOChannel objects
+  *
+- * Copyright IBM, Corp. 2008
++ * Copyright (c) 2015-2016 Red Hat, Inc
+  *
+- * Authors:
+- *  Anthony Liguori   <aliguori@us.ibm.com>
++ * Permission is hereby granted, free of charge, to any person obtaining=
+ a copy
++ * of this software and associated documentation files (the "Software"),=
+ to deal
++ * in the Software without restriction, including without limitation the=
+ rights
++ * to use, copy, modify, merge, publish, distribute, sublicense, and/or =
+sell
++ * copies of the Software, and to permit persons to whom the Software is
++ * furnished to do so, subject to the following conditions:
+  *
+- * This work is licensed under the terms of the GNU GPL, version 2.  See
+- * the COPYING file in the top-level directory.
++ * The above copyright notice and this permission notice shall be includ=
+ed in
++ * all copies or substantial portions of the Software.
+  *
++ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRE=
+SS OR
++ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILI=
+TY,
++ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHA=
+LL
++ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR =
+OTHER
++ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISI=
+NG FROM,
++ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALING=
+S IN
++ * THE SOFTWARE.
+  */
+=20
+ #ifndef QEMU_FILE_CHANNEL_H
 
-ccid, uas and mtp are new enough to not carry around -usbdevice
-compatibility support.
 
-cheers,
-  Gerd
+[v3]
+
+- dropped movement of colo*h headers
+  they are used in other palaces in patches outside the tree
+- Change the license of vmstate*c files to GPL v2+
+  Dave noted that I was using the wrong text
+- page_cache.c movement was already reviewd and it has no conflicts,
+  moved to pull request.
+
+Please, review
+
+Thanks, Juan.
+
+
+[v3]
+Due to popular demand, and to make reviews easier, I just split the
+big cleanup series (41 patches) in small chunks.  This chunk just
+include the easy patches:
+
+- create several include files foo.h for functcions exported from foo.c
+- split channel operations in channel.c
+- move colo headers to migration/
+- split vmstate-types.c from vmstate.c (now it only contains the interpre=
+ter)
+- untangle qemu-file.h, vmstate.h and migration.h.  Now none include the =
+other
+  fix all callers.
+- Remove uses of migration.h that are not needed
+
+
+
+Juan Quintela (9):
+  migration: Create migration/xbzrle.h
+  migration: Split migration/channel.c for channel operations
+  migration: Export qemu-file-channel.c functions in its own file
+  migration: Remove migration.h from colo.h
+  migration: Move qjson.h to migration/
+  migration: Split vmstate-types.c from vmstate.c
+  migration: Remove qemu-file.h from vmstate.h
+  migration: Remove vmstate.h from migration.h
+  migration: migration.h was not needed
+
+ block/qed.c                              |   1 -
+ hw/i386/pc_q35.c                         |   1 -
+ hw/virtio/vhost-user.c                   |   1 -
+ hw/virtio/vhost-vsock.c                  |   1 -
+ hw/virtio/virtio.c                       |   1 -
+ include/hw/hw.h                          |   1 +
+ include/migration/colo.h                 |   1 -
+ include/migration/migration.h            |  13 +-
+ include/migration/qemu-file.h            |   4 -
+ include/migration/vmstate.h              |   3 -
+ migration/Makefile.objs                  |   4 +-
+ migration/block.c                        |   2 +
+ migration/channel.c                      |  70 ++++
+ migration/channel.h                      |  27 ++
+ migration/colo-comm.c                    |   4 +-
+ migration/colo.c                         |   3 +
+ migration/exec.c                         |   1 +
+ migration/fd.c                           |   1 +
+ migration/migration.c                    |  52 +--
+ migration/postcopy-ram.c                 |   1 +
+ migration/qemu-file-channel.c            |   1 +
+ migration/qemu-file-channel.h            |  32 ++
+ migration/qjson.c                        |   2 +-
+ {include/migration =3D> migration}/qjson.h |   0
+ migration/ram.c                          |   3 +
+ migration/rdma.c                         |   1 +
+ migration/savevm.c                       |   1 +
+ migration/socket.c                       |   1 +
+ migration/tls.c                          |   1 +
+ migration/vmstate-types.c                | 661 +++++++++++++++++++++++++=
+++++++
+ migration/vmstate.c                      | 656 +------------------------=
+-----
+ migration/xbzrle.c                       |   2 +-
+ migration/xbzrle.h                       |  21 +
+ monitor.c                                |   1 -
+ tests/Makefile.include                   |   2 +-
+ tests/test-vmstate.c                     |   2 +
+ tests/test-xbzrle.c                      |   2 +-
+ 37 files changed, 855 insertions(+), 726 deletions(-)
+ create mode 100644 migration/channel.c
+ create mode 100644 migration/channel.h
+ create mode 100644 migration/qemu-file-channel.h
+ rename {include/migration =3D> migration}/qjson.h (100%)
+ create mode 100644 migration/vmstate-types.c
+ create mode 100644 migration/xbzrle.h
+
+--=20
+2.9.3
