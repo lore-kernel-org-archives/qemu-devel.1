@@ -1,29 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54447)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55111)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dBHNV-0003aP-KX
-	for qemu-devel@nongnu.org; Thu, 18 May 2017 05:05:51 -0400
+	(envelope-from <stefanha@gmail.com>) id 1dBHRT-0004qw-TW
+	for qemu-devel@nongnu.org; Thu, 18 May 2017 05:09:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dBHNR-0002Ce-L1
-	for qemu-devel@nongnu.org; Thu, 18 May 2017 05:05:49 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47256)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1dBHNR-0002Bc-Bi
-	for qemu-devel@nongnu.org; Thu, 18 May 2017 05:05:45 -0400
-References: <1495035337-13337-1-git-send-email-thuth@redhat.com>
-	<0721f18a-fc66-0be3-7462-76eb60de7f55@redhat.com>
-	<394772e4-949a-b92f-6879-7b9e343e10d3@redhat.com>
-	<0cb4c90d-cfcc-3d12-44b5-c979f20ec7b9@redhat.com>
-	<d352caf1-90c5-558c-1d25-cfd91d4e24fc@de.ibm.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <47701282-594e-8ddd-9969-25097be0d77d@redhat.com>
-Date: Thu, 18 May 2017 11:05:37 +0200
+	(envelope-from <stefanha@gmail.com>) id 1dBHRQ-0003XA-Kc
+	for qemu-devel@nongnu.org; Thu, 18 May 2017 05:09:55 -0400
+Received: from mail-wr0-x242.google.com ([2a00:1450:400c:c0c::242]:36473)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1dBHRQ-0003Wy-Bg
+	for qemu-devel@nongnu.org; Thu, 18 May 2017 05:09:52 -0400
+Received: by mail-wr0-x242.google.com with SMTP id v42so5237939wrc.3
+	for <qemu-devel@nongnu.org>; Thu, 18 May 2017 02:09:52 -0700 (PDT)
+Date: Thu, 18 May 2017 10:09:49 +0100
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20170518090949.GE30862@stefanha-x1.localdomain>
+References: <20170517111346.21450-1-quintela@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <d352caf1-90c5-558c-1d25-cfd91d4e24fc@de.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC PATCH] target/s390x/cpu_models: Set some
- additional feature bits for the "qemu" CPU
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="4Epv4kl9IRBfg3rk"
+Content-Disposition: inline
+In-Reply-To: <20170517111346.21450-1-quintela@redhat.com>
+Subject: Re: [Qemu-devel] [PULL 0/7] Migration pull request
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,121 +29,117 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Christian Borntraeger <borntraeger@de.ibm.com>, David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>
-Cc: mmarek@suse.com, mbenes@suse.cz, Aurelien Jarno <aurelien@aurel32.net>, "Jason J. Herne" <jjherne@linux.vnet.ibm.com>
+To: Juan Quintela <quintela@redhat.com>
+Cc: qemu-devel@nongnu.org, lvivier@redhat.com, dgilbert@redhat.com, peterx@redhat.com
 
-On 18.05.2017 11:00, Christian Borntraeger wrote:
-> On 05/18/2017 10:48 AM, David Hildenbrand wrote:
->> On 18.05.2017 03:55, Thomas Huth wrote:
->>> On 17.05.2017 18:49, David Hildenbrand wrote:
->>>> On 17.05.2017 17:35, Thomas Huth wrote:
->>>>> Currently we only present the plain z900 feature bits to the guest,
->>>>> but QEMU already emulates some additional features (but not all of
->>>>> the next CPU generation, so we can not use the next CPU level as
->>>>> default yet). Since newer Linux kernels are checking the feature bits
->>>>> and refuse to work if a required feature is missing, we should present
->>>>> as much of the supported features as possible when we are running
->>>>> with the default "qemu" CPU.
->>>>> This patch now adds the "stfle", "extended immediate" and "stckf"
->>>>> facility bits to the "qemu" CPU, which are already supported facilities.
->>>>> It is unfortunately still not enough to run e.g. recent Fedora kernels,
->>>>> but at least it's a first step into the right direction.
->>>>>
->>>>
->>>> Three things:
->>>>
->>>> 1. Should we care about backwards compatibility? I think so. This should
->>>> be fixed up using compat machine properties. (qemu model is a
->>>> migration-safe model and could e.g. be used in KVM setups, too).
->>>
->>> Theoretically, I agree, but do we really care about backwards
->>> compatibility at this point in time? All major distro kernels (except
->>> Debian, I think) currently do not work in QEMU, so there is currently
->>> not that much that can be migrated...
->>> And currently, the "qemu" CPU is the very same as the "z900" CPU, so you
->>> might also get along with simply using "-cpu z900" on the destination
->>> instead, I guess.
->>
->> If possible, I would like to avoid changing migration safe CPU model.
->> And I guess it shouldn't be too hard for now (unless we really change
->> the base model to e.g. a z9, then some more work might have to be done)
->>
->> I think for now, setting "stfle=off" on "s390-cpu-qemu" for compat
->> machines should do the trick.
->>
->>>
->>>> 2. I would recommend to not enable STFLE for now. Why?
->>>>
->>>> It is/was an indication that the system is running on a z9 (and
->>>> implicitly has the basic features). This was not only done because
->>>> people were lazy, but because this bit was implicitly connected to other
->>>> machine properties.
->>>
->>> Uh, that's ugly!
->>>
->>>> One popular example is the "DAT-enhancement facility 2". It introduced
->>>> the "LOAD PAGE TABLE ENTRY ADDRESS" instruction, but no facility bit was
->>>> introduced. SO there is no way to check if the instruction is available
->>>> and actually working.
->>>
->>> Does the Linux kernel use this instruction at all? I just grep'ed
->>> through the kernel sources and did not find it. If the Linux kernel does
->>> not use it, I think we should ignore this interdependency and just
->>> provide the STFLE feature bit to the guest - since recent Linux kernels
->>> depend on it.
->>
->> Yes, current linux doesn't use it, I don't remember if previous versions
->> did. Most likely not. The question is if they relied on the stfle==z9
->> assumption. The STFLE facility really is special in that sense.
->>
->>>
->>>> Please note that we added a feature representation for this facility,
->>>> because this would allow us later on to at least model removal of such a
->>>> facility (if HW actually would drop it) on a CPU model level.
->>>
->>> What about STFLE bit 78, according to my version of the POP, it says:
->>>
->>> "The enhanced-DAT facility 2 is installed in the
->>>  z/Architecture architectural mode."
->>>
->>> ?
->>
->> As Aurelien already mentioned, there seemed to be different ways to
->> enhance DAT :) enhanced-DAT facility 2 is 2GB page support.
->>
->>>
->>>> 3. This introduces some inconsistency. s390x/cpu_models.c:set_feature()
->>>> explicitly tests for such inconsistencies.
->>>>
->>>> So your QEMU CPU model would have a feature, but you would not be able
->>>> to run that model using QEMU when manually specifying it on the command
->>>> line. Especially, expanding the "qemu" model and feeding it back to QEMU
->>>> will fail.
->>>
->>> I've checked that I can also successfully disable the features again at
->>> the command line, using "-cpu qemu,eimm=false" for example, so not sure
->>> what exactly you're talking about here. Could you please elaborate?
->>
->> Assume libvirt/the user expands the CPU model name "qemu" via
->> "qmp-expand-cpu-model "qemu", you will get something like
->>
->> "z900-base,.....,stfle=on"
->>
->> If you feed that to QEMU using "-cpu z900-base,...,stfle=on", QEMU will
->> detect the inconsistency when setting the property and abort. However,
->> "-cpu qemu" will succeed. Please note that these checks actually make
->> sense for KVM:
->>
-> 
-> Jason (now on cc) has a patch prepared for other reasons that disabled features
-> for given machines. I kept the ESOP example in that patch.
-> That would allow us to disable STFLE for old machines but enable it for 2.10
-[...]
-> Maybe we should split that out and merge such a patch sooner than the
-> (yet in development) other changes?
 
-Yes, that sounds like a good idea, I think we could use the same
-mechanism here, too, so please split it out and submit it earlier!
+--4Epv4kl9IRBfg3rk
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
- Thanks a lot,
-  Thomas
+On Wed, May 17, 2017 at 01:13:39PM +0200, Juan Quintela wrote:
+> Hi
+>=20
+> This pull request:
+> - drop block capability patch (now they is being reviewed)
+> - add following patches that got reviewed:
+>   * page_cache.c into migration
+>   * postcopy stuff into postocpy-ram.c
+>   * check_migratable change
+>=20
+> Please apply.
+>=20
+> Thanks, Juan.
+>=20
+> The following changes since commit cdece0467c00007cf8e3f4b3c3f0b13bf2c4fe=
+a9:
+>=20
+>   block/win32: fix 'ret not initialized' warning (2017-05-16 15:34:18 +01=
+00)
+>=20
+> are available in the git repository at:
+>=20
+>   git://github.com/juanquintela/qemu.git tags/migration/20170517
+>=20
+> for you to fetch changes up to 1bfe5f0586083747f1602931713111673849cd9d:
+>=20
+>   migration: Move check_migratable() into qdev.c (2017-05-17 12:04:59 +02=
+00)
+>=20
+> ----------------------------------------------------------------
+> migration/next for 20170517
+>=20
+> ----------------------------------------------------------------
+> Juan Quintela (7):
+>       migration: Fix regression with compression threads
+>       migration: Pass Error ** argument to {save,load}_vmstate
+>       ram: Rename RAM_SAVE_FLAG_COMPRESS to RAM_SAVE_FLAG_ZERO
+>       migration: Create migration/blocker.h
+>       migration: Move page_cache.c to migration/
+>       migration: Move postcopy stuff to postcopy-ram.c
+>       migration: Move check_migratable() into qdev.c
+>=20
+>  Makefile.objs                                 |  1 -
+>  block/qcow.c                                  |  2 +-
+>  block/vdi.c                                   |  2 +-
+>  block/vhdx.c                                  |  2 +-
+>  block/vmdk.c                                  |  2 +-
+>  block/vpc.c                                   |  2 +-
+>  block/vvfat.c                                 |  2 +-
+>  hmp.c                                         |  9 +++-
+>  hw/9pfs/9p.c                                  |  2 +-
+>  hw/core/qdev.c                                | 20 +++++++--
+>  hw/display/qxl.c                              |  2 +-
+>  hw/display/virtio-gpu.c                       |  2 +-
+>  hw/intc/arm_gic_kvm.c                         |  2 +-
+>  hw/intc/arm_gicv3_its_kvm.c                   |  2 +-
+>  hw/intc/arm_gicv3_kvm.c                       |  2 +-
+>  hw/misc/ivshmem.c                             |  2 +-
+>  hw/scsi/vhost-scsi.c                          |  2 +-
+>  hw/virtio/vhost.c                             |  2 +-
+>  include/migration/blocker.h                   | 35 +++++++++++++++
+>  include/migration/migration.h                 | 50 ----------------------
+>  include/migration/vmstate.h                   |  2 +
+>  include/sysemu/sysemu.h                       |  6 +--
+>  migration/Makefile.objs                       |  2 +-
+>  migration/migration.c                         | 34 +--------------
+>  page_cache.c =3D> migration/page_cache.c        |  0
+>  {include/migration =3D> migration}/page_cache.h |  0
+>  migration/postcopy-ram.c                      | 18 ++++++++
+>  migration/postcopy-ram.h                      | 26 ++++++++++++
+>  migration/ram.c                               | 35 +++++++++------
+>  migration/savevm.c                            | 61 +++++++++++++++------=
+------
+>  replay/replay-snapshot.c                      |  8 +++-
+>  stubs/migr-blocker.c                          |  2 +-
+>  stubs/vmstate.c                               |  5 +--
+>  target/i386/kvm.c                             |  2 +-
+>  tests/Makefile.include                        |  2 +-
+>  vl.c                                          |  4 +-
+>  36 files changed, 194 insertions(+), 158 deletions(-)
+>  create mode 100644 include/migration/blocker.h
+>  rename page_cache.c =3D> migration/page_cache.c (100%)
+>  rename {include/migration =3D> migration}/page_cache.h (100%)
+>=20
+
+Thanks, applied to my staging tree:
+https://github.com/stefanha/qemu/commits/staging
+
+Stefan
+
+--4Epv4kl9IRBfg3rk
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJZHWTdAAoJEJykq7OBq3PIlM8H/107mTq2iof/ObeKtMDK6wPR
+/N05+O5xqs9le+XhF9M2TgbuhzsfBR7Aj8JLDHHQtS6nDSa47dGGSnDiK7kpJjU+
+0JJ7UUA+z0m3X3sCFyZlffrzKf2By3n+KR7CeVBNAYuwR/kZymNIhKGFtH6uOTSG
+fr3B3kQGJJSWva/cngwLiK+zVuSBFC78ppiDSEoYNpSlaP2VDxImEozHUMmqy9M5
+eXXXq/5rfgrmpshCANTLmLvOrav8nPBE5ENlEwJrXRdQTVxLZT53MideZqtoJe0P
+2XJKHixwA0D4tCPv6LQyh0o6qv3BB5NNFba8OxXuH5isMsa24kyONUIyb6QWFf8=
+=g55F
+-----END PGP SIGNATURE-----
+
+--4Epv4kl9IRBfg3rk--
