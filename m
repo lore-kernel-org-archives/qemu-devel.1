@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38176)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42169)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1dBPdO-00019y-8I
-	for qemu-devel@nongnu.org; Thu, 18 May 2017 13:54:47 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1dBQ1I-0005T6-IT
+	for qemu-devel@nongnu.org; Thu, 18 May 2017 14:19:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1dBPdN-0000tg-10
-	for qemu-devel@nongnu.org; Thu, 18 May 2017 13:54:46 -0400
-Date: Thu, 18 May 2017 13:54:36 -0400
-From: Jeff Cody <jcody@redhat.com>
-Message-ID: <20170518175436.GF6761@localhost.localdomain>
-References: <20170515191136.24314-1-ndevos@redhat.com>
-	<20170518095422.12555-1-ndevos@redhat.com>
+	(envelope-from <ehabkost@redhat.com>) id 1dBQ1H-0007fB-7W
+	for qemu-devel@nongnu.org; Thu, 18 May 2017 14:19:28 -0400
+Date: Thu, 18 May 2017 15:19:13 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20170518181913.GN4748@thinpad.lan.raisama.net>
+References: <1495094971-177754-1-git-send-email-imammedo@redhat.com>
+	<1495094971-177754-2-git-send-email-imammedo@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20170518095422.12555-1-ndevos@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2] gluster: add support for
- PREALLOC_MODE_FALLOC
+In-Reply-To: <1495094971-177754-2-git-send-email-imammedo@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 1/3] numa: consolidate cpu_preplug
+ fixups/checks for pc/arm/spapr
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,187 +24,194 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Niels de Vos <ndevos@redhat.com>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-arm@nongnu.org, qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, Andrew Jones <drjones@redhat.com>
 
-On Thu, May 18, 2017 at 11:54:22AM +0200, Niels de Vos wrote:
-> Add missing support for "preallocation=falloc" to the Gluster block
-> driver. This change bases its logic on that of block/file-posix.c and
-> removed the gluster_supports_zerofill() and qemu_gluster_zerofill()
-> functiond in favour of #ifdef checks in an easy to read
-> switch-statement.
-> 
-> Both glfs_zerofill() and glfs_fallocate() have been introduced with
-> GlusterFS 3.5.0 (pkg-config glusterfs-api = 6). A #define for the
-> availability of glfs_fallocate() has been added to ./configure.
-> 
-> Reported-by: Satheesaran Sundaramoorthi <sasundar@redhat.com>
-> URL: https://bugzilla.redhat.com/1450759
-> Signed-off-by: Niels de Vos <ndevos@redhat.com>
+On Thu, May 18, 2017 at 10:09:29AM +0200, Igor Mammedov wrote:
+> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
 > ---
-> v2 changes requested by Jeff Cody:
-> - add CONFIG_GLUSTERFS_FALLOCATE
-> - remove unneeded wrapper qemu_gluster_zerofill()
+>  include/sysemu/numa.h |  1 +
+>  hw/arm/virt.c         | 16 ++--------------
+>  hw/i386/pc.c          | 17 +----------------
+>  hw/ppc/spapr.c        | 17 +----------------
+>  numa.c                | 22 ++++++++++++++++++++++
+>  5 files changed, 27 insertions(+), 46 deletions(-)
 > 
->  block/gluster.c | 76 ++++++++++++++++++++++++++++++---------------------------
->  configure       |  6 +++++
->  2 files changed, 46 insertions(+), 36 deletions(-)
-> 
-> diff --git a/block/gluster.c b/block/gluster.c
-> index 7c76cd0..0610183 100644
-> --- a/block/gluster.c
-> +++ b/block/gluster.c
-> @@ -964,29 +964,6 @@ static coroutine_fn int qemu_gluster_co_pwrite_zeroes(BlockDriverState *bs,
->      qemu_coroutine_yield();
->      return acb.ret;
->  }
-> -
-> -static inline bool gluster_supports_zerofill(void)
-> -{
-> -    return 1;
-> -}
-> -
-> -static inline int qemu_gluster_zerofill(struct glfs_fd *fd, int64_t offset,
-> -                                        int64_t size)
-> -{
-> -    return glfs_zerofill(fd, offset, size);
-> -}
-> -
-> -#else
-> -static inline bool gluster_supports_zerofill(void)
-> -{
-> -    return 0;
-> -}
-> -
-> -static inline int qemu_gluster_zerofill(struct glfs_fd *fd, int64_t offset,
-> -                                        int64_t size)
-> -{
-> -    return 0;
-> -}
+> diff --git a/include/sysemu/numa.h b/include/sysemu/numa.h
+> index 7ffde5b..610eece 100644
+> --- a/include/sysemu/numa.h
+> +++ b/include/sysemu/numa.h
+> @@ -35,4 +35,5 @@ void numa_legacy_auto_assign_ram(MachineClass *mc, NodeInfo *nodes,
+>                                   int nb_nodes, ram_addr_t size);
+>  void numa_default_auto_assign_ram(MachineClass *mc, NodeInfo *nodes,
+>                                    int nb_nodes, ram_addr_t size);
+> +void numa_cpu_pre_plug(const CPUArchId *slot, DeviceState *dev, Error **errp);
+
+I understand an explicitly call to numa_cpu_pre_plug() is needed
+on spapr_core_pre_plug() because it is not handling a TYPE_CPU
+object. But why not adding a numa_cpu_pre_plug() call to
+cpu_common_realizefn(), so the explicit calls in machvirt_init()
+and pc_cpu_pre_plug() are not necessary?
+
+Adding the code to cpu_common_realizefn() would also ensure
+CPUState::node_id is set consistently, even if hotplug was not
+done at thread level.
+
+
 >  #endif
+> diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+> index c7c8159..ce676df 100644
+> --- a/hw/arm/virt.c
+> +++ b/hw/arm/virt.c
+> @@ -1351,7 +1351,6 @@ static void machvirt_init(MachineState *machine)
+>      for (n = 0; n < possible_cpus->len; n++) {
+>          Object *cpuobj;
+>          CPUState *cs;
+> -        int node_id;
 >  
->  static int qemu_gluster_create(const char *filename,
-> @@ -996,9 +973,10 @@ static int qemu_gluster_create(const char *filename,
->      struct glfs *glfs;
->      struct glfs_fd *fd;
->      int ret = 0;
-> -    int prealloc = 0;
-> +    PreallocMode prealloc;
->      int64_t total_size = 0;
->      char *tmp = NULL;
-> +    Error *local_err = NULL;
+>          if (n >= smp_cpus) {
+>              break;
+> @@ -1364,19 +1363,8 @@ static void machvirt_init(MachineState *machine)
+>          cs = CPU(cpuobj);
+>          cs->cpu_index = n;
 >  
->      gconf = g_new0(BlockdevOptionsGluster, 1);
->      gconf->debug = qemu_opt_get_number_del(opts, GLUSTER_OPT_DEBUG,
-> @@ -1026,13 +1004,12 @@ static int qemu_gluster_create(const char *filename,
->                            BDRV_SECTOR_SIZE);
+> -        node_id = possible_cpus->cpus[cs->cpu_index].props.node_id;
+> -        if (!possible_cpus->cpus[cs->cpu_index].props.has_node_id) {
+> -            /* by default CPUState::numa_node was 0 if it's not set via CLI
+> -             * keep it this way for now but in future we probably should
+> -             * refuse to start up with incomplete numa mapping */
+> -             node_id = 0;
+> -        }
+> -        if (cs->numa_node == CPU_UNSET_NUMA_NODE_ID) {
+> -            cs->numa_node = node_id;
+> -        } else {
+> -            /* CPU isn't device_add compatible yet, this shouldn't happen */
+> -            error_setg(&error_abort, "user set node-id not implemented");
+> -        }
+> +        numa_cpu_pre_plug(&possible_cpus->cpus[cs->cpu_index], DEVICE(cpuobj),
+> +                          &error_fatal);
 >  
->      tmp = qemu_opt_get_del(opts, BLOCK_OPT_PREALLOC);
-> -    if (!tmp || !strcmp(tmp, "off")) {
-> -        prealloc = 0;
-> -    } else if (!strcmp(tmp, "full") && gluster_supports_zerofill()) {
-> -        prealloc = 1;
-> -    } else {
-> -        error_setg(errp, "Invalid preallocation mode: '%s'"
-> -                         " or GlusterFS doesn't support zerofill API", tmp);
-> +    prealloc = qapi_enum_parse(PreallocMode_lookup, tmp,
-> +                               PREALLOC_MODE__MAX, PREALLOC_MODE_OFF,
-> +                               &local_err);
-> +    g_free(tmp);
-> +    if (local_err) {
-> +        error_propagate(errp, local_err);
->          ret = -EINVAL;
+>          if (!vms->secure) {
+>              object_property_set_bool(cpuobj, false, "has_el3", NULL);
+> diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+> index e36a375..d83c158 100644
+> --- a/hw/i386/pc.c
+> +++ b/hw/i386/pc.c
+> @@ -1895,7 +1895,6 @@ static void pc_cpu_pre_plug(HotplugHandler *hotplug_dev,
+>                              DeviceState *dev, Error **errp)
+>  {
+>      int idx;
+> -    int node_id;
+>      CPUState *cs;
+>      CPUArchId *cpu_slot;
+>      X86CPUTopoInfo topo;
+> @@ -1986,21 +1985,7 @@ static void pc_cpu_pre_plug(HotplugHandler *hotplug_dev,
+>      cs = CPU(cpu);
+>      cs->cpu_index = idx;
+>  
+> -    node_id = cpu_slot->props.node_id;
+> -    if (!cpu_slot->props.has_node_id) {
+> -        /* by default CPUState::numa_node was 0 if it's not set via CLI
+> -         * keep it this way for now but in future we probably should
+> -         * refuse to start up with incomplete numa mapping */
+> -        node_id = 0;
+> -    }
+> -    if (cs->numa_node == CPU_UNSET_NUMA_NODE_ID) {
+> -        cs->numa_node = node_id;
+> -    } else if (cs->numa_node != node_id) {
+> -            error_setg(errp, "node-id %d must match numa node specified"
+> -                "with -numa option for cpu-index %d",
+> -                cs->numa_node, cs->cpu_index);
+> -            return;
+> -    }
+> +    numa_cpu_pre_plug(cpu_slot, dev, errp);
+>  }
+>  
+>  static void pc_machine_device_pre_plug_cb(HotplugHandler *hotplug_dev,
+> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> index 0980d73..c7fee8b 100644
+> --- a/hw/ppc/spapr.c
+> +++ b/hw/ppc/spapr.c
+> @@ -2831,11 +2831,9 @@ static void spapr_core_pre_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
+>      MachineClass *mc = MACHINE_GET_CLASS(hotplug_dev);
+>      Error *local_err = NULL;
+>      CPUCore *cc = CPU_CORE(dev);
+> -    sPAPRCPUCore *sc = SPAPR_CPU_CORE(dev);
+>      char *base_core_type = spapr_get_cpu_core_type(machine->cpu_model);
+>      const char *type = object_get_typename(OBJECT(dev));
+>      CPUArchId *core_slot;
+> -    int node_id;
+>      int index;
+>  
+>      if (dev->hotplugged && !mc->has_hotpluggable_cpus) {
+> @@ -2870,20 +2868,7 @@ static void spapr_core_pre_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
 >          goto out;
 >      }
-> @@ -1041,21 +1018,48 @@ static int qemu_gluster_create(const char *filename,
->                      O_WRONLY | O_CREAT | O_TRUNC | O_BINARY, S_IRUSR | S_IWUSR);
->      if (!fd) {
->          ret = -errno;
-> -    } else {
-> +        goto out;
-> +    }
-> +
-> +    switch (prealloc) {
-> +#ifdef CONFIG_GLUSTERFS_FALLOCATE
-> +    case PREALLOC_MODE_FALLOC:
-> +        if (!glfs_fallocate(fd, 0, 0, total_size)) {
-
-Does glfs_fallocate() return 0 on failure?  Both posix and linux versions of
-fallocate() return 0 on success.
-
-> +            error_setg(errp, "Could not preallocate data for the new file");
-> +            ret = -errno;
-> +        }
-> +        break;
-> +#endif /* CONFIG_GLUSTERFS_FALLOCATE */
-> +#ifdef CONFIG_GLUSTERFS_ZEROFILL
-> +    case PREALLOC_MODE_FULL:
->          if (!glfs_ftruncate(fd, total_size)) {
-> -            if (prealloc && qemu_gluster_zerofill(fd, 0, total_size)) {
-> +            if (glfs_zerofill(fd, 0, total_size)) {
-> +                error_setg(errp, "Could not zerofill the new file");
->                  ret = -errno;
->              }
->          } else {
-> +            error_setg(errp, "Could not resize file");
->              ret = -errno;
->          }
-> -
-> -        if (glfs_close(fd) != 0) {
-> +        break;
-> +#endif /* CONFIG_GLUSTERFS_ZEROFILL */
-> +    case PREALLOC_MODE_OFF:
-> +        if (glfs_ftruncate(fd, total_size) != 0) {
->              ret = -errno;
-> +            error_setg(errp, "Could not resize file");
->          }
-> +        break;
-> +    default:
-> +        ret = -EINVAL;
-> +        error_setg(errp, "Unsupported preallocation mode: %s",
-> +                   PreallocMode_lookup[prealloc]);
-> +        break;
-> +    }
-> +
-> +    if (glfs_close(fd) != 0) {
-> +        ret = -errno;
->      }
->  out:
-> -    g_free(tmp);
->      qapi_free_BlockdevOptionsGluster(gconf);
->      glfs_clear_preopened(glfs);
->      return ret;
-> diff --git a/configure b/configure
-> index 7c020c0..8b8291e 100755
-> --- a/configure
-> +++ b/configure
-> @@ -300,6 +300,7 @@ seccomp=""
->  glusterfs=""
->  glusterfs_xlator_opt="no"
->  glusterfs_discard="no"
-> +glusterfs_fallocate="no"
->  glusterfs_zerofill="no"
->  gtk=""
->  gtkabi=""
-> @@ -3576,6 +3577,7 @@ if test "$glusterfs" != "no" ; then
->        glusterfs_discard="yes"
->      fi
->      if $pkg_config --atleast-version=6 glusterfs-api; then
-> +      glusterfs_fallocate="yes"
->        glusterfs_zerofill="yes"
->      fi
->    else
-> @@ -5780,6 +5782,10 @@ if test "$glusterfs_discard" = "yes" ; then
->    echo "CONFIG_GLUSTERFS_DISCARD=y" >> $config_host_mak
->  fi
 >  
-> +if test "$glusterfs_fallocate" = "yes" ; then
-> +  echo "CONFIG_GLUSTERFS_FALLOCATE=y" >> $config_host_mak
-> +fi
+> -    node_id = core_slot->props.node_id;
+> -    if (!core_slot->props.has_node_id) {
+> -        /* by default CPUState::numa_node was 0 if it's not set via CLI
+> -         * keep it this way for now but in future we probably should
+> -         * refuse to start up with incomplete numa mapping */
+> -        node_id = 0;
+> -    }
+> -    if (sc->node_id == CPU_UNSET_NUMA_NODE_ID) {
+> -        sc->node_id = node_id;
+> -    } else if (sc->node_id != node_id) {
+> -        error_setg(&local_err, "node-id %d must match numa node specified"
+> -            "with -numa option for cpu-index %d", sc->node_id, cc->core_id);
+> -        goto out;
+> -    }
+> +    numa_cpu_pre_plug(core_slot, dev, &local_err);
+>  
+>  out:
+>      g_free(base_core_type);
+> diff --git a/numa.c b/numa.c
+> index ca73145..0115bfd 100644
+> --- a/numa.c
+> +++ b/numa.c
+> @@ -534,6 +534,28 @@ void parse_numa_opts(MachineState *ms)
+>      }
+>  }
+>  
+> +void numa_cpu_pre_plug(const CPUArchId *slot, DeviceState *dev, Error **errp)
+> +{
+> +    int node_id = object_property_get_int(OBJECT(dev), "node-id", errp);
+
+You don't check for errors here. If they will never happen,
+should we use &error_abort instead?
+
 > +
->  if test "$glusterfs_zerofill" = "yes" ; then
->    echo "CONFIG_GLUSTERFS_ZEROFILL=y" >> $config_host_mak
->  fi
+> +    if (node_id == CPU_UNSET_NUMA_NODE_ID) {
+> +        /* by default CPUState::numa_node was 0 if it wasn't set explicitly
+> +         * TODO: make it error when incomplete numa mapping support is removed
+> +         */
+> +        node_id = 0;
+> +
+> +        /* due to bug in libvirt, it doesn't pass node-id from props on
+> +         * device_add as expected, so we have to fix it up here */
+> +        if (slot->props.has_node_id) {
+> +            node_id = slot->props.node_id;
+> +        }
+> +        object_property_set_int(OBJECT(dev), node_id, "node-id", errp);
+> +    } else if (node_id != slot->props.node_id) {
+> +        error_setg(errp, "node-id=%d must match numa node specified "
+> +                   "with -numa option", node_id);
+
+There's less detail on the error message, now. Probably harmless,
+but I would like to understand when exactly this can be
+triggered: is device_add the only way to trigger this error
+message?
+
+> +    }
+> +}
+> +
+>  static void allocate_system_memory_nonnuma(MemoryRegion *mr, Object *owner,
+>                                             const char *name,
+>                                             uint64_t ram_size)
 > -- 
-> 2.9.3
+> 2.7.4
 > 
+
+-- 
+Eduardo
