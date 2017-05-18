@@ -1,22 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34721)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35548)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dBAcK-0004Q2-6S
-	for qemu-devel@nongnu.org; Wed, 17 May 2017 21:52:44 -0400
+	(envelope-from <thuth@redhat.com>) id 1dBAfA-0005CL-6k
+	for qemu-devel@nongnu.org; Wed, 17 May 2017 21:55:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dBAcJ-0004Pi-7z
-	for qemu-devel@nongnu.org; Wed, 17 May 2017 21:52:40 -0400
-References: <684185116.2952708.1495044580181.ref@mail.yahoo.com>
-	<684185116.2952708.1495044580181@mail.yahoo.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <39e1208c-9ed4-6c56-76d1-e5a7e46a409d@redhat.com>
-Date: Wed, 17 May 2017 20:52:29 -0500
+	(envelope-from <thuth@redhat.com>) id 1dBAf6-0005bc-AX
+	for qemu-devel@nongnu.org; Wed, 17 May 2017 21:55:36 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:44826)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1dBAf6-0005bY-2P
+	for qemu-devel@nongnu.org; Wed, 17 May 2017 21:55:32 -0400
+References: <1495035337-13337-1-git-send-email-thuth@redhat.com>
+	<0721f18a-fc66-0be3-7462-76eb60de7f55@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <394772e4-949a-b92f-6879-7b9e343e10d3@redhat.com>
+Date: Thu, 18 May 2017 03:55:25 +0200
 MIME-Version: 1.0
-In-Reply-To: <684185116.2952708.1495044580181@mail.yahoo.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="Ab7OoWov7s3lQXSlLpw97E9oBWsMWiKi5"
-Subject: Re: [Qemu-devel] Add Markus Armbrusters code for Broadcom
- Perhiperals for ARM.
+In-Reply-To: <0721f18a-fc66-0be3-7462-76eb60de7f55@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [RFC PATCH] target/s390x/cpu_models: Set some
+ additional feature bits for the "qemu" CPU
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,100 +29,98 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Bradley <flypie1@yahoo.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: John Bradley <flypie@rocketmail.com>, Laurent Vivier <lvivier@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Geert Martin Ijewski <gm.ijewski@web.de>, Markus Armbruster <armbru@redhat.com>, Alistair Francis <alistair.francis@xilinx.com>, "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>
+Cc: mmarek@suse.com, mbenes@suse.cz, Aurelien Jarno <aurelien@aurel32.net>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---Ab7OoWov7s3lQXSlLpw97E9oBWsMWiKi5
-From: Eric Blake <eblake@redhat.com>
-To: John Bradley <flypie1@yahoo.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: John Bradley <flypie@rocketmail.com>, Laurent Vivier
- <lvivier@redhat.com>, Peter Maydell <peter.maydell@linaro.org>,
- Geert Martin Ijewski <gm.ijewski@web.de>,
- Markus Armbruster <armbru@redhat.com>,
- Alistair Francis <alistair.francis@xilinx.com>,
- "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <39e1208c-9ed4-6c56-76d1-e5a7e46a409d@redhat.com>
-Subject: Re: [Qemu-devel] Add Markus Armbrusters code for Broadcom Perhiperals
- for ARM.
-References: <684185116.2952708.1495044580181.ref@mail.yahoo.com>
- <684185116.2952708.1495044580181@mail.yahoo.com>
-In-Reply-To: <684185116.2952708.1495044580181@mail.yahoo.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 05/17/2017 01:09 PM, John Bradley via Qemu-devel wrote:
-> Also available at=20
+On 17.05.2017 18:49, David Hildenbrand wrote:
+> On 17.05.2017 17:35, Thomas Huth wrote:
+>> Currently we only present the plain z900 feature bits to the guest,
+>> but QEMU already emulates some additional features (but not all of
+>> the next CPU generation, so we can not use the next CPU level as
+>> default yet). Since newer Linux kernels are checking the feature bits
+>> and refuse to work if a required feature is missing, we should present
+>> as much of the supported features as possible when we are running
+>> with the default "qemu" CPU.
+>> This patch now adds the "stfle", "extended immediate" and "stckf"
+>> facility bits to the "qemu" CPU, which are already supported facilitie=
+s.
+>> It is unfortunately still not enough to run e.g. recent Fedora kernels=
+,
+>> but at least it's a first step into the right direction.
+>>
 >=20
-> https://www.dropbox.com/s/gwuquw0kirstw7a/0001-Add-Markus-Armbrusters-c=
-ode-for-Broadcom-Perhiperals.patch?dl=3D0
+> Three things:
 >=20
-> Following suggestions split my original patch up. This the largest mono=
-lithic chunk is=20
-> additional BCM device support from Markus Armbruster.
+> 1. Should we care about backwards compatibility? I think so. This shoul=
+d
+> be fixed up using compat machine properties. (qemu model is a
+> migration-safe model and could e.g. be used in KVM setups, too).
+
+Theoretically, I agree, but do we really care about backwards
+compatibility at this point in time? All major distro kernels (except
+Debian, I think) currently do not work in QEMU, so there is currently
+not that much that can be migrated...
+And currently, the "qemu" CPU is the very same as the "z900" CPU, so you
+might also get along with simply using "-cpu z900" on the destination
+instead, I guess.
+
+> 2. I would recommend to not enable STFLE for now. Why?
 >=20
+> It is/was an indication that the system is running on a z9 (and
+> implicitly has the basic features). This was not only done because
+> people were lazy, but because this bit was implicitly connected to othe=
+r
+> machine properties.
+
+Uh, that's ugly!
+
+> One popular example is the "DAT-enhancement facility 2". It introduced
+> the "LOAD PAGE TABLE ENTRY ADDRESS" instruction, but no facility bit wa=
+s
+> introduced. SO there is no way to check if the instruction is available
+> and actually working.
+
+Does the Linux kernel use this instruction at all? I just grep'ed
+through the kernel sources and did not find it. If the Linux kernel does
+not use it, I think we should ignore this interdependency and just
+provide the STFLE feature bit to the guest - since recent Linux kernels
+depend on it.
+
+> Please note that we added a feature representation for this facility,
+> because this would allow us later on to at least model removal of such =
+a
+> facility (if HW actually would drop it) on a CPU model level.
+
+What about STFLE bit 78, according to my version of the POP, it says:
+
+"The enhanced-DAT facility 2 is installed in the
+ z/Architecture architectural mode."
+
+?
+
+> 3. This introduces some inconsistency. s390x/cpu_models.c:set_feature()
+> explicitly tests for such inconsistencies.
 >=20
->>From 0b39a04030d5a2cea4fcd2159d365580ca155b78 Mon Sep 17 00:00:00 2001
-> From: John Bradley <flypie@rocketmail.com>
-> Date: Wed, 17 May 2017 18:57:21 +0100
-> Subject: [PATCH] Add Markus Armbrusters code for Broadcom Perhiperals f=
-or ARM.
->=20
-> Signed-off-by: John Bradley <flypie@rocketmail.com>
-> ---
+> So your QEMU CPU model would have a feature, but you would not be able
+> to run that model using QEMU when manually specifying it on the command
+> line. Especially, expanding the "qemu" model and feeding it back to QEM=
+U
+> will fail.
 
-After a break from the keyboard (always a good idea), I've re-read my
-comments on this thread so far.  As usual, email is a lousy medium for
-conveying emotion and intent, and I can see how my curt replies merely
-pointing out ways that you can improve your patch can easily be
-misconstrued as negative advice or rejection of the idea in general.  So
-let me take this time to apologize if I've come across as over-harsh,
-and give you a big thanks for your efforts to contribute; your additions
-have the potential to make qemu better.  I hope that we do not scare you
-off with advice on improving your contributions up to community
-standard, but that you feel welcome to contribute to the community, as
-well as using the give-and-take iteration of review to make your first
-patch great.  Writing a first patch series can be especially daunting
-when you are new to an unfamiliar process, and while we were all once at
-your point, it takes effort to remember that not everyone is as familiar
-with open source ways, and how it felt on our own first patch submission.=
+I've checked that I can also successfully disable the features again at
+the command line, using "-cpu qemu,eimm=3Dfalse" for example, so not sure
+what exactly you're talking about here. Could you please elaborate?
 
+> So I am not sure if we should introduce such inconsistencies at that
+> point. Rather fix up the basics and then move the CPU model to a
+> consistent model.
 
-A big hint: the great way to get a patch accepted on ANY project is to
-first offer reviews on other patches being submitted to the list.
-Review backlog is always present, but it gets especially bad if there
-are more contributors than reviewers.  Plus, reviewing code that other
-people write can give you a feel for what constitutes a typical patch
-for the project, which will let you model your own submissions in the
-same style.
+I think we're very far away from being able to use the next official CPU
+model generation in QEMU TCG, so having at least something that let's us
+run other recent distro kernels apart from the Debian ones would be very
+helpful. I also understand the "qemu" CPU this way: "Simply give me the
+best CPU features that TCG currently can provide". If you want to have a
+"consistent" CPU state, you can simply use an official model like "z900"
+instead.
 
-Good luck!
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---Ab7OoWov7s3lQXSlLpw97E9oBWsMWiKi5
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEcBAEBCAAGBQJZHP5dAAoJEKeha0olJ0Nq974H/i6CnFdxCx6faHkmGafVXGOG
-4BVlU3ZYSS40FERS5stGkss3T4DDmZ9l1WYa60YoTCXpYKlvDRcouKUay0tD9anA
-ticiQQ8jvRRDOVLhtd11Gn6ZGOIxgVD010qNt3tRal+yRgNZmbbnm9Ss8OiAx+Vk
-411b6uxgwm9IMNLFjjLVRtW+AkRYx6Z6+lxLXLTljB2tCudSCF67kfn0U0/WHu0+
-FY8d56VIrn7vUg88TiqDvV8fzfdVkaWs2QZcuXmy29F/x67QLJugj0yUsLfwpE7l
-/DsF6QS/9+HhZZyxemEds+iyfGGPxl16eCZuLyQwmZhTCoNweV9Han+4wEWRmZY=
-=Mqhi
------END PGP SIGNATURE-----
-
---Ab7OoWov7s3lQXSlLpw97E9oBWsMWiKi5--
+ Thomas
