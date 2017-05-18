@@ -1,27 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55250)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56329)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1dBHSG-0005Qm-LS
-	for qemu-devel@nongnu.org; Thu, 18 May 2017 05:10:45 -0400
+	(envelope-from <david@redhat.com>) id 1dBHVm-0006pc-Ef
+	for qemu-devel@nongnu.org; Thu, 18 May 2017 05:14:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1dBHSD-0003iD-EO
-	for qemu-devel@nongnu.org; Thu, 18 May 2017 05:10:44 -0400
-Received: from mail-wm0-x22c.google.com ([2a00:1450:400c:c09::22c]:37463)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1dBHSD-0003i9-7U
-	for qemu-devel@nongnu.org; Thu, 18 May 2017 05:10:41 -0400
-Received: by mail-wm0-x22c.google.com with SMTP id d127so44703580wmf.0
-	for <qemu-devel@nongnu.org>; Thu, 18 May 2017 02:10:41 -0700 (PDT)
-Date: Thu, 18 May 2017 10:10:37 +0100
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20170518091037.GF30862@stefanha-x1.localdomain>
-References: <20170517124042.1430-1-stefanha@redhat.com>
+	(envelope-from <david@redhat.com>) id 1dBHVj-0004Yj-6d
+	for qemu-devel@nongnu.org; Thu, 18 May 2017 05:14:22 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:56116)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <david@redhat.com>) id 1dBHVi-0004Y4-VC
+	for qemu-devel@nongnu.org; Thu, 18 May 2017 05:14:19 -0400
+References: <1495035337-13337-1-git-send-email-thuth@redhat.com>
+	<0721f18a-fc66-0be3-7462-76eb60de7f55@redhat.com>
+	<394772e4-949a-b92f-6879-7b9e343e10d3@redhat.com>
+	<0cb4c90d-cfcc-3d12-44b5-c979f20ec7b9@redhat.com>
+	<d352caf1-90c5-558c-1d25-cfd91d4e24fc@de.ibm.com>
+	<47701282-594e-8ddd-9969-25097be0d77d@redhat.com>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <1db53f7d-97b9-115d-8797-9b6187f89ea1@redhat.com>
+Date: Thu, 18 May 2017 11:14:14 +0200
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="7cm2iqirTL37Ot+N"
-Content-Disposition: inline
-In-Reply-To: <20170517124042.1430-1-stefanha@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2] .gdbinit: load QEMU sub-commands when
- gdb starts
+In-Reply-To: <47701282-594e-8ddd-9969-25097be0d77d@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC PATCH] target/s390x/cpu_models: Set some
+ additional feature bits for the "qemu" CPU
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,53 +33,137 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Cc: qemu-devel@nongnu.org, Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, Markus Armbruster <armbru@redhat.com>
+To: Thomas Huth <thuth@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>
+Cc: mmarek@suse.com, mbenes@suse.cz, Aurelien Jarno <aurelien@aurel32.net>, "Jason J. Herne" <jjherne@linux.vnet.ibm.com>
 
+On 18.05.2017 11:05, Thomas Huth wrote:
+> On 18.05.2017 11:00, Christian Borntraeger wrote:
+>> On 05/18/2017 10:48 AM, David Hildenbrand wrote:
+>>> On 18.05.2017 03:55, Thomas Huth wrote:
+>>>> On 17.05.2017 18:49, David Hildenbrand wrote:
+>>>>> On 17.05.2017 17:35, Thomas Huth wrote:
+>>>>>> Currently we only present the plain z900 feature bits to the guest,
+>>>>>> but QEMU already emulates some additional features (but not all of
+>>>>>> the next CPU generation, so we can not use the next CPU level as
+>>>>>> default yet). Since newer Linux kernels are checking the feature bits
+>>>>>> and refuse to work if a required feature is missing, we should present
+>>>>>> as much of the supported features as possible when we are running
+>>>>>> with the default "qemu" CPU.
+>>>>>> This patch now adds the "stfle", "extended immediate" and "stckf"
+>>>>>> facility bits to the "qemu" CPU, which are already supported facilities.
+>>>>>> It is unfortunately still not enough to run e.g. recent Fedora kernels,
+>>>>>> but at least it's a first step into the right direction.
+>>>>>>
+>>>>>
+>>>>> Three things:
+>>>>>
+>>>>> 1. Should we care about backwards compatibility? I think so. This should
+>>>>> be fixed up using compat machine properties. (qemu model is a
+>>>>> migration-safe model and could e.g. be used in KVM setups, too).
+>>>>
+>>>> Theoretically, I agree, but do we really care about backwards
+>>>> compatibility at this point in time? All major distro kernels (except
+>>>> Debian, I think) currently do not work in QEMU, so there is currently
+>>>> not that much that can be migrated...
+>>>> And currently, the "qemu" CPU is the very same as the "z900" CPU, so you
+>>>> might also get along with simply using "-cpu z900" on the destination
+>>>> instead, I guess.
+>>>
+>>> If possible, I would like to avoid changing migration safe CPU model.
+>>> And I guess it shouldn't be too hard for now (unless we really change
+>>> the base model to e.g. a z9, then some more work might have to be done)
+>>>
+>>> I think for now, setting "stfle=off" on "s390-cpu-qemu" for compat
+>>> machines should do the trick.
+>>>
+>>>>
+>>>>> 2. I would recommend to not enable STFLE for now. Why?
+>>>>>
+>>>>> It is/was an indication that the system is running on a z9 (and
+>>>>> implicitly has the basic features). This was not only done because
+>>>>> people were lazy, but because this bit was implicitly connected to other
+>>>>> machine properties.
+>>>>
+>>>> Uh, that's ugly!
+>>>>
+>>>>> One popular example is the "DAT-enhancement facility 2". It introduced
+>>>>> the "LOAD PAGE TABLE ENTRY ADDRESS" instruction, but no facility bit was
+>>>>> introduced. SO there is no way to check if the instruction is available
+>>>>> and actually working.
+>>>>
+>>>> Does the Linux kernel use this instruction at all? I just grep'ed
+>>>> through the kernel sources and did not find it. If the Linux kernel does
+>>>> not use it, I think we should ignore this interdependency and just
+>>>> provide the STFLE feature bit to the guest - since recent Linux kernels
+>>>> depend on it.
+>>>
+>>> Yes, current linux doesn't use it, I don't remember if previous versions
+>>> did. Most likely not. The question is if they relied on the stfle==z9
+>>> assumption. The STFLE facility really is special in that sense.
+>>>
+>>>>
+>>>>> Please note that we added a feature representation for this facility,
+>>>>> because this would allow us later on to at least model removal of such a
+>>>>> facility (if HW actually would drop it) on a CPU model level.
+>>>>
+>>>> What about STFLE bit 78, according to my version of the POP, it says:
+>>>>
+>>>> "The enhanced-DAT facility 2 is installed in the
+>>>>  z/Architecture architectural mode."
+>>>>
+>>>> ?
+>>>
+>>> As Aurelien already mentioned, there seemed to be different ways to
+>>> enhance DAT :) enhanced-DAT facility 2 is 2GB page support.
+>>>
+>>>>
+>>>>> 3. This introduces some inconsistency. s390x/cpu_models.c:set_feature()
+>>>>> explicitly tests for such inconsistencies.
+>>>>>
+>>>>> So your QEMU CPU model would have a feature, but you would not be able
+>>>>> to run that model using QEMU when manually specifying it on the command
+>>>>> line. Especially, expanding the "qemu" model and feeding it back to QEMU
+>>>>> will fail.
+>>>>
+>>>> I've checked that I can also successfully disable the features again at
+>>>> the command line, using "-cpu qemu,eimm=false" for example, so not sure
+>>>> what exactly you're talking about here. Could you please elaborate?
+>>>
+>>> Assume libvirt/the user expands the CPU model name "qemu" via
+>>> "qmp-expand-cpu-model "qemu", you will get something like
+>>>
+>>> "z900-base,.....,stfle=on"
+>>>
+>>> If you feed that to QEMU using "-cpu z900-base,...,stfle=on", QEMU will
+>>> detect the inconsistency when setting the property and abort. However,
+>>> "-cpu qemu" will succeed. Please note that these checks actually make
+>>> sense for KVM:
+>>>
+>>
+>> Jason (now on cc) has a patch prepared for other reasons that disabled features
+>> for given machines. I kept the ESOP example in that patch.
+>> That would allow us to disable STFLE for old machines but enable it for 2.10
+> [...]
+>> Maybe we should split that out and merge such a patch sooner than the
+>> (yet in development) other changes?
+> 
+> Yes, that sounds like a good idea, I think we could use the same
+> mechanism here, too, so please split it out and submit it earlier!
+> 
+>  Thanks a lot,
+>   Thomas
+> 
 
---7cm2iqirTL37Ot+N
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+I think this is useful but a different use case:
 
-On Wed, May 17, 2017 at 01:40:42PM +0100, Stefan Hajnoczi wrote:
-> The scripts/qemu-gdb.py file is not easily discoverable.  Add a .gdbinit
-> file so GDB either loads qemu-gdb.py automatically or prints a message
-> informing the user how to enable them (some systems disable ./.gdbinit
-> loading for security reasons).
->=20
-> Symlink .gdbinit and the scripts directory in order to make out-of-tree
-> builds work.  The scripts directory is used to find the qemu-gdb.py file
-> specified by a relative path in .gdbinit.
->=20
-> Suggested-by: Eric Blake <eblake@redhat.com>
-> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
-> ---
-> v2:
->  * Support out-of-tree builds [Daniel, Markus]
->=20
->  configure | 1 +
->  .gdbinit  | 8 ++++++++
->  2 files changed, 9 insertions(+)
->  create mode 100644 .gdbinit
+What Christian/Jason have here is a way to fixup default models (e.g.
+z900, ZEC12...). This is necessary when introducing new features /
+movinf features from FULL into DEFAULT.
 
-Thanks, applied to my block tree:
-https://github.com/stefanha/qemu/commits/block
+We don't want to fixup default models but the s390x-cpu-qemu.
 
-Stefan
+-- 
 
---7cm2iqirTL37Ot+N
-Content-Type: application/pgp-signature; name="signature.asc"
+Thanks,
 
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJZHWUNAAoJEJykq7OBq3PI+GAIAI0FObgEyjgsZ0J2POKrW4QQ
-wZLmABXc8cJwtl/2DKhPfk8FwLnKUu/IJOCvlf2UexQDME79H/rtyr2wAJS58Ila
-we7vsQ2C0Fcaaa8Ftnh7/xdGgC12uBPBfHiZQcN7J1xgg18KdeADYOQVTrB+CjPj
-yYbK2f/i1LAlNlnxU5CHF/SG/mordx5iJcloPwvKo22dOdzq3S3ZDSEJ0PrixAd9
-RGTZutlSdz1x2eEEDaJmzPgstKoLeTFNjIUgMmBx529SkJa9c1WKO9myjYySis/b
-cjv80Rn9vmkqF+nM9vVQgp0VW1M29wZr8/10W77YUVc9IMp1SnF1HtO8gbc8S5Y=
-=vNsJ
------END PGP SIGNATURE-----
-
---7cm2iqirTL37Ot+N--
+David
