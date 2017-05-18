@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58202)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58191)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yang.zhong@intel.com>) id 1dBJRh-0004z2-3B
-	for qemu-devel@nongnu.org; Thu, 18 May 2017 07:18:21 -0400
+	(envelope-from <yang.zhong@intel.com>) id 1dBJRg-0004yN-2I
+	for qemu-devel@nongnu.org; Thu, 18 May 2017 07:18:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yang.zhong@intel.com>) id 1dBJRc-0001l4-B2
-	for qemu-devel@nongnu.org; Thu, 18 May 2017 07:18:17 -0400
+	(envelope-from <yang.zhong@intel.com>) id 1dBJRZ-0001V8-5W
+	for qemu-devel@nongnu.org; Thu, 18 May 2017 07:18:16 -0400
 Received: from mga03.intel.com ([134.134.136.65]:4954)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <yang.zhong@intel.com>)
-	id 1dBJRa-0001OQ-Hb
-	for qemu-devel@nongnu.org; Thu, 18 May 2017 07:18:12 -0400
+	id 1dBJRY-0001OQ-G4
+	for qemu-devel@nongnu.org; Thu, 18 May 2017 07:18:09 -0400
 From: Yang Zhong <yang.zhong@intel.com>
-Date: Fri, 19 May 2017 03:14:54 +0800
-Message-Id: <1495134895-7814-3-git-send-email-yang.zhong@intel.com>
+Date: Fri, 19 May 2017 03:14:53 +0800
+Message-Id: <1495134895-7814-2-git-send-email-yang.zhong@intel.com>
 In-Reply-To: <1495134895-7814-1-git-send-email-yang.zhong@intel.com>
 References: <1495134895-7814-1-git-send-email-yang.zhong@intel.com>
-Subject: [Qemu-devel] [PATCH 3/4] move cpu-exec.c
+Subject: [Qemu-devel] [PATCH 2/4] move cputlb.c
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,74 +27,48 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: pbonzini@redhat.com
 Cc: anthony.xu@intel.com, qemu-devel@nongnu.org, Yang Zhong <yang.zhong@intel.com>
 
-move cpu-exec.c to ./accel/tcg/
+move cputlb.c to accel/tcg/
 
 Signed-off-by: Yang Zhong <yang.zhong@intel.com>
 ---
- Makefile.objs           |   1 +
- Makefile.target         |   4 +-
- accel/tcg/Makefile.objs |   1 +
- accel/tcg/cpu-exec.c    | 686 ++++++++++++++++++++++++++++++++++++++++++++++++
- accel/tcg/trace-events  |   7 +
- cpu-exec.c              | 685 -----------------------------------------------
- trace-events            |   5 -
- 7 files changed, 697 insertions(+), 692 deletions(-)
- create mode 100644 accel/tcg/cpu-exec.c
- create mode 100644 accel/tcg/trace-events
- delete mode 100644 cpu-exec.c
+ Makefile.target         |    2 +-
+ accel/tcg/Makefile.objs |    1 +
+ accel/tcg/cputlb.c      | 1051 +++++++++++++++++++++++++++++++++++++++++++++++
+ cputlb.c                | 1051 -----------------------------------------------
+ 4 files changed, 1053 insertions(+), 1052 deletions(-)
+ create mode 100644 accel/tcg/cputlb.c
+ delete mode 100644 cputlb.c
 
-diff --git a/Makefile.objs b/Makefile.objs
-index 2a8de77..6a33874 100644
---- a/Makefile.objs
-+++ b/Makefile.objs
-@@ -163,6 +163,7 @@ trace-events-subdirs += target/ppc
- trace-events-subdirs += qom
- trace-events-subdirs += linux-user
- trace-events-subdirs += qapi
-+trace-events-subdirs += accel/tcg
- 
- trace-events-files = $(SRC_PATH)/trace-events $(trace-events-subdirs:%=$(SRC_PATH)/%/trace-events)
- 
 diff --git a/Makefile.target b/Makefile.target
-index 3e19fe9..709d07a 100644
+index ba893a8..3e19fe9 100644
 --- a/Makefile.target
 +++ b/Makefile.target
-@@ -88,7 +88,8 @@ all: $(PROGS) stap
- 
- #########################################################
- # cpu emulator library
--obj-y = exec.o translate-all.o cpu-exec.o
-+obj-y = exec.o translate-all.o
-+obj-y += accel/
- obj-y += translate-common.o
- obj-y += cpu-exec-common.o
- obj-y += tcg/tcg.o tcg/tcg-op.o tcg/optimize.o
-@@ -143,7 +144,6 @@ obj-y += arch_init.o cpus.o monitor.o gdbstub.o balloon.o ioport.o numa.o
- obj-y += qtest.o bootdevice.o
+@@ -144,7 +144,7 @@ obj-y += qtest.o bootdevice.o
  obj-y += hw/
  obj-$(CONFIG_KVM) += kvm-all.o
--obj-y += accel/
- obj-y += memory.o
+ obj-y += accel/
+-obj-y += memory.o cputlb.o
++obj-y += memory.o
  obj-y += memory_mapping.o
  obj-y += dump.o
+ obj-y += migration/ram.o migration/savevm.o
 diff --git a/accel/tcg/Makefile.objs b/accel/tcg/Makefile.objs
-index 487570f..6b75a31 100644
+index 6e3211a..487570f 100644
 --- a/accel/tcg/Makefile.objs
 +++ b/accel/tcg/Makefile.objs
-@@ -1,2 +1,3 @@
+@@ -1 +1,2 @@
  obj-$(CONFIG_SOFTMMU) += tcg-all.o
- obj-$(CONFIG_SOFTMMU) += cputlb.o
-+obj-y += cpu-exec.o
-diff --git a/accel/tcg/cpu-exec.c b/accel/tcg/cpu-exec.c
++obj-$(CONFIG_SOFTMMU) += cputlb.o
+diff --git a/accel/tcg/cputlb.c b/accel/tcg/cputlb.c
 new file mode 100644
-index 0000000..2019160
+index 0000000..743776a
 --- /dev/null
-+++ b/accel/tcg/cpu-exec.c
-@@ -0,0 +1,686 @@
++++ b/accel/tcg/cputlb.c
+@@ -0,0 +1,1051 @@
 +/*
-+ *  emulator main execution loop
++ *  Common CPU TLB handling
 + *
-+ *  Copyright (c) 2003-2005 Fabrice Bellard
++ *  Copyright (c) 2003 Fabrice Bellard
 + *
 + * This library is free software; you can redistribute it and/or
 + * modify it under the terms of the GNU Lesser General Public
@@ -109,697 +83,1049 @@ index 0000000..2019160
 + * You should have received a copy of the GNU Lesser General Public
 + * License along with this library; if not, see <http://www.gnu.org/licenses/>.
 + */
++
 +#include "qemu/osdep.h"
-+#include "cpu.h"
-+#include "trace.h"
-+#include "disas/disas.h"
-+#include "exec/exec-all.h"
-+#include "tcg.h"
-+#include "qemu/atomic.h"
-+#include "sysemu/qtest.h"
-+#include "qemu/timer.h"
-+#include "exec/address-spaces.h"
-+#include "qemu/rcu.h"
-+#include "exec/tb-hash.h"
-+#include "exec/log.h"
 +#include "qemu/main-loop.h"
-+#if defined(TARGET_I386) && !defined(CONFIG_USER_ONLY)
-+#include "hw/i386/apic.h"
++#include "cpu.h"
++#include "exec/exec-all.h"
++#include "exec/memory.h"
++#include "exec/address-spaces.h"
++#include "exec/cpu_ldst.h"
++#include "exec/cputlb.h"
++#include "exec/memory-internal.h"
++#include "exec/ram_addr.h"
++#include "tcg/tcg.h"
++#include "qemu/error-report.h"
++#include "exec/log.h"
++#include "exec/helper-proto.h"
++#include "qemu/atomic.h"
++
++/* DEBUG defines, enable DEBUG_TLB_LOG to log to the CPU_LOG_MMU target */
++/* #define DEBUG_TLB */
++/* #define DEBUG_TLB_LOG */
++
++#ifdef DEBUG_TLB
++# define DEBUG_TLB_GATE 1
++# ifdef DEBUG_TLB_LOG
++#  define DEBUG_TLB_LOG_GATE 1
++# else
++#  define DEBUG_TLB_LOG_GATE 0
++# endif
++#else
++# define DEBUG_TLB_GATE 0
++# define DEBUG_TLB_LOG_GATE 0
 +#endif
-+#include "sysemu/cpus.h"
-+#include "sysemu/replay.h"
 +
-+/* -icount align implementation. */
++#define tlb_debug(fmt, ...) do { \
++    if (DEBUG_TLB_LOG_GATE) { \
++        qemu_log_mask(CPU_LOG_MMU, "%s: " fmt, __func__, \
++                      ## __VA_ARGS__); \
++    } else if (DEBUG_TLB_GATE) { \
++        fprintf(stderr, "%s: " fmt, __func__, ## __VA_ARGS__); \
++    } \
++} while (0)
 +
-+typedef struct SyncClocks {
-+    int64_t diff_clk;
-+    int64_t last_cpu_icount;
-+    int64_t realtime_clock;
-+} SyncClocks;
++#define assert_cpu_is_self(this_cpu) do {                         \
++        if (DEBUG_TLB_GATE) {                                     \
++            g_assert(!cpu->created || qemu_cpu_is_self(cpu));     \
++        }                                                         \
++    } while (0)
 +
-+#if !defined(CONFIG_USER_ONLY)
-+/* Allow the guest to have a max 3ms advance.
-+ * The difference between the 2 clocks could therefore
-+ * oscillate around 0.
++/* run_on_cpu_data.target_ptr should always be big enough for a
++ * target_ulong even on 32 bit builds */
++QEMU_BUILD_BUG_ON(sizeof(target_ulong) > sizeof(run_on_cpu_data));
++
++/* We currently can't handle more than 16 bits in the MMUIDX bitmask.
 + */
-+#define VM_CLOCK_ADVANCE 3000000
-+#define THRESHOLD_REDUCE 1.5
-+#define MAX_DELAY_PRINT_RATE 2000000000LL
-+#define MAX_NB_PRINTS 100
++QEMU_BUILD_BUG_ON(NB_MMU_MODES > 16);
++#define ALL_MMUIDX_BITS ((1 << NB_MMU_MODES) - 1)
 +
-+static void align_clocks(SyncClocks *sc, const CPUState *cpu)
++/* flush_all_helper: run fn across all cpus
++ *
++ * If the wait flag is set then the src cpu's helper will be queued as
++ * "safe" work and the loop exited creating a synchronisation point
++ * where all queued work will be finished before execution starts
++ * again.
++ */
++static void flush_all_helper(CPUState *src, run_on_cpu_func fn,
++                             run_on_cpu_data d)
 +{
-+    int64_t cpu_icount;
++    CPUState *cpu;
 +
-+    if (!icount_align_option) {
-+        return;
-+    }
-+
-+    cpu_icount = cpu->icount_extra + cpu->icount_decr.u16.low;
-+    sc->diff_clk += cpu_icount_to_ns(sc->last_cpu_icount - cpu_icount);
-+    sc->last_cpu_icount = cpu_icount;
-+
-+    if (sc->diff_clk > VM_CLOCK_ADVANCE) {
-+#ifndef _WIN32
-+        struct timespec sleep_delay, rem_delay;
-+        sleep_delay.tv_sec = sc->diff_clk / 1000000000LL;
-+        sleep_delay.tv_nsec = sc->diff_clk % 1000000000LL;
-+        if (nanosleep(&sleep_delay, &rem_delay) < 0) {
-+            sc->diff_clk = rem_delay.tv_sec * 1000000000LL + rem_delay.tv_nsec;
-+        } else {
-+            sc->diff_clk = 0;
-+        }
-+#else
-+        Sleep(sc->diff_clk / SCALE_MS);
-+        sc->diff_clk = 0;
-+#endif
-+    }
-+}
-+
-+static void print_delay(const SyncClocks *sc)
-+{
-+    static float threshold_delay;
-+    static int64_t last_realtime_clock;
-+    static int nb_prints;
-+
-+    if (icount_align_option &&
-+        sc->realtime_clock - last_realtime_clock >= MAX_DELAY_PRINT_RATE &&
-+        nb_prints < MAX_NB_PRINTS) {
-+        if ((-sc->diff_clk / (float)1000000000LL > threshold_delay) ||
-+            (-sc->diff_clk / (float)1000000000LL <
-+             (threshold_delay - THRESHOLD_REDUCE))) {
-+            threshold_delay = (-sc->diff_clk / 1000000000LL) + 1;
-+            printf("Warning: The guest is now late by %.1f to %.1f seconds\n",
-+                   threshold_delay - 1,
-+                   threshold_delay);
-+            nb_prints++;
-+            last_realtime_clock = sc->realtime_clock;
++    CPU_FOREACH(cpu) {
++        if (cpu != src) {
++            async_run_on_cpu(cpu, fn, d);
 +        }
 +    }
 +}
 +
-+static void init_delay_params(SyncClocks *sc,
-+                              const CPUState *cpu)
-+{
-+    if (!icount_align_option) {
-+        return;
-+    }
-+    sc->realtime_clock = qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL_RT);
-+    sc->diff_clk = qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) - sc->realtime_clock;
-+    sc->last_cpu_icount = cpu->icount_extra + cpu->icount_decr.u16.low;
-+    if (sc->diff_clk < max_delay) {
-+        max_delay = sc->diff_clk;
-+    }
-+    if (sc->diff_clk > max_advance) {
-+        max_advance = sc->diff_clk;
-+    }
++/* statistics */
++int tlb_flush_count;
 +
-+    /* Print every 2s max if the guest is late. We limit the number
-+       of printed messages to NB_PRINT_MAX(currently 100) */
-+    print_delay(sc);
-+}
-+#else
-+static void align_clocks(SyncClocks *sc, const CPUState *cpu)
-+{
-+}
-+
-+static void init_delay_params(SyncClocks *sc, const CPUState *cpu)
-+{
-+}
-+#endif /* CONFIG USER ONLY */
-+
-+/* Execute a TB, and fix up the CPU state afterwards if necessary */
-+static inline tcg_target_ulong cpu_tb_exec(CPUState *cpu, TranslationBlock *itb)
++/* This is OK because CPU architectures generally permit an
++ * implementation to drop entries from the TLB at any time, so
++ * flushing more entries than required is only an efficiency issue,
++ * not a correctness issue.
++ */
++static void tlb_flush_nocheck(CPUState *cpu)
 +{
 +    CPUArchState *env = cpu->env_ptr;
-+    uintptr_t ret;
-+    TranslationBlock *last_tb;
-+    int tb_exit;
-+    uint8_t *tb_ptr = itb->tc_ptr;
 +
-+    qemu_log_mask_and_addr(CPU_LOG_EXEC, itb->pc,
-+                           "Trace %p [%d: " TARGET_FMT_lx "] %s\n",
-+                           itb->tc_ptr, cpu->cpu_index, itb->pc,
-+                           lookup_symbol(itb->pc));
-+
-+#if defined(DEBUG_DISAS)
-+    if (qemu_loglevel_mask(CPU_LOG_TB_CPU)
-+        && qemu_log_in_addr_range(itb->pc)) {
-+        qemu_log_lock();
-+#if defined(TARGET_I386)
-+        log_cpu_state(cpu, CPU_DUMP_CCOP);
-+#else
-+        log_cpu_state(cpu, 0);
-+#endif
-+        qemu_log_unlock();
-+    }
-+#endif /* DEBUG_DISAS */
-+
-+    cpu->can_do_io = !use_icount;
-+    ret = tcg_qemu_tb_exec(env, tb_ptr);
-+    cpu->can_do_io = 1;
-+    last_tb = (TranslationBlock *)(ret & ~TB_EXIT_MASK);
-+    tb_exit = ret & TB_EXIT_MASK;
-+    trace_exec_tb_exit(last_tb, tb_exit);
-+
-+    if (tb_exit > TB_EXIT_IDX1) {
-+        /* We didn't start executing this TB (eg because the instruction
-+         * counter hit zero); we must restore the guest PC to the address
-+         * of the start of the TB.
-+         */
-+        CPUClass *cc = CPU_GET_CLASS(cpu);
-+        qemu_log_mask_and_addr(CPU_LOG_EXEC, last_tb->pc,
-+                               "Stopped execution of TB chain before %p ["
-+                               TARGET_FMT_lx "] %s\n",
-+                               last_tb->tc_ptr, last_tb->pc,
-+                               lookup_symbol(last_tb->pc));
-+        if (cc->synchronize_from_tb) {
-+            cc->synchronize_from_tb(cpu, last_tb);
-+        } else {
-+            assert(cc->set_pc);
-+            cc->set_pc(cpu, last_tb->pc);
-+        }
-+    }
-+    return ret;
-+}
-+
-+#ifndef CONFIG_USER_ONLY
-+/* Execute the code without caching the generated code. An interpreter
-+   could be used if available. */
-+static void cpu_exec_nocache(CPUState *cpu, int max_cycles,
-+                             TranslationBlock *orig_tb, bool ignore_icount)
-+{
-+    TranslationBlock *tb;
-+
-+    /* Should never happen.
-+       We only end up here when an existing TB is too long.  */
-+    if (max_cycles > CF_COUNT_MASK) {
-+        max_cycles = CF_COUNT_MASK;
-+    }
-+
-+    tb_lock();
-+    tb = tb_gen_code(cpu, orig_tb->pc, orig_tb->cs_base, orig_tb->flags,
-+                     max_cycles | CF_NOCACHE
-+                         | (ignore_icount ? CF_IGNORE_ICOUNT : 0));
-+    tb->orig_tb = orig_tb;
-+    tb_unlock();
-+
-+    /* execute the generated code */
-+    trace_exec_tb_nocache(tb, tb->pc);
-+    cpu_tb_exec(cpu, tb);
-+
-+    tb_lock();
-+    tb_phys_invalidate(tb, -1);
-+    tb_free(tb);
-+    tb_unlock();
-+}
-+#endif
-+
-+static void cpu_exec_step(CPUState *cpu)
-+{
-+    CPUClass *cc = CPU_GET_CLASS(cpu);
-+    CPUArchState *env = (CPUArchState *)cpu->env_ptr;
-+    TranslationBlock *tb;
-+    target_ulong cs_base, pc;
-+    uint32_t flags;
-+
-+    cpu_get_tb_cpu_state(env, &pc, &cs_base, &flags);
-+    if (sigsetjmp(cpu->jmp_env, 0) == 0) {
-+        mmap_lock();
-+        tb_lock();
-+        tb = tb_gen_code(cpu, pc, cs_base, flags,
-+                         1 | CF_NOCACHE | CF_IGNORE_ICOUNT);
-+        tb->orig_tb = NULL;
-+        tb_unlock();
-+        mmap_unlock();
-+
-+        cc->cpu_exec_enter(cpu);
-+        /* execute the generated code */
-+        trace_exec_tb_nocache(tb, pc);
-+        cpu_tb_exec(cpu, tb);
-+        cc->cpu_exec_exit(cpu);
-+
-+        tb_lock();
-+        tb_phys_invalidate(tb, -1);
-+        tb_free(tb);
-+        tb_unlock();
-+    } else {
-+        /* We may have exited due to another problem here, so we need
-+         * to reset any tb_locks we may have taken but didn't release.
-+         * The mmap_lock is dropped by tb_gen_code if it runs out of
-+         * memory.
-+         */
-+#ifndef CONFIG_SOFTMMU
-+        tcg_debug_assert(!have_mmap_lock());
-+#endif
-+        tb_lock_reset();
-+    }
-+}
-+
-+void cpu_exec_step_atomic(CPUState *cpu)
-+{
-+    start_exclusive();
-+
-+    /* Since we got here, we know that parallel_cpus must be true.  */
-+    parallel_cpus = false;
-+    cpu_exec_step(cpu);
-+    parallel_cpus = true;
-+
-+    end_exclusive();
-+}
-+
-+struct tb_desc {
-+    target_ulong pc;
-+    target_ulong cs_base;
-+    CPUArchState *env;
-+    tb_page_addr_t phys_page1;
-+    uint32_t flags;
-+};
-+
-+static bool tb_cmp(const void *p, const void *d)
-+{
-+    const TranslationBlock *tb = p;
-+    const struct tb_desc *desc = d;
-+
-+    if (tb->pc == desc->pc &&
-+        tb->page_addr[0] == desc->phys_page1 &&
-+        tb->cs_base == desc->cs_base &&
-+        tb->flags == desc->flags &&
-+        !atomic_read(&tb->invalid)) {
-+        /* check next page if needed */
-+        if (tb->page_addr[1] == -1) {
-+            return true;
-+        } else {
-+            tb_page_addr_t phys_page2;
-+            target_ulong virt_page2;
-+
-+            virt_page2 = (desc->pc & TARGET_PAGE_MASK) + TARGET_PAGE_SIZE;
-+            phys_page2 = get_page_addr_code(desc->env, virt_page2);
-+            if (tb->page_addr[1] == phys_page2) {
-+                return true;
-+            }
-+        }
-+    }
-+    return false;
-+}
-+
-+static TranslationBlock *tb_htable_lookup(CPUState *cpu,
-+                                          target_ulong pc,
-+                                          target_ulong cs_base,
-+                                          uint32_t flags)
-+{
-+    tb_page_addr_t phys_pc;
-+    struct tb_desc desc;
-+    uint32_t h;
-+
-+    desc.env = (CPUArchState *)cpu->env_ptr;
-+    desc.cs_base = cs_base;
-+    desc.flags = flags;
-+    desc.pc = pc;
-+    phys_pc = get_page_addr_code(desc.env, pc);
-+    desc.phys_page1 = phys_pc & TARGET_PAGE_MASK;
-+    h = tb_hash_func(phys_pc, pc, flags);
-+    return qht_lookup(&tcg_ctx.tb_ctx.htable, tb_cmp, &desc, h);
-+}
-+
-+static inline TranslationBlock *tb_find(CPUState *cpu,
-+                                        TranslationBlock *last_tb,
-+                                        int tb_exit)
-+{
-+    CPUArchState *env = (CPUArchState *)cpu->env_ptr;
-+    TranslationBlock *tb;
-+    target_ulong cs_base, pc;
-+    uint32_t flags;
-+    bool have_tb_lock = false;
-+
-+    /* we record a subset of the CPU state. It will
-+       always be the same before a given translated block
-+       is executed. */
-+    cpu_get_tb_cpu_state(env, &pc, &cs_base, &flags);
-+    tb = atomic_rcu_read(&cpu->tb_jmp_cache[tb_jmp_cache_hash_func(pc)]);
-+    if (unlikely(!tb || tb->pc != pc || tb->cs_base != cs_base ||
-+                 tb->flags != flags)) {
-+        tb = tb_htable_lookup(cpu, pc, cs_base, flags);
-+        if (!tb) {
-+
-+            /* mmap_lock is needed by tb_gen_code, and mmap_lock must be
-+             * taken outside tb_lock. As system emulation is currently
-+             * single threaded the locks are NOPs.
-+             */
-+            mmap_lock();
-+            tb_lock();
-+            have_tb_lock = true;
-+
-+            /* There's a chance that our desired tb has been translated while
-+             * taking the locks so we check again inside the lock.
-+             */
-+            tb = tb_htable_lookup(cpu, pc, cs_base, flags);
-+            if (!tb) {
-+                /* if no translated code available, then translate it now */
-+                tb = tb_gen_code(cpu, pc, cs_base, flags, 0);
-+            }
-+
-+            mmap_unlock();
-+        }
-+
-+        /* We add the TB in the virtual pc hash table for the fast lookup */
-+        atomic_set(&cpu->tb_jmp_cache[tb_jmp_cache_hash_func(pc)], tb);
-+    }
-+#ifndef CONFIG_USER_ONLY
-+    /* We don't take care of direct jumps when address mapping changes in
-+     * system emulation. So it's not safe to make a direct jump to a TB
-+     * spanning two pages because the mapping for the second page can change.
++    /* The QOM tests will trigger tlb_flushes without setting up TCG
++     * so we bug out here in that case.
 +     */
-+    if (tb->page_addr[1] != -1) {
-+        last_tb = NULL;
++    if (!tcg_enabled()) {
++        return;
 +    }
-+#endif
-+    /* See if we can patch the calling TB. */
-+    if (last_tb && !qemu_loglevel_mask(CPU_LOG_TB_NOCHAIN)) {
-+        if (!have_tb_lock) {
-+            tb_lock();
-+            have_tb_lock = true;
-+        }
-+        if (!tb->invalid) {
-+            tb_add_jump(last_tb, tb_exit, tb);
-+        }
-+    }
-+    if (have_tb_lock) {
-+        tb_unlock();
-+    }
-+    return tb;
++
++    assert_cpu_is_self(cpu);
++    tlb_debug("(count: %d)\n", tlb_flush_count++);
++
++    tb_lock();
++
++    memset(env->tlb_table, -1, sizeof(env->tlb_table));
++    memset(env->tlb_v_table, -1, sizeof(env->tlb_v_table));
++    memset(cpu->tb_jmp_cache, 0, sizeof(cpu->tb_jmp_cache));
++
++    env->vtlb_index = 0;
++    env->tlb_flush_addr = -1;
++    env->tlb_flush_mask = 0;
++
++    tb_unlock();
++
++    atomic_mb_set(&cpu->pending_tlb_flush, 0);
 +}
 +
-+static inline bool cpu_handle_halt(CPUState *cpu)
++static void tlb_flush_global_async_work(CPUState *cpu, run_on_cpu_data data)
 +{
-+    if (cpu->halted) {
-+#if defined(TARGET_I386) && !defined(CONFIG_USER_ONLY)
-+        if ((cpu->interrupt_request & CPU_INTERRUPT_POLL)
-+            && replay_interrupt()) {
-+            X86CPU *x86_cpu = X86_CPU(cpu);
-+            qemu_mutex_lock_iothread();
-+            apic_poll_irq(x86_cpu->apic_state);
-+            cpu_reset_interrupt(cpu, CPU_INTERRUPT_POLL);
-+            qemu_mutex_unlock_iothread();
-+        }
-+#endif
-+        if (!cpu_has_work(cpu)) {
-+            return true;
-+        }
-+
-+        cpu->halted = 0;
-+    }
-+
-+    return false;
++    tlb_flush_nocheck(cpu);
 +}
 +
-+static inline void cpu_handle_debug_exception(CPUState *cpu)
++void tlb_flush(CPUState *cpu)
 +{
-+    CPUClass *cc = CPU_GET_CLASS(cpu);
-+    CPUWatchpoint *wp;
++    if (cpu->created && !qemu_cpu_is_self(cpu)) {
++        if (atomic_mb_read(&cpu->pending_tlb_flush) != ALL_MMUIDX_BITS) {
++            atomic_mb_set(&cpu->pending_tlb_flush, ALL_MMUIDX_BITS);
++            async_run_on_cpu(cpu, tlb_flush_global_async_work,
++                             RUN_ON_CPU_NULL);
++        }
++    } else {
++        tlb_flush_nocheck(cpu);
++    }
++}
 +
-+    if (!cpu->watchpoint_hit) {
-+        QTAILQ_FOREACH(wp, &cpu->watchpoints, entry) {
-+            wp->flags &= ~BP_WATCHPOINT_HIT;
++void tlb_flush_all_cpus(CPUState *src_cpu)
++{
++    const run_on_cpu_func fn = tlb_flush_global_async_work;
++    flush_all_helper(src_cpu, fn, RUN_ON_CPU_NULL);
++    fn(src_cpu, RUN_ON_CPU_NULL);
++}
++
++void tlb_flush_all_cpus_synced(CPUState *src_cpu)
++{
++    const run_on_cpu_func fn = tlb_flush_global_async_work;
++    flush_all_helper(src_cpu, fn, RUN_ON_CPU_NULL);
++    async_safe_run_on_cpu(src_cpu, fn, RUN_ON_CPU_NULL);
++}
++
++static void tlb_flush_by_mmuidx_async_work(CPUState *cpu, run_on_cpu_data data)
++{
++    CPUArchState *env = cpu->env_ptr;
++    unsigned long mmu_idx_bitmask = data.host_int;
++    int mmu_idx;
++
++    assert_cpu_is_self(cpu);
++
++    tb_lock();
++
++    tlb_debug("start: mmu_idx:0x%04lx\n", mmu_idx_bitmask);
++
++    for (mmu_idx = 0; mmu_idx < NB_MMU_MODES; mmu_idx++) {
++
++        if (test_bit(mmu_idx, &mmu_idx_bitmask)) {
++            tlb_debug("%d\n", mmu_idx);
++
++            memset(env->tlb_table[mmu_idx], -1, sizeof(env->tlb_table[0]));
++            memset(env->tlb_v_table[mmu_idx], -1, sizeof(env->tlb_v_table[0]));
 +        }
 +    }
 +
-+    cc->debug_excp_handler(cpu);
++    memset(cpu->tb_jmp_cache, 0, sizeof(cpu->tb_jmp_cache));
++
++    tlb_debug("done\n");
++
++    tb_unlock();
 +}
 +
-+static inline bool cpu_handle_exception(CPUState *cpu, int *ret)
++void tlb_flush_by_mmuidx(CPUState *cpu, uint16_t idxmap)
 +{
-+    if (cpu->exception_index >= 0) {
-+        if (cpu->exception_index >= EXCP_INTERRUPT) {
-+            /* exit request from the cpu execution loop */
-+            *ret = cpu->exception_index;
-+            if (*ret == EXCP_DEBUG) {
-+                cpu_handle_debug_exception(cpu);
++    tlb_debug("mmu_idx: 0x%" PRIx16 "\n", idxmap);
++
++    if (!qemu_cpu_is_self(cpu)) {
++        uint16_t pending_flushes = idxmap;
++        pending_flushes &= ~atomic_mb_read(&cpu->pending_tlb_flush);
++
++        if (pending_flushes) {
++            tlb_debug("reduced mmu_idx: 0x%" PRIx16 "\n", pending_flushes);
++
++            atomic_or(&cpu->pending_tlb_flush, pending_flushes);
++            async_run_on_cpu(cpu, tlb_flush_by_mmuidx_async_work,
++                             RUN_ON_CPU_HOST_INT(pending_flushes));
++        }
++    } else {
++        tlb_flush_by_mmuidx_async_work(cpu,
++                                       RUN_ON_CPU_HOST_INT(idxmap));
++    }
++}
++
++void tlb_flush_by_mmuidx_all_cpus(CPUState *src_cpu, uint16_t idxmap)
++{
++    const run_on_cpu_func fn = tlb_flush_by_mmuidx_async_work;
++
++    tlb_debug("mmu_idx: 0x%"PRIx16"\n", idxmap);
++
++    flush_all_helper(src_cpu, fn, RUN_ON_CPU_HOST_INT(idxmap));
++    fn(src_cpu, RUN_ON_CPU_HOST_INT(idxmap));
++}
++
++void tlb_flush_by_mmuidx_all_cpus_synced(CPUState *src_cpu,
++                                                       uint16_t idxmap)
++{
++    const run_on_cpu_func fn = tlb_flush_by_mmuidx_async_work;
++
++    tlb_debug("mmu_idx: 0x%"PRIx16"\n", idxmap);
++
++    flush_all_helper(src_cpu, fn, RUN_ON_CPU_HOST_INT(idxmap));
++    async_safe_run_on_cpu(src_cpu, fn, RUN_ON_CPU_HOST_INT(idxmap));
++}
++
++
++
++static inline void tlb_flush_entry(CPUTLBEntry *tlb_entry, target_ulong addr)
++{
++    if (addr == (tlb_entry->addr_read &
++                 (TARGET_PAGE_MASK | TLB_INVALID_MASK)) ||
++        addr == (tlb_entry->addr_write &
++                 (TARGET_PAGE_MASK | TLB_INVALID_MASK)) ||
++        addr == (tlb_entry->addr_code &
++                 (TARGET_PAGE_MASK | TLB_INVALID_MASK))) {
++        memset(tlb_entry, -1, sizeof(*tlb_entry));
++    }
++}
++
++static void tlb_flush_page_async_work(CPUState *cpu, run_on_cpu_data data)
++{
++    CPUArchState *env = cpu->env_ptr;
++    target_ulong addr = (target_ulong) data.target_ptr;
++    int i;
++    int mmu_idx;
++
++    assert_cpu_is_self(cpu);
++
++    tlb_debug("page :" TARGET_FMT_lx "\n", addr);
++
++    /* Check if we need to flush due to large pages.  */
++    if ((addr & env->tlb_flush_mask) == env->tlb_flush_addr) {
++        tlb_debug("forcing full flush ("
++                  TARGET_FMT_lx "/" TARGET_FMT_lx ")\n",
++                  env->tlb_flush_addr, env->tlb_flush_mask);
++
++        tlb_flush(cpu);
++        return;
++    }
++
++    addr &= TARGET_PAGE_MASK;
++    i = (addr >> TARGET_PAGE_BITS) & (CPU_TLB_SIZE - 1);
++    for (mmu_idx = 0; mmu_idx < NB_MMU_MODES; mmu_idx++) {
++        tlb_flush_entry(&env->tlb_table[mmu_idx][i], addr);
++    }
++
++    /* check whether there are entries that need to be flushed in the vtlb */
++    for (mmu_idx = 0; mmu_idx < NB_MMU_MODES; mmu_idx++) {
++        int k;
++        for (k = 0; k < CPU_VTLB_SIZE; k++) {
++            tlb_flush_entry(&env->tlb_v_table[mmu_idx][k], addr);
++        }
++    }
++
++    tb_flush_jmp_cache(cpu, addr);
++}
++
++void tlb_flush_page(CPUState *cpu, target_ulong addr)
++{
++    tlb_debug("page :" TARGET_FMT_lx "\n", addr);
++
++    if (!qemu_cpu_is_self(cpu)) {
++        async_run_on_cpu(cpu, tlb_flush_page_async_work,
++                         RUN_ON_CPU_TARGET_PTR(addr));
++    } else {
++        tlb_flush_page_async_work(cpu, RUN_ON_CPU_TARGET_PTR(addr));
++    }
++}
++
++/* As we are going to hijack the bottom bits of the page address for a
++ * mmuidx bit mask we need to fail to build if we can't do that
++ */
++QEMU_BUILD_BUG_ON(NB_MMU_MODES > TARGET_PAGE_BITS_MIN);
++
++static void tlb_flush_page_by_mmuidx_async_work(CPUState *cpu,
++                                                run_on_cpu_data data)
++{
++    CPUArchState *env = cpu->env_ptr;
++    target_ulong addr_and_mmuidx = (target_ulong) data.target_ptr;
++    target_ulong addr = addr_and_mmuidx & TARGET_PAGE_MASK;
++    unsigned long mmu_idx_bitmap = addr_and_mmuidx & ALL_MMUIDX_BITS;
++    int page = (addr >> TARGET_PAGE_BITS) & (CPU_TLB_SIZE - 1);
++    int mmu_idx;
++    int i;
++
++    assert_cpu_is_self(cpu);
++
++    tlb_debug("page:%d addr:"TARGET_FMT_lx" mmu_idx:0x%lx\n",
++              page, addr, mmu_idx_bitmap);
++
++    for (mmu_idx = 0; mmu_idx < NB_MMU_MODES; mmu_idx++) {
++        if (test_bit(mmu_idx, &mmu_idx_bitmap)) {
++            tlb_flush_entry(&env->tlb_table[mmu_idx][page], addr);
++
++            /* check whether there are vltb entries that need to be flushed */
++            for (i = 0; i < CPU_VTLB_SIZE; i++) {
++                tlb_flush_entry(&env->tlb_v_table[mmu_idx][i], addr);
 +            }
-+            cpu->exception_index = -1;
-+            return true;
++        }
++    }
++
++    tb_flush_jmp_cache(cpu, addr);
++}
++
++static void tlb_check_page_and_flush_by_mmuidx_async_work(CPUState *cpu,
++                                                          run_on_cpu_data data)
++{
++    CPUArchState *env = cpu->env_ptr;
++    target_ulong addr_and_mmuidx = (target_ulong) data.target_ptr;
++    target_ulong addr = addr_and_mmuidx & TARGET_PAGE_MASK;
++    unsigned long mmu_idx_bitmap = addr_and_mmuidx & ALL_MMUIDX_BITS;
++
++    tlb_debug("addr:"TARGET_FMT_lx" mmu_idx: %04lx\n", addr, mmu_idx_bitmap);
++
++    /* Check if we need to flush due to large pages.  */
++    if ((addr & env->tlb_flush_mask) == env->tlb_flush_addr) {
++        tlb_debug("forced full flush ("
++                  TARGET_FMT_lx "/" TARGET_FMT_lx ")\n",
++                  env->tlb_flush_addr, env->tlb_flush_mask);
++
++        tlb_flush_by_mmuidx_async_work(cpu,
++                                       RUN_ON_CPU_HOST_INT(mmu_idx_bitmap));
++    } else {
++        tlb_flush_page_by_mmuidx_async_work(cpu, data);
++    }
++}
++
++void tlb_flush_page_by_mmuidx(CPUState *cpu, target_ulong addr, uint16_t idxmap)
++{
++    target_ulong addr_and_mmu_idx;
++
++    tlb_debug("addr: "TARGET_FMT_lx" mmu_idx:%" PRIx16 "\n", addr, idxmap);
++
++    /* This should already be page aligned */
++    addr_and_mmu_idx = addr & TARGET_PAGE_MASK;
++    addr_and_mmu_idx |= idxmap;
++
++    if (!qemu_cpu_is_self(cpu)) {
++        async_run_on_cpu(cpu, tlb_check_page_and_flush_by_mmuidx_async_work,
++                         RUN_ON_CPU_TARGET_PTR(addr_and_mmu_idx));
++    } else {
++        tlb_check_page_and_flush_by_mmuidx_async_work(
++            cpu, RUN_ON_CPU_TARGET_PTR(addr_and_mmu_idx));
++    }
++}
++
++void tlb_flush_page_by_mmuidx_all_cpus(CPUState *src_cpu, target_ulong addr,
++                                       uint16_t idxmap)
++{
++    const run_on_cpu_func fn = tlb_check_page_and_flush_by_mmuidx_async_work;
++    target_ulong addr_and_mmu_idx;
++
++    tlb_debug("addr: "TARGET_FMT_lx" mmu_idx:%"PRIx16"\n", addr, idxmap);
++
++    /* This should already be page aligned */
++    addr_and_mmu_idx = addr & TARGET_PAGE_MASK;
++    addr_and_mmu_idx |= idxmap;
++
++    flush_all_helper(src_cpu, fn, RUN_ON_CPU_TARGET_PTR(addr_and_mmu_idx));
++    fn(src_cpu, RUN_ON_CPU_TARGET_PTR(addr_and_mmu_idx));
++}
++
++void tlb_flush_page_by_mmuidx_all_cpus_synced(CPUState *src_cpu,
++                                                            target_ulong addr,
++                                                            uint16_t idxmap)
++{
++    const run_on_cpu_func fn = tlb_check_page_and_flush_by_mmuidx_async_work;
++    target_ulong addr_and_mmu_idx;
++
++    tlb_debug("addr: "TARGET_FMT_lx" mmu_idx:%"PRIx16"\n", addr, idxmap);
++
++    /* This should already be page aligned */
++    addr_and_mmu_idx = addr & TARGET_PAGE_MASK;
++    addr_and_mmu_idx |= idxmap;
++
++    flush_all_helper(src_cpu, fn, RUN_ON_CPU_TARGET_PTR(addr_and_mmu_idx));
++    async_safe_run_on_cpu(src_cpu, fn, RUN_ON_CPU_TARGET_PTR(addr_and_mmu_idx));
++}
++
++void tlb_flush_page_all_cpus(CPUState *src, target_ulong addr)
++{
++    const run_on_cpu_func fn = tlb_flush_page_async_work;
++
++    flush_all_helper(src, fn, RUN_ON_CPU_TARGET_PTR(addr));
++    fn(src, RUN_ON_CPU_TARGET_PTR(addr));
++}
++
++void tlb_flush_page_all_cpus_synced(CPUState *src,
++                                                  target_ulong addr)
++{
++    const run_on_cpu_func fn = tlb_flush_page_async_work;
++
++    flush_all_helper(src, fn, RUN_ON_CPU_TARGET_PTR(addr));
++    async_safe_run_on_cpu(src, fn, RUN_ON_CPU_TARGET_PTR(addr));
++}
++
++/* update the TLBs so that writes to code in the virtual page 'addr'
++   can be detected */
++void tlb_protect_code(ram_addr_t ram_addr)
++{
++    cpu_physical_memory_test_and_clear_dirty(ram_addr, TARGET_PAGE_SIZE,
++                                             DIRTY_MEMORY_CODE);
++}
++
++/* update the TLB so that writes in physical page 'phys_addr' are no longer
++   tested for self modifying code */
++void tlb_unprotect_code(ram_addr_t ram_addr)
++{
++    cpu_physical_memory_set_dirty_flag(ram_addr, DIRTY_MEMORY_CODE);
++}
++
++
++/*
++ * Dirty write flag handling
++ *
++ * When the TCG code writes to a location it looks up the address in
++ * the TLB and uses that data to compute the final address. If any of
++ * the lower bits of the address are set then the slow path is forced.
++ * There are a number of reasons to do this but for normal RAM the
++ * most usual is detecting writes to code regions which may invalidate
++ * generated code.
++ *
++ * Because we want other vCPUs to respond to changes straight away we
++ * update the te->addr_write field atomically. If the TLB entry has
++ * been changed by the vCPU in the mean time we skip the update.
++ *
++ * As this function uses atomic accesses we also need to ensure
++ * updates to tlb_entries follow the same access rules. We don't need
++ * to worry about this for oversized guests as MTTCG is disabled for
++ * them.
++ */
++
++static void tlb_reset_dirty_range(CPUTLBEntry *tlb_entry, uintptr_t start,
++                           uintptr_t length)
++{
++#if TCG_OVERSIZED_GUEST
++    uintptr_t addr = tlb_entry->addr_write;
++
++    if ((addr & (TLB_INVALID_MASK | TLB_MMIO | TLB_NOTDIRTY)) == 0) {
++        addr &= TARGET_PAGE_MASK;
++        addr += tlb_entry->addend;
++        if ((addr - start) < length) {
++            tlb_entry->addr_write |= TLB_NOTDIRTY;
++        }
++    }
++#else
++    /* paired with atomic_mb_set in tlb_set_page_with_attrs */
++    uintptr_t orig_addr = atomic_mb_read(&tlb_entry->addr_write);
++    uintptr_t addr = orig_addr;
++
++    if ((addr & (TLB_INVALID_MASK | TLB_MMIO | TLB_NOTDIRTY)) == 0) {
++        addr &= TARGET_PAGE_MASK;
++        addr += atomic_read(&tlb_entry->addend);
++        if ((addr - start) < length) {
++            uintptr_t notdirty_addr = orig_addr | TLB_NOTDIRTY;
++            atomic_cmpxchg(&tlb_entry->addr_write, orig_addr, notdirty_addr);
++        }
++    }
++#endif
++}
++
++/* For atomic correctness when running MTTCG we need to use the right
++ * primitives when copying entries */
++static inline void copy_tlb_helper(CPUTLBEntry *d, CPUTLBEntry *s,
++                                   bool atomic_set)
++{
++#if TCG_OVERSIZED_GUEST
++    *d = *s;
++#else
++    if (atomic_set) {
++        d->addr_read = s->addr_read;
++        d->addr_code = s->addr_code;
++        atomic_set(&d->addend, atomic_read(&s->addend));
++        /* Pairs with flag setting in tlb_reset_dirty_range */
++        atomic_mb_set(&d->addr_write, atomic_read(&s->addr_write));
++    } else {
++        d->addr_read = s->addr_read;
++        d->addr_write = atomic_read(&s->addr_write);
++        d->addr_code = s->addr_code;
++        d->addend = atomic_read(&s->addend);
++    }
++#endif
++}
++
++/* This is a cross vCPU call (i.e. another vCPU resetting the flags of
++ * the target vCPU). As such care needs to be taken that we don't
++ * dangerously race with another vCPU update. The only thing actually
++ * updated is the target TLB entry ->addr_write flags.
++ */
++void tlb_reset_dirty(CPUState *cpu, ram_addr_t start1, ram_addr_t length)
++{
++    CPUArchState *env;
++
++    int mmu_idx;
++
++    env = cpu->env_ptr;
++    for (mmu_idx = 0; mmu_idx < NB_MMU_MODES; mmu_idx++) {
++        unsigned int i;
++
++        for (i = 0; i < CPU_TLB_SIZE; i++) {
++            tlb_reset_dirty_range(&env->tlb_table[mmu_idx][i],
++                                  start1, length);
++        }
++
++        for (i = 0; i < CPU_VTLB_SIZE; i++) {
++            tlb_reset_dirty_range(&env->tlb_v_table[mmu_idx][i],
++                                  start1, length);
++        }
++    }
++}
++
++static inline void tlb_set_dirty1(CPUTLBEntry *tlb_entry, target_ulong vaddr)
++{
++    if (tlb_entry->addr_write == (vaddr | TLB_NOTDIRTY)) {
++        tlb_entry->addr_write = vaddr;
++    }
++}
++
++/* update the TLB corresponding to virtual page vaddr
++   so that it is no longer dirty */
++void tlb_set_dirty(CPUState *cpu, target_ulong vaddr)
++{
++    CPUArchState *env = cpu->env_ptr;
++    int i;
++    int mmu_idx;
++
++    assert_cpu_is_self(cpu);
++
++    vaddr &= TARGET_PAGE_MASK;
++    i = (vaddr >> TARGET_PAGE_BITS) & (CPU_TLB_SIZE - 1);
++    for (mmu_idx = 0; mmu_idx < NB_MMU_MODES; mmu_idx++) {
++        tlb_set_dirty1(&env->tlb_table[mmu_idx][i], vaddr);
++    }
++
++    for (mmu_idx = 0; mmu_idx < NB_MMU_MODES; mmu_idx++) {
++        int k;
++        for (k = 0; k < CPU_VTLB_SIZE; k++) {
++            tlb_set_dirty1(&env->tlb_v_table[mmu_idx][k], vaddr);
++        }
++    }
++}
++
++/* Our TLB does not support large pages, so remember the area covered by
++   large pages and trigger a full TLB flush if these are invalidated.  */
++static void tlb_add_large_page(CPUArchState *env, target_ulong vaddr,
++                               target_ulong size)
++{
++    target_ulong mask = ~(size - 1);
++
++    if (env->tlb_flush_addr == (target_ulong)-1) {
++        env->tlb_flush_addr = vaddr & mask;
++        env->tlb_flush_mask = mask;
++        return;
++    }
++    /* Extend the existing region to include the new page.
++       This is a compromise between unnecessary flushes and the cost
++       of maintaining a full variable size TLB.  */
++    mask &= env->tlb_flush_mask;
++    while (((env->tlb_flush_addr ^ vaddr) & mask) != 0) {
++        mask <<= 1;
++    }
++    env->tlb_flush_addr &= mask;
++    env->tlb_flush_mask = mask;
++}
++
++/* Add a new TLB entry. At most one entry for a given virtual address
++ * is permitted. Only a single TARGET_PAGE_SIZE region is mapped, the
++ * supplied size is only used by tlb_flush_page.
++ *
++ * Called from TCG-generated code, which is under an RCU read-side
++ * critical section.
++ */
++void tlb_set_page_with_attrs(CPUState *cpu, target_ulong vaddr,
++                             hwaddr paddr, MemTxAttrs attrs, int prot,
++                             int mmu_idx, target_ulong size)
++{
++    CPUArchState *env = cpu->env_ptr;
++    MemoryRegionSection *section;
++    unsigned int index;
++    target_ulong address;
++    target_ulong code_address;
++    uintptr_t addend;
++    CPUTLBEntry *te, *tv, tn;
++    hwaddr iotlb, xlat, sz;
++    unsigned vidx = env->vtlb_index++ % CPU_VTLB_SIZE;
++    int asidx = cpu_asidx_from_attrs(cpu, attrs);
++
++    assert_cpu_is_self(cpu);
++    assert(size >= TARGET_PAGE_SIZE);
++    if (size != TARGET_PAGE_SIZE) {
++        tlb_add_large_page(env, vaddr, size);
++    }
++
++    sz = size;
++    section = address_space_translate_for_iotlb(cpu, asidx, paddr, &xlat, &sz);
++    assert(sz >= TARGET_PAGE_SIZE);
++
++    tlb_debug("vaddr=" TARGET_FMT_lx " paddr=0x" TARGET_FMT_plx
++              " prot=%x idx=%d\n",
++              vaddr, paddr, prot, mmu_idx);
++
++    address = vaddr;
++    if (!memory_region_is_ram(section->mr) && !memory_region_is_romd(section->mr)) {
++        /* IO memory case */
++        address |= TLB_MMIO;
++        addend = 0;
++    } else {
++        /* TLB_MMIO for rom/romd handled below */
++        addend = (uintptr_t)memory_region_get_ram_ptr(section->mr) + xlat;
++    }
++
++    code_address = address;
++    iotlb = memory_region_section_get_iotlb(cpu, section, vaddr, paddr, xlat,
++                                            prot, &address);
++
++    index = (vaddr >> TARGET_PAGE_BITS) & (CPU_TLB_SIZE - 1);
++    te = &env->tlb_table[mmu_idx][index];
++    /* do not discard the translation in te, evict it into a victim tlb */
++    tv = &env->tlb_v_table[mmu_idx][vidx];
++
++    /* addr_write can race with tlb_reset_dirty_range */
++    copy_tlb_helper(tv, te, true);
++
++    env->iotlb_v[mmu_idx][vidx] = env->iotlb[mmu_idx][index];
++
++    /* refill the tlb */
++    env->iotlb[mmu_idx][index].addr = iotlb - vaddr;
++    env->iotlb[mmu_idx][index].attrs = attrs;
++
++    /* Now calculate the new entry */
++    tn.addend = addend - vaddr;
++    if (prot & PAGE_READ) {
++        tn.addr_read = address;
++    } else {
++        tn.addr_read = -1;
++    }
++
++    if (prot & PAGE_EXEC) {
++        tn.addr_code = code_address;
++    } else {
++        tn.addr_code = -1;
++    }
++
++    tn.addr_write = -1;
++    if (prot & PAGE_WRITE) {
++        if ((memory_region_is_ram(section->mr) && section->readonly)
++            || memory_region_is_romd(section->mr)) {
++            /* Write access calls the I/O callback.  */
++            tn.addr_write = address | TLB_MMIO;
++        } else if (memory_region_is_ram(section->mr)
++                   && cpu_physical_memory_is_clean(
++                        memory_region_get_ram_addr(section->mr) + xlat)) {
++            tn.addr_write = address | TLB_NOTDIRTY;
 +        } else {
-+#if defined(CONFIG_USER_ONLY)
-+            /* if user mode only, we simulate a fake exception
-+               which will be handled outside the cpu execution
-+               loop */
-+#if defined(TARGET_I386)
-+            CPUClass *cc = CPU_GET_CLASS(cpu);
-+            cc->do_interrupt(cpu);
-+#endif
-+            *ret = cpu->exception_index;
-+            cpu->exception_index = -1;
-+            return true;
-+#else
-+            if (replay_exception()) {
-+                CPUClass *cc = CPU_GET_CLASS(cpu);
-+                qemu_mutex_lock_iothread();
-+                cc->do_interrupt(cpu);
-+                qemu_mutex_unlock_iothread();
-+                cpu->exception_index = -1;
-+            } else if (!replay_has_interrupt()) {
-+                /* give a chance to iothread in replay mode */
-+                *ret = EXCP_INTERRUPT;
-+                return true;
-+            }
-+#endif
++            tn.addr_write = address;
 +        }
-+#ifndef CONFIG_USER_ONLY
-+    } else if (replay_has_exception()
-+               && cpu->icount_decr.u16.low + cpu->icount_extra == 0) {
-+        /* try to cause an exception pending in the log */
-+        cpu_exec_nocache(cpu, 1, tb_find(cpu, NULL, 0), true);
-+        *ret = -1;
-+        return true;
-+#endif
 +    }
 +
-+    return false;
++    /* Pairs with flag setting in tlb_reset_dirty_range */
++    copy_tlb_helper(te, &tn, true);
++    /* atomic_mb_set(&te->addr_write, write_address); */
 +}
 +
-+static inline bool cpu_handle_interrupt(CPUState *cpu,
-+                                        TranslationBlock **last_tb)
++/* Add a new TLB entry, but without specifying the memory
++ * transaction attributes to be used.
++ */
++void tlb_set_page(CPUState *cpu, target_ulong vaddr,
++                  hwaddr paddr, int prot,
++                  int mmu_idx, target_ulong size)
 +{
-+    CPUClass *cc = CPU_GET_CLASS(cpu);
++    tlb_set_page_with_attrs(cpu, vaddr, paddr, MEMTXATTRS_UNSPECIFIED,
++                            prot, mmu_idx, size);
++}
 +
-+    if (unlikely(atomic_read(&cpu->interrupt_request))) {
-+        int interrupt_request;
++static void report_bad_exec(CPUState *cpu, target_ulong addr)
++{
++    /* Accidentally executing outside RAM or ROM is quite common for
++     * several user-error situations, so report it in a way that
++     * makes it clear that this isn't a QEMU bug and provide suggestions
++     * about what a user could do to fix things.
++     */
++    error_report("Trying to execute code outside RAM or ROM at 0x"
++                 TARGET_FMT_lx, addr);
++    error_printf("This usually means one of the following happened:\n\n"
++                 "(1) You told QEMU to execute a kernel for the wrong machine "
++                 "type, and it crashed on startup (eg trying to run a "
++                 "raspberry pi kernel on a versatilepb QEMU machine)\n"
++                 "(2) You didn't give QEMU a kernel or BIOS filename at all, "
++                 "and QEMU executed a ROM full of no-op instructions until "
++                 "it fell off the end\n"
++                 "(3) Your guest kernel has a bug and crashed by jumping "
++                 "off into nowhere\n\n"
++                 "This is almost always one of the first two, so check your "
++                 "command line and that you are using the right type of kernel "
++                 "for this machine.\n"
++                 "If you think option (3) is likely then you can try debugging "
++                 "your guest with the -d debug options; in particular "
++                 "-d guest_errors will cause the log to include a dump of the "
++                 "guest register state at this point.\n\n"
++                 "Execution cannot continue; stopping here.\n\n");
++
++    /* Report also to the logs, with more detail including register dump */
++    qemu_log_mask(LOG_GUEST_ERROR, "qemu: fatal: Trying to execute code "
++                  "outside RAM or ROM at 0x" TARGET_FMT_lx "\n", addr);
++    log_cpu_state_mask(LOG_GUEST_ERROR, cpu, CPU_DUMP_FPU | CPU_DUMP_CCOP);
++}
++
++static inline ram_addr_t qemu_ram_addr_from_host_nofail(void *ptr)
++{
++    ram_addr_t ram_addr;
++
++    ram_addr = qemu_ram_addr_from_host(ptr);
++    if (ram_addr == RAM_ADDR_INVALID) {
++        error_report("Bad ram pointer %p", ptr);
++        abort();
++    }
++    return ram_addr;
++}
++
++/* NOTE: this function can trigger an exception */
++/* NOTE2: the returned address is not exactly the physical address: it
++ * is actually a ram_addr_t (in system mode; the user mode emulation
++ * version of this function returns a guest virtual address).
++ */
++tb_page_addr_t get_page_addr_code(CPUArchState *env1, target_ulong addr)
++{
++    int mmu_idx, page_index, pd;
++    void *p;
++    MemoryRegion *mr;
++    CPUState *cpu = ENV_GET_CPU(env1);
++    CPUIOTLBEntry *iotlbentry;
++
++    page_index = (addr >> TARGET_PAGE_BITS) & (CPU_TLB_SIZE - 1);
++    mmu_idx = cpu_mmu_index(env1, true);
++    if (unlikely(env1->tlb_table[mmu_idx][page_index].addr_code !=
++                 (addr & TARGET_PAGE_MASK))) {
++        cpu_ldub_code(env1, addr);
++    }
++    iotlbentry = &env1->iotlb[mmu_idx][page_index];
++    pd = iotlbentry->addr & ~TARGET_PAGE_MASK;
++    mr = iotlb_to_region(cpu, pd, iotlbentry->attrs);
++    if (memory_region_is_unassigned(mr)) {
++        cpu_unassigned_access(cpu, addr, false, true, 0, 4);
++        /* The CPU's unassigned access hook might have longjumped out
++         * with an exception. If it didn't (or there was no hook) then
++         * we can't proceed further.
++         */
++        report_bad_exec(cpu, addr);
++        exit(1);
++    }
++    p = (void *)((uintptr_t)addr + env1->tlb_table[mmu_idx][page_index].addend);
++    return qemu_ram_addr_from_host_nofail(p);
++}
++
++static uint64_t io_readx(CPUArchState *env, CPUIOTLBEntry *iotlbentry,
++                         target_ulong addr, uintptr_t retaddr, int size)
++{
++    CPUState *cpu = ENV_GET_CPU(env);
++    hwaddr physaddr = iotlbentry->addr;
++    MemoryRegion *mr = iotlb_to_region(cpu, physaddr, iotlbentry->attrs);
++    uint64_t val;
++    bool locked = false;
++
++    physaddr = (physaddr & TARGET_PAGE_MASK) + addr;
++    cpu->mem_io_pc = retaddr;
++    if (mr != &io_mem_rom && mr != &io_mem_notdirty && !cpu->can_do_io) {
++        cpu_io_recompile(cpu, retaddr);
++    }
++
++    cpu->mem_io_vaddr = addr;
++
++    if (mr->global_locking) {
 +        qemu_mutex_lock_iothread();
-+        interrupt_request = cpu->interrupt_request;
-+        if (unlikely(cpu->singlestep_enabled & SSTEP_NOIRQ)) {
-+            /* Mask out external interrupts for this step. */
-+            interrupt_request &= ~CPU_INTERRUPT_SSTEP_MASK;
-+        }
-+        if (interrupt_request & CPU_INTERRUPT_DEBUG) {
-+            cpu->interrupt_request &= ~CPU_INTERRUPT_DEBUG;
-+            cpu->exception_index = EXCP_DEBUG;
-+            qemu_mutex_unlock_iothread();
-+            return true;
-+        }
-+        if (replay_mode == REPLAY_MODE_PLAY && !replay_has_interrupt()) {
-+            /* Do nothing */
-+        } else if (interrupt_request & CPU_INTERRUPT_HALT) {
-+            replay_interrupt();
-+            cpu->interrupt_request &= ~CPU_INTERRUPT_HALT;
-+            cpu->halted = 1;
-+            cpu->exception_index = EXCP_HLT;
-+            qemu_mutex_unlock_iothread();
-+            return true;
-+        }
-+#if defined(TARGET_I386)
-+        else if (interrupt_request & CPU_INTERRUPT_INIT) {
-+            X86CPU *x86_cpu = X86_CPU(cpu);
-+            CPUArchState *env = &x86_cpu->env;
-+            replay_interrupt();
-+            cpu_svm_check_intercept_param(env, SVM_EXIT_INIT, 0, 0);
-+            do_cpu_init(x86_cpu);
-+            cpu->exception_index = EXCP_HALTED;
-+            qemu_mutex_unlock_iothread();
-+            return true;
-+        }
-+#else
-+        else if (interrupt_request & CPU_INTERRUPT_RESET) {
-+            replay_interrupt();
-+            cpu_reset(cpu);
-+            qemu_mutex_unlock_iothread();
-+            return true;
-+        }
-+#endif
-+        /* The target hook has 3 exit conditions:
-+           False when the interrupt isn't processed,
-+           True when it is, and we should restart on a new TB,
-+           and via longjmp via cpu_loop_exit.  */
-+        else {
-+            if (cc->cpu_exec_interrupt(cpu, interrupt_request)) {
-+                replay_interrupt();
-+                *last_tb = NULL;
-+            }
-+            /* The target hook may have updated the 'cpu->interrupt_request';
-+             * reload the 'interrupt_request' value */
-+            interrupt_request = cpu->interrupt_request;
-+        }
-+        if (interrupt_request & CPU_INTERRUPT_EXITTB) {
-+            cpu->interrupt_request &= ~CPU_INTERRUPT_EXITTB;
-+            /* ensure that no TB jump will be modified as
-+               the program flow was changed */
-+            *last_tb = NULL;
-+        }
-+
-+        /* If we exit via cpu_loop_exit/longjmp it is reset in cpu_exec */
++        locked = true;
++    }
++    memory_region_dispatch_read(mr, physaddr, &val, size, iotlbentry->attrs);
++    if (locked) {
 +        qemu_mutex_unlock_iothread();
 +    }
 +
-+    /* Finally, check if we need to exit to the main loop.  */
-+    if (unlikely(atomic_read(&cpu->exit_request)
-+        || (use_icount && cpu->icount_decr.u16.low + cpu->icount_extra == 0))) {
-+        atomic_set(&cpu->exit_request, 0);
-+        cpu->exception_index = EXCP_INTERRUPT;
-+        return true;
-+    }
++    return val;
++}
 +
++static void io_writex(CPUArchState *env, CPUIOTLBEntry *iotlbentry,
++                      uint64_t val, target_ulong addr,
++                      uintptr_t retaddr, int size)
++{
++    CPUState *cpu = ENV_GET_CPU(env);
++    hwaddr physaddr = iotlbentry->addr;
++    MemoryRegion *mr = iotlb_to_region(cpu, physaddr, iotlbentry->attrs);
++    bool locked = false;
++
++    physaddr = (physaddr & TARGET_PAGE_MASK) + addr;
++    if (mr != &io_mem_rom && mr != &io_mem_notdirty && !cpu->can_do_io) {
++        cpu_io_recompile(cpu, retaddr);
++    }
++    cpu->mem_io_vaddr = addr;
++    cpu->mem_io_pc = retaddr;
++
++    if (mr->global_locking) {
++        qemu_mutex_lock_iothread();
++        locked = true;
++    }
++    memory_region_dispatch_write(mr, physaddr, val, size, iotlbentry->attrs);
++    if (locked) {
++        qemu_mutex_unlock_iothread();
++    }
++}
++
++/* Return true if ADDR is present in the victim tlb, and has been copied
++   back to the main tlb.  */
++static bool victim_tlb_hit(CPUArchState *env, size_t mmu_idx, size_t index,
++                           size_t elt_ofs, target_ulong page)
++{
++    size_t vidx;
++    for (vidx = 0; vidx < CPU_VTLB_SIZE; ++vidx) {
++        CPUTLBEntry *vtlb = &env->tlb_v_table[mmu_idx][vidx];
++        target_ulong cmp = *(target_ulong *)((uintptr_t)vtlb + elt_ofs);
++
++        if (cmp == page) {
++            /* Found entry in victim tlb, swap tlb and iotlb.  */
++            CPUTLBEntry tmptlb, *tlb = &env->tlb_table[mmu_idx][index];
++
++            copy_tlb_helper(&tmptlb, tlb, false);
++            copy_tlb_helper(tlb, vtlb, true);
++            copy_tlb_helper(vtlb, &tmptlb, true);
++
++            CPUIOTLBEntry tmpio, *io = &env->iotlb[mmu_idx][index];
++            CPUIOTLBEntry *vio = &env->iotlb_v[mmu_idx][vidx];
++            tmpio = *io; *io = *vio; *vio = tmpio;
++            return true;
++        }
++    }
 +    return false;
 +}
 +
-+static inline void cpu_loop_exec_tb(CPUState *cpu, TranslationBlock *tb,
-+                                    TranslationBlock **last_tb, int *tb_exit)
++/* Macro to call the above, with local variables from the use context.  */
++#define VICTIM_TLB_HIT(TY, ADDR) \
++  victim_tlb_hit(env, mmu_idx, index, offsetof(CPUTLBEntry, TY), \
++                 (ADDR) & TARGET_PAGE_MASK)
++
++/* Probe for whether the specified guest write access is permitted.
++ * If it is not permitted then an exception will be taken in the same
++ * way as if this were a real write access (and we will not return).
++ * Otherwise the function will return, and there will be a valid
++ * entry in the TLB for this access.
++ */
++void probe_write(CPUArchState *env, target_ulong addr, int mmu_idx,
++                 uintptr_t retaddr)
 +{
-+    uintptr_t ret;
-+    int32_t insns_left;
++    int index = (addr >> TARGET_PAGE_BITS) & (CPU_TLB_SIZE - 1);
++    target_ulong tlb_addr = env->tlb_table[mmu_idx][index].addr_write;
 +
-+    trace_exec_tb(tb, tb->pc);
-+    ret = cpu_tb_exec(cpu, tb);
-+    tb = (TranslationBlock *)(ret & ~TB_EXIT_MASK);
-+    *tb_exit = ret & TB_EXIT_MASK;
-+    if (*tb_exit != TB_EXIT_REQUESTED) {
-+        *last_tb = tb;
-+        return;
-+    }
-+
-+    *last_tb = NULL;
-+    insns_left = atomic_read(&cpu->icount_decr.u32);
-+    atomic_set(&cpu->icount_decr.u16.high, 0);
-+    if (insns_left < 0) {
-+        /* Something asked us to stop executing chained TBs; just
-+         * continue round the main loop. Whatever requested the exit
-+         * will also have set something else (eg exit_request or
-+         * interrupt_request) which we will handle next time around
-+         * the loop.  But we need to ensure the zeroing of icount_decr
-+         * comes before the next read of cpu->exit_request
-+         * or cpu->interrupt_request.
-+         */
-+        smp_mb();
-+        return;
-+    }
-+
-+    /* Instruction counter expired.  */
-+    assert(use_icount);
-+#ifndef CONFIG_USER_ONLY
-+    /* Ensure global icount has gone forward */
-+    cpu_update_icount(cpu);
-+    /* Refill decrementer and continue execution.  */
-+    insns_left = MIN(0xffff, cpu->icount_budget);
-+    cpu->icount_decr.u16.low = insns_left;
-+    cpu->icount_extra = cpu->icount_budget - insns_left;
-+    if (!cpu->icount_extra) {
-+        /* Execute any remaining instructions, then let the main loop
-+         * handle the next event.
-+         */
-+        if (insns_left > 0) {
-+            cpu_exec_nocache(cpu, insns_left, tb, false);
++    if ((addr & TARGET_PAGE_MASK)
++        != (tlb_addr & (TARGET_PAGE_MASK | TLB_INVALID_MASK))) {
++        /* TLB entry is for a different page */
++        if (!VICTIM_TLB_HIT(addr_write, addr)) {
++            tlb_fill(ENV_GET_CPU(env), addr, MMU_DATA_STORE, mmu_idx, retaddr);
 +        }
 +    }
++}
++
++/* Probe for a read-modify-write atomic operation.  Do not allow unaligned
++ * operations, or io operations to proceed.  Return the host address.  */
++static void *atomic_mmu_lookup(CPUArchState *env, target_ulong addr,
++                               TCGMemOpIdx oi, uintptr_t retaddr)
++{
++    size_t mmu_idx = get_mmuidx(oi);
++    size_t index = (addr >> TARGET_PAGE_BITS) & (CPU_TLB_SIZE - 1);
++    CPUTLBEntry *tlbe = &env->tlb_table[mmu_idx][index];
++    target_ulong tlb_addr = tlbe->addr_write;
++    TCGMemOp mop = get_memop(oi);
++    int a_bits = get_alignment_bits(mop);
++    int s_bits = mop & MO_SIZE;
++
++    /* Adjust the given return address.  */
++    retaddr -= GETPC_ADJ;
++
++    /* Enforce guest required alignment.  */
++    if (unlikely(a_bits > 0 && (addr & ((1 << a_bits) - 1)))) {
++        /* ??? Maybe indicate atomic op to cpu_unaligned_access */
++        cpu_unaligned_access(ENV_GET_CPU(env), addr, MMU_DATA_STORE,
++                             mmu_idx, retaddr);
++    }
++
++    /* Enforce qemu required alignment.  */
++    if (unlikely(addr & ((1 << s_bits) - 1))) {
++        /* We get here if guest alignment was not requested,
++           or was not enforced by cpu_unaligned_access above.
++           We might widen the access and emulate, but for now
++           mark an exception and exit the cpu loop.  */
++        goto stop_the_world;
++    }
++
++    /* Check TLB entry and enforce page permissions.  */
++    if ((addr & TARGET_PAGE_MASK)
++        != (tlb_addr & (TARGET_PAGE_MASK | TLB_INVALID_MASK))) {
++        if (!VICTIM_TLB_HIT(addr_write, addr)) {
++            tlb_fill(ENV_GET_CPU(env), addr, MMU_DATA_STORE, mmu_idx, retaddr);
++        }
++        tlb_addr = tlbe->addr_write;
++    }
++
++    /* Check notdirty */
++    if (unlikely(tlb_addr & TLB_NOTDIRTY)) {
++        tlb_set_dirty(ENV_GET_CPU(env), addr);
++        tlb_addr = tlb_addr & ~TLB_NOTDIRTY;
++    }
++
++    /* Notice an IO access  */
++    if (unlikely(tlb_addr & ~TARGET_PAGE_MASK)) {
++        /* There's really nothing that can be done to
++           support this apart from stop-the-world.  */
++        goto stop_the_world;
++    }
++
++    /* Let the guest notice RMW on a write-only page.  */
++    if (unlikely(tlbe->addr_read != tlb_addr)) {
++        tlb_fill(ENV_GET_CPU(env), addr, MMU_DATA_LOAD, mmu_idx, retaddr);
++        /* Since we don't support reads and writes to different addresses,
++           and we do have the proper page loaded for write, this shouldn't
++           ever return.  But just in case, handle via stop-the-world.  */
++        goto stop_the_world;
++    }
++
++    return (void *)((uintptr_t)addr + tlbe->addend);
++
++ stop_the_world:
++    cpu_loop_exit_atomic(ENV_GET_CPU(env), retaddr);
++}
++
++#ifdef TARGET_WORDS_BIGENDIAN
++# define TGT_BE(X)  (X)
++# define TGT_LE(X)  BSWAP(X)
++#else
++# define TGT_BE(X)  BSWAP(X)
++# define TGT_LE(X)  (X)
 +#endif
-+}
 +
-+/* main execution loop */
++#define MMUSUFFIX _mmu
 +
-+int cpu_exec(CPUState *cpu)
-+{
-+    CPUClass *cc = CPU_GET_CLASS(cpu);
-+    int ret;
-+    SyncClocks sc = { 0 };
++#define DATA_SIZE 1
++#include "softmmu_template.h"
 +
-+    /* replay_interrupt may need current_cpu */
-+    current_cpu = cpu;
++#define DATA_SIZE 2
++#include "softmmu_template.h"
 +
-+    if (cpu_handle_halt(cpu)) {
-+        return EXCP_HALTED;
-+    }
++#define DATA_SIZE 4
++#include "softmmu_template.h"
 +
-+    rcu_read_lock();
++#define DATA_SIZE 8
++#include "softmmu_template.h"
 +
-+    cc->cpu_exec_enter(cpu);
++/* First set of helpers allows passing in of OI and RETADDR.  This makes
++   them callable from other helpers.  */
 +
-+    /* Calculate difference between guest clock and host clock.
-+     * This delay includes the delay of the last cycle, so
-+     * what we have to do is sleep until it is 0. As for the
-+     * advance/delay we gain here, we try to fix it next time.
-+     */
-+    init_delay_params(&sc, cpu);
++#define EXTRA_ARGS     , TCGMemOpIdx oi, uintptr_t retaddr
++#define ATOMIC_NAME(X) \
++    HELPER(glue(glue(glue(atomic_ ## X, SUFFIX), END), _mmu))
++#define ATOMIC_MMU_LOOKUP  atomic_mmu_lookup(env, addr, oi, retaddr)
 +
-+    /* prepare setjmp context for exception handling */
-+    if (sigsetjmp(cpu->jmp_env, 0) != 0) {
-+#if defined(__clang__) || !QEMU_GNUC_PREREQ(4, 6)
-+        /* Some compilers wrongly smash all local variables after
-+         * siglongjmp. There were bug reports for gcc 4.5.0 and clang.
-+         * Reload essential local variables here for those compilers.
-+         * Newer versions of gcc would complain about this code (-Wclobbered). */
-+        cpu = current_cpu;
-+        cc = CPU_GET_CLASS(cpu);
-+#else /* buggy compiler */
-+        /* Assert that the compiler does not smash local variables. */
-+        g_assert(cpu == current_cpu);
-+        g_assert(cc == CPU_GET_CLASS(cpu));
-+#endif /* buggy compiler */
-+        cpu->can_do_io = 1;
-+        tb_lock_reset();
-+        if (qemu_mutex_iothread_locked()) {
-+            qemu_mutex_unlock_iothread();
-+        }
-+    }
++#define DATA_SIZE 1
++#include "atomic_template.h"
 +
-+    /* if an exception is pending, we execute it here */
-+    while (!cpu_handle_exception(cpu, &ret)) {
-+        TranslationBlock *last_tb = NULL;
-+        int tb_exit = 0;
++#define DATA_SIZE 2
++#include "atomic_template.h"
 +
-+        while (!cpu_handle_interrupt(cpu, &last_tb)) {
-+            TranslationBlock *tb = tb_find(cpu, last_tb, tb_exit);
-+            cpu_loop_exec_tb(cpu, tb, &last_tb, &tb_exit);
-+            /* Try to align the host and virtual clocks
-+               if the guest is in advance */
-+            align_clocks(&sc, cpu);
-+        }
-+    }
++#define DATA_SIZE 4
++#include "atomic_template.h"
 +
-+    cc->cpu_exec_exit(cpu);
-+    rcu_read_unlock();
++#ifdef CONFIG_ATOMIC64
++#define DATA_SIZE 8
++#include "atomic_template.h"
++#endif
 +
-+    return ret;
-+}
-diff --git a/accel/tcg/trace-events b/accel/tcg/trace-events
-new file mode 100644
-index 0000000..f2db388
---- /dev/null
-+++ b/accel/tcg/trace-events
-@@ -0,0 +1,7 @@
-+# Trace events for debugging and performance instrumentation
++#ifdef CONFIG_ATOMIC128
++#define DATA_SIZE 16
++#include "atomic_template.h"
++#endif
 +
-+# TCG related tracing (mostly disabled by default)
-+# cpu-exec.c
-+disable exec_tb(void *tb, uintptr_t pc) "tb:%p pc=0x%"PRIxPTR
-+disable exec_tb_nocache(void *tb, uintptr_t pc) "tb:%p pc=0x%"PRIxPTR
-+disable exec_tb_exit(void *last_tb, unsigned int flags) "tb:%p flags=%x"
-diff --git a/cpu-exec.c b/cpu-exec.c
++/* Second set of helpers are directly callable from TCG as helpers.  */
++
++#undef EXTRA_ARGS
++#undef ATOMIC_NAME
++#undef ATOMIC_MMU_LOOKUP
++#define EXTRA_ARGS         , TCGMemOpIdx oi
++#define ATOMIC_NAME(X)     HELPER(glue(glue(atomic_ ## X, SUFFIX), END))
++#define ATOMIC_MMU_LOOKUP  atomic_mmu_lookup(env, addr, oi, GETPC())
++
++#define DATA_SIZE 1
++#include "atomic_template.h"
++
++#define DATA_SIZE 2
++#include "atomic_template.h"
++
++#define DATA_SIZE 4
++#include "atomic_template.h"
++
++#ifdef CONFIG_ATOMIC64
++#define DATA_SIZE 8
++#include "atomic_template.h"
++#endif
++
++/* Code access functions.  */
++
++#undef MMUSUFFIX
++#define MMUSUFFIX _cmmu
++#undef GETPC
++#define GETPC() ((uintptr_t)0)
++#define SOFTMMU_CODE_ACCESS
++
++#define DATA_SIZE 1
++#include "softmmu_template.h"
++
++#define DATA_SIZE 2
++#include "softmmu_template.h"
++
++#define DATA_SIZE 4
++#include "softmmu_template.h"
++
++#define DATA_SIZE 8
++#include "softmmu_template.h"
+diff --git a/cputlb.c b/cputlb.c
 deleted file mode 100644
-index 63a56d0..0000000
---- a/cpu-exec.c
+index 743776a..0000000
+--- a/cputlb.c
 +++ /dev/null
-@@ -1,685 +0,0 @@
+@@ -1,1051 +0,0 @@
 -/*
-- *  emulator main execution loop
+- *  Common CPU TLB handling
 - *
-- *  Copyright (c) 2003-2005 Fabrice Bellard
+- *  Copyright (c) 2003 Fabrice Bellard
 - *
 - * This library is free software; you can redistribute it and/or
 - * modify it under the terms of the GNU Lesser General Public
@@ -814,688 +1140,1038 @@ index 63a56d0..0000000
 - * You should have received a copy of the GNU Lesser General Public
 - * License along with this library; if not, see <http://www.gnu.org/licenses/>.
 - */
+-
 -#include "qemu/osdep.h"
--#include "cpu.h"
--#include "trace-root.h"
--#include "disas/disas.h"
--#include "exec/exec-all.h"
--#include "tcg.h"
--#include "qemu/atomic.h"
--#include "sysemu/qtest.h"
--#include "qemu/timer.h"
--#include "exec/address-spaces.h"
--#include "qemu/rcu.h"
--#include "exec/tb-hash.h"
--#include "exec/log.h"
 -#include "qemu/main-loop.h"
--#if defined(TARGET_I386) && !defined(CONFIG_USER_ONLY)
--#include "hw/i386/apic.h"
+-#include "cpu.h"
+-#include "exec/exec-all.h"
+-#include "exec/memory.h"
+-#include "exec/address-spaces.h"
+-#include "exec/cpu_ldst.h"
+-#include "exec/cputlb.h"
+-#include "exec/memory-internal.h"
+-#include "exec/ram_addr.h"
+-#include "tcg/tcg.h"
+-#include "qemu/error-report.h"
+-#include "exec/log.h"
+-#include "exec/helper-proto.h"
+-#include "qemu/atomic.h"
+-
+-/* DEBUG defines, enable DEBUG_TLB_LOG to log to the CPU_LOG_MMU target */
+-/* #define DEBUG_TLB */
+-/* #define DEBUG_TLB_LOG */
+-
+-#ifdef DEBUG_TLB
+-# define DEBUG_TLB_GATE 1
+-# ifdef DEBUG_TLB_LOG
+-#  define DEBUG_TLB_LOG_GATE 1
+-# else
+-#  define DEBUG_TLB_LOG_GATE 0
+-# endif
+-#else
+-# define DEBUG_TLB_GATE 0
+-# define DEBUG_TLB_LOG_GATE 0
 -#endif
--#include "sysemu/cpus.h"
--#include "sysemu/replay.h"
 -
--/* -icount align implementation. */
+-#define tlb_debug(fmt, ...) do { \
+-    if (DEBUG_TLB_LOG_GATE) { \
+-        qemu_log_mask(CPU_LOG_MMU, "%s: " fmt, __func__, \
+-                      ## __VA_ARGS__); \
+-    } else if (DEBUG_TLB_GATE) { \
+-        fprintf(stderr, "%s: " fmt, __func__, ## __VA_ARGS__); \
+-    } \
+-} while (0)
 -
--typedef struct SyncClocks {
--    int64_t diff_clk;
--    int64_t last_cpu_icount;
--    int64_t realtime_clock;
--} SyncClocks;
+-#define assert_cpu_is_self(this_cpu) do {                         \
+-        if (DEBUG_TLB_GATE) {                                     \
+-            g_assert(!cpu->created || qemu_cpu_is_self(cpu));     \
+-        }                                                         \
+-    } while (0)
 -
--#if !defined(CONFIG_USER_ONLY)
--/* Allow the guest to have a max 3ms advance.
-- * The difference between the 2 clocks could therefore
-- * oscillate around 0.
+-/* run_on_cpu_data.target_ptr should always be big enough for a
+- * target_ulong even on 32 bit builds */
+-QEMU_BUILD_BUG_ON(sizeof(target_ulong) > sizeof(run_on_cpu_data));
+-
+-/* We currently can't handle more than 16 bits in the MMUIDX bitmask.
 - */
--#define VM_CLOCK_ADVANCE 3000000
--#define THRESHOLD_REDUCE 1.5
--#define MAX_DELAY_PRINT_RATE 2000000000LL
--#define MAX_NB_PRINTS 100
+-QEMU_BUILD_BUG_ON(NB_MMU_MODES > 16);
+-#define ALL_MMUIDX_BITS ((1 << NB_MMU_MODES) - 1)
 -
--static void align_clocks(SyncClocks *sc, const CPUState *cpu)
+-/* flush_all_helper: run fn across all cpus
+- *
+- * If the wait flag is set then the src cpu's helper will be queued as
+- * "safe" work and the loop exited creating a synchronisation point
+- * where all queued work will be finished before execution starts
+- * again.
+- */
+-static void flush_all_helper(CPUState *src, run_on_cpu_func fn,
+-                             run_on_cpu_data d)
 -{
--    int64_t cpu_icount;
+-    CPUState *cpu;
 -
--    if (!icount_align_option) {
--        return;
--    }
--
--    cpu_icount = cpu->icount_extra + cpu->icount_decr.u16.low;
--    sc->diff_clk += cpu_icount_to_ns(sc->last_cpu_icount - cpu_icount);
--    sc->last_cpu_icount = cpu_icount;
--
--    if (sc->diff_clk > VM_CLOCK_ADVANCE) {
--#ifndef _WIN32
--        struct timespec sleep_delay, rem_delay;
--        sleep_delay.tv_sec = sc->diff_clk / 1000000000LL;
--        sleep_delay.tv_nsec = sc->diff_clk % 1000000000LL;
--        if (nanosleep(&sleep_delay, &rem_delay) < 0) {
--            sc->diff_clk = rem_delay.tv_sec * 1000000000LL + rem_delay.tv_nsec;
--        } else {
--            sc->diff_clk = 0;
--        }
--#else
--        Sleep(sc->diff_clk / SCALE_MS);
--        sc->diff_clk = 0;
--#endif
--    }
--}
--
--static void print_delay(const SyncClocks *sc)
--{
--    static float threshold_delay;
--    static int64_t last_realtime_clock;
--    static int nb_prints;
--
--    if (icount_align_option &&
--        sc->realtime_clock - last_realtime_clock >= MAX_DELAY_PRINT_RATE &&
--        nb_prints < MAX_NB_PRINTS) {
--        if ((-sc->diff_clk / (float)1000000000LL > threshold_delay) ||
--            (-sc->diff_clk / (float)1000000000LL <
--             (threshold_delay - THRESHOLD_REDUCE))) {
--            threshold_delay = (-sc->diff_clk / 1000000000LL) + 1;
--            printf("Warning: The guest is now late by %.1f to %.1f seconds\n",
--                   threshold_delay - 1,
--                   threshold_delay);
--            nb_prints++;
--            last_realtime_clock = sc->realtime_clock;
+-    CPU_FOREACH(cpu) {
+-        if (cpu != src) {
+-            async_run_on_cpu(cpu, fn, d);
 -        }
 -    }
 -}
 -
--static void init_delay_params(SyncClocks *sc,
--                              const CPUState *cpu)
--{
--    if (!icount_align_option) {
--        return;
--    }
--    sc->realtime_clock = qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL_RT);
--    sc->diff_clk = qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) - sc->realtime_clock;
--    sc->last_cpu_icount = cpu->icount_extra + cpu->icount_decr.u16.low;
--    if (sc->diff_clk < max_delay) {
--        max_delay = sc->diff_clk;
--    }
--    if (sc->diff_clk > max_advance) {
--        max_advance = sc->diff_clk;
--    }
+-/* statistics */
+-int tlb_flush_count;
 -
--    /* Print every 2s max if the guest is late. We limit the number
--       of printed messages to NB_PRINT_MAX(currently 100) */
--    print_delay(sc);
--}
--#else
--static void align_clocks(SyncClocks *sc, const CPUState *cpu)
--{
--}
--
--static void init_delay_params(SyncClocks *sc, const CPUState *cpu)
--{
--}
--#endif /* CONFIG USER ONLY */
--
--/* Execute a TB, and fix up the CPU state afterwards if necessary */
--static inline tcg_target_ulong cpu_tb_exec(CPUState *cpu, TranslationBlock *itb)
+-/* This is OK because CPU architectures generally permit an
+- * implementation to drop entries from the TLB at any time, so
+- * flushing more entries than required is only an efficiency issue,
+- * not a correctness issue.
+- */
+-static void tlb_flush_nocheck(CPUState *cpu)
 -{
 -    CPUArchState *env = cpu->env_ptr;
--    uintptr_t ret;
--    TranslationBlock *last_tb;
--    int tb_exit;
--    uint8_t *tb_ptr = itb->tc_ptr;
 -
--    qemu_log_mask_and_addr(CPU_LOG_EXEC, itb->pc,
--                           "Trace %p [%d: " TARGET_FMT_lx "] %s\n",
--                           itb->tc_ptr, cpu->cpu_index, itb->pc,
--                           lookup_symbol(itb->pc));
--
--#if defined(DEBUG_DISAS)
--    if (qemu_loglevel_mask(CPU_LOG_TB_CPU)
--        && qemu_log_in_addr_range(itb->pc)) {
--        qemu_log_lock();
--#if defined(TARGET_I386)
--        log_cpu_state(cpu, CPU_DUMP_CCOP);
--#else
--        log_cpu_state(cpu, 0);
--#endif
--        qemu_log_unlock();
--    }
--#endif /* DEBUG_DISAS */
--
--    cpu->can_do_io = !use_icount;
--    ret = tcg_qemu_tb_exec(env, tb_ptr);
--    cpu->can_do_io = 1;
--    last_tb = (TranslationBlock *)(ret & ~TB_EXIT_MASK);
--    tb_exit = ret & TB_EXIT_MASK;
--    trace_exec_tb_exit(last_tb, tb_exit);
--
--    if (tb_exit > TB_EXIT_IDX1) {
--        /* We didn't start executing this TB (eg because the instruction
--         * counter hit zero); we must restore the guest PC to the address
--         * of the start of the TB.
--         */
--        CPUClass *cc = CPU_GET_CLASS(cpu);
--        qemu_log_mask_and_addr(CPU_LOG_EXEC, last_tb->pc,
--                               "Stopped execution of TB chain before %p ["
--                               TARGET_FMT_lx "] %s\n",
--                               last_tb->tc_ptr, last_tb->pc,
--                               lookup_symbol(last_tb->pc));
--        if (cc->synchronize_from_tb) {
--            cc->synchronize_from_tb(cpu, last_tb);
--        } else {
--            assert(cc->set_pc);
--            cc->set_pc(cpu, last_tb->pc);
--        }
--    }
--    return ret;
--}
--
--#ifndef CONFIG_USER_ONLY
--/* Execute the code without caching the generated code. An interpreter
--   could be used if available. */
--static void cpu_exec_nocache(CPUState *cpu, int max_cycles,
--                             TranslationBlock *orig_tb, bool ignore_icount)
--{
--    TranslationBlock *tb;
--
--    /* Should never happen.
--       We only end up here when an existing TB is too long.  */
--    if (max_cycles > CF_COUNT_MASK)
--        max_cycles = CF_COUNT_MASK;
--
--    tb_lock();
--    tb = tb_gen_code(cpu, orig_tb->pc, orig_tb->cs_base, orig_tb->flags,
--                     max_cycles | CF_NOCACHE
--                         | (ignore_icount ? CF_IGNORE_ICOUNT : 0));
--    tb->orig_tb = orig_tb;
--    tb_unlock();
--
--    /* execute the generated code */
--    trace_exec_tb_nocache(tb, tb->pc);
--    cpu_tb_exec(cpu, tb);
--
--    tb_lock();
--    tb_phys_invalidate(tb, -1);
--    tb_free(tb);
--    tb_unlock();
--}
--#endif
--
--static void cpu_exec_step(CPUState *cpu)
--{
--    CPUClass *cc = CPU_GET_CLASS(cpu);
--    CPUArchState *env = (CPUArchState *)cpu->env_ptr;
--    TranslationBlock *tb;
--    target_ulong cs_base, pc;
--    uint32_t flags;
--
--    cpu_get_tb_cpu_state(env, &pc, &cs_base, &flags);
--    if (sigsetjmp(cpu->jmp_env, 0) == 0) {
--        mmap_lock();
--        tb_lock();
--        tb = tb_gen_code(cpu, pc, cs_base, flags,
--                         1 | CF_NOCACHE | CF_IGNORE_ICOUNT);
--        tb->orig_tb = NULL;
--        tb_unlock();
--        mmap_unlock();
--
--        cc->cpu_exec_enter(cpu);
--        /* execute the generated code */
--        trace_exec_tb_nocache(tb, pc);
--        cpu_tb_exec(cpu, tb);
--        cc->cpu_exec_exit(cpu);
--
--        tb_lock();
--        tb_phys_invalidate(tb, -1);
--        tb_free(tb);
--        tb_unlock();
--    } else {
--        /* We may have exited due to another problem here, so we need
--         * to reset any tb_locks we may have taken but didn't release.
--         * The mmap_lock is dropped by tb_gen_code if it runs out of
--         * memory.
--         */
--#ifndef CONFIG_SOFTMMU
--        tcg_debug_assert(!have_mmap_lock());
--#endif
--        tb_lock_reset();
--    }
--}
--
--void cpu_exec_step_atomic(CPUState *cpu)
--{
--    start_exclusive();
--
--    /* Since we got here, we know that parallel_cpus must be true.  */
--    parallel_cpus = false;
--    cpu_exec_step(cpu);
--    parallel_cpus = true;
--
--    end_exclusive();
--}
--
--struct tb_desc {
--    target_ulong pc;
--    target_ulong cs_base;
--    CPUArchState *env;
--    tb_page_addr_t phys_page1;
--    uint32_t flags;
--};
--
--static bool tb_cmp(const void *p, const void *d)
--{
--    const TranslationBlock *tb = p;
--    const struct tb_desc *desc = d;
--
--    if (tb->pc == desc->pc &&
--        tb->page_addr[0] == desc->phys_page1 &&
--        tb->cs_base == desc->cs_base &&
--        tb->flags == desc->flags &&
--        !atomic_read(&tb->invalid)) {
--        /* check next page if needed */
--        if (tb->page_addr[1] == -1) {
--            return true;
--        } else {
--            tb_page_addr_t phys_page2;
--            target_ulong virt_page2;
--
--            virt_page2 = (desc->pc & TARGET_PAGE_MASK) + TARGET_PAGE_SIZE;
--            phys_page2 = get_page_addr_code(desc->env, virt_page2);
--            if (tb->page_addr[1] == phys_page2) {
--                return true;
--            }
--        }
--    }
--    return false;
--}
--
--static TranslationBlock *tb_htable_lookup(CPUState *cpu,
--                                          target_ulong pc,
--                                          target_ulong cs_base,
--                                          uint32_t flags)
--{
--    tb_page_addr_t phys_pc;
--    struct tb_desc desc;
--    uint32_t h;
--
--    desc.env = (CPUArchState *)cpu->env_ptr;
--    desc.cs_base = cs_base;
--    desc.flags = flags;
--    desc.pc = pc;
--    phys_pc = get_page_addr_code(desc.env, pc);
--    desc.phys_page1 = phys_pc & TARGET_PAGE_MASK;
--    h = tb_hash_func(phys_pc, pc, flags);
--    return qht_lookup(&tcg_ctx.tb_ctx.htable, tb_cmp, &desc, h);
--}
--
--static inline TranslationBlock *tb_find(CPUState *cpu,
--                                        TranslationBlock *last_tb,
--                                        int tb_exit)
--{
--    CPUArchState *env = (CPUArchState *)cpu->env_ptr;
--    TranslationBlock *tb;
--    target_ulong cs_base, pc;
--    uint32_t flags;
--    bool have_tb_lock = false;
--
--    /* we record a subset of the CPU state. It will
--       always be the same before a given translated block
--       is executed. */
--    cpu_get_tb_cpu_state(env, &pc, &cs_base, &flags);
--    tb = atomic_rcu_read(&cpu->tb_jmp_cache[tb_jmp_cache_hash_func(pc)]);
--    if (unlikely(!tb || tb->pc != pc || tb->cs_base != cs_base ||
--                 tb->flags != flags)) {
--        tb = tb_htable_lookup(cpu, pc, cs_base, flags);
--        if (!tb) {
--
--            /* mmap_lock is needed by tb_gen_code, and mmap_lock must be
--             * taken outside tb_lock. As system emulation is currently
--             * single threaded the locks are NOPs.
--             */
--            mmap_lock();
--            tb_lock();
--            have_tb_lock = true;
--
--            /* There's a chance that our desired tb has been translated while
--             * taking the locks so we check again inside the lock.
--             */
--            tb = tb_htable_lookup(cpu, pc, cs_base, flags);
--            if (!tb) {
--                /* if no translated code available, then translate it now */
--                tb = tb_gen_code(cpu, pc, cs_base, flags, 0);
--            }
--
--            mmap_unlock();
--        }
--
--        /* We add the TB in the virtual pc hash table for the fast lookup */
--        atomic_set(&cpu->tb_jmp_cache[tb_jmp_cache_hash_func(pc)], tb);
--    }
--#ifndef CONFIG_USER_ONLY
--    /* We don't take care of direct jumps when address mapping changes in
--     * system emulation. So it's not safe to make a direct jump to a TB
--     * spanning two pages because the mapping for the second page can change.
+-    /* The QOM tests will trigger tlb_flushes without setting up TCG
+-     * so we bug out here in that case.
 -     */
--    if (tb->page_addr[1] != -1) {
--        last_tb = NULL;
+-    if (!tcg_enabled()) {
+-        return;
 -    }
--#endif
--    /* See if we can patch the calling TB. */
--    if (last_tb && !qemu_loglevel_mask(CPU_LOG_TB_NOCHAIN)) {
--        if (!have_tb_lock) {
--            tb_lock();
--            have_tb_lock = true;
--        }
--        if (!tb->invalid) {
--            tb_add_jump(last_tb, tb_exit, tb);
--        }
--    }
--    if (have_tb_lock) {
--        tb_unlock();
--    }
--    return tb;
+-
+-    assert_cpu_is_self(cpu);
+-    tlb_debug("(count: %d)\n", tlb_flush_count++);
+-
+-    tb_lock();
+-
+-    memset(env->tlb_table, -1, sizeof(env->tlb_table));
+-    memset(env->tlb_v_table, -1, sizeof(env->tlb_v_table));
+-    memset(cpu->tb_jmp_cache, 0, sizeof(cpu->tb_jmp_cache));
+-
+-    env->vtlb_index = 0;
+-    env->tlb_flush_addr = -1;
+-    env->tlb_flush_mask = 0;
+-
+-    tb_unlock();
+-
+-    atomic_mb_set(&cpu->pending_tlb_flush, 0);
 -}
 -
--static inline bool cpu_handle_halt(CPUState *cpu)
+-static void tlb_flush_global_async_work(CPUState *cpu, run_on_cpu_data data)
 -{
--    if (cpu->halted) {
--#if defined(TARGET_I386) && !defined(CONFIG_USER_ONLY)
--        if ((cpu->interrupt_request & CPU_INTERRUPT_POLL)
--            && replay_interrupt()) {
--            X86CPU *x86_cpu = X86_CPU(cpu);
--            qemu_mutex_lock_iothread();
--            apic_poll_irq(x86_cpu->apic_state);
--            cpu_reset_interrupt(cpu, CPU_INTERRUPT_POLL);
--            qemu_mutex_unlock_iothread();
--        }
--#endif
--        if (!cpu_has_work(cpu)) {
--            return true;
--        }
--
--        cpu->halted = 0;
--    }
--
--    return false;
+-    tlb_flush_nocheck(cpu);
 -}
 -
--static inline void cpu_handle_debug_exception(CPUState *cpu)
+-void tlb_flush(CPUState *cpu)
 -{
--    CPUClass *cc = CPU_GET_CLASS(cpu);
--    CPUWatchpoint *wp;
+-    if (cpu->created && !qemu_cpu_is_self(cpu)) {
+-        if (atomic_mb_read(&cpu->pending_tlb_flush) != ALL_MMUIDX_BITS) {
+-            atomic_mb_set(&cpu->pending_tlb_flush, ALL_MMUIDX_BITS);
+-            async_run_on_cpu(cpu, tlb_flush_global_async_work,
+-                             RUN_ON_CPU_NULL);
+-        }
+-    } else {
+-        tlb_flush_nocheck(cpu);
+-    }
+-}
 -
--    if (!cpu->watchpoint_hit) {
--        QTAILQ_FOREACH(wp, &cpu->watchpoints, entry) {
--            wp->flags &= ~BP_WATCHPOINT_HIT;
+-void tlb_flush_all_cpus(CPUState *src_cpu)
+-{
+-    const run_on_cpu_func fn = tlb_flush_global_async_work;
+-    flush_all_helper(src_cpu, fn, RUN_ON_CPU_NULL);
+-    fn(src_cpu, RUN_ON_CPU_NULL);
+-}
+-
+-void tlb_flush_all_cpus_synced(CPUState *src_cpu)
+-{
+-    const run_on_cpu_func fn = tlb_flush_global_async_work;
+-    flush_all_helper(src_cpu, fn, RUN_ON_CPU_NULL);
+-    async_safe_run_on_cpu(src_cpu, fn, RUN_ON_CPU_NULL);
+-}
+-
+-static void tlb_flush_by_mmuidx_async_work(CPUState *cpu, run_on_cpu_data data)
+-{
+-    CPUArchState *env = cpu->env_ptr;
+-    unsigned long mmu_idx_bitmask = data.host_int;
+-    int mmu_idx;
+-
+-    assert_cpu_is_self(cpu);
+-
+-    tb_lock();
+-
+-    tlb_debug("start: mmu_idx:0x%04lx\n", mmu_idx_bitmask);
+-
+-    for (mmu_idx = 0; mmu_idx < NB_MMU_MODES; mmu_idx++) {
+-
+-        if (test_bit(mmu_idx, &mmu_idx_bitmask)) {
+-            tlb_debug("%d\n", mmu_idx);
+-
+-            memset(env->tlb_table[mmu_idx], -1, sizeof(env->tlb_table[0]));
+-            memset(env->tlb_v_table[mmu_idx], -1, sizeof(env->tlb_v_table[0]));
 -        }
 -    }
 -
--    cc->debug_excp_handler(cpu);
+-    memset(cpu->tb_jmp_cache, 0, sizeof(cpu->tb_jmp_cache));
+-
+-    tlb_debug("done\n");
+-
+-    tb_unlock();
 -}
 -
--static inline bool cpu_handle_exception(CPUState *cpu, int *ret)
+-void tlb_flush_by_mmuidx(CPUState *cpu, uint16_t idxmap)
 -{
--    if (cpu->exception_index >= 0) {
--        if (cpu->exception_index >= EXCP_INTERRUPT) {
--            /* exit request from the cpu execution loop */
--            *ret = cpu->exception_index;
--            if (*ret == EXCP_DEBUG) {
--                cpu_handle_debug_exception(cpu);
+-    tlb_debug("mmu_idx: 0x%" PRIx16 "\n", idxmap);
+-
+-    if (!qemu_cpu_is_self(cpu)) {
+-        uint16_t pending_flushes = idxmap;
+-        pending_flushes &= ~atomic_mb_read(&cpu->pending_tlb_flush);
+-
+-        if (pending_flushes) {
+-            tlb_debug("reduced mmu_idx: 0x%" PRIx16 "\n", pending_flushes);
+-
+-            atomic_or(&cpu->pending_tlb_flush, pending_flushes);
+-            async_run_on_cpu(cpu, tlb_flush_by_mmuidx_async_work,
+-                             RUN_ON_CPU_HOST_INT(pending_flushes));
+-        }
+-    } else {
+-        tlb_flush_by_mmuidx_async_work(cpu,
+-                                       RUN_ON_CPU_HOST_INT(idxmap));
+-    }
+-}
+-
+-void tlb_flush_by_mmuidx_all_cpus(CPUState *src_cpu, uint16_t idxmap)
+-{
+-    const run_on_cpu_func fn = tlb_flush_by_mmuidx_async_work;
+-
+-    tlb_debug("mmu_idx: 0x%"PRIx16"\n", idxmap);
+-
+-    flush_all_helper(src_cpu, fn, RUN_ON_CPU_HOST_INT(idxmap));
+-    fn(src_cpu, RUN_ON_CPU_HOST_INT(idxmap));
+-}
+-
+-void tlb_flush_by_mmuidx_all_cpus_synced(CPUState *src_cpu,
+-                                                       uint16_t idxmap)
+-{
+-    const run_on_cpu_func fn = tlb_flush_by_mmuidx_async_work;
+-
+-    tlb_debug("mmu_idx: 0x%"PRIx16"\n", idxmap);
+-
+-    flush_all_helper(src_cpu, fn, RUN_ON_CPU_HOST_INT(idxmap));
+-    async_safe_run_on_cpu(src_cpu, fn, RUN_ON_CPU_HOST_INT(idxmap));
+-}
+-
+-
+-
+-static inline void tlb_flush_entry(CPUTLBEntry *tlb_entry, target_ulong addr)
+-{
+-    if (addr == (tlb_entry->addr_read &
+-                 (TARGET_PAGE_MASK | TLB_INVALID_MASK)) ||
+-        addr == (tlb_entry->addr_write &
+-                 (TARGET_PAGE_MASK | TLB_INVALID_MASK)) ||
+-        addr == (tlb_entry->addr_code &
+-                 (TARGET_PAGE_MASK | TLB_INVALID_MASK))) {
+-        memset(tlb_entry, -1, sizeof(*tlb_entry));
+-    }
+-}
+-
+-static void tlb_flush_page_async_work(CPUState *cpu, run_on_cpu_data data)
+-{
+-    CPUArchState *env = cpu->env_ptr;
+-    target_ulong addr = (target_ulong) data.target_ptr;
+-    int i;
+-    int mmu_idx;
+-
+-    assert_cpu_is_self(cpu);
+-
+-    tlb_debug("page :" TARGET_FMT_lx "\n", addr);
+-
+-    /* Check if we need to flush due to large pages.  */
+-    if ((addr & env->tlb_flush_mask) == env->tlb_flush_addr) {
+-        tlb_debug("forcing full flush ("
+-                  TARGET_FMT_lx "/" TARGET_FMT_lx ")\n",
+-                  env->tlb_flush_addr, env->tlb_flush_mask);
+-
+-        tlb_flush(cpu);
+-        return;
+-    }
+-
+-    addr &= TARGET_PAGE_MASK;
+-    i = (addr >> TARGET_PAGE_BITS) & (CPU_TLB_SIZE - 1);
+-    for (mmu_idx = 0; mmu_idx < NB_MMU_MODES; mmu_idx++) {
+-        tlb_flush_entry(&env->tlb_table[mmu_idx][i], addr);
+-    }
+-
+-    /* check whether there are entries that need to be flushed in the vtlb */
+-    for (mmu_idx = 0; mmu_idx < NB_MMU_MODES; mmu_idx++) {
+-        int k;
+-        for (k = 0; k < CPU_VTLB_SIZE; k++) {
+-            tlb_flush_entry(&env->tlb_v_table[mmu_idx][k], addr);
+-        }
+-    }
+-
+-    tb_flush_jmp_cache(cpu, addr);
+-}
+-
+-void tlb_flush_page(CPUState *cpu, target_ulong addr)
+-{
+-    tlb_debug("page :" TARGET_FMT_lx "\n", addr);
+-
+-    if (!qemu_cpu_is_self(cpu)) {
+-        async_run_on_cpu(cpu, tlb_flush_page_async_work,
+-                         RUN_ON_CPU_TARGET_PTR(addr));
+-    } else {
+-        tlb_flush_page_async_work(cpu, RUN_ON_CPU_TARGET_PTR(addr));
+-    }
+-}
+-
+-/* As we are going to hijack the bottom bits of the page address for a
+- * mmuidx bit mask we need to fail to build if we can't do that
+- */
+-QEMU_BUILD_BUG_ON(NB_MMU_MODES > TARGET_PAGE_BITS_MIN);
+-
+-static void tlb_flush_page_by_mmuidx_async_work(CPUState *cpu,
+-                                                run_on_cpu_data data)
+-{
+-    CPUArchState *env = cpu->env_ptr;
+-    target_ulong addr_and_mmuidx = (target_ulong) data.target_ptr;
+-    target_ulong addr = addr_and_mmuidx & TARGET_PAGE_MASK;
+-    unsigned long mmu_idx_bitmap = addr_and_mmuidx & ALL_MMUIDX_BITS;
+-    int page = (addr >> TARGET_PAGE_BITS) & (CPU_TLB_SIZE - 1);
+-    int mmu_idx;
+-    int i;
+-
+-    assert_cpu_is_self(cpu);
+-
+-    tlb_debug("page:%d addr:"TARGET_FMT_lx" mmu_idx:0x%lx\n",
+-              page, addr, mmu_idx_bitmap);
+-
+-    for (mmu_idx = 0; mmu_idx < NB_MMU_MODES; mmu_idx++) {
+-        if (test_bit(mmu_idx, &mmu_idx_bitmap)) {
+-            tlb_flush_entry(&env->tlb_table[mmu_idx][page], addr);
+-
+-            /* check whether there are vltb entries that need to be flushed */
+-            for (i = 0; i < CPU_VTLB_SIZE; i++) {
+-                tlb_flush_entry(&env->tlb_v_table[mmu_idx][i], addr);
 -            }
--            cpu->exception_index = -1;
--            return true;
+-        }
+-    }
+-
+-    tb_flush_jmp_cache(cpu, addr);
+-}
+-
+-static void tlb_check_page_and_flush_by_mmuidx_async_work(CPUState *cpu,
+-                                                          run_on_cpu_data data)
+-{
+-    CPUArchState *env = cpu->env_ptr;
+-    target_ulong addr_and_mmuidx = (target_ulong) data.target_ptr;
+-    target_ulong addr = addr_and_mmuidx & TARGET_PAGE_MASK;
+-    unsigned long mmu_idx_bitmap = addr_and_mmuidx & ALL_MMUIDX_BITS;
+-
+-    tlb_debug("addr:"TARGET_FMT_lx" mmu_idx: %04lx\n", addr, mmu_idx_bitmap);
+-
+-    /* Check if we need to flush due to large pages.  */
+-    if ((addr & env->tlb_flush_mask) == env->tlb_flush_addr) {
+-        tlb_debug("forced full flush ("
+-                  TARGET_FMT_lx "/" TARGET_FMT_lx ")\n",
+-                  env->tlb_flush_addr, env->tlb_flush_mask);
+-
+-        tlb_flush_by_mmuidx_async_work(cpu,
+-                                       RUN_ON_CPU_HOST_INT(mmu_idx_bitmap));
+-    } else {
+-        tlb_flush_page_by_mmuidx_async_work(cpu, data);
+-    }
+-}
+-
+-void tlb_flush_page_by_mmuidx(CPUState *cpu, target_ulong addr, uint16_t idxmap)
+-{
+-    target_ulong addr_and_mmu_idx;
+-
+-    tlb_debug("addr: "TARGET_FMT_lx" mmu_idx:%" PRIx16 "\n", addr, idxmap);
+-
+-    /* This should already be page aligned */
+-    addr_and_mmu_idx = addr & TARGET_PAGE_MASK;
+-    addr_and_mmu_idx |= idxmap;
+-
+-    if (!qemu_cpu_is_self(cpu)) {
+-        async_run_on_cpu(cpu, tlb_check_page_and_flush_by_mmuidx_async_work,
+-                         RUN_ON_CPU_TARGET_PTR(addr_and_mmu_idx));
+-    } else {
+-        tlb_check_page_and_flush_by_mmuidx_async_work(
+-            cpu, RUN_ON_CPU_TARGET_PTR(addr_and_mmu_idx));
+-    }
+-}
+-
+-void tlb_flush_page_by_mmuidx_all_cpus(CPUState *src_cpu, target_ulong addr,
+-                                       uint16_t idxmap)
+-{
+-    const run_on_cpu_func fn = tlb_check_page_and_flush_by_mmuidx_async_work;
+-    target_ulong addr_and_mmu_idx;
+-
+-    tlb_debug("addr: "TARGET_FMT_lx" mmu_idx:%"PRIx16"\n", addr, idxmap);
+-
+-    /* This should already be page aligned */
+-    addr_and_mmu_idx = addr & TARGET_PAGE_MASK;
+-    addr_and_mmu_idx |= idxmap;
+-
+-    flush_all_helper(src_cpu, fn, RUN_ON_CPU_TARGET_PTR(addr_and_mmu_idx));
+-    fn(src_cpu, RUN_ON_CPU_TARGET_PTR(addr_and_mmu_idx));
+-}
+-
+-void tlb_flush_page_by_mmuidx_all_cpus_synced(CPUState *src_cpu,
+-                                                            target_ulong addr,
+-                                                            uint16_t idxmap)
+-{
+-    const run_on_cpu_func fn = tlb_check_page_and_flush_by_mmuidx_async_work;
+-    target_ulong addr_and_mmu_idx;
+-
+-    tlb_debug("addr: "TARGET_FMT_lx" mmu_idx:%"PRIx16"\n", addr, idxmap);
+-
+-    /* This should already be page aligned */
+-    addr_and_mmu_idx = addr & TARGET_PAGE_MASK;
+-    addr_and_mmu_idx |= idxmap;
+-
+-    flush_all_helper(src_cpu, fn, RUN_ON_CPU_TARGET_PTR(addr_and_mmu_idx));
+-    async_safe_run_on_cpu(src_cpu, fn, RUN_ON_CPU_TARGET_PTR(addr_and_mmu_idx));
+-}
+-
+-void tlb_flush_page_all_cpus(CPUState *src, target_ulong addr)
+-{
+-    const run_on_cpu_func fn = tlb_flush_page_async_work;
+-
+-    flush_all_helper(src, fn, RUN_ON_CPU_TARGET_PTR(addr));
+-    fn(src, RUN_ON_CPU_TARGET_PTR(addr));
+-}
+-
+-void tlb_flush_page_all_cpus_synced(CPUState *src,
+-                                                  target_ulong addr)
+-{
+-    const run_on_cpu_func fn = tlb_flush_page_async_work;
+-
+-    flush_all_helper(src, fn, RUN_ON_CPU_TARGET_PTR(addr));
+-    async_safe_run_on_cpu(src, fn, RUN_ON_CPU_TARGET_PTR(addr));
+-}
+-
+-/* update the TLBs so that writes to code in the virtual page 'addr'
+-   can be detected */
+-void tlb_protect_code(ram_addr_t ram_addr)
+-{
+-    cpu_physical_memory_test_and_clear_dirty(ram_addr, TARGET_PAGE_SIZE,
+-                                             DIRTY_MEMORY_CODE);
+-}
+-
+-/* update the TLB so that writes in physical page 'phys_addr' are no longer
+-   tested for self modifying code */
+-void tlb_unprotect_code(ram_addr_t ram_addr)
+-{
+-    cpu_physical_memory_set_dirty_flag(ram_addr, DIRTY_MEMORY_CODE);
+-}
+-
+-
+-/*
+- * Dirty write flag handling
+- *
+- * When the TCG code writes to a location it looks up the address in
+- * the TLB and uses that data to compute the final address. If any of
+- * the lower bits of the address are set then the slow path is forced.
+- * There are a number of reasons to do this but for normal RAM the
+- * most usual is detecting writes to code regions which may invalidate
+- * generated code.
+- *
+- * Because we want other vCPUs to respond to changes straight away we
+- * update the te->addr_write field atomically. If the TLB entry has
+- * been changed by the vCPU in the mean time we skip the update.
+- *
+- * As this function uses atomic accesses we also need to ensure
+- * updates to tlb_entries follow the same access rules. We don't need
+- * to worry about this for oversized guests as MTTCG is disabled for
+- * them.
+- */
+-
+-static void tlb_reset_dirty_range(CPUTLBEntry *tlb_entry, uintptr_t start,
+-                           uintptr_t length)
+-{
+-#if TCG_OVERSIZED_GUEST
+-    uintptr_t addr = tlb_entry->addr_write;
+-
+-    if ((addr & (TLB_INVALID_MASK | TLB_MMIO | TLB_NOTDIRTY)) == 0) {
+-        addr &= TARGET_PAGE_MASK;
+-        addr += tlb_entry->addend;
+-        if ((addr - start) < length) {
+-            tlb_entry->addr_write |= TLB_NOTDIRTY;
+-        }
+-    }
+-#else
+-    /* paired with atomic_mb_set in tlb_set_page_with_attrs */
+-    uintptr_t orig_addr = atomic_mb_read(&tlb_entry->addr_write);
+-    uintptr_t addr = orig_addr;
+-
+-    if ((addr & (TLB_INVALID_MASK | TLB_MMIO | TLB_NOTDIRTY)) == 0) {
+-        addr &= TARGET_PAGE_MASK;
+-        addr += atomic_read(&tlb_entry->addend);
+-        if ((addr - start) < length) {
+-            uintptr_t notdirty_addr = orig_addr | TLB_NOTDIRTY;
+-            atomic_cmpxchg(&tlb_entry->addr_write, orig_addr, notdirty_addr);
+-        }
+-    }
+-#endif
+-}
+-
+-/* For atomic correctness when running MTTCG we need to use the right
+- * primitives when copying entries */
+-static inline void copy_tlb_helper(CPUTLBEntry *d, CPUTLBEntry *s,
+-                                   bool atomic_set)
+-{
+-#if TCG_OVERSIZED_GUEST
+-    *d = *s;
+-#else
+-    if (atomic_set) {
+-        d->addr_read = s->addr_read;
+-        d->addr_code = s->addr_code;
+-        atomic_set(&d->addend, atomic_read(&s->addend));
+-        /* Pairs with flag setting in tlb_reset_dirty_range */
+-        atomic_mb_set(&d->addr_write, atomic_read(&s->addr_write));
+-    } else {
+-        d->addr_read = s->addr_read;
+-        d->addr_write = atomic_read(&s->addr_write);
+-        d->addr_code = s->addr_code;
+-        d->addend = atomic_read(&s->addend);
+-    }
+-#endif
+-}
+-
+-/* This is a cross vCPU call (i.e. another vCPU resetting the flags of
+- * the target vCPU). As such care needs to be taken that we don't
+- * dangerously race with another vCPU update. The only thing actually
+- * updated is the target TLB entry ->addr_write flags.
+- */
+-void tlb_reset_dirty(CPUState *cpu, ram_addr_t start1, ram_addr_t length)
+-{
+-    CPUArchState *env;
+-
+-    int mmu_idx;
+-
+-    env = cpu->env_ptr;
+-    for (mmu_idx = 0; mmu_idx < NB_MMU_MODES; mmu_idx++) {
+-        unsigned int i;
+-
+-        for (i = 0; i < CPU_TLB_SIZE; i++) {
+-            tlb_reset_dirty_range(&env->tlb_table[mmu_idx][i],
+-                                  start1, length);
+-        }
+-
+-        for (i = 0; i < CPU_VTLB_SIZE; i++) {
+-            tlb_reset_dirty_range(&env->tlb_v_table[mmu_idx][i],
+-                                  start1, length);
+-        }
+-    }
+-}
+-
+-static inline void tlb_set_dirty1(CPUTLBEntry *tlb_entry, target_ulong vaddr)
+-{
+-    if (tlb_entry->addr_write == (vaddr | TLB_NOTDIRTY)) {
+-        tlb_entry->addr_write = vaddr;
+-    }
+-}
+-
+-/* update the TLB corresponding to virtual page vaddr
+-   so that it is no longer dirty */
+-void tlb_set_dirty(CPUState *cpu, target_ulong vaddr)
+-{
+-    CPUArchState *env = cpu->env_ptr;
+-    int i;
+-    int mmu_idx;
+-
+-    assert_cpu_is_self(cpu);
+-
+-    vaddr &= TARGET_PAGE_MASK;
+-    i = (vaddr >> TARGET_PAGE_BITS) & (CPU_TLB_SIZE - 1);
+-    for (mmu_idx = 0; mmu_idx < NB_MMU_MODES; mmu_idx++) {
+-        tlb_set_dirty1(&env->tlb_table[mmu_idx][i], vaddr);
+-    }
+-
+-    for (mmu_idx = 0; mmu_idx < NB_MMU_MODES; mmu_idx++) {
+-        int k;
+-        for (k = 0; k < CPU_VTLB_SIZE; k++) {
+-            tlb_set_dirty1(&env->tlb_v_table[mmu_idx][k], vaddr);
+-        }
+-    }
+-}
+-
+-/* Our TLB does not support large pages, so remember the area covered by
+-   large pages and trigger a full TLB flush if these are invalidated.  */
+-static void tlb_add_large_page(CPUArchState *env, target_ulong vaddr,
+-                               target_ulong size)
+-{
+-    target_ulong mask = ~(size - 1);
+-
+-    if (env->tlb_flush_addr == (target_ulong)-1) {
+-        env->tlb_flush_addr = vaddr & mask;
+-        env->tlb_flush_mask = mask;
+-        return;
+-    }
+-    /* Extend the existing region to include the new page.
+-       This is a compromise between unnecessary flushes and the cost
+-       of maintaining a full variable size TLB.  */
+-    mask &= env->tlb_flush_mask;
+-    while (((env->tlb_flush_addr ^ vaddr) & mask) != 0) {
+-        mask <<= 1;
+-    }
+-    env->tlb_flush_addr &= mask;
+-    env->tlb_flush_mask = mask;
+-}
+-
+-/* Add a new TLB entry. At most one entry for a given virtual address
+- * is permitted. Only a single TARGET_PAGE_SIZE region is mapped, the
+- * supplied size is only used by tlb_flush_page.
+- *
+- * Called from TCG-generated code, which is under an RCU read-side
+- * critical section.
+- */
+-void tlb_set_page_with_attrs(CPUState *cpu, target_ulong vaddr,
+-                             hwaddr paddr, MemTxAttrs attrs, int prot,
+-                             int mmu_idx, target_ulong size)
+-{
+-    CPUArchState *env = cpu->env_ptr;
+-    MemoryRegionSection *section;
+-    unsigned int index;
+-    target_ulong address;
+-    target_ulong code_address;
+-    uintptr_t addend;
+-    CPUTLBEntry *te, *tv, tn;
+-    hwaddr iotlb, xlat, sz;
+-    unsigned vidx = env->vtlb_index++ % CPU_VTLB_SIZE;
+-    int asidx = cpu_asidx_from_attrs(cpu, attrs);
+-
+-    assert_cpu_is_self(cpu);
+-    assert(size >= TARGET_PAGE_SIZE);
+-    if (size != TARGET_PAGE_SIZE) {
+-        tlb_add_large_page(env, vaddr, size);
+-    }
+-
+-    sz = size;
+-    section = address_space_translate_for_iotlb(cpu, asidx, paddr, &xlat, &sz);
+-    assert(sz >= TARGET_PAGE_SIZE);
+-
+-    tlb_debug("vaddr=" TARGET_FMT_lx " paddr=0x" TARGET_FMT_plx
+-              " prot=%x idx=%d\n",
+-              vaddr, paddr, prot, mmu_idx);
+-
+-    address = vaddr;
+-    if (!memory_region_is_ram(section->mr) && !memory_region_is_romd(section->mr)) {
+-        /* IO memory case */
+-        address |= TLB_MMIO;
+-        addend = 0;
+-    } else {
+-        /* TLB_MMIO for rom/romd handled below */
+-        addend = (uintptr_t)memory_region_get_ram_ptr(section->mr) + xlat;
+-    }
+-
+-    code_address = address;
+-    iotlb = memory_region_section_get_iotlb(cpu, section, vaddr, paddr, xlat,
+-                                            prot, &address);
+-
+-    index = (vaddr >> TARGET_PAGE_BITS) & (CPU_TLB_SIZE - 1);
+-    te = &env->tlb_table[mmu_idx][index];
+-    /* do not discard the translation in te, evict it into a victim tlb */
+-    tv = &env->tlb_v_table[mmu_idx][vidx];
+-
+-    /* addr_write can race with tlb_reset_dirty_range */
+-    copy_tlb_helper(tv, te, true);
+-
+-    env->iotlb_v[mmu_idx][vidx] = env->iotlb[mmu_idx][index];
+-
+-    /* refill the tlb */
+-    env->iotlb[mmu_idx][index].addr = iotlb - vaddr;
+-    env->iotlb[mmu_idx][index].attrs = attrs;
+-
+-    /* Now calculate the new entry */
+-    tn.addend = addend - vaddr;
+-    if (prot & PAGE_READ) {
+-        tn.addr_read = address;
+-    } else {
+-        tn.addr_read = -1;
+-    }
+-
+-    if (prot & PAGE_EXEC) {
+-        tn.addr_code = code_address;
+-    } else {
+-        tn.addr_code = -1;
+-    }
+-
+-    tn.addr_write = -1;
+-    if (prot & PAGE_WRITE) {
+-        if ((memory_region_is_ram(section->mr) && section->readonly)
+-            || memory_region_is_romd(section->mr)) {
+-            /* Write access calls the I/O callback.  */
+-            tn.addr_write = address | TLB_MMIO;
+-        } else if (memory_region_is_ram(section->mr)
+-                   && cpu_physical_memory_is_clean(
+-                        memory_region_get_ram_addr(section->mr) + xlat)) {
+-            tn.addr_write = address | TLB_NOTDIRTY;
 -        } else {
--#if defined(CONFIG_USER_ONLY)
--            /* if user mode only, we simulate a fake exception
--               which will be handled outside the cpu execution
--               loop */
--#if defined(TARGET_I386)
--            CPUClass *cc = CPU_GET_CLASS(cpu);
--            cc->do_interrupt(cpu);
--#endif
--            *ret = cpu->exception_index;
--            cpu->exception_index = -1;
--            return true;
--#else
--            if (replay_exception()) {
--                CPUClass *cc = CPU_GET_CLASS(cpu);
--                qemu_mutex_lock_iothread();
--                cc->do_interrupt(cpu);
--                qemu_mutex_unlock_iothread();
--                cpu->exception_index = -1;
--            } else if (!replay_has_interrupt()) {
--                /* give a chance to iothread in replay mode */
--                *ret = EXCP_INTERRUPT;
--                return true;
--            }
--#endif
+-            tn.addr_write = address;
 -        }
--#ifndef CONFIG_USER_ONLY
--    } else if (replay_has_exception()
--               && cpu->icount_decr.u16.low + cpu->icount_extra == 0) {
--        /* try to cause an exception pending in the log */
--        cpu_exec_nocache(cpu, 1, tb_find(cpu, NULL, 0), true);
--        *ret = -1;
--        return true;
--#endif
 -    }
 -
--    return false;
+-    /* Pairs with flag setting in tlb_reset_dirty_range */
+-    copy_tlb_helper(te, &tn, true);
+-    /* atomic_mb_set(&te->addr_write, write_address); */
 -}
 -
--static inline bool cpu_handle_interrupt(CPUState *cpu,
--                                        TranslationBlock **last_tb)
+-/* Add a new TLB entry, but without specifying the memory
+- * transaction attributes to be used.
+- */
+-void tlb_set_page(CPUState *cpu, target_ulong vaddr,
+-                  hwaddr paddr, int prot,
+-                  int mmu_idx, target_ulong size)
 -{
--    CPUClass *cc = CPU_GET_CLASS(cpu);
+-    tlb_set_page_with_attrs(cpu, vaddr, paddr, MEMTXATTRS_UNSPECIFIED,
+-                            prot, mmu_idx, size);
+-}
 -
--    if (unlikely(atomic_read(&cpu->interrupt_request))) {
--        int interrupt_request;
+-static void report_bad_exec(CPUState *cpu, target_ulong addr)
+-{
+-    /* Accidentally executing outside RAM or ROM is quite common for
+-     * several user-error situations, so report it in a way that
+-     * makes it clear that this isn't a QEMU bug and provide suggestions
+-     * about what a user could do to fix things.
+-     */
+-    error_report("Trying to execute code outside RAM or ROM at 0x"
+-                 TARGET_FMT_lx, addr);
+-    error_printf("This usually means one of the following happened:\n\n"
+-                 "(1) You told QEMU to execute a kernel for the wrong machine "
+-                 "type, and it crashed on startup (eg trying to run a "
+-                 "raspberry pi kernel on a versatilepb QEMU machine)\n"
+-                 "(2) You didn't give QEMU a kernel or BIOS filename at all, "
+-                 "and QEMU executed a ROM full of no-op instructions until "
+-                 "it fell off the end\n"
+-                 "(3) Your guest kernel has a bug and crashed by jumping "
+-                 "off into nowhere\n\n"
+-                 "This is almost always one of the first two, so check your "
+-                 "command line and that you are using the right type of kernel "
+-                 "for this machine.\n"
+-                 "If you think option (3) is likely then you can try debugging "
+-                 "your guest with the -d debug options; in particular "
+-                 "-d guest_errors will cause the log to include a dump of the "
+-                 "guest register state at this point.\n\n"
+-                 "Execution cannot continue; stopping here.\n\n");
+-
+-    /* Report also to the logs, with more detail including register dump */
+-    qemu_log_mask(LOG_GUEST_ERROR, "qemu: fatal: Trying to execute code "
+-                  "outside RAM or ROM at 0x" TARGET_FMT_lx "\n", addr);
+-    log_cpu_state_mask(LOG_GUEST_ERROR, cpu, CPU_DUMP_FPU | CPU_DUMP_CCOP);
+-}
+-
+-static inline ram_addr_t qemu_ram_addr_from_host_nofail(void *ptr)
+-{
+-    ram_addr_t ram_addr;
+-
+-    ram_addr = qemu_ram_addr_from_host(ptr);
+-    if (ram_addr == RAM_ADDR_INVALID) {
+-        error_report("Bad ram pointer %p", ptr);
+-        abort();
+-    }
+-    return ram_addr;
+-}
+-
+-/* NOTE: this function can trigger an exception */
+-/* NOTE2: the returned address is not exactly the physical address: it
+- * is actually a ram_addr_t (in system mode; the user mode emulation
+- * version of this function returns a guest virtual address).
+- */
+-tb_page_addr_t get_page_addr_code(CPUArchState *env1, target_ulong addr)
+-{
+-    int mmu_idx, page_index, pd;
+-    void *p;
+-    MemoryRegion *mr;
+-    CPUState *cpu = ENV_GET_CPU(env1);
+-    CPUIOTLBEntry *iotlbentry;
+-
+-    page_index = (addr >> TARGET_PAGE_BITS) & (CPU_TLB_SIZE - 1);
+-    mmu_idx = cpu_mmu_index(env1, true);
+-    if (unlikely(env1->tlb_table[mmu_idx][page_index].addr_code !=
+-                 (addr & TARGET_PAGE_MASK))) {
+-        cpu_ldub_code(env1, addr);
+-    }
+-    iotlbentry = &env1->iotlb[mmu_idx][page_index];
+-    pd = iotlbentry->addr & ~TARGET_PAGE_MASK;
+-    mr = iotlb_to_region(cpu, pd, iotlbentry->attrs);
+-    if (memory_region_is_unassigned(mr)) {
+-        cpu_unassigned_access(cpu, addr, false, true, 0, 4);
+-        /* The CPU's unassigned access hook might have longjumped out
+-         * with an exception. If it didn't (or there was no hook) then
+-         * we can't proceed further.
+-         */
+-        report_bad_exec(cpu, addr);
+-        exit(1);
+-    }
+-    p = (void *)((uintptr_t)addr + env1->tlb_table[mmu_idx][page_index].addend);
+-    return qemu_ram_addr_from_host_nofail(p);
+-}
+-
+-static uint64_t io_readx(CPUArchState *env, CPUIOTLBEntry *iotlbentry,
+-                         target_ulong addr, uintptr_t retaddr, int size)
+-{
+-    CPUState *cpu = ENV_GET_CPU(env);
+-    hwaddr physaddr = iotlbentry->addr;
+-    MemoryRegion *mr = iotlb_to_region(cpu, physaddr, iotlbentry->attrs);
+-    uint64_t val;
+-    bool locked = false;
+-
+-    physaddr = (physaddr & TARGET_PAGE_MASK) + addr;
+-    cpu->mem_io_pc = retaddr;
+-    if (mr != &io_mem_rom && mr != &io_mem_notdirty && !cpu->can_do_io) {
+-        cpu_io_recompile(cpu, retaddr);
+-    }
+-
+-    cpu->mem_io_vaddr = addr;
+-
+-    if (mr->global_locking) {
 -        qemu_mutex_lock_iothread();
--        interrupt_request = cpu->interrupt_request;
--        if (unlikely(cpu->singlestep_enabled & SSTEP_NOIRQ)) {
--            /* Mask out external interrupts for this step. */
--            interrupt_request &= ~CPU_INTERRUPT_SSTEP_MASK;
--        }
--        if (interrupt_request & CPU_INTERRUPT_DEBUG) {
--            cpu->interrupt_request &= ~CPU_INTERRUPT_DEBUG;
--            cpu->exception_index = EXCP_DEBUG;
--            qemu_mutex_unlock_iothread();
--            return true;
--        }
--        if (replay_mode == REPLAY_MODE_PLAY && !replay_has_interrupt()) {
--            /* Do nothing */
--        } else if (interrupt_request & CPU_INTERRUPT_HALT) {
--            replay_interrupt();
--            cpu->interrupt_request &= ~CPU_INTERRUPT_HALT;
--            cpu->halted = 1;
--            cpu->exception_index = EXCP_HLT;
--            qemu_mutex_unlock_iothread();
--            return true;
--        }
--#if defined(TARGET_I386)
--        else if (interrupt_request & CPU_INTERRUPT_INIT) {
--            X86CPU *x86_cpu = X86_CPU(cpu);
--            CPUArchState *env = &x86_cpu->env;
--            replay_interrupt();
--            cpu_svm_check_intercept_param(env, SVM_EXIT_INIT, 0, 0);
--            do_cpu_init(x86_cpu);
--            cpu->exception_index = EXCP_HALTED;
--            qemu_mutex_unlock_iothread();
--            return true;
--        }
--#else
--        else if (interrupt_request & CPU_INTERRUPT_RESET) {
--            replay_interrupt();
--            cpu_reset(cpu);
--            qemu_mutex_unlock_iothread();
--            return true;
--        }
--#endif
--        /* The target hook has 3 exit conditions:
--           False when the interrupt isn't processed,
--           True when it is, and we should restart on a new TB,
--           and via longjmp via cpu_loop_exit.  */
--        else {
--            if (cc->cpu_exec_interrupt(cpu, interrupt_request)) {
--                replay_interrupt();
--                *last_tb = NULL;
--            }
--            /* The target hook may have updated the 'cpu->interrupt_request';
--             * reload the 'interrupt_request' value */
--            interrupt_request = cpu->interrupt_request;
--        }
--        if (interrupt_request & CPU_INTERRUPT_EXITTB) {
--            cpu->interrupt_request &= ~CPU_INTERRUPT_EXITTB;
--            /* ensure that no TB jump will be modified as
--               the program flow was changed */
--            *last_tb = NULL;
--        }
--
--        /* If we exit via cpu_loop_exit/longjmp it is reset in cpu_exec */
+-        locked = true;
+-    }
+-    memory_region_dispatch_read(mr, physaddr, &val, size, iotlbentry->attrs);
+-    if (locked) {
 -        qemu_mutex_unlock_iothread();
 -    }
 -
--    /* Finally, check if we need to exit to the main loop.  */
--    if (unlikely(atomic_read(&cpu->exit_request)
--        || (use_icount && cpu->icount_decr.u16.low + cpu->icount_extra == 0))) {
--        atomic_set(&cpu->exit_request, 0);
--        cpu->exception_index = EXCP_INTERRUPT;
--        return true;
--    }
+-    return val;
+-}
 -
+-static void io_writex(CPUArchState *env, CPUIOTLBEntry *iotlbentry,
+-                      uint64_t val, target_ulong addr,
+-                      uintptr_t retaddr, int size)
+-{
+-    CPUState *cpu = ENV_GET_CPU(env);
+-    hwaddr physaddr = iotlbentry->addr;
+-    MemoryRegion *mr = iotlb_to_region(cpu, physaddr, iotlbentry->attrs);
+-    bool locked = false;
+-
+-    physaddr = (physaddr & TARGET_PAGE_MASK) + addr;
+-    if (mr != &io_mem_rom && mr != &io_mem_notdirty && !cpu->can_do_io) {
+-        cpu_io_recompile(cpu, retaddr);
+-    }
+-    cpu->mem_io_vaddr = addr;
+-    cpu->mem_io_pc = retaddr;
+-
+-    if (mr->global_locking) {
+-        qemu_mutex_lock_iothread();
+-        locked = true;
+-    }
+-    memory_region_dispatch_write(mr, physaddr, val, size, iotlbentry->attrs);
+-    if (locked) {
+-        qemu_mutex_unlock_iothread();
+-    }
+-}
+-
+-/* Return true if ADDR is present in the victim tlb, and has been copied
+-   back to the main tlb.  */
+-static bool victim_tlb_hit(CPUArchState *env, size_t mmu_idx, size_t index,
+-                           size_t elt_ofs, target_ulong page)
+-{
+-    size_t vidx;
+-    for (vidx = 0; vidx < CPU_VTLB_SIZE; ++vidx) {
+-        CPUTLBEntry *vtlb = &env->tlb_v_table[mmu_idx][vidx];
+-        target_ulong cmp = *(target_ulong *)((uintptr_t)vtlb + elt_ofs);
+-
+-        if (cmp == page) {
+-            /* Found entry in victim tlb, swap tlb and iotlb.  */
+-            CPUTLBEntry tmptlb, *tlb = &env->tlb_table[mmu_idx][index];
+-
+-            copy_tlb_helper(&tmptlb, tlb, false);
+-            copy_tlb_helper(tlb, vtlb, true);
+-            copy_tlb_helper(vtlb, &tmptlb, true);
+-
+-            CPUIOTLBEntry tmpio, *io = &env->iotlb[mmu_idx][index];
+-            CPUIOTLBEntry *vio = &env->iotlb_v[mmu_idx][vidx];
+-            tmpio = *io; *io = *vio; *vio = tmpio;
+-            return true;
+-        }
+-    }
 -    return false;
 -}
 -
--static inline void cpu_loop_exec_tb(CPUState *cpu, TranslationBlock *tb,
--                                    TranslationBlock **last_tb, int *tb_exit)
+-/* Macro to call the above, with local variables from the use context.  */
+-#define VICTIM_TLB_HIT(TY, ADDR) \
+-  victim_tlb_hit(env, mmu_idx, index, offsetof(CPUTLBEntry, TY), \
+-                 (ADDR) & TARGET_PAGE_MASK)
+-
+-/* Probe for whether the specified guest write access is permitted.
+- * If it is not permitted then an exception will be taken in the same
+- * way as if this were a real write access (and we will not return).
+- * Otherwise the function will return, and there will be a valid
+- * entry in the TLB for this access.
+- */
+-void probe_write(CPUArchState *env, target_ulong addr, int mmu_idx,
+-                 uintptr_t retaddr)
 -{
--    uintptr_t ret;
--    int32_t insns_left;
+-    int index = (addr >> TARGET_PAGE_BITS) & (CPU_TLB_SIZE - 1);
+-    target_ulong tlb_addr = env->tlb_table[mmu_idx][index].addr_write;
 -
--    trace_exec_tb(tb, tb->pc);
--    ret = cpu_tb_exec(cpu, tb);
--    tb = (TranslationBlock *)(ret & ~TB_EXIT_MASK);
--    *tb_exit = ret & TB_EXIT_MASK;
--    if (*tb_exit != TB_EXIT_REQUESTED) {
--        *last_tb = tb;
--        return;
--    }
--
--    *last_tb = NULL;
--    insns_left = atomic_read(&cpu->icount_decr.u32);
--    atomic_set(&cpu->icount_decr.u16.high, 0);
--    if (insns_left < 0) {
--        /* Something asked us to stop executing chained TBs; just
--         * continue round the main loop. Whatever requested the exit
--         * will also have set something else (eg exit_request or
--         * interrupt_request) which we will handle next time around
--         * the loop.  But we need to ensure the zeroing of icount_decr
--         * comes before the next read of cpu->exit_request
--         * or cpu->interrupt_request.
--         */
--        smp_mb();
--        return;
--    }
--
--    /* Instruction counter expired.  */
--    assert(use_icount);
--#ifndef CONFIG_USER_ONLY
--    /* Ensure global icount has gone forward */
--    cpu_update_icount(cpu);
--    /* Refill decrementer and continue execution.  */
--    insns_left = MIN(0xffff, cpu->icount_budget);
--    cpu->icount_decr.u16.low = insns_left;
--    cpu->icount_extra = cpu->icount_budget - insns_left;
--    if (!cpu->icount_extra) {
--        /* Execute any remaining instructions, then let the main loop
--         * handle the next event.
--         */
--        if (insns_left > 0) {
--            cpu_exec_nocache(cpu, insns_left, tb, false);
+-    if ((addr & TARGET_PAGE_MASK)
+-        != (tlb_addr & (TARGET_PAGE_MASK | TLB_INVALID_MASK))) {
+-        /* TLB entry is for a different page */
+-        if (!VICTIM_TLB_HIT(addr_write, addr)) {
+-            tlb_fill(ENV_GET_CPU(env), addr, MMU_DATA_STORE, mmu_idx, retaddr);
 -        }
 -    }
+-}
+-
+-/* Probe for a read-modify-write atomic operation.  Do not allow unaligned
+- * operations, or io operations to proceed.  Return the host address.  */
+-static void *atomic_mmu_lookup(CPUArchState *env, target_ulong addr,
+-                               TCGMemOpIdx oi, uintptr_t retaddr)
+-{
+-    size_t mmu_idx = get_mmuidx(oi);
+-    size_t index = (addr >> TARGET_PAGE_BITS) & (CPU_TLB_SIZE - 1);
+-    CPUTLBEntry *tlbe = &env->tlb_table[mmu_idx][index];
+-    target_ulong tlb_addr = tlbe->addr_write;
+-    TCGMemOp mop = get_memop(oi);
+-    int a_bits = get_alignment_bits(mop);
+-    int s_bits = mop & MO_SIZE;
+-
+-    /* Adjust the given return address.  */
+-    retaddr -= GETPC_ADJ;
+-
+-    /* Enforce guest required alignment.  */
+-    if (unlikely(a_bits > 0 && (addr & ((1 << a_bits) - 1)))) {
+-        /* ??? Maybe indicate atomic op to cpu_unaligned_access */
+-        cpu_unaligned_access(ENV_GET_CPU(env), addr, MMU_DATA_STORE,
+-                             mmu_idx, retaddr);
+-    }
+-
+-    /* Enforce qemu required alignment.  */
+-    if (unlikely(addr & ((1 << s_bits) - 1))) {
+-        /* We get here if guest alignment was not requested,
+-           or was not enforced by cpu_unaligned_access above.
+-           We might widen the access and emulate, but for now
+-           mark an exception and exit the cpu loop.  */
+-        goto stop_the_world;
+-    }
+-
+-    /* Check TLB entry and enforce page permissions.  */
+-    if ((addr & TARGET_PAGE_MASK)
+-        != (tlb_addr & (TARGET_PAGE_MASK | TLB_INVALID_MASK))) {
+-        if (!VICTIM_TLB_HIT(addr_write, addr)) {
+-            tlb_fill(ENV_GET_CPU(env), addr, MMU_DATA_STORE, mmu_idx, retaddr);
+-        }
+-        tlb_addr = tlbe->addr_write;
+-    }
+-
+-    /* Check notdirty */
+-    if (unlikely(tlb_addr & TLB_NOTDIRTY)) {
+-        tlb_set_dirty(ENV_GET_CPU(env), addr);
+-        tlb_addr = tlb_addr & ~TLB_NOTDIRTY;
+-    }
+-
+-    /* Notice an IO access  */
+-    if (unlikely(tlb_addr & ~TARGET_PAGE_MASK)) {
+-        /* There's really nothing that can be done to
+-           support this apart from stop-the-world.  */
+-        goto stop_the_world;
+-    }
+-
+-    /* Let the guest notice RMW on a write-only page.  */
+-    if (unlikely(tlbe->addr_read != tlb_addr)) {
+-        tlb_fill(ENV_GET_CPU(env), addr, MMU_DATA_LOAD, mmu_idx, retaddr);
+-        /* Since we don't support reads and writes to different addresses,
+-           and we do have the proper page loaded for write, this shouldn't
+-           ever return.  But just in case, handle via stop-the-world.  */
+-        goto stop_the_world;
+-    }
+-
+-    return (void *)((uintptr_t)addr + tlbe->addend);
+-
+- stop_the_world:
+-    cpu_loop_exit_atomic(ENV_GET_CPU(env), retaddr);
+-}
+-
+-#ifdef TARGET_WORDS_BIGENDIAN
+-# define TGT_BE(X)  (X)
+-# define TGT_LE(X)  BSWAP(X)
+-#else
+-# define TGT_BE(X)  BSWAP(X)
+-# define TGT_LE(X)  (X)
 -#endif
--}
 -
--/* main execution loop */
+-#define MMUSUFFIX _mmu
 -
--int cpu_exec(CPUState *cpu)
--{
--    CPUClass *cc = CPU_GET_CLASS(cpu);
--    int ret;
--    SyncClocks sc = { 0 };
+-#define DATA_SIZE 1
+-#include "softmmu_template.h"
 -
--    /* replay_interrupt may need current_cpu */
--    current_cpu = cpu;
+-#define DATA_SIZE 2
+-#include "softmmu_template.h"
 -
--    if (cpu_handle_halt(cpu)) {
--        return EXCP_HALTED;
--    }
+-#define DATA_SIZE 4
+-#include "softmmu_template.h"
 -
--    rcu_read_lock();
+-#define DATA_SIZE 8
+-#include "softmmu_template.h"
 -
--    cc->cpu_exec_enter(cpu);
+-/* First set of helpers allows passing in of OI and RETADDR.  This makes
+-   them callable from other helpers.  */
 -
--    /* Calculate difference between guest clock and host clock.
--     * This delay includes the delay of the last cycle, so
--     * what we have to do is sleep until it is 0. As for the
--     * advance/delay we gain here, we try to fix it next time.
--     */
--    init_delay_params(&sc, cpu);
+-#define EXTRA_ARGS     , TCGMemOpIdx oi, uintptr_t retaddr
+-#define ATOMIC_NAME(X) \
+-    HELPER(glue(glue(glue(atomic_ ## X, SUFFIX), END), _mmu))
+-#define ATOMIC_MMU_LOOKUP  atomic_mmu_lookup(env, addr, oi, retaddr)
 -
--    /* prepare setjmp context for exception handling */
--    if (sigsetjmp(cpu->jmp_env, 0) != 0) {
--#if defined(__clang__) || !QEMU_GNUC_PREREQ(4, 6)
--        /* Some compilers wrongly smash all local variables after
--         * siglongjmp. There were bug reports for gcc 4.5.0 and clang.
--         * Reload essential local variables here for those compilers.
--         * Newer versions of gcc would complain about this code (-Wclobbered). */
--        cpu = current_cpu;
--        cc = CPU_GET_CLASS(cpu);
--#else /* buggy compiler */
--        /* Assert that the compiler does not smash local variables. */
--        g_assert(cpu == current_cpu);
--        g_assert(cc == CPU_GET_CLASS(cpu));
--#endif /* buggy compiler */
--        cpu->can_do_io = 1;
--        tb_lock_reset();
--        if (qemu_mutex_iothread_locked()) {
--            qemu_mutex_unlock_iothread();
--        }
--    }
+-#define DATA_SIZE 1
+-#include "atomic_template.h"
 -
--    /* if an exception is pending, we execute it here */
--    while (!cpu_handle_exception(cpu, &ret)) {
--        TranslationBlock *last_tb = NULL;
--        int tb_exit = 0;
+-#define DATA_SIZE 2
+-#include "atomic_template.h"
 -
--        while (!cpu_handle_interrupt(cpu, &last_tb)) {
--            TranslationBlock *tb = tb_find(cpu, last_tb, tb_exit);
--            cpu_loop_exec_tb(cpu, tb, &last_tb, &tb_exit);
--            /* Try to align the host and virtual clocks
--               if the guest is in advance */
--            align_clocks(&sc, cpu);
--        }
--    }
+-#define DATA_SIZE 4
+-#include "atomic_template.h"
 -
--    cc->cpu_exec_exit(cpu);
--    rcu_read_unlock();
+-#ifdef CONFIG_ATOMIC64
+-#define DATA_SIZE 8
+-#include "atomic_template.h"
+-#endif
 -
--    return ret;
--}
-diff --git a/trace-events b/trace-events
-index e582d63..153942d 100644
---- a/trace-events
-+++ b/trace-events
-@@ -73,11 +73,6 @@ kvm_irqchip_add_msi_route(int virq) "Adding MSI route virq=%d"
- kvm_irqchip_update_msi_route(int virq) "Updating MSI route virq=%d"
- 
- # TCG related tracing (mostly disabled by default)
--# cpu-exec.c
--disable exec_tb(void *tb, uintptr_t pc) "tb:%p pc=0x%"PRIxPTR
--disable exec_tb_nocache(void *tb, uintptr_t pc) "tb:%p pc=0x%"PRIxPTR
--disable exec_tb_exit(void *last_tb, unsigned int flags) "tb:%p flags=%x"
+-#ifdef CONFIG_ATOMIC128
+-#define DATA_SIZE 16
+-#include "atomic_template.h"
+-#endif
 -
- # translate-all.c
- translate_block(void *tb, uintptr_t pc, uint8_t *tb_code) "tb:%p, pc:0x%"PRIxPTR", tb_code:%p"
- 
+-/* Second set of helpers are directly callable from TCG as helpers.  */
+-
+-#undef EXTRA_ARGS
+-#undef ATOMIC_NAME
+-#undef ATOMIC_MMU_LOOKUP
+-#define EXTRA_ARGS         , TCGMemOpIdx oi
+-#define ATOMIC_NAME(X)     HELPER(glue(glue(atomic_ ## X, SUFFIX), END))
+-#define ATOMIC_MMU_LOOKUP  atomic_mmu_lookup(env, addr, oi, GETPC())
+-
+-#define DATA_SIZE 1
+-#include "atomic_template.h"
+-
+-#define DATA_SIZE 2
+-#include "atomic_template.h"
+-
+-#define DATA_SIZE 4
+-#include "atomic_template.h"
+-
+-#ifdef CONFIG_ATOMIC64
+-#define DATA_SIZE 8
+-#include "atomic_template.h"
+-#endif
+-
+-/* Code access functions.  */
+-
+-#undef MMUSUFFIX
+-#define MMUSUFFIX _cmmu
+-#undef GETPC
+-#define GETPC() ((uintptr_t)0)
+-#define SOFTMMU_CODE_ACCESS
+-
+-#define DATA_SIZE 1
+-#include "softmmu_template.h"
+-
+-#define DATA_SIZE 2
+-#include "softmmu_template.h"
+-
+-#define DATA_SIZE 4
+-#include "softmmu_template.h"
+-
+-#define DATA_SIZE 8
+-#include "softmmu_template.h"
 -- 
 1.9.1
