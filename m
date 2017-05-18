@@ -1,35 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53854)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55316)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dBM3W-0002yG-7l
-	for qemu-devel@nongnu.org; Thu, 18 May 2017 10:05:31 -0400
+	(envelope-from <eblake@redhat.com>) id 1dBM7v-0003x8-OP
+	for qemu-devel@nongnu.org; Thu, 18 May 2017 10:10:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dBM3S-0003rF-5j
-	for qemu-devel@nongnu.org; Thu, 18 May 2017 10:05:30 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60593)
+	(envelope-from <eblake@redhat.com>) id 1dBM7s-00064Z-Gu
+	for qemu-devel@nongnu.org; Thu, 18 May 2017 10:10:03 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:38732)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1dBM3R-0003r3-Sq
-	for qemu-devel@nongnu.org; Thu, 18 May 2017 10:05:26 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 69192C04B95D
-	for <qemu-devel@nongnu.org>; Thu, 18 May 2017 14:05:24 +0000 (UTC)
-References: <20170512122158.32032-1-kraxel@redhat.com>
-	<20170512122158.32032-7-kraxel@redhat.com>
-	<a4f99c9b-1fb4-8a0c-ec3b-0cadc7dfd382@redhat.com>
-	<728dca25-a9ef-a061-dee7-c5b4309ca8dc@redhat.com>
-	<6d9941a5-268c-9bc2-4122-64f023dfaa51@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <7d426658-c6ff-5eb0-025a-e421c5773703@redhat.com>
-Date: Thu, 18 May 2017 16:05:18 +0200
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dBM7s-00064A-8p
+	for qemu-devel@nongnu.org; Thu, 18 May 2017 10:10:00 -0400
+References: <1494595886-30912-1-git-send-email-a.perevalov@samsung.com>
+	<CGME20170512133144eucas1p25b4275feb4126a21415242c5085382fd@eucas1p2.samsung.com>
+	<1494595886-30912-3-git-send-email-a.perevalov@samsung.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <d5047c00-9000-aebe-6b59-75e9d5398db6@redhat.com>
+Date: Thu, 18 May 2017 09:09:49 -0500
 MIME-Version: 1.0
-In-Reply-To: <6d9941a5-268c-9bc2-4122-64f023dfaa51@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PULL 6/6] hw/usb/dev-serial: Do not try to set
- vendorid or productid properties
+In-Reply-To: <1494595886-30912-3-git-send-email-a.perevalov@samsung.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="0jW4lsdHKlMnBn09S8V1NIx4cV72JhEEP"
+Subject: Re: [Qemu-devel] [PATCH V5 2/9] migration: pass ptr to
+ MigrationIncomingState into migration ufd_version_check &
+ postcopy_ram_supported_by_host
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,102 +31,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org
+To: Alexey Perevalov <a.perevalov@samsung.com>, qemu-devel@nongnu.org
+Cc: i.maximets@samsung.com, dgilbert@redhat.com, peterx@redhat.com
 
-On 18.05.2017 15:35, Paolo Bonzini wrote:
-> 
-> 
-> On 18/05/2017 15:22, Thomas Huth wrote:
->> On 18.05.2017 14:00, Paolo Bonzini wrote:
->>>
->>>
->>> On 12/05/2017 14:21, Gerd Hoffmann wrote:
->>>> From: Thomas Huth <thuth@redhat.com>
->>>>
->>>> When starting QEMU with the legacy USB serial device like this:
->>>>
->>>>  qemu-system-x86_64 -usbdevice serial:vendorid=0x1234:stdio
->>>>
->>>> it currently aborts since the vendorid property does not exist
->>>> anymore (it has been removed by commit f29783f72ea77dfbd7ea0c9):
->>>>
->>>>  Unexpected error in object_property_find() at qemu/qom/object.c:1008:
->>>>  qemu-system-x86_64: -usbdevice serial:vendorid=0x1234:stdio: Property
->>>>                      '.vendorid' not found
->>>>  Aborted (core dumped)
->>>>
->>>> Fix this crash by issuing a more friendly error message instead
->>>> (and simplify the code also a little bit this way).
->>>>
->>>> Signed-off-by: Thomas Huth <thuth@redhat.com>
->>>> Message-id: 1493883704-27604-1-git-send-email-thuth@redhat.com
->>>> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
->>>> ---
->>>>  hw/usb/dev-serial.c | 24 ++++++------------------
->>>>  1 file changed, 6 insertions(+), 18 deletions(-)
->>>>
->>>> diff --git a/hw/usb/dev-serial.c b/hw/usb/dev-serial.c
->>>> index 6d5137383b..83a4f0e6fb 100644
->>>> --- a/hw/usb/dev-serial.c
->>>> +++ b/hw/usb/dev-serial.c
->>>> @@ -513,27 +513,18 @@ static USBDevice *usb_serial_init(USBBus *bus, const char *filename)
->>>>  {
->>>>      USBDevice *dev;
->>>>      Chardev *cdrv;
->>>> -    uint32_t vendorid = 0, productid = 0;
->>>>      char label[32];
->>>>      static int index;
->>>>  
->>>>      while (*filename && *filename != ':') {
->>>>          const char *p;
->>>> -        char *e;
->>>> +
->>>>          if (strstart(filename, "vendorid=", &p)) {
->>>> -            vendorid = strtol(p, &e, 16);
->>>> -            if (e == p || (*e && *e != ',' && *e != ':')) {
->>>> -                error_report("bogus vendor ID %s", p);
->>>> -                return NULL;
->>>> -            }
->>>> -            filename = e;
->>>> +            error_report("vendorid is not supported anymore");
->>>> +            return NULL;
->>>>          } else if (strstart(filename, "productid=", &p)) {
->>>> -            productid = strtol(p, &e, 16);
->>>> -            if (e == p || (*e && *e != ',' && *e != ':')) {
->>>> -                error_report("bogus product ID %s", p);
->>>> -                return NULL;
->>>> -            }
->>>> -            filename = e;
->>>> +            error_report("productid is not supported anymore");
->>>> +            return NULL;
->>>>          } else {
->>>>              error_report("unrecognized serial USB option %s", filename);
->>>>              return NULL;
->>>
->>> All breanches of the "if" now return NULL, so the "while" loop in turn
->>> can become an
->>>
->>>     if (*filename && *filename != ':') {
->>>     }
->>>
->>> and the "while (*filename == ',')" subloop can go away, replaced by just
->>> "return NULL".
->>>
->>> Even better, the "if (!*filename)" if just below can be moved first.
->>
->> Feel free to send an additional cleanup patch ... otherwise, I'd say let
->> it bitrot for another year and we then remove it completely together
->> with all the other "-usbdevice" functions...
-> 
-> Well, Coverity reports it so I'd rather keep it clean...
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--0jW4lsdHKlMnBn09S8V1NIx4cV72JhEEP
+From: Eric Blake <eblake@redhat.com>
+To: Alexey Perevalov <a.perevalov@samsung.com>, qemu-devel@nongnu.org
+Cc: i.maximets@samsung.com, dgilbert@redhat.com, peterx@redhat.com
+Message-ID: <d5047c00-9000-aebe-6b59-75e9d5398db6@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH V5 2/9] migration: pass ptr to
+ MigrationIncomingState into migration ufd_version_check &
+ postcopy_ram_supported_by_host
+References: <1494595886-30912-1-git-send-email-a.perevalov@samsung.com>
+ <CGME20170512133144eucas1p25b4275feb4126a21415242c5085382fd@eucas1p2.samsung.com>
+ <1494595886-30912-3-git-send-email-a.perevalov@samsung.com>
+In-Reply-To: <1494595886-30912-3-git-send-email-a.perevalov@samsung.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Hmm, maybe we should simply remove "-usbdevice serial" right now already
-... ? The vendorid/productid parameter handling has been broken since
-QEMU v0.14 already and nobody ever complained, so I guess hardly anybody
-is using "-usbdevice serial" anymore ... so I tend to simply remove it
-directly instead of going through the typical "mark-as-deprecated ->
-wait-two-release-cycles -> finally-remove-it" process here...
+On 05/12/2017 08:31 AM, Alexey Perevalov wrote:
 
-Paolo, Gerd, what do you think?
+Long subject line. Try to keep things in the subject around 60
+characters or less, in part so that 'git shortlog --oneline -30' still
+fits in an 80-column screen.  Maybe:
 
- Thomas
+migration: Refactor use of MigrationIncomingState pointer
+
+> That tiny refactoring is necessary to be able to set
+> UFFD_FEATURE_THREAD_ID while requesting features, and then
+> to create downtime context in case when kernel supports it.
+>=20
+> Signed-off-by: Alexey Perevalov <a.perevalov@samsung.com>
+> ---
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--0jW4lsdHKlMnBn09S8V1NIx4cV72JhEEP
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEcBAEBCAAGBQJZHastAAoJEKeha0olJ0Nqg38H+gKcHP8xgxcnl7iiaoyinDBH
+4mWQqHmFOruxNnQ3y3IkCltkGhq+kghxDF7wfioIp6BjmPDhngQe/cZfVOWvChxl
+dJ3hC9RjkiaCQirWZ/Cxd+q0KkHJSlnzbRCXHRXQAtfBnmW9CCRudts5k6H80dS1
+2Uryo08ANQMHhViXFaDjhqAjwW/ETe5HYjJ9oEzd8W+rg7U6rIwizB1NXWSQSjxv
+8//5+7d2AiW080OE51zAUh2N3ccJ1nj2i2c6aiY0Q83l/4Hs2H01yDXnaknk6oYs
+3qBFe73LkvRGzEdcp7yI+eETw2kEVAseEU7d3fnCCo+Ll2EwketVBUmp84zUJ1M=
+=K7Es
+-----END PGP SIGNATURE-----
+
+--0jW4lsdHKlMnBn09S8V1NIx4cV72JhEEP--
