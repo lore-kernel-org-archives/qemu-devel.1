@@ -1,20 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51452)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51817)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dBHAq-0007LY-Oe
-	for qemu-devel@nongnu.org; Thu, 18 May 2017 04:52:45 -0400
+	(envelope-from <david@redhat.com>) id 1dBHCD-0007xF-4v
+	for qemu-devel@nongnu.org; Thu, 18 May 2017 04:54:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dBHAl-0006n0-U9
-	for qemu-devel@nongnu.org; Thu, 18 May 2017 04:52:44 -0400
-Date: Thu, 18 May 2017 16:52:33 +0800
-From: Fam Zheng <famz@redhat.com>
-Message-ID: <20170518085233.GG5764@lemon.lan>
-References: <149500797926.28874.3877030098009500731.stgit@bahia>
+	(envelope-from <david@redhat.com>) id 1dBHCC-0007kN-7l
+	for qemu-devel@nongnu.org; Thu, 18 May 2017 04:54:09 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49426)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <david@redhat.com>) id 1dBHCB-0007k8-WD
+	for qemu-devel@nongnu.org; Thu, 18 May 2017 04:54:08 -0400
+References: <1495035337-13337-1-git-send-email-thuth@redhat.com>
+	<20170517162642.ebmrhawmfdde5vsz@aurel32.net>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <871c5d88-66ec-b421-5c0b-7704b5379ae3@redhat.com>
+Date: Thu, 18 May 2017 10:54:03 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <149500797926.28874.3877030098009500731.stgit@bahia>
-Subject: Re: [Qemu-devel] [Qemu-stable] [RESEND PATCH] virtio: allow broken
- device to notify guest
+In-Reply-To: <20170517162642.ebmrhawmfdde5vsz@aurel32.net>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC PATCH] target/s390x/cpu_models: Set some
+ additional feature bits for the "qemu" CPU
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,72 +29,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>
-Cc: qemu-devel@nongnu.org, Cornelia Huck <cornelia.huck@de.ibm.com>, qemu-stable@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>
+To: Aurelien Jarno <aurelien@aurel32.net>, Thomas Huth <thuth@redhat.com>
+Cc: qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>, mmarek@suse.com, mbenes@suse.cz
 
-On Wed, 05/17 10:17, Greg Kurz wrote:
-> According to section 2.1.2 of the virtio-1 specification:
+On 17.05.2017 18:26, Aurelien Jarno wrote:
+> On 2017-05-17 17:35, Thomas Huth wrote:
+>> Currently we only present the plain z900 feature bits to the guest,
+>> but QEMU already emulates some additional features (but not all of
+>> the next CPU generation, so we can not use the next CPU level as
+>> default yet). Since newer Linux kernels are checking the feature bits
+>> and refuse to work if a required feature is missing, we should present
+>> as much of the supported features as possible when we are running
+>> with the default "qemu" CPU.
+>> This patch now adds the "stfle", "extended immediate" and "stckf"
+>> facility bits to the "qemu" CPU, which are already supported facilities.
+>> It is unfortunately still not enough to run e.g. recent Fedora kernels,
+>> but at least it's a first step into the right direction.
 > 
-> "The device SHOULD set DEVICE_NEEDS_RESET when it enters an error state that
-> a reset is needed. If DRIVER_OK is set, after it sets DEVICE_NEEDS_RESET,
-> the device MUST send a device configuration change notification to the
-> driver."
+> This indeed looks like a step in a good direction. At least it makes the
+> recently added STFLE emulation useful :-).
 > 
-> Commit "f5ed36635d8f virtio: stop virtqueue processing if device is broken"
-> introduced a virtio_error() call that just does that:
+>> Signed-off-by: Thomas Huth <thuth@redhat.com>
+>> ---
+>>  target/s390x/cpu_models.c | 29 ++++++++++++++++++++++++++---
+>>  1 file changed, 26 insertions(+), 3 deletions(-)
+>>
+>> diff --git a/target/s390x/cpu_models.c b/target/s390x/cpu_models.c
+>> index 8d27363..18789ab 100644
+>> --- a/target/s390x/cpu_models.c
+>> +++ b/target/s390x/cpu_models.c
+>> @@ -658,6 +658,24 @@ static void check_compatibility(const S390CPUModel *max_model,
+>>                    "available in the configuration: ");
+>>  }
+>>  
+>> +/**
+>> + * The base TCG CPU model "qemu" is based on the z900. However, we already
+>> + * can also emulate some additional features of later CPU generations, so
+>> + * we add these additional feature bits here.
+>> + */
+>> +static void add_qemu_cpu_model_features(S390FeatBitmap fbm)
+>> +{
+>> +    int i, feats[] = {
+>> +        S390_FEAT_STFLE,
+>> +        S390_FEAT_EXTENDED_IMMEDIATE,
+>> +        S390_FEAT_STORE_CLOCK_FAST
 > 
-> - internally mark the device as broken
-> - set the DEVICE_NEEDS_RESET bit in the status
-> - send a configuration change notification
+> According to my list, QEMU also fully implements the following
+> facilities:
 > 
-> Unfortunately, virtio_notify_vector(), called by virtio_notify_config(),
-> returns right away when the device is marked as broken and the notification
-> isn't sent in this case.
-> 
-> The spec doesn't say whether a broken device can send notifications
-> in other situations or not. But since the driver isn't supposed to do
-> anything but to reset the device, it makes sense to keep the check in
-> virtio_notify_config().
-> 
-> Marking the device as broken AFTER the configuration change notification was
-> sent is enough to fix the issue.
-> 
-> Signed-off-by: Greg Kurz <groug@kaod.org>
-> Reviewed-by: Cornelia Huck <cornelia.huck@de.ibm.com>
-> ---
->  hw/virtio/virtio.c |    4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
-> 
-> Re-sending this patch with Cornelia's Reviewed-by and Cc'ing qemu-stable
-> since this is a spec violation, as suggested in:
-> 
-> Message-ID: <20170427183237-mutt-send-email-mst@kernel.org>
-> 
-> Cheers,
-> 
-> --
-> Greg
-> 
-> diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
-> index 03592c542a55..890b4d7eb751 100644
-> --- a/hw/virtio/virtio.c
-> +++ b/hw/virtio/virtio.c
-> @@ -2451,12 +2451,12 @@ void GCC_FMT_ATTR(2, 3) virtio_error(VirtIODevice *vdev, const char *fmt, ...)
->      error_vreport(fmt, ap);
->      va_end(ap);
->  
-> -    vdev->broken = true;
-> -
->      if (virtio_vdev_has_feature(vdev, VIRTIO_F_VERSION_1)) {
->          virtio_set_status(vdev, vdev->status | VIRTIO_CONFIG_S_NEEDS_RESET);
->          virtio_notify_config(vdev);
->      }
-> +
-> +    vdev->broken = true;
->  }
->  
->  static void virtio_memory_listener_commit(MemoryListener *listener)
-> 
+> S390_FEAT_LONG_DISPLACEMENT
+> S390_FEAT_GENERAL_INSTRUCTIONS_EXT
+> S390_FEAT_EXECUTE_EXT
+> S390_FEAT_STFLE_45
 > 
 
-Reviewed-by: Fam Zheng <famz@redhat.com>
+If S390_FEAT_LONG_DISPLACEMENT is supported, so is
+S390_FEAT_LONG_DISPLACEMENT_FAST (because TCG obvious has high
+performance ;) )
+
+-- 
+
+Thanks,
+
+David
