@@ -1,22 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46227)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46402)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dBKGJ-00030b-23
-	for qemu-devel@nongnu.org; Thu, 18 May 2017 08:10:36 -0400
+	(envelope-from <peterx@redhat.com>) id 1dBKGj-0003LK-GX
+	for qemu-devel@nongnu.org; Thu, 18 May 2017 08:11:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dBKGI-0004Vu-4e
-	for qemu-devel@nongnu.org; Thu, 18 May 2017 08:10:35 -0400
-Date: Thu, 18 May 2017 14:10:26 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20170518121026.GF4646@noname.redhat.com>
-References: <20170518100925.28682-1-vsementsov@virtuozzo.com>
-	<20170518102523.GD4646@noname.redhat.com>
-	<4f9deae2-c489-9681-83d3-e878adb33946@virtuozzo.com>
+	(envelope-from <peterx@redhat.com>) id 1dBKGg-0004aS-CN
+	for qemu-devel@nongnu.org; Thu, 18 May 2017 08:11:01 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:57380)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1dBKGg-0004aD-62
+	for qemu-devel@nongnu.org; Thu, 18 May 2017 08:10:58 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 2507F20B18
+	for <qemu-devel@nongnu.org>; Thu, 18 May 2017 12:10:57 +0000 (UTC)
+Date: Thu, 18 May 2017 20:10:52 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20170518121052.GB15294@pxdev.xzpeter.org>
+References: <20170517154756.22079-1-quintela@redhat.com>
+	<20170517154756.22079-10-quintela@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <4f9deae2-c489-9681-83d3-e878adb33946@virtuozzo.com>
-Subject: Re: [Qemu-devel] [PATCH] qcow2: add allocated-size to image
- specific info
+In-Reply-To: <20170517154756.22079-10-quintela@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 9/9] migration: migration.h was not needed
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,58 +33,15 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, eblake@redhat.com, armbru@redhat.com, mreitz@redhat.com, den@openvz.org
+To: Juan Quintela <quintela@redhat.com>
+Cc: qemu-devel@nongnu.org, dgilbert@redhat.com, lvivier@redhat.com
 
-Am 18.05.2017 um 13:04 hat Vladimir Sementsov-Ogievskiy geschrieben:
-> 18.05.2017 13:25, Kevin Wolf wrote:
-> >Am 18.05.2017 um 12:09 hat Vladimir Sementsov-Ogievskiy geschrieben:
-> >>Shows, how much data qcow2 allocates in underlying file. This should
-> >>be helpful on non-sparse file systems, when qemu-img info "disk size"
-> >>doesn't provide this information.
-> >>
-> >>Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> >>---
-> >>Hi all.
-> >>
-> >>Here is an allocated-size feature for qemu-img info.
-> >I'm not a fan of loading all L2 tables (can take some time) for
-> >'qemu-img info' (which should be very quick). Why isn't the qemu-img
-> >check output good enough?
-> >
-> >Kevin
-> >
-> >$ ./qemu-img check /tmp/test.qcow2
-> >No errors were found on the image.
-> >16164/491520 = 3.29% allocated, 11.98% fragmented, 0.00% compressed clusters
-> >Image end offset: 1060044800
-> >$ ./qemu-img check --output=json /tmp/test.qcow2
-> >{
-> >     "image-end-offset": 1060044800,
-> >     "total-clusters": 491520,
-> >     "check-errors": 0,
-> >     "allocated-clusters": 16164,
-> >     "filename": "/tmp/test.qcow2",
-> >     "format": "qcow2",
-> >     "fragmented-clusters": 1937
-> >}
+On Wed, May 17, 2017 at 05:47:56PM +0200, Juan Quintela wrote:
+> This files don't use any function from migration.h, so drop it.
 > 
-> It is not the same, it shows guest clusters, but we need host
-> clusters - including all metadata, dirty bitmaps, snapshots, etc..
+> Signed-off-by: Juan Quintela <quintela@redhat.com>
 
-Ah, right. But isn't that exactly the "disk size" (actual-size in JSON)
-from qemu-img info? Your commit message mentions non-sparse filesystems
-(which one?), but why wouldn't "disk size" provide this information
-there?
+Reviewed-by: Peter Xu <peterx@redhat.com>
 
-The one case where it doesn't work is if you store a qcow2 image on a
-raw block device (this is something that oVirt does). In that case,
-you can't benefit from sparseness and disk space is used for a cluster
-in the middle even if its refcount is 0. oVirt uses "image-end-offset"
-to get the size of the first of the block device that is actually in use
-by the image.
-
-What is your exact use case? Maybe this helps me understand the exact
-kind of information that you need.
-
-Kevin
+-- 
+Peter Xu
