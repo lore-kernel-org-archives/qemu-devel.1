@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34831)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35072)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <anthony.xu@intel.com>) id 1dBTHw-00062I-Gk
-	for qemu-devel@nongnu.org; Thu, 18 May 2017 17:48:53 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1dBTIy-0006Xq-Ik
+	for qemu-devel@nongnu.org; Thu, 18 May 2017 17:49:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <anthony.xu@intel.com>) id 1dBTHt-00057q-AK
-	for qemu-devel@nongnu.org; Thu, 18 May 2017 17:48:52 -0400
-Received: from mga05.intel.com ([192.55.52.43]:39212)
+	(envelope-from <pbonzini@redhat.com>) id 1dBTIv-0005a8-Du
+	for qemu-devel@nongnu.org; Thu, 18 May 2017 17:49:56 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49384)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <anthony.xu@intel.com>)
-	id 1dBTHs-000576-VP
-	for qemu-devel@nongnu.org; Thu, 18 May 2017 17:48:49 -0400
-From: "Xu, Anthony" <anthony.xu@intel.com>
-Date: Thu, 18 May 2017 21:48:42 +0000
-Message-ID: <4712D8F4B26E034E80552F30A67BE0B1ACCB4D@ORSMSX112.amr.corp.intel.com>
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1dBTIv-0005a2-7V
+	for qemu-devel@nongnu.org; Thu, 18 May 2017 17:49:53 -0400
 References: <1494972923-31756-1-git-send-email-anthony.xu@intel.com>
 	<20170517112756.74cf6e47@nial.brq.redhat.com>
 	<4712D8F4B26E034E80552F30A67BE0B1ACB970@ORSMSX112.amr.corp.intel.com>
 	<6eff688c-b62e-8796-f852-a855079f3175@redhat.com>
-In-Reply-To: <6eff688c-b62e-8796-f852-a855079f3175@redhat.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	<4712D8F4B26E034E80552F30A67BE0B1ACCB4D@ORSMSX112.amr.corp.intel.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <3a55757b-fcdb-0829-c23d-68b1d416599f@redhat.com>
+Date: Thu, 18 May 2017 23:49:49 +0200
 MIME-Version: 1.0
+In-Reply-To: <4712D8F4B26E034E80552F30A67BE0B1ACCB4D@ORSMSX112.amr.corp.intel.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Subject: Re: [Qemu-devel] [PATCH] Memory: use memory address space for
  cpu-memory
 List-Id: <qemu-devel.nongnu.org>
@@ -32,61 +32,20 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>
+To: "Xu, Anthony" <anthony.xu@intel.com>, Igor Mammedov <imammedo@redhat.com>
 Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 
-PiA+Pj4gLSAgICAgICAgQWRkcmVzc1NwYWNlICphcyA9IGFkZHJlc3Nfc3BhY2VfaW5pdF9zaGFy
-ZWFibGUoY3B1LT5tZW1vcnksDQo+ID4+PiAtICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAiY3B1LW1lbW9yeSIpOw0KPiA+Pj4gKyAgICAgICAg
-QWRkcmVzc1NwYWNlICphczsNCj4gPj4+ICsgICAgICAgIGlmIChjcHUtPm1lbW9yeSA9PSBhZGRy
-ZXNzX3NwYWNlX21lbW9yeS5yb290KSB7DQo+ID4+PiArICAgICAgICAgICAgYWRkcmVzc19zcGFj
-ZV9tZW1vcnkucmVmX2NvdW50Kys7DQo+ID4+IHByb2JhYmx5IHRoaXMgd291bGQgY2F1c2UgcmVm
-ZXJlbmNlIGxlYWsgd2hlbiB2Y3B1IGlzIGRlc3Ryb3llZA0KPiA+IEkgdGhvdWdodCBhZGRyZXNz
-X3NwYWNlX2Rlc3Ryb3kgaXMgY2FsbGVkIHdoZW4gdmNwdSBpcyB1bnBsdWdnZWQsDQo+ID4gc2Vl
-bXMgdGhhdCdzIG5vdCB0aGUgY2FzZSwgdGhlbiByZWZfY291bnQrKyBpcyBub3QgbmVlZGVkLg0K
-PiANCj4gSXQgc2hvdWxkIGJlIGNhbGxlZC4gIEFsdGVybmF0aXZlbHkgeW91IGNvdWxkIHRyeSBh
-ZGRpbmcgYSBuZXcgZnVuY3Rpb24NCj4gdG8gbWFyayBhZGRyZXNzX3NwYWNlX21lbW9yeSBhcyBh
-IG5ldmVyLWRlc3Ryb3llZCBBZGRyZXNzU3BhY2U6DQo+IA0KVGhpcyBwYXRjaCB3b3VsZCBkbyBp
-dCwgY291bGQgeW91IHBsZWFzZSBzdWJtaXQgdGhpcyBwYXRjaD8NCg0KYWRkcmVzc19zcGFjZV9k
-ZXN0cm95IGlzIG5vdCBjYWxsZWQgd2hlbiB2Y3B1IGlzIHVucGx1Z2dlZCwgdGhhdCBsaWtlbHkN
-CmNhdXNlcyBtZW1vcnkgbGVhay4gSSB3aWxsIHRha2UgYSBsb29rIHdoZW4gSSBoYXZlIHRpbWUu
-DQpJZiBzb21lb25lIGNhbiB0YWtlIGEgbG9vayBub3csIHRoYXQnZCBiZSBncmVhdC4NCg0KDQpU
-aGFua3MsDQpBbnRob255DQoNCg0KDQo+IGRpZmYgLS1naXQgYS9pbmNsdWRlL2V4ZWMvbWVtb3J5
-LmggYi9pbmNsdWRlL2V4ZWMvbWVtb3J5LmgNCj4gaW5kZXggOTllMGY1NGQ4Ni4uYjI3YjI4OGM4
-ZiAxMDA2NDQNCj4gLS0tIGEvaW5jbHVkZS9leGVjL21lbW9yeS5oDQo+ICsrKyBiL2luY2x1ZGUv
-ZXhlYy9tZW1vcnkuaA0KPiBAQCAtMjkwLDYgKzI5MCw3IEBAIHN0cnVjdCBBZGRyZXNzU3BhY2Ug
-ew0KPiAgICAgIE1lbW9yeVJlZ2lvbiAqcm9vdDsNCj4gICAgICBpbnQgcmVmX2NvdW50Ow0KPiAg
-ICAgIGJvb2wgbWFsbG9jZWQ7DQo+ICsgICAgYm9vbCBzaGFyZWQ7DQo+IA0KPiAgICAgIC8qIEFj
-Y2Vzc2VkIHZpYSBSQ1UuICAqLw0KPiAgICAgIHN0cnVjdCBGbGF0VmlldyAqY3VycmVudF9tYXA7
-DQo+IGRpZmYgLS1naXQgYS9tZW1vcnkuYyBiL21lbW9yeS5jDQo+IGluZGV4IGI3MjdmNWVjMGUu
-LjE5MGNkM2Q1Y2UgMTAwNjQ0DQo+IC0tLSBhL21lbW9yeS5jDQo+ICsrKyBiL21lbW9yeS5jDQo+
-IEBAIC0yNDMyLDYgKzI0MzIsNyBAQCB2b2lkIGFkZHJlc3Nfc3BhY2VfaW5pdChBZGRyZXNzU3Bh
-Y2UgKmFzLA0KPiBNZW1vcnlSZWdpb24gKnJvb3QsIGNvbnN0IGNoYXIgKm5hbWUpDQo+ICAgICAg
-YXMtPnJlZl9jb3VudCA9IDE7DQo+ICAgICAgYXMtPnJvb3QgPSByb290Ow0KPiAgICAgIGFzLT5t
-YWxsb2NlZCA9IGZhbHNlOw0KPiArICAgIGFzLT5zaGFyZWQgPSBmYWxzZTsNCj4gICAgICBhcy0+
-Y3VycmVudF9tYXAgPSBnX25ldyhGbGF0VmlldywgMSk7DQo+ICAgICAgZmxhdHZpZXdfaW5pdChh
-cy0+Y3VycmVudF9tYXApOw0KPiAgICAgIGFzLT5pb2V2ZW50ZmRfbmIgPSAwOw0KPiBAQCAtMjQ2
-MCwxMiArMjQ2MSwxOCBAQCBzdGF0aWMgdm9pZA0KPiBkb19hZGRyZXNzX3NwYWNlX2Rlc3Ryb3ko
-QWRkcmVzc1NwYWNlICphcykNCj4gICAgICB9DQo+ICB9DQo+IA0KPiArdm9pZCBhZGRyZXNzX3Nw
-YWNlX2luaXRfc3RhdGljKEFkZHJlc3NTcGFjZSAqYXMsIE1lbW9yeVJlZ2lvbiAqcm9vdCwNCj4g
-Y29uc3QgY2hhciAqbmFtZSkNCj4gK3sNCj4gKyAgICBhZGRyZXNzX3NwYWNlX2luaXQoYXMsIHJv
-b3QsIG5hbWUpOw0KPiArICAgIGFzLT5zaGFyZWQgPSB0cnVlOw0KPiArfQ0KPiArDQo+ICBBZGRy
-ZXNzU3BhY2UgKmFkZHJlc3Nfc3BhY2VfaW5pdF9zaGFyZWFibGUoTWVtb3J5UmVnaW9uICpyb290
-LCBjb25zdA0KPiBjaGFyICpuYW1lKQ0KPiAgew0KPiAgICAgIEFkZHJlc3NTcGFjZSAqYXM7DQo+
-IA0KPiAgICAgIFFUQUlMUV9GT1JFQUNIKGFzLCAmYWRkcmVzc19zcGFjZXMsIGFkZHJlc3Nfc3Bh
-Y2VzX2xpbmspIHsNCj4gLSAgICAgICAgaWYgKHJvb3QgPT0gYXMtPnJvb3QgJiYgYXMtPm1hbGxv
-Y2VkKSB7DQo+ICsgICAgICAgIGlmIChyb290ID09IGFzLT5yb290ICYmIGFzLT5zaGFyZWQpIHsN
-Cj4gICAgICAgICAgICAgIGFzLT5yZWZfY291bnQrKzsNCj4gICAgICAgICAgICAgIHJldHVybiBh
-czsNCj4gICAgICAgICAgfQ0KPiBAQCAtMjQ3NCw2ICsyNDgxLDcgQEAgQWRkcmVzc1NwYWNlDQo+
-ICphZGRyZXNzX3NwYWNlX2luaXRfc2hhcmVhYmxlKE1lbW9yeVJlZ2lvbiAqcm9vdCwgY29uc3Qg
-Y2hhciAqbmFtZSkNCj4gICAgICBhcyA9IGdfbWFsbG9jMChzaXplb2YgKmFzKTsNCj4gICAgICBh
-ZGRyZXNzX3NwYWNlX2luaXQoYXMsIHJvb3QsIG5hbWUpOw0KPiAgICAgIGFzLT5tYWxsb2NlZCA9
-IHRydWU7DQo+ICsgICAgYXMtPnNoYXJlZCA9IHRydWU7DQo+ICAgICAgcmV0dXJuIGFzOw0KPiAg
-fQ0KPiANCj4gQEAgLTI0ODUsNiArMjQ5Myw4IEBAIHZvaWQgYWRkcmVzc19zcGFjZV9kZXN0cm95
-KEFkZHJlc3NTcGFjZSAqYXMpDQo+ICAgICAgaWYgKGFzLT5yZWZfY291bnQpIHsNCj4gICAgICAg
-ICAgcmV0dXJuOw0KPiAgICAgIH0NCj4gKyAgICBhc3NlcnQoIWFzLT5zaGFyZWQgfHwgYXMtPm1h
-bGxvY2VkKTsNCj4gKw0KPiAgICAgIC8qIEZsdXNoIG91dCBhbnl0aGluZyBmcm9tIE1lbW9yeUxp
-c3RlbmVycyBsaXN0ZW5pbmcgaW4gb24gdGhpcyAqLw0KPiAgICAgIG1lbW9yeV9yZWdpb25fdHJh
-bnNhY3Rpb25fYmVnaW4oKTsNCj4gICAgICBhcy0+cm9vdCA9IE5VTEw7DQo+IA0KPiANCj4gdGhl
-biBDUFVzIGNhbiBrZWVwIHVzaW5nIGFkZHJlc3Nfc3BhY2VfaW5pdF9zaGFyZWFibGUuDQo+IA0K
-PiBQYW9sbw0K
+
+
+On 18/05/2017 23:48, Xu, Anthony wrote:
+>> It should be called.  Alternatively you could try adding a new function
+>> to mark address_space_memory as a never-destroyed AddressSpace:
+>>
+> This patch would do it, could you please submit this patch?
+
+If you have tested it (together with the change in the initialization of
+address_space_memory), I can do that.
+
+Thanks,
+
+Paolo
