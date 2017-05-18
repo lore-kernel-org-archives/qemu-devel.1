@@ -1,28 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58498)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36556)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dBPES-0003Qx-DH
-	for qemu-devel@nongnu.org; Thu, 18 May 2017 13:29:01 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1dBPWG-0008Ak-PY
+	for qemu-devel@nongnu.org; Thu, 18 May 2017 13:47:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dBPER-0008J4-Kp
-	for qemu-devel@nongnu.org; Thu, 18 May 2017 13:29:00 -0400
-Received: from mail-qt0-x242.google.com ([2607:f8b0:400d:c0d::242]:33415)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1dBPER-0008Iq-HE
-	for qemu-devel@nongnu.org; Thu, 18 May 2017 13:28:59 -0400
-Received: by mail-qt0-x242.google.com with SMTP id a46so6595104qte.0
-	for <qemu-devel@nongnu.org>; Thu, 18 May 2017 10:28:59 -0700 (PDT)
-Sender: Richard Henderson <rth7680@gmail.com>
-References: <1495128400-23759-1-git-send-email-thuth@redhat.com>
-From: Richard Henderson <rth@twiddle.net>
-Message-ID: <ca84f48b-4d7f-f018-89a1-d4d9e88c073b@twiddle.net>
-Date: Thu, 18 May 2017 10:28:55 -0700
+	(envelope-from <dgilbert@redhat.com>) id 1dBPWC-0006TH-Qg
+	for qemu-devel@nongnu.org; Thu, 18 May 2017 13:47:24 -0400
+Date: Thu, 18 May 2017 18:47:15 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170518174714.GK2079@work-vm>
+References: <20170510151209.32767-1-pasic@linux.vnet.ibm.com>
 MIME-Version: 1.0
-In-Reply-To: <1495128400-23759-1-git-send-email-thuth@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v4] target/s390x: Add support for the TEST
- BLOCK instruction
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170510151209.32767-1-pasic@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH 1/1] s390x/css: catch section mismatch on
+ load
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,37 +23,139 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, Alexander Graf <agraf@suse.de>
-Cc: David Hildenbrand <david@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>
+To: Halil Pasic <pasic@linux.vnet.ibm.com>
+Cc: Cornelia Huck <cornelia.huck@de.ibm.com>, Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org, qemu-stable@nongnu.org
 
-On 05/18/2017 10:26 AM, Thomas Huth wrote:
-> TEST BLOCK was likely once used to execute basic memory
-> tests, but nowadays it's just a (slow) way to clear a page.
+* Halil Pasic (pasic@linux.vnet.ibm.com) wrote:
+> Prior to the virtio-ccw-2.7 machine (and commit 2a79eb1a), our virtio
+> devices residing under the virtual-css bus do not have qdev_path based
+> migration stream identifiers (because their qdev_path is NULL). The ids
+> are instead generated when the device is registered as a composition of
+> the so called idstr, which takes the vmsd name as its value, and an
+> instance_id, which is which is calculated as a maximal instance_id
+> registered with the same idstr plus one, or zero (if none was registered
+> previously).
 > 
-> Signed-off-by: Thomas Huth<thuth@redhat.com>
+> That means, under certain circumstances, one device might try, and even
+> succeed, to load the state of a different device. This can lead to
+> trouble.
+> 
+> Let us fail the migration if the above problem is detected during load.
+> 
+> How to reproduce the problem:
+> 1) start qemu-system-s390x making sure you have the following devices
+>    defined on your command line:
+>      -device virtio-rng-ccw,id=rng1,devno=fe.0.0001
+>      -device virtio-rng-ccw,id=rng2,devno=fe.0.0002
+> 2) detach the devices and reattach in reverse order using the monitor:
+>      (qemu) device_del rng1
+>      (qemu) device_del rng2
+>      (qemu) device_add virtio-rng-ccw,id=rng2,devno=fe.0.0002
+>      (qemu) device_add virtio-rng-ccw,id=rng1,devno=fe.0.0001
+> 3) save the state of the vm into a temporary file and quit QEMU:
+>      (qemu) migrate "exec:gzip -c > /tmp/tmp_vmstate.gz"
+>      (qemu) q
+> 4) use your command line from step 1 with
+>      -incoming "exec:gzip -c -d /tmp/tmp_vmstate.gz"
+>    appended to reproduce the problem (while trying to to load the saved vm)
+> 
+> CC: qemu-stable@nongnu.org
+> Signed-off-by: Halil Pasic <pasic@linux.vnet.ibm.com>
+> Reviewed-by: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
 > ---
->   v4:
->   - Switched TCG_CALL_NO_RWG back to TCG_CALL_NO_WG as indicated by Richard
 > 
->   v3:
->   - Use TCG_CALL_NO_RWG instead of TCG_CALL_NO_WG
->   - Use potential_page_fault() since the helper can generate an exception
+> Hi!
 > 
->   v2:
->   - Use DEF_HELPER_FLAGS_2 instead for DEF_HELPER_2 for returning CC value
->   - Convert real to absolute address
->   - Added a check for valid RAM page
->   - Added low-address protection check
+> I also wonder what is the best way to do this with vmstate.  I know there
+> are VMSTATE_*_EQUAL macros for integers, and I have partially modelled my
+> patch after that, but there we only get a != b as error message, which is
+> satisfactory for detecting bugs which are supposed to get fixed. In this
+> particular case having a verbose error message should be really helpful
+> and thus important.
 > 
->   target/s390x/cpu.h         |  1 +
->   target/s390x/helper.h      |  1 +
->   target/s390x/insn-data.def |  2 ++
->   target/s390x/mem_helper.c  | 28 ++++++++++++++++++++++++++++
->   target/s390x/mmu_helper.c  |  2 +-
->   target/s390x/translate.c   | 11 +++++++++++
->   6 files changed, 44 insertions(+), 1 deletion(-)
+> I'm asking because I'm currently working on a vmstate conversion of the
+> s390x css and virtio-ccw  stuff (find my latest patch set here
+> https://lists.gnu.org/archive/html/qemu-devel/2017-05/msg01364.html).
 
-Reviewed-by: Richard Henderson <rth@twiddle.net>
+I think the way to solve that problem will probably be adding a 'hint'
+parameter to the VMSTATE_*_EQUAL macros that is a constant string,
+stuff a pointer to that into a possibly new field in VMStateField,
+and then make the get_*_equal functions include that string in the
+message like you do.  There's a lot of copy and paste but it's
+not too bad now that Jianjun's patch from a few months ago passed
+the VMStateField* to the .get/.put.
+
+Dave
 
 
-r~
+> Regards,
+> Halil
+> ---
+>  hw/s390x/css.c        | 14 ++++++++++++++
+>  hw/s390x/virtio-ccw.c |  6 +++++-
+>  2 files changed, 19 insertions(+), 1 deletion(-)
+> 
+> diff --git a/hw/s390x/css.c b/hw/s390x/css.c
+> index 15c4f4b..6cff3a3 100644
+> --- a/hw/s390x/css.c
+> +++ b/hw/s390x/css.c
+> @@ -14,6 +14,7 @@
+>  #include "qapi/visitor.h"
+>  #include "hw/qdev.h"
+>  #include "qemu/bitops.h"
+> +#include "qemu/error-report.h"
+>  #include "exec/address-spaces.h"
+>  #include "cpu.h"
+>  #include "hw/s390x/ioinst.h"
+> @@ -1721,13 +1722,26 @@ void subch_device_save(SubchDev *s, QEMUFile *f)
+>  int subch_device_load(SubchDev *s, QEMUFile *f)
+>  {
+>      SubchDev *old_s;
+> +    Error *err = NULL;
+>      uint16_t old_schid = s->schid;
+> +    uint16_t old_devno = s->devno;
+>      int i;
+>  
+>      s->cssid = qemu_get_byte(f);
+>      s->ssid = qemu_get_byte(f);
+>      s->schid = qemu_get_be16(f);
+>      s->devno = qemu_get_be16(f);
+> +    if (s->devno != old_devno) {
+> +        /* Only possible if machine < 2.7 (no css_dev_path) */
+> +
+> +        error_setg(&err, "%x != %x", old_devno,  s->devno);
+> +        error_append_hint(&err, "Devno mismatch, tried to load wrong section!"
+> +                          " Likely reason: some sequences of plug and unplug"
+> +                          " can break migration for machine versions prior"
+> +                          " 2.7 (known design flaw).\n");
+> +        error_report_err(err);
+> +        return -EINVAL;
+> +    }
+>      /* Re-assign subch. */
+>      if (old_schid != s->schid) {
+>          old_s = channel_subsys.css[s->cssid]->sch_set[s->ssid]->sch[old_schid];
+> diff --git a/hw/s390x/virtio-ccw.c b/hw/s390x/virtio-ccw.c
+> index e7167e3..4f7efa2 100644
+> --- a/hw/s390x/virtio-ccw.c
+> +++ b/hw/s390x/virtio-ccw.c
+> @@ -1274,9 +1274,13 @@ static int virtio_ccw_load_config(DeviceState *d, QEMUFile *f)
+>      SubchDev *s = ccw_dev->sch;
+>      VirtIODevice *vdev = virtio_ccw_get_vdev(s);
+>      int len;
+> +    int ret;
+>  
+>      s->driver_data = dev;
+> -    subch_device_load(s, f);
+> +    ret = subch_device_load(s, f);
+> +    if (ret) {
+> +        return ret;
+> +    }
+>      /* Re-fill subch_id after loading the subchannel states.*/
+>      if (ck->refill_ids) {
+>          ck->refill_ids(ccw_dev);
+> -- 
+> 2.10.2
+> 
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
