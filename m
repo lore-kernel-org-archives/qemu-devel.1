@@ -1,34 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41589)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41997)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <flypie@rocketmail.com>) id 1dBOSS-0005lE-Ol
-	for qemu-devel@nongnu.org; Thu, 18 May 2017 12:39:26 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1dBOU6-0006Uo-N6
+	for qemu-devel@nongnu.org; Thu, 18 May 2017 12:41:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <flypie@rocketmail.com>) id 1dBOSP-0006Ti-8x
-	for qemu-devel@nongnu.org; Thu, 18 May 2017 12:39:24 -0400
-Received: from sonic310-16.consmr.mail.ir2.yahoo.com ([77.238.177.37]:46585)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <flypie@rocketmail.com>) id 1dBOSO-0006TT-TQ
-	for qemu-devel@nongnu.org; Thu, 18 May 2017 12:39:21 -0400
-Date: Thu, 18 May 2017 16:39:18 +0000 (UTC)
-From: John Bradley <flypie@rocketmail.com>
-Reply-To: John Bradley <flypie1@yahoo.com>
-Message-ID: <1226435878.1302692.1495125558392@mail.yahoo.com>
-In-Reply-To: <87bmqqvc6h.fsf@dusky.pond.sub.org>
-References: <684185116.2952708.1495044580181.ref@mail.yahoo.com>
-	<684185116.2952708.1495044580181@mail.yahoo.com>
-	<3293e70a-71ac-2e6d-433f-06346ad253c9@redhat.com>
-	<107015620.2969780.1495046091978@mail.yahoo.com>
-	<5a2b9e50-1444-af4a-dc89-021a4beca0f4@redhat.com>
-	<1832071588.99743.1495054408073@mail.yahoo.com>
-	<bcff9cd4-3ec2-0757-02e0-96f0e0a7747e@redhat.com>
-	<968647832.156883.1495056309814@mail.yahoo.com>
-	<d7324134-4eb5-0ca2-2a13-6fd5c5479b49@redhat.com>
-	<87bmqqvc6h.fsf@dusky.pond.sub.org>
+	(envelope-from <dgilbert@redhat.com>) id 1dBOU1-0006uF-NE
+	for qemu-devel@nongnu.org; Thu, 18 May 2017 12:41:06 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55890)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dBOU1-0006u9-Ai
+	for qemu-devel@nongnu.org; Thu, 18 May 2017 12:41:01 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id F1B2F7246A
+	for <qemu-devel@nongnu.org>; Thu, 18 May 2017 16:40:59 +0000 (UTC)
+Date: Thu, 18 May 2017 17:40:54 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170518164053.GH2079@work-vm>
+References: <20170518161655.30311-1-quintela@redhat.com>
+	<20170518161655.30311-3-quintela@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] Add Markus Armbrusters code for Broadcom
- Perhiperals for ARM.
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170518161655.30311-3-quintela@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 2/9] migration: Split migration/channel.c
+ for channel operations
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,170 +34,292 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>, Eric Blake <eblake@redhat.com>
-Cc: John Bradley <flypie1@yahoo.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Laurent Vivier <lvivier@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Geert Martin Ijewski <gm.ijewski@web.de>, Alistair Francis <alistair.francis@xilinx.com>, "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>, =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+To: Juan Quintela <quintela@redhat.com>, berrange@redhat.com
+Cc: qemu-devel@nongnu.org, lvivier@redhat.com, peterx@redhat.com
 
-HI,
-No worries about Yesterday.
-I decided to take a different approach. I'll put that stuff in that relates=
- to GDummyPanel flypie/GDummyPanel first I sent the patch to the list a cop=
-y is here. 0001-PATCH-V-2-GDummyPanel-Fix-formatingissues.patch
+* Juan Quintela (quintela@redhat.com) wrote:
+> Create an include for its exported functions.
+> 
+> Signed-off-by: Juan Quintela <quintela@redhat.com>
+> 
+> ---
+> Add proper header
+> ---
+>  include/migration/migration.h |  7 -----
+>  migration/Makefile.objs       |  2 +-
+>  migration/channel.c           | 69 +++++++++++++++++++++++++++++++++++++++++++
+>  migration/channel.h           | 27 +++++++++++++++++
+>  migration/exec.c              |  1 +
+>  migration/fd.c                |  1 +
+>  migration/migration.c         | 50 -------------------------------
+>  migration/socket.c            |  1 +
+>  migration/tls.c               |  1 +
+>  9 files changed, 101 insertions(+), 58 deletions(-)
+>  create mode 100644 migration/channel.c
+>  create mode 100644 migration/channel.h
+> 
+> diff --git a/include/migration/migration.h b/include/migration/migration.h
+> index 7d1eef7..e831259 100644
+> --- a/include/migration/migration.h
+> +++ b/include/migration/migration.h
+> @@ -157,17 +157,10 @@ void migration_fd_process_incoming(QEMUFile *f);
+>  
+>  void qemu_start_incoming_migration(const char *uri, Error **errp);
+>  
+> -void migration_channel_process_incoming(MigrationState *s,
+> -                                        QIOChannel *ioc);
+> -
+>  void migration_tls_channel_process_incoming(MigrationState *s,
+>                                              QIOChannel *ioc,
+>                                              Error **errp);
+>  
+> -void migration_channel_connect(MigrationState *s,
+> -                               QIOChannel *ioc,
+> -                               const char *hostname);
+> -
+>  void migration_tls_channel_connect(MigrationState *s,
+>                                     QIOChannel *ioc,
+>                                     const char *hostname,
+> diff --git a/migration/Makefile.objs b/migration/Makefile.objs
+> index 00a3f4a..4e8ab0a 100644
+> --- a/migration/Makefile.objs
+> +++ b/migration/Makefile.objs
+> @@ -1,5 +1,5 @@
+>  common-obj-y += migration.o socket.o fd.o exec.o
+> -common-obj-y += tls.o
+> +common-obj-y += tls.o channel.o
+>  common-obj-y += colo-comm.o colo.o colo-failover.o
+>  common-obj-y += vmstate.o page_cache.o
+>  common-obj-y += qemu-file.o
+> diff --git a/migration/channel.c b/migration/channel.c
+> new file mode 100644
+> index 0000000..f50267a
+> --- /dev/null
+> +++ b/migration/channel.c
+> @@ -0,0 +1,69 @@
+> +/*
+> + * QEMU live migration channel operations
+> + *
+> + * Copyright Red Hat, Inc. 2016
+> + *
+> + * Authors:
+> + *  Daniel P. Berrange <berrange@redhat.com>
+> + *
+> + * This work is licensed under the terms of the GNU GPL, version 2.  See
+> + * the COPYING file in the top-level directory.
+> + *
+> + * Contributions after 2012-01-13 are licensed under the terms of the
+> + * GNU GPL, version 2 or (at your option) any later version.
+> + */
 
- =20
-| =20
-|  =20
-|  =20
-|   |    |
+OK, better - but...  isn't all this after 2012?
+Since it is I think you need the header that says it's v2 or later
+(e.g. the one on migration/page_cache.c )
 
-   |
+But just get Dan to agree.
 
-  |
-| =20
-|    | =20
-0001-PATCH-V-2-GDummyPanel-Fix-formatingissues.patch
- Shared with Dropbox  |   |
+Other than that I'm happy.
 
-  |
+Dave
 
-  |
-
-=20
-
-
-Then set about getting the upgrades from Andrew Baumann in.
-Then prepare an RFC for the=C2=A0 protocol used by GDummyPanel taking into =
-account any feed pack on the prototype/proof of concept/risk reduction in t=
-he patch.
-
- =20
-| =20
-|  =20
-|  =20
-|   |    |
-
-   |
-
-  |
-| =20
-|    | =20
-flypie/GDummyPanel
- GDummyPanel - The Client App which links to the Raspi to help simulate GPI=
-O  |   |
-
-  |
-
-  |
-
-=20
-=C2=A0John BradleyTel: 07896 839635Skype: flypie125 125B Grove StreetEdge H=
-ill Liverpool L7 7AF=20
-
-    On Thursday, 18 May 2017, 8:47, Markus Armbruster <armbru@redhat.com> w=
-rote:
-=20
-
- IANAL, this wouldn't be legal advice even if I was one, yadda, yadda,
-here goes anyway:
-
-Eric Blake <eblake@redhat.com> writes:
-
-> On 05/17/2017 04:25 PM, John Bradley wrote:
->> Well unfortunately Eric. I don't understand your "top posted" slang.
->
-> To learn what top-posting is:
-> http://lmgtfy.com/?q=3Dwhat+is+top-posting
->
-> and why we don't like it on technical lists:
-> http://www.caliburn.nl/topposting.html
->
-> Or more humorously:
-
-Seconded.
-
-> A: Yes.
->> >Q: Are you sure?
->>> >>A: Because it reverses the logical flow of conversation.
->>>> >>>Q: Why is top posting frowned upon?
->
->>=20
->> As for his "intent", it is quite irrelevant as I have gone over the code=
- line by line and what every he intended to do, he has succeed, as far as I=
- can tell , in matching you standards, to such an extent that I am happy th=
-at=20
->
-> You are correct that the GPL gives us legal rights to use Andrew's code
-> without his permission.=C2=A0 And yes, YOU can fork qemu, and take whatev=
-er
-> GPL patches you want without attribution, and you are probably still
-> just fine legally (as long as you still abide by the GPL in that you
-> distribute sources to anyone that has your binary).
->
-> But our project rules do not allow us to live by just GPL (in part,
-> because the license of qemu is sometimes tricky to determine due to a
-> mix of GPLv2-only code and non-GPL code, even though most new code is
-> GPLv2+).=C2=A0 Also, if we ever had a reason to change license (supposing=
- it
-> is even possible, although it might require ripping out or
-> reimplementing portions of the code base), having S-o-b means that we
-> cannot be accused of applying a license that someone did not agree to.
->
-> Therefore, it is easier, pragmatically, even if not legally necessary,
-> to enforce proper chain of authorship by getting Signed-off-by: tags on
-> ALL patches, especially where a patch asserts a copyright owner, insofar
-> as the original copyright owner is still alive and able to assent to the
-> action.=C2=A0 It is not just about legalities, it is also about risk-avoi=
-dance.
->
-> It may sound like we are being hard-nosed (and so be it), but there's a
-> reason that we list proper Signed-off-by: rules as our number 1 item on
-> the SubmitAPatch page.
-> http://wiki.qemu.org/Contribute/SubmitAPatch
-
-Yes, we require patch submitters to provide their Signed-off-by.
-
-We encourage documenting a patch's provenance in full by having every
-author provide their S-o-b, whenever practical.=C2=A0 But we don't require
-it.
-
-The core purpose of the S-o-b is "to improve tracking of who did what"
-by making patch authors formally certify that they "wrote it or
-otherwise have the right to pass it on as a open-source patch"[2].=C2=A0 No=
-te
-"improve" and "have the right to pass it on".
-
-One of the (many) reasons we're making software free is to help our
-neighbor[1] by letting him use our creation on a quid pro quo basis.
-Always requiring all author's S-o-b could make incorporating otherwise
-free code impractical, and thus would conflict with this mission.
-
-When obtaining an S-o-b is impractical, documenting provenance in other
-ways has to do.
-
-John wrote upthread:
-
-=C2=A0 =C2=A0 Andrew Baumann has and others have release the code under GNU
-=C2=A0 =C2=A0 General Public License version 2 (GPLv2), the same as QEMU th=
-at
-=C2=A0 =C2=A0 allows me to added it to QEMU as it is under the same license=
-, by
-=C2=A0 =C2=A0 signing it off this is what I am certifying.
-
-I agree with the reasoning "if free software compatible with the GPLv2,
-then I can incorporate it into QEMU as long as I certify by signing
-off".
-
-John, thank you for your contribution to QEMU.=C2=A0 I'm sorry your patch g=
-ot
-side-tracked into this non-technical swamp, and hope you understand why
-we're rather careful when it comes to protecting the freedom of our
-software.=C2=A0 I futher hope that we can put than behind us (along with
-top-posting *grin*), and move on to the fun part.
-
-
-[1] See "The four essential freedoms"
-https://www.gnu.org/philosophy/free-sw.en.html
-[2] https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/plai=
-n/Documentation/process/submitting-patches.rst
-
-
-  =20
+> +#include "qemu/osdep.h"
+> +#include "channel.h"
+> +#include "migration/migration.h"
+> +#include "trace.h"
+> +#include "qapi/error.h"
+> +#include "io/channel-tls.h"
+> +
+> +void migration_channel_process_incoming(MigrationState *s,
+> +                                        QIOChannel *ioc)
+> +{
+> +    trace_migration_set_incoming_channel(
+> +        ioc, object_get_typename(OBJECT(ioc)));
+> +
+> +    if (s->parameters.tls_creds &&
+> +        *s->parameters.tls_creds &&
+> +        !object_dynamic_cast(OBJECT(ioc),
+> +                             TYPE_QIO_CHANNEL_TLS)) {
+> +        Error *local_err = NULL;
+> +        migration_tls_channel_process_incoming(s, ioc, &local_err);
+> +        if (local_err) {
+> +            error_report_err(local_err);
+> +        }
+> +    } else {
+> +        QEMUFile *f = qemu_fopen_channel_input(ioc);
+> +        migration_fd_process_incoming(f);
+> +    }
+> +}
+> +
+> +
+> +void migration_channel_connect(MigrationState *s,
+> +                               QIOChannel *ioc,
+> +                               const char *hostname)
+> +{
+> +    trace_migration_set_outgoing_channel(
+> +        ioc, object_get_typename(OBJECT(ioc)), hostname);
+> +
+> +    if (s->parameters.tls_creds &&
+> +        *s->parameters.tls_creds &&
+> +        !object_dynamic_cast(OBJECT(ioc),
+> +                             TYPE_QIO_CHANNEL_TLS)) {
+> +        Error *local_err = NULL;
+> +        migration_tls_channel_connect(s, ioc, hostname, &local_err);
+> +        if (local_err) {
+> +            migrate_fd_error(s, local_err);
+> +            error_free(local_err);
+> +        }
+> +    } else {
+> +        QEMUFile *f = qemu_fopen_channel_output(ioc);
+> +
+> +        s->to_dst_file = f;
+> +
+> +        migrate_fd_connect(s);
+> +    }
+> +}
+> diff --git a/migration/channel.h b/migration/channel.h
+> new file mode 100644
+> index 0000000..2e0a7e3
+> --- /dev/null
+> +++ b/migration/channel.h
+> @@ -0,0 +1,27 @@
+> +/*
+> + * QEMU live migration channel operations
+> + *
+> + * Copyright Red Hat, Inc. 2016
+> + *
+> + * Authors:
+> + *  Daniel P. Berrange <berrange@redhat.com>
+> + *
+> + * This work is licensed under the terms of the GNU GPL, version 2.  See
+> + * the COPYING file in the top-level directory.
+> + *
+> + * Contributions after 2012-01-13 are licensed under the terms of the
+> + * GNU GPL, version 2 or (at your option) any later version.
+> + */
+> +
+> +#ifndef QEMU_MIGRATION_CHANNEL_H
+> +#define QEMU_MIGRATION_CHANNEL_H
+> +
+> +#include "io/channel.h"
+> +
+> +void migration_channel_process_incoming(MigrationState *s,
+> +                                        QIOChannel *ioc);
+> +
+> +void migration_channel_connect(MigrationState *s,
+> +                               QIOChannel *ioc,
+> +                               const char *hostname);
+> +#endif
+> diff --git a/migration/exec.c b/migration/exec.c
+> index aba9089..57a9335 100644
+> --- a/migration/exec.c
+> +++ b/migration/exec.c
+> @@ -20,6 +20,7 @@
+>  #include "qemu/osdep.h"
+>  #include "qapi/error.h"
+>  #include "qemu-common.h"
+> +#include "channel.h"
+>  #include "migration/migration.h"
+>  #include "io/channel-command.h"
+>  #include "trace.h"
+> diff --git a/migration/fd.c b/migration/fd.c
+> index 58cb51a..05e0a5c 100644
+> --- a/migration/fd.c
+> +++ b/migration/fd.c
+> @@ -17,6 +17,7 @@
+>  #include "qemu/osdep.h"
+>  #include "qapi/error.h"
+>  #include "qemu-common.h"
+> +#include "channel.h"
+>  #include "migration/migration.h"
+>  #include "monitor/monitor.h"
+>  #include "io/channel-util.h"
+> diff --git a/migration/migration.c b/migration/migration.c
+> index 2feeee8..217616d 100644
+> --- a/migration/migration.c
+> +++ b/migration/migration.c
+> @@ -444,56 +444,6 @@ void migration_fd_process_incoming(QEMUFile *f)
+>      qemu_coroutine_enter(co);
+>  }
+>  
+> -
+> -void migration_channel_process_incoming(MigrationState *s,
+> -                                        QIOChannel *ioc)
+> -{
+> -    trace_migration_set_incoming_channel(
+> -        ioc, object_get_typename(OBJECT(ioc)));
+> -
+> -    if (s->parameters.tls_creds &&
+> -        *s->parameters.tls_creds &&
+> -        !object_dynamic_cast(OBJECT(ioc),
+> -                             TYPE_QIO_CHANNEL_TLS)) {
+> -        Error *local_err = NULL;
+> -        migration_tls_channel_process_incoming(s, ioc, &local_err);
+> -        if (local_err) {
+> -            error_report_err(local_err);
+> -        }
+> -    } else {
+> -        QEMUFile *f = qemu_fopen_channel_input(ioc);
+> -        migration_fd_process_incoming(f);
+> -    }
+> -}
+> -
+> -
+> -void migration_channel_connect(MigrationState *s,
+> -                               QIOChannel *ioc,
+> -                               const char *hostname)
+> -{
+> -    trace_migration_set_outgoing_channel(
+> -        ioc, object_get_typename(OBJECT(ioc)), hostname);
+> -
+> -    if (s->parameters.tls_creds &&
+> -        *s->parameters.tls_creds &&
+> -        !object_dynamic_cast(OBJECT(ioc),
+> -                             TYPE_QIO_CHANNEL_TLS)) {
+> -        Error *local_err = NULL;
+> -        migration_tls_channel_connect(s, ioc, hostname, &local_err);
+> -        if (local_err) {
+> -            migrate_fd_error(s, local_err);
+> -            error_free(local_err);
+> -        }
+> -    } else {
+> -        QEMUFile *f = qemu_fopen_channel_output(ioc);
+> -
+> -        s->to_dst_file = f;
+> -
+> -        migrate_fd_connect(s);
+> -    }
+> -}
+> -
+> -
+>  /*
+>   * Send a message on the return channel back to the source
+>   * of the migration.
+> diff --git a/migration/socket.c b/migration/socket.c
+> index 1cfbe81..53f9d61 100644
+> --- a/migration/socket.c
+> +++ b/migration/socket.c
+> @@ -19,6 +19,7 @@
+>  #include "qemu-common.h"
+>  #include "qemu/error-report.h"
+>  #include "qapi/error.h"
+> +#include "channel.h"
+>  #include "migration/migration.h"
+>  #include "migration/qemu-file.h"
+>  #include "io/channel-socket.h"
+> diff --git a/migration/tls.c b/migration/tls.c
+> index a33ecb7..34ad121 100644
+> --- a/migration/tls.c
+> +++ b/migration/tls.c
+> @@ -19,6 +19,7 @@
+>   */
+>  
+>  #include "qemu/osdep.h"
+> +#include "channel.h"
+>  #include "migration/migration.h"
+>  #include "io/channel-tls.h"
+>  #include "crypto/tlscreds.h"
+> -- 
+> 2.9.3
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
