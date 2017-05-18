@@ -1,35 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44790)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44844)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <danielhb@linux.vnet.ibm.com>) id 1dBS9d-0002Wz-1H
-	for qemu-devel@nongnu.org; Thu, 18 May 2017 16:36:14 -0400
+	(envelope-from <danielhb@linux.vnet.ibm.com>) id 1dBS9g-0002YV-Hm
+	for qemu-devel@nongnu.org; Thu, 18 May 2017 16:36:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <danielhb@linux.vnet.ibm.com>) id 1dBS9Y-0005su-0g
-	for qemu-devel@nongnu.org; Thu, 18 May 2017 16:36:13 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:47245)
+	(envelope-from <danielhb@linux.vnet.ibm.com>) id 1dBS9d-0005ui-FM
+	for qemu-devel@nongnu.org; Thu, 18 May 2017 16:36:16 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:54050)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <danielhb@linux.vnet.ibm.com>)
-	id 1dBS9X-0005sa-NA
-	for qemu-devel@nongnu.org; Thu, 18 May 2017 16:36:07 -0400
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
+	id 1dBS9d-0005uT-5h
+	for qemu-devel@nongnu.org; Thu, 18 May 2017 16:36:13 -0400
+Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
 	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v4IKYQWX115945
-	for <qemu-devel@nongnu.org>; Thu, 18 May 2017 16:36:06 -0400
-Received: from e24smtp04.br.ibm.com (e24smtp04.br.ibm.com [32.104.18.25])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2ahd7pyyge-1
+	v4IKY4jt083312
+	for <qemu-devel@nongnu.org>; Thu, 18 May 2017 16:36:11 -0400
+Received: from e24smtp05.br.ibm.com (e24smtp05.br.ibm.com [32.104.18.26])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2ahh6vv2m1-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Thu, 18 May 2017 16:36:05 -0400
+	for <qemu-devel@nongnu.org>; Thu, 18 May 2017 16:36:11 -0400
 Received: from localhost
-	by e24smtp04.br.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	by e24smtp05.br.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
 	Only! Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <danielhb@linux.vnet.ibm.com>;
-	Thu, 18 May 2017 17:36:03 -0300
+	Thu, 18 May 2017 17:36:08 -0300
 From: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
-Date: Thu, 18 May 2017 17:35:44 -0300
+Date: Thu, 18 May 2017 17:35:46 -0300
 In-Reply-To: <20170518203548.14207-1-danielhb@linux.vnet.ibm.com>
 References: <20170518203548.14207-1-danielhb@linux.vnet.ibm.com>
-Message-Id: <20170518203548.14207-2-danielhb@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH v10 1/5] hw/ppc/spapr.c: adding
- pending_dimm_unplugs to sPAPRMachineState
+Message-Id: <20170518203548.14207-4-danielhb@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [PATCH v10 3/5] hw/ppc: migrating the DRC state of
+ hotplugged devices
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -41,163 +41,125 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-ppc@nongnu.org, david@gibson.dropbear.id.au, mdroth@linux.vnet.ibm.com
 
-The LMB DRC release callback, spapr_lmb_release(), uses an opaque
-parameter, a sPAPRDIMMState struct that stores the current LMBs that
-are allocated to a DIMM (nr_lmbs). After each call to this callback,
-the nr_lmbs is decremented by one and, when it reaches zero, the callback
-proceeds with the qdev calls to hot unplug the LMB.
+In pseries, a firmware abstraction called Dynamic Reconfiguration
+Connector (DRC) is used to assign a particular dynamic resource
+to the guest and provide an interface to manage configuration/removal
+of the resource associated with it. In other words, DRC is the
+'plugged state' of a device.
 
-Using drc->detach_cb_opaque is problematic because it can't be migrated in
-the future DRC migration work. This patch makes the following changes to
-eliminate the usage of this opaque callback inside spapr_lmb_release:
+Before this patch, DRC wasn't being migrated. This causes
+post-migration problems due to DRC state mismatch between source and
+target. The DRC state of a device X in the source might
+change, while in the target the DRC state of X is still fresh. When
+migrating the guest, X will not have the same hotplugged state as it
+did in the source. This means that we can't hot unplug X in the
+target after migration is completed because its DRC state is not consistent.
+https://bugs.launchpad.net/ubuntu/+source/qemu/+bug/1677552 is one
+bug that is caused by this DRC state mismatch between source and
+target.
 
-- sPAPRDIMMState was moved from spapr.c and added to spapr.h. A new
-attribute called 'addr' was added to it. This is used as an unique
-identifier to associate a sPAPRDIMMState to a PCDIMM element.
+To migrate the DRC state, we defined the VMStateDescription struct for
+spapr_drc to enable the transmission of spapr_drc state in migration.
+Not all the elements in the DRC state are migrated - only those
+that can be modified by guest actions or device add/remove
+operations:
 
-- sPAPRMachineState now hosts a new QTAILQ called 'pending_dimm_unplugs'.
-This queue of sPAPRDIMMState elements will store the DIMM state of DIMMs
-that are currently going under an unplug process.
+- 'isolation_state', 'allocation_state' and 'indicator_state'
+are involved in the DR state transition diagram from
+PAPR+ 2.7, 13.4;
 
-- spapr_lmb_release() will now retrieve the nr_lmbs value by getting the
-correspondent sPAPRDIMMState. A helper function called spapr_dimm_get_address
-was created to fetch the address of a PCDIMM device inside spapr_lmb_release.
-When nr_lmbs reaches zero and the callback proceeds with the qdev hot unplug
-calls, the sPAPRDIMMState struct is removed from spapr->pending_dimm_unplugs.
+- 'configured', 'signalled', 'awaiting_release' and 'awaiting_allocation'
+are needed in attaching and detaching devices;
 
-After these changes, the opaque argument for spapr_lmb_release is now
-unused and is passed as NULL inside spapr_del_lmbs. This and the other
-opaque arguments can now be safely removed from the code.
+- 'indicator_state' provides users with hardware state information.
+
+These are the DRC elements that are migrated.
+
+In this patch the DRC state is migrated for PCI, LMB and CPU
+connector types. At this moment there is no support to migrate
+DRC for the PHB (PCI Host Bridge) type.
+
+In the 'realize' function the DRC is registered using vmstate_register,
+similar to what hw/ppc/spapr_iommu.c does in 'spapr_tce_table_realize'.
+This approach works because  DRCs are bus-less and do not sit
+on a BusClass that implements bc->get_dev_path, so as a fallback the
+VMSD gets identified via "spapr_drc"/get_index(drc).
 
 Signed-off-by: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
 ---
- hw/ppc/spapr.c         | 57 +++++++++++++++++++++++++++++++++++++++++++++-----
- include/hw/ppc/spapr.h |  4 ++++
- 2 files changed, 56 insertions(+), 5 deletions(-)
+ hw/ppc/spapr_drc.c | 53 +++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 53 insertions(+)
 
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index 0980d73..b05abe5 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -2050,6 +2050,7 @@ static void ppc_spapr_init(MachineState *machine)
-     msi_nonbroken = true;
- 
-     QLIST_INIT(&spapr->phbs);
-+    QTAILQ_INIT(&spapr->pending_dimm_unplugs);
- 
-     /* Allocate RMA if necessary */
-     rma_alloc_size = kvmppc_alloc_rma(&rma);
-@@ -2603,20 +2604,63 @@ out:
-     error_propagate(errp, local_err);
+diff --git a/hw/ppc/spapr_drc.c b/hw/ppc/spapr_drc.c
+index 976f71f..3c3e9e9 100644
+--- a/hw/ppc/spapr_drc.c
++++ b/hw/ppc/spapr_drc.c
+@@ -519,6 +519,57 @@ static void reset(DeviceState *d)
+     }
  }
  
--typedef struct sPAPRDIMMState {
-+struct sPAPRDIMMState {
-+    uint64_t addr;
-     uint32_t nr_lmbs;
--} sPAPRDIMMState;
-+    QTAILQ_ENTRY(sPAPRDIMMState) next;
++static bool spapr_drc_needed(void *opaque)
++{
++    sPAPRDRConnector *drc = (sPAPRDRConnector *)opaque;
++    sPAPRDRConnectorClass *drck = SPAPR_DR_CONNECTOR_GET_CLASS(drc);
++    bool rc = false;
++    sPAPRDREntitySense value;
++    drck->entity_sense(drc, &value);
++
++    /* If no dev is plugged in there is no need to migrate the DRC state */
++    if (value != SPAPR_DR_ENTITY_SENSE_PRESENT) {
++        return false;
++    }
++
++    /*
++     * If there is dev plugged in, we need to migrate the DRC state when
++     * it is different from cold-plugged state
++     */
++    switch (drc->type) {
++    case SPAPR_DR_CONNECTOR_TYPE_PCI:
++        rc = !((drc->isolation_state == SPAPR_DR_ISOLATION_STATE_UNISOLATED) &&
++               (drc->allocation_state == SPAPR_DR_ALLOCATION_STATE_USABLE) &&
++               drc->configured && drc->signalled && !drc->awaiting_release);
++        return rc;
++    case SPAPR_DR_CONNECTOR_TYPE_CPU:
++    case SPAPR_DR_CONNECTOR_TYPE_LMB:
++        rc = !((drc->isolation_state == SPAPR_DR_ISOLATION_STATE_ISOLATED) &&
++               (drc->allocation_state == SPAPR_DR_ALLOCATION_STATE_UNUSABLE) &&
++               drc->configured && drc->signalled && !drc->awaiting_release);
++        return rc;
++    default:
++        g_assert(false);
++    }
++}
++
++static const VMStateDescription vmstate_spapr_drc = {
++    .name = "spapr_drc",
++    .version_id = 1,
++    .minimum_version_id = 1,
++    .needed = spapr_drc_needed,
++    .fields  = (VMStateField []) {
++        VMSTATE_UINT32(isolation_state, sPAPRDRConnector),
++        VMSTATE_UINT32(allocation_state, sPAPRDRConnector),
++        VMSTATE_UINT32(indicator_state, sPAPRDRConnector),
++        VMSTATE_BOOL(configured, sPAPRDRConnector),
++        VMSTATE_BOOL(awaiting_release, sPAPRDRConnector),
++        VMSTATE_BOOL(awaiting_allocation, sPAPRDRConnector),
++        VMSTATE_BOOL(signalled, sPAPRDRConnector),
++        VMSTATE_END_OF_LIST()
++    }
 +};
 +
-+static sPAPRDIMMState *spapr_pending_dimm_unplugs_find(sPAPRMachineState *s,
-+                                                       uint64_t addr)
-+{
-+    sPAPRDIMMState *dimm_state = NULL;
-+    QTAILQ_FOREACH(dimm_state, &s->pending_dimm_unplugs, next) {
-+        if (dimm_state->addr == addr) {
-+            break;
-+        }
-+    }
-+    return dimm_state;
-+}
-+
-+static void spapr_pending_dimm_unplugs_add(sPAPRMachineState *spapr,
-+                                           sPAPRDIMMState *dimm_state)
-+{
-+    g_assert(!spapr_pending_dimm_unplugs_find(spapr, dimm_state->addr));
-+    QTAILQ_INSERT_HEAD(&spapr->pending_dimm_unplugs, dimm_state, next);
-+}
-+
-+static void spapr_pending_dimm_unplugs_remove(sPAPRMachineState *spapr,
-+                                              sPAPRDIMMState *dimm_state)
-+{
-+    QTAILQ_REMOVE(&spapr->pending_dimm_unplugs, dimm_state, next);
-+    g_free(dimm_state);
-+}
-+
-+static uint64_t spapr_dimm_get_address(PCDIMMDevice *dimm)
-+{
-+    Error *local_err = NULL;
-+    uint64_t addr;
-+    addr = object_property_get_int(OBJECT(dimm), PC_DIMM_ADDR_PROP,
-+                                   &local_err);
-+    if (local_err) {
-+        error_propagate(&error_abort, local_err);
-+        return 0;
-+    }
-+    return addr;
-+}
- 
- static void spapr_lmb_release(DeviceState *dev, void *opaque)
+ static void realize(DeviceState *d, Error **errp)
  {
--    sPAPRDIMMState *ds = (sPAPRDIMMState *)opaque;
-     HotplugHandler *hotplug_ctrl;
-+    uint64_t addr = spapr_dimm_get_address(PC_DIMM(dev));
-+    sPAPRMachineState *spapr = SPAPR_MACHINE(qdev_get_machine());
-+    sPAPRDIMMState *ds = spapr_pending_dimm_unplugs_find(spapr, addr);
- 
-     if (--ds->nr_lmbs) {
-         return;
+     sPAPRDRConnector *drc = SPAPR_DR_CONNECTOR(d);
+@@ -547,6 +598,8 @@ static void realize(DeviceState *d, Error **errp)
+         object_unref(OBJECT(drc));
      }
+     g_free(child_name);
++    vmstate_register(DEVICE(drc), drck->get_index(drc), &vmstate_spapr_drc,
++                     drc);
+     trace_spapr_drc_realize_complete(drck->get_index(drc));
+ }
  
--    g_free(ds);
-+    spapr_pending_dimm_unplugs_remove(spapr, ds);
- 
-     /*
-      * Now that all the LMBs have been removed by the guest, call the
-@@ -2633,17 +2677,20 @@ static void spapr_del_lmbs(DeviceState *dev, uint64_t addr_start, uint64_t size,
-     sPAPRDRConnectorClass *drck;
-     uint32_t nr_lmbs = size / SPAPR_MEMORY_BLOCK_SIZE;
-     int i;
-+    sPAPRMachineState *spapr = SPAPR_MACHINE(qdev_get_machine());
-     sPAPRDIMMState *ds = g_malloc0(sizeof(sPAPRDIMMState));
-     uint64_t addr = addr_start;
- 
-     ds->nr_lmbs = nr_lmbs;
-+    ds->addr = addr_start;
-+    spapr_pending_dimm_unplugs_add(spapr, ds);
-     for (i = 0; i < nr_lmbs; i++) {
-         drc = spapr_dr_connector_by_id(SPAPR_DR_CONNECTOR_TYPE_LMB,
-                 addr / SPAPR_MEMORY_BLOCK_SIZE);
-         g_assert(drc);
- 
-         drck = SPAPR_DR_CONNECTOR_GET_CLASS(drc);
--        drck->detach(drc, dev, spapr_lmb_release, ds, errp);
-+        drck->detach(drc, dev, spapr_lmb_release, NULL, errp);
-         addr += SPAPR_MEMORY_BLOCK_SIZE;
-     }
- 
-diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
-index 5802f88..9823296 100644
---- a/include/hw/ppc/spapr.h
-+++ b/include/hw/ppc/spapr.h
-@@ -32,6 +32,7 @@ struct sPAPRRTCState {
-     int64_t ns_offset;
- };
- 
-+typedef struct sPAPRDIMMState sPAPRDIMMState;
- typedef struct sPAPRMachineClass sPAPRMachineClass;
- 
- #define TYPE_SPAPR_MACHINE      "spapr-machine"
-@@ -104,6 +105,9 @@ struct sPAPRMachineState {
-     /* RTAS state */
-     QTAILQ_HEAD(, sPAPRConfigureConnectorState) ccs_list;
- 
-+    /* pending DIMM unplug queue */
-+    QTAILQ_HEAD(, sPAPRDIMMState) pending_dimm_unplugs;
-+
-     /*< public >*/
-     char *kvm_type;
-     MemoryHotplugState hotplug_memory;
 -- 
 2.9.4
