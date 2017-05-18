@@ -1,29 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44697)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45839)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pradeep.jagadeesh@huawei.com>) id 1dBLWU-0002H9-B3
-	for qemu-devel@nongnu.org; Thu, 18 May 2017 09:31:23 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1dBLb6-0004It-T2
+	for qemu-devel@nongnu.org; Thu, 18 May 2017 09:36:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pradeep.jagadeesh@huawei.com>) id 1dBLWR-00079X-60
-	for qemu-devel@nongnu.org; Thu, 18 May 2017 09:31:22 -0400
-Received: from lhrrgout.huawei.com ([194.213.3.17]:13417)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <pradeep.jagadeesh@huawei.com>) id 1dBLWQ-00079F-Re
-	for qemu-devel@nongnu.org; Thu, 18 May 2017 09:31:19 -0400
-References: <1494405683-20877-1-git-send-email-pradeep.jagadeesh@huawei.com>
-	<1494405683-20877-5-git-send-email-pradeep.jagadeesh@huawei.com>
-	<6a035cd9-34f9-c1f5-e986-404daf941641@redhat.com>
-	<57a24e21-0864-16d3-1bce-ad801875ea9f@huawei.com>
-	<2c0e99ce-f3cb-90e8-baed-8fad9d39455b@redhat.com>
-	<20170517182938.0c7f366e@bahia.lan>
-	<6df407d5-4145-2e90-a7eb-b047819ceb75@redhat.com>
-From: Pradeep Jagadeesh <pradeep.jagadeesh@huawei.com>
-Message-ID: <e1d5b2d3-bfe7-4fac-03f7-bbfbd5de10fe@huawei.com>
-Date: Thu, 18 May 2017 15:30:06 +0200
+	(envelope-from <pbonzini@redhat.com>) id 1dBLb3-0000DZ-MK
+	for qemu-devel@nongnu.org; Thu, 18 May 2017 09:36:08 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47163)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1dBLb3-0000D9-CO
+	for qemu-devel@nongnu.org; Thu, 18 May 2017 09:36:05 -0400
+References: <20170512122158.32032-1-kraxel@redhat.com>
+	<20170512122158.32032-7-kraxel@redhat.com>
+	<a4f99c9b-1fb4-8a0c-ec3b-0cadc7dfd382@redhat.com>
+	<728dca25-a9ef-a061-dee7-c5b4309ca8dc@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <6d9941a5-268c-9bc2-4122-64f023dfaa51@redhat.com>
+Date: Thu, 18 May 2017 15:35:58 +0200
 MIME-Version: 1.0
-In-Reply-To: <6df407d5-4145-2e90-a7eb-b047819ceb75@redhat.com>
-Content-Type: text/plain; charset="utf-8"; format=flowed
+In-Reply-To: <728dca25-a9ef-a061-dee7-c5b4309ca8dc@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v4 4/4] fsdev: QMP interface for throttling
+Subject: Re: [Qemu-devel] [PULL 6/6] hw/usb/dev-serial: Do not try to set
+ vendorid or productid properties
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,50 +31,93 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, Greg Kurz <groug@kaod.org>
-Cc: Pradeep Jagadeesh <pradeepkiruvale@gmail.com>, alberto garcia <berto@igalia.com>, jani kokkonen <jani.kokkonen@huawei.com>, qemu-devel@nongnu.org
+To: Thomas Huth <thuth@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org
+Cc: Samuel Thibault <samuel.thibault@ens-lyon.org>
 
-On 5/17/2017 7:09 PM, Eric Blake wrote:
-> On 05/17/2017 11:29 AM, Greg Kurz wrote:
->
->>>
->>> First point: is fsdev a Linux-only feature, or can it be compiled on
->>> BSD?  If it is Linux-only, then compiling a stub for Windows will still
->>> leave BSD broken, and your #ifdef is wrong.  Fixing compilation on mingw
->>> is nice, but not the only platform to worry about.
->>>
->>
->> fsdev compilation currently depends on CONFIG_VIRTFS which is a Linux-only
->> feature for the moment. There was a tentative to support it on Windows hosts
->> two years ago but it stayed at the RFC stage.
->>
->> But even on Linux hosts, the current fsdev implementation also depends on
->> the target supporting PCI and VIRTIO. We have a fsdev/qemu-fsdev-dummy.c
->> file to put stubs so that we don't pull all the code for such targets.
->>
->> Maybe this could be reused for the above stubs as well ?
->
-> That helps.  The stub should live in qemu-fsdev-dummy.c (where it
-> shouldn't need any #ifdef, because that file is only compiled when the
-> condition is false), and...
->
->>
->>> Second point: if fsdev is indeed a platform-specific feature, then we
->>> don't want to advertise the QMP commands that are useless when running
->>> on a platform that doesn't support it. Anywhere you have to add a stub
->>> for compilation means you ALSO need to patch monitor.c to unregister the
->>> command from being advertised as a valid QMP command.  (If you used
->>> #ifdef __LINUX__ to guard the working version, and #ifndef __LINUX__ to
->>> declare the stub, then the monitor.c needs an #ifndef section within
->>> qmp_unregister_commands_hack() to tell QMP to not advertise the stubs.)
->
-> monitor.c should wrap the unregister under #ifndef CONFIG_VIRTFS (rather
-> than a particular platform name).
-I did unregister the functions as mentioned above in monitor.c. But it 
-does not address the issue when I run "make docker-test-mingw@fedora".
-I think the VIRTFS is still enabled.
-Only having dummy functions even in qmp.c addresses the issue.
 
-Regards,
-Pradeep
->
+
+On 18/05/2017 15:22, Thomas Huth wrote:
+> On 18.05.2017 14:00, Paolo Bonzini wrote:
+>>
+>>
+>> On 12/05/2017 14:21, Gerd Hoffmann wrote:
+>>> From: Thomas Huth <thuth@redhat.com>
+>>>
+>>> When starting QEMU with the legacy USB serial device like this:
+>>>
+>>>  qemu-system-x86_64 -usbdevice serial:vendorid=0x1234:stdio
+>>>
+>>> it currently aborts since the vendorid property does not exist
+>>> anymore (it has been removed by commit f29783f72ea77dfbd7ea0c9):
+>>>
+>>>  Unexpected error in object_property_find() at qemu/qom/object.c:1008:
+>>>  qemu-system-x86_64: -usbdevice serial:vendorid=0x1234:stdio: Property
+>>>                      '.vendorid' not found
+>>>  Aborted (core dumped)
+>>>
+>>> Fix this crash by issuing a more friendly error message instead
+>>> (and simplify the code also a little bit this way).
+>>>
+>>> Signed-off-by: Thomas Huth <thuth@redhat.com>
+>>> Message-id: 1493883704-27604-1-git-send-email-thuth@redhat.com
+>>> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+>>> ---
+>>>  hw/usb/dev-serial.c | 24 ++++++------------------
+>>>  1 file changed, 6 insertions(+), 18 deletions(-)
+>>>
+>>> diff --git a/hw/usb/dev-serial.c b/hw/usb/dev-serial.c
+>>> index 6d5137383b..83a4f0e6fb 100644
+>>> --- a/hw/usb/dev-serial.c
+>>> +++ b/hw/usb/dev-serial.c
+>>> @@ -513,27 +513,18 @@ static USBDevice *usb_serial_init(USBBus *bus, const char *filename)
+>>>  {
+>>>      USBDevice *dev;
+>>>      Chardev *cdrv;
+>>> -    uint32_t vendorid = 0, productid = 0;
+>>>      char label[32];
+>>>      static int index;
+>>>  
+>>>      while (*filename && *filename != ':') {
+>>>          const char *p;
+>>> -        char *e;
+>>> +
+>>>          if (strstart(filename, "vendorid=", &p)) {
+>>> -            vendorid = strtol(p, &e, 16);
+>>> -            if (e == p || (*e && *e != ',' && *e != ':')) {
+>>> -                error_report("bogus vendor ID %s", p);
+>>> -                return NULL;
+>>> -            }
+>>> -            filename = e;
+>>> +            error_report("vendorid is not supported anymore");
+>>> +            return NULL;
+>>>          } else if (strstart(filename, "productid=", &p)) {
+>>> -            productid = strtol(p, &e, 16);
+>>> -            if (e == p || (*e && *e != ',' && *e != ':')) {
+>>> -                error_report("bogus product ID %s", p);
+>>> -                return NULL;
+>>> -            }
+>>> -            filename = e;
+>>> +            error_report("productid is not supported anymore");
+>>> +            return NULL;
+>>>          } else {
+>>>              error_report("unrecognized serial USB option %s", filename);
+>>>              return NULL;
+>>
+>> All breanches of the "if" now return NULL, so the "while" loop in turn
+>> can become an
+>>
+>>     if (*filename && *filename != ':') {
+>>     }
+>>
+>> and the "while (*filename == ',')" subloop can go away, replaced by just
+>> "return NULL".
+>>
+>> Even better, the "if (!*filename)" if just below can be moved first.
+> 
+> Feel free to send an additional cleanup patch ... otherwise, I'd say let
+> it bitrot for another year and we then remove it completely together
+> with all the other "-usbdevice" functions...
+
+Well, Coverity reports it so I'd rather keep it clean...
+
+Paolo
