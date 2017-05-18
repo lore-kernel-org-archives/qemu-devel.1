@@ -1,28 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44496)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44697)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dBLVb-0001bS-H5
-	for qemu-devel@nongnu.org; Thu, 18 May 2017 09:30:28 -0400
+	(envelope-from <pradeep.jagadeesh@huawei.com>) id 1dBLWU-0002H9-B3
+	for qemu-devel@nongnu.org; Thu, 18 May 2017 09:31:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dBLVY-0006vE-BH
-	for qemu-devel@nongnu.org; Thu, 18 May 2017 09:30:27 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58812)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1dBLVY-0006v7-5Q
-	for qemu-devel@nongnu.org; Thu, 18 May 2017 09:30:24 -0400
-References: <1495107549-6097-1-git-send-email-thuth@redhat.com>
-	<aa39e27c-4ec0-6431-3fe6-3e3c761502a2@redhat.com>
-	<58434d0d-66f9-c86e-7f86-6b7437a21a24@redhat.com>
-	<20170518132025.xuqowm2q5rgshrva@aurel32.net>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <7633253d-d622-79eb-1825-1b77ba5e2d31@redhat.com>
+	(envelope-from <pradeep.jagadeesh@huawei.com>) id 1dBLWR-00079X-60
+	for qemu-devel@nongnu.org; Thu, 18 May 2017 09:31:22 -0400
+Received: from lhrrgout.huawei.com ([194.213.3.17]:13417)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
+	(envelope-from <pradeep.jagadeesh@huawei.com>) id 1dBLWQ-00079F-Re
+	for qemu-devel@nongnu.org; Thu, 18 May 2017 09:31:19 -0400
+References: <1494405683-20877-1-git-send-email-pradeep.jagadeesh@huawei.com>
+	<1494405683-20877-5-git-send-email-pradeep.jagadeesh@huawei.com>
+	<6a035cd9-34f9-c1f5-e986-404daf941641@redhat.com>
+	<57a24e21-0864-16d3-1bce-ad801875ea9f@huawei.com>
+	<2c0e99ce-f3cb-90e8-baed-8fad9d39455b@redhat.com>
+	<20170517182938.0c7f366e@bahia.lan>
+	<6df407d5-4145-2e90-a7eb-b047819ceb75@redhat.com>
+From: Pradeep Jagadeesh <pradeep.jagadeesh@huawei.com>
+Message-ID: <e1d5b2d3-bfe7-4fac-03f7-bbfbd5de10fe@huawei.com>
 Date: Thu, 18 May 2017 15:30:06 +0200
 MIME-Version: 1.0
-In-Reply-To: <20170518132025.xuqowm2q5rgshrva@aurel32.net>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+In-Reply-To: <6df407d5-4145-2e90-a7eb-b047819ceb75@redhat.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2] target/s390x: Add support for the TEST
- BLOCK instruction
+Subject: Re: [Qemu-devel] [PATCH v4 4/4] fsdev: QMP interface for throttling
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,57 +32,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Aurelien Jarno <aurelien@aurel32.net>
-Cc: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>
+To: Eric Blake <eblake@redhat.com>, Greg Kurz <groug@kaod.org>
+Cc: Pradeep Jagadeesh <pradeepkiruvale@gmail.com>, alberto garcia <berto@igalia.com>, jani kokkonen <jani.kokkonen@huawei.com>, qemu-devel@nongnu.org
 
-On 18.05.2017 15:20, Aurelien Jarno wrote:
-> On 2017-05-18 14:59, Thomas Huth wrote:
->> On 18.05.2017 14:23, David Hildenbrand wrote:
+On 5/17/2017 7:09 PM, Eric Blake wrote:
+> On 05/17/2017 11:29 AM, Greg Kurz wrote:
+>
 >>>
->>>> diff --git a/target/s390x/mem_helper.c b/target/s390x/mem_helper.c
->>>> index f6e5bce..de0ecd4 100644
->>>> --- a/target/s390x/mem_helper.c
->>>> +++ b/target/s390x/mem_helper.c
->>>> @@ -20,6 +20,7 @@
->>>>  
->>>>  #include "qemu/osdep.h"
->>>>  #include "cpu.h"
->>>> +#include "exec/address-spaces.h"
->>>>  #include "exec/helper-proto.h"
->>>>  #include "exec/exec-all.h"
->>>>  #include "exec/cpu_ldst.h"
->>>> @@ -973,6 +974,33 @@ void HELPER(stctl)(CPUS390XState *env, uint32_t r1, uint64_t a2, uint32_t r3)
->>>>      }
->>>>  }
->>>>  
->>>> +uint32_t HELPER(testblock)(CPUS390XState *env, uint64_t real_addr)
->>>> +{
->>>> +    CPUState *cs = CPU(s390_env_get_cpu(env));
->>>> +    uint64_t abs_addr;
->>>> +    int i;
->>>> +
+>>> First point: is fsdev a Linux-only feature, or can it be compiled on
+>>> BSD?  If it is Linux-only, then compiling a stub for Windows will still
+>>> leave BSD broken, and your #ifdef is wrong.  Fixing compilation on mingw
+>>> is nice, but not the only platform to worry about.
 >>>
->>> It is somewhat strange that we set a condition code in case of a program
->>> interrupt (I assume that's the magic of the return value?). But maybe
->>> setting the CC on program interrupts is perfectly valid.
 >>
->> According to the PoP:
+>> fsdev compilation currently depends on CONFIG_VIRTFS which is a Linux-only
+>> feature for the moment. There was a tentative to support it on Windows hosts
+>> two years ago but it stayed at the RFC stage.
 >>
->> "[...] The operation is ter-
->> minated on addressing and protection exceptions. If
->> termination occurs, the condition code and the con-
->> tents of bit positions 32-63 of general register 0 are
->> unpredictable in the 24-bit or 31-bit addressing
->> mode, or the condition code and bits 0-63 of the reg-
->> ister are unpredictable in the 64-bit addressing mode."
+>> But even on Linux hosts, the current fsdev implementation also depends on
+>> the target supporting PCI and VIRTIO. We have a fsdev/qemu-fsdev-dummy.c
+>> file to put stubs so that we don't pull all the code for such targets.
 >>
->> So setting CC=1 seems a valid behavior here ;-)
-> 
-> Actually program_interrupt will never return, so CC is left unchanged in
-> case of an exception. It's also matches the unpredictable value
-> described in the PoP ;-).
+>> Maybe this could be reused for the above stubs as well ?
+>
+> That helps.  The stub should live in qemu-fsdev-dummy.c (where it
+> shouldn't need any #ifdef, because that file is only compiled when the
+> condition is false), and...
+>
+>>
+>>> Second point: if fsdev is indeed a platform-specific feature, then we
+>>> don't want to advertise the QMP commands that are useless when running
+>>> on a platform that doesn't support it. Anywhere you have to add a stub
+>>> for compilation means you ALSO need to patch monitor.c to unregister the
+>>> command from being advertised as a valid QMP command.  (If you used
+>>> #ifdef __LINUX__ to guard the working version, and #ifndef __LINUX__ to
+>>> declare the stub, then the monitor.c needs an #ifndef section within
+>>> qmp_unregister_commands_hack() to tell QMP to not advertise the stubs.)
+>
+> monitor.c should wrap the unregister under #ifndef CONFIG_VIRTFS (rather
+> than a particular platform name).
+I did unregister the functions as mentioned above in monitor.c. But it 
+does not address the issue when I run "make docker-test-mingw@fedora".
+I think the VIRTFS is still enabled.
+Only having dummy functions even in qmp.c addresses the issue.
 
-Ah, right, program_interrupt() calls cpu_loop_exit() which in turn does
-the longjump ... makes more sense to me now, thanks for the hint!
-
- Thomas
+Regards,
+Pradeep
+>
