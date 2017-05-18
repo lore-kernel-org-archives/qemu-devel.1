@@ -1,22 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35828)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35914)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lvivier@redhat.com>) id 1dBG9s-0002ed-2f
-	for qemu-devel@nongnu.org; Thu, 18 May 2017 03:47:41 -0400
+	(envelope-from <armbru@redhat.com>) id 1dBGA2-0002tY-Oy
+	for qemu-devel@nongnu.org; Thu, 18 May 2017 03:47:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lvivier@redhat.com>) id 1dBG9o-0002Tb-4S
-	for qemu-devel@nongnu.org; Thu, 18 May 2017 03:47:40 -0400
-References: <20170518054522.13141-1-david@gibson.dropbear.id.au>
-	<20170518054522.13141-4-david@gibson.dropbear.id.au>
-From: Laurent Vivier <lvivier@redhat.com>
-Message-ID: <43cf4078-1362-dacd-2d38-461bf1d45aa1@redhat.com>
-Date: Thu, 18 May 2017 09:47:31 +0200
+	(envelope-from <armbru@redhat.com>) id 1dBG9y-0002dV-SQ
+	for qemu-devel@nongnu.org; Thu, 18 May 2017 03:47:50 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <684185116.2952708.1495044580181.ref@mail.yahoo.com>
+	<684185116.2952708.1495044580181@mail.yahoo.com>
+	<3293e70a-71ac-2e6d-433f-06346ad253c9@redhat.com>
+	<107015620.2969780.1495046091978@mail.yahoo.com>
+	<5a2b9e50-1444-af4a-dc89-021a4beca0f4@redhat.com>
+	<1832071588.99743.1495054408073@mail.yahoo.com>
+	<bcff9cd4-3ec2-0757-02e0-96f0e0a7747e@redhat.com>
+	<968647832.156883.1495056309814@mail.yahoo.com>
+	<d7324134-4eb5-0ca2-2a13-6fd5c5479b49@redhat.com>
+Date: Thu, 18 May 2017 09:47:34 +0200
+In-Reply-To: <d7324134-4eb5-0ca2-2a13-6fd5c5479b49@redhat.com> (Eric Blake's
+	message of "Wed, 17 May 2017 16:55:41 -0500")
+Message-ID: <87bmqqvc6h.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <20170518054522.13141-4-david@gibson.dropbear.id.au>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 3/3] pseries: Improve tracing of CPU
- compatibility negotiation
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] Add Markus Armbrusters code for Broadcom
+ Perhiperals for ARM.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,102 +31,97 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>, abologna@redhat.com, thuth@redhat.com
-Cc: mdroth@linux.vnet.ibm.com, groug@kaod.org, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+To: Eric Blake <eblake@redhat.com>
+Cc: John Bradley <flypie1@yahoo.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Laurent Vivier <lvivier@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Geert Martin Ijewski <gm.ijewski@web.de>, John Bradley <flypie@rocketmail.com>, Alistair Francis <alistair.francis@xilinx.com>, "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 
-On 18/05/2017 07:45, David Gibson wrote:
-> This makes some improvements to the debug tracepoints around the
-> negotiation of CPU compatibility mode during CAS.  The traces are
-> reorganized to emphasise what the inputs and outputs of the process are,
-> then distinguish the internal state of the two possible negotiation paths
-> (current and pre-2.8 machine type compatibility).
-> 
-> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+IANAL, this wouldn't be legal advice even if I was one, yadda, yadda,
+here goes anyway:
 
-Reviewed-by: Laurent Vivier <lvivier@redhat.com>
+Eric Blake <eblake@redhat.com> writes:
 
-> ---
->  hw/ppc/spapr_hcall.c | 14 ++++++++------
->  hw/ppc/trace-events  |  6 ++++--
->  2 files changed, 12 insertions(+), 8 deletions(-)
-> 
-> diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
-> index a790da7..cea5d99 100644
-> --- a/hw/ppc/spapr_hcall.c
-> +++ b/hw/ppc/spapr_hcall.c
-> @@ -1109,7 +1109,6 @@ static uint32_t cas_check_pvr_pre_2_9(PowerPCCPU *cpu, target_ulong *addr,
->              break; /* Terminator record */
->          }
->  
-> -        trace_spapr_cas_pvr_try(pvr);
->          if (!max_lvl &&
->              ((cpu->env.spr[SPR_PVR] & pvr_mask) == (pvr & pvr_mask))) {
->              cpu_match = true;
-> @@ -1120,10 +1119,10 @@ static uint32_t cas_check_pvr_pre_2_9(PowerPCCPU *cpu, target_ulong *addr,
->          } else if (!cpu_match) {
->              cas_handle_compat_cpu(pcc, pvr, max_lvl, &compat_lvl, &compat_pvr);
->          }
-> +        trace_cas_check_pvr_pre_2_9(pvr, pvr_mask, cpu_match,
-> +                                    compat_lvl, compat_pvr);
->      }
->  
-> -    trace_spapr_cas_pvr(cpu->compat_pvr, cpu_match, compat_pvr);
-> -
->      return compat_pvr;
->  }
->  
-> @@ -1158,6 +1157,7 @@ static uint32_t cas_check_pvr(PowerPCCPU *cpu, target_ulong *addr,
->                  best_compat = pvr;
->              }
->          }
-> +        trace_cas_check_pvr(pvr, pvr_mask, explicit_match, best_compat);
->      }
->  
->      if ((best_compat == 0) && (!explicit_match || max_compat)) {
-> @@ -1168,9 +1168,6 @@ static uint32_t cas_check_pvr(PowerPCCPU *cpu, target_ulong *addr,
->          return 0;
->      }
->  
-> -    /* Parsing finished */
-> -    trace_spapr_cas_pvr(cpu->compat_pvr, explicit_match, best_compat);
-> -
->      return best_compat;
->  }
->  
-> @@ -1188,6 +1185,9 @@ static target_ulong h_client_architecture_support(PowerPCCPU *cpu,
->      bool guest_radix;
->      Error *local_err = NULL;
->  
-> +    trace_cas_check_pvr_start(cpu->compat_pvr, cpu->max_compat,
-> +                              cpu->env.spr[SPR_PVR]);
-> +
->      if (smc->pre_2_9_cas_pvr) {
->          cas_pvr = cas_check_pvr_pre_2_9(cpu, &addr, &local_err);
->      } else {
-> @@ -1198,6 +1198,8 @@ static target_ulong h_client_architecture_support(PowerPCCPU *cpu,
->          return H_HARDWARE;
->      }
->  
-> +    trace_cas_check_pvr_complete(cpu->compat_pvr, cas_pvr);
-> +
->      /* Update CPUs */
->      if (cpu->compat_pvr != cas_pvr) {
->          ppc_set_compat_all(cas_pvr, &local_err);
-> diff --git a/hw/ppc/trace-events b/hw/ppc/trace-events
-> index 43d265f..5329740 100644
-> --- a/hw/ppc/trace-events
-> +++ b/hw/ppc/trace-events
-> @@ -14,8 +14,10 @@ spapr_cas_failed(unsigned long n) "DT diff buffer is too small: %ld bytes"
->  spapr_cas_continue(unsigned long n) "Copy changes to the guest: %ld bytes"
->  
->  # hw/ppc/spapr_hcall.c
-> -spapr_cas_pvr_try(uint32_t pvr) "%x"
-> -spapr_cas_pvr(uint32_t cur_pvr, bool explicit_match, uint32_t new_pvr) "current=%x, explicit_match=%u, new=%x"
-> +cas_check_pvr_pre_2_9(uint32_t pvr, uint32_t mask, bool match, unsigned lvl, uint32_t compat_pvr) "0x%08x/0x%08x match=%d lvl=%d compat_pvr=0x%x"
-> +cas_check_pvr(uint32_t pvr, uint32_t pvr_mask, bool explicit_match, uint32_t best_compat) "0x%08x/0x%08x explicit_match=%d best_compat=0x%08x"
-> +cas_check_pvr_start(uint32_t compat_pvr, uint32_t max_compat, uint32_t phys_pvr) "Initial compat PVR 0x%08x, max compat 0x%08x (real PVR 0x%08x)"
-> +cas_check_pvr_complete(uint32_t old_pvr, uint32_t new_pvr) "Compatibility PVR was 0x%08x, now 0x%08x"
->  
->  # hw/ppc/spapr_iommu.c
->  spapr_iommu_put(uint64_t liobn, uint64_t ioba, uint64_t tce, uint64_t ret) "liobn=%"PRIx64" ioba=0x%"PRIx64" tce=0x%"PRIx64" ret=%"PRId64
-> 
+> On 05/17/2017 04:25 PM, John Bradley wrote:
+>> Well unfortunately Eric. I don't understand your "top posted" slang.
+>
+> To learn what top-posting is:
+> http://lmgtfy.com/?q=what+is+top-posting
+>
+> and why we don't like it on technical lists:
+> http://www.caliburn.nl/topposting.html
+>
+> Or more humorously:
+
+Seconded.
+
+> A: Yes.
+>> >Q: Are you sure?
+>>> >>A: Because it reverses the logical flow of conversation.
+>>>> >>>Q: Why is top posting frowned upon?
+>
+>> 
+>> As for his "intent", it is quite irrelevant as I have gone over the code line by line and what every he intended to do, he has succeed, as far as I can tell , in matching you standards, to such an extent that I am happy that 
+>
+> You are correct that the GPL gives us legal rights to use Andrew's code
+> without his permission.  And yes, YOU can fork qemu, and take whatever
+> GPL patches you want without attribution, and you are probably still
+> just fine legally (as long as you still abide by the GPL in that you
+> distribute sources to anyone that has your binary).
+>
+> But our project rules do not allow us to live by just GPL (in part,
+> because the license of qemu is sometimes tricky to determine due to a
+> mix of GPLv2-only code and non-GPL code, even though most new code is
+> GPLv2+).  Also, if we ever had a reason to change license (supposing it
+> is even possible, although it might require ripping out or
+> reimplementing portions of the code base), having S-o-b means that we
+> cannot be accused of applying a license that someone did not agree to.
+>
+> Therefore, it is easier, pragmatically, even if not legally necessary,
+> to enforce proper chain of authorship by getting Signed-off-by: tags on
+> ALL patches, especially where a patch asserts a copyright owner, insofar
+> as the original copyright owner is still alive and able to assent to the
+> action.  It is not just about legalities, it is also about risk-avoidance.
+>
+> It may sound like we are being hard-nosed (and so be it), but there's a
+> reason that we list proper Signed-off-by: rules as our number 1 item on
+> the SubmitAPatch page.
+> http://wiki.qemu.org/Contribute/SubmitAPatch
+
+Yes, we require patch submitters to provide their Signed-off-by.
+
+We encourage documenting a patch's provenance in full by having every
+author provide their S-o-b, whenever practical.  But we don't require
+it.
+
+The core purpose of the S-o-b is "to improve tracking of who did what"
+by making patch authors formally certify that they "wrote it or
+otherwise have the right to pass it on as a open-source patch"[2].  Note
+"improve" and "have the right to pass it on".
+
+One of the (many) reasons we're making software free is to help our
+neighbor[1] by letting him use our creation on a quid pro quo basis.
+Always requiring all author's S-o-b could make incorporating otherwise
+free code impractical, and thus would conflict with this mission.
+
+When obtaining an S-o-b is impractical, documenting provenance in other
+ways has to do.
+
+John wrote upthread:
+
+    Andrew Baumann has and others have release the code under GNU
+    General Public License version 2 (GPLv2), the same as QEMU that
+    allows me to added it to QEMU as it is under the same license, by
+    signing it off this is what I am certifying.
+
+I agree with the reasoning "if free software compatible with the GPLv2,
+then I can incorporate it into QEMU as long as I certify by signing
+off".
+
+John, thank you for your contribution to QEMU.  I'm sorry your patch got
+side-tracked into this non-technical swamp, and hope you understand why
+we're rather careful when it comes to protecting the freedom of our
+software.  I futher hope that we can put than behind us (along with
+top-posting *grin*), and move on to the fun part.
+
+
+[1] See "The four essential freedoms"
+https://www.gnu.org/philosophy/free-sw.en.html
+[2] https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/plain/Documentation/process/submitting-patches.rst
