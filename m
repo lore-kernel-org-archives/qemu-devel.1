@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50715)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51040)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1dBKTO-0001bR-BO
-	for qemu-devel@nongnu.org; Thu, 18 May 2017 08:24:07 -0400
+	(envelope-from <sbates@raithlin.com>) id 1dBKUJ-00025B-9l
+	for qemu-devel@nongnu.org; Thu, 18 May 2017 08:25:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1dBKTJ-0000eC-8I
-	for qemu-devel@nongnu.org; Thu, 18 May 2017 08:24:06 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:33532)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <david@redhat.com>) id 1dBKTJ-0000e4-1W
-	for qemu-devel@nongnu.org; Thu, 18 May 2017 08:24:01 -0400
-References: <1495107549-6097-1-git-send-email-thuth@redhat.com>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <aa39e27c-4ec0-6431-3fe6-3e3c761502a2@redhat.com>
-Date: Thu, 18 May 2017 14:23:57 +0200
-MIME-Version: 1.0
-In-Reply-To: <1495107549-6097-1-git-send-email-thuth@redhat.com>
-Content-Type: text/plain; charset=utf-8
+	(envelope-from <sbates@raithlin.com>) id 1dBKUI-0000s2-EX
+	for qemu-devel@nongnu.org; Thu, 18 May 2017 08:25:03 -0400
+From: "Stephen  Bates" <sbates@raithlin.com>
+Date: Thu, 18 May 2017 12:24:53 +0000
+Message-ID: <DD2BC561-A89A-4CA8-B2A0-ED3B590C3EA2@raithlin.com>
+References: <1494961859-14833-1-git-send-email-sbates@raithlin.com>
+	<20170516204327.GB28520@localhost.localdomain>
+	<901A5622-D0D7-41E8-9631-0D0B9D657EB3@raithlin.com>
+	<20170517130156.GB12936@noname.redhat.com>
+In-Reply-To: <20170517130156.GB12936@noname.redhat.com>
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2] target/s390x: Add support for the TEST
- BLOCK instruction
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <34C556A14498BA43B3EF9E7661F54550@CANPRD01.PROD.OUTLOOK.COM>
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [PATCH] nvme: Add support for Controller Memory
+ Buffers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,82 +28,16 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>
-Cc: Aurelien Jarno <aurelien@aurel32.net>
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: Keith Busch <keith.busch@intel.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "mreitz@redhat.com" <mreitz@redhat.com>
 
-
-> diff --git a/target/s390x/mem_helper.c b/target/s390x/mem_helper.c
-> index f6e5bce..de0ecd4 100644
-> --- a/target/s390x/mem_helper.c
-> +++ b/target/s390x/mem_helper.c
-> @@ -20,6 +20,7 @@
->  
->  #include "qemu/osdep.h"
->  #include "cpu.h"
-> +#include "exec/address-spaces.h"
->  #include "exec/helper-proto.h"
->  #include "exec/exec-all.h"
->  #include "exec/cpu_ldst.h"
-> @@ -973,6 +974,33 @@ void HELPER(stctl)(CPUS390XState *env, uint32_t r1, uint64_t a2, uint32_t r3)
->      }
->  }
->  
-> +uint32_t HELPER(testblock)(CPUS390XState *env, uint64_t real_addr)
-> +{
-> +    CPUState *cs = CPU(s390_env_get_cpu(env));
-> +    uint64_t abs_addr;
-> +    int i;
-> +
-
-It is somewhat strange that we set a condition code in case of a program
-interrupt (I assume that's the magic of the return value?). But maybe
-setting the CC on program interrupts is perfectly valid.
-
-Reading the PoP, I think it is supposed to be like this:
-
-- Memory not addressable? -> PGM_ADDRESSING
-- Memory protected? -> PGM_PROTECTION
-- Memory not usable ("invalid checking-block-code", using it would
-  result in a machine check) -> CC=1
-- Memory usable and cleared -> CC=0
-
-So in essence, I think we should only set the CC if successful, as we
-are not simulating ram failure. But maybe that's how all these handlers
-work, and we can't hinder it from setting the CC.
-
-> +    real_addr = fix_address(env, real_addr);
-
-Could it be that fix_address() misses handling for 24 bit mode? (no idea
-if that is really relevant, just wondering).
-
-> +    abs_addr = mmu_real2abs(env, real_addr) & TARGET_PAGE_MASK;
-> +    if (!address_space_access_valid(&address_space_memory, abs_addr,
-> +                                    TARGET_PAGE_SIZE, true)) {
-> +        program_interrupt(env, PGM_ADDRESSING, 4);
-> +        return 1;
-> +    }
-> +
-> +    /* Check low-address protection */
-> +    if ((env->cregs[0] & CR0_LOWPROT) != 0 && real_addr < 0x2000) {
-
-I would drop the != 0.
-
-
-> +        program_interrupt(env, PGM_PROTECTION, 4);
-> +        return 1;
-> +    }
-> +
-> +    for (i = 0; i < TARGET_PAGE_SIZE; i += 8) {
-> +        stq_phys(cs->as, abs_addr + i, 0);
-> +    }
-> +
-> +    return 0;
-> +}
-
-Looks good to me!
-
--- 
-
-Thanks,
-
-David
+DQo+IFRoaXMgbWFpbCBzZWVtcyB0byBoYXZlIG1hZGUgaXQgdG8gdGhlIGxpc3QsIGJ1dCB0aGUg
+cGF0Y2ggaGFzbid0Lg0KPiBMb29raW5nIGF0IHRoZSBoZWFkZXJzLCB5b3UgZG9uJ3Qgc2VlbSB0
+byB1c2UgdGhlIHNhbWUgc2VydmVyIGZvcg0KPiB5b3VyIG5vcm1hbCBtYWlsIGNsaWVudCBhbmQg
+Z2l0IHNlbmQtZW1haWwuIE1heWJlIGl0J3MgcmVsYXRlZCB0byB0aGlzPw0KDQpNeSBwYXRjaGVz
+IGNvbWUgdGhyb3VnaCBteSBnbWFpbCBzbXRwIGNsaWVudCAodmlhIGdpdCBzZW5kLWVtYWlsKSBz
+byBtYXliZSB0aGF04oCZcyBhIHByb2JsZW0uIEkgd2lsbCB0cnkgc2VuZGluZyBteSBuZXh0IHBh
+dGNoc2V0IHZpYSBteSBvZmZpY2UzNjUgc210cCBjbGllbnQgYW5kIHNlZSB3aGF0IGhhcHBlbnMu
+IEdvb2QgdG8gc2VlIG15IHJlc3BvbnNlcyBhcmUgbm93IGdldHRpbmcgdGhyb3VnaOKApg0KDQo+
+IEFueXdheSwgdGhhbmtzLCBhcHBsaWVkIHRvIHRoZSBibG9jayBicmFuY2guDQoNCkF3ZXNvbWUs
+IHRoYW5rcyBLZXZpbiENCg0KDQo=
