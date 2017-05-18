@@ -1,31 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39481)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39779)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dBMvX-0001Kz-Ud
-	for qemu-devel@nongnu.org; Thu, 18 May 2017 11:01:21 -0400
+	(envelope-from <den@virtuozzo.com>) id 1dBMwU-0001xz-V6
+	for qemu-devel@nongnu.org; Thu, 18 May 2017 11:02:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dBMvU-0006ym-UK
-	for qemu-devel@nongnu.org; Thu, 18 May 2017 11:01:20 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:51226)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dBMvU-0006yf-Lm
-	for qemu-devel@nongnu.org; Thu, 18 May 2017 11:01:16 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 738BD7249E
-	for <qemu-devel@nongnu.org>; Thu, 18 May 2017 15:01:15 +0000 (UTC)
-Date: Thu, 18 May 2017 16:00:22 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170518150022.GF2079@work-vm>
-References: <20170517160804.22245-1-quintela@redhat.com>
-	<20170517160804.22245-3-quintela@redhat.com>
+	(envelope-from <den@virtuozzo.com>) id 1dBMwT-0007EM-Qy
+	for qemu-devel@nongnu.org; Thu, 18 May 2017 11:02:19 -0400
+References: <20170518100925.28682-1-vsementsov@virtuozzo.com>
+	<20170518102523.GD4646@noname.redhat.com>
+	<4f9deae2-c489-9681-83d3-e878adb33946@virtuozzo.com>
+	<20170518121026.GF4646@noname.redhat.com>
+	<aa80a3e6-07c4-22cb-1dc4-24102b67ecfe@openvz.org>
+	<20170518145429.GH4646@noname.redhat.com>
+From: "Denis V. Lunev" <den@openvz.org>
+Message-ID: <89c36240-2fdc-732b-6f09-1c06ac7e1db6@openvz.org>
+Date: Thu, 18 May 2017 18:02:02 +0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170517160804.22245-3-quintela@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 2/2] migration: Make savevm.c target
- independent
+In-Reply-To: <20170518145429.GH4646@noname.redhat.com>
+Content-Type: text/plain; charset="windows-1252"
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] qcow2: add allocated-size to image
+ specific info
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,144 +28,87 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Juan Quintela <quintela@redhat.com>
-Cc: qemu-devel@nongnu.org, lvivier@redhat.com, peterx@redhat.com
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org, eblake@redhat.com, armbru@redhat.com, mreitz@redhat.com
 
-* Juan Quintela (quintela@redhat.com) wrote:
-> It only needed TARGET_PAGE_SIZE/BITS/BITS_MIN values, so just export
-> them from exec.h
-> 
-> Signed-off-by: Juan Quintela <quintela@redhat.com>
+On 05/18/2017 05:54 PM, Kevin Wolf wrote:
+> Am 18.05.2017 um 14:22 hat Denis V. Lunev geschrieben:
+>> On 05/18/2017 03:10 PM, Kevin Wolf wrote:
+>>> Am 18.05.2017 um 13:04 hat Vladimir Sementsov-Ogievskiy geschrieben:
+>>>> 18.05.2017 13:25, Kevin Wolf wrote:
+>>>>> Am 18.05.2017 um 12:09 hat Vladimir Sementsov-Ogievskiy geschrieben:
+>>>>>> Shows, how much data qcow2 allocates in underlying file. This should
+>>>>>> be helpful on non-sparse file systems, when qemu-img info "disk size"
+>>>>>> doesn't provide this information.
+>>>>>>
+>>>>>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+>>>>>> ---
+>>>>>> Hi all.
+>>>>>>
+>>>>>> Here is an allocated-size feature for qemu-img info.
+>>>>> I'm not a fan of loading all L2 tables (can take some time) for
+>>>>> 'qemu-img info' (which should be very quick). Why isn't the qemu-img
+>>>>> check output good enough?
+>>>>>
+>>>>> Kevin
+>>>>>
+>>>>> $ ./qemu-img check /tmp/test.qcow2
+>>>>> No errors were found on the image.
+>>>>> 16164/491520 = 3.29% allocated, 11.98% fragmented, 0.00% compressed clusters
+>>>>> Image end offset: 1060044800
+>>>>> $ ./qemu-img check --output=json /tmp/test.qcow2
+>>>>> {
+>>>>>     "image-end-offset": 1060044800,
+>>>>>     "total-clusters": 491520,
+>>>>>     "check-errors": 0,
+>>>>>     "allocated-clusters": 16164,
+>>>>>     "filename": "/tmp/test.qcow2",
+>>>>>     "format": "qcow2",
+>>>>>     "fragmented-clusters": 1937
+>>>>> }
+>>>> It is not the same, it shows guest clusters, but we need host
+>>>> clusters - including all metadata, dirty bitmaps, snapshots, etc..
+>>> Ah, right. But isn't that exactly the "disk size" (actual-size in JSON)
+>>> from qemu-img info? Your commit message mentions non-sparse filesystems
+>>> (which one?), but why wouldn't "disk size" provide this information
+>>> there?
+>>>
+>>> The one case where it doesn't work is if you store a qcow2 image on a
+>>> raw block device (this is something that oVirt does). In that case,
+>>> you can't benefit from sparseness and disk space is used for a cluster
+>>> in the middle even if its refcount is 0. oVirt uses "image-end-offset"
+>>> to get the size of the first of the block device that is actually in use
+>>> by the image.
+>>>
+>>> What is your exact use case? Maybe this helps me understand the exact
+>>> kind of information that you need.
+>>>
+>>> Kevin
+>> Let us assume we have an image like the following:
+>>   [0][1][2][3][4][5][6]
+>> Here [N] represents guest block number N, i.e. there are
+>> 7 sequential guest blocks. Let us assume that the guest
+>> issues TRIM and says that block [1] is not needed at all.
+>> The image becomes like
+>>   [0][.][2][3][4][5][6]
+>> If the filesystem with this image is dumb and does not
+>> support holes, we could not determine that we have
+>> not used space inside the disk marked as [.]
+>>
+>> The goal of this patch is to know amount of [.] blocks.
+> Okay. If the existing tools can't give you the numbers that you need,
+> I think we could easily add this number to qemu-img check.
+>
+> However, is this really what you need or do you want to know the image
+> size if the image was converted into a new image file? Because in this
+> case, some metadata (refcount blocks) might go away as well. In this
+> case, it sounds like Stefan's 'qemu-img measure' patches could be useful
+> for you (I haven't looked at them in detail yet, but that's what I
+> understood from the high level overview).
+>
+> Kevin
+OK. 'qemu-img check' is not a problem to integrated with.
+I'll look into measure patches to see applicability.
+This is for sure good idea.
 
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-
-> ---
->  Makefile.target            |  2 +-
->  exec.c                     |  9 +++++++++
->  include/exec/target_page.h |  2 ++
->  migration/Makefile.objs    |  2 +-
->  migration/savevm.c         | 14 +++++++-------
->  5 files changed, 20 insertions(+), 9 deletions(-)
-> 
-> diff --git a/Makefile.target b/Makefile.target
-> index 465a633..ce8dfe4 100644
-> --- a/Makefile.target
-> +++ b/Makefile.target
-> @@ -146,7 +146,7 @@ obj-$(CONFIG_KVM) += kvm-all.o
->  obj-y += memory.o cputlb.o
->  obj-y += memory_mapping.o
->  obj-y += dump.o
-> -obj-y += migration/ram.o migration/savevm.o
-> +obj-y += migration/ram.o
->  LIBS := $(libs_softmmu) $(LIBS)
->  
->  # Hardware support
-> diff --git a/exec.c b/exec.c
-> index e9a201a..447ac63 100644
-> --- a/exec.c
-> +++ b/exec.c
-> @@ -3387,6 +3387,15 @@ size_t qemu_target_page_size(void)
->      return TARGET_PAGE_SIZE;
->  }
->  
-> +int qemu_target_page_bits(void)
-> +{
-> +    return TARGET_PAGE_BITS;
-> +}
-> +
-> +int qemu_target_page_bits_min(void)
-> +{
-> +    return TARGET_PAGE_BITS_MIN;
-> +}
->  #endif
->  
->  /*
-> diff --git a/include/exec/target_page.h b/include/exec/target_page.h
-> index 0961591..e3a19cc 100644
-> --- a/include/exec/target_page.h
-> +++ b/include/exec/target_page.h
-> @@ -16,5 +16,7 @@
->  #define EXEC_TARGET_PAGE_H
->  
->  size_t qemu_target_page_size(void);
-> +int qemu_target_page_bits(void);
-> +int qemu_target_page_bits_min(void);
->  
->  #endif
-> diff --git a/migration/Makefile.objs b/migration/Makefile.objs
-> index 3272415..90f8c1f 100644
-> --- a/migration/Makefile.objs
-> +++ b/migration/Makefile.objs
-> @@ -1,5 +1,5 @@
->  common-obj-y += migration.o socket.o fd.o exec.o
-> -common-obj-y += tls.o channel.o
-> +common-obj-y += tls.o channel.o savevm.o
->  common-obj-y += colo-comm.o colo.o colo-failover.o
->  common-obj-y += vmstate.o vmstate-types.o page_cache.o
->  common-obj-y += qemu-file.o
-> diff --git a/migration/savevm.c b/migration/savevm.c
-> index 8763700..d971e5e 100644
-> --- a/migration/savevm.c
-> +++ b/migration/savevm.c
-> @@ -27,7 +27,6 @@
->   */
->  
->  #include "qemu/osdep.h"
-> -#include "cpu.h"
->  #include "hw/boards.h"
->  #include "hw/hw.h"
->  #include "hw/qdev.h"
-> @@ -288,7 +287,7 @@ static void configuration_pre_save(void *opaque)
->  
->      state->len = strlen(current_name);
->      state->name = current_name;
-> -    state->target_page_bits = TARGET_PAGE_BITS;
-> +    state->target_page_bits = qemu_target_page_bits();
->  }
->  
->  static int configuration_pre_load(void *opaque)
-> @@ -299,7 +298,7 @@ static int configuration_pre_load(void *opaque)
->       * predates the variable-target-page-bits support and is using the
->       * minimum possible value for this CPU.
->       */
-> -    state->target_page_bits = TARGET_PAGE_BITS_MIN;
-> +    state->target_page_bits = qemu_target_page_bits_min();
->      return 0;
->  }
->  
-> @@ -314,9 +313,9 @@ static int configuration_post_load(void *opaque, int version_id)
->          return -EINVAL;
->      }
->  
-> -    if (state->target_page_bits != TARGET_PAGE_BITS) {
-> +    if (state->target_page_bits != qemu_target_page_bits()) {
->          error_report("Received TARGET_PAGE_BITS is %d but local is %d",
-> -                     state->target_page_bits, TARGET_PAGE_BITS);
-> +                     state->target_page_bits, qemu_target_page_bits());
->          return -EINVAL;
->      }
->  
-> @@ -332,7 +331,8 @@ static int configuration_post_load(void *opaque, int version_id)
->   */
->  static bool vmstate_target_page_bits_needed(void *opaque)
->  {
-> -    return TARGET_PAGE_BITS > TARGET_PAGE_BITS_MIN;
-> +    return qemu_target_page_bits()
-> +        > qemu_target_page_bits_min();
->  }
->  
->  static const VMStateDescription vmstate_target_page_bits = {
-> @@ -1138,7 +1138,7 @@ void qemu_savevm_state_complete_precopy(QEMUFile *f, bool iterable_only)
->      }
->  
->      vmdesc = qjson_new();
-> -    json_prop_int(vmdesc, "page_size", TARGET_PAGE_SIZE);
-> +    json_prop_int(vmdesc, "page_size", qemu_target_page_size());
->      json_start_array(vmdesc, "devices");
->      QTAILQ_FOREACH(se, &savevm_state.handlers, entry) {
->  
-> -- 
-> 2.9.3
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+Thanks.
