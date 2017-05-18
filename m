@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36556)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38176)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dBPWG-0008Ak-PY
-	for qemu-devel@nongnu.org; Thu, 18 May 2017 13:47:26 -0400
+	(envelope-from <jcody@redhat.com>) id 1dBPdO-00019y-8I
+	for qemu-devel@nongnu.org; Thu, 18 May 2017 13:54:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dBPWC-0006TH-Qg
-	for qemu-devel@nongnu.org; Thu, 18 May 2017 13:47:24 -0400
-Date: Thu, 18 May 2017 18:47:15 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170518174714.GK2079@work-vm>
-References: <20170510151209.32767-1-pasic@linux.vnet.ibm.com>
+	(envelope-from <jcody@redhat.com>) id 1dBPdN-0000tg-10
+	for qemu-devel@nongnu.org; Thu, 18 May 2017 13:54:46 -0400
+Date: Thu, 18 May 2017 13:54:36 -0400
+From: Jeff Cody <jcody@redhat.com>
+Message-ID: <20170518175436.GF6761@localhost.localdomain>
+References: <20170515191136.24314-1-ndevos@redhat.com>
+	<20170518095422.12555-1-ndevos@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20170510151209.32767-1-pasic@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH 1/1] s390x/css: catch section mismatch on
- load
+In-Reply-To: <20170518095422.12555-1-ndevos@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2] gluster: add support for
+ PREALLOC_MODE_FALLOC
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,139 +24,187 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Halil Pasic <pasic@linux.vnet.ibm.com>
-Cc: Cornelia Huck <cornelia.huck@de.ibm.com>, Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org, qemu-stable@nongnu.org
+To: Niels de Vos <ndevos@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
 
-* Halil Pasic (pasic@linux.vnet.ibm.com) wrote:
-> Prior to the virtio-ccw-2.7 machine (and commit 2a79eb1a), our virtio
-> devices residing under the virtual-css bus do not have qdev_path based
-> migration stream identifiers (because their qdev_path is NULL). The ids
-> are instead generated when the device is registered as a composition of
-> the so called idstr, which takes the vmsd name as its value, and an
-> instance_id, which is which is calculated as a maximal instance_id
-> registered with the same idstr plus one, or zero (if none was registered
-> previously).
+On Thu, May 18, 2017 at 11:54:22AM +0200, Niels de Vos wrote:
+> Add missing support for "preallocation=falloc" to the Gluster block
+> driver. This change bases its logic on that of block/file-posix.c and
+> removed the gluster_supports_zerofill() and qemu_gluster_zerofill()
+> functiond in favour of #ifdef checks in an easy to read
+> switch-statement.
 > 
-> That means, under certain circumstances, one device might try, and even
-> succeed, to load the state of a different device. This can lead to
-> trouble.
+> Both glfs_zerofill() and glfs_fallocate() have been introduced with
+> GlusterFS 3.5.0 (pkg-config glusterfs-api = 6). A #define for the
+> availability of glfs_fallocate() has been added to ./configure.
 > 
-> Let us fail the migration if the above problem is detected during load.
-> 
-> How to reproduce the problem:
-> 1) start qemu-system-s390x making sure you have the following devices
->    defined on your command line:
->      -device virtio-rng-ccw,id=rng1,devno=fe.0.0001
->      -device virtio-rng-ccw,id=rng2,devno=fe.0.0002
-> 2) detach the devices and reattach in reverse order using the monitor:
->      (qemu) device_del rng1
->      (qemu) device_del rng2
->      (qemu) device_add virtio-rng-ccw,id=rng2,devno=fe.0.0002
->      (qemu) device_add virtio-rng-ccw,id=rng1,devno=fe.0.0001
-> 3) save the state of the vm into a temporary file and quit QEMU:
->      (qemu) migrate "exec:gzip -c > /tmp/tmp_vmstate.gz"
->      (qemu) q
-> 4) use your command line from step 1 with
->      -incoming "exec:gzip -c -d /tmp/tmp_vmstate.gz"
->    appended to reproduce the problem (while trying to to load the saved vm)
-> 
-> CC: qemu-stable@nongnu.org
-> Signed-off-by: Halil Pasic <pasic@linux.vnet.ibm.com>
-> Reviewed-by: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
+> Reported-by: Satheesaran Sundaramoorthi <sasundar@redhat.com>
+> URL: https://bugzilla.redhat.com/1450759
+> Signed-off-by: Niels de Vos <ndevos@redhat.com>
 > ---
+> v2 changes requested by Jeff Cody:
+> - add CONFIG_GLUSTERFS_FALLOCATE
+> - remove unneeded wrapper qemu_gluster_zerofill()
 > 
-> Hi!
+>  block/gluster.c | 76 ++++++++++++++++++++++++++++++---------------------------
+>  configure       |  6 +++++
+>  2 files changed, 46 insertions(+), 36 deletions(-)
 > 
-> I also wonder what is the best way to do this with vmstate.  I know there
-> are VMSTATE_*_EQUAL macros for integers, and I have partially modelled my
-> patch after that, but there we only get a != b as error message, which is
-> satisfactory for detecting bugs which are supposed to get fixed. In this
-> particular case having a verbose error message should be really helpful
-> and thus important.
-> 
-> I'm asking because I'm currently working on a vmstate conversion of the
-> s390x css and virtio-ccw  stuff (find my latest patch set here
-> https://lists.gnu.org/archive/html/qemu-devel/2017-05/msg01364.html).
-
-I think the way to solve that problem will probably be adding a 'hint'
-parameter to the VMSTATE_*_EQUAL macros that is a constant string,
-stuff a pointer to that into a possibly new field in VMStateField,
-and then make the get_*_equal functions include that string in the
-message like you do.  There's a lot of copy and paste but it's
-not too bad now that Jianjun's patch from a few months ago passed
-the VMStateField* to the .get/.put.
-
-Dave
-
-
-> Regards,
-> Halil
-> ---
->  hw/s390x/css.c        | 14 ++++++++++++++
->  hw/s390x/virtio-ccw.c |  6 +++++-
->  2 files changed, 19 insertions(+), 1 deletion(-)
-> 
-> diff --git a/hw/s390x/css.c b/hw/s390x/css.c
-> index 15c4f4b..6cff3a3 100644
-> --- a/hw/s390x/css.c
-> +++ b/hw/s390x/css.c
-> @@ -14,6 +14,7 @@
->  #include "qapi/visitor.h"
->  #include "hw/qdev.h"
->  #include "qemu/bitops.h"
-> +#include "qemu/error-report.h"
->  #include "exec/address-spaces.h"
->  #include "cpu.h"
->  #include "hw/s390x/ioinst.h"
-> @@ -1721,13 +1722,26 @@ void subch_device_save(SubchDev *s, QEMUFile *f)
->  int subch_device_load(SubchDev *s, QEMUFile *f)
->  {
->      SubchDev *old_s;
-> +    Error *err = NULL;
->      uint16_t old_schid = s->schid;
-> +    uint16_t old_devno = s->devno;
->      int i;
+> diff --git a/block/gluster.c b/block/gluster.c
+> index 7c76cd0..0610183 100644
+> --- a/block/gluster.c
+> +++ b/block/gluster.c
+> @@ -964,29 +964,6 @@ static coroutine_fn int qemu_gluster_co_pwrite_zeroes(BlockDriverState *bs,
+>      qemu_coroutine_yield();
+>      return acb.ret;
+>  }
+> -
+> -static inline bool gluster_supports_zerofill(void)
+> -{
+> -    return 1;
+> -}
+> -
+> -static inline int qemu_gluster_zerofill(struct glfs_fd *fd, int64_t offset,
+> -                                        int64_t size)
+> -{
+> -    return glfs_zerofill(fd, offset, size);
+> -}
+> -
+> -#else
+> -static inline bool gluster_supports_zerofill(void)
+> -{
+> -    return 0;
+> -}
+> -
+> -static inline int qemu_gluster_zerofill(struct glfs_fd *fd, int64_t offset,
+> -                                        int64_t size)
+> -{
+> -    return 0;
+> -}
+>  #endif
 >  
->      s->cssid = qemu_get_byte(f);
->      s->ssid = qemu_get_byte(f);
->      s->schid = qemu_get_be16(f);
->      s->devno = qemu_get_be16(f);
-> +    if (s->devno != old_devno) {
-> +        /* Only possible if machine < 2.7 (no css_dev_path) */
+>  static int qemu_gluster_create(const char *filename,
+> @@ -996,9 +973,10 @@ static int qemu_gluster_create(const char *filename,
+>      struct glfs *glfs;
+>      struct glfs_fd *fd;
+>      int ret = 0;
+> -    int prealloc = 0;
+> +    PreallocMode prealloc;
+>      int64_t total_size = 0;
+>      char *tmp = NULL;
+> +    Error *local_err = NULL;
+>  
+>      gconf = g_new0(BlockdevOptionsGluster, 1);
+>      gconf->debug = qemu_opt_get_number_del(opts, GLUSTER_OPT_DEBUG,
+> @@ -1026,13 +1004,12 @@ static int qemu_gluster_create(const char *filename,
+>                            BDRV_SECTOR_SIZE);
+>  
+>      tmp = qemu_opt_get_del(opts, BLOCK_OPT_PREALLOC);
+> -    if (!tmp || !strcmp(tmp, "off")) {
+> -        prealloc = 0;
+> -    } else if (!strcmp(tmp, "full") && gluster_supports_zerofill()) {
+> -        prealloc = 1;
+> -    } else {
+> -        error_setg(errp, "Invalid preallocation mode: '%s'"
+> -                         " or GlusterFS doesn't support zerofill API", tmp);
+> +    prealloc = qapi_enum_parse(PreallocMode_lookup, tmp,
+> +                               PREALLOC_MODE__MAX, PREALLOC_MODE_OFF,
+> +                               &local_err);
+> +    g_free(tmp);
+> +    if (local_err) {
+> +        error_propagate(errp, local_err);
+>          ret = -EINVAL;
+>          goto out;
+>      }
+> @@ -1041,21 +1018,48 @@ static int qemu_gluster_create(const char *filename,
+>                      O_WRONLY | O_CREAT | O_TRUNC | O_BINARY, S_IRUSR | S_IWUSR);
+>      if (!fd) {
+>          ret = -errno;
+> -    } else {
+> +        goto out;
+> +    }
 > +
-> +        error_setg(&err, "%x != %x", old_devno,  s->devno);
-> +        error_append_hint(&err, "Devno mismatch, tried to load wrong section!"
-> +                          " Likely reason: some sequences of plug and unplug"
-> +                          " can break migration for machine versions prior"
-> +                          " 2.7 (known design flaw).\n");
-> +        error_report_err(err);
-> +        return -EINVAL;
+> +    switch (prealloc) {
+> +#ifdef CONFIG_GLUSTERFS_FALLOCATE
+> +    case PREALLOC_MODE_FALLOC:
+> +        if (!glfs_fallocate(fd, 0, 0, total_size)) {
+
+Does glfs_fallocate() return 0 on failure?  Both posix and linux versions of
+fallocate() return 0 on success.
+
+> +            error_setg(errp, "Could not preallocate data for the new file");
+> +            ret = -errno;
+> +        }
+> +        break;
+> +#endif /* CONFIG_GLUSTERFS_FALLOCATE */
+> +#ifdef CONFIG_GLUSTERFS_ZEROFILL
+> +    case PREALLOC_MODE_FULL:
+>          if (!glfs_ftruncate(fd, total_size)) {
+> -            if (prealloc && qemu_gluster_zerofill(fd, 0, total_size)) {
+> +            if (glfs_zerofill(fd, 0, total_size)) {
+> +                error_setg(errp, "Could not zerofill the new file");
+>                  ret = -errno;
+>              }
+>          } else {
+> +            error_setg(errp, "Could not resize file");
+>              ret = -errno;
+>          }
+> -
+> -        if (glfs_close(fd) != 0) {
+> +        break;
+> +#endif /* CONFIG_GLUSTERFS_ZEROFILL */
+> +    case PREALLOC_MODE_OFF:
+> +        if (glfs_ftruncate(fd, total_size) != 0) {
+>              ret = -errno;
+> +            error_setg(errp, "Could not resize file");
+>          }
+> +        break;
+> +    default:
+> +        ret = -EINVAL;
+> +        error_setg(errp, "Unsupported preallocation mode: %s",
+> +                   PreallocMode_lookup[prealloc]);
+> +        break;
 > +    }
->      /* Re-assign subch. */
->      if (old_schid != s->schid) {
->          old_s = channel_subsys.css[s->cssid]->sch_set[s->ssid]->sch[old_schid];
-> diff --git a/hw/s390x/virtio-ccw.c b/hw/s390x/virtio-ccw.c
-> index e7167e3..4f7efa2 100644
-> --- a/hw/s390x/virtio-ccw.c
-> +++ b/hw/s390x/virtio-ccw.c
-> @@ -1274,9 +1274,13 @@ static int virtio_ccw_load_config(DeviceState *d, QEMUFile *f)
->      SubchDev *s = ccw_dev->sch;
->      VirtIODevice *vdev = virtio_ccw_get_vdev(s);
->      int len;
-> +    int ret;
+> +
+> +    if (glfs_close(fd) != 0) {
+> +        ret = -errno;
+>      }
+>  out:
+> -    g_free(tmp);
+>      qapi_free_BlockdevOptionsGluster(gconf);
+>      glfs_clear_preopened(glfs);
+>      return ret;
+> diff --git a/configure b/configure
+> index 7c020c0..8b8291e 100755
+> --- a/configure
+> +++ b/configure
+> @@ -300,6 +300,7 @@ seccomp=""
+>  glusterfs=""
+>  glusterfs_xlator_opt="no"
+>  glusterfs_discard="no"
+> +glusterfs_fallocate="no"
+>  glusterfs_zerofill="no"
+>  gtk=""
+>  gtkabi=""
+> @@ -3576,6 +3577,7 @@ if test "$glusterfs" != "no" ; then
+>        glusterfs_discard="yes"
+>      fi
+>      if $pkg_config --atleast-version=6 glusterfs-api; then
+> +      glusterfs_fallocate="yes"
+>        glusterfs_zerofill="yes"
+>      fi
+>    else
+> @@ -5780,6 +5782,10 @@ if test "$glusterfs_discard" = "yes" ; then
+>    echo "CONFIG_GLUSTERFS_DISCARD=y" >> $config_host_mak
+>  fi
 >  
->      s->driver_data = dev;
-> -    subch_device_load(s, f);
-> +    ret = subch_device_load(s, f);
-> +    if (ret) {
-> +        return ret;
-> +    }
->      /* Re-fill subch_id after loading the subchannel states.*/
->      if (ck->refill_ids) {
->          ck->refill_ids(ccw_dev);
+> +if test "$glusterfs_fallocate" = "yes" ; then
+> +  echo "CONFIG_GLUSTERFS_FALLOCATE=y" >> $config_host_mak
+> +fi
+> +
+>  if test "$glusterfs_zerofill" = "yes" ; then
+>    echo "CONFIG_GLUSTERFS_ZEROFILL=y" >> $config_host_mak
+>  fi
 > -- 
-> 2.10.2
+> 2.9.3
 > 
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
