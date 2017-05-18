@@ -1,26 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36475)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40288)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dBAl0-0006Oo-Mj
-	for qemu-devel@nongnu.org; Wed, 17 May 2017 22:01:39 -0400
+	(envelope-from <guangrong.xiao@gmail.com>) id 1dBB9V-0002Nm-4j
+	for qemu-devel@nongnu.org; Wed, 17 May 2017 22:26:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dBAkw-00073r-Pu
-	for qemu-devel@nongnu.org; Wed, 17 May 2017 22:01:38 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47778)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1dBAkw-00073h-GB
-	for qemu-devel@nongnu.org; Wed, 17 May 2017 22:01:34 -0400
-References: <1495035337-13337-1-git-send-email-thuth@redhat.com>
-	<20170517162642.ebmrhawmfdde5vsz@aurel32.net>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <4d64a1a0-71dd-5ea0-6d2f-e2fa547cfbe3@redhat.com>
-Date: Thu, 18 May 2017 04:01:27 +0200
+	(envelope-from <guangrong.xiao@gmail.com>) id 1dBB9Q-0004rU-8E
+	for qemu-devel@nongnu.org; Wed, 17 May 2017 22:26:57 -0400
+Received: from mail-pg0-x243.google.com ([2607:f8b0:400e:c05::243]:35059)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <guangrong.xiao@gmail.com>)
+	id 1dBB9Q-0004r9-1W
+	for qemu-devel@nongnu.org; Wed, 17 May 2017 22:26:52 -0400
+Received: by mail-pg0-x243.google.com with SMTP id i63so4026710pgd.2
+	for <qemu-devel@nongnu.org>; Wed, 17 May 2017 19:26:51 -0700 (PDT)
+From: Xiao Guangrong <guangrong.xiao@gmail.com>
+References: <20170510083259.3900-1-xiaoguangrong@tencent.com>
+	<9626326d-977f-bf26-851a-59d420f27993@redhat.com>
+Message-ID: <0900def5-6049-4338-1eb0-8a0404c6c839@gmail.com>
+Date: Thu, 18 May 2017 10:26:54 +0800
 MIME-Version: 1.0
-In-Reply-To: <20170517162642.ebmrhawmfdde5vsz@aurel32.net>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <9626326d-977f-bf26-851a-59d420f27993@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC PATCH] target/s390x/cpu_models: Set some
- additional feature bits for the "qemu" CPU
+Subject: Re: [Qemu-devel] [PATCH v3 0/5] mc146818rtc: fix Windows VM clock
+ faster
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,107 +32,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Aurelien Jarno <aurelien@aurel32.net>
-Cc: qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>, David Hildenbrand <david@redhat.com>, mmarek@suse.com, mbenes@suse.cz
+To: Paolo Bonzini <pbonzini@redhat.com>, mst@redhat.com, mtosatti@redhat.com
+Cc: qemu-devel@nongnu.org, kvm@vger.kernel.org, yunfangtai@tencent.com, Xiao Guangrong <xiaoguangrong@tencent.com>
 
-On 17.05.2017 18:26, Aurelien Jarno wrote:
-> On 2017-05-17 17:35, Thomas Huth wrote:
->> Currently we only present the plain z900 feature bits to the guest,
->> but QEMU already emulates some additional features (but not all of
->> the next CPU generation, so we can not use the next CPU level as
->> default yet). Since newer Linux kernels are checking the feature bits
->> and refuse to work if a required feature is missing, we should present
->> as much of the supported features as possible when we are running
->> with the default "qemu" CPU.
->> This patch now adds the "stfle", "extended immediate" and "stckf"
->> facility bits to the "qemu" CPU, which are already supported facilities.
->> It is unfortunately still not enough to run e.g. recent Fedora kernels,
->> but at least it's a first step into the right direction.
+
+
+On 05/10/2017 05:53 PM, Paolo Bonzini wrote:
 > 
-> This indeed looks like a step in a good direction. At least it makes the
-> recently added STFLE emulation useful :-).
 > 
->> Signed-off-by: Thomas Huth <thuth@redhat.com>
->> ---
->>  target/s390x/cpu_models.c | 29 ++++++++++++++++++++++++++---
->>  1 file changed, 26 insertions(+), 3 deletions(-)
+> On 10/05/2017 10:32, guangrong.xiao@gmail.com wrote:
+>> From: Xiao Guangrong <xiaoguangrong@tencent.com>
 >>
->> diff --git a/target/s390x/cpu_models.c b/target/s390x/cpu_models.c
->> index 8d27363..18789ab 100644
->> --- a/target/s390x/cpu_models.c
->> +++ b/target/s390x/cpu_models.c
->> @@ -658,6 +658,24 @@ static void check_compatibility(const S390CPUModel *max_model,
->>                    "available in the configuration: ");
->>  }
->>  
->> +/**
->> + * The base TCG CPU model "qemu" is based on the z900. However, we already
->> + * can also emulate some additional features of later CPU generations, so
->> + * we add these additional feature bits here.
->> + */
->> +static void add_qemu_cpu_model_features(S390FeatBitmap fbm)
->> +{
->> +    int i, feats[] = {
->> +        S390_FEAT_STFLE,
->> +        S390_FEAT_EXTENDED_IMMEDIATE,
->> +        S390_FEAT_STORE_CLOCK_FAST
+>> Changelog in v3:
+>> Thanks to Paolo's the elaborate review comments, this version
+>> simplifies the logic of periodic_timer_update() significantly
+>> that includes:
+>> 1) introduce rtc_periodic_clock_ticks() that takes both regA and
+>>     regB into account and returns the period clock
+>> 2) count the clocks since last interrupt by always using current
+>>     clock subtracts the clock when last interrupt happened
+>> 3) improve the assert() logic
+>>
+>> Paolo, all you comments have been reflected in this version except
+>> globally using s->period because in the current code, only x86 is
+>> using s->period so that we should obey this rule to keep compatible
+>> migration. I have added the comment to explain this suitable in the
+>> code:
+>>
+>>              /*
+>>               * as the old QEMUs only used s->period for the case that
+>>               * LOST_TICK_POLICY_SLEW is used, in order to keep the
+>>               * compatible migration, we obey the rule as old QEMUs.
+>>               */
+>>              s->period = period;
+>> If anything i missed, please let me know. :)
 > 
-> According to my list, QEMU also fully implements the following
-> facilities:
+> Looks great.  Thanks for following up quickly on the reviews.
 > 
-> S390_FEAT_LONG_DISPLACEMENT
-> S390_FEAT_GENERAL_INSTRUCTIONS_EXT
-> S390_FEAT_EXECUTE_EXT
-> S390_FEAT_STFLE_45
 
-Ok, thanks, I'll respin and add them to the list!
-
->> +    };
->> +
->> +    for (i = 0; i < ARRAY_SIZE(feats); i++) {
->> +        set_bit(feats[i], fbm);
->> +    }
->> +}
->> +
->>  static S390CPUModel *get_max_cpu_model(Error **errp)
->>  {
->>      static S390CPUModel max_model;
->> @@ -670,10 +688,11 @@ static S390CPUModel *get_max_cpu_model(Error **errp)
->>      if (kvm_enabled()) {
->>          kvm_s390_get_host_cpu_model(&max_model, errp);
->>      } else {
->> -        /* TCG emulates a z900 */
->> +        /* TCG emulates a z900 (with some additional features) */
->>          max_model.def = &s390_cpu_defs[0];
->>          bitmap_copy(max_model.features, max_model.def->default_feat,
->>                      S390_FEAT_MAX);
->> +        add_qemu_cpu_model_features(max_model.features);
->>      }
->>      if (!*errp) {
->>          cached = true;
->> @@ -925,11 +944,15 @@ static void s390_host_cpu_model_initfn(Object *obj)
->>  
->>  static void s390_qemu_cpu_model_initfn(Object *obj)
->>  {
->> +    static S390CPUDef s390_qemu_cpu_defs;
->>      S390CPU *cpu = S390_CPU(obj);
->>  
->>      cpu->model = g_malloc0(sizeof(*cpu->model));
->> -    /* TCG emulates a z900 */
->> -    cpu->model->def = &s390_cpu_defs[0];
->> +    /* TCG emulates a z900 (with some additional features) */
->> +    memcpy(&s390_qemu_cpu_defs, &s390_cpu_defs[0], sizeof(s390_qemu_cpu_defs));
->> +    add_qemu_cpu_model_features(s390_qemu_cpu_defs.default_feat);
->> +    add_qemu_cpu_model_features(s390_qemu_cpu_defs.full_feat);
->> +    cpu->model->def = &s390_qemu_cpu_defs;
->>      bitmap_copy(cpu->model->features, cpu->model->def->default_feat,
->>                  S390_FEAT_MAX);
->>  }
-> 
-> Otherwise it looks fine to me.
-> 
-> Reviewed-by: Aurelien Jarno <aurelien@aurel32.net>
-
-Thanks!
-
- Thomas
+Paolo, if it is okay to you, could you please consider to merge this
+patchset? ;)
