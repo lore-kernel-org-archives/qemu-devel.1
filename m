@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58327)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58371)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1dBJSG-0005PO-9C
-	for qemu-devel@nongnu.org; Thu, 18 May 2017 07:18:57 -0400
+	(envelope-from <quintela@redhat.com>) id 1dBJSL-0005TY-4t
+	for qemu-devel@nongnu.org; Thu, 18 May 2017 07:18:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1dBJSE-0002IF-Tn
-	for qemu-devel@nongnu.org; Thu, 18 May 2017 07:18:52 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:33082)
+	(envelope-from <quintela@redhat.com>) id 1dBJSK-0002NM-0K
+	for qemu-devel@nongnu.org; Thu, 18 May 2017 07:18:57 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55782)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1dBJSE-0002Hv-LL
-	for qemu-devel@nongnu.org; Thu, 18 May 2017 07:18:50 -0400
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1dBJSJ-0002N1-N2
+	for qemu-devel@nongnu.org; Thu, 18 May 2017 07:18:55 -0400
 Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
 	[10.5.11.14])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id A6440804FE
-	for <qemu-devel@nongnu.org>; Thu, 18 May 2017 11:18:49 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id B84E5624A8
+	for <qemu-devel@nongnu.org>; Thu, 18 May 2017 11:18:54 +0000 (UTC)
 From: Juan Quintela <quintela@redhat.com>
-Date: Thu, 18 May 2017 13:18:35 +0200
-Message-Id: <20170518111837.29212-4-quintela@redhat.com>
+Date: Thu, 18 May 2017 13:18:37 +0200
+Message-Id: <20170518111837.29212-6-quintela@redhat.com>
 In-Reply-To: <20170518111837.29212-1-quintela@redhat.com>
 References: <20170518111837.29212-1-quintela@redhat.com>
-Subject: [Qemu-devel] [PATCH 3/5] migration: Remove use of old
- MigrationParams
+Subject: [Qemu-devel] [PATCH 5/5] block migration: Allow compile time disable
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,160 +32,162 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: dgilbert@redhat.com, lvivier@redhat.com, peterx@redhat.com, eblake@redhat.com, armbru@redhat.com
 
-We have change in the previous patch to use migration capabilities for
-it.  Notice that we continue using the old command line flags from
-migrate command from the time being.  Remove the set_params method as
-now it is empty.
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-For savevm, one can't do a:
+Many users now prefer to use drive_mirror over NBD as an
+alternative to the older migrate -b option; drive_mirror is
+more complex to setup but gives you more options (e.g. only
+migrating some of the disks if some of them are shared).
 
-savevm -b/-i foo
+Allow the large chunk of block migration code to be compiled
+out for those who don't use it.
 
-but now one can do:
+Based on a downstream-patch we've had for a while by Jeff Cody.
 
-migrate_set_capability block on
-savevm foo
+Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 
-And we can't use block migration. We could disable block capability
-unconditionally, but it would not be much better.
+--
 
-Signed-off-by: Juan Quintela <quintela@redhat.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
-
+- When compiled out, allow seting block only with false value (eric)
 ---
-- Maintain shared/enabled dependency (Xu suggestion)
-- Now we maintain the dependency on the setter functions
-- improve error messages
----
- include/migration/migration.h |  3 +--
- migration/block.c             | 17 ++---------------
- migration/colo.c              |  4 ++--
- migration/migration.c         |  3 ---
- migration/savevm.c            |  8 ++++++--
- 5 files changed, 11 insertions(+), 24 deletions(-)
+ configure                 | 11 +++++++++++
+ include/migration/block.h | 24 +++++++++++++++++++++++-
+ migration/Makefile.objs   |  2 +-
+ migration/migration.c     | 14 ++++++++++++++
+ 4 files changed, 49 insertions(+), 2 deletions(-)
 
-diff --git a/include/migration/migration.h b/include/migration/migration.h
-index 024a048..4dedc66 100644
---- a/include/migration/migration.h
-+++ b/include/migration/migration.h
-@@ -39,8 +39,7 @@
- #define QEMU_VM_SECTION_FOOTER       0x7e
+diff --git a/configure b/configure
+index 57b5ae6..ace1a52 100755
+--- a/configure
++++ b/configure
+@@ -316,6 +316,7 @@ vte=""
+ virglrenderer=""
+ tpm="yes"
+ libssh2=""
++live_block_migration="yes"
+ numa=""
+ tcmalloc="no"
+ jemalloc="no"
+@@ -1169,6 +1170,10 @@ for opt do
+   ;;
+   --enable-libssh2) libssh2="yes"
+   ;;
++  --disable-live-block-migration) live_block_migration="no"
++  ;;
++  --enable-live-block-migration) live_block_migration="yes"
++  ;;
+   --disable-numa) numa="no"
+   ;;
+   --enable-numa) numa="yes"
+@@ -1401,6 +1406,7 @@ disabled with --disable-FEATURE, default is enabled if available:
+   libnfs          nfs support
+   smartcard       smartcard support (libcacard)
+   libusb          libusb (for usb passthrough)
++  live-block-migration   Block migration in the main migration stream
+   usb-redir       usb network redirection support
+   lzo             support of lzo compression library
+   snappy          support of snappy compression library
+@@ -5216,6 +5222,7 @@ echo "TPM support       $tpm"
+ echo "libssh2 support   $libssh2"
+ echo "TPM passthrough   $tpm_passthrough"
+ echo "QOM debugging     $qom_cast_debug"
++echo "Live block migration $live_block_migration"
+ echo "lzo support       $lzo"
+ echo "snappy support    $snappy"
+ echo "bzip2 support     $bzip2"
+@@ -5782,6 +5789,10 @@ if test "$libssh2" = "yes" ; then
+   echo "LIBSSH2_LIBS=$libssh2_libs" >> $config_host_mak
+ fi
  
- struct MigrationParams {
--    bool blk;
--    bool shared;
-+    bool unused; /* C doesn't allow empty structs */
- };
++if test "$live_block_migration" = "yes" ; then
++  echo "CONFIG_LIVE_BLOCK_MIGRATION=y" >> $config_host_mak
++fi
++
+ # USB host support
+ if test "$libusb" = "yes"; then
+   echo "HOST_USB=libusb legacy" >> $config_host_mak
+diff --git a/include/migration/block.h b/include/migration/block.h
+index 5225af9..28cff53 100644
+--- a/include/migration/block.h
++++ b/include/migration/block.h
+@@ -14,12 +14,34 @@
+ #ifndef MIGRATION_BLOCK_H
+ #define MIGRATION_BLOCK_H
  
- /* Messages sent on the return path from destination to source */
-diff --git a/migration/block.c b/migration/block.c
-index 060087f..5d22926 100644
---- a/migration/block.c
-+++ b/migration/block.c
-@@ -94,9 +94,6 @@ typedef struct BlkMigBlock {
- } BlkMigBlock;
++#ifdef CONFIG_LIVE_BLOCK_MIGRATION
+ void blk_mig_init(void);
+ int blk_mig_active(void);
+ uint64_t blk_mig_bytes_transferred(void);
+ uint64_t blk_mig_bytes_remaining(void);
+ uint64_t blk_mig_bytes_total(void);
  
- typedef struct BlkMigState {
--    /* Written during setup phase.  Can be read without a lock.  */
--    int blk_enable;
--    int shared_base;
-     QSIMPLEQ_HEAD(bmds_list, BlkMigDevState) bmds_list;
-     int64_t total_sector_sum;
-     bool zero_blocks;
-@@ -425,7 +422,7 @@ static int init_blk_migration(QEMUFile *f)
-         bmds->bulk_completed = 0;
-         bmds->total_sectors = sectors;
-         bmds->completed_sectors = 0;
--        bmds->shared_base = block_mig_state.shared_base;
-+        bmds->shared_base = migrate_use_block_incremental();
- 
-         assert(i < num_bs);
-         bmds_bs[i].bmds = bmds;
-@@ -994,22 +991,12 @@ static int block_load(QEMUFile *f, void *opaque, int version_id)
-     return 0;
- }
- 
--static void block_set_params(const MigrationParams *params, void *opaque)
--{
--    block_mig_state.blk_enable = params->blk;
--    block_mig_state.shared_base = params->shared;
++#else
++static inline void blk_mig_init(void) { }
++static inline int blk_mig_active(void)
++{
++    return false;
++}
++static inline uint64_t blk_mig_bytes_transferred(void)
++{
++    return 0;
++}
++
++static inline uint64_t blk_mig_bytes_remaining(void)
++{
++    return 0;
++}
++
++static inline uint64_t blk_mig_bytes_total(void)
++{
++    return 0;
++}
++#endif /* CONFIG_LIVE_BLOCK_MIGRATION */
++
+ void migrate_set_block_enabled(bool value, Error **errp);
 -
--    /* shared base means that blk_enable = 1 */
--    block_mig_state.blk_enable |= params->shared;
--}
--
- static bool block_is_active(void *opaque)
- {
--    return block_mig_state.blk_enable == 1;
-+    return migrate_use_block();
- }
+ #endif /* MIGRATION_BLOCK_H */
+diff --git a/migration/Makefile.objs b/migration/Makefile.objs
+index c1920b6..00a3f4a 100644
+--- a/migration/Makefile.objs
++++ b/migration/Makefile.objs
+@@ -9,5 +9,5 @@ common-obj-y += qjson.o
  
- static SaveVMHandlers savevm_block_handlers = {
--    .set_params = block_set_params,
-     .save_live_setup = block_save_setup,
-     .save_live_iterate = block_save_iterate,
-     .save_live_complete_precopy = block_save_complete,
-diff --git a/migration/colo.c b/migration/colo.c
-index 963c802..8c86892 100644
---- a/migration/colo.c
-+++ b/migration/colo.c
-@@ -14,6 +14,7 @@
- #include "qemu/timer.h"
- #include "sysemu/sysemu.h"
- #include "migration/colo.h"
-+#include "migration/block.h"
- #include "io/channel-buffer.h"
- #include "trace.h"
- #include "qemu/error-report.h"
-@@ -345,8 +346,7 @@ static int colo_do_checkpoint_transaction(MigrationState *s,
-     }
+ common-obj-$(CONFIG_RDMA) += rdma.o
  
-     /* Disable block migration */
--    s->params.blk = 0;
--    s->params.shared = 0;
-+    migrate_set_block_enabled(false, &local_err);
-     qemu_savevm_state_header(fb);
-     qemu_savevm_state_begin(fb, &s->params);
-     qemu_mutex_lock_iothread();
+-common-obj-y += block.o
++common-obj-$(CONFIG_LIVE_BLOCK_MIGRATION) += block.o
+ 
 diff --git a/migration/migration.c b/migration/migration.c
-index c13c0a2..b3d300d 100644
+index ed66158..2feeee8 100644
 --- a/migration/migration.c
 +++ b/migration/migration.c
-@@ -1224,9 +1224,6 @@ void qmp_migrate(const char *uri, bool has_blk, bool blk,
-     MigrationParams params;
-     const char *p;
+@@ -547,6 +547,11 @@ MigrationCapabilityStatusList *qmp_query_migrate_capabilities(Error **errp)
  
--    params.blk = has_blk && blk;
--    params.shared = has_inc && inc;
--
-     if (migration_is_setup_or_active(s->state) ||
-         s->state == MIGRATION_STATUS_CANCELLING ||
-         s->state == MIGRATION_STATUS_COLO) {
-diff --git a/migration/savevm.c b/migration/savevm.c
-index f5e8194..2f1f4eb 100644
---- a/migration/savevm.c
-+++ b/migration/savevm.c
-@@ -1233,8 +1233,6 @@ static int qemu_savevm_state(QEMUFile *f, Error **errp)
- {
-     int ret;
-     MigrationParams params = {
--        .blk = 0,
--        .shared = 0
-     };
-     MigrationState *ms = migrate_init(&params);
-     MigrationStatus status;
-@@ -1245,6 +1243,12 @@ static int qemu_savevm_state(QEMUFile *f, Error **errp)
-         goto done;
+     caps = NULL; /* silence compiler warning */
+     for (i = 0; i < MIGRATION_CAPABILITY__MAX; i++) {
++#ifndef CONFIG_LIVE_BLOCK_MIGRATION
++        if (i == MIGRATION_CAPABILITY_BLOCK) {
++            continue;
++        }
++#endif
+         if (i == MIGRATION_CAPABILITY_X_COLO && !colo_supported()) {
+             continue;
+         }
+@@ -763,6 +768,15 @@ void qmp_migrate_set_capabilities(MigrationCapabilityStatusList *params,
      }
  
-+    if (migrate_use_block()) {
-+        error_setg(errp, "Block migration and snapshots are incompatible");
-+        ret = -EINVAL;
-+        goto done;
-+    }
-+
-     qemu_mutex_unlock_iothread();
-     qemu_savevm_state_header(f);
-     qemu_savevm_state_begin(f, &params);
+     for (cap = params; cap; cap = cap->next) {
++#ifndef CONFIG_LIVE_BLOCK_MIGRATION
++        if (cap->value->capability == MIGRATION_CAPABILITY_BLOCK
++            && cap->value->state) {
++            error_setg(errp, "QEMU compiled without old-style (blk/-b, inc/-i) "
++                       "block migration");
++            error_append_hint(errp, "Use drive_mirror+NBD instead.\n");
++            continue;
++        }
++#endif
+         if (cap->value->capability == MIGRATION_CAPABILITY_X_COLO) {
+             if (!colo_supported()) {
+                 error_setg(errp, "COLO is not currently supported, please"
 -- 
 2.9.3
