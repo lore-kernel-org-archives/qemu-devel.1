@@ -1,22 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45190)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46190)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ndevos@redhat.com>) id 1dBNEm-0007aI-46
-	for qemu-devel@nongnu.org; Thu, 18 May 2017 11:21:13 -0400
+	(envelope-from <mst@redhat.com>) id 1dBNIo-0000NT-Lt
+	for qemu-devel@nongnu.org; Thu, 18 May 2017 11:25:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ndevos@redhat.com>) id 1dBNEl-0004yX-18
-	for qemu-devel@nongnu.org; Thu, 18 May 2017 11:21:12 -0400
-Date: Thu, 18 May 2017 17:21:02 +0200
-From: Niels de Vos <ndevos@redhat.com>
-Message-ID: <20170518152102.GE2431@ndevos-x240.usersys.redhat.com>
-References: <20170515191136.24314-1-ndevos@redhat.com>
-	<20170518095422.12555-1-ndevos@redhat.com>
-	<a194304c-1327-ec67-3f64-c0124c6482dd@redhat.com>
+	(envelope-from <mst@redhat.com>) id 1dBNIj-0006M2-OY
+	for qemu-devel@nongnu.org; Thu, 18 May 2017 11:25:22 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:51610)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1dBNIj-0006Lc-Ej
+	for qemu-devel@nongnu.org; Thu, 18 May 2017 11:25:17 -0400
+Date: Thu, 18 May 2017 18:24:59 +0300
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20170518181945-mutt-send-email-mst@kernel.org>
+References: <20170511123246.31308-1-maxime.coquelin@redhat.com>
+	<20170511123246.31308-4-maxime.coquelin@redhat.com>
+	<20170511202154-mutt-send-email-mst@kernel.org>
+	<8101cc11-51b7-9361-6506-25986aa652c4@redhat.com>
+	<20170517194008-mutt-send-email-mst@kernel.org>
+	<74684170-6dc8-3146-6a93-9c5dd723d1eb@redhat.com>
+	<34ccd41c-d799-21d9-ecf3-3903b68a24ea@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <a194304c-1327-ec67-3f64-c0124c6482dd@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2] gluster: add support for
- PREALLOC_MODE_FALLOC
+In-Reply-To: <34ccd41c-d799-21d9-ecf3-3903b68a24ea@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 3/6] vhost: Update rings information for
+ IOTLB earlier
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,35 +33,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: Jeff Cody <jcody@redhat.com>, Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
+To: Maxime Coquelin <maxime.coquelin@redhat.com>
+Cc: peterx@redhat.com, marcandre.lureau@gmail.com, vkaplans@redhat.com, jasowang@redhat.com, wexu@redhat.com, yuanhan.liu@linux.intel.com, qemu-devel@nongnu.org, jfreiman@redhat.com
 
-On Thu, May 18, 2017 at 09:30:53AM -0500, Eric Blake wrote:
-> On 05/18/2017 04:54 AM, Niels de Vos wrote:
-> > Add missing support for "preallocation=falloc" to the Gluster block
-> > driver. This change bases its logic on that of block/file-posix.c and
-> > removed the gluster_supports_zerofill() and qemu_gluster_zerofill()
-> > functiond in favour of #ifdef checks in an easy to read
+On Thu, May 18, 2017 at 04:45:23PM +0200, Maxime Coquelin wrote:
+> Hi Michael,
 > 
-> s/functiond/functions/
-> 
-> > switch-statement.
+> On 05/18/2017 09:35 AM, Maxime Coquelin wrote:
 > > 
-> > Both glfs_zerofill() and glfs_fallocate() have been introduced with
-> > GlusterFS 3.5.0 (pkg-config glusterfs-api = 6). A #define for the
-> > availability of glfs_fallocate() has been added to ./configure.
 > > 
-> > Reported-by: Satheesaran Sundaramoorthi <sasundar@redhat.com>
-> > URL: https://bugzilla.redhat.com/1450759
-> > Signed-off-by: Niels de Vos <ndevos@redhat.com>
-> > ---
-> > v2 changes requested by Jeff Cody:
-> > - add CONFIG_GLUSTERFS_FALLOCATE
-> > - remove unneeded wrapper qemu_gluster_zerofill()
+> > On 05/17/2017 06:41 PM, Michael S. Tsirkin wrote:
+> > > On Fri, May 12, 2017 at 01:21:18PM +0200, Maxime Coquelin wrote:
+> > > > 
+> > > > On 05/11/2017 07:33 PM, Michael S. Tsirkin wrote:
+> > > > > On Thu, May 11, 2017 at 02:32:43PM +0200, Maxime Coquelin wrote:
+> > > > > > Vhost-kernel backend need to receive IOTLB entries for rings
+> > > > > > information early, but vhost-user need the same information
+> > > > > > earlier, before VHOST_USER_SET_VRING_ADDR is sent.
+> > > > > Weird. What does VHOST_USER_SET_VRING_ADDR have to do with it?
+> > > > > 
+> > > > > According to
+> > > > >     Starting and stopping rings
+> > > > > in vhost user spec, vhost user does not access
+> > > > > anything until ring is started and enabled.
+> > > > > 
+> > > > > 
+> > > > > > This patch also trigger IOTLB miss for all rings informations
+> > > > > > for robustness, even if in practice these adresses are on the
+> > > > > > same page.
+> > > > Actually, the DPDK vhost-user backend is compliant with the spec,
+> > > > but when handling VHOST_USER_SET_VRING_ADDR request, it translates the
+> > > > guest addresses into backend VAs, and check they are valid. I
+> > > > will make the
+> > > > commit message clearer about this in next revision.
+> > > > 
+> > > > The check could be done later, for example when the ring are started,
+> > > > but it wouldn't change the need to trigger a miss at some point.
+> > > I think it should be done later, yes. As long as ring is not
+> > > started addresses should not be interpreted.
+> > > 
+> > 
+> > Ok, then I'll move these addresses translations in the
+> > VHOST_USER_SET_VRING_KICK handler.
+> s/VHOST_USER_SET_VRING_KICK/VHOST_USER_SET_VRING_ENABLE/
+
+Note that when protocol features are off ring is started in
+enabled state, but iommu requires protocol features.
+
+> I just looked at implementing this change, but I'm not convinced this is
+> the right thing to do.
 > 
-> The automated tools prefer that v2 patches are sent as a new top-level
-> thread, rather than buried in-reply-to the v1 thread.
+> On backend side, it means saving temporarily the vhost_vring_addr struct
+> into the vq struct, and moving all what is done currently in
+> SET_VRING_ADDR handler to SET_VRING_ENABLE one.
 
-Ok, I'm happy to resend it with the typo corrected if that helps.
+Yes, and this is consistent with what the kernel does.
 
-Niels
+> My understanding of the "Starting and stopping rings" chapter of the
+> spec is that the ring must not be processed as long as not started and
+> enabled, not that the addresses passed should not be checked/translated
+> as it is done today both in DPDK and libvhost-user.
+> 
+> If the addresses are invalid, isn't it better to know as soon as
+> possible?
+> 
+> Cheers,
+> Maxime
+
+There could be valid reasons to set an invalid address temporarily.
+For example to make sure connection is reset.
+
+
+
+-- 
+MST
