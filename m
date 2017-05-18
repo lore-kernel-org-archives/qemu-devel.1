@@ -1,19 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58118)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58193)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yang.zhong@intel.com>) id 1dBJRO-0004p5-Kl
-	for qemu-devel@nongnu.org; Thu, 18 May 2017 07:18:05 -0400
+	(envelope-from <yang.zhong@intel.com>) id 1dBJRg-0004yT-7G
+	for qemu-devel@nongnu.org; Thu, 18 May 2017 07:18:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yang.zhong@intel.com>) id 1dBJRL-0000es-DD
-	for qemu-devel@nongnu.org; Thu, 18 May 2017 07:17:58 -0400
-Received: from mga14.intel.com ([192.55.52.115]:40877)
+	(envelope-from <yang.zhong@intel.com>) id 1dBJRe-0001yu-Ov
+	for qemu-devel@nongnu.org; Thu, 18 May 2017 07:18:16 -0400
+Received: from mga03.intel.com ([134.134.136.65]:4954)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <yang.zhong@intel.com>)
-	id 1dBJRL-0000WF-1O
-	for qemu-devel@nongnu.org; Thu, 18 May 2017 07:17:55 -0400
+	id 1dBJRe-0001OQ-Bj
+	for qemu-devel@nongnu.org; Thu, 18 May 2017 07:18:14 -0400
 From: Yang Zhong <yang.zhong@intel.com>
-Date: Fri, 19 May 2017 03:14:52 +0800
-Message-Id: <1495134895-7814-1-git-send-email-yang.zhong@intel.com>
-Subject: [Qemu-devel] [PATCH 1/4] split the tcg accelerator from accel.c file
+Date: Fri, 19 May 2017 03:14:55 +0800
+Message-Id: <1495134895-7814-4-git-send-email-yang.zhong@intel.com>
+In-Reply-To: <1495134895-7814-1-git-send-email-yang.zhong@intel.com>
+References: <1495134895-7814-1-git-send-email-yang.zhong@intel.com>
+Subject: [Qemu-devel] [PATCH 4/4] move cpu-exec-common.c
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,428 +27,214 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: pbonzini@redhat.com
 Cc: anthony.xu@intel.com, qemu-devel@nongnu.org, Yang Zhong <yang.zhong@intel.com>
 
-there are two accelerators in qemu, kvm and tcg.  kvm
-accelerator is defined in kvm-all.c, but tcg accelerator
-is defined in accel.c file. we split tcg accelerator from
-accel.c file and create one new accel directory,which will
-include kvm and tcg accel files.
+move cpu-exec-common.c to accel/tcg
 
 Signed-off-by: Yang Zhong <yang.zhong@intel.com>
 ---
- Makefile.objs           |   1 -
- Makefile.target         |   1 +
- accel.c                 | 155 ------------------------------------------------
- accel/Makefile.objs     |   2 +
- accel/accel.c           | 128 +++++++++++++++++++++++++++++++++++++++
- accel/tcg/Makefile.objs |   1 +
- accel/tcg/tcg-all.c     |  61 +++++++++++++++++++
- 7 files changed, 193 insertions(+), 156 deletions(-)
- delete mode 100644 accel.c
- create mode 100644 accel/Makefile.objs
- create mode 100644 accel/accel.c
- create mode 100644 accel/tcg/Makefile.objs
- create mode 100644 accel/tcg/tcg-all.c
+ Makefile.target             |  1 -
+ accel/tcg/Makefile.objs     |  2 +-
+ accel/tcg/cpu-exec-common.c | 82 +++++++++++++++++++++++++++++++++++++++++++++
+ cpu-exec-common.c           | 82 ---------------------------------------------
+ 4 files changed, 83 insertions(+), 84 deletions(-)
+ create mode 100644 accel/tcg/cpu-exec-common.c
+ delete mode 100644 cpu-exec-common.c
 
-diff --git a/Makefile.objs b/Makefile.objs
-index 6167e7b..2a8de77 100644
---- a/Makefile.objs
-+++ b/Makefile.objs
-@@ -55,7 +55,6 @@ common-obj-$(CONFIG_SPICE) += spice-qemu-char.o
- 
- common-obj-y += audio/
- common-obj-y += hw/
--common-obj-y += accel.o
- 
- common-obj-y += replay/
- 
 diff --git a/Makefile.target b/Makefile.target
-index 465a633..ba893a8 100644
+index 709d07a..b083a76 100644
 --- a/Makefile.target
 +++ b/Makefile.target
-@@ -143,6 +143,7 @@ obj-y += arch_init.o cpus.o monitor.o gdbstub.o balloon.o ioport.o numa.o
- obj-y += qtest.o bootdevice.o
- obj-y += hw/
- obj-$(CONFIG_KVM) += kvm-all.o
-+obj-y += accel/
- obj-y += memory.o cputlb.o
- obj-y += memory_mapping.o
- obj-y += dump.o
-diff --git a/accel.c b/accel.c
+@@ -91,7 +91,6 @@ all: $(PROGS) stap
+ obj-y = exec.o translate-all.o
+ obj-y += accel/
+ obj-y += translate-common.o
+-obj-y += cpu-exec-common.o
+ obj-y += tcg/tcg.o tcg/tcg-op.o tcg/optimize.o
+ obj-$(CONFIG_TCG_INTERPRETER) += tci.o
+ obj-y += tcg/tcg-common.o
+diff --git a/accel/tcg/Makefile.objs b/accel/tcg/Makefile.objs
+index 6b75a31..940379b 100644
+--- a/accel/tcg/Makefile.objs
++++ b/accel/tcg/Makefile.objs
+@@ -1,3 +1,3 @@
+ obj-$(CONFIG_SOFTMMU) += tcg-all.o
+ obj-$(CONFIG_SOFTMMU) += cputlb.o
+-obj-y += cpu-exec.o
++obj-y += cpu-exec.o cpu-exec-common.o
+diff --git a/accel/tcg/cpu-exec-common.c b/accel/tcg/cpu-exec-common.c
+new file mode 100644
+index 0000000..e81da27
+--- /dev/null
++++ b/accel/tcg/cpu-exec-common.c
+@@ -0,0 +1,82 @@
++/*
++ *  emulator main execution loop
++ *
++ *  Copyright (c) 2003-2005 Fabrice Bellard
++ *
++ * This library is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU Lesser General Public
++ * License as published by the Free Software Foundation; either
++ * version 2 of the License, or (at your option) any later version.
++ *
++ * This library is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * Lesser General Public License for more details.
++ *
++ * You should have received a copy of the GNU Lesser General Public
++ * License along with this library; if not, see <http://www.gnu.org/licenses/>.
++ */
++
++#include "qemu/osdep.h"
++#include "cpu.h"
++#include "sysemu/cpus.h"
++#include "exec/exec-all.h"
++#include "exec/memory-internal.h"
++
++/* exit the current TB, but without causing any exception to be raised */
++void cpu_loop_exit_noexc(CPUState *cpu)
++{
++    /* XXX: restore cpu registers saved in host registers */
++
++    cpu->exception_index = -1;
++    siglongjmp(cpu->jmp_env, 1);
++}
++
++#if defined(CONFIG_SOFTMMU)
++void cpu_reloading_memory_map(void)
++{
++    if (qemu_in_vcpu_thread() && current_cpu->running) {
++        /* The guest can in theory prolong the RCU critical section as long
++         * as it feels like. The major problem with this is that because it
++         * can do multiple reconfigurations of the memory map within the
++         * critical section, we could potentially accumulate an unbounded
++         * collection of memory data structures awaiting reclamation.
++         *
++         * Because the only thing we're currently protecting with RCU is the
++         * memory data structures, it's sufficient to break the critical section
++         * in this callback, which we know will get called every time the
++         * memory map is rearranged.
++         *
++         * (If we add anything else in the system that uses RCU to protect
++         * its data structures, we will need to implement some other mechanism
++         * to force TCG CPUs to exit the critical section, at which point this
++         * part of this callback might become unnecessary.)
++         *
++         * This pair matches cpu_exec's rcu_read_lock()/rcu_read_unlock(), which
++         * only protects cpu->as->dispatch. Since we know our caller is about
++         * to reload it, it's safe to split the critical section.
++         */
++        rcu_read_unlock();
++        rcu_read_lock();
++    }
++}
++#endif
++
++void cpu_loop_exit(CPUState *cpu)
++{
++    siglongjmp(cpu->jmp_env, 1);
++}
++
++void cpu_loop_exit_restore(CPUState *cpu, uintptr_t pc)
++{
++    if (pc) {
++        cpu_restore_state(cpu, pc);
++    }
++    siglongjmp(cpu->jmp_env, 1);
++}
++
++void cpu_loop_exit_atomic(CPUState *cpu, uintptr_t pc)
++{
++    cpu->exception_index = EXCP_ATOMIC;
++    cpu_loop_exit_restore(cpu, pc);
++}
+diff --git a/cpu-exec-common.c b/cpu-exec-common.c
 deleted file mode 100644
-index 664bb88..0000000
---- a/accel.c
+index e81da27..0000000
+--- a/cpu-exec-common.c
 +++ /dev/null
-@@ -1,155 +0,0 @@
+@@ -1,82 +0,0 @@
 -/*
-- * QEMU System Emulator, accelerator interfaces
+- *  emulator main execution loop
 - *
-- * Copyright (c) 2003-2008 Fabrice Bellard
-- * Copyright (c) 2014 Red Hat Inc.
+- *  Copyright (c) 2003-2005 Fabrice Bellard
 - *
-- * Permission is hereby granted, free of charge, to any person obtaining a copy
-- * of this software and associated documentation files (the "Software"), to deal
-- * in the Software without restriction, including without limitation the rights
-- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-- * copies of the Software, and to permit persons to whom the Software is
-- * furnished to do so, subject to the following conditions:
+- * This library is free software; you can redistribute it and/or
+- * modify it under the terms of the GNU Lesser General Public
+- * License as published by the Free Software Foundation; either
+- * version 2 of the License, or (at your option) any later version.
 - *
-- * The above copyright notice and this permission notice shall be included in
-- * all copies or substantial portions of the Software.
+- * This library is distributed in the hope that it will be useful,
+- * but WITHOUT ANY WARRANTY; without even the implied warranty of
+- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+- * Lesser General Public License for more details.
 - *
-- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
-- * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-- * THE SOFTWARE.
+- * You should have received a copy of the GNU Lesser General Public
+- * License along with this library; if not, see <http://www.gnu.org/licenses/>.
 - */
 -
 -#include "qemu/osdep.h"
--#include "sysemu/accel.h"
--#include "hw/boards.h"
--#include "qemu-common.h"
--#include "sysemu/arch_init.h"
--#include "sysemu/sysemu.h"
--#include "sysemu/kvm.h"
--#include "sysemu/qtest.h"
--#include "hw/xen/xen.h"
--#include "qom/object.h"
+-#include "cpu.h"
+-#include "sysemu/cpus.h"
+-#include "exec/exec-all.h"
+-#include "exec/memory-internal.h"
 -
--int tcg_tb_size;
--static bool tcg_allowed = true;
--
--static int tcg_init(MachineState *ms)
+-/* exit the current TB, but without causing any exception to be raised */
+-void cpu_loop_exit_noexc(CPUState *cpu)
 -{
--    tcg_exec_init(tcg_tb_size * 1024 * 1024);
--    return 0;
+-    /* XXX: restore cpu registers saved in host registers */
+-
+-    cpu->exception_index = -1;
+-    siglongjmp(cpu->jmp_env, 1);
 -}
 -
--static const TypeInfo accel_type = {
--    .name = TYPE_ACCEL,
--    .parent = TYPE_OBJECT,
--    .class_size = sizeof(AccelClass),
--    .instance_size = sizeof(AccelState),
--};
--
--/* Lookup AccelClass from opt_name. Returns NULL if not found */
--static AccelClass *accel_find(const char *opt_name)
+-#if defined(CONFIG_SOFTMMU)
+-void cpu_reloading_memory_map(void)
 -{
--    char *class_name = g_strdup_printf(ACCEL_CLASS_NAME("%s"), opt_name);
--    AccelClass *ac = ACCEL_CLASS(object_class_by_name(class_name));
--    g_free(class_name);
--    return ac;
--}
--
--static int accel_init_machine(AccelClass *acc, MachineState *ms)
--{
--    ObjectClass *oc = OBJECT_CLASS(acc);
--    const char *cname = object_class_get_name(oc);
--    AccelState *accel = ACCEL(object_new(cname));
--    int ret;
--    ms->accelerator = accel;
--    *(acc->allowed) = true;
--    ret = acc->init_machine(ms);
--    if (ret < 0) {
--        ms->accelerator = NULL;
--        *(acc->allowed) = false;
--        object_unref(OBJECT(accel));
--    }
--    return ret;
--}
--
--void configure_accelerator(MachineState *ms)
--{
--    const char *p;
--    char buf[10];
--    int ret;
--    bool accel_initialised = false;
--    bool init_failed = false;
--    AccelClass *acc = NULL;
--
--    p = qemu_opt_get(qemu_get_machine_opts(), "accel");
--    if (p == NULL) {
--        /* Use the default "accelerator", tcg */
--        p = "tcg";
--    }
--
--    while (!accel_initialised && *p != '\0') {
--        if (*p == ':') {
--            p++;
--        }
--        p = get_opt_name(buf, sizeof(buf), p, ':');
--        acc = accel_find(buf);
--        if (!acc) {
--            fprintf(stderr, "\"%s\" accelerator not found.\n", buf);
--            continue;
--        }
--        if (acc->available && !acc->available()) {
--            printf("%s not supported for this target\n",
--                   acc->name);
--            continue;
--        }
--        ret = accel_init_machine(acc, ms);
--        if (ret < 0) {
--            init_failed = true;
--            fprintf(stderr, "failed to initialize %s: %s\n",
--                    acc->name,
--                    strerror(-ret));
--        } else {
--            accel_initialised = true;
--        }
--    }
--
--    if (!accel_initialised) {
--        if (!init_failed) {
--            fprintf(stderr, "No accelerator found!\n");
--        }
--        exit(1);
--    }
--
--    if (init_failed) {
--        fprintf(stderr, "Back to %s accelerator.\n", acc->name);
+-    if (qemu_in_vcpu_thread() && current_cpu->running) {
+-        /* The guest can in theory prolong the RCU critical section as long
+-         * as it feels like. The major problem with this is that because it
+-         * can do multiple reconfigurations of the memory map within the
+-         * critical section, we could potentially accumulate an unbounded
+-         * collection of memory data structures awaiting reclamation.
+-         *
+-         * Because the only thing we're currently protecting with RCU is the
+-         * memory data structures, it's sufficient to break the critical section
+-         * in this callback, which we know will get called every time the
+-         * memory map is rearranged.
+-         *
+-         * (If we add anything else in the system that uses RCU to protect
+-         * its data structures, we will need to implement some other mechanism
+-         * to force TCG CPUs to exit the critical section, at which point this
+-         * part of this callback might become unnecessary.)
+-         *
+-         * This pair matches cpu_exec's rcu_read_lock()/rcu_read_unlock(), which
+-         * only protects cpu->as->dispatch. Since we know our caller is about
+-         * to reload it, it's safe to split the critical section.
+-         */
+-        rcu_read_unlock();
+-        rcu_read_lock();
 -    }
 -}
+-#endif
 -
--
--static void tcg_accel_class_init(ObjectClass *oc, void *data)
+-void cpu_loop_exit(CPUState *cpu)
 -{
--    AccelClass *ac = ACCEL_CLASS(oc);
--    ac->name = "tcg";
--    ac->init_machine = tcg_init;
--    ac->allowed = &tcg_allowed;
+-    siglongjmp(cpu->jmp_env, 1);
 -}
 -
--#define TYPE_TCG_ACCEL ACCEL_CLASS_NAME("tcg")
--
--static const TypeInfo tcg_accel_type = {
--    .name = TYPE_TCG_ACCEL,
--    .parent = TYPE_ACCEL,
--    .class_init = tcg_accel_class_init,
--};
--
--static void register_accel_types(void)
+-void cpu_loop_exit_restore(CPUState *cpu, uintptr_t pc)
 -{
--    type_register_static(&accel_type);
--    type_register_static(&tcg_accel_type);
+-    if (pc) {
+-        cpu_restore_state(cpu, pc);
+-    }
+-    siglongjmp(cpu->jmp_env, 1);
 -}
 -
--type_init(register_accel_types);
-diff --git a/accel/Makefile.objs b/accel/Makefile.objs
-new file mode 100644
-index 0000000..11ad823
---- /dev/null
-+++ b/accel/Makefile.objs
-@@ -0,0 +1,2 @@
-+obj-$(CONFIG_SOFTMMU) += accel.o
-+obj-y += tcg/
-diff --git a/accel/accel.c b/accel/accel.c
-new file mode 100644
-index 0000000..7c079a5
---- /dev/null
-+++ b/accel/accel.c
-@@ -0,0 +1,128 @@
-+/*
-+ * QEMU System Emulator, accelerator interfaces
-+ *
-+ * Copyright (c) 2003-2008 Fabrice Bellard
-+ * Copyright (c) 2014 Red Hat Inc.
-+ *
-+ * Permission is hereby granted, free of charge, to any person obtaining a copy
-+ * of this software and associated documentation files (the "Software"), to deal
-+ * in the Software without restriction, including without limitation the rights
-+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-+ * copies of the Software, and to permit persons to whom the Software is
-+ * furnished to do so, subject to the following conditions:
-+ *
-+ * The above copyright notice and this permission notice shall be included in
-+ * all copies or substantial portions of the Software.
-+ *
-+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
-+ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-+ * THE SOFTWARE.
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "sysemu/accel.h"
-+#include "hw/boards.h"
-+#include "qemu-common.h"
-+#include "sysemu/arch_init.h"
-+#include "sysemu/sysemu.h"
-+#include "sysemu/kvm.h"
-+#include "sysemu/qtest.h"
-+#include "hw/xen/xen.h"
-+#include "qom/object.h"
-+
-+static const TypeInfo accel_type = {
-+    .name = TYPE_ACCEL,
-+    .parent = TYPE_OBJECT,
-+    .class_size = sizeof(AccelClass),
-+    .instance_size = sizeof(AccelState),
-+};
-+
-+/* Lookup AccelClass from opt_name. Returns NULL if not found */
-+static AccelClass *accel_find(const char *opt_name)
-+{
-+    char *class_name = g_strdup_printf(ACCEL_CLASS_NAME("%s"), opt_name);
-+    AccelClass *ac = ACCEL_CLASS(object_class_by_name(class_name));
-+    g_free(class_name);
-+    return ac;
-+}
-+
-+static int accel_init_machine(AccelClass *acc, MachineState *ms)
-+{
-+    ObjectClass *oc = OBJECT_CLASS(acc);
-+    const char *cname = object_class_get_name(oc);
-+    AccelState *accel = ACCEL(object_new(cname));
-+    int ret;
-+    ms->accelerator = accel;
-+    *(acc->allowed) = true;
-+    ret = acc->init_machine(ms);
-+    if (ret < 0) {
-+        ms->accelerator = NULL;
-+        *(acc->allowed) = false;
-+        object_unref(OBJECT(accel));
-+    }
-+    return ret;
-+}
-+
-+void configure_accelerator(MachineState *ms)
-+{
-+    const char *p;
-+    char buf[10];
-+    int ret;
-+    bool accel_initialised = false;
-+    bool init_failed = false;
-+    AccelClass *acc = NULL;
-+
-+    p = qemu_opt_get(qemu_get_machine_opts(), "accel");
-+    if (p == NULL) {
-+        /* Use the default "accelerator", tcg */
-+        p = "tcg";
-+    }
-+
-+    while (!accel_initialised && *p != '\0') {
-+        if (*p == ':') {
-+            p++;
-+        }
-+        p = get_opt_name(buf, sizeof(buf), p, ':');
-+        acc = accel_find(buf);
-+        if (!acc) {
-+            fprintf(stderr, "\"%s\" accelerator not found.\n", buf);
-+            continue;
-+        }
-+        if (acc->available && !acc->available()) {
-+            printf("%s not supported for this target\n",
-+                   acc->name);
-+            continue;
-+        }
-+        ret = accel_init_machine(acc, ms);
-+        if (ret < 0) {
-+            init_failed = true;
-+            fprintf(stderr, "failed to initialize %s: %s\n",
-+                    acc->name,
-+                    strerror(-ret));
-+        } else {
-+            accel_initialised = true;
-+        }
-+    }
-+
-+    if (!accel_initialised) {
-+        if (!init_failed) {
-+            fprintf(stderr, "No accelerator found!\n");
-+        }
-+        exit(1);
-+    }
-+
-+    if (init_failed) {
-+        fprintf(stderr, "Back to %s accelerator.\n", acc->name);
-+    }
-+}
-+
-+static void register_accel_types(void)
-+{
-+    type_register_static(&accel_type);
-+}
-+
-+type_init(register_accel_types);
-diff --git a/accel/tcg/Makefile.objs b/accel/tcg/Makefile.objs
-new file mode 100644
-index 0000000..6e3211a
---- /dev/null
-+++ b/accel/tcg/Makefile.objs
-@@ -0,0 +1 @@
-+obj-$(CONFIG_SOFTMMU) += tcg-all.o
-diff --git a/accel/tcg/tcg-all.c b/accel/tcg/tcg-all.c
-new file mode 100644
-index 0000000..dba9931
---- /dev/null
-+++ b/accel/tcg/tcg-all.c
-@@ -0,0 +1,61 @@
-+/*
-+ * QEMU System Emulator, accelerator interfaces
-+ *
-+ * Copyright (c) 2003-2008 Fabrice Bellard
-+ * Copyright (c) 2014 Red Hat Inc.
-+ *
-+ * Permission is hereby granted, free of charge, to any person obtaining a copy
-+ * of this software and associated documentation files (the "Software"), to deal
-+ * in the Software without restriction, including without limitation the rights
-+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-+ * copies of the Software, and to permit persons to whom the Software is
-+ * furnished to do so, subject to the following conditions:
-+ *
-+ * The above copyright notice and this permission notice shall be included in
-+ * all copies or substantial portions of the Software.
-+ *
-+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
-+ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-+ * THE SOFTWARE.
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "sysemu/accel.h"
-+#include "sysemu/sysemu.h"
-+#include "qom/object.h"
-+
-+int tcg_tb_size;
-+static bool tcg_allowed = true;
-+
-+static int tcg_init(MachineState *ms)
-+{
-+    tcg_exec_init(tcg_tb_size * 1024 * 1024);
-+    return 0;
-+}
-+
-+static void tcg_accel_class_init(ObjectClass *oc, void *data)
-+{
-+    AccelClass *ac = ACCEL_CLASS(oc);
-+    ac->name = "tcg";
-+    ac->init_machine = tcg_init;
-+    ac->allowed = &tcg_allowed;
-+}
-+
-+#define TYPE_TCG_ACCEL ACCEL_CLASS_NAME("tcg")
-+
-+static const TypeInfo tcg_accel_type = {
-+    .name = TYPE_TCG_ACCEL,
-+    .parent = TYPE_ACCEL,
-+    .class_init = tcg_accel_class_init,
-+};
-+
-+static void register_accel_types(void)
-+{
-+    type_register_static(&tcg_accel_type);
-+}
-+
-+type_init(register_accel_types);
+-void cpu_loop_exit_atomic(CPUState *cpu, uintptr_t pc)
+-{
+-    cpu->exception_index = EXCP_ATOMIC;
+-    cpu_loop_exit_restore(cpu, pc);
+-}
 -- 
 1.9.1
