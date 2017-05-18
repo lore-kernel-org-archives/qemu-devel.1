@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37384)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45638)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dBTTL-0004av-DD
-	for qemu-devel@nongnu.org; Thu, 18 May 2017 18:00:40 -0400
+	(envelope-from <rob@landley.net>) id 1dBU0n-00022g-FP
+	for qemu-devel@nongnu.org; Thu, 18 May 2017 18:35:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dBTTG-00008f-Ne
-	for qemu-devel@nongnu.org; Thu, 18 May 2017 18:00:39 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46288)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1dBTTG-00008P-HX
-	for qemu-devel@nongnu.org; Thu, 18 May 2017 18:00:34 -0400
-References: <1494897683-16395-1-git-send-email-anthony.xu@intel.com>
-	<9fa04242-c144-d5d1-f49b-1bce1df10053@redhat.com>
-	<4712D8F4B26E034E80552F30A67BE0B1AB8D87@ORSMSX112.amr.corp.intel.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <23ecbc03-751d-e804-ea99-949e5dabe63b@redhat.com>
-Date: Fri, 19 May 2017 00:00:30 +0200
+	(envelope-from <rob@landley.net>) id 1dBU0k-0003bl-8r
+	for qemu-devel@nongnu.org; Thu, 18 May 2017 18:35:13 -0400
+Received: from mail-oi0-x243.google.com ([2607:f8b0:4003:c06::243]:35212)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <rob@landley.net>) id 1dBU0k-0003ac-23
+	for qemu-devel@nongnu.org; Thu, 18 May 2017 18:35:10 -0400
+Received: by mail-oi0-x243.google.com with SMTP id m17so9729480oik.2
+	for <qemu-devel@nongnu.org>; Thu, 18 May 2017 15:35:09 -0700 (PDT)
+References: <f0c4de76-77a7-90c4-6a99-10ddda953b19@landley.net>
+	<c07840b7-29ce-1866-d739-ebe2646a040d@redhat.com>
+From: Rob Landley <rob@landley.net>
+Message-ID: <fa9191ac-21dd-ee56-cd4b-b3b473625ae7@landley.net>
+Date: Thu, 18 May 2017 17:35:07 -0500
 MIME-Version: 1.0
-In-Reply-To: <4712D8F4B26E034E80552F30A67BE0B1AB8D87@ORSMSX112.amr.corp.intel.com>
+In-Reply-To: <c07840b7-29ce-1866-d739-ebe2646a040d@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] SMM: disable smram region if smm is
- disabled
+Subject: Re: [Qemu-devel] qemu-system-sh4 -M r2d serial is broken.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,24 +29,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Xu, Anthony" <anthony.xu@intel.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org, Aurelien Jarno <aurelien@aurel32.net>
 
 
 
-On 16/05/2017 22:22, Xu, Anthony wrote:
->> On 16/05/2017 03:21, Anthony Xu wrote:
->>> when smm is disabled, smram is not used, so disable it
->>>
->>> Signed-off-by: Anthony Xu <anthony.xu@intel.com>
->>
->> What is the benefit?
+On 05/18/2017 02:57 PM, Paolo Bonzini wrote:
 > 
-> This patch removes 1 memory region for i440 platform and 3 memory regions
-> for q35 platform. That makes functions which iterates memory region tree
-> a little bit fast even the memory regions are disabled.
+> 
+> On 18/05/2017 18:08, Rob Landley wrote:
+>> Serial input hangs after the first character in the 4.11 kernel:
+>>
+>>   http://www.spinics.net/lists/linux-sh/msg51183.html
+>>
+>> Because they enabled support for a buffer size thing QEMU doesn't
+>> emulate right:
+>>
+>>   http://www.spinics.net/lists/linux-sh/msg51189.html
+> 
+> Hey,
+> 
+> regarding this:
+> 
+>> The really _fun_ thing about this is qemu broke it a couple years back
+>> and now if you hit ctrl-c it kills the _emulator_ rather than passing it
+>> through to the Linux console. (Just sh4, the rest do it right.)
+> 
+> Try replacing "-serial stdio" with "-serial mon:stdio".  You'll also be
+> able to use the QEMU monitor with "Ctrl-a c", so you can quit with
+> "Ctrl-a c quit <enter>".
 
-Does it translate to anything measurable in benchmarks?  Could you leave
-the regions there, but skip the creation of the SMRAM address space in
-register_smram_listener when the machine doesn't have SMM enabled?
+Ctrl-c now goes through. Thanks!
 
-Paolo
+Exiting the linux instance says "reboot: Restarting system\nUnauthorized
+access" and then hangs eating 100% cpu, but maybe I can fix that with
+kernel configuration changes.
+
+(I'm still doing a variant of
+https://landley.net/aboriginal/control-images so the virtual system
+needs to be able to indicate when it's done. But
+https://landley.net/aboriginal/about.html is getting replaced with
+https://github.com/landley/mkroot so there's some plumbing to do before
+that's blocking anything...)
+
+Thanks again,
+
+Rob
