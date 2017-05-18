@@ -1,36 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44959)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48651)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <danielhb@linux.vnet.ibm.com>) id 1dBS9z-0002lK-5K
-	for qemu-devel@nongnu.org; Thu, 18 May 2017 16:36:39 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1dBSLr-0000ik-To
+	for qemu-devel@nongnu.org; Thu, 18 May 2017 16:48:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <danielhb@linux.vnet.ibm.com>) id 1dBS9t-0005y6-V8
-	for qemu-devel@nongnu.org; Thu, 18 May 2017 16:36:35 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:38440
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <danielhb@linux.vnet.ibm.com>)
-	id 1dBS9t-0005xz-Pd
-	for qemu-devel@nongnu.org; Thu, 18 May 2017 16:36:29 -0400
-Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v4IKY3in036132
-	for <qemu-devel@nongnu.org>; Thu, 18 May 2017 16:36:29 -0400
-Received: from e24smtp03.br.ibm.com (e24smtp03.br.ibm.com [32.104.18.24])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2ahjhprk5w-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Thu, 18 May 2017 16:36:28 -0400
-Received: from localhost
-	by e24smtp03.br.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <danielhb@linux.vnet.ibm.com>;
-	Thu, 18 May 2017 17:36:27 -0300
-From: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
-Date: Thu, 18 May 2017 17:35:48 -0300
-In-Reply-To: <20170518203548.14207-1-danielhb@linux.vnet.ibm.com>
-References: <20170518203548.14207-1-danielhb@linux.vnet.ibm.com>
-Message-Id: <20170518203548.14207-6-danielhb@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH v10 5/5] migration: spapr: migrate ccs_list in
- spapr state
+	(envelope-from <pbonzini@redhat.com>) id 1dBSLn-0002HI-Ug
+	for qemu-devel@nongnu.org; Thu, 18 May 2017 16:48:51 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:51186)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1dBSLn-0002Gi-OX
+	for qemu-devel@nongnu.org; Thu, 18 May 2017 16:48:47 -0400
+References: <f0c4de76-77a7-90c4-6a99-10ddda953b19@landley.net>
+	<c07840b7-29ce-1866-d739-ebe2646a040d@redhat.com>
+	<20170518201038.ytrkrqvrioavcudq@aurel32.net>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <12c57fbe-d9f1-a54c-b2a8-e7dffcb6670b@redhat.com>
+Date: Thu, 18 May 2017 22:48:43 +0200
+MIME-Version: 1.0
+In-Reply-To: <20170518201038.ytrkrqvrioavcudq@aurel32.net>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] qemu-system-sh4 -M r2d serial is broken.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,99 +29,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-ppc@nongnu.org, david@gibson.dropbear.id.au, mdroth@linux.vnet.ibm.com
+To: Aurelien Jarno <aurelien@aurel32.net>
+Cc: Rob Landley <rob@landley.net>, qemu-devel@nongnu.org
 
-From: Jianjun Duan <duanj@linux.vnet.ibm.com>
 
-ccs_list in spapr state maintains the device tree related
-information on the rtas side for hotplugged devices. In racing
-situations between hotplug events and migration operation, a rtas
-hotplug event could be migrated from the source guest to target
-guest, or the source guest could have not yet finished fetching
-the device tree when migration is started, the target will try
-to finish fetching the device tree. By migrating ccs_list, the
-target can fetch the device tree properly.
 
-In theory there would be other alternatives besides migrating the
-css_list to fix this. For example, we could add a flag that indicates
-whether a device is in the middle of the configure_connector during the
-migration process, in the post_load we can detect if this flag
-is active and then return an error informing the guest to restart the
-hotplug process. However, the DRC state can still be modified outside of
-hotplug. Using:
+On 18/05/2017 22:10, Aurelien Jarno wrote:
+> On 2017-05-18 21:57, Paolo Bonzini wrote:
+>> Anyway, Uli Hecht is saying SCIF "asserts DR even if the FIFO threshold
+>> has not been reached if no data is received for 1.5 frames".  If that's
+>> just a register and doesn't trigger an interrupt, you can compute the
+>> bit's value dynamically based on the current clock.
+>>
+>> This is for example how the x86 RTC chip computes the "update in
+>> progress" bit, which is set for 220 us before the RC updates.  Doing
+>> that with a timer would be really imprecise.
+> 
+> Unfortunately, the DR bit is set to 1 after 1.5 frames (so the exact
+> timing depends on the actual baud rate), and that also triggers an
+> interrupt if the RIE bit is set to 1. I haven't checked yet if the
+> kernel relies on the bit or the interrupt or both.
 
-   drmgr -c pci -s <drc_index> -r
-   drmgr -c pci -s <drc_index> -a
+DR only generates interrupts in asynchronous mode according to the data
+sheet I found
+(http://datasheet.octopart.com/DF72115D160FPV-Renesas-datasheet-11797591.pdf).
 
-it is possible to return a device to firmware and then later take it
-back and reconfigure it. This is not a common case but it's not prohibited,
-and performing a migration between these 2 operations would fail because
-the default coldplug state on target assumes a configured state in
-the source*. Migrating ccs_list is one solution that cover this
-case as well.
-
-ccs_list is put in a subsection in the spapr state VMSD to make
-sure migration across different versions is not broken.
-
-* see http://lists.nongnu.org/archive/html/qemu-devel/2016-10/msg01763.html
-for more information on this discussion.
-
-Signed-off-by: Jianjun Duan <duanj@linux.vnet.ibm.com>
-Signed-off-by: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
----
- hw/ppc/spapr.c | 32 ++++++++++++++++++++++++++++++++
- 1 file changed, 32 insertions(+)
-
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index 7d304fc..ec1605a 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -1444,6 +1444,37 @@ static bool version_before_3(void *opaque, int version_id)
-     return version_id < 3;
- }
- 
-+static bool spapr_ccs_list_needed(void *opaque)
-+{
-+    sPAPRMachineState *spapr = (sPAPRMachineState *)opaque;
-+    return !QTAILQ_EMPTY(&spapr->ccs_list);
-+}
-+
-+static const VMStateDescription vmstate_spapr_ccs = {
-+    .name = "spapr_configure_connector_state",
-+    .version_id = 1,
-+    .minimum_version_id = 1,
-+    .fields = (VMStateField[]) {
-+        VMSTATE_UINT32(drc_index, sPAPRConfigureConnectorState),
-+        VMSTATE_INT32(fdt_offset, sPAPRConfigureConnectorState),
-+        VMSTATE_INT32(fdt_depth, sPAPRConfigureConnectorState),
-+        VMSTATE_END_OF_LIST()
-+    },
-+};
-+
-+static const VMStateDescription vmstate_spapr_ccs_list = {
-+    .name = "spapr_ccs_list",
-+    .version_id = 1,
-+    .minimum_version_id = 1,
-+    .needed = spapr_ccs_list_needed,
-+    .fields = (VMStateField[]) {
-+        VMSTATE_QTAILQ_V(ccs_list, sPAPRMachineState, 1,
-+                         vmstate_spapr_ccs, sPAPRConfigureConnectorState,
-+                         next),
-+        VMSTATE_END_OF_LIST()
-+    },
-+};
-+
- static bool spapr_ov5_cas_needed(void *opaque)
- {
-     sPAPRMachineState *spapr = opaque;
-@@ -1542,6 +1573,7 @@ static const VMStateDescription vmstate_spapr = {
-     .subsections = (const VMStateDescription*[]) {
-         &vmstate_spapr_ov5_cas,
-         &vmstate_spapr_patb_entry,
-+        &vmstate_spapr_ccs_list,
-         NULL
-     }
- };
--- 
-2.9.4
+Paolo
