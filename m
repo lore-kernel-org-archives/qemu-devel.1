@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44620)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44651)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dBEFj-00084O-BZ
-	for qemu-devel@nongnu.org; Thu, 18 May 2017 01:45:36 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1dBEFk-00084g-5b
+	for qemu-devel@nongnu.org; Thu, 18 May 2017 01:45:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dBEFi-0003Rs-8K
-	for qemu-devel@nongnu.org; Thu, 18 May 2017 01:45:35 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1dBEFi-0003S5-L0
+	for qemu-devel@nongnu.org; Thu, 18 May 2017 01:45:36 -0400
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Thu, 18 May 2017 15:45:22 +1000
-Message-Id: <20170518054522.13141-4-david@gibson.dropbear.id.au>
+Date: Thu, 18 May 2017 15:45:21 +1000
+Message-Id: <20170518054522.13141-3-david@gibson.dropbear.id.au>
 In-Reply-To: <20170518054522.13141-1-david@gibson.dropbear.id.au>
 References: <20170518054522.13141-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [PATCH 3/3] pseries: Improve tracing of CPU
- compatibility negotiation
+Subject: [Qemu-devel] [PATCH 2/3] pseries: Restore PVR negotiation logic for
+ pre-2.9 machine types
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,96 +23,172 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: abologna@redhat.com, thuth@redhat.com, lvivier@redhat.com
 Cc: mdroth@linux.vnet.ibm.com, groug@kaod.org, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
 
-This makes some improvements to the debug tracepoints around the
-negotiation of CPU compatibility mode during CAS.  The traces are
-reorganized to emphasise what the inputs and outputs of the process are,
-then distinguish the internal state of the two possible negotiation paths
-(current and pre-2.8 machine type compatibility).
+"pseries" guests go through a hypervisor<->guest feature negotiation during
+early boot.  Part of this is finding a CPU compatibility mode which works
+for both.
 
+In 152ef80 "pseries: Rewrite CAS PVR compatibility logic" this logic was
+changed to strongly prefer architecture defined CPU compatibility modes,
+rather than CPU "raw" modes.  However, this change was made universally,
+which introduces a guest visible change for the previously existing machine
+types (pseries-2.8 and earlier).  That's never supposed to happen.
+
+This corrects the behaviour, reverting to the old PVR negotiation logic
+for machine types prior to pseries-2.9.
+
+Fixes: 152ef803ceb1959e2380a1da7736b935b109222e
+Reported-by: Andrea Bolognani <abologna@redhat.com>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+Reviewed-by: Laurent Vivier <lvivier@redhat.com>
 ---
- hw/ppc/spapr_hcall.c | 14 ++++++++------
- hw/ppc/trace-events  |  6 ++++--
- 2 files changed, 12 insertions(+), 8 deletions(-)
+ hw/ppc/spapr.c         |  3 ++
+ hw/ppc/spapr_hcall.c   | 90 +++++++++++++++++++++++++++++++++++++++++++++++++-
+ include/hw/ppc/spapr.h |  1 +
+ 3 files changed, 93 insertions(+), 1 deletion(-)
 
+diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+index 35dceb0..ad8ddf2 100644
+--- a/hw/ppc/spapr.c
++++ b/hw/ppc/spapr.c
+@@ -3313,9 +3313,12 @@ static void spapr_machine_2_8_instance_options(MachineState *machine)
+ 
+ static void spapr_machine_2_8_class_options(MachineClass *mc)
+ {
++    sPAPRMachineClass *smc = SPAPR_MACHINE_CLASS(mc);
++
+     spapr_machine_2_9_class_options(mc);
+     SET_MACHINE_COMPAT(mc, SPAPR_COMPAT_2_8);
+     mc->numa_mem_align_shift = 23;
++    smc->pre_2_9_cas_pvr = true;
+ }
+ 
+ DEFINE_SPAPR_MACHINE(2_8, "2.8", false);
 diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
-index a790da7..cea5d99 100644
+index 77d2d66..a790da7 100644
 --- a/hw/ppc/spapr_hcall.c
 +++ b/hw/ppc/spapr_hcall.c
-@@ -1109,7 +1109,6 @@ static uint32_t cas_check_pvr_pre_2_9(PowerPCCPU *cpu, target_ulong *addr,
-             break; /* Terminator record */
-         }
- 
--        trace_spapr_cas_pvr_try(pvr);
-         if (!max_lvl &&
-             ((cpu->env.spr[SPR_PVR] & pvr_mask) == (pvr & pvr_mask))) {
-             cpu_match = true;
-@@ -1120,10 +1119,10 @@ static uint32_t cas_check_pvr_pre_2_9(PowerPCCPU *cpu, target_ulong *addr,
-         } else if (!cpu_match) {
-             cas_handle_compat_cpu(pcc, pvr, max_lvl, &compat_lvl, &compat_pvr);
-         }
-+        trace_cas_check_pvr_pre_2_9(pvr, pvr_mask, cpu_match,
-+                                    compat_lvl, compat_pvr);
+@@ -1044,6 +1044,89 @@ static target_ulong h_signal_sys_reset(PowerPCCPU *cpu,
      }
- 
--    trace_spapr_cas_pvr(cpu->compat_pvr, cpu_match, compat_pvr);
--
-     return compat_pvr;
  }
  
-@@ -1158,6 +1157,7 @@ static uint32_t cas_check_pvr(PowerPCCPU *cpu, target_ulong *addr,
-                 best_compat = pvr;
-             }
-         }
-+        trace_cas_check_pvr(pvr, pvr_mask, explicit_match, best_compat);
-     }
- 
-     if ((best_compat == 0) && (!explicit_match || max_compat)) {
-@@ -1168,9 +1168,6 @@ static uint32_t cas_check_pvr(PowerPCCPU *cpu, target_ulong *addr,
-         return 0;
-     }
- 
--    /* Parsing finished */
--    trace_spapr_cas_pvr(cpu->compat_pvr, explicit_match, best_compat);
--
-     return best_compat;
- }
- 
-@@ -1188,6 +1185,9 @@ static target_ulong h_client_architecture_support(PowerPCCPU *cpu,
++/*
++ * Old logic for PVR negotiation, used old <2.9 machine types for
++ * compatibility with old qemu versions
++ */
++#define get_compat_level(cpuver) (                  \
++        ((cpuver) == CPU_POWERPC_LOGICAL_2_05) ? 2050 : \
++        ((cpuver) == CPU_POWERPC_LOGICAL_2_06) ? 2060 :  \
++        ((cpuver) == CPU_POWERPC_LOGICAL_2_06_PLUS) ? 2061 :    \
++        ((cpuver) == CPU_POWERPC_LOGICAL_2_07) ? 2070 : 0)
++
++static void cas_handle_compat_cpu(PowerPCCPUClass *pcc, uint32_t pvr,
++                                  unsigned max_lvl, unsigned *compat_lvl,
++                                  unsigned *compat_pvr)
++{
++    unsigned lvl = get_compat_level(pvr);
++    bool is205, is206, is207;
++
++    if (!lvl) {
++        return;
++    }
++
++    /* If it is a logical PVR, try to determine the highest level */
++    is205 = (pcc->pcr_supported & PCR_COMPAT_2_05) &&
++        (lvl == get_compat_level(CPU_POWERPC_LOGICAL_2_05));
++    is206 = (pcc->pcr_supported & PCR_COMPAT_2_06) &&
++        ((lvl == get_compat_level(CPU_POWERPC_LOGICAL_2_06)) ||
++         (lvl == get_compat_level(CPU_POWERPC_LOGICAL_2_06_PLUS)));
++    is207 = (pcc->pcr_supported & PCR_COMPAT_2_07) &&
++        (lvl == get_compat_level(CPU_POWERPC_LOGICAL_2_07));
++
++    if (is205 || is206 || is207) {
++        if (!max_lvl) {
++            /* User did not set the level, choose the highest */
++            if (*compat_lvl <= lvl) {
++                *compat_lvl = lvl;
++                *compat_pvr = pvr;
++            }
++        } else if (max_lvl >= lvl) {
++            /* User chose the level, don't set higher than this */
++            *compat_lvl = lvl;
++            *compat_pvr = pvr;
++        }
++    }
++}
++
++static uint32_t cas_check_pvr_pre_2_9(PowerPCCPU *cpu, target_ulong *addr,
++                                      Error **errp)
++{
++    PowerPCCPUClass *pcc = POWERPC_CPU_GET_CLASS(cpu);
++    int counter;
++    unsigned max_lvl = get_compat_level(cpu->max_compat);
++    bool cpu_match = false;
++    unsigned compat_lvl = 0, compat_pvr = 0;
++
++    for (counter = 0; counter < 512; ++counter) {
++        uint32_t pvr, pvr_mask;
++
++        pvr_mask = ldl_be_phys(&address_space_memory, *addr);
++        pvr = ldl_be_phys(&address_space_memory, *addr + 4);
++        *addr += 8;
++
++        if (~pvr_mask & pvr) {
++            break; /* Terminator record */
++        }
++
++        trace_spapr_cas_pvr_try(pvr);
++        if (!max_lvl &&
++            ((cpu->env.spr[SPR_PVR] & pvr_mask) == (pvr & pvr_mask))) {
++            cpu_match = true;
++            compat_pvr = 0;
++        } else if (pvr == cpu->compat_pvr) {
++            cpu_match = true;
++            compat_pvr = cpu->compat_pvr;
++        } else if (!cpu_match) {
++            cas_handle_compat_cpu(pcc, pvr, max_lvl, &compat_lvl, &compat_pvr);
++        }
++    }
++
++    trace_spapr_cas_pvr(cpu->compat_pvr, cpu_match, compat_pvr);
++
++    return compat_pvr;
++}
++
+ static uint32_t cas_check_pvr(PowerPCCPU *cpu, target_ulong *addr,
+                               Error **errp)
+ {
+@@ -1096,6 +1179,7 @@ static target_ulong h_client_architecture_support(PowerPCCPU *cpu,
+                                                   target_ulong opcode,
+                                                   target_ulong *args)
+ {
++    sPAPRMachineClass *smc = SPAPR_MACHINE_GET_CLASS(spapr);
+     /* Working address in data buffer */
+     target_ulong addr = ppc64_phys_to_real(args[0]);
+     target_ulong ov_table;
+@@ -1104,7 +1188,11 @@ static target_ulong h_client_architecture_support(PowerPCCPU *cpu,
      bool guest_radix;
      Error *local_err = NULL;
  
-+    trace_cas_check_pvr_start(cpu->compat_pvr, cpu->max_compat,
-+                              cpu->env.spr[SPR_PVR]);
-+
-     if (smc->pre_2_9_cas_pvr) {
-         cas_pvr = cas_check_pvr_pre_2_9(cpu, &addr, &local_err);
-     } else {
-@@ -1198,6 +1198,8 @@ static target_ulong h_client_architecture_support(PowerPCCPU *cpu,
+-    cas_pvr = cas_check_pvr(cpu, &addr, &local_err);
++    if (smc->pre_2_9_cas_pvr) {
++        cas_pvr = cas_check_pvr_pre_2_9(cpu, &addr, &local_err);
++    } else {
++        cas_pvr = cas_check_pvr(cpu, &addr, &local_err);
++    }
+     if (local_err) {
+         error_report_err(local_err);
          return H_HARDWARE;
-     }
- 
-+    trace_cas_check_pvr_complete(cpu->compat_pvr, cas_pvr);
-+
-     /* Update CPUs */
-     if (cpu->compat_pvr != cas_pvr) {
-         ppc_set_compat_all(cas_pvr, &local_err);
-diff --git a/hw/ppc/trace-events b/hw/ppc/trace-events
-index 43d265f..5329740 100644
---- a/hw/ppc/trace-events
-+++ b/hw/ppc/trace-events
-@@ -14,8 +14,10 @@ spapr_cas_failed(unsigned long n) "DT diff buffer is too small: %ld bytes"
- spapr_cas_continue(unsigned long n) "Copy changes to the guest: %ld bytes"
- 
- # hw/ppc/spapr_hcall.c
--spapr_cas_pvr_try(uint32_t pvr) "%x"
--spapr_cas_pvr(uint32_t cur_pvr, bool explicit_match, uint32_t new_pvr) "current=%x, explicit_match=%u, new=%x"
-+cas_check_pvr_pre_2_9(uint32_t pvr, uint32_t mask, bool match, unsigned lvl, uint32_t compat_pvr) "0x%08x/0x%08x match=%d lvl=%d compat_pvr=0x%x"
-+cas_check_pvr(uint32_t pvr, uint32_t pvr_mask, bool explicit_match, uint32_t best_compat) "0x%08x/0x%08x explicit_match=%d best_compat=0x%08x"
-+cas_check_pvr_start(uint32_t compat_pvr, uint32_t max_compat, uint32_t phys_pvr) "Initial compat PVR 0x%08x, max compat 0x%08x (real PVR 0x%08x)"
-+cas_check_pvr_complete(uint32_t old_pvr, uint32_t new_pvr) "Compatibility PVR was 0x%08x, now 0x%08x"
- 
- # hw/ppc/spapr_iommu.c
- spapr_iommu_put(uint64_t liobn, uint64_t ioba, uint64_t tce, uint64_t ret) "liobn=%"PRIx64" ioba=0x%"PRIx64" tce=0x%"PRIx64" ret=%"PRId64
+diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
+index 93c4cfc..f875dc4 100644
+--- a/include/hw/ppc/spapr.h
++++ b/include/hw/ppc/spapr.h
+@@ -52,6 +52,7 @@ struct sPAPRMachineClass {
+     /*< public >*/
+     bool dr_lmb_enabled;       /* enable dynamic-reconfig/hotplug of LMBs */
+     bool use_ohci_by_default;  /* use USB-OHCI instead of XHCI */
++    bool pre_2_9_cas_pvr;      /* Use old logic for PVR compat negotiation */
+     const char *tcg_default_cpu; /* which (TCG) CPU to simulate by default */
+     void (*phb_placement)(sPAPRMachineState *spapr, uint32_t index,
+                           uint64_t *buid, hwaddr *pio, 
 -- 
 2.9.4
