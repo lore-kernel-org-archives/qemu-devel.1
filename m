@@ -1,38 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39085)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41076)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cornelia.huck@de.ibm.com>) id 1dBLFr-0000Bk-HQ
-	for qemu-devel@nongnu.org; Thu, 18 May 2017 09:14:12 -0400
+	(envelope-from <aurelien@aurel32.net>) id 1dBLLt-0002R0-AF
+	for qemu-devel@nongnu.org; Thu, 18 May 2017 09:20:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cornelia.huck@de.ibm.com>) id 1dBLFn-0000vQ-Hr
-	for qemu-devel@nongnu.org; Thu, 18 May 2017 09:14:11 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:34817)
+	(envelope-from <aurelien@aurel32.net>) id 1dBLLr-0003XO-VE
+	for qemu-devel@nongnu.org; Thu, 18 May 2017 09:20:25 -0400
+Received: from hall.aurel32.net ([2001:bc8:30d7:100::1]:58938)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cornelia.huck@de.ibm.com>)
-	id 1dBLFn-0000vG-7h
-	for qemu-devel@nongnu.org; Thu, 18 May 2017 09:14:07 -0400
-Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v4IDDxLn070359
-	for <qemu-devel@nongnu.org>; Thu, 18 May 2017 09:14:05 -0400
-Received: from e06smtp14.uk.ibm.com (e06smtp14.uk.ibm.com [195.75.94.110])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2ah87fm54t-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Thu, 18 May 2017 09:14:05 -0400
-Received: from localhost
-	by e06smtp14.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <cornelia.huck@de.ibm.com>;
-	Thu, 18 May 2017 14:14:02 +0100
-Date: Thu, 18 May 2017 15:13:56 +0200
-From: Cornelia Huck <cornelia.huck@de.ibm.com>
-In-Reply-To: <20170517004813.58227-1-bjsdjshi@linux.vnet.ibm.com>
-References: <20170517004813.58227-1-bjsdjshi@linux.vnet.ibm.com>
+	(Exim 4.71) (envelope-from <aurelien@aurel32.net>)
+	id 1dBLLr-0003Wv-P8
+	for qemu-devel@nongnu.org; Thu, 18 May 2017 09:20:23 -0400
+Date: Thu, 18 May 2017 15:20:20 +0200
+From: Aurelien Jarno <aurelien@aurel32.net>
+Message-ID: <20170518132020.o6bi2eb7x2vierlc@aurel32.net>
+References: <1495107549-6097-1-git-send-email-thuth@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Message-Id: <20170518151356.3dfc4207.cornelia.huck@de.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH v8 00/13] basic channel IO passthrough
- infrastructure based on vfio
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1495107549-6097-1-git-send-email-thuth@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2] target/s390x: Add support for the TEST
+ BLOCK instruction
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -41,67 +28,165 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
-Cc: kvm@vger.kernel.org, linux-s390@vger.kernel.org, qemu-devel@nongnu.org, borntraeger@de.ibm.com, agraf@suse.com, alex.williamson@redhat.com, eric.auger@redhat.com
+To: Thomas Huth <thuth@redhat.com>
+Cc: qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>, David Hildenbrand <david@redhat.com>
 
-On Wed, 17 May 2017 02:48:00 +0200
-Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com> wrote:
-
-> The patch series introduce a basic channel I/O passthrough
-> infrastructure based on vfio.
-> - Focus on supporting dasd-eckd(cu_type/dev_type = 0x3990/0x3390) as
->   the target device. 
-> - Support new qemu parameters in the style of:
->     -machine s390-ccw-virtio(,s390-squash-mcss=on|off) \
->     -device vfio-ccw,sysfsdev=$MDEV_PATH
->   We want to support real (i.e. not virtual) channel devices even for
->   guests that do not support MCSS-E (where guests may see devices from
->   any channel subsystem image at once). As all virtio-ccw devices are in
->   css 0xfe (and show up in the default css 0 for guests not activating
->   MCSS-E), we need an option to squash e.g. passed-through channel devices
->   from their real css (0-3, or 0 for hosts not activating MCSS-E) into
->   the default css, that is what the new machine option s390-squash-css is
->   added.
-
-Patches queued, with minor changes (see my comments).
-
-I'll push out to s390-next once this passes some of my tests.
-
+On 2017-05-18 13:39, Thomas Huth wrote:
+> TEST BLOCK was likely once used to execute basic memory
+> tests, but nowadays it's just a (slow) way to clear a page.
 > 
-> Build and install:
-> 1. kernel configuration
->   CONFIG_S390_CCW_IOMMU=m
->   CONFIG_VFIO=m
->   CONFIG_VFIO_MDEV=m
->   CONFIG_VFIO_MDEV_DEVICE=m
->   CONFIG_VFIO_CCW=m
-> 2. modules required
->   modprobe vfio.ko
->   modprobe mdev.ko
->   modprobe vfio_mdev.ko
->   modprobe vfio_iommu_type1.ko
->   modprobe vfio_ccw.ko
-> 3. find a subchannel(0.0."%schid") of a DASD-ECKD device and bind it to
->   vfio_ccw driver
->   #find the dasd you can use with lsdasd on your host. e.g.:
->   devno="7e52"
->   schid="16ca"
->   #unbind the ccw device from the subchannel
->   echo 0.0."$devno" > /sys/bus/ccw/devices/0.0."$devno"/driver/unbind
->   #unbind the subchannel from io_subchannel driver
->   echo 0.0."$schid" > /sys/bus/css/devices/0.0."$schid"/driver/unbind
->   #bind the subchannel with vfio_ccw driver
->   echo 0.0."$schid" > /sys/bus/css/drivers/vfio_ccw/bind
-> 4. create a mediated device
->   #generate a uuid with uuidgen. e.g.:
->   uuid="6dfd3ec5-e8b3-4e18-a6fe-57bc9eceb920"
->   echo "$uuid" > \
->   /sys/bus/css/devices/0.0."$schid"/mdev_supported_types/vfio_ccw-io/create
-> 5. pass-through this device to a vm
->   -M s390-ccw-virtio,s390-squash-css=on \
->   -device vfio-ccw,sysfsdev=/sys/bus/mdev/devices/$uuid \
->   ... ...
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> ---
+>  v2:
+>  - Use DEF_HELPER_FLAGS_2 instead for DEF_HELPER_2 for returning CC value
+>  - Convert real to absolute address
+>  - Added a check for valid RAM page
+>  - Added low-address protection check
+> 
+>  target/s390x/cpu.h         |  1 +
+>  target/s390x/helper.h      |  1 +
+>  target/s390x/insn-data.def |  2 ++
+>  target/s390x/mem_helper.c  | 28 ++++++++++++++++++++++++++++
+>  target/s390x/mmu_helper.c  |  2 +-
+>  target/s390x/translate.c   | 10 ++++++++++
+>  6 files changed, 43 insertions(+), 1 deletion(-)
+> 
+> diff --git a/target/s390x/cpu.h b/target/s390x/cpu.h
+> index 240b8a5..4f38ba0 100644
+> --- a/target/s390x/cpu.h
+> +++ b/target/s390x/cpu.h
+> @@ -1082,6 +1082,7 @@ struct sysib_322 {
+>  #define SIGP_ORDER_MASK 0x000000ff
+>  
+>  void load_psw(CPUS390XState *env, uint64_t mask, uint64_t addr);
+> +target_ulong mmu_real2abs(CPUS390XState *env, target_ulong raddr);
+>  int mmu_translate(CPUS390XState *env, target_ulong vaddr, int rw, uint64_t asc,
+>                    target_ulong *raddr, int *flags, bool exc);
+>  int sclp_service_call(CPUS390XState *env, uint64_t sccb, uint32_t code);
+> diff --git a/target/s390x/helper.h b/target/s390x/helper.h
+> index 0b70770..1fae191 100644
+> --- a/target/s390x/helper.h
+> +++ b/target/s390x/helper.h
+> @@ -102,6 +102,7 @@ DEF_HELPER_FLAGS_4(lctl, TCG_CALL_NO_WG, void, env, i32, i64, i32)
+>  DEF_HELPER_FLAGS_4(lctlg, TCG_CALL_NO_WG, void, env, i32, i64, i32)
+>  DEF_HELPER_FLAGS_4(stctl, TCG_CALL_NO_WG, void, env, i32, i64, i32)
+>  DEF_HELPER_FLAGS_4(stctg, TCG_CALL_NO_WG, void, env, i32, i64, i32)
+> +DEF_HELPER_FLAGS_2(testblock, TCG_CALL_NO_WG, i32, env, i64)
 
-These instructions would be helpful to preserve in the qemu wiki and
-could even be expanded upon. Ping me if you need an account (hint,
-hint ;)
+As the helper does not read any values from the global, you can even use
+TCG_CALL_NO_RWG.
+
+>  DEF_HELPER_FLAGS_2(tprot, TCG_CALL_NO_RWG, i32, i64, i64)
+>  DEF_HELPER_FLAGS_2(iske, TCG_CALL_NO_RWG_SE, i64, env, i64)
+>  DEF_HELPER_FLAGS_3(sske, TCG_CALL_NO_RWG, void, env, i64, i64)
+> diff --git a/target/s390x/insn-data.def b/target/s390x/insn-data.def
+> index 55a7c52..cac0f51 100644
+> --- a/target/s390x/insn-data.def
+> +++ b/target/s390x/insn-data.def
+> @@ -918,6 +918,8 @@
+>  /* STORE USING REAL ADDRESS */
+>      C(0xb246, STURA,   RRE,   Z,   r1_o, r2_o, 0, 0, stura, 0)
+>      C(0xb925, STURG,   RRE,   Z,   r1_o, r2_o, 0, 0, sturg, 0)
+> +/* TEST BLOCK */
+> +    C(0xb22c, TB,      RRE,   Z,   0, r2_o, 0, 0, testblock, 0)
+>  /* TEST PROTECTION */
+>      C(0xe501, TPROT,   SSE,   Z,   la1, a2, 0, 0, tprot, 0)
+>  
+> diff --git a/target/s390x/mem_helper.c b/target/s390x/mem_helper.c
+> index f6e5bce..de0ecd4 100644
+> --- a/target/s390x/mem_helper.c
+> +++ b/target/s390x/mem_helper.c
+> @@ -20,6 +20,7 @@
+>  
+>  #include "qemu/osdep.h"
+>  #include "cpu.h"
+> +#include "exec/address-spaces.h"
+>  #include "exec/helper-proto.h"
+>  #include "exec/exec-all.h"
+>  #include "exec/cpu_ldst.h"
+> @@ -973,6 +974,33 @@ void HELPER(stctl)(CPUS390XState *env, uint32_t r1, uint64_t a2, uint32_t r3)
+>      }
+>  }
+>  
+> +uint32_t HELPER(testblock)(CPUS390XState *env, uint64_t real_addr)
+> +{
+> +    CPUState *cs = CPU(s390_env_get_cpu(env));
+> +    uint64_t abs_addr;
+> +    int i;
+> +
+> +    real_addr = fix_address(env, real_addr);
+> +    abs_addr = mmu_real2abs(env, real_addr) & TARGET_PAGE_MASK;
+> +    if (!address_space_access_valid(&address_space_memory, abs_addr,
+> +                                    TARGET_PAGE_SIZE, true)) {
+> +        program_interrupt(env, PGM_ADDRESSING, 4);
+> +        return 1;
+> +    }
+> +
+> +    /* Check low-address protection */
+> +    if ((env->cregs[0] & CR0_LOWPROT) != 0 && real_addr < 0x2000) {
+> +        program_interrupt(env, PGM_PROTECTION, 4);
+> +        return 1;
+> +    }
+> +
+> +    for (i = 0; i < TARGET_PAGE_SIZE; i += 8) {
+> +        stq_phys(cs->as, abs_addr + i, 0);
+> +    }
+> +
+> +    return 0;
+> +}
+> +
+>  uint32_t HELPER(tprot)(uint64_t a1, uint64_t a2)
+>  {
+>      /* XXX implement */
+> diff --git a/target/s390x/mmu_helper.c b/target/s390x/mmu_helper.c
+> index b11a027..31eb9ef 100644
+> --- a/target/s390x/mmu_helper.c
+> +++ b/target/s390x/mmu_helper.c
+> @@ -108,7 +108,7 @@ static void trigger_page_fault(CPUS390XState *env, target_ulong vaddr,
+>   * Translate real address to absolute (= physical)
+>   * address by taking care of the prefix mapping.
+>   */
+> -static target_ulong mmu_real2abs(CPUS390XState *env, target_ulong raddr)
+> +target_ulong mmu_real2abs(CPUS390XState *env, target_ulong raddr)
+>  {
+>      if (raddr < 0x2000) {
+>          return raddr + env->psa;    /* Map the lowcore. */
+> diff --git a/target/s390x/translate.c b/target/s390x/translate.c
+> index 4c48c59..61aa2c9 100644
+> --- a/target/s390x/translate.c
+> +++ b/target/s390x/translate.c
+> @@ -4057,6 +4057,15 @@ static ExitStatus op_tcxb(DisasContext *s, DisasOps *o)
+>  }
+>  
+>  #ifndef CONFIG_USER_ONLY
+> +
+> +static ExitStatus op_testblock(DisasContext *s, DisasOps *o)
+> +{
+> +    check_privileged(s);
+
+You should also call potential_page_fault as the helper can trigger an
+exception.
+
+> +    gen_helper_testblock(cc_op, cpu_env, o->in2);
+> +    set_cc_static(s);
+> +    return NO_EXIT;
+> +}
+> +
+>  static ExitStatus op_tprot(DisasContext *s, DisasOps *o)
+>  {
+>      potential_page_fault(s);
+> @@ -4064,6 +4073,7 @@ static ExitStatus op_tprot(DisasContext *s, DisasOps *o)
+>      set_cc_static(s);
+>      return NO_EXIT;
+>  }
+> +
+>  #endif
+>  
+>  static ExitStatus op_tr(DisasContext *s, DisasOps *o)
+
+Besides the two minor things above, it looks all good to me. Thanks for
+the new version.
+
+-- 
+Aurelien Jarno                          GPG: 4096R/1DDD8C9B
+aurelien@aurel32.net                 http://www.aurel32.net
