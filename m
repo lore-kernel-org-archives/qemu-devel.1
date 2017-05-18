@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57576)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57589)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1dBPBx-00010N-NL
-	for qemu-devel@nongnu.org; Thu, 18 May 2017 13:26:26 -0400
+	(envelope-from <quintela@redhat.com>) id 1dBPBy-00011N-O1
+	for qemu-devel@nongnu.org; Thu, 18 May 2017 13:26:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1dBPBv-0006yF-HL
-	for qemu-devel@nongnu.org; Thu, 18 May 2017 13:26:25 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:42966)
+	(envelope-from <quintela@redhat.com>) id 1dBPBx-0006yV-Iq
+	for qemu-devel@nongnu.org; Thu, 18 May 2017 13:26:26 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:35862)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1dBPBv-0006yB-C4
-	for qemu-devel@nongnu.org; Thu, 18 May 2017 13:26:23 -0400
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1dBPBx-0006yP-9m
+	for qemu-devel@nongnu.org; Thu, 18 May 2017 13:26:25 -0400
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
 	[10.5.11.13])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 60366448D99
-	for <qemu-devel@nongnu.org>; Thu, 18 May 2017 17:26:22 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 488A172486
+	for <qemu-devel@nongnu.org>; Thu, 18 May 2017 17:26:24 +0000 (UTC)
 From: Juan Quintela <quintela@redhat.com>
-Date: Thu, 18 May 2017 19:25:37 +0200
-Message-Id: <20170518172543.32694-6-quintela@redhat.com>
+Date: Thu, 18 May 2017 19:25:38 +0200
+Message-Id: <20170518172543.32694-7-quintela@redhat.com>
 In-Reply-To: <20170518172543.32694-1-quintela@redhat.com>
 References: <20170518172543.32694-1-quintela@redhat.com>
-Subject: [Qemu-devel] [PATCH 05/11] migration: Export fd.c functions in its
- own file
+Subject: [Qemu-devel] [PATCH 06/11] migration: Export socket.c functions in
+ its own file
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,48 +35,64 @@ Cc: dgilbert@redhat.com, lvivier@redhat.com, peterx@redhat.com
 
 Signed-off-by: Juan Quintela <quintela@redhat.com>
 ---
- include/migration/migration.h |  4 ----
- migration/fd.c                |  1 +
- migration/fd.h                | 23 +++++++++++++++++++++++
+ include/migration/migration.h |  8 --------
  migration/migration.c         |  1 +
- 4 files changed, 25 insertions(+), 4 deletions(-)
- create mode 100644 migration/fd.h
+ migration/socket.c            |  1 +
+ migration/socket.h            | 28 ++++++++++++++++++++++++++++
+ 4 files changed, 30 insertions(+), 8 deletions(-)
+ create mode 100644 migration/socket.h
 
 diff --git a/include/migration/migration.h b/include/migration/migration.h
-index b942378..d0ce199 100644
+index d0ce199..7a0a50b 100644
 --- a/include/migration/migration.h
 +++ b/include/migration/migration.h
-@@ -176,10 +176,6 @@ void unix_start_incoming_migration(const char *path, Error **errp);
+@@ -168,14 +168,6 @@ void migration_tls_channel_connect(MigrationState *s,
  
- void unix_start_outgoing_migration(MigrationState *s, const char *path, Error **errp);
+ uint64_t migrate_max_downtime(void);
  
--void fd_start_incoming_migration(const char *path, Error **errp);
+-void tcp_start_incoming_migration(const char *host_port, Error **errp);
 -
--void fd_start_outgoing_migration(MigrationState *s, const char *fdname, Error **errp);
+-void tcp_start_outgoing_migration(MigrationState *s, const char *host_port, Error **errp);
+-
+-void unix_start_incoming_migration(const char *path, Error **errp);
+-
+-void unix_start_outgoing_migration(MigrationState *s, const char *path, Error **errp);
 -
  void rdma_start_outgoing_migration(void *opaque, const char *host_port, Error **errp);
  
  void rdma_start_incoming_migration(const char *host_port, Error **errp);
-diff --git a/migration/fd.c b/migration/fd.c
-index 05e0a5c..0077a50 100644
---- a/migration/fd.c
-+++ b/migration/fd.c
-@@ -18,6 +18,7 @@
- #include "qapi/error.h"
- #include "qemu-common.h"
- #include "channel.h"
-+#include "fd.h"
+diff --git a/migration/migration.c b/migration/migration.c
+index 1b99ced..efdb9bb 100644
+--- a/migration/migration.c
++++ b/migration/migration.c
+@@ -20,6 +20,7 @@
+ #include "migration/blocker.h"
+ #include "exec.h"
+ #include "fd.h"
++#include "socket.h"
  #include "migration/migration.h"
- #include "monitor/monitor.h"
- #include "io/channel-util.h"
-diff --git a/migration/fd.h b/migration/fd.h
+ #include "savevm.h"
+ #include "qemu-file-channel.h"
+diff --git a/migration/socket.c b/migration/socket.c
+index 3f8ffc9..85bfdcc 100644
+--- a/migration/socket.c
++++ b/migration/socket.c
+@@ -20,6 +20,7 @@
+ #include "qemu/error-report.h"
+ #include "qapi/error.h"
+ #include "channel.h"
++#include "socket.h"
+ #include "migration/migration.h"
+ #include "qemu-file.h"
+ #include "io/channel-socket.h"
+diff --git a/migration/socket.h b/migration/socket.h
 new file mode 100644
-index 0000000..a14a63c
+index 0000000..6b91e9d
 --- /dev/null
-+++ b/migration/fd.h
-@@ -0,0 +1,23 @@
++++ b/migration/socket.h
+@@ -0,0 +1,28 @@
 +/*
-+ * QEMU live migration via generic fd
++ * QEMU live migration via socket
 + *
 + * Copyright Red Hat, Inc. 2009-2016
 + *
@@ -91,24 +107,17 @@ index 0000000..a14a63c
 + * GNU GPL, version 2 or (at your option) any later version.
 + */
 +
-+#ifndef QEMU_MIGRATION_FD_H
-+#define QEMU_MIGRATION_FD_H
-+void fd_start_incoming_migration(const char *path, Error **errp);
++#ifndef QEMU_MIGRATION_SOCKET_H
++#define QEMU_MIGRATION_SOCKET_H
++void tcp_start_incoming_migration(const char *host_port, Error **errp);
 +
-+void fd_start_outgoing_migration(MigrationState *s, const char *fdname,
-+                                 Error **errp);
++void tcp_start_outgoing_migration(MigrationState *s, const char *host_port,
++                                  Error **errp);
++
++void unix_start_incoming_migration(const char *path, Error **errp);
++
++void unix_start_outgoing_migration(MigrationState *s, const char *path,
++                                   Error **errp);
 +#endif
-diff --git a/migration/migration.c b/migration/migration.c
-index cefffac..1b99ced 100644
---- a/migration/migration.c
-+++ b/migration/migration.c
-@@ -19,6 +19,7 @@
- #include "qemu/main-loop.h"
- #include "migration/blocker.h"
- #include "exec.h"
-+#include "fd.h"
- #include "migration/migration.h"
- #include "savevm.h"
- #include "qemu-file-channel.h"
 -- 
 2.9.3
