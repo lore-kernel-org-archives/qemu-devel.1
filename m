@@ -1,26 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50177)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55521)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aurelien@aurel32.net>) id 1dBUQS-0006Qm-PV
-	for qemu-devel@nongnu.org; Thu, 18 May 2017 19:01:45 -0400
+	(envelope-from <anthony.xu@intel.com>) id 1dBUqg-0002ZQ-6N
+	for qemu-devel@nongnu.org; Thu, 18 May 2017 19:28:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aurelien@aurel32.net>) id 1dBUQR-0003Vr-TU
-	for qemu-devel@nongnu.org; Thu, 18 May 2017 19:01:44 -0400
-Received: from hall.aurel32.net ([2001:bc8:30d7:100::1]:34694)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <aurelien@aurel32.net>)
-	id 1dBUQR-0003VZ-Nt
-	for qemu-devel@nongnu.org; Thu, 18 May 2017 19:01:43 -0400
-Date: Fri, 19 May 2017 01:01:41 +0200
-From: Aurelien Jarno <aurelien@aurel32.net>
-Message-ID: <20170518230141.75xhr7mul6lci3sj@aurel32.net>
-References: <f0c4de76-77a7-90c4-6a99-10ddda953b19@landley.net>
-	<20170518190052.qxzzcpurulnghlog@aurel32.net>
-	<53613c44-1785-28f1-ae60-22adac96c8ad@landley.net>
+	(envelope-from <anthony.xu@intel.com>) id 1dBUqc-0002eh-6r
+	for qemu-devel@nongnu.org; Thu, 18 May 2017 19:28:50 -0400
+Received: from mga02.intel.com ([134.134.136.20]:29679)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <anthony.xu@intel.com>)
+	id 1dBUqb-0002d9-TI
+	for qemu-devel@nongnu.org; Thu, 18 May 2017 19:28:46 -0400
+From: "Xu, Anthony" <anthony.xu@intel.com>
+Date: Thu, 18 May 2017 23:28:40 +0000
+Message-ID: <4712D8F4B26E034E80552F30A67BE0B1ACCCA9@ORSMSX112.amr.corp.intel.com>
+References: <1494972923-31756-1-git-send-email-anthony.xu@intel.com>
+	<20170517112756.74cf6e47@nial.brq.redhat.com>
+	<4712D8F4B26E034E80552F30A67BE0B1ACB970@ORSMSX112.amr.corp.intel.com>
+	<6eff688c-b62e-8796-f852-a855079f3175@redhat.com>
+	<4712D8F4B26E034E80552F30A67BE0B1ACCB4D@ORSMSX112.amr.corp.intel.com>
+	<3a55757b-fcdb-0829-c23d-68b1d416599f@redhat.com>
+In-Reply-To: <3a55757b-fcdb-0829-c23d-68b1d416599f@redhat.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <53613c44-1785-28f1-ae60-22adac96c8ad@landley.net>
-Subject: Re: [Qemu-devel] qemu-system-sh4 -M r2d serial is broken.
+Subject: Re: [Qemu-devel] [PATCH] Memory: use memory address space for
+ cpu-memory
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,41 +34,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Rob Landley <rob@landley.net>
-Cc: qemu-devel@nongnu.org, Rich Felker <dalias@libc.org>
+To: Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 
-On 2017-05-18 17:37, Rob Landley wrote:
-> 
-> 
-> On 05/18/2017 02:00 PM, Aurelien Jarno wrote:
-> > On 2017-05-18 11:08, Rob Landley wrote:
-> >> Serial input hangs after the first character in the 4.11 kernel:
-> >>
-> >>   http://www.spinics.net/lists/linux-sh/msg51183.html
-> >>
-> >> Because they enabled support for a buffer size thing QEMU doesn't
-> >> emulate right:
-> >>
-> >>   http://www.spinics.net/lists/linux-sh/msg51189.html
-> > 
-> > Indeed the SCIF emulation in QEMU is quite limited. The problem is that
-> > it exposes many internal states to the software (and that's the same for
-> > the SH4 CPU in general), and that's not really compatible with quick
-> > emulation. In that case the timer should depend on the baud rate which
-> > we don't really emulate.
-> > 
-> > I'll try to have a look, that said my test environment is stuck with
-> > kernel 4.8 due to the broken futex support on UP in kernel 4.9 (and
-> > that's not QEMU specific). I'll try to build a more recent kernel with
-> > additional patches.
-> 
-> I thought Rich fixed that. Rich?
-> 
-
-I have sent a patch already, but TTBOMK it hasn't been applied yet.
-
-Aurelien
-
--- 
-Aurelien Jarno                          GPG: 4096R/1DDD8C9B
-aurelien@aurel32.net                 http://www.aurel32.net
+PiBPbiAxOC8wNS8yMDE3IDIzOjQ4LCBYdSwgQW50aG9ueSB3cm90ZToNCj4gPj4gSXQgc2hvdWxk
+IGJlIGNhbGxlZC4gIEFsdGVybmF0aXZlbHkgeW91IGNvdWxkIHRyeSBhZGRpbmcgYSBuZXcgZnVu
+Y3Rpb24NCj4gPj4gdG8gbWFyayBhZGRyZXNzX3NwYWNlX21lbW9yeSBhcyBhIG5ldmVyLWRlc3Ry
+b3llZCBBZGRyZXNzU3BhY2U6DQo+ID4+DQo+ID4gVGhpcyBwYXRjaCB3b3VsZCBkbyBpdCwgY291
+bGQgeW91IHBsZWFzZSBzdWJtaXQgdGhpcyBwYXRjaD8NCj4gDQo+IElmIHlvdSBoYXZlIHRlc3Rl
+ZCBpdCAodG9nZXRoZXIgd2l0aCB0aGUgY2hhbmdlIGluIHRoZSBpbml0aWFsaXphdGlvbiBvZg0K
+PiBhZGRyZXNzX3NwYWNlX21lbW9yeSksIEkgY2FuIGRvIHRoYXQuDQo+IA0KDQpCYXNlZCBvbiB5
+b3VyIHBhdGNoLCBJIGFkZGVkIHRoZSBjaGFuZ2UgaW4gdGhlIGluaXRpYWxpemF0aW9uIG9mIA0K
+YWRkcmVzc19zcGFjZV9tZW1vcnkuIEl0IHdvcmtzIHdlbGwgaW4gbXkgc2V0dXAsIGNwdS1tZW1v
+cnkNCmFkZHJlc3Mgc3BhY2UgZG9lc24ndCBzaG93IHVwIGFzIHdlIGV4cGVjdGVkLg0KDQpBbnRo
+b255DQoNCmRpZmYgLS1naXQgYS9leGVjLmMgYi9leGVjLmMNCmluZGV4IDk2ZTNhYzkuLjc0NmRi
+YmMgMTAwNjQ0DQotLS0gYS9leGVjLmMNCisrKyBiL2V4ZWMuYw0KQEAgLTI3MTIsNyArMjcxMiw3
+IEBAIHN0YXRpYyB2b2lkIG1lbW9yeV9tYXBfaW5pdCh2b2lkKQ0KICAgICBzeXN0ZW1fbWVtb3J5
+ID0gZ19tYWxsb2Moc2l6ZW9mKCpzeXN0ZW1fbWVtb3J5KSk7DQoNCiAgICAgbWVtb3J5X3JlZ2lv
+bl9pbml0KHN5c3RlbV9tZW1vcnksIE5VTEwsICJzeXN0ZW0iLCBVSU5UNjRfTUFYKTsNCi0gICAg
+YWRkcmVzc19zcGFjZV9pbml0KCZhZGRyZXNzX3NwYWNlX21lbW9yeSwgc3lzdGVtX21lbW9yeSwg
+Im1lbW9yeSIpOw0KKyAgICBhZGRyZXNzX3NwYWNlX2luaXRfc3RhdGljKCZhZGRyZXNzX3NwYWNl
+X21lbW9yeSwgc3lzdGVtX21lbW9yeSwgIm1lbW9yeSIpOw0KDQogICAgIHN5c3RlbV9pbyA9IGdf
+bWFsbG9jKHNpemVvZigqc3lzdGVtX2lvKSk7DQogICAgIG1lbW9yeV9yZWdpb25faW5pdF9pbyhz
+eXN0ZW1faW8sIE5VTEwsICZ1bmFzc2lnbmVkX2lvX29wcywgTlVMTCwgImlvIiwNCmRpZmYgLS1n
+aXQgYS9pbmNsdWRlL2V4ZWMvbWVtb3J5LmggYi9pbmNsdWRlL2V4ZWMvbWVtb3J5LmgNCmluZGV4
+IGIyN2IyODguLjZmNDRiNzkgMTAwNjQ0DQotLS0gYS9pbmNsdWRlL2V4ZWMvbWVtb3J5LmgNCisr
+KyBiL2luY2x1ZGUvZXhlYy9tZW1vcnkuaA0KQEAgLTEzOTUsNiArMTM5NSwxNyBAQCBNZW1UeFJl
+c3VsdCBtZW1vcnlfcmVnaW9uX2Rpc3BhdGNoX3dyaXRlKE1lbW9yeVJlZ2lvbiAqbXIsDQogdm9p
+ZCBhZGRyZXNzX3NwYWNlX2luaXQoQWRkcmVzc1NwYWNlICphcywgTWVtb3J5UmVnaW9uICpyb290
+LCBjb25zdCBjaGFyICpuYW1lKTsNCg0KIC8qKg0KKyAqIGFkZHJlc3Nfc3BhY2VfaW5pdF9zdGF0
+aWM6IGluaXRpYWxpemVzIGFuIHN0YXRpYyBhZGRyZXNzIHNwYWNlDQorICoNCisgKiBAYXM6IGFu
+IHVuaW5pdGlhbGl6ZWQgI0FkZHJlc3NTcGFjZQ0KKyAqIEByb290OiBhICNNZW1vcnlSZWdpb24g
+dGhhdCByb3V0ZXMgYWRkcmVzc2VzIGZvciB0aGUgYWRkcmVzcyBzcGFjZQ0KKyAqIEBuYW1lOiBh
+biBhZGRyZXNzIHNwYWNlIG5hbWUuICBUaGUgbmFtZSBpcyBvbmx5IHVzZWQgZm9yIGRlYnVnZ2lu
+Zw0KKyAqICAgICAgICBvdXRwdXQuDQorICovDQordm9pZCBhZGRyZXNzX3NwYWNlX2luaXRfc3Rh
+dGljKEFkZHJlc3NTcGFjZSAqYXMsIE1lbW9yeVJlZ2lvbiAqcm9vdCwNCisgICAgICAgY29uc3Qg
+Y2hhciAqbmFtZSk7DQorDQorLyoqDQogICogYWRkcmVzc19zcGFjZV9pbml0X3NoYXJlYWJsZTog
+cmV0dXJuIGFuIGFkZHJlc3Mgc3BhY2UgZm9yIGEgbWVtb3J5IHJlZ2lvbiwNCiAgKiAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICBjcmVhdGluZyBpdCBpZiBpdCBkb2VzIG5vdCBhbHJlYWR5
+IGV4aXN0DQogICoNCmRpZmYgLS1naXQgYS9tZW1vcnkuYyBiL21lbW9yeS5jDQppbmRleCAxOTBj
+ZDNkLi42YzkzM2Q4IDEwMDY0NA0KLS0tIGEvbWVtb3J5LmMNCisrKyBiL21lbW9yeS5jDQpAQCAt
+MjQ2MSw3ICsyNDYxLDggQEAgc3RhdGljIHZvaWQgZG9fYWRkcmVzc19zcGFjZV9kZXN0cm95KEFk
+ZHJlc3NTcGFjZSAqYXMpDQogICAgIH0NCiB9DQoNCi12b2lkIGFkZHJlc3Nfc3BhY2VfaW5pdF9z
+dGF0aWMoQWRkcmVzc1NwYWNlICphcywgTWVtb3J5UmVnaW9uICpyb290LCBjb25zdCBjaGFyICpu
+YW1lKQ0KK3ZvaWQgYWRkcmVzc19zcGFjZV9pbml0X3N0YXRpYyhBZGRyZXNzU3BhY2UgKmFzLCBN
+ZW1vcnlSZWdpb24gKnJvb3QsDQorICAgICAgIGNvbnN0IGNoYXIgKm5hbWUpDQogew0KICAgICBh
+ZGRyZXNzX3NwYWNlX2luaXQoYXMsIHJvb3QsIG5hbWUpOw0KICAgICBhcy0+c2hhcmVkID0gdHJ1
+ZTsNCg0K
