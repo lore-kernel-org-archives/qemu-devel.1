@@ -1,20 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40285)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40888)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1dBK2w-0002Sl-LJ
-	for qemu-devel@nongnu.org; Thu, 18 May 2017 07:56:47 -0400
+	(envelope-from <peterx@redhat.com>) id 1dBK52-0003St-W6
+	for qemu-devel@nongnu.org; Thu, 18 May 2017 07:58:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1dBK2t-0007Yy-IL
-	for qemu-devel@nongnu.org; Thu, 18 May 2017 07:56:46 -0400
-From: Alberto Garcia <berto@igalia.com>
-In-Reply-To: <20170511144208.24075-9-pbonzini@redhat.com>
-References: <20170511144208.24075-1-pbonzini@redhat.com>
-	<20170511144208.24075-9-pbonzini@redhat.com>
-Date: Thu, 18 May 2017 13:56:39 +0200
-Message-ID: <w51h90igyyw.fsf@maestria.local.igalia.com>
+	(envelope-from <peterx@redhat.com>) id 1dBK4z-0008VB-S8
+	for qemu-devel@nongnu.org; Thu, 18 May 2017 07:58:57 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:50736)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1dBK4z-0008V0-It
+	for qemu-devel@nongnu.org; Thu, 18 May 2017 07:58:53 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 746337F4A0
+	for <qemu-devel@nongnu.org>; Thu, 18 May 2017 11:58:52 +0000 (UTC)
+Date: Thu, 18 May 2017 19:58:45 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20170518115845.GC24085@pxdev.xzpeter.org>
+References: <20170517154756.22079-1-quintela@redhat.com>
+	<20170517154756.22079-2-quintela@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 08/18] throttle-groups: do not
- use qemu_co_enter_next
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20170517154756.22079-2-quintela@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 1/9] migration: Create migration/xbzrle.h
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,16 +33,106 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
-Cc: famz@redhat.com, qemu-block@nongnu.org, stefanha@redhat.com
+To: Juan Quintela <quintela@redhat.com>
+Cc: qemu-devel@nongnu.org, dgilbert@redhat.com, lvivier@redhat.com
 
-On Thu 11 May 2017 04:41:58 PM CEST, Paolo Bonzini wrote:
-> Prepare for removing this function; always restart throttled requests
-> from coroutine context.  This will matter when restarting throttled
-> requests will have to acquire a CoMutex.
->
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+On Wed, May 17, 2017 at 05:47:48PM +0200, Juan Quintela wrote:
+> Signed-off-by: Juan Quintela <quintela@redhat.com>
 
-Reviewed-by: Alberto Garcia <berto@igalia.com>
+Reviewed-by: Peter Xu <peterx@redhat.com>
 
-Berto
+> ---
+>  include/migration/migration.h |  4 ----
+>  migration/ram.c               |  1 +
+>  migration/xbzrle.c            |  2 +-
+>  migration/xbzrle.h            | 21 +++++++++++++++++++++
+>  tests/test-xbzrle.c           |  2 +-
+>  5 files changed, 24 insertions(+), 6 deletions(-)
+>  create mode 100644 migration/xbzrle.h
+> 
+> diff --git a/include/migration/migration.h b/include/migration/migration.h
+> index b80a6ed..7d1eef7 100644
+> --- a/include/migration/migration.h
+> +++ b/include/migration/migration.h
+> @@ -251,10 +251,6 @@ bool migrate_zero_blocks(void);
+>  
+>  bool migrate_auto_converge(void);
+>  
+> -int xbzrle_encode_buffer(uint8_t *old_buf, uint8_t *new_buf, int slen,
+> -                         uint8_t *dst, int dlen);
+> -int xbzrle_decode_buffer(uint8_t *src, int slen, uint8_t *dst, int dlen);
+> -
+>  int migrate_use_xbzrle(void);
+>  int64_t migrate_xbzrle_cache_size(void);
+>  bool migrate_colo_enabled(void);
+> diff --git a/migration/ram.c b/migration/ram.c
+> index 76c118c..2564c00 100644
+> --- a/migration/ram.c
+> +++ b/migration/ram.c
+> @@ -35,6 +35,7 @@
+>  #include "qemu/bitmap.h"
+>  #include "qemu/timer.h"
+>  #include "qemu/main-loop.h"
+> +#include "xbzrle.h"
+>  #include "migration/migration.h"
+>  #include "postcopy-ram.h"
+>  #include "exec/address-spaces.h"
+> diff --git a/migration/xbzrle.c b/migration/xbzrle.c
+> index c858339..1ba482d 100644
+> --- a/migration/xbzrle.c
+> +++ b/migration/xbzrle.c
+> @@ -12,7 +12,7 @@
+>   */
+>  #include "qemu/osdep.h"
+>  #include "qemu/cutils.h"
+> -#include "include/migration/migration.h"
+> +#include "xbzrle.h"
+>  
+>  /*
+>    page = zrun nzrun
+> diff --git a/migration/xbzrle.h b/migration/xbzrle.h
+> new file mode 100644
+> index 0000000..a0db507
+> --- /dev/null
+> +++ b/migration/xbzrle.h
+> @@ -0,0 +1,21 @@
+> +/*
+> + * QEMU live migration
+> + *
+> + * Copyright IBM, Corp. 2008
+> + *
+> + * Authors:
+> + *  Anthony Liguori   <aliguori@us.ibm.com>
+> + *
+> + * This work is licensed under the terms of the GNU GPL, version 2.  See
+> + * the COPYING file in the top-level directory.
+> + *
+> + */
+> +
+> +#ifndef QEMU_MIGRATION_XBZRLE_H
+> +#define QEMU_MIGRATION_XBZRLE_H
+> +
+> +int xbzrle_encode_buffer(uint8_t *old_buf, uint8_t *new_buf, int slen,
+> +                         uint8_t *dst, int dlen);
+> +
+> +int xbzrle_decode_buffer(uint8_t *src, int slen, uint8_t *dst, int dlen);
+> +#endif
+> diff --git a/tests/test-xbzrle.c b/tests/test-xbzrle.c
+> index 49f6419..f5e08de 100644
+> --- a/tests/test-xbzrle.c
+> +++ b/tests/test-xbzrle.c
+> @@ -13,7 +13,7 @@
+>  #include "qemu/osdep.h"
+>  #include "qemu-common.h"
+>  #include "qemu/cutils.h"
+> -#include "include/migration/migration.h"
+> +#include "../migration/xbzrle.h"
+>  
+>  #define PAGE_SIZE 4096
+>  
+> -- 
+> 2.9.3
+> 
+
+-- 
+Peter Xu
