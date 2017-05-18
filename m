@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38880)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39371)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1dBMts-0000H0-0L
-	for qemu-devel@nongnu.org; Thu, 18 May 2017 10:59:36 -0400
+	(envelope-from <lvivier@redhat.com>) id 1dBMvD-00019X-JE
+	for qemu-devel@nongnu.org; Thu, 18 May 2017 11:01:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1dBMtp-0006UT-0U
-	for qemu-devel@nongnu.org; Thu, 18 May 2017 10:59:36 -0400
-Date: Thu, 18 May 2017 16:59:27 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20170518165927.30087aad@nial.brq.redhat.com>
-In-Reply-To: <149511591185.8828.11947901967942107196.stgit@bahia.lab.toulouse-stg.fr.ibm.com>
-References: <149511591185.8828.11947901967942107196.stgit@bahia.lab.toulouse-stg.fr.ibm.com>
+	(envelope-from <lvivier@redhat.com>) id 1dBMvB-0006tU-9g
+	for qemu-devel@nongnu.org; Thu, 18 May 2017 11:00:59 -0400
+References: <20170518103334.8808-1-pbonzini@redhat.com>
+From: Laurent Vivier <lvivier@redhat.com>
+Message-ID: <b502c8a2-56b5-a526-aa82-0f64ba1d7981@redhat.com>
+Date: Thu, 18 May 2017 17:00:49 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <20170518103334.8808-1-pbonzini@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] spapr: ensure core_slot isn't NULL in
- spapr_core_unplug()
+Subject: Re: [Qemu-devel] [Qemu-trivial] [PATCH] altera_timer: fix incorrect
+ memset
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,38 +24,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
+To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-trivial@nongnu.org
 
-On Thu, 18 May 2017 15:58:31 +0200
-Greg Kurz <groug@kaod.org> wrote:
-
-> If we go that far on the path of hot-removing a core and we find out that
-> the core-id is invalid, then we have a serious bug.
+On 18/05/2017 12:33, Paolo Bonzini wrote:
+> Use sizeof instead of ARRAY_SIZE, fixing -Wmemset-elt-size with recent
+> GCC versions.
 > 
-> Let's make it explicit with an assert() instead of dereferencing a NULL
-> pointer.
-> 
-> This fixes Coverity issue CID 1375404.
-> 
-> Signed-off-by: Greg Kurz <groug@kaod.org>
-Reviewed-by: Igor Mammedov <imammedo@redhat.com>
-
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 > ---
->  hw/ppc/spapr.c |    1 +
->  1 file changed, 1 insertion(+)
+>  hw/timer/altera_timer.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 > 
-> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> index 0980d733cd7a..1c5b814fc0bf 100644
-> --- a/hw/ppc/spapr.c
-> +++ b/hw/ppc/spapr.c
-> @@ -2715,6 +2715,7 @@ static void spapr_core_unplug(HotplugHandler *hotplug_dev, DeviceState *dev,
->      CPUCore *cc = CPU_CORE(dev);
->      CPUArchId *core_slot = spapr_find_cpu_slot(ms, cc->core_id, NULL);
+> diff --git a/hw/timer/altera_timer.c b/hw/timer/altera_timer.c
+> index 6d4862661d..c9a0fc5dca 100644
+> --- a/hw/timer/altera_timer.c
+> +++ b/hw/timer/altera_timer.c
+> @@ -204,7 +204,7 @@ static void altera_timer_reset(DeviceState *dev)
 >  
-> +    assert(core_slot);
->      core_slot->cpu = NULL;
->      object_unparent(OBJECT(dev));
+>      ptimer_stop(t->ptimer);
+>      ptimer_set_limit(t->ptimer, 0xffffffff, 1);
+> -    memset(t->regs, 0, ARRAY_SIZE(t->regs));
+> +    memset(t->regs, 0, sizeof(t->regs));
 >  }
+>  
+>  static Property altera_timer_properties[] = {
 > 
-> 
+Reviewed-by: Laurent Vivier <lvivier@redhat.com>
