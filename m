@@ -1,27 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50206)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51104)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aurelien@aurel32.net>) id 1dBQba-00048E-ES
-	for qemu-devel@nongnu.org; Thu, 18 May 2017 14:56:59 -0400
+	(envelope-from <aurelien@aurel32.net>) id 1dBQfP-0005eO-Iv
+	for qemu-devel@nongnu.org; Thu, 18 May 2017 15:00:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aurelien@aurel32.net>) id 1dBQbZ-0002z9-Hn
-	for qemu-devel@nongnu.org; Thu, 18 May 2017 14:56:58 -0400
-Received: from hall.aurel32.net ([2001:bc8:30d7:100::1]:33084)
+	(envelope-from <aurelien@aurel32.net>) id 1dBQfO-0004Qf-IP
+	for qemu-devel@nongnu.org; Thu, 18 May 2017 15:00:55 -0400
+Received: from hall.aurel32.net ([2001:bc8:30d7:100::1]:33140)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <aurelien@aurel32.net>)
-	id 1dBQbZ-0002y5-C2
-	for qemu-devel@nongnu.org; Thu, 18 May 2017 14:56:57 -0400
-Date: Thu, 18 May 2017 20:56:41 +0200
+	id 1dBQfO-0004QV-Ck
+	for qemu-devel@nongnu.org; Thu, 18 May 2017 15:00:54 -0400
+Date: Thu, 18 May 2017 21:00:52 +0200
 From: Aurelien Jarno <aurelien@aurel32.net>
-Message-ID: <20170518185641.udlg66nqgvmebsmt@aurel32.net>
-References: <1495107549-6097-1-git-send-email-thuth@redhat.com>
-	<20170518132020.o6bi2eb7x2vierlc@aurel32.net>
-	<103cd6bc-4240-7158-b275-9006979a48e8@twiddle.net>
+Message-ID: <20170518190052.qxzzcpurulnghlog@aurel32.net>
+References: <f0c4de76-77a7-90c4-6a99-10ddda953b19@landley.net>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <103cd6bc-4240-7158-b275-9006979a48e8@twiddle.net>
-Subject: Re: [Qemu-devel] [PATCH v2] target/s390x: Add support for the TEST
- BLOCK instruction
+In-Reply-To: <f0c4de76-77a7-90c4-6a99-10ddda953b19@landley.net>
+Subject: Re: [Qemu-devel] qemu-system-sh4 -M r2d serial is broken.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,20 +27,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <rth@twiddle.net>
-Cc: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, Alexander Graf <agraf@suse.de>, David Hildenbrand <david@redhat.com>
+To: Rob Landley <rob@landley.net>
+Cc: qemu-devel@nongnu.org
 
-On 2017-05-18 08:42, Richard Henderson wrote:
-> On 05/18/2017 06:20 AM, Aurelien Jarno wrote:
-> > > +DEF_HELPER_FLAGS_2(testblock, TCG_CALL_NO_WG, i32, env, i64)
-> > As the helper does not read any values from the global, you can even use
-> > TCG_CALL_NO_RWG.
-> > 
+On 2017-05-18 11:08, Rob Landley wrote:
+> Serial input hangs after the first character in the 4.11 kernel:
 > 
-> By throwing an exception, we imply a read of all values along the exception path.
+>   http://www.spinics.net/lists/linux-sh/msg51183.html
 > 
+> Because they enabled support for a buffer size thing QEMU doesn't
+> emulate right:
+> 
+>   http://www.spinics.net/lists/linux-sh/msg51189.html
 
-You are indeed correct, sorry about the wrong comment.
+Indeed the SCIF emulation in QEMU is quite limited. The problem is that
+it exposes many internal states to the software (and that's the same for
+the SH4 CPU in general), and that's not really compatible with quick
+emulation. In that case the timer should depend on the baud rate which
+we don't really emulate.
+
+I'll try to have a look, that said my test environment is stuck with
+kernel 4.8 due to the broken futex support on UP in kernel 4.9 (and
+that's not QEMU specific). I'll try to build a more recent kernel with
+additional patches.
+
+Aurelien
 
 -- 
 Aurelien Jarno                          GPG: 4096R/1DDD8C9B
