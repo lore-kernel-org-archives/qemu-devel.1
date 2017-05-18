@@ -1,31 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55521)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56184)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <anthony.xu@intel.com>) id 1dBUqg-0002ZQ-6N
-	for qemu-devel@nongnu.org; Thu, 18 May 2017 19:28:51 -0400
+	(envelope-from <anthony.xu@intel.com>) id 1dBUv2-0003Vm-8P
+	for qemu-devel@nongnu.org; Thu, 18 May 2017 19:33:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <anthony.xu@intel.com>) id 1dBUqc-0002eh-6r
-	for qemu-devel@nongnu.org; Thu, 18 May 2017 19:28:50 -0400
-Received: from mga02.intel.com ([134.134.136.20]:29679)
+	(envelope-from <anthony.xu@intel.com>) id 1dBUuy-0004Bm-AV
+	for qemu-devel@nongnu.org; Thu, 18 May 2017 19:33:20 -0400
+Received: from mga05.intel.com ([192.55.52.43]:9950)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <anthony.xu@intel.com>)
-	id 1dBUqb-0002d9-TI
-	for qemu-devel@nongnu.org; Thu, 18 May 2017 19:28:46 -0400
+	id 1dBUuy-0004Be-12
+	for qemu-devel@nongnu.org; Thu, 18 May 2017 19:33:16 -0400
 From: "Xu, Anthony" <anthony.xu@intel.com>
-Date: Thu, 18 May 2017 23:28:40 +0000
-Message-ID: <4712D8F4B26E034E80552F30A67BE0B1ACCCA9@ORSMSX112.amr.corp.intel.com>
-References: <1494972923-31756-1-git-send-email-anthony.xu@intel.com>
-	<20170517112756.74cf6e47@nial.brq.redhat.com>
-	<4712D8F4B26E034E80552F30A67BE0B1ACB970@ORSMSX112.amr.corp.intel.com>
-	<6eff688c-b62e-8796-f852-a855079f3175@redhat.com>
-	<4712D8F4B26E034E80552F30A67BE0B1ACCB4D@ORSMSX112.amr.corp.intel.com>
-	<3a55757b-fcdb-0829-c23d-68b1d416599f@redhat.com>
-In-Reply-To: <3a55757b-fcdb-0829-c23d-68b1d416599f@redhat.com>
+Date: Thu, 18 May 2017 23:33:13 +0000
+Message-ID: <4712D8F4B26E034E80552F30A67BE0B1ACCCBA@ORSMSX112.amr.corp.intel.com>
+References: <1494897683-16395-1-git-send-email-anthony.xu@intel.com>
+	<9fa04242-c144-d5d1-f49b-1bce1df10053@redhat.com>
+	<4712D8F4B26E034E80552F30A67BE0B1AB8D87@ORSMSX112.amr.corp.intel.com>
+	<23ecbc03-751d-e804-ea99-949e5dabe63b@redhat.com>
+In-Reply-To: <23ecbc03-751d-e804-ea99-949e5dabe63b@redhat.com>
 Content-Language: en-US
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH] Memory: use memory address space for
- cpu-memory
+Subject: Re: [Qemu-devel] [PATCH] SMM: disable smram region if smm is
+ disabled
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,50 +32,21 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+To: Paolo Bonzini <pbonzini@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 
-PiBPbiAxOC8wNS8yMDE3IDIzOjQ4LCBYdSwgQW50aG9ueSB3cm90ZToNCj4gPj4gSXQgc2hvdWxk
-IGJlIGNhbGxlZC4gIEFsdGVybmF0aXZlbHkgeW91IGNvdWxkIHRyeSBhZGRpbmcgYSBuZXcgZnVu
-Y3Rpb24NCj4gPj4gdG8gbWFyayBhZGRyZXNzX3NwYWNlX21lbW9yeSBhcyBhIG5ldmVyLWRlc3Ry
-b3llZCBBZGRyZXNzU3BhY2U6DQo+ID4+DQo+ID4gVGhpcyBwYXRjaCB3b3VsZCBkbyBpdCwgY291
-bGQgeW91IHBsZWFzZSBzdWJtaXQgdGhpcyBwYXRjaD8NCj4gDQo+IElmIHlvdSBoYXZlIHRlc3Rl
-ZCBpdCAodG9nZXRoZXIgd2l0aCB0aGUgY2hhbmdlIGluIHRoZSBpbml0aWFsaXphdGlvbiBvZg0K
-PiBhZGRyZXNzX3NwYWNlX21lbW9yeSksIEkgY2FuIGRvIHRoYXQuDQo+IA0KDQpCYXNlZCBvbiB5
-b3VyIHBhdGNoLCBJIGFkZGVkIHRoZSBjaGFuZ2UgaW4gdGhlIGluaXRpYWxpemF0aW9uIG9mIA0K
-YWRkcmVzc19zcGFjZV9tZW1vcnkuIEl0IHdvcmtzIHdlbGwgaW4gbXkgc2V0dXAsIGNwdS1tZW1v
-cnkNCmFkZHJlc3Mgc3BhY2UgZG9lc24ndCBzaG93IHVwIGFzIHdlIGV4cGVjdGVkLg0KDQpBbnRo
-b255DQoNCmRpZmYgLS1naXQgYS9leGVjLmMgYi9leGVjLmMNCmluZGV4IDk2ZTNhYzkuLjc0NmRi
-YmMgMTAwNjQ0DQotLS0gYS9leGVjLmMNCisrKyBiL2V4ZWMuYw0KQEAgLTI3MTIsNyArMjcxMiw3
-IEBAIHN0YXRpYyB2b2lkIG1lbW9yeV9tYXBfaW5pdCh2b2lkKQ0KICAgICBzeXN0ZW1fbWVtb3J5
-ID0gZ19tYWxsb2Moc2l6ZW9mKCpzeXN0ZW1fbWVtb3J5KSk7DQoNCiAgICAgbWVtb3J5X3JlZ2lv
-bl9pbml0KHN5c3RlbV9tZW1vcnksIE5VTEwsICJzeXN0ZW0iLCBVSU5UNjRfTUFYKTsNCi0gICAg
-YWRkcmVzc19zcGFjZV9pbml0KCZhZGRyZXNzX3NwYWNlX21lbW9yeSwgc3lzdGVtX21lbW9yeSwg
-Im1lbW9yeSIpOw0KKyAgICBhZGRyZXNzX3NwYWNlX2luaXRfc3RhdGljKCZhZGRyZXNzX3NwYWNl
-X21lbW9yeSwgc3lzdGVtX21lbW9yeSwgIm1lbW9yeSIpOw0KDQogICAgIHN5c3RlbV9pbyA9IGdf
-bWFsbG9jKHNpemVvZigqc3lzdGVtX2lvKSk7DQogICAgIG1lbW9yeV9yZWdpb25faW5pdF9pbyhz
-eXN0ZW1faW8sIE5VTEwsICZ1bmFzc2lnbmVkX2lvX29wcywgTlVMTCwgImlvIiwNCmRpZmYgLS1n
-aXQgYS9pbmNsdWRlL2V4ZWMvbWVtb3J5LmggYi9pbmNsdWRlL2V4ZWMvbWVtb3J5LmgNCmluZGV4
-IGIyN2IyODguLjZmNDRiNzkgMTAwNjQ0DQotLS0gYS9pbmNsdWRlL2V4ZWMvbWVtb3J5LmgNCisr
-KyBiL2luY2x1ZGUvZXhlYy9tZW1vcnkuaA0KQEAgLTEzOTUsNiArMTM5NSwxNyBAQCBNZW1UeFJl
-c3VsdCBtZW1vcnlfcmVnaW9uX2Rpc3BhdGNoX3dyaXRlKE1lbW9yeVJlZ2lvbiAqbXIsDQogdm9p
-ZCBhZGRyZXNzX3NwYWNlX2luaXQoQWRkcmVzc1NwYWNlICphcywgTWVtb3J5UmVnaW9uICpyb290
-LCBjb25zdCBjaGFyICpuYW1lKTsNCg0KIC8qKg0KKyAqIGFkZHJlc3Nfc3BhY2VfaW5pdF9zdGF0
-aWM6IGluaXRpYWxpemVzIGFuIHN0YXRpYyBhZGRyZXNzIHNwYWNlDQorICoNCisgKiBAYXM6IGFu
-IHVuaW5pdGlhbGl6ZWQgI0FkZHJlc3NTcGFjZQ0KKyAqIEByb290OiBhICNNZW1vcnlSZWdpb24g
-dGhhdCByb3V0ZXMgYWRkcmVzc2VzIGZvciB0aGUgYWRkcmVzcyBzcGFjZQ0KKyAqIEBuYW1lOiBh
-biBhZGRyZXNzIHNwYWNlIG5hbWUuICBUaGUgbmFtZSBpcyBvbmx5IHVzZWQgZm9yIGRlYnVnZ2lu
-Zw0KKyAqICAgICAgICBvdXRwdXQuDQorICovDQordm9pZCBhZGRyZXNzX3NwYWNlX2luaXRfc3Rh
-dGljKEFkZHJlc3NTcGFjZSAqYXMsIE1lbW9yeVJlZ2lvbiAqcm9vdCwNCisgICAgICAgY29uc3Qg
-Y2hhciAqbmFtZSk7DQorDQorLyoqDQogICogYWRkcmVzc19zcGFjZV9pbml0X3NoYXJlYWJsZTog
-cmV0dXJuIGFuIGFkZHJlc3Mgc3BhY2UgZm9yIGEgbWVtb3J5IHJlZ2lvbiwNCiAgKiAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICBjcmVhdGluZyBpdCBpZiBpdCBkb2VzIG5vdCBhbHJlYWR5
-IGV4aXN0DQogICoNCmRpZmYgLS1naXQgYS9tZW1vcnkuYyBiL21lbW9yeS5jDQppbmRleCAxOTBj
-ZDNkLi42YzkzM2Q4IDEwMDY0NA0KLS0tIGEvbWVtb3J5LmMNCisrKyBiL21lbW9yeS5jDQpAQCAt
-MjQ2MSw3ICsyNDYxLDggQEAgc3RhdGljIHZvaWQgZG9fYWRkcmVzc19zcGFjZV9kZXN0cm95KEFk
-ZHJlc3NTcGFjZSAqYXMpDQogICAgIH0NCiB9DQoNCi12b2lkIGFkZHJlc3Nfc3BhY2VfaW5pdF9z
-dGF0aWMoQWRkcmVzc1NwYWNlICphcywgTWVtb3J5UmVnaW9uICpyb290LCBjb25zdCBjaGFyICpu
-YW1lKQ0KK3ZvaWQgYWRkcmVzc19zcGFjZV9pbml0X3N0YXRpYyhBZGRyZXNzU3BhY2UgKmFzLCBN
-ZW1vcnlSZWdpb24gKnJvb3QsDQorICAgICAgIGNvbnN0IGNoYXIgKm5hbWUpDQogew0KICAgICBh
-ZGRyZXNzX3NwYWNlX2luaXQoYXMsIHJvb3QsIG5hbWUpOw0KICAgICBhcy0+c2hhcmVkID0gdHJ1
-ZTsNCg0K
+PiBPbiAxNi8wNS8yMDE3IDIyOjIyLCBYdSwgQW50aG9ueSB3cm90ZToNCj4gPj4gT24gMTYvMDUv
+MjAxNyAwMzoyMSwgQW50aG9ueSBYdSB3cm90ZToNCj4gPj4+IHdoZW4gc21tIGlzIGRpc2FibGVk
+LCBzbXJhbSBpcyBub3QgdXNlZCwgc28gZGlzYWJsZSBpdA0KPiA+Pj4NCj4gPj4+IFNpZ25lZC1v
+ZmYtYnk6IEFudGhvbnkgWHUgPGFudGhvbnkueHVAaW50ZWwuY29tPg0KPiA+Pg0KPiA+PiBXaGF0
+IGlzIHRoZSBiZW5lZml0Pw0KPiA+DQo+ID4gVGhpcyBwYXRjaCByZW1vdmVzIDEgbWVtb3J5IHJl
+Z2lvbiBmb3IgaTQ0MCBwbGF0Zm9ybSBhbmQgMyBtZW1vcnkNCj4gcmVnaW9ucw0KPiA+IGZvciBx
+MzUgcGxhdGZvcm0uIFRoYXQgbWFrZXMgZnVuY3Rpb25zIHdoaWNoIGl0ZXJhdGVzIG1lbW9yeSBy
+ZWdpb24gdHJlZQ0KPiA+IGEgbGl0dGxlIGJpdCBmYXN0IGV2ZW4gdGhlIG1lbW9yeSByZWdpb25z
+IGFyZSBkaXNhYmxlZC4NCj4gDQo+IERvZXMgaXQgdHJhbnNsYXRlIHRvIGFueXRoaW5nIG1lYXN1
+cmFibGUgaW4gYmVuY2htYXJrcz8gIA0KWWVzICwgd2Ugc2VlIGJvb3QgdGltZSBpbXByb3ZlbWVu
+dCB3aXRoIHRoaXMgcGF0Y2ggaW4gb3VyIHNldHVwIChza2lwIGd1ZXN0IEJJT1MsIA0KZGlzYWJs
+ZSBndWVzdCBQQU0pLg0KDQo+Q291bGQgeW91IGxlYXZlDQo+IHRoZSByZWdpb25zIHRoZXJlLCBi
+dXQgc2tpcCB0aGUgY3JlYXRpb24gb2YgdGhlIFNNUkFNIGFkZHJlc3Mgc3BhY2UgaW4NCj4gcmVn
+aXN0ZXJfc21yYW1fbGlzdGVuZXIgd2hlbiB0aGUgbWFjaGluZSBkb2Vzbid0IGhhdmUgU01NIGVu
+YWJsZWQ/DQpTb3VuZHMgbGlrZSB5b3UgaGF2ZSBjb25jZXJucyBvbiByZW1vdmluZyBzbXJhbSBy
+ZWdpb25zLg0KV2hhdCBhcmUgeW91ciBjb25jZXJucz8NCg0KLUFudGhvbnkNCg==
