@@ -1,26 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51478)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51950)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1dBLvC-0000Vr-M3
-	for qemu-devel@nongnu.org; Thu, 18 May 2017 09:56:55 -0400
+	(envelope-from <groug@kaod.org>) id 1dBLww-0001DX-Ml
+	for qemu-devel@nongnu.org; Thu, 18 May 2017 09:58:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1dBLv8-0007yQ-Mi
-	for qemu-devel@nongnu.org; Thu, 18 May 2017 09:56:54 -0400
-Resent-Message-Id: <E1dBLv8-0007yQ-Mi@eggs.gnu.org>
-Received: from sender-of-o52.zoho.com ([135.84.80.217]:21484)
+	(envelope-from <groug@kaod.org>) id 1dBLws-00006P-Oj
+	for qemu-devel@nongnu.org; Thu, 18 May 2017 09:58:42 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:35343)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1dBLv8-0007xr-Fl
-	for qemu-devel@nongnu.org; Thu, 18 May 2017 09:56:50 -0400
-In-Reply-To: <1495085580-10631-1-git-send-email-tianyu.lan@intel.com>
-Message-ID: <149511579421.633.4290625814337862196@c05f1edc8ed1>
-Reply-To: <qemu-devel@nongnu.org>
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1dBLws-00005k-Dl
+	for qemu-devel@nongnu.org; Thu, 18 May 2017 09:58:38 -0400
+Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v4IDrfsL024985
+	for <qemu-devel@nongnu.org>; Thu, 18 May 2017 09:58:36 -0400
+Received: from e36.co.us.ibm.com (e36.co.us.ibm.com [32.97.110.154])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2ahbsfktgy-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Thu, 18 May 2017 09:58:36 -0400
+Received: from localhost
+	by e36.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <groug@kaod.org>;
+	Thu, 18 May 2017 07:58:35 -0600
+From: Greg Kurz <groug@kaod.org>
+Date: Thu, 18 May 2017 15:58:31 +0200
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Thu, 18 May 2017 06:56:35 -0700 (PDT)
-Subject: Re: [Qemu-devel] [RFC PATCH V2 0/2] Qemu: Add Xen vIOMMU interrupt
- remapping function.
+Content-Transfer-Encoding: 7bit
+Message-Id: <149511591185.8828.11947901967942107196.stgit@bahia.lab.toulouse-stg.fr.ibm.com>
+Subject: [Qemu-devel] [PATCH] spapr: ensure core_slot isn't NULL in
+ spapr_core_unplug()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,51 +38,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: tianyu.lan@intel.com
-Cc: famz@redhat.com, qemu-devel@nongnu.org, xen-devel@lists.xenproject.org, kevin.tian@intel.com, sstabellini@kernel.org, mst@redhat.com, marcel@redhat.com, anthony.perard@citrix.com, chao.gao@intel.com
+To: qemu-devel@nongnu.org
+Cc: qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKU3ViamVjdDogW1FlbXUt
-ZGV2ZWxdIFtSRkMgUEFUQ0ggVjIgMC8yXSBRZW11OiBBZGQgWGVuIHZJT01NVSBpbnRlcnJ1cHQg
-cmVtYXBwaW5nIGZ1bmN0aW9uLgpUeXBlOiBzZXJpZXMKTWVzc2FnZS1pZDogMTQ5NTA4NTU4MC0x
-MDYzMS0xLWdpdC1zZW5kLWVtYWlsLXRpYW55dS5sYW5AaW50ZWwuY29tCgo9PT0gVEVTVCBTQ1JJ
-UFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCgpCQVNFPWJhc2UKbj0xCnRvdGFsPSQoZ2l0IGxvZyAt
-LW9uZWxpbmUgJEJBU0UuLiB8IHdjIC1sKQpmYWlsZWQ9MAoKZ2l0IGNvbmZpZyAtLWxvY2FsIGRp
-ZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKCmNv
-bW1pdHM9IiQoZ2l0IGxvZyAtLWZvcm1hdD0lSCAtLXJldmVyc2UgJEJBU0UuLikiCmZvciBjIGlu
-ICRjb21taXRzOyBkbwogICAgZWNobyAiQ2hlY2tpbmcgUEFUQ0ggJG4vJHRvdGFsOiAkKGdpdCBs
-b2cgLW4gMSAtLWZvcm1hdD0lcyAkYykuLi4iCiAgICBpZiAhIGdpdCBzaG93ICRjIC0tZm9ybWF0
-PWVtYWlsIHwgLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFjayAtOyB0aGVuCiAgICAg
-ICAgZmFpbGVkPTEKICAgICAgICBlY2hvCiAgICBmaQogICAgbj0kKChuKzEpKQpkb25lCgpleGl0
-ICRmYWlsZWQKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KClVwZGF0aW5nIDNjOGNmNWE5YzIxZmY4
-NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0
-JwpjYmU0NzM2IG1zaTogSGFuZGxlIHJlbWFwcGFibGUgZm9ybWF0IGludGVycnVwdCByZXF1ZXN0
-CjY1ZTI2MDEgeGVuLXB0OiBiaW5kL3VuYmluZCBpbnRlcnJ1cHQgcmVtYXBwaW5nIGZvcm1hdCBN
-U0kKCj09PSBPVVRQVVQgQkVHSU4gPT09CkNoZWNraW5nIFBBVENIIDEvMjogeGVuLXB0OiBiaW5k
-L3VuYmluZCBpbnRlcnJ1cHQgcmVtYXBwaW5nIGZvcm1hdCBNU0kuLi4KRVJST1I6IHNwYWNlcyBy
-ZXF1aXJlZCBhcm91bmQgdGhhdCAnOicgKGN0eDpWeFcpCiMzNTogRklMRTogaHcveGVuL3hlbl9w
-dF9tc2kuYzoxNzI6CisgICAgICAgICAgICAgICAgICAgaXNfbXNpeCA/ICItWCI6ICIiLCBhZGRy
-LCBkYXRhKTsKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIF4KCkVSUk9SOiBlbHNl
-IHNob3VsZCBmb2xsb3cgY2xvc2UgYnJhY2UgJ30nCiMzOTogRklMRTogaHcveGVuL3hlbl9wdF9t
-c2kuYzoxNzY6CisgICAgfQorICAgIGVsc2UgewoKRVJST1I6IHNwYWNlIHByb2hpYml0ZWQgYWZ0
-ZXIgdGhhdCBvcGVuIHBhcmVudGhlc2lzICcoJwojNjE6IEZJTEU6IGh3L3hlbi94ZW5fcHRfbXNp
-LmM6MjE1OgorICAgICAgICBpZiAoIGFkZHIgJiBNU0lfQUREUl9JRl9NQVNLICkgewoKRVJST1I6
-IHNwYWNlIHByb2hpYml0ZWQgYmVmb3JlIHRoYXQgY2xvc2UgcGFyZW50aGVzaXMgJyknCiM2MTog
-RklMRTogaHcveGVuL3hlbl9wdF9tc2kuYzoyMTU6CisgICAgICAgIGlmICggYWRkciAmIE1TSV9B
-RERSX0lGX01BU0sgKSB7CgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojNzc6IEZJ
-TEU6IGh3L3hlbi94ZW5fcHRfbXNpLmM6MjMxOgorICAgICAgICAgICAgcmMgPSB4Y19kb21haW5f
-dW5iaW5kX21zaV9pcnEoeGVuX3hjLCB4ZW5fZG9taWQsIGd2ZWMsIHBpcnEsIGdmbGFncyk7Cgp0
-b3RhbDogNCBlcnJvcnMsIDEgd2FybmluZ3MsIDc0IGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2gg
-aGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9y
-cwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUK
-Q0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCkNoZWNraW5nIFBBVENIIDIvMjogbXNpOiBIYW5k
-bGUgcmVtYXBwYWJsZSBmb3JtYXQgaW50ZXJydXB0IHJlcXVlc3QuLi4KRVJST1I6IGJyYWNlcyB7
-fSBhcmUgbmVjZXNzYXJ5IGZvciBhbGwgYXJtcyBvZiB0aGlzIHN0YXRlbWVudAojMzA6IEZJTEU6
-IGh3L2kzODYveGVuL3hlbi1odm0uYzoxNTQ6CisgICAgaWYgKG1zaV9hZGRyX2xvICYgTVNJX0FE
-RFJfSUZfTUFTSykKWy4uLl0KCnRvdGFsOiAxIGVycm9ycywgMCB3YXJuaW5ncywgNjcgbGluZXMg
-Y2hlY2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJ
-ZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8g
-dGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKPT09IE9VVFBV
-VCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKCi0tLQpFbWFpbCBn
-ZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4K
-UGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQGZyZWVsaXN0cy5vcmc=
+If we go that far on the path of hot-removing a core and we find out that
+the core-id is invalid, then we have a serious bug.
+
+Let's make it explicit with an assert() instead of dereferencing a NULL
+pointer.
+
+This fixes Coverity issue CID 1375404.
+
+Signed-off-by: Greg Kurz <groug@kaod.org>
+---
+ hw/ppc/spapr.c |    1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+index 0980d733cd7a..1c5b814fc0bf 100644
+--- a/hw/ppc/spapr.c
++++ b/hw/ppc/spapr.c
+@@ -2715,6 +2715,7 @@ static void spapr_core_unplug(HotplugHandler *hotplug_dev, DeviceState *dev,
+     CPUCore *cc = CPU_CORE(dev);
+     CPUArchId *core_slot = spapr_find_cpu_slot(ms, cc->core_id, NULL);
+ 
++    assert(core_slot);
+     core_slot->cpu = NULL;
+     object_unparent(OBJECT(dev));
+ }
