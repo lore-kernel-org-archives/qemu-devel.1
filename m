@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49634)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50708)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <maxime.coquelin@redhat.com>) id 1dBH2p-0004k7-7N
-	for qemu-devel@nongnu.org; Thu, 18 May 2017 04:44:28 -0400
+	(envelope-from <david@redhat.com>) id 1dBH6x-0006IU-K5
+	for qemu-devel@nongnu.org; Thu, 18 May 2017 04:48:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <maxime.coquelin@redhat.com>) id 1dBH2k-0003SR-AS
-	for qemu-devel@nongnu.org; Thu, 18 May 2017 04:44:27 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46600)
+	(envelope-from <david@redhat.com>) id 1dBH6s-0005IF-OP
+	for qemu-devel@nongnu.org; Thu, 18 May 2017 04:48:43 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47062)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <maxime.coquelin@redhat.com>)
-	id 1dBH2k-0003SM-1h
-	for qemu-devel@nongnu.org; Thu, 18 May 2017 04:44:22 -0400
-From: Maxime Coquelin <maxime.coquelin@redhat.com>
-References: <20170511123246.31308-1-maxime.coquelin@redhat.com>
-	<20170511123246.31308-7-maxime.coquelin@redhat.com>
-	<20170517194401-mutt-send-email-mst@kernel.org>
-Message-ID: <63eaa3cf-1114-0ab2-da05-9f2731464c83@redhat.com>
-Date: Thu, 18 May 2017 10:43:58 +0200
+	(Exim 4.71) (envelope-from <david@redhat.com>) id 1dBH6s-0005I9-F6
+	for qemu-devel@nongnu.org; Thu, 18 May 2017 04:48:38 -0400
+References: <1495035337-13337-1-git-send-email-thuth@redhat.com>
+	<0721f18a-fc66-0be3-7462-76eb60de7f55@redhat.com>
+	<394772e4-949a-b92f-6879-7b9e343e10d3@redhat.com>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <0cb4c90d-cfcc-3d12-44b5-c979f20ec7b9@redhat.com>
+Date: Thu, 18 May 2017 10:48:33 +0200
 MIME-Version: 1.0
-In-Reply-To: <20170517194401-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <394772e4-949a-b92f-6879-7b9e343e10d3@redhat.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 6/6] spec/vhost-user spec: Add IOMMU support
+Subject: Re: [Qemu-devel] [RFC PATCH] target/s390x/cpu_models: Set some
+ additional feature bits for the "qemu" CPU
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,136 +30,151 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: peterx@redhat.com, marcandre.lureau@gmail.com, vkaplans@redhat.com, jasowang@redhat.com, wexu@redhat.com, yuanhan.liu@linux.intel.com, qemu-devel@nongnu.org, jfreiman@redhat.com
+To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>
+Cc: mmarek@suse.com, mbenes@suse.cz, Aurelien Jarno <aurelien@aurel32.net>, Christian Borntraeger <borntraeger@de.ibm.com>
 
-
-
-On 05/17/2017 06:48 PM, Michael S. Tsirkin wrote:
-> On Thu, May 11, 2017 at 02:32:46PM +0200, Maxime Coquelin wrote:
->> This patch specifies and implements the master/slave communication
->> to support device IOTLB in slave.
+On 18.05.2017 03:55, Thomas Huth wrote:
+> On 17.05.2017 18:49, David Hildenbrand wrote:
+>> On 17.05.2017 17:35, Thomas Huth wrote:
+>>> Currently we only present the plain z900 feature bits to the guest,
+>>> but QEMU already emulates some additional features (but not all of
+>>> the next CPU generation, so we can not use the next CPU level as
+>>> default yet). Since newer Linux kernels are checking the feature bits
+>>> and refuse to work if a required feature is missing, we should present
+>>> as much of the supported features as possible when we are running
+>>> with the default "qemu" CPU.
+>>> This patch now adds the "stfle", "extended immediate" and "stckf"
+>>> facility bits to the "qemu" CPU, which are already supported facilities.
+>>> It is unfortunately still not enough to run e.g. recent Fedora kernels,
+>>> but at least it's a first step into the right direction.
+>>>
 >>
->> The vhost_iotlb_msg structure introduced for kernel backends is
->> re-used, making the design close between the two backends.
+>> Three things:
 >>
->> An exception is the use of the secondary channel to enable the
->> slave to send IOTLB miss requests to the master.
+>> 1. Should we care about backwards compatibility? I think so. This should
+>> be fixed up using compat machine properties. (qemu model is a
+>> migration-safe model and could e.g. be used in KVM setups, too).
+> 
+> Theoretically, I agree, but do we really care about backwards
+> compatibility at this point in time? All major distro kernels (except
+> Debian, I think) currently do not work in QEMU, so there is currently
+> not that much that can be migrated...
+> And currently, the "qemu" CPU is the very same as the "z900" CPU, so you
+> might also get along with simply using "-cpu z900" on the destination
+> instead, I guess.
+
+If possible, I would like to avoid changing migration safe CPU model.
+And I guess it shouldn't be too hard for now (unless we really change
+the base model to e.g. a z9, then some more work might have to be done)
+
+I think for now, setting "stfle=off" on "s390-cpu-qemu" for compat
+machines should do the trick.
+
+> 
+>> 2. I would recommend to not enable STFLE for now. Why?
 >>
->> Signed-off-by: Maxime Coquelin <maxime.coquelin@redhat.com>
->> ---
->>   docs/specs/vhost-user.txt | 75 +++++++++++++++++++++++++++++++++++++++++++++++
->>   hw/virtio/vhost-user.c    | 31 ++++++++++++++++++++
->>   2 files changed, 106 insertions(+)
+>> It is/was an indication that the system is running on a z9 (and
+>> implicitly has the basic features). This was not only done because
+>> people were lazy, but because this bit was implicitly connected to other
+>> machine properties.
+> 
+> Uh, that's ugly!
+> 
+>> One popular example is the "DAT-enhancement facility 2". It introduced
+>> the "LOAD PAGE TABLE ENTRY ADDRESS" instruction, but no facility bit was
+>> introduced. SO there is no way to check if the instruction is available
+>> and actually working.
+> 
+> Does the Linux kernel use this instruction at all? I just grep'ed
+> through the kernel sources and did not find it. If the Linux kernel does
+> not use it, I think we should ignore this interdependency and just
+> provide the STFLE feature bit to the guest - since recent Linux kernels
+> depend on it.
+
+Yes, current linux doesn't use it, I don't remember if previous versions
+did. Most likely not. The question is if they relied on the stfle==z9
+assumption. The STFLE facility really is special in that sense.
+
+> 
+>> Please note that we added a feature representation for this facility,
+>> because this would allow us later on to at least model removal of such a
+>> facility (if HW actually would drop it) on a CPU model level.
+> 
+> What about STFLE bit 78, according to my version of the POP, it says:
+> 
+> "The enhanced-DAT facility 2 is installed in the
+>  z/Architecture architectural mode."
+> 
+> ?
+
+As Aurelien already mentioned, there seemed to be different ways to
+enhance DAT :) enhanced-DAT facility 2 is 2GB page support.
+
+> 
+>> 3. This introduces some inconsistency. s390x/cpu_models.c:set_feature()
+>> explicitly tests for such inconsistencies.
 >>
->> diff --git a/docs/specs/vhost-user.txt b/docs/specs/vhost-user.txt
->> index 5fa7016..4a1f0c3 100644
->> --- a/docs/specs/vhost-user.txt
->> +++ b/docs/specs/vhost-user.txt
->> @@ -97,6 +97,23 @@ Depending on the request type, payload can be:
->>      log offset: offset from start of supplied file descriptor
->>          where logging starts (i.e. where guest address 0 would be logged)
->>   
->> + * An IOTLB message
->> +   ---------------------------------------------------------
->> +   | iova | size | user address | permissions flags | type |
->> +   ---------------------------------------------------------
->> +
->> +   IOVA: a 64-bit guest I/O virtual address
->> +   Size: a 64-bit size
->> +   User address: a 64-bit user address
->> +   Permissions flags: a 8-bit bit field:
->> +    - Bit 0: Read access
->> +    - Bit 1: Write access
->> +   Type: a 8-bit IOTLB message type:
->> +    - 1: IOTLB miss
->> +    - 2: IOTLB update
->> +    - 3: IOTLB invalidate
->> +    - 4: IOTLB access fail
->> +
->>   In QEMU the vhost-user message is implemented with the following struct:
->>   
->>   typedef struct VhostUserMsg {
->> @@ -109,6 +126,7 @@ typedef struct VhostUserMsg {
->>           struct vhost_vring_addr addr;
->>           VhostUserMemory memory;
->>           VhostUserLog log;
->> +        struct vhost_iotlb_msg iotlb;
->>       };
->>   } QEMU_PACKED VhostUserMsg;
->>   
->> @@ -253,6 +271,31 @@ Once the source has finished migration, rings will be stopped by
->>   the source. No further update must be done before rings are
->>   restarted.
->>   
->> +IOMMU support
->> +-------------
->> +
->> +When the VIRTIO_F_IOMMU_PLATFORM feature has been negotiated, the master has
->> +to send IOTLB entries update & invalidation by sending VHOST_USER_IOTLB_MSG
->> +requests to the slave with a struct vhost_iotlb_msg payload. For update events,
->> +the iotlb payload has to be filled with the update message type (2), the I/O
->> +virtual address, the size, the user virtual address, and the permissions
->> +flags. For invalidation events, the iotlb payload has to be filled with the
->> +invalidation message type (3), the I/O virtual address and the size. On
->> +success, the slave is expected to reply with a zero payload, non-zero
->> +otherwise.
->> +
->> +When the VHOST_USER_PROTOCOL_F_SLAVE_REQ is supported by the slave, and the
->> +master initiated the slave to master communication channel using the
->> +VHOST_USER_SET_SLAVE_REQ_FD request, the slave can send IOTLB miss and access
->> +failure events by sending VHOST_USER_SLAVE_IOTLB_MSG requests to the master
->> +with a struct vhost_iotlb_msg payload. For miss events, the iotlb payload has
->> +to be filled with the miss message type (1), the I/O virtual address and the
->> +permissions flags. For access failure event, the iotlb payload has to be
->> +filled with the access failure message type (4), the I/O virtual address and
->> +the permissions flags.
+>> So your QEMU CPU model would have a feature, but you would not be able
+>> to run that model using QEMU when manually specifying it on the command
+>> line. Especially, expanding the "qemu" model and feeding it back to QEMU
+>> will fail.
 > 
-> I don't think slave should cache invalid entries. If it does not,
-> how can it detect access failure as opposed to a miss?
+> I've checked that I can also successfully disable the features again at
+> the command line, using "-cpu qemu,eimm=false" for example, so not sure
+> what exactly you're talking about here. Could you please elaborate?
 
-Of course, invalid cache entries should not be cached.
-The VHOST_IOTLB_ACCESS_FAIL has been specified for the Kernel backend,
-even if the latter does not implement it yet.
+Assume libvirt/the user expands the CPU model name "qemu" via
+"qmp-expand-cpu-model "qemu", you will get something like
 
-In the case of user backend, I think it could be used without caching
-entries.
+"z900-base,.....,stfle=on"
 
-After the backend sends a miss requests, the master will send an update
-requests.
+If you feed that to QEMU using "-cpu z900-base,...,stfle=on", QEMU will
+detect the inconsistency when setting the property and abort. However,
+"-cpu qemu" will succeed. Please note that these checks actually make
+sense for KVM:
 
-If for some reasons, the update entry is invalid (e.g. is outside the
-memory ranges shared by set_mem_table), it won't be inserted into the
-cache. So, when looking again at the cache, the backend will still face
-a miss, and so can notify the master of the failing access.
+If you're on a z13 and configure a zEC12, you might be tempted to add
+e.g. "vx=on". However, IBC (Instruction Blocking Control) in the machine
+will block any attempt to execute a vx instruction. So these checks make
+sure that only facilities really supported for a machine generation can
+be enabled.
 
-That said, I specified this message type to mimic the kernel backend, I
-don't what the master could do of such information.
+If we really want that, we might decide to drop such checks for models <
+e.g. z9, because nobody will most likely care.
 
 > 
->> For synchronization purpose, the slave may rely on the
->> +reply-ack feature, so the master may send a reply when operation is completed
+>> So I am not sure if we should introduce such inconsistencies at that
+>> point. Rather fix up the basics and then move the CPU model to a
+>> consistent model.
 > 
-> What does completed mean in this context?
+> I think we're very far away from being able to use the next official CPU
+> model generation in QEMU TCG, so having at least something that let's us
+> run other recent distro kernels apart from the Debian ones would be very
+> helpful. I also understand the "qemu" CPU this way: "Simply give me the
+> best CPU features that TCG currently can provide". If you want to have a
+> "consistent" CPU state, you can simply use an official model like "z900"
+> instead.
 
-Completed means either the master has sent the IOTLB entry update to the
-slave through the master->slave channel, or the IOVA is invalid (so
-nothing sent).
+"qemu" is just like what "host" is for kvm. A consistent model, because
+it is the default.
+
+However, KVM folks also have the requirement to allow
+"unfiltered"/"inconsistent" models, e.g. for development purposes.
+
+There was the idea to introduce a CPU model "-cpu off", that would act
+as before, without any CPU model support: Blindly enable anything we can.
+
+This model would of course not be static, not migration-safe, and one
+would not be able to modify features. This would map to an "unfiltered
+qemu" model under TCG. We could blindly enable anything there.
 
 > 
->> +if the reply-ack feature is negotiated and slaves requests a reply.
->> +
+>  Thomas
 > 
-> This is not very clear to me.
-> So slave sends an access to master. Master finds a pte that
-> overlaps. What does it send to guest? Initial PTE?
-> All PTEs to cover the request? Part of the PTE that overlaps
-> the request?
 
-Actually, the slave only sends the IOVA and access permissions, not the
-size. So the master will send the PTE overlapping this IOVA if
-permissions match.
-When received the slave will again lookup into its cache, and may send
-another request with the next first missing IOVA if needed.
 
-Maxime
+-- 
+
+Thanks,
+
+David
