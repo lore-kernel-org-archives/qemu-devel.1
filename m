@@ -1,28 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33397)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35640)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <prvs=305c22658=anthony.perard@citrix.com>)
-	id 1dBgXM-0004bt-Rh
-	for qemu-devel@nongnu.org; Fri, 19 May 2017 07:57:42 -0400
+	(envelope-from <JBeulich@suse.com>) id 1dBgdo-0006gu-Kz
+	for qemu-devel@nongnu.org; Fri, 19 May 2017 08:04:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <prvs=305c22658=anthony.perard@citrix.com>)
-	id 1dBgXI-00051x-S8
-	for qemu-devel@nongnu.org; Fri, 19 May 2017 07:57:40 -0400
-Received: from smtp02.citrix.com ([66.165.176.63]:36119)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <prvs=305c22658=anthony.perard@citrix.com>)
-	id 1dBgXI-00051a-Kz
-	for qemu-devel@nongnu.org; Fri, 19 May 2017 07:57:36 -0400
-Date: Fri, 19 May 2017 12:57:33 +0100
-From: Anthony PERARD <anthony.perard@citrix.com>
-Message-ID: <20170519115733.GB3260@perard.uk.xensource.com>
+	(envelope-from <JBeulich@suse.com>) id 1dBgdk-0007B5-KK
+	for qemu-devel@nongnu.org; Fri, 19 May 2017 08:04:20 -0400
+Received: from prv-mh.provo.novell.com ([137.65.248.74]:55977)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <JBeulich@suse.com>) id 1dBgdk-0007Ar-BM
+	for qemu-devel@nongnu.org; Fri, 19 May 2017 08:04:16 -0400
+Message-Id: <591EFB5D020000780015B47A@prv-mh.provo.novell.com>
+Date: Fri, 19 May 2017 06:04:13 -0600
+From: "Jan Beulich" <JBeulich@suse.com>
 References: <1495085580-10631-1-git-send-email-tianyu.lan@intel.com>
-	<1495085580-10631-3-git-send-email-tianyu.lan@intel.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+	<1495085580-10631-2-git-send-email-tianyu.lan@intel.com>
+	<20170519111622.GA3260@perard.uk.xensource.com>
+In-Reply-To: <20170519111622.GA3260@perard.uk.xensource.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 Content-Disposition: inline
-In-Reply-To: <1495085580-10631-3-git-send-email-tianyu.lan@intel.com>
-Subject: Re: [Qemu-devel] [RFC PATCH V2 2/2] msi: Handle remappable format
- interrupt request
+Subject: Re: [Qemu-devel] [Xen-devel] [RFC PATCH V2 1/2] xen-pt: bind/unbind
+ interrupt remapping format MSI
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,138 +30,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Lan Tianyu <tianyu.lan@intel.com>
-Cc: qemu-devel@nongnu.org, xen-devel@lists.xenproject.org, Chao Gao <chao.gao@intel.com>, mst@redhat.com, marcel@redhat.com, sstabellini@kernel.org, kevin.tian@intel.com
+To: Anthony PERARD <anthony.perard@citrix.com>, Lan Tianyu <tianyu.lan@intel.com>
+Cc: Chao Gao <chao.gao@intel.com>, kevin.tian@intel.com, sstabellini@kernel.org, xen-devel@lists.xenproject.org, qemu-devel@nongnu.org, marcel@redhat.com, mst@redhat.com
 
-On Thu, May 18, 2017 at 01:33:00AM -0400, Lan Tianyu wrote:
-> From: Chao Gao <chao.gao@intel.com>
-> 
-> According to VT-d spec Interrupt Remapping and Interrupt Posting ->
-> Interrupt Remapping -> Interrupt Request Formats On Intel 64
-> Platforms, fields of MSI data register have changed. This patch
-> avoids wrongly regarding a remappable format interrupt request as
-> an interrupt binded with an event channel.
-> 
-> Signed-off-by: Chao Gao <chao.gao@intel.com>
-> Signed-off-by: Lan Tianyu <tianyu.lan@intel.com>
-> ---
->  hw/pci/msi.c         | 5 +++--
->  hw/pci/msix.c        | 4 +++-
->  hw/xen/xen_pt_msi.c  | 2 +-
->  include/hw/xen/xen.h | 2 +-
->  xen-hvm-stub.c       | 2 +-
->  xen-hvm.c            | 7 ++++++-
->  6 files changed, 15 insertions(+), 7 deletions(-)
-> 
-> diff --git a/hw/pci/msi.c b/hw/pci/msi.c
-> index a87b227..199cb47 100644
-> --- a/hw/pci/msi.c
-> +++ b/hw/pci/msi.c
-> @@ -289,7 +289,7 @@ void msi_reset(PCIDevice *dev)
->  static bool msi_is_masked(const PCIDevice *dev, unsigned int vector)
->  {
->      uint16_t flags = pci_get_word(dev->config + msi_flags_off(dev));
-> -    uint32_t mask, data;
-> +    uint32_t mask, data, addr_lo;
->      bool msi64bit = flags & PCI_MSI_FLAGS_64BIT;
->      assert(vector < PCI_MSI_VECTORS_MAX);
->  
-> @@ -298,7 +298,8 @@ static bool msi_is_masked(const PCIDevice *dev, unsigned int vector)
->      }
->  
->      data = pci_get_word(dev->config + msi_data_off(dev, msi64bit));
-> -    if (xen_is_pirq_msi(data)) {
-> +    addr_lo = pci_get_long(dev->config + msi_address_lo_off(dev));
-> +    if (xen_is_pirq_msi(data, addr_lo)) {
->          return false;
->      }
->  
-> diff --git a/hw/pci/msix.c b/hw/pci/msix.c
-> index bb54e8b..efe2982 100644
-> --- a/hw/pci/msix.c
-> +++ b/hw/pci/msix.c
-> @@ -82,9 +82,11 @@ static bool msix_vector_masked(PCIDevice *dev, unsigned int vector, bool fmask)
->  {
->      unsigned offset = vector * PCI_MSIX_ENTRY_SIZE;
->      uint8_t *data = &dev->msix_table[offset + PCI_MSIX_ENTRY_DATA];
-> +    uint8_t *addr_lo = &dev->msix_table[offset + PCI_MSIX_ENTRY_LOWER_ADDR];
->      /* MSIs on Xen can be remapped into pirqs. In those cases, masking
->       * and unmasking go through the PV evtchn path. */
-> -    if (xen_enabled() && xen_is_pirq_msi(pci_get_long(data))) {
-> +    if (xen_enabled() && xen_is_pirq_msi(pci_get_long(data),
-> +                                         pci_get_long(addr_lo))) {
->          return false;
->      }
->      return fmask || dev->msix_table[offset + PCI_MSIX_ENTRY_VECTOR_CTRL] &
-> diff --git a/hw/xen/xen_pt_msi.c b/hw/xen/xen_pt_msi.c
-> index 5fab95e..45a9e9f 100644
-> --- a/hw/xen/xen_pt_msi.c
-> +++ b/hw/xen/xen_pt_msi.c
-> @@ -114,7 +114,7 @@ static int msi_msix_setup(XenPCIPassthroughState *s,
->  
->      assert((!is_msix && msix_entry == 0) || is_msix);
->  
-> -    if (xen_is_pirq_msi(data)) {
-> +    if (xen_is_pirq_msi(data, addr)) {
->          *ppirq = msi_ext_dest_id(addr >> 32) | msi_dest_id(addr);
->          if (!*ppirq) {
->              /* this probably identifies an misconfiguration of the guest,
-> diff --git a/include/hw/xen/xen.h b/include/hw/xen/xen.h
-> index 09c2ce5..af759bc 100644
-> --- a/include/hw/xen/xen.h
-> +++ b/include/hw/xen/xen.h
-> @@ -33,7 +33,7 @@ int xen_pci_slot_get_pirq(PCIDevice *pci_dev, int irq_num);
->  void xen_piix3_set_irq(void *opaque, int irq_num, int level);
->  void xen_piix_pci_write_config_client(uint32_t address, uint32_t val, int len);
->  void xen_hvm_inject_msi(uint64_t addr, uint32_t data);
-> -int xen_is_pirq_msi(uint32_t msi_data);
-> +int xen_is_pirq_msi(uint32_t msi_data, uint32_t msi_addr_lo);
+>>> On 19.05.17 at 13:16, <anthony.perard@citrix.com> wrote:
+> On Thu, May 18, 2017 at 01:32:59AM -0400, Lan Tianyu wrote:
+>> --- a/include/hw/i386/apic-msidef.h
+>> +++ b/include/hw/i386/apic-msidef.h
+>> @@ -26,6 +26,7 @@
+>> =20
+>>  #define MSI_ADDR_DEST_ID_SHIFT          12
+>>  #define MSI_ADDR_DEST_IDX_SHIFT         4
+>> -#define  MSI_ADDR_DEST_ID_MASK          0x00ffff0
+>> +#define  MSI_ADDR_DEST_ID_MASK          0x000fff00
+>=20
+> The value of MSI_ADDR_DEST_ID_MASK is changed here. I think the patch
+> should be:
+> +#define  MSI_ADDR_DEST_ID_MASK          0x000ffff0
 
-Maybe inverting the arguments would be better, so the arguments would be
-the address first, then the data, like I think it is often the case.
-What do you think?
+Judging from other sources, rather the other way around - the
+mask needs to have further bits removed (should be 0x000ff000
+afaict). Xen sources confirm this, and while Linux has the value
+you suggest, that contradicts
 
->  
->  qemu_irq *xen_interrupt_controller_init(void);
->  
-> diff --git a/xen-hvm-stub.c b/xen-hvm-stub.c
-> index c500325..dae421c 100644
-> --- a/xen-hvm-stub.c
-> +++ b/xen-hvm-stub.c
-> @@ -31,7 +31,7 @@ void xen_hvm_inject_msi(uint64_t addr, uint32_t data)
->  {
->  }
->  
-> -int xen_is_pirq_msi(uint32_t msi_data)
-> +int xen_is_pirq_msi(uint32_t msi_data, uint32_t msi_addr_lo)
->  {
->      return 0;
->  }
-> diff --git a/xen-hvm.c b/xen-hvm.c
-> index 5043beb..db29121 100644
-> --- a/xen-hvm.c
-> +++ b/xen-hvm.c
-> @@ -146,8 +146,13 @@ void xen_piix_pci_write_config_client(uint32_t address, uint32_t val, int len)
->      }
->  }
->  
-> -int xen_is_pirq_msi(uint32_t msi_data)
-> +int xen_is_pirq_msi(uint32_t msi_data, uint32_t msi_addr_lo)
->  {
-> +    /* If msi address is configurate to remapping format, the msi will not
-> +     * remapped into a pirq.
+#define MSI_ADDR_DEST_ID_SHIFT		12
+#define  MSI_ADDR_DEST_ID(dest)		(((dest) << MSI_ADDR_DEST_ID_SHIFT)=
+ & \
+					 MSI_ADDR_DEST_ID_MASK)
 
-What do you think of: "If the MSI address is configured in remappable
-format, the MSI will not be remapped into a pirq." ?
+as well as
 
-> +     */
-> +    if (msi_addr_lo & MSI_ADDR_IF_MASK)
-> +        return 0;
->      /* If vector is 0, the msi is remapped into a pirq, passed as
->       * dest_id.
->       */
+#define MSI_ADDR_EXT_DEST_ID(dest)	((dest) & 0xffffff00)
 
-Thanks,
+chopping off just the low 8 bits.
 
--- 
-Anthony PERARD
+Jan
