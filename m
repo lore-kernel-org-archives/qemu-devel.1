@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47402)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47431)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yang.zhong@intel.com>) id 1dBcNQ-0007JS-Mr
-	for qemu-devel@nongnu.org; Fri, 19 May 2017 03:31:09 -0400
+	(envelope-from <yang.zhong@intel.com>) id 1dBcNS-0007Jj-5j
+	for qemu-devel@nongnu.org; Fri, 19 May 2017 03:31:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yang.zhong@intel.com>) id 1dBcNM-00037i-Mn
-	for qemu-devel@nongnu.org; Fri, 19 May 2017 03:31:08 -0400
+	(envelope-from <yang.zhong@intel.com>) id 1dBcNR-000391-Dc
+	for qemu-devel@nongnu.org; Fri, 19 May 2017 03:31:10 -0400
 Received: from mga09.intel.com ([134.134.136.24]:61751)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <yang.zhong@intel.com>)
-	id 1dBcNM-00037L-FW
-	for qemu-devel@nongnu.org; Fri, 19 May 2017 03:31:04 -0400
+	id 1dBcNR-00037L-51
+	for qemu-devel@nongnu.org; Fri, 19 May 2017 03:31:09 -0400
 From: Yang Zhong <yang.zhong@intel.com>
-Date: Fri, 19 May 2017 15:30:21 +0800
-Message-Id: <1495179026-27872-2-git-send-email-yang.zhong@intel.com>
+Date: Fri, 19 May 2017 15:30:24 +0800
+Message-Id: <1495179026-27872-5-git-send-email-yang.zhong@intel.com>
 In-Reply-To: <1495179026-27872-1-git-send-email-yang.zhong@intel.com>
 References: <1495179026-27872-1-git-send-email-yang.zhong@intel.com>
-Subject: [Qemu-devel] [PATCH v0 1/6] move tcg relative files into tcg
+Subject: [Qemu-devel] [PATCH v0 4/6] move tcg relative files into tcg
  directory
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -28,31 +28,31 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: pbonzini@redhat.com
 Cc: qemu-devel@nongnu.org, anthony.xu@intel.com, Yang Zhong <yang.zhong@intel.com>
 
-move tcg-runtime.c to ./tcg directory
+move translate-common.c to ./tcg
 
 Signed-off-by: Yang Zhong <yang.zhong@intel.com>
 ---
- Makefile.target                    | 2 +-
- tcg-runtime.c => tcg/tcg-runtime.c | 0
+ Makefile.target                              | 2 +-
+ translate-common.c => tcg/translate-common.c | 0
  2 files changed, 1 insertion(+), 1 deletion(-)
- rename tcg-runtime.c => tcg/tcg-runtime.c (100%)
+ rename translate-common.c => tcg/translate-common.c (100%)
 
 diff --git a/Makefile.target b/Makefile.target
-index 465a633..c388fd6 100644
+index c96ebd2..7ee6cb3 100644
 --- a/Makefile.target
 +++ b/Makefile.target
-@@ -98,7 +98,7 @@ obj-$(CONFIG_TCG_INTERPRETER) += disas/tci.o
- obj-y += fpu/softfloat.o
- obj-y += target/$(TARGET_BASE_ARCH)/
- obj-y += disas.o
--obj-y += tcg-runtime.o
-+obj-y += tcg/tcg-runtime.o
- obj-$(call notempty,$(TARGET_XML_FILES)) += gdbstub-xml.o
- obj-$(call lnot,$(CONFIG_HAX)) += hax-stub.o
- obj-$(call lnot,$(CONFIG_KVM)) += kvm-stub.o
-diff --git a/tcg-runtime.c b/tcg/tcg-runtime.c
+@@ -90,7 +90,7 @@ all: $(PROGS) stap
+ # cpu emulator library
+ obj-y = exec.o cpu-exec.o
+ obj-y += tcg/translate-all.o
+-obj-y += translate-common.o
++obj-y += tcg/translate-common.o
+ obj-y += cpu-exec-common.o
+ obj-y += tcg/tcg.o tcg/tcg-op.o tcg/optimize.o
+ obj-$(CONFIG_TCG_INTERPRETER) += tci.o
+diff --git a/translate-common.c b/tcg/translate-common.c
 similarity index 100%
-rename from tcg-runtime.c
-rename to tcg/tcg-runtime.c
+rename from translate-common.c
+rename to tcg/translate-common.c
 -- 
 1.9.1
