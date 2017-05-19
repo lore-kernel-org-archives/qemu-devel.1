@@ -1,31 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57542)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57698)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dBnUN-0001vF-Rh
-	for qemu-devel@nongnu.org; Fri, 19 May 2017 15:23:05 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1dBnUy-0002Fr-LH
+	for qemu-devel@nongnu.org; Fri, 19 May 2017 15:23:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dBnUI-0008E5-PA
-	for qemu-devel@nongnu.org; Fri, 19 May 2017 15:23:03 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43508)
+	(envelope-from <dgilbert@redhat.com>) id 1dBnUt-00005y-Rp
+	for qemu-devel@nongnu.org; Fri, 19 May 2017 15:23:40 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:41580)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1dBnUI-0008Dk-GD
-	for qemu-devel@nongnu.org; Fri, 19 May 2017 15:22:58 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 7FD12624CF
-	for <qemu-devel@nongnu.org>; Fri, 19 May 2017 19:22:56 +0000 (UTC)
-Date: Fri, 19 May 2017 16:22:50 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20170519192250.GV4748@thinpad.lan.raisama.net>
-References: <20170517212547.4767-1-ehabkost@redhat.com>
-	<871srmtlxi.fsf@dusky.pond.sub.org>
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dBnUt-00005h-Ij
+	for qemu-devel@nongnu.org; Fri, 19 May 2017 15:23:35 -0400
+Date: Fri, 19 May 2017 20:23:28 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170519192327.GX2081@work-vm>
+References: <1494595886-30912-1-git-send-email-a.perevalov@samsung.com>
+	<CGME20170512133148eucas1p2c04111d415b1fbd6fb702cfc2a3ed6f9@eucas1p2.samsung.com>
+	<1494595886-30912-9-git-send-email-a.perevalov@samsung.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <871srmtlxi.fsf@dusky.pond.sub.org>
-Subject: Re: [Qemu-devel] [RFC] qmp: Return 'user_creatable' &
- 'hotpluggable' fields on qom-list-types
+In-Reply-To: <1494595886-30912-9-git-send-email-a.perevalov@samsung.com>
+Subject: Re: [Qemu-devel] [PATCH V5 8/9] migration: add postcopy total
+ blocktime into query-migrate
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,173 +29,273 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: qemu-devel@nongnu.org, Marcel Apfelbaum <marcel@redhat.com>
+To: Alexey Perevalov <a.perevalov@samsung.com>, eblake@redhat.com
+Cc: qemu-devel@nongnu.org, i.maximets@samsung.com, peterx@redhat.com
 
-On Thu, May 18, 2017 at 01:59:53PM +0200, Markus Armbruster wrote:
-> Eduardo Habkost <ehabkost@redhat.com> writes:
+* Alexey Perevalov (a.perevalov@samsung.com) wrote:
+> Postcopy total blocktime is available on destination side only.
+> But query-migrate was possible only for source. This patch
+> adds ability to call query-migrate on destination. To distinguish
+> src/dst, state of the MigrationState is using, query-migrate prepares
+> MigrationInfo for source machine only in case of migration's state is different
+> than MIGRATION_STATUS_NONE.
 > 
-> > Currently there's no way for QMP clients to get a list of device types
-> > that are really usable with -device.  This information would be useful
-> > for management software and test scripts (like the device-crash-test
-> > script I have submitted recently).  Interestingly, the "info qdm" HMP
-> > command provides this information, but no QMP command does.
-> >
-> > Add two new fields to the return value of qom-list-types:
-> > "user-creatable-device" and "hotpluggable-device".
+> To be able to see postcopy blocktime, need to request postcopy-blocktime
+> capability.
 > 
-> Does the combination
+> The query-migrate command will show following sample result:
+> {"return":
+>     "postcopy_vcpu_blocktime": [115, 100],
+>     "status": "completed",
+>     "postcopy_blocktime": 100
+> }}
 > 
->     "user-creatable-device": false,
->     "hotpluggable-device": true
+> postcopy_vcpu_blocktime contains list, where the first item is the first
+> vCPU in QEMU.
+
+Lets just check Eric is happy with the qapi side.
+Please also update hmp.c:hmp_info_migrate.
+
+A few comments below.
+
+> Signed-off-by: Alexey Perevalov <a.perevalov@samsung.com>
+> ---
+>  include/migration/migration.h |  4 +++
+>  migration/migration.c         | 47 ++++++++++++++++++++++++++--
+>  migration/postcopy-ram.c      | 73 +++++++++++++++++++++++++++++++++++++++++++
+>  migration/trace-events        |  1 +
+>  qapi-schema.json              |  6 +++-
+>  5 files changed, 127 insertions(+), 4 deletions(-)
 > 
-> make any sense?
+> diff --git a/include/migration/migration.h b/include/migration/migration.h
+> index 7e69a2d..aba0535 100644
+> --- a/include/migration/migration.h
+> +++ b/include/migration/migration.h
+> @@ -135,6 +135,10 @@ struct MigrationIncomingState {
+>  
+>  MigrationIncomingState *migration_incoming_get_current(void);
+>  void migration_incoming_state_destroy(void);
+> +/*
+> + * Functions to work with blocktime context
+> + */
+> +void fill_destination_postcopy_migration_info(MigrationInfo *info);
+>  
+>  struct MigrationState
+>  {
+> diff --git a/migration/migration.c b/migration/migration.c
+> index c0443ce..7a4f33f 100644
+> --- a/migration/migration.c
+> +++ b/migration/migration.c
+> @@ -666,9 +666,15 @@ static void populate_ram_info(MigrationInfo *info, MigrationState *s)
+>      }
+>  }
+>  
+> -MigrationInfo *qmp_query_migrate(Error **errp)
+> +/* TODO improve this assumption */
+> +static bool is_source_migration(void)
+> +{
+> +    MigrationState *ms = migrate_get_current();
+> +    return ms->state != MIGRATION_STATUS_NONE;
+> +}
+> +
+> +static void fill_source_migration_info(MigrationInfo *info)
+>  {
+> -    MigrationInfo *info = g_malloc0(sizeof(*info));
+>      MigrationState *s = migrate_get_current();
+>  
+>      switch (s->state) {
+> @@ -759,10 +765,45 @@ MigrationInfo *qmp_query_migrate(Error **errp)
+>          break;
+>      }
+>      info->status = s->state;
+> +}
+> +
+> +static void fill_destination_migration_info(MigrationInfo *info)
+> +{
+> +    MigrationIncomingState *mis = migration_incoming_get_current();
+>  
+> -    return info;
+> +    switch (mis->state) {
+> +    case MIGRATION_STATUS_NONE:
+> +        break;
+> +    case MIGRATION_STATUS_SETUP:
+> +    case MIGRATION_STATUS_CANCELLING:
+> +    case MIGRATION_STATUS_CANCELLED:
+> +    case MIGRATION_STATUS_ACTIVE:
+> +    case MIGRATION_STATUS_POSTCOPY_ACTIVE:
+> +    case MIGRATION_STATUS_FAILED:
+> +    case MIGRATION_STATUS_COLO:
+> +        info->has_status = true;
+> +        break;
+> +    case MIGRATION_STATUS_COMPLETED:
+> +        info->has_status = true;
+> +        fill_destination_postcopy_migration_info(info);
+> +        break;
+> +    }
+> +    info->status = mis->state;
+>  }
+>  
+> +MigrationInfo *qmp_query_migrate(Error **errp)
+> +{
+> +    MigrationInfo *info = g_malloc0(sizeof(*info));
+> +
+> +    if (is_source_migration()) {
+> +        fill_source_migration_info(info);
+> +    } else {
+> +        fill_destination_migration_info(info);
+> +    }
 
-It doesn't, and the code ensures this won't happen.
+A VM that was migated in can then later get migrated out;
+so I think you need to give both sets of data.
+Which probably means you need a second status field
+since existing stuff might get confused if it's watching
+an outbound migration after an inbound one.
 
+Dave
+ 
+> +
+> +     return info;
+> + }
+> +
+>  void qmp_migrate_set_capabilities(MigrationCapabilityStatusList *params,
+>                                    Error **errp)
+>  {
+> diff --git a/migration/postcopy-ram.c b/migration/postcopy-ram.c
+> index e2660ae..fe047c8 100644
+> --- a/migration/postcopy-ram.c
+> +++ b/migration/postcopy-ram.c
+> @@ -129,6 +129,71 @@ static struct PostcopyBlocktimeContext *blocktime_context_new(void)
+>      return ctx;
+>  }
+>  
+> +static int64List *get_vcpu_blocktime_list(PostcopyBlocktimeContext *ctx)
+> +{
+> +    int64List *list = NULL, *entry = NULL;
+> +    int i;
+> +
+> +    for (i = smp_cpus - 1; i >= 0; i--) {
+> +            entry = g_new0(int64List, 1);
+> +            entry->value = ctx->vcpu_blocktime[i];
+> +            entry->next = list;
+> +            list = entry;
+> +    }
+> +
+> +    return list;
+> +}
+> +
+> +/*
+> + * This function just provide calculated blocktime per cpu and trace it.
+> + * Total blocktime is calculated in mark_postcopy_blocktime_end.
+> + *
+> + *
+> + * Assume we have 3 CPU
+> + *
+> + *      S1        E1           S1               E1
+> + * -----***********------------xxx***************------------------------> CPU1
+> + *
+> + *             S2                E2
+> + * ------------****************xxx---------------------------------------> CPU2
+> + *
+> + *                         S3            E3
+> + * ------------------------****xxx********-------------------------------> CPU3
+> + *
+> + * We have sequence S1,S2,E1,S3,S1,E2,E3,E1
+> + * S2,E1 - doesn't match condition due to sequence S1,S2,E1 doesn't include CPU3
+> + * S3,S1,E2 - sequence includes all CPUs, in this case overlap will be S1,E2 -
+> + *            it's a part of total blocktime.
+> + * S1 - here is last_begin
+> + * Legend of the picture is following:
+> + *              * - means blocktime per vCPU
+> + *              x - means overlapped blocktime (total blocktime)
+> + */
+> +void fill_destination_postcopy_migration_info(MigrationInfo *info)
+> +{
+> +    MigrationIncomingState *mis = migration_incoming_get_current();
+> +
+> +    if (!mis->blocktime_ctx) {
+> +        return;
+> +    }
+> +
+> +    info->has_postcopy_blocktime = true;
+> +    info->postcopy_blocktime = mis->blocktime_ctx->total_blocktime;
+> +    info->has_postcopy_vcpu_blocktime = true;
+> +    info->postcopy_vcpu_blocktime = get_vcpu_blocktime_list(mis->blocktime_ctx);
+> +}
+> +
+> +static uint64_t get_postcopy_total_blocktime(void)
+> +{
+> +    MigrationIncomingState *mis = migration_incoming_get_current();
+> +
+> +    if (!mis->blocktime_ctx) {
+> +        return 0;
+> +    }
+> +
+> +    return mis->blocktime_ctx->total_blocktime;
+> +}
+> +
+>  /*
+>   * Check userfault fd features, to request only supported features in
+>   * future.
+> @@ -462,6 +527,9 @@ int postcopy_ram_incoming_cleanup(MigrationIncomingState *mis)
+>      }
+>  
+>      postcopy_state_set(POSTCOPY_INCOMING_END);
+> +    /* here should be blocktime receiving back operation */
+> +    trace_postcopy_ram_incoming_cleanup_blocktime(
+> +            get_postcopy_total_blocktime());
+>      migrate_send_rp_shut(mis, qemu_file_get_error(mis->from_src_file) != 0);
+>  
+>      if (mis->postcopy_tmp_page) {
+> @@ -876,6 +944,11 @@ void *postcopy_get_tmp_page(MigrationIncomingState *mis)
+>  
+>  #else
+>  /* No target OS support, stubs just fail */
+> +void fill_destination_postcopy_migration_info(MigrationInfo *info)
+> +{
+> +    error_report("%s: No OS support", __func__);
+> +}
+> +
+>  bool postcopy_ram_supported_by_host(MigrationIncomingState *mis)
+>  {
+>      error_report("%s: No OS support", __func__);
+> diff --git a/migration/trace-events b/migration/trace-events
+> index 9424e3e..bdaca1d 100644
+> --- a/migration/trace-events
+> +++ b/migration/trace-events
+> @@ -193,6 +193,7 @@ postcopy_ram_incoming_cleanup_closeuf(void) ""
+>  postcopy_ram_incoming_cleanup_entry(void) ""
+>  postcopy_ram_incoming_cleanup_exit(void) ""
+>  postcopy_ram_incoming_cleanup_join(void) ""
+> +postcopy_ram_incoming_cleanup_blocktime(uint64_t total) "total blocktime %" PRIu64
+>  save_xbzrle_page_skipping(void) ""
+>  save_xbzrle_page_overflow(void) ""
+>  ram_save_iterate_big_wait(uint64_t milliconds, int iterations) "big wait: %" PRIu64 " milliseconds, %d iterations"
+> diff --git a/qapi-schema.json b/qapi-schema.json
+> index fde6d63..e11c5f2 100644
+> --- a/qapi-schema.json
+> +++ b/qapi-schema.json
+> @@ -712,6 +712,8 @@
+>  #              @status is 'failed'. Clients should not attempt to parse the
+>  #              error strings. (Since 2.7)
+>  #
+> +# @postcopy_vcpu_blocktime: list of the postcopy blocktime per vCPU (Since 2.9)
+> +#
+>  # Since: 0.14.0
+>  ##
+>  { 'struct': 'MigrationInfo',
+> @@ -723,7 +725,9 @@
+>             '*downtime': 'int',
+>             '*setup-time': 'int',
+>             '*cpu-throttle-percentage': 'int',
+> -           '*error-desc': 'str'} }
+> +           '*error-desc': 'str',
+> +           '*postcopy_blocktime' : 'int64',
+> +           '*postcopy_vcpu_blocktime': ['int64']} }
+>  
+>  ##
+>  # @query-migrate:
+> -- 
+> 1.9.1
 > 
-> Exposing information on user-creatable/hot-pluggable via QMP makes
-> sense.  The question is how.  This is a design question, and as so often
-> with design questions, I need more words to make my case than I'd like
-> to.  Please bear with me.
-> 
-> >                                                     Also, add extra
-> > arguments for filtering the list of types based on the new fields.
-> 
-> I consider the case for filtering weak.  Let's ignore this part for now.
-
-I considered sending a version that didn't include filtering.  I
-will be happy to ignore it.  :)
-
-> 
-> We have a number of commands to introspect static information,
-> e.g. query-version, query-commands, query-qmp-schema, query-target,
-> query-machines, query-cpu-definitions, query-chardev-backends,
-> device-list-properties, qom-list-types.
-> 
-> Aside: us abandoning the convention to name such commands query-FOO is
-> regrettable.
-> 
-> In its basic form, i.e. without arguments, qom-list-types does what its
-> name suggests: it lists the QOM types.
-> 
-> It also permits finding out whether a type is abstract, but only in a
-> roundabout way: subtract the result of running it without arguments (or
-> with 'abstract':false) from the result with 'abstract':true.
-> 
-> It also permits finding the "implements" relation, but only in an even
-> more roundabout way: run it with 'implements':T for every abstract T,
-> then solve the resulting puzzle.
-> 
-> Unless there's a direct way to find both (and I'm not aware of any),
-> this is bad design.  The obvious fix is to extend its return type to
-> include the information.
-
-Agreed.
-
-> 
-> With qom-list-types fixed that way, there's precedence for exposing
-> additional information on QOM types there.
-> 
-> Note that both the "abstract" bit and the "implements directly" list
-> apply to any QOM type, not just to certain subtypes.  As proposed,
-> "user-creatable-device' and "hotpluggable-device" apply only to the
-> "device" subtype.  There's no precedence for exposing information
-> specific to certain subtypes.
-> 
-> If we want to do it anyway, then qom-list-type should perhaps return a
-> union.  Taken to the logical conclusion, this becomes a nest of unions
-> mirroring the "direct subtype of" relation.  Hmm.
-
-I don't think that's the logical conclusion.  The differences
-between "object" and "device" are hardcoded in our interfaces: we
-already have -object and -device.  Modelling our data to take
-care of thoes differences doesn't mean we will also have to treat
-the differences between other QOM types (e.g. between
-"pci-device" and "usb-device") the same way.
-
-Now, we could choose to encode that in different ways.  We could
-have a single command for all QOM types (like qom-list-types or a
-new query-qom-type command) that return an union, or have
-separate commands for object types and device types.  I'm not
-sure what's the better option here (see below for additional
-comments on that).
-
-> 
-> However, we already have a command to introspect device types:
-> device-list-properties.  Can we expose the information as read-only
-> property/ies of type "device" and be done?
-
-I don't think we should.  device-list-properties has a very
-specific purpose: listing QOM properties that can be read or
-written using qom-get and qom-set, or set in -device.  If there's
-no use case for qom-get/qom-set on a property like "hotpluggable"
-or "user-creatable", we shouldn't make them QOM properties (hence
-they shouldn't appear on device-list-properties).
-
-But that doesn't mean we can't have something like a
-"query-device-type" command that returns other information about
-a given device type, in addition to the property list.
-
-(In my specific use case (the device-crash-test script), I would
-prefer to avoid having to fetch the full list of properties of
-every single device type, just to find out which ones are
-user-creatable.  But this is not really performance-critical
-code, so I can live with that.)
-
-
-So, I see a few options here:
-
-1) Including DeviceClass::user_creatable and
-   DeviceClass::hotpluggable in qom-list-types output.  Probably
-   using an union.
-
-2) Adding a new "query-device-type" command, returning
-   DeviceClass::user_creatable and DeviceClass::hotpluggable, and
-   possibly other DeviceClass fields (like the list of
-   properties)
-
-3) Adding a new "query-qom-type" command, returning extended
-   information about a QOM type.  This might include the list of
-   properties supported by the type.  This might include
-   device-specific data if the command return an union.
-
-Those options are not mutually exclusive.  e.g.: we might decide
-that a small set of fields is useful if included in
-qom-list-types too, even if we implement a query-device-type or
-query-qom-type command.
-
-
-> 
-> But perhaps they aren't really specific to devices.  There are other QOM
-> types that can be created by users, e.g. with -object, so the
-> "user-creatable" bit applies more widely.  Are any of them only
-> creatable during initial startup?  If yes, then that applies more
-> widely, too.
-
-I prefer to have very specific semantics like "this type can be
-used with -device" than something more generic and prone to
-confusion like "this can be user-creatable, but the method used
-to create it can vary".
-
-> 
-> > I'm not sure about the naming of the new command arguments.  Maybe the
-> > names are too long, but I believe that "user-creatable-devices-only=false"
-> > would have more obvious semantics than "user-creatable-devices=false"
-> > (the latter looks ambiguous: it could mean "return only
-> > non-user-creatable devices" or "return all devices").
-> 
-> I consider the filtering feature unnecessary complexity.  The filtering
-> we have got in against my objections.  I won't veto additional filtering
-> outright, but I will insist on test coverage.
-> 
-> The unfiltered output of qom-list-types is less than 10 KiB.  Even if we
-> extend it some, the need to filter it client-side seems dubious.  If a
-> management application really wants to save resources here, it should
-> cache the result and re-get it only when QEMU changes.
-
-I don't think we really need filtering, and I will be happy to
-remove that feature on the next version.
-
--- 
-Eduardo
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
