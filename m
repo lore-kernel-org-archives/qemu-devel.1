@@ -1,33 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48896)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49646)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dBmnF-0000u3-Ja
-	for qemu-devel@nongnu.org; Fri, 19 May 2017 14:38:30 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1dBmqO-0001rr-HF
+	for qemu-devel@nongnu.org; Fri, 19 May 2017 14:41:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dBmnA-0002Qv-NE
-	for qemu-devel@nongnu.org; Fri, 19 May 2017 14:38:29 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:50580)
+	(envelope-from <dgilbert@redhat.com>) id 1dBmqK-0003N1-Fn
+	for qemu-devel@nongnu.org; Fri, 19 May 2017 14:41:44 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43534)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dBmnA-0002QS-Dz
-	for qemu-devel@nongnu.org; Fri, 19 May 2017 14:38:24 -0400
-Date: Fri, 19 May 2017 19:38:17 +0100
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dBmqK-0003MM-89
+	for qemu-devel@nongnu.org; Fri, 19 May 2017 14:41:40 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 3E0E6C0467C5
+	for <qemu-devel@nongnu.org>; Fri, 19 May 2017 18:41:39 +0000 (UTC)
+Date: Fri, 19 May 2017 19:41:34 +0100
 From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170519183816.GT2081@work-vm>
-References: <20170508173650.GJ2120@work-vm>
-	<877c80d1-fa63-0fd1-e394-fb649281aea1@linux.vnet.ibm.com>
-	<20170508175906.GK2120@work-vm>
-	<b69e0df0-120f-6634-d7ff-4bea9ccb4e31@linux.vnet.ibm.com>
-	<20170508184251.GM2120@work-vm>
-	<f84db83a-4347-ef8c-56d3-ba3171d5a430@linux.vnet.ibm.com>
-	<20170515190706.GD2324@work-vm>
-	<0000bcfe-5d9f-e656-1819-9403a1663c39@linux.vnet.ibm.com>
-	<20170519172838.GC2685@work-vm>
-	<644cabb4-44ed-3b49-4c03-35b7b2266882@linux.vnet.ibm.com>
+Message-ID: <20170519184133.GU2081@work-vm>
+References: <1495176212-14446-1-git-send-email-peterx@redhat.com>
+	<1495176212-14446-2-git-send-email-peterx@redhat.com>
+	<20170519082538.GD4912@redhat.com> <20170519125139.GM2081@work-vm>
+	<20170519125601.GD28392@redhat.com> <20170519130200.GO2081@work-vm>
+	<20170519131344.GA22341@redhat.com> <20170519143312.GP2081@work-vm>
+	<20170519145126.GA17164@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <644cabb4-44ed-3b49-4c03-35b7b2266882@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH 06/10] virtio-ccw: use vmstate way for
- config migration
+In-Reply-To: <20170519145126.GA17164@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH RFC 1/6] io: only allow return path for
+ socket typed
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,77 +38,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Halil Pasic <pasic@linux.vnet.ibm.com>
-Cc: Cornelia Huck <cornelia.huck@de.ibm.com>, qemu-devel@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, dhildenb@redhat.com
+To: "Daniel P. Berrange" <berrange@redhat.com>
+Cc: Peter Xu <peterx@redhat.com>, qemu-devel@nongnu.org, Juan Quintela <quintela@redhat.com>
 
-* Halil Pasic (pasic@linux.vnet.ibm.com) wrote:
+* Daniel P. Berrange (berrange@redhat.com) wrote:
+> On Fri, May 19, 2017 at 03:33:12PM +0100, Dr. David Alan Gilbert wrote:
+> > * Daniel P. Berrange (berrange@redhat.com) wrote:
+> > > > shutdown() is safe, in that it stops any other threads accessing the fd
+> > > > but doesn't allow it's reallocation until the close;  We perform the
+> > > > close only when we've joined all other threads that were using the fd.
+> > > > Any of the threads that do new calls on the fd get an error and quickly
+> > > > fall down their error paths.
+> > > 
+> > > Ahh that's certainly an interesting scenario. That would certainly be
+> > > a problem with the migration code when this was originally written.
+> > > It had two QEMUFile structs each with an 'int fd' field, so when you
+> > > close 'fd' on one QEMUFile struct, it wouldn't update the other QEMUFile
+> > > used by another thread.
+> > > 
+> > > Since we switched over to use QIOChannel though, I think the thread
+> > > scenario you describe should be avoided entirely. When you have multiple
+> > > QEMUFile objects, they each have a reference counted pointer to the same
+> > > underlying QIOChannel object instance. So when QEMUFile triggers a call
+> > > to qio_channel_close() in one thread, that'll set fd=-1 in the QIOChannel.
+> > > Since the other threads have a reference to the same QIOChannel object,
+> > > they'll now see this fd == -1 straightaway.
+> > > 
+> > > So, IIUC, this should make the need for shutdown() redundant (at least
+> > > for the thread race conditions you describe).
+> > 
+> > That's not thread safe unless you're doing some very careful locking.
+> > Consider:
+> >   T1                      T2       
+> >      oldfd=fd               tmp=fd
+> >      fd=-1
+> >      close(oldfd)
+> >      unrelated open()
+> >                             read(tmp,...
+> > 
+> > In practice every use of fd will be a copy into a tmp and then the
+> > syscall; the unrelated open() could happen in another thread.
+> > (OK, the gap between the tmp and the read is tiny, although if we're
+> > doing multiple operations chances are the compiler will optimise
+> > it to the top of a loop).
+> > 
+> > There's no way to make that code safe.
 > 
+> Urgh, yes, I see what you mean.
 > 
-> On 05/19/2017 07:28 PM, Dr. David Alan Gilbert wrote:
-> >> To sum it up although I'm currently leaning towards abandoning my idea
-> >> of two sections for two devices, I'm not comfortable with making the
-> >> call myself. I'm hoping for some maintainer guidance (s390x, virtio
-> >> and migration). 
-> > <A couple of hours of reading, the CCW and PCI code, chatting with
-> > dhildenb etc>
-> > 
-> > OK, so I think:
-> >   a) First split the series into two separate series; one that
-> > VMStatifies the existing stuff without breaking compatibility;
-> > and one that adds the new stuff.  Lets get the first of those
-> > going in while we think about the second.
-> > 
-> >     a.1) I'd do this with patches that convert one chunk into
-> >      vmstate and remove the corresponding C code at the same time.
-> > 
-> >   b) While the way PCI devices are done is weird, I think it'll
-> > be a lot simpler if you can stick to a structure that's similar
-> > to them while diverging.  It's hard enough for those of us
-> > who don't do Virtio every day to get our minds around virtio-pci
-> > without it being different for virtio-ccw/css.
-> > 
-> >   c) To do (b) I suggest:
-> >       c.1) you *don't* add a vmsd to your virtio_ccw_device
-> > 
-> >       c.2) but *do* add a VMSTATE_CCW_DEVICE to the start of any
-> >          non-virtio devices you migrate (like each of the PCI devices
-> >           have)
-> > 
-> >       c.3) You can add extra state for CSS to the ->save_extra_state
-> >            handle on virtio devices or to the config
-> > 
-> >   d) vmstatifying the config is OK as well.
-> > 
-> > I should say I'm no virtio expert, so if any of that's truly
-> > mad say so.
-> > 
-> > Dave
-> > 
+> Currently the QIOChannelCommand implementation, uses a pair of anonymous
+> pipes for stdin/out to the child process. I wonder if we could switch
+> that to use socketpair() instead, thus letting us shutdown() on it too.
 > 
-> Agreed (a,b,c,d). Reorganizing my patch set according to a) is
-> going to require some effort, but it should not be too bad. 
-> About c.2): I don't think we have any migratable non virtio devices
-> yet, but I'll keep it in mind.
-> 
-> I do not understand what you mean by c.3) and extra_sate. Maybe
-> it will settle with time. My idea of extending VirtioCcwDevice
-> is just adding subsections to it's VMStateDescription. The
-> call vmstate_save_state(f, &vmstate_virtio_ccw_dev, dev, NULL)
-> in save_config should take care of compatibility. Maybe some
-> staring at virtio-pci is going to help, but right now I can't tell
-> what's the extra_state for, and how/why is it 'extra'.
+> Though I guess it would be sufficient for qio_channel_shutdown() to
+> merely kill the child PID, while leaving the FDs open, as then you'd
+> get EOF and/or EPIPE on the read/writes.
 
-Yes adding extra subsections into the 'config' is probably fine;
-but there's also another hook that Jason added, see a6df8adf3,
-it's an existing subsection at the end of the virtio state
-that can be linked for transport specific data.
+Yes, I guess it's a question of which one is more likely to actually
+kill the exec child off; the socketpair is more likely to cause the
+source side migration code to cancel cleanly, although a kill -9 
+should sort out a wayward exec child.
 
 Dave
 
-> Thanks for your patience!
-> 
 > Regards,
-> Halil
-> 
+> Daniel
+> -- 
+> |: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+> |: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+> |: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
 --
 Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
