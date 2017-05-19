@@ -1,31 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52931)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54325)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1dBl68-0002Zw-53
-	for qemu-devel@nongnu.org; Fri, 19 May 2017 12:49:53 -0400
+	(envelope-from <mst@redhat.com>) id 1dBlBg-0003nv-Ca
+	for qemu-devel@nongnu.org; Fri, 19 May 2017 12:55:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1dBl65-0007I0-1N
-	for qemu-devel@nongnu.org; Fri, 19 May 2017 12:49:52 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:42106)
+	(envelope-from <mst@redhat.com>) id 1dBlBe-0001Xe-7g
+	for qemu-devel@nongnu.org; Fri, 19 May 2017 12:55:36 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:57530)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1dBl64-0007Hp-Nv
-	for qemu-devel@nongnu.org; Fri, 19 May 2017 12:49:48 -0400
-Date: Fri, 19 May 2017 19:49:46 +0300
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1dBlBd-0001XB-Us
+	for qemu-devel@nongnu.org; Fri, 19 May 2017 12:55:34 -0400
+Date: Fri, 19 May 2017 19:55:26 +0300
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20170519194544-mutt-send-email-mst@kernel.org>
-References: <1494578148-102868-1-git-send-email-wei.w.wang@intel.com>
-	<a3f2cae3-5d3d-f620-4a8d-bb11470c0b08@redhat.com>
-	<591AA65F.8080608@intel.com>
-	<d6eb1d73-c791-b8d3-7ef3-a7653aef00d6@redhat.com>
-	<7e1b48d5-83e6-a0ae-5d91-696d8db09d7c@redhat.com>
-	<591D0EF5.9000807@intel.com>
-	<d7df5484-7e08-4e1c-9e35-69d73858c736@redhat.com>
+Message-ID: <20170519195349-mutt-send-email-mst@kernel.org>
+References: <1495163989-9994-1-git-send-email-peterx@redhat.com>
+	<1495163989-9994-11-git-send-email-peterx@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <d7df5484-7e08-4e1c-9e35-69d73858c736@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [virtio-dev] Re: [virtio-dev] Re: [PATCH v2 00/16]
- Vhost-pci for inter-VM communication
+In-Reply-To: <1495163989-9994-11-git-send-email-peterx@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v4 10/10] vhost: iommu: cache static
+ mapping if there is
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,105 +28,125 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jason Wang <jasowang@redhat.com>
-Cc: Wei Wang <wei.w.wang@intel.com>, stefanha@gmail.com, marcandre.lureau@gmail.com, pbonzini@redhat.com, virtio-dev@lists.oasis-open.org, qemu-devel@nongnu.org
+To: Peter Xu <peterx@redhat.com>
+Cc: qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, yi.l.liu@intel.com, Marcel Apfelbaum <marcel@redhat.com>, Lan Tianyu <tianyu.lan@intel.com>, Jason Wang <jasowang@redhat.com>
 
-On Fri, May 19, 2017 at 11:10:33AM +0800, Jason Wang wrote:
->=20
->=20
-> On 2017=E5=B9=B405=E6=9C=8818=E6=97=A5 11:03, Wei Wang wrote:
-> > On 05/17/2017 02:22 PM, Jason Wang wrote:
-> > >=20
-> > >=20
-> > > On 2017=E5=B9=B405=E6=9C=8817=E6=97=A5 14:16, Jason Wang wrote:
-> > > >=20
-> > > >=20
-> > > > On 2017=E5=B9=B405=E6=9C=8816=E6=97=A5 15:12, Wei Wang wrote:
-> > > > > > >=20
-> > > > > >=20
-> > > > > > Hi:
-> > > > > >=20
-> > > > > > Care to post the driver codes too?
-> > > > > >=20
-> > > > > OK. It may take some time to clean up the driver code before
-> > > > > post it out. You can first
-> > > > > have a check of the draft at the repo here:
-> > > > > https://github.com/wei-w-wang/vhost-pci-driver
-> > > > >=20
-> > > > > Best,
-> > > > > Wei
-> > > >=20
-> > > > Interesting, looks like there's one copy on tx side. We used to
-> > > > have zerocopy support for tun for VM2VM traffic. Could you
-> > > > please try to compare it with your vhost-pci-net by:
-> > > >=20
-> > We can analyze from the whole data path - from VM1's network stack to
-> > send packets -> VM2's
-> > network stack to receive packets. The number of copies are actually t=
-he
-> > same for both.
->=20
-> That's why I'm asking you to compare the performance. The only reason f=
-or
-> vhost-pci is performance. You should prove it.
->=20
-> >=20
-> > vhost-pci: 1-copy happen in VM1's driver xmit(), which copes packets
-> > from its network stack to VM2's
-> > RX ring buffer. (we call it "zerocopy" because there is no intermedia=
-te
-> > copy between VMs)
-> > zerocopy enabled vhost-net: 1-copy happen in tun's recvmsg, which cop=
-ies
-> > packets from VM1's TX ring
-> > buffer to VM2's RX ring buffer.
->=20
-> Actually, there's a major difference here. You do copy in guest which
-> consumes time slice of vcpu thread on host. Vhost_net do this in its ow=
-n
-> thread. So I feel vhost_net is even faster here, maybe I was wrong.
+On Fri, May 19, 2017 at 11:19:49AM +0800, Peter Xu wrote:
+> This patch pre-heat vhost iotlb cache when passthrough mode enabled.
+> 
+> Sometimes, even if user specified iommu_platform for vhost devices,
+> IOMMU might still be disabled. One case is passthrough mode in VT-d
+> implementation. We can detect this by observing iommu_list. If it's
+> empty, it means IOMMU translation is disabled, then we can actually
+> pre-heat the translation (it'll be static mapping then) by first
+> invalidating all IOTLB, then cache existing memory ranges into vhost
+> backend iotlb using 1:1 mapping.
+> 
+> Signed-off-by: Peter Xu <peterx@redhat.com>
 
-Yes but only if you have enough CPUs. The point of vhost-pci
-is to put the switch in a VM and scale better with # of VMs.
+I don't really understand. Is this a performance optimization?
+Can you post some #s please?
 
-> >=20
-> > That being said, we compared to vhost-user, instead of vhost_net,
-> > because vhost-user is the one
-> > that is used in NFV, which we think is a major use case for vhost-pci=
-.
->=20
-> If this is true, why not draft a pmd driver instead of a kernel one? An=
-d do
-> you use virtio-net kernel driver to compare the performance? If yes, ha=
-s OVS
-> dpdk optimized for kernel driver (I think not)?
->=20
-> What's more important, if vhost-pci is faster, I think its kernel drive=
-r
-> should be also faster than virtio-net, no?
+Also, if it's PT, can't we bypass iommu altogether? That would be
+even faster ...
 
-If you have a vhost CPU per VCPU and can give a host CPU to each using
-that will be faster.  But not everyone has so many host CPUs.
-
-
-> >=20
-> >=20
-> > > > - make sure zerocopy is enabled for vhost_net
-> > > > - comment skb_orphan_frags() in tun_net_xmit()
-> > > >=20
-> > > > Thanks
-> > > >=20
-> > >=20
-> > > You can even enable tx batching for tun by ethtool -C tap0 rx-frame=
-s
-> > > N. This will greatly improve the performance according to my test.
-> > >=20
-> >=20
-> > Thanks, but would this hurt latency?
-> >=20
-> > Best,
-> > Wei
->=20
-> I don't see this in my test.
->=20
-> Thanks
+> ---
+>  hw/virtio/trace-events |  4 ++++
+>  hw/virtio/vhost.c      | 49 +++++++++++++++++++++++++++++++++++++++++++++++++
+>  2 files changed, 53 insertions(+)
+> 
+> diff --git a/hw/virtio/trace-events b/hw/virtio/trace-events
+> index 1f7a7c1..54dcbb3 100644
+> --- a/hw/virtio/trace-events
+> +++ b/hw/virtio/trace-events
+> @@ -24,3 +24,7 @@ virtio_balloon_handle_output(const char *name, uint64_t gpa) "section name: %s g
+>  virtio_balloon_get_config(uint32_t num_pages, uint32_t actual) "num_pages: %d actual: %d"
+>  virtio_balloon_set_config(uint32_t actual, uint32_t oldactual) "actual: %d oldactual: %d"
+>  virtio_balloon_to_target(uint64_t target, uint32_t num_pages) "balloon target: %"PRIx64" num_pages: %d"
+> +
+> +# hw/virtio/vhost.c
+> +vhost_iommu_commit(void) ""
+> +vhost_iommu_static_preheat(void) ""
+> diff --git a/hw/virtio/vhost.c b/hw/virtio/vhost.c
+> index 03a46a7..8069135 100644
+> --- a/hw/virtio/vhost.c
+> +++ b/hw/virtio/vhost.c
+> @@ -27,6 +27,7 @@
+>  #include "hw/virtio/virtio-access.h"
+>  #include "migration/blocker.h"
+>  #include "sysemu/dma.h"
+> +#include "trace.h"
+>  
+>  /* enabled until disconnected backend stabilizes */
+>  #define _VHOST_DEBUG 1
+> @@ -730,6 +731,11 @@ static void vhost_iommu_unmap_notify(IOMMUNotifier *n, IOMMUTLBEntry *iotlb)
+>      }
+>  }
+>  
+> +static bool vhost_iommu_mr_enabled(struct vhost_dev *dev)
+> +{
+> +    return !QLIST_EMPTY(&dev->iommu_list);
+> +}
+> +
+>  static void vhost_iommu_region_add(MemoryListener *listener,
+>                                     MemoryRegionSection *section)
+>  {
+> @@ -782,6 +788,48 @@ static void vhost_iommu_region_del(MemoryListener *listener,
+>      }
+>  }
+>  
+> +static void vhost_iommu_commit(MemoryListener *listener)
+> +{
+> +    struct vhost_dev *dev = container_of(listener, struct vhost_dev,
+> +                                         iommu_listener);
+> +    struct vhost_memory_region *r;
+> +    int i;
+> +
+> +    trace_vhost_iommu_commit();
+> +
+> +    if (!vhost_iommu_mr_enabled(dev)) {
+> +        /*
+> +        * This means iommu_platform is enabled, however iommu memory
+> +        * region is disabled, e.g., when device passthrough is setup.
+> +        * Then, no translation is needed any more.
+> +        *
+> +        * Let's first invalidate the whole IOTLB, then pre-heat the
+> +        * static mapping by looping over vhost memory ranges.
+> +        */
+> +
+> +        if (dev->vhost_ops->vhost_invalidate_device_iotlb(dev, 0,
+> +                                                          UINT64_MAX)) {
+> +            error_report("%s: flush existing IOTLB failed", __func__);
+> +            return;
+> +        }
+> +
+> +        for (i = 0; i < dev->mem->nregions; i++) {
+> +            r = &dev->mem->regions[i];
+> +            /* Vhost regions are writable RAM, so IOMMU_RW suites. */
+> +            if (dev->vhost_ops->vhost_update_device_iotlb(dev,
+> +                                                          r->guest_phys_addr,
+> +                                                          r->userspace_addr,
+> +                                                          r->memory_size,
+> +                                                          IOMMU_RW)) {
+> +                error_report("%s: pre-heat static mapping failed", __func__);
+> +                return;
+> +            }
+> +        }
+> +
+> +        trace_vhost_iommu_static_preheat();
+> +    }
+> +}
+> +
+>  static void vhost_region_nop(MemoryListener *listener,
+>                               MemoryRegionSection *section)
+>  {
+> @@ -1298,6 +1346,7 @@ int vhost_dev_init(struct vhost_dev *hdev, void *opaque,
+>      hdev->iommu_listener = (MemoryListener) {
+>          .region_add = vhost_iommu_region_add,
+>          .region_del = vhost_iommu_region_del,
+> +        .commit = vhost_iommu_commit,
+>      };
+>  
+>      if (hdev->migration_blocker == NULL) {
+> -- 
+> 2.7.4
