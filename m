@@ -1,29 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41352)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41377)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kevin.tian@intel.com>) id 1dBdt8-0006kZ-PR
-	for qemu-devel@nongnu.org; Fri, 19 May 2017 05:07:59 -0400
+	(envelope-from <stefanha@gmail.com>) id 1dBdtF-0006mN-8w
+	for qemu-devel@nongnu.org; Fri, 19 May 2017 05:08:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kevin.tian@intel.com>) id 1dBdt5-0007Es-CX
-	for qemu-devel@nongnu.org; Fri, 19 May 2017 05:07:58 -0400
-Received: from mga02.intel.com ([134.134.136.20]:13402)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kevin.tian@intel.com>)
-	id 1dBdt5-0007Eg-1G
-	for qemu-devel@nongnu.org; Fri, 19 May 2017 05:07:55 -0400
-From: "Tian, Kevin" <kevin.tian@intel.com>
-Date: Fri, 19 May 2017 09:07:49 +0000
-Message-ID: <AADFC41AFE54684AB9EE6CBC0274A5D190CD9CA5@SHSMSX101.ccr.corp.intel.com>
-References: <1493201210-14357-1-git-send-email-yi.l.liu@linux.intel.com>
-	<1493201210-14357-10-git-send-email-yi.l.liu@linux.intel.com>
-	<5c64416d-7d8a-f1a6-64f9-cb0bf1d95a4a@intel.com>
-	<20170519052338.GA10952@sky-dev>
-In-Reply-To: <20170519052338.GA10952@sky-dev>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	(envelope-from <stefanha@gmail.com>) id 1dBdt9-0007FL-CD
+	for qemu-devel@nongnu.org; Fri, 19 May 2017 05:08:05 -0400
+Date: Fri, 19 May 2017 10:07:50 +0100
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20170519090750.GA12305@stefanha-x1.localdomain>
+References: <20170517170941.25850-1-stefanha@redhat.com>
+	<20170517170941.25850-4-stefanha@redhat.com>
+	<20170518081846.GB4646@noname.redhat.com>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [RFC PATCH 09/20] Memory: introduce
- iommu_ops->record_device
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="UugvWAfsgieZRqgk"
+Content-Disposition: inline
+In-Reply-To: <20170518081846.GB4646@noname.redhat.com>
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 3/3] migration: avoid
+ recursive AioContext locking in save_vmstate()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,73 +26,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Liu, Yi L" <yi.l.liu@linux.intel.com>, "alex.williamson@redhat.com" <alex.williamson@redhat.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "peterx@redhat.com" <peterx@redhat.com>, "Liu, Yi L" <yi.l.liu@intel.com>, "Raj, Ashok" <ashok.raj@intel.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "jean-philippe.brucker@arm.com" <jean-philippe.brucker@arm.com>, "jasowang@redhat.com" <jasowang@redhat.com>, "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>, "Pan, Jacob jun" <jacob.jun.pan@intel.com>, "Lan,
-	Tianyu" <tianyu.lan@intel.com>
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
 
-PiBGcm9tOiBMaXUsIFlpIEwgW21haWx0bzp5aS5sLmxpdUBsaW51eC5pbnRlbC5jb21dDQo+IFNl
-bnQ6IEZyaWRheSwgTWF5IDE5LCAyMDE3IDE6MjQgUE0NCj4gDQo+IEhpIEFsZXgsDQo+IA0KPiBX
-aGF0J3MgeW91ciBvcGluaW9uIHdpdGggVGlhbnl1J3MgcXVlc3Rpb24/IElzIGl0IGFjY2VwYXRh
-YmxlDQo+IHRvIHVzZSBWRklPIEFQSSBpbiBpbnRlbF9pb21tdSBlbXVsYXRvcj8NCg0KRGlkIHlv
-dSBhY3R1YWxseSBuZWVkIHN1Y2ggdHJhbnNsYXRpb24gYXQgYWxsPyBTSUQgc2hvdWxkIGJlDQpm
-aWxsZWQgYnkga2VybmVsIElPTU1VIGRyaXZlciBiYXNlZCBvbiB3aGljaCBkZXZpY2UgaXMNCnJl
-cXVlc3RlZCB3aXRoIGludmFsaWRhdGlvbiByZXF1ZXN0LCByZWdhcmRsZXNzIG9mIHdoaWNoIA0K
-Z3Vlc3QgU0lEIGlzIHVzZWQgaW4gdXNlciBzcGFjZS4gUWVtdSBvbmx5IG5lZWRzIHRvIGtub3cN
-CndoaWNoIGZkIGNvcnJlc3BvbmRzIHRvIGd1ZXN0IFNJRCwgYW5kIHRoZW4gaW5pdGlhdGVzIGFu
-DQppbnZhbGlkYXRpb24gcmVxdWVzdCBvbiB0aGF0IGZkPw0KDQo+IA0KPiBUaGFua3MsDQo+IFlp
-IEwNCj4gT24gRnJpLCBBcHIgMjgsIDIwMTcgYXQgMDI6NDY6MTZQTSArMDgwMCwgTGFuIFRpYW55
-dSB3cm90ZToNCj4gPiBPbiAyMDE35bm0MDTmnIgyNuaXpSAxODowNiwgTGl1LCBZaSBMIHdyb3Rl
-Og0KPiA+ID4gV2l0aCB2SU9NTVUgZXhwb3NlZCB0byBndWVzdCwgdklPTU1VIGVtdWxhdG9yIG5l
-ZWRzIHRvIGRvDQo+IHRyYW5zbGF0aW9uDQo+ID4gPiBiZXR3ZWVuIGhvc3QgYW5kIGd1ZXN0LiBl
-LmcuIGEgZGV2aWNlLXNlbGVjdGl2ZSBUTEIgZmx1c2gsIHZJT01NVQ0KPiA+ID4gZW11bGF0b3Ig
-bmVlZHMgdG8gcmVwbGFjZSBndWVzdCBTSUQgd2l0aCBob3N0IFNJRCBzbyB0aGF0IHRvIGxpbWl0
-DQo+ID4gPiB0aGUgaW52YWxpZGF0aW9uLiBUaGlzIHBhdGNoIGludHJvZHVjZXMgYSBuZXcgY2Fs
-bGJhY2sNCj4gPiA+IGlvbW11X29wcy0+cmVjb3JkX2RldmljZSgpIHRvIG5vdGlmeSB2SU9NTVUg
-ZW11bGF0b3IgdG8gcmVjb3JkDQo+IG5lY2Vzc2FyeQ0KPiA+ID4gaW5mb3JtYXRpb24gYWJvdXQg
-dGhlIGFzc2lnbmVkIGRldmljZS4NCj4gPg0KPiA+IFRoaXMgcGF0Y2ggaXMgdG8gcHJlcGFyZSB0
-byB0cmFuc2xhdGUgZ3Vlc3Qgc2JkZiB0byBob3N0IHNiZGYuDQo+ID4NCj4gPiBBbGV4Og0KPiA+
-IAlDb3VsZCB3ZSBhZGQgYSBuZXcgdmZpbyBBUEkgdG8gZG8gc3VjaCB0cmFuc2xhdGlvbj8gVGhp
-cyB3aWxsIGJlIG1vcmUNCj4gPiBzdHJhaWdodCBmb3J3YXJkIHRoYW4gc3RvcmluZyBob3N0IHNi
-ZGYgaW4gdGhlIHZJT01NVSBkZXZpY2UgbW9kZWwuDQo+ID4NCj4gPiA+DQo+ID4gPiBTaWduZWQt
-b2ZmLWJ5OiBMaXUsIFlpIEwgPHlpLmwubGl1QGxpbnV4LmludGVsLmNvbT4NCj4gPiA+IC0tLQ0K
-PiA+ID4gIGluY2x1ZGUvZXhlYy9tZW1vcnkuaCB8IDExICsrKysrKysrKysrDQo+ID4gPiAgbWVt
-b3J5LmMgICAgICAgICAgICAgIHwgMTIgKysrKysrKysrKysrDQo+ID4gPiAgMiBmaWxlcyBjaGFu
-Z2VkLCAyMyBpbnNlcnRpb25zKCspDQo+ID4gPg0KPiA+ID4gZGlmZiAtLWdpdCBhL2luY2x1ZGUv
-ZXhlYy9tZW1vcnkuaCBiL2luY2x1ZGUvZXhlYy9tZW1vcnkuaA0KPiA+ID4gaW5kZXggN2JkMTNh
-Yi4uNDkwODdlZiAxMDA2NDQNCj4gPiA+IC0tLSBhL2luY2x1ZGUvZXhlYy9tZW1vcnkuaA0KPiA+
-ID4gKysrIGIvaW5jbHVkZS9leGVjL21lbW9yeS5oDQo+ID4gPiBAQCAtMjAzLDYgKzIwMyw4IEBA
-IHN0cnVjdCBNZW1vcnlSZWdpb25JT01NVU9wcyB7DQo+ID4gPiAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICBJT01NVU5vdGlmaWVyRmxhZyBuZXdfZmxhZ3MpOw0KPiA+ID4gICAgICAv
-KiBTZXQgdGhpcyB1cCB0byBwcm92aWRlIGN1c3RvbWl6ZWQgSU9NTVUgcmVwbGF5IGZ1bmN0aW9u
-ICovDQo+ID4gPiAgICAgIHZvaWQgKCpyZXBsYXkpKE1lbW9yeVJlZ2lvbiAqaW9tbXUsIElPTU1V
-Tm90aWZpZXIgKm5vdGlmaWVyKTsNCj4gPiA+ICsgICAgdm9pZCAoKnJlY29yZF9kZXZpY2UpKE1l
-bW9yeVJlZ2lvbiAqaW9tbXUsDQo+ID4gPiArICAgICAgICAgICAgICAgICAgICAgICAgICB2b2lk
-ICpkZXZpY2VfaW5mbyk7DQo+ID4gPiAgfTsNCj4gPiA+DQo+ID4gPiAgdHlwZWRlZiBzdHJ1Y3Qg
-Q29hbGVzY2VkTWVtb3J5UmFuZ2UgQ29hbGVzY2VkTWVtb3J5UmFuZ2U7DQo+ID4gPiBAQCAtNzA4
-LDYgKzcxMCwxNSBAQCB2b2lkDQo+IG1lbW9yeV9yZWdpb25fbm90aWZ5X2lvbW11KE1lbW9yeVJl
-Z2lvbiAqbXIsDQo+ID4gPiAgdm9pZCBtZW1vcnlfcmVnaW9uX25vdGlmeV9vbmUoSU9NTVVOb3Rp
-ZmllciAqbm90aWZpZXIsDQo+ID4gPiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgSU9N
-TVVUTEJFbnRyeSAqZW50cnkpOw0KPiA+ID4NCj4gPiA+ICsvKg0KPiA+ID4gKyAqIG1lbW9yeV9y
-ZWdpb25fbm90aWZ5X2RldmljZV9yZWNvcmQ6IG5vdGlmeSBJT01NVSB0byByZWNvcmQNCj4gYXNz
-aWduDQo+ID4gPiArICogZGV2aWNlLg0KPiA+ID4gKyAqIEBtcjogdGhlIG1lbW9yeSByZWdpb24g
-dG8gbm90aWZ5DQo+ID4gPiArICogQCBkZXZpY2VfaW5mbzogZGV2aWNlIGluZm9ybWF0aW9uDQo+
-ID4gPiArICovDQo+ID4gPiArdm9pZCBtZW1vcnlfcmVnaW9uX25vdGlmeV9kZXZpY2VfcmVjb3Jk
-KE1lbW9yeVJlZ2lvbiAqbXIsDQo+ID4gPiArICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgIHZvaWQgKmluZm8pOw0KPiA+ID4gKw0KPiA+ID4gIC8qKg0KPiA+ID4gICAqIG1l
-bW9yeV9yZWdpb25fcmVnaXN0ZXJfaW9tbXVfbm90aWZpZXI6IHJlZ2lzdGVyIGEgbm90aWZpZXIg
-Zm9yDQo+IGNoYW5nZXMgdG8NCj4gPiA+ICAgKiBJT01NVSB0cmFuc2xhdGlvbiBlbnRyaWVzLg0K
-PiA+ID4gZGlmZiAtLWdpdCBhL21lbW9yeS5jIGIvbWVtb3J5LmMNCj4gPiA+IGluZGV4IDA3Mjhl
-NjIuLjQ1ZWYwNjkgMTAwNjQ0DQo+ID4gPiAtLS0gYS9tZW1vcnkuYw0KPiA+ID4gKysrIGIvbWVt
-b3J5LmMNCj4gPiA+IEBAIC0xNjAwLDYgKzE2MDAsMTggQEAgc3RhdGljIHZvaWQNCj4gbWVtb3J5
-X3JlZ2lvbl91cGRhdGVfaW9tbXVfbm90aWZ5X2ZsYWdzKE1lbW9yeVJlZ2lvbiAqbXIpDQo+ID4g
-PiAgICAgIG1yLT5pb21tdV9ub3RpZnlfZmxhZ3MgPSBmbGFnczsNCj4gPiA+ICB9DQo+ID4gPg0K
-PiA+ID4gK3ZvaWQgbWVtb3J5X3JlZ2lvbl9ub3RpZnlfZGV2aWNlX3JlY29yZChNZW1vcnlSZWdp
-b24gKm1yLA0KPiA+ID4gKyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICB2
-b2lkICppbmZvKQ0KPiA+ID4gK3sNCj4gPiA+ICsgICAgYXNzZXJ0KG1lbW9yeV9yZWdpb25faXNf
-aW9tbXUobXIpKTsNCj4gPiA+ICsNCj4gPiA+ICsgICAgaWYgKG1yLT5pb21tdV9vcHMtPnJlY29y
-ZF9kZXZpY2UpIHsNCj4gPiA+ICsgICAgICAgIG1yLT5pb21tdV9vcHMtPnJlY29yZF9kZXZpY2Uo
-bXIsIGluZm8pOw0KPiA+ID4gKyAgICB9DQo+ID4gPiArDQo+ID4gPiArICAgIHJldHVybjsNCj4g
-PiA+ICt9DQo+ID4gPiArDQo+ID4gPiAgdm9pZCBtZW1vcnlfcmVnaW9uX3JlZ2lzdGVyX2lvbW11
-X25vdGlmaWVyKE1lbW9yeVJlZ2lvbiAqbXIsDQo+ID4gPiAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgIElPTU1VTm90aWZpZXIgKm4pDQo+ID4gPiAgew0KPiA+ID4N
-Cj4gPg0KPiA+DQo=
+
+--UugvWAfsgieZRqgk
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Thu, May 18, 2017 at 10:18:46AM +0200, Kevin Wolf wrote:
+> Am 17.05.2017 um 19:09 hat Stefan Hajnoczi geschrieben:
+> > diff --git a/migration/savevm.c b/migration/savevm.c
+> > index 7f66d58..a70ba20 100644
+> > --- a/migration/savevm.c
+> > +++ b/migration/savevm.c
+> > @@ -2153,6 +2153,14 @@ int save_vmstate(const char *name)
+> >          goto the_end;
+> >      }
+> > =20
+> > +    /* The bdrv_all_create_snapshot() call that follows acquires the A=
+ioContext
+> > +     * for itself.  BDRV_POLL_WHILE() does not support nested locking =
+because
+> > +     * it only releases the lock once.  Therefore synchronous I/O will=
+ deadlock
+> > +     * unless we release the AioContext before bdrv_all_create_snapsho=
+t().
+> > +     */
+> > +    aio_context_release(aio_context);
+> > +    aio_context =3D NULL;
+> > +
+> >      ret =3D bdrv_all_create_snapshot(sn, bs, vm_state_size, &bs);
+> >      if (ret < 0) {
+> >          error_report("Error while creating snapshot on '%s'",
+> > @@ -2163,7 +2171,9 @@ int save_vmstate(const char *name)
+> >      ret =3D 0;
+> > =20
+> >   the_end:
+> > -    aio_context_release(aio_context);
+> > +    if (aio_context) {
+> > +        aio_context_release(aio_context);
+> > +    }
+> >      if (saved_vm_running) {
+> >          vm_start();
+> >      }
+>=20
+> It might actually even be true before this patch because the lock is
+> already only taken for some parts of the function, but don't we need to
+> call bdrv_drain_all_begin/end() around the whole function now?
+>=20
+> We're stopping the VM, so hopefully no device is continuing to process
+> requests, but can't we still have block jobs, NBD server requests etc.?
+>=20
+> And the same is probably true for qemu_loadvm_state().
+
+Yes, they currently rely on bdrv_drain_all() but that's not enough.
+Thanks for the suggestion, will add a patch in v2.
+
+Stefan
+
+--UugvWAfsgieZRqgk
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJZHrXmAAoJEJykq7OBq3PIt6YH/RTYZ+1dGx4Dtq1cvUD6Im42
++bfJUQ3QwYxvYpRnEMKLZ/Lpsxs8WGq+rs1olzA5Wu1B20KGod90QofzMVlFOP4x
+KZLHG77AcwB/WBMMjKqhlVky93TcQgUJMI8wwsxVTPeo6VJjiV/wE8tSdMGr9ktN
+meEbYdD6pBzAY8MlXi0Qd0aqBL09dIPR/wd/nIlZgO16eTkezRTnmOECTj0DeDKa
+ewqreU2rcT8ntTlcULGzHwKmaUCKzszpucARpPP0s53/xFbJzXKBQ1u7IDiTUJdE
+n+vonWtjXOSX4yxS1Vz2wfo8TVxW6K7niJff+fVe9RVVq3ufD/P4ugUBUJklQYQ=
+=n6lV
+-----END PGP SIGNATURE-----
+
+--UugvWAfsgieZRqgk--
