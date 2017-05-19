@@ -1,31 +1,49 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38280)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40981)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dBm0a-000697-L2
-	for qemu-devel@nongnu.org; Fri, 19 May 2017 13:48:13 -0400
+	(envelope-from <pasic@linux.vnet.ibm.com>) id 1dBmEj-0008BF-VA
+	for qemu-devel@nongnu.org; Fri, 19 May 2017 14:02:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dBm0W-0000xw-NL
-	for qemu-devel@nongnu.org; Fri, 19 May 2017 13:48:12 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:45016)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dBm0W-0000xJ-EL
-	for qemu-devel@nongnu.org; Fri, 19 May 2017 13:48:08 -0400
-Date: Fri, 19 May 2017 18:47:54 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170519174753.GS2081@work-vm>
+	(envelope-from <pasic@linux.vnet.ibm.com>) id 1dBmEg-0006e9-RB
+	for qemu-devel@nongnu.org; Fri, 19 May 2017 14:02:49 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:59557
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pasic@linux.vnet.ibm.com>)
+	id 1dBmEg-0006cs-MQ
+	for qemu-devel@nongnu.org; Fri, 19 May 2017 14:02:46 -0400
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v4JHwoU1058196
+	for <qemu-devel@nongnu.org>; Fri, 19 May 2017 14:02:45 -0400
+Received: from e06smtp12.uk.ibm.com (e06smtp12.uk.ibm.com [195.75.94.108])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2aj0kn6g3q-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Fri, 19 May 2017 14:02:45 -0400
+Received: from localhost
+	by e06smtp12.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <pasic@linux.vnet.ibm.com>;
+	Fri, 19 May 2017 19:02:43 +0100
 References: <20170505173507.74077-1-pasic@linux.vnet.ibm.com>
-	<20170505173507.74077-4-pasic@linux.vnet.ibm.com>
-	<20170508164505.GG2120@work-vm>
-	<3e0195e2-ada5-2efc-1feb-e2415761e7bc@linux.vnet.ibm.com>
-	<20170515180129.GC2324@work-vm>
-	<2bf9d9d3-86ed-da36-dc81-415065e08a91@linux.vnet.ibm.com>
-	<20170519145502.GQ2081@work-vm>
-	<1ef8e6c0-02c6-5208-151a-01bcbf7acfe4@linux.vnet.ibm.com>
+	<20170505173507.74077-7-pasic@linux.vnet.ibm.com>
+	<20170508173650.GJ2120@work-vm>
+	<877c80d1-fa63-0fd1-e394-fb649281aea1@linux.vnet.ibm.com>
+	<20170508175906.GK2120@work-vm>
+	<b69e0df0-120f-6634-d7ff-4bea9ccb4e31@linux.vnet.ibm.com>
+	<20170508184251.GM2120@work-vm>
+	<f84db83a-4347-ef8c-56d3-ba3171d5a430@linux.vnet.ibm.com>
+	<20170515190706.GD2324@work-vm>
+	<0000bcfe-5d9f-e656-1819-9403a1663c39@linux.vnet.ibm.com>
+	<20170519172838.GC2685@work-vm>
+From: Halil Pasic <pasic@linux.vnet.ibm.com>
+Date: Fri, 19 May 2017 20:02:40 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1ef8e6c0-02c6-5208-151a-01bcbf7acfe4@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH 03/10] s390x/css: add vmstate entities for
- css
+In-Reply-To: <20170519172838.GC2685@work-vm>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 8bit
+Message-Id: <644cabb4-44ed-3b49-4c03-35b7b2266882@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH 06/10] virtio-ccw: use vmstate way for
+ config migration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,85 +52,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Halil Pasic <pasic@linux.vnet.ibm.com>
-Cc: Cornelia Huck <cornelia.huck@de.ibm.com>, qemu-devel@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: Cornelia Huck <cornelia.huck@de.ibm.com>, qemu-devel@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, dhildenb@redhat.com
 
-* Halil Pasic (pasic@linux.vnet.ibm.com) wrote:
-> 
-> 
-> On 05/19/2017 04:55 PM, Dr. David Alan Gilbert wrote:
-> >> We could also consider making WITH_TMP act as a normal field. 
-> >> Working on the whole state looks like a bit like a corner case:
-> >> we have some stuff adjacent in the migration stream, and we have
-> >> to map it on multiple fields (and vice-versa). Getting the whole
-> >> state with a pointer to a certain field could work via container_of.
-> > You do need to know which field you're working on to be able to safely
-> > use container_of, so I'm not sure how it would work for you in this
-> > case.
-> 
-> 
-> Well, if you have to write to just one field you are good because you
-> already have a pointer to that field (.offset was added).
-> 
-> If you need to write to multiple fields in post_load then you just pick
-> one of the fields you are going to write to (probably the first) and use
-> container_of to gain access to the whole state. The logic is specific to
-> the bunch of the fields you are going to touch anyway.
-> 
-> In fact any member of the state struct will do it's only important that
-> you use the same when creating the VMStateField and when trying to get a
-> pointer to the parent in pre_save and post_load.
-> 
-> I haven't tried, so I'm not 100% sure, but if you like I can try, and send
-> you a patch if it's viable. 
-> 
-> I think the key to a good solution is really what is intended and typical
-> usage, and what is corner case. My patch in the other reply shows that we
-> can do without changing the ways of VMSTATE_WITH_TMP. I think we can make
-> what I'm trying to do here a bit prettier at the expense of making what
-> you are doing in virtio-net a bit uglier, but whether it's a good idea to
-> do so, I cant tell.
 
-Lets go with what you put in the other patch (I replied to it); I hadn't
-realised that was possible (hence my comment below).
-Once we have a bunch of different uses of VMSTATE_WITH_TMP in the code
-base, I'll step back and see how to tidy them up.
 
-Dave
+On 05/19/2017 07:28 PM, Dr. David Alan Gilbert wrote:
+>> To sum it up although I'm currently leaning towards abandoning my idea
+>> of two sections for two devices, I'm not comfortable with making the
+>> call myself. I'm hoping for some maintainer guidance (s390x, virtio
+>> and migration). 
+> <A couple of hours of reading, the CCW and PCI code, chatting with
+> dhildenb etc>
+> 
+> OK, so I think:
+>   a) First split the series into two separate series; one that
+> VMStatifies the existing stuff without breaking compatibility;
+> and one that adds the new stuff.  Lets get the first of those
+> going in while we think about the second.
+> 
+>     a.1) I'd do this with patches that convert one chunk into
+>      vmstate and remove the corresponding C code at the same time.
+> 
+>   b) While the way PCI devices are done is weird, I think it'll
+> be a lot simpler if you can stick to a structure that's similar
+> to them while diverging.  It's hard enough for those of us
+> who don't do Virtio every day to get our minds around virtio-pci
+> without it being different for virtio-ccw/css.
+> 
+>   c) To do (b) I suggest:
+>       c.1) you *don't* add a vmsd to your virtio_ccw_device
+> 
+>       c.2) but *do* add a VMSTATE_CCW_DEVICE to the start of any
+>          non-virtio devices you migrate (like each of the PCI devices
+>           have)
+> 
+>       c.3) You can add extra state for CSS to the ->save_extra_state
+>            handle on virtio devices or to the config
+> 
+>   d) vmstatifying the config is OK as well.
+> 
+> I should say I'm no virtio expert, so if any of that's truly
+> mad say so.
+> 
+> Dave
+> 
 
-> > 
-> > The other thought I'd had was that perhaps we could change the temporary
-> > structure in VMSTATE_WITH_TMP to:
-> > 
-> >   struct foo {
-> >      struct whatever **parent;
-> > 
-> > so now you could write to *parent in cases like these.
-> >
-> 
-> Sorry, I do not get your idea. If you have some WIP patch in this
-> direction I would be happy to provide some feedback.
-> 
->  
-> >> Btw, I would rather call it get_indicator a factory method or even a
-> >> constructor than an allocator, but I think we understand each-other
-> >> anyway.
-> > Yes; I'm not too worried about the actual name as long as it's short
-> > and obvious.
-> > 
-> > I'd thought of 'allocator' since in most cases it's used where the
-> > load-time code allocates memory for the object being loaded.
-> > A constructor is normally something I think of as happening after
-> > allocation; and a factory, hmm maybe.  However, if it does the right
-> > thing I wouldn't object to any of those names.
-> > 
-> 
-> I think we are on the same page.
-> 
-> Cheers,
-> Halil
-> 
-> > Dave
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+Agreed (a,b,c,d). Reorganizing my patch set according to a) is
+going to require some effort, but it should not be too bad. 
+About c.2): I don't think we have any migratable non virtio devices
+yet, but I'll keep it in mind.
+
+I do not understand what you mean by c.3) and extra_sate. Maybe
+it will settle with time. My idea of extending VirtioCcwDevice
+is just adding subsections to it's VMStateDescription. The
+call vmstate_save_state(f, &vmstate_virtio_ccw_dev, dev, NULL)
+in save_config should take care of compatibility. Maybe some
+staring at virtio-pci is going to help, but right now I can't tell
+what's the extra_state for, and how/why is it 'extra'.
+
+Thanks for your patience!
+
+Regards,
+Halil
