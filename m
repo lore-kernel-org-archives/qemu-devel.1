@@ -1,24 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35907)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42740)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dBqEt-0006YX-LY
-	for qemu-devel@nongnu.org; Fri, 19 May 2017 18:19:16 -0400
+	(envelope-from <jsnow@redhat.com>) id 1dBquq-0005It-1K
+	for qemu-devel@nongnu.org; Fri, 19 May 2017 19:02:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dBqEq-0002HA-ID
-	for qemu-devel@nongnu.org; Fri, 19 May 2017 18:19:15 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47026)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dBqEq-0002H1-88
-	for qemu-devel@nongnu.org; Fri, 19 May 2017 18:19:12 -0400
-References: <149520423435.7495.2756710723268429379.stgit@bahia.lan>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <ea69f777-6b99-1e39-7e5b-4decde958769@redhat.com>
-Date: Fri, 19 May 2017 17:19:10 -0500
+	(envelope-from <jsnow@redhat.com>) id 1dBqup-0008FR-0k
+	for qemu-devel@nongnu.org; Fri, 19 May 2017 19:02:36 -0400
+References: <20170503122539.282182-1-vsementsov@virtuozzo.com>
+	<20170503122539.282182-10-vsementsov@virtuozzo.com>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <4b694da7-4fa8-24dc-6808-a47cbf985d82@redhat.com>
+Date: Fri, 19 May 2017 19:02:22 -0400
 MIME-Version: 1.0
-In-Reply-To: <149520423435.7495.2756710723268429379.stgit@bahia.lan>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="lNSAkUe34FOvapkmMWW8FHl42FPx2XAVA"
-Subject: Re: [Qemu-devel] [PATCH] fsdev: fix virtfs-proxy-helper cwd
+In-Reply-To: <20170503122539.282182-10-vsementsov@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 09/25] block/dirty-bitmap: add readonly
+ field to BdrvDirtyBitmap
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,73 +25,103 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, famz@redhat.com, armbru@redhat.com, mreitz@redhat.com, stefanha@redhat.com, pbonzini@redhat.com, den@openvz.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---lNSAkUe34FOvapkmMWW8FHl42FPx2XAVA
-From: Eric Blake <eblake@redhat.com>
-To: Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org
-Message-ID: <ea69f777-6b99-1e39-7e5b-4decde958769@redhat.com>
-Subject: Re: [PATCH] fsdev: fix virtfs-proxy-helper cwd
-References: <149520423435.7495.2756710723268429379.stgit@bahia.lan>
-In-Reply-To: <149520423435.7495.2756710723268429379.stgit@bahia.lan>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
 
-On 05/19/2017 09:30 AM, Greg Kurz wrote:
-> Since chroot() doesn't change the current directory, it is indeed a goo=
-d
-> practice to chdir() to the target directory and then then chroot(), or
-> to chroot() to the target directory and then chdir("/").
->=20
-> The current code does neither of them actually. Let's go for the latter=
-=2E
->=20
-> This doesn't fix any security issue since all of this takes place befor=
-e
-> the helper begins to process requests.
->=20
-> Signed-off-by: Greg Kurz <groug@kaod.org>
+
+On 05/03/2017 08:25 AM, Vladimir Sementsov-Ogievskiy wrote:
+> It will be needed in following commits for persistent bitmaps.
+> If bitmap is loaded from read-only storage (and we can't mark it
+> "in use" in this storage) corresponding BdrvDirtyBitmap should be
+> read-only.
+> 
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 > ---
->  fsdev/virtfs-proxy-helper.c |    8 ++++----
->  1 file changed, 4 insertions(+), 4 deletions(-)
+>  block/dirty-bitmap.c         | 16 ++++++++++++++++
+>  include/block/dirty-bitmap.h |  3 +++
+>  2 files changed, 19 insertions(+)
+> 
+> diff --git a/block/dirty-bitmap.c b/block/dirty-bitmap.c
+> index 90af37287f..ab6a95cf41 100644
+> --- a/block/dirty-bitmap.c
+> +++ b/block/dirty-bitmap.c
+> @@ -44,6 +44,8 @@ struct BdrvDirtyBitmap {
+>      int64_t size;               /* Size of the bitmap (Number of sectors) */
+>      bool disabled;              /* Bitmap is read-only */
+>      int active_iterators;       /* How many iterators are active */
+> +    bool readonly;              /* Bitmap is read-only and may be changed only
+> +                                   by deserialize* functions */
+>      QLIST_ENTRY(BdrvDirtyBitmap) list;
+>  };
+>  
+> @@ -436,6 +438,7 @@ void bdrv_set_dirty_bitmap(BdrvDirtyBitmap *bitmap,
+>                             int64_t cur_sector, int64_t nr_sectors)
+>  {
+>      assert(bdrv_dirty_bitmap_enabled(bitmap));
+> +    assert(!bdrv_dirty_bitmap_readonly(bitmap));
 
-You are correct that failing to sanitize the current working directory
-alongside a chroot() can lead to escaped access outside of the new
-smaller root.
+Doesn't this change the nature of the assertion?
 
-Aside: chdir() is annoying in multi-threaded apps - it is global state,
-rather than thread-local.  A multi-threaded app should therefore either
-never change the current working directory, or else never rely on the
-current working directory.  But if I'm not mistaken, virtfs-proxy-helper
-is an independent helper app, not qemu proper, so the use of
-chdir/chroot is not affecting other threads.
+We're going from
+    return !(bitmap->disabled || bitmap->successor);
+to
+	!bitmap->readonly
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
+That makes me a little nervous to ACK this patch, because the
+correctness depends on how readonly is updated and manipulated in the
+future, which makes it more prone to error.
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---lNSAkUe34FOvapkmMWW8FHl42FPx2XAVA
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEcBAEBCAAGBQJZH29eAAoJEKeha0olJ0NqvCsH/A5UFrM+BKQaDF+Mijm89Jnp
-gJZA3Q1Qjv8wVqhIhjN5oRZ63OjrnEli3kexgv9UfiI+LKmDfkznY9gbAN4YRtgj
-kHOPRd8mxFSXZwfpxmNjFR7Z2Jyt6GOzNVfL85BNt3j5gcnXg0zZRJg/Hw7R9J7/
-44XCtQHSaLyIsXPlNm+9sPoGwrrDZZpr7OI7iSiGdPQTRiWz9vbEe2/psN/MtmWa
-mlGsdFgjNc0wERkNXjAsQP6kIxZr8GiuzUzA8PyXwx18R/ldv83xy9HjYbGczz27
-IdWPrvLMSd5G6km4IcbeMMqa8P+a5FnMNABLXqzNZXXI0YnVzJujwnAeypUJlG0=
-=S4lB
------END PGP SIGNATURE-----
-
---lNSAkUe34FOvapkmMWW8FHl42FPx2XAVA--
+>      hbitmap_set(bitmap->bitmap, cur_sector, nr_sectors);
+>  }
+>  
+> @@ -443,12 +446,14 @@ void bdrv_reset_dirty_bitmap(BdrvDirtyBitmap *bitmap,
+>                               int64_t cur_sector, int64_t nr_sectors)
+>  {
+>      assert(bdrv_dirty_bitmap_enabled(bitmap));
+> +    assert(!bdrv_dirty_bitmap_readonly(bitmap));
+>      hbitmap_reset(bitmap->bitmap, cur_sector, nr_sectors);
+>  }
+>  
+>  void bdrv_clear_dirty_bitmap(BdrvDirtyBitmap *bitmap, HBitmap **out)
+>  {
+>      assert(bdrv_dirty_bitmap_enabled(bitmap));
+> +    assert(!bdrv_dirty_bitmap_readonly(bitmap));
+>      if (!out) {
+>          hbitmap_reset_all(bitmap->bitmap);
+>      } else {
+> @@ -519,6 +524,7 @@ void bdrv_set_dirty(BlockDriverState *bs, int64_t cur_sector,
+>          if (!bdrv_dirty_bitmap_enabled(bitmap)) {
+>              continue;
+>          }
+> +        assert(!bdrv_dirty_bitmap_readonly(bitmap));
+>          hbitmap_set(bitmap->bitmap, cur_sector, nr_sectors);
+>      }
+>  }
+> @@ -540,3 +546,13 @@ int64_t bdrv_get_meta_dirty_count(BdrvDirtyBitmap *bitmap)
+>  {
+>      return hbitmap_count(bitmap->meta);
+>  }
+> +
+> +bool bdrv_dirty_bitmap_readonly(const BdrvDirtyBitmap *bitmap)
+> +{
+> +    return bitmap->readonly;
+> +}
+> +
+> +void bdrv_dirty_bitmap_set_readonly(BdrvDirtyBitmap *bitmap)
+> +{
+> +    bitmap->readonly = true;
+> +}
+> diff --git a/include/block/dirty-bitmap.h b/include/block/dirty-bitmap.h
+> index 1e17729ac2..0aab5841f5 100644
+> --- a/include/block/dirty-bitmap.h
+> +++ b/include/block/dirty-bitmap.h
+> @@ -75,4 +75,7 @@ void bdrv_dirty_bitmap_deserialize_ones(BdrvDirtyBitmap *bitmap,
+>                                          bool finish);
+>  void bdrv_dirty_bitmap_deserialize_finish(BdrvDirtyBitmap *bitmap);
+>  
+> +bool bdrv_dirty_bitmap_readonly(const BdrvDirtyBitmap *bitmap);
+> +void bdrv_dirty_bitmap_set_readonly(BdrvDirtyBitmap *bitmap);
+> +
+>  #endif
+> 
