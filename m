@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46909)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46903)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <anton.nefedov@virtuozzo.com>) id 1dBhK2-0000e9-4I
+	(envelope-from <anton.nefedov@virtuozzo.com>) id 1dBhK1-0000ds-QU
 	for qemu-devel@nongnu.org; Fri, 19 May 2017 08:48:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <anton.nefedov@virtuozzo.com>) id 1dBhK1-0004MK-8V
-	for qemu-devel@nongnu.org; Fri, 19 May 2017 08:47:58 -0400
+	(envelope-from <anton.nefedov@virtuozzo.com>) id 1dBhK0-0004LL-LA
+	for qemu-devel@nongnu.org; Fri, 19 May 2017 08:47:57 -0400
 Received: from mail-eopbgr00136.outbound.protection.outlook.com
 	([40.107.0.136]:31167
 	helo=EUR02-AM5-obe.outbound.protection.outlook.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <anton.nefedov@virtuozzo.com>)
-	id 1dBhK0-0004AG-Tk
-	for qemu-devel@nongnu.org; Fri, 19 May 2017 08:47:57 -0400
+	id 1dBhK0-0004AG-Dp
+	for qemu-devel@nongnu.org; Fri, 19 May 2017 08:47:56 -0400
 From: Anton Nefedov <anton.nefedov@virtuozzo.com>
-Date: Fri, 19 May 2017 15:47:21 +0300
-Message-ID: <1495198042-124203-9-git-send-email-anton.nefedov@virtuozzo.com>
+Date: Fri, 19 May 2017 15:47:20 +0300
+Message-ID: <1495198042-124203-8-git-send-email-anton.nefedov@virtuozzo.com>
 In-Reply-To: <1495198042-124203-1-git-send-email-anton.nefedov@virtuozzo.com>
 References: <1495198042-124203-1-git-send-email-anton.nefedov@virtuozzo.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v2 8/9] serial: chardev hotswap support
+Subject: [Qemu-devel] [PATCH v2 7/9] serial: move TIOCM update to a separate
+ function
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,70 +32,70 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: den@virtuozzo.com, pbonzini@redhat.com, marcandre.lureau@redhat.com, Anton Nefedov <anton.nefedov@virtuozzo.com>, "Michael S . Tsirkin" <mst@redhat.com>
 
-for a backend change, a number of ioctls has to be replayed to sync
-the current setup of a frontend to a backend tty. This is hopefully
-enough so we don't have to track, store and replay the whole original
-control byte sequence.
+will be used by the following patch
 
 Signed-off-by: Anton Nefedov <anton.nefedov@virtuozzo.com>
 Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 CC: Michael S. Tsirkin <mst@redhat.com>
 CC: Paolo Bonzini <pbonzini@redhat.com>
 ---
- hw/char/serial.c | 32 ++++++++++++++++++++++++++++++--
- 1 file changed, 30 insertions(+), 2 deletions(-)
+ hw/char/serial.c | 31 +++++++++++++++++++------------
+ 1 file changed, 19 insertions(+), 12 deletions(-)
 
 diff --git a/hw/char/serial.c b/hw/char/serial.c
-index 1e6bdeb..ed01637 100644
+index d8d34d0..1e6bdeb 100644
 --- a/hw/char/serial.c
 +++ b/hw/char/serial.c
-@@ -891,9 +891,37 @@ static void serial_reset(void *opaque)
-     s->msr &= ~UART_MSR_ANY_DELTA;
+@@ -312,6 +312,24 @@ static void serial_write_fcr(SerialState *s, uint8_t val)
+     }
  }
  
-+static int serial_be_change(void *opaque)
++static void serial_update_tiocm(SerialState *s)
 +{
-+    SerialState *s = opaque;
++    int flags;
 +
-+    qemu_chr_fe_set_handlers(&s->chr, serial_can_receive1, serial_receive1,
-+                             serial_event, serial_be_change, s, NULL, true);
++    qemu_chr_fe_ioctl(&s->chr, CHR_IOCTL_SERIAL_GET_TIOCM, &flags);
 +
-+    serial_update_parameters(s);
++    flags &= ~(CHR_TIOCM_RTS | CHR_TIOCM_DTR);
 +
-+    qemu_chr_fe_ioctl(&s->chr, CHR_IOCTL_SERIAL_SET_BREAK,
-+                      &s->last_break_enable);
-+
-+    s->poll_msl = (s->ier & UART_IER_MSI) ? 1 : 0;
-+    serial_update_msl(s);
-+
-+    if (s->poll_msl >= 0 && !(s->mcr & UART_MCR_LOOP)) {
-+        serial_update_tiocm(s);
++    if (s->mcr & UART_MCR_RTS) {
++        flags |= CHR_TIOCM_RTS;
++    }
++    if (s->mcr & UART_MCR_DTR) {
++        flags |= CHR_TIOCM_DTR;
 +    }
 +
-+    if (s->watch_tag > 0) {
-+        g_source_remove(s->watch_tag);
-+        s->watch_tag = qemu_chr_fe_add_watch(&s->chr, G_IO_OUT | G_IO_HUP,
-+                                             serial_watch_cb, s);
-+    }
-+
-+    return 0;
++    qemu_chr_fe_ioctl(&s->chr, CHR_IOCTL_SERIAL_SET_TIOCM, &flags);
 +}
 +
- void serial_realize_core(SerialState *s, Error **errp)
+ static void serial_ioport_write(void *opaque, hwaddr addr, uint64_t val,
+                                 unsigned size)
  {
--    if (!qemu_chr_fe_get_driver(&s->chr)) {
-+    if (!qemu_chr_fe_backend_connected(&s->chr)) {
-         error_setg(errp, "Can't create serial device, empty char device");
-         return;
-     }
-@@ -904,7 +932,7 @@ void serial_realize_core(SerialState *s, Error **errp)
-     qemu_register_reset(serial_reset, s);
+@@ -426,24 +444,13 @@ static void serial_ioport_write(void *opaque, hwaddr addr, uint64_t val,
+         break;
+     case 4:
+         {
+-            int flags;
+             int old_mcr = s->mcr;
+             s->mcr = val & 0x1f;
+             if (val & UART_MCR_LOOP)
+                 break;
  
-     qemu_chr_fe_set_handlers(&s->chr, serial_can_receive1, serial_receive1,
--                             serial_event, NULL, s, NULL, true);
-+                             serial_event, serial_be_change, s, NULL, true);
-     fifo8_create(&s->recv_fifo, UART_FIFO_LENGTH);
-     fifo8_create(&s->xmit_fifo, UART_FIFO_LENGTH);
-     serial_reset(s);
+             if (s->poll_msl >= 0 && old_mcr != s->mcr) {
+-
+-                qemu_chr_fe_ioctl(&s->chr, CHR_IOCTL_SERIAL_GET_TIOCM, &flags);
+-
+-                flags &= ~(CHR_TIOCM_RTS | CHR_TIOCM_DTR);
+-
+-                if (val & UART_MCR_RTS)
+-                    flags |= CHR_TIOCM_RTS;
+-                if (val & UART_MCR_DTR)
+-                    flags |= CHR_TIOCM_DTR;
+-
+-                qemu_chr_fe_ioctl(&s->chr, CHR_IOCTL_SERIAL_SET_TIOCM, &flags);
++                serial_update_tiocm(s);
+                 /* Update the modem status after a one-character-send wait-time, since there may be a response
+                    from the device/computer at the other end of the serial line */
+                 timer_mod(s->modem_status_poll, qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) + s->char_transmit_time);
 -- 
 2.7.4
