@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33906)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33921)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1dBfDW-000190-7E
-	for qemu-devel@nongnu.org; Fri, 19 May 2017 06:33:07 -0400
+	(envelope-from <stefanha@redhat.com>) id 1dBfDX-0001AI-Ls
+	for qemu-devel@nongnu.org; Fri, 19 May 2017 06:33:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1dBfDS-00081T-HV
-	for qemu-devel@nongnu.org; Fri, 19 May 2017 06:33:06 -0400
+	(envelope-from <stefanha@redhat.com>) id 1dBfDU-00081p-F7
+	for qemu-devel@nongnu.org; Fri, 19 May 2017 06:33:07 -0400
 From: Stefan Hajnoczi <stefanha@redhat.com>
-Date: Fri, 19 May 2017 11:32:45 +0100
-Message-Id: <20170519103247.4405-3-stefanha@redhat.com>
+Date: Fri, 19 May 2017 11:32:46 +0100
+Message-Id: <20170519103247.4405-4-stefanha@redhat.com>
 In-Reply-To: <20170519103247.4405-1-stefanha@redhat.com>
 References: <20170519103247.4405-1-stefanha@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 2/4] block: use BDRV_POLL_WHILE() in
- bdrv_rw_vmstate()
+Subject: [Qemu-devel] [PATCH v2 3/4] migration: avoid recursive AioContext
+ locking in save_vmstate()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,38 +23,63 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-block@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Fam Zheng <famz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
-Calling aio_poll() directly may have been fine previously, but this is
-the future, man!  The difference between an aio_poll() loop and
-BDRV_POLL_WHILE() is that BDRV_POLL_WHILE() releases the AioContext
-around aio_poll().
+AioContext was designed to allow nested acquire/release calls.  It uses
+a recursive mutex so callers don't need to worry about nesting...or so
+we thought.
 
-This allows the IOThread to run fd handlers or BHs to complete the
-request.  Failure to release the AioContext causes deadlocks.
+BDRV_POLL_WHILE() is used to wait for block I/O requests.  It releases
+the AioContext temporarily around aio_poll().  This gives IOThreads a
+chance to acquire the AioContext to process I/O completions.
 
-Using BDRV_POLL_WHILE() partially fixes a 'savevm' hang with -object
+It turns out that recursive locking and BDRV_POLL_WHILE() don't mix.
+BDRV_POLL_WHILE() only releases the AioContext once, so the IOThread
+will not be able to acquire the AioContext if it was acquired
+multiple times.
+
+Instead of trying to release AioContext n times in BDRV_POLL_WHILE(),
+this patch simply avoids nested locking in save_vmstate().  It's the
+simplest fix and we should step back to consider the big picture with
+all the recent changes to block layer threading.
+
+This patch is the final fix to solve 'savevm' hanging with -object
 iothread.
 
 Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
 Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- block/io.c | 4 +---
- 1 file changed, 1 insertion(+), 3 deletions(-)
+ migration/savevm.c | 12 +++++++++++-
+ 1 file changed, 11 insertions(+), 1 deletion(-)
 
-diff --git a/block/io.c b/block/io.c
-index cc56e90..f0041cd 100644
---- a/block/io.c
-+++ b/block/io.c
-@@ -2031,9 +2031,7 @@ bdrv_rw_vmstate(BlockDriverState *bs, QEMUIOVector *qiov, int64_t pos,
-         Coroutine *co = qemu_coroutine_create(bdrv_co_rw_vmstate_entry, &data);
- 
-         bdrv_coroutine_enter(bs, co);
--        while (data.ret == -EINPROGRESS) {
--            aio_poll(bdrv_get_aio_context(bs), true);
--        }
-+        BDRV_POLL_WHILE(bs, data.ret == -EINPROGRESS);
-         return data.ret;
+diff --git a/migration/savevm.c b/migration/savevm.c
+index f5e8194..3ca319f 100644
+--- a/migration/savevm.c
++++ b/migration/savevm.c
+@@ -2150,6 +2150,14 @@ int save_vmstate(const char *name, Error **errp)
+         goto the_end;
      }
- }
+ 
++    /* The bdrv_all_create_snapshot() call that follows acquires the AioContext
++     * for itself.  BDRV_POLL_WHILE() does not support nested locking because
++     * it only releases the lock once.  Therefore synchronous I/O will deadlock
++     * unless we release the AioContext before bdrv_all_create_snapshot().
++     */
++    aio_context_release(aio_context);
++    aio_context = NULL;
++
+     ret = bdrv_all_create_snapshot(sn, bs, vm_state_size, &bs);
+     if (ret < 0) {
+         error_setg(errp, "Error while creating snapshot on '%s'",
+@@ -2160,7 +2168,9 @@ int save_vmstate(const char *name, Error **errp)
+     ret = 0;
+ 
+  the_end:
+-    aio_context_release(aio_context);
++    if (aio_context) {
++        aio_context_release(aio_context);
++    }
+     if (saved_vm_running) {
+         vm_start();
+     }
 -- 
 2.9.3
