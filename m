@@ -1,33 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52502)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53302)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <maxime.coquelin@redhat.com>) id 1dBeWx-00006c-1M
-	for qemu-devel@nongnu.org; Fri, 19 May 2017 05:49:08 -0400
+	(envelope-from <peterx@redhat.com>) id 1dBeZf-0000zk-6P
+	for qemu-devel@nongnu.org; Fri, 19 May 2017 05:51:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <maxime.coquelin@redhat.com>) id 1dBeWu-0002pk-LH
-	for qemu-devel@nongnu.org; Fri, 19 May 2017 05:49:07 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:54878)
+	(envelope-from <peterx@redhat.com>) id 1dBeZc-0003pg-1w
+	for qemu-devel@nongnu.org; Fri, 19 May 2017 05:51:55 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34398)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <maxime.coquelin@redhat.com>)
-	id 1dBeWu-0002oe-Av
-	for qemu-devel@nongnu.org; Fri, 19 May 2017 05:49:04 -0400
-References: <20170511123246.31308-1-maxime.coquelin@redhat.com>
-	<20170511123246.31308-4-maxime.coquelin@redhat.com>
-	<20170511202154-mutt-send-email-mst@kernel.org>
-	<8101cc11-51b7-9361-6506-25986aa652c4@redhat.com>
-	<20170517194008-mutt-send-email-mst@kernel.org>
-	<74684170-6dc8-3146-6a93-9c5dd723d1eb@redhat.com>
-	<34ccd41c-d799-21d9-ecf3-3903b68a24ea@redhat.com>
-	<20170518181945-mutt-send-email-mst@kernel.org>
-From: Maxime Coquelin <maxime.coquelin@redhat.com>
-Message-ID: <9f994094-348e-3be9-de6b-e5a22c1c10be@redhat.com>
-Date: Fri, 19 May 2017 11:48:52 +0200
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1dBeZb-0003oz-Pz
+	for qemu-devel@nongnu.org; Fri, 19 May 2017 05:51:52 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id B5140C05975E
+	for <qemu-devel@nongnu.org>; Fri, 19 May 2017 09:51:50 +0000 (UTC)
+Date: Fri, 19 May 2017 17:51:43 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20170519095143.GC14679@pxdev.xzpeter.org>
+References: <1495176212-14446-1-git-send-email-peterx@redhat.com>
+	<1495176212-14446-2-git-send-email-peterx@redhat.com>
+	<20170519082538.GD4912@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20170518181945-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 3/6] vhost: Update rings information for
- IOTLB earlier
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20170519082538.GD4912@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH RFC 1/6] io: only allow return path for
+ socket typed
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,91 +35,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: peterx@redhat.com, marcandre.lureau@gmail.com, vkaplans@redhat.com, jasowang@redhat.com, wexu@redhat.com, yuanhan.liu@linux.intel.com, qemu-devel@nongnu.org, jfreiman@redhat.com
+To: "Daniel P. Berrange" <berrange@redhat.com>
+Cc: qemu-devel@nongnu.org, Juan Quintela <quintela@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
 
-
-
-On 05/18/2017 05:24 PM, Michael S. Tsirkin wrote:
-> On Thu, May 18, 2017 at 04:45:23PM +0200, Maxime Coquelin wrote:
->> Hi Michael,
->>
->> On 05/18/2017 09:35 AM, Maxime Coquelin wrote:
->>>
->>>
->>> On 05/17/2017 06:41 PM, Michael S. Tsirkin wrote:
->>>> On Fri, May 12, 2017 at 01:21:18PM +0200, Maxime Coquelin wrote:
->>>>>
->>>>> On 05/11/2017 07:33 PM, Michael S. Tsirkin wrote:
->>>>>> On Thu, May 11, 2017 at 02:32:43PM +0200, Maxime Coquelin wrote:
->>>>>>> Vhost-kernel backend need to receive IOTLB entries for rings
->>>>>>> information early, but vhost-user need the same information
->>>>>>> earlier, before VHOST_USER_SET_VRING_ADDR is sent.
->>>>>> Weird. What does VHOST_USER_SET_VRING_ADDR have to do with it?
->>>>>>
->>>>>> According to
->>>>>>      Starting and stopping rings
->>>>>> in vhost user spec, vhost user does not access
->>>>>> anything until ring is started and enabled.
->>>>>>
->>>>>>
->>>>>>> This patch also trigger IOTLB miss for all rings informations
->>>>>>> for robustness, even if in practice these adresses are on the
->>>>>>> same page.
->>>>> Actually, the DPDK vhost-user backend is compliant with the spec,
->>>>> but when handling VHOST_USER_SET_VRING_ADDR request, it translates the
->>>>> guest addresses into backend VAs, and check they are valid. I
->>>>> will make the
->>>>> commit message clearer about this in next revision.
->>>>>
->>>>> The check could be done later, for example when the ring are started,
->>>>> but it wouldn't change the need to trigger a miss at some point.
->>>> I think it should be done later, yes. As long as ring is not
->>>> started addresses should not be interpreted.
->>>>
->>>
->>> Ok, then I'll move these addresses translations in the
->>> VHOST_USER_SET_VRING_KICK handler.
->> s/VHOST_USER_SET_VRING_KICK/VHOST_USER_SET_VRING_ENABLE/
+On Fri, May 19, 2017 at 09:25:38AM +0100, Daniel P. Berrange wrote:
+> On Fri, May 19, 2017 at 02:43:27PM +0800, Peter Xu wrote:
+> > We don't really have a return path for the other types yet. Let's check
+> > this when .get_return_path() is called.
+> > 
+> > For this, we introduce a new feature bit, and set it up only for socket
+> > typed IO channels.
+> > 
+> > This will help detect earlier failure for postcopy, e.g., logically
+> > speaking postcopy cannot work with "exec:". Before this patch, when we
+> > try to migrate with "migrate -d exec:cat>out", we'll hang the system.
+> > With this patch, we'll get:
+> > 
+> > (qemu) migrate -d exec:cat>out
+> > Unable to open return-path for postcopy
 > 
-> Note that when protocol features are off ring is started in
-> enabled state, but iommu requires protocol features.
+> This is wrong - post-copy migration *can* work with exec: - it just entirely
+> depends on what command you are running. Your example ran a command which is
+> unidirectional, but if you ran 'exec:socat ...' you would have a fully
+> bidirectional channel. Actually the channel is always bi-directional, but
+> 'cat' simply won't ever send data back to QEMU.
 
-OK, I will take care of this.
+Indeed. I should not block postcopy if the user used a TCP tunnel
+between the source and destination in some way, using this exec: way.
+Thanks for pointing that out.
 
-Note that currently in DPDK, the ring is created in enabled state,
-so it is enabled as soon as started even with protocol features.
-I have done the patch to fix this, will be posted with the patch that
-do the ring addresses translations only when starting/enabling the ring.
+However I still think the idea is needed here. Say, we'd better know
+whether the transport would be able to respond (though current
+approach of "assuming sockets are the only ones that can reply" is not
+a good solution...). Please see below.
 
-Also, note that disabling VHOST_USER_F_PROTOCOL_FEATURES with latest
-DPDK and QEMU seems broken. I'll add this to my todo list to understand
-where the problem is, but this is lower priority.
-
->> I just looked at implementing this change, but I'm not convinced this is
->> the right thing to do.
->>
->> On backend side, it means saving temporarily the vhost_vring_addr struct
->> into the vq struct, and moving all what is done currently in
->> SET_VRING_ADDR handler to SET_VRING_ENABLE one.
 > 
-> Yes, and this is consistent with what the kernel does.
-> 
->> My understanding of the "Starting and stopping rings" chapter of the
->> spec is that the ring must not be processed as long as not started and
->> enabled, not that the addresses passed should not be checked/translated
->> as it is done today both in DPDK and libvhost-user.
->>
->> If the addresses are invalid, isn't it better to know as soon as
->> possible?
->>
->> Cheers,
->> Maxime
-> 
-> There could be valid reasons to set an invalid address temporarily.
-> For example to make sure connection is reset.
+> If QEMU hangs when the other end doesn't send data back, that actually seems
+> like a potentially serious bug in migration code. Even if using the normal
+> 'tcp' migration protocol, if the target QEMU server hangs and fails to
+> send data to QEMU on the return path, the source QEMU must never hang.
 
-Ok.
+Firstly I should not say it's a hang - it's actually by-design here
+imho - migration thread is in the last phase now, waiting for a SHUT
+message from destination (which I think is wise). But from the
+behavior, indeed src VM is not usable during the time, just like what
+happened for most postcopy cases on the source side. So, we can see
+that postcopy "assumes" that destination side can reply now.
+
+Meanwhile, I see it reasonable for postcopy to have such an
+assumption. After all, postcopy means "start VM on destination before
+pages are moved over completely", then there must be someone to reply
+to source, no matter whether it'll be via some kind of io channel.
+
+That's why I think we still need the general idea here, that we need
+to know whether destination end is able to reply.
+
+But, I still have no good idea (after knowing this patch won't work)
+on how we can do this... Any further suggestions would be greatly
+welcomed.
 
 Thanks,
-Maxime
+
+-- 
+Peter Xu
