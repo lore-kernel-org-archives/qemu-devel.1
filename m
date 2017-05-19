@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49401)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49427)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1dBfyK-0004MI-E5
-	for qemu-devel@nongnu.org; Fri, 19 May 2017 07:21:32 -0400
+	(envelope-from <paolo.bonzini@gmail.com>) id 1dBfyO-0004QW-Ez
+	for qemu-devel@nongnu.org; Fri, 19 May 2017 07:21:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1dBfyJ-0000wr-Jg
-	for qemu-devel@nongnu.org; Fri, 19 May 2017 07:21:28 -0400
-Received: from mail-wm0-x243.google.com ([2a00:1450:400c:c09::243]:32775)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1dBfyK-0000xH-HN
+	for qemu-devel@nongnu.org; Fri, 19 May 2017 07:21:32 -0400
+Received: from mail-wm0-x244.google.com ([2a00:1450:400c:c09::244]:35866)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1dBfyJ-0000wU-Cu
-	for qemu-devel@nongnu.org; Fri, 19 May 2017 07:21:27 -0400
-Received: by mail-wm0-x243.google.com with SMTP id b84so1792395wmh.0
-	for <qemu-devel@nongnu.org>; Fri, 19 May 2017 04:21:27 -0700 (PDT)
+	id 1dBfyK-0000wz-Am
+	for qemu-devel@nongnu.org; Fri, 19 May 2017 07:21:28 -0400
+Received: by mail-wm0-x244.google.com with SMTP id k15so16379729wmh.3
+	for <qemu-devel@nongnu.org>; Fri, 19 May 2017 04:21:28 -0700 (PDT)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Fri, 19 May 2017 13:21:01 +0200
-Message-Id: <1495192872-27667-10-git-send-email-pbonzini@redhat.com>
+Date: Fri, 19 May 2017 13:21:02 +0200
+Message-Id: <1495192872-27667-11-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1495192872-27667-1-git-send-email-pbonzini@redhat.com>
 References: <1495192872-27667-1-git-send-email-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PULL 09/20] Check the return value of fcntl in
- qemu_set_cloexec
+Subject: [Qemu-devel] [PULL 10/20] nbd: strict nbd_wr_syncv
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,39 +28,53 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Stefano Stabellini <sstabellini@kernel.org>, groug@kaod.org, pbonzini@redhat.com, Eric Blake <eblake@redhat.com>
+Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 
-From: Stefano Stabellini <sstabellini@kernel.org>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 
-Assert that the return value is not an error. This issue was found by
-Coverity.
+nbd_wr_syncv is called either from coroutine or from client negotiation
+code, when socket is in blocking mode. So, -EAGAIN is impossible.
 
-CID: 1374831
+Furthermore, EAGAIN is confusing, as, what to read/write again? With
+EAGAIN as a return code we don't know how much data is already
+read or written by the function, so in case of EAGAIN the whole
+communication is broken.
 
-Signed-off-by: Stefano Stabellini <sstabellini@kernel.org>
-CC: groug@kaod.org
-CC: pbonzini@redhat.com
-CC: Eric Blake <eblake@redhat.com>
-Message-Id: <1494356693-13190-2-git-send-email-sstabellini@kernel.org>
+Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-Id: <20170516094533.6160-2-vsementsov@virtuozzo.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- util/oslib-posix.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+ nbd/common.c | 11 ++++++-----
+ 1 file changed, 6 insertions(+), 5 deletions(-)
 
-diff --git a/util/oslib-posix.c b/util/oslib-posix.c
-index 4d9189e..16894ad 100644
---- a/util/oslib-posix.c
-+++ b/util/oslib-posix.c
-@@ -182,7 +182,9 @@ void qemu_set_cloexec(int fd)
- {
-     int f;
-     f = fcntl(fd, F_GETFD);
--    fcntl(fd, F_SETFD, f | FD_CLOEXEC);
-+    assert(f != -1);
-+    f = fcntl(fd, F_SETFD, f | FD_CLOEXEC);
-+    assert(f != -1);
- }
+diff --git a/nbd/common.c b/nbd/common.c
+index dccbb8e..4db45b3 100644
+--- a/nbd/common.c
++++ b/nbd/common.c
+@@ -20,6 +20,10 @@
+ #include "qapi/error.h"
+ #include "nbd-internal.h"
  
- /*
++/* nbd_wr_syncv
++ * The function may be called from coroutine or from non-coroutine context.
++ * When called from non-coroutine context @ioc must be in blocking mode.
++ */
+ ssize_t nbd_wr_syncv(QIOChannel *ioc,
+                      struct iovec *iov,
+                      size_t niov,
+@@ -42,11 +46,8 @@ ssize_t nbd_wr_syncv(QIOChannel *ioc,
+             len = qio_channel_writev(ioc, local_iov, nlocal_iov, &local_err);
+         }
+         if (len == QIO_CHANNEL_ERR_BLOCK) {
+-            if (qemu_in_coroutine()) {
+-                qio_channel_yield(ioc, do_read ? G_IO_IN : G_IO_OUT);
+-            } else {
+-                return -EAGAIN;
+-            }
++            assert(qemu_in_coroutine());
++            qio_channel_yield(ioc, do_read ? G_IO_IN : G_IO_OUT);
+             continue;
+         }
+         if (len < 0) {
 -- 
 1.8.3.1
