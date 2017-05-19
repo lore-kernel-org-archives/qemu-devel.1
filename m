@@ -1,34 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45486)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45916)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jianjay.zhou@huawei.com>) id 1dBeCG-0004WP-Uz
-	for qemu-devel@nongnu.org; Fri, 19 May 2017 05:27:45 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1dBeEu-0005AR-2z
+	for qemu-devel@nongnu.org; Fri, 19 May 2017 05:30:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jianjay.zhou@huawei.com>) id 1dBeCD-0003q0-01
-	for qemu-devel@nongnu.org; Fri, 19 May 2017 05:27:44 -0400
-Received: from szxga02-in.huawei.com ([45.249.212.188]:3933)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <jianjay.zhou@huawei.com>) id 1dBeCC-0003jv-D1
-	for qemu-devel@nongnu.org; Fri, 19 May 2017 05:27:40 -0400
-References: <830bfc39-56c7-a901-9ebb-77d6e7a5614c@huawei.com>
-	<874lxeovrg.fsf@secure.mitica>
-	<7cd332ec-48d4-1feb-12e2-97b50b04e028@huawei.com>
-	<20170424164244.GJ2362@work-vm>
-	<B2D15215269B544CADD246097EACE747395AD759@dggeml511-mbx.china.huawei.com>
-	<85e3a0dd-20c8-8ff2-37ce-bfdf543e7787@redhat.com>
-	<CANRm+CzvNpLGqH5KuqqO7Wh7UabSkMBbxuTymbM0CZPgpQOwCg@mail.gmail.com>
-	<B2D15215269B544CADD246097EACE747395C283F@dggeml511-mbx.china.huawei.com>
-	<1280755991.8446336.1495007019282.JavaMail.zimbra@redhat.com>
-	<CANRm+CwbTaoxq35zyfNF1BP3d5GqRmtq0sY+aRKRaOsFwGB1Mw@mail.gmail.com>
-	<591EA84D.1030800@huawei.com>
-	<32e3c2ed-2a41-0c20-2cc8-eb51e9de236b@gmail.com>
-From: Jay Zhou <jianjay.zhou@huawei.com>
-Message-ID: <591EBA6B.9040206@huawei.com>
-Date: Fri, 19 May 2017 17:27:07 +0800
+	(envelope-from <pbonzini@redhat.com>) id 1dBeEq-00052t-6U
+	for qemu-devel@nongnu.org; Fri, 19 May 2017 05:30:28 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:35370)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1dBeEp-00052j-Ue
+	for qemu-devel@nongnu.org; Fri, 19 May 2017 05:30:24 -0400
+References: <1494972923-31756-1-git-send-email-anthony.xu@intel.com>
+	<20170517112756.74cf6e47@nial.brq.redhat.com>
+	<4712D8F4B26E034E80552F30A67BE0B1ACB970@ORSMSX112.amr.corp.intel.com>
+	<6eff688c-b62e-8796-f852-a855079f3175@redhat.com>
+	<4712D8F4B26E034E80552F30A67BE0B1ACCB4D@ORSMSX112.amr.corp.intel.com>
+	<3a55757b-fcdb-0829-c23d-68b1d416599f@redhat.com>
+	<4712D8F4B26E034E80552F30A67BE0B1ACCCA9@ORSMSX112.amr.corp.intel.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <551f2d35-53d3-1eda-9f39-d8b3f466f25a@redhat.com>
+Date: Fri, 19 May 2017 11:30:17 +0200
 MIME-Version: 1.0
-In-Reply-To: <32e3c2ed-2a41-0c20-2cc8-eb51e9de236b@gmail.com>
-Content-Type: text/plain; charset="utf-8"; format=flowed
+In-Reply-To: <4712D8F4B26E034E80552F30A67BE0B1ACCCA9@ORSMSX112.amr.corp.intel.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] About QEMU BQL and dirty log switch in Migration
+Subject: Re: [Qemu-devel] [PATCH] Memory: use memory address space for
+ cpu-memory
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,81 +34,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Xiao Guangrong <guangrong.xiao@gmail.com>, Wanpeng Li <kernellwp@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>
-Cc: "Huangweidong (C)" <weidong.huang@huawei.com>, Zhanghailiang <zhang.zhanghailiang@huawei.com>, Juan Quintela <quintela@redhat.com>, "wangxin (U)" <wangxinxin.wang@huawei.com>, yanghongyang <yanghongyang@huawei.com>, Xiao Guangrong <xiaoguangrong@tencent.com>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, "Dr. David Alan
-	Gilbert" <dgilbert@redhat.com>, "Gonglei (Arei)" <arei.gonglei@huawei.com>, Huangzhichao <huangzhichao@huawei.com>, "Herongguang (Stephen)" <herongguang.he@huawei.com>
+To: "Xu, Anthony" <anthony.xu@intel.com>, Igor Mammedov <imammedo@redhat.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 
-Hi Xiao,
 
-On 2017/5/19 16:32, Xiao Guangrong wrote:
->
-> I do not know why i was removed from the list.
 
-I was CCed to you...
-Your comments are very valuable to us, and thank for your quick response.
-
->
-> On 05/19/2017 04:09 PM, Jay Zhou wrote:
->> Hi Paolo and Wanpeng,
+On 19/05/2017 01:28, Xu, Anthony wrote:
+>> On 18/05/2017 23:48, Xu, Anthony wrote:
+>>>> It should be called.  Alternatively you could try adding a new function
+>>>> to mark address_space_memory as a never-destroyed AddressSpace:
+>>>>
+>>> This patch would do it, could you please submit this patch?
 >>
->> On 2017/5/17 16:38, Wanpeng Li wrote:
->>> 2017-05-17 15:43 GMT+08:00 Paolo Bonzini <pbonzini@redhat.com>:
->>>>> Recently, I have tested the performance before migration and after
->>>>> migration failure
->>>>> using spec cpu2006 https://www.spec.org/cpu2006/, which is a standard
->>>>> performance
->>>>> evaluation tool.
->>>>>
->>>>> These are the steps:
->>>>> ======
->>>>>   (1) the version of kmod is 4.4.11(with slightly modified) and the
->>>>> version of
->>>>>   qemu is 2.6.0
->>>>>      (with slightly modified), the kmod is applied with the following patch
->>>>>
->>>>> diff --git a/source/x86/x86.c b/source/x86/x86.c
->>>>> index 054a7d3..75a4bb3 100644
->>>>> --- a/source/x86/x86.c
->>>>> +++ b/source/x86/x86.c
->>>>> @@ -8550,8 +8550,10 @@ void kvm_arch_commit_memory_region(struct kvm *kvm,
->>>>>           */
->>>>>          if ((change != KVM_MR_DELETE) &&
->>>>>                  (old->flags & KVM_MEM_LOG_DIRTY_PAGES) &&
->>>>> -               !(new->flags & KVM_MEM_LOG_DIRTY_PAGES))
->>>>> -               kvm_mmu_zap_collapsible_sptes(kvm, new);
->>>>> +               !(new->flags & KVM_MEM_LOG_DIRTY_PAGES)) {
->>>>> +               printk(KERN_ERR "zj make KVM_REQ_MMU_RELOAD request\n");
->>>>> +               kvm_make_all_cpus_request(kvm, KVM_REQ_MMU_RELOAD);
->>>>> +       }
->>>>>
->>>>>          /*
->>>>>           * Set up write protection and/or dirty logging for the new slot.
->>>>
->>>> Try these modifications to the setup:
->>>>
->>>> 1) set up 1G hugetlbfs hugepages and use those for the guest's memory
->>>>
->>>> 2) test both without and with the above patch.
->>>>
+>> If you have tested it (together with the change in the initialization of
+>> address_space_memory), I can do that.
 >>
->> In order to avoid random memory allocation issues, I reran the test cases:
->> (1) setup: start a 4U10G VM with memory preoccupied, each vcpu is pinned to a
->> pcpu respectively, these resources(memory and pcpu) allocated to VM are all
->> from NUMA node 0
->> (2) sequence: firstly, I run the 429.mcf of spec cpu2006 before migration,
->> and get a result. And then, migration failure is constructed. At last, I run
->> the test case again, and get an another result.
->
-> I guess this case purely writes the memory, that means the readonly mappings will
+> 
+> Based on your patch, I added the change in the initialization of 
+> address_space_memory. It works well in my setup, cpu-memory
+> address space doesn't show up as we expected.
 
-Yes, I printed out the speed of dirty page rate, it is about 1GB per second.
+Thanks.
 
-> always be dropped by #PF, then huge mappings are established.
->
-> If benchmark memory read, you show observe its difference.
->
+I am also thinking of resolving aliases early, and sharing the
+AddressSpaceDispatch if the root memory region is the same.  This
+hopefully will also reduce memory consumption and speed up AddressSpace
+updates.
 
-OK, thank for your suggestion!
+Paolo
 
-Regards,
-Jay Zhou
+> Anthony
+> 
+> diff --git a/exec.c b/exec.c
+> index 96e3ac9..746dbbc 100644
+> --- a/exec.c
+> +++ b/exec.c
+> @@ -2712,7 +2712,7 @@ static void memory_map_init(void)
+>      system_memory = g_malloc(sizeof(*system_memory));
+> 
+>      memory_region_init(system_memory, NULL, "system", UINT64_MAX);
+> -    address_space_init(&address_space_memory, system_memory, "memory");
+> +    address_space_init_static(&address_space_memory, system_memory, "memory");
+> 
+>      system_io = g_malloc(sizeof(*system_io));
+>      memory_region_init_io(system_io, NULL, &unassigned_io_ops, NULL, "io",
+> diff --git a/include/exec/memory.h b/include/exec/memory.h
+> index b27b288..6f44b79 100644
+> --- a/include/exec/memory.h
+> +++ b/include/exec/memory.h
+> @@ -1395,6 +1395,17 @@ MemTxResult memory_region_dispatch_write(MemoryRegion *mr,
+>  void address_space_init(AddressSpace *as, MemoryRegion *root, const char *name);
+> 
+>  /**
+> + * address_space_init_static: initializes an static address space
+> + *
+> + * @as: an uninitialized #AddressSpace
+> + * @root: a #MemoryRegion that routes addresses for the address space
+> + * @name: an address space name.  The name is only used for debugging
+> + *        output.
+> + */
+> +void address_space_init_static(AddressSpace *as, MemoryRegion *root,
+> +       const char *name);
+> +
+> +/**
+>   * address_space_init_shareable: return an address space for a memory region,
+>   *                               creating it if it does not already exist
+>   *
+> diff --git a/memory.c b/memory.c
+> index 190cd3d..6c933d8 100644
+> --- a/memory.c
+> +++ b/memory.c
+> @@ -2461,7 +2461,8 @@ static void do_address_space_destroy(AddressSpace *as)
+>      }
+>  }
+> 
+> -void address_space_init_static(AddressSpace *as, MemoryRegion *root, const char *name)
+> +void address_space_init_static(AddressSpace *as, MemoryRegion *root,
+> +       const char *name)
+>  {
+>      address_space_init(as, root, name);
+>      as->shared = true;
+> 
