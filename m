@@ -1,34 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36685)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40156)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dBfQ3-0000p8-6F
-	for qemu-devel@nongnu.org; Fri, 19 May 2017 06:46:06 -0400
+	(envelope-from <armbru@redhat.com>) id 1dBfYT-0003qu-8A
+	for qemu-devel@nongnu.org; Fri, 19 May 2017 06:54:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dBfQ1-0003ls-Tk
-	for qemu-devel@nongnu.org; Fri, 19 May 2017 06:46:03 -0400
-Received: from indium.canonical.com ([91.189.90.7]:50126)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1dBfQ1-0003lf-F1
-	for qemu-devel@nongnu.org; Fri, 19 May 2017 06:46:01 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1dBfQ0-0002nL-08
-	for <qemu-devel@nongnu.org>; Fri, 19 May 2017 10:46:00 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id A651E2E804F
-	for <qemu-devel@nongnu.org>; Fri, 19 May 2017 10:45:59 +0000 (UTC)
+	(envelope-from <armbru@redhat.com>) id 1dBfYQ-0007dQ-5R
+	for qemu-devel@nongnu.org; Fri, 19 May 2017 06:54:45 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:51906)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dBfYP-0007d4-Vm
+	for qemu-devel@nongnu.org; Fri, 19 May 2017 06:54:42 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 8D3AF37EEC
+	for <qemu-devel@nongnu.org>; Fri, 19 May 2017 10:54:40 +0000 (UTC)
+From: Markus Armbruster <armbru@redhat.com>
+References: <20170518111837.29212-1-quintela@redhat.com>
+	<20170518111837.29212-4-quintela@redhat.com>
+Date: Fri, 19 May 2017 12:54:36 +0200
+In-Reply-To: <20170518111837.29212-4-quintela@redhat.com> (Juan Quintela's
+	message of "Thu, 18 May 2017 13:18:35 +0200")
+Message-ID: <8760gxce1f.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 19 May 2017 10:29:34 -0000
-From: Thomas Huth <685096@bugs.launchpad.net>
-Reply-To: Bug 685096 <685096@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20101204070046.21747.93608.malonedeb@gandwana.canonical.com>
-Message-Id: <149518977394.11822.16507775486911103210.malone@soybean.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 685096] Re: USB Passthrough not working for
- Windows 7 guest
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH 3/5] migration: Remove use of old
+ MigrationParams
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,54 +34,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Juan Quintela <quintela@redhat.com>
+Cc: qemu-devel@nongnu.org, lvivier@redhat.com, dgilbert@redhat.com, peterx@redhat.com
 
-If I get the previous comments right, this is just about using the right
-configuration, and not a real bug? If so, I assume we can close this
-ticket nowadays?
+Juan Quintela <quintela@redhat.com> writes:
 
-** Changed in: qemu
-       Status: Confirmed =3D> Incomplete
+> We have change in the previous patch to use migration capabilities for
+> it.  Notice that we continue using the old command line flags from
+> migrate command from the time being.  Remove the set_params method as
+> now it is empty.
+>
+> For savevm, one can't do a:
+>
+> savevm -b/-i foo
 
--- =
+Yes (savem has no such options).
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/685096
+> but now one can do:
+>
+> migrate_set_capability block on
+> savevm foo
+>
+> And we can't use block migration. We could disable block capability
+> unconditionally, but it would not be much better.
 
-Title:
-  USB Passthrough not working for Windows 7 guest
+This leaves me confused: what does the example do?  Reading ahead...
+looks like it fails with "Block migration and snapshots are
+incompatible".  What are you trying to say here?
 
-Status in QEMU:
-  Incomplete
-Status in qemu package in Ubuntu:
-  Confirmed
-Status in qemu package in Debian:
-  New
+> Signed-off-by: Juan Quintela <quintela@redhat.com>
+> Reviewed-by: Eric Blake <eblake@redhat.com>
 
-Bug description:
-  USB Passthrough from host to guest is not working for a 32-bit Windows
-  7 guest, while it works perfectly for a 32-bit Windows XP guest.
-
-  The device appears in the device manager of Windows 7, but with "Error
-  code 10: device cannot start". I have tried this with numerous USB
-  thumbdrives and a USB wireless NIC, all with the same result. The
-  device name and functionality is recognized, so at least some USB
-  negotiation is taking place.
-
-  I am trying this with the latest git-pull of QEMU-KVM.
-
-  The command line to launch qemu-kvm for win7 is:
-  sudo /home/user/local_install/bin/qemu-system-x86_64 -cpu core2duo -m 102=
-4 -smp 2 -vga std -hda ./disk_images/win7.qcow -vnc :1 -boot c -usb -usbdev=
-ice tablet -usbdevice host:0781:5150
-
-  The command line to launch qemu-kvm for winxp is:
-  sudo /home/user/local_install/bin/qemu-system-x86_64 -cpu core2duo -m 102=
-4 -smp 2 -usb -vga std -hda ./winxpsp3.qcow -vnc :0 -boot c -usbdevice tabl=
-et -usbdevice host:0781:5150
-
-  Any help is appreciated.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/685096/+subscriptions
+Patch looks good to me.
