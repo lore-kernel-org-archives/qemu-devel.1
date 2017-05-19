@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46859)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46862)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <anton.nefedov@virtuozzo.com>) id 1dBhK0-0000Zz-95
+	(envelope-from <anton.nefedov@virtuozzo.com>) id 1dBhK0-0000aD-Cb
 	for qemu-devel@nongnu.org; Fri, 19 May 2017 08:47:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <anton.nefedov@virtuozzo.com>) id 1dBhJz-0004JX-3b
+	(envelope-from <anton.nefedov@virtuozzo.com>) id 1dBhJz-0004Jy-JH
 	for qemu-devel@nongnu.org; Fri, 19 May 2017 08:47:56 -0400
 Received: from mail-eopbgr00136.outbound.protection.outlook.com
 	([40.107.0.136]:31167
 	helo=EUR02-AM5-obe.outbound.protection.outlook.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <anton.nefedov@virtuozzo.com>)
-	id 1dBhJy-0004AG-OE
+	id 1dBhJz-0004AG-BQ
 	for qemu-devel@nongnu.org; Fri, 19 May 2017 08:47:55 -0400
 From: Anton Nefedov <anton.nefedov@virtuozzo.com>
-Date: Fri, 19 May 2017 15:47:17 +0300
-Message-ID: <1495198042-124203-5-git-send-email-anton.nefedov@virtuozzo.com>
+Date: Fri, 19 May 2017 15:47:18 +0300
+Message-ID: <1495198042-124203-6-git-send-email-anton.nefedov@virtuozzo.com>
 In-Reply-To: <1495198042-124203-1-git-send-email-anton.nefedov@virtuozzo.com>
 References: <1495198042-124203-1-git-send-email-anton.nefedov@virtuozzo.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v2 4/9] hmp: add hmp analogue for
- qmp-chardev-change
+Subject: [Qemu-devel] [PATCH v2 5/9] char: forbid direct chardevice access
+ for hotswap devices
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,140 +30,63 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: den@virtuozzo.com, pbonzini@redhat.com, marcandre.lureau@redhat.com, Anton Nefedov <anton.nefedov@virtuozzo.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+Cc: den@virtuozzo.com, pbonzini@redhat.com, marcandre.lureau@redhat.com, Anton Nefedov <anton.nefedov@virtuozzo.com>
+
+qemu_chr_fe_get_driver() is unsafe, frontends with hotswap support
+should not access CharDriver ptr directly as CharDriver might change.
 
 Signed-off-by: Anton Nefedov <anton.nefedov@virtuozzo.com>
 Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-CC: Dr. David Alan Gilbert <dgilbert@redhat.com>
 ---
- chardev/char.c        |  4 ++--
- hmp-commands.hx       | 16 ++++++++++++++++
- hmp.c                 | 34 ++++++++++++++++++++++++++++++++++
- hmp.h                 |  1 +
- include/sysemu/char.h | 12 ++++++++++++
- 5 files changed, 65 insertions(+), 2 deletions(-)
+ chardev/char.c        |  7 +++++++
+ include/sysemu/char.h | 10 ++++++++++
+ 2 files changed, 17 insertions(+)
 
 diff --git a/chardev/char.c b/chardev/char.c
-index bac5e1c..0483f19 100644
+index 0483f19..36d6f36 100644
 --- a/chardev/char.c
 +++ b/chardev/char.c
-@@ -880,8 +880,8 @@ help_string_append(const char *name, void *opaque)
-     g_string_append_printf(str, "\n%s", name);
- }
+@@ -484,9 +484,16 @@ static Notifier muxes_realize_notify = {
  
--static ChardevBackend *qemu_chr_parse_opts(QemuOpts *opts,
--                                           Error **errp)
-+ChardevBackend *qemu_chr_parse_opts(QemuOpts *opts,
-+                                    Error **errp)
+ Chardev *qemu_chr_fe_get_driver(CharBackend *be)
  {
-     Error *local_err = NULL;
-     const ChardevClass *cc;
-diff --git a/hmp-commands.hx b/hmp-commands.hx
-index 0aca984..0f2a059 100644
---- a/hmp-commands.hx
-+++ b/hmp-commands.hx
-@@ -1727,6 +1727,22 @@ chardev_add accepts the same parameters as the -chardev command line switch.
- ETEXI
- 
-     {
-+        .name       = "chardev-change",
-+        .args_type  = "id:s,args:s",
-+        .params     = "id args",
-+        .help       = "change chardev",
-+        .cmd        = hmp_chardev_change,
-+    },
-+
-+STEXI
-+@item chardev-change args
-+@findex chardev-change
-+chardev_change accepts existing chardev @var{id} and then the same arguments
-+as the -chardev command line switch (except for "id").
-+
-+ETEXI
-+
-+    {
-         .name       = "chardev-remove",
-         .args_type  = "id:s",
-         .params     = "id",
-diff --git a/hmp.c b/hmp.c
-index 3dceaf8..f7d0b38 100644
---- a/hmp.c
-+++ b/hmp.c
-@@ -2209,6 +2209,40 @@ void hmp_chardev_add(Monitor *mon, const QDict *qdict)
-     hmp_handle_error(mon, &err);
++    /* this is unsafe for the users that support chardev hotswap */
++    assert(be->chr_be_change == NULL);
+     return be->chr;
  }
  
-+void hmp_chardev_change(Monitor *mon, const QDict *qdict)
++bool qemu_chr_fe_backend_connected(CharBackend *be)
 +{
-+    const char *args = qdict_get_str(qdict, "args");
-+    const char *id;
-+    Error *err = NULL;
-+    ChardevBackend *backend = NULL;
-+    ChardevReturn *ret = NULL;
-+    QemuOpts *opts = qemu_opts_parse_noisily(qemu_find_opts("chardev"), args,
-+                                             true);
-+    if (!opts) {
-+        error_setg(&err, "Parsing chardev args failed");
-+        goto end;
-+    }
-+
-+    id = qdict_get_str(qdict, "id");
-+    if (qemu_opts_id(opts)) {
-+        error_setg(&err, "Unexpected 'id' parameter");
-+        goto end;
-+    }
-+
-+    backend = qemu_chr_parse_opts(opts, &err);
-+    if (!backend) {
-+        goto end;
-+    }
-+
-+    ret = qmp_chardev_change(id, backend, &err);
-+
-+end:
-+    qapi_free_ChardevReturn(ret);
-+    qapi_free_ChardevBackend(backend);
-+    qemu_opts_del(opts);
-+    hmp_handle_error(mon, &err);
++    return !!be->chr;
 +}
 +
- void hmp_chardev_remove(Monitor *mon, const QDict *qdict)
+ static bool fe_connect(CharBackend *b, Chardev *s, Error **errp)
  {
-     Error *local_err = NULL;
-diff --git a/hmp.h b/hmp.h
-index d8b94ce..23e035c 100644
---- a/hmp.h
-+++ b/hmp.h
-@@ -102,6 +102,7 @@ void hmp_nbd_server_start(Monitor *mon, const QDict *qdict);
- void hmp_nbd_server_add(Monitor *mon, const QDict *qdict);
- void hmp_nbd_server_stop(Monitor *mon, const QDict *qdict);
- void hmp_chardev_add(Monitor *mon, const QDict *qdict);
-+void hmp_chardev_change(Monitor *mon, const QDict *qdict);
- void hmp_chardev_remove(Monitor *mon, const QDict *qdict);
- void hmp_qemu_io(Monitor *mon, const QDict *qdict);
- void hmp_cpu_add(Monitor *mon, const QDict *qdict);
+     int tag = 0;
 diff --git a/include/sysemu/char.h b/include/sysemu/char.h
-index 68c7876..92ae57e 100644
+index 92ae57e..fa21535 100644
 --- a/include/sysemu/char.h
 +++ b/include/sysemu/char.h
-@@ -132,6 +132,18 @@ Chardev *qemu_chr_new_from_opts(QemuOpts *opts,
- void qemu_chr_parse_common(QemuOpts *opts, ChardevCommon *backend);
+@@ -404,10 +404,20 @@ bool qemu_chr_fe_init(CharBackend *b, Chardev *s, Error **errp);
+  *
+  * Returns the driver associated with a CharBackend or NULL if no
+  * associated Chardev.
++ * Note: avoid this function as the driver should never be accessed directly,
++ *       especially by the frontends that support chardevice hotswap.
++ *       Consider qemu_chr_fe_backend_connected() to check for driver existence
+  */
+ Chardev *qemu_chr_fe_get_driver(CharBackend *be);
  
  /**
-+ * @qemu_chr_parse_opts:
++ * @qemu_chr_fe_backend_connected:
 + *
-+ * Parse the options to the ChardevBackend struct.
-+ *
-+ * @opts
-+ *
-+ * Returns: a new backend
++ * Returns true if there is a chardevice associated with @be.
 + */
-+ChardevBackend *qemu_chr_parse_opts(QemuOpts *opts,
-+                                    Error **errp);
++bool qemu_chr_fe_backend_connected(CharBackend *be);
 +
 +/**
-  * @qemu_chr_new:
+  * @qemu_chr_fe_deinit:
   *
-  * Create a new character backend from a URI.
+  * Dissociate the CharBackend from the Chardev.
 -- 
 2.7.4
