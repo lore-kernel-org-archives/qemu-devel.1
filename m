@@ -1,24 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45512)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45581)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dBcDX-0005CU-MR
-	for qemu-devel@nongnu.org; Fri, 19 May 2017 03:20:57 -0400
+	(envelope-from <bounces@canonical.com>) id 1dBcDx-0005Rg-6X
+	for qemu-devel@nongnu.org; Fri, 19 May 2017 03:21:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dBcDU-0008If-FN
-	for qemu-devel@nongnu.org; Fri, 19 May 2017 03:20:55 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:54056)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dBcDU-0008IS-07
-	for qemu-devel@nongnu.org; Fri, 19 May 2017 03:20:52 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <cover.1495018956.git.maozy.fnst@cn.fujitsu.com>
-	<645c1b3e6fc23605365c0685d94ec50df7a7fd2b.1495018956.git.maozy.fnst@cn.fujitsu.com>
-Date: Fri, 19 May 2017 09:20:48 +0200
-In-Reply-To: <645c1b3e6fc23605365c0685d94ec50df7a7fd2b.1495018956.git.maozy.fnst@cn.fujitsu.com>
-	(Mao Zhongyi's message of "Wed, 17 May 2017 19:12:25 +0800")
-Message-ID: <87y3ttgvn3.fsf@dusky.pond.sub.org>
+	(envelope-from <bounces@canonical.com>) id 1dBcDu-0008S2-11
+	for qemu-devel@nongnu.org; Fri, 19 May 2017 03:21:21 -0400
+Received: from indium.canonical.com ([91.189.90.7]:45457)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1dBcDt-0008Ra-Rd
+	for qemu-devel@nongnu.org; Fri, 19 May 2017 03:21:17 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1dBcDr-0004O2-W8
+	for <qemu-devel@nongnu.org>; Fri, 19 May 2017 07:21:16 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id F1FF92E804A
+	for <qemu-devel@nongnu.org>; Fri, 19 May 2017 07:21:15 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v4 3/3] net/rocker: Convert to realize()
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 19 May 2017 07:05:36 -0000
+From: Thomas Huth <1180924@bugs.launchpad.net>
+Reply-To: Bug 1180924 <1180924@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20130516173517.573.9514.malonedeb@soybean.canonical.com>
+Message-Id: <149517753644.11684.9985178704613136406.malone@soybean.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1180924] Re: fails to handle a usb serial port
+ with a specific vendorid
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,235 +37,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
-Cc: qemu-devel@nongnu.org, jasowang@redhat.com, jiri@resnulli.us, f4bug@amsat.org
+To: qemu-devel@nongnu.org
 
-Mao Zhongyi <maozy.fnst@cn.fujitsu.com> writes:
+The crash has now been fixed here:
+http://git.qemu.org/?p=3Dqemu.git;a=3Dcommitdiff;h=3Daa612b364ecbe1dc
+Please also note that the "-usbdevice serial" syntax is considered as depre=
+cated nowadays - use "-device usb-serial" instead.
 
-> The rocker device still implements the old PCIDeviceClass .init()
-> instead of the new .realize(). All devices need to be converted to
-> .realize().
->
-> .init() reports errors with fprintf() and return 0 on success, negative
-> number on failure. Meanwhile, when -device rocker fails, it first report
-> a specific error, then a generic one, like this:
->
->     $ x86_64-softmmu/qemu-system-x86_64 -device rocker,name=qemu-rocker
->     rocker: name too long; please shorten to at most 9 chars
->     qemu-system-x86_64: -device rocker,name=qemu-rocker: Device initialization failed
->
-> Now, convert it to .realize() that passes errors to its callers via its
-> errp argument. Also avoid the superfluous second error message. After
-> the patch, effect like this:
->
->     $ x86_64-softmmu/qemu-system-x86_64 -device rocker,name=qemu-rocker
->     qemu-system-x86_64: -device rocker,name=qemu-rocker: name too long; please shorten to at most 9 chars
->
-> Cc: jasowang@redhat.com
-> Cc: jiri@resnulli.us
-> Cc: f4bug@amsat.org
-> Cc: armbru@redhat.com
-> Signed-off-by: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
+** Changed in: qemu
+       Status: New =3D> Fix Committed
 
-The conversion to realize() looks good to me, therefore
-Reviewed-by: Markus Armbruster <armbru@redhat.com>
+-- =
 
-However, I spotted a few issues not related to this patch.
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1180924
 
-1. Unusual macro names
+Title:
+  fails to handle a usb serial port with a specific vendorid
 
-    #define ROCKER "rocker"
+Status in QEMU:
+  Fix Committed
 
-    #define to_rocker(obj) \
-        OBJECT_CHECK(Rocker, (obj), ROCKER)
+Bug description:
+  If I run qemu-system-i386 with arguments
+  -usb -usbdevice serial:vendorid=3D1221:pty
+  (this is what the documentation says about how I shoud add a usb device w=
+hich has a serial port interface and which has a specific vendor id, I used=
+ the documentation located here:
+  http://qemu.weilnetz.de/qemu-doc.html
+  ), it says =
 
-   Please clean up to
+  char device redirected to /dev/pts/<something> (label usbserial0)
+  qemu-system-i386: -usbdevice serial:vendorid=3D1221:pty: Property '.vendo=
+rid' not found
+  Aborted
+  and exits. Moreover, if I try to add such a device to a running machine b=
+y typing usb_add serial:vendorid=3D1221:pty in the machine's control termin=
+al (to reach it, I press ctrl-alt-2), qemu also writes =
 
-    #define TYPE_ROCKER "rocker"
+  char device redirected to /dev/pts/<something> (label usbserial0)
+  Aborted
+  to the terminal where I run it from and exits. To the quest OS this looks=
+ like a power failure which causes all the programs inside the virtual mach=
+ine to lose their unsaved data.
+  I have tested this with qemu-1.5.0-rc2, actually, the issue occured in a =
+similar way since 1.0.1, but did not occur in 0.11.1.
+  The issue is reproducible always, even if I don't specify any hard disk i=
+n the command line, i. e.
+  $ qemu-system-i386 -usb -usbdevice serial:vendorid=3D1221:pty
+  , so I believe it is guest OS -independent.
 
-    #define ROCKER(obj) \
-        OBJECT_CHECK(Rocker, (obj), TYPE_ROCKER)
-
-   in a separate patch.
-
-2. Memory leaks on error and unplug
-
-   Explained inline below.
-
-> ---
->  hw/net/rocker/rocker.c | 27 +++++++++++----------------
->  1 file changed, 11 insertions(+), 16 deletions(-)
->
-> diff --git a/hw/net/rocker/rocker.c b/hw/net/rocker/rocker.c
-> index a382a6f..b9a77f1 100644
-> --- a/hw/net/rocker/rocker.c
-> +++ b/hw/net/rocker/rocker.c
-> @@ -1252,20 +1252,18 @@ rollback:
->      return err;
->  }
->  
-> -static int rocker_msix_init(Rocker *r)
-> +static int rocker_msix_init(Rocker *r, Error **errp)
->  {
->      PCIDevice *dev = PCI_DEVICE(r);
->      int err;
-> -    Error *local_err = NULL;
->  
->      err = msix_init(dev, ROCKER_MSIX_VEC_COUNT(r->fp_ports),
->                      &r->msix_bar,
->                      ROCKER_PCI_MSIX_BAR_IDX, ROCKER_PCI_MSIX_TABLE_OFFSET,
->                      &r->msix_bar,
->                      ROCKER_PCI_MSIX_BAR_IDX, ROCKER_PCI_MSIX_PBA_OFFSET,
-> -                    0, &local_err);
-> +                    0, errp);
->      if (err) {
-> -        error_report_err(local_err);
->          return err;
->      }
->  
-> @@ -1301,7 +1299,7 @@ static World *rocker_world_type_by_name(Rocker *r, const char *name)
->      return NULL;
->  }
->  
-> -static int pci_rocker_init(PCIDevice *dev)
-> +static void pci_rocker_realize(PCIDevice *dev, Error **errp)
->  {
->      Rocker *r = to_rocker(dev);
->      const MACAddr zero = { .a = { 0, 0, 0, 0, 0, 0 } };
-> @@ -1319,10 +1317,9 @@ static int pci_rocker_init(PCIDevice *dev)
->  
->      r->world_dflt = rocker_world_type_by_name(r, r->world_name);
->      if (!r->world_dflt) {
-> -        fprintf(stderr,
-> -                "rocker: requested world \"%s\" does not exist\n",
-> +        error_setg(errp,
-> +                "invalid argument requested world %s does not exist",
->                  r->world_name);
-> -        err = -EINVAL;
->          goto err_world_type_by_name;
->      }
->  
-> @@ -1342,7 +1339,7 @@ static int pci_rocker_init(PCIDevice *dev)
->  
->      /* MSI-X init */
->  
-> -    err = rocker_msix_init(r);
-> +    err = rocker_msix_init(r, errp);
->      if (err) {
->          goto err_msix_init;
->      }
-> @@ -1354,7 +1351,7 @@ static int pci_rocker_init(PCIDevice *dev)
->      }
->  
->      if (rocker_find(r->name)) {
-> -        err = -EEXIST;
-> +        error_setg(errp, "%s already exists", r->name);
->          goto err_duplicate;
->      }
->  
-> @@ -1368,10 +1365,9 @@ static int pci_rocker_init(PCIDevice *dev)
->  #define ROCKER_IFNAMSIZ 16
->  #define MAX_ROCKER_NAME_LEN  (ROCKER_IFNAMSIZ - 1 - 3 - 3)
->      if (strlen(r->name) > MAX_ROCKER_NAME_LEN) {
-> -        fprintf(stderr,
-> -                "rocker: name too long; please shorten to at most %d chars\n",
-> +        error_setg(errp,
-> +                "name too long; please shorten to at most %d chars",
->                  MAX_ROCKER_NAME_LEN);
-> -        err = -EINVAL;
->          goto err_name_too_long;
->      }
->  
-> @@ -1429,7 +1425,7 @@ static int pci_rocker_init(PCIDevice *dev)
->  
->      QLIST_INSERT_HEAD(&rockers, r, next);
->  
-> -    return 0;
-> +    return;
->  
->  err_name_too_long:
->  err_duplicate:
-       rocker_msix_uninit(r);
-   err_msix_init:
-       object_unparent(OBJECT(&r->msix_bar));
-       object_unparent(OBJECT(&r->mmio));
-   err_world_type_by_name:
-       for (i = 0; i < ROCKER_WORLD_TYPE_MAX; i++) {
-           if (r->worlds[i]) {
-> @@ -1443,7 +1439,6 @@ err_world_type_by_name:
->              world_free(r->worlds[i]);
->          }
->      }
-> -    return err;
->  }
->  
-
-Does this leak r->world_name and r->name?
-
-If yes, can you delay their allocation until after the last thing that
-can fail?  That way, you don't have to free them on failure.  Simplifies
-the error paths.  Keeping them as simple as practical is desireable,
-because they're hard to test.
-
-Simlarly, if you can delay allocation of r->worlds[], you can remove its
-cleanup here.  Same for the other things you clean up here; I trust you
-get the idea.
-
-If substantial cleanup work remains, you could try to make
-pci_rocker_uninit() usable here: ensure each of its steps does nothing
-when the corresponding step in pci_rocker_realize() hasn't been
-executed.  For a simple g_free() that's automatic, because g_free(P)
-does nothing when P is null.  More complicated steps you might need to
-wrap in a suitable conditional.
-
->  static void pci_rocker_uninit(PCIDevice *dev)
-   {
-       Rocker *r = to_rocker(dev);
-       int i;
-
-       QLIST_REMOVE(r, next);
-
-       for (i = 0; i < r->fp_ports; i++) {
-           FpPort *port = r->fp_port[i];
-
-           fp_port_free(port);
-           r->fp_port[i] = NULL;
-       }
-
-       for (i = 0; i < rocker_pci_ring_count(r); i++) {
-           if (r->rings[i]) {
-               desc_ring_free(r->rings[i]);
-           }
-       }
-       g_free(r->rings);
-
-       rocker_msix_uninit(r);
-       object_unparent(OBJECT(&r->msix_bar));
-       object_unparent(OBJECT(&r->mmio));
-
-       for (i = 0; i < ROCKER_WORLD_TYPE_MAX; i++) {
-           if (r->worlds[i]) {
-               world_free(r->worlds[i]);
-           }
-       }
-       g_free(r->fp_ports_peers);
-   }
-
-Does this leak r->world_name and r->name?
-
-Suggest to run a hot unplug under valgrind to check for leaks.  Best run
-it before fixing the leaks you can see to make sure you're using it
-correctly.
-
-Fixes could be squashed into PATCH 2.  If you don't want to do that, a
-separate patch would also be okay.
-
-> @@ -1528,7 +1523,7 @@ static void rocker_class_init(ObjectClass *klass, void *data)
->      DeviceClass *dc = DEVICE_CLASS(klass);
->      PCIDeviceClass *k = PCI_DEVICE_CLASS(klass);
->  
-> -    k->init = pci_rocker_init;
-> +    k->realize = pci_rocker_realize;
->      k->exit = pci_rocker_uninit;
->      k->vendor_id = PCI_VENDOR_ID_REDHAT;
->      k->device_id = PCI_DEVICE_ID_REDHAT_ROCKER;
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1180924/+subscriptions
