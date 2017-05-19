@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35251)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35380)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <voipio@kos.to>) id 1dBiQy-0005pX-6j
-	for qemu-devel@nongnu.org; Fri, 19 May 2017 09:59:13 -0400
+	(envelope-from <voipio@kos.to>) id 1dBiRY-000688-Fv
+	for qemu-devel@nongnu.org; Fri, 19 May 2017 09:59:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <voipio@kos.to>) id 1dBiQt-0000Lt-JB
-	for qemu-devel@nongnu.org; Fri, 19 May 2017 09:59:12 -0400
-Received: from jessie.kos.to ([212.47.231.226]:40418 helo=pilvi.kos.to)
+	(envelope-from <voipio@kos.to>) id 1dBiRT-0000ZZ-OC
+	for qemu-devel@nongnu.org; Fri, 19 May 2017 09:59:48 -0400
+Received: from jessie.kos.to ([212.47.231.226]:40424 helo=pilvi.kos.to)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <voipio@kos.to>) id 1dBiQt-0000Kl-D2
-	for qemu-devel@nongnu.org; Fri, 19 May 2017 09:59:07 -0400
-Date: Fri, 19 May 2017 13:59:05 +0000
+	(Exim 4.71) (envelope-from <voipio@kos.to>) id 1dBiRT-0000Yn-H5
+	for qemu-devel@nongnu.org; Fri, 19 May 2017 09:59:43 -0400
+Date: Fri, 19 May 2017 13:59:40 +0000
 From: Riku Voipio <riku.voipio@iki.fi>
-Message-ID: <20170519135905.GA19553@kos.to>
-References: <20170311175019.GA7195@ls3530.fritz.box>
-	<b4ca5292-bee3-1e3b-13ba-7dd6c1f00f8a@twiddle.net>
+Message-ID: <20170519135940.GB19553@kos.to>
+References: <mvmh92ouqtw.fsf@suse.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <b4ca5292-bee3-1e3b-13ba-7dd6c1f00f8a@twiddle.net>
-Subject: Re: [Qemu-devel] [PATCH] linux-user: Fix TARGET_MAP* and
- TARGET_F_??LCK for hppa arch
+In-Reply-To: <mvmh92ouqtw.fsf@suse.de>
+Subject: Re: [Qemu-devel] [PATCH] linux-user: remove all traces of qemu from
+ /proc/self/cmdline
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,25 +27,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <rth@twiddle.net>
-Cc: Helge Deller <deller@gmx.de>, qemu-devel@nongnu.org
+To: Andreas Schwab <schwab@suse.de>
+Cc: qemu-devel@nongnu.org
 
-On Sun, Mar 12, 2017 at 08:17:46AM +1000, Richard Henderson wrote:
-> On 03/12/2017 03:50 AM, Helge Deller wrote:
-> >TARGET_MAP_TYPE needs to be 0x03 instead of 0x0f on the hppa
-> >architecture, otherwise it conflicts with MAP_FIXED which is 0x04.
-> >
-> >Add missing TARGET_MAP_STACK and TARGET_MAP_HUGETLB values.
-> >
-> >Fix TARGET_F_RDLCK, TARGET_F_WRLCK and TARGET_F_UNLCK.
-> >
-> >Signed-off-by: Helge Deller <deller@gmx.de>
-> 
-> I applied the MAP_FIXED and TARGET_F_* parts separately in my tree.  I'd
-> like to see what others think about the other MAP_* defines before including
-> that.
+On Mon, Mar 20, 2017 at 12:31:55PM +0100, Andreas Schwab wrote:
+> Instead of post-processing the real contents use the remembered target
+> argv.  That removes all traces of qemu, including command line options,
+> and handles QEMU_ARGV0.
 
-What's the current state of these patches? Are these patches still waiting for
-opinions?
+Applied to Linux-user, thanks
 
 Riku
+ 
+> Signed-off-by: Andreas Schwab <schwab@suse.de>
+> ---
+>  linux-user/syscall.c | 47 +++++++----------------------------------------
+>  1 file changed, 7 insertions(+), 40 deletions(-)
+> 
+> diff --git a/linux-user/syscall.c b/linux-user/syscall.c
+> index cec8428589..ec1fd20386 100644
+> --- a/linux-user/syscall.c
+> +++ b/linux-user/syscall.c
+> @@ -7358,52 +7358,19 @@ int host_to_target_waitstatus(int status)
+>  
+>  static int open_self_cmdline(void *cpu_env, int fd)
+>  {
+> -    int fd_orig = -1;
+> -    bool word_skipped = false;
+> -
+> -    fd_orig = open("/proc/self/cmdline", O_RDONLY);
+> -    if (fd_orig < 0) {
+> -        return fd_orig;
+> -    }
+> +    CPUState *cpu = ENV_GET_CPU((CPUArchState *)cpu_env);
+> +    struct linux_binprm *bprm = ((TaskState *)cpu->opaque)->bprm;
+> +    int i;
+>  
+> -    while (true) {
+> -        ssize_t nb_read;
+> -        char buf[128];
+> -        char *cp_buf = buf;
+> +    for (i = 0; i < bprm->argc; i++) {
+> +        size_t len = strlen(bprm->argv[i]) + 1;
+>  
+> -        nb_read = read(fd_orig, buf, sizeof(buf));
+> -        if (nb_read < 0) {
+> -            int e = errno;
+> -            fd_orig = close(fd_orig);
+> -            errno = e;
+> +        if (write(fd, bprm->argv[i], len) != len) {
+>              return -1;
+> -        } else if (nb_read == 0) {
+> -            break;
+> -        }
+> -
+> -        if (!word_skipped) {
+> -            /* Skip the first string, which is the path to qemu-*-static
+> -               instead of the actual command. */
+> -            cp_buf = memchr(buf, 0, nb_read);
+> -            if (cp_buf) {
+> -                /* Null byte found, skip one string */
+> -                cp_buf++;
+> -                nb_read -= cp_buf - buf;
+> -                word_skipped = true;
+> -            }
+> -        }
+> -
+> -        if (word_skipped) {
+> -            if (write(fd, cp_buf, nb_read) != nb_read) {
+> -                int e = errno;
+> -                close(fd_orig);
+> -                errno = e;
+> -                return -1;
+> -            }
+>          }
+>      }
+>  
+> -    return close(fd_orig);
+> +    return 0;
+>  }
+>  
+>  static int open_self_maps(void *cpu_env, int fd)
+> -- 
+> 2.12.0
+> 
+> 
+> -- 
+> Andreas Schwab, SUSE Labs, schwab@suse.de
+> GPG Key fingerprint = 0196 BAD8 1CE9 1970 F4BE  1748 E4D4 88E3 0EEA B9D7
+> "And now for something completely different."
