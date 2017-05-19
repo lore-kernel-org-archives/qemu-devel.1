@@ -1,33 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48676)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48710)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dBhQO-0005y7-4r
-	for qemu-devel@nongnu.org; Fri, 19 May 2017 08:54:33 -0400
+	(envelope-from <bounces@canonical.com>) id 1dBhQi-0006CR-BY
+	for qemu-devel@nongnu.org; Fri, 19 May 2017 08:54:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dBhQK-0006k4-5r
-	for qemu-devel@nongnu.org; Fri, 19 May 2017 08:54:32 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:45726)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dBhQJ-0006hi-SI
-	for qemu-devel@nongnu.org; Fri, 19 May 2017 08:54:28 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id C195180478
-	for <qemu-devel@nongnu.org>; Fri, 19 May 2017 12:54:26 +0000 (UTC)
-Date: Fri, 19 May 2017 13:54:21 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170519125421.GN2081@work-vm>
-References: <1495176212-14446-1-git-send-email-peterx@redhat.com>
-	<1495176212-14446-2-git-send-email-peterx@redhat.com>
-	<20170519082538.GD4912@redhat.com>
-	<20170519083010.GE4912@redhat.com>
+	(envelope-from <bounces@canonical.com>) id 1dBhQd-0006pY-EN
+	for qemu-devel@nongnu.org; Fri, 19 May 2017 08:54:52 -0400
+Received: from indium.canonical.com ([91.189.90.7]:38677)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1dBhQd-0006pR-8V
+	for qemu-devel@nongnu.org; Fri, 19 May 2017 08:54:47 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1dBhQc-0005wM-3O
+	for <qemu-devel@nongnu.org>; Fri, 19 May 2017 12:54:46 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 189C22E8052
+	for <qemu-devel@nongnu.org>; Fri, 19 May 2017 12:54:46 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170519083010.GE4912@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH RFC 1/6] io: only allow return path for
- socket typed
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 19 May 2017 12:44:05 -0000
+From: Thomas Huth <1511887@bugs.launchpad.net>
+Reply-To: Bug 1511887 <1511887@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20151031002349.21474.82964.malonedeb@soybean.canonical.com>
+Message-Id: <149519784588.12723.12242251656121032127.launchpad@wampee.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1511887] Re: USB device 1.1 not correctly
+ passedthru from Linux host to Windows guest
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,57 +37,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>
-Cc: Peter Xu <peterx@redhat.com>, qemu-devel@nongnu.org, Juan Quintela <quintela@redhat.com>
+To: qemu-devel@nongnu.org
 
-* Daniel P. Berrange (berrange@redhat.com) wrote:
-> On Fri, May 19, 2017 at 09:25:38AM +0100, Daniel P. Berrange wrote:
-> > On Fri, May 19, 2017 at 02:43:27PM +0800, Peter Xu wrote:
-> > > We don't really have a return path for the other types yet. Let's check
-> > > this when .get_return_path() is called.
-> > > 
-> > > For this, we introduce a new feature bit, and set it up only for socket
-> > > typed IO channels.
-> > > 
-> > > This will help detect earlier failure for postcopy, e.g., logically
-> > > speaking postcopy cannot work with "exec:". Before this patch, when we
-> > > try to migrate with "migrate -d exec:cat>out", we'll hang the system.
-> > > With this patch, we'll get:
-> > > 
-> > > (qemu) migrate -d exec:cat>out
-> > > Unable to open return-path for postcopy
-> > 
-> > This is wrong - post-copy migration *can* work with exec: - it just entirely
-> > depends on what command you are running. Your example ran a command which is
-> > unidirectional, but if you ran 'exec:socat ...' you would have a fully
-> > bidirectional channel. Actually the channel is always bi-directional, but
-> > 'cat' simply won't ever send data back to QEMU.
-> > 
-> > If QEMU hangs when the other end doesn't send data back, that actually seems
-> > like a potentially serious bug in migration code. Even if using the normal
-> > 'tcp' migration protocol, if the target QEMU server hangs and fails to
-> > send data to QEMU on the return path, the source QEMU must never hang.
-> 
-> BTW, if you want to simplify the code in this area at all, then arguably
-> we should get rid of the "get_return_path" helper method entirely. We're
-> not actually opening any new connections - we're just creating a second
-> QEMUFile that uses the same underlying QIOChannel object. All we would
-> need is for the QEMUFile to have a separate 'buf' field management in
-> QEMUFile for the read & write directions.  Then all the code would be
-> able to just use the single QEMUFile for read & write getting rid of this
-> concept of "opening a return path" which doens't actually do anything at
-> the underlying data transport level.
+** Changed in: qemu
+       Status: Incomplete =3D> Triaged
 
-No, I'd rather keep the get_return_path;  we should keep each direction
-separate.
+-- =
 
-Dave
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1511887
 
-> Regards,
-> Daniel
-> -- 
-> |: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-> |: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-> |: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+Title:
+  USB device 1.1 not correctly passedthru from Linux host to Windows
+  guest
+
+Status in QEMU:
+  Triaged
+
+Bug description:
+  I have USB Digital Oscilloscope which works great on pure Windows
+  machine but not work on virtualized one. I tried passthru the device
+  from my Debian Jessie (64bit) host machine to Windows 7 (32bit) guest
+  machine but unfortunately it does not work very well. It looks that
+  device is passed thru so Windows machine knows about new device and
+  loads HID device driver for it but the device driver failed to start
+  the device and details of an error provided by device manager is "This
+  device cannot start" Code 10.
+
+  Installed Qemu version: 2.1+dfsg-12+deb8u4 0
+
+  USB device spec: Dynon Instruments ELAB-080, USB 1.1
+
+  On linux host computer
+  ---------------------------
+  lsusb identify it as:
+  Bus 003 Device 009: ID 13a3:0001 =
+
+
+  lsusb -t identify it as:
+  /: Bus 03.Port 1: Dev 1, Class=3Droot_hub, Driver=3Duhci_hcd/2p, 12M
+      |__ Port 1: Dev 9, If 0, Class=3DHuman Interface Device, Driver=3Dusb=
+hid, 12M
+
+  This is how I started my Windows guest machine
+  ------------------------------------------------------
+  kvm -cpu host \
+      -m 2048MiB \
+      -hda test.vdi \
+      -ctrl-grab \
+      -parallel /dev/parport0 \
+      -usbdevice host:13a3:0001
+
+  ...also instead of last line I tried this one:
+      -device usb-host,vendorid=3D0x13a3,productid=3D0x0001
+
+  none of them help to properly handle my device inside guest machine.
+
+  Only one time the Windows guest machine properly start the device so
+  software for that oscilloscope can identify the Oscilloscope and
+  measure for a while but unfortunately after I guess 5 seconds of
+  measurement the device was disconnected from Windows and never start
+  working again even after couple of restarts of guest machine even
+  after plug and unplug it's USB cable and power cable.
+
+  I searched for a solution or some clues to get it work but none of my
+  searching over the internet was successful. Because device works on
+  pure Windows but not work on virtualized one, I think there is a
+  problem with handling not standard USB devices (like sticks,
+  keyboards, mouses etc.)
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1511887/+subscriptions
