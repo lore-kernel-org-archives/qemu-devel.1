@@ -1,25 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38723)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42839)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <arei.gonglei@huawei.com>) id 1dBidH-0003Nq-3I
-	for qemu-devel@nongnu.org; Fri, 19 May 2017 10:11:56 -0400
+	(envelope-from <danielhb@linux.vnet.ibm.com>) id 1dBitX-0006V5-RR
+	for qemu-devel@nongnu.org; Fri, 19 May 2017 10:28:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <arei.gonglei@huawei.com>) id 1dBidC-0005rN-3b
-	for qemu-devel@nongnu.org; Fri, 19 May 2017 10:11:55 -0400
-Received: from szxga01-in.huawei.com ([45.249.212.187]:3998)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <arei.gonglei@huawei.com>) id 1dBidB-0005q6-Gz
-	for qemu-devel@nongnu.org; Fri, 19 May 2017 10:11:50 -0400
-From: "Gonglei (Arei)" <arei.gonglei@huawei.com>
-Date: Fri, 19 May 2017 14:11:28 +0000
-Message-ID: <33183CC9F5247A488A2544077AF19020DA2A0CAF@DGGEMA505-MBS.china.huawei.com>
-References: <36fcce23-2fd2-961a-80b4-c5cb152c7233@huawei.com>
-	<b4e2b09b-0fb8-5b71-066e-b1aa50ab45f9@redhat.com>
-Content-Language: zh-CN
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-MIME-Version: 1.0
-Subject: Re: [Qemu-devel] Migration downtime more than 5s when migrating
- guest with massive disks
+	(envelope-from <danielhb@linux.vnet.ibm.com>) id 1dBitU-0004Pz-L5
+	for qemu-devel@nongnu.org; Fri, 19 May 2017 10:28:43 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:49745)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <danielhb@linux.vnet.ibm.com>)
+	id 1dBitU-0004OS-CV
+	for qemu-devel@nongnu.org; Fri, 19 May 2017 10:28:40 -0400
+Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v4JELqMv004629
+	for <qemu-devel@nongnu.org>; Fri, 19 May 2017 10:28:39 -0400
+Received: from e24smtp05.br.ibm.com (e24smtp05.br.ibm.com [32.104.18.26])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2ahrwn9uu9-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Fri, 19 May 2017 10:28:39 -0400
+Received: from localhost
+	by e24smtp05.br.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <danielhb@linux.vnet.ibm.com>;
+	Fri, 19 May 2017 11:28:36 -0300
+From: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
+Date: Fri, 19 May 2017 11:27:49 -0300
+In-Reply-To: <20170519142750.18437-1-danielhb@linux.vnet.ibm.com>
+References: <20170519142750.18437-1-danielhb@linux.vnet.ibm.com>
+Message-Id: <20170519142750.18437-2-danielhb@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [PATCH v12 1/2] hw/ppc/spapr_events.c: removing
+ 'exception' from sPAPREventLogEntry
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,41 +38,195 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Gonglei (Arei)" <arei.gonglei@huawei.com>, Paolo Bonzini <pbonzini@redhat.com>, yanghongyang <yanghongyang@huawei.com>, "mst@redhat.com" <mst@redhat.com>
-Cc: "quintela@redhat.com" <quintela@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Huangzhichao <huangzhichao@huawei.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "imhy.yang@gmail.com" <imhy.yang@gmail.com>
+To: qemu-devel@nongnu.org
+Cc: qemu-ppc@nongnu.org, david@gibson.dropbear.id.au, mdroth@linux.vnet.ibm.com
 
-T29wcywgZm9yZ290IHRvIENDIHFlbXUtZGV2ZWwsIGFkZCBpdC4NCg0KDQo+IC0tLS0tT3JpZ2lu
-YWwgTWVzc2FnZS0tLS0tDQo+IEZyb206IEdvbmdsZWkgKEFyZWkpDQo+IFNlbnQ6IEZyaWRheSwg
-TWF5IDE5LCAyMDE3IDg6MTcgUE0NCj4gVG86ICdQYW9sbyBCb256aW5pJzsgeWFuZ2hvbmd5YW5n
-OyBtc3RAcmVkaGF0LmNvbQ0KPiBDYzogcXVpbnRlbGFAcmVkaGF0LmNvbTsgRHIuIERhdmlkIEFs
-YW4gR2lsYmVydDsgSHVhbmd6aGljaGFvDQo+IFN1YmplY3Q6IFJFOiBNaWdyYXRpb24gZG93bnRp
-bWUgbW9yZSB0aGFuIDVzIHdoZW4gbWlncmF0aW5nIGd1ZXN0IHdpdGgNCj4gbWFzc2l2ZSBkaXNr
-cw0KPiANCj4gDQo+ID4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gPiBGcm9tOiBQYW9s
-byBCb256aW5pIFttYWlsdG86cGJvbnppbmlAcmVkaGF0LmNvbV0NCj4gPiBTZW50OiBGcmlkYXks
-IE1heSAxOSwgMjAxNyA2OjE5IFBNDQo+ID4NCj4gPiBPbiAxOS8wNS8yMDE3IDEyOjAwLCBZYW5n
-IEhvbmd5YW5nIHdyb3RlOg0KPiA+ID4gV2UgZm91bmQgdGhhdCBtaWdyYXRpb24gZG93bnRpbWUg
-aXMgdW5hY2NlcHRhYmxlIHdoZW4gbWlncmF0aW5nIGd1ZXN0DQo+ID4gd2l0aA0KPiA+ID4gNjAg
-ZGlza3MsIG1vcmUgdGhhbiA1LjUgc2Vjb25kcy4NCj4gPiA+IEJ5IGRlYnVnZ2luZywgd2UgZmlu
-ZCBvdXQgdGhlIHByb2JsZW0gaXMgdGhlcmUncyB0b28gbWFueQ0KPiA+ID4gbWVtb3J5X3JlZ2lv
-bl90cmFuc2FjdGlvbl9jb21taXQoKSBvcGVyYXRpb25zIGR1cmluZyBndWVzdCBsb2FkLCBhYm91
-dA0KPiA+ID4gMzF3KyB0aW1lcy4NCj4gPiA+IEFueSBpZGVhIHRvIG9wdGltaXplIHRoZSBtaWdy
-YXRpb24gZG93bnRpbWUgaW4gdGhpcyBzY2VuYXJpbz8NCj4gPiA+IG1heWJlIHJlZHVjZSB0aGUg
-dGltZXMgb2YgbWVtb3J5X3JlZ2lvbl90cmFuc2FjdGlvbl9jb21taXQoKSBjYWxsLCBidXQNCj4g
-PiBob3c/DQo+ID4gPiBvciB3ZSBjb3VsZCBvcHRpbWl6ZSB0aGUgdGltZSBjb3N0IG9mDQo+IG1l
-bW9yeV9yZWdpb25fdHJhbnNhY3Rpb25fY29tbWl0KCkNCj4gPiBjYWxsLA0KPiA+ID4gYnV0IEkg
-dGhpbmsgdGhhdCB3b3VsZG4ndCBoZWxwIG11Y2guDQo+ID4NCj4gPiBJdCB3b3VsZC4gIFJpZ2h0
-IG5vdyBtZW1vcnlfcmVnaW9uX3RyYW5zYWN0aW9uX2NvbW1pdCgpIGlzIHJvdWdobHkNCj4gPiBP
-KG5eMikgKG4gZGV2aWNlcyAqIG4gQkFScyksIGFuZCB0aGVyZSBhcmUgbiBvZiB0aGVtLg0KPiA+
-DQo+ID4gUmVkdWNpbmcgbWVtb3J5X3JlZ2lvbl90cmFuc2FjdGlvbl9jb21taXQgdG8gTyhuKSB3
-b3VsZCBiZSBhIGxhcmdlDQo+ID4gY2hhbmdlLiAgT25lIGlkZWEgaXMgdG8gc2hhcmUgdGhlIEFk
-ZHJlc3NTcGFjZURpc3BhdGNoIGZvciBBZGRyZXNzU3BhY2VzDQo+ID4gdGhhdCBoYXZlIHRoZSBz
-YW1lIHJvb3QgbWVtb3J5IHJlZ2lvbiAoYWZ0ZXIgcmVzb2x2aW5nIGFsaWFzZXMpLiAgVGhlDQo+
-ID4gc3RhcnRpbmcgcG9pbnQgd291bGQgYmUgdG8gY2hhbmdlIG1lbV9iZWdpbi9tZW1fY29tbWl0
-L21lbV9hZGQgZnJvbQ0KPiBhDQo+ID4gTWVtb3J5TGlzdGVuZXIgdG8gYW4gbG9vcCBvbiB0aGUg
-RmxhdFZpZXcsIHN0b3JpbmcgdGhlDQo+ID4gQWRkcmVzc1NwYWNlRGlzcGF0Y2ggaW4gdGhlIEZs
-YXRWaWV3Lg0KPiA+DQo+IEhvdyBhYm91dCBkbyBPKDEpIGZvciBzdG9wcGluZyBzdGFnZSBvZiBs
-aXZlIG1pZ3JhdGlvbj8NCj4gQmVjYXVzZSB0aGUgY3B1IGlzIHN0b3BwZWQgaW4gdGhpcyBwaGFz
-ZSwgaXQgd291bGRuJ3QgY2F1c2UNCj4gc2lkZSBlZmZlY3RzIElNSE8sIHJpZ2h0Pw0KPiANCj4g
-VGhhbmtzLA0KPiAtR29uZ2xlaQ0KPiANCj4gPiBPbmUgYmFuZGFpZCBzb2x1dGlvbiBpcyB0byB1
-c2UgdmlydGlvLXNjc2kgaW4gdGhlIGd1ZXN0LCB3aXRoIG11bHRpcGxlDQo+ID4gZGlza3MgYmVo
-aW5kIG9uZSBjb250cm9sbGVyLg0KPiA+DQo+ID4gVGhhbmtzLA0KPiA+DQo+ID4gUGFvbG8NCg==
+Currenty we do not have any RTAS event that is reported by the
+event-scan interface. The existing events, RTAS_LOG_TYPE_EPOW and
+RTAS_LOG_TYPE_HOTPLUG, are being reported by the check-exception
+interface and, as such, marked as 'exception=true'.
+
+Commit 79853e18d9, 'spapr_events: event-scan RTAS interface', added
+the event_scan interface because the guest kernel requires it to
+initialize other required interfaces. It is acting since then as
+a stub because no events that would be reported by it were added
+since then. However, the existence of the 'exception' boolean adds
+an unnecessary load in the future migration of the pending_events,
+sPAPREventLogEntry QTAILQ that hosts the pending RTAS events.
+
+To make the code cleaner and ease the future migration changes, this
+patch makes the following changes:
+
+- remove the 'exception' boolean that filter these events. There is
+nothing to filter since all events are reported by check-exception;
+
+- functions rtas_event_log_queue, rtas_event_log_dequeue and
+rtas_event_log_contains don't receive the 'exception' boolean
+as parameter;
+
+- event_scan function was simplified. It was calling
+'rtas_event_log_dequeue(mask, false)' that was always returning
+'NULL' because we have no events that are created with
+exception=false, thus in the end it would execute a jump to
+'out_no_events' all the time. The function now assumes that
+this will always be the case and all the remaining logic were
+deleted.
+
+In the future, when or if we add new RTAS events that should
+be reported with the event_scan interface, we can refer to
+the changes made in this patch to add the event_scan logic
+back.
+
+Signed-off-by: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
+---
+ hw/ppc/spapr_events.c  | 52 +++++++-------------------------------------------
+ include/hw/ppc/spapr.h |  1 -
+ 2 files changed, 7 insertions(+), 46 deletions(-)
+
+diff --git a/hw/ppc/spapr_events.c b/hw/ppc/spapr_events.c
+index f0b28d8..73e2a18 100644
+--- a/hw/ppc/spapr_events.c
++++ b/hw/ppc/spapr_events.c
+@@ -342,20 +342,18 @@ static int rtas_event_log_to_irq(sPAPRMachineState *spapr, int log_type)
+     return source->irq;
+ }
+ 
+-static void rtas_event_log_queue(int log_type, void *data, bool exception)
++static void rtas_event_log_queue(int log_type, void *data)
+ {
+     sPAPRMachineState *spapr = SPAPR_MACHINE(qdev_get_machine());
+     sPAPREventLogEntry *entry = g_new(sPAPREventLogEntry, 1);
+ 
+     g_assert(data);
+     entry->log_type = log_type;
+-    entry->exception = exception;
+     entry->data = data;
+     QTAILQ_INSERT_TAIL(&spapr->pending_events, entry, next);
+ }
+ 
+-static sPAPREventLogEntry *rtas_event_log_dequeue(uint32_t event_mask,
+-                                                  bool exception)
++static sPAPREventLogEntry *rtas_event_log_dequeue(uint32_t event_mask)
+ {
+     sPAPRMachineState *spapr = SPAPR_MACHINE(qdev_get_machine());
+     sPAPREventLogEntry *entry = NULL;
+@@ -364,10 +362,6 @@ static sPAPREventLogEntry *rtas_event_log_dequeue(uint32_t event_mask,
+         const sPAPREventSource *source =
+             rtas_event_log_to_source(spapr, entry->log_type);
+ 
+-        if (entry->exception != exception) {
+-            continue;
+-        }
+-
+         if (source->mask & event_mask) {
+             break;
+         }
+@@ -380,7 +374,7 @@ static sPAPREventLogEntry *rtas_event_log_dequeue(uint32_t event_mask,
+     return entry;
+ }
+ 
+-static bool rtas_event_log_contains(uint32_t event_mask, bool exception)
++static bool rtas_event_log_contains(uint32_t event_mask)
+ {
+     sPAPRMachineState *spapr = SPAPR_MACHINE(qdev_get_machine());
+     sPAPREventLogEntry *entry = NULL;
+@@ -389,10 +383,6 @@ static bool rtas_event_log_contains(uint32_t event_mask, bool exception)
+         const sPAPREventSource *source =
+             rtas_event_log_to_source(spapr, entry->log_type);
+ 
+-        if (entry->exception != exception) {
+-            continue;
+-        }
+-
+         if (source->mask & event_mask) {
+             return true;
+         }
+@@ -479,7 +469,7 @@ static void spapr_powerdown_req(Notifier *n, void *opaque)
+     epow->event_modifier = RTAS_LOG_V6_EPOW_MODIFIER_NORMAL;
+     epow->extended_modifier = RTAS_LOG_V6_EPOW_XMODIFIER_PARTITION_SPECIFIC;
+ 
+-    rtas_event_log_queue(RTAS_LOG_TYPE_EPOW, new_epow, true);
++    rtas_event_log_queue(RTAS_LOG_TYPE_EPOW, new_epow);
+ 
+     qemu_irq_pulse(xics_get_qirq(XICS_FABRIC(spapr),
+                                  rtas_event_log_to_irq(spapr,
+@@ -572,7 +562,7 @@ static void spapr_hotplug_req_event(uint8_t hp_id, uint8_t hp_action,
+             cpu_to_be32(drc_id->count_indexed.index);
+     }
+ 
+-    rtas_event_log_queue(RTAS_LOG_TYPE_HOTPLUG, new_hp, true);
++    rtas_event_log_queue(RTAS_LOG_TYPE_HOTPLUG, new_hp);
+ 
+     qemu_irq_pulse(xics_get_qirq(XICS_FABRIC(spapr),
+                                  rtas_event_log_to_irq(spapr,
+@@ -667,7 +657,7 @@ static void check_exception(PowerPCCPU *cpu, sPAPRMachineState *spapr,
+         xinfo |= (uint64_t)rtas_ld(args, 6) << 32;
+     }
+ 
+-    event = rtas_event_log_dequeue(mask, true);
++    event = rtas_event_log_dequeue(mask);
+     if (!event) {
+         goto out_no_events;
+     }
+@@ -690,7 +680,7 @@ static void check_exception(PowerPCCPU *cpu, sPAPRMachineState *spapr,
+      * interrupts.
+      */
+     for (i = 0; i < EVENT_CLASS_MAX; i++) {
+-        if (rtas_event_log_contains(EVENT_CLASS_MASK(i), true)) {
++        if (rtas_event_log_contains(EVENT_CLASS_MASK(i))) {
+             const sPAPREventSource *source =
+                 spapr_event_sources_get_source(spapr->event_sources, i);
+ 
+@@ -710,38 +700,10 @@ static void event_scan(PowerPCCPU *cpu, sPAPRMachineState *spapr,
+                        target_ulong args,
+                        uint32_t nret, target_ulong rets)
+ {
+-    uint32_t mask, buf, len, event_len;
+-    sPAPREventLogEntry *event;
+-    struct rtas_error_log *hdr;
+-
+     if (nargs != 4 || nret != 1) {
+         rtas_st(rets, 0, RTAS_OUT_PARAM_ERROR);
+         return;
+     }
+-
+-    mask = rtas_ld(args, 0);
+-    buf = rtas_ld(args, 2);
+-    len = rtas_ld(args, 3);
+-
+-    event = rtas_event_log_dequeue(mask, false);
+-    if (!event) {
+-        goto out_no_events;
+-    }
+-
+-    hdr = event->data;
+-    event_len = be32_to_cpu(hdr->extended_length) + sizeof(*hdr);
+-
+-    if (event_len < len) {
+-        len = event_len;
+-    }
+-
+-    cpu_physical_memory_write(buf, event->data, len);
+-    rtas_st(rets, 0, RTAS_OUT_SUCCESS);
+-    g_free(event->data);
+-    g_free(event);
+-    return;
+-
+-out_no_events:
+     rtas_st(rets, 0, RTAS_OUT_NO_ERRORS_FOUND);
+ }
+ 
+diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
+index 5802f88..02239a5 100644
+--- a/include/hw/ppc/spapr.h
++++ b/include/hw/ppc/spapr.h
+@@ -598,7 +598,6 @@ sPAPRTCETable *spapr_tce_find_by_liobn(target_ulong liobn);
+ 
+ struct sPAPREventLogEntry {
+     int log_type;
+-    bool exception;
+     void *data;
+     QTAILQ_ENTRY(sPAPREventLogEntry) next;
+ };
+-- 
+2.9.4
