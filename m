@@ -1,35 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49646)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50803)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dBmqO-0001rr-HF
-	for qemu-devel@nongnu.org; Fri, 19 May 2017 14:41:45 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1dBmuz-0003Hh-Ai
+	for qemu-devel@nongnu.org; Fri, 19 May 2017 14:46:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dBmqK-0003N1-Fn
-	for qemu-devel@nongnu.org; Fri, 19 May 2017 14:41:44 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43534)
+	(envelope-from <dgilbert@redhat.com>) id 1dBmuv-00058c-D6
+	for qemu-devel@nongnu.org; Fri, 19 May 2017 14:46:29 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40238)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dBmqK-0003MM-89
-	for qemu-devel@nongnu.org; Fri, 19 May 2017 14:41:40 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 3E0E6C0467C5
-	for <qemu-devel@nongnu.org>; Fri, 19 May 2017 18:41:39 +0000 (UTC)
-Date: Fri, 19 May 2017 19:41:34 +0100
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dBmuv-00058T-3L
+	for qemu-devel@nongnu.org; Fri, 19 May 2017 14:46:25 -0400
+Date: Fri, 19 May 2017 19:46:16 +0100
 From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170519184133.GU2081@work-vm>
-References: <1495176212-14446-1-git-send-email-peterx@redhat.com>
-	<1495176212-14446-2-git-send-email-peterx@redhat.com>
-	<20170519082538.GD4912@redhat.com> <20170519125139.GM2081@work-vm>
-	<20170519125601.GD28392@redhat.com> <20170519130200.GO2081@work-vm>
-	<20170519131344.GA22341@redhat.com> <20170519143312.GP2081@work-vm>
-	<20170519145126.GA17164@redhat.com>
+Message-ID: <20170519184615.GV2081@work-vm>
+References: <1494595886-30912-1-git-send-email-a.perevalov@samsung.com>
+	<CGME20170512133146eucas1p17df48bb6b5fcefe3717e18cd9afd84b7@eucas1p1.samsung.com>
+	<1494595886-30912-5-git-send-email-a.perevalov@samsung.com>
+	<20170516103250.GB2839@work-vm>
+	<20170518065518.GA8752@aperevalov-ubuntu>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20170519145126.GA17164@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH RFC 1/6] io: only allow return path for
- socket typed
+In-Reply-To: <20170518065518.GA8752@aperevalov-ubuntu>
+Subject: Re: [Qemu-devel] [PATCH V5 4/9] migration: split ufd_version_check
+ onto receive/request features part
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,74 +31,198 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>
-Cc: Peter Xu <peterx@redhat.com>, qemu-devel@nongnu.org, Juan Quintela <quintela@redhat.com>
+To: Alexey <a.perevalov@samsung.com>
+Cc: i.maximets@samsung.com, qemu-devel@nongnu.org, peterx@redhat.com
 
-* Daniel P. Berrange (berrange@redhat.com) wrote:
-> On Fri, May 19, 2017 at 03:33:12PM +0100, Dr. David Alan Gilbert wrote:
-> > * Daniel P. Berrange (berrange@redhat.com) wrote:
-> > > > shutdown() is safe, in that it stops any other threads accessing the fd
-> > > > but doesn't allow it's reallocation until the close;  We perform the
-> > > > close only when we've joined all other threads that were using the fd.
-> > > > Any of the threads that do new calls on the fd get an error and quickly
-> > > > fall down their error paths.
+* Alexey (a.perevalov@samsung.com) wrote:
+> On Tue, May 16, 2017 at 11:32:51AM +0100, Dr. David Alan Gilbert wrote:
+> > * Alexey Perevalov (a.perevalov@samsung.com) wrote:
+> > > This modification is necessary for userfault fd features which are
+> > > required to be requested from userspace.
+> > > UFFD_FEATURE_THREAD_ID is a one of such "on demand" feature, which will
+> > > be introduced in the next patch.
 > > > 
-> > > Ahh that's certainly an interesting scenario. That would certainly be
-> > > a problem with the migration code when this was originally written.
-> > > It had two QEMUFile structs each with an 'int fd' field, so when you
-> > > close 'fd' on one QEMUFile struct, it wouldn't update the other QEMUFile
-> > > used by another thread.
+> > > QEMU need to use separate userfault file descriptor, due to
+> > > userfault context has internal state, and after first call of
+> > > ioctl UFFD_API it changes its state to UFFD_STATE_RUNNING (in case of
+> > > success), but
+> > > kernel while handling ioctl UFFD_API expects UFFD_STATE_WAIT_API. So
+> > > only one ioctl with UFFD_API is possible per ufd.
 > > > 
-> > > Since we switched over to use QIOChannel though, I think the thread
-> > > scenario you describe should be avoided entirely. When you have multiple
-> > > QEMUFile objects, they each have a reference counted pointer to the same
-> > > underlying QIOChannel object instance. So when QEMUFile triggers a call
-> > > to qio_channel_close() in one thread, that'll set fd=-1 in the QIOChannel.
-> > > Since the other threads have a reference to the same QIOChannel object,
-> > > they'll now see this fd == -1 straightaway.
+> > > Signed-off-by: Alexey Perevalov <a.perevalov@samsung.com>
+> > > ---
+> > >  migration/postcopy-ram.c | 82 ++++++++++++++++++++++++++++++++++++++++++------
+> > >  1 file changed, 73 insertions(+), 9 deletions(-)
 > > > 
-> > > So, IIUC, this should make the need for shutdown() redundant (at least
-> > > for the thread race conditions you describe).
+> > > diff --git a/migration/postcopy-ram.c b/migration/postcopy-ram.c
+> > > index 0f75700..c96d5f5 100644
+> > > --- a/migration/postcopy-ram.c
+> > > +++ b/migration/postcopy-ram.c
+> > > @@ -60,32 +60,96 @@ struct PostcopyDiscardState {
+> > >  #include <sys/eventfd.h>
+> > >  #include <linux/userfaultfd.h>
+> > >  
+> > > -static bool ufd_version_check(int ufd, MigrationIncomingState *mis)
+> > > +
+> > > +/*
+> > > + * Check userfault fd features, to request only supported features in
+> > > + * future.
+> > > + * __NR_userfaultfd - should be checked before
+> > > + * Return obtained features
 > > 
-> > That's not thread safe unless you're doing some very careful locking.
-> > Consider:
-> >   T1                      T2       
-> >      oldfd=fd               tmp=fd
-> >      fd=-1
-> >      close(oldfd)
-> >      unrelated open()
-> >                             read(tmp,...
+> > That's not quite right;
+> >  * Returns: True on success, sets *features to supported features
+> >             False on failure or if kernel doesn't support ufd
 > > 
-> > In practice every use of fd will be a copy into a tmp and then the
-> > syscall; the unrelated open() could happen in another thread.
-> > (OK, the gap between the tmp and the read is tiny, although if we're
-> > doing multiple operations chances are the compiler will optimise
-> > it to the top of a loop).
-> > 
-> > There's no way to make that code safe.
-> 
-> Urgh, yes, I see what you mean.
-> 
-> Currently the QIOChannelCommand implementation, uses a pair of anonymous
-> pipes for stdin/out to the child process. I wonder if we could switch
-> that to use socketpair() instead, thus letting us shutdown() on it too.
-> 
-> Though I guess it would be sufficient for qio_channel_shutdown() to
-> merely kill the child PID, while leaving the FDs open, as then you'd
-> get EOF and/or EPIPE on the read/writes.
+> yes, obtained features is out parameter,
+> but I want to keep false uncommented and just add error_report into
+> syscall check, because the possible reason of failure is:
+> 1. No syscall userfaultfd, but function expects that syscall, it reflects in
+> comment
+> 2  Within syscall:  exhausted fd or out of memory (file in kernel
+> is allocating)
+> 3. Problem in ioctl due to internal state of UFFD, as example
+> UFFDIO_API after UFFDIO_REGISTER
 
-Yes, I guess it's a question of which one is more likely to actually
-kill the exec child off; the socketpair is more likely to cause the
-source side migration code to cancel cleanly, although a kill -9 
-should sort out a wayward exec child.
+I don't think we're allowed to depend on error pointers, but either
+way we should comment it to make sure it's clear, so if you have a
+boolean return at least say it's true for success and explain features
+etc.
+
+> Also I would prefer follow migration/ram.c comment style.
+
+Yes, that's fine - it's the content of the comment I was more
+worried about (and the one below).
 
 Dave
 
-> Regards,
-> Daniel
+> > > + */
+> > > +static bool receive_ufd_features(uint64_t *features)
+> > >  {
+> > > -    struct uffdio_api api_struct;
+> > > -    uint64_t ioctl_mask;
+> > > +    struct uffdio_api api_struct = {0};
+> > > +    int ufd;
+> > > +    bool ret = true;
+> > > +
+> > > +    /* if we are here __NR_userfaultfd should exists */
+> > > +    ufd = syscall(__NR_userfaultfd, O_CLOEXEC);
+> > > +    if (ufd == -1) {
+> > > +        return false;
+> > > +    }
+> > >  
+> > > +    /* ask features */
+> > >      api_struct.api = UFFD_API;
+> > >      api_struct.features = 0;
+> > >      if (ioctl(ufd, UFFDIO_API, &api_struct)) {
+> > > -        error_report("%s: UFFDIO_API failed: %s", __func__
+> > > +        error_report("%s: UFFDIO_API failed: %s", __func__,
+> > >                       strerror(errno));
+> > > +        ret = false;
+> > > +        goto release_ufd;
+> > > +    }
+> > > +
+> > > +    *features = api_struct.features;
+> > > +
+> > > +release_ufd:
+> > > +    close(ufd);
+> > > +    return ret;
+> > > +}
+> > 
+> > Needs a comment; perhaps something like:
+> >   * Called once on a newly opened ufd, can request specific features.
+> >   * Returns: True on success
+> > 
+> > > +static bool request_ufd_features(int ufd, uint64_t features)
+> > > +{
+> > > +    struct uffdio_api api_struct = {0};
+> > > +    uint64_t ioctl_mask;
+> > > +
+> > > +    api_struct.api = UFFD_API;
+> > > +    api_struct.features = features;
+> > > +    if (ioctl(ufd, UFFDIO_API, &api_struct)) {
+> > > +        error_report("%s failed: UFFDIO_API failed: %s", __func__,
+> > > +                strerror(errno));
+> > >          return false;
+> > >      }
+> > >  
+> > > -    ioctl_mask = (__u64)1 << _UFFDIO_REGISTER |
+> > > -                 (__u64)1 << _UFFDIO_UNREGISTER;
+> > > +    ioctl_mask = 1 << _UFFDIO_REGISTER |
+> > > +                 1 << _UFFDIO_UNREGISTER;
+> > >      if ((api_struct.ioctls & ioctl_mask) != ioctl_mask) {
+> > >          error_report("Missing userfault features: %" PRIx64,
+> > >                       (uint64_t)(~api_struct.ioctls & ioctl_mask));
+> > >          return false;
+> > >      }
+> > >  
+> > > +    return true;
+> > > +}
+> > > +
+> > > +static bool ufd_check_and_apply(int ufd, MigrationIncomingState *mis)
+> > > +{
+> > > +    uint64_t asked_features = 0;
+> > > +    uint64_t supported_features;
+> > > +
+> > > +    /*
+> > > +     * it's not possible to
+> > > +     * request UFFD_API twice per one fd
+> > > +     */
+> > > +    if (!receive_ufd_features(&supported_features)) {
+> > > +        error_report("%s failed", __func__);
+> > > +        return false;
+> > > +    }
+> > > +
+> > > +    /*
+> > > +     * request features, even if asked_features is 0, due to
+> > > +     * kernel expects UFFD_API before UFFDIO_REGISTER, per
+> > > +     * userfault file descriptor
+> > > +     */
+> > > +    if (!request_ufd_features(ufd, asked_features)) {
+> > > +        error_report("%s failed: features %" PRIu64, __func__,
+> > > +                asked_features);
+> > > +        return false;
+> > > +    }
+> > > +
+> > >      if (getpagesize() != ram_pagesize_summary()) {
+> > >          bool have_hp = false;
+> > >          /* We've got a huge page */
+> > >  #ifdef UFFD_FEATURE_MISSING_HUGETLBFS
+> > > -        have_hp = api_struct.features & UFFD_FEATURE_MISSING_HUGETLBFS;
+> > > +        have_hp = supported_features & UFFD_FEATURE_MISSING_HUGETLBFS;
+> > >  #endif
+> > >          if (!have_hp) {
+> > >              error_report("Userfault on this host does not support huge pages");
+> > > @@ -136,7 +200,7 @@ bool postcopy_ram_supported_by_host(MigrationIncomingState *mis)
+> > >      }
+> > >  
+> > >      /* Version and features check */
+> > > -    if (!ufd_version_check(ufd, mis)) {
+> > > +    if (!ufd_check_and_apply(ufd, mis)) {
+> > >          goto out;
+> > >      }
+> > >  
+> > > @@ -513,7 +577,7 @@ int postcopy_ram_enable_notify(MigrationIncomingState *mis)
+> > >       * Although the host check already tested the API, we need to
+> > >       * do the check again as an ABI handshake on the new fd.
+> > >       */
+> > > -    if (!ufd_version_check(mis->userfault_fd, mis)) {
+> > > +    if (!ufd_check_and_apply(mis->userfault_fd, mis)) {
+> > >          return -1;
+> > >      }
+> > >  
+> > > -- 
+> > > 1.9.1
+> > 
+> > Dave
+> > 
+> > --
+> > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> > 
+> 
 > -- 
-> |: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-> |: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-> |: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+> 
+> BR
+> Alexey
 --
 Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
