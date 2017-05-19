@@ -1,35 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41714)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41701)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cornelia.huck@de.ibm.com>) id 1dBfaD-0005HZ-8A
-	for qemu-devel@nongnu.org; Fri, 19 May 2017 06:56:34 -0400
+	(envelope-from <cornelia.huck@de.ibm.com>) id 1dBfaB-0005GJ-Uo
+	for qemu-devel@nongnu.org; Fri, 19 May 2017 06:56:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cornelia.huck@de.ibm.com>) id 1dBfaA-0000Bk-5G
-	for qemu-devel@nongnu.org; Fri, 19 May 2017 06:56:33 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:42306
-	helo=mx0a-001b2d01.pphosted.com)
+	(envelope-from <cornelia.huck@de.ibm.com>) id 1dBfa8-0000AL-MH
+	for qemu-devel@nongnu.org; Fri, 19 May 2017 06:56:32 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:60987)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <cornelia.huck@de.ibm.com>)
-	id 1dBfa9-0000Aq-Uc
-	for qemu-devel@nongnu.org; Fri, 19 May 2017 06:56:30 -0400
-Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
+	id 1dBfa8-00009n-CP
+	for qemu-devel@nongnu.org; Fri, 19 May 2017 06:56:28 -0400
+Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
 	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v4JAnB9g121554
-	for <qemu-devel@nongnu.org>; Fri, 19 May 2017 06:56:29 -0400
-Received: from e06smtp14.uk.ibm.com (e06smtp14.uk.ibm.com [195.75.94.110])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2ahr3j2udc-1
+	v4JArvUc115747
+	for <qemu-devel@nongnu.org>; Fri, 19 May 2017 06:56:27 -0400
+Received: from e06smtp11.uk.ibm.com (e06smtp11.uk.ibm.com [195.75.94.107])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2ahnff89v5-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Fri, 19 May 2017 06:56:29 -0400
+	for <qemu-devel@nongnu.org>; Fri, 19 May 2017 06:56:26 -0400
 Received: from localhost
-	by e06smtp14.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	by e06smtp11.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
 	Only! Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <cornelia.huck@de.ibm.com>;
-	Fri, 19 May 2017 11:56:27 +0100
+	Fri, 19 May 2017 11:56:24 +0100
 From: Cornelia Huck <cornelia.huck@de.ibm.com>
-Date: Fri, 19 May 2017 12:55:57 +0200
+Date: Fri, 19 May 2017 12:55:55 +0200
 In-Reply-To: <20170519105600.11589-1-cornelia.huck@de.ibm.com>
 References: <20170519105600.11589-1-cornelia.huck@de.ibm.com>
-Message-Id: <20170519105600.11589-19-cornelia.huck@de.ibm.com>
-Subject: [Qemu-devel] [PATCH 18/21] s390x/css: ccw translation infrastructure
+Message-Id: <20170519105600.11589-17-cornelia.huck@de.ibm.com>
+Subject: [Qemu-devel] [PATCH 16/21] vfio/ccw: get irqs info and set the
+ eventfd fd
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,245 +39,166 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: borntraeger@de.ibm.com, agraf@suse.de, Xiao Feng Ren <renxiaof@linux.vnet.ibm.com>, Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, Cornelia Huck <cornelia.huck@de.ibm.com>
+Cc: borntraeger@de.ibm.com, agraf@suse.de, Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, Cornelia Huck <cornelia.huck@de.ibm.com>
 
-From: Xiao Feng Ren <renxiaof@linux.vnet.ibm.com>
+From: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
 
-Implement a basic infrastructure of handling channel I/O instruction
-interception for passed through subchannels:
-1. Branch the code path of instruction interception handling by
-   SubChannel type.
-2. For a passed-through subchannel, issue the ORB to kernel to do ccw
-   translation and perform an I/O operation.
-3. Assign different condition code based on the I/O result, or
-   trigger a program check.
+vfio-ccw resorts to the eventfd mechanism to communicate with userspace.
+We fetch the irqs info via the ioctl VFIO_DEVICE_GET_IRQ_INFO,
+register a event notifier to get the eventfd fd which is sent
+to kernel via the ioctl VFIO_DEVICE_SET_IRQS, then we can implement
+read operation once kernel sends the signal.
 
-Signed-off-by: Xiao Feng Ren <renxiaof@linux.vnet.ibm.com>
+Reviewed-by: Eric Auger <eric.auger@redhat.com>
+Acked-by: Alex Williamson <alex.williamson@redhat.com>
 Signed-off-by: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
-Message-Id: <20170517004813.58227-12-bjsdjshi@linux.vnet.ibm.com>
+Message-Id: <20170517004813.58227-10-bjsdjshi@linux.vnet.ibm.com>
 Signed-off-by: Cornelia Huck <cornelia.huck@de.ibm.com>
 ---
- hw/s390x/css.c         | 89 ++++++++++++++++++++++++++++++++++++++++++++++----
- hw/s390x/s390-ccw.c    | 12 +++++++
- hw/s390x/virtio-ccw.c  |  1 +
- include/hw/s390x/css.h |  4 +++
- target/s390x/ioinst.c  |  9 +++++
- 5 files changed, 109 insertions(+), 6 deletions(-)
+ hw/vfio/ccw.c | 101 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 101 insertions(+)
 
-diff --git a/hw/s390x/css.c b/hw/s390x/css.c
-index 462a768f9e..1e2f26b65a 100644
---- a/hw/s390x/css.c
-+++ b/hw/s390x/css.c
-@@ -524,7 +524,7 @@ static int css_interpret_ccw(SubchDev *sch, hwaddr ccw_addr,
-     return ret;
- }
- 
--static void sch_handle_start_func(SubchDev *sch, ORB *orb)
-+static void sch_handle_start_func_virtual(SubchDev *sch, ORB *orb)
- {
- 
-     PMCW *p = &sch->curr_status.pmcw;
-@@ -626,13 +626,58 @@ static void sch_handle_start_func(SubchDev *sch, ORB *orb)
- 
- }
- 
-+static int sch_handle_start_func_passthrough(SubchDev *sch, ORB *orb)
-+{
-+
-+    PMCW *p = &sch->curr_status.pmcw;
-+    SCSW *s = &sch->curr_status.scsw;
-+    int ret;
-+
-+    if (!(s->ctrl & SCSW_ACTL_SUSP)) {
-+        assert(orb != NULL);
-+        p->intparm = orb->intparm;
-+    }
-+
-+    /*
-+     * Only support prefetch enable mode.
-+     * Only support 64bit addressing idal.
-+     */
-+    if (!(orb->ctrl0 & ORB_CTRL0_MASK_PFCH) ||
-+        !(orb->ctrl0 & ORB_CTRL0_MASK_C64)) {
-+        return -EINVAL;
-+    }
-+
-+    ret = s390_ccw_cmd_request(orb, s, sch->driver_data);
-+    switch (ret) {
-+    /* Currently we don't update control block and just return the cc code. */
-+    case 0:
-+        break;
-+    case -EBUSY:
-+        break;
-+    case -ENODEV:
-+        break;
-+    case -EACCES:
-+        /* Let's reflect an inaccessible host device by cc 3. */
-+        ret = -ENODEV;
-+        break;
-+    default:
-+       /*
-+        * All other return codes will trigger a program check,
-+        * or set cc to 1.
-+        */
-+       break;
-+    };
-+
-+    return ret;
-+}
-+
- /*
-  * On real machines, this would run asynchronously to the main vcpus.
-  * We might want to make some parts of the ssch handling (interpreting
-  * read/writes) asynchronous later on if we start supporting more than
-  * our current very simple devices.
-  */
--static void do_subchannel_work(SubchDev *sch, ORB *orb)
-+int do_subchannel_work_virtual(SubchDev *sch, ORB *orb)
- {
- 
-     SCSW *s = &sch->curr_status.scsw;
-@@ -643,12 +688,45 @@ static void do_subchannel_work(SubchDev *sch, ORB *orb)
-         sch_handle_halt_func(sch);
-     } else if (s->ctrl & SCSW_FCTL_START_FUNC) {
-         /* Triggered by both ssch and rsch. */
--        sch_handle_start_func(sch, orb);
-+        sch_handle_start_func_virtual(sch, orb);
-     } else {
-         /* Cannot happen. */
--        return;
-+        return 0;
-     }
-     css_inject_io_interrupt(sch);
-+    return 0;
-+}
-+
-+int do_subchannel_work_passthrough(SubchDev *sch, ORB *orb)
-+{
-+    int ret;
-+    SCSW *s = &sch->curr_status.scsw;
-+
-+    if (s->ctrl & SCSW_FCTL_CLEAR_FUNC) {
-+        /* TODO: Clear handling */
-+        sch_handle_clear_func(sch);
-+        ret = 0;
-+    } else if (s->ctrl & SCSW_FCTL_HALT_FUNC) {
-+        /* TODO: Halt handling */
-+        sch_handle_halt_func(sch);
-+        ret = 0;
-+    } else if (s->ctrl & SCSW_FCTL_START_FUNC) {
-+        ret = sch_handle_start_func_passthrough(sch, orb);
-+    } else {
-+        /* Cannot happen. */
-+        return -ENODEV;
-+    }
-+
-+    return ret;
-+}
-+
-+static int do_subchannel_work(SubchDev *sch, ORB *orb)
-+{
-+    if (sch->do_subchannel_work) {
-+        return sch->do_subchannel_work(sch, orb);
-+    } else {
-+        return -EINVAL;
-+    }
- }
- 
- static void copy_pmcw_to_guest(PMCW *dest, const PMCW *src)
-@@ -967,8 +1045,7 @@ int css_do_ssch(SubchDev *sch, ORB *orb)
-     s->ctrl |= (SCSW_FCTL_START_FUNC | SCSW_ACTL_START_PEND);
-     s->flags &= ~SCSW_FLAGS_MASK_PNO;
- 
--    do_subchannel_work(sch, orb);
--    ret = 0;
-+    ret = do_subchannel_work(sch, orb);
- 
- out:
-     return ret;
-diff --git a/hw/s390x/s390-ccw.c b/hw/s390x/s390-ccw.c
-index e2b1973fda..8614dda6f8 100644
---- a/hw/s390x/s390-ccw.c
-+++ b/hw/s390x/s390-ccw.c
-@@ -18,6 +18,17 @@
- #include "hw/s390x/css-bridge.h"
+diff --git a/hw/vfio/ccw.c b/hw/vfio/ccw.c
+index 7ddcfd7767..689a7724b6 100644
+--- a/hw/vfio/ccw.c
++++ b/hw/vfio/ccw.c
+@@ -22,6 +22,7 @@
+ #include "hw/vfio/vfio-common.h"
  #include "hw/s390x/s390-ccw.h"
+ #include "hw/s390x/ccw-device.h"
++#include "qemu/error-report.h"
  
-+int s390_ccw_cmd_request(ORB *orb, SCSW *scsw, void *data)
+ #define TYPE_VFIO_CCW "vfio-ccw"
+ typedef struct VFIOCCWDevice {
+@@ -30,6 +31,7 @@ typedef struct VFIOCCWDevice {
+     uint64_t io_region_size;
+     uint64_t io_region_offset;
+     struct ccw_io_region *io_region;
++    EventNotifier io_notifier;
+ } VFIOCCWDevice;
+ 
+ static void vfio_ccw_compute_needs_reset(VFIODevice *vdev)
+@@ -54,6 +56,97 @@ static void vfio_ccw_reset(DeviceState *dev)
+     ioctl(vcdev->vdev.fd, VFIO_DEVICE_RESET);
+ }
+ 
++static void vfio_ccw_io_notifier_handler(void *opaque)
 +{
-+    S390CCWDeviceClass *cdc = S390_CCW_DEVICE_GET_CLASS(data);
++    VFIOCCWDevice *vcdev = opaque;
 +
-+    if (cdc->handle_request) {
-+        return cdc->handle_request(orb, scsw, data);
-+    } else {
-+        return -ENOSYS;
++    if (!event_notifier_test_and_clear(&vcdev->io_notifier)) {
++        return;
 +    }
 +}
 +
- static void s390_ccw_get_dev_info(S390CCWDevice *cdev,
-                                   char *sysfsdev,
-                                   Error **errp)
-@@ -72,6 +83,7 @@ static void s390_ccw_realize(S390CCWDevice *cdev, char *sysfsdev, Error **errp)
-         goto out_mdevid_free;
-     }
-     sch->driver_data = cdev;
-+    sch->do_subchannel_work = do_subchannel_work_passthrough;
- 
-     ccw_dev->sch = sch;
-     ret = css_sch_build_schib(sch, &cdev->hostid);
-diff --git a/hw/s390x/virtio-ccw.c b/hw/s390x/virtio-ccw.c
-index 4e386e9781..e6a6f74be3 100644
---- a/hw/s390x/virtio-ccw.c
-+++ b/hw/s390x/virtio-ccw.c
-@@ -701,6 +701,7 @@ static void virtio_ccw_device_realize(VirtioCcwDevice *dev, Error **errp)
-     sch->disable_cb = virtio_sch_disable_cb;
-     sch->id.reserved = 0xff;
-     sch->id.cu_type = VIRTIO_CCW_CU_TYPE;
-+    sch->do_subchannel_work = do_subchannel_work_virtual;
-     ccw_dev->sch = sch;
-     dev->indicators = NULL;
-     dev->revision = -1;
-diff --git a/include/hw/s390x/css.h b/include/hw/s390x/css.h
-index a932f91edb..596a2f2ef3 100644
---- a/include/hw/s390x/css.h
-+++ b/include/hw/s390x/css.h
-@@ -91,6 +91,7 @@ struct SubchDev {
-     /* transport-provided data: */
-     int (*ccw_cb) (SubchDev *, CCW1);
-     void (*disable_cb)(SubchDev *);
-+    int (*do_subchannel_work) (SubchDev *, ORB *);
-     SenseId id;
-     void *driver_data;
- };
-@@ -148,6 +149,9 @@ void css_generate_chp_crws(uint8_t cssid, uint8_t chpid);
- void css_generate_css_crws(uint8_t cssid);
- void css_clear_sei_pending(void);
- void css_adapter_interrupt(uint8_t isc);
-+int s390_ccw_cmd_request(ORB *orb, SCSW *scsw, void *data);
-+int do_subchannel_work_virtual(SubchDev *sub, ORB *orb);
-+int do_subchannel_work_passthrough(SubchDev *sub, ORB *orb);
- 
- typedef enum {
-     CSS_IO_ADAPTER_VIRTIO = 0,
-diff --git a/target/s390x/ioinst.c b/target/s390x/ioinst.c
-index 590bfa4f12..62a777100c 100644
---- a/target/s390x/ioinst.c
-+++ b/target/s390x/ioinst.c
-@@ -244,6 +244,15 @@ void ioinst_handle_ssch(S390CPU *cpu, uint64_t reg1, uint32_t ipb)
-     case -EBUSY:
-         cc = 2;
-         break;
-+    case -EFAULT:
-+        /*
-+         * TODO:
-+         * I'm wondering whether there is something better
-+         * to do for us here (like setting some device or
-+         * subchannel status).
-+         */
-+        program_interrupt(env, PGM_ADDRESSING, 4);
++static void vfio_ccw_register_io_notifier(VFIOCCWDevice *vcdev, Error **errp)
++{
++    VFIODevice *vdev = &vcdev->vdev;
++    struct vfio_irq_info *irq_info;
++    struct vfio_irq_set *irq_set;
++    size_t argsz;
++    int32_t *pfd;
++
++    if (vdev->num_irqs < VFIO_CCW_IO_IRQ_INDEX + 1) {
++        error_setg(errp, "vfio: unexpected number of io irqs %u",
++                   vdev->num_irqs);
 +        return;
-     case 0:
-         cc = 0;
-         break;
++    }
++
++    argsz = sizeof(*irq_set);
++    irq_info = g_malloc0(argsz);
++    irq_info->index = VFIO_CCW_IO_IRQ_INDEX;
++    irq_info->argsz = argsz;
++    if (ioctl(vdev->fd, VFIO_DEVICE_GET_IRQ_INFO,
++              irq_info) < 0 || irq_info->count < 1) {
++        error_setg_errno(errp, errno, "vfio: Error getting irq info");
++        goto out_free_info;
++    }
++
++    if (event_notifier_init(&vcdev->io_notifier, 0)) {
++        error_setg_errno(errp, errno,
++                         "vfio: Unable to init event notifier for IO");
++        goto out_free_info;
++    }
++
++    argsz = sizeof(*irq_set) + sizeof(*pfd);
++    irq_set = g_malloc0(argsz);
++    irq_set->argsz = argsz;
++    irq_set->flags = VFIO_IRQ_SET_DATA_EVENTFD |
++                     VFIO_IRQ_SET_ACTION_TRIGGER;
++    irq_set->index = VFIO_CCW_IO_IRQ_INDEX;
++    irq_set->start = 0;
++    irq_set->count = 1;
++    pfd = (int32_t *) &irq_set->data;
++
++    *pfd = event_notifier_get_fd(&vcdev->io_notifier);
++    qemu_set_fd_handler(*pfd, vfio_ccw_io_notifier_handler, NULL, vcdev);
++    if (ioctl(vdev->fd, VFIO_DEVICE_SET_IRQS, irq_set)) {
++        error_setg(errp, "vfio: Failed to set up io notification");
++        qemu_set_fd_handler(*pfd, NULL, NULL, vcdev);
++        event_notifier_cleanup(&vcdev->io_notifier);
++    }
++
++    g_free(irq_set);
++
++out_free_info:
++    g_free(irq_info);
++}
++
++static void vfio_ccw_unregister_io_notifier(VFIOCCWDevice *vcdev)
++{
++    struct vfio_irq_set *irq_set;
++    size_t argsz;
++    int32_t *pfd;
++
++    argsz = sizeof(*irq_set) + sizeof(*pfd);
++    irq_set = g_malloc0(argsz);
++    irq_set->argsz = argsz;
++    irq_set->flags = VFIO_IRQ_SET_DATA_EVENTFD |
++                     VFIO_IRQ_SET_ACTION_TRIGGER;
++    irq_set->index = VFIO_CCW_IO_IRQ_INDEX;
++    irq_set->start = 0;
++    irq_set->count = 1;
++    pfd = (int32_t *) &irq_set->data;
++    *pfd = -1;
++
++    if (ioctl(vcdev->vdev.fd, VFIO_DEVICE_SET_IRQS, irq_set)) {
++        error_report("vfio: Failed to de-assign device io fd: %m");
++    }
++
++    qemu_set_fd_handler(event_notifier_get_fd(&vcdev->io_notifier),
++                        NULL, NULL, vcdev);
++    event_notifier_cleanup(&vcdev->io_notifier);
++
++    g_free(irq_set);
++}
++
+ static void vfio_ccw_get_region(VFIOCCWDevice *vcdev, Error **errp)
+ {
+     VFIODevice *vdev = &vcdev->vdev;
+@@ -173,8 +266,15 @@ static void vfio_ccw_realize(DeviceState *dev, Error **errp)
+         goto out_region_err;
+     }
+ 
++    vfio_ccw_register_io_notifier(vcdev, &err);
++    if (err) {
++        goto out_notifier_err;
++    }
++
+     return;
+ 
++out_notifier_err:
++    vfio_ccw_put_region(vcdev);
+ out_region_err:
+     vfio_put_device(vcdev);
+ out_device_err:
+@@ -195,6 +295,7 @@ static void vfio_ccw_unrealize(DeviceState *dev, Error **errp)
+     S390CCWDeviceClass *cdc = S390_CCW_DEVICE_GET_CLASS(cdev);
+     VFIOGroup *group = vcdev->vdev.group;
+ 
++    vfio_ccw_unregister_io_notifier(vcdev);
+     vfio_ccw_put_region(vcdev);
+     vfio_put_device(vcdev);
+     vfio_put_group(group);
 -- 
 2.13.0
