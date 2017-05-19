@@ -1,34 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37573)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41675)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dBoAs-0007dy-AL
-	for qemu-devel@nongnu.org; Fri, 19 May 2017 16:06:59 -0400
+	(envelope-from <bounces@canonical.com>) id 1dBoSP-0003g4-3s
+	for qemu-devel@nongnu.org; Fri, 19 May 2017 16:25:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dBoAp-00075l-4k
-	for qemu-devel@nongnu.org; Fri, 19 May 2017 16:06:58 -0400
-Received: from indium.canonical.com ([91.189.90.7]:60581)
+	(envelope-from <bounces@canonical.com>) id 1dBoSL-0004aU-Vb
+	for qemu-devel@nongnu.org; Fri, 19 May 2017 16:25:05 -0400
+Received: from indium.canonical.com ([91.189.90.7]:34129)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1dBoAo-00075b-W3
-	for qemu-devel@nongnu.org; Fri, 19 May 2017 16:06:55 -0400
+	id 1dBoSL-0004aJ-Ou
+	for qemu-devel@nongnu.org; Fri, 19 May 2017 16:25:01 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1dBoAn-0008Up-T7
-	for <qemu-devel@nongnu.org>; Fri, 19 May 2017 20:06:53 +0000
+	id 1dBoSK-000776-4j
+	for <qemu-devel@nongnu.org>; Fri, 19 May 2017 20:25:00 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id D86F02E8050
-	for <qemu-devel@nongnu.org>; Fri, 19 May 2017 20:06:53 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 7AC972E8053
+	for <qemu-devel@nongnu.org>; Fri, 19 May 2017 20:24:59 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Fri, 19 May 2017 19:47:17 -0000
-From: Thomas Huth <917824@bugs.launchpad.net>
-Reply-To: Bug 917824 <917824@bugs.launchpad.net>
+Date: Fri, 19 May 2017 20:08:05 -0000
+From: Stefan Hajnoczi <721825@bugs.launchpad.net>
+Reply-To: Bug 721825 <721825@bugs.launchpad.net>
 Sender: bounces@canonical.com
-References: <20120117193053.13476.91530.malonedeb@chaenomeles.canonical.com>
-Message-Id: <149522323863.6737.8224365453356880799.launchpad@chaenomeles.canonical.com>
+References: <20110219161957.9055.80104.malonedeb@gandwana.canonical.com>
+	<149522261208.12451.14164199324746532419.malone@gac.canonical.com>
+Message-Id: <CAJSP0QVZRzdUde4egFeJEL4P6ORgQDNtc_wWkxYDQs=XF2hFZw@mail.gmail.com>
 Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 917824] Re: qemu loops/hangs on extending
- qcow2-diskspace
+Subject: Re: [Qemu-devel] [Bug 721825] Re: VDI block driver bugs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,47 +39,148 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-** Changed in: qemu
-       Status: New =3D> Invalid
+On Fri, May 19, 2017 at 8:36 PM, Thomas Huth <721825@bugs.launchpad.net> wr=
+ote:
+> Is this still an issue with the latest version of QEMU, or could we
+> close this bug nowadays?
+
+A quick check of block/vdi.c shows that error handling is still
+lacking.  Updates to in-memory data structures are not reverted if the
+write to disk fails.
+
+Let's leave this in case someone is interested in fixing the bugs
+sometime.  VDI is not used heavily and typically in read-only mode so
+these bugs are not urgent.
 
 -- =
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/917824
+https://bugs.launchpad.net/bugs/721825
 
 Title:
-  qemu loops/hangs on extending qcow2-diskspace
+  VDI block driver bugs
 
 Status in QEMU:
-  Invalid
-Status in qemu-kvm package in Ubuntu:
-  Invalid
+  Incomplete
 
 Bug description:
-  system is ubuntu 11-10 with qemu-kvm 0.14.1 (standard dpkg)
+  Chunqiang Tang reports the following issues with the VDI block driver,
+  these are present in QEMU 0.14:
 
-  while trying to install a software in a winXP-guest on a nearly empty
-  disk within a qcow2-file, qemu stops answering console and vnc.
+  "Bug 1. The most serious bug is caused by race condition in updating a ne=
+w =
 
-  gdb on original binary shows, that it doesn't really hang, but seems
-  to endless loop
+  bmap entry in memory and on disk. Considering the following operation =
 
-  recompiling the binary with debugging-symbols shows following problem:
+  sequence. =
 
-  in block/qcow2-cluster.c:777 there's a loop over an allocation-list, but =
-instead of stopping somewhere, the "next" points to the current one.
-   QLIST_FOREACH(old_alloc, &s->cluster_allocs, next_in_flight) { ... }
+    O1: VM issues a write to sector X
+    O2: VDI allocates a new bmap entry and updates in-memory s->bmap
+    O3: VDI writes data to disk
+    O4: The disk I/O for writing sector X fails
+    O5: VDI reports error to VM and returns.
 
-  because I'm not firm with qemu-development, I don't know, which
-  behaviour would be correct, but simply break this loop doesn't seem to
-  work: a few moments later the process is again at this point (tried so
-  by setting the register for comparison to 0)
+  Note that the bmap entry is updated in memory, but not persisted on disk. =
 
-  this situation is continuosly reproducible, but it always take at
-  least 10-15min to get there, so please, if you have suggestion which I
-  should try and report, try to give as much suggestions as possible in
-  one action.
+  Now consider another write that immediately follows:
+    P1: VM issues a write to sector X+1, which locates in the same block as =
+
+  the previously used sector X.
+    P2: s->bmap already has one entry for the block, and hence VDI writes =
+
+  data directly without persisting the new s->bmap entry on disk.
+    P3: The write disk I/O succeeds
+    P4: VDI report success to VM, but the bitmap entry is still not =
+
+  persisted on disk.
+
+  Now suppose the VM powers off gracefully (i.e., the QEMU process quits) =
+
+  and reboots. The second write to sector X+1, which is reported as finishe=
+d =
+
+  successfully, is simply lost, because the corresponding in-memory s->bmap =
+
+  entry is never persisted on disk. This is exactly what FVD's testing tool =
+
+  discovers. After the block device is closed and then re-opened, disk =
+
+  content verification fails.
+
+  This is just one example of the problem. Race condition plus host crash =
+
+  also causes problems. Consider another example below.
+    Q1: VM issues a write to sector X
+    Q2: VDI allocates a new bmap entry and updates in-memory s->bmap
+    Q3: VDI writes sector X to disk and waits for the callback
+    Q4: VM issues a write to another sector X+1, which is in the same block =
+
+  as sector X.
+    Q5: VDI sees the bitmap entry in s->bmap is already allocated, and =
+
+  writes sector X+1 to disk.
+    Q6: Write to sector X+1 finishes, and VDI's callback is invoked.
+    Q7: VDI acknowledges to the VM the completion of writing sector X+1
+    Q8: After observing the completion of writing sector X+1, VM issues a =
+
+  flush to ensure that sector X+1 is persisted on disk.
+    Q9: VDI finishes the flush and acknowledge the completion of the =
+
+  operation.
+    Q10: ... (some other arbitrary operations, but the disk I/O for writing =
+
+  sector X is still not finished....)
+    Q11: The host crashes
+
+  Now the new bitmap entry is not persisted on disk, while both writing to =
+
+  sector X+1 and the flush has been acknowledged as finished. Sector X+1 is =
+
+  lost, which is a corruption. This problem exists even if it uses O_DSYNC. =
+
+  The root cause of the problem is that, if a request updates in-memory =
+
+  s->bmap, another request that sees this update assumes that the update is =
+
+  already persisted on disk, which is not.
+
+  Bug 2: Similar to the bugs the FVD testing tool found for QCOW2, there ar=
+e =
+
+  several cases of the code below on failure handling path without setting =
+
+  error return code, which mistakenly reports failure as success. This =
+
+  mistake is caught by FVD when doing image content validation.
+         if (acb->hd_aiocb =3D=3D NULL) {
+             /* missing     ret =3D -EIO; */
+              goto done; =
+
+          } =
+
+
+  Bug 3: Similar to the bugs the FVD testing tool found for QCOW2, =
+
+  vdi_aio_cancel does not perform a complete clean up and there are several =
+
+  related bugs. First, memory buffer is not freed, acb->orig_buf and =
+
+  acb->block_buffer. Second, acb->bh is not cancelled. Third, =
+
+  vdi_aio_setup() does not initialize acb->bh to NULL so that when a reques=
+t =
+
+  acb is cancelled and then later reused for another request, its acb->bh !=
+=3D =
+
+  NULL and the new request fails in  vdi_schedule_bh(). This is caught by =
+
+  FVD's testing tool, when it observes that no I/O failure is injected but =
+
+  VDI reports a failed I/O request, which indicates a bug in the driver."
+
+  http://permalink.gmane.org/gmane.comp.emulators.qemu/94340
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/917824/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/721825/+subscriptions
