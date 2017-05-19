@@ -1,49 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40981)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41241)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pasic@linux.vnet.ibm.com>) id 1dBmEj-0008BF-VA
-	for qemu-devel@nongnu.org; Fri, 19 May 2017 14:02:50 -0400
+	(envelope-from <berrange@redhat.com>) id 1dBmFs-0000UA-53
+	for qemu-devel@nongnu.org; Fri, 19 May 2017 14:04:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pasic@linux.vnet.ibm.com>) id 1dBmEg-0006e9-RB
-	for qemu-devel@nongnu.org; Fri, 19 May 2017 14:02:49 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:59557
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pasic@linux.vnet.ibm.com>)
-	id 1dBmEg-0006cs-MQ
-	for qemu-devel@nongnu.org; Fri, 19 May 2017 14:02:46 -0400
-Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v4JHwoU1058196
-	for <qemu-devel@nongnu.org>; Fri, 19 May 2017 14:02:45 -0400
-Received: from e06smtp12.uk.ibm.com (e06smtp12.uk.ibm.com [195.75.94.108])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2aj0kn6g3q-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Fri, 19 May 2017 14:02:45 -0400
-Received: from localhost
-	by e06smtp12.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <pasic@linux.vnet.ibm.com>;
-	Fri, 19 May 2017 19:02:43 +0100
-References: <20170505173507.74077-1-pasic@linux.vnet.ibm.com>
-	<20170505173507.74077-7-pasic@linux.vnet.ibm.com>
-	<20170508173650.GJ2120@work-vm>
-	<877c80d1-fa63-0fd1-e394-fb649281aea1@linux.vnet.ibm.com>
-	<20170508175906.GK2120@work-vm>
-	<b69e0df0-120f-6634-d7ff-4bea9ccb4e31@linux.vnet.ibm.com>
-	<20170508184251.GM2120@work-vm>
-	<f84db83a-4347-ef8c-56d3-ba3171d5a430@linux.vnet.ibm.com>
-	<20170515190706.GD2324@work-vm>
-	<0000bcfe-5d9f-e656-1819-9403a1663c39@linux.vnet.ibm.com>
-	<20170519172838.GC2685@work-vm>
-From: Halil Pasic <pasic@linux.vnet.ibm.com>
-Date: Fri, 19 May 2017 20:02:40 +0200
-MIME-Version: 1.0
-In-Reply-To: <20170519172838.GC2685@work-vm>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 8bit
-Message-Id: <644cabb4-44ed-3b49-4c03-35b7b2266882@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH 06/10] virtio-ccw: use vmstate way for
- config migration
+	(envelope-from <berrange@redhat.com>) id 1dBmFp-0007Ol-1q
+	for qemu-devel@nongnu.org; Fri, 19 May 2017 14:04:00 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40586)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1dBmFo-0007ON-Ro
+	for qemu-devel@nongnu.org; Fri, 19 May 2017 14:03:56 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id D9FC63B70D
+	for <qemu-devel@nongnu.org>; Fri, 19 May 2017 18:03:54 +0000 (UTC)
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Date: Fri, 19 May 2017 19:03:37 +0100
+Message-Id: <20170519180342.19618-1-berrange@redhat.com>
+Subject: [Qemu-devel] [PATCH v2 0/5] Fix handling of IPv4/IPv6 dual stack
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -52,66 +27,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: Cornelia Huck <cornelia.huck@de.ibm.com>, qemu-devel@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, dhildenb@redhat.com
+To: qemu-devel@nongnu.org
+Cc: Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>
 
+This is a (much larger) followup to:
 
+  v1: https://lists.nongnu.org/archive/html/qemu-devel/2017-04/msg05659.html
 
-On 05/19/2017 07:28 PM, Dr. David Alan Gilbert wrote:
->> To sum it up although I'm currently leaning towards abandoning my idea
->> of two sections for two devices, I'm not comfortable with making the
->> call myself. I'm hoping for some maintainer guidance (s390x, virtio
->> and migration). 
-> <A couple of hours of reading, the CCW and PCI code, chatting with
-> dhildenb etc>
-> 
-> OK, so I think:
->   a) First split the series into two separate series; one that
-> VMStatifies the existing stuff without breaking compatibility;
-> and one that adds the new stuff.  Lets get the first of those
-> going in while we think about the second.
-> 
->     a.1) I'd do this with patches that convert one chunk into
->      vmstate and remove the corresponding C code at the same time.
-> 
->   b) While the way PCI devices are done is weird, I think it'll
-> be a lot simpler if you can stick to a structure that's similar
-> to them while diverging.  It's hard enough for those of us
-> who don't do Virtio every day to get our minds around virtio-pci
-> without it being different for virtio-ccw/css.
-> 
->   c) To do (b) I suggest:
->       c.1) you *don't* add a vmsd to your virtio_ccw_device
-> 
->       c.2) but *do* add a VMSTATE_CCW_DEVICE to the start of any
->          non-virtio devices you migrate (like each of the PCI devices
->           have)
-> 
->       c.3) You can add extra state for CSS to the ->save_extra_state
->            handle on virtio devices or to the config
-> 
->   d) vmstatifying the config is OK as well.
-> 
-> I should say I'm no virtio expert, so if any of that's truly
-> mad say so.
-> 
-> Dave
-> 
+This series aims to fix a lot of bugs related to handling of IPv4 / IPv6
+dual stack.
 
-Agreed (a,b,c,d). Reorganizing my patch set according to a) is
-going to require some effort, but it should not be too bad. 
-About c.2): I don't think we have any migratable non virtio devices
-yet, but I'll keep it in mind.
+ - The VNC server mistakenly listened on two separate ports 5900+5901
+   when the to= parameter was given
+ - IPv6 sockets are accepting IPv4 clients even when IPv4 is set to
+   be disabled
+ - IPv6 sockets are failing to accept IPv4 clients when IPv4 is not set
+   to be disabled
+ - The VNC server was loosing the ipv4=/ipv6= settings due to a bug
+   in the DNS resolver
 
-I do not understand what you mean by c.3) and extra_sate. Maybe
-it will settle with time. My idea of extending VirtioCcwDevice
-is just adding subsections to it's VMStateDescription. The
-call vmstate_save_state(f, &vmstate_virtio_ccw_dev, dev, NULL)
-in save_config should take care of compatibility. Maybe some
-staring at virtio-pci is going to help, but right now I can't tell
-what's the extra_state for, and how/why is it 'extra'.
+The behaviour of all this is really subtle and hard to get working correctly
+across all the different network backends. Thus, the most important part of
+this patch series is the last patch which adds a test case covering the
+backends for -vnc, -chardev tcp, -net socket, and -incoming socket, with
+a 120 entry matrix.
 
-Thanks for your patience!
+IOW, if you think any of the first 4 patches are applying the wrong logic,
+then take a look at the last patch and indicate which test matrix entries
+are believed to be defining wrong behaviour :-)
 
-Regards,
-Halil
+Daniel P. Berrange (5):
+  sockets: ensure we can bind to both ipv4 & ipv6 separately
+  sockets: don't block IPv4 clients when listening on "::"
+  sockets: ensure we don't accept IPv4 clients when IPv4 is disabled
+  io: preserve ipv4/ipv6 flags when resolving InetSocketAddress
+  tests: add functional test validating ipv4/ipv6 address flag handling
+
+ io/dns-resolver.c          |   6 +-
+ tests/.gitignore           |   1 +
+ tests/Makefile.include     |   4 +
+ tests/test-sockets-proto.c | 855 +++++++++++++++++++++++++++++++++++++++++++++
+ util/qemu-sockets.c        |  71 +++-
+ 5 files changed, 916 insertions(+), 21 deletions(-)
+ create mode 100644 tests/test-sockets-proto.c
+
+-- 
+2.9.3
