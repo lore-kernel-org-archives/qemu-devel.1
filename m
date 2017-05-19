@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46262)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46321)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dBXiP-0001Yd-ST
-	for qemu-devel@nongnu.org; Thu, 18 May 2017 22:32:31 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1dBXiS-0001Z4-UM
+	for qemu-devel@nongnu.org; Thu, 18 May 2017 22:32:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dBXiM-00026j-Pb
-	for qemu-devel@nongnu.org; Thu, 18 May 2017 22:32:29 -0400
-Date: Fri, 19 May 2017 12:32:16 +1000
+	(envelope-from <dgibson@ozlabs.org>) id 1dBXiR-000290-Hv
+	for qemu-devel@nongnu.org; Thu, 18 May 2017 22:32:32 -0400
+Date: Fri, 19 May 2017 12:20:20 +1000
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20170519023216.GD12284@umbus.fritz.box>
-References: <20170518202402.12571-1-danielhb@linux.vnet.ibm.com>
-	<20170518202402.12571-3-danielhb@linux.vnet.ibm.com>
+Message-ID: <20170519022020.GB12284@umbus.fritz.box>
+References: <1495094971-177754-1-git-send-email-imammedo@redhat.com>
+	<1495094971-177754-2-git-send-email-imammedo@redhat.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="C1iGAkRnbeBonpVg"
+	protocol="application/pgp-signature"; boundary="rS8CxjVDS/+yyDmU"
 Content-Disposition: inline
-In-Reply-To: <20170518202402.12571-3-danielhb@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH v11 2/2] migration: spapr: migrate
- pending_events of spapr state
+In-Reply-To: <1495094971-177754-2-git-send-email-imammedo@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 1/3] numa: consolidate cpu_preplug
+ fixups/checks for pc/arm/spapr
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,124 +25,194 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, mdroth@linux.vnet.ibm.com
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-arm@nongnu.org, qemu-ppc@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, Andrew Jones <drjones@redhat.com>
 
 
---C1iGAkRnbeBonpVg
+--rS8CxjVDS/+yyDmU
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, May 18, 2017 at 05:24:02PM -0300, Daniel Henrique Barboza wrote:
-> From: Jianjun Duan <duanj@linux.vnet.ibm.com>
->=20
-> In racing situations between hotplug events and migration operation,
-> a rtas hotplug event could have not yet be delivered to the source
-> guest when migration is started. In this case the pending_events of
-> spapr state need be transmitted to the target so that the hotplug
-> event can be finished on the target.
->=20
-> All the different fields of the events are encoded as defined by
-> PAPR. We can migrate them as uint8_t binary stream without any
-> concerns about data padding or endianess.
->=20
-> pending_events is put in a subsection in the spapr state VMSD to make
-> sure migration across different versions is not broken.
->=20
-> Signed-off-by: Jianjun Duan <duanj@linux.vnet.ibm.com>
-> Signed-off-by: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
+On Thu, May 18, 2017 at 10:09:29AM +0200, Igor Mammedov wrote:
+> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+
+Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
+
 > ---
->  hw/ppc/spapr.c         | 32 ++++++++++++++++++++++++++++++++
->  hw/ppc/spapr_events.c  |  1 +
->  include/hw/ppc/spapr.h |  3 ++-
->  3 files changed, 35 insertions(+), 1 deletion(-)
+>  include/sysemu/numa.h |  1 +
+>  hw/arm/virt.c         | 16 ++--------------
+>  hw/i386/pc.c          | 17 +----------------
+>  hw/ppc/spapr.c        | 17 +----------------
+>  numa.c                | 22 ++++++++++++++++++++++
+>  5 files changed, 27 insertions(+), 46 deletions(-)
 >=20
+> diff --git a/include/sysemu/numa.h b/include/sysemu/numa.h
+> index 7ffde5b..610eece 100644
+> --- a/include/sysemu/numa.h
+> +++ b/include/sysemu/numa.h
+> @@ -35,4 +35,5 @@ void numa_legacy_auto_assign_ram(MachineClass *mc, Node=
+Info *nodes,
+>                                   int nb_nodes, ram_addr_t size);
+>  void numa_default_auto_assign_ram(MachineClass *mc, NodeInfo *nodes,
+>                                    int nb_nodes, ram_addr_t size);
+> +void numa_cpu_pre_plug(const CPUArchId *slot, DeviceState *dev, Error **=
+errp);
+>  #endif
+> diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+> index c7c8159..ce676df 100644
+> --- a/hw/arm/virt.c
+> +++ b/hw/arm/virt.c
+> @@ -1351,7 +1351,6 @@ static void machvirt_init(MachineState *machine)
+>      for (n =3D 0; n < possible_cpus->len; n++) {
+>          Object *cpuobj;
+>          CPUState *cs;
+> -        int node_id;
+> =20
+>          if (n >=3D smp_cpus) {
+>              break;
+> @@ -1364,19 +1363,8 @@ static void machvirt_init(MachineState *machine)
+>          cs =3D CPU(cpuobj);
+>          cs->cpu_index =3D n;
+> =20
+> -        node_id =3D possible_cpus->cpus[cs->cpu_index].props.node_id;
+> -        if (!possible_cpus->cpus[cs->cpu_index].props.has_node_id) {
+> -            /* by default CPUState::numa_node was 0 if it's not set via =
+CLI
+> -             * keep it this way for now but in future we probably should
+> -             * refuse to start up with incomplete numa mapping */
+> -             node_id =3D 0;
+> -        }
+> -        if (cs->numa_node =3D=3D CPU_UNSET_NUMA_NODE_ID) {
+> -            cs->numa_node =3D node_id;
+> -        } else {
+> -            /* CPU isn't device_add compatible yet, this shouldn't happe=
+n */
+> -            error_setg(&error_abort, "user set node-id not implemented");
+> -        }
+> +        numa_cpu_pre_plug(&possible_cpus->cpus[cs->cpu_index], DEVICE(cp=
+uobj),
+> +                          &error_fatal);
+> =20
+>          if (!vms->secure) {
+>              object_property_set_bool(cpuobj, false, "has_el3", NULL);
+> diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+> index e36a375..d83c158 100644
+> --- a/hw/i386/pc.c
+> +++ b/hw/i386/pc.c
+> @@ -1895,7 +1895,6 @@ static void pc_cpu_pre_plug(HotplugHandler *hotplug=
+_dev,
+>                              DeviceState *dev, Error **errp)
+>  {
+>      int idx;
+> -    int node_id;
+>      CPUState *cs;
+>      CPUArchId *cpu_slot;
+>      X86CPUTopoInfo topo;
+> @@ -1986,21 +1985,7 @@ static void pc_cpu_pre_plug(HotplugHandler *hotplu=
+g_dev,
+>      cs =3D CPU(cpu);
+>      cs->cpu_index =3D idx;
+> =20
+> -    node_id =3D cpu_slot->props.node_id;
+> -    if (!cpu_slot->props.has_node_id) {
+> -        /* by default CPUState::numa_node was 0 if it's not set via CLI
+> -         * keep it this way for now but in future we probably should
+> -         * refuse to start up with incomplete numa mapping */
+> -        node_id =3D 0;
+> -    }
+> -    if (cs->numa_node =3D=3D CPU_UNSET_NUMA_NODE_ID) {
+> -        cs->numa_node =3D node_id;
+> -    } else if (cs->numa_node !=3D node_id) {
+> -            error_setg(errp, "node-id %d must match numa node specified"
+> -                "with -numa option for cpu-index %d",
+> -                cs->numa_node, cs->cpu_index);
+> -            return;
+> -    }
+> +    numa_cpu_pre_plug(cpu_slot, dev, errp);
+>  }
+> =20
+>  static void pc_machine_device_pre_plug_cb(HotplugHandler *hotplug_dev,
 > diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> index 0980d73..5afd328 100644
+> index 0980d73..c7fee8b 100644
 > --- a/hw/ppc/spapr.c
 > +++ b/hw/ppc/spapr.c
-> @@ -1444,6 +1444,37 @@ static bool version_before_3(void *opaque, int ver=
-sion_id)
->      return version_id < 3;
+> @@ -2831,11 +2831,9 @@ static void spapr_core_pre_plug(HotplugHandler *ho=
+tplug_dev, DeviceState *dev,
+>      MachineClass *mc =3D MACHINE_GET_CLASS(hotplug_dev);
+>      Error *local_err =3D NULL;
+>      CPUCore *cc =3D CPU_CORE(dev);
+> -    sPAPRCPUCore *sc =3D SPAPR_CPU_CORE(dev);
+>      char *base_core_type =3D spapr_get_cpu_core_type(machine->cpu_model);
+>      const char *type =3D object_get_typename(OBJECT(dev));
+>      CPUArchId *core_slot;
+> -    int node_id;
+>      int index;
+> =20
+>      if (dev->hotplugged && !mc->has_hotpluggable_cpus) {
+> @@ -2870,20 +2868,7 @@ static void spapr_core_pre_plug(HotplugHandler *ho=
+tplug_dev, DeviceState *dev,
+>          goto out;
+>      }
+> =20
+> -    node_id =3D core_slot->props.node_id;
+> -    if (!core_slot->props.has_node_id) {
+> -        /* by default CPUState::numa_node was 0 if it's not set via CLI
+> -         * keep it this way for now but in future we probably should
+> -         * refuse to start up with incomplete numa mapping */
+> -        node_id =3D 0;
+> -    }
+> -    if (sc->node_id =3D=3D CPU_UNSET_NUMA_NODE_ID) {
+> -        sc->node_id =3D node_id;
+> -    } else if (sc->node_id !=3D node_id) {
+> -        error_setg(&local_err, "node-id %d must match numa node specifie=
+d"
+> -            "with -numa option for cpu-index %d", sc->node_id, cc->core_=
+id);
+> -        goto out;
+> -    }
+> +    numa_cpu_pre_plug(core_slot, dev, &local_err);
+> =20
+>  out:
+>      g_free(base_core_type);
+> diff --git a/numa.c b/numa.c
+> index ca73145..0115bfd 100644
+> --- a/numa.c
+> +++ b/numa.c
+> @@ -534,6 +534,28 @@ void parse_numa_opts(MachineState *ms)
+>      }
 >  }
 > =20
-> +static bool spapr_pending_events_needed(void *opaque)
+> +void numa_cpu_pre_plug(const CPUArchId *slot, DeviceState *dev, Error **=
+errp)
 > +{
-> +    sPAPRMachineState *spapr =3D (sPAPRMachineState *)opaque;
-> +    return !QTAILQ_EMPTY(&spapr->pending_events);
+> +    int node_id =3D object_property_get_int(OBJECT(dev), "node-id", errp=
+);
+> +
+> +    if (node_id =3D=3D CPU_UNSET_NUMA_NODE_ID) {
+> +        /* by default CPUState::numa_node was 0 if it wasn't set explici=
+tly
+> +         * TODO: make it error when incomplete numa mapping support is r=
+emoved
+> +         */
+> +        node_id =3D 0;
+> +
+> +        /* due to bug in libvirt, it doesn't pass node-id from props on
+> +         * device_add as expected, so we have to fix it up here */
+> +        if (slot->props.has_node_id) {
+> +            node_id =3D slot->props.node_id;
+> +        }
+> +        object_property_set_int(OBJECT(dev), node_id, "node-id", errp);
+> +    } else if (node_id !=3D slot->props.node_id) {
+> +        error_setg(errp, "node-id=3D%d must match numa node specified "
+> +                   "with -numa option", node_id);
+> +    }
 > +}
 > +
-> +static const VMStateDescription vmstate_spapr_event_entry =3D {
-> +    .name =3D "spapr_event_log_entry",
-> +    .version_id =3D 1,
-> +    .minimum_version_id =3D 1,
-> +    .fields =3D (VMStateField[]) {
-> +        VMSTATE_INT32(log_type, sPAPREventLogEntry),
-> +        VMSTATE_UINT32(data_size, sPAPREventLogEntry),
-> +        VMSTATE_VBUFFER_ALLOC_UINT32(data, sPAPREventLogEntry, 0,
-> +                                     NULL, data_size),
-> +        VMSTATE_END_OF_LIST()
-> +    },
-> +};
-> +
-> +static const VMStateDescription vmstate_spapr_pending_events =3D {
-> +    .name =3D "spapr_pending_events",
-> +    .version_id =3D 1,
-> +    .minimum_version_id =3D 1,
-> +    .needed =3D spapr_pending_events_needed,
-> +    .fields =3D (VMStateField[]) {
-> +        VMSTATE_QTAILQ_V(pending_events, sPAPRMachineState, 1,
-> +                         vmstate_spapr_event_entry, sPAPREventLogEntry, =
-next),
-> +        VMSTATE_END_OF_LIST()
-> +    },
-> +};
-> +
->  static bool spapr_ov5_cas_needed(void *opaque)
->  {
->      sPAPRMachineState *spapr =3D opaque;
-> @@ -1542,6 +1573,7 @@ static const VMStateDescription vmstate_spapr =3D {
->      .subsections =3D (const VMStateDescription*[]) {
->          &vmstate_spapr_ov5_cas,
->          &vmstate_spapr_patb_entry,
-> +        &vmstate_spapr_pending_events,
->          NULL
->      }
->  };
-> diff --git a/hw/ppc/spapr_events.c b/hw/ppc/spapr_events.c
-> index 73e2a18..96c1605 100644
-> --- a/hw/ppc/spapr_events.c
-> +++ b/hw/ppc/spapr_events.c
-> @@ -350,6 +350,7 @@ static void rtas_event_log_queue(int log_type, void *=
-data)
->      g_assert(data);
->      entry->log_type =3D log_type;
->      entry->data =3D data;
-> +    entry->data_size =3D sizeof(*data);
-
-This can't be right, since data is a void*.  I'm surprised it even
-compiles.  You'll need to actually look into the data buffer here and
-extract the size field.
-
->      QTAILQ_INSERT_TAIL(&spapr->pending_events, entry, next);
->  }
-> =20
-> diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
-> index 02239a5..0554e11 100644
-> --- a/include/hw/ppc/spapr.h
-> +++ b/include/hw/ppc/spapr.h
-> @@ -597,8 +597,9 @@ struct sPAPRTCETable {
->  sPAPRTCETable *spapr_tce_find_by_liobn(target_ulong liobn);
-> =20
->  struct sPAPREventLogEntry {
-> -    int log_type;
-> +    int32_t log_type;
->      void *data;
-> +    uint32_t data_size;
->      QTAILQ_ENTRY(sPAPREventLogEntry) next;
->  };
-> =20
+>  static void allocate_system_memory_nonnuma(MemoryRegion *mr, Object *own=
+er,
+>                                             const char *name,
+>                                             uint64_t ram_size)
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -150,25 +220,25 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---C1iGAkRnbeBonpVg
+--rS8CxjVDS/+yyDmU
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v2
 
-iQIcBAEBCAAGBQJZHlkvAAoJEGw4ysog2bOSxgMP/jbrS9R+9B2awTgRlr7pb354
-W5mq+Zc44/3eluttGlThhP4V4rp7P83z8rUgfkxNL+/l0zoL97Eb0vO+6QUSeZw/
-eRYz8DKqVcoSOzchhUTILXOHSjrvIEXah6Q5ioMr+PQM9fW7TIIpctB2AR8s3KM4
-SvH1hFqVjPYJ4t4QS0bu1+8SkTJoeeBmYlB9m23JeC8Fzvy/mqIfOJzHVsP6uVmD
-/fzUozETgCj90HWt+h2CN4N+vvagAJnNAoRYhBauG/7ECgbsPuSQUiSX2Om8Izwk
-Su8xae+1/aDIkOkSbTR9yYA18IqY/fbhHLgpGcACMWATmY3re3hje0ys+T0fUeF9
-wnxI/ng/XK7u/dr5YIh+S574eKfxxbPNZl2kK+35FYFDrzQLajNxcDNtVp/jG39s
-K8WvJCLhl+3Wl6vaMNA7rWjBraUz3f6EU4YoJL50/2CQ01uUvwexgmrRQc99/zFo
-+RkuHgQRBJVNRVKDbdivlDRWfWIVv1vVXj4dXXaVaYsYl5fFvIZopkSGNg93LijD
-lyDc5Z2F6BFzXbMoxjucCcV5Cj6LyTLZJ1iisgIR9pfskEppQvcO5RmwoTXVAYN4
-WPbRS+N3TZgGkU5iO5dH+ygM5Eclw0OFM69GlvHOEJDx151jJgtk3yL4TwRKo+RX
-kx/kJ7xLMZiylu81rNAh
-=VpjX
+iQIcBAEBCAAGBQJZHlZiAAoJEGw4ysog2bOSEtYP/RNvOSPJHGw7Eph/vSwG0cAa
+0qH6qwybcR17o1tbC2eoUgmHLBT+cKPsEV1KnuoXLj/1872Pinx9SXvTAcwlH+lz
+JaCrwQH7hsBaAdnkt6hI6RN3quRNMBMi7sJuqV3aAkrwU+SdGHDr624oCz/0Ur9x
+F9heJbgb5dyaMlNchuIcMq2yXQAX2ddlBDht0ozm7+a9wahWmwawm5zbcRlX4uIS
+F/KDEPLo8NnOFvy1h1WLDCK6VHsdog9D7fBVkYiMs1YqzJt0i/75+LttWZqo+Lvo
+jxZEt059BXx2vZRglwJeCsyuneRvMJAHUd5ALx3aN3u1INhuWZllSZ7NfuD4mnSQ
+uztlGPmSxzi6HqfMvT8FfEnXDxMlRoAJ0WSlwOUhLQ82JpaFCoStCJvACJ8cOKOH
+wLqaJMavBpmjLZRpWfVvuyJwj3z4KXOD1oJFywHMkaG8b0ybx0rMs5vONeDrUMoR
+urQVhrg3bcYPhV51KjSbF7Hc9BKlWhfI3SN0hAoTmG0TV8y5VZPjz1aO7F1E+HKR
+FN2rY9A/PHPOex0eiYs8G+CIDuWdwtmNLnshUr7hc9leCwhMIdcsD0+TaiN/AXCm
+C39RgKnv3lD6BTvlPSvjzc6PFTM0tyz2yrP18iz73u+Csq/s3JnhIscyYjGtOQJ3
+yGs0B9jxkU0XBlz/8ATz
+=DVLI
 -----END PGP SIGNATURE-----
 
---C1iGAkRnbeBonpVg--
+--rS8CxjVDS/+yyDmU--
