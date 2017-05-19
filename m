@@ -1,32 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53302)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53473)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1dBeZf-0000zk-6P
-	for qemu-devel@nongnu.org; Fri, 19 May 2017 05:51:56 -0400
+	(envelope-from <yi.l.liu@linux.intel.com>) id 1dBea0-0001C5-Ef
+	for qemu-devel@nongnu.org; Fri, 19 May 2017 05:52:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1dBeZc-0003pg-1w
-	for qemu-devel@nongnu.org; Fri, 19 May 2017 05:51:55 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34398)
+	(envelope-from <yi.l.liu@linux.intel.com>) id 1dBeZx-0003vK-BE
+	for qemu-devel@nongnu.org; Fri, 19 May 2017 05:52:16 -0400
+Received: from mga06.intel.com ([134.134.136.31]:21396)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1dBeZb-0003oz-Pz
-	for qemu-devel@nongnu.org; Fri, 19 May 2017 05:51:52 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id B5140C05975E
-	for <qemu-devel@nongnu.org>; Fri, 19 May 2017 09:51:50 +0000 (UTC)
-Date: Fri, 19 May 2017 17:51:43 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20170519095143.GC14679@pxdev.xzpeter.org>
-References: <1495176212-14446-1-git-send-email-peterx@redhat.com>
-	<1495176212-14446-2-git-send-email-peterx@redhat.com>
-	<20170519082538.GD4912@redhat.com>
+	(Exim 4.71) (envelope-from <yi.l.liu@linux.intel.com>)
+	id 1dBeZw-0003v6-Vw
+	for qemu-devel@nongnu.org; Fri, 19 May 2017 05:52:13 -0400
+Date: Fri, 19 May 2017 17:35:59 +0800
+From: "Liu, Yi L" <yi.l.liu@linux.intel.com>
+Message-ID: <20170519093559.GB10952@sky-dev>
+References: <1493201210-14357-1-git-send-email-yi.l.liu@linux.intel.com>
+	<1493201210-14357-10-git-send-email-yi.l.liu@linux.intel.com>
+	<5c64416d-7d8a-f1a6-64f9-cb0bf1d95a4a@intel.com>
+	<20170519052338.GA10952@sky-dev>
+	<AADFC41AFE54684AB9EE6CBC0274A5D190CD9CA5@SHSMSX101.ccr.corp.intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20170519082538.GD4912@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH RFC 1/6] io: only allow return path for
- socket typed
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <AADFC41AFE54684AB9EE6CBC0274A5D190CD9CA5@SHSMSX101.ccr.corp.intel.com>
+Subject: Re: [Qemu-devel] [RFC PATCH 09/20] Memory: introduce
+ iommu_ops->record_device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,66 +33,122 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>
-Cc: qemu-devel@nongnu.org, Juan Quintela <quintela@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+To: "Tian, Kevin" <kevin.tian@intel.com>
+Cc: "alex.williamson@redhat.com" <alex.williamson@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "peterx@redhat.com" <peterx@redhat.com>, "Liu, Yi L" <yi.l.liu@intel.com>, "Raj, Ashok" <ashok.raj@intel.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "jean-philippe.brucker@arm.com" <jean-philippe.brucker@arm.com>, "jasowang@redhat.com" <jasowang@redhat.com>, "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>, "Pan, Jacob jun" <jacob.jun.pan@intel.com>, "Lan, Tianyu" <tianyu.lan@intel.com>
 
-On Fri, May 19, 2017 at 09:25:38AM +0100, Daniel P. Berrange wrote:
-> On Fri, May 19, 2017 at 02:43:27PM +0800, Peter Xu wrote:
-> > We don't really have a return path for the other types yet. Let's check
-> > this when .get_return_path() is called.
+On Fri, May 19, 2017 at 09:07:49AM +0000, Tian, Kevin wrote:
+> > From: Liu, Yi L [mailto:yi.l.liu@linux.intel.com]
+> > Sent: Friday, May 19, 2017 1:24 PM
 > > 
-> > For this, we introduce a new feature bit, and set it up only for socket
-> > typed IO channels.
+> > Hi Alex,
 > > 
-> > This will help detect earlier failure for postcopy, e.g., logically
-> > speaking postcopy cannot work with "exec:". Before this patch, when we
-> > try to migrate with "migrate -d exec:cat>out", we'll hang the system.
-> > With this patch, we'll get:
-> > 
-> > (qemu) migrate -d exec:cat>out
-> > Unable to open return-path for postcopy
+> > What's your opinion with Tianyu's question? Is it accepatable
+> > to use VFIO API in intel_iommu emulator?
 > 
-> This is wrong - post-copy migration *can* work with exec: - it just entirely
-> depends on what command you are running. Your example ran a command which is
-> unidirectional, but if you ran 'exec:socat ...' you would have a fully
-> bidirectional channel. Actually the channel is always bi-directional, but
-> 'cat' simply won't ever send data back to QEMU.
+> Did you actually need such translation at all? SID should be
+> filled by kernel IOMMU driver based on which device is
+> requested with invalidation request, regardless of which 
+> guest SID is used in user space. Qemu only needs to know
+> which fd corresponds to guest SID, and then initiates an
+> invalidation request on that fd?
 
-Indeed. I should not block postcopy if the user used a TCP tunnel
-between the source and destination in some way, using this exec: way.
-Thanks for pointing that out.
+Kevin,
 
-However I still think the idea is needed here. Say, we'd better know
-whether the transport would be able to respond (though current
-approach of "assuming sockets are the only ones that can reply" is not
-a good solution...). Please see below.
+It actually depends on the svm binding behavior we expect in host
+IOMMU driver side. If we want to have the binding per-device, this
+translation is needed in Qemu either in VFIO or intel_iommu emulator.
+So that the host SID could be used as a device selector when looping
+devices in a group.
 
-> 
-> If QEMU hangs when the other end doesn't send data back, that actually seems
-> like a potentially serious bug in migration code. Even if using the normal
-> 'tcp' migration protocol, if the target QEMU server hangs and fails to
-> send data to QEMU on the return path, the source QEMU must never hang.
-
-Firstly I should not say it's a hang - it's actually by-design here
-imho - migration thread is in the last phase now, waiting for a SHUT
-message from destination (which I think is wise). But from the
-behavior, indeed src VM is not usable during the time, just like what
-happened for most postcopy cases on the source side. So, we can see
-that postcopy "assumes" that destination side can reply now.
-
-Meanwhile, I see it reasonable for postcopy to have such an
-assumption. After all, postcopy means "start VM on destination before
-pages are moved over completely", then there must be someone to reply
-to source, no matter whether it'll be via some kind of io channel.
-
-That's why I think we still need the general idea here, that we need
-to know whether destination end is able to reply.
-
-But, I still have no good idea (after knowing this patch won't work)
-on how we can do this... Any further suggestions would be greatly
-welcomed.
+If we can use VFIO API directly, we also may trigger the svm bind/qi
+propagation straightforwardly instead of using notifier.
 
 Thanks,
-
--- 
-Peter Xu
+Yi L
+ 
+> > 
+> > Thanks,
+> > Yi L
+> > On Fri, Apr 28, 2017 at 02:46:16PM +0800, Lan Tianyu wrote:
+> > > On 2017年04月26日 18:06, Liu, Yi L wrote:
+> > > > With vIOMMU exposed to guest, vIOMMU emulator needs to do
+> > translation
+> > > > between host and guest. e.g. a device-selective TLB flush, vIOMMU
+> > > > emulator needs to replace guest SID with host SID so that to limit
+> > > > the invalidation. This patch introduces a new callback
+> > > > iommu_ops->record_device() to notify vIOMMU emulator to record
+> > necessary
+> > > > information about the assigned device.
+> > >
+> > > This patch is to prepare to translate guest sbdf to host sbdf.
+> > >
+> > > Alex:
+> > > 	Could we add a new vfio API to do such translation? This will be more
+> > > straight forward than storing host sbdf in the vIOMMU device model.
+> > >
+> > > >
+> > > > Signed-off-by: Liu, Yi L <yi.l.liu@linux.intel.com>
+> > > > ---
+> > > >  include/exec/memory.h | 11 +++++++++++
+> > > >  memory.c              | 12 ++++++++++++
+> > > >  2 files changed, 23 insertions(+)
+> > > >
+> > > > diff --git a/include/exec/memory.h b/include/exec/memory.h
+> > > > index 7bd13ab..49087ef 100644
+> > > > --- a/include/exec/memory.h
+> > > > +++ b/include/exec/memory.h
+> > > > @@ -203,6 +203,8 @@ struct MemoryRegionIOMMUOps {
+> > > >                                  IOMMUNotifierFlag new_flags);
+> > > >      /* Set this up to provide customized IOMMU replay function */
+> > > >      void (*replay)(MemoryRegion *iommu, IOMMUNotifier *notifier);
+> > > > +    void (*record_device)(MemoryRegion *iommu,
+> > > > +                          void *device_info);
+> > > >  };
+> > > >
+> > > >  typedef struct CoalescedMemoryRange CoalescedMemoryRange;
+> > > > @@ -708,6 +710,15 @@ void
+> > memory_region_notify_iommu(MemoryRegion *mr,
+> > > >  void memory_region_notify_one(IOMMUNotifier *notifier,
+> > > >                                IOMMUTLBEntry *entry);
+> > > >
+> > > > +/*
+> > > > + * memory_region_notify_device_record: notify IOMMU to record
+> > assign
+> > > > + * device.
+> > > > + * @mr: the memory region to notify
+> > > > + * @ device_info: device information
+> > > > + */
+> > > > +void memory_region_notify_device_record(MemoryRegion *mr,
+> > > > +                                        void *info);
+> > > > +
+> > > >  /**
+> > > >   * memory_region_register_iommu_notifier: register a notifier for
+> > changes to
+> > > >   * IOMMU translation entries.
+> > > > diff --git a/memory.c b/memory.c
+> > > > index 0728e62..45ef069 100644
+> > > > --- a/memory.c
+> > > > +++ b/memory.c
+> > > > @@ -1600,6 +1600,18 @@ static void
+> > memory_region_update_iommu_notify_flags(MemoryRegion *mr)
+> > > >      mr->iommu_notify_flags = flags;
+> > > >  }
+> > > >
+> > > > +void memory_region_notify_device_record(MemoryRegion *mr,
+> > > > +                                        void *info)
+> > > > +{
+> > > > +    assert(memory_region_is_iommu(mr));
+> > > > +
+> > > > +    if (mr->iommu_ops->record_device) {
+> > > > +        mr->iommu_ops->record_device(mr, info);
+> > > > +    }
+> > > > +
+> > > > +    return;
+> > > > +}
+> > > > +
+> > > >  void memory_region_register_iommu_notifier(MemoryRegion *mr,
+> > > >                                             IOMMUNotifier *n)
+> > > >  {
+> > > >
+> > >
+> > >
