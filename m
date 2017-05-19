@@ -1,26 +1,44 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38498)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41114)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1dBkEu-0006Lu-PC
-	for qemu-devel@nongnu.org; Fri, 19 May 2017 11:54:53 -0400
+	(envelope-from <pasic@linux.vnet.ibm.com>) id 1dBkKQ-000802-74
+	for qemu-devel@nongnu.org; Fri, 19 May 2017 12:00:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1dBkEq-0007UY-JH
-	for qemu-devel@nongnu.org; Fri, 19 May 2017 11:54:52 -0400
-Received: from mail-wm0-x241.google.com ([2a00:1450:400c:c09::241]:36727)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1dBkEq-0007UB-CI
-	for qemu-devel@nongnu.org; Fri, 19 May 2017 11:54:48 -0400
-Received: by mail-wm0-x241.google.com with SMTP id k15so17828413wmh.3
-	for <qemu-devel@nongnu.org>; Fri, 19 May 2017 08:54:48 -0700 (PDT)
-Date: Fri, 19 May 2017 16:54:45 +0100
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20170519155445.GF30573@stefanha-x1.localdomain>
-References: <20170519112415.19191-1-kraxel@redhat.com>
+	(envelope-from <pasic@linux.vnet.ibm.com>) id 1dBkKM-0002to-8e
+	for qemu-devel@nongnu.org; Fri, 19 May 2017 12:00:34 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:33736)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pasic@linux.vnet.ibm.com>)
+	id 1dBkKL-0002tK-TN
+	for qemu-devel@nongnu.org; Fri, 19 May 2017 12:00:30 -0400
+Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v4JFwmSN006254
+	for <qemu-devel@nongnu.org>; Fri, 19 May 2017 12:00:27 -0400
+Received: from e06smtp15.uk.ibm.com (e06smtp15.uk.ibm.com [195.75.94.111])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2ahw463n99-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Fri, 19 May 2017 12:00:27 -0400
+Received: from localhost
+	by e06smtp15.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <pasic@linux.vnet.ibm.com>;
+	Fri, 19 May 2017 17:00:21 +0100
+References: <20170505173507.74077-1-pasic@linux.vnet.ibm.com>
+	<20170505173507.74077-4-pasic@linux.vnet.ibm.com>
+	<20170508164505.GG2120@work-vm>
+	<3e0195e2-ada5-2efc-1feb-e2415761e7bc@linux.vnet.ibm.com>
+	<20170515180129.GC2324@work-vm>
+	<2bf9d9d3-86ed-da36-dc81-415065e08a91@linux.vnet.ibm.com>
+	<20170519145502.GQ2081@work-vm>
+From: Halil Pasic <pasic@linux.vnet.ibm.com>
+Date: Fri, 19 May 2017 18:00:16 +0200
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="vA66WO2vHvL/CRSR"
-Content-Disposition: inline
-In-Reply-To: <20170519112415.19191-1-kraxel@redhat.com>
-Subject: Re: [Qemu-devel] [PULL 0/3] audio patch queue.
+In-Reply-To: <20170519145502.GQ2081@work-vm>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+Message-Id: <5a2c4261-c97e-0b0c-24c5-0500948be0e9@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH 03/10] s390x/css: add vmstate entities for
+ css
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,87 +47,245 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: Cornelia Huck <cornelia.huck@de.ibm.com>, qemu-devel@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>
 
 
---vA66WO2vHvL/CRSR
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
 
-On Fri, May 19, 2017 at 01:24:12PM +0200, Gerd Hoffmann wrote:
->   Hi,
->=20
-> Smallish audio patch queue, renaming moving soundhw init code.
->=20
-> please pull,
->   Gerd
->=20
-> The following changes since commit 56821559f0ba682fe6b367815572e6f974d329=
-ab:
->=20
->   Merge remote-tracking branch 'dgilbert/tags/pull-hmp-20170517' into sta=
-ging (2017-05-18 13:36:15 +0100)
->=20
-> are available in the git repository at:
->=20
->   git://git.kraxel.org/qemu tags/pull-audio-20170519-1
->=20
-> for you to fetch changes up to 8a824e4d74213a2da39323304f949c5b4243e1fb:
->=20
->   audio: Rename hw/audio/audio.h to hw/audio/soundhw.h (2017-05-19 10:48:=
-54 +0200)
->=20
-> ----------------------------------------------------------------
-> audio: move & rename soundhw init code.
->=20
-> ----------------------------------------------------------------
-> Eduardo Habkost (3):
->       audio: Move arch_init audio code to hw/audio/soundhw.c
->       audio: Rename audio_init() to soundhw_init()
->       audio: Rename hw/audio/audio.h to hw/audio/soundhw.h
->=20
->  include/hw/audio/{audio.h =3D> soundhw.h} |   3 +
->  include/sysemu/arch_init.h              |   2 -
->  arch_init.c                             | 126 +-------------------------
->  hw/audio/ac97.c                         |   2 +-
->  hw/audio/adlib.c                        |   2 +-
->  hw/audio/cs4231a.c                      |   2 +-
->  hw/audio/es1370.c                       |   2 +-
->  hw/audio/gus.c                          |   2 +-
->  hw/audio/intel-hda.c                    |   2 +-
->  hw/audio/pcspk.c                        |   2 +-
->  hw/audio/sb16.c                         |   2 +-
->  hw/audio/soundhw.c                      | 156 ++++++++++++++++++++++++++=
-++++++
->  hw/ppc/prep.c                           |   3 +-
->  vl.c                                    |   3 +-
->  hw/audio/Makefile.objs                  |   2 +
->  15 files changed, 174 insertions(+), 137 deletions(-)
->  rename include/hw/audio/{audio.h =3D> soundhw.h} (81%)
->  create mode 100644 hw/audio/soundhw.c
->=20
+On 05/19/2017 04:55 PM, Dr. David Alan Gilbert wrote:
+> * Halil Pasic (pasic@linux.vnet.ibm.com) wrote:
+>>
+>>
+>> On 05/15/2017 08:01 PM, Dr. David Alan Gilbert wrote:
+>>> * Halil Pasic (pasic@linux.vnet.ibm.com) wrote:
+>>>>
+>>>>
+>>>> On 05/08/2017 06:45 PM, Dr. David Alan Gilbert wrote:
+>>>>> * Halil Pasic (pasic@linux.vnet.ibm.com) wrote:
+>>>>>> As a preparation for switching to a vmstate based migration let us
+>>>>>> introduce vmstate entities (e.g. VMStateDescription) for the css entities
+>>>>>> to be migrated. Alongside some comments explaining or indicating the not
+>>>>>> migration of certain members are introduced too.
+>>>>>>
+>>>>>> No changes in behavior, we just added some dead code -- which should
+>>>>>> rise to life soon.
+>>>>>>
+>>>>>> Signed-off-by: Halil Pasic <pasic@linux.vnet.ibm.com>
+>>>>>> ---
+>>>>>>  hw/s390x/css.c         | 276 +++++++++++++++++++++++++++++++++++++++++++++++++
+>>>>>>  include/hw/s390x/css.h |  10 +-
+>>>>>>  2 files changed, 285 insertions(+), 1 deletion(-)
+>>>>>>
+>>>>>> diff --git a/hw/s390x/css.c b/hw/s390x/css.c
+>>>>>> index c03bb20..2bda7d0 100644
+>>>>>> --- a/hw/s390x/css.c
+>>>>>> +++ b/hw/s390x/css.c
+>>>>>> @@ -20,29 +20,231 @@
+>>>>>>  #include "hw/s390x/css.h"
+>>>>>>  #include "trace.h"
+>>>>>>  #include "hw/s390x/s390_flic.h"
+>>>>>> +#include "hw/s390x/s390-virtio-ccw.h"
+>>>>>>  
+>>>>
+>>>> [..]
+>>>>
+>>>>>> +static int css_get_ind_addr(QEMUFile *f, void *pv, size_t size,
+>>>>>> +                            VMStateField *field)
+>>>>>> +{
+>>>>>> +    int32_t len;
+>>>>>> +    IndAddr **ind_addr = pv;
+>>>>>> +
+>>>>>> +    len = qemu_get_be32(f);
+>>>>>> +    if (len != 0) {
+>>>>>> +        *ind_addr = get_indicator(qemu_get_be64(f), len);
+>>>>>> +    } else {
+>>>>>> +        qemu_get_be64(f);
+>>>>>> +        *ind_addr = NULL;
+>>>>>> +    }
+>>>>>> +    return 0;
+>>>>>> +}
+>>>>>> +
+>>>>>> +static int css_put_ind_addr(QEMUFile *f, void *pv, size_t size,
+>>>>>> +                            VMStateField *field, QJSON *vmdesc)
+>>>>>> +{
+>>>>>> +    IndAddr *ind_addr = *(IndAddr **) pv;
+>>>>>> +
+>>>>>> +    if (ind_addr != NULL) {
+>>>>>> +        qemu_put_be32(f, ind_addr->len);
+>>>>>> +        qemu_put_be64(f, ind_addr->addr);
+>>>>>> +    } else {
+>>>>>> +        qemu_put_be32(f, 0);
+>>>>>> +        qemu_put_be64(f, 0UL);
+>>>>>> +    }
+>>>>>> +    return 0;
+>>>>>> +}
+>>>>>> +
+>>>>>> +const VMStateInfo vmstate_info_ind_addr = {
+>>>>>> +    .name = "s390_ind_addr",
+>>>>>> +    .get = css_get_ind_addr,
+>>>>>> +    .put = css_put_ind_addr
+>>>>>> +};
+>>>>>
+>>>>> You should be able to avoid this .get/.put by using VMSTATE_WITH_TMP,
+>>>>> declare a temporary struct something like:
+>>>>>   struct tmp_ind_addr {
+>>>>>      IndAddr *parent;
+>>>>>      uint32_t  len;
+>>>>>      uint64_t  addr;
+>>>>>   }
+>>>>>
+>>>>> and then your .get/.put routines turn into pre_save/post_load
+>>>>> routines to just setup the len/addr.
+>>>>>
+>>>>
+>>>> I don't think this is going to work -- unfortunately! You can see below,
+>>>> how this IndAddr* migration stuff is supposed to be used:
+>>>> the client code just uses the VMSTATE_PTR_TO_IND_ADDR macro as a
+>>>> field when describing state which needs and IndAddr* migrated.
+>>>>
+>>>> The problem is, we do not know in what state will this field
+>>>> be embedded, the pre_save/post_load called by put_tmp/get_tmp
+>>>> is however copying the pointer to this state into the parent.
+>>>> So instead of having a pointer to IndAddr* in those functions
+>>>> and updating it accordingly, I would have to find the IndAddr*
+>>>> in some arbitrary state (in our case VirtioCcwDevice) first,
+>>>> and I lack information for that.
+>>>>
+>>>> If it's hard to follow I can give you the patch I was debugging
+>>>> to come to this conclusion. (By the way I ended up with 10
+>>>> lines of code more than in this version, and although I think
+>>>> it looks nicer, it's simpler only if one knows how WITH_TMP
+>>>> works. My plan was to ask you which version do you like more
+>>>> and go with that before I realized it ain't gonna work.)
+>>>>
+>>>
+>>> Yes, I see - I've got some similar other cases; the challenge
+>>> is it's a custom allocator - 'get_indicator' - and it's used
+>>> as fields in a few places.  Hmm.
+>>>
+>>>
+>>
+>> The problem can be worked around by wrapping the WITH_TMP into a another
+>> vmsd and using VMSTATE_STRUCT for describing the field in question. It's
+>> quite some boilerplate (+16 lines). Should I post the patch here?
+> 
+> Yes please.
+> 
+--------------------------------8<------------------------------------------
 
-Coding style violations are pre-existing.  That's fine.
+>From a0b6c725b114745c8434f683133995c4e33d936e Mon Sep 17 00:00:00 2001
+From: Halil Pasic <pasic@linux.vnet.ibm.com>
+Date: Tue, 9 May 2017 12:06:42 +0200
+Subject: [PATCH 1/1] s390x/css: replace info with VMSTATE_WITH_TMP
 
-Thanks, applied to my staging tree:
-https://github.com/stefanha/qemu/commits/staging
+Convert s VMSatateInfo based solution manipulating the migration stream
+directly to VMSTATE_WITH_TMP witch keeps IO and transformation logic
+separate.
 
-Stefan
+Signed-off-by: Halil Pasic <pasic@linux.vnet.ibm.com>
+---
+ hw/s390x/css.c         | 56 ++++++++++++++++++++++++++++++++------------------
+ include/hw/s390x/css.h |  4 ++--
+ 2 files changed, 38 insertions(+), 22 deletions(-)
 
---vA66WO2vHvL/CRSR
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJZHxVFAAoJEJykq7OBq3PIkoQH/jNaIVXKBfgghBgr0QtaXsKG
-zW2n3Pkky3SjsYisXBbs1PzoqtZU6DI9OqTc8L3XiJq8z9Ggo5vCdPI6GbfXMjLS
-3mve0DvhNRo7W1LAF8A0R2Eoat5LgTw/Tx/1igMUMVgviP3jTLB4032QFjpbsq7j
-pdR1qeDlELGdpPBXc4ATCDYk/S/pXecPn4mC8SgHspVnUmmTH7ip9TnSUwnPSZUj
-9db9S0uyRfOcrICmAxUr3eHwShLJePFtoEyC1gGgbcs0g7EQeglhcVWFYxM0FNKv
-JgVINiTq4jLMtHu3VWJ85BDOZMxJHfcZPdzoHUPdF7aUdtnbbq9NTx0mjogWWFo=
-=wj4M
------END PGP SIGNATURE-----
-
---vA66WO2vHvL/CRSR--
+diff --git a/hw/s390x/css.c b/hw/s390x/css.c
+index 694365b395..71d1b95e3f 100644
+--- a/hw/s390x/css.c
++++ b/hw/s390x/css.c
+@@ -224,41 +224,57 @@ const VMStateDescription vmstate_subch_dev = {
+     }
+ };
+ 
+-static int css_get_ind_addr(QEMUFile *f, void *pv, size_t size,
+-                            VMStateField *field)
+-{
++typedef struct IndAddrPtrTmp {
++    IndAddr **parent;
++    uint64_t addr;
+     int32_t len;
+-    IndAddr **ind_addr = pv;
++} IndAddrPtrTmp;
+ 
+-    len = qemu_get_be32(f);
+-    if (len != 0) {
+-        *ind_addr = get_indicator(qemu_get_be64(f), len);
++static int post_load_ind_addr(void *opaque, int version_id)
++{
++    IndAddrPtrTmp *ptmp = opaque;
++    IndAddr **ind_addr = ptmp->parent;
++
++    if (ptmp->len != 0) {
++        *ind_addr = get_indicator(ptmp->addr, ptmp->len);
+     } else {
+-        qemu_get_be64(f);
+         *ind_addr = NULL;
+     }
+     return 0;
+ }
+ 
+-static int css_put_ind_addr(QEMUFile *f, void *pv, size_t size,
+-                            VMStateField *field, QJSON *vmdesc)
++static void pre_save_ind_addr(void *opaque)
+ {
+-    IndAddr *ind_addr = *(IndAddr **) pv;
++    IndAddrPtrTmp *ptmp = opaque;
++    IndAddr *ind_addr = *(ptmp->parent);
+ 
+     if (ind_addr != NULL) {
+-        qemu_put_be32(f, ind_addr->len);
+-        qemu_put_be64(f, ind_addr->addr);
++        ptmp->len = ind_addr->len;
++        ptmp->addr = ind_addr->addr;
+     } else {
+-        qemu_put_be32(f, 0);
+-        qemu_put_be64(f, 0UL);
++        ptmp->len = 0;
++        ptmp->addr = 0L;
+     }
+-    return 0;
+ }
+ 
+-const VMStateInfo vmstate_info_ind_addr = {
+-    .name = "s390_ind_addr",
+-    .get = css_get_ind_addr,
+-    .put = css_put_ind_addr
++const VMStateDescription vmstate_ind_addr_tmp = {
++    .name = "s390_ind_addr_tmp",
++    .pre_save = pre_save_ind_addr,
++    .post_load = post_load_ind_addr,
++
++    .fields = (VMStateField[]) {
++        VMSTATE_INT32(len, IndAddrPtrTmp),
++        VMSTATE_UINT64(addr, IndAddrPtrTmp),
++        VMSTATE_END_OF_LIST()
++    }
++};
++
++const VMStateDescription vmstate_ind_addr = {
++    .name = "s390_ind_addr_tmp",
++    .fields = (VMStateField[]) {
++        VMSTATE_WITH_TMP(IndAddr*, IndAddrPtrTmp, vmstate_ind_addr_tmp),
++        VMSTATE_END_OF_LIST()
++    }
+ };
+ 
+ typedef struct CssImage {
+diff --git a/include/hw/s390x/css.h b/include/hw/s390x/css.h
+index be5eb81ece..efe7cafef0 100644
+--- a/include/hw/s390x/css.h
++++ b/include/hw/s390x/css.h
+@@ -106,10 +106,10 @@ typedef struct IndAddr {
+     QTAILQ_ENTRY(IndAddr) sibling;
+ } IndAddr;
+ 
+-extern const VMStateInfo vmstate_info_ind_addr;
++extern const VMStateDescription vmstate_ind_addr;
+ 
+ #define VMSTATE_PTR_TO_IND_ADDR(_f, _s)                                   \
+-    VMSTATE_SINGLE(_f, _s, 1 , vmstate_info_ind_addr, IndAddr*)
++    VMSTATE_STRUCT(_f, _s, 1, vmstate_ind_addr, IndAddr*)
+ 
+ IndAddr *get_indicator(hwaddr ind_addr, int len);
+ void release_indicator(AdapterInfo *adapter, IndAddr *indicator);
+-- 
+2.11.2
