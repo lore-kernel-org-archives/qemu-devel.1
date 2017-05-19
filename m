@@ -1,23 +1,44 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44611)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50549)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1dBkVg-0004n7-Fu
-	for qemu-devel@nongnu.org; Fri, 19 May 2017 12:12:13 -0400
+	(envelope-from <pasic@linux.vnet.ibm.com>) id 1dBkqo-0008Uu-Iv
+	for qemu-devel@nongnu.org; Fri, 19 May 2017 12:34:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1dBkVc-0007z6-DE
-	for qemu-devel@nongnu.org; Fri, 19 May 2017 12:12:12 -0400
-Received: from chuckie.co.uk ([82.165.15.123]:59759
-	helo=s16892447.onlinehome-server.info)
+	(envelope-from <pasic@linux.vnet.ibm.com>) id 1dBkql-0000um-Dr
+	for qemu-devel@nongnu.org; Fri, 19 May 2017 12:34:02 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:59351)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
-	id 1dBkVc-0007yr-6Q
-	for qemu-devel@nongnu.org; Fri, 19 May 2017 12:12:08 -0400
-Date: Fri, 19 May 2017 17:11:56 +0100
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Message-ID: <20170519161156.GB6895@kentang.lan>
+	(Exim 4.71) (envelope-from <pasic@linux.vnet.ibm.com>)
+	id 1dBkql-0000uM-4z
+	for qemu-devel@nongnu.org; Fri, 19 May 2017 12:33:59 -0400
+Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v4JGU6Fn062075
+	for <qemu-devel@nongnu.org>; Fri, 19 May 2017 12:33:57 -0400
+Received: from e06smtp12.uk.ibm.com (e06smtp12.uk.ibm.com [195.75.94.108])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2ahrwnf9bu-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Fri, 19 May 2017 12:33:56 -0400
+Received: from localhost
+	by e06smtp12.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <pasic@linux.vnet.ibm.com>;
+	Fri, 19 May 2017 17:33:54 +0100
+References: <20170505173507.74077-1-pasic@linux.vnet.ibm.com>
+	<20170505173507.74077-4-pasic@linux.vnet.ibm.com>
+	<20170508164505.GG2120@work-vm>
+	<3e0195e2-ada5-2efc-1feb-e2415761e7bc@linux.vnet.ibm.com>
+	<20170515180129.GC2324@work-vm>
+	<2bf9d9d3-86ed-da36-dc81-415065e08a91@linux.vnet.ibm.com>
+	<20170519145502.GQ2081@work-vm>
+From: Halil Pasic <pasic@linux.vnet.ibm.com>
+Date: Fri, 19 May 2017 18:33:52 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Subject: [Qemu-devel] [PULL] Update OpenBIOS images
+In-Reply-To: <20170519145502.GQ2081@work-vm>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 8bit
+Message-Id: <1ef8e6c0-02c6-5208-151a-01bcbf7acfe4@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH 03/10] s390x/css: add vmstate entities for
+ css
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,41 +47,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: stefanha@gmail.com, qemu-devel@nongnu.org
-
-Hi Stefan,
-
-This update contains the OpenBIOS VGA driver updates required to enable Ben's QemuMacDrivers
-for Mac guests. Please pull.
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: Cornelia Huck <cornelia.huck@de.ibm.com>, qemu-devel@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>
 
 
-ATB,
 
-Mark.
+On 05/19/2017 04:55 PM, Dr. David Alan Gilbert wrote:
+>> We could also consider making WITH_TMP act as a normal field. 
+>> Working on the whole state looks like a bit like a corner case:
+>> we have some stuff adjacent in the migration stream, and we have
+>> to map it on multiple fields (and vice-versa). Getting the whole
+>> state with a pointer to a certain field could work via container_of.
+> You do need to know which field you're working on to be able to safely
+> use container_of, so I'm not sure how it would work for you in this
+> case.
 
 
-The following changes since commit 56821559f0ba682fe6b367815572e6f974d329ab:
+Well, if you have to write to just one field you are good because you
+already have a pointer to that field (.offset was added).
 
-  Merge remote-tracking branch 'dgilbert/tags/pull-hmp-20170517' into staging (2017-05-18 13:36:15 +0100)
+If you need to write to multiple fields in post_load then you just pick
+one of the fields you are going to write to (probably the first) and use
+container_of to gain access to the whole state. The logic is specific to
+the bunch of the fields you are going to touch anyway.
 
-are available in the git repository at:
+In fact any member of the state struct will do it's only important that
+you use the same when creating the VMStateField and when trying to get a
+pointer to the parent in pre_save and post_load.
 
+I haven't tried, so I'm not 100% sure, but if you like I can try, and send
+you a patch if it's viable. 
 
-  https://github.com/mcayland/qemu.git tags/qemu-openbios-signed
+I think the key to a good solution is really what is intended and typical
+usage, and what is corner case. My patch in the other reply shows that we
+can do without changing the ways of VMSTATE_WITH_TMP. I think we can make
+what I'm trying to do here a bit prettier at the expense of making what
+you are doing in virtio-net a bit uglier, but whether it's a good idea to
+do so, I cant tell.
 
-for you to fetch changes up to 415c3824836d3b65a5796a81b17fccd1ad575ff8:
+> 
+> The other thought I'd had was that perhaps we could change the temporary
+> structure in VMSTATE_WITH_TMP to:
+> 
+>   struct foo {
+>      struct whatever **parent;
+> 
+> so now you could write to *parent in cases like these.
+>
 
-  Update OpenBIOS images to 3ebaaa2 built from submodule. (2017-05-19 16:52:40 +0100)
+Sorry, I do not get your idea. If you have some WIP patch in this
+direction I would be happy to provide some feedback.
 
-----------------------------------------------------------------
-Update OpenBIOS images
+ 
+>> Btw, I would rather call it get_indicator a factory method or even a
+>> constructor than an allocator, but I think we understand each-other
+>> anyway.
+> Yes; I'm not too worried about the actual name as long as it's short
+> and obvious.
+> 
+> I'd thought of 'allocator' since in most cases it's used where the
+> load-time code allocates memory for the object being loaded.
+> A constructor is normally something I think of as happening after
+> allocation; and a factory, hmm maybe.  However, if it does the right
+> thing I wouldn't object to any of those names.
+> 
 
-----------------------------------------------------------------
-Mark Cave-Ayland (1):
-      Update OpenBIOS images to 3ebaaa2 built from submodule.
+I think we are on the same page.
 
- pc-bios/openbios-ppc     |  Bin 750840 -> 750840 bytes
- pc-bios/openbios-sparc32 |  Bin 382048 -> 382048 bytes
- pc-bios/openbios-sparc64 |  Bin 1593408 -> 1593408 bytes
- roms/openbios            |    2 +-
- 4 files changed, 1 insertion(+), 1 deletion(-)
+Cheers,
+Halil
+
+> Dave
