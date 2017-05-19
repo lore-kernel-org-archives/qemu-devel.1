@@ -1,25 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49390)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49367)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1dBfyJ-0004LM-CJ
-	for qemu-devel@nongnu.org; Fri, 19 May 2017 07:21:28 -0400
+	(envelope-from <paolo.bonzini@gmail.com>) id 1dBfyH-0004Is-8d
+	for qemu-devel@nongnu.org; Fri, 19 May 2017 07:21:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1dBfyI-0000wE-AT
-	for qemu-devel@nongnu.org; Fri, 19 May 2017 07:21:27 -0400
-Received: from mail-wm0-x244.google.com ([2a00:1450:400c:c09::244]:32772)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1dBfyG-0000vO-Df
+	for qemu-devel@nongnu.org; Fri, 19 May 2017 07:21:25 -0400
+Received: from mail-wm0-x242.google.com ([2a00:1450:400c:c09::242]:33971)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1dBfyI-0000vy-3X
-	for qemu-devel@nongnu.org; Fri, 19 May 2017 07:21:26 -0400
-Received: by mail-wm0-x244.google.com with SMTP id b84so1792230wmh.0
-	for <qemu-devel@nongnu.org>; Fri, 19 May 2017 04:21:26 -0700 (PDT)
+	id 1dBfyG-0000v8-7L
+	for qemu-devel@nongnu.org; Fri, 19 May 2017 07:21:24 -0400
+Received: by mail-wm0-x242.google.com with SMTP id d127so17622354wmf.1
+	for <qemu-devel@nongnu.org>; Fri, 19 May 2017 04:21:24 -0700 (PDT)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Fri, 19 May 2017 13:21:00 +0200
-Message-Id: <1495192872-27667-9-git-send-email-pbonzini@redhat.com>
+Date: Fri, 19 May 2017 13:20:58 +0200
+Message-Id: <1495192872-27667-7-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1495192872-27667-1-git-send-email-pbonzini@redhat.com>
 References: <1495192872-27667-1-git-send-email-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PULL 08/20] kvm: irqchip: skip update msi when
- disabled
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PULL 06/20] kvm: irqchip: trace changes on msi
+ add/remove
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,61 +36,56 @@ Cc: Peter Xu <peterx@redhat.com>
 
 From: Peter Xu <peterx@redhat.com>
 
-It's possible that one device kept its irqfd/virq there even when
-MSI/MSIX was disabled globally for that device. One example is
-virtio-net-pci (see commit f1d0f15a6 and virtio_pci_vq_vector_mask()).
-It is used as a fast path to avoid allocate/release irqfd/virq
-frequently when guest enables/disables MSIX.
+It'll be nice to know which virq belongs to which device/vector when
+adding msi routes, so adding two more parameters for the add trace.
 
-However, this fast path brought a problem to msi_route_list, that the
-device MSIRouteEntry is still dangling there even if MSIX disabled -
-then we cannot know which message to fetch, even if we can, the messages
-are meaningless. In this case, we can just simply ignore this entry.
-
-It's safe, since when MSIX is enabled again, we'll rebuild them no
-matter what.
-
-Fixes: https://bugzilla.redhat.com/show_bug.cgi?id=1448813
+Meanwhile, releasing virq has no tracing before. Add one for it.
 
 Signed-off-by: Peter Xu <peterx@redhat.com>
-Message-Id: <1494309644-18743-4-git-send-email-peterx@redhat.com>
+Message-Id: <1494309644-18743-2-git-send-email-peterx@redhat.com>
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- target/i386/kvm.c | 12 +++++++++---
- 1 file changed, 9 insertions(+), 3 deletions(-)
+ kvm-all.c    | 4 +++-
+ trace-events | 3 ++-
+ 2 files changed, 5 insertions(+), 2 deletions(-)
 
-diff --git a/target/i386/kvm.c b/target/i386/kvm.c
-index 011d4a5..82c72d2 100644
---- a/target/i386/kvm.c
-+++ b/target/i386/kvm.c
-@@ -43,6 +43,7 @@
- #include "standard-headers/asm-x86/hyperv.h"
- #include "hw/pci/pci.h"
- #include "hw/pci/msi.h"
-+#include "hw/pci/msix.h"
- #include "migration/blocker.h"
- #include "exec/memattrs.h"
- #include "trace.h"
-@@ -3510,12 +3511,17 @@ static void kvm_update_msi_routes_all(void *private, bool global,
-     int cnt = 0;
-     MSIRouteEntry *entry;
-     MSIMessage msg;
-+    PCIDevice *dev;
-+
-     /* TODO: explicit route update */
-     QLIST_FOREACH(entry, &msi_route_list, list) {
-         cnt++;
--        msg = pci_get_msi_message(entry->dev, entry->vector);
--        kvm_irqchip_update_msi_route(kvm_state, entry->virq,
--                                     msg, entry->dev);
-+        dev = entry->dev;
-+        if (!msix_enabled(dev) && !msi_enabled(dev)) {
-+            continue;
-+        }
-+        msg = pci_get_msi_message(dev, entry->vector);
-+        kvm_irqchip_update_msi_route(kvm_state, entry->virq, msg, dev);
+diff --git a/kvm-all.c b/kvm-all.c
+index 90b8573..2598b1f 100644
+--- a/kvm-all.c
++++ b/kvm-all.c
+@@ -1144,6 +1144,7 @@ void kvm_irqchip_release_virq(KVMState *s, int virq)
      }
-     kvm_irqchip_commit_routes(kvm_state);
-     trace_kvm_x86_update_msi_routes(cnt);
+     clear_gsi(s, virq);
+     kvm_arch_release_virq_post(virq);
++    trace_kvm_irqchip_release_virq(virq);
+ }
+ 
+ static unsigned int kvm_hash_msi(uint32_t data)
+@@ -1287,7 +1288,8 @@ int kvm_irqchip_add_msi_route(KVMState *s, int vector, PCIDevice *dev)
+         return -EINVAL;
+     }
+ 
+-    trace_kvm_irqchip_add_msi_route(virq);
++    trace_kvm_irqchip_add_msi_route(dev ? dev->name : (char *)"N/A",
++                                    vector, virq);
+ 
+     kvm_add_routing_entry(s, &kroute);
+     kvm_arch_add_msi_route_post(&kroute, vector, dev);
+diff --git a/trace-events b/trace-events
+index e582d63..f01ec05 100644
+--- a/trace-events
++++ b/trace-events
+@@ -69,8 +69,9 @@ kvm_device_ioctl(int fd, int type, void *arg) "dev fd %d, type 0x%x, arg %p"
+ kvm_failed_reg_get(uint64_t id, const char *msg) "Warning: Unable to retrieve ONEREG %" PRIu64 " from KVM: %s"
+ kvm_failed_reg_set(uint64_t id, const char *msg) "Warning: Unable to set ONEREG %" PRIu64 " to KVM: %s"
+ kvm_irqchip_commit_routes(void) ""
+-kvm_irqchip_add_msi_route(int virq) "Adding MSI route virq=%d"
++kvm_irqchip_add_msi_route(char *name, int vector, int virq) "dev %s vector %d virq %d"
+ kvm_irqchip_update_msi_route(int virq) "Updating MSI route virq=%d"
++kvm_irqchip_release_virq(int virq) "virq %d"
+ 
+ # TCG related tracing (mostly disabled by default)
+ # cpu-exec.c
 -- 
 1.8.3.1
