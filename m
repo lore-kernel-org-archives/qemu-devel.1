@@ -1,31 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38157)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40778)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1dBbiC-0004Jr-Em
-	for qemu-devel@nongnu.org; Fri, 19 May 2017 02:48:33 -0400
+	(envelope-from <thuth@redhat.com>) id 1dBbtc-0007qD-D5
+	for qemu-devel@nongnu.org; Fri, 19 May 2017 03:00:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1dBbiB-0005UE-5x
-	for qemu-devel@nongnu.org; Fri, 19 May 2017 02:48:32 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60416)
+	(envelope-from <thuth@redhat.com>) id 1dBbtY-0000Dd-G2
+	for qemu-devel@nongnu.org; Fri, 19 May 2017 03:00:20 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:58144)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1dBbiA-0005SR-T1
-	for qemu-devel@nongnu.org; Fri, 19 May 2017 02:48:31 -0400
-References: <20170511123246.31308-1-maxime.coquelin@redhat.com>
-	<20170511123246.31308-7-maxime.coquelin@redhat.com>
-	<20170511203345-mutt-send-email-mst@kernel.org>
-	<62516ce5-9d4c-d021-c4ab-a767c7f07b31@redhat.com>
-	<20170513025938-mutt-send-email-mst@kernel.org>
-	<9f030e52-60ec-0b42-e0d0-6158eebf99d4@redhat.com>
-	<20170516181455-mutt-send-email-mst@kernel.org>
-	<c59af526-a290-1f11-2d34-6fad817a03d1@redhat.com>
-	<779cdcfc-80df-373a-e772-3b14cd49a2ff@redhat.com>
-From: Jason Wang <jasowang@redhat.com>
-Message-ID: <ae30fce9-04d4-18b2-1b4a-fec9772f163c@redhat.com>
-Date: Fri, 19 May 2017 14:48:17 +0800
-MIME-Version: 1.0
-In-Reply-To: <779cdcfc-80df-373a-e772-3b14cd49a2ff@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 6/6] spec/vhost-user spec: Add IOMMU support
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1dBbtY-0000DW-Ac
+	for qemu-devel@nongnu.org; Fri, 19 May 2017 03:00:16 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id CD5897AE9E
+	for <qemu-devel@nongnu.org>; Fri, 19 May 2017 07:00:14 +0000 (UTC)
+From: Thomas Huth <thuth@redhat.com>
+Date: Fri, 19 May 2017 09:00:04 +0200
+Message-Id: <1495177204-16808-1-git-send-email-thuth@redhat.com>
+Subject: [Qemu-devel] [PATCH] usb: Simplify the parameter parsing of the
+ legacy usb serial device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,134 +28,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Maxime Coquelin <maxime.coquelin@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
-Cc: yuanhan.liu@linux.intel.com, qemu-devel@nongnu.org, peterx@redhat.com, marcandre.lureau@gmail.com, wexu@redhat.com, vkaplans@redhat.com, jfreiman@redhat.com
+To: qemu-devel@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>
 
+Coverity complains about the current code, so let's get rid of
+the now unneeded while loop and simply always emit "unrecognized
+serial USB option" for all unsupported options.
 
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+---
+ hw/usb/dev-serial.c | 21 +++++----------------
+ 1 file changed, 5 insertions(+), 16 deletions(-)
 
-On 2017=E5=B9=B405=E6=9C=8817=E6=97=A5 22:10, Maxime Coquelin wrote:
->
->
-> On 05/17/2017 04:53 AM, Jason Wang wrote:
->>
->>
->> On 2017=E5=B9=B405=E6=9C=8816=E6=97=A5 23:16, Michael S. Tsirkin wrote=
-:
->>> On Mon, May 15, 2017 at 01:45:28PM +0800, Jason Wang wrote:
->>>>
->>>> On 2017=E5=B9=B405=E6=9C=8813=E6=97=A5 08:02, Michael S. Tsirkin wro=
-te:
->>>>> On Fri, May 12, 2017 at 04:21:58PM +0200, Maxime Coquelin wrote:
->>>>>> On 05/11/2017 08:25 PM, Michael S. Tsirkin wrote:
->>>>>>> On Thu, May 11, 2017 at 02:32:46PM +0200, Maxime Coquelin wrote:
->>>>>>>> This patch specifies and implements the master/slave communicati=
-on
->>>>>>>> to support device IOTLB in slave.
->>>>>>>>
->>>>>>>> The vhost_iotlb_msg structure introduced for kernel backends is
->>>>>>>> re-used, making the design close between the two backends.
->>>>>>>>
->>>>>>>> An exception is the use of the secondary channel to enable the
->>>>>>>> slave to send IOTLB miss requests to the master.
->>>>>>>>
->>>>>>>> Signed-off-by: Maxime Coquelin <maxime.coquelin@redhat.com>
->>>>>>>> ---
->>>>>>>>     docs/specs/vhost-user.txt | 75=20
->>>>>>>> +++++++++++++++++++++++++++++++++++++++++++++++
->>>>>>>>     hw/virtio/vhost-user.c    | 31 ++++++++++++++++++++
->>>>>>>>     2 files changed, 106 insertions(+)
->>>>>>>>
->>>>>>>> diff --git a/docs/specs/vhost-user.txt b/docs/specs/vhost-user.t=
-xt
->>>>>>>> index 5fa7016..4a1f0c3 100644
->>>>>>>> --- a/docs/specs/vhost-user.txt
->>>>>>>> +++ b/docs/specs/vhost-user.txt
->>>>>>>> @@ -97,6 +97,23 @@ Depending on the request type, payload can be=
-:
->>>>>>>>        log offset: offset from start of supplied file descriptor
->>>>>>>>            where logging starts (i.e. where guest address 0=20
->>>>>>>> would be logged)
->>>>>>>> + * An IOTLB message
->>>>>>>> + ---------------------------------------------------------
->>>>>>>> +   | iova | size | user address | permissions flags | type |
->>>>>>>> + ---------------------------------------------------------
->>>>>>>> +
->>>>>>>> +   IOVA: a 64-bit guest I/O virtual address
->>>>>>> guest -> VM
->>>>>> Ok.
->>>>>>
->>>>>>>> +   Size: a 64-bit size
->>>>>>> How do you specify "all memory"? give special meaning to size 0?
->>>>>> Good point, it does not support all memory currently.
->>>>>> It is not vhost-user specific, but general to the vhost=20
->>>>>> implementation.
->>>>> But iommu needs it to support passthrough.
->>>> Probably not, we will just pass the mappings in vhost_memory_region =
-to
->>>> vhost. Its memory_size is also a __u64.
->>>>
->>>> Thanks
->>> That's different since that's chunks of qemu virtual memory.
->>>
->>> IOMMU maps IOVA to GPA.
->>>
->>
->> But we're in fact cache IOVA -> HVA mapping in the remote IOTLB. When=20
->> passthrough mode is enabled, IOVA =3D=3D GPA, so passing mappings in=20
->> vhost_memory_region should be fine.
->
-> Not sure this is a good idea, because when configured in passthrough,
-> QEMU will see the IOMMU as enabled, so the the VIRTIO_F_IOMMU_PLATFORM
-> feature will be negotiated if both guest and backend support it.
-> So how the backend will know whether it should directly pick the
-> translation directly into the vhost_memory_region, or translate it
-> through the device IOTLB?
-
-This no need for backend to know about this, since IOVA equals to GPA,=20
-vhost_memory_region stores IOVA -> HVA mapping. If we pass them, device=20
-IOTLB should work as usual?
-
->
-> Maybe the solution would be for QEMU to wrap "all memory" IOTLB updates
-> & invalidations to vhost_memory_regions, since the backend won't anyway
-> be able to perform accesses outside these regions?
-
-This is just what I mean, you can refer Peter's series.
-
->
->> The only possible "issue" with "all memory" is if you can not use a=20
->> single TLB invalidation to invalidate all caches in remote TLB.
->
-> If needed, maybe we could introduce a new VHOST_IOTLB_INVALIDATE messag=
-e
-> type?
-> For older kernel backend that doesn't support it, -EINVAL will be
-> returned, so QEMU could handle it another way in this case.
-
-We could, but not sure it was really needed.
-
->
->> But this is only theoretical problem since it only happen when we=20
->> have a 1 byte mapping [2^64 - 1, 2^64) cached in remote TLB. Consider:
->>
->> - E.g intel IOMMU has a range limitation for invalidation (1G currentl=
-y)
->> - Looks like all existed IOMMU use page aligned mappings
->>
->> It was probably not a big issue. And for safety we could use two=20
->> invalidations to make sure all caches were flushed remotely. Or just=20
->> change the protocol from start, size to start, end. Vhost-kernel is=20
->> probably too late for this change, but I'm still not quite sure it is=20
->> worthwhile.
->
-> I'm not for diverging the protocol between kernel & user backends.
->
-> Thanks,
-> Maxime
-
-Yes, agree.
-
-Thanks
-
->
->> Thanks
+diff --git a/hw/usb/dev-serial.c b/hw/usb/dev-serial.c
+index 83a4f0e..76ceca1 100644
+--- a/hw/usb/dev-serial.c
++++ b/hw/usb/dev-serial.c
+@@ -516,27 +516,16 @@ static USBDevice *usb_serial_init(USBBus *bus, const char *filename)
+     char label[32];
+     static int index;
+ 
+-    while (*filename && *filename != ':') {
+-        const char *p;
+-
+-        if (strstart(filename, "vendorid=", &p)) {
+-            error_report("vendorid is not supported anymore");
+-            return NULL;
+-        } else if (strstart(filename, "productid=", &p)) {
+-            error_report("productid is not supported anymore");
+-            return NULL;
+-        } else {
+-            error_report("unrecognized serial USB option %s", filename);
+-            return NULL;
+-        }
+-        while(*filename == ',')
+-            filename++;
++    if (*filename == ':') {
++        filename++;
++    } else if (*filename) {
++        error_report("unrecognized serial USB option %s", filename);
++        return NULL;
+     }
+     if (!*filename) {
+         error_report("character device specification needed");
+         return NULL;
+     }
+-    filename++;
+ 
+     snprintf(label, sizeof(label), "usbserial%d", index++);
+     cdrv = qemu_chr_new(label, filename);
+-- 
+1.8.3.1
