@@ -1,24 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48170)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48202)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <anton.nefedov@virtuozzo.com>) id 1dBeJQ-0006eC-5h
-	for qemu-devel@nongnu.org; Fri, 19 May 2017 05:35:09 -0400
+	(envelope-from <anton.nefedov@virtuozzo.com>) id 1dBeJT-0006hc-Lv
+	for qemu-devel@nongnu.org; Fri, 19 May 2017 05:35:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <anton.nefedov@virtuozzo.com>) id 1dBeJM-0006fo-7q
-	for qemu-devel@nongnu.org; Fri, 19 May 2017 05:35:08 -0400
-Received: from mail-db5eur01on0097.outbound.protection.outlook.com
-	([104.47.2.97]:23097
+	(envelope-from <anton.nefedov@virtuozzo.com>) id 1dBeJP-0006ho-Ou
+	for qemu-devel@nongnu.org; Fri, 19 May 2017 05:35:11 -0400
+Received: from mail-db5eur01on0095.outbound.protection.outlook.com
+	([104.47.2.95]:23375
 	helo=EUR01-DB5-obe.outbound.protection.outlook.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <anton.nefedov@virtuozzo.com>)
-	id 1dBeJL-0006e7-Ht
-	for qemu-devel@nongnu.org; Fri, 19 May 2017 05:35:04 -0400
+	id 1dBeJP-0006g9-F5
+	for qemu-devel@nongnu.org; Fri, 19 May 2017 05:35:07 -0400
 From: Anton Nefedov <anton.nefedov@virtuozzo.com>
-Date: Fri, 19 May 2017 12:34:27 +0300
-Message-ID: <1495186480-114192-1-git-send-email-anton.nefedov@virtuozzo.com>
+Date: Fri, 19 May 2017 12:34:28 +0300
+Message-ID: <1495186480-114192-2-git-send-email-anton.nefedov@virtuozzo.com>
+In-Reply-To: <1495186480-114192-1-git-send-email-anton.nefedov@virtuozzo.com>
+References: <1495186480-114192-1-git-send-email-anton.nefedov@virtuozzo.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v1 00/13] qcow2: space preallocation and COW
- improvements
+Subject: [Qemu-devel] [PATCH v1 01/13] qcow2: alloc space for COW in one
+ chunk
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,68 +30,79 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: den@virtuozzo.com, kwolf@redhat.com, mreitz@redhat.com, Anton Nefedov <anton.nefedov@virtuozzo.com>
+Cc: den@virtuozzo.com, kwolf@redhat.com, mreitz@redhat.com, "Denis V.
+	Lunev" <den@openvz.org>, Anton Nefedov <anton.nefedov@virtuozzo.com>
 
-This pull request is to address a few performance problems of qcow2 format:
+From: "Denis V. Lunev" <den@openvz.org>
 
-  1. non cluster-aligned write requests (to unallocated clusters) explicitly
-    pad data with zeroes if there is no backing data. This can be avoided
-    and the whole clusters are preallocated and zeroed in a single
-    efficient write_zeroes() operation, also providing better host file
-    continuity
+Currently each single write operation can result in 3 write operations
+if guest offsets are not cluster aligned. One write is performed for the
+real payload and two for COW-ed areas. Thus the data possibly lays
+non-contiguously on the host filesystem. This will reduce further
+sequential read performance significantly.
 
-  2. moreover, efficient write_zeroes() operation can be used to preallocate
-    space megabytes ahead which gives noticeable improvement on some storage
-    types (e.g. distributed storages where space allocation operation is
-    expensive)
+The patch allocates the space in the file with cluster granularity,
+ensuring
+  1. better host offset locality
+  2. less space allocation operations
+     (which can be expensive on distributed storages)
 
-  3. preallocating/zeroing the clusters in advance makes possible to enable
-    simultaneous writes to the same unallocated cluster, which is beneficial
-    for parallel sequential write operations which are not cluster-aligned
+Signed-off-by: Denis V. Lunev <den@openvz.org>
+Signed-off-by: Anton Nefedov <anton.nefedov@virtuozzo.com>
+---
+ block/qcow2.c | 32 +++++++++++++++++++++++++++++++-
+ 1 file changed, 31 insertions(+), 1 deletion(-)
 
-Performance test results are added to commit messages (see patch 3, 12)
-
-Anton Nefedov (9):
-  qcow2: is_zero_sectors(): return true if area is outside of backing
-    file
-  qcow2: do not COW the empty areas
-  qcow2: set inactive flag
-  qcow2: handle_prealloc(): find out if area zeroed by earlier
-    preallocation
-  qcow2: fix misleading comment about L2 linking
-  qcow2-cluster: slightly refactor handle_dependencies()
-  qcow2-cluster: make handle_dependencies() logic easier to follow
-  qcow2: allow concurrent unaligned writes to the same clusters
-  iotest 046: test simultaneous cluster write error case
-
-Denis V. Lunev (3):
-  qcow2: alloc space for COW in one chunk
-  qcow2: preallocation at image expand
-  qcow2: truncate preallocated space
-
-Pavel Butsykin (1):
-  qcow2: check space leak at the end of the image
-
- block/qcow2-cache.c                |   3 +
- block/qcow2-cluster.c              | 216 +++++++++++++++++++++++-----
- block/qcow2-refcount.c             |  21 +++
- block/qcow2.c                      | 286 ++++++++++++++++++++++++++++++++++++-
- block/qcow2.h                      |  26 ++++
- tests/qemu-iotests/026.out         | 104 ++++++++++----
- tests/qemu-iotests/026.out.nocache | 104 ++++++++++----
- tests/qemu-iotests/029.out         |   5 +-
- tests/qemu-iotests/046             |  38 ++++-
- tests/qemu-iotests/046.out         |  23 +++
- tests/qemu-iotests/060             |   2 +-
- tests/qemu-iotests/060.out         |  13 +-
- tests/qemu-iotests/061.out         |   5 +-
- tests/qemu-iotests/066             |   2 +-
- tests/qemu-iotests/066.out         |   9 +-
- tests/qemu-iotests/098.out         |   7 +-
- tests/qemu-iotests/108.out         |   5 +-
- tests/qemu-iotests/112.out         |   5 +-
- tests/qemu-iotests/154.out         |   4 +-
- 19 files changed, 769 insertions(+), 109 deletions(-)
-
+diff --git a/block/qcow2.c b/block/qcow2.c
+index a8d61f0..2e6a0ec 100644
+--- a/block/qcow2.c
++++ b/block/qcow2.c
+@@ -1575,6 +1575,32 @@ fail:
+     return ret;
+ }
+ 
++static void handle_alloc_space(BlockDriverState *bs, QCowL2Meta *l2meta)
++{
++    BDRVQcow2State *s = bs->opaque;
++    BlockDriverState *file = bs->file->bs;
++    QCowL2Meta *m;
++    int ret;
++
++    for (m = l2meta; m != NULL; m = m->next) {
++        uint64_t bytes = m->nb_clusters << s->cluster_bits;
++
++        if (m->cow_start.nb_bytes == 0 && m->cow_end.nb_bytes == 0) {
++            continue;
++        }
++
++        /* try to alloc host space in one chunk for better locality */
++        ret = file->drv->bdrv_co_pwrite_zeroes(file, m->alloc_offset, bytes, 0);
++
++        if (ret != 0) {
++            continue;
++        }
++
++        file->total_sectors = MAX(file->total_sectors,
++                                  (m->alloc_offset + bytes) / BDRV_SECTOR_SIZE);
++    }
++}
++
+ static coroutine_fn int qcow2_co_pwritev(BlockDriverState *bs, uint64_t offset,
+                                          uint64_t bytes, QEMUIOVector *qiov,
+                                          int flags)
+@@ -1656,8 +1682,12 @@ static coroutine_fn int qcow2_co_pwritev(BlockDriverState *bs, uint64_t offset,
+         if (ret < 0) {
+             goto fail;
+         }
+-
+         qemu_co_mutex_unlock(&s->lock);
++
++        if (bs->file->bs->drv->bdrv_co_pwrite_zeroes != NULL) {
++            handle_alloc_space(bs, l2meta);
++        }
++
+         BLKDBG_EVENT(bs->file, BLKDBG_WRITE_AIO);
+         trace_qcow2_writev_data(qemu_coroutine_self(),
+                                 cluster_offset + offset_in_cluster);
 -- 
 2.7.4
