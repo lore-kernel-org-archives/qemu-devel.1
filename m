@@ -1,34 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58801)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60584)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dBgMC-0000JZ-N7
-	for qemu-devel@nongnu.org; Fri, 19 May 2017 07:46:09 -0400
+	(envelope-from <bounces@canonical.com>) id 1dBgRA-00034v-Km
+	for qemu-devel@nongnu.org; Fri, 19 May 2017 07:51:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dBgM7-0001E4-FN
-	for qemu-devel@nongnu.org; Fri, 19 May 2017 07:46:08 -0400
-Received: from indium.canonical.com ([91.189.90.7]:58591)
+	(envelope-from <bounces@canonical.com>) id 1dBgR5-0003Ey-Mi
+	for qemu-devel@nongnu.org; Fri, 19 May 2017 07:51:16 -0400
+Received: from indium.canonical.com ([91.189.90.7]:59304)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1dBgM7-0001D1-8W
-	for qemu-devel@nongnu.org; Fri, 19 May 2017 07:46:03 -0400
+	id 1dBgR5-0003Eg-GA
+	for qemu-devel@nongnu.org; Fri, 19 May 2017 07:51:11 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1dBgM4-0000Gu-7T
-	for <qemu-devel@nongnu.org>; Fri, 19 May 2017 11:46:00 +0000
+	id 1dBgR3-0003hP-0S
+	for <qemu-devel@nongnu.org>; Fri, 19 May 2017 11:51:09 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 36B222E8050
-	for <qemu-devel@nongnu.org>; Fri, 19 May 2017 11:46:00 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id DCA1E2E80D3
+	for <qemu-devel@nongnu.org>; Fri, 19 May 2017 11:51:00 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Fri, 19 May 2017 11:26:40 -0000
-From: Jiri Cejka <jirkacejka@gmail.com>
-Reply-To: Bug 1511887 <1511887@bugs.launchpad.net>
+Date: Fri, 19 May 2017 11:44:31 -0000
+From: Frediano Ziglio <1635339@bugs.launchpad.net>
+Reply-To: Bug 1635339 <1635339@bugs.launchpad.net>
 Sender: bounces@canonical.com
-References: <20151031002349.21474.82964.malonedeb@soybean.canonical.com>
-Message-Id: <149519320033.11651.5046550921013739506.malone@soybean.canonical.com>
+References: <20161020160532.23339.63373.malonedeb@soybean.canonical.com>
+Message-Id: <149519427188.12752.205323951998377091.malone@gac.canonical.com>
 Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1511887] Re: USB device 1.1 not correctly
- passedthru from Linux host to Windows guest
+Subject: [Qemu-devel] [Bug 1635339] Re: qxl_pre_save assertion failure on vm
+ "save"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,74 +39,33 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Currently I can reproduce this bug with 2.8+dfsg-3~bpo8+1 version
-because I'm using stable Debian GNU/Linux. I'll try install latest qemu
-test it and report back here.
+wddm dod 0.17 version released which fixes the issue guest side.
 
 -- =
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1511887
+https://bugs.launchpad.net/bugs/1635339
 
 Title:
-  USB device 1.1 not correctly passedthru from Linux host to Windows
-  guest
+  qxl_pre_save assertion failure on vm "save"
 
 Status in QEMU:
-  Incomplete
+  Confirmed
 
 Bug description:
-  I have USB Digital Oscilloscope which works great on pure Windows
-  machine but not work on virtualized one. I tried passthru the device
-  from my Debian Jessie (64bit) host machine to Windows 7 (32bit) guest
-  machine but unfortunately it does not work very well. It looks that
-  device is passed thru so Windows machine knows about new device and
-  loads HID device driver for it but the device driver failed to start
-  the device and details of an error provided by device manager is "This
-  device cannot start" Code 10.
+  When I try and save my Windows 10 VM, I see an assertion failure, and
+  the machine is shut down.
 
-  Installed Qemu version: 2.1+dfsg-12+deb8u4 0
+  I see the following in the log:
 
-  USB device spec: Dynon Instruments ELAB-080, USB 1.1
+  main_channel_handle_parsed: agent start
+  qemu-system-x86_64: /build/qemu-Zwynhi/qemu-2.5+dfsg/hw/display/qxl.c:210=
+1: qxl_pre_save: Assertion `d->last_release_offset < d->vga.vram_size' fail=
+ed.
+  2016-10-20 11:52:42.713+0000: shutting down
 
-  On linux host computer
-  ---------------------------
-  lsusb identify it as:
-  Bus 003 Device 009: ID 13a3:0001 =
-
-
-  lsusb -t identify it as:
-  /: Bus 03.Port 1: Dev 1, Class=3Droot_hub, Driver=3Duhci_hcd/2p, 12M
-      |__ Port 1: Dev 9, If 0, Class=3DHuman Interface Device, Driver=3Dusb=
-hid, 12M
-
-  This is how I started my Windows guest machine
-  ------------------------------------------------------
-  kvm -cpu host \
-      -m 2048MiB \
-      -hda test.vdi \
-      -ctrl-grab \
-      -parallel /dev/parport0 \
-      -usbdevice host:13a3:0001
-
-  ...also instead of last line I tried this one:
-      -device usb-host,vendorid=3D0x13a3,productid=3D0x0001
-
-  none of them help to properly handle my device inside guest machine.
-
-  Only one time the Windows guest machine properly start the device so
-  software for that oscilloscope can identify the Oscilloscope and
-  measure for a while but unfortunately after I guess 5 seconds of
-  measurement the device was disconnected from Windows and never start
-  working again even after couple of restarts of guest machine even
-  after plug and unplug it's USB cable and power cable.
-
-  I searched for a solution or some clues to get it work but none of my
-  searching over the internet was successful. Because device works on
-  pure Windows but not work on virtualized one, I think there is a
-  problem with handling not standard USB devices (like sticks,
-  keyboards, mouses etc.)
+  Please let me know what other information would be relevant!
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1511887/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1635339/+subscriptions
