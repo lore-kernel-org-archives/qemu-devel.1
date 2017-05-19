@@ -1,26 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57698)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58725)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dBnUy-0002Fr-LH
-	for qemu-devel@nongnu.org; Fri, 19 May 2017 15:23:42 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1dBnZs-0004eS-01
+	for qemu-devel@nongnu.org; Fri, 19 May 2017 15:28:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dBnUt-00005y-Rp
-	for qemu-devel@nongnu.org; Fri, 19 May 2017 15:23:40 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:41580)
+	(envelope-from <dgilbert@redhat.com>) id 1dBnZn-0001ZV-UM
+	for qemu-devel@nongnu.org; Fri, 19 May 2017 15:28:44 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:58466)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dBnUt-00005h-Ij
-	for qemu-devel@nongnu.org; Fri, 19 May 2017 15:23:35 -0400
-Date: Fri, 19 May 2017 20:23:28 +0100
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dBnZn-0001ZF-Ob
+	for qemu-devel@nongnu.org; Fri, 19 May 2017 15:28:39 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 6F4543D952
+	for <qemu-devel@nongnu.org>; Fri, 19 May 2017 19:28:38 +0000 (UTC)
+Date: Fri, 19 May 2017 20:28:33 +0100
 From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170519192327.GX2081@work-vm>
-References: <1494595886-30912-1-git-send-email-a.perevalov@samsung.com>
-	<CGME20170512133148eucas1p2c04111d415b1fbd6fb702cfc2a3ed6f9@eucas1p2.samsung.com>
-	<1494595886-30912-9-git-send-email-a.perevalov@samsung.com>
+Message-ID: <20170519192833.GY2081@work-vm>
+References: <1495176212-14446-1-git-send-email-peterx@redhat.com>
+	<1495176212-14446-5-git-send-email-peterx@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1494595886-30912-9-git-send-email-a.perevalov@samsung.com>
-Subject: Re: [Qemu-devel] [PATCH V5 8/9] migration: add postcopy total
- blocktime into query-migrate
+In-Reply-To: <1495176212-14446-5-git-send-email-peterx@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH RFC 4/6] migration: shut src return path
+ unconditionally
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,273 +34,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alexey Perevalov <a.perevalov@samsung.com>, eblake@redhat.com
-Cc: qemu-devel@nongnu.org, i.maximets@samsung.com, peterx@redhat.com
+To: Peter Xu <peterx@redhat.com>
+Cc: qemu-devel@nongnu.org, Juan Quintela <quintela@redhat.com>
 
-* Alexey Perevalov (a.perevalov@samsung.com) wrote:
-> Postcopy total blocktime is available on destination side only.
-> But query-migrate was possible only for source. This patch
-> adds ability to call query-migrate on destination. To distinguish
-> src/dst, state of the MigrationState is using, query-migrate prepares
-> MigrationInfo for source machine only in case of migration's state is different
-> than MIGRATION_STATUS_NONE.
+* Peter Xu (peterx@redhat.com) wrote:
+> We were do the shutting off only for postcopy. Now we do this as long as
+> the source return path is there.
 > 
-> To be able to see postcopy blocktime, need to request postcopy-blocktime
-> capability.
+> Moving the cleanup of from_src_file there too.
 > 
-> The query-migrate command will show following sample result:
-> {"return":
->     "postcopy_vcpu_blocktime": [115, 100],
->     "status": "completed",
->     "postcopy_blocktime": 100
-> }}
-> 
-> postcopy_vcpu_blocktime contains list, where the first item is the first
-> vCPU in QEMU.
+> Signed-off-by: Peter Xu <peterx@redhat.com>
 
-Lets just check Eric is happy with the qapi side.
-Please also update hmp.c:hmp_info_migrate.
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 
-A few comments below.
-
-> Signed-off-by: Alexey Perevalov <a.perevalov@samsung.com>
 > ---
->  include/migration/migration.h |  4 +++
->  migration/migration.c         | 47 ++++++++++++++++++++++++++--
->  migration/postcopy-ram.c      | 73 +++++++++++++++++++++++++++++++++++++++++++
->  migration/trace-events        |  1 +
->  qapi-schema.json              |  6 +++-
->  5 files changed, 127 insertions(+), 4 deletions(-)
+>  migration/migration.c    | 8 +++++++-
+>  migration/postcopy-ram.c | 1 -
+>  2 files changed, 7 insertions(+), 2 deletions(-)
 > 
-> diff --git a/include/migration/migration.h b/include/migration/migration.h
-> index 7e69a2d..aba0535 100644
-> --- a/include/migration/migration.h
-> +++ b/include/migration/migration.h
-> @@ -135,6 +135,10 @@ struct MigrationIncomingState {
->  
->  MigrationIncomingState *migration_incoming_get_current(void);
->  void migration_incoming_state_destroy(void);
-> +/*
-> + * Functions to work with blocktime context
-> + */
-> +void fill_destination_postcopy_migration_info(MigrationInfo *info);
->  
->  struct MigrationState
->  {
 > diff --git a/migration/migration.c b/migration/migration.c
-> index c0443ce..7a4f33f 100644
+> index 92617fc..a4006b4 100644
 > --- a/migration/migration.c
 > +++ b/migration/migration.c
-> @@ -666,9 +666,15 @@ static void populate_ram_info(MigrationInfo *info, MigrationState *s)
+> @@ -131,10 +131,17 @@ void migration_incoming_state_destroy(void)
+>      struct MigrationIncomingState *mis = migration_incoming_get_current();
+>  
+>      if (mis->to_src_file) {
+> +        /* Tell source that we are done */
+> +        migrate_send_rp_shut(mis, qemu_file_get_error(mis->from_src_file) != 0);
+>          qemu_fclose(mis->to_src_file);
+>          mis->to_src_file = NULL;
 >      }
->  }
 >  
-> -MigrationInfo *qmp_query_migrate(Error **errp)
-> +/* TODO improve this assumption */
-> +static bool is_source_migration(void)
-> +{
-> +    MigrationState *ms = migrate_get_current();
-> +    return ms->state != MIGRATION_STATUS_NONE;
-> +}
+> +    if (mis->from_src_file) {
+> +        qemu_fclose(mis->from_src_file);
+> +        mis->from_src_file = NULL;
+> +    }
 > +
-> +static void fill_source_migration_info(MigrationInfo *info)
->  {
-> -    MigrationInfo *info = g_malloc0(sizeof(*info));
->      MigrationState *s = migrate_get_current();
->  
->      switch (s->state) {
-> @@ -759,10 +765,45 @@ MigrationInfo *qmp_query_migrate(Error **errp)
->          break;
+>      qemu_event_destroy(&mis->main_thread_load_event);
+>      loadvm_free_handlers(mis);
+>  }
+> @@ -433,7 +440,6 @@ static void process_incoming_migration_co(void *opaque)
+>          exit(EXIT_FAILURE);
 >      }
->      info->status = s->state;
-> +}
-> +
-> +static void fill_destination_migration_info(MigrationInfo *info)
-> +{
-> +    MigrationIncomingState *mis = migration_incoming_get_current();
 >  
-> -    return info;
-> +    switch (mis->state) {
-> +    case MIGRATION_STATUS_NONE:
-> +        break;
-> +    case MIGRATION_STATUS_SETUP:
-> +    case MIGRATION_STATUS_CANCELLING:
-> +    case MIGRATION_STATUS_CANCELLED:
-> +    case MIGRATION_STATUS_ACTIVE:
-> +    case MIGRATION_STATUS_POSTCOPY_ACTIVE:
-> +    case MIGRATION_STATUS_FAILED:
-> +    case MIGRATION_STATUS_COLO:
-> +        info->has_status = true;
-> +        break;
-> +    case MIGRATION_STATUS_COMPLETED:
-> +        info->has_status = true;
-> +        fill_destination_postcopy_migration_info(info);
-> +        break;
-> +    }
-> +    info->status = mis->state;
->  }
+> -    qemu_fclose(f);
+>      free_xbzrle_decoded_buf();
 >  
-> +MigrationInfo *qmp_query_migrate(Error **errp)
-> +{
-> +    MigrationInfo *info = g_malloc0(sizeof(*info));
-> +
-> +    if (is_source_migration()) {
-> +        fill_source_migration_info(info);
-> +    } else {
-> +        fill_destination_migration_info(info);
-> +    }
-
-A VM that was migated in can then later get migrated out;
-so I think you need to give both sets of data.
-Which probably means you need a second status field
-since existing stuff might get confused if it's watching
-an outbound migration after an inbound one.
-
-Dave
- 
-> +
-> +     return info;
-> + }
-> +
->  void qmp_migrate_set_capabilities(MigrationCapabilityStatusList *params,
->                                    Error **errp)
->  {
+>      mis->bh = qemu_bh_new(process_incoming_migration_bh, mis);
 > diff --git a/migration/postcopy-ram.c b/migration/postcopy-ram.c
-> index e2660ae..fe047c8 100644
+> index a0489f6..57aa208 100644
 > --- a/migration/postcopy-ram.c
 > +++ b/migration/postcopy-ram.c
-> @@ -129,6 +129,71 @@ static struct PostcopyBlocktimeContext *blocktime_context_new(void)
->      return ctx;
->  }
->  
-> +static int64List *get_vcpu_blocktime_list(PostcopyBlocktimeContext *ctx)
-> +{
-> +    int64List *list = NULL, *entry = NULL;
-> +    int i;
-> +
-> +    for (i = smp_cpus - 1; i >= 0; i--) {
-> +            entry = g_new0(int64List, 1);
-> +            entry->value = ctx->vcpu_blocktime[i];
-> +            entry->next = list;
-> +            list = entry;
-> +    }
-> +
-> +    return list;
-> +}
-> +
-> +/*
-> + * This function just provide calculated blocktime per cpu and trace it.
-> + * Total blocktime is calculated in mark_postcopy_blocktime_end.
-> + *
-> + *
-> + * Assume we have 3 CPU
-> + *
-> + *      S1        E1           S1               E1
-> + * -----***********------------xxx***************------------------------> CPU1
-> + *
-> + *             S2                E2
-> + * ------------****************xxx---------------------------------------> CPU2
-> + *
-> + *                         S3            E3
-> + * ------------------------****xxx********-------------------------------> CPU3
-> + *
-> + * We have sequence S1,S2,E1,S3,S1,E2,E3,E1
-> + * S2,E1 - doesn't match condition due to sequence S1,S2,E1 doesn't include CPU3
-> + * S3,S1,E2 - sequence includes all CPUs, in this case overlap will be S1,E2 -
-> + *            it's a part of total blocktime.
-> + * S1 - here is last_begin
-> + * Legend of the picture is following:
-> + *              * - means blocktime per vCPU
-> + *              x - means overlapped blocktime (total blocktime)
-> + */
-> +void fill_destination_postcopy_migration_info(MigrationInfo *info)
-> +{
-> +    MigrationIncomingState *mis = migration_incoming_get_current();
-> +
-> +    if (!mis->blocktime_ctx) {
-> +        return;
-> +    }
-> +
-> +    info->has_postcopy_blocktime = true;
-> +    info->postcopy_blocktime = mis->blocktime_ctx->total_blocktime;
-> +    info->has_postcopy_vcpu_blocktime = true;
-> +    info->postcopy_vcpu_blocktime = get_vcpu_blocktime_list(mis->blocktime_ctx);
-> +}
-> +
-> +static uint64_t get_postcopy_total_blocktime(void)
-> +{
-> +    MigrationIncomingState *mis = migration_incoming_get_current();
-> +
-> +    if (!mis->blocktime_ctx) {
-> +        return 0;
-> +    }
-> +
-> +    return mis->blocktime_ctx->total_blocktime;
-> +}
-> +
->  /*
->   * Check userfault fd features, to request only supported features in
->   * future.
-> @@ -462,6 +527,9 @@ int postcopy_ram_incoming_cleanup(MigrationIncomingState *mis)
+> @@ -320,7 +320,6 @@ int postcopy_ram_incoming_cleanup(MigrationIncomingState *mis)
 >      }
 >  
 >      postcopy_state_set(POSTCOPY_INCOMING_END);
-> +    /* here should be blocktime receiving back operation */
-> +    trace_postcopy_ram_incoming_cleanup_blocktime(
-> +            get_postcopy_total_blocktime());
->      migrate_send_rp_shut(mis, qemu_file_get_error(mis->from_src_file) != 0);
+> -    migrate_send_rp_shut(mis, qemu_file_get_error(mis->from_src_file) != 0);
 >  
 >      if (mis->postcopy_tmp_page) {
-> @@ -876,6 +944,11 @@ void *postcopy_get_tmp_page(MigrationIncomingState *mis)
->  
->  #else
->  /* No target OS support, stubs just fail */
-> +void fill_destination_postcopy_migration_info(MigrationInfo *info)
-> +{
-> +    error_report("%s: No OS support", __func__);
-> +}
-> +
->  bool postcopy_ram_supported_by_host(MigrationIncomingState *mis)
->  {
->      error_report("%s: No OS support", __func__);
-> diff --git a/migration/trace-events b/migration/trace-events
-> index 9424e3e..bdaca1d 100644
-> --- a/migration/trace-events
-> +++ b/migration/trace-events
-> @@ -193,6 +193,7 @@ postcopy_ram_incoming_cleanup_closeuf(void) ""
->  postcopy_ram_incoming_cleanup_entry(void) ""
->  postcopy_ram_incoming_cleanup_exit(void) ""
->  postcopy_ram_incoming_cleanup_join(void) ""
-> +postcopy_ram_incoming_cleanup_blocktime(uint64_t total) "total blocktime %" PRIu64
->  save_xbzrle_page_skipping(void) ""
->  save_xbzrle_page_overflow(void) ""
->  ram_save_iterate_big_wait(uint64_t milliconds, int iterations) "big wait: %" PRIu64 " milliseconds, %d iterations"
-> diff --git a/qapi-schema.json b/qapi-schema.json
-> index fde6d63..e11c5f2 100644
-> --- a/qapi-schema.json
-> +++ b/qapi-schema.json
-> @@ -712,6 +712,8 @@
->  #              @status is 'failed'. Clients should not attempt to parse the
->  #              error strings. (Since 2.7)
->  #
-> +# @postcopy_vcpu_blocktime: list of the postcopy blocktime per vCPU (Since 2.9)
-> +#
->  # Since: 0.14.0
->  ##
->  { 'struct': 'MigrationInfo',
-> @@ -723,7 +725,9 @@
->             '*downtime': 'int',
->             '*setup-time': 'int',
->             '*cpu-throttle-percentage': 'int',
-> -           '*error-desc': 'str'} }
-> +           '*error-desc': 'str',
-> +           '*postcopy_blocktime' : 'int64',
-> +           '*postcopy_vcpu_blocktime': ['int64']} }
->  
->  ##
->  # @query-migrate:
+>          munmap(mis->postcopy_tmp_page, mis->largest_page_size);
 > -- 
-> 1.9.1
+> 2.7.4
 > 
 --
 Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
