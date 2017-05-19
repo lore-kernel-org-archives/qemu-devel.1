@@ -1,27 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35640)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35698)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <JBeulich@suse.com>) id 1dBgdo-0006gu-Kz
-	for qemu-devel@nongnu.org; Fri, 19 May 2017 08:04:21 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1dBgeA-0006s9-L1
+	for qemu-devel@nongnu.org; Fri, 19 May 2017 08:04:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <JBeulich@suse.com>) id 1dBgdk-0007B5-KK
-	for qemu-devel@nongnu.org; Fri, 19 May 2017 08:04:20 -0400
-Received: from prv-mh.provo.novell.com ([137.65.248.74]:55977)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <JBeulich@suse.com>) id 1dBgdk-0007Ar-BM
-	for qemu-devel@nongnu.org; Fri, 19 May 2017 08:04:16 -0400
-Message-Id: <591EFB5D020000780015B47A@prv-mh.provo.novell.com>
-Date: Fri, 19 May 2017 06:04:13 -0600
-From: "Jan Beulich" <JBeulich@suse.com>
-References: <1495085580-10631-1-git-send-email-tianyu.lan@intel.com>
-	<1495085580-10631-2-git-send-email-tianyu.lan@intel.com>
-	<20170519111622.GA3260@perard.uk.xensource.com>
-In-Reply-To: <20170519111622.GA3260@perard.uk.xensource.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+	(envelope-from <dgilbert@redhat.com>) id 1dBge7-0007H0-21
+	for qemu-devel@nongnu.org; Fri, 19 May 2017 08:04:42 -0400
+Date: Fri, 19 May 2017 13:04:32 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170519120432.GK2081@work-vm>
+References: <20170510151209.32767-1-pasic@linux.vnet.ibm.com>
+	<20170518174714.GK2079@work-vm>
+	<14e80dcc-9e3b-4a45-0dbe-735ad2590ade@linux.vnet.ibm.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Subject: Re: [Qemu-devel] [Xen-devel] [RFC PATCH V2 1/2] xen-pt: bind/unbind
- interrupt remapping format MSI
+In-Reply-To: <14e80dcc-9e3b-4a45-0dbe-735ad2590ade@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH 1/1] s390x/css: catch section mismatch on
+ load
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,38 +25,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Anthony PERARD <anthony.perard@citrix.com>, Lan Tianyu <tianyu.lan@intel.com>
-Cc: Chao Gao <chao.gao@intel.com>, kevin.tian@intel.com, sstabellini@kernel.org, xen-devel@lists.xenproject.org, qemu-devel@nongnu.org, marcel@redhat.com, mst@redhat.com
+To: Halil Pasic <pasic@linux.vnet.ibm.com>
+Cc: Cornelia Huck <cornelia.huck@de.ibm.com>, Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org, qemu-stable@nongnu.org
 
->>> On 19.05.17 at 13:16, <anthony.perard@citrix.com> wrote:
-> On Thu, May 18, 2017 at 01:32:59AM -0400, Lan Tianyu wrote:
->> --- a/include/hw/i386/apic-msidef.h
->> +++ b/include/hw/i386/apic-msidef.h
->> @@ -26,6 +26,7 @@
->> =20
->>  #define MSI_ADDR_DEST_ID_SHIFT          12
->>  #define MSI_ADDR_DEST_IDX_SHIFT         4
->> -#define  MSI_ADDR_DEST_ID_MASK          0x00ffff0
->> +#define  MSI_ADDR_DEST_ID_MASK          0x000fff00
->=20
-> The value of MSI_ADDR_DEST_ID_MASK is changed here. I think the patch
-> should be:
-> +#define  MSI_ADDR_DEST_ID_MASK          0x000ffff0
+* Halil Pasic (pasic@linux.vnet.ibm.com) wrote:
+> 
+> 
+> On 05/18/2017 07:47 PM, Dr. David Alan Gilbert wrote:
+> >> Hi!
+> >>
+> >> I also wonder what is the best way to do this with vmstate.  I know there
+> >> are VMSTATE_*_EQUAL macros for integers, and I have partially modelled my
+> >> patch after that, but there we only get a != b as error message, which is
+> >> satisfactory for detecting bugs which are supposed to get fixed. In this
+> >> particular case having a verbose error message should be really helpful
+> >> and thus important.
+> >>
+> >> I'm asking because I'm currently working on a vmstate conversion of the
+> >> s390x css and virtio-ccw  stuff (find my latest patch set here
+> >> https://lists.gnu.org/archive/html/qemu-devel/2017-05/msg01364.html).
+> > I think the way to solve that problem will probably be adding a 'hint'
+> > parameter to the VMSTATE_*_EQUAL macros that is a constant string,
+> > stuff a pointer to that into a possibly new field in VMStateField,
+> > and then make the get_*_equal functions include that string in the
+> > message like you do.  There's a lot of copy and paste but it's
+> > not too bad now that Jianjun's patch from a few months ago passed
+> > the VMStateField* to the .get/.put.
+> > 
+> > Dave
+> > 
+> > 
+> 
+> Thanks Dave! I read your reply like you are seeing this verbose
+> message if VMSTATE_*_EQUAL feature something worth of inclusion.
+> Am I right? 
 
-Judging from other sources, rather the other way around - the
-mask needs to have further bits removed (should be 0x000ff000
-afaict). Xen sources confirm this, and while Linux has the value
-you suggest, that contradicts
+Yes.
 
-#define MSI_ADDR_DEST_ID_SHIFT		12
-#define  MSI_ADDR_DEST_ID(dest)		(((dest) << MSI_ADDR_DEST_ID_SHIFT)=
- & \
-					 MSI_ADDR_DEST_ID_MASK)
+> If yes, I'm willing to implement it.
 
-as well as
+Please do!
 
-#define MSI_ADDR_EXT_DEST_ID(dest)	((dest) & 0xffffff00)
+Dave
 
-chopping off just the low 8 bits.
-
-Jan
+> Halil
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
