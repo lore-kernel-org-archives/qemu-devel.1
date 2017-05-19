@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34036)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34072)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rjones@redhat.com>) id 1dBnvm-0001I3-Hz
-	for qemu-devel@nongnu.org; Fri, 19 May 2017 15:51:23 -0400
+	(envelope-from <rjones@redhat.com>) id 1dBnvw-0001KC-Kv
+	for qemu-devel@nongnu.org; Fri, 19 May 2017 15:51:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rjones@redhat.com>) id 1dBnvj-0000pJ-GE
-	for qemu-devel@nongnu.org; Fri, 19 May 2017 15:51:22 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:35254)
+	(envelope-from <rjones@redhat.com>) id 1dBnvt-0000yT-Jz
+	for qemu-devel@nongnu.org; Fri, 19 May 2017 15:51:32 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:35488)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <rjones@redhat.com>) id 1dBnvj-0000oy-9j
-	for qemu-devel@nongnu.org; Fri, 19 May 2017 15:51:19 -0400
-Date: Fri, 19 May 2017 20:51:16 +0100
+	(Exim 4.71) (envelope-from <rjones@redhat.com>) id 1dBnvt-0000yJ-Do
+	for qemu-devel@nongnu.org; Fri, 19 May 2017 15:51:29 -0400
+Date: Fri, 19 May 2017 20:51:27 +0100
 From: "Richard W.M. Jones" <rjones@redhat.com>
-Message-ID: <20170519195115.GW16511@redhat.com>
+Message-ID: <20170519195126.GX16511@redhat.com>
 References: <20170509132736.10071-1-berrange@redhat.com>
 	<040c1e25-224f-1a8a-9f60-7238e6ad5df6@twiddle.net>
 	<20170509141336.GF27432@redhat.com>
@@ -53,12 +53,12 @@ On Fri, May 19, 2017 at 04:41:46PM -0300, Eduardo Habkost wrote:
 > 
 > Richard, Paolo: I would like to merge this. Do you agree?
 
-It's fine by me but note that I didn't review the patch.
+Ah, other Richard, OK!
 
 Rich.
 
 -- 
 Richard Jones, Virtualization Group, Red Hat http://people.redhat.com/~rjones
 Read my programming and virtualization blog: http://rwmj.wordpress.com
-libguestfs lets you edit virtual machines.  Supports shell scripting,
-bindings from many languages.  http://libguestfs.org
+virt-builder quickly builds VMs from scratch
+http://libguestfs.org/virt-builder.1.html
