@@ -1,15 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54383)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54805)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dBrj7-0006jV-SJ
-	for qemu-devel@nongnu.org; Fri, 19 May 2017 19:54:34 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dBrlC-0007a1-OB
+	for qemu-devel@nongnu.org; Fri, 19 May 2017 19:56:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dBrj4-0000ZN-Pi
-	for qemu-devel@nongnu.org; Fri, 19 May 2017 19:54:33 -0400
-From: Thomas Huth <thuth@redhat.com>
-Date: Sat, 20 May 2017 01:54:25 +0200
-Message-Id: <1495238065-15846-1-git-send-email-thuth@redhat.com>
-Subject: [Qemu-devel] [PATCH] tests/libqtest: Print error instead of
- aborting when env variable is missing
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dBrl9-0001Dt-K1
+	for qemu-devel@nongnu.org; Fri, 19 May 2017 19:56:42 -0400
+Received: from mail-oi0-x244.google.com ([2607:f8b0:4003:c06::244]:35835)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dBrl9-0001Dp-Er
+	for qemu-devel@nongnu.org; Fri, 19 May 2017 19:56:39 -0400
+Received: by mail-oi0-x244.google.com with SMTP id m17so14731432oik.2
+	for <qemu-devel@nongnu.org>; Fri, 19 May 2017 16:56:39 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20170429104937.31341-1-zxq_yx_007@163.com>
+	<20170429104937.31341-6-zxq_yx_007@163.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <16091cdb-0658-4793-40dd-0d9ac2af020a@amsat.org>
+Date: Fri, 19 May 2017 20:56:36 -0300
+MIME-Version: 1.0
+In-Reply-To: <20170429104937.31341-6-zxq_yx_007@163.com>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v2 5/9] hw/timer: QOM'ify m48txx_sysbus
+ (pass 1)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -18,41 +35,91 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Markus Armbruster <armbru@redhat.com>, Eric Blake <eblake@redhat.com>, qemu-trivial@nongnu.org
+To: xiaoqiang zhao <zxq_yx_007@163.com>, qemu-devel@nongnu.org
+Cc: edgar.iglesias@xilinx.com, peter.maydell@linaro.org, mark.cave-ayland@ilande.co.uk, pbonzini@redhat.com, atar4qemu@gmail.com, david@gibson.dropbear.id.au
 
-When you currently try to run a test directly from the command line
-without setting the QTEST_QEMU_BINARY environment variable first,
-you are presented with an unhelpful assertion message like this:
+On 04/29/2017 07:49 AM, xiaoqiang zhao wrote:
+> * split the old SysBus init function into an instance_init
+>   and a Device realize function
+> * use DeviceClass::realize instead of SysBusDeviceClass::init
+>
+> Signed-off-by: xiaoqiang zhao <zxq_yx_007@163.com>
 
- ERROR:tests/libqtest.c:163:qtest_init_without_qmp_handshake:
- assertion failed: (qemu_binary != NULL)
- Aborted (core dumped)
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
-Let's replace the assert() with a more user friendly error message
-instead.
-
-Signed-off-by: Thomas Huth <thuth@redhat.com>
----
- tests/libqtest.c | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
-
-diff --git a/tests/libqtest.c b/tests/libqtest.c
-index 84ecbd2..f0fd682 100644
---- a/tests/libqtest.c
-+++ b/tests/libqtest.c
-@@ -160,7 +160,11 @@ QTestState *qtest_init_without_qmp_handshake(const char *extra_args)
-     const char *qemu_binary;
- 
-     qemu_binary = getenv("QTEST_QEMU_BINARY");
--    g_assert(qemu_binary != NULL);
-+    if (!qemu_binary) {
-+        fprintf(stderr, "The environment variable QTEST_QEMU_BINARY has to be "
-+                        "set before running the test.\n");
-+        exit(1);
-+    }
- 
-     s = g_malloc(sizeof(*s));
- 
--- 
-1.8.3.1
+> ---
+>  hw/timer/m48t59.c | 35 ++++++++++++++++++-----------------
+>  1 file changed, 18 insertions(+), 17 deletions(-)
+>
+> diff --git a/hw/timer/m48t59.c b/hw/timer/m48t59.c
+> index 474981a6ac..eff259ef96 100644
+> --- a/hw/timer/m48t59.c
+> +++ b/hw/timer/m48t59.c
+> @@ -644,30 +644,31 @@ void m48t59_realize_common(M48t59State *s, Error **errp)
+>      vmstate_register(NULL, -1, &vmstate_m48t59, s);
+>  }
+>
+> -static int m48t59_init1(SysBusDevice *dev)
+> +static void m48t59_init1(Object *obj)
+>  {
+> -    M48txxSysBusDeviceClass *u = M48TXX_SYS_BUS_GET_CLASS(dev);
+> -    M48txxSysBusState *d = M48TXX_SYS_BUS(dev);
+> -    Object *o = OBJECT(dev);
+> +    M48txxSysBusDeviceClass *u = M48TXX_SYS_BUS_GET_CLASS(obj);
+> +    M48txxSysBusState *d = M48TXX_SYS_BUS(obj);
+> +    SysBusDevice *dev = SYS_BUS_DEVICE(obj);
+>      M48t59State *s = &d->state;
+> -    Error *err = NULL;
+>
+>      s->model = u->info.model;
+>      s->size = u->info.size;
+>      sysbus_init_irq(dev, &s->IRQ);
+>
+> -    memory_region_init_io(&s->iomem, o, &nvram_ops, s, "m48t59.nvram",
+> +    memory_region_init_io(&s->iomem, obj, &nvram_ops, s, "m48t59.nvram",
+>                            s->size);
+> -    memory_region_init_io(&d->io, o, &m48t59_io_ops, s, "m48t59", 4);
+> -    sysbus_init_mmio(dev, &s->iomem);
+> -    sysbus_init_mmio(dev, &d->io);
+> -    m48t59_realize_common(s, &err);
+> -    if (err != NULL) {
+> -        error_free(err);
+> -        return -1;
+> -    }
+> +    memory_region_init_io(&d->io, obj, &m48t59_io_ops, s, "m48t59", 4);
+> +}
+> +
+> +static void m48t59_realize(DeviceState *dev, Error **errp)
+> +{
+> +    M48txxSysBusState *d = M48TXX_SYS_BUS(dev);
+> +    M48t59State *s = &d->state;
+> +    SysBusDevice *sbd = SYS_BUS_DEVICE(dev);
+>
+> -    return 0;
+> +    sysbus_init_mmio(sbd, &s->iomem);
+> +    sysbus_init_mmio(sbd, &d->io);
+> +    m48t59_realize_common(s, errp);
+>  }
+>
+>  static uint32_t m48txx_sysbus_read(Nvram *obj, uint32_t addr)
+> @@ -696,10 +697,9 @@ static Property m48t59_sysbus_properties[] = {
+>  static void m48txx_sysbus_class_init(ObjectClass *klass, void *data)
+>  {
+>      DeviceClass *dc = DEVICE_CLASS(klass);
+> -    SysBusDeviceClass *k = SYS_BUS_DEVICE_CLASS(klass);
+>      NvramClass *nc = NVRAM_CLASS(klass);
+>
+> -    k->init = m48t59_init1;
+> +    dc->realize = m48t59_realize;
+>      dc->reset = m48t59_reset_sysbus;
+>      dc->props = m48t59_sysbus_properties;
+>      nc->read = m48txx_sysbus_read;
+> @@ -725,6 +725,7 @@ static const TypeInfo m48txx_sysbus_type_info = {
+>      .name = TYPE_M48TXX_SYS_BUS,
+>      .parent = TYPE_SYS_BUS_DEVICE,
+>      .instance_size = sizeof(M48txxSysBusState),
+> +    .instance_init = m48t59_init1,
+>      .abstract = true,
+>      .class_init = m48txx_sysbus_class_init,
+>      .interfaces = (InterfaceInfo[]) {
+>
