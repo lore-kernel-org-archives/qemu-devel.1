@@ -1,33 +1,42 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50675)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52080)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dBhXn-0001MA-M5
-	for qemu-devel@nongnu.org; Fri, 19 May 2017 09:02:13 -0400
+	(envelope-from <danielhb@linux.vnet.ibm.com>) id 1dBhh4-0002xC-6a
+	for qemu-devel@nongnu.org; Fri, 19 May 2017 09:11:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dBhXj-0000eS-Oo
-	for qemu-devel@nongnu.org; Fri, 19 May 2017 09:02:11 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46890)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dBhXj-0000eG-GI
-	for qemu-devel@nongnu.org; Fri, 19 May 2017 09:02:07 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 3F25780046
-	for <qemu-devel@nongnu.org>; Fri, 19 May 2017 13:02:06 +0000 (UTC)
-Date: Fri, 19 May 2017 14:02:00 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170519130200.GO2081@work-vm>
-References: <1495176212-14446-1-git-send-email-peterx@redhat.com>
-	<1495176212-14446-2-git-send-email-peterx@redhat.com>
-	<20170519082538.GD4912@redhat.com> <20170519125139.GM2081@work-vm>
-	<20170519125601.GD28392@redhat.com>
+	(envelope-from <danielhb@linux.vnet.ibm.com>) id 1dBhh0-00030D-7Y
+	for qemu-devel@nongnu.org; Fri, 19 May 2017 09:11:46 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:45463
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <danielhb@linux.vnet.ibm.com>)
+	id 1dBhh0-000302-1z
+	for qemu-devel@nongnu.org; Fri, 19 May 2017 09:11:42 -0400
+Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v4JD9Bc3055093
+	for <qemu-devel@nongnu.org>; Fri, 19 May 2017 09:11:41 -0400
+Received: from e24smtp01.br.ibm.com (e24smtp01.br.ibm.com [32.104.18.85])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2ahpwwtrry-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Fri, 19 May 2017 09:11:41 -0400
+Received: from localhost
+	by e24smtp01.br.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <danielhb@linux.vnet.ibm.com>;
+	Fri, 19 May 2017 10:11:39 -0300
+References: <20170518202402.12571-1-danielhb@linux.vnet.ibm.com>
+	<20170518202402.12571-3-danielhb@linux.vnet.ibm.com>
+	<20170519023216.GD12284@umbus.fritz.box>
+From: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
+Date: Fri, 19 May 2017 10:10:57 -0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170519125601.GD28392@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH RFC 1/6] io: only allow return path for
- socket typed
+In-Reply-To: <20170519023216.GD12284@umbus.fritz.box>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+Message-Id: <e8b5bb30-2f2d-7064-2131-99870d85e060@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH v11 2/2] migration: spapr:
+ migrate pending_events of spapr state
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,114 +45,125 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>
-Cc: Peter Xu <peterx@redhat.com>, qemu-devel@nongnu.org, Juan Quintela <quintela@redhat.com>
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, mdroth@linux.vnet.ibm.com
 
-* Daniel P. Berrange (berrange@redhat.com) wrote:
-> On Fri, May 19, 2017 at 01:51:43PM +0100, Dr. David Alan Gilbert wrote:
-> > * Daniel P. Berrange (berrange@redhat.com) wrote:
-> > > On Fri, May 19, 2017 at 02:43:27PM +0800, Peter Xu wrote:
-> > > > We don't really have a return path for the other types yet. Let's check
-> > > > this when .get_return_path() is called.
-> > > > 
-> > > > For this, we introduce a new feature bit, and set it up only for socket
-> > > > typed IO channels.
-> > > > 
-> > > > This will help detect earlier failure for postcopy, e.g., logically
-> > > > speaking postcopy cannot work with "exec:". Before this patch, when we
-> > > > try to migrate with "migrate -d exec:cat>out", we'll hang the system.
-> > > > With this patch, we'll get:
-> > > > 
-> > > > (qemu) migrate -d exec:cat>out
-> > > > Unable to open return-path for postcopy
-> > > 
-> > > This is wrong - post-copy migration *can* work with exec: - it just entirely
-> > > depends on what command you are running. Your example ran a command which is
-> > > unidirectional, but if you ran 'exec:socat ...' you would have a fully
-> > > bidirectional channel. Actually the channel is always bi-directional, but
-> > > 'cat' simply won't ever send data back to QEMU.
-> > 
-> > The thing is it didn't used to be able to; prior to your conversion to
-> > channel, postcopy would reject being started with exec: because it
-> > couldn't open a return path, so it was safe.
-> 
-> It safe but functionally broken because it is valid to want to use
-> exec migration with post-copy.
-> 
-> > > If QEMU hangs when the other end doesn't send data back, that actually seems
-> > > like a potentially serious bug in migration code. Even if using the normal
-> > > 'tcp' migration protocol, if the target QEMU server hangs and fails to
-> > > send data to QEMU on the return path, the source QEMU must never hang.
-> > 
-> > Hmm, we shouldn't get a 'hang' with a postcopy on a link without a
-> > return path; but it does depend on how the exec: behaves on the
-> > destination.
-> > If the destination discards data written to it, then I think the
-> > behaviour would be:
-> >    a) Page requests would just get dropped, they'd eventually get
-> > fulfilled by the background page transmissions, but that could mean that
-> > a page request would wait for minutes for the page.
-> >    b) The qemu main thread on the destination can be blocked by that, so
-> > the monitor might not respond until the page request is fulfilled.
-> >    c) I'm not quite sure what would happen to the source return-path
-> > thread
-> > 
-> > The behaviour seems to have changed between 2.9.0 (f26 package) and my
-> > reasonably recent head build.
-> 
-> That's due to the bug we just fixed where we mistakenly didn't
-> allow bi-directional I/O for exec
-> 
->   commit 062d81f0e968fe1597474735f3ea038065027372
->   Author: Daniel P. Berrange <berrange@redhat.com>
->   Date:   Fri Apr 21 12:12:20 2017 +0100
-> 
->     migration: setup bi-directional I/O channel for exec: protocol
->     
->     Historically the migration data channel has only needed to be
->     unidirectional. Thus the 'exec:' protocol was requesting an
->     I/O channel with O_RDONLY on incoming side, and O_WRONLY on
->     the outgoing side.
->     
->     This is fine for classic migration, but if you then try to run
->     TLS over it, this fails because the TLS handshake requires a
->     bi-directional channel.
->     
->     Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
->     Reviewed-by: Juan Quintela <quintela@redhat.com>
->     Signed-off-by: Juan Quintela <quintela@redhat.com>
-> 
-> 
-> > A migration_cancel also doesn't work for 'exec' because it doesn't
-> > support shutdown() - it just sticks in 'cancelling'.
-> > On a socket that was broken like this the cancel would work because
-> > it issues a shutdown() which causes the socket to cleanup.
-> 
-> I'm curious why migration_cancel requires shutdown() to work ? Why
-> isn't it sufficient from the source POV to just close the socket
-> entirely straight away.
 
-close() closes the fd so that any other uses of the fd get an
-error and you're at risk of the fd getting reallocated by something
-else.  So consider if the main thread calls close(), the migration
-thread and the return thread both carry on using that fd, which might
-have been reallocated to something different.  Worse I think we came to the
-consolution that on some OSs a read()/write() blocked in the use of an fd didn't
-get kicked out by a close.
 
-shutdown() is safe, in that it stops any other threads accessing the fd
-but doesn't allow it's reallocation until the close;  We perform the
-close only when we've joined all other threads that were using the fd.
-Any of the threads that do new calls on the fd get an error and quickly
-fall down their error paths.
+On 05/18/2017 11:32 PM, David Gibson wrote:
+> On Thu, May 18, 2017 at 05:24:02PM -0300, Daniel Henrique Barboza wrote:
+>> From: Jianjun Duan <duanj@linux.vnet.ibm.com>
+>>
+>> In racing situations between hotplug events and migration operation,
+>> a rtas hotplug event could have not yet be delivered to the source
+>> guest when migration is started. In this case the pending_events of
+>> spapr state need be transmitted to the target so that the hotplug
+>> event can be finished on the target.
+>>
+>> All the different fields of the events are encoded as defined by
+>> PAPR. We can migrate them as uint8_t binary stream without any
+>> concerns about data padding or endianess.
+>>
+>> pending_events is put in a subsection in the spapr state VMSD to make
+>> sure migration across different versions is not broken.
+>>
+>> Signed-off-by: Jianjun Duan <duanj@linux.vnet.ibm.com>
+>> Signed-off-by: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
+>> ---
+>>   hw/ppc/spapr.c         | 32 ++++++++++++++++++++++++++++++++
+>>   hw/ppc/spapr_events.c  |  1 +
+>>   include/hw/ppc/spapr.h |  3 ++-
+>>   3 files changed, 35 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+>> index 0980d73..5afd328 100644
+>> --- a/hw/ppc/spapr.c
+>> +++ b/hw/ppc/spapr.c
+>> @@ -1444,6 +1444,37 @@ static bool version_before_3(void *opaque, int version_id)
+>>       return version_id < 3;
+>>   }
+>>   
+>> +static bool spapr_pending_events_needed(void *opaque)
+>> +{
+>> +    sPAPRMachineState *spapr = (sPAPRMachineState *)opaque;
+>> +    return !QTAILQ_EMPTY(&spapr->pending_events);
+>> +}
+>> +
+>> +static const VMStateDescription vmstate_spapr_event_entry = {
+>> +    .name = "spapr_event_log_entry",
+>> +    .version_id = 1,
+>> +    .minimum_version_id = 1,
+>> +    .fields = (VMStateField[]) {
+>> +        VMSTATE_INT32(log_type, sPAPREventLogEntry),
+>> +        VMSTATE_UINT32(data_size, sPAPREventLogEntry),
+>> +        VMSTATE_VBUFFER_ALLOC_UINT32(data, sPAPREventLogEntry, 0,
+>> +                                     NULL, data_size),
+>> +        VMSTATE_END_OF_LIST()
+>> +    },
+>> +};
+>> +
+>> +static const VMStateDescription vmstate_spapr_pending_events = {
+>> +    .name = "spapr_pending_events",
+>> +    .version_id = 1,
+>> +    .minimum_version_id = 1,
+>> +    .needed = spapr_pending_events_needed,
+>> +    .fields = (VMStateField[]) {
+>> +        VMSTATE_QTAILQ_V(pending_events, sPAPRMachineState, 1,
+>> +                         vmstate_spapr_event_entry, sPAPREventLogEntry, next),
+>> +        VMSTATE_END_OF_LIST()
+>> +    },
+>> +};
+>> +
+>>   static bool spapr_ov5_cas_needed(void *opaque)
+>>   {
+>>       sPAPRMachineState *spapr = opaque;
+>> @@ -1542,6 +1573,7 @@ static const VMStateDescription vmstate_spapr = {
+>>       .subsections = (const VMStateDescription*[]) {
+>>           &vmstate_spapr_ov5_cas,
+>>           &vmstate_spapr_patb_entry,
+>> +        &vmstate_spapr_pending_events,
+>>           NULL
+>>       }
+>>   };
+>> diff --git a/hw/ppc/spapr_events.c b/hw/ppc/spapr_events.c
+>> index 73e2a18..96c1605 100644
+>> --- a/hw/ppc/spapr_events.c
+>> +++ b/hw/ppc/spapr_events.c
+>> @@ -350,6 +350,7 @@ static void rtas_event_log_queue(int log_type, void *data)
+>>       g_assert(data);
+>>       entry->log_type = log_type;
+>>       entry->data = data;
+>> +    entry->data_size = sizeof(*data);
+> This can't be right, since data is a void*.  I'm surprised it even
+> compiles.  You'll need to actually look into the data buffer here and
+> extract the size field.
+Hehe completely forgot here that I was querying the sizeof void. Good catch.
+I think it didn't throw an error because the compiler defaulted the type 
+of void
+in sizeof() to something else (char perhaps?).
 
-Dave
+I'll fix it by making a switch with the log_type and setting sizeof with 
+the proper
+structured used.
 
-> Regards,
-> Daniel
-> -- 
-> |: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-> |: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-> |: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+
+Daniel
+>
+>>       QTAILQ_INSERT_TAIL(&spapr->pending_events, entry, next);
+>>   }
+>>   
+>> diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
+>> index 02239a5..0554e11 100644
+>> --- a/include/hw/ppc/spapr.h
+>> +++ b/include/hw/ppc/spapr.h
+>> @@ -597,8 +597,9 @@ struct sPAPRTCETable {
+>>   sPAPRTCETable *spapr_tce_find_by_liobn(target_ulong liobn);
+>>   
+>>   struct sPAPREventLogEntry {
+>> -    int log_type;
+>> +    int32_t log_type;
+>>       void *data;
+>> +    uint32_t data_size;
+>>       QTAILQ_ENTRY(sPAPREventLogEntry) next;
+>>   };
+>>   
