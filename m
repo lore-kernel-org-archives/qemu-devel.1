@@ -1,21 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55812)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56875)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1dBhzJ-0007i0-GN
-	for qemu-devel@nongnu.org; Fri, 19 May 2017 09:30:38 -0400
+	(envelope-from <voipio@kos.to>) id 1dBi30-0000n9-Ea
+	for qemu-devel@nongnu.org; Fri, 19 May 2017 09:34:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1dBhzI-0008TP-J1
-	for qemu-devel@nongnu.org; Fri, 19 May 2017 09:30:37 -0400
-References: <20170508171302.17805-1-eblake@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <2f66f2d1-ff51-8b41-8e7d-ef21297de97b@redhat.com>
-Date: Fri, 19 May 2017 15:30:25 +0200
+	(envelope-from <voipio@kos.to>) id 1dBi2x-0000jb-CU
+	for qemu-devel@nongnu.org; Fri, 19 May 2017 09:34:26 -0400
+Received: from jessie.kos.to ([212.47.231.226]:40382 helo=pilvi.kos.to)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <voipio@kos.to>) id 1dBi2x-0000jX-6c
+	for qemu-devel@nongnu.org; Fri, 19 May 2017 09:34:23 -0400
+Date: Fri, 19 May 2017 13:34:17 +0000
+From: Riku Voipio <riku.voipio@iki.fi>
+Message-ID: <20170519133417.GA18402@kos.to>
+References: <20170301093748.28033-1-laurent@vivier.eu>
+	<260f8cca-719e-dc31-12cf-507e01270c53@vivier.eu>
 MIME-Version: 1.0
-In-Reply-To: <20170508171302.17805-1-eblake@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="qAF0tM7RQCakc5RDMpomWDWXM26xu5ecG"
-Subject: Re: [Qemu-devel] [PATCH] block: Tweak error message related to
- qemu-img convert
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <260f8cca-719e-dc31-12cf-507e01270c53@vivier.eu>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 0/2] linux-user: fix eventfd()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,66 +28,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>
+To: Laurent Vivier <laurent@vivier.eu>
+Cc: qemu-devel@nongnu.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---qAF0tM7RQCakc5RDMpomWDWXM26xu5ecG
-From: Max Reitz <mreitz@redhat.com>
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>
-Message-ID: <2f66f2d1-ff51-8b41-8e7d-ef21297de97b@redhat.com>
-Subject: Re: [PATCH] block: Tweak error message related to qemu-img convert
-References: <20170508171302.17805-1-eblake@redhat.com>
-In-Reply-To: <20170508171302.17805-1-eblake@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On Tue, Apr 25, 2017 at 06:32:30PM +0200, Laurent Vivier wrote:
+> Ping?
 
-On 2017-05-08 19:13, Eric Blake wrote:
-> When converting a 1.1 image down to 0.10, qemu-iotests 060 forces
-> a contrived failure where allocating a cluster used to replace a
-> zero cluster reads unaligned data.  Since it is a zero cluster
-> rather than a data cluster being converted, changing the error
-> message to match our earlier change in 'qcow2: Make distinction
-> bewteen zero cluster types obvious' is worthwhile.
+Applied, thanks.=20
+
+> Laurent
 >=20
-> Suggested-by: Max Reitz <mreitz@redhat.com>
-> Signed-off-by: Eric Blake <eblake@redhat.com>
-> ---
+> Le 01/03/2017 =C3=A0 10:37, Laurent Vivier a =C3=A9crit :
+> > This patch series byte-swap the uint64_t data stream
+> > of a file-descriptor opened with eventfd().
+> >=20
+> > It allows to pass more LTP test cases:
+> >=20
+> > eventfd01    1  TPASS  :  counter value matches required
+> > eventfd01    2  TPASS  :  read failed with EAGAIN as expected
+> > eventfd01    3  TPASS  :  counter value matches required
+> > eventfd01    4  TPASS  :  write failed with EAGAIN as expected
+> > eventfd01    5  TPASS  :  read failed with EINVAL as expected
+> > eventfd01    6  TPASS  :  write failed with EINVAL as expected
+> > eventfd01    7  TPASS  :  write failed with EINVAL as expected
+> > eventfd01    8  TPASS  :  fd is set in readfds
+> > eventfd01    9  TPASS  :  fd is not set in readfds
+> > eventfd01   10  TPASS  :  fd is set in writefds
+> > eventfd01   11  TPASS  :  fd is not set in writefds
+> > eventfd01    1  TPASS  :  counter value matches required
+> > eventfd01    2  TPASS  :  read failed with EAGAIN as expected
+> > eventfd01    3  TPASS  :  counter value matches required
+> > eventfd01    4  TPASS  :  write failed with EAGAIN as expected
+> > eventfd01    5  TPASS  :  read failed with EINVAL as expected
+> > eventfd01    6  TPASS  :  write failed with EINVAL as expected
+> > eventfd01    7  TPASS  :  write failed with EINVAL as expected
+> > eventfd01    8  TPASS  :  fd is set in readfds
+> > eventfd01    9  TPASS  :  fd is not set in readfds
+> > eventfd01   10  TPASS  :  fd is set in writefds
+> > eventfd01   11  TPASS  :  fd is not set in writefds
+> > eventfd01   12  TPASS  :  counter value write from child successful
+> > eventfd01   13  TCONF  :  eventfd01.c:642: eventfd support is not ava=
+ilable in AIO subsystem
+> > eventfd01   14  TCONF  :  eventfd01.c:647: eventfd support is not ava=
+ilable in AIO subsystem
+> > eventfd01   15  TCONF  :  eventfd01.c:652: eventfd support is not ava=
+ilable in AIO subsystem
+> >=20
+> > Laurent Vivier (2):
+> >   linux-user: call fd_trans_target_to_host_data() for write()
+> >   linux-user: fix eventfd
+> >=20
+> >  linux-user/syscall.c | 38 +++++++++++++++++++++++++++++++++++---
+> >  1 file changed, 35 insertions(+), 3 deletions(-)
+> >=20
 >=20
-> There's one more instance of "Data cluster offset" in qcow2-cluster.c,
-> but that one in handle_copied() is contained inside a
-> cluster_type =3D=3D QCOW2_CLUSTER_NORMAL conditional.
->=20
->  block/qcow2-cluster.c      | 3 ++-
->  tests/qemu-iotests/060.out | 2 +-
->  2 files changed, 3 insertions(+), 2 deletions(-)
-
-Assuming no objection means consent:
-
-Thanks, fixed the commit title and applied to my block branch:
-
-https://github.com/XanClic/qemu/commits/block
-
-Max
-
-
---qAF0tM7RQCakc5RDMpomWDWXM26xu5ecG
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-
-iQEvBAEBCAAZBQJZHvNxEhxtcmVpdHpAcmVkaGF0LmNvbQAKCRD0B9sAYdXPQKuY
-B/4h5UbyFQUEoUwu7Gs2nXskRH6y3RVCyTUSFxUt22Ps+ja2Wj0tA2yT9Vx+0HAp
-3mjDuV0uVQkzLNhzg87Fejjvx1zDxsKA0o4drwWkS/mPeyAdHO/yCfUA4Ntk/0cR
-yMkH06R5XrMtfwTSKhdKI2lAv8uqnlG2yNlW0t1fP8hu1tbEMxKJYluWYmtu/IqG
-tIX8KDt5SeJF8rB5xw0IZMz37kAmQSG4Efv0byCHeeYWFTT8EsKlT9aWwUhH+gGX
-aBEhaKw0eDOxJqtlNURd5TvGzAvBChE22l8tzBGM9kGHLrKVyhf4Ee6qhZpT85k1
-iCAHh27ADA659a3zMlH3vEpX
-=U5/e
------END PGP SIGNATURE-----
-
---qAF0tM7RQCakc5RDMpomWDWXM26xu5ecG--
