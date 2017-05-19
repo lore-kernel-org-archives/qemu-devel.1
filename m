@@ -1,24 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35380)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36400)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <voipio@kos.to>) id 1dBiRY-000688-Fv
-	for qemu-devel@nongnu.org; Fri, 19 May 2017 09:59:51 -0400
+	(envelope-from <sameeh@daynix.com>) id 1dBiVt-0008Fi-Hq
+	for qemu-devel@nongnu.org; Fri, 19 May 2017 10:04:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <voipio@kos.to>) id 1dBiRT-0000ZZ-OC
-	for qemu-devel@nongnu.org; Fri, 19 May 2017 09:59:48 -0400
-Received: from jessie.kos.to ([212.47.231.226]:40424 helo=pilvi.kos.to)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <voipio@kos.to>) id 1dBiRT-0000Yn-H5
-	for qemu-devel@nongnu.org; Fri, 19 May 2017 09:59:43 -0400
-Date: Fri, 19 May 2017 13:59:40 +0000
-From: Riku Voipio <riku.voipio@iki.fi>
-Message-ID: <20170519135940.GB19553@kos.to>
-References: <mvmh92ouqtw.fsf@suse.de>
+	(envelope-from <sameeh@daynix.com>) id 1dBiVp-0002Mg-8i
+	for qemu-devel@nongnu.org; Fri, 19 May 2017 10:04:17 -0400
+Received: from mail-vk0-x244.google.com ([2607:f8b0:400c:c05::244]:33872)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <sameeh@daynix.com>) id 1dBiVp-0002M8-17
+	for qemu-devel@nongnu.org; Fri, 19 May 2017 10:04:13 -0400
+Received: by mail-vk0-x244.google.com with SMTP id w1so1551015vkd.1
+	for <qemu-devel@nongnu.org>; Fri, 19 May 2017 07:04:12 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <mvmh92ouqtw.fsf@suse.de>
-Subject: Re: [Qemu-devel] [PATCH] linux-user: remove all traces of qemu from
- /proc/self/cmdline
+In-Reply-To: <eebf4765-3c20-7ca4-badd-a02f3870e8a0@redhat.com>
+References: <1495021572-20852-1-git-send-email-sameeh@daynix.com>
+	<eebf4765-3c20-7ca4-badd-a02f3870e8a0@redhat.com>
+From: Sameeh Jubran <sameeh@daynix.com>
+Date: Fri, 19 May 2017 17:04:11 +0300
+Message-ID: <CAKPgXcHWJqHoJ4R84znRrTK68XOQbYh9fNV_vn2+xY2QHG3Tig@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] e1000e: Fix a bug where guest hangs upon
+ migration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,92 +30,135 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Andreas Schwab <schwab@suse.de>
-Cc: qemu-devel@nongnu.org
+To: Jason Wang <jasowang@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Dmitry Fleytman <dmitry@daynix.com>, Yan Vugenfirer <yan@daynix.com>
 
-On Mon, Mar 20, 2017 at 12:31:55PM +0100, Andreas Schwab wrote:
-> Instead of post-processing the real contents use the remembered target
-> argv.  That removes all traces of qemu, including command line options,
-> and handles QEMU_ARGV0.
+On Fri, May 19, 2017 at 9:25 AM, Jason Wang <jasowang@redhat.com> wrote:
 
-Applied to Linux-user, thanks
+>
+>
+> On 2017=E5=B9=B405=E6=9C=8817=E6=97=A5 19:46, Sameeh Jubran wrote:
+>
+>> The bug was caused by the "receive overrun" (bit #6 of the ICR register)
+>> interrupt
+>> which would be triggered post migration in a heavy traffic environment.
+>> Even though the
+>> "receive overrun" bit (#6) is masked out by the IMS register (refer to
+>> the log below)
+>> the driver still receives an interrupt as the "receive overrun" bit (#6)
+>> causes the
+>> "Other" - bit #24 of the ICR register - bit to be set as documented
+>> below. The driver
+>> handles the interrupt and clears the "Other" bit (#24) but doesn't clear
+>> the
+>> "receive overrun" bit (#6) which leads to an infinite loop. Apparently
+>> the Windows
+>> driver expects that the "receive overrun" bit and other ones - documente=
+d
+>> below - to be
+>> cleared when the "Other" bit (#24) is cleared.
+>>
+>> So to sum that up:
+>> 1. Bit #6 of the ICR register is set by heavy traffic
+>> 2. As a results of setting bit #6, bit #24 is set
+>> 3. The driver receives an interrupt for bit 24 (it doesn't receieve an
+>> interrupt for bit #6 as it is masked out by IMS)
+>> 4. The driver handles and clears the interrupt of bit #24
+>> 5. Bit #6 is still set.
+>> 6. 2 happens all over again
+>>
+>> The Interrupt Cause Read - ICR register:
+>>
+>> The ICR has the "Other" bit - bit #24 - that is set when one or more of
+>> the following
+>> ICR register's bits are set:
+>>
+>> LSC - bit #2, RXO - bit #6, MDAC - bit #9, SRPD - bit #16, ACK - bit #17=
+,
+>> MNG - bit #18
+>>
+>> Log sample of the storm:
+>>
+>> 27563@1494850819.411877:e1000e_irq_pending_interrupts ICR PENDING:
+>> 0x1000000 (ICR: 0x815000c2, IMS: 0x1a00004)
+>> 27563@1494850819.411900:e1000e_irq_pending_interrupts ICR PENDING: 0x0
+>> (ICR: 0x815000c2, IMS: 0xa00004)
+>> 27563@1494850819.411915:e1000e_irq_pending_interrupts ICR PENDING: 0x0
+>> (ICR: 0x815000c2, IMS: 0xa00004)
+>> 27563@1494850819.412380:e1000e_irq_pending_interrupts ICR PENDING: 0x0
+>> (ICR: 0x815000c2, IMS: 0xa00004)
+>> 27563@1494850819.412395:e1000e_irq_pending_interrupts ICR PENDING: 0x0
+>> (ICR: 0x815000c2, IMS: 0xa00004)
+>> 27563@1494850819.412436:e1000e_irq_pending_interrupts ICR PENDING: 0x0
+>> (ICR: 0x815000c2, IMS: 0xa00004)
+>> 27563@1494850819.412441:e1000e_irq_pending_interrupts ICR PENDING: 0x0
+>> (ICR: 0x815000c2, IMS: 0xa00004)
+>> 27563@1494850819.412998:e1000e_irq_pending_interrupts ICR PENDING:
+>> 0x1000000 (ICR: 0x815000c2, IMS: 0x1a00004)
+>>
+>> This commit solves:
+>> https://bugzilla.redhat.com/show_bug.cgi?id=3D1447935
+>> https://bugzilla.redhat.com/show_bug.cgi?id=3D1449490
+>>
+>> Signed-off-by: Sameeh Jubran <sjubran@redhat.com>
+>> ---
+>>   hw/net/e1000e_core.c | 7 +++++--
+>>   1 file changed, 5 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/hw/net/e1000e_core.c b/hw/net/e1000e_core.c
+>> index 28c5be1..8174b53 100644
+>> --- a/hw/net/e1000e_core.c
+>> +++ b/hw/net/e1000e_core.c
+>> @@ -2454,14 +2454,17 @@ e1000e_set_ics(E1000ECore *core, int index,
+>> uint32_t val)
+>>   static void
+>>   e1000e_set_icr(E1000ECore *core, int index, uint32_t val)
+>>   {
+>> +    uint32_t icr =3D 0;
+>>       if ((core->mac[ICR] & E1000_ICR_ASSERTED) &&
+>>           (core->mac[CTRL_EXT] & E1000_CTRL_EXT_IAME)) {
+>>           trace_e1000e_irq_icr_process_iame();
+>>           e1000e_clear_ims_bits(core, core->mac[IAM]);
+>>       }
+>>   -    trace_e1000e_irq_icr_write(val, core->mac[ICR], core->mac[ICR] &
+>> ~val);
+>> -    core->mac[ICR] &=3D ~val;
+>> +    icr =3D core->mac[ICR] & ~val;
+>> +    icr =3D (val & E1000_ICR_OTHER) ? (icr & ~E1000_ICR_OTHER_CAUSES) :
+>> icr;
+>> +    trace_e1000e_irq_icr_write(val, core->mac[ICR], icr);
+>> +    core->mac[ICR] =3D icr;
+>>       e1000e_update_interrupt_state(core);
+>>   }
+>>
+>>
+>
+> Thanks for the patch.
+>
+> So this is an undocumented behavior, we must be careful on this. Several
+> question below:
+>
+> - have you verified this on real hardware?
+>
+No I haven't
 
-Riku
- 
-> Signed-off-by: Andreas Schwab <schwab@suse.de>
-> ---
->  linux-user/syscall.c | 47 +++++++----------------------------------------
->  1 file changed, 7 insertions(+), 40 deletions(-)
-> 
-> diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-> index cec8428589..ec1fd20386 100644
-> --- a/linux-user/syscall.c
-> +++ b/linux-user/syscall.c
-> @@ -7358,52 +7358,19 @@ int host_to_target_waitstatus(int status)
->  
->  static int open_self_cmdline(void *cpu_env, int fd)
->  {
-> -    int fd_orig = -1;
-> -    bool word_skipped = false;
-> -
-> -    fd_orig = open("/proc/self/cmdline", O_RDONLY);
-> -    if (fd_orig < 0) {
-> -        return fd_orig;
-> -    }
-> +    CPUState *cpu = ENV_GET_CPU((CPUArchState *)cpu_env);
-> +    struct linux_binprm *bprm = ((TaskState *)cpu->opaque)->bprm;
-> +    int i;
->  
-> -    while (true) {
-> -        ssize_t nb_read;
-> -        char buf[128];
-> -        char *cp_buf = buf;
-> +    for (i = 0; i < bprm->argc; i++) {
-> +        size_t len = strlen(bprm->argv[i]) + 1;
->  
-> -        nb_read = read(fd_orig, buf, sizeof(buf));
-> -        if (nb_read < 0) {
-> -            int e = errno;
-> -            fd_orig = close(fd_orig);
-> -            errno = e;
-> +        if (write(fd, bprm->argv[i], len) != len) {
->              return -1;
-> -        } else if (nb_read == 0) {
-> -            break;
-> -        }
-> -
-> -        if (!word_skipped) {
-> -            /* Skip the first string, which is the path to qemu-*-static
-> -               instead of the actual command. */
-> -            cp_buf = memchr(buf, 0, nb_read);
-> -            if (cp_buf) {
-> -                /* Null byte found, skip one string */
-> -                cp_buf++;
-> -                nb_read -= cp_buf - buf;
-> -                word_skipped = true;
-> -            }
-> -        }
-> -
-> -        if (word_skipped) {
-> -            if (write(fd, cp_buf, nb_read) != nb_read) {
-> -                int e = errno;
-> -                close(fd_orig);
-> -                errno = e;
-> -                return -1;
-> -            }
->          }
->      }
->  
-> -    return close(fd_orig);
-> +    return 0;
->  }
->  
->  static int open_self_maps(void *cpu_env, int fd)
-> -- 
-> 2.12.0
-> 
-> 
-> -- 
-> Andreas Schwab, SUSE Labs, schwab@suse.de
-> GPG Key fingerprint = 0196 BAD8 1CE9 1970 F4BE  1748 E4D4 88E3 0EEA B9D7
-> "And now for something completely different."
+> - is MSIX enabled in this case?
+>
+Yes it is, I have tested the patch with msi disabled too.
+
+> - according to the steps you've summed up above, it's not specific to
+> migration?
+>
+True
+
+>
+> Thanks
+>
+
+
+
+--=20
+Respectfully,
+*Sameeh Jubran*
+*Linkedin <https://il.linkedin.com/pub/sameeh-jubran/87/747/a8a>*
+*Software Engineer @ Daynix <http://www.daynix.com>.*
