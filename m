@@ -1,31 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39076)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41352)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1dBdkA-0004T4-6c
-	for qemu-devel@nongnu.org; Fri, 19 May 2017 04:58:43 -0400
+	(envelope-from <kevin.tian@intel.com>) id 1dBdt8-0006kZ-PR
+	for qemu-devel@nongnu.org; Fri, 19 May 2017 05:07:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1dBdk7-0004ee-3b
-	for qemu-devel@nongnu.org; Fri, 19 May 2017 04:58:42 -0400
-Received: from mga11.intel.com ([192.55.52.93]:33677)
+	(envelope-from <kevin.tian@intel.com>) id 1dBdt5-0007Es-CX
+	for qemu-devel@nongnu.org; Fri, 19 May 2017 05:07:58 -0400
+Received: from mga02.intel.com ([134.134.136.20]:13402)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <wei.w.wang@intel.com>)
-	id 1dBdk6-0004dQ-QF
-	for qemu-devel@nongnu.org; Fri, 19 May 2017 04:58:39 -0400
-Message-ID: <591EB435.4080109@intel.com>
-Date: Fri, 19 May 2017 17:00:37 +0800
-From: Wei Wang <wei.w.wang@intel.com>
+	(Exim 4.71) (envelope-from <kevin.tian@intel.com>)
+	id 1dBdt5-0007Eg-1G
+	for qemu-devel@nongnu.org; Fri, 19 May 2017 05:07:55 -0400
+From: "Tian, Kevin" <kevin.tian@intel.com>
+Date: Fri, 19 May 2017 09:07:49 +0000
+Message-ID: <AADFC41AFE54684AB9EE6CBC0274A5D190CD9CA5@SHSMSX101.ccr.corp.intel.com>
+References: <1493201210-14357-1-git-send-email-yi.l.liu@linux.intel.com>
+	<1493201210-14357-10-git-send-email-yi.l.liu@linux.intel.com>
+	<5c64416d-7d8a-f1a6-64f9-cb0bf1d95a4a@intel.com>
+	<20170519052338.GA10952@sky-dev>
+In-Reply-To: <20170519052338.GA10952@sky-dev>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-References: <1494578148-102868-1-git-send-email-wei.w.wang@intel.com>
-	<a3f2cae3-5d3d-f620-4a8d-bb11470c0b08@redhat.com>
-	<591AA65F.8080608@intel.com>
-	<d6eb1d73-c791-b8d3-7ef3-a7653aef00d6@redhat.com>
-	<7e1b48d5-83e6-a0ae-5d91-696d8db09d7c@redhat.com>
-	<591D0EF5.9000807@intel.com>
-	<d7df5484-7e08-4e1c-9e35-69d73858c736@redhat.com>
-In-Reply-To: <d7df5484-7e08-4e1c-9e35-69d73858c736@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [virtio-dev] Re: [virtio-dev] Re: [PATCH v2 00/16]
- Vhost-pci for inter-VM communication
+Subject: Re: [Qemu-devel] [RFC PATCH 09/20] Memory: introduce
+ iommu_ops->record_device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,102 +32,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jason Wang <jasowang@redhat.com>, stefanha@gmail.com, marcandre.lureau@gmail.com, mst@redhat.com, pbonzini@redhat.com, virtio-dev@lists.oasis-open.org, qemu-devel@nongnu.org
+To: "Liu, Yi L" <yi.l.liu@linux.intel.com>, "alex.williamson@redhat.com" <alex.williamson@redhat.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "peterx@redhat.com" <peterx@redhat.com>, "Liu, Yi L" <yi.l.liu@intel.com>, "Raj, Ashok" <ashok.raj@intel.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "jean-philippe.brucker@arm.com" <jean-philippe.brucker@arm.com>, "jasowang@redhat.com" <jasowang@redhat.com>, "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>, "Pan, Jacob jun" <jacob.jun.pan@intel.com>, "Lan,
+	Tianyu" <tianyu.lan@intel.com>
 
-On 05/19/2017 11:10 AM, Jason Wang wrote:
->
->
-> On 2017年05月18日 11:03, Wei Wang wrote:
->> On 05/17/2017 02:22 PM, Jason Wang wrote:
->>>
->>>
->>> On 2017年05月17日 14:16, Jason Wang wrote:
->>>>
->>>>
->>>> On 2017年05月16日 15:12, Wei Wang wrote:
->>>>>>>
->>>>>>
->>>>>> Hi:
->>>>>>
->>>>>> Care to post the driver codes too?
->>>>>>
->>>>> OK. It may take some time to clean up the driver code before post 
->>>>> it out. You can first
->>>>> have a check of the draft at the repo here:
->>>>> https://github.com/wei-w-wang/vhost-pci-driver
->>>>>
->>>>> Best,
->>>>> Wei
->>>>
->>>> Interesting, looks like there's one copy on tx side. We used to 
->>>> have zerocopy support for tun for VM2VM traffic. Could you please 
->>>> try to compare it with your vhost-pci-net by:
->>>>
->> We can analyze from the whole data path - from VM1's network stack to 
->> send packets -> VM2's
->> network stack to receive packets. The number of copies are actually 
->> the same for both.
->
-> That's why I'm asking you to compare the performance. The only reason 
-> for vhost-pci is performance. You should prove it.
->
->>
->> vhost-pci: 1-copy happen in VM1's driver xmit(), which copes packets 
->> from its network stack to VM2's
->> RX ring buffer. (we call it "zerocopy" because there is no 
->> intermediate copy between VMs)
->> zerocopy enabled vhost-net: 1-copy happen in tun's recvmsg, which 
->> copies packets from VM1's TX ring
->> buffer to VM2's RX ring buffer.
->
-> Actually, there's a major difference here. You do copy in guest which 
-> consumes time slice of vcpu thread on host. Vhost_net do this in its 
-> own thread. So I feel vhost_net is even faster here, maybe I was wrong.
->
-
-The code path using vhost_net is much longer - the Ping test shows that 
-the zcopy based vhost_net reports around 0.237ms,
-while using vhost-pci it reports around 0.06 ms.
-For some environment issue, I can report the throughput number later.
-
->>
->> That being said, we compared to vhost-user, instead of vhost_net, 
->> because vhost-user is the one
->> that is used in NFV, which we think is a major use case for vhost-pci.
->
-> If this is true, why not draft a pmd driver instead of a kernel one? 
-
-Yes, that's right. There are actually two directions of the vhost-pci 
-driver implementation - kernel driver
-and dpdk pmd. The QEMU side device patches are first posted out for 
-discussion, because when the device
-part is ready, we will be able to have the related team work on the pmd 
-driver as well. As usual, the pmd
-driver would give a much better throughput.
-
-So, I think at this stage we should focus on the device part review, and 
-use the kernel driver to prove that
-the device part design and implementation is reasonable and functional.
-
-
-> And do you use virtio-net kernel driver to compare the performance? If 
-> yes, has OVS dpdk optimized for kernel driver (I think not)?
->
-
-We used the legacy OVS+DPDK.
-Another thing with the existing OVS+DPDK usage is its centralization 
-property. With vhost-pci, we will be able to
-de-centralize the usage.
-
-> What's more important, if vhost-pci is faster, I think its kernel 
-> driver should be also faster than virtio-net, no?
-
-Sorry about the confusion. We are actually not trying to use vhost-pci 
-to replace virtio-net. Rather, vhost-pci
-can be viewed as another type of backend for virtio-net to be used in 
-NFV (the communication channel is
-vhost-pci-net<->virtio_net).
-
-
-Best,
-Wei
+PiBGcm9tOiBMaXUsIFlpIEwgW21haWx0bzp5aS5sLmxpdUBsaW51eC5pbnRlbC5jb21dDQo+IFNl
+bnQ6IEZyaWRheSwgTWF5IDE5LCAyMDE3IDE6MjQgUE0NCj4gDQo+IEhpIEFsZXgsDQo+IA0KPiBX
+aGF0J3MgeW91ciBvcGluaW9uIHdpdGggVGlhbnl1J3MgcXVlc3Rpb24/IElzIGl0IGFjY2VwYXRh
+YmxlDQo+IHRvIHVzZSBWRklPIEFQSSBpbiBpbnRlbF9pb21tdSBlbXVsYXRvcj8NCg0KRGlkIHlv
+dSBhY3R1YWxseSBuZWVkIHN1Y2ggdHJhbnNsYXRpb24gYXQgYWxsPyBTSUQgc2hvdWxkIGJlDQpm
+aWxsZWQgYnkga2VybmVsIElPTU1VIGRyaXZlciBiYXNlZCBvbiB3aGljaCBkZXZpY2UgaXMNCnJl
+cXVlc3RlZCB3aXRoIGludmFsaWRhdGlvbiByZXF1ZXN0LCByZWdhcmRsZXNzIG9mIHdoaWNoIA0K
+Z3Vlc3QgU0lEIGlzIHVzZWQgaW4gdXNlciBzcGFjZS4gUWVtdSBvbmx5IG5lZWRzIHRvIGtub3cN
+CndoaWNoIGZkIGNvcnJlc3BvbmRzIHRvIGd1ZXN0IFNJRCwgYW5kIHRoZW4gaW5pdGlhdGVzIGFu
+DQppbnZhbGlkYXRpb24gcmVxdWVzdCBvbiB0aGF0IGZkPw0KDQo+IA0KPiBUaGFua3MsDQo+IFlp
+IEwNCj4gT24gRnJpLCBBcHIgMjgsIDIwMTcgYXQgMDI6NDY6MTZQTSArMDgwMCwgTGFuIFRpYW55
+dSB3cm90ZToNCj4gPiBPbiAyMDE35bm0MDTmnIgyNuaXpSAxODowNiwgTGl1LCBZaSBMIHdyb3Rl
+Og0KPiA+ID4gV2l0aCB2SU9NTVUgZXhwb3NlZCB0byBndWVzdCwgdklPTU1VIGVtdWxhdG9yIG5l
+ZWRzIHRvIGRvDQo+IHRyYW5zbGF0aW9uDQo+ID4gPiBiZXR3ZWVuIGhvc3QgYW5kIGd1ZXN0LiBl
+LmcuIGEgZGV2aWNlLXNlbGVjdGl2ZSBUTEIgZmx1c2gsIHZJT01NVQ0KPiA+ID4gZW11bGF0b3Ig
+bmVlZHMgdG8gcmVwbGFjZSBndWVzdCBTSUQgd2l0aCBob3N0IFNJRCBzbyB0aGF0IHRvIGxpbWl0
+DQo+ID4gPiB0aGUgaW52YWxpZGF0aW9uLiBUaGlzIHBhdGNoIGludHJvZHVjZXMgYSBuZXcgY2Fs
+bGJhY2sNCj4gPiA+IGlvbW11X29wcy0+cmVjb3JkX2RldmljZSgpIHRvIG5vdGlmeSB2SU9NTVUg
+ZW11bGF0b3IgdG8gcmVjb3JkDQo+IG5lY2Vzc2FyeQ0KPiA+ID4gaW5mb3JtYXRpb24gYWJvdXQg
+dGhlIGFzc2lnbmVkIGRldmljZS4NCj4gPg0KPiA+IFRoaXMgcGF0Y2ggaXMgdG8gcHJlcGFyZSB0
+byB0cmFuc2xhdGUgZ3Vlc3Qgc2JkZiB0byBob3N0IHNiZGYuDQo+ID4NCj4gPiBBbGV4Og0KPiA+
+IAlDb3VsZCB3ZSBhZGQgYSBuZXcgdmZpbyBBUEkgdG8gZG8gc3VjaCB0cmFuc2xhdGlvbj8gVGhp
+cyB3aWxsIGJlIG1vcmUNCj4gPiBzdHJhaWdodCBmb3J3YXJkIHRoYW4gc3RvcmluZyBob3N0IHNi
+ZGYgaW4gdGhlIHZJT01NVSBkZXZpY2UgbW9kZWwuDQo+ID4NCj4gPiA+DQo+ID4gPiBTaWduZWQt
+b2ZmLWJ5OiBMaXUsIFlpIEwgPHlpLmwubGl1QGxpbnV4LmludGVsLmNvbT4NCj4gPiA+IC0tLQ0K
+PiA+ID4gIGluY2x1ZGUvZXhlYy9tZW1vcnkuaCB8IDExICsrKysrKysrKysrDQo+ID4gPiAgbWVt
+b3J5LmMgICAgICAgICAgICAgIHwgMTIgKysrKysrKysrKysrDQo+ID4gPiAgMiBmaWxlcyBjaGFu
+Z2VkLCAyMyBpbnNlcnRpb25zKCspDQo+ID4gPg0KPiA+ID4gZGlmZiAtLWdpdCBhL2luY2x1ZGUv
+ZXhlYy9tZW1vcnkuaCBiL2luY2x1ZGUvZXhlYy9tZW1vcnkuaA0KPiA+ID4gaW5kZXggN2JkMTNh
+Yi4uNDkwODdlZiAxMDA2NDQNCj4gPiA+IC0tLSBhL2luY2x1ZGUvZXhlYy9tZW1vcnkuaA0KPiA+
+ID4gKysrIGIvaW5jbHVkZS9leGVjL21lbW9yeS5oDQo+ID4gPiBAQCAtMjAzLDYgKzIwMyw4IEBA
+IHN0cnVjdCBNZW1vcnlSZWdpb25JT01NVU9wcyB7DQo+ID4gPiAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICBJT01NVU5vdGlmaWVyRmxhZyBuZXdfZmxhZ3MpOw0KPiA+ID4gICAgICAv
+KiBTZXQgdGhpcyB1cCB0byBwcm92aWRlIGN1c3RvbWl6ZWQgSU9NTVUgcmVwbGF5IGZ1bmN0aW9u
+ICovDQo+ID4gPiAgICAgIHZvaWQgKCpyZXBsYXkpKE1lbW9yeVJlZ2lvbiAqaW9tbXUsIElPTU1V
+Tm90aWZpZXIgKm5vdGlmaWVyKTsNCj4gPiA+ICsgICAgdm9pZCAoKnJlY29yZF9kZXZpY2UpKE1l
+bW9yeVJlZ2lvbiAqaW9tbXUsDQo+ID4gPiArICAgICAgICAgICAgICAgICAgICAgICAgICB2b2lk
+ICpkZXZpY2VfaW5mbyk7DQo+ID4gPiAgfTsNCj4gPiA+DQo+ID4gPiAgdHlwZWRlZiBzdHJ1Y3Qg
+Q29hbGVzY2VkTWVtb3J5UmFuZ2UgQ29hbGVzY2VkTWVtb3J5UmFuZ2U7DQo+ID4gPiBAQCAtNzA4
+LDYgKzcxMCwxNSBAQCB2b2lkDQo+IG1lbW9yeV9yZWdpb25fbm90aWZ5X2lvbW11KE1lbW9yeVJl
+Z2lvbiAqbXIsDQo+ID4gPiAgdm9pZCBtZW1vcnlfcmVnaW9uX25vdGlmeV9vbmUoSU9NTVVOb3Rp
+ZmllciAqbm90aWZpZXIsDQo+ID4gPiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgSU9N
+TVVUTEJFbnRyeSAqZW50cnkpOw0KPiA+ID4NCj4gPiA+ICsvKg0KPiA+ID4gKyAqIG1lbW9yeV9y
+ZWdpb25fbm90aWZ5X2RldmljZV9yZWNvcmQ6IG5vdGlmeSBJT01NVSB0byByZWNvcmQNCj4gYXNz
+aWduDQo+ID4gPiArICogZGV2aWNlLg0KPiA+ID4gKyAqIEBtcjogdGhlIG1lbW9yeSByZWdpb24g
+dG8gbm90aWZ5DQo+ID4gPiArICogQCBkZXZpY2VfaW5mbzogZGV2aWNlIGluZm9ybWF0aW9uDQo+
+ID4gPiArICovDQo+ID4gPiArdm9pZCBtZW1vcnlfcmVnaW9uX25vdGlmeV9kZXZpY2VfcmVjb3Jk
+KE1lbW9yeVJlZ2lvbiAqbXIsDQo+ID4gPiArICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgIHZvaWQgKmluZm8pOw0KPiA+ID4gKw0KPiA+ID4gIC8qKg0KPiA+ID4gICAqIG1l
+bW9yeV9yZWdpb25fcmVnaXN0ZXJfaW9tbXVfbm90aWZpZXI6IHJlZ2lzdGVyIGEgbm90aWZpZXIg
+Zm9yDQo+IGNoYW5nZXMgdG8NCj4gPiA+ICAgKiBJT01NVSB0cmFuc2xhdGlvbiBlbnRyaWVzLg0K
+PiA+ID4gZGlmZiAtLWdpdCBhL21lbW9yeS5jIGIvbWVtb3J5LmMNCj4gPiA+IGluZGV4IDA3Mjhl
+NjIuLjQ1ZWYwNjkgMTAwNjQ0DQo+ID4gPiAtLS0gYS9tZW1vcnkuYw0KPiA+ID4gKysrIGIvbWVt
+b3J5LmMNCj4gPiA+IEBAIC0xNjAwLDYgKzE2MDAsMTggQEAgc3RhdGljIHZvaWQNCj4gbWVtb3J5
+X3JlZ2lvbl91cGRhdGVfaW9tbXVfbm90aWZ5X2ZsYWdzKE1lbW9yeVJlZ2lvbiAqbXIpDQo+ID4g
+PiAgICAgIG1yLT5pb21tdV9ub3RpZnlfZmxhZ3MgPSBmbGFnczsNCj4gPiA+ICB9DQo+ID4gPg0K
+PiA+ID4gK3ZvaWQgbWVtb3J5X3JlZ2lvbl9ub3RpZnlfZGV2aWNlX3JlY29yZChNZW1vcnlSZWdp
+b24gKm1yLA0KPiA+ID4gKyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICB2
+b2lkICppbmZvKQ0KPiA+ID4gK3sNCj4gPiA+ICsgICAgYXNzZXJ0KG1lbW9yeV9yZWdpb25faXNf
+aW9tbXUobXIpKTsNCj4gPiA+ICsNCj4gPiA+ICsgICAgaWYgKG1yLT5pb21tdV9vcHMtPnJlY29y
+ZF9kZXZpY2UpIHsNCj4gPiA+ICsgICAgICAgIG1yLT5pb21tdV9vcHMtPnJlY29yZF9kZXZpY2Uo
+bXIsIGluZm8pOw0KPiA+ID4gKyAgICB9DQo+ID4gPiArDQo+ID4gPiArICAgIHJldHVybjsNCj4g
+PiA+ICt9DQo+ID4gPiArDQo+ID4gPiAgdm9pZCBtZW1vcnlfcmVnaW9uX3JlZ2lzdGVyX2lvbW11
+X25vdGlmaWVyKE1lbW9yeVJlZ2lvbiAqbXIsDQo+ID4gPiAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgIElPTU1VTm90aWZpZXIgKm4pDQo+ID4gPiAgew0KPiA+ID4N
+Cj4gPg0KPiA+DQo=
