@@ -1,25 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49562)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49591)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1dBfyV-0004YE-Aj
-	for qemu-devel@nongnu.org; Fri, 19 May 2017 07:21:42 -0400
+	(envelope-from <paolo.bonzini@gmail.com>) id 1dBfyY-0004cK-Gm
+	for qemu-devel@nongnu.org; Fri, 19 May 2017 07:21:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1dBfyT-00010Y-0l
-	for qemu-devel@nongnu.org; Fri, 19 May 2017 07:21:39 -0400
-Received: from mail-wm0-x22b.google.com ([2a00:1450:400c:c09::22b]:37858)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1dBfyV-000128-SI
+	for qemu-devel@nongnu.org; Fri, 19 May 2017 07:21:42 -0400
+Received: from mail-wr0-x242.google.com ([2a00:1450:400c:c0c::242]:34690)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1dBfyS-000108-MW
-	for qemu-devel@nongnu.org; Fri, 19 May 2017 07:21:36 -0400
-Received: by mail-wm0-x22b.google.com with SMTP id d127so83229484wmf.0
-	for <qemu-devel@nongnu.org>; Fri, 19 May 2017 04:21:36 -0700 (PDT)
+	id 1dBfyV-00011q-ID
+	for qemu-devel@nongnu.org; Fri, 19 May 2017 07:21:39 -0400
+Received: by mail-wr0-x242.google.com with SMTP id 6so2624583wrb.1
+	for <qemu-devel@nongnu.org>; Fri, 19 May 2017 04:21:39 -0700 (PDT)
+Received: from 640k.lan (94-39-157-43.adsl-ull.clienti.tiscali.it.
+	[94.39.157.43])
+	by smtp.gmail.com with ESMTPSA id v65sm2640095wmv.5.2017.05.19.04.21.36
+	for <qemu-devel@nongnu.org>
+	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+	Fri, 19 May 2017 04:21:37 -0700 (PDT)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Fri, 19 May 2017 13:21:09 +0200
-Message-Id: <1495192872-27667-18-git-send-email-pbonzini@redhat.com>
+Date: Fri, 19 May 2017 13:21:11 +0200
+Message-Id: <1495192872-27667-20-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1495192872-27667-1-git-send-email-pbonzini@redhat.com>
 References: <1495192872-27667-1-git-send-email-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PULL 17/20] vhost-user-scsi: Introduce
- vhost-user-scsi host device
+Subject: [Qemu-devel] [PULL 19/20] target/i386: enable A20 automatically in
+ system management mode
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,472 +35,288 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Felipe Franciosi <felipe@nutanix.com>
 
-From: Felipe Franciosi <felipe@nutanix.com>
+Ignore env->a20_mask when running in system management mode.
 
-This commit introduces a vhost-user device for SCSI. This is based
-on the existing vhost-scsi implementation, but done over vhost-user
-instead. It also uses a chardev to connect to the backend. Unlike
-vhost-scsi (today), VMs using vhost-user-scsi can be live migrated.
-
-To use it, start Qemu with a command line equivalent to:
-
-qemu-system-x86_64 \
-       -chardev socket,id=vus0,path=/tmp/vus.sock \
-       -device vhost-user-scsi-pci,chardev=vus0,bus=pci.0,addr=...
-
-A separate commit presents a sample application linked with libiscsi to
-provide a backend for vhost-user-scsi.
-
-Signed-off-by: Felipe Franciosi <felipe@nutanix.com>
-Message-Id: <1488479153-21203-4-git-send-email-felipe@nutanix.com>
+Reported-by: Anthony Xu <anthony.xu@intel.com>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+Message-Id: <1494502528-12670-1-git-send-email-pbonzini@redhat.com>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- .gitignore                          |   1 +
- default-configs/pci.mak             |   1 +
- default-configs/s390x-softmmu.mak   |   1 +
- hw/scsi/Makefile.objs               |   1 +
- hw/scsi/vhost-user-scsi.c           | 215 ++++++++++++++++++++++++++++++++++++
- hw/virtio/virtio-pci.c              |  54 +++++++++
- hw/virtio/virtio-pci.h              |  11 ++
- include/hw/virtio/vhost-user-scsi.h |  35 ++++++
- include/hw/virtio/virtio-scsi.h     |   3 +
- 9 files changed, 322 insertions(+)
- create mode 100644 hw/scsi/vhost-user-scsi.c
- create mode 100644 include/hw/virtio/vhost-user-scsi.h
+ target/i386/arch_memory_mapping.c | 18 +++++++++--------
+ target/i386/cpu.h                 |  9 +++++++++
+ target/i386/helper.c              | 42 +++++++++++++++++++++------------------
+ 3 files changed, 42 insertions(+), 27 deletions(-)
 
-diff --git a/.gitignore b/.gitignore
-index 55a001e..fa96bd2 100644
---- a/.gitignore
-+++ b/.gitignore
-@@ -50,6 +50,7 @@
- /qemu-version.h.tmp
- /module_block.h
- /vscclient
-+/vhost-user-scsi
- /fsdev/virtfs-proxy-helper
- *.[1-9]
- *.a
-diff --git a/default-configs/pci.mak b/default-configs/pci.mak
-index 60dc651..ada9c6f 100644
---- a/default-configs/pci.mak
-+++ b/default-configs/pci.mak
-@@ -42,3 +42,4 @@ CONFIG_VGA=y
- CONFIG_VGA_PCI=y
- CONFIG_IVSHMEM=$(CONFIG_EVENTFD)
- CONFIG_ROCKER=y
-+CONFIG_VHOST_USER_SCSI=$(CONFIG_POSIX)
-diff --git a/default-configs/s390x-softmmu.mak b/default-configs/s390x-softmmu.mak
-index 9615a48..9a0b6d9 100644
---- a/default-configs/s390x-softmmu.mak
-+++ b/default-configs/s390x-softmmu.mak
-@@ -1,5 +1,6 @@
- CONFIG_PCI=y
- CONFIG_VIRTIO_PCI=y
-+CONFIG_VHOST_USER_SCSI=y
- CONFIG_VIRTIO=y
- CONFIG_SCLPCONSOLE=y
- CONFIG_TERMINAL3270=y
-diff --git a/hw/scsi/Makefile.objs b/hw/scsi/Makefile.objs
-index 54d8754..b188f72 100644
---- a/hw/scsi/Makefile.objs
-+++ b/hw/scsi/Makefile.objs
-@@ -11,4 +11,5 @@ obj-$(CONFIG_PSERIES) += spapr_vscsi.o
- ifeq ($(CONFIG_VIRTIO),y)
- obj-y += virtio-scsi.o virtio-scsi-dataplane.o
- obj-$(CONFIG_VHOST_SCSI) += vhost-scsi-common.o vhost-scsi.o
-+obj-$(CONFIG_VHOST_USER_SCSI) += vhost-scsi-common.o vhost-user-scsi.o
- endif
-diff --git a/hw/scsi/vhost-user-scsi.c b/hw/scsi/vhost-user-scsi.c
-new file mode 100644
-index 0000000..694a637
---- /dev/null
-+++ b/hw/scsi/vhost-user-scsi.c
-@@ -0,0 +1,215 @@
-+/*
-+ * vhost-user-scsi host device
-+ *
-+ * Copyright (c) 2016 Nutanix Inc. All rights reserved.
-+ *
-+ * Author:
-+ *  Felipe Franciosi <felipe@nutanix.com>
-+ *
-+ * This work is largely based on the "vhost-scsi" implementation by:
-+ *  Stefan Hajnoczi    <stefanha@linux.vnet.ibm.com>
-+ *  Nicholas Bellinger <nab@risingtidesystems.com>
-+ *
-+ * This work is licensed under the terms of the GNU LGPL, version 2 or later.
-+ * See the COPYING.LIB file in the top-level directory.
-+ *
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "migration/vmstate.h"
-+#include "qapi/error.h"
-+#include "qemu/error-report.h"
-+#include "qemu/typedefs.h"
-+#include "qom/object.h"
-+#include "hw/fw-path-provider.h"
-+#include "hw/qdev-core.h"
-+#include "hw/virtio/vhost.h"
-+#include "hw/virtio/vhost-backend.h"
-+#include "hw/virtio/vhost-user-scsi.h"
-+#include "hw/virtio/virtio.h"
-+#include "hw/virtio/virtio-access.h"
-+#include "sysemu/char.h"
-+
-+/* Features supported by the host application */
-+static const int user_feature_bits[] = {
-+    VIRTIO_F_NOTIFY_ON_EMPTY,
-+    VIRTIO_RING_F_INDIRECT_DESC,
-+    VIRTIO_RING_F_EVENT_IDX,
-+    VIRTIO_SCSI_F_HOTPLUG,
-+    VHOST_INVALID_FEATURE_BIT
-+};
-+
-+static void vhost_user_scsi_set_status(VirtIODevice *vdev, uint8_t status)
+diff --git a/target/i386/arch_memory_mapping.c b/target/i386/arch_memory_mapping.c
+index 826aee5..647cff2 100644
+--- a/target/i386/arch_memory_mapping.c
++++ b/target/i386/arch_memory_mapping.c
+@@ -272,25 +272,27 @@ void x86_cpu_get_memory_mapping(CPUState *cs, MemoryMappingList *list,
+ {
+     X86CPU *cpu = X86_CPU(cs);
+     CPUX86State *env = &cpu->env;
++    int32_t a20_mask;
+ 
+     if (!cpu_paging_enabled(cs)) {
+         /* paging is disabled */
+         return;
+     }
+ 
++    a20_mask = x86_get_a20_mask(env);
+     if (env->cr[4] & CR4_PAE_MASK) {
+ #ifdef TARGET_X86_64
+         if (env->hflags & HF_LMA_MASK) {
+             if (env->cr[4] & CR4_LA57_MASK) {
+                 hwaddr pml5e_addr;
+ 
+-                pml5e_addr = (env->cr[3] & PLM4_ADDR_MASK) & env->a20_mask;
+-                walk_pml5e(list, cs->as, pml5e_addr, env->a20_mask);
++                pml5e_addr = (env->cr[3] & PLM4_ADDR_MASK) & a20_mask;
++                walk_pml5e(list, cs->as, pml5e_addr, a20_mask);
+             } else {
+                 hwaddr pml4e_addr;
+ 
+-                pml4e_addr = (env->cr[3] & PLM4_ADDR_MASK) & env->a20_mask;
+-                walk_pml4e(list, cs->as, pml4e_addr, env->a20_mask,
++                pml4e_addr = (env->cr[3] & PLM4_ADDR_MASK) & a20_mask;
++                walk_pml4e(list, cs->as, pml4e_addr, a20_mask,
+                         0xffffULL << 48);
+             }
+         } else
+@@ -298,16 +300,16 @@ void x86_cpu_get_memory_mapping(CPUState *cs, MemoryMappingList *list,
+         {
+             hwaddr pdpe_addr;
+ 
+-            pdpe_addr = (env->cr[3] & ~0x1f) & env->a20_mask;
+-            walk_pdpe2(list, cs->as, pdpe_addr, env->a20_mask);
++            pdpe_addr = (env->cr[3] & ~0x1f) & a20_mask;
++            walk_pdpe2(list, cs->as, pdpe_addr, a20_mask);
+         }
+     } else {
+         hwaddr pde_addr;
+         bool pse;
+ 
+-        pde_addr = (env->cr[3] & ~0xfff) & env->a20_mask;
++        pde_addr = (env->cr[3] & ~0xfff) & a20_mask;
+         pse = !!(env->cr[4] & CR4_PSE_MASK);
+-        walk_pde2(list, cs->as, pde_addr, env->a20_mask, pse);
++        walk_pde2(list, cs->as, pde_addr, a20_mask, pse);
+     }
+ }
+ 
+diff --git a/target/i386/cpu.h b/target/i386/cpu.h
+index c4602ca..32a3a0c 100644
+--- a/target/i386/cpu.h
++++ b/target/i386/cpu.h
+@@ -1624,6 +1624,15 @@ static inline MemTxAttrs cpu_get_mem_attrs(CPUX86State *env)
+     return ((MemTxAttrs) { .secure = (env->hflags & HF_SMM_MASK) != 0 });
+ }
+ 
++static inline int32_t x86_get_a20_mask(CPUX86State *env)
 +{
-+    VHostUserSCSI *s = (VHostUserSCSI *)vdev;
-+    VHostSCSICommon *vsc = VHOST_SCSI_COMMON(s);
-+    bool start = (status & VIRTIO_CONFIG_S_DRIVER_OK) && vdev->vm_running;
-+
-+    if (vsc->dev.started == start) {
-+        return;
-+    }
-+
-+    if (start) {
-+        int ret;
-+
-+        ret = vhost_scsi_common_start(vsc);
-+        if (ret < 0) {
-+            error_report("unable to start vhost-user-scsi: %s", strerror(-ret));
-+            exit(1);
-+        }
++    if (env->hflags & HF_SMM_MASK) {
++        return -1;
 +    } else {
-+        vhost_scsi_common_stop(vsc);
++        return env->a20_mask;
 +    }
 +}
 +
-+static void vhost_dummy_handle_output(VirtIODevice *vdev, VirtQueue *vq)
-+{
-+}
-+
-+static void vhost_user_scsi_save(QEMUFile *f, void *opaque)
-+{
-+    VirtIODevice *vdev = VIRTIO_DEVICE(opaque);
-+    virtio_save(vdev, f);
-+}
-+
-+static int vhost_user_scsi_load(QEMUFile *f, void *opaque, int version_id)
-+{
-+    VirtIODevice *vdev = VIRTIO_DEVICE(opaque);
-+    return virtio_load(vdev, f, version_id);
-+}
-+
-+static void vhost_user_scsi_realize(DeviceState *dev, Error **errp)
-+{
-+    VirtIOSCSICommon *vs = VIRTIO_SCSI_COMMON(dev);
-+    VHostUserSCSI *s = VHOST_USER_SCSI(dev);
-+    VHostSCSICommon *vsc = VHOST_SCSI_COMMON(s);
-+    static int vhost_user_scsi_id;
-+    Error *err = NULL;
-+    int ret;
-+
-+    if (!vs->conf.chardev.chr) {
-+        error_setg(errp, "vhost-user-scsi: missing chardev");
-+        return;
-+    }
-+
-+    virtio_scsi_common_realize(dev, vhost_dummy_handle_output,
-+                               vhost_dummy_handle_output,
-+                               vhost_dummy_handle_output, &err);
-+    if (err != NULL) {
-+        error_propagate(errp, err);
-+        return;
-+    }
-+
-+    vsc->dev.nvqs = 2 + vs->conf.num_queues;
-+    vsc->dev.vqs = g_new(struct vhost_virtqueue, vsc->dev.nvqs);
-+    vsc->dev.vq_index = 0;
-+    vsc->dev.backend_features = 0;
-+
-+    ret = vhost_dev_init(&vsc->dev, (void *)&vs->conf.chardev,
-+                         VHOST_BACKEND_TYPE_USER, 0);
-+    if (ret < 0) {
-+        error_setg(errp, "vhost-user-scsi: vhost initialization failed: %s",
-+                   strerror(-ret));
-+        return;
-+    }
-+
-+    /* Channel and lun both are 0 for bootable vhost-user-scsi disk */
-+    vsc->channel = 0;
-+    vsc->lun = 0;
-+    vsc->target = vs->conf.boot_tpgt;
-+
-+    register_savevm(dev, "vhost-user-scsi", vhost_user_scsi_id++, 1,
-+                    vhost_user_scsi_save, vhost_user_scsi_load, s);
-+}
-+
-+static void vhost_user_scsi_unrealize(DeviceState *dev, Error **errp)
-+{
-+    VirtIODevice *vdev = VIRTIO_DEVICE(dev);
-+    VHostUserSCSI *s = VHOST_USER_SCSI(dev);
-+    VHostSCSICommon *vsc = VHOST_SCSI_COMMON(s);
-+
-+    /* This will stop the vhost backend. */
-+    vhost_user_scsi_set_status(vdev, 0);
-+
-+    vhost_dev_cleanup(&vsc->dev);
-+    g_free(vsc->dev.vqs);
-+
-+    virtio_scsi_common_unrealize(dev, errp);
-+}
-+
-+static uint64_t vhost_user_scsi_get_features(VirtIODevice *vdev,
-+                                             uint64_t features, Error **errp)
-+{
-+    VHostUserSCSI *s = VHOST_USER_SCSI(vdev);
-+
-+    // Turn on predefined features supported by this device
-+    features |= s->host_features;
-+
-+    return vhost_scsi_common_get_features(vdev, features, errp);
-+}
-+
-+static Property vhost_user_scsi_properties[] = {
-+    DEFINE_PROP_CHR("chardev", VirtIOSCSICommon, conf.chardev),
-+    DEFINE_PROP_UINT32("boot_tpgt", VirtIOSCSICommon, conf.boot_tpgt, 0),
-+    DEFINE_PROP_UINT32("num_queues", VirtIOSCSICommon, conf.num_queues, 1),
-+    DEFINE_PROP_UINT32("max_sectors", VirtIOSCSICommon, conf.max_sectors,
-+                       0xFFFF),
-+    DEFINE_PROP_UINT32("cmd_per_lun", VirtIOSCSICommon, conf.cmd_per_lun, 128),
-+    DEFINE_PROP_BIT64("hotplug", VHostUserSCSI, host_features,
-+                                                VIRTIO_SCSI_F_HOTPLUG,
-+                                                true),
-+    DEFINE_PROP_BIT64("param_change", VHostUserSCSI, host_features,
-+                                                     VIRTIO_SCSI_F_CHANGE,
-+                                                     true),
-+    DEFINE_PROP_END_OF_LIST(),
-+};
-+
-+static void vhost_user_scsi_class_init(ObjectClass *klass, void *data)
-+{
-+    DeviceClass *dc = DEVICE_CLASS(klass);
-+    VirtioDeviceClass *vdc = VIRTIO_DEVICE_CLASS(klass);
-+    FWPathProviderClass *fwc = FW_PATH_PROVIDER_CLASS(klass);
-+
-+    dc->props = vhost_user_scsi_properties;
-+    set_bit(DEVICE_CATEGORY_STORAGE, dc->categories);
-+    vdc->realize = vhost_user_scsi_realize;
-+    vdc->unrealize = vhost_user_scsi_unrealize;
-+    vdc->get_features = vhost_user_scsi_get_features;
-+    vdc->set_config = vhost_scsi_common_set_config;
-+    vdc->set_status = vhost_user_scsi_set_status;
-+    fwc->get_dev_path = vhost_scsi_common_get_fw_dev_path;
-+}
-+
-+static void vhost_user_scsi_instance_init(Object *obj)
-+{
-+    VirtIOSCSICommon *vs = VIRTIO_SCSI_COMMON(obj);
-+    VHostSCSICommon *vsc = VHOST_SCSI_COMMON(obj);
-+
-+    vsc->feature_bits = user_feature_bits;
-+
-+    // Add the bootindex property for this object
-+    device_add_bootindex_property(obj, &vsc->bootindex, "bootindex", NULL,
-+                                  DEVICE(vsc), NULL);
-+
-+    // Set boot index according the the device config
-+    object_property_set_int(obj, vs->conf.bootindex, "bootindex", NULL);
-+}
-+
-+static const TypeInfo vhost_user_scsi_info = {
-+    .name = TYPE_VHOST_USER_SCSI,
-+    .parent = TYPE_VHOST_SCSI_COMMON,
-+    .instance_size = sizeof(VHostUserSCSI),
-+    .class_init = vhost_user_scsi_class_init,
-+    .instance_init = vhost_user_scsi_instance_init,
-+    .interfaces = (InterfaceInfo[]) {
-+        { TYPE_FW_PATH_PROVIDER },
-+        { }
-+    },
-+};
-+
-+static void virtio_register_types(void)
-+{
-+    type_register_static(&vhost_user_scsi_info);
-+}
-+
-+type_init(virtio_register_types)
-diff --git a/hw/virtio/virtio-pci.c b/hw/virtio/virtio-pci.c
-index f9b7244..d52faeb 100644
---- a/hw/virtio/virtio-pci.c
-+++ b/hw/virtio/virtio-pci.c
-@@ -2135,6 +2135,59 @@ static const TypeInfo vhost_scsi_pci_info = {
- };
+ /* fpu_helper.c */
+ void cpu_set_mxcsr(CPUX86State *env, uint32_t val);
+ void cpu_set_fpuc(CPUX86State *env, uint16_t val);
+diff --git a/target/i386/helper.c b/target/i386/helper.c
+index f11cac6..6c16e7c 100644
+--- a/target/i386/helper.c
++++ b/target/i386/helper.c
+@@ -724,6 +724,7 @@ int x86_cpu_handle_mmu_fault(CPUState *cs, vaddr addr,
+     X86CPU *cpu = X86_CPU(cs);
+     CPUX86State *env = &cpu->env;
+     uint64_t ptep, pte;
++    int32_t a20_mask;
+     target_ulong pde_addr, pte_addr;
+     int error_code = 0;
+     int is_dirty, prot, page_size, is_write, is_user;
+@@ -739,6 +740,7 @@ int x86_cpu_handle_mmu_fault(CPUState *cs, vaddr addr,
  #endif
+     is_write = is_write1 & 1;
  
-+/* vhost-user-scsi-pci */
-+static Property vhost_user_scsi_pci_properties[] = {
-+    DEFINE_PROP_UINT32("vectors", VirtIOPCIProxy, nvectors,
-+                       DEV_NVECTORS_UNSPECIFIED),
-+    DEFINE_PROP_END_OF_LIST(),
-+};
-+
-+static void vhost_user_scsi_pci_realize(VirtIOPCIProxy *vpci_dev, Error **errp)
-+{
-+    VHostUserSCSIPCI *dev = VHOST_USER_SCSI_PCI(vpci_dev);
-+    DeviceState *vdev = DEVICE(&dev->vdev);
-+    VirtIOSCSICommon *vs = VIRTIO_SCSI_COMMON(vdev);
-+
-+    if (vpci_dev->nvectors == DEV_NVECTORS_UNSPECIFIED) {
-+        vpci_dev->nvectors = vs->conf.num_queues + 3;
-+    }
-+
-+    qdev_set_parent_bus(vdev, BUS(&vpci_dev->bus));
-+    object_property_set_bool(OBJECT(vdev), true, "realized", errp);
-+}
-+
-+static void vhost_user_scsi_pci_class_init(ObjectClass *klass, void *data)
-+{
-+    DeviceClass *dc = DEVICE_CLASS(klass);
-+    VirtioPCIClass *k = VIRTIO_PCI_CLASS(klass);
-+    PCIDeviceClass *pcidev_k = PCI_DEVICE_CLASS(klass);
-+    k->realize = vhost_user_scsi_pci_realize;
-+    set_bit(DEVICE_CATEGORY_STORAGE, dc->categories);
-+    dc->props = vhost_user_scsi_pci_properties;
-+    pcidev_k->vendor_id = PCI_VENDOR_ID_REDHAT_QUMRANET;
-+    pcidev_k->device_id = PCI_DEVICE_ID_VIRTIO_SCSI;
-+    pcidev_k->revision = 0x00;
-+    pcidev_k->class_id = PCI_CLASS_STORAGE_SCSI;
-+}
-+
-+static void vhost_user_scsi_pci_instance_init(Object *obj)
-+{
-+    VHostUserSCSIPCI *dev = VHOST_USER_SCSI_PCI(obj);
-+
-+    virtio_instance_init_common(obj, &dev->vdev, sizeof(dev->vdev),
-+                                TYPE_VHOST_USER_SCSI);
-+    object_property_add_alias(obj, "bootindex", OBJECT(&dev->vdev),
-+                              "bootindex", &error_abort);
-+}
-+
-+static const TypeInfo vhost_user_scsi_pci_info = {
-+    .name          = TYPE_VHOST_USER_SCSI_PCI,
-+    .parent        = TYPE_VIRTIO_PCI,
-+    .instance_size = sizeof(VHostUserSCSIPCI),
-+    .instance_init = vhost_user_scsi_pci_instance_init,
-+    .class_init    = vhost_user_scsi_pci_class_init,
-+};
-+
- /* vhost-vsock-pci */
++    a20_mask = x86_get_a20_mask(env);
+     if (!(env->cr[0] & CR0_PG_MASK)) {
+         pte = addr;
+ #ifdef TARGET_X86_64
+@@ -777,7 +779,7 @@ int x86_cpu_handle_mmu_fault(CPUState *cs, vaddr addr,
  
- #ifdef CONFIG_VHOST_VSOCK
-@@ -2612,6 +2665,7 @@ static void virtio_pci_register_types(void)
- #ifdef CONFIG_VHOST_SCSI
-     type_register_static(&vhost_scsi_pci_info);
+             if (la57) {
+                 pml5e_addr = ((env->cr[3] & ~0xfff) +
+-                        (((addr >> 48) & 0x1ff) << 3)) & env->a20_mask;
++                        (((addr >> 48) & 0x1ff) << 3)) & a20_mask;
+                 pml5e = x86_ldq_phys(cs, pml5e_addr);
+                 if (!(pml5e & PG_PRESENT_MASK)) {
+                     goto do_fault;
+@@ -796,7 +798,7 @@ int x86_cpu_handle_mmu_fault(CPUState *cs, vaddr addr,
+             }
+ 
+             pml4e_addr = ((pml5e & PG_ADDRESS_MASK) +
+-                    (((addr >> 39) & 0x1ff) << 3)) & env->a20_mask;
++                    (((addr >> 39) & 0x1ff) << 3)) & a20_mask;
+             pml4e = x86_ldq_phys(cs, pml4e_addr);
+             if (!(pml4e & PG_PRESENT_MASK)) {
+                 goto do_fault;
+@@ -810,7 +812,7 @@ int x86_cpu_handle_mmu_fault(CPUState *cs, vaddr addr,
+             }
+             ptep &= pml4e ^ PG_NX_MASK;
+             pdpe_addr = ((pml4e & PG_ADDRESS_MASK) + (((addr >> 30) & 0x1ff) << 3)) &
+-                env->a20_mask;
++                a20_mask;
+             pdpe = x86_ldq_phys(cs, pdpe_addr);
+             if (!(pdpe & PG_PRESENT_MASK)) {
+                 goto do_fault;
+@@ -835,7 +837,7 @@ int x86_cpu_handle_mmu_fault(CPUState *cs, vaddr addr,
+         {
+             /* XXX: load them when cr3 is loaded ? */
+             pdpe_addr = ((env->cr[3] & ~0x1f) + ((addr >> 27) & 0x18)) &
+-                env->a20_mask;
++                a20_mask;
+             pdpe = x86_ldq_phys(cs, pdpe_addr);
+             if (!(pdpe & PG_PRESENT_MASK)) {
+                 goto do_fault;
+@@ -848,7 +850,7 @@ int x86_cpu_handle_mmu_fault(CPUState *cs, vaddr addr,
+         }
+ 
+         pde_addr = ((pdpe & PG_ADDRESS_MASK) + (((addr >> 21) & 0x1ff) << 3)) &
+-            env->a20_mask;
++            a20_mask;
+         pde = x86_ldq_phys(cs, pde_addr);
+         if (!(pde & PG_PRESENT_MASK)) {
+             goto do_fault;
+@@ -870,7 +872,7 @@ int x86_cpu_handle_mmu_fault(CPUState *cs, vaddr addr,
+             x86_stl_phys_notdirty(cs, pde_addr, pde);
+         }
+         pte_addr = ((pde & PG_ADDRESS_MASK) + (((addr >> 12) & 0x1ff) << 3)) &
+-            env->a20_mask;
++            a20_mask;
+         pte = x86_ldq_phys(cs, pte_addr);
+         if (!(pte & PG_PRESENT_MASK)) {
+             goto do_fault;
+@@ -886,7 +888,7 @@ int x86_cpu_handle_mmu_fault(CPUState *cs, vaddr addr,
+ 
+         /* page directory entry */
+         pde_addr = ((env->cr[3] & ~0xfff) + ((addr >> 20) & 0xffc)) &
+-            env->a20_mask;
++            a20_mask;
+         pde = x86_ldl_phys(cs, pde_addr);
+         if (!(pde & PG_PRESENT_MASK)) {
+             goto do_fault;
+@@ -913,7 +915,7 @@ int x86_cpu_handle_mmu_fault(CPUState *cs, vaddr addr,
+ 
+         /* page directory entry */
+         pte_addr = ((pde & ~0xfff) + ((addr >> 10) & 0xffc)) &
+-            env->a20_mask;
++            a20_mask;
+         pte = x86_ldl_phys(cs, pte_addr);
+         if (!(pte & PG_PRESENT_MASK)) {
+             goto do_fault;
+@@ -992,7 +994,7 @@ do_check_protect_pse36:
+     }
+ 
+  do_mapping:
+-    pte = pte & env->a20_mask;
++    pte = pte & a20_mask;
+ 
+     /* align to page_size */
+     pte &= PG_ADDRESS_MASK & ~(page_size - 1);
+@@ -1039,11 +1041,13 @@ hwaddr x86_cpu_get_phys_page_debug(CPUState *cs, vaddr addr)
+     CPUX86State *env = &cpu->env;
+     target_ulong pde_addr, pte_addr;
+     uint64_t pte;
++    int32_t a20_mask;
+     uint32_t page_offset;
+     int page_size;
+ 
++    a20_mask = x86_get_a20_mask(env);
+     if (!(env->cr[0] & CR0_PG_MASK)) {
+-        pte = addr & env->a20_mask;
++        pte = addr & a20_mask;
+         page_size = 4096;
+     } else if (env->cr[4] & CR4_PAE_MASK) {
+         target_ulong pdpe_addr;
+@@ -1064,7 +1068,7 @@ hwaddr x86_cpu_get_phys_page_debug(CPUState *cs, vaddr addr)
+ 
+             if (la57) {
+                 pml5e_addr = ((env->cr[3] & ~0xfff) +
+-                        (((addr >> 48) & 0x1ff) << 3)) & env->a20_mask;
++                        (((addr >> 48) & 0x1ff) << 3)) & a20_mask;
+                 pml5e = x86_ldq_phys(cs, pml5e_addr);
+                 if (!(pml5e & PG_PRESENT_MASK)) {
+                     return -1;
+@@ -1074,13 +1078,13 @@ hwaddr x86_cpu_get_phys_page_debug(CPUState *cs, vaddr addr)
+             }
+ 
+             pml4e_addr = ((pml5e & PG_ADDRESS_MASK) +
+-                    (((addr >> 39) & 0x1ff) << 3)) & env->a20_mask;
++                    (((addr >> 39) & 0x1ff) << 3)) & a20_mask;
+             pml4e = x86_ldq_phys(cs, pml4e_addr);
+             if (!(pml4e & PG_PRESENT_MASK)) {
+                 return -1;
+             }
+             pdpe_addr = ((pml4e & PG_ADDRESS_MASK) +
+-                         (((addr >> 30) & 0x1ff) << 3)) & env->a20_mask;
++                         (((addr >> 30) & 0x1ff) << 3)) & a20_mask;
+             pdpe = x86_ldq_phys(cs, pdpe_addr);
+             if (!(pdpe & PG_PRESENT_MASK)) {
+                 return -1;
+@@ -1095,14 +1099,14 @@ hwaddr x86_cpu_get_phys_page_debug(CPUState *cs, vaddr addr)
  #endif
-+    type_register_static(&vhost_user_scsi_pci_info);
- #ifdef CONFIG_VHOST_VSOCK
-     type_register_static(&vhost_vsock_pci_info);
- #endif
-diff --git a/hw/virtio/virtio-pci.h b/hw/virtio/virtio-pci.h
-index b095dfc..69f5959 100644
---- a/hw/virtio/virtio-pci.h
-+++ b/hw/virtio/virtio-pci.h
-@@ -26,6 +26,7 @@
- #include "hw/virtio/virtio-input.h"
- #include "hw/virtio/virtio-gpu.h"
- #include "hw/virtio/virtio-crypto.h"
-+#include "hw/virtio/vhost-user-scsi.h"
+         {
+             pdpe_addr = ((env->cr[3] & ~0x1f) + ((addr >> 27) & 0x18)) &
+-                env->a20_mask;
++                a20_mask;
+             pdpe = x86_ldq_phys(cs, pdpe_addr);
+             if (!(pdpe & PG_PRESENT_MASK))
+                 return -1;
+         }
  
- #ifdef CONFIG_VIRTFS
- #include "hw/9pfs/virtio-9p.h"
-@@ -44,6 +45,7 @@ typedef struct VirtIOBalloonPCI VirtIOBalloonPCI;
- typedef struct VirtIOSerialPCI VirtIOSerialPCI;
- typedef struct VirtIONetPCI VirtIONetPCI;
- typedef struct VHostSCSIPCI VHostSCSIPCI;
-+typedef struct VHostUserSCSIPCI VHostUserSCSIPCI;
- typedef struct VirtIORngPCI VirtIORngPCI;
- typedef struct VirtIOInputPCI VirtIOInputPCI;
- typedef struct VirtIOInputHIDPCI VirtIOInputHIDPCI;
-@@ -230,6 +232,15 @@ struct VHostSCSIPCI {
- };
- #endif
+         pde_addr = ((pdpe & PG_ADDRESS_MASK) +
+-                    (((addr >> 21) & 0x1ff) << 3)) & env->a20_mask;
++                    (((addr >> 21) & 0x1ff) << 3)) & a20_mask;
+         pde = x86_ldq_phys(cs, pde_addr);
+         if (!(pde & PG_PRESENT_MASK)) {
+             return -1;
+@@ -1114,7 +1118,7 @@ hwaddr x86_cpu_get_phys_page_debug(CPUState *cs, vaddr addr)
+         } else {
+             /* 4 KB page */
+             pte_addr = ((pde & PG_ADDRESS_MASK) +
+-                        (((addr >> 12) & 0x1ff) << 3)) & env->a20_mask;
++                        (((addr >> 12) & 0x1ff) << 3)) & a20_mask;
+             page_size = 4096;
+             pte = x86_ldq_phys(cs, pte_addr);
+         }
+@@ -1125,7 +1129,7 @@ hwaddr x86_cpu_get_phys_page_debug(CPUState *cs, vaddr addr)
+         uint32_t pde;
  
-+#define TYPE_VHOST_USER_SCSI_PCI "vhost-user-scsi-pci"
-+#define VHOST_USER_SCSI_PCI(obj) \
-+        OBJECT_CHECK(VHostUserSCSIPCI, (obj), TYPE_VHOST_USER_SCSI_PCI)
-+
-+struct VHostUserSCSIPCI {
-+    VirtIOPCIProxy parent_obj;
-+    VHostUserSCSI vdev;
-+};
-+
- /*
-  * virtio-blk-pci: This extends VirtioPCIProxy.
-  */
-diff --git a/include/hw/virtio/vhost-user-scsi.h b/include/hw/virtio/vhost-user-scsi.h
-new file mode 100644
-index 0000000..01861f7
---- /dev/null
-+++ b/include/hw/virtio/vhost-user-scsi.h
-@@ -0,0 +1,35 @@
-+/*
-+ * vhost-user-scsi host device
-+ *
-+ * Copyright (c) 2016 Nutanix Inc. All rights reserved.
-+ *
-+ * Author:
-+ *  Felipe Franciosi <felipe@nutanix.com>
-+ *
-+ * This file is largely based on "vhost-scsi.h" by:
-+ *  Stefan Hajnoczi   <stefanha@linux.vnet.ibm.com>
-+ *
-+ * This work is licensed under the terms of the GNU LGPL, version 2 or later.
-+ * See the COPYING.LIB file in the top-level directory.
-+ *
-+ */
-+
-+#ifndef VHOST_USER_SCSI_H
-+#define VHOST_USER_SCSI_H
-+
-+#include "qemu-common.h"
-+#include "hw/qdev.h"
-+#include "hw/virtio/virtio-scsi.h"
-+#include "hw/virtio/vhost.h"
-+#include "hw/virtio/vhost-scsi-common.h"
-+
-+#define TYPE_VHOST_USER_SCSI "vhost-user-scsi"
-+#define VHOST_USER_SCSI(obj) \
-+        OBJECT_CHECK(VHostUserSCSI, (obj), TYPE_VHOST_USER_SCSI)
-+
-+typedef struct VHostUserSCSI {
-+    VHostSCSICommon parent_obj;
-+    uint64_t host_features;
-+} VHostUserSCSI;
-+
-+#endif /* VHOST_USER_SCSI_H */
-diff --git a/include/hw/virtio/virtio-scsi.h b/include/hw/virtio/virtio-scsi.h
-index eac2013..3827e95 100644
---- a/include/hw/virtio/virtio-scsi.h
-+++ b/include/hw/virtio/virtio-scsi.h
-@@ -21,6 +21,7 @@
- #include "hw/virtio/virtio.h"
- #include "hw/pci/pci.h"
- #include "hw/scsi/scsi.h"
-+#include "sysemu/char.h"
- #include "sysemu/iothread.h"
+         /* page directory entry */
+-        pde_addr = ((env->cr[3] & ~0xfff) + ((addr >> 20) & 0xffc)) & env->a20_mask;
++        pde_addr = ((env->cr[3] & ~0xfff) + ((addr >> 20) & 0xffc)) & a20_mask;
+         pde = x86_ldl_phys(cs, pde_addr);
+         if (!(pde & PG_PRESENT_MASK))
+             return -1;
+@@ -1134,14 +1138,14 @@ hwaddr x86_cpu_get_phys_page_debug(CPUState *cs, vaddr addr)
+             page_size = 4096 * 1024;
+         } else {
+             /* page directory entry */
+-            pte_addr = ((pde & ~0xfff) + ((addr >> 10) & 0xffc)) & env->a20_mask;
++            pte_addr = ((pde & ~0xfff) + ((addr >> 10) & 0xffc)) & a20_mask;
+             pte = x86_ldl_phys(cs, pte_addr);
+             if (!(pte & PG_PRESENT_MASK)) {
+                 return -1;
+             }
+             page_size = 4096;
+         }
+-        pte = pte & env->a20_mask;
++        pte = pte & a20_mask;
+     }
  
- #define TYPE_VIRTIO_SCSI_COMMON "virtio-scsi-common"
-@@ -53,6 +54,8 @@ struct VirtIOSCSIConf {
-     char *vhostfd;
-     char *wwpn;
- #endif
-+    CharBackend chardev;
-+    int32_t bootindex;
-     uint32_t boot_tpgt;
-     IOThread *iothread;
- };
+ #ifdef TARGET_X86_64
 -- 
 1.8.3.1
