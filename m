@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35735)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35796)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1dBYTQ-0007Cf-EM
-	for qemu-devel@nongnu.org; Thu, 18 May 2017 23:21:07 -0400
+	(envelope-from <peterx@redhat.com>) id 1dBYTU-0007Gd-WB
+	for qemu-devel@nongnu.org; Thu, 18 May 2017 23:21:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1dBYTP-0005kG-LL
-	for qemu-devel@nongnu.org; Thu, 18 May 2017 23:21:04 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:33160)
+	(envelope-from <peterx@redhat.com>) id 1dBYTT-0005lF-V3
+	for qemu-devel@nongnu.org; Thu, 18 May 2017 23:21:08 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37444)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1dBYTP-0005jm-8w
-	for qemu-devel@nongnu.org; Thu, 18 May 2017 23:21:03 -0400
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1dBYTT-0005ku-Lm
+	for qemu-devel@nongnu.org; Thu, 18 May 2017 23:21:07 -0400
 From: Peter Xu <peterx@redhat.com>
-Date: Fri, 19 May 2017 11:19:48 +0800
-Message-Id: <1495163989-9994-10-git-send-email-peterx@redhat.com>
+Date: Fri, 19 May 2017 11:19:49 +0800
+Message-Id: <1495163989-9994-11-git-send-email-peterx@redhat.com>
 In-Reply-To: <1495163989-9994-1-git-send-email-peterx@redhat.com>
 References: <1495163989-9994-1-git-send-email-peterx@redhat.com>
-Subject: [Qemu-devel] [PATCH v4 09/10] intel_iommu: turn off pt before 2.9
+Subject: [Qemu-devel] [PATCH v4 10/10] vhost: iommu: cache static mapping if
+ there is
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,27 +27,114 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: "Michael S . Tsirkin" <mst@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, yi.l.liu@intel.com, Marcel Apfelbaum <marcel@redhat.com>, Lan Tianyu <tianyu.lan@intel.com>, peterx@redhat.com, Jason Wang <jasowang@redhat.com>
 
-This is for compatibility.
+This patch pre-heat vhost iotlb cache when passthrough mode enabled.
+
+Sometimes, even if user specified iommu_platform for vhost devices,
+IOMMU might still be disabled. One case is passthrough mode in VT-d
+implementation. We can detect this by observing iommu_list. If it's
+empty, it means IOMMU translation is disabled, then we can actually
+pre-heat the translation (it'll be static mapping then) by first
+invalidating all IOTLB, then cache existing memory ranges into vhost
+backend iotlb using 1:1 mapping.
 
 Signed-off-by: Peter Xu <peterx@redhat.com>
 ---
- include/hw/compat.h | 4 ++++
- 1 file changed, 4 insertions(+)
+ hw/virtio/trace-events |  4 ++++
+ hw/virtio/vhost.c      | 49 +++++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 53 insertions(+)
 
-diff --git a/include/hw/compat.h b/include/hw/compat.h
-index 55b1765..4c53d60 100644
---- a/include/hw/compat.h
-+++ b/include/hw/compat.h
-@@ -6,6 +6,10 @@
-         .driver   = "pci-bridge",\
-         .property = "shpc",\
-         .value    = "off",\
-+    },{\
-+        .driver   = "intel-iommu",\
-+        .property = "pt",\
-+        .value    = "off",\
-     },
+diff --git a/hw/virtio/trace-events b/hw/virtio/trace-events
+index 1f7a7c1..54dcbb3 100644
+--- a/hw/virtio/trace-events
++++ b/hw/virtio/trace-events
+@@ -24,3 +24,7 @@ virtio_balloon_handle_output(const char *name, uint64_t gpa) "section name: %s g
+ virtio_balloon_get_config(uint32_t num_pages, uint32_t actual) "num_pages: %d actual: %d"
+ virtio_balloon_set_config(uint32_t actual, uint32_t oldactual) "actual: %d oldactual: %d"
+ virtio_balloon_to_target(uint64_t target, uint32_t num_pages) "balloon target: %"PRIx64" num_pages: %d"
++
++# hw/virtio/vhost.c
++vhost_iommu_commit(void) ""
++vhost_iommu_static_preheat(void) ""
+diff --git a/hw/virtio/vhost.c b/hw/virtio/vhost.c
+index 03a46a7..8069135 100644
+--- a/hw/virtio/vhost.c
++++ b/hw/virtio/vhost.c
+@@ -27,6 +27,7 @@
+ #include "hw/virtio/virtio-access.h"
+ #include "migration/blocker.h"
+ #include "sysemu/dma.h"
++#include "trace.h"
  
- #define HW_COMPAT_2_8 \
+ /* enabled until disconnected backend stabilizes */
+ #define _VHOST_DEBUG 1
+@@ -730,6 +731,11 @@ static void vhost_iommu_unmap_notify(IOMMUNotifier *n, IOMMUTLBEntry *iotlb)
+     }
+ }
+ 
++static bool vhost_iommu_mr_enabled(struct vhost_dev *dev)
++{
++    return !QLIST_EMPTY(&dev->iommu_list);
++}
++
+ static void vhost_iommu_region_add(MemoryListener *listener,
+                                    MemoryRegionSection *section)
+ {
+@@ -782,6 +788,48 @@ static void vhost_iommu_region_del(MemoryListener *listener,
+     }
+ }
+ 
++static void vhost_iommu_commit(MemoryListener *listener)
++{
++    struct vhost_dev *dev = container_of(listener, struct vhost_dev,
++                                         iommu_listener);
++    struct vhost_memory_region *r;
++    int i;
++
++    trace_vhost_iommu_commit();
++
++    if (!vhost_iommu_mr_enabled(dev)) {
++        /*
++        * This means iommu_platform is enabled, however iommu memory
++        * region is disabled, e.g., when device passthrough is setup.
++        * Then, no translation is needed any more.
++        *
++        * Let's first invalidate the whole IOTLB, then pre-heat the
++        * static mapping by looping over vhost memory ranges.
++        */
++
++        if (dev->vhost_ops->vhost_invalidate_device_iotlb(dev, 0,
++                                                          UINT64_MAX)) {
++            error_report("%s: flush existing IOTLB failed", __func__);
++            return;
++        }
++
++        for (i = 0; i < dev->mem->nregions; i++) {
++            r = &dev->mem->regions[i];
++            /* Vhost regions are writable RAM, so IOMMU_RW suites. */
++            if (dev->vhost_ops->vhost_update_device_iotlb(dev,
++                                                          r->guest_phys_addr,
++                                                          r->userspace_addr,
++                                                          r->memory_size,
++                                                          IOMMU_RW)) {
++                error_report("%s: pre-heat static mapping failed", __func__);
++                return;
++            }
++        }
++
++        trace_vhost_iommu_static_preheat();
++    }
++}
++
+ static void vhost_region_nop(MemoryListener *listener,
+                              MemoryRegionSection *section)
+ {
+@@ -1298,6 +1346,7 @@ int vhost_dev_init(struct vhost_dev *hdev, void *opaque,
+     hdev->iommu_listener = (MemoryListener) {
+         .region_add = vhost_iommu_region_add,
+         .region_del = vhost_iommu_region_del,
++        .commit = vhost_iommu_commit,
+     };
+ 
+     if (hdev->migration_blocker == NULL) {
 -- 
 2.7.4
