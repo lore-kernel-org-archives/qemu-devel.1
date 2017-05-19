@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35798)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36716)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dBbaA-0007JK-JR
-	for qemu-devel@nongnu.org; Fri, 19 May 2017 02:40:16 -0400
+	(envelope-from <peterx@redhat.com>) id 1dBbdc-0000Wg-A8
+	for qemu-devel@nongnu.org; Fri, 19 May 2017 02:43:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dBba9-000356-JI
-	for qemu-devel@nongnu.org; Fri, 19 May 2017 02:40:14 -0400
-Date: Fri, 19 May 2017 16:40:04 +1000
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20170519064004.GI12284@umbus.fritz.box>
-References: <149484833874.20089.4164801378197848306.stgit@bahia.lan>
-	<149484840466.20089.893964776019028654.stgit@bahia.lan>
-	<a94cf0ed-3318-fb2d-f16c-4d2b12fff3bb@kaod.org>
-	<20170515151602.61dc381d@bahia>
-	<b2fe560d-e8ef-dc47-2f7a-e06092a503b6@kaod.org>
-	<20170517041816.GG15596@umbus.fritz.box>
-	<20170517223344.5bf8ed1f@bahia.lan>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="BWWlCdgt6QLN7tv3"
-Content-Disposition: inline
-In-Reply-To: <20170517223344.5bf8ed1f@bahia.lan>
-Subject: Re: [Qemu-devel] [PATCH 6/6] spapr: fix migration of ICP objects
- from/to older QEMU
+	(envelope-from <peterx@redhat.com>) id 1dBbdb-00049L-9w
+	for qemu-devel@nongnu.org; Fri, 19 May 2017 02:43:48 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:58096)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1dBbdb-00049H-0j
+	for qemu-devel@nongnu.org; Fri, 19 May 2017 02:43:47 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id DDAB87F4A3
+	for <qemu-devel@nongnu.org>; Fri, 19 May 2017 06:43:45 +0000 (UTC)
+From: Peter Xu <peterx@redhat.com>
+Date: Fri, 19 May 2017 14:43:27 +0800
+Message-Id: <1495176212-14446-2-git-send-email-peterx@redhat.com>
+In-Reply-To: <1495176212-14446-1-git-send-email-peterx@redhat.com>
+References: <1495176212-14446-1-git-send-email-peterx@redhat.com>
+Subject: [Qemu-devel] [PATCH RFC 1/6] io: only allow return path for socket
+ typed
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,117 +30,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>
-Cc: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Bharata B Rao <bharata@linux.vnet.ibm.com>
+To: qemu-devel@nongnu.org
+Cc: Juan Quintela <quintela@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, peterx@redhat.com, "Daniel P . Berrange" <berrange@redhat.com>
 
+We don't really have a return path for the other types yet. Let's check
+this when .get_return_path() is called.
 
---BWWlCdgt6QLN7tv3
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+For this, we introduce a new feature bit, and set it up only for socket
+typed IO channels.
 
-On Wed, May 17, 2017 at 10:33:44PM +0200, Greg Kurz wrote:
-> On Wed, 17 May 2017 14:18:16 +1000
-> David Gibson <david@gibson.dropbear.id.au> wrote:
->=20
-> > On Mon, May 15, 2017 at 06:11:27PM +0200, C=C3=A9dric Le Goater wrote:
-> > > >>> +        int smt =3D kvmppc_smt_threads();
-> > > >>> +        int nr_servers =3D DIV_ROUND_UP(max_cpus * smt, smp_thre=
-ads);
-> > > >>
-> > > >> may be we should reintroduce nr_servers at the machine level ?=20
-> > > >> =20
-> > > >=20
-> > > > I had reintroduced it but then I realized it was only used in this
-> > > > function. =20
-> > >=20
-> > > nr_servers is also used when the device tree is populated with the=20
-> > > interrupt controller nodes. No big deal. =20
-> >=20
-> > Which is guest visible, so we should really make that stay the same
-> > for older machine types.  I'd like to avoid re-introducing nr_servers
-> > as a property if we can, but maybe we can't.
-> >=20
->=20
-> Yes we can :) or at least maybe, if you can shed light on a guest
-> visible change introduced by this commit in 2.8:
->=20
-> commit 9b9a19080a6e548b91420ce7925f2ac81ef63ae8
-> Author: David Gibson <david@gibson.dropbear.id.au>
-> Date:   Thu Oct 20 16:07:56 2016 +1100
->=20
->     pseries: Move construction of /interrupt-controller fdt node
->=20
->=20
-> It changes the "ibm,interrupt-server-ranges" property in the device
-> tree from
->=20
->     {0, cpu_to_be32(max_cpus)}
->=20
-> to
->=20
->     {0, cpu_to_be32(xics->nr_servers)}
->=20
-> ie, {0, cpu_to_be32(DIV_ROUND_UP(max_cpus * smt, smp_threads))}
->=20
-> And indeed, if I start QEMU with
->=20
->  -smp cores=3D2,threads=3D4,maxcpus=3D16 -machine type=3Dpseries-2.7,acce=
-l=3Dkvm
->=20
-> the following is exposed to the guest with 2.7:
->=20
-> ibm,interrupt-server-ranges
->                  00000000 00000010
->=20
-> and with 2.8 we get:
->=20
-> ibm,interrupt-server-ranges
->                  00000000 00000020
->=20
-> LoPAPR B.6.9.1.1 says that the range (ie, the second number) "shall be the
-> number of contiguous server#s supported by the unit (this also corresponds
-> to the number of =E2=80=9Creg=E2=80=9D entries)". I'm inclined to think t=
-his maps to max_cpus
-> but I may be wrong... any clues ?
+This will help detect earlier failure for postcopy, e.g., logically
+speaking postcopy cannot work with "exec:". Before this patch, when we
+try to migrate with "migrate -d exec:cat>out", we'll hang the system.
+With this patch, we'll get:
 
-So, yes, it's a guest visible change in some configurations, but in
-those configurations the previous behaviour was sufficiently broken
-that I think that's preferable to not changing it.
+(qemu) migrate -d exec:cat>out
+Unable to open return-path for postcopy
 
-Basically the ibm,interrupt-server-ranges property gives the total
-range of valid server IDs.  The server IDs assigned to each thread are
-based on the dt_id, and are spaced by the number of host threads, not
-the number of guest threads.  That means that with 2.7, the last cpus
-would have advertised ibm,ppc-interrupt-server#s properties with
-values outside the range given by ibm,interrupt-server-ranages, which
-is definitely wrong.
+CC: Daniel P. Berrange <berrange@redhat.com>
+Signed-off-by: Peter Xu <peterx@redhat.com>
+---
+ include/io/channel.h          | 1 +
+ io/channel-socket.c           | 1 +
+ migration/qemu-file-channel.c | 9 +++++++++
+ 3 files changed, 11 insertions(+)
 
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---BWWlCdgt6QLN7tv3
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-
-iQIcBAEBCAAGBQJZHpNBAAoJEGw4ysog2bOSOfsQAMeddnH5IpF8uMVapeuTEamu
-hb6L3TWgf67T1HUeEfksmERiC0acNST+ZdtXip+okpXkYJGTqMM862gZhKxAm89f
-//CIpmdzalVfFF6ObwpNMRcypu5xE/AnuKvBOsWTs13qGeJHfBmH/TEX4fWzsMxo
-WktJSbW/CN+KLmLdiNquIGlec0uogn4lbriNzhv23MQ/8Ez2JwTi3JDVPO5mvYDF
-yHAaHvg9VMRtCBK+vpv21CjL98eYn6uNwy4xsfNwo+4DHNDGxpS//wVtRWGnsVLC
-ibQ93NOVrSvyRP7wn9LKW3DirZ7dk3w2Zg64i+TavZs/W7AvUXI/4suxoo9pf4wy
-tkOj9dBdw6TvnTYJ5/f0AHrgTCOcF0Uig+2wTGfY3TV3dNjjFkCdVWhm63/xUOvL
-ZTORE2AE/MRyztZ888ao2lxuLXbizm//eblxlX0/dOP5bwcxN8TP7yXp/29KOJBB
-Lrp6PZv6IWe4E86tl8glvtUon5HBAX/UGQMtsv+wZDSBIDm2GDWq4NFX6aWorn3U
-YDOm0tPA7eXyHqjPwvyKZoVuowGhIdGgdtHf9q6m63ql1NmtazCxvu7vY6oXMqw/
-Ple8/yX5xKFUSXLL+6bayo6hNzNS0uaHmrlsKNzjZQC71FJCUZaS+tr1FQWZy/mZ
-4VRy645F7Z9S87Qg/st3
-=ZiOJ
------END PGP SIGNATURE-----
-
---BWWlCdgt6QLN7tv3--
+diff --git a/include/io/channel.h b/include/io/channel.h
+index db9bb02..7876534 100644
+--- a/include/io/channel.h
++++ b/include/io/channel.h
+@@ -45,6 +45,7 @@ enum QIOChannelFeature {
+     QIO_CHANNEL_FEATURE_FD_PASS,
+     QIO_CHANNEL_FEATURE_SHUTDOWN,
+     QIO_CHANNEL_FEATURE_LISTEN,
++    QIO_CHANNEL_FEATURE_RETURN_PATH,
+ };
+ 
+ 
+diff --git a/io/channel-socket.c b/io/channel-socket.c
+index 53386b7..ee81b2d 100644
+--- a/io/channel-socket.c
++++ b/io/channel-socket.c
+@@ -56,6 +56,7 @@ qio_channel_socket_new(void)
+ 
+     ioc = QIO_CHANNEL(sioc);
+     qio_channel_set_feature(ioc, QIO_CHANNEL_FEATURE_SHUTDOWN);
++    qio_channel_set_feature(ioc, QIO_CHANNEL_FEATURE_RETURN_PATH);
+ 
+ #ifdef WIN32
+     ioc->event = CreateEvent(NULL, FALSE, FALSE, NULL);
+diff --git a/migration/qemu-file-channel.c b/migration/qemu-file-channel.c
+index 45c13f1..3bd7940 100644
+--- a/migration/qemu-file-channel.c
++++ b/migration/qemu-file-channel.c
+@@ -23,6 +23,7 @@
+  */
+ 
+ #include "qemu/osdep.h"
++#include "qom/object.h"
+ #include "migration/qemu-file.h"
+ #include "io/channel-socket.h"
+ #include "qemu/iov.h"
+@@ -139,6 +140,10 @@ static QEMUFile *channel_get_input_return_path(void *opaque)
+ {
+     QIOChannel *ioc = QIO_CHANNEL(opaque);
+ 
++    if (!qio_channel_has_feature(ioc, QIO_CHANNEL_FEATURE_RETURN_PATH)) {
++        return NULL;
++    }
++
+     return qemu_fopen_channel_output(ioc);
+ }
+ 
+@@ -146,6 +151,10 @@ static QEMUFile *channel_get_output_return_path(void *opaque)
+ {
+     QIOChannel *ioc = QIO_CHANNEL(opaque);
+ 
++    if (!qio_channel_has_feature(ioc, QIO_CHANNEL_FEATURE_RETURN_PATH)) {
++        return NULL;
++    }
++
+     return qemu_fopen_channel_input(ioc);
+ }
+ 
+-- 
+2.7.4
