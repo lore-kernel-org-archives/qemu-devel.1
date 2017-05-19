@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48202)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48214)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <anton.nefedov@virtuozzo.com>) id 1dBeJT-0006hc-Lv
-	for qemu-devel@nongnu.org; Fri, 19 May 2017 05:35:12 -0400
+	(envelope-from <anton.nefedov@virtuozzo.com>) id 1dBeJV-0006ja-5P
+	for qemu-devel@nongnu.org; Fri, 19 May 2017 05:35:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <anton.nefedov@virtuozzo.com>) id 1dBeJP-0006ho-Ou
-	for qemu-devel@nongnu.org; Fri, 19 May 2017 05:35:11 -0400
-Received: from mail-db5eur01on0095.outbound.protection.outlook.com
-	([104.47.2.95]:23375
+	(envelope-from <anton.nefedov@virtuozzo.com>) id 1dBeJR-0006ki-8N
+	for qemu-devel@nongnu.org; Fri, 19 May 2017 05:35:13 -0400
+Received: from mail-db5eur01on0118.outbound.protection.outlook.com
+	([104.47.2.118]:9856
 	helo=EUR01-DB5-obe.outbound.protection.outlook.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <anton.nefedov@virtuozzo.com>)
-	id 1dBeJP-0006g9-F5
-	for qemu-devel@nongnu.org; Fri, 19 May 2017 05:35:07 -0400
+	id 1dBeJQ-0006hy-UF
+	for qemu-devel@nongnu.org; Fri, 19 May 2017 05:35:09 -0400
 From: Anton Nefedov <anton.nefedov@virtuozzo.com>
-Date: Fri, 19 May 2017 12:34:28 +0300
-Message-ID: <1495186480-114192-2-git-send-email-anton.nefedov@virtuozzo.com>
+Date: Fri, 19 May 2017 12:34:29 +0300
+Message-ID: <1495186480-114192-3-git-send-email-anton.nefedov@virtuozzo.com>
 In-Reply-To: <1495186480-114192-1-git-send-email-anton.nefedov@virtuozzo.com>
 References: <1495186480-114192-1-git-send-email-anton.nefedov@virtuozzo.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v1 01/13] qcow2: alloc space for COW in one
- chunk
+Subject: [Qemu-devel] [PATCH v1 02/13] qcow2: is_zero_sectors(): return true
+ if area is outside of backing file
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,79 +30,64 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: den@virtuozzo.com, kwolf@redhat.com, mreitz@redhat.com, "Denis V.
-	Lunev" <den@openvz.org>, Anton Nefedov <anton.nefedov@virtuozzo.com>
+Cc: den@virtuozzo.com, kwolf@redhat.com, mreitz@redhat.com, Anton Nefedov <anton.nefedov@virtuozzo.com>
 
-From: "Denis V. Lunev" <den@openvz.org>
+in such case, bdrv_get_block_status() shall return 0, *nr == 0
 
-Currently each single write operation can result in 3 write operations
-if guest offsets are not cluster aligned. One write is performed for the
-real payload and two for COW-ed areas. Thus the data possibly lays
-non-contiguously on the host filesystem. This will reduce further
-sequential read performance significantly.
+iotest 154 updated accordingly: write-zeroes tail alignment can be detected
+as zeroes now, so pwrite_zeroes succeeds
 
-The patch allocates the space in the file with cluster granularity,
-ensuring
-  1. better host offset locality
-  2. less space allocation operations
-     (which can be expensive on distributed storages)
-
-Signed-off-by: Denis V. Lunev <den@openvz.org>
 Signed-off-by: Anton Nefedov <anton.nefedov@virtuozzo.com>
 ---
- block/qcow2.c | 32 +++++++++++++++++++++++++++++++-
- 1 file changed, 31 insertions(+), 1 deletion(-)
+ block/qcow2.c              | 6 ++++--
+ tests/qemu-iotests/154.out | 4 ++--
+ 2 files changed, 6 insertions(+), 4 deletions(-)
 
 diff --git a/block/qcow2.c b/block/qcow2.c
-index a8d61f0..2e6a0ec 100644
+index 2e6a0ec..b885dfc 100644
 --- a/block/qcow2.c
 +++ b/block/qcow2.c
-@@ -1575,6 +1575,32 @@ fail:
-     return ret;
+@@ -2482,7 +2482,7 @@ static bool is_zero_sectors(BlockDriverState *bs, int64_t start,
+     int64_t res;
+ 
+     if (start + count > bs->total_sectors) {
+-        count = bs->total_sectors - start;
++        count = start < bs->total_sectors ? bs->total_sectors - start : 0;
+     }
+ 
+     if (!count) {
+@@ -2490,7 +2490,9 @@ static bool is_zero_sectors(BlockDriverState *bs, int64_t start,
+     }
+     res = bdrv_get_block_status_above(bs, NULL, start, count,
+                                       &nr, &file);
+-    return res >= 0 && (res & BDRV_BLOCK_ZERO) && nr == count;
++    return res >= 0
++        && (((res & BDRV_BLOCK_ZERO) && nr == count)
++            || nr == 0);
  }
  
-+static void handle_alloc_space(BlockDriverState *bs, QCowL2Meta *l2meta)
-+{
-+    BDRVQcow2State *s = bs->opaque;
-+    BlockDriverState *file = bs->file->bs;
-+    QCowL2Meta *m;
-+    int ret;
-+
-+    for (m = l2meta; m != NULL; m = m->next) {
-+        uint64_t bytes = m->nb_clusters << s->cluster_bits;
-+
-+        if (m->cow_start.nb_bytes == 0 && m->cow_end.nb_bytes == 0) {
-+            continue;
-+        }
-+
-+        /* try to alloc host space in one chunk for better locality */
-+        ret = file->drv->bdrv_co_pwrite_zeroes(file, m->alloc_offset, bytes, 0);
-+
-+        if (ret != 0) {
-+            continue;
-+        }
-+
-+        file->total_sectors = MAX(file->total_sectors,
-+                                  (m->alloc_offset + bytes) / BDRV_SECTOR_SIZE);
-+    }
-+}
-+
- static coroutine_fn int qcow2_co_pwritev(BlockDriverState *bs, uint64_t offset,
-                                          uint64_t bytes, QEMUIOVector *qiov,
-                                          int flags)
-@@ -1656,8 +1682,12 @@ static coroutine_fn int qcow2_co_pwritev(BlockDriverState *bs, uint64_t offset,
-         if (ret < 0) {
-             goto fail;
-         }
--
-         qemu_co_mutex_unlock(&s->lock);
-+
-+        if (bs->file->bs->drv->bdrv_co_pwrite_zeroes != NULL) {
-+            handle_alloc_space(bs, l2meta);
-+        }
-+
-         BLKDBG_EVENT(bs->file, BLKDBG_WRITE_AIO);
-         trace_qcow2_writev_data(qemu_coroutine_self(),
-                                 cluster_offset + offset_in_cluster);
+ static coroutine_fn int qcow2_co_pwrite_zeroes(BlockDriverState *bs,
+diff --git a/tests/qemu-iotests/154.out b/tests/qemu-iotests/154.out
+index d8485ee..259340e 100644
+--- a/tests/qemu-iotests/154.out
++++ b/tests/qemu-iotests/154.out
+@@ -322,7 +322,7 @@ wrote 1024/1024 bytes at offset 134218240
+ 1 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+ 2048/2048 bytes allocated at offset 128 MiB
+ [{ "start": 0, "length": 134217728, "depth": 1, "zero": true, "data": false},
+-{ "start": 134217728, "length": 2048, "depth": 0, "zero": false, "data": true, "offset": OFFSET}]
++{ "start": 134217728, "length": 2048, "depth": 0, "zero": true, "data": false}]
+ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=134219776 backing_file=TEST_DIR/t.IMGFMT.base
+ wrote 2048/2048 bytes at offset 134217728
+ 2 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+@@ -348,7 +348,7 @@ wrote 1024/1024 bytes at offset 134218240
+ 1 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+ 2048/2048 bytes allocated at offset 128 MiB
+ [{ "start": 0, "length": 134217728, "depth": 1, "zero": true, "data": false},
+-{ "start": 134217728, "length": 2048, "depth": 0, "zero": false, "data": true, "offset": OFFSET}]
++{ "start": 134217728, "length": 2048, "depth": 0, "zero": true, "data": false}]
+ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=134219776 backing_file=TEST_DIR/t.IMGFMT.base
+ wrote 2048/2048 bytes at offset 134217728
+ 2 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
 -- 
 2.7.4
