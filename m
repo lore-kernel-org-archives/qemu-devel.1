@@ -1,22 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42740)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46606)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1dBquq-0005It-1K
-	for qemu-devel@nongnu.org; Fri, 19 May 2017 19:02:37 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dBrJC-0000ch-Ta
+	for qemu-devel@nongnu.org; Fri, 19 May 2017 19:27:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1dBqup-0008FR-0k
-	for qemu-devel@nongnu.org; Fri, 19 May 2017 19:02:36 -0400
-References: <20170503122539.282182-1-vsementsov@virtuozzo.com>
-	<20170503122539.282182-10-vsementsov@virtuozzo.com>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <4b694da7-4fa8-24dc-6808-a47cbf985d82@redhat.com>
-Date: Fri, 19 May 2017 19:02:22 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dBrJ8-0008Ds-0n
+	for qemu-devel@nongnu.org; Fri, 19 May 2017 19:27:46 -0400
+Received: from mail-oi0-x242.google.com ([2607:f8b0:4003:c06::242]:36198)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dBrJ7-0008Be-OM
+	for qemu-devel@nongnu.org; Fri, 19 May 2017 19:27:41 -0400
+Received: by mail-oi0-x242.google.com with SMTP id w138so14671501oiw.3
+	for <qemu-devel@nongnu.org>; Fri, 19 May 2017 16:27:41 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20170519180342.19618-1-berrange@redhat.com>
+	<20170519180342.19618-2-berrange@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <a70c02ea-d6e8-c9c3-a078-0df3faaff9f9@amsat.org>
+Date: Fri, 19 May 2017 20:27:38 -0300
 MIME-Version: 1.0
-In-Reply-To: <20170503122539.282182-10-vsementsov@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 09/25] block/dirty-bitmap: add readonly
- field to BdrvDirtyBitmap
+In-Reply-To: <20170519180342.19618-2-berrange@redhat.com>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v2 1/5] sockets: ensure we can bind to both
+ ipv4 & ipv6 separately
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,103 +35,96 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, famz@redhat.com, armbru@redhat.com, mreitz@redhat.com, stefanha@redhat.com, pbonzini@redhat.com, den@openvz.org
+To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
 
+On 05/19/2017 03:03 PM, Daniel P. Berrange wrote:
+> When binding to an IPv6 socket we currently force the
+> IPV6_V6ONLY flag to off. This means that the IPv6 socket
+> will accept both IPv4 & IPv6 sockets when QEMU is launched
+> with something like
+>
+>   -vnc :::1
+>
+> While this is good for that case, it is bad for other
+> cases. For example if an empty hostname is given,
+> getaddrinfo resolves it to 2 addresses 0.0.0.0 and ::,
+> in that order. We will thus bind to 0.0.0.0 first, and
+> then fail to bind to :: on the same port. The same
+> problem can happen if any other hostname lookup causes
+> the IPv4 address to be reported before the IPv6 address.
+>
+> When we get an IPv6 bind failure, we should re-try the
+> same port, but with IPV6_V6ONLY turned on again, to
+> avoid clash with any IPv4 listener.
+>
+> This ensures that
+>
+>   -vnc :1
+>
+> will bind successfully to both 0.0.0.0 and ::, and also
+> avoid
+>
+>   -vnc :1,to=2
+>
+> from mistakenly using a 2nd port for the :: listener.
+>
+> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
 
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
-On 05/03/2017 08:25 AM, Vladimir Sementsov-Ogievskiy wrote:
-> It will be needed in following commits for persistent bitmaps.
-> If bitmap is loaded from read-only storage (and we can't mark it
-> "in use" in this storage) corresponding BdrvDirtyBitmap should be
-> read-only.
-> 
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 > ---
->  block/dirty-bitmap.c         | 16 ++++++++++++++++
->  include/block/dirty-bitmap.h |  3 +++
->  2 files changed, 19 insertions(+)
-> 
-> diff --git a/block/dirty-bitmap.c b/block/dirty-bitmap.c
-> index 90af37287f..ab6a95cf41 100644
-> --- a/block/dirty-bitmap.c
-> +++ b/block/dirty-bitmap.c
-> @@ -44,6 +44,8 @@ struct BdrvDirtyBitmap {
->      int64_t size;               /* Size of the bitmap (Number of sectors) */
->      bool disabled;              /* Bitmap is read-only */
->      int active_iterators;       /* How many iterators are active */
-> +    bool readonly;              /* Bitmap is read-only and may be changed only
-> +                                   by deserialize* functions */
->      QLIST_ENTRY(BdrvDirtyBitmap) list;
->  };
->  
-> @@ -436,6 +438,7 @@ void bdrv_set_dirty_bitmap(BdrvDirtyBitmap *bitmap,
->                             int64_t cur_sector, int64_t nr_sectors)
->  {
->      assert(bdrv_dirty_bitmap_enabled(bitmap));
-> +    assert(!bdrv_dirty_bitmap_readonly(bitmap));
-
-Doesn't this change the nature of the assertion?
-
-We're going from
-    return !(bitmap->disabled || bitmap->successor);
-to
-	!bitmap->readonly
-
-That makes me a little nervous to ACK this patch, because the
-correctness depends on how readonly is updated and manipulated in the
-future, which makes it more prone to error.
-
->      hbitmap_set(bitmap->bitmap, cur_sector, nr_sectors);
->  }
->  
-> @@ -443,12 +446,14 @@ void bdrv_reset_dirty_bitmap(BdrvDirtyBitmap *bitmap,
->                               int64_t cur_sector, int64_t nr_sectors)
->  {
->      assert(bdrv_dirty_bitmap_enabled(bitmap));
-> +    assert(!bdrv_dirty_bitmap_readonly(bitmap));
->      hbitmap_reset(bitmap->bitmap, cur_sector, nr_sectors);
->  }
->  
->  void bdrv_clear_dirty_bitmap(BdrvDirtyBitmap *bitmap, HBitmap **out)
->  {
->      assert(bdrv_dirty_bitmap_enabled(bitmap));
-> +    assert(!bdrv_dirty_bitmap_readonly(bitmap));
->      if (!out) {
->          hbitmap_reset_all(bitmap->bitmap);
->      } else {
-> @@ -519,6 +524,7 @@ void bdrv_set_dirty(BlockDriverState *bs, int64_t cur_sector,
->          if (!bdrv_dirty_bitmap_enabled(bitmap)) {
->              continue;
+>  util/qemu-sockets.c | 31 +++++++++++++++++++++++--------
+>  1 file changed, 23 insertions(+), 8 deletions(-)
+>
+> diff --git a/util/qemu-sockets.c b/util/qemu-sockets.c
+> index d8183f7..397212b 100644
+> --- a/util/qemu-sockets.c
+> +++ b/util/qemu-sockets.c
+> @@ -208,22 +208,37 @@ static int inet_listen_saddr(InetSocketAddress *saddr,
 >          }
-> +        assert(!bdrv_dirty_bitmap_readonly(bitmap));
->          hbitmap_set(bitmap->bitmap, cur_sector, nr_sectors);
->      }
->  }
-> @@ -540,3 +546,13 @@ int64_t bdrv_get_meta_dirty_count(BdrvDirtyBitmap *bitmap)
->  {
->      return hbitmap_count(bitmap->meta);
->  }
+>
+>          socket_set_fast_reuse(slisten);
+> -#ifdef IPV6_V6ONLY
+> -        if (e->ai_family == PF_INET6) {
+> -            /* listen on both ipv4 and ipv6 */
+> -            const int off = 0;
+> -            qemu_setsockopt(slisten, IPPROTO_IPV6, IPV6_V6ONLY, &off,
+> -                            sizeof(off));
+> -        }
+> -#endif
+>
+>          port_min = inet_getport(e);
+>          port_max = saddr->has_to ? saddr->to + port_offset : port_min;
+>          for (p = port_min; p <= port_max; p++) {
+> +#ifdef IPV6_V6ONLY
+> +            /* listen on both ipv4 and ipv6 */
+> +            int v6only = 0;
+> +#endif
+>              inet_setport(e, p);
+> +#ifdef IPV6_V6ONLY
+> +        rebind:
+> +            if (e->ai_family == PF_INET6) {
+> +                qemu_setsockopt(slisten, IPPROTO_IPV6, IPV6_V6ONLY, &v6only,
+> +                                sizeof(v6only));
+> +            }
+> +#endif
+>              if (bind(slisten, e->ai_addr, e->ai_addrlen) == 0) {
+>                  goto listen;
+>              }
 > +
-> +bool bdrv_dirty_bitmap_readonly(const BdrvDirtyBitmap *bitmap)
-> +{
-> +    return bitmap->readonly;
-> +}
+> +#ifdef IPV6_V6ONLY
+> +            /* If we got EADDRINUSE from an IPv6 bind & V6ONLY is unset,
+> +             * it could be that the IPv4 port is already claimed, so retry
+> +             * with V6ONLY set
+> +             */
+> +            if (e->ai_family == PF_INET6 && errno == EADDRINUSE && !v6only) {
+> +                v6only = 1;
+> +                goto rebind;
+> +            }
+> +#endif
 > +
-> +void bdrv_dirty_bitmap_set_readonly(BdrvDirtyBitmap *bitmap)
-> +{
-> +    bitmap->readonly = true;
-> +}
-> diff --git a/include/block/dirty-bitmap.h b/include/block/dirty-bitmap.h
-> index 1e17729ac2..0aab5841f5 100644
-> --- a/include/block/dirty-bitmap.h
-> +++ b/include/block/dirty-bitmap.h
-> @@ -75,4 +75,7 @@ void bdrv_dirty_bitmap_deserialize_ones(BdrvDirtyBitmap *bitmap,
->                                          bool finish);
->  void bdrv_dirty_bitmap_deserialize_finish(BdrvDirtyBitmap *bitmap);
->  
-> +bool bdrv_dirty_bitmap_readonly(const BdrvDirtyBitmap *bitmap);
-> +void bdrv_dirty_bitmap_set_readonly(BdrvDirtyBitmap *bitmap);
-> +
->  #endif
-> 
+>              if (p == port_max) {
+>                  if (!e->ai_next) {
+>                      error_setg_errno(errp, errno, "Failed to bind socket");
+>
