@@ -1,33 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37412)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37402)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dBoAO-0007Im-GT
-	for qemu-devel@nongnu.org; Fri, 19 May 2017 16:06:29 -0400
+	(envelope-from <bounces@canonical.com>) id 1dBoAO-0007IW-3c
+	for qemu-devel@nongnu.org; Fri, 19 May 2017 16:06:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dBoAN-0006ow-27
+	(envelope-from <bounces@canonical.com>) id 1dBoAK-0006l6-Sm
 	for qemu-devel@nongnu.org; Fri, 19 May 2017 16:06:28 -0400
-Received: from indium.canonical.com ([91.189.90.7]:60520)
+Received: from indium.canonical.com ([91.189.90.7]:60502)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1dBoAM-0006oa-QI
-	for qemu-devel@nongnu.org; Fri, 19 May 2017 16:06:27 -0400
+	id 1dBoAK-0006k1-Jy
+	for qemu-devel@nongnu.org; Fri, 19 May 2017 16:06:24 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1dBoAM-0008Tj-12
-	for <qemu-devel@nongnu.org>; Fri, 19 May 2017 20:06:26 +0000
+	id 1dBoAJ-0008Sn-Jp
+	for <qemu-devel@nongnu.org>; Fri, 19 May 2017 20:06:23 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id F26052E804A
-	for <qemu-devel@nongnu.org>; Fri, 19 May 2017 20:06:25 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 8BA392E8048
+	for <qemu-devel@nongnu.org>; Fri, 19 May 2017 20:06:23 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Fri, 19 May 2017 19:48:32 -0000
-From: Thomas Huth <950692@bugs.launchpad.net>
-Reply-To: Bug 950692 <950692@bugs.launchpad.net>
+Date: Fri, 19 May 2017 19:49:22 -0000
+From: Thomas Huth <1234179@bugs.launchpad.net>
+Reply-To: Bug 1234179 <1234179@bugs.launchpad.net>
 Sender: bounces@canonical.com
-References: <20120309101320.24066.98151.malonedeb@gac.canonical.com>
-Message-Id: <149522331286.7216.18149658419425859797.malone@chaenomeles.canonical.com>
+References: <20131002134046.29393.71162.malonedeb@chaenomeles.canonical.com>
+Message-Id: <149522336264.11521.17527162171274482035.malone@soybean.canonical.com>
 Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 950692] Re: High CPU usage in Host (revisited)
+Subject: [Qemu-devel] [Bug 1234179] Re: QEMU segfaults during Windows 7
+ unattended install
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -49,137 +50,220 @@ close this ticket nowadays?
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/950692
+https://bugs.launchpad.net/bugs/1234179
 
 Title:
-  High CPU usage in Host (revisited)
+  QEMU segfaults during Windows 7 unattended install
 
 Status in QEMU:
   Incomplete
 
 Bug description:
-  Hi,
+  During today's automated qemu.git testing, a segmentation fault while
+  installing Windows 7 SP1 happened.
 
-  last time QEMU(KVM) was working for us flawlessly was 2.6.35 kernel.
+  qemu.git top commit: =
 
-  Actually it still works flawlessly on that one single machine, that
-  still has this kernel. Qemu version is meanwhile 1.0-r3, so the
-  problem seems to be dependent on kernel version and not qemu version.
+  10/02 01:30:24 INFO |       git:0150| git commit ID is a684f3cf9b9b9c3cb8=
+2be87aafc463de8974610c (tag v1.4.0-4237-ga684f3c)
 
-  We have several other machines, where the "high CPU usage in host"
-  problem is present in various degrees of annoyingness.
+  commit a684f3cf9b9b9c3cb82be87aafc463de8974610c
+  Merge: 349cd52 1cf9412
+  Author: Anthony Liguori <anthony@codemonkey.ws>
+  Date:   Mon Sep 30 17:15:27 2013 -0500
 
-  Both host and guest are Gentoo linux, at least that's what we test
-  with. Several tested systems with other linux distributions and
-  FreeBSD show similar - if not worse - behaviour. I will talk about 3
-  hosts, machine A, machine B and machine C
+      Merge remote-tracking branch 'kraxel/seabios-1.7.3.2' into staging
+      =
 
-  A:
+      # By Gerd Hoffmann
+      # Via Gerd Hoffmann
+      * kraxel/seabios-1.7.3.2:
+        update seabios from 1.7.2.2 to 1.7.3.2
+      =
 
-  2.6.35-gentoo-r9 #2 SMP Sat Nov 6 22:32:28 CET 2010 x86_64 Intel(R) Xeon(=
-R) CPU L5410 @ 2.33GHz
-  32GB, runs about 15 KVM guests (all Gentoo, some 32bit, some 64bit, all S=
-MP)
-  no problems whatsoever, host CPU usage corresponds to Guest CPU usage + 1=
--2%, that's how we like it
-  qemu 1.0-r3
+      Message-id: 1380533055-24960-1-git-send-email-kraxel@redhat.com
 
-  B:
+  We have the core file saved in our test servers, we can make
+  arrangements to transfer it if there's someone interested in
+  investigating further. The framework saved the 'bt full' of the core
+  file, that was missing some debug info:
 
-  3.0.6-gentoo #1 SMP Sun Oct 16 18:57:31 CEST 2011 x86_64 Intel(R) Xeon(R)=
- CPU L5630 @ 2.13GHz
-  144GB, runs 1(!) KVM guest (Debian 6.x)
-  /usr/bin/qemu-system-x86_64 --enable-kvm -daemonize -cpu host -k de -net =
-tap -tdf -hda /data/vm/disk.raw -m 768 -smp 1 -vnc :5 -net nic,model=3De100=
-0,macaddr=3D...
-  100% host CPU load always, therefore it got only "smp 1", if we gave it s=
-mp 2, it would have 200%, smp 4 400% and so on.
-  qemu 1.0-r3
+  [Thread debugging using libthread_db enabled]
+  Using host libthread_db library "/lib64/libthread_db.so.1".
+  Core was generated by `/usr/local/autotest/tests/virt/qemu/qemu -S -name =
+virt-tests-vm1 -M pc -nodefau'.
+  Program terminated with signal 11, Segmentation fault.
+  #0  0x00007ffc8fb86cf0 in pixman_image_get_data () from /lib64/libpixman-=
+1.so.0
+  #0  0x00007ffc8fb86cf0 in pixman_image_get_data () from /lib64/libpixman-=
+1.so.0
+  No symbol table info available.
+  #1  0x00007ffc9165b05c in ?? ()
+  No symbol table info available.
+  #2  0x00007ffc9382b540 in ?? ()
+  No symbol table info available.
+  #3  0x00007ffc8f359a8d in clock_gettime () from /lib64/libc.so.6
+  No symbol table info available.
+  #4  0x00007ffc9382b5a8 in ?? ()
+  No symbol table info available.
+  #5  0x000000019382b4c0 in ?? ()
+  No symbol table info available.
+  #6  0x0000000000000000 in ?? ()
+  No symbol table info available.
 
-  C:
+  Extra info:
 
-  3.1.6-gentoo #5 SMP Tue Mar 6 20:34:44 CET 2012 x86_64 Intel(R) Xeon(R) C=
-PU 5148 @ 2.33GHz
-  16GB, runs 1-4 KVM guests (mostly Gentoo machines from A, plus some SuSE,=
- RedHat etc.)
-  X00% CPU usage, where x corresponds to the smp X parameter, at startup as=
- well as if someone "touches" the VM, like logging in, doing a "ls". If the=
- machine is ABSOLUTELY IDLE, the process also exhibits 1-2% CPU load in hos=
-t, but as soon as you do a simple ls, usage goes to - say - 400%, where it =
-remains for some seconds, then slowly falls 280%, 120%, 60%, ... back to 1-=
-2%
-  qemu 1.0-r3
+  Commits for the submodules:
 
-  =
+  10/02 01:30:29 DEBUG|base_utils:0134| [stdout] Submodule path 'dtc': chec=
+ked out 'bc895d6d09695d05ceb8b52486ffe861d6cfbdde'
+  10/02 01:30:51 DEBUG|base_utils:0134| [stdout] Submodule path 'pixman': c=
+hecked out '97336fad32acf802003855cd8bd6477fa49a12e3'
+  10/02 01:30:58 DEBUG|base_utils:0134| [stdout] Submodule path 'roms/SLOF'=
+: checked out '8cfdfc43f4c4c8c8dfa4b7cf16f7c19c84eee812'
+  10/02 01:31:16 DEBUG|base_utils:0134| [stdout] Submodule path 'roms/ipxe'=
+: checked out '09c5109b8585178172c7608de8d52e9d9af0b680'
+  10/02 01:31:20 DEBUG|base_utils:0134| [stdout] Submodule path 'roms/openb=
+ios': checked out '0f3d51ef22ec9166beb3ed434d253029ed7cfe84'
+  10/02 01:31:21 DEBUG|base_utils:0134| [stdout] Submodule path 'roms/qemu-=
+palcode': checked out 'c87a92639b28ac42bc8f6c67443543b405dc479b'
+  10/02 01:31:27 DEBUG|base_utils:0134| [stdout] Submodule path 'roms/seabi=
+os': checked out 'ece025f5980bae88fa677bc9c0d24d2e580e205d'
+  10/02 01:31:28 DEBUG|base_utils:0134| [stdout] Submodule path 'roms/sgabi=
+os': checked out '23d474943dcd55d0550a3d20b3d30e9040a4f15b'
+  10/02 01:31:31 DEBUG|base_utils:0134| [stdout] Submodule path 'roms/vgabi=
+os': checked out '19ea12c230ded95928ecaef0db47a82231c2e485'
 
-  B is no go, C tries to well-behave but ultimatively fails, A is golden.
+  Configure options:
 
-  There seems to be REAL high CPU usage and not only an error in
-  displaying it. Other processes get less CPU power and exhibit
-  definitely a slower runtime. On B, definitely one CPU core is hogged
-  all the time
+  10/02 01:31:32 DEBUG|base_utils:0099| Running '/usr/local/autotest/tmp/vi=
+rt/src/qemu/configure --target-list=3Dx86_64-softmmu --disable-strip --pref=
+ix=3D/usr/local/autotest/tests/virt/qemu/install_root'
+  10/02 01:31:35 DEBUG|env_proces:0829| (address cache) DHCP lease OK: 00:3=
+0:48:c5:d6:e2 --> 10.16.72.38
+  10/02 01:31:40 DEBUG|base_utils:0134| [stdout] Install prefix    /usr/loc=
+al/autotest/tests/virt/qemu/install_root
+  10/02 01:31:40 DEBUG|base_utils:0134| [stdout] BIOS directory    /usr/loc=
+al/autotest/tests/virt/qemu/install_root/share/qemu
+  10/02 01:31:40 DEBUG|base_utils:0134| [stdout] binary directory  /usr/loc=
+al/autotest/tests/virt/qemu/install_root/bin
+  10/02 01:31:40 DEBUG|base_utils:0134| [stdout] library directory /usr/loc=
+al/autotest/tests/virt/qemu/install_root/lib
+  10/02 01:31:40 DEBUG|base_utils:0134| [stdout] libexec directory /usr/loc=
+al/autotest/tests/virt/qemu/install_root/libexec
+  10/02 01:31:40 DEBUG|base_utils:0134| [stdout] include directory /usr/loc=
+al/autotest/tests/virt/qemu/install_root/include
+  10/02 01:31:40 DEBUG|base_utils:0134| [stdout] config directory  /usr/loc=
+al/autotest/tests/virt/qemu/install_root/etc
+  10/02 01:31:40 DEBUG|base_utils:0134| [stdout] local state directory   /u=
+sr/local/autotest/tests/virt/qemu/install_root/var
+  10/02 01:31:40 DEBUG|base_utils:0134| [stdout] Manual directory  /usr/loc=
+al/autotest/tests/virt/qemu/install_root/share/man
+  10/02 01:31:40 DEBUG|base_utils:0134| [stdout] ELF interp prefix /usr/gne=
+mul/qemu-%M
+  10/02 01:31:40 DEBUG|base_utils:0134| [stdout] Source path       /usr/loc=
+al/autotest/tmp/virt/src/qemu
+  10/02 01:31:40 DEBUG|base_utils:0134| [stdout] C compiler        cc
+  10/02 01:31:40 DEBUG|base_utils:0134| [stdout] Host C compiler   cc
+  10/02 01:31:40 DEBUG|base_utils:0134| [stdout] C++ compiler      c++
+  10/02 01:31:40 DEBUG|base_utils:0134| [stdout] Objective-C compiler cc
+  10/02 01:31:40 DEBUG|base_utils:0134| [stdout] CFLAGS            -O2 -U_F=
+ORTIFY_SOURCE -D_FORTIFY_SOURCE=3D2 -g =
 
-  =
+  10/02 01:31:40 DEBUG|base_utils:0134| [stdout] QEMU_CFLAGS       -Werror =
+-fPIE -DPIE -m64 -D_GNU_SOURCE -D_FILE_OFFSET_BITS=3D64 -D_LARGEFILE_SOURCE=
+ -Wstrict-prototypes -Wredundant-decls -Wall -Wundef -Wwrite-strings -Wmiss=
+ing-prototypes -fno-strict-aliasing  -Wendif-labels -Wmissing-include-dirs =
+-Wempty-body -Wnested-externs -Wformat-security -Wformat-y2k -Winit-self -W=
+ignored-qualifiers -Wold-style-declaration -Wold-style-definition -Wtype-li=
+mits -fstack-protector-all  -I/usr/include/pixman-1   -I$(SRC_PATH)/dtc/lib=
+fdt
+  10/02 01:31:40 DEBUG|base_utils:0134| [stdout] LDFLAGS           -Wl,--wa=
+rn-common -Wl,-z,relro -Wl,-z,now -pie -m64 -g =
 
-  Some years ago we experienced something similar with ~2.6.26 and after a =
-long and woeful period, we found out that compiling the host kernel as a ti=
-ckless system caused the problem. Enabling high resolution timers made the =
-problem go away and that is the situation on machine A until today. Since t=
-hen no one dared to touch this production server. Unfortunately, this recip=
-e didn't help with the other machines.
+  10/02 01:31:40 DEBUG|base_utils:0134| [stdout] make              make
+  10/02 01:31:40 DEBUG|base_utils:0134| [stdout] install           install
+  10/02 01:31:40 DEBUG|base_utils:0134| [stdout] python            python -B
+  10/02 01:31:40 DEBUG|base_utils:0134| [stdout] smbd              /usr/sbi=
+n/smbd
+  10/02 01:31:40 DEBUG|base_utils:0134| [stdout] host CPU          x86_64
+  10/02 01:31:40 DEBUG|base_utils:0134| [stdout] host big endian   no
+  10/02 01:31:40 DEBUG|base_utils:0134| [stdout] target list       x86_64-s=
+oftmmu
+  10/02 01:31:40 DEBUG|base_utils:0134| [stdout] tcg debug enabled no
+  10/02 01:31:40 DEBUG|base_utils:0134| [stdout] gprof enabled     no
+  10/02 01:31:40 DEBUG|base_utils:0134| [stdout] sparse enabled    no
+  10/02 01:31:40 DEBUG|base_utils:0134| [stdout] strip binaries    no
+  10/02 01:31:40 DEBUG|base_utils:0134| [stdout] profiler          no
+  10/02 01:31:40 DEBUG|base_utils:0134| [stdout] static build      no
+  10/02 01:31:40 DEBUG|base_utils:0134| [stdout] -Werror enabled   yes
+  10/02 01:31:40 DEBUG|base_utils:0134| [stdout] pixman            system
+  10/02 01:31:40 DEBUG|base_utils:0134| [stdout] SDL support       no
+  10/02 01:31:40 DEBUG|base_utils:0134| [stdout] GTK support       no
+  10/02 01:31:40 DEBUG|base_utils:0134| [stdout] curses support    yes
+  10/02 01:31:40 DEBUG|base_utils:0134| [stdout] curl support      yes
+  10/02 01:31:40 DEBUG|base_utils:0134| [stdout] mingw32 support   no
+  10/02 01:31:40 DEBUG|base_utils:0134| [stdout] Audio drivers     oss
+  10/02 01:31:40 DEBUG|base_utils:0134| [stdout] Block whitelist (rw) =
 
-  I have scanned the net for similar problems and there are people
-  complaining about high CPU usage. Unfortunately very often the devs or
-  maintainers cannot reproduce it and the issue is dropped. Well - we
-  cannot reproduce a "good behaviour"(tm) on any but one machine with
-  any recent (read: post-2.6.35) linux kernel.
+  10/02 01:31:40 DEBUG|base_utils:0134| [stdout] Block whitelist (ro) =
 
-  Summary what we tried so far:
-
-  * different linux kernels @ host, and @ guest
-
-  -> no difference, especially there are guests @ A, that run newer
-  kernels and there are Guests at B and C that run older kernels than is
-  the host kernel
-
-  * smp and non-smp, 32bit and 64bit guests
-
-  -> 32/64bit in the guest makes no difference whatsoever. The smp just
-  limits how much of the host CPU the guest hogs on non-well behaving
-  systems (smp X -> X * 100%)
-
-  * various linux guest OS, as well as FreeBSD
-
-  -> no difference whatsoever
-
-  * various options parameters in the host kernel (other schedulers,
-  HRT, tickless,...)
-
-  -> no difference whatsoever
-
-  * various versions of qemu/kvm since 0.13
-
-  -> no difference whatsoever
-
-  * various qemu/kvm options, virtio and non-virtio configurations (most
-  of the VMs @ A run blk-virtio but emulate an e1000)
-
-  -> no difference whatsoever
-
-  =
-
-  You could say, we've reached wits' end. We could try 2.6.35 @ machine C w=
-ith the same configuration from A (they are identical except CPU and RAM si=
-ze, but same RAID, mainboard, etc. plus A once had also the 5148 Xeons and =
-an upgrade luckily made no difference in good behaviour, so I would exclude=
- the CPU factor) but honestly that is not the way I'd like to go. The goal =
-is to update A to something recent and not to loose it's VM-hosting well be=
-haviour. Ideally to propagate this well beaviour to the other machines.
-
-  =
-
-  Arjan Minski
-    PetaMem IT
+  10/02 01:31:40 DEBUG|base_utils:0134| [stdout] VirtFS support    yes
+  10/02 01:31:40 DEBUG|base_utils:0134| [stdout] VNC support       yes
+  10/02 01:31:40 DEBUG|base_utils:0134| [stdout] VNC TLS support   no
+  10/02 01:31:40 DEBUG|base_utils:0134| [stdout] VNC SASL support  yes
+  10/02 01:31:40 DEBUG|base_utils:0134| [stdout] VNC JPEG support  no
+  10/02 01:31:40 DEBUG|base_utils:0134| [stdout] VNC PNG support   no
+  10/02 01:31:40 DEBUG|base_utils:0134| [stdout] VNC WS support    no
+  10/02 01:31:40 DEBUG|base_utils:0134| [stdout] xen support       no
+  10/02 01:31:40 DEBUG|base_utils:0134| [stdout] brlapi support    no
+  10/02 01:31:40 DEBUG|base_utils:0134| [stdout] bluez  support    no
+  10/02 01:31:40 DEBUG|base_utils:0134| [stdout] Documentation     no
+  10/02 01:31:40 DEBUG|base_utils:0134| [stdout] GUEST_BASE        yes
+  10/02 01:31:40 DEBUG|base_utils:0134| [stdout] PIE               yes
+  10/02 01:31:40 DEBUG|base_utils:0134| [stdout] vde support       no
+  10/02 01:31:40 DEBUG|base_utils:0134| [stdout] Linux AIO support no
+  10/02 01:31:40 DEBUG|base_utils:0134| [stdout] ATTR/XATTR support yes
+  10/02 01:31:40 DEBUG|base_utils:0134| [stdout] Install blobs     yes
+  10/02 01:31:40 DEBUG|base_utils:0134| [stdout] KVM support       yes
+  10/02 01:31:40 DEBUG|base_utils:0134| [stdout] RDMA support      no
+  10/02 01:31:40 DEBUG|base_utils:0134| [stdout] TCG interpreter   no
+  10/02 01:31:40 DEBUG|base_utils:0134| [stdout] fdt support       yes
+  10/02 01:31:40 DEBUG|base_utils:0134| [stdout] preadv support    yes
+  10/02 01:31:40 DEBUG|base_utils:0134| [stdout] fdatasync         yes
+  10/02 01:31:40 DEBUG|base_utils:0134| [stdout] madvise           yes
+  10/02 01:31:40 DEBUG|base_utils:0134| [stdout] posix_madvise     yes
+  10/02 01:31:40 DEBUG|base_utils:0134| [stdout] sigev_thread_id   yes
+  10/02 01:31:40 DEBUG|base_utils:0134| [stdout] uuid support      no
+  10/02 01:31:40 DEBUG|base_utils:0134| [stdout] libcap-ng support no
+  10/02 01:31:40 DEBUG|base_utils:0134| [stdout] vhost-net support yes
+  10/02 01:31:40 DEBUG|base_utils:0134| [stdout] vhost-scsi support yes
+  10/02 01:31:40 DEBUG|base_utils:0134| [stdout] Trace backend     nop
+  10/02 01:31:40 DEBUG|base_utils:0134| [stdout] Trace output file trace-<p=
+id>
+  10/02 01:31:40 DEBUG|base_utils:0134| [stdout] spice support     no (/)
+  10/02 01:31:40 DEBUG|base_utils:0134| [stdout] rbd support       no
+  10/02 01:31:40 DEBUG|base_utils:0134| [stdout] xfsctl support    no
+  10/02 01:31:40 DEBUG|base_utils:0134| [stdout] nss used          no
+  10/02 01:31:40 DEBUG|base_utils:0134| [stdout] libusb            no
+  10/02 01:31:40 DEBUG|base_utils:0134| [stdout] usb net redir     no
+  10/02 01:31:40 DEBUG|base_utils:0134| [stdout] GLX support       no
+  10/02 01:31:40 DEBUG|base_utils:0134| [stdout] libiscsi support  no
+  10/02 01:31:40 DEBUG|base_utils:0134| [stdout] build guest agent yes
+  10/02 01:31:40 DEBUG|base_utils:0134| [stdout] QGA VSS support   no
+  10/02 01:31:40 DEBUG|base_utils:0134| [stdout] seccomp support   no
+  10/02 01:31:40 DEBUG|base_utils:0134| [stdout] coroutine backend ucontext
+  10/02 01:31:40 DEBUG|base_utils:0134| [stdout] coroutine pool    yes
+  10/02 01:31:40 DEBUG|base_utils:0134| [stdout] GlusterFS support no
+  10/02 01:31:40 DEBUG|base_utils:0134| [stdout] virtio-blk-data-plane no
+  10/02 01:31:40 DEBUG|base_utils:0134| [stdout] gcov              gcov
+  10/02 01:31:40 DEBUG|base_utils:0134| [stdout] gcov enabled      no
+  10/02 01:31:40 DEBUG|base_utils:0134| [stdout] TPM support       no
+  10/02 01:31:40 DEBUG|base_utils:0134| [stdout] libssh2 support   no
+  10/02 01:31:40 DEBUG|base_utils:0134| [stdout] TPM passthrough   no
+  10/02 01:31:40 DEBUG|base_utils:0134| [stdout] QOM debugging     yes
+  10/02 01:31:40 INFO |build_help:0617| Running parallel make on build dir
+  10/02 01:31:40 DEBUG|base_utils:0099| Running 'make -j 24'
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/950692/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1234179/+subscriptions
