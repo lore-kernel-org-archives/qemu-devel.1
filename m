@@ -1,37 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48375)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48587)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1dBjF1-0004Pj-1o
-	for qemu-devel@nongnu.org; Fri, 19 May 2017 10:50:58 -0400
+	(envelope-from <berrange@redhat.com>) id 1dBjFo-0004yB-SO
+	for qemu-devel@nongnu.org; Fri, 19 May 2017 10:51:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1dBjEx-0004M1-S4
-	for qemu-devel@nongnu.org; Fri, 19 May 2017 10:50:55 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:38018
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1dBjEx-0004Ls-MQ
-	for qemu-devel@nongnu.org; Fri, 19 May 2017 10:50:51 -0400
-Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v4JEkIEO121384
-	for <qemu-devel@nongnu.org>; Fri, 19 May 2017 10:50:51 -0400
-Received: from e17.ny.us.ibm.com (e17.ny.us.ibm.com [129.33.205.207])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2ahvaxu388-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Fri, 19 May 2017 10:50:50 -0400
-Received: from localhost
-	by e17.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <groug@kaod.org>;
-	Fri, 19 May 2017 10:50:50 -0400
-From: Greg Kurz <groug@kaod.org>
-Date: Fri, 19 May 2017 16:50:45 +0200
-In-Reply-To: <149520531371.9327.383828886525307842.stgit@bahia>
-References: <149520531371.9327.383828886525307842.stgit@bahia>
+	(envelope-from <berrange@redhat.com>) id 1dBjFl-0004X6-Op
+	for qemu-devel@nongnu.org; Fri, 19 May 2017 10:51:44 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:36946)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1dBjFl-0004VT-FE
+	for qemu-devel@nongnu.org; Fri, 19 May 2017 10:51:41 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 8A5EC8048D
+	for <qemu-devel@nongnu.org>; Fri, 19 May 2017 14:51:39 +0000 (UTC)
+Date: Fri, 19 May 2017 15:51:26 +0100
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20170519145126.GA17164@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <1495176212-14446-1-git-send-email-peterx@redhat.com>
+	<1495176212-14446-2-git-send-email-peterx@redhat.com>
+	<20170519082538.GD4912@redhat.com> <20170519125139.GM2081@work-vm>
+	<20170519125601.GD28392@redhat.com> <20170519130200.GO2081@work-vm>
+	<20170519131344.GA22341@redhat.com> <20170519143312.GP2081@work-vm>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <149520544530.9327.4054335919728922017.stgit@bahia>
-Subject: [Qemu-devel] [PATCH 2/2] util: drop old utimensat() compat code
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20170519143312.GP2081@work-vm>
+Subject: Re: [Qemu-devel] [PATCH RFC 1/6] io: only allow return path for
+ socket typed
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -40,136 +38,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Eric Blake <eblake@redhat.com>, Greg Kurz <groug@kaod.org>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: Peter Xu <peterx@redhat.com>, qemu-devel@nongnu.org, Juan Quintela <quintela@redhat.com>
 
-Now that 9pfs and virtfs-proxy-helper have been converted to utimensat(),
-we don't need to keep qemu_utimens() anymore.
+On Fri, May 19, 2017 at 03:33:12PM +0100, Dr. David Alan Gilbert wrote:
+> * Daniel P. Berrange (berrange@redhat.com) wrote:
+> > > shutdown() is safe, in that it stops any other threads accessing the fd
+> > > but doesn't allow it's reallocation until the close;  We perform the
+> > > close only when we've joined all other threads that were using the fd.
+> > > Any of the threads that do new calls on the fd get an error and quickly
+> > > fall down their error paths.
+> > 
+> > Ahh that's certainly an interesting scenario. That would certainly be
+> > a problem with the migration code when this was originally written.
+> > It had two QEMUFile structs each with an 'int fd' field, so when you
+> > close 'fd' on one QEMUFile struct, it wouldn't update the other QEMUFile
+> > used by another thread.
+> > 
+> > Since we switched over to use QIOChannel though, I think the thread
+> > scenario you describe should be avoided entirely. When you have multiple
+> > QEMUFile objects, they each have a reference counted pointer to the same
+> > underlying QIOChannel object instance. So when QEMUFile triggers a call
+> > to qio_channel_close() in one thread, that'll set fd=-1 in the QIOChannel.
+> > Since the other threads have a reference to the same QIOChannel object,
+> > they'll now see this fd == -1 straightaway.
+> > 
+> > So, IIUC, this should make the need for shutdown() redundant (at least
+> > for the thread race conditions you describe).
+> 
+> That's not thread safe unless you're doing some very careful locking.
+> Consider:
+>   T1                      T2       
+>      oldfd=fd               tmp=fd
+>      fd=-1
+>      close(oldfd)
+>      unrelated open()
+>                             read(tmp,...
+> 
+> In practice every use of fd will be a copy into a tmp and then the
+> syscall; the unrelated open() could happen in another thread.
+> (OK, the gap between the tmp and the read is tiny, although if we're
+> doing multiple operations chances are the compiler will optimise
+> it to the top of a loop).
+> 
+> There's no way to make that code safe.
 
-Signed-off-by: Greg Kurz <groug@kaod.org>
----
- configure                 |   22 ---------------------
- include/sysemu/os-posix.h |   11 -----------
- util/oslib-posix.c        |   47 ---------------------------------------------
- 3 files changed, 80 deletions(-)
+Urgh, yes, I see what you mean.
 
-diff --git a/configure b/configure
-index 139638e922e0..1dea17ed2e73 100755
---- a/configure
-+++ b/configure
-@@ -3623,25 +3623,6 @@ if compile_prog "" "" ; then
-   inotify1=yes
- fi
- 
--# check if utimensat and futimens are supported
--utimens=no
--cat > $TMPC << EOF
--#define _ATFILE_SOURCE
--#include <stddef.h>
--#include <fcntl.h>
--#include <sys/stat.h>
--
--int main(void)
--{
--    utimensat(AT_FDCWD, "foo", NULL, 0);
--    futimens(0, NULL);
--    return 0;
--}
--EOF
--if compile_prog "" "" ; then
--  utimens=yes
--fi
--
- # check if pipe2 is there
- pipe2=no
- cat > $TMPC << EOF
-@@ -5427,9 +5408,6 @@ fi
- if test "$curses" = "yes" ; then
-   echo "CONFIG_CURSES=y" >> $config_host_mak
- fi
--if test "$utimens" = "yes" ; then
--  echo "CONFIG_UTIMENSAT=y" >> $config_host_mak
--fi
- if test "$pipe2" = "yes" ; then
-   echo "CONFIG_PIPE2=y" >> $config_host_mak
- fi
-diff --git a/include/sysemu/os-posix.h b/include/sysemu/os-posix.h
-index 900bdcb45ad0..629c8c648b7a 100644
---- a/include/sysemu/os-posix.h
-+++ b/include/sysemu/os-posix.h
-@@ -51,17 +51,6 @@ int os_mlock(void);
- typedef struct timeval qemu_timeval;
- #define qemu_gettimeofday(tp) gettimeofday(tp, NULL)
- 
--#ifndef CONFIG_UTIMENSAT
--#ifndef UTIME_NOW
--# define UTIME_NOW     ((1l << 30) - 1l)
--#endif
--#ifndef UTIME_OMIT
--# define UTIME_OMIT    ((1l << 30) - 2l)
--#endif
--#endif
--typedef struct timespec qemu_timespec;
--int qemu_utimens(const char *path, const qemu_timespec *times);
--
- bool is_daemonized(void);
- 
- /**
-diff --git a/util/oslib-posix.c b/util/oslib-posix.c
-index 4d9189e9efcf..7e28c161b257 100644
---- a/util/oslib-posix.c
-+++ b/util/oslib-posix.c
-@@ -207,53 +207,6 @@ int qemu_pipe(int pipefd[2])
-     return ret;
- }
- 
--int qemu_utimens(const char *path, const struct timespec *times)
--{
--    struct timeval tv[2], tv_now;
--    struct stat st;
--    int i;
--#ifdef CONFIG_UTIMENSAT
--    int ret;
--
--    ret = utimensat(AT_FDCWD, path, times, AT_SYMLINK_NOFOLLOW);
--    if (ret != -1 || errno != ENOSYS) {
--        return ret;
--    }
--#endif
--    /* Fallback: use utimes() instead of utimensat() */
--
--    /* happy if special cases */
--    if (times[0].tv_nsec == UTIME_OMIT && times[1].tv_nsec == UTIME_OMIT) {
--        return 0;
--    }
--    if (times[0].tv_nsec == UTIME_NOW && times[1].tv_nsec == UTIME_NOW) {
--        return utimes(path, NULL);
--    }
--
--    /* prepare for hard cases */
--    if (times[0].tv_nsec == UTIME_NOW || times[1].tv_nsec == UTIME_NOW) {
--        gettimeofday(&tv_now, NULL);
--    }
--    if (times[0].tv_nsec == UTIME_OMIT || times[1].tv_nsec == UTIME_OMIT) {
--        stat(path, &st);
--    }
--
--    for (i = 0; i < 2; i++) {
--        if (times[i].tv_nsec == UTIME_NOW) {
--            tv[i].tv_sec = tv_now.tv_sec;
--            tv[i].tv_usec = tv_now.tv_usec;
--        } else if (times[i].tv_nsec == UTIME_OMIT) {
--            tv[i].tv_sec = (i == 0) ? st.st_atime : st.st_mtime;
--            tv[i].tv_usec = 0;
--        } else {
--            tv[i].tv_sec = times[i].tv_sec;
--            tv[i].tv_usec = times[i].tv_nsec / 1000;
--        }
--    }
--
--    return utimes(path, &tv[0]);
--}
--
- char *
- qemu_get_local_state_pathname(const char *relative_pathname)
- {
+Currently the QIOChannelCommand implementation, uses a pair of anonymous
+pipes for stdin/out to the child process. I wonder if we could switch
+that to use socketpair() instead, thus letting us shutdown() on it too.
+
+Though I guess it would be sufficient for qio_channel_shutdown() to
+merely kill the child PID, while leaving the FDs open, as then you'd
+get EOF and/or EPIPE on the read/writes.
+
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
