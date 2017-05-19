@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49427)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49429)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1dBfyO-0004QW-Ez
+	(envelope-from <paolo.bonzini@gmail.com>) id 1dBfyO-0004Qk-KO
 	for qemu-devel@nongnu.org; Fri, 19 May 2017 07:21:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1dBfyK-0000xH-HN
+	(envelope-from <paolo.bonzini@gmail.com>) id 1dBfyN-0000y5-JS
 	for qemu-devel@nongnu.org; Fri, 19 May 2017 07:21:32 -0400
-Received: from mail-wm0-x244.google.com ([2a00:1450:400c:c09::244]:35866)
+Received: from mail-wm0-x22c.google.com ([2a00:1450:400c:c09::22c]:36068)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1dBfyK-0000wz-Am
-	for qemu-devel@nongnu.org; Fri, 19 May 2017 07:21:28 -0400
-Received: by mail-wm0-x244.google.com with SMTP id k15so16379729wmh.3
-	for <qemu-devel@nongnu.org>; Fri, 19 May 2017 04:21:28 -0700 (PDT)
+	id 1dBfyN-0000xk-A3
+	for qemu-devel@nongnu.org; Fri, 19 May 2017 07:21:31 -0400
+Received: by mail-wm0-x22c.google.com with SMTP id 70so77499235wmq.1
+	for <qemu-devel@nongnu.org>; Fri, 19 May 2017 04:21:31 -0700 (PDT)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Fri, 19 May 2017 13:21:02 +0200
-Message-Id: <1495192872-27667-11-git-send-email-pbonzini@redhat.com>
+Date: Fri, 19 May 2017 13:21:04 +0200
+Message-Id: <1495192872-27667-13-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1495192872-27667-1-git-send-email-pbonzini@redhat.com>
 References: <1495192872-27667-1-git-send-email-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PULL 10/20] nbd: strict nbd_wr_syncv
+Subject: [Qemu-devel] [PULL 12/20] nbd: add errp parameter to nbd_wr_syncv()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,49 +32,116 @@ Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 
-nbd_wr_syncv is called either from coroutine or from client negotiation
-code, when socket is in blocking mode. So, -EAGAIN is impossible.
-
-Furthermore, EAGAIN is confusing, as, what to read/write again? With
-EAGAIN as a return code we don't know how much data is already
-read or written by the function, so in case of EAGAIN the whole
-communication is broken.
+Will be used in following patch to provide actual error message in
+some cases.
 
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-Id: <20170516094533.6160-2-vsementsov@virtuozzo.com>
+Message-Id: <20170516094533.6160-4-vsementsov@virtuozzo.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- nbd/common.c | 11 ++++++-----
- 1 file changed, 6 insertions(+), 5 deletions(-)
+ block/nbd-client.c  |  4 ++--
+ include/block/nbd.h |  3 ++-
+ nbd/common.c        | 12 +++++-------
+ nbd/nbd-internal.h  |  4 ++--
+ 4 files changed, 11 insertions(+), 12 deletions(-)
 
-diff --git a/nbd/common.c b/nbd/common.c
-index dccbb8e..4db45b3 100644
---- a/nbd/common.c
-+++ b/nbd/common.c
-@@ -20,6 +20,10 @@
- #include "qapi/error.h"
- #include "nbd-internal.h"
- 
-+/* nbd_wr_syncv
-+ * The function may be called from coroutine or from non-coroutine context.
-+ * When called from non-coroutine context @ioc must be in blocking mode.
-+ */
- ssize_t nbd_wr_syncv(QIOChannel *ioc,
+diff --git a/block/nbd-client.c b/block/nbd-client.c
+index 1e2952f..538d95e 100644
+--- a/block/nbd-client.c
++++ b/block/nbd-client.c
+@@ -136,7 +136,7 @@ static int nbd_co_send_request(BlockDriverState *bs,
+         rc = nbd_send_request(s->ioc, request);
+         if (rc >= 0) {
+             ret = nbd_wr_syncv(s->ioc, qiov->iov, qiov->niov, request->len,
+-                               false);
++                               false, NULL);
+             if (ret != request->len) {
+                 rc = -EIO;
+             }
+@@ -165,7 +165,7 @@ static void nbd_co_receive_reply(NBDClientSession *s,
+     } else {
+         if (qiov && reply->error == 0) {
+             ret = nbd_wr_syncv(s->ioc, qiov->iov, qiov->niov, request->len,
+-                               true);
++                               true, NULL);
+             if (ret != request->len) {
+                 reply->error = EIO;
+             }
+diff --git a/include/block/nbd.h b/include/block/nbd.h
+index 0ed0775..9d385ea 100644
+--- a/include/block/nbd.h
++++ b/include/block/nbd.h
+@@ -127,7 +127,8 @@ ssize_t nbd_wr_syncv(QIOChannel *ioc,
                       struct iovec *iov,
                       size_t niov,
-@@ -42,11 +46,8 @@ ssize_t nbd_wr_syncv(QIOChannel *ioc,
-             len = qio_channel_writev(ioc, local_iov, nlocal_iov, &local_err);
+                      size_t length,
+-                     bool do_read);
++                     bool do_read,
++                     Error **errp);
+ int nbd_receive_negotiate(QIOChannel *ioc, const char *name, uint16_t *flags,
+                           QCryptoTLSCreds *tlscreds, const char *hostname,
+                           QIOChannel **outioc,
+diff --git a/nbd/common.c b/nbd/common.c
+index 4db45b3..bd81637 100644
+--- a/nbd/common.c
++++ b/nbd/common.c
+@@ -28,10 +28,10 @@ ssize_t nbd_wr_syncv(QIOChannel *ioc,
+                      struct iovec *iov,
+                      size_t niov,
+                      size_t length,
+-                     bool do_read)
++                     bool do_read,
++                     Error **errp)
+ {
+     ssize_t done = 0;
+-    Error *local_err = NULL;
+     struct iovec *local_iov = g_new(struct iovec, niov);
+     struct iovec *local_iov_head = local_iov;
+     unsigned int nlocal_iov = niov;
+@@ -41,19 +41,17 @@ ssize_t nbd_wr_syncv(QIOChannel *ioc,
+     while (nlocal_iov > 0) {
+         ssize_t len;
+         if (do_read) {
+-            len = qio_channel_readv(ioc, local_iov, nlocal_iov, &local_err);
++            len = qio_channel_readv(ioc, local_iov, nlocal_iov, errp);
+         } else {
+-            len = qio_channel_writev(ioc, local_iov, nlocal_iov, &local_err);
++            len = qio_channel_writev(ioc, local_iov, nlocal_iov, errp);
          }
          if (len == QIO_CHANNEL_ERR_BLOCK) {
--            if (qemu_in_coroutine()) {
--                qio_channel_yield(ioc, do_read ? G_IO_IN : G_IO_OUT);
--            } else {
--                return -EAGAIN;
--            }
-+            assert(qemu_in_coroutine());
-+            qio_channel_yield(ioc, do_read ? G_IO_IN : G_IO_OUT);
++            /* errp should not be set */
+             assert(qemu_in_coroutine());
+             qio_channel_yield(ioc, do_read ? G_IO_IN : G_IO_OUT);
              continue;
          }
          if (len < 0) {
+-            TRACE("I/O error: %s", error_get_pretty(local_err));
+-            error_free(local_err);
+-            /* XXX handle Error objects */
+             done = -EIO;
+             goto cleanup;
+         }
+diff --git a/nbd/nbd-internal.h b/nbd/nbd-internal.h
+index e6bbc7c..1d479fe 100644
+--- a/nbd/nbd-internal.h
++++ b/nbd/nbd-internal.h
+@@ -108,7 +108,7 @@ static inline ssize_t read_sync_eof(QIOChannel *ioc, void *buffer, size_t size)
+      * our request/reply.  Synchronization is done with recv_coroutine, so
+      * that this is coroutine-safe.
+      */
+-    return nbd_wr_syncv(ioc, &iov, 1, size, true);
++    return nbd_wr_syncv(ioc, &iov, 1, size, true, NULL);
+ }
+ 
+ /* read_sync
+@@ -132,7 +132,7 @@ static inline int write_sync(QIOChannel *ioc, const void *buffer, size_t size)
+ {
+     struct iovec iov = { .iov_base = (void *) buffer, .iov_len = size };
+ 
+-    ssize_t ret = nbd_wr_syncv(ioc, &iov, 1, size, false);
++    ssize_t ret = nbd_wr_syncv(ioc, &iov, 1, size, false, NULL);
+ 
+     assert(ret < 0 || ret == size);
+ 
 -- 
 1.8.3.1
