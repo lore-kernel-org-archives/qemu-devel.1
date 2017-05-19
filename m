@@ -1,23 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44751)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45486)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1dBe9m-0003aE-Nr
-	for qemu-devel@nongnu.org; Fri, 19 May 2017 05:25:11 -0400
+	(envelope-from <jianjay.zhou@huawei.com>) id 1dBeCG-0004WP-Uz
+	for qemu-devel@nongnu.org; Fri, 19 May 2017 05:27:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1dBe9h-00033A-RU
-	for qemu-devel@nongnu.org; Fri, 19 May 2017 05:25:10 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:59476)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1dBe9h-000330-Kx
-	for qemu-devel@nongnu.org; Fri, 19 May 2017 05:25:05 -0400
-Message-ID: <1495185902.627.55.camel@redhat.com>
-From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Fri, 19 May 2017 11:25:02 +0200
-In-Reply-To: <CAJO5WKsHRbOpeSB2BrUhBRuB=xDUbXDm4n+XhO2v2phV+1Sgiw@mail.gmail.com>
-References: <CAJO5WKsHRbOpeSB2BrUhBRuB=xDUbXDm4n+XhO2v2phV+1Sgiw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Mime-Version: 1.0
-Subject: Re: [Qemu-devel] specify memory in QEMU with Virtio
+	(envelope-from <jianjay.zhou@huawei.com>) id 1dBeCD-0003q0-01
+	for qemu-devel@nongnu.org; Fri, 19 May 2017 05:27:44 -0400
+Received: from szxga02-in.huawei.com ([45.249.212.188]:3933)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
+	(envelope-from <jianjay.zhou@huawei.com>) id 1dBeCC-0003jv-D1
+	for qemu-devel@nongnu.org; Fri, 19 May 2017 05:27:40 -0400
+References: <830bfc39-56c7-a901-9ebb-77d6e7a5614c@huawei.com>
+	<874lxeovrg.fsf@secure.mitica>
+	<7cd332ec-48d4-1feb-12e2-97b50b04e028@huawei.com>
+	<20170424164244.GJ2362@work-vm>
+	<B2D15215269B544CADD246097EACE747395AD759@dggeml511-mbx.china.huawei.com>
+	<85e3a0dd-20c8-8ff2-37ce-bfdf543e7787@redhat.com>
+	<CANRm+CzvNpLGqH5KuqqO7Wh7UabSkMBbxuTymbM0CZPgpQOwCg@mail.gmail.com>
+	<B2D15215269B544CADD246097EACE747395C283F@dggeml511-mbx.china.huawei.com>
+	<1280755991.8446336.1495007019282.JavaMail.zimbra@redhat.com>
+	<CANRm+CwbTaoxq35zyfNF1BP3d5GqRmtq0sY+aRKRaOsFwGB1Mw@mail.gmail.com>
+	<591EA84D.1030800@huawei.com>
+	<32e3c2ed-2a41-0c20-2cc8-eb51e9de236b@gmail.com>
+From: Jay Zhou <jianjay.zhou@huawei.com>
+Message-ID: <591EBA6B.9040206@huawei.com>
+Date: Fri, 19 May 2017 17:27:07 +0800
+MIME-Version: 1.0
+In-Reply-To: <32e3c2ed-2a41-0c20-2cc8-eb51e9de236b@gmail.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] About QEMU BQL and dirty log switch in Migration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,29 +37,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: jenia mtl <jenia.ivlev@gmail.com>
-Cc: qemu-devel@nongnu.org
+To: Xiao Guangrong <guangrong.xiao@gmail.com>, Wanpeng Li <kernellwp@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: "Huangweidong (C)" <weidong.huang@huawei.com>, Zhanghailiang <zhang.zhanghailiang@huawei.com>, Juan Quintela <quintela@redhat.com>, "wangxin (U)" <wangxinxin.wang@huawei.com>, yanghongyang <yanghongyang@huawei.com>, Xiao Guangrong <xiaoguangrong@tencent.com>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, "Dr. David Alan
+	Gilbert" <dgilbert@redhat.com>, "Gonglei (Arei)" <arei.gonglei@huawei.com>, Huangzhichao <huangzhichao@huawei.com>, "Herongguang (Stephen)" <herongguang.he@huawei.com>
 
-On Do, 2017-05-18 at 22:43 -0400, jenia mtl wrote:
-> Hello.
->=20
->=20
-> How do I specify how much graphics memory the Windows client should have =
-in
-> QEMU. I have successfully installed Virtio and can launch the VM (Windows=
-)
-> with it. This doubles the memory form 8MB to 16MB. But I need 512. How ca=
-n
-> I set that?
+Hi Xiao,
 
-virtio-vga doesn't need dedicated video memory, except for the
-(unaccelerated) vga compatibility mode.  But given that there are no
-virtio-vga drivers for windows (yet) it'll actually runs in vga mode, so
-you have no advantages over stdvga.
+On 2017/5/19 16:32, Xiao Guangrong wrote:
+>
+> I do not know why i was removed from the list.
 
-stdvga can be configured with up to 256M of video memory (-device
-VGA,vgamem_mb=3D64).  This will allow higher resolutions display
-resolutions.  Still an unaccelerated framebuffer though.
+I was CCed to you...
+Your comments are very valuable to us, and thank for your quick response.
 
-cheers,
-  Gerd
+>
+> On 05/19/2017 04:09 PM, Jay Zhou wrote:
+>> Hi Paolo and Wanpeng,
+>>
+>> On 2017/5/17 16:38, Wanpeng Li wrote:
+>>> 2017-05-17 15:43 GMT+08:00 Paolo Bonzini <pbonzini@redhat.com>:
+>>>>> Recently, I have tested the performance before migration and after
+>>>>> migration failure
+>>>>> using spec cpu2006 https://www.spec.org/cpu2006/, which is a standard
+>>>>> performance
+>>>>> evaluation tool.
+>>>>>
+>>>>> These are the steps:
+>>>>> ======
+>>>>>   (1) the version of kmod is 4.4.11(with slightly modified) and the
+>>>>> version of
+>>>>>   qemu is 2.6.0
+>>>>>      (with slightly modified), the kmod is applied with the following patch
+>>>>>
+>>>>> diff --git a/source/x86/x86.c b/source/x86/x86.c
+>>>>> index 054a7d3..75a4bb3 100644
+>>>>> --- a/source/x86/x86.c
+>>>>> +++ b/source/x86/x86.c
+>>>>> @@ -8550,8 +8550,10 @@ void kvm_arch_commit_memory_region(struct kvm *kvm,
+>>>>>           */
+>>>>>          if ((change != KVM_MR_DELETE) &&
+>>>>>                  (old->flags & KVM_MEM_LOG_DIRTY_PAGES) &&
+>>>>> -               !(new->flags & KVM_MEM_LOG_DIRTY_PAGES))
+>>>>> -               kvm_mmu_zap_collapsible_sptes(kvm, new);
+>>>>> +               !(new->flags & KVM_MEM_LOG_DIRTY_PAGES)) {
+>>>>> +               printk(KERN_ERR "zj make KVM_REQ_MMU_RELOAD request\n");
+>>>>> +               kvm_make_all_cpus_request(kvm, KVM_REQ_MMU_RELOAD);
+>>>>> +       }
+>>>>>
+>>>>>          /*
+>>>>>           * Set up write protection and/or dirty logging for the new slot.
+>>>>
+>>>> Try these modifications to the setup:
+>>>>
+>>>> 1) set up 1G hugetlbfs hugepages and use those for the guest's memory
+>>>>
+>>>> 2) test both without and with the above patch.
+>>>>
+>>
+>> In order to avoid random memory allocation issues, I reran the test cases:
+>> (1) setup: start a 4U10G VM with memory preoccupied, each vcpu is pinned to a
+>> pcpu respectively, these resources(memory and pcpu) allocated to VM are all
+>> from NUMA node 0
+>> (2) sequence: firstly, I run the 429.mcf of spec cpu2006 before migration,
+>> and get a result. And then, migration failure is constructed. At last, I run
+>> the test case again, and get an another result.
+>
+> I guess this case purely writes the memory, that means the readonly mappings will
+
+Yes, I printed out the speed of dirty page rate, it is about 1GB per second.
+
+> always be dropped by #PF, then huge mappings are established.
+>
+> If benchmark memory read, you show observe its difference.
+>
+
+OK, thank for your suggestion!
+
+Regards,
+Jay Zhou
