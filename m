@@ -1,32 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46606)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49045)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dBrJC-0000ch-Ta
-	for qemu-devel@nongnu.org; Fri, 19 May 2017 19:27:48 -0400
+	(envelope-from <bounces@canonical.com>) id 1dBrQ2-00027b-7m
+	for qemu-devel@nongnu.org; Fri, 19 May 2017 19:34:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dBrJ8-0008Ds-0n
-	for qemu-devel@nongnu.org; Fri, 19 May 2017 19:27:46 -0400
-Received: from mail-oi0-x242.google.com ([2607:f8b0:4003:c06::242]:36198)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dBrJ7-0008Be-OM
-	for qemu-devel@nongnu.org; Fri, 19 May 2017 19:27:41 -0400
-Received: by mail-oi0-x242.google.com with SMTP id w138so14671501oiw.3
-	for <qemu-devel@nongnu.org>; Fri, 19 May 2017 16:27:41 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20170519180342.19618-1-berrange@redhat.com>
-	<20170519180342.19618-2-berrange@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <a70c02ea-d6e8-c9c3-a078-0df3faaff9f9@amsat.org>
-Date: Fri, 19 May 2017 20:27:38 -0300
+	(envelope-from <bounces@canonical.com>) id 1dBrPy-0002dq-9v
+	for qemu-devel@nongnu.org; Fri, 19 May 2017 19:34:50 -0400
+Received: from indium.canonical.com ([91.189.90.7]:42799)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1dBrPy-0002db-3m
+	for qemu-devel@nongnu.org; Fri, 19 May 2017 19:34:46 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1dBrPw-00007X-2R
+	for <qemu-devel@nongnu.org>; Fri, 19 May 2017 23:34:44 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 052052E8003
+	for <qemu-devel@nongnu.org>; Fri, 19 May 2017 23:34:44 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20170519180342.19618-2-berrange@redhat.com>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v2 1/5] sockets: ensure we can bind to both
- ipv4 & ipv6 separately
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 19 May 2017 23:25:22 -0000
+From: Thomas Huth <721825@bugs.launchpad.net>
+Reply-To: Bug 721825 <721825@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20110219161957.9055.80104.malonedeb@gandwana.canonical.com>
+Message-Id: <149523632285.12320.6206520449157924625.launchpad@wampee.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 721825] Re: VDI block driver bugs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,96 +36,140 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
+To: qemu-devel@nongnu.org
 
-On 05/19/2017 03:03 PM, Daniel P. Berrange wrote:
-> When binding to an IPv6 socket we currently force the
-> IPV6_V6ONLY flag to off. This means that the IPv6 socket
-> will accept both IPv4 & IPv6 sockets when QEMU is launched
-> with something like
->
->   -vnc :::1
->
-> While this is good for that case, it is bad for other
-> cases. For example if an empty hostname is given,
-> getaddrinfo resolves it to 2 addresses 0.0.0.0 and ::,
-> in that order. We will thus bind to 0.0.0.0 first, and
-> then fail to bind to :: on the same port. The same
-> problem can happen if any other hostname lookup causes
-> the IPv4 address to be reported before the IPv6 address.
->
-> When we get an IPv6 bind failure, we should re-try the
-> same port, but with IPV6_V6ONLY turned on again, to
-> avoid clash with any IPv4 listener.
->
-> This ensures that
->
->   -vnc :1
->
-> will bind successfully to both 0.0.0.0 and ::, and also
-> avoid
->
->   -vnc :1,to=2
->
-> from mistakenly using a 2nd port for the :: listener.
->
-> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
+** Changed in: qemu
+       Status: Incomplete =3D> Triaged
 
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+-- =
 
-> ---
->  util/qemu-sockets.c | 31 +++++++++++++++++++++++--------
->  1 file changed, 23 insertions(+), 8 deletions(-)
->
-> diff --git a/util/qemu-sockets.c b/util/qemu-sockets.c
-> index d8183f7..397212b 100644
-> --- a/util/qemu-sockets.c
-> +++ b/util/qemu-sockets.c
-> @@ -208,22 +208,37 @@ static int inet_listen_saddr(InetSocketAddress *saddr,
->          }
->
->          socket_set_fast_reuse(slisten);
-> -#ifdef IPV6_V6ONLY
-> -        if (e->ai_family == PF_INET6) {
-> -            /* listen on both ipv4 and ipv6 */
-> -            const int off = 0;
-> -            qemu_setsockopt(slisten, IPPROTO_IPV6, IPV6_V6ONLY, &off,
-> -                            sizeof(off));
-> -        }
-> -#endif
->
->          port_min = inet_getport(e);
->          port_max = saddr->has_to ? saddr->to + port_offset : port_min;
->          for (p = port_min; p <= port_max; p++) {
-> +#ifdef IPV6_V6ONLY
-> +            /* listen on both ipv4 and ipv6 */
-> +            int v6only = 0;
-> +#endif
->              inet_setport(e, p);
-> +#ifdef IPV6_V6ONLY
-> +        rebind:
-> +            if (e->ai_family == PF_INET6) {
-> +                qemu_setsockopt(slisten, IPPROTO_IPV6, IPV6_V6ONLY, &v6only,
-> +                                sizeof(v6only));
-> +            }
-> +#endif
->              if (bind(slisten, e->ai_addr, e->ai_addrlen) == 0) {
->                  goto listen;
->              }
-> +
-> +#ifdef IPV6_V6ONLY
-> +            /* If we got EADDRINUSE from an IPv6 bind & V6ONLY is unset,
-> +             * it could be that the IPv4 port is already claimed, so retry
-> +             * with V6ONLY set
-> +             */
-> +            if (e->ai_family == PF_INET6 && errno == EADDRINUSE && !v6only) {
-> +                v6only = 1;
-> +                goto rebind;
-> +            }
-> +#endif
-> +
->              if (p == port_max) {
->                  if (!e->ai_next) {
->                      error_setg_errno(errp, errno, "Failed to bind socket");
->
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/721825
+
+Title:
+  VDI block driver bugs
+
+Status in QEMU:
+  Triaged
+
+Bug description:
+  Chunqiang Tang reports the following issues with the VDI block driver,
+  these are present in QEMU 0.14:
+
+  "Bug 1. The most serious bug is caused by race condition in updating a ne=
+w =
+
+  bmap entry in memory and on disk. Considering the following operation =
+
+  sequence. =
+
+    O1: VM issues a write to sector X
+    O2: VDI allocates a new bmap entry and updates in-memory s->bmap
+    O3: VDI writes data to disk
+    O4: The disk I/O for writing sector X fails
+    O5: VDI reports error to VM and returns.
+
+  Note that the bmap entry is updated in memory, but not persisted on disk. =
+
+  Now consider another write that immediately follows:
+    P1: VM issues a write to sector X+1, which locates in the same block as =
+
+  the previously used sector X.
+    P2: s->bmap already has one entry for the block, and hence VDI writes =
+
+  data directly without persisting the new s->bmap entry on disk.
+    P3: The write disk I/O succeeds
+    P4: VDI report success to VM, but the bitmap entry is still not =
+
+  persisted on disk.
+
+  Now suppose the VM powers off gracefully (i.e., the QEMU process quits) =
+
+  and reboots. The second write to sector X+1, which is reported as finishe=
+d =
+
+  successfully, is simply lost, because the corresponding in-memory s->bmap =
+
+  entry is never persisted on disk. This is exactly what FVD's testing tool =
+
+  discovers. After the block device is closed and then re-opened, disk =
+
+  content verification fails.
+
+  This is just one example of the problem. Race condition plus host crash =
+
+  also causes problems. Consider another example below.
+    Q1: VM issues a write to sector X
+    Q2: VDI allocates a new bmap entry and updates in-memory s->bmap
+    Q3: VDI writes sector X to disk and waits for the callback
+    Q4: VM issues a write to another sector X+1, which is in the same block =
+
+  as sector X.
+    Q5: VDI sees the bitmap entry in s->bmap is already allocated, and =
+
+  writes sector X+1 to disk.
+    Q6: Write to sector X+1 finishes, and VDI's callback is invoked.
+    Q7: VDI acknowledges to the VM the completion of writing sector X+1
+    Q8: After observing the completion of writing sector X+1, VM issues a =
+
+  flush to ensure that sector X+1 is persisted on disk.
+    Q9: VDI finishes the flush and acknowledge the completion of the =
+
+  operation.
+    Q10: ... (some other arbitrary operations, but the disk I/O for writing =
+
+  sector X is still not finished....)
+    Q11: The host crashes
+
+  Now the new bitmap entry is not persisted on disk, while both writing to =
+
+  sector X+1 and the flush has been acknowledged as finished. Sector X+1 is =
+
+  lost, which is a corruption. This problem exists even if it uses O_DSYNC. =
+
+  The root cause of the problem is that, if a request updates in-memory =
+
+  s->bmap, another request that sees this update assumes that the update is =
+
+  already persisted on disk, which is not.
+
+  Bug 2: Similar to the bugs the FVD testing tool found for QCOW2, there ar=
+e =
+
+  several cases of the code below on failure handling path without setting =
+
+  error return code, which mistakenly reports failure as success. This =
+
+  mistake is caught by FVD when doing image content validation.
+         if (acb->hd_aiocb =3D=3D NULL) {
+             /* missing     ret =3D -EIO; */
+              goto done; =
+
+          } =
+
+
+  Bug 3: Similar to the bugs the FVD testing tool found for QCOW2, =
+
+  vdi_aio_cancel does not perform a complete clean up and there are several =
+
+  related bugs. First, memory buffer is not freed, acb->orig_buf and =
+
+  acb->block_buffer. Second, acb->bh is not cancelled. Third, =
+
+  vdi_aio_setup() does not initialize acb->bh to NULL so that when a reques=
+t =
+
+  acb is cancelled and then later reused for another request, its acb->bh !=
+=3D =
+
+  NULL and the new request fails in  vdi_schedule_bh(). This is caught by =
+
+  FVD's testing tool, when it observes that no I/O failure is injected but =
+
+  VDI reports a failed I/O request, which indicates a bug in the driver."
+
+  http://permalink.gmane.org/gmane.comp.emulators.qemu/94340
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/721825/+subscriptions
