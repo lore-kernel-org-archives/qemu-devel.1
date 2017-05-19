@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33921)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33946)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1dBfDX-0001AI-Ls
-	for qemu-devel@nongnu.org; Fri, 19 May 2017 06:33:08 -0400
+	(envelope-from <stefanha@redhat.com>) id 1dBfDZ-0001Cw-UH
+	for qemu-devel@nongnu.org; Fri, 19 May 2017 06:33:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1dBfDU-00081p-F7
-	for qemu-devel@nongnu.org; Fri, 19 May 2017 06:33:07 -0400
+	(envelope-from <stefanha@redhat.com>) id 1dBfDZ-00082w-2F
+	for qemu-devel@nongnu.org; Fri, 19 May 2017 06:33:09 -0400
 From: Stefan Hajnoczi <stefanha@redhat.com>
-Date: Fri, 19 May 2017 11:32:46 +0100
-Message-Id: <20170519103247.4405-4-stefanha@redhat.com>
+Date: Fri, 19 May 2017 11:32:47 +0100
+Message-Id: <20170519103247.4405-5-stefanha@redhat.com>
 In-Reply-To: <20170519103247.4405-1-stefanha@redhat.com>
 References: <20170519103247.4405-1-stefanha@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 3/4] migration: avoid recursive AioContext
- locking in save_vmstate()
+Subject: [Qemu-devel] [PATCH v2 4/4] migration: use
+ bdrv_drain_all_begin/end() instead bdrv_drain_all()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,63 +23,68 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-block@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Fam Zheng <famz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
-AioContext was designed to allow nested acquire/release calls.  It uses
-a recursive mutex so callers don't need to worry about nesting...or so
-we thought.
+blk/bdrv_drain_all() only takes effect for a single instant and then
+resumes block jobs, guest devices, and other external clients like the
+NBD server.  This can be handy when performing a synchronous drain
+before terminating the program, for example.
 
-BDRV_POLL_WHILE() is used to wait for block I/O requests.  It releases
-the AioContext temporarily around aio_poll().  This gives IOThreads a
-chance to acquire the AioContext to process I/O completions.
+Monitor commands usually need to quiesce I/O across an entire code
+region so blk/bdrv_drain_all() is not suitable.  They must use
+bdrv_drain_all_begin/end() to mark the region.  This prevents new I/O
+requests from slipping in or worse - block jobs completing and modifying
+the graph.
 
-It turns out that recursive locking and BDRV_POLL_WHILE() don't mix.
-BDRV_POLL_WHILE() only releases the AioContext once, so the IOThread
-will not be able to acquire the AioContext if it was acquired
-multiple times.
+I audited other blk/bdrv_drain_all() callers but did not find anything
+that needs a similar fix.  This patch fixes the savevm/loadvm commands.
+Although I haven't encountered a read world issue this makes the code
+safer.
 
-Instead of trying to release AioContext n times in BDRV_POLL_WHILE(),
-this patch simply avoids nested locking in save_vmstate().  It's the
-simplest fix and we should step back to consider the big picture with
-all the recent changes to block layer threading.
-
-This patch is the final fix to solve 'savevm' hanging with -object
-iothread.
-
+Suggested-by: Kevin Wolf <kwolf@redhat.com>
 Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
-Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- migration/savevm.c | 12 +++++++++++-
- 1 file changed, 11 insertions(+), 1 deletion(-)
+ migration/savevm.c | 9 ++++++++-
+ 1 file changed, 8 insertions(+), 1 deletion(-)
 
 diff --git a/migration/savevm.c b/migration/savevm.c
-index f5e8194..3ca319f 100644
+index 3ca319f..f134e48 100644
 --- a/migration/savevm.c
 +++ b/migration/savevm.c
-@@ -2150,6 +2150,14 @@ int save_vmstate(const char *name, Error **errp)
-         goto the_end;
+@@ -2113,6 +2113,8 @@ int save_vmstate(const char *name, Error **errp)
      }
+     vm_stop(RUN_STATE_SAVE_VM);
  
-+    /* The bdrv_all_create_snapshot() call that follows acquires the AioContext
-+     * for itself.  BDRV_POLL_WHILE() does not support nested locking because
-+     * it only releases the lock once.  Therefore synchronous I/O will deadlock
-+     * unless we release the AioContext before bdrv_all_create_snapshot().
-+     */
-+    aio_context_release(aio_context);
-+    aio_context = NULL;
++    bdrv_drain_all_begin();
 +
-     ret = bdrv_all_create_snapshot(sn, bs, vm_state_size, &bs);
-     if (ret < 0) {
-         error_setg(errp, "Error while creating snapshot on '%s'",
-@@ -2160,7 +2168,9 @@ int save_vmstate(const char *name, Error **errp)
-     ret = 0;
+     aio_context_acquire(aio_context);
  
-  the_end:
--    aio_context_release(aio_context);
-+    if (aio_context) {
-+        aio_context_release(aio_context);
-+    }
+     memset(sn, 0, sizeof(*sn));
+@@ -2171,6 +2173,9 @@ int save_vmstate(const char *name, Error **errp)
+     if (aio_context) {
+         aio_context_release(aio_context);
+     }
++
++    bdrv_drain_all_end();
++
      if (saved_vm_running) {
          vm_start();
      }
+@@ -2279,7 +2284,7 @@ int load_vmstate(const char *name, Error **errp)
+     }
+ 
+     /* Flush all IO requests so they don't interfere with the new state.  */
+-    bdrv_drain_all();
++    bdrv_drain_all_begin();
+ 
+     ret = bdrv_all_goto_snapshot(name, &bs);
+     if (ret < 0) {
+@@ -2303,6 +2308,8 @@ int load_vmstate(const char *name, Error **errp)
+     qemu_fclose(f);
+     aio_context_release(aio_context);
+ 
++    bdrv_drain_all_end();
++
+     migration_incoming_state_destroy();
+     if (ret < 0) {
+         error_setg(errp, "Error %d while loading VM state", ret);
 -- 
 2.9.3
