@@ -1,24 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57956)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60082)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alexander.svk@gmail.com>) id 1dBz3p-0005b3-MT
-	for qemu-devel@nongnu.org; Sat, 20 May 2017 03:44:26 -0400
+	(envelope-from <maxime.coquelin@redhat.com>) id 1dBzPu-0001BI-S7
+	for qemu-devel@nongnu.org; Sat, 20 May 2017 04:07:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alexander.svk@gmail.com>) id 1dBz3o-0007BA-U7
-	for qemu-devel@nongnu.org; Sat, 20 May 2017 03:44:25 -0400
-Received: from mail-oi0-x22e.google.com ([2607:f8b0:4003:c06::22e]:34507)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alexander.svk@gmail.com>)
-	id 1dBz3o-0007Az-Op
-	for qemu-devel@nongnu.org; Sat, 20 May 2017 03:44:24 -0400
-Received: by mail-oi0-x22e.google.com with SMTP id b204so115639121oii.1
-	for <qemu-devel@nongnu.org>; Sat, 20 May 2017 00:44:24 -0700 (PDT)
-MIME-Version: 1.0
-From: Alexander Syvak <alexander.svk@gmail.com>
-Date: Sat, 20 May 2017 10:44:23 +0300
-Message-ID: <CA+9O3V3G8CqDuKWMP3wT2j+e7GB0B9Xe1ps22MT9eViSFEC3zg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: [Qemu-devel] How to pass intercepted mouse move x and y from host
- to a virtual machine running in Qemu
+	(envelope-from <maxime.coquelin@redhat.com>) id 1dBzPr-0004tS-MV
+	for qemu-devel@nongnu.org; Sat, 20 May 2017 04:07:14 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:56008)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <maxime.coquelin@redhat.com>)
+	id 1dBzPr-0004tC-GV
+	for qemu-devel@nongnu.org; Sat, 20 May 2017 04:07:11 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 92C6E624CC
+	for <qemu-devel@nongnu.org>; Sat, 20 May 2017 08:07:09 +0000 (UTC)
+From: Maxime Coquelin <maxime.coquelin@redhat.com>
+Date: Sat, 20 May 2017 10:06:58 +0200
+Message-Id: <20170520080658.337-1-maxime.coquelin@redhat.com>
+Subject: [Qemu-devel] [PATCH] vhost_net: do not expose MTU feature bit to
+ kernel backend
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,21 +29,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: mst@redhat.com, aconole@redhat.com, jasowang@redhat.com, qemu-devel@nongnu.org
+Cc: Maxime Coquelin <maxime.coquelin@redhat.com>
 
-Hi, guys!
+This patch removes MTU from the list of features supported by
+the kernel backend, so that vhost kernel backend does not have
+to advertise it to be negotiated.
 
-There exists a manually written virtual USB device registered as Qemu type.
+Cc: Aaron Conole <aconole@redhat.com>
+Suggested-by: Michael S. Tsirkin <mst@redhat.com>
+Signed-off-by: Maxime Coquelin <maxime.coquelin@redhat.com>
+---
+ hw/net/vhost_net.c | 1 -
+ 1 file changed, 1 deletion(-)
 
-It reads 5 bytes
-
-- x and y of a mouse move, x and y of scrolling, and buttons state -
-
-from mouse.fifo but there is no code in the implementation file which would
-actually parse those bytes.
-
-First where does Qemu actually parse those bytes?
-
-And the most important - can I actually pass double value for a mouse move?
-
-I use libinput in order to intercept host input events.
+diff --git a/hw/net/vhost_net.c b/hw/net/vhost_net.c
+index 22874a9..bdd8633 100644
+--- a/hw/net/vhost_net.c
++++ b/hw/net/vhost_net.c
+@@ -51,7 +51,6 @@ static const int kernel_feature_bits[] = {
+     VIRTIO_RING_F_EVENT_IDX,
+     VIRTIO_NET_F_MRG_RXBUF,
+     VIRTIO_F_VERSION_1,
+-    VIRTIO_NET_F_MTU,
+     VIRTIO_F_IOMMU_PLATFORM,
+     VHOST_INVALID_FEATURE_BIT
+ };
+-- 
+2.9.3
