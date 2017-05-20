@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45023)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55017)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dBtpc-0000k5-P7
-	for qemu-devel@nongnu.org; Fri, 19 May 2017 22:09:26 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dBuy0-00024g-HS
+	for qemu-devel@nongnu.org; Fri, 19 May 2017 23:22:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dBtpb-0005QU-GR
-	for qemu-devel@nongnu.org; Fri, 19 May 2017 22:09:24 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:56288)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1dBtpb-0005Q6-7Y
-	for qemu-devel@nongnu.org; Fri, 19 May 2017 22:09:23 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 48B844E040
-	for <qemu-devel@nongnu.org>; Sat, 20 May 2017 02:09:22 +0000 (UTC)
-From: Eduardo Habkost <ehabkost@redhat.com>
-Date: Fri, 19 May 2017 23:09:14 -0300
-Message-Id: <20170520020914.14562-4-ehabkost@redhat.com>
-In-Reply-To: <20170520020914.14562-1-ehabkost@redhat.com>
-References: <20170520020914.14562-1-ehabkost@redhat.com>
-Subject: [Qemu-devel] [RFC 3/3] qmp: Include parent types on
- 'qom-list-types' output
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dBuxv-0007pa-Ji
+	for qemu-devel@nongnu.org; Fri, 19 May 2017 23:22:08 -0400
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20170520002653.20213-1-andrew@aj.id.au>
+	<20170520002653.20213-2-andrew@aj.id.au>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <59538b3b-2936-cdc7-f582-9d473c72ce09@amsat.org>
+Date: Sat, 20 May 2017 00:21:59 -0300
+MIME-Version: 1.0
+In-Reply-To: <20170520002653.20213-2-andrew@aj.id.au>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH 1/2] hw/adc: Add basic Aspeed
+ ADC model
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,191 +28,347 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Markus Armbruster <armbru@redhat.com>, Eric Blake <eblake@redhat.com>
+To: Andrew Jeffery <andrew@aj.id.au>, qemu-arm@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, Ryan Chen <ryan_chen@aspeedtech.com>, Alistair Francis <alistair@alistair23.me>, qemu-devel@nongnu.org, =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>, Joel Stanley <joel@jms.id.au>
 
-Include list of parent types of each type on 'qom-list-types' output.
+Hi Andrew,
 
-Without this, there's no way to figure out the parents of a given type
-without making additional 'qom-list-types' queries.
+On 05/19/2017 09:26 PM, Andrew Jeffery wrote:
+> This model implements enough behaviour to do basic functionality tests
+> such as device initialisation and read out of dummy sample values. The
+> sample value generation strategy is similar to the STM ADC already in
+> the tree.
+>
+> Signed-off-by: Andrew Jeffery <andrew@aj.id.au>
+> ---
+>  hw/adc/Makefile.objs        |   1 +
+>  hw/adc/aspeed_adc.c         | 246 ++++++++++++++++++++++++++++++++++++++++++++
+>  include/hw/adc/aspeed_adc.h |  33 ++++++
+>  3 files changed, 280 insertions(+)
+>  create mode 100644 hw/adc/aspeed_adc.c
+>  create mode 100644 include/hw/adc/aspeed_adc.h
+>
+> diff --git a/hw/adc/Makefile.objs b/hw/adc/Makefile.objs
+> index 3f6dfdedaec7..2bf9362ba3c4 100644
+> --- a/hw/adc/Makefile.objs
+> +++ b/hw/adc/Makefile.objs
+> @@ -1 +1,2 @@
+>  obj-$(CONFIG_STM32F2XX_ADC) += stm32f2xx_adc.o
+> +obj-$(CONFIG_ASPEED_SOC) += aspeed_adc.o
+> diff --git a/hw/adc/aspeed_adc.c b/hw/adc/aspeed_adc.c
+> new file mode 100644
+> index 000000000000..d08f1684f7bc
+> --- /dev/null
+> +++ b/hw/adc/aspeed_adc.c
+> @@ -0,0 +1,246 @@
+> +/*
+> + * Aspeed ADC
+> + *
+> + * Andrew Jeffery <andrew@aj.id.au>
+> + *
+> + * Copyright 2017 IBM Corp.
+> + *
+> + * This code is licensed under the GPL version 2 or later.  See
+> + * the COPYING file in the top-level directory.
+> + */
+> +
+> +#include "qemu/osdep.h"
+> +#include "hw/adc/aspeed_adc.h"
+> +#include "qapi/error.h"
+> +#include "qemu/log.h"
+> +
+> +#define ASPEED_ADC_ENGINE_CTRL                  0x00
+> +#define  ASPEED_ADC_ENGINE_CH_EN_MASK           0xffff0000
+> +#define   ASPEED_ADC_ENGINE_CH_EN(x)            ((BIT(x)) << 16)
+> +#define  ASPEED_ADC_ENGINE_INIT                 BIT(8)
+> +#define  ASPEED_ADC_ENGINE_AUTO_COMP            BIT(5)
+> +#define  ASPEED_ADC_ENGINE_COMP                 BIT(4)
+> +#define  ASPEED_ADC_ENGINE_MODE_MASK            0x0000000e
+> +#define   ASPEED_ADC_ENGINE_MODE_OFF            (0b000 << 1)
+> +#define   ASPEED_ADC_ENGINE_MODE_STANDBY        (0b001 << 1)
+> +#define   ASPEED_ADC_ENGINE_MODE_NORMAL         (0b111 << 1)
+> +#define  ASPEED_ADC_ENGINE_EN                   BIT(0)
+> +
+> +#define ASPEED_ADC_L_MASK       ((1 << 10) - 1)
+> +#define ASPEED_ADC_L(x)         ((x) & ASPEED_ADC_L_MASK)
+> +#define ASPEED_ADC_H(x)         (((x) >> 16) & ASPEED_ADC_L_MASK)
+> +#define ASPEED_ADC_LH_MASK      (ASPEED_ADC_L_MASK << 16 | ASPEED_ADC_L_MASK)
+> +
+> +static inline uint32_t update_channels(uint32_t current)
+> +{
+> +    const uint32_t next = (current + 7) & 0x3ff;
+> +
+> +    return (next << 16) | next;
+> +}
+> +
+> +static bool breaks_threshold(AspeedADCState *s, int ch_off)
+> +{
+> +    const uint32_t a = ASPEED_ADC_L(s->channels[ch_off]);
+> +    const uint32_t a_lower = ASPEED_ADC_L(s->bounds[2 * ch_off]);
+> +    const uint32_t a_upper = ASPEED_ADC_H(s->bounds[2 * ch_off]);
+> +    const uint32_t b = ASPEED_ADC_H(s->channels[ch_off]);
+> +    const uint32_t b_lower = ASPEED_ADC_L(s->bounds[2 * ch_off + 1]);
+> +    const uint32_t b_upper = ASPEED_ADC_H(s->bounds[2 * ch_off + 1]);
+> +
+> +    return ((a < a_lower || a > a_upper)) ||
+> +           ((b < b_lower || b > b_upper));
+> +}
+> +
+> +static uint32_t read_channel_sample(AspeedADCState *s, int ch_off)
+> +{
+> +    uint32_t ret;
+> +
+> +    /* Poor man's sampling */
+> +    ret = s->channels[ch_off];
+> +    s->channels[ch_off] = update_channels(s->channels[ch_off]);
+> +
+> +    if (breaks_threshold(s, ch_off)) {
+> +        qemu_irq_raise(s->irq);
+> +    }
+> +
+> +    return ret;
+> +}
+> +
+> +#define TO_INDEX(addr, base) (((addr) - (base)) >> 2)
+> +
+> +static uint64_t aspeed_adc_read(void *opaque, hwaddr addr,
+> +                                     unsigned int size)
+> +{
+> +    AspeedADCState *s = ASPEED_ADC(opaque);
+> +    uint64_t ret;
+> +
+> +    switch (addr) {
+> +    case 0x00:
+> +        ret = s->engine_ctrl;
+> +        break;
+> +    case 0x04:
+> +        ret = s->irq_ctrl;
+> +        break;
+> +    case 0x08:
+> +        ret = s->vga_detect_ctrl;
+> +        break;
+> +    case 0x0c:
+> +        ret = s->adc_clk_ctrl;
+> +        break;
+> +    case 0x10 ... 0x2e:
+> +        ret = read_channel_sample(s, TO_INDEX(addr, 0x10));
+> +        break;
+> +    case 0x30 ... 0x6e:
+> +        ret = s->bounds[TO_INDEX(addr, 0x30)];
+> +        break;
+> +    case 0x70 ... 0xae:
+> +        ret = s->hysteresis[TO_INDEX(addr, 0x70)];
+> +        break;
+> +    case 0xc0:
+> +        ret = s->irq_src;
+> +        break;
+> +    case 0xc4:
+> +        ret = s->comp_trim;
+> +        break;
+> +    default:
+> +        qemu_log_mask(LOG_UNIMP, "%s: addr: 0x%lx, size: %u\n", __func__, addr,
+> +                size);
+> +        ret = 0;
+> +        break;
+> +    }
+> +
+> +    return ret;
+> +}
+> +
+> +static void aspeed_adc_write(void *opaque, hwaddr addr,
+> +                       uint64_t val, unsigned int size)
+> +{
+> +    AspeedADCState *s = ASPEED_ADC(opaque);
+> +
+> +    switch (addr) {
+> +    case 0x00:
+> +        {
+> +            uint32_t init;
+> +
+> +            init = !!(val & ASPEED_ADC_ENGINE_EN);
+> +            init *= ASPEED_ADC_ENGINE_INIT;
+> +
+> +            val &= ~ASPEED_ADC_ENGINE_INIT;
+> +            val |= init;
+> +        }
+> +
+> +        val &= ~ASPEED_ADC_ENGINE_AUTO_COMP;
+> +        s->engine_ctrl = val;
+> +
+> +        break;
+> +    case 0x04:
+> +        s->irq_ctrl = val;
+> +        break;
+> +    case 0x08:
+> +        s->vga_detect_ctrl = val;
+> +        break;
+> +    case 0x0c:
+> +        s->adc_clk_ctrl = val;
+> +        break;
+> +    case 0x10 ... 0x2e:
+> +        s->channels[TO_INDEX(addr, 0x10)] = val;
+> +        break;
+> +    case 0x30 ... 0x6e:
+> +        s->bounds[TO_INDEX(addr, 0x30)] = (val & ASPEED_ADC_LH_MASK);
+> +        break;
+> +    case 0x70 ... 0xae:
+> +        s->hysteresis[TO_INDEX(addr, 0x70)] =
+> +            (val & (BIT(31) | ASPEED_ADC_LH_MASK));
 
-In addition to the test case for the new feature, update the
-abstract-interface test case to use the new field and avoid the
-"qom-list-types implements=object" trick.
+Can you add a #define for this BIT(31)?
 
-Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
----
-I would to include a "interfaces" field in the future, too, but
-this would require extending the core QOM API to allow that.
----
- qapi-schema.json               |  6 ++++-
- qmp.c                          | 16 +++++++++++
- tests/device-introspect-test.c | 61 +++++++++++++++++++++++++++++++++++-------
- 3 files changed, 72 insertions(+), 11 deletions(-)
+> +        break;
+> +    case 0xc0:
+> +        s->irq_src = (val & 0xffff);
+> +        break;
+> +    case 0xc4:
+> +        s->comp_trim = (val & 0xf);
+> +        break;
+> +    default:
+> +        qemu_log_mask(LOG_UNIMP, "%s: %lu\n", __func__, addr);
+> +        break;
+> +    }
+> +}
+> +
+> +static const MemoryRegionOps aspeed_adc_ops = {
+> +    .read = aspeed_adc_read,
+> +    .write = aspeed_adc_write,
+> +    .endianness = DEVICE_LITTLE_ENDIAN,
+> +    .valid.min_access_size = 4,
 
-diff --git a/qapi-schema.json b/qapi-schema.json
-index cbf1e2a837..169dfd2d7f 100644
---- a/qapi-schema.json
-+++ b/qapi-schema.json
-@@ -3037,12 +3037,16 @@
- # @abstract: the type is abstract and can't be directly instantiated
- #            (since 2.10)
- #
-+# @parent-types: parent types.  Parent types implemented by the type.  Note that
-+#           this doesn't include interface names also implemented by the type.
-+#           (since 2.10)
-+#
- # Since: 1.1
- #
- # Notes: This command is experimental and may change syntax in future releases.
- ##
- { 'struct': 'ObjectTypeInfo',
--  'data': { 'name': 'str', 'abstract': 'bool' } }
-+  'data': { 'name': 'str', 'abstract': 'bool', 'parent-types': [ 'str' ] } }
- 
- ##
- # @qom-list-types:
-diff --git a/qmp.c b/qmp.c
-index 8066705dbe..5b50f6f650 100644
---- a/qmp.c
-+++ b/qmp.c
-@@ -436,6 +436,21 @@ void qmp_change(const char *device, const char *target,
-     }
- }
- 
-+static strList *qom_type_get_parents(ObjectClass *klass)
-+{
-+    ObjectClass *parent = object_class_get_parent(klass);
-+    strList *r = NULL;
-+
-+    if (!parent) {
-+        return NULL;
-+    }
-+
-+    r = g_new0(strList, 1);
-+    r->value = g_strdup(object_class_get_name(parent));
-+    r->next = qom_type_get_parents(parent);
-+    return r;
-+}
-+
- static void qom_list_types_tramp(ObjectClass *klass, void *data)
- {
-     ObjectTypeInfoList *e, **pret = data;
-@@ -444,6 +459,7 @@ static void qom_list_types_tramp(ObjectClass *klass, void *data)
-     info = g_malloc0(sizeof(*info));
-     info->name = g_strdup(object_class_get_name(klass));
-     info->abstract = object_class_is_abstract(klass);
-+    info->parent_types = qom_type_get_parents(klass);
- 
-     e = g_malloc0(sizeof(*e));
-     e->value = info;
-diff --git a/tests/device-introspect-test.c b/tests/device-introspect-test.c
-index d5aacb4ed1..350b862f3b 100644
---- a/tests/device-introspect-test.c
-+++ b/tests/device-introspect-test.c
-@@ -61,6 +61,20 @@ static QDict *type_list_find(QList *types, const char *name)
-     return NULL;
- }
- 
-+static bool str_list_has(QList *strlist, const char *str)
-+{
-+    QListEntry *e;
-+
-+    QLIST_FOREACH_ENTRY(strlist, e) {
-+        const char *s = qstring_get_str(qobject_to_qstring(qlist_entry_obj(e)));
-+        if (!strcmp(s, str)) {
-+            return true;
-+        }
-+    }
-+
-+    return false;
-+}
-+
- static QList *device_type_list(bool abstract)
- {
-     return qom_list_types("device", abstract);
-@@ -103,6 +117,31 @@ static void test_device_intro_list(void)
-     qtest_end();
- }
- 
-+/*
-+ * Ensure all entries returned by qom-list-types implements=<parent>
-+ * have <parent> in parent-types.
-+ */
-+static void test_qom_list_parents(const char *parent)
-+{
-+    QList *types;
-+    QListEntry *e;
-+
-+    types = qom_list_types(parent, true);
-+
-+    QLIST_FOREACH_ENTRY(types, e) {
-+        QDict *d = qobject_to_qdict(qlist_entry_obj(e));
-+
-+        /* The parent type being queried is included in the list too, skip it */
-+        if (!strcmp(qdict_get_str(d, "name"), parent)) {
-+            continue;
-+        }
-+
-+        g_assert(str_list_has(qdict_get_qlist(d, "parent-types"), parent));
-+    }
-+
-+    QDECREF(types);
-+}
-+
- static void test_qom_list_fields(void)
- {
-     QList *all_types;
-@@ -123,6 +162,10 @@ static void test_qom_list_fields(void)
-         g_assert(abstract == expected_abstract);
-     }
- 
-+    test_qom_list_parents("object");
-+    test_qom_list_parents("device");
-+    test_qom_list_parents("sys-bus-device");
-+
-     QDECREF(all_types);
-     QDECREF(non_abstract);
-     qtest_end();
-@@ -165,23 +208,22 @@ static void test_device_intro_concrete(void)
- static void test_abstract_interfaces(void)
- {
-     QList *all_types;
--    QList *obj_types;
-     QListEntry *e;
- 
-     qtest_start(common_args);
--    /*
--     * qom-list-types implements=interface returns all types that
--     * implement _any_ interface (not just interface types), but
--     * we can filter them out because interfaces don't implement
--     * the "object" type.
--     */
-+
-     all_types = qom_list_types("interface", true);
--    obj_types = qom_list_types("object", true);
- 
-     QLIST_FOREACH_ENTRY(all_types, e) {
-         QDict *d = qobject_to_qdict(qlist_entry_obj(e));
- 
--        if (type_list_find(obj_types, qdict_get_str(d, "name"))) {
-+        /*
-+         * qom-list-types implements=interface returns all types
-+         * that implement _any_ interface (not just interface
-+         * types), so skip the ones that don't have "interface"
-+         * on parent-types.
-+         */
-+        if (!str_list_has(qdict_get_qlist(d, "parent-types"), "interface")) {
-             /* Not an interface type */
-             continue;
-         }
-@@ -190,7 +232,6 @@ static void test_abstract_interfaces(void)
-     }
- 
-     QDECREF(all_types);
--    QDECREF(obj_types);
-     qtest_end();
- }
- 
--- 
-2.11.0.259.g40922b1
+You sure about that? How the registers are aligned it seems this device 
+can also be accessed 2-byte wide.
+
+> +    .valid.max_access_size = 4,
+> +    .valid.unaligned = false,
+> +};
+> +
+> +static void aspeed_adc_reset(DeviceState *dev)
+> +{
+> +    struct AspeedADCState *s = ASPEED_ADC(dev);
+> +
+> +    s->engine_ctrl = 0;
+> +    s->irq_ctrl = 0;
+> +    s->vga_detect_ctrl = 0x0000000f;
+> +    s->adc_clk_ctrl = 0x0000000f;
+> +    memset(s->channels, 0, sizeof(s->channels));
+> +    memset(s->bounds, 0, sizeof(s->bounds));
+> +    memset(s->hysteresis, 0, sizeof(s->hysteresis));
+> +    s->irq_src = 0;
+> +    s->comp_trim = 0;
+> +}
+> +
+> +static void aspeed_adc_realize(DeviceState *dev, Error **errp)
+> +{
+> +    AspeedADCState *s = ASPEED_ADC(dev);
+> +    SysBusDevice *sbd = SYS_BUS_DEVICE(dev);
+> +
+> +    sysbus_init_irq(sbd, &s->irq);
+> +
+> +    memory_region_init_io(&s->mmio, OBJECT(s), &aspeed_adc_ops, s,
+> +            TYPE_ASPEED_ADC, 0x1000);
+> +
+> +    sysbus_init_mmio(sbd, &s->mmio);
+> +}
+> +
+> +static const VMStateDescription vmstate_aspeed_adc = {
+> +    .name = TYPE_ASPEED_ADC,
+> +    .version_id = 1,
+> +    .minimum_version_id = 1,
+> +    .fields = (VMStateField[]) {
+> +        VMSTATE_UINT32(engine_ctrl, AspeedADCState),
+> +        VMSTATE_UINT32(irq_ctrl, AspeedADCState),
+> +        VMSTATE_UINT32(vga_detect_ctrl, AspeedADCState),
+> +        VMSTATE_UINT32(adc_clk_ctrl, AspeedADCState),
+> +        VMSTATE_UINT32_ARRAY(channels, AspeedADCState,
+> +                ASPEED_ADC_NR_CHANNELS / 2),
+> +        VMSTATE_UINT32_ARRAY(bounds, AspeedADCState, ASPEED_ADC_NR_CHANNELS),
+> +        VMSTATE_UINT32_ARRAY(hysteresis, AspeedADCState,
+> +                ASPEED_ADC_NR_CHANNELS),
+> +        VMSTATE_UINT32(irq_src, AspeedADCState),
+> +        VMSTATE_UINT32(comp_trim, AspeedADCState),
+> +        VMSTATE_END_OF_LIST(),
+> +    }
+> +};
+> +
+> +static void aspeed_adc_class_init(ObjectClass *klass, void *data)
+> +{
+> +    DeviceClass *dc = DEVICE_CLASS(klass);
+> +
+> +    dc->realize = aspeed_adc_realize;
+> +    dc->reset = aspeed_adc_reset;
+> +    dc->desc = "Aspeed Analog-to-Digital Converter",
+> +    dc->vmsd = &vmstate_aspeed_adc;
+> +}
+> +
+> +static const TypeInfo aspeed_adc_info = {
+> +    .name = TYPE_ASPEED_ADC,
+> +    .parent = TYPE_SYS_BUS_DEVICE,
+> +    .instance_size = sizeof(AspeedADCState),
+> +    .class_init = aspeed_adc_class_init,
+> +};
+> +
+> +static void aspeed_adc_register_types(void)
+> +{
+> +    type_register_static(&aspeed_adc_info);
+> +}
+> +
+> +type_init(aspeed_adc_register_types);
+> diff --git a/include/hw/adc/aspeed_adc.h b/include/hw/adc/aspeed_adc.h
+> new file mode 100644
+> index 000000000000..ae2089ac62ca
+> --- /dev/null
+> +++ b/include/hw/adc/aspeed_adc.h
+> @@ -0,0 +1,33 @@
+> +#ifndef _ASPEED_ADC_H_
+> +#define _ASPEED_ADC_H_
+> +
+
+You missed the license.
+
+Can you also add a comment about which ADC are modeled (2400/2500 no 
+difference) as you explain in your cover letter?
+
+> +#include <stdint.h>
+> +
+> +#include "hw/hw.h"
+> +#include "hw/irq.h"
+> +#include "hw/sysbus.h"
+> +
+> +#define TYPE_ASPEED_ADC "aspeed.adc"
+> +#define ASPEED_ADC(obj) OBJECT_CHECK(AspeedADCState, (obj), TYPE_ASPEED_ADC)
+> +
+> +#define ASPEED_ADC_NR_CHANNELS 16
+> +
+> +typedef struct AspeedADCState {
+> +    /* <private> */
+> +    SysBusDevice parent;
+> +
+> +    MemoryRegion mmio;
+> +    qemu_irq irq;
+> +
+> +    uint32_t engine_ctrl;
+> +    uint32_t irq_ctrl;
+> +    uint32_t vga_detect_ctrl;
+> +    uint32_t adc_clk_ctrl;
+> +    uint32_t channels[ASPEED_ADC_NR_CHANNELS / 2];
+
+I can't find the datasheet, but it seems this ADC has a 10-bit 
+resolution, so a channel sample can fit into a uint16_t.
+It sounds weird to read ASPEED_ADC_NR_CHANNELS=16 then use 
+ASPEED_ADC_NR_CHANNELS/2 channels.
+I think using an uint16_t array you can get rid of the ASPEED_ADC_L/H 
+macros.
+
+> +    uint32_t bounds[ASPEED_ADC_NR_CHANNELS];
+> +    uint32_t hysteresis[ASPEED_ADC_NR_CHANNELS];
+> +    uint32_t irq_src;
+> +    uint32_t comp_trim;
+> +} AspeedADCState;
+> +
+> +#endif /* _ASPEED_ADC_H_ */
+>
+
+Regards,
+
+Phil.
