@@ -1,30 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56531)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58933)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dBrxX-0001az-RQ
-	for qemu-devel@nongnu.org; Fri, 19 May 2017 20:09:28 -0400
+	(envelope-from <andrew@aj.id.au>) id 1dBsFF-00048x-Re
+	for qemu-devel@nongnu.org; Fri, 19 May 2017 20:27:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dBrxU-0004wE-Im
-	for qemu-devel@nongnu.org; Fri, 19 May 2017 20:09:27 -0400
-Received: from mail-oi0-x244.google.com ([2607:f8b0:4003:c06::244]:33803)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dBrxU-0004vL-E9
-	for qemu-devel@nongnu.org; Fri, 19 May 2017 20:09:24 -0400
-Received: by mail-oi0-x244.google.com with SMTP id w10so14770981oif.1
-	for <qemu-devel@nongnu.org>; Fri, 19 May 2017 17:09:24 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20170429104937.31341-1-zxq_yx_007@163.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <9bf6a5a4-e8d7-b3b3-029d-baad2e3b507e@amsat.org>
-Date: Fri, 19 May 2017 21:09:21 -0300
-MIME-Version: 1.0
-In-Reply-To: <20170429104937.31341-1-zxq_yx_007@163.com>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 0/9] QOM'ify work for sparc
+	(envelope-from <andrew@aj.id.au>) id 1dBsFF-0001Z6-11
+	for qemu-devel@nongnu.org; Fri, 19 May 2017 20:27:45 -0400
+From: Andrew Jeffery <andrew@aj.id.au>
+Date: Sat, 20 May 2017 08:26:51 +0800
+Message-Id: <20170520002653.20213-1-andrew@aj.id.au>
+Subject: [Qemu-devel] [PATCH 0/2] hw/adc: Implement a basic Aspeed ADC model
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,39 +17,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: xiaoqiang zhao <zxq_yx_007@163.com>, qemu-devel@nongnu.org
-Cc: edgar.iglesias@xilinx.com, peter.maydell@linaro.org, mark.cave-ayland@ilande.co.uk, pbonzini@redhat.com, atar4qemu@gmail.com, david@gibson.dropbear.id.au
+To: qemu-arm@nongnu.org
+Cc: Andrew Jeffery <andrew@aj.id.au>, qemu-devel@nongnu.org, Alistair Francis <alistair@alistair23.me>, Peter Maydell <peter.maydell@linaro.org>, Joel Stanley <joel@jms.id.au>, =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>, Ryan Chen <ryan_chen@aspeedtech.com>
 
-Hi Xiaoqiang,
+Hello,
 
-On 04/29/2017 07:49 AM, xiaoqiang zhao wrote:
-> This patch set aims for QOM'ifying code relate with sparc.
-> It is part of my QOM'ify work of qemu code base.
->
-> changes since v1:
-> * rebased on the latest master
->
-> xiaoqiang zhao (9):
->   hw/misc: QOM'ify eccmemctl.c
->   hw/dma: QOM'ify sparc32_dma.c
->   hw/dma: QOM'ify sun4m_iommu.c
->   hw/misc: QOM'ify slavio_misc.c
->   hw/timer: QOM'ify m48txx_sysbus (pass 1)
->   hw/timer: QOM'ify m48txx_sysbus (pass 2)
+This short series introduces a basic model for the Aspeed ADC and glues it into
+the generic Aspeed SoC definition. The register interface is enhanced slightly
+from the AST2400 to the AST2500, but in a backwards-compatible way by making
+use of reserved bits. As such I haven't made any effort to differentiate the
+two.
 
-I think you can squash those 2. Any particular reason you did pass 2 in 
-another commit?
+The addition of a basic ADC model allows the Aspeed SDK kernel to boot under
+QEMU's ast2500-evb machine. The upstream kernel driver doesn't test the
+initialisation bit before completing its probe(), and thus doesn't get stuck if
+the bit is not set. This is in contrast to the SDK kernel which spins on the
+initialisation bit, never making forward progress in the absence of the ADC
+model.
 
->   hw/timer: QOM'ify slavio_timer
->   hw/sparc: QOM'ify sun4m.c
->   hw/sparc64: QOM'ify sun4u.c
->
->  hw/dma/sparc32_dma.c    | 25 ++++++++++++++---------
->  hw/dma/sun4m_iommu.c    | 12 +++++------
->  hw/misc/eccmemctl.c     | 25 ++++++++++++++---------
->  hw/misc/slavio_misc.c   | 43 ++++++++++++++++-----------------------
->  hw/sparc/sun4m.c        | 54 +++++++++++++++++--------------------------------
->  hw/sparc64/sun4u.c      | 20 +++++++++---------
->  hw/timer/m48t59.c       | 38 +++++++++++++++++-----------------
->  hw/timer/slavio_timer.c | 12 +++++------
->  8 files changed, 105 insertions(+), 124 deletions(-)
+Tested with both Aspeed's SDK kernel and upstream Linux.
+
+Cheers,
+
+Andrew
+
+Andrew Jeffery (2):
+  hw/adc: Add basic Aspeed ADC model
+  hw/arm: Integrate ADC model into Aspeed SoC
+
+ hw/adc/Makefile.objs        |   1 +
+ hw/adc/aspeed_adc.c         | 246 ++++++++++++++++++++++++++++++++++++++++++++
+ hw/arm/aspeed_soc.c         |  15 +++
+ include/hw/adc/aspeed_adc.h |  33 ++++++
+ include/hw/arm/aspeed_soc.h |   2 +
+ 5 files changed, 297 insertions(+)
+ create mode 100644 hw/adc/aspeed_adc.c
+ create mode 100644 include/hw/adc/aspeed_adc.h
+
+-- 
+2.9.3
