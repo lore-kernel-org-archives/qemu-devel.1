@@ -1,20 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53665)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53662)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <krzk@kernel.org>) id 1dCSoD-0002SM-UK
+	(envelope-from <krzk@kernel.org>) id 1dCSoD-0002SG-Qb
 	for qemu-devel@nongnu.org; Sun, 21 May 2017 11:30:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <krzk@kernel.org>) id 1dCSoD-0007KJ-2p
+	(envelope-from <krzk@kernel.org>) id 1dCSoD-0007KP-4v
 	for qemu-devel@nongnu.org; Sun, 21 May 2017 11:30:17 -0400
 From: Krzysztof Kozlowski <krzk@kernel.org>
-Date: Sun, 21 May 2017 17:29:45 +0200
-Message-Id: <20170521152949.15338-8-krzk@kernel.org>
+Date: Sun, 21 May 2017 17:29:43 +0200
+Message-Id: <20170521152949.15338-6-krzk@kernel.org>
 In-Reply-To: <20170521152949.15338-1-krzk@kernel.org>
 References: <20170521152949.15338-1-krzk@kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v3 07/11] hw/arm/exynos: Declare local
- variables in some order
+Subject: [Qemu-devel] [PATCH v3 05/11] hw/timer/exynos4210_mct: Remove
+ unused defines
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,33 +23,31 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Igor Mitsyanko <i.mitsyanko@gmail.com>, Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-devel@nongnu.org
 Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Krzysztof Kozlowski <krzk@kernel.org>
 
-Bring some more readability by declaring local function variables: first
-initialized ones and then the rest (with reversed-christmas-tree order).
+Remove defines not used anywhere.
 
 Signed-off-by: Krzysztof Kozlowski <krzk@kernel.org>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- hw/arm/exynos4210.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ hw/timer/exynos4210_mct.c | 3 ---
+ 1 file changed, 3 deletions(-)
 
-diff --git a/hw/arm/exynos4210.c b/hw/arm/exynos4210.c
-index 0da877f8db0a..27a7bf28a5a9 100644
---- a/hw/arm/exynos4210.c
-+++ b/hw/arm/exynos4210.c
-@@ -162,12 +162,12 @@ static uint64_t exynos4210_calc_affinity(int cpu)
-=20
- Exynos4210State *exynos4210_init(MemoryRegion *system_mem)
- {
--    int i, n;
-     Exynos4210State *s =3D g_new(Exynos4210State, 1);
-     qemu_irq gate_irq[EXYNOS4210_NCPUS][EXYNOS4210_IRQ_GATE_NINPUTS];
--    DeviceState *dev;
-     SysBusDevice *busdev;
-     ObjectClass *cpu_oc;
-+    DeviceState *dev;
-+    int i, n;
-=20
-     cpu_oc =3D cpu_class_by_name(TYPE_ARM_CPU, "cortex-a9");
-     assert(cpu_oc);
---=20
+diff --git a/hw/timer/exynos4210_mct.c b/hw/timer/exynos4210_mct.c
+index ea5f99d9a41b..e4ef4cfd3625 100644
+--- a/hw/timer/exynos4210_mct.c
++++ b/hw/timer/exynos4210_mct.c
+@@ -173,13 +173,10 @@ enum LocalTimerRegCntIndexes {
+     L_REG_CNT_AMOUNT
+ };
+ 
+-#define MCT_NIRQ                6
+ #define MCT_SFR_SIZE            0x444
+ 
+ #define MCT_GT_CMP_NUM          4
+ 
+-#define MCT_GT_MAX_VAL          UINT64_MAX
+-
+ #define MCT_GT_COUNTER_STEP     0x100000000ULL
+ #define MCT_LT_COUNTER_STEP     0x100000000ULL
+ #define MCT_LT_CNT_LOW_LIMIT    0x100
+-- 
 2.9.3
