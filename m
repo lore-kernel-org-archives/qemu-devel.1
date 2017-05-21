@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48424)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48463)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dCHZe-0001Pw-KV
-	for qemu-devel@nongnu.org; Sat, 20 May 2017 23:30:31 -0400
+	id 1dCHZh-0001Sw-Bk
+	for qemu-devel@nongnu.org; Sat, 20 May 2017 23:30:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dCHZd-0007G9-Ua
-	for qemu-devel@nongnu.org; Sat, 20 May 2017 23:30:30 -0400
+	id 1dCHZg-0007HR-Gf
+	for qemu-devel@nongnu.org; Sat, 20 May 2017 23:30:33 -0400
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Sun, 21 May 2017 00:29:41 -0300
-Message-Id: <20170521032956.27446-10-f4bug@amsat.org>
+Date: Sun, 21 May 2017 00:29:43 -0300
+Message-Id: <20170521032956.27446-12-f4bug@amsat.org>
 In-Reply-To: <20170521032956.27446-1-f4bug@amsat.org>
 References: <20170521032956.27446-1-f4bug@amsat.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v3 09/24] docker: use eatmydata in debian armhf
- image
+Subject: [Qemu-devel] [PATCH v3 11/24] docker: add extra libs to armhf
+ target to extend codebase coverage
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,26 +32,27 @@ Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- tests/docker/dockerfiles/debian-armhf-cross.docker | 7 +++++--
- 1 file changed, 5 insertions(+), 2 deletions(-)
+ tests/docker/dockerfiles/debian-armhf-cross.docker | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
 
 diff --git a/tests/docker/dockerfiles/debian-armhf-cross.docker b/tests/docker/dockerfiles/debian-armhf-cross.docker
-index 668d60aeb3..ba8d5a5167 100644
+index ba8d5a5167..e67dfdccc5 100644
 --- a/tests/docker/dockerfiles/debian-armhf-cross.docker
 +++ b/tests/docker/dockerfiles/debian-armhf-cross.docker
-@@ -8,8 +8,11 @@ FROM qemu:debian
- # Add the foreign architecture we want and install dependencies
- RUN dpkg --add-architecture armhf
- RUN apt update
--RUN apt install -yy crossbuild-essential-armhf
--RUN apt-get build-dep -yy -a armhf qemu
-+RUN DEBIAN_FRONTEND=noninteractive eatmydata \
-+    apt-get install -y --no-install-recommends \
-+        crossbuild-essential-armhf
-+RUN DEBIAN_FRONTEND=noninteractive eatmydata \
-+    apt-get build-dep -yy -a armhf qemu
+@@ -16,3 +16,14 @@ RUN DEBIAN_FRONTEND=noninteractive eatmydata \
  
  # Specify the cross prefix for this image (see tests/docker/common.rc)
  ENV QEMU_CONFIGURE_OPTS --cross-prefix=arm-linux-gnueabihf-
++
++RUN DEBIAN_FRONTEND=noninteractive eatmydata \
++    apt-get install -y --no-install-recommends \
++        glusterfs-common:armhf \
++        libbz2-dev:armhf \
++        liblzo2-dev:armhf \
++        libncursesw5-dev:armhf \
++        libnfs-dev:armhf \
++        librdmacm-dev:armhf \
++        libsnappy-dev:armhf \
++        libxen-dev:armhf
 -- 
 2.11.0
