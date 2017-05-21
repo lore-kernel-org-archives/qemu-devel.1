@@ -1,30 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40617)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52277)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1dCUGj-00058h-Lu
-	for qemu-devel@nongnu.org; Sun, 21 May 2017 13:03:50 -0400
+	(envelope-from <lvivier@redhat.com>) id 1dCVuP-0003Nb-8H
+	for qemu-devel@nongnu.org; Sun, 21 May 2017 14:48:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1dCUGg-0002Ev-H5
-	for qemu-devel@nongnu.org; Sun, 21 May 2017 13:03:49 -0400
-Received: from 6.mo179.mail-out.ovh.net ([46.105.56.76]:48198)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1dCUGg-0002EN-9v
-	for qemu-devel@nongnu.org; Sun, 21 May 2017 13:03:46 -0400
-Received: from player690.ha.ovh.net (b6.ovh.net [213.186.33.56])
-	by mo179.mail-out.ovh.net (Postfix) with ESMTP id D30FD3D679
-	for <qemu-devel@nongnu.org>; Sun, 21 May 2017 19:03:42 +0200 (CEST)
-Date: Sun, 21 May 2017 19:03:33 +0200
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20170521190333.49404422@bahia.lan>
-In-Reply-To: <20170520064509.GD30246@umbus.fritz.box>
-References: <149518991537.24289.6673616934370284758.stgit@bahia.lan>
-	<149518993198.24289.7946457258780782948.stgit@bahia.lan>
-	<20170520064509.GD30246@umbus.fritz.box>
+	(envelope-from <lvivier@redhat.com>) id 1dCVuK-0003JP-OK
+	for qemu-devel@nongnu.org; Sun, 21 May 2017 14:48:53 -0400
+References: <1495172439-1504-1-git-send-email-bharata@linux.vnet.ibm.com>
+	<1495172439-1504-4-git-send-email-bharata@linux.vnet.ibm.com>
+From: Laurent Vivier <lvivier@redhat.com>
+Message-ID: <13948266-7fd2-a752-3546-cb236f87d16d@redhat.com>
+Date: Sun, 21 May 2017 20:48:42 +0200
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	boundary="Sig_/eZeo3aoAPxjrcmH9A=zA.Mt";
-	protocol="application/pgp-signature"
-Subject: Re: [Qemu-devel] [PATCH v2 2/4] spapr: fix error reporting in
- xics_system_init()
+In-Reply-To: <1495172439-1504-4-git-send-email-bharata@linux.vnet.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC PATCH v2 3/4] spapr: Make
+ h_register_process_table hcall flags global
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,111 +25,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Laurent Vivier <lvivier@redhat.com>, Bharata B Rao <bharata@linux.vnet.ibm.com>, Cedric Le Goater <clg@kaod.org>
+To: Bharata B Rao <bharata@linux.vnet.ibm.com>, qemu-devel@nongnu.org
+Cc: rnsastry@linux.vnet.ibm.com, qemu-ppc@nongnu.org, sam.bobroff@au1.ibm.com, david@gibson.dropbear.id.au
 
---Sig_/eZeo3aoAPxjrcmH9A=zA.Mt
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+On 19/05/2017 07:40, Bharata B Rao wrote:
+> The flags used in h_register_process_table hcall are needed in spapr.c
+> and hence move them to a header file. While doing so, give them
+> slightly specific names.
+> 
+> Signed-off-by: Bharata B Rao <bharata@linux.vnet.ibm.com>
+> Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
+> ---
+>  hw/ppc/spapr_hcall.c   | 31 ++++++++++++++-----------------
+>  include/hw/ppc/spapr.h | 10 ++++++++++
+>  2 files changed, 24 insertions(+), 17 deletions(-)
+> 
+> diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
+> index cea5d99..3915e6f 100644
+> --- a/hw/ppc/spapr_hcall.c
+> +++ b/hw/ppc/spapr_hcall.c
+> @@ -921,13 +921,6 @@ static void spapr_check_setup_free_hpt(sPAPRMachineState *spapr,
+>      return;
+>  }
+>  
+> -#define FLAGS_MASK              0x01FULL
+> -#define FLAG_MODIFY             0x10
+> -#define FLAG_REGISTER           0x08
+> -#define FLAG_RADIX              0x04
+> -#define FLAG_HASH_PROC_TBL      0x02
+> -#define FLAG_GTSE               0x01
+> -
+...
+> diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
+> index e581c4a..588872a 100644
+> --- a/include/hw/ppc/spapr.h
+> +++ b/include/hw/ppc/spapr.h
+> @@ -685,4 +685,14 @@ int spapr_rng_populate_dt(void *fdt);
+>  
+>  void spapr_do_system_reset_on_cpu(CPUState *cs, run_on_cpu_data arg);
+>  
+> +/*
+> + * Defines for flag value used in H_REGISTER_PROC_TBL hcall.
+> + */
+> +#define SPAPR_PROC_TABLE_MASK        0x01FULL
+> +#define SPAPR_PROC_TABLE_MODIFY      0x10
+> +#define SPAPR_PROC_TABLE_REGISTER    0x08
+> +#define SPAPR_PROC_TABLE_RADIX       0x04
+> +#define SPAPR_PROC_TABLE_HPT_PT      0x02
+> +#define SPAPR_PROC_TABLE_GTSE        0x01
 
-On Sat, 20 May 2017 16:45:09 +1000
-David Gibson <david@gibson.dropbear.id.au> wrote:
+I think it should be cleaner if you use 0x1fULL
 
-> On Fri, May 19, 2017 at 12:32:12PM +0200, Greg Kurz wrote:
-> > If the user explicitely asked for kernel-irqchip support and "xics-kvm"
-> > initialization fails, we shouldn't fallback to emulated "xics" as we
-> > do now. It is also awkward to print an error message when we have an
-> > errp pointer argument.
-> >=20
-> > Let's use the errp argument to report the error and let the caller deci=
-de.
-> > This simplifies the code as we don't need a local Error * here.
-> >=20
-> > Signed-off-by: Greg Kurz <groug@kaod.org> =20
->=20
-> Concept looks good, but..
->=20
-> > ---
-> > v2: - total rewrite
-> > ---
-> >  hw/ppc/spapr.c |   13 ++++++-------
-> >  1 file changed, 6 insertions(+), 7 deletions(-)
-> >=20
-> > diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> > index 91f7434861a8..75e298b4c6be 100644
-> > --- a/hw/ppc/spapr.c
-> > +++ b/hw/ppc/spapr.c
-> > @@ -128,18 +128,14 @@ static void xics_system_init(MachineState *machin=
-e, int nr_irqs, Error **errp)
-> >      sPAPRMachineState *spapr =3D SPAPR_MACHINE(machine);
-> > =20
-> >      if (kvm_enabled()) {
-> > -        Error *err =3D NULL;
-> > -
-> >          if (machine_kernel_irqchip_allowed(machine) &&
-> >              !xics_kvm_init(spapr, errp)) {
-> >              spapr->icp_type =3D TYPE_KVM_ICP;
-> > -            spapr->ics =3D spapr_ics_create(spapr, TYPE_ICS_KVM, nr_ir=
-qs, &err);
-> > +            spapr->ics =3D spapr_ics_create(spapr, TYPE_ICS_KVM, nr_ir=
-qs, errp); =20
->=20
-> I believe there are reasons you're not supposed to just pass an errp
-> through to a subordinate function.  Instead you're supposed to have a
-> local Error * and use error_propagate().
->=20
-
-You only need to have a local Error * if it is used to check the return sta=
-tus
-of the function (ie, you cannot check *errp because errp could be NULL) as
-described in error.h. This isn't the case here but...
-
-> >          }
-> >          if (machine_kernel_irqchip_required(machine) && !spapr->ics) {
-> > -            error_reportf_err(err,
-> > -                              "kernel_irqchip requested but unavailabl=
-e: ");
-> > -        } else {
-> > -            error_free(err);
-> > +            error_prepend(errp, "kernel_irqchip requested but unavaila=
-ble: ");
-> > +            return;
-> >          }
-> >      }
-> > =20
-> > @@ -147,6 +143,9 @@ static void xics_system_init(MachineState *machine,=
- int nr_irqs, Error **errp)
-> >          xics_spapr_init(spapr);
-> >          spapr->icp_type =3D TYPE_ICP;
-> >          spapr->ics =3D spapr_ics_create(spapr, TYPE_ICS_SIMPLE, nr_irq=
-s, errp);
-> > +        if (!spapr->ics) { =20
->=20
-> It would also be more standard to check the returned error, rather
-> than the other result.
->=20
-
-... if you prefer to use a local Error *, I'll gladly do that. :)
-
-> > +            return;
-> > +        }
-> >      }
-> >  }
-> > =20
-> >  =20
->=20
-
-
---Sig_/eZeo3aoAPxjrcmH9A=zA.Mt
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-
-iEYEARECAAYFAlkhyGUACgkQAvw66wEB28JgaQCgny6X2ynFyOzYJWqvYxRNZ89V
-dssAoISoGWtxi0pHKZDCMaGZ1ifB4kkI
-=lBAT
------END PGP SIGNATURE-----
-
---Sig_/eZeo3aoAPxjrcmH9A=zA.Mt--
+Laurent
