@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48304)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48358)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dCHZV-0001Jo-Sd
-	for qemu-devel@nongnu.org; Sat, 20 May 2017 23:30:24 -0400
+	id 1dCHZZ-0001KJ-1Z
+	for qemu-devel@nongnu.org; Sat, 20 May 2017 23:30:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dCHZU-0007C8-Vz
-	for qemu-devel@nongnu.org; Sat, 20 May 2017 23:30:21 -0400
-Received: from mail-oi0-x243.google.com ([2607:f8b0:4003:c06::243]:35614)
+	id 1dCHZY-0007Dk-1d
+	for qemu-devel@nongnu.org; Sat, 20 May 2017 23:30:25 -0400
+Received: from mail-oi0-x243.google.com ([2607:f8b0:4003:c06::243]:35617)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dCHZU-0007Bz-QU
-	for qemu-devel@nongnu.org; Sat, 20 May 2017 23:30:20 -0400
-Received: by mail-oi0-x243.google.com with SMTP id m17so18048749oik.2
-	for <qemu-devel@nongnu.org>; Sat, 20 May 2017 20:30:20 -0700 (PDT)
+	id 1dCHZX-0007DU-ST
+	for qemu-devel@nongnu.org; Sat, 20 May 2017 23:30:23 -0400
+Received: by mail-oi0-x243.google.com with SMTP id m17so18048887oik.2
+	for <qemu-devel@nongnu.org>; Sat, 20 May 2017 20:30:23 -0700 (PDT)
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Sun, 21 May 2017 00:29:34 -0300
-Message-Id: <20170521032956.27446-3-f4bug@amsat.org>
+Date: Sun, 21 May 2017 00:29:36 -0300
+Message-Id: <20170521032956.27446-5-f4bug@amsat.org>
 In-Reply-To: <20170521032956.27446-1-f4bug@amsat.org>
 References: <20170521032956.27446-1-f4bug@amsat.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v3 02/24] docker: add --include-files argument
- to 'build' command
+Subject: [Qemu-devel] [PATCH v3 04/24] docker: add 'apt-fake' script which
+ generate fake debian packages
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,66 +34,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Fam Zheng <famz@redhat.com>
+To: qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Fam Zheng <famz@redhat.com>, Aurelien Jarno <aurel32@debian.org>, Riku Voipio <riku.voipio@iki.fi>, Vagrant Cascadian <vagrant@debian.org>, Michael Tokarev <mjt@tls.msk.ru>
 Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- tests/docker/Makefile.include |  5 ++++-
- tests/docker/docker.py        | 12 +++++++++---
- 2 files changed, 13 insertions(+), 4 deletions(-)
+ tests/docker/dockerfiles/debian-apt-fake.sh | 46 +++++++++++++++++++++++++++++
+ 1 file changed, 46 insertions(+)
+ create mode 100755 tests/docker/dockerfiles/debian-apt-fake.sh
 
-diff --git a/tests/docker/Makefile.include b/tests/docker/Makefile.include
-index 03eda37bf4..fe1a9a53ff 100644
---- a/tests/docker/Makefile.include
-+++ b/tests/docker/Makefile.include
-@@ -51,6 +51,7 @@ docker-image-%: $(DOCKER_FILES_DIR)/%.docker
- 		$(SRC_PATH)/tests/docker/docker.py build qemu:$* $< \
- 		$(if $V,,--quiet) $(if $(NOCACHE),--no-cache) \
- 		$(if $(NOUSER),,--add-current-user) \
-+		$(if $(EXTRA_FILES),--extra-files $(EXTRA_FILES))\
- 		$(if $(EXECUTABLE),--include-executable=$(EXECUTABLE)),\
- 		"BUILD","$*")
- 
-@@ -107,6 +108,8 @@ docker:
- 	@echo '    NOUSER               Define to disable adding current user to containers passwd.'
- 	@echo '    NOCACHE=1            Ignore cache when build images.'
- 	@echo '    EXECUTABLE=<path>    Include executable in image.'
-+	@echo '    EXTRA_FILES="<path> [... <path>]"'
-+	@echo '                         Include extra files in image.'
- 
- # This rule if for directly running against an arbitrary docker target.
- # It is called by the expanded docker targets (e.g. make
-diff --git a/tests/docker/docker.py b/tests/docker/docker.py
-index 6ddc6e4c2a..68cca25f89 100755
---- a/tests/docker/docker.py
-+++ b/tests/docker/docker.py
-@@ -237,6 +237,11 @@ class BuildCommand(SubCommand):
-                             help="""Specify a binary that will be copied to the
-                             container together with all its dependent
-                             libraries""")
-+        parser.add_argument("--extra-files", "-f", nargs='*',
-+                            help="""Specify files that will be sent to the
-+                            Docker daemon. The daemon will copy those files into
-+                            the built image. The ADD directive of the Dockerfile
-+                            specify where a file is placed into the image""")
-         parser.add_argument("--add-current-user", "-u", dest="user",
-                             action="store_true",
-                             help="Add the current user to image's passwd")
-@@ -270,10 +275,11 @@ class BuildCommand(SubCommand):
-                     print "%s exited with code %d" % (docker_pre, rc)
-                     return 1
- 
--            # Do we include a extra binary?
-+            # Include files used by ADD directives found within the Dockerfile.
-             if args.include_executable:
--                _copy_binary_with_libs(args.include_executable,
--                                       docker_dir)
-+                _copy_binary_with_libs(args.include_executable, docker_dir)
-+            for filename in args.extra_files or []:
-+                _copy_with_mkdir(filename, docker_dir)
- 
-             argv += ["--build-arg=" + k.lower() + "=" + v
-                         for k, v in os.environ.iteritems()
+diff --git a/tests/docker/dockerfiles/debian-apt-fake.sh b/tests/docker/dockerfiles/debian-apt-fake.sh
+new file mode 100755
+index 0000000000..387522c174
+--- /dev/null
++++ b/tests/docker/dockerfiles/debian-apt-fake.sh
+@@ -0,0 +1,46 @@
++#! /bin/sh
++#
++# Generate fake debian package to resolve unimportant unmet dependencies held
++# by upstream multiarch broken packages.
++#
++# Copyright (c) 2017 Philippe Mathieu-Daudé <f4bug@amsat.org>
++#
++# This work is licensed under the terms of the GNU GPL, version 2
++# or (at your option) any later version. See the COPYING file in
++# the top-level directory.
++
++test $1 = "install" && shift 1
++
++fake_install()
++{
++    echo "Generating fake $2 $1 $3 ..."
++    (cd /var/cache/apt/archives
++        (cat << 'EOF'
++Section: misc
++Priority: optional
++Standards-Version: 3.9.2
++
++Package: NAME
++Version: VERSION
++Maintainer: qemu-devel@nongnu.org
++Architecture: any
++Multi-Arch: same
++Description: fake NAME
++EOF
++        ) | sed s/NAME/$2/g | sed s/VERSION/$3/g > $2.control
++        equivs-build -a $1 $2.control 1>/dev/null 2>/dev/null
++        dpkg -i $2_$3_$1.deb
++    )
++}
++
++try_install()
++{
++    name=$(echo $1|sed "s/\(.*\):\(.*\)=\(.*\)/\1/")
++    arch=$(echo $1|sed "s/\(.*\):\(.*\)=\(.*\)/\2/")
++    vers=$(echo $1|sed "s/\(.*\):\(.*\)=\(.*\)/\3/")
++    apt-get install -q -yy $1 || fake_install $arch $name $vers
++}
++
++for package in $*; do
++    try_install $package
++done
 -- 
 2.11.0
