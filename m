@@ -1,20 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53759)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53765)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <krzk@kernel.org>) id 1dCSoK-0002Zz-2N
+	(envelope-from <krzk@kernel.org>) id 1dCSoK-0002aV-DL
 	for qemu-devel@nongnu.org; Sun, 21 May 2017 11:30:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <krzk@kernel.org>) id 1dCSoJ-0007NO-4w
+	(envelope-from <krzk@kernel.org>) id 1dCSoJ-0007NV-Du
 	for qemu-devel@nongnu.org; Sun, 21 May 2017 11:30:24 -0400
 From: Krzysztof Kozlowski <krzk@kernel.org>
-Date: Sun, 21 May 2017 17:29:48 +0200
-Message-Id: <20170521152949.15338-11-krzk@kernel.org>
+Date: Sun, 21 May 2017 17:29:49 +0200
+Message-Id: <20170521152949.15338-12-krzk@kernel.org>
 In-Reply-To: <20170521152949.15338-1-krzk@kernel.org>
 References: <20170521152949.15338-1-krzk@kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v3 10/11] hw/intc/exynos4210_gic: Constify
- array of combiner interrupts
+Subject: [Qemu-devel] [PATCH v3 11/11] hw/misc/exynos4210_pmu: Add support
+ for system poweroff
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,27 +23,86 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Igor Mitsyanko <i.mitsyanko@gmail.com>, Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-devel@nongnu.org
 Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Krzysztof Kozlowski <krzk@kernel.org>
 
-The static array of interrupt combiner mappings is not modified so it
-can be made const for code safeness.
+On all Exynos-based boards, the system powers down itself by driving
+PS_HOLD signal low - eight bit in PS_HOLD_CONTROL register of PMU.
+Handle writing to respective PMU register to fix power off failure:
+
+    reboot: Power down
+    Unable to poweroff system
+    shutdown: 31 output lines suppressed due to ratelimiting
+    Kernel panic - not syncing: Attempted to kill init! exitcode=0x00000000
+
+    CPU: 0 PID: 1 Comm: shutdown Not tainted 4.11.0-rc8 #846
+    Hardware name: SAMSUNG EXYNOS (Flattened Device Tree)
+    [<c031050c>] (unwind_backtrace) from [<c030ba6c>] (show_stack+0x10/0x14)
+    [<c030ba6c>] (show_stack) from [<c05b2800>] (dump_stack+0x88/0x9c)
+    [<c05b2800>] (dump_stack) from [<c03d3140>] (panic+0xdc/0x268)
+    [<c03d3140>] (panic) from [<c0343614>] (do_exit+0xa90/0xab4)
+    [<c0343614>] (do_exit) from [<c035f2dc>] (SyS_reboot+0x164/0x1d0)
+    [<c035f2dc>] (SyS_reboot) from [<c0307c80>] (ret_fast_syscall+0x0/0x3c)
+
+Additionally the initial value of PS_HOLD has to be changed because
+recent Linux kernel (v4.12-rc1) uses regmap cache for this access.
+When the register is kept at reset value, the kernel will not issue a
+write to it.  Usually the bootloader sets the eight bit of PS_HOLD high
+so mimic its existence here.
 
 Signed-off-by: Krzysztof Kozlowski <krzk@kernel.org>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 ---
- hw/intc/exynos4210_gic.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ hw/misc/exynos4210_pmu.c | 20 +++++++++++++++++++-
+ 1 file changed, 19 insertions(+), 1 deletion(-)
 
-diff --git a/hw/intc/exynos4210_gic.c b/hw/intc/exynos4210_gic.c
-index 9a2254f0b13c..d79b4cfcc7c9 100644
---- a/hw/intc/exynos4210_gic.c
-+++ b/hw/intc/exynos4210_gic.c
-@@ -116,7 +116,7 @@ enum ExtInt {
-  * which is INTG16 in Internal Interrupt Combiner.
-  */
-=20
--static uint32_t
-+static const uint32_t
- combiner_grp_to_gic_id[64-EXYNOS4210_MAX_EXT_COMBINER_OUT_IRQ][8] =3D {
-     /* int combiner groups 16-19 */
-     { }, { }, { }, { },
---=20
+diff --git a/hw/misc/exynos4210_pmu.c b/hw/misc/exynos4210_pmu.c
+index 63a8ccd35559..f3f96b1f4889 100644
+--- a/hw/misc/exynos4210_pmu.c
++++ b/hw/misc/exynos4210_pmu.c
+@@ -26,6 +26,7 @@
+ 
+ #include "qemu/osdep.h"
+ #include "hw/sysbus.h"
++#include "sysemu/sysemu.h"
+ 
+ #ifndef DEBUG_PMU
+ #define DEBUG_PMU           0
+@@ -350,7 +351,11 @@ static const Exynos4210PmuReg exynos4210_pmu_regs[] = {
+     {"PAD_RETENTION_MMCB_OPTION", PAD_RETENTION_MMCB_OPTION, 0x00000000},
+     {"PAD_RETENTION_EBIA_OPTION", PAD_RETENTION_EBIA_OPTION, 0x00000000},
+     {"PAD_RETENTION_EBIB_OPTION", PAD_RETENTION_EBIB_OPTION, 0x00000000},
+-    {"PS_HOLD_CONTROL", PS_HOLD_CONTROL, 0x00005200},
++    /*
++     * PS_HOLD_CONTROL: reset value and manually toggle high the DATA bit.
++     * DATA bit high, set usually by bootloader, keeps system on.
++     */
++    {"PS_HOLD_CONTROL", PS_HOLD_CONTROL, 0x00005200 | BIT(8)},
+     {"XUSBXTI_CONFIGURATION", XUSBXTI_CONFIGURATION, 0x00000001},
+     {"XUSBXTI_STATUS", XUSBXTI_STATUS, 0x00000001},
+     {"XUSBXTI_DURATION", XUSBXTI_DURATION, 0xFFF00000},
+@@ -397,6 +402,12 @@ typedef struct Exynos4210PmuState {
+     uint32_t reg[PMU_NUM_OF_REGISTERS];
+ } Exynos4210PmuState;
+ 
++static void exynos4210_pmu_poweroff(void)
++{
++    PRINT_DEBUG("QEMU PMU: PS_HOLD bit down, powering off\n");
++    qemu_system_shutdown_request();
++}
++
+ static uint64_t exynos4210_pmu_read(void *opaque, hwaddr offset,
+                                     unsigned size)
+ {
+@@ -428,6 +439,13 @@ static void exynos4210_pmu_write(void *opaque, hwaddr offset,
+             PRINT_DEBUG_EXTEND("%s <0x%04x> <- 0x%04x\n", reg_p->name,
+                     (uint32_t)offset, (uint32_t)val);
+             s->reg[i] = val;
++            if ((offset == PS_HOLD_CONTROL) && ((val & BIT(8)) == 0)) {
++                /*
++                 * We are interested only in setting data bit
++                 * of PS_HOLD_CONTROL register to indicate power off request.
++                 */
++                exynos4210_pmu_poweroff();
++            }
+             return;
+         }
+         reg_p++;
+-- 
 2.9.3
