@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48328)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48304)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dCHZX-0001Ju-3r
+	id 1dCHZV-0001Jo-Sd
 	for qemu-devel@nongnu.org; Sat, 20 May 2017 23:30:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dCHZW-0007Cs-9x
-	for qemu-devel@nongnu.org; Sat, 20 May 2017 23:30:23 -0400
-Received: from mail-oi0-x230.google.com ([2607:f8b0:4003:c06::230]:35543)
+	id 1dCHZU-0007C8-Vz
+	for qemu-devel@nongnu.org; Sat, 20 May 2017 23:30:21 -0400
+Received: from mail-oi0-x243.google.com ([2607:f8b0:4003:c06::243]:35614)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dCHZW-0007CJ-5J
-	for qemu-devel@nongnu.org; Sat, 20 May 2017 23:30:22 -0400
-Received: by mail-oi0-x230.google.com with SMTP id l18so129363641oig.2
-	for <qemu-devel@nongnu.org>; Sat, 20 May 2017 20:30:22 -0700 (PDT)
+	id 1dCHZU-0007Bz-QU
+	for qemu-devel@nongnu.org; Sat, 20 May 2017 23:30:20 -0400
+Received: by mail-oi0-x243.google.com with SMTP id m17so18048749oik.2
+	for <qemu-devel@nongnu.org>; Sat, 20 May 2017 20:30:20 -0700 (PDT)
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Sun, 21 May 2017 00:29:35 -0300
-Message-Id: <20170521032956.27446-4-f4bug@amsat.org>
+Date: Sun, 21 May 2017 00:29:34 -0300
+Message-Id: <20170521032956.27446-3-f4bug@amsat.org>
 In-Reply-To: <20170521032956.27446-1-f4bug@amsat.org>
 References: <20170521032956.27446-1-f4bug@amsat.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v3 03/24] docker: rebuild image if 'extra
- files' checksum does not match
+Subject: [Qemu-devel] [PATCH v3 02/24] docker: add --include-files argument
+ to 'build' command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,64 +39,61 @@ Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- tests/docker/docker.py | 15 ++++++++++++---
- 1 file changed, 12 insertions(+), 3 deletions(-)
+ tests/docker/Makefile.include |  5 ++++-
+ tests/docker/docker.py        | 12 +++++++++---
+ 2 files changed, 13 insertions(+), 4 deletions(-)
 
+diff --git a/tests/docker/Makefile.include b/tests/docker/Makefile.include
+index 03eda37bf4..fe1a9a53ff 100644
+--- a/tests/docker/Makefile.include
++++ b/tests/docker/Makefile.include
+@@ -51,6 +51,7 @@ docker-image-%: $(DOCKER_FILES_DIR)/%.docker
+ 		$(SRC_PATH)/tests/docker/docker.py build qemu:$* $< \
+ 		$(if $V,,--quiet) $(if $(NOCACHE),--no-cache) \
+ 		$(if $(NOUSER),,--add-current-user) \
++		$(if $(EXTRA_FILES),--extra-files $(EXTRA_FILES))\
+ 		$(if $(EXECUTABLE),--include-executable=$(EXECUTABLE)),\
+ 		"BUILD","$*")
+ 
+@@ -107,6 +108,8 @@ docker:
+ 	@echo '    NOUSER               Define to disable adding current user to containers passwd.'
+ 	@echo '    NOCACHE=1            Ignore cache when build images.'
+ 	@echo '    EXECUTABLE=<path>    Include executable in image.'
++	@echo '    EXTRA_FILES="<path> [... <path>]"'
++	@echo '                         Include extra files in image.'
+ 
+ # This rule if for directly running against an arbitrary docker target.
+ # It is called by the expanded docker targets (e.g. make
 diff --git a/tests/docker/docker.py b/tests/docker/docker.py
-index eef92a54f1..0dd6a3304f 100755
+index 6ddc6e4c2a..68cca25f89 100755
 --- a/tests/docker/docker.py
 +++ b/tests/docker/docker.py
-@@ -38,6 +38,9 @@ def _text_checksum(text):
-     """Calculate a digest string unique to the text content"""
-     return hashlib.sha1(text).hexdigest()
- 
-+def _file_checksum(filename):
-+    return _text_checksum(open(filename, 'rb').read())
-+
- def _guess_docker_command():
-     """ Guess a working docker command or raise exception if not found"""
-     commands = [["docker"], ["sudo", "-n", "docker"]]
-@@ -154,7 +157,7 @@ class Docker(object):
-         return labels.get("com.qemu.dockerfile-checksum", "")
- 
-     def build_image(self, tag, docker_dir, dockerfile,
--                    quiet=True, user=False, argv=None):
-+                    quiet=True, user=False, argv=None, extra_files_cksum=[]):
-         if argv == None:
-             argv = []
- 
-@@ -170,7 +173,7 @@ class Docker(object):
- 
-         tmp_df.write("\n")
-         tmp_df.write("LABEL com.qemu.dockerfile-checksum=%s" %
--                     _text_checksum(dockerfile))
-+                     _text_checksum(dockerfile + "-".join(extra_files_cksum)))
-         tmp_df.flush()
- 
-         self._do(["build", "-t", tag, "-f", tmp_df.name] + argv + \
-@@ -276,16 +279,22 @@ class BuildCommand(SubCommand):
+@@ -237,6 +237,11 @@ class BuildCommand(SubCommand):
+                             help="""Specify a binary that will be copied to the
+                             container together with all its dependent
+                             libraries""")
++        parser.add_argument("--extra-files", "-f", nargs='*',
++                            help="""Specify files that will be sent to the
++                            Docker daemon. The daemon will copy those files into
++                            the built image. The ADD directive of the Dockerfile
++                            specify where a file is placed into the image""")
+         parser.add_argument("--add-current-user", "-u", dest="user",
+                             action="store_true",
+                             help="Add the current user to image's passwd")
+@@ -270,10 +275,11 @@ class BuildCommand(SubCommand):
+                     print "%s exited with code %d" % (docker_pre, rc)
                      return 1
  
-             # Include files used by ADD directives found within the Dockerfile.
-+            cksum = []
+-            # Do we include a extra binary?
++            # Include files used by ADD directives found within the Dockerfile.
              if args.include_executable:
-+                # FIXME: there is no checksum of this executable and the linked
-+                # libraries, once the image built any change of this executable
-+                # or any library won't trigger another build.
-                 _copy_binary_with_libs(args.include_executable, docker_dir)
-             for filename in args.include_files or []:
-                 _copy_with_mkdir(filename, docker_dir)
-+                cksum += [_file_checksum(filename)]
+-                _copy_binary_with_libs(args.include_executable,
+-                                       docker_dir)
++                _copy_binary_with_libs(args.include_executable, docker_dir)
++            for filename in args.extra_files or []:
++                _copy_with_mkdir(filename, docker_dir)
  
              argv += ["--build-arg=" + k.lower() + "=" + v
                          for k, v in os.environ.iteritems()
-                         if k.lower() in FILTERED_ENV_NAMES]
-             dkr.build_image(tag, docker_dir, dockerfile,
--                            quiet=args.quiet, user=args.user, argv=argv)
-+                            quiet=args.quiet, user=args.user, argv=argv,
-+                            extra_files_cksum=cksum)
- 
-             rmtree(docker_dir)
- 
 -- 
 2.11.0
