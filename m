@@ -1,23 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49662)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53504)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ali.saeedi56@gmail.com>) id 1dCSIL-0004jA-2e
-	for qemu-devel@nongnu.org; Sun, 21 May 2017 10:57:21 -0400
+	(envelope-from <krzk@kernel.org>) id 1dCSo2-0002Fm-SJ
+	for qemu-devel@nongnu.org; Sun, 21 May 2017 11:30:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ali.saeedi56@gmail.com>) id 1dCSIK-0002jf-Dh
-	for qemu-devel@nongnu.org; Sun, 21 May 2017 10:57:21 -0400
-Received: from mail-qt0-x22a.google.com ([2607:f8b0:400d:c0d::22a]:32898)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <ali.saeedi56@gmail.com>)
-	id 1dCSIK-0002jZ-86
-	for qemu-devel@nongnu.org; Sun, 21 May 2017 10:57:20 -0400
-Received: by mail-qt0-x22a.google.com with SMTP id t26so86274581qtg.0
-	for <qemu-devel@nongnu.org>; Sun, 21 May 2017 07:57:19 -0700 (PDT)
+	(envelope-from <krzk@kernel.org>) id 1dCSo1-00079q-SN
+	for qemu-devel@nongnu.org; Sun, 21 May 2017 11:30:06 -0400
+From: Krzysztof Kozlowski <krzk@kernel.org>
+Date: Sun, 21 May 2017 17:29:39 +0200
+Message-Id: <20170521152949.15338-2-krzk@kernel.org>
+In-Reply-To: <20170521152949.15338-1-krzk@kernel.org>
+References: <20170521152949.15338-1-krzk@kernel.org>
 MIME-Version: 1.0
-From: ali saeedi <ali.saeedi56@gmail.com>
-Date: Sun, 21 May 2017 19:27:18 +0430
-Message-ID: <CAGKXQyeWd3iOvnRGfQt1nzLcvf6vnSwmg_5RQvoOxfFs5d5yhg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: [Qemu-devel] Precopy VM Live Migration
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v3 01/11] hw/intc/exynos4210_gic: Fix GIC
+ memory mappings for secondary CPU
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,13 +23,96 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Igor Mitsyanko <i.mitsyanko@gmail.com>, Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-devel@nongnu.org
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Krzysztof Kozlowski <krzk@kernel.org>
 
-Hello
-I have understood from code that In Precopy, there is no Priority for
-sending dirty pages and qemu  sends a page as soon as it is found in a
-block(by linear searching in blocks). in other word, qemu does not consider
-to pages that dirties more than others until sends them later than other
-pages.
-is my understanding true?
-thanks a lot
+Recent Linux kernel (tested next-20170224) was complaining about missing
+GIC mask and was unable to bring up secondary CPU:
+
+    [ =C2=A0 =C2=A00.000000] NR_IRQS:16 nr_irqs:16 16
+    [    0.000000] GIC CPU mask not found - kernel will fail to boot.
+    ...
+    [ =C2=A0 =C2=A00.400492] smp: Bringing up secondary CPUs ...
+    [ =C2=A0 =C2=A01.413184] CPU1: failed to boot: -110
+    [ =C2=A0 =C2=A01.423981] smp: Brought up 1 node, 1 CPU
+
+In its instance_init() call, the Exynos GIC driver was setting GIC
+memory mappings for each CPU, from 1 up to "num-cpu" property.  The
+Exynos4210 machine init call on the other hand, first created Exynos GIC
+device and then set the "num-cpu" property which was too late.  The init
+already happened with default "num-cpu" value of 1 thus GIC mappings
+were created only for the first CPU.
+
+Split the Exynos GIC init code into realize function so the code will
+see updated "num-cpu" property.  This fixes the warning and brings
+second CPU:
+    [    0.435780] CPU1: thread -1, cpu 1, socket 9, mpidr 80000901
+    [    0.451838] smp: Brought up 1 node, 2 CPUs
+
+Additionally this fixes missing Software Generated Interrupts (except
+CPU wakeup, non of SGIs are coming) which are needed for example for IRQ
+work.  Lack of IRQ work causes kernel to hang during system power off
+because cpufreq_dbs_governor_stop() waits for completion with
+irq_work_sync().
+
+Signed-off-by: Krzysztof Kozlowski <krzk@kernel.org>
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+---
+ hw/intc/exynos4210_gic.c | 21 ++++++++++++++-------
+ 1 file changed, 14 insertions(+), 7 deletions(-)
+
+diff --git a/hw/intc/exynos4210_gic.c b/hw/intc/exynos4210_gic.c
+index 2a55817b7660..222cfd6c6387 100644
+--- a/hw/intc/exynos4210_gic.c
++++ b/hw/intc/exynos4210_gic.c
+@@ -283,9 +283,20 @@ static void exynos4210_gic_set_irq(void *opaque, int=
+ irq, int level)
+=20
+ static void exynos4210_gic_init(Object *obj)
+ {
+-    DeviceState *dev =3D DEVICE(obj);
+     Exynos4210GicState *s =3D EXYNOS4210_GIC(obj);
+-    SysBusDevice *sbd =3D SYS_BUS_DEVICE(obj);
++
++    memory_region_init(&s->cpu_container, obj, "exynos4210-cpu-container=
+",
++            EXYNOS4210_EXT_GIC_CPU_REGION_SIZE);
++    memory_region_init(&s->dist_container, obj, "exynos4210-dist-contain=
+er",
++            EXYNOS4210_EXT_GIC_DIST_REGION_SIZE);
++
++}
++
++static void exynos4210_gic_realize(DeviceState *dev, Error **errp)
++{
++    Exynos4210GicState *s =3D EXYNOS4210_GIC(dev);
++    SysBusDevice *sbd =3D SYS_BUS_DEVICE(dev);
++    Object *obj =3D OBJECT(dev);
+     uint32_t i;
+     const char cpu_prefix[] =3D "exynos4210-gic-alias_cpu";
+     const char dist_prefix[] =3D "exynos4210-gic-alias_dist";
+@@ -306,11 +317,6 @@ static void exynos4210_gic_init(Object *obj)
+     qdev_init_gpio_in(dev, exynos4210_gic_set_irq,
+                       EXYNOS4210_GIC_NIRQ - 32);
+=20
+-    memory_region_init(&s->cpu_container, obj, "exynos4210-cpu-container=
+",
+-            EXYNOS4210_EXT_GIC_CPU_REGION_SIZE);
+-    memory_region_init(&s->dist_container, obj, "exynos4210-dist-contain=
+er",
+-            EXYNOS4210_EXT_GIC_DIST_REGION_SIZE);
+-
+     for (i =3D 0; i < s->num_cpu; i++) {
+         /* Map CPU interface per SMP Core */
+         sprintf(cpu_alias_name, "%s%x", cpu_prefix, i);
+@@ -346,6 +352,7 @@ static void exynos4210_gic_class_init(ObjectClass *kl=
+ass, void *data)
+ {
+     DeviceClass *dc =3D DEVICE_CLASS(klass);
+=20
++    dc->realize =3D exynos4210_gic_realize;
+     dc->props =3D exynos4210_gic_properties;
+ }
+=20
+--=20
+2.9.3
