@@ -1,18 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53513)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53573)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <krzk@kernel.org>) id 1dCSo3-0002Gq-8k
-	for qemu-devel@nongnu.org; Sun, 21 May 2017 11:30:08 -0400
+	(envelope-from <krzk@kernel.org>) id 1dCSo6-0002NB-TB
+	for qemu-devel@nongnu.org; Sun, 21 May 2017 11:30:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <krzk@kernel.org>) id 1dCSo2-0007AO-Df
-	for qemu-devel@nongnu.org; Sun, 21 May 2017 11:30:07 -0400
+	(envelope-from <krzk@kernel.org>) id 1dCSo5-0007F7-Sc
+	for qemu-devel@nongnu.org; Sun, 21 May 2017 11:30:10 -0400
 From: Krzysztof Kozlowski <krzk@kernel.org>
-Date: Sun, 21 May 2017 17:29:38 +0200
-Message-Id: <20170521152949.15338-1-krzk@kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v3 00/11] hw: arm: exynos: Bring up secondary
- CPU, QOM-ify Soc, other improvements
+Date: Sun, 21 May 2017 17:29:42 +0200
+Message-Id: <20170521152949.15338-5-krzk@kernel.org>
+In-Reply-To: <20170521152949.15338-1-krzk@kernel.org>
+References: <20170521152949.15338-1-krzk@kernel.org>
+Subject: [Qemu-devel] [PATCH v3 04/11] hw/timer/exynos4210_mct: Cleanup
+ indentation and empty new lines
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,61 +23,119 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Igor Mitsyanko <i.mitsyanko@gmail.com>, Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-devel@nongnu.org
 Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Krzysztof Kozlowski <krzk@kernel.org>
 
+Statements under 'case' were in some places wrongly indented bringing
+confusion and making the code less readable.  Remove also few unneeded
+blank lines.  No functional changes.
 
-Hi,
-
-This is a collection of three already sent patchsets [1] [2] [3].
-
-
-Changes since previous versions (v2):
-1. Patch 11/11: set BIT(8) in PS_HOLD to fix power off on Linux v4.12-rc1=
-.
-2. Add reviewed-by tags.
-
-
-The first patch in set is a bugfix which also exposes problem of cpuidle.
-Kernel compiled with disabled CPU_IDLE works fine (two CPUs, coming SGIs,
-poweroff working) but with CPU_IDLE it behaves bad due to low-power
-mode (AFTR). This was discussed at [1].
-
-There are no external dependencies.
-
-Patchset is also available here:
-https://github.com/krzk/qemu/tree/for-next/exynos4210-gic-qom-soc-powerof=
-f-v3
-
-
-Best regards,
-Krzysztof
-
-[1] https://www.mail-archive.com/qemu-devel@nongnu.org/msg436902.html
-[2] https://lists.gnu.org/archive/html/qemu-devel/2017-05/msg01562.html
-[3] https://lists.gnu.org/archive/html/qemu-devel/2017-05/msg01553.html
-
-
-Krzysztof Kozlowski (11):
-  hw/intc/exynos4210_gic: Fix GIC memory mappings for secondary CPU
-  hw/intc/exynos4210_gic: Use more meaningful name for local variable
-  hw/timer/exynos4210_mct: Fix checkpatch style errors
-  hw/timer/exynos4210_mct: Cleanup indentation and empty new lines
-  hw/timer/exynos4210_mct: Remove unused defines
-  hw/arm/exynos: Move DRAM initialization next boards
-  hw/arm/exynos: Declare local variables in some order
-  hw/arm/exynos: QOM-ify the SoC
-  hw/arm/exynos: Use type define instead of hard-coded a9mpcore_priv
-    string
-  hw/intc/exynos4210_gic: Constify array of combiner interrupts
-  hw/misc/exynos4210_pmu: Add support for system poweroff
-
- hw/arm/exynos4210.c         | 43 ++++++++++++++++--------------------
- hw/arm/exynos4_boards.c     | 53 +++++++++++++++++++++++++++++++++++++++=
-------
- hw/intc/exynos4210_gic.c    | 35 ++++++++++++++++++------------
- hw/misc/exynos4210_pmu.c    | 20 ++++++++++++++++-
- hw/timer/exynos4210_mct.c   | 50 ++++++++++++++++++---------------------=
+Signed-off-by: Krzysztof Kozlowski <krzk@kernel.org>
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- include/hw/arm/exynos4210.h | 11 +++++-----
- 6 files changed, 132 insertions(+), 80 deletions(-)
+ hw/timer/exynos4210_mct.c | 45 ++++++++++++++++++++-------------------------
+ 1 file changed, 20 insertions(+), 25 deletions(-)
 
---=20
+diff --git a/hw/timer/exynos4210_mct.c b/hw/timer/exynos4210_mct.c
+index 2404fb737ac4..ea5f99d9a41b 100644
+--- a/hw/timer/exynos4210_mct.c
++++ b/hw/timer/exynos4210_mct.c
+@@ -1016,9 +1016,9 @@ static uint64_t exynos4210_mct_read(void *opaque, hwaddr offset,
+ 
+     case G_COMP_L(0): case G_COMP_L(1): case G_COMP_L(2): case G_COMP_L(3):
+     case G_COMP_U(0): case G_COMP_U(1): case G_COMP_U(2): case G_COMP_U(3):
+-    index = GET_G_COMP_IDX(offset);
+-    shift = 8 * (offset & 0x4);
+-    value = UINT32_MAX & (s->g_timer.reg.comp[index] >> shift);
++        index = GET_G_COMP_IDX(offset);
++        shift = 8 * (offset & 0x4);
++        value = UINT32_MAX & (s->g_timer.reg.comp[index] >> shift);
+     break;
+ 
+     case G_TCON:
+@@ -1067,7 +1067,6 @@ static uint64_t exynos4210_mct_read(void *opaque, hwaddr offset,
+         lt_i = GET_L_TIMER_IDX(offset);
+ 
+         value = exynos4210_lfrc_get_count(&s->l_timer[lt_i]);
+-
+         break;
+ 
+     case L0_TCON: case L1_TCON:
+@@ -1153,23 +1152,23 @@ static void exynos4210_mct_write(void *opaque, hwaddr offset,
+ 
+     case G_COMP_L(0): case G_COMP_L(1): case G_COMP_L(2): case G_COMP_L(3):
+     case G_COMP_U(0): case G_COMP_U(1): case G_COMP_U(2): case G_COMP_U(3):
+-    index = GET_G_COMP_IDX(offset);
+-    shift = 8 * (offset & 0x4);
+-    s->g_timer.reg.comp[index] =
+-            (s->g_timer.reg.comp[index] &
+-            (((uint64_t)UINT32_MAX << 32) >> shift)) +
+-            (value << shift);
++        index = GET_G_COMP_IDX(offset);
++        shift = 8 * (offset & 0x4);
++        s->g_timer.reg.comp[index] =
++                (s->g_timer.reg.comp[index] &
++                (((uint64_t)UINT32_MAX << 32) >> shift)) +
++                (value << shift);
+ 
+-    DPRINTF("comparator %d write 0x%llx val << %d\n", index, value, shift);
++        DPRINTF("comparator %d write 0x%llx val << %d\n", index, value, shift);
+ 
+-    if (offset & 0x4) {
+-        s->g_timer.reg.wstat |= G_WSTAT_COMP_U(index);
+-    } else {
+-        s->g_timer.reg.wstat |= G_WSTAT_COMP_L(index);
+-    }
++        if (offset & 0x4) {
++            s->g_timer.reg.wstat |= G_WSTAT_COMP_U(index);
++        } else {
++            s->g_timer.reg.wstat |= G_WSTAT_COMP_L(index);
++        }
+ 
+-    exynos4210_gfrc_restart(s);
+-    break;
++        exynos4210_gfrc_restart(s);
++        break;
+ 
+     case G_TCON:
+         old_val = s->g_timer.reg.tcon;
+@@ -1207,7 +1206,6 @@ static void exynos4210_mct_write(void *opaque, hwaddr offset,
+         break;
+ 
+     case G_INT_ENB:
+-
+         /* Raise IRQ if transition from disabled to enabled and CSTAT pending */
+         for (i = 0; i < MCT_GT_CMP_NUM; i++) {
+             if ((value & G_INT_ENABLE(i)) > (s->g_timer.reg.tcon &
+@@ -1288,7 +1286,6 @@ static void exynos4210_mct_write(void *opaque, hwaddr offset,
+         break;
+ 
+     case L0_TCNTB: case L1_TCNTB:
+-
+         lt_i = GET_L_TIMER_IDX(offset);
+         index = GET_L_TIMER_CNT_REG_IDX(offset, lt_i);
+ 
+@@ -1316,7 +1313,6 @@ static void exynos4210_mct_write(void *opaque, hwaddr offset,
+         break;
+ 
+     case L0_ICNTB: case L1_ICNTB:
+-
+         lt_i = GET_L_TIMER_IDX(offset);
+         index = GET_L_TIMER_CNT_REG_IDX(offset, lt_i);
+ 
+@@ -1353,13 +1349,12 @@ static void exynos4210_mct_write(void *opaque, hwaddr offset,
+         if (icntb_max[lt_i] < value) {
+             icntb_max[lt_i] = value;
+         }
+-DPRINTF("local timer[%d] ICNTB write %llx; max=%x, min=%x\n\n",
+-        lt_i, value, icntb_max[lt_i], icntb_min[lt_i]);
++        DPRINTF("local timer[%d] ICNTB write %llx; max=%x, min=%x\n\n",
++                lt_i, value, icntb_max[lt_i], icntb_min[lt_i]);
+ #endif
+-break;
++        break;
+ 
+     case L0_FRCNTB: case L1_FRCNTB:
+-
+         lt_i = GET_L_TIMER_IDX(offset);
+         index = GET_L_TIMER_CNT_REG_IDX(offset, lt_i);
+ 
+-- 
 2.9.3
