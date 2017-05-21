@@ -1,29 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48306)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48328)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dCHZV-0001Jp-Su
-	for qemu-devel@nongnu.org; Sat, 20 May 2017 23:30:23 -0400
+	id 1dCHZX-0001Ju-3r
+	for qemu-devel@nongnu.org; Sat, 20 May 2017 23:30:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dCHZS-0007BP-Nt
-	for qemu-devel@nongnu.org; Sat, 20 May 2017 23:30:21 -0400
-Received: from mail-oi0-x229.google.com ([2607:f8b0:4003:c06::229]:35538)
+	id 1dCHZW-0007Cs-9x
+	for qemu-devel@nongnu.org; Sat, 20 May 2017 23:30:23 -0400
+Received: from mail-oi0-x230.google.com ([2607:f8b0:4003:c06::230]:35543)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dCHZS-0007B8-HU
-	for qemu-devel@nongnu.org; Sat, 20 May 2017 23:30:18 -0400
-Received: by mail-oi0-x229.google.com with SMTP id l18so129363108oig.2
-	for <qemu-devel@nongnu.org>; Sat, 20 May 2017 20:30:18 -0700 (PDT)
+	id 1dCHZW-0007CJ-5J
+	for qemu-devel@nongnu.org; Sat, 20 May 2017 23:30:22 -0400
+Received: by mail-oi0-x230.google.com with SMTP id l18so129363641oig.2
+	for <qemu-devel@nongnu.org>; Sat, 20 May 2017 20:30:22 -0700 (PDT)
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Sun, 21 May 2017 00:29:32 -0300
-Message-Id: <20170521032956.27446-1-f4bug@amsat.org>
+Date: Sun, 21 May 2017 00:29:35 -0300
+Message-Id: <20170521032956.27446-4-f4bug@amsat.org>
+In-Reply-To: <20170521032956.27446-1-f4bug@amsat.org>
+References: <20170521032956.27446-1-f4bug@amsat.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v3 00/24] docker/shippable: cross-build mipsel
- and powerpc targets
+Subject: [Qemu-devel] [PATCH v3 03/24] docker: rebuild image if 'extra
+ files' checksum does not match
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,93 +37,66 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Fam Zheng <famz@redhat.com>
 Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 
-This patchset add 2 more architectures to the cross-build farm.
+Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+---
+ tests/docker/docker.py | 15 ++++++++++++---
+ 1 file changed, 12 insertions(+), 3 deletions(-)
 
-There is still some issue trying to cross-build mips64el-softmmu, it seems the
-cross tools use the system outdated libfdt instead of the one checkouted in the
-dtc submodule. I disabled this target for now.
-
-The branch https://github.com/philmd/qemu/tree/docker_shippable_v3 can be
-checked at Shippable:
-  https://app.shippable.com/github/philmd/qemu/status/dashboard
-
-Each arch builds in around ~9min. Using Shippable free open source projects
-service, the 5 jobs take ~38-44min in total.
-
-v3:
-- Addressed review feedbacks from Fam:
-- Keep building images in various layers, but use DEBIAN_FRONTEND=noninteractive
-- Document '--extra-files', now it supports adding various files at once
-- Checksum extra files to trigger a docker image rebuild if modified
-- Use better regex to generate deb-src entries
-- Reordered extra libs, to ease further add/remove diffs
-
-v2:
-- Addressed review feedback from Alex, added his R-B
-- Fixed the "Problem with the SSL CA cert" problem while cloning from github.com
-  installing the ca-certificates package.
-- Squashed/split some commits
-- use 'apt-get clean' instead of brutal 'rm -rf'
-- checked how many cores are available on Shippable and use them fully
-  (reduced total time from 44min to 38min)
-- build armeb-linux-user target
-
-v1:
-- Reorganize Dockerfiles to use less layers, resulting in smaller images.
-  This also reduce time of image transfer, for example while using:
-  `docker save qemu:debian | ssh remote docker load`
-- Install more debian packages so the configure script enable more features and
-  more code can be compiled/covered.
-- There are still some incorrect multiarch packages on debian/jessie used in
-  the docker images, add a script to generate fake packages and avoid
-  dependencies issues.
-- Modify the docker.py script to include an extra file while building images.
-
-Regards,
-
-Phil.
-
-Philippe Mathieu-Daudé (24):
-  docker: let _copy_with_mkdir() sub_path argument be optional
-  docker: add --include-files argument to 'build' command
-  docker: rebuild image if 'extra files' checksum does not match
-  docker: add 'apt-fake' script which generate fake debian packages
-  docker: install ca-certificates package in base image
-  docker: create deb-src entry and setup Emdebian in the same layer
-  docker: use better regex to generate deb-src entries
-  docker: use eatmydata, install common build packages in base image
-  docker: use eatmydata in debian armhf image
-  docker: use eatmydata in debian arm64 image
-  docker: add extra libs to armhf target to extend codebase coverage
-  docker: add extra libs to arm64 target to extend codebase coverage
-  docker: add extra libs to s390x target to extend codebase coverage
-  docker: add mipsel build target
-  docker: add powerpc build target
-  shippable: use C locale to simplify console output
-  shippable: build using all available cpus
-  shippable: do not initialize submodules automatically
-  shippable: be verbose while building docker images
-  shippable: add armeb-linux-user target
-  shippable: add powerpc target
-  shippable: add mipsel target
-  MAINTAINERS: add Shippable automation platform URL
-  MAINTAINERS: self-appoint me as reviewer in build/test automation
-
- .shippable.yml                                     | 23 +++++++++--
- MAINTAINERS                                        |  2 +
- tests/docker/Makefile.include                      |  8 +++-
- tests/docker/docker.py                             | 29 ++++++++++----
- tests/docker/dockerfiles/debian-apt-fake.sh        | 46 ++++++++++++++++++++++
- tests/docker/dockerfiles/debian-arm64-cross.docker | 18 ++++++++-
- tests/docker/dockerfiles/debian-armhf-cross.docker | 18 ++++++++-
- .../docker/dockerfiles/debian-mipsel-cross.docker  | 41 +++++++++++++++++++
- .../docker/dockerfiles/debian-powerpc-cross.docker | 40 +++++++++++++++++++
- tests/docker/dockerfiles/debian-s390x-cross.docker | 10 +++++
- tests/docker/dockerfiles/debian.docker             | 18 +++++----
- 11 files changed, 230 insertions(+), 23 deletions(-)
- create mode 100755 tests/docker/dockerfiles/debian-apt-fake.sh
- create mode 100644 tests/docker/dockerfiles/debian-mipsel-cross.docker
- create mode 100644 tests/docker/dockerfiles/debian-powerpc-cross.docker
-
+diff --git a/tests/docker/docker.py b/tests/docker/docker.py
+index eef92a54f1..0dd6a3304f 100755
+--- a/tests/docker/docker.py
++++ b/tests/docker/docker.py
+@@ -38,6 +38,9 @@ def _text_checksum(text):
+     """Calculate a digest string unique to the text content"""
+     return hashlib.sha1(text).hexdigest()
+ 
++def _file_checksum(filename):
++    return _text_checksum(open(filename, 'rb').read())
++
+ def _guess_docker_command():
+     """ Guess a working docker command or raise exception if not found"""
+     commands = [["docker"], ["sudo", "-n", "docker"]]
+@@ -154,7 +157,7 @@ class Docker(object):
+         return labels.get("com.qemu.dockerfile-checksum", "")
+ 
+     def build_image(self, tag, docker_dir, dockerfile,
+-                    quiet=True, user=False, argv=None):
++                    quiet=True, user=False, argv=None, extra_files_cksum=[]):
+         if argv == None:
+             argv = []
+ 
+@@ -170,7 +173,7 @@ class Docker(object):
+ 
+         tmp_df.write("\n")
+         tmp_df.write("LABEL com.qemu.dockerfile-checksum=%s" %
+-                     _text_checksum(dockerfile))
++                     _text_checksum(dockerfile + "-".join(extra_files_cksum)))
+         tmp_df.flush()
+ 
+         self._do(["build", "-t", tag, "-f", tmp_df.name] + argv + \
+@@ -276,16 +279,22 @@ class BuildCommand(SubCommand):
+                     return 1
+ 
+             # Include files used by ADD directives found within the Dockerfile.
++            cksum = []
+             if args.include_executable:
++                # FIXME: there is no checksum of this executable and the linked
++                # libraries, once the image built any change of this executable
++                # or any library won't trigger another build.
+                 _copy_binary_with_libs(args.include_executable, docker_dir)
+             for filename in args.include_files or []:
+                 _copy_with_mkdir(filename, docker_dir)
++                cksum += [_file_checksum(filename)]
+ 
+             argv += ["--build-arg=" + k.lower() + "=" + v
+                         for k, v in os.environ.iteritems()
+                         if k.lower() in FILTERED_ENV_NAMES]
+             dkr.build_image(tag, docker_dir, dockerfile,
+-                            quiet=args.quiet, user=args.user, argv=argv)
++                            quiet=args.quiet, user=args.user, argv=argv,
++                            extra_files_cksum=cksum)
+ 
+             rmtree(docker_dir)
+ 
 -- 
 2.11.0
