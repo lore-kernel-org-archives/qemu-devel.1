@@ -1,26 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34280)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36403)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yang.zhong@intel.com>) id 1dCrB0-000648-H7
-	for qemu-devel@nongnu.org; Mon, 22 May 2017 13:31:27 -0400
+	(envelope-from <eblake@redhat.com>) id 1dCrJl-0008GD-Ni
+	for qemu-devel@nongnu.org; Mon, 22 May 2017 13:40:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yang.zhong@intel.com>) id 1dCrAx-0004qP-CM
-	for qemu-devel@nongnu.org; Mon, 22 May 2017 13:31:26 -0400
-Received: from mga03.intel.com ([134.134.136.65]:13419)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <yang.zhong@intel.com>)
-	id 1dCrAx-0004pd-4O
-	for qemu-devel@nongnu.org; Mon, 22 May 2017 13:31:23 -0400
-Date: Tue, 23 May 2017 01:31:13 +0800
-From: Zhong Yang <yang.zhong@intel.com>
-Message-ID: <20170522173113.GA914@yangzhon-Virtual>
-References: <1495179026-27872-1-git-send-email-yang.zhong@intel.com>
-	<afc2d6a0-cefa-9609-d781-5e69d372a7bd@redhat.com>
+	(envelope-from <eblake@redhat.com>) id 1dCrJk-000895-P5
+	for qemu-devel@nongnu.org; Mon, 22 May 2017 13:40:29 -0400
+References: <20170522135704.842-1-stefanha@redhat.com>
+	<20170522135704.842-5-stefanha@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <497bff5d-6667-f88d-bd9d-0a706b4a9f73@redhat.com>
+Date: Mon, 22 May 2017 12:40:10 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <afc2d6a0-cefa-9609-d781-5e69d372a7bd@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v0 0/6] move the tcg files into tcg
- directory.
+In-Reply-To: <20170522135704.842-5-stefanha@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="Dp3TetCDIM8hP8EHtU3FwnJ3mM9GmWTeI"
+Subject: Re: [Qemu-devel] [PATCH v3 4/4] migration: use
+ bdrv_drain_all_begin/end() instead bdrv_drain_all()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,71 +25,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: pbonzini@redhat.com, anthony.xu@intel.com, qemu-devel@nongnu.org
+To: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Fam Zheng <famz@redhat.com>, qemu-block@nongnu.org
 
-O Fri, May 19, 2017 at 05:14:19PM -0500, Eric Blake wrote:
-> On 05/19/2017 02:30 AM, Yang Zhong wrote:
-> > Move the tcg relative files into tcg directory, which will make
-> > the code more clean in qemu.
-> 
-> Titling a patch series v0 is a bit unusual (typically, the first version
-> is untitled, and the second version is titled v2; 'git send-email -v2'
-> can help).  But since 0 is less than 1 or 2, I don't think it breaks any
-> tools if you use that as your explicit title for a first submission,
-> even if you have to respin.
-> 
-> > 
-> > Yang Zhong (6):
-> >   move tcg relative files into tcg directory
-> >   move tcg relative files into tcg directory
-> >   move tcg header file
-> >   move tcg relative files into tcg directory
-> >   move tcg relative files into tcg directory
-> 
-> None of your patches match the usual "topic: Short description" of other
-> patches.  Furthermore, having identical titles on 4 out of 6 distinct
-> patches is a nightmare for downstream backporters (which "move tcg
-> relative files into tcg directory" do I have to backport to fix the bug,
-> again?).  I highly suggest that every patch you submit have enough
-> details in the subject line that the subject is distinct (we don't
-> always succeed, but it's usually quite easy to avoid duplicates).
-> 
-> So, as an example, I might title a patch:
-> 
-> "tcg: Move tcg-runtime.c to tcg/ subdirectory"
->
-Thanks for your comments, and i will send v2 patchset to commnunity accroding to your suggestions.
-Please also help review my tcg accelator patchset,many thanks! 
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--Dp3TetCDIM8hP8EHtU3FwnJ3mM9GmWTeI
+From: Eric Blake <eblake@redhat.com>
+To: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Fam Zheng <famz@redhat.com>, qemu-block@nongnu.org
+Message-ID: <497bff5d-6667-f88d-bd9d-0a706b4a9f73@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v3 4/4] migration: use
+ bdrv_drain_all_begin/end() instead bdrv_drain_all()
+References: <20170522135704.842-1-stefanha@redhat.com>
+ <20170522135704.842-5-stefanha@redhat.com>
+In-Reply-To: <20170522135704.842-5-stefanha@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-> >   change tcg relative file's compile definition
-> > 
-> >  Makefile.objs                                | 1 +
-> >  Makefile.target                              | 8 ++------
-> >  tcg/Makefile.objs                            | 2 ++
-> >  tcg-runtime.c => tcg/tcg-runtime.c           | 0
-> >  tci.c => tcg/tci.c                           | 0
-> >  tcg/trace-events                             | 6 ++++++
-> >  translate-all.c => tcg/translate-all.c       | 2 +-
-> >  translate-all.h => tcg/translate-all.h       | 0
-> >  translate-common.c => tcg/translate-common.c | 0
-> >  trace-events                                 | 3 ---
-> 
-> Thankfully, you've got git rename detection turned on, which makes for
-> much nicer reviews.
-> 
-> >  10 files changed, 12 insertions(+), 10 deletions(-)
-> >  create mode 100644 tcg/Makefile.objs
-> >  rename tcg-runtime.c => tcg/tcg-runtime.c (100%)
-> >  rename tci.c => tcg/tci.c (100%)
-> >  create mode 100644 tcg/trace-events
-> >  rename translate-all.c => tcg/translate-all.c (99%)
-> >  rename translate-all.h => tcg/translate-all.h (100%)
-> >  rename translate-common.c => tcg/translate-common.c (100%)
-> > 
-> 
-> -- 
-> Eric Blake, Principal Software Engineer
-> Red Hat, Inc.           +1-919-301-3266
-> Virtualization:  qemu.org | libvirt.org
-> 
+On 05/22/2017 08:57 AM, Stefan Hajnoczi wrote:
+> blk/bdrv_drain_all() only takes effect for a single instant and then
+> resumes block jobs, guest devices, and other external clients like the
+> NBD server.  This can be handy when performing a synchronous drain
+> before terminating the program, for example.
+>=20
+> Monitor commands usually need to quiesce I/O across an entire code
+> region so blk/bdrv_drain_all() is not suitable.  They must use
+> bdrv_drain_all_begin/end() to mark the region.  This prevents new I/O
+> requests from slipping in or worse - block jobs completing and modifyin=
+g
+> the graph.
+>=20
+> I audited other blk/bdrv_drain_all() callers but did not find anything
+> that needs a similar fix.  This patch fixes the savevm/loadvm commands.=
+
+> Although I haven't encountered a read world issue this makes the code
+> safer.
+>=20
+> Suggested-by: Kevin Wolf <kwolf@redhat.com>
+> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+> ---
+>  migration/savevm.c | 18 +++++++++++++++---
+>  1 file changed, 15 insertions(+), 3 deletions(-)
+>=20
+
+Reviewed-by: Eric Blake <eblake@redhat.com>
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--Dp3TetCDIM8hP8EHtU3FwnJ3mM9GmWTeI
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEcBAEBCAAGBQJZIyJ6AAoJEKeha0olJ0Nq02wH/20euVLNhaXYd/fKd5d7Fu8f
+GaBGNkQxqlQK0kqlriJtLQC4rZJ7nSHYUznQSYTM9x+Z4px0plkfU2DNsJMT30Im
+f5KlYhLpYrJUimtsL26ZDjYVYYTVKCKYCxON0X+AH8Zk/faa8Q8ArTuUpQsvh1eX
+WiM2so1Ci1PipVagREcPK8p8BXFwD2eZ2FddcAlVzAODlJUlKFwQnZGkw2XgaIUV
+ty6Ar1ehX+E6grVq0QObN2gxwOoAP6Yo7mNUqf+BL8r5B3gpPy51KUNQLl7Gy6Vm
+6j6+b6nYLsod7vcwnOgUBK6GcW6ntE2K1z2pjFn4tgsQT6UXnkyaeavy86IjWEI=
+=rFXB
+-----END PGP SIGNATURE-----
+
+--Dp3TetCDIM8hP8EHtU3FwnJ3mM9GmWTeI--
