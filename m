@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46541)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47826)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1dCjMj-00014W-NX
-	for qemu-devel@nongnu.org; Mon, 22 May 2017 05:11:06 -0400
+	(envelope-from <paolo.bonzini@gmail.com>) id 1dCjSx-0002wO-Ph
+	for qemu-devel@nongnu.org; Mon, 22 May 2017 05:17:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1dCjMd-0005df-T6
-	for qemu-devel@nongnu.org; Mon, 22 May 2017 05:11:01 -0400
-Received: from 10.mo179.mail-out.ovh.net ([46.105.79.46]:56001)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1dCjMd-0005dH-7A
-	for qemu-devel@nongnu.org; Mon, 22 May 2017 05:10:55 -0400
-Received: from player690.ha.ovh.net (b6.ovh.net [213.186.33.56])
-	by mo179.mail-out.ovh.net (Postfix) with ESMTP id 70F2C3DB76
-	for <qemu-devel@nongnu.org>; Mon, 22 May 2017 11:10:53 +0200 (CEST)
-Date: Mon, 22 May 2017 11:09:56 +0200
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20170522110956.6f894c55@bahia.lan>
-In-Reply-To: <20170522021246.GG30246@umbus.fritz.box>
-References: <149518991537.24289.6673616934370284758.stgit@bahia.lan>
-	<149518994010.24289.12584852638589552255.stgit@bahia.lan>
-	<20170522020413.GF30246@umbus.fritz.box>
-	<20170522021246.GG30246@umbus.fritz.box>
+	(envelope-from <paolo.bonzini@gmail.com>) id 1dCjSu-0008I0-LO
+	for qemu-devel@nongnu.org; Mon, 22 May 2017 05:17:27 -0400
+Received: from mail-wm0-x242.google.com ([2a00:1450:400c:c09::242]:33027)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
+	id 1dCjSu-0008HZ-Bb
+	for qemu-devel@nongnu.org; Mon, 22 May 2017 05:17:24 -0400
+Received: by mail-wm0-x242.google.com with SMTP id b84so15941410wmh.0
+	for <qemu-devel@nongnu.org>; Mon, 22 May 2017 02:17:24 -0700 (PDT)
+Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
+References: <33183CC9F5247A488A2544077AF19020DA2AF6CA@DGGEMA505-MBX.china.huawei.com>
+	<0f88ad61-06d8-57bb-3228-9b2dde993c70@redhat.com>
+	<20170522083203.GE5158@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <2bbe969f-a9f7-920a-26dd-b92c5b498705@redhat.com>
+Date: Mon, 22 May 2017 11:17:19 +0200
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	boundary="Sig_/wy.VCnhJK3IsDi.+f8yZOW8";
-	protocol="application/pgp-signature"
-Subject: Re: [Qemu-devel] [PATCH v2 3/4] target/ppc: consolidate CPU
- device-tree id computation in helper
+In-Reply-To: <20170522083203.GE5158@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC] memory consumption of Qemu is twice as much
+ as the previous version in KVM
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,180 +34,91 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Laurent Vivier <lvivier@redhat.com>, Bharata B Rao <bharata@linux.vnet.ibm.com>, Cedric Le Goater <clg@kaod.org>
+To: "Daniel P. Berrange" <berrange@redhat.com>
+Cc: "Gonglei (Arei)" <arei.gonglei@huawei.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>
 
---Sig_/wy.VCnhJK3IsDi.+f8yZOW8
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+On 22/05/2017 10:32, Daniel P. Berrange wrote:
+> On Mon, May 22, 2017 at 10:27:59AM +0200, Paolo Bonzini wrote:
+>>
+>>
+>> On 22/05/2017 09:04, Gonglei (Arei) wrote:
+>>> Hi Paolo,
+>>>
+>>> I found that the latest Qemu eat 2 time memory in KVM since Qemu-2.3.0.
+>>>
+>>> Replication Steps:
+>>>
+>>> 1. I created a CentOS 7 with 4U8G using Qemu-2.3.0, 
+>>>
+>>> # grep kvm_kvzalloc /proc/vmallocinfo | awk '{total+=$2}; END {print total}'
+>>> 16932864
+>>> # grep kvm_kvzalloc /proc/vmallocinfo
+>>> 0xffffc900205c7000-0xffffc90020fc8000 10489856 kvm_kvzalloc+0x3c/0x40 [kvm] pages=2560 vmalloc vpages N1=2560
+>>> 0xffffc90020fc8000-0xffffc90020fce000   24576 kvm_kvzalloc+0x3c/0x40 [kvm] pages=5 vmalloc N1=5
+>>> 0xffffc90020fce000-0xffffc90020fd4000   24576 kvm_kvzalloc+0x3c/0x40 [kvm] pages=5 vmalloc N1=5
+>>> 0xffffc90020fd4000-0xffffc90020fd8000   16384 kvm_kvzalloc+0x3c/0x40 [kvm] pages=3 vmalloc N1=3
+>>> 0xffffc9002438b000-0xffffc9002498c000 6295552 kvm_kvzalloc+0x3c/0x40 [kvm] pages=1536 vmalloc vpages N1=1536
+>>> 0xffffc9002498c000-0xffffc90024990000   16384 kvm_kvzalloc+0x3c/0x40 [kvm] pages=3 vmalloc N1=3
+>>> 0xffffc90024990000-0xffffc90024994000   16384 kvm_kvzalloc+0x3c/0x40 [kvm] pages=3 vmalloc N1=3
+>>> 0xffffc90024994000-0xffffc90024997000   12288 kvm_kvzalloc+0x3c/0x40 [kvm] pages=2 vmalloc N1=2
+>>> 0xffffc90024a75000-0xffffc90024a7e000   36864 kvm_kvzalloc+0x3c/0x40 [kvm] pages=8 vmalloc N1=8
+>>>
+>>> PS: There is only this VM in my host.
+>>>
+>>> 2. Do the same test using the latest Qemu:
+>>>
+>>> # grep kvm_kvzalloc /proc/vmallocinfo | awk '{total+=$2}; END {print total}'
+>>> 33865728
+>>> linux-PsHdkO:~ # grep kvm_kvzalloc /proc/vmallocinfo 
+>>> 0xffffc9001f181000-0xffffc9001fb82000 10489856 kvm_kvzalloc+0x25/0x30 [kvm] pages=2560 vmalloc vpages N1=2560
+>>> 0xffffc9001fb82000-0xffffc9001fb88000   24576 kvm_kvzalloc+0x25/0x30 [kvm] pages=5 vmalloc N1=5
+>>> 0xffffc9001fb88000-0xffffc9001fb8e000   24576 kvm_kvzalloc+0x25/0x30 [kvm] pages=5 vmalloc N1=5
+>>> 0xffffc9001fb8e000-0xffffc9001fb92000   16384 kvm_kvzalloc+0x25/0x30 [kvm] pages=3 vmalloc N1=3
+>>> 0xffffc90020854000-0xffffc90021255000 10489856 kvm_kvzalloc+0x25/0x30 [kvm] pages=2560 vmalloc vpages N1=2560
+>>> 0xffffc90021255000-0xffffc9002125b000   24576 kvm_kvzalloc+0x25/0x30 [kvm] pages=5 vmalloc N1=5
+>>> 0xffffc9002125b000-0xffffc90021261000   24576 kvm_kvzalloc+0x25/0x30 [kvm] pages=5 vmalloc N1=5
+>>> 0xffffc90021261000-0xffffc90021265000   16384 kvm_kvzalloc+0x25/0x30 [kvm] pages=3 vmalloc N1=3
+>>> 0xffffc9002616e000-0xffffc90026172000   16384 kvm_kvzalloc+0x25/0x30 [kvm] pages=3 vmalloc N1=3
+>>> 0xffffc90026172000-0xffffc90026176000   16384 kvm_kvzalloc+0x25/0x30 [kvm] pages=3 vmalloc N1=3
+>>> 0xffffc90026176000-0xffffc90026179000   12288 kvm_kvzalloc+0x25/0x30 [kvm] pages=2 vmalloc N1=2
+>>> 0xffffc900261a9000-0xffffc900261ad000   16384 kvm_kvzalloc+0x25/0x30 [kvm] pages=3 vmalloc N1=3
+>>> 0xffffc900261ad000-0xffffc900261b1000   16384 kvm_kvzalloc+0x25/0x30 [kvm] pages=3 vmalloc N1=3
+>>> 0xffffc900261b1000-0xffffc900261b4000   12288 kvm_kvzalloc+0x25/0x30 [kvm] pages=2 vmalloc N1=2
+>>> 0xffffc900280fe000-0xffffc900286ff000 6295552 kvm_kvzalloc+0x25/0x30 [kvm] pages=1536 vmalloc vpages N1=1536
+>>> 0xffffc900286ff000-0xffffc90028d00000 6295552 kvm_kvzalloc+0x25/0x30 [kvm] pages=1536 vmalloc vpages N1=1536
+>>> 0xffffc90028d87000-0xffffc90028d90000   36864 kvm_kvzalloc+0x25/0x30 [kvm] pages=8 vmalloc N1=8
+>>> 0xffffc90028d9c000-0xffffc90028da5000   36864 kvm_kvzalloc+0x25/0x30 [kvm] pages=8 vmalloc N1=8
+>>>
+>>>
+>>> 3. I found the first bad commit by 'git biscet'
+>>>
+>>> linux-arei:/mnt/sdb/gonglei/opensource/qemu # git bisect bad
+>>> 6410848bec38089424d54a6a8f10d4cf77182b5d is the first bad commit
+>>> commit 6410848bec38089424d54a6a8f10d4cf77182b5d
+>>> Author: Paolo Bonzini <pbonzini@redhat.com>
+>>> Date:   Thu Jun 18 18:30:16 2015 +0200
+>>>
+>>>     target-i386: register a separate KVM address space including SMRAM regions
+>>>     
+>>>     Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+>>>
+>>> :040000 040000 b2435d7cd0829e6416b316f1ae2856e6f7b0023d 1acb81aecaf50f2d313b33f2b61a24f7f0bd6f07 M      target-i386
+>>> linux-PsHdkO:/mnt/sdb/gonglei/opensource/qemu #
+>>>
+>>>
+>>> Any ideas about this change? Do we really need to trigger two times memory region allocation?
+>>
+>> We are registering two memory maps, so yes as long as "-machine smm=on"
+>> is set.  We can skip the second address space if SMM is disabled.
+> 
+> Am I right in thinking that it is just causing the same memory allocation
+> to be mapped twice at different addresses, not actually allocating double
+> the amount of memory ?
 
-On Mon, 22 May 2017 12:12:46 +1000
-David Gibson <david@gibson.dropbear.id.au> wrote:
+These are kernel allocations done by KVM when it gets the
+KVM_SET_USER_MEMORY_REGION ioctl; of course the two memory maps point to
+the same userspace mmap-ed area.
 
-> On Mon, May 22, 2017 at 12:04:13PM +1000, David Gibson wrote:
-> > On Fri, May 19, 2017 at 12:32:20PM +0200, Greg Kurz wrote: =20
-> > > For historical reasons, we compute CPU device-tree ids with a non-tri=
-vial
-> > > logic. This patch consolidate the logic in a single helper to be used
-> > > in various places where it is currently open-coded.
-> > >=20
-> > > It is okay to get rid of DIV_ROUND_UP() because we're sure that the n=
-umber
-> > > of threads per core in the guest cannot exceed the number of threads =
-per
-> > > core in the host. =20
-> >=20
-> > However, your new logic still gives different answers in some cases.
-> > In particular when max_cpus is not a multiple of smp_threads.  Which
-> > is generally a bad idea, but allowed for older machine types for
-> > compatibility.   e.g. smp_threads=3D4, max_cpus=3D6 smt=3D8
-> >=20
-> > Old logic:
-> > 	         DIV_ROUND_UP(6 * 8, 4)
-> > 	       =3D =E2=8C=8848 / 4=E2=8C=89 =3D 12
-> >=20
-> > New logic gives: =E2=8C=8A6 / 4=E2=8C=8B * 8 + (6 % 4)
-> >                =3D 1 * 8 + 2
-> > 	       =3D 10
-> >=20
-> > In any case the DIV_ROUND_UP() isn't to handle the case where guest
-> > threads-per-core is bigger than host threads-per-core, it's (IIRC) for
-> > the case where guest threads-per-core is not a factor of host
-> > threads-per-core.  Again, a bad idea, but I think allowed in some old
-> > cases. =20
->=20
-> Oh, so, the other more general point here is that I actually want to
-> get rid of dt_id from the cpu structure.  It's basically an abuse of
-> the cpu stuff to include what's really an spapr concept - dt IDs for
-> powernv are based on the PIR and not allocate the same way.
->=20
+Thanks,
 
-Agreed.
-
-> That said, I'm still ok with a fixed version of this patch as an
-> interim step.
->=20
-
-Well... I'm not sure anymore I need this patch to fix the migration
-breakage.
-
-> > > Signed-off-by: Greg Kurz <groug@kaod.org>
-> > > ---
-> > >  hw/ppc/spapr.c              |    6 ++----
-> > >  target/ppc/cpu.h            |   17 +++++++++++++++++
-> > >  target/ppc/translate_init.c |    3 +--
-> > >  3 files changed, 20 insertions(+), 6 deletions(-)
-> > >=20
-> > > diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> > > index 75e298b4c6be..1bb05a9a6b07 100644
-> > > --- a/hw/ppc/spapr.c
-> > > +++ b/hw/ppc/spapr.c
-> > > @@ -981,7 +981,6 @@ static void *spapr_build_fdt(sPAPRMachineState *s=
-papr,
-> > >      void *fdt;
-> > >      sPAPRPHBState *phb;
-> > >      char *buf;
-> > > -    int smt =3D kvmppc_smt_threads();
-> > > =20
-> > >      fdt =3D g_malloc0(FDT_MAX_SIZE);
-> > >      _FDT((fdt_create_empty_tree(fdt, FDT_MAX_SIZE)));
-> > > @@ -1021,7 +1020,7 @@ static void *spapr_build_fdt(sPAPRMachineState =
-*spapr,
-> > >      _FDT(fdt_setprop_cell(fdt, 0, "#size-cells", 2));
-> > > =20
-> > >      /* /interrupt controller */
-> > > -    spapr_dt_xics(DIV_ROUND_UP(max_cpus * smt, smp_threads), fdt, PH=
-ANDLE_XICP);
-> > > +    spapr_dt_xics(ppc_cpu_dt_id_from_index(max_cpus), fdt, PHANDLE_X=
-ICP);
-> > > =20
-> > >      ret =3D spapr_populate_memory(spapr, fdt);
-> > >      if (ret < 0) {
-> > > @@ -1977,7 +1976,6 @@ static void spapr_init_cpus(sPAPRMachineState *=
-spapr)
-> > >      MachineState *machine =3D MACHINE(spapr);
-> > >      MachineClass *mc =3D MACHINE_GET_CLASS(machine);
-> > >      char *type =3D spapr_get_cpu_core_type(machine->cpu_model);
-> > > -    int smt =3D kvmppc_smt_threads();
-> > >      const CPUArchIdList *possible_cpus;
-> > >      int boot_cores_nr =3D smp_cpus / smp_threads;
-> > >      int i;
-> > > @@ -2014,7 +2012,7 @@ static void spapr_init_cpus(sPAPRMachineState *=
-spapr)
-> > >              sPAPRDRConnector *drc =3D
-> > >                  spapr_dr_connector_new(OBJECT(spapr),
-> > >                                         SPAPR_DR_CONNECTOR_TYPE_CPU,
-> > > -                                       (core_id / smp_threads) * smt=
-);
-> > > +                                       ppc_cpu_dt_id_from_index(core=
-_id));
-> > > =20
-> > >              qemu_register_reset(spapr_drc_reset, drc);
-> > >          }
-> > > diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
-> > > index 401e10e7dad8..47fe6c64698f 100644
-> > > --- a/target/ppc/cpu.h
-> > > +++ b/target/ppc/cpu.h
-> > > @@ -2529,4 +2529,21 @@ int ppc_get_vcpu_dt_id(PowerPCCPU *cpu);
-> > >  PowerPCCPU *ppc_get_vcpu_by_dt_id(int cpu_dt_id);
-> > > =20
-> > >  void ppc_maybe_bswap_register(CPUPPCState *env, uint8_t *mem_buf, in=
-t len);
-> > > +
-> > > +#if !defined(CONFIG_USER_ONLY)
-> > > +#include "sysemu/cpus.h"
-> > > +#include "target/ppc/kvm_ppc.h"
-> > > +
-> > > +static inline int ppc_cpu_dt_id_from_index(int cpu_index)
-> > > +{
-> > > +    /* POWER HV support has an historical limitation that different =
-threads
-> > > +     * on a single core cannot be in different guests at the same ti=
-me. In
-> > > +     * order to allow KVM to assign guest threads to host cores acco=
-rdingly,
-> > > +     * CPU device tree ids are spaced by the number of threads per h=
-ost cores.
-> > > +     */
-> > > +    return (cpu_index / smp_threads) * kvmppc_smt_threads()
-> > > +        + (cpu_index % smp_threads);
-> > > +}
-> > > +#endif
-> > > +
-> > >  #endif /* PPC_CPU_H */
-> > > diff --git a/target/ppc/translate_init.c b/target/ppc/translate_init.c
-> > > index 56a0ab22cfbe..837a9a496a65 100644
-> > > --- a/target/ppc/translate_init.c
-> > > +++ b/target/ppc/translate_init.c
-> > > @@ -9851,8 +9851,7 @@ static void ppc_cpu_realizefn(DeviceState *dev,=
- Error **errp)
-> > >      }
-> > > =20
-> > >  #if !defined(CONFIG_USER_ONLY)
-> > > -    cpu->cpu_dt_id =3D (cs->cpu_index / smp_threads) * max_smt
-> > > -        + (cs->cpu_index % smp_threads);
-> > > +    cpu->cpu_dt_id =3D ppc_cpu_dt_id_from_index(cs->cpu_index);
-> > > =20
-> > >      if (kvm_enabled() && !kvm_vcpu_id_is_valid(cpu->cpu_dt_id)) {
-> > >          error_setg(errp, "Can't create CPU with id %d in KVM", cpu->=
-cpu_dt_id);
-> > >  =20
-> >  =20
->=20
->=20
->=20
-
-
---Sig_/wy.VCnhJK3IsDi.+f8yZOW8
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-
-iEYEARECAAYFAlkiquUACgkQAvw66wEB28JiNQCfTBARbv2l25olCucJIinNh3KR
-M/AAoI22/FJJHYmTyw/bdeufEt22En0h
-=4juQ
------END PGP SIGNATURE-----
-
---Sig_/wy.VCnhJK3IsDi.+f8yZOW8--
+Paolo
