@@ -1,27 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37920)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37936)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1dCmvP-00017u-LH
-	for qemu-devel@nongnu.org; Mon, 22 May 2017 08:59:04 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1dCmvR-00018G-2A
+	for qemu-devel@nongnu.org; Mon, 22 May 2017 08:59:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1dCmvO-0006KK-Ad
-	for qemu-devel@nongnu.org; Mon, 22 May 2017 08:59:03 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46102)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1dCmvO-0006K5-0y
-	for qemu-devel@nongnu.org; Mon, 22 May 2017 08:59:02 -0400
-Date: Mon, 22 May 2017 14:58:56 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20170522145856.4728a2a4@nial.brq.redhat.com>
-In-Reply-To: <894afc82-4214-1734-d5ea-532218fac34c@virtuozzo.com>
-References: <1495446630-365062-1-git-send-email-eyakovlev@virtuozzo.com>
-	<1495446630-365062-2-git-send-email-eyakovlev@virtuozzo.com>
-	<20170522123524.4c0bff9d@nial.brq.redhat.com>
-	<894afc82-4214-1734-d5ea-532218fac34c@virtuozzo.com>
+	(envelope-from <ehabkost@redhat.com>) id 1dCmvQ-0006Ku-7v
+	for qemu-devel@nongnu.org; Mon, 22 May 2017 08:59:05 -0400
+Date: Mon, 22 May 2017 09:58:45 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20170522125845.GA18350@thinpad.lan.raisama.net>
+References: <1495094971-177754-1-git-send-email-imammedo@redhat.com>
+	<1495094971-177754-2-git-send-email-imammedo@redhat.com>
+	<20170518181913.GN4748@thinpad.lan.raisama.net>
+	<20170522083931.568735a4@nial.brq.redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] acpi: change CPU container node _HID to
- compatible PNP0A05
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170522083931.568735a4@nial.brq.redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 1/3] numa: consolidate cpu_preplug
+ fixups/checks for pc/arm/spapr
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,95 +26,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Evgeny Yakovlev <eyakovlev@virtuozzo.com>
-Cc: Denis Lunev <den@virtuozzo.com>, rkagan@virtuozzo.com, qemu-devel@nongnu.org, mst@redhat.com
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-arm@nongnu.org, qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, Andrew Jones <drjones@redhat.com>
 
-On Mon, 22 May 2017 14:01:15 +0300
-Evgeny Yakovlev <eyakovlev@virtuozzo.com> wrote:
-
-> On 22.05.2017 13:35, Igor Mammedov wrote:
-> > On Mon, 22 May 2017 12:50:30 +0300
-> > Evgeny Yakovlev <eyakovlev@virtuozzo.com> wrote:
-> >  
-> >> When running windows 2016 server guests we have encountered a problem
-> >> with ACPI representation of CPU devices. This windows version contains a
-> >> hidinterrupt.sys driver which looks for ACPI device node with _HID set
-> >> to "ACPI0010" and "ACPI0011". ACPI0010 is also a valid id for CPU
-> >> container device which qemu uses.
-> >>
-> >> hidinterrupt driver takes over (even though it fails) ACPI0010 node and
-> >> thus hides its children -- the CPUs -- from the regular ACPI
-> >> enumeration.  So there are no processors in the Windows device tree
-> >> Device Manager or "!devnode 0 1" in the debugger.
-> >>
-> >> hidinterrupt.inf as shipped with Windows 2016 has both ACPI0011 and
-> >> ACPI0010; the record for the latter is preceded with a comment "This Id
-> >> is not to be used. It will be removed once everyone has stopped using
-> >> it."  So I guess the typo was not in the driver but in the ACPI tables
-> >> of some device(s) which the driver wanted to support despite the bug.
-> >>
-> >> For reference this is a known issue:
-> >> https://bugzilla.redhat.com/show_bug.cgi?id=1377155#c31
-> >>
-> >> This change works around this problem by setting qemu CPU container ACPI
-> >> _HID to compatible PNP0A05.  
-> > I'd say NACK to it.
-> > It's Windows server 2016 bug that violates spec and
-> > it's been reported to them before RTM has been released.
-> > So complain to Microsoft support and make them fix it.
-> >
-> > Meanwhile there is MS suggested workaround to fix issue,
-> > one can use https://bugzilla.redhat.com/show_bug.cgi?id=1377155#c17
-> >
-> > Perhaps I should add workaround link as comment above line:
-> >
-> > aml_append(cpus_dev, aml_name_decl("_HID", aml_string("ACPI0010")));  
+On Mon, May 22, 2017 at 08:39:31AM +0200, Igor Mammedov wrote:
+> On Thu, 18 May 2017 15:19:13 -0300
+> Eduardo Habkost <ehabkost@redhat.com> wrote:
 > 
-> Thanks for replying!
+> > On Thu, May 18, 2017 at 10:09:29AM +0200, Igor Mammedov wrote:
+> > > Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+> > > ---
+> > >  include/sysemu/numa.h |  1 +
+> > >  hw/arm/virt.c         | 16 ++--------------
+> > >  hw/i386/pc.c          | 17 +----------------
+> > >  hw/ppc/spapr.c        | 17 +----------------
+> > >  numa.c                | 22 ++++++++++++++++++++++
+> > >  5 files changed, 27 insertions(+), 46 deletions(-)
+> > > 
+> > > diff --git a/include/sysemu/numa.h b/include/sysemu/numa.h
+> > > index 7ffde5b..610eece 100644
+> > > --- a/include/sysemu/numa.h
+> > > +++ b/include/sysemu/numa.h
+> > > @@ -35,4 +35,5 @@ void numa_legacy_auto_assign_ram(MachineClass *mc, NodeInfo *nodes,
+> > >                                   int nb_nodes, ram_addr_t size);
+> > >  void numa_default_auto_assign_ram(MachineClass *mc, NodeInfo *nodes,
+> > >                                    int nb_nodes, ram_addr_t size);
+> > > +void numa_cpu_pre_plug(const CPUArchId *slot, DeviceState *dev, Error **errp);  
+> > 
+> > I understand an explicitly call to numa_cpu_pre_plug() is needed
+> > on spapr_core_pre_plug() because it is not handling a TYPE_CPU
+> > object. But why not adding a numa_cpu_pre_plug() call to
+> > cpu_common_realizefn(), so the explicit calls in machvirt_init()
+> > and pc_cpu_pre_plug() are not necessary?
+> 1. of the reasons is not to pollute all cpus with numa code
+
+I understand this goal...
+
 > 
-> Strictly speaking, this is not a Windows bug. Comment in INF file says 
-> that they had to support a hardware device which erroneously picked this 
-> ACPI HID.
-in linux kernel we use device specific quirks to workaround broken hardware,
-there is no point to break generic code for all hardware configurations
-for the sake of one broken firmware.
-So it's Windows problem that they prefer to violate spec and cannibalize
-ACPI0010 for the sake of broken firmware. Open support case with Windows,
-the more complains they get, the more chances that they'll fix it.
+> > Adding the code to cpu_common_realizefn() would also ensure
+> > CPUState::node_id is set consistently, even if hotplug was not
+> > done at thread level.
+> 2. not all CPUs have node-id property
 
-> I understand that this is not a qemu problem either. Then again other 
-> emulators we've tested this on (VirtualBox, Parallels, HyperV) provide a 
-> compatible ACPI configuration and don't trigger this conflict. If this 
-we provide it, that's what '_CID' field is for, so OS that doesn't know
-about ACPI0010 would be happy (any Windows prior Win10/2016)
+...and this. But: we already have the CPUState::numa_node field.
+If we don't handle it in common code, we risk leaving the field
+uninitialized, which is a problem if other code tries to use the
+field for something.
 
-> fix is not a big deal and does not affect anything negatively then maybe 
-> we pay a relatively small price to improve compatibility with some guest 
-> systems?
-we plan to reuse this code for ARM in future and it might use
-ACPI0010 container as per spec to describe modeled topology.
-Hence no workaround in QEMU, just use MS suggested workaround
-to remove wrong device binding in WS2016 until they actually
-fix it.
+Maybe that's an argument for removing the CPUState::numa_node
+field too.
 
 
-> >> Signed-off-by: Evgeny Yakovlev <eyakovlev@virtuozzo.com>
-> >> ---
-> >>   hw/acpi/cpu.c | 2 +-
-> >>   1 file changed, 1 insertion(+), 1 deletion(-)
-> >>
-> >> diff --git a/hw/acpi/cpu.c b/hw/acpi/cpu.c
-> >> index a233fe1..b93db40 100644
-> >> --- a/hw/acpi/cpu.c
-> >> +++ b/hw/acpi/cpu.c
-> >> @@ -397,7 +397,7 @@ void build_cpus_aml(Aml *table, MachineState *machine, CPUHotplugFeatures opts,
-> >>           Aml *rm_evt = aml_name("%s.%s", cphp_res_path, CPU_REMOVE_EVENT);
-> >>           Aml *ej_evt = aml_name("%s.%s", cphp_res_path, CPU_EJECT_EVENT);
-> >>   
-> >> -        aml_append(cpus_dev, aml_name_decl("_HID", aml_string("ACPI0010")));
-> >> +        aml_append(cpus_dev, aml_name_decl("_HID", aml_string("PNP0A05")));
-> >>           aml_append(cpus_dev, aml_name_decl("_CID", aml_eisaid("PNP0A05")));
-> >>   
-> >>           method = aml_method(CPU_NOTIFY_METHOD, 2, AML_NOTSERIALIZED);  
-> 
-> 
+> 3. call site of thread_realize() in encapsulating object (spapr_core)
+>    might be somewhere in the middle of parent's realize and likely
+>    failure would need proper parent state rollback/cleanup.
+
+I don't see why this could be a problem, if the code setting
+realized=true is already supposed to handle errors on the realize
+method.
+
+> 4. and finely it's not cpu's responsibility to assign/check
+>    node-id property. It's machine's job that owns/manages topology
+>    layout. It' the same like with socket/core/thread properties.
+>    So for the sake of small optimization, I'm not really willing
+>    to violate that.
+
+I don't disagree with that, but in that case I would like to
+remove the CPUState::numa_node field soon, if possible.
+
+[...]
+> > > +    } else if (node_id != slot->props.node_id) {
+> > > +        error_setg(errp, "node-id=%d must match numa node specified "
+> > > +                   "with -numa option", node_id);  
+> > 
+> > There's less detail on the error message, now. Probably harmless,
+> > but I would like to understand when exactly this can be
+> > triggered: is device_add the only way to trigger this error
+> > message?
+> error is triggered only during -device/device_add so there were no
+> need in more verbose error as device_add will report its arguments
+> (affected cpu in this case)
+
+OK.
+
+-- 
+Eduardo
