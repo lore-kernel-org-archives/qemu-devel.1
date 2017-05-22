@@ -1,31 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52563)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52577)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <danielhb@linux.vnet.ibm.com>) id 1dCsGL-0007HM-8F
+	(envelope-from <danielhb@linux.vnet.ibm.com>) id 1dCsGL-0007HO-PZ
 	for qemu-devel@nongnu.org; Mon, 22 May 2017 14:41:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <danielhb@linux.vnet.ibm.com>) id 1dCsGI-0003Pj-2N
+	(envelope-from <danielhb@linux.vnet.ibm.com>) id 1dCsGJ-0003QC-0O
 	for qemu-devel@nongnu.org; Mon, 22 May 2017 14:41:01 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:45293)
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:58145)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <danielhb@linux.vnet.ibm.com>)
-	id 1dCsGH-0003OY-JN
-	for qemu-devel@nongnu.org; Mon, 22 May 2017 14:40:57 -0400
-Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
+	id 1dCsGI-0003PX-Dz
+	for qemu-devel@nongnu.org; Mon, 22 May 2017 14:40:58 -0400
+Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
 	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v4MIXnII146622
+	v4MIXnm7033546
 	for <qemu-devel@nongnu.org>; Mon, 22 May 2017 14:40:56 -0400
-Received: from e24smtp04.br.ibm.com (e24smtp04.br.ibm.com [32.104.18.25])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2am4b3amhb-1
+Received: from e24smtp05.br.ibm.com (e24smtp05.br.ibm.com [32.104.18.26])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2am3rw3vdy-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 22 May 2017 14:40:55 -0400
+	for <qemu-devel@nongnu.org>; Mon, 22 May 2017 14:40:56 -0400
 Received: from localhost
-	by e24smtp04.br.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	by e24smtp05.br.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
 	Only! Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <danielhb@linux.vnet.ibm.com>;
-	Mon, 22 May 2017 15:40:51 -0300
+	Mon, 22 May 2017 15:40:54 -0300
 From: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
-Date: Mon, 22 May 2017 15:40:38 -0300
-Message-Id: <20170522184039.23877-1-danielhb@linux.vnet.ibm.com>
+Date: Mon, 22 May 2017 15:40:39 -0300
+In-Reply-To: <20170522184039.23877-1-danielhb@linux.vnet.ibm.com>
+References: <20170522184039.23877-1-danielhb@linux.vnet.ibm.com>
+Message-Id: <20170522184039.23877-2-danielhb@linux.vnet.ibm.com>
 Subject: [Qemu-devel] [PATCH v13] migration: spapr: migrate pending_events
  of spapr state
 List-Id: <qemu-devel.nongnu.org>
@@ -39,69 +41,127 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-ppc@nongnu.org, david@gibson.dropbear.id.au, mdroth@linux.vnet.ibm.com
 
-v13:
-- rebased with dgibson/ppc-for-2.10
-- patch 1 removed from the series (already applied at ppc-for-2.10)
-- data_size is now being calculated by using the extended_length field inside
-rtas_event_log_queue
+From: Jianjun Duan <duanj@linux.vnet.ibm.com>
 
-v12:
-- patch 2: added a switch statement to get the proper data_size based on
-the log_type
+In racing situations between hotplug events and migration operation,
+a rtas hotplug event could have not yet be delivered to the source
+guest when migration is started. In this case the pending_events of
+spapr state need be transmitted to the target so that the hotplug
+event can be finished on the target.
 
-v11:
-- patch 1 (new): cleanup of spapr_events.c:
-    * removed the 'exception' boolean from the sPAPREventLogEntry
-    * simplified the 'event_scan' function
-- patch 2:
-    * data_size is now calculated inside rtas_event_log_queue()
-    * using VBUFFER instead of VARRAY to avoid casts
-    * log_type changed to int32_t
+All the different fields of the events are encoded as defined by
+PAPR. We can migrate them as a binary stream inside VBUFFER without
+any concerns about data padding or endianess.
 
-v10: detached from DRC patch set
+pending_events is put in a subsection in the spapr state VMSD to make
+sure migration across different versions is not broken.
 
-v9: no changes
-
-v8: no changes
-
-v7: no changes
-
-v6: - Rebased with QEMU master after 6+ months.
-class and minor improvements.
-    - Added clarifications from the previous v5 discussions in the commit messages.
-
-v5: - Rebased on David's ppc-for-2.8.
-
-v4: - Rebased on David's ppc-for-2.7. 
-
-v3: - Simplify overall design followng discussion with Paolo. No longer need
-      metadata to migrate QTAILQ.
-    - Extend VMStateInfo instead of adding similar fields to VMStateField.
-
-v2: - Put the newly added migrating fields in subsections so that backward 
-      migration is not broken.  
-(link: https://lists.nongnu.org/archive/html/qemu-devel/2016-05/msg04188.html)
-
-v1: - Inital version.
-(link: https://lists.nongnu.org/archive/html/qemu-devel/2016-04/msg02601.html)
-
-
-This patch was detached from the patchset:
-
-"[PATCH v9 0/6] migration/ppc: migrating DRC, ccs_list and pending_events"
-
-Because it is independent and has use outside of the scope of the
-pseries DRC migration patchset.
-
-
-
-Jianjun Duan (1):
-  migration: spapr: migrate pending_events of spapr state
-
+Signed-off-by: Jianjun Duan <duanj@linux.vnet.ibm.com>
+Signed-off-by: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
+---
  hw/ppc/spapr.c         | 32 ++++++++++++++++++++++++++++++++
  hw/ppc/spapr_events.c  | 19 +++++++++++++++++++
  include/hw/ppc/spapr.h |  3 ++-
  3 files changed, 53 insertions(+), 1 deletion(-)
 
+diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+index 75e298b..558f951 100644
+--- a/hw/ppc/spapr.c
++++ b/hw/ppc/spapr.c
+@@ -1453,6 +1453,37 @@ static bool version_before_3(void *opaque, int version_id)
+     return version_id < 3;
+ }
+ 
++static bool spapr_pending_events_needed(void *opaque)
++{
++    sPAPRMachineState *spapr = (sPAPRMachineState *)opaque;
++    return !QTAILQ_EMPTY(&spapr->pending_events);
++}
++
++static const VMStateDescription vmstate_spapr_event_entry = {
++    .name = "spapr_event_log_entry",
++    .version_id = 1,
++    .minimum_version_id = 1,
++    .fields = (VMStateField[]) {
++        VMSTATE_INT32(log_type, sPAPREventLogEntry),
++        VMSTATE_UINT32(data_size, sPAPREventLogEntry),
++        VMSTATE_VBUFFER_ALLOC_UINT32(data, sPAPREventLogEntry, 0,
++                                     NULL, data_size),
++        VMSTATE_END_OF_LIST()
++    },
++};
++
++static const VMStateDescription vmstate_spapr_pending_events = {
++    .name = "spapr_pending_events",
++    .version_id = 1,
++    .minimum_version_id = 1,
++    .needed = spapr_pending_events_needed,
++    .fields = (VMStateField[]) {
++        VMSTATE_QTAILQ_V(pending_events, sPAPRMachineState, 1,
++                         vmstate_spapr_event_entry, sPAPREventLogEntry, next),
++        VMSTATE_END_OF_LIST()
++    },
++};
++
+ static bool spapr_ov5_cas_needed(void *opaque)
+ {
+     sPAPRMachineState *spapr = opaque;
+@@ -1551,6 +1582,7 @@ static const VMStateDescription vmstate_spapr = {
+     .subsections = (const VMStateDescription*[]) {
+         &vmstate_spapr_ov5_cas,
+         &vmstate_spapr_patb_entry,
++        &vmstate_spapr_pending_events,
+         NULL
+     }
+ };
+diff --git a/hw/ppc/spapr_events.c b/hw/ppc/spapr_events.c
+index 73e2a18..6c42041 100644
+--- a/hw/ppc/spapr_events.c
++++ b/hw/ppc/spapr_events.c
+@@ -346,10 +346,29 @@ static void rtas_event_log_queue(int log_type, void *data)
+ {
+     sPAPRMachineState *spapr = SPAPR_MACHINE(qdev_get_machine());
+     sPAPREventLogEntry *entry = g_new(sPAPREventLogEntry, 1);
++    struct epow_log_full *new_epow = NULL;
++    struct hp_log_full *new_hp = NULL;
++    uint32_t ext_length = 0;
+ 
+     g_assert(data);
+     entry->log_type = log_type;
+     entry->data = data;
++
++    switch (log_type) {
++    case RTAS_LOG_TYPE_EPOW:
++        new_epow = (struct epow_log_full *)data;
++        ext_length = be32_to_cpu(new_epow->hdr.extended_length);
++        entry->data_size = ext_length + sizeof(new_epow->hdr);
++        break;
++    case RTAS_LOG_TYPE_HOTPLUG:
++        new_hp = (struct hp_log_full *)data;
++        ext_length = be32_to_cpu(new_hp->hdr.extended_length);
++        entry->data_size = ext_length + sizeof(new_hp->hdr);
++        break;
++    default:
++        g_assert(false);
++    }
++
+     QTAILQ_INSERT_TAIL(&spapr->pending_events, entry, next);
+ }
+ 
+diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
+index be2b3b8..b2fcd62 100644
+--- a/include/hw/ppc/spapr.h
++++ b/include/hw/ppc/spapr.h
+@@ -598,8 +598,9 @@ struct sPAPRTCETable {
+ sPAPRTCETable *spapr_tce_find_by_liobn(target_ulong liobn);
+ 
+ struct sPAPREventLogEntry {
+-    int log_type;
++    int32_t log_type;
+     void *data;
++    uint32_t data_size;
+     QTAILQ_ENTRY(sPAPREventLogEntry) next;
+ };
+ 
 -- 
 2.9.4
