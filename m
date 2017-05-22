@@ -1,23 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53767)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53801)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dCdax-0006To-Bb
-	for qemu-devel@nongnu.org; Sun, 21 May 2017 23:01:20 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1dCdaz-0006Tz-C7
+	for qemu-devel@nongnu.org; Sun, 21 May 2017 23:01:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dCdaw-0005XC-Cr
-	for qemu-devel@nongnu.org; Sun, 21 May 2017 23:01:19 -0400
-Date: Mon, 22 May 2017 12:44:48 +1000
+	(envelope-from <dgibson@ozlabs.org>) id 1dCdaw-0005X2-Cc
+	for qemu-devel@nongnu.org; Sun, 21 May 2017 23:01:21 -0400
+Date: Mon, 22 May 2017 12:36:32 +1000
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20170522024448.GL30246@umbus.fritz.box>
+Message-ID: <20170522023632.GJ30246@umbus.fritz.box>
 References: <1495172439-1504-1-git-send-email-bharata@linux.vnet.ibm.com>
-	<1495172439-1504-5-git-send-email-bharata@linux.vnet.ibm.com>
-	<20170519063614.GG3446@in.ibm.com>
+	<1495172439-1504-2-git-send-email-bharata@linux.vnet.ibm.com>
+	<20170519073303.GK12284@umbus.fritz.box>
+	<b39e67c9-f7e7-9277-56e5-8e0769efc15d@redhat.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="aYrjF+tKt+ApYAdb"
+	protocol="application/pgp-signature"; boundary="ed/6oDxOLijJh8b0"
 Content-Disposition: inline
-In-Reply-To: <20170519063614.GG3446@in.ibm.com>
-Subject: Re: [Qemu-devel] [RFC PATCH v2 4/4] spapr: Fix migration of Radix
- guests
+In-Reply-To: <b39e67c9-f7e7-9277-56e5-8e0769efc15d@redhat.com>
+Subject: Re: [Qemu-devel] [RFC PATCH v2 1/4] migration: Introduce
+ unregister_savevm_live()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,92 +27,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Bharata B Rao <bharata@linux.vnet.ibm.com>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, sam.bobroff@au1.ibm.com, rnsastry@linux.vnet.ibm.com
+To: Laurent Vivier <lvivier@redhat.com>
+Cc: Bharata B Rao <bharata@linux.vnet.ibm.com>, rnsastry@linux.vnet.ibm.com, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, sam.bobroff@au1.ibm.com, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Juan Quintela <quintela@redhat.com>
 
 
---aYrjF+tKt+ApYAdb
+--ed/6oDxOLijJh8b0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, May 19, 2017 at 12:06:14PM +0530, Bharata B Rao wrote:
-> On Fri, May 19, 2017 at 11:10:39AM +0530, Bharata B Rao wrote:
-> > Fix migration of radix guests by ensuring that we issue
-> > KVM_PPC_CONFIGURE_V3_MMU for radix case post migration.
+On Fri, May 19, 2017 at 03:14:35PM +0200, Laurent Vivier wrote:
+> On 19/05/2017 09:33, David Gibson wrote:
+> > On Fri, May 19, 2017 at 11:10:36AM +0530, Bharata B Rao wrote:
+> >> Introduce a new function unregister_savevm_live() to unregister the vm=
+state
+> >> handlers registered via register_savevm_live().
+> >>
+> >> register_savevm() allocates SaveVMHandlers while register_savevm_live()
+> >> gets passed with SaveVMHandlers. During unregistration, we  want to
+> >> free SaveVMHandlers in the former case but not free in the latter case.
+> >> Hence this new API is needed to differentiate this.
+> >>
+> >> This new API will be needed by PowerPC to unregister the HTAB savevm
+> >> handlers.
+> >>
+> >> Signed-off-by: Bharata B Rao <bharata@linux.vnet.ibm.com>
 > >=20
-> > Reported-by: Nageswara R Sastry <rnsastry@linux.vnet.ibm.com>
-> > Signed-off-by: Bharata B Rao <bharata@linux.vnet.ibm.com>
-> > ---
-> >  hw/ppc/spapr.c | 12 ++++++++++++
-> >  1 file changed, 12 insertions(+)
+> > Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
 > >=20
-> > diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> > index daf335c..8f20f14 100644
-> > --- a/hw/ppc/spapr.c
-> > +++ b/hw/ppc/spapr.c
-> > @@ -1400,6 +1400,18 @@ static int spapr_post_load(void *opaque, int ver=
-sion_id)
-> >          err =3D spapr_rtc_import_offset(&spapr->rtc, spapr->rtc_offset=
-);
-> >      }
-> >=20
-> > +    if (spapr->patb_entry) {
-> > +        PowerPCCPU *cpu =3D POWERPC_CPU(first_cpu);
-> > +        if (kvmppc_has_cap_mmu_radix() && kvm_enabled()) {
-> > +            err =3D kvmppc_configure_v3_mmu(cpu, SPAPR_PROC_TABLE_RADI=
-X,
-> > +                ((cpu->env.spr[SPR_LPCR] & LPCR_GTSE) ? SPAPR_PROC_TAB=
-LE_GTSE :
-> > +                0), spapr->patb_entry);
+> > I could take this through my tree, but it would need an ACK from Dave
+> > Gilbert or Juan Quintela.
 >=20
-> Better to use explicit 'true' and 'false' in the above call. Here is
-> the updated patch:
+> I cc: them for that.
 
-Or just !!(cpu->env.spr[SPR_LPCR] & LPCR_GTSE) and avoid the ?:
-entirely.
-
-With this version you no longer need patch 3/4 AFAICT.
+Dave, Juan: his is fairly urgent, since it's a prereq for (sanely)
+fixing a migration bug.  Please let me know what I can do to expedite
+review.
 
 >=20
-> >From 937c51cac73b4211ef153c1f5940215960383494 Mon Sep 17 00:00:00 2001
-> From: Bharata B Rao <bharata@linux.vnet.ibm.com>
-> Date: Tue, 16 May 2017 12:19:54 +0530
-> Subject: [RFC PATCH v2.1 4/4] spapr: Fix migration of Radix guests
+> Just a comment on the patch.
 >=20
-> Fix migration of radix guests by ensuring that we issue
-> KVM_PPC_CONFIGURE_V3_MMU for radix case post migration.
->=20
-> Reported-by: Nageswara R Sastry <rnsastry@linux.vnet.ibm.com>
-> Signed-off-by: Bharata B Rao <bharata@linux.vnet.ibm.com>
-> ---
->  hw/ppc/spapr.c | 12 ++++++++++++
->  1 file changed, 12 insertions(+)
->=20
-> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> index daf335c..69e184b 100644
-> --- a/hw/ppc/spapr.c
-> +++ b/hw/ppc/spapr.c
-> @@ -1400,6 +1400,18 @@ static int spapr_post_load(void *opaque, int versi=
-on_id)
->          err =3D spapr_rtc_import_offset(&spapr->rtc, spapr->rtc_offset);
->      }
-> =20
-> +    if (spapr->patb_entry) {
-> +        PowerPCCPU *cpu =3D POWERPC_CPU(first_cpu);
-> +        if (kvmppc_has_cap_mmu_radix() && kvm_enabled()) {
-> +            err =3D kvmppc_configure_v3_mmu(cpu, true,
-> +                ((cpu->env.spr[SPR_LPCR] & LPCR_GTSE) ? true : false),
-> +                spapr->patb_entry);
-> +        } else {
-> +            error_report("Radix guest is unsupported by the host");
-> +            return -EINVAL;
-> +        }
-> +    }
-> +
->      return err;
->  }
-> =20
+> Instead of introducing a new function, perhaps we can homogenize the use
+> of register_savevm() by always providing a SaveVMHandlers pointer and
+> never a couple of (SaveStateHandler, LoadStateHandler) so the
+> unregister_save() has never to free se->ops?
+
+Sounds reasonable to me.  Again, Dave?  Juan?
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -119,25 +80,25 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---aYrjF+tKt+ApYAdb
+--ed/6oDxOLijJh8b0
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v2
 
-iQIcBAEBCAAGBQJZIlCgAAoJEGw4ysog2bOSMy4P/isDMpjfYVFuWM/dueU9x9jh
-8NJALs44Xk2FPk0wvaGsUTSkHY4wqwG41SM9RjV2WETgnYrjmJblwztDuYND3h3P
-6/QdcO5gl2URtt9Bto3SXtoa6cWvdfekL2r/mFMLUL9vo0acDfsScqoko9toBn6t
-lZxeIeY5NhsD6Q9e38Vh25z6xHdDs6ewdXCrV+qoVD9LcFiLB7a5xxqoW2FAtByO
-zRekn3qEuUKtO/Hp308VkzdvRWMsaDwZ1GTDxjLrTEV0fj8pmt4w0a8vC2hRSKVV
-ElPsd/GB/u/lYcMfRPmeFfbhg5WgSARSTQ8Py0OiSV/x6mPVPc3wlBZTqUL3X56P
-47pQ7RZPtdZ6SNr9Ams90R8qDF1ELu57wZyHYy4BmO1wgbhmnfZiPXyHbtg+2OAi
-IU23SixErOj4mk8k+AbFz6UYGN9sBG8KP2VXceFnq3I+2o75o9HXdivZk9Xp5cjO
-gaHv4WjKneI6EpfyiRkJJlDcArHMeJqa5V+7H7yuE1/zeGS6SkPD5nV88BdmQ6dk
-NzQ8jnqxBQiWA+LRFhgggbOPrZOyBrsx0UmJII/895i4lCvbCPbatZCbbgiAe09u
-wY4fT1Lkj8yxxjT0xT5RpcgG6gjR4s/CmYmTwhn11xmCp/AA+VbJSWbOkaT+y/fM
-L9MRRK7uk/36DY+7rJLq
-=JpWY
+iQIcBAEBCAAGBQJZIk6wAAoJEGw4ysog2bOSAiQP/j22R0ZZ7itkJlh5QflsJniT
+2catZYbfTvCRieRnr6W9TUDDU09SbVHYH4oDGu2r8HZwgJumwZyPUhEQhMQ+WihW
+k8HJ2o5kOq3FO1T89l62shNDUO/cIDlISHuXehCw5BRrTbDoApmB604CeO3dcWKZ
+W3SJcN0jKovmugAUayCwB9ylsJkE2nbx/sT5dAds2jomMy+wT0bICo+5dXBhPmmz
+66egjhx3RVsQdjz3ePF0rF8ImVJEvYd1QXNzxe6uKnZK21b3MyXDBnmYtDxrWL0N
+/r6g0a9csX4WsQSqpx6+S8RcBOt1Y3CUygX+gvTgCvtNoLkdm9Zcg9cAmJNvtSbJ
+Z0f0sIj8ZGiy9yOEYQcpBr424wKJ/sQ44uPVqOSJaaO6t+xRLakHPVZw3zjyAdtN
+we3ktwuACUgc5uurOHuHJz3y8IYLwE1DilnC9aCnARt71BQwmLH8ta4OcMo4bR5l
+R4Mb7/HfRo+HrsJJTJpo2iLqol98TzXLeNV4v2cxLUchk6QO+8rlMzM3OGVk7/pO
+nHgYq5F38YlQnBV2FUARezGxOvycY0tALgDcwAMbPBQFAOwYy8HuGXGmoVGva1kC
+RfHiF7YK5Vg7eUyWrYkZJmIrWI1XDETWZpm0Wk36ockZ7x4KplGUmRptDo6gNNMR
+0JBkz+2BkpAIBlh7rbsv
+=CWMj
 -----END PGP SIGNATURE-----
 
---aYrjF+tKt+ApYAdb--
+--ed/6oDxOLijJh8b0--
