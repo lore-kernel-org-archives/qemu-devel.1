@@ -1,22 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39226)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39602)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1dCh0K-0000rt-OP
-	for qemu-devel@nongnu.org; Mon, 22 May 2017 02:39:46 -0400
+	(envelope-from <armbru@redhat.com>) id 1dCh1H-0001Vd-10
+	for qemu-devel@nongnu.org; Mon, 22 May 2017 02:40:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1dCh0J-0006hM-8k
-	for qemu-devel@nongnu.org; Mon, 22 May 2017 02:39:44 -0400
-Date: Mon, 22 May 2017 08:39:31 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20170522083931.568735a4@nial.brq.redhat.com>
-In-Reply-To: <20170518181913.GN4748@thinpad.lan.raisama.net>
-References: <1495094971-177754-1-git-send-email-imammedo@redhat.com>
-	<1495094971-177754-2-git-send-email-imammedo@redhat.com>
-	<20170518181913.GN4748@thinpad.lan.raisama.net>
+	(envelope-from <armbru@redhat.com>) id 1dCh1C-00071a-Vg
+	for qemu-devel@nongnu.org; Mon, 22 May 2017 02:40:43 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:41850)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dCh1C-00071J-MU
+	for qemu-devel@nongnu.org; Mon, 22 May 2017 02:40:38 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <cover.1495018956.git.maozy.fnst@cn.fujitsu.com>
+	<645c1b3e6fc23605365c0685d94ec50df7a7fd2b.1495018956.git.maozy.fnst@cn.fujitsu.com>
+	<87y3ttgvn3.fsf@dusky.pond.sub.org>
+	<8925c606-5d9c-4c7a-f812-2cb71ec74855@cn.fujitsu.com>
+Date: Mon, 22 May 2017 08:40:35 +0200
+In-Reply-To: <8925c606-5d9c-4c7a-f812-2cb71ec74855@cn.fujitsu.com> (Mao
+	Zhongyi's message of "Mon, 22 May 2017 12:17:11 +0800")
+Message-ID: <87tw4d4cnw.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 1/3] numa: consolidate cpu_preplug
- fixups/checks for pc/arm/spapr
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v4 3/3] net/rocker: Convert to realize()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,210 +29,201 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-arm@nongnu.org, qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, Andrew Jones <drjones@redhat.com>
+To: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
+Cc: jasowang@redhat.com, jiri@resnulli.us, qemu-devel@nongnu.org, f4bug@amsat.org
 
-On Thu, 18 May 2017 15:19:13 -0300
-Eduardo Habkost <ehabkost@redhat.com> wrote:
+Mao Zhongyi <maozy.fnst@cn.fujitsu.com> writes:
 
-> On Thu, May 18, 2017 at 10:09:29AM +0200, Igor Mammedov wrote:
-> > Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-> > ---
-> >  include/sysemu/numa.h |  1 +
-> >  hw/arm/virt.c         | 16 ++--------------
-> >  hw/i386/pc.c          | 17 +----------------
-> >  hw/ppc/spapr.c        | 17 +----------------
-> >  numa.c                | 22 ++++++++++++++++++++++
-> >  5 files changed, 27 insertions(+), 46 deletions(-)
-> > 
-> > diff --git a/include/sysemu/numa.h b/include/sysemu/numa.h
-> > index 7ffde5b..610eece 100644
-> > --- a/include/sysemu/numa.h
-> > +++ b/include/sysemu/numa.h
-> > @@ -35,4 +35,5 @@ void numa_legacy_auto_assign_ram(MachineClass *mc, NodeInfo *nodes,
-> >                                   int nb_nodes, ram_addr_t size);
-> >  void numa_default_auto_assign_ram(MachineClass *mc, NodeInfo *nodes,
-> >                                    int nb_nodes, ram_addr_t size);
-> > +void numa_cpu_pre_plug(const CPUArchId *slot, DeviceState *dev, Error **errp);  
-> 
-> I understand an explicitly call to numa_cpu_pre_plug() is needed
-> on spapr_core_pre_plug() because it is not handling a TYPE_CPU
-> object. But why not adding a numa_cpu_pre_plug() call to
-> cpu_common_realizefn(), so the explicit calls in machvirt_init()
-> and pc_cpu_pre_plug() are not necessary?
-1. of the reasons is not to pollute all cpus with numa code
+> Hi, Markus
+>
+> On 05/19/2017 03:20 PM, Markus Armbruster wrote:
+>> Mao Zhongyi <maozy.fnst@cn.fujitsu.com> writes:
+>>
+>>> The rocker device still implements the old PCIDeviceClass .init()
+>>> instead of the new .realize(). All devices need to be converted to
+>>> .realize().
+>>>
+>>> .init() reports errors with fprintf() and return 0 on success, negative
+>>> number on failure. Meanwhile, when -device rocker fails, it first report
+>>> a specific error, then a generic one, like this:
+>>>
+>>>     $ x86_64-softmmu/qemu-system-x86_64 -device rocker,name=qemu-rocker
+>>>     rocker: name too long; please shorten to at most 9 chars
+>>>     qemu-system-x86_64: -device rocker,name=qemu-rocker: Device initialization failed
+>>>
+>>> Now, convert it to .realize() that passes errors to its callers via its
+>>> errp argument. Also avoid the superfluous second error message. After
+>>> the patch, effect like this:
+>>>
+>>>     $ x86_64-softmmu/qemu-system-x86_64 -device rocker,name=qemu-rocker
+>>>     qemu-system-x86_64: -device rocker,name=qemu-rocker: name too long; please shorten to at most 9 chars
+>>>
+>>> Cc: jasowang@redhat.com
+>>> Cc: jiri@resnulli.us
+>>> Cc: f4bug@amsat.org
+>>> Cc: armbru@redhat.com
+>>> Signed-off-by: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
+>>
+>> The conversion to realize() looks good to me, therefore
+>> Reviewed-by: Markus Armbruster <armbru@redhat.com>
+>>
+>> However, I spotted a few issues not related to this patch.
+>>
+>> 1. Unusual macro names
+>>
+>>     #define ROCKER "rocker"
+>>
+>>     #define to_rocker(obj) \
+>>         OBJECT_CHECK(Rocker, (obj), ROCKER)
+>>
+>>    Please clean up to
+>>
+>>     #define TYPE_ROCKER "rocker"
+>>
+>>     #define ROCKER(obj) \
+>>         OBJECT_CHECK(Rocker, (obj), TYPE_ROCKER)
+>>
+>>    in a separate patch.
+>
+> Thanks, will fix it in the next version.
+>
+>>
+>> 2. Memory leaks on error and unplug
+>>
+>>    Explained inline below.
+>>
+>>> ---
+>>>  hw/net/rocker/rocker.c | 27 +++++++++++----------------
+>>>  1 file changed, 11 insertions(+), 16 deletions(-)
+>>>
+>>> diff --git a/hw/net/rocker/rocker.c b/hw/net/rocker/rocker.c
+>>> index a382a6f..b9a77f1 100644
+>>> --- a/hw/net/rocker/rocker.c
+>>> +++ b/hw/net/rocker/rocker.c
+>>> @@ -1252,20 +1252,18 @@ rollback:
+>>>      return err;
+>>>  }
+>>>
+>>> -static int rocker_msix_init(Rocker *r)
+>>> +static int rocker_msix_init(Rocker *r, Error **errp)
+>>>  {
+>>>      PCIDevice *dev = PCI_DEVICE(r);
+>>>      int err;
+>>> -    Error *local_err = NULL;
+>>>
+>>>      err = msix_init(dev, ROCKER_MSIX_VEC_COUNT(r->fp_ports),
+>>>                      &r->msix_bar,
+>>>                      ROCKER_PCI_MSIX_BAR_IDX, ROCKER_PCI_MSIX_TABLE_OFFSET,
+>>>                      &r->msix_bar,
+>>>                      ROCKER_PCI_MSIX_BAR_IDX, ROCKER_PCI_MSIX_PBA_OFFSET,
+>>> -                    0, &local_err);
+>>> +                    0, errp);
+>>>      if (err) {
+>>> -        error_report_err(local_err);
+>>>          return err;
+>>>      }
+>>>
+>>> @@ -1301,7 +1299,7 @@ static World *rocker_world_type_by_name(Rocker *r, const char *name)
+>>>      return NULL;
+>>>  }
+>>>
+>>> -static int pci_rocker_init(PCIDevice *dev)
+>>> +static void pci_rocker_realize(PCIDevice *dev, Error **errp)
+>>>  {
+>>>      Rocker *r = to_rocker(dev);
+>>>      const MACAddr zero = { .a = { 0, 0, 0, 0, 0, 0 } };
+>>> @@ -1319,10 +1317,9 @@ static int pci_rocker_init(PCIDevice *dev)
+>>>
+>>>      r->world_dflt = rocker_world_type_by_name(r, r->world_name);
+>>>      if (!r->world_dflt) {
+>>> -        fprintf(stderr,
+>>> -                "rocker: requested world \"%s\" does not exist\n",
+>>> +        error_setg(errp,
+>>> +                "invalid argument requested world %s does not exist",
+>>>                  r->world_name);
+>>> -        err = -EINVAL;
+>>>          goto err_world_type_by_name;
+>>>      }
+>>>
+>>> @@ -1342,7 +1339,7 @@ static int pci_rocker_init(PCIDevice *dev)
+>>>
+>>>      /* MSI-X init */
+>>>
+>>> -    err = rocker_msix_init(r);
+>>> +    err = rocker_msix_init(r, errp);
+>>>      if (err) {
+>>>          goto err_msix_init;
+>>>      }
+>>> @@ -1354,7 +1351,7 @@ static int pci_rocker_init(PCIDevice *dev)
+>>>      }
+>>>
+>>>      if (rocker_find(r->name)) {
+>>> -        err = -EEXIST;
+>>> +        error_setg(errp, "%s already exists", r->name);
+>>>          goto err_duplicate;
+>>>      }
+>>>
+>>> @@ -1368,10 +1365,9 @@ static int pci_rocker_init(PCIDevice *dev)
+>>>  #define ROCKER_IFNAMSIZ 16
+>>>  #define MAX_ROCKER_NAME_LEN  (ROCKER_IFNAMSIZ - 1 - 3 - 3)
+>>>      if (strlen(r->name) > MAX_ROCKER_NAME_LEN) {
+>>> -        fprintf(stderr,
+>>> -                "rocker: name too long; please shorten to at most %d chars\n",
+>>> +        error_setg(errp,
+>>> +                "name too long; please shorten to at most %d chars",
+>>>                  MAX_ROCKER_NAME_LEN);
+>>> -        err = -EINVAL;
+>>>          goto err_name_too_long;
+>>>      }
+>>>
+>>> @@ -1429,7 +1425,7 @@ static int pci_rocker_init(PCIDevice *dev)
+>>>
+>>>      QLIST_INSERT_HEAD(&rockers, r, next);
+>>>
+>>> -    return 0;
+>>> +    return;
+>>>
+>>>  err_name_too_long:
+>>>  err_duplicate:
+>>        rocker_msix_uninit(r);
+>>    err_msix_init:
+>>        object_unparent(OBJECT(&r->msix_bar));
+>>        object_unparent(OBJECT(&r->mmio));
+>>    err_world_type_by_name:
+>>        for (i = 0; i < ROCKER_WORLD_TYPE_MAX; i++) {
+>>            if (r->worlds[i]) {
+>>> @@ -1443,7 +1439,6 @@ err_world_type_by_name:
+>>>              world_free(r->worlds[i]);
+>>>          }
+>>>      }
+>>> -    return err;
+>>>  }
+>>>
+>>
+>> Does this leak r->world_name and r->name?
+>
+> I think it was leaked neither r->world_name nor r->name, but msix and
+> worlds related.
 
-> Adding the code to cpu_common_realizefn() would also ensure
-> CPUState::node_id is set consistently, even if hotplug was not
-> done at thread level.
-2. not all CPUs have node-id property
-3. call site of thread_realize() in encapsulating object (spapr_core)
-   might be somewhere in the middle of parent's realize and likely
-   failure would need proper parent state rollback/cleanup.
-4. and finely it's not cpu's responsibility to assign/check
-   node-id property. It's machine's job that owns/manages topology
-   layout. It' the same like with socket/core/thread properties.
-   So for the sake of small optimization, I'm not really willing
-   to violate that.
- 
-> >  #endif
-> > diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-> > index c7c8159..ce676df 100644
-> > --- a/hw/arm/virt.c
-> > +++ b/hw/arm/virt.c
-> > @@ -1351,7 +1351,6 @@ static void machvirt_init(MachineState *machine)
-> >      for (n = 0; n < possible_cpus->len; n++) {
-> >          Object *cpuobj;
-> >          CPUState *cs;
-> > -        int node_id;
-> >  
-> >          if (n >= smp_cpus) {
-> >              break;
-> > @@ -1364,19 +1363,8 @@ static void machvirt_init(MachineState *machine)
-> >          cs = CPU(cpuobj);
-> >          cs->cpu_index = n;
-> >  
-> > -        node_id = possible_cpus->cpus[cs->cpu_index].props.node_id;
-> > -        if (!possible_cpus->cpus[cs->cpu_index].props.has_node_id) {
-> > -            /* by default CPUState::numa_node was 0 if it's not set via CLI
-> > -             * keep it this way for now but in future we probably should
-> > -             * refuse to start up with incomplete numa mapping */
-> > -             node_id = 0;
-> > -        }
-> > -        if (cs->numa_node == CPU_UNSET_NUMA_NODE_ID) {
-> > -            cs->numa_node = node_id;
-> > -        } else {
-> > -            /* CPU isn't device_add compatible yet, this shouldn't happen */
-> > -            error_setg(&error_abort, "user set node-id not implemented");
-> > -        }
-> > +        numa_cpu_pre_plug(&possible_cpus->cpus[cs->cpu_index], DEVICE(cpuobj),
-> > +                          &error_fatal);
-> >  
-> >          if (!vms->secure) {
-> >              object_property_set_bool(cpuobj, false, "has_el3", NULL);
-> > diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-> > index e36a375..d83c158 100644
-> > --- a/hw/i386/pc.c
-> > +++ b/hw/i386/pc.c
-> > @@ -1895,7 +1895,6 @@ static void pc_cpu_pre_plug(HotplugHandler *hotplug_dev,
-> >                              DeviceState *dev, Error **errp)
-> >  {
-> >      int idx;
-> > -    int node_id;
-> >      CPUState *cs;
-> >      CPUArchId *cpu_slot;
-> >      X86CPUTopoInfo topo;
-> > @@ -1986,21 +1985,7 @@ static void pc_cpu_pre_plug(HotplugHandler *hotplug_dev,
-> >      cs = CPU(cpu);
-> >      cs->cpu_index = idx;
-> >  
-> > -    node_id = cpu_slot->props.node_id;
-> > -    if (!cpu_slot->props.has_node_id) {
-> > -        /* by default CPUState::numa_node was 0 if it's not set via CLI
-> > -         * keep it this way for now but in future we probably should
-> > -         * refuse to start up with incomplete numa mapping */
-> > -        node_id = 0;
-> > -    }
-> > -    if (cs->numa_node == CPU_UNSET_NUMA_NODE_ID) {
-> > -        cs->numa_node = node_id;
-> > -    } else if (cs->numa_node != node_id) {
-> > -            error_setg(errp, "node-id %d must match numa node specified"
-> > -                "with -numa option for cpu-index %d",
-> > -                cs->numa_node, cs->cpu_index);
-> > -            return;
-> > -    }
-> > +    numa_cpu_pre_plug(cpu_slot, dev, errp);
-> >  }
-> >  
-> >  static void pc_machine_device_pre_plug_cb(HotplugHandler *hotplug_dev,
-> > diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> > index 0980d73..c7fee8b 100644
-> > --- a/hw/ppc/spapr.c
-> > +++ b/hw/ppc/spapr.c
-> > @@ -2831,11 +2831,9 @@ static void spapr_core_pre_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
-> >      MachineClass *mc = MACHINE_GET_CLASS(hotplug_dev);
-> >      Error *local_err = NULL;
-> >      CPUCore *cc = CPU_CORE(dev);
-> > -    sPAPRCPUCore *sc = SPAPR_CPU_CORE(dev);
-> >      char *base_core_type = spapr_get_cpu_core_type(machine->cpu_model);
-> >      const char *type = object_get_typename(OBJECT(dev));
-> >      CPUArchId *core_slot;
-> > -    int node_id;
-> >      int index;
-> >  
-> >      if (dev->hotplugged && !mc->has_hotpluggable_cpus) {
-> > @@ -2870,20 +2868,7 @@ static void spapr_core_pre_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
-> >          goto out;
-> >      }
-> >  
-> > -    node_id = core_slot->props.node_id;
-> > -    if (!core_slot->props.has_node_id) {
-> > -        /* by default CPUState::numa_node was 0 if it's not set via CLI
-> > -         * keep it this way for now but in future we probably should
-> > -         * refuse to start up with incomplete numa mapping */
-> > -        node_id = 0;
-> > -    }
-> > -    if (sc->node_id == CPU_UNSET_NUMA_NODE_ID) {
-> > -        sc->node_id = node_id;
-> > -    } else if (sc->node_id != node_id) {
-> > -        error_setg(&local_err, "node-id %d must match numa node specified"
-> > -            "with -numa option for cpu-index %d", sc->node_id, cc->core_id);
-> > -        goto out;
-> > -    }
-> > +    numa_cpu_pre_plug(core_slot, dev, &local_err);
-> >  
-> >  out:
-> >      g_free(base_core_type);
-> > diff --git a/numa.c b/numa.c
-> > index ca73145..0115bfd 100644
-> > --- a/numa.c
-> > +++ b/numa.c
-> > @@ -534,6 +534,28 @@ void parse_numa_opts(MachineState *ms)
-> >      }
-> >  }
-> >  
-> > +void numa_cpu_pre_plug(const CPUArchId *slot, DeviceState *dev, Error **errp)
-> > +{
-> > +    int node_id = object_property_get_int(OBJECT(dev), "node-id", errp);  
-> 
-> You don't check for errors here. If they will never happen,
-> should we use &error_abort instead?
-sure, I'll use &error_abort in v2
+You're right: the two are properties, so the property machinery should
+free them.
 
-> > +
-> > +    if (node_id == CPU_UNSET_NUMA_NODE_ID) {
-> > +        /* by default CPUState::numa_node was 0 if it wasn't set explicitly
-> > +         * TODO: make it error when incomplete numa mapping support is removed
-> > +         */
-> > +        node_id = 0;
-> > +
-> > +        /* due to bug in libvirt, it doesn't pass node-id from props on
-> > +         * device_add as expected, so we have to fix it up here */
-> > +        if (slot->props.has_node_id) {
-> > +            node_id = slot->props.node_id;
-> > +        }
-> > +        object_property_set_int(OBJECT(dev), node_id, "node-id", errp);
-> > +    } else if (node_id != slot->props.node_id) {
-> > +        error_setg(errp, "node-id=%d must match numa node specified "
-> > +                   "with -numa option", node_id);  
-> 
-> There's less detail on the error message, now. Probably harmless,
-> but I would like to understand when exactly this can be
-> triggered: is device_add the only way to trigger this error
-> message?
-error is triggered only during -device/device_add so there were no
-need in more verbose error as device_add will report its arguments
-(affected cpu in this case)
+>> If yes, can you delay their allocation until after the last thing that
+>> can fail?  That way, you don't have to free them on failure.  Simplifies
+>> the error paths.  Keeping them as simple as practical is desireable,
+>> because they're hard to test.
+>
+> If delay allocation of r->worlds[] until after the last, when r->name and
+> r->world_name failed, passing the error message to errp is a good idea. I
+> think that's what 'error paths' means, then it is really not need to free
+> the memory in the goto label. Because the r->worlds[] has not yet been
+> allocated. Is that right? If yes, it's really a perfect solution.
+>
+> But, this ignores the fact that r->name and r->world_name are depend on
+> r->worlds, so r->worlds's allocation must be before them. in this case,
+> the previous solution will be lose its meaning.
 
+Delaying allocation until after all error checks is not always
+practical.  You decide.
 
-> 
-> > +    }
-> > +}
-> > +
-> >  static void allocate_system_memory_nonnuma(MemoryRegion *mr, Object *owner,
-> >                                             const char *name,
-> >                                             uint64_t ram_size)
-> > -- 
-> > 2.7.4
-> >   
-> 
+[...]
