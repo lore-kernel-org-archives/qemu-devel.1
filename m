@@ -1,26 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39963)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44209)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dCt8p-0005yI-IH
-	for qemu-devel@nongnu.org; Mon, 22 May 2017 15:37:20 -0400
+	(envelope-from <mreitz@redhat.com>) id 1dCtNW-0004Dk-9t
+	for qemu-devel@nongnu.org; Mon, 22 May 2017 15:52:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dCt8l-0000Tf-Ll
-	for qemu-devel@nongnu.org; Mon, 22 May 2017 15:37:19 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58158)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dCt8l-0000T7-Ca
-	for qemu-devel@nongnu.org; Mon, 22 May 2017 15:37:15 -0400
-References: <1495186480-114192-1-git-send-email-anton.nefedov@virtuozzo.com>
-	<1495186480-114192-12-git-send-email-anton.nefedov@virtuozzo.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <be27430f-d63b-5e2a-6d87-f3753c9a7e26@redhat.com>
-Date: Mon, 22 May 2017 14:37:04 -0500
-MIME-Version: 1.0
-In-Reply-To: <1495186480-114192-12-git-send-email-anton.nefedov@virtuozzo.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="CujWjU6pPro8S8NnaINNx4awPJtmLC3oa"
-Subject: Re: [Qemu-devel] [PATCH v1 11/13] qcow2-cluster: make
- handle_dependencies() logic easier to follow
+	(envelope-from <mreitz@redhat.com>) id 1dCtNV-0006LB-9z
+	for qemu-devel@nongnu.org; Mon, 22 May 2017 15:52:30 -0400
+From: Max Reitz <mreitz@redhat.com>
+Date: Mon, 22 May 2017 21:52:14 +0200
+Message-Id: <20170522195217.12991-1-mreitz@redhat.com>
+Subject: [Qemu-devel] [PATCH v2 0/3] block: Fix backing paths for filenames
+ with colons
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,72 +18,93 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Anton Nefedov <anton.nefedov@virtuozzo.com>, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, "Denis V . Lunev" <den@openvz.org>, den@virtuozzo.com, mreitz@redhat.com
+To: qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Eric Blake <eblake@redhat.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---CujWjU6pPro8S8NnaINNx4awPJtmLC3oa
-From: Eric Blake <eblake@redhat.com>
-To: Anton Nefedov <anton.nefedov@virtuozzo.com>, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, "Denis V . Lunev" <den@openvz.org>, den@virtuozzo.com,
- mreitz@redhat.com
-Message-ID: <be27430f-d63b-5e2a-6d87-f3753c9a7e26@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v1 11/13] qcow2-cluster: make
- handle_dependencies() logic easier to follow
-References: <1495186480-114192-1-git-send-email-anton.nefedov@virtuozzo.com>
- <1495186480-114192-12-git-send-email-anton.nefedov@virtuozzo.com>
-In-Reply-To: <1495186480-114192-12-git-send-email-anton.nefedov@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+There are (at least) two issues with filenames that contain colons when
+trying to use relative backing filenames with them, for each of which
+there is a patch in this series.
 
-On 05/19/2017 04:34 AM, Anton Nefedov wrote:
-> Avoid complicated nested conditions; return or continue asap instead.
-> The logic is not changed.
->=20
-> Signed-off-by: Anton Nefedov <anton.nefedov@virtuozzo.com>
-> Signed-off-by: Denis V. Lunev <den@openvz.org>
-> ---
->  block/qcow2-cluster.c | 45 ++++++++++++++++++++++---------------------=
---
->  1 file changed, 22 insertions(+), 23 deletions(-)
->=20
+The first patch fixes an issue in the general block layer
+(path_combine() does not have the same opinion on what constitutes a
+protocol prefix as path_has_protocl()), the second fixes an issue in
+file-* (when stripping off the optional "file:" prefix we should not
+create a filename that seems to have another valid protocol prefix).
 
-> =20
-> -            /* Stop if already an l2meta exists. After yielding, it wo=
-uldn't
-
-As long as you're touching this,
+The third patch adds a test.
 
 
-> -            }
-> +        /* Stop if already an l2meta exists. After yielding, it wouldn=
-'t
+Bonus info: The following is something I did not change, although it is
+weird:
+$ mkdir foo && cd foo
+$ ../qemu-img create -f qcow2 file:image:base.qcow2 64M
+Formatting 'file:image:base.qcow2', fmt=qcow2 size=67108864
+    encryption=off cluster_size=65536 lazy_refcounts=off
+    refcount_bits=16
+$ ../qemu-img create -f qcow2 -b file:image:base.qcow2 file:image:top.qcow2
+Formatting 'file:image:top.qcow2', fmt=qcow2 size=67108864
+    backing_file=file:image:base.qcow2 encryption=off
+    cluster_size=65536 lazy_refcounts=off refcount_bits=16
+$ cd ..
+$ ./qemu-img info foo/image:top.qcow2
+image: foo/image:top.qcow2
+file format: qcow2
+virtual size: 64M (67108864 bytes)
+disk size: 196K
+cluster_size: 65536
+backing file: file:image:base.qcow2
+Format specific information:
+    compat: 1.1
+    lazy refcounts: false
+    refcount bits: 16
+    corrupt: false
+$ ./qemu-io foo/image:top.qcow2
+can't open device foo/image:top.qcow2: Could not open backing file:
+    Could not open './image:base.qcow2': No such file or directory
 
-fix the grammar: s/already an l2meta/an l2meta already/
+Patch 3 adds a comment to the test which explains this behavior in a bit
+more detail, but the gist is this: qemu generally thinks that
+protocol-prefixed filenames are absolute filenames; but from a
+file-posix perspective, "file:foo" is still a relative filename.
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+I think the above behavior is what we want and that it's the best we can
+do, but it still is weird, so I just wanted to mention it.
 
 
---CujWjU6pPro8S8NnaINNx4awPJtmLC3oa
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+v2:
+- Kept patch 1 unchanged
+- Added patch 2
+- Extended patch 3 (did NOT change the patch title)
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQEcBAEBCAAGBQJZIz3gAAoJEKeha0olJ0Nqia8H/24h8SOTdTwldBsCFMVqiIVF
-jraa1rVdAuPmQtYaxYTCKJ2yke94w7s39wTbnWLu7ouixRk1ZnozQpJ/px5XgtWV
-Sn+YRMfoTsjP2SgcPoc5ZfpRNkJ5yADG+B3oVetMicova2ZNPhaUJwwlUv+pP02u
-jCB5p69Ec1IyUtNcWhkY84XHAQS6Eo1hAku32+sjRBsRvH8SJgp/wTfjiGM0te2/
-r9L5JQlRgrJxO1bm++uUsZkaGXNnpBV8B2T3Bbh3lS63sbtqIB1GRXUsvdZE955o
-rKmjQR2k/O3ES+al7C5a6oNs0ipPQ1TAgQSFEBe0wgl5B+Mq13uQkikP2xhX0jI=
-=EJAb
------END PGP SIGNATURE-----
+git-backport-diff against v2:
 
---CujWjU6pPro8S8NnaINNx4awPJtmLC3oa--
+Key:
+[----] : patches are identical
+[####] : number of functional differences between upstream/downstream patch
+[down] : patch is downstream-only
+The flags [FC] indicate (F)unctional and (C)ontextual differences, respectively
+
+001/3:[----] [--] 'block: Fix backing paths for filenames with colons'
+002/3:[down] 'block/file-*: *_parse_filename() and colons'
+003/3:[0036] [FC] 'iotests: Add test for colon handling'
+
+
+Max Reitz (3):
+  block: Fix backing paths for filenames with colons
+  block/file-*: *_parse_filename() and colons
+  iotests: Add test for colon handling
+
+ include/block/block_int.h  |   3 ++
+ block.c                    |  50 ++++++++++++++++++---
+ block/file-posix.c         |  17 ++------
+ block/file-win32.c         |  12 +-----
+ tests/qemu-iotests/126     | 105 +++++++++++++++++++++++++++++++++++++++++++++
+ tests/qemu-iotests/126.out |  23 ++++++++++
+ tests/qemu-iotests/group   |   1 +
+ 7 files changed, 182 insertions(+), 29 deletions(-)
+ create mode 100755 tests/qemu-iotests/126
+ create mode 100644 tests/qemu-iotests/126.out
+
+-- 
+2.9.4
