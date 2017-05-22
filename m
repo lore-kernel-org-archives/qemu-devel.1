@@ -1,22 +1,46 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48555)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49146)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1dChO3-00076A-KM
-	for qemu-devel@nongnu.org; Mon, 22 May 2017 03:04:16 -0400
+	(envelope-from <nikunj@linux.vnet.ibm.com>) id 1dChOb-0007Mz-Bm
+	for qemu-devel@nongnu.org; Mon, 22 May 2017 03:04:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1dChO2-0000HI-EF
-	for qemu-devel@nongnu.org; Mon, 22 May 2017 03:04:15 -0400
-Date: Mon, 22 May 2017 09:04:03 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20170522090403.4b284345@nial.brq.redhat.com>
-In-Reply-To: <20170518185058.GP4748@thinpad.lan.raisama.net>
-References: <1495094971-177754-1-git-send-email-imammedo@redhat.com>
-	<1495094971-177754-3-git-send-email-imammedo@redhat.com>
-	<20170518185058.GP4748@thinpad.lan.raisama.net>
+	(envelope-from <nikunj@linux.vnet.ibm.com>) id 1dChOX-0000es-Sq
+	for qemu-devel@nongnu.org; Mon, 22 May 2017 03:04:49 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:52793
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <nikunj@linux.vnet.ibm.com>)
+	id 1dChOX-0000cL-Mk
+	for qemu-devel@nongnu.org; Mon, 22 May 2017 03:04:45 -0400
+Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v4M6x8iN103074
+	for <qemu-devel@nongnu.org>; Mon, 22 May 2017 03:04:44 -0400
+Received: from e23smtp03.au.ibm.com (e23smtp03.au.ibm.com [202.81.31.145])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2aktkk9e87-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Mon, 22 May 2017 03:04:43 -0400
+Received: from localhost
+	by e23smtp03.au.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <nikunj@linux.vnet.ibm.com>;
+	Mon, 22 May 2017 17:04:41 +1000
+Received: from d23av06.au.ibm.com (d23av06.au.ibm.com [9.190.235.151])
+	by d23relay06.au.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+	v4M74VjC19005610
+	for <qemu-devel@nongnu.org>; Mon, 22 May 2017 17:04:39 +1000
+Received: from d23av06.au.ibm.com (localhost [127.0.0.1])
+	by d23av06.au.ibm.com (8.14.4/8.14.4/NCO v10.0 AVout) with ESMTP id
+	v4M745rB025671
+	for <qemu-devel@nongnu.org>; Mon, 22 May 2017 17:04:06 +1000
+From: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
+In-Reply-To: <1495433816-4265-1-git-send-email-sandipandas1990@gmail.com>
+References: <1495433816-4265-1-git-send-email-sandipandas1990@gmail.com>
+Date: Mon, 22 May 2017 12:33:29 +0530
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 2/3] numa: move default mapping init to
- machine
+Content-Type: text/plain
+Message-Id: <87a865nzjy.fsf@abhimanyu.i-did-not-set--mail-host-address--so-tickle-me>
+Subject: Re: [Qemu-devel] [PATCH risu] ppc64: Fix patterns for rotate
+ doubleword instructions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,138 +49,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-arm@nongnu.org, qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, Andrew Jones <drjones@redhat.com>
+To: Sandipan Das <sandipandas1990@gmail.com>
+Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org, joserz@linux.vnet.ibm.com
 
-On Thu, 18 May 2017 15:50:58 -0300
-Eduardo Habkost <ehabkost@redhat.com> wrote:
+Sandipan Das <sandipandas1990@gmail.com> writes:
 
-> On Thu, May 18, 2017 at 10:09:30AM +0200, Igor Mammedov wrote:
-> > there is no need use cpu_index_to_instance_props() for setting
-> > default cpu -> node mapping. Generic machine code can do it
-> > without cpu_index by just enabling already preset defaults
-> > in possible_cpus.
-> > 
-> > PS:
-> > as bonus it makes one less user of cpu_index_to_instance_props()
-> > 
-> > Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-> > ---
-> >  hw/core/machine.c | 32 +++++++++++++++++++++-----------
-> >  numa.c            | 26 --------------------------
-> >  2 files changed, 21 insertions(+), 37 deletions(-)
-> > 
-> > diff --git a/hw/core/machine.c b/hw/core/machine.c
-> > index fd6a436..2e91aa9 100644
-> > --- a/hw/core/machine.c
-> > +++ b/hw/core/machine.c
-> > @@ -700,26 +700,36 @@ static char *cpu_slot_to_string(const CPUArchId *cpu)
-> >      return g_string_free(s, false);
-> >  }
-> >  
-> > -static void machine_numa_validate(MachineState *machine)
-> > +static void machine_numa_finish_init(MachineState *machine)
-> >  {
-> > -    int i;
-> > +    int i, default_mapping;  
-> 
-> I suggest bool instead of int.
-will do it in v2
+> The patterns for the following instructions are fixed:
+>  * Rotate Left Doubleword then Clear Right (rldcr[.])
+>  * Rotate Left Doubleword Immediate then Clear Right (rldicr[.])
+>  * Rotate Left Doubleword Immediate then Mask Insert (rldimi[.])
+>
+> Signed-off-by: Sandipan Das <sandipandas1990@gmail.com>
+> ---
+>  ppc64.risu | 10 +++++-----
+>  1 file changed, 5 insertions(+), 5 deletions(-)
+>
+> diff --git a/ppc64.risu b/ppc64.risu
+> index 28df9da..0f29248 100644
+> --- a/ppc64.risu
+> +++ b/ppc64.risu
+> @@ -1451,7 +1451,7 @@ RLDCLd PPC64LE 011110 rs:5 ra:5 rb:5 mb:6 10001 \
+>  !constraints { $rs != 1 && $ra != 1 && $rb != 1 && $rs != 13 && $ra != 13 && $rb != 13; }
+>
+>  # format:MDS book:I page:103 PPC SR rldcr Rotate Left Dword then Clear Right
+> -RLCDR PPC64LE 011110 rs:5 ra:5 rb:5 mb:6 10010 \
+> +RLDCR PPC64LE 011110 rs:5 ra:5 rb:5 mb:6 10010 \
+>  !constraints { $rs != 1 && $ra != 1 && $rb != 1 && $rs != 13 && $ra != 13 && $rb != 13; }
+>  # format:MDS book:I page:103 PPC SR rldcr Rotate Left Dword then Clear Right
+>  RLDCRd PPC64LE 011110 rs:5 ra:5 rb:5 mb:6 10011 \
+> @@ -1472,17 +1472,17 @@ RLDICLd PPC64LE 011110 rs:5 ra:5 sh:5 mb:6 000 sha:1 1 \
+>  !constraints { $rs != 1 && $ra != 1 && $rs != 13 && $ra != 13; }
+>
+>  # format:MD book:I page:105 PPC SR rldicr[.] Rotate Left Dword Immediate then Clear Right
+> -RLDICR PPC64LE 011110 rs:5 ra:5 rb:5 me:6 00010 \
+> +RLDICR PPC64LE 011110 rs:5 ra:5 rb:5 me:6 001 sha:1 0 \
 
-> 
-> >      GString *s = g_string_new(NULL);
-> >      MachineClass *mc = MACHINE_GET_CLASS(machine);
-> >      const CPUArchIdList *possible_cpus = mc->possible_cpu_arch_ids(machine);
-> >  
-> >      assert(nb_numa_nodes);
-> > +    for (i = possible_cpus->len;
-> > +         i && !possible_cpus->cpus[i - 1].props.has_node_id;
-> > +         i--)
-> > +        ;;  
-> 
-> I believe the original code was more readable, and it had only 1
-> more line than this version. i.e.:
-> 
->     for (i = 0; i < possible_cpus->len; i++) {
->         if (possible_cpus->cpus[i].props.has_node_id) {
->             break;
->         }
->     }
->     default_mapping = (i == possible_cpus->len);
-ok, I'll do it this way
+   RLDICR PPC64LE 011110 rs:5 ra:5 sh:5 me:6 001 sha:1 0
 
-> 
-> > +    default_mapping = !i; /* i == 0 : no explicit mapping provided by user */
-> > +
-> >      for (i = 0; i < possible_cpus->len; i++) {
-> >          const CPUArchId *cpu_slot = &possible_cpus->cpus[i];
-> >  
-> > -        /* at this point numa mappings are initilized by CLI options
-> > -         * or with default mappings so it's sufficient to list
-> > -         * all not yet mapped CPUs here */
-> > -        /* TODO: make it hard error in future */  
-> 
-> Did we change our mind about making it a hard error in the
-> future?
-nope, error message at the end of function says that partial mapping
-is obsoleted and will be removed. I've thought that's was sufficient
-reminder for us of what needs to be removed.
-I'll move TODO to:
+Also "rb:5" be changed as "sh:5"?
 
-+            } else {
-+                /* record slots with not set mapping */
-++               /* TODO: make it hard error in future */ 
-+                char *cpu_str = cpu_slot_to_string(cpu_slot);
-+                g_string_append_printf(s, "%sCPU %d [%s]",
+>  !constraints { $rs != 1 && $ra != 1 && $rb != 1 && $rs != 13 && $ra != 13 && $rb != 13; }
+>  # format:MD book:I page:105 PPC SR rldicr[.] Rotate Left Dword Immediate then Clear Right
+> -RLDICRd PPC64LE 011110 rs:5 ra:5 rb:5 me:6 00011 \
+> +RLDICRd PPC64LE 011110 rs:5 ra:5 rb:5 me:6 001 sha:1 1 \
 
-> 
-> >          if (!cpu_slot->props.has_node_id) {
-> > -            char *cpu_str = cpu_slot_to_string(cpu_slot);
-> > -            g_string_append_printf(s, "%sCPU %d [%s]", s->len ? ", " : "", i,
-> > -                                   cpu_str);
-> > -            g_free(cpu_str);
-> > +            if (default_mapping) {
-> > +                /* fetch default mapping from board and enable it */
-> > +                CpuInstanceProperties props = cpu_slot->props;
-> > +                props.has_node_id = true;
-> > +                machine_set_cpu_numa_node(machine, &props, &error_fatal);  
-> 
-> Is a machine_set_cpu_numa_node() call really necessary here, if
-> we are already looking at cpu_slot->props directly?
-yes, it's necessary as cpu_slot comes from:
-   const CPUArchIdList *possible_cpus = mc->possible_cpu_arch_ids(machine);
-callback, which initializes machine::possible_cpus if necessary.
+   RLDICRd PPC64LE 011110 rs:5 ra:5 sh:5 me:6 001 sha:1 0
 
-So cpu_slot is readonly and I'd prefer to keep mc->possible_cpu_arch_ids()
-returning 'const' as it's used by external callers and they shouldn't
-mess with possible_cpus content by accident.
 
-usage of machine_set_cpu_numa_node() adds +2 more lines and it's
-proper/validating setter for node_id and will catch
-mistakes if we make them in the code.
-So I wouldn't use shortcuts here to save 2 lines.
+>  !constraints { $rs != 1 && $ra != 1 && $rb != 1 && $rs != 13 && $ra != 13 && $rb != 13; }
+>
+>  # format:MD book:I page:105 PPC SR rldimi[.] Rotate Left Dword Immediate then Mask Insert
+> -RLDIMI PPC64LE 011110 rs:5 ra:5 rb:5 me:6 00110 \
+> +RLDIMI PPC64LE 011110 rs:5 ra:5 rb:5 me:6 011 sha:1 0 \
 
- 
-> > +            } else {
-> > +                /* record slots with not set mapping */
-> > +                char *cpu_str = cpu_slot_to_string(cpu_slot);
-> > +                g_string_append_printf(s, "%sCPU %d [%s]",
-> > +                                       s->len ? ", " : "", i, cpu_str);
-> > +                g_free(cpu_str);
-> > +            }
-> >          }  
-> 
-> What about doing this instead:
-> 
->         if (default_mapping) {
->             /*
->              * Default mapping was already set by board at
->              * cpu_slot->props.node_id, just enable it
->              */
->             cpu_slot->props.has_node_id = true;
->         } else if (!cpu_slot->props.has_node_id) {
->             char *cpu_str = cpu_slot_to_string(cpu_slot);
->             g_string_append_printf(s, "%sCPU %d [%s]", s->len ? ", " : "", i,
->                                    cpu_str);
->             g_free(cpu_str);
->         }
+   RLDIMI PPC64LE 011110 rs:5 ra:5 sh:5 me:6 011 sha:1 0
+
+
+>  !constraints { $rs != 1 && $ra != 1 && $rb != 1 && $rs != 13 && $ra != 13 && $rb != 13; }
+>  # format:MD book:I page:105 PPC SR rldimi[.] Rotate Left Dword Immediate then Mask Insert
+> -RLDIMId PPC64LE 011110 rs:5 ra:5 rb:5 me:6 00111 \
+> +RLDIMId PPC64LE 011110 rs:5 ra:5 rb:5 me:6 011 sha:1 1 \
+
+   RLDIMId PPC64LE 011110 rs:5 ra:5 sh:5 me:6 011 sha:1 1
+
+>  !constraints { $rs != 1 && $ra != 1 && $rb != 1 && $rs != 13 && $ra != 13 && $rb != 13; }
+>
+>  # format:M book:I page:102 v:P1 SR rlwimi[.] Rotate Left Word Immediate then Mask Insert
+> -- 
+> 2.7.4
+
+Regards,
+Nikunj
