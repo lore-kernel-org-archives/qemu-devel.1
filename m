@@ -1,28 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49564)
-	by lists.gnu.org with esmtp (Exim 4.71) (envelope-from <n54@gmx.com>)
-	id 1dCqbM-0006Ix-W7
-	for qemu-devel@nongnu.org; Mon, 22 May 2017 12:54:48 -0400
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50902)
+	by lists.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <berrange@redhat.com>) id 1dCqdh-0007OY-Hr
+	for qemu-devel@nongnu.org; Mon, 22 May 2017 12:57:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <n54@gmx.com>) id 1dCqbA-0006Vz-Fp
-	for qemu-devel@nongnu.org; Mon, 22 May 2017 12:54:37 -0400
-Received: from mout.gmx.net ([212.227.15.18]:61924)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <n54@gmx.com>) id 1dCqbA-0006R2-3G
-	for qemu-devel@nongnu.org; Mon, 22 May 2017 12:54:24 -0400
-References: <20170513004616.25749-1-n54@gmx.com>
-	<87a86crlg0.fsf@dusky.pond.sub.org>
-	<a5bcd9dd-feb8-8083-30de-dec8d7139c96@gmx.com>
-	<874lwd5rsx.fsf@dusky.pond.sub.org>
-From: Kamil Rytarowski <n54@gmx.com>
-Message-ID: <688e36b3-6707-c4e5-4f0c-3c7a5d0fa390@gmx.com>
-Date: Mon, 22 May 2017 18:46:01 +0200
+	(envelope-from <berrange@redhat.com>) id 1dCqdd-0007hm-MF
+	for qemu-devel@nongnu.org; Mon, 22 May 2017 12:57:01 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40028)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1dCqdd-0007ge-Cc
+	for qemu-devel@nongnu.org; Mon, 22 May 2017 12:56:57 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 1D19751F08
+	for <qemu-devel@nongnu.org>; Mon, 22 May 2017 16:56:56 +0000 (UTC)
+Date: Mon, 22 May 2017 17:56:50 +0100
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20170522165650.GG25655@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <20170519180342.19618-1-berrange@redhat.com>
+	<20170519180342.19618-6-berrange@redhat.com>
+	<b8303243-384c-88a5-b372-c6e3e429e628@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <874lwd5rsx.fsf@dusky.pond.sub.org>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="vNcvOfTaf8RTckg4VNXrAtohhLxMVVL7o"
-Subject: Re: [Qemu-devel] [PATCH] ivshmem-server: Detect and use if there is
- required -lrt linking
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <b8303243-384c-88a5-b372-c6e3e429e628@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 5/5] tests: add functional test
+ validating ipv4/ipv6 address flag handling
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,207 +36,194 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: peter.maydell@linaro.org, qemu-devel@nongnu.org
+To: Eric Blake <eblake@redhat.com>
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---vNcvOfTaf8RTckg4VNXrAtohhLxMVVL7o
-From: Kamil Rytarowski <n54@gmx.com>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: peter.maydell@linaro.org, qemu-devel@nongnu.org
-Message-ID: <688e36b3-6707-c4e5-4f0c-3c7a5d0fa390@gmx.com>
-Subject: Re: [Qemu-devel] [PATCH] ivshmem-server: Detect and use if there is
- required -lrt linking
-References: <20170513004616.25749-1-n54@gmx.com>
- <87a86crlg0.fsf@dusky.pond.sub.org>
- <a5bcd9dd-feb8-8083-30de-dec8d7139c96@gmx.com>
- <874lwd5rsx.fsf@dusky.pond.sub.org>
-In-Reply-To: <874lwd5rsx.fsf@dusky.pond.sub.org>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: quoted-printable
+On Mon, May 22, 2017 at 11:00:26AM -0500, Eric Blake wrote:
+> On 05/19/2017 01:03 PM, Daniel P. Berrange wrote:
+> > The semantics around handling ipv4=on|off & ipv6=on|off are quite
+> > subtle to understand in combination with the various hostname addresses
+> > and backend types. Introduce a massive test matrix that launches QEMU
+> > and validates the ability to connect a client on each protocol as
+> > appropriate.
+> > 
+> > The test requires that the host has ability to bind to both :: and
+> > 0.0.0.0, on port 9000. If either protocol is not available, or if
+> > something is already listening on that port the test will skip.
+> > 
+> > Although it isn't using the QTest APIs, it expects the
+> > QTEST_QEMU_BINARY env variable to be set.
+> > 
+> > Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
+> > ---
+> >  tests/.gitignore           |   1 +
+> 
+> Nice - that often gets forgotten.
+> 
+> >  tests/Makefile.include     |   4 +
+> >  tests/test-sockets-proto.c | 855 +++++++++++++++++++++++++++++++++++++++++++++
+> >  3 files changed, 860 insertions(+)
+> >  create mode 100644 tests/test-sockets-proto.c
+> 
+> 'make check' passed for me with your patches (on a system with both IPv4
+> and IPv6 support), so:
+> 
+> Tested-by: Eric Blake <eblake@redhat.com>
+> 
+> I did not try what happens on an IPv4-only system, presumably the test
+> still behaves sanely there (where sanely may mean skipping rather than
+> completing?).
 
-On 22.05.2017 08:28, Markus Armbruster wrote:
-> Kamil Rytarowski <n54@gmx.com> writes:
->=20
->> Hello,
->>
->> Excuse me for delay, I missed this mail.
->=20
-> No problem.
->=20
->> Please see in-line.
->>
->> On 17.05.2017 09:28, Markus Armbruster wrote:
->>> Kamil Rytarowski <n54@gmx.com> writes:
->>>
->>>> ivshmem-server makes use of the POSIX shared memory object interface=
-s.
->>>> This library is provided on NetBSD in -lrt (POSIX Real-time Library)=
-=2E
->>>> Add ./configure check if there is needed -lrt linking for shm_open()=
+I've not tested either, but I've copied the IPv4/6 protocol detection
+code previously used in tests-io-channel-socket, so that should be
+safe enough.
 
->>>> and if so use it. Introduce new configure generated variable LIBS_SH=
-MLIB.
->>>>
->>>> This fixes build issue on NetBSD.
->>>>
->>>> Signed-off-by: Kamil Rytarowski <n54@gmx.com>
->>>> ---
->>>>  Makefile  |  1 +
->>>>  configure | 20 ++++++++++++++++++++
->>>>  2 files changed, 21 insertions(+)
->>>>
->>>> diff --git a/Makefile b/Makefile
->>>> index 31d41a7eae..3248cb53d7 100644
->>>> --- a/Makefile
->>>> +++ b/Makefile
->>>> @@ -473,6 +473,7 @@ ivshmem-client$(EXESUF): $(ivshmem-client-obj-y)=
- $(COMMON_LDADDS)
->>>>  	$(call LINK, $^)
->>>>  ivshmem-server$(EXESUF): $(ivshmem-server-obj-y) $(COMMON_LDADDS)
->>>>  	$(call LINK, $^)
->>>> +ivshmem-server$(EXESUF): LIBS +=3D $(LIBS_SHMLIB)
->>>> =20
->>>>  module_block.h: $(SRC_PATH)/scripts/modules/module_block.py config-=
-host.mak
->>>>  	$(call quiet-command,$(PYTHON) $< $@ \
->>>> diff --git a/configure b/configure
->>>> index 7c020c076b..50c3aee746 100755
->>>> --- a/configure
->>>> +++ b/configure
->>>> @@ -179,6 +179,7 @@ audio_pt_int=3D""
->>>>  audio_win_int=3D""
->>>>  cc_i386=3Di386-pc-linux-gnu-gcc
->>>>  libs_qga=3D""
->>>> +libs_shmlib=3D""
->>>>  debug_info=3D"yes"
->>>>  stack_protector=3D""
->>>> =20
->>>> @@ -4133,6 +4134,24 @@ elif compile_prog "" "$pthread_lib -lrt" ; th=
-en
->>>>    libs_qga=3D"$libs_qga -lrt"
->>>>  fi
->>>> =20
->>>> +##########################################
->>>> +# Do we need librt for shm_open()
->>>> +cat > $TMPC <<EOF
->>>> +#include <sys/mman.h>
->>>> +#include <sys/stat.h>
->>>> +#include <fcntl.h>
->>>> +#include <stddef.h>
->>>> +int main(void) {
->>>> +  return shm_open(NULL, O_RDWR, 0644);
->>>> +}
->>>> +EOF
->>>> +
->>>> +if compile_prog "" "" ; then
->>>> +  :
->>>> +elif compile_prog "" "-lrt" ; then
->>>> +  libs_shmlib=3D"$libs_shmlib -lrt"
->>>> +fi
->>>> +
->>>>  if test "$darwin" !=3D "yes" -a "$mingw32" !=3D "yes" -a "$solaris"=
- !=3D yes -a \
->>>>          "$aix" !=3D "yes" -a "$haiku" !=3D "yes" ; then
->>>>      libs_softmmu=3D"-lutil $libs_softmmu"
->>>> @@ -5949,6 +5968,7 @@ echo "EXESUF=3D$EXESUF" >> $config_host_mak
->>>>  echo "DSOSUF=3D$DSOSUF" >> $config_host_mak
->>>>  echo "LDFLAGS_SHARED=3D$LDFLAGS_SHARED" >> $config_host_mak
->>>>  echo "LIBS_QGA+=3D$libs_qga" >> $config_host_mak
->>>> +echo "LIBS_SHMLIB+=3D$libs_shmlib" >> $config_host_mak
->>>>  echo "TASN1_LIBS=3D$tasn1_libs" >> $config_host_mak
->>>>  echo "TASN1_CFLAGS=3D$tasn1_cflags" >> $config_host_mak
->>>>  echo "POD2MAN=3D$POD2MAN" >> $config_host_mak
->>>
->>> We already have a test for -lrt.
->>
->> Correct.
->>
->>>  It looks for timer_create() and
->>> clock_gettime().
->>
->>
->> timer_create(2) and clock_settime(2) are in libc on NetBSD.
->>
->>>  If we need -lrt,
->>
->> We need it just for shm_open(3).
->>
->>> we add it to LIBS and to LIBS_QGA.
->>> The latter because we don't use LIBS for qemu-ga:
->>>
->>>     qemu-ga$(EXESUF): LIBS =3D $(LIBS_QGA)
->>>
->>> This patch adds a second test for -lrt, to look for shm_open().  It a=
-dds
->>> -lrt to new variable LIBS_SHMLIB, which gets used only for
->>> ivshmem-server:
->>>
->>>     ivshmem-server$(EXESUF): LIBS +=3D $(LIBS_SHMLIB)
->>>
->>> Note that ivshmem-server already uses LIBS.
->>>
->>> Shouldn't we instead widen the existing test for -lrt to cover
->>> shm_open()?
->>>
->>
->> I will prepare patch in the requested way. I don't have preference.
->>
->>> Can you confirm that the existing test does not add -lrt to LIBS on
->>> NetBSD?
->>>
->>
->> config-host.mak:LIBS+=3D-lm -L/usr/pkg/lib -lgthread-2.0 -pthread
->> -Wl,-R/usr/pkg/lib -lglib-2.0 -lintl   -lz
->> config-host.mak:LIBS_QGA+=3D-lm -L/usr/pkg/lib -lgthread-2.0 -pthread
->> -Wl,-R/usr/pkg/lib -lglib-2.0 -lintl
->>
->>> tests/ivshmem-test.c also calls shm_open().  Does it work on NetBSD?
->>>
->>
->> Currently it's disabled, as it requires eventfd() (Linux API).
->=20
-> You're right.
->=20
-> So is the ivshmem device.  Hmm.  Why would anyone want ivshmem-server o=
-n
-> NetBSD?  Its purpose is connecting ivshmem-doorbell devices.  Could we
-> simply add the obvious CONFIG_IVSHMEM dependence to
-> contrib/ivshmem-*/Makefile.objs?
->=20
+> > +++ b/tests/test-sockets-proto.c
+> > @@ -0,0 +1,855 @@
+> > +/*
+> > + * QTest for IPv4/IPv6 protocol setup
+> > + *
+> > + * Copyright (c) 2017 Red Hat, Inc. and/or its affiliates
+> 
+> Interesting choice of attribution line.
 
-In general I would like to get feature parity on NetBSD, there is no
-reason to blacklist this feature for !Linux hosts. However short term
-there are higher priorities, to fix build of pristine sources
-(ivshmem-server is blocking here, not that I'm right now working on its
-correctness on the NetBSD host) and run test suite.
+Copy+paste for the win :-)  I started out copying postcopy-test.c
+but eventually deleted all the code.
 
-I wanted to avoid overlinking, that would be caused by adding -lrt.
-Adding dedicated -lrt check for shm_open(3) made sense to me, but I will
-go the requested route.
+Seems we have a few of these ususual Red Hat copyright lines
+that are probably a candidate to be cleaned up to match the
+dominate style.
+
+> > +/*
+> > + * This is the giant matrix of combinations we need to consider.
+> > + * There are 3 axes we deal with
+> > + *
+> > + * Axis 1: Protocol flags:
+> > + *
+> > + *  ipv4=unset, ipv6=unset  -> v4 & v6 clients ([1]
+> > + *  ipv4=unset, ipv6=off    -> v4 clients only
+> > + *  ipv4=unset, ipv6=on     -> v6 clients only
+> > + *  ipv4=off, ipv6=unset    -> v6 clients only
+> > + *  ipv4=off, ipv6=off      -> error - can't disable both [2]
+> > + *  ipv4=off, ipv6=on       -> v6 clients only
+> > + *  ipv4=on, ipv6=unset     -> v4 clients only
+> > + *  ipv4=on, ipv6=off       -> v4 clients only
+> > + *  ipv4=on, ipv6=on        -> v4 & v6 clients [3]
+> > + *
+> > + * Depending on the listening address, some of those combinations
+> > + * may result in errors. eg ipv4=off,ipv6=on combined with 0.0.0.0
+> > + * is nonsensical.
+> > + *
+> > + * [1] Some backends only support a single socket listener, so
+> > + *     will actually only allow v4 clients
+> > + * [2] QEMU should fail to startup in this case
+> > + * [3] If hostname is "" or "::", then we get a single listener
+> > + *     on IPv6 and thus can also accept v4 clients. For all other
+> > + *     hostnames, have same problem as [1].
+> 
+> Makes sense.
+> 
+> > + *
+> > + * Axis 2: Listening address:
+> > + *
+> > + *  ""        - resolves to 0.0.0.0 and ::, in that order
+> > + *  "0.0.0.0" - v4 clients only
+> > + *  "::"      - Mostly v6 clients only. Some scenarios should
+> > + *              permit v4 clients too.
+> 
+> Correct.
+> 
+> > + *
+> > + * Axis 3: Backend type:
+> > + *
+> > + *  Migration - restricted to a single listener. Also relies
+> > + *              on buggy inet_parse() which can't accept
+> > + *              =off/=on parameters to ipv4/ipv6 flags
+> > + *  Chardevs  - restricted to a single listener.
+> > + *  VNC       - supports multiple listeners. Also supports
+> > + *              socket ranges, so has extra set of tests
+> > + *              in the matrix
+> 
+> And explains the size of the test.  Thankfully it doesn't seem to add
+> too much noticeable additional time to 'make check'.
+
+Yeah, since we're not relying on actually running anything for
+real we have the most minimal QEMU possible with no devices
+beyond whats on the machine type, and we just need QEMU to get
+as far as accept'ing network clients before we can then kill
+it off. IOW, it'll run the mainloop for a very few iterations
+and then get killed.
+
+> 
+> > + *
+> > + */
+> > +static QSocketsData test_data[] = {
+> > +    /* Migrate with "" address */
+> > +    /* XXX all settings with =off are disabled due to inet_parse() bug */
+> > +    /* XXX multilistener bug - should be .ipv6 = 1 */
+> 
+> Nice that you've pointed out spots for further improvements, and where
+> we EXPECT the test to change once we improve the code.
+
+Yes, this is a reminder to myself of what to tackle next :-)
+
+> > +static pid_t run_qemu(const char *args)
+> > +{
+> > +    const char *pidfile = "test-sockets-proto.pid";
+> > +    char *pidstr;
+> > +    pid_t child;
+> > +    int status;
+> > +    pid_t ret;
+> > +    const char *binary = getenv("QTEST_QEMU_BINARY");
+> > +    long pid;
+> > +    if (binary == NULL) {
+> > +        g_printerr("Missing QTEST_QEMU_BINARY env variable");
+> > +    }
+> > +    g_assert(binary != NULL);
+> 
+> Should we do:
+> 
+> if (!binary) {
+>   message;
+>   exit(1);
+> }
+> 
+> instead of relying on g_assert() to do the exit?
+
+Sure.
+
+> 
+> > +    /* Now test IPv6 */
+> > +    child = run_qemu(data->args);
+> > +
+> > +    /*
+> > +     * The child should always succeed, because its the
+> > +     * same config as the succesful run we just did above
+> 
+> s/succesful/successful/
+> 
+> > +
+> > +int main(int argc, char **argv)
+> > +{
+> > +    int ret;
+> > +    gsize i;
+> > +
+> > +    if (check_protocol_support() < 0) {
+> > +        return 0; /* Skip test if we can't bind */
+> 
+> We don't have a magic number for skipped tests?  Many projects use exit
+> status 77 (rather than 0) to delineate a test that did not fail, but
+> whose skip results cannot be used as conclusive evidence of passing.  At
+> any rate, you've answered my question earlier - you do behave sanely if
+> you cannot test both IPv4 and IPv6 on a given host.
+
+I thought about using status 77, but that doesn't seem to be done in
+QEMU unit tests, so I stuck with 0.
 
 
---vNcvOfTaf8RTckg4VNXrAtohhLxMVVL7o
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-
-iQIcBAEBCAAGBQJZIxXKAAoJEEuzCOmwLnZsf0MP/2P4P9hMZEKAoqG4xlPKimAu
-0FVXBUQk+S/yDpO55iVAiBDO4c4x2RHOutWlHUUgPEIXyO0CoHJloHQcNkqfJkt3
-3cwWDTfo4y/SUsvfAeiFPtOcHkVDXQ17TzQb/x5J/tb62RBgE+oAZZ8DPI7M6zhD
-0QcQV/0BQf5G3Xdni+9VcRBxxbQpkAk8637n5zYHs6SGTbSzy0ReMHmsQ2tZZF4m
-tsqXthBKZqm8M+inSoImWv+stshNilEYpevdlE8D5TnaIk1jSalbddRujfWWgTKl
-208dv7tDmm0Ej9IPggn91pxd2xEzmYIpnP0f2K2gT69/ZpHUs4aaIx+9+W6JXt/2
-rimB0u5Ric7r8MZje9Upc6C9IdOxJTMH5CsuBNEobXKgskmpMU9L6rSUNhQp7siE
-I6mSt9KARfekwcdkVIjpG0zQaHImMelx7dpz89TrTF5XjBUbJ909K3q1T3pMBUox
-2AWVlhBFulb42TGT/neszropwsv50RJGem1YuB7NxQPl6H+8xBjHqhTBJbm9T193
-xqE79gWl27iw3LCW0ub0RiO1V6l3zN0xsgn+03XqxZsfKy24sn2gOh406DrFNpGw
-YWC8n8SNSknuxDfvERcLFvxgEZbQpk26kxvIA+j1M4cUxUredT5mGA5FZjM5nJZC
-OHeCdcvC0LwJDwvSsjmr
-=+eYe
------END PGP SIGNATURE-----
-
---vNcvOfTaf8RTckg4VNXrAtohhLxMVVL7o--
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
