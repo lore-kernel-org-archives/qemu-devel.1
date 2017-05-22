@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33136)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34124)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dCskx-0006jW-E8
-	for qemu-devel@nongnu.org; Mon, 22 May 2017 15:12:40 -0400
+	(envelope-from <eblake@redhat.com>) id 1dCsn7-00081u-9W
+	for qemu-devel@nongnu.org; Mon, 22 May 2017 15:14:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dCskt-0008VM-E0
-	for qemu-devel@nongnu.org; Mon, 22 May 2017 15:12:39 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:37162)
+	(envelope-from <eblake@redhat.com>) id 1dCsn5-0001Ce-GE
+	for qemu-devel@nongnu.org; Mon, 22 May 2017 15:14:53 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:45196)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dCskt-0008TT-3W
-	for qemu-devel@nongnu.org; Mon, 22 May 2017 15:12:35 -0400
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dCsn5-0001CP-6M
+	for qemu-devel@nongnu.org; Mon, 22 May 2017 15:14:51 -0400
 References: <1495186480-114192-1-git-send-email-anton.nefedov@virtuozzo.com>
 	<1495186480-114192-3-git-send-email-anton.nefedov@virtuozzo.com>
+	<7fbddc0e-298b-5973-8f0e-47b753ab41a8@redhat.com>
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <7fbddc0e-298b-5973-8f0e-47b753ab41a8@redhat.com>
-Date: Mon, 22 May 2017 14:12:24 -0500
+Message-ID: <903458e3-c82e-67d5-85f6-e1b67b829ec7@redhat.com>
+Date: Mon, 22 May 2017 14:14:42 -0500
 MIME-Version: 1.0
-In-Reply-To: <1495186480-114192-3-git-send-email-anton.nefedov@virtuozzo.com>
+In-Reply-To: <7fbddc0e-298b-5973-8f0e-47b753ab41a8@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="HFpNsmj3RPOPgXgdhADJXLttloAWMsnpf"
+	boundary="nG7eEBrDKswIoSiF9sEkgoE1lrs48ItQa"
 Subject: Re: [Qemu-devel] [PATCH v1 02/13] qcow2: is_zero_sectors(): return
  true if area is outside of backing file
 List-Id: <qemu-devel.nongnu.org>
@@ -33,81 +34,61 @@ To: Anton Nefedov <anton.nefedov@virtuozzo.com>, qemu-devel@nongnu.org
 Cc: kwolf@redhat.com, den@virtuozzo.com, mreitz@redhat.com
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---HFpNsmj3RPOPgXgdhADJXLttloAWMsnpf
+--nG7eEBrDKswIoSiF9sEkgoE1lrs48ItQa
 From: Eric Blake <eblake@redhat.com>
 To: Anton Nefedov <anton.nefedov@virtuozzo.com>, qemu-devel@nongnu.org
 Cc: kwolf@redhat.com, den@virtuozzo.com, mreitz@redhat.com
-Message-ID: <7fbddc0e-298b-5973-8f0e-47b753ab41a8@redhat.com>
+Message-ID: <903458e3-c82e-67d5-85f6-e1b67b829ec7@redhat.com>
 Subject: Re: [Qemu-devel] [PATCH v1 02/13] qcow2: is_zero_sectors(): return
  true if area is outside of backing file
 References: <1495186480-114192-1-git-send-email-anton.nefedov@virtuozzo.com>
  <1495186480-114192-3-git-send-email-anton.nefedov@virtuozzo.com>
-In-Reply-To: <1495186480-114192-3-git-send-email-anton.nefedov@virtuozzo.com>
+ <7fbddc0e-298b-5973-8f0e-47b753ab41a8@redhat.com>
+In-Reply-To: <7fbddc0e-298b-5973-8f0e-47b753ab41a8@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On 05/19/2017 04:34 AM, Anton Nefedov wrote:
-> in such case, bdrv_get_block_status() shall return 0, *nr =3D=3D 0
+On 05/22/2017 02:12 PM, Eric Blake wrote:
 
-Sounds better as s/shall/will/
-
+>> +++ b/block/qcow2.c
+>> @@ -2482,7 +2482,7 @@ static bool is_zero_sectors(BlockDriverState *bs=
+, int64_t start,
+>>      int64_t res;
+>> =20
+>>      if (start + count > bs->total_sectors) {
+>> -        count =3D bs->total_sectors - start;
+>> +        count =3D start < bs->total_sectors ? bs->total_sectors - sta=
+rt : 0;
+>>      }
+>> =20
+>>      if (!count) {
+>> @@ -2490,7 +2490,9 @@ static bool is_zero_sectors(BlockDriverState *bs=
+, int64_t start,
+>>      }
+>>      res =3D bdrv_get_block_status_above(bs, NULL, start, count,
+>>                                        &nr, &file);
+>> -    return res >=3D 0 && (res & BDRV_BLOCK_ZERO) && nr =3D=3D count;
+>> +    return res >=3D 0
+>> +        && (((res & BDRV_BLOCK_ZERO) && nr =3D=3D count)
+>> +            || nr =3D=3D 0);
 >=20
-> iotest 154 updated accordingly: write-zeroes tail alignment can be dete=
-cted
-> as zeroes now, so pwrite_zeroes succeeds
+> The logic makes sense to me, although the formatting is unusual (we ten=
+d
+> to split && and || with the operator at the tail of the previous line,
+> not the head of the new line).
 >=20
-> Signed-off-by: Anton Nefedov <anton.nefedov@virtuozzo.com>
-> ---
->  block/qcow2.c              | 6 ++++--
->  tests/qemu-iotests/154.out | 4 ++--
->  2 files changed, 6 insertions(+), 4 deletions(-)
->=20
+> This quick check may make me revisit whether it is worth my my RFC
+> series about adding BDRV_BLOCK_EOF for more quickly tracking reads
+> beyond EOF (my solution in that series was able to make the same change=
 
-You'll want to also patch test 154 proper to remove these two TODO commen=
-ts:
+> to test 154, but by doing it at the block layer instead of the qcow2.c
+> code).  https://lists.gnu.org/archive/html/qemu-devel/2017-05/msg01127.=
+html
 
-# TODO: Note that this forces an allocation, because we aren't yet able t=
-o
-# quickly detect that reads beyond EOF of the backing file are always zer=
-o
-
-
-> diff --git a/block/qcow2.c b/block/qcow2.c
-> index 2e6a0ec..b885dfc 100644
-> --- a/block/qcow2.c
-> +++ b/block/qcow2.c
-> @@ -2482,7 +2482,7 @@ static bool is_zero_sectors(BlockDriverState *bs,=
- int64_t start,
->      int64_t res;
-> =20
->      if (start + count > bs->total_sectors) {
-> -        count =3D bs->total_sectors - start;
-> +        count =3D start < bs->total_sectors ? bs->total_sectors - star=
-t : 0;
->      }
-> =20
->      if (!count) {
-> @@ -2490,7 +2490,9 @@ static bool is_zero_sectors(BlockDriverState *bs,=
- int64_t start,
->      }
->      res =3D bdrv_get_block_status_above(bs, NULL, start, count,
->                                        &nr, &file);
-> -    return res >=3D 0 && (res & BDRV_BLOCK_ZERO) && nr =3D=3D count;
-> +    return res >=3D 0
-> +        && (((res & BDRV_BLOCK_ZERO) && nr =3D=3D count)
-> +            || nr =3D=3D 0);
-
-The logic makes sense to me, although the formatting is unusual (we tend
-to split && and || with the operator at the tail of the previous line,
-not the head of the new line).
-
-This quick check may make me revisit whether it is worth my my RFC
-series about adding BDRV_BLOCK_EOF for more quickly tracking reads
-beyond EOF (my solution in that series was able to make the same change
-to test 154, but by doing it at the block layer instead of the qcow2.c
-code).  https://lists.gnu.org/archive/html/qemu-devel/2017-05/msg01127.ht=
-ml
-
+Actually, re-reading my RFC - I was able to change 6 instances in test
+154, while your tweak only affected 2 instances (you still left four
+instances that were allocating).  So my approach may still be more
+optimal in the long run.
 
 --=20
 Eric Blake, Principal Software Engineer
@@ -115,7 +96,7 @@ Red Hat, Inc.           +1-919-301-3266
 Virtualization:  qemu.org | libvirt.org
 
 
---HFpNsmj3RPOPgXgdhADJXLttloAWMsnpf
+--nG7eEBrDKswIoSiF9sEkgoE1lrs48ItQa
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
@@ -125,13 +106,13 @@ Version: GnuPG v2
 Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
 Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQEcBAEBCAAGBQJZIzgYAAoJEKeha0olJ0NqGiYIAIcqOMl9Lu5FVbSm4vpRtwkd
-GEWwAqLl2dZ6vfg9eHAj8B77nXQfy0dFpPl/kNlkJe6bozcTvW/KZcTLK9maCuzs
-ZeehNantQnfA6U5RWqdtcexiJbCS6bKPfIm4Q94AFcRedRAJQld15NPqMxpWNLJ1
-2GsZhytcvv3y5HhTu16RqLdbkORRolTto7fXsErTeqHhl7CWH8t17ePtQQLIV5N8
-LCFIRnJ4LdsJlZioMhPxj8LzgXUzS838Vq/3+wKZHZrsK+MxVh5087Mu6ZRogUnG
-1g3Xw61V13iQvV9JpSdbX8HuEYhtCyOC22mVZep4vUkdCCKRiVTu+oJV7saa28U=
-=DHgK
+iQEcBAEBCAAGBQJZIziiAAoJEKeha0olJ0Nqp5gIAJjo42vEVtWWeYgOxnJXFFnk
+zn8xZsb1YKCl2H80cMQP6bnydQLQxVLqfVQMjK4hrGuoqosXsx9O1Ifbybmqd8AO
+Ab7uI0bmJa6elT4W48ae91NDZtqak96ubZFhP4pMUkbY4VghQ2G4cFCl1hQhd8Xa
+YF45rtkR1Plkqu9n7mybKrdX/05wPhL6+YOx7Lp21Utcf0EX+9MN6/fClMfVY3cv
+2Z6dpda4LuRwRkgLkFEZZ58TK4H+T8YsT0Bx8HFf6UR7RAzZ+my+L4u7MZc5sDeD
+wyfk7RoP/GzIKwkh8prYgsKBLMC5aaWNuwSV3qzqv421TswGkktSRmym09L8NoI=
+=1GeZ
 -----END PGP SIGNATURE-----
 
---HFpNsmj3RPOPgXgdhADJXLttloAWMsnpf--
+--nG7eEBrDKswIoSiF9sEkgoE1lrs48ItQa--
