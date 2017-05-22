@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50666)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52826)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1dCtlz-0003Lu-Aj
-	for qemu-devel@nongnu.org; Mon, 22 May 2017 16:17:48 -0400
+	(envelope-from <eblake@redhat.com>) id 1dCtrz-0006Re-83
+	for qemu-devel@nongnu.org; Mon, 22 May 2017 16:24:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1dCtly-0006EH-7F
-	for qemu-devel@nongnu.org; Mon, 22 May 2017 16:17:47 -0400
-References: <20170522195217.12991-1-mreitz@redhat.com>
-	<20170522195217.12991-4-mreitz@redhat.com>
-	<8792c1f3-b079-2f0f-bf35-b3f3843da5c7@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <eb9f70e3-5766-60c0-8d8d-6fe76c1f170e@redhat.com>
-Date: Mon, 22 May 2017 22:17:34 +0200
+	(envelope-from <eblake@redhat.com>) id 1dCtry-0000kZ-98
+	for qemu-devel@nongnu.org; Mon, 22 May 2017 16:23:59 -0400
+References: <20170519023233.24461-1-eblake@redhat.com>
+	<20170519023233.24461-4-eblake@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <2a4b9b8f-c1eb-dc71-fe9a-426becd5065c@redhat.com>
+Date: Mon, 22 May 2017 15:23:48 -0500
 MIME-Version: 1.0
-In-Reply-To: <8792c1f3-b079-2f0f-bf35-b3f3843da5c7@redhat.com>
+In-Reply-To: <20170519023233.24461-4-eblake@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="mX0QG0Nx16kUocpR3Thi6tLJKvViE7gmc"
-Subject: Re: [Qemu-devel] [PATCH v2 3/3] iotests: Add test for colon handling
+	boundary="Ffp0LVLHJM7r59ulmOno14cnD1vgVqp1t"
+Subject: Re: [Qemu-devel] [PATCH 3/4] block: Simplify use of BDRV_BLOCK_RAW.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,99 +24,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, Jeff Cody <jcody@redhat.com>, jsnow@redhat.com, qemu-block@nongnu.org, mreitz@redhat.com
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---mX0QG0Nx16kUocpR3Thi6tLJKvViE7gmc
-From: Max Reitz <mreitz@redhat.com>
-To: Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>
-Message-ID: <eb9f70e3-5766-60c0-8d8d-6fe76c1f170e@redhat.com>
-Subject: Re: [PATCH v2 3/3] iotests: Add test for colon handling
-References: <20170522195217.12991-1-mreitz@redhat.com>
- <20170522195217.12991-4-mreitz@redhat.com>
- <8792c1f3-b079-2f0f-bf35-b3f3843da5c7@redhat.com>
-In-Reply-To: <8792c1f3-b079-2f0f-bf35-b3f3843da5c7@redhat.com>
+--Ffp0LVLHJM7r59ulmOno14cnD1vgVqp1t
+From: Eric Blake <eblake@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, Jeff Cody <jcody@redhat.com>,
+ jsnow@redhat.com, qemu-block@nongnu.org, mreitz@redhat.com
+Message-ID: <2a4b9b8f-c1eb-dc71-fe9a-426becd5065c@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 3/4] block: Simplify use of BDRV_BLOCK_RAW.
+References: <20170519023233.24461-1-eblake@redhat.com>
+ <20170519023233.24461-4-eblake@redhat.com>
+In-Reply-To: <20170519023233.24461-4-eblake@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On 2017-05-22 22:06, Eric Blake wrote:
-> On 05/22/2017 02:52 PM, Max Reitz wrote:
->> Signed-off-by: Max Reitz <mreitz@redhat.com>
->> ---
->>  tests/qemu-iotests/126     | 105 ++++++++++++++++++++++++++++++++++++=
-+++++++++
->>  tests/qemu-iotests/126.out |  23 ++++++++++
->>  tests/qemu-iotests/group   |   1 +
->>  3 files changed, 129 insertions(+)
->>  create mode 100755 tests/qemu-iotests/126
->>  create mode 100644 tests/qemu-iotests/126.out
->>
+On 05/18/2017 09:32 PM, Eric Blake wrote:
+
+Not sure why I included a trailing dot in the subject line; a maintainer
+can remove that if desired.
+
+> The lone caller that cares about a return of BDRV_BLOCK_RAW
+> completely replaces the return value, so there is no point in
+> passing BDRV_BLOCK_DATA.
+
+For that matter, I could have mentioned that the lone caller is
+io.c:bdrv_co_get_block_status().
+
 >=20
->> +# Note that we could also do the same test with BASE_IMG=3Dfile:image=
-:base.$IMGFMT
->> +# -- but behavior for that case is a bit strange. Protocol-prefixed p=
-aths are
->> +# in a sense always absolute paths, so such paths will never be combi=
-ned with
->> +# the path of the overlay. But since "image:base.$IMGFMT" is actually=
- a
->> +# relative path, it will always be evaluated relative to qemu's CWD (=
-but not
->> +# relative to the overlay!). While this is more or less intended, it =
-is still
->> +# pretty strange and thus not something that is tested here.
->> +# (The root of the issue is to use a relative path with a protocol pr=
-efix. This
->=20
-> s/to/the/
-
-Then it will also have to be s/use a/use of a/.
-
->> +#  may always give you weird results because in one sense, qemu consi=
-ders such
->> +#  paths absolute, whereas in another, they are still relative.)
->=20
-> Should we tighten qemu to forbid the use of a protocol prefix with a
-> non-absolute path?  But that can be a subsequent patch, I don't see it
-> as a reason to hold up this one.
-
-Hm. I'd rather not do this. It could be considered a bug fix (and it
-would make patch 2 obsolete, so it would definitely have a use there),
-but it would break compatibility.
-
-The whole filename handling in qemu is a mess, and that's mostly because
-users expect it to be a mess. It would be great if we didn't have to
-handle filenames at all, or at least only absolute filenames, but that
-would not be something that users like. And having little weird things
-like these in some corner cases (it's not like many people are using an
-explicit "file:" prefix anyway) is better than not supporting relative
-filenames at all...
-
-> Reviewed-by: Eric Blake <eblake@redhat.com>
-
-Thanks!
-
-Max
+> Signed-off-by: Eric Blake <eblake@redhat.com>
+> ---
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
 
 
---mX0QG0Nx16kUocpR3Thi6tLJKvViE7gmc
+--Ffp0LVLHJM7r59ulmOno14cnD1vgVqp1t
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQEvBAEBCAAZBQJZI0deEhxtcmVpdHpAcmVkaGF0LmNvbQAKCRD0B9sAYdXPQBFG
-B/9sYOFdlYWk4Qs9XfyNVxj71HVEVuBYqWBlEntZ2oBZVtQsofhLWrL6NIg4mlZO
-YQkoE6LTE+jVx+EcRn4ePr8bKGa/7GoZBbPiULlQWdHb+nB8miycbDCFTBSkXaWW
-WdP3NxQCBzqXXrPf5P9x3+mfw0c8OS9tYjXe/R/UowzZ0XXEM6aiNnbHGxmNHkYT
-G7v2YaH88uwwWOwC3b0ozSeGHy745H4wiPaFJSM+U9776xeiPYzJctS+PjBuGTWB
-bPp9XHLuiyzWvZPbzAvKVZjk2Ok6ouE2ZNu+K9rqiOKtiVJgo652hZCo8oK0M47X
-7GNsonWdpUx9drQurQdTcKqz
-=HOhG
+iQEcBAEBCAAGBQJZI0jUAAoJEKeha0olJ0Nq2pEH/A3UkfoEUVrq/XiQvb48wmqE
+EBzf9YM65qjpSOORdZYg2ZxZxfwLexcQ/ghfpSyxL8tESKrMjiViFsRZRu/kXuf8
+cWW/tuoxmDe21FShnguZ0bKvE1iUIyrIaK4MG738/7KwbmDParDkmXFImT/LZebO
+wSf+DxzEYuMiiTJP/Vn3shvl1oB0NBrWTGAuj7tCnYorGCrq5pLJvmKvzJHbSLR5
+VfYC/mQbfnuzq8cWu5x5NPaBY1yH3JmsYyHpP0ZabgGOJGzqrckKLNs/A39L74w9
+6yaHK3w0wS2xIfcCrE9ceDwpj3S8NVYms3R7XNRRp+meqBu98YntKwR8Jm1Tdkg=
+=4go1
 -----END PGP SIGNATURE-----
 
---mX0QG0Nx16kUocpR3Thi6tLJKvViE7gmc--
+--Ffp0LVLHJM7r59ulmOno14cnD1vgVqp1t--
