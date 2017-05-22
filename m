@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35976)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36238)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ali.saeedi56@gmail.com>) id 1dCmpp-0007xY-0Q
-	for qemu-devel@nongnu.org; Mon, 22 May 2017 08:53:17 -0400
+	(envelope-from <ali.saeedi56@gmail.com>) id 1dCmqs-0008UF-GU
+	for qemu-devel@nongnu.org; Mon, 22 May 2017 08:54:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ali.saeedi56@gmail.com>) id 1dCmpo-0003mz-9u
-	for qemu-devel@nongnu.org; Mon, 22 May 2017 08:53:17 -0400
-Received: from mail-qt0-x22c.google.com ([2607:f8b0:400d:c0d::22c]:36518)
+	(envelope-from <ali.saeedi56@gmail.com>) id 1dCmqr-0004Fg-RQ
+	for qemu-devel@nongnu.org; Mon, 22 May 2017 08:54:22 -0400
+Received: from mail-qt0-x22a.google.com ([2607:f8b0:400d:c0d::22a]:35437)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <ali.saeedi56@gmail.com>)
-	id 1dCmpo-0003mS-30
-	for qemu-devel@nongnu.org; Mon, 22 May 2017 08:53:16 -0400
-Received: by mail-qt0-x22c.google.com with SMTP id f55so100329610qta.3
-	for <qemu-devel@nongnu.org>; Mon, 22 May 2017 05:53:15 -0700 (PDT)
+	id 1dCmqr-0004Fb-NA
+	for qemu-devel@nongnu.org; Mon, 22 May 2017 08:54:21 -0400
+Received: by mail-qt0-x22a.google.com with SMTP id v27so100452326qtg.2
+	for <qemu-devel@nongnu.org>; Mon, 22 May 2017 05:54:21 -0700 (PDT)
 MIME-Version: 1.0
 From: ali saeedi <ali.saeedi56@gmail.com>
-Date: Mon, 22 May 2017 17:23:14 +0430
-Message-ID: <CAGKXQydv+TcBfogg_Yojh2ayjNq9PiCqHzwOnHPpMudpHMqjnw@mail.gmail.com>
+Date: Mon, 22 May 2017 17:24:20 +0430
+Message-ID: <CAGKXQyf0A+hoBdzU3BD16v1LoWNVnuf++U4d1bt1q3UZotdMSQ@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: [Qemu-devel] Offset
+Subject: [Qemu-devel] TARGET_PAGE_BITS
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,6 +29,5 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 
 Hello
-what is the difference between offset is available in 'PageSearchStatus'
-struct and offset in 'RamBlock' struct in Ram.c File?
+What is TARGET_PAGE_BITS in ram.c?
 thanks a lot
