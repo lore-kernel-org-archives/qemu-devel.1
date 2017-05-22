@@ -1,20 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37352)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37344)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <hpoussin@reactos.org>) id 1dCucp-0007eD-Lo
+	(envelope-from <hpoussin@reactos.org>) id 1dCucp-0007e6-J4
 	for qemu-devel@nongnu.org; Mon, 22 May 2017 17:12:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <hpoussin@reactos.org>) id 1dCuco-00008v-KB
+	(envelope-from <hpoussin@reactos.org>) id 1dCuco-00008i-JN
 	for qemu-devel@nongnu.org; Mon, 22 May 2017 17:12:23 -0400
 From: =?UTF-8?q?Herv=C3=A9=20Poussineau?= <hpoussin@reactos.org>
-Date: Mon, 22 May 2017 23:11:56 +0200
-Message-Id: <20170522211205.14265-5-hpoussin@reactos.org>
+Date: Mon, 22 May 2017 23:12:05 +0200
+Message-Id: <20170522211205.14265-14-hpoussin@reactos.org>
 In-Reply-To: <20170522211205.14265-1-hpoussin@reactos.org>
 References: <20170522211205.14265-1-hpoussin@reactos.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v2 04/13] vvfat: rename useless enumeration
- values
+Subject: [Qemu-devel] [PATCH v2 13/13] vvfat: change OEM name to 'MSWIN4.1'
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,44 +25,33 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org, =?UTF-8?q?Herv=C3=A9=20Poussineau?= <hpoussin@reactos.org>
 
-MODE_FAKED and MODE_RENAMED are not and were never used.
+According to specification:
+"'MSWIN4.1' is the recommanded setting, because it is the setting least l=
+ikely
+to cause compatibility problems. If you want to put something else in her=
+e,
+that is your option, but the result may be that some FAT drivers might no=
+t
+recognize the volume."
 
+Specification: "FAT: General overview of on-disk format" v1.03, page 9
 Signed-off-by: Herv=C3=A9 Poussineau <hpoussin@reactos.org>
 ---
- block/vvfat.c | 13 ++++++++-----
- 1 file changed, 8 insertions(+), 5 deletions(-)
+ block/vvfat.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/block/vvfat.c b/block/vvfat.c
-index 8b5f53ad26..6a36d4f7fa 100644
+index 53e8faa54c..1f7f46ecea 100644
 --- a/block/vvfat.c
 +++ b/block/vvfat.c
-@@ -287,8 +287,7 @@ typedef struct mapping_t {
-     union {
-         /* offset is
-          * - the offset in the file (in clusters) for a file, or
--         * - the next cluster of the directory for a directory, and
--         * - the address of the buffer for a faked entry
-+         * - the next cluster of the directory for a directory
-          */
-         struct {
-             uint32_t offset;
-@@ -301,9 +300,13 @@ typedef struct mapping_t {
-     /* path contains the full path, i.e. it always starts with s->path *=
-/
-     char* path;
-=20
--    enum { MODE_UNDEFINED =3D 0, MODE_NORMAL =3D 1, MODE_MODIFIED =3D 2,
--        MODE_DIRECTORY =3D 4, MODE_FAKED =3D 8,
--        MODE_DELETED =3D 16, MODE_RENAMED =3D 32 } mode;
-+    enum {
-+        MODE_UNDEFINED =3D 0,
-+        MODE_NORMAL =3D 1,
-+        MODE_MODIFIED =3D 2,
-+        MODE_DIRECTORY =3D 4,
-+        MODE_DELETED =3D 8,
-+    } mode;
-     int read_only;
- } mapping_t;
-=20
+@@ -1024,7 +1024,7 @@ static int init_directories(BDRVVVFATState* s,
+     bootsector->jump[0]=3D0xeb;
+     bootsector->jump[1]=3D0x3e;
+     bootsector->jump[2]=3D0x90;
+-    memcpy(bootsector->name,"QEMU    ",8);
++    memcpy(bootsector->name, "MSWIN4.1", 8);
+     bootsector->sector_size=3Dcpu_to_le16(0x200);
+     bootsector->sectors_per_cluster=3Ds->sectors_per_cluster;
+     bootsector->reserved_sectors=3Dcpu_to_le16(1);
 --=20
 2.11.0
