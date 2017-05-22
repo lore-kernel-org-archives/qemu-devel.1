@@ -1,32 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39880)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41046)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dCrY2-0003mN-TJ
-	for qemu-devel@nongnu.org; Mon, 22 May 2017 13:55:19 -0400
+	(envelope-from <ianloic@google.com>) id 1dCrfR-0005E0-42
+	for qemu-devel@nongnu.org; Mon, 22 May 2017 14:02:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dCrXy-0004XH-UE
-	for qemu-devel@nongnu.org; Mon, 22 May 2017 13:55:14 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:59884)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dCrXy-0004Wl-Lk
-	for qemu-devel@nongnu.org; Mon, 22 May 2017 13:55:10 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 3B6AC155E4
-	for <qemu-devel@nongnu.org>; Mon, 22 May 2017 17:55:09 +0000 (UTC)
-References: <1495471335-23707-1-git-send-email-armbru@redhat.com>
-	<1495471335-23707-4-git-send-email-armbru@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <02f35a78-5004-9023-1e7d-3add147f0450@redhat.com>
-Date: Mon, 22 May 2017 12:55:07 -0500
-MIME-Version: 1.0
-In-Reply-To: <1495471335-23707-4-git-send-email-armbru@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="agi2dbRaV2RrSERKVv3mwS69n6vOu27uq"
-Subject: Re: [Qemu-devel] [PATCH 3/4] tests/qapi-schema: Avoid 'str' in
- alternate test cases
+	(envelope-from <ianloic@google.com>) id 1dCrfN-0006tk-49
+	for qemu-devel@nongnu.org; Mon, 22 May 2017 14:02:53 -0400
+Received: from mail-pf0-x233.google.com ([2607:f8b0:400e:c00::233]:32776)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <ianloic@google.com>) id 1dCrfM-0006tg-T5
+	for qemu-devel@nongnu.org; Mon, 22 May 2017 14:02:49 -0400
+Received: by mail-pf0-x233.google.com with SMTP id e193so89455777pfh.0
+	for <qemu-devel@nongnu.org>; Mon, 22 May 2017 11:02:48 -0700 (PDT)
+From: Ian McKellar <ianloic@google.com>
+Date: Mon, 22 May 2017 11:02:17 -0700
+Message-Id: <20170522180217.18234-1-ianloic@google.com>
+Subject: [Qemu-devel] [PATCH 1/1] Improve Cocoa modifier key handling
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,57 +23,112 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-Cc: mlureau@redhat.com
+To: qemu-devel@nongnu.org
+Cc: Ian McKellar <ianloic@google.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---agi2dbRaV2RrSERKVv3mwS69n6vOu27uq
-From: Eric Blake <eblake@redhat.com>
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-Cc: mlureau@redhat.com
-Message-ID: <02f35a78-5004-9023-1e7d-3add147f0450@redhat.com>
-Subject: Re: [PATCH 3/4] tests/qapi-schema: Avoid 'str' in alternate test
- cases
-References: <1495471335-23707-1-git-send-email-armbru@redhat.com>
- <1495471335-23707-4-git-send-email-armbru@redhat.com>
-In-Reply-To: <1495471335-23707-4-git-send-email-armbru@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+I had two problems with QEMU on macOS:
+ 1) Sometimes when alt-tabbing to QEMU it would act as if the 'a' key
+    was pressed so I'd get 'aaaaaaaaa....'.
+ 2) Using Sikuli to programatically send keys to the QEMU window text
+    like "foo_bar" would come out as "fooa-bar".
 
-On 05/22/2017 11:42 AM, Markus Armbruster wrote:
-> The next commit is going to make alternate members of type 'str'
-> conflict with other scalar types.  Would break a few test cases that
-> don't actually require 'str'.  Flip them from 'str' to 'bool' or
-> 'EnumOne'.
->=20
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
-> ---
+They looked similar and after much digging the problem turned out to be
+the same. When QEMU's ui/cocoa.m received an NSFlagsChanged NSEvent it
+looked at the keyCode to determine what modifier key changed. This
+usually works fine but sometimes the keyCode is 0 and the app should
+instead be looking at the modifierFlags bitmask. Key code 0 is the 'a'
+key.
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
+I added code that handles keyCode == 0 differently. It checks the
+modifierFlags and if they differ from QEMU's idea of which modifier
+keys are currently pressed it toggles those changed keys.
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+This fixes my problems and seems work fine.
 
+Signed-off-by: Ian McKellar <ianloic@google.com>
+---
+ ui/cocoa.m | 48 ++++++++++++++++++++++++++++++++++++++++--------
+ 1 file changed, 40 insertions(+), 8 deletions(-)
 
---agi2dbRaV2RrSERKVv3mwS69n6vOu27uq
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEcBAEBCAAGBQJZIyX7AAoJEKeha0olJ0Nq+ncH/iLc1Tz0Xy7UiVARuDgmBbM9
-9JGZ1ulI649xPCX7Bhw8YdK+a1ZRtjsbJbArhOtQvc/d+0IV1qN1pNE6r937/R8j
-Oop9Sn8T5mMCqoZJjeVAKXxnCALRTivYUy2/kqd23VYMwMUai99hYJLbKDaJF1al
-JY+YT5w/DnEYioS6KP1p3wtPjCIltMegK7RPuY8nAziPInBlktIafiSCN3On8COD
-hhytcAR1Mc9/LelK2Q5H8T6g4cV9cDxx+1Zuu+ZXMddZxUxeRl6PjkeFfFG9vjCI
-g8zlhd3kZU9P7EoPW9ByyVqoXLdSxbMb57XJyikeIsf79qF3mjODddTyEdn/erg=
-=8GJQ
------END PGP SIGNATURE-----
-
---agi2dbRaV2RrSERKVv3mwS69n6vOu27uq--
+diff --git a/ui/cocoa.m b/ui/cocoa.m
+index 207555edf7..e645befa13 100644
+--- a/ui/cocoa.m
++++ b/ui/cocoa.m
+@@ -52,6 +52,8 @@
+ /* macOS 10.12 deprecated many constants, #define the new names for older SDKs */
+ #if MAC_OS_X_VERSION_MAX_ALLOWED < MAC_OS_X_VERSION_10_12
+ #define NSEventMaskAny                  NSAnyEventMask
++#define NSEventModifierFlagCapsLock     NSAlphaShiftKeyMask
++#define NSEventModifierFlagShift        NSShiftKeyMask
+ #define NSEventModifierFlagCommand      NSCommandKeyMask
+ #define NSEventModifierFlagControl      NSControlKeyMask
+ #define NSEventModifierFlagOption       NSAlternateKeyMask
+@@ -536,6 +538,16 @@ QemuCocoaView *cocoaView;
+     }
+ }
+ 
++- (void) toggleModifier: (int)keycode {
++    if (modifiers_state[keycode] == 0) { // keydown
++        qemu_input_event_send_key_qcode(dcl->con, keycode, true);
++        modifiers_state[keycode] = 1;
++    } else { // keyup
++        qemu_input_event_send_key_qcode(dcl->con, keycode, false);
++        modifiers_state[keycode] = 0;
++    }
++}
++
+ - (void) handleEvent:(NSEvent *)event
+ {
+     COCOA_DEBUG("QemuCocoaView: handleEvent\n");
+@@ -547,7 +559,33 @@ QemuCocoaView *cocoaView;
+ 
+     switch ([event type]) {
+         case NSEventTypeFlagsChanged:
+-            keycode = cocoa_keycode_to_qemu([event keyCode]);
++            if ([event keyCode] == 0) {
++                // When the Cocoa keyCode is zero that means keys should be
++                // synthesized based on the values in in the eventModifiers
++                // bitmask.
++
++                if (qemu_console_is_graphic(NULL)) {
++                    NSEventModifierFlags modifiers = [event modifierFlags];
++
++                    if (!!(modifiers & NSEventModifierFlagCapsLock) != !!modifiers_state[Q_KEY_CODE_CAPS_LOCK]) {
++                        [self toggleModifier:Q_KEY_CODE_CAPS_LOCK];
++                    }
++                    if (!!(modifiers & NSEventModifierFlagShift) != !!modifiers_state[Q_KEY_CODE_SHIFT]) {
++                        [self toggleModifier:Q_KEY_CODE_SHIFT];
++                    }
++                    if (!!(modifiers & NSEventModifierFlagControl) != !!modifiers_state[Q_KEY_CODE_CTRL]) {
++                        [self toggleModifier:Q_KEY_CODE_CTRL];
++                    }
++                    if (!!(modifiers & NSEventModifierFlagOption) != !!modifiers_state[Q_KEY_CODE_ALT]) {
++                        [self toggleModifier:Q_KEY_CODE_ALT];
++                    }
++                    if (!!(modifiers & NSEventModifierFlagCommand) != !!modifiers_state[Q_KEY_CODE_META_L]) {
++                        [self toggleModifier:Q_KEY_CODE_META_L];
++                    }
++                }
++            } else {
++                keycode = cocoa_keycode_to_qemu([event keyCode]);
++            }
+ 
+             if ((keycode == Q_KEY_CODE_META_L || keycode == Q_KEY_CODE_META_R)
+                && !isMouseGrabbed) {
+@@ -562,13 +600,7 @@ QemuCocoaView *cocoaView;
+                     qemu_input_event_send_key_qcode(dcl->con, keycode, true);
+                     qemu_input_event_send_key_qcode(dcl->con, keycode, false);
+                 } else if (qemu_console_is_graphic(NULL)) {
+-                    if (modifiers_state[keycode] == 0) { // keydown
+-                        qemu_input_event_send_key_qcode(dcl->con, keycode, true);
+-                        modifiers_state[keycode] = 1;
+-                    } else { // keyup
+-                        qemu_input_event_send_key_qcode(dcl->con, keycode, false);
+-                        modifiers_state[keycode] = 0;
+-                    }
++                  [self toggleModifier:keycode];
+                 }
+             }
+ 
+-- 
+2.11.0.390.gc69c2f50cf-goog
