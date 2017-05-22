@@ -1,26 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48217)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49372)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1dClqn-000095-Tv
-	for qemu-devel@nongnu.org; Mon, 22 May 2017 07:50:14 -0400
+	(envelope-from <den@virtuozzo.com>) id 1dClxV-0001z3-EF
+	for qemu-devel@nongnu.org; Mon, 22 May 2017 07:57:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1dClqk-000700-TB
-	for qemu-devel@nongnu.org; Mon, 22 May 2017 07:50:13 -0400
-Received: from mga02.intel.com ([134.134.136.20]:32819)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <wei.w.wang@intel.com>)
-	id 1dClqk-0006zM-Jt
-	for qemu-devel@nongnu.org; Mon, 22 May 2017 07:50:10 -0400
-Message-ID: <5922D0EC.6060405@intel.com>
-Date: Mon, 22 May 2017 19:52:12 +0800
-From: Wei Wang <wei.w.wang@intel.com>
+	(envelope-from <den@virtuozzo.com>) id 1dClxS-0000FT-CG
+	for qemu-devel@nongnu.org; Mon, 22 May 2017 07:57:09 -0400
+References: <1495376506-13227-1-git-send-email-den@openvz.org>
+	<705cdc34-b45d-5f56-3fb2-f8a67c4d2b9f@redhat.com>
+From: "Denis V. Lunev" <den@openvz.org>
+Message-ID: <8d854387-01fc-1f36-7452-7e9cc3cdbcc2@openvz.org>
+Date: Mon, 22 May 2017 14:56:55 +0300
 MIME-Version: 1.0
-References: <1495161139-28757-1-git-send-email-wei.w.wang@intel.com>
-	<20170519233750-mutt-send-email-mst@kernel.org>
-In-Reply-To: <20170519233750-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [virtio-dev] Re: [PATCH RFC] virtio-net: enable
- configurable tx queue size
+In-Reply-To: <705cdc34-b45d-5f56-3fb2-f8a67c4d2b9f@redhat.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Content-Language: en-US
+Subject: Re: [Qemu-devel] [PATCH 1/1] qcow2: handle cluster leak happening
+ with a guest TRIM command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,30 +25,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: jasowang@redhat.com, stefanha@gmail.com, marcandre.lureau@gmail.com, "pbonzini"@redhat.com, jan.scheurich@ericsson.com, virtio-dev@lists.oasis-open.org, qemu-devel@nongnu.org
+To: Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
 
-On 05/20/2017 04:42 AM, Michael S. Tsirkin wrote:
-> On Fri, May 19, 2017 at 10:32:19AM +0800, Wei Wang wrote:
->> This patch enables the virtio-net tx queue size to be configurable
->> between 256 (the default queue size) and 1024 by the user. The queue
->> size specified by the user should be power of 2.
+On 05/22/2017 02:37 PM, Eric Blake wrote:
+> On 05/21/2017 09:21 AM, Denis V. Lunev wrote:
+>>   qemu-img create -f qcow2 1.img 64G
+>>   qemu-io -c "write -P 0x32 0 64k" 1.img
+>> results in
+>>   324 -rw-r--r-- 1 den den 393216 May 21 16:48 1.img
+>> Subsequent
+>>   qemu-io -c "write -z 0 64k" 1.img
+>>   qemu-io -c "write -P 0x32 0 64k" 1.img
+>> results in
+>>   388 -rw-r--r-- 1 den den 458752 May 21 16:50 1.img
+>> which looks like we have 1 cluster leaked.
 >>
->> Setting the tx queue size to be 1024 requires the guest driver to
->> support the VIRTIO_NET_F_MAX_CHAIN_SIZE feature.
-> This should be a generic ring feature, not one specific to virtio net.
-OK. How about making two more changes below:
+>> Indeed, qcow2_co_pwrite_zeroes calls qcow2_zero_clusters/zero_single_l=
+2,
+>> which does not update refcount for the host cluster and keep the offse=
+t
+>> as used. Later on handle_copied() does not take into account
+>> QCOW2_CLUSTER_ZERO type of the cluster.
+> NACK.  We've already fixed this upstream, at commit 564a6b693.
+My bad. I am updating sources too infrequently :(
 
-1) make the default tx queue size = 1024 (instead of 256).
-We can reduce the size (to 256) if the MAX_CHAIN_SIZE feature
-is not supported by the guest.
-In this way, people who apply the QEMU patch can directly use the
-largest queue size(1024) without adding the booting command line.
+> $ ./qemu-img create -f qcow2 1.img 64g
+> Formatting '1.img', fmt=3Dqcow2 size=3D68719476736 encryption=3Doff
+> cluster_size=3D65536 lazy_refcounts=3Doff refcount_bits=3D16
+> $ ./qemu-io -c 'w -P 0x32 0 64k' 1.img
+> wrote 65536/65536 bytes at offset 0
+> 64 KiB, 1 ops; 0.0410 sec (1.524 MiB/sec and 24.3902 ops/sec)
+> $ ls -l 1.img
+> -rw-r--r--. 1 eblake eblake 393216 May 22 06:35 1.img
+> $ ./qemu-io -c 'w -z 0 64k' 1.img
+> wrote 65536/65536 bytes at offset 0
+> 64 KiB, 1 ops; 0.0055 sec (11.345 MiB/sec and 181.5211 ops/sec)
+> $ ./qemu-io -c 'w -P 0x32 0 64k' 1.img
+> wrote 65536/65536 bytes at offset 0
+> 64 KiB, 1 ops; 0.0160 sec (3.903 MiB/sec and 62.4415 ops/sec)
+> $ ls -l 1.img
+> -rw-r--r--. 1 eblake eblake 393216 May 22 06:35 1.img
+>
+>
+> As it is, your patch doesn't apply to master.  And even if it did, your=
 
-2) The vhost backend does not use writev, so I think when the vhost
-backed is used, using 1024 queue size should not depend on the
-MAX_CHAIN_SIZE feature.
+> patch breaks semantics - we CANNOT discard clusters that must read back=
 
+> as zeroes.
+>
+Can you pls give some details why the cluster can not be
+discarded? This is something that I can not understand.
 
-Best,
-Wei
+At my opinion the cluster is clearly marked with QCOW_OFLAG_ZERO
+and thus will be read with zeroes regardless of the content of the
+cluster which is pointed by the offset. This is actually what
+happens on the FS without PUNCH_HOLE support.
+
+That is why this offset can be actually reused for any other
+block, what is I am trying to propose.
+
+Den
