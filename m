@@ -1,20 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43302)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44641)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sameeh@daynix.com>) id 1dClUQ-00011x-Qq
-	for qemu-devel@nongnu.org; Mon, 22 May 2017 07:27:08 -0400
+	(envelope-from <bounces@canonical.com>) id 1dClcn-00035S-MX
+	for qemu-devel@nongnu.org; Mon, 22 May 2017 07:35:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sameeh@daynix.com>) id 1dClUN-0008BP-Kp
-	for qemu-devel@nongnu.org; Mon, 22 May 2017 07:27:06 -0400
-Received: from mail-wm0-x243.google.com ([2a00:1450:400c:c09::243]:34027)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <sameeh@daynix.com>) id 1dClUN-0008BK-EE
-	for qemu-devel@nongnu.org; Mon, 22 May 2017 07:27:03 -0400
-Received: by mail-wm0-x243.google.com with SMTP id d127so32609179wmf.1
-	for <qemu-devel@nongnu.org>; Mon, 22 May 2017 04:27:03 -0700 (PDT)
-From: Sameeh Jubran <sameeh@daynix.com>
-Date: Mon, 22 May 2017 14:26:22 +0300
-Message-Id: <1495452382-19840-1-git-send-email-sameeh@daynix.com>
-Subject: [Qemu-devel] [PATCH v2] e1000e: Fix ICR "Other" causes clear logic
+	(envelope-from <bounces@canonical.com>) id 1dClck-0002FF-IO
+	for qemu-devel@nongnu.org; Mon, 22 May 2017 07:35:45 -0400
+Received: from indium.canonical.com ([91.189.90.7]:34383)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1dClck-0002F5-9P
+	for qemu-devel@nongnu.org; Mon, 22 May 2017 07:35:42 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1dClcj-0000Oe-7W
+	for <qemu-devel@nongnu.org>; Mon, 22 May 2017 11:35:41 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 2AECD2E8075
+	for <qemu-devel@nongnu.org>; Mon, 22 May 2017 11:35:41 +0000 (UTC)
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 22 May 2017 11:17:00 -0000
+From: John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>
+Reply-To: Bug 1527765 <1527765@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20151218220640.25998.28926.malonedeb@soybean.canonical.com>
+Message-Id: <149545181996.6496.6895309386081423077.malone@chaenomeles.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1527765] Re: sh4: ghc randomly segfaults on
+ qemu-sh4-static
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,86 +37,138 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, Jason Wang <jasowang@redhat.com>, Dmitry Fleytman <dmitry@daynix.com>
-Cc: Yan Vugenfirer <yan@daynix.com>
+To: qemu-devel@nongnu.org
 
-This commit fixes a bug which causes the guest to hang. The bug was observed upon a
-"receive overrun" (bit #6 of the ICR register) interrupt which could be triggered post
-migration in a heavy traffic environment. Even though the "receive overrun" bit (#6)
-is masked out by the IMS register (refer to the log below) the driver still receives
-an interrupt as the "receive overrun" bit (#6) causes the "Other" - bit #24 of the
-ICR register - bit to be set as documented below. The driver handles the interrupt
-and clears the "Other" bit (#24) but doesn't clear the "receive overrun" bit (#6)
-which leads to an infinite loop. Apparently the Windows driver expects that the
-"receive overrun" bit and other ones - documented below - to be cleared when the
-"Other" bit (#24) is cleared.
+Just tested with the latest git snapshot of qemu, still no improvement:
 
-So to sum that up:
-1. Bit #6 of the ICR register is set by heavy traffic
-2. As a results of setting bit #6, bit #24 is set
-3. The driver receives an interrupt for bit 24 (it doesn't receieve an interrupt for bit #6 as it is masked out by IMS)
-4. The driver handles and clears the interrupt of bit #24
-5. Bit #6 is still set.
-6. 2 happens all over again
+...
+checking for gfind... no
+checking for find... /usr/bin/find
+checking for sort... /usr/bin/sort
+checking for GHC Git commit id... given 4986837f8168cacf95c24fecc84d7b36c47=
+f3c11
+checking version of ghc... 8.0.1
+ghc: pthread_mutex_lock.c:81: __pthread_mutex_lock: Assertion `mutex->__dat=
+a.__owner =3D=3D 0' failed.
+qemu: uncaught target signal 6 (Aborted) - core dumped
+ghc: pthread_mutex_lock.c:81: __pthread_mutex_lock: Assertion `mutex->__dat=
+a.__owner =3D=3D 0' failed.
+qemu: uncaught target signal 6 (Aborted) - core dumped
+ghc: pthread_mutex_lock.c:81: __pthread_mutex_lock: Assertion `mutex->__dat=
+a.__owner =3D=3D 0' failed.
+qemu: uncaught target signal 6 (Aborted) - core dumped
+Bootstrapping GHC is a cross compiler. This probably isn't going to work
+checking build system type... sh4-unknown-linux-gnu
+checking host system type... sh4-unknown-linux-gnu
+checking target system type... sh4-unknown-linux-gnu
+Build platform inferred as: sh4-unknown-linux
+Host platform inferred as: sh4-unknown-linux
+Target platform inferred as: sh4-unknown-linux
+GHC build  : sh4-unknown-linux
+GHC host   : sh4-unknown-linux
+GHC target : sh4-unknown-linux
+configure: Building in-tree ghc-pwd
+(hangs here)
 
-The Interrupt Cause Read - ICR register:
+-- =
 
-The ICR has the "Other" bit - bit #24 - that is set when one or more of the following
-ICR register's bits are set:
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1527765
 
-LSC - bit #2, RXO - bit #6, MDAC - bit #9, SRPD - bit #16, ACK - bit #17, MNG - bit #18
+Title:
+  sh4: ghc randomly segfaults on qemu-sh4-static
 
-This bug can occur with any of these bits depending on the driver's behaviour and
-the way it configures the device. However, trying to reproduce it with any bit other
-than RX0 is challenging and came to failure as the drivers don't implement most of
-these bits, trying to reproduce it with LSC (Link Status Change - bit #2) bit didn't
-succeed too as it seems that Windows handles this bit differently.
+Status in QEMU:
+  New
 
-Log sample of the storm:
+Bug description:
+  Hello!
 
-27563@1494850819.411877:e1000e_irq_pending_interrupts ICR PENDING: 0x1000000 (ICR: 0x815000c2, IMS: 0x1a00004)
-27563@1494850819.411900:e1000e_irq_pending_interrupts ICR PENDING: 0x0 (ICR: 0x815000c2, IMS: 0xa00004)
-27563@1494850819.411915:e1000e_irq_pending_interrupts ICR PENDING: 0x0 (ICR: 0x815000c2, IMS: 0xa00004)
-27563@1494850819.412380:e1000e_irq_pending_interrupts ICR PENDING: 0x0 (ICR: 0x815000c2, IMS: 0xa00004)
-27563@1494850819.412395:e1000e_irq_pending_interrupts ICR PENDING: 0x0 (ICR: 0x815000c2, IMS: 0xa00004)
-27563@1494850819.412436:e1000e_irq_pending_interrupts ICR PENDING: 0x0 (ICR: 0x815000c2, IMS: 0xa00004)
-27563@1494850819.412441:e1000e_irq_pending_interrupts ICR PENDING: 0x0 (ICR: 0x815000c2, IMS: 0xa00004)
-27563@1494850819.412998:e1000e_irq_pending_interrupts ICR PENDING: 0x1000000 (ICR: 0x815000c2, IMS: 0x1a00004)
+  I am currently in the process of bootstrapping ghc for the Debian sh4
+  port and ran into a strange problem with qemu-sh4-static which
+  randomly segfaults when running ghc to compile a Haskell source:
 
-* This bug behaviour wasn't observed with the Linux driver.
+  root@jessie32:~/ghc-7.8.4/utils/ghc-pwd# ls
+  Main.hi  Main.hs  Setup.hs  ghc-pwd.cabal  ghc.mk
+  root@jessie32:~/ghc-7.8.4/utils/ghc-pwd# ghc Main.hs
+  /bin/bash: warning: setlocale: LC_ALL: cannot change locale (en_US.UTF-8)
+  qemu: uncaught target signal 11 (Segmentation fault) - core dumped
+  Segmentation fault
+  root@jessie32:~/ghc-7.8.4/utils/ghc-pwd# ghc Main.hs
+  /bin/bash: warning: setlocale: LC_ALL: cannot change locale (en_US.UTF-8)
+  qemu: uncaught target signal 11 (Segmentation fault) - core dumped
+  Segmentation fault
+  root@jessie32:~/ghc-7.8.4/utils/ghc-pwd# ghc Main.hs
+  /bin/bash: warning: setlocale: LC_ALL: cannot change locale (en_US.UTF-8)
+  qemu: uncaught target signal 11 (Segmentation fault) - core dumped
+  Segmentation fault
+  root@jessie32:~/ghc-7.8.4/utils/ghc-pwd# ghc Main.hs
+  /bin/bash: warning: setlocale: LC_ALL: cannot change locale (en_US.UTF-8)
+  qemu: uncaught target signal 11 (Segmentation fault) - core dumped
+  Segmentation fault
+  root@jessie32:~/ghc-7.8.4/utils/ghc-pwd# ghc Main.hs
+  /bin/bash: warning: setlocale: LC_ALL: cannot change locale (en_US.UTF-8)
+  [1 of 1] Compiling Main             ( Main.hs, Main.o )
+  qemu: uncaught target signal 11 (Segmentation fault) - core dumped
+  Segmentation fault
+  root@jessie32:~/ghc-7.8.4/utils/ghc-pwd# ghc Main.hs
+  /bin/bash: warning: setlocale: LC_ALL: cannot change locale (en_US.UTF-8)
+  [1 of 1] Compiling Main             ( Main.hs, Main.o )
+  qemu: uncaught target signal 11 (Segmentation fault) - core dumped
+  Segmentation fault
+  root@jessie32:~/ghc-7.8.4/utils/ghc-pwd# ghc Main.hs
+  /bin/bash: warning: setlocale: LC_ALL: cannot change locale (en_US.UTF-8)
+  [1 of 1] Compiling Main             ( Main.hs, Main.o )
+  Bad interface file: /usr/local/lib/sh4-unknown-linux-gnu-ghc-7.10.3/time/=
+dist-install/build/Data/Time/Format/Parse.hi
+  =C2=A0=C2=A0=C2=A0=C2=A0ghc: panic! (the 'impossible' happened)
+  =C2=A0=C2=A0(GHC version 7.10.3 for sh4-unknown-linux):
+  =C2=A0getSymtabName:unknown known-key unique
+  <<details unavailable>>
 
-This commit solves:
-https://bugzilla.redhat.com/show_bug.cgi?id=1447935
-https://bugzilla.redhat.com/show_bug.cgi?id=1449490
+  Please report this as a GHC bug:
+  http://www.haskell.org/ghc/reportabug
 
-Signed-off-by: Sameeh Jubran <sjubran@redhat.com>
----
- hw/net/e1000e_core.c | 7 +++++--
- 1 file changed, 5 insertions(+), 2 deletions(-)
+  root@jessie32:~/ghc-7.8.4/utils/ghc-pwd# ghc Main.hs
+  /bin/bash: warning: setlocale: LC_ALL: cannot change locale (en_US.UTF-8)
+  [1 of 1] Compiling Main             ( Main.hs, Main.o )
+  Linking Main ...
+  root@jessie32:~/ghc-7.8.4/utils/ghc-pwd#
 
-diff --git a/hw/net/e1000e_core.c b/hw/net/e1000e_core.c
-index 28c5be1..8174b53 100644
---- a/hw/net/e1000e_core.c
-+++ b/hw/net/e1000e_core.c
-@@ -2454,14 +2454,17 @@ e1000e_set_ics(E1000ECore *core, int index, uint32_t val)
- static void
- e1000e_set_icr(E1000ECore *core, int index, uint32_t val)
- {
-+    uint32_t icr = 0;
-     if ((core->mac[ICR] & E1000_ICR_ASSERTED) &&
-         (core->mac[CTRL_EXT] & E1000_CTRL_EXT_IAME)) {
-         trace_e1000e_irq_icr_process_iame();
-         e1000e_clear_ims_bits(core, core->mac[IAM]);
-     }
- 
--    trace_e1000e_irq_icr_write(val, core->mac[ICR], core->mac[ICR] & ~val);
--    core->mac[ICR] &= ~val;
-+    icr = core->mac[ICR] & ~val;
-+    icr = (val & E1000_ICR_OTHER) ? (icr & ~E1000_ICR_OTHER_CAUSES) : icr;
-+    trace_e1000e_irq_icr_write(val, core->mac[ICR], icr);
-+    core->mac[ICR] = icr;
-     e1000e_update_interrupt_state(core);
- }
- 
--- 
-2.8.1.185.gdc0db2c
+  As seen above, compiling a Haskell source code often results in a
+  segfault but simply by retrying to run ghc over and over again, the
+  compile process will eventually succeed and no segfault occurs.
+
+  I have created a tarball which contains the sh4 chroot from the
+  example above which also includes ghc, gcc and the source code in
+  question (in /root/ghc-7.8.4/utils/ghc-pwd). To test, it's probably a
+  good idea to replace the qemu-sh4-static binary in /usr/bin with a
+  current git snapshot (which I tried but didn't help).
+
+  > http://users.physik.fu-berlin.de/~glaubitz/sid-sh4-sbuild-ghc.tgz
+
+  In case anyone wants to try ghc with their own sh4 chroot, here's my
+  version of ghc:
+
+  > https://people.debian.org/~glaubitz/sh4-unknown-linux-gnu-
+  ghc-7.10.3.tar.gz
+
+  Just extract this tarball into the root directory of the sh4 chroot.
+
+  Please note, that it might be advisable on sh4 to apply the patches
+  from these two bug reports as otherwise qemu-sh4-static won't work
+  properly on amd64 and misses syscall 186:
+
+  > https://bugs.launchpad.net/ubuntu/+source/qemu-linaro/+bug/1254824
+  > https://bugs.launchpad.net/qemu/+bug/1516408
+
+  The above issue is reproducible with the two patches applied and
+  without. It's also reproducible with both libc6 2.19 and 2.21 in the
+  chroot. Thus, I am currently out of ideas what else to test.
+
+  Cheers,
+  Adrian
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1527765/+subscriptions
