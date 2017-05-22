@@ -1,27 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38956)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44683)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dCq4E-0006Hz-Kw
-	for qemu-devel@nongnu.org; Mon, 22 May 2017 12:20:23 -0400
+	(envelope-from <armbru@redhat.com>) id 1dCqPV-0000wp-Q0
+	for qemu-devel@nongnu.org; Mon, 22 May 2017 12:42:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dCq4A-0002Fc-Ft
-	for qemu-devel@nongnu.org; Mon, 22 May 2017 12:20:22 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:40914)
+	(envelope-from <armbru@redhat.com>) id 1dCqPS-0001KL-OM
+	for qemu-devel@nongnu.org; Mon, 22 May 2017 12:42:21 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:38474)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dCq4A-0002FP-6e
-	for qemu-devel@nongnu.org; Mon, 22 May 2017 12:20:18 -0400
-References: <1494595886-30912-1-git-send-email-a.perevalov@samsung.com>
-	<CGME20170512133146eucas1p2ba4841cabf508b66410fae6784952eaa@eucas1p2.samsung.com>
-	<1494595886-30912-6-git-send-email-a.perevalov@samsung.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <43617b5a-0fcc-d171-aa19-4a24a4007e35@redhat.com>
-Date: Mon, 22 May 2017 11:20:13 -0500
-MIME-Version: 1.0
-In-Reply-To: <1494595886-30912-6-git-send-email-a.perevalov@samsung.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="KbUcJPTxjCPGOw2wCcvAcIjxqG0Cuhd7T"
-Subject: Re: [Qemu-devel] [PATCH V5 5/9] migration: introduce
- postcopy-blocktime capability
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dCqPS-0001Ju-IZ
+	for qemu-devel@nongnu.org; Mon, 22 May 2017 12:42:18 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 3C8EE3DBC8
+	for <qemu-devel@nongnu.org>; Mon, 22 May 2017 16:42:17 +0000 (UTC)
+From: Markus Armbruster <armbru@redhat.com>
+Date: Mon, 22 May 2017 18:42:11 +0200
+Message-Id: <1495471335-23707-1-git-send-email-armbru@redhat.com>
+Subject: [Qemu-devel] [PATCH 0/4] qapi: Handle some keyval fallout
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,84 +27,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alexey Perevalov <a.perevalov@samsung.com>, qemu-devel@nongnu.org
-Cc: i.maximets@samsung.com, dgilbert@redhat.com, peterx@redhat.com
+To: qemu-devel@nongnu.org
+Cc: eblake@redhat.com, mlureau@redhat.com
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---KbUcJPTxjCPGOw2wCcvAcIjxqG0Cuhd7T
-From: Eric Blake <eblake@redhat.com>
-To: Alexey Perevalov <a.perevalov@samsung.com>, qemu-devel@nongnu.org
-Cc: i.maximets@samsung.com, dgilbert@redhat.com, peterx@redhat.com
-Message-ID: <43617b5a-0fcc-d171-aa19-4a24a4007e35@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH V5 5/9] migration: introduce
- postcopy-blocktime capability
-References: <1494595886-30912-1-git-send-email-a.perevalov@samsung.com>
- <CGME20170512133146eucas1p2ba4841cabf508b66410fae6784952eaa@eucas1p2.samsung.com>
- <1494595886-30912-6-git-send-email-a.perevalov@samsung.com>
-In-Reply-To: <1494595886-30912-6-git-send-email-a.perevalov@samsung.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Markus Armbruster (4):
+  qobject-input-visitor: Reject non-finite numbers with keyval
+  qapi: Document visit_type_any() issues with keyval input
+  tests/qapi-schema: Avoid 'str' in alternate test cases
+  qapi: Reject alternates that can't work with keyval_parse()
 
-On 05/12/2017 08:31 AM, Alexey Perevalov wrote:
-> Right now it could be used on destination side to
-> enable vCPU blocktime calculation for postcopy live migration.
-> vCPU blocktime - it's time since vCPU thread was put into
-> interruptible sleep, till memory page was copied and thread awake.
->=20
-> Signed-off-by: Alexey Perevalov <a.perevalov@samsung.com>
-> ---
->  include/migration/migration.h | 1 +
->  migration/migration.c         | 9 +++++++++
->  qapi-schema.json              | 5 ++++-
->  3 files changed, 14 insertions(+), 1 deletion(-)
->=20
+ include/qapi/visitor.h                             |  4 ++
+ qapi/qobject-input-visitor.c                       |  3 +-
+ scripts/qapi.py                                    | 19 ++++++-
+ tests/Makefile.include                             |  2 +
+ tests/qapi-schema/alternate-clash.json             |  2 +-
+ tests/qapi-schema/alternate-conflict-dict.json     |  2 +-
+ tests/qapi-schema/alternate-conflict-enum-bool.err |  1 +
+ .../qapi-schema/alternate-conflict-enum-bool.exit  |  1 +
+ .../qapi-schema/alternate-conflict-enum-bool.json  |  6 +++
+ tests/qapi-schema/alternate-conflict-enum-bool.out |  0
+ tests/qapi-schema/alternate-conflict-enum-int.err  |  1 +
+ tests/qapi-schema/alternate-conflict-enum-int.exit |  1 +
+ tests/qapi-schema/alternate-conflict-enum-int.json |  6 +++
+ tests/qapi-schema/alternate-conflict-enum-int.out  |  0
+ tests/qapi-schema/alternate-conflict-string.err    |  2 +-
+ tests/qapi-schema/alternate-conflict-string.json   |  6 +--
+ tests/qapi-schema/alternate-nested.json            |  2 +-
+ tests/qapi-schema/args-alternate.json              |  2 +-
+ tests/qapi-schema/doc-bad-alternate-member.json    |  2 +-
+ tests/qapi-schema/qapi-schema-test.json            | 13 +++--
+ tests/qapi-schema/qapi-schema-test.out             | 34 ++++++------
+ tests/qapi-schema/returns-alternate.json           |  2 +-
+ tests/test-clone-visitor.c                         | 23 ++++----
+ tests/test-keyval.c                                | 18 ++++---
+ tests/test-qobject-input-visitor.c                 | 62 ++++++++++++----------
+ tests/test-qobject-output-visitor.c                |  4 +-
+ util/keyval.c                                      | 10 ++--
+ 27 files changed, 140 insertions(+), 88 deletions(-)
+ create mode 100644 tests/qapi-schema/alternate-conflict-enum-bool.err
+ create mode 100644 tests/qapi-schema/alternate-conflict-enum-bool.exit
+ create mode 100644 tests/qapi-schema/alternate-conflict-enum-bool.json
+ create mode 100644 tests/qapi-schema/alternate-conflict-enum-bool.out
+ create mode 100644 tests/qapi-schema/alternate-conflict-enum-int.err
+ create mode 100644 tests/qapi-schema/alternate-conflict-enum-int.exit
+ create mode 100644 tests/qapi-schema/alternate-conflict-enum-int.json
+ create mode 100644 tests/qapi-schema/alternate-conflict-enum-int.out
 
-> +++ b/qapi-schema.json
-> @@ -894,11 +894,14 @@
->  # @release-ram: if enabled, qemu will free the migrated ram pages on t=
-he source
->  #        during postcopy-ram migration. (since 2.9)
->  #
-> +# @postcopy-blocktime: Calculate downtime for postcopy live migration =
-(since 2.10)
-> +#
->  # Since: 1.2
->  ##
->  { 'enum': 'MigrationCapability',
->    'data': ['xbzrle', 'rdma-pin-all', 'auto-converge', 'zero-blocks',
-> -           'compress', 'events', 'postcopy-ram', 'x-colo', 'release-ra=
-m'] }
-> +           'compress', 'events', 'postcopy-ram', 'x-colo', 'release-ra=
-m',
-> +           'postcopy-blocktime'] }
-
-Why does this need to be a capability that we have to turn on, and not
-something that is collected unconditionally? Is there a drawback to
-having the stat collection always enabled without a capability?
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---KbUcJPTxjCPGOw2wCcvAcIjxqG0Cuhd7T
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEcBAEBCAAGBQJZIw+9AAoJEKeha0olJ0NqkDgIAIvAL4FRpv3zMQ8m0HgCseCQ
-2TzSI7vW+2hCkCFDHIiK/z2bDHlzhKSGZrTI2B2rukxdy0chu+WAAwwWLaeutt9P
-4OVDQ3ySJyRBshETnAjdGtwaKsRK4rooKqTdavBcHVbOmJvg4Dy8E58tHGMlPcMY
-gmGiIiRpoV7M4ktN2sgTrT0uWhXNrtRVEQXvOrGGiNSkI+cJ4OZ1BuXnVqVAU90g
-khAp37FwW7NkwxtnNT5me6LlxOji/7heuu06KGiC+KS9ITap87/cf1KZx7YctcSk
-ODDQTVf8ThbNqZd9q+WlRysSHoxrhJjoqwYAHABIRXDsImb6J7Cm/aHX3uyYG6U=
-=4W8P
------END PGP SIGNATURE-----
-
---KbUcJPTxjCPGOw2wCcvAcIjxqG0Cuhd7T--
+-- 
+2.7.4
