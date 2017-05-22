@@ -1,31 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47537)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50271)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1dCn9a-00039l-6V
-	for qemu-devel@nongnu.org; Mon, 22 May 2017 09:13:48 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dCnJ2-0008Qz-3X
+	for qemu-devel@nongnu.org; Mon, 22 May 2017 09:23:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1dCn9W-0005As-1p
-	for qemu-devel@nongnu.org; Mon, 22 May 2017 09:13:42 -0400
-Received: from 5.mo179.mail-out.ovh.net ([46.105.43.140]:58629)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1dCn9V-00058n-Os
-	for qemu-devel@nongnu.org; Mon, 22 May 2017 09:13:37 -0400
-Received: from player690.ha.ovh.net (b6.ovh.net [213.186.33.56])
-	by mo179.mail-out.ovh.net (Postfix) with ESMTP id 34F5B3A8E4
-	for <qemu-devel@nongnu.org>; Mon, 22 May 2017 15:13:34 +0200 (CEST)
-Date: Mon, 22 May 2017 15:13:25 +0200
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20170522151325.0ce5e89a@bahia.lan>
-In-Reply-To: <20170522105950.4af008c1@bahia.lan>
-References: <149518991537.24289.6673616934370284758.stgit@bahia.lan>
-	<149518994010.24289.12584852638589552255.stgit@bahia.lan>
-	<20170522020413.GF30246@umbus.fritz.box>
-	<20170522105950.4af008c1@bahia.lan>
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dCnIv-0001CV-QI
+	for qemu-devel@nongnu.org; Mon, 22 May 2017 09:23:28 -0400
+Received: from mail-oi0-x22c.google.com ([2607:f8b0:4003:c06::22c]:33366)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dCnIv-0001Bw-Ki
+	for qemu-devel@nongnu.org; Mon, 22 May 2017 09:23:21 -0400
+Received: by mail-oi0-x22c.google.com with SMTP id w10so161063349oif.0
+	for <qemu-devel@nongnu.org>; Mon, 22 May 2017 06:23:21 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20170521032956.27446-1-f4bug@amsat.org>
+	<20170521032956.27446-4-f4bug@amsat.org> <87mva5497m.fsf@linaro.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <39794bd4-b387-7431-1f25-a70af6013c42@amsat.org>
+Date: Mon, 22 May 2017 10:23:18 -0300
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	boundary="Sig_/MP+McEELbldvneHRbefgSzw";
-	protocol="application/pgp-signature"
-Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH v2 3/4] target/ppc: consolidate
- CPU device-tree id computation in helper
+In-Reply-To: <87mva5497m.fsf@linaro.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v3 03/24] docker: rebuild image if 'extra
+ files' checksum does not match
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,207 +35,112 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: Laurent Vivier <lvivier@redhat.com>, Cedric Le Goater <clg@kaod.org>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Bharata B Rao <bharata@linux.vnet.ibm.com>
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+Cc: qemu-devel@nongnu.org, Fam Zheng <famz@redhat.com>
 
---Sig_/MP+McEELbldvneHRbefgSzw
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Hi Alex,
 
-On Mon, 22 May 2017 10:59:50 +0200
-Greg Kurz <groug@kaod.org> wrote:
+On 05/22/2017 04:55 AM, Alex Bennée wrote:
+>
+> Philippe Mathieu-Daudé <f4bug@amsat.org> writes:
+>
+>> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+>> ---
+>>  tests/docker/docker.py | 15 ++++++++++++---
+>>  1 file changed, 12 insertions(+), 3 deletions(-)
+>
+> Hmm odd what bracnh did you cut this from. git apply-mbox keeps falling
+> over:
+>
+> Applying: docker: rebuild image if 'extra files' checksum does not match
+> error: sha1 information is lacking or useless (tests/docker/docker.py).
+> error: could not build fake ancestor
+> Patch failed at 0001 docker: rebuild image if 'extra files' checksum does not match
+> The copy of the patch that failed is found in: .git/rebase-apply/patch
+> When you have resolved this problem, run "git am --continue".
+> If you prefer to skip this patch, run "git am --skip" instead.
+> To restore the original branch and stop patching, run "git am --abort".
 
-> On Mon, 22 May 2017 12:04:13 +1000
-> David Gibson <david@gibson.dropbear.id.au> wrote:
->=20
-> > On Fri, May 19, 2017 at 12:32:20PM +0200, Greg Kurz wrote: =20
-> > > For historical reasons, we compute CPU device-tree ids with a non-tri=
-vial
-> > > logic. This patch consolidate the logic in a single helper to be used
-> > > in various places where it is currently open-coded.
-> > >=20
-> > > It is okay to get rid of DIV_ROUND_UP() because we're sure that the n=
-umber
-> > > of threads per core in the guest cannot exceed the number of threads =
-per
-> > > core in the host.   =20
-> >=20
-> > However, your new logic still gives different answers in some cases.
-> > In particular when max_cpus is not a multiple of smp_threads.  Which
-> > is generally a bad idea, but allowed for older machine types for
-> > compatibility.   e.g. smp_threads=3D4, max_cpus=3D6 smt=3D8
-> >=20
+Weird...
 
-FWIW, this topology was never supported for pseries >=3D 2.7 since commit
-94a94e4c4919 ("spapr: convert boot CPUs into CPU core devices", QEMU 2.7):
+I still have the command in my history, I used:
+   $ git format-patch master --cover-letter -v 3 -n -s -o 
+outgoing/shippable_v3 --to qemu-devel@nongnu.org --to 'Alex Bennée 
+<alex.bennee@linaro.org>' --to 'Fam Zheng <famz@redhat.com>'
 
-qemu-system-ppc64: max_cpus (6) must be multiple of threads (4)
+Having:
+   $ git rev-parse master
+56821559f0ba682fe6b367815572e6f974d329ab
 
-The same happens goes with smp_cpus.
+You can also fetch this branch here:
+   https://github.com/philmd/qemu/tree/docker_shippable_v3
+Shippable output:
+   https://app.shippable.com/github/philmd/qemu/status/dashboard
 
-If we care for compat with pre-2.7 machine types (ie, no support for CPU
-hotplug), this topology isn't valid anymore since QEMU 2.9, with these
-commits:
+Regards,
 
-0c86d0fd92aa ("pseries: Always use core objects for CPU construction") which
-causes the following error if we only set max_cpus:
+Phil.
 
-qemu-system-ppc64: This machine version does not support CPU hotplug
-
-8149e2992f78 ("pseries: Enforce homogeneous threads-per-core") which
-causes the following error if we set smp_cpus (or smp_cpus =3D=3D max_cpus):
-
-qemu-system-ppc64: invalid nr-threads 2, must be 4
-
-So in the end, we already enforce max_cpus and smp_cpus to be multiple
-of smp_threads for all machine types. In this case...
-
-> > Old logic:
-> > 	         DIV_ROUND_UP(6 * 8, 4)
-> > 	       =3D =E2=8C=8848 / 4=E2=8C=89 =3D 12
-> >=20
-> > New logic gives: =E2=8C=8A6 / 4=E2=8C=8B * 8 + (6 % 4)
-> >                =3D 1 * 8 + 2
-> > 	       =3D 10
-> >  =20
->=20
-> I now realize this two formulas are hardly reconcilable... this
-> probably means that this patch shouldn't try to consolidate the
-> logic in hw/ppc/spapr.c with the one in target/ppc/translate_init.c.
->=20
-
-... both formulas are equivalent, unless I'm missing something. Or
-do we really want to re-allow the funky topologies for older machines ?
-
-> > In any case the DIV_ROUND_UP() isn't to handle the case where guest
-> > threads-per-core is bigger than host threads-per-core, it's (IIRC) for
-> > the case where guest threads-per-core is not a factor of host
-> > threads-per-core.  Again, a bad idea, but I think allowed in some old
-> > cases.
-> >  =20
->=20
-> FWIW, DIV_ROUND_UP() comes from this commit:
->=20
-> f303f117fec3 spapr: ensure we have at least one XICS server
->=20
-> but I agree that this was a bad idea...
->=20
-> > >=20
-> > > Signed-off-by: Greg Kurz <groug@kaod.org>
-> > > ---
-> > >  hw/ppc/spapr.c              |    6 ++----
-> > >  target/ppc/cpu.h            |   17 +++++++++++++++++
-> > >  target/ppc/translate_init.c |    3 +--
-> > >  3 files changed, 20 insertions(+), 6 deletions(-)
-> > >=20
-> > > diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> > > index 75e298b4c6be..1bb05a9a6b07 100644
-> > > --- a/hw/ppc/spapr.c
-> > > +++ b/hw/ppc/spapr.c
-> > > @@ -981,7 +981,6 @@ static void *spapr_build_fdt(sPAPRMachineState *s=
-papr,
-> > >      void *fdt;
-> > >      sPAPRPHBState *phb;
-> > >      char *buf;
-> > > -    int smt =3D kvmppc_smt_threads();
-> > > =20
-> > >      fdt =3D g_malloc0(FDT_MAX_SIZE);
-> > >      _FDT((fdt_create_empty_tree(fdt, FDT_MAX_SIZE)));
-> > > @@ -1021,7 +1020,7 @@ static void *spapr_build_fdt(sPAPRMachineState =
-*spapr,
-> > >      _FDT(fdt_setprop_cell(fdt, 0, "#size-cells", 2));
-> > > =20
-> > >      /* /interrupt controller */
-> > > -    spapr_dt_xics(DIV_ROUND_UP(max_cpus * smt, smp_threads), fdt, PH=
-ANDLE_XICP);
-> > > +    spapr_dt_xics(ppc_cpu_dt_id_from_index(max_cpus), fdt, PHANDLE_X=
-ICP);
-> > > =20
-> > >      ret =3D spapr_populate_memory(spapr, fdt);
-> > >      if (ret < 0) {
-> > > @@ -1977,7 +1976,6 @@ static void spapr_init_cpus(sPAPRMachineState *=
-spapr)
-> > >      MachineState *machine =3D MACHINE(spapr);
-> > >      MachineClass *mc =3D MACHINE_GET_CLASS(machine);
-> > >      char *type =3D spapr_get_cpu_core_type(machine->cpu_model);
-> > > -    int smt =3D kvmppc_smt_threads();
-> > >      const CPUArchIdList *possible_cpus;
-> > >      int boot_cores_nr =3D smp_cpus / smp_threads;
-> > >      int i;
-> > > @@ -2014,7 +2012,7 @@ static void spapr_init_cpus(sPAPRMachineState *=
-spapr)
-> > >              sPAPRDRConnector *drc =3D
-> > >                  spapr_dr_connector_new(OBJECT(spapr),
-> > >                                         SPAPR_DR_CONNECTOR_TYPE_CPU,
-> > > -                                       (core_id / smp_threads) * smt=
-);
-> > > +                                       ppc_cpu_dt_id_from_index(core=
-_id));
-> > > =20
-> > >              qemu_register_reset(spapr_drc_reset, drc);
-> > >          }
-> > > diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
-> > > index 401e10e7dad8..47fe6c64698f 100644
-> > > --- a/target/ppc/cpu.h
-> > > +++ b/target/ppc/cpu.h
-> > > @@ -2529,4 +2529,21 @@ int ppc_get_vcpu_dt_id(PowerPCCPU *cpu);
-> > >  PowerPCCPU *ppc_get_vcpu_by_dt_id(int cpu_dt_id);
-> > > =20
-> > >  void ppc_maybe_bswap_register(CPUPPCState *env, uint8_t *mem_buf, in=
-t len);
-> > > +
-> > > +#if !defined(CONFIG_USER_ONLY)
-> > > +#include "sysemu/cpus.h"
-> > > +#include "target/ppc/kvm_ppc.h"
-> > > +
-> > > +static inline int ppc_cpu_dt_id_from_index(int cpu_index)
-> > > +{
-> > > +    /* POWER HV support has an historical limitation that different =
-threads
-> > > +     * on a single core cannot be in different guests at the same ti=
-me. In
-> > > +     * order to allow KVM to assign guest threads to host cores acco=
-rdingly,
-> > > +     * CPU device tree ids are spaced by the number of threads per h=
-ost cores.
-> > > +     */
-> > > +    return (cpu_index / smp_threads) * kvmppc_smt_threads()
-> > > +        + (cpu_index % smp_threads);
-> > > +}
-> > > +#endif
-> > > +
-> > >  #endif /* PPC_CPU_H */
-> > > diff --git a/target/ppc/translate_init.c b/target/ppc/translate_init.c
-> > > index 56a0ab22cfbe..837a9a496a65 100644
-> > > --- a/target/ppc/translate_init.c
-> > > +++ b/target/ppc/translate_init.c
-> > > @@ -9851,8 +9851,7 @@ static void ppc_cpu_realizefn(DeviceState *dev,=
- Error **errp)
-> > >      }
-> > > =20
-> > >  #if !defined(CONFIG_USER_ONLY)
-> > > -    cpu->cpu_dt_id =3D (cs->cpu_index / smp_threads) * max_smt
-> > > -        + (cs->cpu_index % smp_threads);
-> > > +    cpu->cpu_dt_id =3D ppc_cpu_dt_id_from_index(cs->cpu_index);
-> > > =20
-> > >      if (kvm_enabled() && !kvm_vcpu_id_is_valid(cpu->cpu_dt_id)) {
-> > >          error_setg(errp, "Can't create CPU with id %d in KVM", cpu->=
-cpu_dt_id);
-> > >    =20
-> >  =20
->=20
-
-
---Sig_/MP+McEELbldvneHRbefgSzw
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-
-iEYEARECAAYFAlki4/UACgkQAvw66wEB28KvEgCfXePeJKlWrSTMDb6gqRaOh3Xv
-TJAAn3QOrbs3bqf83A3W/kq2RpE9thsZ
-=NEDH
------END PGP SIGNATURE-----
-
---Sig_/MP+McEELbldvneHRbefgSzw--
+>
+>
+>>
+>> diff --git a/tests/docker/docker.py b/tests/docker/docker.py
+>> index eef92a54f1..0dd6a3304f 100755
+>> --- a/tests/docker/docker.py
+>> +++ b/tests/docker/docker.py
+>> @@ -38,6 +38,9 @@ def _text_checksum(text):
+>>      """Calculate a digest string unique to the text content"""
+>>      return hashlib.sha1(text).hexdigest()
+>>
+>> +def _file_checksum(filename):
+>> +    return _text_checksum(open(filename, 'rb').read())
+>> +
+>>  def _guess_docker_command():
+>>      """ Guess a working docker command or raise exception if not found"""
+>>      commands = [["docker"], ["sudo", "-n", "docker"]]
+>> @@ -154,7 +157,7 @@ class Docker(object):
+>>          return labels.get("com.qemu.dockerfile-checksum", "")
+>>
+>>      def build_image(self, tag, docker_dir, dockerfile,
+>> -                    quiet=True, user=False, argv=None):
+>> +                    quiet=True, user=False, argv=None, extra_files_cksum=[]):
+>>          if argv == None:
+>>              argv = []
+>>
+>> @@ -170,7 +173,7 @@ class Docker(object):
+>>
+>>          tmp_df.write("\n")
+>>          tmp_df.write("LABEL com.qemu.dockerfile-checksum=%s" %
+>> -                     _text_checksum(dockerfile))
+>> +                     _text_checksum(dockerfile + "-".join(extra_files_cksum)))
+>>          tmp_df.flush()
+>>
+>>          self._do(["build", "-t", tag, "-f", tmp_df.name] + argv + \
+>> @@ -276,16 +279,22 @@ class BuildCommand(SubCommand):
+>>                      return 1
+>>
+>>              # Include files used by ADD directives found within the Dockerfile.
+>> +            cksum = []
+>>              if args.include_executable:
+>> +                # FIXME: there is no checksum of this executable and the linked
+>> +                # libraries, once the image built any change of this executable
+>> +                # or any library won't trigger another build.
+>>                  _copy_binary_with_libs(args.include_executable, docker_dir)
+>>              for filename in args.include_files or []:
+>>                  _copy_with_mkdir(filename, docker_dir)
+>> +                cksum += [_file_checksum(filename)]
+>>
+>>              argv += ["--build-arg=" + k.lower() + "=" + v
+>>                          for k, v in os.environ.iteritems()
+>>                          if k.lower() in FILTERED_ENV_NAMES]
+>>              dkr.build_image(tag, docker_dir, dockerfile,
+>> -                            quiet=args.quiet, user=args.user, argv=argv)
+>> +                            quiet=args.quiet, user=args.user, argv=argv,
+>> +                            extra_files_cksum=cksum)
+>>
+>>              rmtree(docker_dir)
+>
+>
+> --
+> Alex Bennée
+>
