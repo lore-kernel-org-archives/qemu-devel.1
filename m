@@ -1,23 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42976)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44849)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dCmzR-000482-53
-	for qemu-devel@nongnu.org; Mon, 22 May 2017 09:03:17 -0400
+	(envelope-from <programmingkidx@gmail.com>) id 1dCn2X-0006Sm-Gc
+	for qemu-devel@nongnu.org; Mon, 22 May 2017 09:06:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dCmzL-0000tS-0Z
-	for qemu-devel@nongnu.org; Mon, 22 May 2017 09:03:13 -0400
-References: <1495376506-13227-1-git-send-email-den@openvz.org>
-	<705cdc34-b45d-5f56-3fb2-f8a67c4d2b9f@redhat.com>
-	<8d854387-01fc-1f36-7452-7e9cc3cdbcc2@openvz.org>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <07c51989-1032-8039-0436-515e63f14df1@redhat.com>
-Date: Mon, 22 May 2017 08:02:54 -0500
-MIME-Version: 1.0
-In-Reply-To: <8d854387-01fc-1f36-7452-7e9cc3cdbcc2@openvz.org>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="1vHWjdRpPBS3NqJvt8cCgUaiiKvjM4Cg0"
-Subject: Re: [Qemu-devel] [PATCH 1/1] qcow2: handle cluster leak happening
- with a guest TRIM command
+	(envelope-from <programmingkidx@gmail.com>) id 1dCn2R-0002He-46
+	for qemu-devel@nongnu.org; Mon, 22 May 2017 09:06:25 -0400
+Received: from mail-io0-x243.google.com ([2607:f8b0:4001:c06::243]:36449)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <programmingkidx@gmail.com>)
+	id 1dCn2Q-0002Gh-V0
+	for qemu-devel@nongnu.org; Mon, 22 May 2017 09:06:19 -0400
+Received: by mail-io0-x243.google.com with SMTP id f102so13202011ioi.3
+	for <qemu-devel@nongnu.org>; Mon, 22 May 2017 06:06:17 -0700 (PDT)
+In-Reply-To: <mailman.73115.1495441935.22737.qemu-devel@nongnu.org>
+References: <mailman.73115.1495441935.22737.qemu-devel@nongnu.org>
+Mime-Version: 1.0 (Apple Message framework v753.1)
+Content-Type: text/plain; charset=US-ASCII; delsp=yes; format=flowed
+Message-Id: <BBC4E515-FE7D-4600-A5CA-BBCE26059415@gmail.com>
+Content-Transfer-Encoding: 7bit
+From: G 3 <programmingkidx@gmail.com>
+Date: Mon, 22 May 2017 09:06:08 -0400
+Subject: Re: [Qemu-devel] [PATCH risu] ppc64: Fix patterns for rotate
+ doubleword instructions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,136 +30,138 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Denis V. Lunev" <den@openvz.org>, qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
+To: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>, "qemu-devel@nongnu.org qemu-devel" <qemu-devel@nongnu.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Sandipan Das <sandipandas1990@gmail.com>, Jose Ricardo Ziviani <joserz@linux.vnet.ibm.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---1vHWjdRpPBS3NqJvt8cCgUaiiKvjM4Cg0
-From: Eric Blake <eblake@redhat.com>
-To: "Denis V. Lunev" <den@openvz.org>, qemu-block@nongnu.org,
- qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
-Message-ID: <07c51989-1032-8039-0436-515e63f14df1@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 1/1] qcow2: handle cluster leak happening
- with a guest TRIM command
-References: <1495376506-13227-1-git-send-email-den@openvz.org>
- <705cdc34-b45d-5f56-3fb2-f8a67c4d2b9f@redhat.com>
- <8d854387-01fc-1f36-7452-7e9cc3cdbcc2@openvz.org>
-In-Reply-To: <8d854387-01fc-1f36-7452-7e9cc3cdbcc2@openvz.org>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
 
-On 05/22/2017 06:56 AM, Denis V. Lunev wrote:
+On May 22, 2017, at 4:32 AM, qemu-devel-request@nongnu.org wrote:
+
+> Message: 2
+> Date: Mon, 22 May 2017 12:33:29 +0530
+> From: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
+> To: Sandipan Das <sandipandas1990@gmail.com>
+> Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org,
+> 	joserz@linux.vnet.ibm.com
+> Subject: Re: [Qemu-devel] [PATCH risu] ppc64: Fix patterns for rotate
+> 	doubleword instructions
+> Message-ID:
+> 	<87a865nzjy.fsf@abhimanyu.i-did-not-set--mail-host-address--so- 
+> tickle-me>
+> 	
+> Content-Type: text/plain
+>
+> Sandipan Das <sandipandas1990@gmail.com> writes:
+>
+>> The patterns for the following instructions are fixed:
+>>  * Rotate Left Doubleword then Clear Right (rldcr[.])
+>>  * Rotate Left Doubleword Immediate then Clear Right (rldicr[.])
+>>  * Rotate Left Doubleword Immediate then Mask Insert (rldimi[.])
 >>
+>> Signed-off-by: Sandipan Das <sandipandas1990@gmail.com>
+>> ---
+>>  ppc64.risu | 10 +++++-----
+>>  1 file changed, 5 insertions(+), 5 deletions(-)
 >>
->> As it is, your patch doesn't apply to master.  And even if it did, you=
-r
->> patch breaks semantics - we CANNOT discard clusters that must read bac=
-k
->> as zeroes.
+>> diff --git a/ppc64.risu b/ppc64.risu
+>> index 28df9da..0f29248 100644
+>> --- a/ppc64.risu
+>> +++ b/ppc64.risu
+>> @@ -1451,7 +1451,7 @@ RLDCLd PPC64LE 011110 rs:5 ra:5 rb:5 mb:6  
+>> 10001 \
+>>  !constraints { $rs != 1 && $ra != 1 && $rb != 1 && $rs != 13 &&  
+>> $ra != 13 && $rb != 13; }
 >>
-> Can you pls give some details why the cluster can not be
-> discarded? This is something that I can not understand.
+>>  # format:MDS book:I page:103 PPC SR rldcr Rotate Left Dword then  
+>> Clear Right
+>> -RLCDR PPC64LE 011110 rs:5 ra:5 rb:5 mb:6 10010 \
+>> +RLDCR PPC64LE 011110 rs:5 ra:5 rb:5 mb:6 10010 \
+>>  !constraints { $rs != 1 && $ra != 1 && $rb != 1 && $rs != 13 &&  
+>> $ra != 13 && $rb != 13; }
+>>  # format:MDS book:I page:103 PPC SR rldcr Rotate Left Dword then  
+>> Clear Right
+>>  RLDCRd PPC64LE 011110 rs:5 ra:5 rb:5 mb:6 10011 \
+>> @@ -1472,17 +1472,17 @@ RLDICLd PPC64LE 011110 rs:5 ra:5 sh:5 mb:6  
+>> 000 sha:1 1 \
+>>  !constraints { $rs != 1 && $ra != 1 && $rs != 13 && $ra != 13; }
+>>
+>>  # format:MD book:I page:105 PPC SR rldicr[.] Rotate Left Dword  
+>> Immediate then Clear Right
+>> -RLDICR PPC64LE 011110 rs:5 ra:5 rb:5 me:6 00010 \
+>> +RLDICR PPC64LE 011110 rs:5 ra:5 rb:5 me:6 001 sha:1 0 \
+>
+>    RLDICR PPC64LE 011110 rs:5 ra:5 sh:5 me:6 001 sha:1 0
+>
+> Also "rb:5" be changed as "sh:5"?
+>
+>>  !constraints { $rs != 1 && $ra != 1 && $rb != 1 && $rs != 13 &&  
+>> $ra != 13 && $rb != 13; }
+>>  # format:MD book:I page:105 PPC SR rldicr[.] Rotate Left Dword  
+>> Immediate then Clear Right
+>> -RLDICRd PPC64LE 011110 rs:5 ra:5 rb:5 me:6 00011 \
+>> +RLDICRd PPC64LE 011110 rs:5 ra:5 rb:5 me:6 001 sha:1 1 \
+>
+>    RLDICRd PPC64LE 011110 rs:5 ra:5 sh:5 me:6 001 sha:1 0
+>
+>
+>>  !constraints { $rs != 1 && $ra != 1 && $rb != 1 && $rs != 13 &&  
+>> $ra != 13 && $rb != 13; }
+>>
+>>  # format:MD book:I page:105 PPC SR rldimi[.] Rotate Left Dword  
+>> Immediate then Mask Insert
+>> -RLDIMI PPC64LE 011110 rs:5 ra:5 rb:5 me:6 00110 \
+>> +RLDIMI PPC64LE 011110 rs:5 ra:5 rb:5 me:6 011 sha:1 0 \
+>
+>    RLDIMI PPC64LE 011110 rs:5 ra:5 sh:5 me:6 011 sha:1 0
+>
+>
+>>  !constraints { $rs != 1 && $ra != 1 && $rb != 1 && $rs != 13 &&  
+>> $ra != 13 && $rb != 13; }
+>>  # format:MD book:I page:105 PPC SR rldimi[.] Rotate Left Dword  
+>> Immediate then Mask Insert
+>> -RLDIMId PPC64LE 011110 rs:5 ra:5 rb:5 me:6 00111 \
+>> +RLDIMId PPC64LE 011110 rs:5 ra:5 rb:5 me:6 011 sha:1 1 \
+>
+>    RLDIMId PPC64LE 011110 rs:5 ra:5 sh:5 me:6 011 sha:1 1
+>
+>>  !constraints { $rs != 1 && $ra != 1 && $rb != 1 && $rs != 13 &&  
+>> $ra != 13 && $rb != 13; }
+>>
+>>  # format:M book:I page:102 v:P1 SR rlwimi[.] Rotate Left Word  
+>> Immediate then Mask Insert
+>> -- 
+>> 2.7.4
+>
+> Regards,
+> Nikunj
 
-The cluster CAN be discarded if the guest requests it.  There is a
-difference between:
+Hello I have also done some work risu. My patches add ppc32 support.  
+Well my patches were made to work with Mac OS X but they are required  
+to work with Linux. Do you think you could help port these patches to  
+Linux?
 
-qemu-img -f qcow2 'w -z    0 64k' 1.img
+ppc.risu:
+https://patchwork.kernel.org/patch/9697489/
 
-which says to ensure that the cluster reads back as zero, but to NOT
-unmap things (corresponding to NBD_CMD_WRITE_ZEROES with
-NBD_CMD_FLAG_NO_HOLE set), and:
+risu_ppc.c:
+https://patchwork.kernel.org/patch/9697491/
 
-qemu-img -f qcow2 'w -z -u 0 64k' 1.img
+risu_reginfo_ppc.c:
+https://patchwork.kernel.org/patch/9697493/
 
-which says to ensure that the cluster reads back as zero, and that
-unmapping the cluster is permitted if that will make the operation
-faster and/or use less space (corresponding to NBD_CMD_WRITE_ZEROES with
-NBD_CMD_FLAG_NO_HOLE clear).
+risu_reginfo_ppc.h:
+https://patchwork.kernel.org/patch/9697495/
 
-In current master, we've gone as far as to make an obvious difference
-between the two types of qcow2 zero clusters (see commit fdfab37);
-QCOW2_CLUSTER_ZERO_PLAIN corresponds to the case where the guest allowed
-a cluster to be unmapped, while QCOW2_CLUSTER_ZERO_ALLOC corresponds to
-the case where we've written zeroes but require the allocation mapping
-to remain intact.
+risugen_ppc.pm:
+https://patchwork.kernel.org/patch/9697497/
 
-One of the big reasons why we do NOT want the guest to be able to
-convert a cluster to QCOW2_CLUSTER_UNALLOCATED after a write zero
-request (but only after a discard request) is that we don't want to
-audit what will happen if a backing file is later added to the image.
-If a guest does a discard, then they are acknowledging that the data in
-that cluster can read back as anything (we try to make it read back as
-zero where practical, but do not guarantee that).  But if a guest does a
-write zero request, even if they permit unmapping, the semantics require
-that they can read back zero, no matter what happens to the backing chain=
-=2E
+Add ppc support to configure:
+https://patchwork.kernel.org/patch/9697499/
 
-An example that Kevin used to convince me was the process of drive
-mirroring: if you mirror just the active qcow2 layer, then cancel the
-mirror, the destination is supposed to be a snapshot of what the guest
-saw at that moment, once you rebase the destination image to be on top
-of the same backing contents as the source saw.  That implies that I can
-use 'qemu-img rebase -u' to inject a backing chain.  If we mirror a zero
-cluster over to the destination, and make sure the destination sees a
-QCOW2_CLUSTER_ZERO_PLAIN, then no matter what the backing chain we later
-rebase the destination onto, we still read 0 for that cluster (as the
-guest expected).  But if we mirror the zero cluster over and leave the
-destination image with QCOW2_CLUSTER_UNALLOCATED, then supply a backing
-chain where the cluster does not read as zero, then we have altered the
-guest-visible contents.  So it is safer to ALWAYS require that a guest
-write-zero action uses one of the two types of qcow2 zero clusters, to
-keep the guest-visible contents of that cluster constant no matter what
-rebasing actions later occur.
+Add verbose option:
+https://patchwork.kernel.org/patch/9697501/
 
-That said, we've also had a conversation on things we can do to improve
-mirroring; one of the ideas was to add a new flag (comparable to the
-existing BDRV_REQ_MAY_UNMAP) that mirroring (but not guest actions) can
-use to request that zero_single_l2() is permitted to reuse
-QCOW2_CLUSTER_UNALLOCATED instead of having to switch to
-QCOW2_CLUSTER_ZERO_PLAIN, or where we can exploit PUNCH_HOLE semantics
-on the underlying bs->file to efficiently write zeroes into the file
-system even while keeping QCOW2_CLUSTER_ZERO_ALLOC at the qcow2 layer.
+Add end of test message:
+https://patchwork.kernel.org/patch/9697503/
 
->=20
-> At my opinion the cluster is clearly marked with QCOW_OFLAG_ZERO
-> and thus will be read with zeroes regardless of the content of the
-> cluster which is pointed by the offset. This is actually what
-> happens on the FS without PUNCH_HOLE support.
->=20
-> That is why this offset can be actually reused for any other
-> block, what is I am trying to propose.
-
-Yes, when using write zeros with unmap (qemu-io -c 'w -z -u ...'), then
-the code already unmaps the cluster, so that it can be reused for any
-other block.  So it boils down to whether your guest is really
-requesting write zeroes with permission to unmap, and whether any other
-options you have specified regarding the disk are filtering out
-BDRV_REQ_MAY_UNMAP before it reaches the qcow2 layer.
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---1vHWjdRpPBS3NqJvt8cCgUaiiKvjM4Cg0
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEcBAEBCAAGBQJZIuF+AAoJEKeha0olJ0NqjRQIAIHOg0wSyLG/YCreUoxAHb9x
-KdYCcYDzDv3zghopF44cflAW7umBvnz09v+h2ZdKBzFjsrpJ49rwyuFFYt6NPbAH
-3U4gpayL752OxqVAkIAdWqsqE67vfDmnV2x34kw4qdrNWwFACjbgJ44n1NzJoBiN
-366wFfl/xbSLDKUOqmy6PkOhx94wxLgxxWnENT+9CPZpllhonj3NKGi65krtYZS6
-eLvFf1Hfj84WDv86AImlfUGkTgnojba146rPbbfhobMISHlyhzjs1Dj6BkE1Te8a
-WjNZ/q6lTtBm3DpzFSwLs+mrupE4QZmuDMg8iYdnOijvmaqK+mbi4D5VDBZQAts=
-=Y+wo
------END PGP SIGNATURE-----
-
---1vHWjdRpPBS3NqJvt8cCgUaiiKvjM4Cg0--
+Add more descriptive comment for mismatch or end of test condition:
+https://patchwork.kernel.org/patch/9697505/
