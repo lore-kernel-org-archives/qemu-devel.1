@@ -1,23 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36238)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37920)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ali.saeedi56@gmail.com>) id 1dCmqs-0008UF-GU
-	for qemu-devel@nongnu.org; Mon, 22 May 2017 08:54:23 -0400
+	(envelope-from <imammedo@redhat.com>) id 1dCmvP-00017u-LH
+	for qemu-devel@nongnu.org; Mon, 22 May 2017 08:59:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ali.saeedi56@gmail.com>) id 1dCmqr-0004Fg-RQ
-	for qemu-devel@nongnu.org; Mon, 22 May 2017 08:54:22 -0400
-Received: from mail-qt0-x22a.google.com ([2607:f8b0:400d:c0d::22a]:35437)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <ali.saeedi56@gmail.com>)
-	id 1dCmqr-0004Fb-NA
-	for qemu-devel@nongnu.org; Mon, 22 May 2017 08:54:21 -0400
-Received: by mail-qt0-x22a.google.com with SMTP id v27so100452326qtg.2
-	for <qemu-devel@nongnu.org>; Mon, 22 May 2017 05:54:21 -0700 (PDT)
+	(envelope-from <imammedo@redhat.com>) id 1dCmvO-0006KK-Ad
+	for qemu-devel@nongnu.org; Mon, 22 May 2017 08:59:03 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46102)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1dCmvO-0006K5-0y
+	for qemu-devel@nongnu.org; Mon, 22 May 2017 08:59:02 -0400
+Date: Mon, 22 May 2017 14:58:56 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20170522145856.4728a2a4@nial.brq.redhat.com>
+In-Reply-To: <894afc82-4214-1734-d5ea-532218fac34c@virtuozzo.com>
+References: <1495446630-365062-1-git-send-email-eyakovlev@virtuozzo.com>
+	<1495446630-365062-2-git-send-email-eyakovlev@virtuozzo.com>
+	<20170522123524.4c0bff9d@nial.brq.redhat.com>
+	<894afc82-4214-1734-d5ea-532218fac34c@virtuozzo.com>
 MIME-Version: 1.0
-From: ali saeedi <ali.saeedi56@gmail.com>
-Date: Mon, 22 May 2017 17:24:20 +0430
-Message-ID: <CAGKXQyf0A+hoBdzU3BD16v1LoWNVnuf++U4d1bt1q3UZotdMSQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: [Qemu-devel] TARGET_PAGE_BITS
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] acpi: change CPU container node _HID to
+ compatible PNP0A05
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,8 +30,95 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Evgeny Yakovlev <eyakovlev@virtuozzo.com>
+Cc: Denis Lunev <den@virtuozzo.com>, rkagan@virtuozzo.com, qemu-devel@nongnu.org, mst@redhat.com
 
-Hello
-What is TARGET_PAGE_BITS in ram.c?
-thanks a lot
+On Mon, 22 May 2017 14:01:15 +0300
+Evgeny Yakovlev <eyakovlev@virtuozzo.com> wrote:
+
+> On 22.05.2017 13:35, Igor Mammedov wrote:
+> > On Mon, 22 May 2017 12:50:30 +0300
+> > Evgeny Yakovlev <eyakovlev@virtuozzo.com> wrote:
+> >  
+> >> When running windows 2016 server guests we have encountered a problem
+> >> with ACPI representation of CPU devices. This windows version contains a
+> >> hidinterrupt.sys driver which looks for ACPI device node with _HID set
+> >> to "ACPI0010" and "ACPI0011". ACPI0010 is also a valid id for CPU
+> >> container device which qemu uses.
+> >>
+> >> hidinterrupt driver takes over (even though it fails) ACPI0010 node and
+> >> thus hides its children -- the CPUs -- from the regular ACPI
+> >> enumeration.  So there are no processors in the Windows device tree
+> >> Device Manager or "!devnode 0 1" in the debugger.
+> >>
+> >> hidinterrupt.inf as shipped with Windows 2016 has both ACPI0011 and
+> >> ACPI0010; the record for the latter is preceded with a comment "This Id
+> >> is not to be used. It will be removed once everyone has stopped using
+> >> it."  So I guess the typo was not in the driver but in the ACPI tables
+> >> of some device(s) which the driver wanted to support despite the bug.
+> >>
+> >> For reference this is a known issue:
+> >> https://bugzilla.redhat.com/show_bug.cgi?id=1377155#c31
+> >>
+> >> This change works around this problem by setting qemu CPU container ACPI
+> >> _HID to compatible PNP0A05.  
+> > I'd say NACK to it.
+> > It's Windows server 2016 bug that violates spec and
+> > it's been reported to them before RTM has been released.
+> > So complain to Microsoft support and make them fix it.
+> >
+> > Meanwhile there is MS suggested workaround to fix issue,
+> > one can use https://bugzilla.redhat.com/show_bug.cgi?id=1377155#c17
+> >
+> > Perhaps I should add workaround link as comment above line:
+> >
+> > aml_append(cpus_dev, aml_name_decl("_HID", aml_string("ACPI0010")));  
+> 
+> Thanks for replying!
+> 
+> Strictly speaking, this is not a Windows bug. Comment in INF file says 
+> that they had to support a hardware device which erroneously picked this 
+> ACPI HID.
+in linux kernel we use device specific quirks to workaround broken hardware,
+there is no point to break generic code for all hardware configurations
+for the sake of one broken firmware.
+So it's Windows problem that they prefer to violate spec and cannibalize
+ACPI0010 for the sake of broken firmware. Open support case with Windows,
+the more complains they get, the more chances that they'll fix it.
+
+> I understand that this is not a qemu problem either. Then again other 
+> emulators we've tested this on (VirtualBox, Parallels, HyperV) provide a 
+> compatible ACPI configuration and don't trigger this conflict. If this 
+we provide it, that's what '_CID' field is for, so OS that doesn't know
+about ACPI0010 would be happy (any Windows prior Win10/2016)
+
+> fix is not a big deal and does not affect anything negatively then maybe 
+> we pay a relatively small price to improve compatibility with some guest 
+> systems?
+we plan to reuse this code for ARM in future and it might use
+ACPI0010 container as per spec to describe modeled topology.
+Hence no workaround in QEMU, just use MS suggested workaround
+to remove wrong device binding in WS2016 until they actually
+fix it.
+
+
+> >> Signed-off-by: Evgeny Yakovlev <eyakovlev@virtuozzo.com>
+> >> ---
+> >>   hw/acpi/cpu.c | 2 +-
+> >>   1 file changed, 1 insertion(+), 1 deletion(-)
+> >>
+> >> diff --git a/hw/acpi/cpu.c b/hw/acpi/cpu.c
+> >> index a233fe1..b93db40 100644
+> >> --- a/hw/acpi/cpu.c
+> >> +++ b/hw/acpi/cpu.c
+> >> @@ -397,7 +397,7 @@ void build_cpus_aml(Aml *table, MachineState *machine, CPUHotplugFeatures opts,
+> >>           Aml *rm_evt = aml_name("%s.%s", cphp_res_path, CPU_REMOVE_EVENT);
+> >>           Aml *ej_evt = aml_name("%s.%s", cphp_res_path, CPU_EJECT_EVENT);
+> >>   
+> >> -        aml_append(cpus_dev, aml_name_decl("_HID", aml_string("ACPI0010")));
+> >> +        aml_append(cpus_dev, aml_name_decl("_HID", aml_string("PNP0A05")));
+> >>           aml_append(cpus_dev, aml_name_decl("_CID", aml_eisaid("PNP0A05")));
+> >>   
+> >>           method = aml_method(CPU_NOTIFY_METHOD, 2, AML_NOTSERIALIZED);  
+> 
+> 
