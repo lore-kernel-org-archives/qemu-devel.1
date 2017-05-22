@@ -1,33 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44842)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46266)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <a.perevalov@samsung.com>) id 1dCqQG-0001ft-Ks
-	for qemu-devel@nongnu.org; Mon, 22 May 2017 12:43:09 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1dCqVI-0004rl-G5
+	for qemu-devel@nongnu.org; Mon, 22 May 2017 12:48:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <a.perevalov@samsung.com>) id 1dCqQD-0001kg-HG
-	for qemu-devel@nongnu.org; Mon, 22 May 2017 12:43:08 -0400
-Received: from mailout3.w1.samsung.com ([210.118.77.13]:58070)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <a.perevalov@samsung.com>)
-	id 1dCqQD-0001jy-BD
-	for qemu-devel@nongnu.org; Mon, 22 May 2017 12:43:05 -0400
-Received: from eucas1p2.samsung.com (unknown [182.198.249.207])
-	by mailout3.w1.samsung.com
-	(Oracle Communications Messaging Server 7.0.5.31.0 64bit (built May 5
-	2014)) with ESMTP id <0OQD004OZ53NNG40@mailout3.w1.samsung.com> for
-	qemu-devel@nongnu.org; Mon, 22 May 2017 17:42:59 +0100 (BST)
-Date: Mon, 22 May 2017 19:42:56 +0300
-From: Alexey <a.perevalov@samsung.com>
-Message-id: <20170522164256.GA5454@aperevalov-ubuntu>
-MIME-version: 1.0
-Content-type: text/plain; charset=us-ascii
-Content-disposition: inline
-In-reply-to: <43617b5a-0fcc-d171-aa19-4a24a4007e35@redhat.com>
-References: <1494595886-30912-1-git-send-email-a.perevalov@samsung.com>
-	<CGME20170512133146eucas1p2ba4841cabf508b66410fae6784952eaa@eucas1p2.samsung.com>
-	<1494595886-30912-6-git-send-email-a.perevalov@samsung.com>
-	<43617b5a-0fcc-d171-aa19-4a24a4007e35@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH V5 5/9] migration: introduce
- postcopy-blocktime capability
+	(envelope-from <alex.bennee@linaro.org>) id 1dCqVF-0003JI-E9
+	for qemu-devel@nongnu.org; Mon, 22 May 2017 12:48:20 -0400
+Received: from mail-wm0-x231.google.com ([2a00:1450:400c:c09::231]:33909)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1dCqVF-0003IZ-6I
+	for qemu-devel@nongnu.org; Mon, 22 May 2017 12:48:17 -0400
+Received: by mail-wm0-x231.google.com with SMTP id 123so13219647wmg.1
+	for <qemu-devel@nongnu.org>; Mon, 22 May 2017 09:48:17 -0700 (PDT)
+References: <20170521032956.27446-1-f4bug@amsat.org>
+	<20170521032956.27446-23-f4bug@amsat.org>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <20170521032956.27446-23-f4bug@amsat.org>
+Date: Mon, 22 May 2017 17:48:19 +0100
+Message-ID: <87r2zg3kj0.fsf@linaro.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v3 22/24] shippable: add mipsel target
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,58 +30,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: qemu-devel@nongnu.org, i.maximets@samsung.com, dgilbert@redhat.com, peterx@redhat.com
-
-On Mon, May 22, 2017 at 11:20:13AM -0500, Eric Blake wrote:
-> On 05/12/2017 08:31 AM, Alexey Perevalov wrote:
-> > Right now it could be used on destination side to
-> > enable vCPU blocktime calculation for postcopy live migration.
-> > vCPU blocktime - it's time since vCPU thread was put into
-> > interruptible sleep, till memory page was copied and thread awake.
-> > 
-> > Signed-off-by: Alexey Perevalov <a.perevalov@samsung.com>
-> > ---
-> >  include/migration/migration.h | 1 +
-> >  migration/migration.c         | 9 +++++++++
-> >  qapi-schema.json              | 5 ++++-
-> >  3 files changed, 14 insertions(+), 1 deletion(-)
-> > 
-> 
-> > +++ b/qapi-schema.json
-> > @@ -894,11 +894,14 @@
-> >  # @release-ram: if enabled, qemu will free the migrated ram pages on the source
-> >  #        during postcopy-ram migration. (since 2.9)
-> >  #
-> > +# @postcopy-blocktime: Calculate downtime for postcopy live migration (since 2.10)
-> > +#
-> >  # Since: 1.2
-> >  ##
-> >  { 'enum': 'MigrationCapability',
-> >    'data': ['xbzrle', 'rdma-pin-all', 'auto-converge', 'zero-blocks',
-> > -           'compress', 'events', 'postcopy-ram', 'x-colo', 'release-ram'] }
-> > +           'compress', 'events', 'postcopy-ram', 'x-colo', 'release-ram',
-> > +           'postcopy-blocktime'] }
-> 
-> Why does this need to be a capability that we have to turn on, and not
-> something that is collected unconditionally? Is there a drawback to
-> having the stat collection always enabled without a capability?
-yes, it has a performance penalty
-(runtime complexity O(n) + O(m), where n is vCPU number, m is number of memory
-pages), but not so huge, compared to network
-latencies, also memory usage, but no more than 0.03% of QEMU's total
-memory.
-
-> 
-> -- 
-> Eric Blake, Principal Software Engineer
-> Red Hat, Inc.           +1-919-301-3266
-> Virtualization:  qemu.org | libvirt.org
-> 
+To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Cc: qemu-devel@nongnu.org, Fam Zheng <famz@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>, Yongbok Kim <yongbok.kim@imgtec.com>
 
 
+Philippe Mathieu-Daudé <f4bug@amsat.org> writes:
 
--- 
+> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
-BR
-Alexey
+Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
+
+> ---
+>  .shippable.yml | 3 +++
+>  1 file changed, 3 insertions(+)
+>
+> diff --git a/.shippable.yml b/.shippable.yml
+> index aad66ec5ec..75c2895a21 100644
+> --- a/.shippable.yml
+> +++ b/.shippable.yml
+> @@ -13,6 +13,9 @@ env:
+>        TARGET_LIST=s390x-softmmu,s390x-linux-user
+>      - IMAGE=debian-powerpc-cross
+>        TARGET_LIST=ppc-softmmu,ppcemb-softmmu,ppc-linux-user
+> +    # mips64el-softmmu disabled due to libfdt problem
+> +    - IMAGE=debian-mipsel-cross
+> +      TARGET_LIST=mipsel-softmmu,mipsel-linux-user,mips64el-linux-user
+>  build:
+>    pre_ci:
+>      - make docker-image-${IMAGE} V=1
+
+
+--
+Alex Bennée
