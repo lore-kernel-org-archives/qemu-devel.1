@@ -1,16 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44251)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46369)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1dCtNZ-0004H5-I3
-	for qemu-devel@nongnu.org; Mon, 22 May 2017 15:52:36 -0400
+	(envelope-from <eblake@redhat.com>) id 1dCtWz-0007Rz-Mw
+	for qemu-devel@nongnu.org; Mon, 22 May 2017 16:02:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1dCtNY-0006MC-8y
-	for qemu-devel@nongnu.org; Mon, 22 May 2017 15:52:33 -0400
-From: Max Reitz <mreitz@redhat.com>
-Date: Mon, 22 May 2017 21:52:17 +0200
-Message-Id: <20170522195217.12991-4-mreitz@redhat.com>
-In-Reply-To: <20170522195217.12991-1-mreitz@redhat.com>
+	(envelope-from <eblake@redhat.com>) id 1dCtWy-0000kS-Tt
+	for qemu-devel@nongnu.org; Mon, 22 May 2017 16:02:17 -0400
 References: <20170522195217.12991-1-mreitz@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 3/3] iotests: Add test for colon handling
+	<20170522195217.12991-3-mreitz@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <67407510-111e-c669-9f4b-dc8ba12c42a3@redhat.com>
+Date: Mon, 22 May 2017 15:02:08 -0500
+MIME-Version: 1.0
+In-Reply-To: <20170522195217.12991-3-mreitz@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="Dax4DDbdsH99s1s8feMocgl4tLGXw8LGc"
+Subject: Re: [Qemu-devel] [PATCH v2 2/3] block/file-*: *_parse_filename()
+ and colons
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -19,169 +25,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Eric Blake <eblake@redhat.com>
+To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>
 
-Signed-off-by: Max Reitz <mreitz@redhat.com>
----
- tests/qemu-iotests/126     | 105 +++++++++++++++++++++++++++++++++++++++++++++
- tests/qemu-iotests/126.out |  23 ++++++++++
- tests/qemu-iotests/group   |   1 +
- 3 files changed, 129 insertions(+)
- create mode 100755 tests/qemu-iotests/126
- create mode 100644 tests/qemu-iotests/126.out
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--Dax4DDbdsH99s1s8feMocgl4tLGXw8LGc
+From: Eric Blake <eblake@redhat.com>
+To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>
+Message-ID: <67407510-111e-c669-9f4b-dc8ba12c42a3@redhat.com>
+Subject: Re: [PATCH v2 2/3] block/file-*: *_parse_filename() and colons
+References: <20170522195217.12991-1-mreitz@redhat.com>
+ <20170522195217.12991-3-mreitz@redhat.com>
+In-Reply-To: <20170522195217.12991-3-mreitz@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-diff --git a/tests/qemu-iotests/126 b/tests/qemu-iotests/126
-new file mode 100755
-index 0000000..3a2a43a
---- /dev/null
-+++ b/tests/qemu-iotests/126
-@@ -0,0 +1,105 @@
-+#!/bin/bash
-+#
-+# Tests handling of colons in filenames (which may be confused with protocol
-+# prefixes)
-+#
-+# Copyright (C) 2017 Red Hat, Inc.
-+#
-+# This program is free software; you can redistribute it and/or modify
-+# it under the terms of the GNU General Public License as published by
-+# the Free Software Foundation; either version 2 of the License, or
-+# (at your option) any later version.
-+#
-+# This program is distributed in the hope that it will be useful,
-+# but WITHOUT ANY WARRANTY; without even the implied warranty of
-+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+# GNU General Public License for more details.
-+#
-+# You should have received a copy of the GNU General Public License
-+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-+#
-+
-+# creator
-+owner=mreitz@redhat.com
-+
-+seq="$(basename $0)"
-+echo "QA output created by $seq"
-+
-+here="$PWD"
-+status=1	# failure is the default!
-+
-+# get standard environment, filters and checks
-+. ./common.rc
-+. ./common.filter
-+
-+# Needs backing file support
-+_supported_fmt qcow qcow2 qed vmdk
-+# This is the default protocol (and we want to test the difference between
-+# colons which separate a protocol prefix from the rest and colons which are
-+# just part of the filename, so we cannot test protocols which require a prefix)
-+_supported_proto file
-+_supported_os Linux
-+
-+echo
-+echo '=== Testing plain files ==='
-+echo
-+
-+# A colon after a slash is not a protocol prefix separator
-+TEST_IMG="$TEST_DIR/a:b.$IMGFMT" _make_test_img 64M
-+_rm_test_img "$TEST_DIR/a:b.$IMGFMT"
-+
-+# But if you want to be really sure, you can do this
-+TEST_IMG="file:$TEST_DIR/a:b.$IMGFMT" _make_test_img 64M
-+_rm_test_img "$TEST_DIR/a:b.$IMGFMT"
-+
-+
-+echo
-+echo '=== Testing relative backing filename resolution ==='
-+echo
-+
-+BASE_IMG="$TEST_DIR/image:base.$IMGFMT"
-+TOP_IMG="$TEST_DIR/image:top.$IMGFMT"
-+
-+TEST_IMG=$BASE_IMG _make_test_img 64M
-+TEST_IMG=$TOP_IMG _make_test_img -b ./image:base.$IMGFMT
-+
-+# The default cluster size depends on the image format
-+TEST_IMG=$TOP_IMG _img_info | grep -v 'cluster_size'
-+
-+_rm_test_img "$BASE_IMG"
-+_rm_test_img "$TOP_IMG"
-+
-+
-+# Do another test where we access both top and base without any slash in them
-+echo
-+pushd "$TEST_DIR" >/dev/null
-+
-+BASE_IMG="base.$IMGFMT"
-+TOP_IMG="file:image:top.$IMGFMT"
-+
-+TEST_IMG=$BASE_IMG _make_test_img 64M
-+TEST_IMG=$TOP_IMG _make_test_img -b "$BASE_IMG"
-+
-+TEST_IMG=$TOP_IMG _img_info | grep -v 'cluster_size'
-+
-+_rm_test_img "$BASE_IMG"
-+_rm_test_img "image:top.$IMGFMT"
-+
-+popd >/dev/null
-+
-+# Note that we could also do the same test with BASE_IMG=file:image:base.$IMGFMT
-+# -- but behavior for that case is a bit strange. Protocol-prefixed paths are
-+# in a sense always absolute paths, so such paths will never be combined with
-+# the path of the overlay. But since "image:base.$IMGFMT" is actually a
-+# relative path, it will always be evaluated relative to qemu's CWD (but not
-+# relative to the overlay!). While this is more or less intended, it is still
-+# pretty strange and thus not something that is tested here.
-+# (The root of the issue is to use a relative path with a protocol prefix. This
-+#  may always give you weird results because in one sense, qemu considers such
-+#  paths absolute, whereas in another, they are still relative.)
-+
-+
-+# success, all done
-+echo '*** done'
-+rm -f $seq.full
-+status=0
-diff --git a/tests/qemu-iotests/126.out b/tests/qemu-iotests/126.out
-new file mode 100644
-index 0000000..50d7308
---- /dev/null
-+++ b/tests/qemu-iotests/126.out
-@@ -0,0 +1,23 @@
-+QA output created by 126
-+
-+=== Testing plain files ===
-+
-+Formatting 'TEST_DIR/a:b.IMGFMT', fmt=IMGFMT size=67108864
-+Formatting 'TEST_DIR/a:b.IMGFMT', fmt=IMGFMT size=67108864
-+
-+=== Testing relative backing filename resolution ===
-+
-+Formatting 'TEST_DIR/image:base.IMGFMT', fmt=IMGFMT size=67108864
-+Formatting 'TEST_DIR/image:top.IMGFMT', fmt=IMGFMT size=67108864 backing_file=./image:base.IMGFMT
-+image: TEST_DIR/image:top.IMGFMT
-+file format: IMGFMT
-+virtual size: 64M (67108864 bytes)
-+backing file: ./image:base.IMGFMT (actual path: TEST_DIR/./image:base.IMGFMT)
-+
-+Formatting 'base.IMGFMT', fmt=IMGFMT size=67108864
-+Formatting 'file:image:top.IMGFMT', fmt=IMGFMT size=67108864 backing_file=base.IMGFMT
-+image: ./image:top.IMGFMT
-+file format: IMGFMT
-+virtual size: 64M (67108864 bytes)
-+backing file: base.IMGFMT (actual path: ./base.IMGFMT)
-+*** done
-diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
-index 5c8ea0f..30717cb 100644
---- a/tests/qemu-iotests/group
-+++ b/tests/qemu-iotests/group
-@@ -130,6 +130,7 @@
- 122 rw auto
- 123 rw auto quick
- 124 rw auto backing
-+126 rw auto backing
- 128 rw auto quick
- 129 rw auto quick
- 130 rw auto quick
--- 
-2.9.4
+On 05/22/2017 02:52 PM, Max Reitz wrote:
+> The file drivers' *_parse_filename() implementations just strip the
+> optional protocol prefix off the filename. However, for e.g.
+> "file:foo:bar", this would lead to "foo:bar" being stored as the BDS's
+> filename which looks like it should be managed using the "foo" protocol=
+=2E
+> This is especially troublesome if you then try to resolve a backing
+> filename based on "foo:bar".
+>=20
+> This issue can only occur if the stripped part is a relative filename
+> ("file:/foo:bar" will be shortened to "/foo:bar" and having a slash
+> before the first colon means that "/foo" is not recognized as a protoco=
+l
+> part). Therefore, we can easily fix it by prepending "./" to such
+> filenames.
+
+Slick.
+
+Reviewed-by: Eric Blake <eblake@redhat.com>
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--Dax4DDbdsH99s1s8feMocgl4tLGXw8LGc
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEcBAEBCAAGBQJZI0PAAAoJEKeha0olJ0NqbFIH+wWiYn1E6OyS9bwc081v6Ze3
+wBkLeVJ3NDmXKbBU3oK0e3qUegln3i9LTvjcAEy0cA9YgZI2rUIqUKsayvDmd7zp
+XVsB37oh83LhYahyJf2YP25FMb6sVrsgfLz/FYcUIVXn8xE7IyFvSlGC2HvBb8V2
+BmBygfZJZcN2f12y5ZKPh8713wpG15AAMFpBsSclka8m3Xe+iLcz1r24FAOI3tny
+Fgd0q5tanLrMBnQA0Up2fVMhOhohHXyaregZHsJpgjL+nTFB/v4HlRr3/uMVwWcB
+HYmPx/bp/auOLUkvcle/zC7zu1RrKZ12hGQP/RZ1l7j8qaVv1c16DTtDuASWNsw=
+=3g8o
+-----END PGP SIGNATURE-----
+
+--Dax4DDbdsH99s1s8feMocgl4tLGXw8LGc--
