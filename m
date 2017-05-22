@@ -1,24 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53801)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33988)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dCdaz-0006Tz-C7
-	for qemu-devel@nongnu.org; Sun, 21 May 2017 23:01:22 -0400
+	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1dCeKP-0007xh-TF
+	for qemu-devel@nongnu.org; Sun, 21 May 2017 23:48:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dCdaw-0005X2-Cc
-	for qemu-devel@nongnu.org; Sun, 21 May 2017 23:01:21 -0400
-Date: Mon, 22 May 2017 12:36:32 +1000
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20170522023632.GJ30246@umbus.fritz.box>
-References: <1495172439-1504-1-git-send-email-bharata@linux.vnet.ibm.com>
-	<1495172439-1504-2-git-send-email-bharata@linux.vnet.ibm.com>
-	<20170519073303.GK12284@umbus.fritz.box>
-	<b39e67c9-f7e7-9277-56e5-8e0769efc15d@redhat.com>
+	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1dCeKM-0002qx-Pz
+	for qemu-devel@nongnu.org; Sun, 21 May 2017 23:48:17 -0400
+Received: from [59.151.112.132] (port=38460 helo=heian.cn.fujitsu.com)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1dCeKL-0002mw-Sl
+	for qemu-devel@nongnu.org; Sun, 21 May 2017 23:48:14 -0400
+References: <cover.1495018956.git.maozy.fnst@cn.fujitsu.com>
+	<7b167e0f406b66ae11313d4cde04396952d0902f.1495018956.git.maozy.fnst@cn.fujitsu.com>
+	<87k25dictv.fsf@dusky.pond.sub.org>
+From: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
+Message-ID: <257627fe-8645-33fe-8f20-0f896670d59d@cn.fujitsu.com>
+Date: Mon, 22 May 2017 11:47:24 +0800
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="ed/6oDxOLijJh8b0"
-Content-Disposition: inline
-In-Reply-To: <b39e67c9-f7e7-9277-56e5-8e0769efc15d@redhat.com>
-Subject: Re: [Qemu-devel] [RFC PATCH v2 1/4] migration: Introduce
- unregister_savevm_live()
+In-Reply-To: <87k25dictv.fsf@dusky.pond.sub.org>
+Content-Type: text/plain; charset="windows-1252"; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v4 1/3] net/rocker: Remove the dead error
+ handling
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,78 +29,216 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laurent Vivier <lvivier@redhat.com>
-Cc: Bharata B Rao <bharata@linux.vnet.ibm.com>, rnsastry@linux.vnet.ibm.com, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, sam.bobroff@au1.ibm.com, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Juan Quintela <quintela@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: qemu-devel@nongnu.org, jasowang@redhat.com, jiri@resnulli.us, f4bug@amsat.org
 
+Hi, Markus
+Thanks for review and sorry for replying late, I was on the weekend.
 
---ed/6oDxOLijJh8b0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+On 05/19/2017 02:24 PM, Markus Armbruster wrote:
+> Mao Zhongyi <maozy.fnst@cn.fujitsu.com> writes:
+>
+>> The function of_dpa_world_alloc is a wrapper around world_alloc(), which
+>> returns null only when g_malloc0(size_t size) does. But g_malloc0() also
+>> is a wrapper around g_malloc0_n(1, size) that ignore the fact that
+>> g_malloc0() of 0 bytes, it doesn't returns null. So the error handling is
+>> dead. Similar like desc_ring_alloc(), fp_port_alloc() etc. Remove these
+>> entirely.
+>>
+>> Cc: jasowang@redhat.com
+>> Cc: jiri@resnulli.us
+>> Cc: f4bug@amsat.org
+>> Cc: armbru@redhat.com
+>> Signed-off-by: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
+>> ---
+>>  hw/net/rocker/rocker.c      | 32 --------------------------------
+>>  hw/net/rocker/rocker_desc.c |  3 ---
+>>  hw/net/rocker/rocker_fp.c   |  4 ----
+>>  3 files changed, 39 deletions(-)
+>>
+>> diff --git a/hw/net/rocker/rocker.c b/hw/net/rocker/rocker.c
+>> index 6e70fdd..b2b6dc7 100644
+>> --- a/hw/net/rocker/rocker.c
+>> +++ b/hw/net/rocker/rocker.c
+>> @@ -1313,13 +1313,6 @@ static int pci_rocker_init(PCIDevice *dev)
+>>
+>>      r->worlds[ROCKER_WORLD_TYPE_OF_DPA] = of_dpa_world_alloc(r);
+>>
+>> -    for (i = 0; i < ROCKER_WORLD_TYPE_MAX; i++) {
+>> -        if (!r->worlds[i]) {
+>> -            err = -ENOMEM;
+>> -            goto err_world_alloc;
+>> -        }
+>> -    }
+>> -
+>>      if (!r->world_name) {
+>>          r->world_name = g_strdup(world_name(r->worlds[ROCKER_WORLD_TYPE_OF_DPA]));
+>>      }
+>
+> Please also simplify world_alloc()
+>
+>    World *world_alloc(Rocker *r, size_t sizeof_private,
+>                       enum rocker_world_type type, WorldOps *ops)
+>    {
+>        World *w = g_malloc0(sizeof(World) + sizeof_private);
+>
+>   -    if (w) {
+>            w->r = r;
+>            w->type = type;
+>            w->ops = ops;
+>            if (w->ops->init) {
+>                w->ops->init(w);
+>            }
+>        }
+>
+>   -    return w;
+>    }
 
-On Fri, May 19, 2017 at 03:14:35PM +0200, Laurent Vivier wrote:
-> On 19/05/2017 09:33, David Gibson wrote:
-> > On Fri, May 19, 2017 at 11:10:36AM +0530, Bharata B Rao wrote:
-> >> Introduce a new function unregister_savevm_live() to unregister the vm=
-state
-> >> handlers registered via register_savevm_live().
-> >>
-> >> register_savevm() allocates SaveVMHandlers while register_savevm_live()
-> >> gets passed with SaveVMHandlers. During unregistration, we  want to
-> >> free SaveVMHandlers in the former case but not free in the latter case.
-> >> Hence this new API is needed to differentiate this.
-> >>
-> >> This new API will be needed by PowerPC to unregister the HTAB savevm
-> >> handlers.
-> >>
-> >> Signed-off-by: Bharata B Rao <bharata@linux.vnet.ibm.com>
-> >=20
-> > Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
-> >=20
-> > I could take this through my tree, but it would need an ACK from Dave
-> > Gilbert or Juan Quintela.
->=20
-> I cc: them for that.
+OK, I will fix it and search for the similar error handling from others allocation
+functions.
 
-Dave, Juan: his is fairly urgent, since it's a prereq for (sanely)
-fixing a migration bug.  Please let me know what I can do to expedite
-review.
+>
+> and reindent.
+>
+>> @@ -1396,9 +1389,6 @@ static int pci_rocker_init(PCIDevice *dev)
+>>      }
+>>
+>>      r->rings = g_new(DescRing *, rocker_pci_ring_count(r));
+>> -    if (!r->rings) {
+>> -        goto err_rings_alloc;
+>> -    }
+>>
+>>      /* Rings are ordered like this:
+>>       * - command ring
+>> @@ -1410,14 +1400,9 @@ static int pci_rocker_init(PCIDevice *dev)
+>>       * .....
+>>       */
+>>
+>> -    err = -ENOMEM;
+>>      for (i = 0; i < rocker_pci_ring_count(r); i++) {
+>>          DescRing *ring = desc_ring_alloc(r, i);
+>>
+>> -        if (!ring) {
+>> -            goto err_ring_alloc;
+>> -        }
+>> -
+>>          if (i == ROCKER_RING_CMD) {
+>>              desc_ring_set_consume(ring, cmd_consume, ROCKER_MSIX_VEC_CMD);
+>>          } else if (i == ROCKER_RING_EVENT) {
+>> @@ -1437,10 +1422,6 @@ static int pci_rocker_init(PCIDevice *dev)
+>>              fp_port_alloc(r, r->name, &r->fp_start_macaddr,
+>>                            i, &r->fp_ports_peers[i]);
+>>
+>> -        if (!port) {
+>> -            goto err_port_alloc;
+>> -        }
+>> -
+>>          r->fp_port[i] = port;
+>>          fp_port_set_world(port, r->world_dflt);
+>>      }
+>> @@ -1449,25 +1430,12 @@ static int pci_rocker_init(PCIDevice *dev)
+>>
+>>      return 0;
+>>
+>> -err_port_alloc:
+>> -    for (--i; i >= 0; i--) {
+>> -        FpPort *port = r->fp_port[i];
+>> -        fp_port_free(port);
+>> -    }
+>> -    i = rocker_pci_ring_count(r);
+>> -err_ring_alloc:
+>> -    for (--i; i >= 0; i--) {
+>> -        desc_ring_free(r->rings[i]);
+>> -    }
+>> -    g_free(r->rings);
+>> -err_rings_alloc:
+>>  err_duplicate:
+>>      rocker_msix_uninit(r);
+>>  err_msix_init:
+>>      object_unparent(OBJECT(&r->msix_bar));
+>>      object_unparent(OBJECT(&r->mmio));
+>>  err_world_type_by_name:
+>> -err_world_alloc:
+>>      for (i = 0; i < ROCKER_WORLD_TYPE_MAX; i++) {
+>>          if (r->worlds[i]) {
+>>              world_free(r->worlds[i]);
+>> diff --git a/hw/net/rocker/rocker_desc.c b/hw/net/rocker/rocker_desc.c
+>> index ac02797..bd7e364 100644
+>> --- a/hw/net/rocker/rocker_desc.c
+>> +++ b/hw/net/rocker/rocker_desc.c
+>> @@ -347,9 +347,6 @@ DescRing *desc_ring_alloc(Rocker *r, int index)
+>>      DescRing *ring;
+>>
+>>      ring = g_new0(DescRing, 1);
+>> -    if (!ring) {
+>> -        return NULL;
+>> -    }
+>>
+>>      ring->r = r;
+>>      ring->index = index;
+>> diff --git a/hw/net/rocker/rocker_fp.c b/hw/net/rocker/rocker_fp.c
+>> index 1305ac3..4b3c984 100644
+>> --- a/hw/net/rocker/rocker_fp.c
+>> +++ b/hw/net/rocker/rocker_fp.c
+>> @@ -226,10 +226,6 @@ FpPort *fp_port_alloc(Rocker *r, char *sw_name,
+>>  {
+>>      FpPort *port = g_new0(FpPort, 1);
+>>
+>> -    if (!port) {
+>> -        return NULL;
+>> -    }
+>> -
+>>      port->r = r;
+>>      port->index = index;
+>>      port->pport = index + 1;
+>
+> There's more!
+>
+> In tx_consume():
+>
+>            }
+>            iov[iovcnt].iov_len = frag_len;
+>            iov[iovcnt].iov_base = g_malloc(frag_len);
+>   -        if (!iov[iovcnt].iov_base) {
+>   -            err = -ROCKER_ENOMEM;
+>   -            goto err_no_mem;
+>   -        }
+>
+>            if (pci_dma_read(dev, frag_addr, iov[iovcnt].iov_base,
+>
+> In rx_produce():
+>
+>        data = g_malloc(data_size);
+>   -    if (!data) {
+>   -        err = -ROCKER_ENOMEM;
+>   -        goto out;
+>   -    }
+>        iov_to_buf(iov, iovcnt, 0, data, data_size);
+>        pci_dma_write(dev, frag_addr, data, data_size);
+>
+> In rocker_test_dma_ctrl():
+>
+>        int i;
+>
+>        buf = g_malloc(r->test_dma_size);
+>    -
+>    -   if (!buf) {
+>    -       DPRINTF("test dma buffer alloc failed");
+>    -       return;
+>    -   }
+>
+>        switch (val) {
+>
+> This is just the result of a quick grep for '\<g_' immediately followed
+> by dead error handling in rocker.c.  Please do the same for the rest of
+> the rocker sources, and additionally search for dead error handling
+> separated from the allocation by function returns, like the one you
+> fixed in pci_rocker_init().
 
->=20
-> Just a comment on the patch.
->=20
-> Instead of introducing a new function, perhaps we can homogenize the use
-> of register_savevm() by always providing a SaveVMHandlers pointer and
-> never a couple of (SaveStateHandler, LoadStateHandler) so the
-> unregister_save() has never to free se->ops?
+After reading your detailed explanation, I think I will try to do these:
+1. Searching for all the dead error handling in the rocker_*.c.
+2. All dead error handling from allocation functions will be as a separated
+    patch. Similarly, from function returns as another patch. Is that right?
 
-Sounds reasonable to me.  Again, Dave?  Juan?
-
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---ed/6oDxOLijJh8b0
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-
-iQIcBAEBCAAGBQJZIk6wAAoJEGw4ysog2bOSAiQP/j22R0ZZ7itkJlh5QflsJniT
-2catZYbfTvCRieRnr6W9TUDDU09SbVHYH4oDGu2r8HZwgJumwZyPUhEQhMQ+WihW
-k8HJ2o5kOq3FO1T89l62shNDUO/cIDlISHuXehCw5BRrTbDoApmB604CeO3dcWKZ
-W3SJcN0jKovmugAUayCwB9ylsJkE2nbx/sT5dAds2jomMy+wT0bICo+5dXBhPmmz
-66egjhx3RVsQdjz3ePF0rF8ImVJEvYd1QXNzxe6uKnZK21b3MyXDBnmYtDxrWL0N
-/r6g0a9csX4WsQSqpx6+S8RcBOt1Y3CUygX+gvTgCvtNoLkdm9Zcg9cAmJNvtSbJ
-Z0f0sIj8ZGiy9yOEYQcpBr424wKJ/sQ44uPVqOSJaaO6t+xRLakHPVZw3zjyAdtN
-we3ktwuACUgc5uurOHuHJz3y8IYLwE1DilnC9aCnARt71BQwmLH8ta4OcMo4bR5l
-R4Mb7/HfRo+HrsJJTJpo2iLqol98TzXLeNV4v2cxLUchk6QO+8rlMzM3OGVk7/pO
-nHgYq5F38YlQnBV2FUARezGxOvycY0tALgDcwAMbPBQFAOwYy8HuGXGmoVGva1kC
-RfHiF7YK5Vg7eUyWrYkZJmIrWI1XDETWZpm0Wk36ockZ7x4KplGUmRptDo6gNNMR
-0JBkz+2BkpAIBlh7rbsv
-=CWMj
------END PGP SIGNATURE-----
-
---ed/6oDxOLijJh8b0--
+Thanks
+Mao
