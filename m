@@ -1,35 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39677)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39963)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <danielhb@linux.vnet.ibm.com>) id 1dCt84-0005MX-8M
-	for qemu-devel@nongnu.org; Mon, 22 May 2017 15:36:36 -0400
+	(envelope-from <eblake@redhat.com>) id 1dCt8p-0005yI-IH
+	for qemu-devel@nongnu.org; Mon, 22 May 2017 15:37:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <danielhb@linux.vnet.ibm.com>) id 1dCt80-0000H3-HG
-	for qemu-devel@nongnu.org; Mon, 22 May 2017 15:36:32 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:55204)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <danielhb@linux.vnet.ibm.com>)
-	id 1dCt80-0000Gl-7e
-	for qemu-devel@nongnu.org; Mon, 22 May 2017 15:36:28 -0400
-Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v4MJPh18115102
-	for <qemu-devel@nongnu.org>; Mon, 22 May 2017 15:36:27 -0400
-Received: from e24smtp01.br.ibm.com (e24smtp01.br.ibm.com [32.104.18.85])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2am4b3cexn-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 22 May 2017 15:36:26 -0400
-Received: from localhost
-	by e24smtp01.br.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <danielhb@linux.vnet.ibm.com>;
-	Mon, 22 May 2017 16:36:24 -0300
-From: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
-Date: Mon, 22 May 2017 16:35:51 -0300
-In-Reply-To: <20170522193551.826-1-danielhb@linux.vnet.ibm.com>
-References: <20170522193551.826-1-danielhb@linux.vnet.ibm.com>
-Message-Id: <20170522193551.826-6-danielhb@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH v11 5/5] migration: spapr: migrate ccs_list in
- spapr state
+	(envelope-from <eblake@redhat.com>) id 1dCt8l-0000Tf-Ll
+	for qemu-devel@nongnu.org; Mon, 22 May 2017 15:37:19 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:58158)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dCt8l-0000T7-Ca
+	for qemu-devel@nongnu.org; Mon, 22 May 2017 15:37:15 -0400
+References: <1495186480-114192-1-git-send-email-anton.nefedov@virtuozzo.com>
+	<1495186480-114192-12-git-send-email-anton.nefedov@virtuozzo.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <be27430f-d63b-5e2a-6d87-f3753c9a7e26@redhat.com>
+Date: Mon, 22 May 2017 14:37:04 -0500
+MIME-Version: 1.0
+In-Reply-To: <1495186480-114192-12-git-send-email-anton.nefedov@virtuozzo.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="CujWjU6pPro8S8NnaINNx4awPJtmLC3oa"
+Subject: Re: [Qemu-devel] [PATCH v1 11/13] qcow2-cluster: make
+ handle_dependencies() logic easier to follow
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,99 +29,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-ppc@nongnu.org, david@gibson.dropbear.id.au, mdroth@linux.vnet.ibm.com
+To: Anton Nefedov <anton.nefedov@virtuozzo.com>, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, "Denis V . Lunev" <den@openvz.org>, den@virtuozzo.com, mreitz@redhat.com
 
-From: Jianjun Duan <duanj@linux.vnet.ibm.com>
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--CujWjU6pPro8S8NnaINNx4awPJtmLC3oa
+From: Eric Blake <eblake@redhat.com>
+To: Anton Nefedov <anton.nefedov@virtuozzo.com>, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, "Denis V . Lunev" <den@openvz.org>, den@virtuozzo.com,
+ mreitz@redhat.com
+Message-ID: <be27430f-d63b-5e2a-6d87-f3753c9a7e26@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v1 11/13] qcow2-cluster: make
+ handle_dependencies() logic easier to follow
+References: <1495186480-114192-1-git-send-email-anton.nefedov@virtuozzo.com>
+ <1495186480-114192-12-git-send-email-anton.nefedov@virtuozzo.com>
+In-Reply-To: <1495186480-114192-12-git-send-email-anton.nefedov@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-ccs_list in spapr state maintains the device tree related
-information on the rtas side for hotplugged devices. In racing
-situations between hotplug events and migration operation, a rtas
-hotplug event could be migrated from the source guest to target
-guest, or the source guest could have not yet finished fetching
-the device tree when migration is started, the target will try
-to finish fetching the device tree. By migrating ccs_list, the
-target can fetch the device tree properly.
+On 05/19/2017 04:34 AM, Anton Nefedov wrote:
+> Avoid complicated nested conditions; return or continue asap instead.
+> The logic is not changed.
+>=20
+> Signed-off-by: Anton Nefedov <anton.nefedov@virtuozzo.com>
+> Signed-off-by: Denis V. Lunev <den@openvz.org>
+> ---
+>  block/qcow2-cluster.c | 45 ++++++++++++++++++++++---------------------=
+--
+>  1 file changed, 22 insertions(+), 23 deletions(-)
+>=20
 
-In theory there would be other alternatives besides migrating the
-css_list to fix this. For example, we could add a flag that indicates
-whether a device is in the middle of the configure_connector during the
-migration process, in the post_load we can detect if this flag
-is active and then return an error informing the guest to restart the
-hotplug process. However, the DRC state can still be modified outside of
-hotplug. Using:
+> =20
+> -            /* Stop if already an l2meta exists. After yielding, it wo=
+uldn't
 
-   drmgr -c pci -s <drc_index> -r
-   drmgr -c pci -s <drc_index> -a
+As long as you're touching this,
 
-it is possible to return a device to firmware and then later take it
-back and reconfigure it. This is not a common case but it's not prohibited,
-and performing a migration between these 2 operations would fail because
-the default coldplug state on target assumes a configured state in
-the source*. Migrating ccs_list is one solution that cover this
-case as well.
 
-ccs_list is put in a subsection in the spapr state VMSD to make
-sure migration across different versions is not broken.
+> -            }
+> +        /* Stop if already an l2meta exists. After yielding, it wouldn=
+'t
 
-* see http://lists.nongnu.org/archive/html/qemu-devel/2016-10/msg01763.html
-for more information on this discussion.
+fix the grammar: s/already an l2meta/an l2meta already/
 
-Signed-off-by: Jianjun Duan <duanj@linux.vnet.ibm.com>
-Signed-off-by: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
----
- hw/ppc/spapr.c | 32 ++++++++++++++++++++++++++++++++
- 1 file changed, 32 insertions(+)
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
 
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index c4473b9..785a5e9 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -1453,6 +1453,37 @@ static bool version_before_3(void *opaque, int version_id)
-     return version_id < 3;
- }
- 
-+static bool spapr_ccs_list_needed(void *opaque)
-+{
-+    sPAPRMachineState *spapr = (sPAPRMachineState *)opaque;
-+    return !QTAILQ_EMPTY(&spapr->ccs_list);
-+}
-+
-+static const VMStateDescription vmstate_spapr_ccs = {
-+    .name = "spapr_configure_connector_state",
-+    .version_id = 1,
-+    .minimum_version_id = 1,
-+    .fields = (VMStateField[]) {
-+        VMSTATE_UINT32(drc_index, sPAPRConfigureConnectorState),
-+        VMSTATE_INT32(fdt_offset, sPAPRConfigureConnectorState),
-+        VMSTATE_INT32(fdt_depth, sPAPRConfigureConnectorState),
-+        VMSTATE_END_OF_LIST()
-+    },
-+};
-+
-+static const VMStateDescription vmstate_spapr_ccs_list = {
-+    .name = "spapr_ccs_list",
-+    .version_id = 1,
-+    .minimum_version_id = 1,
-+    .needed = spapr_ccs_list_needed,
-+    .fields = (VMStateField[]) {
-+        VMSTATE_QTAILQ_V(ccs_list, sPAPRMachineState, 1,
-+                         vmstate_spapr_ccs, sPAPRConfigureConnectorState,
-+                         next),
-+        VMSTATE_END_OF_LIST()
-+    },
-+};
-+
- static bool spapr_ov5_cas_needed(void *opaque)
- {
-     sPAPRMachineState *spapr = opaque;
-@@ -1551,6 +1582,7 @@ static const VMStateDescription vmstate_spapr = {
-     .subsections = (const VMStateDescription*[]) {
-         &vmstate_spapr_ov5_cas,
-         &vmstate_spapr_patb_entry,
-+        &vmstate_spapr_ccs_list,
-         NULL
-     }
- };
--- 
-2.9.4
+
+--CujWjU6pPro8S8NnaINNx4awPJtmLC3oa
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEcBAEBCAAGBQJZIz3gAAoJEKeha0olJ0Nqia8H/24h8SOTdTwldBsCFMVqiIVF
+jraa1rVdAuPmQtYaxYTCKJ2yke94w7s39wTbnWLu7ouixRk1ZnozQpJ/px5XgtWV
+Sn+YRMfoTsjP2SgcPoc5ZfpRNkJ5yADG+B3oVetMicova2ZNPhaUJwwlUv+pP02u
+jCB5p69Ec1IyUtNcWhkY84XHAQS6Eo1hAku32+sjRBsRvH8SJgp/wTfjiGM0te2/
+r9L5JQlRgrJxO1bm++uUsZkaGXNnpBV8B2T3Bbh3lS63sbtqIB1GRXUsvdZE955o
+rKmjQR2k/O3ES+al7C5a6oNs0ipPQ1TAgQSFEBe0wgl5B+Mq13uQkikP2xhX0jI=
+=EJAb
+-----END PGP SIGNATURE-----
+
+--CujWjU6pPro8S8NnaINNx4awPJtmLC3oa--
