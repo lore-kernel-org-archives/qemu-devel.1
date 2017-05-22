@@ -1,26 +1,43 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33988)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38545)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1dCeKP-0007xh-TF
-	for qemu-devel@nongnu.org; Sun, 21 May 2017 23:48:19 -0400
+	(envelope-from <bharata@linux.vnet.ibm.com>) id 1dCelW-0004iF-9T
+	for qemu-devel@nongnu.org; Mon, 22 May 2017 00:16:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1dCeKM-0002qx-Pz
-	for qemu-devel@nongnu.org; Sun, 21 May 2017 23:48:17 -0400
-Received: from [59.151.112.132] (port=38460 helo=heian.cn.fujitsu.com)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1dCeKL-0002mw-Sl
-	for qemu-devel@nongnu.org; Sun, 21 May 2017 23:48:14 -0400
-References: <cover.1495018956.git.maozy.fnst@cn.fujitsu.com>
-	<7b167e0f406b66ae11313d4cde04396952d0902f.1495018956.git.maozy.fnst@cn.fujitsu.com>
-	<87k25dictv.fsf@dusky.pond.sub.org>
-From: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
-Message-ID: <257627fe-8645-33fe-8f20-0f896670d59d@cn.fujitsu.com>
-Date: Mon, 22 May 2017 11:47:24 +0800
+	(envelope-from <bharata@linux.vnet.ibm.com>) id 1dCelS-0007ya-BD
+	for qemu-devel@nongnu.org; Mon, 22 May 2017 00:16:18 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:57501
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bharata@linux.vnet.ibm.com>)
+	id 1dCelS-0007x0-5p
+	for qemu-devel@nongnu.org; Mon, 22 May 2017 00:16:14 -0400
+Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v4M48ouN123634
+	for <qemu-devel@nongnu.org>; Mon, 22 May 2017 00:16:12 -0400
+Received: from e23smtp07.au.ibm.com (e23smtp07.au.ibm.com [202.81.31.140])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2akkgc8us4-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Mon, 22 May 2017 00:16:12 -0400
+Received: from localhost
+	by e23smtp07.au.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <bharata@linux.vnet.ibm.com>;
+	Mon, 22 May 2017 14:16:09 +1000
+Date: Mon, 22 May 2017 09:45:15 +0530
+From: Bharata B Rao <bharata@linux.vnet.ibm.com>
+Reply-To: bharata@linux.vnet.ibm.com
+References: <1495172439-1504-1-git-send-email-bharata@linux.vnet.ibm.com>
+	<1495172439-1504-5-git-send-email-bharata@linux.vnet.ibm.com>
+	<20170519063614.GG3446@in.ibm.com>
+	<20170522024448.GL30246@umbus.fritz.box>
 MIME-Version: 1.0
-In-Reply-To: <87k25dictv.fsf@dusky.pond.sub.org>
-Content-Type: text/plain; charset="windows-1252"; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v4 1/3] net/rocker: Remove the dead error
- handling
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170522024448.GL30246@umbus.fritz.box>
+Message-Id: <20170522041515.GH3446@in.ibm.com>
+Subject: Re: [Qemu-devel] [RFC PATCH v2 4/4] spapr: Fix migration of Radix
+ guests
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,216 +46,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: qemu-devel@nongnu.org, jasowang@redhat.com, jiri@resnulli.us, f4bug@amsat.org
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, sam.bobroff@au1.ibm.com, rnsastry@linux.vnet.ibm.com
 
-Hi, Markus
-Thanks for review and sorry for replying late, I was on the weekend.
+On Mon, May 22, 2017 at 12:44:48PM +1000, David Gibson wrote:
+> On Fri, May 19, 2017 at 12:06:14PM +0530, Bharata B Rao wrote:
+> > On Fri, May 19, 2017 at 11:10:39AM +0530, Bharata B Rao wrote:
+> > > Fix migration of radix guests by ensuring that we issue
+> > > KVM_PPC_CONFIGURE_V3_MMU for radix case post migration.
+> > > 
+> > > Reported-by: Nageswara R Sastry <rnsastry@linux.vnet.ibm.com>
+> > > Signed-off-by: Bharata B Rao <bharata@linux.vnet.ibm.com>
+> > > ---
+> > >  hw/ppc/spapr.c | 12 ++++++++++++
+> > >  1 file changed, 12 insertions(+)
+> > > 
+> > > diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> > > index daf335c..8f20f14 100644
+> > > --- a/hw/ppc/spapr.c
+> > > +++ b/hw/ppc/spapr.c
+> > > @@ -1400,6 +1400,18 @@ static int spapr_post_load(void *opaque, int version_id)
+> > >          err = spapr_rtc_import_offset(&spapr->rtc, spapr->rtc_offset);
+> > >      }
+> > > 
+> > > +    if (spapr->patb_entry) {
+> > > +        PowerPCCPU *cpu = POWERPC_CPU(first_cpu);
+> > > +        if (kvmppc_has_cap_mmu_radix() && kvm_enabled()) {
+> > > +            err = kvmppc_configure_v3_mmu(cpu, SPAPR_PROC_TABLE_RADIX,
+> > > +                ((cpu->env.spr[SPR_LPCR] & LPCR_GTSE) ? SPAPR_PROC_TABLE_GTSE :
+> > > +                0), spapr->patb_entry);
+> > 
+> > Better to use explicit 'true' and 'false' in the above call. Here is
+> > the updated patch:
+> 
+> Or just !!(cpu->env.spr[SPR_LPCR] & LPCR_GTSE) and avoid the ?:
+> entirely.
+> 
+> With this version you no longer need patch 3/4 AFAICT.
 
-On 05/19/2017 02:24 PM, Markus Armbruster wrote:
-> Mao Zhongyi <maozy.fnst@cn.fujitsu.com> writes:
->
->> The function of_dpa_world_alloc is a wrapper around world_alloc(), which
->> returns null only when g_malloc0(size_t size) does. But g_malloc0() also
->> is a wrapper around g_malloc0_n(1, size) that ignore the fact that
->> g_malloc0() of 0 bytes, it doesn't returns null. So the error handling is
->> dead. Similar like desc_ring_alloc(), fp_port_alloc() etc. Remove these
->> entirely.
->>
->> Cc: jasowang@redhat.com
->> Cc: jiri@resnulli.us
->> Cc: f4bug@amsat.org
->> Cc: armbru@redhat.com
->> Signed-off-by: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
->> ---
->>  hw/net/rocker/rocker.c      | 32 --------------------------------
->>  hw/net/rocker/rocker_desc.c |  3 ---
->>  hw/net/rocker/rocker_fp.c   |  4 ----
->>  3 files changed, 39 deletions(-)
->>
->> diff --git a/hw/net/rocker/rocker.c b/hw/net/rocker/rocker.c
->> index 6e70fdd..b2b6dc7 100644
->> --- a/hw/net/rocker/rocker.c
->> +++ b/hw/net/rocker/rocker.c
->> @@ -1313,13 +1313,6 @@ static int pci_rocker_init(PCIDevice *dev)
->>
->>      r->worlds[ROCKER_WORLD_TYPE_OF_DPA] = of_dpa_world_alloc(r);
->>
->> -    for (i = 0; i < ROCKER_WORLD_TYPE_MAX; i++) {
->> -        if (!r->worlds[i]) {
->> -            err = -ENOMEM;
->> -            goto err_world_alloc;
->> -        }
->> -    }
->> -
->>      if (!r->world_name) {
->>          r->world_name = g_strdup(world_name(r->worlds[ROCKER_WORLD_TYPE_OF_DPA]));
->>      }
->
-> Please also simplify world_alloc()
->
->    World *world_alloc(Rocker *r, size_t sizeof_private,
->                       enum rocker_world_type type, WorldOps *ops)
->    {
->        World *w = g_malloc0(sizeof(World) + sizeof_private);
->
->   -    if (w) {
->            w->r = r;
->            w->type = type;
->            w->ops = ops;
->            if (w->ops->init) {
->                w->ops->init(w);
->            }
->        }
->
->   -    return w;
->    }
+Ah yes, will send the updated version next.
 
-OK, I will fix it and search for the similar error handling from others allocation
-functions.
-
->
-> and reindent.
->
->> @@ -1396,9 +1389,6 @@ static int pci_rocker_init(PCIDevice *dev)
->>      }
->>
->>      r->rings = g_new(DescRing *, rocker_pci_ring_count(r));
->> -    if (!r->rings) {
->> -        goto err_rings_alloc;
->> -    }
->>
->>      /* Rings are ordered like this:
->>       * - command ring
->> @@ -1410,14 +1400,9 @@ static int pci_rocker_init(PCIDevice *dev)
->>       * .....
->>       */
->>
->> -    err = -ENOMEM;
->>      for (i = 0; i < rocker_pci_ring_count(r); i++) {
->>          DescRing *ring = desc_ring_alloc(r, i);
->>
->> -        if (!ring) {
->> -            goto err_ring_alloc;
->> -        }
->> -
->>          if (i == ROCKER_RING_CMD) {
->>              desc_ring_set_consume(ring, cmd_consume, ROCKER_MSIX_VEC_CMD);
->>          } else if (i == ROCKER_RING_EVENT) {
->> @@ -1437,10 +1422,6 @@ static int pci_rocker_init(PCIDevice *dev)
->>              fp_port_alloc(r, r->name, &r->fp_start_macaddr,
->>                            i, &r->fp_ports_peers[i]);
->>
->> -        if (!port) {
->> -            goto err_port_alloc;
->> -        }
->> -
->>          r->fp_port[i] = port;
->>          fp_port_set_world(port, r->world_dflt);
->>      }
->> @@ -1449,25 +1430,12 @@ static int pci_rocker_init(PCIDevice *dev)
->>
->>      return 0;
->>
->> -err_port_alloc:
->> -    for (--i; i >= 0; i--) {
->> -        FpPort *port = r->fp_port[i];
->> -        fp_port_free(port);
->> -    }
->> -    i = rocker_pci_ring_count(r);
->> -err_ring_alloc:
->> -    for (--i; i >= 0; i--) {
->> -        desc_ring_free(r->rings[i]);
->> -    }
->> -    g_free(r->rings);
->> -err_rings_alloc:
->>  err_duplicate:
->>      rocker_msix_uninit(r);
->>  err_msix_init:
->>      object_unparent(OBJECT(&r->msix_bar));
->>      object_unparent(OBJECT(&r->mmio));
->>  err_world_type_by_name:
->> -err_world_alloc:
->>      for (i = 0; i < ROCKER_WORLD_TYPE_MAX; i++) {
->>          if (r->worlds[i]) {
->>              world_free(r->worlds[i]);
->> diff --git a/hw/net/rocker/rocker_desc.c b/hw/net/rocker/rocker_desc.c
->> index ac02797..bd7e364 100644
->> --- a/hw/net/rocker/rocker_desc.c
->> +++ b/hw/net/rocker/rocker_desc.c
->> @@ -347,9 +347,6 @@ DescRing *desc_ring_alloc(Rocker *r, int index)
->>      DescRing *ring;
->>
->>      ring = g_new0(DescRing, 1);
->> -    if (!ring) {
->> -        return NULL;
->> -    }
->>
->>      ring->r = r;
->>      ring->index = index;
->> diff --git a/hw/net/rocker/rocker_fp.c b/hw/net/rocker/rocker_fp.c
->> index 1305ac3..4b3c984 100644
->> --- a/hw/net/rocker/rocker_fp.c
->> +++ b/hw/net/rocker/rocker_fp.c
->> @@ -226,10 +226,6 @@ FpPort *fp_port_alloc(Rocker *r, char *sw_name,
->>  {
->>      FpPort *port = g_new0(FpPort, 1);
->>
->> -    if (!port) {
->> -        return NULL;
->> -    }
->> -
->>      port->r = r;
->>      port->index = index;
->>      port->pport = index + 1;
->
-> There's more!
->
-> In tx_consume():
->
->            }
->            iov[iovcnt].iov_len = frag_len;
->            iov[iovcnt].iov_base = g_malloc(frag_len);
->   -        if (!iov[iovcnt].iov_base) {
->   -            err = -ROCKER_ENOMEM;
->   -            goto err_no_mem;
->   -        }
->
->            if (pci_dma_read(dev, frag_addr, iov[iovcnt].iov_base,
->
-> In rx_produce():
->
->        data = g_malloc(data_size);
->   -    if (!data) {
->   -        err = -ROCKER_ENOMEM;
->   -        goto out;
->   -    }
->        iov_to_buf(iov, iovcnt, 0, data, data_size);
->        pci_dma_write(dev, frag_addr, data, data_size);
->
-> In rocker_test_dma_ctrl():
->
->        int i;
->
->        buf = g_malloc(r->test_dma_size);
->    -
->    -   if (!buf) {
->    -       DPRINTF("test dma buffer alloc failed");
->    -       return;
->    -   }
->
->        switch (val) {
->
-> This is just the result of a quick grep for '\<g_' immediately followed
-> by dead error handling in rocker.c.  Please do the same for the rest of
-> the rocker sources, and additionally search for dead error handling
-> separated from the allocation by function returns, like the one you
-> fixed in pci_rocker_init().
-
-After reading your detailed explanation, I think I will try to do these:
-1. Searching for all the dead error handling in the rocker_*.c.
-2. All dead error handling from allocation functions will be as a separated
-    patch. Similarly, from function returns as another patch. Is that right?
-
-Thanks
-Mao
+Regards,
+Bharata.
