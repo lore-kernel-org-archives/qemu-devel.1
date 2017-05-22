@@ -1,32 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53229)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53670)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dChbV-0002IB-B9
-	for qemu-devel@nongnu.org; Mon, 22 May 2017 03:18:10 -0400
+	(envelope-from <clg@kaod.org>) id 1dCheL-0002xE-1r
+	for qemu-devel@nongnu.org; Mon, 22 May 2017 03:21:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dChbQ-0005y2-9h
-	for qemu-devel@nongnu.org; Mon, 22 May 2017 03:18:09 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:59750)
+	(envelope-from <clg@kaod.org>) id 1dCheG-0006ry-2i
+	for qemu-devel@nongnu.org; Mon, 22 May 2017 03:21:05 -0400
+Received: from 5.mo178.mail-out.ovh.net ([46.105.51.53]:54577)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dChbQ-0005xt-1N
-	for qemu-devel@nongnu.org; Mon, 22 May 2017 03:18:04 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 9EDEE3D959
-	for <qemu-devel@nongnu.org>; Mon, 22 May 2017 07:18:02 +0000 (UTC)
-From: Markus Armbruster <armbru@redhat.com>
-References: <20170517212547.4767-1-ehabkost@redhat.com>
-	<871srmtlxi.fsf@dusky.pond.sub.org>
-	<20170519192250.GV4748@thinpad.lan.raisama.net>
-Date: Mon, 22 May 2017 09:17:58 +0200
-In-Reply-To: <20170519192250.GV4748@thinpad.lan.raisama.net> (Eduardo
-	Habkost's message of "Fri, 19 May 2017 16:22:50 -0300")
-Message-ID: <87vaot2wd5.fsf@dusky.pond.sub.org>
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1dCheF-0006q0-G3
+	for qemu-devel@nongnu.org; Mon, 22 May 2017 03:20:59 -0400
+Received: from player715.ha.ovh.net (b9.ovh.net [213.186.33.59])
+	by mo178.mail-out.ovh.net (Postfix) with ESMTP id 2C2AD38352
+	for <qemu-devel@nongnu.org>; Mon, 22 May 2017 09:20:51 +0200 (CEST)
+References: <149518991537.24289.6673616934370284758.stgit@bahia.lan>
+	<149518994738.24289.215239362416048889.stgit@bahia.lan>
+	<20170522023039.GH30246@umbus.fritz.box>
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <dad9039d-1b4c-be7f-bc49-c485b25632fa@kaod.org>
+Date: Mon, 22 May 2017 09:20:42 +0200
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [RFC] qmp: Return 'user_creatable' &
- 'hotpluggable' fields on qom-list-types
+In-Reply-To: <20170522023039.GH30246@umbus.fritz.box>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 4/4] spapr: fix migration of ICP objects
+ from/to older QEMU
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,194 +32,223 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: Marcel Apfelbaum <marcel@redhat.com>, qemu-devel@nongnu.org
+To: David Gibson <david@gibson.dropbear.id.au>, Greg Kurz <groug@kaod.org>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Laurent Vivier <lvivier@redhat.com>, Bharata B Rao <bharata@linux.vnet.ibm.com>
 
-Eduardo Habkost <ehabkost@redhat.com> writes:
+On 05/22/2017 04:30 AM, David Gibson wrote:
+> On Fri, May 19, 2017 at 12:32:27PM +0200, Greg Kurz wrote:
+>> Commit 5bc8d26de20c ("spapr: allocate the ICPState object from under
+>> sPAPRCPUCore") moved ICP objects from the machine to CPU cores. This
+>> is an improvement since we no longer allocate ICP objects that will
+>> never be used. But it has the side-effect of breaking migration of
+>> older machine types from older QEMU versions.
+>>
+>> This patch introduces a compat flag in the sPAPR machine class so
+>> that all pseries machine up to 2.9 go on with the previous behavior
+>> of pre-allocating ICP objects.
+>>
+>> Signed-off-by: Greg Kurz <groug@kaod.org>
+>> ---
+>> v2: - s/void* /void * in xics_system_init()
+>>     - don't use "[*]" in the ICP object name
+>>     - use pre_2_10_ prefix in field names
+>>     - added xics_nr_servers() helper
+>> ---
+>>  hw/ppc/spapr.c          |   40 +++++++++++++++++++++++++++++++++++++++-
+>>  hw/ppc/spapr_cpu_core.c |   29 ++++++++++++++++++++---------
+>>  include/hw/ppc/spapr.h  |    2 ++
+>>  3 files changed, 61 insertions(+), 10 deletions(-)
+>>
+>> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+>> index 1bb05a9a6b07..182262257c60 100644
+>> --- a/hw/ppc/spapr.c
+>> +++ b/hw/ppc/spapr.c
+>> @@ -123,9 +123,15 @@ error:
+>>      return NULL;
+>>  }
+>>  
+>> +static inline int xics_nr_servers(void)
+>> +{
+>> +    return ppc_cpu_dt_id_from_index(max_cpus);
+>> +}
+>> +
+>>  static void xics_system_init(MachineState *machine, int nr_irqs, Error **errp)
+>>  {
+>>      sPAPRMachineState *spapr = SPAPR_MACHINE(machine);
+>> +    sPAPRMachineClass *smc = SPAPR_MACHINE_GET_CLASS(spapr);
+>>  
+>>      if (kvm_enabled()) {
+>>          if (machine_kernel_irqchip_allowed(machine) &&
+>> @@ -147,6 +153,35 @@ static void xics_system_init(MachineState *machine, int nr_irqs, Error **errp)
+>>              return;
+>>          }
+>>      }
+>> +
+>> +    if (smc->pre_2_10_icp_allocation) {
+>> +        int nr_servers = xics_nr_servers();
+>> +        Error *local_err = NULL;
+>> +        int i;
+>> +
+>> +        spapr->pre_2_10_icps = g_malloc0(nr_servers * sizeof(ICPState));
+>> +
+>> +        for (i = 0; i < nr_servers; i++) {
+>> +            void *obj = &spapr->pre_2_10_icps[i];
+>> +            char *name = g_strdup_printf("icp[%d]", i);
+>> +
+>> +            object_initialize(obj, sizeof(ICPState), spapr->icp_type);
+>> +            object_property_add_child(OBJECT(spapr), name, obj, &error_abort);
+>> +            g_free(name);
+>> +            object_unref(obj);
+>> +            object_property_add_const_link(obj, "xics", OBJECT(spapr),
+>> +                                           &error_abort);
+>> +            object_property_set_bool(obj, true, "realized", &local_err);
+>> +            if (local_err) {
+>> +                while (i--) {
+>> +                    object_unparent(obj);
+>> +                }
+>> +                g_free(spapr->pre_2_10_icps);
+>> +                error_propagate(errp, local_err);
+>> +                break;
+>> +            }
+>> +        }
+>> +    }
+>>  }
+>>  
+>>  static int spapr_fixup_cpu_smt_dt(void *fdt, int offset, PowerPCCPU *cpu,
+>> @@ -1020,7 +1055,7 @@ static void *spapr_build_fdt(sPAPRMachineState *spapr,
+>>      _FDT(fdt_setprop_cell(fdt, 0, "#size-cells", 2));
+>>  
+>>      /* /interrupt controller */
+>> -    spapr_dt_xics(ppc_cpu_dt_id_from_index(max_cpus), fdt, PHANDLE_XICP);
+>> +    spapr_dt_xics(xics_nr_servers(), fdt, PHANDLE_XICP);
+>>  
+>>      ret = spapr_populate_memory(spapr, fdt);
+>>      if (ret < 0) {
+>> @@ -3286,9 +3321,12 @@ static void spapr_machine_2_9_instance_options(MachineState *machine)
+>>  
+>>  static void spapr_machine_2_9_class_options(MachineClass *mc)
+>>  {
+>> +    sPAPRMachineClass *smc = SPAPR_MACHINE_CLASS(mc);
+>> +
+>>      spapr_machine_2_10_class_options(mc);
+>>      SET_MACHINE_COMPAT(mc, SPAPR_COMPAT_2_9);
+>>      mc->numa_auto_assign_ram = numa_legacy_auto_assign_ram;
+>> +    smc->pre_2_10_icp_allocation = true;
+>>  }
+>>  
+>>  DEFINE_SPAPR_MACHINE(2_9, "2.9", false);
+>> diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
+>> index ff7058ecc00e..13c4916aa5e6 100644
+>> --- a/hw/ppc/spapr_cpu_core.c
+>> +++ b/hw/ppc/spapr_cpu_core.c
+>> @@ -119,6 +119,7 @@ static void spapr_cpu_core_unrealizefn(DeviceState *dev, Error **errp)
+>>      size_t size = object_type_get_instance_size(typename);
+>>      CPUCore *cc = CPU_CORE(dev);
+>>      int i;
+>> +    sPAPRMachineState *spapr = SPAPR_MACHINE(qdev_get_machine());
+>>  
+>>      for (i = 0; i < cc->nr_threads; i++) {
+>>          void *obj = sc->threads + i * size;
+>> @@ -127,7 +128,9 @@ static void spapr_cpu_core_unrealizefn(DeviceState *dev, Error **errp)
+>>          PowerPCCPU *cpu = POWERPC_CPU(cs);
+>>  
+>>          spapr_cpu_destroy(cpu);
+>> -        object_unparent(cpu->intc);
+>> +        if (!spapr->pre_2_10_icps) {
+> 
+> Hrm.  I dislike code for the core object directly reaching into the
+> machine to check the compat flag here (and a bunch of other places
+> below).  I can think of a few possible ways of avoiding this:
+> 
+> 1) The most direct is to make another compat flag in the cpu core
+> object, set by the machine.  Straightforward, but ugly.
+> 
+> 2) Use a property to optionally pass a reference to the ICP array into
+> the core object.  If set it will give the cpu objects ICPs from that
+> array (compat mode), if not it will allocate them (new style mode).
 
-> On Thu, May 18, 2017 at 01:59:53PM +0200, Markus Armbruster wrote:
->> Eduardo Habkost <ehabkost@redhat.com> writes:
->> 
->> > Currently there's no way for QMP clients to get a list of device types
->> > that are really usable with -device.  This information would be useful
->> > for management software and test scripts (like the device-crash-test
->> > script I have submitted recently).  Interestingly, the "info qdm" HMP
->> > command provides this information, but no QMP command does.
->> >
->> > Add two new fields to the return value of qom-list-types:
->> > "user-creatable-device" and "hotpluggable-device".
->> 
->> Does the combination
->> 
->>     "user-creatable-device": false,
->>     "hotpluggable-device": true
->> 
->> make any sense?
->
-> It doesn't, and the code ensures this won't happen.
+for 2) we can just use a object_property_add_const_link() like
+we do to pass the 'xics' object which is needed by the ICSes.
 
-Would a single variable with three states be clearer?  I don't like
-entangled booleans much...
+> 3) (Preferred, if it works)  Always have the core allocate ICPs for
+> each CPU.  For compat mode instead of directly allocating ICPs, the
+> machine sets up an array of pointers to the existing ICPs for each
+> CPU.  The "extra" slots that don't have ICPs in new-style allocation
+> get references to dummy ICP objects (maybe even all the same one).
+> Only the dummy ICP(s) are allocated by the machine, the rest remain
+> owned by the cpu.
 
->> Exposing information on user-creatable/hot-pluggable via QMP makes
->> sense.  The question is how.  This is a design question, and as so often
->> with design questions, I need more words to make my case than I'd like
->> to.  Please bear with me.
->> 
->> >                                                     Also, add extra
->> > arguments for filtering the list of types based on the new fields.
->> 
->> I consider the case for filtering weak.  Let's ignore this part for now.
->
-> I considered sending a version that didn't include filtering.  I
-> will be happy to ignore it.  :)
->
->> 
->> We have a number of commands to introspect static information,
->> e.g. query-version, query-commands, query-qmp-schema, query-target,
->> query-machines, query-cpu-definitions, query-chardev-backends,
->> device-list-properties, qom-list-types.
->> 
->> Aside: us abandoning the convention to name such commands query-FOO is
->> regrettable.
->> 
->> In its basic form, i.e. without arguments, qom-list-types does what its
->> name suggests: it lists the QOM types.
->> 
->> It also permits finding out whether a type is abstract, but only in a
->> roundabout way: subtract the result of running it without arguments (or
->> with 'abstract':false) from the result with 'abstract':true.
->> 
->> It also permits finding the "implements" relation, but only in an even
->> more roundabout way: run it with 'implements':T for every abstract T,
->> then solve the resulting puzzle.
->> 
->> Unless there's a direct way to find both (and I'm not aware of any),
->> this is bad design.  The obvious fix is to extend its return type to
->> include the information.
->
-> Agreed.
->
->> 
->> With qom-list-types fixed that way, there's precedence for exposing
->> additional information on QOM types there.
->> 
->> Note that both the "abstract" bit and the "implements directly" list
->> apply to any QOM type, not just to certain subtypes.  As proposed,
->> "user-creatable-device' and "hotpluggable-device" apply only to the
->> "device" subtype.  There's no precedence for exposing information
->> specific to certain subtypes.
->> 
->> If we want to do it anyway, then qom-list-type should perhaps return a
->> union.  Taken to the logical conclusion, this becomes a nest of unions
->> mirroring the "direct subtype of" relation.  Hmm.
->
-> I don't think that's the logical conclusion.  The differences
-> between "object" and "device" are hardcoded in our interfaces: we
-> already have -object and -device.  Modelling our data to take
-> care of thoes differences doesn't mean we will also have to treat
-> the differences between other QOM types (e.g. between
-> "pci-device" and "usb-device") the same way.
+I like this solution too as it should isolate the compat handling under
+the machine, maybe even in a single routine.
 
-*If* we make qom-list-type return a union to properly reflect which
-results apply to which devices, *then* the logical conclusion is a nest
-of unions mirroring the "direct subtype of" relation.
+Thanks,
 
-"Hmm" expresses my less than enthusiastic reaction to the thought of
-such a nest.
+C. 
 
-> Now, we could choose to encode that in different ways.  We could
-> have a single command for all QOM types (like qom-list-types or a
-> new query-qom-type command) that return an union, or have
-> separate commands for object types and device types.  I'm not
-> sure what's the better option here (see below for additional
-> comments on that).
->
->> 
->> However, we already have a command to introspect device types:
->> device-list-properties.  Can we expose the information as read-only
->> property/ies of type "device" and be done?
->
-> I don't think we should.  device-list-properties has a very
-> specific purpose: listing QOM properties that can be read or
-> written using qom-get and qom-set, or set in -device.  If there's
-> no use case for qom-get/qom-set on a property like "hotpluggable"
-> or "user-creatable", we shouldn't make them QOM properties (hence
-> they shouldn't appear on device-list-properties).
-
-I figure your argument boils down to "we should distinguish between
-information about a device instance and a device type, and properties
-are for the former, but ...
-
-> But that doesn't mean we can't have something like a
-> "query-device-type" command that returns other information about
-> a given device type, in addition to the property list.
-
-... we still need something for the latter."
-
-> (In my specific use case (the device-crash-test script), I would
-> prefer to avoid having to fetch the full list of properties of
-> every single device type, just to find out which ones are
-> user-creatable.  But this is not really performance-critical
-> code, so I can live with that.)
->
-> So, I see a few options here:
->
-> 1) Including DeviceClass::user_creatable and
->    DeviceClass::hotpluggable in qom-list-types output.  Probably
->    using an union.
->
-> 2) Adding a new "query-device-type" command, returning
->    DeviceClass::user_creatable and DeviceClass::hotpluggable, and
->    possibly other DeviceClass fields (like the list of
->    properties)
->
-> 3) Adding a new "query-qom-type" command, returning extended
->    information about a QOM type.  This might include the list of
->    properties supported by the type.  This might include
->    device-specific data if the command return an union.
-
-That way's a nest of unions.
-
-> Those options are not mutually exclusive.  e.g.: we might decide
-> that a small set of fields is useful if included in
-> qom-list-types too, even if we implement a query-device-type or
-> query-qom-type command.
-
-Yes.  But let's start with just one.
-
->> But perhaps they aren't really specific to devices.  There are other QOM
->> types that can be created by users, e.g. with -object, so the
->> "user-creatable" bit applies more widely.  Are any of them only
->> creatable during initial startup?  If yes, then that applies more
->> widely, too.
->
-> I prefer to have very specific semantics like "this type can be
-> used with -device" than something more generic and prone to
-> confusion like "this can be user-creatable, but the method used
-> to create it can vary".
-
-Point taken.
-
-We have user-creatable objects and user-creatable devices.  The latter
-are objects, but not user-creatable objects.  Aesthetically displeasing.
-
->> > I'm not sure about the naming of the new command arguments.  Maybe the
->> > names are too long, but I believe that "user-creatable-devices-only=false"
->> > would have more obvious semantics than "user-creatable-devices=false"
->> > (the latter looks ambiguous: it could mean "return only
->> > non-user-creatable devices" or "return all devices").
->> 
->> I consider the filtering feature unnecessary complexity.  The filtering
->> we have got in against my objections.  I won't veto additional filtering
->> outright, but I will insist on test coverage.
->> 
->> The unfiltered output of qom-list-types is less than 10 KiB.  Even if we
->> extend it some, the need to filter it client-side seems dubious.  If a
->> management application really wants to save resources here, it should
->> cache the result and re-get it only when QEMU changes.
->
-> I don't think we really need filtering, and I will be happy to
-> remove that feature on the next version.
-
-We can always add it later if we find a real need.
+> 
+> 
+>> +            object_unparent(cpu->intc);
+>> +        }
+>>          cpu_remove_sync(cs);
+>>          object_unparent(obj);
+>>      }
+>> @@ -142,13 +145,19 @@ static void spapr_cpu_core_realize_child(Object *child, Error **errp)
+>>      PowerPCCPU *cpu = POWERPC_CPU(cs);
+>>      Object *obj;
+>>  
+>> -    obj = object_new(spapr->icp_type);
+>> -    object_property_add_child(OBJECT(cpu), "icp", obj, &error_abort);
+>> -    object_unref(obj);
+>> -    object_property_add_const_link(obj, "xics", OBJECT(spapr), &error_abort);
+>> -    object_property_set_bool(obj, true, "realized", &local_err);
+>> -    if (local_err) {
+>> -        goto error;
+>> +    if (spapr->pre_2_10_icps) {
+>> +        int index = cpu->parent_obj.cpu_index;
+>> +
+>> +        obj = OBJECT(&spapr->pre_2_10_icps[index]);
+>> +    } else {
+>> +        obj = object_new(spapr->icp_type);
+>> +        object_property_add_child(OBJECT(cpu), "icp", obj, &error_abort);
+>> +        object_property_add_const_link(obj, "xics", OBJECT(spapr),
+>> +                                       &error_abort);
+>> +        object_property_set_bool(obj, true, "realized", &local_err);
+>> +        if (local_err) {
+>> +            goto error;
+>> +        }
+>>      }
+>>  
+>>      object_property_set_bool(child, true, "realized", &local_err);
+>> @@ -165,7 +174,9 @@ static void spapr_cpu_core_realize_child(Object *child, Error **errp)
+>>      return;
+>>  
+>>  error:
+>> -    object_unparent(obj);
+>> +    if (!spapr->pre_2_10_icps) {
+>> +        object_unparent(obj);
+>> +    }
+>>      error_propagate(errp, local_err);
+>>  }
+>>  
+>> diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
+>> index f875dc41d811..d1dcf0c8bddf 100644
+>> --- a/include/hw/ppc/spapr.h
+>> +++ b/include/hw/ppc/spapr.h
+>> @@ -54,6 +54,7 @@ struct sPAPRMachineClass {
+>>      bool use_ohci_by_default;  /* use USB-OHCI instead of XHCI */
+>>      bool pre_2_9_cas_pvr;      /* Use old logic for PVR compat negotiation */
+>>      const char *tcg_default_cpu; /* which (TCG) CPU to simulate by default */
+>> +    bool pre_2_10_icp_allocation;
+>>      void (*phb_placement)(sPAPRMachineState *spapr, uint32_t index,
+>>                            uint64_t *buid, hwaddr *pio, 
+>>                            hwaddr *mmio32, hwaddr *mmio64,
+>> @@ -110,6 +111,7 @@ struct sPAPRMachineState {
+>>      MemoryHotplugState hotplug_memory;
+>>  
+>>      const char *icp_type;
+>> +    ICPState *pre_2_10_icps;
+>>  };
+>>  
+>>  #define H_SUCCESS         0
+>>
+> 
