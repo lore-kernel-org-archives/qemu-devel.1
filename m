@@ -1,21 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44964)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47280)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dCleW-000458-5J
-	for qemu-devel@nongnu.org; Mon, 22 May 2017 07:37:33 -0400
+	(envelope-from <wei.w.wang@intel.com>) id 1dClnM-0006uE-2V
+	for qemu-devel@nongnu.org; Mon, 22 May 2017 07:46:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dCleV-0002Yt-2D
-	for qemu-devel@nongnu.org; Mon, 22 May 2017 07:37:32 -0400
-References: <1495376506-13227-1-git-send-email-den@openvz.org>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <705cdc34-b45d-5f56-3fb2-f8a67c4d2b9f@redhat.com>
-Date: Mon, 22 May 2017 06:37:21 -0500
+	(envelope-from <wei.w.wang@intel.com>) id 1dClnI-0005IM-Jv
+	for qemu-devel@nongnu.org; Mon, 22 May 2017 07:46:40 -0400
+Received: from mga05.intel.com ([192.55.52.43]:23738)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <wei.w.wang@intel.com>)
+	id 1dClnI-0005Gp-B0
+	for qemu-devel@nongnu.org; Mon, 22 May 2017 07:46:36 -0400
+From: "Wang, Wei W" <wei.w.wang@intel.com>
+Date: Mon, 22 May 2017 11:46:29 +0000
+Message-ID: <286AC319A985734F985F78AFA26841F7392351DD@shsmsx102.ccr.corp.intel.com>
+References: <1494578148-102868-1-git-send-email-wei.w.wang@intel.com>
+	<a3f2cae3-5d3d-f620-4a8d-bb11470c0b08@redhat.com>
+	<591AA65F.8080608@intel.com>
+	<d6eb1d73-c791-b8d3-7ef3-a7653aef00d6@redhat.com>
+	<7e1b48d5-83e6-a0ae-5d91-696d8db09d7c@redhat.com>
+	<591D0EF5.9000807@intel.com>
+	<d7df5484-7e08-4e1c-9e35-69d73858c736@redhat.com>
+	<20170519153329.GA30573@stefanha-x1.localdomain>
+	<ec3c391c-6f0a-b316-e7d9-8f5e431b5e45@redhat.com>
+In-Reply-To: <ec3c391c-6f0a-b316-e7d9-8f5e431b5e45@redhat.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="gb2312"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-In-Reply-To: <1495376506-13227-1-git-send-email-den@openvz.org>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="0DD9rFh86M7tcOM3l4rXpwjTUahsGc03N"
-Subject: Re: [Qemu-devel] [PATCH 1/1] qcow2: handle cluster leak happening
- with a guest TRIM command
+Subject: Re: [Qemu-devel] [virtio-dev] Re: [virtio-dev] Re: [PATCH v2 00/16]
+ Vhost-pci for inter-VM communication
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,89 +37,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Denis V. Lunev" <den@openvz.org>, qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
+To: Jason Wang <jasowang@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>
+Cc: "virtio-dev@lists.oasis-open.org" <virtio-dev@lists.oasis-open.org>, "mst@redhat.com" <mst@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "marcandre.lureau@gmail.com" <marcandre.lureau@gmail.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---0DD9rFh86M7tcOM3l4rXpwjTUahsGc03N
-From: Eric Blake <eblake@redhat.com>
-To: "Denis V. Lunev" <den@openvz.org>, qemu-block@nongnu.org,
- qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
-Message-ID: <705cdc34-b45d-5f56-3fb2-f8a67c4d2b9f@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 1/1] qcow2: handle cluster leak happening
- with a guest TRIM command
-References: <1495376506-13227-1-git-send-email-den@openvz.org>
-In-Reply-To: <1495376506-13227-1-git-send-email-den@openvz.org>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 05/21/2017 09:21 AM, Denis V. Lunev wrote:
->   qemu-img create -f qcow2 1.img 64G
->   qemu-io -c "write -P 0x32 0 64k" 1.img
-> results in
->   324 -rw-r--r-- 1 den den 393216 May 21 16:48 1.img
-> Subsequent
->   qemu-io -c "write -z 0 64k" 1.img
->   qemu-io -c "write -P 0x32 0 64k" 1.img
-> results in
->   388 -rw-r--r-- 1 den den 458752 May 21 16:50 1.img
-> which looks like we have 1 cluster leaked.
->=20
-> Indeed, qcow2_co_pwrite_zeroes calls qcow2_zero_clusters/zero_single_l2=
-,
-> which does not update refcount for the host cluster and keep the offset=
-
-> as used. Later on handle_copied() does not take into account
-> QCOW2_CLUSTER_ZERO type of the cluster.
-
-NACK.  We've already fixed this upstream, at commit 564a6b693.
-
-$ ./qemu-img create -f qcow2 1.img 64g
-Formatting '1.img', fmt=3Dqcow2 size=3D68719476736 encryption=3Doff
-cluster_size=3D65536 lazy_refcounts=3Doff refcount_bits=3D16
-$ ./qemu-io -c 'w -P 0x32 0 64k' 1.img
-wrote 65536/65536 bytes at offset 0
-64 KiB, 1 ops; 0.0410 sec (1.524 MiB/sec and 24.3902 ops/sec)
-$ ls -l 1.img
--rw-r--r--. 1 eblake eblake 393216 May 22 06:35 1.img
-$ ./qemu-io -c 'w -z 0 64k' 1.img
-wrote 65536/65536 bytes at offset 0
-64 KiB, 1 ops; 0.0055 sec (11.345 MiB/sec and 181.5211 ops/sec)
-$ ./qemu-io -c 'w -P 0x32 0 64k' 1.img
-wrote 65536/65536 bytes at offset 0
-64 KiB, 1 ops; 0.0160 sec (3.903 MiB/sec and 62.4415 ops/sec)
-$ ls -l 1.img
--rw-r--r--. 1 eblake eblake 393216 May 22 06:35 1.img
-
-
-As it is, your patch doesn't apply to master.  And even if it did, your
-patch breaks semantics - we CANNOT discard clusters that must read back
-as zeroes.
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---0DD9rFh86M7tcOM3l4rXpwjTUahsGc03N
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEcBAEBCAAGBQJZIs1xAAoJEKeha0olJ0NqFV4H/AzVeQmLd7+Wj3xXebAuOj0U
-RftLDclNDBnkSlGsP6yLHm14vKNKqclsn4hnBPXJAjByudVaxMmwX5A2DqSCA78Z
-Vmf3R+GWfqTXroC+xpfEzjyJgXL4XQqe/ZzNr08efJKoLX6W9EI0IA+H1zWF7vj5
-rC4KhoQUzsU0Sv/aaKdqaqzlV0euajsEHEHLe1JuRDebg35ZzutNaSZjMNQpvjJl
-1/931YtKC1wRiacd5zn6DR8Rp4kRmtIadjJMjhjFczrm9xhbWPPWGUdRVSW/CnhP
-/ipmqh0+vgSypO/eFJo+hWdjX2MbTV0BC2nGerw0QR2X5IIFGSoU5VfIkWndv9c=
-=YARx
------END PGP SIGNATURE-----
-
---0DD9rFh86M7tcOM3l4rXpwjTUahsGc03N--
+T24gTW9uZGF5LCBNYXkgMjIsIDIwMTcgMTA6MjggQU0sIEphc29uIFdhbmcgd3JvdGU6DQo+IE9u
+IDIwMTfE6jA11MIxOcjVIDIzOjMzLCBTdGVmYW4gSGFqbm9jemkgd3JvdGU6DQo+ID4gT24gRnJp
+LCBNYXkgMTksIDIwMTcgYXQgMTE6MTA6MzNBTSArMDgwMCwgSmFzb24gV2FuZyB3cm90ZToNCj4g
+Pj4gT24gMjAxN8TqMDXUwjE4yNUgMTE6MDMsIFdlaSBXYW5nIHdyb3RlOg0KPiA+Pj4gT24gMDUv
+MTcvMjAxNyAwMjoyMiBQTSwgSmFzb24gV2FuZyB3cm90ZToNCj4gPj4+PiBPbiAyMDE3xOowNdTC
+MTfI1SAxNDoxNiwgSmFzb24gV2FuZyB3cm90ZToNCj4gPj4+Pj4gT24gMjAxN8TqMDXUwjE2yNUg
+MTU6MTIsIFdlaSBXYW5nIHdyb3RlOg0KPiA+Pj4+Pj4+IEhpOg0KPiA+Pj4+Pj4+DQo+ID4+Pj4+
+Pj4gQ2FyZSB0byBwb3N0IHRoZSBkcml2ZXIgY29kZXMgdG9vPw0KPiA+Pj4+Pj4+DQo+ID4+Pj4+
+PiBPSy4gSXQgbWF5IHRha2Ugc29tZSB0aW1lIHRvIGNsZWFuIHVwIHRoZSBkcml2ZXIgY29kZSBi
+ZWZvcmUgcG9zdA0KPiA+Pj4+Pj4gaXQgb3V0LiBZb3UgY2FuIGZpcnN0IGhhdmUgYSBjaGVjayBv
+ZiB0aGUgZHJhZnQgYXQgdGhlIHJlcG8gaGVyZToNCj4gPj4+Pj4+IGh0dHBzOi8vZ2l0aHViLmNv
+bS93ZWktdy13YW5nL3Zob3N0LXBjaS1kcml2ZXINCj4gPj4+Pj4+DQo+ID4+Pj4+PiBCZXN0LA0K
+PiA+Pj4+Pj4gV2VpDQo+ID4+Pj4+IEludGVyZXN0aW5nLCBsb29rcyBsaWtlIHRoZXJlJ3Mgb25l
+IGNvcHkgb24gdHggc2lkZS4gV2UgdXNlZCB0bw0KPiA+Pj4+PiBoYXZlIHplcm9jb3B5IHN1cHBv
+cnQgZm9yIHR1biBmb3IgVk0yVk0gdHJhZmZpYy4gQ291bGQgeW91IHBsZWFzZQ0KPiA+Pj4+PiB0
+cnkgdG8gY29tcGFyZSBpdCB3aXRoIHlvdXIgdmhvc3QtcGNpLW5ldCBieToNCj4gPj4+Pj4NCj4g
+Pj4+IFdlIGNhbiBhbmFseXplIGZyb20gdGhlIHdob2xlIGRhdGEgcGF0aCAtIGZyb20gVk0xJ3Mg
+bmV0d29yayBzdGFjaw0KPiA+Pj4gdG8gc2VuZCBwYWNrZXRzIC0+IFZNMidzIG5ldHdvcmsgc3Rh
+Y2sgdG8gcmVjZWl2ZSBwYWNrZXRzLiBUaGUNCj4gPj4+IG51bWJlciBvZiBjb3BpZXMgYXJlIGFj
+dHVhbGx5IHRoZSBzYW1lIGZvciBib3RoLg0KPiA+PiBUaGF0J3Mgd2h5IEknbSBhc2tpbmcgeW91
+IHRvIGNvbXBhcmUgdGhlIHBlcmZvcm1hbmNlLiBUaGUgb25seSByZWFzb24NCj4gPj4gZm9yIHZo
+b3N0LXBjaSBpcyBwZXJmb3JtYW5jZS4gWW91IHNob3VsZCBwcm92ZSBpdC4NCj4gPiBUaGVyZSBp
+cyBhbm90aGVyIHJlYXNvbiBmb3Igdmhvc3QtcGNpIGJlc2lkZXMgbWF4aW11bSBwZXJmb3JtYW5j
+ZToNCj4gPg0KPiA+IHZob3N0LXBjaSBtYWtlcyBpdCBwb3NzaWJsZSBmb3IgZW5kLXVzZXJzIHRv
+IHJ1biBuZXR3b3JraW5nIG9yIHN0b3JhZ2UNCj4gPiBhcHBsaWFuY2VzIGluIGNvbXB1dGUgY2xv
+dWRzLiAgQ2xvdWQgcHJvdmlkZXJzIGRvIG5vdCBhbGxvdyBlbmQtdXNlcnMNCj4gPiB0byBydW4g
+Y3VzdG9tIHZob3N0LXVzZXIgcHJvY2Vzc2VzIG9uIHRoZSBob3N0IHNvIHlvdSBuZWVkIHZob3N0
+LXBjaS4NCj4gPg0KPiA+IFN0ZWZhbg0KPiANCj4gVGhlbiBpdCBoYXMgbm9uIE5GViB1c2UgY2Fz
+ZXMgYW5kIHRoZSBxdWVzdGlvbiBnb2VzIGJhY2sgdG8gdGhlIHBlcmZvcm1hbmNlDQo+IGNvbXBh
+cmluZyBiZXR3ZWVuIHZob3N0LXBjaSBhbmQgemVyb2NvcHkgdmhvc3RfbmV0LiBJZiBpdCBkb2Vz
+IG5vdCBwZXJmb3JtDQo+IGJldHRlciwgaXQgd2FzIGxlc3MgaW50ZXJlc3RpbmcgYXQgbGVhc3Qg
+aW4gdGhpcyBjYXNlLg0KPiANCg0KUHJvYmFibHkgSSBjYW4gc2hhcmUgd2hhdCB3ZSBnb3QgYWJv
+dXQgdmhvc3QtcGNpIGFuZCB2aG9zdC11c2VyOg0KaHR0cHM6Ly9naXRodWIuY29tL3dlaS13LXdh
+bmcvdmhvc3QtcGNpLWRpc2N1c3Npb24vYmxvYi9tYXN0ZXIvdmhvc3RfcGNpX3ZzX3Zob3N0X3Vz
+ZXIucGRmDQpSaWdodCBub3csIEkgZG9uoa90IGhhdmUgdGhlIGVudmlyb25tZW50IHRvIGFkZCB0
+aGUgdmhvc3RfbmV0IHRlc3QuDQoNCkJ0dywgZG8geW91IGhhdmUgZGF0YSBhYm91dCB2aG9zdF9u
+ZXQgdi5zLiB2aG9zdF91c2VyPw0KDQpCZXN0LA0KV2VpDQoNCg==
