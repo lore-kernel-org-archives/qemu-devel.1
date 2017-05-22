@@ -1,28 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60892)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33329)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1dCiBd-0002am-N8
-	for qemu-devel@nongnu.org; Mon, 22 May 2017 03:55:31 -0400
+	(envelope-from <imammedo@redhat.com>) id 1dCiEq-0003S7-PX
+	for qemu-devel@nongnu.org; Mon, 22 May 2017 03:58:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1dCiBZ-0001gS-Eg
-	for qemu-devel@nongnu.org; Mon, 22 May 2017 03:55:29 -0400
-Received: from mail-wm0-x236.google.com ([2a00:1450:400c:c09::236]:37543)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1dCiBZ-0001fG-5l
-	for qemu-devel@nongnu.org; Mon, 22 May 2017 03:55:25 -0400
-Received: by mail-wm0-x236.google.com with SMTP id d127so141792456wmf.0
-	for <qemu-devel@nongnu.org>; Mon, 22 May 2017 00:55:16 -0700 (PDT)
-References: <20170521032956.27446-1-f4bug@amsat.org>
-	<20170521032956.27446-4-f4bug@amsat.org>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <20170521032956.27446-4-f4bug@amsat.org>
-Date: Mon, 22 May 2017 08:55:09 +0100
-Message-ID: <87mva5497m.fsf@linaro.org>
+	(envelope-from <imammedo@redhat.com>) id 1dCiEq-0002pg-5U
+	for qemu-devel@nongnu.org; Mon, 22 May 2017 03:58:48 -0400
+Date: Mon, 22 May 2017 09:58:36 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20170522095836.59149abc@nial.brq.redhat.com>
+In-Reply-To: <20170518182039.GO4748@thinpad.lan.raisama.net>
+References: <1495094971-177754-1-git-send-email-imammedo@redhat.com>
+	<1495094971-177754-4-git-send-email-imammedo@redhat.com>
+	<20170518182039.GO4748@thinpad.lan.raisama.net>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v3 03/24] docker: rebuild image if 'extra
- files' checksum does not match
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 3/3] numa: silence incomplete mapping
+ warning under qtest
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,87 +25,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Cc: qemu-devel@nongnu.org, Fam Zheng <famz@redhat.com>
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: Andrew Jones <drjones@redhat.com>, Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org, qemu-arm@nongnu.org, qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
 
+On Thu, 18 May 2017 15:20:39 -0300
+Eduardo Habkost <ehabkost@redhat.com> wrote:
 
-Philippe Mathieu-Daudé <f4bug@amsat.org> writes:
+> On Thu, May 18, 2017 at 10:09:31AM +0200, Igor Mammedov wrote:
+> > Suggested-by: Markus Armbruster <armbru@redhat.com>
+> > Signed-off-by: Igor Mammedov <imammedo@redhat.com>  
+> 
+> Where exactly is the test code that triggers those messages and
+> requires this patch? I would like to document that in the commit
+> message.
 
-> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-> ---
->  tests/docker/docker.py | 15 ++++++++++++---
->  1 file changed, 12 insertions(+), 3 deletions(-)
+ok, I'll  mention test case in commit message on respin
 
-Hmm odd what bracnh did you cut this from. git apply-mbox keeps falling
-over:
-
-Applying: docker: rebuild image if 'extra files' checksum does not match
-error: sha1 information is lacking or useless (tests/docker/docker.py).
-error: could not build fake ancestor
-Patch failed at 0001 docker: rebuild image if 'extra files' checksum does not match
-The copy of the patch that failed is found in: .git/rebase-apply/patch
-When you have resolved this problem, run "git am --continue".
-If you prefer to skip this patch, run "git am --skip" instead.
-To restore the original branch and stop patching, run "git am --abort".
-
-
->
-> diff --git a/tests/docker/docker.py b/tests/docker/docker.py
-> index eef92a54f1..0dd6a3304f 100755
-> --- a/tests/docker/docker.py
-> +++ b/tests/docker/docker.py
-> @@ -38,6 +38,9 @@ def _text_checksum(text):
->      """Calculate a digest string unique to the text content"""
->      return hashlib.sha1(text).hexdigest()
->
-> +def _file_checksum(filename):
-> +    return _text_checksum(open(filename, 'rb').read())
-> +
->  def _guess_docker_command():
->      """ Guess a working docker command or raise exception if not found"""
->      commands = [["docker"], ["sudo", "-n", "docker"]]
-> @@ -154,7 +157,7 @@ class Docker(object):
->          return labels.get("com.qemu.dockerfile-checksum", "")
->
->      def build_image(self, tag, docker_dir, dockerfile,
-> -                    quiet=True, user=False, argv=None):
-> +                    quiet=True, user=False, argv=None, extra_files_cksum=[]):
->          if argv == None:
->              argv = []
->
-> @@ -170,7 +173,7 @@ class Docker(object):
->
->          tmp_df.write("\n")
->          tmp_df.write("LABEL com.qemu.dockerfile-checksum=%s" %
-> -                     _text_checksum(dockerfile))
-> +                     _text_checksum(dockerfile + "-".join(extra_files_cksum)))
->          tmp_df.flush()
->
->          self._do(["build", "-t", tag, "-f", tmp_df.name] + argv + \
-> @@ -276,16 +279,22 @@ class BuildCommand(SubCommand):
->                      return 1
->
->              # Include files used by ADD directives found within the Dockerfile.
-> +            cksum = []
->              if args.include_executable:
-> +                # FIXME: there is no checksum of this executable and the linked
-> +                # libraries, once the image built any change of this executable
-> +                # or any library won't trigger another build.
->                  _copy_binary_with_libs(args.include_executable, docker_dir)
->              for filename in args.include_files or []:
->                  _copy_with_mkdir(filename, docker_dir)
-> +                cksum += [_file_checksum(filename)]
->
->              argv += ["--build-arg=" + k.lower() + "=" + v
->                          for k, v in os.environ.iteritems()
->                          if k.lower() in FILTERED_ENV_NAMES]
->              dkr.build_image(tag, docker_dir, dockerfile,
-> -                            quiet=args.quiet, user=args.user, argv=argv)
-> +                            quiet=args.quiet, user=args.user, argv=argv,
-> +                            extra_files_cksum=cksum)
->
->              rmtree(docker_dir)
-
-
---
-Alex Bennée
+> > ---
+> > CC: Markus Armbruster <armbru@redhat.com>
+> > 
+> > ---
+> >  hw/core/machine.c | 3 ++-
+> >  1 file changed, 2 insertions(+), 1 deletion(-)
+> > 
+> > diff --git a/hw/core/machine.c b/hw/core/machine.c
+> > index 2e91aa9..21ebef8 100644
+> > --- a/hw/core/machine.c
+> > +++ b/hw/core/machine.c
+> > @@ -21,6 +21,7 @@
+> >  #include "qemu/error-report.h"
+> >  #include "qemu/cutils.h"
+> >  #include "sysemu/numa.h"
+> > +#include "sysemu/qtest.h"
+> >  
+> >  static char *machine_get_accel(Object *obj, Error **errp)
+> >  {
+> > @@ -732,7 +733,7 @@ static void machine_numa_finish_init(MachineState *machine)
+> >              }
+> >          }
+> >      }
+> > -    if (s->len) {
+> > +    if (s->len && !qtest_enabled()) {
+> >          error_report("warning: CPU(s) not present in any NUMA nodes: %s",
+> >                       s->str);
+> >          error_report("warning: All CPU(s) up to maxcpus should be described "
+> > -- 
+> > 2.7.4
+> >   
+> 
