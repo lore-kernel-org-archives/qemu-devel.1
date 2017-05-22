@@ -1,22 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36403)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37033)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dCrJl-0008GD-Ni
-	for qemu-devel@nongnu.org; Mon, 22 May 2017 13:40:30 -0400
+	(envelope-from <mst@redhat.com>) id 1dCrNf-0000iz-FG
+	for qemu-devel@nongnu.org; Mon, 22 May 2017 13:44:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dCrJk-000895-P5
-	for qemu-devel@nongnu.org; Mon, 22 May 2017 13:40:29 -0400
-References: <20170522135704.842-1-stefanha@redhat.com>
-	<20170522135704.842-5-stefanha@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <497bff5d-6667-f88d-bd9d-0a706b4a9f73@redhat.com>
-Date: Mon, 22 May 2017 12:40:10 -0500
+	(envelope-from <mst@redhat.com>) id 1dCrNa-0000a6-K5
+	for qemu-devel@nongnu.org; Mon, 22 May 2017 13:44:31 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49874)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1dCrNa-0000Z0-Bd
+	for qemu-devel@nongnu.org; Mon, 22 May 2017 13:44:26 -0400
+Date: Mon, 22 May 2017 20:44:24 +0300
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20170522204309-mutt-send-email-mst@kernel.org>
+References: <1495446630-365062-1-git-send-email-eyakovlev@virtuozzo.com>
+	<1495446630-365062-2-git-send-email-eyakovlev@virtuozzo.com>
+	<20170522123524.4c0bff9d@nial.brq.redhat.com>
+	<894afc82-4214-1734-d5ea-532218fac34c@virtuozzo.com>
+	<20170522145856.4728a2a4@nial.brq.redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20170522135704.842-5-stefanha@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="Dp3TetCDIM8hP8EHtU3FwnJ3mM9GmWTeI"
-Subject: Re: [Qemu-devel] [PATCH v3 4/4] migration: use
- bdrv_drain_all_begin/end() instead bdrv_drain_all()
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170522145856.4728a2a4@nial.brq.redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] acpi: change CPU container node _HID to
+ compatible PNP0A05
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,75 +31,101 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Fam Zheng <famz@redhat.com>, qemu-block@nongnu.org
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: Evgeny Yakovlev <eyakovlev@virtuozzo.com>, Denis Lunev <den@virtuozzo.com>, rkagan@virtuozzo.com, qemu-devel@nongnu.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---Dp3TetCDIM8hP8EHtU3FwnJ3mM9GmWTeI
-From: Eric Blake <eblake@redhat.com>
-To: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Fam Zheng <famz@redhat.com>, qemu-block@nongnu.org
-Message-ID: <497bff5d-6667-f88d-bd9d-0a706b4a9f73@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v3 4/4] migration: use
- bdrv_drain_all_begin/end() instead bdrv_drain_all()
-References: <20170522135704.842-1-stefanha@redhat.com>
- <20170522135704.842-5-stefanha@redhat.com>
-In-Reply-To: <20170522135704.842-5-stefanha@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On Mon, May 22, 2017 at 02:58:56PM +0200, Igor Mammedov wrote:
+> On Mon, 22 May 2017 14:01:15 +0300
+> Evgeny Yakovlev <eyakovlev@virtuozzo.com> wrote:
+> 
+> > On 22.05.2017 13:35, Igor Mammedov wrote:
+> > > On Mon, 22 May 2017 12:50:30 +0300
+> > > Evgeny Yakovlev <eyakovlev@virtuozzo.com> wrote:
+> > >  
+> > >> When running windows 2016 server guests we have encountered a problem
+> > >> with ACPI representation of CPU devices. This windows version contains a
+> > >> hidinterrupt.sys driver which looks for ACPI device node with _HID set
+> > >> to "ACPI0010" and "ACPI0011". ACPI0010 is also a valid id for CPU
+> > >> container device which qemu uses.
+> > >>
+> > >> hidinterrupt driver takes over (even though it fails) ACPI0010 node and
+> > >> thus hides its children -- the CPUs -- from the regular ACPI
+> > >> enumeration.  So there are no processors in the Windows device tree
+> > >> Device Manager or "!devnode 0 1" in the debugger.
+> > >>
+> > >> hidinterrupt.inf as shipped with Windows 2016 has both ACPI0011 and
+> > >> ACPI0010; the record for the latter is preceded with a comment "This Id
+> > >> is not to be used. It will be removed once everyone has stopped using
+> > >> it."  So I guess the typo was not in the driver but in the ACPI tables
+> > >> of some device(s) which the driver wanted to support despite the bug.
+> > >>
+> > >> For reference this is a known issue:
+> > >> https://bugzilla.redhat.com/show_bug.cgi?id=1377155#c31
+> > >>
+> > >> This change works around this problem by setting qemu CPU container ACPI
+> > >> _HID to compatible PNP0A05.  
+> > > I'd say NACK to it.
+> > > It's Windows server 2016 bug that violates spec and
+> > > it's been reported to them before RTM has been released.
+> > > So complain to Microsoft support and make them fix it.
+> > >
+> > > Meanwhile there is MS suggested workaround to fix issue,
+> > > one can use https://bugzilla.redhat.com/show_bug.cgi?id=1377155#c17
+> > >
+> > > Perhaps I should add workaround link as comment above line:
+> > >
+> > > aml_append(cpus_dev, aml_name_decl("_HID", aml_string("ACPI0010")));  
+> > 
+> > Thanks for replying!
+> > 
+> > Strictly speaking, this is not a Windows bug. Comment in INF file says 
+> > that they had to support a hardware device which erroneously picked this 
+> > ACPI HID.
+> in linux kernel we use device specific quirks to workaround broken hardware,
+> there is no point to break generic code for all hardware configurations
+> for the sake of one broken firmware.
+> So it's Windows problem that they prefer to violate spec and cannibalize
+> ACPI0010 for the sake of broken firmware. Open support case with Windows,
+> the more complains they get, the more chances that they'll fix it.
+> 
+> > I understand that this is not a qemu problem either. Then again other 
+> > emulators we've tested this on (VirtualBox, Parallels, HyperV) provide a 
+> > compatible ACPI configuration and don't trigger this conflict. If this 
+> we provide it, that's what '_CID' field is for, so OS that doesn't know
+> about ACPI0010 would be happy (any Windows prior Win10/2016)
+> 
+> > fix is not a big deal and does not affect anything negatively then maybe 
+> > we pay a relatively small price to improve compatibility with some guest 
+> > systems?
+> we plan to reuse this code for ARM in future and it might use
+> ACPI0010 container as per spec to describe modeled topology.
+> Hence no workaround in QEMU, just use MS suggested workaround
+> to remove wrong device binding in WS2016 until they actually
+> fix it.
 
-On 05/22/2017 08:57 AM, Stefan Hajnoczi wrote:
-> blk/bdrv_drain_all() only takes effect for a single instant and then
-> resumes block jobs, guest devices, and other external clients like the
-> NBD server.  This can be handy when performing a synchronous drain
-> before terminating the program, for example.
->=20
-> Monitor commands usually need to quiesce I/O across an entire code
-> region so blk/bdrv_drain_all() is not suitable.  They must use
-> bdrv_drain_all_begin/end() to mark the region.  This prevents new I/O
-> requests from slipping in or worse - block jobs completing and modifyin=
-g
-> the graph.
->=20
-> I audited other blk/bdrv_drain_all() callers but did not find anything
-> that needs a similar fix.  This patch fixes the savevm/loadvm commands.=
-
-> Although I haven't encountered a read world issue this makes the code
-> safer.
->=20
-> Suggested-by: Kevin Wolf <kwolf@redhat.com>
-> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
-> ---
->  migration/savevm.c | 18 +++++++++++++++---
->  1 file changed, 15 insertions(+), 3 deletions(-)
->=20
-
-Reviewed-by: Eric Blake <eblake@redhat.com>
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+I wonder whether adding an INF with a stub driver
+on the install disk can also help as a work-around.
+Thoughts?
 
 
---Dp3TetCDIM8hP8EHtU3FwnJ3mM9GmWTeI
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEcBAEBCAAGBQJZIyJ6AAoJEKeha0olJ0Nq02wH/20euVLNhaXYd/fKd5d7Fu8f
-GaBGNkQxqlQK0kqlriJtLQC4rZJ7nSHYUznQSYTM9x+Z4px0plkfU2DNsJMT30Im
-f5KlYhLpYrJUimtsL26ZDjYVYYTVKCKYCxON0X+AH8Zk/faa8Q8ArTuUpQsvh1eX
-WiM2so1Ci1PipVagREcPK8p8BXFwD2eZ2FddcAlVzAODlJUlKFwQnZGkw2XgaIUV
-ty6Ar1ehX+E6grVq0QObN2gxwOoAP6Yo7mNUqf+BL8r5B3gpPy51KUNQLl7Gy6Vm
-6j6+b6nYLsod7vcwnOgUBK6GcW6ntE2K1z2pjFn4tgsQT6UXnkyaeavy86IjWEI=
-=rFXB
------END PGP SIGNATURE-----
-
---Dp3TetCDIM8hP8EHtU3FwnJ3mM9GmWTeI--
+> 
+> > >> Signed-off-by: Evgeny Yakovlev <eyakovlev@virtuozzo.com>
+> > >> ---
+> > >>   hw/acpi/cpu.c | 2 +-
+> > >>   1 file changed, 1 insertion(+), 1 deletion(-)
+> > >>
+> > >> diff --git a/hw/acpi/cpu.c b/hw/acpi/cpu.c
+> > >> index a233fe1..b93db40 100644
+> > >> --- a/hw/acpi/cpu.c
+> > >> +++ b/hw/acpi/cpu.c
+> > >> @@ -397,7 +397,7 @@ void build_cpus_aml(Aml *table, MachineState *machine, CPUHotplugFeatures opts,
+> > >>           Aml *rm_evt = aml_name("%s.%s", cphp_res_path, CPU_REMOVE_EVENT);
+> > >>           Aml *ej_evt = aml_name("%s.%s", cphp_res_path, CPU_EJECT_EVENT);
+> > >>   
+> > >> -        aml_append(cpus_dev, aml_name_decl("_HID", aml_string("ACPI0010")));
+> > >> +        aml_append(cpus_dev, aml_name_decl("_HID", aml_string("PNP0A05")));
+> > >>           aml_append(cpus_dev, aml_name_decl("_CID", aml_eisaid("PNP0A05")));
+> > >>   
+> > >>           method = aml_method(CPU_NOTIFY_METHOD, 2, AML_NOTSERIALIZED);  
+> > 
+> > 
