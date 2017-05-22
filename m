@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44262)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45238)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <flypie@rocketmail.com>) id 1dCx3C-0007Xc-Ay
-	for qemu-devel@nongnu.org; Mon, 22 May 2017 19:47:48 -0400
+	(envelope-from <no-reply@patchew.org>) id 1dCxAZ-0000BA-4Y
+	for qemu-devel@nongnu.org; Mon, 22 May 2017 19:55:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <flypie@rocketmail.com>) id 1dCx39-0003Z5-51
-	for qemu-devel@nongnu.org; Mon, 22 May 2017 19:47:46 -0400
-Received: from nm14-vm5.bullet.mail.ir2.yahoo.com ([212.82.96.193]:52115)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <flypie@rocketmail.com>) id 1dCx38-0003Yk-PM
-	for qemu-devel@nongnu.org; Mon, 22 May 2017 19:47:43 -0400
-Date: Tue, 23 May 2017 00:47:38 +0000
-From: John Bradley <flypie@rocketmail.com>
-Sender: John Bradley <flypie@rocketmail.com>
-Message-ID: <56fa8a79-fa90-4adc-aa0e-0527c9d96698@ONE.local>
+	(envelope-from <no-reply@patchew.org>) id 1dCxAU-0005hv-S5
+	for qemu-devel@nongnu.org; Mon, 22 May 2017 19:55:23 -0400
+Resent-Message-Id: <E1dCxAU-0005hv-S5@eggs.gnu.org>
+In-Reply-To: <56fa8a79-fa90-4adc-aa0e-0527c9d96698@ONE.local>
+Message-ID: <149549730836.1032.2993190005430162981@c05f1edc8ed1>
+Reply-To: <qemu-devel@nongnu.org>
 MIME-Version: 1.0
-Content-Type: text/plain; 
-Subject: [Qemu-devel] [PATCH] [PATCH V2] GDummyPanel Fix formatingissues.
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Mon, 22 May 2017 16:55:09 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PATCH] [PATCH V2] GDummyPanel Fix formatingissues.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,888 +23,352 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org, qemu-arm@nongnu.org, flypie@rocketmail.com
+To: qemu-devel@nongnu.org
+Cc: famz@redhat.com, flypie@rocketmail.com, peter.maydell@linaro.org, qemu-arm@nongnu.org
 
->From 468b7c74d36b1e9d56ca014531301f0485254866 Mon Sep 17 00:00:00 2001
-From: John Bradley <flypie@rocketmail.com>
-Date: Fri, 19 May 2017 00:01:07 +0100
-Subject: [PATCH] [PATCH V2] GDummyPanel Fix formatingissues.
-
-Add inital discussion of protocol version.
-
-Add code to connect with https://github.com/flypie/GDummyPanel The code uses GNU Sockets & Windows
-sockets as on MINGW GNU no available. This is inteded as a Demo for RFC.
-
-Signed-off-by: John Bradley <flypie@rocketmail.com>
----
- hw/gpio/bcm2835_gpio.c         | 316 ++++++++++++++++++++++-----------------
- include/hw/gpio/bcm2835_gpio.h |   4 +
- include/qemu/PanelEmu.h        |  53 +++++++
- util/Makefile.objs             |   1 +
- util/PanelEmu.c                | 327 +++++++++++++++++++++++++++++++++++++++++
- 5 files changed, 570 insertions(+), 131 deletions(-)
- create mode 100644 include/qemu/PanelEmu.h
- create mode 100644 util/PanelEmu.c
-
-diff --git a/hw/gpio/bcm2835_gpio.c b/hw/gpio/bcm2835_gpio.c
-index acc2e3cf9e..2c9026c597 100644
---- a/hw/gpio/bcm2835_gpio.c
-+++ b/hw/gpio/bcm2835_gpio.c
-@@ -19,6 +19,8 @@
- #include "hw/sd/sd.h"
- #include "hw/gpio/bcm2835_gpio.h"
- 
-+
-+
- #define GPFSEL0   0x00
- #define GPFSEL1   0x04
- #define GPFSEL2   0x08
-@@ -55,7 +57,7 @@ static uint32_t gpfsel_get(BCM2835GpioState *s, uint8_t reg)
-     uint32_t value = 0;
-     for (i = 0; i < 10; i++) {
-         uint32_t index = 10 * reg + i;
--        if (index < sizeof(s->fsel)) {
-+        if (index < sizeof (s->fsel)) {
-             value |= (s->fsel[index] & 0x7) << (3 * i);
-         }
-     }
-@@ -67,7 +69,7 @@ static void gpfsel_set(BCM2835GpioState *s, uint8_t reg, uint32_t value)
-     int i;
-     for (i = 0; i < 10; i++) {
-         uint32_t index = 10 * reg + i;
--        if (index < sizeof(s->fsel)) {
-+        if (index < sizeof (s->fsel)) {
-             int fsel = (value >> (3 * i)) & 0x7;
-             s->fsel[index] = fsel;
-         }
-@@ -75,24 +77,24 @@ static void gpfsel_set(BCM2835GpioState *s, uint8_t reg, uint32_t value)
- 
-     /* SD controller selection (48-53) */
-     if (s->sd_fsel != 0
--            && (s->fsel[48] == 0) /* SD_CLK_R */
--            && (s->fsel[49] == 0) /* SD_CMD_R */
--            && (s->fsel[50] == 0) /* SD_DATA0_R */
--            && (s->fsel[51] == 0) /* SD_DATA1_R */
--            && (s->fsel[52] == 0) /* SD_DATA2_R */
--            && (s->fsel[53] == 0) /* SD_DATA3_R */
--            ) {
-+        && (s->fsel[48] == 0) /* SD_CLK_R */
-+        && (s->fsel[49] == 0) /* SD_CMD_R */
-+        && (s->fsel[50] == 0) /* SD_DATA0_R */
-+        && (s->fsel[51] == 0) /* SD_DATA1_R */
-+        && (s->fsel[52] == 0) /* SD_DATA2_R */
-+        && (s->fsel[53] == 0) /* SD_DATA3_R */
-+        ) {
-         /* SDHCI controller selected */
-         sdbus_reparent_card(s->sdbus_sdhost, s->sdbus_sdhci);
-         s->sd_fsel = 0;
-     } else if (s->sd_fsel != 4
--            && (s->fsel[48] == 4) /* SD_CLK_R */
--            && (s->fsel[49] == 4) /* SD_CMD_R */
--            && (s->fsel[50] == 4) /* SD_DATA0_R */
--            && (s->fsel[51] == 4) /* SD_DATA1_R */
--            && (s->fsel[52] == 4) /* SD_DATA2_R */
--            && (s->fsel[53] == 4) /* SD_DATA3_R */
--            ) {
-+               && (s->fsel[48] == 4) /* SD_CLK_R */
-+               && (s->fsel[49] == 4) /* SD_CMD_R */
-+               && (s->fsel[50] == 4) /* SD_DATA0_R */
-+               && (s->fsel[51] == 4) /* SD_DATA1_R */
-+               && (s->fsel[52] == 4) /* SD_DATA2_R */
-+               && (s->fsel[53] == 4) /* SD_DATA3_R */
-+               ) {
-         /* SDHost controller selected */
-         sdbus_reparent_card(s->sdbus_sdhci, s->sdbus_sdhost);
-         s->sd_fsel = 4;
-@@ -108,9 +110,9 @@ static int gpfsel_is_out(BCM2835GpioState *s, int index)
- }
- 
- static void gpset(BCM2835GpioState *s,
--        uint32_t val, uint8_t start, uint8_t count, uint32_t *lev)
-+                  uint32_t val, uint8_t start, uint8_t count, uint32_t *lev)
- {
--    uint32_t changes = val & ~*lev;
-+    uint32_t changes = val & ~ *lev;
-     uint32_t cur = 1;
- 
-     int i;
-@@ -125,7 +127,7 @@ static void gpset(BCM2835GpioState *s,
- }
- 
- static void gpclr(BCM2835GpioState *s,
--        uint32_t val, uint8_t start, uint8_t count, uint32_t *lev)
-+                  uint32_t val, uint8_t start, uint8_t count, uint32_t *lev)
- {
-     uint32_t changes = val & *lev;
-     uint32_t cur = 1;
-@@ -141,116 +143,153 @@ static void gpclr(BCM2835GpioState *s,
-     *lev &= ~val;
- }
- 
--static uint64_t bcm2835_gpio_read(void *opaque, hwaddr offset,
--        unsigned size)
-+static uint64_t bcm2835_gpio_read(void *opaque, hwaddr offset, unsigned size)
- {
-     BCM2835GpioState *s = (BCM2835GpioState *)opaque;
- 
-+    uint64_t Data;
-+
-     switch (offset) {
--    case GPFSEL0:
--    case GPFSEL1:
--    case GPFSEL2:
--    case GPFSEL3:
--    case GPFSEL4:
--    case GPFSEL5:
--        return gpfsel_get(s, offset / 4);
--    case GPSET0:
--    case GPSET1:
--        /* Write Only */
--        return 0;
--    case GPCLR0:
--    case GPCLR1:
--        /* Write Only */
--        return 0;
--    case GPLEV0:
--        return s->lev0;
--    case GPLEV1:
--        return s->lev1;
--    case GPEDS0:
--    case GPEDS1:
--    case GPREN0:
--    case GPREN1:
--    case GPFEN0:
--    case GPFEN1:
--    case GPHEN0:
--    case GPHEN1:
--    case GPLEN0:
--    case GPLEN1:
--    case GPAREN0:
--    case GPAREN1:
--    case GPAFEN0:
--    case GPAFEN1:
--    case GPPUD:
--    case GPPUDCLK0:
--    case GPPUDCLK1:
--        /* Not implemented */
--        return 0;
--    default:
--        qemu_log_mask(LOG_GUEST_ERROR, "%s: Bad offset %"HWADDR_PRIx"\n",
--                __func__, offset);
--        break;
-+        case GPFSEL0:
-+        case GPFSEL1:
-+        case GPFSEL2:
-+        case GPFSEL3:
-+        case GPFSEL4:
-+        case GPFSEL5:
-+            return gpfsel_get(s, offset / 4);
-+        case GPSET0:
-+        case GPSET1:
-+            /* Write Only */
-+            return 0;
-+        case GPCLR0:
-+        case GPCLR1:
-+            /* Write Only */
-+            return 0;
-+        case GPLEV0:
-+            if (s->panel.socket != -1) {
-+                if (panel_read(&s->panel, &Data)) {
-+                    s->lev0 = (uint32_t)Data;
-+                    s->lev1 = (uint32_t)(Data >> 32);
-+                }
-+            }
-+            return s->lev0;
-+        case GPLEV1:
-+            if (s->panel.socket != -1) {
-+                if (panel_read(&s->panel, &Data)) {
-+                    s->lev0 = (uint32_t)Data;
-+                    s->lev1 = (uint32_t)(Data >> 32);
-+                }
-+            }
-+            return s->lev1;
-+        case GPEDS0:
-+        case GPEDS1:
-+        case GPREN0:
-+        case GPREN1:
-+        case GPFEN0:
-+        case GPFEN1:
-+        case GPHEN0:
-+        case GPHEN1:
-+        case GPLEN0:
-+        case GPLEN1:
-+        case GPAREN0:
-+        case GPAREN1:
-+        case GPAFEN0:
-+        case GPAFEN1:
-+        case GPPUD:
-+        case GPPUDCLK0:
-+        case GPPUDCLK1:
-+            /* Not implemented */
-+            return 0;
-+        default:
-+            qemu_log_mask(LOG_GUEST_ERROR, "%s: Bad offset %"HWADDR_PRIx"\n",
-+                          __func__, offset);
-+            break;
-     }
- 
-     return 0;
- }
- 
- static void bcm2835_gpio_write(void *opaque, hwaddr offset,
--        uint64_t value, unsigned size)
-+                               uint64_t value, unsigned size)
- {
-     BCM2835GpioState *s = (BCM2835GpioState *)opaque;
-+    uint64_t Data;
-+
- 
-     switch (offset) {
--    case GPFSEL0:
--    case GPFSEL1:
--    case GPFSEL2:
--    case GPFSEL3:
--    case GPFSEL4:
--    case GPFSEL5:
--        gpfsel_set(s, offset / 4, value);
--        break;
--    case GPSET0:
--        gpset(s, value, 0, 32, &s->lev0);
--        break;
--    case GPSET1:
--        gpset(s, value, 32, 22, &s->lev1);
--        break;
--    case GPCLR0:
--        gpclr(s, value, 0, 32, &s->lev0);
--        break;
--    case GPCLR1:
--        gpclr(s, value, 32, 22, &s->lev1);
--        break;
--    case GPLEV0:
--    case GPLEV1:
--        /* Read Only */
--        break;
--    case GPEDS0:
--    case GPEDS1:
--    case GPREN0:
--    case GPREN1:
--    case GPFEN0:
--    case GPFEN1:
--    case GPHEN0:
--    case GPHEN1:
--    case GPLEN0:
--    case GPLEN1:
--    case GPAREN0:
--    case GPAREN1:
--    case GPAFEN0:
--    case GPAFEN1:
--    case GPPUD:
--    case GPPUDCLK0:
--    case GPPUDCLK1:
--        /* Not implemented */
--        break;
--    default:
--        goto err_out;
-+        case GPFSEL0:
-+        case GPFSEL1:
-+        case GPFSEL2:
-+        case GPFSEL3:
-+        case GPFSEL4:
-+        case GPFSEL5:
-+            gpfsel_set(s, offset / 4, value);
-+            break;
-+        case GPSET0:
-+            gpset(s, value, 0, 32, &s->lev0);
-+            if (s->panel.socket != -1) {
-+                Data = value;
-+                /* John Bradley dummy GPIO Panel */
-+                senddatatopanel(&s->panel, Data, true);
-+            }
-+            break;
-+        case GPSET1:
-+            gpset(s, value, 32, 22, &s->lev1);
-+            if (s->panel.socket != -1) {
-+                Data = value;
-+                Data <<= 32;
-+                /* John Bradley dummy GPIO Panel */
-+                senddatatopanel(&s->panel, Data, true);
-+            }
-+            break;
-+        case GPCLR0:
-+            gpclr(s, value, 0, 32, &s->lev0);
-+            if (s->panel.socket != -1) {
-+                Data = value;
-+                /* John Bradley dummy GPIO Panel */
-+                senddatatopanel(&s->panel, Data, false);
-+            }
-+            break;
-+        case GPCLR1:
-+            gpclr(s, value, 32, 22, &s->lev1);
-+            if (s->panel.socket != -1) {
-+                Data = value;
-+                Data <<= 32;
-+                /* John Bradley dummy GPIO Panel */
-+                senddatatopanel(&s->panel, Data, false);
-+            }
-+            break;
-+        case GPLEV0:
-+        case GPLEV1:
-+            /* Read Only */
-+            break;
-+        case GPEDS0:
-+        case GPEDS1:
-+        case GPREN0:
-+        case GPREN1:
-+        case GPFEN0:
-+        case GPFEN1:
-+        case GPHEN0:
-+        case GPHEN1:
-+        case GPLEN0:
-+        case GPLEN1:
-+        case GPAREN0:
-+        case GPAREN1:
-+        case GPAFEN0:
-+        case GPAFEN1:
-+        case GPPUD:
-+        case GPPUDCLK0:
-+        case GPPUDCLK1:
-+            /* Not implemented */
-+            break;
-+        default:
-+            goto err_out;
-     }
-     return;
- 
- err_out:
-     qemu_log_mask(LOG_GUEST_ERROR, "%s: Bad offset %"HWADDR_PRIx"\n",
--            __func__, offset);
-+                  __func__, offset);
- }
- 
- static void bcm2835_gpio_reset(DeviceState *dev)
-@@ -272,21 +311,22 @@ static void bcm2835_gpio_reset(DeviceState *dev)
- }
- 
- static const MemoryRegionOps bcm2835_gpio_ops = {
--    .read = bcm2835_gpio_read,
--    .write = bcm2835_gpio_write,
--    .endianness = DEVICE_NATIVE_ENDIAN,
-+                                                 .read = bcm2835_gpio_read,
-+                                                 .write = bcm2835_gpio_write,
-+                                                 .endianness = DEVICE_NATIVE_ENDIAN,
- };
- 
- static const VMStateDescription vmstate_bcm2835_gpio = {
--    .name = "bcm2835_gpio",
--    .version_id = 1,
--    .minimum_version_id = 1,
--    .fields = (VMStateField[]) {
--        VMSTATE_UINT8_ARRAY(fsel, BCM2835GpioState, 54),
--        VMSTATE_UINT32(lev0, BCM2835GpioState),
--        VMSTATE_UINT32(lev1, BCM2835GpioState),
--        VMSTATE_UINT8(sd_fsel, BCM2835GpioState),
--        VMSTATE_END_OF_LIST()
-+                                                        .name = "bcm2835_gpio",
-+                                                        .version_id = 1,
-+                                                        .minimum_version_id = 1,
-+                                                        .fields = (VMStateField[])
-+    {
-+     VMSTATE_UINT8_ARRAY(fsel, BCM2835GpioState, 54),
-+     VMSTATE_UINT32(lev0, BCM2835GpioState),
-+     VMSTATE_UINT32(lev1, BCM2835GpioState),
-+     VMSTATE_UINT8(sd_fsel, BCM2835GpioState),
-+     VMSTATE_END_OF_LIST()
-     }
- };
- 
-@@ -296,13 +336,27 @@ static void bcm2835_gpio_init(Object *obj)
-     DeviceState *dev = DEVICE(obj);
-     SysBusDevice *sbd = SYS_BUS_DEVICE(obj);
- 
--    qbus_create_inplace(&s->sdbus, sizeof(s->sdbus),
-+    qbus_create_inplace(&s->sdbus, sizeof (s->sdbus),
-                         TYPE_SD_BUS, DEVICE(s), "sd-bus");
- 
-     memory_region_init_io(&s->iomem, obj,
--            &bcm2835_gpio_ops, s, "bcm2835_gpio", 0x1000);
-+                          &bcm2835_gpio_ops, s, "bcm2835_gpio", 0x1000);
-     sysbus_init_mmio(sbd, &s->iomem);
-     qdev_init_gpio_out(dev, s->out, 54);
-+
-+    /* Get access to the GPIO panel, program will quit on fail */
-+    if (panel_open(&s->panel)) {
-+        /* PI Has 54 Pins */
-+        sendpincount(&s->panel, 54);
-+        /* Pins 0 & 1 are I2C so disable */
-+        sendenabledmap(&s->panel, 0x003FFFFFFFFFFFFC);
-+        /* There are no dedicated input pins I know of */
-+        sendinputmap(&s->panel, 0x0000000000000000);
-+        /* Pin 53 is dedicated output LED */
-+        sendoutputmap(&s->panel, 0x0000800000000000);
-+    } else {
-+        printf("Couldn't connect to a GPIO panel\n");
-+    }
- }
- 
- static void bcm2835_gpio_realize(DeviceState *dev, Error **errp)
-@@ -314,7 +368,7 @@ static void bcm2835_gpio_realize(DeviceState *dev, Error **errp)
-     obj = object_property_get_link(OBJECT(dev), "sdbus-sdhci", &err);
-     if (obj == NULL) {
-         error_setg(errp, "%s: required sdhci link not found: %s",
--                __func__, error_get_pretty(err));
-+                   __func__, error_get_pretty(err));
-         return;
-     }
-     s->sdbus_sdhci = SD_BUS(obj);
-@@ -322,7 +376,7 @@ static void bcm2835_gpio_realize(DeviceState *dev, Error **errp)
-     obj = object_property_get_link(OBJECT(dev), "sdbus-sdhost", &err);
-     if (obj == NULL) {
-         error_setg(errp, "%s: required sdhost link not found: %s",
--                __func__, error_get_pretty(err));
-+                   __func__, error_get_pretty(err));
-         return;
-     }
-     s->sdbus_sdhost = SD_BUS(obj);
-@@ -338,11 +392,11 @@ static void bcm2835_gpio_class_init(ObjectClass *klass, void *data)
- }
- 
- static const TypeInfo bcm2835_gpio_info = {
--    .name          = TYPE_BCM2835_GPIO,
--    .parent        = TYPE_SYS_BUS_DEVICE,
--    .instance_size = sizeof(BCM2835GpioState),
--    .instance_init = bcm2835_gpio_init,
--    .class_init    = bcm2835_gpio_class_init,
-+                                           .name = TYPE_BCM2835_GPIO,
-+                                           .parent = TYPE_SYS_BUS_DEVICE,
-+                                           .instance_size = sizeof (BCM2835GpioState),
-+                                           .instance_init = bcm2835_gpio_init,
-+                                           .class_init = bcm2835_gpio_class_init,
- };
- 
- static void bcm2835_gpio_register_types(void)
-diff --git a/include/hw/gpio/bcm2835_gpio.h b/include/hw/gpio/bcm2835_gpio.h
-index 9f8e0c720c..f7d7c79aa2 100644
---- a/include/hw/gpio/bcm2835_gpio.h
-+++ b/include/hw/gpio/bcm2835_gpio.h
-@@ -15,6 +15,7 @@
- #define BCM2835_GPIO_H
- 
- #include "hw/sd/sd.h"
-+#include "qemu/PanelEmu.h"
- 
- typedef struct BCM2835GpioState {
-     SysBusDevice parent_obj;
-@@ -30,6 +31,9 @@ typedef struct BCM2835GpioState {
-     uint32_t lev0, lev1;
-     uint8_t sd_fsel;
-     qemu_irq out[54];
-+
-+    panel_connection_t panel;
-+
- } BCM2835GpioState;
- 
- #define TYPE_BCM2835_GPIO "bcm2835_gpio"
-diff --git a/include/qemu/PanelEmu.h b/include/qemu/PanelEmu.h
-new file mode 100644
-index 0000000000..35a0b2c3af
---- /dev/null
-+++ b/include/qemu/PanelEmu.h
-@@ -0,0 +1,53 @@
-+/*
-+ * To change this license header, choose License Headers in Project Properties.
-+ * To change this template file, choose Tools | Templates
-+ * and open the template in the editor.
-+ */
-+
-+/*
-+ * File:   PanelEmu.h
-+ * Author: John Bradley
-+ *
-+ * Created on 22 April 2017, 22:26
-+ */
-+
-+#ifndef PANELEMU_H
-+#define PANELEMU_H
-+
-+#ifdef __cplusplus
-+extern "C" {
-+#endif
-+
-+
-+#define DRIVER_NAME "RDC-GPIO: "
-+#define PANEL_NAME "GPIO panel: "
-+
-+
-+#define DEFAULT_PORT 0xb1ff       /*45567*/
-+
-+#define PANEL_PINS 54
-+
-+    typedef struct panel_connection {
-+        int socket; /* socket we'll connect to the panel with */
-+        fd_set fds; /* list of descriptors (only the above socket */
-+        char last[PANEL_PINS / 8]; /* we don't want to send updates to the panel
-+	                       unless something changed */
-+        int ProtocolInUse; /*What version of the protocol are we using. */
-+    } panel_connection_t;
-+
-+    bool panel_open(panel_connection_t *h);
-+
-+    bool panel_read(panel_connection_t *h, uint64_t *pinS);
-+    void senddatatopanel(panel_connection_t *h, uint64_t pinS, bool Value);
-+    void panel_send_read_command(panel_connection_t *h);
-+    void sendpincount(panel_connection_t *h, int Num);
-+    void sendenabledmap(panel_connection_t *h, uint64_t pins);
-+    void sendinputmap(panel_connection_t *h, uint64_t pins);
-+    void sendoutputmap(panel_connection_t *h, uint64_t pins);
-+
-+#ifdef __cplusplus
-+}
-+#endif
-+
-+#endif /* PANELEMU_H */
-+
-diff --git a/util/Makefile.objs b/util/Makefile.objs
-index c6205ebf86..8316ed79ba 100644
---- a/util/Makefile.objs
-+++ b/util/Makefile.objs
-@@ -43,3 +43,4 @@ util-obj-y += qdist.o
- util-obj-y += qht.o
- util-obj-y += range.o
- util-obj-y += systemd.o
-+util-obj-y += PanelEmu.o
-\ No newline at end of file
-diff --git a/util/PanelEmu.c b/util/PanelEmu.c
-new file mode 100644
-index 0000000000..4700f951ec
---- /dev/null
-+++ b/util/PanelEmu.c
-@@ -0,0 +1,327 @@
-+/*
-+ * Emulation for Rasp PI GPIO via Server connected to via Socket
-+ *
-+ */
-+#include "qemu/osdep.h"
-+
-+#include <stdio.h>
-+#include <stdlib.h>
-+#include <memory.h>
-+#include <errno.h>
-+#include <string.h>
-+#include <sys/types.h>
-+#ifdef __MINGW32__
-+#include <winsock2.h>
-+#else
-+#include <sys/socket.h>
-+#include <arpa/inet.h>
-+#include <netinet/in.h>
-+#endif
-+
-+#include "qemu/PanelEmu.h"
-+
-+typedef enum
-+{
-+    PROTOCOLDESCFROMQEMU = 0,
-+    PROTOCOLDESCFROMPANEL = 1,
-+    PINSTOPANEL = 2,
-+    READREQ = 3,
-+    PINCOUNT = 4,
-+    ENABLEMAP = 5,
-+    INPUTMAP = 6,
-+    OUTPUTMAP = 7,
-+    PINSTOQEMU = 8
-+} PacketType;
-+
-+#define MINPROTOCOL 0
-+#define MAXPROTOCOL 0
-+
-+#define MAXPACKET   255
-+
-+#define PACKETLEN   0  /* Includes Packet Length */
-+#define PACKETTYPE  1
-+
-+typedef struct
-+{
-+    unsigned short int Data[MAXPACKET];
-+} CommandPacket;
-+
-+static void panel_command(panel_connection_t *h, CommandPacket *Pkt);
-+
-+static void panel_send_protocol_command(panel_connection_t *h)
-+{
-+    CommandPacket Pkt;
-+
-+    Pkt.Data[PACKETLEN] = 8;
-+    Pkt.Data[PACKETTYPE] = PROTOCOLDESCFROMQEMU;
-+    Pkt.Data[2] = MINPROTOCOL;
-+    Pkt.Data[3] = MAXPROTOCOL;
-+
-+    panel_command(h, &Pkt);
-+}
-+
-+void panel_send_read_command(panel_connection_t *h)
-+{
-+    CommandPacket Pkt;
-+
-+    Pkt.Data[PACKETLEN] = 4;
-+    Pkt.Data[PACKETTYPE] = READREQ;
-+
-+    panel_command(h, &Pkt);
-+}
-+
-+/* Set a pin to a specified value */
-+void senddatatopanel(panel_connection_t *h, uint64_t pin, bool val)
-+{
-+    CommandPacket Pkt;
-+
-+    Pkt.Data[PACKETLEN] = (char *)&Pkt.Data[6 + 1] - (char *)&Pkt.Data[0];
-+    Pkt.Data[PACKETTYPE] = PINSTOPANEL;
-+    Pkt.Data[2] = (unsigned short int)(pin & 0xFFFF);
-+    Pkt.Data[3] = (unsigned short int)((pin >> 16) & 0xFFFF);
-+    Pkt.Data[4] = (unsigned short int)(pin >> 32 & 0xFFFF);
-+    Pkt.Data[5] = (unsigned short int)((pin >> 48) & 0xFFFF);
-+    Pkt.Data[6] = val;
-+
-+    panel_command(h, &Pkt);
-+}
-+
-+void sendpincount(panel_connection_t *h, int val)
-+{
-+    CommandPacket Pkt;
-+
-+    Pkt.Data[PACKETLEN] = (char *)&Pkt.Data[2 + 1] - (char *)&Pkt.Data[0];
-+    Pkt.Data[PACKETTYPE] = PINCOUNT;
-+    Pkt.Data[2] = val;
-+
-+    panel_command(h, &Pkt);
-+}
-+
-+void sendenabledmap(panel_connection_t *h, uint64_t pin)
-+{
-+    CommandPacket Pkt;
-+
-+    Pkt.Data[PACKETLEN] = (char *)&Pkt.Data[5 + 1] - (char *)&Pkt.Data[0];
-+    Pkt.Data[PACKETTYPE] = ENABLEMAP;
-+    Pkt.Data[2] = (unsigned short int)(pin & 0xFFFF);
-+    Pkt.Data[3] = (unsigned short int)((pin >> 16) & 0xFFFF);
-+    Pkt.Data[4] = (unsigned short int)(pin >> 32 & 0xFFFF);
-+    Pkt.Data[5] = (unsigned short int)((pin >> 48) & 0xFFFF);
-+
-+    panel_command(h, &Pkt);
-+}
-+
-+void sendinputmap(panel_connection_t *h, uint64_t pin)
-+{
-+    CommandPacket Pkt;
-+
-+    Pkt.Data[PACKETLEN] = (char *)&Pkt.Data[5 + 1] - (char *)&Pkt.Data[0];
-+    Pkt.Data[PACKETTYPE] = INPUTMAP;
-+    Pkt.Data[2] = (unsigned short int)(pin & 0xFFFF);
-+    Pkt.Data[3] = (unsigned short int)((pin >> 16) & 0xFFFF);
-+    Pkt.Data[4] = (unsigned short int)(pin >> 32 & 0xFFFF);
-+    Pkt.Data[5] = (unsigned short int)((pin >> 48) & 0xFFFF);
-+
-+    panel_command(h, &Pkt);
-+}
-+
-+void sendoutputmap(panel_connection_t *h, uint64_t pin)
-+{
-+    CommandPacket Pkt;
-+
-+    Pkt.Data[PACKETLEN] = (char *)&Pkt.Data[5 + 1] - (char *)&Pkt.Data[0];
-+    Pkt.Data[PACKETTYPE] = OUTPUTMAP;
-+    Pkt.Data[2] = (unsigned short int)(pin & 0xFFFF);
-+    Pkt.Data[3] = (unsigned short int)((pin >> 16) & 0xFFFF);
-+    Pkt.Data[4] = (unsigned short int)(pin >> 32 & 0xFFFF);
-+    Pkt.Data[5] = (unsigned short int)((pin >> 48) & 0xFFFF);
-+
-+    panel_command(h, &Pkt);
-+}
-+
-+static void panel_command(panel_connection_t *h, CommandPacket *Pkt)
-+{
-+    if (send(h->socket, (char *)Pkt, Pkt->Data[PACKETLEN], 0) == -1) {
-+        perror(PANEL_NAME "send");
-+#ifdef __MINGW32__
-+        closesocket(h->socket);
-+#else
-+        close(h->socket);
-+#endif
-+        h->socket = -1; /* act like we never connected */
-+    }
-+}
-+
-+/* Wait for values to be read back from panel */
-+bool panel_read(panel_connection_t *h, uint64_t* Data)
-+{
-+    fd_set rfds, efds;
-+    int LengthInBuffer;
-+    int select_res = 0;
-+
-+    CommandPacket *PktPtr = (CommandPacket *)malloc(sizeof(CommandPacket));
-+    CommandPacket *Pkt;
-+    bool NoError = true;
-+    bool NewData = false;
-+    bool NoData = false;
-+    struct timeval timeout;
-+
-+    int ReadStart = 0;
-+
-+    timeout.tv_sec = 0;
-+    timeout.tv_usec = 0;
-+
-+    if (h->socket != -1) {
-+        rfds = h->fds;
-+        efds = h->fds;
-+
-+        Pkt = PktPtr;
-+        while (NoError&&! NoData) {
-+            select_res = select(h->socket + 1, &rfds, NULL, &efds, &timeout);
-+            if (select_res > 0) {
-+                if (FD_ISSET(h->socket, &rfds)) {
-+                    /* receive more data */
-+                    LengthInBuffer = recv(h->socket, (char *)&Pkt[ReadStart],
-+                                    sizeof(*Pkt) - ReadStart, 0);
-+                    if (LengthInBuffer > 0) {
-+                        LengthInBuffer += ReadStart;
-+                        for (int i = 0; LengthInBuffer > 0; i ++) {
-+                            if (LengthInBuffer >= Pkt->Data[i + PACKETLEN]) {
-+                                switch (Pkt->Data[i + PACKETTYPE]) {
-+                                case PINSTOQEMU:
-+                                    *Data = (uint64_t)Pkt->Data[i + 2];
-+                                    *Data |= ((uint64_t)Pkt->Data[i + 3]) << 16;
-+                                    *Data |= ((uint64_t)Pkt->Data[i + 4]) << 32;
-+                                    *Data |= ((uint64_t)Pkt->Data[i + 5]) << 48;
-+
-+                                    NewData = true;
-+                                    break;
-+
-+                                case PROTOCOLDESCFROMPANEL:
-+                                    h->ProtocolInUse = (int)Pkt->Data[i + 2];
-+                                    if (h->ProtocolInUse != -1) {
-+                                        printf(PANEL_NAME "Protocol %d\n",
-+                                               h->ProtocolInUse);
-+                                    } else {
-+                                        printf(PANEL_NAME "No Common Pcol\n");
-+                                    }
-+                                    break;
-+
-+                                default:
-+                                    printf(PANEL_NAME "Invalid data receive\n");
-+                                    break;
-+                                }
-+                                LengthInBuffer -= Pkt->Data[PACKETLEN];
-+                                i += Pkt->Data[PACKETLEN];
-+                            } else {
-+                                ReadStart = LengthInBuffer;
-+                                for (int j = 0; j < LengthInBuffer; j ++) {
-+                                    Pkt->Data[j] = Pkt->Data[i + j];
-+                                }
-+                                printf(PANEL_NAME "Partial Packet Read");
-+                            }
-+                        }
-+                    } else {
-+                        if (LengthInBuffer < 0) {
-+                            if (errno != EINTR) {
-+                                printf(PANEL_NAME "recv");
-+                                NoError = FALSE;
-+                            }
-+                        } else {
-+                            printf(PANEL_NAME "closed connection\n");
-+                            NoError = FALSE;
-+                        }
-+                    }
-+                }
-+            } else if (select_res == 0) {
-+                NoData = true;
-+            } else if (errno != EINTR) {
-+#ifdef __MINGW32__
-+                closesocket(h->socket);
-+#else
-+                close(h->socket);
-+#endif
-+                h->socket = -1; /* act like we never connected */
-+                perror(PANEL_NAME "select error");
-+                NoError = FALSE;
-+            }
-+        }
-+    }
-+
-+    free(PktPtr);
-+
-+    return NewData;
-+}
-+
-+bool panel_open(panel_connection_t *h)
-+{
-+    int rv;
-+#ifdef __MINGW32__
-+    struct sockaddr_in remote;
-+#else
-+    struct sockaddr_in remote;
-+#endif
-+
-+    bool returnval = false;
-+
-+#ifdef __MINGW32__
-+    printf("__MINGW32__\n");
-+#else
-+    printf("NOT __MINGW32__\n");
-+#endif
-+
-+    h->socket = -1;
-+    h->ProtocolInUse = -1;
-+
-+#ifdef __MINGW32__
-+    WSADATA wsadata;
-+    if (WSAStartup(MAKEWORD(1, 1), &wsadata) == SOCKET_ERROR) {
-+        printf("Error creating socket.\n");
-+    } else {
-+#endif
-+        h->socket = socket(AF_INET, SOCK_STREAM, 0);
-+        if (h->socket != -1) {
-+#ifdef __MINGW32__
-+            memset((char *)&remote, 0, sizeof(remote));
-+            remote.sin_family = AF_INET;
-+            remote.sin_port = htons(DEFAULT_PORT);
-+            remote.sin_addr.s_addr = inet_addr("127.0.0.1");
-+#else
-+            memset((char *)&remote, 0, sizeof(remote));
-+            remote.sin_family = AF_INET;
-+            remote.sin_port = htons(DEFAULT_PORT);
-+            remote.sin_addr.s_addr = inet_addr("127.0.0.1");
-+#endif
-+            rv = connect(h->socket,
-+                            (struct sockaddr *)&remote, sizeof(remote));
-+            if (rv != -1) {
-+#ifdef __MINGW32__
-+                char value = 1;
-+                setsockopt(h->socket, IPPROTO_TCP, TCP_NODELAY,
-+                           &value, sizeof(value));
-+#endif
-+                FD_ZERO(&h->fds);
-+
-+                /* Set our connected socket */
-+                FD_SET(h->socket, &h->fds);
-+
-+                printf(PANEL_NAME "Connected OK %d\n", rv);
-+
-+                panel_send_protocol_command(h);
-+
-+                returnval = true;
-+            } else {
-+                printf(PANEL_NAME "connection Fails %d\n", rv);
-+#ifdef __MINGW32__
-+                closesocket(h->socket);
-+#else
-+                close(h->socket);
-+#endif
-+                h->socket = -1;
-+            }
-+        }
-+#ifdef __MINGW32__
-+    }
-+#endif
-+    return returnval;
-+}
--- 
-2.13.0.windows.1
+SGksCgpUaGlzIHNlcmllcyBmYWlsZWQgYXV0b21hdGljIGJ1aWxkIHRlc3QuIFBsZWFzZSBmaW5k
+IHRoZSB0ZXN0aW5nIGNvbW1hbmRzIGFuZAp0aGVpciBvdXRwdXQgYmVsb3cuIElmIHlvdSBoYXZl
+IGRvY2tlciBpbnN0YWxsZWQsIHlvdSBjYW4gcHJvYmFibHkgcmVwcm9kdWNlIGl0CmxvY2FsbHku
+CgpNZXNzYWdlLWlkOiA1NmZhOGE3OS1mYTkwLTRhZGMtYWEwZS0wNTI3YzlkOTY2OThAT05FLmxv
+Y2FsClN1YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0hdIFtQQVRDSCBWMl0gR0R1bW15UGFuZWwg
+Rml4IGZvcm1hdGluZ2lzc3Vlcy4KVHlwZTogc2VyaWVzCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4g
+PT09CiMhL2Jpbi9iYXNoCnNldCAtZQpnaXQgc3VibW9kdWxlIHVwZGF0ZSAtLWluaXQgZHRjCiMg
+TGV0IGRvY2tlciB0ZXN0cyBkdW1wIGVudmlyb25tZW50IGluZm8KZXhwb3J0IFNIT1dfRU5WPTEK
+ZXhwb3J0IEo9OAp0aW1lIG1ha2UgZG9ja2VyLXRlc3QtcXVpY2tAY2VudG9zNgp0aW1lIG1ha2Ug
+ZG9ja2VyLXRlc3QtbWluZ3dAZmVkb3JhCnRpbWUgbWFrZSBkb2NrZXItdGVzdC1idWlsZEBtaW4t
+Z2xpYgo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIx
+NjRkMWRlZjdmNDRiZDg4ODcxMzM4NApGcm9tIGh0dHBzOi8vZ2l0aHViLmNvbS9wYXRjaGV3LXBy
+b2plY3QvcWVtdQogLSBbdGFnIHVwZGF0ZV0gICAgICBwYXRjaGV3LzIwMTcwNTIwMDAyNjUzLjIw
+MjEzLTEtYW5kcmV3QGFqLmlkLmF1IC0+IHBhdGNoZXcvMjAxNzA1MjAwMDI2NTMuMjAyMTMtMS1h
+bmRyZXdAYWouaWQuYXUKICogW25ldyB0YWddICAgICAgICAgcGF0Y2hldy81NmZhOGE3OS1mYTkw
+LTRhZGMtYWEwZS0wNTI3YzlkOTY2OThAT05FLmxvY2FsIC0+IHBhdGNoZXcvNTZmYThhNzktZmE5
+MC00YWRjLWFhMGUtMDUyN2M5ZDk2Njk4QE9ORS5sb2NhbApTd2l0Y2hlZCB0byBhIG5ldyBicmFu
+Y2ggJ3Rlc3QnCmMzM2ExZjcgR0R1bW15UGFuZWwgRml4IGZvcm1hdGluZ2lzc3Vlcy4KCj09PSBP
+VVRQVVQgQkVHSU4gPT09ClN1Ym1vZHVsZSAnZHRjJyAoZ2l0Oi8vZ2l0LnFlbXUtcHJvamVjdC5v
+cmcvZHRjLmdpdCkgcmVnaXN0ZXJlZCBmb3IgcGF0aCAnZHRjJwpDbG9uaW5nIGludG8gJy92YXIv
+dG1wL3BhdGNoZXctdGVzdGVyLXRtcC1wNDcybnk3Ny9zcmMvZHRjJy4uLgpTdWJtb2R1bGUgcGF0
+aCAnZHRjJzogY2hlY2tlZCBvdXQgJzU1OGNkODFiZGQ0MzI3NjliNTliZmYwMTI0MGM0NGY4MmNm
+YjFhOWQnCiAgQlVJTEQgICBjZW50b3M2Cm1ha2VbMV06IEVudGVyaW5nIGRpcmVjdG9yeSAnL3Zh
+ci90bXAvcGF0Y2hldy10ZXN0ZXItdG1wLXA0NzJueTc3L3NyYycKICBBUkNISVZFIHFlbXUudGd6
+CiAgQVJDSElWRSBkdGMudGd6CiAgQ09QWSAgICBSVU5ORVIKICAgIFJVTiB0ZXN0LXF1aWNrIGlu
+IHFlbXU6Y2VudG9zNiAKUGFja2FnZXMgaW5zdGFsbGVkOgpTREwtZGV2ZWwtMS4yLjE0LTcuZWw2
+XzcuMS54ODZfNjQKY2NhY2hlLTMuMS42LTIuZWw2Lng4Nl82NAplcGVsLXJlbGVhc2UtNi04Lm5v
+YXJjaApnY2MtNC40LjctMTcuZWw2Lng4Nl82NApnaXQtMS43LjEtNC5lbDZfNy4xLng4Nl82NApn
+bGliMi1kZXZlbC0yLjI4LjgtNS5lbDYueDg2XzY0CmxpYmZkdC1kZXZlbC0xLjQuMC0xLmVsNi54
+ODZfNjQKbWFrZS0zLjgxLTIzLmVsNi54ODZfNjQKcGFja2FnZSBnKysgaXMgbm90IGluc3RhbGxl
+ZApwaXhtYW4tZGV2ZWwtMC4zMi44LTEuZWw2Lng4Nl82NAp0YXItMS4yMy0xNS5lbDZfOC54ODZf
+NjQKemxpYi1kZXZlbC0xLjIuMy0yOS5lbDYueDg2XzY0CgpFbnZpcm9ubWVudCB2YXJpYWJsZXM6
+ClBBQ0tBR0VTPWxpYmZkdC1kZXZlbCBjY2FjaGUgICAgIHRhciBnaXQgbWFrZSBnY2MgZysrICAg
+ICB6bGliLWRldmVsIGdsaWIyLWRldmVsIFNETC1kZXZlbCBwaXhtYW4tZGV2ZWwgICAgIGVwZWwt
+cmVsZWFzZQpIT1NUTkFNRT1iMjVmZTc0OGJjNTMKVEVSTT14dGVybQpNQUtFRkxBR1M9IC1qOApI
+SVNUU0laRT0xMDAwCko9OApVU0VSPXJvb3QKQ0NBQ0hFX0RJUj0vdmFyL3RtcC9jY2FjaGUKRVhU
+UkFfQ09ORklHVVJFX09QVFM9ClY9ClNIT1dfRU5WPTEKTUFJTD0vdmFyL3Nwb29sL21haWwvcm9v
+dApQQVRIPS91c3IvbGliL2NjYWNoZTovdXNyL2xpYjY0L2NjYWNoZTovdXNyL2xvY2FsL3NiaW46
+L3Vzci9sb2NhbC9iaW46L3Vzci9zYmluOi91c3IvYmluOi9zYmluOi9iaW4KUFdEPS8KTEFORz1l
+bl9VUy5VVEYtOApUQVJHRVRfTElTVD0KSElTVENPTlRST0w9aWdub3JlZHVwcwpTSExWTD0xCkhP
+TUU9L3Jvb3QKVEVTVF9ESVI9L3RtcC9xZW11LXRlc3QKTE9HTkFNRT1yb290CkxFU1NPUEVOPXx8
+L3Vzci9iaW4vbGVzc3BpcGUuc2ggJXMKRkVBVFVSRVM9IGR0YwpERUJVRz0KR19CUk9LRU5fRklM
+RU5BTUVTPTEKQ0NBQ0hFX0hBU0hESVI9Cl89L3Vzci9iaW4vZW52CgpDb25maWd1cmUgb3B0aW9u
+czoKLS1lbmFibGUtd2Vycm9yIC0tdGFyZ2V0LWxpc3Q9eDg2XzY0LXNvZnRtbXUsYWFyY2g2NC1z
+b2Z0bW11IC0tcHJlZml4PS92YXIvdG1wL3FlbXUtYnVpbGQvaW5zdGFsbApObyBDKysgY29tcGls
+ZXIgYXZhaWxhYmxlOyBkaXNhYmxpbmcgQysrIHNwZWNpZmljIG9wdGlvbmFsIGNvZGUKSW5zdGFs
+bCBwcmVmaXggICAgL3Zhci90bXAvcWVtdS1idWlsZC9pbnN0YWxsCkJJT1MgZGlyZWN0b3J5ICAg
+IC92YXIvdG1wL3FlbXUtYnVpbGQvaW5zdGFsbC9zaGFyZS9xZW11CmJpbmFyeSBkaXJlY3Rvcnkg
+IC92YXIvdG1wL3FlbXUtYnVpbGQvaW5zdGFsbC9iaW4KbGlicmFyeSBkaXJlY3RvcnkgL3Zhci90
+bXAvcWVtdS1idWlsZC9pbnN0YWxsL2xpYgptb2R1bGUgZGlyZWN0b3J5ICAvdmFyL3RtcC9xZW11
+LWJ1aWxkL2luc3RhbGwvbGliL3FlbXUKbGliZXhlYyBkaXJlY3RvcnkgL3Zhci90bXAvcWVtdS1i
+dWlsZC9pbnN0YWxsL2xpYmV4ZWMKaW5jbHVkZSBkaXJlY3RvcnkgL3Zhci90bXAvcWVtdS1idWls
+ZC9pbnN0YWxsL2luY2x1ZGUKY29uZmlnIGRpcmVjdG9yeSAgL3Zhci90bXAvcWVtdS1idWlsZC9p
+bnN0YWxsL2V0Ywpsb2NhbCBzdGF0ZSBkaXJlY3RvcnkgICAvdmFyL3RtcC9xZW11LWJ1aWxkL2lu
+c3RhbGwvdmFyCk1hbnVhbCBkaXJlY3RvcnkgIC92YXIvdG1wL3FlbXUtYnVpbGQvaW5zdGFsbC9z
+aGFyZS9tYW4KRUxGIGludGVycCBwcmVmaXggL3Vzci9nbmVtdWwvcWVtdS0lTQpTb3VyY2UgcGF0
+aCAgICAgICAvdG1wL3FlbXUtdGVzdC9zcmMKQyBjb21waWxlciAgICAgICAgY2MKSG9zdCBDIGNv
+bXBpbGVyICAgY2MKQysrIGNvbXBpbGVyICAgICAgCk9iamVjdGl2ZS1DIGNvbXBpbGVyIGNjCkFS
+RkxBR1MgICAgICAgICAgIHJ2CkNGTEFHUyAgICAgICAgICAgIC1PMiAtVV9GT1JUSUZZX1NPVVJD
+RSAtRF9GT1JUSUZZX1NPVVJDRT0yIC1nIApRRU1VX0NGTEFHUyAgICAgICAtSS91c3IvaW5jbHVk
+ZS9waXhtYW4tMSAgIC1JJChTUkNfUEFUSCkvZHRjL2xpYmZkdCAtcHRocmVhZCAtSS91c3IvaW5j
+bHVkZS9nbGliLTIuMCAtSS91c3IvbGliNjQvZ2xpYi0yLjAvaW5jbHVkZSAgIC1mUElFIC1EUElF
+IC1tNjQgLW1jeDE2IC1EX0dOVV9TT1VSQ0UgLURfRklMRV9PRkZTRVRfQklUUz02NCAtRF9MQVJH
+RUZJTEVfU09VUkNFIC1Xc3RyaWN0LXByb3RvdHlwZXMgLVdyZWR1bmRhbnQtZGVjbHMgLVdhbGwg
+LVd1bmRlZiAtV3dyaXRlLXN0cmluZ3MgLVdtaXNzaW5nLXByb3RvdHlwZXMgLWZuby1zdHJpY3Qt
+YWxpYXNpbmcgLWZuby1jb21tb24gLWZ3cmFwdiAgLVdlbmRpZi1sYWJlbHMgLVduby1taXNzaW5n
+LWluY2x1ZGUtZGlycyAtV2VtcHR5LWJvZHkgLVduZXN0ZWQtZXh0ZXJucyAtV2Zvcm1hdC1zZWN1
+cml0eSAtV2Zvcm1hdC15MmsgLVdpbml0LXNlbGYgLVdpZ25vcmVkLXF1YWxpZmllcnMgLVdvbGQt
+c3R5bGUtZGVjbGFyYXRpb24gLVdvbGQtc3R5bGUtZGVmaW5pdGlvbiAtV3R5cGUtbGltaXRzIC1m
+c3RhY2stcHJvdGVjdG9yLWFsbApMREZMQUdTICAgICAgICAgICAtV2wsLS13YXJuLWNvbW1vbiAt
+V2wsLXoscmVscm8gLVdsLC16LG5vdyAtcGllIC1tNjQgLWcgCm1ha2UgICAgICAgICAgICAgIG1h
+a2UKaW5zdGFsbCAgICAgICAgICAgaW5zdGFsbApweXRob24gICAgICAgICAgICBweXRob24gLUIK
+c21iZCAgICAgICAgICAgICAgL3Vzci9zYmluL3NtYmQKbW9kdWxlIHN1cHBvcnQgICAgbm8KaG9z
+dCBDUFUgICAgICAgICAgeDg2XzY0Cmhvc3QgYmlnIGVuZGlhbiAgIG5vCnRhcmdldCBsaXN0ICAg
+ICAgIHg4Nl82NC1zb2Z0bW11IGFhcmNoNjQtc29mdG1tdQp0Y2cgZGVidWcgZW5hYmxlZCBubwpn
+cHJvZiBlbmFibGVkICAgICBubwpzcGFyc2UgZW5hYmxlZCAgICBubwpzdHJpcCBiaW5hcmllcyAg
+ICB5ZXMKcHJvZmlsZXIgICAgICAgICAgbm8Kc3RhdGljIGJ1aWxkICAgICAgbm8KcGl4bWFuICAg
+ICAgICAgICAgc3lzdGVtClNETCBzdXBwb3J0ICAgICAgIHllcyAoMS4yLjE0KQpHVEsgc3VwcG9y
+dCAgICAgICBubyAKR1RLIEdMIHN1cHBvcnQgICAgbm8KVlRFIHN1cHBvcnQgICAgICAgbm8gClRM
+UyBwcmlvcml0eSAgICAgIE5PUk1BTApHTlVUTFMgc3VwcG9ydCAgICBubwpHTlVUTFMgcm5kICAg
+ICAgICBubwpsaWJnY3J5cHQgICAgICAgICBubwpsaWJnY3J5cHQga2RmICAgICBubwpuZXR0bGUg
+ICAgICAgICAgICBubyAKbmV0dGxlIGtkZiAgICAgICAgbm8KbGlidGFzbjEgICAgICAgICAgbm8K
+Y3Vyc2VzIHN1cHBvcnQgICAgbm8KdmlyZ2wgc3VwcG9ydCAgICAgbm8KY3VybCBzdXBwb3J0ICAg
+ICAgbm8KbWluZ3czMiBzdXBwb3J0ICAgbm8KQXVkaW8gZHJpdmVycyAgICAgb3NzCkJsb2NrIHdo
+aXRlbGlzdCAocncpIApCbG9jayB3aGl0ZWxpc3QgKHJvKSAKVmlydEZTIHN1cHBvcnQgICAgbm8K
+Vk5DIHN1cHBvcnQgICAgICAgeWVzClZOQyBTQVNMIHN1cHBvcnQgIG5vClZOQyBKUEVHIHN1cHBv
+cnQgIG5vClZOQyBQTkcgc3VwcG9ydCAgIG5vCnhlbiBzdXBwb3J0ICAgICAgIG5vCmJybGFwaSBz
+dXBwb3J0ICAgIG5vCmJsdWV6ICBzdXBwb3J0ICAgIG5vCkRvY3VtZW50YXRpb24gICAgIG5vClBJ
+RSAgICAgICAgICAgICAgIHllcwp2ZGUgc3VwcG9ydCAgICAgICBubwpuZXRtYXAgc3VwcG9ydCAg
+ICBubwpMaW51eCBBSU8gc3VwcG9ydCBubwpBVFRSL1hBVFRSIHN1cHBvcnQgeWVzCkluc3RhbGwg
+YmxvYnMgICAgIHllcwpLVk0gc3VwcG9ydCAgICAgICB5ZXMKSEFYIHN1cHBvcnQgICAgICAgbm8K
+UkRNQSBzdXBwb3J0ICAgICAgbm8KVENHIGludGVycHJldGVyICAgbm8KZmR0IHN1cHBvcnQgICAg
+ICAgeWVzCnByZWFkdiBzdXBwb3J0ICAgIHllcwpmZGF0YXN5bmMgICAgICAgICB5ZXMKbWFkdmlz
+ZSAgICAgICAgICAgeWVzCnBvc2l4X21hZHZpc2UgICAgIHllcwpsaWJjYXAtbmcgc3VwcG9ydCBu
+bwp2aG9zdC1uZXQgc3VwcG9ydCB5ZXMKdmhvc3Qtc2NzaSBzdXBwb3J0IHllcwp2aG9zdC12c29j
+ayBzdXBwb3J0IHllcwpUcmFjZSBiYWNrZW5kcyAgICBsb2cKc3BpY2Ugc3VwcG9ydCAgICAgbm8g
+CnJiZCBzdXBwb3J0ICAgICAgIG5vCnhmc2N0bCBzdXBwb3J0ICAgIG5vCnNtYXJ0Y2FyZCBzdXBw
+b3J0IG5vCmxpYnVzYiAgICAgICAgICAgIG5vCnVzYiBuZXQgcmVkaXIgICAgIG5vCk9wZW5HTCBz
+dXBwb3J0ICAgIG5vCk9wZW5HTCBkbWFidWZzICAgIG5vCmxpYmlzY3NpIHN1cHBvcnQgIG5vCmxp
+Ym5mcyBzdXBwb3J0ICAgIG5vCmJ1aWxkIGd1ZXN0IGFnZW50IHllcwpRR0EgVlNTIHN1cHBvcnQg
+ICBubwpRR0EgdzMyIGRpc2sgaW5mbyBubwpRR0EgTVNJIHN1cHBvcnQgICBubwpzZWNjb21wIHN1
+cHBvcnQgICBubwpjb3JvdXRpbmUgYmFja2VuZCB1Y29udGV4dApjb3JvdXRpbmUgcG9vbCAgICB5
+ZXMKZGVidWcgc3RhY2sgdXNhZ2Ugbm8KR2x1c3RlckZTIHN1cHBvcnQgbm8KZ2NvdiAgICAgICAg
+ICAgICAgZ2NvdgpnY292IGVuYWJsZWQgICAgICBubwpUUE0gc3VwcG9ydCAgICAgICB5ZXMKbGli
+c3NoMiBzdXBwb3J0ICAgbm8KVFBNIHBhc3N0aHJvdWdoICAgeWVzClFPTSBkZWJ1Z2dpbmcgICAg
+IHllcwpsem8gc3VwcG9ydCAgICAgICBubwpzbmFwcHkgc3VwcG9ydCAgICBubwpiemlwMiBzdXBw
+b3J0ICAgICBubwpOVU1BIGhvc3Qgc3VwcG9ydCBubwp0Y21hbGxvYyBzdXBwb3J0ICBubwpqZW1h
+bGxvYyBzdXBwb3J0ICBubwphdngyIG9wdGltaXphdGlvbiBubwpyZXBsaWNhdGlvbiBzdXBwb3J0
+IHllcwpWeEhTIGJsb2NrIGRldmljZSBubwogIEdFTiAgICAgeDg2XzY0LXNvZnRtbXUvY29uZmln
+LWRldmljZXMubWFrLnRtcApta2RpciAtcCBkdGMvbGliZmR0Cm1rZGlyIC1wIGR0Yy90ZXN0cwog
+IEdFTiAgICAgYWFyY2g2NC1zb2Z0bW11L2NvbmZpZy1kZXZpY2VzLm1hay50bXAKICBHRU4gICAg
+IHFlbXUtb3B0aW9ucy5kZWYKICBHRU4gICAgIGNvbmZpZy1ob3N0LmgKICBHRU4gICAgIHFtcC1j
+b21tYW5kcy5oCiAgR0VOICAgICBxYXBpLXR5cGVzLmgKICBHRU4gICAgIHFhcGktdmlzaXQuaAog
+IEdFTiAgICAgcWFwaS1ldmVudC5oCiAgR0VOICAgICB4ODZfNjQtc29mdG1tdS9jb25maWctZGV2
+aWNlcy5tYWsKICBHRU4gICAgIGFhcmNoNjQtc29mdG1tdS9jb25maWctZGV2aWNlcy5tYWsKICBH
+RU4gICAgIHFtcC1tYXJzaGFsLmMKICBHRU4gICAgIHFhcGktdHlwZXMuYwogIEdFTiAgICAgcWFw
+aS12aXNpdC5jCiAgR0VOICAgICBxYXBpLWV2ZW50LmMKICBHRU4gICAgIHFtcC1pbnRyb3NwZWN0
+LmgKICBHRU4gICAgIHFtcC1pbnRyb3NwZWN0LmMKICBHRU4gICAgIHRyYWNlL2dlbmVyYXRlZC10
+Y2ctdHJhY2Vycy5oCiAgR0VOICAgICB0cmFjZS9nZW5lcmF0ZWQtaGVscGVycy13cmFwcGVycy5o
+CiAgR0VOICAgICB0cmFjZS9nZW5lcmF0ZWQtaGVscGVycy5oCiAgR0VOICAgICB0cmFjZS9nZW5l
+cmF0ZWQtaGVscGVycy5jCiAgR0VOICAgICBtb2R1bGVfYmxvY2suaAogIEdFTiAgICAgdGVzdHMv
+dGVzdC1xYXBpLXR5cGVzLmgKICBHRU4gICAgIHRlc3RzL3Rlc3QtcWFwaS12aXNpdC5oCiAgR0VO
+ICAgICB0ZXN0cy90ZXN0LXFtcC1jb21tYW5kcy5oCiAgR0VOICAgICB0ZXN0cy90ZXN0LXFhcGkt
+ZXZlbnQuaAogIEdFTiAgICAgdGVzdHMvdGVzdC1xbXAtaW50cm9zcGVjdC5oCiAgR0VOICAgICB0
+cmFjZS1yb290LmgKICBHRU4gICAgIHV0aWwvdHJhY2UuaAogIEdFTiAgICAgY3J5cHRvL3RyYWNl
+LmgKICBHRU4gICAgIGlvL3RyYWNlLmgKICBHRU4gICAgIG1pZ3JhdGlvbi90cmFjZS5oCiAgR0VO
+ICAgICBibG9jay90cmFjZS5oCiAgR0VOICAgICBiYWNrZW5kcy90cmFjZS5oCiAgR0VOICAgICBo
+dy9ibG9jay90cmFjZS5oCiAgR0VOICAgICBody9ibG9jay9kYXRhcGxhbmUvdHJhY2UuaAogIEdF
+TiAgICAgaHcvY2hhci90cmFjZS5oCiAgR0VOICAgICBody9pbnRjL3RyYWNlLmgKICBHRU4gICAg
+IGh3L25ldC90cmFjZS5oCiAgR0VOICAgICBody92aXJ0aW8vdHJhY2UuaAogIEdFTiAgICAgaHcv
+YXVkaW8vdHJhY2UuaAogIEdFTiAgICAgaHcvbWlzYy90cmFjZS5oCiAgR0VOICAgICBody91c2Iv
+dHJhY2UuaAogIEdFTiAgICAgaHcvc2NzaS90cmFjZS5oCiAgR0VOICAgICBody9udnJhbS90cmFj
+ZS5oCiAgR0VOICAgICBody9kaXNwbGF5L3RyYWNlLmgKICBHRU4gICAgIGh3L2lucHV0L3RyYWNl
+LmgKICBHRU4gICAgIGh3L3RpbWVyL3RyYWNlLmgKICBHRU4gICAgIGh3L2RtYS90cmFjZS5oCiAg
+R0VOICAgICBody9zcGFyYy90cmFjZS5oCiAgR0VOICAgICBody9zZC90cmFjZS5oCiAgR0VOICAg
+ICBody9pc2EvdHJhY2UuaAogIEdFTiAgICAgaHcvbWVtL3RyYWNlLmgKICBHRU4gICAgIGh3L2kz
+ODYvdHJhY2UuaAogIEdFTiAgICAgaHcvaTM4Ni94ZW4vdHJhY2UuaAogIEdFTiAgICAgaHcvOXBm
+cy90cmFjZS5oCiAgR0VOICAgICBody9wcGMvdHJhY2UuaAogIEdFTiAgICAgaHcvcGNpL3RyYWNl
+LmgKICBHRU4gICAgIGh3L3MzOTB4L3RyYWNlLmgKICBHRU4gICAgIGh3L3ZmaW8vdHJhY2UuaAog
+IEdFTiAgICAgaHcvYWNwaS90cmFjZS5oCiAgR0VOICAgICBody9hcm0vdHJhY2UuaAogIEdFTiAg
+ICAgaHcvYWxwaGEvdHJhY2UuaAogIEdFTiAgICAgaHcveGVuL3RyYWNlLmgKICBHRU4gICAgIHVp
+L3RyYWNlLmgKICBHRU4gICAgIGF1ZGlvL3RyYWNlLmgKICBHRU4gICAgIG5ldC90cmFjZS5oCiAg
+R0VOICAgICB0YXJnZXQvYXJtL3RyYWNlLmgKICBHRU4gICAgIHRhcmdldC9pMzg2L3RyYWNlLmgK
+ICBHRU4gICAgIHRhcmdldC9taXBzL3RyYWNlLmgKICBHRU4gICAgIHRhcmdldC9zcGFyYy90cmFj
+ZS5oCiAgR0VOICAgICB0YXJnZXQvczM5MHgvdHJhY2UuaAogIEdFTiAgICAgdGFyZ2V0L3BwYy90
+cmFjZS5oCiAgR0VOICAgICBxb20vdHJhY2UuaAogIEdFTiAgICAgbGludXgtdXNlci90cmFjZS5o
+CiAgR0VOICAgICBxYXBpL3RyYWNlLmgKICBHRU4gICAgIHRyYWNlLXJvb3QuYwogIEdFTiAgICAg
+dXRpbC90cmFjZS5jCiAgR0VOICAgICBjcnlwdG8vdHJhY2UuYwogIEdFTiAgICAgaW8vdHJhY2Uu
+YwogIEdFTiAgICAgbWlncmF0aW9uL3RyYWNlLmMKICBHRU4gICAgIGJsb2NrL3RyYWNlLmMKICBH
+RU4gICAgIGJhY2tlbmRzL3RyYWNlLmMKICBHRU4gICAgIGh3L2Jsb2NrL3RyYWNlLmMKICBHRU4g
+ICAgIGh3L2Jsb2NrL2RhdGFwbGFuZS90cmFjZS5jCiAgR0VOICAgICBody9jaGFyL3RyYWNlLmMK
+ICBHRU4gICAgIGh3L2ludGMvdHJhY2UuYwogIEdFTiAgICAgaHcvbmV0L3RyYWNlLmMKICBHRU4g
+ICAgIGh3L3ZpcnRpby90cmFjZS5jCiAgR0VOICAgICBody9hdWRpby90cmFjZS5jCiAgR0VOICAg
+ICBody9taXNjL3RyYWNlLmMKICBHRU4gICAgIGh3L3VzYi90cmFjZS5jCiAgR0VOICAgICBody9z
+Y3NpL3RyYWNlLmMKICBHRU4gICAgIGh3L252cmFtL3RyYWNlLmMKICBHRU4gICAgIGh3L2Rpc3Bs
+YXkvdHJhY2UuYwogIEdFTiAgICAgaHcvaW5wdXQvdHJhY2UuYwogIEdFTiAgICAgaHcvdGltZXIv
+dHJhY2UuYwogIEdFTiAgICAgaHcvZG1hL3RyYWNlLmMKICBHRU4gICAgIGh3L3NwYXJjL3RyYWNl
+LmMKICBHRU4gICAgIGh3L3NkL3RyYWNlLmMKICBHRU4gICAgIGh3L2lzYS90cmFjZS5jCiAgR0VO
+ICAgICBody9tZW0vdHJhY2UuYwogIEdFTiAgICAgaHcvaTM4Ni90cmFjZS5jCiAgR0VOICAgICBo
+dy9pMzg2L3hlbi90cmFjZS5jCiAgR0VOICAgICBody85cGZzL3RyYWNlLmMKICBHRU4gICAgIGh3
+L3BwYy90cmFjZS5jCiAgR0VOICAgICBody9wY2kvdHJhY2UuYwogIEdFTiAgICAgaHcvczM5MHgv
+dHJhY2UuYwogIEdFTiAgICAgaHcvdmZpby90cmFjZS5jCiAgR0VOICAgICBody9hY3BpL3RyYWNl
+LmMKICBHRU4gICAgIGh3L2FybS90cmFjZS5jCiAgR0VOICAgICBody9hbHBoYS90cmFjZS5jCiAg
+R0VOICAgICBody94ZW4vdHJhY2UuYwogIEdFTiAgICAgdWkvdHJhY2UuYwogIEdFTiAgICAgYXVk
+aW8vdHJhY2UuYwogIEdFTiAgICAgbmV0L3RyYWNlLmMKICBHRU4gICAgIHRhcmdldC9hcm0vdHJh
+Y2UuYwogIEdFTiAgICAgdGFyZ2V0L2kzODYvdHJhY2UuYwogIEdFTiAgICAgdGFyZ2V0L21pcHMv
+dHJhY2UuYwogIEdFTiAgICAgdGFyZ2V0L3NwYXJjL3RyYWNlLmMKICBHRU4gICAgIHRhcmdldC9z
+MzkweC90cmFjZS5jCiAgR0VOICAgICB0YXJnZXQvcHBjL3RyYWNlLmMKICBHRU4gICAgIHFvbS90
+cmFjZS5jCiAgR0VOICAgICBsaW51eC11c2VyL3RyYWNlLmMKICBHRU4gICAgIHFhcGkvdHJhY2Uu
+YwogIEdFTiAgICAgY29uZmlnLWFsbC1kZXZpY2VzLm1hawoJIERFUCAvdG1wL3FlbXUtdGVzdC9z
+cmMvZHRjL3Rlc3RzL2R1bXB0cmVlcy5jCgkgREVQIC90bXAvcWVtdS10ZXN0L3NyYy9kdGMvdGVz
+dHMvdHJlZXMuUwoJIERFUCAvdG1wL3FlbXUtdGVzdC9zcmMvZHRjL3Rlc3RzL3Rlc3R1dGlscy5j
+CgkgREVQIC90bXAvcWVtdS10ZXN0L3NyYy9kdGMvdGVzdHMvdmFsdWUtbGFiZWxzLmMKCSBERVAg
+L3RtcC9xZW11LXRlc3Qvc3JjL2R0Yy90ZXN0cy9hc21fdHJlZV9kdW1wLmMKCSBERVAgL3RtcC9x
+ZW11LXRlc3Qvc3JjL2R0Yy90ZXN0cy90cnVuY2F0ZWRfcHJvcGVydHkuYwoJIERFUCAvdG1wL3Fl
+bXUtdGVzdC9zcmMvZHRjL3Rlc3RzL2NoZWNrX3BhdGguYwoJIERFUCAvdG1wL3FlbXUtdGVzdC9z
+cmMvZHRjL3Rlc3RzL292ZXJsYXlfYmFkX2ZpeHVwLmMKCSBERVAgL3RtcC9xZW11LXRlc3Qvc3Jj
+L2R0Yy90ZXN0cy9vdmVybGF5LmMKCSBERVAgL3RtcC9xZW11LXRlc3Qvc3JjL2R0Yy90ZXN0cy9z
+dWJub2RlX2l0ZXJhdGUuYwoJIERFUCAvdG1wL3FlbXUtdGVzdC9zcmMvZHRjL3Rlc3RzL3Byb3Bl
+cnR5X2l0ZXJhdGUuYwoJIERFUCAvdG1wL3FlbXUtdGVzdC9zcmMvZHRjL3Rlc3RzL2ludGVnZXIt
+ZXhwcmVzc2lvbnMuYwoJIERFUCAvdG1wL3FlbXUtdGVzdC9zcmMvZHRjL3Rlc3RzL3V0aWxmZHRf
+dGVzdC5jCgkgREVQIC90bXAvcWVtdS10ZXN0L3NyYy9kdGMvdGVzdHMvcGF0aF9vZmZzZXRfYWxp
+YXNlcy5jCgkgREVQIC90bXAvcWVtdS10ZXN0L3NyYy9kdGMvdGVzdHMvYWRkX3N1Ym5vZGVfd2l0
+aF9ub3BzLmMKCSBERVAgL3RtcC9xZW11LXRlc3Qvc3JjL2R0Yy90ZXN0cy9kdGJzX2VxdWFsX3Vu
+b3JkZXJlZC5jCgkgREVQIC90bXAvcWVtdS10ZXN0L3NyYy9kdGMvdGVzdHMvZHRiX3JldmVyc2Uu
+YwoJIERFUCAvdG1wL3FlbXUtdGVzdC9zcmMvZHRjL3Rlc3RzL2R0YnNfZXF1YWxfb3JkZXJlZC5j
+CgkgREVQIC90bXAvcWVtdS10ZXN0L3NyYy9kdGMvdGVzdHMvZXh0cmEtdGVybWluYXRpbmctbnVs
+bC5jCgkgREVQIC90bXAvcWVtdS10ZXN0L3NyYy9kdGMvdGVzdHMvaW5jYmluLmMKCSBERVAgL3Rt
+cC9xZW11LXRlc3Qvc3JjL2R0Yy90ZXN0cy9ib290LWNwdWlkLmMKCSBERVAgL3RtcC9xZW11LXRl
+c3Qvc3JjL2R0Yy90ZXN0cy9waGFuZGxlX2Zvcm1hdC5jCgkgREVQIC90bXAvcWVtdS10ZXN0L3Ny
+Yy9kdGMvdGVzdHMvcGF0aC1yZWZlcmVuY2VzLmMKCSBERVAgL3RtcC9xZW11LXRlc3Qvc3JjL2R0
+Yy90ZXN0cy9yZWZlcmVuY2VzLmMKCSBERVAgL3RtcC9xZW11LXRlc3Qvc3JjL2R0Yy90ZXN0cy9z
+dHJpbmdfZXNjYXBlcy5jCgkgREVQIC90bXAvcWVtdS10ZXN0L3NyYy9kdGMvdGVzdHMvcHJvcG5h
+bWVfZXNjYXBlcy5jCgkgREVQIC90bXAvcWVtdS10ZXN0L3NyYy9kdGMvdGVzdHMvYXBwZW5kcHJv
+cDIuYwoJIERFUCAvdG1wL3FlbXUtdGVzdC9zcmMvZHRjL3Rlc3RzL2FwcGVuZHByb3AxLmMKCSBE
+RVAgL3RtcC9xZW11LXRlc3Qvc3JjL2R0Yy90ZXN0cy9kZWxfbm9kZS5jCgkgREVQIC90bXAvcWVt
+dS10ZXN0L3NyYy9kdGMvdGVzdHMvZGVsX3Byb3BlcnR5LmMKCSBERVAgL3RtcC9xZW11LXRlc3Qv
+c3JjL2R0Yy90ZXN0cy9zZXRwcm9wLmMKCSBERVAgL3RtcC9xZW11LXRlc3Qvc3JjL2R0Yy90ZXN0
+cy9zZXRfbmFtZS5jCgkgREVQIC90bXAvcWVtdS10ZXN0L3NyYy9kdGMvdGVzdHMvcndfdHJlZTEu
+YwoJIERFUCAvdG1wL3FlbXUtdGVzdC9zcmMvZHRjL3Rlc3RzL29wZW5fcGFjay5jCgkgREVQIC90
+bXAvcWVtdS10ZXN0L3NyYy9kdGMvdGVzdHMvbm9wdWxhdGUuYwoJIERFUCAvdG1wL3FlbXUtdGVz
+dC9zcmMvZHRjL3Rlc3RzL21hbmdsZS1sYXlvdXQuYwoJIERFUCAvdG1wL3FlbXUtdGVzdC9zcmMv
+ZHRjL3Rlc3RzL21vdmVfYW5kX3NhdmUuYwoJIERFUCAvdG1wL3FlbXUtdGVzdC9zcmMvZHRjL3Rl
+c3RzL3N3X3RyZWUxLmMKCSBERVAgL3RtcC9xZW11LXRlc3Qvc3JjL2R0Yy90ZXN0cy9ub3Bfbm9k
+ZS5jCgkgREVQIC90bXAvcWVtdS10ZXN0L3NyYy9kdGMvdGVzdHMvbm9wX3Byb3BlcnR5LmMKCSBE
+RVAgL3RtcC9xZW11LXRlc3Qvc3JjL2R0Yy90ZXN0cy9zZXRwcm9wX2lucGxhY2UuYwoJIERFUCAv
+dG1wL3FlbXUtdGVzdC9zcmMvZHRjL3Rlc3RzL3N0cmluZ2xpc3QuYwoJIERFUCAvdG1wL3FlbXUt
+dGVzdC9zcmMvZHRjL3Rlc3RzL2FkZHJfc2l6ZV9jZWxscy5jCgkgREVQIC90bXAvcWVtdS10ZXN0
+L3NyYy9kdGMvdGVzdHMvbm90Zm91bmQuYwoJIERFUCAvdG1wL3FlbXUtdGVzdC9zcmMvZHRjL3Rl
+c3RzL3NpemVkX2NlbGxzLmMKCSBERVAgL3RtcC9xZW11LXRlc3Qvc3JjL2R0Yy90ZXN0cy9jaGFy
+X2xpdGVyYWwuYwoJIERFUCAvdG1wL3FlbXUtdGVzdC9zcmMvZHRjL3Rlc3RzL2dldF9hbGlhcy5j
+CgkgREVQIC90bXAvcWVtdS10ZXN0L3NyYy9kdGMvdGVzdHMvbm9kZV9vZmZzZXRfYnlfY29tcGF0
+aWJsZS5jCgkgREVQIC90bXAvcWVtdS10ZXN0L3NyYy9kdGMvdGVzdHMvbm9kZV9jaGVja19jb21w
+YXRpYmxlLmMKCSBERVAgL3RtcC9xZW11LXRlc3Qvc3JjL2R0Yy90ZXN0cy9ub2RlX29mZnNldF9i
+eV9wcm9wX3ZhbHVlLmMKCSBERVAgL3RtcC9xZW11LXRlc3Qvc3JjL2R0Yy90ZXN0cy9ub2RlX29m
+ZnNldF9ieV9waGFuZGxlLmMKCSBERVAgL3RtcC9xZW11LXRlc3Qvc3JjL2R0Yy90ZXN0cy9wYXJl
+bnRfb2Zmc2V0LmMKCSBERVAgL3RtcC9xZW11LXRlc3Qvc3JjL2R0Yy90ZXN0cy9zdXBlcm5vZGVf
+YXRkZXB0aF9vZmZzZXQuYwoJIERFUCAvdG1wL3FlbXUtdGVzdC9zcmMvZHRjL3Rlc3RzL2dldF9w
+YXRoLmMKCSBERVAgL3RtcC9xZW11LXRlc3Qvc3JjL2R0Yy90ZXN0cy9nZXRwcm9wLmMKCSBERVAg
+L3RtcC9xZW11LXRlc3Qvc3JjL2R0Yy90ZXN0cy9nZXRfcGhhbmRsZS5jCgkgREVQIC90bXAvcWVt
+dS10ZXN0L3NyYy9kdGMvdGVzdHMvZ2V0X25hbWUuYwoJIERFUCAvdG1wL3FlbXUtdGVzdC9zcmMv
+ZHRjL3Rlc3RzL3BhdGhfb2Zmc2V0LmMKCSBERVAgL3RtcC9xZW11LXRlc3Qvc3JjL2R0Yy90ZXN0
+cy9zdWJub2RlX29mZnNldC5jCgkgREVQIC90bXAvcWVtdS10ZXN0L3NyYy9kdGMvdGVzdHMvZmlu
+ZF9wcm9wZXJ0eS5jCgkgREVQIC90bXAvcWVtdS10ZXN0L3NyYy9kdGMvdGVzdHMvcm9vdF9ub2Rl
+LmMKCSBERVAgL3RtcC9xZW11LXRlc3Qvc3JjL2R0Yy90ZXN0cy9nZXRfbWVtX3Jzdi5jCgkgREVQ
+IC90bXAvcWVtdS10ZXN0L3NyYy9kdGMvbGliZmR0L2ZkdF9vdmVybGF5LmMKCSBERVAgL3RtcC9x
+ZW11LXRlc3Qvc3JjL2R0Yy9saWJmZHQvZmR0X2FkZHJlc3Nlcy5jCgkgREVQIC90bXAvcWVtdS10
+ZXN0L3NyYy9kdGMvbGliZmR0L2ZkdF9zdHJlcnJvci5jCgkgREVQIC90bXAvcWVtdS10ZXN0L3Ny
+Yy9kdGMvbGliZmR0L2ZkdF9lbXB0eV90cmVlLmMKCSBERVAgL3RtcC9xZW11LXRlc3Qvc3JjL2R0
+Yy9saWJmZHQvZmR0X3J3LmMKCSBERVAgL3RtcC9xZW11LXRlc3Qvc3JjL2R0Yy9saWJmZHQvZmR0
+X3N3LmMKCSBERVAgL3RtcC9xZW11LXRlc3Qvc3JjL2R0Yy9saWJmZHQvZmR0X3dpcC5jCgkgREVQ
+IC90bXAvcWVtdS10ZXN0L3NyYy9kdGMvbGliZmR0L2ZkdF9yby5jCgkgREVQIC90bXAvcWVtdS10
+ZXN0L3NyYy9kdGMvbGliZmR0L2ZkdC5jCgkgREVQIC90bXAvcWVtdS10ZXN0L3NyYy9kdGMvdXRp
+bC5jCgkgREVQIC90bXAvcWVtdS10ZXN0L3NyYy9kdGMvZmR0cHV0LmMKCSBERVAgL3RtcC9xZW11
+LXRlc3Qvc3JjL2R0Yy9mZHRnZXQuYwoJIERFUCAvdG1wL3FlbXUtdGVzdC9zcmMvZHRjL2ZkdGR1
+bXAuYwoJIExFWCBjb252ZXJ0LWR0c3YwLWxleGVyLmxleC5jCm1ha2VbMV06IGZsZXg6IENvbW1h
+bmQgbm90IGZvdW5kCgkgREVQIC90bXAvcWVtdS10ZXN0L3NyYy9kdGMvc3JjcG9zLmMKCSBCSVNP
+TiBkdGMtcGFyc2VyLnRhYi5jCgkgREVQIC90bXAvcWVtdS10ZXN0L3NyYy9kdGMvdHJlZXNvdXJj
+ZS5jCm1ha2VbMV06IGJpc29uOiBDb21tYW5kIG5vdCBmb3VuZAoJIExFWCBkdGMtbGV4ZXIubGV4
+LmMKbWFrZVsxXTogCSBERVAgL3RtcC9xZW11LXRlc3Qvc3JjL2R0Yy9saXZldHJlZS5jCmZsZXg6
+IENvbW1hbmQgbm90IGZvdW5kCgkgREVQIC90bXAvcWVtdS10ZXN0L3NyYy9kdGMvZnN0cmVlLmMK
+CSBERVAgL3RtcC9xZW11LXRlc3Qvc3JjL2R0Yy9mbGF0dHJlZS5jCgkgREVQIC90bXAvcWVtdS10
+ZXN0L3NyYy9kdGMvZHRjLmMKCSBERVAgL3RtcC9xZW11LXRlc3Qvc3JjL2R0Yy9kYXRhLmMKCSBE
+RVAgL3RtcC9xZW11LXRlc3Qvc3JjL2R0Yy9jaGVja3MuYwoJQ0hLIHZlcnNpb25fZ2VuLmgKCSBM
+RVggY29udmVydC1kdHN2MC1sZXhlci5sZXguYwoJIEJJU09OIGR0Yy1wYXJzZXIudGFiLmMKbWFr
+ZVsxXTogZmxleDogQ29tbWFuZCBub3QgZm91bmQKbWFrZVsxXTogYmlzb246IENvbW1hbmQgbm90
+IGZvdW5kCgkgTEVYIGR0Yy1sZXhlci5sZXguYwoJVVBEIHZlcnNpb25fZ2VuLmgKbWFrZVsxXTog
+ZmxleDogQ29tbWFuZCBub3QgZm91bmQKCSBERVAgL3RtcC9xZW11LXRlc3Qvc3JjL2R0Yy91dGls
+LmMKCSBMRVggY29udmVydC1kdHN2MC1sZXhlci5sZXguYwoJIEJJU09OIGR0Yy1wYXJzZXIudGFi
+LmMKCSBMRVggZHRjLWxleGVyLmxleC5jCm1ha2VbMV06IGZsZXg6IENvbW1hbmQgbm90IGZvdW5k
+Cm1ha2VbMV06IGJpc29uOiBDb21tYW5kIG5vdCBmb3VuZAptYWtlWzFdOiBmbGV4OiBDb21tYW5k
+IG5vdCBmb3VuZAoJIENDIGxpYmZkdC9mZHQubwoJIENDIGxpYmZkdC9mZHRfcm8ubwoJIENDIGxp
+YmZkdC9mZHRfd2lwLm8KCSBDQyBsaWJmZHQvZmR0X3N3Lm8KCSBDQyBsaWJmZHQvZmR0X3J3Lm8K
+CSBDQyBsaWJmZHQvZmR0X3N0cmVycm9yLm8KCSBDQyBsaWJmZHQvZmR0X2VtcHR5X3RyZWUubwoJ
+IENDIGxpYmZkdC9mZHRfYWRkcmVzc2VzLm8KCSBDQyBsaWJmZHQvZmR0X292ZXJsYXkubwoJIEFS
+IGxpYmZkdC9saWJmZHQuYQphcjogY3JlYXRpbmcgbGliZmR0L2xpYmZkdC5hCmEgLSBsaWJmZHQv
+ZmR0Lm8KYSAtIGxpYmZkdC9mZHRfcm8ubwphIC0gbGliZmR0L2ZkdF93aXAubwphIC0gbGliZmR0
+L2ZkdF9zdy5vCmEgLSBsaWJmZHQvZmR0X3J3Lm8KYSAtIGxpYmZkdC9mZHRfc3RyZXJyb3Iubwph
+IC0gbGliZmR0L2ZkdF9lbXB0eV90cmVlLm8KYSAtIGxpYmZkdC9mZHRfYWRkcmVzc2VzLm8KYSAt
+IGxpYmZkdC9mZHRfb3ZlcmxheS5vCgkgTEVYIGR0Yy1sZXhlci5sZXguYwoJIExFWCBjb252ZXJ0
+LWR0c3YwLWxleGVyLmxleC5jCm1ha2VbMV06IGZsZXg6IENvbW1hbmQgbm90IGZvdW5kCm1ha2Vb
+MV06IGZsZXg6IENvbW1hbmQgbm90IGZvdW5kCgkgQklTT04gZHRjLXBhcnNlci50YWIuYwptYWtl
+WzFdOiBiaXNvbjogQ29tbWFuZCBub3QgZm91bmQKICBDQyAgICAgIHRlc3RzL3FlbXUtaW90ZXN0
+cy9zb2NrZXRfc2NtX2hlbHBlci5vCiAgR0VOICAgICBxZ2EvcWFwaS1nZW5lcmF0ZWQvcWdhLXFh
+cGktdHlwZXMuaAogIEdFTiAgICAgcWdhL3FhcGktZ2VuZXJhdGVkL3FnYS1xYXBpLXZpc2l0LmgK
+ICBHRU4gICAgIHFnYS9xYXBpLWdlbmVyYXRlZC9xZ2EtcW1wLWNvbW1hbmRzLmgKICBHRU4gICAg
+IHFnYS9xYXBpLWdlbmVyYXRlZC9xZ2EtcWFwaS12aXNpdC5jCiAgR0VOICAgICBxZ2EvcWFwaS1n
+ZW5lcmF0ZWQvcWdhLXFtcC1tYXJzaGFsLmMKICBHRU4gICAgIHFnYS9xYXBpLWdlbmVyYXRlZC9x
+Z2EtcWFwaS10eXBlcy5jCiAgQ0MgICAgICBxbXAtaW50cm9zcGVjdC5vCiAgQ0MgICAgICBxYXBp
+LXR5cGVzLm8KICBDQyAgICAgIHFhcGktdmlzaXQubwogIENDICAgICAgcWFwaS1ldmVudC5vCiAg
+Q0MgICAgICBxYXBpL3FhcGktdmlzaXQtY29yZS5vCiAgQ0MgICAgICBxYXBpL3FhcGktZGVhbGxv
+Yy12aXNpdG9yLm8KICBDQyAgICAgIHFhcGkvcW9iamVjdC1pbnB1dC12aXNpdG9yLm8KICBDQyAg
+ICAgIHFhcGkvcW9iamVjdC1vdXRwdXQtdmlzaXRvci5vCiAgQ0MgICAgICBxYXBpL3FtcC1yZWdp
+c3RyeS5vCiAgQ0MgICAgICBxYXBpL3FtcC1kaXNwYXRjaC5vCiAgQ0MgICAgICBxYXBpL3N0cmlu
+Zy1pbnB1dC12aXNpdG9yLm8KICBDQyAgICAgIHFhcGkvc3RyaW5nLW91dHB1dC12aXNpdG9yLm8K
+ICBDQyAgICAgIHFhcGkvb3B0cy12aXNpdG9yLm8KICBDQyAgICAgIHFhcGkvcWFwaS1jbG9uZS12
+aXNpdG9yLm8KICBDQyAgICAgIHFhcGkvcW1wLWV2ZW50Lm8KICBDQyAgICAgIHFhcGkvcWFwaS11
+dGlsLm8KICBDQyAgICAgIHFvYmplY3QvcW51bGwubwogIENDICAgICAgcW9iamVjdC9xaW50Lm8K
+ICBDQyAgICAgIHFvYmplY3QvcXN0cmluZy5vCiAgQ0MgICAgICBxb2JqZWN0L3FkaWN0Lm8KICBD
+QyAgICAgIHFvYmplY3QvcWxpc3QubwogIENDICAgICAgcW9iamVjdC9xZmxvYXQubwogIENDICAg
+ICAgcW9iamVjdC9xYm9vbC5vCiAgQ0MgICAgICBxb2JqZWN0L3Fqc29uLm8KICBDQyAgICAgIHFv
+YmplY3QvcW9iamVjdC5vCiAgQ0MgICAgICBxb2JqZWN0L2pzb24tbGV4ZXIubwogIENDICAgICAg
+cW9iamVjdC9qc29uLXN0cmVhbWVyLm8KICBDQyAgICAgIHRyYWNlL2NvbnRyb2wubwogIENDICAg
+ICAgcW9iamVjdC9qc29uLXBhcnNlci5vCiAgQ0MgICAgICB0cmFjZS9xbXAubwogIENDICAgICAg
+dXRpbC9vc2RlcC5vCiAgQ0MgICAgICB1dGlsL2N1dGlscy5vCiAgQ0MgICAgICB1dGlsL3VuaWNv
+ZGUubwogIENDICAgICAgdXRpbC9xZW11LXRpbWVyLWNvbW1vbi5vCiAgQ0MgICAgICB1dGlsL2J1
+ZmZlcmlzemVyby5vCiAgQ0MgICAgICB1dGlsL2xvY2tjbnQubwogIENDICAgICAgdXRpbC9haW9j
+Yi5vCiAgQ0MgICAgICB1dGlsL3RocmVhZC1wb29sLm8KICBDQyAgICAgIHV0aWwvYXN5bmMubwog
+IENDICAgICAgdXRpbC9xZW11LXRpbWVyLm8KICBDQyAgICAgIHV0aWwvbWFpbi1sb29wLm8KICBD
+QyAgICAgIHV0aWwvaW9oYW5kbGVyLm8KICBDQyAgICAgIHV0aWwvYWlvLXBvc2l4Lm8KICBDQyAg
+ICAgIHV0aWwvY29tcGF0ZmQubwogIENDICAgICAgdXRpbC9ldmVudF9ub3RpZmllci1wb3NpeC5v
+CiAgQ0MgICAgICB1dGlsL21tYXAtYWxsb2MubwogIENDICAgICAgdXRpbC9vc2xpYi1wb3NpeC5v
+CiAgQ0MgICAgICB1dGlsL3FlbXUtb3BlbnB0eS5vCiAgQ0MgICAgICB1dGlsL3FlbXUtdGhyZWFk
+LXBvc2l4Lm8KICBDQyAgICAgIHV0aWwvbWVtZmQubwogIENDICAgICAgdXRpbC9lbnZsaXN0Lm8K
+ICBDQyAgICAgIHV0aWwvcGF0aC5vCiAgQ0MgICAgICB1dGlsL21vZHVsZS5vCiAgQ0MgICAgICB1
+dGlsL2hvc3QtdXRpbHMubwogIENDICAgICAgdXRpbC9iaXRtYXAubwogIENDICAgICAgdXRpbC9i
+aXRvcHMubwogIENDICAgICAgdXRpbC9oYml0bWFwLm8KICBDQyAgICAgIHV0aWwvZmlmbzgubwog
+IENDICAgICAgdXRpbC9lcnJvci5vCiAgQ0MgICAgICB1dGlsL2FjbC5vCiAgQ0MgICAgICB1dGls
+L3FlbXUtZXJyb3IubwogIENDICAgICAgdXRpbC9pZC5vCiAgQ0MgICAgICB1dGlsL2lvdi5vCiAg
+Q0MgICAgICB1dGlsL3FlbXUtY29uZmlnLm8KICBDQyAgICAgIHV0aWwvcWVtdS1zb2NrZXRzLm8K
+ICBDQyAgICAgIHV0aWwvdXJpLm8KICBDQyAgICAgIHV0aWwvbm90aWZ5Lm8KICBDQyAgICAgIHV0
+aWwvcWVtdS1vcHRpb24ubwogIENDICAgICAgdXRpbC9xZW11LXByb2dyZXNzLm8KICBDQyAgICAg
+IHV0aWwva2V5dmFsLm8KICBDQyAgICAgIHV0aWwvaGV4ZHVtcC5vCiAgQ0MgICAgICB1dGlsL2Ny
+YzMyYy5vCiAgQ0MgICAgICB1dGlsL3V1aWQubwogIENDICAgICAgdXRpbC90aHJvdHRsZS5vCiAg
+Q0MgICAgICB1dGlsL2dldGF1eHZhbC5vCiAgQ0MgICAgICB1dGlsL3JlYWRsaW5lLm8KICBDQyAg
+ICAgIHV0aWwvcmN1Lm8KICBDQyAgICAgIHV0aWwvcWVtdS1jb3JvdXRpbmUtbG9jay5vCiAgQ0Mg
+ICAgICB1dGlsL3FlbXUtY29yb3V0aW5lLm8KICBDQyAgICAgIHV0aWwvcWVtdS1jb3JvdXRpbmUt
+aW8ubwogIENDICAgICAgdXRpbC9xZW11LWNvcm91dGluZS1zbGVlcC5vCiAgQ0MgICAgICB1dGls
+L2Nvcm91dGluZS11Y29udGV4dC5vCiAgQ0MgICAgICB1dGlsL2J1ZmZlci5vCiAgQ0MgICAgICB1
+dGlsL3RpbWVkLWF2ZXJhZ2UubwogIENDICAgICAgdXRpbC9iYXNlNjQubwogIENDICAgICAgdXRp
+bC9sb2cubwogIENDICAgICAgdXRpbC9xZGlzdC5vCiAgQ0MgICAgICB1dGlsL3FodC5vCiAgQ0Mg
+ICAgICB1dGlsL3JhbmdlLm8KICBDQyAgICAgIHV0aWwvc3lzdGVtZC5vCiAgQ0MgICAgICB1dGls
+L1BhbmVsRW11Lm8KICBDQyAgICAgIHRyYWNlLXJvb3QubwogIENDICAgICAgdXRpbC90cmFjZS5v
+CiAgQ0MgICAgICBjcnlwdG8vdHJhY2UubwogIENDICAgICAgaW8vdHJhY2UubwogIENDICAgICAg
+bWlncmF0aW9uL3RyYWNlLm8KICBDQyAgICAgIGJsb2NrL3RyYWNlLm8KICBDQyAgICAgIGJhY2tl
+bmRzL3RyYWNlLm8KICBDQyAgICAgIGh3L2Jsb2NrL3RyYWNlLm8KICBDQyAgICAgIGh3L2Jsb2Nr
+L2RhdGFwbGFuZS90cmFjZS5vCiAgQ0MgICAgICBody9jaGFyL3RyYWNlLm8KICBDQyAgICAgIGh3
+L2ludGMvdHJhY2UubwogIENDICAgICAgaHcvbmV0L3RyYWNlLm8KICBDQyAgICAgIGh3L3ZpcnRp
+by90cmFjZS5vCiAgQ0MgICAgICBody9hdWRpby90cmFjZS5vCiAgQ0MgICAgICBody91c2IvdHJh
+Y2UubwogIENDICAgICAgaHcvbWlzYy90cmFjZS5vCiAgQ0MgICAgICBody9zY3NpL3RyYWNlLm8K
+ICBDQyAgICAgIGh3L252cmFtL3RyYWNlLm8KICBDQyAgICAgIGh3L2Rpc3BsYXkvdHJhY2Uubwog
+IENDICAgICAgaHcvaW5wdXQvdHJhY2UubwogIENDICAgICAgaHcvZG1hL3RyYWNlLm8KICBDQyAg
+ICAgIGh3L3RpbWVyL3RyYWNlLm8KICBDQyAgICAgIGh3L3NwYXJjL3RyYWNlLm8KICBDQyAgICAg
+IGh3L3NkL3RyYWNlLm8KICBDQyAgICAgIGh3L2lzYS90cmFjZS5vCiAgQ0MgICAgICBody9tZW0v
+dHJhY2UubwogIENDICAgICAgaHcvaTM4Ni90cmFjZS5vCiAgQ0MgICAgICBody9pMzg2L3hlbi90
+cmFjZS5vCiAgQ0MgICAgICBody85cGZzL3RyYWNlLm8KICBDQyAgICAgIGh3L3BwYy90cmFjZS5v
+CiAgQ0MgICAgICBody9zMzkweC90cmFjZS5vCiAgQ0MgICAgICBody9wY2kvdHJhY2UubwogIEND
+ICAgICAgaHcvdmZpby90cmFjZS5vCiAgQ0MgICAgICBody9hY3BpL3RyYWNlLm8KICBDQyAgICAg
+IGh3L2FybS90cmFjZS5vCiAgQ0MgICAgICBody9hbHBoYS90cmFjZS5vCi90bXAvcWVtdS10ZXN0
+L3NyYy91dGlsL1BhbmVsRW11LmM6IEluIGZ1bmN0aW9uIOKAmHBhbmVsX3JlYWTigJk6Ci90bXAv
+cWVtdS10ZXN0L3NyYy91dGlsL1BhbmVsRW11LmM6MTg4OiBlcnJvcjog4oCYZm9y4oCZIGxvb3Ag
+aW5pdGlhbCBkZWNsYXJhdGlvbnMgYXJlIG9ubHkgYWxsb3dlZCBpbiBDOTkgbW9kZQovdG1wL3Fl
+bXUtdGVzdC9zcmMvdXRpbC9QYW5lbEVtdS5jOjE4ODogbm90ZTogdXNlIG9wdGlvbiAtc3RkPWM5
+OSBvciAtc3RkPWdudTk5IHRvIGNvbXBpbGUgeW91ciBjb2RlCi90bXAvcWVtdS10ZXN0L3NyYy91
+dGlsL1BhbmVsRW11LmM6MjE4OiBlcnJvcjog4oCYZm9y4oCZIGxvb3AgaW5pdGlhbCBkZWNsYXJh
+dGlvbnMgYXJlIG9ubHkgYWxsb3dlZCBpbiBDOTkgbW9kZQptYWtlOiAqKiogW3V0aWwvUGFuZWxF
+bXUub10gRXJyb3IgMQptYWtlOiAqKiogV2FpdGluZyBmb3IgdW5maW5pc2hlZCBqb2JzLi4uLgp0
+ZXN0cy9kb2NrZXIvTWFrZWZpbGUuaW5jbHVkZToxMTg6IHJlY2lwZSBmb3IgdGFyZ2V0ICdkb2Nr
+ZXItcnVuJyBmYWlsZWQKbWFrZVsxXTogKioqIFtkb2NrZXItcnVuXSBFcnJvciAyCm1ha2VbMV06
+IExlYXZpbmcgZGlyZWN0b3J5ICcvdmFyL3RtcC9wYXRjaGV3LXRlc3Rlci10bXAtcDQ3Mm55Nzcv
+c3JjJwp0ZXN0cy9kb2NrZXIvTWFrZWZpbGUuaW5jbHVkZToxNDk6IHJlY2lwZSBmb3IgdGFyZ2V0
+ICdkb2NrZXItcnVuLXRlc3QtcXVpY2tAY2VudG9zNicgZmFpbGVkCm1ha2U6ICoqKiBbZG9ja2Vy
+LXJ1bi10ZXN0LXF1aWNrQGNlbnRvczZdIEVycm9yIDIKPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0
+IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMgoKCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21h
+dGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91
+ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQGZyZWVsaXN0cy5vcmc=
