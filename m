@@ -1,36 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38438)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38850)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dCifl-0007bK-44
-	for qemu-devel@nongnu.org; Mon, 22 May 2017 04:26:38 -0400
+	(envelope-from <paolo.bonzini@gmail.com>) id 1dCihG-000093-1b
+	for qemu-devel@nongnu.org; Mon, 22 May 2017 04:28:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dCifh-0002o9-5x
-	for qemu-devel@nongnu.org; Mon, 22 May 2017 04:26:37 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:42080)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1dCifg-0002nm-T4
-	for qemu-devel@nongnu.org; Mon, 22 May 2017 04:26:33 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 3103A7F6A4
-	for <qemu-devel@nongnu.org>; Mon, 22 May 2017 08:26:30 +0000 (UTC)
-Date: Mon, 22 May 2017 09:26:23 +0100
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170522082623.GD5158@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <1495176212-14446-1-git-send-email-peterx@redhat.com>
-	<1495176212-14446-2-git-send-email-peterx@redhat.com>
-	<20170519082538.GD4912@redhat.com> <20170519125139.GM2081@work-vm>
-	<20170519125601.GD28392@redhat.com> <20170519130200.GO2081@work-vm>
-	<20170519131344.GA22341@redhat.com> <20170519143312.GP2081@work-vm>
-	<20170519145126.GA17164@redhat.com> <20170519184133.GU2081@work-vm>
+	(envelope-from <paolo.bonzini@gmail.com>) id 1dCihB-0003Hk-4d
+	for qemu-devel@nongnu.org; Mon, 22 May 2017 04:28:10 -0400
+Received: from mail-wm0-x234.google.com ([2a00:1450:400c:c09::234]:35629)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
+	id 1dCihA-0003HL-RX
+	for qemu-devel@nongnu.org; Mon, 22 May 2017 04:28:05 -0400
+Received: by mail-wm0-x234.google.com with SMTP id b84so290093000wmh.0
+	for <qemu-devel@nongnu.org>; Mon, 22 May 2017 01:28:04 -0700 (PDT)
+Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
+References: <33183CC9F5247A488A2544077AF19020DA2AF6CA@DGGEMA505-MBX.china.huawei.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <0f88ad61-06d8-57bb-3228-9b2dde993c70@redhat.com>
+Date: Mon, 22 May 2017 10:27:59 +0200
 MIME-Version: 1.0
+In-Reply-To: <33183CC9F5247A488A2544077AF19020DA2AF6CA@DGGEMA505-MBX.china.huawei.com>
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20170519184133.GU2081@work-vm>
-Subject: Re: [Qemu-devel] [PATCH RFC 1/6] io: only allow return path for
- socket typed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [RFC] memory consumption of Qemu is twice as much
+ as the previous version in KVM
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,74 +32,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: Peter Xu <peterx@redhat.com>, qemu-devel@nongnu.org, Juan Quintela <quintela@redhat.com>
+To: "Gonglei (Arei)" <arei.gonglei@huawei.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>
 
-On Fri, May 19, 2017 at 07:41:34PM +0100, Dr. David Alan Gilbert wrote:
-> * Daniel P. Berrange (berrange@redhat.com) wrote:
-> > On Fri, May 19, 2017 at 03:33:12PM +0100, Dr. David Alan Gilbert wrote:
-> > > * Daniel P. Berrange (berrange@redhat.com) wrote:
-> > > > > shutdown() is safe, in that it stops any other threads accessing the fd
-> > > > > but doesn't allow it's reallocation until the close;  We perform the
-> > > > > close only when we've joined all other threads that were using the fd.
-> > > > > Any of the threads that do new calls on the fd get an error and quickly
-> > > > > fall down their error paths.
-> > > > 
-> > > > Ahh that's certainly an interesting scenario. That would certainly be
-> > > > a problem with the migration code when this was originally written.
-> > > > It had two QEMUFile structs each with an 'int fd' field, so when you
-> > > > close 'fd' on one QEMUFile struct, it wouldn't update the other QEMUFile
-> > > > used by another thread.
-> > > > 
-> > > > Since we switched over to use QIOChannel though, I think the thread
-> > > > scenario you describe should be avoided entirely. When you have multiple
-> > > > QEMUFile objects, they each have a reference counted pointer to the same
-> > > > underlying QIOChannel object instance. So when QEMUFile triggers a call
-> > > > to qio_channel_close() in one thread, that'll set fd=-1 in the QIOChannel.
-> > > > Since the other threads have a reference to the same QIOChannel object,
-> > > > they'll now see this fd == -1 straightaway.
-> > > > 
-> > > > So, IIUC, this should make the need for shutdown() redundant (at least
-> > > > for the thread race conditions you describe).
-> > > 
-> > > That's not thread safe unless you're doing some very careful locking.
-> > > Consider:
-> > >   T1                      T2       
-> > >      oldfd=fd               tmp=fd
-> > >      fd=-1
-> > >      close(oldfd)
-> > >      unrelated open()
-> > >                             read(tmp,...
-> > > 
-> > > In practice every use of fd will be a copy into a tmp and then the
-> > > syscall; the unrelated open() could happen in another thread.
-> > > (OK, the gap between the tmp and the read is tiny, although if we're
-> > > doing multiple operations chances are the compiler will optimise
-> > > it to the top of a loop).
-> > > 
-> > > There's no way to make that code safe.
-> > 
-> > Urgh, yes, I see what you mean.
-> > 
-> > Currently the QIOChannelCommand implementation, uses a pair of anonymous
-> > pipes for stdin/out to the child process. I wonder if we could switch
-> > that to use socketpair() instead, thus letting us shutdown() on it too.
-> > 
-> > Though I guess it would be sufficient for qio_channel_shutdown() to
-> > merely kill the child PID, while leaving the FDs open, as then you'd
-> > get EOF and/or EPIPE on the read/writes.
+
+
+On 22/05/2017 09:04, Gonglei (Arei) wrote:
+> Hi Paolo,
 > 
-> Yes, I guess it's a question of which one is more likely to actually
-> kill the exec child off; the socketpair is more likely to cause the
-> source side migration code to cancel cleanly, although a kill -9 
-> should sort out a wayward exec child.
+> I found that the latest Qemu eat 2 time memory in KVM since Qemu-2.3.0.
+> 
+> Replication Steps:
+> 
+> 1. I created a CentOS 7 with 4U8G using Qemu-2.3.0, 
+> 
+> # grep kvm_kvzalloc /proc/vmallocinfo | awk '{total+=$2}; END {print total}'
+> 16932864
+> # grep kvm_kvzalloc /proc/vmallocinfo
+> 0xffffc900205c7000-0xffffc90020fc8000 10489856 kvm_kvzalloc+0x3c/0x40 [kvm] pages=2560 vmalloc vpages N1=2560
+> 0xffffc90020fc8000-0xffffc90020fce000   24576 kvm_kvzalloc+0x3c/0x40 [kvm] pages=5 vmalloc N1=5
+> 0xffffc90020fce000-0xffffc90020fd4000   24576 kvm_kvzalloc+0x3c/0x40 [kvm] pages=5 vmalloc N1=5
+> 0xffffc90020fd4000-0xffffc90020fd8000   16384 kvm_kvzalloc+0x3c/0x40 [kvm] pages=3 vmalloc N1=3
+> 0xffffc9002438b000-0xffffc9002498c000 6295552 kvm_kvzalloc+0x3c/0x40 [kvm] pages=1536 vmalloc vpages N1=1536
+> 0xffffc9002498c000-0xffffc90024990000   16384 kvm_kvzalloc+0x3c/0x40 [kvm] pages=3 vmalloc N1=3
+> 0xffffc90024990000-0xffffc90024994000   16384 kvm_kvzalloc+0x3c/0x40 [kvm] pages=3 vmalloc N1=3
+> 0xffffc90024994000-0xffffc90024997000   12288 kvm_kvzalloc+0x3c/0x40 [kvm] pages=2 vmalloc N1=2
+> 0xffffc90024a75000-0xffffc90024a7e000   36864 kvm_kvzalloc+0x3c/0x40 [kvm] pages=8 vmalloc N1=8
+> 
+> PS: There is only this VM in my host.
+> 
+> 2. Do the same test using the latest Qemu:
+> 
+> # grep kvm_kvzalloc /proc/vmallocinfo | awk '{total+=$2}; END {print total}'
+> 33865728
+> linux-PsHdkO:~ # grep kvm_kvzalloc /proc/vmallocinfo 
+> 0xffffc9001f181000-0xffffc9001fb82000 10489856 kvm_kvzalloc+0x25/0x30 [kvm] pages=2560 vmalloc vpages N1=2560
+> 0xffffc9001fb82000-0xffffc9001fb88000   24576 kvm_kvzalloc+0x25/0x30 [kvm] pages=5 vmalloc N1=5
+> 0xffffc9001fb88000-0xffffc9001fb8e000   24576 kvm_kvzalloc+0x25/0x30 [kvm] pages=5 vmalloc N1=5
+> 0xffffc9001fb8e000-0xffffc9001fb92000   16384 kvm_kvzalloc+0x25/0x30 [kvm] pages=3 vmalloc N1=3
+> 0xffffc90020854000-0xffffc90021255000 10489856 kvm_kvzalloc+0x25/0x30 [kvm] pages=2560 vmalloc vpages N1=2560
+> 0xffffc90021255000-0xffffc9002125b000   24576 kvm_kvzalloc+0x25/0x30 [kvm] pages=5 vmalloc N1=5
+> 0xffffc9002125b000-0xffffc90021261000   24576 kvm_kvzalloc+0x25/0x30 [kvm] pages=5 vmalloc N1=5
+> 0xffffc90021261000-0xffffc90021265000   16384 kvm_kvzalloc+0x25/0x30 [kvm] pages=3 vmalloc N1=3
+> 0xffffc9002616e000-0xffffc90026172000   16384 kvm_kvzalloc+0x25/0x30 [kvm] pages=3 vmalloc N1=3
+> 0xffffc90026172000-0xffffc90026176000   16384 kvm_kvzalloc+0x25/0x30 [kvm] pages=3 vmalloc N1=3
+> 0xffffc90026176000-0xffffc90026179000   12288 kvm_kvzalloc+0x25/0x30 [kvm] pages=2 vmalloc N1=2
+> 0xffffc900261a9000-0xffffc900261ad000   16384 kvm_kvzalloc+0x25/0x30 [kvm] pages=3 vmalloc N1=3
+> 0xffffc900261ad000-0xffffc900261b1000   16384 kvm_kvzalloc+0x25/0x30 [kvm] pages=3 vmalloc N1=3
+> 0xffffc900261b1000-0xffffc900261b4000   12288 kvm_kvzalloc+0x25/0x30 [kvm] pages=2 vmalloc N1=2
+> 0xffffc900280fe000-0xffffc900286ff000 6295552 kvm_kvzalloc+0x25/0x30 [kvm] pages=1536 vmalloc vpages N1=1536
+> 0xffffc900286ff000-0xffffc90028d00000 6295552 kvm_kvzalloc+0x25/0x30 [kvm] pages=1536 vmalloc vpages N1=1536
+> 0xffffc90028d87000-0xffffc90028d90000   36864 kvm_kvzalloc+0x25/0x30 [kvm] pages=8 vmalloc N1=8
+> 0xffffc90028d9c000-0xffffc90028da5000   36864 kvm_kvzalloc+0x25/0x30 [kvm] pages=8 vmalloc N1=8
+> 
+> 
+> 3. I found the first bad commit by 'git biscet'
+> 
+> linux-arei:/mnt/sdb/gonglei/opensource/qemu # git bisect bad
+> 6410848bec38089424d54a6a8f10d4cf77182b5d is the first bad commit
+> commit 6410848bec38089424d54a6a8f10d4cf77182b5d
+> Author: Paolo Bonzini <pbonzini@redhat.com>
+> Date:   Thu Jun 18 18:30:16 2015 +0200
+> 
+>     target-i386: register a separate KVM address space including SMRAM regions
+>     
+>     Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> 
+> :040000 040000 b2435d7cd0829e6416b316f1ae2856e6f7b0023d 1acb81aecaf50f2d313b33f2b61a24f7f0bd6f07 M      target-i386
+> linux-PsHdkO:/mnt/sdb/gonglei/opensource/qemu #
+> 
+> 
+> Any ideas about this change? Do we really need to trigger two times memory region allocation?
 
-I'm also curious if there's any real world performance difference between
-using a pipe vs socketpair to communicate with a child process
+We are registering two memory maps, so yes as long as "-machine smm=on"
+is set.  We can skip the second address space if SMM is disabled.
 
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+Paolo
