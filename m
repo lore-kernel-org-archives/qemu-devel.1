@@ -1,35 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39526)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39571)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <danielhb@linux.vnet.ibm.com>) id 1dCt7q-0005DA-Jz
-	for qemu-devel@nongnu.org; Mon, 22 May 2017 15:36:20 -0400
+	(envelope-from <danielhb@linux.vnet.ibm.com>) id 1dCt7u-0005FE-9W
+	for qemu-devel@nongnu.org; Mon, 22 May 2017 15:36:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <danielhb@linux.vnet.ibm.com>) id 1dCt7m-0000CK-Qv
-	for qemu-devel@nongnu.org; Mon, 22 May 2017 15:36:18 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:35318)
+	(envelope-from <danielhb@linux.vnet.ibm.com>) id 1dCt7q-0000DT-Mg
+	for qemu-devel@nongnu.org; Mon, 22 May 2017 15:36:22 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:43916)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <danielhb@linux.vnet.ibm.com>)
-	id 1dCt7m-0000Bq-HL
-	for qemu-devel@nongnu.org; Mon, 22 May 2017 15:36:14 -0400
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
+	id 1dCt7q-0000Cu-CH
+	for qemu-devel@nongnu.org; Mon, 22 May 2017 15:36:18 -0400
+Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
 	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v4MJ9DjE113078
-	for <qemu-devel@nongnu.org>; Mon, 22 May 2017 15:36:13 -0400
-Received: from e24smtp05.br.ibm.com (e24smtp05.br.ibm.com [32.104.18.26])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2am3rw5pxv-1
+	v4MJ9Enj012619
+	for <qemu-devel@nongnu.org>; Mon, 22 May 2017 15:36:16 -0400
+Received: from e24smtp01.br.ibm.com (e24smtp01.br.ibm.com [32.104.18.85])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2am3vpdfje-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 22 May 2017 15:36:13 -0400
+	for <qemu-devel@nongnu.org>; Mon, 22 May 2017 15:36:16 -0400
 Received: from localhost
-	by e24smtp05.br.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	by e24smtp01.br.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
 	Only! Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <danielhb@linux.vnet.ibm.com>;
-	Mon, 22 May 2017 16:36:10 -0300
+	Mon, 22 May 2017 16:36:13 -0300
 From: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
-Date: Mon, 22 May 2017 16:35:47 -0300
+Date: Mon, 22 May 2017 16:35:48 -0300
 In-Reply-To: <20170522193551.826-1-danielhb@linux.vnet.ibm.com>
 References: <20170522193551.826-1-danielhb@linux.vnet.ibm.com>
-Message-Id: <20170522193551.826-2-danielhb@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH v11 1/5] hw/ppc/spapr.c: adding
- pending_dimm_unplugs to sPAPRMachineState
+Message-Id: <20170522193551.826-3-danielhb@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [PATCH v11 2/5] hw/ppc: removing drc->detach_cb and
+ drc->detach_cb_opaque
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -41,214 +41,257 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-ppc@nongnu.org, david@gibson.dropbear.id.au, mdroth@linux.vnet.ibm.com
 
-The LMB DRC release callback, spapr_lmb_release(), uses an opaque
-parameter, a sPAPRDIMMState struct that stores the current LMBs that
-are allocated to a DIMM (nr_lmbs). After each call to this callback,
-the nr_lmbs is decremented by one and, when it reaches zero, the callback
-proceeds with the qdev calls to hot unplug the LMB.
+The pointer drc->detach_cb is being used as a way of informing
+the detach() function inside spapr_drc.c which cb to execute. This
+information can also be retrieved simply by checking drc->type and
+choosing the right callback based on it. In this context, detach_cb
+is redundant information that must be managed.
 
-Using drc->detach_cb_opaque is problematic because it can't be migrated in
-the future DRC migration work. This patch makes the following changes to
-eliminate the usage of this opaque callback inside spapr_lmb_release:
+After the previous spapr_lmb_release change, no detach_cb_opaques
+are being used by any of the three callbacks functions. This is
+yet another information that is now unused and, on top of that, can't
+be migrated either.
 
-- sPAPRDIMMState was moved from spapr.c and added to spapr.h. A new
-attribute called 'addr' was added to it. This is used as an unique
-identifier to associate a sPAPRDIMMState to a PCDIMM element.
+This patch makes the following changes:
 
-- sPAPRMachineState now hosts a new QTAILQ called 'pending_dimm_unplugs'.
-This queue of sPAPRDIMMState elements will store the DIMM state of DIMMs
-that are currently going under an unplug process.
+- removal of detach_cb_opaque. the 'opaque' argument was removed from
+the callbacks and from the detach() function of sPAPRConnectorClass. The
+attribute detach_cb_opaque of sPAPRConnector was removed.
 
-- spapr_lmb_release() will now retrieve the nr_lmbs value by getting the
-correspondent sPAPRDIMMState. A helper function called spapr_dimm_get_address
-was created to fetch the address of a PCDIMM device inside spapr_lmb_release.
-When nr_lmbs reaches zero and the callback proceeds with the qdev hot unplug
-calls, the sPAPRDIMMState struct is removed from spapr->pending_dimm_unplugs.
-
-After these changes, the opaque argument for spapr_lmb_release is now
-unused and is passed as NULL inside spapr_del_lmbs. This and the other
-opaque arguments can now be safely removed from the code.
-
-As an additional cleanup made by this patch, the spapr_del_lmbs function
-was merged with spapr_memory_unplug_request. The former was being called
-only by the latter and both were small enough to fit one single function.
+- removal of detach_cb from the detach() call. The function pointer
+detach_cb of sPAPRConnector was removed. detach() now uses a
+switch(drc->type) to execute the apropriate callback. To achieve this,
+spapr_core_release, spapr_lmb_release and spapr_phb_remove_pci_device_cb
+callbacks were made public to be visible inside detach().
 
 Signed-off-by: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
 ---
- hw/ppc/spapr.c         | 98 +++++++++++++++++++++++++++++++-------------------
- include/hw/ppc/spapr.h |  6 ++++
- 2 files changed, 68 insertions(+), 36 deletions(-)
+ hw/ppc/spapr.c              | 10 ++++++----
+ hw/ppc/spapr_drc.c          | 36 ++++++++++++++++++++----------------
+ hw/ppc/spapr_pci.c          |  5 +++--
+ include/hw/pci-host/spapr.h |  3 +++
+ include/hw/ppc/spapr.h      |  4 ++++
+ include/hw/ppc/spapr_drc.h  |  8 +-------
+ 6 files changed, 37 insertions(+), 29 deletions(-)
 
 diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index 75e298b..5743b78 100644
+index 5743b78..463177e 100644
 --- a/hw/ppc/spapr.c
 +++ b/hw/ppc/spapr.c
-@@ -2059,6 +2059,7 @@ static void ppc_spapr_init(MachineState *machine)
-     msi_nonbroken = true;
- 
-     QLIST_INIT(&spapr->phbs);
-+    QTAILQ_INIT(&spapr->pending_dimm_unplugs);
- 
-     /* Allocate RMA if necessary */
-     rma_alloc_size = kvmppc_alloc_rma(&rma);
-@@ -2612,58 +2613,57 @@ out:
-     error_propagate(errp, local_err);
+@@ -2645,7 +2645,8 @@ static void spapr_pending_dimm_unplugs_remove(sPAPRMachineState *spapr,
+     g_free(dimm_state);
  }
  
--typedef struct sPAPRDIMMState {
-+struct sPAPRDIMMState {
-+    PCDIMMDevice *dimm;
-     uint32_t nr_lmbs;
--} sPAPRDIMMState;
-+    QTAILQ_ENTRY(sPAPRDIMMState) next;
-+};
-+
-+static sPAPRDIMMState *spapr_pending_dimm_unplugs_find(sPAPRMachineState *s,
-+                                                       PCDIMMDevice *dimm)
-+{
-+    sPAPRDIMMState *dimm_state = NULL;
-+    QTAILQ_FOREACH(dimm_state, &s->pending_dimm_unplugs, next) {
-+        if (dimm_state->dimm == dimm) {
-+            break;
-+        }
-+    }
-+    return dimm_state;
-+}
-+
-+static void spapr_pending_dimm_unplugs_add(sPAPRMachineState *spapr,
-+                                           sPAPRDIMMState *dimm_state)
-+{
-+    g_assert(!spapr_pending_dimm_unplugs_find(spapr, dimm_state->dimm));
-+    QTAILQ_INSERT_HEAD(&spapr->pending_dimm_unplugs, dimm_state, next);
-+}
-+
-+static void spapr_pending_dimm_unplugs_remove(sPAPRMachineState *spapr,
-+                                              sPAPRDIMMState *dimm_state)
-+{
-+    QTAILQ_REMOVE(&spapr->pending_dimm_unplugs, dimm_state, next);
-+    g_free(dimm_state);
-+}
- 
- static void spapr_lmb_release(DeviceState *dev, void *opaque)
+-static void spapr_lmb_release(DeviceState *dev, void *opaque)
++/* Callback to be called during DRC release. */
++void spapr_lmb_release(DeviceState *dev)
  {
--    sPAPRDIMMState *ds = (sPAPRDIMMState *)opaque;
--    HotplugHandler *hotplug_ctrl;
-+    HotplugHandler *hotplug_ctrl = qdev_get_hotplug_handler(dev);
-+    sPAPRMachineState *spapr = SPAPR_MACHINE(hotplug_ctrl);
-+    sPAPRDIMMState *ds = spapr_pending_dimm_unplugs_find(spapr, PC_DIMM(dev));
+     HotplugHandler *hotplug_ctrl = qdev_get_hotplug_handler(dev);
+     sPAPRMachineState *spapr = SPAPR_MACHINE(hotplug_ctrl);
+@@ -2708,7 +2709,7 @@ static void spapr_memory_unplug_request(HotplugHandler *hotplug_dev,
+         g_assert(drc);
  
-     if (--ds->nr_lmbs) {
-         return;
+         drck = SPAPR_DR_CONNECTOR_GET_CLASS(drc);
+-        drck->detach(drc, dev, spapr_lmb_release, NULL, errp);
++        drck->detach(drc, dev, errp);
+         addr += SPAPR_MEMORY_BLOCK_SIZE;
      }
  
--    g_free(ds);
-+    spapr_pending_dimm_unplugs_remove(spapr, ds);
- 
-     /*
-      * Now that all the LMBs have been removed by the guest, call the
-      * pc-dimm unplug handler to cleanup up the pc-dimm device.
-      */
--    hotplug_ctrl = qdev_get_hotplug_handler(dev);
-     hotplug_handler_unplug(hotplug_ctrl, dev, &error_abort);
+@@ -2755,7 +2756,8 @@ static void spapr_core_unplug(HotplugHandler *hotplug_dev, DeviceState *dev,
+     object_unparent(OBJECT(dev));
  }
  
--static void spapr_del_lmbs(DeviceState *dev, uint64_t addr_start, uint64_t size,
--                           Error **errp)
--{
--    sPAPRDRConnector *drc;
--    sPAPRDRConnectorClass *drck;
--    uint32_t nr_lmbs = size / SPAPR_MEMORY_BLOCK_SIZE;
--    int i;
--    sPAPRDIMMState *ds = g_malloc0(sizeof(sPAPRDIMMState));
--    uint64_t addr = addr_start;
--
--    ds->nr_lmbs = nr_lmbs;
--    for (i = 0; i < nr_lmbs; i++) {
--        drc = spapr_dr_connector_by_id(SPAPR_DR_CONNECTOR_TYPE_LMB,
--                addr / SPAPR_MEMORY_BLOCK_SIZE);
--        g_assert(drc);
--
--        drck = SPAPR_DR_CONNECTOR_GET_CLASS(drc);
--        drck->detach(drc, dev, spapr_lmb_release, ds, errp);
--        addr += SPAPR_MEMORY_BLOCK_SIZE;
--    }
--
--    drc = spapr_dr_connector_by_id(SPAPR_DR_CONNECTOR_TYPE_LMB,
--                                   addr_start / SPAPR_MEMORY_BLOCK_SIZE);
--    drck = SPAPR_DR_CONNECTOR_GET_CLASS(drc);
--    spapr_hotplug_req_remove_by_count_indexed(SPAPR_DR_CONNECTOR_TYPE_LMB,
--                                              nr_lmbs,
--                                              drck->get_index(drc));
--}
--
- static void spapr_memory_unplug(HotplugHandler *hotplug_dev, DeviceState *dev,
-                                 Error **errp)
+-static void spapr_core_release(DeviceState *dev, void *opaque)
++/* Callback to be called during DRC release. */
++void spapr_core_release(DeviceState *dev)
  {
-@@ -2684,14 +2684,40 @@ static void spapr_memory_unplug_request(HotplugHandler *hotplug_dev,
-     PCDIMMDeviceClass *ddc = PC_DIMM_GET_CLASS(dimm);
-     MemoryRegion *mr = ddc->get_memory_region(dimm);
-     uint64_t size = memory_region_size(mr);
-+    uint32_t nr_lmbs = size / SPAPR_MEMORY_BLOCK_SIZE;
-     uint64_t addr;
-+    sPAPRDRConnector *drc;
-+    sPAPRDRConnectorClass *drck;
+     HotplugHandler *hotplug_ctrl;
  
-     addr = object_property_get_int(OBJECT(dimm), PC_DIMM_ADDR_PROP, &local_err);
+@@ -2788,7 +2790,7 @@ void spapr_core_unplug_request(HotplugHandler *hotplug_dev, DeviceState *dev,
+     g_assert(drc);
+ 
+     drck = SPAPR_DR_CONNECTOR_GET_CLASS(drc);
+-    drck->detach(drc, dev, spapr_core_release, NULL, &local_err);
++    drck->detach(drc, dev, &local_err);
      if (local_err) {
-         goto out;
+         error_propagate(errp, local_err);
+         return;
+diff --git a/hw/ppc/spapr_drc.c b/hw/ppc/spapr_drc.c
+index 9fa5545..2851e16 100644
+--- a/hw/ppc/spapr_drc.c
++++ b/hw/ppc/spapr_drc.c
+@@ -20,6 +20,7 @@
+ #include "qapi/visitor.h"
+ #include "qemu/error-report.h"
+ #include "hw/ppc/spapr.h" /* for RTAS return codes */
++#include "hw/pci-host/spapr.h" /* spapr_phb_remove_pci_device_cb callback */
+ #include "trace.h"
+ 
+ #define DRC_CONTAINER_PATH "/dr-connector"
+@@ -99,8 +100,7 @@ static uint32_t set_isolation_state(sPAPRDRConnector *drc,
+         if (drc->awaiting_release) {
+             if (drc->configured) {
+                 trace_spapr_drc_set_isolation_state_finalizing(get_index(drc));
+-                drck->detach(drc, DEVICE(drc->dev), drc->detach_cb,
+-                             drc->detach_cb_opaque, NULL);
++                drck->detach(drc, DEVICE(drc->dev), NULL);
+             } else {
+                 trace_spapr_drc_set_isolation_state_deferring(get_index(drc));
+             }
+@@ -153,8 +153,7 @@ static uint32_t set_allocation_state(sPAPRDRConnector *drc,
+         if (drc->awaiting_release &&
+             drc->allocation_state == SPAPR_DR_ALLOCATION_STATE_UNUSABLE) {
+             trace_spapr_drc_set_allocation_state_finalizing(get_index(drc));
+-            drck->detach(drc, DEVICE(drc->dev), drc->detach_cb,
+-                         drc->detach_cb_opaque, NULL);
++            drck->detach(drc, DEVICE(drc->dev), NULL);
+         } else if (drc->allocation_state == SPAPR_DR_ALLOCATION_STATE_USABLE) {
+             drc->awaiting_allocation = false;
+         }
+@@ -404,15 +403,10 @@ static void attach(sPAPRDRConnector *drc, DeviceState *d, void *fdt,
+                              NULL, 0, NULL);
+ }
+ 
+-static void detach(sPAPRDRConnector *drc, DeviceState *d,
+-                   spapr_drc_detach_cb *detach_cb,
+-                   void *detach_cb_opaque, Error **errp)
++static void detach(sPAPRDRConnector *drc, DeviceState *d, Error **errp)
+ {
+     trace_spapr_drc_detach(get_index(drc));
+ 
+-    drc->detach_cb = detach_cb;
+-    drc->detach_cb_opaque = detach_cb_opaque;
+-
+     /* if we've signalled device presence to the guest, or if the guest
+      * has gone ahead and configured the device (via manually-executed
+      * device add via drmgr in guest, namely), we need to wait
+@@ -456,8 +450,21 @@ static void detach(sPAPRDRConnector *drc, DeviceState *d,
+ 
+     drc->indicator_state = SPAPR_DR_INDICATOR_STATE_INACTIVE;
+ 
+-    if (drc->detach_cb) {
+-        drc->detach_cb(drc->dev, drc->detach_cb_opaque);
++    /* Calling release callbacks based on drc->type. */
++    switch (drc->type) {
++    case SPAPR_DR_CONNECTOR_TYPE_CPU:
++        spapr_core_release(drc->dev);
++        break;
++    case SPAPR_DR_CONNECTOR_TYPE_PCI:
++        spapr_phb_remove_pci_device_cb(drc->dev);
++        break;
++    case SPAPR_DR_CONNECTOR_TYPE_LMB:
++        spapr_lmb_release(drc->dev);
++        break;
++    case SPAPR_DR_CONNECTOR_TYPE_PHB:
++    case SPAPR_DR_CONNECTOR_TYPE_VIO:
++    default:
++        g_assert(false);
      }
  
--    spapr_del_lmbs(dev, addr, size, &error_abort);
-+    sPAPRMachineState *spapr = SPAPR_MACHINE(hotplug_dev);
-+    sPAPRDIMMState *ds = g_malloc0(sizeof(sPAPRDIMMState));
-+    ds->nr_lmbs = nr_lmbs;
-+    ds->dimm = dimm;
-+    spapr_pending_dimm_unplugs_add(spapr, ds);
-+
-+    uint64_t addr_start = addr;
-+    int i;
-+    for (i = 0; i < nr_lmbs; i++) {
-+        drc = spapr_dr_connector_by_id(SPAPR_DR_CONNECTOR_TYPE_LMB,
-+                addr / SPAPR_MEMORY_BLOCK_SIZE);
-+        g_assert(drc);
-+
-+        drck = SPAPR_DR_CONNECTOR_GET_CLASS(drc);
-+        drck->detach(drc, dev, spapr_lmb_release, NULL, errp);
-+        addr += SPAPR_MEMORY_BLOCK_SIZE;
-+    }
-+
-+    drc = spapr_dr_connector_by_id(SPAPR_DR_CONNECTOR_TYPE_LMB,
-+                                   addr_start / SPAPR_MEMORY_BLOCK_SIZE);
-+    drck = SPAPR_DR_CONNECTOR_GET_CLASS(drc);
-+    spapr_hotplug_req_remove_by_count_indexed(SPAPR_DR_CONNECTOR_TYPE_LMB,
-+                                              nr_lmbs,
-+                                              drck->get_index(drc));
- out:
-     error_propagate(errp, local_err);
+     drc->awaiting_release = false;
+@@ -467,8 +474,6 @@ static void detach(sPAPRDRConnector *drc, DeviceState *d,
+     drc->fdt_start_offset = 0;
+     object_property_del(OBJECT(drc), "device", NULL);
+     drc->dev = NULL;
+-    drc->detach_cb = NULL;
+-    drc->detach_cb_opaque = NULL;
  }
+ 
+ static bool release_pending(sPAPRDRConnector *drc)
+@@ -498,8 +503,7 @@ static void reset(DeviceState *d)
+          * force removal if we are
+          */
+         if (drc->awaiting_release) {
+-            drck->detach(drc, DEVICE(drc->dev), drc->detach_cb,
+-                         drc->detach_cb_opaque, NULL);
++            drck->detach(drc, DEVICE(drc->dev), NULL);
+         }
+ 
+         /* non-PCI devices may be awaiting a transition to UNUSABLE */
+diff --git a/hw/ppc/spapr_pci.c b/hw/ppc/spapr_pci.c
+index a7cff32..e4daf8d 100644
+--- a/hw/ppc/spapr_pci.c
++++ b/hw/ppc/spapr_pci.c
+@@ -1369,7 +1369,8 @@ out:
+     }
+ }
+ 
+-static void spapr_phb_remove_pci_device_cb(DeviceState *dev, void *opaque)
++/* Callback to be called during DRC release. */
++void spapr_phb_remove_pci_device_cb(DeviceState *dev)
+ {
+     /* some version guests do not wait for completion of a device
+      * cleanup (generally done asynchronously by the kernel) before
+@@ -1392,7 +1393,7 @@ static void spapr_phb_remove_pci_device(sPAPRDRConnector *drc,
+ {
+     sPAPRDRConnectorClass *drck = SPAPR_DR_CONNECTOR_GET_CLASS(drc);
+ 
+-    drck->detach(drc, DEVICE(pdev), spapr_phb_remove_pci_device_cb, phb, errp);
++    drck->detach(drc, DEVICE(pdev), errp);
+ }
+ 
+ static sPAPRDRConnector *spapr_phb_get_pci_func_drc(sPAPRPHBState *phb,
+diff --git a/include/hw/pci-host/spapr.h b/include/hw/pci-host/spapr.h
+index 1c2e970..38470b2 100644
+--- a/include/hw/pci-host/spapr.h
++++ b/include/hw/pci-host/spapr.h
+@@ -123,6 +123,9 @@ sPAPRPHBState *spapr_pci_find_phb(sPAPRMachineState *spapr, uint64_t buid);
+ PCIDevice *spapr_pci_find_dev(sPAPRMachineState *spapr, uint64_t buid,
+                               uint32_t config_addr);
+ 
++/* PCI release callback. */
++void spapr_phb_remove_pci_device_cb(DeviceState *dev);
++
+ /* VFIO EEH hooks */
+ #ifdef CONFIG_LINUX
+ bool spapr_phb_eeh_available(sPAPRPHBState *sphb);
 diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
-index be2b3b8..87af2f1 100644
+index 87af2f1..3aca19c 100644
 --- a/include/hw/ppc/spapr.h
 +++ b/include/hw/ppc/spapr.h
-@@ -32,6 +32,7 @@ struct sPAPRRTCState {
-     int64_t ns_offset;
- };
+@@ -643,6 +643,10 @@ void spapr_hotplug_req_remove_by_count_indexed(sPAPRDRConnectorType drc_type,
+ void *spapr_populate_hotplug_cpu_dt(CPUState *cs, int *fdt_offset,
+                                     sPAPRMachineState *spapr);
  
-+typedef struct sPAPRDIMMState sPAPRDIMMState;
- typedef struct sPAPRMachineClass sPAPRMachineClass;
- 
- #define TYPE_SPAPR_MACHINE      "spapr-machine"
-@@ -105,6 +106,11 @@ struct sPAPRMachineState {
-     /* RTAS state */
-     QTAILQ_HEAD(, sPAPRConfigureConnectorState) ccs_list;
- 
-+    /* Pending DIMM unplug cache. It is populated when a LMB
-+     * unplug starts. It can be regenerated if a migration
-+     * occurs during the unplug process. */
-+    QTAILQ_HEAD(, sPAPRDIMMState) pending_dimm_unplugs;
++/* CPU and LMB DRC release callbacks. */
++void spapr_core_release(DeviceState *dev);
++void spapr_lmb_release(DeviceState *dev);
 +
-     /*< public >*/
-     char *kvm_type;
-     MemoryHotplugState hotplug_memory;
+ /* rtas-configure-connector state */
+ struct sPAPRConfigureConnectorState {
+     uint32_t drc_index;
+diff --git a/include/hw/ppc/spapr_drc.h b/include/hw/ppc/spapr_drc.h
+index 5524247..813b9ff 100644
+--- a/include/hw/ppc/spapr_drc.h
++++ b/include/hw/ppc/spapr_drc.h
+@@ -130,8 +130,6 @@ typedef enum {
+     SPAPR_DR_CC_RESPONSE_NOT_CONFIGURABLE = -9003,
+ } sPAPRDRCCResponse;
+ 
+-typedef void (spapr_drc_detach_cb)(DeviceState *d, void *opaque);
+-
+ typedef struct sPAPRDRConnector {
+     /*< private >*/
+     DeviceState parent;
+@@ -158,8 +156,6 @@ typedef struct sPAPRDRConnector {
+ 
+     /* device pointer, via link property */
+     DeviceState *dev;
+-    spapr_drc_detach_cb *detach_cb;
+-    void *detach_cb_opaque;
+ } sPAPRDRConnector;
+ 
+ typedef struct sPAPRDRConnectorClass {
+@@ -188,9 +184,7 @@ typedef struct sPAPRDRConnectorClass {
+     /* QEMU interfaces for managing hotplug operations */
+     void (*attach)(sPAPRDRConnector *drc, DeviceState *d, void *fdt,
+                    int fdt_start_offset, bool coldplug, Error **errp);
+-    void (*detach)(sPAPRDRConnector *drc, DeviceState *d,
+-                   spapr_drc_detach_cb *detach_cb,
+-                   void *detach_cb_opaque, Error **errp);
++    void (*detach)(sPAPRDRConnector *drc, DeviceState *d, Error **errp);
+     bool (*release_pending)(sPAPRDRConnector *drc);
+     void (*set_signalled)(sPAPRDRConnector *drc);
+ } sPAPRDRConnectorClass;
 -- 
 2.9.4
