@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39887)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41250)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dCilB-0001Nb-Qm
-	for qemu-devel@nongnu.org; Mon, 22 May 2017 04:32:15 -0400
+	(envelope-from <arei.gonglei@huawei.com>) id 1dCitM-00040D-QR
+	for qemu-devel@nongnu.org; Mon, 22 May 2017 04:40:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dCil7-0004pd-St
-	for qemu-devel@nongnu.org; Mon, 22 May 2017 04:32:13 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:37112)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1dCil7-0004pW-K0
-	for qemu-devel@nongnu.org; Mon, 22 May 2017 04:32:09 -0400
-Date: Mon, 22 May 2017 09:32:03 +0100
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170522083203.GE5158@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+	(envelope-from <arei.gonglei@huawei.com>) id 1dCitI-0007lW-Si
+	for qemu-devel@nongnu.org; Mon, 22 May 2017 04:40:40 -0400
+Received: from szxga03-in.huawei.com ([45.249.212.189]:3882)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
+	(envelope-from <arei.gonglei@huawei.com>) id 1dCitI-0007k3-1c
+	for qemu-devel@nongnu.org; Mon, 22 May 2017 04:40:36 -0400
+From: "Gonglei (Arei)" <arei.gonglei@huawei.com>
+Date: Mon, 22 May 2017 08:40:18 +0000
+Message-ID: <33183CC9F5247A488A2544077AF19020DA2B082F@DGGEMA505-MBX.china.huawei.com>
 References: <33183CC9F5247A488A2544077AF19020DA2AF6CA@DGGEMA505-MBX.china.huawei.com>
 	<0f88ad61-06d8-57bb-3228-9b2dde993c70@redhat.com>
+	<20170522083203.GE5158@redhat.com>
+In-Reply-To: <20170522083203.GE5158@redhat.com>
+Content-Language: zh-CN
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <0f88ad61-06d8-57bb-3228-9b2dde993c70@redhat.com>
 Subject: Re: [Qemu-devel] [RFC] memory consumption of Qemu is twice as much
  as the previous version in KVM
 List-Id: <qemu-devel.nongnu.org>
@@ -29,89 +30,103 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: "Gonglei (Arei)" <arei.gonglei@huawei.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+To: "Daniel P. Berrange" <berrange@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>
 
-On Mon, May 22, 2017 at 10:27:59AM +0200, Paolo Bonzini wrote:
-> 
-> 
-> On 22/05/2017 09:04, Gonglei (Arei) wrote:
-> > Hi Paolo,
-> > 
-> > I found that the latest Qemu eat 2 time memory in KVM since Qemu-2.3.0.
-> > 
-> > Replication Steps:
-> > 
-> > 1. I created a CentOS 7 with 4U8G using Qemu-2.3.0, 
-> > 
-> > # grep kvm_kvzalloc /proc/vmallocinfo | awk '{total+=$2}; END {print total}'
-> > 16932864
-> > # grep kvm_kvzalloc /proc/vmallocinfo
-> > 0xffffc900205c7000-0xffffc90020fc8000 10489856 kvm_kvzalloc+0x3c/0x40 [kvm] pages=2560 vmalloc vpages N1=2560
-> > 0xffffc90020fc8000-0xffffc90020fce000   24576 kvm_kvzalloc+0x3c/0x40 [kvm] pages=5 vmalloc N1=5
-> > 0xffffc90020fce000-0xffffc90020fd4000   24576 kvm_kvzalloc+0x3c/0x40 [kvm] pages=5 vmalloc N1=5
-> > 0xffffc90020fd4000-0xffffc90020fd8000   16384 kvm_kvzalloc+0x3c/0x40 [kvm] pages=3 vmalloc N1=3
-> > 0xffffc9002438b000-0xffffc9002498c000 6295552 kvm_kvzalloc+0x3c/0x40 [kvm] pages=1536 vmalloc vpages N1=1536
-> > 0xffffc9002498c000-0xffffc90024990000   16384 kvm_kvzalloc+0x3c/0x40 [kvm] pages=3 vmalloc N1=3
-> > 0xffffc90024990000-0xffffc90024994000   16384 kvm_kvzalloc+0x3c/0x40 [kvm] pages=3 vmalloc N1=3
-> > 0xffffc90024994000-0xffffc90024997000   12288 kvm_kvzalloc+0x3c/0x40 [kvm] pages=2 vmalloc N1=2
-> > 0xffffc90024a75000-0xffffc90024a7e000   36864 kvm_kvzalloc+0x3c/0x40 [kvm] pages=8 vmalloc N1=8
-> > 
-> > PS: There is only this VM in my host.
-> > 
-> > 2. Do the same test using the latest Qemu:
-> > 
-> > # grep kvm_kvzalloc /proc/vmallocinfo | awk '{total+=$2}; END {print total}'
-> > 33865728
-> > linux-PsHdkO:~ # grep kvm_kvzalloc /proc/vmallocinfo 
-> > 0xffffc9001f181000-0xffffc9001fb82000 10489856 kvm_kvzalloc+0x25/0x30 [kvm] pages=2560 vmalloc vpages N1=2560
-> > 0xffffc9001fb82000-0xffffc9001fb88000   24576 kvm_kvzalloc+0x25/0x30 [kvm] pages=5 vmalloc N1=5
-> > 0xffffc9001fb88000-0xffffc9001fb8e000   24576 kvm_kvzalloc+0x25/0x30 [kvm] pages=5 vmalloc N1=5
-> > 0xffffc9001fb8e000-0xffffc9001fb92000   16384 kvm_kvzalloc+0x25/0x30 [kvm] pages=3 vmalloc N1=3
-> > 0xffffc90020854000-0xffffc90021255000 10489856 kvm_kvzalloc+0x25/0x30 [kvm] pages=2560 vmalloc vpages N1=2560
-> > 0xffffc90021255000-0xffffc9002125b000   24576 kvm_kvzalloc+0x25/0x30 [kvm] pages=5 vmalloc N1=5
-> > 0xffffc9002125b000-0xffffc90021261000   24576 kvm_kvzalloc+0x25/0x30 [kvm] pages=5 vmalloc N1=5
-> > 0xffffc90021261000-0xffffc90021265000   16384 kvm_kvzalloc+0x25/0x30 [kvm] pages=3 vmalloc N1=3
-> > 0xffffc9002616e000-0xffffc90026172000   16384 kvm_kvzalloc+0x25/0x30 [kvm] pages=3 vmalloc N1=3
-> > 0xffffc90026172000-0xffffc90026176000   16384 kvm_kvzalloc+0x25/0x30 [kvm] pages=3 vmalloc N1=3
-> > 0xffffc90026176000-0xffffc90026179000   12288 kvm_kvzalloc+0x25/0x30 [kvm] pages=2 vmalloc N1=2
-> > 0xffffc900261a9000-0xffffc900261ad000   16384 kvm_kvzalloc+0x25/0x30 [kvm] pages=3 vmalloc N1=3
-> > 0xffffc900261ad000-0xffffc900261b1000   16384 kvm_kvzalloc+0x25/0x30 [kvm] pages=3 vmalloc N1=3
-> > 0xffffc900261b1000-0xffffc900261b4000   12288 kvm_kvzalloc+0x25/0x30 [kvm] pages=2 vmalloc N1=2
-> > 0xffffc900280fe000-0xffffc900286ff000 6295552 kvm_kvzalloc+0x25/0x30 [kvm] pages=1536 vmalloc vpages N1=1536
-> > 0xffffc900286ff000-0xffffc90028d00000 6295552 kvm_kvzalloc+0x25/0x30 [kvm] pages=1536 vmalloc vpages N1=1536
-> > 0xffffc90028d87000-0xffffc90028d90000   36864 kvm_kvzalloc+0x25/0x30 [kvm] pages=8 vmalloc N1=8
-> > 0xffffc90028d9c000-0xffffc90028da5000   36864 kvm_kvzalloc+0x25/0x30 [kvm] pages=8 vmalloc N1=8
-> > 
-> > 
-> > 3. I found the first bad commit by 'git biscet'
-> > 
-> > linux-arei:/mnt/sdb/gonglei/opensource/qemu # git bisect bad
-> > 6410848bec38089424d54a6a8f10d4cf77182b5d is the first bad commit
-> > commit 6410848bec38089424d54a6a8f10d4cf77182b5d
-> > Author: Paolo Bonzini <pbonzini@redhat.com>
-> > Date:   Thu Jun 18 18:30:16 2015 +0200
-> > 
-> >     target-i386: register a separate KVM address space including SMRAM regions
-> >     
-> >     Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> > 
-> > :040000 040000 b2435d7cd0829e6416b316f1ae2856e6f7b0023d 1acb81aecaf50f2d313b33f2b61a24f7f0bd6f07 M      target-i386
-> > linux-PsHdkO:/mnt/sdb/gonglei/opensource/qemu #
-> > 
-> > 
-> > Any ideas about this change? Do we really need to trigger two times memory region allocation?
-> 
-> We are registering two memory maps, so yes as long as "-machine smm=on"
-> is set.  We can skip the second address space if SMM is disabled.
-
-Am I right in thinking that it is just causing the same memory allocation
-to be mapped twice at different addresses, not actually allocating double
-the amount of memory ?
-
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+DQo+IC0tLS0tT3JpZ2luYWwgTWVzc2FnZS0tLS0tDQo+IEZyb206IGt2bS1vd25lckB2Z2VyLmtl
+cm5lbC5vcmcgW21haWx0bzprdm0tb3duZXJAdmdlci5rZXJuZWwub3JnXSBPbg0KPiBCZWhhbGYg
+T2YgRGFuaWVsIFAuIEJlcnJhbmdlDQo+IFNlbnQ6IE1vbmRheSwgTWF5IDIyLCAyMDE3IDQ6MzIg
+UE0NCj4gVG86IFBhb2xvIEJvbnppbmkNCj4gQ2M6IEdvbmdsZWkgKEFyZWkpOyBxZW11LWRldmVs
+QG5vbmdudS5vcmc7IGt2bUB2Z2VyLmtlcm5lbC5vcmcNCj4gU3ViamVjdDogUmU6IFtRZW11LWRl
+dmVsXSBbUkZDXSBtZW1vcnkgY29uc3VtcHRpb24gb2YgUWVtdSBpcyB0d2ljZSBhcw0KPiBtdWNo
+IGFzIHRoZSBwcmV2aW91cyB2ZXJzaW9uIGluIEtWTQ0KPiANCj4gT24gTW9uLCBNYXkgMjIsIDIw
+MTcgYXQgMTA6Mjc6NTlBTSArMDIwMCwgUGFvbG8gQm9uemluaSB3cm90ZToNCj4gPg0KPiA+DQo+
+ID4gT24gMjIvMDUvMjAxNyAwOTowNCwgR29uZ2xlaSAoQXJlaSkgd3JvdGU6DQo+ID4gPiBIaSBQ
+YW9sbywNCj4gPiA+DQo+ID4gPiBJIGZvdW5kIHRoYXQgdGhlIGxhdGVzdCBRZW11IGVhdCAyIHRp
+bWUgbWVtb3J5IGluIEtWTSBzaW5jZSBRZW11LTIuMy4wLg0KPiA+ID4NCj4gPiA+IFJlcGxpY2F0
+aW9uIFN0ZXBzOg0KPiA+ID4NCj4gPiA+IDEuIEkgY3JlYXRlZCBhIENlbnRPUyA3IHdpdGggNFU4
+RyB1c2luZyBRZW11LTIuMy4wLA0KPiA+ID4NCj4gPiA+ICMgZ3JlcCBrdm1fa3Z6YWxsb2MgL3By
+b2Mvdm1hbGxvY2luZm8gfCBhd2sgJ3t0b3RhbCs9JDJ9OyBFTkQge3ByaW50IHRvdGFsfScNCj4g
+PiA+IDE2OTMyODY0DQo+ID4gPiAjIGdyZXAga3ZtX2t2emFsbG9jIC9wcm9jL3ZtYWxsb2NpbmZv
+DQo+ID4gPiAweGZmZmZjOTAwMjA1YzcwMDAtMHhmZmZmYzkwMDIwZmM4MDAwIDEwNDg5ODU2IGt2
+bV9rdnphbGxvYysweDNjLzB4NDANCj4gW2t2bV0gcGFnZXM9MjU2MCB2bWFsbG9jIHZwYWdlcyBO
+MT0yNTYwDQo+ID4gPiAweGZmZmZjOTAwMjBmYzgwMDAtMHhmZmZmYzkwMDIwZmNlMDAwICAgMjQ1
+NzYga3ZtX2t2emFsbG9jKzB4M2MvMHg0MA0KPiBba3ZtXSBwYWdlcz01IHZtYWxsb2MgTjE9NQ0K
+PiA+ID4gMHhmZmZmYzkwMDIwZmNlMDAwLTB4ZmZmZmM5MDAyMGZkNDAwMCAgIDI0NTc2IGt2bV9r
+dnphbGxvYysweDNjLzB4NDANCj4gW2t2bV0gcGFnZXM9NSB2bWFsbG9jIE4xPTUNCj4gPiA+IDB4
+ZmZmZmM5MDAyMGZkNDAwMC0weGZmZmZjOTAwMjBmZDgwMDAgICAxNjM4NCBrdm1fa3Z6YWxsb2Mr
+MHgzYy8weDQwDQo+IFtrdm1dIHBhZ2VzPTMgdm1hbGxvYyBOMT0zDQo+ID4gPiAweGZmZmZjOTAw
+MjQzOGIwMDAtMHhmZmZmYzkwMDI0OThjMDAwIDYyOTU1NTIga3ZtX2t2emFsbG9jKzB4M2MvMHg0
+MA0KPiBba3ZtXSBwYWdlcz0xNTM2IHZtYWxsb2MgdnBhZ2VzIE4xPTE1MzYNCj4gPiA+IDB4ZmZm
+ZmM5MDAyNDk4YzAwMC0weGZmZmZjOTAwMjQ5OTAwMDAgICAxNjM4NCBrdm1fa3Z6YWxsb2MrMHgz
+Yy8weDQwDQo+IFtrdm1dIHBhZ2VzPTMgdm1hbGxvYyBOMT0zDQo+ID4gPiAweGZmZmZjOTAwMjQ5
+OTAwMDAtMHhmZmZmYzkwMDI0OTk0MDAwICAgMTYzODQga3ZtX2t2emFsbG9jKzB4M2MvMHg0MA0K
+PiBba3ZtXSBwYWdlcz0zIHZtYWxsb2MgTjE9Mw0KPiA+ID4gMHhmZmZmYzkwMDI0OTk0MDAwLTB4
+ZmZmZmM5MDAyNDk5NzAwMCAgIDEyMjg4IGt2bV9rdnphbGxvYysweDNjLzB4NDANCj4gW2t2bV0g
+cGFnZXM9MiB2bWFsbG9jIE4xPTINCj4gPiA+IDB4ZmZmZmM5MDAyNGE3NTAwMC0weGZmZmZjOTAw
+MjRhN2UwMDAgICAzNjg2NCBrdm1fa3Z6YWxsb2MrMHgzYy8weDQwDQo+IFtrdm1dIHBhZ2VzPTgg
+dm1hbGxvYyBOMT04DQo+ID4gPg0KPiA+ID4gUFM6IFRoZXJlIGlzIG9ubHkgdGhpcyBWTSBpbiBt
+eSBob3N0Lg0KPiA+ID4NCj4gPiA+IDIuIERvIHRoZSBzYW1lIHRlc3QgdXNpbmcgdGhlIGxhdGVz
+dCBRZW11Og0KPiA+ID4NCj4gPiA+ICMgZ3JlcCBrdm1fa3Z6YWxsb2MgL3Byb2Mvdm1hbGxvY2lu
+Zm8gfCBhd2sgJ3t0b3RhbCs9JDJ9OyBFTkQge3ByaW50IHRvdGFsfScNCj4gPiA+IDMzODY1NzI4
+DQo+ID4gPiBsaW51eC1Qc0hka086fiAjIGdyZXAga3ZtX2t2emFsbG9jIC9wcm9jL3ZtYWxsb2Np
+bmZvDQo+ID4gPiAweGZmZmZjOTAwMWYxODEwMDAtMHhmZmZmYzkwMDFmYjgyMDAwIDEwNDg5ODU2
+IGt2bV9rdnphbGxvYysweDI1LzB4MzANCj4gW2t2bV0gcGFnZXM9MjU2MCB2bWFsbG9jIHZwYWdl
+cyBOMT0yNTYwDQo+ID4gPiAweGZmZmZjOTAwMWZiODIwMDAtMHhmZmZmYzkwMDFmYjg4MDAwICAg
+MjQ1NzYga3ZtX2t2emFsbG9jKzB4MjUvMHgzMA0KPiBba3ZtXSBwYWdlcz01IHZtYWxsb2MgTjE9
+NQ0KPiA+ID4gMHhmZmZmYzkwMDFmYjg4MDAwLTB4ZmZmZmM5MDAxZmI4ZTAwMCAgIDI0NTc2IGt2
+bV9rdnphbGxvYysweDI1LzB4MzANCj4gW2t2bV0gcGFnZXM9NSB2bWFsbG9jIE4xPTUNCj4gPiA+
+IDB4ZmZmZmM5MDAxZmI4ZTAwMC0weGZmZmZjOTAwMWZiOTIwMDAgICAxNjM4NCBrdm1fa3Z6YWxs
+b2MrMHgyNS8weDMwDQo+IFtrdm1dIHBhZ2VzPTMgdm1hbGxvYyBOMT0zDQo+ID4gPiAweGZmZmZj
+OTAwMjA4NTQwMDAtMHhmZmZmYzkwMDIxMjU1MDAwIDEwNDg5ODU2DQo+IGt2bV9rdnphbGxvYysw
+eDI1LzB4MzAgW2t2bV0gcGFnZXM9MjU2MCB2bWFsbG9jIHZwYWdlcyBOMT0yNTYwDQo+ID4gPiAw
+eGZmZmZjOTAwMjEyNTUwMDAtMHhmZmZmYzkwMDIxMjViMDAwICAgMjQ1NzYga3ZtX2t2emFsbG9j
+KzB4MjUvMHgzMA0KPiBba3ZtXSBwYWdlcz01IHZtYWxsb2MgTjE9NQ0KPiA+ID4gMHhmZmZmYzkw
+MDIxMjViMDAwLTB4ZmZmZmM5MDAyMTI2MTAwMCAgIDI0NTc2IGt2bV9rdnphbGxvYysweDI1LzB4
+MzANCj4gW2t2bV0gcGFnZXM9NSB2bWFsbG9jIE4xPTUNCj4gPiA+IDB4ZmZmZmM5MDAyMTI2MTAw
+MC0weGZmZmZjOTAwMjEyNjUwMDAgICAxNjM4NCBrdm1fa3Z6YWxsb2MrMHgyNS8weDMwDQo+IFtr
+dm1dIHBhZ2VzPTMgdm1hbGxvYyBOMT0zDQo+ID4gPiAweGZmZmZjOTAwMjYxNmUwMDAtMHhmZmZm
+YzkwMDI2MTcyMDAwICAgMTYzODQga3ZtX2t2emFsbG9jKzB4MjUvMHgzMA0KPiBba3ZtXSBwYWdl
+cz0zIHZtYWxsb2MgTjE9Mw0KPiA+ID4gMHhmZmZmYzkwMDI2MTcyMDAwLTB4ZmZmZmM5MDAyNjE3
+NjAwMCAgIDE2Mzg0IGt2bV9rdnphbGxvYysweDI1LzB4MzANCj4gW2t2bV0gcGFnZXM9MyB2bWFs
+bG9jIE4xPTMNCj4gPiA+IDB4ZmZmZmM5MDAyNjE3NjAwMC0weGZmZmZjOTAwMjYxNzkwMDAgICAx
+MjI4OCBrdm1fa3Z6YWxsb2MrMHgyNS8weDMwDQo+IFtrdm1dIHBhZ2VzPTIgdm1hbGxvYyBOMT0y
+DQo+ID4gPiAweGZmZmZjOTAwMjYxYTkwMDAtMHhmZmZmYzkwMDI2MWFkMDAwICAgMTYzODQga3Zt
+X2t2emFsbG9jKzB4MjUvMHgzMA0KPiBba3ZtXSBwYWdlcz0zIHZtYWxsb2MgTjE9Mw0KPiA+ID4g
+MHhmZmZmYzkwMDI2MWFkMDAwLTB4ZmZmZmM5MDAyNjFiMTAwMCAgIDE2Mzg0IGt2bV9rdnphbGxv
+YysweDI1LzB4MzANCj4gW2t2bV0gcGFnZXM9MyB2bWFsbG9jIE4xPTMNCj4gPiA+IDB4ZmZmZmM5
+MDAyNjFiMTAwMC0weGZmZmZjOTAwMjYxYjQwMDAgICAxMjI4OCBrdm1fa3Z6YWxsb2MrMHgyNS8w
+eDMwDQo+IFtrdm1dIHBhZ2VzPTIgdm1hbGxvYyBOMT0yDQo+ID4gPiAweGZmZmZjOTAwMjgwZmUw
+MDAtMHhmZmZmYzkwMDI4NmZmMDAwIDYyOTU1NTIga3ZtX2t2emFsbG9jKzB4MjUvMHgzMA0KPiBb
+a3ZtXSBwYWdlcz0xNTM2IHZtYWxsb2MgdnBhZ2VzIE4xPTE1MzYNCj4gPiA+IDB4ZmZmZmM5MDAy
+ODZmZjAwMC0weGZmZmZjOTAwMjhkMDAwMDAgNjI5NTU1MiBrdm1fa3Z6YWxsb2MrMHgyNS8weDMw
+DQo+IFtrdm1dIHBhZ2VzPTE1MzYgdm1hbGxvYyB2cGFnZXMgTjE9MTUzNg0KPiA+ID4gMHhmZmZm
+YzkwMDI4ZDg3MDAwLTB4ZmZmZmM5MDAyOGQ5MDAwMCAgIDM2ODY0IGt2bV9rdnphbGxvYysweDI1
+LzB4MzANCj4gW2t2bV0gcGFnZXM9OCB2bWFsbG9jIE4xPTgNCj4gPiA+IDB4ZmZmZmM5MDAyOGQ5
+YzAwMC0weGZmZmZjOTAwMjhkYTUwMDAgICAzNjg2NCBrdm1fa3Z6YWxsb2MrMHgyNS8weDMwDQo+
+IFtrdm1dIHBhZ2VzPTggdm1hbGxvYyBOMT04DQo+ID4gPg0KPiA+ID4NCj4gPiA+IDMuIEkgZm91
+bmQgdGhlIGZpcnN0IGJhZCBjb21taXQgYnkgJ2dpdCBiaXNjZXQnDQo+ID4gPg0KPiA+ID4gbGlu
+dXgtYXJlaTovbW50L3NkYi9nb25nbGVpL29wZW5zb3VyY2UvcWVtdSAjIGdpdCBiaXNlY3QgYmFk
+DQo+ID4gPiA2NDEwODQ4YmVjMzgwODk0MjRkNTRhNmE4ZjEwZDRjZjc3MTgyYjVkIGlzIHRoZSBm
+aXJzdCBiYWQgY29tbWl0DQo+ID4gPiBjb21taXQgNjQxMDg0OGJlYzM4MDg5NDI0ZDU0YTZhOGYx
+MGQ0Y2Y3NzE4MmI1ZA0KPiA+ID4gQXV0aG9yOiBQYW9sbyBCb256aW5pIDxwYm9uemluaUByZWRo
+YXQuY29tPg0KPiA+ID4gRGF0ZTogICBUaHUgSnVuIDE4IDE4OjMwOjE2IDIwMTUgKzAyMDANCj4g
+PiA+DQo+ID4gPiAgICAgdGFyZ2V0LWkzODY6IHJlZ2lzdGVyIGEgc2VwYXJhdGUgS1ZNIGFkZHJl
+c3Mgc3BhY2UgaW5jbHVkaW5nIFNNUkFNDQo+IHJlZ2lvbnMNCj4gPiA+DQo+ID4gPiAgICAgU2ln
+bmVkLW9mZi1ieTogUGFvbG8gQm9uemluaSA8cGJvbnppbmlAcmVkaGF0LmNvbT4NCj4gPiA+DQo+
+ID4gPiA6MDQwMDAwIDA0MDAwMCBiMjQzNWQ3Y2QwODI5ZTY0MTZiMzE2ZjFhZTI4NTZlNmY3YjAw
+MjNkDQo+IDFhY2I4MWFlY2FmNTBmMmQzMTNiMzNmMmI2MWEyNGY3ZjBiZDZmMDcgTSAgICAgIHRh
+cmdldC1pMzg2DQo+ID4gPiBsaW51eC1Qc0hka086L21udC9zZGIvZ29uZ2xlaS9vcGVuc291cmNl
+L3FlbXUgIw0KPiA+ID4NCj4gPiA+DQo+ID4gPiBBbnkgaWRlYXMgYWJvdXQgdGhpcyBjaGFuZ2U/
+IERvIHdlIHJlYWxseSBuZWVkIHRvIHRyaWdnZXIgdHdvIHRpbWVzDQo+IG1lbW9yeSByZWdpb24g
+YWxsb2NhdGlvbj8NCj4gPg0KPiA+IFdlIGFyZSByZWdpc3RlcmluZyB0d28gbWVtb3J5IG1hcHMs
+IHNvIHllcyBhcyBsb25nIGFzICItbWFjaGluZSBzbW09b24iDQo+ID4gaXMgc2V0LiAgV2UgY2Fu
+IHNraXAgdGhlIHNlY29uZCBhZGRyZXNzIHNwYWNlIGlmIFNNTSBpcyBkaXNhYmxlZC4NCj4gDQpT
+b3JyeSwgSSBkb24ndCBrbm93IG11Y2ggYWJvdXQgU01NLCBkbyB3ZSBoYXZlIHRvIHJlZ2lzdGVy
+IHR3byBtZW1vcnkgbWFwcyB0byANCmVuYWJsZSBpdD8NCg0KPiBBbSBJIHJpZ2h0IGluIHRoaW5r
+aW5nIHRoYXQgaXQgaXMganVzdCBjYXVzaW5nIHRoZSBzYW1lIG1lbW9yeSBhbGxvY2F0aW9uDQo+
+IHRvIGJlIG1hcHBlZCB0d2ljZSBhdCBkaWZmZXJlbnQgYWRkcmVzc2VzLCBub3QgYWN0dWFsbHkg
+YWxsb2NhdGluZyBkb3VibGUNCj4gdGhlIGFtb3VudCBvZiBtZW1vcnkgPw0KPiANCk5vLCBpdCBv
+Y2N1cGllcyBwaHlzaWNhbCBtZW1vcnkgaW4gYWN0dWFsbHksIGFuZCB5b3UgY2FuIHNlZSBkaWZm
+ZXJlbnQgaHZhIGFuZCBwYWdlcw0KaW4gYWJvdmUga3ZtX2t2emFsbG9jLg0KDQpUaGFua3MsDQot
+R29uZ2xlaQ0KIA0K
