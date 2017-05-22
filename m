@@ -1,17 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44220)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44251)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1dCtNW-0004E9-NE
-	for qemu-devel@nongnu.org; Mon, 22 May 2017 15:52:32 -0400
+	(envelope-from <mreitz@redhat.com>) id 1dCtNZ-0004H5-I3
+	for qemu-devel@nongnu.org; Mon, 22 May 2017 15:52:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1dCtNV-0006LM-HP
-	for qemu-devel@nongnu.org; Mon, 22 May 2017 15:52:30 -0400
+	(envelope-from <mreitz@redhat.com>) id 1dCtNY-0006MC-8y
+	for qemu-devel@nongnu.org; Mon, 22 May 2017 15:52:33 -0400
 From: Max Reitz <mreitz@redhat.com>
-Date: Mon, 22 May 2017 21:52:16 +0200
-Message-Id: <20170522195217.12991-3-mreitz@redhat.com>
+Date: Mon, 22 May 2017 21:52:17 +0200
+Message-Id: <20170522195217.12991-4-mreitz@redhat.com>
 In-Reply-To: <20170522195217.12991-1-mreitz@redhat.com>
 References: <20170522195217.12991-1-mreitz@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 2/3] block/file-*: *_parse_filename() and
- colons
+Subject: [Qemu-devel] [PATCH v2 3/3] iotests: Add test for colon handling
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,174 +22,166 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Eric Blake <eblake@redhat.com>
 
-The file drivers' *_parse_filename() implementations just strip the
-optional protocol prefix off the filename. However, for e.g.
-"file:foo:bar", this would lead to "foo:bar" being stored as the BDS's
-filename which looks like it should be managed using the "foo" protocol.
-This is especially troublesome if you then try to resolve a backing
-filename based on "foo:bar".
-
-This issue can only occur if the stripped part is a relative filename
-("file:/foo:bar" will be shortened to "/foo:bar" and having a slash
-before the first colon means that "/foo" is not recognized as a protocol
-part). Therefore, we can easily fix it by prepending "./" to such
-filenames.
-
-Before this patch:
-$ ./qemu-img create -f qcow2 backing.qcow2 64M
-Formatting 'backing.qcow2', fmt=qcow2 size=67108864 encryption=off
-    cluster_size=65536 lazy_refcounts=off refcount_bits=16
-$ ./qemu-img create -f qcow2 -b backing.qcow2 file:top:image.qcow2
-Formatting 'file:top:image.qcow2', fmt=qcow2 size=67108864
-    backing_file=backing.qcow2 encryption=off cluster_size=65536
-    lazy_refcounts=off refcount_bits=16
-$ ./qemu-io file:top:image.qcow2
-can't open device file:top:image.qcow2: Could not open backing file:
-    Unknown protocol 'top'
-
-After this patch:
-$ ./qemu-io file:top:image.qcow2
-[no error]
-
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 ---
- include/block/block_int.h |  3 +++
- block.c                   | 35 +++++++++++++++++++++++++++++++++++
- block/file-posix.c        | 17 +++--------------
- block/file-win32.c        | 12 ++----------
- 4 files changed, 43 insertions(+), 24 deletions(-)
+ tests/qemu-iotests/126     | 105 +++++++++++++++++++++++++++++++++++++++++++++
+ tests/qemu-iotests/126.out |  23 ++++++++++
+ tests/qemu-iotests/group   |   1 +
+ 3 files changed, 129 insertions(+)
+ create mode 100755 tests/qemu-iotests/126
+ create mode 100644 tests/qemu-iotests/126.out
 
-diff --git a/include/block/block_int.h b/include/block/block_int.h
-index 8d3724c..e5eb473 100644
---- a/include/block/block_int.h
-+++ b/include/block/block_int.h
-@@ -682,6 +682,9 @@ int get_tmp_filename(char *filename, int size);
- BlockDriver *bdrv_probe_all(const uint8_t *buf, int buf_size,
-                             const char *filename);
- 
-+void bdrv_parse_filename_strip_prefix(const char *filename, const char *prefix,
-+                                      QDict *options);
+diff --git a/tests/qemu-iotests/126 b/tests/qemu-iotests/126
+new file mode 100755
+index 0000000..3a2a43a
+--- /dev/null
++++ b/tests/qemu-iotests/126
+@@ -0,0 +1,105 @@
++#!/bin/bash
++#
++# Tests handling of colons in filenames (which may be confused with protocol
++# prefixes)
++#
++# Copyright (C) 2017 Red Hat, Inc.
++#
++# This program is free software; you can redistribute it and/or modify
++# it under the terms of the GNU General Public License as published by
++# the Free Software Foundation; either version 2 of the License, or
++# (at your option) any later version.
++#
++# This program is distributed in the hope that it will be useful,
++# but WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++# GNU General Public License for more details.
++#
++# You should have received a copy of the GNU General Public License
++# along with this program.  If not, see <http://www.gnu.org/licenses/>.
++#
 +
- 
- /**
-  * bdrv_add_before_write_notifier:
-diff --git a/block.c b/block.c
-index b72b872..fa1d06d 100644
---- a/block.c
-+++ b/block.c
-@@ -197,6 +197,41 @@ void path_combine(char *dest, int dest_size,
-     }
- }
- 
-+/*
-+ * Helper function for bdrv_parse_filename() implementations to remove optional
-+ * protocol prefixes (especially "file:") from a filename and for putting the
-+ * stripped filename into the options QDict if there is such a prefix.
-+ */
-+void bdrv_parse_filename_strip_prefix(const char *filename, const char *prefix,
-+                                      QDict *options)
-+{
-+    if (strstart(filename, prefix, &filename)) {
-+        /* Stripping the explicit protocol prefix may result in a protocol
-+         * prefix being (wrongly) detected (if the filename contains a colon) */
-+        if (path_has_protocol(filename)) {
-+            QString *fat_filename;
++# creator
++owner=mreitz@redhat.com
 +
-+            /* This means there is some colon before the first slash; therefore,
-+             * this cannot be an absolute path */
-+            assert(!path_is_absolute(filename));
++seq="$(basename $0)"
++echo "QA output created by $seq"
 +
-+            /* And we can thus fix the protocol detection issue by prefixing it
-+             * by "./" */
-+            fat_filename = qstring_from_str("./");
-+            qstring_append(fat_filename, filename);
++here="$PWD"
++status=1	# failure is the default!
 +
-+            assert(!path_has_protocol(qstring_get_str(fat_filename)));
++# get standard environment, filters and checks
++. ./common.rc
++. ./common.filter
 +
-+            qdict_put(options, "filename", fat_filename);
-+        } else {
-+            /* If no protocol prefix was detected, we can use the shortened
-+             * filename as-is */
-+            qdict_put_str(options, "filename", filename);
-+        }
-+    }
-+}
++# Needs backing file support
++_supported_fmt qcow qcow2 qed vmdk
++# This is the default protocol (and we want to test the difference between
++# colons which separate a protocol prefix from the rest and colons which are
++# just part of the filename, so we cannot test protocols which require a prefix)
++_supported_proto file
++_supported_os Linux
++
++echo
++echo '=== Testing plain files ==='
++echo
++
++# A colon after a slash is not a protocol prefix separator
++TEST_IMG="$TEST_DIR/a:b.$IMGFMT" _make_test_img 64M
++_rm_test_img "$TEST_DIR/a:b.$IMGFMT"
++
++# But if you want to be really sure, you can do this
++TEST_IMG="file:$TEST_DIR/a:b.$IMGFMT" _make_test_img 64M
++_rm_test_img "$TEST_DIR/a:b.$IMGFMT"
 +
 +
- /* Returns whether the image file is opened as read-only. Note that this can
-  * return false and writing to the image file is still not possible because the
-  * image is inactivated. */
-diff --git a/block/file-posix.c b/block/file-posix.c
-index 4354d49..de2d3a2 100644
---- a/block/file-posix.c
-+++ b/block/file-posix.c
-@@ -381,12 +381,7 @@ static void raw_parse_flags(int bdrv_flags, int *open_flags)
- static void raw_parse_filename(const char *filename, QDict *options,
-                                Error **errp)
- {
--    /* The filename does not have to be prefixed by the protocol name, since
--     * "file" is the default protocol; therefore, the return value of this
--     * function call can be ignored. */
--    strstart(filename, "file:", &filename);
--
--    qdict_put_str(options, "filename", filename);
-+    bdrv_parse_filename_strip_prefix(filename, "file:", options);
- }
- 
- static QemuOptsList raw_runtime_opts = {
-@@ -2395,10 +2390,7 @@ static int check_hdev_writable(BDRVRawState *s)
- static void hdev_parse_filename(const char *filename, QDict *options,
-                                 Error **errp)
- {
--    /* The prefix is optional, just as for "file". */
--    strstart(filename, "host_device:", &filename);
--
--    qdict_put_str(options, "filename", filename);
-+    bdrv_parse_filename_strip_prefix(filename, "host_device:", options);
- }
- 
- static bool hdev_is_sg(BlockDriverState *bs)
-@@ -2697,10 +2689,7 @@ static BlockDriver bdrv_host_device = {
- static void cdrom_parse_filename(const char *filename, QDict *options,
-                                  Error **errp)
- {
--    /* The prefix is optional, just as for "file". */
--    strstart(filename, "host_cdrom:", &filename);
--
--    qdict_put_str(options, "filename", filename);
-+    bdrv_parse_filename_strip_prefix(filename, "host_cdrom:", options);
- }
- #endif
- 
-diff --git a/block/file-win32.c b/block/file-win32.c
-index 8f14f0b..ef2910b 100644
---- a/block/file-win32.c
-+++ b/block/file-win32.c
-@@ -276,12 +276,7 @@ static void raw_parse_flags(int flags, bool use_aio, int *access_flags,
- static void raw_parse_filename(const char *filename, QDict *options,
-                                Error **errp)
- {
--    /* The filename does not have to be prefixed by the protocol name, since
--     * "file" is the default protocol; therefore, the return value of this
--     * function call can be ignored. */
--    strstart(filename, "file:", &filename);
--
--    qdict_put_str(options, "filename", filename);
-+    bdrv_parse_filename_strip_prefix(filename, "file:", options);
- }
- 
- static QemuOptsList raw_runtime_opts = {
-@@ -671,10 +666,7 @@ static int hdev_probe_device(const char *filename)
- static void hdev_parse_filename(const char *filename, QDict *options,
-                                 Error **errp)
- {
--    /* The prefix is optional, just as for "file". */
--    strstart(filename, "host_device:", &filename);
--
--    qdict_put_str(options, "filename", filename);
-+    bdrv_parse_filename_strip_prefix(filename, "host_device:", options);
- }
- 
- static int hdev_open(BlockDriverState *bs, QDict *options, int flags,
++echo
++echo '=== Testing relative backing filename resolution ==='
++echo
++
++BASE_IMG="$TEST_DIR/image:base.$IMGFMT"
++TOP_IMG="$TEST_DIR/image:top.$IMGFMT"
++
++TEST_IMG=$BASE_IMG _make_test_img 64M
++TEST_IMG=$TOP_IMG _make_test_img -b ./image:base.$IMGFMT
++
++# The default cluster size depends on the image format
++TEST_IMG=$TOP_IMG _img_info | grep -v 'cluster_size'
++
++_rm_test_img "$BASE_IMG"
++_rm_test_img "$TOP_IMG"
++
++
++# Do another test where we access both top and base without any slash in them
++echo
++pushd "$TEST_DIR" >/dev/null
++
++BASE_IMG="base.$IMGFMT"
++TOP_IMG="file:image:top.$IMGFMT"
++
++TEST_IMG=$BASE_IMG _make_test_img 64M
++TEST_IMG=$TOP_IMG _make_test_img -b "$BASE_IMG"
++
++TEST_IMG=$TOP_IMG _img_info | grep -v 'cluster_size'
++
++_rm_test_img "$BASE_IMG"
++_rm_test_img "image:top.$IMGFMT"
++
++popd >/dev/null
++
++# Note that we could also do the same test with BASE_IMG=file:image:base.$IMGFMT
++# -- but behavior for that case is a bit strange. Protocol-prefixed paths are
++# in a sense always absolute paths, so such paths will never be combined with
++# the path of the overlay. But since "image:base.$IMGFMT" is actually a
++# relative path, it will always be evaluated relative to qemu's CWD (but not
++# relative to the overlay!). While this is more or less intended, it is still
++# pretty strange and thus not something that is tested here.
++# (The root of the issue is to use a relative path with a protocol prefix. This
++#  may always give you weird results because in one sense, qemu considers such
++#  paths absolute, whereas in another, they are still relative.)
++
++
++# success, all done
++echo '*** done'
++rm -f $seq.full
++status=0
+diff --git a/tests/qemu-iotests/126.out b/tests/qemu-iotests/126.out
+new file mode 100644
+index 0000000..50d7308
+--- /dev/null
++++ b/tests/qemu-iotests/126.out
+@@ -0,0 +1,23 @@
++QA output created by 126
++
++=== Testing plain files ===
++
++Formatting 'TEST_DIR/a:b.IMGFMT', fmt=IMGFMT size=67108864
++Formatting 'TEST_DIR/a:b.IMGFMT', fmt=IMGFMT size=67108864
++
++=== Testing relative backing filename resolution ===
++
++Formatting 'TEST_DIR/image:base.IMGFMT', fmt=IMGFMT size=67108864
++Formatting 'TEST_DIR/image:top.IMGFMT', fmt=IMGFMT size=67108864 backing_file=./image:base.IMGFMT
++image: TEST_DIR/image:top.IMGFMT
++file format: IMGFMT
++virtual size: 64M (67108864 bytes)
++backing file: ./image:base.IMGFMT (actual path: TEST_DIR/./image:base.IMGFMT)
++
++Formatting 'base.IMGFMT', fmt=IMGFMT size=67108864
++Formatting 'file:image:top.IMGFMT', fmt=IMGFMT size=67108864 backing_file=base.IMGFMT
++image: ./image:top.IMGFMT
++file format: IMGFMT
++virtual size: 64M (67108864 bytes)
++backing file: base.IMGFMT (actual path: ./base.IMGFMT)
++*** done
+diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
+index 5c8ea0f..30717cb 100644
+--- a/tests/qemu-iotests/group
++++ b/tests/qemu-iotests/group
+@@ -130,6 +130,7 @@
+ 122 rw auto
+ 123 rw auto quick
+ 124 rw auto backing
++126 rw auto backing
+ 128 rw auto quick
+ 129 rw auto quick
+ 130 rw auto quick
 -- 
 2.9.4
