@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57671)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57849)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1dCngr-0001yF-M6
-	for qemu-devel@nongnu.org; Mon, 22 May 2017 09:48:06 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1dCnhk-0002eE-No
+	for qemu-devel@nongnu.org; Mon, 22 May 2017 09:49:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1dCngp-0002Xc-2i
-	for qemu-devel@nongnu.org; Mon, 22 May 2017 09:48:05 -0400
-Received: from mail-wm0-x22f.google.com ([2a00:1450:400c:c09::22f]:34633)
+	(envelope-from <alex.bennee@linaro.org>) id 1dCnhi-0002oK-4p
+	for qemu-devel@nongnu.org; Mon, 22 May 2017 09:49:00 -0400
+Received: from mail-wm0-x236.google.com ([2a00:1450:400c:c09::236]:37123)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1dCngo-0002W1-Sr
-	for qemu-devel@nongnu.org; Mon, 22 May 2017 09:48:03 -0400
-Received: by mail-wm0-x22f.google.com with SMTP id 123so12124393wmg.1
-	for <qemu-devel@nongnu.org>; Mon, 22 May 2017 06:48:02 -0700 (PDT)
+	id 1dCnhh-0002oG-Uz
+	for qemu-devel@nongnu.org; Mon, 22 May 2017 09:48:58 -0400
+Received: by mail-wm0-x236.google.com with SMTP id d127so152647251wmf.0
+	for <qemu-devel@nongnu.org>; Mon, 22 May 2017 06:48:57 -0700 (PDT)
 References: <20170521032956.27446-1-f4bug@amsat.org>
-	<20170521032956.27446-6-f4bug@amsat.org>
+	<20170521032956.27446-7-f4bug@amsat.org>
 From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <20170521032956.27446-6-f4bug@amsat.org>
-Date: Mon, 22 May 2017 14:48:05 +0100
-Message-ID: <87efvh3sve.fsf@linaro.org>
+In-reply-to: <20170521032956.27446-7-f4bug@amsat.org>
+Date: Mon, 22 May 2017 14:49:00 +0100
+Message-ID: <87d1b13stv.fsf@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v3 05/24] docker: install ca-certificates
- package in base image
+Subject: Re: [Qemu-devel] [PATCH v3 06/24] docker: create deb-src entry and
+ setup Emdebian in the same layer
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,39 +37,37 @@ Cc: qemu-devel@nongnu.org, Fam Zheng <famz@redhat.com>
 
 Philippe Mathieu-Daudé <f4bug@amsat.org> writes:
 
-> Resolve SSL verification issue at shippable container's git_sync stage:
->
-> shippable logs:
-> --------------
-> git_sync
-> - ssh-agent bash -c 'ssh-add /tmp/ssh/01_deploy; git clone https://github.com/philmd/qemu.git /root/src/github.com/philmd/qemu'
-> Identity added: /tmp/ssh/01_deploy (rsa w/o comment)
-> Cloning into '/root/src/github.com/philmd/qemu'...
-> fatal: unable to access 'https://github.com/philmd/qemu.git/': Problem with the SSL CA cert (path? access rights?)
-> retrying 1 of 3 times...
->
-> Suggested-by: Alex Bennée <alex.bennee@linaro.org>
 > Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
 Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
 
 > ---
->  tests/docker/dockerfiles/debian.docker | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+>  tests/docker/dockerfiles/debian.docker | 12 +++++-------
+>  1 file changed, 5 insertions(+), 7 deletions(-)
 >
 > diff --git a/tests/docker/dockerfiles/debian.docker b/tests/docker/dockerfiles/debian.docker
-> index 52bd79938e..d08def6a8d 100644
+> index d08def6a8d..33ba686892 100644
 > --- a/tests/docker/dockerfiles/debian.docker
 > +++ b/tests/docker/dockerfiles/debian.docker
-> @@ -11,7 +11,7 @@ FROM debian:stable-slim
->
->  # Setup some basic tools we need
+> @@ -13,13 +13,11 @@ FROM debian:stable-slim
 >  RUN apt update
-> -RUN apt install -yy curl aptitude
-> +RUN apt install -yy aptitude ca-certificates curl
+>  RUN apt install -yy aptitude ca-certificates curl
 >
->  # Setup Emdebian
->  RUN echo "deb http://emdebian.org/tools/debian/ jessie main" >> /etc/apt/sources.list
+> -# Setup Emdebian
+> -RUN echo "deb http://emdebian.org/tools/debian/ jessie main" >> /etc/apt/sources.list
+> -RUN curl http://emdebian.org/tools/debian/emdebian-toolchain-archive.key | apt-key add -
+> -
+> -# Duplicate deb line as deb-src
+> -RUN cat /etc/apt/sources.list | sed "s/deb/deb-src/" >> /etc/apt/sources.list
+> -
+>  # Install common build utilities
+>  RUN apt update
+>  RUN apt install -yy build-essential clang
+> +
+> +# Duplicate deb line as deb-src, setup Emdebian
+> +RUN cat /etc/apt/sources.list | sed "s/deb/deb-src/" >> /etc/apt/sources.list && \
+> +    echo "deb http://emdebian.org/tools/debian/ jessie main" >> /etc/apt/sources.list && \
+> +    curl http://emdebian.org/tools/debian/emdebian-toolchain-archive.key | apt-key add -
 
 
 --
