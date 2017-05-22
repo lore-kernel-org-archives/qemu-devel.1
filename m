@@ -1,32 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54079)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54705)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dCpIf-0005Vv-J6
-	for qemu-devel@nongnu.org; Mon, 22 May 2017 11:31:14 -0400
+	(envelope-from <eblake@redhat.com>) id 1dCpKC-0006UA-5i
+	for qemu-devel@nongnu.org; Mon, 22 May 2017 11:32:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dCpIc-00016Y-FU
-	for qemu-devel@nongnu.org; Mon, 22 May 2017 11:31:13 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:33816)
+	(envelope-from <eblake@redhat.com>) id 1dCpK9-0001pw-2t
+	for qemu-devel@nongnu.org; Mon, 22 May 2017 11:32:48 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40468)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dCpIc-000161-6j
-	for qemu-devel@nongnu.org; Mon, 22 May 2017 11:31:10 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dCpK8-0001oB-Qe
+	for qemu-devel@nongnu.org; Mon, 22 May 2017 11:32:45 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 3BBDC72497
-	for <qemu-devel@nongnu.org>; Mon, 22 May 2017 15:31:09 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id C8AF920264
+	for <qemu-devel@nongnu.org>; Mon, 22 May 2017 15:32:43 +0000 (UTC)
 References: <20170519180342.19618-1-berrange@redhat.com>
-	<20170519180342.19618-3-berrange@redhat.com>
+	<20170519180342.19618-4-berrange@redhat.com>
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <cfb86d90-8a74-ed2c-ae15-feb7d628f197@redhat.com>
-Date: Mon, 22 May 2017 10:30:55 -0500
+Message-ID: <d14a673e-b78b-a8c1-84c7-ab558fc376d2@redhat.com>
+Date: Mon, 22 May 2017 10:32:41 -0500
 MIME-Version: 1.0
-In-Reply-To: <20170519180342.19618-3-berrange@redhat.com>
+In-Reply-To: <20170519180342.19618-4-berrange@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="qrMnPV52vxIwCwHBb7FbU2XtIvjH55mh3"
-Subject: Re: [Qemu-devel] [PATCH v2 2/5] sockets: don't block IPv4 clients
- when listening on "::"
+	boundary="QxLab3dJbMnLWcPNIailWkl0HC09Q1WjH"
+Subject: Re: [Qemu-devel] [PATCH v2 3/5] sockets: ensure we don't accept
+ IPv4 clients when IPv4 is disabled
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,52 +39,46 @@ To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
 Cc: Paolo Bonzini <pbonzini@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---qrMnPV52vxIwCwHBb7FbU2XtIvjH55mh3
+--QxLab3dJbMnLWcPNIailWkl0HC09Q1WjH
 From: Eric Blake <eblake@redhat.com>
 To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
 Cc: Paolo Bonzini <pbonzini@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
-Message-ID: <cfb86d90-8a74-ed2c-ae15-feb7d628f197@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 2/5] sockets: don't block IPv4 clients
- when listening on "::"
+Message-ID: <d14a673e-b78b-a8c1-84c7-ab558fc376d2@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 3/5] sockets: ensure we don't accept IPv4
+ clients when IPv4 is disabled
 References: <20170519180342.19618-1-berrange@redhat.com>
- <20170519180342.19618-3-berrange@redhat.com>
-In-Reply-To: <20170519180342.19618-3-berrange@redhat.com>
+ <20170519180342.19618-4-berrange@redhat.com>
+In-Reply-To: <20170519180342.19618-4-berrange@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
 On 05/19/2017 01:03 PM, Daniel P. Berrange wrote:
-> When inet_parse() parses the hostname, it is forcing the
-> has_ipv6 && ipv6 flags if the address contains a ":". This
-> means that if the user had set the ipv4=3Don flag, to try to
-> restrict the listener to just ipv4, an error would not have
-> been raised.  eg
+> Currently if you disable listening on IPv4 addresses, via the
+> CLI flag ipv4=3Doff, we still mistakenly accept IPv4 clients via
+> the IPv6 listener socket due to IPV6_V6ONLY flag being unset.
 >=20
->    -incoming tcp:[::]:9000,ipv4
+> We must ensure IPV6_V6ONLY is always set if ipv4=3Doff
 >=20
-> should have raised an error because listening for IPv4
-> on "::" is a non-sensical combination.
-
-If I understand correctly, the correct response (and post-patch
-behavior) is an error (mismatch between requesting IPv4-only usage while
-giving an IPv6 address), but the buggy response (pre-patch behavior) is
-that we ended up setting ipv6 in addition to the user-set ipv4 (because
-we found a ':'), and then end up listening on IPv6 after all contrary to
-the user's request.
-
-
-> With this removed,
-> we now call getaddrinfo() on "::" passing PF_INET and
-> so getaddrinfo reports an error about the hostname being
-> incompatible with the requested protocol.
+> This fixes the following scenarios
 >=20
-> Likewise it is explicitly setting the has_ipv4 & ipv4
-> flags when the address contains only digits + '.'. This
-> has no ill-effect, but also has no benefit, so is removed.
+>   -incoming tcp::9000,ipv6=3Don
+>   -incoming tcp:[::]:9000,ipv6=3Don
+>   -chardev socket,id=3Dcdev0,host=3D,port=3D9000,server,nowait,ipv4=3Do=
+ff
+>   -chardev socket,id=3Dcdev0,host=3D,port=3D9000,server,nowait,ipv6=3Do=
+n
+>   -chardev socket,id=3Dcdev0,host=3D::,port=3D9000,server,nowait,ipv4=3D=
+off
+>   -chardev socket,id=3Dcdev0,host=3D::,port=3D9000,server,nowait,ipv6=3D=
+on
+>=20
+> which all mistakenly accepted IPv4 clients
 >=20
 > Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
 > ---
->  util/qemu-sockets.c | 4 ----
->  1 file changed, 4 deletions(-)
+>  util/qemu-sockets.c | 40 +++++++++++++++++++++++++++++++---------
+>  1 file changed, 31 insertions(+), 9 deletions(-)
+>=20
 
 Reviewed-by: Eric Blake <eblake@redhat.com>
 
@@ -94,7 +88,7 @@ Red Hat, Inc.           +1-919-301-3266
 Virtualization:  qemu.org | libvirt.org
 
 
---qrMnPV52vxIwCwHBb7FbU2XtIvjH55mh3
+--QxLab3dJbMnLWcPNIailWkl0HC09Q1WjH
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
@@ -104,13 +98,13 @@ Version: GnuPG v2
 Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
 Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQEcBAEBCAAGBQJZIwQwAAoJEKeha0olJ0NqzMwH/Rf/vIA35yn/qsftEPzaXIFZ
-W9FowcArLxcB21gdo+qClF+JvIiV9e6c79hRIsZ0qS8/tGLj79ingZ1nZa0K3O+v
-iqQe3sCdeUJQH+mqknUCOtkhBALLCY/bYWC/glplnO7VYR9HtGm0Gj2m3R/zVf/k
-efyQRq4w4wpzFARZKqoYDawQLhnmmk+lMLfUHPCqZsoA3Ua03nnz34R9Z051QpPv
-cZ8ViNM/KVfOOeOOihA+CNZIwz/JPiShqH9F7TVGO6sEmnJDtpRD1I1HRfLzInof
-knMgF7hOpw2ubBahnZHRY0WmuYTtyd1KGT7BgGBxwZ6Wej2WLUP5NHN6QK2m1+c=
-=zgMg
+iQEcBAEBCAAGBQJZIwSaAAoJEKeha0olJ0Nq3DMH/3XrJlbPAEY6c5/ZOXO2En4t
+7GUWqyLRe32FVCSpMLxX4teQe6PIAIE3jsaxwCML9qSQAX+ATDhi5tCnVklcoVix
+lWbztZe/C1KH69n+thlyP+AGuexJYWDHUmt/0NKiEQdYeeVhyFmwU00+9z6EP2lm
+d/yTWk39sJ4sqqJ2oOeUeig+wqwPe3P330GiE2jHFw1i3EZ1ZE+lo4QO8bHFu/6X
+ZRvi4p1HNoEzQhUJQdOPRFMz4LjV592wBEd3o3PiCVQ4ks67tVBUYQaEK7txkpco
+2U54URjRs6h1jzfkBGhl8Qxy9F8QMwEMQamve4chEx8OK67csKSJb//UZIvklJg=
+=k01L
 -----END PGP SIGNATURE-----
 
---qrMnPV52vxIwCwHBb7FbU2XtIvjH55mh3--
+--QxLab3dJbMnLWcPNIailWkl0HC09Q1WjH--
