@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34124)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36322)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dCsn7-00081u-9W
-	for qemu-devel@nongnu.org; Mon, 22 May 2017 15:14:54 -0400
+	(envelope-from <eblake@redhat.com>) id 1dCswi-0002Go-CN
+	for qemu-devel@nongnu.org; Mon, 22 May 2017 15:24:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dCsn5-0001Ce-GE
-	for qemu-devel@nongnu.org; Mon, 22 May 2017 15:14:53 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:45196)
+	(envelope-from <eblake@redhat.com>) id 1dCswe-0004b2-Ei
+	for qemu-devel@nongnu.org; Mon, 22 May 2017 15:24:48 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:35312)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dCsn5-0001CP-6M
-	for qemu-devel@nongnu.org; Mon, 22 May 2017 15:14:51 -0400
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dCswe-0004as-5T
+	for qemu-devel@nongnu.org; Mon, 22 May 2017 15:24:44 -0400
 References: <1495186480-114192-1-git-send-email-anton.nefedov@virtuozzo.com>
-	<1495186480-114192-3-git-send-email-anton.nefedov@virtuozzo.com>
-	<7fbddc0e-298b-5973-8f0e-47b753ab41a8@redhat.com>
+	<1495186480-114192-4-git-send-email-anton.nefedov@virtuozzo.com>
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <903458e3-c82e-67d5-85f6-e1b67b829ec7@redhat.com>
-Date: Mon, 22 May 2017 14:14:42 -0500
+Message-ID: <fb751647-3473-76e2-bc49-bf2c9734a027@redhat.com>
+Date: Mon, 22 May 2017 14:24:39 -0500
 MIME-Version: 1.0
-In-Reply-To: <7fbddc0e-298b-5973-8f0e-47b753ab41a8@redhat.com>
+In-Reply-To: <1495186480-114192-4-git-send-email-anton.nefedov@virtuozzo.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="nG7eEBrDKswIoSiF9sEkgoE1lrs48ItQa"
-Subject: Re: [Qemu-devel] [PATCH v1 02/13] qcow2: is_zero_sectors(): return
- true if area is outside of backing file
+	boundary="0F98DdVCwcHkJsIE1WjWUVWN45E8N4lXf"
+Subject: Re: [Qemu-devel] [PATCH v1 03/13] qcow2: do not COW the empty areas
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,64 +29,76 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Anton Nefedov <anton.nefedov@virtuozzo.com>, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, den@virtuozzo.com, mreitz@redhat.com
+Cc: kwolf@redhat.com, "Denis V . Lunev" <den@openvz.org>, den@virtuozzo.com, mreitz@redhat.com
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---nG7eEBrDKswIoSiF9sEkgoE1lrs48ItQa
+--0F98DdVCwcHkJsIE1WjWUVWN45E8N4lXf
 From: Eric Blake <eblake@redhat.com>
 To: Anton Nefedov <anton.nefedov@virtuozzo.com>, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, den@virtuozzo.com, mreitz@redhat.com
-Message-ID: <903458e3-c82e-67d5-85f6-e1b67b829ec7@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v1 02/13] qcow2: is_zero_sectors(): return
- true if area is outside of backing file
+Cc: kwolf@redhat.com, "Denis V . Lunev" <den@openvz.org>, den@virtuozzo.com,
+ mreitz@redhat.com
+Message-ID: <fb751647-3473-76e2-bc49-bf2c9734a027@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v1 03/13] qcow2: do not COW the empty areas
 References: <1495186480-114192-1-git-send-email-anton.nefedov@virtuozzo.com>
- <1495186480-114192-3-git-send-email-anton.nefedov@virtuozzo.com>
- <7fbddc0e-298b-5973-8f0e-47b753ab41a8@redhat.com>
-In-Reply-To: <7fbddc0e-298b-5973-8f0e-47b753ab41a8@redhat.com>
+ <1495186480-114192-4-git-send-email-anton.nefedov@virtuozzo.com>
+In-Reply-To: <1495186480-114192-4-git-send-email-anton.nefedov@virtuozzo.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On 05/22/2017 02:12 PM, Eric Blake wrote:
+On 05/19/2017 04:34 AM, Anton Nefedov wrote:
+> If COW area of the newly allocated cluster is zeroes, there is no reaso=
+n
+> to write zero sectors in perform_cow() again now as whole clusters are
+> zeroed out in single chunks by handle_alloc_space().
 
->> +++ b/block/qcow2.c
->> @@ -2482,7 +2482,7 @@ static bool is_zero_sectors(BlockDriverState *bs=
-, int64_t start,
->>      int64_t res;
->> =20
->>      if (start + count > bs->total_sectors) {
->> -        count =3D bs->total_sectors - start;
->> +        count =3D start < bs->total_sectors ? bs->total_sectors - sta=
-rt : 0;
->>      }
->> =20
->>      if (!count) {
->> @@ -2490,7 +2490,9 @@ static bool is_zero_sectors(BlockDriverState *bs=
-, int64_t start,
->>      }
->>      res =3D bdrv_get_block_status_above(bs, NULL, start, count,
->>                                        &nr, &file);
->> -    return res >=3D 0 && (res & BDRV_BLOCK_ZERO) && nr =3D=3D count;
->> +    return res >=3D 0
->> +        && (((res & BDRV_BLOCK_ZERO) && nr =3D=3D count)
->> +            || nr =3D=3D 0);
+But that's only true if you can guarantee that handle_alloc_space()
+succeeded at ensuring the cluster reads as zeroes.  If you silently
+ignore errors (which is what patch 1/13 does), you risk assuming that
+the cluster reads as zeroes when in reality it does not, and then you
+have corrupted data.
+
+The idea of avoiding a COW of areas that read as zero at the source when
+the destination also already reads as zeroes makes sense, but I'm not
+convinced that this patch is safe as written.
+
 >=20
-> The logic makes sense to me, although the formatting is unusual (we ten=
-d
-> to split && and || with the operator at the tail of the previous line,
-> not the head of the new line).
+> Introduce QCowL2Meta field "reduced", since the existing fields
+> (offset and nb_bytes) still has to keep other write requests from
+> simultaneous writing in the area
 >=20
-> This quick check may make me revisit whether it is worth my my RFC
-> series about adding BDRV_BLOCK_EOF for more quickly tracking reads
-> beyond EOF (my solution in that series was able to make the same change=
+> iotest 060:
+> write to the discarded cluster does not trigger COW anymore.
+> so, break on write_aio event instead, will work for the test
+> (but write won't fail anymore, so update reference output)
+>=20
+> iotest 066:
+> cluster-alignment areas that were not really COWed are now detected
+> as zeroes, hence the initial write has to be exactly the same size for
+> the maps to match
+>=20
+> performance tests: =3D=3D=3D
+>=20
+> qemu-io,
+>   results in seconds to complete (less is better)
+>   random write 4k to empty image, no backing
+>     HDD
+>       64k cluster
+>         128M over 128M image:   160 -> 160 ( x1  )
+>         128M over   2G image:    86 ->  84 ( x1  )
+>         128M over   8G image:    40 ->  29 ( x1.4 )
+>       1M cluster
+>          32M over   8G image:    58 ->  23 ( x2.5 )
+>=20
+>     SSD
+>       64k cluster
+>           2G over   2G image:    71 ->  38 (  x1.9 )
+>         512M over   8G image:    85 ->   8 ( x10.6 )
+>       1M cluster
+>         128M over  32G image:   314 ->   2 ( x157  )
 
-> to test 154, but by doing it at the block layer instead of the qcow2.c
-> code).  https://lists.gnu.org/archive/html/qemu-devel/2017-05/msg01127.=
-html
-
-Actually, re-reading my RFC - I was able to change 6 instances in test
-154, while your tweak only affected 2 instances (you still left four
-instances that were allocating).  So my approach may still be more
-optimal in the long run.
+At any rate, the benchmark numbers show that there is merit to pursuing
+the idea of reducing I/O when partial cluster writes can avoid writing
+COW'd zeroes on either side of the data.
 
 --=20
 Eric Blake, Principal Software Engineer
@@ -96,7 +106,7 @@ Red Hat, Inc.           +1-919-301-3266
 Virtualization:  qemu.org | libvirt.org
 
 
---nG7eEBrDKswIoSiF9sEkgoE1lrs48ItQa
+--0F98DdVCwcHkJsIE1WjWUVWN45E8N4lXf
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
@@ -106,13 +116,13 @@ Version: GnuPG v2
 Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
 Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQEcBAEBCAAGBQJZIziiAAoJEKeha0olJ0Nqp5gIAJjo42vEVtWWeYgOxnJXFFnk
-zn8xZsb1YKCl2H80cMQP6bnydQLQxVLqfVQMjK4hrGuoqosXsx9O1Ifbybmqd8AO
-Ab7uI0bmJa6elT4W48ae91NDZtqak96ubZFhP4pMUkbY4VghQ2G4cFCl1hQhd8Xa
-YF45rtkR1Plkqu9n7mybKrdX/05wPhL6+YOx7Lp21Utcf0EX+9MN6/fClMfVY3cv
-2Z6dpda4LuRwRkgLkFEZZ58TK4H+T8YsT0Bx8HFf6UR7RAzZ+my+L4u7MZc5sDeD
-wyfk7RoP/GzIKwkh8prYgsKBLMC5aaWNuwSV3qzqv421TswGkktSRmym09L8NoI=
-=1GeZ
+iQEcBAEBCAAGBQJZIzr3AAoJEKeha0olJ0NqDQQH/jWWvm8FpGu5edo9Z1YW9jY4
+sp+5/bFnszioYnnilRAj2Rthe+/hOgAwsB0HkdCslAJfd29A1jWmWi7jIAyDRJ8L
+iQZbMT/0d1mQWdVOUotCXVEqV6d3tS/digWEEdGfjQZrBQPfzvBzYu/THbAJNlQA
+FdglH4pHrjW9SsNrGeq5pg0s2c18TYYj8OdkvGjJH9aV5jU0SqWp4JhpW7DhifUT
+uf2E8/DU93MgKrQSDmsmxUff5rDgkgpHdYjMis4Xxha2kbZapIXt24O05vHWFKXu
+flKMyTbrI+miU1NVa9whd7AsH4we+evGOqqi7eq5bZzcD+UrbnHvk21GszFlUtk=
+=Vn5n
 -----END PGP SIGNATURE-----
 
---nG7eEBrDKswIoSiF9sEkgoE1lrs48ItQa--
+--0F98DdVCwcHkJsIE1WjWUVWN45E8N4lXf--
