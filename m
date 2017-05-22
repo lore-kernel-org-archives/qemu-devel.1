@@ -1,46 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49146)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50990)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <nikunj@linux.vnet.ibm.com>) id 1dChOb-0007Mz-Bm
-	for qemu-devel@nongnu.org; Mon, 22 May 2017 03:04:51 -0400
+	(envelope-from <arei.gonglei@huawei.com>) id 1dChQf-00005F-Fb
+	for qemu-devel@nongnu.org; Mon, 22 May 2017 03:06:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <nikunj@linux.vnet.ibm.com>) id 1dChOX-0000es-Sq
-	for qemu-devel@nongnu.org; Mon, 22 May 2017 03:04:49 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:52793
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <nikunj@linux.vnet.ibm.com>)
-	id 1dChOX-0000cL-Mk
-	for qemu-devel@nongnu.org; Mon, 22 May 2017 03:04:45 -0400
-Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v4M6x8iN103074
-	for <qemu-devel@nongnu.org>; Mon, 22 May 2017 03:04:44 -0400
-Received: from e23smtp03.au.ibm.com (e23smtp03.au.ibm.com [202.81.31.145])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2aktkk9e87-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 22 May 2017 03:04:43 -0400
-Received: from localhost
-	by e23smtp03.au.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <nikunj@linux.vnet.ibm.com>;
-	Mon, 22 May 2017 17:04:41 +1000
-Received: from d23av06.au.ibm.com (d23av06.au.ibm.com [9.190.235.151])
-	by d23relay06.au.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
-	v4M74VjC19005610
-	for <qemu-devel@nongnu.org>; Mon, 22 May 2017 17:04:39 +1000
-Received: from d23av06.au.ibm.com (localhost [127.0.0.1])
-	by d23av06.au.ibm.com (8.14.4/8.14.4/NCO v10.0 AVout) with ESMTP id
-	v4M745rB025671
-	for <qemu-devel@nongnu.org>; Mon, 22 May 2017 17:04:06 +1000
-From: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
-In-Reply-To: <1495433816-4265-1-git-send-email-sandipandas1990@gmail.com>
-References: <1495433816-4265-1-git-send-email-sandipandas1990@gmail.com>
-Date: Mon, 22 May 2017 12:33:29 +0530
+	(envelope-from <arei.gonglei@huawei.com>) id 1dChQa-00028m-Hl
+	for qemu-devel@nongnu.org; Mon, 22 May 2017 03:06:57 -0400
+Received: from szxga03-in.huawei.com ([45.249.212.189]:3880)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
+	(envelope-from <arei.gonglei@huawei.com>) id 1dChQa-000278-03
+	for qemu-devel@nongnu.org; Mon, 22 May 2017 03:06:52 -0400
+From: "Gonglei (Arei)" <arei.gonglei@huawei.com>
+Date: Mon, 22 May 2017 07:04:49 +0000
+Message-ID: <33183CC9F5247A488A2544077AF19020DA2AF6CA@DGGEMA505-MBX.china.huawei.com>
+Content-Language: zh-CN
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Type: text/plain
-Message-Id: <87a865nzjy.fsf@abhimanyu.i-did-not-set--mail-host-address--so-tickle-me>
-Subject: Re: [Qemu-devel] [PATCH risu] ppc64: Fix patterns for rotate
- doubleword instructions
+Subject: [Qemu-devel] [RFC] memory consumption of Qemu is twice as much as
+ the previous version in KVM
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -49,74 +26,107 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Sandipan Das <sandipandas1990@gmail.com>
-Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org, joserz@linux.vnet.ibm.com
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>
 
-Sandipan Das <sandipandas1990@gmail.com> writes:
+Hi Paolo,
 
-> The patterns for the following instructions are fixed:
->  * Rotate Left Doubleword then Clear Right (rldcr[.])
->  * Rotate Left Doubleword Immediate then Clear Right (rldicr[.])
->  * Rotate Left Doubleword Immediate then Mask Insert (rldimi[.])
->
-> Signed-off-by: Sandipan Das <sandipandas1990@gmail.com>
-> ---
->  ppc64.risu | 10 +++++-----
->  1 file changed, 5 insertions(+), 5 deletions(-)
->
-> diff --git a/ppc64.risu b/ppc64.risu
-> index 28df9da..0f29248 100644
-> --- a/ppc64.risu
-> +++ b/ppc64.risu
-> @@ -1451,7 +1451,7 @@ RLDCLd PPC64LE 011110 rs:5 ra:5 rb:5 mb:6 10001 \
->  !constraints { $rs != 1 && $ra != 1 && $rb != 1 && $rs != 13 && $ra != 13 && $rb != 13; }
->
->  # format:MDS book:I page:103 PPC SR rldcr Rotate Left Dword then Clear Right
-> -RLCDR PPC64LE 011110 rs:5 ra:5 rb:5 mb:6 10010 \
-> +RLDCR PPC64LE 011110 rs:5 ra:5 rb:5 mb:6 10010 \
->  !constraints { $rs != 1 && $ra != 1 && $rb != 1 && $rs != 13 && $ra != 13 && $rb != 13; }
->  # format:MDS book:I page:103 PPC SR rldcr Rotate Left Dword then Clear Right
->  RLDCRd PPC64LE 011110 rs:5 ra:5 rb:5 mb:6 10011 \
-> @@ -1472,17 +1472,17 @@ RLDICLd PPC64LE 011110 rs:5 ra:5 sh:5 mb:6 000 sha:1 1 \
->  !constraints { $rs != 1 && $ra != 1 && $rs != 13 && $ra != 13; }
->
->  # format:MD book:I page:105 PPC SR rldicr[.] Rotate Left Dword Immediate then Clear Right
-> -RLDICR PPC64LE 011110 rs:5 ra:5 rb:5 me:6 00010 \
-> +RLDICR PPC64LE 011110 rs:5 ra:5 rb:5 me:6 001 sha:1 0 \
+I found that the latest Qemu eat 2 time memory in KVM since Qemu-2.3.0.
 
-   RLDICR PPC64LE 011110 rs:5 ra:5 sh:5 me:6 001 sha:1 0
+Replication Steps:
 
-Also "rb:5" be changed as "sh:5"?
+1. I created a CentOS 7 with 4U8G using Qemu-2.3.0,=20
 
->  !constraints { $rs != 1 && $ra != 1 && $rb != 1 && $rs != 13 && $ra != 13 && $rb != 13; }
->  # format:MD book:I page:105 PPC SR rldicr[.] Rotate Left Dword Immediate then Clear Right
-> -RLDICRd PPC64LE 011110 rs:5 ra:5 rb:5 me:6 00011 \
-> +RLDICRd PPC64LE 011110 rs:5 ra:5 rb:5 me:6 001 sha:1 1 \
+# grep kvm_kvzalloc /proc/vmallocinfo | awk '{total+=3D$2}; END {print tota=
+l}'
+16932864
+# grep kvm_kvzalloc /proc/vmallocinfo
+0xffffc900205c7000-0xffffc90020fc8000 10489856 kvm_kvzalloc+0x3c/0x40 [kvm]=
+ pages=3D2560 vmalloc vpages N1=3D2560
+0xffffc90020fc8000-0xffffc90020fce000   24576 kvm_kvzalloc+0x3c/0x40 [kvm] =
+pages=3D5 vmalloc N1=3D5
+0xffffc90020fce000-0xffffc90020fd4000   24576 kvm_kvzalloc+0x3c/0x40 [kvm] =
+pages=3D5 vmalloc N1=3D5
+0xffffc90020fd4000-0xffffc90020fd8000   16384 kvm_kvzalloc+0x3c/0x40 [kvm] =
+pages=3D3 vmalloc N1=3D3
+0xffffc9002438b000-0xffffc9002498c000 6295552 kvm_kvzalloc+0x3c/0x40 [kvm] =
+pages=3D1536 vmalloc vpages N1=3D1536
+0xffffc9002498c000-0xffffc90024990000   16384 kvm_kvzalloc+0x3c/0x40 [kvm] =
+pages=3D3 vmalloc N1=3D3
+0xffffc90024990000-0xffffc90024994000   16384 kvm_kvzalloc+0x3c/0x40 [kvm] =
+pages=3D3 vmalloc N1=3D3
+0xffffc90024994000-0xffffc90024997000   12288 kvm_kvzalloc+0x3c/0x40 [kvm] =
+pages=3D2 vmalloc N1=3D2
+0xffffc90024a75000-0xffffc90024a7e000   36864 kvm_kvzalloc+0x3c/0x40 [kvm] =
+pages=3D8 vmalloc N1=3D8
 
-   RLDICRd PPC64LE 011110 rs:5 ra:5 sh:5 me:6 001 sha:1 0
+PS: There is only this VM in my host.
+
+2. Do the same test using the latest Qemu:
+
+# grep kvm_kvzalloc /proc/vmallocinfo | awk '{total+=3D$2}; END {print tota=
+l}'
+33865728
+linux-PsHdkO:~ # grep kvm_kvzalloc /proc/vmallocinfo=20
+0xffffc9001f181000-0xffffc9001fb82000 10489856 kvm_kvzalloc+0x25/0x30 [kvm]=
+ pages=3D2560 vmalloc vpages N1=3D2560
+0xffffc9001fb82000-0xffffc9001fb88000   24576 kvm_kvzalloc+0x25/0x30 [kvm] =
+pages=3D5 vmalloc N1=3D5
+0xffffc9001fb88000-0xffffc9001fb8e000   24576 kvm_kvzalloc+0x25/0x30 [kvm] =
+pages=3D5 vmalloc N1=3D5
+0xffffc9001fb8e000-0xffffc9001fb92000   16384 kvm_kvzalloc+0x25/0x30 [kvm] =
+pages=3D3 vmalloc N1=3D3
+0xffffc90020854000-0xffffc90021255000 10489856 kvm_kvzalloc+0x25/0x30 [kvm]=
+ pages=3D2560 vmalloc vpages N1=3D2560
+0xffffc90021255000-0xffffc9002125b000   24576 kvm_kvzalloc+0x25/0x30 [kvm] =
+pages=3D5 vmalloc N1=3D5
+0xffffc9002125b000-0xffffc90021261000   24576 kvm_kvzalloc+0x25/0x30 [kvm] =
+pages=3D5 vmalloc N1=3D5
+0xffffc90021261000-0xffffc90021265000   16384 kvm_kvzalloc+0x25/0x30 [kvm] =
+pages=3D3 vmalloc N1=3D3
+0xffffc9002616e000-0xffffc90026172000   16384 kvm_kvzalloc+0x25/0x30 [kvm] =
+pages=3D3 vmalloc N1=3D3
+0xffffc90026172000-0xffffc90026176000   16384 kvm_kvzalloc+0x25/0x30 [kvm] =
+pages=3D3 vmalloc N1=3D3
+0xffffc90026176000-0xffffc90026179000   12288 kvm_kvzalloc+0x25/0x30 [kvm] =
+pages=3D2 vmalloc N1=3D2
+0xffffc900261a9000-0xffffc900261ad000   16384 kvm_kvzalloc+0x25/0x30 [kvm] =
+pages=3D3 vmalloc N1=3D3
+0xffffc900261ad000-0xffffc900261b1000   16384 kvm_kvzalloc+0x25/0x30 [kvm] =
+pages=3D3 vmalloc N1=3D3
+0xffffc900261b1000-0xffffc900261b4000   12288 kvm_kvzalloc+0x25/0x30 [kvm] =
+pages=3D2 vmalloc N1=3D2
+0xffffc900280fe000-0xffffc900286ff000 6295552 kvm_kvzalloc+0x25/0x30 [kvm] =
+pages=3D1536 vmalloc vpages N1=3D1536
+0xffffc900286ff000-0xffffc90028d00000 6295552 kvm_kvzalloc+0x25/0x30 [kvm] =
+pages=3D1536 vmalloc vpages N1=3D1536
+0xffffc90028d87000-0xffffc90028d90000   36864 kvm_kvzalloc+0x25/0x30 [kvm] =
+pages=3D8 vmalloc N1=3D8
+0xffffc90028d9c000-0xffffc90028da5000   36864 kvm_kvzalloc+0x25/0x30 [kvm] =
+pages=3D8 vmalloc N1=3D8
 
 
->  !constraints { $rs != 1 && $ra != 1 && $rb != 1 && $rs != 13 && $ra != 13 && $rb != 13; }
->
->  # format:MD book:I page:105 PPC SR rldimi[.] Rotate Left Dword Immediate then Mask Insert
-> -RLDIMI PPC64LE 011110 rs:5 ra:5 rb:5 me:6 00110 \
-> +RLDIMI PPC64LE 011110 rs:5 ra:5 rb:5 me:6 011 sha:1 0 \
+3. I found the first bad commit by 'git biscet'
 
-   RLDIMI PPC64LE 011110 rs:5 ra:5 sh:5 me:6 011 sha:1 0
+linux-arei:/mnt/sdb/gonglei/opensource/qemu # git bisect bad
+6410848bec38089424d54a6a8f10d4cf77182b5d is the first bad commit
+commit 6410848bec38089424d54a6a8f10d4cf77182b5d
+Author: Paolo Bonzini <pbonzini@redhat.com>
+Date:   Thu Jun 18 18:30:16 2015 +0200
+
+    target-i386: register a separate KVM address space including SMRAM regi=
+ons
+   =20
+    Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+
+:040000 040000 b2435d7cd0829e6416b316f1ae2856e6f7b0023d 1acb81aecaf50f2d313=
+b33f2b61a24f7f0bd6f07 M      target-i386
+linux-PsHdkO:/mnt/sdb/gonglei/opensource/qemu #
 
 
->  !constraints { $rs != 1 && $ra != 1 && $rb != 1 && $rs != 13 && $ra != 13 && $rb != 13; }
->  # format:MD book:I page:105 PPC SR rldimi[.] Rotate Left Dword Immediate then Mask Insert
-> -RLDIMId PPC64LE 011110 rs:5 ra:5 rb:5 me:6 00111 \
-> +RLDIMId PPC64LE 011110 rs:5 ra:5 rb:5 me:6 011 sha:1 1 \
+Any ideas about this change? Do we really need to trigger two times memory =
+region allocation?
 
-   RLDIMId PPC64LE 011110 rs:5 ra:5 sh:5 me:6 011 sha:1 1
 
->  !constraints { $rs != 1 && $ra != 1 && $rb != 1 && $rs != 13 && $ra != 13 && $rb != 13; }
->
->  # format:M book:I page:102 v:P1 SR rlwimi[.] Rotate Left Word Immediate then Mask Insert
-> -- 
-> 2.7.4
-
-Regards,
-Nikunj
+Thanks,
+-Gonglei
