@@ -1,28 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37033)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38293)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1dCrNf-0000iz-FG
-	for qemu-devel@nongnu.org; Mon, 22 May 2017 13:44:32 -0400
+	(envelope-from <eblake@redhat.com>) id 1dCrQA-0001S5-7v
+	for qemu-devel@nongnu.org; Mon, 22 May 2017 13:47:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1dCrNa-0000a6-K5
-	for qemu-devel@nongnu.org; Mon, 22 May 2017 13:44:31 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:49874)
+	(envelope-from <eblake@redhat.com>) id 1dCrQ5-0001vn-M7
+	for qemu-devel@nongnu.org; Mon, 22 May 2017 13:47:06 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53403)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1dCrNa-0000Z0-Bd
-	for qemu-devel@nongnu.org; Mon, 22 May 2017 13:44:26 -0400
-Date: Mon, 22 May 2017 20:44:24 +0300
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20170522204309-mutt-send-email-mst@kernel.org>
-References: <1495446630-365062-1-git-send-email-eyakovlev@virtuozzo.com>
-	<1495446630-365062-2-git-send-email-eyakovlev@virtuozzo.com>
-	<20170522123524.4c0bff9d@nial.brq.redhat.com>
-	<894afc82-4214-1734-d5ea-532218fac34c@virtuozzo.com>
-	<20170522145856.4728a2a4@nial.brq.redhat.com>
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dCrQ5-0001ug-C2
+	for qemu-devel@nongnu.org; Mon, 22 May 2017 13:47:01 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 45BDE47041
+	for <qemu-devel@nongnu.org>; Mon, 22 May 2017 17:47:00 +0000 (UTC)
+References: <1495471335-23707-1-git-send-email-armbru@redhat.com>
+	<1495471335-23707-2-git-send-email-armbru@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <49915086-e945-1ccc-2928-7de0c3c3469c@redhat.com>
+Date: Mon, 22 May 2017 12:46:58 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170522145856.4728a2a4@nial.brq.redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] acpi: change CPU container node _HID to
- compatible PNP0A05
+In-Reply-To: <1495471335-23707-2-git-send-email-armbru@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="671V2fn58i3l2UftHLO3dp0wFluCDI8ik"
+Subject: Re: [Qemu-devel] [PATCH 1/4] qobject-input-visitor: Reject
+ non-finite numbers with keyval
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,101 +35,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: Evgeny Yakovlev <eyakovlev@virtuozzo.com>, Denis Lunev <den@virtuozzo.com>, rkagan@virtuozzo.com, qemu-devel@nongnu.org
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+Cc: mlureau@redhat.com
 
-On Mon, May 22, 2017 at 02:58:56PM +0200, Igor Mammedov wrote:
-> On Mon, 22 May 2017 14:01:15 +0300
-> Evgeny Yakovlev <eyakovlev@virtuozzo.com> wrote:
-> 
-> > On 22.05.2017 13:35, Igor Mammedov wrote:
-> > > On Mon, 22 May 2017 12:50:30 +0300
-> > > Evgeny Yakovlev <eyakovlev@virtuozzo.com> wrote:
-> > >  
-> > >> When running windows 2016 server guests we have encountered a problem
-> > >> with ACPI representation of CPU devices. This windows version contains a
-> > >> hidinterrupt.sys driver which looks for ACPI device node with _HID set
-> > >> to "ACPI0010" and "ACPI0011". ACPI0010 is also a valid id for CPU
-> > >> container device which qemu uses.
-> > >>
-> > >> hidinterrupt driver takes over (even though it fails) ACPI0010 node and
-> > >> thus hides its children -- the CPUs -- from the regular ACPI
-> > >> enumeration.  So there are no processors in the Windows device tree
-> > >> Device Manager or "!devnode 0 1" in the debugger.
-> > >>
-> > >> hidinterrupt.inf as shipped with Windows 2016 has both ACPI0011 and
-> > >> ACPI0010; the record for the latter is preceded with a comment "This Id
-> > >> is not to be used. It will be removed once everyone has stopped using
-> > >> it."  So I guess the typo was not in the driver but in the ACPI tables
-> > >> of some device(s) which the driver wanted to support despite the bug.
-> > >>
-> > >> For reference this is a known issue:
-> > >> https://bugzilla.redhat.com/show_bug.cgi?id=1377155#c31
-> > >>
-> > >> This change works around this problem by setting qemu CPU container ACPI
-> > >> _HID to compatible PNP0A05.  
-> > > I'd say NACK to it.
-> > > It's Windows server 2016 bug that violates spec and
-> > > it's been reported to them before RTM has been released.
-> > > So complain to Microsoft support and make them fix it.
-> > >
-> > > Meanwhile there is MS suggested workaround to fix issue,
-> > > one can use https://bugzilla.redhat.com/show_bug.cgi?id=1377155#c17
-> > >
-> > > Perhaps I should add workaround link as comment above line:
-> > >
-> > > aml_append(cpus_dev, aml_name_decl("_HID", aml_string("ACPI0010")));  
-> > 
-> > Thanks for replying!
-> > 
-> > Strictly speaking, this is not a Windows bug. Comment in INF file says 
-> > that they had to support a hardware device which erroneously picked this 
-> > ACPI HID.
-> in linux kernel we use device specific quirks to workaround broken hardware,
-> there is no point to break generic code for all hardware configurations
-> for the sake of one broken firmware.
-> So it's Windows problem that they prefer to violate spec and cannibalize
-> ACPI0010 for the sake of broken firmware. Open support case with Windows,
-> the more complains they get, the more chances that they'll fix it.
-> 
-> > I understand that this is not a qemu problem either. Then again other 
-> > emulators we've tested this on (VirtualBox, Parallels, HyperV) provide a 
-> > compatible ACPI configuration and don't trigger this conflict. If this 
-> we provide it, that's what '_CID' field is for, so OS that doesn't know
-> about ACPI0010 would be happy (any Windows prior Win10/2016)
-> 
-> > fix is not a big deal and does not affect anything negatively then maybe 
-> > we pay a relatively small price to improve compatibility with some guest 
-> > systems?
-> we plan to reuse this code for ARM in future and it might use
-> ACPI0010 container as per spec to describe modeled topology.
-> Hence no workaround in QEMU, just use MS suggested workaround
-> to remove wrong device binding in WS2016 until they actually
-> fix it.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--671V2fn58i3l2UftHLO3dp0wFluCDI8ik
+From: Eric Blake <eblake@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+Cc: mlureau@redhat.com
+Message-ID: <49915086-e945-1ccc-2928-7de0c3c3469c@redhat.com>
+Subject: Re: [PATCH 1/4] qobject-input-visitor: Reject non-finite numbers with
+ keyval
+References: <1495471335-23707-1-git-send-email-armbru@redhat.com>
+ <1495471335-23707-2-git-send-email-armbru@redhat.com>
+In-Reply-To: <1495471335-23707-2-git-send-email-armbru@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-I wonder whether adding an INF with a stub driver
-on the install disk can also help as a work-around.
-Thoughts?
+On 05/22/2017 11:42 AM, Markus Armbruster wrote:
+> The QObject input visitor can produce only finite numbers when its
+> input comes out of the JSON parser, because the the JSON parser
+> implements RFC 7159, which provides no syntax for infinity and NaN.
+>=20
+> However, it can produce infinity and NaN when its input comes out of
+> keyval_parse(), because we parse with strtod() then.
+>=20
+> The keyval variant should not be able to express things the JSON
+> variant can't.  Rejecting non-finite numbers there is the conservative
+> fix.  It's also minimally invasive.
+
+I also posted patches once (and should revive them) to add more
+assertions in our code base that we aren't passing non-finite numbers to
+the JSON outputter.
+
+>=20
+> We could instead extend our JSON dialect to provide for infinity and
+> NaN.  Not today.
+>=20
+> Note that the JSON formatter can emit non-finite numbers (marked FIXME
+> in commit 6e8e5cb).
+>=20
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+> ---
+>  qapi/qobject-input-visitor.c       | 3 ++-
+>  tests/test-qobject-input-visitor.c | 6 ++++++
+>  2 files changed, 8 insertions(+), 1 deletion(-)
+
+Reviewed-by: Eric Blake <eblake@redhat.com>
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
 
 
-> 
-> > >> Signed-off-by: Evgeny Yakovlev <eyakovlev@virtuozzo.com>
-> > >> ---
-> > >>   hw/acpi/cpu.c | 2 +-
-> > >>   1 file changed, 1 insertion(+), 1 deletion(-)
-> > >>
-> > >> diff --git a/hw/acpi/cpu.c b/hw/acpi/cpu.c
-> > >> index a233fe1..b93db40 100644
-> > >> --- a/hw/acpi/cpu.c
-> > >> +++ b/hw/acpi/cpu.c
-> > >> @@ -397,7 +397,7 @@ void build_cpus_aml(Aml *table, MachineState *machine, CPUHotplugFeatures opts,
-> > >>           Aml *rm_evt = aml_name("%s.%s", cphp_res_path, CPU_REMOVE_EVENT);
-> > >>           Aml *ej_evt = aml_name("%s.%s", cphp_res_path, CPU_EJECT_EVENT);
-> > >>   
-> > >> -        aml_append(cpus_dev, aml_name_decl("_HID", aml_string("ACPI0010")));
-> > >> +        aml_append(cpus_dev, aml_name_decl("_HID", aml_string("PNP0A05")));
-> > >>           aml_append(cpus_dev, aml_name_decl("_CID", aml_eisaid("PNP0A05")));
-> > >>   
-> > >>           method = aml_method(CPU_NOTIFY_METHOD, 2, AML_NOTSERIALIZED);  
-> > 
-> > 
+--671V2fn58i3l2UftHLO3dp0wFluCDI8ik
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEcBAEBCAAGBQJZIyQTAAoJEKeha0olJ0NqmCoH/2D688rVw7EQJMlTWBPABZF4
+LiqPXagTMlFJt6yXAwa9kBbdpGYT+uUst7WcRAsvA0zohjtiusE6kcJWEpNZQc5W
+/RY+lK4XFP4l5xLJDJ83TWxoEsrDc1KUkbWL+QSmD264h9rNuf9UESviETvVa5UF
+GrD9OhetFrkwgGChT1Z0ROMqDlYX61xIf/Ss/9jLnJPNhud8sBy/xvEbpsL0Crkl
+b405Pmf4P/LjeyZW2f1XoOte0xXpzpGaN+2XZZy22nEzt5S7bx9NmFBQWz+bMJ43
+5L+93FQU09wKRN4dNNuPNZGLhsqn7q39UmLzE7tVyLan8bNayv5AnRjLmbHlTtI=
+=V3D4
+-----END PGP SIGNATURE-----
+
+--671V2fn58i3l2UftHLO3dp0wFluCDI8ik--
