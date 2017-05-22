@@ -1,33 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36510)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37892)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dCpry-0002SU-SI
-	for qemu-devel@nongnu.org; Mon, 22 May 2017 12:07:47 -0400
+	(envelope-from <eblake@redhat.com>) id 1dCpz6-0004at-25
+	for qemu-devel@nongnu.org; Mon, 22 May 2017 12:15:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dCprx-00078m-E1
-	for qemu-devel@nongnu.org; Mon, 22 May 2017 12:07:42 -0400
-Received: from indium.canonical.com ([91.189.90.7]:54890)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1dCprx-00076z-88
-	for qemu-devel@nongnu.org; Mon, 22 May 2017 12:07:41 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1dCprv-0006n3-Jq
-	for <qemu-devel@nongnu.org>; Mon, 22 May 2017 16:07:39 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id D7B1C2E80D5
-	for <qemu-devel@nongnu.org>; Mon, 22 May 2017 16:07:31 +0000 (UTC)
+	(envelope-from <eblake@redhat.com>) id 1dCpz1-0000x3-Tl
+	for qemu-devel@nongnu.org; Mon, 22 May 2017 12:15:04 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:27818)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dCpz1-0000wv-KB
+	for qemu-devel@nongnu.org; Mon, 22 May 2017 12:14:59 -0400
+References: <1494595886-30912-1-git-send-email-a.perevalov@samsung.com>
+	<CGME20170512133148eucas1p2c04111d415b1fbd6fb702cfc2a3ed6f9@eucas1p2.samsung.com>
+	<1494595886-30912-9-git-send-email-a.perevalov@samsung.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <af4f91ca-0b56-b734-58b8-5b5b668d5dd4@redhat.com>
+Date: Mon, 22 May 2017 11:14:54 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 22 May 2017 15:48:41 -0000
-From: Thomas Huth <1297487@bugs.launchpad.net>
-Reply-To: Bug 1297487 <1297487@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20140325201253.30630.89237.malonedeb@gac.canonical.com>
-Message-Id: <149546812160.11684.2988735321091806070.malone@soybean.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1297487] Re: MTU not honored in virtio vnet
+In-Reply-To: <1494595886-30912-9-git-send-email-a.perevalov@samsung.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="uNpFdk5r9Rjx14sbW6uGSjx8r9rL8aPgJ"
+Subject: Re: [Qemu-devel] [PATCH V5 8/9] migration: add postcopy total
+ blocktime into query-migrate
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,215 +30,105 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Alexey Perevalov <a.perevalov@samsung.com>, qemu-devel@nongnu.org
+Cc: i.maximets@samsung.com, dgilbert@redhat.com, peterx@redhat.com
 
-Did anybody ever tried to reproduce this bug with upstream QEMU?
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--uNpFdk5r9Rjx14sbW6uGSjx8r9rL8aPgJ
+From: Eric Blake <eblake@redhat.com>
+To: Alexey Perevalov <a.perevalov@samsung.com>, qemu-devel@nongnu.org
+Cc: i.maximets@samsung.com, dgilbert@redhat.com, peterx@redhat.com
+Message-ID: <af4f91ca-0b56-b734-58b8-5b5b668d5dd4@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH V5 8/9] migration: add postcopy total
+ blocktime into query-migrate
+References: <1494595886-30912-1-git-send-email-a.perevalov@samsung.com>
+ <CGME20170512133148eucas1p2c04111d415b1fbd6fb702cfc2a3ed6f9@eucas1p2.samsung.com>
+ <1494595886-30912-9-git-send-email-a.perevalov@samsung.com>
+In-Reply-To: <1494595886-30912-9-git-send-email-a.perevalov@samsung.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-** Changed in: qemu
-       Status: New =3D> Incomplete
+On 05/12/2017 08:31 AM, Alexey Perevalov wrote:
+> Postcopy total blocktime is available on destination side only.
+> But query-migrate was possible only for source. This patch
+> adds ability to call query-migrate on destination. To distinguish
+> src/dst, state of the MigrationState is using, query-migrate prepares
+> MigrationInfo for source machine only in case of migration's state is d=
+ifferent
+> than MIGRATION_STATUS_NONE.
+>=20
+> To be able to see postcopy blocktime, need to request postcopy-blocktim=
+e
+> capability.
+>=20
+> The query-migrate command will show following sample result:
+> {"return":
+>     "postcopy_vcpu_blocktime": [115, 100],
+>     "status": "completed",
+>     "postcopy_blocktime": 100
+> }}
+>=20
+> postcopy_vcpu_blocktime contains list, where the first item is the firs=
+t
+> vCPU in QEMU.
+>=20
+> Signed-off-by: Alexey Perevalov <a.perevalov@samsung.com>
+> ---
 
--- =
+> +++ b/qapi-schema.json
+> @@ -712,6 +712,8 @@
+>  #              @status is 'failed'. Clients should not attempt to pars=
+e the
+>  #              error strings. (Since 2.7)
+>  #
+> +# @postcopy_vcpu_blocktime: list of the postcopy blocktime per vCPU (S=
+ince 2.9)
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1297487
+You've missed 2.9; this should be 2.10.
 
-Title:
-  MTU not honored in virtio vnet
+> +#
+>  # Since: 0.14.0
+>  ##
+>  { 'struct': 'MigrationInfo',
+> @@ -723,7 +725,9 @@
+>             '*downtime': 'int',
+>             '*setup-time': 'int',
+>             '*cpu-throttle-percentage': 'int',
+> -           '*error-desc': 'str'} }
+> +           '*error-desc': 'str',
+> +           '*postcopy_blocktime' : 'int64',
+> +           '*postcopy_vcpu_blocktime': ['int64']} }
 
-Status in QEMU:
-  Incomplete
-Status in Salt:
-  New
-Status in qemu-kvm package in Ubuntu:
-  Confirmed
+You're adding two fields, but only documented one of them
+(postcopy_blocktime needs mention).
 
-Bug description:
-  I am observing a potential regression/different behavior between rel.
-  14.04 (dev branch) and release 13.04.
+New fields should favor names with '-', not '_'; especially when part of
+a struct that is already using '-' names.  So these should be
+'postcopy-blocktime' and 'postcopy-vcpu-blocktime'.
 
-  My hardware is: Cisco UCS blade B200-M3 and the network adapter card:
-  Cisco UCS VIC 1240.
-
-  lsb_release -rd
-  Description:	Ubuntu Trusty Tahr (development branch)
-  Release:	14.04
-
-  uname -a
-  Linux konan2 3.13.0-19-generic #40-Ubuntu SMP Mon Mar 24 02:36:06 UTC 201=
-4 x86_64 x86_64 x86_64 GNU/Linux
-
-  The problem:
-  After starting a kvm with virtio interfaces I am passing HTTP traffic via=
- an external network traffic simulator.
-  The tool is sending a TCP packet of 3481B, because the tool MTU is set to=
- 1400B, it splits the packets into 3 TCP segments.
-  When the 3 segments are received at the host eth1 interface, the host (ub=
-untu 14.04) reassembles the TCP packets into a larger packet (GRO), then pa=
-sses the packet up on vnet1. At this point, because vnet1 MTU is 1500B, it =
-is supposed to re-segment the packet and pass the 3 segments up to the VM. =
-But it passes the big 3481B packet instead.
-
-  This behavior did not happen when I tried the same scenario in release
-  13.04
-
-  I can disable this behavior by disabling TSO (TCP segment offloading
-  in the vnet), but I did not have to do this in rel. 13.04 and I feel
-  the MTU is not honored as it should be with rel. 14.04.
-
-   ip link show | grep eth1
-  3: eth1: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc mq master br1 s=
-tate UP mode DEFAULT group default qlen 1000
-   ip link show | grep vnet1
-  16: vnet1: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc pfifo_fast ma=
-ster br1 state UNKNOWN mode DEFAULT group default qlen 500
-
-  I am attaching two tcpdump/pcap traces that show a TCP transaction
-  passing on vnet1 when TSO is on and when TSO is off.
-
-  Please see:
-
-  - vnet1_tso_on.pcap
-  - vnet1_tso_off.pcap
-
-  in attachment.
-
-  I noticed there was a driver upgrade in rel. 14.04:
-
-  in 14.04:
-
-  ethtool -i eth1
-  driver: enic
-  version: 2.1.1.50  =
-
-  firmware-version: 2.1(3a)
-  bus-info: 0000:07:00.0
-  supports-statistics: yes
-  supports-test: no
-  supports-eeprom-access: no
-  supports-register-dump: no
-  supports-priv-flags: no
-
-  ethtool -i vnet1
-  driver: tun
-  version: 1.6
-  firmware-version: =
-
-  bus-info: tap
-  supports-statistics: no
-  supports-test: no
-  supports-eeprom-access: no
-  supports-register-dump: no
-  supports-priv-flags: no
-
-  ethtool -k vnet1
-  Features for vnet1:
-  rx-checksumming: off [fixed]
-  tx-checksumming: on
-  	tx-checksum-ipv4: off [fixed]
-  	tx-checksum-ip-generic: on
-  	tx-checksum-ipv6: off [fixed]
-  	tx-checksum-fcoe-crc: off [fixed]
-  	tx-checksum-sctp: off [fixed]
-  scatter-gather: on
-  	tx-scatter-gather: on
-  	tx-scatter-gather-fraglist: on
-  tcp-segmentation-offload: off
-  	tx-tcp-segmentation: off
-  	tx-tcp-ecn-segmentation: off
-  	tx-tcp6-segmentation: off
-  udp-fragmentation-offload: on
-  generic-segmentation-offload: on
-  generic-receive-offload: on
-  large-receive-offload: off [fixed]
-  rx-vlan-offload: off [fixed]
-  tx-vlan-offload: on
-  ntuple-filters: off [fixed]
-  receive-hashing: off [fixed]
-  highdma: off [fixed]
-  rx-vlan-filter: off [fixed]
-  vlan-challenged: off [fixed]
-  tx-lockless: off [fixed]
-  netns-local: off [fixed]
-  tx-gso-robust: off [fixed]
-  tx-fcoe-segmentation: off [fixed]
-  tx-gre-segmentation: off [fixed]
-  tx-ipip-segmentation: off [fixed]
-  tx-sit-segmentation: off [fixed]
-  tx-udp_tnl-segmentation: off [fixed]
-  tx-mpls-segmentation: off [fixed]
-  fcoe-mtu: off [fixed]
-  tx-nocache-copy: on
-  loopback: off [fixed]
-  rx-fcs: off [fixed]
-  rx-all: off [fixed]
-  tx-vlan-stag-hw-insert: on
-  rx-vlan-stag-hw-parse: off [fixed]
-  rx-vlan-stag-filter: off [fixed]
-  l2-fwd-offload: off [fixed]
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
 
 
-  in 13.04 :
+--uNpFdk5r9Rjx14sbW6uGSjx8r9rL8aPgJ
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-  ethtool -i eth1
-  driver: enic
-  version: 2.1.1.39
-  firmware-version: 2.1(3a)
-  bus-info: 0000:07:00.0
-  supports-statistics: yes
-  supports-test: no
-  supports-eeprom-access: no
-  supports-register-dump: no
-  supports-priv-flags: no
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-  =
+iQEcBAEBCAAGBQJZIw5+AAoJEKeha0olJ0Nq7J4IAJSFb1+DwfAMTQaes5YvjDR4
+NdPVOmB2RpLctwKRr1thDboGp54ghdhPWdasxpk43dczMQXE17dwFQn24VpIA2cl
+zze9ALVHfCz6BYxCg3tizRW0Km211GaE/4Rt/GuXr6PbX3iYFKFhH751bvmxmEoK
+yV2K3rEFvtn+TQoUBQC/XBGCyV9DaDJVqWFU8wf5gbKtYZq6Ls4whBTQ5/OipPS6
+eVc0xZiHpEh0bXfvf74JmBBP/JDQyI68osmWwY476fNv+OtlVfSQdVJwrXS9puXO
+UJ3MyPROaXe2NFPxVqSF4yM/5Fo5inFkhoy0Xhw7i/78IntmsU0Ij0m7Aje7qYY=
+=ZmlP
+-----END PGP SIGNATURE-----
 
-  ethtool -i vnet1
-  driver: tun
-  version: 1.6
-  firmware-version: =
-
-  bus-info: tap
-  supports-statistics: no
-  supports-test: no
-  supports-eeprom-access: no
-  supports-register-dump: no
-  supports-priv-flags: no
-
-  =
-
-  ethtool -k vnet1
-  Features for vnet1:
-  rx-checksumming: off [fixed]
-  tx-checksumming: on
-  	tx-checksum-ipv4: off [fixed]
-  	tx-checksum-ip-generic: on
-  	tx-checksum-ipv6: off [fixed]
-  	tx-checksum-fcoe-crc: off [fixed]
-  	tx-checksum-sctp: off [fixed]
-  scatter-gather: on
-  	tx-scatter-gather: on
-  	tx-scatter-gather-fraglist: on
-  tcp-segmentation-offload: on
-  	tx-tcp-segmentation: on
-  	tx-tcp-ecn-segmentation: on
-  	tx-tcp6-segmentation: on
-  udp-fragmentation-offload: on
-  generic-segmentation-offload: on
-  generic-receive-offload: on
-  large-receive-offload: off [fixed]
-  rx-vlan-offload: off [fixed]
-  tx-vlan-offload: off [fixed]
-  ntuple-filters: off [fixed]
-  receive-hashing: off [fixed]
-  highdma: off [fixed]
-  rx-vlan-filter: off [fixed]
-  vlan-challenged: off [fixed]
-  tx-lockless: off [fixed]
-  netns-local: off [fixed]
-  tx-gso-robust: off [fixed]
-  tx-fcoe-segmentation: off [fixed]
-  fcoe-mtu: off [fixed]
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1297487/+subscriptions
+--uNpFdk5r9Rjx14sbW6uGSjx8r9rL8aPgJ--
