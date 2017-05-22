@@ -1,26 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39602)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48555)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dCh1H-0001Vd-10
-	for qemu-devel@nongnu.org; Mon, 22 May 2017 02:40:44 -0400
+	(envelope-from <imammedo@redhat.com>) id 1dChO3-00076A-KM
+	for qemu-devel@nongnu.org; Mon, 22 May 2017 03:04:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dCh1C-00071a-Vg
-	for qemu-devel@nongnu.org; Mon, 22 May 2017 02:40:43 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:41850)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dCh1C-00071J-MU
-	for qemu-devel@nongnu.org; Mon, 22 May 2017 02:40:38 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <cover.1495018956.git.maozy.fnst@cn.fujitsu.com>
-	<645c1b3e6fc23605365c0685d94ec50df7a7fd2b.1495018956.git.maozy.fnst@cn.fujitsu.com>
-	<87y3ttgvn3.fsf@dusky.pond.sub.org>
-	<8925c606-5d9c-4c7a-f812-2cb71ec74855@cn.fujitsu.com>
-Date: Mon, 22 May 2017 08:40:35 +0200
-In-Reply-To: <8925c606-5d9c-4c7a-f812-2cb71ec74855@cn.fujitsu.com> (Mao
-	Zhongyi's message of "Mon, 22 May 2017 12:17:11 +0800")
-Message-ID: <87tw4d4cnw.fsf@dusky.pond.sub.org>
+	(envelope-from <imammedo@redhat.com>) id 1dChO2-0000HI-EF
+	for qemu-devel@nongnu.org; Mon, 22 May 2017 03:04:15 -0400
+Date: Mon, 22 May 2017 09:04:03 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20170522090403.4b284345@nial.brq.redhat.com>
+In-Reply-To: <20170518185058.GP4748@thinpad.lan.raisama.net>
+References: <1495094971-177754-1-git-send-email-imammedo@redhat.com>
+	<1495094971-177754-3-git-send-email-imammedo@redhat.com>
+	<20170518185058.GP4748@thinpad.lan.raisama.net>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v4 3/3] net/rocker: Convert to realize()
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 2/3] numa: move default mapping init to
+ machine
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,201 +25,138 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
-Cc: jasowang@redhat.com, jiri@resnulli.us, qemu-devel@nongnu.org, f4bug@amsat.org
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-arm@nongnu.org, qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, Andrew Jones <drjones@redhat.com>
 
-Mao Zhongyi <maozy.fnst@cn.fujitsu.com> writes:
+On Thu, 18 May 2017 15:50:58 -0300
+Eduardo Habkost <ehabkost@redhat.com> wrote:
 
-> Hi, Markus
->
-> On 05/19/2017 03:20 PM, Markus Armbruster wrote:
->> Mao Zhongyi <maozy.fnst@cn.fujitsu.com> writes:
->>
->>> The rocker device still implements the old PCIDeviceClass .init()
->>> instead of the new .realize(). All devices need to be converted to
->>> .realize().
->>>
->>> .init() reports errors with fprintf() and return 0 on success, negative
->>> number on failure. Meanwhile, when -device rocker fails, it first report
->>> a specific error, then a generic one, like this:
->>>
->>>     $ x86_64-softmmu/qemu-system-x86_64 -device rocker,name=qemu-rocker
->>>     rocker: name too long; please shorten to at most 9 chars
->>>     qemu-system-x86_64: -device rocker,name=qemu-rocker: Device initialization failed
->>>
->>> Now, convert it to .realize() that passes errors to its callers via its
->>> errp argument. Also avoid the superfluous second error message. After
->>> the patch, effect like this:
->>>
->>>     $ x86_64-softmmu/qemu-system-x86_64 -device rocker,name=qemu-rocker
->>>     qemu-system-x86_64: -device rocker,name=qemu-rocker: name too long; please shorten to at most 9 chars
->>>
->>> Cc: jasowang@redhat.com
->>> Cc: jiri@resnulli.us
->>> Cc: f4bug@amsat.org
->>> Cc: armbru@redhat.com
->>> Signed-off-by: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
->>
->> The conversion to realize() looks good to me, therefore
->> Reviewed-by: Markus Armbruster <armbru@redhat.com>
->>
->> However, I spotted a few issues not related to this patch.
->>
->> 1. Unusual macro names
->>
->>     #define ROCKER "rocker"
->>
->>     #define to_rocker(obj) \
->>         OBJECT_CHECK(Rocker, (obj), ROCKER)
->>
->>    Please clean up to
->>
->>     #define TYPE_ROCKER "rocker"
->>
->>     #define ROCKER(obj) \
->>         OBJECT_CHECK(Rocker, (obj), TYPE_ROCKER)
->>
->>    in a separate patch.
->
-> Thanks, will fix it in the next version.
->
->>
->> 2. Memory leaks on error and unplug
->>
->>    Explained inline below.
->>
->>> ---
->>>  hw/net/rocker/rocker.c | 27 +++++++++++----------------
->>>  1 file changed, 11 insertions(+), 16 deletions(-)
->>>
->>> diff --git a/hw/net/rocker/rocker.c b/hw/net/rocker/rocker.c
->>> index a382a6f..b9a77f1 100644
->>> --- a/hw/net/rocker/rocker.c
->>> +++ b/hw/net/rocker/rocker.c
->>> @@ -1252,20 +1252,18 @@ rollback:
->>>      return err;
->>>  }
->>>
->>> -static int rocker_msix_init(Rocker *r)
->>> +static int rocker_msix_init(Rocker *r, Error **errp)
->>>  {
->>>      PCIDevice *dev = PCI_DEVICE(r);
->>>      int err;
->>> -    Error *local_err = NULL;
->>>
->>>      err = msix_init(dev, ROCKER_MSIX_VEC_COUNT(r->fp_ports),
->>>                      &r->msix_bar,
->>>                      ROCKER_PCI_MSIX_BAR_IDX, ROCKER_PCI_MSIX_TABLE_OFFSET,
->>>                      &r->msix_bar,
->>>                      ROCKER_PCI_MSIX_BAR_IDX, ROCKER_PCI_MSIX_PBA_OFFSET,
->>> -                    0, &local_err);
->>> +                    0, errp);
->>>      if (err) {
->>> -        error_report_err(local_err);
->>>          return err;
->>>      }
->>>
->>> @@ -1301,7 +1299,7 @@ static World *rocker_world_type_by_name(Rocker *r, const char *name)
->>>      return NULL;
->>>  }
->>>
->>> -static int pci_rocker_init(PCIDevice *dev)
->>> +static void pci_rocker_realize(PCIDevice *dev, Error **errp)
->>>  {
->>>      Rocker *r = to_rocker(dev);
->>>      const MACAddr zero = { .a = { 0, 0, 0, 0, 0, 0 } };
->>> @@ -1319,10 +1317,9 @@ static int pci_rocker_init(PCIDevice *dev)
->>>
->>>      r->world_dflt = rocker_world_type_by_name(r, r->world_name);
->>>      if (!r->world_dflt) {
->>> -        fprintf(stderr,
->>> -                "rocker: requested world \"%s\" does not exist\n",
->>> +        error_setg(errp,
->>> +                "invalid argument requested world %s does not exist",
->>>                  r->world_name);
->>> -        err = -EINVAL;
->>>          goto err_world_type_by_name;
->>>      }
->>>
->>> @@ -1342,7 +1339,7 @@ static int pci_rocker_init(PCIDevice *dev)
->>>
->>>      /* MSI-X init */
->>>
->>> -    err = rocker_msix_init(r);
->>> +    err = rocker_msix_init(r, errp);
->>>      if (err) {
->>>          goto err_msix_init;
->>>      }
->>> @@ -1354,7 +1351,7 @@ static int pci_rocker_init(PCIDevice *dev)
->>>      }
->>>
->>>      if (rocker_find(r->name)) {
->>> -        err = -EEXIST;
->>> +        error_setg(errp, "%s already exists", r->name);
->>>          goto err_duplicate;
->>>      }
->>>
->>> @@ -1368,10 +1365,9 @@ static int pci_rocker_init(PCIDevice *dev)
->>>  #define ROCKER_IFNAMSIZ 16
->>>  #define MAX_ROCKER_NAME_LEN  (ROCKER_IFNAMSIZ - 1 - 3 - 3)
->>>      if (strlen(r->name) > MAX_ROCKER_NAME_LEN) {
->>> -        fprintf(stderr,
->>> -                "rocker: name too long; please shorten to at most %d chars\n",
->>> +        error_setg(errp,
->>> +                "name too long; please shorten to at most %d chars",
->>>                  MAX_ROCKER_NAME_LEN);
->>> -        err = -EINVAL;
->>>          goto err_name_too_long;
->>>      }
->>>
->>> @@ -1429,7 +1425,7 @@ static int pci_rocker_init(PCIDevice *dev)
->>>
->>>      QLIST_INSERT_HEAD(&rockers, r, next);
->>>
->>> -    return 0;
->>> +    return;
->>>
->>>  err_name_too_long:
->>>  err_duplicate:
->>        rocker_msix_uninit(r);
->>    err_msix_init:
->>        object_unparent(OBJECT(&r->msix_bar));
->>        object_unparent(OBJECT(&r->mmio));
->>    err_world_type_by_name:
->>        for (i = 0; i < ROCKER_WORLD_TYPE_MAX; i++) {
->>            if (r->worlds[i]) {
->>> @@ -1443,7 +1439,6 @@ err_world_type_by_name:
->>>              world_free(r->worlds[i]);
->>>          }
->>>      }
->>> -    return err;
->>>  }
->>>
->>
->> Does this leak r->world_name and r->name?
->
-> I think it was leaked neither r->world_name nor r->name, but msix and
-> worlds related.
+> On Thu, May 18, 2017 at 10:09:30AM +0200, Igor Mammedov wrote:
+> > there is no need use cpu_index_to_instance_props() for setting
+> > default cpu -> node mapping. Generic machine code can do it
+> > without cpu_index by just enabling already preset defaults
+> > in possible_cpus.
+> > 
+> > PS:
+> > as bonus it makes one less user of cpu_index_to_instance_props()
+> > 
+> > Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+> > ---
+> >  hw/core/machine.c | 32 +++++++++++++++++++++-----------
+> >  numa.c            | 26 --------------------------
+> >  2 files changed, 21 insertions(+), 37 deletions(-)
+> > 
+> > diff --git a/hw/core/machine.c b/hw/core/machine.c
+> > index fd6a436..2e91aa9 100644
+> > --- a/hw/core/machine.c
+> > +++ b/hw/core/machine.c
+> > @@ -700,26 +700,36 @@ static char *cpu_slot_to_string(const CPUArchId *cpu)
+> >      return g_string_free(s, false);
+> >  }
+> >  
+> > -static void machine_numa_validate(MachineState *machine)
+> > +static void machine_numa_finish_init(MachineState *machine)
+> >  {
+> > -    int i;
+> > +    int i, default_mapping;  
+> 
+> I suggest bool instead of int.
+will do it in v2
 
-You're right: the two are properties, so the property machinery should
-free them.
+> 
+> >      GString *s = g_string_new(NULL);
+> >      MachineClass *mc = MACHINE_GET_CLASS(machine);
+> >      const CPUArchIdList *possible_cpus = mc->possible_cpu_arch_ids(machine);
+> >  
+> >      assert(nb_numa_nodes);
+> > +    for (i = possible_cpus->len;
+> > +         i && !possible_cpus->cpus[i - 1].props.has_node_id;
+> > +         i--)
+> > +        ;;  
+> 
+> I believe the original code was more readable, and it had only 1
+> more line than this version. i.e.:
+> 
+>     for (i = 0; i < possible_cpus->len; i++) {
+>         if (possible_cpus->cpus[i].props.has_node_id) {
+>             break;
+>         }
+>     }
+>     default_mapping = (i == possible_cpus->len);
+ok, I'll do it this way
 
->> If yes, can you delay their allocation until after the last thing that
->> can fail?  That way, you don't have to free them on failure.  Simplifies
->> the error paths.  Keeping them as simple as practical is desireable,
->> because they're hard to test.
->
-> If delay allocation of r->worlds[] until after the last, when r->name and
-> r->world_name failed, passing the error message to errp is a good idea. I
-> think that's what 'error paths' means, then it is really not need to free
-> the memory in the goto label. Because the r->worlds[] has not yet been
-> allocated. Is that right? If yes, it's really a perfect solution.
->
-> But, this ignores the fact that r->name and r->world_name are depend on
-> r->worlds, so r->worlds's allocation must be before them. in this case,
-> the previous solution will be lose its meaning.
+> 
+> > +    default_mapping = !i; /* i == 0 : no explicit mapping provided by user */
+> > +
+> >      for (i = 0; i < possible_cpus->len; i++) {
+> >          const CPUArchId *cpu_slot = &possible_cpus->cpus[i];
+> >  
+> > -        /* at this point numa mappings are initilized by CLI options
+> > -         * or with default mappings so it's sufficient to list
+> > -         * all not yet mapped CPUs here */
+> > -        /* TODO: make it hard error in future */  
+> 
+> Did we change our mind about making it a hard error in the
+> future?
+nope, error message at the end of function says that partial mapping
+is obsoleted and will be removed. I've thought that's was sufficient
+reminder for us of what needs to be removed.
+I'll move TODO to:
 
-Delaying allocation until after all error checks is not always
-practical.  You decide.
++            } else {
++                /* record slots with not set mapping */
+++               /* TODO: make it hard error in future */ 
++                char *cpu_str = cpu_slot_to_string(cpu_slot);
++                g_string_append_printf(s, "%sCPU %d [%s]",
 
-[...]
+> 
+> >          if (!cpu_slot->props.has_node_id) {
+> > -            char *cpu_str = cpu_slot_to_string(cpu_slot);
+> > -            g_string_append_printf(s, "%sCPU %d [%s]", s->len ? ", " : "", i,
+> > -                                   cpu_str);
+> > -            g_free(cpu_str);
+> > +            if (default_mapping) {
+> > +                /* fetch default mapping from board and enable it */
+> > +                CpuInstanceProperties props = cpu_slot->props;
+> > +                props.has_node_id = true;
+> > +                machine_set_cpu_numa_node(machine, &props, &error_fatal);  
+> 
+> Is a machine_set_cpu_numa_node() call really necessary here, if
+> we are already looking at cpu_slot->props directly?
+yes, it's necessary as cpu_slot comes from:
+   const CPUArchIdList *possible_cpus = mc->possible_cpu_arch_ids(machine);
+callback, which initializes machine::possible_cpus if necessary.
+
+So cpu_slot is readonly and I'd prefer to keep mc->possible_cpu_arch_ids()
+returning 'const' as it's used by external callers and they shouldn't
+mess with possible_cpus content by accident.
+
+usage of machine_set_cpu_numa_node() adds +2 more lines and it's
+proper/validating setter for node_id and will catch
+mistakes if we make them in the code.
+So I wouldn't use shortcuts here to save 2 lines.
+
+ 
+> > +            } else {
+> > +                /* record slots with not set mapping */
+> > +                char *cpu_str = cpu_slot_to_string(cpu_slot);
+> > +                g_string_append_printf(s, "%sCPU %d [%s]",
+> > +                                       s->len ? ", " : "", i, cpu_str);
+> > +                g_free(cpu_str);
+> > +            }
+> >          }  
+> 
+> What about doing this instead:
+> 
+>         if (default_mapping) {
+>             /*
+>              * Default mapping was already set by board at
+>              * cpu_slot->props.node_id, just enable it
+>              */
+>             cpu_slot->props.has_node_id = true;
+>         } else if (!cpu_slot->props.has_node_id) {
+>             char *cpu_str = cpu_slot_to_string(cpu_slot);
+>             g_string_append_printf(s, "%sCPU %d [%s]", s->len ? ", " : "", i,
+>                                    cpu_str);
+>             g_free(cpu_str);
+>         }
