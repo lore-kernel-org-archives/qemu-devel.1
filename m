@@ -1,24 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39167)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:32990)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dCoKU-0005Ui-QU
-	for qemu-devel@nongnu.org; Mon, 22 May 2017 10:29:03 -0400
+	(envelope-from <sandipandas1990@gmail.com>) id 1dCgeW-00047S-UX
+	for qemu-devel@nongnu.org; Mon, 22 May 2017 02:17:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dCoKR-0002xB-Um
-	for qemu-devel@nongnu.org; Mon, 22 May 2017 10:29:02 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:41960)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dCoKR-0002wz-Os
-	for qemu-devel@nongnu.org; Mon, 22 May 2017 10:28:59 -0400
-References: <149520531371.9327.383828886525307842.stgit@bahia>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <826e8431-8998-4c83-4ca5-980cbe4631bf@redhat.com>
-Date: Mon, 22 May 2017 09:28:57 -0500
-MIME-Version: 1.0
-In-Reply-To: <149520531371.9327.383828886525307842.stgit@bahia>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="QGg7SiMdWIqNRNPfF24VlueTdSWkt0OQO"
-Subject: Re: [Qemu-devel] [PATCH 0/2] get rid of qemu_utimens()
+	(envelope-from <sandipandas1990@gmail.com>) id 1dCgeT-00019Y-Nt
+	for qemu-devel@nongnu.org; Mon, 22 May 2017 02:17:12 -0400
+Received: from mail-pf0-x243.google.com ([2607:f8b0:400e:c00::243]:35531)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <sandipandas1990@gmail.com>)
+	id 1dCgeT-00019I-Gv
+	for qemu-devel@nongnu.org; Mon, 22 May 2017 02:17:09 -0400
+Received: by mail-pf0-x243.google.com with SMTP id u26so17717396pfd.2
+	for <qemu-devel@nongnu.org>; Sun, 21 May 2017 23:17:08 -0700 (PDT)
+From: Sandipan Das <sandipandas1990@gmail.com>
+Date: Mon, 22 May 2017 11:46:56 +0530
+Message-Id: <1495433816-4265-1-git-send-email-sandipandas1990@gmail.com>
+Subject: [Qemu-devel] [PATCH risu] ppc64: Fix patterns for rotate doubleword
+ instructions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,58 +25,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org
+To: nikunj@linux.vnet.ibm.com
+Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org, joserz@linux.vnet.ibm.com
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---QGg7SiMdWIqNRNPfF24VlueTdSWkt0OQO
-From: Eric Blake <eblake@redhat.com>
-To: Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org
-Message-ID: <826e8431-8998-4c83-4ca5-980cbe4631bf@redhat.com>
-Subject: Re: [PATCH 0/2] get rid of qemu_utimens()
-References: <149520531371.9327.383828886525307842.stgit@bahia>
-In-Reply-To: <149520531371.9327.383828886525307842.stgit@bahia>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+The patterns for the following instructions are fixed:
+ * Rotate Left Doubleword then Clear Right (rldcr[.])
+ * Rotate Left Doubleword Immediate then Clear Right (rldicr[.])
+ * Rotate Left Doubleword Immediate then Mask Insert (rldimi[.])
 
-On 05/19/2017 09:50 AM, Greg Kurz wrote:
-> It is currently only used by 9pfs and virtfs-proxy-helper. This series =
-convert
-> them to utimensat() and futimens().
->=20
-> --
-> Greg
->=20
-> ---
->=20
-> Greg Kurz (2):
->       9pfs: assume utimensat() and futimens() are present
->       util: drop old utimensat() compat code
+Signed-off-by: Sandipan Das <sandipandas1990@gmail.com>
+---
+ ppc64.risu | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---QGg7SiMdWIqNRNPfF24VlueTdSWkt0OQO
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEcBAEBCAAGBQJZIvWpAAoJEKeha0olJ0NqR1AH/jms01gGSr9puXbWn9ykSzfQ
-IN4iiTlsDNDtpMir3h51BFAJoaQmXl9R842YnOcuXylFmBQFd+75nrpGPSGfgTXg
-5WR88ZAeWd7CcKpCi2Ps+gxk/DR1Yuf3vdvtu+xYMA6CokrUn54tQmTLwIwNhvmu
-P82QzCAwcHZPJ+he8/2AWmqXQWs0LaWI3FPs+UK2v3KPjM7NU7gbTVKo4Jd1HAU1
-WKvOkvkMD33guc9Mqz+/YZ9MYIYy+2bNhZLIBJ2o9u5E3JDaEpIc2qLZ1VHyV3wB
-M5325cEa1BC9jOZnoW1h4lxsAO3elBdWfhTHbrR4NQSfrbq+ytB4JT7kIMSAhyg=
-=uPYU
------END PGP SIGNATURE-----
-
---QGg7SiMdWIqNRNPfF24VlueTdSWkt0OQO--
+diff --git a/ppc64.risu b/ppc64.risu
+index 28df9da..0f29248 100644
+--- a/ppc64.risu
++++ b/ppc64.risu
+@@ -1451,7 +1451,7 @@ RLDCLd PPC64LE 011110 rs:5 ra:5 rb:5 mb:6 10001 \
+ !constraints { $rs != 1 && $ra != 1 && $rb != 1 && $rs != 13 && $ra != 13 && $rb != 13; }
+ 
+ # format:MDS book:I page:103 PPC SR rldcr Rotate Left Dword then Clear Right
+-RLCDR PPC64LE 011110 rs:5 ra:5 rb:5 mb:6 10010 \
++RLDCR PPC64LE 011110 rs:5 ra:5 rb:5 mb:6 10010 \
+ !constraints { $rs != 1 && $ra != 1 && $rb != 1 && $rs != 13 && $ra != 13 && $rb != 13; }
+ # format:MDS book:I page:103 PPC SR rldcr Rotate Left Dword then Clear Right
+ RLDCRd PPC64LE 011110 rs:5 ra:5 rb:5 mb:6 10011 \
+@@ -1472,17 +1472,17 @@ RLDICLd PPC64LE 011110 rs:5 ra:5 sh:5 mb:6 000 sha:1 1 \
+ !constraints { $rs != 1 && $ra != 1 && $rs != 13 && $ra != 13; }
+ 
+ # format:MD book:I page:105 PPC SR rldicr[.] Rotate Left Dword Immediate then Clear Right
+-RLDICR PPC64LE 011110 rs:5 ra:5 rb:5 me:6 00010 \
++RLDICR PPC64LE 011110 rs:5 ra:5 rb:5 me:6 001 sha:1 0 \
+ !constraints { $rs != 1 && $ra != 1 && $rb != 1 && $rs != 13 && $ra != 13 && $rb != 13; }
+ # format:MD book:I page:105 PPC SR rldicr[.] Rotate Left Dword Immediate then Clear Right
+-RLDICRd PPC64LE 011110 rs:5 ra:5 rb:5 me:6 00011 \
++RLDICRd PPC64LE 011110 rs:5 ra:5 rb:5 me:6 001 sha:1 1 \
+ !constraints { $rs != 1 && $ra != 1 && $rb != 1 && $rs != 13 && $ra != 13 && $rb != 13; }
+ 
+ # format:MD book:I page:105 PPC SR rldimi[.] Rotate Left Dword Immediate then Mask Insert
+-RLDIMI PPC64LE 011110 rs:5 ra:5 rb:5 me:6 00110 \
++RLDIMI PPC64LE 011110 rs:5 ra:5 rb:5 me:6 011 sha:1 0 \
+ !constraints { $rs != 1 && $ra != 1 && $rb != 1 && $rs != 13 && $ra != 13 && $rb != 13; }
+ # format:MD book:I page:105 PPC SR rldimi[.] Rotate Left Dword Immediate then Mask Insert
+-RLDIMId PPC64LE 011110 rs:5 ra:5 rb:5 me:6 00111 \
++RLDIMId PPC64LE 011110 rs:5 ra:5 rb:5 me:6 011 sha:1 1 \
+ !constraints { $rs != 1 && $ra != 1 && $rb != 1 && $rs != 13 && $ra != 13 && $rb != 13; }
+ 
+ # format:M book:I page:102 v:P1 SR rlwimi[.] Rotate Left Word Immediate then Mask Insert
+-- 
+2.7.4
