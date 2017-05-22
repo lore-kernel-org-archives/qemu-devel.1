@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48523)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49508)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1dCjX7-0003qV-W1
-	for qemu-devel@nongnu.org; Mon, 22 May 2017 05:21:47 -0400
+	(envelope-from <stefanha@gmail.com>) id 1dCjbG-0004q6-7T
+	for qemu-devel@nongnu.org; Mon, 22 May 2017 05:26:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1dCjX4-0001Ik-Rk
-	for qemu-devel@nongnu.org; Mon, 22 May 2017 05:21:45 -0400
-Received: from mail-wm0-x22c.google.com ([2a00:1450:400c:c09::22c]:35746)
+	(envelope-from <stefanha@gmail.com>) id 1dCjbD-0003A4-4H
+	for qemu-devel@nongnu.org; Mon, 22 May 2017 05:26:02 -0400
+Received: from mail-wm0-x243.google.com ([2a00:1450:400c:c09::243]:35893)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1dCjX4-0001Ic-L9
-	for qemu-devel@nongnu.org; Mon, 22 May 2017 05:21:42 -0400
-Received: by mail-wm0-x22c.google.com with SMTP id b84so291970645wmh.0
-	for <qemu-devel@nongnu.org>; Mon, 22 May 2017 02:21:42 -0700 (PDT)
-Date: Mon, 22 May 2017 10:21:39 +0100
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1dCjbC-00039u-Tw
+	for qemu-devel@nongnu.org; Mon, 22 May 2017 05:25:59 -0400
+Received: by mail-wm0-x243.google.com with SMTP id k15so30610172wmh.3
+	for <qemu-devel@nongnu.org>; Mon, 22 May 2017 02:25:58 -0700 (PDT)
+Date: Mon, 22 May 2017 10:25:55 +0100
 From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20170522092139.GB12205@stefanha-x1.localdomain>
-References: <20170519161156.GB6895@kentang.lan>
+Message-ID: <20170522092555.GC12205@stefanha-x1.localdomain>
+References: <CA+9O3V3G8CqDuKWMP3wT2j+e7GB0B9Xe1ps22MT9eViSFEC3zg@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="U+BazGySraz5kW0T"
+	protocol="application/pgp-signature"; boundary="Md/poaVZ8hnGTzuv"
 Content-Disposition: inline
-In-Reply-To: <20170519161156.GB6895@kentang.lan>
-Subject: Re: [Qemu-devel] [PULL] Update OpenBIOS images
+In-Reply-To: <CA+9O3V3G8CqDuKWMP3wT2j+e7GB0B9Xe1ps22MT9eViSFEC3zg@mail.gmail.com>
+Subject: Re: [Qemu-devel] How to pass intercepted mouse move x and y from
+ host to a virtual machine running in Qemu
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,74 +30,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Cc: qemu-devel@nongnu.org
+To: Alexander Syvak <alexander.svk@gmail.com>
+Cc: qemu-devel@nongnu.org, kraxel@redhat.com
 
 
---U+BazGySraz5kW0T
+--Md/poaVZ8hnGTzuv
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, May 19, 2017 at 05:11:56PM +0100, Mark Cave-Ayland wrote:
-> Hi Stefan,
+On Sat, May 20, 2017 at 10:44:23AM +0300, Alexander Syvak wrote:
+> Hi, guys!
 >=20
-> This update contains the OpenBIOS VGA driver updates required to enable B=
-en's QemuMacDrivers
-> for Mac guests. Please pull.
+> There exists a manually written virtual USB device registered as Qemu typ=
+e.
 >=20
+> It reads 5 bytes
 >=20
-> ATB,
+> - x and y of a mouse move, x and y of scrolling, and buttons state -
 >=20
-> Mark.
+> from mouse.fifo but there is no code in the implementation file which wou=
+ld
+> actually parse those bytes.
 >=20
+> First where does Qemu actually parse those bytes?
 >=20
-> The following changes since commit 56821559f0ba682fe6b367815572e6f974d329=
-ab:
+> And the most important - can I actually pass double value for a mouse mov=
+e?
 >=20
->   Merge remote-tracking branch 'dgilbert/tags/pull-hmp-20170517' into sta=
-ging (2017-05-18 13:36:15 +0100)
->=20
-> are available in the git repository at:
->=20
->=20
->   https://github.com/mcayland/qemu.git tags/qemu-openbios-signed
->=20
-> for you to fetch changes up to 415c3824836d3b65a5796a81b17fccd1ad575ff8:
->=20
->   Update OpenBIOS images to 3ebaaa2 built from submodule. (2017-05-19 16:=
-52:40 +0100)
->=20
-> ----------------------------------------------------------------
-> Update OpenBIOS images
->=20
-> ----------------------------------------------------------------
-> Mark Cave-Ayland (1):
->       Update OpenBIOS images to 3ebaaa2 built from submodule.
->=20
->  pc-bios/openbios-ppc     |  Bin 750840 -> 750840 bytes
->  pc-bios/openbios-sparc32 |  Bin 382048 -> 382048 bytes
->  pc-bios/openbios-sparc64 |  Bin 1593408 -> 1593408 bytes
->  roms/openbios            |    2 +-
->  4 files changed, 1 insertion(+), 1 deletion(-)
+> I use libinput in order to intercept host input events.
 
-Thanks, applied to my staging tree:
-https://github.com/stefanha/qemu/commits/staging
+It's not clear whether you are referring to a device in qemu.git or
+custom code.  If you want help with custom code, please post a link to
+the source.  If you want help with qemu.git code, please mention
+specific the filename and/or function name you are asking about.
+
+CCing Gerd Hoffman, USB maintainer.
 
 Stefan
 
---U+BazGySraz5kW0T
+--Md/poaVZ8hnGTzuv
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEcBAEBAgAGBQJZIq2jAAoJEJykq7OBq3PIQX4H/2AhMIkzuxNAfjyaAlUVElm0
-HTmwtCWvwP4Ds7//5Tw98yLCMohqknMse1NwRFc8qqZzY575FMNgnlImhDptC395
-x255Ioiqk8gLhUjwQQOF2x2zUwA/njeKNR2/9Z/4SXXn7zhiECl/urrW1ycKfyYa
-ZmG/FNQIGxIz4X2nnv3jf/nzMYqq3F7a9YWAaRip0mufXK6futde+am/G8pwx8px
-TyRgRidxTCUvozKeTiIYEIh7W+Uk8KdMUJEUFV/Tl7K6Prt7vWGO/jA82b6ml4Ld
-H3slSEO58WL55nxoNSXZ7OPynd26KjAspY5g9ncu3kMaWHM1pFE0jjqyNs8l8sg=
-=JmjF
+iQEcBAEBAgAGBQJZIq6jAAoJEJykq7OBq3PIn5gIAL+4Kj+CXV3tAxg1CuZY3/Es
+SPPPjj7MfVMHxd+89XaNdXUSDUZmUSHfaH/xFF+kKjzC5hCDhtiWXRs15aW4cgBP
+ymEep9472dDjyRcRe2UutYsexEonWYMDOxY218VzODbMNfMH5kHqcJ39D7utboI1
+HIuntfBVFAGdJ8qrCtETs1NP2hoy2+G1HmHvl1yhZWlCcqQBx23COg/i9nTsruug
+9rEjCj7Nmg0ru0iqSzBkcotdHqCyOPcOZbbq+SVli3S7LQZHzWz/Q4To7JgRDgCb
+BAseyeXtEdwj504xk9gWv8nGvhMaSuzZez7U0VFdA874zKU7EBcijjjlPeoMNhc=
+=YaMb
 -----END PGP SIGNATURE-----
 
---U+BazGySraz5kW0T--
+--Md/poaVZ8hnGTzuv--
