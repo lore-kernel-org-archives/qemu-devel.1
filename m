@@ -1,39 +1,39 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57743)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33066)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <danielhb@linux.vnet.ibm.com>) id 1dDEDX-0003wM-Hw
-	for qemu-devel@nongnu.org; Tue, 23 May 2017 14:07:36 -0400
+	(envelope-from <danielhb@linux.vnet.ibm.com>) id 1dDERk-0006iK-Jr
+	for qemu-devel@nongnu.org; Tue, 23 May 2017 14:22:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <danielhb@linux.vnet.ibm.com>) id 1dDEDT-00065d-Hw
-	for qemu-devel@nongnu.org; Tue, 23 May 2017 14:07:35 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:60637
-	helo=mx0a-001b2d01.pphosted.com)
+	(envelope-from <danielhb@linux.vnet.ibm.com>) id 1dDERh-0004Rg-ET
+	for qemu-devel@nongnu.org; Tue, 23 May 2017 14:22:16 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:34144)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <danielhb@linux.vnet.ibm.com>)
-	id 1dDEDT-00065G-C1
-	for qemu-devel@nongnu.org; Tue, 23 May 2017 14:07:31 -0400
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v4NHx0Rm024572
-	for <qemu-devel@nongnu.org>; Tue, 23 May 2017 14:07:30 -0400
-Received: from e24smtp04.br.ibm.com (e24smtp04.br.ibm.com [32.104.18.25])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2amr5spahc-1
+	id 1dDERh-0004R3-5J
+	for qemu-devel@nongnu.org; Tue, 23 May 2017 14:22:13 -0400
+Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v4NI8bw5013677
+	for <qemu-devel@nongnu.org>; Tue, 23 May 2017 14:22:11 -0400
+Received: from e24smtp03.br.ibm.com (e24smtp03.br.ibm.com [32.104.18.24])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2amsaqarhw-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 23 May 2017 14:07:30 -0400
+	for <qemu-devel@nongnu.org>; Tue, 23 May 2017 14:22:11 -0400
 Received: from localhost
-	by e24smtp04.br.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	by e24smtp03.br.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
 	Only! Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <danielhb@linux.vnet.ibm.com>;
-	Tue, 23 May 2017 15:07:28 -0300
+	Tue, 23 May 2017 15:22:08 -0300
 From: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
 References: <20170523111812.13469-1-lvivier@redhat.com>
 	<7509d665-566e-2570-9936-44a04bad75fe@linux.vnet.ibm.com>
-Date: Tue, 23 May 2017 15:07:23 -0300
+	<e0a75b06-5bbf-e831-b049-93e2ad5aa717@linux.vnet.ibm.com>
+Date: Tue, 23 May 2017 15:22:04 -0300
 MIME-Version: 1.0
-In-Reply-To: <7509d665-566e-2570-9936-44a04bad75fe@linux.vnet.ibm.com>
+In-Reply-To: <e0a75b06-5bbf-e831-b049-93e2ad5aa717@linux.vnet.ibm.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 7bit
 Content-Language: en-US
-Message-Id: <e0a75b06-5bbf-e831-b049-93e2ad5aa717@linux.vnet.ibm.com>
+Message-Id: <6e4170f5-5fbe-dc45-70f7-6c3c5a9e4b33@linux.vnet.ibm.com>
 Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH 0/4] spapr: disable hotplugging
  without OS
 List-Id: <qemu-devel.nongnu.org>
@@ -49,81 +49,112 @@ Cc: Thomas Huth <thuth@redhat.com>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, 
 
 
 
-On 05/23/2017 02:52 PM, Daniel Henrique Barboza wrote:
-> Hi Laurent,
+On 05/23/2017 03:07 PM, Daniel Henrique Barboza wrote:
 >
-> This is an interesting patch series. I've been working in the last 
-> weeks in the DRC
-> migration, mainly to solve the problem in which a hot CPU unplug will 
-> not succeed after
-> a migration if the CPU was hotplugged in the source. The problem 
-> happened when
-> migrating with virsh because Libvirt hotplugs the CPU in both source 
-> and target, and
-> the DRC state of the hotplugged after the migration is inconsistent. 
-> This series solves the
-> issue by preventing it from happening in the first place. Of course 
-> that migrating DRC states
-> has other uses (pending unplug operations during a migration, for 
-> example) so both patch
-> series can coexist.
 >
-> One possible issue I see with this series is that it breaks Libvirt 
-> migration entirely if
-> a CPU/mem hotplug happens in the target. With your series applied the 
-> migration
-> fails before start with:
+> On 05/23/2017 02:52 PM, Daniel Henrique Barboza wrote:
+>> Hi Laurent,
+>>
+>> This is an interesting patch series. I've been working in the last 
+>> weeks in the DRC
+>> migration, mainly to solve the problem in which a hot CPU unplug will 
+>> not succeed after
+>> a migration if the CPU was hotplugged in the source. The problem 
+>> happened when
+>> migrating with virsh because Libvirt hotplugs the CPU in both source 
+>> and target, and
+>> the DRC state of the hotplugged after the migration is inconsistent. 
+>> This series solves the
+>> issue by preventing it from happening in the first place. Of course 
+>> that migrating DRC states
+>> has other uses (pending unplug operations during a migration, for 
+>> example) so both patch
+>> series can coexist.
+>>
+>> One possible issue I see with this series is that it breaks Libvirt 
+>> migration entirely if
+>> a CPU/mem hotplug happens in the target. With your series applied the 
+>> migration
+>> fails before start with:
+>
+> Sorry: if a migration happens in the *source*, before the migration.
 
-Sorry: if a migration happens in the *source*, before the migration.
+Hehe nothing like fixing a typo with another one ...
+
+This is the Libvirt use case that fails with this patch set applied in 
+QEMU master, Libvirt 3.4.0 compiled from
+source:
+
+# ./virsh start dhb_ub1704_nfs 2
+#
+# ./virsh setvcpus dhb_ub1704_nfs 2 --live
+#
+# ./virsh -c 'qemu:///system' migrate --live --domain dhb_ub1704_nfs 
+--desturi qemu+ssh://target_ip/system --timeout 60 --verbose
+error: internal error: unable to execute QEMU command 'device_add': CPU 
+hotplug not supported without OS
+
+This is the error msg that appears in Libvirt daemon:
+
+2017-05-23 18:17:17.844+0000: 159678: error : 
+qemuMonitorJSONCheckError:389 : internal error: unable to execute QEMU 
+command 'device_add': CPU hotplug not supported without OS
+
+
+
+Daniel
 
 >
->
-> # ./virsh -c 'qemu:///system' migrate --live --domain dhb_ub1704_nfs 
-> --desturi qemu+ssh://target_ip/system --timeout 60 --verbose
-> error: internal error: unable to execute QEMU command 'device_add': 
-> CPU hotplug not supported without OS
->
-> Note that I say "possible issue" because, although I believe we do not 
-> want to break Libvirt
-> if possible, I also believe that we need to think about what makes 
-> sense in QEMU first.
->
->
->
-> Thanks,
->
->
-> Daniel
->
->
-> On 05/23/2017 08:18 AM, Laurent Vivier wrote:
->> If the OS is not started, QEMU sends an event to the OS
->> that is lost and cannot be recovered. An unplug is not
->> able to restore QEMU in a coherent state.
->> So, while the OS is not started, disable CPU and memory hotplug.
->> We use option vector 6 to know if the OS is started
 >>
->> This series moves error checking for memory hotplug
->> in a pre_plug function, and introduces the option
->> vector 6 management. It also revert previous
->> fix which was not really fixing the hotplug problem
->> when the OS is not running.
 >>
->> Laurent Vivier (4):
->>    spapr: add pre_plug function for memory
->>    spapr: add option vector 6
->>    spapr: disable hotplugging without OS
->>    Revert "spapr: fix memory hot-unplugging"
+>> # ./virsh -c 'qemu:///system' migrate --live --domain dhb_ub1704_nfs 
+>> --desturi qemu+ssh://target_ip/system --timeout 60 --verbose
+>> error: internal error: unable to execute QEMU command 'device_add': 
+>> CPU hotplug not supported without OS
 >>
->>   hw/ppc/spapr.c              | 103 
->> ++++++++++++++++++++++++++++++++++++--------
->>   hw/ppc/spapr_drc.c          |  20 ++-------
->>   hw/ppc/spapr_hcall.c        |   5 ++-
->>   hw/ppc/spapr_ovec.c         |   8 ++++
->>   include/hw/ppc/spapr.h      |   2 +
->>   include/hw/ppc/spapr_drc.h  |   1 -
->>   include/hw/ppc/spapr_ovec.h |   7 +++
->>   7 files changed, 109 insertions(+), 37 deletions(-)
+>> Note that I say "possible issue" because, although I believe we do 
+>> not want to break Libvirt
+>> if possible, I also believe that we need to think about what makes 
+>> sense in QEMU first.
+>>
+>>
+>>
+>> Thanks,
+>>
+>>
+>> Daniel
+>>
+>>
+>> On 05/23/2017 08:18 AM, Laurent Vivier wrote:
+>>> If the OS is not started, QEMU sends an event to the OS
+>>> that is lost and cannot be recovered. An unplug is not
+>>> able to restore QEMU in a coherent state.
+>>> So, while the OS is not started, disable CPU and memory hotplug.
+>>> We use option vector 6 to know if the OS is started
+>>>
+>>> This series moves error checking for memory hotplug
+>>> in a pre_plug function, and introduces the option
+>>> vector 6 management. It also revert previous
+>>> fix which was not really fixing the hotplug problem
+>>> when the OS is not running.
+>>>
+>>> Laurent Vivier (4):
+>>>    spapr: add pre_plug function for memory
+>>>    spapr: add option vector 6
+>>>    spapr: disable hotplugging without OS
+>>>    Revert "spapr: fix memory hot-unplugging"
+>>>
+>>>   hw/ppc/spapr.c              | 103 
+>>> ++++++++++++++++++++++++++++++++++++--------
+>>>   hw/ppc/spapr_drc.c          |  20 ++-------
+>>>   hw/ppc/spapr_hcall.c        |   5 ++-
+>>>   hw/ppc/spapr_ovec.c         |   8 ++++
+>>>   include/hw/ppc/spapr.h      |   2 +
+>>>   include/hw/ppc/spapr_drc.h  |   1 -
+>>>   include/hw/ppc/spapr_ovec.h |   7 +++
+>>>   7 files changed, 109 insertions(+), 37 deletions(-)
+>>>
+>>
 >>
 >
 >
