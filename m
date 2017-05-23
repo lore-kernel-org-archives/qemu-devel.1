@@ -1,26 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51864)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53687)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <leo@gaspard.io>) id 1dDIme-0002A1-Ge
-	for qemu-devel@nongnu.org; Tue, 23 May 2017 19:00:09 -0400
+	(envelope-from <leo@gaspard.io>) id 1dDIvJ-0003o6-S2
+	for qemu-devel@nongnu.org; Tue, 23 May 2017 19:09:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <leo@gaspard.io>) id 1dDImY-0007iq-Lq
-	for qemu-devel@nongnu.org; Tue, 23 May 2017 19:00:08 -0400
-Received: from smtp09.smtpout.orange.fr ([80.12.242.131]:32633
+	(envelope-from <leo@gaspard.io>) id 1dDIvG-0002h2-Ms
+	for qemu-devel@nongnu.org; Tue, 23 May 2017 19:09:05 -0400
+Received: from smtp09.smtpout.orange.fr ([80.12.242.131]:53911
 	helo=smtp.smtpout.orange.fr)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <leo@gaspard.io>) id 1dDImY-0007EV-59
-	for qemu-devel@nongnu.org; Tue, 23 May 2017 19:00:02 -0400
+	(Exim 4.71) (envelope-from <leo@gaspard.io>) id 1dDIvG-0002fJ-55
+	for qemu-devel@nongnu.org; Tue, 23 May 2017 19:09:02 -0400
 References: <149554993519.23396.2947622015408783770.stgit@bahia.lab.toulouse-stg.fr.ibm.com>
+	<149554996230.23396.14573553304393992709.stgit@bahia.lab.toulouse-stg.fr.ibm.com>
+	<5222368e-d0de-457b-7f07-5f104860ec56@redhat.com>
 From: Leo Gaspard <leo@gaspard.io>
-Message-ID: <c3f72497-76d9-7400-d701-0a6446463600@gaspard.io>
-Date: Wed, 24 May 2017 00:59:29 +0200
+Message-ID: <d74d2235-97e8-e529-9bf7-3e5c7b09830b@gaspard.io>
+Date: Wed, 24 May 2017 01:08:55 +0200
 MIME-Version: 1.0
-In-Reply-To: <149554993519.23396.2947622015408783770.stgit@bahia.lab.toulouse-stg.fr.ibm.com>
+In-Reply-To: <5222368e-d0de-457b-7f07-5f104860ec56@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="qG89tMlNQ7oaoawuOF5gpRKdxHlL1OMhk"
-Subject: Re: [Qemu-devel] [PATCH v2 0/4] 9pfs: local: fix metadata of
- mapped-file security mode
+	boundary="SaOXWPWw8tBs1f1wRI2qIh0bMd5MvKxKH"
+Subject: Re: [Qemu-devel] [PATCH v2 4/4] 9pfs: local: metadata file for the
+ VirtFS root
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,76 +31,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org
+To: Eric Blake <eblake@redhat.com>, Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---qG89tMlNQ7oaoawuOF5gpRKdxHlL1OMhk
+--SaOXWPWw8tBs1f1wRI2qIh0bMd5MvKxKH
 From: Leo Gaspard <leo@gaspard.io>
-To: Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org
-Cc: Eric Blake <eblake@redhat.com>
-Message-ID: <c3f72497-76d9-7400-d701-0a6446463600@gaspard.io>
-Subject: Re: [PATCH v2 0/4] 9pfs: local: fix metadata of mapped-file security
- mode
+To: Eric Blake <eblake@redhat.com>, Greg Kurz <groug@kaod.org>,
+ qemu-devel@nongnu.org
+Message-ID: <d74d2235-97e8-e529-9bf7-3e5c7b09830b@gaspard.io>
+Subject: Re: [PATCH v2 4/4] 9pfs: local: metadata file for the VirtFS root
 References: <149554993519.23396.2947622015408783770.stgit@bahia.lab.toulouse-stg.fr.ibm.com>
-In-Reply-To: <149554993519.23396.2947622015408783770.stgit@bahia.lab.toulouse-stg.fr.ibm.com>
+ <149554996230.23396.14573553304393992709.stgit@bahia.lab.toulouse-stg.fr.ibm.com>
+ <5222368e-d0de-457b-7f07-5f104860ec56@redhat.com>
+In-Reply-To: <5222368e-d0de-457b-7f07-5f104860ec56@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On 05/23/2017 04:32 PM, Greg Kurz wrote:
-> v2: - posted patch for CVE-2017-7493 separately
->     - other changes available in each patch changelog
->=20
-> Leo,
->=20
-> If you find time to test this series, I'll gladly add your Tested-by: t=
-o
-> it before merging.
+On 05/23/2017 07:13 PM, Eric Blake wrote:> We have to block
+VIRTFS_META_DIR at any depth in the hierarchy, but
+> can/should we change the blocking of VIRTFS_META_ROOT_FILE to only
+> happen at the root directory, rather than at all directories?  On the
+> other hand, if you can simultaneously map /path/to/a for one mount
+> point, and /path/to/a/b for another, then the root file for B is visibl=
+e
+> at a lower depth than the root file for A, and blocking the metafile
+> name everywhere means that the mount A can't influence the behavior on
+> the mount for B.
 
-Just tested with a base of 2.9.0 with patches [1] [2] (from my
-distribution), [3] (required to apply cleanly) and this patchset.
+If you take this kind of vulnerabilities into account, then you also
+have to consider a mix of mapped-file and mapped-attr mounts, or even
+worse a proxy with a mapped-file mount (which I think is currently
+vulnerable to this threat if the "proxy" path points above the
+"local,security_model=3Dmapped-file" path, as the check is done in
+"local_" functions, which are I guess not used for proxy-type virtfs)
 
-Things appear to work as expected, and .virtfs_metadata{,_root} appear
-to be neither readable nor writable by any user.
+I'm clearly not saying it's an invalid attack (there is no explicit
+documentation stating it's insecure to "nest" virtual mounts"), just
+saying it's a much larger attack surface than one internal to virtfs
+mapped-file only. Then the question of what is reasonably possible to
+forbid to the user arises, and that's not one I could answer.
 
-That said, one thing still bothering me with the fix in [3] is that it
-still "leaks" the host's uid/gid to the guest when a corresponding file
-in .virtfs_metadata is not present (while I'd have expected it to appear
-as root:root in the guest), but that's a separate issue, and I guess
-retro-compatibility prevents any fixing it.
-
-Thanks for these patches!
+Cheers & HTH,
 Leo
 
 
-[1]
-https://github.com/NixOS/nixpkgs/blob/master/pkgs/applications/virtualiza=
-tion/qemu/force-uid0-on-9p.patch
-
-[2]
-https://github.com/NixOS/nixpkgs/blob/master/pkgs/applications/virtualiza=
-tion/qemu/no-etc-install.patch
-
-[3] https://lists.gnu.org/archive/html/qemu-devel/2017-05/msg03663.html
-
-
---qG89tMlNQ7oaoawuOF5gpRKdxHlL1OMhk
+--SaOXWPWw8tBs1f1wRI2qIh0bMd5MvKxKH
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQGzBAEBCAAdFiEEplquSIS+CbvsrRWvilWEi2CQ+c8FAlkkvtEACgkQilWEi2CQ
-+c8SjQv9EpshJZHZA/mBEo7nhcc4CbohjhIcNOUPtTUTUCUCFkz7sPUH7efV2HCE
-jTLIWRHDl4+dr5NJcJVvSvo/K4kRfv07zSyz96xrQq82DyfzHndvdN7f9exV1PH1
-4D10LFh24frPMtGvd+Mb/GQDa1oB1ceQRrw1iwGIdtMsEp8ROAnzyqZdlhu0mo4x
-6UPnenQ9yhiiLYNFQHru4Wh18AUBDSmDbWf18nLBHq1f7FYShWOSfpYp8yNSUGxn
-NkUJEsUB++70OBAc/77KLiJgDjcmvjaKTHX5myCMJWXdhDu19iNWGHL9pJs82QhA
-NO0hu1I6L57YLc6EUS5+LcE8hBxGqvH7j3TQaQwqYNtzJTv4zSPUh5fEmaHm7qLd
-FV4q6h4V2vDnJHU5xKPH9YM1qR3mITTiow8mIW//t9ObpoXDOSqiMSOCPzW5tQxn
-XWyImeAe5ICpenJrtpyLBKNztdnHLBf3LXMJlBK9LtXQS4glTLKGi+I/KWcm3rwv
-pTGEGKiU
-=hNof
+iQGzBAEBCAAdFiEEplquSIS+CbvsrRWvilWEi2CQ+c8FAlkkwQcACgkQilWEi2CQ
++c+lggwA1Ld4yrydmx6R/C43Z/veFg48Yl1hVWr03qC2hsNMKmXvzf2QcKUOAq3h
+FMKd54E3wEprmBQyZmcw0STEUChEqdmigkyz4m/rsxpaJf9WU9jzSeGJ5ixqLQAk
+9yf2dUiKePf4Mn2epP0M9UxNdHF3Is1txrW8hkxlHGONYld1TmUVV6t/4e2XDY/G
+zgIYmyKkwEfp2Bm967uyVaFiRnuqhl7l5P7YKHfBOerzznDu5+KQyfVytHqKeG+F
+zMkLN8Qp72f0qAD84xgL0850CEodxG3XhbYr64sFTLMImON7TnQXPwC3gT7jJm9y
+gEHS9SfBjQ/hnshQwmcCU9ywyEJNRtzigxBFnldjwT4BS/iX5XlMzP0gd+YR6Oty
+W/5DhCm1dh66fwjgk25Q3WJGvniqssto/nEjkyC3PCoYyEAXpu3ja8M0pBj5nndF
+xWFVItyMd7dBzOYDgR9M0/MmeIPWhOFUwT90dp2vh+TXET4odjQ8XfgN+zaGAp03
+ifvt5roa
+=FEDD
 -----END PGP SIGNATURE-----
 
---qG89tMlNQ7oaoawuOF5gpRKdxHlL1OMhk--
+--SaOXWPWw8tBs1f1wRI2qIh0bMd5MvKxKH--
