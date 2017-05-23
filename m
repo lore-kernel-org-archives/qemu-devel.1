@@ -1,24 +1,43 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40195)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42432)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1dD1Pc-0002Nv-PC
-	for qemu-devel@nongnu.org; Tue, 23 May 2017 00:27:13 -0400
+	(envelope-from <bharata@linux.vnet.ibm.com>) id 1dD1lL-0005P7-LU
+	for qemu-devel@nongnu.org; Tue, 23 May 2017 00:49:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1dD1PZ-0002mD-L5
-	for qemu-devel@nongnu.org; Tue, 23 May 2017 00:27:12 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:57314)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1dD1PZ-0002lZ-C9
-	for qemu-devel@nongnu.org; Tue, 23 May 2017 00:27:09 -0400
-Date: Tue, 23 May 2017 12:27:02 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20170523042702.GC3873@pxdev.xzpeter.org>
-References: <1495231142-19055-1-git-send-email-felipe@nutanix.com>
+	(envelope-from <bharata@linux.vnet.ibm.com>) id 1dD1lI-00027E-G2
+	for qemu-devel@nongnu.org; Tue, 23 May 2017 00:49:39 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:53679
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bharata@linux.vnet.ibm.com>)
+	id 1dD1lI-000274-A0
+	for qemu-devel@nongnu.org; Tue, 23 May 2017 00:49:36 -0400
+Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v4N4hiAn109372
+	for <qemu-devel@nongnu.org>; Tue, 23 May 2017 00:49:34 -0400
+Received: from e23smtp08.au.ibm.com (e23smtp08.au.ibm.com [202.81.31.141])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2am8nh3p69-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Tue, 23 May 2017 00:49:34 -0400
+Received: from localhost
+	by e23smtp08.au.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <bharata@linux.vnet.ibm.com>;
+	Tue, 23 May 2017 14:49:31 +1000
+Date: Tue, 23 May 2017 10:18:36 +0530
+From: Bharata B Rao <bharata@linux.vnet.ibm.com>
+Reply-To: bharata@linux.vnet.ibm.com
+References: <1495172439-1504-1-git-send-email-bharata@linux.vnet.ibm.com>
+	<1495172439-1504-5-git-send-email-bharata@linux.vnet.ibm.com>
+	<1495434650.2205.1.camel@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <1495231142-19055-1-git-send-email-felipe@nutanix.com>
-Subject: Re: [Qemu-devel] [PATCH] migration: keep bytes_xfer_prev init'd to
- zero
+In-Reply-To: <1495434650.2205.1.camel@gmail.com>
+Message-Id: <20170523044836.GI3446@in.ibm.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [Qemu-ppc] [RFC PATCH v2 4/4] spapr: Fix migration
+ of Radix guests
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,79 +46,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Felipe Franciosi <felipe@nutanix.com>
-Cc: Juan Quintela <quintela@redhat.com>, "Jason J. Herne" <jjherne@linux.vnet.ibm.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+To: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
+Cc: qemu-devel@nongnu.org, rnsastry@linux.vnet.ibm.com, qemu-ppc@nongnu.org, sam.bobroff@au1.ibm.com, david@gibson.dropbear.id.au
 
-On Fri, May 19, 2017 at 10:59:02PM +0100, Felipe Franciosi wrote:
-> The first time migration_bitmap_sync() is called, bytes_xfer_prev is set
-> to ram_state.bytes_transferred which is, at this point, zero. The next
-> time migration_bitmap_sync() is called, an iteration has happened and
-> bytes_xfer_prev is set to 'x' bytes. Most likely, more than one second
-> has passed, so the auto converge logic will be triggered and
-> bytes_xfer_now will also be set to 'x' bytes.
-> 
-> This condition is currently masked by dirty_rate_high_cnt, which will
-> wait for a few iterations before throttling. It would otherwise always
-> assume zero bytes have been copied and therefore throttle the guest
-> (possibly) prematurely.
-> 
-> Given bytes_xfer_prev is only used by the auto convergence logic, it
-> makes sense to only set its value after a check has been made against
-> bytes_xfer_now.
-> 
-> Signed-off-by: Felipe Franciosi <felipe@nutanix.com>
-> ~
-> ---
->  migration/ram.c | 4 ----
->  1 file changed, 4 deletions(-)
-> 
-> diff --git a/migration/ram.c b/migration/ram.c
-> index f59fdd4..793af39 100644
-> --- a/migration/ram.c
-> +++ b/migration/ram.c
-> @@ -670,10 +670,6 @@ static void migration_bitmap_sync(RAMState *rs)
->  
->      rs->bitmap_sync_count++;
->  
-> -    if (!rs->bytes_xfer_prev) {
-> -        rs->bytes_xfer_prev = ram_bytes_transferred();
-> -    }
-> -
->      if (!rs->time_last_bitmap_sync) {
->          rs->time_last_bitmap_sync = qemu_clock_get_ms(QEMU_CLOCK_REALTIME);
->      }
-> -- 
-> 1.9.5
-> 
-> 
+On Mon, May 22, 2017 at 04:30:50PM +1000, Suraj Jitindar Singh wrote:
+> On Fri, 2017-05-19 at 11:10 +0530, Bharata B Rao wrote:
+> > Fix migration of radix guests by ensuring that we issue
+> > KVM_PPC_CONFIGURE_V3_MMU for radix case post migration.
+> >=20
+> > Reported-by: Nageswara R Sastry <rnsastry@linux.vnet.ibm.com>
+> > Signed-off-by: Bharata B Rao <bharata@linux.vnet.ibm.com>
+> > ---
+> > =A0hw/ppc/spapr.c | 12 ++++++++++++
+> > =A01 file changed, 12 insertions(+)
+> >=20
+> > diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> > index daf335c..8f20f14 100644
+> > --- a/hw/ppc/spapr.c
+> > +++ b/hw/ppc/spapr.c
+> > @@ -1400,6 +1400,18 @@ static int spapr_post_load(void *opaque, int
+> > version_id)
+> > =A0=A0=A0=A0=A0=A0=A0=A0=A0err =3D spapr_rtc_import_offset(&spapr->rt=
+c, spapr-
+> > >rtc_offset);
+> > =A0=A0=A0=A0=A0}
+>=20
+> This will break migration for tcg radix guests.
+>=20
+> Given that there is essentially nothing special we need to do on
+> incoming tcg migration, I suggest we make it:
+>=20
+> if (spapr->patb_entry && kvm_enabled()) {
+>     [snip]
+> }
+>=20
+> > =A0
+> > +=A0=A0=A0=A0if (spapr->patb_entry) {
+> > +=A0=A0=A0=A0=A0=A0=A0=A0PowerPCCPU *cpu =3D POWERPC_CPU(first_cpu);
+> > +=A0=A0=A0=A0=A0=A0=A0=A0if (kvmppc_has_cap_mmu_radix() && kvm_enable=
+d()) {
+>=20
+> Why not make this a bit more generic? Something like:
+>=20
+> err =3D kvmppc_configure_v3_mmu(cpu, !!(spapr->patb_entry & PATBE1_GR),
+> !!(cpu->env.spr[SPR_LPCR] & LPCR_GTSE), spapr->patb_entry);
+> if (err) {
+>     error_report("Process table config unsupported by the host");
+>     return -EINVAL;
+> }
+>=20
+> return err;
+>=20
+> While I don't think it's possible currently, there is nothing
+> inherently incorrect about having a non-zero process table entry for a
+> hash guest. And this saves a future update.
 
-I feel like this patch wants to correctly initialize bytes_xfer_prev,
-however I still see problem. E.g., when user specify auto-convergence
-during migration, and in the first iteration we'll always have a very
-small bytes_xfer_prev (with this patch, it'll be zero) with a very big
-bytes_xfer_now (which is the ram_bytes_transferred() value). If so, do
-you think squash below change together with current one would be more
-accurate?
+How about having this logic in spapr_post_load() ?
 
-diff --git a/migration/ram.c b/migration/ram.c
-index f59fdd4..e01a218 100644
---- a/migration/ram.c
-+++ b/migration/ram.c
-@@ -703,7 +703,8 @@ static void migration_bitmap_sync(RAMState *rs)
-                throttling */
-             bytes_xfer_now = ram_bytes_transferred();
- 
--            if (rs->dirty_pages_rate &&
-+            /* Skip first iteration when bytes_xfer_prev not inited */
-+            if (rs->bytes_xfer_prev && rs->dirty_pages_rate &&
-                (rs->num_dirty_pages_period * TARGET_PAGE_SIZE >
-                    (bytes_xfer_now - rs->bytes_xfer_prev) / 2) &&
-                (rs->dirty_rate_high_cnt++ >= 2)) {
+    if (spapr->patb_entry) {
+        /* Can be Hash(in future?) or Radix guest (current) */
+        PowerPCCPU *cpu =3D POWERPC_CPU(first_cpu);
+        bool radix =3D !!(spapr->patb_entry & PATBE1_GR);
+        bool gtse =3D !!(cpu->env.spr[SPR_LPCR] & LPCR_GTSE);
 
-Even I am not sure whether we can move bytes_xfer_prev out of RAMState
-since it's only used by migration_bitmap_sync().
+        if (radix) {
+            /* Radix guest, configure MMU */
+            /* kvmppc_configure_v3_mmu() is NOP for TCG */
+            err =3D kvmppc_configure_v3_mmu(cpu, radix, gtse, spapr->patb=
+_entry);
+            if (err) {
+                error_report("Process table config unsupported by the hos=
+t");
+                return -EINVAL;
+            }
+        } else {
+            /* Can be Hash guest (in future ?), nothing to do */
+        }
+    } else {
+        /* Hash guest (current), nothing to do */
+    }
 
-Thanks,
-
--- 
-Peter Xu
+Regards,
+Bharata.
