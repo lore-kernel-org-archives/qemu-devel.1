@@ -1,35 +1,36 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44032)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44044)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cornelia.huck@de.ibm.com>) id 1dD7l3-0007pF-L3
-	for qemu-devel@nongnu.org; Tue, 23 May 2017 07:13:46 -0400
+	(envelope-from <cornelia.huck@de.ibm.com>) id 1dD7l5-0007rh-UZ
+	for qemu-devel@nongnu.org; Tue, 23 May 2017 07:13:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cornelia.huck@de.ibm.com>) id 1dD7kx-00032j-QR
-	for qemu-devel@nongnu.org; Tue, 23 May 2017 07:13:45 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:60572)
+	(envelope-from <cornelia.huck@de.ibm.com>) id 1dD7l1-00034K-FZ
+	for qemu-devel@nongnu.org; Tue, 23 May 2017 07:13:47 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:33943
+	helo=mx0a-001b2d01.pphosted.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <cornelia.huck@de.ibm.com>)
-	id 1dD7kx-00032I-HF
-	for qemu-devel@nongnu.org; Tue, 23 May 2017 07:13:39 -0400
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v4NB8bhY122474
-	for <qemu-devel@nongnu.org>; Tue, 23 May 2017 07:13:38 -0400
-Received: from e06smtp13.uk.ibm.com (e06smtp13.uk.ibm.com [195.75.94.109])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2am9aeschn-1
+	id 1dD7l1-000349-9r
+	for qemu-devel@nongnu.org; Tue, 23 May 2017 07:13:43 -0400
+Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v4NB4MQD038929
+	for <qemu-devel@nongnu.org>; Tue, 23 May 2017 07:13:42 -0400
+Received: from e06smtp10.uk.ibm.com (e06smtp10.uk.ibm.com [195.75.94.106])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2am85f3jyj-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 23 May 2017 07:13:38 -0400
+	for <qemu-devel@nongnu.org>; Tue, 23 May 2017 07:13:42 -0400
 Received: from localhost
-	by e06smtp13.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	by e06smtp10.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
 	Only! Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <cornelia.huck@de.ibm.com>;
-	Tue, 23 May 2017 12:13:36 +0100
+	Tue, 23 May 2017 12:13:38 +0100
 From: Cornelia Huck <cornelia.huck@de.ibm.com>
-Date: Tue, 23 May 2017 13:13:04 +0200
+Date: Tue, 23 May 2017 13:13:06 +0200
 In-Reply-To: <20170523111306.25493-1-cornelia.huck@de.ibm.com>
 References: <20170523111306.25493-1-cornelia.huck@de.ibm.com>
-Message-Id: <20170523111306.25493-20-cornelia.huck@de.ibm.com>
-Subject: [Qemu-devel] [PULL 19/21] vfio/ccw: update sense data if a unit
- check is pending
+Message-Id: <20170523111306.25493-22-cornelia.huck@de.ibm.com>
+Subject: [Qemu-devel] [PULL 21/21] s390/kvm: do not reset riccb on initial
+ cpu reset
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,47 +40,61 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org, stefanha@redhat.com
-Cc: borntraeger@de.ibm.com, agraf@suse.de, qemu-devel@nongnu.org, Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, Cornelia Huck <cornelia.huck@de.ibm.com>
+Cc: borntraeger@de.ibm.com, agraf@suse.de, qemu-devel@nongnu.org, Cornelia Huck <cornelia.huck@de.ibm.com>
 
-From: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
+From: Christian Borntraeger <borntraeger@de.ibm.com>
 
-Concurrent-sense data is currently not delivered. This patch stores
-the concurrent-sense data to the subchannel if a unit check is pending
-and the concurrent-sense bit is enabled. Then a TSCH can retreive the
-right IRB data back to the guest.
+The riccb is kept unchanged during initial cpu reset. Move the data
+structure to the other registers that are unchanged.
 
-Acked-by: Alex Williamson <alex.williamson@redhat.com>
-Signed-off-by: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
-Message-Id: <20170517004813.58227-13-bjsdjshi@linux.vnet.ibm.com>
+Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
 Signed-off-by: Cornelia Huck <cornelia.huck@de.ibm.com>
 ---
- hw/vfio/ccw.c | 7 +++++++
- 1 file changed, 7 insertions(+)
+ target/s390x/cpu.c | 7 ++++---
+ target/s390x/cpu.h | 6 ++++--
+ 2 files changed, 8 insertions(+), 5 deletions(-)
 
-diff --git a/hw/vfio/ccw.c b/hw/vfio/ccw.c
-index 007ce435f1..12d0262336 100644
---- a/hw/vfio/ccw.c
-+++ b/hw/vfio/ccw.c
-@@ -94,6 +94,7 @@ static void vfio_ccw_io_notifier_handler(void *opaque)
-     CcwDevice *ccw_dev = CCW_DEVICE(cdev);
-     SubchDev *sch = ccw_dev->sch;
-     SCSW *s = &sch->curr_status.scsw;
-+    PMCW *p = &sch->curr_status.pmcw;
-     IRB irb;
-     int size;
+diff --git a/target/s390x/cpu.c b/target/s390x/cpu.c
+index a1bf2ba5a7..a69005d9b5 100644
+--- a/target/s390x/cpu.c
++++ b/target/s390x/cpu.c
+@@ -92,9 +92,10 @@ static void s390_cpu_initial_reset(CPUState *s)
+     int i;
  
-@@ -143,6 +144,12 @@ static void vfio_ccw_io_notifier_handler(void *opaque)
-     /* Update control block via irb. */
-     copy_scsw_to_guest(s, &irb.scsw);
+     s390_cpu_reset(s);
+-    /* initial reset does not touch regs,fregs and aregs */
+-    memset(&env->fpc, 0, offsetof(CPUS390XState, end_reset_fields) -
+-                         offsetof(CPUS390XState, fpc));
++    /* initial reset does not clear everything! */
++    memset(&env->start_initial_reset_fields, 0,
++        offsetof(CPUS390XState, end_reset_fields) -
++        offsetof(CPUS390XState, start_initial_reset_fields));
  
-+    /* If a uint check is pending, copy sense data. */
-+    if ((s->dstat & SCSW_DSTAT_UNIT_CHECK) &&
-+        (p->chars & PMCW_CHARS_MASK_CSENSE)) {
-+        memcpy(sch->sense_data, irb.ecw, sizeof(irb.ecw));
-+    }
+     /* architectured initial values for CR 0 and 14 */
+     env->cregs[0] = CR0_RESET;
+diff --git a/target/s390x/cpu.h b/target/s390x/cpu.h
+index e27d9d874a..c74b4193ee 100644
+--- a/target/s390x/cpu.h
++++ b/target/s390x/cpu.h
+@@ -88,6 +88,10 @@ typedef struct CPUS390XState {
+      */
+     CPU_DoubleU vregs[32][2];  /* vector registers */
+     uint32_t aregs[16];    /* access registers */
++    uint8_t riccb[64];     /* runtime instrumentation control */
 +
- read_err:
-     css_inject_io_interrupt(sch);
- }
++    /* Fields up to this point are not cleared by initial CPU reset */
++    struct {} start_initial_reset_fields;
+ 
+     uint32_t fpc;          /* floating-point control register */
+     uint32_t cc_op;
+@@ -137,8 +141,6 @@ typedef struct CPUS390XState {
+     uint64_t gbea;
+     uint64_t pp;
+ 
+-    uint8_t riccb[64];
+-
+     /* Fields up to this point are cleared by a CPU reset */
+     struct {} end_reset_fields;
+ 
 -- 
 2.13.0
