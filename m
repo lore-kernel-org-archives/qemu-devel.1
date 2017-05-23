@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37171)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37259)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dD7Mn-0002uP-VC
-	for qemu-devel@nongnu.org; Tue, 23 May 2017 06:48:42 -0400
+	(envelope-from <aurelien@aurel32.net>) id 1dD7N4-0003AU-TO
+	for qemu-devel@nongnu.org; Tue, 23 May 2017 06:48:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dD7Mj-0008A1-4W
-	for qemu-devel@nongnu.org; Tue, 23 May 2017 06:48:42 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:19623)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1dD7Mi-00089n-Um
-	for qemu-devel@nongnu.org; Tue, 23 May 2017 06:48:37 -0400
+	(envelope-from <aurelien@aurel32.net>) id 1dD7N4-00004y-3U
+	for qemu-devel@nongnu.org; Tue, 23 May 2017 06:48:58 -0400
+Received: from hall.aurel32.net ([2001:bc8:30d7:100::1]:42992)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <aurelien@aurel32.net>)
+	id 1dD7N3-0008Ug-Us
+	for qemu-devel@nongnu.org; Tue, 23 May 2017 06:48:58 -0400
+Date: Tue, 23 May 2017 12:48:51 +0200
+From: Aurelien Jarno <aurelien@aurel32.net>
+Message-ID: <20170523104851.37tseiq5zlpwevr6@aurel32.net>
 References: <20170523030312.6360-1-rth@twiddle.net>
-	<20170523030312.6360-24-rth@twiddle.net>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <7cdf62f5-34fa-4158-b3a5-fe4bf985d937@redhat.com>
-Date: Tue, 23 May 2017 12:48:33 +0200
+	<20170523030312.6360-3-rth@twiddle.net>
 MIME-Version: 1.0
-In-Reply-To: <20170523030312.6360-24-rth@twiddle.net>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 23/31] target/s390x: Use unwind data for
- helper_lctlg
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170523030312.6360-3-rth@twiddle.net>
+Subject: Re: [Qemu-devel] [PATCH 02/31] target/s390x: Implement EXECUTE via
+ new TranslationBlock
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,43 +29,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <rth@twiddle.net>, qemu-devel@nongnu.org
+To: Richard Henderson <rth@twiddle.net>
+Cc: qemu-devel@nongnu.org
 
-On 23.05.2017 05:03, Richard Henderson wrote:
+On 2017-05-22 20:02, Richard Henderson wrote:
+> Previously, helper_ex would construct the insn and then implement
+> the insn via direct calls other helpers.  This was sufficient to
+> boot Linux but that is all.
+> 
+> It is easy enough to go the whole nine yards by stashing state for
+> EXECUTE within the cpu, and then relying on a new TB to be created
+> that properly and completely interprets the insn.
+> 
 > Signed-off-by: Richard Henderson <rth@twiddle.net>
 > ---
->  target/s390x/mem_helper.c | 8 ++++----
->  target/s390x/translate.c  | 1 -
->  2 files changed, 4 insertions(+), 5 deletions(-)
-> 
-> diff --git a/target/s390x/mem_helper.c b/target/s390x/mem_helper.c
-> index 902290c..26960e4 100644
-> --- a/target/s390x/mem_helper.c
-> +++ b/target/s390x/mem_helper.c
-> @@ -821,20 +821,20 @@ void HELPER(cdsg)(CPUS390XState *env, uint64_t addr,
->  #if !defined(CONFIG_USER_ONLY)
->  void HELPER(lctlg)(CPUS390XState *env, uint32_t r1, uint64_t a2, uint32_t r3)
->  {
-> +    uintptr_t ra = GETPC();
->      S390CPU *cpu = s390_env_get_cpu(env);
->      bool PERchanged = false;
-> -    int i;
->      uint64_t src = a2;
-> -    uint64_t val;
-> +    uint32_t i;
->  
->      for (i = r1;; i = (i + 1) % 16) {
-> -        val = cpu_ldq_data(env, src);
-> +        uint64_t val = cpu_ldq_data_ra(env, src, ra);
->          if (env->cregs[i] != val && i >= 9 && i <= 11) {
->              PERchanged = true;
->          }
->          env->cregs[i] = val;
->          HELPER_LOG("load ctl %d from 0x%" PRIx64 " == 0x%" PRIx64 "\n",
-> -                   i, src, env->cregs[i]);
-> +                   i, src, val);
+>  target/s390x/cpu.h         |   4 +-
+>  target/s390x/helper.h      |   2 +-
+>  target/s390x/insn-data.def |   4 +-
+>  target/s390x/machine.c     |  19 +++++++
+>  target/s390x/mem_helper.c  | 136 +++++++++++----------------------------------
+>  target/s390x/translate.c   | 124 +++++++++++++++++++++++++----------------
+>  6 files changed, 133 insertions(+), 156 deletions(-)
 
-I think you should mention in the patch description that you've fixed
-the HELPER_LOG here, too. Apart from that:
+This looks good on the principle, and finally removes a big hack. That
+said it prevent my test system to boot. I haven't investigated why yet.
 
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+-- 
+Aurelien Jarno                          GPG: 4096R/1DDD8C9B
+aurelien@aurel32.net                 http://www.aurel32.net
