@@ -1,28 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48708)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48707)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <a.perevalov@samsung.com>) id 1dD82F-0006gK-Je
+	(envelope-from <a.perevalov@samsung.com>) id 1dD82F-0006gJ-JY
 	for qemu-devel@nongnu.org; Tue, 23 May 2017 07:31:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <a.perevalov@samsung.com>) id 1dD82D-0003dU-BJ
+	(envelope-from <a.perevalov@samsung.com>) id 1dD82B-0003cc-L3
 	for qemu-devel@nongnu.org; Tue, 23 May 2017 07:31:31 -0400
-Received: from mailout1.w1.samsung.com ([210.118.77.11]:24889)
+Received: from mailout1.w1.samsung.com ([210.118.77.11]:24882)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <a.perevalov@samsung.com>)
-	id 1dD82D-0003d3-5a
-	for qemu-devel@nongnu.org; Tue, 23 May 2017 07:31:29 -0400
+	id 1dD82B-0003bt-Ea
+	for qemu-devel@nongnu.org; Tue, 23 May 2017 07:31:27 -0400
 Received: from eucas1p2.samsung.com (unknown [182.198.249.207])
 	by mailout1.w1.samsung.com
 	(Oracle Communications Messaging Server 7.0.5.31.0 64bit (built May 5
-	2014)) with ESMTP id <0OQE0007FLCFX870@mailout1.w1.samsung.com> for
-	qemu-devel@nongnu.org; Tue, 23 May 2017 12:31:27 +0100 (BST)
+	2014)) with ESMTP id <0OQE0016NLCA5K70@mailout1.w1.samsung.com> for
+	qemu-devel@nongnu.org; Tue, 23 May 2017 12:31:22 +0100 (BST)
 From: Alexey Perevalov <a.perevalov@samsung.com>
-Date: Tue, 23 May 2017 14:31:02 +0300
-Message-id: <1495539071-12995-2-git-send-email-a.perevalov@samsung.com>
-In-reply-to: <1495539071-12995-1-git-send-email-a.perevalov@samsung.com>
-References: <1495539071-12995-1-git-send-email-a.perevalov@samsung.com>
-	<CGME20170523113126eucas1p163c64fe50bd44026fdf4d36716bfc4f2@eucas1p1.samsung.com>
-Subject: [Qemu-devel] [PATCH V6 01/10] userfault: add pid into uffd_msg &
- update UFFD_FEATURE_*
+Date: Tue, 23 May 2017 14:31:01 +0300
+Message-id: <1495539071-12995-1-git-send-email-a.perevalov@samsung.com>
+References: <CGME20170523113120eucas1p2032ace2121aa8627067b6d7f03fbf482@eucas1p2.samsung.com>
+Subject: [Qemu-devel] [PATCH V6 00/10] calculate blocktime for postcopy live
+ migration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,36 +32,50 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: i.maximets@samsung.com, peterx@redhat.com, eblake@redhat.com, dgilbert@redhat.com, Alexey Perevalov <a.perevalov@samsung.com>
 
-This commit duplicates header of "userfaultfd: provide pid in userfault msg"
-into linux kernel.
+Hello, this is 6th version of the series.
 
-Signed-off-by: Alexey Perevalov <a.perevalov@samsung.com>
----
- linux-headers/linux/userfaultfd.h | 5 +++++
- 1 file changed, 5 insertions(+)
+Previous version of that series at
+https://lists.gnu.org/archive/html/qemu-devel/2017-05/msg03117.html 
 
-diff --git a/linux-headers/linux/userfaultfd.h b/linux-headers/linux/userfaultfd.h
-index 2ed5dc3..e7c8898 100644
---- a/linux-headers/linux/userfaultfd.h
-+++ b/linux-headers/linux/userfaultfd.h
-@@ -77,6 +77,9 @@ struct uffd_msg {
- 		struct {
- 			__u64	flags;
- 			__u64	address;
-+			union {
-+				__u32   ptid;
-+			} feat;
- 		} pagefault;
- 
- 		struct {
-@@ -158,6 +161,8 @@ struct uffdio_api {
- #define UFFD_FEATURE_EVENT_MADVDONTNEED		(1<<3)
- #define UFFD_FEATURE_MISSING_HUGETLBFS		(1<<4)
- #define UFFD_FEATURE_MISSING_SHMEM		(1<<5)
-+#define UFFD_FEATURE_EVENT_UNMAP		(1<<6)
-+#define UFFD_FEATURE_THREAD_ID			(1<<7)
- 	__u64 features;
- 
- 	__u64 ioctls;
+(V5 -> V6)
+    - blocktime was added into hmp command. Comment from David.
+    - bitmap for copied pages was added as well as check in *_begin/_end
+functions. Patch uses just introduced RAMBLOCK_FOREACH. Comment from David.
+    - description of receive_ufd_features/request_ufd_features. Comment from David.
+    - commit message headers/@since references were modified. Comment from Eric.
+    - also typos in documentation. Comment from Eric.
+    - style and description of field in MigrationInfo. Comment from Eric.
+    - ufd_check_and_apply (former ufd_version_check) is calling twice,
+so my previous patch contained double allocation of blocktime context and
+as a result memory leak. In this patch series it was fixed.
+
+patch set is based on commit 56821559f0ba682fe6b367815572e6f974d329ab
+"Merge remote-tracking branch 'dgilbert/tags/pull-hmp-20170517' into staging"
+
+Alexey Perevalov (10):
+  userfault: add pid into uffd_msg & update UFFD_FEATURE_*
+  migration: pass MigrationIncomingState* into migration check functions
+  migration: fix hardcoded function name in error report
+  migration: split ufd_version_check onto receive/request features part
+  migration: introduce postcopy-blocktime capability
+  migration: add postcopy blocktime ctx into MigrationIncomingState
+  migration: add bitmap for copied page
+  migration: calculate vCPU blocktime on dst side
+  migration: add postcopy total blocktime into query-migrate
+  migration: postcopy_blocktime documentation
+
+ docs/migration.txt                |  10 +
+ hmp.c                             |  15 ++
+ include/migration/migration.h     |  29 +++
+ linux-headers/linux/userfaultfd.h |   5 +
+ migration/migration.c             |  51 +++++-
+ migration/postcopy-ram.c          | 375 ++++++++++++++++++++++++++++++++++++--
+ migration/postcopy-ram.h          |   2 +-
+ migration/ram.c                   |  63 +++++++
+ migration/savevm.c                |   2 +-
+ migration/trace-events            |   6 +-
+ qapi-schema.json                  |  14 +-
+ 11 files changed, 551 insertions(+), 21 deletions(-)
+
 -- 
 1.8.3.1
