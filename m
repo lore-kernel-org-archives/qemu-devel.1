@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42296)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42323)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1dDAgM-0002hI-AK
-	for qemu-devel@nongnu.org; Tue, 23 May 2017 10:21:14 -0400
+	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1dDAgS-0002nD-CC
+	for qemu-devel@nongnu.org; Tue, 23 May 2017 10:21:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1dDAgH-00030K-6v
-	for qemu-devel@nongnu.org; Tue, 23 May 2017 10:21:06 -0400
-Received: from [59.151.112.132] (port=32707 helo=heian.cn.fujitsu.com)
+	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1dDAgI-000312-Hy
+	for qemu-devel@nongnu.org; Tue, 23 May 2017 10:21:12 -0400
+Received: from [59.151.112.132] (port=29446 helo=heian.cn.fujitsu.com)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1dDAgG-0002zE-LL
-	for qemu-devel@nongnu.org; Tue, 23 May 2017 10:21:01 -0400
+	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1dDAgH-0002zZ-5J
+	for qemu-devel@nongnu.org; Tue, 23 May 2017 10:21:02 -0400
 From: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
-Date: Tue, 23 May 2017 22:20:34 +0800
-Message-ID: <1495549241-23380-3-git-send-email-zhangchen.fnst@cn.fujitsu.com>
+Date: Tue, 23 May 2017 22:20:36 +0800
+Message-ID: <1495549241-23380-5-git-send-email-zhangchen.fnst@cn.fujitsu.com>
 In-Reply-To: <1495549241-23380-1-git-send-email-zhangchen.fnst@cn.fujitsu.com>
 References: <1495549241-23380-1-git-send-email-zhangchen.fnst@cn.fujitsu.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH V5 2/9] net/filter-mirror.c: Make filter mirror
- support vnet support.
+Subject: [Qemu-devel] [PATCH V5 4/9] net/net.c: Add vnet_hdr support in
+ SocketReadState
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,179 +30,110 @@ To: qemu devel <qemu-devel@nongnu.org>, Jason Wang <jasowang@redhat.com>
 Cc: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>, zhanghailiang <zhang.zhanghailiang@huawei.com>, weifuqiang <weifuqiang@huawei.com>, "eddie
 	. dong" <eddie.dong@intel.com>, bian naimeng <biannm@cn.fujitsu.com>, Li Zhijian <lizhijian@cn.fujitsu.com>
 
-We add the vnet_hdr option for filter-mirror, default is disable.
-If you use virtio-net-pci net driver, please enable it.
-You can use it for example:
--object filter-mirror,id=m0,netdev=hn0,queue=tx,outdev=mirror0,vnet_hdr=on
-
-If vnet_hdr=on we change the send packet format from
-struct {int size; const uint8_t buf[];} to {int size; int vnet_hdr_len; const uint8_t buf[];}.
-make other module(like colo-compare) know how to parse net packet correctly.
+We add a flag to dicide whether net_fill_rstate() to read
+the vnet_hdr_len or not.
 
 Signed-off-by: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
+Suggested-by: Jason Wang <jasowang@redhat.com>
 ---
- net/filter-mirror.c | 73 +++++++++++++++++++++++++++++++++++++++++++++++++----
- qemu-options.hx     |  5 ++--
- 2 files changed, 70 insertions(+), 8 deletions(-)
+ include/net/net.h   |  6 +++++-
+ net/filter-mirror.c |  1 +
+ net/net.c           | 33 ++++++++++++++++++++++++++++++---
+ 3 files changed, 36 insertions(+), 4 deletions(-)
 
+diff --git a/include/net/net.h b/include/net/net.h
+index 70edfc0..6846b91 100644
+--- a/include/net/net.h
++++ b/include/net/net.h
+@@ -113,9 +113,13 @@ typedef struct NICState {
+ } NICState;
+ 
+ struct SocketReadState {
+-    int state; /* 0 = getting length, 1 = getting data */
++    /* 0 = getting length, 1 = getting vnet header length, 2 = getting data */
++    int state;
++    /* This flag decide whether to read the vnet_hdr_len field */
++    bool vnet_hdr;
+     uint32_t index;
+     uint32_t packet_len;
++    uint32_t vnet_hdr_len;
+     uint8_t buf[NET_BUFSIZE];
+     SocketReadStateFinalize *finalize;
+ };
 diff --git a/net/filter-mirror.c b/net/filter-mirror.c
-index 72fa7c2..8df0be6 100644
+index 6c8579f..18992e9 100644
 --- a/net/filter-mirror.c
 +++ b/net/filter-mirror.c
-@@ -38,15 +38,17 @@ typedef struct MirrorState {
-     NetFilterState parent_obj;
-     char *indev;
-     char *outdev;
-+    bool vnet_hdr;
-     CharBackend chr_in;
-     CharBackend chr_out;
-     SocketReadState rs;
- } MirrorState;
+@@ -266,6 +266,7 @@ static void filter_redirector_setup(NetFilterState *nf, Error **errp)
+     }
  
--static int filter_mirror_send(CharBackend *chr_out,
-+static int filter_mirror_send(MirrorState *s,
-                               const struct iovec *iov,
-                               int iovcnt)
+     net_socket_rs_init(&s->rs, redirector_rs_finalize);
++    s->rs.vnet_hdr = s->vnet_hdr;
+ 
+     if (s->indev) {
+         chr = qemu_chr_find(s->indev);
+diff --git a/net/net.c b/net/net.c
+index a00a0c9..031cbb5 100644
+--- a/net/net.c
++++ b/net/net.c
+@@ -1607,8 +1607,10 @@ void net_socket_rs_init(SocketReadState *rs,
+                         SocketReadStateFinalize *finalize)
  {
-+    NetFilterState *nf = NETFILTER(s);
-     int ret = 0;
-     ssize_t size = 0;
-     uint32_t len = 0;
-@@ -58,14 +60,42 @@ static int filter_mirror_send(CharBackend *chr_out,
-     }
+     rs->state = 0;
++    rs->vnet_hdr = false;
+     rs->index = 0;
+     rs->packet_len = 0;
++    rs->vnet_hdr_len = 0;
+     memset(rs->buf, 0, sizeof(rs->buf));
+     rs->finalize = finalize;
+ }
+@@ -1623,8 +1625,12 @@ int net_fill_rstate(SocketReadState *rs, const uint8_t *buf, int size)
+     unsigned int l;
  
-     len = htonl(size);
--    ret = qemu_chr_fe_write_all(chr_out, (uint8_t *)&len, sizeof(len));
-+    ret = qemu_chr_fe_write_all(&s->chr_out, (uint8_t *)&len, sizeof(len));
-     if (ret != sizeof(len)) {
-         goto err;
-     }
- 
-+    if (s->vnet_hdr) {
-+        /*
-+         * If vnet_hdr = on, we send vnet header len to make other
-+         * module(like colo-compare) know how to parse net
-+         * packet correctly.
+     while (size > 0) {
+-        /* reassemble a packet from the network */
+-        switch (rs->state) { /* 0 = getting length, 1 = getting data */
++        /* Reassemble a packet from the network.
++         * 0 = getting length.
++         * 1 = getting vnet header length.
++         * 2 = getting data.
 +         */
-+        ssize_t vnet_hdr_len;
-+
-+        /*
-+         * In anytime, nf->netdev and nf->netdev->peer both have a vnet_hdr_len,
-+         * Here we just find out which is we need. When filter set RX or TX
-+         * that the real vnet_hdr_len are different.
-+         */
-+        if (nf->netdev->using_vnet_hdr) {
-+            vnet_hdr_len = nf->netdev->vnet_hdr_len;
-+        } else if (nf->netdev->peer->using_vnet_hdr) {
-+            vnet_hdr_len = nf->netdev->peer->vnet_hdr_len;
-+        } else {
-+            return 0;
-+        }
-+
-+        len = htonl(vnet_hdr_len);
-+        ret = qemu_chr_fe_write_all(&s->chr_out, (uint8_t *)&len, sizeof(len));
-+        if (ret != sizeof(len)) {
-+            goto err;
-+        }
-+    }
-+
-     buf = g_malloc(size);
-     iov_to_buf(iov, iovcnt, 0, buf, size);
--    ret = qemu_chr_fe_write_all(chr_out, (uint8_t *)buf, size);
-+    ret = qemu_chr_fe_write_all(&s->chr_out, (uint8_t *)buf, size);
-     g_free(buf);
-     if (ret != size) {
-         goto err;
-@@ -141,7 +171,7 @@ static ssize_t filter_mirror_receive_iov(NetFilterState *nf,
-     MirrorState *s = FILTER_MIRROR(nf);
-     int ret;
- 
--    ret = filter_mirror_send(&s->chr_out, iov, iovcnt);
-+    ret = filter_mirror_send(s, iov, iovcnt);
-     if (ret) {
-         error_report("filter_mirror_send failed(%s)", strerror(-ret));
-     }
-@@ -164,7 +194,7 @@ static ssize_t filter_redirector_receive_iov(NetFilterState *nf,
-     int ret;
- 
-     if (qemu_chr_fe_get_driver(&s->chr_out)) {
--        ret = filter_mirror_send(&s->chr_out, iov, iovcnt);
-+        ret = filter_mirror_send(s, iov, iovcnt);
-         if (ret) {
-             error_report("filter_mirror_send failed(%s)", strerror(-ret));
-         }
-@@ -308,6 +338,13 @@ static char *filter_mirror_get_outdev(Object *obj, Error **errp)
-     return g_strdup(s->outdev);
- }
- 
-+static char *filter_mirror_get_vnet_hdr(Object *obj, Error **errp)
-+{
-+    MirrorState *s = FILTER_MIRROR(obj);
-+
-+    return s->vnet_hdr ? g_strdup("on") : g_strdup("off");
-+}
-+
- static void
- filter_mirror_set_outdev(Object *obj, const char *value, Error **errp)
- {
-@@ -322,6 +359,21 @@ filter_mirror_set_outdev(Object *obj, const char *value, Error **errp)
-     }
- }
- 
-+static void filter_mirror_set_vnet_hdr(Object *obj,
-+                                       const char *value,
-+                                       Error **errp)
-+{
-+    MirrorState *s = FILTER_MIRROR(obj);
-+
-+    if (strcmp(value, "on") && strcmp(value, "off")) {
-+        error_setg(errp, "Invalid value for filter-mirror vnet_hdr, "
-+                         "should be 'on' or 'off'");
-+        return;
-+    }
-+
-+    s->vnet_hdr = !strcmp(value, "on");
-+}
-+
- static char *filter_redirector_get_outdev(Object *obj, Error **errp)
- {
-     MirrorState *s = FILTER_REDIRECTOR(obj);
-@@ -340,8 +392,19 @@ filter_redirector_set_outdev(Object *obj, const char *value, Error **errp)
- 
- static void filter_mirror_init(Object *obj)
- {
-+    MirrorState *s = FILTER_MIRROR(obj);
-+
-     object_property_add_str(obj, "outdev", filter_mirror_get_outdev,
-                             filter_mirror_set_outdev, NULL);
-+
-+    /*
-+     * The vnet_hdr is disabled by default, if you want to enable
-+     * this option, you must enable all the option on related modules
-+     * (like other filter or colo-compare).
-+     */
-+    s->vnet_hdr = false;
-+    object_property_add_str(obj, "vnet_hdr", filter_mirror_get_vnet_hdr,
-+                             filter_mirror_set_vnet_hdr, NULL);
- }
- 
- static void filter_redirector_init(Object *obj)
-diff --git a/qemu-options.hx b/qemu-options.hx
-index 70c0ded..81fb96b 100644
---- a/qemu-options.hx
-+++ b/qemu-options.hx
-@@ -4024,10 +4024,9 @@ queue @var{all|rx|tx} is an option that can be applied to any netfilter.
- @option{tx}: the filter is attached to the transmit queue of the netdev,
-              where it will receive packets sent by the netdev.
- 
--@item -object filter-mirror,id=@var{id},netdev=@var{netdevid},outdev=@var{chardevid}[,queue=@var{all|rx|tx}]
-+@item -object filter-mirror,id=@var{id},netdev=@var{netdevid},outdev=@var{chardevid},vnet_hdr=@var{on|off}[,queue=@var{all|rx|tx}]
- 
--filter-mirror on netdev @var{netdevid},mirror net packet to chardev
--@var{chardevid}
-+filter-mirror on netdev @var{netdevid},mirror net packet to chardev@var{chardevid}, if vnet_hdr = on, filter-mirror will mirror packet with vnet_hdr_len.
- 
- @item -object filter-redirector,id=@var{id},netdev=@var{netdevid},indev=@var{chardevid},
- outdev=@var{chardevid}[,queue=@var{all|rx|tx}]
++        switch (rs->state) {
+         case 0:
+             l = 4 - rs->index;
+             if (l > size) {
+@@ -1638,10 +1644,31 @@ int net_fill_rstate(SocketReadState *rs, const uint8_t *buf, int size)
+                 /* got length */
+                 rs->packet_len = ntohl(*(uint32_t *)rs->buf);
+                 rs->index = 0;
+-                rs->state = 1;
++                if (rs->vnet_hdr) {
++                    rs->state = 1;
++                } else {
++                    rs->state = 2;
++                    rs->vnet_hdr_len = 0;
++                }
+             }
+             break;
+         case 1:
++            l = 4 - rs->index;
++            if (l > size) {
++                l = size;
++            }
++            memcpy(rs->buf + rs->index, buf, l);
++            buf += l;
++            size -= l;
++            rs->index += l;
++            if (rs->index == 4) {
++                /* got vnet header length */
++                rs->vnet_hdr_len = ntohl(*(uint32_t *)rs->buf);
++                rs->index = 0;
++                rs->state = 2;
++            }
++            break;
++        case 2:
+             l = rs->packet_len - rs->index;
+             if (l > size) {
+                 l = size;
 -- 
 2.7.4
