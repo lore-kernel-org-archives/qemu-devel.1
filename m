@@ -1,36 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43957)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43913)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cornelia.huck@de.ibm.com>) id 1dD7kv-0007fb-PT
+	(envelope-from <cornelia.huck@de.ibm.com>) id 1dD7ks-0007br-DJ
 	for qemu-devel@nongnu.org; Tue, 23 May 2017 07:13:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cornelia.huck@de.ibm.com>) id 1dD7kr-0002zc-Cd
-	for qemu-devel@nongnu.org; Tue, 23 May 2017 07:13:37 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:54276
+	(envelope-from <cornelia.huck@de.ibm.com>) id 1dD7kn-0002xu-DK
+	for qemu-devel@nongnu.org; Tue, 23 May 2017 07:13:34 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:32966
 	helo=mx0a-001b2d01.pphosted.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <cornelia.huck@de.ibm.com>)
-	id 1dD7kr-0002zT-77
-	for qemu-devel@nongnu.org; Tue, 23 May 2017 07:13:33 -0400
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
+	id 1dD7kn-0002xj-7F
+	for qemu-devel@nongnu.org; Tue, 23 May 2017 07:13:29 -0400
+Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
 	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v4NB4KKB116715
-	for <qemu-devel@nongnu.org>; Tue, 23 May 2017 07:13:32 -0400
-Received: from e06smtp14.uk.ibm.com (e06smtp14.uk.ibm.com [195.75.94.110])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2amf9amn9t-1
+	v4NB4L6U038905
+	for <qemu-devel@nongnu.org>; Tue, 23 May 2017 07:13:28 -0400
+Received: from e06smtp11.uk.ibm.com (e06smtp11.uk.ibm.com [195.75.94.107])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2am85f3jps-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 23 May 2017 07:13:32 -0400
+	for <qemu-devel@nongnu.org>; Tue, 23 May 2017 07:13:28 -0400
 Received: from localhost
-	by e06smtp14.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	by e06smtp11.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
 	Only! Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <cornelia.huck@de.ibm.com>;
-	Tue, 23 May 2017 12:13:30 +0100
+	Tue, 23 May 2017 12:13:26 +0100
 From: Cornelia Huck <cornelia.huck@de.ibm.com>
-Date: Tue, 23 May 2017 13:12:59 +0200
+Date: Tue, 23 May 2017 13:12:56 +0200
 In-Reply-To: <20170523111306.25493-1-cornelia.huck@de.ibm.com>
 References: <20170523111306.25493-1-cornelia.huck@de.ibm.com>
-Message-Id: <20170523111306.25493-15-cornelia.huck@de.ibm.com>
-Subject: [Qemu-devel] [PULL 14/21] vfio/ccw: vfio based subchannel
- passthrough driver
+Message-Id: <20170523111306.25493-12-cornelia.huck@de.ibm.com>
+Subject: [Qemu-devel] [PULL 11/21] s390x/css: realize css_sch_build_schib
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -44,253 +43,273 @@ Cc: borntraeger@de.ibm.com, agraf@suse.de, qemu-devel@nongnu.org, Xiao Feng Ren 
 
 From: Xiao Feng Ren <renxiaof@linux.vnet.ibm.com>
 
-We use the IOMMU_TYPE1 of VFIO to realize the subchannels
-passthrough, implement a vfio based subchannels passthrough
-driver called "vfio-ccw".
+The S390 virtual css support already has a mechanism to build a
+virtual subchannel information block (schib) and provide virtual
+subchannels to the guest. However, to pass-through subchannels to
+a guest, we need to introduce a new mechanism to build its schib
+according to the real device information. Thus we realize a new css
+sch_build_schib function to extract the path_masks, chpids, chpid
+type from sysfs. To reuse the existing code, we refactor
+css_add_virtual_chpid to css_add_chpid.
 
-Support qemu parameters in the style of:
-"-device vfio-ccw,sysfsdev=$mdev_file_path,devno=xx.x.xxxx'
-
-Reviewed-by: Eric Auger <eric.auger@redhat.com>
-Acked-by: Alex Williamson <alex.williamson@redhat.com>
+Reviewed-by: Pierre Morel <pmorel@linux.vnet.ibm.com>
 Signed-off-by: Xiao Feng Ren <renxiaof@linux.vnet.ibm.com>
 Signed-off-by: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
-Message-Id: <20170517004813.58227-8-bjsdjshi@linux.vnet.ibm.com>
+Message-Id: <20170517004813.58227-5-bjsdjshi@linux.vnet.ibm.com>
 Signed-off-by: Cornelia Huck <cornelia.huck@de.ibm.com>
 ---
- default-configs/s390x-softmmu.mak |   1 +
- hw/vfio/Makefile.objs             |   1 +
- hw/vfio/ccw.c                     | 187 ++++++++++++++++++++++++++++++++++++++
- include/hw/vfio/vfio-common.h     |   1 +
- 4 files changed, 190 insertions(+)
- create mode 100644 hw/vfio/ccw.c
+ hw/s390x/css.c         | 152 ++++++++++++++++++++++++++++++++++++++++++++++++-
+ include/hw/s390x/css.h |  36 ++++++------
+ 2 files changed, 168 insertions(+), 20 deletions(-)
 
-diff --git a/default-configs/s390x-softmmu.mak b/default-configs/s390x-softmmu.mak
-index 9615a48f80..18aed56fc0 100644
---- a/default-configs/s390x-softmmu.mak
-+++ b/default-configs/s390x-softmmu.mak
-@@ -5,4 +5,5 @@ CONFIG_SCLPCONSOLE=y
- CONFIG_TERMINAL3270=y
- CONFIG_S390_FLIC=y
- CONFIG_S390_FLIC_KVM=$(CONFIG_KVM)
-+CONFIG_VFIO_CCW=$(CONFIG_LINUX)
- CONFIG_WDT_DIAG288=y
-diff --git a/hw/vfio/Makefile.objs b/hw/vfio/Makefile.objs
-index 05e7fbb93f..c3ab9097f1 100644
---- a/hw/vfio/Makefile.objs
-+++ b/hw/vfio/Makefile.objs
-@@ -1,6 +1,7 @@
- ifeq ($(CONFIG_LINUX), y)
- obj-$(CONFIG_SOFTMMU) += common.o
- obj-$(CONFIG_PCI) += pci.o pci-quirks.o
-+obj-$(CONFIG_VFIO_CCW) += ccw.o
- obj-$(CONFIG_SOFTMMU) += platform.o
- obj-$(CONFIG_VFIO_XGMAC) += calxeda-xgmac.o
- obj-$(CONFIG_VFIO_AMD_XGBE) += amd-xgbe.o
-diff --git a/hw/vfio/ccw.c b/hw/vfio/ccw.c
-new file mode 100644
-index 0000000000..7d2497cee6
---- /dev/null
-+++ b/hw/vfio/ccw.c
-@@ -0,0 +1,187 @@
-+/*
-+ * vfio based subchannel assignment support
-+ *
-+ * Copyright 2017 IBM Corp.
-+ * Author(s): Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
-+ *            Xiao Feng Ren <renxiaof@linux.vnet.ibm.com>
-+ *            Pierre Morel <pmorel@linux.vnet.ibm.com>
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or(at
-+ * your option) any version. See the COPYING file in the top-level
-+ * directory.
-+ */
+diff --git a/hw/s390x/css.c b/hw/s390x/css.c
+index 15c4f4b249..2c8d0e7219 100644
+--- a/hw/s390x/css.c
++++ b/hw/s390x/css.c
+@@ -13,6 +13,7 @@
+ #include "qapi/error.h"
+ #include "qapi/visitor.h"
+ #include "hw/qdev.h"
++#include "qemu/error-report.h"
+ #include "qemu/bitops.h"
+ #include "exec/address-spaces.h"
+ #include "cpu.h"
+@@ -1326,7 +1327,8 @@ unsigned int css_find_free_chpid(uint8_t cssid)
+     return MAX_CHPID + 1;
+ }
+ 
+-static int css_add_virtual_chpid(uint8_t cssid, uint8_t chpid, uint8_t type)
++static int css_add_chpid(uint8_t cssid, uint8_t chpid, uint8_t type,
++                         bool is_virt)
+ {
+     CssImage *css;
+ 
+@@ -1340,7 +1342,7 @@ static int css_add_virtual_chpid(uint8_t cssid, uint8_t chpid, uint8_t type)
+     }
+     css->chpids[chpid].in_use = 1;
+     css->chpids[chpid].type = type;
+-    css->chpids[chpid].is_virtual = 1;
++    css->chpids[chpid].is_virtual = is_virt;
+ 
+     css_generate_chp_crws(cssid, chpid);
+ 
+@@ -1364,7 +1366,7 @@ void css_sch_build_virtual_schib(SubchDev *sch, uint8_t chpid, uint8_t type)
+     p->pam = 0x80;
+     p->chpid[0] = chpid;
+     if (!css->chpids[chpid].in_use) {
+-        css_add_virtual_chpid(sch->cssid, chpid, type);
++        css_add_chpid(sch->cssid, chpid, type, true);
+     }
+ 
+     memset(s, 0, sizeof(SCSW));
+@@ -1978,3 +1980,147 @@ SubchDev *css_create_virtual_sch(CssDevId bus_id, Error **errp)
+     css_subch_assign(sch->cssid, sch->ssid, schid, sch->devno, sch);
+     return sch;
+ }
 +
-+#include <linux/vfio.h>
-+#include <sys/ioctl.h>
-+
-+#include "qemu/osdep.h"
-+#include "qapi/error.h"
-+#include "hw/sysbus.h"
-+#include "hw/vfio/vfio.h"
-+#include "hw/vfio/vfio-common.h"
-+#include "hw/s390x/s390-ccw.h"
-+#include "hw/s390x/ccw-device.h"
-+
-+#define TYPE_VFIO_CCW "vfio-ccw"
-+typedef struct VFIOCCWDevice {
-+    S390CCWDevice cdev;
-+    VFIODevice vdev;
-+} VFIOCCWDevice;
-+
-+static void vfio_ccw_compute_needs_reset(VFIODevice *vdev)
++static int css_sch_get_chpids(SubchDev *sch, CssDevId *dev_id)
 +{
-+    vdev->needs_reset = false;
++    char *fid_path;
++    FILE *fd;
++    uint32_t chpid[8];
++    int i;
++    PMCW *p = &sch->curr_status.pmcw;
++
++    fid_path = g_strdup_printf("/sys/bus/css/devices/%x.%x.%04x/chpids",
++                               dev_id->cssid, dev_id->ssid, dev_id->devid);
++    fd = fopen(fid_path, "r");
++    if (fd == NULL) {
++        error_report("%s: open %s failed", __func__, fid_path);
++        g_free(fid_path);
++        return -EINVAL;
++    }
++
++    if (fscanf(fd, "%x %x %x %x %x %x %x %x",
++        &chpid[0], &chpid[1], &chpid[2], &chpid[3],
++        &chpid[4], &chpid[5], &chpid[6], &chpid[7]) != 8) {
++        fclose(fd);
++        g_free(fid_path);
++        return -EINVAL;
++    }
++
++    for (i = 0; i < ARRAY_SIZE(p->chpid); i++) {
++        p->chpid[i] = chpid[i];
++    }
++
++    fclose(fd);
++    g_free(fid_path);
++
++    return 0;
++}
++
++static int css_sch_get_path_masks(SubchDev *sch, CssDevId *dev_id)
++{
++    char *fid_path;
++    FILE *fd;
++    uint32_t pim, pam, pom;
++    PMCW *p = &sch->curr_status.pmcw;
++
++    fid_path = g_strdup_printf("/sys/bus/css/devices/%x.%x.%04x/pimpampom",
++                               dev_id->cssid, dev_id->ssid, dev_id->devid);
++    fd = fopen(fid_path, "r");
++    if (fd == NULL) {
++        error_report("%s: open %s failed", __func__, fid_path);
++        g_free(fid_path);
++        return -EINVAL;
++    }
++
++    if (fscanf(fd, "%x %x %x", &pim, &pam, &pom) != 3) {
++        fclose(fd);
++        g_free(fid_path);
++        return -EINVAL;
++    }
++
++    p->pim = pim;
++    p->pam = pam;
++    p->pom = pom;
++    fclose(fd);
++    g_free(fid_path);
++
++    return 0;
++}
++
++static int css_sch_get_chpid_type(uint8_t chpid, uint32_t *type,
++                                  CssDevId *dev_id)
++{
++    char *fid_path;
++    FILE *fd;
++
++    fid_path = g_strdup_printf("/sys/devices/css%x/chp0.%02x/type",
++                               dev_id->cssid, chpid);
++    fd = fopen(fid_path, "r");
++    if (fd == NULL) {
++        error_report("%s: open %s failed", __func__, fid_path);
++        g_free(fid_path);
++        return -EINVAL;
++    }
++
++    if (fscanf(fd, "%x", type) != 1) {
++        fclose(fd);
++        g_free(fid_path);
++        return -EINVAL;
++    }
++
++    fclose(fd);
++    g_free(fid_path);
++
++    return 0;
 +}
 +
 +/*
-+ * We don't need vfio_hot_reset_multi and vfio_eoi operations for
-+ * vfio_ccw device now.
++ * We currently retrieve the real device information from sysfs to build the
++ * guest subchannel information block without considering the migration feature.
++ * We need to revisit this problem when we want to add migration support.
 + */
-+struct VFIODeviceOps vfio_ccw_ops = {
-+    .vfio_compute_needs_reset = vfio_ccw_compute_needs_reset,
-+};
-+
-+static void vfio_ccw_reset(DeviceState *dev)
++int css_sch_build_schib(SubchDev *sch, CssDevId *dev_id)
 +{
-+    CcwDevice *ccw_dev = DO_UPCAST(CcwDevice, parent_obj, dev);
-+    S390CCWDevice *cdev = DO_UPCAST(S390CCWDevice, parent_obj, ccw_dev);
-+    VFIOCCWDevice *vcdev = DO_UPCAST(VFIOCCWDevice, cdev, cdev);
++    CssImage *css = channel_subsys.css[sch->cssid];
++    PMCW *p = &sch->curr_status.pmcw;
++    SCSW *s = &sch->curr_status.scsw;
++    uint32_t type;
++    int i, ret;
 +
-+    ioctl(vcdev->vdev.fd, VFIO_DEVICE_RESET);
-+}
++    assert(css != NULL);
++    memset(p, 0, sizeof(PMCW));
++    p->flags |= PMCW_FLAGS_MASK_DNV;
++    /* We are dealing with I/O subchannels only. */
++    p->devno = sch->devno;
 +
-+static void vfio_put_device(VFIOCCWDevice *vcdev)
-+{
-+    g_free(vcdev->vdev.name);
-+    vfio_put_base_device(&vcdev->vdev);
-+}
-+
-+static VFIOGroup *vfio_ccw_get_group(S390CCWDevice *cdev, Error **errp)
-+{
-+    char *tmp, group_path[PATH_MAX];
-+    ssize_t len;
-+    int groupid;
-+
-+    tmp = g_strdup_printf("/sys/bus/css/devices/%x.%x.%04x/%s/iommu_group",
-+                          cdev->hostid.cssid, cdev->hostid.ssid,
-+                          cdev->hostid.devid, cdev->mdevid);
-+    len = readlink(tmp, group_path, sizeof(group_path));
-+    g_free(tmp);
-+
-+    if (len <= 0 || len >= sizeof(group_path)) {
-+        error_setg(errp, "vfio: no iommu_group found");
-+        return NULL;
++    /* Grab path mask from sysfs. */
++    ret = css_sch_get_path_masks(sch, dev_id);
++    if (ret) {
++        return ret;
 +    }
 +
-+    group_path[len] = 0;
-+
-+    if (sscanf(basename(group_path), "%d", &groupid) != 1) {
-+        error_setg(errp, "vfio: failed to read %s", group_path);
-+        return NULL;
++    /* Grab chpids from sysfs. */
++    ret = css_sch_get_chpids(sch, dev_id);
++    if (ret) {
++        return ret;
 +    }
 +
-+    return vfio_get_group(groupid, &address_space_memory, errp);
-+}
-+
-+static void vfio_ccw_realize(DeviceState *dev, Error **errp)
-+{
-+    VFIODevice *vbasedev;
-+    VFIOGroup *group;
-+    CcwDevice *ccw_dev = DO_UPCAST(CcwDevice, parent_obj, dev);
-+    S390CCWDevice *cdev = DO_UPCAST(S390CCWDevice, parent_obj, ccw_dev);
-+    VFIOCCWDevice *vcdev = DO_UPCAST(VFIOCCWDevice, cdev, cdev);
-+    S390CCWDeviceClass *cdc = S390_CCW_DEVICE_GET_CLASS(cdev);
-+    Error *err = NULL;
-+
-+    /* Call the class init function for subchannel. */
-+    if (cdc->realize) {
-+        cdc->realize(cdev, vcdev->vdev.sysfsdev, &err);
-+        if (err) {
-+            goto out_err_propagate;
++   /* Build chpid type. */
++    for (i = 0; i < ARRAY_SIZE(p->chpid); i++) {
++        if (p->chpid[i] && !css->chpids[p->chpid[i]].in_use) {
++            ret = css_sch_get_chpid_type(p->chpid[i], &type, dev_id);
++            if (ret) {
++                return ret;
++            }
++            css_add_chpid(sch->cssid, p->chpid[i], type, false);
 +        }
 +    }
 +
-+    group = vfio_ccw_get_group(cdev, &err);
-+    if (!group) {
-+        goto out_group_err;
++    memset(s, 0, sizeof(SCSW));
++    sch->curr_status.mba = 0;
++    for (i = 0; i < ARRAY_SIZE(sch->curr_status.mda); i++) {
++        sch->curr_status.mda[i] = 0;
 +    }
 +
-+    vcdev->vdev.ops = &vfio_ccw_ops;
-+    vcdev->vdev.type = VFIO_DEVICE_TYPE_CCW;
-+    vcdev->vdev.name = g_strdup_printf("%x.%x.%04x", cdev->hostid.cssid,
-+                                       cdev->hostid.ssid, cdev->hostid.devid);
-+    QLIST_FOREACH(vbasedev, &group->device_list, next) {
-+        if (strcmp(vbasedev->name, vcdev->vdev.name) == 0) {
-+            error_setg(&err, "vfio: subchannel %s has already been attached",
-+                       vcdev->vdev.name);
-+            goto out_device_err;
-+        }
-+    }
-+
-+    if (vfio_get_device(group, cdev->mdevid, &vcdev->vdev, &err)) {
-+        goto out_device_err;
-+    }
-+
-+    return;
-+
-+out_device_err:
-+    vfio_put_group(group);
-+out_group_err:
-+    if (cdc->unrealize) {
-+        cdc->unrealize(cdev, NULL);
-+    }
-+out_err_propagate:
-+    error_propagate(errp, err);
++    return 0;
 +}
-+
-+static void vfio_ccw_unrealize(DeviceState *dev, Error **errp)
-+{
-+    CcwDevice *ccw_dev = DO_UPCAST(CcwDevice, parent_obj, dev);
-+    S390CCWDevice *cdev = DO_UPCAST(S390CCWDevice, parent_obj, ccw_dev);
-+    VFIOCCWDevice *vcdev = DO_UPCAST(VFIOCCWDevice, cdev, cdev);
-+    S390CCWDeviceClass *cdc = S390_CCW_DEVICE_GET_CLASS(cdev);
-+    VFIOGroup *group = vcdev->vdev.group;
-+
-+    vfio_put_device(vcdev);
-+    vfio_put_group(group);
-+
-+    if (cdc->unrealize) {
-+        cdc->unrealize(cdev, errp);
-+    }
-+}
-+
-+static Property vfio_ccw_properties[] = {
-+    DEFINE_PROP_STRING("sysfsdev", VFIOCCWDevice, vdev.sysfsdev),
-+    DEFINE_PROP_END_OF_LIST(),
-+};
-+
-+static const VMStateDescription vfio_ccw_vmstate = {
-+    .name = TYPE_VFIO_CCW,
-+    .unmigratable = 1,
-+};
-+
-+static void vfio_ccw_class_init(ObjectClass *klass, void *data)
-+{
-+    DeviceClass *dc = DEVICE_CLASS(klass);
-+
-+    dc->props = vfio_ccw_properties;
-+    dc->vmsd = &vfio_ccw_vmstate;
-+    dc->desc = "VFIO-based subchannel assignment";
-+    dc->realize = vfio_ccw_realize;
-+    dc->unrealize = vfio_ccw_unrealize;
-+    dc->reset = vfio_ccw_reset;
-+}
-+
-+static const TypeInfo vfio_ccw_info = {
-+    .name = TYPE_VFIO_CCW,
-+    .parent = TYPE_S390_CCW,
-+    .instance_size = sizeof(VFIOCCWDevice),
-+    .class_init = vfio_ccw_class_init,
-+};
-+
-+static void register_vfio_ccw_type(void)
-+{
-+    type_register_static(&vfio_ccw_info);
-+}
-+
-+type_init(register_vfio_ccw_type)
-diff --git a/include/hw/vfio/vfio-common.h b/include/hw/vfio/vfio-common.h
-index c582de18c9..9521013d52 100644
---- a/include/hw/vfio/vfio-common.h
-+++ b/include/hw/vfio/vfio-common.h
-@@ -45,6 +45,7 @@
- enum {
-     VFIO_DEVICE_TYPE_PCI = 0,
-     VFIO_DEVICE_TYPE_PLATFORM = 1,
-+    VFIO_DEVICE_TYPE_CCW = 2,
+diff --git a/include/hw/s390x/css.h b/include/hw/s390x/css.h
+index e61fa74d9b..e59a11537f 100644
+--- a/include/hw/s390x/css.h
++++ b/include/hw/s390x/css.h
+@@ -95,6 +95,24 @@ struct SubchDev {
+     void *driver_data;
  };
  
- typedef struct VFIOMmap {
++/*
++ * Identify a device within the channel subsystem.
++ * Note that this can be used to identify either the subchannel or
++ * the attached I/O device, as there's always one I/O device per
++ * subchannel.
++ */
++typedef struct CssDevId {
++    uint8_t cssid;
++    uint8_t ssid;
++    uint16_t devid;
++    bool valid;
++} CssDevId;
++
++extern PropertyInfo css_devid_propinfo;
++
++#define DEFINE_PROP_CSS_DEV_ID(_n, _s, _f) \
++    DEFINE_PROP(_n, _s, _f, css_devid_propinfo, CssDevId)
++
+ typedef struct IndAddr {
+     hwaddr addr;
+     uint64_t map;
+@@ -116,6 +134,7 @@ bool css_devno_used(uint8_t cssid, uint8_t ssid, uint16_t devno);
+ void css_subch_assign(uint8_t cssid, uint8_t ssid, uint16_t schid,
+                       uint16_t devno, SubchDev *sch);
+ void css_sch_build_virtual_schib(SubchDev *sch, uint8_t chpid, uint8_t type);
++int css_sch_build_schib(SubchDev *sch, CssDevId *dev_id);
+ unsigned int css_find_free_chpid(uint8_t cssid);
+ uint16_t css_build_subchannel_id(SubchDev *sch);
+ void css_reset(void);
+@@ -164,23 +183,6 @@ int css_do_rsch(SubchDev *sch);
+ int css_do_rchp(uint8_t cssid, uint8_t chpid);
+ bool css_present(uint8_t cssid);
+ #endif
+-/*
+- * Identify a device within the channel subsystem.
+- * Note that this can be used to identify either the subchannel or
+- * the attached I/O device, as there's always one I/O device per
+- * subchannel.
+- */
+-typedef struct CssDevId {
+-    uint8_t cssid;
+-    uint8_t ssid;
+-    uint16_t devid;
+-    bool valid;
+-} CssDevId;
+-
+-extern PropertyInfo css_devid_propinfo;
+-
+-#define DEFINE_PROP_CSS_DEV_ID(_n, _s, _f) \
+-    DEFINE_PROP(_n, _s, _f, css_devid_propinfo, CssDevId)
+ 
+ extern PropertyInfo css_devid_ro_propinfo;
+ 
 -- 
 2.13.0
