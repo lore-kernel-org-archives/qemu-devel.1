@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55714)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55963)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dDBEY-0006kb-KC
-	for qemu-devel@nongnu.org; Tue, 23 May 2017 10:56:27 -0400
+	(envelope-from <mjt@tls.msk.ru>) id 1dDBEk-0006uP-CM
+	for qemu-devel@nongnu.org; Tue, 23 May 2017 10:56:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dDBEW-0003Mo-3D
-	for qemu-devel@nongnu.org; Tue, 23 May 2017 10:56:26 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <1494322876-28843-1-git-send-email-armbru@redhat.com>
-	<ea74cfd3-9009-e99d-8f18-8edc9c0441c2@redhat.com>
-	<87zie3byk6.fsf@dusky.pond.sub.org>
-Date: Tue, 23 May 2017 16:56:18 +0200
-In-Reply-To: <87zie3byk6.fsf@dusky.pond.sub.org> (Markus Armbruster's message
-	of "Tue, 23 May 2017 13:30:17 +0200")
-Message-ID: <87h90b39m5.fsf@dusky.pond.sub.org>
+	(envelope-from <mjt@tls.msk.ru>) id 1dDBEh-0003Wg-SJ
+	for qemu-devel@nongnu.org; Tue, 23 May 2017 10:56:38 -0400
+References: <20170508233918.9043-1-f4bug@amsat.org>
+	<20170508233918.9043-11-f4bug@amsat.org>
+From: Michael Tokarev <mjt@tls.msk.ru>
+Message-ID: <3a91757e-881f-77cd-f6a5-9db7b9bbae17@msgid.tls.msk.ru>
+Date: Tue, 23 May 2017 17:56:34 +0300
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH 0/2] docs: Minor updates around ide-drive
+In-Reply-To: <20170508233918.9043-11-f4bug@amsat.org>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 10/11] register: display register prefix
+ (name) since it is available
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,31 +24,8 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-trivial@nongnu.org, Thomas Huth <thuth@redhat.com>
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, qemu-trivial@nongnu.org, Alistair Francis <alistair.francis@xilinx.com>
 
-Markus Armbruster <armbru@redhat.com> writes:
+applied to -trivial, thanks!
 
-> John Snow <jsnow@redhat.com> writes:
->
->> On 05/09/2017 05:41 AM, Markus Armbruster wrote:
->>> Markus Armbruster (2):
->>>   docs qemu-doc: Avoid ide-drive, it's deprecated
->>>   docs/qdev-device-use.txt: update section Default Devices
->>> 
->>>  docs/bootindex.txt       |  2 +-
->>>  docs/qdev-device-use.txt | 13 +++++++------
->>>  qemu-options.hx          |  2 +-
->>>  3 files changed, 9 insertions(+), 8 deletions(-)
->>> 
->>
->> Shame on me for not noticing, but thank you.
->>
->> Acked-by: John Snow <jsnow@redhat.com>
->
-> Thanks!
->
-> The canonical path is through your tree, but I could stick it into a
-> miscellaneous pull request if you like.
-
-Nevermind, qemu-trivial picked it up.
+/mjt
