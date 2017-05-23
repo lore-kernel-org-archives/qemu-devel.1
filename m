@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37535)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37785)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aurelien@aurel32.net>) id 1dD7No-0003jm-Ja
-	for qemu-devel@nongnu.org; Tue, 23 May 2017 06:49:45 -0400
+	(envelope-from <aurelien@aurel32.net>) id 1dD7OR-0004LG-RH
+	for qemu-devel@nongnu.org; Tue, 23 May 2017 06:50:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aurelien@aurel32.net>) id 1dD7Nn-0000OK-BO
-	for qemu-devel@nongnu.org; Tue, 23 May 2017 06:49:44 -0400
-Received: from hall.aurel32.net ([2001:bc8:30d7:100::1]:43020)
+	(envelope-from <aurelien@aurel32.net>) id 1dD7OQ-0000p1-WB
+	for qemu-devel@nongnu.org; Tue, 23 May 2017 06:50:23 -0400
+Received: from hall.aurel32.net ([2001:bc8:30d7:100::1]:43034)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <aurelien@aurel32.net>)
-	id 1dD7Nn-0000O0-5u
-	for qemu-devel@nongnu.org; Tue, 23 May 2017 06:49:43 -0400
-Date: Tue, 23 May 2017 12:49:39 +0200
+	id 1dD7OQ-0000og-Qf
+	for qemu-devel@nongnu.org; Tue, 23 May 2017 06:50:22 -0400
+Date: Tue, 23 May 2017 12:50:16 +0200
 From: Aurelien Jarno <aurelien@aurel32.net>
-Message-ID: <20170523104939.mxwjdnhhmlpw5vb4@aurel32.net>
+Message-ID: <20170523105016.nfr2gibuy5uwt3xn@aurel32.net>
 References: <20170523030312.6360-1-rth@twiddle.net>
-	<20170523030312.6360-5-rth@twiddle.net>
-	<52641a4b-80b1-3e9e-fdff-21ad0bd591ed@redhat.com>
+	<20170523030312.6360-6-rth@twiddle.net>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <52641a4b-80b1-3e9e-fdff-21ad0bd591ed@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 04/31] target/s390x: Use unwind data for
- helper_xc
+In-Reply-To: <20170523030312.6360-6-rth@twiddle.net>
+Subject: Re: [Qemu-devel] [PATCH 05/31] target/s390x: Use unwind data for
+ helper_oc
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,16 +29,15 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: Richard Henderson <rth@twiddle.net>, qemu-devel@nongnu.org
+To: Richard Henderson <rth@twiddle.net>
+Cc: qemu-devel@nongnu.org
 
-On 2017-05-23 10:56, Thomas Huth wrote:
-> On 23.05.2017 05:02, Richard Henderson wrote:
-> > Signed-off-by: Richard Henderson <rth@twiddle.net>
-> > ---
-> >  target/s390x/mem_helper.c | 25 ++++++++++++-------------
-> >  target/s390x/translate.c  |  1 -
-> >  2 files changed, 12 insertions(+), 14 deletions(-)
+On 2017-05-22 20:02, Richard Henderson wrote:
+> Signed-off-by: Richard Henderson <rth@twiddle.net>
+> ---
+>  target/s390x/mem_helper.c | 18 +++++++++---------
+>  target/s390x/translate.c  |  1 -
+>  2 files changed, 9 insertions(+), 10 deletions(-)
 
 Reviewed-by: Aurelien Jarno <aurelien@aurel32.net>
 
