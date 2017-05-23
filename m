@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48824)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48788)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <a.perevalov@samsung.com>) id 1dD82M-0006mf-DQ
+	(envelope-from <a.perevalov@samsung.com>) id 1dD82L-0006lz-Hj
 	for qemu-devel@nongnu.org; Tue, 23 May 2017 07:31:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <a.perevalov@samsung.com>) id 1dD82I-0003gX-3G
-	for qemu-devel@nongnu.org; Tue, 23 May 2017 07:31:38 -0400
-Received: from mailout3.w1.samsung.com ([210.118.77.13]:29807)
+	(envelope-from <a.perevalov@samsung.com>) id 1dD82H-0003fr-Kl
+	for qemu-devel@nongnu.org; Tue, 23 May 2017 07:31:37 -0400
+Received: from mailout4.w1.samsung.com ([210.118.77.14]:54528)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <a.perevalov@samsung.com>)
-	id 1dD82H-0003eu-QN
-	for qemu-devel@nongnu.org; Tue, 23 May 2017 07:31:34 -0400
+	id 1dD82H-0003eh-Fn
+	for qemu-devel@nongnu.org; Tue, 23 May 2017 07:31:33 -0400
 Received: from eucas1p2.samsung.com (unknown [182.198.249.207])
-	by mailout3.w1.samsung.com
+	by mailout4.w1.samsung.com
 	(Oracle Communications Messaging Server 7.0.5.31.0 64bit (built May 5
-	2014)) with ESMTP id <0OQE00088LCGQB70@mailout3.w1.samsung.com> for
-	qemu-devel@nongnu.org; Tue, 23 May 2017 12:31:28 +0100 (BST)
+	2014)) with ESMTP id <0OQE0024TLCJWO70@mailout4.w1.samsung.com> for
+	qemu-devel@nongnu.org; Tue, 23 May 2017 12:31:31 +0100 (BST)
 From: Alexey Perevalov <a.perevalov@samsung.com>
-Date: Tue, 23 May 2017 14:31:03 +0300
-Message-id: <1495539071-12995-3-git-send-email-a.perevalov@samsung.com>
+Date: Tue, 23 May 2017 14:31:06 +0300
+Message-id: <1495539071-12995-6-git-send-email-a.perevalov@samsung.com>
 In-reply-to: <1495539071-12995-1-git-send-email-a.perevalov@samsung.com>
 References: <1495539071-12995-1-git-send-email-a.perevalov@samsung.com>
-	<CGME20170523113127eucas1p22dba0fddcc9bcf70e554bf659272f947@eucas1p2.samsung.com>
-Subject: [Qemu-devel] [PATCH V6 02/10] migration: pass
- MigrationIncomingState* into migration check functions
+	<CGME20170523113129eucas1p2146e1018e660eed0b319cbe22adc2712@eucas1p2.samsung.com>
+Subject: [Qemu-devel] [PATCH V6 05/10] migration: introduce
+ postcopy-blocktime capability
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,105 +34,70 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: i.maximets@samsung.com, peterx@redhat.com, eblake@redhat.com, dgilbert@redhat.com, Alexey Perevalov <a.perevalov@samsung.com>
 
-That tiny refactoring is necessary to be able to set
-UFFD_FEATURE_THREAD_ID while requesting features, and then
-to create downtime context in case when kernel supports it.
+Right now it could be used on destination side to
+enable vCPU blocktime calculation for postcopy live migration.
+vCPU blocktime - it's time since vCPU thread was put into
+interruptible sleep, till memory page was copied and thread awake.
 
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 Signed-off-by: Alexey Perevalov <a.perevalov@samsung.com>
 ---
- migration/migration.c    |  2 +-
- migration/postcopy-ram.c | 10 +++++-----
- migration/postcopy-ram.h |  2 +-
- migration/savevm.c       |  2 +-
- 4 files changed, 8 insertions(+), 8 deletions(-)
+ include/migration/migration.h | 1 +
+ migration/migration.c         | 9 +++++++++
+ qapi-schema.json              | 5 ++++-
+ 3 files changed, 14 insertions(+), 1 deletion(-)
 
+diff --git a/include/migration/migration.h b/include/migration/migration.h
+index 49ec501..2951253 100644
+--- a/include/migration/migration.h
++++ b/include/migration/migration.h
+@@ -270,6 +270,7 @@ int migrate_compress_level(void);
+ int migrate_compress_threads(void);
+ int migrate_decompress_threads(void);
+ bool migrate_use_events(void);
++bool migrate_postcopy_blocktime(void);
+ 
+ /* Sending on the return path - generic and then for each message type */
+ void migrate_send_rp_message(MigrationIncomingState *mis,
 diff --git a/migration/migration.c b/migration/migration.c
-index 0304c01..d735976 100644
+index d735976..e10284e 100644
 --- a/migration/migration.c
 +++ b/migration/migration.c
-@@ -789,7 +789,7 @@ void qmp_migrate_set_capabilities(MigrationCapabilityStatusList *params,
-          * special support.
-          */
-         if (!old_postcopy_cap && runstate_check(RUN_STATE_INMIGRATE) &&
--            !postcopy_ram_supported_by_host()) {
-+            !postcopy_ram_supported_by_host(NULL)) {
-             /* postcopy_ram_supported_by_host will have emitted a more
-              * detailed message
-              */
-diff --git a/migration/postcopy-ram.c b/migration/postcopy-ram.c
-index a0489f6..4adab36 100644
---- a/migration/postcopy-ram.c
-+++ b/migration/postcopy-ram.c
-@@ -59,7 +59,7 @@ struct PostcopyDiscardState {
- #include <sys/eventfd.h>
- #include <linux/userfaultfd.h>
+@@ -1341,6 +1341,15 @@ bool migrate_zero_blocks(void)
+     return s->enabled_capabilities[MIGRATION_CAPABILITY_ZERO_BLOCKS];
+ }
  
--static bool ufd_version_check(int ufd)
-+static bool ufd_version_check(int ufd, MigrationIncomingState *mis)
++bool migrate_postcopy_blocktime(void)
++{
++    MigrationState *s;
++
++    s = migrate_get_current();
++
++    return s->enabled_capabilities[MIGRATION_CAPABILITY_POSTCOPY_BLOCKTIME];
++}
++
+ bool migrate_use_compression(void)
  {
-     struct uffdio_api api_struct;
-     uint64_t ioctl_mask;
-@@ -112,7 +112,7 @@ static int test_range_shared(const char *block_name, void *host_addr,
-  * normally fine since if the postcopy succeeds it gets turned back on at the
-  * end.
-  */
--bool postcopy_ram_supported_by_host(void)
-+bool postcopy_ram_supported_by_host(MigrationIncomingState *mis)
- {
-     long pagesize = getpagesize();
-     int ufd = -1;
-@@ -135,7 +135,7 @@ bool postcopy_ram_supported_by_host(void)
-     }
+     MigrationState *s;
+diff --git a/qapi-schema.json b/qapi-schema.json
+index 80603cf..78617fe 100644
+--- a/qapi-schema.json
++++ b/qapi-schema.json
+@@ -894,11 +894,14 @@
+ # @release-ram: if enabled, qemu will free the migrated ram pages on the source
+ #        during postcopy-ram migration. (since 2.9)
+ #
++# @postcopy-blocktime: Calculate downtime for postcopy live migration (since 2.10)
++#
+ # Since: 1.2
+ ##
+ { 'enum': 'MigrationCapability',
+   'data': ['xbzrle', 'rdma-pin-all', 'auto-converge', 'zero-blocks',
+-           'compress', 'events', 'postcopy-ram', 'x-colo', 'release-ram'] }
++           'compress', 'events', 'postcopy-ram', 'x-colo', 'release-ram',
++           'postcopy-blocktime'] }
  
-     /* Version and features check */
--    if (!ufd_version_check(ufd)) {
-+    if (!ufd_version_check(ufd, mis)) {
-         goto out;
-     }
- 
-@@ -512,7 +512,7 @@ int postcopy_ram_enable_notify(MigrationIncomingState *mis)
-      * Although the host check already tested the API, we need to
-      * do the check again as an ABI handshake on the new fd.
-      */
--    if (!ufd_version_check(mis->userfault_fd)) {
-+    if (!ufd_version_check(mis->userfault_fd, mis)) {
-         return -1;
-     }
- 
-@@ -650,7 +650,7 @@ void *postcopy_get_tmp_page(MigrationIncomingState *mis)
- 
- #else
- /* No target OS support, stubs just fail */
--bool postcopy_ram_supported_by_host(void)
-+bool postcopy_ram_supported_by_host(MigrationIncomingState *mis)
- {
-     error_report("%s: No OS support", __func__);
-     return false;
-diff --git a/migration/postcopy-ram.h b/migration/postcopy-ram.h
-index 52d51e8..587a8b8 100644
---- a/migration/postcopy-ram.h
-+++ b/migration/postcopy-ram.h
-@@ -14,7 +14,7 @@
- #define QEMU_POSTCOPY_RAM_H
- 
- /* Return true if the host supports everything we need to do postcopy-ram */
--bool postcopy_ram_supported_by_host(void);
-+bool postcopy_ram_supported_by_host(MigrationIncomingState *mis);
- 
- /*
-  * Make all of RAM sensitive to accesses to areas that haven't yet been written
-diff --git a/migration/savevm.c b/migration/savevm.c
-index f5e8194..61a6df7 100644
---- a/migration/savevm.c
-+++ b/migration/savevm.c
-@@ -1356,7 +1356,7 @@ static int loadvm_postcopy_handle_advise(MigrationIncomingState *mis)
-         return -1;
-     }
- 
--    if (!postcopy_ram_supported_by_host()) {
-+    if (!postcopy_ram_supported_by_host(mis)) {
-         postcopy_state_set(POSTCOPY_INCOMING_NONE);
-         return -1;
-     }
+ ##
+ # @MigrationCapabilityStatus:
 -- 
 1.8.3.1
