@@ -1,19 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42214)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43411)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1dCz5E-0005au-9p
-	for qemu-devel@nongnu.org; Mon, 22 May 2017 21:58:01 -0400
+	(envelope-from <jasowang@redhat.com>) id 1dCzBU-0006mG-5G
+	for qemu-devel@nongnu.org; Mon, 22 May 2017 22:04:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1dCz5D-0004iM-Dt
-	for qemu-devel@nongnu.org; Mon, 22 May 2017 21:58:00 -0400
-Date: Mon, 22 May 2017 21:57:47 -0400
-From: Jeff Cody <jcody@redhat.com>
-Message-ID: <20170523015747.GG6761@localhost.localdomain>
-References: <20170508141310.8674-1-pbonzini@redhat.com>
+	(envelope-from <jasowang@redhat.com>) id 1dCzBQ-0008DG-VX
+	for qemu-devel@nongnu.org; Mon, 22 May 2017 22:04:28 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:48622)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1dCzBQ-0008Cn-PS
+	for qemu-devel@nongnu.org; Mon, 22 May 2017 22:04:24 -0400
+References: <1495161139-28757-1-git-send-email-wei.w.wang@intel.com>
+	<20170519233750-mutt-send-email-mst@kernel.org>
+	<5922D0EC.6060405@intel.com>
+From: Jason Wang <jasowang@redhat.com>
+Message-ID: <b415fea9-9d48-9390-0ec2-46f69b7a54b0@redhat.com>
+Date: Tue, 23 May 2017 10:04:10 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170508141310.8674-1-pbonzini@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 00/11] Preparation for block job mutex
+In-Reply-To: <5922D0EC.6060405@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [virtio-dev] Re: [PATCH RFC] virtio-net: enable
+ configurable tx queue size
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,62 +29,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, jsnow@redhat.com, stefanha@redhat.com
+To: Wei Wang <wei.w.wang@intel.com>, "Michael S. Tsirkin" <mst@redhat.com>
+Cc: stefanha@gmail.com, marcandre.lureau@gmail.com, pbonzini@redhat.com, jan.scheurich@ericsson.com, virtio-dev@lists.oasis-open.org, qemu-devel@nongnu.org
 
-On Mon, May 08, 2017 at 04:12:59PM +0200, Paolo Bonzini wrote:
-> These are a bunch of cleanups and patches extracted from the AioContext
-> lock removal series.  As a general theme, the patches reorganize
-> blockjob.c to follow the blockjob.h/blockjob_int.h separation more
-> closely.  For this reason, a lot of the patches are just moving functions
-> around.
-> 
-> The blockjob.h/blockjob_int.h split later will correspond to different
-> locking rules, but the patches are independent from this change, and
-> can be applied/reviewed separately.
-> 
-> There is no code change from v1, but all patches now have Reviewed-by
-> from at least one of John and Stefan.
-> 
-> Thanks,
-> 
-> Paolo
-> 
-> 
-> Paolo Bonzini (11):
->   blockjob: remove unnecessary check
->   blockjob: remove iostatus_reset callback
->   blockjob: introduce block_job_early_fail
->   blockjob: introduce block_job_pause/resume_all
->   blockjob: separate monitor and blockjob APIs
->   blockjob: move iostatus reset inside block_job_user_resume
->   blockjob: introduce block_job_cancel_async, check iostatus invariants
->   blockjob: group BlockJob transaction functions together
->   blockjob: strengthen a bit test-blockjob-txn
->   blockjob: reorganize block_job_completed_txn_abort
->   blockjob: use deferred_to_main_loop to indicate the coroutine has
->     ended
-> 
->  block/backup.c               |   2 +-
->  block/commit.c               |   2 +-
->  block/io.c                   |  19 +-
->  block/mirror.c               |   2 +-
->  blockdev.c                   |   1 -
->  blockjob.c                   | 900 +++++++++++++++++++++++--------------------
->  include/block/blockjob.h     |  16 -
->  include/block/blockjob_int.h |  27 +-
->  tests/test-blockjob-txn.c    |   7 +-
->  tests/test-blockjob.c        |  10 +-
->  10 files changed, 522 insertions(+), 464 deletions(-)
-> 
-> -- 
-> 2.12.2
-> 
 
-Thanks,
 
-Applied to my block branch:
+On 2017=E5=B9=B405=E6=9C=8822=E6=97=A5 19:52, Wei Wang wrote:
+> On 05/20/2017 04:42 AM, Michael S. Tsirkin wrote:
+>> On Fri, May 19, 2017 at 10:32:19AM +0800, Wei Wang wrote:
+>>> This patch enables the virtio-net tx queue size to be configurable
+>>> between 256 (the default queue size) and 1024 by the user. The queue
+>>> size specified by the user should be power of 2.
+>>>
+>>> Setting the tx queue size to be 1024 requires the guest driver to
+>>> support the VIRTIO_NET_F_MAX_CHAIN_SIZE feature.
+>> This should be a generic ring feature, not one specific to virtio net.
+> OK. How about making two more changes below:
+>
+> 1) make the default tx queue size =3D 1024 (instead of 256).
 
-git://github.com/codyprime/qemu-kvm-jtc block
+As has been pointed out, you need compat the default value too in this ca=
+se.
 
--Jeff
+> We can reduce the size (to 256) if the MAX_CHAIN_SIZE feature
+> is not supported by the guest.
+> In this way, people who apply the QEMU patch can directly use the
+> largest queue size(1024) without adding the booting command line.
+>
+> 2) The vhost backend does not use writev, so I think when the vhost
+> backed is used, using 1024 queue size should not depend on the
+> MAX_CHAIN_SIZE feature.
+
+But do we need to consider even larger queue size now?
+
+Btw, I think it's better to draft a spec patch.
+
+Thanks
+
+>
+>
+> Best,
+> Wei
