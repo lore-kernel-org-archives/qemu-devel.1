@@ -1,23 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37688)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39775)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1dD14p-0005B0-4l
-	for qemu-devel@nongnu.org; Tue, 23 May 2017 00:05:44 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dD1Lj-0000u7-Ef
+	for qemu-devel@nongnu.org; Tue, 23 May 2017 00:23:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1dD14n-0004iF-Nu
-	for qemu-devel@nongnu.org; Tue, 23 May 2017 00:05:43 -0400
-Received: from [59.151.112.132] (port=40966 helo=heian.cn.fujitsu.com)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1dD14m-0004gt-QN
-	for qemu-devel@nongnu.org; Tue, 23 May 2017 00:05:41 -0400
-From: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
-Date: Tue, 23 May 2017 12:04:37 +0800
-Message-ID: <29c33313efd2ee4f7bf3abb71a4809582891f408.1495508197.git.maozy.fnst@cn.fujitsu.com>
-In-Reply-To: <cover.1495508197.git.maozy.fnst@cn.fujitsu.com>
-References: <cover.1495508197.git.maozy.fnst@cn.fujitsu.com>
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dD1Li-0001X4-Bi
+	for qemu-devel@nongnu.org; Tue, 23 May 2017 00:23:11 -0400
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20170522211205.14265-1-hpoussin@reactos.org>
+	<20170522211205.14265-14-hpoussin@reactos.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <75ccc442-1a32-bf36-3674-ec69ce944213@amsat.org>
+Date: Tue, 23 May 2017 01:23:00 -0300
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v5 1/4] net/rocker: Remove the dead error
- handling
+In-Reply-To: <20170522211205.14265-14-hpoussin@reactos.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v2 13/13] vvfat: change OEM name to
+ 'MSWIN4.1'
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,281 +28,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: armbru@redhat.com, jasowang@redhat.com, f4bug@amsat.org, jiri@resnulli.us
+To: =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 
-Memory allocation functions like world_alloc, desc_ring_alloc etc,
-they are all wrappers around g_malloc, g_new etc. But g_malloc and 
-similar functions doesn't return null. Because they ignore the fact 
-that g_malloc() of 0 bytes returns null. So error checks for these
-allocation failure are superfluous. Now, remove them entirely.
+Hi Hervé,
 
-Signed-off-by: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
----
- hw/net/rocker/rocker.c        | 46 -------------------------------------------
- hw/net/rocker/rocker_desc.c   | 10 ----------
- hw/net/rocker/rocker_fp.c     |  4 ----
- hw/net/rocker/rocker_of_dpa.c | 20 -------------------
- hw/net/rocker/rocker_world.c  | 12 +++++------
- 5 files changed, 5 insertions(+), 87 deletions(-)
+On 05/22/2017 06:12 PM, Hervé Poussineau wrote:
+> According to specification:
+> "'MSWIN4.1' is the recommanded setting, because it is the setting least likely
+> to cause compatibility problems. If you want to put something else in here,
+> that is your option, but the result may be that some FAT drivers might not
+> recognize the volume."
 
-diff --git a/hw/net/rocker/rocker.c b/hw/net/rocker/rocker.c
-index 6e70fdd..d01ba9d 100644
---- a/hw/net/rocker/rocker.c
-+++ b/hw/net/rocker/rocker.c
-@@ -239,10 +239,6 @@ static int tx_consume(Rocker *r, DescInfo *info)
-         }
-         iov[iovcnt].iov_len = frag_len;
-         iov[iovcnt].iov_base = g_malloc(frag_len);
--        if (!iov[iovcnt].iov_base) {
--            err = -ROCKER_ENOMEM;
--            goto err_no_mem;
--        }
- 
-         if (pci_dma_read(dev, frag_addr, iov[iovcnt].iov_base,
-                      iov[iovcnt].iov_len)) {
-@@ -262,7 +258,6 @@ static int tx_consume(Rocker *r, DescInfo *info)
- 
- err_too_many_frags:
- err_bad_io:
--err_no_mem:
- err_bad_attr:
-     for (i = 0; i < ROCKER_TX_FRAGS_MAX; i++) {
-         g_free(iov[i].iov_base);
-@@ -674,10 +669,6 @@ int rx_produce(World *world, uint32_t pport,
-      */
- 
-     data = g_malloc(data_size);
--    if (!data) {
--        err = -ROCKER_ENOMEM;
--        goto out;
--    }
-     iov_to_buf(iov, iovcnt, 0, data, data_size);
-     pci_dma_write(dev, frag_addr, data, data_size);
-     g_free(data);
-@@ -722,11 +713,6 @@ static void rocker_test_dma_ctrl(Rocker *r, uint32_t val)
- 
-     buf = g_malloc(r->test_dma_size);
- 
--    if (!buf) {
--        DPRINTF("test dma buffer alloc failed");
--        return;
--    }
--
-     switch (val) {
-     case ROCKER_TEST_DMA_CTRL_CLEAR:
-         memset(buf, 0, r->test_dma_size);
-@@ -1313,13 +1299,6 @@ static int pci_rocker_init(PCIDevice *dev)
- 
-     r->worlds[ROCKER_WORLD_TYPE_OF_DPA] = of_dpa_world_alloc(r);
- 
--    for (i = 0; i < ROCKER_WORLD_TYPE_MAX; i++) {
--        if (!r->worlds[i]) {
--            err = -ENOMEM;
--            goto err_world_alloc;
--        }
--    }
--
-     if (!r->world_name) {
-         r->world_name = g_strdup(world_name(r->worlds[ROCKER_WORLD_TYPE_OF_DPA]));
-     }
-@@ -1396,9 +1375,6 @@ static int pci_rocker_init(PCIDevice *dev)
-     }
- 
-     r->rings = g_new(DescRing *, rocker_pci_ring_count(r));
--    if (!r->rings) {
--        goto err_rings_alloc;
--    }
- 
-     /* Rings are ordered like this:
-      * - command ring
-@@ -1410,14 +1386,9 @@ static int pci_rocker_init(PCIDevice *dev)
-      * .....
-      */
- 
--    err = -ENOMEM;
-     for (i = 0; i < rocker_pci_ring_count(r); i++) {
-         DescRing *ring = desc_ring_alloc(r, i);
- 
--        if (!ring) {
--            goto err_ring_alloc;
--        }
--
-         if (i == ROCKER_RING_CMD) {
-             desc_ring_set_consume(ring, cmd_consume, ROCKER_MSIX_VEC_CMD);
-         } else if (i == ROCKER_RING_EVENT) {
-@@ -1437,10 +1408,6 @@ static int pci_rocker_init(PCIDevice *dev)
-             fp_port_alloc(r, r->name, &r->fp_start_macaddr,
-                           i, &r->fp_ports_peers[i]);
- 
--        if (!port) {
--            goto err_port_alloc;
--        }
--
-         r->fp_port[i] = port;
-         fp_port_set_world(port, r->world_dflt);
-     }
-@@ -1449,25 +1416,12 @@ static int pci_rocker_init(PCIDevice *dev)
- 
-     return 0;
- 
--err_port_alloc:
--    for (--i; i >= 0; i--) {
--        FpPort *port = r->fp_port[i];
--        fp_port_free(port);
--    }
--    i = rocker_pci_ring_count(r);
--err_ring_alloc:
--    for (--i; i >= 0; i--) {
--        desc_ring_free(r->rings[i]);
--    }
--    g_free(r->rings);
--err_rings_alloc:
- err_duplicate:
-     rocker_msix_uninit(r);
- err_msix_init:
-     object_unparent(OBJECT(&r->msix_bar));
-     object_unparent(OBJECT(&r->mmio));
- err_world_type_by_name:
--err_world_alloc:
-     for (i = 0; i < ROCKER_WORLD_TYPE_MAX; i++) {
-         if (r->worlds[i]) {
-             world_free(r->worlds[i]);
-diff --git a/hw/net/rocker/rocker_desc.c b/hw/net/rocker/rocker_desc.c
-index ac02797..d0df89a 100644
---- a/hw/net/rocker/rocker_desc.c
-+++ b/hw/net/rocker/rocker_desc.c
-@@ -65,10 +65,6 @@ char *desc_get_buf(DescInfo *info, bool read_only)
-         info->buf_size = size;
-     }
- 
--    if (!info->buf) {
--        return NULL;
--    }
--
-     if (pci_dma_read(dev, le64_to_cpu(info->desc.buf_addr), info->buf, size)) {
-         return NULL;
-     }
-@@ -144,9 +140,6 @@ bool desc_ring_set_size(DescRing *ring, uint32_t size)
-     ring->head = ring->tail = 0;
- 
-     ring->info = g_renew(DescInfo, ring->info, size);
--    if (!ring->info) {
--        return false;
--    }
- 
-     memset(ring->info, 0, size * sizeof(DescInfo));
- 
-@@ -347,9 +340,6 @@ DescRing *desc_ring_alloc(Rocker *r, int index)
-     DescRing *ring;
- 
-     ring = g_new0(DescRing, 1);
--    if (!ring) {
--        return NULL;
--    }
- 
-     ring->r = r;
-     ring->index = index;
-diff --git a/hw/net/rocker/rocker_fp.c b/hw/net/rocker/rocker_fp.c
-index 1305ac3..4b3c984 100644
---- a/hw/net/rocker/rocker_fp.c
-+++ b/hw/net/rocker/rocker_fp.c
-@@ -226,10 +226,6 @@ FpPort *fp_port_alloc(Rocker *r, char *sw_name,
- {
-     FpPort *port = g_new0(FpPort, 1);
- 
--    if (!port) {
--        return NULL;
--    }
--
-     port->r = r;
-     port->index = index;
-     port->pport = index + 1;
-diff --git a/hw/net/rocker/rocker_of_dpa.c b/hw/net/rocker/rocker_of_dpa.c
-index 9b1e0d2..191a58e 100644
---- a/hw/net/rocker/rocker_of_dpa.c
-+++ b/hw/net/rocker/rocker_of_dpa.c
-@@ -368,9 +368,6 @@ static OfDpaFlow *of_dpa_flow_alloc(uint64_t cookie)
-     int64_t now = qemu_clock_get_ms(QEMU_CLOCK_VIRTUAL) / 1000;
- 
-     flow = g_new0(OfDpaFlow, 1);
--    if (!flow) {
--        return NULL;
--    }
- 
-     flow->cookie = cookie;
-     flow->mask.tbl_id = 0xffffffff;
-@@ -813,10 +810,6 @@ static OfDpaGroup *of_dpa_group_alloc(uint32_t id)
- {
-     OfDpaGroup *group = g_new0(OfDpaGroup, 1);
- 
--    if (!group) {
--        return NULL;
--    }
--
-     group->id = id;
- 
-     return group;
-@@ -1867,9 +1860,6 @@ static int of_dpa_cmd_flow_add(OfDpa *of_dpa, uint64_t cookie,
-     }
- 
-     flow = of_dpa_flow_alloc(cookie);
--    if (!flow) {
--        return -ROCKER_ENOMEM;
--    }
- 
-     err = of_dpa_cmd_flow_add_mod(of_dpa, flow, flow_tlvs);
-     if (err) {
-@@ -2040,17 +2030,10 @@ static int of_dpa_cmd_add_l2_flood(OfDpa *of_dpa, OfDpaGroup *group,
-         rocker_tlv_get_le16(group_tlvs[ROCKER_TLV_OF_DPA_GROUP_COUNT]);
- 
-     tlvs = g_new0(RockerTlv *, group->l2_flood.group_count + 1);
--    if (!tlvs) {
--        return -ROCKER_ENOMEM;
--    }
- 
-     g_free(group->l2_flood.group_ids);
-     group->l2_flood.group_ids =
-         g_new0(uint32_t, group->l2_flood.group_count);
--    if (!group->l2_flood.group_ids) {
--        err = -ROCKER_ENOMEM;
--        goto err_out;
--    }
- 
-     rocker_tlv_parse_nested(tlvs, group->l2_flood.group_count,
-                             group_tlvs[ROCKER_TLV_OF_DPA_GROUP_IDS]);
-@@ -2157,9 +2140,6 @@ static int of_dpa_cmd_group_add(OfDpa *of_dpa, uint32_t group_id,
-     }
- 
-     group = of_dpa_group_alloc(group_id);
--    if (!group) {
--        return -ROCKER_ENOMEM;
--    }
- 
-     err = of_dpa_cmd_group_do(of_dpa, group_id, group, group_tlvs);
-     if (err) {
-diff --git a/hw/net/rocker/rocker_world.c b/hw/net/rocker/rocker_world.c
-index 89777e9..f73c534 100644
---- a/hw/net/rocker/rocker_world.c
-+++ b/hw/net/rocker/rocker_world.c
-@@ -51,13 +51,11 @@ World *world_alloc(Rocker *r, size_t sizeof_private,
- {
-     World *w = g_malloc0(sizeof(World) + sizeof_private);
- 
--    if (w) {
--        w->r = r;
--        w->type = type;
--        w->ops = ops;
--        if (w->ops->init) {
--            w->ops->init(w);
--        }
-+    w->r = r;
-+    w->type = type;
-+    w->ops = ops;
-+    if (w->ops->init) {
-+        w->ops->init(w);
-     }
- 
-     return w;
--- 
-2.9.3
+It also says "Typically this is some indication of what system formatted
+the volume."
+
+ From https://technet.microsoft.com/en-us/library/cc976796.aspx:
+
+"Following the jump instruction is the 8-byte OEM ID, a string of 
+characters that identifies the name and version number of the operating 
+system that formatted the volume. To preserve compatibility with MS-DOS, 
+Windows 2000 records "MSDOS5.0" in this field on FAT16 and FAT32 disks. 
+On NTFS disks, Windows 2000 records "NTFS."
+You may also see the OEM ID "MSWIN4.0" on disks formatted by Windows 95 
+and "MSWIN4.1" on disks formatted by Windows 95 OSR2 and Windows 98. 
+Windows 2000 does not use the OEM ID field in the boot sector except for 
+verifying NTFS volumes."
+
+I'm curious which one is the most up-to-date, the specification v1.03 or 
+a Windows 2000. Do you have an idea if there is more MSDOS/W2K vs W95/98 
+users? Hopefully W95 is a Long time no see to me.
+
+You think having "QEMU" OEM does more harm than good?
+
+>
+> Specification: "FAT: General overview of on-disk format" v1.03, page 9
+> Signed-off-by: Hervé Poussineau <hpoussin@reactos.org>
+> ---
+>  block/vvfat.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/block/vvfat.c b/block/vvfat.c
+> index 53e8faa54c..1f7f46ecea 100644
+> --- a/block/vvfat.c
+> +++ b/block/vvfat.c
+> @@ -1024,7 +1024,7 @@ static int init_directories(BDRVVVFATState* s,
+>      bootsector->jump[0]=0xeb;
+>      bootsector->jump[1]=0x3e;
+>      bootsector->jump[2]=0x90;
+> -    memcpy(bootsector->name,"QEMU    ",8);
+> +    memcpy(bootsector->name, "MSWIN4.1", 8);
+>      bootsector->sector_size=cpu_to_le16(0x200);
+>      bootsector->sectors_per_cluster=s->sectors_per_cluster;
+>      bootsector->reserved_sectors=cpu_to_le16(1);
+>
+
+Regards,
+
+Phil.
