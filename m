@@ -1,25 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43100)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46302)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1dDAiw-00052T-67
-	for qemu-devel@nongnu.org; Tue, 23 May 2017 10:23:47 -0400
+	(envelope-from <groug@kaod.org>) id 1dDArL-0002TN-Ha
+	for qemu-devel@nongnu.org; Tue, 23 May 2017 10:32:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1dDAir-0004QI-R3
-	for qemu-devel@nongnu.org; Tue, 23 May 2017 10:23:46 -0400
-Received: from [59.151.112.132] (port=49008 helo=heian.cn.fujitsu.com)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1dDAir-0004Pr-Eu
-	for qemu-devel@nongnu.org; Tue, 23 May 2017 10:23:41 -0400
-References: <1495549241-23380-1-git-send-email-zhangchen.fnst@cn.fujitsu.com>
-	<1495549241-23380-2-git-send-email-zhangchen.fnst@cn.fujitsu.com>
-From: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
-Message-ID: <b575fd8f-8a1f-47b8-4928-a7481e43d6db@cn.fujitsu.com>
-Date: Tue, 23 May 2017 22:24:05 +0800
+	(envelope-from <groug@kaod.org>) id 1dDArH-00081S-Hw
+	for qemu-devel@nongnu.org; Tue, 23 May 2017 10:32:27 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:39945)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1dDArH-000814-9P
+	for qemu-devel@nongnu.org; Tue, 23 May 2017 10:32:23 -0400
+Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v4NEVUl0098679
+	for <qemu-devel@nongnu.org>; Tue, 23 May 2017 10:32:21 -0400
+Received: from e33.co.us.ibm.com (e33.co.us.ibm.com [32.97.110.151])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2am8pdm8u4-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Tue, 23 May 2017 10:32:21 -0400
+Received: from localhost
+	by e33.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <groug@kaod.org>;
+	Tue, 23 May 2017 08:32:20 -0600
+From: Greg Kurz <groug@kaod.org>
+Date: Tue, 23 May 2017 16:32:15 +0200
 MIME-Version: 1.0
-In-Reply-To: <1495549241-23380-2-git-send-email-zhangchen.fnst@cn.fujitsu.com>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH V5 1/9] net: Add vnet_hdr_len related
- arguments in NetClientState
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <149554993519.23396.2947622015408783770.stgit@bahia.lab.toulouse-stg.fr.ibm.com>
+Subject: [Qemu-devel] [PATCH v2 0/4] 9pfs: local: fix metadata of
+ mapped-file security mode
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,60 +38,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu devel <qemu-devel@nongnu.org>, Jason Wang <jasowang@redhat.com>
-Cc: zhangchen.fnst@cn.fujitsu.com, zhanghailiang <zhang.zhanghailiang@huawei.com>, weifuqiang <weifuqiang@huawei.com>, "eddie
-	. dong" <eddie.dong@intel.com>, bian naimeng <biannm@cn.fujitsu.com>, Li Zhijian <lizhijian@cn.fujitsu.com>
+To: qemu-devel@nongnu.org
+Cc: Leo Gaspard <leo@gaspard.io>, Eric Blake <eblake@redhat.com>, Greg Kurz <groug@kaod.org>
+
+v2: - posted patch for CVE-2017-7493 separately
+    - other changes available in each patch changelog
+
+Leo,
+
+If you find time to test this series, I'll gladly add your Tested-by: to
+it before merging.
+
+Cheers,
+
+--
+Greg
+
+---
+
+Greg Kurz (4):
+      9pfs: check return value of v9fs_co_name_to_path()
+      9pfs: local: resolve special directories in paths
+      9pfs: local: simplify file opening
+      9pfs: local: metadata file for the VirtFS root
 
 
-
-On 05/23/2017 10:20 PM, Zhang Chen wrote:
-> Add vnet_hdr_len and using_vnet_hdr arguments in NetClientState
-> that make othermodule get real vnet_hdr_len easily.
->
-> Signed-off-by: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
-
-Sorry, I forgot to add the reviewed-by:
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-
-> ---
->   include/net/net.h | 2 ++
->   net/net.c         | 2 ++
->   2 files changed, 4 insertions(+)
->
-> diff --git a/include/net/net.h b/include/net/net.h
-> index 99b28d5..70edfc0 100644
-> --- a/include/net/net.h
-> +++ b/include/net/net.h
-> @@ -100,6 +100,8 @@ struct NetClientState {
->       unsigned int queue_index;
->       unsigned rxfilter_notify_enabled:1;
->       int vring_enable;
-> +    bool using_vnet_hdr;
-> +    int vnet_hdr_len;
->       QTAILQ_HEAD(NetFilterHead, NetFilterState) filters;
->   };
->   
-> diff --git a/net/net.c b/net/net.c
-> index 0ac3b9e..a00a0c9 100644
-> --- a/net/net.c
-> +++ b/net/net.c
-> @@ -472,6 +472,7 @@ void qemu_using_vnet_hdr(NetClientState *nc, bool enable)
->           return;
->       }
->   
-> +    nc->using_vnet_hdr = enable;
->       nc->info->using_vnet_hdr(nc, enable);
->   }
->   
-> @@ -491,6 +492,7 @@ void qemu_set_vnet_hdr_len(NetClientState *nc, int len)
->           return;
->       }
->   
-> +    nc->vnet_hdr_len = len;
->       nc->info->set_vnet_hdr_len(nc, len);
->   }
->   
-
--- 
-Thanks
-Zhang Chen
+ hw/9pfs/9p-local.c |  147 ++++++++++++++++++++++++++++++++++++++--------------
+ hw/9pfs/9p-util.c  |   43 ---------------
+ hw/9pfs/9p-util.h  |    2 -
+ hw/9pfs/9p.c       |   36 +++++++++----
+ 4 files changed, 133 insertions(+), 95 deletions(-)
