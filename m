@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42259)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42271)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1dDAgL-0002gX-1j
-	for qemu-devel@nongnu.org; Tue, 23 May 2017 10:21:08 -0400
+	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1dDAgL-0002gg-BA
+	for qemu-devel@nongnu.org; Tue, 23 May 2017 10:21:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1dDAgG-000307-BY
-	for qemu-devel@nongnu.org; Tue, 23 May 2017 10:21:04 -0400
-Received: from [59.151.112.132] (port=29446 helo=heian.cn.fujitsu.com)
+	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1dDAgK-00031g-4x
+	for qemu-devel@nongnu.org; Tue, 23 May 2017 10:21:05 -0400
+Received: from [59.151.112.132] (port=32707 helo=heian.cn.fujitsu.com)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1dDAgF-0002zZ-NH
-	for qemu-devel@nongnu.org; Tue, 23 May 2017 10:21:00 -0400
+	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1dDAgJ-0002zE-Of
+	for qemu-devel@nongnu.org; Tue, 23 May 2017 10:21:04 -0400
 From: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
-Date: Tue, 23 May 2017 22:20:33 +0800
-Message-ID: <1495549241-23380-2-git-send-email-zhangchen.fnst@cn.fujitsu.com>
+Date: Tue, 23 May 2017 22:20:40 +0800
+Message-ID: <1495549241-23380-9-git-send-email-zhangchen.fnst@cn.fujitsu.com>
 In-Reply-To: <1495549241-23380-1-git-send-email-zhangchen.fnst@cn.fujitsu.com>
 References: <1495549241-23380-1-git-send-email-zhangchen.fnst@cn.fujitsu.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH V5 1/9] net: Add vnet_hdr_len related arguments
- in NetClientState
+Subject: [Qemu-devel] [PATCH V5 8/9] net/colo-compare.c: Add vnet packet's
+ tcp/udp/icmp compare
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,47 +30,40 @@ To: qemu devel <qemu-devel@nongnu.org>, Jason Wang <jasowang@redhat.com>
 Cc: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>, zhanghailiang <zhang.zhanghailiang@huawei.com>, weifuqiang <weifuqiang@huawei.com>, "eddie
 	. dong" <eddie.dong@intel.com>, bian naimeng <biannm@cn.fujitsu.com>, Li Zhijian <lizhijian@cn.fujitsu.com>
 
-Add vnet_hdr_len and using_vnet_hdr arguments in NetClientState
-that make othermodule get real vnet_hdr_len easily.
+COLO-Proxy just focus on packet payload, So we skip vnet header.
 
 Signed-off-by: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
 ---
- include/net/net.h | 2 ++
- net/net.c         | 2 ++
- 2 files changed, 4 insertions(+)
+ net/colo-compare.c | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
 
-diff --git a/include/net/net.h b/include/net/net.h
-index 99b28d5..70edfc0 100644
---- a/include/net/net.h
-+++ b/include/net/net.h
-@@ -100,6 +100,8 @@ struct NetClientState {
-     unsigned int queue_index;
-     unsigned rxfilter_notify_enabled:1;
-     int vring_enable;
-+    bool using_vnet_hdr;
-+    int vnet_hdr_len;
-     QTAILQ_HEAD(NetFilterHead, NetFilterState) filters;
- };
- 
-diff --git a/net/net.c b/net/net.c
-index 0ac3b9e..a00a0c9 100644
---- a/net/net.c
-+++ b/net/net.c
-@@ -472,6 +472,7 @@ void qemu_using_vnet_hdr(NetClientState *nc, bool enable)
-         return;
+diff --git a/net/colo-compare.c b/net/colo-compare.c
+index f89b380..0d7fe2b 100644
+--- a/net/colo-compare.c
++++ b/net/colo-compare.c
+@@ -201,8 +201,11 @@ static int colo_packet_compare_common(Packet *ppkt, Packet *spkt, int offset)
+                                    sec_ip_src, sec_ip_dst);
      }
  
-+    nc->using_vnet_hdr = enable;
-     nc->info->using_vnet_hdr(nc, enable);
- }
- 
-@@ -491,6 +492,7 @@ void qemu_set_vnet_hdr_len(NetClientState *nc, int len)
-         return;
-     }
- 
-+    nc->vnet_hdr_len = len;
-     nc->info->set_vnet_hdr_len(nc, len);
- }
- 
++    offset = ppkt->vnet_hdr_len + offset;
++
+     if (ppkt->size == spkt->size) {
+-        return memcmp(ppkt->data + offset, spkt->data + offset,
++        return memcmp(ppkt->data + offset,
++                      spkt->data + offset,
+                       spkt->size - offset);
+     } else {
+         trace_colo_compare_main("Net packet size are not the same");
+@@ -261,8 +264,9 @@ static int colo_packet_compare_tcp(Packet *spkt, Packet *ppkt)
+      */
+     if (ptcp->th_off > 5) {
+         ptrdiff_t tcp_offset;
++
+         tcp_offset = ppkt->transport_header - (uint8_t *)ppkt->data
+-                     + (ptcp->th_off * 4);
++                     + (ptcp->th_off * 4) - ppkt->vnet_hdr_len;
+         res = colo_packet_compare_common(ppkt, spkt, tcp_offset);
+     } else if (ptcp->th_sum == stcp->th_sum) {
+         res = colo_packet_compare_common(ppkt, spkt, ETH_HLEN);
 -- 
 2.7.4
