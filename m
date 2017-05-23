@@ -1,32 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42091)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43462)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <prvs=309f0b608=anthony.perard@citrix.com>)
-	id 1dDDGS-0003G8-BA
-	for qemu-devel@nongnu.org; Tue, 23 May 2017 13:06:33 -0400
+	(envelope-from <eblake@redhat.com>) id 1dDDN6-0004nn-VQ
+	for qemu-devel@nongnu.org; Tue, 23 May 2017 13:13:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <prvs=309f0b608=anthony.perard@citrix.com>)
-	id 1dDDGN-0000m9-Ir
-	for qemu-devel@nongnu.org; Tue, 23 May 2017 13:06:32 -0400
-Received: from smtp02.citrix.com ([66.165.176.63]:56998)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <prvs=309f0b608=anthony.perard@citrix.com>)
-	id 1dDDGN-0000lD-CL
-	for qemu-devel@nongnu.org; Tue, 23 May 2017 13:06:27 -0400
-Date: Tue, 23 May 2017 18:06:22 +0100
-From: Anthony PERARD <anthony.perard@citrix.com>
-Message-ID: <20170523170622.GD1591@perard.uk.xensource.com>
-References: <1495085580-10631-1-git-send-email-tianyu.lan@intel.com>
-	<1495085580-10631-2-git-send-email-tianyu.lan@intel.com>
-	<20170519111622.GA3260@perard.uk.xensource.com>
-	<591EFB5D020000780015B47A@prv-mh.provo.novell.com>
-	<3f3c2075-da6b-dd14-279f-23525f46b3c5@intel.com>
+	(envelope-from <eblake@redhat.com>) id 1dDDN2-0003dJ-VA
+	for qemu-devel@nongnu.org; Tue, 23 May 2017 13:13:24 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:45572)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dDDN2-0003d5-LT
+	for qemu-devel@nongnu.org; Tue, 23 May 2017 13:13:20 -0400
+References: <149554993519.23396.2947622015408783770.stgit@bahia.lab.toulouse-stg.fr.ibm.com>
+	<149554996230.23396.14573553304393992709.stgit@bahia.lab.toulouse-stg.fr.ibm.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <5222368e-d0de-457b-7f07-5f104860ec56@redhat.com>
+Date: Tue, 23 May 2017 12:13:17 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <3f3c2075-da6b-dd14-279f-23525f46b3c5@intel.com>
-Subject: Re: [Qemu-devel] [Xen-devel] [RFC PATCH V2 1/2] xen-pt: bind/unbind
- interrupt remapping format MSI
+In-Reply-To: <149554996230.23396.14573553304393992709.stgit@bahia.lab.toulouse-stg.fr.ibm.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="unJQIfWAth8dbIC7JIV6bdr5PH8btlEKo"
+Subject: Re: [Qemu-devel] [PATCH v2 4/4] 9pfs: local: metadata file for the
+ VirtFS root
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,39 +29,91 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Lan Tianyu <tianyu.lan@intel.com>
-Cc: Jan Beulich <JBeulich@suse.com>, Chao Gao <chao.gao@intel.com>, kevin.tian@intel.com, sstabellini@kernel.org, xen-devel@lists.xenproject.org, qemu-devel@nongnu.org, marcel@redhat.com, mst@redhat.com
+To: Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org
+Cc: Leo Gaspard <leo@gaspard.io>
 
-On Tue, May 23, 2017 at 08:16:25PM +0800, Lan Tianyu wrote:
-> On 2017年05月19日 20:04, Jan Beulich wrote:
-> >>>> On 19.05.17 at 13:16, <anthony.perard@citrix.com> wrote:
-> >> On Thu, May 18, 2017 at 01:32:59AM -0400, Lan Tianyu wrote:
-> >>> --- a/include/hw/i386/apic-msidef.h
-> >>> +++ b/include/hw/i386/apic-msidef.h
-> >>> @@ -26,6 +26,7 @@
-> >>>  
-> >>>  #define MSI_ADDR_DEST_ID_SHIFT          12
-> >>>  #define MSI_ADDR_DEST_IDX_SHIFT         4
-> >>> -#define  MSI_ADDR_DEST_ID_MASK          0x00ffff0
-> >>> +#define  MSI_ADDR_DEST_ID_MASK          0x000fff00
-> >> The value of MSI_ADDR_DEST_ID_MASK is changed here. I think the patch
-> >> should be:
-> >> +#define  MSI_ADDR_DEST_ID_MASK          0x000ffff0
-> > Judging from other sources, rather the other way around - the
-> > mask needs to have further bits removed (should be 0x000ff000
-> > afaict). Xen sources confirm this, and while Linux has the value
-> > you suggest, that contradicts
-> Agree. Defining the mask as "0x000ff000" makes more sense.
-> Just check Qemu source code. Only apic_send_msi() and msi_dest_id() use
-> the mask
-> to get dest apic id. They mask MSI address field with 
-> MSI_ADDR_DEST_ID_MASK and
-> then right-shift 12bit. The low 12bit won't be used.
-> 
-> Anthony, does this make sense?
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--unJQIfWAth8dbIC7JIV6bdr5PH8btlEKo
+From: Eric Blake <eblake@redhat.com>
+To: Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org
+Cc: Leo Gaspard <leo@gaspard.io>
+Message-ID: <5222368e-d0de-457b-7f07-5f104860ec56@redhat.com>
+Subject: Re: [PATCH v2 4/4] 9pfs: local: metadata file for the VirtFS root
+References: <149554993519.23396.2947622015408783770.stgit@bahia.lab.toulouse-stg.fr.ibm.com>
+ <149554996230.23396.14573553304393992709.stgit@bahia.lab.toulouse-stg.fr.ibm.com>
+In-Reply-To: <149554996230.23396.14573553304393992709.stgit@bahia.lab.toulouse-stg.fr.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Yes, it does.
-The change to MSI_ADDR_DEST_ID_MASK should probably go in its own patch.
+On 05/23/2017 09:32 AM, Greg Kurz wrote:
+> When using the mapped-file security, credentials are stored in a metada=
+ta
+> directory located in the parent directory. This is okay for all paths w=
+ith
+> the notable exception of the root path, since we don't want and probabl=
+y
+> can't create a metadata directory above the virtfs directory on the hos=
+t.
+>=20
+> This patch introduces a dedicated metadata file, sitting in the virtfs =
+root
+> for this purpose. It relies on the fact that the "." name necessarily r=
+efers
+> to the virtfs root.
+>=20
+> As for the metadata directory, we don't want the client to see this fil=
+e.
+> The current code only cares for readdir() but there are many other plac=
+es
+> to fix actually. The filtering logic is hence put in a separate functio=
+n.
+>=20
+> @@ -478,7 +504,8 @@ static off_t local_telldir(FsContext *ctx, V9fsFidO=
+penState *fs)
+> =20
+>  static bool local_is_mapped_file_metadata(FsContext *fs_ctx, const cha=
+r *name)
+>  {
+> -    return !strcmp(name, VIRTFS_META_DIR);
+> +    return
+> +        !strcmp(name, VIRTFS_META_DIR) || !strcmp(name, VIRTFS_META_RO=
+OT_FILE);
 
--- 
-Anthony PERARD
+We have to block VIRTFS_META_DIR at any depth in the hierarchy, but
+can/should we change the blocking of VIRTFS_META_ROOT_FILE to only
+happen at the root directory, rather than at all directories?  On the
+other hand, if you can simultaneously map /path/to/a for one mount
+point, and /path/to/a/b for another, then the root file for B is visible
+at a lower depth than the root file for A, and blocking the metafile
+name everywhere means that the mount A can't influence the behavior on
+the mount for B.
+
+Not tested, but looks sane, so:
+Reviewed-by: Eric Blake <eblake@redhat.com>
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--unJQIfWAth8dbIC7JIV6bdr5PH8btlEKo
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEcBAEBCAAGBQJZJG2tAAoJEKeha0olJ0NqmHYIAKvOpr73eJI6AI4DW0Jjyli9
+0rnn2i7QPYQeIke8CQp9kZDKbF9XzrQJDQZmeLZOI1dx+owS5nN7K6wqvSwKsfH2
+6lfVat6GdKf5rxWZHmr5/rNTGr6KShj4BGe66UD8/T69OY3FQJA3ca83vJpilPU+
+pKxkIGto+wQh6plR0uyMd89947smHPQrWtmcGGOEYYO6+l5wLKJD0Q++K2HTNd71
+DG9ALD2QnFt9EhoZZwb8elIwKmd8csXg/n9BWq4QhtwDuktHvvDXXfLCJwk99vuP
+5npfCy2oOidePGbFEEee+i5o6Ua5SwaDYOvURpW0ZV8MzCZmqNlGrmWWX9GCwvo=
+=pHZA
+-----END PGP SIGNATURE-----
+
+--unJQIfWAth8dbIC7JIV6bdr5PH8btlEKo--
