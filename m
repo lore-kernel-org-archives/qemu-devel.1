@@ -1,45 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38892)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41123)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bharata@linux.vnet.ibm.com>) id 1dD5gs-0004V9-38
-	for qemu-devel@nongnu.org; Tue, 23 May 2017 05:01:23 -0400
+	(envelope-from <den@virtuozzo.com>) id 1dD5sV-00079R-Pa
+	for qemu-devel@nongnu.org; Tue, 23 May 2017 05:13:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bharata@linux.vnet.ibm.com>) id 1dD5gm-0006GA-By
-	for qemu-devel@nongnu.org; Tue, 23 May 2017 05:01:18 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:46062
-	helo=mx0a-001b2d01.pphosted.com)
+	(envelope-from <den@virtuozzo.com>) id 1dD5sS-0000dB-GW
+	for qemu-devel@nongnu.org; Tue, 23 May 2017 05:13:19 -0400
+Received: from mail-db5eur01on0132.outbound.protection.outlook.com
+	([104.47.2.132]:55744
+	helo=EUR01-DB5-obe.outbound.protection.outlook.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bharata@linux.vnet.ibm.com>)
-	id 1dD5gm-0006Fa-6e
-	for qemu-devel@nongnu.org; Tue, 23 May 2017 05:01:12 -0400
-Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v4N8woR6134001
-	for <qemu-devel@nongnu.org>; Tue, 23 May 2017 05:01:11 -0400
-Received: from e23smtp05.au.ibm.com (e23smtp05.au.ibm.com [202.81.31.147])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2am7txev87-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 23 May 2017 05:01:11 -0400
-Received: from localhost
-	by e23smtp05.au.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <bharata@linux.vnet.ibm.com>;
-	Tue, 23 May 2017 19:01:07 +1000
-Date: Tue, 23 May 2017 14:30:12 +0530
-From: Bharata B Rao <bharata@linux.vnet.ibm.com>
-Reply-To: bharata@linux.vnet.ibm.com
-References: <1495172439-1504-1-git-send-email-bharata@linux.vnet.ibm.com>
-	<1495172439-1504-5-git-send-email-bharata@linux.vnet.ibm.com>
-	<1495434650.2205.1.camel@gmail.com>
-	<20170523044836.GI3446@in.ibm.com>
-	<1495528948.2205.3.camel@gmail.com>
+	(Exim 4.71) (envelope-from <den@virtuozzo.com>) id 1dD5sR-0000bn-Nh
+	for qemu-devel@nongnu.org; Tue, 23 May 2017 05:13:16 -0400
+References: <1495186480-114192-1-git-send-email-anton.nefedov@virtuozzo.com>
+	<1495186480-114192-2-git-send-email-anton.nefedov@virtuozzo.com>
+	<f628e214-2faa-0cf2-c5d2-39b0b6505fc2@redhat.com>
+From: "Denis V. Lunev" <den@openvz.org>
+Message-ID: <ac9d8539-e713-8c6b-0cf0-ce45c3f270d4@openvz.org>
+Date: Tue, 23 May 2017 12:13:09 +0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <1495528948.2205.3.camel@gmail.com>
-Message-Id: <20170523090012.GJ3446@in.ibm.com>
+In-Reply-To: <f628e214-2faa-0cf2-c5d2-39b0b6505fc2@redhat.com>
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [Qemu-ppc] [RFC PATCH v2 4/4] spapr: Fix migration
- of Radix guests
+Content-Language: en-US
+Subject: Re: [Qemu-devel] [PATCH v1 01/13] qcow2: alloc space for COW in one
+ chunk
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -48,117 +32,149 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
-Cc: qemu-devel@nongnu.org, rnsastry@linux.vnet.ibm.com, qemu-ppc@nongnu.org, sam.bobroff@au1.ibm.com, david@gibson.dropbear.id.au
+To: Eric Blake <eblake@redhat.com>, Anton Nefedov <anton.nefedov@virtuozzo.com>, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, den@virtuozzo.com, mreitz@redhat.com
 
-On Tue, May 23, 2017 at 06:42:28PM +1000, Suraj Jitindar Singh wrote:
-> On Tue, 2017-05-23 at 10:18 +0530, Bharata B Rao wrote:
-> > On Mon, May 22, 2017 at 04:30:50PM +1000, Suraj Jitindar Singh wrote:
-> > > On Fri, 2017-05-19 at 11:10 +0530, Bharata B Rao wrote:
-> > > > Fix migration of radix guests by ensuring that we issue
-> > > > KVM_PPC_CONFIGURE_V3_MMU for radix case post migration.
-> > > >=20
-> > > > Reported-by: Nageswara R Sastry <rnsastry@linux.vnet.ibm.com>
-> > > > Signed-off-by: Bharata B Rao <bharata@linux.vnet.ibm.com>
-> > > > ---
-> > > > =A0hw/ppc/spapr.c | 12 ++++++++++++
-> > > > =A01 file changed, 12 insertions(+)
-> > > >=20
-> > > > diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> > > > index daf335c..8f20f14 100644
-> > > > --- a/hw/ppc/spapr.c
-> > > > +++ b/hw/ppc/spapr.c
-> > > > @@ -1400,6 +1400,18 @@ static int spapr_post_load(void *opaque,
-> > > > int
-> > > > version_id)
-> > > > =A0=A0=A0=A0=A0=A0=A0=A0=A0err =3D spapr_rtc_import_offset(&spapr=
-->rtc, spapr-
-> > > > > rtc_offset);
-> > > >=20
-> > > > =A0=A0=A0=A0=A0}
-> > >=20
-> > > This will break migration for tcg radix guests.
-> > >=20
-> > > Given that there is essentially nothing special we need to do on
-> > > incoming tcg migration, I suggest we make it:
-> > >=20
-> > > if (spapr->patb_entry && kvm_enabled()) {
-> > > =A0=A0=A0=A0[snip]
-> > > }
-> > >=20
-> > > > =A0
-> > > > +=A0=A0=A0=A0if (spapr->patb_entry) {
-> > > > +=A0=A0=A0=A0=A0=A0=A0=A0PowerPCCPU *cpu =3D POWERPC_CPU(first_cp=
-u);
-> > > > +=A0=A0=A0=A0=A0=A0=A0=A0if (kvmppc_has_cap_mmu_radix() && kvm_en=
-abled()) {
-> > >=20
-> > > Why not make this a bit more generic? Something like:
-> > >=20
-> > > err =3D kvmppc_configure_v3_mmu(cpu, !!(spapr->patb_entry &
-> > > PATBE1_GR),
-> > > !!(cpu->env.spr[SPR_LPCR] & LPCR_GTSE), spapr->patb_entry);
-> > > if (err) {
-> > > =A0=A0=A0=A0error_report("Process table config unsupported by the h=
-ost");
-> > > =A0=A0=A0=A0return -EINVAL;
-> > > }
-> > >=20
-> > > return err;
-> > >=20
-> > > While I don't think it's possible currently, there is nothing
-> > > inherently incorrect about having a non-zero process table entry
-> > > for a
-> > > hash guest. And this saves a future update.
-> >=20
-> > How about having this logic in spapr_post_load() ?
->=20
-> Looks a lot better :)
->=20
-> >=20
-> > =A0=A0=A0=A0if (spapr->patb_entry) {
-> > =A0=A0=A0=A0=A0=A0=A0=A0/* Can be Hash(in future?) or Radix guest (cu=
-rrent) */
-> > =A0=A0=A0=A0=A0=A0=A0=A0PowerPCCPU *cpu =3D POWERPC_CPU(first_cpu);
-> > =A0=A0=A0=A0=A0=A0=A0=A0bool radix =3D !!(spapr->patb_entry & PATBE1_=
-GR);
-> > =A0=A0=A0=A0=A0=A0=A0=A0bool gtse =3D !!(cpu->env.spr[SPR_LPCR] & LPC=
-R_GTSE);
-> >=20
->=20
-> Don't think we need this if statement though. When hash with patb entry
-> is possible it will still need to call kvmppc_configure_v3_mmu on
-> incoming migration, that isn't radix specific.
+On 05/22/2017 10:00 PM, Eric Blake wrote:
+> On 05/19/2017 04:34 AM, Anton Nefedov wrote:
+>> From: "Denis V. Lunev" <den@openvz.org>
+>>
+>> Currently each single write operation can result in 3 write operations=
 
-Right.
+>> if guest offsets are not cluster aligned. One write is performed for t=
+he
+>> real payload and two for COW-ed areas. Thus the data possibly lays
+>> non-contiguously on the host filesystem. This will reduce further
+>> sequential read performance significantly.
+>>
+>> The patch allocates the space in the file with cluster granularity,
+>> ensuring
+>>   1. better host offset locality
+>>   2. less space allocation operations
+>>      (which can be expensive on distributed storages)
+> s/storages/storage/
+>
+>> Signed-off-by: Denis V. Lunev <den@openvz.org>
+>> Signed-off-by: Anton Nefedov <anton.nefedov@virtuozzo.com>
+>> ---
+>>  block/qcow2.c | 32 +++++++++++++++++++++++++++++++-
+>>  1 file changed, 31 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/block/qcow2.c b/block/qcow2.c
+>> index a8d61f0..2e6a0ec 100644
+>> --- a/block/qcow2.c
+>> +++ b/block/qcow2.c
+>> @@ -1575,6 +1575,32 @@ fail:
+>>      return ret;
+>>  }
+>> =20
+>> +static void handle_alloc_space(BlockDriverState *bs, QCowL2Meta *l2me=
+ta)
+>> +{
+>> +    BDRVQcow2State *s =3D bs->opaque;
+>> +    BlockDriverState *file =3D bs->file->bs;
+>> +    QCowL2Meta *m;
+>> +    int ret;
+>> +
+>> +    for (m =3D l2meta; m !=3D NULL; m =3D m->next) {
+>> +        uint64_t bytes =3D m->nb_clusters << s->cluster_bits;
+>> +
+>> +        if (m->cow_start.nb_bytes =3D=3D 0 && m->cow_end.nb_bytes =3D=
+=3D 0) {
+>> +            continue;
+>> +        }
+>> +
+>> +        /* try to alloc host space in one chunk for better locality *=
+/
+>> +        ret =3D file->drv->bdrv_co_pwrite_zeroes(file, m->alloc_offse=
+t, bytes, 0);
+> Are we guaranteed that this is a fast operation?  (That is, it either
+> results in a hole or an error, and doesn't waste time tediously writing=
 
->=20
-> > =A0=A0=A0=A0=A0=A0=A0=A0if (radix) {
-> > =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0/* Radix guest, configure MMU */
-> > =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0/* kvmppc_configure_v3_mmu() is N=
-OP for TCG */
-> > =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0err =3D kvmppc_configure_v3_mmu(c=
-pu, radix, gtse, spapr-
-> > >patb_entry);
-> > =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0if (err) {
-> > =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0error_report("Process=
- table config unsupported by the
-> > host");
-> > =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0return -EINVAL;
-> > =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0}
-> > =A0=A0=A0=A0=A0=A0=A0=A0} else {
-> > =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0/* Can be Hash guest (in future ?=
-), nothing to do */
-> > =A0=A0=A0=A0=A0=A0=A0=A0}
-> > =A0=A0=A0=A0} else {
->=20
-> Don't need this else statement. Can just have the comment below if you
-> feel it's necessary.
+> actual zeroes)
+>
+This is why we call driver directly. We expect that replacing with actual=
+y
+zeroes write happens only in generic function.
 
-Was just being verbose with empty else blocks, will not have them in the
-actual patch.
+>> +
+>> +        if (ret !=3D 0) {
+>> +            continue;
+>> +        }
+> Supposing we are using a file system that doesn't support holes, then
+> ret will not be zero, and we ended up not allocating anything after all=
+=2E
+>  Is that a problem that we are just blindly continuing the loop as our
+> reaction to the error?
+>
+> /reads further
+>
+> I guess not - you aren't reacting to any error call, but merely using
+> the side effect that an allocation happened for speed when it worked,
+> and ignoring failure (you get the old behavior of the write() now
+> causing the allocation) when it didn't.
+good point
 
-Thanks for the review.
+>> +
+>> +        file->total_sectors =3D MAX(file->total_sectors,
+>> +                                  (m->alloc_offset + bytes) / BDRV_SE=
+CTOR_SIZE);
+>> +    }
+>> +}
+>> +
+>>  static coroutine_fn int qcow2_co_pwritev(BlockDriverState *bs, uint64=
+_t offset,
+>>                                           uint64_t bytes, QEMUIOVector=
+ *qiov,
+>>                                           int flags)
+>> @@ -1656,8 +1682,12 @@ static coroutine_fn int qcow2_co_pwritev(BlockD=
+riverState *bs, uint64_t offset,
+>>          if (ret < 0) {
+>>              goto fail;
+>>          }
+>> -
+>>          qemu_co_mutex_unlock(&s->lock);
+>> +
+>> +        if (bs->file->bs->drv->bdrv_co_pwrite_zeroes !=3D NULL) {
+>> +            handle_alloc_space(bs, l2meta);
+>> +        }
+> Is it really a good idea to be modifying the underlying protocol image
+> outside of the mutex?
+yes! This is by design, not accidental. The area is protected by the
+meta and
+thus writes to not allocated areas will pass.
 
-Regards,
-Bharata.
+> At any rate, it looks like your patch is doing a best-effort write
+> zeroes as an attempt to trigger consecutive allocation of the entire
+> cluster in the underlying protocol right after a cluster has been
+> allocated at the qcow2 format layer.  Which means there are more
+> syscalls now than there were previously, but now when we do three
+> write() calls at offsets B, A, C, those three calls are into file space=
+
+> that was allocated earlier by the write zeroes, rather than fresh calls=
+
+> into unallocated space that is likely to trigger up to three disjoint
+> allocations.
+>
+> As a discussion point, wouldn't we achieve the same effect of less
+> fragmentation if we instead collect our data into a bounce buffer, and
+> only then do a single write() (or more likely, a writev() where the iov=
+
+> is set up to reconstruct a single buffer on the syscall, but where the
+> source data is still at different offsets)?  We'd be avoiding the extra=
+
+> syscalls of pre-allocating the cluster, and while our write() call is
+> still causing allocations, at least it is now one cluster-aligned
+> write() rather than three sub-cluster out-of-order write()s.
+>
+If the cluster will become bigger, the difference will be much more
+significant.
+Actually we have done that already in the original patchset, but those
+changes are a bit controversal in terms of performance. They works much
+better on SSD and worse on HDD.
+
+May be we have done something wrong, but here only simple non-questionabl=
+e
+things in terms of performance are included.
+
+Den
