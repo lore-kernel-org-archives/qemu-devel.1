@@ -1,47 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54698)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55464)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <nikunj@linux.vnet.ibm.com>) id 1dD39j-000102-R9
-	for qemu-devel@nongnu.org; Tue, 23 May 2017 02:18:56 -0400
+	(envelope-from <jasowang@redhat.com>) id 1dD3FZ-00025g-GQ
+	for qemu-devel@nongnu.org; Tue, 23 May 2017 02:24:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <nikunj@linux.vnet.ibm.com>) id 1dD39f-0007hO-T3
-	for qemu-devel@nongnu.org; Tue, 23 May 2017 02:18:55 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:50393
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <nikunj@linux.vnet.ibm.com>)
-	id 1dD39f-0007gk-NQ
-	for qemu-devel@nongnu.org; Tue, 23 May 2017 02:18:51 -0400
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v4N68d9S079751
-	for <qemu-devel@nongnu.org>; Tue, 23 May 2017 02:18:50 -0400
-Received: from e23smtp08.au.ibm.com (e23smtp08.au.ibm.com [202.81.31.141])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2amf9a8yfe-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 23 May 2017 02:18:49 -0400
-Received: from localhost
-	by e23smtp08.au.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <nikunj@linux.vnet.ibm.com>;
-	Tue, 23 May 2017 16:18:46 +1000
-Received: from d23av03.au.ibm.com (d23av03.au.ibm.com [9.190.234.97])
-	by d23relay10.au.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
-	v4N6IYCc7340342
-	for <qemu-devel@nongnu.org>; Tue, 23 May 2017 16:18:42 +1000
-Received: from d23av03.au.ibm.com (localhost [127.0.0.1])
-	by d23av03.au.ibm.com (8.14.4/8.14.4/NCO v10.0 AVout) with ESMTP id
-	v4N6I12r022476
-	for <qemu-devel@nongnu.org>; Tue, 23 May 2017 16:18:03 +1000
-From: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
-In-Reply-To: <BBC4E515-FE7D-4600-A5CA-BBCE26059415@gmail.com>
-References: <mailman.73115.1495441935.22737.qemu-devel@nongnu.org>
-	<BBC4E515-FE7D-4600-A5CA-BBCE26059415@gmail.com>
-Date: Tue, 23 May 2017 11:47:30 +0530
+	(envelope-from <jasowang@redhat.com>) id 1dD3FW-0003Tj-Cp
+	for qemu-devel@nongnu.org; Tue, 23 May 2017 02:24:57 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49820)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1dD3FW-0003T5-3l
+	for qemu-devel@nongnu.org; Tue, 23 May 2017 02:24:54 -0400
+References: <1495161139-28757-1-git-send-email-wei.w.wang@intel.com>
+	<20170519233750-mutt-send-email-mst@kernel.org>
+	<5922D0EC.6060405@intel.com>
+	<b415fea9-9d48-9390-0ec2-46f69b7a54b0@redhat.com>
+	<5923C557.3020301@intel.com>
+From: Jason Wang <jasowang@redhat.com>
+Message-ID: <ac8a484d-744a-8bdf-eba2-05239c6eefb1@redhat.com>
+Date: Tue, 23 May 2017 14:24:44 +0800
 MIME-Version: 1.0
-Content-Type: text/plain
-Message-Id: <87efvghzb9.fsf@abhimanyu.i-did-not-set--mail-host-address--so-tickle-me>
-Subject: Re: [Qemu-devel] [PATCH risu] ppc64: Fix patterns for rotate
- doubleword instructions
+In-Reply-To: <5923C557.3020301@intel.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [virtio-dev] Re: [PATCH RFC] virtio-net: enable
+ configurable tx queue size
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -50,50 +31,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: G 3 <programmingkidx@gmail.com>, "qemu-devel@nongnu.org qemu-devel" <qemu-devel@nongnu.org>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Sandipan Das <sandipandas1990@gmail.com>, Jose Ricardo Ziviani <joserz@linux.vnet.ibm.com>
+To: Wei Wang <wei.w.wang@intel.com>, "Michael S. Tsirkin" <mst@redhat.com>
+Cc: stefanha@gmail.com, marcandre.lureau@gmail.com, pbonzini@redhat.com, jan.scheurich@ericsson.com, virtio-dev@lists.oasis-open.org, qemu-devel@nongnu.org
 
-G 3 <programmingkidx@gmail.com> writes:
 
-> On May 22, 2017, at 4:32 AM, qemu-devel-request@nongnu.org wrote:
->
-> Hello I have also done some work risu. My patches add ppc32 support.  
-> Well my patches were made to work with Mac OS X but they are required  
-> to work with Linux. Do you think you could help port these patches to  
-> Linux?
 
-Ziviani did the ppc64 work, lets see if he can spare some time.
+On 2017=E5=B9=B405=E6=9C=8823=E6=97=A5 13:15, Wei Wang wrote:
+> On 05/23/2017 10:04 AM, Jason Wang wrote:
+>>
+>>
+>> On 2017=E5=B9=B405=E6=9C=8822=E6=97=A5 19:52, Wei Wang wrote:
+>>> On 05/20/2017 04:42 AM, Michael S. Tsirkin wrote:
+>>>> On Fri, May 19, 2017 at 10:32:19AM +0800, Wei Wang wrote:
+>>>>> This patch enables the virtio-net tx queue size to be configurable
+>>>>> between 256 (the default queue size) and 1024 by the user. The queu=
+e
+>>>>> size specified by the user should be power of 2.
+>>>>>
+>>>>> Setting the tx queue size to be 1024 requires the guest driver to
+>>>>> support the VIRTIO_NET_F_MAX_CHAIN_SIZE feature.
+>>>> This should be a generic ring feature, not one specific to virtio ne=
+t.
+>>> OK. How about making two more changes below:
+>>>
+>>> 1) make the default tx queue size =3D 1024 (instead of 256).
+>>
+>> As has been pointed out, you need compat the default value too in=20
+>> this case.
+>
+> The driver gets the size info from the device, then would it cause any
+> compatibility issue if we change the default ring size to 1024 in the
+> vhost case? In other words, is there any software (i.e. any virtio-net=20
+> driver)
+> functions based on the assumption of 256 queue size?
 
-The patches haven't come right on the mailing list, its tedious to pull
-them. Please resend them with git send-mail.
+I don't know. But is it safe e.g we migrate from 1024 to an older qemu=20
+with 256 as its queue size?
 
 >
-> ppc.risu:
-> https://patchwork.kernel.org/patch/9697489/
+> For live migration, the queue size that is being used will also be=20
+> transferred
+> to the destination.
 >
-> risu_ppc.c:
-> https://patchwork.kernel.org/patch/9697491/
+>>
+>>> We can reduce the size (to 256) if the MAX_CHAIN_SIZE feature
+>>> is not supported by the guest.
+>>> In this way, people who apply the QEMU patch can directly use the
+>>> largest queue size(1024) without adding the booting command line.
+>>>
+>>> 2) The vhost backend does not use writev, so I think when the vhost
+>>> backed is used, using 1024 queue size should not depend on the
+>>> MAX_CHAIN_SIZE feature.
+>>
+>> But do we need to consider even larger queue size now?
 >
-> risu_reginfo_ppc.c:
-> https://patchwork.kernel.org/patch/9697493/
->
-> risu_reginfo_ppc.h:
-> https://patchwork.kernel.org/patch/9697495/
->
-> risugen_ppc.pm:
-> https://patchwork.kernel.org/patch/9697497/
->
-> Add ppc support to configure:
-> https://patchwork.kernel.org/patch/9697499/
->
-> Add verbose option:
-> https://patchwork.kernel.org/patch/9697501/
->
-> Add end of test message:
-> https://patchwork.kernel.org/patch/9697503/
->
-> Add more descriptive comment for mismatch or end of test condition:
-> https://patchwork.kernel.org/patch/9697505/
+> Need Michael's feedback on this. Meanwhile, I'll get the next version o=
+f
+> code ready and check if larger queue size would cause any corner case.
 
-Regards
-Nikunj
+The problem is, do we really need a new config filed for this? Or just=20
+introduce a flag which means "I support up to 1024 sgs" is sufficient?
+
+>
+>>
+>> Btw, I think it's better to draft a spec patch.
+>>
+>
+> I think it should be easier to draft the spec patch when the code is
+> almost done.
+
+Maybe both.
+
+Thanks
+
+>
+>
+> Best,
+> Wei
+>
+>
+>
+>
