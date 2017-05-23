@@ -1,35 +1,38 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46302)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46353)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1dDArL-0002TN-Ha
-	for qemu-devel@nongnu.org; Tue, 23 May 2017 10:32:28 -0400
+	(envelope-from <groug@kaod.org>) id 1dDArR-0002gd-DN
+	for qemu-devel@nongnu.org; Tue, 23 May 2017 10:32:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1dDArH-00081S-Hw
-	for qemu-devel@nongnu.org; Tue, 23 May 2017 10:32:27 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:39945)
+	(envelope-from <groug@kaod.org>) id 1dDArN-00083o-Bd
+	for qemu-devel@nongnu.org; Tue, 23 May 2017 10:32:33 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:48390
+	helo=mx0a-001b2d01.pphosted.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1dDArH-000814-9P
-	for qemu-devel@nongnu.org; Tue, 23 May 2017 10:32:23 -0400
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v4NEVUl0098679
-	for <qemu-devel@nongnu.org>; Tue, 23 May 2017 10:32:21 -0400
-Received: from e33.co.us.ibm.com (e33.co.us.ibm.com [32.97.110.151])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2am8pdm8u4-1
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1dDArN-00083X-6F
+	for qemu-devel@nongnu.org; Tue, 23 May 2017 10:32:29 -0400
+Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v4NEUQ2P087664
+	for <qemu-devel@nongnu.org>; Tue, 23 May 2017 10:32:28 -0400
+Received: from e34.co.us.ibm.com (e34.co.us.ibm.com [32.97.110.152])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2amgy026u4-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 23 May 2017 10:32:21 -0400
+	for <qemu-devel@nongnu.org>; Tue, 23 May 2017 10:32:28 -0400
 Received: from localhost
-	by e33.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	by e34.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
 	Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <groug@kaod.org>;
-	Tue, 23 May 2017 08:32:20 -0600
+	Tue, 23 May 2017 08:32:27 -0600
 From: Greg Kurz <groug@kaod.org>
-Date: Tue, 23 May 2017 16:32:15 +0200
+Date: Tue, 23 May 2017 16:32:22 +0200
+In-Reply-To: <149554993519.23396.2947622015408783770.stgit@bahia.lab.toulouse-stg.fr.ibm.com>
+References: <149554993519.23396.2947622015408783770.stgit@bahia.lab.toulouse-stg.fr.ibm.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <149554993519.23396.2947622015408783770.stgit@bahia.lab.toulouse-stg.fr.ibm.com>
-Subject: [Qemu-devel] [PATCH v2 0/4] 9pfs: local: fix metadata of
- mapped-file security mode
+Message-Id: <149554994233.23396.14501404339582791504.stgit@bahia.lab.toulouse-stg.fr.ibm.com>
+Subject: [Qemu-devel] [PATCH v2 1/4] 9pfs: check return value of
+ v9fs_co_name_to_path()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -41,30 +44,100 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Leo Gaspard <leo@gaspard.io>, Eric Blake <eblake@redhat.com>, Greg Kurz <groug@kaod.org>
 
-v2: - posted patch for CVE-2017-7493 separately
-    - other changes available in each patch changelog
+These v9fs_co_name_to_path() call sites have always been around. I guess
+no care was taken to check the return value because the name_to_path
+operation could never fail at the time. This is no longer true: the
+handle and synth backends can already fail this operation, and so will the
+local backend soon.
 
-Leo,
-
-If you find time to test this series, I'll gladly add your Tested-by: to
-it before merging.
-
-Cheers,
-
---
-Greg
-
+Signed-off-by: Greg Kurz <groug@kaod.org>
+Reviewed-by: Eric Blake <eblake@redhat.com>
 ---
+ hw/9pfs/9p.c |   36 +++++++++++++++++++++++++-----------
+ 1 file changed, 25 insertions(+), 11 deletions(-)
 
-Greg Kurz (4):
-      9pfs: check return value of v9fs_co_name_to_path()
-      9pfs: local: resolve special directories in paths
-      9pfs: local: simplify file opening
-      9pfs: local: metadata file for the VirtFS root
-
-
- hw/9pfs/9p-local.c |  147 ++++++++++++++++++++++++++++++++++++++--------------
- hw/9pfs/9p-util.c  |   43 ---------------
- hw/9pfs/9p-util.h  |    2 -
- hw/9pfs/9p.c       |   36 +++++++++----
- 4 files changed, 133 insertions(+), 95 deletions(-)
+diff --git a/hw/9pfs/9p.c b/hw/9pfs/9p.c
+index ab3e22f23130..57c6ed6079b1 100644
+--- a/hw/9pfs/9p.c
++++ b/hw/9pfs/9p.c
+@@ -2576,7 +2576,10 @@ static int coroutine_fn v9fs_complete_rename(V9fsPDU *pdu, V9fsFidState *fidp,
+             err = -EINVAL;
+             goto out;
+         }
+-        v9fs_co_name_to_path(pdu, &dirfidp->path, name->data, &new_path);
++        err = v9fs_co_name_to_path(pdu, &dirfidp->path, name->data, &new_path);
++        if (err < 0) {
++            goto out;
++        }
+     } else {
+         old_name = fidp->path.data;
+         end = strrchr(old_name, '/');
+@@ -2588,8 +2591,11 @@ static int coroutine_fn v9fs_complete_rename(V9fsPDU *pdu, V9fsFidState *fidp,
+         new_name = g_malloc0(end - old_name + name->size + 1);
+         strncat(new_name, old_name, end - old_name);
+         strncat(new_name + (end - old_name), name->data, name->size);
+-        v9fs_co_name_to_path(pdu, NULL, new_name, &new_path);
++        err = v9fs_co_name_to_path(pdu, NULL, new_name, &new_path);
+         g_free(new_name);
++        if (err < 0) {
++            goto out;
++        }
+     }
+     err = v9fs_co_rename(pdu, &fidp->path, &new_path);
+     if (err < 0) {
+@@ -2669,20 +2675,26 @@ out_nofid:
+     v9fs_string_free(&name);
+ }
+ 
+-static void coroutine_fn v9fs_fix_fid_paths(V9fsPDU *pdu, V9fsPath *olddir,
+-                                            V9fsString *old_name,
+-                                            V9fsPath *newdir,
+-                                            V9fsString *new_name)
++static int coroutine_fn v9fs_fix_fid_paths(V9fsPDU *pdu, V9fsPath *olddir,
++                                           V9fsString *old_name,
++                                           V9fsPath *newdir,
++                                           V9fsString *new_name)
+ {
+     V9fsFidState *tfidp;
+     V9fsPath oldpath, newpath;
+     V9fsState *s = pdu->s;
+-
++    int err;
+ 
+     v9fs_path_init(&oldpath);
+     v9fs_path_init(&newpath);
+-    v9fs_co_name_to_path(pdu, olddir, old_name->data, &oldpath);
+-    v9fs_co_name_to_path(pdu, newdir, new_name->data, &newpath);
++    err = v9fs_co_name_to_path(pdu, olddir, old_name->data, &oldpath);
++    if (err < 0) {
++        goto out;
++    }
++    err = v9fs_co_name_to_path(pdu, newdir, new_name->data, &newpath);
++    if (err < 0) {
++        goto out;
++    }
+ 
+     /*
+      * Fixup fid's pointing to the old name to
+@@ -2694,8 +2706,10 @@ static void coroutine_fn v9fs_fix_fid_paths(V9fsPDU *pdu, V9fsPath *olddir,
+             v9fs_fix_path(&tfidp->path, &newpath, strlen(oldpath.data));
+         }
+     }
++out:
+     v9fs_path_free(&oldpath);
+     v9fs_path_free(&newpath);
++    return err;
+ }
+ 
+ static int coroutine_fn v9fs_complete_renameat(V9fsPDU *pdu, int32_t olddirfid,
+@@ -2729,8 +2743,8 @@ static int coroutine_fn v9fs_complete_renameat(V9fsPDU *pdu, int32_t olddirfid,
+     }
+     if (s->ctx.export_flags & V9FS_PATHNAME_FSCONTEXT) {
+         /* Only for path based fid  we need to do the below fixup */
+-        v9fs_fix_fid_paths(pdu, &olddirfidp->path, old_name,
+-                           &newdirfidp->path, new_name);
++        err = v9fs_fix_fid_paths(pdu, &olddirfidp->path, old_name,
++                                 &newdirfidp->path, new_name);
+     }
+ out:
+     if (olddirfidp) {
