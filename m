@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44633)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45368)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1dDBys-0000tL-I8
-	for qemu-devel@nongnu.org; Tue, 23 May 2017 11:44:19 -0400
+	(envelope-from <eblake@redhat.com>) id 1dDC0z-0001l3-To
+	for qemu-devel@nongnu.org; Tue, 23 May 2017 11:46:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1dDByr-0002Z5-Ij
-	for qemu-devel@nongnu.org; Tue, 23 May 2017 11:44:18 -0400
-Date: Tue, 23 May 2017 17:44:03 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20170523174403.26a69d7c@Igors-MacBook-Pro.local>
-In-Reply-To: <20170523144854.GF32274@thinpad.lan.raisama.net>
-References: <1495550330-34087-1-git-send-email-imammedo@redhat.com>
-	<1495550330-34087-5-git-send-email-imammedo@redhat.com>
-	<20170523144854.GF32274@thinpad.lan.raisama.net>
+	(envelope-from <eblake@redhat.com>) id 1dDC0z-0003G6-0U
+	for qemu-devel@nongnu.org; Tue, 23 May 2017 11:46:29 -0400
+References: <1495548064-10926-1-git-send-email-kwolf@redhat.com>
+	<1495548064-10926-5-git-send-email-kwolf@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <b56cd2ae-8793-4b61-e867-73d66baba45b@redhat.com>
+Date: Tue, 23 May 2017 10:46:17 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 4/5] numa: fallback to default NUMA node
- instead of node 0
+In-Reply-To: <1495548064-10926-5-git-send-email-kwolf@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="XCvi4QrAwW5JC7JsQwqTqSDVichT5ewae"
+Subject: Re: [Qemu-devel] [PATCH 4/4] qemu-iotests: Block migration test
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,50 +24,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-arm@nongnu.org, qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, Andrew Jones <drjones@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: famz@redhat.com, quintela@redhat.com, qemu-devel@nongnu.org, dgilbert@redhat.com, mreitz@redhat.com, stefanha@redhat.com
 
-On Tue, 23 May 2017 11:48:54 -0300
-Eduardo Habkost <ehabkost@redhat.com> wrote:
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--XCvi4QrAwW5JC7JsQwqTqSDVichT5ewae
+From: Eric Blake <eblake@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: famz@redhat.com, quintela@redhat.com, qemu-devel@nongnu.org,
+ dgilbert@redhat.com, mreitz@redhat.com, stefanha@redhat.com
+Message-ID: <b56cd2ae-8793-4b61-e867-73d66baba45b@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 4/4] qemu-iotests: Block migration test
+References: <1495548064-10926-1-git-send-email-kwolf@redhat.com>
+ <1495548064-10926-5-git-send-email-kwolf@redhat.com>
+In-Reply-To: <1495548064-10926-5-git-send-email-kwolf@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-> On Tue, May 23, 2017 at 04:38:49PM +0200, Igor Mammedov wrote:
-> > Do the same as we did in commit
-> >   (57924bcd8 numa: introduce machine callback for VCPU to node mapping)
-> > but only for incomplete mapping usecase, falling back to board
-> > provided default cpu to node mapping if user hasn't provided
-> > mapping for CPU explicitly.
-> > 
-> > Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-> 
-> This breaks migration compatibility, doesn't it? I understand
-> this use case is not supported, but if are going to break stuff
-> for people using incomplete mappings (by rejecting the
-> configuration on a future release), I would prefer to break it
-> only once.
-it's firmware change and we generally don't care nor maintain firmware compat stuff
-the same as with above mentioned 
- (57924bcd8 numa: introduce machine callback for VCPU to node mapping)
+On 05/23/2017 09:01 AM, Kevin Wolf wrote:
+> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> ---
+>  tests/qemu-iotests/183     | 121 +++++++++++++++++++++++++++++++++++++=
+++++++++
+>  tests/qemu-iotests/183.out |  48 ++++++++++++++++++
+>  tests/qemu-iotests/group   |   1 +
+>  3 files changed, 170 insertions(+)
+>  create mode 100755 tests/qemu-iotests/183
+>  create mode 100644 tests/qemu-iotests/183.out
+>=20
 
-> 
-> > ---
-> >  hw/core/machine.c | 3 ---
-> >  1 file changed, 3 deletions(-)
-> > 
-> > diff --git a/hw/core/machine.c b/hw/core/machine.c
-> > index 964b75d..b8df15f 100644
-> > --- a/hw/core/machine.c
-> > +++ b/hw/core/machine.c
-> > @@ -730,9 +730,6 @@ static void machine_numa_finish_init(MachineState *machine)
-> >                  g_string_append_printf(s, "%sCPU %d [%s]",
-> >                                         s->len ? ", " : "", i, cpu_str);
-> >                  g_free(cpu_str);
-> > -
-> > -                /* non mapped cpus used to fallback to node 0 */
-> > -                props.node_id = 0;
-> >              }
-> >  
-> >              props.has_node_id = true;
-> > -- 
-> > 2.7.4
-> > 
-> 
+Does this test gracefully skip when coupled with the efforts for a
+configure option to disable block migration?
+https://lists.gnu.org/archive/html/qemu-devel/2017-05/msg04398.html
+
+> +echo
+> +echo =3D=3D=3D Do block migration to destination =3D=3D=3D
+> +echo
+> +
+> +_send_qemu_cmd $src "migrate -b unix:${MIG_SOCKET}" "(qemu)"
+
+I don't see any earlier checks, so it looks like you'd choke here if -b
+is not compiled in.
+
+Should we also check the use of -i?
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--XCvi4QrAwW5JC7JsQwqTqSDVichT5ewae
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEcBAEBCAAGBQJZJFlJAAoJEKeha0olJ0NqSQsH/i+tcVmSXHhOTnYhtQ161dGD
+16uMjqClPefIpNN71nEkho0uO6cLysY2fyowHCLK/i5O/tLdGxcewEyosLpWRgX4
+Uk1p0ZcpbuPDV+SfhLGqivv050eKn1AFCNwlqhKFz1vKYCI1eUyeE/nCTPHfzcHm
+yaBcPfOBkAObcxE0PuZxeThYro6v4H9Gr+1I1KLFhV51JN7RDtm4zAfdBPJ4qYxj
+C4EIF+sVFhEG1+bLp3YUIQSMP/dBx0SMHjUaa2iYAZzuKyTcVZ+mwb+YUqJFD1xH
+1Vi/iLPCo85XmEjKiqf23TPwb9dCoGraap8KRaRQ+YlFfJddodmlHd2pe+9iavA=
+=4IYm
+-----END PGP SIGNATURE-----
+
+--XCvi4QrAwW5JC7JsQwqTqSDVichT5ewae--
