@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42364)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43880)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dDBrP-00075r-8a
-	for qemu-devel@nongnu.org; Tue, 23 May 2017 11:36:36 -0400
+	(envelope-from <eblake@redhat.com>) id 1dDBwd-0008Gi-PU
+	for qemu-devel@nongnu.org; Tue, 23 May 2017 11:42:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dDBrO-0006Au-8u
-	for qemu-devel@nongnu.org; Tue, 23 May 2017 11:36:35 -0400
+	(envelope-from <eblake@redhat.com>) id 1dDBwc-0001ld-TC
+	for qemu-devel@nongnu.org; Tue, 23 May 2017 11:41:59 -0400
 References: <1495548064-10926-1-git-send-email-kwolf@redhat.com>
-	<1495548064-10926-3-git-send-email-kwolf@redhat.com>
+	<1495548064-10926-4-git-send-email-kwolf@redhat.com>
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <feb15924-6939-a0ad-cb89-033cb0aa7641@redhat.com>
-Date: Tue, 23 May 2017 10:36:20 -0500
+Message-ID: <2bf654ba-4f30-78f6-ea71-50a12274540e@redhat.com>
+Date: Tue, 23 May 2017 10:41:27 -0500
 MIME-Version: 1.0
-In-Reply-To: <1495548064-10926-3-git-send-email-kwolf@redhat.com>
+In-Reply-To: <1495548064-10926-4-git-send-email-kwolf@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="csN93PLnkdpDOfb5I3wirW5Gv0nvlu9WW"
-Subject: Re: [Qemu-devel] [PATCH 2/4] migration: Inactivate images after
- .save_live_complete_precopy()
+	boundary="ACrEk1GTejjsgxkqFwR1DMxtISkNQw3Tv"
+Subject: Re: [Qemu-devel] [PATCH 3/4] migration/block: Clean up BBs in
+ block_save_complete()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,37 +29,30 @@ To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
 Cc: famz@redhat.com, quintela@redhat.com, qemu-devel@nongnu.org, dgilbert@redhat.com, mreitz@redhat.com, stefanha@redhat.com
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---csN93PLnkdpDOfb5I3wirW5Gv0nvlu9WW
+--ACrEk1GTejjsgxkqFwR1DMxtISkNQw3Tv
 From: Eric Blake <eblake@redhat.com>
 To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
 Cc: famz@redhat.com, quintela@redhat.com, qemu-devel@nongnu.org,
  dgilbert@redhat.com, mreitz@redhat.com, stefanha@redhat.com
-Message-ID: <feb15924-6939-a0ad-cb89-033cb0aa7641@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 2/4] migration: Inactivate images after
- .save_live_complete_precopy()
+Message-ID: <2bf654ba-4f30-78f6-ea71-50a12274540e@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 3/4] migration/block: Clean up BBs in
+ block_save_complete()
 References: <1495548064-10926-1-git-send-email-kwolf@redhat.com>
- <1495548064-10926-3-git-send-email-kwolf@redhat.com>
-In-Reply-To: <1495548064-10926-3-git-send-email-kwolf@redhat.com>
+ <1495548064-10926-4-git-send-email-kwolf@redhat.com>
+In-Reply-To: <1495548064-10926-4-git-send-email-kwolf@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
 On 05/23/2017 09:01 AM, Kevin Wolf wrote:
-> Block migration may still access the image during its
-> .save_live_complete_precopy() implementation, so we should only
-> inactivate the image afterwards.
->=20
-> Another reason for the change is that inactivating an image fails when
-> there is still a non-device BlockBackend using it, which includes the
-> BBs used by block migration. We want to give block migration a chance t=
-o
-> release the BBs before trying to inactivate the image (this will be don=
-e
-> in another patch).
+> We need to release any block migrations BlockBackends on the source
+> before successfully completing the migration because otherwise
+> inactivating the images will fail (inactivation only tolerates device
+> BBs).
 >=20
 > Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 > ---
->  migration/migration.c | 12 +++++++-----
->  1 file changed, 7 insertions(+), 5 deletions(-)
+>  migration/block.c | 22 +++++++++++++++++-----
+>  1 file changed, 17 insertions(+), 5 deletions(-)
 >=20
 
 Reviewed-by: Eric Blake <eblake@redhat.com>
@@ -70,7 +63,7 @@ Red Hat, Inc.           +1-919-301-3266
 Virtualization:  qemu.org | libvirt.org
 
 
---csN93PLnkdpDOfb5I3wirW5Gv0nvlu9WW
+--ACrEk1GTejjsgxkqFwR1DMxtISkNQw3Tv
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
@@ -80,13 +73,13 @@ Version: GnuPG v2
 Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
 Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQEcBAEBCAAGBQJZJFb1AAoJEKeha0olJ0NqRf4H/0xU6pswSGVbv6ZelRiAACAw
-piQXL95gA4k9+gIokp+zD7HaLcShKlR1bqNpgKIodZMbUn2jXb9qFMFxqLUGlEUh
-LwWxIbdiMhacCsJv+aYlSiKBefJomlu+hDgeGEgDwE+0Q802jpf//RAht/sk3P3X
-FobTn4rzD3af0sS9M6PwkdxTSb6FcG64cDLVuOtd24TbdbEVzh0x41E5y50ISd6y
-ShwQFnB0S5ylH9kXTDaoQDQ5Tebq7Sa9j5EPRGOXBU8OgMBb1nHTKTFNmz8pUvg4
-SllEMDR4RCBcQgpieNT1cxThH+NL8DxzSQCHBGwEiqI6TQ57X8Jv2v0tL99nLSs=
-=jIgE
+iQEcBAEBCAAGBQJZJFgnAAoJEKeha0olJ0NqHnIH/j8gWdMp6qrxwhev3BfmjcWS
+x6Td0FgpRbXCRjOQWZLpVMf0cVd7ILRpA1KLAIhaWMw8IkM24L+g+hJch6l414SU
+rOnE6yebaxWWXtNPBhYIV3zOYn5b8JWH6RYYUOCp6Tg25SgX4sx8zI1Ti38k/sh7
+duRjUbmXfiBzgWzMm+ehE22Cz7I+DfTS3KpZvA+Io4AJOaLyUmsGqnvZmDXlZ3pg
+nA4/Jf4M4fJDcUsXtsxWQqJ2ScuL009Jx61d/xaRguYRcwuygqp07Yb/aKJwkLxn
+WWwO/Xpa/uQKFDhJv33BzXC7xaWa3bTXJfII3aWLwH+l4cMik/RlN3gdAIS3SIk=
+=4CNK
 -----END PGP SIGNATURE-----
 
---csN93PLnkdpDOfb5I3wirW5Gv0nvlu9WW--
+--ACrEk1GTejjsgxkqFwR1DMxtISkNQw3Tv--
