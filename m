@@ -1,39 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43906)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47510)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1dD9Lc-0006rh-G0
-	for qemu-devel@nongnu.org; Tue, 23 May 2017 08:55:37 -0400
+	(envelope-from <vyasevic@redhat.com>) id 1dD9bO-0002ss-E8
+	for qemu-devel@nongnu.org; Tue, 23 May 2017 09:11:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1dD9LX-0005Jl-KP
-	for qemu-devel@nongnu.org; Tue, 23 May 2017 08:55:36 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:55287)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
-	id 1dD9LX-0005JQ-AD
-	for qemu-devel@nongnu.org; Tue, 23 May 2017 08:55:31 -0400
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v4NCnEBA063546
-	for <qemu-devel@nongnu.org>; Tue, 23 May 2017 08:55:28 -0400
-Received: from e37.co.us.ibm.com (e37.co.us.ibm.com [32.97.110.158])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2am8pdeu9k-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 23 May 2017 08:55:28 -0400
-Received: from localhost
-	by e37.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
-	Tue, 23 May 2017 06:55:27 -0600
-References: <20170518111405.56947-1-pasic@linux.vnet.ibm.com>
-	<20170523141821.79db6b2b.cornelia.huck@de.ibm.com>
-From: Christian Borntraeger <borntraeger@de.ibm.com>
-Date: Tue, 23 May 2017 14:55:21 +0200
+	(envelope-from <vyasevic@redhat.com>) id 1dD9bL-0005Rz-92
+	for qemu-devel@nongnu.org; Tue, 23 May 2017 09:11:54 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:33108)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <vyasevic@redhat.com>) id 1dD9bL-0005Rd-0k
+	for qemu-devel@nongnu.org; Tue, 23 May 2017 09:11:51 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 174C4C0467C3
+	for <qemu-devel@nongnu.org>; Tue, 23 May 2017 13:11:49 +0000 (UTC)
+Reply-To: vyasevic@redhat.com
+References: <20170520080658.337-1-maxime.coquelin@redhat.com>
+	<20170523123119.7414-1-maxime.coquelin@redhat.com>
+From: Vlad Yasevich <vyasevic@redhat.com>
+Message-ID: <54836ca8-7cf3-6f27-f519-a32fc3e7a5d4@redhat.com>
+Date: Tue, 23 May 2017 09:11:43 -0400
 MIME-Version: 1.0
-In-Reply-To: <20170523141821.79db6b2b.cornelia.huck@de.ibm.com>
+In-Reply-To: <20170523123119.7414-1-maxime.coquelin@redhat.com>
 Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
-Message-Id: <23e0910b-a2bc-e571-804d-1c0f033dd1e7@de.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH v2 1/1] s390x/css: catch section mismatch
- on load
+Subject: Re: [Qemu-devel] [PATCH v2] virtio_net: Bypass backends for MTU
+ feature negotiation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -42,53 +35,132 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cornelia.huck@de.ibm.com>, Halil Pasic <pasic@linux.vnet.ibm.com>
-Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org, qemu-stable@nongnu.org
+To: Maxime Coquelin <maxime.coquelin@redhat.com>, mst@redhat.com, aconole@redhat.com, jasowang@redhat.com, qemu-devel@nongnu.org
 
-On 05/23/2017 02:18 PM, Cornelia Huck wrote:
-> On Thu, 18 May 2017 13:14:05 +0200
-> Halil Pasic <pasic@linux.vnet.ibm.com> wrote:
+On 05/23/2017 08:31 AM, Maxime Coquelin wrote:
+> This patch adds a new internal "x-mtu-bypass-backend" property
+> to bypass backends for MTU feature negotiation.
 > 
->> Prior to the virtio-ccw-2.7 machine (and commit 2a79eb1a), our virtio
->> devices residing under the virtual-css bus do not have qdev_path based
->> migration stream identifiers (because their qdev_path is NULL). The ids
->> are instead generated when the device is registered as a composition of
->> the so called idstr, which takes the vmsd name as its value, and an
->> instance_id, which is which is calculated as a maximal instance_id
->> registered with the same idstr plus one, or zero (if none was registered
->> previously).
->>
->> That means, under certain circumstances, one device might try, and even
->> succeed, to load the state of a different device. This can lead to
->> trouble.
->>
->> Let us fail the migration if the above problem is detected during load.
->>
->> How to reproduce the problem:
->> 1) start qemu-system-s390x making sure you have the following devices
->>    defined on your command line:
->>      -device virtio-rng-ccw,id=rng1,devno=fe.0.0001
->>      -device virtio-rng-ccw,id=rng2,devno=fe.0.0002
->> 2) detach the devices and reattach in reverse order using the monitor:
->>      (qemu) device_del rng1
->>      (qemu) device_del rng2
->>      (qemu) device_add virtio-rng-ccw,id=rng2,devno=fe.0.0002
->>      (qemu) device_add virtio-rng-ccw,id=rng1,devno=fe.0.0001
->> 3) save the state of the vm into a temporary file and quit QEMU:
->>      (qemu) migrate "exec:gzip -c > /tmp/tmp_vmstate.gz"
->>      (qemu) q
->> 4) use your command line from step 1 with
->>      -incoming "exec:gzip -c -d /tmp/tmp_vmstate.gz"
->>    appended to reproduce the problem (while trying to to load the saved vm)
->>
->> CC: qemu-stable@nongnu.org
->> Signed-off-by: Halil Pasic <pasic@linux.vnet.ibm.com>
->> Reviewed-by: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
+> When this property is set, the MTU feature is negotiated as soon
+> as supported by the guest and a MTU value is set via the host_mtu
+> parameter. In case the backend advertises the feature (e.g. DPDK's
+> vhost-user backend), the feature negotiation is propagated down to
+> the backend.
 > 
-> Hum, missed that one for my pull request, sorry.
+> When this property is not set, the backend has to support the MTU
+> feature for its negotiation to succeed.
 > 
-> Reviewed-by: Cornelia Huck <cornelia.huck@de.ibm.com>
+> For compatibility purpose, this property is disabled for machine
+> types v2.9 and older.
 > 
-> Christian, can you please pick for the next set of s390x patches?
+> Cc: Aaron Conole <aconole@redhat.com>
+> Suggested-by: Michael S. Tsirkin <mst@redhat.com>
+> Signed-off-by: Maxime Coquelin <maxime.coquelin@redhat.com>
 
-applied to my tree, Thanks.
+Reviewed-by: Vlad Yasevich <vyasevic@redhat.com>
+
+-vlad
+
+> ---
+> 
+> Tests performed:
+> - Vhost-net kernel backendi, host_mtu=2000:
+>  * default machine type: guest MTU = 2000
+>  * pc-q35-2.9 machine type: Guest MTU = 1500
+> 
+> - Vhost-net user backend, host_mtu=2000:
+>  * DPDK v17.05 (MTU feature supported on backend side)
+>   - default machine type: guest MTU = 2000
+>   - pc-q35-2.9 machine type: guest MTU = 2000)
+>  * DPDK v16.11 (MTU feature not supported on backend side)
+>   - default machine type: guest MTU = 2000
+>   - pc-q35-2.9 machine type: guest MTU = 1500)
+> 
+>  hw/net/virtio-net.c            | 17 ++++++++++++++++-
+>  include/hw/compat.h            |  4 ++++
+>  include/hw/virtio/virtio-net.h |  1 +
+>  include/hw/virtio/virtio.h     |  1 +
+>  4 files changed, 22 insertions(+), 1 deletion(-)
+> 
+> diff --git a/hw/net/virtio-net.c b/hw/net/virtio-net.c
+> index 7d091c9..39c336e 100644
+> --- a/hw/net/virtio-net.c
+> +++ b/hw/net/virtio-net.c
+> @@ -589,7 +589,15 @@ static uint64_t virtio_net_get_features(VirtIODevice *vdev, uint64_t features,
+>      if (!get_vhost_net(nc->peer)) {
+>          return features;
+>      }
+> -    return vhost_net_get_features(get_vhost_net(nc->peer), features);
+> +    features = vhost_net_get_features(get_vhost_net(nc->peer), features);
+> +    vdev->backend_features = features;
+> +
+> +    if (n->mtu_bypass_backend &&
+> +            (n->host_features & 1ULL << VIRTIO_NET_F_MTU)) {
+> +        features |= (1ULL << VIRTIO_NET_F_MTU);
+> +    }
+> +
+> +    return features;
+>  }
+>  
+>  static uint64_t virtio_net_bad_features(VirtIODevice *vdev)
+> @@ -640,6 +648,11 @@ static void virtio_net_set_features(VirtIODevice *vdev, uint64_t features)
+>      VirtIONet *n = VIRTIO_NET(vdev);
+>      int i;
+>  
+> +    if (n->mtu_bypass_backend &&
+> +            !virtio_has_feature(vdev->backend_features, VIRTIO_NET_F_MTU)) {
+> +        features &= ~(1ULL << VIRTIO_NET_F_MTU);
+> +    }
+> +
+>      virtio_net_set_multiqueue(n,
+>                                virtio_has_feature(features, VIRTIO_NET_F_MQ));
+>  
+> @@ -2090,6 +2103,8 @@ static Property virtio_net_properties[] = {
+>      DEFINE_PROP_UINT16("rx_queue_size", VirtIONet, net_conf.rx_queue_size,
+>                         VIRTIO_NET_RX_QUEUE_DEFAULT_SIZE),
+>      DEFINE_PROP_UINT16("host_mtu", VirtIONet, net_conf.mtu, 0),
+> +    DEFINE_PROP_BOOL("x-mtu-bypass-backend", VirtIONet, mtu_bypass_backend,
+> +                     true),
+>      DEFINE_PROP_END_OF_LIST(),
+>  };
+>  
+> diff --git a/include/hw/compat.h b/include/hw/compat.h
+> index 55b1765..181f450 100644
+> --- a/include/hw/compat.h
+> +++ b/include/hw/compat.h
+> @@ -6,6 +6,10 @@
+>          .driver   = "pci-bridge",\
+>          .property = "shpc",\
+>          .value    = "off",\
+> +    },{\
+> +        .driver   = "virtio-net-device",\
+> +        .property = "x-mtu-bypass-backend",\
+> +        .value    = "off",\
+>      },
+>  
+>  #define HW_COMPAT_2_8 \
+> diff --git a/include/hw/virtio/virtio-net.h b/include/hw/virtio/virtio-net.h
+> index 1eec9a2..602b486 100644
+> --- a/include/hw/virtio/virtio-net.h
+> +++ b/include/hw/virtio/virtio-net.h
+> @@ -97,6 +97,7 @@ typedef struct VirtIONet {
+>      QEMUTimer *announce_timer;
+>      int announce_counter;
+>      bool needs_vnet_hdr_swap;
+> +    bool mtu_bypass_backend;
+>  } VirtIONet;
+>  
+>  void virtio_net_set_netclient_name(VirtIONet *n, const char *name,
+> diff --git a/include/hw/virtio/virtio.h b/include/hw/virtio/virtio.h
+> index 7b6edba..80c45c3 100644
+> --- a/include/hw/virtio/virtio.h
+> +++ b/include/hw/virtio/virtio.h
+> @@ -79,6 +79,7 @@ struct VirtIODevice
+>      uint16_t queue_sel;
+>      uint64_t guest_features;
+>      uint64_t host_features;
+> +    uint64_t backend_features;
+>      size_t config_len;
+>      void *config;
+>      uint16_t config_vector;
+> 
