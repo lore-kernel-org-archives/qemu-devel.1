@@ -1,33 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34191)
-	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1dDBWq-0001GU-8O
-	for qemu-devel@nongnu.org; Tue, 23 May 2017 11:15:21 -0400
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34602)
+	by lists.gnu.org with esmtp (Exim 4.71) (envelope-from <n54@gmx.com>)
+	id 1dDBYE-0001zd-Bc
+	for qemu-devel@nongnu.org; Tue, 23 May 2017 11:16:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1dDBWn-0005rn-2S
-	for qemu-devel@nongnu.org; Tue, 23 May 2017 11:15:20 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:44374)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1dDBWm-0005rS-Sm
-	for qemu-devel@nongnu.org; Tue, 23 May 2017 11:15:17 -0400
-Date: Tue, 23 May 2017 18:15:13 +0300
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20170523180941-mutt-send-email-mst@kernel.org>
-References: <1494578148-102868-1-git-send-email-wei.w.wang@intel.com>
-	<a3f2cae3-5d3d-f620-4a8d-bb11470c0b08@redhat.com>
-	<591AA65F.8080608@intel.com>
-	<d6eb1d73-c791-b8d3-7ef3-a7653aef00d6@redhat.com>
-	<7e1b48d5-83e6-a0ae-5d91-696d8db09d7c@redhat.com>
-	<591D0EF5.9000807@intel.com>
-	<d7df5484-7e08-4e1c-9e35-69d73858c736@redhat.com>
-	<591EB435.4080109@intel.com>
-	<20170519234246-mutt-send-email-mst@kernel.org>
-	<59241851.1040606@intel.com>
+	(envelope-from <n54@gmx.com>) id 1dDBYB-0006Dv-4Q
+	for qemu-devel@nongnu.org; Tue, 23 May 2017 11:16:46 -0400
+Received: from mout.gmx.net ([212.227.17.22]:52368)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <n54@gmx.com>) id 1dDBYA-0006Dc-NH
+	for qemu-devel@nongnu.org; Tue, 23 May 2017 11:16:43 -0400
+References: <20170513004616.25749-1-n54@gmx.com>
+	<87a86crlg0.fsf@dusky.pond.sub.org>
+	<a5bcd9dd-feb8-8083-30de-dec8d7139c96@gmx.com>
+	<874lwd5rsx.fsf@dusky.pond.sub.org>
+	<688e36b3-6707-c4e5-4f0c-3c7a5d0fa390@gmx.com>
+	<87fufwjfqw.fsf@dusky.pond.sub.org>
+	<93d4d9ae-ed35-e610-7343-8f0ef9e7efab@gmx.com>
+	<87tw4by5kj.fsf@dusky.pond.sub.org>
+From: Kamil Rytarowski <n54@gmx.com>
+Message-ID: <63271d29-0b55-dd7d-bcd6-ce0e7fe2cbbf@gmx.com>
+Date: Tue, 23 May 2017 17:08:13 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <59241851.1040606@intel.com>
-Subject: Re: [Qemu-devel] [virtio-dev] Re: [virtio-dev] Re: [PATCH v2 00/16]
- Vhost-pci for inter-VM communication
+In-Reply-To: <87tw4by5kj.fsf@dusky.pond.sub.org>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="w5KWb5IjnSRJrUJhPSeP6kigTNlAaLlaS"
+Subject: Re: [Qemu-devel] [PATCH] ivshmem-server: Detect and use if there is
+ required -lrt linking
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,44 +35,251 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Wei Wang <wei.w.wang@intel.com>
-Cc: Jason Wang <jasowang@redhat.com>, stefanha@gmail.com, marcandre.lureau@gmail.com, pbonzini@redhat.com, virtio-dev@lists.oasis-open.org, qemu-devel@nongnu.org
+To: Markus Armbruster <armbru@redhat.com>
+Cc: peter.maydell@linaro.org, qemu-devel@nongnu.org
 
-On Tue, May 23, 2017 at 07:09:05PM +0800, Wei Wang wrote:
-> On 05/20/2017 04:44 AM, Michael S. Tsirkin wrote:
-> > On Fri, May 19, 2017 at 05:00:37PM +0800, Wei Wang wrote:
-> > > > > That being said, we compared to vhost-user, instead of vhost_net,
-> > > > > because vhost-user is the one
-> > > > > that is used in NFV, which we think is a major use case for vhost-pci.
-> > > > If this is true, why not draft a pmd driver instead of a kernel one?
-> > > Yes, that's right. There are actually two directions of the vhost-pci driver
-> > > implementation - kernel driver
-> > > and dpdk pmd. The QEMU side device patches are first posted out for
-> > > discussion, because when the device
-> > > part is ready, we will be able to have the related team work on the pmd
-> > > driver as well. As usual, the pmd
-> > > driver would give a much better throughput.
-> > For PMD to work though, the protocol will need to support vIOMMU.
-> > Not asking you to add it right now since it's work in progress
-> > for vhost user at this point, but something you will have to
-> > keep in mind. Further, reviewing vhost user iommu patches might be
-> > a good idea for you.
-> > 
-> 
-> For the dpdk pmd case, I'm not sure if vIOMMU is necessary to be used -
-> Since it only needs to share a piece of memory between the two VMs, we
-> can only send that piece of memory info for sharing, instead of sending the
-> entire VM's memory and using vIOMMU to expose that accessible portion.
-> 
-> Best,
-> Wei
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--w5KWb5IjnSRJrUJhPSeP6kigTNlAaLlaS
+From: Kamil Rytarowski <n54@gmx.com>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: peter.maydell@linaro.org, qemu-devel@nongnu.org
+Message-ID: <63271d29-0b55-dd7d-bcd6-ce0e7fe2cbbf@gmx.com>
+Subject: Re: [Qemu-devel] [PATCH] ivshmem-server: Detect and use if there is
+ required -lrt linking
+References: <20170513004616.25749-1-n54@gmx.com>
+ <87a86crlg0.fsf@dusky.pond.sub.org>
+ <a5bcd9dd-feb8-8083-30de-dec8d7139c96@gmx.com>
+ <874lwd5rsx.fsf@dusky.pond.sub.org>
+ <688e36b3-6707-c4e5-4f0c-3c7a5d0fa390@gmx.com>
+ <87fufwjfqw.fsf@dusky.pond.sub.org>
+ <93d4d9ae-ed35-e610-7343-8f0ef9e7efab@gmx.com>
+ <87tw4by5kj.fsf@dusky.pond.sub.org>
+In-Reply-To: <87tw4by5kj.fsf@dusky.pond.sub.org>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: quoted-printable
 
-I am not sure I understand what you are saying here. My understanding is
-that at the moment with VM1 using virtio and VM2 vhost pci, all of VM1's
-memory is exposed to VM2. If VM1 is using a userspace driver, it needs a
-way for the kernel to limit the memory regions which are accessible to
-the device. At the moment this is done by VFIO by means of interacting
-with a vIOMMU.
+On 23.05.2017 17:07, Markus Armbruster wrote:
+> Kamil Rytarowski <n54@gmx.com> writes:
+>=20
+>> On 23.05.2017 07:37, Markus Armbruster wrote:
+>>> Kamil Rytarowski <n54@gmx.com> writes:
+>>>
+>>>> On 22.05.2017 08:28, Markus Armbruster wrote:
+>>>>> Kamil Rytarowski <n54@gmx.com> writes:
+>>>>>
+>>>>>> Hello,
+>>>>>>
+>>>>>> Excuse me for delay, I missed this mail.
+>>>>>
+>>>>> No problem.
+>>>>>
+>>>>>> Please see in-line.
+>>>>>>
+>>>>>> On 17.05.2017 09:28, Markus Armbruster wrote:
+>>>>>>> Kamil Rytarowski <n54@gmx.com> writes:
+>>>>>>>
+>>>>>>>> ivshmem-server makes use of the POSIX shared memory object inter=
+faces.
+>>>>>>>> This library is provided on NetBSD in -lrt (POSIX Real-time Libr=
+ary).
+>>>>>>>> Add ./configure check if there is needed -lrt linking for shm_op=
+en()
+>>>>>>>> and if so use it. Introduce new configure generated variable LIB=
+S_SHMLIB.
+>>>>>>>>
+>>>>>>>> This fixes build issue on NetBSD.
+>>>>>>>>
+>>>>>>>> Signed-off-by: Kamil Rytarowski <n54@gmx.com>
+>>>>>>>> ---
+>>>>>>>>  Makefile  |  1 +
+>>>>>>>>  configure | 20 ++++++++++++++++++++
+>>>>>>>>  2 files changed, 21 insertions(+)
+>>>>>>>>
+>>>>>>>> diff --git a/Makefile b/Makefile
+>>>>>>>> index 31d41a7eae..3248cb53d7 100644
+>>>>>>>> --- a/Makefile
+>>>>>>>> +++ b/Makefile
+>>>>>>>> @@ -473,6 +473,7 @@ ivshmem-client$(EXESUF): $(ivshmem-client-ob=
+j-y) $(COMMON_LDADDS)
+>>>>>>>>  	$(call LINK, $^)
+>>>>>>>>  ivshmem-server$(EXESUF): $(ivshmem-server-obj-y) $(COMMON_LDADD=
+S)
+>>>>>>>>  	$(call LINK, $^)
+>>>>>>>> +ivshmem-server$(EXESUF): LIBS +=3D $(LIBS_SHMLIB)
+>>>>>>>> =20
+>>>>>>>>  module_block.h: $(SRC_PATH)/scripts/modules/module_block.py con=
+fig-host.mak
+>>>>>>>>  	$(call quiet-command,$(PYTHON) $< $@ \
+>>>>>>>> diff --git a/configure b/configure
+>>>>>>>> index 7c020c076b..50c3aee746 100755
+>>>>>>>> --- a/configure
+>>>>>>>> +++ b/configure
+>>>>>>>> @@ -179,6 +179,7 @@ audio_pt_int=3D""
+>>>>>>>>  audio_win_int=3D""
+>>>>>>>>  cc_i386=3Di386-pc-linux-gnu-gcc
+>>>>>>>>  libs_qga=3D""
+>>>>>>>> +libs_shmlib=3D""
+>>>>>>>>  debug_info=3D"yes"
+>>>>>>>>  stack_protector=3D""
+>>>>>>>> =20
+>>>>>>>> @@ -4133,6 +4134,24 @@ elif compile_prog "" "$pthread_lib -lrt" =
+; then
+>>>>>>>>    libs_qga=3D"$libs_qga -lrt"
+>>>>>>>>  fi
+>>>>>>>> =20
+>>>>>>>> +##########################################
+>>>>>>>> +# Do we need librt for shm_open()
+>>>>>>>> +cat > $TMPC <<EOF
+>>>>>>>> +#include <sys/mman.h>
+>>>>>>>> +#include <sys/stat.h>
+>>>>>>>> +#include <fcntl.h>
+>>>>>>>> +#include <stddef.h>
+>>>>>>>> +int main(void) {
+>>>>>>>> +  return shm_open(NULL, O_RDWR, 0644);
+>>>>>>>> +}
+>>>>>>>> +EOF
+>>>>>>>> +
+>>>>>>>> +if compile_prog "" "" ; then
+>>>>>>>> +  :
+>>>>>>>> +elif compile_prog "" "-lrt" ; then
+>>>>>>>> +  libs_shmlib=3D"$libs_shmlib -lrt"
+>>>>>>>> +fi
+>>>>>>>> +
+>>>>>>>>  if test "$darwin" !=3D "yes" -a "$mingw32" !=3D "yes" -a "$sola=
+ris" !=3D yes -a \
+>>>>>>>>          "$aix" !=3D "yes" -a "$haiku" !=3D "yes" ; then
+>>>>>>>>      libs_softmmu=3D"-lutil $libs_softmmu"
+>>>>>>>> @@ -5949,6 +5968,7 @@ echo "EXESUF=3D$EXESUF" >> $config_host_ma=
+k
+>>>>>>>>  echo "DSOSUF=3D$DSOSUF" >> $config_host_mak
+>>>>>>>>  echo "LDFLAGS_SHARED=3D$LDFLAGS_SHARED" >> $config_host_mak
+>>>>>>>>  echo "LIBS_QGA+=3D$libs_qga" >> $config_host_mak
+>>>>>>>> +echo "LIBS_SHMLIB+=3D$libs_shmlib" >> $config_host_mak
+>>>>>>>>  echo "TASN1_LIBS=3D$tasn1_libs" >> $config_host_mak
+>>>>>>>>  echo "TASN1_CFLAGS=3D$tasn1_cflags" >> $config_host_mak
+>>>>>>>>  echo "POD2MAN=3D$POD2MAN" >> $config_host_mak
+>>>>>>>
+>>>>>>> We already have a test for -lrt.
+>>>>>>
+>>>>>> Correct.
+>>>>>>
+>>>>>>>  It looks for timer_create() and
+>>>>>>> clock_gettime().
+>>>>>>
+>>>>>>
+>>>>>> timer_create(2) and clock_settime(2) are in libc on NetBSD.
+>>>>>>
+>>>>>>>  If we need -lrt,
+>>>>>>
+>>>>>> We need it just for shm_open(3).
+>>>>>>
+>>>>>>> we add it to LIBS and to LIBS_QGA.
+>>>>>>> The latter because we don't use LIBS for qemu-ga:
+>>>>>>>
+>>>>>>>     qemu-ga$(EXESUF): LIBS =3D $(LIBS_QGA)
+>>>>>>>
+>>>>>>> This patch adds a second test for -lrt, to look for shm_open().  =
+It adds
+>>>>>>> -lrt to new variable LIBS_SHMLIB, which gets used only for
+>>>>>>> ivshmem-server:
+>>>>>>>
+>>>>>>>     ivshmem-server$(EXESUF): LIBS +=3D $(LIBS_SHMLIB)
+>>>>>>>
+>>>>>>> Note that ivshmem-server already uses LIBS.
+>>>>>>>
+>>>>>>> Shouldn't we instead widen the existing test for -lrt to cover
+>>>>>>> shm_open()?
+>>>>>>>
+>>>>>>
+>>>>>> I will prepare patch in the requested way. I don't have preference=
+=2E
+>>>>>>
+>>>>>>> Can you confirm that the existing test does not add -lrt to LIBS =
+on
+>>>>>>> NetBSD?
+>>>>>>>
+>>>>>>
+>>>>>> config-host.mak:LIBS+=3D-lm -L/usr/pkg/lib -lgthread-2.0 -pthread
+>>>>>> -Wl,-R/usr/pkg/lib -lglib-2.0 -lintl   -lz
+>>>>>> config-host.mak:LIBS_QGA+=3D-lm -L/usr/pkg/lib -lgthread-2.0 -pthr=
+ead
+>>>>>> -Wl,-R/usr/pkg/lib -lglib-2.0 -lintl
+>>>>>>
+>>>>>>> tests/ivshmem-test.c also calls shm_open().  Does it work on NetB=
+SD?
+>>>>>>>
+>>>>>>
+>>>>>> Currently it's disabled, as it requires eventfd() (Linux API).
+>>>>>
+>>>>> You're right.
+>>>>>
+>>>>> So is the ivshmem device.  Hmm.  Why would anyone want ivshmem-serv=
+er on
+>>>>> NetBSD?  Its purpose is connecting ivshmem-doorbell devices.  Could=
+ we
+>>>>> simply add the obvious CONFIG_IVSHMEM dependence to
+>>>>> contrib/ivshmem-*/Makefile.objs?
+>>>>>
+>>>>
+>>>> In general I would like to get feature parity on NetBSD, there is no=
 
--- 
-MST
+>>>> reason to blacklist this feature for !Linux hosts. However short ter=
+m
+>>>
+>>> Feature parity is a worthy goal, but compiling ivshmem-server without=
+
+>>> ivshmem-doorbell doesn't gets you a feature, it gets you a binary you=
+
+>>> can't use for its intended purpose :)
+>>>
+>>
+>> $ qemu-system-x86_64 -device ? 2>&1 |grep ivsh
+>> name "ivshmem", bus PCI, desc "Inter-VM shared memory (legacy)"
+>> name "ivshmem-doorbell", bus PCI, desc "Inter-VM shared memory"
+>> name "ivshmem-plain", bus PCI, desc "Inter-VM shared memory"
+>>
+>> This will need definitely more work. We can disable ivshmem and hide t=
+he
+>> problem, but it will be unveiled in future again and we will be back t=
+o
+>> this discussion.
+>>
+>> Also people can use NetBSD libc on Linux and share the same issue.
+>=20
+> CONFIG_IVSHMEM defaults to CONFIG_EVENTFD.  If you compile with a
+> toolchain that doesn't provide eventfd(), configure should deselect
+> CONFIG_EVENTFD and thus CONFIG_IVSHMEM automatically.
+>=20
+> Having contrib/ivshmem* depend on CONFIG_IVSHMEM makes total sense.
+> Looking forward to your patch.
+>=20
+> [...]
+>=20
+
+OK, I will prepare this way the needed patch.
+
+
+--w5KWb5IjnSRJrUJhPSeP6kigTNlAaLlaS
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iQIcBAEBCAAGBQJZJFBmAAoJEEuzCOmwLnZs+7IQAL2voTnwqpqCo+s55Uh+Lg4t
+8sKj++cu1Xohhp9geIhnXQJiFHOjCYObjm6EWeFdMfE0Iml43csTX+/6j36DHqxK
+cbqDl8smC0NCb/Tx5m7MKcQ+DVaD64M/MCc2wo/cwiI2XptbMW4NZIY7u0Qxu3nH
+04mMJ154e5GubVCu4YmtxkTpz9cxdtLHa38XPJQn5qhYBVnFNgJPp7euQtFrOAXF
+g9rZSvulJqROfmNhiY2LW98QHMS2puWYvE8BPpXu64RmP7MXoYdBr6TLdpcgq/9+
+h8mRk19Ehr43RhbueMDJ683NfFwFpgTjpACR5ZC8MpOwcep1GJFb+cnTKhvULIbv
+qYOWGBdgusNPT2jVB79TDlcUixrpfZA6zKIqp50vTtpRZb6EFjz/WjyffDi6aOQa
++c+IP1iYrHOjHzCOHM9yOSxbCMMJ/r+LDvYQCLCEK4Xr3FOjzBrQct5/iDLp3IJ0
+JPTi1m+e70dlf1Y9ODL8ERT3/l8hCxsVlBeGAOJFkCSwGuaAizYNa5Jpclu3Q5zw
+kimUaKzAxbO/C6COCYFsEa98WEZ2s+Hc8dpCBerOHt1bC7YLyqE5jouTSBcaJ6fM
+DCerTvNQYtZ3Q2QPpf1+Vctvk8nuXCYVssuEQ8RQS6SuXKAb0fvDae1QIRO7eaIa
+oiPYYxEXT9FTgXLBrIVC
+=lmlY
+-----END PGP SIGNATURE-----
+
+--w5KWb5IjnSRJrUJhPSeP6kigTNlAaLlaS--
