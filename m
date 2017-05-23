@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43880)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44633)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dDBwd-0008Gi-PU
-	for qemu-devel@nongnu.org; Tue, 23 May 2017 11:42:03 -0400
+	(envelope-from <imammedo@redhat.com>) id 1dDBys-0000tL-I8
+	for qemu-devel@nongnu.org; Tue, 23 May 2017 11:44:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dDBwc-0001ld-TC
-	for qemu-devel@nongnu.org; Tue, 23 May 2017 11:41:59 -0400
-References: <1495548064-10926-1-git-send-email-kwolf@redhat.com>
-	<1495548064-10926-4-git-send-email-kwolf@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <2bf654ba-4f30-78f6-ea71-50a12274540e@redhat.com>
-Date: Tue, 23 May 2017 10:41:27 -0500
+	(envelope-from <imammedo@redhat.com>) id 1dDByr-0002Z5-Ij
+	for qemu-devel@nongnu.org; Tue, 23 May 2017 11:44:18 -0400
+Date: Tue, 23 May 2017 17:44:03 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20170523174403.26a69d7c@Igors-MacBook-Pro.local>
+In-Reply-To: <20170523144854.GF32274@thinpad.lan.raisama.net>
+References: <1495550330-34087-1-git-send-email-imammedo@redhat.com>
+	<1495550330-34087-5-git-send-email-imammedo@redhat.com>
+	<20170523144854.GF32274@thinpad.lan.raisama.net>
 MIME-Version: 1.0
-In-Reply-To: <1495548064-10926-4-git-send-email-kwolf@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="ACrEk1GTejjsgxkqFwR1DMxtISkNQw3Tv"
-Subject: Re: [Qemu-devel] [PATCH 3/4] migration/block: Clean up BBs in
- block_save_complete()
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 4/5] numa: fallback to default NUMA node
+ instead of node 0
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,61 +25,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-Cc: famz@redhat.com, quintela@redhat.com, qemu-devel@nongnu.org, dgilbert@redhat.com, mreitz@redhat.com, stefanha@redhat.com
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-arm@nongnu.org, qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, Andrew Jones <drjones@redhat.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---ACrEk1GTejjsgxkqFwR1DMxtISkNQw3Tv
-From: Eric Blake <eblake@redhat.com>
-To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-Cc: famz@redhat.com, quintela@redhat.com, qemu-devel@nongnu.org,
- dgilbert@redhat.com, mreitz@redhat.com, stefanha@redhat.com
-Message-ID: <2bf654ba-4f30-78f6-ea71-50a12274540e@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 3/4] migration/block: Clean up BBs in
- block_save_complete()
-References: <1495548064-10926-1-git-send-email-kwolf@redhat.com>
- <1495548064-10926-4-git-send-email-kwolf@redhat.com>
-In-Reply-To: <1495548064-10926-4-git-send-email-kwolf@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On Tue, 23 May 2017 11:48:54 -0300
+Eduardo Habkost <ehabkost@redhat.com> wrote:
 
-On 05/23/2017 09:01 AM, Kevin Wolf wrote:
-> We need to release any block migrations BlockBackends on the source
-> before successfully completing the migration because otherwise
-> inactivating the images will fail (inactivation only tolerates device
-> BBs).
->=20
-> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-> ---
->  migration/block.c | 22 +++++++++++++++++-----
->  1 file changed, 17 insertions(+), 5 deletions(-)
->=20
+> On Tue, May 23, 2017 at 04:38:49PM +0200, Igor Mammedov wrote:
+> > Do the same as we did in commit
+> >   (57924bcd8 numa: introduce machine callback for VCPU to node mapping)
+> > but only for incomplete mapping usecase, falling back to board
+> > provided default cpu to node mapping if user hasn't provided
+> > mapping for CPU explicitly.
+> > 
+> > Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+> 
+> This breaks migration compatibility, doesn't it? I understand
+> this use case is not supported, but if are going to break stuff
+> for people using incomplete mappings (by rejecting the
+> configuration on a future release), I would prefer to break it
+> only once.
+it's firmware change and we generally don't care nor maintain firmware compat stuff
+the same as with above mentioned 
+ (57924bcd8 numa: introduce machine callback for VCPU to node mapping)
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---ACrEk1GTejjsgxkqFwR1DMxtISkNQw3Tv
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEcBAEBCAAGBQJZJFgnAAoJEKeha0olJ0NqHnIH/j8gWdMp6qrxwhev3BfmjcWS
-x6Td0FgpRbXCRjOQWZLpVMf0cVd7ILRpA1KLAIhaWMw8IkM24L+g+hJch6l414SU
-rOnE6yebaxWWXtNPBhYIV3zOYn5b8JWH6RYYUOCp6Tg25SgX4sx8zI1Ti38k/sh7
-duRjUbmXfiBzgWzMm+ehE22Cz7I+DfTS3KpZvA+Io4AJOaLyUmsGqnvZmDXlZ3pg
-nA4/Jf4M4fJDcUsXtsxWQqJ2ScuL009Jx61d/xaRguYRcwuygqp07Yb/aKJwkLxn
-WWwO/Xpa/uQKFDhJv33BzXC7xaWa3bTXJfII3aWLwH+l4cMik/RlN3gdAIS3SIk=
-=4CNK
------END PGP SIGNATURE-----
-
---ACrEk1GTejjsgxkqFwR1DMxtISkNQw3Tv--
+> 
+> > ---
+> >  hw/core/machine.c | 3 ---
+> >  1 file changed, 3 deletions(-)
+> > 
+> > diff --git a/hw/core/machine.c b/hw/core/machine.c
+> > index 964b75d..b8df15f 100644
+> > --- a/hw/core/machine.c
+> > +++ b/hw/core/machine.c
+> > @@ -730,9 +730,6 @@ static void machine_numa_finish_init(MachineState *machine)
+> >                  g_string_append_printf(s, "%sCPU %d [%s]",
+> >                                         s->len ? ", " : "", i, cpu_str);
+> >                  g_free(cpu_str);
+> > -
+> > -                /* non mapped cpus used to fallback to node 0 */
+> > -                props.node_id = 0;
+> >              }
+> >  
+> >              props.has_node_id = true;
+> > -- 
+> > 2.7.4
+> > 
+> 
