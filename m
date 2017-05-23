@@ -1,29 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55031)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55046)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dD070-00060b-L3
-	for qemu-devel@nongnu.org; Mon, 22 May 2017 23:03:55 -0400
+	(envelope-from <rth7680@gmail.com>) id 1dD072-000618-0L
+	for qemu-devel@nongnu.org; Mon, 22 May 2017 23:03:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dD06z-00040E-Tt
-	for qemu-devel@nongnu.org; Mon, 22 May 2017 23:03:54 -0400
-Received: from mail-qt0-x241.google.com ([2607:f8b0:400d:c0d::241]:34212)
+	(envelope-from <rth7680@gmail.com>) id 1dD071-00040W-0W
+	for qemu-devel@nongnu.org; Mon, 22 May 2017 23:03:56 -0400
+Received: from mail-qt0-x241.google.com ([2607:f8b0:400d:c0d::241]:34215)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1dD06z-00040A-PY
-	for qemu-devel@nongnu.org; Mon, 22 May 2017 23:03:53 -0400
-Received: by mail-qt0-x241.google.com with SMTP id l39so20704449qtb.1
-	for <qemu-devel@nongnu.org>; Mon, 22 May 2017 20:03:53 -0700 (PDT)
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1dD070-00040O-Sd
+	for qemu-devel@nongnu.org; Mon, 22 May 2017 23:03:54 -0400
+Received: by mail-qt0-x241.google.com with SMTP id l39so20704501qtb.1
+	for <qemu-devel@nongnu.org>; Mon, 22 May 2017 20:03:54 -0700 (PDT)
 Received: from bigtime.twiddle.net.com
 	([2602:47:d954:1500:5e51:4fff:fe40:9c64])
 	by smtp.gmail.com with ESMTPSA id
-	s190sm12918805qkh.57.2017.05.22.20.03.52 for <qemu-devel@nongnu.org>
+	s190sm12918805qkh.57.2017.05.22.20.03.53 for <qemu-devel@nongnu.org>
 	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Mon, 22 May 2017 20:03:52 -0700 (PDT)
+	Mon, 22 May 2017 20:03:53 -0700 (PDT)
 Sender: Richard Henderson <rth7680@gmail.com>
 From: Richard Henderson <rth@twiddle.net>
-Date: Mon, 22 May 2017 20:03:11 -0700
-Message-Id: <20170523030312.6360-31-rth@twiddle.net>
+Date: Mon, 22 May 2017 20:03:12 -0700
+Message-Id: <20170523030312.6360-32-rth@twiddle.net>
 In-Reply-To: <20170523030312.6360-1-rth@twiddle.net>
 References: <20170523030312.6360-1-rth@twiddle.net>
-Subject: [Qemu-devel] [PATCH 30/31] target/s390x: Implement CSPG
+Subject: [Qemu-devel] [PATCH 31/31] target/s390x: Use unwind data for
+ helper_mvcs/mvcp
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,20 +37,69 @@ To: qemu-devel@nongnu.org
 
 Signed-off-by: Richard Henderson <rth@twiddle.net>
 ---
- target/s390x/insn-data.def | 1 +
- 1 file changed, 1 insertion(+)
+ target/s390x/mem_helper.c | 8 ++++++--
+ target/s390x/translate.c  | 2 --
+ 2 files changed, 6 insertions(+), 4 deletions(-)
 
-diff --git a/target/s390x/insn-data.def b/target/s390x/insn-data.def
-index 4c91f30..8604847 100644
---- a/target/s390x/insn-data.def
-+++ b/target/s390x/insn-data.def
-@@ -838,6 +838,7 @@
- #ifndef CONFIG_USER_ONLY
- /* COMPARE AND SWAP AND PURGE */
-     D(0xb250, CSP,     RRE,   Z,   r1_32u, ra2, r1_P, 0, csp, 0, MO_TEUL)
-+    D(0xb98a, CSPG,    RRE,   Z,   r1_o, ra2, r1_P, 0, csp, 0, MO_TEQ)
- /* DIAGNOSE (KVM hypercall) */
-     C(0x8300, DIAG,    RSI,   Z,   0, 0, 0, 0, diag, 0)
- /* INSERT STORAGE KEY EXTENDED */
+diff --git a/target/s390x/mem_helper.c b/target/s390x/mem_helper.c
+index 4becc80..d8d29bd 100644
+--- a/target/s390x/mem_helper.c
++++ b/target/s390x/mem_helper.c
+@@ -1031,6 +1031,7 @@ uint32_t HELPER(rrbe)(CPUS390XState *env, uint64_t r2)
+ 
+ uint32_t HELPER(mvcs)(CPUS390XState *env, uint64_t l, uint64_t a1, uint64_t a2)
+ {
++    uintptr_t ra = GETPC();
+     int cc = 0, i;
+ 
+     HELPER_LOG("%s: %16" PRIx64 " %16" PRIx64 " %16" PRIx64 "\n",
+@@ -1044,7 +1045,8 @@ uint32_t HELPER(mvcs)(CPUS390XState *env, uint64_t l, uint64_t a1, uint64_t a2)
+ 
+     /* XXX replace w/ memcpy */
+     for (i = 0; i < l; i++) {
+-        cpu_stb_secondary(env, a1 + i, cpu_ldub_primary(env, a2 + i));
++        uint8_t x = cpu_ldub_primary_ra(env, a2 + i, ra);
++        cpu_stb_secondary_ra(env, a1 + i, x, ra);
+     }
+ 
+     return cc;
+@@ -1052,6 +1054,7 @@ uint32_t HELPER(mvcs)(CPUS390XState *env, uint64_t l, uint64_t a1, uint64_t a2)
+ 
+ uint32_t HELPER(mvcp)(CPUS390XState *env, uint64_t l, uint64_t a1, uint64_t a2)
+ {
++    uintptr_t ra = GETPC();
+     int cc = 0, i;
+ 
+     HELPER_LOG("%s: %16" PRIx64 " %16" PRIx64 " %16" PRIx64 "\n",
+@@ -1065,7 +1068,8 @@ uint32_t HELPER(mvcp)(CPUS390XState *env, uint64_t l, uint64_t a1, uint64_t a2)
+ 
+     /* XXX replace w/ memcpy */
+     for (i = 0; i < l; i++) {
+-        cpu_stb_primary(env, a1 + i, cpu_ldub_secondary(env, a2 + i));
++        uint8_t x = cpu_ldub_secondary_ra(env, a2 + i, ra);
++        cpu_stb_primary_ra(env, a1 + i, x, ra);
+     }
+ 
+     return cc;
+diff --git a/target/s390x/translate.c b/target/s390x/translate.c
+index ca5be7b..67c85f0 100644
+--- a/target/s390x/translate.c
++++ b/target/s390x/translate.c
+@@ -2928,7 +2928,6 @@ static ExitStatus op_mvcp(DisasContext *s, DisasOps *o)
+ {
+     int r1 = get_field(s->fields, l1);
+     check_privileged(s);
+-    potential_page_fault(s);
+     gen_helper_mvcp(cc_op, cpu_env, regs[r1], o->addr1, o->in2);
+     set_cc_static(s);
+     return NO_EXIT;
+@@ -2938,7 +2937,6 @@ static ExitStatus op_mvcs(DisasContext *s, DisasOps *o)
+ {
+     int r1 = get_field(s->fields, l1);
+     check_privileged(s);
+-    potential_page_fault(s);
+     gen_helper_mvcs(cc_op, cpu_env, regs[r1], o->addr1, o->in2);
+     set_cc_static(s);
+     return NO_EXIT;
 -- 
 2.9.4
