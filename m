@@ -1,14 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46662)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47010)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1dDDbC-0000E6-EE
-	for qemu-devel@nongnu.org; Tue, 23 May 2017 13:27:59 -0400
+	(envelope-from <aurelien@aurel32.net>) id 1dDDcD-00011n-Te
+	for qemu-devel@nongnu.org; Tue, 23 May 2017 13:29:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1dDDbB-0007uz-BT
-	for qemu-devel@nongnu.org; Tue, 23 May 2017 13:27:58 -0400
-From: Jeff Cody <jcody@redhat.com>
-Date: Tue, 23 May 2017 13:27:50 -0400
-Message-Id: <87c0140e9407c08f6e74b04131b610f2e27c014c.1495560397.git.jcody@redhat.com>
-Subject: [Qemu-devel] [PATCH] block/gluster: glfs_lseek() workaround
+	(envelope-from <aurelien@aurel32.net>) id 1dDDcC-0008Pe-UJ
+	for qemu-devel@nongnu.org; Tue, 23 May 2017 13:29:01 -0400
+Received: from hall.aurel32.net ([2001:bc8:30d7:100::1]:46436)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <aurelien@aurel32.net>)
+	id 1dDDcC-0008PQ-Nu
+	for qemu-devel@nongnu.org; Tue, 23 May 2017 13:29:00 -0400
+Date: Tue, 23 May 2017 19:28:58 +0200
+From: Aurelien Jarno <aurelien@aurel32.net>
+Message-ID: <20170523172858.aqvgqlrwrwu6jk2o@aurel32.net>
+References: <20170523030312.6360-1-rth@twiddle.net>
+	<20170523030312.6360-3-rth@twiddle.net>
+	<20170523104851.37tseiq5zlpwevr6@aurel32.net>
+	<d059a3b3-ac6c-27d2-5270-b6d5b32cc41d@twiddle.net>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <d059a3b3-ac6c-27d2-5270-b6d5b32cc41d@twiddle.net>
+Subject: Re: [Qemu-devel] [PATCH 02/31] target/s390x: Implement EXECUTE via
+ new TranslationBlock
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -17,103 +31,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, ndevos@redhat.com
+To: Richard Henderson <rth@twiddle.net>
+Cc: qemu-devel@nongnu.org
 
-On current released versions of glusterfs, glfs_lseek() will sometimes
-return invalid values for SEEK_DATA or SEEK_HOLE.  For SEEK_DATA and
-SEEK_HOLE, the returned value should be >= the passed offset, or < 0 in
-the case of error:
+On 2017-05-23 08:54, Richard Henderson wrote:
+> On 05/23/2017 03:48 AM, Aurelien Jarno wrote:
+> > On 2017-05-22 20:02, Richard Henderson wrote:
+> > > Previously, helper_ex would construct the insn and then implement
+> > > the insn via direct calls other helpers.  This was sufficient to
+> > > boot Linux but that is all.
+> > > 
+> > > It is easy enough to go the whole nine yards by stashing state for
+> > > EXECUTE within the cpu, and then relying on a new TB to be created
+> > > that properly and completely interprets the insn.
+> > > 
+> > > Signed-off-by: Richard Henderson <rth@twiddle.net>
+> > > ---
+> > >   target/s390x/cpu.h         |   4 +-
+> > >   target/s390x/helper.h      |   2 +-
+> > >   target/s390x/insn-data.def |   4 +-
+> > >   target/s390x/machine.c     |  19 +++++++
+> > >   target/s390x/mem_helper.c  | 136 +++++++++++----------------------------------
+> > >   target/s390x/translate.c   | 124 +++++++++++++++++++++++++----------------
+> > >   6 files changed, 133 insertions(+), 156 deletions(-)
+> > 
+> > This looks good on the principle, and finally removes a big hack. That
+> > said it prevent my test system to boot. I haven't investigated why yet.
+> 
+> Hmm.  I've not got a complete environment -- merely booting a kernel up to
+> the point it fails to find a rootfs.  Which did find several problems with
+> my first attempts at this, but wouldn't have exercised paging.  I'll try
+> again to get a full install working...
+> 
+> I wonder if I needed to adjust s390_cpu_handle_mmu_fault (and its myriad
+> subroutines) to handle setting ILEN correctly.
+> 
+> There might be a simpler fix though.  Currently I advance the PC and
+> remember the ilen of the EX(RL).  Maybe better to *not* advance the PC so as
+> to have the original EX(RL) right there for ILEN_LATER and ILEN_LATER_INC to
+> operate on.
+> 
+> Something like this, as a delta patch.
 
-LSEEK(2):
+Unfortunately it doesn't work. So far I have no real idea what could be
+the root cause of the issue. I have just determined that up to the crash,
+only a very limited set of instructions are being executed. They are the
+4 bytes long versions of MVC, CLC, XC, TR.
 
-    off_t lseek(int fd, off_t offset, int whence);
-
-    [...]
-
-    SEEK_HOLE
-              Adjust  the file offset to the next hole in the file greater
-              than or equal to offset.  If offset points into the middle of
-              a hole, then the file offset is set to offset.  If there is no
-              hole past offset, then the file offset is adjusted to the end
-              of the file (i.e., there is  an implicit hole at the end of
-              any file).
-
-    [...]
-
-    RETURN VALUE
-              Upon  successful  completion,  lseek()  returns  the resulting
-              offset location as measured in bytes from the beginning of the
-              file.  On error, the value (off_t) -1 is returned and errno is
-              set to indicate the error
-
-However, occasionally glfs_lseek() for SEEK_HOLE/DATA will return a
-value less than the passed offset, yet greater than zero.
-
-For instance, here are example values observed from this call:
-
-    offs = glfs_lseek(s->fd, start, SEEK_HOLE);
-    if (offs < 0) {
-        return -errno;          /* D1 and (H3 or H4) */
-    }
-
-start == 7608336384
-offs == 7607877632
-
-This causes QEMU to abort on the assert test.  When this value is
-returned, errno is also 0.
-
-This is a reported and known bug to glusterfs:
-https://bugzilla.redhat.com/show_bug.cgi?id=1425293
-
-Although this is being fixed in gluster, we still should work around it
-in QEMU, given that multiple released versions of gluster behave this
-way.
-
-This patch treats the return case of (offs < start) the same as if an
-error value other than ENXIO is returned; we will assume we learned
-nothing, and there are no holes in the file.
-
-Signed-off-by: Jeff Cody <jcody@redhat.com>
----
- block/gluster.c | 18 ++++++++++++++++--
- 1 file changed, 16 insertions(+), 2 deletions(-)
-
-diff --git a/block/gluster.c b/block/gluster.c
-index 7c76cd0..c147909e 100644
---- a/block/gluster.c
-+++ b/block/gluster.c
-@@ -1275,7 +1275,14 @@ static int find_allocation(BlockDriverState *bs, off_t start,
-     if (offs < 0) {
-         return -errno;          /* D3 or D4 */
-     }
--    assert(offs >= start);
-+
-+    if (offs < start) {
-+        /* This is not a valid return by lseek().  We are safe to just return
-+         * -EIO in this case, and we'll treat it like D4. Unfortunately some
-+         *  versions of libgfapi will return offs < start, so an assert here
-+         *  will unneccesarily abort QEMU. */
-+        return -EIO;
-+    }
- 
-     if (offs > start) {
-         /* D2: in hole, next data at offs */
-@@ -1307,7 +1314,14 @@ static int find_allocation(BlockDriverState *bs, off_t start,
-     if (offs < 0) {
-         return -errno;          /* D1 and (H3 or H4) */
-     }
--    assert(offs >= start);
-+
-+    if (offs < start) {
-+        /* This is not a valid return by lseek().  We are safe to just return
-+         * -EIO in this case, and we'll treat it like H4. Unfortunately some
-+         *  versions of libgfapi will return offs < start, so an assert here
-+         *  will unneccesarily abort QEMU. */
-+        return -EIO;
-+    }
- 
-     if (offs > start) {
-         /*
 -- 
-2.9.3
+Aurelien Jarno                          GPG: 4096R/1DDD8C9B
+aurelien@aurel32.net                 http://www.aurel32.net
