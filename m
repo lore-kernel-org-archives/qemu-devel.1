@@ -1,19 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46660)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46951)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1dD7ux-0000AU-DN
-	for qemu-devel@nongnu.org; Tue, 23 May 2017 07:24:00 -0400
+	(envelope-from <quintela@redhat.com>) id 1dD7vY-0000j4-3i
+	for qemu-devel@nongnu.org; Tue, 23 May 2017 07:24:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1dD7us-0000HR-Ez
-	for qemu-devel@nongnu.org; Tue, 23 May 2017 07:23:59 -0400
-From: Alberto Garcia <berto@igalia.com>
-Date: Tue, 23 May 2017 13:23:01 +0200
-Message-Id: <ad607e17f182f1e8a2e8e73cfd177ce9b02a3bfa.1495536228.git.berto@igalia.com>
-In-Reply-To: <cover.1495536228.git.berto@igalia.com>
-References: <cover.1495536228.git.berto@igalia.com>
-In-Reply-To: <cover.1495536228.git.berto@igalia.com>
-References: <cover.1495536228.git.berto@igalia.com>
-Subject: [Qemu-devel] [PATCH 6/7] qcow2: Pass a QEMUIOVector to
- do_perform_cow_{read, write}()
+	(envelope-from <quintela@redhat.com>) id 1dD7vT-0000cu-7l
+	for qemu-devel@nongnu.org; Tue, 23 May 2017 07:24:36 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46172)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1dD7vT-0000cO-1k
+	for qemu-devel@nongnu.org; Tue, 23 May 2017 07:24:31 -0400
+From: Juan Quintela <quintela@redhat.com>
+In-Reply-To: <20170522154501.GA2925@stefanha-x1.localdomain> (Stefan
+	Hajnoczi's message of "Mon, 22 May 2017 16:45:01 +0100")
+References: <CAGKXQyeuP6Oqar4R3Yuy2Y2O=Bg-=wM+wsxmaZGLt9=7fdSmmg@mail.gmail.com>
+	<20170522154501.GA2925@stefanha-x1.localdomain>
+Reply-To: quintela@redhat.com
+Date: Tue, 23 May 2017 13:24:26 +0200
+Message-ID: <87k25795p1.fsf@secure.mitica>
+MIME-Version: 1.0
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] bitmap
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,157 +28,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Eric Blake <eblake@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, "Denis V . Lunev" <den@openvz.org>, Alberto Garcia <berto@igalia.com>
+To: Stefan Hajnoczi <stefanha@gmail.com>
+Cc: ali saeedi <ali.saeedi56@gmail.com>, qemu-devel@nongnu.org, pbonzini@gapps.redhat.com, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-Instead of passing a single buffer pointer to do_perform_cow_write(),
-pass a QEMUIOVector. This will allow us to merge the write requests
-for the COW regions and the actual data into a single one.
+Stefan Hajnoczi <stefanha@gmail.com> wrote:
+> On Mon, May 22, 2017 at 06:00:12PM +0430, ali saeedi wrote:
+>> does this code 'atomic_rcu_read(&migration_bitmap_rcu)->bmap' return bitmap
+>> of dirty blocks or bitmap of pages?
+>
+> This code changed recently.  Please refer to qemu.git/master when asking
+> questions on qemu-devel.
+>
+> I think you're asking about what is now RAMBlock->bmap.  This bitmap
+> describes pages (each page is TARGET_PAGE_SIZE bytes).
+>
+> This comment looks outdated, I don't think it returns a byte offset:
+>
+> /**
+>  * migration_bitmap_find_dirty: find the next dirty page from start
+>  *
+>  * Called with rcu_read_lock() to protect migration_bitmap
+>  *
+>  * Returns the byte offset within memory region of the start of a dirty page
+>  *
+>  * @rs: current RAM state
+>  * @rb: RAMBlock where to search for dirty pages
+>  * @start: page where we start the search
+>  */
+> static inline
+> unsigned long migration_bitmap_find_dirty(RAMState *rs, RAMBlock *rb,
+>                                           unsigned long start)
+>
+> Evidence:
+>
+> static bool find_dirty_block(RAMState *rs, PageSearchStatus *pss, bool *again)
+> {
+>     pss->page = migration_bitmap_find_dirty(rs, pss->block, pss->page);
+>     ...
+>     if ((pss->page << TARGET_PAGE_BITS) >= pss->block->used_length) {
+>
+> Stefan
 
-Although do_perform_cow_read() does not strictly need to change its
-API, we're doing it here as well for consistency.
+Oops, thanks you are right.
 
-Signed-off-by: Alberto Garcia <berto@igalia.com>
----
- block/qcow2-cluster.c | 51 ++++++++++++++++++++++++---------------------------
- 1 file changed, 24 insertions(+), 27 deletions(-)
+We used to have a global dirty bitmap.  As far as I know, it has always
+worked on pages.  TARGET_PAGE_SIZE to be exact.  Since 2.10 open out, we
+moved to a bitmap by RAMBlock.  It used to return an absolute page
+number, now it returns a page number relative to the start of the block.
 
-diff --git a/block/qcow2-cluster.c b/block/qcow2-cluster.c
-index 67a761731d..ae737adf88 100644
---- a/block/qcow2-cluster.c
-+++ b/block/qcow2-cluster.c
-@@ -406,19 +406,14 @@ int qcow2_encrypt_sectors(BDRVQcow2State *s, int64_t sector_num,
- static int coroutine_fn do_perform_cow_read(BlockDriverState *bs,
-                                             uint64_t src_cluster_offset,
-                                             unsigned offset_in_cluster,
--                                            uint8_t *buffer,
--                                            unsigned bytes)
-+                                            QEMUIOVector *qiov)
- {
--    QEMUIOVector qiov;
--    struct iovec iov = { .iov_base = buffer, .iov_len = bytes };
-     int ret;
- 
--    if (bytes == 0) {
-+    if (qiov->size == 0) {
-         return 0;
-     }
- 
--    qemu_iovec_init_external(&qiov, &iov, 1);
--
-     BLKDBG_EVENT(bs->file, BLKDBG_COW_READ);
- 
-     if (!bs->drv) {
-@@ -430,7 +425,7 @@ static int coroutine_fn do_perform_cow_read(BlockDriverState *bs,
-      * which can lead to deadlock when block layer copy-on-read is enabled.
-      */
-     ret = bs->drv->bdrv_co_preadv(bs, src_cluster_offset + offset_in_cluster,
--                                  bytes, &qiov, 0);
-+                                  qiov->size, qiov, 0);
-     if (ret < 0) {
-         return ret;
-     }
-@@ -462,28 +457,23 @@ static bool coroutine_fn do_perform_cow_encrypt(BlockDriverState *bs,
- static int coroutine_fn do_perform_cow_write(BlockDriverState *bs,
-                                              uint64_t cluster_offset,
-                                              unsigned offset_in_cluster,
--                                             uint8_t *buffer,
--                                             unsigned bytes)
-+                                             QEMUIOVector *qiov)
- {
--    QEMUIOVector qiov;
--    struct iovec iov = { .iov_base = buffer, .iov_len = bytes };
-     int ret;
- 
--    if (bytes == 0) {
-+    if (qiov->size == 0) {
-         return 0;
-     }
- 
--    qemu_iovec_init_external(&qiov, &iov, 1);
--
-     ret = qcow2_pre_write_overlap_check(bs, 0,
--            cluster_offset + offset_in_cluster, bytes);
-+            cluster_offset + offset_in_cluster, qiov->size);
-     if (ret < 0) {
-         return ret;
-     }
- 
-     BLKDBG_EVENT(bs->file, BLKDBG_COW_WRITE);
-     ret = bdrv_co_pwritev(bs->file, cluster_offset + offset_in_cluster,
--                          bytes, &qiov, 0);
-+                          qiov->size, qiov, 0);
-     if (ret < 0) {
-         return ret;
-     }
-@@ -780,6 +770,7 @@ static int perform_cow(BlockDriverState *bs, QCowL2Meta *m)
-     unsigned data_bytes = end->offset - (start->offset + start->nb_bytes);
-     bool merge_reads = false;
-     uint8_t *start_buffer, *end_buffer;
-+    QEMUIOVector qiov;
-     int ret;
- 
-     assert(start->nb_bytes <= UINT_MAX - end->nb_bytes);
-@@ -807,22 +798,25 @@ static int perform_cow(BlockDriverState *bs, QCowL2Meta *m)
-     /* The part of the buffer where the end region is located */
-     end_buffer = start_buffer + buffer_size - end->nb_bytes;
- 
-+    qemu_iovec_init(&qiov, 3);
-+
-     qemu_co_mutex_unlock(&s->lock);
-     /* First we read the existing data from both COW regions. We
-      * either read the whole region in one go, or the start and end
-      * regions separately. */
-     if (merge_reads) {
--        ret = do_perform_cow_read(bs, m->offset, start->offset,
--                                  start_buffer, buffer_size);
-+        qemu_iovec_add(&qiov, start_buffer, buffer_size);
-+        ret = do_perform_cow_read(bs, m->offset, start->offset, &qiov);
-     } else {
--        ret = do_perform_cow_read(bs, m->offset, start->offset,
--                                  start_buffer, start->nb_bytes);
-+        qemu_iovec_add(&qiov, start_buffer, start->nb_bytes);
-+        ret = do_perform_cow_read(bs, m->offset, start->offset, &qiov);
-         if (ret < 0) {
-             goto fail;
-         }
- 
--        ret = do_perform_cow_read(bs, m->offset, end->offset,
--                                  end_buffer, end->nb_bytes);
-+        qemu_iovec_reset(&qiov);
-+        qemu_iovec_add(&qiov, end_buffer, end->nb_bytes);
-+        ret = do_perform_cow_read(bs, m->offset, end->offset, &qiov);
-     }
-     if (ret < 0) {
-         goto fail;
-@@ -840,14 +834,16 @@ static int perform_cow(BlockDriverState *bs, QCowL2Meta *m)
-     }
- 
-     /* And now we can write everything */
--    ret = do_perform_cow_write(bs, m->alloc_offset, start->offset,
--                               start_buffer, start->nb_bytes);
-+    qemu_iovec_reset(&qiov);
-+    qemu_iovec_add(&qiov, start_buffer, start->nb_bytes);
-+    ret = do_perform_cow_write(bs, m->alloc_offset, start->offset, &qiov);
-     if (ret < 0) {
-         goto fail;
-     }
- 
--    ret = do_perform_cow_write(bs, m->alloc_offset, end->offset,
--                               end_buffer, end->nb_bytes);
-+    qemu_iovec_reset(&qiov);
-+    qemu_iovec_add(&qiov, end_buffer, end->nb_bytes);
-+    ret = do_perform_cow_write(bs, m->alloc_offset, end->offset, &qiov);
- fail:
-     qemu_co_mutex_lock(&s->lock);
- 
-@@ -861,6 +857,7 @@ fail:
-     }
- 
-     qemu_vfree(start_buffer);
-+    qemu_iovec_destroy(&qiov);
-     return ret;
- }
- 
--- 
-2.11.0
+Later, Juan.
