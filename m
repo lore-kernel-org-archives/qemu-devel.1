@@ -1,22 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51405)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52664)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1dD4j7-0004uR-Gg
-	for qemu-devel@nongnu.org; Tue, 23 May 2017 03:59:34 -0400
+	(envelope-from <thuth@redhat.com>) id 1dD4nF-0006hi-L9
+	for qemu-devel@nongnu.org; Tue, 23 May 2017 04:03:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1dD4j4-0007G7-B2
-	for qemu-devel@nongnu.org; Tue, 23 May 2017 03:59:33 -0400
-Date: Tue, 23 May 2017 09:59:27 +0200
-From: Samuel Thibault <samuel.thibault@gnu.org>
-Message-ID: <20170523075927.vhxqlurygwycfwsu@var.youpi.perso.aquilenet.fr>
-References: <149546869825.1005.10210133978512879518@c05f1edc8ed1>
-	<48dfeca5-0640-796f-66ce-8cab198fcaef@redhat.com>
+	(envelope-from <thuth@redhat.com>) id 1dD4nC-0002qw-E8
+	for qemu-devel@nongnu.org; Tue, 23 May 2017 04:03:49 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:50068)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1dD4nC-0002qX-8T
+	for qemu-devel@nongnu.org; Tue, 23 May 2017 04:03:46 -0400
+References: <20170523030312.6360-1-rth@twiddle.net>
+	<20170523030312.6360-2-rth@twiddle.net>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <e876585a-e0ef-d82a-8d36-a6dabc0724d3@redhat.com>
+Date: Tue, 23 May 2017 10:03:41 +0200
 MIME-Version: 1.0
+In-Reply-To: <20170523030312.6360-2-rth@twiddle.net>
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <48dfeca5-0640-796f-66ce-8cab198fcaef@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2] tests/libqtest: Print error instead of
- aborting when env variable is missing
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 01/31] target/s390: Use
+ cpu_loop_exit_restore for tlb_fill
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,30 +29,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: qemu-devel@nongnu.org, famz@redhat.com, qemu-trivial@nongnu.org, armbru@redhat.com, Stefan Hajnoczi <stefanha@redhat.com>, Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>, Paolo Bonzini <pbonzini@redhat.com>, John Snow <jsnow@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>
+To: Richard Henderson <rth@twiddle.net>, qemu-devel@nongnu.org
 
-Thomas Huth, on mar. 23 mai 2017 09:25:30 +0200, wrote:
-> > /tmp/qemu-test/src/slirp/tcp_input.c: In function =E2=80=98tcp_input=E2=
-=80=99:
-> > /tmp/qemu-test/src/slirp/tcp_input.c:219: warning: =E2=80=98save_ip.i=
-p_p=E2=80=99 may be used uninitialized in this function
->=20
-> I've never seen these warnings in tcp_input.c before ... and they also
-> look like false positives too me ...=20
+On 23.05.2017 05:02, Richard Henderson wrote:
+> Signed-off-by: Richard Henderson <rth@twiddle.net>
+> ---
+>  target/s390x/mem_helper.c | 10 ++--------
+>  1 file changed, 2 insertions(+), 8 deletions(-)
+> 
+> diff --git a/target/s390x/mem_helper.c b/target/s390x/mem_helper.c
+> index 0c6a0d9..e3325a4 100644
+> --- a/target/s390x/mem_helper.c
+> +++ b/target/s390x/mem_helper.c
+> @@ -41,15 +41,9 @@
+>  void tlb_fill(CPUState *cs, target_ulong addr, MMUAccessType access_type,
+>                int mmu_idx, uintptr_t retaddr)
+>  {
+> -    int ret;
+> -
+> -    ret = s390_cpu_handle_mmu_fault(cs, addr, access_type, mmu_idx);
+> +    int ret = s390_cpu_handle_mmu_fault(cs, addr, access_type, mmu_idx);
+>      if (unlikely(ret != 0)) {
+> -        if (likely(retaddr)) {
+> -            /* now we have a real cpu fault */
+> -            cpu_restore_state(cs, retaddr);
+> -        }
+> -        cpu_loop_exit(cs);
+> +        cpu_loop_exit_restore(cs, retaddr);
+>      }
+>  }
 
-They are.  It's the classical false-positive:
-
-int foo;
-if (blah)
-	foo =3D 1;
-...
-if (blah)
-	f(foo);
-
-where gcc doesn't realize it's the same condition between the
-initialization and the use.
-
-If that poses problem, we can force a dumb initialization...
-
-Samuel
+Reviewed-by: Thomas Huth <thuth@redhat.com>
