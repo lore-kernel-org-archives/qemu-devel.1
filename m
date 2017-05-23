@@ -1,23 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53933)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56842)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lvivier@redhat.com>) id 1dDCMt-0003PL-4B
-	for qemu-devel@nongnu.org; Tue, 23 May 2017 12:09:08 -0400
+	(envelope-from <kwolf@redhat.com>) id 1dDCW6-0007gg-BX
+	for qemu-devel@nongnu.org; Tue, 23 May 2017 12:18:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lvivier@redhat.com>) id 1dDCMp-0003bB-Uy
-	for qemu-devel@nongnu.org; Tue, 23 May 2017 12:09:07 -0400
-References: <20170523111812.13469-1-lvivier@redhat.com>
-	<20170523111812.13469-2-lvivier@redhat.com>
-	<20170523172842.1fce414e@bahia.ttt.fr.ibm.com>
-From: Laurent Vivier <lvivier@redhat.com>
-Message-ID: <bc9a69f9-eb7b-943a-a9bf-bb4a3b18f525@redhat.com>
-Date: Tue, 23 May 2017 18:09:00 +0200
+	(envelope-from <kwolf@redhat.com>) id 1dDCW5-0006Ul-AT
+	for qemu-devel@nongnu.org; Tue, 23 May 2017 12:18:38 -0400
+Date: Tue, 23 May 2017 18:18:22 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20170523161822.GB6791@noname.redhat.com>
+References: <1495548064-10926-1-git-send-email-kwolf@redhat.com>
+	<1495548064-10926-5-git-send-email-kwolf@redhat.com>
+	<b56cd2ae-8793-4b61-e867-73d66baba45b@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20170523172842.1fce414e@bahia.ttt.fr.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH 1/4] spapr: add pre_plug
- function for memory
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="s/l3CgOIzMHHjg/5"
+Content-Disposition: inline
+In-Reply-To: <b56cd2ae-8793-4b61-e867-73d66baba45b@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 4/4] qemu-iotests: Block migration test
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,87 +25,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>
-Cc: David Gibson <david@gibson.dropbear.id.au>, Thomas Huth <thuth@redhat.com>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Michael Roth <mdroth@linux.vnet.ibm.com>
+To: Eric Blake <eblake@redhat.com>
+Cc: qemu-block@nongnu.org, famz@redhat.com, quintela@redhat.com, qemu-devel@nongnu.org, dgilbert@redhat.com, mreitz@redhat.com, stefanha@redhat.com
 
-On 23/05/2017 17:28, Greg Kurz wrote:
-> On Tue, 23 May 2017 13:18:09 +0200
-> Laurent Vivier <lvivier@redhat.com> wrote:
-> 
->> This allows to manage errors before the memory
->> has started to be hotplugged. We already have
->> the function for the CPU cores.
->>
->> Signed-off-by: Laurent Vivier <lvivier@redhat.com>
->> ---
->>  hw/ppc/spapr.c | 45 ++++++++++++++++++++++++++++++---------------
->>  1 file changed, 30 insertions(+), 15 deletions(-)
->>
->> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
->> index 0980d73..0e8d8d1 100644
->> --- a/hw/ppc/spapr.c
->> +++ b/hw/ppc/spapr.c
->> @@ -2569,20 +2569,6 @@ static void spapr_memory_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
->>      uint64_t align = memory_region_get_alignment(mr);
->>      uint64_t size = memory_region_size(mr);
->>      uint64_t addr;
->> -    char *mem_dev;
->> -
->> -    if (size % SPAPR_MEMORY_BLOCK_SIZE) {
->> -        error_setg(&local_err, "Hotplugged memory size must be a multiple of "
->> -                      "%lld MB", SPAPR_MEMORY_BLOCK_SIZE/M_BYTE);
->> -        goto out;
->> -    }
->> -
->> -    mem_dev = object_property_get_str(OBJECT(dimm), PC_DIMM_MEMDEV_PROP, NULL);
->> -    if (mem_dev && !kvmppc_is_mem_backend_page_size_ok(mem_dev)) {
->> -        error_setg(&local_err, "Memory backend has bad page size. "
->> -                   "Use 'memory-backend-file' with correct mem-path.");
->> -        goto out;
->> -    }
->>  
->>      pc_dimm_memory_plug(dev, &ms->hotplug_memory, mr, align, &local_err);
->>      if (local_err) {
->> @@ -2603,6 +2589,33 @@ out:
->>      error_propagate(errp, local_err);
->>  }
->>  
->> +static void spapr_memory_pre_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
->> +                                Error **errp)
-> 
-> Indentation nit
 
-ok
+--s/l3CgOIzMHHjg/5
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-> 
->> +{
->> +    PCDIMMDevice *dimm = PC_DIMM(dev);
->> +    PCDIMMDeviceClass *ddc = PC_DIMM_GET_CLASS(dimm);
->> +    MemoryRegion *mr = ddc->get_memory_region(dimm);
->> +    uint64_t size = memory_region_size(mr);
->> +    Error *local_err = NULL;
->> +    char *mem_dev;
->> +
->> +    if (size % SPAPR_MEMORY_BLOCK_SIZE) {
->> +        error_setg(&local_err, "Hotplugged memory size must be a multiple of "
->> +                      "%lld MB", SPAPR_MEMORY_BLOCK_SIZE / M_BYTE);
->> +        goto out;
->> +    }
->> +
->> +    mem_dev = object_property_get_str(OBJECT(dimm), PC_DIMM_MEMDEV_PROP, NULL);
->> +    if (mem_dev && !kvmppc_is_mem_backend_page_size_ok(mem_dev)) {
->> +        error_setg(&local_err, "Memory backend has bad page size. "
->> +                   "Use 'memory-backend-file' with correct mem-path.");
->> +        goto out;
->> +    }
->> +
->> +out:
->> +    error_propagate(errp, local_err);
-> 
-> As recently discussed with Markus Armbruster, it isn't necessary to have a
-> local Error * if you don't do anything else with it but propagate it.
+Am 23.05.2017 um 17:46 hat Eric Blake geschrieben:
+> On 05/23/2017 09:01 AM, Kevin Wolf wrote:
+> > Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> > ---
+> >  tests/qemu-iotests/183     | 121 +++++++++++++++++++++++++++++++++++++=
+++++++++
+> >  tests/qemu-iotests/183.out |  48 ++++++++++++++++++
+> >  tests/qemu-iotests/group   |   1 +
+> >  3 files changed, 170 insertions(+)
+> >  create mode 100755 tests/qemu-iotests/183
+> >  create mode 100644 tests/qemu-iotests/183.out
+>=20
+> Does this test gracefully skip when coupled with the efforts for a
+> configure option to disable block migration?
+> https://lists.gnu.org/archive/html/qemu-devel/2017-05/msg04398.html
 
-Yes, you are right, it's a stupid cut'n'paste.
+Obviously it doesn't. How would we even check? Just grep whether the
+magic error string turns up somewhere after doing 'migrate -b'?
 
-Thanks,
-Laurent
+I don't think we have other test cases that don't skip immediately, but
+only after doing half of the test, but I think it might work anyway.
+
+> > +echo
+> > +echo =3D=3D=3D Do block migration to destination =3D=3D=3D
+> > +echo
+> > +
+> > +_send_qemu_cmd $src "migrate -b unix:${MIG_SOCKET}" "(qemu)"
+>=20
+> I don't see any earlier checks, so it looks like you'd choke here if -b
+> is not compiled in.
+>=20
+> Should we also check the use of -i?
+
+Good point, though I don't even know how to use -i manually. :-)
+
+We can either have a follow-up patch extending this one or a completely
+separate test case for it. I would have to try out -i before I could say
+which makes more sense.
+
+Kevin
+
+--s/l3CgOIzMHHjg/5
+Content-Type: application/pgp-signature
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2.0.22 (GNU/Linux)
+
+iQIcBAEBAgAGBQJZJGDOAAoJEH8JsnLIjy/WEPwP/27/ecn84VdLaahUy4zfR/eo
+WyrWink7sq2aP25CMicyff3jBeopl4aGypgW0vDN5GaGHYe+paSQYZbqdI9g4pP0
+oyihR3I2xp2yhM/5hwBN5rc5ULVd+EcdyI/k0wLlt3oSjfxQ3mw82IUesxx7traf
+0kn/XvQuQqSfPkwzewuRLFlhciu5DbMPA3LjYSWSo/bTtq+ik2tgu8HyRbrUapPr
+BRujlgBviSx4mMmsIRimqLYDvK4yV3hAy/iUb8okjnt3QwvY8HX82rNi2PM//zvf
+n0oZifaVVQqavC60WPrgzVPCbl/ff+C0wyaObsWXXXcUiB8z2irOsNIXGKHf0CEE
+fIQ7OcuziOJgYSPZUZ4K3rMdzTQrhrhifLW8VO/GmOePU1/eFXHwCPbw+TEUpOms
+nrtgX4g3Y6rr6VJcSDXvemYMwGTscx0BRPBosd3csvi4+HRJlorb62FyjJwgV6hZ
+n9OSyhF9+b1WK4Rd0eCqRaQ5o/4I5Fz1iLFEEPaLTGdKeWbdWhaTJylDssBVMWnt
+qtRqxlRTOSZ3/cxue1Cy3S/AMOxndZsFP3P2++5rVXrx/XPvOK36aJ4BUrA9jD2L
+TRzxynVetC4u9D4/OJQSam9Tdr/leUK0Gu2XFmsvk81SbJTipgwH3YJlkGEsu4+V
+soqZfFy4IDyYglgtQE+u
+=3R2A
+-----END PGP SIGNATURE-----
+
+--s/l3CgOIzMHHjg/5--
