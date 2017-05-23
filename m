@@ -1,18 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37785)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37886)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aurelien@aurel32.net>) id 1dD7OR-0004LG-RH
-	for qemu-devel@nongnu.org; Tue, 23 May 2017 06:50:24 -0400
+	(envelope-from <aurelien@aurel32.net>) id 1dD7Ov-0004h1-Uu
+	for qemu-devel@nongnu.org; Tue, 23 May 2017 06:50:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aurelien@aurel32.net>) id 1dD7OQ-0000p1-WB
-	for qemu-devel@nongnu.org; Tue, 23 May 2017 06:50:23 -0400
-Received: from hall.aurel32.net ([2001:bc8:30d7:100::1]:43034)
+	(envelope-from <aurelien@aurel32.net>) id 1dD7Ov-0000wC-AB
+	for qemu-devel@nongnu.org; Tue, 23 May 2017 06:50:54 -0400
+Received: from hall.aurel32.net ([2001:bc8:30d7:100::1]:43054)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <aurelien@aurel32.net>)
-	id 1dD7OQ-0000og-Qf
-	for qemu-devel@nongnu.org; Tue, 23 May 2017 06:50:22 -0400
-Date: Tue, 23 May 2017 12:50:16 +0200
+	id 1dD7Ov-0000vr-0q
+	for qemu-devel@nongnu.org; Tue, 23 May 2017 06:50:53 -0400
+Date: Tue, 23 May 2017 12:50:50 +0200
 From: Aurelien Jarno <aurelien@aurel32.net>
-Message-ID: <20170523105016.nfr2gibuy5uwt3xn@aurel32.net>
+Message-ID: <20170523105050.xbqbkkydxb5piwct@aurel32.net>
 References: <20170523030312.6360-1-rth@twiddle.net>
 	<20170523030312.6360-6-rth@twiddle.net>
 MIME-Version: 1.0
