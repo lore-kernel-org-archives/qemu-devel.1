@@ -1,25 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59749)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36069)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dD3Xm-0006CA-L7
-	for qemu-devel@nongnu.org; Tue, 23 May 2017 02:43:47 -0400
+	(envelope-from <groug@kaod.org>) id 1dD3lY-0000E6-Qw
+	for qemu-devel@nongnu.org; Tue, 23 May 2017 02:58:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dD3Xi-0000qn-MS
-	for qemu-devel@nongnu.org; Tue, 23 May 2017 02:43:46 -0400
-Date: Tue, 23 May 2017 16:37:19 +1000
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20170523063719.GT30246@umbus.fritz.box>
+	(envelope-from <groug@kaod.org>) id 1dD3lU-00041p-Tp
+	for qemu-devel@nongnu.org; Tue, 23 May 2017 02:58:00 -0400
+Received: from 9.mo179.mail-out.ovh.net ([46.105.76.148]:34724)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1dD3lU-0003oZ-Ki
+	for qemu-devel@nongnu.org; Tue, 23 May 2017 02:57:56 -0400
+Received: from player690.ha.ovh.net (b6.ovh.net [213.186.33.56])
+	by mo179.mail-out.ovh.net (Postfix) with ESMTP id 1E1453DE23
+	for <qemu-devel@nongnu.org>; Tue, 23 May 2017 08:57:47 +0200 (CEST)
+Date: Tue, 23 May 2017 08:57:39 +0200
+From: Greg Kurz <groug@kaod.org>
+Message-ID: <20170523085739.75d7359a@bahia.lan>
+In-Reply-To: <20170523023554.GQ30246@umbus.fritz.box>
 References: <149518991537.24289.6673616934370284758.stgit@bahia.lan>
 	<149518994010.24289.12584852638589552255.stgit@bahia.lan>
 	<20170522020413.GF30246@umbus.fritz.box>
 	<20170522105950.4af008c1@bahia.lan>
-	<20170522151325.0ce5e89a@bahia.lan>
+	<20170523023554.GQ30246@umbus.fritz.box>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="CMEQapY8OuP5ao1l"
-Content-Disposition: inline
-In-Reply-To: <20170522151325.0ce5e89a@bahia.lan>
-Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH v2 3/4] target/ppc: consolidate
- CPU device-tree id computation in helper
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	boundary="Sig_/Qm3dUgjJZ/4b5vN3ioIR2Xg";
+	protocol="application/pgp-signature"
+Subject: Re: [Qemu-devel] [PATCH v2 3/4] target/ppc: consolidate CPU
+ device-tree id computation in helper
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,22 +35,20 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>
-Cc: Laurent Vivier <lvivier@redhat.com>, Cedric Le Goater <clg@kaod.org>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Bharata B Rao <bharata@linux.vnet.ibm.com>
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Laurent Vivier <lvivier@redhat.com>, Bharata B Rao <bharata@linux.vnet.ibm.com>, Cedric Le Goater <clg@kaod.org>
 
-
---CMEQapY8OuP5ao1l
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
+--Sig_/Qm3dUgjJZ/4b5vN3ioIR2Xg
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, May 22, 2017 at 03:13:25PM +0200, Greg Kurz wrote:
-> On Mon, 22 May 2017 10:59:50 +0200
-> Greg Kurz <groug@kaod.org> wrote:
->=20
+On Tue, 23 May 2017 12:35:54 +1000
+David Gibson <david@gibson.dropbear.id.au> wrote:
+
+> On Mon, May 22, 2017 at 10:59:50AM +0200, Greg Kurz wrote:
 > > On Mon, 22 May 2017 12:04:13 +1000
 > > David Gibson <david@gibson.dropbear.id.au> wrote:
-> >=20
+> >  =20
 > > > On Fri, May 19, 2017 at 12:32:20PM +0200, Greg Kurz wrote: =20
 > > > > For historical reasons, we compute CPU device-tree ids with a non-t=
 rivial
@@ -62,45 +67,6 @@ s per
 > > > is generally a bad idea, but allowed for older machine types for
 > > > compatibility.   e.g. smp_threads=3D4, max_cpus=3D6 smt=3D8
 > > >=20
->=20
-> FWIW, this topology was never supported for pseries >=3D 2.7 since commit
-> 94a94e4c4919 ("spapr: convert boot CPUs into CPU core devices", QEMU 2.7):
->=20
-> qemu-system-ppc64: max_cpus (6) must be multiple of threads (4)
->=20
-> The same happens goes with smp_cpus.
-
-Yes, pre-2.7 is what I meant by older machine types.
-
-> If we care for compat with pre-2.7 machine types (ie, no support for CPU
-> hotplug),
-
-We do.. RHEL 7.3 is still 2.6 based, for one thing.
-
-> this topology isn't valid anymore since QEMU 2.9, with these
-> commits:
->=20
-> 0c86d0fd92aa ("pseries: Always use core objects for CPU construction") wh=
-ich
-> causes the following error if we only set max_cpus:
->=20
-> qemu-system-ppc64: This machine version does not support CPU hotplug
-
-That patch has explicit provision for allowing the last core to have a
-not-full complement of threads.
-
-> 8149e2992f78 ("pseries: Enforce homogeneous threads-per-core") which
-> causes the following error if we set smp_cpus (or smp_cpus =3D=3D max_cpu=
-s):
->=20
-> qemu-system-ppc64: invalid nr-threads 2, must be 4
-
-This one does indeed do what you say - but that's a bug :(.  It means
-migration from older versions may be broken.
-
-> So in the end, we already enforce max_cpus and smp_cpus to be multiple
-> of smp_threads for all machine types. In this case...
->=20
 > > > Old logic:
 > > > 	         DIV_ROUND_UP(6 * 8, 4)
 > > > 	       =3D =E2=8C=8848 / 4=E2=8C=89 =3D 12
@@ -112,41 +78,158 @@ migration from older versions may be broken.
 > >=20
 > > I now realize this two formulas are hardly reconcilable... this
 > > probably means that this patch shouldn't try to consolidate the
-> > logic in hw/ppc/spapr.c with the one in target/ppc/translate_init.c.
+> > logic in hw/ppc/spapr.c with the one in target/ppc/translate_init.c. =20
 >=20
-> ... both formulas are equivalent, unless I'm missing something. Or
-> do we really want to re-allow the funky topologies for older
-> machines ?
+> Ok.
+>=20
+> > > In any case the DIV_ROUND_UP() isn't to handle the case where guest
+> > > threads-per-core is bigger than host threads-per-core, it's (IIRC) for
+> > > the case where guest threads-per-core is not a factor of host
+> > > threads-per-core.  Again, a bad idea, but I think allowed in some old
+> > > cases.
+> > >  =20
+> >=20
+> > FWIW, DIV_ROUND_UP() comes from this commit:
+> >=20
+> > f303f117fec3 spapr: ensure we have at least one XICS server =20
+>=20
+> Ah, yes, I see your point.  Hrm.  I thought even then that guest
+> threads > host threads was definitely incorrect; but I'm wondering if
+> the change was just because the check for guest threads > host threads
+> came later during init and we didn't want to crash before we got to
+> it.
 
-Want to?  Not really.  Have to for compatibility?  Yes, absolutely.
+AFAICR, this was the only motivation... but I hadn't realized the trickiness
+of CPU id computations in ppc at the time. Otherwise I would have added
+another smp_threads > kvmppc_smt_threads() sanity check instead. :-\
 
-I've just sent a patch to address this.
+>=20
+> > but I agree that this was a bad idea... =20
+>=20
+> But yeah, looks like we'll be taking a different approach so it's kind
+> of moot anyway.
+>=20
+> >  =20
+> > > >=20
+> > > > Signed-off-by: Greg Kurz <groug@kaod.org>
+> > > > ---
+> > > >  hw/ppc/spapr.c              |    6 ++----
+> > > >  target/ppc/cpu.h            |   17 +++++++++++++++++
+> > > >  target/ppc/translate_init.c |    3 +--
+> > > >  3 files changed, 20 insertions(+), 6 deletions(-)
+> > > >=20
+> > > > diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> > > > index 75e298b4c6be..1bb05a9a6b07 100644
+> > > > --- a/hw/ppc/spapr.c
+> > > > +++ b/hw/ppc/spapr.c
+> > > > @@ -981,7 +981,6 @@ static void *spapr_build_fdt(sPAPRMachineState =
+*spapr,
+> > > >      void *fdt;
+> > > >      sPAPRPHBState *phb;
+> > > >      char *buf;
+> > > > -    int smt =3D kvmppc_smt_threads();
+> > > > =20
+> > > >      fdt =3D g_malloc0(FDT_MAX_SIZE);
+> > > >      _FDT((fdt_create_empty_tree(fdt, FDT_MAX_SIZE)));
+> > > > @@ -1021,7 +1020,7 @@ static void *spapr_build_fdt(sPAPRMachineStat=
+e *spapr,
+> > > >      _FDT(fdt_setprop_cell(fdt, 0, "#size-cells", 2));
+> > > > =20
+> > > >      /* /interrupt controller */
+> > > > -    spapr_dt_xics(DIV_ROUND_UP(max_cpus * smt, smp_threads), fdt, =
+PHANDLE_XICP);
+> > > > +    spapr_dt_xics(ppc_cpu_dt_id_from_index(max_cpus), fdt, PHANDLE=
+_XICP);
+> > > > =20
+> > > >      ret =3D spapr_populate_memory(spapr, fdt);
+> > > >      if (ret < 0) {
+> > > > @@ -1977,7 +1976,6 @@ static void spapr_init_cpus(sPAPRMachineState=
+ *spapr)
+> > > >      MachineState *machine =3D MACHINE(spapr);
+> > > >      MachineClass *mc =3D MACHINE_GET_CLASS(machine);
+> > > >      char *type =3D spapr_get_cpu_core_type(machine->cpu_model);
+> > > > -    int smt =3D kvmppc_smt_threads();
+> > > >      const CPUArchIdList *possible_cpus;
+> > > >      int boot_cores_nr =3D smp_cpus / smp_threads;
+> > > >      int i;
+> > > > @@ -2014,7 +2012,7 @@ static void spapr_init_cpus(sPAPRMachineState=
+ *spapr)
+> > > >              sPAPRDRConnector *drc =3D
+> > > >                  spapr_dr_connector_new(OBJECT(spapr),
+> > > >                                         SPAPR_DR_CONNECTOR_TYPE_CPU,
+> > > > -                                       (core_id / smp_threads) * s=
+mt);
+> > > > +                                       ppc_cpu_dt_id_from_index(co=
+re_id));
+> > > > =20
+> > > >              qemu_register_reset(spapr_drc_reset, drc);
+> > > >          }
+> > > > diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
+> > > > index 401e10e7dad8..47fe6c64698f 100644
+> > > > --- a/target/ppc/cpu.h
+> > > > +++ b/target/ppc/cpu.h
+> > > > @@ -2529,4 +2529,21 @@ int ppc_get_vcpu_dt_id(PowerPCCPU *cpu);
+> > > >  PowerPCCPU *ppc_get_vcpu_by_dt_id(int cpu_dt_id);
+> > > > =20
+> > > >  void ppc_maybe_bswap_register(CPUPPCState *env, uint8_t *mem_buf, =
+int len);
+> > > > +
+> > > > +#if !defined(CONFIG_USER_ONLY)
+> > > > +#include "sysemu/cpus.h"
+> > > > +#include "target/ppc/kvm_ppc.h"
+> > > > +
+> > > > +static inline int ppc_cpu_dt_id_from_index(int cpu_index)
+> > > > +{
+> > > > +    /* POWER HV support has an historical limitation that differen=
+t threads
+> > > > +     * on a single core cannot be in different guests at the same =
+time. In
+> > > > +     * order to allow KVM to assign guest threads to host cores ac=
+cordingly,
+> > > > +     * CPU device tree ids are spaced by the number of threads per=
+ host cores.
+> > > > +     */
+> > > > +    return (cpu_index / smp_threads) * kvmppc_smt_threads()
+> > > > +        + (cpu_index % smp_threads);
+> > > > +}
+> > > > +#endif
+> > > > +
+> > > >  #endif /* PPC_CPU_H */
+> > > > diff --git a/target/ppc/translate_init.c b/target/ppc/translate_ini=
+t.c
+> > > > index 56a0ab22cfbe..837a9a496a65 100644
+> > > > --- a/target/ppc/translate_init.c
+> > > > +++ b/target/ppc/translate_init.c
+> > > > @@ -9851,8 +9851,7 @@ static void ppc_cpu_realizefn(DeviceState *de=
+v, Error **errp)
+> > > >      }
+> > > > =20
+> > > >  #if !defined(CONFIG_USER_ONLY)
+> > > > -    cpu->cpu_dt_id =3D (cs->cpu_index / smp_threads) * max_smt
+> > > > -        + (cs->cpu_index % smp_threads);
+> > > > +    cpu->cpu_dt_id =3D ppc_cpu_dt_id_from_index(cs->cpu_index);
+> > > > =20
+> > > >      if (kvm_enabled() && !kvm_vcpu_id_is_valid(cpu->cpu_dt_id)) {
+> > > >          error_setg(errp, "Can't create CPU with id %d in KVM", cpu=
+->cpu_dt_id);
+> > > >    =20
+> > >  =20
+> >  =20
+>=20
+>=20
+>=20
 
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
 
---CMEQapY8OuP5ao1l
-Content-Type: application/pgp-signature; name="signature.asc"
+--Sig_/Qm3dUgjJZ/4b5vN3ioIR2Xg
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
 
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v2
 
-iQIcBAEBCAAGBQJZI9icAAoJEGw4ysog2bOS8+oP/3X+yLH2+7qPBl9sCE9L67Dv
-v8fONCw47+W+vo+8kOM0BT98HgsOKB4DHBAYrVSaEWueJrh1iB5AHwb2SyeU2Zwx
-z59jIazrnEyClMfF8BMEnrqYyc0a8v1iVVzxSamYt8zthKTlcyQ3pa02voJms3il
-etCdoBMIJUwa9vme2f5Cd2JkwcQY9DUy48mJ3ukFhOFaYr7uLjOUyqZvsMNbm5eM
-5rKhsYSI6D7pCPlzNqbRZxdxXjnpXXxSK99LFy0RW228VoAqttuarcj34ojLhLFz
-epFRxOSbE5K1idcNKkbCju5D57z3Dnmz7+XZdhQ9P6Cqhh3J19g2hjc+KPYVwFtv
-VsfY6uc1VMPUHceOe5YyvmnoIkGE4ld6Fe61aJOGp6iRzq6hXg+h3e6DBZDlgRUW
-Q6B9HE9etc/7x0NxkARIUgZwx+rsaHdpcqVxC5Zjs0yhcgEKgtMC9SHNGPd9SZnv
-qcvW2msvYD5RHbChD+mz0K9itSELI+dxuTyGLY+wLGoYsehrcp6lugSzcRxlA5lo
-aZgZuqZN8VQtUB5NTEuKjmNaLQe4v5qyrD8FVocZf1o99v9jll7Y/LUxMbeKad9R
-A81HKeLkTZOXvIgGDSQdBuiAZDinix7fOLeYpFrLJ5JgKIoBmMWJGW4wSlSXduc+
-4AhMY9ZY0nFNp4BzzWVA
-=DDOi
+iEYEARECAAYFAlkj3WQACgkQAvw66wEB28LclwCfQZclRyEK4Km2OA+2Nxc/RtOT
+QM0AnA5MTPwGg3OEnlcWOyCg/GEBa/TK
+=7vMs
 -----END PGP SIGNATURE-----
 
---CMEQapY8OuP5ao1l--
+--Sig_/Qm3dUgjJZ/4b5vN3ioIR2Xg--
