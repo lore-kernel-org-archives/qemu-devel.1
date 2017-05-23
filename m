@@ -1,21 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42252)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49889)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dD4CR-0005lP-Ek
-	for qemu-devel@nongnu.org; Tue, 23 May 2017 03:25:48 -0400
+	(envelope-from <eyakovlev@virtuozzo.com>) id 1dD4dW-0003MD-RM
+	for qemu-devel@nongnu.org; Tue, 23 May 2017 03:53:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dD4CM-0006oE-Rn
-	for qemu-devel@nongnu.org; Tue, 23 May 2017 03:25:47 -0400
-References: <149546869825.1005.10210133978512879518@c05f1edc8ed1>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <48dfeca5-0640-796f-66ce-8cab198fcaef@redhat.com>
-Date: Tue, 23 May 2017 09:25:30 +0200
+	(envelope-from <eyakovlev@virtuozzo.com>) id 1dD4dS-0003FY-Pr
+	for qemu-devel@nongnu.org; Tue, 23 May 2017 03:53:46 -0400
+Received: from mail-ve1eur01on0128.outbound.protection.outlook.com
+	([104.47.1.128]:48789
+	helo=EUR01-VE1-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eyakovlev@virtuozzo.com>)
+	id 1dD4dS-0003EO-54
+	for qemu-devel@nongnu.org; Tue, 23 May 2017 03:53:42 -0400
+References: <1495446630-365062-1-git-send-email-eyakovlev@virtuozzo.com>
+	<1495446630-365062-2-git-send-email-eyakovlev@virtuozzo.com>
+	<20170522123524.4c0bff9d@nial.brq.redhat.com>
+	<894afc82-4214-1734-d5ea-532218fac34c@virtuozzo.com>
+	<20170522145856.4728a2a4@nial.brq.redhat.com>
+	<20170522204309-mutt-send-email-mst@kernel.org>
+From: Evgeny Yakovlev <eyakovlev@virtuozzo.com>
+Message-ID: <d063eb22-cd22-80e7-d9f9-46b0fed61f28@virtuozzo.com>
+Date: Tue, 23 May 2017 10:53:35 +0300
 MIME-Version: 1.0
-In-Reply-To: <149546869825.1005.10210133978512879518@c05f1edc8ed1>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2] tests/libqtest: Print error instead of
- aborting when env variable is missing
+In-Reply-To: <20170522204309-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain; charset="windows-1252"; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] acpi: change CPU container node _HID to
+ compatible PNP0A05
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,186 +35,102 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: famz@redhat.com, qemu-trivial@nongnu.org, armbru@redhat.com, Stefan Hajnoczi <stefanha@redhat.com>, Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>, Paolo Bonzini <pbonzini@redhat.com>, Samuel Thibault <samuel.thibault@ens-lyon.org>, John Snow <jsnow@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>
+Cc: Denis Lunev <den@virtuozzo.com>, rkagan@virtuozzo.com, qemu-devel@nongnu.org
 
-On 22.05.2017 17:58, no-reply@patchew.org wrote:
-> This series failed automatic build test. Please find the testing comman=
-ds and
-> their output below. If you have docker installed, you can probably repr=
-oduce it
-> locally.
-[...]
-> 	 LEX convert-dtsv0-lexer.lex.c
-> 	 DEP /tmp/qemu-test/src/dtc/fdtdump.c
-> make[1]: flex: Command not found
-> 	 BISON dtc-parser.tab.c
-> make[1]: bison: Command not found
-> 	 DEP /tmp/qemu-test/src/dtc/srcpos.c
-> 	 LEX dtc-lexer.lex.c
-> make[1]: flex: Command not found
-> 	 DEP /tmp/qemu-test/src/dtc/treesource.c
-> 	 DEP /tmp/qemu-test/src/dtc/livetree.c
-> 	 DEP /tmp/qemu-test/src/dtc/fstree.c
-> 	 DEP /tmp/qemu-test/src/dtc/flattree.c
-> 	 DEP /tmp/qemu-test/src/dtc/dtc.c
-> 	 DEP /tmp/qemu-test/src/dtc/data.c
-> 	 DEP /tmp/qemu-test/src/dtc/checks.c
-> 	CHK version_gen.h
-> 	 BISON dtc-parser.tab.c
-> make[1]: bison: Command not found
-> 	 LEX convert-dtsv0-lexer.lex.c
-> 	UPD version_gen.h
-> make[1]: flex: Command not found
-> 	 LEX dtc-lexer.lex.c
-> make[1]: flex: Command not found
-> 	 DEP /tmp/qemu-test/src/dtc/util.c
-> 	 LEX convert-dtsv0-lexer.lex.c
-> 	 BISON dtc-parser.tab.c
-> make[1]: flex: Command not found
-> make[1]: bison: Command not found
-> 	 LEX dtc-lexer.lex.c
-> make[1]: flex: Command not found
 
-Looks like flex and bison are missing in the docker image? Could someone
-please add it?
 
-[...]
->   CC      replay/replay-internal.o
-> /tmp/qemu-test/src/replay/replay-internal.c: In function =E2=80=98repla=
-y_put_array=E2=80=99:
-> /tmp/qemu-test/src/replay/replay-internal.c:65: warning: ignoring retur=
-n value of =E2=80=98fwrite=E2=80=99, declared with attribute warn_unused_=
-result
+On 22.05.2017 20:44, Michael S. Tsirkin wrote:
+> On Mon, May 22, 2017 at 02:58:56PM +0200, Igor Mammedov wrote:
+>> On Mon, 22 May 2017 14:01:15 +0300
+>> Evgeny Yakovlev <eyakovlev@virtuozzo.com> wrote:
+>>
+>>> On 22.05.2017 13:35, Igor Mammedov wrote:
+>>>> On Mon, 22 May 2017 12:50:30 +0300
+>>>> Evgeny Yakovlev <eyakovlev@virtuozzo.com> wrote:
+>>>>   
+>>>>> When running windows 2016 server guests we have encountered a problem
+>>>>> with ACPI representation of CPU devices. This windows version contains a
+>>>>> hidinterrupt.sys driver which looks for ACPI device node with _HID set
+>>>>> to "ACPI0010" and "ACPI0011". ACPI0010 is also a valid id for CPU
+>>>>> container device which qemu uses.
+>>>>>
+>>>>> hidinterrupt driver takes over (even though it fails) ACPI0010 node and
+>>>>> thus hides its children -- the CPUs -- from the regular ACPI
+>>>>> enumeration.  So there are no processors in the Windows device tree
+>>>>> Device Manager or "!devnode 0 1" in the debugger.
+>>>>>
+>>>>> hidinterrupt.inf as shipped with Windows 2016 has both ACPI0011 and
+>>>>> ACPI0010; the record for the latter is preceded with a comment "This Id
+>>>>> is not to be used. It will be removed once everyone has stopped using
+>>>>> it."  So I guess the typo was not in the driver but in the ACPI tables
+>>>>> of some device(s) which the driver wanted to support despite the bug.
+>>>>>
+>>>>> For reference this is a known issue:
+>>>>> https://bugzilla.redhat.com/show_bug.cgi?id=1377155#c31
+>>>>>
+>>>>> This change works around this problem by setting qemu CPU container ACPI
+>>>>> _HID to compatible PNP0A05.
+>>>> I'd say NACK to it.
+>>>> It's Windows server 2016 bug that violates spec and
+>>>> it's been reported to them before RTM has been released.
+>>>> So complain to Microsoft support and make them fix it.
+>>>>
+>>>> Meanwhile there is MS suggested workaround to fix issue,
+>>>> one can use https://bugzilla.redhat.com/show_bug.cgi?id=1377155#c17
+>>>>
+>>>> Perhaps I should add workaround link as comment above line:
+>>>>
+>>>> aml_append(cpus_dev, aml_name_decl("_HID", aml_string("ACPI0010")));
+>>> Thanks for replying!
+>>>
+>>> Strictly speaking, this is not a Windows bug. Comment in INF file says
+>>> that they had to support a hardware device which erroneously picked this
+>>> ACPI HID.
+>> in linux kernel we use device specific quirks to workaround broken hardware,
+>> there is no point to break generic code for all hardware configurations
+>> for the sake of one broken firmware.
+>> So it's Windows problem that they prefer to violate spec and cannibalize
+>> ACPI0010 for the sake of broken firmware. Open support case with Windows,
+>> the more complains they get, the more chances that they'll fix it.
+>>
+>>> I understand that this is not a qemu problem either. Then again other
+>>> emulators we've tested this on (VirtualBox, Parallels, HyperV) provide a
+>>> compatible ACPI configuration and don't trigger this conflict. If this
+>> we provide it, that's what '_CID' field is for, so OS that doesn't know
+>> about ACPI0010 would be happy (any Windows prior Win10/2016)
+>>
+>>> fix is not a big deal and does not affect anything negatively then maybe
+>>> we pay a relatively small price to improve compatibility with some guest
+>>> systems?
+>> we plan to reuse this code for ARM in future and it might use
+>> ACPI0010 container as per spec to describe modeled topology.
+>> Hence no workaround in QEMU, just use MS suggested workaround
+>> to remove wrong device binding in WS2016 until they actually
+>> fix it.
+> I wonder whether adding an INF with a stub driver
+> on the install disk can also help as a work-around.
+> Thoughts?
 
-I guess that should be fixed?
+As far as i know this is one of the proposed solutions we consider. Will 
+have to test and see.
 
-[...]
->   CC      slirp/tcp_input.o
->   CC      slirp/tcp_output.o
->   CC      slirp/tcp_subr.o
->   CC      slirp/tcp_timer.o
-> /tmp/qemu-test/src/slirp/tcp_input.c: In function =E2=80=98tcp_input=E2=
-=80=99:
-> /tmp/qemu-test/src/slirp/tcp_input.c:219: warning: =E2=80=98save_ip.ip_=
-p=E2=80=99 may be used uninitialized in this function
-> /tmp/qemu-test/src/slirp/tcp_input.c:219: warning: =E2=80=98save_ip.ip_=
-len=E2=80=99 may be used uninitialized in this function
-> /tmp/qemu-test/src/slirp/tcp_input.c:219: warning: =E2=80=98save_ip.ip_=
-tos=E2=80=99 may be used uninitialized in this function
-> /tmp/qemu-test/src/slirp/tcp_input.c:219: warning: =E2=80=98save_ip.ip_=
-id=E2=80=99 may be used uninitialized in this function
-> /tmp/qemu-test/src/slirp/tcp_input.c:219: warning: =E2=80=98save_ip.ip_=
-off=E2=80=99 may be used uninitialized in this function
-> /tmp/qemu-test/src/slirp/tcp_input.c:219: warning: =E2=80=98save_ip.ip_=
-ttl=E2=80=99 may be used uninitialized in this function
-> /tmp/qemu-test/src/slirp/tcp_input.c:219: warning: =E2=80=98save_ip.ip_=
-sum=E2=80=99 may be used uninitialized in this function
-> /tmp/qemu-test/src/slirp/tcp_input.c:219: warning: =E2=80=98save_ip.ip_=
-src.s_addr=E2=80=99 may be used uninitialized in this function
-> /tmp/qemu-test/src/slirp/tcp_input.c:219: warning: =E2=80=98save_ip.ip_=
-dst.s_addr=E2=80=99 may be used uninitialized in this function
-> /tmp/qemu-test/src/slirp/tcp_input.c:220: warning: =E2=80=98save_ip6.ip=
-_nh=E2=80=99 may be used uninitialized in this function
-
-I've never seen these warnings in tcp_input.c before ... and they also
-look like false positives too me ... is that GCC in the docker image too
-sensitive?
-
-[...]
->   CC      aarch64-softmmu/hw/timer/exynos4210_rtc.o
-> /tmp/qemu-test/src/hw/i386/pc_piix.c: In function =E2=80=98igd_passthro=
-ugh_isa_bridge_create=E2=80=99:
-> /tmp/qemu-test/src/hw/i386/pc_piix.c:1067: warning: =E2=80=98pch_rev_id=
-=E2=80=99 may be used uninitialized in this function
-
-dito
-
->   CC      aarch64-softmmu/hw/usb/tusb6010.o
-> /tmp/qemu-test/src/hw/i386/acpi-build.c: In function =E2=80=98build_app=
-end_pci_bus_devices=E2=80=99:
-> /tmp/qemu-test/src/hw/i386/acpi-build.c:525: warning: =E2=80=98notify_m=
-ethod=E2=80=99 may be used uninitialized in this function
-
-dito
-
-[...]
-> /tmp/qemu-test/src/tests/ide-test.c: In function =E2=80=98cdrom_pio_imp=
-l=E2=80=99:
-> /tmp/qemu-test/src/tests/ide-test.c:803: warning: ignoring return value=
- of =E2=80=98fwrite=E2=80=99, declared with attribute warn_unused_result
-> /tmp/qemu-test/src/tests/ide-test.c: In function =E2=80=98test_cdrom_dm=
-a=E2=80=99:
-> /tmp/qemu-test/src/tests/ide-test.c:899: warning: ignoring return value=
- of =E2=80=98fwrite=E2=80=99, declared with attribute warn_unused_result
-
-Needs a patch, I guess?
-
->   GTESTER tests/test-vmstate
-> Failed to load simple/primitive:b_1
-> Failed to load simple/primitive:i64_2
-> Failed to load simple/primitive:i32_1
-> Failed to load simple/primitive:i32_1
-> Failed to load test/with_tmp:a
-> Failed to load test/tmp_child_parent:f
-> Failed to load test/tmp_child:parent
-> Failed to load test/with_tmp:tmp
-> Failed to load test/tmp_child:diff
-> Failed to load test/with_tmp:tmp
-> Failed to load test/tmp_child:diff
-> Failed to load test/with_tmp:tmp
-
-That works for me when I run "make check" locally ... could my patch
-have broken this, or is there something else wrong in the repository or
-docker image?
-
-[...]
->   GTESTER tests/test-qga
->   GTESTER tests/test-timed-average
->   GTESTER tests/test-io-task
->   GTESTER tests/test-io-channel-socket
->   GTESTER tests/test-io-channel-file
->   GTESTER tests/test-io-channel-command
->   GTESTER tests/test-io-channel-buffer
->   GTESTER tests/test-base64
->   GTESTER tests/test-crypto-ivgen
->   GTESTER tests/test-crypto-afsplit
->   GTESTER tests/test-crypto-xts
->   GTESTER tests/test-crypto-block
->   GTESTER tests/test-logging
->   GTESTER tests/test-replication
->   GTESTER tests/test-bufferiszero
->   GTESTER tests/test-uuid
->   GTESTER tests/ptimer-test
->   GTESTER tests/test-qapi-util
->   GTESTER check-qtest-x86_64
->   GTESTER check-qtest-aarch64
->   GTESTER tests/test-qobject-output-visitor
->   GTESTER tests/test-clone-visitor
->   GTESTER tests/test-qobject-input-visitor
->   GTESTER tests/test-qmp-commands
->   GTESTER tests/test-string-input-visitor
->   GTESTER tests/test-string-output-visitor
->   GTESTER tests/test-qmp-event
->   GTESTER tests/test-opts-visitor
->   GTESTER tests/test-qht-par
-> qemu-system-aarch64: warning: CPU(s) not present in any NUMA nodes: CPU=
- 2 [thread-id: 2], CPU 3 [thread-id: 3], CPU 6 [thread-id: 6], CPU 7 [thr=
-ead-id: 7]
-> qemu-system-aarch64: warning: All CPU(s) up to maxcpus should be descri=
-bed in NUMA config, ability to start up with partial NUMA mappings is obs=
-oleted and will be removed in future
-> **
-> ERROR:/tmp/qemu-test/src/tests/test-qga.c:894:test_qga_guest_exec: asse=
-rtion failed: (exited)
-> GTester: last random seed: R02S88fe048bce3aa693228ab12699fc6771
-> make: *** [check-tests/test-qga] Error 1
-> make: *** Waiting for unfinished jobs....
-
-I also can not reproduce this here when running "make check". I also can
-not see how this should be related to my patch ... could it be that the
-docker image was simply running into some time out problems here 'cause
-the server was overloaded? In that case we should maybe increase the
-timeout value in test_qga_guest_exec() ?
-
- Thomas
+>>>>> Signed-off-by: Evgeny Yakovlev <eyakovlev@virtuozzo.com>
+>>>>> ---
+>>>>>    hw/acpi/cpu.c | 2 +-
+>>>>>    1 file changed, 1 insertion(+), 1 deletion(-)
+>>>>>
+>>>>> diff --git a/hw/acpi/cpu.c b/hw/acpi/cpu.c
+>>>>> index a233fe1..b93db40 100644
+>>>>> --- a/hw/acpi/cpu.c
+>>>>> +++ b/hw/acpi/cpu.c
+>>>>> @@ -397,7 +397,7 @@ void build_cpus_aml(Aml *table, MachineState *machine, CPUHotplugFeatures opts,
+>>>>>            Aml *rm_evt = aml_name("%s.%s", cphp_res_path, CPU_REMOVE_EVENT);
+>>>>>            Aml *ej_evt = aml_name("%s.%s", cphp_res_path, CPU_EJECT_EVENT);
+>>>>>    
+>>>>> -        aml_append(cpus_dev, aml_name_decl("_HID", aml_string("ACPI0010")));
+>>>>> +        aml_append(cpus_dev, aml_name_decl("_HID", aml_string("PNP0A05")));
+>>>>>            aml_append(cpus_dev, aml_name_decl("_CID", aml_eisaid("PNP0A05")));
+>>>>>    
+>>>>>            method = aml_method(CPU_NOTIFY_METHOD, 2, AML_NOTSERIALIZED);
+>>>
