@@ -1,32 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58151)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58189)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dDBL2-00035U-9z
-	for qemu-devel@nongnu.org; Tue, 23 May 2017 11:03:11 -0400
+	(envelope-from <mjt@tls.msk.ru>) id 1dDBL6-00036N-FQ
+	for qemu-devel@nongnu.org; Tue, 23 May 2017 11:03:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dDBKz-0008Bf-ON
-	for qemu-devel@nongnu.org; Tue, 23 May 2017 11:03:08 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:44214)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dDBKz-00089Y-J7
-	for qemu-devel@nongnu.org; Tue, 23 May 2017 11:03:05 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 5111E6267F
-	for <qemu-devel@nongnu.org>; Tue, 23 May 2017 15:03:04 +0000 (UTC)
-From: Markus Armbruster <armbru@redhat.com>
-References: <1494327362-30727-1-git-send-email-armbru@redhat.com>
-	<b3e17067-8cb1-9b2f-413f-5e8b3d3ba503@redhat.com>
-	<87vaorbyj9.fsf@dusky.pond.sub.org>
-	<730a6123-61cc-39f2-b62e-0bac48babf80@redhat.com>
-Date: Tue, 23 May 2017 17:03:02 +0200
-In-Reply-To: <730a6123-61cc-39f2-b62e-0bac48babf80@redhat.com> (Paolo
-	Bonzini's message of "Tue, 23 May 2017 16:52:32 +0200")
-Message-ID: <871srfzkd5.fsf@dusky.pond.sub.org>
+	(envelope-from <mjt@tls.msk.ru>) id 1dDBL3-0008Gk-ST
+	for qemu-devel@nongnu.org; Tue, 23 May 2017 11:03:12 -0400
+References: <20170508233918.9043-1-f4bug@amsat.org>
+From: Michael Tokarev <mjt@tls.msk.ru>
+Message-ID: <ad362ec8-86c5-1573-8d1e-755b2f55fc67@msgid.tls.msk.ru>
+Date: Tue, 23 May 2017 18:03:08 +0300
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH 0/2] scsi: Minor cleanups around scsi-disk
+In-Reply-To: <20170508233918.9043-1-f4bug@amsat.org>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 00/11] various easy cleanups
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,33 +22,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, qemu-trivial@nongnu.org
 
-Paolo Bonzini <pbonzini@redhat.com> writes:
+09.05.2017 02:39, Philippe Mathieu-Daud=C3=A9 wrote:
+> various easy patchs added while coding around:
+> - remove old comments
+> - add/remove includes
+> - use TYPE_ names when available
+> - use ARRAY_SIZE() macro
+>=20
+> Philippe Mathieu-Daud=C3=A9 (11):
+>   hw/net: removed obsolete comments
+>   hw/pci: define msi_nonbroken in pci-stub
+>   hw/misc: add missing includes
+>   ide/ahci: add missing includes
+>   hw/mips: add missing include
+>   hw/arm: removed unnecessary include
+>   hw/arm: use defined type name instead of hard-coded string.
+>   hw/sparc: use ARRAY_SIZE() macro
+>   target/sparc: fix DEBUG_MMU DPRINTF() arguments
+>   register: display register prefix (name) since it is available
+>   MAINTAINERS: self-appoint me as reviewer of the Register API
 
-> On 23/05/2017 13:30, Markus Armbruster wrote:
->> Paolo Bonzini <pbonzini@redhat.com> writes:
->> 
->>> On 09/05/2017 12:56, Markus Armbruster wrote:
->>>> Markus Armbruster (2):
->>>>   block: Clarify documentation of BlockInfo member io-status
->>>>   virtio-scsi-test: Use scsi-hd instead of legacy scsi-disk
->>>>
->>>>  qapi/block-core.json     | 3 ++-
->>>>  tests/virtio-scsi-test.c | 2 +-
->>>>  2 files changed, 3 insertions(+), 2 deletions(-)
->>>>
->>>
->>> Acked-by: Paolo Bonzini <pbonzini@redhat.com>
->> 
->> Thanks!
->> 
->> The canonical path is through your tree, but I could stick it into a
->> miscellaneous pull request if you like.
->
-> I saw you posted these two together so I wasn't sure who would do that.
-> :)  These are not files that my pull requests touch a lot.
+>From this set, I've applied 4 patches:
+ [PATCH 05/11] hw/mips: add missing include
+ [PATCH 06/11] hw/arm: removed unnecessary include
+ [PATCH 08/11] hw/sparc: use ARRAY_SIZE() macro
+ [PATCH 10/11] register: display register prefix (name) since it is avail=
+able
 
-I assume that means I should post the pull request myself.  Holler if
-I'm wrong.
+Thanks,
+
+/mjt
