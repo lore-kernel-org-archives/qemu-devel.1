@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38741)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38777)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dD8xZ-0005kx-5R
-	for qemu-devel@nongnu.org; Tue, 23 May 2017 08:30:46 -0400
+	(envelope-from <armbru@redhat.com>) id 1dD8xa-0005l9-7g
+	for qemu-devel@nongnu.org; Tue, 23 May 2017 08:30:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dD8xW-00013Q-4m
-	for qemu-devel@nongnu.org; Tue, 23 May 2017 08:30:45 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60384)
+	(envelope-from <armbru@redhat.com>) id 1dD8xX-000158-Vs
+	for qemu-devel@nongnu.org; Tue, 23 May 2017 08:30:46 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:38570)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dD8xV-00012P-RL
-	for qemu-devel@nongnu.org; Tue, 23 May 2017 08:30:42 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dD8xX-00014G-NV
+	for qemu-devel@nongnu.org; Tue, 23 May 2017 08:30:43 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id D24AF7249C
-	for <qemu-devel@nongnu.org>; Tue, 23 May 2017 12:30:40 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id BB7E717AC78
+	for <qemu-devel@nongnu.org>; Tue, 23 May 2017 12:30:42 +0000 (UTC)
 From: Markus Armbruster <armbru@redhat.com>
-Date: Tue, 23 May 2017 14:30:33 +0200
-Message-Id: <1495542638-12335-5-git-send-email-armbru@redhat.com>
+Date: Tue, 23 May 2017 14:30:36 +0200
+Message-Id: <1495542638-12335-8-git-send-email-armbru@redhat.com>
 In-Reply-To: <1495542638-12335-1-git-send-email-armbru@redhat.com>
 References: <1495542638-12335-1-git-send-email-armbru@redhat.com>
-Subject: [Qemu-devel] [PULL 4/9] shutdown: Prepare for use of an enum in
- reset/shutdown_request
+Subject: [Qemu-devel] [PULL 7/9] shutdown: Expose bool cause in SHUTDOWN and
+ RESET events
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,300 +34,337 @@ To: qemu-devel@nongnu.org
 
 From: Eric Blake <eblake@redhat.com>
 
-We want to track why a guest was shutdown; in particular, being able
-to tell the difference between a guest request (such as ACPI request)
-and host request (such as SIGINT) will prove useful to libvirt.
-Since all requests eventually end up changing shutdown_requested in
-vl.c, the logical change is to make that value track the reason,
-rather than its current 0/1 contents.
+Libvirt would like to be able to distinguish between a SHUTDOWN
+event triggered solely by guest request and one triggered by a
+SIGTERM or other action on the host.  While qemu_kill_report() was
+already able to give different output to stderr based on whether a
+shutdown was triggered by a host signal (but NOT by a host UI event,
+such as clicking the X on the window), that information was then
+lost to management.  The previous patches improved things to use an
+enum throughout all callsites, so now we have something ready to
+expose through QMP.
 
-Since command-line options control whether a reset request is turned
-into a shutdown request instead, the same treatment is given to
-reset_requested.
+Note that for now, the decision was to expose ONLY a boolean,
+rather than promoting ShutdownCause to a QAPI enum; this is because
+libvirt has not expressed an interest in anything finer-grained.
+We can still add additional details, in a backwards-compatible
+manner, if a need later arises (if the addition happens before 2.10,
+we can replace the bool with an enum; otherwise, the enum will have
+to be in addition to the bool); this patch merely adds a helper
+shutdown_caused_by_guest() to map the internal enum into the
+external boolean.
 
-This patch adds an internal enum ShutdownCause that describes reasons
-that a shutdown can be requested, and changes qemu_system_reset() to
-pass the reason through, although for now nothing is actually changed
-with regards to what gets reported.  The enum could be exported via
-QAPI at a later date, if deemed necessary, but for now, there has not
-been a request to expose that much detail to end clients.
+Update expected iotest outputs to match the new data (complete
+coverage of the affected tests is obtained by -raw, -qcow2, and -nbd).
 
-For the most part, we turn 0 into SHUTDOWN_CAUSE_NONE, and 1 into
-SHUTDOWN_CAUSE_HOST_ERROR; the only specific case where we have enough
-information right now to use a different value is when we are reacting
-to a host signal.  It will take a further patch to edit all call-sites
-that can trigger a reset or shutdown request to properly pass in any
-other reasons; this patch includes TODOs to point such places out.
+Here is output from 'virsh qemu-monitor-event --loop' with the
+patch installed:
 
-qemu_system_reset() trades its 'bool report' parameter for a
-'ShutdownCause reason', with all non-zero values having the same
-effect; this lets us get rid of the weird #defines for VMRESET_*
-as synonyms for bools.
+event SHUTDOWN at 1492639680.731251 for domain fedora_13: {"guest":true}
+event STOP at 1492639680.732116 for domain fedora_13: <null>
+event SHUTDOWN at 1492639680.732830 for domain fedora_13: {"guest":false}
+
+Note that libvirt runs qemu with -no-shutdown: the first SHUTDOWN event
+was triggered by an action I took directly in the guest (shutdown -h),
+at which point qemu stops the vcpus and waits for libvirt to do any
+final cleanups; the second SHUTDOWN event is the result of libvirt
+sending SIGTERM now that it has completed cleanup.  Libvirt is already
+smart enough to only feed the first qemu SHUTDOWN event to the end user
+(remember, virsh qemu-monitor-event is a low-level debugging interface
+that is explicitly unsupported by libvirt, so it sees things that normal
+end users do not); changing qemu to emit SHUTDOWN only once is outside
+the scope of this series.
+
+See also https://bugzilla.redhat.com/1384007
 
 Signed-off-by: Eric Blake <eblake@redhat.com>
-Message-Id: <20170515214114.15442-3-eblake@redhat.com>
+Message-Id: <20170515214114.15442-6-eblake@redhat.com>
 Reviewed-by: Markus Armbruster <armbru@redhat.com>
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 ---
- hw/i386/xen/xen-hvm.c   |  7 +++++--
- include/sysemu/sysemu.h | 23 ++++++++++++++++-----
- migration/colo.c        |  2 +-
- migration/savevm.c      |  2 +-
- vl.c                    | 53 ++++++++++++++++++++++++++++++-------------------
- 5 files changed, 58 insertions(+), 29 deletions(-)
+ include/sysemu/sysemu.h    |  5 +++++
+ qapi/event.json            | 17 +++++++++++++----
+ tests/qemu-iotests/071.out |  4 ++--
+ tests/qemu-iotests/081.out |  2 +-
+ tests/qemu-iotests/087.out | 12 ++++++------
+ tests/qemu-iotests/094.out |  2 +-
+ tests/qemu-iotests/117.out |  2 +-
+ tests/qemu-iotests/119.out |  2 +-
+ tests/qemu-iotests/120.out |  2 +-
+ tests/qemu-iotests/140.out |  2 +-
+ tests/qemu-iotests/143.out |  2 +-
+ tests/qemu-iotests/156.out |  2 +-
+ vl.c                       |  8 ++++----
+ 13 files changed, 38 insertions(+), 24 deletions(-)
 
-diff --git a/hw/i386/xen/xen-hvm.c b/hw/i386/xen/xen-hvm.c
-index b1c05ff..222d89a 100644
---- a/hw/i386/xen/xen-hvm.c
-+++ b/hw/i386/xen/xen-hvm.c
-@@ -1089,11 +1089,14 @@ static void cpu_handle_ioreq(void *opaque)
-          * causes Xen to powerdown the domain.
-          */
-         if (runstate_is_running()) {
-+            ShutdownCause request;
-+
-             if (qemu_shutdown_requested_get()) {
-                 destroy_hvm_domain(false);
-             }
--            if (qemu_reset_requested_get()) {
--                qemu_system_reset(VMRESET_REPORT);
-+            request = qemu_reset_requested_get();
-+            if (request) {
-+                qemu_system_reset(request);
-                 destroy_hvm_domain(true);
-             }
-         }
 diff --git a/include/sysemu/sysemu.h b/include/sysemu/sysemu.h
-index 83c1ceb..ba633d7 100644
+index 58e54ee..a86b8cf 100644
 --- a/include/sysemu/sysemu.h
 +++ b/include/sysemu/sysemu.h
-@@ -33,8 +33,21 @@ VMChangeStateEntry *qemu_add_vm_change_state_handler(VMChangeStateHandler *cb,
- void qemu_del_vm_change_state_handler(VMChangeStateEntry *e);
- void vm_state_notify(int running, RunState state);
+@@ -49,6 +49,11 @@ typedef enum ShutdownCause {
+     SHUTDOWN_CAUSE__MAX,
+ } ShutdownCause;
  
--#define VMRESET_SILENT   false
--#define VMRESET_REPORT   true
-+/* Enumeration of various causes for shutdown. */
-+typedef enum ShutdownCause {
-+    SHUTDOWN_CAUSE_NONE,          /* No shutdown request pending */
-+    SHUTDOWN_CAUSE_HOST_ERROR,    /* An error prevents further use of guest */
-+    SHUTDOWN_CAUSE_HOST_QMP,      /* Reaction to a QMP command, like 'quit' */
-+    SHUTDOWN_CAUSE_HOST_SIGNAL,   /* Reaction to a signal, such as SIGINT */
-+    SHUTDOWN_CAUSE_HOST_UI,       /* Reaction to UI event, like window close */
-+    SHUTDOWN_CAUSE_GUEST_SHUTDOWN,/* Guest shutdown/suspend request, via
-+                                     ACPI or other hardware-specific means */
-+    SHUTDOWN_CAUSE_GUEST_RESET,   /* Guest reset request, and command line
-+                                     turns that into a shutdown */
-+    SHUTDOWN_CAUSE_GUEST_PANIC,   /* Guest panicked, and command line turns
-+                                     that into a shutdown */
-+    SHUTDOWN_CAUSE__MAX,
-+} ShutdownCause;
- 
++static inline bool shutdown_caused_by_guest(ShutdownCause cause)
++{
++    return cause >= SHUTDOWN_CAUSE_GUEST_SHUTDOWN;
++}
++
  void vm_start(void);
  int vm_prepare_start(void);
-@@ -62,10 +75,10 @@ void qemu_system_debug_request(void);
- void qemu_system_vmstop_request(RunState reason);
- void qemu_system_vmstop_request_prepare(void);
- bool qemu_vmstop_requested(RunState *r);
--int qemu_shutdown_requested_get(void);
--int qemu_reset_requested_get(void);
-+ShutdownCause qemu_shutdown_requested_get(void);
-+ShutdownCause qemu_reset_requested_get(void);
- void qemu_system_killed(int signal, pid_t pid);
--void qemu_system_reset(bool report);
-+void qemu_system_reset(ShutdownCause reason);
- void qemu_system_guest_panicked(GuestPanicInformation *info);
- size_t qemu_target_page_size(void);
+ int vm_stop(RunState state);
+diff --git a/qapi/event.json b/qapi/event.json
+index e80f3f4..6d22b02 100644
+--- a/qapi/event.json
++++ b/qapi/event.json
+@@ -10,6 +10,10 @@
+ # Emitted when the virtual machine has shut down, indicating that qemu is
+ # about to exit.
+ #
++# @guest: If true, the shutdown was triggered by a guest request (such as
++# a guest-initiated ACPI shutdown request or other hardware-specific action)
++# rather than a host request (such as sending qemu a SIGINT). (since 2.10)
++#
+ # Note: If the command-line option "-no-shutdown" has been specified, qemu will
+ # not exit, and a STOP event will eventually follow the SHUTDOWN event
+ #
+@@ -17,11 +21,11 @@
+ #
+ # Example:
+ #
+-# <- { "event": "SHUTDOWN",
++# <- { "event": "SHUTDOWN", "data": { "guest": true },
+ #      "timestamp": { "seconds": 1267040730, "microseconds": 682951 } }
+ #
+ ##
+-{ 'event': 'SHUTDOWN' }
++{ 'event': 'SHUTDOWN', 'data': { 'guest': 'bool' } }
  
-diff --git a/migration/colo.c b/migration/colo.c
-index 963c802..12d355a 100644
---- a/migration/colo.c
-+++ b/migration/colo.c
-@@ -623,7 +623,7 @@ void *colo_process_incoming_thread(void *opaque)
-         }
+ ##
+ # @POWERDOWN:
+@@ -44,15 +48,20 @@
+ #
+ # Emitted when the virtual machine is reset
+ #
++# @guest: If true, the reset was triggered by a guest request (such as
++# a guest-initiated ACPI reboot request or other hardware-specific action)
++# rather than a host request (such as the QMP command system_reset).
++# (since 2.10)
++#
+ # Since: 0.12.0
+ #
+ # Example:
+ #
+-# <- { "event": "RESET",
++# <- { "event": "RESET", "data": { "guest": false },
+ #      "timestamp": { "seconds": 1267041653, "microseconds": 9518 } }
+ #
+ ##
+-{ 'event': 'RESET' }
++{ 'event': 'RESET', 'data': { 'guest': 'bool' } }
  
-         qemu_mutex_lock_iothread();
--        qemu_system_reset(VMRESET_SILENT);
-+        qemu_system_reset(SHUTDOWN_CAUSE_NONE);
-         vmstate_loading = true;
-         if (qemu_loadvm_state(fb) < 0) {
-             error_report("COLO: loadvm failed");
-diff --git a/migration/savevm.c b/migration/savevm.c
-index f5e8194..752bf64 100644
---- a/migration/savevm.c
-+++ b/migration/savevm.c
-@@ -2285,7 +2285,7 @@ int load_vmstate(const char *name, Error **errp)
-         return -EINVAL;
-     }
+ ##
+ # @STOP:
+diff --git a/tests/qemu-iotests/071.out b/tests/qemu-iotests/071.out
+index dd879f1..1d5e28d 100644
+--- a/tests/qemu-iotests/071.out
++++ b/tests/qemu-iotests/071.out
+@@ -46,7 +46,7 @@ QMP_VERSION
+ read failed: Input/output error
+ {"return": ""}
+ {"return": {}}
+-{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN"}
++{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
  
--    qemu_system_reset(VMRESET_SILENT);
-+    qemu_system_reset(SHUTDOWN_CAUSE_NONE);
-     mis->from_src_file = f;
  
-     aio_context_acquire(aio_context);
+ === Testing blkverify on existing block device ===
+@@ -85,7 +85,7 @@ wrote 512/512 bytes at offset 0
+ read failed: Input/output error
+ {"return": ""}
+ {"return": {}}
+-{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN"}
++{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
+ QEMU_PROG: Failed to flush the L2 table cache: Input/output error
+ QEMU_PROG: Failed to flush the refcount block cache: Input/output error
+ 
+diff --git a/tests/qemu-iotests/081.out b/tests/qemu-iotests/081.out
+index 97df69d..2533c31 100644
+--- a/tests/qemu-iotests/081.out
++++ b/tests/qemu-iotests/081.out
+@@ -36,7 +36,7 @@ read 10485760/10485760 bytes at offset 0
+ 10 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+ {"return": ""}
+ {"return": {}}
+-{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN"}
++{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
+ 
+ 
+ == using quorum rewrite corrupted mode ==
+diff --git a/tests/qemu-iotests/087.out b/tests/qemu-iotests/087.out
+index dc6baf9..59c5208 100644
+--- a/tests/qemu-iotests/087.out
++++ b/tests/qemu-iotests/087.out
+@@ -8,7 +8,7 @@ QMP_VERSION
+ {"return": {}}
+ {"error": {"class": "GenericError", "desc": "'node-name' must be specified for the root node"}}
+ {"return": {}}
+-{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN"}
++{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
+ 
+ 
+ === Duplicate ID ===
+@@ -19,7 +19,7 @@ QMP_VERSION
+ {"error": {"class": "GenericError", "desc": "node-name=disk is conflicting with a device id"}}
+ {"error": {"class": "GenericError", "desc": "Duplicate node name"}}
+ {"return": {}}
+-{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN"}
++{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
+ 
+ 
+ === aio=native without O_DIRECT ===
+@@ -29,7 +29,7 @@ QMP_VERSION
+ {"return": {}}
+ {"error": {"class": "GenericError", "desc": "aio=native was specified, but it requires cache.direct=on, which was not specified."}}
+ {"return": {}}
+-{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN"}
++{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
+ 
+ 
+ === Encrypted image ===
+@@ -40,14 +40,14 @@ QMP_VERSION
+ {"return": {}}
+ {"error": {"class": "GenericError", "desc": "Use of AES-CBC encrypted IMGFMT images is no longer supported in system emulators"}}
+ {"return": {}}
+-{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN"}
++{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
+ 
+ Testing:
+ QMP_VERSION
+ {"return": {}}
+ {"error": {"class": "GenericError", "desc": "Use of AES-CBC encrypted IMGFMT images is no longer supported in system emulators"}}
+ {"return": {}}
+-{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN"}
++{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
+ 
+ 
+ === Missing driver ===
+@@ -58,6 +58,6 @@ QMP_VERSION
+ {"return": {}}
+ {"error": {"class": "GenericError", "desc": "Parameter 'driver' is missing"}}
+ {"return": {}}
+-{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN"}
++{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
+ 
+ *** done
+diff --git a/tests/qemu-iotests/094.out b/tests/qemu-iotests/094.out
+index b66dc07..f52baff 100644
+--- a/tests/qemu-iotests/094.out
++++ b/tests/qemu-iotests/094.out
+@@ -7,5 +7,5 @@ Formatting 'TEST_DIR/source.IMGFMT', fmt=IMGFMT size=67108864
+ {"return": {}}
+ {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_COMPLETED", "data": {"device": "src", "len": 67108864, "offset": 67108864, "speed": 0, "type": "mirror"}}
+ {"return": {}}
+-{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN"}
++{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
+ *** done
+diff --git a/tests/qemu-iotests/117.out b/tests/qemu-iotests/117.out
+index f52dc1a..851e214 100644
+--- a/tests/qemu-iotests/117.out
++++ b/tests/qemu-iotests/117.out
+@@ -7,7 +7,7 @@ wrote 65536/65536 bytes at offset 0
+ 64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+ {"return": ""}
+ {"return": {}}
+-{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN"}
++{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
+ No errors were found on the image.
+ read 65536/65536 bytes at offset 0
+ 64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+diff --git a/tests/qemu-iotests/119.out b/tests/qemu-iotests/119.out
+index 58e7114..a8743b8 100644
+--- a/tests/qemu-iotests/119.out
++++ b/tests/qemu-iotests/119.out
+@@ -6,6 +6,6 @@ read 65536/65536 bytes at offset 0
+ 64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+ {"return": ""}
+ {"return": {}}
+-{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN"}
++{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
+ 
+ *** done
+diff --git a/tests/qemu-iotests/120.out b/tests/qemu-iotests/120.out
+index 9131b1b..1af1aeb 100644
+--- a/tests/qemu-iotests/120.out
++++ b/tests/qemu-iotests/120.out
+@@ -6,7 +6,7 @@ wrote 65536/65536 bytes at offset 0
+ 64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+ {"return": ""}
+ {"return": {}}
+-{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN"}
++{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
+ read 65536/65536 bytes at offset 0
+ 64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+ read 65536/65536 bytes at offset 0
+diff --git a/tests/qemu-iotests/140.out b/tests/qemu-iotests/140.out
+index 6c04456..0689b2b 100644
+--- a/tests/qemu-iotests/140.out
++++ b/tests/qemu-iotests/140.out
+@@ -10,5 +10,5 @@ read 65536/65536 bytes at offset 0
+ {"return": {}}
+ can't open device nbd+unix:///drv?socket=TEST_DIR/nbd: No export with name 'drv' available
+ {"return": {}}
+-{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN"}
++{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
+ *** done
+diff --git a/tests/qemu-iotests/143.out b/tests/qemu-iotests/143.out
+index d24ad20..0978b89 100644
+--- a/tests/qemu-iotests/143.out
++++ b/tests/qemu-iotests/143.out
+@@ -3,5 +3,5 @@ QA output created by 143
+ {"return": {}}
+ can't open device nbd+unix:///no_such_export?socket=TEST_DIR/nbd: No export with name 'no_such_export' available
+ {"return": {}}
+-{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN"}
++{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
+ *** done
+diff --git a/tests/qemu-iotests/156.out b/tests/qemu-iotests/156.out
+index 3af82ae..f96a564 100644
+--- a/tests/qemu-iotests/156.out
++++ b/tests/qemu-iotests/156.out
+@@ -34,7 +34,7 @@ read 65536/65536 bytes at offset 196608
+ {"return": ""}
+ 
+ {"return": {}}
+-{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN"}
++{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
+ 
+ read 65536/65536 bytes at offset 0
+ 64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
 diff --git a/vl.c b/vl.c
-index b42b0b3..d90ae3f 100644
+index 1064fd1..25e1fb4 100644
 --- a/vl.c
 +++ b/vl.c
-@@ -1597,8 +1597,9 @@ void vm_state_notify(int running, RunState state)
-     }
- }
- 
--static int reset_requested;
--static int shutdown_requested, shutdown_signal;
-+static ShutdownCause reset_requested;
-+static ShutdownCause shutdown_requested;
-+static int shutdown_signal;
- static pid_t shutdown_pid;
- static int powerdown_requested;
- static int debug_requested;
-@@ -1612,19 +1613,19 @@ static NotifierList wakeup_notifiers =
-     NOTIFIER_LIST_INITIALIZER(wakeup_notifiers);
- static uint32_t wakeup_reason_mask = ~(1 << QEMU_WAKEUP_REASON_NONE);
- 
--int qemu_shutdown_requested_get(void)
-+ShutdownCause qemu_shutdown_requested_get(void)
- {
-     return shutdown_requested;
- }
- 
--int qemu_reset_requested_get(void)
-+ShutdownCause qemu_reset_requested_get(void)
- {
-     return reset_requested;
- }
- 
- static int qemu_shutdown_requested(void)
- {
--    return atomic_xchg(&shutdown_requested, 0);
-+    return atomic_xchg(&shutdown_requested, SHUTDOWN_CAUSE_NONE);
- }
- 
- static void qemu_kill_report(void)
-@@ -1647,14 +1648,15 @@ static void qemu_kill_report(void)
-     }
- }
- 
--static int qemu_reset_requested(void)
-+static ShutdownCause qemu_reset_requested(void)
- {
--    int r = reset_requested;
-+    ShutdownCause r = reset_requested;
-+
-     if (r && replay_checkpoint(CHECKPOINT_RESET_REQUESTED)) {
--        reset_requested = 0;
-+        reset_requested = SHUTDOWN_CAUSE_NONE;
-         return r;
-     }
--    return false;
-+    return SHUTDOWN_CAUSE_NONE;
- }
- 
- static int qemu_suspend_requested(void)
-@@ -1686,7 +1688,10 @@ static int qemu_debug_requested(void)
-     return r;
- }
- 
--void qemu_system_reset(bool report)
-+/*
-+ * Reset the VM. Issue an event unless @reason is SHUTDOWN_CAUSE_NONE.
-+ */
-+void qemu_system_reset(ShutdownCause reason)
- {
-     MachineClass *mc;
- 
-@@ -1699,7 +1704,8 @@ void qemu_system_reset(bool report)
-     } else {
+@@ -1705,8 +1705,8 @@ void qemu_system_reset(ShutdownCause reason)
          qemu_devices_reset();
      }
--    if (report) {
-+    if (reason) {
-+        /* TODO update event based on reason */
-         qapi_event_send_reset(&error_abort);
+     if (reason) {
+-        /* TODO update event based on reason */
+-        qapi_event_send_reset(&error_abort);
++        qapi_event_send_reset(shutdown_caused_by_guest(reason),
++                              &error_abort);
      }
      cpu_synchronize_all_post_reset();
-@@ -1738,9 +1744,10 @@ void qemu_system_guest_panicked(GuestPanicInformation *info)
- void qemu_system_reset_request(void)
- {
-     if (no_reboot) {
--        shutdown_requested = 1;
-+        /* TODO - add a parameter to allow callers to specify reason */
-+        shutdown_requested = SHUTDOWN_CAUSE_HOST_ERROR;
-     } else {
--        reset_requested = 1;
-+        reset_requested = SHUTDOWN_CAUSE_HOST_ERROR;
-     }
-     cpu_stop_current();
-     qemu_notify_event();
-@@ -1807,7 +1814,7 @@ void qemu_system_killed(int signal, pid_t pid)
-     /* Cannot call qemu_system_shutdown_request directly because
-      * we are in a signal handler.
-      */
--    shutdown_requested = 1;
-+    shutdown_requested = SHUTDOWN_CAUSE_HOST_SIGNAL;
-     qemu_notify_event();
  }
- 
-@@ -1815,7 +1822,8 @@ void qemu_system_shutdown_request(void)
- {
-     trace_qemu_system_shutdown_request();
-     replay_shutdown_request();
--    shutdown_requested = 1;
-+    /* TODO - add a parameter to allow callers to specify reason */
-+    shutdown_requested = SHUTDOWN_CAUSE_HOST_ERROR;
-     qemu_notify_event();
- }
- 
-@@ -1846,14 +1854,18 @@ void qemu_system_debug_request(void)
- static bool main_loop_should_exit(void)
- {
-     RunState r;
-+    ShutdownCause request;
-+
-     if (qemu_debug_requested()) {
-         vm_stop(RUN_STATE_DEBUG);
-     }
-     if (qemu_suspend_requested()) {
-         qemu_system_suspend();
-     }
--    if (qemu_shutdown_requested()) {
-+    request = qemu_shutdown_requested();
-+    if (request) {
+@@ -1863,8 +1863,8 @@ static bool main_loop_should_exit(void)
+     request = qemu_shutdown_requested();
+     if (request) {
          qemu_kill_report();
-+        /* TODO update event based on request */
-         qapi_event_send_shutdown(&error_abort);
+-        /* TODO update event based on request */
+-        qapi_event_send_shutdown(&error_abort);
++        qapi_event_send_shutdown(shutdown_caused_by_guest(request),
++                                 &error_abort);
          if (no_shutdown) {
              vm_stop(RUN_STATE_SHUTDOWN);
-@@ -1861,9 +1873,10 @@ static bool main_loop_should_exit(void)
-             return true;
-         }
-     }
--    if (qemu_reset_requested()) {
-+    request = qemu_reset_requested();
-+    if (request) {
-         pause_all_vcpus();
--        qemu_system_reset(VMRESET_REPORT);
-+        qemu_system_reset(request);
-         resume_all_vcpus();
-         if (!runstate_check(RUN_STATE_RUNNING) &&
-                 !runstate_check(RUN_STATE_INMIGRATE)) {
-@@ -1872,7 +1885,7 @@ static bool main_loop_should_exit(void)
-     }
-     if (qemu_wakeup_requested()) {
-         pause_all_vcpus();
--        qemu_system_reset(VMRESET_SILENT);
-+        qemu_system_reset(SHUTDOWN_CAUSE_NONE);
-         notifier_list_notify(&wakeup_notifiers, &wakeup_reason);
-         wakeup_reason = QEMU_WAKEUP_REASON_NONE;
-         resume_all_vcpus();
-@@ -4696,7 +4709,7 @@ int main(int argc, char **argv, char **envp)
-        reading from the other reads, because timer polling functions query
-        clock values from the log. */
-     replay_checkpoint(CHECKPOINT_RESET);
--    qemu_system_reset(VMRESET_SILENT);
-+    qemu_system_reset(SHUTDOWN_CAUSE_NONE);
-     register_global_state();
-     if (replay_mode != REPLAY_MODE_NONE) {
-         replay_vmstate_init();
+         } else {
 -- 
 2.7.4
