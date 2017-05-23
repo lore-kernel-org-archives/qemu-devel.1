@@ -1,23 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42323)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43008)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1dDAgS-0002nD-CC
-	for qemu-devel@nongnu.org; Tue, 23 May 2017 10:21:16 -0400
+	(envelope-from <armbru@redhat.com>) id 1dDAiY-0004iY-C9
+	for qemu-devel@nongnu.org; Tue, 23 May 2017 10:23:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1dDAgI-000312-Hy
-	for qemu-devel@nongnu.org; Tue, 23 May 2017 10:21:12 -0400
-Received: from [59.151.112.132] (port=29446 helo=heian.cn.fujitsu.com)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1dDAgH-0002zZ-5J
-	for qemu-devel@nongnu.org; Tue, 23 May 2017 10:21:02 -0400
-From: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
-Date: Tue, 23 May 2017 22:20:36 +0800
-Message-ID: <1495549241-23380-5-git-send-email-zhangchen.fnst@cn.fujitsu.com>
-In-Reply-To: <1495549241-23380-1-git-send-email-zhangchen.fnst@cn.fujitsu.com>
-References: <1495549241-23380-1-git-send-email-zhangchen.fnst@cn.fujitsu.com>
+	(envelope-from <armbru@redhat.com>) id 1dDAiT-0004Hc-CC
+	for qemu-devel@nongnu.org; Tue, 23 May 2017 10:23:22 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:36148)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dDAiT-0004HG-6I
+	for qemu-devel@nongnu.org; Tue, 23 May 2017 10:23:17 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id F0BEB8553F
+	for <qemu-devel@nongnu.org>; Tue, 23 May 2017 14:23:15 +0000 (UTC)
+From: Markus Armbruster <armbru@redhat.com>
+References: <20170513033316.22395-1-ehabkost@redhat.com>
+	<20170513033316.22395-2-ehabkost@redhat.com>
+Date: Tue, 23 May 2017 16:23:08 +0200
+In-Reply-To: <20170513033316.22395-2-ehabkost@redhat.com> (Eduardo Habkost's
+	message of "Sat, 13 May 2017 00:33:14 -0300")
+Message-ID: <87d1az64ab.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH V5 4/9] net/net.c: Add vnet_hdr support in
- SocketReadState
+Subject: Re: [Qemu-devel] [PATCH v2 1/3] qemu.py: Don't set _popen=None on
+ error/shutdown
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,114 +34,17 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu devel <qemu-devel@nongnu.org>, Jason Wang <jasowang@redhat.com>
-Cc: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>, zhanghailiang <zhang.zhanghailiang@huawei.com>, weifuqiang <weifuqiang@huawei.com>, "eddie
-	. dong" <eddie.dong@intel.com>, bian naimeng <biannm@cn.fujitsu.com>, Li Zhijian <lizhijian@cn.fujitsu.com>
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: qemu-devel@nongnu.org, Marcel Apfelbaum <marcel@redhat.com>, Thomas Huth <thuth@redhat.com>
 
-We add a flag to dicide whether net_fill_rstate() to read
-the vnet_hdr_len or not.
+Eduardo Habkost <ehabkost@redhat.com> writes:
 
-Signed-off-by: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
-Suggested-by: Jason Wang <jasowang@redhat.com>
----
- include/net/net.h   |  6 +++++-
- net/filter-mirror.c |  1 +
- net/net.c           | 33 ++++++++++++++++++++++++++++++---
- 3 files changed, 36 insertions(+), 4 deletions(-)
+> Keep the Popen object around to we can query its exit code later.
+>
+> To keep the existing 'self._popen is None' checks working, add a
+> is_running() method, that will check if the process is still running.
+>
+> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 
-diff --git a/include/net/net.h b/include/net/net.h
-index 70edfc0..6846b91 100644
---- a/include/net/net.h
-+++ b/include/net/net.h
-@@ -113,9 +113,13 @@ typedef struct NICState {
- } NICState;
- 
- struct SocketReadState {
--    int state; /* 0 = getting length, 1 = getting data */
-+    /* 0 = getting length, 1 = getting vnet header length, 2 = getting data */
-+    int state;
-+    /* This flag decide whether to read the vnet_hdr_len field */
-+    bool vnet_hdr;
-     uint32_t index;
-     uint32_t packet_len;
-+    uint32_t vnet_hdr_len;
-     uint8_t buf[NET_BUFSIZE];
-     SocketReadStateFinalize *finalize;
- };
-diff --git a/net/filter-mirror.c b/net/filter-mirror.c
-index 6c8579f..18992e9 100644
---- a/net/filter-mirror.c
-+++ b/net/filter-mirror.c
-@@ -266,6 +266,7 @@ static void filter_redirector_setup(NetFilterState *nf, Error **errp)
-     }
- 
-     net_socket_rs_init(&s->rs, redirector_rs_finalize);
-+    s->rs.vnet_hdr = s->vnet_hdr;
- 
-     if (s->indev) {
-         chr = qemu_chr_find(s->indev);
-diff --git a/net/net.c b/net/net.c
-index a00a0c9..031cbb5 100644
---- a/net/net.c
-+++ b/net/net.c
-@@ -1607,8 +1607,10 @@ void net_socket_rs_init(SocketReadState *rs,
-                         SocketReadStateFinalize *finalize)
- {
-     rs->state = 0;
-+    rs->vnet_hdr = false;
-     rs->index = 0;
-     rs->packet_len = 0;
-+    rs->vnet_hdr_len = 0;
-     memset(rs->buf, 0, sizeof(rs->buf));
-     rs->finalize = finalize;
- }
-@@ -1623,8 +1625,12 @@ int net_fill_rstate(SocketReadState *rs, const uint8_t *buf, int size)
-     unsigned int l;
- 
-     while (size > 0) {
--        /* reassemble a packet from the network */
--        switch (rs->state) { /* 0 = getting length, 1 = getting data */
-+        /* Reassemble a packet from the network.
-+         * 0 = getting length.
-+         * 1 = getting vnet header length.
-+         * 2 = getting data.
-+         */
-+        switch (rs->state) {
-         case 0:
-             l = 4 - rs->index;
-             if (l > size) {
-@@ -1638,10 +1644,31 @@ int net_fill_rstate(SocketReadState *rs, const uint8_t *buf, int size)
-                 /* got length */
-                 rs->packet_len = ntohl(*(uint32_t *)rs->buf);
-                 rs->index = 0;
--                rs->state = 1;
-+                if (rs->vnet_hdr) {
-+                    rs->state = 1;
-+                } else {
-+                    rs->state = 2;
-+                    rs->vnet_hdr_len = 0;
-+                }
-             }
-             break;
-         case 1:
-+            l = 4 - rs->index;
-+            if (l > size) {
-+                l = size;
-+            }
-+            memcpy(rs->buf + rs->index, buf, l);
-+            buf += l;
-+            size -= l;
-+            rs->index += l;
-+            if (rs->index == 4) {
-+                /* got vnet header length */
-+                rs->vnet_hdr_len = ntohl(*(uint32_t *)rs->buf);
-+                rs->index = 0;
-+                rs->state = 2;
-+            }
-+            break;
-+        case 2:
-             l = rs->packet_len - rs->index;
-             if (l > size) {
-                 l = size;
--- 
-2.7.4
+Looks harmless enough.  Have you tested the scripts using this module
+still work?
