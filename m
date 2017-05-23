@@ -1,35 +1,47 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50094)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54698)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1dD2dQ-0004G9-Cy
-	for qemu-devel@nongnu.org; Tue, 23 May 2017 01:45:33 -0400
+	(envelope-from <nikunj@linux.vnet.ibm.com>) id 1dD39j-000102-R9
+	for qemu-devel@nongnu.org; Tue, 23 May 2017 02:18:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1dD2dN-0001lK-8v
-	for qemu-devel@nongnu.org; Tue, 23 May 2017 01:45:32 -0400
-Received: from mga09.intel.com ([134.134.136.24]:48524)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <wei.w.wang@intel.com>)
-	id 1dD2dN-0001k2-0V
-	for qemu-devel@nongnu.org; Tue, 23 May 2017 01:45:29 -0400
-Message-ID: <5923CCF2.2000001@intel.com>
-Date: Tue, 23 May 2017 13:47:30 +0800
-From: Wei Wang <wei.w.wang@intel.com>
+	(envelope-from <nikunj@linux.vnet.ibm.com>) id 1dD39f-0007hO-T3
+	for qemu-devel@nongnu.org; Tue, 23 May 2017 02:18:55 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:50393
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <nikunj@linux.vnet.ibm.com>)
+	id 1dD39f-0007gk-NQ
+	for qemu-devel@nongnu.org; Tue, 23 May 2017 02:18:51 -0400
+Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v4N68d9S079751
+	for <qemu-devel@nongnu.org>; Tue, 23 May 2017 02:18:50 -0400
+Received: from e23smtp08.au.ibm.com (e23smtp08.au.ibm.com [202.81.31.141])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2amf9a8yfe-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Tue, 23 May 2017 02:18:49 -0400
+Received: from localhost
+	by e23smtp08.au.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <nikunj@linux.vnet.ibm.com>;
+	Tue, 23 May 2017 16:18:46 +1000
+Received: from d23av03.au.ibm.com (d23av03.au.ibm.com [9.190.234.97])
+	by d23relay10.au.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+	v4N6IYCc7340342
+	for <qemu-devel@nongnu.org>; Tue, 23 May 2017 16:18:42 +1000
+Received: from d23av03.au.ibm.com (localhost [127.0.0.1])
+	by d23av03.au.ibm.com (8.14.4/8.14.4/NCO v10.0 AVout) with ESMTP id
+	v4N6I12r022476
+	for <qemu-devel@nongnu.org>; Tue, 23 May 2017 16:18:03 +1000
+From: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
+In-Reply-To: <BBC4E515-FE7D-4600-A5CA-BBCE26059415@gmail.com>
+References: <mailman.73115.1495441935.22737.qemu-devel@nongnu.org>
+	<BBC4E515-FE7D-4600-A5CA-BBCE26059415@gmail.com>
+Date: Tue, 23 May 2017 11:47:30 +0530
 MIME-Version: 1.0
-References: <1494578148-102868-1-git-send-email-wei.w.wang@intel.com>
-	<a3f2cae3-5d3d-f620-4a8d-bb11470c0b08@redhat.com>
-	<591AA65F.8080608@intel.com>
-	<d6eb1d73-c791-b8d3-7ef3-a7653aef00d6@redhat.com>
-	<7e1b48d5-83e6-a0ae-5d91-696d8db09d7c@redhat.com>
-	<591D0EF5.9000807@intel.com>
-	<d7df5484-7e08-4e1c-9e35-69d73858c736@redhat.com>
-	<20170519153329.GA30573@stefanha-x1.localdomain>
-	<ec3c391c-6f0a-b316-e7d9-8f5e431b5e45@redhat.com>
-	<286AC319A985734F985F78AFA26841F7392351DD@shsmsx102.ccr.corp.intel.com>
-	<7ff05785-6bca-a886-0eb0-aeeb0f8d8e1a@redhat.com>
-In-Reply-To: <7ff05785-6bca-a886-0eb0-aeeb0f8d8e1a@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [virtio-dev] Re: [virtio-dev] Re: [PATCH v2 00/16]
- Vhost-pci for inter-VM communication
+Content-Type: text/plain
+Message-Id: <87efvghzb9.fsf@abhimanyu.i-did-not-set--mail-host-address--so-tickle-me>
+Subject: Re: [Qemu-devel] [PATCH risu] ppc64: Fix patterns for rotate
+ doubleword instructions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,71 +50,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jason Wang <jasowang@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>
-Cc: "virtio-dev@lists.oasis-open.org" <virtio-dev@lists.oasis-open.org>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "marcandre.lureau@gmail.com" <marcandre.lureau@gmail.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "mst@redhat.com" <mst@redhat.com>
+To: G 3 <programmingkidx@gmail.com>, "qemu-devel@nongnu.org qemu-devel" <qemu-devel@nongnu.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Sandipan Das <sandipandas1990@gmail.com>, Jose Ricardo Ziviani <joserz@linux.vnet.ibm.com>
 
-On 05/23/2017 10:08 AM, Jason Wang wrote:
+G 3 <programmingkidx@gmail.com> writes:
+
+> On May 22, 2017, at 4:32 AM, qemu-devel-request@nongnu.org wrote:
 >
+> Hello I have also done some work risu. My patches add ppc32 support.  
+> Well my patches were made to work with Mac OS X but they are required  
+> to work with Linux. Do you think you could help port these patches to  
+> Linux?
+
+Ziviani did the ppc64 work, lets see if he can spare some time.
+
+The patches haven't come right on the mailing list, its tedious to pull
+them. Please resend them with git send-mail.
+
 >
-> On 2017年05月22日 19:46, Wang, Wei W wrote:
->> On Monday, May 22, 2017 10:28 AM, Jason Wang wrote:
->>> On 2017年05月19日 23:33, Stefan Hajnoczi wrote:
->>>> On Fri, May 19, 2017 at 11:10:33AM +0800, Jason Wang wrote:
->>>>> On 2017年05月18日 11:03, Wei Wang wrote:
->>>>>> On 05/17/2017 02:22 PM, Jason Wang wrote:
->>>>>>> On 2017年05月17日 14:16, Jason Wang wrote:
->>>>>>>> On 2017年05月16日 15:12, Wei Wang wrote:
->>>>>>>>>> Hi:
->>>>>>>>>>
->>>>>>>>>> Care to post the driver codes too?
->>>>>>>>>>
->>>>>>>>> OK. It may take some time to clean up the driver code before post
->>>>>>>>> it out. You can first have a check of the draft at the repo here:
->>>>>>>>> https://github.com/wei-w-wang/vhost-pci-driver
->>>>>>>>>
->>>>>>>>> Best,
->>>>>>>>> Wei
->>>>>>>> Interesting, looks like there's one copy on tx side. We used to
->>>>>>>> have zerocopy support for tun for VM2VM traffic. Could you please
->>>>>>>> try to compare it with your vhost-pci-net by:
->>>>>>>>
->>>>>> We can analyze from the whole data path - from VM1's network stack
->>>>>> to send packets -> VM2's network stack to receive packets. The
->>>>>> number of copies are actually the same for both.
->>>>> That's why I'm asking you to compare the performance. The only reason
->>>>> for vhost-pci is performance. You should prove it.
->>>> There is another reason for vhost-pci besides maximum performance:
->>>>
->>>> vhost-pci makes it possible for end-users to run networking or storage
->>>> appliances in compute clouds.  Cloud providers do not allow end-users
->>>> to run custom vhost-user processes on the host so you need vhost-pci.
->>>>
->>>> Stefan
->>> Then it has non NFV use cases and the question goes back to the 
->>> performance
->>> comparing between vhost-pci and zerocopy vhost_net. If it does not 
->>> perform
->>> better, it was less interesting at least in this case.
->>>
->> Probably I can share what we got about vhost-pci and vhost-user:
->> https://github.com/wei-w-wang/vhost-pci-discussion/blob/master/vhost_pci_vs_vhost_user.pdf 
->>
->> Right now, I don’t have the environment to add the vhost_net test.
+> ppc.risu:
+> https://patchwork.kernel.org/patch/9697489/
 >
-> Thanks, the number looks good. But I have some questions:
+> risu_ppc.c:
+> https://patchwork.kernel.org/patch/9697491/
 >
-> - Is the number measured through your vhost-pci kernel driver code?
+> risu_reginfo_ppc.c:
+> https://patchwork.kernel.org/patch/9697493/
+>
+> risu_reginfo_ppc.h:
+> https://patchwork.kernel.org/patch/9697495/
+>
+> risugen_ppc.pm:
+> https://patchwork.kernel.org/patch/9697497/
+>
+> Add ppc support to configure:
+> https://patchwork.kernel.org/patch/9697499/
+>
+> Add verbose option:
+> https://patchwork.kernel.org/patch/9697501/
+>
+> Add end of test message:
+> https://patchwork.kernel.org/patch/9697503/
+>
+> Add more descriptive comment for mismatch or end of test condition:
+> https://patchwork.kernel.org/patch/9697505/
 
-Yes, the kernel driver code.
-
-> - Have you tested packet size other than 64B?
-
-Not yet.
-
-> - Is zerocopy supported in OVS-dpdk? If yes, is it enabled in your test?
-zerocopy is not used in the test, but I don't think zerocopy can increase
-the throughput to 2x. On the other side, we haven't put effort to optimize
-the draft kernel driver yet.
-
-Best,
-Wei
+Regards
+Nikunj
