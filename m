@@ -1,28 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47010)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50469)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aurelien@aurel32.net>) id 1dDDcD-00011n-Te
-	for qemu-devel@nongnu.org; Tue, 23 May 2017 13:29:03 -0400
+	(envelope-from <ianloic@google.com>) id 1dDDmP-00044e-DP
+	for qemu-devel@nongnu.org; Tue, 23 May 2017 13:39:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aurelien@aurel32.net>) id 1dDDcC-0008Pe-UJ
-	for qemu-devel@nongnu.org; Tue, 23 May 2017 13:29:01 -0400
-Received: from hall.aurel32.net ([2001:bc8:30d7:100::1]:46436)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <aurelien@aurel32.net>)
-	id 1dDDcC-0008PQ-Nu
-	for qemu-devel@nongnu.org; Tue, 23 May 2017 13:29:00 -0400
-Date: Tue, 23 May 2017 19:28:58 +0200
-From: Aurelien Jarno <aurelien@aurel32.net>
-Message-ID: <20170523172858.aqvgqlrwrwu6jk2o@aurel32.net>
-References: <20170523030312.6360-1-rth@twiddle.net>
-	<20170523030312.6360-3-rth@twiddle.net>
-	<20170523104851.37tseiq5zlpwevr6@aurel32.net>
-	<d059a3b3-ac6c-27d2-5270-b6d5b32cc41d@twiddle.net>
+	(envelope-from <ianloic@google.com>) id 1dDDmO-00045D-Et
+	for qemu-devel@nongnu.org; Tue, 23 May 2017 13:39:33 -0400
+Received: from mail-wm0-x236.google.com ([2a00:1450:400c:c09::236]:38839)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <ianloic@google.com>) id 1dDDmO-000453-71
+	for qemu-devel@nongnu.org; Tue, 23 May 2017 13:39:32 -0400
+Received: by mail-wm0-x236.google.com with SMTP id e127so39658301wmg.1
+	for <qemu-devel@nongnu.org>; Tue, 23 May 2017 10:39:32 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <d059a3b3-ac6c-27d2-5270-b6d5b32cc41d@twiddle.net>
-Subject: Re: [Qemu-devel] [PATCH 02/31] target/s390x: Implement EXECUTE via
- new TranslationBlock
+References: <20170522180217.18234-1-ianloic@google.com>
+	<1495533796.30747.2.camel@redhat.com>
+	<CA+YAivh=GjS5P_3BXccj5tYSxNSQoHQfeTvjgCQfVtw5QwY=_A@mail.gmail.com>
+In-Reply-To: <CA+YAivh=GjS5P_3BXccj5tYSxNSQoHQfeTvjgCQfVtw5QwY=_A@mail.gmail.com>
+From: Ian McKellar <ianloic@google.com>
+Date: Tue, 23 May 2017 17:39:18 +0000
+Message-ID: <CA+YAiviJq3VSLR1yCD9Yob7xb5z60Gw59mrSLL1+qFrtnv7OUw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH 1/1] Improve Cocoa modifier key handling
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,53 +29,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <rth@twiddle.net>
-Cc: qemu-devel@nongnu.org
+To: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org
 
-On 2017-05-23 08:54, Richard Henderson wrote:
-> On 05/23/2017 03:48 AM, Aurelien Jarno wrote:
-> > On 2017-05-22 20:02, Richard Henderson wrote:
-> > > Previously, helper_ex would construct the insn and then implement
-> > > the insn via direct calls other helpers.  This was sufficient to
-> > > boot Linux but that is all.
-> > > 
-> > > It is easy enough to go the whole nine yards by stashing state for
-> > > EXECUTE within the cpu, and then relying on a new TB to be created
-> > > that properly and completely interprets the insn.
-> > > 
-> > > Signed-off-by: Richard Henderson <rth@twiddle.net>
-> > > ---
-> > >   target/s390x/cpu.h         |   4 +-
-> > >   target/s390x/helper.h      |   2 +-
-> > >   target/s390x/insn-data.def |   4 +-
-> > >   target/s390x/machine.c     |  19 +++++++
-> > >   target/s390x/mem_helper.c  | 136 +++++++++++----------------------------------
-> > >   target/s390x/translate.c   | 124 +++++++++++++++++++++++++----------------
-> > >   6 files changed, 133 insertions(+), 156 deletions(-)
-> > 
-> > This looks good on the principle, and finally removes a big hack. That
-> > said it prevent my test system to boot. I haven't investigated why yet.
-> 
-> Hmm.  I've not got a complete environment -- merely booting a kernel up to
-> the point it fails to find a rootfs.  Which did find several problems with
-> my first attempts at this, but wouldn't have exercised paging.  I'll try
-> again to get a full install working...
-> 
-> I wonder if I needed to adjust s390_cpu_handle_mmu_fault (and its myriad
-> subroutines) to handle setting ILEN correctly.
-> 
-> There might be a simpler fix though.  Currently I advance the PC and
-> remember the ilen of the EX(RL).  Maybe better to *not* advance the PC so as
-> to have the original EX(RL) right there for ILEN_LATER and ILEN_LATER_INC to
-> operate on.
-> 
-> Something like this, as a delta patch.
+On Tue, May 23, 2017 at 8:52 AM Ian McKellar <ianloic@google.com> wrote:
 
-Unfortunately it doesn't work. So far I have no real idea what could be
-the root cause of the issue. I have just determined that up to the crash,
-only a very limited set of instructions are being executed. They are the
-4 bytes long versions of MVC, CLC, XC, TR.
+> On Tue, May 23, 2017 at 3:03 AM Gerd Hoffmann <kraxel@redhat.com> wrote:
+>
+>>
+>> I'm wondering whenever we should just use modifierFlags all the time.
+>>
+>
+> Probably. My initial patch tried to be minimally intrusive but I can try
+> reworking the NSEventTypeFlagsChanged handling to compare the new
+> modifierFlags to the last we've seen and synthesize the appropriate key
+> down/up events.
+>
+> After a little more experimentation I think that the approach in this
+patch is the right one. modifierFlags doesn't[1] indicate which instance of
+a modifier (ie: left or right) is being held. Except for
+the NSEventTypeFlagsChanged that's synthesized when a window takes focus
+the event's keyCode indicates which physical key is affected. That first
+event after focus has keyCode==0 which we can detect because 0 is the
+keyCode of the 'A' key which isn't a modifier.
 
--- 
-Aurelien Jarno                          GPG: 4096R/1DDD8C9B
-aurelien@aurel32.net                 http://www.aurel32.net
+Ian
+
+[1] actually there are undocumented flags outside the
+NSEventModifierFlagDeviceIndependentFlagsMask mask that indicate left/right
+keys but I don't think we should use them.
