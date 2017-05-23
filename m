@@ -1,28 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49427)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50094)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dD2VS-00030A-7u
-	for qemu-devel@nongnu.org; Tue, 23 May 2017 01:37:19 -0400
+	(envelope-from <wei.w.wang@intel.com>) id 1dD2dQ-0004G9-Cy
+	for qemu-devel@nongnu.org; Tue, 23 May 2017 01:45:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dD2VP-0007FC-2R
-	for qemu-devel@nongnu.org; Tue, 23 May 2017 01:37:18 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:54982)
+	(envelope-from <wei.w.wang@intel.com>) id 1dD2dN-0001lK-8v
+	for qemu-devel@nongnu.org; Tue, 23 May 2017 01:45:32 -0400
+Received: from mga09.intel.com ([134.134.136.24]:48524)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dD2VO-0007F5-P1
-	for qemu-devel@nongnu.org; Tue, 23 May 2017 01:37:14 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <20170513004616.25749-1-n54@gmx.com>
-	<87a86crlg0.fsf@dusky.pond.sub.org>
-	<a5bcd9dd-feb8-8083-30de-dec8d7139c96@gmx.com>
-	<874lwd5rsx.fsf@dusky.pond.sub.org>
-	<688e36b3-6707-c4e5-4f0c-3c7a5d0fa390@gmx.com>
-Date: Tue, 23 May 2017 07:37:11 +0200
-In-Reply-To: <688e36b3-6707-c4e5-4f0c-3c7a5d0fa390@gmx.com> (Kamil
-	Rytarowski's message of "Mon, 22 May 2017 18:46:01 +0200")
-Message-ID: <87fufwjfqw.fsf@dusky.pond.sub.org>
+	(Exim 4.71) (envelope-from <wei.w.wang@intel.com>)
+	id 1dD2dN-0001k2-0V
+	for qemu-devel@nongnu.org; Tue, 23 May 2017 01:45:29 -0400
+Message-ID: <5923CCF2.2000001@intel.com>
+Date: Tue, 23 May 2017 13:47:30 +0800
+From: Wei Wang <wei.w.wang@intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH] ivshmem-server: Detect and use if there is
- required -lrt linking
+References: <1494578148-102868-1-git-send-email-wei.w.wang@intel.com>
+	<a3f2cae3-5d3d-f620-4a8d-bb11470c0b08@redhat.com>
+	<591AA65F.8080608@intel.com>
+	<d6eb1d73-c791-b8d3-7ef3-a7653aef00d6@redhat.com>
+	<7e1b48d5-83e6-a0ae-5d91-696d8db09d7c@redhat.com>
+	<591D0EF5.9000807@intel.com>
+	<d7df5484-7e08-4e1c-9e35-69d73858c736@redhat.com>
+	<20170519153329.GA30573@stefanha-x1.localdomain>
+	<ec3c391c-6f0a-b316-e7d9-8f5e431b5e45@redhat.com>
+	<286AC319A985734F985F78AFA26841F7392351DD@shsmsx102.ccr.corp.intel.com>
+	<7ff05785-6bca-a886-0eb0-aeeb0f8d8e1a@redhat.com>
+In-Reply-To: <7ff05785-6bca-a886-0eb0-aeeb0f8d8e1a@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [virtio-dev] Re: [virtio-dev] Re: [PATCH v2 00/16]
+ Vhost-pci for inter-VM communication
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,166 +38,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kamil Rytarowski <n54@gmx.com>
-Cc: peter.maydell@linaro.org, qemu-devel@nongnu.org
+To: Jason Wang <jasowang@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>
+Cc: "virtio-dev@lists.oasis-open.org" <virtio-dev@lists.oasis-open.org>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "marcandre.lureau@gmail.com" <marcandre.lureau@gmail.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "mst@redhat.com" <mst@redhat.com>
 
-Kamil Rytarowski <n54@gmx.com> writes:
-
-> On 22.05.2017 08:28, Markus Armbruster wrote:
->> Kamil Rytarowski <n54@gmx.com> writes:
->> 
->>> Hello,
->>>
->>> Excuse me for delay, I missed this mail.
->> 
->> No problem.
->> 
->>> Please see in-line.
->>>
->>> On 17.05.2017 09:28, Markus Armbruster wrote:
->>>> Kamil Rytarowski <n54@gmx.com> writes:
->>>>
->>>>> ivshmem-server makes use of the POSIX shared memory object interfaces.
->>>>> This library is provided on NetBSD in -lrt (POSIX Real-time Library).
->>>>> Add ./configure check if there is needed -lrt linking for shm_open()
->>>>> and if so use it. Introduce new configure generated variable LIBS_SHMLIB.
->>>>>
->>>>> This fixes build issue on NetBSD.
->>>>>
->>>>> Signed-off-by: Kamil Rytarowski <n54@gmx.com>
->>>>> ---
->>>>>  Makefile  |  1 +
->>>>>  configure | 20 ++++++++++++++++++++
->>>>>  2 files changed, 21 insertions(+)
->>>>>
->>>>> diff --git a/Makefile b/Makefile
->>>>> index 31d41a7eae..3248cb53d7 100644
->>>>> --- a/Makefile
->>>>> +++ b/Makefile
->>>>> @@ -473,6 +473,7 @@ ivshmem-client$(EXESUF): $(ivshmem-client-obj-y) $(COMMON_LDADDS)
->>>>>  	$(call LINK, $^)
->>>>>  ivshmem-server$(EXESUF): $(ivshmem-server-obj-y) $(COMMON_LDADDS)
->>>>>  	$(call LINK, $^)
->>>>> +ivshmem-server$(EXESUF): LIBS += $(LIBS_SHMLIB)
->>>>>  
->>>>>  module_block.h: $(SRC_PATH)/scripts/modules/module_block.py config-host.mak
->>>>>  	$(call quiet-command,$(PYTHON) $< $@ \
->>>>> diff --git a/configure b/configure
->>>>> index 7c020c076b..50c3aee746 100755
->>>>> --- a/configure
->>>>> +++ b/configure
->>>>> @@ -179,6 +179,7 @@ audio_pt_int=""
->>>>>  audio_win_int=""
->>>>>  cc_i386=i386-pc-linux-gnu-gcc
->>>>>  libs_qga=""
->>>>> +libs_shmlib=""
->>>>>  debug_info="yes"
->>>>>  stack_protector=""
->>>>>  
->>>>> @@ -4133,6 +4134,24 @@ elif compile_prog "" "$pthread_lib -lrt" ; then
->>>>>    libs_qga="$libs_qga -lrt"
->>>>>  fi
->>>>>  
->>>>> +##########################################
->>>>> +# Do we need librt for shm_open()
->>>>> +cat > $TMPC <<EOF
->>>>> +#include <sys/mman.h>
->>>>> +#include <sys/stat.h>
->>>>> +#include <fcntl.h>
->>>>> +#include <stddef.h>
->>>>> +int main(void) {
->>>>> +  return shm_open(NULL, O_RDWR, 0644);
->>>>> +}
->>>>> +EOF
->>>>> +
->>>>> +if compile_prog "" "" ; then
->>>>> +  :
->>>>> +elif compile_prog "" "-lrt" ; then
->>>>> +  libs_shmlib="$libs_shmlib -lrt"
->>>>> +fi
->>>>> +
->>>>>  if test "$darwin" != "yes" -a "$mingw32" != "yes" -a "$solaris" != yes -a \
->>>>>          "$aix" != "yes" -a "$haiku" != "yes" ; then
->>>>>      libs_softmmu="-lutil $libs_softmmu"
->>>>> @@ -5949,6 +5968,7 @@ echo "EXESUF=$EXESUF" >> $config_host_mak
->>>>>  echo "DSOSUF=$DSOSUF" >> $config_host_mak
->>>>>  echo "LDFLAGS_SHARED=$LDFLAGS_SHARED" >> $config_host_mak
->>>>>  echo "LIBS_QGA+=$libs_qga" >> $config_host_mak
->>>>> +echo "LIBS_SHMLIB+=$libs_shmlib" >> $config_host_mak
->>>>>  echo "TASN1_LIBS=$tasn1_libs" >> $config_host_mak
->>>>>  echo "TASN1_CFLAGS=$tasn1_cflags" >> $config_host_mak
->>>>>  echo "POD2MAN=$POD2MAN" >> $config_host_mak
->>>>
->>>> We already have a test for -lrt.
->>>
->>> Correct.
->>>
->>>>  It looks for timer_create() and
->>>> clock_gettime().
->>>
->>>
->>> timer_create(2) and clock_settime(2) are in libc on NetBSD.
->>>
->>>>  If we need -lrt,
->>>
->>> We need it just for shm_open(3).
->>>
->>>> we add it to LIBS and to LIBS_QGA.
->>>> The latter because we don't use LIBS for qemu-ga:
->>>>
->>>>     qemu-ga$(EXESUF): LIBS = $(LIBS_QGA)
->>>>
->>>> This patch adds a second test for -lrt, to look for shm_open().  It adds
->>>> -lrt to new variable LIBS_SHMLIB, which gets used only for
->>>> ivshmem-server:
->>>>
->>>>     ivshmem-server$(EXESUF): LIBS += $(LIBS_SHMLIB)
->>>>
->>>> Note that ivshmem-server already uses LIBS.
->>>>
->>>> Shouldn't we instead widen the existing test for -lrt to cover
->>>> shm_open()?
->>>>
->>>
->>> I will prepare patch in the requested way. I don't have preference.
->>>
->>>> Can you confirm that the existing test does not add -lrt to LIBS on
->>>> NetBSD?
->>>>
->>>
->>> config-host.mak:LIBS+=-lm -L/usr/pkg/lib -lgthread-2.0 -pthread
->>> -Wl,-R/usr/pkg/lib -lglib-2.0 -lintl   -lz
->>> config-host.mak:LIBS_QGA+=-lm -L/usr/pkg/lib -lgthread-2.0 -pthread
->>> -Wl,-R/usr/pkg/lib -lglib-2.0 -lintl
->>>
->>>> tests/ivshmem-test.c also calls shm_open().  Does it work on NetBSD?
->>>>
->>>
->>> Currently it's disabled, as it requires eventfd() (Linux API).
->> 
->> You're right.
->> 
->> So is the ivshmem device.  Hmm.  Why would anyone want ivshmem-server on
->> NetBSD?  Its purpose is connecting ivshmem-doorbell devices.  Could we
->> simply add the obvious CONFIG_IVSHMEM dependence to
->> contrib/ivshmem-*/Makefile.objs?
->> 
+On 05/23/2017 10:08 AM, Jason Wang wrote:
 >
-> In general I would like to get feature parity on NetBSD, there is no
-> reason to blacklist this feature for !Linux hosts. However short term
+>
+> On 2017年05月22日 19:46, Wang, Wei W wrote:
+>> On Monday, May 22, 2017 10:28 AM, Jason Wang wrote:
+>>> On 2017年05月19日 23:33, Stefan Hajnoczi wrote:
+>>>> On Fri, May 19, 2017 at 11:10:33AM +0800, Jason Wang wrote:
+>>>>> On 2017年05月18日 11:03, Wei Wang wrote:
+>>>>>> On 05/17/2017 02:22 PM, Jason Wang wrote:
+>>>>>>> On 2017年05月17日 14:16, Jason Wang wrote:
+>>>>>>>> On 2017年05月16日 15:12, Wei Wang wrote:
+>>>>>>>>>> Hi:
+>>>>>>>>>>
+>>>>>>>>>> Care to post the driver codes too?
+>>>>>>>>>>
+>>>>>>>>> OK. It may take some time to clean up the driver code before post
+>>>>>>>>> it out. You can first have a check of the draft at the repo here:
+>>>>>>>>> https://github.com/wei-w-wang/vhost-pci-driver
+>>>>>>>>>
+>>>>>>>>> Best,
+>>>>>>>>> Wei
+>>>>>>>> Interesting, looks like there's one copy on tx side. We used to
+>>>>>>>> have zerocopy support for tun for VM2VM traffic. Could you please
+>>>>>>>> try to compare it with your vhost-pci-net by:
+>>>>>>>>
+>>>>>> We can analyze from the whole data path - from VM1's network stack
+>>>>>> to send packets -> VM2's network stack to receive packets. The
+>>>>>> number of copies are actually the same for both.
+>>>>> That's why I'm asking you to compare the performance. The only reason
+>>>>> for vhost-pci is performance. You should prove it.
+>>>> There is another reason for vhost-pci besides maximum performance:
+>>>>
+>>>> vhost-pci makes it possible for end-users to run networking or storage
+>>>> appliances in compute clouds.  Cloud providers do not allow end-users
+>>>> to run custom vhost-user processes on the host so you need vhost-pci.
+>>>>
+>>>> Stefan
+>>> Then it has non NFV use cases and the question goes back to the 
+>>> performance
+>>> comparing between vhost-pci and zerocopy vhost_net. If it does not 
+>>> perform
+>>> better, it was less interesting at least in this case.
+>>>
+>> Probably I can share what we got about vhost-pci and vhost-user:
+>> https://github.com/wei-w-wang/vhost-pci-discussion/blob/master/vhost_pci_vs_vhost_user.pdf 
+>>
+>> Right now, I don’t have the environment to add the vhost_net test.
+>
+> Thanks, the number looks good. But I have some questions:
+>
+> - Is the number measured through your vhost-pci kernel driver code?
 
-Feature parity is a worthy goal, but compiling ivshmem-server without
-ivshmem-doorbell doesn't gets you a feature, it gets you a binary you
-can't use for its intended purpose :)
+Yes, the kernel driver code.
 
-> there are higher priorities, to fix build of pristine sources
-> (ivshmem-server is blocking here, not that I'm right now working on its
-> correctness on the NetBSD host) and run test suite.
+> - Have you tested packet size other than 64B?
 
-Your priorities make sense.
+Not yet.
 
-> I wanted to avoid overlinking, that would be caused by adding -lrt.
-> Adding dedicated -lrt check for shm_open(3) made sense to me, but I will
-> go the requested route.
+> - Is zerocopy supported in OVS-dpdk? If yes, is it enabled in your test?
+zerocopy is not used in the test, but I don't think zerocopy can increase
+the throughput to 2x. On the other side, we haven't put effort to optimize
+the draft kernel driver yet.
 
-Avoiding overlinking makes sense, too.
+Best,
+Wei
