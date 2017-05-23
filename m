@@ -1,21 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60004)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34343)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1dCy89-0004sl-Ul
-	for qemu-devel@nongnu.org; Mon, 22 May 2017 20:56:59 -0400
+	(envelope-from <rth7680@gmail.com>) id 1dCyIQ-00074D-8p
+	for qemu-devel@nongnu.org; Mon, 22 May 2017 21:07:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1dCy85-0001Ny-Ur
-	for qemu-devel@nongnu.org; Mon, 22 May 2017 20:56:58 -0400
-Resent-Message-Id: <E1dCy85-0001Ny-Ur@eggs.gnu.org>
-In-Reply-To: <1da30c06-46bd-47fa-b0ef-886ea9ab84e5@ONE.local>
-Message-ID: <149550100498.1035.202486928967568753@c05f1edc8ed1>
-Reply-To: <qemu-devel@nongnu.org>
+	(envelope-from <rth7680@gmail.com>) id 1dCyIP-0004bY-Fg
+	for qemu-devel@nongnu.org; Mon, 22 May 2017 21:07:34 -0400
+Received: from mail-qk0-x243.google.com ([2607:f8b0:400d:c09::243]:36432)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1dCyIP-0004bQ-AS
+	for qemu-devel@nongnu.org; Mon, 22 May 2017 21:07:33 -0400
+Received: by mail-qk0-x243.google.com with SMTP id y128so21234528qka.3
+	for <qemu-devel@nongnu.org>; Mon, 22 May 2017 18:07:33 -0700 (PDT)
+Sender: Richard Henderson <rth7680@gmail.com>
+References: <20170516230159.4195-1-aurelien@aurel32.net>
+	<20170516230159.4195-5-aurelien@aurel32.net>
+From: Richard Henderson <rth@twiddle.net>
+Message-ID: <fa8a29a3-9c78-54c4-a91b-24937ece8e1d@twiddle.net>
+Date: Mon, 22 May 2017 18:07:29 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Mon, 22 May 2017 17:56:45 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH] Add code to connect to external panel,
- for ARM
+In-Reply-To: <20170516230159.4195-5-aurelien@aurel32.net>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 4/4] target/mips: optimize WSBH,
+ DSBH and DSHD
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,69 +32,19 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: famz@redhat.com, flypie@rocketmail.com, peter.maydell@linaro.org, qemu-arm@nongnu.org
+To: Aurelien Jarno <aurelien@aurel32.net>, qemu-devel@nongnu.org
+Cc: Yongbok Kim <yongbok.kim@imgtec.com>
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzClN1
-YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0hdIEFkZCBjb2RlIHRvIGNvbm5lY3QgdG8gZXh0ZXJu
-YWwgcGFuZWwsIGZvciBBUk0KTWVzc2FnZS1pZDogMWRhMzBjMDYtNDZiZC00N2ZhLWIwZWYtODg2
-ZWE5YWI4NGU1QE9ORS5sb2NhbAoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFz
-aAoKQkFTRT1iYXNlCm49MQp0b3RhbD0kKGdpdCBsb2cgLS1vbmVsaW5lICRCQVNFLi4gfCB3YyAt
-bCkKZmFpbGVkPTAKCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNv
-bmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCgpjb21taXRzPSIkKGdpdCBsb2cgLS1mb3Jt
-YXQ9JUggLS1yZXZlcnNlICRCQVNFLi4pIgpmb3IgYyBpbiAkY29tbWl0czsgZG8KICAgIGVjaG8g
-IkNoZWNraW5nIFBBVENIICRuLyR0b3RhbDogJChnaXQgbG9nIC1uIDEgLS1mb3JtYXQ9JXMgJGMp
-Li4uIgogICAgaWYgISBnaXQgc2hvdyAkYyAtLWZvcm1hdD1lbWFpbCB8IC4vc2NyaXB0cy9jaGVj
-a3BhdGNoLnBsIC0tbWFpbGJhY2sgLTsgdGhlbgogICAgICAgIGZhaWxlZD0xCiAgICAgICAgZWNo
-bwogICAgZmkKICAgIG49JCgobisxKSkKZG9uZQoKZXhpdCAkZmFpbGVkCj09PSBURVNUIFNDUklQ
-VCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQxZGVmN2Y0NGJkODg4NzEz
-Mzg0ClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKZDllN2U2YiBBZGQgY29kZSB0byBj
-b25uZWN0IHRvIGV4dGVybmFsIHBhbmVsLCBmb3IgQVJNCgo9PT0gT1VUUFVUIEJFR0lOID09PQpD
-aGVja2luZyBQQVRDSCAxLzE6IEFkZCBjb2RlIHRvIGNvbm5lY3QgdG8gZXh0ZXJuYWwgcGFuZWws
-IGZvciBBUk0uLi4KV0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzE2OTogRklMRTog
-aHcvYXJtL2JjbTI4MzVfcGVyaXBoZXJhbHMuYzozMDc6CisgICAgbWVtb3J5X3JlZ2lvbl9hZGRf
-c3VicmVnaW9uKCZzLT5tYm94X21yLCBNQk9YX0NIQU5fUE9XRVIgPDwgTUJPWF9BU19DSEFOX1NI
-SUZULAoKRVJST1I6IHNwYWNlcyByZXF1aXJlZCBhcm91bmQgdGhhdCAnPScgKGN0eDpWeFYpCiMx
-ODI6IEZJTEU6IGh3L2FybS9iY20yODM1X3BlcmlwaGVyYWxzLmM6NDQ0OgorICAgIGRjLT51c2Vy
-X2NyZWF0YWJsZT1mYWxzZTsKICAgICAgICAgICAgICAgICAgICAgICBeCgpXQVJOSU5HOiBsaW5l
-IG92ZXIgODAgY2hhcmFjdGVycwojNDUwOiBGSUxFOiBody9ncGlvL2JjbTI4MzVfZ3Bpby5jOjM5
-NzoKKyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAuaW5zdGFuY2Vf
-c2l6ZSA9IHNpemVvZihCQ00yODM1R3Bpb1N0YXRlKSwKCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBj
-aGFyYWN0ZXJzCiM0NTI6IEZJTEU6IGh3L2dwaW8vYmNtMjgzNV9ncGlvLmM6Mzk5OgorICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIC5jbGFzc19pbml0ID0gYmNtMjgz
-NV9ncGlvX2NsYXNzX2luaXQsCgpXQVJOSU5HOiBhcmNoaXRlY3R1cmUgc3BlY2lmaWMgZGVmaW5l
-cyBzaG91bGQgYmUgYXZvaWRlZAojNTAwOiBGSUxFOiBpbmNsdWRlL3FlbXUvUGFuZWxFbXUuaDox
-NzoKKyNpZmRlZiBfX2NwbHVzcGx1cwoKRVJST1I6IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1
-c2UgdGFicwojNTE3OiBGSUxFOiBpbmNsdWRlL3FlbXUvUGFuZWxFbXUuaDozNDoKK15JICAgICAg
-ICAgICAgICAgICAgICAgICB1bmxlc3Mgc29tZXRoaW5nIGNoYW5nZWQgKi8kCgpXQVJOSU5HOiBh
-cmNoaXRlY3R1cmUgc3BlY2lmaWMgZGVmaW5lcyBzaG91bGQgYmUgYXZvaWRlZAojNTMxOiBGSUxF
-OiBpbmNsdWRlL3FlbXUvUGFuZWxFbXUuaDo0ODoKKyNpZmRlZiBfX2NwbHVzcGx1cwoKV0FSTklO
-RzogYXJjaGl0ZWN0dXJlIHNwZWNpZmljIGRlZmluZXMgc2hvdWxkIGJlIGF2b2lkZWQKIzU1NTog
-RklMRTogdXRpbC9QYW5lbEVtdS5jOjEzOgorI2lmZGVmIF9fTUlOR1czMl9fCgpXQVJOSU5HOiBh
-cmNoaXRlY3R1cmUgc3BlY2lmaWMgZGVmaW5lcyBzaG91bGQgYmUgYXZvaWRlZAojNjg2OiBGSUxF
-OiB1dGlsL1BhbmVsRW11LmM6MTQ0OgorI2lmZGVmIF9fTUlOR1czMl9fCgpFUlJPUjogc3BhY2Ug
-cmVxdWlyZWQgYWZ0ZXIgdGhhdCAnLCcgKGN0eDpWeFYpCiM3MTA6IEZJTEU6IHV0aWwvUGFuZWxF
-bXUuYzoxNjg6CisgICAgaW50IGksajsKICAgICAgICAgIF4KCldBUk5JTkc6IGFyY2hpdGVjdHVy
-ZSBzcGVjaWZpYyBkZWZpbmVzIHNob3VsZCBiZSBhdm9pZGVkCiM3ODA6IEZJTEU6IHV0aWwvUGFu
-ZWxFbXUuYzoyMzg6CisjaWZkZWYgX19NSU5HVzMyX18KCldBUk5JTkc6IGFyY2hpdGVjdHVyZSBz
-cGVjaWZpYyBkZWZpbmVzIHNob3VsZCBiZSBhdm9pZGVkCiM4MDA6IEZJTEU6IHV0aWwvUGFuZWxF
-bXUuYzoyNTg6CisjaWZkZWYgX19NSU5HVzMyX18KCldBUk5JTkc6IGFyY2hpdGVjdHVyZSBzcGVj
-aWZpYyBkZWZpbmVzIHNob3VsZCBiZSBhdm9pZGVkCiM4MDg6IEZJTEU6IHV0aWwvUGFuZWxFbXUu
-YzoyNjY6CisjaWZkZWYgX19NSU5HVzMyX18KCldBUk5JTkc6IGFyY2hpdGVjdHVyZSBzcGVjaWZp
-YyBkZWZpbmVzIHNob3VsZCBiZSBhdm9pZGVkCiM4MTc6IEZJTEU6IHV0aWwvUGFuZWxFbXUuYzoy
-NzU6CisjaWZkZWYgX19NSU5HVzMyX18KCldBUk5JTkc6IGFyY2hpdGVjdHVyZSBzcGVjaWZpYyBk
-ZWZpbmVzIHNob3VsZCBiZSBhdm9pZGVkCiM4MjU6IEZJTEU6IHV0aWwvUGFuZWxFbXUuYzoyODM6
-CisjaWZkZWYgX19NSU5HVzMyX18KCldBUk5JTkc6IGFyY2hpdGVjdHVyZSBzcGVjaWZpYyBkZWZp
-bmVzIHNob3VsZCBiZSBhdm9pZGVkCiM4Mzk6IEZJTEU6IHV0aWwvUGFuZWxFbXUuYzoyOTc6Cisj
-aWZkZWYgX19NSU5HVzMyX18KCldBUk5JTkc6IGFyY2hpdGVjdHVyZSBzcGVjaWZpYyBkZWZpbmVz
-IHNob3VsZCBiZSBhdm9pZGVkCiM4NTY6IEZJTEU6IHV0aWwvUGFuZWxFbXUuYzozMTQ6CisjaWZk
-ZWYgX19NSU5HVzMyX18KCldBUk5JTkc6IGFyY2hpdGVjdHVyZSBzcGVjaWZpYyBkZWZpbmVzIHNo
-b3VsZCBiZSBhdm9pZGVkCiM4NjQ6IEZJTEU6IHV0aWwvUGFuZWxFbXUuYzozMjI6CisjaWZkZWYg
-X19NSU5HVzMyX18KCnRvdGFsOiAzIGVycm9ycywgMTUgd2FybmluZ3MsIDc5NCBsaW5lcyBjaGVj
-a2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFu
-eSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUg
-bWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgo9PT0gT1VUUFVUIEVO
-RCA9PT0KClRlc3QgY29tbWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoKLS0tCkVtYWlsIGdlbmVy
-YXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHA6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVh
-c2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAZnJlZWxpc3RzLm9yZw==
+On 05/16/2017 04:01 PM, Aurelien Jarno wrote:
+> Use the same mask to avoid having to load two different constants, as
+> suggested by Richard Henderson.
+> 
+> Signed-off-by: Aurelien Jarno<aurelien@aurel32.net>
+> ---
+>   target/mips/translate.c | 18 ++++++++++++------
+>   1 file changed, 12 insertions(+), 6 deletions(-)
+
+Reviewed-by: Richard Henderson <rth@twiddle.net>
+
+
+r~
