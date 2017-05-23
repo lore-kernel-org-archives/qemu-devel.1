@@ -1,22 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37679)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37688)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1dD14o-0005An-Eu
-	for qemu-devel@nongnu.org; Tue, 23 May 2017 00:05:43 -0400
+	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1dD14p-0005B0-4l
+	for qemu-devel@nongnu.org; Tue, 23 May 2017 00:05:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1dD14n-0004i7-EF
-	for qemu-devel@nongnu.org; Tue, 23 May 2017 00:05:42 -0400
-Received: from [59.151.112.132] (port=56572 helo=heian.cn.fujitsu.com)
+	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1dD14n-0004iF-Nu
+	for qemu-devel@nongnu.org; Tue, 23 May 2017 00:05:43 -0400
+Received: from [59.151.112.132] (port=40966 helo=heian.cn.fujitsu.com)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1dD14m-0004eW-0Z
+	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1dD14m-0004gt-QN
 	for qemu-devel@nongnu.org; Tue, 23 May 2017 00:05:41 -0400
 From: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
-Date: Tue, 23 May 2017 12:04:39 +0800
-Message-ID: <9c83a8920af8a2e4ab4077dc5ae1b74622bba871.1495508197.git.maozy.fnst@cn.fujitsu.com>
+Date: Tue, 23 May 2017 12:04:37 +0800
+Message-ID: <29c33313efd2ee4f7bf3abb71a4809582891f408.1495508197.git.maozy.fnst@cn.fujitsu.com>
 In-Reply-To: <cover.1495508197.git.maozy.fnst@cn.fujitsu.com>
 References: <cover.1495508197.git.maozy.fnst@cn.fujitsu.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v5 3/4] net/rocker: Convert to realize()
+Subject: [Qemu-devel] [PATCH v5 1/4] net/rocker: Remove the dead error
+ handling
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,136 +29,278 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: armbru@redhat.com, jasowang@redhat.com, f4bug@amsat.org, jiri@resnulli.us
 
-The rocker device still implements the old PCIDeviceClass .init()
-instead of the new .realize(). All devices need to be converted to
-.realize().
-
-.init() reports errors with fprintf() and return 0 on success, negative
-number on failure. Meanwhile, when -device rocker fails, it first report
-a specific error, then a generic one, like this:
-
-    $ x86_64-softmmu/qemu-system-x86_64 -device rocker,name=qemu-rocker
-    rocker: name too long; please shorten to at most 9 chars
-    qemu-system-x86_64: -device rocker,name=qemu-rocker: Device initialization failed
-
-Now, convert it to .realize() that passes errors to its callers via its
-errp argument. Also avoid the superfluous second error message. After
-the patch, effect like this:
-
-    $ x86_64-softmmu/qemu-system-x86_64 -device rocker,name=qemu-rocker
-    qemu-system-x86_64: -device rocker,name=qemu-rocker: name too long; please shorten to at most 9 chars
+Memory allocation functions like world_alloc, desc_ring_alloc etc,
+they are all wrappers around g_malloc, g_new etc. But g_malloc and 
+similar functions doesn't return null. Because they ignore the fact 
+that g_malloc() of 0 bytes returns null. So error checks for these
+allocation failure are superfluous. Now, remove them entirely.
 
 Signed-off-by: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
-Reviewed-by: Markus Armbruster <armbru@redhat.com>
 ---
- hw/net/rocker/rocker.c | 27 +++++++++++----------------
- 1 file changed, 11 insertions(+), 16 deletions(-)
+ hw/net/rocker/rocker.c        | 46 -------------------------------------------
+ hw/net/rocker/rocker_desc.c   | 10 ----------
+ hw/net/rocker/rocker_fp.c     |  4 ----
+ hw/net/rocker/rocker_of_dpa.c | 20 -------------------
+ hw/net/rocker/rocker_world.c  | 12 +++++------
+ 5 files changed, 5 insertions(+), 87 deletions(-)
 
 diff --git a/hw/net/rocker/rocker.c b/hw/net/rocker/rocker.c
-index 6d44f37..2764529 100644
+index 6e70fdd..d01ba9d 100644
 --- a/hw/net/rocker/rocker.c
 +++ b/hw/net/rocker/rocker.c
-@@ -1238,20 +1238,18 @@ rollback:
-     return err;
- }
- 
--static int rocker_msix_init(Rocker *r)
-+static int rocker_msix_init(Rocker *r, Error **errp)
- {
-     PCIDevice *dev = PCI_DEVICE(r);
-     int err;
--    Error *local_err = NULL;
- 
-     err = msix_init(dev, ROCKER_MSIX_VEC_COUNT(r->fp_ports),
-                     &r->msix_bar,
-                     ROCKER_PCI_MSIX_BAR_IDX, ROCKER_PCI_MSIX_TABLE_OFFSET,
-                     &r->msix_bar,
-                     ROCKER_PCI_MSIX_BAR_IDX, ROCKER_PCI_MSIX_PBA_OFFSET,
--                    0, &local_err);
-+                    0, errp);
-     if (err) {
--        error_report_err(local_err);
-         return err;
-     }
- 
-@@ -1287,7 +1285,7 @@ static World *rocker_world_type_by_name(Rocker *r, const char *name)
-     return NULL;
- }
- 
--static int pci_rocker_init(PCIDevice *dev)
-+static void pci_rocker_realize(PCIDevice *dev, Error **errp)
- {
-     Rocker *r = to_rocker(dev);
-     const MACAddr zero = { .a = { 0, 0, 0, 0, 0, 0 } };
-@@ -1305,10 +1303,9 @@ static int pci_rocker_init(PCIDevice *dev)
- 
-     r->world_dflt = rocker_world_type_by_name(r, r->world_name);
-     if (!r->world_dflt) {
--        fprintf(stderr,
--                "rocker: requested world \"%s\" does not exist\n",
-+        error_setg(errp,
-+                "invalid argument requested world %s does not exist",
-                 r->world_name);
--        err = -EINVAL;
-         goto err_world_type_by_name;
-     }
- 
-@@ -1328,7 +1325,7 @@ static int pci_rocker_init(PCIDevice *dev)
- 
-     /* MSI-X init */
- 
--    err = rocker_msix_init(r);
-+    err = rocker_msix_init(r, errp);
-     if (err) {
-         goto err_msix_init;
-     }
-@@ -1340,7 +1337,7 @@ static int pci_rocker_init(PCIDevice *dev)
-     }
- 
-     if (rocker_find(r->name)) {
--        err = -EEXIST;
-+        error_setg(errp, "%s already exists", r->name);
-         goto err_duplicate;
-     }
- 
-@@ -1354,10 +1351,9 @@ static int pci_rocker_init(PCIDevice *dev)
- #define ROCKER_IFNAMSIZ 16
- #define MAX_ROCKER_NAME_LEN  (ROCKER_IFNAMSIZ - 1 - 3 - 3)
-     if (strlen(r->name) > MAX_ROCKER_NAME_LEN) {
--        fprintf(stderr,
--                "rocker: name too long; please shorten to at most %d chars\n",
-+        error_setg(errp,
-+                "name too long; please shorten to at most %d chars",
-                 MAX_ROCKER_NAME_LEN);
--        err = -EINVAL;
-         goto err_name_too_long;
-     }
- 
-@@ -1415,7 +1411,7 @@ static int pci_rocker_init(PCIDevice *dev)
- 
-     QLIST_INSERT_HEAD(&rockers, r, next);
- 
--    return 0;
-+    return;
- 
- err_name_too_long:
- err_duplicate:
-@@ -1429,7 +1425,6 @@ err_world_type_by_name:
-             world_free(r->worlds[i]);
+@@ -239,10 +239,6 @@ static int tx_consume(Rocker *r, DescInfo *info)
          }
+         iov[iovcnt].iov_len = frag_len;
+         iov[iovcnt].iov_base = g_malloc(frag_len);
+-        if (!iov[iovcnt].iov_base) {
+-            err = -ROCKER_ENOMEM;
+-            goto err_no_mem;
+-        }
+ 
+         if (pci_dma_read(dev, frag_addr, iov[iovcnt].iov_base,
+                      iov[iovcnt].iov_len)) {
+@@ -262,7 +258,6 @@ static int tx_consume(Rocker *r, DescInfo *info)
+ 
+ err_too_many_frags:
+ err_bad_io:
+-err_no_mem:
+ err_bad_attr:
+     for (i = 0; i < ROCKER_TX_FRAGS_MAX; i++) {
+         g_free(iov[i].iov_base);
+@@ -674,10 +669,6 @@ int rx_produce(World *world, uint32_t pport,
+      */
+ 
+     data = g_malloc(data_size);
+-    if (!data) {
+-        err = -ROCKER_ENOMEM;
+-        goto out;
+-    }
+     iov_to_buf(iov, iovcnt, 0, data, data_size);
+     pci_dma_write(dev, frag_addr, data, data_size);
+     g_free(data);
+@@ -722,11 +713,6 @@ static void rocker_test_dma_ctrl(Rocker *r, uint32_t val)
+ 
+     buf = g_malloc(r->test_dma_size);
+ 
+-    if (!buf) {
+-        DPRINTF("test dma buffer alloc failed");
+-        return;
+-    }
+-
+     switch (val) {
+     case ROCKER_TEST_DMA_CTRL_CLEAR:
+         memset(buf, 0, r->test_dma_size);
+@@ -1313,13 +1299,6 @@ static int pci_rocker_init(PCIDevice *dev)
+ 
+     r->worlds[ROCKER_WORLD_TYPE_OF_DPA] = of_dpa_world_alloc(r);
+ 
+-    for (i = 0; i < ROCKER_WORLD_TYPE_MAX; i++) {
+-        if (!r->worlds[i]) {
+-            err = -ENOMEM;
+-            goto err_world_alloc;
+-        }
+-    }
+-
+     if (!r->world_name) {
+         r->world_name = g_strdup(world_name(r->worlds[ROCKER_WORLD_TYPE_OF_DPA]));
      }
--    return err;
- }
+@@ -1396,9 +1375,6 @@ static int pci_rocker_init(PCIDevice *dev)
+     }
  
- static void pci_rocker_uninit(PCIDevice *dev)
-@@ -1514,7 +1509,7 @@ static void rocker_class_init(ObjectClass *klass, void *data)
-     DeviceClass *dc = DEVICE_CLASS(klass);
-     PCIDeviceClass *k = PCI_DEVICE_CLASS(klass);
+     r->rings = g_new(DescRing *, rocker_pci_ring_count(r));
+-    if (!r->rings) {
+-        goto err_rings_alloc;
+-    }
  
--    k->init = pci_rocker_init;
-+    k->realize = pci_rocker_realize;
-     k->exit = pci_rocker_uninit;
-     k->vendor_id = PCI_VENDOR_ID_REDHAT;
-     k->device_id = PCI_DEVICE_ID_REDHAT_ROCKER;
+     /* Rings are ordered like this:
+      * - command ring
+@@ -1410,14 +1386,9 @@ static int pci_rocker_init(PCIDevice *dev)
+      * .....
+      */
+ 
+-    err = -ENOMEM;
+     for (i = 0; i < rocker_pci_ring_count(r); i++) {
+         DescRing *ring = desc_ring_alloc(r, i);
+ 
+-        if (!ring) {
+-            goto err_ring_alloc;
+-        }
+-
+         if (i == ROCKER_RING_CMD) {
+             desc_ring_set_consume(ring, cmd_consume, ROCKER_MSIX_VEC_CMD);
+         } else if (i == ROCKER_RING_EVENT) {
+@@ -1437,10 +1408,6 @@ static int pci_rocker_init(PCIDevice *dev)
+             fp_port_alloc(r, r->name, &r->fp_start_macaddr,
+                           i, &r->fp_ports_peers[i]);
+ 
+-        if (!port) {
+-            goto err_port_alloc;
+-        }
+-
+         r->fp_port[i] = port;
+         fp_port_set_world(port, r->world_dflt);
+     }
+@@ -1449,25 +1416,12 @@ static int pci_rocker_init(PCIDevice *dev)
+ 
+     return 0;
+ 
+-err_port_alloc:
+-    for (--i; i >= 0; i--) {
+-        FpPort *port = r->fp_port[i];
+-        fp_port_free(port);
+-    }
+-    i = rocker_pci_ring_count(r);
+-err_ring_alloc:
+-    for (--i; i >= 0; i--) {
+-        desc_ring_free(r->rings[i]);
+-    }
+-    g_free(r->rings);
+-err_rings_alloc:
+ err_duplicate:
+     rocker_msix_uninit(r);
+ err_msix_init:
+     object_unparent(OBJECT(&r->msix_bar));
+     object_unparent(OBJECT(&r->mmio));
+ err_world_type_by_name:
+-err_world_alloc:
+     for (i = 0; i < ROCKER_WORLD_TYPE_MAX; i++) {
+         if (r->worlds[i]) {
+             world_free(r->worlds[i]);
+diff --git a/hw/net/rocker/rocker_desc.c b/hw/net/rocker/rocker_desc.c
+index ac02797..d0df89a 100644
+--- a/hw/net/rocker/rocker_desc.c
++++ b/hw/net/rocker/rocker_desc.c
+@@ -65,10 +65,6 @@ char *desc_get_buf(DescInfo *info, bool read_only)
+         info->buf_size = size;
+     }
+ 
+-    if (!info->buf) {
+-        return NULL;
+-    }
+-
+     if (pci_dma_read(dev, le64_to_cpu(info->desc.buf_addr), info->buf, size)) {
+         return NULL;
+     }
+@@ -144,9 +140,6 @@ bool desc_ring_set_size(DescRing *ring, uint32_t size)
+     ring->head = ring->tail = 0;
+ 
+     ring->info = g_renew(DescInfo, ring->info, size);
+-    if (!ring->info) {
+-        return false;
+-    }
+ 
+     memset(ring->info, 0, size * sizeof(DescInfo));
+ 
+@@ -347,9 +340,6 @@ DescRing *desc_ring_alloc(Rocker *r, int index)
+     DescRing *ring;
+ 
+     ring = g_new0(DescRing, 1);
+-    if (!ring) {
+-        return NULL;
+-    }
+ 
+     ring->r = r;
+     ring->index = index;
+diff --git a/hw/net/rocker/rocker_fp.c b/hw/net/rocker/rocker_fp.c
+index 1305ac3..4b3c984 100644
+--- a/hw/net/rocker/rocker_fp.c
++++ b/hw/net/rocker/rocker_fp.c
+@@ -226,10 +226,6 @@ FpPort *fp_port_alloc(Rocker *r, char *sw_name,
+ {
+     FpPort *port = g_new0(FpPort, 1);
+ 
+-    if (!port) {
+-        return NULL;
+-    }
+-
+     port->r = r;
+     port->index = index;
+     port->pport = index + 1;
+diff --git a/hw/net/rocker/rocker_of_dpa.c b/hw/net/rocker/rocker_of_dpa.c
+index 9b1e0d2..191a58e 100644
+--- a/hw/net/rocker/rocker_of_dpa.c
++++ b/hw/net/rocker/rocker_of_dpa.c
+@@ -368,9 +368,6 @@ static OfDpaFlow *of_dpa_flow_alloc(uint64_t cookie)
+     int64_t now = qemu_clock_get_ms(QEMU_CLOCK_VIRTUAL) / 1000;
+ 
+     flow = g_new0(OfDpaFlow, 1);
+-    if (!flow) {
+-        return NULL;
+-    }
+ 
+     flow->cookie = cookie;
+     flow->mask.tbl_id = 0xffffffff;
+@@ -813,10 +810,6 @@ static OfDpaGroup *of_dpa_group_alloc(uint32_t id)
+ {
+     OfDpaGroup *group = g_new0(OfDpaGroup, 1);
+ 
+-    if (!group) {
+-        return NULL;
+-    }
+-
+     group->id = id;
+ 
+     return group;
+@@ -1867,9 +1860,6 @@ static int of_dpa_cmd_flow_add(OfDpa *of_dpa, uint64_t cookie,
+     }
+ 
+     flow = of_dpa_flow_alloc(cookie);
+-    if (!flow) {
+-        return -ROCKER_ENOMEM;
+-    }
+ 
+     err = of_dpa_cmd_flow_add_mod(of_dpa, flow, flow_tlvs);
+     if (err) {
+@@ -2040,17 +2030,10 @@ static int of_dpa_cmd_add_l2_flood(OfDpa *of_dpa, OfDpaGroup *group,
+         rocker_tlv_get_le16(group_tlvs[ROCKER_TLV_OF_DPA_GROUP_COUNT]);
+ 
+     tlvs = g_new0(RockerTlv *, group->l2_flood.group_count + 1);
+-    if (!tlvs) {
+-        return -ROCKER_ENOMEM;
+-    }
+ 
+     g_free(group->l2_flood.group_ids);
+     group->l2_flood.group_ids =
+         g_new0(uint32_t, group->l2_flood.group_count);
+-    if (!group->l2_flood.group_ids) {
+-        err = -ROCKER_ENOMEM;
+-        goto err_out;
+-    }
+ 
+     rocker_tlv_parse_nested(tlvs, group->l2_flood.group_count,
+                             group_tlvs[ROCKER_TLV_OF_DPA_GROUP_IDS]);
+@@ -2157,9 +2140,6 @@ static int of_dpa_cmd_group_add(OfDpa *of_dpa, uint32_t group_id,
+     }
+ 
+     group = of_dpa_group_alloc(group_id);
+-    if (!group) {
+-        return -ROCKER_ENOMEM;
+-    }
+ 
+     err = of_dpa_cmd_group_do(of_dpa, group_id, group, group_tlvs);
+     if (err) {
+diff --git a/hw/net/rocker/rocker_world.c b/hw/net/rocker/rocker_world.c
+index 89777e9..f73c534 100644
+--- a/hw/net/rocker/rocker_world.c
++++ b/hw/net/rocker/rocker_world.c
+@@ -51,13 +51,11 @@ World *world_alloc(Rocker *r, size_t sizeof_private,
+ {
+     World *w = g_malloc0(sizeof(World) + sizeof_private);
+ 
+-    if (w) {
+-        w->r = r;
+-        w->type = type;
+-        w->ops = ops;
+-        if (w->ops->init) {
+-            w->ops->init(w);
+-        }
++    w->r = r;
++    w->type = type;
++    w->ops = ops;
++    if (w->ops->init) {
++        w->ops->init(w);
+     }
+ 
+     return w;
 -- 
 2.9.3
