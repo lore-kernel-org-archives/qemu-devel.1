@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48608)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48634)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1dDAxn-0008Pr-3w
-	for qemu-devel@nongnu.org; Tue, 23 May 2017 10:39:08 -0400
+	(envelope-from <imammedo@redhat.com>) id 1dDAxo-0008Rj-KZ
+	for qemu-devel@nongnu.org; Tue, 23 May 2017 10:39:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1dDAxl-0002hu-2Y
-	for qemu-devel@nongnu.org; Tue, 23 May 2017 10:39:07 -0400
+	(envelope-from <imammedo@redhat.com>) id 1dDAxn-0002jm-BW
+	for qemu-devel@nongnu.org; Tue, 23 May 2017 10:39:08 -0400
 From: Igor Mammedov <imammedo@redhat.com>
-Date: Tue, 23 May 2017 16:38:48 +0200
-Message-Id: <1495550330-34087-4-git-send-email-imammedo@redhat.com>
+Date: Tue, 23 May 2017 16:38:50 +0200
+Message-Id: <1495550330-34087-6-git-send-email-imammedo@redhat.com>
 In-Reply-To: <1495550330-34087-1-git-send-email-imammedo@redhat.com>
 References: <1495550330-34087-1-git-send-email-imammedo@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 3/5] numa: make sure that all cpus in has
- has_node_id set if numa is enabled
+Subject: [Qemu-devel] [PATCH v2 5/5] numa: move numa_node from CPUState into
+ target specific classes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,134 +23,222 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-arm@nongnu.org, qemu-ppc@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Andrew Jones <drjones@redhat.com>
 
-It fixes/add missing _PXM object for non mapped CPU (x86)
-and missing fdt node (virt-arm).
-
-It ensures that possible_cpus contains complete mapping if
-numa is enabled by the time machine_init() is executed.
-
-As result non completely mapped CPUs:
- 1) appear in ACPI/fdt blobs
- 2) QMP query-hotpluggable-cpus command shows bound nodes for such CPUs
- 3) allows to drop checks for has_node_id in numa only code,
-   reducing number of invariants incomplete mapping could produce
- 4) moves fixup/implicit node init from runtime numa_cpu_pre_plug()
-   (when CPU object is created) to machine_numa_finish_init() which
-   helps to fix [1, 2] and make possible_cpus complete source
-   of numa mapping available even before CPUs are created.
+Move vcpu's assocciated numa_node field out of generic CPUState
+into inherited classes that actually care about cpu<->numa mapping,
+i.e: ARMCPU, PowerPCCPU, X86CPU.
 
 Signed-off-by: Igor Mammedov <imammedo@redhat.com>
 ---
- hw/arm/virt-acpi-build.c |  4 +---
- hw/core/machine.c        | 16 ++++++++++------
- hw/i386/acpi-build.c     |  3 +--
- hw/i386/pc.c             |  4 +---
- numa.c                   |  7 +------
- 5 files changed, 14 insertions(+), 20 deletions(-)
+ include/qom/cpu.h       |  2 --
+ target/arm/cpu.h        |  2 ++
+ target/i386/cpu.h       |  1 +
+ target/ppc/cpu.h        |  1 +
+ hw/ppc/spapr.c          | 24 +++++++++++-------------
+ hw/ppc/spapr_cpu_core.c |  4 +++-
+ monitor.c               | 11 +++++++----
+ target/arm/cpu.c        |  2 +-
+ target/i386/cpu.c       |  2 +-
+ 9 files changed, 27 insertions(+), 22 deletions(-)
 
-diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
-index e585206..977a794 100644
---- a/hw/arm/virt-acpi-build.c
-+++ b/hw/arm/virt-acpi-build.c
-@@ -496,12 +496,10 @@ build_srat(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
-     srat->reserved1 = cpu_to_le32(1);
+diff --git a/include/qom/cpu.h b/include/qom/cpu.h
+index 55214ce..89ddb68 100644
+--- a/include/qom/cpu.h
++++ b/include/qom/cpu.h
+@@ -265,7 +265,6 @@ struct qemu_work_item;
+  * @cpu_index: CPU index (informative).
+  * @nr_cores: Number of cores within this CPU package.
+  * @nr_threads: Number of threads within this CPU.
+- * @numa_node: NUMA node this CPU is belonging to.
+  * @host_tid: Host thread ID.
+  * @running: #true if CPU is currently running (lockless).
+  * @has_waiter: #true if a CPU is currently waiting for the cpu_exec_end;
+@@ -314,7 +313,6 @@ struct CPUState {
  
-     for (i = 0; i < cpu_list->len; ++i) {
--        int node_id = cpu_list->cpus[i].props.has_node_id ?
--            cpu_list->cpus[i].props.node_id : 0;
-         core = acpi_data_push(table_data, sizeof(*core));
-         core->type = ACPI_SRAT_PROCESSOR_GICC;
-         core->length = sizeof(*core);
--        core->proximity = cpu_to_le32(node_id);
-+        core->proximity = cpu_to_le32(cpu_list->cpus[i].props.node_id);
-         core->acpi_processor_uid = cpu_to_le32(i);
-         core->flags = cpu_to_le32(1);
-     }
-diff --git a/hw/core/machine.c b/hw/core/machine.c
-index aaf3cff..964b75d 100644
---- a/hw/core/machine.c
-+++ b/hw/core/machine.c
-@@ -720,19 +720,23 @@ static void machine_numa_finish_init(MachineState *machine)
-         const CPUArchId *cpu_slot = &possible_cpus->cpus[i];
+     int nr_cores;
+     int nr_threads;
+-    int numa_node;
  
-         if (!cpu_slot->props.has_node_id) {
--            if (default_mapping) {
--                /* fetch default mapping from board and enable it */
--                CpuInstanceProperties props = cpu_slot->props;
--                props.has_node_id = true;
--                machine_set_cpu_numa_node(machine, &props, &error_fatal);
--            } else {
-+            /* fetch default mapping from board and enable it */
-+            CpuInstanceProperties props = cpu_slot->props;
+     struct QemuThread *thread;
+ #ifdef _WIN32
+diff --git a/target/arm/cpu.h b/target/arm/cpu.h
+index 048faed..5ffc9d8 100644
+--- a/target/arm/cpu.h
++++ b/target/arm/cpu.h
+@@ -703,6 +703,8 @@ struct ARMCPU {
+ 
+     ARMELChangeHook *el_change_hook;
+     void *el_change_hook_opaque;
 +
-+            if (!default_mapping) {
-                 /* record slots with not set mapping,
-                  * TODO: make it hard error in future */
-                 char *cpu_str = cpu_slot_to_string(cpu_slot);
-                 g_string_append_printf(s, "%sCPU %d [%s]",
-                                        s->len ? ", " : "", i, cpu_str);
-                 g_free(cpu_str);
-+
-+                /* non mapped cpus used to fallback to node 0 */
-+                props.node_id = 0;
-             }
-+
-+            props.has_node_id = true;
-+            machine_set_cpu_numa_node(machine, &props, &error_fatal);
-         }
-     }
-     if (s->len) {
-diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
-index afcadac..873880d 100644
---- a/hw/i386/acpi-build.c
-+++ b/hw/i386/acpi-build.c
-@@ -2335,8 +2335,7 @@ build_srat(GArray *table_data, BIOSLinker *linker, MachineState *machine)
-     srat->reserved1 = cpu_to_le32(1);
++    int32_t node_id; /* NUMA node this CPU is belonging to */
+ };
  
-     for (i = 0; i < apic_ids->len; i++) {
--        int node_id = apic_ids->cpus[i].props.has_node_id ?
--            apic_ids->cpus[i].props.node_id : 0;
-+        int node_id = apic_ids->cpus[i].props.node_id;
-         uint32_t apic_id = apic_ids->cpus[i].arch_id;
+ static inline ARMCPU *arm_env_get_cpu(CPUARMState *env)
+diff --git a/target/i386/cpu.h b/target/i386/cpu.h
+index c4602ca..00f35a0 100644
+--- a/target/i386/cpu.h
++++ b/target/i386/cpu.h
+@@ -1278,6 +1278,7 @@ struct X86CPU {
+     int32_t socket_id;
+     int32_t core_id;
+     int32_t thread_id;
++    int32_t node_id; /* NUMA node this CPU is belonging to */
+ };
  
-         if (apic_id < 255) {
-diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-index cf09949..84f0a6f 100644
---- a/hw/i386/pc.c
-+++ b/hw/i386/pc.c
-@@ -788,9 +788,7 @@ static FWCfgState *bochs_bios_init(AddressSpace *as, PCMachineState *pcms)
-     for (i = 0; i < cpus->len; i++) {
-         unsigned int apic_id = cpus->cpus[i].arch_id;
-         assert(apic_id < pcms->apic_id_limit);
--        if (cpus->cpus[i].props.has_node_id) {
--            numa_fw_cfg[apic_id + 1] = cpu_to_le64(cpus->cpus[i].props.node_id);
--        }
-+        numa_fw_cfg[apic_id + 1] = cpu_to_le64(cpus->cpus[i].props.node_id);
-     }
-     for (i = 0; i < nb_numa_nodes; i++) {
-         numa_fw_cfg[pcms->apic_id_limit + 1 + i] =
-diff --git a/numa.c b/numa.c
-index e30702e..4ef6dea 100644
---- a/numa.c
-+++ b/numa.c
-@@ -513,17 +513,12 @@ void numa_cpu_pre_plug(const CPUArchId *slot, DeviceState *dev, Error **errp)
-     int node_id = object_property_get_int(OBJECT(dev), "node-id", &error_abort);
+ static inline X86CPU *x86_env_get_cpu(CPUX86State *env)
+diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
+index 401e10e..31c052d 100644
+--- a/target/ppc/cpu.h
++++ b/target/ppc/cpu.h
+@@ -1205,6 +1205,7 @@ struct PowerPCCPU {
+     uint32_t compat_pvr;
+     PPCVirtualHypervisor *vhyp;
+     Object *intc;
++    int32_t node_id; /* NUMA node this CPU is belonging to */
  
-     if (node_id == CPU_UNSET_NUMA_NODE_ID) {
--        /* by default CPUState::numa_node was 0 if it wasn't set explicitly
--         * TODO: make it error when incomplete numa mapping support is removed
--         */
--        node_id = 0;
+     /* Fields related to migration compatibility hacks */
+     bool pre_2_8_migration;
+diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+index c7fee8b..96a2a74 100644
+--- a/hw/ppc/spapr.c
++++ b/hw/ppc/spapr.c
+@@ -178,25 +178,19 @@ static int spapr_fixup_cpu_smt_dt(void *fdt, int offset, PowerPCCPU *cpu,
+     return ret;
+ }
+ 
+-static int spapr_fixup_cpu_numa_dt(void *fdt, int offset, CPUState *cs)
++static int spapr_fixup_cpu_numa_dt(void *fdt, int offset, PowerPCCPU *cpu)
+ {
+-    int ret = 0;
+-    PowerPCCPU *cpu = POWERPC_CPU(cs);
+     int index = ppc_get_vcpu_dt_id(cpu);
+     uint32_t associativity[] = {cpu_to_be32(0x5),
+                                 cpu_to_be32(0x0),
+                                 cpu_to_be32(0x0),
+                                 cpu_to_be32(0x0),
+-                                cpu_to_be32(cs->numa_node),
++                                cpu_to_be32(cpu->node_id),
+                                 cpu_to_be32(index)};
+ 
+     /* Advertise NUMA via ibm,associativity */
+-    if (nb_numa_nodes > 1) {
+-        ret = fdt_setprop(fdt, offset, "ibm,associativity", associativity,
++    return fdt_setprop(fdt, offset, "ibm,associativity", associativity,
+                           sizeof(associativity));
+-    }
 -
-         /* due to bug in libvirt, it doesn't pass node-id from props on
-          * device_add as expected, so we have to fix it up here */
-         if (slot->props.has_node_id) {
-             node_id = slot->props.node_id;
-+            object_property_set_int(OBJECT(dev), node_id, "node-id", errp);
+-    return ret;
+ }
+ 
+ /* Populate the "ibm,pa-features" property */
+@@ -321,9 +315,11 @@ static int spapr_fixup_cpu_dt(void *fdt, sPAPRMachineState *spapr)
+             return ret;
          }
--        object_property_set_int(OBJECT(dev), node_id, "node-id", errp);
-     } else if (node_id != slot->props.node_id) {
-         error_setg(errp, "node-id=%d must match numa node specified "
-                    "with -numa option", node_id);
+ 
+-        ret = spapr_fixup_cpu_numa_dt(fdt, offset, cs);
+-        if (ret < 0) {
+-            return ret;
++        if (nb_numa_nodes > 1) {
++            ret = spapr_fixup_cpu_numa_dt(fdt, offset, cpu);
++            if (ret < 0) {
++                return ret;
++            }
+         }
+ 
+         ret = spapr_fixup_cpu_smt_dt(fdt, offset, cpu, compat_smt);
+@@ -538,7 +534,9 @@ static void spapr_populate_cpu_dt(CPUState *cs, void *fdt, int offset,
+     _FDT((fdt_setprop(fdt, offset, "ibm,pft-size",
+                       pft_size_prop, sizeof(pft_size_prop))));
+ 
+-    _FDT(spapr_fixup_cpu_numa_dt(fdt, offset, cs));
++    if (nb_numa_nodes > 1) {
++        _FDT(spapr_fixup_cpu_numa_dt(fdt, offset, cpu));
++    }
+ 
+     _FDT(spapr_fixup_cpu_smt_dt(fdt, offset, cpu, compat_smt));
+ 
+diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
+index a17ea07..60baf02 100644
+--- a/hw/ppc/spapr_cpu_core.c
++++ b/hw/ppc/spapr_cpu_core.c
+@@ -183,15 +183,17 @@ static void spapr_cpu_core_realize(DeviceState *dev, Error **errp)
+     for (i = 0; i < cc->nr_threads; i++) {
+         char id[32];
+         CPUState *cs;
++        PowerPCCPU *cpu;
+ 
+         obj = sc->threads + i * size;
+ 
+         object_initialize(obj, size, typename);
+         cs = CPU(obj);
++        cpu = POWERPC_CPU(cs);
+         cs->cpu_index = cc->core_id + i;
+ 
+         /* Set NUMA node for the threads belonged to core  */
+-        cs->numa_node = sc->node_id;
++        cpu->node_id = sc->node_id;
+ 
+         snprintf(id, sizeof(id), "thread[%d]", i);
+         object_property_add_child(OBJECT(sc), id, obj, &local_err);
+diff --git a/monitor.c b/monitor.c
+index afbacfe..b053c40 100644
+--- a/monitor.c
++++ b/monitor.c
+@@ -1697,23 +1697,26 @@ static void hmp_info_mtree(Monitor *mon, const QDict *qdict)
+ static void hmp_info_numa(Monitor *mon, const QDict *qdict)
+ {
+     int i;
+-    CPUState *cpu;
+     uint64_t *node_mem;
++    CpuInfoList *cpu_list, *cpu;
+ 
++    cpu_list = qmp_query_cpus(&error_abort);
+     node_mem = g_new0(uint64_t, nb_numa_nodes);
+     query_numa_node_mem(node_mem);
+     monitor_printf(mon, "%d nodes\n", nb_numa_nodes);
+     for (i = 0; i < nb_numa_nodes; i++) {
+         monitor_printf(mon, "node %d cpus:", i);
+-        CPU_FOREACH(cpu) {
+-            if (cpu->numa_node == i) {
+-                monitor_printf(mon, " %d", cpu->cpu_index);
++        for (cpu = cpu_list; cpu; cpu = cpu->next) {
++            if (cpu->value->has_props && cpu->value->props->has_node_id &&
++                cpu->value->props->node_id == i) {
++                monitor_printf(mon, " %" PRIi64, cpu->value->CPU);
+             }
+         }
+         monitor_printf(mon, "\n");
+         monitor_printf(mon, "node %d size: %" PRId64 " MB\n", i,
+                        node_mem[i] >> 20);
+     }
++    qapi_free_CpuInfoList(cpu_list);
+     g_free(node_mem);
+ }
+ 
+diff --git a/target/arm/cpu.c b/target/arm/cpu.c
+index c185eb1..09ef3a6 100644
+--- a/target/arm/cpu.c
++++ b/target/arm/cpu.c
+@@ -1573,7 +1573,7 @@ static Property arm_cpu_properties[] = {
+     DEFINE_PROP_UINT32("midr", ARMCPU, midr, 0),
+     DEFINE_PROP_UINT64("mp-affinity", ARMCPU,
+                         mp_affinity, ARM64_AFFINITY_INVALID),
+-    DEFINE_PROP_INT32("node-id", CPUState, numa_node, CPU_UNSET_NUMA_NODE_ID),
++    DEFINE_PROP_INT32("node-id", ARMCPU, node_id, CPU_UNSET_NUMA_NODE_ID),
+     DEFINE_PROP_END_OF_LIST()
+ };
+ 
+diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+index a41d595..ffb5267 100644
+--- a/target/i386/cpu.c
++++ b/target/i386/cpu.c
+@@ -3986,7 +3986,7 @@ static Property x86_cpu_properties[] = {
+     DEFINE_PROP_INT32("core-id", X86CPU, core_id, -1),
+     DEFINE_PROP_INT32("socket-id", X86CPU, socket_id, -1),
+ #endif
+-    DEFINE_PROP_INT32("node-id", CPUState, numa_node, CPU_UNSET_NUMA_NODE_ID),
++    DEFINE_PROP_INT32("node-id", X86CPU, node_id, CPU_UNSET_NUMA_NODE_ID),
+     DEFINE_PROP_BOOL("pmu", X86CPU, enable_pmu, false),
+     { .name  = "hv-spinlocks", .info  = &qdev_prop_spinlocks },
+     DEFINE_PROP_BOOL("hv-relaxed", X86CPU, hyperv_relaxed_timing, false),
 -- 
 2.7.4
