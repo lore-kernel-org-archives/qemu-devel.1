@@ -1,20 +1,40 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53569)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54208)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dDDwh-00008T-Jm
-	for qemu-devel@nongnu.org; Tue, 23 May 2017 13:50:12 -0400
+	(envelope-from <danielhb@linux.vnet.ibm.com>) id 1dDDzV-00015k-K7
+	for qemu-devel@nongnu.org; Tue, 23 May 2017 13:53:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dDDwg-0007PU-Hg
-	for qemu-devel@nongnu.org; Tue, 23 May 2017 13:50:11 -0400
-References: <87c0140e9407c08f6e74b04131b610f2e27c014c.1495560397.git.jcody@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <ede19401-6025-19f1-9c34-d1dd3ab5b073@redhat.com>
-Date: Tue, 23 May 2017 12:50:00 -0500
+	(envelope-from <danielhb@linux.vnet.ibm.com>) id 1dDDzQ-0000Qu-O4
+	for qemu-devel@nongnu.org; Tue, 23 May 2017 13:53:05 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:38215
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <danielhb@linux.vnet.ibm.com>)
+	id 1dDDzQ-0000QZ-Hk
+	for qemu-devel@nongnu.org; Tue, 23 May 2017 13:53:00 -0400
+Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v4NHnA9a056314
+	for <qemu-devel@nongnu.org>; Tue, 23 May 2017 13:52:59 -0400
+Received: from e24smtp04.br.ibm.com (e24smtp04.br.ibm.com [32.104.18.25])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2amreh4f4w-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Tue, 23 May 2017 13:52:59 -0400
+Received: from localhost
+	by e24smtp04.br.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <danielhb@linux.vnet.ibm.com>;
+	Tue, 23 May 2017 14:52:57 -0300
+References: <20170523111812.13469-1-lvivier@redhat.com>
+From: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
+Date: Tue, 23 May 2017 14:52:54 -0300
 MIME-Version: 1.0
-In-Reply-To: <87c0140e9407c08f6e74b04131b610f2e27c014c.1495560397.git.jcody@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="uh9e8GPH4vn9XQhLoLACKf78KrR42nbqK"
-Subject: Re: [Qemu-devel] [PATCH] block/gluster: glfs_lseek() workaround
+In-Reply-To: <20170523111812.13469-1-lvivier@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+Message-Id: <7509d665-566e-2570-9936-44a04bad75fe@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH 0/4] spapr: disable hotplugging
+ without OS
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,96 +43,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jeff Cody <jcody@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, ndevos@redhat.com
+To: Laurent Vivier <lvivier@redhat.com>, David Gibson <david@gibson.dropbear.id.au>
+Cc: Thomas Huth <thuth@redhat.com>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Michael Roth <mdroth@linux.vnet.ibm.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---uh9e8GPH4vn9XQhLoLACKf78KrR42nbqK
-From: Eric Blake <eblake@redhat.com>
-To: Jeff Cody <jcody@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, ndevos@redhat.com
-Message-ID: <ede19401-6025-19f1-9c34-d1dd3ab5b073@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] block/gluster: glfs_lseek() workaround
-References: <87c0140e9407c08f6e74b04131b610f2e27c014c.1495560397.git.jcody@redhat.com>
-In-Reply-To: <87c0140e9407c08f6e74b04131b610f2e27c014c.1495560397.git.jcody@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Hi Laurent,
 
-On 05/23/2017 12:27 PM, Jeff Cody wrote:
-> On current released versions of glusterfs, glfs_lseek() will sometimes
-> return invalid values for SEEK_DATA or SEEK_HOLE.  For SEEK_DATA and
-> SEEK_HOLE, the returned value should be >=3D the passed offset, or < 0 =
-in
-> the case of error:
->=20
+This is an interesting patch series. I've been working in the last weeks 
+in the DRC
+migration, mainly to solve the problem in which a hot CPU unplug will 
+not succeed after
+a migration if the CPU was hotplugged in the source. The problem 
+happened when
+migrating with virsh because Libvirt hotplugs the CPU in both source and 
+target, and
+the DRC state of the hotplugged after the migration is inconsistent. 
+This series solves the
+issue by preventing it from happening in the first place. Of course that 
+migrating DRC states
+has other uses (pending unplug operations during a migration, for 
+example) so both patch
+series can coexist.
 
-> However, occasionally glfs_lseek() for SEEK_HOLE/DATA will return a
-> value less than the passed offset, yet greater than zero.
-
-Ouch.
-
->=20
-> Although this is being fixed in gluster, we still should work around it=
-
-> in QEMU, given that multiple released versions of gluster behave this
-> way.
-
-Fair enough.
-
->=20
-> This patch treats the return case of (offs < start) the same as if an
-> error value other than ENXIO is returned; we will assume we learned
-> nothing, and there are no holes in the file.
-
-Yes, holes are merely an optimization, so treating bugs by the
-pessimistic fallback of no holes rather than aborting is reasonable.
+One possible issue I see with this series is that it breaks Libvirt 
+migration entirely if
+a CPU/mem hotplug happens in the target. With your series applied the 
+migration
+fails before start with:
 
 
-> +++ b/block/gluster.c
-> @@ -1275,7 +1275,14 @@ static int find_allocation(BlockDriverState *bs,=
- off_t start,
->      if (offs < 0) {
->          return -errno;          /* D3 or D4 */
->      }
-> -    assert(offs >=3D start);
-> +
-> +    if (offs < start) {
-> +        /* This is not a valid return by lseek().  We are safe to just=
- return
-> +         * -EIO in this case, and we'll treat it like D4. Unfortunatel=
-y some
-> +         *  versions of libgfapi will return offs < start, so an asser=
-t here
-> +         *  will unneccesarily abort QEMU. */
+# ./virsh -c 'qemu:///system' migrate --live --domain dhb_ub1704_nfs 
+--desturi qemu+ssh://target_ip/system --timeout 60 --verbose
+error: internal error: unable to execute QEMU command 'device_add': CPU 
+hotplug not supported without OS
 
-s/unneccesarily/unnecessarily/ (twice)
-
-With spelling fix,
-Reviewed-by: Eric Blake <eblake@redhat.com>
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+Note that I say "possible issue" because, although I believe we do not 
+want to break Libvirt
+if possible, I also believe that we need to think about what makes sense 
+in QEMU first.
 
 
---uh9e8GPH4vn9XQhLoLACKf78KrR42nbqK
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+Thanks,
 
-iQEcBAEBCAAGBQJZJHZIAAoJEKeha0olJ0NqNbYH/2u+hmRedgdVoWnFAQ0DrYRf
-BDKBLerjQdrZp9shUJo800nSXJdI1Ofdi0Qd5e7rlCEMS+2XjjfcxOhyrcM7qHvs
-pIHiJnFgCmkei0/AstP6e6d0Ltcjus4FGxk3qwV/fYywTpL5ZQKeYxU0zHv89yYr
-7yb7oMjlzDrT41147oSB8ebEWv6/vGEBuVF7TubE3vWAh9PGGWKXY5cdO3UbocjA
-sJdsSHn6V42M8fhzEOdnOjP80WkO7bfNmPpFm77YVSvWk3Sy0WwGNTx75qWWzf9v
-N2f7oX6Cjs+8hwhOnUHN0weuIXo7VlhkZoLIFCoj/BSUOUXl0rlPdCDTctPvmfc=
-=d6Aa
------END PGP SIGNATURE-----
 
---uh9e8GPH4vn9XQhLoLACKf78KrR42nbqK--
+Daniel
+
+
+On 05/23/2017 08:18 AM, Laurent Vivier wrote:
+> If the OS is not started, QEMU sends an event to the OS
+> that is lost and cannot be recovered. An unplug is not
+> able to restore QEMU in a coherent state.
+> So, while the OS is not started, disable CPU and memory hotplug.
+> We use option vector 6 to know if the OS is started
+>
+> This series moves error checking for memory hotplug
+> in a pre_plug function, and introduces the option
+> vector 6 management. It also revert previous
+> fix which was not really fixing the hotplug problem
+> when the OS is not running.
+>
+> Laurent Vivier (4):
+>    spapr: add pre_plug function for memory
+>    spapr: add option vector 6
+>    spapr: disable hotplugging without OS
+>    Revert "spapr: fix memory hot-unplugging"
+>
+>   hw/ppc/spapr.c              | 103 ++++++++++++++++++++++++++++++++++++--------
+>   hw/ppc/spapr_drc.c          |  20 ++-------
+>   hw/ppc/spapr_hcall.c        |   5 ++-
+>   hw/ppc/spapr_ovec.c         |   8 ++++
+>   include/hw/ppc/spapr.h      |   2 +
+>   include/hw/ppc/spapr_drc.h  |   1 -
+>   include/hw/ppc/spapr_ovec.h |   7 +++
+>   7 files changed, 109 insertions(+), 37 deletions(-)
+>
