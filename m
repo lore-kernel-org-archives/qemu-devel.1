@@ -1,25 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39775)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40011)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dD1Lj-0000u7-Ef
-	for qemu-devel@nongnu.org; Tue, 23 May 2017 00:23:12 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1dD1Nh-0001Yd-FB
+	for qemu-devel@nongnu.org; Tue, 23 May 2017 00:25:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dD1Li-0001X4-Bi
-	for qemu-devel@nongnu.org; Tue, 23 May 2017 00:23:11 -0400
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20170522211205.14265-1-hpoussin@reactos.org>
-	<20170522211205.14265-14-hpoussin@reactos.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <75ccc442-1a32-bf36-3674-ec69ce944213@amsat.org>
-Date: Tue, 23 May 2017 01:23:00 -0300
+	(envelope-from <dgibson@ozlabs.org>) id 1dD1Nf-0002CW-Nd
+	for qemu-devel@nongnu.org; Tue, 23 May 2017 00:25:13 -0400
+Date: Tue, 23 May 2017 14:07:50 +1000
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20170523040750.GS30246@umbus.fritz.box>
+References: <20170522184039.23877-1-danielhb@linux.vnet.ibm.com>
+	<20170522184039.23877-2-danielhb@linux.vnet.ibm.com>
 MIME-Version: 1.0
-In-Reply-To: <20170522211205.14265-14-hpoussin@reactos.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v2 13/13] vvfat: change OEM name to
- 'MSWIN4.1'
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="psiTe9LjpVyD9953"
+Content-Disposition: inline
+In-Reply-To: <20170522184039.23877-2-danielhb@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH v13] migration: spapr: migrate
+ pending_events of spapr state
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,61 +25,186 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>, qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
+To: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, mdroth@linux.vnet.ibm.com
 
-Hi Hervé,
 
-On 05/22/2017 06:12 PM, Hervé Poussineau wrote:
-> According to specification:
-> "'MSWIN4.1' is the recommanded setting, because it is the setting least likely
-> to cause compatibility problems. If you want to put something else in here,
-> that is your option, but the result may be that some FAT drivers might not
-> recognize the volume."
+--psiTe9LjpVyD9953
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-It also says "Typically this is some indication of what system formatted
-the volume."
-
- From https://technet.microsoft.com/en-us/library/cc976796.aspx:
-
-"Following the jump instruction is the 8-byte OEM ID, a string of 
-characters that identifies the name and version number of the operating 
-system that formatted the volume. To preserve compatibility with MS-DOS, 
-Windows 2000 records "MSDOS5.0" in this field on FAT16 and FAT32 disks. 
-On NTFS disks, Windows 2000 records "NTFS."
-You may also see the OEM ID "MSWIN4.0" on disks formatted by Windows 95 
-and "MSWIN4.1" on disks formatted by Windows 95 OSR2 and Windows 98. 
-Windows 2000 does not use the OEM ID field in the boot sector except for 
-verifying NTFS volumes."
-
-I'm curious which one is the most up-to-date, the specification v1.03 or 
-a Windows 2000. Do you have an idea if there is more MSDOS/W2K vs W95/98 
-users? Hopefully W95 is a Long time no see to me.
-
-You think having "QEMU" OEM does more harm than good?
-
->
-> Specification: "FAT: General overview of on-disk format" v1.03, page 9
-> Signed-off-by: Hervé Poussineau <hpoussin@reactos.org>
+On Mon, May 22, 2017 at 03:40:39PM -0300, Daniel Henrique Barboza wrote:
+> From: Jianjun Duan <duanj@linux.vnet.ibm.com>
+>=20
+> In racing situations between hotplug events and migration operation,
+> a rtas hotplug event could have not yet be delivered to the source
+> guest when migration is started. In this case the pending_events of
+> spapr state need be transmitted to the target so that the hotplug
+> event can be finished on the target.
+>=20
+> All the different fields of the events are encoded as defined by
+> PAPR. We can migrate them as a binary stream inside VBUFFER without
+> any concerns about data padding or endianess.
+>=20
+> pending_events is put in a subsection in the spapr state VMSD to make
+> sure migration across different versions is not broken.
+>=20
+> Signed-off-by: Jianjun Duan <duanj@linux.vnet.ibm.com>
+> Signed-off-by: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
 > ---
->  block/vvfat.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/block/vvfat.c b/block/vvfat.c
-> index 53e8faa54c..1f7f46ecea 100644
-> --- a/block/vvfat.c
-> +++ b/block/vvfat.c
-> @@ -1024,7 +1024,7 @@ static int init_directories(BDRVVVFATState* s,
->      bootsector->jump[0]=0xeb;
->      bootsector->jump[1]=0x3e;
->      bootsector->jump[2]=0x90;
-> -    memcpy(bootsector->name,"QEMU    ",8);
-> +    memcpy(bootsector->name, "MSWIN4.1", 8);
->      bootsector->sector_size=cpu_to_le16(0x200);
->      bootsector->sectors_per_cluster=s->sectors_per_cluster;
->      bootsector->reserved_sectors=cpu_to_le16(1);
->
+>  hw/ppc/spapr.c         | 32 ++++++++++++++++++++++++++++++++
+>  hw/ppc/spapr_events.c  | 19 +++++++++++++++++++
+>  include/hw/ppc/spapr.h |  3 ++-
+>  3 files changed, 53 insertions(+), 1 deletion(-)
+>=20
+> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> index 75e298b..558f951 100644
+> --- a/hw/ppc/spapr.c
+> +++ b/hw/ppc/spapr.c
+> @@ -1453,6 +1453,37 @@ static bool version_before_3(void *opaque, int ver=
+sion_id)
+>      return version_id < 3;
+>  }
+> =20
+> +static bool spapr_pending_events_needed(void *opaque)
+> +{
+> +    sPAPRMachineState *spapr =3D (sPAPRMachineState *)opaque;
+> +    return !QTAILQ_EMPTY(&spapr->pending_events);
+> +}
+> +
+> +static const VMStateDescription vmstate_spapr_event_entry =3D {
+> +    .name =3D "spapr_event_log_entry",
+> +    .version_id =3D 1,
+> +    .minimum_version_id =3D 1,
+> +    .fields =3D (VMStateField[]) {
+> +        VMSTATE_INT32(log_type, sPAPREventLogEntry),
+> +        VMSTATE_UINT32(data_size, sPAPREventLogEntry),
+> +        VMSTATE_VBUFFER_ALLOC_UINT32(data, sPAPREventLogEntry, 0,
+> +                                     NULL, data_size),
+> +        VMSTATE_END_OF_LIST()
+> +    },
+> +};
+> +
+> +static const VMStateDescription vmstate_spapr_pending_events =3D {
+> +    .name =3D "spapr_pending_events",
+> +    .version_id =3D 1,
+> +    .minimum_version_id =3D 1,
+> +    .needed =3D spapr_pending_events_needed,
+> +    .fields =3D (VMStateField[]) {
+> +        VMSTATE_QTAILQ_V(pending_events, sPAPRMachineState, 1,
+> +                         vmstate_spapr_event_entry, sPAPREventLogEntry, =
+next),
+> +        VMSTATE_END_OF_LIST()
+> +    },
+> +};
+> +
+>  static bool spapr_ov5_cas_needed(void *opaque)
+>  {
+>      sPAPRMachineState *spapr =3D opaque;
+> @@ -1551,6 +1582,7 @@ static const VMStateDescription vmstate_spapr =3D {
+>      .subsections =3D (const VMStateDescription*[]) {
+>          &vmstate_spapr_ov5_cas,
+>          &vmstate_spapr_patb_entry,
+> +        &vmstate_spapr_pending_events,
+>          NULL
+>      }
+>  };
+> diff --git a/hw/ppc/spapr_events.c b/hw/ppc/spapr_events.c
+> index 73e2a18..6c42041 100644
+> --- a/hw/ppc/spapr_events.c
+> +++ b/hw/ppc/spapr_events.c
+> @@ -346,10 +346,29 @@ static void rtas_event_log_queue(int log_type, void=
+ *data)
+>  {
+>      sPAPRMachineState *spapr =3D SPAPR_MACHINE(qdev_get_machine());
+>      sPAPREventLogEntry *entry =3D g_new(sPAPREventLogEntry, 1);
+> +    struct epow_log_full *new_epow =3D NULL;
+> +    struct hp_log_full *new_hp =3D NULL;
+> +    uint32_t ext_length =3D 0;
+> =20
+>      g_assert(data);
+>      entry->log_type =3D log_type;
+>      entry->data =3D data;
+> +
+> +    switch (log_type) {
+> +    case RTAS_LOG_TYPE_EPOW:
+> +        new_epow =3D (struct epow_log_full *)data;
+> +        ext_length =3D be32_to_cpu(new_epow->hdr.extended_length);
+> +        entry->data_size =3D ext_length + sizeof(new_epow->hdr);
+> +        break;
+> +    case RTAS_LOG_TYPE_HOTPLUG:
+> +        new_hp =3D (struct hp_log_full *)data;
+> +        ext_length =3D be32_to_cpu(new_hp->hdr.extended_length);
+> +        entry->data_size =3D ext_length + sizeof(new_hp->hdr);
+> +        break;
+> +    default:
+> +        g_assert(false);
+> +    }
+> +
 
-Regards,
+You're still overcomplicating this.  Both epow_log_full and
+hp_log_full start with an rtas_error_log header, which is what
+contains the extended_length field.  You can just case data directly
+to struct rtas_error_log *, and derive the data size from there.
 
-Phil.
+And.. come to think of it, you don't need the log_type in the vmsd
+either, since it can be derived from the summary field in the same
+header.
+
+And.. going even further, we could alter the existing code so that
+instead of embedding the rtas_error_log header in the allocated
+buffer, we could inline it into the sPAPREventLogEntry structure, with
+just the extended data in the variable sized buffer.  Then we wouldn't
+need a new data_size field, the extended_size field from the
+rtas_error_log substructure would already be exactly what we need to
+size the buffer.
+
+
+>      QTAILQ_INSERT_TAIL(&spapr->pending_events, entry, next);
+>  }
+> =20
+> diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
+> index be2b3b8..b2fcd62 100644
+> --- a/include/hw/ppc/spapr.h
+> +++ b/include/hw/ppc/spapr.h
+> @@ -598,8 +598,9 @@ struct sPAPRTCETable {
+>  sPAPRTCETable *spapr_tce_find_by_liobn(target_ulong liobn);
+> =20
+>  struct sPAPREventLogEntry {
+> -    int log_type;
+> +    int32_t log_type;
+>      void *data;
+> +    uint32_t data_size;
+>      QTAILQ_ENTRY(sPAPREventLogEntry) next;
+>  };
+> =20
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--psiTe9LjpVyD9953
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iQIcBAEBCAAGBQJZI7WUAAoJEGw4ysog2bOSFPMP+wUNY232F1Sn+kc1YUkGZbve
+hBEgfq6Hnl/gNoWKPCtIwZUnRBLSvY8i3X7MJFj8NoAAAw4HiIMCshsyHYf4Yc7F
+GwJCMkpB3LG9Dbl1cuguJFVIjdqicsAOXDNnNOkjBJoW2ml4bDoNhR1jmey8O/Fr
+91A9NANUuokHgs0C5nXypE9WDhHHtCkcY7cJwPQNRFPfo1d7HoL50NV80DSVCH5D
++uAISO8aLi/da71kODtLc6cJtLOKkfmZrGANVp1jG4bSHAmAW9OpM/Hg8KTAFTz6
+fKgNK3D8N9XQShtvdGcTKNL3KmgHd1/IaHGbp/RX95XrKpNHgyHItv7kYfJzZVEv
+URZpqR7QoyNvNlskpWUQ6QSJpp6PzRafkJwE0iD2fW+LUNlGIVEGY+8XloS64LTe
+nkSE+XXPnpPVd3y6qDf0+KDsOU7/V0xhNRZBpC0pBWskhgY/HbC281M5l4HXex+Q
+BGGRGLuzZmCm+4w32V7Orq/A6yOZ3n3+GOJRtrBt2+eS6l5okJxuJBCln6JW3spp
+iGm7grIV1D/i3zWi9jRMinhDcW1xe4lL31JUOeAgfChH1axDcpWf75zBOTR+w1xQ
+WwaiPK9+EeZpVrwamYbiZ0pFXPcolTCBdPNtj+QapBlqgku78RrkBdNhoEPwEByW
+mtrIKTq6UtZ1UK1kbp5V
+=yQrM
+-----END PGP SIGNATURE-----
+
+--psiTe9LjpVyD9953--
