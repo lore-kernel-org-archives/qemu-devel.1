@@ -1,22 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60969)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33508)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sjitindarsingh@gmail.com>) id 1dD5Oq-00073F-CM
-	for qemu-devel@nongnu.org; Tue, 23 May 2017 04:42:41 -0400
+	(envelope-from <armbru@redhat.com>) id 1dD5RM-0007s0-2i
+	for qemu-devel@nongnu.org; Tue, 23 May 2017 04:45:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sjitindarsingh@gmail.com>) id 1dD5Ol-0008JU-GE
-	for qemu-devel@nongnu.org; Tue, 23 May 2017 04:42:40 -0400
-Message-ID: <1495528948.2205.3.camel@gmail.com>
-From: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
-Date: Tue, 23 May 2017 18:42:28 +1000
-In-Reply-To: <20170523044836.GI3446@in.ibm.com>
-References: <1495172439-1504-1-git-send-email-bharata@linux.vnet.ibm.com>
-	<1495172439-1504-5-git-send-email-bharata@linux.vnet.ibm.com>
-	<1495434650.2205.1.camel@gmail.com> <20170523044836.GI3446@in.ibm.com>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [Qemu-ppc] [RFC PATCH v2 4/4] spapr: Fix migration
- of Radix guests
+	(envelope-from <armbru@redhat.com>) id 1dD5RH-0002TM-84
+	for qemu-devel@nongnu.org; Tue, 23 May 2017 04:45:16 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:50632)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dD5RH-0002SH-0F
+	for qemu-devel@nongnu.org; Tue, 23 May 2017 04:45:11 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 82FD9C059721
+	for <qemu-devel@nongnu.org>; Tue, 23 May 2017 08:45:09 +0000 (UTC)
+From: Markus Armbruster <armbru@redhat.com>
+References: <1495471335-23707-1-git-send-email-armbru@redhat.com>
+	<1495471335-23707-5-git-send-email-armbru@redhat.com>
+	<4b996cbf-028a-0f45-e7ba-6b599680fc9a@redhat.com>
+Date: Tue, 23 May 2017 10:45:02 +0200
+In-Reply-To: <4b996cbf-028a-0f45-e7ba-6b599680fc9a@redhat.com> (Eric Blake's
+	message of "Mon, 22 May 2017 13:18:59 -0500")
+Message-ID: <8760gshshd.fsf@dusky.pond.sub.org>
+MIME-Version: 1.0
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH 4/4] qapi: Reject alternates that can't
+ work with keyval_parse()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,104 +35,120 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: bharata@linux.vnet.ibm.com
-Cc: qemu-devel@nongnu.org, rnsastry@linux.vnet.ibm.com, qemu-ppc@nongnu.org, sam.bobroff@au1.ibm.com, david@gibson.dropbear.id.au
+To: Eric Blake <eblake@redhat.com>
+Cc: qemu-devel@nongnu.org, mlureau@redhat.com
 
-On Tue, 2017-05-23 at 10:18 +0530, Bharata B Rao wrote:
-> On Mon, May 22, 2017 at 04:30:50PM +1000, Suraj Jitindar Singh wrote:
-> > On Fri, 2017-05-19 at 11:10 +0530, Bharata B Rao wrote:
-> > > Fix migration of radix guests by ensuring that we issue
-> > > KVM_PPC_CONFIGURE_V3_MMU for radix case post migration.
-> > > 
-> > > Reported-by: Nageswara R Sastry <rnsastry@linux.vnet.ibm.com>
-> > > Signed-off-by: Bharata B Rao <bharata@linux.vnet.ibm.com>
-> > > ---
-> > >  hw/ppc/spapr.c | 12 ++++++++++++
-> > >  1 file changed, 12 insertions(+)
-> > > 
-> > > diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> > > index daf335c..8f20f14 100644
-> > > --- a/hw/ppc/spapr.c
-> > > +++ b/hw/ppc/spapr.c
-> > > @@ -1400,6 +1400,18 @@ static int spapr_post_load(void *opaque,
-> > > int
-> > > version_id)
-> > >          err = spapr_rtc_import_offset(&spapr->rtc, spapr-
-> > > > rtc_offset);
-> > > 
-> > >      }
-> > 
-> > This will break migration for tcg radix guests.
-> > 
-> > Given that there is essentially nothing special we need to do on
-> > incoming tcg migration, I suggest we make it:
-> > 
-> > if (spapr->patb_entry && kvm_enabled()) {
-> >     [snip]
-> > }
-> > 
-> > >  
-> > > +    if (spapr->patb_entry) {
-> > > +        PowerPCCPU *cpu = POWERPC_CPU(first_cpu);
-> > > +        if (kvmppc_has_cap_mmu_radix() && kvm_enabled()) {
-> > 
-> > Why not make this a bit more generic? Something like:
-> > 
-> > err = kvmppc_configure_v3_mmu(cpu, !!(spapr->patb_entry &
-> > PATBE1_GR),
-> > !!(cpu->env.spr[SPR_LPCR] & LPCR_GTSE), spapr->patb_entry);
-> > if (err) {
-> >     error_report("Process table config unsupported by the host");
-> >     return -EINVAL;
-> > }
-> > 
-> > return err;
-> > 
-> > While I don't think it's possible currently, there is nothing
-> > inherently incorrect about having a non-zero process table entry
-> > for a
-> > hash guest. And this saves a future update.
-> 
-> How about having this logic in spapr_post_load() ?
+Eric Blake <eblake@redhat.com> writes:
 
-Looks a lot better :)
+> On 05/22/2017 11:42 AM, Markus Armbruster wrote:
+>> Alternates are sum types like unions, but use the JSON type on the
+>> wire / QType in QObject instead of an explicit tag.  That's why we
+>> require alternate members to have distinct QTypes.
+>> 
+>> The recently introduced keyval_parse() (commit d454dbe) can only
+>> produce string scalars.  The qobject_input_visitor_new_keyval() input
+>> visitor mostly hides the difference, so code using a QObject input
+>> visitor doesn't have to care whether its input was parsed from JSON or
+>> KEY=VALUE,...  The difference leaks for alternates, as noted in commit
+>> 0ee9ae7: an non-string, non-enum scalar alternate value can't
+>
+> s/an non/a non/
 
-> 
->     if (spapr->patb_entry) {
->         /* Can be Hash(in future?) or Radix guest (current) */
->         PowerPCCPU *cpu = POWERPC_CPU(first_cpu);
->         bool radix = !!(spapr->patb_entry & PATBE1_GR);
->         bool gtse = !!(cpu->env.spr[SPR_LPCR] & LPCR_GTSE);
-> 
+Will fix.
 
-Don't think we need this if statement though. When hash with patb entry
-is possible it will still need to call kvmppc_configure_v3_mmu on
-incoming migration, that isn't radix specific.
+>> currently be expressed.
+>> 
+>> In part, this is just our insufficiently sophisticated implementation.
+>> Consider alternate type 'GuestFileWhence'.  It has an integer member
+>> and a 'QGASeek' member.  The latter is an enumeration with values
+>> 'set', 'cur', 'end'.  The meaning of b=set, b=cur, b=end, b=0, b=1 and
+>> so forth is perfectly obvious.  However, our current implementation
+>> falls apart at run time for b=0, b=1, and so forth.  Fixable, but not
+>> today; add a test case and a TODO comment.
+>> 
+>> Now consider an alternate type with a string and an integer member.
+>> What's the meaning of a=42?  Is it the string "42" or the integer 42?
+>> Whichever meaning you pick makes the other inexpressible.  This isn't
+>> just an implementation problem, it's fundamental.  Our current
+>> implementation will pick string.
+>> 
+>> So far, we haven't needed such alternates.  To make sure we stop and
+>> think before we add one that cannot sanely work with keyval_parse(),
+>> let's require alternate members to have sufficiently district
+>
+> s/district/distinct/
 
->         if (radix) {
->             /* Radix guest, configure MMU */
->             /* kvmppc_configure_v3_mmu() is NOP for TCG */
->             err = kvmppc_configure_v3_mmu(cpu, radix, gtse, spapr-
-> >patb_entry);
->             if (err) {
->                 error_report("Process table config unsupported by the
-> host");
->                 return -EINVAL;
->             }
->         } else {
->             /* Can be Hash guest (in future ?), nothing to do */
->         }
->     } else {
+Will fix.
 
-Don't need this else statement. Can just have the comment below if you
-feel it's necessary.
+>> representation in KEY=VALUE,... syntax:
+>> 
+>> * A string member clashes with any other scalar member
+>> 
+>> * An enumeration member clashes with bool members when it has value
+>>   'on' or 'off'.
+>
+> Does case-(in)sensitivity factor in here?
 
->         /* Hash guest (current), nothing to do */
->     }
-> 
-> Regards,
-> Bharata.
-> 
+KEY=VALUE,... syntax is case-sensitive.
 
-Thanks,
-Suraj
+>                                           Should it also be a problem
+> for an enum member with value 'true' or 'false'?
+
+No, because those are spelled "on" and "off" in KEY=VALUE,... syntax.
+
+If we add synonyms there, we'll have to tighten the restrictions here.
+
+>> * An enumeration member clashes with numeric members when it has a
+>>   value that starts with '-', '+', '0' or '9'.  This is a rather lazy
+>
+> s/'0' or '9'/or among '0' to '9'/
+
+Will fix.
+
+>>   approximation of the actual number syntax accepted by the visitor.
+>> 
+>>   Note that enumeration values starting with '-' and '+' are rejected
+>>   elsewhere already, but better safe than sorry.
+>> 
+>> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+>> ---
+>
+>> +++ b/scripts/qapi.py
+>> @@ -812,11 +812,26 @@ def check_alternate(expr, info):
+>>          if not qtype:
+>>              raise QAPISemError(info, "Alternate '%s' member '%s' cannot use "
+>>                                 "type '%s'" % (name, key, value))
+>> -        if qtype in types_seen:
+>> +        conflicting = set([qtype])
+>> +        if qtype == 'QTYPE_QSTRING':
+>> +            enum_expr = enum_types.get(value)
+>> +            if enum_expr:
+>> +                for v in enum_expr['data']:
+>> +                    if v in ['on', 'off']:
+>
+> what about 'true', 'false'?
+>
+> Do we care about case insensitive?
+
+See above.
+
+>> +                        conflicting.add('QTYPE_QBOOL')
+>> +                    if re.match(r'[-+0-9.]', v): # lazy, could be tightened
+>> +                        conflicting.add('QTYPE_QINT')
+>> +                        conflicting.add('QTYPE_QFLOAT')
+>> +            else:
+>> +                conflicting.add('QTYPE_QINT')
+>> +                conflicting.add('QTYPE_QFLOAT')
+>> +                conflicting.add('QTYPE_QBOOL')
+>> +        if conflicting & set(types_seen):
+>>              raise QAPISemError(info, "Alternate '%s' member '%s' can't "
+>>                                 "be distinguished from member '%s'"
+>>                                 % (name, key, types_seen[qtype]))
+>> -        types_seen[qtype] = key
+>> +        for qt in conflicting:
+>> +            types_seen[qt] = key
+>>  
+>
+> Looks good.
+
+Thanks!
