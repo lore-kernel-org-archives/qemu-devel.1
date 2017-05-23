@@ -1,30 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48657)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48708)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dD81h-0006F2-Ho
-	for qemu-devel@nongnu.org; Tue, 23 May 2017 07:30:58 -0400
+	(envelope-from <a.perevalov@samsung.com>) id 1dD82F-0006gK-Je
+	for qemu-devel@nongnu.org; Tue, 23 May 2017 07:31:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dD81d-0003T1-Ds
-	for qemu-devel@nongnu.org; Tue, 23 May 2017 07:30:57 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:52010)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dD81d-0003Sm-0b
-	for qemu-devel@nongnu.org; Tue, 23 May 2017 07:30:53 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id EC49E448D65
-	for <qemu-devel@nongnu.org>; Tue, 23 May 2017 11:30:51 +0000 (UTC)
-From: Markus Armbruster <armbru@redhat.com>
-References: <1494327362-30727-1-git-send-email-armbru@redhat.com>
-	<b3e17067-8cb1-9b2f-413f-5e8b3d3ba503@redhat.com>
-Date: Tue, 23 May 2017 13:30:50 +0200
-In-Reply-To: <b3e17067-8cb1-9b2f-413f-5e8b3d3ba503@redhat.com> (Paolo
-	Bonzini's message of "Tue, 9 May 2017 12:59:07 +0200")
-Message-ID: <87vaorbyj9.fsf@dusky.pond.sub.org>
-MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH 0/2] scsi: Minor cleanups around scsi-disk
+	(envelope-from <a.perevalov@samsung.com>) id 1dD82D-0003dU-BJ
+	for qemu-devel@nongnu.org; Tue, 23 May 2017 07:31:31 -0400
+Received: from mailout1.w1.samsung.com ([210.118.77.11]:24889)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <a.perevalov@samsung.com>)
+	id 1dD82D-0003d3-5a
+	for qemu-devel@nongnu.org; Tue, 23 May 2017 07:31:29 -0400
+Received: from eucas1p2.samsung.com (unknown [182.198.249.207])
+	by mailout1.w1.samsung.com
+	(Oracle Communications Messaging Server 7.0.5.31.0 64bit (built May 5
+	2014)) with ESMTP id <0OQE0007FLCFX870@mailout1.w1.samsung.com> for
+	qemu-devel@nongnu.org; Tue, 23 May 2017 12:31:27 +0100 (BST)
+From: Alexey Perevalov <a.perevalov@samsung.com>
+Date: Tue, 23 May 2017 14:31:02 +0300
+Message-id: <1495539071-12995-2-git-send-email-a.perevalov@samsung.com>
+In-reply-to: <1495539071-12995-1-git-send-email-a.perevalov@samsung.com>
+References: <1495539071-12995-1-git-send-email-a.perevalov@samsung.com>
+	<CGME20170523113126eucas1p163c64fe50bd44026fdf4d36716bfc4f2@eucas1p1.samsung.com>
+Subject: [Qemu-devel] [PATCH V6 01/10] userfault: add pid into uffd_msg &
+ update UFFD_FEATURE_*
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,24 +31,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: i.maximets@samsung.com, peterx@redhat.com, eblake@redhat.com, dgilbert@redhat.com, Alexey Perevalov <a.perevalov@samsung.com>
 
-Paolo Bonzini <pbonzini@redhat.com> writes:
+This commit duplicates header of "userfaultfd: provide pid in userfault msg"
+into linux kernel.
 
-> On 09/05/2017 12:56, Markus Armbruster wrote:
->> Markus Armbruster (2):
->>   block: Clarify documentation of BlockInfo member io-status
->>   virtio-scsi-test: Use scsi-hd instead of legacy scsi-disk
->> 
->>  qapi/block-core.json     | 3 ++-
->>  tests/virtio-scsi-test.c | 2 +-
->>  2 files changed, 3 insertions(+), 2 deletions(-)
->> 
->
-> Acked-by: Paolo Bonzini <pbonzini@redhat.com>
+Signed-off-by: Alexey Perevalov <a.perevalov@samsung.com>
+---
+ linux-headers/linux/userfaultfd.h | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-Thanks!
-
-The canonical path is through your tree, but I could stick it into a
-miscellaneous pull request if you like.
+diff --git a/linux-headers/linux/userfaultfd.h b/linux-headers/linux/userfaultfd.h
+index 2ed5dc3..e7c8898 100644
+--- a/linux-headers/linux/userfaultfd.h
++++ b/linux-headers/linux/userfaultfd.h
+@@ -77,6 +77,9 @@ struct uffd_msg {
+ 		struct {
+ 			__u64	flags;
+ 			__u64	address;
++			union {
++				__u32   ptid;
++			} feat;
+ 		} pagefault;
+ 
+ 		struct {
+@@ -158,6 +161,8 @@ struct uffdio_api {
+ #define UFFD_FEATURE_EVENT_MADVDONTNEED		(1<<3)
+ #define UFFD_FEATURE_MISSING_HUGETLBFS		(1<<4)
+ #define UFFD_FEATURE_MISSING_SHMEM		(1<<5)
++#define UFFD_FEATURE_EVENT_UNMAP		(1<<6)
++#define UFFD_FEATURE_THREAD_ID			(1<<7)
+ 	__u64 features;
+ 
+ 	__u64 ioctls;
+-- 
+1.8.3.1
