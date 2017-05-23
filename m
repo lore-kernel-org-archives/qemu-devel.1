@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45400)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51864)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dDIHT-0005so-Ro
-	for qemu-devel@nongnu.org; Tue, 23 May 2017 18:27:56 -0400
+	(envelope-from <leo@gaspard.io>) id 1dDIme-0002A1-Ge
+	for qemu-devel@nongnu.org; Tue, 23 May 2017 19:00:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dDIHP-0001Ih-TB
-	for qemu-devel@nongnu.org; Tue, 23 May 2017 18:27:55 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:39034)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1dDIHP-0001I9-Mi
-	for qemu-devel@nongnu.org; Tue, 23 May 2017 18:27:51 -0400
-Date: Wed, 24 May 2017 06:27:46 +0800
-From: Fam Zheng <famz@redhat.com>
-Message-ID: <20170523222746.GA12279@lemon.lan>
+	(envelope-from <leo@gaspard.io>) id 1dDImY-0007iq-Lq
+	for qemu-devel@nongnu.org; Tue, 23 May 2017 19:00:08 -0400
+Received: from smtp09.smtpout.orange.fr ([80.12.242.131]:32633
+	helo=smtp.smtpout.orange.fr)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <leo@gaspard.io>) id 1dDImY-0007EV-59
+	for qemu-devel@nongnu.org; Tue, 23 May 2017 19:00:02 -0400
 References: <149554993519.23396.2947622015408783770.stgit@bahia.lab.toulouse-stg.fr.ibm.com>
-	<149555082900.1095.16206351753645529469@c05f1edc8ed1>
-	<20170523170406.6e862ab2@bahia.ttt.fr.ibm.com>
+From: Leo Gaspard <leo@gaspard.io>
+Message-ID: <c3f72497-76d9-7400-d701-0a6446463600@gaspard.io>
+Date: Wed, 24 May 2017 00:59:29 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20170523170406.6e862ab2@bahia.ttt.fr.ibm.com>
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <149554993519.23396.2947622015408783770.stgit@bahia.lab.toulouse-stg.fr.ibm.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="qG89tMlNQ7oaoawuOF5gpRKdxHlL1OMhk"
 Subject: Re: [Qemu-devel] [PATCH v2 0/4] 9pfs: local: fix metadata of
  mapped-file security mode
 List-Id: <qemu-devel.nongnu.org>
@@ -30,28 +29,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>
-Cc: qemu-devel@nongnu.org, leo@gaspard.io
+To: Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org
 
-On Tue, 05/23 17:04, Greg Kurz wrote:
-> >   CC      hw/9pfs/9p-xattr-user.o
-> > In file included from /var/tmp/patchew-tester-tmp-5niyvzwz/src/hw/9pf=
-s/9p-local.c:18:0:
-> > /var/tmp/patchew-tester-tmp-5niyvzwz/src/hw/9pfs/9p-local.c: In funct=
-ion =E2=80=98local_set_mapped_file_attrat=E2=80=99:
-> > /var/tmp/patchew-tester-tmp-5niyvzwz/src/hw/9pfs/9p-util.h:19:5: erro=
-r: =E2=80=98map_dirfd=E2=80=99 may be used uninitialized in this function=
- [-Werror=3Dmaybe-uninitialized]
-> >      close(fd);
-> >      ^~~~~~~~~
-> > /var/tmp/patchew-tester-tmp-5niyvzwz/src/hw/9pfs/9p-local.c:235:9: no=
-te: =E2=80=98map_dirfd=E2=80=99 was declared here
-> >      int map_dirfd, map_fd;
-> >          ^~~~~~~~~
-> > cc1: all warnings being treated as errors
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--qG89tMlNQ7oaoawuOF5gpRKdxHlL1OMhk
+From: Leo Gaspard <leo@gaspard.io>
+To: Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org
+Cc: Eric Blake <eblake@redhat.com>
+Message-ID: <c3f72497-76d9-7400-d701-0a6446463600@gaspard.io>
+Subject: Re: [PATCH v2 0/4] 9pfs: local: fix metadata of mapped-file security
+ mode
+References: <149554993519.23396.2947622015408783770.stgit@bahia.lab.toulouse-stg.fr.ibm.com>
+In-Reply-To: <149554993519.23396.2947622015408783770.stgit@bahia.lab.toulouse-stg.fr.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 05/23/2017 04:32 PM, Greg Kurz wrote:
+> v2: - posted patch for CVE-2017-7493 separately
+>     - other changes available in each patch changelog
 >=20
-> This is a false positive AFAICT... what compiler is this ?
+> Leo,
+>=20
+> If you find time to test this series, I'll gladly add your Tested-by: t=
+o
+> it before merging.
 
-It's gcc, as in the snipped package list above.
+Just tested with a base of 2.9.0 with patches [1] [2] (from my
+distribution), [3] (required to apply cleanly) and this patchset.
 
-Fam
+Things appear to work as expected, and .virtfs_metadata{,_root} appear
+to be neither readable nor writable by any user.
+
+That said, one thing still bothering me with the fix in [3] is that it
+still "leaks" the host's uid/gid to the guest when a corresponding file
+in .virtfs_metadata is not present (while I'd have expected it to appear
+as root:root in the guest), but that's a separate issue, and I guess
+retro-compatibility prevents any fixing it.
+
+Thanks for these patches!
+Leo
+
+
+[1]
+https://github.com/NixOS/nixpkgs/blob/master/pkgs/applications/virtualiza=
+tion/qemu/force-uid0-on-9p.patch
+
+[2]
+https://github.com/NixOS/nixpkgs/blob/master/pkgs/applications/virtualiza=
+tion/qemu/no-etc-install.patch
+
+[3] https://lists.gnu.org/archive/html/qemu-devel/2017-05/msg03663.html
+
+
+--qG89tMlNQ7oaoawuOF5gpRKdxHlL1OMhk
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQGzBAEBCAAdFiEEplquSIS+CbvsrRWvilWEi2CQ+c8FAlkkvtEACgkQilWEi2CQ
++c8SjQv9EpshJZHZA/mBEo7nhcc4CbohjhIcNOUPtTUTUCUCFkz7sPUH7efV2HCE
+jTLIWRHDl4+dr5NJcJVvSvo/K4kRfv07zSyz96xrQq82DyfzHndvdN7f9exV1PH1
+4D10LFh24frPMtGvd+Mb/GQDa1oB1ceQRrw1iwGIdtMsEp8ROAnzyqZdlhu0mo4x
+6UPnenQ9yhiiLYNFQHru4Wh18AUBDSmDbWf18nLBHq1f7FYShWOSfpYp8yNSUGxn
+NkUJEsUB++70OBAc/77KLiJgDjcmvjaKTHX5myCMJWXdhDu19iNWGHL9pJs82QhA
+NO0hu1I6L57YLc6EUS5+LcE8hBxGqvH7j3TQaQwqYNtzJTv4zSPUh5fEmaHm7qLd
+FV4q6h4V2vDnJHU5xKPH9YM1qR3mITTiow8mIW//t9ObpoXDOSqiMSOCPzW5tQxn
+XWyImeAe5ICpenJrtpyLBKNztdnHLBf3LXMJlBK9LtXQS4glTLKGi+I/KWcm3rwv
+pTGEGKiU
+=hNof
+-----END PGP SIGNATURE-----
+
+--qG89tMlNQ7oaoawuOF5gpRKdxHlL1OMhk--
