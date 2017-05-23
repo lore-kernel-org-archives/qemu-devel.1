@@ -1,22 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40011)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40195)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dD1Nh-0001Yd-FB
-	for qemu-devel@nongnu.org; Tue, 23 May 2017 00:25:14 -0400
+	(envelope-from <peterx@redhat.com>) id 1dD1Pc-0002Nv-PC
+	for qemu-devel@nongnu.org; Tue, 23 May 2017 00:27:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dD1Nf-0002CW-Nd
-	for qemu-devel@nongnu.org; Tue, 23 May 2017 00:25:13 -0400
-Date: Tue, 23 May 2017 14:07:50 +1000
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20170523040750.GS30246@umbus.fritz.box>
-References: <20170522184039.23877-1-danielhb@linux.vnet.ibm.com>
-	<20170522184039.23877-2-danielhb@linux.vnet.ibm.com>
+	(envelope-from <peterx@redhat.com>) id 1dD1PZ-0002mD-L5
+	for qemu-devel@nongnu.org; Tue, 23 May 2017 00:27:12 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:57314)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1dD1PZ-0002lZ-C9
+	for qemu-devel@nongnu.org; Tue, 23 May 2017 00:27:09 -0400
+Date: Tue, 23 May 2017 12:27:02 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20170523042702.GC3873@pxdev.xzpeter.org>
+References: <1495231142-19055-1-git-send-email-felipe@nutanix.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="psiTe9LjpVyD9953"
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20170522184039.23877-2-danielhb@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH v13] migration: spapr: migrate
- pending_events of spapr state
+In-Reply-To: <1495231142-19055-1-git-send-email-felipe@nutanix.com>
+Subject: Re: [Qemu-devel] [PATCH] migration: keep bytes_xfer_prev init'd to
+ zero
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,186 +27,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, mdroth@linux.vnet.ibm.com
+To: Felipe Franciosi <felipe@nutanix.com>
+Cc: Juan Quintela <quintela@redhat.com>, "Jason J. Herne" <jjherne@linux.vnet.ibm.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 
-
---psiTe9LjpVyD9953
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Mon, May 22, 2017 at 03:40:39PM -0300, Daniel Henrique Barboza wrote:
-> From: Jianjun Duan <duanj@linux.vnet.ibm.com>
->=20
-> In racing situations between hotplug events and migration operation,
-> a rtas hotplug event could have not yet be delivered to the source
-> guest when migration is started. In this case the pending_events of
-> spapr state need be transmitted to the target so that the hotplug
-> event can be finished on the target.
->=20
-> All the different fields of the events are encoded as defined by
-> PAPR. We can migrate them as a binary stream inside VBUFFER without
-> any concerns about data padding or endianess.
->=20
-> pending_events is put in a subsection in the spapr state VMSD to make
-> sure migration across different versions is not broken.
->=20
-> Signed-off-by: Jianjun Duan <duanj@linux.vnet.ibm.com>
-> Signed-off-by: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
+On Fri, May 19, 2017 at 10:59:02PM +0100, Felipe Franciosi wrote:
+> The first time migration_bitmap_sync() is called, bytes_xfer_prev is set
+> to ram_state.bytes_transferred which is, at this point, zero. The next
+> time migration_bitmap_sync() is called, an iteration has happened and
+> bytes_xfer_prev is set to 'x' bytes. Most likely, more than one second
+> has passed, so the auto converge logic will be triggered and
+> bytes_xfer_now will also be set to 'x' bytes.
+> 
+> This condition is currently masked by dirty_rate_high_cnt, which will
+> wait for a few iterations before throttling. It would otherwise always
+> assume zero bytes have been copied and therefore throttle the guest
+> (possibly) prematurely.
+> 
+> Given bytes_xfer_prev is only used by the auto convergence logic, it
+> makes sense to only set its value after a check has been made against
+> bytes_xfer_now.
+> 
+> Signed-off-by: Felipe Franciosi <felipe@nutanix.com>
+> ~
 > ---
->  hw/ppc/spapr.c         | 32 ++++++++++++++++++++++++++++++++
->  hw/ppc/spapr_events.c  | 19 +++++++++++++++++++
->  include/hw/ppc/spapr.h |  3 ++-
->  3 files changed, 53 insertions(+), 1 deletion(-)
->=20
-> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> index 75e298b..558f951 100644
-> --- a/hw/ppc/spapr.c
-> +++ b/hw/ppc/spapr.c
-> @@ -1453,6 +1453,37 @@ static bool version_before_3(void *opaque, int ver=
-sion_id)
->      return version_id < 3;
->  }
-> =20
-> +static bool spapr_pending_events_needed(void *opaque)
-> +{
-> +    sPAPRMachineState *spapr =3D (sPAPRMachineState *)opaque;
-> +    return !QTAILQ_EMPTY(&spapr->pending_events);
-> +}
-> +
-> +static const VMStateDescription vmstate_spapr_event_entry =3D {
-> +    .name =3D "spapr_event_log_entry",
-> +    .version_id =3D 1,
-> +    .minimum_version_id =3D 1,
-> +    .fields =3D (VMStateField[]) {
-> +        VMSTATE_INT32(log_type, sPAPREventLogEntry),
-> +        VMSTATE_UINT32(data_size, sPAPREventLogEntry),
-> +        VMSTATE_VBUFFER_ALLOC_UINT32(data, sPAPREventLogEntry, 0,
-> +                                     NULL, data_size),
-> +        VMSTATE_END_OF_LIST()
-> +    },
-> +};
-> +
-> +static const VMStateDescription vmstate_spapr_pending_events =3D {
-> +    .name =3D "spapr_pending_events",
-> +    .version_id =3D 1,
-> +    .minimum_version_id =3D 1,
-> +    .needed =3D spapr_pending_events_needed,
-> +    .fields =3D (VMStateField[]) {
-> +        VMSTATE_QTAILQ_V(pending_events, sPAPRMachineState, 1,
-> +                         vmstate_spapr_event_entry, sPAPREventLogEntry, =
-next),
-> +        VMSTATE_END_OF_LIST()
-> +    },
-> +};
-> +
->  static bool spapr_ov5_cas_needed(void *opaque)
->  {
->      sPAPRMachineState *spapr =3D opaque;
-> @@ -1551,6 +1582,7 @@ static const VMStateDescription vmstate_spapr =3D {
->      .subsections =3D (const VMStateDescription*[]) {
->          &vmstate_spapr_ov5_cas,
->          &vmstate_spapr_patb_entry,
-> +        &vmstate_spapr_pending_events,
->          NULL
+>  migration/ram.c | 4 ----
+>  1 file changed, 4 deletions(-)
+> 
+> diff --git a/migration/ram.c b/migration/ram.c
+> index f59fdd4..793af39 100644
+> --- a/migration/ram.c
+> +++ b/migration/ram.c
+> @@ -670,10 +670,6 @@ static void migration_bitmap_sync(RAMState *rs)
+>  
+>      rs->bitmap_sync_count++;
+>  
+> -    if (!rs->bytes_xfer_prev) {
+> -        rs->bytes_xfer_prev = ram_bytes_transferred();
+> -    }
+> -
+>      if (!rs->time_last_bitmap_sync) {
+>          rs->time_last_bitmap_sync = qemu_clock_get_ms(QEMU_CLOCK_REALTIME);
 >      }
->  };
-> diff --git a/hw/ppc/spapr_events.c b/hw/ppc/spapr_events.c
-> index 73e2a18..6c42041 100644
-> --- a/hw/ppc/spapr_events.c
-> +++ b/hw/ppc/spapr_events.c
-> @@ -346,10 +346,29 @@ static void rtas_event_log_queue(int log_type, void=
- *data)
->  {
->      sPAPRMachineState *spapr =3D SPAPR_MACHINE(qdev_get_machine());
->      sPAPREventLogEntry *entry =3D g_new(sPAPREventLogEntry, 1);
-> +    struct epow_log_full *new_epow =3D NULL;
-> +    struct hp_log_full *new_hp =3D NULL;
-> +    uint32_t ext_length =3D 0;
-> =20
->      g_assert(data);
->      entry->log_type =3D log_type;
->      entry->data =3D data;
-> +
-> +    switch (log_type) {
-> +    case RTAS_LOG_TYPE_EPOW:
-> +        new_epow =3D (struct epow_log_full *)data;
-> +        ext_length =3D be32_to_cpu(new_epow->hdr.extended_length);
-> +        entry->data_size =3D ext_length + sizeof(new_epow->hdr);
-> +        break;
-> +    case RTAS_LOG_TYPE_HOTPLUG:
-> +        new_hp =3D (struct hp_log_full *)data;
-> +        ext_length =3D be32_to_cpu(new_hp->hdr.extended_length);
-> +        entry->data_size =3D ext_length + sizeof(new_hp->hdr);
-> +        break;
-> +    default:
-> +        g_assert(false);
-> +    }
-> +
+> -- 
+> 1.9.5
+> 
+> 
 
-You're still overcomplicating this.  Both epow_log_full and
-hp_log_full start with an rtas_error_log header, which is what
-contains the extended_length field.  You can just case data directly
-to struct rtas_error_log *, and derive the data size from there.
+I feel like this patch wants to correctly initialize bytes_xfer_prev,
+however I still see problem. E.g., when user specify auto-convergence
+during migration, and in the first iteration we'll always have a very
+small bytes_xfer_prev (with this patch, it'll be zero) with a very big
+bytes_xfer_now (which is the ram_bytes_transferred() value). If so, do
+you think squash below change together with current one would be more
+accurate?
 
-And.. come to think of it, you don't need the log_type in the vmsd
-either, since it can be derived from the summary field in the same
-header.
+diff --git a/migration/ram.c b/migration/ram.c
+index f59fdd4..e01a218 100644
+--- a/migration/ram.c
++++ b/migration/ram.c
+@@ -703,7 +703,8 @@ static void migration_bitmap_sync(RAMState *rs)
+                throttling */
+             bytes_xfer_now = ram_bytes_transferred();
+ 
+-            if (rs->dirty_pages_rate &&
++            /* Skip first iteration when bytes_xfer_prev not inited */
++            if (rs->bytes_xfer_prev && rs->dirty_pages_rate &&
+                (rs->num_dirty_pages_period * TARGET_PAGE_SIZE >
+                    (bytes_xfer_now - rs->bytes_xfer_prev) / 2) &&
+                (rs->dirty_rate_high_cnt++ >= 2)) {
 
-And.. going even further, we could alter the existing code so that
-instead of embedding the rtas_error_log header in the allocated
-buffer, we could inline it into the sPAPREventLogEntry structure, with
-just the extended data in the variable sized buffer.  Then we wouldn't
-need a new data_size field, the extended_size field from the
-rtas_error_log substructure would already be exactly what we need to
-size the buffer.
+Even I am not sure whether we can move bytes_xfer_prev out of RAMState
+since it's only used by migration_bitmap_sync().
 
+Thanks,
 
->      QTAILQ_INSERT_TAIL(&spapr->pending_events, entry, next);
->  }
-> =20
-> diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
-> index be2b3b8..b2fcd62 100644
-> --- a/include/hw/ppc/spapr.h
-> +++ b/include/hw/ppc/spapr.h
-> @@ -598,8 +598,9 @@ struct sPAPRTCETable {
->  sPAPRTCETable *spapr_tce_find_by_liobn(target_ulong liobn);
-> =20
->  struct sPAPREventLogEntry {
-> -    int log_type;
-> +    int32_t log_type;
->      void *data;
-> +    uint32_t data_size;
->      QTAILQ_ENTRY(sPAPREventLogEntry) next;
->  };
-> =20
-
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---psiTe9LjpVyD9953
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-
-iQIcBAEBCAAGBQJZI7WUAAoJEGw4ysog2bOSFPMP+wUNY232F1Sn+kc1YUkGZbve
-hBEgfq6Hnl/gNoWKPCtIwZUnRBLSvY8i3X7MJFj8NoAAAw4HiIMCshsyHYf4Yc7F
-GwJCMkpB3LG9Dbl1cuguJFVIjdqicsAOXDNnNOkjBJoW2ml4bDoNhR1jmey8O/Fr
-91A9NANUuokHgs0C5nXypE9WDhHHtCkcY7cJwPQNRFPfo1d7HoL50NV80DSVCH5D
-+uAISO8aLi/da71kODtLc6cJtLOKkfmZrGANVp1jG4bSHAmAW9OpM/Hg8KTAFTz6
-fKgNK3D8N9XQShtvdGcTKNL3KmgHd1/IaHGbp/RX95XrKpNHgyHItv7kYfJzZVEv
-URZpqR7QoyNvNlskpWUQ6QSJpp6PzRafkJwE0iD2fW+LUNlGIVEGY+8XloS64LTe
-nkSE+XXPnpPVd3y6qDf0+KDsOU7/V0xhNRZBpC0pBWskhgY/HbC281M5l4HXex+Q
-BGGRGLuzZmCm+4w32V7Orq/A6yOZ3n3+GOJRtrBt2+eS6l5okJxuJBCln6JW3spp
-iGm7grIV1D/i3zWi9jRMinhDcW1xe4lL31JUOeAgfChH1axDcpWf75zBOTR+w1xQ
-WwaiPK9+EeZpVrwamYbiZ0pFXPcolTCBdPNtj+QapBlqgku78RrkBdNhoEPwEByW
-mtrIKTq6UtZ1UK1kbp5V
-=yQrM
------END PGP SIGNATURE-----
-
---psiTe9LjpVyD9953--
+-- 
+Peter Xu
