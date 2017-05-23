@@ -1,25 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46951)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47970)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1dD7vY-0000j4-3i
-	for qemu-devel@nongnu.org; Tue, 23 May 2017 07:24:37 -0400
+	(envelope-from <quintela@redhat.com>) id 1dD7z0-0003pH-QL
+	for qemu-devel@nongnu.org; Tue, 23 May 2017 07:28:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1dD7vT-0000cu-7l
-	for qemu-devel@nongnu.org; Tue, 23 May 2017 07:24:36 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46172)
+	(envelope-from <quintela@redhat.com>) id 1dD7yw-0002EE-It
+	for qemu-devel@nongnu.org; Tue, 23 May 2017 07:28:10 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47022)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1dD7vT-0000cO-1k
-	for qemu-devel@nongnu.org; Tue, 23 May 2017 07:24:31 -0400
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1dD7yw-0002DN-Ai
+	for qemu-devel@nongnu.org; Tue, 23 May 2017 07:28:06 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 5341A80F7B
+	for <qemu-devel@nongnu.org>; Tue, 23 May 2017 11:28:05 +0000 (UTC)
 From: Juan Quintela <quintela@redhat.com>
-In-Reply-To: <20170522154501.GA2925@stefanha-x1.localdomain> (Stefan
-	Hajnoczi's message of "Mon, 22 May 2017 16:45:01 +0100")
-References: <CAGKXQyeuP6Oqar4R3Yuy2Y2O=Bg-=wM+wsxmaZGLt9=7fdSmmg@mail.gmail.com>
-	<20170522154501.GA2925@stefanha-x1.localdomain>
+In-Reply-To: <20170519024641.GC15294@pxdev.xzpeter.org> (Peter Xu's message of
+	"Fri, 19 May 2017 10:46:41 +0800")
+References: <20170517154756.22079-1-quintela@redhat.com>
+	<20170517154756.22079-4-quintela@redhat.com>
+	<20170518120710.GE24085@pxdev.xzpeter.org>
+	<871srm9tz4.fsf@secure.mitica>
+	<20170519024641.GC15294@pxdev.xzpeter.org>
 Reply-To: quintela@redhat.com
-Date: Tue, 23 May 2017 13:24:26 +0200
-Message-ID: <87k25795p1.fsf@secure.mitica>
+Date: Tue, 23 May 2017 13:28:01 +0200
+Message-ID: <87fufv95j2.fsf@secure.mitica>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: Re: [Qemu-devel] bitmap
+Subject: Re: [Qemu-devel] [PATCH 3/9] migration: Export qemu-file-channel.c
+ functions in its own file
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,52 +38,91 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@gmail.com>
-Cc: ali saeedi <ali.saeedi56@gmail.com>, qemu-devel@nongnu.org, pbonzini@gapps.redhat.com, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Peter Xu <peterx@redhat.com>
+Cc: qemu-devel@nongnu.org, dgilbert@redhat.com, lvivier@redhat.com
 
-Stefan Hajnoczi <stefanha@gmail.com> wrote:
-> On Mon, May 22, 2017 at 06:00:12PM +0430, ali saeedi wrote:
->> does this code 'atomic_rcu_read(&migration_bitmap_rcu)->bmap' return bitmap
->> of dirty blocks or bitmap of pages?
+Peter Xu <peterx@redhat.com> wrote:
+> On Thu, May 18, 2017 at 03:26:23PM +0200, Juan Quintela wrote:
+>> Peter Xu <peterx@redhat.com> wrote:
+>> > On Wed, May 17, 2017 at 05:47:50PM +0200, Juan Quintela wrote:
+>> >> Signed-off-by: Juan Quintela <quintela@redhat.com>
+>> >> ---
+>> >>  include/migration/migration.h |  1 +
+>> >>  include/migration/qemu-file.h |  4 ----
+>> >>  migration/channel.c           |  1 +
+>> >>  migration/colo.c              |  1 +
+>> >>  migration/migration.c         |  1 +
+>> >>  migration/qemu-file-channel.c |  1 +
+>> >>  migration/qemu-file-channel.h | 21 +++++++++++++++++++++
+>> >>  migration/rdma.c              |  1 +
+>> >>  migration/savevm.c            |  1 +
+>> >>  tests/test-vmstate.c          |  1 +
+>> >>  10 files changed, 29 insertions(+), 4 deletions(-)
+>> >>  create mode 100644 migration/qemu-file-channel.h
+>> >> 
+>> >> diff --git a/include/migration/migration.h b/include/migration/migration.h
+>> >> index e831259..8280df1 100644
+>> >> --- a/include/migration/migration.h
+>> >> +++ b/include/migration/migration.h
+>> >> @@ -19,6 +19,7 @@
+>> >>  #include "qemu/thread.h"
+>> >>  #include "qemu/notify.h"
+>> >>  #include "migration/vmstate.h"
+>> >> +#include "io/channel.h"
+>> >
+>> > Could I ask why we add this line here? I thought one of the main goals
+>> > of this series is removing things from migration.h...
+>> 
+>> 
+>> 
+>> I remove from include/migration/qemu-file.h
+>> 
+>> -#include "io/channel.h"
+>> 
+>> 
+>> Because all the QIOChannel functions in qemu-file.h are moved to
+>> qemu-file-channel.h.
+>> 
+>> Great!
+>> 
+>> But migration/vmstate.h includes qemu-file.h
+>> 
+>> And migration.h includes vmstate.h
+>> 
+>> And migration.h has this functions:
+>> 
+>> void qemu_start_incoming_migration(const char *uri, Error **errp);
+>>                                             QIOChannel *ioc,
+>>                                             Error **errp);
 >
-> This code changed recently.  Please refer to qemu.git/master when asking
-> questions on qemu-devel.
+> (In my repo, it does not need QIOChannel, which looks like:
+>  void qemu_start_incoming_migration(const char *uri, Error **errp)
+>  but it does not really matter much...)
 >
-> I think you're asking about what is now RAMBlock->bmap.  This bitmap
-> describes pages (each page is TARGET_PAGE_SIZE bytes).
+>> 
+>> void migration_tls_channel_connect(MigrationState *s,
+>>                                    QIOChannel *ioc,
+>>                                    const char *hostname,
+>>                                    Error **errp);
+>> 
+>> And nothing else declares the QIOChannel.
+>> 
+>> So, the easy solution so far is to include this by now to maintain
+>> compilation.
 >
-> This comment looks outdated, I don't think it returns a byte offset:
+> I see. It's okay to me.
 >
-> /**
->  * migration_bitmap_find_dirty: find the next dirty page from start
->  *
->  * Called with rcu_read_lock() to protect migration_bitmap
->  *
->  * Returns the byte offset within memory region of the start of a dirty page
->  *
->  * @rs: current RAM state
->  * @rb: RAMBlock where to search for dirty pages
->  * @start: page where we start the search
->  */
-> static inline
-> unsigned long migration_bitmap_find_dirty(RAMState *rs, RAMBlock *rb,
->                                           unsigned long start)
+> (Another solution would be moving these functions outside of
+>  migration/migration.h as well since they are used by migration
+>  internally as well? Anyway we already have migration/tls.c to keep
+>  migration_tls_* functions)
 >
-> Evidence:
->
-> static bool find_dirty_block(RAMState *rs, PageSearchStatus *pss, bool *again)
-> {
->     pss->page = migration_bitmap_find_dirty(rs, pss->block, pss->page);
->     ...
->     if ((pss->page << TARGET_PAGE_BITS) >= pss->block->used_length) {
->
-> Stefan
+> I'll reply to the latest version of this patch for the r-b. Thanks.
 
-Oops, thanks you are right.
+They are moved there on the new cleanup series that I sent on Thrusday.
+Internally the series were about 70 patches, so I tried to group the
+patches in series by the way that they do similar things, so some things
+like this one have not been handled "perfectly".  Grouping by this kind
+of thing made other things less clean.  Compromise, as usual.
 
-We used to have a global dirty bitmap.  As far as I know, it has always
-worked on pages.  TARGET_PAGE_SIZE to be exact.  Since 2.10 open out, we
-moved to a bitmap by RAMBlock.  It used to return an absolute page
-number, now it returns a page number relative to the start of the block.
-
-Later, Juan.
+Thanks, Juan.
