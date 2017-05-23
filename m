@@ -1,28 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60551)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38841)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dDFzw-0001dc-HP
-	for qemu-devel@nongnu.org; Tue, 23 May 2017 16:01:41 -0400
+	(envelope-from <eblake@redhat.com>) id 1dDGJf-0007VV-Lt
+	for qemu-devel@nongnu.org; Tue, 23 May 2017 16:22:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dDFzt-0007dS-Ft
-	for qemu-devel@nongnu.org; Tue, 23 May 2017 16:01:40 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58206)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1dDFzt-0007d9-Aa
-	for qemu-devel@nongnu.org; Tue, 23 May 2017 16:01:37 -0400
-References: <20170523030312.6360-1-rth@twiddle.net>
-	<20170523030312.6360-3-rth@twiddle.net>
-	<20170523104851.37tseiq5zlpwevr6@aurel32.net>
-	<d059a3b3-ac6c-27d2-5270-b6d5b32cc41d@twiddle.net>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <ed13c091-3f0f-db86-861f-01a0823d117d@redhat.com>
-Date: Tue, 23 May 2017 22:01:31 +0200
+	(envelope-from <eblake@redhat.com>) id 1dDGJe-00036f-Oj
+	for qemu-devel@nongnu.org; Tue, 23 May 2017 16:22:03 -0400
+References: <cover.1495536228.git.berto@igalia.com>
+	<504d7d07c4227d4615b72f46deb34ba77efbea2c.1495536228.git.berto@igalia.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <f40b58a9-6c63-39fc-b8ef-f830e77f1e68@redhat.com>
+Date: Tue, 23 May 2017 15:21:49 -0500
 MIME-Version: 1.0
-In-Reply-To: <d059a3b3-ac6c-27d2-5270-b6d5b32cc41d@twiddle.net>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 02/31] target/s390x: Implement EXECUTE via
- new TranslationBlock
+In-Reply-To: <504d7d07c4227d4615b72f46deb34ba77efbea2c.1495536228.git.berto@igalia.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="GTQ3hDte7T2a22AnKShGcugRut1LtOmrK"
+Subject: Re: [Qemu-devel] [PATCH 1/7] qcow2: Remove unused Error in
+ do_perform_cow()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,44 +25,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <rth@twiddle.net>, Aurelien Jarno <aurelien@aurel32.net>
-Cc: qemu-devel@nongnu.org
+To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, "Denis V . Lunev" <den@openvz.org>
 
-On 23.05.2017 17:54, Richard Henderson wrote:
-> On 05/23/2017 03:48 AM, Aurelien Jarno wrote:
->> On 2017-05-22 20:02, Richard Henderson wrote:
->>> Previously, helper_ex would construct the insn and then implement
->>> the insn via direct calls other helpers.  This was sufficient to
->>> boot Linux but that is all.
->>>
->>> It is easy enough to go the whole nine yards by stashing state for
->>> EXECUTE within the cpu, and then relying on a new TB to be created
->>> that properly and completely interprets the insn.
->>>
->>> Signed-off-by: Richard Henderson <rth@twiddle.net>
->>> ---
->>>   target/s390x/cpu.h         |   4 +-
->>>   target/s390x/helper.h      |   2 +-
->>>   target/s390x/insn-data.def |   4 +-
->>>   target/s390x/machine.c     |  19 +++++++
->>>   target/s390x/mem_helper.c  | 136
->>> +++++++++++----------------------------------
->>>   target/s390x/translate.c   | 124
->>> +++++++++++++++++++++++++----------------
->>>   6 files changed, 133 insertions(+), 156 deletions(-)
->>
->> This looks good on the principle, and finally removes a big hack. That
->> said it prevent my test system to boot. I haven't investigated why yet.
-> 
-> Hmm.  I've not got a complete environment -- merely booting a kernel up
-> to the point it fails to find a rootfs.  Which did find several problems
-> with my first attempts at this, but wouldn't have exercised paging. 
-> I'll try again to get a full install working...
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--GTQ3hDte7T2a22AnKShGcugRut1LtOmrK
+From: Eric Blake <eblake@redhat.com>
+To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>,
+ Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
+ "Denis V . Lunev" <den@openvz.org>
+Message-ID: <f40b58a9-6c63-39fc-b8ef-f830e77f1e68@redhat.com>
+Subject: Re: [PATCH 1/7] qcow2: Remove unused Error in do_perform_cow()
+References: <cover.1495536228.git.berto@igalia.com>
+ <504d7d07c4227d4615b72f46deb34ba77efbea2c.1495536228.git.berto@igalia.com>
+In-Reply-To: <504d7d07c4227d4615b72f46deb34ba77efbea2c.1495536228.git.berto@igalia.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Something nice for a quick test is also:
+On 05/23/2017 06:22 AM, Alberto Garcia wrote:
+> qcow2_encrypt_sectors() does not need an Error parameter, and we're
+> not checking its value anyway, so we can safely remove it.
 
-http://www.qemu-advent-calendar.org/2014/download/s390-moon-buggy.tar.xz
+Misleading. You are NOT removing the Error parameter from
+qcow2_encrypt_sectors(), but rather are explicitly ignoring any errors
+by passing NULL.
 
-Not sure whether it will trigger your EXECUTE problem, though.
+I'd update the commit message to something like:
 
- Thomas
+We are relying on the return value of qcow2_encrypt_sectors() to flag
+problems, but have no way to report that error to the end user.  Since
+we are just throwing away the error, we can pass NULL instead for
+simpler code.
+
+A more robust solution would figure out how to pass the original error
+(rather than a new message related to our -EIO return) back to the
+caller, but that is more invasive.
+
+>=20
+> Signed-off-by: Alberto Garcia <berto@igalia.com>
+> ---
+>  block/qcow2-cluster.c | 4 +---
+>  1 file changed, 1 insertion(+), 3 deletions(-)
+>=20
+
+With a better commit message,
+Reviewed-by: Eric Blake <eblake@redhat.com>
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--GTQ3hDte7T2a22AnKShGcugRut1LtOmrK
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEcBAEBCAAGBQJZJJndAAoJEKeha0olJ0NqMccIAKrePzXwPZ9H2agC076ykOSY
+Lk+hVtuz+XJlMjh0mGOPqCmVGc86AxL4+6aogP8oDZNOwgfRgxV5O2YdJroMcluR
+RvmuX3yoBydjKjfvZ2vkVtb2S2mcZu8RfasOO0S1oMLTFnD9ARXNPi2j3oGyOyC+
+FiDbYVArxZloVLEh27BJFmcJcCxSuJprFOPWkS3ItqbFJtYmKaioyCkR4CdsbNrU
+nCO7tuwBBFryu4SpwBD33Rp484CtpUbEncLI2ddigfIv7zjUIQ1DKbx/D95d7Hdv
+MNXDOM3tE3MLVd6L7TtluQoQV+rWVrc93f8i5YMh24iemfh0Ex1kNs8iW/thie8=
+=M3W4
+-----END PGP SIGNATURE-----
+
+--GTQ3hDte7T2a22AnKShGcugRut1LtOmrK--
