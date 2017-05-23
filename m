@@ -1,29 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53349)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57184)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yi.l.liu@linux.intel.com>) id 1dD4qQ-0007nl-1O
-	for qemu-devel@nongnu.org; Tue, 23 May 2017 04:07:08 -0400
+	(envelope-from <anton.nefedov@virtuozzo.com>) id 1dD5BU-0002ej-2r
+	for qemu-devel@nongnu.org; Tue, 23 May 2017 04:28:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yi.l.liu@linux.intel.com>) id 1dD4qM-0004mr-Ky
-	for qemu-devel@nongnu.org; Tue, 23 May 2017 04:07:06 -0400
-Received: from mga04.intel.com ([192.55.52.120]:27607)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <yi.l.liu@linux.intel.com>)
-	id 1dD4qM-0004ll-9H
-	for qemu-devel@nongnu.org; Tue, 23 May 2017 04:07:02 -0400
-Date: Tue, 23 May 2017 15:50:49 +0800
-From: "Liu, Yi L" <yi.l.liu@linux.intel.com>
-Message-ID: <20170523075049.GA3955@sky-dev>
-References: <1493201525-14418-1-git-send-email-yi.l.liu@intel.com>
-	<1493201525-14418-2-git-send-email-yi.l.liu@intel.com>
-	<c042bf90-d48b-4ebf-c01a-fca7c4875277@arm.com>
-	<20170428090458.GB15484@sky-dev>
-	<3adb4e33-db96-4133-0510-412c3bfb24fe@arm.com>
+	(envelope-from <anton.nefedov@virtuozzo.com>) id 1dD5BQ-0005Sv-UA
+	for qemu-devel@nongnu.org; Tue, 23 May 2017 04:28:52 -0400
+Received: from mail-ve1eur01on0133.outbound.protection.outlook.com
+	([104.47.1.133]:49574
+	helo=EUR01-VE1-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <anton.nefedov@virtuozzo.com>)
+	id 1dD5BQ-0005N9-BP
+	for qemu-devel@nongnu.org; Tue, 23 May 2017 04:28:48 -0400
+References: <1495186480-114192-1-git-send-email-anton.nefedov@virtuozzo.com>
+	<1495186480-114192-2-git-send-email-anton.nefedov@virtuozzo.com>
+	<f628e214-2faa-0cf2-c5d2-39b0b6505fc2@redhat.com>
+From: Anton Nefedov <anton.nefedov@virtuozzo.com>
+Message-ID: <761233e8-026d-732c-4527-a744b16eba3e@virtuozzo.com>
+Date: Tue, 23 May 2017 11:28:39 +0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <3adb4e33-db96-4133-0510-412c3bfb24fe@arm.com>
-Subject: Re: [Qemu-devel] [RFC PATCH 1/8] iommu: Introduce bind_pasid_table
- API function
+In-Reply-To: <f628e214-2faa-0cf2-c5d2-39b0b6505fc2@redhat.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v1 01/13] qcow2: alloc space for COW in one
+ chunk
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,207 +32,161 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>
-Cc: "Liu, Yi L" <yi.l.liu@intel.com>, kvm@vger.kernel.org, iommu@lists.linux-foundation.org, alex.williamson@redhat.com, peterx@redhat.com, tianyu.lan@intel.com, kevin.tian@intel.com, Jacob Pan <jacob.jun.pan@linux.intel.com>, ashok.raj@intel.com, jasowang@redhat.com, qemu-devel@nongnu.org, jacob.jun.pan@intel.com
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, "Denis V. Lunev" <den@openvz.org>, den@virtuozzo.com, mreitz@redhat.com
 
-On Fri, Apr 28, 2017 at 01:51:42PM +0100, Jean-Philippe Brucker wrote:
-> On 28/04/17 10:04, Liu, Yi L wrote:
-Hi Jean,
 
-Sorry for the delay response. Still have some follow-up comments on
-per-device or per-group. Pls refer to comments inline.
 
-> > On Wed, Apr 26, 2017 at 05:56:45PM +0100, Jean-Philippe Brucker wrote:
-> >> Hi Yi, Jacob,
-> >>
-> >> On 26/04/17 11:11, Liu, Yi L wrote:
-> >>> From: Jacob Pan <jacob.jun.pan@linux.intel.com>
-> >>>
-> >>> Virtual IOMMU was proposed to support Shared Virtual Memory (SVM) use
-> >>> case in the guest:
-> >>> https://lists.gnu.org/archive/html/qemu-devel/2016-11/msg05311.html
-> >>>
-> >>> As part of the proposed architecture, when a SVM capable PCI
-> >>> device is assigned to a guest, nested mode is turned on. Guest owns the
-> >>> first level page tables (request with PASID) and performs GVA->GPA
-> >>> translation. Second level page tables are owned by the host for GPA->HPA
-> >>> translation for both request with and without PASID.
-> >>>
-> >>> A new IOMMU driver interface is therefore needed to perform tasks as
-> >>> follows:
-> >>> * Enable nested translation and appropriate translation type
-> >>> * Assign guest PASID table pointer (in GPA) and size to host IOMMU
-> >>>
-> >>> This patch introduces new functions called iommu_(un)bind_pasid_table()
-> >>> to IOMMU APIs. Architecture specific IOMMU function can be added later
-> >>> to perform the specific steps for binding pasid table of assigned devices.
-> >>>
-> >>> This patch also adds model definition in iommu.h. It would be used to
-> >>> check if the bind request is from a compatible entity. e.g. a bind
-> >>> request from an intel_iommu emulator may not be supported by an ARM SMMU
-> >>> driver.
-> >>>
-> >>> Signed-off-by: Jacob Pan <jacob.jun.pan@linux.intel.com>
-> >>> Signed-off-by: Liu, Yi L <yi.l.liu@linux.intel.com>
-> >>> ---
-> >>>  drivers/iommu/iommu.c | 19 +++++++++++++++++++
-> >>>  include/linux/iommu.h | 31 +++++++++++++++++++++++++++++++
-> >>>  2 files changed, 50 insertions(+)
-> >>>
-> >>> diff --git a/drivers/iommu/iommu.c b/drivers/iommu/iommu.c
-> >>> index dbe7f65..f2da636 100644
-> >>> --- a/drivers/iommu/iommu.c
-> >>> +++ b/drivers/iommu/iommu.c
-> >>> @@ -1134,6 +1134,25 @@ int iommu_attach_device(struct iommu_domain *domain, struct device *dev)
-> >>>  }
-> >>>  EXPORT_SYMBOL_GPL(iommu_attach_device);
-> >>>  
-> >>> +int iommu_bind_pasid_table(struct iommu_domain *domain, struct device *dev,
-> >>> +			struct pasid_table_info *pasidt_binfo)
-> >>
-> >> I guess that domain can always be deduced from dev using
-> >> iommu_get_domain_for_dev, and doesn't need to be passed as argument?
-> >>
-> >> For the next version of my SVM series, I was thinking of passing group
-> >> instead of device to iommu_bind. Since all devices in a group are expected
-> >> to share the same mappings (whether they want it or not), users will have
-> > 
-> > Virtual address space is not tied to protection domain as I/O virtual address
-> > space does. Is it really necessary to affect all the devices in this group.
-> > Or it is just for consistence?
-> 
-> It's mostly about consistency, and also avoid hiding implicit behavior in
-> the IOMMU driver. I have the following example, described using group and
-> domain structures from the IOMMU API:
->                  ____________________
->                 |IOMMU  ____________ |
->                 |      |DOM  ______ ||
->                 |      |    |GRP   |||     bind
->                 |      |    |    A<-----------------Task 1
->                 |      |    |    B |||
->                 |      |    |______|||
->                 |      |     ______ ||
->                 |      |    |GRP   |||
->                 |      |    |    C |||
->                 |      |    |______|||
->                 |      |____________||
->                 |       ____________ |
->                 |      |DOM  ______ ||
->                 |      |    |GRP   |||
->                 |      |    |    D |||
->                 |      |    |______|||
->                 |      |____________||
->                 |____________________|
-> 
-> Let's take PCI functions A, B, C, and D, all with PASID capabilities. Due
-> to some hardware limitation (in the bus, the device or the IOMMU), B can
-> see all DMA transactions issued by A. A and B are therefore in the same
-> IOMMU group. C and D can be isolated by the IOMMU, so they each have their
-> own group.
-> 
-> (As far as I know, in the SVM world at the moment, devices are neatly
-> integrated and there is no need for putting multiple devices in the same
-> IOMMU group, but I don't think we should expect all future SVM systems to
-> be well-behaved.)
+On 05/22/2017 10:00 PM, Eric Blake wrote:
+> On 05/19/2017 04:34 AM, Anton Nefedov wrote:
+>> From: "Denis V. Lunev" <den@openvz.org>
+>>
+>> Currently each single write operation can result in 3 write operations
+>> if guest offsets are not cluster aligned. One write is performed for the
+>> real payload and two for COW-ed areas. Thus the data possibly lays
+>> non-contiguously on the host filesystem. This will reduce further
+>> sequential read performance significantly.
+>>
+>> The patch allocates the space in the file with cluster granularity,
+>> ensuring
+>>   1. better host offset locality
+>>   2. less space allocation operations
+>>      (which can be expensive on distributed storages)
 >
-> So when a user binds Task 1 to device A, it is *implicitly* giving device
-> B access to Task 1 as well. Simply because the IOMMU is unable to isolate
-> A from B, PASID or not. B could access the same address space as A, even
-> if you don't call bind again to explicitly attach the PASID table to B.
-> 
-> If the bind is done with device as argument, maybe users will believe that
-> using PASIDs provides an additional level of isolation within a group,
-> when it really doesn't. That's why I'm inclined to have the whole bind API
-> be on groups rather than devices, if only for clarity.
+> s/storages/storage/
+>
 
-This may depend on how the user understand the isolation. I think different
-PASID does mean different address space. From this perspective, it does look
-like isolation.
+Done.
 
-> But I don't know, maybe a comment explaining the above would be sufficient.
-> 
-> To be frank my comment about group versus device is partly to make sure
-> that I grasp the various concepts correctly and that we're on the same
-> page. Doing the bind on groups is less significant in your case, for PASID
-> table binding, because VFIO already takes care of IOMMU group properly. In
-> my case I expect DRM, network, DMA drivers to use the API as well for
-> binding tasks, and I don't want to introduce ambiguity in the API that
-> would lead to security holes later.
+>>
+>> Signed-off-by: Denis V. Lunev <den@openvz.org>
+>> Signed-off-by: Anton Nefedov <anton.nefedov@virtuozzo.com>
+>> ---
+>>  block/qcow2.c | 32 +++++++++++++++++++++++++++++++-
+>>  1 file changed, 31 insertions(+), 1 deletion(-)
+>>
+>
+>> diff --git a/block/qcow2.c b/block/qcow2.c
+>> index a8d61f0..2e6a0ec 100644
+>> --- a/block/qcow2.c
+>> +++ b/block/qcow2.c
+>> @@ -1575,6 +1575,32 @@ fail:
+>>      return ret;
+>>  }
+>>
+>> +static void handle_alloc_space(BlockDriverState *bs, QCowL2Meta *l2meta)
+>> +{
+>> +    BDRVQcow2State *s = bs->opaque;
+>> +    BlockDriverState *file = bs->file->bs;
+>> +    QCowL2Meta *m;
+>> +    int ret;
+>> +
+>> +    for (m = l2meta; m != NULL; m = m->next) {
+>> +        uint64_t bytes = m->nb_clusters << s->cluster_bits;
+>> +
+>> +        if (m->cow_start.nb_bytes == 0 && m->cow_end.nb_bytes == 0) {
+>> +            continue;
+>> +        }
+>> +
+>> +        /* try to alloc host space in one chunk for better locality */
+>> +        ret = file->drv->bdrv_co_pwrite_zeroes(file, m->alloc_offset, bytes, 0);
+>
+> Are we guaranteed that this is a fast operation?  (That is, it either
+> results in a hole or an error, and doesn't waste time tediously writing
+> actual zeroes)
+>
 
-For this part, would you provide more detail about why it would be more
-significant to bind on group level in your case? I think we need strong
-reason to support it. Currently, the other map_page APIs are passing
-device as argument. Would it also be recommended to use group as argument?
+well, block_int.h reads:
 
-Thanks,
-Yi L
+/*
+* Efficiently zero a region of the disk image. Typically an image format
+* would use a compact metadata representation to implement this. This
+* function pointer may be NULL or return -ENOSUP and .bdrv_co_writev()
+* will be called instead.
+*/
+int coroutine_fn (*bdrv_co_pwrite_zeroes)(BlockDriverState *bs,
+int64_t offset, int count, BdrvRequestFlags flags);
 
-> >> to do iommu_group_for_each_dev anyway (as you do in patch 6/8). So it
-> >> might be simpler to let the IOMMU core take the group lock and do
-> >> group->domain->ops->bind_task(dev...) for each device. The question also
-> >> holds for iommu_do_invalidate in patch 3/8.
-> > 
-> > In my understanding, it is moving the for_each_dev loop into iommu driver?
-> > Is it?
-> 
-> Yes, that's what I meant
-> 
-> >> This way the prototypes would be:
-> >> int iommu_bind...(struct iommu_group *group, struct ... *info)
-> >> int iommu_unbind...(struct iommu_group *group, struct ...*info)
-> >> int iommu_invalidate...(struct iommu_group *group, struct ...*info)
-> > 
-> > For PASID table binding from guest, I think it'd better to be per-device op
-> > since the bind operation wants to modify the host context entry. But we may
-> > still share the API and do things differently in iommu driver.
-> 
-> Sure, as said above the use cases for PASID table and single PASID binding
-> are different, sharing the API is not strictly necessary.
-> 
-> > For invalidation, I think it'd better to be per-group. Actually, with guest
-> > IOMMU exists, there is only one group in a domain on Intel platform. Do it for
-> > each device is not expected. How about it on ARM?
-> 
-> In ARM systems with the DMA API (IOMMU_DOMAIN_DMA), there is one group per
-> domain. But with VFIO (IOMMU_DOMAIN_UNMANAGED), VFIO will try to attach
-> multiple groups in the same container to the same domain when possible.
-> 
-> >> For PASID table binding it might not matter much, as VFIO will most likely
-> >> be the only user. But task binding will be called by device drivers, which
-> >> by now should be encouraged to do things at iommu_group granularity.
-> >> Alternatively it could be done implicitly like in iommu_attach_device,
-> >> with "iommu_bind_device_x" calling "iommu_bind_group_x".
-> > 
-> > Do you mean the bind task from userspace driver? I guess you're trying to do
-> > different types of binding request in a single svm_bind API?
-> > 
-> >>
-> >> Extending this reasoning, since groups in a domain are also supposed to
-> >> have the same mappings, then similarly to map/unmap,
-> >> bind/unbind/invalidate should really be done with an iommu_domain (and
-> >> nothing else) as target argument. However this requires the IOMMU core to
-> >> keep a group list in each domain, which might complicate things a little
-> >> too much.
-> >>
-> >> But "all devices in a domain share the same PASID table" is the paradigm
-> >> I'm currently using in the guts of arm-smmu-v3. And I wonder if, as with
-> >> iommu_group, it should be made more explicit to users, so they don't
-> >> assume that devices within a domain are isolated from each others with
-> >> regard to PASID DMA.
-> > 
-> > Is the isolation you mentioned means forbidding to do PASID DMA to the same
-> > virtual address space when the device comes from different domain?
-> 
-> In the above example, devices A, B and C are in the same IOMMU domain
-> (because, for instance, user put the two groups in the same VFIO
-> container.) Then in the SMMUv3 driver they would all share the same PASID
-> table. A, B and C can access Task 1 with the PASID obtained during the
-> depicted bind. They don't need to call bind again for device C, though it
-> would be good practice.
-> 
-> But D is in a different domain, so unless you also call bind on Task 1 for
-> device D, there is no way that D can access Task 1.
-> 
-> Thanks,
-> Jean
-> 
+
+(and that's why the driver function is used directly, bypassing the 
+'safe' bdrv interface that would try to write zeroes no matter the cost)
+
+As far as I checked the drivers mostly follow the idea
+
+>> +
+>> +        if (ret != 0) {
+>> +            continue;
+>> +        }
+>
+> Supposing we are using a file system that doesn't support holes, then
+> ret will not be zero, and we ended up not allocating anything after all.
+>  Is that a problem that we are just blindly continuing the loop as our
+> reaction to the error?
+>
+> /reads further
+>
+> I guess not - you aren't reacting to any error call, but merely using
+> the side effect that an allocation happened for speed when it worked,
+> and ignoring failure (you get the old behavior of the write() now
+> causing the allocation) when it didn't.
+>
+
+yes, exactly
+
+>> +
+>> +        file->total_sectors = MAX(file->total_sectors,
+>> +                                  (m->alloc_offset + bytes) / BDRV_SECTOR_SIZE);
+>> +    }
+>> +}
+>> +
+>>  static coroutine_fn int qcow2_co_pwritev(BlockDriverState *bs, uint64_t offset,
+>>                                           uint64_t bytes, QEMUIOVector *qiov,
+>>                                           int flags)
+>> @@ -1656,8 +1682,12 @@ static coroutine_fn int qcow2_co_pwritev(BlockDriverState *bs, uint64_t offset,
+>>          if (ret < 0) {
+>>              goto fail;
+>>          }
+>> -
+>>          qemu_co_mutex_unlock(&s->lock);
+>> +
+>> +        if (bs->file->bs->drv->bdrv_co_pwrite_zeroes != NULL) {
+>> +            handle_alloc_space(bs, l2meta);
+>> +        }
+>
+> Is it really a good idea to be modifying the underlying protocol image
+> outside of the mutex?
+>
+
+as far as I understand, qcow2 usually modifies the underlying image
+outside of the mutex? I guess it's qcow2 metadata that we wouldn't want
+to touch unlocked
+
+> At any rate, it looks like your patch is doing a best-effort write
+> zeroes as an attempt to trigger consecutive allocation of the entire
+> cluster in the underlying protocol right after a cluster has been
+> allocated at the qcow2 format layer.  Which means there are more
+> syscalls now than there were previously, but now when we do three
+> write() calls at offsets B, A, C, those three calls are into file space
+> that was allocated earlier by the write zeroes, rather than fresh calls
+> into unallocated space that is likely to trigger up to three disjoint
+> allocations.
+>
+> As a discussion point, wouldn't we achieve the same effect of less
+> fragmentation if we instead collect our data into a bounce buffer, and
+> only then do a single write() (or more likely, a writev() where the iov
+> is set up to reconstruct a single buffer on the syscall, but where the
+> source data is still at different offsets)?  We'd be avoiding the extra
+> syscalls of pre-allocating the cluster, and while our write() call is
+> still causing allocations, at least it is now one cluster-aligned
+> write() rather than three sub-cluster out-of-order write()s.
+>
+
+I think yes we would achieve the same effect of less fragmentation;
+but pre-zeroing also makes the following patch possible (to skip COW if 
+there is no backing data)
+
+I have follow-up patches which merge initial data and COW padding into a
+single writev(). After those it should become reasonable to skip
+cluster pre-zeroing (for cases when there is backing data).
+
+/Anton
