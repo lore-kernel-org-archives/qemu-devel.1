@@ -1,28 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51880)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53569)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aurelien@aurel32.net>) id 1dDDrZ-0006Bb-4m
-	for qemu-devel@nongnu.org; Tue, 23 May 2017 13:44:54 -0400
+	(envelope-from <eblake@redhat.com>) id 1dDDwh-00008T-Jm
+	for qemu-devel@nongnu.org; Tue, 23 May 2017 13:50:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aurelien@aurel32.net>) id 1dDDrY-0005X1-22
-	for qemu-devel@nongnu.org; Tue, 23 May 2017 13:44:53 -0400
-Received: from hall.aurel32.net ([2001:bc8:30d7:100::1]:46532)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <aurelien@aurel32.net>)
-	id 1dDDrX-0005Wi-SM
-	for qemu-devel@nongnu.org; Tue, 23 May 2017 13:44:51 -0400
-Date: Tue, 23 May 2017 19:44:49 +0200
-From: Aurelien Jarno <aurelien@aurel32.net>
-Message-ID: <20170523174449.yibfredwo2vaumbg@aurel32.net>
-References: <20170523030312.6360-1-rth@twiddle.net>
-	<20170523030312.6360-30-rth@twiddle.net>
-	<20170523122820.owcu3pt6tympfeli@aurel32.net>
-	<161a2a51-8b97-dd84-7828-c2e8a2db5524@twiddle.net>
+	(envelope-from <eblake@redhat.com>) id 1dDDwg-0007PU-Hg
+	for qemu-devel@nongnu.org; Tue, 23 May 2017 13:50:11 -0400
+References: <87c0140e9407c08f6e74b04131b610f2e27c014c.1495560397.git.jcody@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <ede19401-6025-19f1-9c34-d1dd3ab5b073@redhat.com>
+Date: Tue, 23 May 2017 12:50:00 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <161a2a51-8b97-dd84-7828-c2e8a2db5524@twiddle.net>
-Subject: Re: [Qemu-devel] [PATCH 29/31] target/s390x: Use atomic operations
- for COMPARE SWAP PURGE
+In-Reply-To: <87c0140e9407c08f6e74b04131b610f2e27c014c.1495560397.git.jcody@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="uh9e8GPH4vn9XQhLoLACKf78KrR42nbqK"
+Subject: Re: [Qemu-devel] [PATCH] block/gluster: glfs_lseek() workaround
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,66 +23,96 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <rth@twiddle.net>
-Cc: qemu-devel@nongnu.org
+To: Jeff Cody <jcody@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, ndevos@redhat.com
 
-On 2017-05-23 09:31, Richard Henderson wrote:
-> On 05/23/2017 05:28 AM, Aurelien Jarno wrote:
-> > On 2017-05-22 20:03, Richard Henderson wrote:
-> > > +/* flush global tlb */
-> > > +void HELPER(purge)(CPUS390XState *env)
-> > > +{
-> > > +    S390CPU *cpu = s390_env_get_cpu(env);
-> > > +
-> > > +    tlb_flush_all_cpus(CPU(cpu));
-> > 
-> > > From what I understand from the PoP, the instruction should not complete
-> > before the TLB has been purged on all CPUs. Therefore I guess
-> > tlb_flush_all_cpus_synced() should be used instead.
-> I don't read that from this:
-> 
-> # (1) all specified entries have been cleared
-> # from the ALB and TLB of this CPU and
-> 
-> # (2) all other
-> # CPUs in the configuration have completed any stor-
-> # age accesses, including the updating of the change
-> # and reference bits, by using the specified ALB and
-> # TLB entries.
-> 
-> It talks about referenced bits being updated -- presumably before the tlb
-> entry is flushed.  But it doesn't say "all specified ALB and TLB entries of
-> other CPUs in the configuration".
-> 
-> But if you still disagree, it's certainly an easy change as you note.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--uh9e8GPH4vn9XQhLoLACKf78KrR42nbqK
+From: Eric Blake <eblake@redhat.com>
+To: Jeff Cody <jcody@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, ndevos@redhat.com
+Message-ID: <ede19401-6025-19f1-9c34-d1dd3ab5b073@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] block/gluster: glfs_lseek() workaround
+References: <87c0140e9407c08f6e74b04131b610f2e27c014c.1495560397.git.jcody@redhat.com>
+In-Reply-To: <87c0140e9407c08f6e74b04131b610f2e27c014c.1495560397.git.jcody@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Well i have to say it's not very clear. My point is that given the way
-QEMU model things, if we want to ensure that all storage accesses using
-the specified TLB entries are completed, we currently can only just make
-sure that the all TLB entries have been flushed.
- 
-> > > +    tcg_gen_atomic_cmpxchg_i64(old, addr, o->in1, o->out2,
-> > 
-> > Here the prep generator took the 32-bit version of in1. I guess the same
-> > should be done for out2.
-> 
-> No, in1 is zero-extended for its use ...
-> 
-> > 
-> > > +                               get_mem_index(s), mop | MO_ALIGN);
-> > > +    tcg_temp_free_i64(addr);
-> > > +
-> > > +    /* Are the memory and expected values (un)equal?  */
-> > > +    cc = tcg_temp_new_i64();
-> > > +    tcg_gen_setcond_i64(TCG_COND_NE, cc, o->in1, old);
-> 
-> ... here.
-> 
-> For out2 above, cmpxchg acts as any other store wrt MO_TEUL, in that it
-> ignores the unused upper bits.
+On 05/23/2017 12:27 PM, Jeff Cody wrote:
+> On current released versions of glusterfs, glfs_lseek() will sometimes
+> return invalid values for SEEK_DATA or SEEK_HOLE.  For SEEK_DATA and
+> SEEK_HOLE, the returned value should be >=3D the passed offset, or < 0 =
+in
+> the case of error:
+>=20
 
-Indeed you are correct, I read it too fast.
+> However, occasionally glfs_lseek() for SEEK_HOLE/DATA will return a
+> value less than the passed offset, yet greater than zero.
 
--- 
-Aurelien Jarno                          GPG: 4096R/1DDD8C9B
-aurelien@aurel32.net                 http://www.aurel32.net
+Ouch.
+
+>=20
+> Although this is being fixed in gluster, we still should work around it=
+
+> in QEMU, given that multiple released versions of gluster behave this
+> way.
+
+Fair enough.
+
+>=20
+> This patch treats the return case of (offs < start) the same as if an
+> error value other than ENXIO is returned; we will assume we learned
+> nothing, and there are no holes in the file.
+
+Yes, holes are merely an optimization, so treating bugs by the
+pessimistic fallback of no holes rather than aborting is reasonable.
+
+
+> +++ b/block/gluster.c
+> @@ -1275,7 +1275,14 @@ static int find_allocation(BlockDriverState *bs,=
+ off_t start,
+>      if (offs < 0) {
+>          return -errno;          /* D3 or D4 */
+>      }
+> -    assert(offs >=3D start);
+> +
+> +    if (offs < start) {
+> +        /* This is not a valid return by lseek().  We are safe to just=
+ return
+> +         * -EIO in this case, and we'll treat it like D4. Unfortunatel=
+y some
+> +         *  versions of libgfapi will return offs < start, so an asser=
+t here
+> +         *  will unneccesarily abort QEMU. */
+
+s/unneccesarily/unnecessarily/ (twice)
+
+With spelling fix,
+Reviewed-by: Eric Blake <eblake@redhat.com>
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--uh9e8GPH4vn9XQhLoLACKf78KrR42nbqK
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEcBAEBCAAGBQJZJHZIAAoJEKeha0olJ0NqNbYH/2u+hmRedgdVoWnFAQ0DrYRf
+BDKBLerjQdrZp9shUJo800nSXJdI1Ofdi0Qd5e7rlCEMS+2XjjfcxOhyrcM7qHvs
+pIHiJnFgCmkei0/AstP6e6d0Ltcjus4FGxk3qwV/fYywTpL5ZQKeYxU0zHv89yYr
+7yb7oMjlzDrT41147oSB8ebEWv6/vGEBuVF7TubE3vWAh9PGGWKXY5cdO3UbocjA
+sJdsSHn6V42M8fhzEOdnOjP80WkO7bfNmPpFm77YVSvWk3Sy0WwGNTx75qWWzf9v
+N2f7oX6Cjs+8hwhOnUHN0weuIXo7VlhkZoLIFCoj/BSUOUXl0rlPdCDTctPvmfc=
+=d6Aa
+-----END PGP SIGNATURE-----
+
+--uh9e8GPH4vn9XQhLoLACKf78KrR42nbqK--
