@@ -1,16 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45345)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46668)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lvivier@redhat.com>) id 1dD7pa-0003pv-DG
-	for qemu-devel@nongnu.org; Tue, 23 May 2017 07:18:27 -0400
+	(envelope-from <berto@igalia.com>) id 1dD7ux-0000Ab-Ez
+	for qemu-devel@nongnu.org; Tue, 23 May 2017 07:24:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lvivier@redhat.com>) id 1dD7pZ-0006Ei-Dj
-	for qemu-devel@nongnu.org; Tue, 23 May 2017 07:18:26 -0400
-From: Laurent Vivier <lvivier@redhat.com>
-Date: Tue, 23 May 2017 13:18:12 +0200
-Message-Id: <20170523111812.13469-5-lvivier@redhat.com>
-In-Reply-To: <20170523111812.13469-1-lvivier@redhat.com>
-References: <20170523111812.13469-1-lvivier@redhat.com>
-Subject: [Qemu-devel] [PATCH 4/4] Revert "spapr: fix memory hot-unplugging"
+	(envelope-from <berto@igalia.com>) id 1dD7us-0000HV-F2
+	for qemu-devel@nongnu.org; Tue, 23 May 2017 07:23:59 -0400
+From: Alberto Garcia <berto@igalia.com>
+Date: Tue, 23 May 2017 13:22:58 +0200
+Message-Id: <b3659d971731e5ef832399400a0f14daa580fce4.1495536228.git.berto@igalia.com>
+In-Reply-To: <cover.1495536228.git.berto@igalia.com>
+References: <cover.1495536228.git.berto@igalia.com>
+In-Reply-To: <cover.1495536228.git.berto@igalia.com>
+References: <cover.1495536228.git.berto@igalia.com>
+Subject: [Qemu-devel] [PATCH 3/7] qcow2: Make perform_cow() call
+ do_perform_cow() twice
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -19,78 +22,99 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: Thomas Huth <thuth@redhat.com>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Michael Roth <mdroth@linux.vnet.ibm.com>, Laurent Vivier <lvivier@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Eric Blake <eblake@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, "Denis V . Lunev" <den@openvz.org>, Alberto Garcia <berto@igalia.com>
 
-This reverts commit fe6824d12642b005c69123ecf8631f9b13553f8b.
+Instead of calling perform_cow() twice with a different COW region
+each time, call it just once and make perform_cow() handle both
+regions.
 
-This didn't fix the problem. Once the hotplug has been started
-some memory is allocated and some structures are allocated.
-We don't free it when we ignore the unplug, and we can't because
-they can be in use by the kernel.
+This patch simply moves code around. The next one will do the actual
+reordering of the COW operations.
 
-Signed-off-by: Laurent Vivier <lvivier@redhat.com>
+Signed-off-by: Alberto Garcia <berto@igalia.com>
 ---
- hw/ppc/spapr_drc.c         | 20 +++-----------------
- include/hw/ppc/spapr_drc.h |  1 -
- 2 files changed, 3 insertions(+), 18 deletions(-)
+ block/qcow2-cluster.c | 38 +++++++++++++++++++++++---------------
+ 1 file changed, 23 insertions(+), 15 deletions(-)
 
-diff --git a/hw/ppc/spapr_drc.c b/hw/ppc/spapr_drc.c
-index 9fa5545..2bda00f 100644
---- a/hw/ppc/spapr_drc.c
-+++ b/hw/ppc/spapr_drc.c
-@@ -135,17 +135,6 @@ static uint32_t set_allocation_state(sPAPRDRConnector *drc,
-         if (!drc->dev) {
-             return RTAS_OUT_NO_SUCH_INDICATOR;
-         }
--        if (drc->awaiting_release && drc->awaiting_allocation) {
--            /* kernel is acknowledging a previous hotplug event
--             * while we are already removing it.
--             * it's safe to ignore awaiting_allocation here since we know the
--             * situation is predicated on the guest either already having done
--             * so (boot-time hotplug), or never being able to acquire in the
--             * first place (hotplug followed by immediate unplug).
--             */
--            drc->awaiting_allocation_skippable = true;
--            return RTAS_OUT_NO_SUCH_INDICATOR;
--        }
+diff --git a/block/qcow2-cluster.c b/block/qcow2-cluster.c
+index 6757875ec9..59a0ffba1a 100644
+--- a/block/qcow2-cluster.c
++++ b/block/qcow2-cluster.c
+@@ -414,6 +414,10 @@ static int coroutine_fn do_perform_cow(BlockDriverState *bs,
+     struct iovec iov;
+     int ret;
+ 
++    if (bytes == 0) {
++        return 0;
++    }
++
+     iov.iov_len = bytes;
+     iov.iov_base = qemu_try_blockalign(bs, iov.iov_len);
+     if (iov.iov_base == NULL) {
+@@ -751,31 +755,40 @@ uint64_t qcow2_alloc_compressed_cluster_offset(BlockDriverState *bs,
+     return cluster_offset;
+ }
+ 
+-static int perform_cow(BlockDriverState *bs, QCowL2Meta *m, Qcow2COWRegion *r)
++static int perform_cow(BlockDriverState *bs, QCowL2Meta *m)
+ {
+     BDRVQcow2State *s = bs->opaque;
++    Qcow2COWRegion *start = &m->cow_start;
++    Qcow2COWRegion *end = &m->cow_end;
+     int ret;
+ 
+-    if (r->nb_bytes == 0) {
++    if (start->nb_bytes == 0 && end->nb_bytes == 0) {
+         return 0;
      }
  
-     if (drc->type != SPAPR_DR_CONNECTOR_TYPE_PCI) {
-@@ -447,11 +436,9 @@ static void detach(sPAPRDRConnector *drc, DeviceState *d,
+     qemu_co_mutex_unlock(&s->lock);
+-    ret = do_perform_cow(bs, m->offset, m->alloc_offset, r->offset, r->nb_bytes);
++    ret = do_perform_cow(bs, m->offset, m->alloc_offset,
++                         start->offset, start->nb_bytes);
++    if (ret < 0) {
++        goto fail;
++    }
++
++    ret = do_perform_cow(bs, m->offset, m->alloc_offset,
++                         end->offset, end->nb_bytes);
++
++fail:
+     qemu_co_mutex_lock(&s->lock);
+ 
+-    if (ret < 0) {
+-        return ret;
+-    }
+-
+     /*
+      * Before we update the L2 table to actually point to the new cluster, we
+      * need to be sure that the refcounts have been increased and COW was
+      * handled.
+      */
+-    qcow2_cache_depends_on_flush(s->l2_table_cache);
++    if (ret == 0) {
++        qcow2_cache_depends_on_flush(s->l2_table_cache);
++    }
+ 
+-    return 0;
++    return ret;
+ }
+ 
+ int qcow2_alloc_cluster_link_l2(BlockDriverState *bs, QCowL2Meta *m)
+@@ -795,12 +808,7 @@ int qcow2_alloc_cluster_link_l2(BlockDriverState *bs, QCowL2Meta *m)
      }
  
-     if (drc->awaiting_allocation) {
--        if (!drc->awaiting_allocation_skippable) {
--            drc->awaiting_release = true;
--            trace_spapr_drc_awaiting_allocation(get_index(drc));
--            return;
--        }
-+        drc->awaiting_release = true;
-+        trace_spapr_drc_awaiting_allocation(get_index(drc));
-+        return;
+     /* copy content of unmodified sectors */
+-    ret = perform_cow(bs, m, &m->cow_start);
+-    if (ret < 0) {
+-        goto err;
+-    }
+-
+-    ret = perform_cow(bs, m, &m->cow_end);
++    ret = perform_cow(bs, m);
+     if (ret < 0) {
+         goto err;
      }
- 
-     drc->indicator_state = SPAPR_DR_INDICATOR_STATE_INACTIVE;
-@@ -461,7 +448,6 @@ static void detach(sPAPRDRConnector *drc, DeviceState *d,
-     }
- 
-     drc->awaiting_release = false;
--    drc->awaiting_allocation_skippable = false;
-     g_free(drc->fdt);
-     drc->fdt = NULL;
-     drc->fdt_start_offset = 0;
-diff --git a/include/hw/ppc/spapr_drc.h b/include/hw/ppc/spapr_drc.h
-index 5524247..fa531d5 100644
---- a/include/hw/ppc/spapr_drc.h
-+++ b/include/hw/ppc/spapr_drc.h
-@@ -154,7 +154,6 @@ typedef struct sPAPRDRConnector {
-     bool awaiting_release;
-     bool signalled;
-     bool awaiting_allocation;
--    bool awaiting_allocation_skippable;
- 
-     /* device pointer, via link property */
-     DeviceState *dev;
 -- 
-2.9.4
+2.11.0
