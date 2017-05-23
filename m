@@ -1,41 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33066)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40632)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <danielhb@linux.vnet.ibm.com>) id 1dDERk-0006iK-Jr
-	for qemu-devel@nongnu.org; Tue, 23 May 2017 14:22:17 -0400
+	(envelope-from <groug@kaod.org>) id 1dDEqS-00071F-PF
+	for qemu-devel@nongnu.org; Tue, 23 May 2017 14:47:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <danielhb@linux.vnet.ibm.com>) id 1dDERh-0004Rg-ET
-	for qemu-devel@nongnu.org; Tue, 23 May 2017 14:22:16 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:34144)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <danielhb@linux.vnet.ibm.com>)
-	id 1dDERh-0004R3-5J
-	for qemu-devel@nongnu.org; Tue, 23 May 2017 14:22:13 -0400
-Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v4NI8bw5013677
-	for <qemu-devel@nongnu.org>; Tue, 23 May 2017 14:22:11 -0400
-Received: from e24smtp03.br.ibm.com (e24smtp03.br.ibm.com [32.104.18.24])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2amsaqarhw-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 23 May 2017 14:22:11 -0400
-Received: from localhost
-	by e24smtp03.br.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <danielhb@linux.vnet.ibm.com>;
-	Tue, 23 May 2017 15:22:08 -0300
-From: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
-References: <20170523111812.13469-1-lvivier@redhat.com>
-	<7509d665-566e-2570-9936-44a04bad75fe@linux.vnet.ibm.com>
-	<e0a75b06-5bbf-e831-b049-93e2ad5aa717@linux.vnet.ibm.com>
-Date: Tue, 23 May 2017 15:22:04 -0300
+	(envelope-from <groug@kaod.org>) id 1dDEqP-0005SK-Mz
+	for qemu-devel@nongnu.org; Tue, 23 May 2017 14:47:48 -0400
+Received: from 7.mo2.mail-out.ovh.net ([188.165.48.182]:37220)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1dDEqP-0005S7-Gj
+	for qemu-devel@nongnu.org; Tue, 23 May 2017 14:47:45 -0400
+Received: from player718.ha.ovh.net (b6.ovh.net [213.186.33.56])
+	by mo2.mail-out.ovh.net (Postfix) with ESMTP id A2BB488693
+	for <qemu-devel@nongnu.org>; Tue, 23 May 2017 20:47:42 +0200 (CEST)
+Date: Tue, 23 May 2017 20:47:38 +0200
+From: Greg Kurz <groug@kaod.org>
+Message-ID: <20170523204738.62c5e73b@bahia.ttt.fr.ibm.com>
+In-Reply-To: <5222368e-d0de-457b-7f07-5f104860ec56@redhat.com>
+References: <149554993519.23396.2947622015408783770.stgit@bahia.lab.toulouse-stg.fr.ibm.com>
+	<149554996230.23396.14573553304393992709.stgit@bahia.lab.toulouse-stg.fr.ibm.com>
+	<5222368e-d0de-457b-7f07-5f104860ec56@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <e0a75b06-5bbf-e831-b049-93e2ad5aa717@linux.vnet.ibm.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-Message-Id: <6e4170f5-5fbe-dc45-70f7-6c3c5a9e4b33@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH 0/4] spapr: disable hotplugging
- without OS
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	boundary="Sig_/CjGXDp0OwzKfiDtNWXomj4=";
+	protocol="application/pgp-signature"
+Subject: Re: [Qemu-devel] [PATCH v2 4/4] 9pfs: local: metadata file for the
+ VirtFS root
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -44,117 +33,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laurent Vivier <lvivier@redhat.com>, David Gibson <david@gibson.dropbear.id.au>
-Cc: Thomas Huth <thuth@redhat.com>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Michael Roth <mdroth@linux.vnet.ibm.com>
+To: Eric Blake <eblake@redhat.com>
+Cc: qemu-devel@nongnu.org, Leo Gaspard <leo@gaspard.io>
 
+--Sig_/CjGXDp0OwzKfiDtNWXomj4=
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
+On Tue, 23 May 2017 12:13:17 -0500
+Eric Blake <eblake@redhat.com> wrote:
 
-On 05/23/2017 03:07 PM, Daniel Henrique Barboza wrote:
->
->
-> On 05/23/2017 02:52 PM, Daniel Henrique Barboza wrote:
->> Hi Laurent,
->>
->> This is an interesting patch series. I've been working in the last 
->> weeks in the DRC
->> migration, mainly to solve the problem in which a hot CPU unplug will 
->> not succeed after
->> a migration if the CPU was hotplugged in the source. The problem 
->> happened when
->> migrating with virsh because Libvirt hotplugs the CPU in both source 
->> and target, and
->> the DRC state of the hotplugged after the migration is inconsistent. 
->> This series solves the
->> issue by preventing it from happening in the first place. Of course 
->> that migrating DRC states
->> has other uses (pending unplug operations during a migration, for 
->> example) so both patch
->> series can coexist.
->>
->> One possible issue I see with this series is that it breaks Libvirt 
->> migration entirely if
->> a CPU/mem hotplug happens in the target. With your series applied the 
->> migration
->> fails before start with:
->
-> Sorry: if a migration happens in the *source*, before the migration.
+> On 05/23/2017 09:32 AM, Greg Kurz wrote:
+> > When using the mapped-file security, credentials are stored in a metada=
+ta
+> > directory located in the parent directory. This is okay for all paths w=
+ith
+> > the notable exception of the root path, since we don't want and probably
+> > can't create a metadata directory above the virtfs directory on the hos=
+t.
+> >=20
+> > This patch introduces a dedicated metadata file, sitting in the virtfs =
+root
+> > for this purpose. It relies on the fact that the "." name necessarily r=
+efers
+> > to the virtfs root.
+> >=20
+> > As for the metadata directory, we don't want the client to see this fil=
+e.
+> > The current code only cares for readdir() but there are many other plac=
+es
+> > to fix actually. The filtering logic is hence put in a separate functio=
+n.
+> >=20
+> > @@ -478,7 +504,8 @@ static off_t local_telldir(FsContext *ctx, V9fsFidO=
+penState *fs)
+> > =20
+> >  static bool local_is_mapped_file_metadata(FsContext *fs_ctx, const cha=
+r *name)
+> >  {
+> > -    return !strcmp(name, VIRTFS_META_DIR);
+> > +    return
+> > +        !strcmp(name, VIRTFS_META_DIR) || !strcmp(name, VIRTFS_META_RO=
+OT_FILE); =20
+>=20
+> We have to block VIRTFS_META_DIR at any depth in the hierarchy, but
+> can/should we change the blocking of VIRTFS_META_ROOT_FILE to only
+> happen at the root directory, rather than at all directories?  On the
+> other hand, if you can simultaneously map /path/to/a for one mount
+> point, and /path/to/a/b for another, then the root file for B is visible
+> at a lower depth than the root file for A, and blocking the metafile
+> name everywhere means that the mount A can't influence the behavior on
+> the mount for B.
+>=20
 
-Hehe nothing like fixing a typo with another one ...
+I must confess I hadn't this scenario in mind but it's safer from a
+security standpoint indeed.
 
-This is the Libvirt use case that fails with this patch set applied in 
-QEMU master, Libvirt 3.4.0 compiled from
-source:
+> Not tested, but looks sane, so:
+> Reviewed-by: Eric Blake <eblake@redhat.com>
+>=20
 
-# ./virsh start dhb_ub1704_nfs 2
-#
-# ./virsh setvcpus dhb_ub1704_nfs 2 --live
-#
-# ./virsh -c 'qemu:///system' migrate --live --domain dhb_ub1704_nfs 
---desturi qemu+ssh://target_ip/system --timeout 60 --verbose
-error: internal error: unable to execute QEMU command 'device_add': CPU 
-hotplug not supported without OS
+Thanks again for the review, Eric.
 
-This is the error msg that appears in Libvirt daemon:
+Cheers,
 
-2017-05-23 18:17:17.844+0000: 159678: error : 
-qemuMonitorJSONCheckError:389 : internal error: unable to execute QEMU 
-command 'device_add': CPU hotplug not supported without OS
+--
+Greg
 
+--Sig_/CjGXDp0OwzKfiDtNWXomj4=
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
 
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
 
-Daniel
+iEYEARECAAYFAlkkg8oACgkQAvw66wEB28KR2gCfeTWSXKuyKMJyAclIGz+rrHTF
+06AAoKMZo5h9z51WXMV/lnjjcJwZZlGY
+=p8Kw
+-----END PGP SIGNATURE-----
 
->
->>
->>
->> # ./virsh -c 'qemu:///system' migrate --live --domain dhb_ub1704_nfs 
->> --desturi qemu+ssh://target_ip/system --timeout 60 --verbose
->> error: internal error: unable to execute QEMU command 'device_add': 
->> CPU hotplug not supported without OS
->>
->> Note that I say "possible issue" because, although I believe we do 
->> not want to break Libvirt
->> if possible, I also believe that we need to think about what makes 
->> sense in QEMU first.
->>
->>
->>
->> Thanks,
->>
->>
->> Daniel
->>
->>
->> On 05/23/2017 08:18 AM, Laurent Vivier wrote:
->>> If the OS is not started, QEMU sends an event to the OS
->>> that is lost and cannot be recovered. An unplug is not
->>> able to restore QEMU in a coherent state.
->>> So, while the OS is not started, disable CPU and memory hotplug.
->>> We use option vector 6 to know if the OS is started
->>>
->>> This series moves error checking for memory hotplug
->>> in a pre_plug function, and introduces the option
->>> vector 6 management. It also revert previous
->>> fix which was not really fixing the hotplug problem
->>> when the OS is not running.
->>>
->>> Laurent Vivier (4):
->>>    spapr: add pre_plug function for memory
->>>    spapr: add option vector 6
->>>    spapr: disable hotplugging without OS
->>>    Revert "spapr: fix memory hot-unplugging"
->>>
->>>   hw/ppc/spapr.c              | 103 
->>> ++++++++++++++++++++++++++++++++++++--------
->>>   hw/ppc/spapr_drc.c          |  20 ++-------
->>>   hw/ppc/spapr_hcall.c        |   5 ++-
->>>   hw/ppc/spapr_ovec.c         |   8 ++++
->>>   include/hw/ppc/spapr.h      |   2 +
->>>   include/hw/ppc/spapr_drc.h  |   1 -
->>>   include/hw/ppc/spapr_ovec.h |   7 +++
->>>   7 files changed, 109 insertions(+), 37 deletions(-)
->>>
->>
->>
->
->
+--Sig_/CjGXDp0OwzKfiDtNWXomj4=--
