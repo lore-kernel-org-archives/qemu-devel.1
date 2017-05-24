@@ -1,20 +1,46 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40164)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40833)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <maxime.coquelin@redhat.com>) id 1dDRlA-00083k-Pk
-	for qemu-devel@nongnu.org; Wed, 24 May 2017 04:35:13 -0400
+	(envelope-from <dongdwdw@linux.vnet.ibm.com>) id 1dDRpB-0000qm-Cz
+	for qemu-devel@nongnu.org; Wed, 24 May 2017 04:39:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <maxime.coquelin@redhat.com>) id 1dDRl6-0007LZ-PI
-	for qemu-devel@nongnu.org; Wed, 24 May 2017 04:35:12 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:38514)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <maxime.coquelin@redhat.com>)
-	id 1dDRl6-0007KE-Jk
-	for qemu-devel@nongnu.org; Wed, 24 May 2017 04:35:08 -0400
-From: Maxime Coquelin <maxime.coquelin@redhat.com>
-Date: Wed, 24 May 2017 10:34:46 +0200
-Message-Id: <20170524083446.32261-1-maxime.coquelin@redhat.com>
-Subject: [Qemu-devel] [PATCH] vhost-user: pass message as a pointer to
- process_message_reply()
+	(envelope-from <dongdwdw@linux.vnet.ibm.com>) id 1dDRp6-0008FY-Dn
+	for qemu-devel@nongnu.org; Wed, 24 May 2017 04:39:21 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:41975)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dongdwdw@linux.vnet.ibm.com>)
+	id 1dDRp6-0008FQ-2k
+	for qemu-devel@nongnu.org; Wed, 24 May 2017 04:39:16 -0400
+Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v4O8dBBi031243
+	for <qemu-devel@nongnu.org>; Wed, 24 May 2017 04:39:14 -0400
+Received: from e23smtp05.au.ibm.com (e23smtp05.au.ibm.com [202.81.31.147])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2amvavpd64-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Wed, 24 May 2017 04:39:13 -0400
+Received: from localhost
+	by e23smtp05.au.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <dongdwdw@linux.vnet.ibm.com>;
+	Wed, 24 May 2017 18:38:51 +1000
+Received: from d23av03.au.ibm.com (d23av03.au.ibm.com [9.190.234.97])
+	by d23relay09.au.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+	v4O8celc39125074
+	for <qemu-devel@nongnu.org>; Wed, 24 May 2017 18:38:48 +1000
+Received: from d23av03.au.ibm.com (localhost [127.0.0.1])
+	by d23av03.au.ibm.com (8.14.4/8.14.4/NCO v10.0 AVout) with ESMTP id
+	v4O8c83P018658
+	for <qemu-devel@nongnu.org>; Wed, 24 May 2017 18:38:09 +1000
+References: <f0b11c2d-9f61-c4c2-4b55-58644b760e31@linux.vnet.ibm.com>
+	<20170524031141.GI12279@lemon.lan>
+From: Wang Dong <dongdwdw@linux.vnet.ibm.com>
+Date: Wed, 24 May 2017 16:37:58 +0800
+MIME-Version: 1.0
+In-Reply-To: <20170524031141.GI12279@lemon.lan>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 7bit
+Message-Id: <d68094a6-574e-9bb7-5574-298285ac477c@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] new to qemu with a simple question
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,70 +49,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: zhiyong.yang@intel.com, mst@redhat.com, qemu-devel@nongnu.org, jfreiman@redhat.com, marcandre.lureau@redhat.com
-Cc: Maxime Coquelin <maxime.coquelin@redhat.com>
+To: Fam Zheng <famz@redhat.com>
+Cc: qemu-devel@nongnu.org
 
-process_message_reply() was recently updated to get full message
-content instead of only its request field.
+Thank you, Fam.
 
-There is no need to copy all the struct content into the stack,
-so just pass its pointer.
 
-Cc: Zhiyong Yang <zhiyong.yang@intel.com>
-Fixes: 60cd11024f41 ("hw/virtio: fix vhost user fails to startup when MQ")
-Signed-off-by: Maxime Coquelin <maxime.coquelin@redhat.com>
----
- hw/virtio/vhost-user.c | 12 ++++++------
- 1 file changed, 6 insertions(+), 6 deletions(-)
+On 05/24/2017 11:11 AM, Fam Zheng wrote:
+> On Wed, 05/24 10:56, Wang Dong wrote:
+>> Some C source code is generate from json file.
+>>
+>> I wonder why this? What is the benefits of this?
+> This allows you to concentrate on the high level semantics of the QMP API,
+> without worrying about C syntax and structural code here and there. In one
+> word, more conciseness and little code duplication.
+>
+> If done in C, it would be much more lines of code and hardly readable.
+>
+> Fam
+>
 
-diff --git a/hw/virtio/vhost-user.c b/hw/virtio/vhost-user.c
-index b87a176..baf2487 100644
---- a/hw/virtio/vhost-user.c
-+++ b/hw/virtio/vhost-user.c
-@@ -162,11 +162,11 @@ fail:
- }
- 
- static int process_message_reply(struct vhost_dev *dev,
--                                 VhostUserMsg msg)
-+                                 VhostUserMsg *msg)
- {
-     VhostUserMsg msg_reply;
- 
--    if ((msg.flags & VHOST_USER_NEED_REPLY_MASK) == 0) {
-+    if ((msg->flags & VHOST_USER_NEED_REPLY_MASK) == 0) {
-         return 0;
-     }
- 
-@@ -174,10 +174,10 @@ static int process_message_reply(struct vhost_dev *dev,
-         return -1;
-     }
- 
--    if (msg_reply.request != msg.request) {
-+    if (msg_reply.request != msg->request) {
-         error_report("Received unexpected msg type."
-                      "Expected %d received %d",
--                     msg.request, msg_reply.request);
-+                     msg->request, msg_reply.request);
-         return -1;
-     }
- 
-@@ -324,7 +324,7 @@ static int vhost_user_set_mem_table(struct vhost_dev *dev,
-     }
- 
-     if (reply_supported) {
--        return process_message_reply(dev, msg);
-+        return process_message_reply(dev, &msg);
-     }
- 
-     return 0;
-@@ -716,7 +716,7 @@ static int vhost_user_net_set_mtu(struct vhost_dev *dev, uint16_t mtu)
- 
-     /* If reply_ack supported, slave has to ack specified MTU is valid */
-     if (reply_supported) {
--        return process_message_reply(dev, msg);
-+        return process_message_reply(dev, &msg);
-     }
- 
-     return 0;
 -- 
-2.9.4
+Best regards. Wang Dong
