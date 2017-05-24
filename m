@@ -1,24 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58357)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58722)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dDWNf-00024U-Um
-	for qemu-devel@nongnu.org; Wed, 24 May 2017 09:31:17 -0400
+	(envelope-from <lvivier@redhat.com>) id 1dDWPR-0002rA-JT
+	for qemu-devel@nongnu.org; Wed, 24 May 2017 09:33:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dDWNa-0007dY-Iu
-	for qemu-devel@nongnu.org; Wed, 24 May 2017 09:31:15 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43828)
+	(envelope-from <lvivier@redhat.com>) id 1dDWPO-000891-HY
+	for qemu-devel@nongnu.org; Wed, 24 May 2017 09:33:05 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53042)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dDWNa-0007dP-8v
-	for qemu-devel@nongnu.org; Wed, 24 May 2017 09:31:10 -0400
-References: <f0b11c2d-9f61-c4c2-4b55-58644b760e31@linux.vnet.ibm.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <f5c021e4-86ce-7476-44dc-d386f2349ed0@redhat.com>
-Date: Wed, 24 May 2017 08:30:58 -0500
+	(Exim 4.71) (envelope-from <lvivier@redhat.com>) id 1dDWPO-00088q-8F
+	for qemu-devel@nongnu.org; Wed, 24 May 2017 09:33:02 -0400
+References: <20170524085519.22856-1-quintela@redhat.com>
+	<20170524085519.22856-2-quintela@redhat.com>
+From: Laurent Vivier <lvivier@redhat.com>
+Message-ID: <6c8b845f-fca7-5208-7097-8c4408dea004@redhat.com>
+Date: Wed, 24 May 2017 15:32:57 +0200
 MIME-Version: 1.0
-In-Reply-To: <f0b11c2d-9f61-c4c2-4b55-58644b760e31@linux.vnet.ibm.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="c6mRPugd6GL9RGdXFNLUNoNNXCd4wLMlj"
-Subject: Re: [Qemu-devel] new to qemu with a simple question
+In-Reply-To: <20170524085519.22856-2-quintela@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 1/3] migration: Use savevm_handlers instead
+ of loadvm copy
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,67 +29,93 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Wang Dong <dongdwdw@linux.vnet.ibm.com>, qemu-devel@nongnu.org
+To: Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org
+Cc: dgilbert@redhat.com, peterx@redhat.com, Juan Quintela <quintela@trasno.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---c6mRPugd6GL9RGdXFNLUNoNNXCd4wLMlj
-From: Eric Blake <eblake@redhat.com>
-To: Wang Dong <dongdwdw@linux.vnet.ibm.com>, qemu-devel@nongnu.org
-Message-ID: <f5c021e4-86ce-7476-44dc-d386f2349ed0@redhat.com>
-Subject: Re: [Qemu-devel] new to qemu with a simple question
-References: <f0b11c2d-9f61-c4c2-4b55-58644b760e31@linux.vnet.ibm.com>
-In-Reply-To: <f0b11c2d-9f61-c4c2-4b55-58644b760e31@linux.vnet.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On 24/05/2017 10:55, Juan Quintela wrote:
+> From: Juan Quintela <quintela@trasno.org>
+> 
+> There is no reason for having the loadvm_handlers at all.  There is
+> only one use, and we can use the savevm handlers.
+> 
+> We will remove the loadvm handlers on a following patch.
+> 
+> Signed-off-by: Juan Quintela <quintela@redhat.com>
+> ---
+>  migration/savevm.c | 24 ++++++++++++------------
+>  1 file changed, 12 insertions(+), 12 deletions(-)
+> 
+> diff --git a/migration/savevm.c b/migration/savevm.c
+> index d971e5e..55ac8c1 100644
+> --- a/migration/savevm.c
+> +++ b/migration/savevm.c
+> @@ -1792,7 +1792,7 @@ struct LoadStateEntry {
+>   * Returns: true if the footer was good
+>   *          false if there is a problem (and calls error_report to say why)
+>   */
+> -static bool check_section_footer(QEMUFile *f, LoadStateEntry *le)
+> +static bool check_section_footer(QEMUFile *f, SaveStateEntry *se)
+>  {
+>      uint8_t read_mark;
+>      uint32_t read_section_id;
+> @@ -1805,15 +1805,15 @@ static bool check_section_footer(QEMUFile *f, LoadStateEntry *le)
+>      read_mark = qemu_get_byte(f);
+>  
+>      if (read_mark != QEMU_VM_SECTION_FOOTER) {
+> -        error_report("Missing section footer for %s", le->se->idstr);
+> +        error_report("Missing section footer for %s", se->idstr);
+>          return false;
+>      }
+>  
+>      read_section_id = qemu_get_be32(f);
+> -    if (read_section_id != le->section_id) {
+> +    if (read_section_id != se->section_id) {
+>          error_report("Mismatched section id in footer for %s -"
+>                       " read 0x%x expected 0x%x",
+> -                     le->se->idstr, read_section_id, le->section_id);
+> +                     se->idstr, read_section_id, se->section_id);
+>          return false;
+>      }
+>  
+> @@ -1887,7 +1887,7 @@ qemu_loadvm_section_start_full(QEMUFile *f, MigrationIncomingState *mis)
+>                       " device '%s'", instance_id, idstr);
+>          return ret;
+>      }
+> -    if (!check_section_footer(f, le)) {
+> +    if (!check_section_footer(f, se)) {
+>          return -EINVAL;
+>      }
+>  
+> @@ -1898,29 +1898,29 @@ static int
+>  qemu_loadvm_section_part_end(QEMUFile *f, MigrationIncomingState *mis)
+>  {
+>      uint32_t section_id;
+> -    LoadStateEntry *le;
+> +    SaveStateEntry *se;
+>      int ret;
+>  
+>      section_id = qemu_get_be32(f);
+>  
+>      trace_qemu_loadvm_state_section_partend(section_id);
+> -    QLIST_FOREACH(le, &mis->loadvm_handlers, entry) {
+> -        if (le->section_id == section_id) {
+> +    QTAILQ_FOREACH(se, &savevm_state.handlers, entry) {
+> +        if (se->section_id == section_id) {
+>              break;
+>          }
+>      }
+> -    if (le == NULL) {
+> +    if (se == NULL) {
+>          error_report("Unknown savevm section %d", section_id);
+>          return -EINVAL;
+>      }
+>  
+> -    ret = vmstate_load(f, le->se, le->version_id);
+> +    ret = vmstate_load(f, se, se->version_id);
+Are you sure you can replace le->version_id by se->version?
 
-On 05/23/2017 09:56 PM, Wang Dong wrote:
->=20
-> Hi guys,
->=20
-> I am new to qemu. But I need do some job in it right now.
->=20
-> When I try read qmp code. I found a interesting part against it.
->=20
-> Some C source code is generate from json file.
->=20
-> I wonder why this? What is the benefits of this?
+Because according to code in qemu_loadvm_section_start_full(),
+we can have le->version_id <= se->version_id.
 
-Boring and repetitive code that is easy to typo is best written by a
-computer, which excels at boring and repetitive tasks.  Writing our
-description in a more concise higher language and generating C code from
-that lets us focus on the actual design, rather than the mundane
-correctness of the code implementing the design.
-
-It's the same reason that people use bison/yacc rather than hand-written
-parsers for complex grammars - you isolate the correctness of the code
-to the correctness of the generator, and free yourself to now only have
-to worry about the bigger picture of the input you feed to the
-generator.  And on another level, it's why we write programs in C
-instead of assembly.  Abstraction is good.
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---c6mRPugd6GL9RGdXFNLUNoNNXCd4wLMlj
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEcBAEBCAAGBQJZJYsSAAoJEKeha0olJ0NqiYEH/iTvJWVT9j+MQSZDDuG20QIQ
-M2bJ0kSWSScTqh1z81h8FUBfRNekrl5LqxqbUyFKGF2ie23QI9aBDOVmcpcMmHYw
-/oWMmS5UejSf0UL0ADdA64O/kPgqjHJnXo+iEdjYRmeBuppEqy1z9mX32VOdw9cz
-bB3DrhHCsvngW2GQrzVoCogEtIWUA+Hu/+wHoVoxII82I1U816RDitB4e8UPz3Cf
-328pfWAVjqXY1t443iJ88M9QPVwnsvtVBOaSNCG+Ub0Trst9fziy4SrGeYxNEnfZ
-vk89uWnjmz7lXiucYS+PJ17MPOMOkrHFp4aoUkMIuNXGqMBx8fXsY8uA7Dfiho4=
-=J6Fj
------END PGP SIGNATURE-----
-
---c6mRPugd6GL9RGdXFNLUNoNNXCd4wLMlj--
+Thanks,
+Laurent
