@@ -1,30 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50219)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52133)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aurelien@aurel32.net>) id 1dDaUK-0000wj-8Y
-	for qemu-devel@nongnu.org; Wed, 24 May 2017 13:54:25 -0400
+	(envelope-from <vyasevic@redhat.com>) id 1dDafO-0003oQ-Vt
+	for qemu-devel@nongnu.org; Wed, 24 May 2017 14:05:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aurelien@aurel32.net>) id 1dDaUJ-0003c6-5D
-	for qemu-devel@nongnu.org; Wed, 24 May 2017 13:54:24 -0400
-Received: from hall.aurel32.net ([2001:bc8:30d7:100::1]:55722)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <aurelien@aurel32.net>)
-	id 1dDaUI-0003Xg-V9
-	for qemu-devel@nongnu.org; Wed, 24 May 2017 13:54:23 -0400
-Date: Wed, 24 May 2017 19:54:09 +0200
-From: Aurelien Jarno <aurelien@aurel32.net>
-Message-ID: <20170524175409.oi5vzjvvpp3hcsfj@aurel32.net>
-References: <20170523030312.6360-1-rth@twiddle.net>
-	<20170523030312.6360-3-rth@twiddle.net>
-	<20170523104851.37tseiq5zlpwevr6@aurel32.net>
-	<d059a3b3-ac6c-27d2-5270-b6d5b32cc41d@twiddle.net>
-	<20170523172858.aqvgqlrwrwu6jk2o@aurel32.net>
-	<d9b3afcc-2def-ee43-9865-ab82c3361b3c@twiddle.net>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <d9b3afcc-2def-ee43-9865-ab82c3361b3c@twiddle.net>
-Subject: Re: [Qemu-devel] [PATCH 02/31] target/s390x: Implement EXECUTE via
- new TranslationBlock
+	(envelope-from <vyasevic@redhat.com>) id 1dDafL-0001JV-58
+	for qemu-devel@nongnu.org; Wed, 24 May 2017 14:05:50 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:57580)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <vyasevic@redhat.com>) id 1dDafK-0001JJ-S1
+	for qemu-devel@nongnu.org; Wed, 24 May 2017 14:05:47 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id D64F3C056793
+	for <qemu-devel@nongnu.org>; Wed, 24 May 2017 18:05:45 +0000 (UTC)
+From: Vladislav Yasevich <vyasevic@redhat.com>
+Date: Wed, 24 May 2017 14:05:17 -0400
+Message-Id: <1495649128-10529-2-git-send-email-vyasevic@redhat.com>
+In-Reply-To: <1495649128-10529-1-git-send-email-vyasevic@redhat.com>
+References: <1495649128-10529-1-git-send-email-vyasevic@redhat.com>
+Subject: [Qemu-devel] [PATCH 01/12] migration: Introduce announce parameters
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,52 +29,243 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <rth@twiddle.net>
-Cc: qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org, dgilbert@redhat.com, quintela@redhat.com
+Cc: germano@redhat.com, lvivier@redhat.com, jasowang@redhat.com, jdenemar@redhat.com, kashyap@redhat.com, armbru@redhat.com, mst@redhat.com, Vladislav Yasevich <vyasevic@redhat.com>
 
-On 2017-05-23 16:21, Richard Henderson wrote:
-> On 05/23/2017 10:28 AM, Aurelien Jarno wrote:
-> > > Something like this, as a delta patch.
+Add parameters that control RARP/GARP announcement timeouts.
+The parameters structure is added to the QAPI and a qmp command
+is added to set/get the parameter data.
 
-I confirm this patch is really needed, otherwise the executed
-instruction seems to be executed at the next instruction.
+Based on work by "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-> > Unfortunately it doesn't work. So far I have no real idea what could be
-> > the root cause of the issue. I have just determined that up to the crash,
-> > only a very limited set of instructions are being executed. They are the
-> > 4 bytes long versions of MVC, CLC, XC, TR.
-> 
-> Yeah, it appears XC is the culprit, though I have not yet determined exactly
-> what's going wrong.
+Signed-off-by: Vladislav Yasevich <vyasevic@redhat.com>
+---
+ include/sysemu/sysemu.h |  7 ++++
+ migration/savevm.c      | 98 +++++++++++++++++++++++++++++++++++++++++++++++++
+ qapi-schema.json        | 84 ++++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 189 insertions(+)
 
-It seems the problem arise if an interrupt happens when the TB
-containing the EXECUTE instruction is being executed. In that case at
-the end of the TB, the interruption code is translated with the ex_value
-set, which means with the wrong PC, wrong permissions and wrong return
-address.
-
-This is the same kind of issue I identified on SH4 recently:
-https://lists.gnu.org/archive/html/qemu-devel/2017-05/msg03880.html
-
-The same king of solution also works, that is disabling the interrupts
-when the ex_value is set:
-
-diff --git a/target/s390x/helper.c b/target/s390x/helper.c
-index 6f81b1a16c..a33abdef16 100644
---- a/target/s390x/helper.c
-+++ b/target/s390x/helper.c
-@@ -655,6 +657,10 @@ bool s390_cpu_exec_interrupt(CPUState *cs, int interrupt_request)
-         S390CPU *cpu = S390_CPU(cs);
-         CPUS390XState *env = &cpu->env;
+diff --git a/include/sysemu/sysemu.h b/include/sysemu/sysemu.h
+index 83c1ceb..7fd49c4 100644
+--- a/include/sysemu/sysemu.h
++++ b/include/sysemu/sysemu.h
+@@ -78,6 +78,13 @@ void qemu_remove_machine_init_done_notifier(Notifier *notify);
+ int save_vmstate(const char *name, Error **errp);
+ int load_vmstate(const char *name, Error **errp);
  
-+        if (env->ex_value) {
-+            return false;
-+        }
++AnnounceParameters *qemu_get_announce_params(void);
++void qemu_fill_announce_parameters(AnnounceParameters **to,
++                                   AnnounceParameters *from);
++bool qemu_validate_announce_parameters(AnnounceParameters *params,
++                                       Error **errp);
++void qemu_set_announce_parameters(AnnounceParameters *announce_params,
++                                  AnnounceParameters *params);
+ void qemu_announce_self(void);
+ 
+ /* Subcommands for QEMU_VM_COMMAND */
+diff --git a/migration/savevm.c b/migration/savevm.c
+index f5e8194..cee2837 100644
+--- a/migration/savevm.c
++++ b/migration/savevm.c
+@@ -78,6 +78,104 @@ static struct mig_cmd_args {
+     [MIG_CMD_MAX]              = { .len = -1, .name = "MAX" },
+ };
+ 
++#define QEMU_ANNOUNCE_INITIAL    50
++#define QEMU_ANNOUNCE_MAX       550
++#define QEMU_ANNOUNCE_ROUNDS      5
++#define QEMU_ANNOUNCE_STEP      100
 +
-         if (env->psw.mask & PSW_MASK_EXT) {
-             s390_cpu_do_interrupt(cs);
-             return true;
-
++AnnounceParameters *qemu_get_announce_params(void)
++{
++    static AnnounceParameters announce = {
++        .initial = QEMU_ANNOUNCE_INITIAL,
++        .max = QEMU_ANNOUNCE_MAX,
++        .rounds = QEMU_ANNOUNCE_ROUNDS,
++        .step = QEMU_ANNOUNCE_STEP,
++    };
++
++    return &announce;
++}
++
++void qemu_fill_announce_parameters(AnnounceParameters **to,
++                                   AnnounceParameters *from)
++{
++    AnnounceParameters *params;
++
++    params = *to = g_malloc0(sizeof(*params));
++    params->has_initial = true;
++    params->initial = from->initial;
++    params->has_max = true;
++    params->max = from->max;
++    params->has_rounds = true;
++    params->rounds = from->rounds;
++    params->has_step = true;
++    params->step = from->step;
++}
++
++bool qemu_validate_announce_parameters(AnnounceParameters *params, Error **errp)
++{
++    if (params->has_initial &&
++        (params->initial < 1 || params->initial > 100000)) {
++        error_setg(errp, QERR_INVALID_PARAMETER_VALUE, "initial",
++                   "is invalid, it should be in the range of 1 to 100000 ms");
++        return false;
++    }
++    if (params->has_max &&
++        (params->max < 1 || params->max > 100000)) {
++        error_setg(errp, QERR_INVALID_PARAMETER_VALUE, "max",
++                   "is invalid, it should be in the range of 1 to 100000 ms");
++        return false;
++    }
++    if (params->has_rounds &&
++        (params->rounds < 1 || params->rounds > 1000)) {
++        error_setg(errp, QERR_INVALID_PARAMETER_VALUE, "rounds",
++                   "is invalid, it should be in the range of 1 to 1000");
++        return false;
++    }
++    if (params->has_step &&
++        (params->step < 0 || params->step > 10000)) {
++        error_setg(errp, QERR_INVALID_PARAMETER_VALUE, "step",
++                   "is invalid, it should be in the range of 1 to 10000 ms");
++        return false;
++    }
++
++    return true;
++}
++
++void qemu_set_announce_parameters(AnnounceParameters *announce_params,
++                                  AnnounceParameters *params)
++{
++    if (params->has_initial) {
++        announce_params->initial = params->initial;
++    }
++    if (params->has_max) {
++        announce_params->max = params->max;
++    }
++    if (params->has_rounds) {
++        announce_params->rounds = params->rounds;
++    }
++    if (params->has_step) {
++        announce_params->step = params->step;
++    }
++}
++
++AnnounceParameters *qmp_query_announce_parameters(Error **errp)
++{
++    AnnounceParameters *params = NULL;
++
++    qemu_fill_announce_parameters(&params, qemu_get_announce_params());
++    return params;
++}
++
++void qmp_announce_set_parameters(AnnounceParameters *params, Error **errp)
++{
++    AnnounceParameters *current = qemu_get_announce_params();
++
++    if (!qemu_validate_announce_parameters(params, errp))
++        return;
++
++    qemu_set_announce_parameters(current, params);
++}
++
+ static int announce_self_create(uint8_t *buf,
+                                 uint8_t *mac_addr)
+ {
+diff --git a/qapi-schema.json b/qapi-schema.json
+index 80603cf..2030087 100644
+--- a/qapi-schema.json
++++ b/qapi-schema.json
+@@ -569,6 +569,90 @@
+ ##
+ { 'command': 'query-events', 'returns': ['EventInfo'] }
+ 
++
++##
++# @AnnounceParameter:
++#
++# @AnnounceParameter enumeration
++#
++# @initial: Initial delay (in ms) before sending the first GARP/RARP
++#       announcement
++#
++# @max: Maximum delay (in ms) to between GARP/RARP announcemnt packets
++#
++# @rounds: Number of self-announcement attempts
++#
++# @step: Delay increate (in ms) after each self-announcment attempt
++#
++# Since: 2.10
++##
++{ 'enum' : 'AnnounceParameter',
++  'data' : [ 'initial', 'max', 'rounds', 'step' ] }
++
++##
++# @AnnounceParameters:
++#
++# Optional members may be omited on input, but all values will be present
++# on output.
++#           
++# @initial: Initial delay (in ms) before sending the first GARP/RARP
++#       announcement
++#
++# @max: Maximum delay (in ms) to between GARP/RARP announcemnt packets
++#
++# @rounds: Number of self-announcement attempts
++#
++# @step: Delay increate (in ms) after each self-announcment attempt
++#
++# Since: 2.10
++##
++
++{ 'struct': 'AnnounceParameters',
++  'data': { '*initial': 'int',
++            '*max': 'int',
++            '*rounds': 'int',
++            '*step': 'int' } }
++
++##
++# @announce-set-parameters:
++#
++# Set qemu announce parameters.
++#
++# Since: 2.10
++#
++# Example:
++#
++# -> { "execute": "announce-set-parameters",
++#      "arguments": { "announce-rounds": 10 } }
++#
++##
++{ 'command': 'announce-set-parameters', 'boxed': true,
++  'data': 'AnnounceParameters' }
++
++##
++# @query-announce-parameters:
++#
++# Returns information about the current announce parameters
++#
++# Returns: @AnnounceParameters
++#
++# Since: 2.10
++#
++# Example:
++#
++# -> { "execute": "query-announce-parameters" }
++# <- { "return": {
++#          "initial": 50,
++#          "max": 500,
++#          "rounds": 5,
++#          "step": 100
++#       }
++#    }
++#
++##
++{ 'command': 'query-announce-parameters',
++  'returns': 'AnnounceParameters' }
++
+ ##
+ # @MigrationStats:
+ #
 -- 
-Aurelien Jarno                          GPG: 4096R/1DDD8C9B
-aurelien@aurel32.net                 http://www.aurel32.net
+2.7.4
