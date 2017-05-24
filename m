@@ -1,24 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38552)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38544)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dDPgE-00081Y-3q
-	for qemu-devel@nongnu.org; Wed, 24 May 2017 02:21:59 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dDPgA-0000i6-Ux
+	(envelope-from <dgibson@ozlabs.org>) id 1dDPgD-000819-9N
 	for qemu-devel@nongnu.org; Wed, 24 May 2017 02:21:58 -0400
-Date: Wed, 24 May 2017 14:52:36 +1000
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <dgibson@ozlabs.org>) id 1dDPgB-0000iZ-SH
+	for qemu-devel@nongnu.org; Wed, 24 May 2017 02:21:57 -0400
+Date: Wed, 24 May 2017 14:58:06 +1000
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20170524045236.GU30246@umbus.fritz.box>
+Message-ID: <20170524045806.GV30246@umbus.fritz.box>
 References: <20170523111812.13469-1-lvivier@redhat.com>
-	<20170523111812.13469-2-lvivier@redhat.com>
-	<20170523172842.1fce414e@bahia.ttt.fr.ibm.com>
-	<bc9a69f9-eb7b-943a-a9bf-bb4a3b18f525@redhat.com>
+	<20170523111812.13469-3-lvivier@redhat.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="R7Dyui215VKdTDYA"
+	protocol="application/pgp-signature"; boundary="e+JRL32uBeeWnrD4"
 Content-Disposition: inline
-In-Reply-To: <bc9a69f9-eb7b-943a-a9bf-bb4a3b18f525@redhat.com>
-Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH 1/4] spapr: add pre_plug
- function for memory
+In-Reply-To: <20170523111812.13469-3-lvivier@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 2/4] spapr: add option vector 6
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,106 +25,221 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Laurent Vivier <lvivier@redhat.com>
-Cc: Greg Kurz <groug@kaod.org>, Thomas Huth <thuth@redhat.com>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Michael Roth <mdroth@linux.vnet.ibm.com>
+Cc: Thomas Huth <thuth@redhat.com>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Michael Roth <mdroth@linux.vnet.ibm.com>
 
 
---R7Dyui215VKdTDYA
+--e+JRL32uBeeWnrD4
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, May 23, 2017 at 06:09:00PM +0200, Laurent Vivier wrote:
-> On 23/05/2017 17:28, Greg Kurz wrote:
-> > On Tue, 23 May 2017 13:18:09 +0200
-> > Laurent Vivier <lvivier@redhat.com> wrote:
-> >=20
-> >> This allows to manage errors before the memory
-> >> has started to be hotplugged. We already have
-> >> the function for the CPU cores.
-> >>
-> >> Signed-off-by: Laurent Vivier <lvivier@redhat.com>
-> >> ---
-> >>  hw/ppc/spapr.c | 45 ++++++++++++++++++++++++++++++---------------
-> >>  1 file changed, 30 insertions(+), 15 deletions(-)
-> >>
-> >> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> >> index 0980d73..0e8d8d1 100644
-> >> --- a/hw/ppc/spapr.c
-> >> +++ b/hw/ppc/spapr.c
-> >> @@ -2569,20 +2569,6 @@ static void spapr_memory_plug(HotplugHandler *h=
-otplug_dev, DeviceState *dev,
-> >>      uint64_t align =3D memory_region_get_alignment(mr);
-> >>      uint64_t size =3D memory_region_size(mr);
-> >>      uint64_t addr;
-> >> -    char *mem_dev;
-> >> -
-> >> -    if (size % SPAPR_MEMORY_BLOCK_SIZE) {
-> >> -        error_setg(&local_err, "Hotplugged memory size must be a mult=
-iple of "
-> >> -                      "%lld MB", SPAPR_MEMORY_BLOCK_SIZE/M_BYTE);
-> >> -        goto out;
-> >> -    }
-> >> -
-> >> -    mem_dev =3D object_property_get_str(OBJECT(dimm), PC_DIMM_MEMDEV_=
-PROP, NULL);
-> >> -    if (mem_dev && !kvmppc_is_mem_backend_page_size_ok(mem_dev)) {
-> >> -        error_setg(&local_err, "Memory backend has bad page size. "
-> >> -                   "Use 'memory-backend-file' with correct mem-path."=
-);
-> >> -        goto out;
-> >> -    }
-> >> =20
-> >>      pc_dimm_memory_plug(dev, &ms->hotplug_memory, mr, align, &local_e=
-rr);
-> >>      if (local_err) {
-> >> @@ -2603,6 +2589,33 @@ out:
-> >>      error_propagate(errp, local_err);
-> >>  }
-> >> =20
-> >> +static void spapr_memory_pre_plug(HotplugHandler *hotplug_dev, Device=
-State *dev,
-> >> +                                Error **errp)
-> >=20
-> > Indentation nit
+On Tue, May 23, 2017 at 01:18:10PM +0200, Laurent Vivier wrote:
+> This allows to know when the OS is started and its type.
 >=20
-> ok
->=20
-> >=20
-> >> +{
-> >> +    PCDIMMDevice *dimm =3D PC_DIMM(dev);
-> >> +    PCDIMMDeviceClass *ddc =3D PC_DIMM_GET_CLASS(dimm);
-> >> +    MemoryRegion *mr =3D ddc->get_memory_region(dimm);
-> >> +    uint64_t size =3D memory_region_size(mr);
-> >> +    Error *local_err =3D NULL;
-> >> +    char *mem_dev;
-> >> +
-> >> +    if (size % SPAPR_MEMORY_BLOCK_SIZE) {
-> >> +        error_setg(&local_err, "Hotplugged memory size must be a mult=
-iple of "
-> >> +                      "%lld MB", SPAPR_MEMORY_BLOCK_SIZE / M_BYTE);
-> >> +        goto out;
-> >> +    }
-> >> +
-> >> +    mem_dev =3D object_property_get_str(OBJECT(dimm), PC_DIMM_MEMDEV_=
-PROP, NULL);
-> >> +    if (mem_dev && !kvmppc_is_mem_backend_page_size_ok(mem_dev)) {
-> >> +        error_setg(&local_err, "Memory backend has bad page size. "
-> >> +                   "Use 'memory-backend-file' with correct mem-path."=
-);
-> >> +        goto out;
-> >> +    }
-> >> +
-> >> +out:
-> >> +    error_propagate(errp, local_err);
-> >=20
-> > As recently discussed with Markus Armbruster, it isn't necessary to hav=
-e a
-> > local Error * if you don't do anything else with it but propagate it.
->=20
-> Yes, you are right, it's a stupid cut'n'paste.
+> Signed-off-by: Laurent Vivier <lvivier@redhat.com>
 
-This patch seems like a good idea regardless of the rest, so I've
-fixed the minor nits Greg pointed out and merged to ppc-for-2.10.
+This seems a bit oddly complex for the task at hand.  AFAICT you're
+never actually using the value in OV6, just whether it's set or not.
+So, it seems like all you're using this as is basically a flag saying
+that CAS is complete.
+
+> ---
+>  hw/ppc/spapr.c              | 36 ++++++++++++++++++++++++++++++++++++
+>  hw/ppc/spapr_hcall.c        |  5 ++++-
+>  hw/ppc/spapr_ovec.c         |  8 ++++++++
+>  include/hw/ppc/spapr.h      |  2 ++
+>  include/hw/ppc/spapr_ovec.h |  7 +++++++
+>  5 files changed, 57 insertions(+), 1 deletion(-)
+>=20
+> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> index 0e8d8d1..eceb4cc 100644
+> --- a/hw/ppc/spapr.c
+> +++ b/hw/ppc/spapr.c
+> @@ -1369,6 +1369,7 @@ static void ppc_spapr_reset(void)
+>      first_ppc_cpu->env.nip =3D SPAPR_ENTRY_POINT;
+> =20
+>      spapr->cas_reboot =3D false;
+> +    spapr->os_name =3D OV6_NONE;
+>  }
+> =20
+>  static void spapr_create_nvram(sPAPRMachineState *spapr)
+> @@ -1524,10 +1525,41 @@ static const VMStateDescription vmstate_spapr_pat=
+b_entry =3D {
+>      },
+>  };
+> =20
+> +static bool spapr_os_name_needed(void *opaque)
+> +{
+> +    sPAPRMachineState *spapr =3D opaque;
+> +    sPAPRMachineClass *smc =3D SPAPR_MACHINE_GET_CLASS(spapr);
+> +    return smc->need_os_name;
+> +}
+> +
+> +static const VMStateDescription vmstate_spapr_os_name =3D {
+> +    .name =3D "spapr_os_name",
+> +    .version_id =3D 1,
+> +    .minimum_version_id =3D 1,
+> +    .needed =3D spapr_os_name_needed,
+> +    .fields =3D (VMStateField[]) {
+> +        VMSTATE_UINT8(os_name, sPAPRMachineState),
+> +        VMSTATE_END_OF_LIST()
+> +    },
+> +};
+> +
+> +static int spapr_pre_load(void *opaque)
+> +{
+> +    sPAPRMachineState *spapr =3D opaque;
+> +
+> +    /* if the os_name is not migrated from the source,
+> +     * we must allow hotplug, so set os_name to linux
+> +     */
+> +    spapr->os_name =3D OV6_LINUX;
+> +
+> +    return 0;
+> +}
+> +
+>  static const VMStateDescription vmstate_spapr =3D {
+>      .name =3D "spapr",
+>      .version_id =3D 3,
+>      .minimum_version_id =3D 1,
+> +    .pre_load =3D spapr_pre_load,
+>      .post_load =3D spapr_post_load,
+>      .fields =3D (VMStateField[]) {
+>          /* used to be @next_irq */
+> @@ -1542,6 +1574,7 @@ static const VMStateDescription vmstate_spapr =3D {
+>      .subsections =3D (const VMStateDescription*[]) {
+>          &vmstate_spapr_ov5_cas,
+>          &vmstate_spapr_patb_entry,
+> +        &vmstate_spapr_os_name,
+>          NULL
+>      }
+>  };
+> @@ -3216,6 +3249,7 @@ static void spapr_machine_class_init(ObjectClass *o=
+c, void *data)
+>       * in which LMBs are represented and hot-added
+>       */
+>      mc->numa_mem_align_shift =3D 28;
+> +    smc->need_os_name =3D true;
+>  }
+> =20
+>  static const TypeInfo spapr_machine_info =3D {
+> @@ -3293,9 +3327,11 @@ static void spapr_machine_2_9_instance_options(Mac=
+hineState *machine)
+> =20
+>  static void spapr_machine_2_9_class_options(MachineClass *mc)
+>  {
+> +    sPAPRMachineClass *smc =3D SPAPR_MACHINE_CLASS(mc);
+>      spapr_machine_2_10_class_options(mc);
+>      SET_MACHINE_COMPAT(mc, SPAPR_COMPAT_2_9);
+>      mc->numa_auto_assign_ram =3D numa_legacy_auto_assign_ram;
+> +    smc->need_os_name =3D false;
+>  }
+> =20
+>  DEFINE_SPAPR_MACHINE(2_9, "2.9", false);
+> diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
+> index 0d608d6..5dbe3c7 100644
+> --- a/hw/ppc/spapr_hcall.c
+> +++ b/hw/ppc/spapr_hcall.c
+> @@ -1058,7 +1058,8 @@ static target_ulong h_client_architecture_support(P=
+owerPCCPU *cpu,
+>      uint32_t max_compat =3D cpu->max_compat;
+>      uint32_t best_compat =3D 0;
+>      int i;
+> -    sPAPROptionVector *ov1_guest, *ov5_guest, *ov5_cas_old, *ov5_updates;
+> +    sPAPROptionVector *ov1_guest, *ov5_guest, *ov5_cas_old, *ov5_updates,
+> +                      *ov6_guest;
+>      bool guest_radix;
+> =20
+>      /*
+> @@ -1112,6 +1113,7 @@ static target_ulong h_client_architecture_support(P=
+owerPCCPU *cpu,
+> =20
+>      ov1_guest =3D spapr_ovec_parse_vector(ov_table, 1);
+>      ov5_guest =3D spapr_ovec_parse_vector(ov_table, 5);
+> +    ov6_guest =3D spapr_ovec_parse_vector(ov_table, 6);
+>      if (spapr_ovec_test(ov5_guest, OV5_MMU_BOTH)) {
+>          error_report("guest requested hash and radix MMU, which is inval=
+id.");
+>          exit(EXIT_FAILURE);
+> @@ -1154,6 +1156,7 @@ static target_ulong h_client_architecture_support(P=
+owerPCCPU *cpu,
+>      }
+>      spapr->cas_legacy_guest_workaround =3D !spapr_ovec_test(ov1_guest,
+>                                                            OV1_PPC_3_00);
+> +    spapr->os_name =3D spapr_ovec_byte(ov6_guest, OV6_OS_NAME);
+>      if (!spapr->cas_reboot) {
+>          spapr->cas_reboot =3D
+>              (spapr_h_cas_compose_response(spapr, args[1], args[2],
+> diff --git a/hw/ppc/spapr_ovec.c b/hw/ppc/spapr_ovec.c
+> index 41df4c3..7adc9e6 100644
+> --- a/hw/ppc/spapr_ovec.c
+> +++ b/hw/ppc/spapr_ovec.c
+> @@ -160,6 +160,14 @@ static uint8_t guest_byte_from_bitmap(unsigned long =
+*bitmap, long bitmap_offset)
+>      return entry;
+>  }
+> =20
+> +uint8_t spapr_ovec_byte(sPAPROptionVector *ov, long bitnr)
+> +{
+> +    g_assert(ov);
+> +    g_assert(bitnr < OV_MAXBITS);
+> +
+> +    return guest_byte_from_bitmap(ov->bitmap, bitnr);
+> +}
+> +
+>  static target_ulong vector_addr(target_ulong table_addr, int vector)
+>  {
+>      uint16_t vector_count, vector_len;
+> diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
+> index 5802f88..041ce19 100644
+> --- a/include/hw/ppc/spapr.h
+> +++ b/include/hw/ppc/spapr.h
+> @@ -52,6 +52,7 @@ struct sPAPRMachineClass {
+>      /*< public >*/
+>      bool dr_lmb_enabled;       /* enable dynamic-reconfig/hotplug of LMB=
+s */
+>      bool use_ohci_by_default;  /* use USB-OHCI instead of XHCI */
+> +    bool need_os_name;
+>      const char *tcg_default_cpu; /* which (TCG) CPU to simulate by defau=
+lt */
+>      void (*phb_placement)(sPAPRMachineState *spapr, uint32_t index,
+>                            uint64_t *buid, hwaddr *pio,=20
+> @@ -90,6 +91,7 @@ struct sPAPRMachineState {
+>      sPAPROptionVector *ov5_cas;     /* negotiated (via CAS) option vecto=
+rs */
+>      bool cas_reboot;
+>      bool cas_legacy_guest_workaround;
+> +    uint8_t os_name;
+> =20
+>      Notifier epow_notifier;
+>      QTAILQ_HEAD(, sPAPREventLogEntry) pending_events;
+> diff --git a/include/hw/ppc/spapr_ovec.h b/include/hw/ppc/spapr_ovec.h
+> index f088833..c728bb3 100644
+> --- a/include/hw/ppc/spapr_ovec.h
+> +++ b/include/hw/ppc/spapr_ovec.h
+> @@ -56,6 +56,12 @@ typedef struct sPAPROptionVector sPAPROptionVector;
+>  #define OV5_MMU_RADIX_300       OV_BIT(24, 1) /* 1=3DRadix only, 0=3DHas=
+h only */
+>  #define OV5_MMU_RADIX_GTSE      OV_BIT(26, 1) /* Radix GTSE */
+> =20
+> +/* option vector 6 */
+> +#define OV6_OS_NAME             OV_BIT(3, 0)
+> +#define OV6_NONE                0x00
+> +#define OV6_AIX                 0x01
+> +#define OV6_LINUX               0x02
+> +
+>  /* interfaces */
+>  sPAPROptionVector *spapr_ovec_new(void);
+>  sPAPROptionVector *spapr_ovec_clone(sPAPROptionVector *ov_orig);
+> @@ -69,6 +75,7 @@ void spapr_ovec_cleanup(sPAPROptionVector *ov);
+>  void spapr_ovec_set(sPAPROptionVector *ov, long bitnr);
+>  void spapr_ovec_clear(sPAPROptionVector *ov, long bitnr);
+>  bool spapr_ovec_test(sPAPROptionVector *ov, long bitnr);
+> +uint8_t spapr_ovec_byte(sPAPROptionVector *ov, long bitnr);
+>  sPAPROptionVector *spapr_ovec_parse_vector(target_ulong table_addr, int =
+vector);
+>  int spapr_ovec_populate_dt(void *fdt, int fdt_offset,
+>                             sPAPROptionVector *ov, const char *name);
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -135,25 +247,25 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---R7Dyui215VKdTDYA
+--e+JRL32uBeeWnrD4
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v2
 
-iQIcBAEBCAAGBQJZJRGUAAoJEGw4ysog2bOSF5kP/3shY+iCViu4T2g7d6ijDuzW
-ZkVQWupYvC3akcsg3MJ77167EhSa88mY2/I/cF0vMofmiP8NYPouFr9QHm0lm7CP
-rZNh4Q9sZYw/2U+THHEs3ku5yfqFfMpcaGC0BBbzxZ2sqEJxOYrk6tztfnhtjfZT
-07uhmYd0YnWVJmHG8Kx1n1yM/HDwcr906LTL6O92XAkJIobiW10T/pW/qoTq0Lax
-zfdMzTJxiAMdB+Bz1CD2ETQpqrJ6rKywvBjmdr7UYq1qMbXm5TTJXRzr6vqimymn
-UqB4KqPEnRumnUCMh2f80fcTio0+uu1FO8PvvsvItcx0SX5LckL3X9YP4058SqlQ
-96kkwa2/GDydMs89MIGWxFLtusxrKmC1jC+HmHv5HspLttf3XUB39rLkL731CzBC
-P3sHBEu3ZBxSJaAW+GK0fUv7oRrYzuXW3vhDr0ruasocGAQWnyS84AJLw5gXP0av
-iOlFz8XuFW9F/Ecu+juyr+BHN4c90RCkvO8pHwetIUVp5DxE0s87TNeRKUe0MPL6
-by5fEF4EBMsr/ch0UY+PvDKo41x1gZ6AdeaR9daknuuO5d2Jgko98hWe6OSM7wcw
-LU/OITljwpRhNbOepEXVw+yEDzVKFmmf92Ma/DjmcckyyYF/w0AsXvgudsaskgHA
-iwa/eOf1XyghEwdiaXZu
-=N9Id
+iQIcBAEBCAAGBQJZJRLeAAoJEGw4ysog2bOS9iAQAM+R6rhkL+q5ojBZkGxv1MOL
+CFFZLwcKNoKqP/1O6OjJPKYifL4d5iU0lPUo2mdMkwxOmBsLcSXOgJwzArONBXtD
+247Ifr06obRD/EWG7xA6JaDy2L3gm6eVWAAzeTPkIjd1sulC09vxocO1JVsd/fjE
+sI2LIVyUVftESM+rir22+tpy2r4vgMjoAI8xt1BjxhJQxCMHDIrO9779BjsNuOFP
+eeo5zplGoJbtvrftEU89OjJMrTzrq1uZEb2xIph4t3D4pavWkUd744psUMLw2XBA
+ZB5H8IWidGvtVUean0Qi6LvpXervGPT/GdlUcTyoP6+HGgqjxEtCGZDdOHBDrxMQ
+u0UtrVYk50kIXaR4G6PsMs7SjZn+u+61pzioeEPmn2PYfeTuSeuZDWcdqhPl0djT
+LQSYsVWLP8IcS4OS/VcRhw1UNmKMgdznNhtoJxBGFj+1DIQ50aNdshcGYwHVD1X9
+uBW0f6SJaw37sTC3kloVUxm/we4fJQ9Mu2uQBLeOcDXE9cHIyHP/VG7N4UzLm//n
+awRb9Tpeii52JmLWZ+cEURzigxbBwpAhqI3b3mxF1KtBvM9RXChstQhc4dGToBDY
+FKlrod6QdZ86XyvYbstOofhotbZpgUUCO7tKZK+8Ph4fNUPbACMP6SPtT5GCbL3Y
+V0W8MvNJeFGmrMEYbwNL
+=2wQw
 -----END PGP SIGNATURE-----
 
---R7Dyui215VKdTDYA--
+--e+JRL32uBeeWnrD4--
