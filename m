@@ -1,25 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:32857)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35569)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lprosek@redhat.com>) id 1dDRMD-00070V-9R
-	for qemu-devel@nongnu.org; Wed, 24 May 2017 04:09:26 -0400
+	(envelope-from <wei.w.wang@intel.com>) id 1dDRT8-0000ac-07
+	for qemu-devel@nongnu.org; Wed, 24 May 2017 04:16:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lprosek@redhat.com>) id 1dDRM9-0005f8-Af
-	for qemu-devel@nongnu.org; Wed, 24 May 2017 04:09:25 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:33824)
+	(envelope-from <wei.w.wang@intel.com>) id 1dDRT4-0000Jp-Q5
+	for qemu-devel@nongnu.org; Wed, 24 May 2017 04:16:34 -0400
+Received: from mga03.intel.com ([134.134.136.65]:36271)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lprosek@redhat.com>) id 1dDRM9-0005eV-5B
-	for qemu-devel@nongnu.org; Wed, 24 May 2017 04:09:21 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 56EA97249D
-	for <qemu-devel@nongnu.org>; Wed, 24 May 2017 08:09:19 +0000 (UTC)
-From: Ladi Prosek <lprosek@redhat.com>
-Date: Wed, 24 May 2017 10:09:14 +0200
-Message-Id: <20170524080914.23484-1-lprosek@redhat.com>
-Subject: [Qemu-devel] [PATCH] pc: ACPI BIOS: use highest NUMA node for
- hotplug mem hole SRAT entry
+	(Exim 4.71) (envelope-from <wei.w.wang@intel.com>)
+	id 1dDRT4-0000JN-Eg
+	for qemu-devel@nongnu.org; Wed, 24 May 2017 04:16:30 -0400
+Message-ID: <592541D9.3030303@intel.com>
+Date: Wed, 24 May 2017 16:18:33 +0800
+From: Wei Wang <wei.w.wang@intel.com>
+MIME-Version: 1.0
+References: <1495161139-28757-1-git-send-email-wei.w.wang@intel.com>
+	<20170519233750-mutt-send-email-mst@kernel.org>
+	<5922D0EC.6060405@intel.com>
+	<b415fea9-9d48-9390-0ec2-46f69b7a54b0@redhat.com>
+	<5923C557.3020301@intel.com>
+	<ac8a484d-744a-8bdf-eba2-05239c6eefb1@redhat.com>
+	<5924109F.6090608@intel.com>
+	<48ec0c88-801f-fc1f-401f-51cb2ca3fed2@redhat.com>
+In-Reply-To: <48ec0c88-801f-fc1f-401f-51cb2ca3fed2@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [virtio-dev] Re: [PATCH RFC] virtio-net: enable
+ configurable tx queue size
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,57 +35,140 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: imammedo@redhat.com, mst@redhat.com
+To: Jason Wang <jasowang@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
+Cc: stefanha@gmail.com, marcandre.lureau@gmail.com, pbonzini@redhat.com, jan.scheurich@ericsson.com, virtio-dev@lists.oasis-open.org, qemu-devel@nongnu.org
 
-For reasons unknown, Windows won't online all memory, both at command
-line and hot-plugged later, unless the hotplug mem hole SRAT entry
-specifies a node greater or equal to the ones where memory is added.
+On 05/24/2017 11:19 AM, Jason Wang wrote:
+>
+>
+> On 2017年05月23日 18:36, Wei Wang wrote:
+>> On 05/23/2017 02:24 PM, Jason Wang wrote:
+>>>
+>>>
+>>> On 2017年05月23日 13:15, Wei Wang wrote:
+>>>> On 05/23/2017 10:04 AM, Jason Wang wrote:
+>>>>>
+>>>>>
+>>>>> On 2017年05月22日 19:52, Wei Wang wrote:
+>>>>>> On 05/20/2017 04:42 AM, Michael S. Tsirkin wrote:
+>>>>>>> On Fri, May 19, 2017 at 10:32:19AM +0800, Wei Wang wrote:
+>>>>>>>> This patch enables the virtio-net tx queue size to be configurable
+>>>>>>>> between 256 (the default queue size) and 1024 by the user. The 
+>>>>>>>> queue
+>>>>>>>> size specified by the user should be power of 2.
+>>>>>>>>
+>>>>>>>> Setting the tx queue size to be 1024 requires the guest driver to
+>>>>>>>> support the VIRTIO_NET_F_MAX_CHAIN_SIZE feature.
+>>>>>>> This should be a generic ring feature, not one specific to 
+>>>>>>> virtio net.
+>>>>>> OK. How about making two more changes below:
+>>>>>>
+>>>>>> 1) make the default tx queue size = 1024 (instead of 256).
+>>>>>
+>>>>> As has been pointed out, you need compat the default value too in 
+>>>>> this case.
+>>>>
+>>>> The driver gets the size info from the device, then would it cause any
+>>>> compatibility issue if we change the default ring size to 1024 in the
+>>>> vhost case? In other words, is there any software (i.e. any 
+>>>> virtio-net driver)
+>>>> functions based on the assumption of 256 queue size?
+>>>
+>>> I don't know. But is it safe e.g we migrate from 1024 to an older 
+>>> qemu with 256 as its queue size?
+>>
+>> Yes, I think it is safe, because the default queue size is used when 
+>> the device is being
+>> set up (e.g. feature negotiation).
+>> During migration (the device has already been running), the 
+>> destination machine will
+>> load the device state based on the the queue size that is being used 
+>> (i.e. vring.num).
+>> The default value is not used any more after the setup phase.
+>
+> I haven't checked all cases, but there's two obvious things:
+>
+> - After migration and after a reset, it will go back to 256 on dst.
 
-Using the highest node on the machine makes recent versions of Windows
-happy.
+Please let me clarify what we want first: when QEMU boots and it 
+realizes the
+virtio-net device, if the tx_queue_size is not given by the command 
+line, we want
+to use 1024 as the queue size, that is, virtio_add_queue(,1024,), which sets
+vring.num=1024 and vring.num_default=1024.
 
-With this example command line:
-  ... \
-  -m 1024,slots=4,maxmem=32G \
-  -numa node,nodeid=0 \
-  -numa node,nodeid=1 \
-  -numa node,nodeid=2 \
-  -numa node,nodeid=3 \
-  -object memory-backend-ram,size=1G,id=mem-mem1 \
-  -device pc-dimm,id=dimm-mem1,memdev=mem-mem1,node=1
+When migration happens, the vring.num variable (has been 1024) is sent to
+the destination machine, where virtio_load() will assign the destination 
+side vring.num
+to that value (1024). So, vring.num=1024 continues to work on the 
+destination machine
+with old QEMU. I don't see an issue here.
 
-Windows reports a total of 1G of RAM without this commit and the expected
-2G with this commit.
+If reset happens, I think the device and driver will re-do the 
+initialization steps. So, if they are
+with the old QEMU, then they use the old qemu realize() function to do 
+virtio_add_queue(,256,),
+and the driver will re-do the probe() steps and take vring.num=256, then 
+everything works fine.
 
-Signed-off-by: Ladi Prosek <lprosek@redhat.com>
----
- hw/i386/acpi-build.c | 7 +++++--
- 1 file changed, 5 insertions(+), 2 deletions(-)
 
-diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
-index afcadac..9653583 100644
---- a/hw/i386/acpi-build.c
-+++ b/hw/i386/acpi-build.c
-@@ -2404,14 +2404,17 @@ build_srat(GArray *table_data, BIOSLinker *linker, MachineState *machine)
-     }
- 
-     /*
--     * Entry is required for Windows to enable memory hotplug in OS.
-+     * Entry is required for Windows to enable memory hotplug in OS
-+     * and for Linux to enable SWIOTLB even if booted with less than
-+     * 4G of RAM. Windows works better if the entry sets proximity
-+     * to the highest NUMA node in the machine.
-      * Memory devices may override proximity set by this entry,
-      * providing _PXM method if necessary.
-      */
-     if (hotplugabble_address_space_size) {
-         numamem = acpi_data_push(table_data, sizeof *numamem);
-         build_srat_memory(numamem, pcms->hotplug_memory.base,
--                          hotplugabble_address_space_size, 0,
-+                          hotplugabble_address_space_size, pcms->numa_nodes - 1,
-                           MEM_AFFINITY_HOTPLUGGABLE | MEM_AFFINITY_ENABLED);
-     }
- 
--- 
-2.9.3
+> - ABI is changed, e.g -M pc-q35-2.10 returns 1024 on 2.11
+>
+Didn't get this. Could you please explain more? which ABI would be 
+changed, and why it affects q35?
+
+
+>>
+>>>
+>>>>
+>>>> For live migration, the queue size that is being used will also be 
+>>>> transferred
+>>>> to the destination.
+>>>>
+>>>>>
+>>>>>> We can reduce the size (to 256) if the MAX_CHAIN_SIZE feature
+>>>>>> is not supported by the guest.
+>>>>>> In this way, people who apply the QEMU patch can directly use the
+>>>>>> largest queue size(1024) without adding the booting command line.
+>>>>>>
+>>>>>> 2) The vhost backend does not use writev, so I think when the vhost
+>>>>>> backed is used, using 1024 queue size should not depend on the
+>>>>>> MAX_CHAIN_SIZE feature.
+>>>>>
+>>>>> But do we need to consider even larger queue size now?
+>>>>
+>>>> Need Michael's feedback on this. Meanwhile, I'll get the next 
+>>>> version of
+>>>> code ready and check if larger queue size would cause any corner case.
+>>>
+>>> The problem is, do we really need a new config filed for this? Or 
+>>> just introduce a flag which means "I support up to 1024 sgs" is 
+>>> sufficient?
+>>>
+>>
+>> For now, it also works without the new config field, max_chain_size,
+>> But I would prefer to keep the new config field, because:
+>>
+>> Without that, the driver will work on  an assumed value, 1023.
+>
+> This is the fact, and it's too late to change legacy driver.
+>
+>> If the future, QEMU needs to change it to 1022, then how can the
+>> new QEMU tell the old driver, which supports the MAX_CHAIN_SIZE
+>> feature but works with the old hardcode value 1023?
+>
+> Can config filed help in this case? The problem is similar to 
+> ANY_HEADER_SG, the only thing we can is to clarify the limitation for 
+> new drivers.
+>
+
+I think it helps, because the driver will do
+virtio_cread_feature(vdev, VIRTIO_NET_F_MAX_CHAIN_SIZE,
+                                   struct virtio_net_config, 
+max_chain_size, &chain_size);
+to get the max_chain_size from the device. So when new QEMU has a new 
+value of max_chain_size, old driver
+will get the new value.
+
+Best,
+Wei
