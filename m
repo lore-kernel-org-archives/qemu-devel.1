@@ -1,20 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47943)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48478)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <maxime.coquelin@redhat.com>) id 1dDSEc-0006sX-B5
-	for qemu-devel@nongnu.org; Wed, 24 May 2017 05:05:39 -0400
+	(envelope-from <lersek@redhat.com>) id 1dDSGR-0008Nx-4x
+	for qemu-devel@nongnu.org; Wed, 24 May 2017 05:07:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <maxime.coquelin@redhat.com>) id 1dDSEZ-0002iS-2c
-	for qemu-devel@nongnu.org; Wed, 24 May 2017 05:05:38 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:59876)
+	(envelope-from <lersek@redhat.com>) id 1dDSGP-0003bH-1k
+	for qemu-devel@nongnu.org; Wed, 24 May 2017 05:07:31 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46046)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <maxime.coquelin@redhat.com>)
-	id 1dDSEY-0002iD-SO
-	for qemu-devel@nongnu.org; Wed, 24 May 2017 05:05:35 -0400
-From: Maxime Coquelin <maxime.coquelin@redhat.com>
-Date: Wed, 24 May 2017 11:05:20 +0200
-Message-Id: <20170524090520.321-1-maxime.coquelin@redhat.com>
-Subject: [Qemu-devel] [PATCH v2] vhost-user: pass message as a pointer to
- process_message_reply()
+	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1dDSGO-0003aF-Ro
+	for qemu-devel@nongnu.org; Wed, 24 May 2017 05:07:28 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 31924C057FAB
+	for <qemu-devel@nongnu.org>; Wed, 24 May 2017 09:07:27 +0000 (UTC)
+References: <20170524080914.23484-1-lprosek@redhat.com>
+From: Laszlo Ersek <lersek@redhat.com>
+Message-ID: <437f8abb-8d19-f4cd-b92d-9780efa0fe0e@redhat.com>
+Date: Wed, 24 May 2017 11:07:16 +0200
+MIME-Version: 1.0
+In-Reply-To: <20170524080914.23484-1-lprosek@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] pc: ACPI BIOS: use highest NUMA node for
+ hotplug mem hole SRAT entry
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,76 +34,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: zhiyong.yang@intel.com, mst@redhat.com, qemu-devel@nongnu.org, jfreiman@redhat.com, marcandre.lureau@redhat.com
-Cc: Maxime Coquelin <maxime.coquelin@redhat.com>
+To: Ladi Prosek <lprosek@redhat.com>, qemu-devel@nongnu.org
+Cc: imammedo@redhat.com, mst@redhat.com
 
-process_message_reply() was recently updated to get full message
-content instead of only its request field.
+On 05/24/17 10:09, Ladi Prosek wrote:
+> For reasons unknown, Windows won't online all memory, both at command
+> line and hot-plugged later, unless the hotplug mem hole SRAT entry
+> specifies a node greater or equal to the ones where memory is added.
 
-There is no need to copy all the struct content into the stack,
-so just pass its pointer as const.
+s/greater or equal to/greater *than* or equal to/
 
-Cc: Zhiyong Yang <zhiyong.yang@intel.com>
-Fixes: 60cd11024f41 ("hw/virtio: fix vhost user fails to startup when MQ")
-Reviewed-by: Jens Freimann <jfreiman@redhat.com>
-Reviewed-by: Zhiyong Yang <zhiyong.yang@intel.com>
-Signed-off-by: Maxime Coquelin <maxime.coquelin@redhat.com>
----
-V2:
- - Make msg pointer const (Marc-Andre)
- - Apply R-b's
+Thanks,
+Laszlo
+(always finding the important issues! ;) )
 
- hw/virtio/vhost-user.c | 12 ++++++------
- 1 file changed, 6 insertions(+), 6 deletions(-)
-
-diff --git a/hw/virtio/vhost-user.c b/hw/virtio/vhost-user.c
-index b87a176..dde094a 100644
---- a/hw/virtio/vhost-user.c
-+++ b/hw/virtio/vhost-user.c
-@@ -162,11 +162,11 @@ fail:
- }
- 
- static int process_message_reply(struct vhost_dev *dev,
--                                 VhostUserMsg msg)
-+                                 const VhostUserMsg *msg)
- {
-     VhostUserMsg msg_reply;
- 
--    if ((msg.flags & VHOST_USER_NEED_REPLY_MASK) == 0) {
-+    if ((msg->flags & VHOST_USER_NEED_REPLY_MASK) == 0) {
-         return 0;
-     }
- 
-@@ -174,10 +174,10 @@ static int process_message_reply(struct vhost_dev *dev,
-         return -1;
-     }
- 
--    if (msg_reply.request != msg.request) {
-+    if (msg_reply.request != msg->request) {
-         error_report("Received unexpected msg type."
-                      "Expected %d received %d",
--                     msg.request, msg_reply.request);
-+                     msg->request, msg_reply.request);
-         return -1;
-     }
- 
-@@ -324,7 +324,7 @@ static int vhost_user_set_mem_table(struct vhost_dev *dev,
-     }
- 
-     if (reply_supported) {
--        return process_message_reply(dev, msg);
-+        return process_message_reply(dev, &msg);
-     }
- 
-     return 0;
-@@ -716,7 +716,7 @@ static int vhost_user_net_set_mtu(struct vhost_dev *dev, uint16_t mtu)
- 
-     /* If reply_ack supported, slave has to ack specified MTU is valid */
-     if (reply_supported) {
--        return process_message_reply(dev, msg);
-+        return process_message_reply(dev, &msg);
-     }
- 
-     return 0;
--- 
-2.9.4
+> 
+> Using the highest node on the machine makes recent versions of Windows
+> happy.
+> 
+> With this example command line:
+>   ... \
+>   -m 1024,slots=4,maxmem=32G \
+>   -numa node,nodeid=0 \
+>   -numa node,nodeid=1 \
+>   -numa node,nodeid=2 \
+>   -numa node,nodeid=3 \
+>   -object memory-backend-ram,size=1G,id=mem-mem1 \
+>   -device pc-dimm,id=dimm-mem1,memdev=mem-mem1,node=1
+> 
+> Windows reports a total of 1G of RAM without this commit and the expected
+> 2G with this commit.
+> 
+> Signed-off-by: Ladi Prosek <lprosek@redhat.com>
+> ---
+>  hw/i386/acpi-build.c | 7 +++++--
+>  1 file changed, 5 insertions(+), 2 deletions(-)
+> 
+> diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
+> index afcadac..9653583 100644
+> --- a/hw/i386/acpi-build.c
+> +++ b/hw/i386/acpi-build.c
+> @@ -2404,14 +2404,17 @@ build_srat(GArray *table_data, BIOSLinker *linker, MachineState *machine)
+>      }
+>  
+>      /*
+> -     * Entry is required for Windows to enable memory hotplug in OS.
+> +     * Entry is required for Windows to enable memory hotplug in OS
+> +     * and for Linux to enable SWIOTLB even if booted with less than
+> +     * 4G of RAM. Windows works better if the entry sets proximity
+> +     * to the highest NUMA node in the machine.
+>       * Memory devices may override proximity set by this entry,
+>       * providing _PXM method if necessary.
+>       */
+>      if (hotplugabble_address_space_size) {
+>          numamem = acpi_data_push(table_data, sizeof *numamem);
+>          build_srat_memory(numamem, pcms->hotplug_memory.base,
+> -                          hotplugabble_address_space_size, 0,
+> +                          hotplugabble_address_space_size, pcms->numa_nodes - 1,
+>                            MEM_AFFINITY_HOTPLUGGABLE | MEM_AFFINITY_ENABLED);
+>      }
+>  
+> 
