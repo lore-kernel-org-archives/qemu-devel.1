@@ -1,18 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54841)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55084)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <felipe@nutanix.com>) id 1dDYs1-0004Nm-Ca
-	for qemu-devel@nongnu.org; Wed, 24 May 2017 12:10:46 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1dDYt8-0005Kg-6I
+	for qemu-devel@nongnu.org; Wed, 24 May 2017 12:11:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <felipe@nutanix.com>) id 1dDYrx-0001ko-Ad
-	for qemu-devel@nongnu.org; Wed, 24 May 2017 12:10:45 -0400
-Received: from [62.254.189.133] (port=38662 helo=centos.localdomain)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <felipe@nutanix.com>) id 1dDYrw-0001dZ-Up
-	for qemu-devel@nongnu.org; Wed, 24 May 2017 12:10:41 -0400
-From: Felipe Franciosi <felipe@nutanix.com>
-Date: Wed, 24 May 2017 17:09:59 +0100
-Message-Id: <1495642203-12702-1-git-send-email-felipe@nutanix.com>
-Subject: [Qemu-devel] [PATCH 0/4] migration: autoconverge counter fixes
+	(envelope-from <pbonzini@redhat.com>) id 1dDYt5-00025L-8B
+	for qemu-devel@nongnu.org; Wed, 24 May 2017 12:11:54 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:33652)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1dDYt4-00024g-Ub
+	for qemu-devel@nongnu.org; Wed, 24 May 2017 12:11:51 -0400
+Received: from int-mx11.intmail.prod.int.phx2.redhat.com
+	(int-mx11.intmail.prod.int.phx2.redhat.com [10.5.11.24])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 07925753D8
+	for <qemu-devel@nongnu.org>; Wed, 24 May 2017 16:11:49 +0000 (UTC)
+Received: from donizetti.redhat.com (ovpn-116-29.ams2.redhat.com
+	[10.36.116.29])
+	by int-mx11.intmail.prod.int.phx2.redhat.com (8.14.4/8.14.4) with ESMTP
+	id v4OGBlvn006822
+	for <qemu-devel@nongnu.org>; Wed, 24 May 2017 12:11:48 -0400
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Wed, 24 May 2017 18:11:45 +0200
+Message-Id: <20170524161147.17846-1-pbonzini@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL v2 00/20] Misc patches for 2017-05-19
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,28 +35,112 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>, Juan Quintela <quintela@redhat.com>, "Jason J. Herne" <jjherne@linux.vnet.ibm.com>, amit Shah <amit.shah@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: Malcolm Crossley <malcolm@nutanix.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Felipe Franciosi <felipe@nutanix.com>
+To: qemu-devel@nongnu.org
 
-As discussed in the ML [1], there are some issues around the way ram.c accounts
-for transferred data and dirty pages for the auto convergence calculations. The
-patches in these series fix that by:
+The following changes since commit 56821559f0ba682fe6b367815572e6f974d329=
+ab:
 
-- Keeping bytes_xfer_prev zeroed until it's used
-- Ensure bytes_xfer_* counters are accounted for the same period as
-  dirty_pages_* counters
-- Start throttling in a consistent manner
+  Merge remote-tracking branch 'dgilbert/tags/pull-hmp-20170517' into sta=
+ging (2017-05-18 13:36:15 +0100)
 
-[1] http://lists.nongnu.org/archive/html/qemu-devel/2017-05/msg05524.html
+are available in the git repository at:
 
-Felipe Franciosi (4):
-  migration: keep bytes_xfer_prev init'd to zero
-  migration: set dirty_pages_rate before autoconverge logic
-  migration: set bytes_xfer_* outside of autoconverge logic
-  migration: use dirty_rate_high_cnt more aggressively
+  git://github.com/bonzini/qemu.git tags/for-upstream
 
- migration/ram.c | 23 +++++++++++------------
- 1 file changed, 11 insertions(+), 12 deletions(-)
+for you to fetch changes up to 46465ffebc75edd75091f4eb0963fd48ce7c02b6:
 
--- 
-1.9.5
+  target/i386: use multiple CPU AddressSpaces (2017-05-24 18:09:03 +0200)
+
+v2 fixes coding style errors in vhost-user-scsi.
+
+----------------------------------------------------------------
+* virtio-scsi use-after-free fix (Fam)
+* vhost-user-scsi support (Felipe)
+* SMM fixes and improvements for TCG (myself)
+* irqchip and AddressSpaceDispatch cleanups and fixes (Peter)
+* Coverity fix (Stefano)
+* NBD cleanups (Vladimir)
+* RTC accuracy improvements and code cleanups (Guangrong+Yunfang)
+
+----------------------------------------------------------------
+Fam Zheng (1):
+      virtio-scsi: Unset hotplug handler when unrealize
+
+Felipe Franciosi (2):
+      vhost-user-scsi: Introduce vhost-user-scsi host device
+      vhost-user-scsi: Introduce a vhost-user-scsi sample application
+
+Paolo Bonzini (2):
+      target/i386: enable A20 automatically in system management mode
+      target/i386: use multiple CPU AddressSpaces
+
+Peter Xu (4):
+      kvm: irqchip: trace changes on msi add/remove
+      msix: trace control bit write op
+      kvm: irqchip: skip update msi when disabled
+      exec: simplify phys_page_find() params
+
+Stefano Stabellini (1):
+      Check the return value of fcntl in qemu_set_cloexec
+
+Tai Yunfang (1):
+      mc146818rtc: precisely count the clock for periodic timer
+
+Vladimir Sementsov-Ogievskiy (5):
+      nbd: strict nbd_wr_syncv
+      nbd: read_sync and friends: return 0 on success
+      nbd: add errp parameter to nbd_wr_syncv()
+      nbd: add errp to read_sync, write_sync and drop_sync
+      nbd/client.c: use errp instead of LOG
+
+Xiao Guangrong (4):
+      mc146818rtc: update periodic timer only if it is needed
+      mc146818rtc: ensure LOST_TICK_POLICY_SLEW is only enabled on TARGET=
+_I386
+      mc146818rtc: drop unnecessary '#ifdef TARGET_I386'
+      mc146818rtc: embrace all x86 specific code
+
+ .gitignore                                |   1 +
+ Makefile                                  |   3 +
+ Makefile.objs                             |   4 +
+ block/nbd-client.c                        |  11 +-
+ contrib/libvhost-user/libvhost-user.h     |  11 +-
+ contrib/vhost-user-scsi/Makefile.objs     |   1 +
+ contrib/vhost-user-scsi/vhost-user-scsi.c | 886 ++++++++++++++++++++++++=
+++++++
+ default-configs/pci.mak                   |   1 +
+ default-configs/s390x-softmmu.mak         |   1 +
+ exec.c                                    |  13 +-
+ hw/pci/msix.c                             |  11 +-
+ hw/pci/trace-events                       |   3 +
+ hw/scsi/Makefile.objs                     |   1 +
+ hw/scsi/vhost-user-scsi.c                 | 211 +++++++
+ hw/scsi/virtio-scsi.c                     |   3 +
+ hw/timer/mc146818rtc.c                    | 206 ++++---
+ hw/virtio/virtio-pci.c                    |  54 ++
+ hw/virtio/virtio-pci.h                    |  11 +
+ include/block/nbd.h                       |   8 +-
+ include/hw/virtio/vhost-user-scsi.h       |  35 ++
+ include/hw/virtio/virtio-scsi.h           |   2 +
+ kvm-all.c                                 |   4 +-
+ nbd/client.c                              | 125 ++---
+ nbd/common.c                              |  23 +-
+ nbd/nbd-internal.h                        |  40 +-
+ nbd/server.c                              |  92 ++--
+ qemu-nbd.c                                |   3 +-
+ target/i386/arch_memory_mapping.c         |  18 +-
+ target/i386/cpu.c                         |  15 +-
+ target/i386/cpu.h                         |  20 +-
+ target/i386/helper.c                      |  96 ++--
+ target/i386/kvm.c                         |  12 +-
+ target/i386/machine.c                     |   4 -
+ target/i386/smm_helper.c                  |  18 -
+ trace-events                              |   3 +-
+ util/oslib-posix.c                        |   4 +-
+ 36 files changed, 1643 insertions(+), 311 deletions(-)
+ create mode 100644 contrib/vhost-user-scsi/Makefile.objs
+ create mode 100644 contrib/vhost-user-scsi/vhost-user-scsi.c
+ create mode 100644 hw/scsi/vhost-user-scsi.c
+ create mode 100644 include/hw/virtio/vhost-user-scsi.h
+--=20
+2.13.0
