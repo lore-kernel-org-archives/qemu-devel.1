@@ -1,26 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57729)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57793)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dDOwL-0003j3-Qd
-	for qemu-devel@nongnu.org; Wed, 24 May 2017 01:34:34 -0400
+	(envelope-from <armbru@redhat.com>) id 1dDOx0-00046t-Au
+	for qemu-devel@nongnu.org; Wed, 24 May 2017 01:35:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dDOwI-0006CT-NJ
-	for qemu-devel@nongnu.org; Wed, 24 May 2017 01:34:33 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:33010)
+	(envelope-from <armbru@redhat.com>) id 1dDOwx-0006eO-6g
+	for qemu-devel@nongnu.org; Wed, 24 May 2017 01:35:14 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46274)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1dDOwI-0006By-Gv
-	for qemu-devel@nongnu.org; Wed, 24 May 2017 01:34:30 -0400
-Date: Wed, 24 May 2017 13:34:25 +0800
-From: Fam Zheng <famz@redhat.com>
-Message-ID: <20170524053425.GM12279@lemon.lan>
-References: <20170521032956.27446-1-f4bug@amsat.org>
-	<20170521032956.27446-3-f4bug@amsat.org>
-	<20170524052123.GJ12279@lemon.lan>
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dDOwx-0006dQ-0G
+	for qemu-devel@nongnu.org; Wed, 24 May 2017 01:35:11 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <cover.1495508197.git.maozy.fnst@cn.fujitsu.com>
+	<29c33313efd2ee4f7bf3abb71a4809582891f408.1495508197.git.maozy.fnst@cn.fujitsu.com>
+	<87wp97hqi4.fsf@dusky.pond.sub.org>
+	<4011bf08-8686-f2ae-474e-004aa603cc0e@amsat.org>
+Date: Wed, 24 May 2017 07:35:04 +0200
+In-Reply-To: <4011bf08-8686-f2ae-474e-004aa603cc0e@amsat.org> ("Philippe
+	=?utf-8?Q?Mathieu-Daud=C3=A9=22's?= message of "Wed,
+	24 May 2017 01:43:04 -0300")
+Message-ID: <87r2zeu8af.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170524052123.GJ12279@lemon.lan>
-Subject: Re: [Qemu-devel] [PATCH v3 02/24] docker: add --include-files
- argument to 'build' command
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v5 1/4] net/rocker: Remove the dead error
+ handling
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,29 +32,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
-Cc: Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org
+To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Cc: qemu-devel@nongnu.org, Mao Zhongyi <maozy.fnst@cn.fujitsu.com>, jiri@resnulli.us, jasowang@redhat.com, "Michael S. Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>
 
-On Wed, 05/24 13:21, Fam Zheng wrote:
-> > diff --git a/tests/docker/docker.py b/tests/docker/docker.py
-> > index 6ddc6e4c2a..68cca25f89 100755
-> > --- a/tests/docker/docker.py
-> > +++ b/tests/docker/docker.py
-> > @@ -237,6 +237,11 @@ class BuildCommand(SubCommand):
-> >                              help="""Specify a binary that will be copied to the
-> >                              container together with all its dependent
-> >                              libraries""")
-> > +        parser.add_argument("--extra-files", "-f", nargs='*',
-> > +                            help="""Specify files that will be sent to the
-> > +                            Docker daemon. The daemon will copy those files into
-> > +                            the built image. The ADD directive of the Dockerfile
-> > +                            specify where a file is placed into the image""")
-> 
-> Or more precisely, "The daemon will copy these files into the docker build
-> directory, which can be copied to the built image with ADD directives in
-> Dockerfile"?
+Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> writes:
 
-Hmm, not copied by daemon, maybe "The files will be sent...". But you have the
-idea.
+> Hi Markus,
+>
+> On 05/23/2017 06:27 AM, Markus Armbruster wrote:
+> [...]
+>> There's one more cleanup opportunity:
+>>
+> [...]
+>>>      if (pci_dma_read(dev, le64_to_cpu(info->desc.buf_addr), info->buf,=
+ size)) {
+>>>          return NULL;
+>>>      }
+>>
+>> None of the pci_dma_read() calls outside rocker check the return value.
+>> Just as well, because it always returns 0.  Please clean this up in a
+>> separate followup patch.
+>
+> It may be the correct way to do it but this sounds like we are missing
+> something somewhere... pci_dma_read() calls pci_dma_rw() which always
+> returns 0. Why not let it returns void? It is inlined and never used
+> by address. Else we should document why returning 0 is correct, and
+> what is the reason to not use a void prototype.
+>
+> pci_dma_rw() calls dma_memory_rw() which does return a boolean value,
+> false on success (MEMTX_OK) and true on error
+> (MEMTX_ERROR/DECODE_ERROR)
 
-Fam
+PCI question.  Michael, Marcel?
