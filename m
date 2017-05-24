@@ -1,36 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51427)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51435)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bharata@linux.vnet.ibm.com>) id 1dDOJw-0001bY-Ey
-	for qemu-devel@nongnu.org; Wed, 24 May 2017 00:54:54 -0400
+	(envelope-from <bharata@linux.vnet.ibm.com>) id 1dDOJw-0001ba-Jz
+	for qemu-devel@nongnu.org; Wed, 24 May 2017 00:54:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bharata@linux.vnet.ibm.com>) id 1dDOJt-0007Bk-CL
+	(envelope-from <bharata@linux.vnet.ibm.com>) id 1dDOJt-0007C3-Un
 	for qemu-devel@nongnu.org; Wed, 24 May 2017 00:54:52 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:49441
-	helo=mx0a-001b2d01.pphosted.com)
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:44098)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <bharata@linux.vnet.ibm.com>)
-	id 1dDOJt-0007BS-72
+	id 1dDOJt-0007BU-Lp
 	for qemu-devel@nongnu.org; Wed, 24 May 2017 00:54:49 -0400
-Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
 	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v4O4rqGV101328
+	v4O4rnQ6141749
 	for <qemu-devel@nongnu.org>; Wed, 24 May 2017 00:54:48 -0400
-Received: from e23smtp05.au.ibm.com (e23smtp05.au.ibm.com [202.81.31.147])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2amynvqb1t-1
+Received: from e23smtp09.au.ibm.com (e23smtp09.au.ibm.com [202.81.31.142])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2an1m0khxp-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
 	for <qemu-devel@nongnu.org>; Wed, 24 May 2017 00:54:48 -0400
 Received: from localhost
-	by e23smtp05.au.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	by e23smtp09.au.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
 	Only! Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <bharata@linux.vnet.ibm.com>;
-	Wed, 24 May 2017 14:54:45 +1000
+	Wed, 24 May 2017 14:54:44 +1000
 From: Bharata B Rao <bharata@linux.vnet.ibm.com>
-Date: Wed, 24 May 2017 10:23:33 +0530
+Date: Wed, 24 May 2017 10:23:32 +0530
 In-Reply-To: <1495601614-18586-1-git-send-email-bharata@linux.vnet.ibm.com>
 References: <1495601614-18586-1-git-send-email-bharata@linux.vnet.ibm.com>
-Message-Id: <1495601614-18586-3-git-send-email-bharata@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH v3 2/3] spapr: Unregister HPT savevm handlers
- for radix guests
+Message-Id: <1495601614-18586-2-git-send-email-bharata@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [PATCH v3 1/3] migration: Introduce
+ unregister_savevm_live()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -40,165 +39,79 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: qemu-ppc@nongnu.org, david@gibson.dropbear.id.au, sam.bobroff@au1.ibm.com, rnsastry@linux.vnet.ibm.com, sjitindarsingh@gmail.com, Bharata B Rao <bharata@linux.vnet.ibm.com>
+Cc: qemu-ppc@nongnu.org, david@gibson.dropbear.id.au, sam.bobroff@au1.ibm.com, rnsastry@linux.vnet.ibm.com, sjitindarsingh@gmail.com, Bharata B Rao <bharata@linux.vnet.ibm.com>, Juan Quintela <quintela@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
 
-HPT gets created by default for TCG guests and later when the guest turns
-out to be a radix guest, the HPT is destroyed when guest does
-H_REGISTER_PROC_TBL hcall. Let HTAB savevm handlers registration and
-unregistration follow the same model so that we don't end up having
-unrequired HTAB savevm handlers for radix guests.
+Introduce a new function unregister_savevm_live() to unregister the vmstate
+handlers registered via register_savevm_live().
 
-This also ensures that HTAB savevm handlers seemlessly get destroyed and
-recreated like HTAB itself when hash guest reboots.
+register_savevm() allocates SaveVMHandlers while register_savevm_live()
+gets passed with SaveVMHandlers. During unregistration, we  want to
+free SaveVMHandlers in the former case but not free in the latter case.
+Hence this new API is needed to differentiate this.
 
-HTAB savevm handlers registration/unregistration is now done from
-spapr_reallocate_hpt() which itself is called from one of the
-savevm_htab_handlers.htab_load(). To cater to this circular dependency
-spapr_reallocate_hpt() is made global.
+This new API will be needed by PowerPC to unregister the HTAB savevm
+handlers.
 
 Signed-off-by: Bharata B Rao <bharata@linux.vnet.ibm.com>
 Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
+Cc: Juan Quintela <quintela@redhat.com>
+Cc: Dr. David Alan Gilbert <dgilbert@redhat.com>
 ---
- hw/ppc/spapr.c         | 99 +++++++++++++++++++++++++-------------------------
- include/hw/ppc/spapr.h |  2 +
- 2 files changed, 52 insertions(+), 49 deletions(-)
+ include/migration/vmstate.h |  1 +
+ migration/savevm.c          | 17 +++++++++++++++--
+ 2 files changed, 16 insertions(+), 2 deletions(-)
 
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index 91f7434..daf335c 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -1233,53 +1233,7 @@ void spapr_free_hpt(sPAPRMachineState *spapr)
-     spapr->htab = NULL;
-     spapr->htab_shift = 0;
-     close_htab_fd(spapr);
--}
--
--static void spapr_reallocate_hpt(sPAPRMachineState *spapr, int shift,
--                                 Error **errp)
--{
--    long rc;
--
--    /* Clean up any HPT info from a previous boot */
--    spapr_free_hpt(spapr);
--
--    rc = kvmppc_reset_htab(shift);
--    if (rc < 0) {
--        /* kernel-side HPT needed, but couldn't allocate one */
--        error_setg_errno(errp, errno,
--                         "Failed to allocate KVM HPT of order %d (try smaller maxmem?)",
--                         shift);
--        /* This is almost certainly fatal, but if the caller really
--         * wants to carry on with shift == 0, it's welcome to try */
--    } else if (rc > 0) {
--        /* kernel-side HPT allocated */
--        if (rc != shift) {
--            error_setg(errp,
--                       "Requested order %d HPT, but kernel allocated order %ld (try smaller maxmem?)",
--                       shift, rc);
--        }
--
--        spapr->htab_shift = shift;
--        spapr->htab = NULL;
--    } else {
--        /* kernel-side HPT not needed, allocate in userspace instead */
--        size_t size = 1ULL << shift;
--        int i;
--
--        spapr->htab = qemu_memalign(size, size);
--        if (!spapr->htab) {
--            error_setg_errno(errp, errno,
--                             "Could not allocate HPT of order %d", shift);
--            return;
--        }
--
--        memset(spapr->htab, 0, size);
--        spapr->htab_shift = shift;
--
--        for (i = 0; i < size / HASH_PTE_SIZE_64; i++) {
--            DIRTY_HPTE(HPTE(spapr->htab, i));
--        }
--    }
-+    unregister_savevm_live(NULL, "spapr/htab", spapr);
+diff --git a/include/migration/vmstate.h b/include/migration/vmstate.h
+index 8489659..02a1bac 100644
+--- a/include/migration/vmstate.h
++++ b/include/migration/vmstate.h
+@@ -79,6 +79,7 @@ int register_savevm_live(DeviceState *dev,
+                          void *opaque);
+ 
+ void unregister_savevm(DeviceState *dev, const char *idstr, void *opaque);
++void unregister_savevm_live(DeviceState *dev, const char *idstr, void *opaque);
+ 
+ typedef struct VMStateInfo VMStateInfo;
+ typedef struct VMStateDescription VMStateDescription;
+diff --git a/migration/savevm.c b/migration/savevm.c
+index f5e8194..4ef6fdc 100644
+--- a/migration/savevm.c
++++ b/migration/savevm.c
+@@ -630,7 +630,8 @@ int register_savevm(DeviceState *dev,
+                                 ops, opaque);
  }
  
- void spapr_setup_hpt_and_vrma(sPAPRMachineState *spapr)
-@@ -1879,6 +1833,55 @@ static SaveVMHandlers savevm_htab_handlers = {
-     .load_state = htab_load,
- };
+-void unregister_savevm(DeviceState *dev, const char *idstr, void *opaque)
++static void unregister_savevm_common(DeviceState *dev, const char *idstr,
++                                     void *opaque, bool free_savevmhandlers)
+ {
+     SaveStateEntry *se, *new_se;
+     char id[256] = "";
+@@ -649,12 +650,24 @@ void unregister_savevm(DeviceState *dev, const char *idstr, void *opaque)
+         if (strcmp(se->idstr, id) == 0 && se->opaque == opaque) {
+             QTAILQ_REMOVE(&savevm_state.handlers, se, entry);
+             g_free(se->compat);
+-            g_free(se->ops);
++            if (free_savevmhandlers) {
++                g_free(se->ops);
++            }
+             g_free(se);
+         }
+     }
+ }
  
-+void spapr_reallocate_hpt(sPAPRMachineState *spapr, int shift,
-+                                 Error **errp)
++void unregister_savevm(DeviceState *dev, const char *idstr, void *opaque)
 +{
-+    long rc;
-+
-+    /* Clean up any HPT info from a previous boot */
-+    spapr_free_hpt(spapr);
-+
-+    rc = kvmppc_reset_htab(shift);
-+    if (rc < 0) {
-+        /* kernel-side HPT needed, but couldn't allocate one */
-+        error_setg_errno(errp, errno,
-+                         "Failed to allocate KVM HPT of order %d (try smaller maxmem?)",
-+                         shift);
-+        /* This is almost certainly fatal, but if the caller really
-+         * wants to carry on with shift == 0, it's welcome to try */
-+    } else if (rc > 0) {
-+        /* kernel-side HPT allocated */
-+        if (rc != shift) {
-+            error_setg(errp,
-+                       "Requested order %d HPT, but kernel allocated order %ld (try smaller maxmem?)",
-+                       shift, rc);
-+        }
-+
-+        spapr->htab_shift = shift;
-+        spapr->htab = NULL;
-+    } else {
-+        /* kernel-side HPT not needed, allocate in userspace instead */
-+        size_t size = 1ULL << shift;
-+        int i;
-+
-+        spapr->htab = qemu_memalign(size, size);
-+        if (!spapr->htab) {
-+            error_setg_errno(errp, errno,
-+                             "Could not allocate HPT of order %d", shift);
-+            return;
-+        }
-+
-+        memset(spapr->htab, 0, size);
-+        spapr->htab_shift = shift;
-+
-+        for (i = 0; i < size / HASH_PTE_SIZE_64; i++) {
-+            DIRTY_HPTE(HPTE(spapr->htab, i));
-+        }
-+    }
-+    register_savevm_live(NULL, "spapr/htab", -1, 1,
-+                         &savevm_htab_handlers, spapr);
++    unregister_savevm_common(dev, idstr, opaque, true);
 +}
 +
- static void spapr_boot_set(void *opaque, const char *boot_device,
-                            Error **errp)
- {
-@@ -2341,8 +2344,6 @@ static void ppc_spapr_init(MachineState *machine)
-      * interface, this is a legacy from the sPAPREnvironment structure
-      * which predated MachineState but had a similar function */
-     vmstate_register(NULL, 0, &vmstate_spapr, spapr);
--    register_savevm_live(NULL, "spapr/htab", -1, 1,
--                         &savevm_htab_handlers, spapr);
- 
-     /* used by RTAS */
-     QTAILQ_INIT(&spapr->ccs_list);
-diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
-index be2b3b8..1b3297c 100644
---- a/include/hw/ppc/spapr.h
-+++ b/include/hw/ppc/spapr.h
-@@ -636,6 +636,8 @@ void spapr_hotplug_req_remove_by_count_indexed(sPAPRDRConnectorType drc_type,
-                                                uint32_t count, uint32_t index);
- void *spapr_populate_hotplug_cpu_dt(CPUState *cs, int *fdt_offset,
-                                     sPAPRMachineState *spapr);
-+void spapr_reallocate_hpt(sPAPRMachineState *spapr, int shift,
-+                                 Error **errp);
- 
- /* rtas-configure-connector state */
- struct sPAPRConfigureConnectorState {
++void unregister_savevm_live(DeviceState *dev, const char *idstr, void *opaque)
++{
++    unregister_savevm_common(dev, idstr, opaque, false);
++}
++
+ int vmstate_register_with_alias_id(DeviceState *dev, int instance_id,
+                                    const VMStateDescription *vmsd,
+                                    void *opaque, int alias_id,
 -- 
 2.7.4
