@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43961)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40435)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1dDQEu-0003yo-J2
-	for qemu-devel@nongnu.org; Wed, 24 May 2017 02:57:50 -0400
+	(envelope-from <boddupavan@yahoo.com>) id 1dDPrH-0005X5-Ef
+	for qemu-devel@nongnu.org; Wed, 24 May 2017 02:33:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1dDQEr-0007Yx-GA
-	for qemu-devel@nongnu.org; Wed, 24 May 2017 02:57:48 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:36292)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1dDQEr-0007YJ-7F
-	for qemu-devel@nongnu.org; Wed, 24 May 2017 02:57:45 -0400
-Date: Wed, 24 May 2017 14:57:36 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20170524065736.GF3873@pxdev.xzpeter.org>
-References: <1495539071-12995-1-git-send-email-a.perevalov@samsung.com>
-	<CGME20170523113130eucas1p1babac9d8659c10abe22ddc7d5b9526ab@eucas1p1.samsung.com>
-	<1495539071-12995-8-git-send-email-a.perevalov@samsung.com>
+	(envelope-from <boddupavan@yahoo.com>) id 1dDPrD-0005fh-3F
+	for qemu-devel@nongnu.org; Wed, 24 May 2017 02:33:23 -0400
+Received: from sonic303-24.consmr.mail.gq1.yahoo.com ([98.137.64.205]:44985)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <boddupavan@yahoo.com>) id 1dDPrC-0005ct-Pe
+	for qemu-devel@nongnu.org; Wed, 24 May 2017 02:33:19 -0400
+Date: Wed, 24 May 2017 06:33:14 +0000 (UTC)
+From: boddu pavan <boddupavan@yahoo.com>
+Reply-To: boddu pavan <boddupavan@yahoo.com>
+Message-ID: <1247874473.1264616.1495607594686@mail.yahoo.com>
+In-Reply-To: <910323563.4048354.1495458265640@mail.yahoo.com>
+References: <910323563.4048354.1495458265640.ref@mail.yahoo.com>
+	<910323563.4048354.1495458265640@mail.yahoo.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <1495539071-12995-8-git-send-email-a.perevalov@samsung.com>
-Subject: Re: [Qemu-devel] [PATCH V6 07/10] migration: add bitmap for copied
- page
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] ssi_auto_connect_slave
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,208 +28,17 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alexey Perevalov <a.perevalov@samsung.com>
-Cc: qemu-devel@nongnu.org, i.maximets@samsung.com, eblake@redhat.com, dgilbert@redhat.com
+To: Qemu-discuss <qemu-discuss@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>
 
-On Tue, May 23, 2017 at 02:31:08PM +0300, Alexey Perevalov wrote:
-> This patch adds ability to track down already copied
-> pages, it's necessary for calculation vCPU block time in
-> postcopy migration feature and maybe for restore after
-> postcopy migration failure.
-> 
-> Functions which work with RAMBlock are placed into ram.c,
-> due to TARGET_WORDS_BIGENDIAN is poisoned int postcopy-ram.c -
-> hardware independed code.
-> 
-> Signed-off-by: Alexey Perevalov <a.perevalov@samsung.com>
-> ---
->  include/migration/migration.h | 16 +++++++++++
->  migration/postcopy-ram.c      | 22 ++++++++++++---
->  migration/ram.c               | 63 +++++++++++++++++++++++++++++++++++++++++++
->  3 files changed, 97 insertions(+), 4 deletions(-)
-> 
-> diff --git a/include/migration/migration.h b/include/migration/migration.h
-> index 449cb07..4e05c83 100644
-> --- a/include/migration/migration.h
-> +++ b/include/migration/migration.h
-> @@ -101,6 +101,20 @@ struct MigrationIncomingState {
->      LoadStateEntry_Head loadvm_handlers;
->  
->      /*
-> +     * bitmap indicates whether page copied,
-> +     * based on ramblock offset
-> +     * now it is using only for blocktime calculation in
-> +     * postcopy migration, so livetime of this entry:
-> +     * since user requested blocktime calculation,
-> +     * till the end of postcopy migration
-> +     * as an example it could represend following memory map
-> +     * ___________________________________
-> +     * |4k pages | hugepages | 4k pages
++qemu-dev 
 
-Can we really do this?
+  Show original message     On Monday, May 22, 2017 6:34 PM, boddu pavan <boddupavan@yahoo.com> wrote:
+ 
 
-The problem is AFAIU migration stream is sending pages only in target
-page size, even for huge pages... so even for huge pages we should
-still need per TARGET_PAGE_SIZE bitmap?
-
-(Please refer to ram_state_init() on init of RAMBlock.bmap)
-
-> +     *
-> +     * */
-> +    unsigned long *copied_pages;
-> +
-> +    /*
->       * PostcopyBlocktimeContext to keep information for postcopy
->       * live migration, to calculate vCPU block time
->       * */
-> @@ -279,6 +293,8 @@ int migrate_compress_threads(void);
->  int migrate_decompress_threads(void);
->  bool migrate_use_events(void);
->  bool migrate_postcopy_blocktime(void);
-> +unsigned long int get_copied_bit_offset(ram_addr_t addr);
-> +unsigned long int *copied_pages_bitmap_new(void);
->  
->  /* Sending on the return path - generic and then for each message type */
->  void migrate_send_rp_message(MigrationIncomingState *mis,
-> diff --git a/migration/postcopy-ram.c b/migration/postcopy-ram.c
-> index 5435a40..d647769 100644
-> --- a/migration/postcopy-ram.c
-> +++ b/migration/postcopy-ram.c
-> @@ -94,23 +94,34 @@ static void destroy_blocktime_context(struct PostcopyBlocktimeContext *ctx)
->  
->  static void postcopy_migration_cb(Notifier *n, void *data)
->  {
-> -    PostcopyBlocktimeContext *ctx = container_of(n, PostcopyBlocktimeContext,
-> -                                               postcopy_notifier);
->      MigrationState *s = data;
->      if (migration_has_finished(s) || migration_has_failed(s)) {
-> +        MigrationIncomingState *mis = migration_incoming_get_current();
-> +        PostcopyBlocktimeContext *ctx = mis->blocktime_ctx;
-> +
-> +        if (!ctx) {
-> +            return;
-> +        }
-
-If we are in postcopy_migration_cb() already, then we have registered
-the notifiers, then... could this (!ctx) really happen?
-
-> +
->          g_free(ctx->page_fault_vcpu_time);
->          /* g_free is NULL robust */
->          ctx->page_fault_vcpu_time = NULL;
->          g_free(ctx->vcpu_addr);
->          ctx->vcpu_addr = NULL;
-> +        g_free(mis->copied_pages);
-> +        mis->copied_pages = NULL;
->      }
->  }
->  
->  static void migration_exit_cb(Notifier *n, void *data)
->  {
-> -    PostcopyBlocktimeContext *ctx = container_of(n, PostcopyBlocktimeContext,
-> -                                               exit_notifier);
-> +    MigrationIncomingState *mis = migration_incoming_get_current();
-> +    PostcopyBlocktimeContext *ctx = mis->blocktime_ctx;
-> +    if (!ctx) {
-> +        return;
-> +    }
-
-I failed to find out why touched this up...
-
+ Hi,
+I see that ssi_auto_connect_slave helper of ssi.c (https://github.com/qemu/qemu/blob/master/hw/ssi/ssi.c#L166) is used to connect SSISlave children of spi controller to its respective spi bus. But this function cannot handle the scenario where controller has two spi busses ( like xilinx_spips). In this case each SSISlave is registered on both the buses.
+I cannot image a possible good way to fix this, other than assigning a bus number property for each SSISlave. Let me know if that works as a good patch if provided ?
 Thanks,
+Sai Pavan
 
->      destroy_blocktime_context(ctx);
-> +    mis->blocktime_ctx = NULL;
->  }
->  
->  static struct PostcopyBlocktimeContext *blocktime_context_new(void)
-> @@ -227,6 +238,9 @@ static bool ufd_check_and_apply(int ufd, MigrationIncomingState *mis)
->              mis->blocktime_ctx = blocktime_context_new();
->          }
->  
-> +        if (!mis->copied_pages) {
-> +            mis->copied_pages = copied_pages_bitmap_new();
-> +        }
->          asked_features |= UFFD_FEATURE_THREAD_ID;
->      }
->  #endif
-> diff --git a/migration/ram.c b/migration/ram.c
-> index f59fdd4..1abb6bb 100644
-> --- a/migration/ram.c
-> +++ b/migration/ram.c
-> @@ -2661,6 +2661,69 @@ static int ram_load(QEMUFile *f, void *opaque, int version_id)
->      return ret;
->  }
->  
-> +static unsigned long get_total_bits_per_page(ram_addr_t mem_length,
-> +        size_t page_size)
-> +{
-> +    unsigned long page_size_bit = find_last_bit((unsigned long *)&page_size,
-> +            BITS_PER_LONG);
-> +    unsigned long total_bits = mem_length >> page_size_bit;
-> +    if (mem_length % page_size) {
-> +        total_bits += 1;
-> +    }
-> +    return total_bits;
-> +}
-> +
-> +/*
-> + * this function allocates bitmap for copied pages,
-> + * also it calculates
-> + * how many entries do we need
-> + * */
-> +unsigned long int *copied_pages_bitmap_new(void)
-> +{
-> +    RAMBlock *block;
-> +    unsigned long int total_bits = 0;
-> +
-> +    rcu_read_lock();
-> +    RAMBLOCK_FOREACH(block) {
-> +        /* in general case used_length may not be aligned
-> +         * by page_size */
-> +
-> +        total_bits += get_total_bits_per_page(block->used_length,
-> +                block->page_size);
-> +    }
-> +    rcu_read_unlock();
-> +
-> +    return bitmap_new(total_bits);
-> +}
-> +
-> +unsigned long int get_copied_bit_offset(ram_addr_t addr)
-> +{
-> +    RAMBlock *block;
-> +    unsigned long int iter_bit = 0;
-> +
-> +    rcu_read_lock();
-> +    RAMBLOCK_FOREACH(block) {
-> +        /* in general case used_length may not be aligned
-> +         * by page_size */
-> +        if (block->host == NULL) {
-> +            continue;
-> +        }
-> +        if (addr - (ram_addr_t)block->host < block->max_length) {
-> +            unsigned long page_size_bit = find_last_bit(
-> +                    (unsigned long *)&block->page_size,
-> +                    BITS_PER_LONG);
-> +            ram_addr_t offset = addr - (ram_addr_t)block->host;
-> +            iter_bit += offset >> page_size_bit;
-> +            break;
-> +        }
-> +        iter_bit += get_total_bits_per_page(block->used_length,
-> +                block->page_size);
-> +    }
-> +    rcu_read_unlock();
-> +
-> +    return iter_bit;
-> +}
-> +
->  static SaveVMHandlers savevm_ram_handlers = {
->      .save_live_setup = ram_save_setup,
->      .save_live_iterate = ram_save_iterate,
-> -- 
-> 1.8.3.1
-> 
-
--- 
-Peter Xu
+   
