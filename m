@@ -1,32 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50764)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50790)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1dDUXv-0005Mx-7D
-	for qemu-devel@nongnu.org; Wed, 24 May 2017 07:33:44 -0400
+	(envelope-from <peterx@redhat.com>) id 1dDUY0-0005Pr-2c
+	for qemu-devel@nongnu.org; Wed, 24 May 2017 07:33:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1dDUXq-0006qX-8C
-	for qemu-devel@nongnu.org; Wed, 24 May 2017 07:33:43 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:45064)
+	(envelope-from <peterx@redhat.com>) id 1dDUXz-0006tj-4Q
+	for qemu-devel@nongnu.org; Wed, 24 May 2017 07:33:48 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53620)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1dDUXq-0006pi-1u
-	for qemu-devel@nongnu.org; Wed, 24 May 2017 07:33:38 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 9E26A61BB2
-	for <qemu-devel@nongnu.org>; Wed, 24 May 2017 11:33:35 +0000 (UTC)
-From: Juan Quintela <quintela@redhat.com>
-In-Reply-To: <20170524112412.GK3873@pxdev.xzpeter.org> (Peter Xu's message of
-	"Wed, 24 May 2017 19:24:12 +0800")
-References: <20170524112152.23226-1-quintela@redhat.com>
-	<20170524112412.GK3873@pxdev.xzpeter.org>
-Reply-To: quintela@redhat.com
-Date: Wed, 24 May 2017 13:33:31 +0200
-Message-ID: <87wp965w1g.fsf@secure.mitica>
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1dDUXy-0006tP-U3
+	for qemu-devel@nongnu.org; Wed, 24 May 2017 07:33:47 -0400
+Date: Wed, 24 May 2017 19:33:38 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20170524113338.GL3873@pxdev.xzpeter.org>
+References: <1495539071-12995-1-git-send-email-a.perevalov@samsung.com>
+	<CGME20170523113128eucas1p17a89f8cb47d5731c50f94c3218ba155f@eucas1p1.samsung.com>
+	<1495539071-12995-5-git-send-email-a.perevalov@samsung.com>
+	<20170524023629.GD3873@pxdev.xzpeter.org>
+	<20170524064548.GA12925@aperevalov-ubuntu>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v2] migration: Allow unregister of
- save_live handlers
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20170524064548.GA12925@aperevalov-ubuntu>
+Subject: Re: [Qemu-devel] [PATCH V6 04/10] migration: split
+ ufd_version_check onto receive/request features part
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,23 +31,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: qemu-devel@nongnu.org, dgilbert@redhat.com, lvivier@redhat.com
+To: Alexey <a.perevalov@samsung.com>
+Cc: i.maximets@samsung.com, qemu-devel@nongnu.org, dgilbert@redhat.com
 
-Peter Xu <peterx@redhat.com> wrote:
-> On Wed, May 24, 2017 at 01:21:52PM +0200, Juan Quintela wrote:
->> Migration non save_live handlers have an ops member that is
->> dinamically allocated by migration code.  Save_live handlers have it
->> passed as argument and are responsability of the caller.  Add a new
->> member is_allocated that remembers if ops has to be freed.  This
->> allows unregister_savevm() to work with save_live handlers.
->> 
->> Signed-off-by: Juan Quintela <quintela@redhat.com>
->
-> I thought Laurent will prepare one patch that will directly remove
-> existing register_savevm() callers, no?
+On Wed, May 24, 2017 at 09:45:48AM +0300, Alexey wrote:
 
-s390, vmxnet3 and slirp are using it.  I am not sure that we will get
-that ones "changed" so easily.
+[...]
 
-Later, Juan.
+> > 
+> > >          return false;
+> > >      }
+> > >  
+> > > -    ioctl_mask = (__u64)1 << _UFFDIO_REGISTER |
+> > > -                 (__u64)1 << _UFFDIO_UNREGISTER;
+> > > +    ioctl_mask = 1 << _UFFDIO_REGISTER |
+> > > +                 1 << _UFFDIO_UNREGISTER;
+> > 
+> > Could I ask why we explicitly removed (__u64) here? Since I see the
+> > old one better.
+> maybe my change not robust, in any case thank to point me, but now I
+> think, here should be a constant instead of ioctl_mask, like
+> UFFD_API_IOCTLS, the total meaning of that check it's make sure kernel
+> returns to us no error and accepted features.
+> ok, from the beginning:
+> 
+> if we request unsupported feature (we check it before) or internal
+> state of userfault ctx inside kernel isn't UFFD_STATE_WAIT_API (for
+> example we are in the middle of the coping process)
+> 	ioctl should end with EINVAL error and ioctls field in
+> 	uffdio_api will be empty
+> 
+> Right now I think ioctls check for UFFD_API is not necessary.
+> We just say here, we will use _UFFDIO_REGISTER, _UFFDIO_UNREGISTER,
+> but kernel supports it unconditionally, by contrast with
+> UFFDIO_REGISTER ioctl - it also returns ioctl field in uffdio_register
+> structure, here can be a variations.
+
+Sorry I didn't get the point...
+
+AFAIU here (__u64) makes the constant "1" a 64bit variable. Just like
+when we do bit shift we normally have "1ULL<<40". I liked it since
+even if _UFFDIO_REGISTER is defined as >32 it will not overflow since
+by default a constant "1" is a "int" typed (and it's 32bit width).
+
+Thanks,
+
+-- 
+Peter Xu
