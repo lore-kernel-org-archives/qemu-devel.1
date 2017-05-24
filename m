@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45483)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45505)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dDbsS-000242-ON
-	for qemu-devel@nongnu.org; Wed, 24 May 2017 15:23:25 -0400
+	(envelope-from <rth7680@gmail.com>) id 1dDbsU-00025M-Uh
+	for qemu-devel@nongnu.org; Wed, 24 May 2017 15:23:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dDbsR-0001d0-Ky
-	for qemu-devel@nongnu.org; Wed, 24 May 2017 15:23:24 -0400
-Received: from mail-qt0-x243.google.com ([2607:f8b0:400d:c0d::243]:34243)
+	(envelope-from <rth7680@gmail.com>) id 1dDbsU-0001fe-1o
+	for qemu-devel@nongnu.org; Wed, 24 May 2017 15:23:26 -0400
+Received: from mail-qk0-x243.google.com ([2607:f8b0:400d:c09::243]:33025)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1dDbsR-0001cN-Gm
-	for qemu-devel@nongnu.org; Wed, 24 May 2017 15:23:23 -0400
-Received: by mail-qt0-x243.google.com with SMTP id l39so27575200qtb.1
-	for <qemu-devel@nongnu.org>; Wed, 24 May 2017 12:23:23 -0700 (PDT)
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1dDbsT-0001f5-U0
+	for qemu-devel@nongnu.org; Wed, 24 May 2017 15:23:25 -0400
+Received: by mail-qk0-x243.google.com with SMTP id o85so27688330qkh.0
+	for <qemu-devel@nongnu.org>; Wed, 24 May 2017 12:23:25 -0700 (PDT)
 Sender: Richard Henderson <rth7680@gmail.com>
 From: Richard Henderson <rth@twiddle.net>
-Date: Wed, 24 May 2017 12:22:37 -0700
-Message-Id: <20170524192246.15905-25-rth@twiddle.net>
+Date: Wed, 24 May 2017 12:22:39 -0700
+Message-Id: <20170524192246.15905-27-rth@twiddle.net>
 In-Reply-To: <20170524192246.15905-1-rth@twiddle.net>
 References: <20170524192246.15905-1-rth@twiddle.net>
-Subject: [Qemu-devel] [PATCH v2 24/33] target/s390x: Use unwind data for
- helper_lctl
+Subject: [Qemu-devel] [PATCH v2 26/33] target/s390x: Use unwind data for
+ helper_testblock
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,49 +34,48 @@ Reviewed-by: Thomas Huth <thuth@redhat.com>
 Reviewed-by: Aurelien Jarno <aurelien@aurel32.net>
 Signed-off-by: Richard Henderson <rth@twiddle.net>
 ---
- target/s390x/mem_helper.c | 9 +++++----
+ target/s390x/mem_helper.c | 3 +++
  target/s390x/translate.c  | 1 -
- 2 files changed, 5 insertions(+), 5 deletions(-)
+ 2 files changed, 3 insertions(+), 1 deletion(-)
 
 diff --git a/target/s390x/mem_helper.c b/target/s390x/mem_helper.c
-index 68e3817..614cdb2 100644
+index b64c04e..7df2e53 100644
 --- a/target/s390x/mem_helper.c
 +++ b/target/s390x/mem_helper.c
-@@ -878,18 +878,19 @@ void HELPER(lctlg)(CPUS390XState *env, uint32_t r1, uint64_t a2, uint32_t r3)
+@@ -939,6 +939,7 @@ void HELPER(stctl)(CPUS390XState *env, uint32_t r1, uint64_t a2, uint32_t r3)
  
- void HELPER(lctl)(CPUS390XState *env, uint32_t r1, uint64_t a2, uint32_t r3)
+ uint32_t HELPER(testblock)(CPUS390XState *env, uint64_t real_addr)
  {
 +    uintptr_t ra = GETPC();
-     S390CPU *cpu = s390_env_get_cpu(env);
-     bool PERchanged = false;
--    int i;
-     uint64_t src = a2;
--    uint32_t val;
-+    uint32_t i;
+     CPUState *cs = CPU(s390_env_get_cpu(env));
+     uint64_t abs_addr;
+     int i;
+@@ -947,12 +948,14 @@ uint32_t HELPER(testblock)(CPUS390XState *env, uint64_t real_addr)
+     abs_addr = mmu_real2abs(env, real_addr) & TARGET_PAGE_MASK;
+     if (!address_space_access_valid(&address_space_memory, abs_addr,
+                                     TARGET_PAGE_SIZE, true)) {
++        cpu_restore_state(cs, ra);
+         program_interrupt(env, PGM_ADDRESSING, 4);
+         return 1;
+     }
  
-     for (i = r1;; i = (i + 1) % 16) {
--        val = cpu_ldl_data(env, src);
-+        uint32_t val = cpu_ldl_data_ra(env, src, ra);
-         if ((uint32_t)env->cregs[i] != val && i >= 9 && i <= 11) {
-             PERchanged = true;
-         }
--        env->cregs[i] = (env->cregs[i] & 0xFFFFFFFF00000000ULL) | val;
-+        env->cregs[i] = deposit64(env->cregs[i], 0, 32, val);
-+        HELPER_LOG("load ctl %d from 0x%" PRIx64 " == 0x%x\n", i, src, val);
-         src += sizeof(uint32_t);
- 
-         if (i == r3) {
+     /* Check low-address protection */
+     if ((env->cregs[0] & CR0_LOWPROT) && real_addr < 0x2000) {
++        cpu_restore_state(cs, ra);
+         program_interrupt(env, PGM_PROTECTION, 4);
+         return 1;
+     }
 diff --git a/target/s390x/translate.c b/target/s390x/translate.c
-index 65ae573..26f6b37 100644
+index 669da89..cd017ce 100644
 --- a/target/s390x/translate.c
 +++ b/target/s390x/translate.c
-@@ -2540,7 +2540,6 @@ static ExitStatus op_lctl(DisasContext *s, DisasOps *o)
-     TCGv_i32 r1 = tcg_const_i32(get_field(s->fields, r1));
-     TCGv_i32 r3 = tcg_const_i32(get_field(s->fields, r3));
+@@ -4042,7 +4042,6 @@ static ExitStatus op_tcxb(DisasContext *s, DisasOps *o)
+ static ExitStatus op_testblock(DisasContext *s, DisasOps *o)
+ {
      check_privileged(s);
 -    potential_page_fault(s);
-     gen_helper_lctl(cpu_env, r1, o->in2, r3);
-     tcg_temp_free_i32(r1);
-     tcg_temp_free_i32(r3);
+     gen_helper_testblock(cc_op, cpu_env, o->in2);
+     set_cc_static(s);
+     return NO_EXIT;
 -- 
 2.9.4
