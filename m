@@ -1,21 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47365)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50287)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ndevos@redhat.com>) id 1dDdtq-0000iH-Ss
-	for qemu-devel@nongnu.org; Wed, 24 May 2017 17:33:00 -0400
+	(envelope-from <rth7680@gmail.com>) id 1dDe69-0004KN-BQ
+	for qemu-devel@nongnu.org; Wed, 24 May 2017 17:45:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ndevos@redhat.com>) id 1dDdtp-0005m5-JH
-	for qemu-devel@nongnu.org; Wed, 24 May 2017 17:32:58 -0400
-Date: Wed, 24 May 2017 23:32:47 +0200
-From: Niels de Vos <ndevos@redhat.com>
-Message-ID: <20170524213246.GR6614@ndevos-x240.usersys.redhat.com>
-References: <87c0140e9407c08f6e74b04131b610f2e27c014c.1495560397.git.jcody@redhat.com>
-	<20170524090202.GI6614@ndevos-x240.usersys.redhat.com>
-	<20170524205003.GB4955@localhost.localdomain>
+	(envelope-from <rth7680@gmail.com>) id 1dDe68-0003xF-Gk
+	for qemu-devel@nongnu.org; Wed, 24 May 2017 17:45:41 -0400
+Received: from mail-qk0-x235.google.com ([2607:f8b0:400d:c09::235]:33919)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1dDe68-0003x9-AZ
+	for qemu-devel@nongnu.org; Wed, 24 May 2017 17:45:40 -0400
+Received: by mail-qk0-x235.google.com with SMTP id k74so165088343qke.1
+	for <qemu-devel@nongnu.org>; Wed, 24 May 2017 14:45:39 -0700 (PDT)
+Sender: Richard Henderson <rth7680@gmail.com>
+References: <20170523030312.6360-1-rth@twiddle.net>
+	<20170523030312.6360-3-rth@twiddle.net>
+	<20170523104851.37tseiq5zlpwevr6@aurel32.net>
+	<d059a3b3-ac6c-27d2-5270-b6d5b32cc41d@twiddle.net>
+	<20170523172858.aqvgqlrwrwu6jk2o@aurel32.net>
+	<d9b3afcc-2def-ee43-9865-ab82c3361b3c@twiddle.net>
+	<20170524175409.oi5vzjvvpp3hcsfj@aurel32.net>
+From: Richard Henderson <rth@twiddle.net>
+Message-ID: <7f8643b2-5bcf-fc65-e111-d885d958f340@twiddle.net>
+Date: Wed, 24 May 2017 14:45:35 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170524205003.GB4955@localhost.localdomain>
-Subject: Re: [Qemu-devel] [PATCH] block/gluster: glfs_lseek() workaround
+In-Reply-To: <20170524175409.oi5vzjvvpp3hcsfj@aurel32.net>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 02/31] target/s390x: Implement EXECUTE via
+ new TranslationBlock
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,152 +37,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jeff Cody <jcody@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org
+To: Aurelien Jarno <aurelien@aurel32.net>
+Cc: qemu-devel@nongnu.org
 
-On Wed, May 24, 2017 at 04:50:03PM -0400, Jeff Cody wrote:
-> On Wed, May 24, 2017 at 11:02:02AM +0200, Niels de Vos wrote:
-> > On Tue, May 23, 2017 at 01:27:50PM -0400, Jeff Cody wrote:
-> > > On current released versions of glusterfs, glfs_lseek() will sometimes
-> > > return invalid values for SEEK_DATA or SEEK_HOLE.  For SEEK_DATA and
-> > > SEEK_HOLE, the returned value should be >= the passed offset, or < 0 in
-> > > the case of error:
-> > > 
-> > > LSEEK(2):
-> > > 
-> > >     off_t lseek(int fd, off_t offset, int whence);
-> > > 
-> > >     [...]
-> > > 
-> > >     SEEK_HOLE
-> > >               Adjust  the file offset to the next hole in the file greater
-> > >               than or equal to offset.  If offset points into the middle of
-> > >               a hole, then the file offset is set to offset.  If there is no
-> > >               hole past offset, then the file offset is adjusted to the end
-> > >               of the file (i.e., there is  an implicit hole at the end of
-> > >               any file).
-> > > 
-> > >     [...]
-> > > 
-> > >     RETURN VALUE
-> > >               Upon  successful  completion,  lseek()  returns  the resulting
-> > >               offset location as measured in bytes from the beginning of the
-> > >               file.  On error, the value (off_t) -1 is returned and errno is
-> > >               set to indicate the error
-> > > 
-> > > However, occasionally glfs_lseek() for SEEK_HOLE/DATA will return a
-> > > value less than the passed offset, yet greater than zero.
-> > > 
-> > > For instance, here are example values observed from this call:
-> > > 
-> > >     offs = glfs_lseek(s->fd, start, SEEK_HOLE);
-> > >     if (offs < 0) {
-> > >         return -errno;          /* D1 and (H3 or H4) */
-> > >     }
-> > > 
-> > > start == 7608336384
-> > > offs == 7607877632
-> > > 
-> > > This causes QEMU to abort on the assert test.  When this value is
-> > > returned, errno is also 0.
-> > > 
-> > > This is a reported and known bug to glusterfs:
-> > > https://bugzilla.redhat.com/show_bug.cgi?id=1425293
-> > > 
-> > > Although this is being fixed in gluster, we still should work around it
-> > > in QEMU, given that multiple released versions of gluster behave this
-> > > way.
-> > 
-> > Versions of GlusterFS 3.8.0 - 3.8.8 are affected, 3.8.9 has the fix
-> > already and was released in February this year. We encourage users to
-> > update to recent versions, and provide a stable (bugfix only) update
-> > each month.
+On 05/24/2017 10:54 AM, Aurelien Jarno wrote:
+> It seems the problem arise if an interrupt happens when the TB
+> containing the EXECUTE instruction is being executed. In that case at
+> the end of the TB, the interruption code is translated with the ex_value
+> set, which means with the wrong PC, wrong permissions and wrong return
+> address.
 > 
-> I am able to reproduce this bug on a server running glusterfs 3.11.0rc0.  Is
-> that expected?
-
-No, that really is not expected. The backport that was reported to fix
-it for a 3.8.4 version is definitely part of 3.11 already. Could you
-pass me some details about your Gluster environment and volume, either
-by email or in a bug? I'll try to reproduce and debug it from the
-Gluster side.
-
-There is a holiday tomorrow (I'm in The Netherlands), and I'm travelling
-the whole weekend. I might not be able to look into this before next
-week. Sorry about that!
-
-Thanks,
-Niels
-
-
+> This is the same kind of issue I identified on SH4 recently:
+> https://lists.gnu.org/archive/html/qemu-devel/2017-05/msg03880.html
 > 
-> > 
-> > The Red Hat Gluster Storage product that is often used in combination
-> > with QEMU (+oVirt) does unfortunately not have an update where this is
-> > fixed.
-> > 
-> > Using an unfixed Gluster storage environment can cause QEMU to segfault.
-> > Although fixes exist for Gluster, not all users will have them
-> > installed. Preventing the segfault in QEMU due to a broken storage
-> > environment makes sense to me.
-> > 
-> > > This patch treats the return case of (offs < start) the same as if an
-> > > error value other than ENXIO is returned; we will assume we learned
-> > > nothing, and there are no holes in the file.
-> > > 
-> > > Signed-off-by: Jeff Cody <jcody@redhat.com>
-> > > ---
-> > >  block/gluster.c | 18 ++++++++++++++++--
-> > >  1 file changed, 16 insertions(+), 2 deletions(-)
-> > > 
-> > > diff --git a/block/gluster.c b/block/gluster.c
-> > > index 7c76cd0..c147909e 100644
-> > > --- a/block/gluster.c
-> > > +++ b/block/gluster.c
-> > > @@ -1275,7 +1275,14 @@ static int find_allocation(BlockDriverState *bs, off_t start,
-> > >      if (offs < 0) {
-> > >          return -errno;          /* D3 or D4 */
-> > >      }
-> > > -    assert(offs >= start);
-> > > +
-> > > +    if (offs < start) {
-> > > +        /* This is not a valid return by lseek().  We are safe to just return
-> > > +         * -EIO in this case, and we'll treat it like D4. Unfortunately some
-> > > +         *  versions of libgfapi will return offs < start, so an assert here
-> > > +         *  will unneccesarily abort QEMU. */
-> > 
-> > This is not really correct, the problem is not in libgfapi, but in the
-> > protocol translator on the server-side. The version of libgfapi does not
-> > matter here, it is the version on the server. But that might be too much
-> > detail for the comment.
-> > 
-> > > +        return -EIO;
-> > > +    }
-> > >  
-> > >      if (offs > start) {
-> > >          /* D2: in hole, next data at offs */
-> > > @@ -1307,7 +1314,14 @@ static int find_allocation(BlockDriverState *bs, off_t start,
-> > >      if (offs < 0) {
-> > >          return -errno;          /* D1 and (H3 or H4) */
-> > >      }
-> > > -    assert(offs >= start);
-> > > +
-> > > +    if (offs < start) {
-> > > +        /* This is not a valid return by lseek().  We are safe to just return
-> > > +         * -EIO in this case, and we'll treat it like H4. Unfortunately some
-> > > +         *  versions of libgfapi will return offs < start, so an assert here
-> > > +         *  will unneccesarily abort QEMU. */
-> > > +        return -EIO;
-> > > +    }
-> > >  
-> > >      if (offs > start) {
-> > >          /*
-> > > -- 
-> > > 2.9.3
-> > > 
-> > 
-> > You might want to explain the problem a little different in the commit
-> > message. It is fine too if you think it would become too detailed, my
-> > explanation is in the archives now in any case.
-> > 
-> > Reviewed-by: Niels de Vos <ndevos@redhat.com>
+> The same king of solution also works, that is disabling the interrupts
+> when the ex_value is set:
+> 
+> diff --git a/target/s390x/helper.c b/target/s390x/helper.c
+> index 6f81b1a16c..a33abdef16 100644
+> --- a/target/s390x/helper.c
+> +++ b/target/s390x/helper.c
+> @@ -655,6 +657,10 @@ bool s390_cpu_exec_interrupt(CPUState *cs, int interrupt_request)
+>           S390CPU *cpu = S390_CPU(cs);
+>           CPUS390XState *env = &cpu->env;
+>   
+> +        if (env->ex_value) {
+> +            return false;
+> +        }
+> +
+>           if (env->psw.mask & PSW_MASK_EXT) {
+>               s390_cpu_do_interrupt(cs);
+>               return true;
+> 
+
+Thanks for the research.  I've incorporated this into my patch set.
+
+
+r~
