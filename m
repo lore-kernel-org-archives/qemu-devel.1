@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41631)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45172)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1dDbax-0005Md-4P
-	for qemu-devel@nongnu.org; Wed, 24 May 2017 15:05:19 -0400
+	(envelope-from <rth7680@gmail.com>) id 1dDbrx-0001Zz-Gb
+	for qemu-devel@nongnu.org; Wed, 24 May 2017 15:22:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1dDbas-0003BT-5b
-	for qemu-devel@nongnu.org; Wed, 24 May 2017 15:05:19 -0400
-From: Alberto Garcia <berto@igalia.com>
-In-Reply-To: <f4437f01-1eb2-d1c1-3df5-ee992fab2036@virtuozzo.com>
-References: <4086b9ad1d1c912298f7c981f2c94a9f9a7026a3.1495536228.git.berto@igalia.com>
-	<5925B107.1060404@virtuozzo.com>
-	<f4437f01-1eb2-d1c1-3df5-ee992fab2036@virtuozzo.com>
-Date: Wed, 24 May 2017 21:05:08 +0200
-Message-ID: <w51inkqyt23.fsf@maestria.local.igalia.com>
-MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH 7/7] qcow2: Merge the writing of the COW
- regions with the guest data
+	(envelope-from <rth7680@gmail.com>) id 1dDbrw-0000qj-NJ
+	for qemu-devel@nongnu.org; Wed, 24 May 2017 15:22:53 -0400
+Received: from mail-qk0-x244.google.com ([2607:f8b0:400d:c09::244]:35549)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1dDbrw-0000qY-II
+	for qemu-devel@nongnu.org; Wed, 24 May 2017 15:22:52 -0400
+Received: by mail-qk0-x244.google.com with SMTP id k74so27740804qke.2
+	for <qemu-devel@nongnu.org>; Wed, 24 May 2017 12:22:52 -0700 (PDT)
+Sender: Richard Henderson <rth7680@gmail.com>
+From: Richard Henderson <rth@twiddle.net>
+Date: Wed, 24 May 2017 12:22:13 -0700
+Message-Id: <20170524192246.15905-1-rth@twiddle.net>
+Subject: [Qemu-devel] [PATCH v2 00/33] target/s390x unwind patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,29 +24,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Anton Nefedov <anton.nefedov@virtuozzo.com>, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, qemu-block@nongnu.org, mreitz@redhat.com, stefanha@redhat.com, den@openvz.org
+To: qemu-devel@nongnu.org
+Cc: thuth@redhat.com, aurelien@aurel32.net
 
-On Wed 24 May 2017 06:43:31 PM CEST, Anton Nefedov wrote:
->> +    if (m->data_qiov) {
->> +        qemu_iovec_reset(&qiov);
->> +        qemu_iovec_add(&qiov, start_buffer, start->nb_bytes);
->> +        qemu_iovec_concat(&qiov, m->data_qiov, 0, data_bytes);
->> +        qemu_iovec_add(&qiov, end_buffer, end->nb_bytes);
->
-> Can it be a problem if (m->data_qiov->niov == IOV_MAX)?
-> We had to add merge-iovecs code for the case (maybe there's better
-> solution?)
+Changes from v1:
+  * Drop major implementation change to EXECUTE; I'll pick that up later.
+  * But there are some implementation errors for EXECUTE, which are not
+    exhibited in real-life code.  Mostly because those edge cases are
+    not really useful.
+  * Incorporate feedback from Aurelien.
 
-You're right, good catch! I'll add a check for that. To be honest I
-don't think that's likely to happen in practice, so if it does we can
-simply fall back to the old behavior (separate writes).
 
-> Also, will this work if allocation is split into several l2metas?
-> e.g. one has cow_start.nb_bytes and another has cow_end.nb_bytes
+r~
 
-The guest request will be merged with the first l2meta that has to copy
-at least one of the two regions. It doesn't matter if the other one has
-nb_bytes == 0.
 
-Berto
+Richard Henderson (33):
+  target/s390x: Use cpu_loop_exit_restore for tlb_fill
+  target/s390x: Move helper_ex to end of file
+  target/s390x: Use unwind data for helper_nc
+  target/s390x: Use unwind data for helper_oc
+  target/s390x: Use unwind data for helper_xc
+  target/s390x: Use unwind data for helper_mvc
+  target/s390x: Use unwind data for helper_clc
+  target/s390x: Use unwind data for helper_clm
+  target/s390x: Use unwind data for helper_srst
+  target/s390x: Use unwind data for helper_clst
+  target/s390x: Use unwind data for helper_mvpg
+  target/s390x: Use unwind data for helper_mvst
+  target/s390x: Use unwind data for helper_lam
+  target/s390x: Use unwind data for helper_stam
+  target/s390x: Use unwind data for helper_mvcl
+  target/s390x: Use unwind data for helper_mvcle
+  target/s390x: Use unwind data for helper_clcle
+  target/s390x: Use unwind data for helper_cksm
+  target/s390x: Use unwind data for helper_unpk
+  target/s390x: Use unwind data for helper_tr
+  target/s390x: Use unwind data for helper_tre
+  target/s390x: Use unwind data for helper_trt
+  target/s390x: Use unwind data for helper_lctlg
+  target/s390x: Use unwind data for helper_lctl
+  target/s390x: Use unwind data for helper_stctl
+  target/s390x: Use unwind data for helper_testblock
+  target/s390x: Use unwind data for helper_tprot
+  target/s390x: Use unwind data for helper_lra
+  target/s390x: Use unwind data for helper_mvcs/mvcp
+  target/s390x: Fix some helper_ex problems
+  target/s390x: Fix EXECUTE with R1==0
+  target/s390x: Use atomic operations for COMPARE SWAP PURGE
+  target/s390x: Implement CSPG
+
+ target/s390x/helper.h      |   6 +-
+ target/s390x/insn-data.def |   7 +-
+ target/s390x/mem_helper.c  | 537 ++++++++++++++++++++++++---------------------
+ target/s390x/translate.c   |  94 ++++----
+ 4 files changed, 354 insertions(+), 290 deletions(-)
+
+-- 
+2.9.4
