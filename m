@@ -1,49 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59131)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59445)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <joserz@linux.vnet.ibm.com>) id 1dDM7l-0003sJ-JF
-	for qemu-devel@nongnu.org; Tue, 23 May 2017 22:34:10 -0400
+	(envelope-from <peterx@redhat.com>) id 1dDMAD-0004Vl-F9
+	for qemu-devel@nongnu.org; Tue, 23 May 2017 22:36:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <joserz@linux.vnet.ibm.com>) id 1dDM7g-0001ps-Jo
-	for qemu-devel@nongnu.org; Tue, 23 May 2017 22:34:09 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:49446
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <joserz@linux.vnet.ibm.com>)
-	id 1dDM7g-0001pe-Eb
-	for qemu-devel@nongnu.org; Tue, 23 May 2017 22:34:04 -0400
-Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v4O2Sw6W007583
-	for <qemu-devel@nongnu.org>; Tue, 23 May 2017 22:34:03 -0400
-Received: from e24smtp05.br.ibm.com (e24smtp05.br.ibm.com [32.104.18.26])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2amrehnk9u-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 23 May 2017 22:34:02 -0400
-Received: from localhost
-	by e24smtp05.br.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <joserz@linux.vnet.ibm.com>;
-	Tue, 23 May 2017 23:34:00 -0300
-Received: from d24av02.br.ibm.com (d24av02.br.ibm.com [9.8.31.93])
-	by d24relay02.br.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
-	v4O2XnYD19464688
-	for <qemu-devel@nongnu.org>; Tue, 23 May 2017 23:33:57 -0300
-Received: from d24av02.br.ibm.com (localhost [127.0.0.1])
-	by d24av02.br.ibm.com (8.14.4/8.14.4/NCO v10.0 AVout) with ESMTP id
-	v4O2XP1r026196
-	for <qemu-devel@nongnu.org>; Tue, 23 May 2017 23:33:25 -0300
-Date: Tue, 23 May 2017 23:33:03 -0300
-From: joserz@linux.vnet.ibm.com
-References: <mailman.73115.1495441935.22737.qemu-devel@nongnu.org>
-	<BBC4E515-FE7D-4600-A5CA-BBCE26059415@gmail.com>
-	<87efvghzb9.fsf@abhimanyu.i-did-not-set--mail-host-address--so-tickle-me>
+	(envelope-from <peterx@redhat.com>) id 1dDMA8-00029x-OD
+	for qemu-devel@nongnu.org; Tue, 23 May 2017 22:36:41 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49004)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1dDMA8-00029r-Et
+	for qemu-devel@nongnu.org; Tue, 23 May 2017 22:36:36 -0400
+Date: Wed, 24 May 2017 10:36:29 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20170524023629.GD3873@pxdev.xzpeter.org>
+References: <1495539071-12995-1-git-send-email-a.perevalov@samsung.com>
+	<CGME20170523113128eucas1p17a89f8cb47d5731c50f94c3218ba155f@eucas1p1.samsung.com>
+	<1495539071-12995-5-git-send-email-a.perevalov@samsung.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <87efvghzb9.fsf@abhimanyu.i-did-not-set--mail-host-address--so-tickle-me>
-Message-Id: <20170524023303.GA12163@pacoca>
-Subject: Re: [Qemu-devel] [PATCH risu] ppc64: Fix patterns for rotate
- doubleword instructions
+In-Reply-To: <1495539071-12995-5-git-send-email-a.perevalov@samsung.com>
+Subject: Re: [Qemu-devel] [PATCH V6 04/10] migration: split
+ ufd_version_check onto receive/request features part
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -52,55 +29,168 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: programmingkidx@gmail.com
-Cc: aNikunj A Dadhania <nikunj@linux.vnet.ibm.com>, "qemu-devel@nongnu.org qemu-devel" <qemu-devel@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>, Sandipan Das <sandipandas1990@gmail.com>
+To: Alexey Perevalov <a.perevalov@samsung.com>
+Cc: qemu-devel@nongnu.org, i.maximets@samsung.com, eblake@redhat.com, dgilbert@redhat.com
 
-On Tue, May 23, 2017 at 11:47:30AM +0530, Nikunj A Dadhania wrote:
-> G 3 <programmingkidx@gmail.com> writes:
+On Tue, May 23, 2017 at 02:31:05PM +0300, Alexey Perevalov wrote:
+> This modification is necessary for userfault fd features which are
+> required to be requested from userspace.
+> UFFD_FEATURE_THREAD_ID is a one of such "on demand" feature, which will
+> be introduced in the next patch.
 > 
-> > On May 22, 2017, at 4:32 AM, qemu-devel-request@nongnu.org wrote:
-> >
-> > Hello I have also done some work risu. My patches add ppc32 support.  
-> > Well my patches were made to work with Mac OS X but they are required  
-> > to work with Linux. Do you think you could help port these patches to  
-> > Linux?
+> QEMU have to use separate userfault file descriptor, due to
+> userfault context has internal state, and after first call of
+> ioctl UFFD_API it changes its state to UFFD_STATE_RUNNING (in case of
+> success), but kernel while handling ioctl UFFD_API expects UFFD_STATE_WAIT_API.
+> So only one ioctl with UFFD_API is possible per ufd.
 > 
-> Ziviani did the ppc64 work, lets see if he can spare some time.
-> 
-> The patches haven't come right on the mailing list, its tedious to pull
-> them. Please resend them with git send-mail.
-> 
+> Signed-off-by: Alexey Perevalov <a.perevalov@samsung.com>
 
-Hey, sure I can help. I'll take a look on them.
+Hi, Alexey,
 
-> >
-> > ppc.risu:
-> > https://patchwork.kernel.org/patch/9697489/
-> >
-> > risu_ppc.c:
-> > https://patchwork.kernel.org/patch/9697491/
-> >
-> > risu_reginfo_ppc.c:
-> > https://patchwork.kernel.org/patch/9697493/
-> >
-> > risu_reginfo_ppc.h:
-> > https://patchwork.kernel.org/patch/9697495/
-> >
-> > risugen_ppc.pm:
-> > https://patchwork.kernel.org/patch/9697497/
-> >
-> > Add ppc support to configure:
-> > https://patchwork.kernel.org/patch/9697499/
-> >
-> > Add verbose option:
-> > https://patchwork.kernel.org/patch/9697501/
-> >
-> > Add end of test message:
-> > https://patchwork.kernel.org/patch/9697503/
-> >
-> > Add more descriptive comment for mismatch or end of test condition:
-> > https://patchwork.kernel.org/patch/9697505/
+Mostly good to me, some nitpicks below.
+
+> ---
+>  migration/postcopy-ram.c | 100 ++++++++++++++++++++++++++++++++++++++++++-----
+>  1 file changed, 91 insertions(+), 9 deletions(-)
 > 
-> Regards
-> Nikunj
-> 
+> diff --git a/migration/postcopy-ram.c b/migration/postcopy-ram.c
+> index 3ed78bf..4f3f495 100644
+> --- a/migration/postcopy-ram.c
+> +++ b/migration/postcopy-ram.c
+> @@ -59,32 +59,114 @@ struct PostcopyDiscardState {
+>  #include <sys/eventfd.h>
+>  #include <linux/userfaultfd.h>
+>  
+> -static bool ufd_version_check(int ufd, MigrationIncomingState *mis)
+> +
+> +/**
+> + * receive_ufd_features: check userfault fd features, to request only supported
+> + * features in the future.
+> + *
+> + * Returns: true on success
+> + *
+> + * __NR_userfaultfd - should be checked before
+
+I don't see this line necessary. After all we will detect the error no
+matter what...
+
+> + *  @features: out parameter will contain uffdio_api.features provided by kernel
+> + *              in case of success
+> + */
+> +static bool receive_ufd_features(uint64_t *features)
+>  {
+> -    struct uffdio_api api_struct;
+> -    uint64_t ioctl_mask;
+> +    struct uffdio_api api_struct = {0};
+> +    int ufd;
+> +    bool ret = true;
+> +
+> +    /* if we are here __NR_userfaultfd should exists */
+> +    ufd = syscall(__NR_userfaultfd, O_CLOEXEC);
+> +    if (ufd == -1) {
+> +        error_report("%s: syscall __NR_userfaultfd failed: %s", __func__,
+> +                     strerror(errno));
+> +        return false;
+> +    }
+>  
+> +    /* ask features */
+>      api_struct.api = UFFD_API;
+>      api_struct.features = 0;
+>      if (ioctl(ufd, UFFDIO_API, &api_struct)) {
+> -        error_report("%s: UFFDIO_API failed: %s", __func__
+> +        error_report("%s: UFFDIO_API failed: %s", __func__,
+>                       strerror(errno));
+> +        ret = false;
+> +        goto release_ufd;
+> +    }
+> +
+> +    *features = api_struct.features;
+> +
+> +release_ufd:
+> +    close(ufd);
+> +    return ret;
+> +}
+> +
+> +/**
+> + * request_ufd_features: this function should be called only once on a newly
+> + * opened ufd, subsequent calls will lead to error.
+> + *
+> + * Returns: true on succes
+> + *
+> + * @ufd: fd obtained from userfaultfd syscall
+> + * @features: bit mask see UFFD_API_FEATURES
+> + */
+> +static bool request_ufd_features(int ufd, uint64_t features)
+> +{
+> +    struct uffdio_api api_struct = {0};
+> +    uint64_t ioctl_mask;
+> +
+> +    api_struct.api = UFFD_API;
+> +    api_struct.features = features;
+> +    if (ioctl(ufd, UFFDIO_API, &api_struct)) {
+> +        error_report("%s failed: UFFDIO_API failed: %s", __func__,
+> +                strerror(errno));
+
+Maybe we can indent this line to follow this file's rule?
+
+    error_report("%s failed: UFFDIO_API failed: %s", __func__,
+                 strerror(errno));
+
+>          return false;
+>      }
+>  
+> -    ioctl_mask = (__u64)1 << _UFFDIO_REGISTER |
+> -                 (__u64)1 << _UFFDIO_UNREGISTER;
+> +    ioctl_mask = 1 << _UFFDIO_REGISTER |
+> +                 1 << _UFFDIO_UNREGISTER;
+
+Could I ask why we explicitly removed (__u64) here? Since I see the
+old one better.
+
+>      if ((api_struct.ioctls & ioctl_mask) != ioctl_mask) {
+>          error_report("Missing userfault features: %" PRIx64,
+>                       (uint64_t)(~api_struct.ioctls & ioctl_mask));
+>          return false;
+>      }
+>  
+> +    return true;
+> +}
+> +
+> +static bool ufd_check_and_apply(int ufd, MigrationIncomingState *mis)
+> +{
+> +    uint64_t asked_features = 0;
+> +    static uint64_t supported_features;
+> +
+> +    /*
+> +     * it's not possible to
+> +     * request UFFD_API twice per one fd
+> +     * userfault fd features is persistent
+> +     */
+> +    if (!supported_features) {
+
+I would prefer not having this static variable. After all, this
+function call is rare, and the receive_ufd_features() is not that slow
+as well.
+
+> +        if (!receive_ufd_features(&supported_features)) {
+> +            error_report("%s failed", __func__);
+> +            return false;
+> +        }
+> +    }
+> +
+> +    /*
+> +     * request features, even if asked_features is 0, due to
+> +     * kernel expects UFFD_API before UFFDIO_REGISTER, per
+> +     * userfault file descriptor
+> +     */
+> +    if (!request_ufd_features(ufd, asked_features)) {
+> +        error_report("%s failed: features %" PRIu64, __func__,
+> +                asked_features);
+
+Better indent?
+
+Thanks,
+
+-- 
+Peter Xu
