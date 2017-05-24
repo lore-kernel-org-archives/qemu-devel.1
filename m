@@ -1,32 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58574)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33928)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1dDT0r-00087D-5V
-	for qemu-devel@nongnu.org; Wed, 24 May 2017 05:55:30 -0400
+	(envelope-from <imammedo@redhat.com>) id 1dDTIx-0004Jx-Qj
+	for qemu-devel@nongnu.org; Wed, 24 May 2017 06:14:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1dDT0m-0007R3-BG
-	for qemu-devel@nongnu.org; Wed, 24 May 2017 05:55:29 -0400
-Received: from 7.mo2.mail-out.ovh.net ([188.165.48.182]:48429)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1dDT0m-0007QD-4n
-	for qemu-devel@nongnu.org; Wed, 24 May 2017 05:55:24 -0400
-Received: from player718.ha.ovh.net (b6.ovh.net [213.186.33.56])
-	by mo2.mail-out.ovh.net (Postfix) with ESMTP id 432D18D5B2
-	for <qemu-devel@nongnu.org>; Wed, 24 May 2017 11:55:22 +0200 (CEST)
-Date: Wed, 24 May 2017 11:55:13 +0200
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20170524115513.71a014f2@bahia.ttt.fr.ibm.com>
-In-Reply-To: <20170524045236.GU30246@umbus.fritz.box>
+	(envelope-from <imammedo@redhat.com>) id 1dDTIt-0000Vz-RK
+	for qemu-devel@nongnu.org; Wed, 24 May 2017 06:14:11 -0400
+Date: Wed, 24 May 2017 12:14:02 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20170524121402.50e62a75@nial.brq.redhat.com>
+In-Reply-To: <20170524112857.31c3d8f9@bahia.ttt.fr.ibm.com>
 References: <20170523111812.13469-1-lvivier@redhat.com>
-	<20170523111812.13469-2-lvivier@redhat.com>
-	<20170523172842.1fce414e@bahia.ttt.fr.ibm.com>
-	<bc9a69f9-eb7b-943a-a9bf-bb4a3b18f525@redhat.com>
-	<20170524045236.GU30246@umbus.fritz.box>
+	<20170523111812.13469-4-lvivier@redhat.com>
+	<20170524050754.GW30246@umbus.fritz.box>
+	<20170524112857.31c3d8f9@bahia.ttt.fr.ibm.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	boundary="Sig_/Tdv6VtLJsbJpPtVFGXm95LX";
-	protocol="application/pgp-signature"
-Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH 1/4] spapr: add pre_plug
- function for memory
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH 3/4] spapr: disable hotplugging
+ without OS
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,68 +26,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Michael Roth <mdroth@linux.vnet.ibm.com>
+To: Greg Kurz <groug@kaod.org>
+Cc: David Gibson <david@gibson.dropbear.id.au>, Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Michael Roth <mdroth@linux.vnet.ibm.com>
 
---Sig_/Tdv6VtLJsbJpPtVFGXm95LX
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+On Wed, 24 May 2017 11:28:57 +0200
+Greg Kurz <groug@kaod.org> wrote:
 
-On Wed, 24 May 2017 14:52:36 +1000
-David Gibson <david@gibson.dropbear.id.au> wrote:
-[...]
+> On Wed, 24 May 2017 15:07:54 +1000
+> David Gibson <david@gibson.dropbear.id.au> wrote:
 >=20
-> This patch seems like a good idea regardless of the rest, so I've
-> fixed the minor nits Greg pointed out and merged to ppc-for-2.10.
+> > On Tue, May 23, 2017 at 01:18:11PM +0200, Laurent Vivier wrote: =20
+> > > If the OS is not started, QEMU sends an event to the OS
+> > > that is lost and cannot be recovered. An unplug is not
+> > > able to restore QEMU in a coherent state.
+> > > So, while the OS is not started, disable CPU and memory hotplug.
+> > > We use option vector 6 to know if the OS is started
+> > >=20
+> > > Signed-off-by: Laurent Vivier <lvivier@redhat.com>   =20
+> >=20
+> > Urgh.. I'm not terribly confident that this is really correct.  As
+> > discussed on the previous patch, you're essentially using OV6 as a
+> > flag that CAS is complete.
+> >=20
+> > But while it undoubtedly makes the race window much smaller, I don't
+> > see that there's any guarantee the guest OS will really be able to
+> > handle hotplug events immediately after CAS.
+> >=20
+> > In particular if the CAS process completes partially but then needs to
+> > trigger a reboot, I think that would end up setting the ov6 variable,
+> > but the OS would definitely not be in a state to accept events.
+wouldn't guest on reboot pick up updated fdt and online hotplugged
+before crash cpu along with initial cpus?
+
+> We never have any guarantee that the OS will process an event that
+> we've sent actually (think of a kernel crash just after a successful
+> CAS negotiation for example, or any failure with the various guest
+> components involved in the process of hotplug).
 >=20
+> > Mike, I really think we need some input from someone familiar with how
+> > these hotplug events are supposed to work.  What do we need to do to
+> > handle lost or stale events, such as those delivered when an OS is not
+> > booted.
+> >  =20
+>=20
+> AFAIK, in the PowerVM world, the HMC exposes a user configurable timeout.
+>=20
+> https://www.ibm.com/support/knowledgecenter/POWER8/p8hat/p8hat_dlparprocp=
+oweraddp6.htm
+>=20
+> I'm not sure we can do anything better than being able to "cancel" a prev=
+ious
+> hotplug attempt if it takes too long, but I'm not necessarily the expert =
+you're
+> looking for :)
+=46rom x86/ACPI world:
+ - if hotplug happens early at boot before guest OS is running
+   hotplug notification (SCI interrupt) stays pending and once guest
+   is up it will/should handle it and online CPU
+ - if guest crashed and is rebooted it will pickup updated apci tables (fdt=
+ equivalent)
+   with all present cpus (including hotplugged one before crash) and online
+   hotplugged cpu along with coldplugged ones
+ - if guest looses SCI somehow, it's considered guest issue and such cpu
+   stays unpluggable until guest picks it somehow (reboot, manually running=
+ cpus scan
+   method from ACPI or another cpu hotplug event) and explicitly ejects it.
 
-David,
+Taking in account that CPUs don't support surprise removal and requires
+guest cooperation it's fine to leave CPU plugged in until guest ejects it.
+That's what I'd expect to happen on baremetal,=20
+you hotplug CPU, hardware notifies OS about it and that's all,
+cpu won't suddenly pop out if OS isn't able to online it.
 
-Commit d2e4c6a1437fab2fbb4553b598f25e282c475199 in your ppc-for-2.10 branch
-doesn't compile:
-
-+static void spapr_memory_pre_plug(HotplugHandler *hotplug_dev, DeviceState=
- *dev,
-+                                  Error **errp)
-+{
-+    PCDIMMDevice *dimm =3D PC_DIMM(dev);
-+    PCDIMMDeviceClass *ddc =3D PC_DIMM_GET_CLASS(dimm);
-+    MemoryRegion *mr =3D ddc->get_memory_region(dimm);
-+    uint64_t size =3D memory_region_size(mr);
-+    char *mem_dev;
-+
-+    if (size % SPAPR_MEMORY_BLOCK_SIZE) {
-+        error_setg(&local_err, "Hotplugged memory size must be a multiple =
-of "
-
-s/&local_err/errp/
-
-+                      "%lld MB", SPAPR_MEMORY_BLOCK_SIZE / M_BYTE);
-+        goto out;
-
-s/goto out/return/
-
-+    }
-+
-+    mem_dev =3D object_property_get_str(OBJECT(dimm), PC_DIMM_MEMDEV_PROP,=
- NULL);
-+    if (mem_dev && !kvmppc_is_mem_backend_page_size_ok(mem_dev)) {
-+        error_setg(errp, "Memory backend has bad page size. "
-+                   "Use 'memory-backend-file' with correct mem-path.");
-+    }
-+}
-+
-
---Sig_/Tdv6VtLJsbJpPtVFGXm95LX
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-
-iEYEARECAAYFAlklWIEACgkQAvw66wEB28LxfgCfcEPIwk4syIkaiWELFnCTL8nn
-1hEAnAhZPivuDrXOYRpqzfchpBM9bNBW
-=lq2+
------END PGP SIGNATURE-----
-
---Sig_/Tdv6VtLJsbJpPtVFGXm95LX--
+More over that hotplugged cpu might be executing some code or one of
+already present cpus might be executing initialization routines to online
+it (think of host overcommit and arbitrary delays) so it is not really safe
+to remove hotplugged but not onlined cpu without OS consent
+(i.e. explicit eject by OS/firmware). I think the lost event handling shoul=
+d be
+fixed on guest side and not in QEMU.
