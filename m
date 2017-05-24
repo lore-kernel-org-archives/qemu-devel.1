@@ -1,30 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38233)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43152)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <anton.nefedov@virtuozzo.com>) id 1dDZbR-0000Dl-Vz
-	for qemu-devel@nongnu.org; Wed, 24 May 2017 12:57:42 -0400
+	(envelope-from <mtosatti@redhat.com>) id 1dDZxX-00077R-Sd
+	for qemu-devel@nongnu.org; Wed, 24 May 2017 13:20:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <anton.nefedov@virtuozzo.com>) id 1dDZbN-0005nl-Tp
-	for qemu-devel@nongnu.org; Wed, 24 May 2017 12:57:42 -0400
-Received: from mail-db5eur01on0122.outbound.protection.outlook.com
-	([104.47.2.122]:54784
-	helo=EUR01-DB5-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <anton.nefedov@virtuozzo.com>)
-	id 1dDZbN-0005jb-31
-	for qemu-devel@nongnu.org; Wed, 24 May 2017 12:57:37 -0400
-From: Anton Nefedov <anton.nefedov@virtuozzo.com>
-References: <1495186480-114192-1-git-send-email-anton.nefedov@virtuozzo.com>
-	<1495186480-114192-5-git-send-email-anton.nefedov@virtuozzo.com>
-	<b2e896f2-363b-9ce0-9ae3-d814c2d503fd@redhat.com>
-Message-ID: <49f09068-17d8-43e0-2f12-05668b6b0095@virtuozzo.com>
-Date: Wed, 24 May 2017 19:57:30 +0300
+	(envelope-from <mtosatti@redhat.com>) id 1dDZxU-00082Z-O3
+	for qemu-devel@nongnu.org; Wed, 24 May 2017 13:20:31 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:36098)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mtosatti@redhat.com>) id 1dDZxU-00080x-FS
+	for qemu-devel@nongnu.org; Wed, 24 May 2017 13:20:28 -0400
+Date: Wed, 24 May 2017 14:20:05 -0300
+From: Marcelo Tosatti <mtosatti@redhat.com>
+Message-ID: <20170524172005.GB4623@amt.cnet>
+References: <1495634844-14777-1-git-send-email-dplotnikov@virtuozzo.com>
+	<20170524155408.GF14372@rkaganb.sw.ru>
 MIME-Version: 1.0
-In-Reply-To: <b2e896f2-363b-9ce0-9ae3-d814c2d503fd@redhat.com>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v1 04/13] qcow2: preallocation at image
- expand
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170524155408.GF14372@rkaganb.sw.ru>
+Subject: Re: [Qemu-devel] [svt-core] [PATCH] kvmclock: update
+ system_time_msr address forcibly
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,39 +28,93 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, "Denis V. Lunev" <den@openvz.org>, mreitz@redhat.com
+To: Roman Kagan <rkagan@virtuozzo.com>, Denis Plotnikov <dplotnikov@virtuozzo.com>, pbonzini@redhat.com, qemu-devel@nongnu.org, den@virtuozzo.com
 
+On Wed, May 24, 2017 at 06:54:09PM +0300, Roman Kagan wrote:
+> On Wed, May 24, 2017 at 05:07:24PM +0300, Denis Plotnikov wrote:
+> > Do an update of system_time_msr address every time before reading
+> > the value of tsc_timestamp from guest's kvmclock page.
+> > 
+> > It should be done in a forcible manner because there is a situation
+> > when system_time_msr has been set by kvm but qemu doesn't aware of it.
+> > This leads to updates of kvmclock_offset without respect of guest's
+> > kvmclock values.
+> > 
+> > The situation appears when L2 linux guest runs over L1 linux guest and
+> > the action inducing system_time_msr update is tpr access reporting.
+> > Some L1 linux guests turn off processing TPR access and when L0
+> > gets an L2 exit induced by TPR MSR access it doesn't enter L1 and
+> > processed it by itself.
+> > Thus, L1 kvm doesn't know about that TPR access happening and doesn't
+> > exit to qemu which in turn doesn't set system_time_msr address.
+> > 
+> > This patch fixes this by making sure it knows the correct address every
+> > time it is needed.
+> > 
+> > Signed-off-by: Denis Plotnikov <dplotnikov@virtuozzo.com>
+> > ---
+> >  hw/i386/kvm/clock.c | 32 +++++++++++++++++++++++++++++++-
+> >  1 file changed, 31 insertions(+), 1 deletion(-)
+> > 
+> > diff --git a/hw/i386/kvm/clock.c b/hw/i386/kvm/clock.c
+> > index e713162..035196a 100644
+> > --- a/hw/i386/kvm/clock.c
+> > +++ b/hw/i386/kvm/clock.c
+> > @@ -48,11 +48,38 @@ struct pvclock_vcpu_time_info {
+> >      uint8_t    pad[2];
+> >  } __attribute__((__packed__)); /* 32 bytes */
+> >  
+> > +static void update_all_system_time_msr(void)
+> > +{
+> > +    CPUState *cpu;
+> > +    CPUX86State *env;
+> > +    struct {
+> > +        struct kvm_msrs info;
+> > +        struct kvm_msr_entry entries[1];
+> > +    } msr_data;
+> > +    int ret;
+> > +
+> > +    msr_data.info.nmsrs = 1;
+> > +    msr_data.entries[0].index = MSR_KVM_SYSTEM_TIME;
+> > +
+> > +    CPU_FOREACH(cpu) {
+> > +        ret = kvm_vcpu_ioctl(cpu, KVM_GET_MSRS, &msr_data);
+> > +
+> > +        if (ret < 0) {
+> > +            fprintf(stderr, "KVM_GET_MSRS failed: %s\n", strerror(ret));
+> > +            abort();
+> > +        }
+> > +
+> > +        assert(ret == 1);
+> > +        env = cpu->env_ptr;
+> > +        env->system_time_msr = msr_data.entries[0].data;
+> > +    }
+> > +}
+> > +
+> >  static uint64_t kvmclock_current_nsec(KVMClockState *s)
+> >  {
+> >      CPUState *cpu = first_cpu;
+> >      CPUX86State *env = cpu->env_ptr;
+> > -    hwaddr kvmclock_struct_pa = env->system_time_msr & ~1ULL;
+> > +    hwaddr kvmclock_struct_pa;
+> >      uint64_t migration_tsc = env->tsc;
+> >      struct pvclock_vcpu_time_info time;
+> >      uint64_t delta;
+> > @@ -60,6 +87,9 @@ static uint64_t kvmclock_current_nsec(KVMClockState *s)
+> >      uint64_t nsec_hi;
+> >      uint64_t nsec;
+> >  
+> > +    update_all_system_time_msr();
+> 
+> I'd rather just cpu_synchronize_state(cpu) here.  
+> 
+> > +    kvmclock_struct_pa = env->system_time_msr & ~1ULL;
+> > +
+> >      if (!(env->system_time_msr & 1ULL)) {
+> >          /* KVM clock not active */
+> >          return 0;
+> 
+> Roman.
 
-
-On 05/22/2017 10:29 PM, Eric Blake wrote:
-> On 05/19/2017 04:34 AM, Anton Nefedov wrote:
->> From: "Denis V. Lunev" <den@openvz.org>
->>
->> This patch adds image preallocation at expand to provide better locality
->> of QCOW2 image file and optimize this procedure for some distributed
->> storages where this procedure is slow.
->>
->> Image expand requests have to be suspended until the allocation is
->> performed which is done via special QCowL2Meta.
->> This meta is invisible to handle_dependencies() code.
->> This is the main reason for also calling preallocation before metadata
->> write: it might intersect with preallocation triggered by another IO,
->> and has to yield
->
-> How does this interact with Max's work on preallocated truncate?
-> https://lists.gnu.org/archive/html/qemu-devel/2017-04/msg00267.html
->
-
-Seems like Max's patchset makes it possible to manually (with qemu-img)
-allocate a continuous guest address space in advance?
-
-Preallocation in this series is a little bit different:
-- it's in-flight, and it fallocates (using drv->write_zeroes) space
-ahead in the underlying image as qcow2 writes beyond EOF.
-- it doesn't link L2. So it leaves the image 'sparse' on qcow2 level.
-
-If you ask me, these 2 patchsets are not contradictory, and probably
-won't even merge-conflict :)
-
-/Anton
+Can't you avoid that call to each CPU? (ie fix the synchronization 
+of the system time address problem in some other way?)
