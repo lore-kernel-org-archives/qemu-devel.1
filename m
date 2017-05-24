@@ -1,17 +1,48 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34405)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35125)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dDMQm-00011d-Mb
-	for qemu-devel@nongnu.org; Tue, 23 May 2017 22:53:49 -0400
+	(envelope-from <dongdwdw@linux.vnet.ibm.com>) id 1dDMUY-0004Qr-CD
+	for qemu-devel@nongnu.org; Tue, 23 May 2017 22:57:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dDMQl-0007DM-Jx
-	for qemu-devel@nongnu.org; Tue, 23 May 2017 22:53:48 -0400
-From: Fam Zheng <famz@redhat.com>
-Date: Wed, 24 May 2017 10:52:35 +0800
-Message-Id: <20170524025235.32190-17-famz@redhat.com>
-In-Reply-To: <20170524025235.32190-1-famz@redhat.com>
-References: <20170524025235.32190-1-famz@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 16/16] tests: Add test case for
- BLK_PERM_AIO_CONTEXT_CHANGE
+	(envelope-from <dongdwdw@linux.vnet.ibm.com>) id 1dDMUR-0000Oz-Ts
+	for qemu-devel@nongnu.org; Tue, 23 May 2017 22:57:42 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:47287
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dongdwdw@linux.vnet.ibm.com>)
+	id 1dDMUR-0000Od-Nl
+	for qemu-devel@nongnu.org; Tue, 23 May 2017 22:57:35 -0400
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v4O2rhV1027786
+	for <qemu-devel@nongnu.org>; Tue, 23 May 2017 22:57:34 -0400
+Received: from e23smtp01.au.ibm.com (e23smtp01.au.ibm.com [202.81.31.143])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2amynvm29h-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Tue, 23 May 2017 22:57:34 -0400
+Received: from localhost
+	by e23smtp01.au.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <dongdwdw@linux.vnet.ibm.com>;
+	Wed, 24 May 2017 12:57:31 +1000
+Received: from d23av04.au.ibm.com (d23av04.au.ibm.com [9.190.235.139])
+	by d23relay06.au.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+	v4O2vMRS66846808
+	for <qemu-devel@nongnu.org>; Wed, 24 May 2017 12:57:30 +1000
+Received: from d23av04.au.ibm.com (localhost [127.0.0.1])
+	by d23av04.au.ibm.com (8.14.4/8.14.4/NCO v10.0 AVout) with ESMTP id
+	v4O2uvKx023585
+	for <qemu-devel@nongnu.org>; Wed, 24 May 2017 12:56:57 +1000
+Received: from oc8580814772.ibm.com ([9.115.112.58])
+	by d23av04.au.ibm.com (8.14.4/8.14.4/NCO v10.0 AVin) with ESMTP id
+	v4O2uugm023320
+	for <qemu-devel@nongnu.org>; Wed, 24 May 2017 12:56:56 +1000
+From: Wang Dong <dongdwdw@linux.vnet.ibm.com>
+Date: Wed, 24 May 2017 10:56:41 +0800
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Message-Id: <f0b11c2d-9f61-c4c2-4b55-58644b760e31@linux.vnet.ibm.com>
+Subject: [Qemu-devel] new to qemu with a simple question
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,99 +52,20 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Stefan Hajnoczi <stefanha@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
 
-Signed-off-by: Fam Zheng <famz@redhat.com>
----
- tests/Makefile.include |  2 ++
- tests/test-blk-perm.c  | 59 ++++++++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 61 insertions(+)
- create mode 100644 tests/test-blk-perm.c
 
-diff --git a/tests/Makefile.include b/tests/Makefile.include
-index 7589383..5811296 100644
---- a/tests/Makefile.include
-+++ b/tests/Makefile.include
-@@ -56,6 +56,7 @@ gcov-files-test-thread-pool-y = thread-pool.c
- gcov-files-test-hbitmap-y = util/hbitmap.c
- check-unit-y += tests/test-hbitmap$(EXESUF)
- gcov-files-test-hbitmap-y = blockjob.c
-+check-unit-y += tests/test-blk-perm$(EXESUF)
- check-unit-y += tests/test-blockjob$(EXESUF)
- check-unit-y += tests/test-blockjob-txn$(EXESUF)
- check-unit-y += tests/test-x86-cpuid$(EXESUF)
-@@ -548,6 +549,7 @@ tests/test-coroutine$(EXESUF): tests/test-coroutine.o $(test-block-obj-y)
- tests/test-aio$(EXESUF): tests/test-aio.o $(test-block-obj-y)
- tests/test-aio-multithread$(EXESUF): tests/test-aio-multithread.o $(test-block-obj-y)
- tests/test-throttle$(EXESUF): tests/test-throttle.o $(test-block-obj-y)
-+tests/test-blk-perm$(EXESUF): tests/test-blk-perm.o $(test-block-obj-y)
- tests/test-blockjob$(EXESUF): tests/test-blockjob.o $(test-block-obj-y) $(test-util-obj-y)
- tests/test-blockjob-txn$(EXESUF): tests/test-blockjob-txn.o $(test-block-obj-y) $(test-util-obj-y)
- tests/test-thread-pool$(EXESUF): tests/test-thread-pool.o $(test-block-obj-y)
-diff --git a/tests/test-blk-perm.c b/tests/test-blk-perm.c
-new file mode 100644
-index 0000000..1c7b5d2
---- /dev/null
-+++ b/tests/test-blk-perm.c
-@@ -0,0 +1,59 @@
-+/*
-+ * Block permission tests
-+ *
-+ * Copyright Red Hat, Inc. 2017
-+ *
-+ * Authors:
-+ *  Fam Zheng <famz@redhat.com>
-+ *
-+ * This work is licensed under the terms of the GNU LGPL, version 2 or later.
-+ * See the COPYING.LIB file in the top-level directory.
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "qapi/error.h"
-+#include "sysemu/block-backend.h"
-+
-+static void test_aio_context_success(void)
-+{
-+    BlockBackend *blk1 = blk_new(BLK_PERM_AIO_CONTEXT_CHANGE, BLK_PERM_ALL);
-+    BlockBackend *blk2 = blk_new(BLK_PERM_AIO_CONTEXT_CHANGE, BLK_PERM_ALL);
-+    BlockDriverState *bs = bdrv_open("null-co://", NULL, NULL, 0, &error_abort);
-+
-+    blk_insert_bs(blk1, bs, &error_abort);
-+    blk_insert_bs(blk2, bs, &error_abort);
-+
-+    blk_unref(blk1);
-+    blk_unref(blk2);
-+    bdrv_unref(bs);
-+}
-+
-+static void test_aio_context_failure(void)
-+{
-+    Error *local_err = NULL;
-+    BlockBackend *blk1 = blk_new(BLK_PERM_AIO_CONTEXT_CHANGE,
-+                                 BLK_PERM_ALL & ~BLK_PERM_AIO_CONTEXT_CHANGE);
-+    BlockBackend *blk2 = blk_new(BLK_PERM_AIO_CONTEXT_CHANGE, BLK_PERM_ALL);
-+    BlockDriverState *bs = bdrv_open("null-co://", NULL, NULL, 0, &error_abort);
-+
-+    blk_insert_bs(blk1, bs, &error_abort);
-+    blk_insert_bs(blk2, bs, &local_err);
-+
-+    error_free_or_abort(&local_err);
-+
-+    blk_unref(blk1);
-+    blk_unref(blk2);
-+    bdrv_unref(bs);
-+}
-+
-+int main(int argc, char **argv)
-+{
-+    bdrv_init();
-+    qemu_init_main_loop(&error_abort);
-+    g_test_init(&argc, &argv, NULL);
-+    g_test_add_func("/block/perm/aio-context/success",
-+                    test_aio_context_success);
-+    g_test_add_func("/block/perm/aio-context/failure",
-+                    test_aio_context_failure);
-+    return g_test_run();
-+}
+Hi guys,
+
+I am new to qemu. But I need do some job in it right now.
+
+When I try read qmp code. I found a interesting part against it.
+
+Some C source code is generate from json file.
+
+I wonder why this? What is the benefits of this?
+
+Thanks in advance.
+
+
 -- 
-2.9.4
+Best regards. Wang Dong
