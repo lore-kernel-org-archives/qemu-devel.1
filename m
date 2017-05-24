@@ -1,35 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51435)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51471)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bharata@linux.vnet.ibm.com>) id 1dDOJw-0001ba-Jz
-	for qemu-devel@nongnu.org; Wed, 24 May 2017 00:54:53 -0400
+	(envelope-from <bharata@linux.vnet.ibm.com>) id 1dDOJz-0001cm-C3
+	for qemu-devel@nongnu.org; Wed, 24 May 2017 00:54:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bharata@linux.vnet.ibm.com>) id 1dDOJt-0007C3-Un
-	for qemu-devel@nongnu.org; Wed, 24 May 2017 00:54:52 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:44098)
+	(envelope-from <bharata@linux.vnet.ibm.com>) id 1dDOJx-0007DB-4K
+	for qemu-devel@nongnu.org; Wed, 24 May 2017 00:54:55 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:55067)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <bharata@linux.vnet.ibm.com>)
-	id 1dDOJt-0007BU-Lp
-	for qemu-devel@nongnu.org; Wed, 24 May 2017 00:54:49 -0400
-Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
+	id 1dDOJw-0007CO-Qx
+	for qemu-devel@nongnu.org; Wed, 24 May 2017 00:54:53 -0400
+Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
 	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v4O4rnQ6141749
-	for <qemu-devel@nongnu.org>; Wed, 24 May 2017 00:54:48 -0400
-Received: from e23smtp09.au.ibm.com (e23smtp09.au.ibm.com [202.81.31.142])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2an1m0khxp-1
+	v4O4rvfR094108
+	for <qemu-devel@nongnu.org>; Wed, 24 May 2017 00:54:50 -0400
+Received: from e23smtp01.au.ibm.com (e23smtp01.au.ibm.com [202.81.31.143])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2amvavduk9-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 24 May 2017 00:54:48 -0400
+	for <qemu-devel@nongnu.org>; Wed, 24 May 2017 00:54:50 -0400
 Received: from localhost
-	by e23smtp09.au.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	by e23smtp01.au.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
 	Only! Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <bharata@linux.vnet.ibm.com>;
-	Wed, 24 May 2017 14:54:44 +1000
+	Wed, 24 May 2017 14:54:48 +1000
 From: Bharata B Rao <bharata@linux.vnet.ibm.com>
-Date: Wed, 24 May 2017 10:23:32 +0530
+Date: Wed, 24 May 2017 10:23:34 +0530
 In-Reply-To: <1495601614-18586-1-git-send-email-bharata@linux.vnet.ibm.com>
 References: <1495601614-18586-1-git-send-email-bharata@linux.vnet.ibm.com>
-Message-Id: <1495601614-18586-2-git-send-email-bharata@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH v3 1/3] migration: Introduce
- unregister_savevm_live()
+Message-Id: <1495601614-18586-4-git-send-email-bharata@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [PATCH v3 3/3] spapr: Fix migration of Radix guests
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,79 +38,39 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: qemu-ppc@nongnu.org, david@gibson.dropbear.id.au, sam.bobroff@au1.ibm.com, rnsastry@linux.vnet.ibm.com, sjitindarsingh@gmail.com, Bharata B Rao <bharata@linux.vnet.ibm.com>, Juan Quintela <quintela@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+Cc: qemu-ppc@nongnu.org, david@gibson.dropbear.id.au, sam.bobroff@au1.ibm.com, rnsastry@linux.vnet.ibm.com, sjitindarsingh@gmail.com, Bharata B Rao <bharata@linux.vnet.ibm.com>
 
-Introduce a new function unregister_savevm_live() to unregister the vmstate
-handlers registered via register_savevm_live().
+Fix migration of radix guests by ensuring that we issue
+KVM_PPC_CONFIGURE_V3_MMU for radix case post migration.
 
-register_savevm() allocates SaveVMHandlers while register_savevm_live()
-gets passed with SaveVMHandlers. During unregistration, we  want to
-free SaveVMHandlers in the former case but not free in the latter case.
-Hence this new API is needed to differentiate this.
-
-This new API will be needed by PowerPC to unregister the HTAB savevm
-handlers.
-
+Reported-by: Nageswara R Sastry <rnsastry@linux.vnet.ibm.com>
 Signed-off-by: Bharata B Rao <bharata@linux.vnet.ibm.com>
-Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
-Cc: Juan Quintela <quintela@redhat.com>
-Cc: Dr. David Alan Gilbert <dgilbert@redhat.com>
 ---
- include/migration/vmstate.h |  1 +
- migration/savevm.c          | 17 +++++++++++++++--
- 2 files changed, 16 insertions(+), 2 deletions(-)
+ hw/ppc/spapr.c | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
 
-diff --git a/include/migration/vmstate.h b/include/migration/vmstate.h
-index 8489659..02a1bac 100644
---- a/include/migration/vmstate.h
-+++ b/include/migration/vmstate.h
-@@ -79,6 +79,7 @@ int register_savevm_live(DeviceState *dev,
-                          void *opaque);
- 
- void unregister_savevm(DeviceState *dev, const char *idstr, void *opaque);
-+void unregister_savevm_live(DeviceState *dev, const char *idstr, void *opaque);
- 
- typedef struct VMStateInfo VMStateInfo;
- typedef struct VMStateDescription VMStateDescription;
-diff --git a/migration/savevm.c b/migration/savevm.c
-index f5e8194..4ef6fdc 100644
---- a/migration/savevm.c
-+++ b/migration/savevm.c
-@@ -630,7 +630,8 @@ int register_savevm(DeviceState *dev,
-                                 ops, opaque);
- }
- 
--void unregister_savevm(DeviceState *dev, const char *idstr, void *opaque)
-+static void unregister_savevm_common(DeviceState *dev, const char *idstr,
-+                                     void *opaque, bool free_savevmhandlers)
- {
-     SaveStateEntry *se, *new_se;
-     char id[256] = "";
-@@ -649,12 +650,24 @@ void unregister_savevm(DeviceState *dev, const char *idstr, void *opaque)
-         if (strcmp(se->idstr, id) == 0 && se->opaque == opaque) {
-             QTAILQ_REMOVE(&savevm_state.handlers, se, entry);
-             g_free(se->compat);
--            g_free(se->ops);
-+            if (free_savevmhandlers) {
-+                g_free(se->ops);
-+            }
-             g_free(se);
-         }
+diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+index daf335c..ea14bed 100644
+--- a/hw/ppc/spapr.c
++++ b/hw/ppc/spapr.c
+@@ -1400,6 +1400,18 @@ static int spapr_post_load(void *opaque, int version_id)
+         err = spapr_rtc_import_offset(&spapr->rtc, spapr->rtc_offset);
      }
+ 
++    if (spapr->patb_entry) {
++        PowerPCCPU *cpu = POWERPC_CPU(first_cpu);
++        bool radix = !!(spapr->patb_entry & PATBE1_GR);
++        bool gtse = !!(cpu->env.spr[SPR_LPCR] & LPCR_GTSE);
++
++        err = kvmppc_configure_v3_mmu(cpu, radix, gtse, spapr->patb_entry);
++        if (err) {
++            error_report("Process table config unsupported by the host");
++            return -EINVAL;
++        }
++    }
++
+     return err;
  }
  
-+void unregister_savevm(DeviceState *dev, const char *idstr, void *opaque)
-+{
-+    unregister_savevm_common(dev, idstr, opaque, true);
-+}
-+
-+void unregister_savevm_live(DeviceState *dev, const char *idstr, void *opaque)
-+{
-+    unregister_savevm_common(dev, idstr, opaque, false);
-+}
-+
- int vmstate_register_with_alias_id(DeviceState *dev, int instance_id,
-                                    const VMStateDescription *vmsd,
-                                    void *opaque, int alias_id,
 -- 
 2.7.4
