@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45517)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45495)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dDbsW-00025N-2a
-	for qemu-devel@nongnu.org; Wed, 24 May 2017 15:23:29 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dDbsV-0001iM-9y
+	(envelope-from <rth7680@gmail.com>) id 1dDbsU-00025D-0S
 	for qemu-devel@nongnu.org; Wed, 24 May 2017 15:23:28 -0400
-Received: from mail-qk0-x242.google.com ([2607:f8b0:400d:c09::242]:33854)
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <rth7680@gmail.com>) id 1dDbsT-0001eo-3d
+	for qemu-devel@nongnu.org; Wed, 24 May 2017 15:23:26 -0400
+Received: from mail-qk0-x241.google.com ([2607:f8b0:400d:c09::241]:35865)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1dDbsV-0001hf-5q
-	for qemu-devel@nongnu.org; Wed, 24 May 2017 15:23:27 -0400
-Received: by mail-qk0-x242.google.com with SMTP id u75so27646236qka.1
-	for <qemu-devel@nongnu.org>; Wed, 24 May 2017 12:23:27 -0700 (PDT)
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1dDbsS-0001eV-VR
+	for qemu-devel@nongnu.org; Wed, 24 May 2017 15:23:25 -0400
+Received: by mail-qk0-x241.google.com with SMTP id y128so27718109qka.3
+	for <qemu-devel@nongnu.org>; Wed, 24 May 2017 12:23:24 -0700 (PDT)
 Sender: Richard Henderson <rth7680@gmail.com>
 From: Richard Henderson <rth@twiddle.net>
-Date: Wed, 24 May 2017 12:22:40 -0700
-Message-Id: <20170524192246.15905-28-rth@twiddle.net>
+Date: Wed, 24 May 2017 12:22:38 -0700
+Message-Id: <20170524192246.15905-26-rth@twiddle.net>
 In-Reply-To: <20170524192246.15905-1-rth@twiddle.net>
 References: <20170524192246.15905-1-rth@twiddle.net>
-Subject: [Qemu-devel] [PATCH v2 27/33] target/s390x: Use unwind data for
- helper_tprot
+Subject: [Qemu-devel] [PATCH v2 25/33] target/s390x: Use unwind data for
+ helper_stctl
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,33 +34,63 @@ Reviewed-by: Thomas Huth <thuth@redhat.com>
 Reviewed-by: Aurelien Jarno <aurelien@aurel32.net>
 Signed-off-by: Richard Henderson <rth@twiddle.net>
 ---
- target/s390x/mem_helper.c | 1 -
- target/s390x/translate.c  | 1 -
- 2 files changed, 2 deletions(-)
+ target/s390x/mem_helper.c | 10 ++++++----
+ target/s390x/translate.c  |  2 --
+ 2 files changed, 6 insertions(+), 6 deletions(-)
 
 diff --git a/target/s390x/mem_helper.c b/target/s390x/mem_helper.c
-index 7df2e53..a8c85c9 100644
+index 614cdb2..b64c04e 100644
 --- a/target/s390x/mem_helper.c
 +++ b/target/s390x/mem_helper.c
-@@ -970,7 +970,6 @@ uint32_t HELPER(testblock)(CPUS390XState *env, uint64_t real_addr)
- uint32_t HELPER(tprot)(uint64_t a1, uint64_t a2)
- {
-     /* XXX implement */
--
-     return 0;
- }
+@@ -907,11 +907,12 @@ void HELPER(lctl)(CPUS390XState *env, uint32_t r1, uint64_t a2, uint32_t r3)
  
+ void HELPER(stctg)(CPUS390XState *env, uint32_t r1, uint64_t a2, uint32_t r3)
+ {
+-    int i;
++    uintptr_t ra = GETPC();
+     uint64_t dest = a2;
++    uint32_t i;
+ 
+     for (i = r1;; i = (i + 1) % 16) {
+-        cpu_stq_data(env, dest, env->cregs[i]);
++        cpu_stq_data_ra(env, dest, env->cregs[i], ra);
+         dest += sizeof(uint64_t);
+ 
+         if (i == r3) {
+@@ -922,11 +923,12 @@ void HELPER(stctg)(CPUS390XState *env, uint32_t r1, uint64_t a2, uint32_t r3)
+ 
+ void HELPER(stctl)(CPUS390XState *env, uint32_t r1, uint64_t a2, uint32_t r3)
+ {
+-    int i;
++    uintptr_t ra = GETPC();
+     uint64_t dest = a2;
++    uint32_t i;
+ 
+     for (i = r1;; i = (i + 1) % 16) {
+-        cpu_stl_data(env, dest, env->cregs[i]);
++        cpu_stl_data_ra(env, dest, env->cregs[i], ra);
+         dest += sizeof(uint32_t);
+ 
+         if (i == r3) {
 diff --git a/target/s390x/translate.c b/target/s390x/translate.c
-index cd017ce..7b9c111 100644
+index 26f6b37..669da89 100644
 --- a/target/s390x/translate.c
 +++ b/target/s390x/translate.c
-@@ -4049,7 +4049,6 @@ static ExitStatus op_testblock(DisasContext *s, DisasOps *o)
- 
- static ExitStatus op_tprot(DisasContext *s, DisasOps *o)
- {
+@@ -3612,7 +3612,6 @@ static ExitStatus op_stctg(DisasContext *s, DisasOps *o)
+     TCGv_i32 r1 = tcg_const_i32(get_field(s->fields, r1));
+     TCGv_i32 r3 = tcg_const_i32(get_field(s->fields, r3));
+     check_privileged(s);
 -    potential_page_fault(s);
-     gen_helper_tprot(cc_op, o->addr1, o->in2);
-     set_cc_static(s);
-     return NO_EXIT;
+     gen_helper_stctg(cpu_env, r1, o->in2, r3);
+     tcg_temp_free_i32(r1);
+     tcg_temp_free_i32(r3);
+@@ -3624,7 +3623,6 @@ static ExitStatus op_stctl(DisasContext *s, DisasOps *o)
+     TCGv_i32 r1 = tcg_const_i32(get_field(s->fields, r1));
+     TCGv_i32 r3 = tcg_const_i32(get_field(s->fields, r3));
+     check_privileged(s);
+-    potential_page_fault(s);
+     gen_helper_stctl(cpu_env, r1, o->in2, r3);
+     tcg_temp_free_i32(r1);
+     tcg_temp_free_i32(r3);
 -- 
 2.9.4
