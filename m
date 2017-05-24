@@ -1,24 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51076)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51421)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dDOI8-0000tH-8L
-	for qemu-devel@nongnu.org; Wed, 24 May 2017 00:53:01 -0400
+	(envelope-from <bharata@linux.vnet.ibm.com>) id 1dDOJw-0001bW-4Q
+	for qemu-devel@nongnu.org; Wed, 24 May 2017 00:54:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dDOI7-0006E2-CW
-	for qemu-devel@nongnu.org; Wed, 24 May 2017 00:53:00 -0400
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20170521032956.27446-1-f4bug@amsat.org>
-	<20170521032956.27446-16-f4bug@amsat.org> <87zie52dcs.fsf@linaro.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <00181409-39e7-0d0d-e936-1ee0824f2cc5@amsat.org>
-Date: Wed, 24 May 2017 01:52:51 -0300
-MIME-Version: 1.0
-In-Reply-To: <87zie52dcs.fsf@linaro.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v3 15/24] docker: add powerpc build target
+	(envelope-from <bharata@linux.vnet.ibm.com>) id 1dDOJt-0007BY-2k
+	for qemu-devel@nongnu.org; Wed, 24 May 2017 00:54:52 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:46042
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bharata@linux.vnet.ibm.com>)
+	id 1dDOJs-0007BK-TJ
+	for qemu-devel@nongnu.org; Wed, 24 May 2017 00:54:49 -0400
+Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v4O4rnue052571
+	for <qemu-devel@nongnu.org>; Wed, 24 May 2017 00:54:45 -0400
+Received: from e23smtp08.au.ibm.com (e23smtp08.au.ibm.com [202.81.31.141])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2amx45t2k3-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Wed, 24 May 2017 00:54:45 -0400
+Received: from localhost
+	by e23smtp08.au.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <bharata@linux.vnet.ibm.com>;
+	Wed, 24 May 2017 14:54:42 +1000
+From: Bharata B Rao <bharata@linux.vnet.ibm.com>
+Date: Wed, 24 May 2017 10:23:31 +0530
+Message-Id: <1495601614-18586-1-git-send-email-bharata@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [PATCH v3 0/3] ppc/spapr: Fix migration of radix guests
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,106 +36,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
-Cc: qemu-devel@nongnu.org, Fam Zheng <famz@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Alexander Graf <agraf@suse.de>, qemu-ppc@nongnu.org, Aurelien Jarno <aurel32@debian.org>, Riku Voipio <riku.voipio@iki.fi>, Vagrant Cascadian <vagrant@debian.org>, Michael Tokarev <mjt@tls.msk.ru>
+To: qemu-devel@nongnu.org
+Cc: qemu-ppc@nongnu.org, david@gibson.dropbear.id.au, sam.bobroff@au1.ibm.com, rnsastry@linux.vnet.ibm.com, sjitindarsingh@gmail.com, Bharata B Rao <bharata@linux.vnet.ibm.com>
 
-Hi Alex,
+This patchset fixes the migration of sPAPR radix guests.
 
-On 05/22/2017 11:08 AM, Alex Bennée wrote:
->
-> Philippe Mathieu-Daudé <f4bug@amsat.org> writes:
->
->> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
->> ---
->>  tests/docker/Makefile.include                      |  4 +--
->>  .../docker/dockerfiles/debian-powerpc-cross.docker | 40 ++++++++++++++++++++++
->>  2 files changed, 42 insertions(+), 2 deletions(-)
->>  create mode 100644 tests/docker/dockerfiles/debian-powerpc-cross.docker
->>
->> diff --git a/tests/docker/Makefile.include b/tests/docker/Makefile.include
->> index 111b8090b2..9815976486 100644
->> --- a/tests/docker/Makefile.include
->> +++ b/tests/docker/Makefile.include
->> @@ -56,11 +56,13 @@ docker-image-%: $(DOCKER_FILES_DIR)/%.docker
->>  		"BUILD","$*")
->>
->>  docker-image-debian-mipsel-cross: EXTRA_FILES:=tests/docker/dockerfiles/debian-apt-fake.sh
->> +docker-image-debian-powerpc-cross: EXTRA_FILES:=tests/docker/dockerfiles/debian-apt-fake.sh
->>
->>  # Enforce dependancies for composite images
->>  docker-image-debian-armhf-cross: docker-image-debian
->>  docker-image-debian-arm64-cross: docker-image-debian
->>  docker-image-debian-mipsel-cross: docker-image-debian
->> +docker-image-debian-powerpc-cross: docker-image-debian
->>
->>  # Expand all the pre-requistes for each docker image and test combination
->>  $(foreach i,$(DOCKER_IMAGES), \
->> @@ -111,8 +113,6 @@ docker:
->>  	@echo '    NOUSER               Define to disable adding current user to containers passwd.'
->>  	@echo '    NOCACHE=1            Ignore cache when build images.'
->>  	@echo '    EXECUTABLE=<path>    Include executable in image.'
->> -	@echo '    EXTRA_FILES="<path> [... <path>]"'
->> -	@echo '                         Include extra files in image.'
->
-> I'm fairly sure you didn't want to do this.
+Changes in v3:
+--------------
+- Dropped the patch that made h_register_process_table flags global as
+  it is not required with the changed logic.
+- The post load logic is now same for both TCG as well as KVM radix guests.
+  Also ensured that radix and future v3 hash migration post load is
+  treated similarly.
+- Ensure TCG Radix guest migration isn't broken.
 
-Ups, good catch :) Rebase mistake.
-Are you Ok with those 2 lines back? (I think since it is pretty much a 
-copy/paste of mipsel Dockerfile).
-I'll send fixed and your other r-b after Fam review, thanks!
+v2: https://lists.gnu.org/archive/html/qemu-devel/2017-05/msg04491.html
 
->
->>
->>  # This rule if for directly running against an arbitrary docker target.
->>  # It is called by the expanded docker targets (e.g. make
->> diff --git a/tests/docker/dockerfiles/debian-powerpc-cross.docker b/tests/docker/dockerfiles/debian-powerpc-cross.docker
->> new file mode 100644
->> index 0000000000..fa2cc7a657
->> --- /dev/null
->> +++ b/tests/docker/dockerfiles/debian-powerpc-cross.docker
->> @@ -0,0 +1,40 @@
->> +#
->> +# Docker powerpc cross-compiler target
->> +#
->> +# This docker target builds on the base debian image.
->> +#
->> +FROM qemu:debian
->> +MAINTAINER Philippe Mathieu-Daudé <f4bug@amsat.org>
->> +
->> +# Add the foreign architecture we want and install dependencies
->> +RUN dpkg --add-architecture powerpc
->> +RUN apt-get update
->> +RUN DEBIAN_FRONTEND=noninteractive eatmydata \
->> +    apt-get install -y --no-install-recommends \
->> +        crossbuild-essential-powerpc
->> +
->> +# <kludge> to fix "following packages have unmet dependencies" ...
->> +ADD debian-apt-fake.sh /usr/local/bin/apt-fake
->> +RUN apt-get install -y --no-install-recommends \
->> +        equivs \
->> +        pkg-config
->> +RUN apt-fake install \
->> +        pkg-config:powerpc=0.28-1.1-fake && \
->> +    ln -s pkg-config /usr/bin/powerpc-linux-gnu-pkg-config
->> +ENV PKG_CONFIG_PATH /usr/lib/powerpc-linux-gnu/pkgconfig
->> +# </kludge>
->> +
->> +# Specify the cross prefix for this image (see tests/docker/common.rc)
->> +ENV QEMU_CONFIGURE_OPTS --cross-prefix=powerpc-linux-gnu-
->> +
->> +RUN DEBIAN_FRONTEND=noninteractive eatmydata \
->> +    apt-get build-dep -yy -a powerpc qemu
->> +RUN DEBIAN_FRONTEND=noninteractive \
->> +    apt-get install -y --no-install-recommends \
->> +        glusterfs-common:powerpc \
->> +        libbz2-dev:powerpc \
->> +        liblzo2-dev:powerpc \
->> +        libncursesw5-dev:powerpc \
->> +        libnfs-dev:powerpc \
->> +        librdmacm-dev:powerpc \
->> +        libsnappy-dev:powerpc
->
->
-> --
-> Alex Bennée
->
+Bharata B Rao (3):
+  migration: Introduce unregister_savevm_live()
+  spapr: Unregister HPT savevm handlers for radix guests
+  spapr: Fix migration of Radix guests
+
+ hw/ppc/spapr.c              | 111 +++++++++++++++++++++++++-------------------
+ include/hw/ppc/spapr.h      |   2 +
+ include/migration/vmstate.h |   1 +
+ migration/savevm.c          |  17 ++++++-
+ 4 files changed, 80 insertions(+), 51 deletions(-)
+
+-- 
+2.7.4
