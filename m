@@ -1,20 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39787)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39813)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dDPmn-0003kH-D6
-	for qemu-devel@nongnu.org; Wed, 24 May 2017 02:28:46 -0400
+	(envelope-from <quintela@redhat.com>) id 1dDPn9-0003y5-5E
+	for qemu-devel@nongnu.org; Wed, 24 May 2017 02:29:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dDPmm-0003sk-Hi
-	for qemu-devel@nongnu.org; Wed, 24 May 2017 02:28:45 -0400
-Date: Wed, 24 May 2017 14:28:33 +0800
-From: Fam Zheng <famz@redhat.com>
-Message-ID: <20170524062833.GO12279@lemon.lan>
-References: <20170519023233.24461-1-eblake@redhat.com>
-	<20170519023233.24461-2-eblake@redhat.com>
+	(envelope-from <quintela@redhat.com>) id 1dDPn4-00040o-Ic
+	for qemu-devel@nongnu.org; Wed, 24 May 2017 02:29:07 -0400
+From: Juan Quintela <quintela@redhat.com>
+In-Reply-To: <1495601614-18586-2-git-send-email-bharata@linux.vnet.ibm.com>
+	(Bharata B. Rao's message of "Wed, 24 May 2017 10:23:32 +0530")
+References: <1495601614-18586-1-git-send-email-bharata@linux.vnet.ibm.com>
+	<1495601614-18586-2-git-send-email-bharata@linux.vnet.ibm.com>
+Reply-To: quintela@redhat.com
+Date: Wed, 24 May 2017 08:28:59 +0200
+Message-ID: <87a8627opg.fsf@secure.mitica>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170519023233.24461-2-eblake@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 1/4] qemu-io: Don't die on second open
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v3 1/3] migration: Introduce
+ unregister_savevm_live()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,49 +25,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, jsnow@redhat.com, qemu-block@nongnu.org, mreitz@redhat.com
+To: Bharata B Rao <bharata@linux.vnet.ibm.com>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, david@gibson.dropbear.id.au, sam.bobroff@au1.ibm.com, rnsastry@linux.vnet.ibm.com, sjitindarsingh@gmail.com, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
 
-On Thu, 05/18 21:32, Eric Blake wrote:
-> Failure to open a file in qemu-io should normally return 1 on
-> failure to end the command loop, on the presumption that when
-> batching commands all on the command line, failure to open means
-> nothing further can be attempted. But when executing qemu-io
-> interactively, there is a special case: if open is executed a
-> second time, we print a hint that the user should try the
-> interactive 'close' first.  But the hint is useless if we don't
-> actually LET them try 'close'.
-> 
-> This has been awkward since at least as far back as commit
-> 43642b3, in 2011 (probably earlier, but git blame has a harder
-> time going past the file renames at that point).
-> 
-> Signed-off-by: Eric Blake <eblake@redhat.com>
-> ---
->  qemu-io.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/qemu-io.c b/qemu-io.c
-> index 34fa8a1..0c82dac 100644
-> --- a/qemu-io.c
-> +++ b/qemu-io.c
-> @@ -63,7 +63,7 @@ static int openfile(char *name, int flags, bool writethrough, bool force_share,
->      if (qemuio_blk) {
->          error_report("file open already, try 'help close'");
->          QDECREF(opts);
-> -        return 1;
-> +        return 0;
->      }
-> 
->      if (force_share) {
-> -- 
-> 2.9.4
-> 
-> 
+Bharata B Rao <bharata@linux.vnet.ibm.com> wrote:
+> Introduce a new function unregister_savevm_live() to unregister the vmstate
+> handlers registered via register_savevm_live().
+>
+> register_savevm() allocates SaveVMHandlers while register_savevm_live()
+> gets passed with SaveVMHandlers. During unregistration, we  want to
+> free SaveVMHandlers in the former case but not free in the latter case.
+> Hence this new API is needed to differentiate this.
+>
+> This new API will be needed by PowerPC to unregister the HTAB savevm
+> handlers.
+>
+> Signed-off-by: Bharata B Rao <bharata@linux.vnet.ibm.com>
+> Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
+> Cc: Juan Quintela <quintela@redhat.com>
+> Cc: Dr. David Alan Gilbert <dgilbert@redhat.com>
 
-Hmm, failure is failure, why is "return 0" better than "return 1"?
+Hi
 
-If the control flow in the caller has a problem, fix it there? Specifically, I
-don't think failed interactive open need to exit program, at all.
+How about this one?
+I just test compiled it.
 
-Fam
+Advantage from my point of view is that we always do the right thing.
+And as migration code already knows if it has to be freed or not, I
+think it is a better API.
+
+What do you think?
+
+Later, Juan.
+
+commit 6e71fac7a9c29cef9625135c58ce59ccfbb3b86f
+Author: Juan Quintela <quintela@redhat.com>
+Date:   Wed May 24 08:25:06 2017 +0200
+
+    migration: Allow to free save_live handlers
+    
+    Migration save_live handlers have an ops member that is not dynamic.
+    Add a new member is_allocated that remembers if ops has to be freed.
+    
+    Signed-off-by: Juan Quintela <quintela@redhat.com>
+
+diff --git a/include/migration/vmstate.h b/include/migration/vmstate.h
+index f97411d..1d20e30 100644
+--- a/include/migration/vmstate.h
++++ b/include/migration/vmstate.h
+@@ -57,6 +57,8 @@ typedef struct SaveVMHandlers {
+                               uint64_t *non_postcopiable_pending,
+                               uint64_t *postcopiable_pending);
+     LoadStateHandler *load_state;
++    /* Has been allocated by migratation code */
++    bool is_allocated;
+ } SaveVMHandlers;
+ 
+ int register_savevm(DeviceState *dev,
+diff --git a/migration/savevm.c b/migration/savevm.c
+index d971e5e..187f386 100644
+--- a/migration/savevm.c
++++ b/migration/savevm.c
+@@ -628,6 +628,7 @@ int register_savevm(DeviceState *dev,
+     SaveVMHandlers *ops = g_new0(SaveVMHandlers, 1);
+     ops->save_state = save_state;
+     ops->load_state = load_state;
++    ops->is_allocated = true;
+     return register_savevm_live(dev, idstr, instance_id, version_id,
+                                 ops, opaque);
+ }
+@@ -651,7 +652,9 @@ void unregister_savevm(DeviceState *dev, const char *idstr, void *opaque)
+         if (strcmp(se->idstr, id) == 0 && se->opaque == opaque) {
+             QTAILQ_REMOVE(&savevm_state.handlers, se, entry);
+             g_free(se->compat);
+-            g_free(se->ops);
++            if (se->ops->is_allocated) {
++                g_free(se->ops);
++            }
+             g_free(se);
+         }
+     }
