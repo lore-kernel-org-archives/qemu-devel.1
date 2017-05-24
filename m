@@ -1,35 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35263)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38399)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <qemu.bugs@whitewinterwolf.com>) id 1dDY26-00044w-So
-	for qemu-devel@nongnu.org; Wed, 24 May 2017 11:17:07 -0400
+	(envelope-from <eblake@redhat.com>) id 1dDYBn-0008O1-NC
+	for qemu-devel@nongnu.org; Wed, 24 May 2017 11:27:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <qemu.bugs@whitewinterwolf.com>) id 1dDY22-0004HA-Um
-	for qemu-devel@nongnu.org; Wed, 24 May 2017 11:17:06 -0400
-Received: from relay2-d.mail.gandi.net ([2001:4b98:c:538::194]:39456)
+	(envelope-from <eblake@redhat.com>) id 1dDYBi-0000IG-5M
+	for qemu-devel@nongnu.org; Wed, 24 May 2017 11:27:07 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:39922)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <qemu.bugs@whitewinterwolf.com>)
-	id 1dDY22-0004Fe-Nv
-	for qemu-devel@nongnu.org; Wed, 24 May 2017 11:17:02 -0400
-Received: from mfilter6-d.gandi.net (mfilter6-d.gandi.net [217.70.178.135])
-	by relay2-d.mail.gandi.net (Postfix) with ESMTP id 698FDC5A6C
-	for <qemu-devel@nongnu.org>; Wed, 24 May 2017 17:17:00 +0200 (CEST)
-Received: from relay2-d.mail.gandi.net ([IPv6:::ffff:217.70.183.194])
-	by mfilter6-d.gandi.net (mfilter6-d.gandi.net [::ffff:10.0.15.180])
-	(amavisd-new, port 10024)
-	with ESMTP id SZvfYzsw70oo for <qemu-devel@nongnu.org>;
-	Wed, 24 May 2017 17:16:59 +0200 (CEST)
-Received: from webmail.eu.com (webmail5-d.mgt.gandi.net [10.58.1.145])
-	(Authenticated sender: lists@whitewinterwolf.com)
-	by relay2-d.mail.gandi.net (Postfix) with ESMTPA id 1D01BC5A73
-	for <qemu-devel@nongnu.org>; Wed, 24 May 2017 17:16:58 +0200 (CEST)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dDYBh-0000H8-SM
+	for qemu-devel@nongnu.org; Wed, 24 May 2017 11:27:02 -0400
+References: <6ace537dec6122d5bd07e600b9ab9b6c@whitewinterwolf.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <2b6ca5dc-724e-49b0-1665-80f7aa82f584@redhat.com>
+Date: Wed, 24 May 2017 10:26:58 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
-Content-Transfer-Encoding: 7bit
-Date: Wed, 24 May 2017 17:16:58 +0200
-From: Simon <qemu.bugs@whitewinterwolf.com>
-Message-ID: <6ace537dec6122d5bd07e600b9ab9b6c@whitewinterwolf.com>
-Subject: [Qemu-devel] Monitor file path length limitation
+In-Reply-To: <6ace537dec6122d5bd07e600b9ab9b6c@whitewinterwolf.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="hDFdgXRsFbMfGpbBrf6m6WOl9dDPq9Q1V"
+Subject: Re: [Qemu-devel] Monitor file path length limitation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,40 +27,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Simon <qemu.bugs@whitewinterwolf.com>, qemu-devel@nongnu.org
 
-Hello,
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--hDFdgXRsFbMfGpbBrf6m6WOl9dDPq9Q1V
+From: Eric Blake <eblake@redhat.com>
+To: Simon <qemu.bugs@whitewinterwolf.com>, qemu-devel@nongnu.org
+Message-ID: <2b6ca5dc-724e-49b0-1665-80f7aa82f584@redhat.com>
+Subject: Re: [Qemu-devel] Monitor file path length limitation
+References: <6ace537dec6122d5bd07e600b9ab9b6c@whitewinterwolf.com>
+In-Reply-To: <6ace537dec6122d5bd07e600b9ab9b6c@whitewinterwolf.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-It seems that the monitor file path length is limited to about 100 
-characters (107 to be precise).
+On 05/24/2017 10:16 AM, Simon wrote:
+> Hello,
+>=20
+> It seems that the monitor file path length is limited to about 100
+> characters (107 to be precise).
 
-Currently I'm using the '-monitor' parameter to create the monitor file 
-in a directory which gather all the files related to a given VM (monitor 
-file, PID file, disk image, etc.):
+Welcome to the joy of Unix socket (AF_UNIX) files.  The kernel imposes a
+hard length limit on sockaddr_un.sun_path[] (see 'man 7 unix') - and it
+is indeed 107 characters plus a NUL terminator.
 
--monitor 
-'unix:/home/user/vmtools/test/out/foobar.iso/foobar.iso_A/foobar.iso_B/foobar.iso_C/foobar.iso_D/foobar.iso_E/monitor.sock,server,nowait'
+> -monitor
+> 'unix:/home/user/vmtools/test/out/foobar.iso/foobar.iso_A/foobar.iso_B/=
+foobar.iso_C/foobar.iso_D/foobar.iso_E/monitor.sock,server,nowait'
+>=20
+>=20
+> With this command Qemu does not produce any warning or error message bu=
+t
+> create the socket file "mon" instead of the expected "monitor.sock".
 
-With this command Qemu does not produce any warning or error message but 
-create the socket file "mon" instead of the expected "monitor.sock".
+Ideally, qemu should be telling you your path is too long to be created
+as a unix socket, and failing up front, rather than silently truncating
+and perhaps doing the wrong thing.
 
-Things go even worse if I add a further nesting:
+> Is there a clean way to work around this limitation?
 
--monitor 
-'unix:/home/user/vmtools/test/out/foobar.iso/foobar.iso_A/foobar.iso_B/foobar.iso_C/foobar.iso_D/foobar.iso_E/foobar.iso_F/monitor.sock,server,nowait'
+Don't use longer path names than the kernel supports.
 
-Now, still without any warning, Qemu creates a file named "foo" in the 
-parent directory ('foobar.iso_E/') instead of the expected directory 
-('foobar.iso_E/').
+>=20
+> As a side-note, is there any technical reason for such a limitation?
 
-Is there a clean way to work around this limitation? For instance, is 
-there an alternative option I can use to generate this monitor file? Or 
-should I just assume that absolute paths are not supported in the 
-'-monitor' option and change the working directory before launching Qemu 
-so I can pass "./monitor.sock" as monitor file path (I really prefer to 
-use absolute path whenever possible though).
+Yes, but you'll have to ask kernel folks for the reason.
 
-As a side-note, is there any technical reason for such a limitation?
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
 
-Regards,
-Simon.
+
+--hDFdgXRsFbMfGpbBrf6m6WOl9dDPq9Q1V
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEcBAEBCAAGBQJZJaZDAAoJEKeha0olJ0NqMKkH/jxeM2eBKahfXh0YTiMssjl0
+N3fcT38GQti5THPE3w+rqCwrUAELSY8lY1hSFm3zN3rXhfNodLCB2U1rtUgvuZaj
+6aj08i152bA8MurgBSFbNYUkci48ws8hh1SH3NmP4kZf4B90qZ6PeEZiUdS3j18X
+gJcpflaxBgzLA+8Dd39Lq9TFB+0jdec9/M2XR2EWuE/GIYCUcJh8f9sGrnhZ+9/j
+nEmzDG48+939BLscNjzBrrfUI0cWLJLm34+9IIAlDRv9pcxYUbrJWZ7p5HWBbHWs
+SxaXRTiTb8omtK/xOTKN+S3QQ/m9ogC3aJbdo+kPLLK/Iz/UU3VnH5v9LKJnEZw=
+=5rBg
+-----END PGP SIGNATURE-----
+
+--hDFdgXRsFbMfGpbBrf6m6WOl9dDPq9Q1V--
