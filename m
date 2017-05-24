@@ -1,18 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44902)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48089)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dDKX9-0004CB-Rz
-	for qemu-devel@nongnu.org; Tue, 23 May 2017 20:52:16 -0400
+	(envelope-from <mst@redhat.com>) id 1dDKs7-0007Bq-9H
+	for qemu-devel@nongnu.org; Tue, 23 May 2017 21:13:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dDKX6-0002Jo-Qn
-	for qemu-devel@nongnu.org; Tue, 23 May 2017 20:52:15 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:36942)
+	(envelope-from <mst@redhat.com>) id 1dDKs4-0000uI-31
+	for qemu-devel@nongnu.org; Tue, 23 May 2017 21:13:55 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:57402)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1dDKX6-0002Je-LT
-	for qemu-devel@nongnu.org; Tue, 23 May 2017 20:52:12 -0400
-From: Fam Zheng <famz@redhat.com>
-Date: Wed, 24 May 2017 08:52:06 +0800
-Message-Id: <20170524005206.31916-1-famz@redhat.com>
-Subject: [Qemu-devel] [PATCH] docker: Add flex and bison to centos6 image
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1dDKs3-0000u0-Sf
+	for qemu-devel@nongnu.org; Tue, 23 May 2017 21:13:52 -0400
+Date: Wed, 24 May 2017 04:13:47 +0300
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20170524001758-mutt-send-email-mst@kernel.org>
+References: <82063967A54EF84C8AFCD6BD7F6AD93310D199A2@SHSMSX103.ccr.corp.intel.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <82063967A54EF84C8AFCD6BD7F6AD93310D199A2@SHSMSX103.ccr.corp.intel.com>
+Subject: Re: [Qemu-devel] virtio crypto device implemenation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,36 +26,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Fam Zheng <famz@redhat.com>, thuth@redhat.com, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: "Zeng, Xin" <xin.zeng@intel.com>
+Cc: "Gonglei (Arei)" <arei.gonglei@huawei.com>, "virtio-dev@lists.oasis-open.org" <virtio-dev@lists.oasis-open.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 
-Currently there are warnings about flex and bison being missing when
-building in the centos6 image:
+On Tue, May 23, 2017 at 04:08:25PM +0000, Zeng, Xin wrote:
+> Hi, Michael, 
+>    As you know, Lei Gong from Huawei and I are co-working  on virtio crypto device spec, he is focusing on symmetric algorithm part, I am focusing on asymmetric part.  Now I am planning the implementation for asymmetric part, would you please give me your point regarding the questions below?
+>    Current virtio crypto device implementation from Lei Gong:
+>    The virtio crypto device implementation has been upstreamed to QEMU and it has a qemu backend implementation for symmetric algorithm part, the front end Linux device driver for symmetric part has been upstreamed to Linux kernel as well.
+>    My questions:
+>    From my side, I planned to add the asymmetric part support in upstreamed front end device driver, and I don't want to add the asymmetric algorithm support to current virtio crypto device's qemu backend, instead, I would like to implement and upstream a DPDK vhost-user based backend for asymmetric algorithm, and accordingly Lei Gong will help to upstream a vhost user agent for virtio crypto device in QEMU,  is this approach acceptable? Is a qemu backend a mandatory requirement for the virtio crypto device?  Is there a general policy for this?
+> 
+> Thanks
 
-    make[1]: flex: Command not found
-             BISON dtc-parser.tab.c
-    make[1]: bison: Command not found
+Parity on QEMU side is naturally preferable.  I don't think we should require it
+at all times, but if there's no implementation outside vhost-user,
+and if the feature includes a non-trivial amount of code, how
+will it be tested? I don't think we want to require all testers to use
+dpdk. An implementation under tests using libvhost-user might
+be a solution.
 
-Add them.
-
-Reported-by: Thomas Huth <thuth@redhat.com>
-Signed-off-by: Fam Zheng <famz@redhat.com>
----
- tests/docker/dockerfiles/centos6.docker | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/tests/docker/dockerfiles/centos6.docker b/tests/docker/dockerfiles/centos6.docker
-index 34e0d3b..17a4d24 100644
---- a/tests/docker/dockerfiles/centos6.docker
-+++ b/tests/docker/dockerfiles/centos6.docker
-@@ -1,7 +1,7 @@
- FROM centos:6
- RUN yum install -y epel-release
- ENV PACKAGES libfdt-devel ccache \
--    tar git make gcc g++ \
-+    tar git make gcc g++ flex bison \
-     zlib-devel glib2-devel SDL-devel pixman-devel \
-     epel-release
- RUN yum install -y $PACKAGES
 -- 
-2.9.4
+MST
