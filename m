@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59567)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:32857)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dDRHC-0005fX-Pb
-	for qemu-devel@nongnu.org; Wed, 24 May 2017 04:04:15 -0400
+	(envelope-from <lprosek@redhat.com>) id 1dDRMD-00070V-9R
+	for qemu-devel@nongnu.org; Wed, 24 May 2017 04:09:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dDRH8-0004GL-Mv
-	for qemu-devel@nongnu.org; Wed, 24 May 2017 04:04:14 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58912)
+	(envelope-from <lprosek@redhat.com>) id 1dDRM9-0005f8-Af
+	for qemu-devel@nongnu.org; Wed, 24 May 2017 04:09:25 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:33824)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1dDRH8-0004GF-Hm
-	for qemu-devel@nongnu.org; Wed, 24 May 2017 04:04:10 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
+	(Exim 4.71) (envelope-from <lprosek@redhat.com>) id 1dDRM9-0005eV-5B
+	for qemu-devel@nongnu.org; Wed, 24 May 2017 04:09:21 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 4838FC057FA8
-	for <qemu-devel@nongnu.org>; Wed, 24 May 2017 08:04:09 +0000 (UTC)
-From: Thomas Huth <thuth@redhat.com>
-Date: Wed, 24 May 2017 10:04:06 +0200
-Message-Id: <1495613046-6430-1-git-send-email-thuth@redhat.com>
-Subject: [Qemu-devel] [PATCH] net: Mark the 'hubport' netdev as deprecated
+	by mx1.redhat.com (Postfix) with ESMTPS id 56EA97249D
+	for <qemu-devel@nongnu.org>; Wed, 24 May 2017 08:09:19 +0000 (UTC)
+From: Ladi Prosek <lprosek@redhat.com>
+Date: Wed, 24 May 2017 10:09:14 +0200
+Message-Id: <20170524080914.23484-1-lprosek@redhat.com>
+Subject: [Qemu-devel] [PATCH] pc: ACPI BIOS: use highest NUMA node for
+ hotplug mem hole SRAT entry
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,64 +29,56 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Jason Wang <jasowang@redhat.com>
+Cc: imammedo@redhat.com, mst@redhat.com
 
-The 'hubport' netdev is closely tied to the 'vlan' concept which
-has been marked as deprecated in commit a2dbe1356faff3cb6 already.
-Thus we should also mark the hubport netdevs as deprecated to make
-the remaining users aware that they should not use this anymore.
+For reasons unknown, Windows won't online all memory, both at command
+line and hot-plugged later, unless the hotplug mem hole SRAT entry
+specifies a node greater or equal to the ones where memory is added.
 
-Signed-off-by: Thomas Huth <thuth@redhat.com>
+Using the highest node on the machine makes recent versions of Windows
+happy.
+
+With this example command line:
+  ... \
+  -m 1024,slots=4,maxmem=32G \
+  -numa node,nodeid=0 \
+  -numa node,nodeid=1 \
+  -numa node,nodeid=2 \
+  -numa node,nodeid=3 \
+  -object memory-backend-ram,size=1G,id=mem-mem1 \
+  -device pc-dimm,id=dimm-mem1,memdev=mem-mem1,node=1
+
+Windows reports a total of 1G of RAM without this commit and the expected
+2G with this commit.
+
+Signed-off-by: Ladi Prosek <lprosek@redhat.com>
 ---
- net/hub.c       | 4 ++++
- qemu-options.hx | 6 ++++--
- 2 files changed, 8 insertions(+), 2 deletions(-)
+ hw/i386/acpi-build.c | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
 
-diff --git a/net/hub.c b/net/hub.c
-index 32d8cf5..85bd5bc 100644
---- a/net/hub.c
-+++ b/net/hub.c
-@@ -13,6 +13,7 @@
-  */
+diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
+index afcadac..9653583 100644
+--- a/hw/i386/acpi-build.c
++++ b/hw/i386/acpi-build.c
+@@ -2404,14 +2404,17 @@ build_srat(GArray *table_data, BIOSLinker *linker, MachineState *machine)
+     }
  
- #include "qemu/osdep.h"
-+#include "qemu/error-report.h"
- #include "monitor/monitor.h"
- #include "net/net.h"
- #include "clients.h"
-@@ -286,6 +287,9 @@ int net_init_hubport(const Netdev *netdev, const char *name,
- {
-     const NetdevHubPortOptions *hubport;
- 
-+    error_report("hubports are deprecated and will be removed in a "
-+                 "future release");
-+
-     assert(netdev->type == NET_CLIENT_DRIVER_HUBPORT);
-     assert(!peer);
-     hubport = &netdev->u.hubport;
-diff --git a/qemu-options.hx b/qemu-options.hx
-index dc1a48a..efb555c 100644
---- a/qemu-options.hx
-+++ b/qemu-options.hx
-@@ -1810,7 +1810,7 @@ DEF("netdev", HAS_ARG, QEMU_OPTION_netdev,
-     "-netdev vhost-user,id=str,chardev=dev[,vhostforce=on|off]\n"
-     "                configure a vhost-user network, backed by a chardev 'dev'\n"
-     "-netdev hubport,id=str,hubid=n\n"
--    "                configure a hub port on QEMU VLAN 'n'\n", QEMU_ARCH_ALL)
-+    "                configure a hub port on QEMU VLAN 'n' (deprecated)\n", QEMU_ARCH_ALL)
- DEF("net", HAS_ARG, QEMU_OPTION_net,
-     "-net nic[,vlan=n][,macaddr=mac][,model=type][,name=str][,addr=str][,vectors=v]\n"
-     "                old way to create a new NIC and connect it to VLAN 'n'\n"
-@@ -2239,7 +2239,9 @@ Create a hub port on QEMU "vlan" @var{hubid}.
- 
- The hubport netdev lets you connect a NIC to a QEMU "vlan" instead of a single
- netdev.  @code{-net} and @code{-device} with parameter @option{vlan} create the
--required hub automatically.
-+required hub automatically. Note that the "vlan" concept and thus the hubport
-+option, too, are considered as deprecated and might be removed in a future
-+release of QEMU.
- 
- @item -netdev vhost-user,chardev=@var{id}[,vhostforce=on|off][,queues=n]
+     /*
+-     * Entry is required for Windows to enable memory hotplug in OS.
++     * Entry is required for Windows to enable memory hotplug in OS
++     * and for Linux to enable SWIOTLB even if booted with less than
++     * 4G of RAM. Windows works better if the entry sets proximity
++     * to the highest NUMA node in the machine.
+      * Memory devices may override proximity set by this entry,
+      * providing _PXM method if necessary.
+      */
+     if (hotplugabble_address_space_size) {
+         numamem = acpi_data_push(table_data, sizeof *numamem);
+         build_srat_memory(numamem, pcms->hotplug_memory.base,
+-                          hotplugabble_address_space_size, 0,
++                          hotplugabble_address_space_size, pcms->numa_nodes - 1,
+                           MEM_AFFINITY_HOTPLUGGABLE | MEM_AFFINITY_ENABLED);
+     }
  
 -- 
-1.8.3.1
+2.9.3
