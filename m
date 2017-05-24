@@ -1,22 +1,49 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57273)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59131)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dDLxl-00017V-05
-	for qemu-devel@nongnu.org; Tue, 23 May 2017 22:23:49 -0400
+	(envelope-from <joserz@linux.vnet.ibm.com>) id 1dDM7l-0003sJ-JF
+	for qemu-devel@nongnu.org; Tue, 23 May 2017 22:34:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dDLxk-0007hm-6y
-	for qemu-devel@nongnu.org; Tue, 23 May 2017 22:23:49 -0400
-Date: Wed, 24 May 2017 10:23:38 +0800
-From: Fam Zheng <famz@redhat.com>
-Message-ID: <20170524022338.GH12279@lemon.lan>
-References: <20170419094356.19826-1-famz@redhat.com>
-	<20170419094356.19826-11-famz@redhat.com>
-	<20170511202702.GM24584@stefanha-x1.localdomain>
+	(envelope-from <joserz@linux.vnet.ibm.com>) id 1dDM7g-0001ps-Jo
+	for qemu-devel@nongnu.org; Tue, 23 May 2017 22:34:09 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:49446
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <joserz@linux.vnet.ibm.com>)
+	id 1dDM7g-0001pe-Eb
+	for qemu-devel@nongnu.org; Tue, 23 May 2017 22:34:04 -0400
+Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v4O2Sw6W007583
+	for <qemu-devel@nongnu.org>; Tue, 23 May 2017 22:34:03 -0400
+Received: from e24smtp05.br.ibm.com (e24smtp05.br.ibm.com [32.104.18.26])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2amrehnk9u-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Tue, 23 May 2017 22:34:02 -0400
+Received: from localhost
+	by e24smtp05.br.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <joserz@linux.vnet.ibm.com>;
+	Tue, 23 May 2017 23:34:00 -0300
+Received: from d24av02.br.ibm.com (d24av02.br.ibm.com [9.8.31.93])
+	by d24relay02.br.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+	v4O2XnYD19464688
+	for <qemu-devel@nongnu.org>; Tue, 23 May 2017 23:33:57 -0300
+Received: from d24av02.br.ibm.com (localhost [127.0.0.1])
+	by d24av02.br.ibm.com (8.14.4/8.14.4/NCO v10.0 AVout) with ESMTP id
+	v4O2XP1r026196
+	for <qemu-devel@nongnu.org>; Tue, 23 May 2017 23:33:25 -0300
+Date: Tue, 23 May 2017 23:33:03 -0300
+From: joserz@linux.vnet.ibm.com
+References: <mailman.73115.1495441935.22737.qemu-devel@nongnu.org>
+	<BBC4E515-FE7D-4600-A5CA-BBCE26059415@gmail.com>
+	<87efvghzb9.fsf@abhimanyu.i-did-not-set--mail-host-address--so-tickle-me>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20170511202702.GM24584@stefanha-x1.localdomain>
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v2 10/16] mirror: Do initial
- aio context move of target via BB interface
+In-Reply-To: <87efvghzb9.fsf@abhimanyu.i-did-not-set--mail-host-address--so-tickle-me>
+Message-Id: <20170524023303.GA12163@pacoca>
+Subject: Re: [Qemu-devel] [PATCH risu] ppc64: Fix patterns for rotate
+ doubleword instructions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,41 +52,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@gmail.com>
-Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>, Max Reitz <mreitz@redhat.com>
+To: programmingkidx@gmail.com
+Cc: aNikunj A Dadhania <nikunj@linux.vnet.ibm.com>, "qemu-devel@nongnu.org qemu-devel" <qemu-devel@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>, Sandipan Das <sandipandas1990@gmail.com>
 
-On Thu, 05/11 16:27, Stefan Hajnoczi wrote:
-> On Wed, Apr 19, 2017 at 05:43:50PM +0800, Fam Zheng wrote:
-> > diff --git a/blockdev.c b/blockdev.c
-> > index dfd1385..53f9874 100644
-> > --- a/blockdev.c
-> > +++ b/blockdev.c
-> > @@ -3556,8 +3556,6 @@ void qmp_drive_mirror(DriveMirror *arg, Error **errp)
-> >          goto out;
-> >      }
-> >  
-> > -    bdrv_set_aio_context(target_bs, aio_context);
-> > -
-> >      blockdev_mirror_common(arg->has_job_id ? arg->job_id : NULL, bs, target_bs,
-> >                             arg->has_replaces, arg->replaces, arg->sync,
-> >                             backing_mode, arg->has_speed, arg->speed,
-> > @@ -3608,8 +3606,6 @@ void qmp_blockdev_mirror(bool has_job_id, const char *job_id,
-> >      aio_context = bdrv_get_aio_context(bs);
-> >      aio_context_acquire(aio_context);
-> >  
-> > -    bdrv_set_aio_context(target_bs, aio_context);
-> > -
-> >      blockdev_mirror_common(has_job_id ? job_id : NULL, bs, target_bs,
-> >                             has_replaces, replaces, sync, backing_mode,
-> >                             has_speed, speed,
+On Tue, May 23, 2017 at 11:47:30AM +0530, Nikunj A Dadhania wrote:
+> G 3 <programmingkidx@gmail.com> writes:
 > 
-> This patch post-pones bdrv_set_aio_context() until later on.  We now
-> call bdrv_get_info() without holding target_bs's AioContext in
-> mirror_start_job().
+> > On May 22, 2017, at 4:32 AM, qemu-devel-request@nongnu.org wrote:
+> >
+> > Hello I have also done some work risu. My patches add ppc32 support.  
+> > Well my patches were made to work with Mac OS X but they are required  
+> > to work with Linux. Do you think you could help port these patches to  
+> > Linux?
 > 
-> Please acquire the AioContext around target_bs accesses until we move it
-> to our AioContext.
+> Ziviani did the ppc64 work, lets see if he can spare some time.
+> 
+> The patches haven't come right on the mailing list, its tedious to pull
+> them. Please resend them with git send-mail.
+> 
 
-Good catch! Will fix.
+Hey, sure I can help. I'll take a look on them.
 
-Fam
+> >
+> > ppc.risu:
+> > https://patchwork.kernel.org/patch/9697489/
+> >
+> > risu_ppc.c:
+> > https://patchwork.kernel.org/patch/9697491/
+> >
+> > risu_reginfo_ppc.c:
+> > https://patchwork.kernel.org/patch/9697493/
+> >
+> > risu_reginfo_ppc.h:
+> > https://patchwork.kernel.org/patch/9697495/
+> >
+> > risugen_ppc.pm:
+> > https://patchwork.kernel.org/patch/9697497/
+> >
+> > Add ppc support to configure:
+> > https://patchwork.kernel.org/patch/9697499/
+> >
+> > Add verbose option:
+> > https://patchwork.kernel.org/patch/9697501/
+> >
+> > Add end of test message:
+> > https://patchwork.kernel.org/patch/9697503/
+> >
+> > Add more descriptive comment for mismatch or end of test condition:
+> > https://patchwork.kernel.org/patch/9697505/
+> 
+> Regards
+> Nikunj
+> 
