@@ -1,30 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54139)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54407)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <tgolembi@redhat.com>) id 1dDeHP-0002go-UH
-	for qemu-devel@nongnu.org; Wed, 24 May 2017 17:57:21 -0400
+	(envelope-from <mst@redhat.com>) id 1dDeIZ-0003ux-BJ
+	for qemu-devel@nongnu.org; Wed, 24 May 2017 17:58:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <tgolembi@redhat.com>) id 1dDeHM-0000yL-QW
-	for qemu-devel@nongnu.org; Wed, 24 May 2017 17:57:20 -0400
-Received: from mail-wm0-f53.google.com ([74.125.82.53]:35915)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <tgolembi@redhat.com>) id 1dDeHM-0000wf-Fk
-	for qemu-devel@nongnu.org; Wed, 24 May 2017 17:57:16 -0400
-Received: by mail-wm0-f53.google.com with SMTP id 7so75343665wmo.1
-	for <qemu-devel@nongnu.org>; Wed, 24 May 2017 14:57:16 -0700 (PDT)
-Date: Wed, 24 May 2017 23:57:09 +0200
-From: =?UTF-8?B?VG9tw6HFoSBHb2xlbWJpb3Zza8O9?= <tgolembi@redhat.com>
-Message-ID: <20170524235709.0ecb668e@fiorina>
-In-Reply-To: <20170524235155.2b1454ef@fiorina>
-References: <20170331101947.2046-1-vfeenstr@redhat.com>
-	<20170331101947.2046-2-vfeenstr@redhat.com>
-	<e60c94da-f3d8-3139-27c5-2c357b37834b@redhat.com>
-	<CAJ+F1CL+jkWOdCeDkfBUBFssR41kT9uumVYrcjqeuQ7YvNX5fg@mail.gmail.com>
-	<149202750217.22939.16193629731178448080@loki>
-	<20170524235155.2b1454ef@fiorina>
+	(envelope-from <mst@redhat.com>) id 1dDeIW-0003je-6S
+	for qemu-devel@nongnu.org; Wed, 24 May 2017 17:58:31 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:52686)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1dDeIV-0003j0-Tt
+	for qemu-devel@nongnu.org; Wed, 24 May 2017 17:58:28 -0400
+Date: Thu, 25 May 2017 00:58:22 +0300
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20170525005724-mutt-send-email-mst@kernel.org>
+References: <20170524090520.321-1-maxime.coquelin@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3] qemu-ga: add guest-get-osrelease command
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170524090520.321-1-maxime.coquelin@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2] vhost-user: pass message as a pointer
+ to process_message_reply()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,158 +27,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Michael Roth <mdroth@linux.vnet.ibm.com>
-Cc: =?UTF-8?B?TWFyYy1BbmRyw6k=?= Lureau <marcandre.lureau@gmail.com>, Eric Blake <eblake@redhat.com>, Vinzenz 'evilissimo' Feenstra <vfeenstr@redhat.com>, qemu-devel@nongnu.org
+To: Maxime Coquelin <maxime.coquelin@redhat.com>
+Cc: zhiyong.yang@intel.com, qemu-devel@nongnu.org, jfreiman@redhat.com, marcandre.lureau@redhat.com
 
-On Wed, 24 May 2017 23:51:55 +0200
-Tom=C3=A1=C5=A1 Golembiovsk=C3=BD <tgolembi@redhat.com> wrote:
+On Wed, May 24, 2017 at 11:05:20AM +0200, Maxime Coquelin wrote:
+> process_message_reply() was recently updated to get full message
+> content instead of only its request field.
+> 
+> There is no need to copy all the struct content into the stack,
+> so just pass its pointer as const.
+> 
+> Cc: Zhiyong Yang <zhiyong.yang@intel.com>
+> Fixes: 60cd11024f41 ("hw/virtio: fix vhost user fails to startup when MQ")
+> Reviewed-by: Jens Freimann <jfreiman@redhat.com>
+> Reviewed-by: Zhiyong Yang <zhiyong.yang@intel.com>
+> Signed-off-by: Maxime Coquelin <maxime.coquelin@redhat.com>
 
-> On Wed, 12 Apr 2017 15:05:02 -0500
-> Michael Roth <mdroth@linux.vnet.ibm.com> wrote:
->=20
-> > On 04/03/2017 10:17 AM, Marc-Andr=C3=A9 Lureau wrote: =20
-> > > Hi
-> > >=20
-> > > On Fri, Mar 31, 2017 at 3:41 PM Eric Blake <eblake@redhat.com> wrote:
-> > >    =20
-> > >> On 03/31/2017 05:19 AM, Vinzenz 'evilissimo' Feenstra wrote:   =20
-> > >>> From: Vinzenz Feenstra <vfeenstr@redhat.com>
-> > >>>
-> > >>> Add a new 'guest-get-osrelease' command to report OS information in
-> > >>> the
-> > >>> os-release format. As documented here:
-> > >>> https://www.freedesktop.org/software/systemd/man/os-release.html
-> > >>>
-> > >>> The win32 implementation generates the information.
-> > >>> On POSIX systems the /etc/os-release or /usr/lib/os-release files
-> > >>> content is returned when available and gets extended with the
-> > >>> fields:
-> > >>> - QGA_UNAME_RELEASE which is the content of `uname -r`
-> > >>> - QGA_UNAME_VERSION which is the content of `uname -v`
-> > >>> - QGA_UNAME_MACHINE which is the content of `uname -m`
-> > >>>
-> > >>> Here an example for a Fedora 25 VM:
-> > >>>
-> > >>> virsh # qemu-agent-command F25 '{ "execute": "guest-get-osrelease"
-> > >>> }'
-> > >>> {"return":{"content":"NAME=3DFedora\nVERSION=3D\"25 (Server Edition=
-)\"\n
-> > >>> ID=3Dfedora\nVERSION_ID=3D25\nPRETTY_NAME=3D\"Fedora 25 (Server
-> > >>> Edition)\"\n
-> > >>> ANSI_COLOR=3D\"0;34\"\nCPE_NAME=3D\"cpe:/o:fedoraproject:fedora:25\=
-"\n
-> > >>> HOME_URL=3D\"https://fedoraproject.org/\"\n
-> > >>> BUG_REPORT_URL=3D\"https://bugzilla.redhat.com/\"\n
-> > >>> REDHAT_BUGZILLA_PRODUCT=3D\"Fedora\"\n
-> > >>> REDHAT_BUGZILLA_PRODUCT_VERSION=3D25\nREDHAT_SUPPORT_PRODUCT=3D\"Fe=
-dora\"\n
-> > >>> REDHAT_SUPPORT_PRODUCT_VERSION=3D25\n
-> > >>> PRIVACY_POLICY_URL=3Dhttps://fedoraproject.org/wiki/Legal:PrivacyPo=
-licy\n
-> > >>> VARIANT=3D\"Server Edition\"\nVARIANT_ID=3Dserver\n\n
-> > >>> QGA_UNAME_RELEASE=3D\"4.8.6-300.fc25.x86_64\"\n
-> > >>> QGA_UNAME_VERSION=3D\"#1 SMP Tue Nov 1 12:36:38 UTC 2016\"\n
-> > >>> QGA_UNAME_MACHINE=3D\"x86_64\"\n"}}   =20
-> > >>
-> > >> Uggh. This is a step backwards.  Now you are requiring the end user
-> > >> to
-> > >> parse a raw string, instead of giving them the information already
-> > >> broken out as a JSON dictionary.
-> > >>   =20
-> > >=20
-> > > yes otoh, it uses an existing standard to retrieve various guest os
-> > > release
-> > > informations, which existing tool may know how to handle.
-> > >=20
-> > > (I feel partially guilty about it since I suggested it, mainly in a
-> > > discussion over irc and Vinzenz adopted it)
-> > >=20
-> > > The format is fairly straightforward to parse, but perhaps it should
-> > > be
-> > > sent as a JSON dict instead? However, that would mean that the list of
-> > > keys
-> > > is limited by what QGA protocol defines, and the agent would have to
-> > > parse
-> > > the file himself. And we would have to duplicate the documentation
-> > > etc..
-> > >=20
-> > > I would rely on the XDG format instead, given its simplicity,
-> > > extensibility
-> > > and documentation that fits the job nicely imho.   =20
-> >=20
-> > I like the idea of using an existing standard, but if they really want
-> > to get at a raw dump of /etc/os-release to use with existing tools then
-> > I think guest-file-open/read are the more appropriate interfaces.
-> >=20
-> > Knowing that they *can* get at information like that for a particular
-> > guest, or do things like execute 'uname -m' via guest-exec, is where I
-> > think an interface like this has it's place.
-> >=20
-> > So I think a more curated/limited set of identifiers is sufficient, and
-> > still flexible enough to enable to more os-specific use-cases.
-> >=20
-> > But I also don't like the idea of re-defining what terms like
-> > "version_id", "variant", "varient_id", etc mean, so I think it's still
-> > a good idea to use the os-release-documented fields as the basis for
-> > the fields we decide to return in our dictionary, and note that
-> > explicitly in the schema documentation.
-> >  =20
->=20
-> So what about the following, would that be acceptable?
->=20
->=20
-> ##
-> # @GuestOSRelease:
-> #
-> # @content:
-> #           POSIX systems the @kernel_version, @kernel_release and
-> #           @machine_hardware correspond to the values release, version a=
-nd
-> #           machine returned by uname(2). On Windows, they correspond to =
-the
-> #           version number, build number and architecture.
-> #
-> #           On Linux-based system where os-release info is available eith=
-er
-> #           from /etc/os-release or from /usr/lib/os-release, the fields =
-@id,
-> #           @name, @pretty_name, @version, @version_codename, @variant,
-> #           correspond to the fields of the same name defined in os-relea=
-se(5).
-> #           On Windows, the data is generated based on the available
-> #           inforamtion.
-> #
-> # Since: 2.10
-> ##
-> { 'struct': 'GuestOSRelease',
->   'data': {
->       'kernel_release': 'str',
->       'kernel_version': 'str',
->       'machine_hardware': 'str'
->       'id': '*str',
->       'name': '*str',
->       'pretty_name': '*str',
->       'version': '*str',
->       'version_codename': '*str',
+Why "Fixes"? It's not a bugfix, is it? Passing a pointer is
+slightly cleaner but it's not a big deal IMHO. I'll apply
+but would like to get clarification on this tag.
 
-I forgot version_id here, maybe it can go in place of version_codename... o=
-r do we want both?
-
->       'variant': '*str',
-
-And here I forgot variant_id.
-
-    Tomas
-
->   } }
->=20
->=20
->     Tomas
->=20
->=20
-> --=20
-> Tom=C3=A1=C5=A1 Golembiovsk=C3=BD <tgolembi@redhat.com>
-
-
---=20
-Tom=C3=A1=C5=A1 Golembiovsk=C3=BD <tgolembi@redhat.com>
+> ---
+> V2:
+>  - Make msg pointer const (Marc-Andre)
+>  - Apply R-b's
+> 
+>  hw/virtio/vhost-user.c | 12 ++++++------
+>  1 file changed, 6 insertions(+), 6 deletions(-)
+> 
+> diff --git a/hw/virtio/vhost-user.c b/hw/virtio/vhost-user.c
+> index b87a176..dde094a 100644
+> --- a/hw/virtio/vhost-user.c
+> +++ b/hw/virtio/vhost-user.c
+> @@ -162,11 +162,11 @@ fail:
+>  }
+>  
+>  static int process_message_reply(struct vhost_dev *dev,
+> -                                 VhostUserMsg msg)
+> +                                 const VhostUserMsg *msg)
+>  {
+>      VhostUserMsg msg_reply;
+>  
+> -    if ((msg.flags & VHOST_USER_NEED_REPLY_MASK) == 0) {
+> +    if ((msg->flags & VHOST_USER_NEED_REPLY_MASK) == 0) {
+>          return 0;
+>      }
+>  
+> @@ -174,10 +174,10 @@ static int process_message_reply(struct vhost_dev *dev,
+>          return -1;
+>      }
+>  
+> -    if (msg_reply.request != msg.request) {
+> +    if (msg_reply.request != msg->request) {
+>          error_report("Received unexpected msg type."
+>                       "Expected %d received %d",
+> -                     msg.request, msg_reply.request);
+> +                     msg->request, msg_reply.request);
+>          return -1;
+>      }
+>  
+> @@ -324,7 +324,7 @@ static int vhost_user_set_mem_table(struct vhost_dev *dev,
+>      }
+>  
+>      if (reply_supported) {
+> -        return process_message_reply(dev, msg);
+> +        return process_message_reply(dev, &msg);
+>      }
+>  
+>      return 0;
+> @@ -716,7 +716,7 @@ static int vhost_user_net_set_mtu(struct vhost_dev *dev, uint16_t mtu)
+>  
+>      /* If reply_ack supported, slave has to ack specified MTU is valid */
+>      if (reply_supported) {
+> -        return process_message_reply(dev, msg);
+> +        return process_message_reply(dev, &msg);
+>      }
+>  
+>      return 0;
+> -- 
+> 2.9.4
