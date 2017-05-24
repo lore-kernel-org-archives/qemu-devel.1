@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39444)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48107)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dDTeZ-00018S-2E
-	for qemu-devel@nongnu.org; Wed, 24 May 2017 06:36:32 -0400
+	(envelope-from <quintela@redhat.com>) id 1dDUMb-0001QU-8w
+	for qemu-devel@nongnu.org; Wed, 24 May 2017 07:22:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dDTeX-0004SE-Td
-	for qemu-devel@nongnu.org; Wed, 24 May 2017 06:36:31 -0400
-Date: Wed, 24 May 2017 20:27:47 +1000
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20170524102747.GA12929@umbus.fritz.box>
-References: <20170523111812.13469-1-lvivier@redhat.com>
-	<20170523111812.13469-2-lvivier@redhat.com>
-	<20170523172842.1fce414e@bahia.ttt.fr.ibm.com>
-	<bc9a69f9-eb7b-943a-a9bf-bb4a3b18f525@redhat.com>
-	<20170524045236.GU30246@umbus.fritz.box>
-	<20170524115513.71a014f2@bahia.ttt.fr.ibm.com>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="pWyiEgJYm5f9v55/"
-Content-Disposition: inline
-In-Reply-To: <20170524115513.71a014f2@bahia.ttt.fr.ibm.com>
-Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH 1/4] spapr: add pre_plug
- function for memory
+	(envelope-from <quintela@redhat.com>) id 1dDUMY-0002Xd-2T
+	for qemu-devel@nongnu.org; Wed, 24 May 2017 07:22:01 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:41905)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1dDUMX-0002W8-SS
+	for qemu-devel@nongnu.org; Wed, 24 May 2017 07:21:58 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id C308380490
+	for <qemu-devel@nongnu.org>; Wed, 24 May 2017 11:21:56 +0000 (UTC)
+From: Juan Quintela <quintela@redhat.com>
+Date: Wed, 24 May 2017 13:21:52 +0200
+Message-Id: <20170524112152.23226-1-quintela@redhat.com>
+Subject: [Qemu-devel] [PATCH v2] migration: Allow unregister of save_live
+ handlers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,89 +28,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>
-Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Michael Roth <mdroth@linux.vnet.ibm.com>
+To: qemu-devel@nongnu.org
+Cc: dgilbert@redhat.com, lvivier@redhat.com, peterx@redhat.com
 
+Migration non save_live handlers have an ops member that is
+dinamically allocated by migration code.  Save_live handlers have it
+passed as argument and are responsability of the caller.  Add a new
+member is_allocated that remembers if ops has to be freed.  This
+allows unregister_savevm() to work with save_live handlers.
 
---pWyiEgJYm5f9v55/
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Signed-off-by: Juan Quintela <quintela@redhat.com>
 
-On Wed, May 24, 2017 at 11:55:13AM +0200, Greg Kurz wrote:
-1;4601;0c> On Wed, 24 May 2017 14:52:36 +1000
-> David Gibson <david@gibson.dropbear.id.au> wrote:
-> [...]
-> >=20
-> > This patch seems like a good idea regardless of the rest, so I've
-> > fixed the minor nits Greg pointed out and merged to ppc-for-2.10.
-> >=20
->=20
-> David,
->=20
-> Commit d2e4c6a1437fab2fbb4553b598f25e282c475199 in your ppc-for-2.10 bran=
-ch
-> doesn't compile:
->=20
-> +static void spapr_memory_pre_plug(HotplugHandler *hotplug_dev, DeviceSta=
-te *dev,
-> +                                  Error **errp)
-> +{
-> +    PCDIMMDevice *dimm =3D PC_DIMM(dev);
-> +    PCDIMMDeviceClass *ddc =3D PC_DIMM_GET_CLASS(dimm);
-> +    MemoryRegion *mr =3D ddc->get_memory_region(dimm);
-> +    uint64_t size =3D memory_region_size(mr);
-> +    char *mem_dev;
-> +
-> +    if (size % SPAPR_MEMORY_BLOCK_SIZE) {
-> +        error_setg(&local_err, "Hotplugged memory size must be a multipl=
-e of "
->=20
-> s/&local_err/errp/
->=20
-> +                      "%lld MB", SPAPR_MEMORY_BLOCK_SIZE / M_BYTE);
-> +        goto out;
->=20
-> s/goto out/return/
->=20
-> +    }
-> +
-> +    mem_dev =3D object_property_get_str(OBJECT(dimm), PC_DIMM_MEMDEV_PRO=
-P, NULL);
-> +    if (mem_dev && !kvmppc_is_mem_backend_page_size_ok(mem_dev)) {
-> +        error_setg(errp, "Memory backend has bad page size. "
-> +                   "Use 'memory-backend-file' with correct mem-path.");
-> +    }
-> +}
-> +
+---
 
-Sorry, I found and fixed that already, but forgot to push the update.
+check that se->ops is not NULL (thanks peterx)
+---
+ include/migration/vmstate.h | 2 ++
+ migration/savevm.c          | 5 ++++-
+ 2 files changed, 6 insertions(+), 1 deletion(-)
 
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---pWyiEgJYm5f9v55/
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-
-iQIcBAEBCAAGBQJZJWAgAAoJEGw4ysog2bOSyEAP/2B3lafi3pLYVNGm1TB+qpgQ
-TmG3ApIsDe0/3pGMCOgCCgk8C+xeJvMOP/ExffVj3hbkjfH1Rl/2tZwbRqkxW+5m
-tqM6yT2EIEQuDlzIC1ndXHbUJ30LOSr9SCvZhUwvCoGDgfB/V5r9FMQuEW4wnCeK
-WFybGG6ZMZr/zBJ2uJ42LbYbUu06jXOkcQ69pxSDSPIXacqJjBQZQa2rdJKH0wwh
-Px6Ydb4+mHAEEzFW6U7Yuf5YFc1e1XAC2QahVN4mwUdssD/nl7Zfyyd5DqBqCCXa
-vxZ+SiKTfM+D+/nxvEsIL7KV7oZv/he7TFVqv7gR15VVqRHtAxLemnYhSXeNOtoY
-kyoRYKMm1Az+CcLPsLSwpUHYhfaUvv/eZdYu7/hMU057uIwqq8dxpRDeU/1g6uGq
-3Xvu4PCkq6wI3EmQ+GSWJWgLAwiuF0USVO5NqJR+SZ06Fi1/z4NDB7n9nWYYMHgA
-VlCYEN08IvGFPrqU5yYAWSDmmvbo+SA32njCr0Ka3ZQQr0OwELkOwR5ds93cZhTz
-tnX8GBJQIT3+k7i+q/wc4DVKUL3uGeOfFbbRbXvQeMdFjYxiK1Ti2jFdDtB9ESgC
-Ej25+rghyoN6ueGXMt+9xj0R+kzWFnI8Ovrq7p03X5yf2AhcO1o2kc3Pfi+hYxwh
-ENzazxsA+X6eSiR1yON1
-=3Yl0
------END PGP SIGNATURE-----
-
---pWyiEgJYm5f9v55/--
+diff --git a/include/migration/vmstate.h b/include/migration/vmstate.h
+index f97411d..1d20e30 100644
+--- a/include/migration/vmstate.h
++++ b/include/migration/vmstate.h
+@@ -57,6 +57,8 @@ typedef struct SaveVMHandlers {
+                               uint64_t *non_postcopiable_pending,
+                               uint64_t *postcopiable_pending);
+     LoadStateHandler *load_state;
++    /* Has been allocated by migratation code */
++    bool is_allocated;
+ } SaveVMHandlers;
+ 
+ int register_savevm(DeviceState *dev,
+diff --git a/migration/savevm.c b/migration/savevm.c
+index d971e5e..569add3 100644
+--- a/migration/savevm.c
++++ b/migration/savevm.c
+@@ -628,6 +628,7 @@ int register_savevm(DeviceState *dev,
+     SaveVMHandlers *ops = g_new0(SaveVMHandlers, 1);
+     ops->save_state = save_state;
+     ops->load_state = load_state;
++    ops->is_allocated = true;
+     return register_savevm_live(dev, idstr, instance_id, version_id,
+                                 ops, opaque);
+ }
+@@ -651,7 +652,9 @@ void unregister_savevm(DeviceState *dev, const char *idstr, void *opaque)
+         if (strcmp(se->idstr, id) == 0 && se->opaque == opaque) {
+             QTAILQ_REMOVE(&savevm_state.handlers, se, entry);
+             g_free(se->compat);
+-            g_free(se->ops);
++            if (se->ops && se->ops->is_allocated) {
++                g_free(se->ops);
++            }
+             g_free(se);
+         }
+     }
+-- 
+2.9.3
