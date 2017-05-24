@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40435)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47399)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <boddupavan@yahoo.com>) id 1dDPrH-0005X5-Ef
-	for qemu-devel@nongnu.org; Wed, 24 May 2017 02:33:24 -0400
+	(envelope-from <quintela@redhat.com>) id 1dDQYh-0000z3-EX
+	for qemu-devel@nongnu.org; Wed, 24 May 2017 03:18:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <boddupavan@yahoo.com>) id 1dDPrD-0005fh-3F
-	for qemu-devel@nongnu.org; Wed, 24 May 2017 02:33:23 -0400
-Received: from sonic303-24.consmr.mail.gq1.yahoo.com ([98.137.64.205]:44985)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <boddupavan@yahoo.com>) id 1dDPrC-0005ct-Pe
-	for qemu-devel@nongnu.org; Wed, 24 May 2017 02:33:19 -0400
-Date: Wed, 24 May 2017 06:33:14 +0000 (UTC)
-From: boddu pavan <boddupavan@yahoo.com>
-Reply-To: boddu pavan <boddupavan@yahoo.com>
-Message-ID: <1247874473.1264616.1495607594686@mail.yahoo.com>
-In-Reply-To: <910323563.4048354.1495458265640@mail.yahoo.com>
-References: <910323563.4048354.1495458265640.ref@mail.yahoo.com>
-	<910323563.4048354.1495458265640@mail.yahoo.com>
+	(envelope-from <quintela@redhat.com>) id 1dDQYd-0008WV-L5
+	for qemu-devel@nongnu.org; Wed, 24 May 2017 03:18:14 -0400
+From: Juan Quintela <quintela@redhat.com>
+In-Reply-To: <20170524063617.GX30246@umbus.fritz.box> (David Gibson's message
+	of "Wed, 24 May 2017 16:36:17 +1000")
+References: <1495601614-18586-1-git-send-email-bharata@linux.vnet.ibm.com>
+	<1495601614-18586-2-git-send-email-bharata@linux.vnet.ibm.com>
+	<87a8627opg.fsf@secure.mitica>
+	<20170524063617.GX30246@umbus.fritz.box>
+Reply-To: quintela@redhat.com
+Date: Wed, 24 May 2017 09:18:08 +0200
+Message-ID: <8760gq7mfj.fsf@secure.mitica>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] ssi_auto_connect_slave
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v3 1/3] migration: Introduce
+ unregister_savevm_live()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,17 +27,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Qemu-discuss <qemu-discuss@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: Bharata B Rao <bharata@linux.vnet.ibm.com>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, sam.bobroff@au1.ibm.com, rnsastry@linux.vnet.ibm.com, sjitindarsingh@gmail.com, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
 
-+qemu-dev 
+David Gibson <david@gibson.dropbear.id.au> wrote:
+> On Wed, May 24, 2017 at 08:28:59AM +0200, Juan Quintela wrote:
+>> Bharata B Rao <bharata@linux.vnet.ibm.com> wrote:
+>> > Introduce a new function unregister_savevm_live() to unregister the vmstate
+>> > handlers registered via register_savevm_live().
+>> >
+>> > register_savevm() allocates SaveVMHandlers while register_savevm_live()
+>> > gets passed with SaveVMHandlers. During unregistration, we  want to
+>> > free SaveVMHandlers in the former case but not free in the latter case.
+>> > Hence this new API is needed to differentiate this.
+>> >
+>> > This new API will be needed by PowerPC to unregister the HTAB savevm
+>> > handlers.
+>> >
+>> > Signed-off-by: Bharata B Rao <bharata@linux.vnet.ibm.com>
+>> > Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
+>> > Cc: Juan Quintela <quintela@redhat.com>
+>> > Cc: Dr. David Alan Gilbert <dgilbert@redhat.com>
+>> 
+>> Hi
+>> 
+>> How about this one?
+>> I just test compiled it.
+>> 
+>> Advantage from my point of view is that we always do the right thing.
+>> And as migration code already knows if it has to be freed or not, I
+>> think it is a better API.
+>> 
+>> What do you think?
+>
+> I think this is a better approach.  Do you want to push this one
+> directly, Juan, or do you want me to take it through my tree?
 
-  Show original message     On Monday, May 22, 2017 6:34 PM, boddu pavan <boddupavan@yahoo.com> wrote:
- 
+I will push it on my next pull request.  I mean, I will send it for
+review on own top level.
 
- Hi,
-I see that ssi_auto_connect_slave helper of ssi.c (https://github.com/qemu/qemu/blob/master/hw/ssi/ssi.c#L166) is used to connect SSISlave children of spi controller to its respective spi bus. But this function cannot handle the scenario where controller has two spi busses ( like xilinx_spips). In this case each SSISlave is registered on both the buses.
-I cannot image a possible good way to fix this, other than assigning a bus number property for each SSISlave. Let me know if that works as a good patch if provided ?
-Thanks,
-Sai Pavan
-
-   
+Thanks, Juan.
