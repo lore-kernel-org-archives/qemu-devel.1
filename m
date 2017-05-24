@@ -1,24 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51018)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51726)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1dDVrK-0008U6-AJ
-	for qemu-devel@nongnu.org; Wed, 24 May 2017 08:57:51 -0400
+	(envelope-from <stefanha@gmail.com>) id 1dDVsw-0000dO-UV
+	for qemu-devel@nongnu.org; Wed, 24 May 2017 08:59:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1dDVrH-0007ag-8T
-	for qemu-devel@nongnu.org; Wed, 24 May 2017 08:57:50 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:51758)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1dDVrG-0007Yn-Uc
-	for qemu-devel@nongnu.org; Wed, 24 May 2017 08:57:47 -0400
-Date: Wed, 24 May 2017 13:57:23 +0100
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20170524125723.GD11609@stefanha-x1.localdomain>
-References: <20170523111306.25493-1-cornelia.huck@de.ibm.com>
+	(envelope-from <stefanha@gmail.com>) id 1dDVst-0000GI-Rm
+	for qemu-devel@nongnu.org; Wed, 24 May 2017 08:59:31 -0400
+Received: from mail-lf0-x242.google.com ([2a00:1450:4010:c07::242]:34048)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1dDVst-0000Fm-Du
+	for qemu-devel@nongnu.org; Wed, 24 May 2017 08:59:27 -0400
+Received: by mail-lf0-x242.google.com with SMTP id q24so10922832lfb.1
+	for <qemu-devel@nongnu.org>; Wed, 24 May 2017 05:59:27 -0700 (PDT)
+Date: Wed, 24 May 2017 13:59:23 +0100
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20170524125923.GE11609@stefanha-x1.localdomain>
+References: <20170508141536.20690-1-stefanha@redhat.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="SO98HVl1bnMOfKZd"
+	protocol="application/pgp-signature"; boundary="BZaMRJmqxGScZ8Mx"
 Content-Disposition: inline
-In-Reply-To: <20170523111306.25493-1-cornelia.huck@de.ibm.com>
-Subject: Re: [Qemu-devel] [PULL 00/21] s390x patches
+In-Reply-To: <20170508141536.20690-1-stefanha@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v6 0/9] qemu-img: add measure sub-command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,145 +29,137 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cornelia.huck@de.ibm.com>
-Cc: peter.maydell@linaro.org, borntraeger@de.ibm.com, agraf@suse.de, qemu-devel@nongnu.org
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: qemu-devel@nongnu.org, John Snow <jsnow@redhat.com>, Nir Soffer <nsoffer@redhat.com>, Maor Lipchuk <mlipchuk@redhat.com>, Alberto Garcia <berto@igalia.com>
 
 
---SO98HVl1bnMOfKZd
+--BZaMRJmqxGScZ8Mx
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, May 23, 2017 at 01:12:45PM +0200, Cornelia Huck wrote:
-> The following changes since commit 56821559f0ba682fe6b367815572e6f974d329=
-ab:
+On Mon, May 08, 2017 at 10:15:27AM -0400, Stefan Hajnoczi wrote:
+> v6:
+>  * Change bdrv_measure() return type to BlockMeasureInfo * [Eric]
+>  * Clarify that holes in sparse POSIX files are still counted [Eric]
 >=20
->   Merge remote-tracking branch 'dgilbert/tags/pull-hmp-20170517' into sta=
-ging (2017-05-18 13:36:15 +0100)
+> v5:
+>  * Use UINT64_MAX instead of ~0ULL [Berto]
+>  * Document qemu-img measure ofmt, fmt, output_fmt, and snapshot_param
+>    [Berto]
 >=20
-> are available in the git repository at:
+> v4:
+>  * Make qcow2 refcount calculation conservative [Maor]
+>  * Include actual qemu-img convert image size in test cases
 >=20
->   git://github.com/cohuck/qemu tags/s390x-20170523
+> v3:
+>  * Drop RFC, this is ready to go for QEMU 2.10
+>  * Use "required size" instead of "required bytes" in qemu-img output for
+>    consistency [Nir]
+>  * Clarify BlockMeasureInfo semantics [Max]
+>  * Clarify bdrv_measure() opts argument and error handling [Nir]
+>  * Handle -o backing_file=3D for qcow2 [Max]
+>  * Handle snapshot options in qemu-img measure
+>  * Probe input image for allocated data clusters for qcow2.  Didn't centr=
+alize
+>    this because there are format-specific aspects such as the cluster_siz=
+e.  It
+>    may make sense to centralize it later (with a bit more complexity) if
+>    support is added to more formats.
+>  * Add qemu-img(1) man page section for 'measure' sub-command [Max]
+>  * Extend test case to cover additional scenarios [Nir]
 >=20
-> for you to fetch changes up to cb4f4bc3535f554daa3266aaa447843949a68193:
+> RFCv2:
+>  * Publishing RFC again to discuss the new user-visible interfaces.  Code=
+ has
+>    changed quite a bit, I have not kept any Reviewed-by tags.
+>  * Rename qemu-img sub-command "measure" and API bdrv_measure() [Nir]
+>  * Report both "required bytes" and "fully allocated bytes" to handle the=
+ empty
+>    image file and prealloc use cases [Nir and Dan]
+>  * Use bdrv_getlength() instead of bdrv_nb_sectors() [Berto]
+>  * Rename "err" label "out" in qemu-img-cmds.c [Nir]
+>  * Add basic qcow2 support, doesn't support qemu-img convert from existin=
+g files yet
 >=20
->   s390/kvm: do not reset riccb on initial cpu reset (2017-05-19 12:31:28 =
-+0200)
+> RFCv1:
+>  * Publishing patch series with just raw support, no qcow2 yet.  Please r=
+eview
+>    the command-line interface and let me know if you are happy with this
+>    approach.
 >=20
-> ----------------------------------------------------------------
-> s390x updates:
-> - support for vfio-ccw to passthrough channel devices
-> - allow ccw bios to boot from scsi generic devices
-> - bugfix for initial reset
+> Users and management tools sometimes need to know the size required for a=
+ new
+> disk image so that an LVM volume, SAN LUN, etc can be allocated ahead of =
+time.
+> Image formats like qcow2 have non-trivial metadata that makes it hard to
+> estimate the exact size without knowledge of file format internals.
 >=20
-> ----------------------------------------------------------------
+> This patch series introduces a new qemu-img sub-command that calculates t=
+he
+> required size for both image creation and conversion scenarios.
 >=20
-> Christian Borntraeger (1):
->   s390/kvm: do not reset riccb on initial cpu reset
+> The conversion scenario is:
 >=20
-> Cornelia Huck (1):
->   linux-headers: update
+>   $ qemu-img measure -f raw -O qcow2 input.img
+>   required size: 1327680
+>   fully allocated size: 1074069504
 >=20
-> Dong Jia Shi (6):
->   s390x/css: realize css_create_sch
->   s390x/css: device support for s390-ccw passthrough
->   vfio/ccw: get io region info
->   vfio/ccw: get irqs info and set the eventfd fd
->   vfio/ccw: update sense data if a unit check is pending
->   MAINTAINERS: Add vfio-ccw maintainer
+> Here an existing image file is taken and the output includes the space re=
+quired
+> for data from the input image file.
 >=20
-> Eric Farman (8):
->   pc-bios/s390-ccw: Remove duplicate blk_factor adjustment
->   pc-bios/s390-ccw: Move SCSI block factor to outer read
->   pc-bios/s390-ccw: Break up virtio-scsi read into multiples
->   pc-bios/s390-ccw: Refactor scsi_inquiry function
->   pc-bios/s390-ccw: Get list of supported VPD pages
->   pc-bios/s390-ccw: Get Block Limits VPD device data
->   pc-bios/s390-ccw: Build a reasonable max_sectors limit
->   pc-bios/s390-ccw.img: rebuild image
+> The creation scenario is:
 >=20
-> Xiao Feng Ren (5):
->   s390x/css: add s390-squash-mcss machine option
->   s390x/css: realize css_sch_build_schib
->   vfio/ccw: vfio based subchannel passthrough driver
->   s390x/css: introduce and realize ccw-request callback
->   s390x/css: ccw translation infrastructure
+>   $ qemu-img measure -O qcow2 --size 5G
+>   required size: 327680
+>   fully allocated size: 1074069504
 >=20
->  MAINTAINERS                                        |   8 +
->  default-configs/s390x-softmmu.mak                  |   1 +
->  hw/s390x/3270-ccw.c                                |   6 +-
->  hw/s390x/Makefile.objs                             |   1 +
->  hw/s390x/css-bridge.c                              |   2 +
->  hw/s390x/css.c                                     | 290 +++++++++++++-
->  hw/s390x/s390-ccw.c                                | 153 ++++++++
->  hw/s390x/s390-virtio-ccw.c                         |  32 +-
->  hw/s390x/virtio-ccw.c                              |   7 +-
->  hw/vfio/Makefile.objs                              |   1 +
->  hw/vfio/ccw.c                                      | 434 +++++++++++++++=
-++++++
->  include/hw/s390x/css-bridge.h                      |   1 +
->  include/hw/s390x/css.h                             |  67 ++--
->  include/hw/s390x/s390-ccw.h                        |  39 ++
->  include/hw/s390x/s390-virtio-ccw.h                 |   1 +
->  include/hw/vfio/vfio-common.h                      |   1 +
->  include/standard-headers/asm-x86/hyperv.h          |   7 +-
->  include/standard-headers/linux/input-event-codes.h |   1 +
->  include/standard-headers/linux/input.h             |  11 +-
->  include/standard-headers/linux/pci_regs.h          |   3 +-
->  linux-headers/asm-arm/kvm.h                        |  10 +-
->  linux-headers/asm-arm/unistd-common.h              |   1 +
->  linux-headers/asm-arm64/kvm.h                      |  10 +-
->  linux-headers/asm-powerpc/kvm.h                    |   3 +
->  linux-headers/asm-powerpc/unistd.h                 |   1 +
->  linux-headers/asm-s390/kvm.h                       |  29 +-
->  linux-headers/asm-s390/unistd.h                    |   4 +-
->  linux-headers/asm-x86/kvm.h                        |   3 +
->  linux-headers/asm-x86/unistd_32.h                  |   2 +
->  linux-headers/asm-x86/unistd_64.h                  |   1 +
->  linux-headers/asm-x86/unistd_x32.h                 |   1 +
->  linux-headers/linux/kvm.h                          |  25 ++
->  linux-headers/linux/userfaultfd.h                  |  11 +-
->  linux-headers/linux/vfio.h                         |  18 +
->  linux-headers/linux/vfio_ccw.h                     |  24 ++
->  pc-bios/s390-ccw.img                               | Bin 26472 -> 26480 =
-bytes
->  pc-bios/s390-ccw/s390-ccw.h                        |   7 +
->  pc-bios/s390-ccw/scsi.h                            |  30 ++
->  pc-bios/s390-ccw/virtio-scsi.c                     |  85 +++-
->  pc-bios/s390-ccw/virtio-scsi.h                     |   2 +
->  pc-bios/s390-ccw/virtio.h                          |   1 +
->  qemu-options.hx                                    |   6 +-
->  scripts/update-linux-headers.sh                    |   2 +-
->  target/s390x/cpu.c                                 |   7 +-
->  target/s390x/cpu.h                                 |  16 +-
->  target/s390x/ioinst.c                              |   9 +
->  46 files changed, 1293 insertions(+), 81 deletions(-)
->  create mode 100644 hw/s390x/s390-ccw.c
->  create mode 100644 hw/vfio/ccw.c
->  create mode 100644 include/hw/s390x/s390-ccw.h
->  create mode 100644 linux-headers/linux/vfio_ccw.h
+> Stefan Hajnoczi (9):
+>   block: add bdrv_measure() API
+>   raw-format: add bdrv_measure() support
+>   qcow2: extract preallocation calculation function
+>   qcow2: make refcount size calculation conservative
+>   qcow2: extract image creation option parsing
+>   qcow2: add bdrv_measure() support
+>   qemu-img: add measure subcommand
+>   qemu-iotests: support per-format golden output files
+>   iotests: add test 178 for qemu-img measure
 >=20
-> --=20
-> 2.13.0
->=20
+>  qapi/block-core.json             |  25 +++
+>  include/block/block.h            |   2 +
+>  include/block/block_int.h        |   2 +
+>  block.c                          |  35 ++++
+>  block/qcow2.c                    | 372 +++++++++++++++++++++++++++++----=
+------
+>  block/raw-format.c               |  26 +++
+>  qemu-img.c                       | 228 ++++++++++++++++++++++++
+>  qemu-img-cmds.hx                 |   6 +
+>  qemu-img.texi                    |  30 ++++
+>  tests/qemu-iotests/178           | 168 ++++++++++++++++++
+>  tests/qemu-iotests/178.out.qcow2 | 278 +++++++++++++++++++++++++++++
+>  tests/qemu-iotests/178.out.raw   | 146 +++++++++++++++
+>  tests/qemu-iotests/check         |   5 +
+>  tests/qemu-iotests/group         |   1 +
+>  14 files changed, 1230 insertions(+), 94 deletions(-)
+>  create mode 100755 tests/qemu-iotests/178
+>  create mode 100644 tests/qemu-iotests/178.out.qcow2
+>  create mode 100644 tests/qemu-iotests/178.out.raw
 
-Thanks, applied to my staging tree:
-https://github.com/stefanha/qemu/commits/staging
+Ping
 
-Stefan
-
---SO98HVl1bnMOfKZd
+--BZaMRJmqxGScZ8Mx
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEcBAEBAgAGBQJZJYMzAAoJEJykq7OBq3PITQ0IAJT9IwCBHVUHUCbpBrFGv2P3
-+iPnP/uv+b6Q4xxQsclpfGS18m9mLGJZ1BszeWVlYJlBIiJPn7R6Rl7CcfFNZMh8
-1ugkXsDdrgBa9G5QZGyG1YE4En27b97Csx61VNRemoc26Ryz+HS/4MEO0STzjmtR
-6g2rQwDziUif0z1Nzu4hcN3j6ask89V1Pf2I/kbz42s6bQiapWAVu0pjWGzm1mD7
-BOjj1p+Po0jE1ZN6amne2PNGN27nfBuXHnDKiiy4URCXqjsryqgPA8MUPrW210ls
-AdqWfYGG9SCNxmx0Be3SoyDkK6IiQu2NNDSmt9cyeVmDOeF2FKI1OKG5P30dJS8=
-=5Hzg
+iQEcBAEBAgAGBQJZJYOrAAoJEJykq7OBq3PIPpMIALfk26tPFccFiV7u8WqkmA5D
+XFld27w+yIlnz2IkNtGTvDz1+OgTKYrCcNuZSHOo6La7fxZZzSxdEdcT8QwYObhK
+r2Fml5befZKiyebwAowq0OMXz7ikqLjxzhx95QePAff+EtI4z4Ji3MRHkjwx7E5e
+4XWRxJ+aup9HGqrWC1fz+uPB59nVPRngdEVqs/h0qE1P3fzHLbHVmIb9llpl6LFt
+4pUKOO6dKqTYlySI2ROIDCL9BT0agJGKhPRBZwvFYUSB6uRvZrN/CYn781LGLcKN
+uCtJLIvk0elIPGSiwYhjuSa7VzXKPrU41CZtyOuj9zHm82R5IngRJbi4OqXg9Wg=
+=OIjO
 -----END PGP SIGNATURE-----
 
---SO98HVl1bnMOfKZd--
+--BZaMRJmqxGScZ8Mx--
