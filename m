@@ -1,26 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58712)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59046)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dDZ6C-00052l-EK
-	for qemu-devel@nongnu.org; Wed, 24 May 2017 12:25:25 -0400
+	(envelope-from <jcody@redhat.com>) id 1dDZ79-0005Wt-Je
+	for qemu-devel@nongnu.org; Wed, 24 May 2017 12:26:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dDZ69-0008Kx-64
-	for qemu-devel@nongnu.org; Wed, 24 May 2017 12:25:24 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43112)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1dDZ68-0008Kr-Vi
-	for qemu-devel@nongnu.org; Wed, 24 May 2017 12:25:21 -0400
-Date: Wed, 24 May 2017 17:25:12 +0100
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170524162512.GL18771@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <1495642203-12702-1-git-send-email-felipe@nutanix.com>
-	<1495642203-12702-5-git-send-email-felipe@nutanix.com>
+	(envelope-from <jcody@redhat.com>) id 1dDZ78-0000HM-CE
+	for qemu-devel@nongnu.org; Wed, 24 May 2017 12:26:23 -0400
+Date: Wed, 24 May 2017 12:26:14 -0400
+From: Jeff Cody <jcody@redhat.com>
+Message-ID: <20170524162614.GA4955@localhost.localdomain>
+References: <87c0140e9407c08f6e74b04131b610f2e27c014c.1495560397.git.jcody@redhat.com>
+	<20170524090202.GI6614@ndevos-x240.usersys.redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1495642203-12702-5-git-send-email-felipe@nutanix.com>
-Subject: Re: [Qemu-devel] [PATCH 4/4] migration: use dirty_rate_high_cnt
- more aggressively
+In-Reply-To: <20170524090202.GI6614@ndevos-x240.usersys.redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] block/gluster: glfs_lseek() workaround
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,55 +23,139 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Felipe Franciosi <felipe@nutanix.com>
-Cc: Peter Xu <peterx@redhat.com>, Juan Quintela <quintela@redhat.com>, "Jason J. Herne" <jjherne@linux.vnet.ibm.com>, amit Shah <amit.shah@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Malcolm Crossley <malcolm@nutanix.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+To: Niels de Vos <ndevos@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org
 
-On Wed, May 24, 2017 at 05:10:03PM +0100, Felipe Franciosi wrote:
-> The commit message from 070afca25 suggests that dirty_rate_high_cnt
-> should be used more aggressively to start throttling after two
-> iterations instead of four. The code, however, only changes the auto
-> convergence behaviour to throttle after three iterations. This makes the
-> behaviour more aggressive by kicking off throttling after two iterations
-> as originally intended.
+On Wed, May 24, 2017 at 11:02:02AM +0200, Niels de Vos wrote:
+> On Tue, May 23, 2017 at 01:27:50PM -0400, Jeff Cody wrote:
+> > On current released versions of glusterfs, glfs_lseek() will sometimes
+> > return invalid values for SEEK_DATA or SEEK_HOLE.  For SEEK_DATA and
+> > SEEK_HOLE, the returned value should be >= the passed offset, or < 0 in
+> > the case of error:
+> > 
+> > LSEEK(2):
+> > 
+> >     off_t lseek(int fd, off_t offset, int whence);
+> > 
+> >     [...]
+> > 
+> >     SEEK_HOLE
+> >               Adjust  the file offset to the next hole in the file greater
+> >               than or equal to offset.  If offset points into the middle of
+> >               a hole, then the file offset is set to offset.  If there is no
+> >               hole past offset, then the file offset is adjusted to the end
+> >               of the file (i.e., there is  an implicit hole at the end of
+> >               any file).
+> > 
+> >     [...]
+> > 
+> >     RETURN VALUE
+> >               Upon  successful  completion,  lseek()  returns  the resulting
+> >               offset location as measured in bytes from the beginning of the
+> >               file.  On error, the value (off_t) -1 is returned and errno is
+> >               set to indicate the error
+> > 
+> > However, occasionally glfs_lseek() for SEEK_HOLE/DATA will return a
+> > value less than the passed offset, yet greater than zero.
+> > 
+> > For instance, here are example values observed from this call:
+> > 
+> >     offs = glfs_lseek(s->fd, start, SEEK_HOLE);
+> >     if (offs < 0) {
+> >         return -errno;          /* D1 and (H3 or H4) */
+> >     }
+> > 
+> > start == 7608336384
+> > offs == 7607877632
+> > 
+> > This causes QEMU to abort on the assert test.  When this value is
+> > returned, errno is also 0.
+> > 
+> > This is a reported and known bug to glusterfs:
+> > https://bugzilla.redhat.com/show_bug.cgi?id=1425293
+> > 
+> > Although this is being fixed in gluster, we still should work around it
+> > in QEMU, given that multiple released versions of gluster behave this
+> > way.
+> 
+> Versions of GlusterFS 3.8.0 - 3.8.8 are affected, 3.8.9 has the fix
+> already and was released in February this year. We encourage users to
+> update to recent versions, and provide a stable (bugfix only) update
+> each month.
+> 
+> The Red Hat Gluster Storage product that is often used in combination
+> with QEMU (+oVirt) does unfortunately not have an update where this is
+> fixed.
+> 
+> Using an unfixed Gluster storage environment can cause QEMU to segfault.
+> Although fixes exist for Gluster, not all users will have them
+> installed. Preventing the segfault in QEMU due to a broken storage
+> environment makes sense to me.
+> 
+> > This patch treats the return case of (offs < start) the same as if an
+> > error value other than ENXIO is returned; we will assume we learned
+> > nothing, and there are no holes in the file.
+> > 
+> > Signed-off-by: Jeff Cody <jcody@redhat.com>
+> > ---
+> >  block/gluster.c | 18 ++++++++++++++++--
+> >  1 file changed, 16 insertions(+), 2 deletions(-)
+> > 
+> > diff --git a/block/gluster.c b/block/gluster.c
+> > index 7c76cd0..c147909e 100644
+> > --- a/block/gluster.c
+> > +++ b/block/gluster.c
+> > @@ -1275,7 +1275,14 @@ static int find_allocation(BlockDriverState *bs, off_t start,
+> >      if (offs < 0) {
+> >          return -errno;          /* D3 or D4 */
+> >      }
+> > -    assert(offs >= start);
+> > +
+> > +    if (offs < start) {
+> > +        /* This is not a valid return by lseek().  We are safe to just return
+> > +         * -EIO in this case, and we'll treat it like D4. Unfortunately some
+> > +         *  versions of libgfapi will return offs < start, so an assert here
+> > +         *  will unneccesarily abort QEMU. */
+> 
+> This is not really correct, the problem is not in libgfapi, but in the
+> protocol translator on the server-side. The version of libgfapi does not
+> matter here, it is the version on the server. But that might be too much
+> detail for the comment.
+> 
+> > +        return -EIO;
+> > +    }
+> >  
+> >      if (offs > start) {
+> >          /* D2: in hole, next data at offs */
+> > @@ -1307,7 +1314,14 @@ static int find_allocation(BlockDriverState *bs, off_t start,
+> >      if (offs < 0) {
+> >          return -errno;          /* D1 and (H3 or H4) */
+> >      }
+> > -    assert(offs >= start);
+> > +
+> > +    if (offs < start) {
+> > +        /* This is not a valid return by lseek().  We are safe to just return
+> > +         * -EIO in this case, and we'll treat it like H4. Unfortunately some
+> > +         *  versions of libgfapi will return offs < start, so an assert here
+> > +         *  will unneccesarily abort QEMU. */
+> > +        return -EIO;
+> > +    }
+> >  
+> >      if (offs > start) {
+> >          /*
+> > -- 
+> > 2.9.3
+> > 
+> 
+> You might want to explain the problem a little different in the commit
+> message. It is fine too if you think it would become too detailed, my
+> explanation is in the archives now in any case.
 
-This description looks suspect vs the code. You say it is changing
-from "after four" to "after two", but you are merely switching a
-post-increment to a pre-increment which can only reduce the boundary
-condition by 1, not 2. So either you mean to write
 
-"after two iterations instead of three" 
+Thanks.  When applying it, I'll update the comments to mention glusterfs
+server, and add the gluster version information you provided to the commit
+message (and also fix the typo Eric pointed out).
 
-or
-
-"after three iterations intead of four"
 
 > 
-> Signed-off-by: Felipe Franciosi <felipe@nutanix.com>
-> ---
->  migration/ram.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/migration/ram.c b/migration/ram.c
-> index 1a3d9e6..26e03a5 100644
-> --- a/migration/ram.c
-> +++ b/migration/ram.c
-> @@ -708,7 +708,7 @@ static void migration_bitmap_sync(RAMState *rs)
->  
->              if ((rs->num_dirty_pages_period * TARGET_PAGE_SIZE >
->                     (bytes_xfer_now - rs->bytes_xfer_prev) / 2) &&
-> -                (rs->dirty_rate_high_cnt++ >= 2)) {
-> +                (++rs->dirty_rate_high_cnt >= 2)) {
->                      trace_migration_throttle();
->                      rs->dirty_rate_high_cnt = 0;
->                      mig_throttle_guest_down();
-> -- 
-> 1.9.5
-> 
-> 
-
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+> Reviewed-by: Niels de Vos <ndevos@redhat.com>
