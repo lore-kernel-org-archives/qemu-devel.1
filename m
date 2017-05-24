@@ -1,28 +1,39 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50500)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50843)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1dDXN0-0004od-PK
-	for qemu-devel@nongnu.org; Wed, 24 May 2017 10:34:39 -0400
+	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1dDXNR-00057a-6G
+	for qemu-devel@nongnu.org; Wed, 24 May 2017 10:35:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1dDXMz-0006ZR-Im
-	for qemu-devel@nongnu.org; Wed, 24 May 2017 10:34:38 -0400
-Received: from mail-lf0-x244.google.com ([2a00:1450:4010:c07::244]:36487)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1dDXMz-0006Yv-7U
-	for qemu-devel@nongnu.org; Wed, 24 May 2017 10:34:37 -0400
-Received: by mail-lf0-x244.google.com with SMTP id h4so11146948lfj.3
-	for <qemu-devel@nongnu.org>; Wed, 24 May 2017 07:34:37 -0700 (PDT)
-MIME-Version: 1.0
+	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1dDXNN-0006pW-5l
+	for qemu-devel@nongnu.org; Wed, 24 May 2017 10:35:05 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:44057)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <stefanb@linux.vnet.ibm.com>)
+	id 1dDXNM-0006ob-Se
+	for qemu-devel@nongnu.org; Wed, 24 May 2017 10:35:01 -0400
+Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v4OEOCEE020620
+	for <qemu-devel@nongnu.org>; Wed, 24 May 2017 10:34:59 -0400
+Received: from e16.ny.us.ibm.com (e16.ny.us.ibm.com [129.33.205.206])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2anbsbrufx-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Wed, 24 May 2017 10:34:59 -0400
+Received: from localhost
+	by e16.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <stefanb@linux.vnet.ibm.com>;
+	Wed, 24 May 2017 10:34:58 -0400
 References: <1494921494-33717-1-git-send-email-amarnath.valluri@intel.com>
-	<1494921494-33717-2-git-send-email-amarnath.valluri@intel.com>
-In-Reply-To: <1494921494-33717-2-git-send-email-amarnath.valluri@intel.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Wed, 24 May 2017 14:34:24 +0000
-Message-ID: <CAJ+F1CL8gFP7QaNRWMJd+HQExtsKCXzGexB-uQH7UzDz6Ru3yg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v4 1/8] tpm-backend: Remove unneeded member
- variable from backend class
+	<1494921494-33717-6-git-send-email-amarnath.valluri@intel.com>
+From: Stefan Berger <stefanb@linux.vnet.ibm.com>
+Date: Wed, 24 May 2017 10:34:54 -0400
+MIME-Version: 1.0
+In-Reply-To: <1494921494-33717-6-git-send-email-amarnath.valluri@intel.com>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 7bit
+Message-Id: <7d66c397-6dff-cdcf-b575-a8c57201f953@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH v4 5/8] tmp backend: Add new api to read
+ backend TpmInfo
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,84 +44,16 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Amarnath Valluri <amarnath.valluri@intel.com>, qemu-devel@nongnu.org
 
-Hi
-
-On Tue, May 16, 2017 at 12:00 PM Amarnath Valluri <
-amarnath.valluri@intel.com> wrote:
-
-> TPMDriverOps inside TPMBackend is not required, as it is supposed to be a
-> class
-> member. The only possible reason for keeping in TPMBackend was, to get th=
-e
-> backend type in tpm.c where dedicated backend api, tpm_backend_get_type()
-> is
-> present.
+On 05/16/2017 03:58 AM, Amarnath Valluri wrote:
+> TPM configuration options are backend implementation details and shall not be
+> part of base TPMBackend object, and these shall not be accessed directly outside
+> of the class, hence added a new interface method, get_tpm_options() to
+> TPMDriverOps., which shall be implemented by the derived classes to return
+> configured tpm options.
+>
+> A new tpm backend api - tpm_backend_query_tpm() which uses _get_tpm_options() to
+> prepare TpmInfo.
 >
 > Signed-off-by: Amarnath Valluri <amarnath.valluri@intel.com>
->
 
-Please add & keep my r-b tags from previous iterations in commit message if
-they are no or only minor changes.
-
-
-
-> ---
->  hw/tpm/tpm_passthrough.c     | 4 ----
->  include/sysemu/tpm_backend.h | 1 -
->  tpm.c                        | 2 +-
->  3 files changed, 1 insertion(+), 6 deletions(-)
->
-> diff --git a/hw/tpm/tpm_passthrough.c b/hw/tpm/tpm_passthrough.c
-> index 9234eb3..a0baf5f 100644
-> --- a/hw/tpm/tpm_passthrough.c
-> +++ b/hw/tpm/tpm_passthrough.c
-> @@ -46,8 +46,6 @@
->  #define TPM_PASSTHROUGH(obj) \
->      OBJECT_CHECK(TPMPassthruState, (obj), TYPE_TPM_PASSTHROUGH)
->
-> -static const TPMDriverOps tpm_passthrough_driver;
-> -
->  /* data structures */
->  typedef struct TPMPassthruThreadParams {
->      TPMState *tpm_state;
-> @@ -462,8 +460,6 @@ static TPMBackend *tpm_passthrough_create(QemuOpts
-> *opts, const char *id)
->      /* let frontend set the fe_model to proper value */
->      tb->fe_model =3D -1;
->
-> -    tb->ops =3D &tpm_passthrough_driver;
-> -
->      if (tpm_passthrough_handle_device_opts(opts, tb)) {
->          goto err_exit;
->      }
-> diff --git a/include/sysemu/tpm_backend.h b/include/sysemu/tpm_backend.h
-> index b58f52d..e7f590d 100644
-> --- a/include/sysemu/tpm_backend.h
-> +++ b/include/sysemu/tpm_backend.h
-> @@ -50,7 +50,6 @@ struct TPMBackend {
->      enum TpmModel fe_model;
->      char *path;
->      char *cancel_path;
-> -    const TPMDriverOps *ops;
->
->      QLIST_ENTRY(TPMBackend) list;
->  };
-> diff --git a/tpm.c b/tpm.c
-> index 9a7c711..0ee021a 100644
-> --- a/tpm.c
-> +++ b/tpm.c
-> @@ -258,7 +258,7 @@ static TPMInfo *qmp_query_tpm_inst(TPMBackend *drv)
->      res->model =3D drv->fe_model;
->      res->options =3D g_new0(TpmTypeOptions, 1);
->
-> -    switch (drv->ops->type) {
-> +    switch (tpm_backend_get_type(drv)) {
->      case TPM_TYPE_PASSTHROUGH:
->          res->options->type =3D TPM_TYPE_OPTIONS_KIND_PASSTHROUGH;
->          tpo =3D g_new0(TPMPassthroughOptions, 1);
-> --
-> 2.7.4
->
->
-> --
-Marc-Andr=C3=A9 Lureau
+Reviewed-by: Stefan Berger <stefanb@linux.vnet.ibm.com>
