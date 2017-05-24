@@ -1,23 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57343)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57366)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dDeSM-0007aI-47
-	for qemu-devel@nongnu.org; Wed, 24 May 2017 18:08:39 -0400
+	(envelope-from <rth7680@gmail.com>) id 1dDeSP-0007gU-3B
+	for qemu-devel@nongnu.org; Wed, 24 May 2017 18:08:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dDeSK-000579-Rh
-	for qemu-devel@nongnu.org; Wed, 24 May 2017 18:08:38 -0400
-Received: from mail-qk0-x243.google.com ([2607:f8b0:400d:c09::243]:35940)
+	(envelope-from <rth7680@gmail.com>) id 1dDeSN-00059h-To
+	for qemu-devel@nongnu.org; Wed, 24 May 2017 18:08:41 -0400
+Received: from mail-qt0-x244.google.com ([2607:f8b0:400d:c0d::244]:33354)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1dDeSK-00056z-NM
-	for qemu-devel@nongnu.org; Wed, 24 May 2017 18:08:36 -0400
-Received: by mail-qk0-x243.google.com with SMTP id y128so28223887qka.3
-	for <qemu-devel@nongnu.org>; Wed, 24 May 2017 15:08:36 -0700 (PDT)
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1dDeSN-00059V-OW
+	for qemu-devel@nongnu.org; Wed, 24 May 2017 18:08:39 -0400
+Received: by mail-qt0-x244.google.com with SMTP id a46so28076333qte.0
+	for <qemu-devel@nongnu.org>; Wed, 24 May 2017 15:08:39 -0700 (PDT)
 Sender: Richard Henderson <rth7680@gmail.com>
 From: Richard Henderson <rth@twiddle.net>
-Date: Wed, 24 May 2017 15:08:25 -0700
-Message-Id: <20170524220827.21154-3-rth@twiddle.net>
+Date: Wed, 24 May 2017 15:08:27 -0700
+Message-Id: <20170524220827.21154-5-rth@twiddle.net>
 In-Reply-To: <20170524220827.21154-1-rth@twiddle.net>
 References: <20170524220827.21154-1-rth@twiddle.net>
-Subject: [Qemu-devel] [PATCH 2/4] target/s390x: End the TB after EXECUTE
+Subject: [Qemu-devel] [PATCH 4/4] target/s390x: Re-implement a few EXECUTE
+ target insns directly
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,143 +30,135 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: thuth@redhat.com, aurelien@aurel32.net
 
-This split will be required for implementing EXECUTE properly.
-Do this now as a separate step to aid comparison of before and
-after TB listings.
+While the previous patch is required for proper conformance,
+the vast majority of target insns are MVC and XC for implementing
+memmove and memset respectively.  The next most common are CLC,
+TR, and SVC.
+
+Implementing these (and a few others for which we already have
+an implementation) directly is faster than going through full
+translation to a TB.
 
 Signed-off-by: Richard Henderson <rth@twiddle.net>
 ---
- target/s390x/mem_helper.c | 54 ++++++++++++++++++++++++++++-------------------
- target/s390x/translate.c  |  6 +++++-
- 2 files changed, 37 insertions(+), 23 deletions(-)
+ target/s390x/mem_helper.c | 66 ++++++++++++++++++++++++++++++++++++-----------
+ 1 file changed, 51 insertions(+), 15 deletions(-)
 
 diff --git a/target/s390x/mem_helper.c b/target/s390x/mem_helper.c
-index 4b96c27..d57d5b1 100644
+index 3a77edc..e35571e 100644
 --- a/target/s390x/mem_helper.c
 +++ b/target/s390x/mem_helper.c
-@@ -1234,6 +1234,7 @@ void HELPER(ex)(CPUS390XState *env, uint32_t ilen, uint64_t r1, uint64_t addr)
-     S390CPU *cpu = s390_env_get_cpu(env);
-     uint64_t insn = cpu_lduw_code(env, addr);
-     uint8_t opc = insn >> 8;
-+    uint32_t cc;
+@@ -200,31 +200,30 @@ uint32_t HELPER(oc)(CPUS390XState *env, uint32_t l, uint64_t dest,
+ }
  
-     /* Or in the contents of R1[56:63].  */
-     insn |= r1 & 0xff;
-@@ -1263,42 +1264,46 @@ void HELPER(ex)(CPUS390XState *env, uint32_t ilen, uint64_t r1, uint64_t addr)
-         b2 = extract64(insn, 28, 4);
-         d1 = extract64(insn, 32, 12);
-         d2 = extract64(insn, 16, 12);
-+
-+        cc = env->cc_op;
-         switch (opc & 0xf) {
-         case 0x2:
-             do_helper_mvc(env, l, get_address(env, 0, b1, d1),
-                           get_address(env, 0, b2, d2), 0);
--            return;
-+            break;
-         case 0x4:
--            env->cc_op = do_helper_nc(env, l, get_address(env, 0, b1, d1),
--                                      get_address(env, 0, b2, d2), 0);
--            return;
-+            cc = do_helper_nc(env, l, get_address(env, 0, b1, d1),
-+                              get_address(env, 0, b2, d2), 0);
-+            break;
-         case 0x5:
--            env->cc_op = do_helper_clc(env, l, get_address(env, 0, b1, d1),
--                                       get_address(env, 0, b2, d2), 0);
--            return;
-+            cc = do_helper_clc(env, l, get_address(env, 0, b1, d1),
-+                               get_address(env, 0, b2, d2), 0);
-+            break;
-         case 0x6:
--            env->cc_op = do_helper_oc(env, l, get_address(env, 0, b1, d1),
--                                      get_address(env, 0, b2, d2), 0);
--            return;
-+            cc = do_helper_oc(env, l, get_address(env, 0, b1, d1),
-+                              get_address(env, 0, b2, d2), 0);
-+            break;
-         case 0x7:
--            env->cc_op = do_helper_xc(env, l, get_address(env, 0, b1, d1),
--                                      get_address(env, 0, b2, d2), 0);
--            return;
-+            cc = do_helper_xc(env, l, get_address(env, 0, b1, d1),
-+                              get_address(env, 0, b2, d2), 0);
-+            break;
-         case 0xc:
-             do_helper_tr(env, l, get_address(env, 0, b1, d1),
-                          get_address(env, 0, b2, d2), 0);
--            return;
-+            break;
-         case 0xd:
--            env->cc_op = do_helper_trt(env, l, get_address(env, 0, b1, d1),
--                                       get_address(env, 0, b2, d2), 0);
--            return;
-+            cc = do_helper_trt(env, l, get_address(env, 0, b1, d1),
-+                               get_address(env, 0, b2, d2), 0);
-+            break;
-+        default:
-+            goto abort;
-         }
-     } else if (opc == 0x0a) {
-         /* supervisor call */
-         env->int_svc_code = extract64(insn, 48, 8);
-         env->int_svc_ilen = ilen;
-         helper_exception(env, EXCP_SVC);
--        return;
-+        g_assert_not_reached();
-     } else if (opc == 0xbf) {
-         uint32_t r1, r3, b2, d2;
+ /* memmove */
+-static void do_helper_mvc(CPUS390XState *env, uint32_t l, uint64_t dest,
+-                          uint64_t src, uintptr_t ra)
++static uint32_t do_helper_mvc(CPUS390XState *env, uint32_t l, uint64_t dest,
++                              uint64_t src, uintptr_t ra)
+ {
+     uint32_t i;
  
-@@ -1306,10 +1311,15 @@ void HELPER(ex)(CPUS390XState *env, uint32_t ilen, uint64_t r1, uint64_t addr)
-         r3 = extract64(insn, 48, 4);
-         b2 = extract64(insn, 44, 4);
-         d2 = extract64(insn, 32, 12);
--        env->cc_op = helper_icm(env, r1, get_address(env, 0, b2, d2), r3);
+     HELPER_LOG("%s l %d dest %" PRIx64 " src %" PRIx64 "\n",
+                __func__, l, dest, src);
+ 
++    /* mvc and memmove do not behave the same when areas overlap! */
+     /* mvc with source pointing to the byte after the destination is the
+        same as memset with the first source byte */
+     if (dest == src + 1) {
+         fast_memset(env, dest, cpu_ldub_data_ra(env, src, ra), l + 1, ra);
 -        return;
-+        cc = helper_icm(env, r1, get_address(env, 0, b2, d2), r3);
+-    }
+-
+-    /* mvc and memmove do not behave the same when areas overlap! */
+-    if (dest < src || src + l < dest) {
++    } else if (dest < src || src + l < dest) {
+         fast_memmove(env, dest, src, l + 1, ra);
+-        return;
 +    } else {
-+ abort:
-+        cpu_abort(CPU(cpu),
-+                  "EXECUTE on instruction prefix 0x%x not implemented\n",
-+                  opc);
++        /* slow version with byte accesses which always work */
++        for (i = 0; i <= l; i++) {
++            uint8_t x = cpu_ldub_data_ra(env, src + i, ra);
++            cpu_stb_data_ra(env, dest + i, x, ra);
++        }
+     }
+ 
+-    /* slow version with byte accesses which always work */
+-    for (i = 0; i <= l; i++) {
+-        cpu_stb_data_ra(env, dest + i, cpu_ldub_data_ra(env, src + i, ra), ra);
+-    }
++    return env->cc_op;
+ }
+ 
+ void HELPER(mvc)(CPUS390XState *env, uint32_t l, uint64_t dest, uint64_t src)
+@@ -692,8 +691,8 @@ void HELPER(unpk)(CPUS390XState *env, uint32_t len, uint64_t dest,
+     }
+ }
+ 
+-static void do_helper_tr(CPUS390XState *env, uint32_t len, uint64_t array,
+-                         uint64_t trans, uintptr_t ra)
++static uint32_t do_helper_tr(CPUS390XState *env, uint32_t len, uint64_t array,
++                             uint64_t trans, uintptr_t ra)
+ {
+     uint32_t i;
+ 
+@@ -702,12 +701,14 @@ static void do_helper_tr(CPUS390XState *env, uint32_t len, uint64_t array,
+         uint8_t new_byte = cpu_ldub_data_ra(env, trans + byte, ra);
+         cpu_stb_data_ra(env, array + i, new_byte, ra);
+     }
++
++    return env->cc_op;
+ }
+ 
+ void HELPER(tr)(CPUS390XState *env, uint32_t len, uint64_t array,
+                 uint64_t trans)
+ {
+-    return do_helper_tr(env, len, array, trans, GETPC());
++    do_helper_tr(env, len, array, trans, GETPC());
+ }
+ 
+ uint64_t HELPER(tre)(CPUS390XState *env, uint64_t array,
+@@ -1221,6 +1222,41 @@ void HELPER(ex)(CPUS390XState *env, uint32_t ilen, uint64_t r1, uint64_t addr)
+         g_assert_not_reached();
+     }
+ 
++    /* The very most common cases can be sped up by avoiding a new TB.  */
++    if ((opc & 0xf0) == 0xd0) {
++        typedef uint32_t (*dx_helper)(CPUS390XState *, uint32_t, uint64_t,
++                                      uint64_t, uintptr_t);
++        static const dx_helper dx[16] = {
++            [0x2] = do_helper_mvc,
++            [0x4] = do_helper_nc,
++            [0x5] = do_helper_clc,
++            [0x6] = do_helper_oc,
++            [0x7] = do_helper_xc,
++            [0xc] = do_helper_tr,
++            [0xd] = do_helper_trt,
++        };
++        dx_helper helper = dx[opc & 0xf];
++
++        if (helper) {
++            uint32_t l = extract64(insn, 48, 8);
++            uint32_t b1 = extract64(insn, 44, 4);
++            uint32_t d1 = extract64(insn, 32, 12);
++            uint32_t b2 = extract64(insn, 28, 4);
++            uint32_t d2 = extract64(insn, 16, 12);
++            uint64_t a1 = get_address(env, 0, b1, d1);
++            uint64_t a2 = get_address(env, 0, b2, d2);
++
++            env->cc_op = helper(env, l, a1, a2, 0);
++            env->psw.addr += ilen;
++            return;
++        }
++    } else if (opc == 0x0a) {
++        env->int_svc_code = extract64(insn, 48, 8);
++        env->int_svc_ilen = ilen;
++        helper_exception(env, EXCP_SVC);
 +        g_assert_not_reached();
-     }
- 
--    cpu_abort(CPU(cpu), "EXECUTE on instruction prefix 0x%x not implemented\n",
--              opc);
-+    env->cc_op = cc;
-+    env->psw.addr += ilen;
- }
-diff --git a/target/s390x/translate.c b/target/s390x/translate.c
-index 5b8333f..70212c8 100644
---- a/target/s390x/translate.c
-+++ b/target/s390x/translate.c
-@@ -1163,6 +1163,8 @@ typedef enum {
-        the PC (for whatever reason), so there's no need to do it again on
-        exiting the TB.  */
-     EXIT_PC_UPDATED,
-+    /* We have updated the PC and CC values.  */
-+    EXIT_PC_CC_UPDATED,
-     /* We are exiting the TB, but have neither emitted a goto_tb, nor
-        updated the PC for the next instruction to be executed.  */
-     EXIT_PC_STALE,
-@@ -2216,7 +2218,7 @@ static ExitStatus op_ex(DisasContext *s, DisasOps *o)
-         tcg_temp_free_i64(v1);
-     }
- 
--    return NO_EXIT;
-+    return EXIT_PC_CC_UPDATED;
- }
- 
- static ExitStatus op_fieb(DisasContext *s, DisasOps *o)
-@@ -5489,6 +5491,8 @@ void gen_intermediate_code(CPUS390XState *env, struct TranslationBlock *tb)
-         /* Next TB starts off with CC_OP_DYNAMIC, so make sure the
-            cc op type is in env */
-         update_cc_op(&dc);
-+        /* FALLTHRU */
-+    case EXIT_PC_CC_UPDATED:
-         /* Exit the TB, either by raising a debug exception or by return.  */
-         if (do_debug) {
-             gen_exception(EXCP_DEBUG);
++    }
++
+     /* Record the insn we want to execute as well as the ilen to use
+        during the execution of the target insn.  This will also ensure
+        that ex_value is non-zero, which flags that we are in a state
 -- 
 2.9.4
