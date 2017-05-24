@@ -1,27 +1,39 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40053)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42558)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <den@virtuozzo.com>) id 1dDWyk-00008H-TH
-	for qemu-devel@nongnu.org; Wed, 24 May 2017 10:09:35 -0400
+	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1dDX4z-0002Yu-IK
+	for qemu-devel@nongnu.org; Wed, 24 May 2017 10:16:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <den@virtuozzo.com>) id 1dDWyh-0007D4-MZ
-	for qemu-devel@nongnu.org; Wed, 24 May 2017 10:09:34 -0400
-Received: from mail-db5eur01on0095.outbound.protection.outlook.com
-	([104.47.2.95]:60864
-	helo=EUR01-DB5-obe.outbound.protection.outlook.com)
+	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1dDX4u-0004ji-Ji
+	for qemu-devel@nongnu.org; Wed, 24 May 2017 10:16:01 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:37241)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <den@virtuozzo.com>) id 1dDWyh-00078v-3x
-	for qemu-devel@nongnu.org; Wed, 24 May 2017 10:09:31 -0400
-References: <1495634844-14777-1-git-send-email-dplotnikov@virtuozzo.com>
-From: "Denis V. Lunev" <den@virtuozzo.com>
-Message-ID: <754a02bd-f029-022b-2cc7-55a8205ca68c@virtuozzo.com>
-Date: Wed, 24 May 2017 17:09:24 +0300
+	(Exim 4.71) (envelope-from <stefanb@linux.vnet.ibm.com>)
+	id 1dDX4u-0004i8-3Y
+	for qemu-devel@nongnu.org; Wed, 24 May 2017 10:15:56 -0400
+Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v4OEEg8R049049
+	for <qemu-devel@nongnu.org>; Wed, 24 May 2017 10:15:53 -0400
+Received: from e18.ny.us.ibm.com (e18.ny.us.ibm.com [129.33.205.208])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2anavf3yyp-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Wed, 24 May 2017 10:15:52 -0400
+Received: from localhost
+	by e18.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <stefanb@linux.vnet.ibm.com>;
+	Wed, 24 May 2017 10:15:51 -0400
+References: <1494921494-33717-1-git-send-email-amarnath.valluri@intel.com>
+	<1494921494-33717-2-git-send-email-amarnath.valluri@intel.com>
+From: Stefan Berger <stefanb@linux.vnet.ibm.com>
+Date: Wed, 24 May 2017 10:15:46 -0400
 MIME-Version: 1.0
-In-Reply-To: <1495634844-14777-1-git-send-email-dplotnikov@virtuozzo.com>
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <1494921494-33717-2-git-send-email-amarnath.valluri@intel.com>
+Content-Type: text/plain; charset=windows-1252; format=flowed
 Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH] kvmclock: update system_time_msr address
- forcibly
+Message-Id: <4c001a5f-578e-a225-e0c1-d84429caa348@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH v4 1/8] tpm-backend: Remove unneeded member
+ variable from backend class
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,88 +42,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Denis Plotnikov <dplotnikov@virtuozzo.com>, pbonzini@redhat.com
-Cc: qemu-devel@nongnu.org, mtosatti@redhat.com, svt-core@lists.sw.ru
+To: Amarnath Valluri <amarnath.valluri@intel.com>, qemu-devel@nongnu.org
 
-On 05/24/2017 05:07 PM, Denis Plotnikov wrote:
-> Do an update of system_time_msr address every time before reading
-> the value of tsc_timestamp from guest's kvmclock page.
+On 05/16/2017 03:58 AM, Amarnath Valluri wrote:
+> TPMDriverOps inside TPMBackend is not required, as it is supposed to be a class
+> member. The only possible reason for keeping in TPMBackend was, to get the
+> backend type in tpm.c where dedicated backend api, tpm_backend_get_type() is
+> present.
 >
-> It should be done in a forcible manner because there is a situation
-> when system_time_msr has been set by kvm but qemu doesn't aware of it.
-> This leads to updates of kvmclock_offset without respect of guest's
-> kvmclock values.
->
-> The situation appears when L2 linux guest runs over L1 linux guest and
-> the action inducing system_time_msr update is tpr access reporting.
-> Some L1 linux guests turn off processing TPR access and when L0
-> gets an L2 exit induced by TPR MSR access it doesn't enter L1 and
-> processed it by itself.
-> Thus, L1 kvm doesn't know about that TPR access happening and doesn't
-> exit to qemu which in turn doesn't set system_time_msr address.
->
-> This patch fixes this by making sure it knows the correct address every
-> time it is needed.
->
-> Signed-off-by: Denis Plotnikov <dplotnikov@virtuozzo.com>
+> Signed-off-by: Amarnath Valluri <amarnath.valluri@intel.com>
+
+Reviewed-by: Stefan Berger <stefanb@linux.vnet.ibm.com>
+
 > ---
->  hw/i386/kvm/clock.c | 32 +++++++++++++++++++++++++++++++-
->  1 file changed, 31 insertions(+), 1 deletion(-)
+>   hw/tpm/tpm_passthrough.c     | 4 ----
+>   include/sysemu/tpm_backend.h | 1 -
+>   tpm.c                        | 2 +-
+>   3 files changed, 1 insertion(+), 6 deletions(-)
 >
-> diff --git a/hw/i386/kvm/clock.c b/hw/i386/kvm/clock.c
-> index e713162..035196a 100644
-> --- a/hw/i386/kvm/clock.c
-> +++ b/hw/i386/kvm/clock.c
-> @@ -48,11 +48,38 @@ struct pvclock_vcpu_time_info {
->      uint8_t    pad[2];
->  } __attribute__((__packed__)); /* 32 bytes */
->  
-> +static void update_all_system_time_msr(void)
-> +{
-> +    CPUState *cpu;
-> +    CPUX86State *env;
-> +    struct {
-> +        struct kvm_msrs info;
-> +        struct kvm_msr_entry entries[1];
-> +    } msr_data;
-> +    int ret;
-> +
-> +    msr_data.info.nmsrs = 1;
-> +    msr_data.entries[0].index = MSR_KVM_SYSTEM_TIME;
-> +
-> +    CPU_FOREACH(cpu) {
-> +        ret = kvm_vcpu_ioctl(cpu, KVM_GET_MSRS, &msr_data);
-> +
-> +        if (ret < 0) {
-> +            fprintf(stderr, "KVM_GET_MSRS failed: %s\n", strerror(ret));
-> +            abort();
-> +        }
-> +
-> +        assert(ret == 1);
-> +        env = cpu->env_ptr;
-> +        env->system_time_msr = msr_data.entries[0].data;
-> +    }
-> +}
-> +
->  static uint64_t kvmclock_current_nsec(KVMClockState *s)
->  {
->      CPUState *cpu = first_cpu;
->      CPUX86State *env = cpu->env_ptr;
-> -    hwaddr kvmclock_struct_pa = env->system_time_msr & ~1ULL;
-> +    hwaddr kvmclock_struct_pa;
->      uint64_t migration_tsc = env->tsc;
->      struct pvclock_vcpu_time_info time;
->      uint64_t delta;
-> @@ -60,6 +87,9 @@ static uint64_t kvmclock_current_nsec(KVMClockState *s)
->      uint64_t nsec_hi;
->      uint64_t nsec;
->  
-> +    update_all_system_time_msr();
-> +    kvmclock_struct_pa = env->system_time_msr & ~1ULL;
-> +
-should we do this once/per guest boot?
-
-Den
->      if (!(env->system_time_msr & 1ULL)) {
->          /* KVM clock not active */
->          return 0;
+> diff --git a/hw/tpm/tpm_passthrough.c b/hw/tpm/tpm_passthrough.c
+> index 9234eb3..a0baf5f 100644
+> --- a/hw/tpm/tpm_passthrough.c
+> +++ b/hw/tpm/tpm_passthrough.c
+> @@ -46,8 +46,6 @@
+>   #define TPM_PASSTHROUGH(obj) \
+>       OBJECT_CHECK(TPMPassthruState, (obj), TYPE_TPM_PASSTHROUGH)
+>
+> -static const TPMDriverOps tpm_passthrough_driver;
+> -
+>   /* data structures */
+>   typedef struct TPMPassthruThreadParams {
+>       TPMState *tpm_state;
+> @@ -462,8 +460,6 @@ static TPMBackend *tpm_passthrough_create(QemuOpts *opts, const char *id)
+>       /* let frontend set the fe_model to proper value */
+>       tb->fe_model = -1;
+>
+> -    tb->ops = &tpm_passthrough_driver;
+> -
+>       if (tpm_passthrough_handle_device_opts(opts, tb)) {
+>           goto err_exit;
+>       }
+> diff --git a/include/sysemu/tpm_backend.h b/include/sysemu/tpm_backend.h
+> index b58f52d..e7f590d 100644
+> --- a/include/sysemu/tpm_backend.h
+> +++ b/include/sysemu/tpm_backend.h
+> @@ -50,7 +50,6 @@ struct TPMBackend {
+>       enum TpmModel fe_model;
+>       char *path;
+>       char *cancel_path;
+> -    const TPMDriverOps *ops;
+>
+>       QLIST_ENTRY(TPMBackend) list;
+>   };
+> diff --git a/tpm.c b/tpm.c
+> index 9a7c711..0ee021a 100644
+> --- a/tpm.c
+> +++ b/tpm.c
+> @@ -258,7 +258,7 @@ static TPMInfo *qmp_query_tpm_inst(TPMBackend *drv)
+>       res->model = drv->fe_model;
+>       res->options = g_new0(TpmTypeOptions, 1);
+>
+> -    switch (drv->ops->type) {
+> +    switch (tpm_backend_get_type(drv)) {
+>       case TPM_TYPE_PASSTHROUGH:
+>           res->options->type = TPM_TYPE_OPTIONS_KIND_PASSTHROUGH;
+>           tpo = g_new0(TPMPassthroughOptions, 1);
