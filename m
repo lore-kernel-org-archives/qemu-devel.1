@@ -1,30 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39728)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39892)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1dDRis-0006Eo-6k
-	for qemu-devel@nongnu.org; Wed, 24 May 2017 04:32:52 -0400
+	(envelope-from <quintela@redhat.com>) id 1dDRjZ-0006mw-NL
+	for qemu-devel@nongnu.org; Wed, 24 May 2017 04:33:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1dDRin-0005gt-5H
-	for qemu-devel@nongnu.org; Wed, 24 May 2017 04:32:50 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:52276)
+	(envelope-from <quintela@redhat.com>) id 1dDRjU-00063J-OQ
+	for qemu-devel@nongnu.org; Wed, 24 May 2017 04:33:33 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:36282)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1dDRim-0005gp-Vb
-	for qemu-devel@nongnu.org; Wed, 24 May 2017 04:32:45 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1dDRjU-00062u-Gp
+	for qemu-devel@nongnu.org; Wed, 24 May 2017 04:33:28 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id EF1B161BB7
-	for <qemu-devel@nongnu.org>; Wed, 24 May 2017 08:32:43 +0000 (UTC)
-Date: Wed, 24 May 2017 10:32:40 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20170524103240.4f9d5327@nial.brq.redhat.com>
-In-Reply-To: <20170524080914.23484-1-lprosek@redhat.com>
-References: <20170524080914.23484-1-lprosek@redhat.com>
+	by mx1.redhat.com (Postfix) with ESMTPS id 7C23980E4A
+	for <qemu-devel@nongnu.org>; Wed, 24 May 2017 08:33:27 +0000 (UTC)
+From: Juan Quintela <quintela@redhat.com>
+In-Reply-To: <20170524082511.GH3873@pxdev.xzpeter.org> (Peter Xu's message of
+	"Wed, 24 May 2017 16:25:11 +0800")
+References: <20170524073719.22531-1-quintela@redhat.com>
+	<20170524082511.GH3873@pxdev.xzpeter.org>
+Reply-To: quintela@redhat.com
+Date: Wed, 24 May 2017 10:33:24 +0200
+Message-ID: <871sre7iy3.fsf@secure.mitica>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] pc: ACPI BIOS: use highest NUMA node for
- hotplug mem hole SRAT entry
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH] migration: Allow unregister of save_live
+ handlers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,60 +35,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Ladi Prosek <lprosek@redhat.com>
-Cc: qemu-devel@nongnu.org, mst@redhat.com
+To: Peter Xu <peterx@redhat.com>
+Cc: qemu-devel@nongnu.org, dgilbert@redhat.com, lvivier@redhat.com
 
-On Wed, 24 May 2017 10:09:14 +0200
-Ladi Prosek <lprosek@redhat.com> wrote:
+Peter Xu <peterx@redhat.com> wrote:
+> On Wed, May 24, 2017 at 09:37:19AM +0200, Juan Quintela wrote:
+>> Migration non save_live handlers have an ops member that is
+>> dinamically allocated by migration code.  Save_live handlers have it
+>> passed as argument and are responsability of the caller.  Add a new
+>> member is_allocated that remembers if ops has to be freed.  This
+>> allows unregister_savevm() to work with save_live handlers.
+>> 
+>> Signed-off-by: Juan Quintela <quintela@redhat.com>
+>> ---
+>>  include/migration/vmstate.h | 2 ++
+>>  migration/savevm.c          | 5 ++++-
+>>  2 files changed, 6 insertions(+), 1 deletion(-)
+>> 
+>> diff --git a/include/migration/vmstate.h b/include/migration/vmstate.h
+>> index f97411d..1d20e30 100644
+>> --- a/include/migration/vmstate.h
+>> +++ b/include/migration/vmstate.h
+>> @@ -57,6 +57,8 @@ typedef struct SaveVMHandlers {
+>>                                uint64_t *non_postcopiable_pending,
+>>                                uint64_t *postcopiable_pending);
+>>      LoadStateHandler *load_state;
+>> +    /* Has been allocated by migratation code */
+>> +    bool is_allocated;
+>>  } SaveVMHandlers;
+>>  
+>>  int register_savevm(DeviceState *dev,
+>> diff --git a/migration/savevm.c b/migration/savevm.c
+>> index d971e5e..187f386 100644
+>> --- a/migration/savevm.c
+>> +++ b/migration/savevm.c
+>> @@ -628,6 +628,7 @@ int register_savevm(DeviceState *dev,
+>>      SaveVMHandlers *ops = g_new0(SaveVMHandlers, 1);
+>>      ops->save_state = save_state;
+>>      ops->load_state = load_state;
+>> +    ops->is_allocated = true;
+>>      return register_savevm_live(dev, idstr, instance_id, version_id,
+>>                                  ops, opaque);
+>>  }
+>> @@ -651,7 +652,9 @@ void unregister_savevm(DeviceState *dev, const char *idstr, void *opaque)
+>>          if (strcmp(se->idstr, id) == 0 && se->opaque == opaque) {
+>>              QTAILQ_REMOVE(&savevm_state.handlers, se, entry);
+>>              g_free(se->compat);
+>> -            g_free(se->ops);
+>> +            if (se->ops->is_allocated) {
+>
+> Would it be good to check against (se->ops && se->ops->is_allocated)?
+> Since I see that devices registered via
+> vmstate_register_with_alias_id() won't have this se->ops. I just don't
+> know whether that case will be allowed to be unregistered with current
+> function.
 
-> For reasons unknown, Windows won't online all memory, both at command
-> line and hot-plugged later, unless the hotplug mem hole SRAT entry
-> specifies a node greater or equal to the ones where memory is added.
-> 
-> Using the highest node on the machine makes recent versions of Windows
-> happy.
-> 
-> With this example command line:
->   ... \
->   -m 1024,slots=4,maxmem=32G \
->   -numa node,nodeid=0 \
->   -numa node,nodeid=1 \
->   -numa node,nodeid=2 \
->   -numa node,nodeid=3 \
->   -object memory-backend-ram,size=1G,id=mem-mem1 \
->   -device pc-dimm,id=dimm-mem1,memdev=mem-mem1,node=1
-> 
-> Windows reports a total of 1G of RAM without this commit and the expected
-> 2G with this commit.
-> 
-> Signed-off-by: Ladi Prosek <lprosek@redhat.com>
-Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+good point.  I thought that not having ->ops was wrong, but I had
+completely forgot about the alias case.  Fixing it.
 
-> ---
->  hw/i386/acpi-build.c | 7 +++++--
->  1 file changed, 5 insertions(+), 2 deletions(-)
-> 
-> diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
-> index afcadac..9653583 100644
-> --- a/hw/i386/acpi-build.c
-> +++ b/hw/i386/acpi-build.c
-> @@ -2404,14 +2404,17 @@ build_srat(GArray *table_data, BIOSLinker *linker, MachineState *machine)
->      }
->  
->      /*
-> -     * Entry is required for Windows to enable memory hotplug in OS.
-> +     * Entry is required for Windows to enable memory hotplug in OS
-> +     * and for Linux to enable SWIOTLB even if booted with less than
-> +     * 4G of RAM. Windows works better if the entry sets proximity
-> +     * to the highest NUMA node in the machine.
->       * Memory devices may override proximity set by this entry,
->       * providing _PXM method if necessary.
->       */
->      if (hotplugabble_address_space_size) {
->          numamem = acpi_data_push(table_data, sizeof *numamem);
->          build_srat_memory(numamem, pcms->hotplug_memory.base,
-> -                          hotplugabble_address_space_size, 0,
-> +                          hotplugabble_address_space_size, pcms->numa_nodes - 1,
->                            MEM_AFFINITY_HOTPLUGGABLE | MEM_AFFINITY_ENABLED);
->      }
->  
+Thanks, Juan.
