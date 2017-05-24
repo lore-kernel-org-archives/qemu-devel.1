@@ -1,48 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35125)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35256)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dongdwdw@linux.vnet.ibm.com>) id 1dDMUY-0004Qr-CD
-	for qemu-devel@nongnu.org; Tue, 23 May 2017 22:57:43 -0400
+	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1dDMV3-0004pl-IX
+	for qemu-devel@nongnu.org; Tue, 23 May 2017 22:58:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dongdwdw@linux.vnet.ibm.com>) id 1dDMUR-0000Oz-Ts
-	for qemu-devel@nongnu.org; Tue, 23 May 2017 22:57:42 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:47287
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dongdwdw@linux.vnet.ibm.com>)
-	id 1dDMUR-0000Od-Nl
-	for qemu-devel@nongnu.org; Tue, 23 May 2017 22:57:35 -0400
-Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v4O2rhV1027786
-	for <qemu-devel@nongnu.org>; Tue, 23 May 2017 22:57:34 -0400
-Received: from e23smtp01.au.ibm.com (e23smtp01.au.ibm.com [202.81.31.143])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2amynvm29h-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 23 May 2017 22:57:34 -0400
-Received: from localhost
-	by e23smtp01.au.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <dongdwdw@linux.vnet.ibm.com>;
-	Wed, 24 May 2017 12:57:31 +1000
-Received: from d23av04.au.ibm.com (d23av04.au.ibm.com [9.190.235.139])
-	by d23relay06.au.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
-	v4O2vMRS66846808
-	for <qemu-devel@nongnu.org>; Wed, 24 May 2017 12:57:30 +1000
-Received: from d23av04.au.ibm.com (localhost [127.0.0.1])
-	by d23av04.au.ibm.com (8.14.4/8.14.4/NCO v10.0 AVout) with ESMTP id
-	v4O2uvKx023585
-	for <qemu-devel@nongnu.org>; Wed, 24 May 2017 12:56:57 +1000
-Received: from oc8580814772.ibm.com ([9.115.112.58])
-	by d23av04.au.ibm.com (8.14.4/8.14.4/NCO v10.0 AVin) with ESMTP id
-	v4O2uugm023320
-	for <qemu-devel@nongnu.org>; Wed, 24 May 2017 12:56:56 +1000
-From: Wang Dong <dongdwdw@linux.vnet.ibm.com>
-Date: Wed, 24 May 2017 10:56:41 +0800
+	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1dDMV0-0000jG-IU
+	for qemu-devel@nongnu.org; Tue, 23 May 2017 22:58:13 -0400
+Received: from [59.151.112.132] (port=44194 helo=heian.cn.fujitsu.com)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1dDMV0-0000hc-4x
+	for qemu-devel@nongnu.org; Tue, 23 May 2017 22:58:10 -0400
+From: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
+Date: Wed, 24 May 2017 10:57:18 +0800
+Message-ID: <20170524025718.2287-1-maozy.fnst@cn.fujitsu.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Message-Id: <f0b11c2d-9f61-c4c2-4b55-58644b760e31@linux.vnet.ibm.com>
-Subject: [Qemu-devel] new to qemu with a simple question
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH] net/rocker: Cleanup the useless return value
+ check
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -52,20 +25,60 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: armbru@redhat.com, jiri@resnulli.us, jasowang@redhat.com
 
+None of pci_dma_read()'s callers check the return value except
+rocker. There is no need to check it because it always return
+0. So the check work is useless. Remove it entirely.
 
-Hi guys,
+Suggested-by: Markus Armbruster <armbru@redhat.com>
+Signed-off-by: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
+---
+ hw/net/rocker/rocker.c      | 9 +++------
+ hw/net/rocker/rocker_desc.c | 4 +---
+ 2 files changed, 4 insertions(+), 9 deletions(-)
 
-I am new to qemu. But I need do some job in it right now.
-
-When I try read qmp code. I found a interesting part against it.
-
-Some C source code is generate from json file.
-
-I wonder why this? What is the benefits of this?
-
-Thanks in advance.
-
-
+diff --git a/hw/net/rocker/rocker.c b/hw/net/rocker/rocker.c
+index 6e70fdd..4f0f6d7 100644
+--- a/hw/net/rocker/rocker.c
++++ b/hw/net/rocker/rocker.c
+@@ -244,11 +244,9 @@ static int tx_consume(Rocker *r, DescInfo *info)
+             goto err_no_mem;
+         }
+ 
+-        if (pci_dma_read(dev, frag_addr, iov[iovcnt].iov_base,
+-                     iov[iovcnt].iov_len)) {
+-            err = -ROCKER_ENXIO;
+-            goto err_bad_io;
+-        }
++        pci_dma_read(dev, frag_addr, iov[iovcnt].iov_base,
++                     iov[iovcnt].iov_len);
++
+         iovcnt++;
+     }
+ 
+@@ -261,7 +259,6 @@ static int tx_consume(Rocker *r, DescInfo *info)
+     err = fp_port_eg(r->fp_port[port], iov, iovcnt);
+ 
+ err_too_many_frags:
+-err_bad_io:
+ err_no_mem:
+ err_bad_attr:
+     for (i = 0; i < ROCKER_TX_FRAGS_MAX; i++) {
+diff --git a/hw/net/rocker/rocker_desc.c b/hw/net/rocker/rocker_desc.c
+index ac02797..6184c40 100644
+--- a/hw/net/rocker/rocker_desc.c
++++ b/hw/net/rocker/rocker_desc.c
+@@ -69,9 +69,7 @@ char *desc_get_buf(DescInfo *info, bool read_only)
+         return NULL;
+     }
+ 
+-    if (pci_dma_read(dev, le64_to_cpu(info->desc.buf_addr), info->buf, size)) {
+-        return NULL;
+-    }
++    pci_dma_read(dev, le64_to_cpu(info->desc.buf_addr), info->buf, size);
+ 
+     return info->buf;
+ }
 -- 
-Best regards. Wang Dong
+2.9.3
