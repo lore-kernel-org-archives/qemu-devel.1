@@ -1,20 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44541)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45569)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1dDS4o-0007a8-OL
-	for qemu-devel@nongnu.org; Wed, 24 May 2017 04:55:31 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1dDS8z-0002oP-SC
+	for qemu-devel@nongnu.org; Wed, 24 May 2017 04:59:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1dDS4n-00071I-LF
-	for qemu-devel@nongnu.org; Wed, 24 May 2017 04:55:30 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:56526)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1dDS4n-00070p-CZ
-	for qemu-devel@nongnu.org; Wed, 24 May 2017 04:55:29 -0400
-From: Juan Quintela <quintela@redhat.com>
-Date: Wed, 24 May 2017 10:55:18 +0200
-Message-Id: <20170524085519.22856-3-quintela@redhat.com>
-In-Reply-To: <20170524085519.22856-1-quintela@redhat.com>
-References: <20170524085519.22856-1-quintela@redhat.com>
-Subject: [Qemu-devel] [PATCH 2/3] migration: loadvm handlers are not used
+	(envelope-from <alex.bennee@linaro.org>) id 1dDS8x-0000Wc-C1
+	for qemu-devel@nongnu.org; Wed, 24 May 2017 04:59:49 -0400
+Received: from mail-wm0-x229.google.com ([2a00:1450:400c:c09::229]:37662)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1dDS8x-0000WA-2q
+	for qemu-devel@nongnu.org; Wed, 24 May 2017 04:59:47 -0400
+Received: by mail-wm0-x229.google.com with SMTP id d127so59489109wmf.0
+	for <qemu-devel@nongnu.org>; Wed, 24 May 2017 01:59:46 -0700 (PDT)
+References: <20170521032956.27446-1-f4bug@amsat.org>
+	<20170521032956.27446-16-f4bug@amsat.org>
+	<87zie52dcs.fsf@linaro.org>
+	<00181409-39e7-0d0d-e936-1ee0824f2cc5@amsat.org>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <00181409-39e7-0d0d-e936-1ee0824f2cc5@amsat.org>
+Date: Wed, 24 May 2017 09:59:51 +0100
+Message-ID: <87lgpm3a0o.fsf@linaro.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v3 15/24] docker: add powerpc build target
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,147 +32,118 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: dgilbert@redhat.com, lvivier@redhat.com, peterx@redhat.com, Juan Quintela <quintela@trasno.org>
+To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Cc: qemu-devel@nongnu.org, Fam Zheng <famz@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Alexander Graf <agraf@suse.de>, qemu-ppc@nongnu.org, Aurelien Jarno <aurel32@debian.org>, Riku Voipio <riku.voipio@iki.fi>, Vagrant Cascadian <vagrant@debian.org>, Michael Tokarev <mjt@tls.msk.ru>
 
-From: Juan Quintela <quintela@trasno.org>
 
-So we remove all traces of them.
+Philippe Mathieu-Daudé <f4bug@amsat.org> writes:
 
-Signed-off-by: Juan Quintela <quintela@redhat.com>
----
- include/migration/migration.h |  5 -----
- include/migration/vmstate.h   |  2 --
- include/qemu/typedefs.h       |  1 -
- migration/migration.c         |  2 --
- migration/savevm.c            | 28 +---------------------------
- 5 files changed, 1 insertion(+), 37 deletions(-)
+> Hi Alex,
+>
+> On 05/22/2017 11:08 AM, Alex Bennée wrote:
+>>
+>> Philippe Mathieu-Daudé <f4bug@amsat.org> writes:
+>>
+>>> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+>>> ---
+>>>  tests/docker/Makefile.include                      |  4 +--
+>>>  .../docker/dockerfiles/debian-powerpc-cross.docker | 40 ++++++++++++++++++++++
+>>>  2 files changed, 42 insertions(+), 2 deletions(-)
+>>>  create mode 100644 tests/docker/dockerfiles/debian-powerpc-cross.docker
+>>>
+>>> diff --git a/tests/docker/Makefile.include b/tests/docker/Makefile.include
+>>> index 111b8090b2..9815976486 100644
+>>> --- a/tests/docker/Makefile.include
+>>> +++ b/tests/docker/Makefile.include
+>>> @@ -56,11 +56,13 @@ docker-image-%: $(DOCKER_FILES_DIR)/%.docker
+>>>  		"BUILD","$*")
+>>>
+>>>  docker-image-debian-mipsel-cross: EXTRA_FILES:=tests/docker/dockerfiles/debian-apt-fake.sh
+>>> +docker-image-debian-powerpc-cross: EXTRA_FILES:=tests/docker/dockerfiles/debian-apt-fake.sh
+>>>
+>>>  # Enforce dependancies for composite images
+>>>  docker-image-debian-armhf-cross: docker-image-debian
+>>>  docker-image-debian-arm64-cross: docker-image-debian
+>>>  docker-image-debian-mipsel-cross: docker-image-debian
+>>> +docker-image-debian-powerpc-cross: docker-image-debian
+>>>
+>>>  # Expand all the pre-requistes for each docker image and test combination
+>>>  $(foreach i,$(DOCKER_IMAGES), \
+>>> @@ -111,8 +113,6 @@ docker:
+>>>  	@echo '    NOUSER               Define to disable adding current user to containers passwd.'
+>>>  	@echo '    NOCACHE=1            Ignore cache when build images.'
+>>>  	@echo '    EXECUTABLE=<path>    Include executable in image.'
+>>> -	@echo '    EXTRA_FILES="<path> [... <path>]"'
+>>> -	@echo '                         Include extra files in image.'
+>>
+>> I'm fairly sure you didn't want to do this.
+>
+> Ups, good catch :) Rebase mistake.
+> Are you Ok with those 2 lines back? (I think since it is pretty much a
+> copy/paste of mipsel Dockerfile).
+> I'll send fixed and your other r-b after Fam review, thanks!
 
-diff --git a/include/migration/migration.h b/include/migration/migration.h
-index 0e807b6..d1a353a 100644
---- a/include/migration/migration.h
-+++ b/include/migration/migration.h
-@@ -50,8 +50,6 @@ enum mig_rp_message_type {
-     MIG_RP_MSG_MAX
- };
- 
--typedef QLIST_HEAD(, LoadStateEntry) LoadStateEntry_Head;
--
- /* State for the incoming migration */
- struct MigrationIncomingState {
-     QEMUFile *from_src_file;
-@@ -89,9 +87,6 @@ struct MigrationIncomingState {
-     /* The coroutine we should enter (back) after failover */
-     Coroutine *migration_incoming_co;
-     QemuSemaphore colo_incoming_sem;
--
--    /* See savevm.c */
--    LoadStateEntry_Head loadvm_handlers;
- };
- 
- MigrationIncomingState *migration_incoming_get_current(void);
-diff --git a/include/migration/vmstate.h b/include/migration/vmstate.h
-index f97411d..6689562 100644
---- a/include/migration/vmstate.h
-+++ b/include/migration/vmstate.h
-@@ -1020,8 +1020,6 @@ extern const VMStateInfo vmstate_info_qtailq;
- 
- #define SELF_ANNOUNCE_ROUNDS 5
- 
--void loadvm_free_handlers(MigrationIncomingState *mis);
--
- int vmstate_load_state(QEMUFile *f, const VMStateDescription *vmsd,
-                        void *opaque, int version_id);
- void vmstate_save_state(QEMUFile *f, const VMStateDescription *vmsd,
-diff --git a/include/qemu/typedefs.h b/include/qemu/typedefs.h
-index 33a6aa1..51958bf 100644
---- a/include/qemu/typedefs.h
-+++ b/include/qemu/typedefs.h
-@@ -39,7 +39,6 @@ typedef struct I2SCodec I2SCodec;
- typedef struct ISABus ISABus;
- typedef struct ISADevice ISADevice;
- typedef struct IsaDma IsaDma;
--typedef struct LoadStateEntry LoadStateEntry;
- typedef struct MACAddr MACAddr;
- typedef struct MachineClass MachineClass;
- typedef struct MachineState MachineState;
-diff --git a/migration/migration.c b/migration/migration.c
-index ad29e53..891a260 100644
---- a/migration/migration.c
-+++ b/migration/migration.c
-@@ -121,7 +121,6 @@ MigrationIncomingState *migration_incoming_get_current(void)
-     if (!once) {
-         mis_current.state = MIGRATION_STATUS_NONE;
-         memset(&mis_current, 0, sizeof(MigrationIncomingState));
--        QLIST_INIT(&mis_current.loadvm_handlers);
-         qemu_mutex_init(&mis_current.rp_mutex);
-         qemu_event_init(&mis_current.main_thread_load_event, false);
-         once = true;
-@@ -134,7 +133,6 @@ void migration_incoming_state_destroy(void)
-     struct MigrationIncomingState *mis = migration_incoming_get_current();
- 
-     qemu_event_destroy(&mis->main_thread_load_event);
--    loadvm_free_handlers(mis);
- }
- 
- 
-diff --git a/migration/savevm.c b/migration/savevm.c
-index 55ac8c1..96b7173 100644
---- a/migration/savevm.c
-+++ b/migration/savevm.c
-@@ -1779,13 +1779,6 @@ static int loadvm_process_command(QEMUFile *f)
-     return 0;
- }
- 
--struct LoadStateEntry {
--    QLIST_ENTRY(LoadStateEntry) entry;
--    SaveStateEntry *se;
--    int section_id;
--    int version_id;
--};
--
- /*
-  * Read a footer off the wire and check that it matches the expected section
-  *
-@@ -1821,22 +1814,11 @@ static bool check_section_footer(QEMUFile *f, SaveStateEntry *se)
-     return true;
- }
- 
--void loadvm_free_handlers(MigrationIncomingState *mis)
--{
--    LoadStateEntry *le, *new_le;
--
--    QLIST_FOREACH_SAFE(le, &mis->loadvm_handlers, entry, new_le) {
--        QLIST_REMOVE(le, entry);
--        g_free(le);
--    }
--}
--
- static int
- qemu_loadvm_section_start_full(QEMUFile *f, MigrationIncomingState *mis)
- {
-     uint32_t instance_id, version_id, section_id;
-     SaveStateEntry *se;
--    LoadStateEntry *le;
-     char idstr[256];
-     int ret;
- 
-@@ -1873,15 +1855,7 @@ qemu_loadvm_section_start_full(QEMUFile *f, MigrationIncomingState *mis)
-         return -EINVAL;
-     }
- 
--    /* Add entry */
--    le = g_malloc0(sizeof(*le));
--
--    le->se = se;
--    le->section_id = section_id;
--    le->version_id = version_id;
--    QLIST_INSERT_HEAD(&mis->loadvm_handlers, le, entry);
--
--    ret = vmstate_load(f, le->se, le->version_id);
-+    ret = vmstate_load(f, se, se->version_id);
-     if (ret < 0) {
-         error_report("error while loading state for instance 0x%x of"
-                      " device '%s'", instance_id, idstr);
--- 
-2.9.3
+Sure its fine with that fixed:
+
+Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
+
+>
+>>
+>>>
+>>>  # This rule if for directly running against an arbitrary docker target.
+>>>  # It is called by the expanded docker targets (e.g. make
+>>> diff --git a/tests/docker/dockerfiles/debian-powerpc-cross.docker b/tests/docker/dockerfiles/debian-powerpc-cross.docker
+>>> new file mode 100644
+>>> index 0000000000..fa2cc7a657
+>>> --- /dev/null
+>>> +++ b/tests/docker/dockerfiles/debian-powerpc-cross.docker
+>>> @@ -0,0 +1,40 @@
+>>> +#
+>>> +# Docker powerpc cross-compiler target
+>>> +#
+>>> +# This docker target builds on the base debian image.
+>>> +#
+>>> +FROM qemu:debian
+>>> +MAINTAINER Philippe Mathieu-Daudé <f4bug@amsat.org>
+>>> +
+>>> +# Add the foreign architecture we want and install dependencies
+>>> +RUN dpkg --add-architecture powerpc
+>>> +RUN apt-get update
+>>> +RUN DEBIAN_FRONTEND=noninteractive eatmydata \
+>>> +    apt-get install -y --no-install-recommends \
+>>> +        crossbuild-essential-powerpc
+>>> +
+>>> +# <kludge> to fix "following packages have unmet dependencies" ...
+>>> +ADD debian-apt-fake.sh /usr/local/bin/apt-fake
+>>> +RUN apt-get install -y --no-install-recommends \
+>>> +        equivs \
+>>> +        pkg-config
+>>> +RUN apt-fake install \
+>>> +        pkg-config:powerpc=0.28-1.1-fake && \
+>>> +    ln -s pkg-config /usr/bin/powerpc-linux-gnu-pkg-config
+>>> +ENV PKG_CONFIG_PATH /usr/lib/powerpc-linux-gnu/pkgconfig
+>>> +# </kludge>
+>>> +
+>>> +# Specify the cross prefix for this image (see tests/docker/common.rc)
+>>> +ENV QEMU_CONFIGURE_OPTS --cross-prefix=powerpc-linux-gnu-
+>>> +
+>>> +RUN DEBIAN_FRONTEND=noninteractive eatmydata \
+>>> +    apt-get build-dep -yy -a powerpc qemu
+>>> +RUN DEBIAN_FRONTEND=noninteractive \
+>>> +    apt-get install -y --no-install-recommends \
+>>> +        glusterfs-common:powerpc \
+>>> +        libbz2-dev:powerpc \
+>>> +        liblzo2-dev:powerpc \
+>>> +        libncursesw5-dev:powerpc \
+>>> +        libnfs-dev:powerpc \
+>>> +        librdmacm-dev:powerpc \
+>>> +        libsnappy-dev:powerpc
+>>
+>>
+>> --
+>> Alex Bennée
+>>
+
+
+--
+Alex Bennée
