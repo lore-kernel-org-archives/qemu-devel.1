@@ -1,25 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36162)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41631)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1dDbCu-0005bU-CM
-	for qemu-devel@nongnu.org; Wed, 24 May 2017 14:40:29 -0400
+	(envelope-from <berto@igalia.com>) id 1dDbax-0005Md-4P
+	for qemu-devel@nongnu.org; Wed, 24 May 2017 15:05:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1dDbCp-0008B6-Fy
-	for qemu-devel@nongnu.org; Wed, 24 May 2017 14:40:28 -0400
-Resent-Message-Id: <E1dDbCp-0008B6-Fy@eggs.gnu.org>
-Received: from sender-of-o52.zoho.com ([135.84.80.217]:21384)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1dDbCp-0008Ae-7I
-	for qemu-devel@nongnu.org; Wed, 24 May 2017 14:40:23 -0400
-In-Reply-To: <1495649128-10529-1-git-send-email-vyasevic@redhat.com>
-Message-ID: <149565121508.1224.14546391458460538769@c05f1edc8ed1>
-Reply-To: <qemu-devel@nongnu.org>
+	(envelope-from <berto@igalia.com>) id 1dDbas-0003BT-5b
+	for qemu-devel@nongnu.org; Wed, 24 May 2017 15:05:19 -0400
+From: Alberto Garcia <berto@igalia.com>
+In-Reply-To: <f4437f01-1eb2-d1c1-3df5-ee992fab2036@virtuozzo.com>
+References: <4086b9ad1d1c912298f7c981f2c94a9f9a7026a3.1495536228.git.berto@igalia.com>
+	<5925B107.1060404@virtuozzo.com>
+	<f4437f01-1eb2-d1c1-3df5-ee992fab2036@virtuozzo.com>
+Date: Wed, 24 May 2017 21:05:08 +0200
+Message-ID: <w51inkqyt23.fsf@maestria.local.igalia.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Wed, 24 May 2017 11:40:15 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH 00/12] self-announce updates
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH 7/7] qcow2: Merge the writing of the COW
+ regions with the guest data
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,76 +24,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: vyasevic@redhat.com
-Cc: famz@redhat.com, qemu-devel@nongnu.org, dgilbert@redhat.com, quintela@redhat.com, germano@redhat.com, lvivier@redhat.com, mst@redhat.com, jasowang@redhat.com, armbru@redhat.com, kashyap@redhat.com, jdenemar@redhat.com
+To: Anton Nefedov <anton.nefedov@virtuozzo.com>, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, qemu-block@nongnu.org, mreitz@redhat.com, stefanha@redhat.com, den@openvz.org
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKU3ViamVjdDogW1FlbXUt
-ZGV2ZWxdIFtQQVRDSCAwMC8xMl0gc2VsZi1hbm5vdW5jZSB1cGRhdGVzCk1lc3NhZ2UtaWQ6IDE0
-OTU2NDkxMjgtMTA1MjktMS1naXQtc2VuZC1lbWFpbC12eWFzZXZpY0ByZWRoYXQuY29tClR5cGU6
-IHNlcmllcwoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaAoKQkFTRT1iYXNl
-Cm49MQp0b3RhbD0kKGdpdCBsb2cgLS1vbmVsaW5lICRCQVNFLi4gfCB3YyAtbCkKZmFpbGVkPTAK
-CmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxvY2Fs
-IGRpZmYucmVuYW1lcyBUcnVlCgpjb21taXRzPSIkKGdpdCBsb2cgLS1mb3JtYXQ9JUggLS1yZXZl
-cnNlICRCQVNFLi4pIgpmb3IgYyBpbiAkY29tbWl0czsgZG8KICAgIGVjaG8gIkNoZWNraW5nIFBB
-VENIICRuLyR0b3RhbDogJChnaXQgbG9nIC1uIDEgLS1mb3JtYXQ9JXMgJGMpLi4uIgogICAgaWYg
-ISBnaXQgc2hvdyAkYyAtLWZvcm1hdD1lbWFpbCB8IC4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0t
-bWFpbGJhY2sgLTsgdGhlbgogICAgICAgIGZhaWxlZD0xCiAgICAgICAgZWNobwogICAgZmkKICAg
-IG49JCgobisxKSkKZG9uZQoKZXhpdCAkZmFpbGVkCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpV
-cGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0ClN3aXRjaGVk
-IHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKM2Y0MjQzMCB0ZXN0czogQWRkIGEgdGVzdCBmb3IgcWVt
-dSBzZWxmIGFubm91bmNtZW50cwpkYmZjNTBhIHRlc3RzL3Rlc3QtaG1wOiBBZGQgYW5ub3VuY2Ug
-cGFyYW1ldGVyIHRlc3RzCjkxM2QzYWIgaG1wOiBBZGQgaG1wX2Fubm91bmNlX3NlbGYKYTY2OGQ0
-MyBobXA6IGFkZCBhbm5vdW5jZSBwYXJhdGVycyBpbmZvL3NldAo5ZThmMzViIGFubm91bmNlX3Rp
-bWVyOiBBZGQgYWJpbGl0eSB0byByZXNldCBhbiBleGlzdGluZwowYzIzODIwIG1pZ3JhdGlvbjog
-QWxsb3cgZm9yIGEgbGltaXRlZCBudW1iZXIgb2YgYW5ub3VuY2UgdGltZXJzCjFjNTk3MjIgcW1w
-OiBFeHBvc2UgcWVtdV9hbm5vdW5jZV9zZWxmIGFzIGEgcW1wIGNvbW1hbmQKNjY2MmU4OCB2aXJ0
-aW8tbmV0OiBBbGxvdyBxZW11X2Fubm91bmNlX3NlbGYgdG8gdHJpZ2dlciB2aXJ0aW8gYW5ub3Vu
-Y2VtZW50cwoyMjBjZGUzIG5ldDogQWRkIGEgbmV0d29yayBkZXZpY2Ugc3BlY2lmaWMgc2VsZi1h
-bm5vdW5jZW1lbnQgYWJpbGl0eQoxMGI4NjZlIG1pZ3JhdGlvbjogU3dpdGNoIHRvIHVzaW5nIGFu
-bm91bmNlbWVudCB0aW1lcgpiN2U3OGU5IG1pZ3JhdGlvbjogSW50cm9kdWNlIGFubm91bmNlbWVu
-dCB0aW1lcgpkZjllOGIzIG1pZ3JhdGlvbjogSW50cm9kdWNlIGFubm91bmNlIHBhcmFtZXRlcnMK
-Cj09PSBPVVRQVVQgQkVHSU4gPT09CkNoZWNraW5nIFBBVENIIDEvMTI6IG1pZ3JhdGlvbjogSW50
-cm9kdWNlIGFubm91bmNlIHBhcmFtZXRlcnMuLi4KRVJST1I6IGJyYWNlcyB7fSBhcmUgbmVjZXNz
-YXJ5IGZvciBhbGwgYXJtcyBvZiB0aGlzIHN0YXRlbWVudAojMTMzOiBGSUxFOiBtaWdyYXRpb24v
-c2F2ZXZtLmM6MTc0OgorICAgIGlmICghcWVtdV92YWxpZGF0ZV9hbm5vdW5jZV9wYXJhbWV0ZXJz
-KHBhcmFtcywgZXJycCkpClsuLi5dCgpFUlJPUjogdHJhaWxpbmcgd2hpdGVzcGFjZQojMTc1OiBG
-SUxFOiBxYXBpLXNjaGVtYS5qc29uOjU5NzoKKyMgICAgICAgICAgICQKCnRvdGFsOiAyIGVycm9y
-cywgMCB3YXJuaW5ncywgMjA3IGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHBy
-b2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2Ug
-cG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBp
-biBNQUlOVEFJTkVSUy4KCkNoZWNraW5nIFBBVENIIDIvMTI6IG1pZ3JhdGlvbjogSW50cm9kdWNl
-IGFubm91bmNlbWVudCB0aW1lci4uLgpDaGVja2luZyBQQVRDSCAzLzEyOiBtaWdyYXRpb246IFN3
-aXRjaCB0byB1c2luZyBhbm5vdW5jZW1lbnQgdGltZXIuLi4KQ2hlY2tpbmcgUEFUQ0ggNC8xMjog
-bmV0OiBBZGQgYSBuZXR3b3JrIGRldmljZSBzcGVjaWZpYyBzZWxmLWFubm91bmNlbWVudCBhYmls
-aXR5Li4uCkNoZWNraW5nIFBBVENIIDUvMTI6IHZpcnRpby1uZXQ6IEFsbG93IHFlbXVfYW5ub3Vu
-Y2Vfc2VsZiB0byB0cmlnZ2VyIHZpcnRpbyBhbm5vdW5jZW1lbnRzLi4uCkVSUk9SOiBicmFjZXMg
-e30gYXJlIG5lY2Vzc2FyeSBmb3IgYWxsIGFybXMgb2YgdGhpcyBzdGF0ZW1lbnQKIzQ5OiBGSUxF
-OiBody9uZXQvdmlydGlvLW5ldC5jOjEzOToKKyAgICBpZiAobi0+YW5ub3VuY2VfdGltZXItPnJv
-dW5kKQpbLi4uXQoKdG90YWw6IDEgZXJyb3JzLCAwIHdhcm5pbmdzLCA1NSBsaW5lcyBjaGVja2Vk
-CgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBv
-ZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFp
-bnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgpDaGVja2luZyBQQVRDSCA2
-LzEyOiBxbXA6IEV4cG9zZSBxZW11X2Fubm91bmNlX3NlbGYgYXMgYSBxbXAgY29tbWFuZC4uLgpF
-UlJPUjogYnJhY2VzIHt9IGFyZSBuZWNlc3NhcnkgZm9yIGFsbCBhcm1zIG9mIHRoaXMgc3RhdGVt
-ZW50CiMyOTogRklMRTogbWlncmF0aW9uL3NhdmV2bS5jOjI3NzoKKyAgICBpZiAoaGFzX3BhcmFt
-cykKWy4uLl0KCnRvdGFsOiAxIGVycm9ycywgMCB3YXJuaW5ncywgNDUgbGluZXMgY2hlY2tlZAoK
-WW91ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2Yg
-dGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50
-YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKQ2hlY2tpbmcgUEFUQ0ggNy8x
-MjogbWlncmF0aW9uOiBBbGxvdyBmb3IgYSBsaW1pdGVkIG51bWJlciBvZiBhbm5vdW5jZSB0aW1l
-cnMuLi4KQ2hlY2tpbmcgUEFUQ0ggOC8xMjogYW5ub3VuY2VfdGltZXI6IEFkZCBhYmlsaXR5IHRv
-IHJlc2V0IGFuIGV4aXN0aW5nLi4uCkVSUk9SOiBzcGFjZSBwcm9oaWJpdGVkIGJlZm9yZSB0aGF0
-IGNsb3NlIHBhcmVudGhlc2lzICcpJwojNTA6IEZJTEU6IG1pZ3JhdGlvbi9zYXZldm0uYzoyMzk6
-CisgICAgaWYgKC0tdGltZXItPnJvdW5kICkgewoKdG90YWw6IDEgZXJyb3JzLCAwIHdhcm5pbmdz
-LCA4MSBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNl
-IHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBv
-cnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMu
-CgpDaGVja2luZyBQQVRDSCA5LzEyOiBobXA6IGFkZCBhbm5vdW5jZSBwYXJhdGVycyBpbmZvL3Nl
-dC4uLgpDaGVja2luZyBQQVRDSCAxMC8xMjogaG1wOiBBZGQgaG1wX2Fubm91bmNlX3NlbGYuLi4K
-Q2hlY2tpbmcgUEFUQ0ggMTEvMTI6IHRlc3RzL3Rlc3QtaG1wOiBBZGQgYW5ub3VuY2UgcGFyYW1l
-dGVyIHRlc3RzLi4uCkNoZWNraW5nIFBBVENIIDEyLzEyOiB0ZXN0czogQWRkIGEgdGVzdCBmb3Ig
-cWVtdSBzZWxmIGFubm91bmNtZW50cy4uLgo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFu
-ZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoKLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5
-IGJ5IFBhdGNoZXcgW2h0dHA6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRi
-YWNrIHRvIHBhdGNoZXctZGV2ZWxAZnJlZWxpc3RzLm9yZw==
+On Wed 24 May 2017 06:43:31 PM CEST, Anton Nefedov wrote:
+>> +    if (m->data_qiov) {
+>> +        qemu_iovec_reset(&qiov);
+>> +        qemu_iovec_add(&qiov, start_buffer, start->nb_bytes);
+>> +        qemu_iovec_concat(&qiov, m->data_qiov, 0, data_bytes);
+>> +        qemu_iovec_add(&qiov, end_buffer, end->nb_bytes);
+>
+> Can it be a problem if (m->data_qiov->niov == IOV_MAX)?
+> We had to add merge-iovecs code for the case (maybe there's better
+> solution?)
+
+You're right, good catch! I'll add a check for that. To be honest I
+don't think that's likely to happen in practice, so if it does we can
+simply fall back to the old behavior (separate writes).
+
+> Also, will this work if allocation is split into several l2metas?
+> e.g. one has cow_start.nb_bytes and another has cow_end.nb_bytes
+
+The guest request will be merged with the first l2meta that has to copy
+at least one of the two regions. It doesn't matter if the other one has
+nb_bytes == 0.
+
+Berto
