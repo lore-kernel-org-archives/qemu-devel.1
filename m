@@ -1,28 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37412)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41498)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mapfelba@redhat.com>) id 1dDV0L-0007Kj-0I
-	for qemu-devel@nongnu.org; Wed, 24 May 2017 08:03:06 -0400
+	(envelope-from <lvivier@redhat.com>) id 1dDV84-0002g3-QC
+	for qemu-devel@nongnu.org; Wed, 24 May 2017 08:11:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mapfelba@redhat.com>) id 1dDV0H-0007Ye-53
-	for qemu-devel@nongnu.org; Wed, 24 May 2017 08:03:05 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:39482)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mapfelba@redhat.com>) id 1dDV0G-0007Ws-RR
-	for qemu-devel@nongnu.org; Wed, 24 May 2017 08:03:01 -0400
-Date: Wed, 24 May 2017 08:01:47 -0400 (EDT)
-From: Marcel Apfelbaum <marcel@redhat.com>
-Message-ID: <231699708.13319856.1495627307861.JavaMail.zimbra@redhat.com>
-In-Reply-To: <87r2zeu8af.fsf@dusky.pond.sub.org>
-References: <cover.1495508197.git.maozy.fnst@cn.fujitsu.com>
-	<29c33313efd2ee4f7bf3abb71a4809582891f408.1495508197.git.maozy.fnst@cn.fujitsu.com>
-	<87wp97hqi4.fsf@dusky.pond.sub.org>
-	<4011bf08-8686-f2ae-474e-004aa603cc0e@amsat.org>
-	<87r2zeu8af.fsf@dusky.pond.sub.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v5 1/4] net/rocker: Remove the dead error
- handling
+	(envelope-from <lvivier@redhat.com>) id 1dDV7z-00084r-L3
+	for qemu-devel@nongnu.org; Wed, 24 May 2017 08:11:04 -0400
+From: Laurent Vivier <lvivier@redhat.com>
+Date: Wed, 24 May 2017 14:10:48 +0200
+Message-Id: <20170524121048.10067-1-lvivier@redhat.com>
+Subject: [Qemu-devel] [PATCH] migration: remove register_savevm()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,74 +17,181 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, David Gibson <dgibson@redhat.com>
-Cc: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, Mao Zhongyi <maozy.fnst@cn.fujitsu.com>, jiri@resnulli.us, jasowang@redhat.com, "Michael S. Tsirkin" <mst@redhat.com>
+To: Juan Quintela <quintela@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+Cc: rnsastry@linux.vnet.ibm.com, Bharata B Rao <bharata@linux.vnet.ibm.com>, qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>, Jason Wang <jasowang@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Dmitry Fleytman <dmitry@daynix.com>, Cornelia Huck <cornelia.huck@de.ibm.com>, qemu-ppc@nongnu.org, Samuel Thibault <samuel.thibault@ens-lyon.org>, sam.bobroff@au1.ibm.com, Peter Xu <peterx@redhat.com>, Laurent Vivier <lvivier@redhat.com>
 
+We can replace the four remaining calls of register_savevm() by
+calls to register_savevm_live(). So we can remove the function and
+as we don't allocate anymore the ops pointer with g_new0()
+we don't have to free it then.
 
+Signed-off-by: Laurent Vivier <lvivier@redhat.com>
+---
+ hw/net/vmxnet3.c            |  8 ++++++--
+ hw/s390x/s390-skeys.c       |  9 +++++++--
+ hw/s390x/s390-virtio-ccw.c  |  8 ++++++--
+ include/migration/vmstate.h |  8 --------
+ migration/savevm.c          | 16 ----------------
+ slirp/slirp.c               |  8 ++++++--
+ 6 files changed, 25 insertions(+), 32 deletions(-)
 
------ Original Message -----
-> From: "Markus Armbruster" <armbru@redhat.com>
-> To: "Philippe Mathieu-Daud=C3=A9" <f4bug@amsat.org>
-> Cc: qemu-devel@nongnu.org, "Mao Zhongyi" <maozy.fnst@cn.fujitsu.com>, jir=
-i@resnulli.us, jasowang@redhat.com, "Michael
-> S. Tsirkin" <mst@redhat.com>, "Marcel Apfelbaum" <marcel@redhat.com>
-> Sent: Wednesday, May 24, 2017 8:35:04 AM
-> Subject: Re: [Qemu-devel] [PATCH v5 1/4] net/rocker: Remove the dead erro=
-r handling
->=20
-> Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> writes:
->=20
-> > Hi Markus,
-> >
-> > On 05/23/2017 06:27 AM, Markus Armbruster wrote:
-> > [...]
-> >> There's one more cleanup opportunity:
-> >>
-> > [...]
-> >>>      if (pci_dma_read(dev, le64_to_cpu(info->desc.buf_addr), info->bu=
-f,
-> >>>      size)) {
-> >>>          return NULL;
-> >>>      }
-> >>
-> >> None of the pci_dma_read() calls outside rocker check the return value=
-.
-> >> Just as well, because it always returns 0.  Please clean this up in a
-> >> separate followup patch.
-> >
-> > It may be the correct way to do it but this sounds like we are missing
-> > something somewhere... pci_dma_read() calls pci_dma_rw() which always
-> > returns 0. Why not let it returns void? It is inlined and never used
-> > by address. Else we should document why returning 0 is correct, and
-> > what is the reason to not use a void prototype.
-> >
-> > pci_dma_rw() calls dma_memory_rw() which does return a boolean value,
-> > false on success (MEMTX_OK) and true on error
-> > (MEMTX_ERROR/DECODE_ERROR)
->=20
-> PCI question.  Michael, Marcel?
->=20
-
-Hi Markus,
-
-Looking at the git history, pci_dma_rw used to call cpu_physical_memory_rw
-which, at that time (commit ec17457), returned void. Since the interface di=
-ctated
-to return int, 0 is returned as "always OK".
-
-The callers to pci_dma_read did not bother to check it for obvious reasons =
-(even if they should).
-
-In the meantime the memory API has changed to allow returning errors, but s=
-ince the callers of
-pci_dma_rw don't check the return value, why bother to update the PCI DMA?
-
-History aside (and my speculations above), it seems  the right move is to u=
-pdate
-the return value and check it by callers, but honestly I don't have any ide=
-a
-if the emulated devices expect pci dma to fail.
-Adding Paolo and David for more insights.
-
-Thanks,
-Marcel
+diff --git a/hw/net/vmxnet3.c b/hw/net/vmxnet3.c
+index 8b1fab2..4df3110 100644
+--- a/hw/net/vmxnet3.c
++++ b/hw/net/vmxnet3.c
+@@ -2262,6 +2262,11 @@ static const MemoryRegionOps b1_ops = {
+     },
+ };
+ 
++static SaveVMHandlers savevm_vmxnet3_msix = {
++    .save_state = vmxnet3_msix_save,
++    .load_state = vmxnet3_msix_load,
++};
++
+ static uint64_t vmxnet3_device_serial_num(VMXNET3State *s)
+ {
+     uint64_t dsn_payload;
+@@ -2331,8 +2336,7 @@ static void vmxnet3_pci_realize(PCIDevice *pci_dev, Error **errp)
+                               vmxnet3_device_serial_num(s));
+     }
+ 
+-    register_savevm(dev, "vmxnet3-msix", -1, 1,
+-                    vmxnet3_msix_save, vmxnet3_msix_load, s);
++    register_savevm_live(dev, "vmxnet3-msix", -1, 1, &savevm_vmxnet3_msix, s);
+ }
+ 
+ static void vmxnet3_instance_init(Object *obj)
+diff --git a/hw/s390x/s390-skeys.c b/hw/s390x/s390-skeys.c
+index e2d4e1a..a3dc088 100644
+--- a/hw/s390x/s390-skeys.c
++++ b/hw/s390x/s390-skeys.c
+@@ -363,6 +363,11 @@ static inline bool s390_skeys_get_migration_enabled(Object *obj, Error **errp)
+     return ss->migration_enabled;
+ }
+ 
++static SaveVMHandlers savevm_s390_storage_keys = {
++    .save_state = s390_storage_keys_save,
++    .load_state = s390_storage_keys_load,
++};
++
+ static inline void s390_skeys_set_migration_enabled(Object *obj, bool value,
+                                             Error **errp)
+ {
+@@ -376,8 +381,8 @@ static inline void s390_skeys_set_migration_enabled(Object *obj, bool value,
+     ss->migration_enabled = value;
+ 
+     if (ss->migration_enabled) {
+-        register_savevm(NULL, TYPE_S390_SKEYS, 0, 1, s390_storage_keys_save,
+-                        s390_storage_keys_load, ss);
++        register_savevm_live(NULL, TYPE_S390_SKEYS, 0, 1,
++                             &savevm_s390_storage_keys, ss);
+     } else {
+         unregister_savevm(DEVICE(ss), TYPE_S390_SKEYS, ss);
+     }
+diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
+index fdd4384..697a2d6 100644
+--- a/hw/s390x/s390-virtio-ccw.c
++++ b/hw/s390x/s390-virtio-ccw.c
+@@ -104,6 +104,11 @@ void s390_memory_init(ram_addr_t mem_size)
+     s390_skeys_init();
+ }
+ 
++static SaveVMHandlers savevm_gtod = {
++    .save_state = gtod_save,
++    .load_state = gtod_load,
++};
++
+ static void ccw_init(MachineState *machine)
+ {
+     int ret;
+@@ -146,8 +151,7 @@ static void ccw_init(MachineState *machine)
+     s390_create_virtio_net(BUS(css_bus), "virtio-net-ccw");
+ 
+     /* Register savevm handler for guest TOD clock */
+-    register_savevm(NULL, "todclock", 0, 1,
+-                    gtod_save, gtod_load, kvm_state);
++    register_savevm_live(NULL, "todclock", 0, 1, &savevm_gtod, kvm_state);
+ }
+ 
+ static void s390_cpu_plug(HotplugHandler *hotplug_dev,
+diff --git a/include/migration/vmstate.h b/include/migration/vmstate.h
+index f97411d..21aa6ca 100644
+--- a/include/migration/vmstate.h
++++ b/include/migration/vmstate.h
+@@ -59,14 +59,6 @@ typedef struct SaveVMHandlers {
+     LoadStateHandler *load_state;
+ } SaveVMHandlers;
+ 
+-int register_savevm(DeviceState *dev,
+-                    const char *idstr,
+-                    int instance_id,
+-                    int version_id,
+-                    SaveStateHandler *save_state,
+-                    LoadStateHandler *load_state,
+-                    void *opaque);
+-
+ int register_savevm_live(DeviceState *dev,
+                          const char *idstr,
+                          int instance_id,
+diff --git a/migration/savevm.c b/migration/savevm.c
+index d971e5e..32badfc 100644
+--- a/migration/savevm.c
++++ b/migration/savevm.c
+@@ -617,21 +617,6 @@ int register_savevm_live(DeviceState *dev,
+     return 0;
+ }
+ 
+-int register_savevm(DeviceState *dev,
+-                    const char *idstr,
+-                    int instance_id,
+-                    int version_id,
+-                    SaveStateHandler *save_state,
+-                    LoadStateHandler *load_state,
+-                    void *opaque)
+-{
+-    SaveVMHandlers *ops = g_new0(SaveVMHandlers, 1);
+-    ops->save_state = save_state;
+-    ops->load_state = load_state;
+-    return register_savevm_live(dev, idstr, instance_id, version_id,
+-                                ops, opaque);
+-}
+-
+ void unregister_savevm(DeviceState *dev, const char *idstr, void *opaque)
+ {
+     SaveStateEntry *se, *new_se;
+@@ -651,7 +636,6 @@ void unregister_savevm(DeviceState *dev, const char *idstr, void *opaque)
+         if (strcmp(se->idstr, id) == 0 && se->opaque == opaque) {
+             QTAILQ_REMOVE(&savevm_state.handlers, se, entry);
+             g_free(se->compat);
+-            g_free(se->ops);
+             g_free(se);
+         }
+     }
+diff --git a/slirp/slirp.c b/slirp/slirp.c
+index 2f2ec2c..11d169b 100644
+--- a/slirp/slirp.c
++++ b/slirp/slirp.c
+@@ -272,6 +272,11 @@ static void slirp_init_once(void)
+ static void slirp_state_save(QEMUFile *f, void *opaque);
+ static int slirp_state_load(QEMUFile *f, void *opaque, int version_id);
+ 
++static SaveVMHandlers savevm_slirp_state = {
++    .save_state = slirp_state_save,
++    .load_state = slirp_state_load,
++};
++
+ Slirp *slirp_init(int restricted, bool in_enabled, struct in_addr vnetwork,
+                   struct in_addr vnetmask, struct in_addr vhost,
+                   bool in6_enabled,
+@@ -321,8 +326,7 @@ Slirp *slirp_init(int restricted, bool in_enabled, struct in_addr vnetwork,
+ 
+     slirp->opaque = opaque;
+ 
+-    register_savevm(NULL, "slirp", 0, 4,
+-                    slirp_state_save, slirp_state_load, slirp);
++    register_savevm_live(NULL, "slirp", 0, 4, &savevm_slirp_state, slirp);
+ 
+     QTAILQ_INSERT_TAIL(&slirp_instances, slirp, entry);
+ 
+-- 
+2.9.4
