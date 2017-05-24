@@ -1,32 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50251)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50268)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dDODu-0006j1-Si
-	for qemu-devel@nongnu.org; Wed, 24 May 2017 00:48:39 -0400
+	id 1dDOE5-0006oL-81
+	for qemu-devel@nongnu.org; Wed, 24 May 2017 00:48:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dDODr-00053f-Qb
-	for qemu-devel@nongnu.org; Wed, 24 May 2017 00:48:38 -0400
-Received: from mail-oi0-x243.google.com ([2607:f8b0:4003:c06::243]:32858)
+	id 1dDOE2-000560-3z
+	for qemu-devel@nongnu.org; Wed, 24 May 2017 00:48:49 -0400
+Received: from mail-oi0-x242.google.com ([2607:f8b0:4003:c06::242]:36745)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dDODr-00053O-LA
-	for qemu-devel@nongnu.org; Wed, 24 May 2017 00:48:35 -0400
-Received: by mail-oi0-x243.google.com with SMTP id h4so31003566oib.0
-	for <qemu-devel@nongnu.org>; Tue, 23 May 2017 21:48:35 -0700 (PDT)
+	id 1dDOE1-00055t-U9
+	for qemu-devel@nongnu.org; Wed, 24 May 2017 00:48:46 -0400
+Received: by mail-oi0-x242.google.com with SMTP id w138so30972000oiw.3
+	for <qemu-devel@nongnu.org>; Tue, 23 May 2017 21:48:45 -0700 (PDT)
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 References: <cover.1495508197.git.maozy.fnst@cn.fujitsu.com>
-	<ec029a5251aeafccf051f27cdbf953b1ec563d4b.1495508197.git.maozy.fnst@cn.fujitsu.com>
+	<9c83a8920af8a2e4ab4077dc5ae1b74622bba871.1495508197.git.maozy.fnst@cn.fujitsu.com>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <ffc75b65-932c-86e1-38ea-def2e2295697@amsat.org>
-Date: Wed, 24 May 2017 01:48:32 -0300
+Message-ID: <fa9a3e1f-4cd3-25bf-f996-8edfb7c532ef@amsat.org>
+Date: Wed, 24 May 2017 01:48:43 -0300
 MIME-Version: 1.0
-In-Reply-To: <ec029a5251aeafccf051f27cdbf953b1ec563d4b.1495508197.git.maozy.fnst@cn.fujitsu.com>
+In-Reply-To: <9c83a8920af8a2e4ab4077dc5ae1b74622bba871.1495508197.git.maozy.fnst@cn.fujitsu.com>
 Content-Type: text/plain; charset=windows-1252; format=flowed
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v5 4/4] net/rocker: Fix the unusual macro
- name
+Subject: Re: [Qemu-devel] [PATCH v5 3/4] net/rocker: Convert to realize()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,85 +38,138 @@ To: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>, qemu-devel@nongnu.org
 Cc: armbru@redhat.com, jasowang@redhat.com, jiri@resnulli.us
 
 On 05/23/2017 01:04 AM, Mao Zhongyi wrote:
-> Suggested-by: Markus Armbruster <armbru@redhat.com>
+> The rocker device still implements the old PCIDeviceClass .init()
+> instead of the new .realize(). All devices need to be converted to
+> .realize().
+>
+> .init() reports errors with fprintf() and return 0 on success, negative
+> number on failure. Meanwhile, when -device rocker fails, it first report
+> a specific error, then a generic one, like this:
+>
+>     $ x86_64-softmmu/qemu-system-x86_64 -device rocker,name=qemu-rocker
+>     rocker: name too long; please shorten to at most 9 chars
+>     qemu-system-x86_64: -device rocker,name=qemu-rocker: Device initialization failed
+>
+> Now, convert it to .realize() that passes errors to its callers via its
+> errp argument. Also avoid the superfluous second error message. After
+> the patch, effect like this:
+>
+>     $ x86_64-softmmu/qemu-system-x86_64 -device rocker,name=qemu-rocker
+>     qemu-system-x86_64: -device rocker,name=qemu-rocker: name too long; please shorten to at most 9 chars
+>
 > Signed-off-by: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
+> Reviewed-by: Markus Armbruster <armbru@redhat.com>
 
 Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
 > ---
->  hw/net/rocker/rocker.c | 18 +++++++++---------
->  1 file changed, 9 insertions(+), 9 deletions(-)
+>  hw/net/rocker/rocker.c | 27 +++++++++++----------------
+>  1 file changed, 11 insertions(+), 16 deletions(-)
 >
 > diff --git a/hw/net/rocker/rocker.c b/hw/net/rocker/rocker.c
-> index 2764529..f8a32f7 100644
+> index 6d44f37..2764529 100644
 > --- a/hw/net/rocker/rocker.c
 > +++ b/hw/net/rocker/rocker.c
-> @@ -69,10 +69,10 @@ struct rocker {
->      QLIST_ENTRY(rocker) next;
->  };
+> @@ -1238,20 +1238,18 @@ rollback:
+>      return err;
+>  }
 >
-> -#define ROCKER "rocker"
-> +#define TYPE_ROCKER "rocker"
->
-> -#define to_rocker(obj) \
-> -    OBJECT_CHECK(Rocker, (obj), ROCKER)
-> +#define ROCKER(obj) \
-> +    OBJECT_CHECK(Rocker, (obj), TYPE_ROCKER)
->
->  static QLIST_HEAD(, rocker) rockers;
->
-> @@ -1287,7 +1287,7 @@ static World *rocker_world_type_by_name(Rocker *r, const char *name)
->
->  static void pci_rocker_realize(PCIDevice *dev, Error **errp)
+> -static int rocker_msix_init(Rocker *r)
+> +static int rocker_msix_init(Rocker *r, Error **errp)
 >  {
-> -    Rocker *r = to_rocker(dev);
-> +    Rocker *r = ROCKER(dev);
->      const MACAddr zero = { .a = { 0, 0, 0, 0, 0, 0 } };
->      const MACAddr dflt = { .a = { 0x52, 0x54, 0x00, 0x12, 0x35, 0x01 } };
->      static int sw_index;
-> @@ -1333,7 +1333,7 @@ static void pci_rocker_realize(PCIDevice *dev, Error **errp)
->      /* validate switch properties */
+>      PCIDevice *dev = PCI_DEVICE(r);
+>      int err;
+> -    Error *local_err = NULL;
 >
->      if (!r->name) {
-> -        r->name = g_strdup(ROCKER);
-> +        r->name = g_strdup(TYPE_ROCKER);
+>      err = msix_init(dev, ROCKER_MSIX_VEC_COUNT(r->fp_ports),
+>                      &r->msix_bar,
+>                      ROCKER_PCI_MSIX_BAR_IDX, ROCKER_PCI_MSIX_TABLE_OFFSET,
+>                      &r->msix_bar,
+>                      ROCKER_PCI_MSIX_BAR_IDX, ROCKER_PCI_MSIX_PBA_OFFSET,
+> -                    0, &local_err);
+> +                    0, errp);
+>      if (err) {
+> -        error_report_err(local_err);
+>          return err;
+>      }
+>
+> @@ -1287,7 +1285,7 @@ static World *rocker_world_type_by_name(Rocker *r, const char *name)
+>      return NULL;
+>  }
+>
+> -static int pci_rocker_init(PCIDevice *dev)
+> +static void pci_rocker_realize(PCIDevice *dev, Error **errp)
+>  {
+>      Rocker *r = to_rocker(dev);
+>      const MACAddr zero = { .a = { 0, 0, 0, 0, 0, 0 } };
+> @@ -1305,10 +1303,9 @@ static int pci_rocker_init(PCIDevice *dev)
+>
+>      r->world_dflt = rocker_world_type_by_name(r, r->world_name);
+>      if (!r->world_dflt) {
+> -        fprintf(stderr,
+> -                "rocker: requested world \"%s\" does not exist\n",
+> +        error_setg(errp,
+> +                "invalid argument requested world %s does not exist",
+>                  r->world_name);
+> -        err = -EINVAL;
+>          goto err_world_type_by_name;
+>      }
+>
+> @@ -1328,7 +1325,7 @@ static int pci_rocker_init(PCIDevice *dev)
+>
+>      /* MSI-X init */
+>
+> -    err = rocker_msix_init(r);
+> +    err = rocker_msix_init(r, errp);
+>      if (err) {
+>          goto err_msix_init;
+>      }
+> @@ -1340,7 +1337,7 @@ static int pci_rocker_init(PCIDevice *dev)
 >      }
 >
 >      if (rocker_find(r->name)) {
-> @@ -1429,7 +1429,7 @@ err_world_type_by_name:
+> -        err = -EEXIST;
+> +        error_setg(errp, "%s already exists", r->name);
+>          goto err_duplicate;
+>      }
 >
->  static void pci_rocker_uninit(PCIDevice *dev)
->  {
-> -    Rocker *r = to_rocker(dev);
-> +    Rocker *r = ROCKER(dev);
->      int i;
+> @@ -1354,10 +1351,9 @@ static int pci_rocker_init(PCIDevice *dev)
+>  #define ROCKER_IFNAMSIZ 16
+>  #define MAX_ROCKER_NAME_LEN  (ROCKER_IFNAMSIZ - 1 - 3 - 3)
+>      if (strlen(r->name) > MAX_ROCKER_NAME_LEN) {
+> -        fprintf(stderr,
+> -                "rocker: name too long; please shorten to at most %d chars\n",
+> +        error_setg(errp,
+> +                "name too long; please shorten to at most %d chars",
+>                  MAX_ROCKER_NAME_LEN);
+> -        err = -EINVAL;
+>          goto err_name_too_long;
+>      }
 >
->      QLIST_REMOVE(r, next);
-> @@ -1462,7 +1462,7 @@ static void pci_rocker_uninit(PCIDevice *dev)
+> @@ -1415,7 +1411,7 @@ static int pci_rocker_init(PCIDevice *dev)
 >
->  static void rocker_reset(DeviceState *dev)
->  {
-> -    Rocker *r = to_rocker(dev);
-> +    Rocker *r = ROCKER(dev);
->      int i;
+>      QLIST_INSERT_HEAD(&rockers, r, next);
 >
->      for (i = 0; i < ROCKER_WORLD_TYPE_MAX; i++) {
-> @@ -1500,7 +1500,7 @@ static Property rocker_properties[] = {
->  };
+> -    return 0;
+> +    return;
 >
->  static const VMStateDescription rocker_vmsd = {
-> -    .name = ROCKER,
-> +    .name = TYPE_ROCKER,
->      .unmigratable = 1,
->  };
->
-> @@ -1523,7 +1523,7 @@ static void rocker_class_init(ObjectClass *klass, void *data)
+>  err_name_too_long:
+>  err_duplicate:
+> @@ -1429,7 +1425,6 @@ err_world_type_by_name:
+>              world_free(r->worlds[i]);
+>          }
+>      }
+> -    return err;
 >  }
 >
->  static const TypeInfo rocker_info = {
-> -    .name          = ROCKER,
-> +    .name          = TYPE_ROCKER,
->      .parent        = TYPE_PCI_DEVICE,
->      .instance_size = sizeof(Rocker),
->      .class_init    = rocker_class_init,
+>  static void pci_rocker_uninit(PCIDevice *dev)
+> @@ -1514,7 +1509,7 @@ static void rocker_class_init(ObjectClass *klass, void *data)
+>      DeviceClass *dc = DEVICE_CLASS(klass);
+>      PCIDeviceClass *k = PCI_DEVICE_CLASS(klass);
+>
+> -    k->init = pci_rocker_init;
+> +    k->realize = pci_rocker_realize;
+>      k->exit = pci_rocker_uninit;
+>      k->vendor_id = PCI_VENDOR_ID_REDHAT;
+>      k->device_id = PCI_DEVICE_ID_REDHAT_ROCKER;
 >
