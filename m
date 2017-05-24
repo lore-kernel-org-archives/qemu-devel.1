@@ -1,20 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39685)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35263)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dplotnikov@virtuozzo.com>) id 1dDWwn-0008W1-NP
-	for qemu-devel@nongnu.org; Wed, 24 May 2017 10:07:34 -0400
+	(envelope-from <qemu.bugs@whitewinterwolf.com>) id 1dDY26-00044w-So
+	for qemu-devel@nongnu.org; Wed, 24 May 2017 11:17:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dplotnikov@virtuozzo.com>) id 1dDWwk-000574-IO
-	for qemu-devel@nongnu.org; Wed, 24 May 2017 10:07:33 -0400
-Received: from mailhub.sw.ru ([195.214.232.25]:12797 helo=relay.sw.ru)
+	(envelope-from <qemu.bugs@whitewinterwolf.com>) id 1dDY22-0004HA-Um
+	for qemu-devel@nongnu.org; Wed, 24 May 2017 11:17:06 -0400
+Received: from relay2-d.mail.gandi.net ([2001:4b98:c:538::194]:39456)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dplotnikov@virtuozzo.com>)
-	id 1dDWwk-00054H-7f
-	for qemu-devel@nongnu.org; Wed, 24 May 2017 10:07:30 -0400
-From: Denis Plotnikov <dplotnikov@virtuozzo.com>
-Date: Wed, 24 May 2017 17:07:24 +0300
-Message-Id: <1495634844-14777-1-git-send-email-dplotnikov@virtuozzo.com>
-Subject: [Qemu-devel] [PATCH] kvmclock: update system_time_msr address
- forcibly
+	(Exim 4.71) (envelope-from <qemu.bugs@whitewinterwolf.com>)
+	id 1dDY22-0004Fe-Nv
+	for qemu-devel@nongnu.org; Wed, 24 May 2017 11:17:02 -0400
+Received: from mfilter6-d.gandi.net (mfilter6-d.gandi.net [217.70.178.135])
+	by relay2-d.mail.gandi.net (Postfix) with ESMTP id 698FDC5A6C
+	for <qemu-devel@nongnu.org>; Wed, 24 May 2017 17:17:00 +0200 (CEST)
+Received: from relay2-d.mail.gandi.net ([IPv6:::ffff:217.70.183.194])
+	by mfilter6-d.gandi.net (mfilter6-d.gandi.net [::ffff:10.0.15.180])
+	(amavisd-new, port 10024)
+	with ESMTP id SZvfYzsw70oo for <qemu-devel@nongnu.org>;
+	Wed, 24 May 2017 17:16:59 +0200 (CEST)
+Received: from webmail.eu.com (webmail5-d.mgt.gandi.net [10.58.1.145])
+	(Authenticated sender: lists@whitewinterwolf.com)
+	by relay2-d.mail.gandi.net (Postfix) with ESMTPA id 1D01BC5A73
+	for <qemu-devel@nongnu.org>; Wed, 24 May 2017 17:16:58 +0200 (CEST)
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
+Content-Transfer-Encoding: 7bit
+Date: Wed, 24 May 2017 17:16:58 +0200
+From: Simon <qemu.bugs@whitewinterwolf.com>
+Message-ID: <6ace537dec6122d5bd07e600b9ab9b6c@whitewinterwolf.com>
+Subject: [Qemu-devel] Monitor file path length limitation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,86 +38,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: pbonzini@redhat.com
-Cc: qemu-devel@nongnu.org, mtosatti@redhat.com, den@virtuozzo.com, svt-core@lists.sw.ru
+To: qemu-devel@nongnu.org
 
-Do an update of system_time_msr address every time before reading
-the value of tsc_timestamp from guest's kvmclock page.
+Hello,
 
-It should be done in a forcible manner because there is a situation
-when system_time_msr has been set by kvm but qemu doesn't aware of it.
-This leads to updates of kvmclock_offset without respect of guest's
-kvmclock values.
+It seems that the monitor file path length is limited to about 100 
+characters (107 to be precise).
 
-The situation appears when L2 linux guest runs over L1 linux guest and
-the action inducing system_time_msr update is tpr access reporting.
-Some L1 linux guests turn off processing TPR access and when L0
-gets an L2 exit induced by TPR MSR access it doesn't enter L1 and
-processed it by itself.
-Thus, L1 kvm doesn't know about that TPR access happening and doesn't
-exit to qemu which in turn doesn't set system_time_msr address.
+Currently I'm using the '-monitor' parameter to create the monitor file 
+in a directory which gather all the files related to a given VM (monitor 
+file, PID file, disk image, etc.):
 
-This patch fixes this by making sure it knows the correct address every
-time it is needed.
+-monitor 
+'unix:/home/user/vmtools/test/out/foobar.iso/foobar.iso_A/foobar.iso_B/foobar.iso_C/foobar.iso_D/foobar.iso_E/monitor.sock,server,nowait'
 
-Signed-off-by: Denis Plotnikov <dplotnikov@virtuozzo.com>
----
- hw/i386/kvm/clock.c | 32 +++++++++++++++++++++++++++++++-
- 1 file changed, 31 insertions(+), 1 deletion(-)
+With this command Qemu does not produce any warning or error message but 
+create the socket file "mon" instead of the expected "monitor.sock".
 
-diff --git a/hw/i386/kvm/clock.c b/hw/i386/kvm/clock.c
-index e713162..035196a 100644
---- a/hw/i386/kvm/clock.c
-+++ b/hw/i386/kvm/clock.c
-@@ -48,11 +48,38 @@ struct pvclock_vcpu_time_info {
-     uint8_t    pad[2];
- } __attribute__((__packed__)); /* 32 bytes */
- 
-+static void update_all_system_time_msr(void)
-+{
-+    CPUState *cpu;
-+    CPUX86State *env;
-+    struct {
-+        struct kvm_msrs info;
-+        struct kvm_msr_entry entries[1];
-+    } msr_data;
-+    int ret;
-+
-+    msr_data.info.nmsrs = 1;
-+    msr_data.entries[0].index = MSR_KVM_SYSTEM_TIME;
-+
-+    CPU_FOREACH(cpu) {
-+        ret = kvm_vcpu_ioctl(cpu, KVM_GET_MSRS, &msr_data);
-+
-+        if (ret < 0) {
-+            fprintf(stderr, "KVM_GET_MSRS failed: %s\n", strerror(ret));
-+            abort();
-+        }
-+
-+        assert(ret == 1);
-+        env = cpu->env_ptr;
-+        env->system_time_msr = msr_data.entries[0].data;
-+    }
-+}
-+
- static uint64_t kvmclock_current_nsec(KVMClockState *s)
- {
-     CPUState *cpu = first_cpu;
-     CPUX86State *env = cpu->env_ptr;
--    hwaddr kvmclock_struct_pa = env->system_time_msr & ~1ULL;
-+    hwaddr kvmclock_struct_pa;
-     uint64_t migration_tsc = env->tsc;
-     struct pvclock_vcpu_time_info time;
-     uint64_t delta;
-@@ -60,6 +87,9 @@ static uint64_t kvmclock_current_nsec(KVMClockState *s)
-     uint64_t nsec_hi;
-     uint64_t nsec;
- 
-+    update_all_system_time_msr();
-+    kvmclock_struct_pa = env->system_time_msr & ~1ULL;
-+
-     if (!(env->system_time_msr & 1ULL)) {
-         /* KVM clock not active */
-         return 0;
--- 
-2.7.4
+Things go even worse if I add a further nesting:
+
+-monitor 
+'unix:/home/user/vmtools/test/out/foobar.iso/foobar.iso_A/foobar.iso_B/foobar.iso_C/foobar.iso_D/foobar.iso_E/foobar.iso_F/monitor.sock,server,nowait'
+
+Now, still without any warning, Qemu creates a file named "foo" in the 
+parent directory ('foobar.iso_E/') instead of the expected directory 
+('foobar.iso_E/').
+
+Is there a clean way to work around this limitation? For instance, is 
+there an alternative option I can use to generate this monitor file? Or 
+should I just assume that absolute paths are not supported in the 
+'-monitor' option and change the working directory before launching Qemu 
+so I can pass "./monitor.sock" as monitor file path (I really prefer to 
+use absolute path whenever possible though).
+
+As a side-note, is there any technical reason for such a limitation?
+
+Regards,
+Simon.
