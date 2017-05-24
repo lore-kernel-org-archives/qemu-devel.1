@@ -1,26 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51726)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52571)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1dDVsw-0000dO-UV
-	for qemu-devel@nongnu.org; Wed, 24 May 2017 08:59:31 -0400
+	(envelope-from <felipe@nutanix.com>) id 1dDVw1-0001NA-A9
+	for qemu-devel@nongnu.org; Wed, 24 May 2017 09:02:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1dDVst-0000GI-Rm
-	for qemu-devel@nongnu.org; Wed, 24 May 2017 08:59:31 -0400
-Received: from mail-lf0-x242.google.com ([2a00:1450:4010:c07::242]:34048)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1dDVst-0000Fm-Du
-	for qemu-devel@nongnu.org; Wed, 24 May 2017 08:59:27 -0400
-Received: by mail-lf0-x242.google.com with SMTP id q24so10922832lfb.1
-	for <qemu-devel@nongnu.org>; Wed, 24 May 2017 05:59:27 -0700 (PDT)
-Date: Wed, 24 May 2017 13:59:23 +0100
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20170524125923.GE11609@stefanha-x1.localdomain>
-References: <20170508141536.20690-1-stefanha@redhat.com>
+	(envelope-from <felipe@nutanix.com>) id 1dDVvw-0001j6-DF
+	for qemu-devel@nongnu.org; Wed, 24 May 2017 09:02:41 -0400
+Received: from mail-co1nam03on0132.outbound.protection.outlook.com
+	([104.47.40.132]:55072
+	helo=NAM03-CO1-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <felipe@nutanix.com>) id 1dDVvv-0001cg-Ut
+	for qemu-devel@nongnu.org; Wed, 24 May 2017 09:02:36 -0400
+From: Felipe Franciosi <felipe@nutanix.com>
+Date: Wed, 24 May 2017 13:02:25 +0000
+Message-ID: <140B898B-D9A0-4123-B3C0-1A3C7BA48584@nutanix.com>
+References: <1495231142-19055-1-git-send-email-felipe@nutanix.com>
+	<20170523042702.GC3873@pxdev.xzpeter.org>
+In-Reply-To: <20170523042702.GC3873@pxdev.xzpeter.org>
+Content-Language: en-US
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <2ACEC30906C56C419B0A2CB09112190C@namprd02.prod.outlook.com>
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="BZaMRJmqxGScZ8Mx"
-Content-Disposition: inline
-In-Reply-To: <20170508141536.20690-1-stefanha@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v6 0/9] qemu-img: add measure sub-command
+Subject: Re: [Qemu-devel] [PATCH] migration: keep bytes_xfer_prev init'd to
+ zero
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,137 +32,121 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: qemu-devel@nongnu.org, John Snow <jsnow@redhat.com>, Nir Soffer <nsoffer@redhat.com>, Maor Lipchuk <mlipchuk@redhat.com>, Alberto Garcia <berto@igalia.com>
+To: Peter Xu <peterx@redhat.com>
+Cc: Juan Quintela <quintela@redhat.com>, "Jason J. Herne" <jjherne@linux.vnet.ibm.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 
 
---BZaMRJmqxGScZ8Mx
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+> On 23 May 2017, at 05:27, Peter Xu <peterx@redhat.com> wrote:
+>=20
+> On Fri, May 19, 2017 at 10:59:02PM +0100, Felipe Franciosi wrote:
+>> The first time migration_bitmap_sync() is called, bytes_xfer_prev is set
+>> to ram_state.bytes_transferred which is, at this point, zero. The next
+>> time migration_bitmap_sync() is called, an iteration has happened and
+>> bytes_xfer_prev is set to 'x' bytes. Most likely, more than one second
+>> has passed, so the auto converge logic will be triggered and
+>> bytes_xfer_now will also be set to 'x' bytes.
+>>=20
+>> This condition is currently masked by dirty_rate_high_cnt, which will
+>> wait for a few iterations before throttling. It would otherwise always
+>> assume zero bytes have been copied and therefore throttle the guest
+>> (possibly) prematurely.
+>>=20
+>> Given bytes_xfer_prev is only used by the auto convergence logic, it
+>> makes sense to only set its value after a check has been made against
+>> bytes_xfer_now.
+>>=20
+>> Signed-off-by: Felipe Franciosi <felipe@nutanix.com>
+>> ~
+>> ---
+>> migration/ram.c | 4 ----
+>> 1 file changed, 4 deletions(-)
+>>=20
+>> diff --git a/migration/ram.c b/migration/ram.c
+>> index f59fdd4..793af39 100644
+>> --- a/migration/ram.c
+>> +++ b/migration/ram.c
+>> @@ -670,10 +670,6 @@ static void migration_bitmap_sync(RAMState *rs)
+>>=20
+>>     rs->bitmap_sync_count++;
+>>=20
+>> -    if (!rs->bytes_xfer_prev) {
+>> -        rs->bytes_xfer_prev =3D ram_bytes_transferred();
+>> -    }
+>> -
+>>     if (!rs->time_last_bitmap_sync) {
+>>         rs->time_last_bitmap_sync =3D qemu_clock_get_ms(QEMU_CLOCK_REALT=
+IME);
+>>     }
+>> --=20
+>> 1.9.5
+>>=20
+>>=20
+>=20
+> I feel like this patch wants to correctly initialize bytes_xfer_prev,
+> however I still see problem. E.g., when user specify auto-convergence
+> during migration, and in the first iteration we'll always have a very
+> small bytes_xfer_prev (with this patch, it'll be zero) with a very big
+> bytes_xfer_now (which is the ram_bytes_transferred() value).
 
-On Mon, May 08, 2017 at 10:15:27AM -0400, Stefan Hajnoczi wrote:
-> v6:
->  * Change bdrv_measure() return type to BlockMeasureInfo * [Eric]
->  * Clarify that holes in sparse POSIX files are still counted [Eric]
->=20
-> v5:
->  * Use UINT64_MAX instead of ~0ULL [Berto]
->  * Document qemu-img measure ofmt, fmt, output_fmt, and snapshot_param
->    [Berto]
->=20
-> v4:
->  * Make qcow2 refcount calculation conservative [Maor]
->  * Include actual qemu-img convert image size in test cases
->=20
-> v3:
->  * Drop RFC, this is ready to go for QEMU 2.10
->  * Use "required size" instead of "required bytes" in qemu-img output for
->    consistency [Nir]
->  * Clarify BlockMeasureInfo semantics [Max]
->  * Clarify bdrv_measure() opts argument and error handling [Nir]
->  * Handle -o backing_file=3D for qcow2 [Max]
->  * Handle snapshot options in qemu-img measure
->  * Probe input image for allocated data clusters for qcow2.  Didn't centr=
-alize
->    this because there are format-specific aspects such as the cluster_siz=
-e.  It
->    may make sense to centralize it later (with a bit more complexity) if
->    support is added to more formats.
->  * Add qemu-img(1) man page section for 'measure' sub-command [Max]
->  * Extend test case to cover additional scenarios [Nir]
->=20
-> RFCv2:
->  * Publishing RFC again to discuss the new user-visible interfaces.  Code=
- has
->    changed quite a bit, I have not kept any Reviewed-by tags.
->  * Rename qemu-img sub-command "measure" and API bdrv_measure() [Nir]
->  * Report both "required bytes" and "fully allocated bytes" to handle the=
- empty
->    image file and prealloc use cases [Nir and Dan]
->  * Use bdrv_getlength() instead of bdrv_nb_sectors() [Berto]
->  * Rename "err" label "out" in qemu-img-cmds.c [Nir]
->  * Add basic qcow2 support, doesn't support qemu-img convert from existin=
-g files yet
->=20
-> RFCv1:
->  * Publishing patch series with just raw support, no qcow2 yet.  Please r=
-eview
->    the command-line interface and let me know if you are happy with this
->    approach.
->=20
-> Users and management tools sometimes need to know the size required for a=
- new
-> disk image so that an LVM volume, SAN LUN, etc can be allocated ahead of =
-time.
-> Image formats like qcow2 have non-trivial metadata that makes it hard to
-> estimate the exact size without knowledge of file format internals.
->=20
-> This patch series introduces a new qemu-img sub-command that calculates t=
-he
-> required size for both image creation and conversion scenarios.
->=20
-> The conversion scenario is:
->=20
->   $ qemu-img measure -f raw -O qcow2 input.img
->   required size: 1327680
->   fully allocated size: 1074069504
->=20
-> Here an existing image file is taken and the output includes the space re=
-quired
-> for data from the input image file.
->=20
-> The creation scenario is:
->=20
->   $ qemu-img measure -O qcow2 --size 5G
->   required size: 327680
->   fully allocated size: 1074069504
->=20
-> Stefan Hajnoczi (9):
->   block: add bdrv_measure() API
->   raw-format: add bdrv_measure() support
->   qcow2: extract preallocation calculation function
->   qcow2: make refcount size calculation conservative
->   qcow2: extract image creation option parsing
->   qcow2: add bdrv_measure() support
->   qemu-img: add measure subcommand
->   qemu-iotests: support per-format golden output files
->   iotests: add test 178 for qemu-img measure
->=20
->  qapi/block-core.json             |  25 +++
->  include/block/block.h            |   2 +
->  include/block/block_int.h        |   2 +
->  block.c                          |  35 ++++
->  block/qcow2.c                    | 372 +++++++++++++++++++++++++++++----=
-------
->  block/raw-format.c               |  26 +++
->  qemu-img.c                       | 228 ++++++++++++++++++++++++
->  qemu-img-cmds.hx                 |   6 +
->  qemu-img.texi                    |  30 ++++
->  tests/qemu-iotests/178           | 168 ++++++++++++++++++
->  tests/qemu-iotests/178.out.qcow2 | 278 +++++++++++++++++++++++++++++
->  tests/qemu-iotests/178.out.raw   | 146 +++++++++++++++
->  tests/qemu-iotests/check         |   5 +
->  tests/qemu-iotests/group         |   1 +
->  14 files changed, 1230 insertions(+), 94 deletions(-)
->  create mode 100755 tests/qemu-iotests/178
->  create mode 100644 tests/qemu-iotests/178.out.qcow2
->  create mode 100644 tests/qemu-iotests/178.out.raw
+Interesting point. Worth noting, that's no different than what happens toda=
+y anyway (bytes_xfer_prev would be initialised to the first non-zero bytes_=
+transferred). I therefore don't think it should stop or slow this patch's a=
+cceptance.
 
-Ping
+> If so, do
+> you think squash below change together with current one would be more
+> accurate?
 
---BZaMRJmqxGScZ8Mx
-Content-Type: application/pgp-signature; name="signature.asc"
+As a matter of fact I had a different idea (below) to fix what you are desc=
+ribing. I was still experimenting with this code, so haven't sent a patch y=
+et. But I'm going to send a series soon for comments. Basically, I think so=
+me other changes are required to make sure these numbers are correct:
 
------BEGIN PGP SIGNATURE-----
+1) dirty_rate_high_cnt++ >=3D 2 should be ++dirty_rate_high_cnt >=3D 2
+- The original commit msg from 070afca25 (Jason J. Herne) says that converg=
+ence should be triggered after two passes. Current code does it after three=
+ passes (and four passes the first time around; see number 2 below).
+- I personally feel this counter should go away altogether. If the migratio=
+n is not converging and the VM is going to be throttled, there's no point s=
+tressing the network any further; just start throttling straight away.
 
-iQEcBAEBAgAGBQJZJYOrAAoJEJykq7OBq3PIPpMIALfk26tPFccFiV7u8WqkmA5D
-XFld27w+yIlnz2IkNtGTvDz1+OgTKYrCcNuZSHOo6La7fxZZzSxdEdcT8QwYObhK
-r2Fml5befZKiyebwAowq0OMXz7ikqLjxzhx95QePAff+EtI4z4Ji3MRHkjwx7E5e
-4XWRxJ+aup9HGqrWC1fz+uPB59nVPRngdEVqs/h0qE1P3fzHLbHVmIb9llpl6LFt
-4pUKOO6dKqTYlySI2ROIDCL9BT0agJGKhPRBZwvFYUSB6uRvZrN/CYn781LGLcKN
-uCtJLIvk0elIPGSiwYhjuSa7VzXKPrU41CZtyOuj9zHm82R5IngRJbi4OqXg9Wg=
-=OIjO
------END PGP SIGNATURE-----
+2) dirty_pages_rate should be updated before the autoconverge logic.
+- Right now, we delay throttling by a further iteration, as dirty_pages_rat=
+e is set after the first pass through the autoconverge logic (it is zero th=
+e first time around).
+- The "if (rs->dirty_pages_rate &&..." part of the conditional can then be =
+removed, as it won't ever be zero.
 
---BZaMRJmqxGScZ8Mx--
+3) bytes_xfer counters should be updated alongside dirty_pages counters (fo=
+r the same period).
+- This fixes the issue you described, as bytes_xfer_* will correspond to th=
+e period.
+
+I'll send the series shortly. Thoughts in the meantime?
+
+Thanks,
+Felipe
+
+>=20
+> diff --git a/migration/ram.c b/migration/ram.c
+> index f59fdd4..e01a218 100644
+> --- a/migration/ram.c
+> +++ b/migration/ram.c
+> @@ -703,7 +703,8 @@ static void migration_bitmap_sync(RAMState *rs)
+>                throttling */
+>             bytes_xfer_now =3D ram_bytes_transferred();
+>=20
+> -            if (rs->dirty_pages_rate &&
+> +            /* Skip first iteration when bytes_xfer_prev not inited */
+> +            if (rs->bytes_xfer_prev && rs->dirty_pages_rate &&
+>                (rs->num_dirty_pages_period * TARGET_PAGE_SIZE >
+>                    (bytes_xfer_now - rs->bytes_xfer_prev) / 2) &&
+>                (rs->dirty_rate_high_cnt++ >=3D 2)) {
+>=20
+> Even I am not sure whether we can move bytes_xfer_prev out of RAMState
+> since it's only used by migration_bitmap_sync().
+>=20
+> Thanks,
+>=20
+> --=20
+> Peter Xu
