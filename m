@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34305)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34325)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dDMQb-0000qg-0n
-	for qemu-devel@nongnu.org; Tue, 23 May 2017 22:53:37 -0400
+	(envelope-from <famz@redhat.com>) id 1dDMQd-0000sq-80
+	for qemu-devel@nongnu.org; Tue, 23 May 2017 22:53:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dDMQa-000797-BS
-	for qemu-devel@nongnu.org; Tue, 23 May 2017 22:53:37 -0400
+	(envelope-from <famz@redhat.com>) id 1dDMQc-0007A4-Fu
+	for qemu-devel@nongnu.org; Tue, 23 May 2017 22:53:39 -0400
 From: Fam Zheng <famz@redhat.com>
-Date: Wed, 24 May 2017 10:52:31 +0800
-Message-Id: <20170524025235.32190-13-famz@redhat.com>
+Date: Wed, 24 May 2017 10:52:32 +0800
+Message-Id: <20170524025235.32190-14-famz@redhat.com>
 In-Reply-To: <20170524025235.32190-1-famz@redhat.com>
 References: <20170524025235.32190-1-famz@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 12/16] virtio-blk: Request
- BLK_PERM_AIO_CONTEXT_CHANGE for dataplane
+Subject: [Qemu-devel] [PATCH v3 13/16] blk: fix aio context loss on media
+ change
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,72 +23,51 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Stefan Hajnoczi <stefanha@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
 
-blk_set_aio_context is audited by perm API, so follow the protocol and
-request for permission first.
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 
-Previously the return code in error path was hardcoded as -EPERM, but
-returning 'r' is more meaningful here both for the new error and
-existing ones.
+If we have separate iothread for cdrom, we lose connection to it on
+qmp_blockdev_change_medium, as aio_context is on bds which is dropped
+and switched with new one.
 
+As an example result, after such media change we have crash on
+virtio_scsi_ctx_check: Assertion `blk_get_aio_context(d->conf.blk) == s->ctx' failed.
+
+Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 Signed-off-by: Fam Zheng <famz@redhat.com>
 ---
- hw/block/dataplane/virtio-blk.c | 15 +++++++++++----
- 1 file changed, 11 insertions(+), 4 deletions(-)
+ block/block-backend.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
-diff --git a/hw/block/dataplane/virtio-blk.c b/hw/block/dataplane/virtio-blk.c
-index 5556f0e..8f2ff2df 100644
---- a/hw/block/dataplane/virtio-blk.c
-+++ b/hw/block/dataplane/virtio-blk.c
-@@ -168,6 +168,7 @@ int virtio_blk_data_plane_start(VirtIODevice *vdev)
-     unsigned i;
-     unsigned nvqs = s->conf->num_queues;
-     int r;
-+    Error *local_err = NULL;
+diff --git a/block/block-backend.c b/block/block-backend.c
+index 5492f64..dfe577d 100644
+--- a/block/block-backend.c
++++ b/block/block-backend.c
+@@ -68,6 +68,7 @@ struct BlockBackend {
+     NotifierList remove_bs_notifiers, insert_bs_notifiers;
  
-     if (vblk->dataplane_started || s->starting) {
-         return 0;
-@@ -175,12 +176,18 @@ int virtio_blk_data_plane_start(VirtIODevice *vdev)
+     int quiesce_counter;
++    AioContext *aio_context;
+ };
  
-     s->starting = true;
+ typedef struct BlockBackendAIOCB {
+@@ -618,6 +619,10 @@ int blk_insert_bs(BlockBackend *blk, BlockDriverState *bs, Error **errp)
+     }
+     bdrv_ref(bs);
  
-+    r = blk_request_perm(s->conf->conf.blk, BLK_PERM_AIO_CONTEXT_CHANGE,
-+                         &local_err);
-+    if (r) {
-+        error_report_err(local_err);
-+        goto fail;
++    if (blk->aio_context != NULL) {
++        bdrv_set_aio_context(bs, blk->aio_context);
 +    }
-     /* Set up guest notifier (irq) */
-     r = k->set_guest_notifiers(qbus->parent, nvqs, true);
-     if (r != 0) {
-         fprintf(stderr, "virtio-blk failed to set guest notifier (%d), "
-                 "ensure -enable-kvm is set\n", r);
--        goto fail_guest_notifiers;
-+        goto fail;
-     }
++
+     notifier_list_notify(&blk->insert_bs_notifiers, blk);
+     if (blk->public.throttle_state) {
+         throttle_timers_attach_aio_context(
+@@ -1692,6 +1697,7 @@ void blk_set_aio_context(BlockBackend *blk, AioContext *new_context)
+ {
+     BlockDriverState *bs = blk_bs(blk);
  
-     /* Set up virtqueue notify */
-@@ -191,7 +198,7 @@ int virtio_blk_data_plane_start(VirtIODevice *vdev)
-             while (i--) {
-                 virtio_bus_set_host_notifier(VIRTIO_BUS(qbus), i, false);
-             }
--            goto fail_guest_notifiers;
-+            goto fail;
-         }
-     }
- 
-@@ -219,11 +226,11 @@ int virtio_blk_data_plane_start(VirtIODevice *vdev)
-     aio_context_release(s->ctx);
-     return 0;
- 
--  fail_guest_notifiers:
-+fail:
-     vblk->dataplane_disabled = true;
-     s->starting = false;
-     vblk->dataplane_started = true;
--    return -ENOSYS;
-+    return r;
- }
- 
- /* Context: QEMU global mutex held */
++    blk->aio_context = new_context;
+     if (bs) {
+         if (blk->public.throttle_state) {
+             throttle_timers_detach_aio_context(&blk->public.throttle_timers);
 -- 
 2.9.4
