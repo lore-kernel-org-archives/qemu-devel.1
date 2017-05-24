@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60702)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60732)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dDcty-0003hC-F3
-	for qemu-devel@nongnu.org; Wed, 24 May 2017 16:29:03 -0400
+	(envelope-from <eblake@redhat.com>) id 1dDctz-0003iG-Hs
+	for qemu-devel@nongnu.org; Wed, 24 May 2017 16:29:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dDctx-00061t-8M
-	for qemu-devel@nongnu.org; Wed, 24 May 2017 16:29:02 -0400
+	(envelope-from <eblake@redhat.com>) id 1dDcty-00062V-9E
+	for qemu-devel@nongnu.org; Wed, 24 May 2017 16:29:03 -0400
 From: Eric Blake <eblake@redhat.com>
-Date: Wed, 24 May 2017 15:28:40 -0500
-Message-Id: <20170524202842.26724-4-eblake@redhat.com>
+Date: Wed, 24 May 2017 15:28:42 -0500
+Message-Id: <20170524202842.26724-6-eblake@redhat.com>
 In-Reply-To: <20170524202842.26724-1-eblake@redhat.com>
 References: <20170524202842.26724-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 3/5] block: Allow NULL file for
- bdrv_get_block_status()
+Subject: [Qemu-devel] [PATCH v2 5/5] blkdebug: Support
+ .bdrv_co_get_block_status
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,181 +21,66 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, jsnow@redhat.com, mreitz@redhat.com, Stefan Hajnoczi <stefanha@redhat.com>, Fam Zheng <famz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Jeff Cody <jcody@redhat.com>
+Cc: qemu-block@nongnu.org, jsnow@redhat.com, mreitz@redhat.com, Kevin Wolf <kwolf@redhat.com>
 
-Not all callers care about which BDS owns the mapping for a given
-range of the file.  This patch merely simplifies the callers by
-consolidating the logic in the common call point, while guaranteeing
-a non-NULL file to all the driver callbacks, for no semantic change.
+Without a passthrough status of BDRV_BLOCK_RAW, anything wrapped by
+blkdebug appears 100% allocated as data.  Better is treating it the
+same as the underlying file being wrapped.
 
-However, this will also set the stage for a future cleanup: when a
-caller does not care about which BDS owns an offset, it would be
-nice to allow the driver to optimize things to not have to return
-BDRV_BLOCK_OFFSET_VALID in the first place.  In the case of fragmented
-allocation (for example, it's fairly easy to create a qcow2 image
-where consecutive guest addresses are not at consecutive host
-addresses), the current contract requires bdrv_get_block_status()
-to clamp *pnum to the limit where host addresses are no longer
-consecutive, but allowing a NULL file means that *pnum could be
-set to the full length of known-allocated data.
+Update iotest 177 for the new expected output.
 
 Signed-off-by: Eric Blake <eblake@redhat.com>
 
 ---
-v2: new patch
+v2: tweak commit message
 ---
- block/io.c     | 15 +++++++++------
- block/mirror.c |  3 +--
- block/qcow2.c  |  4 +---
- qemu-img.c     | 10 ++++------
- 4 files changed, 15 insertions(+), 17 deletions(-)
+ block/blkdebug.c           | 11 +++++++++++
+ tests/qemu-iotests/177.out |  5 ++++-
+ 2 files changed, 15 insertions(+), 1 deletion(-)
 
-diff --git a/block/io.c b/block/io.c
-index 8e6c3fe..eea74cb 100644
---- a/block/io.c
-+++ b/block/io.c
-@@ -706,7 +706,6 @@ int bdrv_make_zero(BdrvChild *child, BdrvRequestFlags flags)
- {
-     int64_t target_sectors, ret, nb_sectors, sector_num = 0;
-     BlockDriverState *bs = child->bs;
--    BlockDriverState *file;
-     int n;
-
-     target_sectors = bdrv_nb_sectors(bs);
-@@ -719,7 +718,7 @@ int bdrv_make_zero(BdrvChild *child, BdrvRequestFlags flags)
-         if (nb_sectors <= 0) {
-             return 0;
-         }
--        ret = bdrv_get_block_status(bs, sector_num, nb_sectors, &n, &file);
-+        ret = bdrv_get_block_status(bs, sector_num, nb_sectors, &n, NULL);
-         if (ret < 0) {
-             error_report("error getting block status at sector %" PRId64 ": %s",
-                          sector_num, strerror(-ret));
-@@ -1737,8 +1736,9 @@ typedef struct BdrvCoGetBlockStatusData {
-  * 'nb_sectors' is the max value 'pnum' should be set to.  If nb_sectors goes
-  * beyond the end of the disk image it will be clamped.
-  *
-- * If returned value is positive and BDRV_BLOCK_OFFSET_VALID bit is set, 'file'
-- * points to the BDS which the sector range is allocated in.
-+ * If returned value is positive, BDRV_BLOCK_OFFSET_VALID bit is set, and
-+ * 'file' is non-NULL, then '*file' points to the BDS which the sector range
-+ * is allocated in.
-  */
- static int64_t coroutine_fn bdrv_co_get_block_status(BlockDriverState *bs,
-                                                      int64_t sector_num,
-@@ -1748,7 +1748,11 @@ static int64_t coroutine_fn bdrv_co_get_block_status(BlockDriverState *bs,
-     int64_t total_sectors;
-     int64_t n;
-     int64_t ret, ret2;
-+    BlockDriverState *tmpfile;
-
-+    if (!file) {
-+        file = &tmpfile;
-+    }
-     *file = NULL;
-     total_sectors = bdrv_nb_sectors(bs);
-     if (total_sectors < 0) {
-@@ -1916,9 +1920,8 @@ int64_t bdrv_get_block_status(BlockDriverState *bs,
- int coroutine_fn bdrv_is_allocated(BlockDriverState *bs, int64_t sector_num,
-                                    int nb_sectors, int *pnum)
- {
--    BlockDriverState *file;
-     int64_t ret = bdrv_get_block_status(bs, sector_num, nb_sectors, pnum,
--                                        &file);
-+                                        NULL);
-     if (ret < 0) {
-         return ret;
-     }
-diff --git a/block/mirror.c b/block/mirror.c
-index e86f8f8..4563ba7 100644
---- a/block/mirror.c
-+++ b/block/mirror.c
-@@ -392,7 +392,6 @@ static uint64_t coroutine_fn mirror_iteration(MirrorBlockJob *s)
-     while (nb_chunks > 0 && sector_num < end) {
-         int64_t ret;
-         int io_sectors, io_sectors_acct;
--        BlockDriverState *file;
-         enum MirrorMethod {
-             MIRROR_METHOD_COPY,
-             MIRROR_METHOD_ZERO,
-@@ -402,7 +401,7 @@ static uint64_t coroutine_fn mirror_iteration(MirrorBlockJob *s)
-         assert(!(sector_num % sectors_per_chunk));
-         ret = bdrv_get_block_status_above(source, NULL, sector_num,
-                                           nb_chunks * sectors_per_chunk,
--                                          &io_sectors, &file);
-+                                          &io_sectors, NULL);
-         if (ret < 0) {
-             io_sectors = MIN(nb_chunks * sectors_per_chunk, max_io_sectors);
-         } else if (ret & BDRV_BLOCK_DATA) {
-diff --git a/block/qcow2.c b/block/qcow2.c
-index b3ba5da..8e9e29b 100644
---- a/block/qcow2.c
-+++ b/block/qcow2.c
-@@ -2448,7 +2448,6 @@ static bool is_zero_sectors(BlockDriverState *bs, int64_t start,
-                             uint32_t count)
- {
-     int nr;
--    BlockDriverState *file;
-     int64_t res;
-
-     if (start + count > bs->total_sectors) {
-@@ -2458,8 +2457,7 @@ static bool is_zero_sectors(BlockDriverState *bs, int64_t start,
-     if (!count) {
-         return true;
-     }
--    res = bdrv_get_block_status_above(bs, NULL, start, count,
--                                      &nr, &file);
-+    res = bdrv_get_block_status_above(bs, NULL, start, count, &nr, NULL);
-     return res >= 0 && (res & BDRV_BLOCK_ZERO) && nr == count;
+diff --git a/block/blkdebug.c b/block/blkdebug.c
+index a5196e8..1ad8d65 100644
+--- a/block/blkdebug.c
++++ b/block/blkdebug.c
+@@ -642,6 +642,16 @@ static int coroutine_fn blkdebug_co_pdiscard(BlockDriverState *bs,
+     return bdrv_co_pdiscard(bs->file->bs, offset, count);
  }
 
-diff --git a/qemu-img.c b/qemu-img.c
-index 5aef8ef..cb78696 100644
---- a/qemu-img.c
-+++ b/qemu-img.c
-@@ -1398,7 +1398,6 @@ static int img_compare(int argc, char **argv)
++static int64_t coroutine_fn blkdebug_co_get_block_status(
++    BlockDriverState *bs, int64_t sector_num, int nb_sectors, int *pnum,
++    BlockDriverState **file)
++{
++    *pnum = nb_sectors;
++    *file = bs->file->bs;
++    return BDRV_BLOCK_RAW | BDRV_BLOCK_OFFSET_VALID |
++        (sector_num << BDRV_SECTOR_BITS);
++}
++
+ static void blkdebug_close(BlockDriverState *bs)
+ {
+     BDRVBlkdebugState *s = bs->opaque;
+@@ -912,6 +922,7 @@ static BlockDriver bdrv_blkdebug = {
+     .bdrv_co_flush_to_disk  = blkdebug_co_flush,
+     .bdrv_co_pwrite_zeroes  = blkdebug_co_pwrite_zeroes,
+     .bdrv_co_pdiscard       = blkdebug_co_pdiscard,
++    .bdrv_co_get_block_status = blkdebug_co_get_block_status,
 
-     for (;;) {
-         int64_t status1, status2;
--        BlockDriverState *file;
-
-         nb_sectors = sectors_to_process(total_sectors, sector_num);
-         if (nb_sectors <= 0) {
-@@ -1406,7 +1405,7 @@ static int img_compare(int argc, char **argv)
-         }
-         status1 = bdrv_get_block_status_above(bs1, NULL, sector_num,
-                                               total_sectors1 - sector_num,
--                                              &pnum1, &file);
-+                                              &pnum1, NULL);
-         if (status1 < 0) {
-             ret = 3;
-             error_report("Sector allocation test failed for %s", filename1);
-@@ -1416,7 +1415,7 @@ static int img_compare(int argc, char **argv)
-
-         status2 = bdrv_get_block_status_above(bs2, NULL, sector_num,
-                                               total_sectors2 - sector_num,
--                                              &pnum2, &file);
-+                                              &pnum2, NULL);
-         if (status2 < 0) {
-             ret = 3;
-             error_report("Sector allocation test failed for %s", filename2);
-@@ -1615,15 +1614,14 @@ static int convert_iteration_sectors(ImgConvertState *s, int64_t sector_num)
-     n = MIN(s->total_sectors - sector_num, BDRV_REQUEST_MAX_SECTORS);
-
-     if (s->sector_next_status <= sector_num) {
--        BlockDriverState *file;
-         if (s->target_has_backing) {
-             ret = bdrv_get_block_status(blk_bs(s->src[src_cur]),
-                                         sector_num - src_cur_offset,
--                                        n, &n, &file);
-+                                        n, &n, NULL);
-         } else {
-             ret = bdrv_get_block_status_above(blk_bs(s->src[src_cur]), NULL,
-                                               sector_num - src_cur_offset,
--                                              n, &n, &file);
-+                                              n, &n, NULL);
-         }
-         if (ret < 0) {
-             return ret;
+     .bdrv_debug_event           = blkdebug_debug_event,
+     .bdrv_debug_breakpoint      = blkdebug_debug_breakpoint,
+diff --git a/tests/qemu-iotests/177.out b/tests/qemu-iotests/177.out
+index b754ed4..43a7778 100644
+--- a/tests/qemu-iotests/177.out
++++ b/tests/qemu-iotests/177.out
+@@ -46,6 +46,9 @@ read 30408704/30408704 bytes at offset 80740352
+ read 23068672/23068672 bytes at offset 111149056
+ 22 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+ Offset          Length          File
+-0               0x8000000       blkdebug::TEST_DIR/t.IMGFMT
++0               0x800000        TEST_DIR/t.IMGFMT
++0x900000        0x2400000       TEST_DIR/t.IMGFMT
++0x3c00000       0x1100000       TEST_DIR/t.IMGFMT
++0x6a00000       0x1600000       TEST_DIR/t.IMGFMT
+ No errors were found on the image.
+ *** done
 -- 
 2.9.4
