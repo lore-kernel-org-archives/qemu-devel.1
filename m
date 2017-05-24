@@ -1,14 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41498)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42203)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lvivier@redhat.com>) id 1dDV84-0002g3-QC
-	for qemu-devel@nongnu.org; Wed, 24 May 2017 08:11:09 -0400
+	(envelope-from <armbru@redhat.com>) id 1dDVAL-0004LG-3u
+	for qemu-devel@nongnu.org; Wed, 24 May 2017 08:13:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lvivier@redhat.com>) id 1dDV7z-00084r-L3
-	for qemu-devel@nongnu.org; Wed, 24 May 2017 08:11:04 -0400
-From: Laurent Vivier <lvivier@redhat.com>
-Date: Wed, 24 May 2017 14:10:48 +0200
-Message-Id: <20170524121048.10067-1-lvivier@redhat.com>
-Subject: [Qemu-devel] [PATCH] migration: remove register_savevm()
+	(envelope-from <armbru@redhat.com>) id 1dDVAG-0001QR-69
+	for qemu-devel@nongnu.org; Wed, 24 May 2017 08:13:25 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53672)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dDVAF-0001PG-UD
+	for qemu-devel@nongnu.org; Wed, 24 May 2017 08:13:20 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 5062F80477
+	for <qemu-devel@nongnu.org>; Wed, 24 May 2017 12:13:18 +0000 (UTC)
+From: Markus Armbruster <armbru@redhat.com>
+References: <20170520020914.14562-1-ehabkost@redhat.com>
+	<87o9uj64ro.fsf@dusky.pond.sub.org>
+	<20170523143443.GE32274@thinpad.lan.raisama.net>
+Date: Wed, 24 May 2017 14:13:16 +0200
+In-Reply-To: <20170523143443.GE32274@thinpad.lan.raisama.net> (Eduardo
+	Habkost's message of "Tue, 23 May 2017 11:34:43 -0300")
+Message-ID: <87zie2pi5f.fsf@dusky.pond.sub.org>
+MIME-Version: 1.0
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [RFC 0/3] qmp: Return extra information on
+ qom-list-types
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -17,181 +35,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Juan Quintela <quintela@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
-Cc: rnsastry@linux.vnet.ibm.com, Bharata B Rao <bharata@linux.vnet.ibm.com>, qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>, Jason Wang <jasowang@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Dmitry Fleytman <dmitry@daynix.com>, Cornelia Huck <cornelia.huck@de.ibm.com>, qemu-ppc@nongnu.org, Samuel Thibault <samuel.thibault@ens-lyon.org>, sam.bobroff@au1.ibm.com, Peter Xu <peterx@redhat.com>, Laurent Vivier <lvivier@redhat.com>
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: qemu-devel@nongnu.org
 
-We can replace the four remaining calls of register_savevm() by
-calls to register_savevm_live(). So we can remove the function and
-as we don't allocate anymore the ops pointer with g_new0()
-we don't have to free it then.
+Eduardo Habkost <ehabkost@redhat.com> writes:
 
-Signed-off-by: Laurent Vivier <lvivier@redhat.com>
----
- hw/net/vmxnet3.c            |  8 ++++++--
- hw/s390x/s390-skeys.c       |  9 +++++++--
- hw/s390x/s390-virtio-ccw.c  |  8 ++++++--
- include/migration/vmstate.h |  8 --------
- migration/savevm.c          | 16 ----------------
- slirp/slirp.c               |  8 ++++++--
- 6 files changed, 25 insertions(+), 32 deletions(-)
+> On Tue, May 23, 2017 at 04:12:43PM +0200, Markus Armbruster wrote:
+>> Eduardo Habkost <ehabkost@redhat.com> writes:
+>> 
+>> > This series adds 'abstract' and 'parent-types' fields to the
+>> > output of qom-list-types.
+>> 
+>> Peeking at PATCH 3, it looks like 'parent-types' is the transitive
+>> closure of the single direct parent type (TypeImpl member parent_type).
+>> Do we need information on interfaces as well?
+>
+> I think we should, but it is more complex so I plan to do in a
+> separate patch.
 
-diff --git a/hw/net/vmxnet3.c b/hw/net/vmxnet3.c
-index 8b1fab2..4df3110 100644
---- a/hw/net/vmxnet3.c
-+++ b/hw/net/vmxnet3.c
-@@ -2262,6 +2262,11 @@ static const MemoryRegionOps b1_ops = {
-     },
- };
- 
-+static SaveVMHandlers savevm_vmxnet3_msix = {
-+    .save_state = vmxnet3_msix_save,
-+    .load_state = vmxnet3_msix_load,
-+};
-+
- static uint64_t vmxnet3_device_serial_num(VMXNET3State *s)
- {
-     uint64_t dsn_payload;
-@@ -2331,8 +2336,7 @@ static void vmxnet3_pci_realize(PCIDevice *pci_dev, Error **errp)
-                               vmxnet3_device_serial_num(s));
-     }
- 
--    register_savevm(dev, "vmxnet3-msix", -1, 1,
--                    vmxnet3_msix_save, vmxnet3_msix_load, s);
-+    register_savevm_live(dev, "vmxnet3-msix", -1, 1, &savevm_vmxnet3_msix, s);
- }
- 
- static void vmxnet3_instance_init(Object *obj)
-diff --git a/hw/s390x/s390-skeys.c b/hw/s390x/s390-skeys.c
-index e2d4e1a..a3dc088 100644
---- a/hw/s390x/s390-skeys.c
-+++ b/hw/s390x/s390-skeys.c
-@@ -363,6 +363,11 @@ static inline bool s390_skeys_get_migration_enabled(Object *obj, Error **errp)
-     return ss->migration_enabled;
- }
- 
-+static SaveVMHandlers savevm_s390_storage_keys = {
-+    .save_state = s390_storage_keys_save,
-+    .load_state = s390_storage_keys_load,
-+};
-+
- static inline void s390_skeys_set_migration_enabled(Object *obj, bool value,
-                                             Error **errp)
- {
-@@ -376,8 +381,8 @@ static inline void s390_skeys_set_migration_enabled(Object *obj, bool value,
-     ss->migration_enabled = value;
- 
-     if (ss->migration_enabled) {
--        register_savevm(NULL, TYPE_S390_SKEYS, 0, 1, s390_storage_keys_save,
--                        s390_storage_keys_load, ss);
-+        register_savevm_live(NULL, TYPE_S390_SKEYS, 0, 1,
-+                             &savevm_s390_storage_keys, ss);
-     } else {
-         unregister_savevm(DEVICE(ss), TYPE_S390_SKEYS, ss);
-     }
-diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
-index fdd4384..697a2d6 100644
---- a/hw/s390x/s390-virtio-ccw.c
-+++ b/hw/s390x/s390-virtio-ccw.c
-@@ -104,6 +104,11 @@ void s390_memory_init(ram_addr_t mem_size)
-     s390_skeys_init();
- }
- 
-+static SaveVMHandlers savevm_gtod = {
-+    .save_state = gtod_save,
-+    .load_state = gtod_load,
-+};
-+
- static void ccw_init(MachineState *machine)
- {
-     int ret;
-@@ -146,8 +151,7 @@ static void ccw_init(MachineState *machine)
-     s390_create_virtio_net(BUS(css_bus), "virtio-net-ccw");
- 
-     /* Register savevm handler for guest TOD clock */
--    register_savevm(NULL, "todclock", 0, 1,
--                    gtod_save, gtod_load, kvm_state);
-+    register_savevm_live(NULL, "todclock", 0, 1, &savevm_gtod, kvm_state);
- }
- 
- static void s390_cpu_plug(HotplugHandler *hotplug_dev,
-diff --git a/include/migration/vmstate.h b/include/migration/vmstate.h
-index f97411d..21aa6ca 100644
---- a/include/migration/vmstate.h
-+++ b/include/migration/vmstate.h
-@@ -59,14 +59,6 @@ typedef struct SaveVMHandlers {
-     LoadStateHandler *load_state;
- } SaveVMHandlers;
- 
--int register_savevm(DeviceState *dev,
--                    const char *idstr,
--                    int instance_id,
--                    int version_id,
--                    SaveStateHandler *save_state,
--                    LoadStateHandler *load_state,
--                    void *opaque);
--
- int register_savevm_live(DeviceState *dev,
-                          const char *idstr,
-                          int instance_id,
-diff --git a/migration/savevm.c b/migration/savevm.c
-index d971e5e..32badfc 100644
---- a/migration/savevm.c
-+++ b/migration/savevm.c
-@@ -617,21 +617,6 @@ int register_savevm_live(DeviceState *dev,
-     return 0;
- }
- 
--int register_savevm(DeviceState *dev,
--                    const char *idstr,
--                    int instance_id,
--                    int version_id,
--                    SaveStateHandler *save_state,
--                    LoadStateHandler *load_state,
--                    void *opaque)
--{
--    SaveVMHandlers *ops = g_new0(SaveVMHandlers, 1);
--    ops->save_state = save_state;
--    ops->load_state = load_state;
--    return register_savevm_live(dev, idstr, instance_id, version_id,
--                                ops, opaque);
--}
--
- void unregister_savevm(DeviceState *dev, const char *idstr, void *opaque)
- {
-     SaveStateEntry *se, *new_se;
-@@ -651,7 +636,6 @@ void unregister_savevm(DeviceState *dev, const char *idstr, void *opaque)
-         if (strcmp(se->idstr, id) == 0 && se->opaque == opaque) {
-             QTAILQ_REMOVE(&savevm_state.handlers, se, entry);
-             g_free(se->compat);
--            g_free(se->ops);
-             g_free(se);
-         }
-     }
-diff --git a/slirp/slirp.c b/slirp/slirp.c
-index 2f2ec2c..11d169b 100644
---- a/slirp/slirp.c
-+++ b/slirp/slirp.c
-@@ -272,6 +272,11 @@ static void slirp_init_once(void)
- static void slirp_state_save(QEMUFile *f, void *opaque);
- static int slirp_state_load(QEMUFile *f, void *opaque, int version_id);
- 
-+static SaveVMHandlers savevm_slirp_state = {
-+    .save_state = slirp_state_save,
-+    .load_state = slirp_state_load,
-+};
-+
- Slirp *slirp_init(int restricted, bool in_enabled, struct in_addr vnetwork,
-                   struct in_addr vnetmask, struct in_addr vhost,
-                   bool in6_enabled,
-@@ -321,8 +326,7 @@ Slirp *slirp_init(int restricted, bool in_enabled, struct in_addr vnetwork,
- 
-     slirp->opaque = opaque;
- 
--    register_savevm(NULL, "slirp", 0, 4,
--                    slirp_state_save, slirp_state_load, slirp);
-+    register_savevm_live(NULL, "slirp", 0, 4, &savevm_slirp_state, slirp);
- 
-     QTAILQ_INSERT_TAIL(&slirp_instances, slirp, entry);
- 
--- 
-2.9.4
+Okay.
+
+>> > For reference, below are the sizes of the output of
+>> > "qom-list-types abstract=true" on qemu-system-x86_64, before and
+>> > after applying the patches:
+>> >
+>> > * before: 11724 bytes
+>> > * with 'abstract' field: 20119 bytes
+>> > * with 'abstract' and 'parent-types': 44383 bytes
+>> 
+>> Obvious ways to save space:
+>> 
+>> * Make 'abstract' optional, default to false, present only when
+>>   necessary (79 out of 456 times right now)
+>
+> Good idea.
+>
+>> 
+>> * Pare down 'parent-types' to *direct* parent types.  The indirect ones
+>>   are redundant.
+>
+> On the one hand, I assume clients don't care if a given type is a
+> direct parent or indirect parent, and including only the direct
+> parent type will require them to make extra queries.
+
+Given the direct parents, computing their transitive closure is trivial.
+So a single query should suffice.
+
+> On the other hand, if the client wants to save a few queries it
+> can use the "implements" argument, already? Not sure.
+>
+>> 
+>> A less obvious way:
+>> 
+>> * 'parent-types' defines a relation with adjacency lists.  If the
+>>   relation is tree-shaped, we can send the tree instead, i.e. a tree of
+>>   device names rather than list of (device name, adjacency list).  New
+>>   command unless we're willing to break qom-list-types.
+>> 
+>> > I'm not sure if extending qom-list-types with this info is the
+>> > right way to go, or if we should keep qom-list-types as-is and
+>> > add a new "query-qom-type" QMP command to query info on one QOM
+>> > type at a time.
+>> 
+>> Might lead to more traffic rather than less.  Depends on what
+>> information the client needs to query.
+>
+> I think queries that return all available QOM types are likely to
+> (should?) be cached by clients.
+
+Perhaps libvirt developers can help us here.
+
+>                                  I believe the size will stay
+> acceptable if we implement the two suggestions above.
+
+Please do.
