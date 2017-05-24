@@ -1,23 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41676)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42120)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dDPzu-0007ds-0m
-	for qemu-devel@nongnu.org; Wed, 24 May 2017 02:42:19 -0400
+	(envelope-from <a.perevalov@samsung.com>) id 1dDQ3U-0008Sv-SB
+	for qemu-devel@nongnu.org; Wed, 24 May 2017 02:46:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dDPzs-0000RM-W6
-	for qemu-devel@nongnu.org; Wed, 24 May 2017 02:42:18 -0400
-Date: Wed, 24 May 2017 16:36:17 +1000
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20170524063617.GX30246@umbus.fritz.box>
-References: <1495601614-18586-1-git-send-email-bharata@linux.vnet.ibm.com>
-	<1495601614-18586-2-git-send-email-bharata@linux.vnet.ibm.com>
-	<87a8627opg.fsf@secure.mitica>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="p11K2BJEgMZL61bg"
-Content-Disposition: inline
-In-Reply-To: <87a8627opg.fsf@secure.mitica>
-Subject: Re: [Qemu-devel] [PATCH v3 1/3] migration: Introduce
- unregister_savevm_live()
+	(envelope-from <a.perevalov@samsung.com>) id 1dDQ3R-0001do-Gt
+	for qemu-devel@nongnu.org; Wed, 24 May 2017 02:46:00 -0400
+Received: from mailout2.w1.samsung.com ([210.118.77.12]:14687)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <a.perevalov@samsung.com>)
+	id 1dDQ3R-0001c3-1q
+	for qemu-devel@nongnu.org; Wed, 24 May 2017 02:45:57 -0400
+Received: from eucas1p2.samsung.com (unknown [182.198.249.207])
+	by mailout2.w1.samsung.com
+	(Oracle Communications Messaging Server 7.0.5.31.0 64bit (built May 5
+	2014)) with ESMTP id <0OQG00L4O2SGZD70@mailout2.w1.samsung.com> for
+	qemu-devel@nongnu.org; Wed, 24 May 2017 07:45:52 +0100 (BST)
+Date: Wed, 24 May 2017 09:45:48 +0300
+From: Alexey <a.perevalov@samsung.com>
+Message-id: <20170524064548.GA12925@aperevalov-ubuntu>
+MIME-version: 1.0
+Content-type: text/plain; charset=us-ascii
+Content-disposition: inline
+In-reply-to: <20170524023629.GD3873@pxdev.xzpeter.org>
+References: <1495539071-12995-1-git-send-email-a.perevalov@samsung.com>
+	<CGME20170523113128eucas1p17a89f8cb47d5731c50f94c3218ba155f@eucas1p1.samsung.com>
+	<1495539071-12995-5-git-send-email-a.perevalov@samsung.com>
+	<20170524023629.GD3873@pxdev.xzpeter.org>
+Subject: Re: [Qemu-devel] [PATCH V6 04/10] migration: split
+ ufd_version_check onto receive/request features part
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,126 +36,199 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Juan Quintela <quintela@redhat.com>
-Cc: Bharata B Rao <bharata@linux.vnet.ibm.com>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, sam.bobroff@au1.ibm.com, rnsastry@linux.vnet.ibm.com, sjitindarsingh@gmail.com, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+To: Peter Xu <peterx@redhat.com>
+Cc: i.maximets@samsung.com, qemu-devel@nongnu.org, dgilbert@redhat.com
 
+Hi, Peter,
 
---p11K2BJEgMZL61bg
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+On Wed, May 24, 2017 at 10:36:29AM +0800, Peter Xu wrote:
+> On Tue, May 23, 2017 at 02:31:05PM +0300, Alexey Perevalov wrote:
+> > This modification is necessary for userfault fd features which are
+> > required to be requested from userspace.
+> > UFFD_FEATURE_THREAD_ID is a one of such "on demand" feature, which will
+> > be introduced in the next patch.
+> > 
+> > QEMU have to use separate userfault file descriptor, due to
+> > userfault context has internal state, and after first call of
+> > ioctl UFFD_API it changes its state to UFFD_STATE_RUNNING (in case of
+> > success), but kernel while handling ioctl UFFD_API expects UFFD_STATE_WAIT_API.
+> > So only one ioctl with UFFD_API is possible per ufd.
+> > 
+> > Signed-off-by: Alexey Perevalov <a.perevalov@samsung.com>
+> 
+> Hi, Alexey,
+> 
+> Mostly good to me, some nitpicks below.
+> 
+> > ---
+> >  migration/postcopy-ram.c | 100 ++++++++++++++++++++++++++++++++++++++++++-----
+> >  1 file changed, 91 insertions(+), 9 deletions(-)
+> > 
+> > diff --git a/migration/postcopy-ram.c b/migration/postcopy-ram.c
+> > index 3ed78bf..4f3f495 100644
+> > --- a/migration/postcopy-ram.c
+> > +++ b/migration/postcopy-ram.c
+> > @@ -59,32 +59,114 @@ struct PostcopyDiscardState {
+> >  #include <sys/eventfd.h>
+> >  #include <linux/userfaultfd.h>
+> >  
+> > -static bool ufd_version_check(int ufd, MigrationIncomingState *mis)
+> > +
+> > +/**
+> > + * receive_ufd_features: check userfault fd features, to request only supported
+> > + * features in the future.
+> > + *
+> > + * Returns: true on success
+> > + *
+> > + * __NR_userfaultfd - should be checked before
+> 
+> I don't see this line necessary. After all we will detect the error no
+> matter what...
+Yes, because in this function it has a check already, but that check
+isn't odd.
+So comment will be removed.
+> 
+> > + *  @features: out parameter will contain uffdio_api.features provided by kernel
+> > + *              in case of success
+> > + */
+> > +static bool receive_ufd_features(uint64_t *features)
+> >  {
+> > -    struct uffdio_api api_struct;
+> > -    uint64_t ioctl_mask;
+> > +    struct uffdio_api api_struct = {0};
+> > +    int ufd;
+> > +    bool ret = true;
+> > +
+> > +    /* if we are here __NR_userfaultfd should exists */
+> > +    ufd = syscall(__NR_userfaultfd, O_CLOEXEC);
+> > +    if (ufd == -1) {
+> > +        error_report("%s: syscall __NR_userfaultfd failed: %s", __func__,
+> > +                     strerror(errno));
+> > +        return false;
+> > +    }
+> >  
+> > +    /* ask features */
+> >      api_struct.api = UFFD_API;
+> >      api_struct.features = 0;
+> >      if (ioctl(ufd, UFFDIO_API, &api_struct)) {
+> > -        error_report("%s: UFFDIO_API failed: %s", __func__
+> > +        error_report("%s: UFFDIO_API failed: %s", __func__,
+> >                       strerror(errno));
+> > +        ret = false;
+> > +        goto release_ufd;
+> > +    }
+> > +
+> > +    *features = api_struct.features;
+> > +
+> > +release_ufd:
+> > +    close(ufd);
+> > +    return ret;
+> > +}
+> > +
+> > +/**
+> > + * request_ufd_features: this function should be called only once on a newly
+> > + * opened ufd, subsequent calls will lead to error.
+> > + *
+> > + * Returns: true on succes
+> > + *
+> > + * @ufd: fd obtained from userfaultfd syscall
+> > + * @features: bit mask see UFFD_API_FEATURES
+> > + */
+> > +static bool request_ufd_features(int ufd, uint64_t features)
+> > +{
+> > +    struct uffdio_api api_struct = {0};
+> > +    uint64_t ioctl_mask;
+> > +
+> > +    api_struct.api = UFFD_API;
+> > +    api_struct.features = features;
+> > +    if (ioctl(ufd, UFFDIO_API, &api_struct)) {
+> > +        error_report("%s failed: UFFDIO_API failed: %s", __func__,
+> > +                strerror(errno));
+> 
+> Maybe we can indent this line to follow this file's rule?
+> 
+>     error_report("%s failed: UFFDIO_API failed: %s", __func__,
+>                  strerror(errno));
+looks like I missed that rule.
+> 
+> >          return false;
+> >      }
+> >  
+> > -    ioctl_mask = (__u64)1 << _UFFDIO_REGISTER |
+> > -                 (__u64)1 << _UFFDIO_UNREGISTER;
+> > +    ioctl_mask = 1 << _UFFDIO_REGISTER |
+> > +                 1 << _UFFDIO_UNREGISTER;
+> 
+> Could I ask why we explicitly removed (__u64) here? Since I see the
+> old one better.
+maybe my change not robust, in any case thank to point me, but now I
+think, here should be a constant instead of ioctl_mask, like
+UFFD_API_IOCTLS, the total meaning of that check it's make sure kernel
+returns to us no error and accepted features.
+ok, from the beginning:
 
-On Wed, May 24, 2017 at 08:28:59AM +0200, Juan Quintela wrote:
-> Bharata B Rao <bharata@linux.vnet.ibm.com> wrote:
-> > Introduce a new function unregister_savevm_live() to unregister the vms=
-tate
-> > handlers registered via register_savevm_live().
-> >
-> > register_savevm() allocates SaveVMHandlers while register_savevm_live()
-> > gets passed with SaveVMHandlers. During unregistration, we  want to
-> > free SaveVMHandlers in the former case but not free in the latter case.
-> > Hence this new API is needed to differentiate this.
-> >
-> > This new API will be needed by PowerPC to unregister the HTAB savevm
-> > handlers.
-> >
-> > Signed-off-by: Bharata B Rao <bharata@linux.vnet.ibm.com>
-> > Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
-> > Cc: Juan Quintela <quintela@redhat.com>
-> > Cc: Dr. David Alan Gilbert <dgilbert@redhat.com>
->=20
-> Hi
->=20
-> How about this one?
-> I just test compiled it.
->=20
-> Advantage from my point of view is that we always do the right thing.
-> And as migration code already knows if it has to be freed or not, I
-> think it is a better API.
->=20
-> What do you think?
+if we request unsupported feature (we check it before) or internal
+state of userfault ctx inside kernel isn't UFFD_STATE_WAIT_API (for
+example we are in the middle of the coping process)
+	ioctl should end with EINVAL error and ioctls field in
+	uffdio_api will be empty
 
-I think this is a better approach.  Do you want to push this one
-directly, Juan, or do you want me to take it through my tree?
+Right now I think ioctls check for UFFD_API is not necessary.
+We just say here, we will use _UFFDIO_REGISTER, _UFFDIO_UNREGISTER,
+but kernel supports it unconditionally, by contrast with
+UFFDIO_REGISTER ioctl - it also returns ioctl field in uffdio_register
+structure, here can be a variations.
+> 
+> >      if ((api_struct.ioctls & ioctl_mask) != ioctl_mask) {
+> >          error_report("Missing userfault features: %" PRIx64,
+> >                       (uint64_t)(~api_struct.ioctls & ioctl_mask));
+> >          return false;
+> >      }
+> >  
+> > +    return true;
+> > +}
+> > +
+> > +static bool ufd_check_and_apply(int ufd, MigrationIncomingState *mis)
+> > +{
+> > +    uint64_t asked_features = 0;
+> > +    static uint64_t supported_features;
+> > +
+> > +    /*
+> > +     * it's not possible to
+> > +     * request UFFD_API twice per one fd
+> > +     * userfault fd features is persistent
+> > +     */
+> > +    if (!supported_features) {
+> 
+> I would prefer not having this static variable. After all, this
+> function call is rare, and the receive_ufd_features() is not that slow
+> as well.
+ok ) for the sake of low code complexity
+> 
+> > +        if (!receive_ufd_features(&supported_features)) {
+> > +            error_report("%s failed", __func__);
+> > +            return false;
+> > +        }
+> > +    }
+> > +
+> > +    /*
+> > +     * request features, even if asked_features is 0, due to
+> > +     * kernel expects UFFD_API before UFFDIO_REGISTER, per
+> > +     * userfault file descriptor
+> > +     */
+> > +    if (!request_ufd_features(ufd, asked_features)) {
+> > +        error_report("%s failed: features %" PRIu64, __func__,
+> > +                asked_features);
+> 
+> Better indent?
+> 
+> Thanks,
+> 
+> -- 
+> Peter Xu
+> 
 
->=20
-> Later, Juan.
->=20
-> commit 6e71fac7a9c29cef9625135c58ce59ccfbb3b86f
-> Author: Juan Quintela <quintela@redhat.com>
-> Date:   Wed May 24 08:25:06 2017 +0200
->=20
->     migration: Allow to free save_live handlers
->    =20
->     Migration save_live handlers have an ops member that is not dynamic.
->     Add a new member is_allocated that remembers if ops has to be freed.
->    =20
->     Signed-off-by: Juan Quintela <quintela@redhat.com>
->=20
-> diff --git a/include/migration/vmstate.h b/include/migration/vmstate.h
-> index f97411d..1d20e30 100644
-> --- a/include/migration/vmstate.h
-> +++ b/include/migration/vmstate.h
-> @@ -57,6 +57,8 @@ typedef struct SaveVMHandlers {
->                                uint64_t *non_postcopiable_pending,
->                                uint64_t *postcopiable_pending);
->      LoadStateHandler *load_state;
-> +    /* Has been allocated by migratation code */
-> +    bool is_allocated;
->  } SaveVMHandlers;
-> =20
->  int register_savevm(DeviceState *dev,
-> diff --git a/migration/savevm.c b/migration/savevm.c
-> index d971e5e..187f386 100644
-> --- a/migration/savevm.c
-> +++ b/migration/savevm.c
-> @@ -628,6 +628,7 @@ int register_savevm(DeviceState *dev,
->      SaveVMHandlers *ops =3D g_new0(SaveVMHandlers, 1);
->      ops->save_state =3D save_state;
->      ops->load_state =3D load_state;
-> +    ops->is_allocated =3D true;
->      return register_savevm_live(dev, idstr, instance_id, version_id,
->                                  ops, opaque);
->  }
-> @@ -651,7 +652,9 @@ void unregister_savevm(DeviceState *dev, const char *=
-idstr, void *opaque)
->          if (strcmp(se->idstr, id) =3D=3D 0 && se->opaque =3D=3D opaque) {
->              QTAILQ_REMOVE(&savevm_state.handlers, se, entry);
->              g_free(se->compat);
-> -            g_free(se->ops);
-> +            if (se->ops->is_allocated) {
-> +                g_free(se->ops);
-> +            }
->              g_free(se);
->          }
->      }
->=20
+-- 
 
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---p11K2BJEgMZL61bg
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-
-iQIcBAEBCAAGBQJZJSnfAAoJEGw4ysog2bOS7M8QAKgqZ+MpCksJuNAOrf72WYmg
-MBXMgY2vM+PMr9TDkEmwDfu053HniHKDghSdOf+8vZmm+YDYGFwrFp1yLsjrzVQl
-S07GhO4+3jZNKSjLeNygwhxjccCkm06vxz1/jHRdM9Dm7BpnFil3DXSQ/YTlZ3nV
-v+GcPDMny5p92kmoax4qkVg+qWg+gzv6JSYyhXSayRJXH3g1bdi7ANG3xZuiF9cn
-ILErdDIpsInE0Ht8XJ3ZflDFqzY6NilylcZp4f9qkgYXD/2EmpYC9BlO6VouzIIB
-3rZPLsnhTgdHBqFH2wKsZpv8h4+DvqajnrpVGXg6U6xInFB2++BASsKUwdf8ww4u
-HdNfTuxU1ypY8gaBx11QOav46wp4PvwdzoJRW/2KP/tIbhOvXE61fQrUvfR93OKN
-qo7xy1gbynEJZQHovg1LlbAuxCeWW9tx3+UMsoc5s3ORNwb2/vTmkRLXLeGmH+8n
-KYAO5sovFPxtYQndTx4OGbVgHDZ6BsnX81hWjJB4HFy525VFpeUzFlYWgCMZZpgi
-If0gpr3vbg0WSYseJEsURSt2z3WAJoyVQMVhQGd0kRkWijIJcitQ9ARu7ZbFhGKI
-J7bHlo8uq7QmEoXGkTur4IsU/VcV/zY+PpjGI3cWsjaROWyztJpT69vCOakwx7kf
-RRs25CK2K3K8+6znIT71
-=pE7o
------END PGP SIGNATURE-----
-
---p11K2BJEgMZL61bg--
+BR
+Alexey
