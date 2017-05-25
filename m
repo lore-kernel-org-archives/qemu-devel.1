@@ -1,26 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37151)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40460)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1dDwS3-0004g4-Vy
-	for qemu-devel@nongnu.org; Thu, 25 May 2017 13:21:32 -0400
+	(envelope-from <no-reply@patchew.org>) id 1dDwlm-00044T-P2
+	for qemu-devel@nongnu.org; Thu, 25 May 2017 13:41:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1dDwS0-0004KI-Sf
-	for qemu-devel@nongnu.org; Thu, 25 May 2017 13:21:32 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:57126)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1dDwS0-0004K0-M7
-	for qemu-devel@nongnu.org; Thu, 25 May 2017 13:21:28 -0400
-Date: Thu, 25 May 2017 20:21:16 +0300
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20170525202109-mutt-send-email-mst@kernel.org>
-References: <20170524090520.321-1-maxime.coquelin@redhat.com>
-	<20170525005724-mutt-send-email-mst@kernel.org>
-	<3f613ef1-0d8b-3d68-ac9d-a3a5c019df26@redhat.com>
+	(envelope-from <no-reply@patchew.org>) id 1dDwli-0002jx-DQ
+	for qemu-devel@nongnu.org; Thu, 25 May 2017 13:41:54 -0400
+Resent-Message-Id: <E1dDwli-0002jx-DQ@eggs.gnu.org>
+In-Reply-To: <20170525163225.29954-1-pbonzini@redhat.com>
+Message-ID: <149573409578.1353.4183057820415976133@c05f1edc8ed1>
+Reply-To: <qemu-devel@nongnu.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <3f613ef1-0d8b-3d68-ac9d-a3a5c019df26@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2] vhost-user: pass message as a pointer
- to process_message_reply()
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Thu, 25 May 2017 10:41:36 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PATCH v3 00/18] Block layer thread safety, part 1
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,39 +23,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Maxime Coquelin <maxime.coquelin@redhat.com>
-Cc: zhiyong.yang@intel.com, qemu-devel@nongnu.org, jfreiman@redhat.com, marcandre.lureau@redhat.com
+To: pbonzini@redhat.com
+Cc: famz@redhat.com, qemu-devel@nongnu.orgfamz@redhat.com, stefanha@redhat.com, qemu-block@nongnu.org
 
-On Thu, May 25, 2017 at 05:57:43PM +0200, Maxime Coquelin wrote:
-> 
-> 
-> On 05/24/2017 11:58 PM, Michael S. Tsirkin wrote:
-> > On Wed, May 24, 2017 at 11:05:20AM +0200, Maxime Coquelin wrote:
-> > > process_message_reply() was recently updated to get full message
-> > > content instead of only its request field.
-> > > 
-> > > There is no need to copy all the struct content into the stack,
-> > > so just pass its pointer as const.
-> > > 
-> > > Cc: Zhiyong Yang <zhiyong.yang@intel.com>
-> > > Fixes: 60cd11024f41 ("hw/virtio: fix vhost user fails to startup when MQ")
-> > > Reviewed-by: Jens Freimann <jfreiman@redhat.com>
-> > > Reviewed-by: Zhiyong Yang <zhiyong.yang@intel.com>
-> > > Signed-off-by: Maxime Coquelin <maxime.coquelin@redhat.com>
-> > 
-> > Why "Fixes"? It's not a bugfix, is it? Passing a pointer is
-> > slightly cleaner but it's not a big deal IMHO. I'll apply
-> > but would like to get clarification on this tag.
-> 
-> Right, this is not a bug fix.
-> I noticed this while rebasing my Vhost-user IOMMU series,
-> which will call this function much more often than currently.
-> That said, I haven't done any measurements, and I don't believe it
-> will have a noticeable impact.
-> 
-> Feel free to remove the "Fixes:" line when applying, or I can resend
-> if you prefer.
-> 
-> Maxime
-
-Applied no need to resend.
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKTWVzc2FnZS1pZDogMjAx
+NzA1MjUxNjMyMjUuMjk5NTQtMS1wYm9uemluaUByZWRoYXQuY29tClN1YmplY3Q6IFtRZW11LWRl
+dmVsXSBbUEFUQ0ggdjMgMDAvMThdIEJsb2NrIGxheWVyIHRocmVhZCBzYWZldHksIHBhcnQgMQpU
+eXBlOiBzZXJpZXMKCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKCkJBU0U9
+YmFzZQpuPTEKdG90YWw9JChnaXQgbG9nIC0tb25lbGluZSAkQkFTRS4uIHwgd2MgLWwpCmZhaWxl
+ZD0wCgpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1s
+b2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQoKY29tbWl0cz0iJChnaXQgbG9nIC0tZm9ybWF0PSVIIC0t
+cmV2ZXJzZSAkQkFTRS4uKSIKZm9yIGMgaW4gJGNvbW1pdHM7IGRvCiAgICBlY2hvICJDaGVja2lu
+ZyBQQVRDSCAkbi8kdG90YWw6ICQoZ2l0IGxvZyAtbiAxIC0tZm9ybWF0PSVzICRjKS4uLiIKICAg
+IGlmICEgZ2l0IHNob3cgJGMgLS1mb3JtYXQ9ZW1haWwgfCAuL3NjcmlwdHMvY2hlY2twYXRjaC5w
+bCAtLW1haWxiYWNrIC07IHRoZW4KICAgICAgICBmYWlsZWQ9MQogICAgICAgIGVjaG8KICAgIGZp
+CiAgICBuPSQoKG4rMSkpCmRvbmUKCmV4aXQgJGZhaWxlZAo9PT0gVEVTVCBTQ1JJUFQgRU5EID09
+PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApGcm9t
+IGh0dHBzOi8vZ2l0aHViLmNvbS9wYXRjaGV3LXByb2plY3QvcWVtdQogKiBbbmV3IHRhZ10gICAg
+ICAgICBwYXRjaGV3LzIwMTcwNTI1MTYzODUxLjgwNDctMS1iZXJyYW5nZUByZWRoYXQuY29tIC0+
+IHBhdGNoZXcvMjAxNzA1MjUxNjM4NTEuODA0Ny0xLWJlcnJhbmdlQHJlZGhhdC5jb20KU3dpdGNo
+ZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0JwplOWY2YjJlIGJsb2NrOiBtYWtlIGFjY291bnRpbmcg
+dGhyZWFkLXNhZmUKODdkYjY2NyBibG9jazogaW50cm9kdWNlIGJsb2NrX2FjY291bnRfb25lX2lv
+CmI3ZGNiZGYgYmxvY2s6IHByb3RlY3QgbW9kaWZpY2F0aW9uIG9mIGRpcnR5IGJpdG1hcHMgd2l0
+aCBhIG11dGV4CmNkZDk0YmEgbWlncmF0aW9uL2Jsb2NrOiByZXNldCBkaXJ0eSBiaXRtYXAgYmVm
+b3JlIHJlYWRpbmcKMjJkOGQxMCBibG9jazogaW50cm9kdWNlIGRpcnR5X2JpdG1hcF9tdXRleApl
+NjliOTFkIGJsb2NrOiBwcm90ZWN0IHRyYWNrZWRfcmVxdWVzdHMgYW5kIGZsdXNoX3F1ZXVlIHdp
+dGggcmVxc19sb2NrCmM1MmE3MDggYmxvY2s6IGFjY2VzcyB3cml0ZV9nZW4gd2l0aCBhdG9taWNz
+CjQ1YWEwYjMgYmxvY2s6IHVzZSBTdGF0NjQgZm9yIHdyX2hpZ2hlc3Rfb2Zmc2V0CjlkMjJkNGQg
+dXRpbDogYWRkIHN0YXRzNjQgbW9kdWxlCjM4MWUyNmIgdGhyb3R0bGUtZ3JvdXBzOiBwcm90ZWN0
+IHRocm90dGxlZCByZXF1ZXN0cyB3aXRoIGEgQ29NdXRleApkNDU3YWFiIHRocm90dGxlLWdyb3Vw
+czogZG8gbm90IHVzZSBxZW11X2NvX2VudGVyX25leHQKY2MxNjFlZCB0aHJvdHRsZS1ncm91cHM6
+IG9ubHkgc3RhcnQgb25lIGNvcm91dGluZSBmcm9tIGRyYWluZWRfYmVnaW4KYTViN2ZmYiBibG9j
+azogYWNjZXNzIGlvX3BsdWdnZWQgd2l0aCBhdG9taWMgb3BzCjZhYWU3NDcgYmxvY2s6IGFjY2Vz
+cyB3YWtldXAgd2l0aCBhdG9taWMgb3BzCjY0MWE5YjQgYmxvY2s6IGFjY2VzcyBzZXJpYWxpc2lu
+Z19pbl9mbGlnaHQgd2l0aCBhdG9taWMgb3BzCjZiMWU2ODcgYmxvY2s6IGFjY2VzcyBpb19saW1p
+dHNfZGlzYWJsZWQgd2l0aCBhdG9taWMgb3BzCjRmMTFmYjAgYmxvY2s6IGFjY2VzcyBxdWllc2Nl
+X2NvdW50ZXIgd2l0aCBhdG9taWMgb3BzCjY4MzE0MjggYmxvY2s6IGFjY2VzcyBjb3B5X29uX3Jl
+YWQgd2l0aCBhdG9taWMgb3BzCgo9PT0gT1VUUFVUIEJFR0lOID09PQpDaGVja2luZyBQQVRDSCAx
+LzE4OiBibG9jazogYWNjZXNzIGNvcHlfb25fcmVhZCB3aXRoIGF0b21pYyBvcHMuLi4KQ2hlY2tp
+bmcgUEFUQ0ggMi8xODogYmxvY2s6IGFjY2VzcyBxdWllc2NlX2NvdW50ZXIgd2l0aCBhdG9taWMg
+b3BzLi4uCkNoZWNraW5nIFBBVENIIDMvMTg6IGJsb2NrOiBhY2Nlc3MgaW9fbGltaXRzX2Rpc2Fi
+bGVkIHdpdGggYXRvbWljIG9wcy4uLgpDaGVja2luZyBQQVRDSCA0LzE4OiBibG9jazogYWNjZXNz
+IHNlcmlhbGlzaW5nX2luX2ZsaWdodCB3aXRoIGF0b21pYyBvcHMuLi4KQ2hlY2tpbmcgUEFUQ0gg
+NS8xODogYmxvY2s6IGFjY2VzcyB3YWtldXAgd2l0aCBhdG9taWMgb3BzLi4uCkNoZWNraW5nIFBB
+VENIIDYvMTg6IGJsb2NrOiBhY2Nlc3MgaW9fcGx1Z2dlZCB3aXRoIGF0b21pYyBvcHMuLi4KQ2hl
+Y2tpbmcgUEFUQ0ggNy8xODogdGhyb3R0bGUtZ3JvdXBzOiBvbmx5IHN0YXJ0IG9uZSBjb3JvdXRp
+bmUgZnJvbSBkcmFpbmVkX2JlZ2luLi4uCkNoZWNraW5nIFBBVENIIDgvMTg6IHRocm90dGxlLWdy
+b3VwczogZG8gbm90IHVzZSBxZW11X2NvX2VudGVyX25leHQuLi4KQ2hlY2tpbmcgUEFUQ0ggOS8x
+ODogdGhyb3R0bGUtZ3JvdXBzOiBwcm90ZWN0IHRocm90dGxlZCByZXF1ZXN0cyB3aXRoIGEgQ29N
+dXRleC4uLgpDaGVja2luZyBQQVRDSCAxMC8xODogdXRpbDogYWRkIHN0YXRzNjQgbW9kdWxlLi4u
+CkVSUk9SOiBtZW1vcnkgYmFycmllciB3aXRob3V0IGNvbW1lbnQKIzMyODogRklMRTogdXRpbC9z
+dGF0czY0LmM6MTAxOgorICAgICAgICBzbXBfd21iKCk7CgpFUlJPUjogbWVtb3J5IGJhcnJpZXIg
+d2l0aG91dCBjb21tZW50CiMzNTc6IEZJTEU6IHV0aWwvc3RhdHM2NC5jOjEzMDoKKyAgICAgICAg
+c21wX3dtYigpOwoKdG90YWw6IDIgZXJyb3JzLCAwIHdhcm5pbmdzLCAzMzQgbGluZXMgY2hlY2tl
+ZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkg
+b2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1h
+aW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKQ2hlY2tpbmcgUEFUQ0gg
+MTEvMTg6IGJsb2NrOiB1c2UgU3RhdDY0IGZvciB3cl9oaWdoZXN0X29mZnNldC4uLgpDaGVja2lu
+ZyBQQVRDSCAxMi8xODogYmxvY2s6IGFjY2VzcyB3cml0ZV9nZW4gd2l0aCBhdG9taWNzLi4uCkNo
+ZWNraW5nIFBBVENIIDEzLzE4OiBibG9jazogcHJvdGVjdCB0cmFja2VkX3JlcXVlc3RzIGFuZCBm
+bHVzaF9xdWV1ZSB3aXRoIHJlcXNfbG9jay4uLgpDaGVja2luZyBQQVRDSCAxNC8xODogYmxvY2s6
+IGludHJvZHVjZSBkaXJ0eV9iaXRtYXBfbXV0ZXguLi4KQ2hlY2tpbmcgUEFUQ0ggMTUvMTg6IG1p
+Z3JhdGlvbi9ibG9jazogcmVzZXQgZGlydHkgYml0bWFwIGJlZm9yZSByZWFkaW5nLi4uCkNoZWNr
+aW5nIFBBVENIIDE2LzE4OiBibG9jazogcHJvdGVjdCBtb2RpZmljYXRpb24gb2YgZGlydHkgYml0
+bWFwcyB3aXRoIGEgbXV0ZXguLi4KV0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzMw
+NDogRklMRTogbWlncmF0aW9uL2Jsb2NrLmM6NTM5OgorICAgICAgICAgICAgYmRydl9yZXNldF9k
+aXJ0eV9iaXRtYXBfbG9ja2VkKGJtZHMtPmRpcnR5X2JpdG1hcCwgc2VjdG9yLCBucl9zZWN0b3Jz
+KTsKCnRvdGFsOiAwIGVycm9ycywgMSB3YXJuaW5ncywgMjcyIGxpbmVzIGNoZWNrZWQKCllvdXIg
+cGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNl
+IGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVy
+LCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KQ2hlY2tpbmcgUEFUQ0ggMTcvMTg6IGJs
+b2NrOiBpbnRyb2R1Y2UgYmxvY2tfYWNjb3VudF9vbmVfaW8uLi4KQ2hlY2tpbmcgUEFUQ0ggMTgv
+MTg6IGJsb2NrOiBtYWtlIGFjY291bnRpbmcgdGhyZWFkLXNhZmUuLi4KPT09IE9VVFBVVCBFTkQg
+PT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKCi0tLQpFbWFpbCBnZW5lcmF0
+ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNl
+IHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQGZyZWVsaXN0cy5vcmc=
