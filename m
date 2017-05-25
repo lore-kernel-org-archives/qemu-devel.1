@@ -1,29 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41128)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41891)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <anton.nefedov@virtuozzo.com>) id 1dDwok-0005Ne-3u
-	for qemu-devel@nongnu.org; Thu, 25 May 2017 13:45:00 -0400
+	(envelope-from <eblake@redhat.com>) id 1dDwqf-0006bM-L1
+	for qemu-devel@nongnu.org; Thu, 25 May 2017 13:46:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <anton.nefedov@virtuozzo.com>) id 1dDwof-00042X-59
-	for qemu-devel@nongnu.org; Thu, 25 May 2017 13:44:58 -0400
-Received: from mail-eopbgr20090.outbound.protection.outlook.com
-	([40.107.2.90]:44145
-	helo=EUR02-VE1-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <anton.nefedov@virtuozzo.com>)
-	id 1dDwoe-000408-DL
-	for qemu-devel@nongnu.org; Thu, 25 May 2017 13:44:53 -0400
-References: <1495198042-124203-1-git-send-email-anton.nefedov@virtuozzo.com>
-	<1495198042-124203-4-git-send-email-anton.nefedov@virtuozzo.com>
-	<CAJ+F1CKHOsDjf8_+vkAT8A5Onz+pbP8xwsLT2rOA4wg2UqX5EA@mail.gmail.com>
-From: Anton Nefedov <anton.nefedov@virtuozzo.com>
-Message-ID: <c4f4bf39-871c-1f7d-ebf7-165fc795ddac@virtuozzo.com>
-Date: Thu, 25 May 2017 20:44:43 +0300
+	(envelope-from <eblake@redhat.com>) id 1dDwqe-0005Ar-L6
+	for qemu-devel@nongnu.org; Thu, 25 May 2017 13:46:57 -0400
+References: <20170525152628.37628-1-vsementsov@virtuozzo.com>
+	<20170525152628.37628-2-vsementsov@virtuozzo.com>
+	<3fdd3178-89d7-2819-d040-1e5132d655ec@redhat.com>
+	<28332b32-f9e8-d426-9b54-d46e5774366c@virtuozzo.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <7f22ab2c-e87a-ac26-fe47-7ba0068762c8@redhat.com>
+Date: Thu, 25 May 2017 12:46:46 -0500
 MIME-Version: 1.0
-In-Reply-To: <CAJ+F1CKHOsDjf8_+vkAT8A5Onz+pbP8xwsLT2rOA4wg2UqX5EA@mail.gmail.com>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 3/9] char: chardevice hotswap
+In-Reply-To: <28332b32-f9e8-d426-9b54-d46e5774366c@virtuozzo.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="GxqhFtw71sbLx2XHFn8xCCWJvBCJX5oho"
+Subject: Re: [Qemu-devel] [PATCH 1/7] block: fix comment for
+ bdrv_get_allocated_file_size()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,287 +27,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@gmail.com>, qemu-devel@nongnu.org
-Cc: pbonzini@redhat.com, den@virtuozzo.com
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: armbru@redhat.com, mreitz@redhat.com, kwolf@redhat.com, den@openvz.org
 
-> Hi
->=20
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--GxqhFtw71sbLx2XHFn8xCCWJvBCJX5oho
+From: Eric Blake <eblake@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: armbru@redhat.com, mreitz@redhat.com, kwolf@redhat.com, den@openvz.org
+Message-ID: <7f22ab2c-e87a-ac26-fe47-7ba0068762c8@redhat.com>
+Subject: Re: [PATCH 1/7] block: fix comment for bdrv_get_allocated_file_size()
+References: <20170525152628.37628-1-vsementsov@virtuozzo.com>
+ <20170525152628.37628-2-vsementsov@virtuozzo.com>
+ <3fdd3178-89d7-2819-d040-1e5132d655ec@redhat.com>
+ <28332b32-f9e8-d426-9b54-d46e5774366c@virtuozzo.com>
+In-Reply-To: <28332b32-f9e8-d426-9b54-d46e5774366c@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Hi Marc-Andr=C3=A9, thanks for reviewing, pls see answers below
+On 05/25/2017 12:03 PM, Vladimir Sementsov-Ogievskiy wrote:
+> 25.05.2017 19:32, Eric Blake wrote:
+>> On 05/25/2017 10:26 AM, Vladimir Sementsov-Ogievskiy wrote:
+>>> Current comment is not clear enough: which sparseness is meant, comin=
+g
+>>> from sparse image format or from sparse file system?
+>>>
+>>> For example, if we have qcow2 above raw file on non-sparse file syste=
+m,
+>>> this function will say nothing about unallocated (by qcow2 layer)
+>>> clusters.
+>>>
 
-> On Fri, May 19, 2017 at 4:51 PM Anton Nefedov <address@hidden>
-> wrote:
->=20
->> This patch adds a possibility to change a char device without a frontend
->> removal.
+>>> + * Size of allocated in underlying file system area. Sparseness is
+>>> taken into
+>> Doesn't read well.  Maybe: s/Size of allocated/Allocation size/ ?
 >>
->> 1. Ideally, it would have to happen transparently to a frontend, i.e.
->> frontend would continue its regular operation.
->> However, backends are not stateless and are set up by the frontends
->> via qemu_chr_fe_<> functions, and it's not (generally) possible to repla=
-y
->> that setup entirely in a backend code, as different chardevs respond
->> to the setup calls differently, so do frontends work differently basing
->> on those setup responses.
->> Moreover, some frontend can generally get and save the backend pointer
->> (qemu_chr_fe_get_driver()), and it will become invalid after backend
->> change.
+>>> + * account for sparse file systems. Return < 0 if error or unknown.
+>> I still don't get what we are trying to present.
 >>
->> So, a frontend which would like to support chardev hotswap has to regist=
-er
->> a "backend change" handler, and redo its backend setup there.
->>
->> 2. Write path can be used by multiple threads and thus protected with
->> chr_write_lock.
->> So hotswap also has to be protected so write functions won't access
->> a backend being replaced.
->>
->>
-> Why not use the chr_write_lock then? (rename it chr_lock?)
->=20
-
-chr_write_lock is a Chardev property, it will be gone together with a
-swapped device.
-
-We could remove chr_write_lock and leave only the new be->chr_lock,=20
-since it covers everything; I guess the only problem is mux, where
-multiple CharBackends share the same Chardev.
-
-Would smth like this be better?:
-
-static void char_lock(CharBackend *be)
-{
-     qemu_mutex_lock(be->chr && CHARDEV_IS_MUX(be->chr) ?
-                     &be->chr->chr_lock : &be->chr_lock);
-}
-
-and use this instead of lock(be->chr_lock) and remove chr_write_lock.
-(This would rely on a fact that mux is never hotswapped so be->chr_lock
-is not needed).
-
-
->=20
->> 3. Hotswap function can be called from e.g. a read handler of a monitor
->> socket. This can cause troubles so it's safer to defer execution to
->> a bottom-half (however, it means we cannot return some of the errors
->> synchronously - but most of them we can)
->>
->=20
-> What kind of troubles?
->=20
-
-if someone tried to hotswap monitor, it would look like:
-
-(gdb) bt
-#0 qmp_chardev_change (id=3Did@entry=3D0x7fc24bee7a60 "charmonitor",
-backend=3Dbackend@entry=3D0x7fc24cc28290, errp=3Derrp@entry=3D0x7ffde4d8d4f=
-0)
-at /mnt/code/us-qemu/chardev/char.c:1438
-#1 0x00007fc249fd914b in hmp_chardev_change (mon=3D<optimized out>,
-qdict=3D<optimized out>) at /mnt/code/us-qemu/hmp.c:2252
-#2 0x00007fc249edeece in handle_hmp_command (mon=3Dmon@entry=3D0x7fc24bef87=
-c0,
-cmdline=3D0x7fc24bf2345f "charmonitor
-socket,path=3D/vz/vmprivate/centosos/mon.socket,server,nowait") at
-/mnt/code/us-qemu/monitor.c:3100
-#3 0x00007fc249ee02fa in monitor_command_cb (opaque=3D0x7fc24bef87c0,
-cmdline=3D<optimized out>, readline_opaque=3D<optimized out>)
-at /mnt/code/us-qemu/monitor.c:3897
-#4 0x00007fc24a242428 in readline_handle_byte (rs=3D0x7fc24bf23450,
-ch=3D<optimized out>) at /mnt/code/us-qemu/util/readline.c:393
-#5 0x00007fc249edf0e2 in monitor_read (opaque=3D<optimized out>,
-buf=3D<optimized out>, size=3D<optimized out>)
-at /mnt/code/us-qemu/monitor.c:3880
-#6 0x00007fc24a1deb2b in tcp_chr_read (chan=3D<optimized out>,
-cond=3D<optimized out>, opaque=3D<optimized out>)
-at /mnt/code/us-qemu/chardev/char-socket.c:441
-#7 0x00007fc240997d7a in g_main_dispatch (context=3D0x7fc24beda950) at
-gmain.c:3152
-#8 g_main_context_dispatch (context=3Dcontext@entry=3D0x7fc24beda950) at
-gmain.c:3767
-#9 0x00007fc24a22fe7c in glib_pollfds_poll () at
-/mnt/code/us-qemu/util/main-loop.c:213
-#10 os_host_main_loop_wait (timeout=3D<optimized out>) at
-/mnt/code/us-qemu/util/main-loop.c:261
-#11 main_loop_wait (nonblocking=3Dnonblocking@entry=3D0) at
-/mnt/code/us-qemu/util/main-loop.c:517
-#12 0x00007fc249e9a19a in main_loop () at /mnt/code/us-qemu/vl.c:1900
-#13 main (argc=3D<optimized out>, argv=3D<optimized out>, envp=3D<optimized
-out>) at /mnt/code/us-qemu/vl.c:4732
-
-i.e. hotswap the device that is in tcp_chr_read (frame #6), and can
-potentially be accessed (with old pointer on a stack) after it is
-destroyed by qmp_chardev_change()
-
-however, there is no support for monitor hotswap in the patchset. Maybe
-it's not worth to mess with bottom-halves at all? It causes problems,
-like those mentioned in your further comments
-
 
 >>
->> Signed-off-by: Anton Nefedov <address@hidden>
->> Reviewed-by: Vladimir Sementsov-Ogievskiy <address@hidden>
->> ---
->>  chardev/char.c        | 147
->> ++++++++++++++++++++++++++++++++++++++++++++++----
->>  include/sysemu/char.h |  10 ++++
->>  qapi-schema.json      |  40 ++++++++++++++
->>  3 files changed, 187 insertions(+), 10 deletions(-)
->>
->> -bool qemu_chr_fe_init(CharBackend *b, Chardev *s, Error **errp)
->> +static bool fe_connect(CharBackend *b, Chardev *s, Error **errp)
->>  {
->>
->=20
-> I would rather keep a qemu_chr prefix for consistency
->=20
+>> I think we still need to do a better job at writing a precise comment.=
 
-Done.
+>>
+>=20
+> bdrv_get_allocated_file_size is not related to qcow2, as qcow2 doesn't
+> support it. So, it is finally just raw_get_allocated_file_size, which
+> returns st.st_blocks * 512 after fstat(s->fd).
+>=20
+> It will correspond to qcow2 sparseness if qcow2 discarded corresponding=
 
->=20
->>      int tag =3D 0;
->>
->> @@ -507,6 +516,17 @@ unavailable:
->>      return false;
->>  }
->>
->> +bool qemu_chr_fe_init(CharBackend *b, Chardev *s, Error **errp)
->> +{
->> +    if (!fe_connect(b, s, errp)) {
->> +        return false;
->> +    }
->> +
->> +    qemu_mutex_init(&b->chr_lock);
->> +    b->hotswap_bh =3D NULL;
->> +    return true;
->> +}
->> +
->>  static bool qemu_chr_is_busy(Chardev *s)
->>  {
->>      if (CHARDEV_IS_MUX(s)) {
->> @@ -531,6 +551,10 @@ void qemu_chr_fe_deinit(CharBackend *b)
->>              d->backends[b->tag] =3D NULL;
->>          }
->>          b->chr =3D NULL;
->> +        qemu_mutex_destroy(&b->chr_lock);
->> +        if (b->hotswap_bh) {
->> +            qemu_bh_delete(b->hotswap_bh);
->>
->=20
-> Could there be a chr_new leak here?
->=20
->=20
+> clusters in bs->file and if underlying fs is sparse.
 
-Yes you're right it can leak.
-Maybe we don't need this asynchrony, see above, otherwise I will think
-how to fix
+Okay, that helps.  How about this wording:
 
->> +        }
->>      }
->>  }
->>
->> @@ -1308,6 +1332,109 @@ ChardevReturn *qmp_chardev_add(const char *id,
->> ChardevBackend *backend,
->>      return ret;
->>  }
->>
->> +static void chardev_change_bh(void *opaque)
->> +{
->> +    Chardev *chr_new =3D opaque;
->> +    const char *id =3D chr_new->label;
->> +    Chardev *chr =3D qemu_chr_find(id);
->>
->=20
-> Could chr be gone in the meantime? potentially
->=20
->=20
+Allocation size of the underlying file system area.  Sparseness is taken
+into account (holes do not contribute to this size).  Return < 0 if
+error or unknown.
 
-Potentially yes. Will fix (clean chr_new and bail out).
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
 
 
->> +
->> +    chr_new =3D qemu_chardev_new(NULL,
->> object_class_get_name(OBJECT_CLASS(cc)),
->> +                               backend, errp);
->> +    chr_new->label =3D g_strdup(id);
->>
->=20
-> move it below the check for !chr_new
->=20
->=20
+--GxqhFtw71sbLx2XHFn8xCCWJvBCJX5oho
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-my bad, thanks
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
->> +    if (!chr_new) {
->> +        return NULL;
->> +    }
->> +
->> +    if (chr->be->hotswap_bh) {
->> +        qemu_bh_delete(chr->be->hotswap_bh);
->> +    }
->>
->=20
-> Is it necessary to delete and recreate the bh? Could there be a chr_new
-> leak if the bh didn't run? It's probably best to deny backend change whil=
-e
-> one is going on.
->=20
->=20
+iQEcBAEBCAAGBQJZJxiGAAoJEKeha0olJ0Nq6TYH+wd7k9Tl2lhre9FPETUDDEZE
+HJC12Lt+WilZoW+2OIVOTw5+ufBHKoAJmX+SxlUf+PrEAdpCoBT5xyXfklr2gdIT
+cs+6JYFoi7ziM5giFRsHtMpvfrppquf8ZASw9NWjdgtpvtY1sLiG9+y/PxLc68Se
+vj/TXsKGafv/yXCX+GMjNMEa69L2yWoWRwmOWXguuNn1OVPMdeIubTBYUITHsQgc
+Utb8JCb9kr2uj2rbPoo12VDhB8QyuCi9mWuXs7uaZELwUVNCelsdmMmtRozbrbja
+t5tikTltDDvhUgL6cOl1k3uFooKqvIjTS80hQnVoaW6888UHp1+eSUe7QLQLEHs=
+=oqad
+-----END PGP SIGNATURE-----
 
-Hmm probably not, but new() is the only function that sets the argument.
-Will think how to fix this if we decide to keep the bh.
-
->> +    chr->be->hotswap_bh =3D qemu_bh_new(chardev_change_bh, chr_new);
->> +    qemu_bh_schedule(chr->be->hotswap_bh);
->> +
->> +    ret =3D g_new0(ChardevReturn, 1);
->> +    if (CHARDEV_IS_PTY(chr_new)) {
->> +        ret->pty =3D g_strdup(chr_new->filename + 4);
->> +        ret->has_pty =3D true;
->> +    }
->> +
->> +    return ret;
->>
->=20
-> ah, potentially a case where qmp-async would be better..
->=20
-> +}
->> +
->>  void qmp_chardev_remove(const char *id, Error **errp)
->>  {
->>      Chardev *chr;
->> diff --git a/include/sysemu/char.h b/include/sysemu/char.h
->> index 9f8df07..68c7876 100644
->> --- a/include/sysemu/char.h
->> +++ b/include/sysemu/char.h
->> @@ -92,6 +92,8 @@ typedef struct CharBackend {
->>      void *opaque;
->>      int tag;
->>      int fe_open;
->> +    QemuMutex chr_lock;
->> +    QEMUBH *hotswap_bh;
->>  } CharBackend;
->>
->>  struct Chardev {
->> @@ -141,6 +143,14 @@ void qemu_chr_parse_common(QemuOpts *opts,
->> ChardevCommon *backend);
->>   */
->>  Chardev *qemu_chr_new(const char *label, const char *filename);
->>
->> +/**
->> + * @qemu_chr_change:
->> + *
->> + * Change an existing character backend
->> + *
->> + * @opts the new backend options
->> + */
->> +void qemu_chr_change(QemuOpts *opts, Error **errp);
->>
->>
-> This patch needs some test-char.c tests.
->=20
->=20
-
-Will do
-
-/Anton
+--GxqhFtw71sbLx2XHFn8xCCWJvBCJX5oho--
