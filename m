@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48862)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49098)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aurelien@aurel32.net>) id 1dE1i4-0002KU-7o
-	for qemu-devel@nongnu.org; Thu, 25 May 2017 18:58:27 -0400
+	(envelope-from <aurelien@aurel32.net>) id 1dE1iZ-0002c4-KB
+	for qemu-devel@nongnu.org; Thu, 25 May 2017 18:58:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aurelien@aurel32.net>) id 1dE1i3-0000dD-Dp
-	for qemu-devel@nongnu.org; Thu, 25 May 2017 18:58:24 -0400
-Received: from hall.aurel32.net ([2001:bc8:30d7:100::1]:38212)
+	(envelope-from <aurelien@aurel32.net>) id 1dE1iY-0000np-Q8
+	for qemu-devel@nongnu.org; Thu, 25 May 2017 18:58:55 -0400
+Received: from hall.aurel32.net ([2001:bc8:30d7:100::1]:38218)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <aurelien@aurel32.net>)
-	id 1dE1i3-0000cp-7f
-	for qemu-devel@nongnu.org; Thu, 25 May 2017 18:58:23 -0400
-Date: Fri, 26 May 2017 00:58:21 +0200
+	id 1dE1iY-0000nZ-Jl
+	for qemu-devel@nongnu.org; Thu, 25 May 2017 18:58:54 -0400
+Date: Fri, 26 May 2017 00:58:52 +0200
 From: Aurelien Jarno <aurelien@aurel32.net>
-Message-ID: <20170525225821.jrj7sskqevp2jpli@aurel32.net>
+Message-ID: <20170525225852.nxa5yvou2obkqsm3@aurel32.net>
 References: <20170524220827.21154-1-rth@twiddle.net>
-	<20170524220827.21154-3-rth@twiddle.net>
+	<20170524220827.21154-4-rth@twiddle.net>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20170524220827.21154-3-rth@twiddle.net>
-Subject: Re: [Qemu-devel] [PATCH 2/4] target/s390x: End the TB after EXECUTE
+In-Reply-To: <20170524220827.21154-4-rth@twiddle.net>
+Subject: Re: [Qemu-devel] [PATCH 3/4] target/s390x: Implement EXECUTE via
+ new TranslationBlock
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,15 +33,22 @@ To: Richard Henderson <rth@twiddle.net>
 Cc: qemu-devel@nongnu.org, thuth@redhat.com
 
 On 2017-05-24 15:08, Richard Henderson wrote:
-> This split will be required for implementing EXECUTE properly.
-> Do this now as a separate step to aid comparison of before and
-> after TB listings.
+> Previously, helper_ex would construct the insn and then implement
+> the insn via direct calls other helpers.  This was sufficient to
+> boot Linux but that is all.
+> 
+> It is easy enough to go the whole nine yards by stashing state for
+> EXECUTE within the cpu, and then rely on a new TB to be created
+> that properly and completely interprets the insn.
 > 
 > Signed-off-by: Richard Henderson <rth@twiddle.net>
 > ---
->  target/s390x/mem_helper.c | 54 ++++++++++++++++++++++++++++-------------------
->  target/s390x/translate.c  |  6 +++++-
->  2 files changed, 37 insertions(+), 23 deletions(-)
+>  target/s390x/cpu.h        |   4 +-
+>  target/s390x/helper.c     |   5 ++
+>  target/s390x/machine.c    |  19 ++++++++
+>  target/s390x/mem_helper.c | 118 +++++-----------------------------------------
+>  target/s390x/translate.c  |  80 ++++++++++++++++++-------------
+>  5 files changed, 85 insertions(+), 141 deletions(-)
 
 Reviewed-by: Aurelien Jarno <aurelien@aurel32.net>
 
