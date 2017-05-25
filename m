@@ -1,21 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33059)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34876)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1dDufA-0004qE-K5
-	for qemu-devel@nongnu.org; Thu, 25 May 2017 11:26:57 -0400
+	(envelope-from <marcandre.lureau@gmail.com>) id 1dDukZ-0002WW-6B
+	for qemu-devel@nongnu.org; Thu, 25 May 2017 11:32:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1dDuf5-0002fr-In
-	for qemu-devel@nongnu.org; Thu, 25 May 2017 11:26:56 -0400
-Received: from mailhub.sw.ru ([195.214.232.25]:29617 helo=relay.sw.ru)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
-	id 1dDuf5-0002fF-79
-	for qemu-devel@nongnu.org; Thu, 25 May 2017 11:26:51 -0400
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Thu, 25 May 2017 18:26:24 +0300
-Message-Id: <20170525152628.37628-4-vsementsov@virtuozzo.com>
-In-Reply-To: <20170525152628.37628-1-vsementsov@virtuozzo.com>
-References: <20170525152628.37628-1-vsementsov@virtuozzo.com>
-Subject: [Qemu-devel] [PATCH 3/7] qcow2: add .bdrv_get_format_allocated_size
+	(envelope-from <marcandre.lureau@gmail.com>) id 1dDukX-0004eH-JS
+	for qemu-devel@nongnu.org; Thu, 25 May 2017 11:32:31 -0400
+Received: from mail-lf0-x244.google.com ([2a00:1450:4010:c07::244]:35681)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+	id 1dDukX-0004e2-84
+	for qemu-devel@nongnu.org; Thu, 25 May 2017 11:32:29 -0400
+Received: by mail-lf0-x244.google.com with SMTP id 99so13706178lfu.2
+	for <qemu-devel@nongnu.org>; Thu, 25 May 2017 08:32:29 -0700 (PDT)
+MIME-Version: 1.0
+References: <1494338586-13416-1-git-send-email-wangyunjian@huawei.com>
+	<CAJ+F1CKL3vgJSSb8JGzNNBDS0xGKhtuP+2JEy1tsszauBMAUyA@mail.gmail.com>
+	<34EFBCA9F01B0748BEB6B629CE643AE60BB56000@DGGEMA505-MBX.china.huawei.com>
+In-Reply-To: <34EFBCA9F01B0748BEB6B629CE643AE60BB56000@DGGEMA505-MBX.china.huawei.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Thu, 25 May 2017 15:32:16 +0000
+Message-ID: <CAJ+F1CK61iRRtq7G_AiS5efhYK+VLJUzkGG8mtju00tOzDve0g@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] vhost-user: fix watcher need be removed
+ when vhost-user hotplug
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,112 +32,106 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: eblake@redhat.com, armbru@redhat.com, mreitz@redhat.com, kwolf@redhat.com, vsementsov@virtuozzo.com, den@openvz.org
+To: wangyunjian <wangyunjian@huawei.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "jasowang@redhat.com" <jasowang@redhat.com>, caihe <caihe@huawei.com>, "mst@redhat.com" <mst@redhat.com>
 
-Realize .bdrv_get_format_allocated_size interface.
+On Wed, May 10, 2017 at 5:55 AM wangyunjian <wangyunjian@huawei.com> wrote:
 
-Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
----
- block/qcow2-refcount.c | 61 ++++++++++++++++++++++++++++++++++++++++++++++++++
- block/qcow2.c          |  2 ++
- block/qcow2.h          |  2 ++
- 3 files changed, 65 insertions(+)
+> On Tue, May 9, 2017 at 5:04 PM Yunjian Wang <wangyunjian@huawei.com>
+> wrote:
+>
+> > > From: w00273186 <wangyunjian@huawei.com>
+> > >
+> > > "nc" is freed after hotplug vhost-user, but the watcher don't be
+> removed.
+> > >
+> >
+> >
+> > > The QEMU crash when the watcher access the "nc" on socket disconnect.
+> > >
+> > >
+> > Do you have a reproducer? thanks
+> >
+>
+> reproduce steps:
+>
+> 1. virsh attach-device vm0 vhost-user.xml
+> 2. virsh detach-device vm0 vhost-user.xml
+> 3. virsh attach-device vm0 vhost-user.xml
+> 4. service openvswitch restart
+> 5. repeat step 2~4
+>
+> The vhost-user xml:
+>
+>     <interface type=3D'vhostuser'>
+>       <mac address=3D'00:01:01:00:10:41'/>
+>       <source type=3D'unix' path=3D'/var/run/vhost-user/tap1' mode=3D'cli=
+ent'/>
+>       <model type=3D'virtio'/>
+>       <driver queues=3D'8'/>
+> </interface>
+>
+> Thanks
+>
+> >
+> > > Call Trace:
+> > >     #0  object_get_class (obj=3Dobj@entry=3D0x2) at qom/object.c:751
+> > >     #1  0x00007fc031c79f41 in qemu_chr_fe_disconnect (be=3D<optimized
+> out>)
+> > > at chardev/char.c:1048
+> > >     #2  0x00007fc031bd62e0 in net_vhost_user_watch (chan=3D<optimized
+> out>,
+> > > cond=3D<optimized out>, opaque=3D<optimized out>) at net/vhost-user.c=
+:191
+> > >     #3  0x00007fc02c23e99a in g_main_context_dispatch () from
+> > > /lib64/libglib-2.0.so.0
+> > >     #4  0x00007fc031ccfc0c in glib_pollfds_poll () at
+> util/main-loop.c:213
+> > >     #5  os_host_main_loop_wait (timeout=3D<optimized out>) at
+> > > util/main-loop.c:261
+> > >     #6  main_loop_wait (nonblocking=3Dnonblocking@entry=3D0) at
+> > > util/main-loop.c:517
+> > >     #7  0x00007fc03193bc87 in main_loop () at vl.c:1899
+> > >     #8  main (argc=3D<optimized out>, argv=3D<optimized out>,
+> envp=3D<optimized
+> > > out>) at vl.c:4719
+> > >
+> > > Signed-off-by: Yunjian Wang <wangyunjian@huawei.com>
+> > > ---
+> > >  net/vhost-user.c | 4 ++++
+> > >  1 file changed, 4 insertions(+)
+> > >
+> > > diff --git a/net/vhost-user.c b/net/vhost-user.c
+> > > index 00a0c1c..5cc2178 100644
+> > > --- a/net/vhost-user.c
+> > > +++ b/net/vhost-user.c
+> > > @@ -155,6 +155,10 @@ static void vhost_user_cleanup(NetClientState *n=
+c)
+> > >
+> > >          qemu_chr_fe_deinit(&s->chr);
+> > >          object_unparent(OBJECT(chr));
+> > > +        if (s->watch) {
+> > > +            g_source_remove(s->watch);
+> > > +            s->watch =3D 0;
+> > > +        }
+> > >      }
+>
 
-diff --git a/block/qcow2-refcount.c b/block/qcow2-refcount.c
-index 7c06061aae..45adf6bd1d 100644
---- a/block/qcow2-refcount.c
-+++ b/block/qcow2-refcount.c
-@@ -2931,3 +2931,64 @@ done:
-     qemu_vfree(new_refblock);
-     return ret;
- }
-+
-+typedef struct NbAllocatedClustersCo {
-+    BlockDriverState *bs;
-+    int64_t ret;
-+} NbAllocatedClustersCo;
-+
-+static void coroutine_fn qcow2_get_format_allocated_size_co_entry(void *opaque)
-+{
-+    NbAllocatedClustersCo *nbco = opaque;
-+    BlockDriverState *bs = nbco->bs;
-+    BDRVQcow2State *s = bs->opaque;
-+    int64_t size, nb_clusters, nb_allocated = 0, i;
-+    int ret = 0;
-+
-+    size = bdrv_getlength(bs->file->bs);
-+    if (size < 0) {
-+        nbco->ret = size;
-+        return;
-+    }
-+
-+    nb_clusters = size_to_clusters(s, size);
-+
-+    qemu_co_mutex_lock(&s->lock);
-+
-+    for (i = 0; i < nb_clusters; ++i) {
-+        uint64_t refcount;
-+        ret = qcow2_get_refcount(bs, i, &refcount);
-+        if (ret < 0) {
-+            nbco->ret = ret;
-+            qemu_co_mutex_unlock(&s->lock);
-+            return;
-+        }
-+        if (refcount > 0) {
-+            nb_allocated++;
-+        }
-+    }
-+
-+    qemu_co_mutex_unlock(&s->lock);
-+
-+    nbco->ret = nb_allocated << s->cluster_bits;
-+}
-+
-+int64_t qcow2_get_format_allocated_size(BlockDriverState *bs)
-+{
-+    NbAllocatedClustersCo nbco = {
-+        .bs = bs,
-+        .ret = -EINPROGRESS
-+    };
-+
-+    if (qemu_in_coroutine()) {
-+        qcow2_get_format_allocated_size_co_entry(&nbco);
-+    } else {
-+        Coroutine *co =
-+            qemu_coroutine_create(qcow2_get_format_allocated_size_co_entry,
-+                                  &nbco);
-+        qemu_coroutine_enter(co);
-+        BDRV_POLL_WHILE(bs, nbco.ret == -EINPROGRESS);
-+    }
-+
-+    return nbco.ret;
-+}
-diff --git a/block/qcow2.c b/block/qcow2.c
-index a8d61f0981..274f213d16 100644
---- a/block/qcow2.c
-+++ b/block/qcow2.c
-@@ -3469,6 +3469,8 @@ BlockDriver bdrv_qcow2 = {
- 
-     .bdrv_detach_aio_context  = qcow2_detach_aio_context,
-     .bdrv_attach_aio_context  = qcow2_attach_aio_context,
-+
-+    .bdrv_get_format_allocated_size = qcow2_get_format_allocated_size,
- };
- 
- static void bdrv_qcow2_init(void)
-diff --git a/block/qcow2.h b/block/qcow2.h
-index 1801dc30dc..8cc63d9e0e 100644
---- a/block/qcow2.h
-+++ b/block/qcow2.h
-@@ -532,6 +532,8 @@ int qcow2_change_refcount_order(BlockDriverState *bs, int refcount_order,
-                                 BlockDriverAmendStatusCB *status_cb,
-                                 void *cb_opaque, Error **errp);
- 
-+int64_t qcow2_get_format_allocated_size(BlockDriverState *bs);
-+
- /* qcow2-cluster.c functions */
- int qcow2_grow_l1_table(BlockDriverState *bs, uint64_t min_size,
-                         bool exact_size);
--- 
-2.11.1
+This change looks ok, and happens because libvirt calls netdev_del before
+the chardev is closed or removed.
+
+I would move the chunk before deinit/unparent though, since that's when the
+close happens.
+
+> >
+> > >      qemu_purge_queued_packets(nc);
+> > > --
+> > > 1.8.3.1
+> > >
+> > >
+> > >
+> > > --
+> > Marc-Andr=C3=A9 Lureau
+>
+--=20
+Marc-Andr=C3=A9 Lureau
