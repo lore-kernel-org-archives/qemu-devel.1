@@ -1,30 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45016)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49727)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1dDfjP-0001iQ-Ip
-	for qemu-devel@nongnu.org; Wed, 24 May 2017 19:30:20 -0400
+	(envelope-from <rth7680@gmail.com>) id 1dDgIl-0003Zy-AJ
+	for qemu-devel@nongnu.org; Wed, 24 May 2017 20:06:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1dDfjM-000337-Fj
-	for qemu-devel@nongnu.org; Wed, 24 May 2017 19:30:19 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47110)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1dDfjM-00032q-6d
-	for qemu-devel@nongnu.org; Wed, 24 May 2017 19:30:16 -0400
-Date: Thu, 25 May 2017 07:30:08 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20170524233008.GN3873@pxdev.xzpeter.org>
-References: <1495539071-12995-1-git-send-email-a.perevalov@samsung.com>
-	<CGME20170523113130eucas1p1babac9d8659c10abe22ddc7d5b9526ab@eucas1p1.samsung.com>
-	<1495539071-12995-8-git-send-email-a.perevalov@samsung.com>
-	<20170524065736.GF3873@pxdev.xzpeter.org>
-	<20170524075637.GB12925@aperevalov-ubuntu>
-	<20170524120047.GM3873@pxdev.xzpeter.org>
-	<83b23059-7109-3c37-90ae-5595f0b3de68@samsung.com>
+	(envelope-from <rth7680@gmail.com>) id 1dDgIk-0006tf-6I
+	for qemu-devel@nongnu.org; Wed, 24 May 2017 20:06:51 -0400
+Received: from mail-qt0-x242.google.com ([2607:f8b0:400d:c0d::242]:32886)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1dDgIk-0006sv-2E
+	for qemu-devel@nongnu.org; Wed, 24 May 2017 20:06:50 -0400
+Received: by mail-qt0-x242.google.com with SMTP id a46so28348190qte.0
+	for <qemu-devel@nongnu.org>; Wed, 24 May 2017 17:06:49 -0700 (PDT)
+Sender: Richard Henderson <rth7680@gmail.com>
+References: <20170519091642.25309-1-pbonzini@redhat.com>
+From: Richard Henderson <rth@twiddle.net>
+Message-ID: <dc999fde-d142-600f-632f-98726c651c8f@twiddle.net>
+Date: Wed, 24 May 2017 17:06:45 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <83b23059-7109-3c37-90ae-5595f0b3de68@samsung.com>
-Subject: Re: [Qemu-devel] [PATCH V6 07/10] migration: add bitmap for copied
- page
+In-Reply-To: <20170519091642.25309-1-pbonzini@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] target/i386: use multiple CPU AddressSpaces
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,92 +30,23 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alexey Perevalov <a.perevalov@samsung.com>
-Cc: i.maximets@samsung.com, qemu-devel@nongnu.org, dgilbert@redhat.com
+To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+Cc: anthony.xu@intel.com
 
-On Wed, May 24, 2017 at 03:16:23PM +0300, Alexey Perevalov wrote:
-> On 05/24/2017 03:01 PM, Peter Xu wrote:
-> >On Wed, May 24, 2017 at 10:56:37AM +0300, Alexey wrote:
-> >>On Wed, May 24, 2017 at 02:57:36PM +0800, Peter Xu wrote:
-> >>>On Tue, May 23, 2017 at 02:31:08PM +0300, Alexey Perevalov wrote:
-> >>>>This patch adds ability to track down already copied
-> >>>>pages, it's necessary for calculation vCPU block time in
-> >>>>postcopy migration feature and maybe for restore after
-> >>>>postcopy migration failure.
-> >>>>
-> >>>>Functions which work with RAMBlock are placed into ram.c,
-> >>>>due to TARGET_WORDS_BIGENDIAN is poisoned int postcopy-ram.c -
-> >>>>hardware independed code.
-> >>>>
-> >>>>Signed-off-by: Alexey Perevalov <a.perevalov@samsung.com>
-> >>>>---
-> >>>>  include/migration/migration.h | 16 +++++++++++
-> >>>>  migration/postcopy-ram.c      | 22 ++++++++++++---
-> >>>>  migration/ram.c               | 63 +++++++++++++++++++++++++++++++++++++++++++
-> >>>>  3 files changed, 97 insertions(+), 4 deletions(-)
-> >>>>
-> >>>>diff --git a/include/migration/migration.h b/include/migration/migration.h
-> >>>>index 449cb07..4e05c83 100644
-> >>>>--- a/include/migration/migration.h
-> >>>>+++ b/include/migration/migration.h
-> >>>>@@ -101,6 +101,20 @@ struct MigrationIncomingState {
-> >>>>      LoadStateEntry_Head loadvm_handlers;
-> >>>>      /*
-> >>>>+     * bitmap indicates whether page copied,
-> >>>>+     * based on ramblock offset
-> >>>>+     * now it is using only for blocktime calculation in
-> >>>>+     * postcopy migration, so livetime of this entry:
-> >>>>+     * since user requested blocktime calculation,
-> >>>>+     * till the end of postcopy migration
-> >>>>+     * as an example it could represend following memory map
-> >>>>+     * ___________________________________
-> >>>>+     * |4k pages | hugepages | 4k pages
-> >>>Can we really do this?
-> >>>The problem is AFAIU migration stream is sending pages only in target
-> >>>page size, even for huge pages... so even for huge pages we should
-> >>>still need per TARGET_PAGE_SIZE bitmap?
-> >>sending maybe, but copying to userfault fd is doing in hugepage size
-> >Yes you are right. :)
-> >
-> >>in case of hugetlbfs memory backend.
-> >>>(Please refer to ram_state_init() on init of RAMBlock.bmap)
-> >>I thought to use bitmap per ramblock, but I decided to not do it,
-> >>because of following reasons:
-> >>	1. There is only 4k ramblocks, for such ramblock it's not
-> >>	optimal
-> >Could you explain what do you mean by "there is only 4k ramblocks"?
-> sorry, could be ramblocks with 4k size,
-> as example, your's qemu hmp info ramblock shows
->  Block Name    PSize              Offset Used              Total
->             /objects/mem    2 MiB  0x0000000000000000 0x0000000020000000
-> 0x0000000020000000
->                 vga.vram    4 KiB  0x0000000020060000 0x0000000001000000
-> 0x0000000001000000
->     /rom@etc/acpi/tables    4 KiB  0x0000000021130000 0x0000000000020000
-> 0x0000000000200000
->                  pc.bios    4 KiB  0x0000000020000000 0x0000000000040000
-> 0x0000000000040000
->   0000:00:03.0/e1000.rom    4 KiB  0x0000000021070000 0x0000000000040000
-> 0x0000000000040000
->   0000:00:04.0/e1000.rom    4 KiB  0x00000000210b0000 0x0000000000040000
-> 0x0000000000040000
->   0000:00:05.0/e1000.rom    4 KiB  0x00000000210f0000 0x0000000000040000
-> 0x0000000000040000
->                   pc.rom    4 KiB  0x0000000020040000 0x0000000000020000
-> 0x0000000000020000
->     0000:00:02.0/vga.rom    4 KiB  0x0000000021060000 0x0000000000010000
-> 0x0000000000010000
->    /rom@etc/table-loader    4 KiB  0x0000000021330000 0x0000000000001000
-> 0x0000000000001000
->       /rom@etc/acpi/rsdp    4 KiB  0x0000000021331000 0x0000000000001000
-> 0x0000000000001000
+On 05/19/2017 02:16 AM, Paolo Bonzini wrote:
+> This speeds up SMM switches.  Later on it may remove the need to take
+> the BQL, and it may also allow to reuse code between TCG and KVM.
 > 
-> /rom@etc/table-loader and /rom@etc/acpi/rsdp has only one 4K page.
+> Signed-off-by: Paolo Bonzini<pbonzini@redhat.com>
+> ---
+>   target/i386/cpu.c        | 15 +++++++++-----
+>   target/i386/cpu.h        | 11 +++++++++-
+>   target/i386/helper.c     | 54 ++++++++++++++++++++++++------------------------
+>   target/i386/machine.c    |  4 ----
+>   target/i386/smm_helper.c | 18 ----------------
+>   5 files changed, 47 insertions(+), 55 deletions(-)
 
-I see. Thanks for explaining this.
+Reviewed-by: Richard Henderson <rth@twiddle.net>
 
-A 4k sized ramblock means the bitmap would be only one unsigned long
-width (via bitmap_new(1)). I still don't see why it's not good... :-)
 
--- 
-Peter Xu
+r~
