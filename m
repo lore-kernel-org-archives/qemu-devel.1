@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57310)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57233)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dDjoQ-0006Vo-HH
-	for qemu-devel@nongnu.org; Wed, 24 May 2017 23:51:47 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dDjoP-0007Ua-6O
+	(envelope-from <dgibson@ozlabs.org>) id 1dDjoO-0006UW-Qp
 	for qemu-devel@nongnu.org; Wed, 24 May 2017 23:51:46 -0400
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <dgibson@ozlabs.org>) id 1dDjoL-0007S4-OW
+	for qemu-devel@nongnu.org; Wed, 24 May 2017 23:51:44 -0400
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Thu, 25 May 2017 13:51:25 +1000
-Message-Id: <20170525035132.24268-12-david@gibson.dropbear.id.au>
-In-Reply-To: <20170525035132.24268-1-david@gibson.dropbear.id.au>
-References: <20170525035132.24268-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [PULL 11/18] pseries: Split CAS PVR negotiation out
- into a separate function
+Date: Thu, 25 May 2017 13:51:14 +1000
+Message-Id: <20170525035132.24268-1-david@gibson.dropbear.id.au>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL 00/18] ppc-for-2.10 queue 20170525
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,117 +23,79 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: peter.maydell@linaro.org
 Cc: agraf@suse.de, aik@ozlabs.ru, mdroth@linux.vnet.ibm.com, sbobroff@redhat.com, sursingh@redhat.com, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
 
-Guests of the qemu machine type go through a feature negotiation process
-known as "client architecture support" (CAS) during early boot.  This does
-a number of things, one of which is finding a CPU compatibility mode which
-can be supported by both guest and host.
+The following changes since commit 9964e96dc9999cf7f7c936ee854a795415d19b=
+60:
 
-In fact the CPU negotiation is probably the single most complex part of the
-CAS process, so this splits it out into a helper function.  We've recently
-made some mistakes in maintaining backward compatibility for old machine
-types here.  Splitting this out will also make it easier to fix this.
+  Merge remote-tracking branch 'jasowang/tags/net-pull-request' into stag=
+ing (2017-05-23 15:01:31 +0100)
 
-This also adds a possibly useful error message if the negotiation fails
-(i.e. if there isn't a CPU mode that's suitable for both guest and host).
+are available in the git repository at:
 
-Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-Reviewed-by: Laurent Vivier <lvivier@redhat.com>
-Reviewed-by: Greg Kurz <groug@kaod.org>
----
- hw/ppc/spapr_hcall.c | 49 ++++++++++++++++++++++++++++++++-----------------
- 1 file changed, 32 insertions(+), 17 deletions(-)
+  git://github.com/dgibson/qemu.git tags/ppc-for-2.10-20170525
 
-diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
-index 2daace4..77d2d66 100644
---- a/hw/ppc/spapr_hcall.c
-+++ b/hw/ppc/spapr_hcall.c
-@@ -1044,19 +1044,13 @@ static target_ulong h_signal_sys_reset(PowerPCCPU *cpu,
-     }
- }
- 
--static target_ulong h_client_architecture_support(PowerPCCPU *cpu,
--                                                  sPAPRMachineState *spapr,
--                                                  target_ulong opcode,
--                                                  target_ulong *args)
-+static uint32_t cas_check_pvr(PowerPCCPU *cpu, target_ulong *addr,
-+                              Error **errp)
- {
--    target_ulong list = ppc64_phys_to_real(args[0]);
--    target_ulong ov_table;
-     bool explicit_match = false; /* Matched the CPU's real PVR */
-     uint32_t max_compat = cpu->max_compat;
-     uint32_t best_compat = 0;
-     int i;
--    sPAPROptionVector *ov1_guest, *ov5_guest, *ov5_cas_old, *ov5_updates;
--    bool guest_radix;
- 
-     /*
-      * We scan the supplied table of PVRs looking for two things
-@@ -1066,9 +1060,9 @@ static target_ulong h_client_architecture_support(PowerPCCPU *cpu,
-     for (i = 0; i < 512; ++i) {
-         uint32_t pvr, pvr_mask;
- 
--        pvr_mask = ldl_be_phys(&address_space_memory, list);
--        pvr = ldl_be_phys(&address_space_memory, list + 4);
--        list += 8;
-+        pvr_mask = ldl_be_phys(&address_space_memory, *addr);
-+        pvr = ldl_be_phys(&address_space_memory, *addr + 4);
-+        *addr += 8;
- 
-         if (~pvr_mask & pvr) {
-             break; /* Terminator record */
-@@ -1087,17 +1081,38 @@ static target_ulong h_client_architecture_support(PowerPCCPU *cpu,
-         /* We couldn't find a suitable compatibility mode, and either
-          * the guest doesn't support "raw" mode for this CPU, or raw
-          * mode is disabled because a maximum compat mode is set */
--        return H_HARDWARE;
-+        error_setg(errp, "Couldn't negotiate a suitable PVR during CAS");
-+        return 0;
-     }
- 
-     /* Parsing finished */
-     trace_spapr_cas_pvr(cpu->compat_pvr, explicit_match, best_compat);
- 
--    /* Update CPUs */
--    if (cpu->compat_pvr != best_compat) {
--        Error *local_err = NULL;
-+    return best_compat;
-+}
- 
--        ppc_set_compat_all(best_compat, &local_err);
-+static target_ulong h_client_architecture_support(PowerPCCPU *cpu,
-+                                                  sPAPRMachineState *spapr,
-+                                                  target_ulong opcode,
-+                                                  target_ulong *args)
-+{
-+    /* Working address in data buffer */
-+    target_ulong addr = ppc64_phys_to_real(args[0]);
-+    target_ulong ov_table;
-+    uint32_t cas_pvr;
-+    sPAPROptionVector *ov1_guest, *ov5_guest, *ov5_cas_old, *ov5_updates;
-+    bool guest_radix;
-+    Error *local_err = NULL;
-+
-+    cas_pvr = cas_check_pvr(cpu, &addr, &local_err);
-+    if (local_err) {
-+        error_report_err(local_err);
-+        return H_HARDWARE;
-+    }
-+
-+    /* Update CPUs */
-+    if (cpu->compat_pvr != cas_pvr) {
-+        ppc_set_compat_all(cas_pvr, &local_err);
-         if (local_err) {
-             error_report_err(local_err);
-             return H_HARDWARE;
-@@ -1105,7 +1120,7 @@ static target_ulong h_client_architecture_support(PowerPCCPU *cpu,
-     }
- 
-     /* For the future use: here @ov_table points to the first option vector */
--    ov_table = list;
-+    ov_table = addr;
- 
-     ov1_guest = spapr_ovec_parse_vector(ov_table, 1);
-     ov5_guest = spapr_ovec_parse_vector(ov_table, 5);
--- 
-2.9.4
+for you to fetch changes up to 62f94fc94f98095173146e753a1f03d7c2cc7ba3:
+
+  xics: add unrealize handler (2017-05-25 11:31:33 +1000)
+
+----------------------------------------------------------------
+ppc patch queue 2017-05-25
+
+Assorted accumulated patches.  These are nearly all bugfixes at one
+level or another - some for longstanding problems, others for some
+regressions caused by more recent cleanups.
+
+This includes preliminary patches towards fixing migration for Radix
+Page Table guests under POWER9 and also fixing some migration
+regressions due to the re-organization of the interrupt controller
+code.  Not all the pieces are there yet, so those still won't quite
+work, but the preliminary changes make sense on their own.
+
+----------------------------------------------------------------
+Bharata B Rao (1):
+      spapr: Consolidate HPT freeing code into a routine
+
+Daniel Henrique Barboza (4):
+      hw/ppc/spapr_events.c: removing 'exception' from sPAPREventLogEntry
+      hw/ppc: removing drc->detach_cb and drc->detach_cb_opaque
+      hw/ppc: migrating the DRC state of hotplugged devices
+      hw/ppc/spapr.c: recover pending LMB unplug info in spapr_lmb_releas=
+e
+
+David Gibson (3):
+      pseries: Split CAS PVR negotiation out into a separate function
+      pseries: Restore support for total vcpus not a multiple of threads-=
+per-core for old machine types
+      hw/ppc/spapr.c: adding pending_dimm_unplugs to sPAPRMachineState
+
+Greg Kurz (8):
+      ppc/xics: simplify prototype of xics_spapr_init()
+      spapr: sanitize error handling in spapr_ics_create()
+      spapr-cpu-core: release ICP object when realization fails
+      xics_kvm: cache already enabled vCPU ids
+      spapr: ensure core_slot isn't NULL in spapr_core_unplug()
+      spapr_cpu_core: drop reference on ICP object during CPU realization
+      spapr: fix error reporting in xics_system_init()
+      xics: add unrealize handler
+
+Laurent Vivier (1):
+      spapr: add pre_plug function for memory
+
+Nikunj A Dadhania (1):
+      target/ppc: reset reservation in do_rfi()
+
+ hw/intc/xics.c              |   5 +
+ hw/intc/xics_kvm.c          |  33 ++++--
+ hw/intc/xics_spapr.c        |   3 +-
+ hw/ppc/spapr.c              | 239 +++++++++++++++++++++++++++++++-------=
+------
+ hw/ppc/spapr_cpu_core.c     |  19 ++--
+ hw/ppc/spapr_drc.c          |  92 ++++++++++++++---
+ hw/ppc/spapr_events.c       |  52 ++--------
+ hw/ppc/spapr_hcall.c        |  54 ++++++----
+ hw/ppc/spapr_pci.c          |   5 +-
+ include/hw/pci-host/spapr.h |   3 +
+ include/hw/ppc/spapr.h      |  12 ++-
+ include/hw/ppc/spapr_drc.h  |   8 +-
+ include/hw/ppc/xics.h       |   3 +-
+ target/ppc/excp_helper.c    |   3 +
+ 14 files changed, 349 insertions(+), 182 deletions(-)
