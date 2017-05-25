@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54749)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59085)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1dDsLF-00081s-Cf
-	for qemu-devel@nongnu.org; Thu, 25 May 2017 08:58:14 -0400
+	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1dDseb-0006Ve-8h
+	for qemu-devel@nongnu.org; Thu, 25 May 2017 09:18:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1dDsLA-0001Gd-TX
-	for qemu-devel@nongnu.org; Thu, 25 May 2017 08:58:13 -0400
-Received: from [59.151.112.132] (port=18232 helo=heian.cn.fujitsu.com)
+	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1dDseX-00082g-8U
+	for qemu-devel@nongnu.org; Thu, 25 May 2017 09:18:13 -0400
+Received: from [59.151.112.132] (port=31329 helo=heian.cn.fujitsu.com)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1dDsLA-0001GO-0B
-	for qemu-devel@nongnu.org; Thu, 25 May 2017 08:58:08 -0400
+	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1dDseV-00081s-Sg
+	for qemu-devel@nongnu.org; Thu, 25 May 2017 09:18:09 -0400
 References: <1495549241-23380-1-git-send-email-zhangchen.fnst@cn.fujitsu.com>
-	<1495549241-23380-4-git-send-email-zhangchen.fnst@cn.fujitsu.com>
-	<118320f3-67cf-bb46-8ae7-6de552cc15bf@redhat.com>
+	<1495549241-23380-7-git-send-email-zhangchen.fnst@cn.fujitsu.com>
+	<9f0e7f5e-7da7-4d78-95d9-be544b1bd28e@redhat.com>
 From: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
-Message-ID: <20c9a93a-de80-68d7-9838-38f5a5444250@cn.fujitsu.com>
-Date: Thu, 25 May 2017 20:58:38 +0800
+Message-ID: <b4ad4d4a-a469-edff-ed98-06cb7d4ecc8f@cn.fujitsu.com>
+Date: Thu, 25 May 2017 21:18:36 +0800
 MIME-Version: 1.0
-In-Reply-To: <118320f3-67cf-bb46-8ae7-6de552cc15bf@redhat.com>
+In-Reply-To: <9f0e7f5e-7da7-4d78-95d9-be544b1bd28e@redhat.com>
 Content-Type: text/plain; charset="utf-8"; format=flowed
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH V5 3/9] net/filter-mirror.c: Add new option
- to enable vnet support for filter-redirector
+Subject: Re: [Qemu-devel] [PATCH V5 6/9] net/colo-compare.c: Make
+ colo-compare support vnet_hdr_len
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,126 +35,124 @@ Cc: zhangchen.fnst@cn.fujitsu.com, zhanghailiang <zhang.zhanghailiang@huawei.com
 
 
 
-On 05/25/2017 02:10 PM, Jason Wang wrote:
+On 05/25/2017 02:22 PM, Jason Wang wrote:
 >
 >
 > On 2017年05月23日 22:20, Zhang Chen wrote:
->> We add the vnet_hdr option for filter-redirector, default is disable.
+>> We add the vnet_hdr option for colo-compare, default is disable.
 >> If you use virtio-net-pci net driver, please enable it.
->> Because colo-compare or other modules needs the vnet_hdr_len to parse
->> packet, so we add this new option send the len to others.
 >> You can use it for example:
 >> -object 
->> filter-redirector,id=r0,netdev=hn0,queue=tx,outdev=red0,vnet_hdr=on
+>> colo-compare,id=comp0,primary_in=compare0-0,secondary_in=compare1,outdev=compare_out0,vnet_hdr=on
+>
+> This is not accurate since virtio-net-pci is not the only card that 
+> uses vnet_hdr. E1000E is another one.
+
+Good catch, I will add the e1000e in this commit log.
+
+>
+>>
+>> COLO-compare can get vnet header length from filter,
+>> Add vnet_hdr_len to struct packet and output packet with
+>> the vnet_hdr_len.
 >>
 >> Signed-off-by: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
 >> ---
->>   net/filter-mirror.c | 33 +++++++++++++++++++++++++++++++++
->>   qemu-options.hx     |  6 +++---
->>   2 files changed, 36 insertions(+), 3 deletions(-)
+>>   net/colo-compare.c | 76 
+>> +++++++++++++++++++++++++++++++++++++++++++++++-------
+>>   qemu-options.hx    |  4 +--
+>>   2 files changed, 69 insertions(+), 11 deletions(-)
 >>
->> diff --git a/net/filter-mirror.c b/net/filter-mirror.c
->> index 8df0be6..6c8579f 100644
->> --- a/net/filter-mirror.c
->> +++ b/net/filter-mirror.c
->> @@ -381,6 +381,13 @@ static char *filter_redirector_get_outdev(Object 
->> *obj, Error **errp)
->>       return g_strdup(s->outdev);
->>   }
->>   +static char *filter_redirector_get_vnet_hdr(Object *obj, Error 
->> **errp)
->> +{
->> +    MirrorState *s = FILTER_REDIRECTOR(obj);
->> +
->> +    return s->vnet_hdr ? g_strdup("on") : g_strdup("off");
->> +}
->> +
->>   static void
->>   filter_redirector_set_outdev(Object *obj, const char *value, Error 
->> **errp)
+>> diff --git a/net/colo-compare.c b/net/colo-compare.c
+>> index bf0b856..f89b380 100644
+>> --- a/net/colo-compare.c
+>> +++ b/net/colo-compare.c
+>> @@ -73,6 +73,7 @@ typedef struct CompareState {
+>>       CharBackend chr_out;
+>>       SocketReadState pri_rs;
+>>       SocketReadState sec_rs;
+>> +    bool vnet_hdr;
+>>         /* connection list: the connections belonged to this NIC 
+>> could be found
+>>        * in this list.
+>> @@ -97,9 +98,10 @@ enum {
+>>       SECONDARY_IN,
+>>   };
+>>   -static int compare_chr_send(CharBackend *out,
+>> +static int compare_chr_send(CompareState *s,
+>>                               const uint8_t *buf,
+>> -                            uint32_t size);
+>> +                            uint32_t size,
+>> +                            uint32_t vnet_hdr_len);
+>>     static gint seq_sorter(Packet *a, Packet *b, gpointer data)
 >>   {
->> @@ -390,6 +397,21 @@ filter_redirector_set_outdev(Object *obj, const 
->> char *value, Error **errp)
->>       s->outdev = g_strdup(value);
->>   }
->>   +static void filter_redirector_set_vnet_hdr(Object *obj,
->> +                                           const char *value,
->> +                                           Error **errp)
->> +{
->> +    MirrorState *s = FILTER_REDIRECTOR(obj);
->> +
->> +    if (strcmp(value, "on") && strcmp(value, "off")) {
->> +        error_setg(errp, "Invalid value for filter-redirector 
->> vnet_hdr, "
->> +                         "should be 'on' or 'off'");
->> +        return;
->> +    }
->> +
->> +    s->vnet_hdr = !strcmp(value, "on");
->> +}
->> +
->>   static void filter_mirror_init(Object *obj)
->>   {
->>       MirrorState *s = FILTER_MIRROR(obj);
->> @@ -409,10 +431,21 @@ static void filter_mirror_init(Object *obj)
->>     static void filter_redirector_init(Object *obj)
->>   {
->> +    MirrorState *s = FILTER_REDIRECTOR(obj);
->> +
->>       object_property_add_str(obj, "indev", filter_redirector_get_indev,
->>                               filter_redirector_set_indev, NULL);
->>       object_property_add_str(obj, "outdev", 
->> filter_redirector_get_outdev,
->>                               filter_redirector_set_outdev, NULL);
->> +
->> +    /*
->> +     * The vnet_hdr is disabled by default, if you want to enable
->> +     * this option, you must enable all the option on related modules
->> +     * (like other filter or colo-compare).
->> +     */
->> +    s->vnet_hdr = false;
->> +    object_property_add_str(obj, "vnet_hdr", 
->> filter_redirector_get_vnet_hdr,
->> +                            filter_redirector_set_vnet_hdr, NULL);
+>> @@ -472,7 +474,10 @@ static void colo_compare_connection(void 
+>> *opaque, void *user_data)
+>>           }
+>>             if (result) {
+>> -            ret = compare_chr_send(&s->chr_out, pkt->data, pkt->size);
+>> +            ret = compare_chr_send(s,
+>> +                                   pkt->data,
+>> +                                   pkt->size,
+>> +                                   pkt->vnet_hdr_len);
 >
-> Why not using object_property_add_bool()?
+> Why not check vnet_hdr support here?  And don't we need strip vnet_hdr 
+> here? (Since the redirector on destination does not do this)
 
-Because use object_property_add_bool() we should change the option from
-"vnet_hdr=on/off" to "vnet_hdr", it seems hard to read for user.
+If we create a normal qemu guest that use virtio-net-pci driver, the 
+guest's send packet have the vnet_hdr,
+qemu virtio-net-pci driver will strip vnet_hdr then send to external 
+network. In COLO we just redirect
+or mirror the packet, finally the packet will back to primary qemu 
+virtio-net-pci driver, So we just send
+the packet.
 
 Thanks
 Zhang Chen
 
 >
-> Thanks
->
+>>               if (ret < 0) {
+>>                   error_report("colo_send_primary_packet failed");
+>>               }
+>> @@ -493,9 +498,10 @@ static void colo_compare_connection(void 
+>> *opaque, void *user_data)
+>>       }
 >>   }
->>     static void filter_mirror_fini(Object *obj)
->> diff --git a/qemu-options.hx b/qemu-options.hx
->> index 81fb96b..a3c4688 100644
->> --- a/qemu-options.hx
->> +++ b/qemu-options.hx
->> @@ -4028,11 +4028,11 @@ queue @var{all|rx|tx} is an option that can 
->> be applied to any netfilter.
->>     filter-mirror on netdev @var{netdevid},mirror net packet to 
->> chardev@var{chardevid}, if vnet_hdr = on, filter-mirror will mirror 
->> packet with vnet_hdr_len.
->>   -@item -object 
->> filter-redirector,id=@var{id},netdev=@var{netdevid},indev=@var{chardevid},
->> -outdev=@var{chardevid}[,queue=@var{all|rx|tx}]
->> +@item -object 
->> filter-redirector,id=@var{id},netdev=@var{netdevid},indev=@var{chardevid},outdev=@var{chardevid},vnet_hdr=@var{on|off}[,queue=@var{all|rx|tx}]
->>     filter-redirector on netdev @var{netdevid},redirect filter's net 
->> packet to chardev
->> -@var{chardevid},and redirect indev's packet to filter.
->> +@var{chardevid},and redirect indev's packet to filter.if vnet_hdr = on,
->> +filter-redirector will redirect packet with vnet_hdr_len.
->>   Create a filter-redirector we need to differ outdev id from indev 
->> id, id can not
->>   be the same. we can just use indev or outdev, but at least one of 
->> indev or outdev
->>   need to be specified.
+>>   -static int compare_chr_send(CharBackend *out,
+>> +static int compare_chr_send(CompareState *s,
+>>                               const uint8_t *buf,
+>> -                            uint32_t size)
+>> +                            uint32_t size,
+>> +                            uint32_t vnet_hdr_len)
+>>   {
+>>       int ret = 0;
+>>       uint32_t len = htonl(size);
+>> @@ -504,12 +510,24 @@ static int compare_chr_send(CharBackend *out,
+>>           return 0;
+>>       }
+>>   -    ret = qemu_chr_fe_write_all(out, (uint8_t *)&len, sizeof(len));
+>> +    ret = qemu_chr_fe_write_all(&s->chr_out, (uint8_t *)&len, 
+>> sizeof(len));
+>>       if (ret != sizeof(len)) {
+>>           goto err;
+>>       }
+>>   -    ret = qemu_chr_fe_write_all(out, (uint8_t *)buf, size);
+>> +    if (s->vnet_hdr) {
+>> +        /*
+>> +         * We send vnet header len make other module(like 
+>> filter-redirector)
+>> +         * know how to parse net packet correctly.
+>> +         */
 >
+> But redirector does not strip the vnet header, does this really work?
+
+Sorry, Here is a typo, I will fix it to "like colo-compare".
+
+Thanks
+ZhangChen
+
+>
+> Thanks
 >
 >
 > .
