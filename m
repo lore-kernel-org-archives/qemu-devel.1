@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40623)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41827)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dDv4c-0006mT-4x
-	for qemu-devel@nongnu.org; Thu, 25 May 2017 11:53:15 -0400
+	(envelope-from <programmingkidx@gmail.com>) id 1dDv90-00004r-FS
+	for qemu-devel@nongnu.org; Thu, 25 May 2017 11:57:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dDv4Z-0004ry-3Q
-	for qemu-devel@nongnu.org; Thu, 25 May 2017 11:53:14 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:55954)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1dDv4Y-0004ra-Qi
-	for qemu-devel@nongnu.org; Thu, 25 May 2017 11:53:11 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 0CD82804FA
-	for <qemu-devel@nongnu.org>; Thu, 25 May 2017 15:53:09 +0000 (UTC)
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Date: Thu, 25 May 2017 16:53:00 +0100
-Message-Id: <20170525155300.22743-1-berrange@redhat.com>
-Subject: [Qemu-devel] [PATCH v4] sockets: improve error reporting if UNIX
- socket path is too long
+	(envelope-from <programmingkidx@gmail.com>) id 1dDv8x-0006Ne-EA
+	for qemu-devel@nongnu.org; Thu, 25 May 2017 11:57:46 -0400
+Received: from mail-io0-x229.google.com ([2607:f8b0:4001:c06::229]:34027)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <programmingkidx@gmail.com>)
+	id 1dDv8x-0006MS-8j
+	for qemu-devel@nongnu.org; Thu, 25 May 2017 11:57:43 -0400
+Received: by mail-io0-x229.google.com with SMTP id k91so139263992ioi.1
+	for <qemu-devel@nongnu.org>; Thu, 25 May 2017 08:57:42 -0700 (PDT)
+From: Programmingkid <programmingkidx@gmail.com>
+Content-Type: text/plain; charset=iso-8859-1
+Content-Transfer-Encoding: quoted-printable
+Date: Thu, 25 May 2017 11:57:36 -0400
+Message-Id: <105DDEA9-0ABE-4D00-A493-A1666783337B@gmail.com>
+Mime-Version: 1.0 (Apple Message framework v1084)
+Subject: [Qemu-devel] Bug report: qmp_stop() freezes QEMU
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,182 +27,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Eric Blake <eblake@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>
+To: qemu-devel qemu-devel <qemu-devel@nongnu.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>
 
-The 'struct sockaddr_un' only allows 108 bytes for the socket
-path.
+=46rom the cocoa interface when I select pause QEMU doesn't pause. =
+Instead QEMU freezes. I have traced the problem to the qmp_stop() =
+function. Here is the stack trace:
 
-If the user supplies a path, QEMU uses snprintf() to silently
-truncate it when too long. This is undesirable because the user
-will then be unable to connect to the path they asked for.
++                                                                        =
+                           2433 -[QemuCocoaAppController pauseQEMU:]  =
+(in qemu-system-ppc) + 30  [0x1003c9a34]  cocoa.m:1049
+    +                                                                    =
+                                 2433 qmp_stop  (in qemu-system-ppc) + =
+105  [0x100203b0d]  qmp.c:102
+    +                                                                    =
+                                   2433 vm_stop  (in qemu-system-ppc) + =
+57  [0x100059326]  cpus.c:1798
+    +                                                                    =
+                                     2433 do_vm_stop  (in =
+qemu-system-ppc) + 37  [0x100057bf3]  cpus.c:930
+    +                                                                    =
+                                       2433 pause_all_vcpus  (in =
+qemu-system-ppc) + 119  [0x100058c36]  cpus.c:1611
+    +                                                                    =
+                                         2433 qemu_cond_wait  (in =
+qemu-system-ppc) + 47  [0x1004f1855]
+    +                                                                    =
+                                           2433 _pthread_cond_wait  (in =
+libSystem.B.dylib) + 1286  [0x7fff82521881]
+    +                                                                    =
+                                             2433 __semwait_signal  (in =
+libSystem.B.dylib) + 10  [0x7fff8251da6a]
 
-If the user doesn't supply a path, QEMU builds one based on
-TMPDIR, but if that leads to an overlong path, it mistakenly
-uses error_setg_errno() with a stale errno value, because
-snprintf() does not set errno on truncation.
+I did use git bisect to find the problem but there were several patches =
+that seem to prevent OpenBIOS from running so finding the exact cause of =
+the problem is difficult. The closest problem patch that may be related =
+to this issue is this one:
 
-In solving this the code needed some refactoring to ensure we
-don't pass 'un.sun_path' directly to any APIs which expect
-NUL-terminated strings, because the path is not required to
-be terminated.
+commit 8bb93c6f99a42c2e0943bc904b283cd622d302c5
+Author: Alex Benn=E9e <alex.bennee@linaro.org>
+Date:   Wed Mar 15 14:48:25 2017 +0000
 
-Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
----
-
-Changed in v4:
-
- - Do length check before any mkstemp to avoid leaving long
-   tmpfile on disk on error
-
-Changed in v3:
-
- - Also fix unix_connect_saddr error reporting
- - Avoid calling unlink with path that might not be nul terminated
- - Ensure the TMPDIR derived path can fill up sun_path space.
- - Don't update saddr->path until we have succesfully listened
- - Unify error reporting across both explicit path & TMPDIR path
-   branches
-
- util/qemu-sockets.c | 68 ++++++++++++++++++++++++++++++++++++-----------------
- 1 file changed, 46 insertions(+), 22 deletions(-)
-
-diff --git a/util/qemu-sockets.c b/util/qemu-sockets.c
-index d8183f7..dfaf4e1 100644
---- a/util/qemu-sockets.c
-+++ b/util/qemu-sockets.c
-@@ -845,6 +845,8 @@ static int unix_listen_saddr(UnixSocketAddress *saddr,
- {
-     struct sockaddr_un un;
-     int sock, fd;
-+    char *pathbuf = NULL;
-+    const char *path;
- 
-     sock = qemu_socket(PF_UNIX, SOCK_STREAM, 0);
-     if (sock < 0) {
-@@ -852,20 +854,22 @@ static int unix_listen_saddr(UnixSocketAddress *saddr,
-         return -1;
-     }
- 
--    memset(&un, 0, sizeof(un));
--    un.sun_family = AF_UNIX;
--    if (saddr->path && strlen(saddr->path)) {
--        snprintf(un.sun_path, sizeof(un.sun_path), "%s", saddr->path);
-+    if (saddr->path && saddr->path[0]) {
-+        path = saddr->path;
-     } else {
-         const char *tmpdir = getenv("TMPDIR");
-         tmpdir = tmpdir ? tmpdir : "/tmp";
--        if (snprintf(un.sun_path, sizeof(un.sun_path), "%s/qemu-socket-XXXXXX",
--                     tmpdir) >= sizeof(un.sun_path)) {
--            error_setg_errno(errp, errno,
--                             "TMPDIR environment variable (%s) too large", tmpdir);
--            goto err;
--        }
-+        path = pathbuf = g_strdup_printf("%s/qemu-socket-XXXXXX", tmpdir);
-+    }
- 
-+    if (strlen(path) > sizeof(un.sun_path)) {
-+        error_setg(errp, "UNIX socket path '%s' is too long", path);
-+        error_append_hint(errp, "Path must be less than %zu bytes\n",
-+                          sizeof(un.sun_path));
-+        goto err;
-+    }
-+
-+    if (pathbuf != NULL) {
-         /*
-          * This dummy fd usage silences the mktemp() unsecure warning.
-          * Using mkstemp() doesn't make things more secure here
-@@ -873,24 +877,25 @@ static int unix_listen_saddr(UnixSocketAddress *saddr,
-          * to unlink first and thus re-open the race window.  The
-          * worst case possible is bind() failing, i.e. a DoS attack.
-          */
--        fd = mkstemp(un.sun_path);
-+        fd = mkstemp(pathbuf);
-         if (fd < 0) {
-             error_setg_errno(errp, errno,
--                             "Failed to make a temporary socket name in %s", tmpdir);
-+                             "Failed to make a temporary socket %s", pathbuf);
-             goto err;
-         }
-         close(fd);
--        if (update_addr) {
--            g_free(saddr->path);
--            saddr->path = g_strdup(un.sun_path);
--        }
-     }
- 
--    if (unlink(un.sun_path) < 0 && errno != ENOENT) {
-+    if (unlink(path) < 0 && errno != ENOENT) {
-         error_setg_errno(errp, errno,
--                         "Failed to unlink socket %s", un.sun_path);
-+                         "Failed to unlink socket %s", path);
-         goto err;
-     }
-+
-+    memset(&un, 0, sizeof(un));
-+    un.sun_family = AF_UNIX;
-+    strncpy(un.sun_path, path, sizeof(un.sun_path));
-+
-     if (bind(sock, (struct sockaddr*) &un, sizeof(un)) < 0) {
-         error_setg_errno(errp, errno, "Failed to bind socket to %s", un.sun_path);
-         goto err;
-@@ -900,9 +905,16 @@ static int unix_listen_saddr(UnixSocketAddress *saddr,
-         goto err;
-     }
- 
-+    if (update_addr && pathbuf) {
-+        g_free(saddr->path);
-+        saddr->path = pathbuf;
-+    } else {
-+        g_free(pathbuf);
-+    }
-     return sock;
- 
- err:
-+    g_free(pathbuf);
-     closesocket(sock);
-     return -1;
- }
-@@ -932,9 +944,16 @@ static int unix_connect_saddr(UnixSocketAddress *saddr,
-         qemu_set_nonblock(sock);
-     }
- 
-+    if (strlen(saddr->path) > sizeof(un.sun_path)) {
-+        error_setg(errp, "UNIX socket path '%s' is too long", saddr->path);
-+        error_append_hint(errp, "Path must be less than %zu bytes\n",
-+                          sizeof(un.sun_path));
-+        goto err;
-+    }
-+
-     memset(&un, 0, sizeof(un));
-     un.sun_family = AF_UNIX;
--    snprintf(un.sun_path, sizeof(un.sun_path), "%s", saddr->path);
-+    strncpy(un.sun_path, saddr->path, sizeof(un.sun_path));
- 
-     /* connect to peer */
-     do {
-@@ -956,13 +975,18 @@ static int unix_connect_saddr(UnixSocketAddress *saddr,
-     }
- 
-     if (rc < 0) {
--        error_setg_errno(errp, -rc, "Failed to connect socket");
--        close(sock);
--        sock = -1;
-+        error_setg_errno(errp, -rc, "Failed to connect socket %s",
-+                         saddr->path);
-+        goto err;
-     }
- 
-     g_free(connect_state);
-     return sock;
-+
-+ err:
-+    close(sock);
-+    g_free(connect_state);
-+    return -1;
- }
- 
- #else
--- 
-2.9.3
+    ui/console: ensure graphic updates don't race with TCG vCPUs
