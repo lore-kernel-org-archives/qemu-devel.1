@@ -1,41 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42383)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46122)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1dDrQj-0001ik-KB
-	for qemu-devel@nongnu.org; Thu, 25 May 2017 07:59:51 -0400
+	(envelope-from <jasowang@redhat.com>) id 1dDreN-00078l-VL
+	for qemu-devel@nongnu.org; Thu, 25 May 2017 08:13:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1dDrQg-00060W-GO
-	for qemu-devel@nongnu.org; Thu, 25 May 2017 07:59:49 -0400
-Received: from mga06.intel.com ([134.134.136.31]:29071)
+	(envelope-from <jasowang@redhat.com>) id 1dDreJ-0000C3-Ft
+	for qemu-devel@nongnu.org; Thu, 25 May 2017 08:13:55 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:51574)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <wei.w.wang@intel.com>)
-	id 1dDrQg-0005yj-5W
-	for qemu-devel@nongnu.org; Thu, 25 May 2017 07:59:46 -0400
-Message-ID: <5926C7AC.4080603@intel.com>
-Date: Thu, 25 May 2017 20:01:48 +0800
-From: Wei Wang <wei.w.wang@intel.com>
+	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1dDreJ-0000BB-75
+	for qemu-devel@nongnu.org; Thu, 25 May 2017 08:13:51 -0400
+References: <1495161139-28757-1-git-send-email-wei.w.wang@intel.com>
+	<20170519233750-mutt-send-email-mst@kernel.org>
+	<5922D0EC.6060405@intel.com>
+	<b415fea9-9d48-9390-0ec2-46f69b7a54b0@redhat.com>
+	<5923C557.3020301@intel.com>
+	<ac8a484d-744a-8bdf-eba2-05239c6eefb1@redhat.com>
+	<5924109F.6090608@intel.com>
+	<48ec0c88-801f-fc1f-401f-51cb2ca3fed2@redhat.com>
+	<592541D9.3030303@intel.com>
+	<781faa1c-9253-d212-f616-2a899087edc1@redhat.com>
+	<5926C519.6080508@intel.com>
+From: Jason Wang <jasowang@redhat.com>
+Message-ID: <2fb56ab7-99c6-ac30-de60-a747438416b8@redhat.com>
+Date: Thu, 25 May 2017 20:13:31 +0800
 MIME-Version: 1.0
-References: <1494578148-102868-1-git-send-email-wei.w.wang@intel.com>
-	<a3f2cae3-5d3d-f620-4a8d-bb11470c0b08@redhat.com>
-	<591AA65F.8080608@intel.com>
-	<d6eb1d73-c791-b8d3-7ef3-a7653aef00d6@redhat.com>
-	<7e1b48d5-83e6-a0ae-5d91-696d8db09d7c@redhat.com>
-	<591D0EF5.9000807@intel.com>
-	<d7df5484-7e08-4e1c-9e35-69d73858c736@redhat.com>
-	<20170519153329.GA30573@stefanha-x1.localdomain>
-	<ec3c391c-6f0a-b316-e7d9-8f5e431b5e45@redhat.com>
-	<286AC319A985734F985F78AFA26841F7392351DD@shsmsx102.ccr.corp.intel.com>
-	<7ff05785-6bca-a886-0eb0-aeeb0f8d8e1a@redhat.com>
-	<5923CCF2.2000001@intel.com>
-	<3d9e8375-fbaa-c011-8242-b37cd971069b@redhat.com>
-	<5924136A.4090004@intel.com>
-	<7636d3d0-a0de-f9a6-47f8-2d09a448b978@redhat.com>
-	<592544D9.5010100@intel.com>
-	<23dac05e-ba3d-df6d-4831-feab9be1c6d2@redhat.com>
-In-Reply-To: <23dac05e-ba3d-df6d-4831-feab9be1c6d2@redhat.com>
+In-Reply-To: <5926C519.6080508@intel.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [virtio-dev] Re: [virtio-dev] Re: [PATCH v2 00/16]
- Vhost-pci for inter-VM communication
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [virtio-dev] Re: [virtio-dev] Re: [PATCH RFC]
+ virtio-net: enable configurable tx queue size
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -44,133 +38,238 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jason Wang <jasowang@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>
-Cc: "virtio-dev@lists.oasis-open.org" <virtio-dev@lists.oasis-open.org>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "marcandre.lureau@gmail.com" <marcandre.lureau@gmail.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "mst@redhat.com" <mst@redhat.com>
+To: Wei Wang <wei.w.wang@intel.com>, "Michael S. Tsirkin" <mst@redhat.com>
+Cc: virtio-dev@lists.oasis-open.org, stefanha@gmail.com, qemu-devel@nongnu.org, jan.scheurich@ericsson.com, marcandre.lureau@gmail.com, pbonzini@redhat.com
 
-On 05/25/2017 03:59 PM, Jason Wang wrote:
->
->
-> On 2017年05月24日 16:31, Wei Wang wrote:
->> On 05/24/2017 11:24 AM, Jason Wang wrote:
->>>
->>>
->>> On 2017年05月23日 18:48, Wei Wang wrote:
->>>> On 05/23/2017 02:32 PM, Jason Wang wrote:
->>>>>
->>>>>
->>>>> On 2017年05月23日 13:47, Wei Wang wrote:
->>>>>> On 05/23/2017 10:08 AM, Jason Wang wrote:
->>>>>>>
->>>>>>>
->>>>>>> On 2017年05月22日 19:46, Wang, Wei W wrote:
->>>>>>>> On Monday, May 22, 2017 10:28 AM, Jason Wang wrote:
->>>>>>>>> On 2017年05月19日 23:33, Stefan Hajnoczi wrote:
->>>>>>>>>> On Fri, May 19, 2017 at 11:10:33AM +0800, Jason Wang wrote:
->>>>>>>>>>> On 2017年05月18日 11:03, Wei Wang wrote:
->>>>>>>>>>>> On 05/17/2017 02:22 PM, Jason Wang wrote:
->>>>>>>>>>>>> On 2017年05月17日 14:16, Jason Wang wrote:
->>>>>>>>>>>>>> On 2017年05月16日 15:12, Wei Wang wrote:
->>>>>>>>>>>>>>>> Hi:
->>>>>>>>>>>>>>>>
->>>>>>>>>>>>>>>> Care to post the driver codes too?
->>>>>>>>>>>>>>>>
->>>>>>>>>>>>>>> OK. It may take some time to clean up the driver code 
->>>>>>>>>>>>>>> before post
->>>>>>>>>>>>>>> it out. You can first have a check of the draft at the 
->>>>>>>>>>>>>>> repo here:
->>>>>>>>>>>>>>> https://github.com/wei-w-wang/vhost-pci-driver
->>>>>>>>>>>>>>>
->>>>>>>>>>>>>>> Best,
->>>>>>>>>>>>>>> Wei
->>>>>>>>>>>>>> Interesting, looks like there's one copy on tx side. We 
->>>>>>>>>>>>>> used to
->>>>>>>>>>>>>> have zerocopy support for tun for VM2VM traffic. Could 
->>>>>>>>>>>>>> you please
->>>>>>>>>>>>>> try to compare it with your vhost-pci-net by:
->>>>>>>>>>>>>>
->>>>>>>>>>>> We can analyze from the whole data path - from VM1's 
->>>>>>>>>>>> network stack
->>>>>>>>>>>> to send packets -> VM2's network stack to receive packets. The
->>>>>>>>>>>> number of copies are actually the same for both.
->>>>>>>>>>> That's why I'm asking you to compare the performance. The 
->>>>>>>>>>> only reason
->>>>>>>>>>> for vhost-pci is performance. You should prove it.
->>>>>>>>>> There is another reason for vhost-pci besides maximum 
->>>>>>>>>> performance:
->>>>>>>>>>
->>>>>>>>>> vhost-pci makes it possible for end-users to run networking 
->>>>>>>>>> or storage
->>>>>>>>>> appliances in compute clouds.  Cloud providers do not allow 
->>>>>>>>>> end-users
->>>>>>>>>> to run custom vhost-user processes on the host so you need 
->>>>>>>>>> vhost-pci.
->>>>>>>>>>
->>>>>>>>>> Stefan
->>>>>>>>> Then it has non NFV use cases and the question goes back to 
->>>>>>>>> the performance
->>>>>>>>> comparing between vhost-pci and zerocopy vhost_net. If it does 
->>>>>>>>> not perform
->>>>>>>>> better, it was less interesting at least in this case.
->>>>>>>>>
->>>>>>>> Probably I can share what we got about vhost-pci and vhost-user:
->>>>>>>> https://github.com/wei-w-wang/vhost-pci-discussion/blob/master/vhost_pci_vs_vhost_user.pdf 
->>>>>>>>
->>>>>>>> Right now, I don’t have the environment to add the vhost_net test.
->>>>>>>
->>>>>>> Thanks, the number looks good. But I have some questions:
->>>>>>>
->>>>>>> - Is the number measured through your vhost-pci kernel driver code?
+
+
+On 2017=E5=B9=B405=E6=9C=8825=E6=97=A5 19:50, Wei Wang wrote:
+> On 05/25/2017 03:49 PM, Jason Wang wrote:
+>>
+>>
+>> On 2017=E5=B9=B405=E6=9C=8824=E6=97=A5 16:18, Wei Wang wrote:
+>>> On 05/24/2017 11:19 AM, Jason Wang wrote:
+>>>>
+>>>>
+>>>> On 2017=E5=B9=B405=E6=9C=8823=E6=97=A5 18:36, Wei Wang wrote:
+>>>>> On 05/23/2017 02:24 PM, Jason Wang wrote:
 >>>>>>
->>>>>> Yes, the kernel driver code.
+>>>>>>
+>>>>>> On 2017=E5=B9=B405=E6=9C=8823=E6=97=A5 13:15, Wei Wang wrote:
+>>>>>>> On 05/23/2017 10:04 AM, Jason Wang wrote:
+>>>>>>>>
+>>>>>>>>
+>>>>>>>> On 2017=E5=B9=B405=E6=9C=8822=E6=97=A5 19:52, Wei Wang wrote:
+>>>>>>>>> On 05/20/2017 04:42 AM, Michael S. Tsirkin wrote:
+>>>>>>>>>> On Fri, May 19, 2017 at 10:32:19AM +0800, Wei Wang wrote:
+>>>>>>>>>>> This patch enables the virtio-net tx queue size to be=20
+>>>>>>>>>>> configurable
+>>>>>>>>>>> between 256 (the default queue size) and 1024 by the user.=20
+>>>>>>>>>>> The queue
+>>>>>>>>>>> size specified by the user should be power of 2.
+>>>>>>>>>>>
+>>>>>>>>>>> Setting the tx queue size to be 1024 requires the guest=20
+>>>>>>>>>>> driver to
+>>>>>>>>>>> support the VIRTIO_NET_F_MAX_CHAIN_SIZE feature.
+>>>>>>>>>> This should be a generic ring feature, not one specific to=20
+>>>>>>>>>> virtio net.
+>>>>>>>>> OK. How about making two more changes below:
+>>>>>>>>>
+>>>>>>>>> 1) make the default tx queue size =3D 1024 (instead of 256).
+>>>>>>>>
+>>>>>>>> As has been pointed out, you need compat the default value too=20
+>>>>>>>> in this case.
+>>>>>>>
+>>>>>>> The driver gets the size info from the device, then would it=20
+>>>>>>> cause any
+>>>>>>> compatibility issue if we change the default ring size to 1024=20
+>>>>>>> in the
+>>>>>>> vhost case? In other words, is there any software (i.e. any=20
+>>>>>>> virtio-net driver)
+>>>>>>> functions based on the assumption of 256 queue size?
+>>>>>>
+>>>>>> I don't know. But is it safe e.g we migrate from 1024 to an older=20
+>>>>>> qemu with 256 as its queue size?
 >>>>>
->>>>> Interesting, in the above link, "l2fwd" was used in vhost-pci 
->>>>> testing. I want to know more about the test configuration: If 
->>>>> l2fwd is the one that dpdk had, want to know how can you make it 
->>>>> work for kernel driver. (Maybe packet socket I think?) If not, 
->>>>> want to know how do you configure it (e.g through bridge or 
->>>>> act_mirred or others). And in OVS dpdk, is dpdk l2fwd + pmd used 
->>>>> in the testing?
+>>>>> Yes, I think it is safe, because the default queue size is used=20
+>>>>> when the device is being
+>>>>> set up (e.g. feature negotiation).
+>>>>> During migration (the device has already been running), the=20
+>>>>> destination machine will
+>>>>> load the device state based on the the queue size that is being=20
+>>>>> used (i.e. vring.num).
+>>>>> The default value is not used any more after the setup phase.
+>>>>
+>>>> I haven't checked all cases, but there's two obvious things:
+>>>>
+>>>> - After migration and after a reset, it will go back to 256 on dst.
+>>>
+>>> Please let me clarify what we want first: when QEMU boots and it=20
+>>> realizes the
+>>> virtio-net device, if the tx_queue_size is not given by the command=20
+>>> line, we want
+>>> to use 1024 as the queue size, that is, virtio_add_queue(,1024,),=20
+>>> which sets
+>>> vring.num=3D1024 and vring.num_default=3D1024.
+>>>
+>>> When migration happens, the vring.num variable (has been 1024) is=20
+>>> sent to
+>>> the destination machine, where virtio_load() will assign the=20
+>>> destination side vring.num
+>>> to that value (1024). So, vring.num=3D1024 continues to work on the=20
+>>> destination machine
+>>> with old QEMU. I don't see an issue here.
+>>>
+>>> If reset happens, I think the device and driver will re-do the=20
+>>> initialization steps. So, if they are
+>>> with the old QEMU, then they use the old qemu realize() function to=20
+>>> do virtio_add_queue(,256,),
+>>> and the driver will re-do the probe() steps and take vring.num=3D256,=
+=20
+>>> then everything works fine.
+>>
+>> Probably works fine but the size is 256 forever after migration.=20
+>> Instead of using 1024 which work just one time and maybe risky, isn't=20
+>> it better to just use 256 for old machine types?
+>>
+>
+> If it migrates to the old QEMU, then I think everything should work in=20
+> the old QEMU style after
+> reset (not just our virtio-net case). I think this should be something=20
+> natural and reasonable.
+
+The point is it should behave exactly the same not only after reset but=20
+also before.
+
+>
+> Why would the change depends on machine types?
+>
+>>>
+>>>
+>>>> - ABI is changed, e.g -M pc-q35-2.10 returns 1024 on 2.11
+>>>>
+>>> Didn't get this. Could you please explain more? which ABI would be=20
+>>> changed, and why it affects q35?
+>>>
+>>
+>> Nothing specific to q35, just to point out the machine type of 2.10.
+>>
+>> E.g on 2.10, -M pc-q35-2.10, vring.num is 256; On 2.11 -M pc-q35-2.10=20
+>> vring.num is 1024.
+>>
+>
+> I think it's not related to the machine type.
+>
+> Probably we can use QEMU version to discuss here.
+> Suppose this change will be made to the next version, QEMU 2.10. Then=20
+> with QEMU 2.10, when
+> people create a virtio-net device as usual:
+> -device virtio-net-pci,netdev=3Dnet1,mac=3D52:54:00:00:00:01
+> it will creates a device with queue size =3D 1024.
+> If they use QEMU 2.9, then the queue size =3D 256.
+>
+> What ABI change did you mean?
+
+See https://fedoraproject.org/wiki/Features/KVM_Stable_Guest_ABI.
+
+>
+>>>
 >>>>>
+>>>>>>
+>>>>>>>
+>>>>>>> For live migration, the queue size that is being used will also=20
+>>>>>>> be transferred
+>>>>>>> to the destination.
+>>>>>>>
+>>>>>>>>
+>>>>>>>>> We can reduce the size (to 256) if the MAX_CHAIN_SIZE feature
+>>>>>>>>> is not supported by the guest.
+>>>>>>>>> In this way, people who apply the QEMU patch can directly use t=
+he
+>>>>>>>>> largest queue size(1024) without adding the booting command lin=
+e.
+>>>>>>>>>
+>>>>>>>>> 2) The vhost backend does not use writev, so I think when the=20
+>>>>>>>>> vhost
+>>>>>>>>> backed is used, using 1024 queue size should not depend on the
+>>>>>>>>> MAX_CHAIN_SIZE feature.
+>>>>>>>>
+>>>>>>>> But do we need to consider even larger queue size now?
+>>>>>>>
+>>>>>>> Need Michael's feedback on this. Meanwhile, I'll get the next=20
+>>>>>>> version of
+>>>>>>> code ready and check if larger queue size would cause any corner=20
+>>>>>>> case.
+>>>>>>
+>>>>>> The problem is, do we really need a new config filed for this? Or=20
+>>>>>> just introduce a flag which means "I support up to 1024 sgs" is=20
+>>>>>> sufficient?
+>>>>>>
+>>>>>
+>>>>> For now, it also works without the new config field, max_chain_size=
+,
+>>>>> But I would prefer to keep the new config field, because:
+>>>>>
+>>>>> Without that, the driver will work on  an assumed value, 1023.
 >>>>
->>>> Oh, that l2fwd is a kernel module from OPNFV vsperf
->>>> (http://artifacts.opnfv.org/vswitchperf/docs/userguide/quickstart.html) 
+>>>> This is the fact, and it's too late to change legacy driver.
 >>>>
->>>> For both legacy and vhost-pci cases, they use the same l2fwd module.
->>>> No bridge is used, the module already works at L2 to forward packets
->>>> between two net devices.
+>>>>> If the future, QEMU needs to change it to 1022, then how can the
+>>>>> new QEMU tell the old driver, which supports the MAX_CHAIN_SIZE
+>>>>> feature but works with the old hardcode value 1023?
+>>>>
+>>>> Can config filed help in this case? The problem is similar to=20
+>>>> ANY_HEADER_SG, the only thing we can is to clarify the limitation=20
+>>>> for new drivers.
+>>>>
 >>>
->>> Thanks for the pointer. Just to confirm, I think virtio-net kernel 
->>> driver is used in OVS-dpdk test?
+>>> I think it helps, because the driver will do
+>>> virtio_cread_feature(vdev, VIRTIO_NET_F_MAX_CHAIN_SIZE,
+>>>                                   struct virtio_net_config,=20
+>>> max_chain_size, &chain_size);
+>>> to get the max_chain_size from the device. So when new QEMU has a=20
+>>> new value of max_chain_size, old driver
+>>> will get the new value.
 >>
->> Yes. In both cases, the guests are using kernel drivers.
+>> I think we're talking about old drivers, so this won't work. It can=20
+>> only work with assumptions (implicitly).
 >>
->>>
->>> Another question is, can we manage to remove the copy in tx? If not, 
->>> is it a limitation of virtio protocol?
->>>
+>> Thanks
 >>
->> No, we can't. Use this example, VM1's Vhost-pci<->virtio-net of VM2, 
->> VM1 sees VM2's memory, but
->> VM2 only sees its own memory.
->> What this copy achieves is to get data from VM1's memory to VM2's 
->> memory, so that VM2 can deliver it's
->> own memory to its network stack.
->
-> Then, as has been pointed out. Should we consider a vhost-pci to 
-> vhost-pci peer?
-I think that's another direction or future extension.
-We already have the vhost-pci to virtio-net model on the way, so I think 
-it would be better to start from here.
+> Not the case. Old drivers which don't have VIRTIO_NET_F_MAX_CHAIN_SIZE=20
+> feature support, will not allow
+> the device to use 1024 queue size. So, in that case, the device will=20
+> use the old, 256, queue size.
 
+I think it's better not tie #sgs to queue size.
 
 >
-> Even with vhost-pci to virito-net configuration, I think rx zerocopy 
-> could be achieved but not implemented in your driver (probably more 
-> easier in pmd).
->
-Yes, it would be easier with dpdk pmd. But I think it would not be 
-important in the NFV use case,
-since the data flow goes to one direction often.
+> The point of using the config field here is, when tomorrow's device is=20
+> released with a requirement for the driver
+> to use max_chain_size=3D1022 (not today's 1023), today's driver will=20
+> naturally support tomorrow's device without
+> any modification, since it reads the max_chain_size from the config=20
+> field which is filled by the device (either today's
+> device or tomorrow's device with different values).
 
-Best,
-Wei
+I'm not saying anything wrong with the config filed you introduced. But=20
+you should answer the following question:
+
+Is it useful to support more than 1024? If yes, why? If not, introduce a=20
+VIRTIO_F_SG_1024 is more than enough I think.
+
+Thanks
+
+>
+> Best,
+> Wei
+>
+>
+>
+>
+>
+>
+> ---------------------------------------------------------------------
+> To unsubscribe, e-mail: virtio-dev-unsubscribe@lists.oasis-open.org
+> For additional commands, e-mail: virtio-dev-help@lists.oasis-open.org
+>
