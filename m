@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57274)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57292)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dDjoP-0006Ur-Pm
-	for qemu-devel@nongnu.org; Wed, 24 May 2017 23:51:46 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1dDjoQ-0006VS-22
+	for qemu-devel@nongnu.org; Wed, 24 May 2017 23:51:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dDjoO-0007TT-Fa
-	for qemu-devel@nongnu.org; Wed, 24 May 2017 23:51:45 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1dDjoP-0007UN-5K
+	for qemu-devel@nongnu.org; Wed, 24 May 2017 23:51:46 -0400
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Thu, 25 May 2017 13:51:21 +1000
-Message-Id: <20170525035132.24268-8-david@gibson.dropbear.id.au>
+Date: Thu, 25 May 2017 13:51:23 +1000
+Message-Id: <20170525035132.24268-10-david@gibson.dropbear.id.au>
 In-Reply-To: <20170525035132.24268-1-david@gibson.dropbear.id.au>
 References: <20170525035132.24268-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [PULL 07/18] spapr: ensure core_slot isn't NULL in
- spapr_core_unplug()
+Subject: [Qemu-devel] [PULL 09/18] spapr_cpu_core: drop reference on ICP
+ object during CPU realization
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,32 +25,34 @@ Cc: agraf@suse.de, aik@ozlabs.ru, mdroth@linux.vnet.ibm.com, sbobroff@redhat.com
 
 From: Greg Kurz <groug@kaod.org>
 
-If we go that far on the path of hot-removing a core and we find out that
-the core-id is invalid, then we have a serious bug.
+When a piece of code allocates an object, it implicitely gets a reference
+on it. If it then makes that object a child property of another object, it
+should drop its own reference at some point otherwise the child object can
+never be finalized. The current code hence leaks one ICP object per CPU
+when hot-removing a core.
 
-Let's make it explicit with an assert() instead of dereferencing a NULL
-pointer.
-
-This fixes Coverity issue CID 1375404.
+Failing to add a newly allocated ICP object to the CPU is a bug. While here,
+let's ensure QEMU aborts if this ever happens.
 
 Signed-off-by: Greg Kurz <groug@kaod.org>
-Reviewed-by: Igor Mammedov <imammedo@redhat.com>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/ppc/spapr.c | 1 +
- 1 file changed, 1 insertion(+)
+ hw/ppc/spapr_cpu_core.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index 35dceb0..c912eaa 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -2725,6 +2725,7 @@ static void spapr_core_unplug(HotplugHandler *hotplug_dev, DeviceState *dev,
-     CPUCore *cc = CPU_CORE(dev);
-     CPUArchId *core_slot = spapr_find_cpu_slot(ms, cc->core_id, NULL);
+diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
+index 1df1404..ff7058e 100644
+--- a/hw/ppc/spapr_cpu_core.c
++++ b/hw/ppc/spapr_cpu_core.c
+@@ -143,7 +143,8 @@ static void spapr_cpu_core_realize_child(Object *child, Error **errp)
+     Object *obj;
  
-+    assert(core_slot);
-     core_slot->cpu = NULL;
-     object_unparent(OBJECT(dev));
- }
+     obj = object_new(spapr->icp_type);
+-    object_property_add_child(OBJECT(cpu), "icp", obj, NULL);
++    object_property_add_child(OBJECT(cpu), "icp", obj, &error_abort);
++    object_unref(obj);
+     object_property_add_const_link(obj, "xics", OBJECT(spapr), &error_abort);
+     object_property_set_bool(obj, true, "realized", &local_err);
+     if (local_err) {
 -- 
 2.9.4
