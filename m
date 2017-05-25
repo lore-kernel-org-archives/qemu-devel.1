@@ -1,19 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42255)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44951)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dDoyN-0003A9-Es
-	for qemu-devel@nongnu.org; Thu, 25 May 2017 05:22:24 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1dDpAC-0006mv-MC
+	for qemu-devel@nongnu.org; Thu, 25 May 2017 05:34:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dDoyK-0002JB-9e
-	for qemu-devel@nongnu.org; Thu, 25 May 2017 05:22:23 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:38950)
+	(envelope-from <vsementsov@virtuozzo.com>) id 1dDpA9-0007Bm-Gj
+	for qemu-devel@nongnu.org; Thu, 25 May 2017 05:34:36 -0400
+Received: from mailhub.sw.ru ([195.214.232.25]:48120 helo=relay.sw.ru)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1dDoyK-0002IX-0l
-	for qemu-devel@nongnu.org; Thu, 25 May 2017 05:22:20 -0400
-From: Thomas Huth <thuth@redhat.com>
-Date: Thu, 25 May 2017 11:22:12 +0200
-Message-Id: <1495704132-5675-1-git-send-email-thuth@redhat.com>
-Subject: [Qemu-devel] [PATCH v2] target/s390x/cpu_models: Allow some
- additional feature bits for the "qemu" CPU
+	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
+	id 1dDpA9-0007Bc-5L
+	for qemu-devel@nongnu.org; Thu, 25 May 2017 05:34:33 -0400
+References: <20170503122539.282182-1-vsementsov@virtuozzo.com>
+	<20170503122539.282182-10-vsementsov@virtuozzo.com>
+	<4b694da7-4fa8-24dc-6808-a47cbf985d82@redhat.com>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <3b6c6e1d-7b20-b039-9a77-156313e961af@virtuozzo.com>
+Date: Thu, 25 May 2017 12:34:08 +0300
+MIME-Version: 1.0
+In-Reply-To: <4b694da7-4fa8-24dc-6808-a47cbf985d82@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+Subject: Re: [Qemu-devel] [PATCH 09/25] block/dirty-bitmap: add readonly
+ field to BdrvDirtyBitmap
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,93 +31,115 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>
-Cc: Alexander Graf <agraf@suse.de>, David Hildenbrand <david@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>
+To: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, famz@redhat.com, armbru@redhat.com, mreitz@redhat.com, stefanha@redhat.com, pbonzini@redhat.com, den@openvz.org
 
-Currently we only present the plain z900 feature bits to the guest,
-but QEMU already emulates some additional features (but not all of
-the next CPU generation, so we can not use the next CPU level as
-default yet). Since newer Linux kernels are checking the feature bits
-and refuse to work if a required feature is missing, it would be nice
-to have a way to present more of the supported features when we are
-running with the "qemu" CPU.
-This patch now adds the supported features to the "full_feat" bitmap,
-so that additional features can be enabled on the command line now,
-for example with:
+20.05.2017 02:02, John Snow wrote:
+>
+> On 05/03/2017 08:25 AM, Vladimir Sementsov-Ogievskiy wrote:
+>> It will be needed in following commits for persistent bitmaps.
+>> If bitmap is loaded from read-only storage (and we can't mark it
+>> "in use" in this storage) corresponding BdrvDirtyBitmap should be
+>> read-only.
+>>
+>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+>> ---
+>>   block/dirty-bitmap.c         | 16 ++++++++++++++++
+>>   include/block/dirty-bitmap.h |  3 +++
+>>   2 files changed, 19 insertions(+)
+>>
+>> diff --git a/block/dirty-bitmap.c b/block/dirty-bitmap.c
+>> index 90af37287f..ab6a95cf41 100644
+>> --- a/block/dirty-bitmap.c
+>> +++ b/block/dirty-bitmap.c
+>> @@ -44,6 +44,8 @@ struct BdrvDirtyBitmap {
+>>       int64_t size;               /* Size of the bitmap (Number of sectors) */
+>>       bool disabled;              /* Bitmap is read-only */
+>>       int active_iterators;       /* How many iterators are active */
+>> +    bool readonly;              /* Bitmap is read-only and may be changed only
+>> +                                   by deserialize* functions */
+>>       QLIST_ENTRY(BdrvDirtyBitmap) list;
+>>   };
+>>   
+>> @@ -436,6 +438,7 @@ void bdrv_set_dirty_bitmap(BdrvDirtyBitmap *bitmap,
+>>                              int64_t cur_sector, int64_t nr_sectors)
+>>   {
+>>       assert(bdrv_dirty_bitmap_enabled(bitmap));
+>> +    assert(!bdrv_dirty_bitmap_readonly(bitmap));
+> Doesn't this change the nature of the assertion?
+>
+> We're going from
+>      return !(bitmap->disabled || bitmap->successor);
+> to
+> 	!bitmap->readonly
+>
+> That makes me a little nervous to ACK this patch, because the
+> correctness depends on how readonly is updated and manipulated in the
+> future, which makes it more prone to error.
 
- qemu-system-s390x -cpu qemu,stfle=true,ldisp=true,eimm=true,stckf=true
+Sorry for late answer, I was ill.
 
-Signed-off-by: Thomas Huth <thuth@redhat.com>
----
- v2: Mark feats array with "static const"
+Hmm, old assert is still here. I just add another one. Readonly means: 
+bitmap must not be changed by _get _set and _clear at all - from loading 
+up to releasing. It is needed to maintain the case: "bitmap was loaded 
+from read-only storage, so that it was not marked as 'in_use' in that 
+storge". 'disabled' field is not appropriate because it is managed by user.
 
- target/s390x/cpu_models.c | 34 +++++++++++++++++++++++++++++++---
- 1 file changed, 31 insertions(+), 3 deletions(-)
+>
+>>       hbitmap_set(bitmap->bitmap, cur_sector, nr_sectors);
+>>   }
+>>   
+>> @@ -443,12 +446,14 @@ void bdrv_reset_dirty_bitmap(BdrvDirtyBitmap *bitmap,
+>>                                int64_t cur_sector, int64_t nr_sectors)
+>>   {
+>>       assert(bdrv_dirty_bitmap_enabled(bitmap));
+>> +    assert(!bdrv_dirty_bitmap_readonly(bitmap));
+>>       hbitmap_reset(bitmap->bitmap, cur_sector, nr_sectors);
+>>   }
+>>   
+>>   void bdrv_clear_dirty_bitmap(BdrvDirtyBitmap *bitmap, HBitmap **out)
+>>   {
+>>       assert(bdrv_dirty_bitmap_enabled(bitmap));
+>> +    assert(!bdrv_dirty_bitmap_readonly(bitmap));
+>>       if (!out) {
+>>           hbitmap_reset_all(bitmap->bitmap);
+>>       } else {
+>> @@ -519,6 +524,7 @@ void bdrv_set_dirty(BlockDriverState *bs, int64_t cur_sector,
+>>           if (!bdrv_dirty_bitmap_enabled(bitmap)) {
+>>               continue;
+>>           }
+>> +        assert(!bdrv_dirty_bitmap_readonly(bitmap));
+>>           hbitmap_set(bitmap->bitmap, cur_sector, nr_sectors);
+>>       }
+>>   }
+>> @@ -540,3 +546,13 @@ int64_t bdrv_get_meta_dirty_count(BdrvDirtyBitmap *bitmap)
+>>   {
+>>       return hbitmap_count(bitmap->meta);
+>>   }
+>> +
+>> +bool bdrv_dirty_bitmap_readonly(const BdrvDirtyBitmap *bitmap)
+>> +{
+>> +    return bitmap->readonly;
+>> +}
+>> +
+>> +void bdrv_dirty_bitmap_set_readonly(BdrvDirtyBitmap *bitmap)
+>> +{
+>> +    bitmap->readonly = true;
+>> +}
+>> diff --git a/include/block/dirty-bitmap.h b/include/block/dirty-bitmap.h
+>> index 1e17729ac2..0aab5841f5 100644
+>> --- a/include/block/dirty-bitmap.h
+>> +++ b/include/block/dirty-bitmap.h
+>> @@ -75,4 +75,7 @@ void bdrv_dirty_bitmap_deserialize_ones(BdrvDirtyBitmap *bitmap,
+>>                                           bool finish);
+>>   void bdrv_dirty_bitmap_deserialize_finish(BdrvDirtyBitmap *bitmap);
+>>   
+>> +bool bdrv_dirty_bitmap_readonly(const BdrvDirtyBitmap *bitmap);
+>> +void bdrv_dirty_bitmap_set_readonly(BdrvDirtyBitmap *bitmap);
+>> +
+>>   #endif
+>>
 
-diff --git a/target/s390x/cpu_models.c b/target/s390x/cpu_models.c
-index 8d27363..e5e005a 100644
---- a/target/s390x/cpu_models.c
-+++ b/target/s390x/cpu_models.c
-@@ -658,6 +658,30 @@ static void check_compatibility(const S390CPUModel *max_model,
-                   "available in the configuration: ");
- }
- 
-+/**
-+ * The base TCG CPU model "qemu" is based on the z900. However, we already
-+ * can also emulate some additional features of later CPU generations, so
-+ * we add these additional feature bits here.
-+ */
-+static void add_qemu_cpu_model_features(S390FeatBitmap fbm)
-+{
-+    static const int feats[] = {
-+        S390_FEAT_STFLE,
-+        S390_FEAT_EXTENDED_IMMEDIATE,
-+        S390_FEAT_LONG_DISPLACEMENT,
-+        S390_FEAT_LONG_DISPLACEMENT_FAST,
-+        S390_FEAT_STORE_CLOCK_FAST,
-+        S390_FEAT_GENERAL_INSTRUCTIONS_EXT,
-+        S390_FEAT_EXECUTE_EXT,
-+        S390_FEAT_STFLE_45,
-+    };
-+    int i;
-+
-+    for (i = 0; i < ARRAY_SIZE(feats); i++) {
-+        set_bit(feats[i], fbm);
-+    }
-+}
-+
- static S390CPUModel *get_max_cpu_model(Error **errp)
- {
-     static S390CPUModel max_model;
-@@ -670,10 +694,11 @@ static S390CPUModel *get_max_cpu_model(Error **errp)
-     if (kvm_enabled()) {
-         kvm_s390_get_host_cpu_model(&max_model, errp);
-     } else {
--        /* TCG emulates a z900 */
-+        /* TCG emulates a z900 (with some optional additional features) */
-         max_model.def = &s390_cpu_defs[0];
-         bitmap_copy(max_model.features, max_model.def->default_feat,
-                     S390_FEAT_MAX);
-+        add_qemu_cpu_model_features(max_model.features);
-     }
-     if (!*errp) {
-         cached = true;
-@@ -925,11 +950,14 @@ static void s390_host_cpu_model_initfn(Object *obj)
- 
- static void s390_qemu_cpu_model_initfn(Object *obj)
- {
-+    static S390CPUDef s390_qemu_cpu_defs;
-     S390CPU *cpu = S390_CPU(obj);
- 
-     cpu->model = g_malloc0(sizeof(*cpu->model));
--    /* TCG emulates a z900 */
--    cpu->model->def = &s390_cpu_defs[0];
-+    /* TCG emulates a z900 (with some optional additional features) */
-+    memcpy(&s390_qemu_cpu_defs, &s390_cpu_defs[0], sizeof(s390_qemu_cpu_defs));
-+    add_qemu_cpu_model_features(s390_qemu_cpu_defs.full_feat);
-+    cpu->model->def = &s390_qemu_cpu_defs;
-     bitmap_copy(cpu->model->features, cpu->model->def->default_feat,
-                 S390_FEAT_MAX);
- }
 -- 
-1.8.3.1
+Best regards,
+Vladimir
