@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34728)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38982)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zxq_yx_007@163.com>) id 1dDsw1-0004hn-Dr
-	for qemu-devel@nongnu.org; Thu, 25 May 2017 09:36:14 -0400
+	(envelope-from <eblake@redhat.com>) id 1dDtHF-00005A-EE
+	for qemu-devel@nongnu.org; Thu, 25 May 2017 09:58:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zxq_yx_007@163.com>) id 1dDsvw-0005Xl-Cx
-	for qemu-devel@nongnu.org; Thu, 25 May 2017 09:36:13 -0400
-Received: from m12-15.163.com ([220.181.12.15]:38037)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zxq_yx_007@163.com>) id 1dDsvu-0005XM-Af
-	for qemu-devel@nongnu.org; Thu, 25 May 2017 09:36:08 -0400
-From: xiaoqiang zhao <zxq_yx_007@163.com>
-Date: Thu, 25 May 2017 21:34:50 +0800
-Message-Id: <20170525133451.22459-8-zxq_yx_007@163.com>
-In-Reply-To: <20170525133451.22459-1-zxq_yx_007@163.com>
-References: <20170525133451.22459-1-zxq_yx_007@163.com>
+	(envelope-from <eblake@redhat.com>) id 1dDtHE-0004c2-Fv
+	for qemu-devel@nongnu.org; Thu, 25 May 2017 09:58:09 -0400
+References: <20170524202842.26724-1-eblake@redhat.com>
+	<20170524202842.26724-4-eblake@redhat.com>
+	<20170525063444.GC27936@lemon.lan>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <9c7d6a45-942d-a824-98e9-cf50a541e640@redhat.com>
+Date: Thu, 25 May 2017 08:57:49 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v3 7/8] hw/sparc: QOM'ify sun4m.c
+In-Reply-To: <20170525063444.GC27936@lemon.lan>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="n9bCDDoAhDCaEGBswHTs2QxKqkPOa7H2A"
+Subject: Re: [Qemu-devel] [PATCH v2 3/5] block: Allow NULL file for
+ bdrv_get_block_status()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,159 +26,103 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: mark.cave-ayland@ilande.co.uk, pbonzini@redhat.com, peter.maydell@linaro.org, edgar.iglesias@xilinx.com, atar4qemu@gmail.com, david@gibson.dropbear.id.au, f4bug@amsat.org
+To: Fam Zheng <famz@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, jsnow@redhat.com, mreitz@redhat.com, Stefan Hajnoczi <stefanha@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Jeff Cody <jcody@redhat.com>
 
-Drop the old SysBusDeviceClass::init and use instance_init
-or DeviceClass::realize instead
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--n9bCDDoAhDCaEGBswHTs2QxKqkPOa7H2A
+From: Eric Blake <eblake@redhat.com>
+To: Fam Zheng <famz@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, jsnow@redhat.com,
+ mreitz@redhat.com, Stefan Hajnoczi <stefanha@redhat.com>,
+ Kevin Wolf <kwolf@redhat.com>, Jeff Cody <jcody@redhat.com>
+Message-ID: <9c7d6a45-942d-a824-98e9-cf50a541e640@redhat.com>
+Subject: Re: [PATCH v2 3/5] block: Allow NULL file for bdrv_get_block_status()
+References: <20170524202842.26724-1-eblake@redhat.com>
+ <20170524202842.26724-4-eblake@redhat.com> <20170525063444.GC27936@lemon.lan>
+In-Reply-To: <20170525063444.GC27936@lemon.lan>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Signed-off-by: xiaoqiang zhao <zxq_yx_007@163.com>
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
----
- hw/sparc/sun4m.c | 54 +++++++++++++++++++-----------------------------------
- 1 file changed, 19 insertions(+), 35 deletions(-)
+On 05/25/2017 01:34 AM, Fam Zheng wrote:
+> On Wed, 05/24 15:28, Eric Blake wrote:
+>> Not all callers care about which BDS owns the mapping for a given
+>> range of the file.  This patch merely simplifies the callers by
+>> consolidating the logic in the common call point, while guaranteeing
+>> a non-NULL file to all the driver callbacks, for no semantic change.
+>>
+>> However, this will also set the stage for a future cleanup: when a
+>> caller does not care about which BDS owns an offset, it would be
+>> nice to allow the driver to optimize things to not have to return
+>> BDRV_BLOCK_OFFSET_VALID in the first place.  In the case of fragmented=
 
-diff --git a/hw/sparc/sun4m.c b/hw/sparc/sun4m.c
-index 5f022cc08d..0faff4619f 100644
---- a/hw/sparc/sun4m.c
-+++ b/hw/sparc/sun4m.c
-@@ -585,30 +585,23 @@ typedef struct IDRegState {
-     MemoryRegion mem;
- } IDRegState;
- 
--static int idreg_init1(SysBusDevice *dev)
-+static void idreg_init1(Object *obj)
- {
--    IDRegState *s = MACIO_ID_REGISTER(dev);
-+    IDRegState *s = MACIO_ID_REGISTER(obj);
-+    SysBusDevice *dev = SYS_BUS_DEVICE(obj);
- 
--    memory_region_init_ram(&s->mem, OBJECT(s),
-+    memory_region_init_ram(&s->mem, obj,
-                            "sun4m.idreg", sizeof(idreg_data), &error_fatal);
-     vmstate_register_ram_global(&s->mem);
-     memory_region_set_readonly(&s->mem, true);
-     sysbus_init_mmio(dev, &s->mem);
--    return 0;
--}
--
--static void idreg_class_init(ObjectClass *klass, void *data)
--{
--    SysBusDeviceClass *k = SYS_BUS_DEVICE_CLASS(klass);
--
--    k->init = idreg_init1;
- }
- 
- static const TypeInfo idreg_info = {
-     .name          = TYPE_MACIO_ID_REGISTER,
-     .parent        = TYPE_SYS_BUS_DEVICE,
-     .instance_size = sizeof(IDRegState),
--    .class_init    = idreg_class_init,
-+    .instance_init = idreg_init1,
- };
- 
- #define TYPE_TCX_AFX "tcx_afx"
-@@ -633,28 +626,21 @@ static void afx_init(hwaddr addr)
-     sysbus_mmio_map(s, 0, addr);
- }
- 
--static int afx_init1(SysBusDevice *dev)
-+static void afx_init1(Object *obj)
- {
--    AFXState *s = TCX_AFX(dev);
-+    AFXState *s = TCX_AFX(obj);
-+    SysBusDevice *dev = SYS_BUS_DEVICE(obj);
- 
--    memory_region_init_ram(&s->mem, OBJECT(s), "sun4m.afx", 4, &error_fatal);
-+    memory_region_init_ram(&s->mem, obj, "sun4m.afx", 4, &error_fatal);
-     vmstate_register_ram_global(&s->mem);
-     sysbus_init_mmio(dev, &s->mem);
--    return 0;
--}
--
--static void afx_class_init(ObjectClass *klass, void *data)
--{
--    SysBusDeviceClass *k = SYS_BUS_DEVICE_CLASS(klass);
--
--    k->init = afx_init1;
- }
- 
- static const TypeInfo afx_info = {
-     .name          = TYPE_TCX_AFX,
-     .parent        = TYPE_SYS_BUS_DEVICE,
-     .instance_size = sizeof(AFXState),
--    .class_init    = afx_class_init,
-+    .instance_init = afx_init1,
- };
- 
- #define TYPE_OPENPROM "openprom"
-@@ -707,16 +693,16 @@ static void prom_init(hwaddr addr, const char *bios_name)
-     }
- }
- 
--static int prom_init1(SysBusDevice *dev)
-+static void prom_init1(Object *obj)
- {
--    PROMState *s = OPENPROM(dev);
-+    PROMState *s = OPENPROM(obj);
-+    SysBusDevice *dev = SYS_BUS_DEVICE(obj);
- 
--    memory_region_init_ram(&s->prom, OBJECT(s), "sun4m.prom", PROM_SIZE_MAX,
-+    memory_region_init_ram(&s->prom, obj, "sun4m.prom", PROM_SIZE_MAX,
-                            &error_fatal);
-     vmstate_register_ram_global(&s->prom);
-     memory_region_set_readonly(&s->prom, true);
-     sysbus_init_mmio(dev, &s->prom);
--    return 0;
- }
- 
- static Property prom_properties[] = {
-@@ -726,9 +712,7 @@ static Property prom_properties[] = {
- static void prom_class_init(ObjectClass *klass, void *data)
- {
-     DeviceClass *dc = DEVICE_CLASS(klass);
--    SysBusDeviceClass *k = SYS_BUS_DEVICE_CLASS(klass);
- 
--    k->init = prom_init1;
-     dc->props = prom_properties;
- }
- 
-@@ -737,6 +721,7 @@ static const TypeInfo prom_info = {
-     .parent        = TYPE_SYS_BUS_DEVICE,
-     .instance_size = sizeof(PROMState),
-     .class_init    = prom_class_init,
-+    .instance_init = prom_init1,
- };
- 
- #define TYPE_SUN4M_MEMORY "memory"
-@@ -750,14 +735,14 @@ typedef struct RamDevice {
- } RamDevice;
- 
- /* System RAM */
--static int ram_init1(SysBusDevice *dev)
-+static void ram_realize(DeviceState *dev, Error **errp)
- {
-     RamDevice *d = SUN4M_RAM(dev);
-+    SysBusDevice *sbd = SYS_BUS_DEVICE(dev);
- 
-     memory_region_allocate_system_memory(&d->ram, OBJECT(d), "sun4m.ram",
-                                          d->size);
--    sysbus_init_mmio(dev, &d->ram);
--    return 0;
-+    sysbus_init_mmio(sbd, &d->ram);
- }
- 
- static void ram_init(hwaddr addr, ram_addr_t RAM_size,
-@@ -793,9 +778,8 @@ static Property ram_properties[] = {
- static void ram_class_init(ObjectClass *klass, void *data)
- {
-     DeviceClass *dc = DEVICE_CLASS(klass);
--    SysBusDeviceClass *k = SYS_BUS_DEVICE_CLASS(klass);
- 
--    k->init = ram_init1;
-+    dc->realize = ram_realize;
-     dc->props = ram_properties;
- }
- 
--- 
-2.13.0.rc2.115.g10c78a162
+>> allocation (for example, it's fairly easy to create a qcow2 image
+>> where consecutive guest addresses are not at consecutive host
+>> addresses), the current contract requires bdrv_get_block_status()
+>> to clamp *pnum to the limit where host addresses are no longer
+>> consecutive, but allowing a NULL file means that *pnum could be
+>> set to the full length of known-allocated data.
+>>
+>> Signed-off-by: Eric Blake <eblake@redhat.com>
+>>
+>> ---
+>> v2: new patch
+>=20
+> Yes. any particular reason why this patch is useful, besides simplifyin=
+g
+> callers?
+
+I guess it is not directly useful to this series. I can delay it to
+later, and include it as part of my v2 of changing
+bdrv_get_block_status() to be byte-based.  As mentioned in the commit
+message, it opens the door for a potential optimization for callers that
+don't care about offsets, but only allocation status, so that they can
+traverse the entire device address space with fewer queries.
+
+I'm fine if we want to just go with 1,2,4,5 for now.
+
+>> @@ -1748,7 +1748,11 @@ static int64_t coroutine_fn bdrv_co_get_block_s=
+tatus(BlockDriverState *bs,
+>>      int64_t total_sectors;
+>>      int64_t n;
+>>      int64_t ret, ret2;
+>> +    BlockDriverState *tmpfile;
+>>
+>> +    if (!file) {
+>> +        file =3D &tmpfile;
+>> +    }
+>=20
+> I don't like this hunk. Instead, how about replacing all "*file =3D ...=
+" with
+> "tmpfile =3D ..." and add "if (file) { *file =3D tmpfile; }" before ret=
+urning?
+
+Can do, particularly if I delay this patch to a later series, and we go
+with the rest now.
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--n9bCDDoAhDCaEGBswHTs2QxKqkPOa7H2A
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEcBAEBCAAGBQJZJuLdAAoJEKeha0olJ0NqTfQIAJfYBFDLpn7jR/M7FhTDQuPv
+1KbfkugS3y4UJe2bBa7J5mRid02xkTV5rR9eam6TT6Lr51t3yQPghMPbuxDcf7Lf
+j7uLhp9ggkJ7R7SYa69CUlPGDFkZ0fKPInxgpofEfJNG3/CDJbyx2jcmRImB5JqQ
+EGFzQGd3A5TciXprSMMTqnYTSB+f7q2hwTsHWtiCGCpuGPrmxmFtQcr4yF0o3DrZ
+cpfMAZwVNQSxiObtM/jBGqc3mcCF5OGimhknLk58Km2IrS031qzrFwmoNChfN5+g
+k8j4pP+anbDu9P71VRM5Tl6L3trpJzCpwG+MBfbaK4ogxsd9VS6xHFjQAhNrMj4=
+=rAU2
+-----END PGP SIGNATURE-----
+
+--n9bCDDoAhDCaEGBswHTs2QxKqkPOa7H2A--
