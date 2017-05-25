@@ -1,21 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51571)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52421)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dDm6A-00036r-82
-	for qemu-devel@nongnu.org; Thu, 25 May 2017 02:18:15 -0400
+	(envelope-from <jasowang@redhat.com>) id 1dDmAI-0005Bp-Ii
+	for qemu-devel@nongnu.org; Thu, 25 May 2017 02:22:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dDm69-0006Ow-8l
-	for qemu-devel@nongnu.org; Thu, 25 May 2017 02:18:14 -0400
-Date: Thu, 25 May 2017 14:18:00 +0800
-From: Fam Zheng <famz@redhat.com>
-Message-ID: <20170525061800.GB27936@lemon.lan>
-References: <20170524202842.26724-1-eblake@redhat.com>
-	<20170524202842.26724-3-eblake@redhat.com>
+	(envelope-from <jasowang@redhat.com>) id 1dDmAE-0000nC-KC
+	for qemu-devel@nongnu.org; Thu, 25 May 2017 02:22:30 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40660)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1dDmAE-0000mR-Au
+	for qemu-devel@nongnu.org; Thu, 25 May 2017 02:22:26 -0400
+References: <1495549241-23380-1-git-send-email-zhangchen.fnst@cn.fujitsu.com>
+	<1495549241-23380-7-git-send-email-zhangchen.fnst@cn.fujitsu.com>
+From: Jason Wang <jasowang@redhat.com>
+Message-ID: <9f0e7f5e-7da7-4d78-95d9-be544b1bd28e@redhat.com>
+Date: Thu, 25 May 2017 14:22:20 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170524202842.26724-3-eblake@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 2/5] block: Guarantee that *file is set
- on bdrv_get_block_status()
+In-Reply-To: <1495549241-23380-7-git-send-email-zhangchen.fnst@cn.fujitsu.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH V5 6/9] net/colo-compare.c: Make
+ colo-compare support vnet_hdr_len
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,109 +29,110 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, jsnow@redhat.com, mreitz@redhat.com, qemu-stable@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>, Kevin Wolf <kwolf@redhat.com>
+To: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>, qemu devel <qemu-devel@nongnu.org>
+Cc: zhanghailiang <zhang.zhanghailiang@huawei.com>, weifuqiang <weifuqiang@huawei.com>, "eddie . dong" <eddie.dong@intel.com>, bian naimeng <biannm@cn.fujitsu.com>, Li Zhijian <lizhijian@cn.fujitsu.com>
 
-On Wed, 05/24 15:28, Eric Blake wrote:
-> We document that *file is valid if the return is not an error and
-> includes BDRV_BLOCK_OFFSET_VALID, but forgot to obey this contract
-> when a driver (such as blkdebug) lacks a callback.  Broken in
-> commit 67a0fd2 (v2.6), when we added the file parameter.
-> 
-> Enhance qemu-iotest 177 to cover this, using a sequence that would
-> print garbage or even SEGV, because it was dererefencing through
-> uninitialized memory.  [The resulting test output shows that we
-> have less-than-ideal block status from the blkdebug driver, but
-> that's a separate fix coming up soon.]
-> 
-> Setting *file on all paths that return BDRV_BLOCK_OFFSET_VALID is
-> enough to fix the crash, but we can go one step further: always
-> setting *file, even on error, means that a broken caller that
-> blindly dereferences file without checking for error is now more
-> likely to get a reliable SEGV instead of randomly acting on garbage,
-> making it easier to diagnose such buggy callers.  Adding an
-> assertion that file is set where expected doesn't hurt either.
-> 
-> CC: qemu-stable@nongnu.org
-> Signed-off-by: Eric Blake <eblake@redhat.com>
-> 
-> ---
-> v2: drop redundant assignment
-> ---
->  block/io.c                 | 5 +++--
->  tests/qemu-iotests/177     | 3 +++
->  tests/qemu-iotests/177.out | 2 ++
->  3 files changed, 8 insertions(+), 2 deletions(-)
-> 
-> diff --git a/block/io.c b/block/io.c
-> index fdd7485..8e6c3fe 100644
-> --- a/block/io.c
-> +++ b/block/io.c
-> @@ -1749,6 +1749,7 @@ static int64_t coroutine_fn bdrv_co_get_block_status(BlockDriverState *bs,
->      int64_t n;
->      int64_t ret, ret2;
-> 
-> +    *file = NULL;
->      total_sectors = bdrv_nb_sectors(bs);
->      if (total_sectors < 0) {
->          return total_sectors;
-> @@ -1769,11 +1770,11 @@ static int64_t coroutine_fn bdrv_co_get_block_status(BlockDriverState *bs,
->          ret = BDRV_BLOCK_DATA | BDRV_BLOCK_ALLOCATED;
->          if (bs->drv->protocol_name) {
->              ret |= BDRV_BLOCK_OFFSET_VALID | (sector_num * BDRV_SECTOR_SIZE);
-> +            *file = bs;
->          }
->          return ret;
->      }
-> 
-> -    *file = NULL;
->      bdrv_inc_in_flight(bs);
->      ret = bs->drv->bdrv_co_get_block_status(bs, sector_num, nb_sectors, pnum,
->                                              file);
-> @@ -1783,7 +1784,7 @@ static int64_t coroutine_fn bdrv_co_get_block_status(BlockDriverState *bs,
->      }
-> 
->      if (ret & BDRV_BLOCK_RAW) {
-> -        assert(ret & BDRV_BLOCK_OFFSET_VALID);
-> +        assert(ret & BDRV_BLOCK_OFFSET_VALID && *file);
->          ret = bdrv_co_get_block_status(*file, ret >> BDRV_SECTOR_BITS,
->                                         *pnum, pnum, file);
->          goto out;
-> diff --git a/tests/qemu-iotests/177 b/tests/qemu-iotests/177
-> index 2005c17..f8ed8fb 100755
-> --- a/tests/qemu-iotests/177
-> +++ b/tests/qemu-iotests/177
-> @@ -43,6 +43,7 @@ _supported_proto file
->  CLUSTER_SIZE=1M
->  size=128M
->  options=driver=blkdebug,image.driver=qcow2
-> +nested_opts=image.file.driver=file,image.file.filename=$TEST_IMG
-> 
->  echo
->  echo "== setting up files =="
-> @@ -106,6 +107,8 @@ function verify_io()
->  }
-> 
->  verify_io | $QEMU_IO -r "$TEST_IMG" | _filter_qemu_io
-> +$QEMU_IMG map --image-opts "$options,$nested_opts,align=4k" \
-> +    | _filter_qemu_img_map
-> 
->  _check_test_img
-> 
-> diff --git a/tests/qemu-iotests/177.out b/tests/qemu-iotests/177.out
-> index e887542..b754ed4 100644
-> --- a/tests/qemu-iotests/177.out
-> +++ b/tests/qemu-iotests/177.out
-> @@ -45,5 +45,7 @@ read 30408704/30408704 bytes at offset 80740352
->  29 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
->  read 23068672/23068672 bytes at offset 111149056
->  22 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-> +Offset          Length          File
-> +0               0x8000000       blkdebug::TEST_DIR/t.IMGFMT
->  No errors were found on the image.
->  *** done
-> -- 
-> 2.9.4
-> 
 
-Reviewed-by: Fam Zheng <famz@redhat.com>
+
+On 2017=E5=B9=B405=E6=9C=8823=E6=97=A5 22:20, Zhang Chen wrote:
+> We add the vnet_hdr option for colo-compare, default is disable.
+> If you use virtio-net-pci net driver, please enable it.
+> You can use it for example:
+> -object colo-compare,id=3Dcomp0,primary_in=3Dcompare0-0,secondary_in=3D=
+compare1,outdev=3Dcompare_out0,vnet_hdr=3Don
+
+This is not accurate since virtio-net-pci is not the only card that uses=20
+vnet_hdr. E1000E is another one.
+
+>
+> COLO-compare can get vnet header length from filter,
+> Add vnet_hdr_len to struct packet and output packet with
+> the vnet_hdr_len.
+>
+> Signed-off-by: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
+> ---
+>   net/colo-compare.c | 76 +++++++++++++++++++++++++++++++++++++++++++++=
+++-------
+>   qemu-options.hx    |  4 +--
+>   2 files changed, 69 insertions(+), 11 deletions(-)
+>
+> diff --git a/net/colo-compare.c b/net/colo-compare.c
+> index bf0b856..f89b380 100644
+> --- a/net/colo-compare.c
+> +++ b/net/colo-compare.c
+> @@ -73,6 +73,7 @@ typedef struct CompareState {
+>       CharBackend chr_out;
+>       SocketReadState pri_rs;
+>       SocketReadState sec_rs;
+> +    bool vnet_hdr;
+>  =20
+>       /* connection list: the connections belonged to this NIC could be=
+ found
+>        * in this list.
+> @@ -97,9 +98,10 @@ enum {
+>       SECONDARY_IN,
+>   };
+>  =20
+> -static int compare_chr_send(CharBackend *out,
+> +static int compare_chr_send(CompareState *s,
+>                               const uint8_t *buf,
+> -                            uint32_t size);
+> +                            uint32_t size,
+> +                            uint32_t vnet_hdr_len);
+>  =20
+>   static gint seq_sorter(Packet *a, Packet *b, gpointer data)
+>   {
+> @@ -472,7 +474,10 @@ static void colo_compare_connection(void *opaque, =
+void *user_data)
+>           }
+>  =20
+>           if (result) {
+> -            ret =3D compare_chr_send(&s->chr_out, pkt->data, pkt->size=
+);
+> +            ret =3D compare_chr_send(s,
+> +                                   pkt->data,
+> +                                   pkt->size,
+> +                                   pkt->vnet_hdr_len);
+
+Why not check vnet_hdr support here?  And don't we need strip vnet_hdr=20
+here? (Since the redirector on destination does not do this)
+
+>               if (ret < 0) {
+>                   error_report("colo_send_primary_packet failed");
+>               }
+> @@ -493,9 +498,10 @@ static void colo_compare_connection(void *opaque, =
+void *user_data)
+>       }
+>   }
+>  =20
+> -static int compare_chr_send(CharBackend *out,
+> +static int compare_chr_send(CompareState *s,
+>                               const uint8_t *buf,
+> -                            uint32_t size)
+> +                            uint32_t size,
+> +                            uint32_t vnet_hdr_len)
+>   {
+>       int ret =3D 0;
+>       uint32_t len =3D htonl(size);
+> @@ -504,12 +510,24 @@ static int compare_chr_send(CharBackend *out,
+>           return 0;
+>       }
+>  =20
+> -    ret =3D qemu_chr_fe_write_all(out, (uint8_t *)&len, sizeof(len));
+> +    ret =3D qemu_chr_fe_write_all(&s->chr_out, (uint8_t *)&len, sizeof=
+(len));
+>       if (ret !=3D sizeof(len)) {
+>           goto err;
+>       }
+>  =20
+> -    ret =3D qemu_chr_fe_write_all(out, (uint8_t *)buf, size);
+> +    if (s->vnet_hdr) {
+> +        /*
+> +         * We send vnet header len make other module(like filter-redir=
+ector)
+> +         * know how to parse net packet correctly.
+> +         */
+
+But redirector does not strip the vnet header, does this really work?
+
+Thanks
