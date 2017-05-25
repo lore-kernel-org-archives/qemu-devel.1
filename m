@@ -1,28 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47142)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48487)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1dDxAo-0003sy-0T
-	for qemu-devel@nongnu.org; Thu, 25 May 2017 14:07:47 -0400
+	(envelope-from <mst@redhat.com>) id 1dDxHx-0007jD-Ma
+	for qemu-devel@nongnu.org; Thu, 25 May 2017 14:15:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1dDxAk-0004jO-OP
-	for qemu-devel@nongnu.org; Thu, 25 May 2017 14:07:45 -0400
-Received: from mailhub.sw.ru ([195.214.232.25]:2631 helo=relay.sw.ru)
+	(envelope-from <mst@redhat.com>) id 1dDxHu-0006nN-Fy
+	for qemu-devel@nongnu.org; Thu, 25 May 2017 14:15:09 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:52620)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
-	id 1dDxAk-0004eY-82
-	for qemu-devel@nongnu.org; Thu, 25 May 2017 14:07:42 -0400
-References: <20170525152628.37628-1-vsementsov@virtuozzo.com>
-	<20170525152628.37628-3-vsementsov@virtuozzo.com>
-	<4d041d0a-ed17-4d72-fce2-e2500e9ec0fc@redhat.com>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <245523c5-59fd-f585-291f-fe7fe64bb500@virtuozzo.com>
-Date: Thu, 25 May 2017 21:07:33 +0300
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1dDxHu-0006mv-72
+	for qemu-devel@nongnu.org; Thu, 25 May 2017 14:15:06 -0400
+Date: Thu, 25 May 2017 21:14:55 +0300
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20170525211413-mutt-send-email-mst@kernel.org>
+References: <1495163989-9994-1-git-send-email-peterx@redhat.com>
+	<1495163989-9994-11-git-send-email-peterx@redhat.com>
+	<20170519195349-mutt-send-email-mst@kernel.org>
+	<20170522024200.GE14679@pxdev.xzpeter.org>
 MIME-Version: 1.0
-In-Reply-To: <4d041d0a-ed17-4d72-fce2-e2500e9ec0fc@redhat.com>
-Content-Language: en-US
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 2/7] block: add
- bdrv_get_format_allocated_size format interface
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170522024200.GE14679@pxdev.xzpeter.org>
+Subject: Re: [Qemu-devel] [PATCH v4 10/10] vhost: iommu: cache static
+ mapping if there is
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,57 +30,161 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: armbru@redhat.com, mreitz@redhat.com, kwolf@redhat.com, den@openvz.org
+To: Peter Xu <peterx@redhat.com>
+Cc: qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, yi.l.liu@intel.com, Marcel Apfelbaum <marcel@redhat.com>, Lan Tianyu <tianyu.lan@intel.com>, Jason Wang <jasowang@redhat.com>
 
-25.05.2017 20:54, Eric Blake wrote:
-> On 05/25/2017 10:26 AM, Vladimir Sementsov-Ogievskiy wrote:
->> The function should return actually used by top-level format driver
-> s/actually/the allocation actually/
->
->> space (in it's .file). It differs from bdrv_get_allocated_file_size,
-> s/it's/its/ (remember, "it's" is only appropriate if "it is" can be used
-> in its place)
->
->> which returns allocated on fs file size.
-> s/allocated on fs file size/the disk usage of the underlying file/
->
-> So this is a measure of how many clusters a qcow2 image is currently
-> using (including metadata clusters, and regardless of whether those
-> clusters happen to point to a hole in the underlying protocol layer)?
+On Mon, May 22, 2017 at 10:42:00AM +0800, Peter Xu wrote:
+> On Fri, May 19, 2017 at 07:55:26PM +0300, Michael S. Tsirkin wrote:
+> > On Fri, May 19, 2017 at 11:19:49AM +0800, Peter Xu wrote:
+> > > This patch pre-heat vhost iotlb cache when passthrough mode enabled.
+> > > 
+> > > Sometimes, even if user specified iommu_platform for vhost devices,
+> > > IOMMU might still be disabled. One case is passthrough mode in VT-d
+> > > implementation. We can detect this by observing iommu_list. If it's
+> > > empty, it means IOMMU translation is disabled, then we can actually
+> > > pre-heat the translation (it'll be static mapping then) by first
+> > > invalidating all IOTLB, then cache existing memory ranges into vhost
+> > > backend iotlb using 1:1 mapping.
+> > > 
+> > > Signed-off-by: Peter Xu <peterx@redhat.com>
+> > 
+> > I don't really understand. Is this a performance optimization?
+> > Can you post some #s please?
+> 
+> Yes, it is. Vhost can work even without this patch, but it should be
+> faster when with this patch.
 
-Hmm, interesting remark. Now it is realized exactly as you write.. But 
-this leads to the situation, when qcow2 allocates data amount > 
-bdrv_getlength(bs->file->bs) and we will have negative size of 
-unallocated area =). Denis what do you think? (Actually, we needed this 
-feature for non-sparce file system and this question was not considered).
+You'll have to include perf testing numbers then.
 
->
->> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
->> ---
->>   block.c                   | 15 +++++++++++++++
->>   include/block/block.h     |  1 +
->>   include/block/block_int.h |  1 +
->>   3 files changed, 17 insertions(+)
->>
->> diff --git a/block.c b/block.c
->> index ba22fc0dfb..6e1a435490 100644
->> --- a/block.c
->> +++ b/block.c
->> @@ -3407,6 +3407,21 @@ int64_t bdrv_get_allocated_file_size(BlockDriverState *bs)
->>   }
->>   
->>   /**
->> + * Actually used by top-level format driver space (in it's .file) in bytes
-> s/it's/its/
->
-> I think we can do better.  How about:
->
-> Return the amount of space allocated by the format driver (including
-> metadata) in bytes, even if some of that space currently maps to holes
-> in the underlying protocol file.
->
+> As mentioned in the commit message and below comment [1], this patch
+> pre-heat the cache for vhost. Currently the cache entries depends on
+> the system memory ranges (dev->mem->nregions), and it should be far
+> smaller than vhost's cache count (currently it is statically defined
+> as max_iotlb_entries=2048 in kernel). If with current patch, these
+> cache entries can cover the whole possible DMA ranges that PT mode
+> would allow, so we won't have any cache miss then.
+> 
+> For the comments, do you have any better suggestion besides commit
+> message and [1]?
+> 
+> > 
+> > Also, if it's PT, can't we bypass iommu altogether? That would be
+> > even faster ...
+> 
+> Yes, but I don't yet know a good way to do it... Any suggestion is
+> welcomed as well.
+> 
+> Btw, do you have any comment on other patches besides this one? Since
+> this patch can really be isolated from the whole PT support series.
+> 
+> Thanks,
 
--- 
-Best regards,
-Vladimir
+I've applied the rest of the series.
+
+> > 
+> > > ---
+> > >  hw/virtio/trace-events |  4 ++++
+> > >  hw/virtio/vhost.c      | 49 +++++++++++++++++++++++++++++++++++++++++++++++++
+> > >  2 files changed, 53 insertions(+)
+> > > 
+> > > diff --git a/hw/virtio/trace-events b/hw/virtio/trace-events
+> > > index 1f7a7c1..54dcbb3 100644
+> > > --- a/hw/virtio/trace-events
+> > > +++ b/hw/virtio/trace-events
+> > > @@ -24,3 +24,7 @@ virtio_balloon_handle_output(const char *name, uint64_t gpa) "section name: %s g
+> > >  virtio_balloon_get_config(uint32_t num_pages, uint32_t actual) "num_pages: %d actual: %d"
+> > >  virtio_balloon_set_config(uint32_t actual, uint32_t oldactual) "actual: %d oldactual: %d"
+> > >  virtio_balloon_to_target(uint64_t target, uint32_t num_pages) "balloon target: %"PRIx64" num_pages: %d"
+> > > +
+> > > +# hw/virtio/vhost.c
+> > > +vhost_iommu_commit(void) ""
+> > > +vhost_iommu_static_preheat(void) ""
+> > > diff --git a/hw/virtio/vhost.c b/hw/virtio/vhost.c
+> > > index 03a46a7..8069135 100644
+> > > --- a/hw/virtio/vhost.c
+> > > +++ b/hw/virtio/vhost.c
+> > > @@ -27,6 +27,7 @@
+> > >  #include "hw/virtio/virtio-access.h"
+> > >  #include "migration/blocker.h"
+> > >  #include "sysemu/dma.h"
+> > > +#include "trace.h"
+> > >  
+> > >  /* enabled until disconnected backend stabilizes */
+> > >  #define _VHOST_DEBUG 1
+> > > @@ -730,6 +731,11 @@ static void vhost_iommu_unmap_notify(IOMMUNotifier *n, IOMMUTLBEntry *iotlb)
+> > >      }
+> > >  }
+> > >  
+> > > +static bool vhost_iommu_mr_enabled(struct vhost_dev *dev)
+> > > +{
+> > > +    return !QLIST_EMPTY(&dev->iommu_list);
+> > > +}
+> > > +
+> > >  static void vhost_iommu_region_add(MemoryListener *listener,
+> > >                                     MemoryRegionSection *section)
+> > >  {
+> > > @@ -782,6 +788,48 @@ static void vhost_iommu_region_del(MemoryListener *listener,
+> > >      }
+> > >  }
+> > >  
+> > > +static void vhost_iommu_commit(MemoryListener *listener)
+> > > +{
+> > > +    struct vhost_dev *dev = container_of(listener, struct vhost_dev,
+> > > +                                         iommu_listener);
+> > > +    struct vhost_memory_region *r;
+> > > +    int i;
+> > > +
+> > > +    trace_vhost_iommu_commit();
+> > > +
+> > > +    if (!vhost_iommu_mr_enabled(dev)) {
+> > > +        /*
+> > > +        * This means iommu_platform is enabled, however iommu memory
+> > > +        * region is disabled, e.g., when device passthrough is setup.
+> > > +        * Then, no translation is needed any more.
+> > > +        *
+> > > +        * Let's first invalidate the whole IOTLB, then pre-heat the
+> > > +        * static mapping by looping over vhost memory ranges.
+> > > +        */
+> 
+> [1]
+> 
+> > > +
+> > > +        if (dev->vhost_ops->vhost_invalidate_device_iotlb(dev, 0,
+> > > +                                                          UINT64_MAX)) {
+> > > +            error_report("%s: flush existing IOTLB failed", __func__);
+> > > +            return;
+> > > +        }
+> > > +
+> > > +        for (i = 0; i < dev->mem->nregions; i++) {
+> > > +            r = &dev->mem->regions[i];
+> > > +            /* Vhost regions are writable RAM, so IOMMU_RW suites. */
+> > > +            if (dev->vhost_ops->vhost_update_device_iotlb(dev,
+> > > +                                                          r->guest_phys_addr,
+> > > +                                                          r->userspace_addr,
+> > > +                                                          r->memory_size,
+> > > +                                                          IOMMU_RW)) {
+> > > +                error_report("%s: pre-heat static mapping failed", __func__);
+> > > +                return;
+> > > +            }
+> > > +        }
+> > > +
+> > > +        trace_vhost_iommu_static_preheat();
+> > > +    }
+> > > +}
+> > > +
+> > >  static void vhost_region_nop(MemoryListener *listener,
+> > >                               MemoryRegionSection *section)
+> > >  {
+> > > @@ -1298,6 +1346,7 @@ int vhost_dev_init(struct vhost_dev *hdev, void *opaque,
+> > >      hdev->iommu_listener = (MemoryListener) {
+> > >          .region_add = vhost_iommu_region_add,
+> > >          .region_del = vhost_iommu_region_del,
+> > > +        .commit = vhost_iommu_commit,
+> > >      };
+> > >  
+> > >      if (hdev->migration_blocker == NULL) {
+> > > -- 
+> > > 2.7.4
+> 
+> -- 
+> Peter Xu
