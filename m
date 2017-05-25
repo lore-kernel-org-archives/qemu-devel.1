@@ -1,29 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49796)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51414)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <felipe@nutanix.com>) id 1dDvZd-0000FN-Uv
-	for qemu-devel@nongnu.org; Thu, 25 May 2017 12:25:19 -0400
+	(envelope-from <eblake@redhat.com>) id 1dDvgX-000486-Vc
+	for qemu-devel@nongnu.org; Thu, 25 May 2017 12:32:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <felipe@nutanix.com>) id 1dDvZZ-0008WQ-0j
-	for qemu-devel@nongnu.org; Thu, 25 May 2017 12:25:17 -0400
-Received: from mail-cys01nam02on0121.outbound.protection.outlook.com
-	([104.47.37.121]:38752
-	helo=NAM02-CY1-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <felipe@nutanix.com>) id 1dDvZY-0008Vm-Do
-	for qemu-devel@nongnu.org; Thu, 25 May 2017 12:25:12 -0400
-From: Felipe Franciosi <felipe@nutanix.com>
-Date: Thu, 25 May 2017 16:25:07 +0000
-Message-ID: <1867E709-8609-41BF-BB0A-3B851D9D984E@nutanix.com>
-References: <1495229390-18909-1-git-send-email-felipe@nutanix.com>
-	<869fcc91-40ff-97fa-2a82-ca34695ac864@redhat.com>
-In-Reply-To: <869fcc91-40ff-97fa-2a82-ca34695ac864@redhat.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <0D5D5F92A573454DBA11A52BFAA22E45@namprd02.prod.outlook.com>
-Content-Transfer-Encoding: quoted-printable
+	(envelope-from <eblake@redhat.com>) id 1dDvgW-0003cK-S1
+	for qemu-devel@nongnu.org; Thu, 25 May 2017 12:32:26 -0400
+References: <20170525152628.37628-1-vsementsov@virtuozzo.com>
+	<20170525152628.37628-2-vsementsov@virtuozzo.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <3fdd3178-89d7-2819-d040-1e5132d655ec@redhat.com>
+Date: Thu, 25 May 2017 11:32:14 -0500
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH] cpus: reset throttle_thread_scheduled
- after sleep
+In-Reply-To: <20170525152628.37628-2-vsementsov@virtuozzo.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="8sWJgmRTDloDKr6xcRrsWAD28RBQ76xU1"
+Subject: Re: [Qemu-devel] [PATCH 1/7] block: fix comment for
+ bdrv_get_allocated_file_size()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,47 +25,108 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: "Jason J. Herne" <jjherne@linux.vnet.ibm.com>, Malcolm Crossley <malcolm@nutanix.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: armbru@redhat.com, mreitz@redhat.com, kwolf@redhat.com, den@openvz.org
 
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--8sWJgmRTDloDKr6xcRrsWAD28RBQ76xU1
+From: Eric Blake <eblake@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: armbru@redhat.com, mreitz@redhat.com, kwolf@redhat.com, den@openvz.org
+Message-ID: <3fdd3178-89d7-2819-d040-1e5132d655ec@redhat.com>
+Subject: Re: [PATCH 1/7] block: fix comment for bdrv_get_allocated_file_size()
+References: <20170525152628.37628-1-vsementsov@virtuozzo.com>
+ <20170525152628.37628-2-vsementsov@virtuozzo.com>
+In-Reply-To: <20170525152628.37628-2-vsementsov@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-> On 25 May 2017, at 16:52, Paolo Bonzini <pbonzini@redhat.com> wrote:
+On 05/25/2017 10:26 AM, Vladimir Sementsov-Ogievskiy wrote:
+> Current comment is not clear enough: which sparseness is meant, coming
+> from sparse image format or from sparse file system?
 >=20
+> For example, if we have qcow2 above raw file on non-sparse file system,=
+
+> this function will say nothing about unallocated (by qcow2 layer)
+> clusters.
 >=20
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> ---
+>  block.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
 >=20
-> On 19/05/2017 23:29, Felipe Franciosi wrote:
->> Currently, the throttle_thread_scheduled flag is reset back to 0 before
->> sleeping (as part of the throttling logic). Given that throttle_timer
->> (well, any timer) may tick with a slight delay, it so happens that under
->> heavy throttling (ie. close or on CPU_THROTTLE_PCT_MAX) the tick may
->> schedule a further cpu_throttle_thread() work item after the flag reset,
->> but before the previous sleep completed. This results on the vCPU thread
->> sleeping continuously for potentially several seconds in a row.
->>=20
->> The chances of that happening can be drastically minimised by resetting
->> the flag after the sleep.
->=20
-> True, on the other hand this may also increase the chance of not
-> sleeping at all.
+> diff --git a/block.c b/block.c
+> index 50ba264143..ba22fc0dfb 100644
+> --- a/block.c
+> +++ b/block.c
+> @@ -3388,8 +3388,8 @@ int bdrv_truncate(BdrvChild *child, int64_t offse=
+t, Error **errp)
+>  }
+> =20
+>  /**
+> - * Length of a allocated file in bytes. Sparse files are counted by ac=
+tual
 
-The perfect solution (for this throttling strategy) would probably be a per=
--cpu timer. In the meantime, I think avoiding massive sleeps is a win. We o=
-bserved stalls in excess of 70 secs at 99% throttle.
+Yay for getting rid of bad grammar (s/a /an /)
 
-> How overcommitted was the host system?
+> - * allocated space. Return < 0 if error or unknown.
+> + * Size of allocated in underlying file system area. Sparseness is tak=
+en into
 
-Not overcommitted at all. And it's quite easy to reproduce. All you need is=
- a workload heavy enough to prevent the migration from converging (or a slo=
-w network which you can emulate with a qdisc).
+Doesn't read well.  Maybe: s/Size of allocated/Allocation size/ ?
 
-With a Linux guest, you should quickly see soft lockups being reported. Wit=
-h Windows, probably BSODs.
+> + * account for sparse file systems. Return < 0 if error or unknown.
 
-Thanks,
-Felipe
+I still don't get what we are trying to present.
 
->=20
-> Paolo
->=20
->> Signed-off-by: Felipe Franciosi <felipe@nutanix.com>
->> Signed-off-by: Malcolm Crossley <malcolm@nutanix.com>
+If we have the following 6 qcow2 file clusters backed by the underlying
+lseek(SEEK_DATA/HOLE) file system contents:
+
+BDRV_BLOCK_UNALLOCATED   N/A
+BDRV_BLOCK_ZERO_PLAIN    N/A
+BDRV_BLOCK_ZERO_ALLOC    hole
+BDRV_BLOCK_ZERO_ALLOC    data
+BDRV_BLOCK_DATA          hole
+BDRV_BLOCK_DATA          data
+
+Then is our answer the size of all qcow2 allocations regardless of
+underlying status (4, due to clusters 3-6), or the size of only the
+clusters that read from the backing file (2, due to clusters 5-6), or
+the size of only the clusters that currently occupy space in the file
+system (2, due to clusters 4 and 6), or the size of clusters that are
+not provably read-as-zero (1, due to cluster 6)?
+
+Does the answer change if you can have underlying holes happen at a
+smaller granularity than clusters?
+
+What happens for compressed clusters?
+
+I think we still need to do a better job at writing a precise comment.
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--8sWJgmRTDloDKr6xcRrsWAD28RBQ76xU1
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEcBAEBCAAGBQJZJwcOAAoJEKeha0olJ0Nq9IwIAKlByUdyMavcRauDeOa8jYlI
+uHdyXOwvBu1831WzX+PwAUKk6tJr/f3MgICPUn4XPN03bHxR7S/95iWQBu2FgkIE
+8nXePvReLeP+SM220lQ3OfrSk+SIdHrU1S+pA0EBVVuRw+MphEHQAPr6i+5QGT+i
+j0mYiQ6FxO+NAqTlTv3ohPfS93p5gPjp4eGFETQ7BQJdkkCSGSE+t3Z3gM0Uvo6s
+aIeN6fpr3Lf9/+LrBH3u5189gBeSznN5BUVKGM+BfFqTJri5ok234RAWOAId4mzF
+Ns9cUCGSW0qJcmzd+9AtatckXUcdPJILCSWKcCQSBUffp0JaDmdpRzkjbBU/xiQ=
+=yYw+
+-----END PGP SIGNATURE-----
+
+--8sWJgmRTDloDKr6xcRrsWAD28RBQ76xU1--
