@@ -1,29 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45497)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51855)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rkagan@virtuozzo.com>) id 1dDpFk-0000ma-27
-	for qemu-devel@nongnu.org; Thu, 25 May 2017 05:40:21 -0400
+	(envelope-from <berrange@redhat.com>) id 1dDprO-000642-41
+	for qemu-devel@nongnu.org; Thu, 25 May 2017 06:19:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rkagan@virtuozzo.com>) id 1dDpFg-0000fE-UD
-	for qemu-devel@nongnu.org; Thu, 25 May 2017 05:40:20 -0400
-Received: from mail-he1eur01on0135.outbound.protection.outlook.com
-	([104.47.0.135]:52544
-	helo=EUR01-HE1-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <rkagan@virtuozzo.com>)
-	id 1dDpFg-0000fA-8Q
-	for qemu-devel@nongnu.org; Thu, 25 May 2017 05:40:16 -0400
-Date: Thu, 25 May 2017 12:40:05 +0300
-From: Roman Kagan <rkagan@virtuozzo.com>
-Message-ID: <20170525094004.GA27740@rkaganb.sw.ru>
-References: <1495634844-14777-1-git-send-email-dplotnikov@virtuozzo.com>
-	<20170524155408.GF14372@rkaganb.sw.ru>
-	<20170524172005.GB4623@amt.cnet>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20170524172005.GB4623@amt.cnet>
-Subject: Re: [Qemu-devel] [svt-core] [PATCH] kvmclock: update
- system_time_msr address forcibly
+	(envelope-from <berrange@redhat.com>) id 1dDprJ-0004sW-5o
+	for qemu-devel@nongnu.org; Thu, 25 May 2017 06:19:14 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46126)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1dDprI-0004sM-Sv
+	for qemu-devel@nongnu.org; Thu, 25 May 2017 06:19:09 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id DE9F23DE3D
+	for <qemu-devel@nongnu.org>; Thu, 25 May 2017 10:19:07 +0000 (UTC)
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Date: Thu, 25 May 2017 11:19:00 +0100
+Message-Id: <20170525101900.15950-1-berrange@redhat.com>
+Subject: [Qemu-devel] [PATCH v3] sockets: improve error reporting if UNIX
+ socket path is too long
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,108 +28,173 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Marcelo Tosatti <mtosatti@redhat.com>
-Cc: Denis Plotnikov <dplotnikov@virtuozzo.com>, pbonzini@redhat.com, qemu-devel@nongnu.org, den@virtuozzo.com
+To: qemu-devel@nongnu.org
+Cc: Eric Blake <eblake@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>
 
-On Wed, May 24, 2017 at 02:20:05PM -0300, Marcelo Tosatti wrote:
-> On Wed, May 24, 2017 at 06:54:09PM +0300, Roman Kagan wrote:
-> > On Wed, May 24, 2017 at 05:07:24PM +0300, Denis Plotnikov wrote:
-> > > Do an update of system_time_msr address every time before reading
-> > > the value of tsc_timestamp from guest's kvmclock page.
-> > > 
-> > > It should be done in a forcible manner because there is a situation
-> > > when system_time_msr has been set by kvm but qemu doesn't aware of it.
-> > > This leads to updates of kvmclock_offset without respect of guest's
-> > > kvmclock values.
-> > > 
-> > > The situation appears when L2 linux guest runs over L1 linux guest and
-> > > the action inducing system_time_msr update is tpr access reporting.
-> > > Some L1 linux guests turn off processing TPR access and when L0
-> > > gets an L2 exit induced by TPR MSR access it doesn't enter L1 and
-> > > processed it by itself.
-> > > Thus, L1 kvm doesn't know about that TPR access happening and doesn't
-> > > exit to qemu which in turn doesn't set system_time_msr address.
-> > > 
-> > > This patch fixes this by making sure it knows the correct address every
-> > > time it is needed.
-> > > 
-> > > Signed-off-by: Denis Plotnikov <dplotnikov@virtuozzo.com>
-> > > ---
-> > >  hw/i386/kvm/clock.c | 32 +++++++++++++++++++++++++++++++-
-> > >  1 file changed, 31 insertions(+), 1 deletion(-)
-> > > 
-> > > diff --git a/hw/i386/kvm/clock.c b/hw/i386/kvm/clock.c
-> > > index e713162..035196a 100644
-> > > --- a/hw/i386/kvm/clock.c
-> > > +++ b/hw/i386/kvm/clock.c
-> > > @@ -48,11 +48,38 @@ struct pvclock_vcpu_time_info {
-> > >      uint8_t    pad[2];
-> > >  } __attribute__((__packed__)); /* 32 bytes */
-> > >  
-> > > +static void update_all_system_time_msr(void)
-> > > +{
-> > > +    CPUState *cpu;
-> > > +    CPUX86State *env;
-> > > +    struct {
-> > > +        struct kvm_msrs info;
-> > > +        struct kvm_msr_entry entries[1];
-> > > +    } msr_data;
-> > > +    int ret;
-> > > +
-> > > +    msr_data.info.nmsrs = 1;
-> > > +    msr_data.entries[0].index = MSR_KVM_SYSTEM_TIME;
-> > > +
-> > > +    CPU_FOREACH(cpu) {
-> > > +        ret = kvm_vcpu_ioctl(cpu, KVM_GET_MSRS, &msr_data);
-> > > +
-> > > +        if (ret < 0) {
-> > > +            fprintf(stderr, "KVM_GET_MSRS failed: %s\n", strerror(ret));
-> > > +            abort();
-> > > +        }
-> > > +
-> > > +        assert(ret == 1);
-> > > +        env = cpu->env_ptr;
-> > > +        env->system_time_msr = msr_data.entries[0].data;
-> > > +    }
-> > > +}
-> > > +
-> > >  static uint64_t kvmclock_current_nsec(KVMClockState *s)
-> > >  {
-> > >      CPUState *cpu = first_cpu;
-> > >      CPUX86State *env = cpu->env_ptr;
-> > > -    hwaddr kvmclock_struct_pa = env->system_time_msr & ~1ULL;
-> > > +    hwaddr kvmclock_struct_pa;
-> > >      uint64_t migration_tsc = env->tsc;
-> > >      struct pvclock_vcpu_time_info time;
-> > >      uint64_t delta;
-> > > @@ -60,6 +87,9 @@ static uint64_t kvmclock_current_nsec(KVMClockState *s)
-> > >      uint64_t nsec_hi;
-> > >      uint64_t nsec;
-> > >  
-> > > +    update_all_system_time_msr();
-> > 
-> > I'd rather just cpu_synchronize_state(cpu) here.  
-> > 
-> > > +    kvmclock_struct_pa = env->system_time_msr & ~1ULL;
-> > > +
-> > >      if (!(env->system_time_msr & 1ULL)) {
-> > >          /* KVM clock not active */
-> > >          return 0;
-> > 
-> > Roman.
-> 
-> Can't you avoid that call to each CPU? (ie fix the synchronization 
-> of the system time address problem in some other way?)
+The 'struct sockaddr_un' only allows 108 bytes for the socket
+path.
 
-Sorry, what call do you mean?  On one hand I suggested exactly to only
-call cpu_synchronize_state on the current (== first) cpu.  On the other,
-cpu_synchronize_state is heavier than just fetching a single msr.
+If the user supplies a path, QEMU uses snprintf() to silently
+truncate it when too long. This is undesirable because the user
+will then be unable to connect to the path they asked for.
 
-Anyway kvmclock_current_nsec is only called in kvmclock_vm_state_change
-callback which is certainly not performance-critical, so IMO less new
-code here is better than more efficiency.
+If the user doesn't supply a path, QEMU builds one based on
+TMPDIR, but if that leads to an overlong path, it mistakenly
+uses error_setg_errno() with a stale errno value, because
+snprintf() does not set errno on truncation.
 
-Or maybe I misunderstand your reason to request that the synchronization
-problem is fixed in some other way?
+In solving this the code needed some refactoring to ensure we
+don't pass 'un.sun_path' directly to any APIs which expect
+NUL-terminated strings, because the path is not required to
+be terminated.
 
-Roman.
+Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
+---
+
+Changed in v3:
+
+ - Also fix unix_connect_saddr error reporting
+ - Avoid calling unlink with path that might not be nul terminated
+ - Ensure the TMPDIR derived path can fill up sun_path space.
+ - Don't update saddr->path until we have succesfully listened
+ - Unify error reporting across both explicit path & TMPDIR path
+   branches
+
+ util/qemu-sockets.c | 64 +++++++++++++++++++++++++++++++++++------------------
+ 1 file changed, 43 insertions(+), 21 deletions(-)
+
+diff --git a/util/qemu-sockets.c b/util/qemu-sockets.c
+index d8183f7..59c774e 100644
+--- a/util/qemu-sockets.c
++++ b/util/qemu-sockets.c
+@@ -845,6 +845,8 @@ static int unix_listen_saddr(UnixSocketAddress *saddr,
+ {
+     struct sockaddr_un un;
+     int sock, fd;
++    char *pathbuf = NULL;
++    const char *path;
+ 
+     sock = qemu_socket(PF_UNIX, SOCK_STREAM, 0);
+     if (sock < 0) {
+@@ -852,19 +854,12 @@ static int unix_listen_saddr(UnixSocketAddress *saddr,
+         return -1;
+     }
+ 
+-    memset(&un, 0, sizeof(un));
+-    un.sun_family = AF_UNIX;
+-    if (saddr->path && strlen(saddr->path)) {
+-        snprintf(un.sun_path, sizeof(un.sun_path), "%s", saddr->path);
++    if (saddr->path && saddr->path[0]) {
++        path = saddr->path;
+     } else {
+         const char *tmpdir = getenv("TMPDIR");
+         tmpdir = tmpdir ? tmpdir : "/tmp";
+-        if (snprintf(un.sun_path, sizeof(un.sun_path), "%s/qemu-socket-XXXXXX",
+-                     tmpdir) >= sizeof(un.sun_path)) {
+-            error_setg_errno(errp, errno,
+-                             "TMPDIR environment variable (%s) too large", tmpdir);
+-            goto err;
+-        }
++        path = pathbuf = g_strdup_printf("%s/qemu-socket-XXXXXX", tmpdir);
+ 
+         /*
+          * This dummy fd usage silences the mktemp() unsecure warning.
+@@ -873,24 +868,32 @@ static int unix_listen_saddr(UnixSocketAddress *saddr,
+          * to unlink first and thus re-open the race window.  The
+          * worst case possible is bind() failing, i.e. a DoS attack.
+          */
+-        fd = mkstemp(un.sun_path);
++        fd = mkstemp(pathbuf);
+         if (fd < 0) {
+             error_setg_errno(errp, errno,
+                              "Failed to make a temporary socket name in %s", tmpdir);
+             goto err;
+         }
+         close(fd);
+-        if (update_addr) {
+-            g_free(saddr->path);
+-            saddr->path = g_strdup(un.sun_path);
+-        }
+     }
+ 
+-    if (unlink(un.sun_path) < 0 && errno != ENOENT) {
++    if (strlen(path) > sizeof(un.sun_path)) {
++        error_setg(errp, "UNIX socket path '%s' is too long", path);
++        error_append_hint(errp, "Path must be less than %zu bytes\n",
++                          sizeof(un.sun_path));
++        goto err;
++    }
++
++    if (unlink(path) < 0 && errno != ENOENT) {
+         error_setg_errno(errp, errno,
+-                         "Failed to unlink socket %s", un.sun_path);
++                         "Failed to unlink socket %s", path);
+         goto err;
+     }
++
++    memset(&un, 0, sizeof(un));
++    un.sun_family = AF_UNIX;
++    strncpy(un.sun_path, path, sizeof(un.sun_path));
++
+     if (bind(sock, (struct sockaddr*) &un, sizeof(un)) < 0) {
+         error_setg_errno(errp, errno, "Failed to bind socket to %s", un.sun_path);
+         goto err;
+@@ -900,9 +903,16 @@ static int unix_listen_saddr(UnixSocketAddress *saddr,
+         goto err;
+     }
+ 
++    if (update_addr && pathbuf) {
++        g_free(saddr->path);
++        saddr->path = pathbuf;
++    } else {
++        g_free(pathbuf);
++    }
+     return sock;
+ 
+ err:
++    g_free(pathbuf);
+     closesocket(sock);
+     return -1;
+ }
+@@ -932,9 +942,16 @@ static int unix_connect_saddr(UnixSocketAddress *saddr,
+         qemu_set_nonblock(sock);
+     }
+ 
++    if (strlen(saddr->path) > sizeof(un.sun_path)) {
++        error_setg(errp, "UNIX socket path '%s' is too long", saddr->path);
++        error_append_hint(errp, "Path must be less than %zu bytes\n",
++                          sizeof(un.sun_path));
++        goto err;
++    }
++
+     memset(&un, 0, sizeof(un));
+     un.sun_family = AF_UNIX;
+-    snprintf(un.sun_path, sizeof(un.sun_path), "%s", saddr->path);
++    strncpy(un.sun_path, saddr->path, sizeof(un.sun_path));
+ 
+     /* connect to peer */
+     do {
+@@ -956,13 +973,18 @@ static int unix_connect_saddr(UnixSocketAddress *saddr,
+     }
+ 
+     if (rc < 0) {
+-        error_setg_errno(errp, -rc, "Failed to connect socket");
+-        close(sock);
+-        sock = -1;
++        error_setg_errno(errp, -rc, "Failed to connect socket %s",
++                         saddr->path);
++        goto err;
+     }
+ 
+     g_free(connect_state);
+     return sock;
++
++ err:
++    close(sock);
++    g_free(connect_state);
++    return -1;
+ }
+ 
+ #else
+-- 
+2.9.3
