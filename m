@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55255)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55299)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aurelien@aurel32.net>) id 1dDzwc-0005fB-Vd
+	(envelope-from <aurelien@aurel32.net>) id 1dDzwd-0005gO-Ps
 	for qemu-devel@nongnu.org; Thu, 25 May 2017 17:05:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aurelien@aurel32.net>) id 1dDzwa-0001M6-Je
-	for qemu-devel@nongnu.org; Thu, 25 May 2017 17:05:18 -0400
-Received: from hall.aurel32.net ([2001:bc8:30d7:100::1]:37440)
+	(envelope-from <aurelien@aurel32.net>) id 1dDzwb-0001NV-Pn
+	for qemu-devel@nongnu.org; Thu, 25 May 2017 17:05:19 -0400
+Received: from hall.aurel32.net ([2001:bc8:30d7:100::1]:37482)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <aurelien@aurel32.net>)
-	id 1dDzwa-0001Kk-Ae
-	for qemu-devel@nongnu.org; Thu, 25 May 2017 17:05:16 -0400
+	id 1dDzwb-0001Mf-GV
+	for qemu-devel@nongnu.org; Thu, 25 May 2017 17:05:17 -0400
 From: Aurelien Jarno <aurelien@aurel32.net>
-Date: Thu, 25 May 2017 23:04:58 +0200
-Message-Id: <20170525210508.4910-17-aurelien@aurel32.net>
+Date: Thu, 25 May 2017 23:05:04 +0200
+Message-Id: <20170525210508.4910-23-aurelien@aurel32.net>
 In-Reply-To: <20170525210508.4910-1-aurelien@aurel32.net>
 References: <20170525210508.4910-1-aurelien@aurel32.net>
-Subject: [Qemu-devel] [PATCH 16/26] target/s390x: implement COMPARE LOGICAL
- LONG
+Subject: [Qemu-devel] [PATCH 22/26] target/s390x: implement UNPACK ASCII
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,185 +27,128 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Aurelien Jarno <aurelien@aurel32.net>, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>
 
-As CLCL and CLCLE mostly differ by their operands, use a common do_clcl
-helper. Another difference is that CLCL is not interruptible.
-
 Signed-off-by: Aurelien Jarno <aurelien@aurel32.net>
 ---
  target/s390x/helper.h      |  1 +
  target/s390x/insn-data.def |  2 ++
- target/s390x/mem_helper.c  | 86 ++++++++++++++++++++++++++++++++--------------
- target/s390x/translate.c   | 11 ++++++
- 4 files changed, 75 insertions(+), 25 deletions(-)
+ target/s390x/mem_helper.c  | 51 ++++++++++++++++++++++++++++++++++++++++++++++
+ target/s390x/translate.c   | 17 ++++++++++++++++
+ 4 files changed, 71 insertions(+)
 
 diff --git a/target/s390x/helper.h b/target/s390x/helper.h
-index e1ab8d5686..32938d99de 100644
+index 1011df122d..ffc0588e83 100644
 --- a/target/s390x/helper.h
 +++ b/target/s390x/helper.h
-@@ -6,6 +6,7 @@ DEF_HELPER_FLAGS_4(mvc, TCG_CALL_NO_WG, void, env, i32, i64, i64)
- DEF_HELPER_FLAGS_4(mvcin, TCG_CALL_NO_WG, void, env, i32, i64, i64)
- DEF_HELPER_FLAGS_4(clc, TCG_CALL_NO_WG, i32, env, i32, i64, i64)
- DEF_HELPER_3(mvcl, i32, env, i32, i32)
-+DEF_HELPER_3(clcl, i32, env, i32, i32)
- DEF_HELPER_FLAGS_4(clm, TCG_CALL_NO_WG, i32, env, i32, i32, i64)
- DEF_HELPER_FLAGS_3(divs32, TCG_CALL_NO_WG, s64, env, s64, s64)
- DEF_HELPER_FLAGS_3(divu32, TCG_CALL_NO_WG, i64, env, i64, i64)
+@@ -86,6 +86,7 @@ DEF_HELPER_FLAGS_4(pack, TCG_CALL_NO_WG, void, env, i32, i64, i64)
+ DEF_HELPER_FLAGS_4(pka, TCG_CALL_NO_WG, void, env, i64, i64, i32)
+ DEF_HELPER_FLAGS_4(pku, TCG_CALL_NO_WG, void, env, i64, i64, i32)
+ DEF_HELPER_FLAGS_4(unpk, TCG_CALL_NO_WG, void, env, i32, i64, i64)
++DEF_HELPER_FLAGS_4(unpka, TCG_CALL_NO_WG, i32, env, i64, i32, i64)
+ DEF_HELPER_FLAGS_4(tr, TCG_CALL_NO_WG, void, env, i32, i64, i64)
+ DEF_HELPER_4(tre, i64, env, i64, i64, i64)
+ DEF_HELPER_4(trt, i32, env, i32, i64, i64)
 diff --git a/target/s390x/insn-data.def b/target/s390x/insn-data.def
-index c69e3f4216..e241c1e486 100644
+index 3335270182..b0c0ea6687 100644
 --- a/target/s390x/insn-data.def
 +++ b/target/s390x/insn-data.def
-@@ -210,6 +210,8 @@
-     C(0xc60e, CLGFRL,  RIL_b, GIE, r1_o, mri2_32u, 0, 0, 0, cmpu64)
-     C(0xc607, CLHRL,   RIL_b, GIE, r1_o, mri2_16u, 0, 0, 0, cmpu32)
-     C(0xc606, CLGHRL,  RIL_b, GIE, r1_o, mri2_16u, 0, 0, 0, cmpu64)
-+/* COMPARE LOGICAL LONG */
-+    C(0x0f00, CLCL,    RR_a,  Z,   0, 0, 0, 0, clcl, 0)
- /* COMPARE LOGICAL LONG EXTENDED */
-     C(0xa900, CLCLE,   RS_a,  Z,   0, a2, 0, 0, clcle, 0)
- /* COMPARE LOGICAL CHARACTERS UNDER MASK */
+@@ -869,6 +869,8 @@
+     /* Really format SS_b, but we pack both lengths into one argument
+        for the helper call, so we might as well leave one 8-bit field.  */
+     C(0xf300, UNPK,    SS_a,  Z,   la1, a2, 0, 0, unpk, 0)
++/* UNPACK ASCII */
++    C(0xea00, UNPKA,   SS_a,  E2,  la1, a2, 0, 0, unpka, 0)
+ 
+ #ifndef CONFIG_USER_ONLY
+ /* COMPARE AND SWAP AND PURGE */
 diff --git a/target/s390x/mem_helper.c b/target/s390x/mem_helper.c
-index bd3bce3623..aa665fe0f7 100644
+index ab34a309ce..aaabc63000 100644
 --- a/target/s390x/mem_helper.c
 +++ b/target/s390x/mem_helper.c
-@@ -706,27 +706,24 @@ uint32_t HELPER(mvcle)(CPUS390XState *env, uint32_t r1, uint64_t a2,
-     return cc;
+@@ -1053,6 +1053,57 @@ void HELPER(unpk)(CPUS390XState *env, uint32_t len, uint64_t dest,
+     }
  }
  
--/* compare logical long extended memcompare insn with padding */
--uint32_t HELPER(clcle)(CPUS390XState *env, uint32_t r1, uint64_t a2,
--                       uint32_t r3)
--{
--    uintptr_t ra = GETPC();
--    uint64_t destlen = get_length(env, r1 + 1);
--    uint64_t dest = get_address(env, r1);
--    uint64_t srclen = get_length(env, r3 + 1);
--    uint64_t src = get_address(env, r3);
--    uint8_t pad = a2 & 0xff;
--    uint64_t len = MAX(srclen, destlen);
-+/* compare logical long helper */
-+static inline uint32_t do_clcl(CPUS390XState *env,
-+                               uint64_t *dest, uint64_t *destlen,
-+                               uint64_t *src, uint64_t *srclen,
-+                               uint8_t pad, uint64_t limit,
-+                               uintptr_t ra)
-+{
-+    uint64_t len = MAX(*srclen, *destlen);
-     uint32_t cc = 0;
- 
--    if (!(destlen || srclen)) {
-+    if (!(*destlen || *srclen)) {
-         return cc;
-     }
- 
-     /* Lest we fail to service interrupts in a timely manner, limit the
--       amount of work we're willing to do.  For now, let's cap at 8k.  */
--    if (len > 0x2000) {
--        len = 0x2000;
-+       amount of work we're willing to do.  */
-+    if (len > limit) {
-+        len = limit;
-         cc = 3;
-     }
- 
-@@ -734,11 +731,11 @@ uint32_t HELPER(clcle)(CPUS390XState *env, uint32_t r1, uint64_t a2,
-         uint8_t v1 = pad;
-         uint8_t v2 = pad;
- 
--        if (srclen) {
--            v1 = cpu_ldub_data_ra(env, src, ra);
-+        if (*srclen) {
-+            v1 = cpu_ldub_data_ra(env, *src, ra);
-         }
--        if (destlen) {
--            v2 = cpu_ldub_data_ra(env, dest, ra);
-+        if (*destlen) {
-+            v2 = cpu_ldub_data_ra(env, *dest, ra);
-         }
- 
-         if (v1 != v2) {
-@@ -746,16 +743,55 @@ uint32_t HELPER(clcle)(CPUS390XState *env, uint32_t r1, uint64_t a2,
-             break;
-         }
- 
--        if (srclen) {
--            src++;
--            srclen--;
-+        if (*srclen) {
-+            *src += 1;
-+            *srclen -= 1;
-         }
--        if (destlen) {
--            dest++;
--            destlen--;
-+        if (*destlen) {
-+            *dest += 1;
-+            *destlen -= 1;
-         }
-     }
- 
-+    return cc;
-+}
-+
-+
-+/* compare logical long */
-+uint32_t HELPER(clcl)(CPUS390XState *env, uint32_t r1, uint32_t r2)
++uint32_t HELPER(unpka)(CPUS390XState *env, uint64_t dest, uint32_t destlen,
++                       uint64_t src)
 +{
 +    uintptr_t ra = GETPC();
-+    uint64_t destlen = extract64(env->regs[r1 + 1], 0, 24);
-+    uint64_t dest = get_address(env, r1);
-+    uint64_t srclen = extract64(env->regs[r2 + 1], 0, 24);
-+    uint64_t src = get_address(env, r2);
-+    uint8_t pad = env->regs[r2 + 1] >> 24;
++    int i;
 +    uint32_t cc;
++    uint8_t b;
++    /* The source operand is always 16 bytes long.  */
++    const int srclen = 16;
 +
-+    cc = do_clcl(env, &dest, &destlen, &src, &srclen, pad, -1, ra);
++    /* The operands are processed from right to left.  */
++    src += srclen - 1;
++    dest += destlen - 1;
 +
-+    env->regs[r1 + 1] = deposit64(env->regs[r1 + 1], 0, 24, destlen);
-+    env->regs[r2 + 1] = deposit64(env->regs[r2 + 1], 0, 24, srclen);
-+    set_address(env, r1, dest);
-+    set_address(env, r2, src);
++    /* Check for the sign.  */
++    b = cpu_ldub_data_ra(env, src, ra);
++    src--;
++    switch (b & 0xf) {
++    case 0xa:
++    case 0xc:
++    case 0xe ... 0xf:
++        cc = 0;  /* plus */
++        break;
++    case 0xb:
++    case 0xd:
++        cc = 1;  /* minus */
++        break;
++    default:
++    case 0x0 ... 0x9:
++        cc = 3;  /* invalid */
++        break;
++    }
++
++    /* Now pad every nibble with 0x30, advancing one nibble at a time. */
++    for (i = 0; i < destlen; i++) {
++        if (i == 31) {
++            /* If length is 32 bytes, the leftmost byte is 0. */
++            b = 0;
++        } else if (i % 2) {
++            b = cpu_ldub_data_ra(env, src, ra);
++            src--;
++        } else {
++            b >>= 4;
++        }
++        cpu_stb_data_ra(env, dest, 0x30 + (b & 0xf), ra);
++        dest--;
++    }
 +
 +    return cc;
 +}
 +
-+/* compare logical long extended memcompare insn with padding */
-+uint32_t HELPER(clcle)(CPUS390XState *env, uint32_t r1, uint64_t a2,
-+                       uint32_t r3)
-+{
-+    uintptr_t ra = GETPC();
-+    uint64_t destlen = get_length(env, r1 + 1);
-+    uint64_t dest = get_address(env, r1);
-+    uint64_t srclen = get_length(env, r3 + 1);
-+    uint64_t src = get_address(env, r3);
-+    uint8_t pad = a2;
-+    uint32_t cc;
-+
-+    cc = do_clcl(env, &dest, &destlen, &src, &srclen, pad, 0x2000, ra);
-+
-     set_length(env, r1 + 1, destlen);
-     set_length(env, r3 + 1, srclen);
-     set_address(env, r1, dest);
+ static void do_helper_tr(CPUS390XState *env, uint32_t len, uint64_t array,
+                          uint64_t trans, uintptr_t ra)
+ {
 diff --git a/target/s390x/translate.c b/target/s390x/translate.c
-index 87408df07a..6f8d75bc2e 100644
+index a2a27c86ea..590ff96301 100644
 --- a/target/s390x/translate.c
 +++ b/target/s390x/translate.c
-@@ -1911,6 +1911,17 @@ static ExitStatus op_clc(DisasContext *s, DisasOps *o)
+@@ -4295,6 +4295,23 @@ static ExitStatus op_unpk(DisasContext *s, DisasOps *o)
      return NO_EXIT;
  }
  
-+static ExitStatus op_clcl(DisasContext *s, DisasOps *o)
++static ExitStatus op_unpka(DisasContext *s, DisasOps *o)
 +{
-+    TCGv_i32 r1 = tcg_const_i32(get_field(s->fields, r1));
-+    TCGv_i32 r2 = tcg_const_i32(get_field(s->fields, r2));
-+    gen_helper_clcl(cc_op, cpu_env, r1, r2);
-+    tcg_temp_free_i32(r1);
-+    tcg_temp_free_i32(r2);
++    int l1 = get_field(s->fields, l1) + 1;
++    TCGv_i32 l;
++
++    /* The length must not exceed 32 bytes.  */
++    if (l1 > 32) {
++        gen_program_exception(s, PGM_SPECIFICATION);
++        return EXIT_NORETURN;
++    }
++    l = tcg_const_i32(l1);
++    gen_helper_unpka(cc_op, cpu_env, o->addr1, l, o->in2);
++    tcg_temp_free_i32(l);
 +    set_cc_static(s);
 +    return NO_EXIT;
 +}
 +
- static ExitStatus op_clcle(DisasContext *s, DisasOps *o)
+ static ExitStatus op_xc(DisasContext *s, DisasOps *o)
  {
-     TCGv_i32 r1 = tcg_const_i32(get_field(s->fields, r1));
+     int d1 = get_field(s->fields, d1);
 -- 
 2.11.0
