@@ -1,32 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46075)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46136)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dDx7k-0001OC-0h
-	for qemu-devel@nongnu.org; Thu, 25 May 2017 14:04:36 -0400
+	(envelope-from <mst@redhat.com>) id 1dDx7t-0001S3-B5
+	for qemu-devel@nongnu.org; Thu, 25 May 2017 14:04:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dDx7g-0003AO-Qi
-	for qemu-devel@nongnu.org; Thu, 25 May 2017 14:04:36 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:44474)
+	(envelope-from <mst@redhat.com>) id 1dDx7q-0003EN-74
+	for qemu-devel@nongnu.org; Thu, 25 May 2017 14:04:45 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:59348)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1dDx7g-00039l-KS
-	for qemu-devel@nongnu.org; Thu, 25 May 2017 14:04:32 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id C14B780460
-	for <qemu-devel@nongnu.org>; Thu, 25 May 2017 18:04:30 +0000 (UTC)
-Date: Thu, 25 May 2017 15:04:26 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20170525180426.GR32274@thinpad.lan.raisama.net>
-References: <20170513033316.22395-1-ehabkost@redhat.com>
-	<20170513033316.22395-2-ehabkost@redhat.com>
-	<87d1az64ab.fsf@dusky.pond.sub.org>
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1dDx7q-0003Dt-0p
+	for qemu-devel@nongnu.org; Thu, 25 May 2017 14:04:42 -0400
+Date: Thu, 25 May 2017 21:04:39 +0300
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20170525210048-mutt-send-email-mst@kernel.org>
+References: <5922D0EC.6060405@intel.com>
+	<b415fea9-9d48-9390-0ec2-46f69b7a54b0@redhat.com>
+	<5923C557.3020301@intel.com>
+	<ac8a484d-744a-8bdf-eba2-05239c6eefb1@redhat.com>
+	<5924109F.6090608@intel.com>
+	<48ec0c88-801f-fc1f-401f-51cb2ca3fed2@redhat.com>
+	<592541D9.3030303@intel.com>
+	<781faa1c-9253-d212-f616-2a899087edc1@redhat.com>
+	<5926C519.6080508@intel.com>
+	<2fb56ab7-99c6-ac30-de60-a747438416b8@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <87d1az64ab.fsf@dusky.pond.sub.org>
-Subject: Re: [Qemu-devel] [PATCH v2 1/3] qemu.py: Don't set _popen=None on
- error/shutdown
+In-Reply-To: <2fb56ab7-99c6-ac30-de60-a747438416b8@redhat.com>
+Subject: Re: [Qemu-devel] [virtio-dev] Re: [virtio-dev] Re: [PATCH RFC]
+ virtio-net: enable configurable tx queue size
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,42 +36,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: qemu-devel@nongnu.org, Marcel Apfelbaum <marcel@redhat.com>, Thomas Huth <thuth@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>
+To: Jason Wang <jasowang@redhat.com>
+Cc: Wei Wang <wei.w.wang@intel.com>, virtio-dev@lists.oasis-open.org, stefanha@gmail.com, qemu-devel@nongnu.org, jan.scheurich@ericsson.com, marcandre.lureau@gmail.com, pbonzini@redhat.com
 
-On Tue, May 23, 2017 at 04:23:08PM +0200, Markus Armbruster wrote:
-> Eduardo Habkost <ehabkost@redhat.com> writes:
+On Thu, May 25, 2017 at 08:13:31PM +0800, Jason Wang wrote:
+> > 
+> > The point of using the config field here is, when tomorrow's device is
+> > released with a requirement for the driver
+> > to use max_chain_size=1022 (not today's 1023), today's driver will
+> > naturally support tomorrow's device without
+> > any modification, since it reads the max_chain_size from the config
+> > field which is filled by the device (either today's
+> > device or tomorrow's device with different values).
 > 
-> > Keep the Popen object around to we can query its exit code later.
-> >
-> > To keep the existing 'self._popen is None' checks working, add a
-> > is_running() method, that will check if the process is still running.
-> >
-> > Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+> I'm not saying anything wrong with the config filed you introduced. But you
+> should answer the following question:
 > 
-> Looks harmless enough.  Have you tested the scripts using this module
-> still work?
+> Is it useful to support more than 1024? If yes, why? If not, introduce a
+> VIRTIO_F_SG_1024 is more than enough I think.
+> 
+> Thanks
 
-Now I did. :)
-
-I see only two users of qemu.py and qtest.py:
-
-  tests/migration/guestperf/engine.py:import qemu
-  tests/qemu-iotests/iotests.py:import qtest
-
-I just tested both using:
-
-  $ make check-tests/qemu-iotests-quick.sh
-  $ make tests/migration/initrd-stress.img PTHREAD_LIB=-pthread
-  $ ./tests/migration/guestperf.py > /tmp/guestperf.json
-
-and they seem to be working.
-
-(It looks like there's no Makefile rule to run guestperf.py)
-
-BTW, it seems to be impossible to build initrd-stress.img on a out-of-tree
-build.  I had to run ./configure inside the source tree to be able to run
-guestperf.py.
+I think it's useful to limit it below queue size too.
 
 -- 
-Eduardo
+MST
