@@ -1,34 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44097)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44559)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1dDx1C-0005Di-Br
-	for qemu-devel@nongnu.org; Thu, 25 May 2017 13:57:51 -0400
+	(envelope-from <eblake@redhat.com>) id 1dDx2b-0006nk-IL
+	for qemu-devel@nongnu.org; Thu, 25 May 2017 13:59:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1dDx18-0000ER-H2
-	for qemu-devel@nongnu.org; Thu, 25 May 2017 13:57:50 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:56936)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1dDx18-0000Cp-7k
-	for qemu-devel@nongnu.org; Thu, 25 May 2017 13:57:46 -0400
-Date: Thu, 25 May 2017 20:57:43 +0300
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20170525204018-mutt-send-email-mst@kernel.org>
-References: <7ff05785-6bca-a886-0eb0-aeeb0f8d8e1a@redhat.com>
-	<5923CCF2.2000001@intel.com>
-	<3d9e8375-fbaa-c011-8242-b37cd971069b@redhat.com>
-	<5924136A.4090004@intel.com>
-	<7636d3d0-a0de-f9a6-47f8-2d09a448b978@redhat.com>
-	<592544D9.5010100@intel.com>
-	<23dac05e-ba3d-df6d-4831-feab9be1c6d2@redhat.com>
-	<5926C7AC.4080603@intel.com>
-	<6a6ecbcd-e9ae-1cf0-ccd9-14294cd0cf86@redhat.com>
-	<5367a1b2-b3cc-8df2-c9ec-99fb60a57666@redhat.com>
+	(envelope-from <eblake@redhat.com>) id 1dDx2a-0001Dv-Ej
+	for qemu-devel@nongnu.org; Thu, 25 May 2017 13:59:17 -0400
+References: <20170525152628.37628-1-vsementsov@virtuozzo.com>
+	<20170525152628.37628-6-vsementsov@virtuozzo.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <7c13a59b-f0d0-df1b-04ad-0177e576ff08@redhat.com>
+Date: Thu, 25 May 2017 12:59:05 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <5367a1b2-b3cc-8df2-c9ec-99fb60a57666@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [virtio-dev] Re: [virtio-dev] Re: [virtio-dev] Re:
- [PATCH v2 00/16] Vhost-pci for inter-VM communication
+In-Reply-To: <20170525152628.37628-6-vsementsov@virtuozzo.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="wRccpK4irNvxmtxdiM11eki3RwwBqDDxc"
+Subject: Re: [Qemu-devel] [PATCH 5/7] qemu-img check: add format unallocated
+ size
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,74 +25,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jason Wang <jasowang@redhat.com>
-Cc: Wei Wang <wei.w.wang@intel.com>, Stefan Hajnoczi <stefanha@gmail.com>, "virtio-dev@lists.oasis-open.org" <virtio-dev@lists.oasis-open.org>, "marcandre.lureau@gmail.com" <marcandre.lureau@gmail.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "pbonzini@redhat.com" <pbonzini@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: armbru@redhat.com, mreitz@redhat.com, kwolf@redhat.com, den@openvz.org
 
-On Thu, May 25, 2017 at 08:31:09PM +0800, Jason Wang wrote:
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--wRccpK4irNvxmtxdiM11eki3RwwBqDDxc
+From: Eric Blake <eblake@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: armbru@redhat.com, mreitz@redhat.com, kwolf@redhat.com, den@openvz.org
+Message-ID: <7c13a59b-f0d0-df1b-04ad-0177e576ff08@redhat.com>
+Subject: Re: [PATCH 5/7] qemu-img check: add format unallocated size
+References: <20170525152628.37628-1-vsementsov@virtuozzo.com>
+ <20170525152628.37628-6-vsementsov@virtuozzo.com>
+In-Reply-To: <20170525152628.37628-6-vsementsov@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 05/25/2017 10:26 AM, Vladimir Sementsov-Ogievskiy wrote:
+> Shows format 'sparseness' of the image top level.
 >=20
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> ---
+>  qapi/block-core.json |  3 ++-
+>  qemu-img.c           | 19 +++++++++++++++++++
+>  2 files changed, 21 insertions(+), 1 deletion(-)
 >=20
-> On 2017=E5=B9=B405=E6=9C=8825=E6=97=A5 20:22, Jason Wang wrote:
-> > > >=20
-> > > > Even with vhost-pci to virito-net configuration, I think rx
-> > > > zerocopy could be achieved but not implemented in your driver
-> > > > (probably more easier in pmd).
-> > > >=20
-> > > Yes, it would be easier with dpdk pmd. But I think it would not be
-> > > important in the NFV use case,
-> > > since the data flow goes to one direction often.
-> > >=20
-> > > Best,
-> > > Wei
-> > >=20
-> >=20
-> > I would say let's don't give up on any possible performance optimizat=
-ion
-> > now. You can do it in the future.
-> >=20
-> > If you still want to keep the copy in both tx and rx, you'd better:
-> >=20
-> > - measure the performance of larger packet size other than 64B
-> > - consider whether or not it's a good idea to do it in vcpu thread, o=
-r
-> > move it to another one(s)
-> >=20
-> > Thanks
->=20
-> And what's more important, since you care NFV seriously. I would really
-> suggest you to draft a pmd for vhost-pci and use it to for benchmarking=
-.
-> It's real life case. OVS dpdk is known for not optimized for kernel dri=
-vers.
->=20
-> Good performance number can help us to examine the correctness of both
-> design and implementation.
->=20
-> Thanks
+> diff --git a/qapi/block-core.json b/qapi/block-core.json
+> index ea0b3e8b13..c7ed5dc970 100644
+> --- a/qapi/block-core.json
+> +++ b/qapi/block-core.json
+> @@ -185,7 +185,8 @@
+>             '*image-end-offset': 'int', '*corruptions': 'int', '*leaks'=
+: 'int',
+>             '*corruptions-fixed': 'int', '*leaks-fixed': 'int',
+>             '*total-clusters': 'int', '*allocated-clusters': 'int',
+> -           '*fragmented-clusters': 'int', '*compressed-clusters': 'int=
+' } }
+> +           '*fragmented-clusters': 'int', '*compressed-clusters': 'int=
+',
+> +           '*format-unallocated-size': 'uint64'} }
 
-I think that's a very valid point. Linux isn't currently optimized to
-handle packets in device BAR.
-
-There are several issues here and you do need to address them in the
-kernel, no way around that:
-
-1. lots of drivers set protection to
-        vma->vm_page_prot =3D pgprot_noncached(vma->vm_page_prot);
-
-   vfio certainly does, and so I think does pci sysfs.
-   You won't get good performance with this, you want to use
-   a cacheable mapping.
-   This needs to be addressed for pmd to work well.
-
-2. linux mostly assumes PCI BAR isn't memory, ioremap_cache returns __iom=
-em
-   pointers which aren't supposed to be dereferenced directly.
-   You want a new API that does direct remap or copy if not possible.
-   Alternatively remap or fail, kind of like pci_remap_iospace.
-   Maybe there's already something like that - I'm not sure.
-
-
-Thanks,
-MST
+Missing documentation (including a since 2.10 blurb).
 
 --=20
-MST
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--wRccpK4irNvxmtxdiM11eki3RwwBqDDxc
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEcBAEBCAAGBQJZJxtpAAoJEKeha0olJ0Nqx2QH/2rQle4ALPAY1afjzwVxZDwg
+0YHx49tP9OQ8Uvp3u3DS0YNDBvfwOddF4dmU33d7lq4ahpxXXFfstT4YjQrON7aj
+NeVuwR/nI7PGzECBFQeE/8C5UJutySPqCz0ZJTmF06NKoGb8+ga4TCJ6vW4o757U
+aCBJFUjVQm0KaEsoO/bvHj1eohiHjWPRsGnn8jDWXQESSeaH+5oyCJp6zvMslwxh
+4d+RK4YQRG1QzFkDDHU7OMYWcxMXUTj5pAP7HHLLWpfHT9fhoWzRyT2l0EKbihwx
+eI0iChnH5mPycTCE6tc6oMMpUyvPEdtmQClPcfGPN32dMuucSKyGGc9JmdMkSIM=
+=FurD
+-----END PGP SIGNATURE-----
+
+--wRccpK4irNvxmtxdiM11eki3RwwBqDDxc--
