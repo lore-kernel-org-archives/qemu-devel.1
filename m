@@ -1,21 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44830)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45379)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dDx3W-000826-TV
-	for qemu-devel@nongnu.org; Thu, 25 May 2017 14:00:15 -0400
+	(envelope-from <eblake@redhat.com>) id 1dDx4o-0000Ly-0p
+	for qemu-devel@nongnu.org; Thu, 25 May 2017 14:01:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dDx3V-0001ZY-Uk
-	for qemu-devel@nongnu.org; Thu, 25 May 2017 14:00:15 -0400
+	(envelope-from <eblake@redhat.com>) id 1dDx4n-0001zs-Ak
+	for qemu-devel@nongnu.org; Thu, 25 May 2017 14:01:34 -0400
 References: <20170525152628.37628-1-vsementsov@virtuozzo.com>
-	<20170525152628.37628-7-vsementsov@virtuozzo.com>
+	<20170525152628.37628-8-vsementsov@virtuozzo.com>
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <59df5eae-d5c5-7edb-cc69-15b768406dfd@redhat.com>
-Date: Thu, 25 May 2017 12:59:58 -0500
+Message-ID: <6c879ccc-5e73-726c-b87a-7da358d4c777@redhat.com>
+Date: Thu, 25 May 2017 13:01:25 -0500
 MIME-Version: 1.0
-In-Reply-To: <20170525152628.37628-7-vsementsov@virtuozzo.com>
+In-Reply-To: <20170525152628.37628-8-vsementsov@virtuozzo.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="bjRK0iiaDieXbXAgSsrJ6WJbwhIoDJ301"
-Subject: Re: [Qemu-devel] [PATCH 6/7] qemu-img check: add file-size
+	boundary="oBQs6HwcBKSwGT36W0oG70ud72I5xHkVm"
+Subject: Re: [Qemu-devel] [PATCH 7/7] block: rename
+ _get_allocated_file_size() to _get_fs_allocated_size()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,43 +29,39 @@ To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.o
 Cc: armbru@redhat.com, mreitz@redhat.com, kwolf@redhat.com, den@openvz.org
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---bjRK0iiaDieXbXAgSsrJ6WJbwhIoDJ301
+--oBQs6HwcBKSwGT36W0oG70ud72I5xHkVm
 From: Eric Blake <eblake@redhat.com>
 To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
  qemu-devel@nongnu.org, qemu-block@nongnu.org
 Cc: armbru@redhat.com, mreitz@redhat.com, kwolf@redhat.com, den@openvz.org
-Message-ID: <59df5eae-d5c5-7edb-cc69-15b768406dfd@redhat.com>
-Subject: Re: [PATCH 6/7] qemu-img check: add file-size
+Message-ID: <6c879ccc-5e73-726c-b87a-7da358d4c777@redhat.com>
+Subject: Re: [PATCH 7/7] block: rename _get_allocated_file_size() to
+ _get_fs_allocated_size()
 References: <20170525152628.37628-1-vsementsov@virtuozzo.com>
- <20170525152628.37628-7-vsementsov@virtuozzo.com>
-In-Reply-To: <20170525152628.37628-7-vsementsov@virtuozzo.com>
+ <20170525152628.37628-8-vsementsov@virtuozzo.com>
+In-Reply-To: <20170525152628.37628-8-vsementsov@virtuozzo.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
 On 05/25/2017 10:26 AM, Vladimir Sementsov-Ogievskiy wrote:
-> Add bdrv_getlength() of underlying bs->file->bs, to improve
-> 'Format unallocated size' section of qemu-img check output.
+> To be in contrast with _get_format_allocated_size()
 >=20
 > Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 > ---
->  qapi/block-core.json |  2 +-
->  qemu-img.c           | 11 ++++++++---
->  2 files changed, 9 insertions(+), 4 deletions(-)
->=20
-> diff --git a/qapi/block-core.json b/qapi/block-core.json
-> index c7ed5dc970..f720a29512 100644
-> --- a/qapi/block-core.json
-> +++ b/qapi/block-core.json
-> @@ -186,7 +186,7 @@
->             '*corruptions-fixed': 'int', '*leaks-fixed': 'int',
->             '*total-clusters': 'int', '*allocated-clusters': 'int',
->             '*fragmented-clusters': 'int', '*compressed-clusters': 'int=
-',
-> -           '*format-unallocated-size': 'uint64'} }
-> +           '*format-unallocated-size': 'uint64', '*file-size': 'uint64=
-'} }
+>  block.c                   |  8 ++++----
+>  block/file-posix.c        | 14 +++++---------
+>  block/file-win32.c        |  8 +++-----
+>  block/gluster.c           |  8 ++++----
+>  block/nfs.c               |  8 ++++----
+>  block/qapi.c              |  2 +-
+>  block/sheepdog.c          |  8 ++++----
+>  block/vmdk.c              |  8 ++++----
+>  include/block/block.h     |  2 +-
+>  include/block/block_int.h |  2 +-
+>  10 files changed, 31 insertions(+), 37 deletions(-)
 
-Missing documentation, including a since 2.10 blurb.
+Bikeshedding: is 'protocol' a better name than 'fs'? Unfortunately, it's
+longer.
 
 --=20
 Eric Blake, Principal Software Engineer
@@ -72,7 +69,7 @@ Red Hat, Inc.           +1-919-301-3266
 Virtualization:  qemu.org | libvirt.org
 
 
---bjRK0iiaDieXbXAgSsrJ6WJbwhIoDJ301
+--oBQs6HwcBKSwGT36W0oG70ud72I5xHkVm
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
@@ -82,13 +79,13 @@ Version: GnuPG v2
 Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
 Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQEcBAEBCAAGBQJZJxueAAoJEKeha0olJ0Nq8i8IAKuuSQ30x1HZCHLRowFV8XYn
-96LaCYlXOIbwDSihN+raSs0usWNLZye56sMZBmXbdJ9L+m7DvHu/YFI+Ve9j7dIW
-bFm5WNwLU3gZVIVJHHnytaESIu6v4Rs9A4Vism/cNG/lTq5yyRt1oiK8aIjG8/al
-A+OFzWS3vzv5q0CmAiJABshALd4Mos+hcZk7B4QoNJ+wBzJ1OgnmF3Us4cYJP8f4
-Pv0Q8m0GkB6h3YdzDzzES7FaLngb7//aNm1MbBfdEcDGcLYclUzcO7gIS/l+N368
-0xkj1Oe7Ei++e5tqV+0V9HAyBvlZpPtI9arHew7Kl1oYrvgtpQg6Mjgh+kKMRqA=
-=rrGx
+iQEcBAEBCAAGBQJZJxv1AAoJEKeha0olJ0NqL6QH+wdgHugXFl2M8UEE72V7VEOQ
+IcLNLwzqiO8baSuAYIhpEfXZipSSd2aLdvNOOwYjP2zE+MVXNn3DjcKFhAxQVsQE
+0WZyGNx2Br6hEz1w9DpoychWWmMGRl82io0wn2msfqp5vHozpQQ/5dPB/6h6PAwp
+LTA/PPuC7t8+ugfo8Ht41JEiZvEEzCLwEZiCFekyCS8P24COdHk3kafd21VJQUcU
+2d+K/wEdMCOB2PuS8P9HeuC26Amu2YnNY6/Jh76jlZs8vw2fqrmzQWoRQjtMa+p3
+uOlIIaw0gorJKCbqejXWOK4LhaB9IMAzp+3rzCS7wniMLLZMQtpWfqTQD1ekSh4=
+=BDIv
 -----END PGP SIGNATURE-----
 
---bjRK0iiaDieXbXAgSsrJ6WJbwhIoDJ301--
+--oBQs6HwcBKSwGT36W0oG70ud72I5xHkVm--
