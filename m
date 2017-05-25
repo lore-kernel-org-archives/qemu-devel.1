@@ -1,24 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51888)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52481)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dDjGT-0002zn-1k
-	for qemu-devel@nongnu.org; Wed, 24 May 2017 23:16:42 -0400
+	(envelope-from <guangrong.xiao@gmail.com>) id 1dDjJh-0005vZ-2K
+	for qemu-devel@nongnu.org; Wed, 24 May 2017 23:20:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dDjGP-0002T6-T9
-	for qemu-devel@nongnu.org; Wed, 24 May 2017 23:16:41 -0400
-Date: Thu, 25 May 2017 12:45:34 +1000
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20170525024534.GD12929@umbus.fritz.box>
-References: <20170523111812.13469-1-lvivier@redhat.com>
-	<20170523111812.13469-4-lvivier@redhat.com>
-	<20170524050754.GW30246@umbus.fritz.box>
-	<20170524112857.31c3d8f9@bahia.ttt.fr.ibm.com>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="2Z2K0IlrPCVsbNpk"
-Content-Disposition: inline
-In-Reply-To: <20170524112857.31c3d8f9@bahia.ttt.fr.ibm.com>
-Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH 3/4] spapr: disable hotplugging
- without OS
+	(envelope-from <guangrong.xiao@gmail.com>) id 1dDjJd-0003Od-Ro
+	for qemu-devel@nongnu.org; Wed, 24 May 2017 23:20:01 -0400
+Received: from mail-pf0-x244.google.com ([2607:f8b0:400e:c00::244]:36552)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <guangrong.xiao@gmail.com>)
+	id 1dDjJd-0003MJ-Iy
+	for qemu-devel@nongnu.org; Wed, 24 May 2017 23:19:57 -0400
+Received: by mail-pf0-x244.google.com with SMTP id n23so36161253pfb.3
+	for <qemu-devel@nongnu.org>; Wed, 24 May 2017 20:19:57 -0700 (PDT)
+From: guangrong.xiao@gmail.com
+Date: Thu, 25 May 2017 11:19:36 +0800
+Message-Id: <20170525031936.8449-1-xiaoguangrong@tencent.com>
+Subject: [Qemu-devel] [PATCH] qtest: add rtc periodic timer test
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,163 +24,281 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>
-Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Michael Roth <mdroth@linux.vnet.ibm.com>
+To: pbonzini@redhat.com, mst@redhat.com, mtosatti@redhat.com
+Cc: qemu-devel@nongnu.org, kvm@vger.kernel.org, Xiao Guangrong <xiaoguangrong@tencent.com>
 
+From: Xiao Guangrong <xiaoguangrong@tencent.com>
 
---2Z2K0IlrPCVsbNpk
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+It tests the accuracy of rtc periodic timer which is recently
+improved & fixed by:
+      mc146818rtc: precisely count the clock for periodic timer
+(commit id has not been decided yet)
 
-On Wed, May 24, 2017 at 11:28:57AM +0200, Greg Kurz wrote:
-> On Wed, 24 May 2017 15:07:54 +1000
-> David Gibson <david@gibson.dropbear.id.au> wrote:
->=20
-> > On Tue, May 23, 2017 at 01:18:11PM +0200, Laurent Vivier wrote:
-> > > If the OS is not started, QEMU sends an event to the OS
-> > > that is lost and cannot be recovered. An unplug is not
-> > > able to restore QEMU in a coherent state.
-> > > So, while the OS is not started, disable CPU and memory hotplug.
-> > > We use option vector 6 to know if the OS is started
-> > >=20
-> > > Signed-off-by: Laurent Vivier <lvivier@redhat.com> =20
-> >=20
-> > Urgh.. I'm not terribly confident that this is really correct.  As
-> > discussed on the previous patch, you're essentially using OV6 as a
-> > flag that CAS is complete.
-> >=20
-> > But while it undoubtedly makes the race window much smaller, I don't
-> > see that there's any guarantee the guest OS will really be able to
-> > handle hotplug events immediately after CAS.
-> >=20
-> > In particular if the CAS process completes partially but then needs to
-> > trigger a reboot, I think that would end up setting the ov6 variable,
-> > but the OS would definitely not be in a state to accept events.
-> >=20
->=20
-> We never have any guarantee that the OS will process an event that
-> we've sent actually (think of a kernel crash just after a successful
-> CAS negotiation for example, or any failure with the various guest
-> components involved in the process of hotplug).
->=20
-> > Mike, I really think we need some input from someone familiar with how
-> > these hotplug events are supposed to work.  What do we need to do to
-> > handle lost or stale events, such as those delivered when an OS is not
-> > booted.
-> >=20
->=20
-> AFAIK, in the PowerVM world, the HMC exposes a user configurable timeout.
->=20
-> https://www.ibm.com/support/knowledgecenter/POWER8/p8hat/p8hat_dlparprocp=
-oweraddp6.htm
->=20
-> I'm not sure we can do anything better than being able to "cancel" a prev=
-ious
-> hotplug attempt if it takes too long, but I'm not necessarily the expert =
-you're
-> looking for :)
+Note: as qemu needs a precise timer to drive its rtc timer callbacks,
+that means clock=vm is not suitable for us as it's driven by icount
+for qtest, so that we use clock=host instead, it is why we put the
+periodic timer test separately without mixing with rtc-test
 
-Right, but at the moment we *don't* have a way to cancel a previous
-hotplug attempt.  Trying to remove again ends up with things in a
-tangle.
+Signed-off-by: Xiao Guangrong <xiaoguangrong@tencent.com>
+---
+ hw/timer/mc146818rtc.c         |  15 ++-----
+ include/hw/timer/mc146818rtc.h |  19 ++++++++
+ tests/Makefile.include         |   2 +
+ tests/rtc-periodic-test.c      | 100 +++++++++++++++++++++++++++++++++++++++++
+ tests/rtc-test.c               |  14 +-----
+ tests/rtc-test.h               |  17 +++++++
+ 6 files changed, 142 insertions(+), 25 deletions(-)
+ create mode 100644 tests/rtc-periodic-test.c
+ create mode 100644 tests/rtc-test.h
 
->=20
-> > > ---
-> > >  hw/ppc/spapr.c | 22 +++++++++++++++++++---
-> > >  1 file changed, 19 insertions(+), 3 deletions(-)
-> > >=20
-> > > diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> > > index eceb4cc..2e9320d 100644
-> > > --- a/hw/ppc/spapr.c
-> > > +++ b/hw/ppc/spapr.c
-> > > @@ -2625,6 +2625,7 @@ out:
-> > >  static void spapr_memory_pre_plug(HotplugHandler *hotplug_dev, Devic=
-eState *dev,
-> > >                                  Error **errp)
-> > >  {
-> > > +    sPAPRMachineState *ms =3D SPAPR_MACHINE(hotplug_dev);
-> > >      PCDIMMDevice *dimm =3D PC_DIMM(dev);
-> > >      PCDIMMDeviceClass *ddc =3D PC_DIMM_GET_CLASS(dimm);
-> > >      MemoryRegion *mr =3D ddc->get_memory_region(dimm);
-> > > @@ -2645,6 +2646,13 @@ static void spapr_memory_pre_plug(HotplugHandl=
-er *hotplug_dev, DeviceState *dev,
-> > >          goto out;
-> > >      }
-> > > =20
-> > > +    if (dev->hotplugged) {
-> > > +        if (!ms->os_name) {
-> > > +            error_setg(&local_err, "Memory hotplug not supported wit=
-hout OS");
-> > > +            goto out;
-> > > +        }
-> > > +    }
-> > > +
-> > >  out:
-> > >      error_propagate(errp, local_err);
-> > >  }
-> > > @@ -2874,6 +2882,7 @@ static void spapr_core_pre_plug(HotplugHandler =
-*hotplug_dev, DeviceState *dev,
-> > >                                  Error **errp)
-> > >  {
-> > >      MachineState *machine =3D MACHINE(OBJECT(hotplug_dev));
-> > > +    sPAPRMachineState *ms =3D SPAPR_MACHINE(machine);
-> > >      MachineClass *mc =3D MACHINE_GET_CLASS(hotplug_dev);
-> > >      Error *local_err =3D NULL;
-> > >      CPUCore *cc =3D CPU_CORE(dev);
-> > > @@ -2884,9 +2893,16 @@ static void spapr_core_pre_plug(HotplugHandler=
- *hotplug_dev, DeviceState *dev,
-> > >      int node_id;
-> > >      int index;
-> > > =20
-> > > -    if (dev->hotplugged && !mc->has_hotpluggable_cpus) {
-> > > -        error_setg(&local_err, "CPU hotplug not supported for this m=
-achine");
-> > > -        goto out;
-> > > +    if (dev->hotplugged) {
-> > > +        if (!mc->has_hotpluggable_cpus) {
-> > > +            error_setg(&local_err,
-> > > +                       "CPU hotplug not supported for this machine");
-> > > +            goto out;
-> > > +        }
-> > > +        if (!ms->os_name) {
-> > > +            error_setg(&local_err, "CPU hotplug not supported withou=
-t OS");
-> > > +            goto out;
-> > > +        }
-> > >      }
-> > > =20
-> > >      if (strcmp(base_core_type, type)) { =20
-> >=20
->=20
-
-
-
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---2Z2K0IlrPCVsbNpk
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-
-iQIcBAEBCAAGBQJZJkVLAAoJEGw4ysog2bOSuboQALXMX2dMdpy8JegxTiSogtF/
-G1Vm+kKyLr3VPnnwv+V+zuS5tWfV3ie9Dq60mNVYyDn8p0KLyLQgzzCkdV6UkFcF
-axYt8MTcsg8yxswUzDEA5PtPpHlOXi284pjXc31vwno81aujxA1/Kc8Eu8llMyQD
-AHRvgtkCbc/jTFJTl4zAlUsw30f9YPWh+VNhJ625uEK/QYRg6LEuuODUSeP95zCO
-6Fvnbkqg/t46gsH409mqjKOSQ6Qe/cY0GpcexP52RCVWERpo/pM9EqBzvtXCg3ni
-/JDD+3WI+8U5GJYPQ86Qn0ZwLXgSQf2hEajuIrEasCIRIUw0Z3oFGyPVrrGyIhTW
-kuRbXOV2WrczegI6Vy8Ppakm+Fp/7ydfKvKAHt4h4Z6mXGjcvBRrtOL4zYL72FCu
-SrNvpP1UTSMlR/X0oSx3QJx16WNGZejGZhSSaxbAfUgzL1MSseVC9EaowTznXQ8e
-E6Qw2beSTEBRR7kYjp5qjNKgb1gyXzSp5CJkgK3JOXZjC2t+MH3zdEvU0vy8TXby
-aGu/S8tY2nARdZrp1BNXYXGpLh6wq5uI3S3+5j0xhCEqEWjdKYJA4MRCE2VNUgwy
-sVb0QtoD0BqYB7easl7W8WZughUHnT21T77P68tfVWy0dhS5lVJGKsl7s0TWEfnb
-1Kbx/q2kVO5e/hcRVNE2
-=f3Cw
------END PGP SIGNATURE-----
-
---2Z2K0IlrPCVsbNpk--
+diff --git a/hw/timer/mc146818rtc.c b/hw/timer/mc146818rtc.c
+index 6d0a610..0aba66c 100644
+--- a/hw/timer/mc146818rtc.c
++++ b/hw/timer/mc146818rtc.c
+@@ -120,7 +120,7 @@ static void rtc_coalesced_timer_update(RTCState *s)
+         /* divide each RTC interval to 2 - 8 smaller intervals */
+         int c = MIN(s->irq_coalesced, 7) + 1; 
+         int64_t next_clock = qemu_clock_get_ns(rtc_clock) +
+-            muldiv64(s->period / c, NANOSECONDS_PER_SECOND, RTC_CLOCK_RATE);
++            periodic_clock_to_ns(s->period / c);
+         timer_mod(s->coalesced_timer, next_clock);
+     }
+ }
+@@ -178,16 +178,8 @@ static uint32_t rtc_periodic_clock_ticks(RTCState *s)
+      }
+ 
+     period_code = s->cmos_data[RTC_REG_A] & 0x0f;
+-    if (!period_code) {
+-        return 0;
+-    }
+-
+-    if (period_code <= 2) {
+-        period_code += 7;
+-    }
+ 
+-    /* period in 32 Khz cycles */
+-    return 1 << (period_code - 1);
++    return periodic_period_to_clock(period_code);
+ }
+ 
+ /*
+@@ -266,8 +258,7 @@ periodic_timer_update(RTCState *s, int64_t current_time, uint32_t old_period)
+         assert(lost_clock >= 0 && lost_clock <= period);
+ 
+         next_irq_clock = cur_clock + period - lost_clock;
+-        s->next_periodic_time = muldiv64(next_irq_clock, NANOSECONDS_PER_SECOND,
+-                                         RTC_CLOCK_RATE) + 1;
++        s->next_periodic_time = periodic_clock_to_ns(next_irq_clock) + 1;
+         timer_mod(s->periodic_timer, s->next_periodic_time);
+     } else {
+         s->irq_coalesced = 0;
+diff --git a/include/hw/timer/mc146818rtc.h b/include/hw/timer/mc146818rtc.h
+index 7c8e64b..f23e734 100644
+--- a/include/hw/timer/mc146818rtc.h
++++ b/include/hw/timer/mc146818rtc.h
+@@ -10,4 +10,23 @@ ISADevice *rtc_init(ISABus *bus, int base_year, qemu_irq intercept_irq);
+ void rtc_set_memory(ISADevice *dev, int addr, int val);
+ int rtc_get_memory(ISADevice *dev, int addr);
+ 
++static inline uint32_t periodic_period_to_clock(int period_code)
++{
++    if (!period_code) {
++        return 0;
++   }
++
++    if (period_code <= 2) {
++        period_code += 7;
++    }
++    /* period in 32 Khz cycles */
++   return 1 << (period_code - 1);
++}
++
++#define RTC_CLOCK_RATE            32768
++
++static inline int64_t periodic_clock_to_ns(int64_t clocks)
++{
++    return muldiv64(clocks, NANOSECONDS_PER_SECOND, RTC_CLOCK_RATE);
++}
+ #endif /* MC146818RTC_H */
+diff --git a/tests/Makefile.include b/tests/Makefile.include
+index 31931c0..6958d91 100644
+--- a/tests/Makefile.include
++++ b/tests/Makefile.include
+@@ -218,6 +218,7 @@ check-qtest-i386-y += tests/bios-tables-test$(EXESUF)
+ check-qtest-i386-y += tests/boot-serial-test$(EXESUF)
+ check-qtest-i386-y += tests/pxe-test$(EXESUF)
+ check-qtest-i386-y += tests/rtc-test$(EXESUF)
++check-qtest-i386-y += tests/rtc-periodic-test$(EXESUF)
+ check-qtest-i386-y += tests/ipmi-kcs-test$(EXESUF)
+ check-qtest-i386-y += tests/ipmi-bt-test$(EXESUF)
+ check-qtest-i386-y += tests/i440fx-test$(EXESUF)
+@@ -677,6 +678,7 @@ libqos-virtio-obj-y = $(libqos-spapr-obj-y) $(libqos-pc-obj-y) tests/libqos/virt
+ tests/qmp-test$(EXESUF): tests/qmp-test.o
+ tests/device-introspect-test$(EXESUF): tests/device-introspect-test.o
+ tests/rtc-test$(EXESUF): tests/rtc-test.o
++tests/rtc-periodic-test$(EXESUF): tests/rtc-periodic-test.o
+ tests/m48t59-test$(EXESUF): tests/m48t59-test.o
+ tests/endianness-test$(EXESUF): tests/endianness-test.o
+ tests/spapr-phb-test$(EXESUF): tests/spapr-phb-test.o $(libqos-obj-y)
+diff --git a/tests/rtc-periodic-test.c b/tests/rtc-periodic-test.c
+new file mode 100644
+index 0000000..8f3e4b5
+--- /dev/null
++++ b/tests/rtc-periodic-test.c
+@@ -0,0 +1,100 @@
++/*
++ * QTest testcase for the periodic timer of MC146818 real-time clock
++ *
++ * Copyright Tencent Corp. 2017
++ *
++ * Authors:
++ *  Xiao Guangrong <xiaoguangrong@tencent.com>
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or later.
++ * See the COPYING file in the top-level directory.
++ *
++ */
++
++#include "qemu/osdep.h"
++#include "qemu/timer.h"
++
++#include "libqtest.h"
++
++#include "hw/timer/mc146818rtc.h"
++#include "hw/timer/mc146818rtc_regs.h"
++
++#include "rtc-test.h"
++
++#define RTC_PERIOD_CODE1    13
++#define RTC_PERIOD_CODE2    15
++
++#define RTC_PERIOD_TEST_NR  50
++
++static void nsleep(int64_t nsecs)
++{
++    const struct timespec val = { .tv_nsec = nsecs };
++    nanosleep(&val, NULL);
++}
++
++static void wait_periodic_interrupt(void)
++{
++    while (1) {
++        if (get_irq(RTC_ISA_IRQ)) {
++            break;
++        }
++
++        /* 1 us.*/
++        nsleep(1000);
++    }
++
++    g_assert((cmos_read(RTC_REG_C) & REG_C_PF) != 0);
++}
++
++static void periodic_timer(void)
++{
++    int i;
++    int64_t period_clocks, period_time, real_time;
++
++    /* disable all interrupts. */
++    cmos_write(RTC_REG_B, cmos_read(RTC_REG_B) &
++                                   ~(REG_B_PIE | REG_B_AIE | REG_B_UIE));
++    cmos_write(RTC_REG_A, RTC_PERIOD_CODE1);
++    /* enable periodic interrupt after properly configure the period. */
++    cmos_write(RTC_REG_B, cmos_read(RTC_REG_B) | REG_B_PIE);
++
++    real_time = qemu_clock_get_ns(QEMU_CLOCK_REALTIME);
++
++    for (i = 0; i < RTC_PERIOD_TEST_NR; i++) {
++        cmos_write(RTC_REG_A, RTC_PERIOD_CODE1);
++        wait_periodic_interrupt();
++        cmos_write(RTC_REG_A, RTC_PERIOD_CODE2);
++        wait_periodic_interrupt();
++    }
++
++    real_time = qemu_clock_get_ns(QEMU_CLOCK_REALTIME) - real_time;
++
++    period_clocks = periodic_period_to_clock(RTC_PERIOD_CODE1) +
++                       periodic_period_to_clock(RTC_PERIOD_CODE2);
++    period_clocks *= RTC_PERIOD_TEST_NR;
++    period_time = periodic_clock_to_ns(period_clocks);
++
++    g_assert_cmpint(ABS(real_time - period_time), <=,
++                    NANOSECONDS_PER_SECOND * 0.5);
++}
++
++int main(int argc, char **argv)
++{
++    QTestState *s = NULL;
++    int ret;
++
++    g_test_init(&argc, &argv, NULL);
++
++    s = qtest_start("-rtc clock=host");
++    qtest_irq_intercept_in(s, "ioapic");
++
++    qtest_add_func("/rtc/periodic/interrupt", periodic_timer);
++
++    ret = g_test_run();
++
++    if (s) {
++        qtest_quit(s);
++    }
++
++    return ret;
++}
+diff --git a/tests/rtc-test.c b/tests/rtc-test.c
+index a086efd..9ec9ba4 100644
+--- a/tests/rtc-test.c
++++ b/tests/rtc-test.c
+@@ -16,25 +16,13 @@
+ #include "libqtest.h"
+ #include "hw/timer/mc146818rtc_regs.h"
+ 
+-static uint8_t base = 0x70;
++#include "rtc-test.h"
+ 
+ static int bcd2dec(int value)
+ {
+     return (((value >> 4) & 0x0F) * 10) + (value & 0x0F);
+ }
+ 
+-static uint8_t cmos_read(uint8_t reg)
+-{
+-    outb(base + 0, reg);
+-    return inb(base + 1);
+-}
+-
+-static void cmos_write(uint8_t reg, uint8_t val)
+-{
+-    outb(base + 0, reg);
+-    outb(base + 1, val);
+-}
+-
+ static int tm_cmp(struct tm *lhs, struct tm *rhs)
+ {
+     time_t a, b;
+diff --git a/tests/rtc-test.h b/tests/rtc-test.h
+new file mode 100644
+index 0000000..5a63d68
+--- /dev/null
++++ b/tests/rtc-test.h
+@@ -0,0 +1,17 @@
++#ifndef TEST_RTC_H__
++#define TEST_RTC_H__
++
++#define RTC_BASE_REG    0x70
++
++static uint8_t cmos_read(uint8_t reg)
++{
++    outb(RTC_BASE_REG + 0, reg);
++    return inb(RTC_BASE_REG + 1);
++}
++
++static void cmos_write(uint8_t reg, uint8_t val)
++{
++    outb(RTC_BASE_REG + 0, reg);
++    outb(RTC_BASE_REG + 1, val);
++}
++#endif
+-- 
+2.9.4
