@@ -1,28 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47587)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47679)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1dDts7-0000Jl-TT
-	for qemu-devel@nongnu.org; Thu, 25 May 2017 10:36:17 -0400
+	(envelope-from <berto@igalia.com>) id 1dDtsJ-0000Pb-Os
+	for qemu-devel@nongnu.org; Thu, 25 May 2017 10:36:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1dDts6-00018K-Ru
-	for qemu-devel@nongnu.org; Thu, 25 May 2017 10:36:15 -0400
-Received: from mail-lf0-x241.google.com ([2a00:1450:4010:c07::241]:33151)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1dDts6-00017l-Gj
-	for qemu-devel@nongnu.org; Thu, 25 May 2017 10:36:14 -0400
-Received: by mail-lf0-x241.google.com with SMTP id m18so13535185lfj.0
-	for <qemu-devel@nongnu.org>; Thu, 25 May 2017 07:36:14 -0700 (PDT)
+	(envelope-from <berto@igalia.com>) id 1dDtsG-0001At-Lz
+	for qemu-devel@nongnu.org; Thu, 25 May 2017 10:36:27 -0400
+From: Alberto Garcia <berto@igalia.com>
+In-Reply-To: <w51a861rwbs.fsf@maestria.local.igalia.com>
+References: <cover.1495536228.git.berto@igalia.com>
+	<142326a3-eaa4-8333-9580-ae0063f8a876@redhat.com>
+	<w51shjutjz7.fsf@maestria.local.igalia.com>
+	<0e3fc298-d47b-4066-c8c8-02f620c50b89@virtuozzo.com>
+	<w51poeytefj.fsf@maestria.local.igalia.com>
+	<713bf6bf-0c62-f3d7-e486-86a581689e3e@virtuozzo.com>
+	<w51a861rwbs.fsf@maestria.local.igalia.com>
+Date: Thu, 25 May 2017 16:35:42 +0200
+Message-ID: <w517f15rold.fsf@maestria.local.igalia.com>
 MIME-Version: 1.0
-References: <1495198042-124203-1-git-send-email-anton.nefedov@virtuozzo.com>
-	<1495198042-124203-8-git-send-email-anton.nefedov@virtuozzo.com>
-In-Reply-To: <1495198042-124203-8-git-send-email-anton.nefedov@virtuozzo.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Thu, 25 May 2017 14:36:02 +0000
-Message-ID: <CAJ+F1C+ku_8AmhY_MfS+0eNLU7UEqqwvJd1_5TezhcGUs_hKCw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 7/9] serial: move TIOCM update to a
- separate function
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 0/7] qcow2: Reduce the number
+ of I/O ops when doing COW
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,93 +28,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Anton Nefedov <anton.nefedov@virtuozzo.com>, qemu-devel@nongnu.org
-Cc: pbonzini@redhat.com, "Michael S . Tsirkin" <mst@redhat.com>, den@virtuozzo.com
+To: Anton Nefedov <anton.nefedov@virtuozzo.com>, Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, "Denis V . Lunev" <den@openvz.org>, Stefan Hajnoczi <stefanha@redhat.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 
-On Fri, May 19, 2017 at 4:55 PM Anton Nefedov <anton.nefedov@virtuozzo.com>
-wrote:
+On Thu 25 May 2017 01:48:39 PM CEST, Alberto Garcia wrote:
+>>>> I agree; as mentioned we have similar patches and they don't
+>>>> conflict much.  We noticed a performance regression on HDD though,
+>>>> for the presumably optimized case (random 4k write over a large
+>>>> backed image); so the patches were put on hold.
+>>> 
+>>> Interesting, I think that scenario was noticeably faster in my
+>>> tests. What cluster size(s) and image size(s) were you using?
+>>> 
+>> 64k cluster, 2g image, write 32m in portions of 4k at random offsets
+>
+> I just tried that and the optimized case performs better (as
+> expected), almost twice as fast in fact:
+>
+> write: io=32892KB, bw=162944B/s, iops=39, runt=206705msec
+> write: io=32892KB, bw=309256B/s, iops=75, runt=108911msec
+>
+> I'll try in a different machine.
 
-> will be used by the following patch
->
-> Signed-off-by: Anton Nefedov <anton.nefedov@virtuozzo.com>
-> Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> CC: Michael S. Tsirkin <mst@redhat.com>
-> CC: Paolo Bonzini <pbonzini@redhat.com>
->
+I made more tests of that same scenario with a different HDD:
 
-Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+write: io=32892KB, bw=588588B/s, iops=143, runt= 57224msec
+write: io=32892KB, bw=779951B/s, iops=190, runt= 43184msec
 
+And here are the results without a backing file:
 
-> ---
->  hw/char/serial.c | 31 +++++++++++++++++++------------
->  1 file changed, 19 insertions(+), 12 deletions(-)
->
-> diff --git a/hw/char/serial.c b/hw/char/serial.c
-> index d8d34d0..1e6bdeb 100644
-> --- a/hw/char/serial.c
-> +++ b/hw/char/serial.c
-> @@ -312,6 +312,24 @@ static void serial_write_fcr(SerialState *s, uint8_t
-> val)
->      }
->  }
->
-> +static void serial_update_tiocm(SerialState *s)
-> +{
-> +    int flags;
-> +
-> +    qemu_chr_fe_ioctl(&s->chr, CHR_IOCTL_SERIAL_GET_TIOCM, &flags);
-> +
-> +    flags &=3D ~(CHR_TIOCM_RTS | CHR_TIOCM_DTR);
-> +
-> +    if (s->mcr & UART_MCR_RTS) {
-> +        flags |=3D CHR_TIOCM_RTS;
-> +    }
-> +    if (s->mcr & UART_MCR_DTR) {
-> +        flags |=3D CHR_TIOCM_DTR;
-> +    }
-> +
-> +    qemu_chr_fe_ioctl(&s->chr, CHR_IOCTL_SERIAL_SET_TIOCM, &flags);
-> +}
-> +
->  static void serial_ioport_write(void *opaque, hwaddr addr, uint64_t val,
->                                  unsigned size)
->  {
-> @@ -426,24 +444,13 @@ static void serial_ioport_write(void *opaque, hwadd=
-r
-> addr, uint64_t val,
->          break;
->      case 4:
->          {
-> -            int flags;
->              int old_mcr =3D s->mcr;
->              s->mcr =3D val & 0x1f;
->              if (val & UART_MCR_LOOP)
->                  break;
->
->              if (s->poll_msl >=3D 0 && old_mcr !=3D s->mcr) {
-> -
-> -                qemu_chr_fe_ioctl(&s->chr, CHR_IOCTL_SERIAL_GET_TIOCM,
-> &flags);
-> -
-> -                flags &=3D ~(CHR_TIOCM_RTS | CHR_TIOCM_DTR);
-> -
-> -                if (val & UART_MCR_RTS)
-> -                    flags |=3D CHR_TIOCM_RTS;
-> -                if (val & UART_MCR_DTR)
-> -                    flags |=3D CHR_TIOCM_DTR;
-> -
-> -                qemu_chr_fe_ioctl(&s->chr, CHR_IOCTL_SERIAL_SET_TIOCM,
-> &flags);
-> +                serial_update_tiocm(s);
->                  /* Update the modem status after a one-character-send
-> wait-time, since there may be a response
->                     from the device/computer at the other end of the
-> serial line */
->                  timer_mod(s->modem_status_poll,
-> qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) + s->char_transmit_time);
-> --
-> 2.7.4
->
->
-> --
-Marc-Andr=C3=A9 Lureau
+write: io=32892KB, bw=1510.2KB/s, iops=377, runt= 21781msec
+write: io=32892KB, bw=5417.1KB/s, iops=1354, runt=  6071msec
+
+Berto
