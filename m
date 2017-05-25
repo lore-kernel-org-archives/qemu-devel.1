@@ -1,21 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55177)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55231)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aurelien@aurel32.net>) id 1dDzwb-0005dR-Bm
-	for qemu-devel@nongnu.org; Thu, 25 May 2017 17:05:18 -0400
+	(envelope-from <aurelien@aurel32.net>) id 1dDzwc-0005eS-K1
+	for qemu-devel@nongnu.org; Thu, 25 May 2017 17:05:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aurelien@aurel32.net>) id 1dDzwZ-0001L6-RI
-	for qemu-devel@nongnu.org; Thu, 25 May 2017 17:05:17 -0400
-Received: from hall.aurel32.net ([2001:bc8:30d7:100::1]:37388)
+	(envelope-from <aurelien@aurel32.net>) id 1dDzwa-0001Lk-Dg
+	for qemu-devel@nongnu.org; Thu, 25 May 2017 17:05:18 -0400
+Received: from hall.aurel32.net ([2001:bc8:30d7:100::1]:37424)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <aurelien@aurel32.net>)
-	id 1dDzwZ-0001JG-DX
-	for qemu-devel@nongnu.org; Thu, 25 May 2017 17:05:15 -0400
+	id 1dDzwa-0001Kb-4F
+	for qemu-devel@nongnu.org; Thu, 25 May 2017 17:05:16 -0400
 From: Aurelien Jarno <aurelien@aurel32.net>
-Date: Thu, 25 May 2017 23:04:51 +0200
-Message-Id: <20170525210508.4910-10-aurelien@aurel32.net>
+Date: Thu, 25 May 2017 23:04:56 +0200
+Message-Id: <20170525210508.4910-15-aurelien@aurel32.net>
 In-Reply-To: <20170525210508.4910-1-aurelien@aurel32.net>
 References: <20170525210508.4910-1-aurelien@aurel32.net>
-Subject: [Qemu-devel] [PATCH 09/26] target/s390x: implement MOVE NUMERICS
+Subject: [Qemu-devel] [PATCH 14/26] target/s390x: improve 24-bit and 31-bit
+ lengths read/write
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,79 +30,103 @@ Cc: Aurelien Jarno <aurelien@aurel32.net>, Richard Henderson <rth@twiddle.net>, 
 
 Signed-off-by: Aurelien Jarno <aurelien@aurel32.net>
 ---
- target/s390x/helper.h      |  1 +
- target/s390x/insn-data.def |  2 ++
- target/s390x/mem_helper.c  | 13 +++++++++++++
- target/s390x/translate.c   |  8 ++++++++
- 4 files changed, 24 insertions(+)
+ target/s390x/mem_helper.c | 47 +++++++++++++++++++++++++++++++++--------------
+ 1 file changed, 33 insertions(+), 14 deletions(-)
 
-diff --git a/target/s390x/helper.h b/target/s390x/helper.h
-index 7d6f11abe8..0558d6dc21 100644
---- a/target/s390x/helper.h
-+++ b/target/s390x/helper.h
-@@ -13,6 +13,7 @@ DEF_HELPER_FLAGS_3(divs64, TCG_CALL_NO_WG, s64, env, s64, s64)
- DEF_HELPER_FLAGS_4(divu64, TCG_CALL_NO_WG, i64, env, i64, i64, i64)
- DEF_HELPER_4(srst, i64, env, i64, i64, i64)
- DEF_HELPER_4(clst, i64, env, i64, i64, i64)
-+DEF_HELPER_FLAGS_4(mvn, TCG_CALL_NO_WG, void, env, i32, i64, i64)
- DEF_HELPER_FLAGS_4(mvpg, TCG_CALL_NO_WG, i32, env, i64, i64, i64)
- DEF_HELPER_4(mvst, i64, env, i64, i64, i64)
- DEF_HELPER_4(ex, void, env, i32, i64, i64)
-diff --git a/target/s390x/insn-data.def b/target/s390x/insn-data.def
-index 52f943c71e..518b87b160 100644
---- a/target/s390x/insn-data.def
-+++ b/target/s390x/insn-data.def
-@@ -572,6 +572,8 @@
-     C(0x0e00, MVCL,    RR_a,  Z,   0, 0, 0, 0, mvcl, 0)
- /* MOVE LONG EXTENDED */
-     C(0xa800, MVCLE,   RS_a,  Z,   0, a2, 0, 0, mvcle, 0)
-+/* MOVE NUMERICS */
-+    C(0xd100, MVN,     SS_a,  Z,   la1, a2, 0, 0, mvn, 0)
- /* MOVE PAGE */
-     C(0xb254, MVPG,    RRE,   Z,   r1_o, r2_o, 0, 0, mvpg, 0)
- /* MOVE STRING */
 diff --git a/target/s390x/mem_helper.c b/target/s390x/mem_helper.c
-index 7faaf588a5..88be30555d 100644
+index bbb3eceb71..1dc71fe5f0 100644
 --- a/target/s390x/mem_helper.c
 +++ b/target/s390x/mem_helper.c
-@@ -244,6 +244,19 @@ void HELPER(mvcin)(CPUS390XState *env, uint32_t l, uint64_t dest, uint64_t src)
+@@ -421,6 +421,31 @@ static inline void set_address(CPUS390XState *env, int reg, uint64_t address)
      }
  }
  
-+/* move numerics  */
-+void HELPER(mvn)(CPUS390XState *env, uint32_t l, uint64_t dest, uint64_t src)
++static inline uint64_t wrap_length(CPUS390XState *env, uint64_t length)
 +{
-+    uintptr_t ra = GETPC();
-+    int i;
++    if (!(env->psw.mask & PSW_MASK_64)) {
++        /* 24-Bit and 31-Bit mode */
++        length &= 0x7fffffff;
++    }
++    return length;
++}
 +
-+    for (i = 0; i <= l; i++) {
-+        uint8_t v = cpu_ldub_data_ra(env, dest + i, ra) & 0xf0;
-+        v |= cpu_ldub_data_ra(env, src + i, ra) & 0x0f;
-+        cpu_stb_data_ra(env, dest + i, v, ra);
++static inline uint64_t get_length(CPUS390XState *env, int reg)
++{
++    return wrap_length(env, env->regs[reg]);
++}
++
++static inline void set_length(CPUS390XState *env, int reg, uint64_t length)
++{
++    if (env->psw.mask & PSW_MASK_64) {
++        /* 64-Bit mode */
++        env->regs[reg] = length;
++    } else {
++        /* 24-Bit and 31-Bit mode */
++        env->regs[reg] = deposit64(env->regs[reg], 0, 32, length);
 +    }
 +}
 +
- /* compare unsigned byte arrays */
- static uint32_t do_helper_clc(CPUS390XState *env, uint32_t l, uint64_t s1,
-                               uint64_t s2, uintptr_t ra)
-diff --git a/target/s390x/translate.c b/target/s390x/translate.c
-index b939c5a39f..ec6b85c2d0 100644
---- a/target/s390x/translate.c
-+++ b/target/s390x/translate.c
-@@ -2975,6 +2975,14 @@ static ExitStatus op_mvcs(DisasContext *s, DisasOps *o)
- }
- #endif
- 
-+static ExitStatus op_mvn(DisasContext *s, DisasOps *o)
-+{
-+    TCGv_i32 l = tcg_const_i32(get_field(s->fields, l1));
-+    gen_helper_mvn(cpu_env, l, o->addr1, o->in2);
-+    tcg_temp_free_i32(l);
-+    return NO_EXIT;
-+}
-+
- static ExitStatus op_mvpg(DisasContext *s, DisasOps *o)
+ /* search string (c is byte to search, r2 is string, r1 end of string) */
+ uint64_t HELPER(srst)(CPUS390XState *env, uint64_t r0, uint64_t end,
+                       uint64_t str)
+@@ -643,19 +668,14 @@ uint32_t HELPER(mvcle)(CPUS390XState *env, uint32_t r1, uint64_t a2,
+                        uint32_t r3)
  {
-     gen_helper_mvpg(cc_op, cpu_env, regs[0], o->in1, o->in2);
+     uintptr_t ra = GETPC();
+-    uint64_t destlen = env->regs[r1 + 1];
++    uint64_t destlen = get_length(env, r1 + 1);
+     uint64_t dest = get_address(env, r1);
+-    uint64_t srclen = env->regs[r3 + 1];
++    uint64_t srclen = get_length(env, r3 + 1);
+     uint64_t src = get_address(env, r3);
+     uint8_t pad = a2 & 0xff;
+     uint8_t v;
+     uint32_t cc;
+ 
+-    if (!(env->psw.mask & PSW_MASK_64)) {
+-        destlen = (uint32_t)destlen;
+-        srclen = (uint32_t)srclen;
+-    }
+-
+     if (destlen == srclen) {
+         cc = 0;
+     } else if (destlen < srclen) {
+@@ -677,10 +697,9 @@ uint32_t HELPER(mvcle)(CPUS390XState *env, uint32_t r1, uint64_t a2,
+         cpu_stb_data_ra(env, dest, pad, ra);
+     }
+ 
+-    env->regs[r1 + 1] = destlen;
++    set_length(env, r1 + 1 , destlen);
+     /* can't use srclen here, we trunc'ed it */
+-    /* FIXME: 31-bit mode! */
+-    env->regs[r3 + 1] -= src - env->regs[r3];
++    set_length(env, r3 + 1, env->regs[r3 + 1] - src - env->regs[r3]);
+     set_address(env, r1, dest);
+     set_address(env, r3, src);
+ 
+@@ -692,9 +711,9 @@ uint32_t HELPER(clcle)(CPUS390XState *env, uint32_t r1, uint64_t a2,
+                        uint32_t r3)
+ {
+     uintptr_t ra = GETPC();
+-    uint64_t destlen = env->regs[r1 + 1];
++    uint64_t destlen = get_length(env, r1 + 1);
+     uint64_t dest = get_address(env, r1);
+-    uint64_t srclen = env->regs[r3 + 1];
++    uint64_t srclen = get_length(env, r3 + 1);
+     uint64_t src = get_address(env, r3);
+     uint8_t pad = a2 & 0xff;
+     uint32_t cc = 0;
+@@ -716,9 +735,9 @@ uint32_t HELPER(clcle)(CPUS390XState *env, uint32_t r1, uint64_t a2,
+         }
+     }
+ 
+-    env->regs[r1 + 1] = destlen;
++    set_length(env, r1 + 1, destlen);
+     /* can't use srclen here, we trunc'ed it */
+-    env->regs[r3 + 1] -= src - env->regs[r3];
++    set_length(env, r3 + 1, env->regs[r3 + 1] - src - env->regs[r3]);
+     set_address(env, r1, dest);
+     set_address(env, r3, src);
+ 
 -- 
 2.11.0
