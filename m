@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57233)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57276)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dDjoO-0006UW-Qp
+	(envelope-from <dgibson@ozlabs.org>) id 1dDjoP-0006Ut-QD
 	for qemu-devel@nongnu.org; Wed, 24 May 2017 23:51:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dDjoL-0007S4-OW
-	for qemu-devel@nongnu.org; Wed, 24 May 2017 23:51:44 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1dDjoO-0007TW-Fk
+	for qemu-devel@nongnu.org; Wed, 24 May 2017 23:51:45 -0400
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Thu, 25 May 2017 13:51:14 +1000
-Message-Id: <20170525035132.24268-1-david@gibson.dropbear.id.au>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 00/18] ppc-for-2.10 queue 20170525
+Date: Thu, 25 May 2017 13:51:19 +1000
+Message-Id: <20170525035132.24268-6-david@gibson.dropbear.id.au>
+In-Reply-To: <20170525035132.24268-1-david@gibson.dropbear.id.au>
+References: <20170525035132.24268-1-david@gibson.dropbear.id.au>
+Subject: [Qemu-devel] [PULL 05/18] spapr: Consolidate HPT freeing code into
+ a routine
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,81 +21,78 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org
-Cc: agraf@suse.de, aik@ozlabs.ru, mdroth@linux.vnet.ibm.com, sbobroff@redhat.com, sursingh@redhat.com, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
+Cc: agraf@suse.de, aik@ozlabs.ru, mdroth@linux.vnet.ibm.com, sbobroff@redhat.com, sursingh@redhat.com, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Bharata B Rao <bharata@linux.vnet.ibm.com>, David Gibson <david@gibson.dropbear.id.au>
 
-The following changes since commit 9964e96dc9999cf7f7c936ee854a795415d19b=
-60:
+From: Bharata B Rao <bharata@linux.vnet.ibm.com>
 
-  Merge remote-tracking branch 'jasowang/tags/net-pull-request' into stag=
-ing (2017-05-23 15:01:31 +0100)
+Consolidate the code that frees HPT into a separate routine
+spapr_free_hpt() as the same chunk of code is called from two places.
 
-are available in the git repository at:
+Signed-off-by: Bharata B Rao <bharata@linux.vnet.ibm.com>
+Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+---
+ hw/ppc/spapr.c         | 13 +++++++++----
+ hw/ppc/spapr_hcall.c   |  5 +----
+ include/hw/ppc/spapr.h |  1 +
+ 3 files changed, 11 insertions(+), 8 deletions(-)
 
-  git://github.com/dgibson/qemu.git tags/ppc-for-2.10-20170525
-
-for you to fetch changes up to 62f94fc94f98095173146e753a1f03d7c2cc7ba3:
-
-  xics: add unrealize handler (2017-05-25 11:31:33 +1000)
-
-----------------------------------------------------------------
-ppc patch queue 2017-05-25
-
-Assorted accumulated patches.  These are nearly all bugfixes at one
-level or another - some for longstanding problems, others for some
-regressions caused by more recent cleanups.
-
-This includes preliminary patches towards fixing migration for Radix
-Page Table guests under POWER9 and also fixing some migration
-regressions due to the re-organization of the interrupt controller
-code.  Not all the pieces are there yet, so those still won't quite
-work, but the preliminary changes make sense on their own.
-
-----------------------------------------------------------------
-Bharata B Rao (1):
-      spapr: Consolidate HPT freeing code into a routine
-
-Daniel Henrique Barboza (4):
-      hw/ppc/spapr_events.c: removing 'exception' from sPAPREventLogEntry
-      hw/ppc: removing drc->detach_cb and drc->detach_cb_opaque
-      hw/ppc: migrating the DRC state of hotplugged devices
-      hw/ppc/spapr.c: recover pending LMB unplug info in spapr_lmb_releas=
-e
-
-David Gibson (3):
-      pseries: Split CAS PVR negotiation out into a separate function
-      pseries: Restore support for total vcpus not a multiple of threads-=
-per-core for old machine types
-      hw/ppc/spapr.c: adding pending_dimm_unplugs to sPAPRMachineState
-
-Greg Kurz (8):
-      ppc/xics: simplify prototype of xics_spapr_init()
-      spapr: sanitize error handling in spapr_ics_create()
-      spapr-cpu-core: release ICP object when realization fails
-      xics_kvm: cache already enabled vCPU ids
-      spapr: ensure core_slot isn't NULL in spapr_core_unplug()
-      spapr_cpu_core: drop reference on ICP object during CPU realization
-      spapr: fix error reporting in xics_system_init()
-      xics: add unrealize handler
-
-Laurent Vivier (1):
-      spapr: add pre_plug function for memory
-
-Nikunj A Dadhania (1):
-      target/ppc: reset reservation in do_rfi()
-
- hw/intc/xics.c              |   5 +
- hw/intc/xics_kvm.c          |  33 ++++--
- hw/intc/xics_spapr.c        |   3 +-
- hw/ppc/spapr.c              | 239 +++++++++++++++++++++++++++++++-------=
-------
- hw/ppc/spapr_cpu_core.c     |  19 ++--
- hw/ppc/spapr_drc.c          |  92 ++++++++++++++---
- hw/ppc/spapr_events.c       |  52 ++--------
- hw/ppc/spapr_hcall.c        |  54 ++++++----
- hw/ppc/spapr_pci.c          |   5 +-
- include/hw/pci-host/spapr.h |   3 +
- include/hw/ppc/spapr.h      |  12 ++-
- include/hw/ppc/spapr_drc.h  |   8 +-
- include/hw/ppc/xics.h       |   3 +-
- target/ppc/excp_helper.c    |   3 +
- 14 files changed, 349 insertions(+), 182 deletions(-)
+diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+index a9471b9..35dceb0 100644
+--- a/hw/ppc/spapr.c
++++ b/hw/ppc/spapr.c
+@@ -1227,16 +1227,21 @@ static int spapr_hpt_shift_for_ramsize(uint64_t ramsize)
+     return shift;
+ }
+ 
++void spapr_free_hpt(sPAPRMachineState *spapr)
++{
++    g_free(spapr->htab);
++    spapr->htab = NULL;
++    spapr->htab_shift = 0;
++    close_htab_fd(spapr);
++}
++
+ static void spapr_reallocate_hpt(sPAPRMachineState *spapr, int shift,
+                                  Error **errp)
+ {
+     long rc;
+ 
+     /* Clean up any HPT info from a previous boot */
+-    g_free(spapr->htab);
+-    spapr->htab = NULL;
+-    spapr->htab_shift = 0;
+-    close_htab_fd(spapr);
++    spapr_free_hpt(spapr);
+ 
+     rc = kvmppc_reset_htab(shift);
+     if (rc < 0) {
+diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
+index 0d608d6..2daace4 100644
+--- a/hw/ppc/spapr_hcall.c
++++ b/hw/ppc/spapr_hcall.c
+@@ -913,10 +913,7 @@ static void spapr_check_setup_free_hpt(sPAPRMachineState *spapr,
+         /* We assume RADIX, so this catches all the "Do Nothing" cases */
+     } else if (!(patbe_old & PATBE1_GR)) {
+         /* HASH->RADIX : Free HPT */
+-        g_free(spapr->htab);
+-        spapr->htab = NULL;
+-        spapr->htab_shift = 0;
+-        close_htab_fd(spapr);
++        spapr_free_hpt(spapr);
+     } else if (!(patbe_new & PATBE1_GR)) {
+         /* RADIX->HASH || NOTHING->HASH : Allocate HPT */
+         spapr_setup_hpt_and_vrma(spapr);
+diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
+index 5802f88..93c4cfc 100644
+--- a/include/hw/ppc/spapr.h
++++ b/include/hw/ppc/spapr.h
+@@ -610,6 +610,7 @@ int spapr_h_cas_compose_response(sPAPRMachineState *sm,
+                                  sPAPROptionVector *ov5_updates);
+ void close_htab_fd(sPAPRMachineState *spapr);
+ void spapr_setup_hpt_and_vrma(sPAPRMachineState *spapr);
++void spapr_free_hpt(sPAPRMachineState *spapr);
+ sPAPRTCETable *spapr_tce_new_table(DeviceState *owner, uint32_t liobn);
+ void spapr_tce_table_enable(sPAPRTCETable *tcet,
+                             uint32_t page_shift, uint64_t bus_offset,
+-- 
+2.9.4
