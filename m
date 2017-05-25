@@ -1,20 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40460)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41128)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1dDwlm-00044T-P2
-	for qemu-devel@nongnu.org; Thu, 25 May 2017 13:41:56 -0400
+	(envelope-from <anton.nefedov@virtuozzo.com>) id 1dDwok-0005Ne-3u
+	for qemu-devel@nongnu.org; Thu, 25 May 2017 13:45:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1dDwli-0002jx-DQ
-	for qemu-devel@nongnu.org; Thu, 25 May 2017 13:41:54 -0400
-Resent-Message-Id: <E1dDwli-0002jx-DQ@eggs.gnu.org>
-In-Reply-To: <20170525163225.29954-1-pbonzini@redhat.com>
-Message-ID: <149573409578.1353.4183057820415976133@c05f1edc8ed1>
-Reply-To: <qemu-devel@nongnu.org>
+	(envelope-from <anton.nefedov@virtuozzo.com>) id 1dDwof-00042X-59
+	for qemu-devel@nongnu.org; Thu, 25 May 2017 13:44:58 -0400
+Received: from mail-eopbgr20090.outbound.protection.outlook.com
+	([40.107.2.90]:44145
+	helo=EUR02-VE1-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <anton.nefedov@virtuozzo.com>)
+	id 1dDwoe-000408-DL
+	for qemu-devel@nongnu.org; Thu, 25 May 2017 13:44:53 -0400
+References: <1495198042-124203-1-git-send-email-anton.nefedov@virtuozzo.com>
+	<1495198042-124203-4-git-send-email-anton.nefedov@virtuozzo.com>
+	<CAJ+F1CKHOsDjf8_+vkAT8A5Onz+pbP8xwsLT2rOA4wg2UqX5EA@mail.gmail.com>
+From: Anton Nefedov <anton.nefedov@virtuozzo.com>
+Message-ID: <c4f4bf39-871c-1f7d-ebf7-165fc795ddac@virtuozzo.com>
+Date: Thu, 25 May 2017 20:44:43 +0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Thu, 25 May 2017 10:41:36 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH v3 00/18] Block layer thread safety, part 1
+In-Reply-To: <CAJ+F1CKHOsDjf8_+vkAT8A5Onz+pbP8xwsLT2rOA4wg2UqX5EA@mail.gmail.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 3/9] char: chardevice hotswap
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,79 +32,287 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: pbonzini@redhat.com
-Cc: famz@redhat.com, qemu-devel@nongnu.orgfamz@redhat.com, stefanha@redhat.com, qemu-block@nongnu.org
+To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@gmail.com>, qemu-devel@nongnu.org
+Cc: pbonzini@redhat.com, den@virtuozzo.com
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKTWVzc2FnZS1pZDogMjAx
-NzA1MjUxNjMyMjUuMjk5NTQtMS1wYm9uemluaUByZWRoYXQuY29tClN1YmplY3Q6IFtRZW11LWRl
-dmVsXSBbUEFUQ0ggdjMgMDAvMThdIEJsb2NrIGxheWVyIHRocmVhZCBzYWZldHksIHBhcnQgMQpU
-eXBlOiBzZXJpZXMKCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKCkJBU0U9
-YmFzZQpuPTEKdG90YWw9JChnaXQgbG9nIC0tb25lbGluZSAkQkFTRS4uIHwgd2MgLWwpCmZhaWxl
-ZD0wCgpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1s
-b2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQoKY29tbWl0cz0iJChnaXQgbG9nIC0tZm9ybWF0PSVIIC0t
-cmV2ZXJzZSAkQkFTRS4uKSIKZm9yIGMgaW4gJGNvbW1pdHM7IGRvCiAgICBlY2hvICJDaGVja2lu
-ZyBQQVRDSCAkbi8kdG90YWw6ICQoZ2l0IGxvZyAtbiAxIC0tZm9ybWF0PSVzICRjKS4uLiIKICAg
-IGlmICEgZ2l0IHNob3cgJGMgLS1mb3JtYXQ9ZW1haWwgfCAuL3NjcmlwdHMvY2hlY2twYXRjaC5w
-bCAtLW1haWxiYWNrIC07IHRoZW4KICAgICAgICBmYWlsZWQ9MQogICAgICAgIGVjaG8KICAgIGZp
-CiAgICBuPSQoKG4rMSkpCmRvbmUKCmV4aXQgJGZhaWxlZAo9PT0gVEVTVCBTQ1JJUFQgRU5EID09
-PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApGcm9t
-IGh0dHBzOi8vZ2l0aHViLmNvbS9wYXRjaGV3LXByb2plY3QvcWVtdQogKiBbbmV3IHRhZ10gICAg
-ICAgICBwYXRjaGV3LzIwMTcwNTI1MTYzODUxLjgwNDctMS1iZXJyYW5nZUByZWRoYXQuY29tIC0+
-IHBhdGNoZXcvMjAxNzA1MjUxNjM4NTEuODA0Ny0xLWJlcnJhbmdlQHJlZGhhdC5jb20KU3dpdGNo
-ZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0JwplOWY2YjJlIGJsb2NrOiBtYWtlIGFjY291bnRpbmcg
-dGhyZWFkLXNhZmUKODdkYjY2NyBibG9jazogaW50cm9kdWNlIGJsb2NrX2FjY291bnRfb25lX2lv
-CmI3ZGNiZGYgYmxvY2s6IHByb3RlY3QgbW9kaWZpY2F0aW9uIG9mIGRpcnR5IGJpdG1hcHMgd2l0
-aCBhIG11dGV4CmNkZDk0YmEgbWlncmF0aW9uL2Jsb2NrOiByZXNldCBkaXJ0eSBiaXRtYXAgYmVm
-b3JlIHJlYWRpbmcKMjJkOGQxMCBibG9jazogaW50cm9kdWNlIGRpcnR5X2JpdG1hcF9tdXRleApl
-NjliOTFkIGJsb2NrOiBwcm90ZWN0IHRyYWNrZWRfcmVxdWVzdHMgYW5kIGZsdXNoX3F1ZXVlIHdp
-dGggcmVxc19sb2NrCmM1MmE3MDggYmxvY2s6IGFjY2VzcyB3cml0ZV9nZW4gd2l0aCBhdG9taWNz
-CjQ1YWEwYjMgYmxvY2s6IHVzZSBTdGF0NjQgZm9yIHdyX2hpZ2hlc3Rfb2Zmc2V0CjlkMjJkNGQg
-dXRpbDogYWRkIHN0YXRzNjQgbW9kdWxlCjM4MWUyNmIgdGhyb3R0bGUtZ3JvdXBzOiBwcm90ZWN0
-IHRocm90dGxlZCByZXF1ZXN0cyB3aXRoIGEgQ29NdXRleApkNDU3YWFiIHRocm90dGxlLWdyb3Vw
-czogZG8gbm90IHVzZSBxZW11X2NvX2VudGVyX25leHQKY2MxNjFlZCB0aHJvdHRsZS1ncm91cHM6
-IG9ubHkgc3RhcnQgb25lIGNvcm91dGluZSBmcm9tIGRyYWluZWRfYmVnaW4KYTViN2ZmYiBibG9j
-azogYWNjZXNzIGlvX3BsdWdnZWQgd2l0aCBhdG9taWMgb3BzCjZhYWU3NDcgYmxvY2s6IGFjY2Vz
-cyB3YWtldXAgd2l0aCBhdG9taWMgb3BzCjY0MWE5YjQgYmxvY2s6IGFjY2VzcyBzZXJpYWxpc2lu
-Z19pbl9mbGlnaHQgd2l0aCBhdG9taWMgb3BzCjZiMWU2ODcgYmxvY2s6IGFjY2VzcyBpb19saW1p
-dHNfZGlzYWJsZWQgd2l0aCBhdG9taWMgb3BzCjRmMTFmYjAgYmxvY2s6IGFjY2VzcyBxdWllc2Nl
-X2NvdW50ZXIgd2l0aCBhdG9taWMgb3BzCjY4MzE0MjggYmxvY2s6IGFjY2VzcyBjb3B5X29uX3Jl
-YWQgd2l0aCBhdG9taWMgb3BzCgo9PT0gT1VUUFVUIEJFR0lOID09PQpDaGVja2luZyBQQVRDSCAx
-LzE4OiBibG9jazogYWNjZXNzIGNvcHlfb25fcmVhZCB3aXRoIGF0b21pYyBvcHMuLi4KQ2hlY2tp
-bmcgUEFUQ0ggMi8xODogYmxvY2s6IGFjY2VzcyBxdWllc2NlX2NvdW50ZXIgd2l0aCBhdG9taWMg
-b3BzLi4uCkNoZWNraW5nIFBBVENIIDMvMTg6IGJsb2NrOiBhY2Nlc3MgaW9fbGltaXRzX2Rpc2Fi
-bGVkIHdpdGggYXRvbWljIG9wcy4uLgpDaGVja2luZyBQQVRDSCA0LzE4OiBibG9jazogYWNjZXNz
-IHNlcmlhbGlzaW5nX2luX2ZsaWdodCB3aXRoIGF0b21pYyBvcHMuLi4KQ2hlY2tpbmcgUEFUQ0gg
-NS8xODogYmxvY2s6IGFjY2VzcyB3YWtldXAgd2l0aCBhdG9taWMgb3BzLi4uCkNoZWNraW5nIFBB
-VENIIDYvMTg6IGJsb2NrOiBhY2Nlc3MgaW9fcGx1Z2dlZCB3aXRoIGF0b21pYyBvcHMuLi4KQ2hl
-Y2tpbmcgUEFUQ0ggNy8xODogdGhyb3R0bGUtZ3JvdXBzOiBvbmx5IHN0YXJ0IG9uZSBjb3JvdXRp
-bmUgZnJvbSBkcmFpbmVkX2JlZ2luLi4uCkNoZWNraW5nIFBBVENIIDgvMTg6IHRocm90dGxlLWdy
-b3VwczogZG8gbm90IHVzZSBxZW11X2NvX2VudGVyX25leHQuLi4KQ2hlY2tpbmcgUEFUQ0ggOS8x
-ODogdGhyb3R0bGUtZ3JvdXBzOiBwcm90ZWN0IHRocm90dGxlZCByZXF1ZXN0cyB3aXRoIGEgQ29N
-dXRleC4uLgpDaGVja2luZyBQQVRDSCAxMC8xODogdXRpbDogYWRkIHN0YXRzNjQgbW9kdWxlLi4u
-CkVSUk9SOiBtZW1vcnkgYmFycmllciB3aXRob3V0IGNvbW1lbnQKIzMyODogRklMRTogdXRpbC9z
-dGF0czY0LmM6MTAxOgorICAgICAgICBzbXBfd21iKCk7CgpFUlJPUjogbWVtb3J5IGJhcnJpZXIg
-d2l0aG91dCBjb21tZW50CiMzNTc6IEZJTEU6IHV0aWwvc3RhdHM2NC5jOjEzMDoKKyAgICAgICAg
-c21wX3dtYigpOwoKdG90YWw6IDIgZXJyb3JzLCAwIHdhcm5pbmdzLCAzMzQgbGluZXMgY2hlY2tl
-ZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkg
-b2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1h
-aW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKQ2hlY2tpbmcgUEFUQ0gg
-MTEvMTg6IGJsb2NrOiB1c2UgU3RhdDY0IGZvciB3cl9oaWdoZXN0X29mZnNldC4uLgpDaGVja2lu
-ZyBQQVRDSCAxMi8xODogYmxvY2s6IGFjY2VzcyB3cml0ZV9nZW4gd2l0aCBhdG9taWNzLi4uCkNo
-ZWNraW5nIFBBVENIIDEzLzE4OiBibG9jazogcHJvdGVjdCB0cmFja2VkX3JlcXVlc3RzIGFuZCBm
-bHVzaF9xdWV1ZSB3aXRoIHJlcXNfbG9jay4uLgpDaGVja2luZyBQQVRDSCAxNC8xODogYmxvY2s6
-IGludHJvZHVjZSBkaXJ0eV9iaXRtYXBfbXV0ZXguLi4KQ2hlY2tpbmcgUEFUQ0ggMTUvMTg6IG1p
-Z3JhdGlvbi9ibG9jazogcmVzZXQgZGlydHkgYml0bWFwIGJlZm9yZSByZWFkaW5nLi4uCkNoZWNr
-aW5nIFBBVENIIDE2LzE4OiBibG9jazogcHJvdGVjdCBtb2RpZmljYXRpb24gb2YgZGlydHkgYml0
-bWFwcyB3aXRoIGEgbXV0ZXguLi4KV0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzMw
-NDogRklMRTogbWlncmF0aW9uL2Jsb2NrLmM6NTM5OgorICAgICAgICAgICAgYmRydl9yZXNldF9k
-aXJ0eV9iaXRtYXBfbG9ja2VkKGJtZHMtPmRpcnR5X2JpdG1hcCwgc2VjdG9yLCBucl9zZWN0b3Jz
-KTsKCnRvdGFsOiAwIGVycm9ycywgMSB3YXJuaW5ncywgMjcyIGxpbmVzIGNoZWNrZWQKCllvdXIg
-cGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNl
-IGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVy
-LCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KQ2hlY2tpbmcgUEFUQ0ggMTcvMTg6IGJs
-b2NrOiBpbnRyb2R1Y2UgYmxvY2tfYWNjb3VudF9vbmVfaW8uLi4KQ2hlY2tpbmcgUEFUQ0ggMTgv
-MTg6IGJsb2NrOiBtYWtlIGFjY291bnRpbmcgdGhyZWFkLXNhZmUuLi4KPT09IE9VVFBVVCBFTkQg
-PT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKCi0tLQpFbWFpbCBnZW5lcmF0
-ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNl
-IHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQGZyZWVsaXN0cy5vcmc=
+> Hi
+>=20
+
+Hi Marc-Andr=C3=A9, thanks for reviewing, pls see answers below
+
+> On Fri, May 19, 2017 at 4:51 PM Anton Nefedov <address@hidden>
+> wrote:
+>=20
+>> This patch adds a possibility to change a char device without a frontend
+>> removal.
+>>
+>> 1. Ideally, it would have to happen transparently to a frontend, i.e.
+>> frontend would continue its regular operation.
+>> However, backends are not stateless and are set up by the frontends
+>> via qemu_chr_fe_<> functions, and it's not (generally) possible to repla=
+y
+>> that setup entirely in a backend code, as different chardevs respond
+>> to the setup calls differently, so do frontends work differently basing
+>> on those setup responses.
+>> Moreover, some frontend can generally get and save the backend pointer
+>> (qemu_chr_fe_get_driver()), and it will become invalid after backend
+>> change.
+>>
+>> So, a frontend which would like to support chardev hotswap has to regist=
+er
+>> a "backend change" handler, and redo its backend setup there.
+>>
+>> 2. Write path can be used by multiple threads and thus protected with
+>> chr_write_lock.
+>> So hotswap also has to be protected so write functions won't access
+>> a backend being replaced.
+>>
+>>
+> Why not use the chr_write_lock then? (rename it chr_lock?)
+>=20
+
+chr_write_lock is a Chardev property, it will be gone together with a
+swapped device.
+
+We could remove chr_write_lock and leave only the new be->chr_lock,=20
+since it covers everything; I guess the only problem is mux, where
+multiple CharBackends share the same Chardev.
+
+Would smth like this be better?:
+
+static void char_lock(CharBackend *be)
+{
+     qemu_mutex_lock(be->chr && CHARDEV_IS_MUX(be->chr) ?
+                     &be->chr->chr_lock : &be->chr_lock);
+}
+
+and use this instead of lock(be->chr_lock) and remove chr_write_lock.
+(This would rely on a fact that mux is never hotswapped so be->chr_lock
+is not needed).
+
+
+>=20
+>> 3. Hotswap function can be called from e.g. a read handler of a monitor
+>> socket. This can cause troubles so it's safer to defer execution to
+>> a bottom-half (however, it means we cannot return some of the errors
+>> synchronously - but most of them we can)
+>>
+>=20
+> What kind of troubles?
+>=20
+
+if someone tried to hotswap monitor, it would look like:
+
+(gdb) bt
+#0 qmp_chardev_change (id=3Did@entry=3D0x7fc24bee7a60 "charmonitor",
+backend=3Dbackend@entry=3D0x7fc24cc28290, errp=3Derrp@entry=3D0x7ffde4d8d4f=
+0)
+at /mnt/code/us-qemu/chardev/char.c:1438
+#1 0x00007fc249fd914b in hmp_chardev_change (mon=3D<optimized out>,
+qdict=3D<optimized out>) at /mnt/code/us-qemu/hmp.c:2252
+#2 0x00007fc249edeece in handle_hmp_command (mon=3Dmon@entry=3D0x7fc24bef87=
+c0,
+cmdline=3D0x7fc24bf2345f "charmonitor
+socket,path=3D/vz/vmprivate/centosos/mon.socket,server,nowait") at
+/mnt/code/us-qemu/monitor.c:3100
+#3 0x00007fc249ee02fa in monitor_command_cb (opaque=3D0x7fc24bef87c0,
+cmdline=3D<optimized out>, readline_opaque=3D<optimized out>)
+at /mnt/code/us-qemu/monitor.c:3897
+#4 0x00007fc24a242428 in readline_handle_byte (rs=3D0x7fc24bf23450,
+ch=3D<optimized out>) at /mnt/code/us-qemu/util/readline.c:393
+#5 0x00007fc249edf0e2 in monitor_read (opaque=3D<optimized out>,
+buf=3D<optimized out>, size=3D<optimized out>)
+at /mnt/code/us-qemu/monitor.c:3880
+#6 0x00007fc24a1deb2b in tcp_chr_read (chan=3D<optimized out>,
+cond=3D<optimized out>, opaque=3D<optimized out>)
+at /mnt/code/us-qemu/chardev/char-socket.c:441
+#7 0x00007fc240997d7a in g_main_dispatch (context=3D0x7fc24beda950) at
+gmain.c:3152
+#8 g_main_context_dispatch (context=3Dcontext@entry=3D0x7fc24beda950) at
+gmain.c:3767
+#9 0x00007fc24a22fe7c in glib_pollfds_poll () at
+/mnt/code/us-qemu/util/main-loop.c:213
+#10 os_host_main_loop_wait (timeout=3D<optimized out>) at
+/mnt/code/us-qemu/util/main-loop.c:261
+#11 main_loop_wait (nonblocking=3Dnonblocking@entry=3D0) at
+/mnt/code/us-qemu/util/main-loop.c:517
+#12 0x00007fc249e9a19a in main_loop () at /mnt/code/us-qemu/vl.c:1900
+#13 main (argc=3D<optimized out>, argv=3D<optimized out>, envp=3D<optimized
+out>) at /mnt/code/us-qemu/vl.c:4732
+
+i.e. hotswap the device that is in tcp_chr_read (frame #6), and can
+potentially be accessed (with old pointer on a stack) after it is
+destroyed by qmp_chardev_change()
+
+however, there is no support for monitor hotswap in the patchset. Maybe
+it's not worth to mess with bottom-halves at all? It causes problems,
+like those mentioned in your further comments
+
+
+>>
+>> Signed-off-by: Anton Nefedov <address@hidden>
+>> Reviewed-by: Vladimir Sementsov-Ogievskiy <address@hidden>
+>> ---
+>>  chardev/char.c        | 147
+>> ++++++++++++++++++++++++++++++++++++++++++++++----
+>>  include/sysemu/char.h |  10 ++++
+>>  qapi-schema.json      |  40 ++++++++++++++
+>>  3 files changed, 187 insertions(+), 10 deletions(-)
+>>
+>> -bool qemu_chr_fe_init(CharBackend *b, Chardev *s, Error **errp)
+>> +static bool fe_connect(CharBackend *b, Chardev *s, Error **errp)
+>>  {
+>>
+>=20
+> I would rather keep a qemu_chr prefix for consistency
+>=20
+
+Done.
+
+>=20
+>>      int tag =3D 0;
+>>
+>> @@ -507,6 +516,17 @@ unavailable:
+>>      return false;
+>>  }
+>>
+>> +bool qemu_chr_fe_init(CharBackend *b, Chardev *s, Error **errp)
+>> +{
+>> +    if (!fe_connect(b, s, errp)) {
+>> +        return false;
+>> +    }
+>> +
+>> +    qemu_mutex_init(&b->chr_lock);
+>> +    b->hotswap_bh =3D NULL;
+>> +    return true;
+>> +}
+>> +
+>>  static bool qemu_chr_is_busy(Chardev *s)
+>>  {
+>>      if (CHARDEV_IS_MUX(s)) {
+>> @@ -531,6 +551,10 @@ void qemu_chr_fe_deinit(CharBackend *b)
+>>              d->backends[b->tag] =3D NULL;
+>>          }
+>>          b->chr =3D NULL;
+>> +        qemu_mutex_destroy(&b->chr_lock);
+>> +        if (b->hotswap_bh) {
+>> +            qemu_bh_delete(b->hotswap_bh);
+>>
+>=20
+> Could there be a chr_new leak here?
+>=20
+>=20
+
+Yes you're right it can leak.
+Maybe we don't need this asynchrony, see above, otherwise I will think
+how to fix
+
+>> +        }
+>>      }
+>>  }
+>>
+>> @@ -1308,6 +1332,109 @@ ChardevReturn *qmp_chardev_add(const char *id,
+>> ChardevBackend *backend,
+>>      return ret;
+>>  }
+>>
+>> +static void chardev_change_bh(void *opaque)
+>> +{
+>> +    Chardev *chr_new =3D opaque;
+>> +    const char *id =3D chr_new->label;
+>> +    Chardev *chr =3D qemu_chr_find(id);
+>>
+>=20
+> Could chr be gone in the meantime? potentially
+>=20
+>=20
+
+Potentially yes. Will fix (clean chr_new and bail out).
+
+
+>> +
+>> +    chr_new =3D qemu_chardev_new(NULL,
+>> object_class_get_name(OBJECT_CLASS(cc)),
+>> +                               backend, errp);
+>> +    chr_new->label =3D g_strdup(id);
+>>
+>=20
+> move it below the check for !chr_new
+>=20
+>=20
+
+my bad, thanks
+
+>> +    if (!chr_new) {
+>> +        return NULL;
+>> +    }
+>> +
+>> +    if (chr->be->hotswap_bh) {
+>> +        qemu_bh_delete(chr->be->hotswap_bh);
+>> +    }
+>>
+>=20
+> Is it necessary to delete and recreate the bh? Could there be a chr_new
+> leak if the bh didn't run? It's probably best to deny backend change whil=
+e
+> one is going on.
+>=20
+>=20
+
+Hmm probably not, but new() is the only function that sets the argument.
+Will think how to fix this if we decide to keep the bh.
+
+>> +    chr->be->hotswap_bh =3D qemu_bh_new(chardev_change_bh, chr_new);
+>> +    qemu_bh_schedule(chr->be->hotswap_bh);
+>> +
+>> +    ret =3D g_new0(ChardevReturn, 1);
+>> +    if (CHARDEV_IS_PTY(chr_new)) {
+>> +        ret->pty =3D g_strdup(chr_new->filename + 4);
+>> +        ret->has_pty =3D true;
+>> +    }
+>> +
+>> +    return ret;
+>>
+>=20
+> ah, potentially a case where qmp-async would be better..
+>=20
+> +}
+>> +
+>>  void qmp_chardev_remove(const char *id, Error **errp)
+>>  {
+>>      Chardev *chr;
+>> diff --git a/include/sysemu/char.h b/include/sysemu/char.h
+>> index 9f8df07..68c7876 100644
+>> --- a/include/sysemu/char.h
+>> +++ b/include/sysemu/char.h
+>> @@ -92,6 +92,8 @@ typedef struct CharBackend {
+>>      void *opaque;
+>>      int tag;
+>>      int fe_open;
+>> +    QemuMutex chr_lock;
+>> +    QEMUBH *hotswap_bh;
+>>  } CharBackend;
+>>
+>>  struct Chardev {
+>> @@ -141,6 +143,14 @@ void qemu_chr_parse_common(QemuOpts *opts,
+>> ChardevCommon *backend);
+>>   */
+>>  Chardev *qemu_chr_new(const char *label, const char *filename);
+>>
+>> +/**
+>> + * @qemu_chr_change:
+>> + *
+>> + * Change an existing character backend
+>> + *
+>> + * @opts the new backend options
+>> + */
+>> +void qemu_chr_change(QemuOpts *opts, Error **errp);
+>>
+>>
+> This patch needs some test-char.c tests.
+>=20
+>=20
+
+Will do
+
+/Anton
