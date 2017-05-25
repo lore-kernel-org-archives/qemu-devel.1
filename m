@@ -1,40 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47927)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51177)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1dDngu-0007wk-Kb
-	for qemu-devel@nongnu.org; Thu, 25 May 2017 04:00:19 -0400
+	(envelope-from <imammedo@redhat.com>) id 1dDnoK-0001rx-Di
+	for qemu-devel@nongnu.org; Thu, 25 May 2017 04:07:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1dDngo-000168-2E
-	for qemu-devel@nongnu.org; Thu, 25 May 2017 04:00:16 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:54858)
+	(envelope-from <imammedo@redhat.com>) id 1dDnoF-000409-GO
+	for qemu-devel@nongnu.org; Thu, 25 May 2017 04:07:56 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:50374)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1dDngn-000153-Os
-	for qemu-devel@nongnu.org; Thu, 25 May 2017 04:00:09 -0400
-References: <1494578148-102868-1-git-send-email-wei.w.wang@intel.com>
-	<a3f2cae3-5d3d-f620-4a8d-bb11470c0b08@redhat.com>
-	<591AA65F.8080608@intel.com>
-	<d6eb1d73-c791-b8d3-7ef3-a7653aef00d6@redhat.com>
-	<7e1b48d5-83e6-a0ae-5d91-696d8db09d7c@redhat.com>
-	<591D0EF5.9000807@intel.com>
-	<d7df5484-7e08-4e1c-9e35-69d73858c736@redhat.com>
-	<20170519153329.GA30573@stefanha-x1.localdomain>
-	<ec3c391c-6f0a-b316-e7d9-8f5e431b5e45@redhat.com>
-	<286AC319A985734F985F78AFA26841F7392351DD@shsmsx102.ccr.corp.intel.com>
-	<7ff05785-6bca-a886-0eb0-aeeb0f8d8e1a@redhat.com>
-	<5923CCF2.2000001@intel.com>
-	<3d9e8375-fbaa-c011-8242-b37cd971069b@redhat.com>
-	<5924136A.4090004@intel.com>
-	<7636d3d0-a0de-f9a6-47f8-2d09a448b978@redhat.com>
-	<592544D9.5010100@intel.com>
-From: Jason Wang <jasowang@redhat.com>
-Message-ID: <23dac05e-ba3d-df6d-4831-feab9be1c6d2@redhat.com>
-Date: Thu, 25 May 2017 15:59:58 +0800
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1dDnoF-0003xb-BU
+	for qemu-devel@nongnu.org; Thu, 25 May 2017 04:07:51 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id E286E4E341
+	for <qemu-devel@nongnu.org>; Thu, 25 May 2017 08:07:48 +0000 (UTC)
+Date: Thu, 25 May 2017 10:07:45 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20170525100745.107b91a8@nial.brq.redhat.com>
+In-Reply-To: <20170525070747.29890-1-lprosek@redhat.com>
+References: <20170525070747.29890-1-lprosek@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <592544D9.5010100@intel.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [virtio-dev] Re: [virtio-dev] Re: [PATCH v2 00/16]
- Vhost-pci for inter-VM communication
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2] pc: ACPI BIOS: use highest NUMA node
+ for hotplug mem hole SRAT entry
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -43,136 +33,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Wei Wang <wei.w.wang@intel.com>, Stefan Hajnoczi <stefanha@gmail.com>
-Cc: "virtio-dev@lists.oasis-open.org" <virtio-dev@lists.oasis-open.org>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "marcandre.lureau@gmail.com" <marcandre.lureau@gmail.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "mst@redhat.com" <mst@redhat.com>
+To: Ladi Prosek <lprosek@redhat.com>
+Cc: qemu-devel@nongnu.org, mst@redhat.com, lersek@redhat.com
 
+On Thu, 25 May 2017 09:07:47 +0200
+Ladi Prosek <lprosek@redhat.com> wrote:
 
+> For reasons unknown, Windows won't online all memory, both at command
+> line and hot-plugged later, unless the hotplug mem hole SRAT entry
+> specifies a node greater than or equal to the ones where memory is
+> added.
+> 
+> Using the highest node on the machine makes recent versions of Windows
+> happy.
+> 
+> With this example command line:
+>   ... \
+>   -m 1024,slots=4,maxmem=32G \
+>   -numa node,nodeid=0 \
+>   -numa node,nodeid=1 \
+>   -numa node,nodeid=2 \
+>   -numa node,nodeid=3 \
+>   -object memory-backend-ram,size=1G,id=mem-mem1 \
+>   -device pc-dimm,id=dimm-mem1,memdev=mem-mem1,node=1
+> 
+> Windows reports a total of 1G of RAM without this commit and the expected
+> 2G with this commit.
+> 
+> Signed-off-by: Ladi Prosek <lprosek@redhat.com>
+Reviewed-by: Igor Mammedov <imammedo@redhat.com>
 
-On 2017=E5=B9=B405=E6=9C=8824=E6=97=A5 16:31, Wei Wang wrote:
-> On 05/24/2017 11:24 AM, Jason Wang wrote:
->>
->>
->> On 2017=E5=B9=B405=E6=9C=8823=E6=97=A5 18:48, Wei Wang wrote:
->>> On 05/23/2017 02:32 PM, Jason Wang wrote:
->>>>
->>>>
->>>> On 2017=E5=B9=B405=E6=9C=8823=E6=97=A5 13:47, Wei Wang wrote:
->>>>> On 05/23/2017 10:08 AM, Jason Wang wrote:
->>>>>>
->>>>>>
->>>>>> On 2017=E5=B9=B405=E6=9C=8822=E6=97=A5 19:46, Wang, Wei W wrote:
->>>>>>> On Monday, May 22, 2017 10:28 AM, Jason Wang wrote:
->>>>>>>> On 2017=E5=B9=B405=E6=9C=8819=E6=97=A5 23:33, Stefan Hajnoczi wr=
-ote:
->>>>>>>>> On Fri, May 19, 2017 at 11:10:33AM +0800, Jason Wang wrote:
->>>>>>>>>> On 2017=E5=B9=B405=E6=9C=8818=E6=97=A5 11:03, Wei Wang wrote:
->>>>>>>>>>> On 05/17/2017 02:22 PM, Jason Wang wrote:
->>>>>>>>>>>> On 2017=E5=B9=B405=E6=9C=8817=E6=97=A5 14:16, Jason Wang wro=
-te:
->>>>>>>>>>>>> On 2017=E5=B9=B405=E6=9C=8816=E6=97=A5 15:12, Wei Wang wrot=
-e:
->>>>>>>>>>>>>>> Hi:
->>>>>>>>>>>>>>>
->>>>>>>>>>>>>>> Care to post the driver codes too?
->>>>>>>>>>>>>>>
->>>>>>>>>>>>>> OK. It may take some time to clean up the driver code=20
->>>>>>>>>>>>>> before post
->>>>>>>>>>>>>> it out. You can first have a check of the draft at the=20
->>>>>>>>>>>>>> repo here:
->>>>>>>>>>>>>> https://github.com/wei-w-wang/vhost-pci-driver
->>>>>>>>>>>>>>
->>>>>>>>>>>>>> Best,
->>>>>>>>>>>>>> Wei
->>>>>>>>>>>>> Interesting, looks like there's one copy on tx side. We=20
->>>>>>>>>>>>> used to
->>>>>>>>>>>>> have zerocopy support for tun for VM2VM traffic. Could you=20
->>>>>>>>>>>>> please
->>>>>>>>>>>>> try to compare it with your vhost-pci-net by:
->>>>>>>>>>>>>
->>>>>>>>>>> We can analyze from the whole data path - from VM1's network=20
->>>>>>>>>>> stack
->>>>>>>>>>> to send packets -> VM2's network stack to receive packets. Th=
-e
->>>>>>>>>>> number of copies are actually the same for both.
->>>>>>>>>> That's why I'm asking you to compare the performance. The=20
->>>>>>>>>> only reason
->>>>>>>>>> for vhost-pci is performance. You should prove it.
->>>>>>>>> There is another reason for vhost-pci besides maximum=20
->>>>>>>>> performance:
->>>>>>>>>
->>>>>>>>> vhost-pci makes it possible for end-users to run networking or=20
->>>>>>>>> storage
->>>>>>>>> appliances in compute clouds.  Cloud providers do not allow=20
->>>>>>>>> end-users
->>>>>>>>> to run custom vhost-user processes on the host so you need=20
->>>>>>>>> vhost-pci.
->>>>>>>>>
->>>>>>>>> Stefan
->>>>>>>> Then it has non NFV use cases and the question goes back to the=20
->>>>>>>> performance
->>>>>>>> comparing between vhost-pci and zerocopy vhost_net. If it does=20
->>>>>>>> not perform
->>>>>>>> better, it was less interesting at least in this case.
->>>>>>>>
->>>>>>> Probably I can share what we got about vhost-pci and vhost-user:
->>>>>>> https://github.com/wei-w-wang/vhost-pci-discussion/blob/master/vh=
-ost_pci_vs_vhost_user.pdf=20
->>>>>>>
->>>>>>> Right now, I don=E2=80=99t have the environment to add the vhost_=
-net test.
->>>>>>
->>>>>> Thanks, the number looks good. But I have some questions:
->>>>>>
->>>>>> - Is the number measured through your vhost-pci kernel driver code=
-?
->>>>>
->>>>> Yes, the kernel driver code.
->>>>
->>>> Interesting, in the above link, "l2fwd" was used in vhost-pci=20
->>>> testing. I want to know more about the test configuration: If l2fwd=20
->>>> is the one that dpdk had, want to know how can you make it work for=20
->>>> kernel driver. (Maybe packet socket I think?) If not, want to know=20
->>>> how do you configure it (e.g through bridge or act_mirred or=20
->>>> others). And in OVS dpdk, is dpdk l2fwd + pmd used in the testing?
->>>>
->>>
->>> Oh, that l2fwd is a kernel module from OPNFV vsperf
->>> (http://artifacts.opnfv.org/vswitchperf/docs/userguide/quickstart.htm=
-l)
->>> For both legacy and vhost-pci cases, they use the same l2fwd module.
->>> No bridge is used, the module already works at L2 to forward packets
->>> between two net devices.
->>
->> Thanks for the pointer. Just to confirm, I think virtio-net kernel=20
->> driver is used in OVS-dpdk test?
->
-> Yes. In both cases, the guests are using kernel drivers.
->
->>
->> Another question is, can we manage to remove the copy in tx? If not,=20
->> is it a limitation of virtio protocol?
->>
->
-> No, we can't. Use this example, VM1's Vhost-pci<->virtio-net of VM2,=20
-> VM1 sees VM2's memory, but
-> VM2 only sees its own memory.
-> What this copy achieves is to get data from VM1's memory to VM2's=20
-> memory, so that VM2 can deliver it's
-> own memory to its network stack.
-
-Then, as has been pointed out. Should we consider a vhost-pci to=20
-vhost-pci peer?
-
-Even with vhost-pci to virito-net configuration, I think rx zerocopy=20
-could be achieved but not implemented in your driver (probably more=20
-easier in pmd).
-
-Thanks
-
->
-> Best,
-> Wei
->
->
->
->
+> ---
+> 
+> note to maintainer:
+> tests/acpi-test-data need to be updated due to change in SRAT table
+> 
+>  hw/i386/acpi-build.c | 7 +++++--
+>  1 file changed, 5 insertions(+), 2 deletions(-)
+> 
+> diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
+> index afcadac..82bd44f 100644
+> --- a/hw/i386/acpi-build.c
+> +++ b/hw/i386/acpi-build.c
+> @@ -2404,14 +2404,17 @@ build_srat(GArray *table_data, BIOSLinker *linker, MachineState *machine)
+>      }
+>  
+>      /*
+> -     * Entry is required for Windows to enable memory hotplug in OS.
+> +     * Entry is required for Windows to enable memory hotplug in OS
+> +     * and for Linux to enable SWIOTLB when booted with less than
+> +     * 4G of RAM. Windows works better if the entry sets proximity
+> +     * to the highest NUMA node in the machine.
+>       * Memory devices may override proximity set by this entry,
+>       * providing _PXM method if necessary.
+>       */
+>      if (hotplugabble_address_space_size) {
+>          numamem = acpi_data_push(table_data, sizeof *numamem);
+>          build_srat_memory(numamem, pcms->hotplug_memory.base,
+> -                          hotplugabble_address_space_size, 0,
+> +                          hotplugabble_address_space_size, pcms->numa_nodes - 1,
+>                            MEM_AFFINITY_HOTPLUGGABLE | MEM_AFFINITY_ENABLED);
+>      }
+>  
