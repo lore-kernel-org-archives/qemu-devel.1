@@ -1,27 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48487)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49369)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1dDxHx-0007jD-Ma
-	for qemu-devel@nongnu.org; Thu, 25 May 2017 14:15:10 -0400
+	(envelope-from <jsnow@redhat.com>) id 1dDxLI-0000zp-Tk
+	for qemu-devel@nongnu.org; Thu, 25 May 2017 14:18:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1dDxHu-0006nN-Fy
-	for qemu-devel@nongnu.org; Thu, 25 May 2017 14:15:09 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:52620)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1dDxHu-0006mv-72
-	for qemu-devel@nongnu.org; Thu, 25 May 2017 14:15:06 -0400
-Date: Thu, 25 May 2017 21:14:55 +0300
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20170525211413-mutt-send-email-mst@kernel.org>
-References: <1495163989-9994-1-git-send-email-peterx@redhat.com>
-	<1495163989-9994-11-git-send-email-peterx@redhat.com>
-	<20170519195349-mutt-send-email-mst@kernel.org>
-	<20170522024200.GE14679@pxdev.xzpeter.org>
+	(envelope-from <jsnow@redhat.com>) id 1dDxLH-0000Tr-Tg
+	for qemu-devel@nongnu.org; Thu, 25 May 2017 14:18:36 -0400
+References: <CADNMjEBdXZeOonsKNf9LpFKK0NFUzAth=CDaSj8q22k+o=ZEFA@mail.gmail.com>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <539d9960-d554-032f-3e88-b2531743a0a1@redhat.com>
+Date: Thu, 25 May 2017 14:18:28 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170522024200.GE14679@pxdev.xzpeter.org>
-Subject: Re: [Qemu-devel] [PATCH v4 10/10] vhost: iommu: cache static
- mapping if there is
+In-Reply-To: <CADNMjEBdXZeOonsKNf9LpFKK0NFUzAth=CDaSj8q22k+o=ZEFA@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] Behavior of QMP "query-block"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,161 +23,147 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, yi.l.liu@intel.com, Marcel Apfelbaum <marcel@redhat.com>, Lan Tianyu <tianyu.lan@intel.com>, Jason Wang <jasowang@redhat.com>
+To: Bruno Alvisio <bruno.alvisio@gmail.com>, qemu-devel@nongnu.org, Qemu-block <qemu-block@nongnu.org>
 
-On Mon, May 22, 2017 at 10:42:00AM +0800, Peter Xu wrote:
-> On Fri, May 19, 2017 at 07:55:26PM +0300, Michael S. Tsirkin wrote:
-> > On Fri, May 19, 2017 at 11:19:49AM +0800, Peter Xu wrote:
-> > > This patch pre-heat vhost iotlb cache when passthrough mode enabled.
-> > > 
-> > > Sometimes, even if user specified iommu_platform for vhost devices,
-> > > IOMMU might still be disabled. One case is passthrough mode in VT-d
-> > > implementation. We can detect this by observing iommu_list. If it's
-> > > empty, it means IOMMU translation is disabled, then we can actually
-> > > pre-heat the translation (it'll be static mapping then) by first
-> > > invalidating all IOTLB, then cache existing memory ranges into vhost
-> > > backend iotlb using 1:1 mapping.
-> > > 
-> > > Signed-off-by: Peter Xu <peterx@redhat.com>
-> > 
-> > I don't really understand. Is this a performance optimization?
-> > Can you post some #s please?
-> 
-> Yes, it is. Vhost can work even without this patch, but it should be
-> faster when with this patch.
 
-You'll have to include perf testing numbers then.
 
-> As mentioned in the commit message and below comment [1], this patch
-> pre-heat the cache for vhost. Currently the cache entries depends on
-> the system memory ranges (dev->mem->nregions), and it should be far
-> smaller than vhost's cache count (currently it is statically defined
-> as max_iotlb_entries=2048 in kernel). If with current patch, these
-> cache entries can cover the whole possible DMA ranges that PT mode
-> would allow, so we won't have any cache miss then.
+On 05/25/2017 12:27 AM, Bruno Alvisio wrote:
+> Hello all,
 > 
-> For the comments, do you have any better suggestion besides commit
-> message and [1]?
+> Summary
 > 
-> > 
-> > Also, if it's PT, can't we bypass iommu altogether? That would be
-> > even faster ...
+> I am using XEN hypervisor to run a HVM with a QEMU backed disk. After I
+> start the HVM I use QMP "query-block" command to see the devices of the VM.
+> Initially the command returns the disk that I set as part of the
+> configuration. After a few seconds the a DEVICE_DELETE event occurs (for
+> device nic0) and after that the "query-block" command returns an empty
+> result.
 > 
-> Yes, but I don't yet know a good way to do it... Any suggestion is
-> welcomed as well.
+> QEMU Version: 4.6.5
+
+I assume this is the KVM version.
+
+> Arch: x86-64
+> QMP : 2.2.1
+
+And I assume this is the QEMU version.
+
 > 
-> Btw, do you have any comment on other patches besides this one? Since
-> this patch can really be isolated from the whole PT support series.
+> Note:
+> 1. I was not performing any activity on the VM when the event occurs.
+> 2. After the event, the QEMU process is still alive and the VM runs
+> normally.
+> 3. This behavior is consistently reproduced.
+> 
+> 
+> Any help on how can I debug this issue would be greatly appreciated .
 > 
 > Thanks,
+> 
+> Bruno
+> 
 
-I've applied the rest of the series.
+I'm not very familiar with XEN, I do know that it likes to add more
+devices than it needs and then deletes them before starting the VM
+proper. The VM actually still runs normally despite the fact that query
+block returns no information? ...
 
-> > 
-> > > ---
-> > >  hw/virtio/trace-events |  4 ++++
-> > >  hw/virtio/vhost.c      | 49 +++++++++++++++++++++++++++++++++++++++++++++++++
-> > >  2 files changed, 53 insertions(+)
-> > > 
-> > > diff --git a/hw/virtio/trace-events b/hw/virtio/trace-events
-> > > index 1f7a7c1..54dcbb3 100644
-> > > --- a/hw/virtio/trace-events
-> > > +++ b/hw/virtio/trace-events
-> > > @@ -24,3 +24,7 @@ virtio_balloon_handle_output(const char *name, uint64_t gpa) "section name: %s g
-> > >  virtio_balloon_get_config(uint32_t num_pages, uint32_t actual) "num_pages: %d actual: %d"
-> > >  virtio_balloon_set_config(uint32_t actual, uint32_t oldactual) "actual: %d oldactual: %d"
-> > >  virtio_balloon_to_target(uint64_t target, uint32_t num_pages) "balloon target: %"PRIx64" num_pages: %d"
-> > > +
-> > > +# hw/virtio/vhost.c
-> > > +vhost_iommu_commit(void) ""
-> > > +vhost_iommu_static_preheat(void) ""
-> > > diff --git a/hw/virtio/vhost.c b/hw/virtio/vhost.c
-> > > index 03a46a7..8069135 100644
-> > > --- a/hw/virtio/vhost.c
-> > > +++ b/hw/virtio/vhost.c
-> > > @@ -27,6 +27,7 @@
-> > >  #include "hw/virtio/virtio-access.h"
-> > >  #include "migration/blocker.h"
-> > >  #include "sysemu/dma.h"
-> > > +#include "trace.h"
-> > >  
-> > >  /* enabled until disconnected backend stabilizes */
-> > >  #define _VHOST_DEBUG 1
-> > > @@ -730,6 +731,11 @@ static void vhost_iommu_unmap_notify(IOMMUNotifier *n, IOMMUTLBEntry *iotlb)
-> > >      }
-> > >  }
-> > >  
-> > > +static bool vhost_iommu_mr_enabled(struct vhost_dev *dev)
-> > > +{
-> > > +    return !QLIST_EMPTY(&dev->iommu_list);
-> > > +}
-> > > +
-> > >  static void vhost_iommu_region_add(MemoryListener *listener,
-> > >                                     MemoryRegionSection *section)
-> > >  {
-> > > @@ -782,6 +788,48 @@ static void vhost_iommu_region_del(MemoryListener *listener,
-> > >      }
-> > >  }
-> > >  
-> > > +static void vhost_iommu_commit(MemoryListener *listener)
-> > > +{
-> > > +    struct vhost_dev *dev = container_of(listener, struct vhost_dev,
-> > > +                                         iommu_listener);
-> > > +    struct vhost_memory_region *r;
-> > > +    int i;
-> > > +
-> > > +    trace_vhost_iommu_commit();
-> > > +
-> > > +    if (!vhost_iommu_mr_enabled(dev)) {
-> > > +        /*
-> > > +        * This means iommu_platform is enabled, however iommu memory
-> > > +        * region is disabled, e.g., when device passthrough is setup.
-> > > +        * Then, no translation is needed any more.
-> > > +        *
-> > > +        * Let's first invalidate the whole IOTLB, then pre-heat the
-> > > +        * static mapping by looping over vhost memory ranges.
-> > > +        */
+CCing qemu-block.
+
+--js
+
 > 
-> [1]
 > 
-> > > +
-> > > +        if (dev->vhost_ops->vhost_invalidate_device_iotlb(dev, 0,
-> > > +                                                          UINT64_MAX)) {
-> > > +            error_report("%s: flush existing IOTLB failed", __func__);
-> > > +            return;
-> > > +        }
-> > > +
-> > > +        for (i = 0; i < dev->mem->nregions; i++) {
-> > > +            r = &dev->mem->regions[i];
-> > > +            /* Vhost regions are writable RAM, so IOMMU_RW suites. */
-> > > +            if (dev->vhost_ops->vhost_update_device_iotlb(dev,
-> > > +                                                          r->guest_phys_addr,
-> > > +                                                          r->userspace_addr,
-> > > +                                                          r->memory_size,
-> > > +                                                          IOMMU_RW)) {
-> > > +                error_report("%s: pre-heat static mapping failed", __func__);
-> > > +                return;
-> > > +            }
-> > > +        }
-> > > +
-> > > +        trace_vhost_iommu_static_preheat();
-> > > +    }
-> > > +}
-> > > +
-> > >  static void vhost_region_nop(MemoryListener *listener,
-> > >                               MemoryRegionSection *section)
-> > >  {
-> > > @@ -1298,6 +1346,7 @@ int vhost_dev_init(struct vhost_dev *hdev, void *opaque,
-> > >      hdev->iommu_listener = (MemoryListener) {
-> > >          .region_add = vhost_iommu_region_add,
-> > >          .region_del = vhost_iommu_region_del,
-> > > +        .commit = vhost_iommu_commit,
-> > >      };
-> > >  
-> > >      if (hdev->migration_blocker == NULL) {
-> > > -- 
-> > > 2.7.4
+> DETAILED LOGS
 > 
-> -- 
-> Peter Xu
+> I am using XEN hypervisor to run a HVM with QEMU backed disk. When I start
+> the HVM I see the following QEMU process started:
+> 
+> root      2199     1  0 18:57 ?        00:00:02
+> /usr/local/lib/xen/bin/qemu-system-i386
+> -xen-domid 3 -chardev socket,id=libxl-cmd,path=/var/
+> run/xen/qmp-libxl-3,server,nowait -no-shutdown -mon
+> chardev=libxl-cmd,mode=control -chardev socket,id=libxenstat-cmd,path=
+> /var/run/xen/qmp-libxenstat-3,server,nowait -mon
+> chardev=libxenstat-cmd,mode=control -nodefaults -no-user-config -name
+> debianL2 -vnc :0,to=99 -display none -serial pty -device
+> cirrus-vga,vgamem_mb=8 -boot order=d -device
+> rtl8139,id=nic0,netdev=net0,mac=00:16:3e:1b:d0:7e
+> -netdev type=tap,id=net0,ifname=vif3.0-emu,script=no,downscript=no -machine
+> xenfv -m 1016 -drive file=/home/balvisio/debian-
+> disk.img,if=ide,index=0,media=disk,format=raw,cache=writeback -drive
+> if=ide,index=2,readonly=on,media=cdrom,id=ide-5632,file=/
+> home/balvisio/debian-live-8.7.1-amd64-gnome-desktop.iso,format=raw
+> 
+> After launching the VM, I connected to the QMP socket:
+> 
+> # rlwrap -C qmp socat STDIO UNIX:/var/run/xen/qmp-libxl-2
+> 
+> {"QMP": {"version": {"qemu": {"micro": 1, "minor": 2, "major": 2},
+> "package": ""}, "capabilities": []}}
+> 
+> {"execute":"qmp_capabilities"}
+> 
+> {"return": {}}
+> 
+> I issue the "query-block" command and I get:
+> 
+> {"execute":"query-block"}
+> 
+> {"return": [{"io-status": "ok", "device": "ide0-hd0", "locked": false,
+> "removable": false, "inserted": {"iops_rd": 0, "detect_zeroes": "off",
+> "image": {"virtual-size": 10737418240, "filename":
+> "/home/balvisio/debian-disk.img", "format": "raw", "actual-size":
+> 4940075008, "dirty-flag": false}, "iops_wr": 0, "ro": false,
+> "backing_file_depth": 0, "drv": "raw", "iops": 0, "bps_wr": 0, "encrypted":
+> false, "bps": 0, "bps_rd": 0, "file": "/home/balvisio/debian-disk.img",
+> "encryption_key_missing": false}, "type": "unknown"}]}
+> 
+> 
+> 
+> After a few seconds, the following event happens asynchronoausly:
+> 
+> {"timestamp": {"seconds": 1495590969, "microseconds": 898981}, "event":
+> "DEVICE_DELETED", "data": {"device": "nic0", "path":
+> "/machine/peripheral/nic0"}}
+> 
+> After that event, I perform a "query-block" command again but now the block
+> device is gone:
+> 
+> {"execute":"query-block"}
+> 
+> {"return": []}
+> 
+> 
+> Xen Config File Used
+> 
+> kernel="/usr/local/lib/xen/boot/hvmloader"
+> 
+> builder='hvm'
+> 
+> memory=1024
+> 
+> vcpus=1
+> 
+> name="debianL2"
+> 
+> vfb = ['type=vnc']
+> 
+> vif= ['bridge=xenbr0']
+> 
+> boot='b'
+> 
+> disk=['file:/home/balvisio/debian-disk.img,xvda,w']
+> 
+> acpi=1
+> 
+> device_model_version='qemu-xen'
+> 
+> serial='pty'
+> 
+> vnc=1
+> 
+> vnclisten=""
+> 
+> vncpasswd=""
+> 
