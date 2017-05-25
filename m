@@ -1,27 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34163)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35328)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1dDn22-0008Dd-7X
-	for qemu-devel@nongnu.org; Thu, 25 May 2017 03:18:03 -0400
+	(envelope-from <peterx@redhat.com>) id 1dDn8b-0001aZ-3Q
+	for qemu-devel@nongnu.org; Thu, 25 May 2017 03:24:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1dDn1y-0008Og-8N
-	for qemu-devel@nongnu.org; Thu, 25 May 2017 03:18:02 -0400
-Received: from chuckie.co.uk ([82.165.15.123]:44134
-	helo=s16892447.onlinehome-server.info)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
-	id 1dDn1y-0007vZ-0M
-	for qemu-devel@nongnu.org; Thu, 25 May 2017 03:17:58 -0400
-References: <20170429104937.31341-1-zxq_yx_007@163.com>
-	<9bf6a5a4-e8d7-b3b3-029d-baad2e3b507e@amsat.org>
-	<C2B7E73D-27BA-40BE-927B-EC047A4BF5BA@163.com>
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Message-ID: <e928c836-9bb0-b4bb-7d2e-a7805253a54c@ilande.co.uk>
-Date: Thu, 25 May 2017 08:17:27 +0100
+	(envelope-from <peterx@redhat.com>) id 1dDn8Z-00006X-Ev
+	for qemu-devel@nongnu.org; Thu, 25 May 2017 03:24:49 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54794)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1dDn8Z-000064-5H
+	for qemu-devel@nongnu.org; Thu, 25 May 2017 03:24:47 -0400
+Date: Thu, 25 May 2017 15:24:30 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20170525072430.GA22816@pxdev.xzpeter.org>
+References: <1493285660-4470-1-git-send-email-peterx@redhat.com>
+	<1493285660-4470-7-git-send-email-peterx@redhat.com>
+	<20170501045822.GM13773@umbus.fritz.box>
+	<20170508054814.GA2820@pxdev.xzpeter.org>
+	<20170508060744.GG25748@umbus.fritz.box>
+	<20170508073217.GD2820@pxdev.xzpeter.org>
+	<20170510070406.GU25748@umbus.fritz.box>
+	<20170511050426.GF28293@pxdev.xzpeter.org>
+	<20170515053211.GB11105@umbus.fritz.box>
 MIME-Version: 1.0
-In-Reply-To: <C2B7E73D-27BA-40BE-927B-EC047A4BF5BA@163.com>
-Content-Type: text/plain; charset=gbk
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v2 0/9] QOM'ify work for sparc
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20170515053211.GB11105@umbus.fritz.box>
+Subject: Re: [Qemu-devel] [RFC PATCH 6/8] memory: introduce AddressSpaceOps
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,34 +34,165 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?B?6LW15bCP5by6?= <zxq_yx_007@163.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Cc: qemu-devel@nongnu.org, edgar.iglesias@xilinx.com, peter.maydell@linaro.org, pbonzini@redhat.com, atar4qemu@gmail.com, david@gibson.dropbear.id.au
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-devel@nongnu.org, tianyu.lan@intel.com, Paolo Bonzini <pbonzini@redhat.com>, kevin.tian@intel.com, yi.l.liu@intel.com, Jason Wang <jasowang@redhat.com>, Alex Williamson <alex.williamson@redhat.com>
 
-On 20/05/17 01:28, 赵小强 wrote:
+On Mon, May 15, 2017 at 03:32:11PM +1000, David Gibson wrote:
+> On Thu, May 11, 2017 at 01:04:26PM +0800, Peter Xu wrote:
+> > On Wed, May 10, 2017 at 05:04:06PM +1000, David Gibson wrote:
+> > > On Mon, May 08, 2017 at 03:32:17PM +0800, Peter Xu wrote:
+> > > > On Mon, May 08, 2017 at 04:07:44PM +1000, David Gibson wrote:
+> > > > > On Mon, May 08, 2017 at 01:48:14PM +0800, Peter Xu wrote:
+> > > > > > On Mon, May 01, 2017 at 02:58:22PM +1000, David Gibson wrote:
+> > > > > > > On Thu, Apr 27, 2017 at 05:34:18PM +0800, Peter Xu wrote:
+> > > > > > > > This is something similar to MemoryRegionOps, it's just for address
+> > > > > > > > spaces to store arch-specific hooks.
+> > > > > > > > 
+> > > > > > > > The first hook I would like to introduce is iommu_get().
+> > > > > > > > 
+> > > > > > > > For systems that have IOMMUs, we will create a special address space per
+> > > > > > > > device which is different from system default address space for
+> > > > > > > > it (please refer to pci_device_iommu_address_space()). Normally when
+> > > > > > > > that happens, there will be one specific IOMMU (or say, translation
+> > > > > > > > unit) stands right behind that new address space.
+> > > > > > > > 
+> > > > > > > > This iommu_get() fetches that guy behind the address space. Here, the
+> > > > > > > > guy is defined as IOMMUObject, which is currently a (void *). In the
+> > > > > > > > future, maybe we can make it a better definition, but imho it's good
+> > > > > > > > enough for now, considering it's arch-dependent.
+> > > > > > > > 
+> > > > > > > > Signed-off-by: Peter Xu <peterx@redhat.com>
+> > > > > > > 
+> > > > > > > This doesn't make sense to me.  It would be entirely possible for a
+> > > > > > > single address space to have different regions mapped by different
+> > > > > > > IOMMUs.  Or some regions mapped by IOMMUs and others direct mapped to
+> > > > > > > a device or memory block.
+> > > > > > 
+> > > > > > Oh, so it's more complicated than I thought... Then, do we really have
+> > > > > > existing use case that one device is managed by more than one IOMMU
+> > > > > > (on any of the platform)? Frankly speaking I haven't thought about
+> > > > > > complicated scenarios like this, or nested IOMMUs yet.
+> > > > > 
+> > > > > Sort of, it depends what you count as "more than one IOMMU".
+> > > > > 
+> > > > > spapr can - depending on guest configuration - have two IOMMU windows
+> > > > > for each guest PCI domain.  In theory the guest can set these up
+> > > > > however it wants, in practice there's usually a small (~256MiB) at PCI
+> > > > > address 0 for the benefit of 32-bit PCI devices, then a much larger
+> > > > > window up at a high address to allow better performance for 64-bit
+> > > > > capable devices.
+> > > > > 
+> > > > > Those are the same IOMMU in the sense that they're both implemented by
+> > > > > logic built into the same virtual PCI host bridge.  However, they're
+> > > > > different IOMMUs in the sense that they have independent data
+> > > > > structures describing the mappings and are currently modelled as two
+> > > > > different IOMMU memory regions.
 
-> 在 2017年5月20日，08:09，Philippe Mathieu-Daudé <f4bug@amsat.org> 写道：
+[1]
+
+> > > > > 
+> > > > > 
+> > > > > I don't believe we have any existing platforms with both an IOMMU and
+> > > > > a direct mapped window in a device's address space.  But it seems to
+> > > > > be just too plausible a setup to not plan for it. [1]
+> > > > > 
+> > > > > > This patch derived from a requirement in virt-svm project (on x86).
+> > > > > > Virt-svm needs some notification mechanism for each IOMMU (or say, the
+> > > > > > IOMMU that managers the SVM-enabled device). For now, all IOMMU
+> > > > > > notifiers are per-memory-region not per-iommu, and that's imho not
+> > > > > > what virt-svm wants. Any suggestions?
+> > > > > 
+> > > > > I don't know SVM, so I can't really make sense of that.  What format
+> > > > > does this identifier need?  What does "for one IOMMU" mean in this
+> > > > > context - i.e. what guest observable properties require the IDs to be
+> > > > > the same or to be different.
+> > > > 
+> > > > Virt-svm should need to trap the content of a register (actually the
+> > > > data is in the memory, but, let's assume it's a mmio operation for
+> > > > simplicity, considering it is finally delivered via invalidation
+> > > > requests), then pass that info down to kernel. So the listened element
+> > > > is per-iommu not per-mr this time. When the content changed, vfio will
+> > > > need to be notified, then pass this info down.
+> > > 
+> > > I don't entirely follow what you're saying.  When the virtual hardware
+> > > gets an invalidate request, it looks up the unit to invalidate in
+> > > memory?  Which component gets to decide that ID?  How is it advertised
+> > > to the guest OS?
+> > > 
+> > > If your ID is tied to the AS now, you could just iterate through the
+> > > AS and invalidate any IOMMU MRs that are present within it.
+> > > 
+> > > Alternatively, if the ID is tied to something more concrete, like a
+> > > specific PCI host bridge (which incorporates the IOMMU logic), then
+> > > that device probably already has a handle on the right IOMMU MR to
+> > > invalidate it.
+> > 
+> > Sorry to be unclear on the requirement. I don't know what's the ID you
+> > mentioned above... Anyway, let me try to further simplify the use
+> > case.
 > 
->>>
->>> changes since v1:
->>> * rebased on the latest master
->>>
->>> xiaoqiang zhao (9):
->>>  hw/misc: QOM'ify eccmemctl.c
->>>  hw/dma: QOM'ify sparc32_dma.c
->>>  hw/dma: QOM'ify sun4m_iommu.c
->>>  hw/misc: QOM'ify slavio_misc.c
->>>  hw/timer: QOM'ify m48txx_sysbus (pass 1)
->>>  hw/timer: QOM'ify m48txx_sysbus (pass 2)
->>
->> I think you can squash those 2. Any particular reason you did pass 2 in another commit?
+> Right, the ID was me guessing badly at what's going on here, so I
+> think it confused rather than clarifying.
 > 
-> No，squash is ok.
+> > Just assume we have such a requirement: when one register of vIOMMU
+> > changes, we need to pass this register data to the hardware IOMMU by
+> > some way. And, let's assume this is a notification mechanism, so that
+> > every device in the system can listen to this register change, then
+> > capture what has changed to what. Here the point is, in all cases this
+> > event is not related to memory region at all. So imho we need some
+> > other way to do it besides memory region IOMMU notifiers.
+> 
+> Ok.  So is this right?
+> 	* You have a single bank of vIOMMU registers
+> 	* Which control two (or more) IOMMU regions in in the guest's
+>           address space
+> 	* Assuming the host also has an AMD IOMMU, those will be
+>           backed by a single IOMMU on the host ("single" meaning
+>           controlled by a single bank of host registers)
+> 
+> I'm assuming the guest IOMMU code must know which IOMMU regions it is
+> managing, so getting from the guest registers to the set of IOMMU MRs
+> should be easy.
+> 
+> What's the operation that needs to happen on the host IOMMU, in terms
+> of the VFIO IOMMU interface?
 
-Okay no further comments so I'll assume everyone else is happy. Can you
-send your v3 patchset rebased onto master and I'll apply it to my queue
-right away.
+(Sorry to respond so late...)
 
+It'll pass the captured data downward to host IOMMU in some way.
 
-ATB,
+IMHO if we are discussing the notifier thing only, we don't really
+need to know what would it do after it gets the data. The point is how
+we should define this kind if notifies, which differs from current
+memory region based notifiers.
 
-Mark.
+> 
+> Is this inherently only possible if both host and guest have an AMD
+> IOMMU?  Could it be made to work if the guest had an AMD IOMMU but the
+> host had an Intel one, or the other way around?
+> 
+> Would it make sense to have a single IOMMU MR in the guest, but
+> instead of mapping it whole into the guest address space, have two
+> (or more) alias MRs in the AS which each allow access to a portion of
+> the IOMMU MR?
+
+For these questions, again I don't know whether it'll affect how we
+design a notifier mechanism to the remapping unit... Would it really?
+Or maybe I missed anything?
+
+Till now, after I know the case for SPAPR you have explained [1]
+(thanks btw!), could I say that these multiple IOMMU windows still be
+backed by some unified hardware in the PCI host bridge? Can that be
+the so-called single "IOMMU" object behind that device? And, would it
+possible that we might have similar requirement in the future just
+like what Yi has met with virt-svm? (I don't know whether Power would
+support SVM or similar, but I guess ARM should support it?)
+
+I am just thinking how we can define a better and general (for all
+platforms) IOMMU model in QEMU that can best suite our needs. And
+currently that should be a model that can satisfy Yi's requirement.
+
+Thanks,
+
+-- 
+Peter Xu
