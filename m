@@ -1,30 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51177)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53845)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1dDnoK-0001rx-Di
-	for qemu-devel@nongnu.org; Thu, 25 May 2017 04:07:57 -0400
+	(envelope-from <jasowang@redhat.com>) id 1dDnx5-00058D-WC
+	for qemu-devel@nongnu.org; Thu, 25 May 2017 04:17:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1dDnoF-000409-GO
-	for qemu-devel@nongnu.org; Thu, 25 May 2017 04:07:56 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:50374)
+	(envelope-from <jasowang@redhat.com>) id 1dDnx1-0000CB-Il
+	for qemu-devel@nongnu.org; Thu, 25 May 2017 04:16:59 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:51398)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1dDnoF-0003xb-BU
-	for qemu-devel@nongnu.org; Thu, 25 May 2017 04:07:51 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id E286E4E341
-	for <qemu-devel@nongnu.org>; Thu, 25 May 2017 08:07:48 +0000 (UTC)
-Date: Thu, 25 May 2017 10:07:45 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20170525100745.107b91a8@nial.brq.redhat.com>
-In-Reply-To: <20170525070747.29890-1-lprosek@redhat.com>
-References: <20170525070747.29890-1-lprosek@redhat.com>
+	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1dDnx1-0000Bo-9V
+	for qemu-devel@nongnu.org; Thu, 25 May 2017 04:16:55 -0400
+References: <1495163989-9994-1-git-send-email-peterx@redhat.com>
+From: Jason Wang <jasowang@redhat.com>
+Message-ID: <a47c4c14-7d0a-bfd1-d2e3-8458cb929286@redhat.com>
+Date: Thu, 25 May 2017 16:16:34 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2] pc: ACPI BIOS: use highest NUMA node
- for hotplug mem hole SRAT entry
+In-Reply-To: <1495163989-9994-1-git-send-email-peterx@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v4 00/10] VT-d: PT (passthrough) mode
+ support and misc fixes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,65 +28,99 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Ladi Prosek <lprosek@redhat.com>
-Cc: qemu-devel@nongnu.org, mst@redhat.com, lersek@redhat.com
+To: Peter Xu <peterx@redhat.com>, qemu-devel@nongnu.org
+Cc: "Michael S . Tsirkin" <mst@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, yi.l.liu@intel.com, Marcel Apfelbaum <marcel@redhat.com>, Lan Tianyu <tianyu.lan@intel.com>
 
-On Thu, 25 May 2017 09:07:47 +0200
-Ladi Prosek <lprosek@redhat.com> wrote:
 
-> For reasons unknown, Windows won't online all memory, both at command
-> line and hot-plugged later, unless the hotplug mem hole SRAT entry
-> specifies a node greater than or equal to the ones where memory is
-> added.
-> 
-> Using the highest node on the machine makes recent versions of Windows
-> happy.
-> 
-> With this example command line:
->   ... \
->   -m 1024,slots=4,maxmem=32G \
->   -numa node,nodeid=0 \
->   -numa node,nodeid=1 \
->   -numa node,nodeid=2 \
->   -numa node,nodeid=3 \
->   -object memory-backend-ram,size=1G,id=mem-mem1 \
->   -device pc-dimm,id=dimm-mem1,memdev=mem-mem1,node=1
-> 
-> Windows reports a total of 1G of RAM without this commit and the expected
-> 2G with this commit.
-> 
-> Signed-off-by: Ladi Prosek <lprosek@redhat.com>
-Reviewed-by: Igor Mammedov <imammedo@redhat.com>
 
-> ---
-> 
-> note to maintainer:
-> tests/acpi-test-data need to be updated due to change in SRAT table
-> 
->  hw/i386/acpi-build.c | 7 +++++--
->  1 file changed, 5 insertions(+), 2 deletions(-)
-> 
-> diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
-> index afcadac..82bd44f 100644
-> --- a/hw/i386/acpi-build.c
-> +++ b/hw/i386/acpi-build.c
-> @@ -2404,14 +2404,17 @@ build_srat(GArray *table_data, BIOSLinker *linker, MachineState *machine)
->      }
->  
->      /*
-> -     * Entry is required for Windows to enable memory hotplug in OS.
-> +     * Entry is required for Windows to enable memory hotplug in OS
-> +     * and for Linux to enable SWIOTLB when booted with less than
-> +     * 4G of RAM. Windows works better if the entry sets proximity
-> +     * to the highest NUMA node in the machine.
->       * Memory devices may override proximity set by this entry,
->       * providing _PXM method if necessary.
->       */
->      if (hotplugabble_address_space_size) {
->          numamem = acpi_data_push(table_data, sizeof *numamem);
->          build_srat_memory(numamem, pcms->hotplug_memory.base,
-> -                          hotplugabble_address_space_size, 0,
-> +                          hotplugabble_address_space_size, pcms->numa_nodes - 1,
->                            MEM_AFFINITY_HOTPLUGGABLE | MEM_AFFINITY_ENABLED);
->      }
->  
+On 2017=E5=B9=B405=E6=9C=8819=E6=97=A5 11:19, Peter Xu wrote:
+> Online repo:
+>
+>    https://github.com/xzpeter/qemu/tree/vtd-passthrough-misc-1
+>
+> v4
+> - remove patch "pc: add 2.10 machine type" since it's merged already
+> - remove patch "memory: fix address_space_get_iotlb_entry()" since
+>    the problem is fixed by an much better upstream patch:
+>    "exec: abstract address_space_do_translate()"
+> - fix issue that patchew reported
+> - introduce vtd_ce_type_check(), then use it in
+>    vtd_dev_to_context_entry() [Jason]
+> - vtd_pt_enable_fast_path() don't use "SUCCESS" but bool [Jason]
+> - do address space switch for dsi/global ce invalidate [Jason]
+> - remove detect_pt in vtd_switch_address_space() [Jason]
+>
+> v3:
+> - add one patch to provide machine type 2.10 for pc, add r-b for Edurad=
+o
+> - add r-b/a-b for David on the two memory patches
+> - add a-b for Paolo on the two memory patches
+> - remove useless if in vtd_switch_address_space() [Jason]
+> - check pt_supported when needed [Yi]
+> - one more patch to check whether dev-iotlb is supported before
+>    allowing such type of context entry
+> - enable pt fast path (squashed into current patch 10). when we found
+>    pt is setup on the first translation, we do address space switch.
+>    When it's unset, we can capture it via invalidations. [Jason]
+> - add compat bit for HW_COMPAT_2_9 for "pt" param [Jason]
+> - one vhost fix for pt (added patch 4)
+> - faster vhost caching (added patch 12) [Jason]
+>
+> This series add support for per-device passthrough mode for VT-d
+> emulation, along with some tweaks on existing codes.
+>
+> Patches 1-2: memory related cleanups.
+>
+> Patches 3-7: some VT-d cleanups and fixes.
+>
+> Patch 8: add support for passthrough.
+>
+> Patch 9: turn pt off for machine type <=3D2.9, for compatibility.
+>
+> Patch 10: vhost enhancement when used with passthrough, to pre-cache
+>            static mappings.
+>
+> A simple test with PT mode using 10g nic is line speed.
+>
+> Please review. Thanks.
+>
+> Peter Xu (10):
+>    memory: tune last param of iommu_ops.translate()
+>    memory: remove the last param in memory_region_iommu_replay()
+>    x86-iommu: use DeviceClass properties
+>    intel_iommu: renaming context entry helpers
+>    intel_iommu: provide vtd_ce_get_type()
+>    intel_iommu: use IOMMU_ACCESS_FLAG()
+>    intel_iommu: allow dev-iotlb context entry conditionally
+>    intel_iommu: support passthrough (PT)
+>    intel_iommu: turn off pt before 2.9
+>    vhost: iommu: cache static mapping if there is
+>
+>   exec.c                         |   3 +-
+>   hw/alpha/typhoon.c             |   2 +-
+>   hw/dma/rc4030.c                |   2 +-
+>   hw/i386/amd_iommu.c            |   4 +-
+>   hw/i386/intel_iommu.c          | 313 ++++++++++++++++++++++++++++++--=
+---------
+>   hw/i386/intel_iommu_internal.h |   1 +
+>   hw/i386/trace-events           |   2 +
+>   hw/i386/x86-iommu.c            |  48 ++-----
+>   hw/pci-host/apb.c              |   2 +-
+>   hw/ppc/spapr_iommu.c           |   2 +-
+>   hw/s390x/s390-pci-bus.c        |   2 +-
+>   hw/s390x/s390-pci-inst.c       |   2 +-
+>   hw/vfio/common.c               |   2 +-
+>   hw/virtio/trace-events         |   4 +
+>   hw/virtio/vhost.c              |  49 +++++++
+>   include/exec/memory.h          |  15 +-
+>   include/hw/compat.h            |   4 +
+>   include/hw/i386/x86-iommu.h    |   1 +
+>   memory.c                       |   7 +-
+>   19 files changed, 319 insertions(+), 146 deletions(-)
+>
+
+For the series
+
+Reviewed-by: Jason Wang <jasowang@redhat.com>
+
+Thanks
