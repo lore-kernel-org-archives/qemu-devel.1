@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:32978)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33866)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sameeh@daynix.com>) id 1dDqal-0006mE-Rz
-	for qemu-devel@nongnu.org; Thu, 25 May 2017 07:06:09 -0400
+	(envelope-from <peterx@redhat.com>) id 1dDqfe-0001Af-C3
+	for qemu-devel@nongnu.org; Thu, 25 May 2017 07:11:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sameeh@daynix.com>) id 1dDqai-0003iS-KP
-	for qemu-devel@nongnu.org; Thu, 25 May 2017 07:06:07 -0400
-Received: from mail-ua0-x241.google.com ([2607:f8b0:400c:c08::241]:34735)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <sameeh@daynix.com>) id 1dDqai-0003iE-6Y
-	for qemu-devel@nongnu.org; Thu, 25 May 2017 07:06:04 -0400
-Received: by mail-ua0-x241.google.com with SMTP id j17so13844567uag.1
-	for <qemu-devel@nongnu.org>; Thu, 25 May 2017 04:06:03 -0700 (PDT)
+	(envelope-from <peterx@redhat.com>) id 1dDqfb-0005Zr-6p
+	for qemu-devel@nongnu.org; Thu, 25 May 2017 07:11:10 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:57652)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1dDqfb-0005Zj-0B
+	for qemu-devel@nongnu.org; Thu, 25 May 2017 07:11:07 -0400
+Date: Thu, 25 May 2017 19:10:58 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20170525111058.GC22816@pxdev.xzpeter.org>
+References: <1495642203-12702-1-git-send-email-felipe@nutanix.com>
+	<1495642203-12702-3-git-send-email-felipe@nutanix.com>
+	<20170525004007.GP3873@pxdev.xzpeter.org>
+	<3F052E47-5144-411B-BBEF-03C0E4D872B7@nutanix.com>
 MIME-Version: 1.0
-In-Reply-To: <CAKPgXcHb2TXibijvRQZnYBsyACKmDArvZoEaNBprdkVqqDqsZA@mail.gmail.com>
-References: <1493299264-10669-1-git-send-email-daniel@daynix.com>
-	<1493299264-10669-2-git-send-email-daniel@daynix.com>
-	<CAKPgXcHb2TXibijvRQZnYBsyACKmDArvZoEaNBprdkVqqDqsZA@mail.gmail.com>
-From: Sameeh Jubran <sameeh@daynix.com>
-Date: Thu, 25 May 2017 14:06:03 +0300
-Message-ID: <CAKPgXcH=VQ4aeP9X_GR5ZYtzJ2zS3Uru9JhWXJVgTne8nwbdQQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v2 1/1] qga-win: fix installation on
- localized windows
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <3F052E47-5144-411B-BBEF-03C0E4D872B7@nutanix.com>
+Subject: Re: [Qemu-devel] [PATCH 2/4] migration: set dirty_pages_rate before
+ autoconverge logic
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,129 +30,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Daniel Rempel <daniel@daynix.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Dmitry Fleytman <dmitry@daynix.com>, Yan Vugenfirer <yan@daynix.com>, Michael Roth <mdroth@linux.vnet.ibm.com>
+To: Felipe Franciosi <felipe@nutanix.com>
+Cc: Juan Quintela <quintela@redhat.com>, "Jason J. Herne" <jjherne@linux.vnet.ibm.com>, amit Shah <amit.shah@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Malcolm Crossley <malcolm@nutanix.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 
-Ping
+On Thu, May 25, 2017 at 10:52:32AM +0000, Felipe Franciosi wrote:
+> 
+> > On 25 May 2017, at 01:40, Peter Xu <peterx@redhat.com> wrote:
+> > 
+> > On Wed, May 24, 2017 at 05:10:01PM +0100, Felipe Franciosi wrote:
+> >> Currently, a "period" in the RAM migration logic is at least a second
+> >> long and accounts for what happened since the last period (or the
+> >> beginning of the migration). The dirty_pages_rate counter is calculated
+> >> at the end this logic.
+> >> 
+> >> If the auto convergence capability is enabled from the start of the
+> >> migration, it won't be able to use this counter the first time around.
+> >> This calculates dirty_pages_rate as soon as a period is deemed over,
+> >> which allows for it to be used immediately.
+> >> 
+> >> Signed-off-by: Felipe Franciosi <felipe@nutanix.com>
+> > 
+> > You fixed the indents as well, but imho it's okay.
+> 
+> Yeah a couple of lines were off-by-one space. Fixed it given I was touching the code anyway, hope it's ok with everyone else. Would you normally patch that separately or just mention it in the commit message?
 
-On Sun, May 14, 2017 at 3:53 PM, Sameeh Jubran <sameeh@daynix.com> wrote:
+For me normally I don't intentionally touch code up only for
+indentation to make sure commit log won't be affected for those lines.
+However I'm also okay if we fix some of them, either separately or
+squashed into patch like this.
 
-> Reviewed-by: Sameeh Jubran <sameeh@daynix.com>
->
-> On Thu, Apr 27, 2017 at 4:21 PM, Daniel Rempel <daniel@daynix.com> wrote:
->
->> Bug: https://bugzilla.redhat.com/show_bug.cgi?id=1357789
->> Replace hardcoded user and group names ("Administrators", "SYSTEM") with
->> the ones acquired from system. Windows uses localized strings for these
->> names and it may cause the installation to fail.
->> Windows has Well-known SIDs for "Administrators" group and "SYSTEM" user
->> so they were used to identify required users and groups.
->> Well-known SIDs: https://support.microsoft.com/
->> en-us/help/243330/well-known-security-identifiers-in-windows
->> -operating-systems
->>
->> Signed-off-by: Daniel Rempel <daniel@daynix.com>
->> ---
->>  qga/vss-win32/install.cpp | 35 +++++++++++++++++++++++++++++++++--
->>  1 file changed, 33 insertions(+), 2 deletions(-)
->>
->> diff --git a/qga/vss-win32/install.cpp b/qga/vss-win32/install.cpp
->> index f4160a3..1be482a 100644
->> --- a/qga/vss-win32/install.cpp
->> +++ b/qga/vss-win32/install.cpp
->> @@ -18,6 +18,9 @@
->>  #include <wbemidl.h>
->>  #include <comdef.h>
->>  #include <comutil.h>
->> +#include <sddl.h>
->> +
->> +#define BUFFER_SIZE 1024
->>
->>  extern HINSTANCE g_hinstDll;
->>
->> @@ -135,6 +138,27 @@ out:
->>      return hr;
->>  }
->>
->> +/* Acquire group or user name by SID */
->> +static HRESULT getNameByStringSID(
->> +    const wchar_t *sid, LPWSTR buffer, LPDWORD bufferLen)
->> +{
->> +    HRESULT hr = S_OK;
->> +    PSID psid = NULL;
->> +    SID_NAME_USE groupType;
->> +    DWORD domainNameLen = BUFFER_SIZE;
->> +    wchar_t domainName[BUFFER_SIZE];
->> +
->> +    chk(ConvertStringSidToSidW(sid, &psid));
->> +    LookupAccountSidW(NULL, psid, buffer, bufferLen,
->> +                domainName, &domainNameLen, &groupType);
->> +    hr = HRESULT_FROM_WIN32(GetLastError());
->> +
->> +    LocalFree(psid);
->> +
->> +out:
->> +    return hr;
->> +}
->> +
->>  /* Find and iterate QGA VSS provider in COM+ Application Catalog */
->>  static HRESULT QGAProviderFind(
->>      HRESULT (*found)(ICatalogCollection *, int, void *), void *arg)
->> @@ -216,6 +240,10 @@ STDAPI COMRegister(void)
->>      CHAR dllPath[MAX_PATH], tlbPath[MAX_PATH];
->>      bool unregisterOnFailure = false;
->>      int count = 0;
->> +    DWORD bufferLen = BUFFER_SIZE;
->> +    wchar_t buffer[BUFFER_SIZE];
->> +    const wchar_t *administratorsGroupSID = L"S-1-5-32-544";
->> +    const wchar_t *systemUserSID = L"S-1-5-18";
->>
->>      if (!g_hinstDll) {
->>          errmsg(E_FAIL, "Failed to initialize DLL");
->> @@ -284,11 +312,12 @@ STDAPI COMRegister(void)
->>
->>      /* Setup roles of the applicaion */
->>
->> +    chk(getNameByStringSID(administratorsGroupSID, buffer, &bufferLen));
->>      chk(pApps->GetCollection(_bstr_t(L"Roles"), key,
->>                               (IDispatch **)pRoles.replace()));
->>      chk(pRoles->Populate());
->>      chk(pRoles->Add((IDispatch **)pObj.replace()));
->> -    chk(put_Value(pObj, L"Name",        L"Administrators"));
->> +    chk(put_Value(pObj, L"Name", buffer));
->>      chk(put_Value(pObj, L"Description", L"Administrators group"));
->>      chk(pRoles->SaveChanges(&n));
->>      chk(pObj->get_Key(&key));
->> @@ -303,8 +332,10 @@ STDAPI COMRegister(void)
->>      chk(GetAdminName(&name));
->>      chk(put_Value(pObj, L"User", _bstr_t(".\\") + name));
->>
->> +    bufferLen = BUFFER_SIZE;
->> +    chk(getNameByStringSID(systemUserSID, buffer, &bufferLen));
->>      chk(pUsersInRole->Add((IDispatch **)pObj.replace()));
->> -    chk(put_Value(pObj, L"User", L"SYSTEM"));
->> +    chk(put_Value(pObj, L"User", buffer));
->>      chk(pUsersInRole->SaveChanges(&n));
->>
->>  out:
->> --
->> 2.9.3
->>
->>
->>
->
->
-> --
-> Respectfully,
-> *Sameeh Jubran*
-> *Linkedin <https://il.linkedin.com/pub/sameeh-jubran/87/747/a8a>*
-> *Software Engineer @ Daynix <http://www.daynix.com>.*
->
+IMHO at last it really depends on the maintainers' flavor on this. :-)
 
-
+Thanks,
 
 -- 
-Respectfully,
-*Sameeh Jubran*
-*Linkedin <https://il.linkedin.com/pub/sameeh-jubran/87/747/a8a>*
-*Software Engineer @ Daynix <http://www.daynix.com>.*
+Peter Xu
