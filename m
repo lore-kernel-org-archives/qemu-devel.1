@@ -1,19 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57296)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57310)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dDjoQ-0006VW-5W
+	(envelope-from <dgibson@ozlabs.org>) id 1dDjoQ-0006Vo-HH
 	for qemu-devel@nongnu.org; Wed, 24 May 2017 23:51:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dDjoO-0007Th-HM
+	(envelope-from <dgibson@ozlabs.org>) id 1dDjoP-0007Ua-6O
 	for qemu-devel@nongnu.org; Wed, 24 May 2017 23:51:46 -0400
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Thu, 25 May 2017 13:51:20 +1000
-Message-Id: <20170525035132.24268-7-david@gibson.dropbear.id.au>
+Date: Thu, 25 May 2017 13:51:25 +1000
+Message-Id: <20170525035132.24268-12-david@gibson.dropbear.id.au>
 In-Reply-To: <20170525035132.24268-1-david@gibson.dropbear.id.au>
 References: <20170525035132.24268-1-david@gibson.dropbear.id.au>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 06/18] xics_kvm: cache already enabled vCPU ids
+Subject: [Qemu-devel] [PULL 11/18] pseries: Split CAS PVR negotiation out
+ into a separate function
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,110 +21,119 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org
-Cc: agraf@suse.de, aik@ozlabs.ru, mdroth@linux.vnet.ibm.com, sbobroff@redhat.com, sursingh@redhat.com, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Greg Kurz <groug@kaod.org>, David Gibson <david@gibson.dropbear.id.au>
+Cc: agraf@suse.de, aik@ozlabs.ru, mdroth@linux.vnet.ibm.com, sbobroff@redhat.com, sursingh@redhat.com, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
 
-From: Greg Kurz <groug@kaod.org>
+Guests of the qemu machine type go through a feature negotiation process
+known as "client architecture support" (CAS) during early boot.  This does
+a number of things, one of which is finding a CPU compatibility mode which
+can be supported by both guest and host.
 
-Since commit a45863bda90d ("xics_kvm: Don't enable KVM_CAP_IRQ_XICS if
-already enabled"), we were able to re-hotplug a vCPU that had been hot-
-unplugged ealier, thanks to a boolean flag in ICPState that we set when
-enabling KVM_CAP_IRQ_XICS.
+In fact the CPU negotiation is probably the single most complex part of the
+CAS process, so this splits it out into a helper function.  We've recently
+made some mistakes in maintaining backward compatibility for old machine
+types here.  Splitting this out will also make it easier to fix this.
 
-This could work because the lifecycle of all ICPState objects was the
-same as the machine. Commit 5bc8d26de20c ("spapr: allocate the ICPState
-object from under sPAPRCPUCore") broke this assumption and now we always
-pass a freshly allocated ICPState object (ie, with the flag unset) to
-icp_kvm_cpu_setup().
+This also adds a possibly useful error message if the negotiation fails
+(i.e. if there isn't a CPU mode that's suitable for both guest and host).
 
-This cause re-hotplug to fail with:
-
-Unable to connect CPU8 to kernel XICS: Device or resource busy
-
-Let's fix this by caching all the vCPU ids for which KVM_CAP_IRQ_XICS was
-enabled. This also drops the now useless boolean flag from ICPState.
-
-Reported-by: Laurent Vivier <lvivier@redhat.com>
-Signed-off-by: Greg Kurz <groug@kaod.org>
-Tested-by: Laurent Vivier <lvivier@redhat.com>
-Reviewed-by: Laurent Vivier <lvivier@redhat.com>
-Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+Reviewed-by: Laurent Vivier <lvivier@redhat.com>
+Reviewed-by: Greg Kurz <groug@kaod.org>
 ---
- hw/intc/xics_kvm.c    | 27 ++++++++++++++++++++-------
- include/hw/ppc/xics.h |  1 -
- 2 files changed, 20 insertions(+), 8 deletions(-)
+ hw/ppc/spapr_hcall.c | 49 ++++++++++++++++++++++++++++++++-----------------
+ 1 file changed, 32 insertions(+), 17 deletions(-)
 
-diff --git a/hw/intc/xics_kvm.c b/hw/intc/xics_kvm.c
-index dd93531..dd7f298 100644
---- a/hw/intc/xics_kvm.c
-+++ b/hw/intc/xics_kvm.c
-@@ -42,6 +42,14 @@
-=20
- static int kernel_xics_fd =3D -1;
-=20
-+typedef struct KVMEnabledICP {
-+    unsigned long vcpu_id;
-+    QLIST_ENTRY(KVMEnabledICP) node;
-+} KVMEnabledICP;
-+
-+static QLIST_HEAD(, KVMEnabledICP)
-+    kvm_enabled_icps =3D QLIST_HEAD_INITIALIZER(&kvm_enabled_icps);
-+
- /*
-  * ICP-KVM
-  */
-@@ -121,6 +129,8 @@ static void icp_kvm_reset(void *dev)
- static void icp_kvm_cpu_setup(ICPState *icp, PowerPCCPU *cpu)
- {
-     CPUState *cs =3D CPU(cpu);
-+    KVMEnabledICP *enabled_icp;
-+    unsigned long vcpu_id =3D kvm_arch_vcpu_id(cs);
-     int ret;
-=20
-     if (kernel_xics_fd =3D=3D -1) {
-@@ -132,18 +142,21 @@ static void icp_kvm_cpu_setup(ICPState *icp, PowerP=
-CCPU *cpu)
-      * which was hot-removed earlier we don't have to renable
-      * KVM_CAP_IRQ_XICS capability again.
-      */
--    if (icp->cap_irq_xics_enabled) {
--        return;
-+    QLIST_FOREACH(enabled_icp, &kvm_enabled_icps, node) {
-+        if (enabled_icp->vcpu_id =3D=3D vcpu_id) {
-+            return;
-+        }
+diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
+index 2daace4..77d2d66 100644
+--- a/hw/ppc/spapr_hcall.c
++++ b/hw/ppc/spapr_hcall.c
+@@ -1044,19 +1044,13 @@ static target_ulong h_signal_sys_reset(PowerPCCPU *cpu,
      }
-=20
--    ret =3D kvm_vcpu_enable_cap(cs, KVM_CAP_IRQ_XICS, 0, kernel_xics_fd,
--                              kvm_arch_vcpu_id(cs));
-+    ret =3D kvm_vcpu_enable_cap(cs, KVM_CAP_IRQ_XICS, 0, kernel_xics_fd,=
- vcpu_id);
-     if (ret < 0) {
--        error_report("Unable to connect CPU%ld to kernel XICS: %s",
--                     kvm_arch_vcpu_id(cs), strerror(errno));
-+        error_report("Unable to connect CPU%ld to kernel XICS: %s", vcpu=
-_id,
-+                     strerror(errno));
-         exit(1);
-     }
--    icp->cap_irq_xics_enabled =3D true;
-+    enabled_icp =3D g_malloc(sizeof(*enabled_icp));
-+    enabled_icp->vcpu_id =3D vcpu_id;
-+    QLIST_INSERT_HEAD(&kvm_enabled_icps, enabled_icp, node);
  }
-=20
- static void icp_kvm_realize(DeviceState *dev, Error **errp)
-diff --git a/include/hw/ppc/xics.h b/include/hw/ppc/xics.h
-index d6cb51f..a3073f9 100644
---- a/include/hw/ppc/xics.h
-+++ b/include/hw/ppc/xics.h
-@@ -81,7 +81,6 @@ struct ICPState {
-     uint8_t pending_priority;
-     uint8_t mfrr;
-     qemu_irq output;
--    bool cap_irq_xics_enabled;
-=20
-     XICSFabric *xics;
- };
---=20
+ 
+-static target_ulong h_client_architecture_support(PowerPCCPU *cpu,
+-                                                  sPAPRMachineState *spapr,
+-                                                  target_ulong opcode,
+-                                                  target_ulong *args)
++static uint32_t cas_check_pvr(PowerPCCPU *cpu, target_ulong *addr,
++                              Error **errp)
+ {
+-    target_ulong list = ppc64_phys_to_real(args[0]);
+-    target_ulong ov_table;
+     bool explicit_match = false; /* Matched the CPU's real PVR */
+     uint32_t max_compat = cpu->max_compat;
+     uint32_t best_compat = 0;
+     int i;
+-    sPAPROptionVector *ov1_guest, *ov5_guest, *ov5_cas_old, *ov5_updates;
+-    bool guest_radix;
+ 
+     /*
+      * We scan the supplied table of PVRs looking for two things
+@@ -1066,9 +1060,9 @@ static target_ulong h_client_architecture_support(PowerPCCPU *cpu,
+     for (i = 0; i < 512; ++i) {
+         uint32_t pvr, pvr_mask;
+ 
+-        pvr_mask = ldl_be_phys(&address_space_memory, list);
+-        pvr = ldl_be_phys(&address_space_memory, list + 4);
+-        list += 8;
++        pvr_mask = ldl_be_phys(&address_space_memory, *addr);
++        pvr = ldl_be_phys(&address_space_memory, *addr + 4);
++        *addr += 8;
+ 
+         if (~pvr_mask & pvr) {
+             break; /* Terminator record */
+@@ -1087,17 +1081,38 @@ static target_ulong h_client_architecture_support(PowerPCCPU *cpu,
+         /* We couldn't find a suitable compatibility mode, and either
+          * the guest doesn't support "raw" mode for this CPU, or raw
+          * mode is disabled because a maximum compat mode is set */
+-        return H_HARDWARE;
++        error_setg(errp, "Couldn't negotiate a suitable PVR during CAS");
++        return 0;
+     }
+ 
+     /* Parsing finished */
+     trace_spapr_cas_pvr(cpu->compat_pvr, explicit_match, best_compat);
+ 
+-    /* Update CPUs */
+-    if (cpu->compat_pvr != best_compat) {
+-        Error *local_err = NULL;
++    return best_compat;
++}
+ 
+-        ppc_set_compat_all(best_compat, &local_err);
++static target_ulong h_client_architecture_support(PowerPCCPU *cpu,
++                                                  sPAPRMachineState *spapr,
++                                                  target_ulong opcode,
++                                                  target_ulong *args)
++{
++    /* Working address in data buffer */
++    target_ulong addr = ppc64_phys_to_real(args[0]);
++    target_ulong ov_table;
++    uint32_t cas_pvr;
++    sPAPROptionVector *ov1_guest, *ov5_guest, *ov5_cas_old, *ov5_updates;
++    bool guest_radix;
++    Error *local_err = NULL;
++
++    cas_pvr = cas_check_pvr(cpu, &addr, &local_err);
++    if (local_err) {
++        error_report_err(local_err);
++        return H_HARDWARE;
++    }
++
++    /* Update CPUs */
++    if (cpu->compat_pvr != cas_pvr) {
++        ppc_set_compat_all(cas_pvr, &local_err);
+         if (local_err) {
+             error_report_err(local_err);
+             return H_HARDWARE;
+@@ -1105,7 +1120,7 @@ static target_ulong h_client_architecture_support(PowerPCCPU *cpu,
+     }
+ 
+     /* For the future use: here @ov_table points to the first option vector */
+-    ov_table = list;
++    ov_table = addr;
+ 
+     ov1_guest = spapr_ovec_parse_vector(ov_table, 1);
+     ov5_guest = spapr_ovec_parse_vector(ov_table, 5);
+-- 
 2.9.4
