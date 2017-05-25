@@ -1,17 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54464)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59629)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dDvnx-000320-Qu
-	for qemu-devel@nongnu.org; Thu, 25 May 2017 12:40:07 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1dDwAa-00048S-IW
+	for qemu-devel@nongnu.org; Thu, 25 May 2017 13:03:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dDvnw-0007C8-NN
-	for qemu-devel@nongnu.org; Thu, 25 May 2017 12:40:05 -0400
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Date: Thu, 25 May 2017 17:38:51 +0100
-Message-Id: <20170525163851.8047-21-berrange@redhat.com>
-In-Reply-To: <20170525163851.8047-1-berrange@redhat.com>
-References: <20170525163851.8047-1-berrange@redhat.com>
-Subject: [Qemu-devel] [PATCH v7 20/20] docs: document encryption options for
- qcow, qcow2 and luks
+	(envelope-from <vsementsov@virtuozzo.com>) id 1dDwAX-0006Ze-Dz
+	for qemu-devel@nongnu.org; Thu, 25 May 2017 13:03:28 -0400
+Received: from mailhub.sw.ru ([195.214.232.25]:10414 helo=relay.sw.ru)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
+	id 1dDwAX-0006Ya-30
+	for qemu-devel@nongnu.org; Thu, 25 May 2017 13:03:25 -0400
+References: <20170525152628.37628-1-vsementsov@virtuozzo.com>
+	<20170525152628.37628-2-vsementsov@virtuozzo.com>
+	<3fdd3178-89d7-2819-d040-1e5132d655ec@redhat.com>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <28332b32-f9e8-d426-9b54-d46e5774366c@virtuozzo.com>
+Date: Thu, 25 May 2017 20:03:15 +0300
+MIME-Version: 1.0
+In-Reply-To: <3fdd3178-89d7-2819-d040-1e5132d655ec@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+Subject: Re: [Qemu-devel] [PATCH 1/7] block: fix comment for
+ bdrv_get_allocated_file_size()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,165 +31,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Eric Blake <eblake@redhat.com>, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Alberto Garcia <berto@igalia.com>, "Daniel P. Berrange" <berrange@redhat.com>
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: armbru@redhat.com, mreitz@redhat.com, kwolf@redhat.com, den@openvz.org
 
-Expand the image format docs to cover the new options for
-the qcow, qcow2 and luks disk image formats
+25.05.2017 19:32, Eric Blake wrote:
+> On 05/25/2017 10:26 AM, Vladimir Sementsov-Ogievskiy wrote:
+>> Current comment is not clear enough: which sparseness is meant, coming
+>> from sparse image format or from sparse file system?
+>>
+>> For example, if we have qcow2 above raw file on non-sparse file system,
+>> this function will say nothing about unallocated (by qcow2 layer)
+>> clusters.
+>>
+>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+>> ---
+>>   block.c | 4 ++--
+>>   1 file changed, 2 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/block.c b/block.c
+>> index 50ba264143..ba22fc0dfb 100644
+>> --- a/block.c
+>> +++ b/block.c
+>> @@ -3388,8 +3388,8 @@ int bdrv_truncate(BdrvChild *child, int64_t offset, Error **errp)
+>>   }
+>>   
+>>   /**
+>> - * Length of a allocated file in bytes. Sparse files are counted by actual
+> Yay for getting rid of bad grammar (s/a /an /)
+>
+>> - * allocated space. Return < 0 if error or unknown.
+>> + * Size of allocated in underlying file system area. Sparseness is taken into
+> Doesn't read well.  Maybe: s/Size of allocated/Allocation size/ ?
+>
+>> + * account for sparse file systems. Return < 0 if error or unknown.
+> I still don't get what we are trying to present.
+>
+> If we have the following 6 qcow2 file clusters backed by the underlying
+> lseek(SEEK_DATA/HOLE) file system contents:
+>
+> BDRV_BLOCK_UNALLOCATED   N/A
+> BDRV_BLOCK_ZERO_PLAIN    N/A
+> BDRV_BLOCK_ZERO_ALLOC    hole
+> BDRV_BLOCK_ZERO_ALLOC    data
+> BDRV_BLOCK_DATA          hole
+> BDRV_BLOCK_DATA          data
+>
+> Then is our answer the size of all qcow2 allocations regardless of
+> underlying status (4, due to clusters 3-6), or the size of only the
+> clusters that read from the backing file (2, due to clusters 5-6), or
+> the size of only the clusters that currently occupy space in the file
+> system (2, due to clusters 4 and 6), or the size of clusters that are
+> not provably read-as-zero (1, due to cluster 6)?
+>
+> Does the answer change if you can have underlying holes happen at a
+> smaller granularity than clusters?
+>
+> What happens for compressed clusters?
+>
+> I think we still need to do a better job at writing a precise comment.
+>
 
-Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
----
- qemu-doc.texi | 123 ++++++++++++++++++++++++++++++++++++++++++++++++++++++----
- 1 file changed, 115 insertions(+), 8 deletions(-)
+bdrv_get_allocated_file_size is not related to qcow2, as qcow2 doesn't 
+support it. So, it is finally just raw_get_allocated_file_size, which 
+returns st.st_blocks * 512 after fstat(s->fd).
 
-diff --git a/qemu-doc.texi b/qemu-doc.texi
-index de0cc30..2b31cc2 100644
---- a/qemu-doc.texi
-+++ b/qemu-doc.texi
-@@ -546,10 +546,20 @@ File name of a base image (see @option{create} subcommand)
- @item backing_fmt
- Image format of the base image
- @item encryption
--If this option is set to @code{on}, the image is encrypted with 128-bit AES-CBC.
-+This option is deprecated and equivalent to @code{encrypt.format=aes}
- 
--The use of encryption in qcow and qcow2 images is considered to be flawed by
--modern cryptography standards, suffering from a number of design problems:
-+@item encrypt.format
-+
-+If this is set to @code{luks}, it requests that the qcow2 payload (not
-+qcow2 header) be encrypted using the LUKS format. The passphrase to
-+use to unlock the LUKS key slot is given by the @code{encrypt.key-secret}
-+parameter. LUKS encryption parameters can be tuned with the other
-+@code{encrypt.*} parameters.
-+
-+If this is set to @code{aes}, the image is encrypted with 128-bit AES-CBC.
-+The encryption key is given by the @code{encrypt.key-secret} parameter.
-+This encryption format is considered to be flawed by modern cryptography
-+standards, suffering from a number of design problems:
- 
- @itemize @minus
- @item The AES-CBC cipher is used with predictable initialization vectors based
-@@ -564,10 +574,45 @@ original file must then be securely erased using a program like shred,
- though even this is ineffective with many modern storage technologies.
- @end itemize
- 
--Use of qcow / qcow2 encryption with QEMU is deprecated, and support for
--it will go away in a future release.  Users are recommended to use an
--alternative encryption technology such as the Linux dm-crypt / LUKS
--system.
-+The use of this is no longer supported in system emulators. Support only
-+remains in the command line utilities, for the purposes of data liberation
-+and interoperability with old versions of QEMU. The @code{luks} format
-+should be used instead.
-+
-+@item encrypt.key-secret
-+
-+Provides the ID of a @code{secret} object that contains the passphrase
-+(@code{encrypt.format=luks}) or encryption key (@code{encrypt.format=aes}).
-+
-+@item encrypt.cipher-alg
-+
-+Name of the cipher algorithm and key length. Currently defaults
-+to @code{aes-256}. Only used when @code{encrypt.format=luks}.
-+
-+@item encrypt.cipher-mode
-+
-+Name of the encryption mode to use. Currently defaults to @code{xts}.
-+Only used when @code{encrypt.format=luks}.
-+
-+@item encrypt.ivgen-alg
-+
-+Name of the initialization vector generator algorithm. Currently defaults
-+to @code{plain64}. Only used when @code{encrypt.format=luks}.
-+
-+@item encrypt.ivgen-hash-alg
-+
-+Name of the hash algorithm to use with the initialization vector generator
-+(if required). Defaults to @code{sha256}. Only used when @code{encrypt.format=luks}.
-+
-+@item encrypt.hash-alg
-+
-+Name of the hash algorithm to use for PBKDF algorithm
-+Defaults to @code{sha256}. Only used when @code{encrypt.format=luks}.
-+
-+@item encrypt.iter-time
-+
-+Amount of time, in milliseconds, to use for PBKDF algorithm per key slot.
-+Defaults to @code{2000}. Only used when @code{encrypt.format=luks}.
- 
- @item cluster_size
- Changes the qcow2 cluster size (must be between 512 and 2M). Smaller cluster
-@@ -642,7 +687,69 @@ Supported options:
- @item backing_file
- File name of a base image (see @option{create} subcommand)
- @item encryption
--If this option is set to @code{on}, the image is encrypted.
-+This option is deprecated and equivalent to @code{encrypt.format=aes}
-+
-+@item encrypt.format
-+If this is set to @code{aes}, the image is encrypted with 128-bit AES-CBC.
-+The encryption key is given by the @code{encrypt.key-secret} parameter.
-+This encryption format is considered to be flawed by modern cryptography
-+standards, suffering from a number of design problems enumerated previously
-+against the @code{qcow2} image format.
-+
-+The use of this is no longer supported in system emulators. Support only
-+remains in the command line utilities, for the purposes of data liberation
-+and interoperability with old versions of QEMU.
-+
-+Users requiring native encryption should use the @code{qcow2} format
-+instead with @code{encrypt.format=luks}.
-+
-+@item encrypt.key-secret
-+
-+Provides the ID of a @code{secret} object that contains the encryption
-+key (@code{encrypt.format=aes}).
-+
-+@end table
-+
-+@item luks
-+
-+LUKS v1 encryption format, compatible with Linux dm-crypt/cryptsetup
-+
-+Supported options:
-+@table @code
-+
-+@item key-secret
-+
-+Provides the ID of a @code{secret} object that contains the passphrase.
-+
-+@item cipher-alg
-+
-+Name of the cipher algorithm and key length. Currently defaults
-+to @code{aes-256}.
-+
-+@item cipher-mode
-+
-+Name of the encryption mode to use. Currently defaults to @code{xts}.
-+
-+@item ivgen-alg
-+
-+Name of the initialization vector generator algorithm. Currently defaults
-+to @code{plain64}.
-+
-+@item ivgen-hash-alg
-+
-+Name of the hash algorithm to use with the initialization vector generator
-+(if required). Defaults to @code{sha256}.
-+
-+@item hash-alg
-+
-+Name of the hash algorithm to use for PBKDF algorithm
-+Defaults to @code{sha256}.
-+
-+@item iter-time
-+
-+Amount of time, in milliseconds, to use for PBKDF algorithm per key slot.
-+Defaults to @code{2000}.
-+
- @end table
- 
- @item vdi
+It will correspond to qcow2 sparseness if qcow2 discarded corresponding 
+clusters in bs->file and if underlying fs is sparse.
+
+
+
 -- 
-2.9.3
+Best regards,
+Vladimir
