@@ -1,23 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35887)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48839)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bruno.alvisio@gmail.com>) id 1dDkN2-0002qI-OH
-	for qemu-devel@nongnu.org; Thu, 25 May 2017 00:27:34 -0400
+	(envelope-from <jasowang@redhat.com>) id 1dDltU-0006xX-8m
+	for qemu-devel@nongnu.org; Thu, 25 May 2017 02:05:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bruno.alvisio@gmail.com>) id 1dDkN1-00012V-ED
-	for qemu-devel@nongnu.org; Thu, 25 May 2017 00:27:32 -0400
-Received: from mail-wm0-x229.google.com ([2a00:1450:400c:c09::229]:37934)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bruno.alvisio@gmail.com>)
-	id 1dDkN1-0000vL-35
-	for qemu-devel@nongnu.org; Thu, 25 May 2017 00:27:31 -0400
-Received: by mail-wm0-x229.google.com with SMTP id e127so91474376wmg.1
-	for <qemu-devel@nongnu.org>; Wed, 24 May 2017 21:27:30 -0700 (PDT)
+	(envelope-from <jasowang@redhat.com>) id 1dDltP-0002sv-EM
+	for qemu-devel@nongnu.org; Thu, 25 May 2017 02:05:08 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55708)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1dDltP-0002rk-6I
+	for qemu-devel@nongnu.org; Thu, 25 May 2017 02:05:03 -0400
+References: <1495549241-23380-1-git-send-email-zhangchen.fnst@cn.fujitsu.com>
+	<1495549241-23380-3-git-send-email-zhangchen.fnst@cn.fujitsu.com>
+From: Jason Wang <jasowang@redhat.com>
+Message-ID: <838b8626-c5e4-86d5-a318-ab957bc9bcbe@redhat.com>
+Date: Thu, 25 May 2017 14:04:55 +0800
 MIME-Version: 1.0
-From: Bruno Alvisio <bruno.alvisio@gmail.com>
-Date: Wed, 24 May 2017 21:27:29 -0700
-Message-ID: <CADNMjEBdXZeOonsKNf9LpFKK0NFUzAth=CDaSj8q22k+o=ZEFA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: [Qemu-devel] Behavior of QMP "query-block"
+In-Reply-To: <1495549241-23380-3-git-send-email-zhangchen.fnst@cn.fujitsu.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH V5 2/9] net/filter-mirror.c: Make filter
+ mirror support vnet support.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,127 +29,216 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-
-Hello all,
-
-Summary
-
-I am using XEN hypervisor to run a HVM with a QEMU backed disk. After I
-start the HVM I use QMP "query-block" command to see the devices of the VM.
-Initially the command returns the disk that I set as part of the
-configuration. After a few seconds the a DEVICE_DELETE event occurs (for
-device nic0) and after that the "query-block" command returns an empty
-result.
-
-QEMU Version: 4.6.5
-Arch: x86-64
-QMP : 2.2.1
-
-Note:
-1. I was not performing any activity on the VM when the event occurs.
-2. After the event, the QEMU process is still alive and the VM runs
-normally.
-3. This behavior is consistently reproduced.
-
-
-Any help on how can I debug this issue would be greatly appreciated .
-
-Thanks,
-
-Bruno
+To: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>, qemu devel <qemu-devel@nongnu.org>
+Cc: zhanghailiang <zhang.zhanghailiang@huawei.com>, weifuqiang <weifuqiang@huawei.com>, "eddie . dong" <eddie.dong@intel.com>, bian naimeng <biannm@cn.fujitsu.com>, Li Zhijian <lizhijian@cn.fujitsu.com>
 
 
 
-DETAILED LOGS
+On 2017=E5=B9=B405=E6=9C=8823=E6=97=A5 22:20, Zhang Chen wrote:
+> We add the vnet_hdr option for filter-mirror, default is disable.
+> If you use virtio-net-pci net driver, please enable it.
+> You can use it for example:
+> -object filter-mirror,id=3Dm0,netdev=3Dhn0,queue=3Dtx,outdev=3Dmirror0,=
+vnet_hdr=3Don
+>
+> If vnet_hdr=3Don we change the send packet format from
+> struct {int size; const uint8_t buf[];} to {int size; int vnet_hdr_len;=
+ const uint8_t buf[];}.
+> make other module(like colo-compare) know how to parse net packet corre=
+ctly.
+>
+> Signed-off-by: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
+> ---
+>   net/filter-mirror.c | 73 ++++++++++++++++++++++++++++++++++++++++++++=
++++++----
+>   qemu-options.hx     |  5 ++--
+>   2 files changed, 70 insertions(+), 8 deletions(-)
+>
+> diff --git a/net/filter-mirror.c b/net/filter-mirror.c
+> index 72fa7c2..8df0be6 100644
+> --- a/net/filter-mirror.c
+> +++ b/net/filter-mirror.c
+> @@ -38,15 +38,17 @@ typedef struct MirrorState {
+>       NetFilterState parent_obj;
+>       char *indev;
+>       char *outdev;
+> +    bool vnet_hdr;
+>       CharBackend chr_in;
+>       CharBackend chr_out;
+>       SocketReadState rs;
+>   } MirrorState;
+>  =20
+> -static int filter_mirror_send(CharBackend *chr_out,
+> +static int filter_mirror_send(MirrorState *s,
+>                                 const struct iovec *iov,
+>                                 int iovcnt)
+>   {
+> +    NetFilterState *nf =3D NETFILTER(s);
+>       int ret =3D 0;
+>       ssize_t size =3D 0;
+>       uint32_t len =3D 0;
+> @@ -58,14 +60,42 @@ static int filter_mirror_send(CharBackend *chr_out,
+>       }
+>  =20
+>       len =3D htonl(size);
+> -    ret =3D qemu_chr_fe_write_all(chr_out, (uint8_t *)&len, sizeof(len=
+));
+> +    ret =3D qemu_chr_fe_write_all(&s->chr_out, (uint8_t *)&len, sizeof=
+(len));
+>       if (ret !=3D sizeof(len)) {
+>           goto err;
+>       }
+>  =20
+> +    if (s->vnet_hdr) {
+> +        /*
+> +         * If vnet_hdr =3D on, we send vnet header len to make other
+> +         * module(like colo-compare) know how to parse net
+> +         * packet correctly.
+> +         */
+> +        ssize_t vnet_hdr_len;
+> +
+> +        /*
+> +         * In anytime, nf->netdev and nf->netdev->peer both have a vne=
+t_hdr_len,
+> +         * Here we just find out which is we need. When filter set RX =
+or TX
+> +         * that the real vnet_hdr_len are different.
+> +         */
+> +        if (nf->netdev->using_vnet_hdr) {
+> +            vnet_hdr_len =3D nf->netdev->vnet_hdr_len;
+> +        } else if (nf->netdev->peer->using_vnet_hdr) {
+> +            vnet_hdr_len =3D nf->netdev->peer->vnet_hdr_len;
 
-I am using XEN hypervisor to run a HVM with QEMU backed disk. When I start
-the HVM I see the following QEMU process started:
+Rethink about this, looks like what we really want is:
 
-root      2199     1  0 18:57 ?        00:00:02
-/usr/local/lib/xen/bin/qemu-system-i386
--xen-domid 3 -chardev socket,id=libxl-cmd,path=/var/
-run/xen/qmp-libxl-3,server,nowait -no-shutdown -mon
-chardev=libxl-cmd,mode=control -chardev socket,id=libxenstat-cmd,path=
-/var/run/xen/qmp-libxenstat-3,server,nowait -mon
-chardev=libxenstat-cmd,mode=control -nodefaults -no-user-config -name
-debianL2 -vnc :0,to=99 -display none -serial pty -device
-cirrus-vga,vgamem_mb=8 -boot order=d -device
-rtl8139,id=nic0,netdev=net0,mac=00:16:3e:1b:d0:7e
--netdev type=tap,id=net0,ifname=vif3.0-emu,script=no,downscript=no -machine
-xenfv -m 1016 -drive file=/home/balvisio/debian-
-disk.img,if=ide,index=0,media=disk,format=raw,cache=writeback -drive
-if=ide,index=2,readonly=on,media=cdrom,id=ide-5632,file=/
-home/balvisio/debian-live-8.7.1-amd64-gnome-desktop.iso,format=raw
+- For tx direction, only check nf->netdev->vnet_hdr_len,
+- For rx direction, only check nf->netdev->peer->vnet_hdr_len
 
-After launching the VM, I connected to the QMP socket:
+Thanks
 
-# rlwrap -C qmp socat STDIO UNIX:/var/run/xen/qmp-libxl-2
-
-{"QMP": {"version": {"qemu": {"micro": 1, "minor": 2, "major": 2},
-"package": ""}, "capabilities": []}}
-
-{"execute":"qmp_capabilities"}
-
-{"return": {}}
-
-I issue the "query-block" command and I get:
-
-{"execute":"query-block"}
-
-{"return": [{"io-status": "ok", "device": "ide0-hd0", "locked": false,
-"removable": false, "inserted": {"iops_rd": 0, "detect_zeroes": "off",
-"image": {"virtual-size": 10737418240, "filename":
-"/home/balvisio/debian-disk.img", "format": "raw", "actual-size":
-4940075008, "dirty-flag": false}, "iops_wr": 0, "ro": false,
-"backing_file_depth": 0, "drv": "raw", "iops": 0, "bps_wr": 0, "encrypted":
-false, "bps": 0, "bps_rd": 0, "file": "/home/balvisio/debian-disk.img",
-"encryption_key_missing": false}, "type": "unknown"}]}
-
-
-
-After a few seconds, the following event happens asynchronoausly:
-
-{"timestamp": {"seconds": 1495590969, "microseconds": 898981}, "event":
-"DEVICE_DELETED", "data": {"device": "nic0", "path":
-"/machine/peripheral/nic0"}}
-
-After that event, I perform a "query-block" command again but now the block
-device is gone:
-
-{"execute":"query-block"}
-
-{"return": []}
-
-
-Xen Config File Used
-
-kernel="/usr/local/lib/xen/boot/hvmloader"
-
-builder='hvm'
-
-memory=1024
-
-vcpus=1
-
-name="debianL2"
-
-vfb = ['type=vnc']
-
-vif= ['bridge=xenbr0']
-
-boot='b'
-
-disk=['file:/home/balvisio/debian-disk.img,xvda,w']
-
-acpi=1
-
-device_model_version='qemu-xen'
-
-serial='pty'
-
-vnc=1
-
-vnclisten=""
-
-vncpasswd=""
+> +        } else {
+> +            return 0;
+> +        }
+> +
+> +        len =3D htonl(vnet_hdr_len);
+> +        ret =3D qemu_chr_fe_write_all(&s->chr_out, (uint8_t *)&len, si=
+zeof(len));
+> +        if (ret !=3D sizeof(len)) {
+> +            goto err;
+> +        }
+> +    }
+> +
+>       buf =3D g_malloc(size);
+>       iov_to_buf(iov, iovcnt, 0, buf, size);
+> -    ret =3D qemu_chr_fe_write_all(chr_out, (uint8_t *)buf, size);
+> +    ret =3D qemu_chr_fe_write_all(&s->chr_out, (uint8_t *)buf, size);
+>       g_free(buf);
+>       if (ret !=3D size) {
+>           goto err;
+> @@ -141,7 +171,7 @@ static ssize_t filter_mirror_receive_iov(NetFilterS=
+tate *nf,
+>       MirrorState *s =3D FILTER_MIRROR(nf);
+>       int ret;
+>  =20
+> -    ret =3D filter_mirror_send(&s->chr_out, iov, iovcnt);
+> +    ret =3D filter_mirror_send(s, iov, iovcnt);
+>       if (ret) {
+>           error_report("filter_mirror_send failed(%s)", strerror(-ret))=
+;
+>       }
+> @@ -164,7 +194,7 @@ static ssize_t filter_redirector_receive_iov(NetFil=
+terState *nf,
+>       int ret;
+>  =20
+>       if (qemu_chr_fe_get_driver(&s->chr_out)) {
+> -        ret =3D filter_mirror_send(&s->chr_out, iov, iovcnt);
+> +        ret =3D filter_mirror_send(s, iov, iovcnt);
+>           if (ret) {
+>               error_report("filter_mirror_send failed(%s)", strerror(-r=
+et));
+>           }
+> @@ -308,6 +338,13 @@ static char *filter_mirror_get_outdev(Object *obj,=
+ Error **errp)
+>       return g_strdup(s->outdev);
+>   }
+>  =20
+> +static char *filter_mirror_get_vnet_hdr(Object *obj, Error **errp)
+> +{
+> +    MirrorState *s =3D FILTER_MIRROR(obj);
+> +
+> +    return s->vnet_hdr ? g_strdup("on") : g_strdup("off");
+> +}
+> +
+>   static void
+>   filter_mirror_set_outdev(Object *obj, const char *value, Error **errp=
+)
+>   {
+> @@ -322,6 +359,21 @@ filter_mirror_set_outdev(Object *obj, const char *=
+value, Error **errp)
+>       }
+>   }
+>  =20
+> +static void filter_mirror_set_vnet_hdr(Object *obj,
+> +                                       const char *value,
+> +                                       Error **errp)
+> +{
+> +    MirrorState *s =3D FILTER_MIRROR(obj);
+> +
+> +    if (strcmp(value, "on") && strcmp(value, "off")) {
+> +        error_setg(errp, "Invalid value for filter-mirror vnet_hdr, "
+> +                         "should be 'on' or 'off'");
+> +        return;
+> +    }
+> +
+> +    s->vnet_hdr =3D !strcmp(value, "on");
+> +}
+> +
+>   static char *filter_redirector_get_outdev(Object *obj, Error **errp)
+>   {
+>       MirrorState *s =3D FILTER_REDIRECTOR(obj);
+> @@ -340,8 +392,19 @@ filter_redirector_set_outdev(Object *obj, const ch=
+ar *value, Error **errp)
+>  =20
+>   static void filter_mirror_init(Object *obj)
+>   {
+> +    MirrorState *s =3D FILTER_MIRROR(obj);
+> +
+>       object_property_add_str(obj, "outdev", filter_mirror_get_outdev,
+>                               filter_mirror_set_outdev, NULL);
+> +
+> +    /*
+> +     * The vnet_hdr is disabled by default, if you want to enable
+> +     * this option, you must enable all the option on related modules
+> +     * (like other filter or colo-compare).
+> +     */
+> +    s->vnet_hdr =3D false;
+> +    object_property_add_str(obj, "vnet_hdr", filter_mirror_get_vnet_hd=
+r,
+> +                             filter_mirror_set_vnet_hdr, NULL);
+>   }
+>  =20
+>   static void filter_redirector_init(Object *obj)
+> diff --git a/qemu-options.hx b/qemu-options.hx
+> index 70c0ded..81fb96b 100644
+> --- a/qemu-options.hx
+> +++ b/qemu-options.hx
+> @@ -4024,10 +4024,9 @@ queue @var{all|rx|tx} is an option that can be a=
+pplied to any netfilter.
+>   @option{tx}: the filter is attached to the transmit queue of the netd=
+ev,
+>                where it will receive packets sent by the netdev.
+>  =20
+> -@item -object filter-mirror,id=3D@var{id},netdev=3D@var{netdevid},outd=
+ev=3D@var{chardevid}[,queue=3D@var{all|rx|tx}]
+> +@item -object filter-mirror,id=3D@var{id},netdev=3D@var{netdevid},outd=
+ev=3D@var{chardevid},vnet_hdr=3D@var{on|off}[,queue=3D@var{all|rx|tx}]
+>  =20
+> -filter-mirror on netdev @var{netdevid},mirror net packet to chardev
+> -@var{chardevid}
+> +filter-mirror on netdev @var{netdevid},mirror net packet to chardev@va=
+r{chardevid}, if vnet_hdr =3D on, filter-mirror will mirror packet with v=
+net_hdr_len.
+>  =20
+>   @item -object filter-redirector,id=3D@var{id},netdev=3D@var{netdevid}=
+,indev=3D@var{chardevid},
+>   outdev=3D@var{chardevid}[,queue=3D@var{all|rx|tx}]
