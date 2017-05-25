@@ -1,29 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49616)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54415)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1dDxMA-0001m8-GV
-	for qemu-devel@nongnu.org; Thu, 25 May 2017 14:19:31 -0400
+	(envelope-from <bruno.alvisio@gmail.com>) id 1dDxkD-0003BJ-7G
+	for qemu-devel@nongnu.org; Thu, 25 May 2017 14:44:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1dDxM5-0000h7-EB
-	for qemu-devel@nongnu.org; Thu, 25 May 2017 14:19:30 -0400
-Received: from mailhub.sw.ru ([195.214.232.25]:19789 helo=relay.sw.ru)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
-	id 1dDxM4-0000gh-Tl
-	for qemu-devel@nongnu.org; Thu, 25 May 2017 14:19:25 -0400
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-References: <20170525152628.37628-1-vsementsov@virtuozzo.com>
-	<20170525152628.37628-3-vsementsov@virtuozzo.com>
-	<4d041d0a-ed17-4d72-fce2-e2500e9ec0fc@redhat.com>
-	<245523c5-59fd-f585-291f-fe7fe64bb500@virtuozzo.com>
-Message-ID: <6d16d9d2-cd5b-a71f-740d-0721845cca96@virtuozzo.com>
-Date: Thu, 25 May 2017 21:19:18 +0300
+	(envelope-from <bruno.alvisio@gmail.com>) id 1dDxkB-0000nm-GF
+	for qemu-devel@nongnu.org; Thu, 25 May 2017 14:44:21 -0400
 MIME-Version: 1.0
-In-Reply-To: <245523c5-59fd-f585-291f-fe7fe64bb500@virtuozzo.com>
-Content-Language: en-US
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 2/7] block: add
- bdrv_get_format_allocated_size format interface
+In-Reply-To: <539d9960-d554-032f-3e88-b2531743a0a1@redhat.com>
+References: <CADNMjEBdXZeOonsKNf9LpFKK0NFUzAth=CDaSj8q22k+o=ZEFA@mail.gmail.com>
+	<539d9960-d554-032f-3e88-b2531743a0a1@redhat.com>
+From: Bruno Alvisio <bruno.alvisio@gmail.com>
+Date: Thu, 25 May 2017 11:44:17 -0700
+Message-ID: <CADNMjECLPFyZp1Rm_M4KuSqnY1cp7k0T38=zmWidYvinrutFPQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] Behavior of QMP "query-block"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,78 +22,176 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: armbru@redhat.com, mreitz@redhat.com, kwolf@redhat.com, den@openvz.org
+To: John Snow <jsnow@redhat.com>
+Cc: qemu-devel@nongnu.org, Qemu-block <qemu-block@nongnu.org>
 
-25.05.2017 21:07, Vladimir Sementsov-Ogievskiy wrote:
-> 25.05.2017 20:54, Eric Blake wrote:
->> On 05/25/2017 10:26 AM, Vladimir Sementsov-Ogievskiy wrote:
->>> The function should return actually used by top-level format driver
->> s/actually/the allocation actually/
->>
->>> space (in it's .file). It differs from bdrv_get_allocated_file_size,
->> s/it's/its/ (remember, "it's" is only appropriate if "it is" can be used
->> in its place)
->>
->>> which returns allocated on fs file size.
->> s/allocated on fs file size/the disk usage of the underlying file/
->>
->> So this is a measure of how many clusters a qcow2 image is currently
->> using (including metadata clusters, and regardless of whether those
->> clusters happen to point to a hole in the underlying protocol layer)?
->
-> Hmm, interesting remark. Now it is realized exactly as you write.. But 
-> this leads to the situation, when qcow2 allocates data amount > 
-> bdrv_getlength(bs->file->bs) and we will have negative size of 
-> unallocated area =). Denis what do you think? (Actually, we needed 
-> this feature for non-sparce file system and this question was not 
-> considered).
+Hello John,
 
-No, it will not be negative, all OK. I've mistaken. length of 
-bs->file->bs will be positive anyway.
+Thanks. Yes, typo when I wrote the e-mail.
 
-Actually, current approach is the following:
+It might be possible that XEN does that (I will ask in the XEN forum).
+However, I have noticed that it is not the case for all of the VMs I have
+launched. In some of them I can query the block devices even after a long
+time the VM has been running.
 
-a. clusters allocated in qcow2 and after the end of bs->file: unallocated
-b. clusters allocated in qcow2 and which are holes bs->file: allocated
+I was wondering if the device is removed in case the disk is corrupted or
+something. When I mention it runs normally, I can log into ithe VM and
+perform read/write operations such creating files.
 
-(a) look inconsistent with b and with commit message and other things. 
-But if I just account (a) clusters, it will lead to negative size of 
-unallocated and will spoil the whole stat.. Something should be 
-adjusted, at least at comment/commit-message level.
+Also, is there an easy way to log all qemu events so that I can see what
+might be going on with the 'ide' device?
 
+Thanks,
+
+Bruno
+
+On Thu, May 25, 2017 at 11:18 AM, John Snow <jsnow@redhat.com> wrote:
 
 >
->>> Signed-off-by: Vladimir Sementsov-Ogievskiy<vsementsov@virtuozzo.com>
->>> ---
->>>   block.c                   | 15 +++++++++++++++
->>>   include/block/block.h     |  1 +
->>>   include/block/block_int.h |  1 +
->>>   3 files changed, 17 insertions(+)
->>>
->>> diff --git a/block.c b/block.c
->>> index ba22fc0dfb..6e1a435490 100644
->>> --- a/block.c
->>> +++ b/block.c
->>> @@ -3407,6 +3407,21 @@ int64_t bdrv_get_allocated_file_size(BlockDriverState *bs)
->>>   }
->>>   
->>>   /**
->>> + * Actually used by top-level format driver space (in it's .file) in bytes
->> s/it's/its/
->>
->> I think we can do better.  How about:
->>
->> Return the amount of space allocated by the format driver (including
->> metadata) in bytes, even if some of that space currently maps to holes
->> in the underlying protocol file.
->>
 >
-> -- 
-> Best regards,
-> Vladimir
-
-
--- 
-Best regards,
-Vladimir
+> On 05/25/2017 12:27 AM, Bruno Alvisio wrote:
+> > Hello all,
+> >
+> > Summary
+> >
+> > I am using XEN hypervisor to run a HVM with a QEMU backed disk. After I
+> > start the HVM I use QMP "query-block" command to see the devices of the
+> VM.
+> > Initially the command returns the disk that I set as part of the
+> > configuration. After a few seconds the a DEVICE_DELETE event occurs (for
+> > device nic0) and after that the "query-block" command returns an empty
+> > result.
+> >
+> > QEMU Version: 4.6.5
+>
+> I assume this is the KVM version.
+>
+> > Arch: x86-64
+> > QMP : 2.2.1
+>
+> And I assume this is the QEMU version.
+>
+> >
+> > Note:
+> > 1. I was not performing any activity on the VM when the event occurs.
+> > 2. After the event, the QEMU process is still alive and the VM runs
+> > normally.
+> > 3. This behavior is consistently reproduced.
+> >
+> >
+> > Any help on how can I debug this issue would be greatly appreciated .
+> >
+> > Thanks,
+> >
+> > Bruno
+> >
+>
+> I'm not very familiar with XEN, I do know that it likes to add more
+> devices than it needs and then deletes them before starting the VM
+> proper. The VM actually still runs normally despite the fact that query
+> block returns no information? ...
+>
+> CCing qemu-block.
+>
+> --js
+>
+> >
+> >
+> > DETAILED LOGS
+> >
+> > I am using XEN hypervisor to run a HVM with QEMU backed disk. When I
+> start
+> > the HVM I see the following QEMU process started:
+> >
+> > root      2199     1  0 18:57 ?        00:00:02
+> > /usr/local/lib/xen/bin/qemu-system-i386
+> > -xen-domid 3 -chardev socket,id=libxl-cmd,path=/var/
+> > run/xen/qmp-libxl-3,server,nowait -no-shutdown -mon
+> > chardev=libxl-cmd,mode=control -chardev socket,id=libxenstat-cmd,path=
+> > /var/run/xen/qmp-libxenstat-3,server,nowait -mon
+> > chardev=libxenstat-cmd,mode=control -nodefaults -no-user-config -name
+> > debianL2 -vnc :0,to=99 -display none -serial pty -device
+> > cirrus-vga,vgamem_mb=8 -boot order=d -device
+> > rtl8139,id=nic0,netdev=net0,mac=00:16:3e:1b:d0:7e
+> > -netdev type=tap,id=net0,ifname=vif3.0-emu,script=no,downscript=no
+> -machine
+> > xenfv -m 1016 -drive file=/home/balvisio/debian-
+> > disk.img,if=ide,index=0,media=disk,format=raw,cache=writeback -drive
+> > if=ide,index=2,readonly=on,media=cdrom,id=ide-5632,file=/
+> > home/balvisio/debian-live-8.7.1-amd64-gnome-desktop.iso,format=raw
+> >
+> > After launching the VM, I connected to the QMP socket:
+> >
+> > # rlwrap -C qmp socat STDIO UNIX:/var/run/xen/qmp-libxl-2
+> >
+> > {"QMP": {"version": {"qemu": {"micro": 1, "minor": 2, "major": 2},
+> > "package": ""}, "capabilities": []}}
+> >
+> > {"execute":"qmp_capabilities"}
+> >
+> > {"return": {}}
+> >
+> > I issue the "query-block" command and I get:
+> >
+> > {"execute":"query-block"}
+> >
+> > {"return": [{"io-status": "ok", "device": "ide0-hd0", "locked": false,
+> > "removable": false, "inserted": {"iops_rd": 0, "detect_zeroes": "off",
+> > "image": {"virtual-size": 10737418240, "filename":
+> > "/home/balvisio/debian-disk.img", "format": "raw", "actual-size":
+> > 4940075008, "dirty-flag": false}, "iops_wr": 0, "ro": false,
+> > "backing_file_depth": 0, "drv": "raw", "iops": 0, "bps_wr": 0,
+> "encrypted":
+> > false, "bps": 0, "bps_rd": 0, "file": "/home/balvisio/debian-disk.img",
+> > "encryption_key_missing": false}, "type": "unknown"}]}
+> >
+> >
+> >
+> > After a few seconds, the following event happens asynchronoausly:
+> >
+> > {"timestamp": {"seconds": 1495590969, "microseconds": 898981}, "event":
+> > "DEVICE_DELETED", "data": {"device": "nic0", "path":
+> > "/machine/peripheral/nic0"}}
+> >
+> > After that event, I perform a "query-block" command again but now the
+> block
+> > device is gone:
+> >
+> > {"execute":"query-block"}
+> >
+> > {"return": []}
+> >
+> >
+> > Xen Config File Used
+> >
+> > kernel="/usr/local/lib/xen/boot/hvmloader"
+> >
+> > builder='hvm'
+> >
+> > memory=1024
+> >
+> > vcpus=1
+> >
+> > name="debianL2"
+> >
+> > vfb = ['type=vnc']
+> >
+> > vif= ['bridge=xenbr0']
+> >
+> > boot='b'
+> >
+> > disk=['file:/home/balvisio/debian-disk.img,xvda,w']
+> >
+> > acpi=1
+> >
+> > device_model_version='qemu-xen'
+> >
+> > serial='pty'
+> >
+> > vnc=1
+> >
+> > vnclisten=""
+> >
+> > vncpasswd=""
+> >
+>
