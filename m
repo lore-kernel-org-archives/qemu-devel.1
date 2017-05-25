@@ -1,26 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50328)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51571)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1dDlyn-0000ec-Uo
-	for qemu-devel@nongnu.org; Thu, 25 May 2017 02:10:38 -0400
+	(envelope-from <famz@redhat.com>) id 1dDm6A-00036r-82
+	for qemu-devel@nongnu.org; Thu, 25 May 2017 02:18:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1dDlyj-0004gX-Bn
-	for qemu-devel@nongnu.org; Thu, 25 May 2017 02:10:37 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:40696)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1dDlyj-0004gN-1x
-	for qemu-devel@nongnu.org; Thu, 25 May 2017 02:10:33 -0400
-References: <1495549241-23380-1-git-send-email-zhangchen.fnst@cn.fujitsu.com>
-	<1495549241-23380-4-git-send-email-zhangchen.fnst@cn.fujitsu.com>
-From: Jason Wang <jasowang@redhat.com>
-Message-ID: <118320f3-67cf-bb46-8ae7-6de552cc15bf@redhat.com>
-Date: Thu, 25 May 2017 14:10:25 +0800
+	(envelope-from <famz@redhat.com>) id 1dDm69-0006Ow-8l
+	for qemu-devel@nongnu.org; Thu, 25 May 2017 02:18:14 -0400
+Date: Thu, 25 May 2017 14:18:00 +0800
+From: Fam Zheng <famz@redhat.com>
+Message-ID: <20170525061800.GB27936@lemon.lan>
+References: <20170524202842.26724-1-eblake@redhat.com>
+	<20170524202842.26724-3-eblake@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <1495549241-23380-4-git-send-email-zhangchen.fnst@cn.fujitsu.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH V5 3/9] net/filter-mirror.c: Add new option
- to enable vnet support for filter-redirector
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170524202842.26724-3-eblake@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 2/5] block: Guarantee that *file is set
+ on bdrv_get_block_status()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,126 +24,109 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>, qemu devel <qemu-devel@nongnu.org>
-Cc: zhanghailiang <zhang.zhanghailiang@huawei.com>, weifuqiang <weifuqiang@huawei.com>, "eddie . dong" <eddie.dong@intel.com>, bian naimeng <biannm@cn.fujitsu.com>, Li Zhijian <lizhijian@cn.fujitsu.com>
+To: Eric Blake <eblake@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, jsnow@redhat.com, mreitz@redhat.com, qemu-stable@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>, Kevin Wolf <kwolf@redhat.com>
 
-
-
-On 2017=E5=B9=B405=E6=9C=8823=E6=97=A5 22:20, Zhang Chen wrote:
-> We add the vnet_hdr option for filter-redirector, default is disable.
-> If you use virtio-net-pci net driver, please enable it.
-> Because colo-compare or other modules needs the vnet_hdr_len to parse
-> packet, so we add this new option send the len to others.
-> You can use it for example:
-> -object filter-redirector,id=3Dr0,netdev=3Dhn0,queue=3Dtx,outdev=3Dred0=
-,vnet_hdr=3Don
->
-> Signed-off-by: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
+On Wed, 05/24 15:28, Eric Blake wrote:
+> We document that *file is valid if the return is not an error and
+> includes BDRV_BLOCK_OFFSET_VALID, but forgot to obey this contract
+> when a driver (such as blkdebug) lacks a callback.  Broken in
+> commit 67a0fd2 (v2.6), when we added the file parameter.
+> 
+> Enhance qemu-iotest 177 to cover this, using a sequence that would
+> print garbage or even SEGV, because it was dererefencing through
+> uninitialized memory.  [The resulting test output shows that we
+> have less-than-ideal block status from the blkdebug driver, but
+> that's a separate fix coming up soon.]
+> 
+> Setting *file on all paths that return BDRV_BLOCK_OFFSET_VALID is
+> enough to fix the crash, but we can go one step further: always
+> setting *file, even on error, means that a broken caller that
+> blindly dereferences file without checking for error is now more
+> likely to get a reliable SEGV instead of randomly acting on garbage,
+> making it easier to diagnose such buggy callers.  Adding an
+> assertion that file is set where expected doesn't hurt either.
+> 
+> CC: qemu-stable@nongnu.org
+> Signed-off-by: Eric Blake <eblake@redhat.com>
+> 
 > ---
->   net/filter-mirror.c | 33 +++++++++++++++++++++++++++++++++
->   qemu-options.hx     |  6 +++---
->   2 files changed, 36 insertions(+), 3 deletions(-)
->
-> diff --git a/net/filter-mirror.c b/net/filter-mirror.c
-> index 8df0be6..6c8579f 100644
-> --- a/net/filter-mirror.c
-> +++ b/net/filter-mirror.c
-> @@ -381,6 +381,13 @@ static char *filter_redirector_get_outdev(Object *=
-obj, Error **errp)
->       return g_strdup(s->outdev);
->   }
->  =20
-> +static char *filter_redirector_get_vnet_hdr(Object *obj, Error **errp)
-> +{
-> +    MirrorState *s =3D FILTER_REDIRECTOR(obj);
-> +
-> +    return s->vnet_hdr ? g_strdup("on") : g_strdup("off");
-> +}
-> +
->   static void
->   filter_redirector_set_outdev(Object *obj, const char *value, Error **=
-errp)
->   {
-> @@ -390,6 +397,21 @@ filter_redirector_set_outdev(Object *obj, const ch=
-ar *value, Error **errp)
->       s->outdev =3D g_strdup(value);
->   }
->  =20
-> +static void filter_redirector_set_vnet_hdr(Object *obj,
-> +                                           const char *value,
-> +                                           Error **errp)
-> +{
-> +    MirrorState *s =3D FILTER_REDIRECTOR(obj);
-> +
-> +    if (strcmp(value, "on") && strcmp(value, "off")) {
-> +        error_setg(errp, "Invalid value for filter-redirector vnet_hdr=
-, "
-> +                         "should be 'on' or 'off'");
-> +        return;
-> +    }
-> +
-> +    s->vnet_hdr =3D !strcmp(value, "on");
-> +}
-> +
->   static void filter_mirror_init(Object *obj)
->   {
->       MirrorState *s =3D FILTER_MIRROR(obj);
-> @@ -409,10 +431,21 @@ static void filter_mirror_init(Object *obj)
->  =20
->   static void filter_redirector_init(Object *obj)
->   {
-> +    MirrorState *s =3D FILTER_REDIRECTOR(obj);
-> +
->       object_property_add_str(obj, "indev", filter_redirector_get_indev=
-,
->                               filter_redirector_set_indev, NULL);
->       object_property_add_str(obj, "outdev", filter_redirector_get_outd=
-ev,
->                               filter_redirector_set_outdev, NULL);
-> +
-> +    /*
-> +     * The vnet_hdr is disabled by default, if you want to enable
-> +     * this option, you must enable all the option on related modules
-> +     * (like other filter or colo-compare).
-> +     */
-> +    s->vnet_hdr =3D false;
-> +    object_property_add_str(obj, "vnet_hdr", filter_redirector_get_vne=
-t_hdr,
-> +                            filter_redirector_set_vnet_hdr, NULL);
+> v2: drop redundant assignment
+> ---
+>  block/io.c                 | 5 +++--
+>  tests/qemu-iotests/177     | 3 +++
+>  tests/qemu-iotests/177.out | 2 ++
+>  3 files changed, 8 insertions(+), 2 deletions(-)
+> 
+> diff --git a/block/io.c b/block/io.c
+> index fdd7485..8e6c3fe 100644
+> --- a/block/io.c
+> +++ b/block/io.c
+> @@ -1749,6 +1749,7 @@ static int64_t coroutine_fn bdrv_co_get_block_status(BlockDriverState *bs,
+>      int64_t n;
+>      int64_t ret, ret2;
+> 
+> +    *file = NULL;
+>      total_sectors = bdrv_nb_sectors(bs);
+>      if (total_sectors < 0) {
+>          return total_sectors;
+> @@ -1769,11 +1770,11 @@ static int64_t coroutine_fn bdrv_co_get_block_status(BlockDriverState *bs,
+>          ret = BDRV_BLOCK_DATA | BDRV_BLOCK_ALLOCATED;
+>          if (bs->drv->protocol_name) {
+>              ret |= BDRV_BLOCK_OFFSET_VALID | (sector_num * BDRV_SECTOR_SIZE);
+> +            *file = bs;
+>          }
+>          return ret;
+>      }
+> 
+> -    *file = NULL;
+>      bdrv_inc_in_flight(bs);
+>      ret = bs->drv->bdrv_co_get_block_status(bs, sector_num, nb_sectors, pnum,
+>                                              file);
+> @@ -1783,7 +1784,7 @@ static int64_t coroutine_fn bdrv_co_get_block_status(BlockDriverState *bs,
+>      }
+> 
+>      if (ret & BDRV_BLOCK_RAW) {
+> -        assert(ret & BDRV_BLOCK_OFFSET_VALID);
+> +        assert(ret & BDRV_BLOCK_OFFSET_VALID && *file);
+>          ret = bdrv_co_get_block_status(*file, ret >> BDRV_SECTOR_BITS,
+>                                         *pnum, pnum, file);
+>          goto out;
+> diff --git a/tests/qemu-iotests/177 b/tests/qemu-iotests/177
+> index 2005c17..f8ed8fb 100755
+> --- a/tests/qemu-iotests/177
+> +++ b/tests/qemu-iotests/177
+> @@ -43,6 +43,7 @@ _supported_proto file
+>  CLUSTER_SIZE=1M
+>  size=128M
+>  options=driver=blkdebug,image.driver=qcow2
+> +nested_opts=image.file.driver=file,image.file.filename=$TEST_IMG
+> 
+>  echo
+>  echo "== setting up files =="
+> @@ -106,6 +107,8 @@ function verify_io()
+>  }
+> 
+>  verify_io | $QEMU_IO -r "$TEST_IMG" | _filter_qemu_io
+> +$QEMU_IMG map --image-opts "$options,$nested_opts,align=4k" \
+> +    | _filter_qemu_img_map
+> 
+>  _check_test_img
+> 
+> diff --git a/tests/qemu-iotests/177.out b/tests/qemu-iotests/177.out
+> index e887542..b754ed4 100644
+> --- a/tests/qemu-iotests/177.out
+> +++ b/tests/qemu-iotests/177.out
+> @@ -45,5 +45,7 @@ read 30408704/30408704 bytes at offset 80740352
+>  29 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+>  read 23068672/23068672 bytes at offset 111149056
+>  22 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+> +Offset          Length          File
+> +0               0x8000000       blkdebug::TEST_DIR/t.IMGFMT
+>  No errors were found on the image.
+>  *** done
+> -- 
+> 2.9.4
+> 
 
-Why not using object_property_add_bool()?
-
-Thanks
-
->   }
->  =20
->   static void filter_mirror_fini(Object *obj)
-> diff --git a/qemu-options.hx b/qemu-options.hx
-> index 81fb96b..a3c4688 100644
-> --- a/qemu-options.hx
-> +++ b/qemu-options.hx
-> @@ -4028,11 +4028,11 @@ queue @var{all|rx|tx} is an option that can be =
-applied to any netfilter.
->  =20
->   filter-mirror on netdev @var{netdevid},mirror net packet to chardev@v=
-ar{chardevid}, if vnet_hdr =3D on, filter-mirror will mirror packet with =
-vnet_hdr_len.
->  =20
-> -@item -object filter-redirector,id=3D@var{id},netdev=3D@var{netdevid},=
-indev=3D@var{chardevid},
-> -outdev=3D@var{chardevid}[,queue=3D@var{all|rx|tx}]
-> +@item -object filter-redirector,id=3D@var{id},netdev=3D@var{netdevid},=
-indev=3D@var{chardevid},outdev=3D@var{chardevid},vnet_hdr=3D@var{on|off}[=
-,queue=3D@var{all|rx|tx}]
->  =20
->   filter-redirector on netdev @var{netdevid},redirect filter's net pack=
-et to chardev
-> -@var{chardevid},and redirect indev's packet to filter.
-> +@var{chardevid},and redirect indev's packet to filter.if vnet_hdr =3D =
-on,
-> +filter-redirector will redirect packet with vnet_hdr_len.
->   Create a filter-redirector we need to differ outdev id from indev id,=
- id can not
->   be the same. we can just use indev or outdev, but at least one of ind=
-ev or outdev
->   need to be specified.
+Reviewed-by: Fam Zheng <famz@redhat.com>
