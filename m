@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40546)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40623)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dDv48-0006M7-KL
-	for qemu-devel@nongnu.org; Thu, 25 May 2017 11:52:45 -0400
+	(envelope-from <berrange@redhat.com>) id 1dDv4c-0006mT-4x
+	for qemu-devel@nongnu.org; Thu, 25 May 2017 11:53:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dDv45-0004YI-H2
-	for qemu-devel@nongnu.org; Thu, 25 May 2017 11:52:44 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:40462)
+	(envelope-from <berrange@redhat.com>) id 1dDv4Z-0004ry-3Q
+	for qemu-devel@nongnu.org; Thu, 25 May 2017 11:53:14 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55954)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1dDv45-0004Wb-Ax
-	for qemu-devel@nongnu.org; Thu, 25 May 2017 11:52:41 -0400
-References: <1495229390-18909-1-git-send-email-felipe@nutanix.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <869fcc91-40ff-97fa-2a82-ca34695ac864@redhat.com>
-Date: Thu, 25 May 2017 17:52:36 +0200
-MIME-Version: 1.0
-In-Reply-To: <1495229390-18909-1-git-send-email-felipe@nutanix.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] cpus: reset throttle_thread_scheduled
- after sleep
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1dDv4Y-0004ra-Qi
+	for qemu-devel@nongnu.org; Thu, 25 May 2017 11:53:11 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 0CD82804FA
+	for <qemu-devel@nongnu.org>; Thu, 25 May 2017 15:53:09 +0000 (UTC)
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Date: Thu, 25 May 2017 16:53:00 +0100
+Message-Id: <20170525155300.22743-1-berrange@redhat.com>
+Subject: [Qemu-devel] [PATCH v4] sockets: improve error reporting if UNIX
+ socket path is too long
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,29 +28,182 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Felipe Franciosi <felipe@nutanix.com>, "Jason J. Herne" <jjherne@linux.vnet.ibm.com>, Malcolm Crossley <malcolm@nutanix.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org
+Cc: Eric Blake <eblake@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>
 
+The 'struct sockaddr_un' only allows 108 bytes for the socket
+path.
 
+If the user supplies a path, QEMU uses snprintf() to silently
+truncate it when too long. This is undesirable because the user
+will then be unable to connect to the path they asked for.
 
-On 19/05/2017 23:29, Felipe Franciosi wrote:
-> Currently, the throttle_thread_scheduled flag is reset back to 0 before
-> sleeping (as part of the throttling logic). Given that throttle_timer
-> (well, any timer) may tick with a slight delay, it so happens that under
-> heavy throttling (ie. close or on CPU_THROTTLE_PCT_MAX) the tick may
-> schedule a further cpu_throttle_thread() work item after the flag reset,
-> but before the previous sleep completed. This results on the vCPU thread
-> sleeping continuously for potentially several seconds in a row.
-> 
-> The chances of that happening can be drastically minimised by resetting
-> the flag after the sleep.
+If the user doesn't supply a path, QEMU builds one based on
+TMPDIR, but if that leads to an overlong path, it mistakenly
+uses error_setg_errno() with a stale errno value, because
+snprintf() does not set errno on truncation.
 
-True, on the other hand this may also increase the chance of not
-sleeping at all.
+In solving this the code needed some refactoring to ensure we
+don't pass 'un.sun_path' directly to any APIs which expect
+NUL-terminated strings, because the path is not required to
+be terminated.
 
-How overcommitted was the host system?
+Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
+---
 
-Paolo
+Changed in v4:
 
-> Signed-off-by: Felipe Franciosi <felipe@nutanix.com>
-> Signed-off-by: Malcolm Crossley <malcolm@nutanix.com>
+ - Do length check before any mkstemp to avoid leaving long
+   tmpfile on disk on error
+
+Changed in v3:
+
+ - Also fix unix_connect_saddr error reporting
+ - Avoid calling unlink with path that might not be nul terminated
+ - Ensure the TMPDIR derived path can fill up sun_path space.
+ - Don't update saddr->path until we have succesfully listened
+ - Unify error reporting across both explicit path & TMPDIR path
+   branches
+
+ util/qemu-sockets.c | 68 ++++++++++++++++++++++++++++++++++++-----------------
+ 1 file changed, 46 insertions(+), 22 deletions(-)
+
+diff --git a/util/qemu-sockets.c b/util/qemu-sockets.c
+index d8183f7..dfaf4e1 100644
+--- a/util/qemu-sockets.c
++++ b/util/qemu-sockets.c
+@@ -845,6 +845,8 @@ static int unix_listen_saddr(UnixSocketAddress *saddr,
+ {
+     struct sockaddr_un un;
+     int sock, fd;
++    char *pathbuf = NULL;
++    const char *path;
+ 
+     sock = qemu_socket(PF_UNIX, SOCK_STREAM, 0);
+     if (sock < 0) {
+@@ -852,20 +854,22 @@ static int unix_listen_saddr(UnixSocketAddress *saddr,
+         return -1;
+     }
+ 
+-    memset(&un, 0, sizeof(un));
+-    un.sun_family = AF_UNIX;
+-    if (saddr->path && strlen(saddr->path)) {
+-        snprintf(un.sun_path, sizeof(un.sun_path), "%s", saddr->path);
++    if (saddr->path && saddr->path[0]) {
++        path = saddr->path;
+     } else {
+         const char *tmpdir = getenv("TMPDIR");
+         tmpdir = tmpdir ? tmpdir : "/tmp";
+-        if (snprintf(un.sun_path, sizeof(un.sun_path), "%s/qemu-socket-XXXXXX",
+-                     tmpdir) >= sizeof(un.sun_path)) {
+-            error_setg_errno(errp, errno,
+-                             "TMPDIR environment variable (%s) too large", tmpdir);
+-            goto err;
+-        }
++        path = pathbuf = g_strdup_printf("%s/qemu-socket-XXXXXX", tmpdir);
++    }
+ 
++    if (strlen(path) > sizeof(un.sun_path)) {
++        error_setg(errp, "UNIX socket path '%s' is too long", path);
++        error_append_hint(errp, "Path must be less than %zu bytes\n",
++                          sizeof(un.sun_path));
++        goto err;
++    }
++
++    if (pathbuf != NULL) {
+         /*
+          * This dummy fd usage silences the mktemp() unsecure warning.
+          * Using mkstemp() doesn't make things more secure here
+@@ -873,24 +877,25 @@ static int unix_listen_saddr(UnixSocketAddress *saddr,
+          * to unlink first and thus re-open the race window.  The
+          * worst case possible is bind() failing, i.e. a DoS attack.
+          */
+-        fd = mkstemp(un.sun_path);
++        fd = mkstemp(pathbuf);
+         if (fd < 0) {
+             error_setg_errno(errp, errno,
+-                             "Failed to make a temporary socket name in %s", tmpdir);
++                             "Failed to make a temporary socket %s", pathbuf);
+             goto err;
+         }
+         close(fd);
+-        if (update_addr) {
+-            g_free(saddr->path);
+-            saddr->path = g_strdup(un.sun_path);
+-        }
+     }
+ 
+-    if (unlink(un.sun_path) < 0 && errno != ENOENT) {
++    if (unlink(path) < 0 && errno != ENOENT) {
+         error_setg_errno(errp, errno,
+-                         "Failed to unlink socket %s", un.sun_path);
++                         "Failed to unlink socket %s", path);
+         goto err;
+     }
++
++    memset(&un, 0, sizeof(un));
++    un.sun_family = AF_UNIX;
++    strncpy(un.sun_path, path, sizeof(un.sun_path));
++
+     if (bind(sock, (struct sockaddr*) &un, sizeof(un)) < 0) {
+         error_setg_errno(errp, errno, "Failed to bind socket to %s", un.sun_path);
+         goto err;
+@@ -900,9 +905,16 @@ static int unix_listen_saddr(UnixSocketAddress *saddr,
+         goto err;
+     }
+ 
++    if (update_addr && pathbuf) {
++        g_free(saddr->path);
++        saddr->path = pathbuf;
++    } else {
++        g_free(pathbuf);
++    }
+     return sock;
+ 
+ err:
++    g_free(pathbuf);
+     closesocket(sock);
+     return -1;
+ }
+@@ -932,9 +944,16 @@ static int unix_connect_saddr(UnixSocketAddress *saddr,
+         qemu_set_nonblock(sock);
+     }
+ 
++    if (strlen(saddr->path) > sizeof(un.sun_path)) {
++        error_setg(errp, "UNIX socket path '%s' is too long", saddr->path);
++        error_append_hint(errp, "Path must be less than %zu bytes\n",
++                          sizeof(un.sun_path));
++        goto err;
++    }
++
+     memset(&un, 0, sizeof(un));
+     un.sun_family = AF_UNIX;
+-    snprintf(un.sun_path, sizeof(un.sun_path), "%s", saddr->path);
++    strncpy(un.sun_path, saddr->path, sizeof(un.sun_path));
+ 
+     /* connect to peer */
+     do {
+@@ -956,13 +975,18 @@ static int unix_connect_saddr(UnixSocketAddress *saddr,
+     }
+ 
+     if (rc < 0) {
+-        error_setg_errno(errp, -rc, "Failed to connect socket");
+-        close(sock);
+-        sock = -1;
++        error_setg_errno(errp, -rc, "Failed to connect socket %s",
++                         saddr->path);
++        goto err;
+     }
+ 
+     g_free(connect_state);
+     return sock;
++
++ err:
++    close(sock);
++    g_free(connect_state);
++    return -1;
+ }
+ 
+ #else
+-- 
+2.9.3
