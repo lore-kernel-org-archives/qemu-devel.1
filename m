@@ -1,31 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35328)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36271)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1dDn8b-0001aZ-3Q
-	for qemu-devel@nongnu.org; Thu, 25 May 2017 03:24:50 -0400
+	(envelope-from <peterx@redhat.com>) id 1dDn9f-0002AB-5D
+	for qemu-devel@nongnu.org; Thu, 25 May 2017 03:25:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1dDn8Z-00006X-Ev
-	for qemu-devel@nongnu.org; Thu, 25 May 2017 03:24:49 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:54794)
+	(envelope-from <peterx@redhat.com>) id 1dDn9b-0000l7-QX
+	for qemu-devel@nongnu.org; Thu, 25 May 2017 03:25:54 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:51296)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1dDn8Z-000064-5H
-	for qemu-devel@nongnu.org; Thu, 25 May 2017 03:24:47 -0400
-Date: Thu, 25 May 2017 15:24:30 +0800
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1dDn9b-0000k3-GM
+	for qemu-devel@nongnu.org; Thu, 25 May 2017 03:25:51 -0400
+Date: Thu, 25 May 2017 15:25:45 +0800
 From: Peter Xu <peterx@redhat.com>
-Message-ID: <20170525072430.GA22816@pxdev.xzpeter.org>
-References: <1493285660-4470-1-git-send-email-peterx@redhat.com>
-	<1493285660-4470-7-git-send-email-peterx@redhat.com>
-	<20170501045822.GM13773@umbus.fritz.box>
-	<20170508054814.GA2820@pxdev.xzpeter.org>
-	<20170508060744.GG25748@umbus.fritz.box>
-	<20170508073217.GD2820@pxdev.xzpeter.org>
-	<20170510070406.GU25748@umbus.fritz.box>
-	<20170511050426.GF28293@pxdev.xzpeter.org>
-	<20170515053211.GB11105@umbus.fritz.box>
+Message-ID: <20170525072545.GB22816@pxdev.xzpeter.org>
+References: <1495539071-12995-1-git-send-email-a.perevalov@samsung.com>
+	<CGME20170523113130eucas1p1babac9d8659c10abe22ddc7d5b9526ab@eucas1p1.samsung.com>
+	<1495539071-12995-8-git-send-email-a.perevalov@samsung.com>
+	<20170524065736.GF3873@pxdev.xzpeter.org>
+	<20170524075637.GB12925@aperevalov-ubuntu>
+	<20170524120047.GM3873@pxdev.xzpeter.org>
+	<83b23059-7109-3c37-90ae-5595f0b3de68@samsung.com>
+	<20170524233008.GN3873@pxdev.xzpeter.org>
+	<c394ae4f-8b62-b306-d077-7f4305d0d1ce@samsung.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20170515053211.GB11105@umbus.fritz.box>
-Subject: Re: [Qemu-devel] [RFC PATCH 6/8] memory: introduce AddressSpaceOps
+In-Reply-To: <c394ae4f-8b62-b306-d077-7f4305d0d1ce@samsung.com>
+Subject: Re: [Qemu-devel] [PATCH V6 07/10] migration: add bitmap for copied
+ page
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,163 +35,102 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: qemu-devel@nongnu.org, tianyu.lan@intel.com, Paolo Bonzini <pbonzini@redhat.com>, kevin.tian@intel.com, yi.l.liu@intel.com, Jason Wang <jasowang@redhat.com>, Alex Williamson <alex.williamson@redhat.com>
+To: Alexey Perevalov <a.perevalov@samsung.com>
+Cc: i.maximets@samsung.com, qemu-devel@nongnu.org, dgilbert@redhat.com
 
-On Mon, May 15, 2017 at 03:32:11PM +1000, David Gibson wrote:
-> On Thu, May 11, 2017 at 01:04:26PM +0800, Peter Xu wrote:
-> > On Wed, May 10, 2017 at 05:04:06PM +1000, David Gibson wrote:
-> > > On Mon, May 08, 2017 at 03:32:17PM +0800, Peter Xu wrote:
-> > > > On Mon, May 08, 2017 at 04:07:44PM +1000, David Gibson wrote:
-> > > > > On Mon, May 08, 2017 at 01:48:14PM +0800, Peter Xu wrote:
-> > > > > > On Mon, May 01, 2017 at 02:58:22PM +1000, David Gibson wrote:
-> > > > > > > On Thu, Apr 27, 2017 at 05:34:18PM +0800, Peter Xu wrote:
-> > > > > > > > This is something similar to MemoryRegionOps, it's just for address
-> > > > > > > > spaces to store arch-specific hooks.
-> > > > > > > > 
-> > > > > > > > The first hook I would like to introduce is iommu_get().
-> > > > > > > > 
-> > > > > > > > For systems that have IOMMUs, we will create a special address space per
-> > > > > > > > device which is different from system default address space for
-> > > > > > > > it (please refer to pci_device_iommu_address_space()). Normally when
-> > > > > > > > that happens, there will be one specific IOMMU (or say, translation
-> > > > > > > > unit) stands right behind that new address space.
-> > > > > > > > 
-> > > > > > > > This iommu_get() fetches that guy behind the address space. Here, the
-> > > > > > > > guy is defined as IOMMUObject, which is currently a (void *). In the
-> > > > > > > > future, maybe we can make it a better definition, but imho it's good
-> > > > > > > > enough for now, considering it's arch-dependent.
-> > > > > > > > 
-> > > > > > > > Signed-off-by: Peter Xu <peterx@redhat.com>
-> > > > > > > 
-> > > > > > > This doesn't make sense to me.  It would be entirely possible for a
-> > > > > > > single address space to have different regions mapped by different
-> > > > > > > IOMMUs.  Or some regions mapped by IOMMUs and others direct mapped to
-> > > > > > > a device or memory block.
-> > > > > > 
-> > > > > > Oh, so it's more complicated than I thought... Then, do we really have
-> > > > > > existing use case that one device is managed by more than one IOMMU
-> > > > > > (on any of the platform)? Frankly speaking I haven't thought about
-> > > > > > complicated scenarios like this, or nested IOMMUs yet.
-> > > > > 
-> > > > > Sort of, it depends what you count as "more than one IOMMU".
-> > > > > 
-> > > > > spapr can - depending on guest configuration - have two IOMMU windows
-> > > > > for each guest PCI domain.  In theory the guest can set these up
-> > > > > however it wants, in practice there's usually a small (~256MiB) at PCI
-> > > > > address 0 for the benefit of 32-bit PCI devices, then a much larger
-> > > > > window up at a high address to allow better performance for 64-bit
-> > > > > capable devices.
-> > > > > 
-> > > > > Those are the same IOMMU in the sense that they're both implemented by
-> > > > > logic built into the same virtual PCI host bridge.  However, they're
-> > > > > different IOMMUs in the sense that they have independent data
-> > > > > structures describing the mappings and are currently modelled as two
-> > > > > different IOMMU memory regions.
-
-[1]
-
-> > > > > 
-> > > > > 
-> > > > > I don't believe we have any existing platforms with both an IOMMU and
-> > > > > a direct mapped window in a device's address space.  But it seems to
-> > > > > be just too plausible a setup to not plan for it. [1]
-> > > > > 
-> > > > > > This patch derived from a requirement in virt-svm project (on x86).
-> > > > > > Virt-svm needs some notification mechanism for each IOMMU (or say, the
-> > > > > > IOMMU that managers the SVM-enabled device). For now, all IOMMU
-> > > > > > notifiers are per-memory-region not per-iommu, and that's imho not
-> > > > > > what virt-svm wants. Any suggestions?
-> > > > > 
-> > > > > I don't know SVM, so I can't really make sense of that.  What format
-> > > > > does this identifier need?  What does "for one IOMMU" mean in this
-> > > > > context - i.e. what guest observable properties require the IDs to be
-> > > > > the same or to be different.
-> > > > 
-> > > > Virt-svm should need to trap the content of a register (actually the
-> > > > data is in the memory, but, let's assume it's a mmio operation for
-> > > > simplicity, considering it is finally delivered via invalidation
-> > > > requests), then pass that info down to kernel. So the listened element
-> > > > is per-iommu not per-mr this time. When the content changed, vfio will
-> > > > need to be notified, then pass this info down.
-> > > 
-> > > I don't entirely follow what you're saying.  When the virtual hardware
-> > > gets an invalidate request, it looks up the unit to invalidate in
-> > > memory?  Which component gets to decide that ID?  How is it advertised
-> > > to the guest OS?
-> > > 
-> > > If your ID is tied to the AS now, you could just iterate through the
-> > > AS and invalidate any IOMMU MRs that are present within it.
-> > > 
-> > > Alternatively, if the ID is tied to something more concrete, like a
-> > > specific PCI host bridge (which incorporates the IOMMU logic), then
-> > > that device probably already has a handle on the right IOMMU MR to
-> > > invalidate it.
-> > 
-> > Sorry to be unclear on the requirement. I don't know what's the ID you
-> > mentioned above... Anyway, let me try to further simplify the use
-> > case.
+On Thu, May 25, 2017 at 09:28:57AM +0300, Alexey Perevalov wrote:
+> On 05/25/2017 02:30 AM, Peter Xu wrote:
+> >On Wed, May 24, 2017 at 03:16:23PM +0300, Alexey Perevalov wrote:
+> >>On 05/24/2017 03:01 PM, Peter Xu wrote:
+> >>>On Wed, May 24, 2017 at 10:56:37AM +0300, Alexey wrote:
+> >>>>On Wed, May 24, 2017 at 02:57:36PM +0800, Peter Xu wrote:
+> >>>>>On Tue, May 23, 2017 at 02:31:08PM +0300, Alexey Perevalov wrote:
+> >>>>>>This patch adds ability to track down already copied
+> >>>>>>pages, it's necessary for calculation vCPU block time in
+> >>>>>>postcopy migration feature and maybe for restore after
+> >>>>>>postcopy migration failure.
+> >>>>>>
+> >>>>>>Functions which work with RAMBlock are placed into ram.c,
+> >>>>>>due to TARGET_WORDS_BIGENDIAN is poisoned int postcopy-ram.c -
+> >>>>>>hardware independed code.
+> >>>>>>
+> >>>>>>Signed-off-by: Alexey Perevalov <a.perevalov@samsung.com>
+> >>>>>>---
+> >>>>>>  include/migration/migration.h | 16 +++++++++++
+> >>>>>>  migration/postcopy-ram.c      | 22 ++++++++++++---
+> >>>>>>  migration/ram.c               | 63 +++++++++++++++++++++++++++++++++++++++++++
+> >>>>>>  3 files changed, 97 insertions(+), 4 deletions(-)
+> >>>>>>
+> >>>>>>diff --git a/include/migration/migration.h b/include/migration/migration.h
+> >>>>>>index 449cb07..4e05c83 100644
+> >>>>>>--- a/include/migration/migration.h
+> >>>>>>+++ b/include/migration/migration.h
+> >>>>>>@@ -101,6 +101,20 @@ struct MigrationIncomingState {
+> >>>>>>      LoadStateEntry_Head loadvm_handlers;
+> >>>>>>      /*
+> >>>>>>+     * bitmap indicates whether page copied,
+> >>>>>>+     * based on ramblock offset
+> >>>>>>+     * now it is using only for blocktime calculation in
+> >>>>>>+     * postcopy migration, so livetime of this entry:
+> >>>>>>+     * since user requested blocktime calculation,
+> >>>>>>+     * till the end of postcopy migration
+> >>>>>>+     * as an example it could represend following memory map
+> >>>>>>+     * ___________________________________
+> >>>>>>+     * |4k pages | hugepages | 4k pages
+> >>>>>Can we really do this?
+> >>>>>The problem is AFAIU migration stream is sending pages only in target
+> >>>>>page size, even for huge pages... so even for huge pages we should
+> >>>>>still need per TARGET_PAGE_SIZE bitmap?
+> >>>>sending maybe, but copying to userfault fd is doing in hugepage size
+> >>>Yes you are right. :)
+> >>>
+> >>>>in case of hugetlbfs memory backend.
+> >>>>>(Please refer to ram_state_init() on init of RAMBlock.bmap)
+> >>>>I thought to use bitmap per ramblock, but I decided to not do it,
+> >>>>because of following reasons:
+> >>>>	1. There is only 4k ramblocks, for such ramblock it's not
+> >>>>	optimal
+> >>>Could you explain what do you mean by "there is only 4k ramblocks"?
+> >>sorry, could be ramblocks with 4k size,
+> >>as example, your's qemu hmp info ramblock shows
+> >>  Block Name    PSize              Offset Used              Total
+> >>             /objects/mem    2 MiB  0x0000000000000000 0x0000000020000000
+> >>0x0000000020000000
+> >>                 vga.vram    4 KiB  0x0000000020060000 0x0000000001000000
+> >>0x0000000001000000
+> >>     /rom@etc/acpi/tables    4 KiB  0x0000000021130000 0x0000000000020000
+> >>0x0000000000200000
+> >>                  pc.bios    4 KiB  0x0000000020000000 0x0000000000040000
+> >>0x0000000000040000
+> >>   0000:00:03.0/e1000.rom    4 KiB  0x0000000021070000 0x0000000000040000
+> >>0x0000000000040000
+> >>   0000:00:04.0/e1000.rom    4 KiB  0x00000000210b0000 0x0000000000040000
+> >>0x0000000000040000
+> >>   0000:00:05.0/e1000.rom    4 KiB  0x00000000210f0000 0x0000000000040000
+> >>0x0000000000040000
+> >>                   pc.rom    4 KiB  0x0000000020040000 0x0000000000020000
+> >>0x0000000000020000
+> >>     0000:00:02.0/vga.rom    4 KiB  0x0000000021060000 0x0000000000010000
+> >>0x0000000000010000
+> >>    /rom@etc/table-loader    4 KiB  0x0000000021330000 0x0000000000001000
+> >>0x0000000000001000
+> >>       /rom@etc/acpi/rsdp    4 KiB  0x0000000021331000 0x0000000000001000
+> >>0x0000000000001000
+> >>
+> >>/rom@etc/table-loader and /rom@etc/acpi/rsdp has only one 4K page.
+> >I see. Thanks for explaining this.
+> >
+> >A 4k sized ramblock means the bitmap would be only one unsigned long
+> >width (via bitmap_new(1)). I still don't see why it's not good... :-)
+> >
+> Ok, I'll take into account your comment, and I'll place copied
 > 
-> Right, the ID was me guessing badly at what's going on here, so I
-> think it confused rather than clarifying.
-> 
-> > Just assume we have such a requirement: when one register of vIOMMU
-> > changes, we need to pass this register data to the hardware IOMMU by
-> > some way. And, let's assume this is a notification mechanism, so that
-> > every device in the system can listen to this register change, then
-> > capture what has changed to what. Here the point is, in all cases this
-> > event is not related to memory region at all. So imho we need some
-> > other way to do it besides memory region IOMMU notifiers.
-> 
-> Ok.  So is this right?
-> 	* You have a single bank of vIOMMU registers
-> 	* Which control two (or more) IOMMU regions in in the guest's
->           address space
-> 	* Assuming the host also has an AMD IOMMU, those will be
->           backed by a single IOMMU on the host ("single" meaning
->           controlled by a single bank of host registers)
-> 
-> I'm assuming the guest IOMMU code must know which IOMMU regions it is
-> managing, so getting from the guest registers to the set of IOMMU MRs
-> should be easy.
-> 
-> What's the operation that needs to happen on the host IOMMU, in terms
-> of the VFIO IOMMU interface?
+> bitmap into RAMBlock.
 
-(Sorry to respond so late...)
+Or we can wait for further comments in case you'll do extra work. :-)
 
-It'll pass the captured data downward to host IOMMU in some way.
-
-IMHO if we are discussing the notifier thing only, we don't really
-need to know what would it do after it gets the data. The point is how
-we should define this kind if notifies, which differs from current
-memory region based notifiers.
-
-> 
-> Is this inherently only possible if both host and guest have an AMD
-> IOMMU?  Could it be made to work if the guest had an AMD IOMMU but the
-> host had an Intel one, or the other way around?
-> 
-> Would it make sense to have a single IOMMU MR in the guest, but
-> instead of mapping it whole into the guest address space, have two
-> (or more) alias MRs in the AS which each allow access to a portion of
-> the IOMMU MR?
-
-For these questions, again I don't know whether it'll affect how we
-design a notifier mechanism to the remapping unit... Would it really?
-Or maybe I missed anything?
-
-Till now, after I know the case for SPAPR you have explained [1]
-(thanks btw!), could I say that these multiple IOMMU windows still be
-backed by some unified hardware in the PCI host bridge? Can that be
-the so-called single "IOMMU" object behind that device? And, would it
-possible that we might have similar requirement in the future just
-like what Yi has met with virt-svm? (I don't know whether Power would
-support SVM or similar, but I guess ARM should support it?)
-
-I am just thinking how we can define a better and general (for all
-platforms) IOMMU model in QEMU that can best suite our needs. And
-currently that should be a model that can satisfy Yi's requirement.
+Just to mention that Dave won't be here until next week, so you may
+need to wait for some days until he can provide some further input.
 
 Thanks,
 
