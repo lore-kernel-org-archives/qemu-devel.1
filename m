@@ -1,22 +1,50 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40911)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43263)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dDyoS-0006OS-Ft
-	for qemu-devel@nongnu.org; Thu, 25 May 2017 15:52:49 -0400
+	(envelope-from <joserz@linux.vnet.ibm.com>) id 1dDz1E-0003Ko-Sy
+	for qemu-devel@nongnu.org; Thu, 25 May 2017 16:06:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dDyoR-0007fE-E2
-	for qemu-devel@nongnu.org; Thu, 25 May 2017 15:52:48 -0400
-References: <20170525163851.8047-1-berrange@redhat.com>
-	<20170525163851.8047-20-berrange@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <1acec55c-fd89-ee9d-0082-372a6e967036@redhat.com>
-Date: Thu, 25 May 2017 14:52:30 -0500
+	(envelope-from <joserz@linux.vnet.ibm.com>) id 1dDz19-0003up-Mb
+	for qemu-devel@nongnu.org; Thu, 25 May 2017 16:06:00 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:45152
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <joserz@linux.vnet.ibm.com>)
+	id 1dDz19-0003uW-An
+	for qemu-devel@nongnu.org; Thu, 25 May 2017 16:05:55 -0400
+Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v4PK4hDm134773
+	for <qemu-devel@nongnu.org>; Thu, 25 May 2017 16:05:54 -0400
+Received: from e24smtp04.br.ibm.com (e24smtp04.br.ibm.com [32.104.18.25])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2ap5vg09xj-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Thu, 25 May 2017 16:05:53 -0400
+Received: from localhost
+	by e24smtp04.br.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <joserz@linux.vnet.ibm.com>;
+	Thu, 25 May 2017 17:05:51 -0300
+Received: from d24av04.br.ibm.com (d24av04.br.ibm.com [9.8.31.97])
+	by d24relay04.br.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+	v4PK5nDb34078840
+	for <qemu-devel@nongnu.org>; Thu, 25 May 2017 17:05:50 -0300
+Received: from d24av04.br.ibm.com (localhost [127.0.0.1])
+	by d24av04.br.ibm.com (8.14.4/8.14.4/NCO v10.0 AVout) with ESMTP id
+	v4PK5n9s031781
+	for <qemu-devel@nongnu.org>; Thu, 25 May 2017 17:05:49 -0300
+Date: Thu, 25 May 2017 17:05:37 -0300
+From: joserz@linux.vnet.ibm.com
+References: <mailman.73115.1495441935.22737.qemu-devel@nongnu.org>
+	<BBC4E515-FE7D-4600-A5CA-BBCE26059415@gmail.com>
+	<87efvghzb9.fsf@abhimanyu.i-did-not-set--mail-host-address--so-tickle-me>
+	<20170524023303.GA12163@pacoca>
 MIME-Version: 1.0
-In-Reply-To: <20170525163851.8047-20-berrange@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="ogUxFnpF7Uj0cAeM26oO48wFVid7Tl4ik"
-Subject: Re: [Qemu-devel] [PATCH v7 19/20] qcow2: report encryption specific
- image information
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20170524023303.GA12163@pacoca>
+Message-Id: <20170525200537.GA12666@pacoca>
+Subject: Re: [Qemu-devel] [PATCH risu] ppc64: Fix patterns for rotate
+ doubleword instructions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,144 +53,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Alberto Garcia <berto@igalia.com>, Markus Armbruster <armbru@redhat.com>
+To: programmingkidx@gmail.com
+Cc: Peter Maydell <peter.maydell@linaro.org>, Sandipan Das <sandipandas1990@gmail.com>, "qemu-devel@nongnu.org qemu-devel" <qemu-devel@nongnu.org>, aNikunj A Dadhania <nikunj@linux.vnet.ibm.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---ogUxFnpF7Uj0cAeM26oO48wFVid7Tl4ik
-From: Eric Blake <eblake@redhat.com>
-To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>,
- Kevin Wolf <kwolf@redhat.com>, Alberto Garcia <berto@igalia.com>,
- Markus Armbruster <armbru@redhat.com>
-Message-ID: <1acec55c-fd89-ee9d-0082-372a6e967036@redhat.com>
-Subject: Re: [PATCH v7 19/20] qcow2: report encryption specific image
- information
-References: <20170525163851.8047-1-berrange@redhat.com>
- <20170525163851.8047-20-berrange@redhat.com>
-In-Reply-To: <20170525163851.8047-20-berrange@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On Tue, May 23, 2017 at 11:33:03PM -0300, joserz@linux.vnet.ibm.com wrote:
+> On Tue, May 23, 2017 at 11:47:30AM +0530, Nikunj A Dadhania wrote:
+> > G 3 <programmingkidx@gmail.com> writes:
+> > 
+> > > On May 22, 2017, at 4:32 AM, qemu-devel-request@nongnu.org wrote:
+> > >
+> > > Hello I have also done some work risu. My patches add ppc32 support.  
+> > > Well my patches were made to work with Mac OS X but they are required  
+> > > to work with Linux. Do you think you could help port these patches to  
+> > > Linux?
+> > 
+> > Ziviani did the ppc64 work, lets see if he can spare some time.
+> > 
+> > The patches haven't come right on the mailing list, its tedious to pull
+> > them. Please resend them with git send-mail.
+> > 
+> 
+> Hey, sure I can help. I'll take a look on them.
+> 
+> > >
+> > > ppc.risu:
+> > > https://patchwork.kernel.org/patch/9697489/
 
-On 05/25/2017 11:38 AM, Daniel P. Berrange wrote:
-> Currently 'qemu-img info' reports a simple "encrypted: yes"
-> field. This is not very useful now that qcow2 can support
-> multiple encryption formats. Users want to know which format
-> is in use and some data related to it.
->=20
-> Wire up usage of the qcrypto_block_get_info() method so that
-> 'qemu-img info' can report about the encryption format
-> and parameters in use
->=20
+Hi John,
 
-> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
-> ---
->  block/qcow2.c        | 35 ++++++++++++++++++++++++++++++++++-
->  qapi/block-core.json | 24 +++++++++++++++++++++++-
->  2 files changed, 57 insertions(+), 2 deletions(-)
->=20
-> diff --git a/block/qcow2.c b/block/qcow2.c
-> index 38f9eb5..cb321a2 100644
-> --- a/block/qcow2.c
-> +++ b/block/qcow2.c
-> @@ -3196,8 +3196,17 @@ static int qcow2_get_info(BlockDriverState *bs, =
-BlockDriverInfo *bdi)
->  static ImageInfoSpecific *qcow2_get_specific_info(BlockDriverState *bs=
-)
->  {
->      BDRVQcow2State *s =3D bs->opaque;
-> -    ImageInfoSpecific *spec_info =3D g_new(ImageInfoSpecific, 1);
-> +    ImageInfoSpecific *spec_info;
-> +    QCryptoBlockInfo *encrypt_info =3D NULL;
-> =20
-> +    if (s->crypto !=3D NULL) {
-> +        encrypt_info =3D qcrypto_block_get_info(s->crypto, NULL);
+What do you think about sharing the same ppc64.risu file to ppc and ppc64/ppc64le. Then, instead of:
 
-Worth using &error_abort instead of silently ignoring the error?  Is an
-error even possible in our output visitor [adding Markus for reference]?
+<NAME> PPC64LE 01111...
 
-> +        if (!encrypt_info) {
-> +            return NULL;
-> +        }
+we'd have:
 
-If you use &error_abort, this is a dead check.
+<NAME> PPC 01111...
 
-> +    }
-> +
-> +    spec_info =3D g_new(ImageInfoSpecific, 1);
->      *spec_info =3D (ImageInfoSpecific){
->          .type  =3D IMAGE_INFO_SPECIFIC_KIND_QCOW2,
->          .u.qcow2.data =3D g_new(ImageInfoSpecificQCow2, 1),
-> @@ -3224,6 +3233,30 @@ static ImageInfoSpecific *qcow2_get_specific_inf=
-o(BlockDriverState *bs)
->          assert(false);
->      }
-> =20
-> +    if (encrypt_info) {
-> +        ImageInfoSpecificQCow2Encryption *qencrypt =3D
-> +            g_new(ImageInfoSpecificQCow2Encryption, 1);
-> +        switch (encrypt_info->format) {
-> +        case Q_CRYPTO_BLOCK_FORMAT_QCOW:
-> +            qencrypt->format =3D BLOCKDEV_QCOW2_ENCRYPTION_FORMAT_AES;=
+So, specific instructions would be:
 
-> +            qencrypt->u.aes =3D encrypt_info->u.qcow;
-> +            break;
-> +        case Q_CRYPTO_BLOCK_FORMAT_LUKS:
-> +            qencrypt->format =3D BLOCKDEV_QCOW2_ENCRYPTION_FORMAT_LUKS=
-;
-> +            qencrypt->u.luks =3D encrypt_info->u.luks;
-> +            break;
-> +        default:
-> +            assert(false);
-> +        }
-> +        /* Since we did shallow copy above, erase any pointers
-> +         * in the original info */
-> +        memset(&encrypt_info->u, 0, sizeof(encrypt_info->u));
-> +        qapi_free_QCryptoBlockInfo(encrypt_info);
+<NAME> PPC64LE 01111...
+<NAME> PPC64 01111...
+<NAME> PPC32 01111...
 
-Does QAPI_CLONE_MEMBERS (commit 4626a19c) make this code any easier to
-write?  Then again, malloc'ing duplicates to then free the unchanged
-original is a bit slower than stealing references from the original then
-making sure the original can be freed without problem.
+It will allow users to select the arch by using patterns like: ./risugen
+--pattern "PPC64*", or --pattern "PPC32*".
 
->  # @ImageInfoSpecificQCow2:
->  #
->  # @compat: compatibility level
-> @@ -51,7 +72,8 @@
->        'compat': 'str',
->        '*lazy-refcounts': 'bool',
->        '*corrupt': 'bool',
-> -      'refcount-bits': 'int'
-> +      'refcount-bits': 'int',
-> +      '*encrypt': 'ImageInfoSpecificQCow2Encryption'
+Finally, we could rename ppc64.risu to powerpc.risu :).
 
-Missing documentation of the @encrypt field.
+What do you think?
 
-Close!
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---ogUxFnpF7Uj0cAeM26oO48wFVid7Tl4ik
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEcBAEBCAAGBQJZJzX+AAoJEKeha0olJ0NqWVoH/jQqkY34FB1DxACxWejC1zbq
-a1JKMReER2EtRoNJVBfLu5oVBuOY3/6TTxeho+BZjPs6+0RxyBfDGHUV7edD++m0
-vzrKjXYDC4lBly0Pbld0XWqdYBR7T6r0xLCOBSuFa/3Wr33as3FV7LzfR2JfajMW
-UJwBeLh3Rz9ky4CBwQqMqfi3YspBxBiV6R4qdibMIIAF/zcLX+ZE9gNOzd/TOJw/
-Anes83slBEvEyXYKHdMCea1OUqACUt9++2+HKqEd56VYmBXqzrmblGZphkGvf0ds
-BDNBYOKLTqQwn5RRu2sLvwUKKooiDq5UEH0rTwd1iKa/R4V15bu/kCW31ogZFlw=
-=DCix
------END PGP SIGNATURE-----
-
---ogUxFnpF7Uj0cAeM26oO48wFVid7Tl4ik--
+Thanks
