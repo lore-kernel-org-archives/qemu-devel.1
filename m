@@ -1,28 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55068)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55322)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <leo@gaspard.io>) id 1dDgo9-0005Vl-QL
-	for qemu-devel@nongnu.org; Wed, 24 May 2017 20:39:18 -0400
+	(envelope-from <peterx@redhat.com>) id 1dDgpB-00064L-Hu
+	for qemu-devel@nongnu.org; Wed, 24 May 2017 20:40:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <leo@gaspard.io>) id 1dDgo6-0003p3-Ka
-	for qemu-devel@nongnu.org; Wed, 24 May 2017 20:39:17 -0400
-Received: from smtp10.smtpout.orange.fr ([80.12.242.132]:18816
-	helo=smtp.smtpout.orange.fr)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <leo@gaspard.io>) id 1dDgo6-0003Xi-4I
-	for qemu-devel@nongnu.org; Wed, 24 May 2017 20:39:14 -0400
-References: <149554993519.23396.2947622015408783770.stgit@bahia.lab.toulouse-stg.fr.ibm.com>
-	<c3f72497-76d9-7400-d701-0a6446463600@gaspard.io>
-	<20170524105432.264f2e43@bahia.ttt.fr.ibm.com>
-From: Leo Gaspard <leo@gaspard.io>
-Message-ID: <a832603e-ffc4-f277-c894-527fc8ccabd8@gaspard.io>
-Date: Thu, 25 May 2017 02:38:38 +0200
+	(envelope-from <peterx@redhat.com>) id 1dDgp8-0004Fm-Cq
+	for qemu-devel@nongnu.org; Wed, 24 May 2017 20:40:21 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:59568)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1dDgp8-0004FQ-3v
+	for qemu-devel@nongnu.org; Wed, 24 May 2017 20:40:18 -0400
+Date: Thu, 25 May 2017 08:40:07 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20170525004007.GP3873@pxdev.xzpeter.org>
+References: <1495642203-12702-1-git-send-email-felipe@nutanix.com>
+	<1495642203-12702-3-git-send-email-felipe@nutanix.com>
 MIME-Version: 1.0
-In-Reply-To: <20170524105432.264f2e43@bahia.ttt.fr.ibm.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="eFhVCAnfE9jiNn6a0Tuq527c567cuTLaJ"
-Subject: Re: [Qemu-devel] [PATCH v2 0/4] 9pfs: local: fix metadata of
- mapped-file security mode
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <1495642203-12702-3-git-send-email-felipe@nutanix.com>
+Subject: Re: [Qemu-devel] [PATCH 2/4] migration: set dirty_pages_rate before
+ autoconverge logic
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,102 +28,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>
-Cc: qemu-devel@nongnu.org, Eric Blake <eblake@redhat.com>
+To: Felipe Franciosi <felipe@nutanix.com>
+Cc: Juan Quintela <quintela@redhat.com>, "Jason J. Herne" <jjherne@linux.vnet.ibm.com>, amit Shah <amit.shah@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Malcolm Crossley <malcolm@nutanix.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---eFhVCAnfE9jiNn6a0Tuq527c567cuTLaJ
-From: Leo Gaspard <leo@gaspard.io>
-To: Greg Kurz <groug@kaod.org>
-Cc: qemu-devel@nongnu.org, Eric Blake <eblake@redhat.com>
-Message-ID: <a832603e-ffc4-f277-c894-527fc8ccabd8@gaspard.io>
-Subject: Re: [PATCH v2 0/4] 9pfs: local: fix metadata of mapped-file security
- mode
-References: <149554993519.23396.2947622015408783770.stgit@bahia.lab.toulouse-stg.fr.ibm.com>
- <c3f72497-76d9-7400-d701-0a6446463600@gaspard.io>
- <20170524105432.264f2e43@bahia.ttt.fr.ibm.com>
-In-Reply-To: <20170524105432.264f2e43@bahia.ttt.fr.ibm.com>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: quoted-printable
+On Wed, May 24, 2017 at 05:10:01PM +0100, Felipe Franciosi wrote:
+> Currently, a "period" in the RAM migration logic is at least a second
+> long and accounts for what happened since the last period (or the
+> beginning of the migration). The dirty_pages_rate counter is calculated
+> at the end this logic.
+> 
+> If the auto convergence capability is enabled from the start of the
+> migration, it won't be able to use this counter the first time around.
+> This calculates dirty_pages_rate as soon as a period is deemed over,
+> which allows for it to be used immediately.
+> 
+> Signed-off-by: Felipe Franciosi <felipe@nutanix.com>
 
-On 05/24/2017 10:54 AM, Greg Kurz wrote:
-> On Wed, 24 May 2017 00:59:29 +0200
-> Leo Gaspard <leo@gaspard.io> wrote:
->=20
->> On 05/23/2017 04:32 PM, Greg Kurz wrote:
->>> v2: - posted patch for CVE-2017-7493 separately
->>>     - other changes available in each patch changelog
->>>
->>> Leo,
->>>
->>> If you find time to test this series, I'll gladly add your Tested-by:=
- to
->>> it before merging. =20
->>
->> Just tested with a base of 2.9.0 with patches [1] [2] (from my
->> distribution), [3] (required to apply cleanly) and this patchset.
->>
->> Things appear to work as expected, and .virtfs_metadata{,_root} appear=
+You fixed the indents as well, but imho it's okay.
 
->> to be neither readable nor writable by any user.
->>
->=20
-> Shall I add your Tested-by: to the patch then ?
+Reviewed-by: Peter Xu <peterx@redhat.com>
 
-Hmm, I can't find the definition of Tested-by: on [1], but if it means
-"tested it by hand without maybe trying all possible edge cases" then I
-guess you can add it :)
+> ---
+>  migration/ram.c | 17 ++++++++++-------
+>  1 file changed, 10 insertions(+), 7 deletions(-)
+> 
+> diff --git a/migration/ram.c b/migration/ram.c
+> index 36bf720..495ecbe 100644
+> --- a/migration/ram.c
+> +++ b/migration/ram.c
+> @@ -694,6 +694,10 @@ static void migration_bitmap_sync(RAMState *rs)
+>  
+>      /* more than 1 second = 1000 millisecons */
+>      if (end_time > rs->time_last_bitmap_sync + 1000) {
+> +        /* calculate period counters */
+> +        rs->dirty_pages_rate = rs->num_dirty_pages_period * 1000
+> +            / (end_time - rs->time_last_bitmap_sync);
+> +
+>          if (migrate_auto_converge()) {
+>              /* The following detection logic can be refined later. For now:
+>                 Check to see if the dirtied bytes is 50% more than the approx.
+> @@ -702,15 +706,14 @@ static void migration_bitmap_sync(RAMState *rs)
+>                 throttling */
+>              bytes_xfer_now = ram_bytes_transferred();
+>  
+> -            if (rs->dirty_pages_rate &&
+> -               (rs->num_dirty_pages_period * TARGET_PAGE_SIZE >
+> +            if ((rs->num_dirty_pages_period * TARGET_PAGE_SIZE >
+>                     (bytes_xfer_now - rs->bytes_xfer_prev) / 2) &&
+> -               (rs->dirty_rate_high_cnt++ >= 2)) {
+> +                (rs->dirty_rate_high_cnt++ >= 2)) {
+>                      trace_migration_throttle();
+>                      rs->dirty_rate_high_cnt = 0;
+>                      mig_throttle_guest_down();
+> -             }
+> -             rs->bytes_xfer_prev = bytes_xfer_now;
+> +            }
+> +            rs->bytes_xfer_prev = bytes_xfer_now;
+>          }
+>  
+>          if (migrate_use_xbzrle()) {
+> @@ -723,8 +726,8 @@ static void migration_bitmap_sync(RAMState *rs)
+>              rs->iterations_prev = rs->iterations;
+>              rs->xbzrle_cache_miss_prev = rs->xbzrle_cache_miss;
+>          }
+> -        rs->dirty_pages_rate = rs->num_dirty_pages_period * 1000
+> -            / (end_time - rs->time_last_bitmap_sync);
+> +
+> +        /* reset period counters */
+>          rs->time_last_bitmap_sync = end_time;
+>          rs->num_dirty_pages_period = 0;
+>      }
+> -- 
+> 1.9.5
+> 
 
->> That said, one thing still bothering me with the fix in [3] is that it=
-
->> still "leaks" the host's uid/gid to the guest when a corresponding fil=
-e
->> in .virtfs_metadata is not present (while I'd have expected it to appe=
-ar
->> as root:root in the guest), but that's a separate issue, and I guess
->> retro-compatibility prevents any fixing it.
->>
->=20
-> Heh, I had a tentative patch to create root:root credentials and 0700 m=
-ode
-> bits by default... but this could indeed break some setups, so I decide=
-d
-> not to post it.
-
-Hmm, maybe adding an option to the security_model=3Dmapped-* that allows
-to run default to root:root 0700 would allow to keep retrocompat, and in
-a few versions swap the default value of the parameter? As the
-'dscript=3Dno' of -netdev type=3Dtap appears to have disappeared -- and
-broke my scripts -- in the switch to 1.9.0, I guess such a change would
-be allowed by the retrocompatibility policy of qemu?
-
-Anyway, it's fun to see you had thought of that too!
-
-Cheers,
-Leo
-
-
-[1] http://wiki.qemu.org/Contribute/SubmitAPatch
-
-
---eFhVCAnfE9jiNn6a0Tuq527c567cuTLaJ
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQGzBAEBCAAdFiEEplquSIS+CbvsrRWvilWEi2CQ+c8FAlkmJ48ACgkQilWEi2CQ
-+c+nYgv/dK5v8vJfEHq+C3sTwEdzd8pZ3N4geaGdJMGlbahE1JxVfBV6rMt1Ydo1
-mhVi0CObhP2eNKFczV4MoZ0sZJ/t5P5GTC+XYxZo+zhxM3cWpyj5DVvQdlwtMC6U
-OdRfOl7WAJh61AGOCKEzMxbJyBzdrY05s+WEng01PFsuWMuudLg2nXgTN8maTlU9
-15CEVYx2OHMDkS+wlOBRB4HZNSLyU27OYA3CMiUF55apqCKr//hIpGpqwZ+NYicU
-ytDOhpckpAp80X9aXniL+Z38KxPQZQdPheLcLNrGjl21eMb/A76ZGaJfmZhKmnuJ
-ec0q+D/pG0HA5EoObezTzGeYImroqBPCAK6ReqYivmUEQVpBENhzzC0e2mSGMsgu
-r44Bapmfp8WzXKegU4wZYfvu49VD3fAyU4+k4/v6ay7QsmJJIpdJijsf/njugjE0
-nOJMAlOwzbIdnSCUzH4Do3YmeviZZlzLZlnfrZumRzrlwrj43a8HpeMHD9Iu37m+
-qe4LBS3A
-=blLh
------END PGP SIGNATURE-----
-
---eFhVCAnfE9jiNn6a0Tuq527c567cuTLaJ--
+-- 
+Peter Xu
