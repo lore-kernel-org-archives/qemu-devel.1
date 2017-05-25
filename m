@@ -1,24 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41827)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41874)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <programmingkidx@gmail.com>) id 1dDv90-00004r-FS
-	for qemu-devel@nongnu.org; Thu, 25 May 2017 11:57:47 -0400
+	(envelope-from <maxime.coquelin@redhat.com>) id 1dDv9A-0000CI-Au
+	for qemu-devel@nongnu.org; Thu, 25 May 2017 11:57:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <programmingkidx@gmail.com>) id 1dDv8x-0006Ne-EA
-	for qemu-devel@nongnu.org; Thu, 25 May 2017 11:57:46 -0400
-Received: from mail-io0-x229.google.com ([2607:f8b0:4001:c06::229]:34027)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <programmingkidx@gmail.com>)
-	id 1dDv8x-0006MS-8j
-	for qemu-devel@nongnu.org; Thu, 25 May 2017 11:57:43 -0400
-Received: by mail-io0-x229.google.com with SMTP id k91so139263992ioi.1
-	for <qemu-devel@nongnu.org>; Thu, 25 May 2017 08:57:42 -0700 (PDT)
-From: Programmingkid <programmingkidx@gmail.com>
-Content-Type: text/plain; charset=iso-8859-1
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 25 May 2017 11:57:36 -0400
-Message-Id: <105DDEA9-0ABE-4D00-A493-A1666783337B@gmail.com>
-Mime-Version: 1.0 (Apple Message framework v1084)
-Subject: [Qemu-devel] Bug report: qmp_stop() freezes QEMU
+	(envelope-from <maxime.coquelin@redhat.com>) id 1dDv97-0006ai-9d
+	for qemu-devel@nongnu.org; Thu, 25 May 2017 11:57:56 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:51746)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <maxime.coquelin@redhat.com>)
+	id 1dDv97-0006ZD-3o
+	for qemu-devel@nongnu.org; Thu, 25 May 2017 11:57:53 -0400
+References: <20170524090520.321-1-maxime.coquelin@redhat.com>
+	<20170525005724-mutt-send-email-mst@kernel.org>
+From: Maxime Coquelin <maxime.coquelin@redhat.com>
+Message-ID: <3f613ef1-0d8b-3d68-ac9d-a3a5c019df26@redhat.com>
+Date: Thu, 25 May 2017 17:57:43 +0200
+MIME-Version: 1.0
+In-Reply-To: <20170525005724-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2] vhost-user: pass message as a pointer
+ to process_message_reply()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,45 +30,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel qemu-devel <qemu-devel@nongnu.org>
-Cc: Peter Maydell <peter.maydell@linaro.org>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: zhiyong.yang@intel.com, qemu-devel@nongnu.org, jfreiman@redhat.com, marcandre.lureau@redhat.com
 
-=46rom the cocoa interface when I select pause QEMU doesn't pause. =
-Instead QEMU freezes. I have traced the problem to the qmp_stop() =
-function. Here is the stack trace:
 
-+                                                                        =
-                           2433 -[QemuCocoaAppController pauseQEMU:]  =
-(in qemu-system-ppc) + 30  [0x1003c9a34]  cocoa.m:1049
-    +                                                                    =
-                                 2433 qmp_stop  (in qemu-system-ppc) + =
-105  [0x100203b0d]  qmp.c:102
-    +                                                                    =
-                                   2433 vm_stop  (in qemu-system-ppc) + =
-57  [0x100059326]  cpus.c:1798
-    +                                                                    =
-                                     2433 do_vm_stop  (in =
-qemu-system-ppc) + 37  [0x100057bf3]  cpus.c:930
-    +                                                                    =
-                                       2433 pause_all_vcpus  (in =
-qemu-system-ppc) + 119  [0x100058c36]  cpus.c:1611
-    +                                                                    =
-                                         2433 qemu_cond_wait  (in =
-qemu-system-ppc) + 47  [0x1004f1855]
-    +                                                                    =
-                                           2433 _pthread_cond_wait  (in =
-libSystem.B.dylib) + 1286  [0x7fff82521881]
-    +                                                                    =
-                                             2433 __semwait_signal  (in =
-libSystem.B.dylib) + 10  [0x7fff8251da6a]
 
-I did use git bisect to find the problem but there were several patches =
-that seem to prevent OpenBIOS from running so finding the exact cause of =
-the problem is difficult. The closest problem patch that may be related =
-to this issue is this one:
+On 05/24/2017 11:58 PM, Michael S. Tsirkin wrote:
+> On Wed, May 24, 2017 at 11:05:20AM +0200, Maxime Coquelin wrote:
+>> process_message_reply() was recently updated to get full message
+>> content instead of only its request field.
+>>
+>> There is no need to copy all the struct content into the stack,
+>> so just pass its pointer as const.
+>>
+>> Cc: Zhiyong Yang <zhiyong.yang@intel.com>
+>> Fixes: 60cd11024f41 ("hw/virtio: fix vhost user fails to startup when MQ")
+>> Reviewed-by: Jens Freimann <jfreiman@redhat.com>
+>> Reviewed-by: Zhiyong Yang <zhiyong.yang@intel.com>
+>> Signed-off-by: Maxime Coquelin <maxime.coquelin@redhat.com>
+> 
+> Why "Fixes"? It's not a bugfix, is it? Passing a pointer is
+> slightly cleaner but it's not a big deal IMHO. I'll apply
+> but would like to get clarification on this tag.
 
-commit 8bb93c6f99a42c2e0943bc904b283cd622d302c5
-Author: Alex Benn=E9e <alex.bennee@linaro.org>
-Date:   Wed Mar 15 14:48:25 2017 +0000
+Right, this is not a bug fix.
+I noticed this while rebasing my Vhost-user IOMMU series,
+which will call this function much more often than currently.
+That said, I haven't done any measurements, and I don't believe it
+will have a noticeable impact.
 
-    ui/console: ensure graphic updates don't race with TCG vCPUs
+Feel free to remove the "Fixes:" line when applying, or I can resend
+if you prefer.
+
+Maxime
