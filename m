@@ -1,27 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41874)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44048)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <maxime.coquelin@redhat.com>) id 1dDv9A-0000CI-Au
-	for qemu-devel@nongnu.org; Thu, 25 May 2017 11:57:57 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1dDvEj-0005bk-6e
+	for qemu-devel@nongnu.org; Thu, 25 May 2017 12:03:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <maxime.coquelin@redhat.com>) id 1dDv97-0006ai-9d
-	for qemu-devel@nongnu.org; Thu, 25 May 2017 11:57:56 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:51746)
+	(envelope-from <pbonzini@redhat.com>) id 1dDvEg-0000Ov-4V
+	for qemu-devel@nongnu.org; Thu, 25 May 2017 12:03:41 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:51446)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <maxime.coquelin@redhat.com>)
-	id 1dDv97-0006ZD-3o
-	for qemu-devel@nongnu.org; Thu, 25 May 2017 11:57:53 -0400
-References: <20170524090520.321-1-maxime.coquelin@redhat.com>
-	<20170525005724-mutt-send-email-mst@kernel.org>
-From: Maxime Coquelin <maxime.coquelin@redhat.com>
-Message-ID: <3f613ef1-0d8b-3d68-ac9d-a3a5c019df26@redhat.com>
-Date: Thu, 25 May 2017 17:57:43 +0200
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1dDvEf-0000Oi-Vc
+	for qemu-devel@nongnu.org; Thu, 25 May 2017 12:03:38 -0400
+References: <20170525031936.8449-1-xiaoguangrong@tencent.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <210485b2-c6f5-2f57-f196-dc1b25bbe243@redhat.com>
+Date: Thu, 25 May 2017 18:03:32 +0200
 MIME-Version: 1.0
-In-Reply-To: <20170525005724-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <20170525031936.8449-1-xiaoguangrong@tencent.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2] vhost-user: pass message as a pointer
- to process_message_reply()
+Subject: Re: [Qemu-devel] [PATCH] qtest: add rtc periodic timer test
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,36 +27,21 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: zhiyong.yang@intel.com, qemu-devel@nongnu.org, jfreiman@redhat.com, marcandre.lureau@redhat.com
+To: guangrong.xiao@gmail.com, mst@redhat.com, mtosatti@redhat.com
+Cc: qemu-devel@nongnu.org, kvm@vger.kernel.org, Xiao Guangrong <xiaoguangrong@tencent.com>
 
 
 
-On 05/24/2017 11:58 PM, Michael S. Tsirkin wrote:
-> On Wed, May 24, 2017 at 11:05:20AM +0200, Maxime Coquelin wrote:
->> process_message_reply() was recently updated to get full message
->> content instead of only its request field.
->>
->> There is no need to copy all the struct content into the stack,
->> so just pass its pointer as const.
->>
->> Cc: Zhiyong Yang <zhiyong.yang@intel.com>
->> Fixes: 60cd11024f41 ("hw/virtio: fix vhost user fails to startup when MQ")
->> Reviewed-by: Jens Freimann <jfreiman@redhat.com>
->> Reviewed-by: Zhiyong Yang <zhiyong.yang@intel.com>
->> Signed-off-by: Maxime Coquelin <maxime.coquelin@redhat.com>
+On 25/05/2017 05:19, guangrong.xiao@gmail.com wrote:
 > 
-> Why "Fixes"? It's not a bugfix, is it? Passing a pointer is
-> slightly cleaner but it's not a big deal IMHO. I'll apply
-> but would like to get clarification on this tag.
+> Note: as qemu needs a precise timer to drive its rtc timer callbacks,
+> that means clock=vm is not suitable for us as it's driven by icount
+> for qtest, so that we use clock=host instead, it is why we put the
+> periodic timer test separately without mixing with rtc-test
 
-Right, this is not a bug fix.
-I noticed this while rebasing my Vhost-user IOMMU series,
-which will call this function much more often than currently.
-That said, I haven't done any measurements, and I don't believe it
-will have a noticeable impact.
+I'm not sure I understand.  Why would clock_step(1000) not be a good
+replacement for nsleep(1000)?
 
-Feel free to remove the "Fixes:" line when applying, or I can resend
-if you prefer.
+Thanks,
 
-Maxime
+Paolo
