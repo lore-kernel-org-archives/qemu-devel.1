@@ -1,27 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39153)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39531)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1dED1l-0003AF-FU
-	for qemu-devel@nongnu.org; Fri, 26 May 2017 07:03:31 -0400
+	(envelope-from <marcandre.lureau@redhat.com>) id 1dED3R-00047t-MF
+	for qemu-devel@nongnu.org; Fri, 26 May 2017 07:05:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1dED1k-0007Ba-Li
-	for qemu-devel@nongnu.org; Fri, 26 May 2017 07:03:29 -0400
-Received: from mail-lf0-x241.google.com ([2a00:1450:4010:c07::241]:33798)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1dED1k-0007Aq-FG
-	for qemu-devel@nongnu.org; Fri, 26 May 2017 07:03:28 -0400
-Received: by mail-lf0-x241.google.com with SMTP id q24so712868lfb.1
-	for <qemu-devel@nongnu.org>; Fri, 26 May 2017 04:03:28 -0700 (PDT)
+	(envelope-from <marcandre.lureau@redhat.com>) id 1dED3O-0007gr-Hf
+	for qemu-devel@nongnu.org; Fri, 26 May 2017 07:05:13 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:56316)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
+	id 1dED3O-0007gI-AD
+	for qemu-devel@nongnu.org; Fri, 26 May 2017 07:05:10 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 284B7C04BD3E
+	for <qemu-devel@nongnu.org>; Fri, 26 May 2017 11:05:09 +0000 (UTC)
+From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+Date: Fri, 26 May 2017 15:04:55 +0400
+Message-Id: <20170526110456.32004-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-References: <20170503223846.6559-1-marcandre.lureau@redhat.com>
-	<20170503223846.6559-6-marcandre.lureau@redhat.com>
-In-Reply-To: <20170503223846.6559-6-marcandre.lureau@redhat.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Fri, 26 May 2017 11:03:16 +0000
-Message-ID: <CAJ+F1CJBs_uqCNbrj4iS94p-04OC3f3_2GZ8sUichC_h=9PHbg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v5 5/5] dump: fix memory_mapping_filter leak
+Subject: [Qemu-devel] [PATCH] numa-test: fix query-cpus leaks
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,42 +31,102 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, wencongyang@gmail.com
+To: qemu-devel@nongnu.org
+Cc: imammedo@redhat.com, ehabkost@redhat.com, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
-Hi
+Fix test leaks introduced in commit 2941020a476.
 
-On Thu, May 4, 2017 at 2:42 AM Marc-Andr=C3=A9 Lureau <
-marcandre.lureau@redhat.com> wrote:
+(and small extra space removed)
 
-> Spotted by ASAN.
->
-> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> ---
->  memory_mapping.c | 1 +
->
+Spotted by ASAN.
 
-No maintainer for this file, Wen, Paolo?
+Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+---
+ tests/numa-test.c | 14 +++++++++-----
+ 1 file changed, 9 insertions(+), 5 deletions(-)
 
-
-
->  1 file changed, 1 insertion(+)
->
-> diff --git a/memory_mapping.c b/memory_mapping.c
-> index 6a39d71da2..a5d38552a6 100644
-> --- a/memory_mapping.c
-> +++ b/memory_mapping.c
-> @@ -337,6 +337,7 @@ void memory_mapping_filter(MemoryMappingList *list,
-> int64_t begin,
->          if (cur->phys_addr >=3D begin + length ||
->              cur->phys_addr + cur->length <=3D begin) {
->              QTAILQ_REMOVE(&list->head, cur, next);
-> +            g_free(cur);
->              list->num--;
->              continue;
->          }
-> --
-> 2.12.0.191.gc5d8de91d
->
->
-> --
-Marc-Andr=C3=A9 Lureau
+diff --git a/tests/numa-test.c b/tests/numa-test.c
+index c3475d6d5e..3f636840b1 100644
+--- a/tests/numa-test.c
++++ b/tests/numa-test.c
+@@ -92,7 +92,7 @@ static QList *get_cpus(QDict **resp)
+     *resp =3D qmp("{ 'execute': 'query-cpus' }");
+     g_assert(*resp);
+     g_assert(qdict_haskey(*resp, "return"));
+-    return  qdict_get_qlist(*resp, "return");
++    return qdict_get_qlist(*resp, "return");
+ }
+=20
+ static void test_query_cpus(const void *data)
+@@ -100,7 +100,7 @@ static void test_query_cpus(const void *data)
+     char *cli;
+     QDict *resp;
+     QList *cpus;
+-    const QObject *e;
++    QObject *e;
+=20
+     cli =3D make_cli(data, "-smp 8 -numa node,cpus=3D0-3 -numa node,cpus=
+=3D4-7");
+     qtest_start(cli);
+@@ -124,6 +124,7 @@ static void test_query_cpus(const void *data)
+         } else {
+             g_assert_cmpint(node, =3D=3D, 1);
+         }
++        qobject_decref(e);
+     }
+=20
+     QDECREF(resp);
+@@ -136,7 +137,7 @@ static void pc_numa_cpu(const void *data)
+     char *cli;
+     QDict *resp;
+     QList *cpus;
+-    const QObject *e;
++    QObject *e;
+=20
+     cli =3D make_cli(data, "-cpu pentium -smp 8,sockets=3D2,cores=3D2,th=
+reads=3D2 "
+         "-numa node,nodeid=3D0 -numa node,nodeid=3D1 "
+@@ -176,6 +177,7 @@ static void pc_numa_cpu(const void *data)
+         } else {
+             g_assert(false);
+         }
++        qobject_decref(e);
+     }
+=20
+     QDECREF(resp);
+@@ -188,7 +190,7 @@ static void spapr_numa_cpu(const void *data)
+     char *cli;
+     QDict *resp;
+     QList *cpus;
+-    const QObject *e;
++    QObject *e;
+=20
+     cli =3D make_cli(data, "-smp 4,cores=3D4 "
+         "-numa node,nodeid=3D0 -numa node,nodeid=3D1 "
+@@ -220,6 +222,7 @@ static void spapr_numa_cpu(const void *data)
+         } else {
+             g_assert(false);
+         }
++        qobject_decref(e);
+     }
+=20
+     QDECREF(resp);
+@@ -232,7 +235,7 @@ static void aarch64_numa_cpu(const void *data)
+     char *cli;
+     QDict *resp;
+     QList *cpus;
+-    const QObject *e;
++    QObject *e;
+=20
+     cli =3D make_cli(data, "-smp 2 "
+         "-numa node,nodeid=3D0 -numa node,nodeid=3D1 "
+@@ -262,6 +265,7 @@ static void aarch64_numa_cpu(const void *data)
+         } else {
+             g_assert(false);
+         }
++        qobject_decref(e);
+     }
+=20
+     QDECREF(resp);
+--=20
+2.13.0.rc1.16.gd80b50c3f
