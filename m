@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43936)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44334)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dEMpn-0001L1-5L
-	for qemu-devel@nongnu.org; Fri, 26 May 2017 17:31:48 -0400
+	(envelope-from <eblake@redhat.com>) id 1dEMrs-00042J-Bc
+	for qemu-devel@nongnu.org; Fri, 26 May 2017 17:33:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dEMpm-0004zz-3H
-	for qemu-devel@nongnu.org; Fri, 26 May 2017 17:31:47 -0400
+	(envelope-from <eblake@redhat.com>) id 1dEMrr-0006Tq-FE
+	for qemu-devel@nongnu.org; Fri, 26 May 2017 17:33:56 -0400
 References: <1495830130-30611-1-git-send-email-kwolf@redhat.com>
-	<1495830130-30611-6-git-send-email-kwolf@redhat.com>
+	<1495830130-30611-7-git-send-email-kwolf@redhat.com>
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <7ca29a83-b3de-1775-0284-d208a5b3e511@redhat.com>
-Date: Fri, 26 May 2017 16:31:35 -0500
+Message-ID: <198caa5b-0416-845a-dcb8-0defa70f6847@redhat.com>
+Date: Fri, 26 May 2017 16:33:45 -0500
 MIME-Version: 1.0
-In-Reply-To: <1495830130-30611-6-git-send-email-kwolf@redhat.com>
+In-Reply-To: <1495830130-30611-7-git-send-email-kwolf@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="ts6VNggVG1jNDDWtFdOa8w9kjTF4M3x6P"
-Subject: Re: [Qemu-devel] [PATCH 05/29] qed: Remove callback from
- qed_find_cluster()
+	boundary="75VNrQnaKNBUaI1RW0rI3nMouCJWCdC70"
+Subject: Re: [Qemu-devel] [PATCH 06/29] qed: Make qed_read_backing_file()
+ synchronous
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,66 +29,30 @@ To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
 Cc: pbonzini@redhat.com, qemu-devel@nongnu.org, stefanha@redhat.com, mreitz@redhat.com
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---ts6VNggVG1jNDDWtFdOa8w9kjTF4M3x6P
+--75VNrQnaKNBUaI1RW0rI3nMouCJWCdC70
 From: Eric Blake <eblake@redhat.com>
 To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
 Cc: pbonzini@redhat.com, qemu-devel@nongnu.org, stefanha@redhat.com,
  mreitz@redhat.com
-Message-ID: <7ca29a83-b3de-1775-0284-d208a5b3e511@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 05/29] qed: Remove callback from
- qed_find_cluster()
+Message-ID: <198caa5b-0416-845a-dcb8-0defa70f6847@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 06/29] qed: Make qed_read_backing_file()
+ synchronous
 References: <1495830130-30611-1-git-send-email-kwolf@redhat.com>
- <1495830130-30611-6-git-send-email-kwolf@redhat.com>
-In-Reply-To: <1495830130-30611-6-git-send-email-kwolf@redhat.com>
+ <1495830130-30611-7-git-send-email-kwolf@redhat.com>
+In-Reply-To: <1495830130-30611-7-git-send-email-kwolf@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
 On 05/26/2017 03:21 PM, Kevin Wolf wrote:
+> Note that this code is generally not running in coroutine context, so
+> this is an actual blocking synchronous operation. We'll fix this in a
+> moment.
+>=20
 > Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 > ---
->  block/qed-cluster.c | 39 ++++++++++++++++++++++-----------------
->  block/qed.c         | 20 +++++++++++---------
->  block/qed.h         |  4 ++--
->  3 files changed, 35 insertions(+), 28 deletions(-)
+>  block/qed.c | 32 ++++++++++++++++++--------------
+>  1 file changed, 18 insertions(+), 14 deletions(-)
 >=20
-
-This diffstat is not as slick as the earlier patches, but the cleanup is
-still worthwhile.
-
-> @@ -93,16 +98,16 @@ void qed_find_cluster(BDRVQEDState *s, QEDRequest *=
-request, uint64_t pos,
->      /* Limit length to L2 boundary.  Requests are broken up at the L2 =
-boundary
->       * so that a request acts on one L2 table at a time.
->       */
-> -    len =3D MIN(len, (((pos >> s->l1_shift) + 1) << s->l1_shift) - pos=
-);
-> +    *len =3D MIN(*len, (((pos >> s->l1_shift) + 1) << s->l1_shift) - p=
-os);
-
-Perhaps a separate cleanup, but wouldn't this be easier to read as:
-*len =3D MIN(*len, QEMU_ALIGN_UP(pos, 1ULL << s->l1_shift) - pos);
-
-(or if there is a direct variable for l1 size, rather than '1ULL <<
-s->l1_shift')
-
-> +++ b/block/qed.h
-> @@ -247,8 +247,8 @@ int qed_write_l2_table_sync(BDRVQEDState *s, QEDReq=
-uest *request,
->  /**
->   * Cluster functions
->   */
-> -void qed_find_cluster(BDRVQEDState *s, QEDRequest *request, uint64_t p=
-os,
-> -                      size_t len, QEDFindClusterFunc *cb, void *opaque=
-);
-> +int qed_find_cluster(BDRVQEDState *s, QEDRequest *request, uint64_t po=
-s,
-> +                     size_t *len, uint64_t *img_offset);
-
-While we're touching this, would it be better to switch to an
-always-64-bit type, rather than using platform-dependent size_t for len?
- But even so, that cleanup would be a separate patch.
 
 Reviewed-by: Eric Blake <eblake@redhat.com>
 
@@ -98,7 +62,7 @@ Red Hat, Inc.           +1-919-301-3266
 Virtualization:  qemu.org | libvirt.org
 
 
---ts6VNggVG1jNDDWtFdOa8w9kjTF4M3x6P
+--75VNrQnaKNBUaI1RW0rI3nMouCJWCdC70
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
@@ -108,13 +72,13 @@ Version: GnuPG v2
 Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
 Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQEcBAEBCAAGBQJZKJ63AAoJEKeha0olJ0Nq8r8IAICkq4cEkeG0RrHc2DcOEMHi
-BKU9Pn0qkfpOKDv3Xg4RFP5g8FN0pfrHVdSyfFiniBVB3GdgT6W4qm/hfboZMdj9
-Z4S/W13WvStg8Fv3wgrIFOb2GOqOtMaZcBULo3E69j8ibdsWRb62puG8YB1tgXwB
-XVcEiwGNzK7+KxZD/fPSPgfEfZCejJ6Kswf4itFHdrCMn/7tFXOIc9JUma0Htxu/
-hmsBNZ3Ltd94HDAF31nsSx2XG6+1c9CWAs34eERMe+39OLECOfcnQx0nuWxA4gcY
-im+abYoTnFygY9owIOlJbVobK2A+iFEYr9I2K2Kv9o8WYfaMTEMnekm8pAdvwts=
-=n4Jt
+iQEcBAEBCAAGBQJZKJ85AAoJEKeha0olJ0NqDMYH/i/2PsA5UgUSLEd00YWElQUn
+5300f6uS/7I0MWkXhYYL7Khl4tLgdS5UQYzcP5y1eZ5cJssvhmBiqW2EOVmJ8CVb
+htNW6jn0/aOWmGx23lhEQOx3TvjjRHeQTCxV0dmqZ656Z8zK2bCDe7Syb89TyiBG
+gDCEr3KoZAy4oddbWXRIEqhnP1VGuN7OaUc29MAf8jjXuXCenY4Z1dVp4qmA37N8
+DXI1IKhEh+tXrNiW0m7t0KmMw10uOCwJatjBW9bN2GMirESv+rDjucInS3XIxl2y
+SQJf23ujMqN5rUPnJyuUC7wXewwZivpd1GjNIx8setHqDDBN0eKoT2TGKB4LYlY=
+=68yn
 -----END PGP SIGNATURE-----
 
---ts6VNggVG1jNDDWtFdOa8w9kjTF4M3x6P--
+--75VNrQnaKNBUaI1RW0rI3nMouCJWCdC70--
