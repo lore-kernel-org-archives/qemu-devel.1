@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46287)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46281)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1dEKqZ-0002U2-2k
-	for qemu-devel@nongnu.org; Fri, 26 May 2017 15:24:28 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1dEKqY-0005y9-6I
+	(envelope-from <jcody@redhat.com>) id 1dEKqY-0002Tf-PI
 	for qemu-devel@nongnu.org; Fri, 26 May 2017 15:24:27 -0400
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <jcody@redhat.com>) id 1dEKqX-0005xs-NN
+	for qemu-devel@nongnu.org; Fri, 26 May 2017 15:24:26 -0400
 From: Jeff Cody <jcody@redhat.com>
-Date: Fri, 26 May 2017 15:23:58 -0400
-Message-Id: <20170526192404.32186-7-jcody@redhat.com>
+Date: Fri, 26 May 2017 15:23:59 -0400
+Message-Id: <20170526192404.32186-8-jcody@redhat.com>
 In-Reply-To: <20170526192404.32186-1-jcody@redhat.com>
 References: <20170526192404.32186-1-jcody@redhat.com>
-Subject: [Qemu-devel] [PULL 06/12] blockjob: move iostatus reset inside
- block_job_user_resume
+Subject: [Qemu-devel] [PULL 07/12] blockjob: introduce
+ block_job_cancel_async, check iostatus invariants
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,79 +25,99 @@ Cc: peter.maydell@linaro.org, jcody@redhat.com, qemu-devel@nongnu.org, stefanha@
 
 From: Paolo Bonzini <pbonzini@redhat.com>
 
-Outside blockjob.c, the block_job_iostatus_reset function is used once
-in the monitor and once in BlockBackend.  When we introduce the block
-job mutex, block_job_iostatus_reset's client is going to be the block
-layer (for which blockjob.c will take the block job mutex) rather than
-the monitor (which will take the block job mutex by itself).
+The new functions helps respecting the invariant that the coroutine
+is entered with false user_resume, zero pause count and no error
+recorded in the iostatus.
 
-The monitor's call to block_job_iostatus_reset from the monitor comes
-just before the sole call to block_job_user_resume, so reset the
-iostatus directly from block_job_iostatus_reset.  This will avoid
-the need to introduce separate block_job_iostatus_reset and
-block_job_iostatus_reset_locked APIs.
+Resetting the iostatus is now common to all of block_job_cancel_async,
+block_job_user_resume and block_job_iostatus_reset, albeit with slight
+differences:
 
-After making this change, move the function together with the others
-that were moved in the previous patch.
+- block_job_cancel_async resets the iostatus, and resumes the job if
+there was an error, but the coroutine is not restarted immediately.
+For example the caller may continue with a call to block_job_finish_sync.
+
+- block_job_user_resume resets the iostatus.  It wants to resume the job
+unconditionally, even if there was no error.
+
+- block_job_iostatus_reset doesn't resume the job at all.  Maybe that's
+a bug but it should be fixed separately.
+
+block_job_iostatus_reset does the least common denominator, so add some
+checking but otherwise leave it as the entry point for resetting the
+iostatus.
 
 Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-Reviewed-by: John Snow <jsnow@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-Reviewed-by: Jeff Cody <jcody@redhat.com>
-Message-id: 20170508141310.8674-7-pbonzini@redhat.com
+Message-id: 20170508141310.8674-8-pbonzini@redhat.com
 Signed-off-by: Jeff Cody <jcody@redhat.com>
 ---
- blockdev.c |  1 -
- blockjob.c | 11 ++++++-----
- 2 files changed, 6 insertions(+), 6 deletions(-)
+ blockjob.c | 24 ++++++++++++++++++++----
+ 1 file changed, 20 insertions(+), 4 deletions(-)
 
-diff --git a/blockdev.c b/blockdev.c
-index c63f4e8..892d768 100644
---- a/blockdev.c
-+++ b/blockdev.c
-@@ -3715,7 +3715,6 @@ void qmp_block_job_resume(const char *device, Error **errp)
-     }
- 
-     trace_qmp_block_job_resume(job);
--    block_job_iostatus_reset(job);
-     block_job_user_resume(job);
-     aio_context_release(aio_context);
- }
 diff --git a/blockjob.c b/blockjob.c
-index a8ecb41..cd1f4c0 100644
+index cd1f4c0..eae8fe7 100644
 --- a/blockjob.c
 +++ b/blockjob.c
-@@ -412,6 +412,7 @@ void block_job_user_resume(BlockJob *job)
+@@ -304,6 +304,19 @@ static void block_job_completed_single(BlockJob *job)
+     block_job_unref(job);
+ }
+ 
++static void block_job_cancel_async(BlockJob *job)
++{
++    if (job->iostatus != BLOCK_DEVICE_IO_STATUS_OK) {
++        block_job_iostatus_reset(job);
++    }
++    if (job->user_paused) {
++        /* Do not call block_job_enter here, the caller will handle it.  */
++        job->user_paused = false;
++        job->pause_count--;
++    }
++    job->cancelled = true;
++}
++
+ static void block_job_completed_txn_abort(BlockJob *job)
+ {
+     AioContext *ctx;
+@@ -328,7 +341,7 @@ static void block_job_completed_txn_abort(BlockJob *job)
+              * them; this job, however, may or may not be cancelled, depending
+              * on the caller, so leave it. */
+             if (other_job != job) {
+-                other_job->cancelled = true;
++                block_job_cancel_async(other_job);
+             }
+             continue;
+         }
+@@ -411,8 +424,8 @@ bool block_job_user_paused(BlockJob *job)
+ void block_job_user_resume(BlockJob *job)
  {
      if (job && job->user_paused && job->pause_count > 0) {
-         job->user_paused = false;
-+        block_job_iostatus_reset(job);
+-        job->user_paused = false;
+         block_job_iostatus_reset(job);
++        job->user_paused = false;
          block_job_resume(job);
      }
  }
-@@ -427,11 +428,6 @@ void block_job_cancel(BlockJob *job)
-     }
- }
- 
--void block_job_iostatus_reset(BlockJob *job)
--{
--    job->iostatus = BLOCK_DEVICE_IO_STATUS_OK;
--}
--
- static int block_job_finish_sync(BlockJob *job,
-                                  void (*finish)(BlockJob *, Error **errp),
-                                  Error **errp)
-@@ -767,6 +763,11 @@ void block_job_yield(BlockJob *job)
-     block_job_pause_point(job);
- }
- 
-+void block_job_iostatus_reset(BlockJob *job)
-+{
-+    job->iostatus = BLOCK_DEVICE_IO_STATUS_OK;
-+}
-+
- void block_job_event_ready(BlockJob *job)
+@@ -420,8 +433,7 @@ void block_job_user_resume(BlockJob *job)
+ void block_job_cancel(BlockJob *job)
  {
-     job->ready = true;
+     if (block_job_started(job)) {
+-        job->cancelled = true;
+-        block_job_iostatus_reset(job);
++        block_job_cancel_async(job);
+         block_job_enter(job);
+     } else {
+         block_job_completed(job, -ECANCELED);
+@@ -765,6 +777,10 @@ void block_job_yield(BlockJob *job)
+ 
+ void block_job_iostatus_reset(BlockJob *job)
+ {
++    if (job->iostatus == BLOCK_DEVICE_IO_STATUS_OK) {
++        return;
++    }
++    assert(job->user_paused && job->pause_count > 0);
+     job->iostatus = BLOCK_DEVICE_IO_STATUS_OK;
+ }
+ 
 -- 
 2.9.3
