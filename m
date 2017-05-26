@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54175)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54174)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dEA3h-0004I3-T5
+	(envelope-from <famz@redhat.com>) id 1dEA3h-0004I0-St
 	for qemu-devel@nongnu.org; Fri, 26 May 2017 03:53:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dEA3g-0006Ae-0P
+	(envelope-from <famz@redhat.com>) id 1dEA3d-0006A4-Un
 	for qemu-devel@nongnu.org; Fri, 26 May 2017 03:53:18 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:39450)
+Received: from mx1.redhat.com ([209.132.183.28]:2975)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1dEA3f-0006AP-QB
-	for qemu-devel@nongnu.org; Fri, 26 May 2017 03:53:15 -0400
+	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1dEA3d-00069m-OJ
+	for qemu-devel@nongnu.org; Fri, 26 May 2017 03:53:13 -0400
 From: Fam Zheng <famz@redhat.com>
-Date: Fri, 26 May 2017 15:52:32 +0800
-Message-Id: <20170526075246.20265-9-famz@redhat.com>
+Date: Fri, 26 May 2017 15:52:31 +0800
+Message-Id: <20170526075246.20265-8-famz@redhat.com>
 In-Reply-To: <20170526075246.20265-1-famz@redhat.com>
 References: <20170526075246.20265-1-famz@redhat.com>
-Subject: [Qemu-devel] [PULL 08/22] block: access serialising_in_flight with
+Subject: [Qemu-devel] [PULL 07/22] block: access io_limits_disabled with
  atomic ops
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -30,72 +30,64 @@ Cc: peter.maydell@linaro.org, Stefan Hajnoczi <stefanha@redhat.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
 
 Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+Reviewed-by: Alberto Garcia <berto@igalia.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-Message-Id: <20170525163225.29954-5-pbonzini@redhat.com>
+Message-Id: <20170525163225.29954-4-pbonzini@redhat.com>
 Signed-off-by: Fam Zheng <famz@redhat.com>
 ---
- block/io.c                |  6 +++---
- include/block/block_int.h | 10 ++++++----
- 2 files changed, 9 insertions(+), 7 deletions(-)
+ block/block-backend.c          | 4 ++--
+ block/throttle-groups.c        | 2 +-
+ include/sysemu/block-backend.h | 3 ++-
+ 3 files changed, 5 insertions(+), 4 deletions(-)
 
-diff --git a/block/io.c b/block/io.c
-index 7d31946..cc5de2c 100644
---- a/block/io.c
-+++ b/block/io.c
-@@ -388,7 +388,7 @@ void bdrv_drain_all(void)
- static void tracked_request_end(BdrvTrackedRequest *req)
- {
-     if (req->serialising) {
--        req->bs->serialising_in_flight--;
-+        atomic_dec(&req->bs->serialising_in_flight);
+diff --git a/block/block-backend.c b/block/block-backend.c
+index f3a6008..e50ec03 100644
+--- a/block/block-backend.c
++++ b/block/block-backend.c
+@@ -1953,7 +1953,7 @@ static void blk_root_drained_begin(BdrvChild *child)
+     /* Note that blk->root may not be accessible here yet if we are just
+      * attaching to a BlockDriverState that is drained. Use child instead. */
+ 
+-    if (blk->public.io_limits_disabled++ == 0) {
++    if (atomic_fetch_inc(&blk->public.io_limits_disabled) == 0) {
+         throttle_group_restart_blk(blk);
      }
+ }
+@@ -1964,7 +1964,7 @@ static void blk_root_drained_end(BdrvChild *child)
+     assert(blk->quiesce_counter);
  
-     QLIST_REMOVE(req, list);
-@@ -427,7 +427,7 @@ static void mark_request_serialising(BdrvTrackedRequest *req, uint64_t align)
-                                - overlap_offset;
+     assert(blk->public.io_limits_disabled);
+-    --blk->public.io_limits_disabled;
++    atomic_dec(&blk->public.io_limits_disabled);
  
-     if (!req->serialising) {
--        req->bs->serialising_in_flight++;
-+        atomic_inc(&req->bs->serialising_in_flight);
-         req->serialising = true;
-     }
+     if (--blk->quiesce_counter == 0) {
+         if (blk->dev_ops && blk->dev_ops->drained_end) {
+diff --git a/block/throttle-groups.c b/block/throttle-groups.c
+index b73e7a8..69bfbd4 100644
+--- a/block/throttle-groups.c
++++ b/block/throttle-groups.c
+@@ -240,7 +240,7 @@ static bool throttle_group_schedule_timer(BlockBackend *blk, bool is_write)
+     ThrottleGroup *tg = container_of(ts, ThrottleGroup, ts);
+     bool must_wait;
  
-@@ -532,7 +532,7 @@ static bool coroutine_fn wait_serialising_requests(BdrvTrackedRequest *self)
-     bool retry;
-     bool waited = false;
- 
--    if (!bs->serialising_in_flight) {
-+    if (!atomic_read(&bs->serialising_in_flight)) {
+-    if (blkp->io_limits_disabled) {
++    if (atomic_read(&blkp->io_limits_disabled)) {
          return false;
      }
  
-diff --git a/include/block/block_int.h b/include/block/block_int.h
-index 4af44df..2fafd65 100644
---- a/include/block/block_int.h
-+++ b/include/block/block_int.h
-@@ -604,10 +604,6 @@ struct BlockDriverState {
-     /* Callback before write request is processed */
-     NotifierWithReturnList before_write_notifiers;
+diff --git a/include/sysemu/block-backend.h b/include/sysemu/block-backend.h
+index 840ad61..24b63d6 100644
+--- a/include/sysemu/block-backend.h
++++ b/include/sysemu/block-backend.h
+@@ -80,7 +80,8 @@ typedef struct BlockBackendPublic {
+     CoQueue      throttled_reqs[2];
  
--    /* number of in-flight requests; overall and serialising */
--    unsigned int in_flight;
--    unsigned int serialising_in_flight;
--
-     bool wakeup;
- 
-     /* Offset after the highest byte written to */
-@@ -634,6 +630,12 @@ struct BlockDriverState {
-      */
-     int copy_on_read;
- 
-+    /* number of in-flight requests; overall and serialising.
-+     * Accessed with atomic ops.
+     /* Nonzero if the I/O limits are currently being ignored; generally
+-     * it is zero.  */
++     * it is zero.  Accessed with atomic operations.
 +     */
-+    unsigned int in_flight;
-+    unsigned int serialising_in_flight;
-+
-     /* do we need to tell the quest if we have a volatile write cache? */
-     int enable_write_cache;
+     unsigned int io_limits_disabled;
  
+     /* The following fields are protected by the ThrottleGroup lock.
 -- 
 2.9.4
