@@ -1,17 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56870)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57328)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dE7in-00081I-IR
-	for qemu-devel@nongnu.org; Fri, 26 May 2017 01:23:34 -0400
+	(envelope-from <jasowang@redhat.com>) id 1dE7kk-0001F6-41
+	for qemu-devel@nongnu.org; Fri, 26 May 2017 01:25:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dE7im-0007Un-4o
-	for qemu-devel@nongnu.org; Fri, 26 May 2017 01:23:33 -0400
-From: David Gibson <david@gibson.dropbear.id.au>
-Date: Fri, 26 May 2017 15:23:19 +1000
-Message-Id: <20170526052319.28096-6-david@gibson.dropbear.id.au>
-In-Reply-To: <20170526052319.28096-1-david@gibson.dropbear.id.au>
-References: <20170526052319.28096-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [PATCHv4 5/5] ppc: Rework CPU compatibility testing
- across migration
+	(envelope-from <jasowang@redhat.com>) id 1dE7kg-0008E4-3N
+	for qemu-devel@nongnu.org; Fri, 26 May 2017 01:25:34 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34420)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1dE7kf-0008Dc-QW
+	for qemu-devel@nongnu.org; Fri, 26 May 2017 01:25:30 -0400
+References: <1495549241-23380-1-git-send-email-zhangchen.fnst@cn.fujitsu.com>
+	<1495549241-23380-3-git-send-email-zhangchen.fnst@cn.fujitsu.com>
+	<838b8626-c5e4-86d5-a318-ab957bc9bcbe@redhat.com>
+	<f9344c1f-fa0a-4745-bf51-658c37d1d53e@cn.fujitsu.com>
+From: Jason Wang <jasowang@redhat.com>
+Message-ID: <1550e79d-c657-6e9b-d7b0-39ee94c8f7af@redhat.com>
+Date: Fri, 26 May 2017 13:25:19 +0800
+MIME-Version: 1.0
+In-Reply-To: <f9344c1f-fa0a-4745-bf51-658c37d1d53e@cn.fujitsu.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH V5 2/9] net/filter-mirror.c: Make filter
+ mirror support vnet support.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,154 +31,103 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: groug@kaod.org, clg@kaod.org, aik@ozlabs.ru, mdroth@linux.vnet.ibm.com, nikunj@linux.vnet.ibm.com
-Cc: agraf@suse.de, abologna@redhat.com, armbru@redhat.com, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, quintela@redhat.com, dgilbert@redhat.com, sursingh@redhat.com, sbobroff@redhat.com, David Gibson <david@gibson.dropbear.id.au>
+To: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>, qemu devel <qemu-devel@nongnu.org>
+Cc: zhanghailiang <zhang.zhanghailiang@huawei.com>, Li Zhijian <lizhijian@cn.fujitsu.com>, weifuqiang <weifuqiang@huawei.com>, "eddie . dong" <eddie.dong@intel.com>, bian naimeng <biannm@cn.fujitsu.com>
 
-Migrating between different CPU versions is a bit complicated for ppc.
-A long time ago, we ensured identical CPU versions at either end by
-checking the PVR had the same value.  However, this breaks under KVM
-HV, because we always have to use the host's PVR - it's not
-virtualized.  That would mean we couldn't migrate between hosts with
-different PVRs, even if the CPUs are close enough to compatible in
-practice (sometimes identical cores with different surrounding logic
-have different PVRs, so this happens in practice quite often).
 
-So, we removed the PVR check, but instead checked that several flags
-indicating supported instructions matched.  This turns out to be a bad
-idea, because those instruction masks are not architected information, but
-essentially a TCG implementation detail.  So changes to qemu internal CPU
-modelling can break migration - this happened between qemu-2.6 and
-qemu-2.7.  That was addressed by 146c11f1 "target-ppc: Allow eventual
-removal of old migration mistakes".
 
-Now, verification of CPU compatibility across a migration basically doesn't
-happen.  We simply ignore the PVR of the incoming migration, and hope the
-cpu on the destination is close enough to work.
+On 2017=E5=B9=B405=E6=9C=8825=E6=97=A5 20:55, Zhang Chen wrote:
+>
+>
+> On 05/25/2017 02:04 PM, Jason Wang wrote:
+>>
+>>
+>> On 2017=E5=B9=B405=E6=9C=8823=E6=97=A5 22:20, Zhang Chen wrote:
+>>> We add the vnet_hdr option for filter-mirror, default is disable.
+>>> If you use virtio-net-pci net driver, please enable it.
+>>> You can use it for example:
+>>> -object=20
+>>> filter-mirror,id=3Dm0,netdev=3Dhn0,queue=3Dtx,outdev=3Dmirror0,vnet_h=
+dr=3Don
+>>>
+>>> If vnet_hdr=3Don we change the send packet format from
+>>> struct {int size; const uint8_t buf[];} to {int size; int=20
+>>> vnet_hdr_len; const uint8_t buf[];}.
+>>> make other module(like colo-compare) know how to parse net packet=20
+>>> correctly.
+>>>
+>>> Signed-off-by: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
+>>> ---
+>>>   net/filter-mirror.c | 73=20
+>>> +++++++++++++++++++++++++++++++++++++++++++++++++----
+>>>   qemu-options.hx     |  5 ++--
+>>>   2 files changed, 70 insertions(+), 8 deletions(-)
+>>>
+>>> diff --git a/net/filter-mirror.c b/net/filter-mirror.c
+>>> index 72fa7c2..8df0be6 100644
+>>> --- a/net/filter-mirror.c
+>>> +++ b/net/filter-mirror.c
+>>> @@ -38,15 +38,17 @@ typedef struct MirrorState {
+>>>       NetFilterState parent_obj;
+>>>       char *indev;
+>>>       char *outdev;
+>>> +    bool vnet_hdr;
+>>>       CharBackend chr_in;
+>>>       CharBackend chr_out;
+>>>       SocketReadState rs;
+>>>   } MirrorState;
+>>>   -static int filter_mirror_send(CharBackend *chr_out,
+>>> +static int filter_mirror_send(MirrorState *s,
+>>>                                 const struct iovec *iov,
+>>>                                 int iovcnt)
+>>>   {
+>>> +    NetFilterState *nf =3D NETFILTER(s);
+>>>       int ret =3D 0;
+>>>       ssize_t size =3D 0;
+>>>       uint32_t len =3D 0;
+>>> @@ -58,14 +60,42 @@ static int filter_mirror_send(CharBackend *chr_ou=
+t,
+>>>       }
+>>>         len =3D htonl(size);
+>>> -    ret =3D qemu_chr_fe_write_all(chr_out, (uint8_t *)&len,=20
+>>> sizeof(len));
+>>> +    ret =3D qemu_chr_fe_write_all(&s->chr_out, (uint8_t *)&len,=20
+>>> sizeof(len));
+>>>       if (ret !=3D sizeof(len)) {
+>>>           goto err;
+>>>       }
+>>>   +    if (s->vnet_hdr) {
+>>> +        /*
+>>> +         * If vnet_hdr =3D on, we send vnet header len to make other
+>>> +         * module(like colo-compare) know how to parse net
+>>> +         * packet correctly.
+>>> +         */
+>>> +        ssize_t vnet_hdr_len;
+>>> +
+>>> +        /*
+>>> +         * In anytime, nf->netdev and nf->netdev->peer both have a=20
+>>> vnet_hdr_len,
+>>> +         * Here we just find out which is we need. When filter set=20
+>>> RX or TX
+>>> +         * that the real vnet_hdr_len are different.
+>>> +         */
+>>> +        if (nf->netdev->using_vnet_hdr) {
+>>> +            vnet_hdr_len =3D nf->netdev->vnet_hdr_len;
+>>> +        } else if (nf->netdev->peer->using_vnet_hdr) {
+>>> +            vnet_hdr_len =3D nf->netdev->peer->vnet_hdr_len;
+>>
+>> Rethink about this, looks like what we really want is:
+>>
+>> - For tx direction, only check nf->netdev->vnet_hdr_len,
+>> - For rx direction, only check nf->netdev->peer->vnet_hdr_len
+>
+> Agree, So do you means we should remove the using_vnet_hdr related=20
+> codes then just
+> use the nf->direction to choice which we need check?
+>
+> Thanks
+> Zhang Chen=20
 
-Now that we've cleaned up handling of processor compatibility modes for
-pseries machine type, we can do better.  We allow migration if:
+Maybe.
 
-    * The source and destination PVRs are for the same type of CPU, as
-      determined by CPU class's pvr_match function
-OR  * When the source was in a compatibility mode, and the destination CPU
-      supports the same compatibility mode
-
-Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
----
- target/ppc/machine.c | 72 +++++++++++++++++++++++++++++++++++++++++++++++++---
- 1 file changed, 69 insertions(+), 3 deletions(-)
-
-diff --git a/target/ppc/machine.c b/target/ppc/machine.c
-index 6cb3a48..2c6d9dc 100644
---- a/target/ppc/machine.c
-+++ b/target/ppc/machine.c
-@@ -8,6 +8,7 @@
- #include "helper_regs.h"
- #include "mmu-hash64.h"
- #include "migration/cpu.h"
-+#include "qapi/error.h"
- 
- static int cpu_load_old(QEMUFile *f, void *opaque, int version_id)
- {
-@@ -195,6 +196,30 @@ static void cpu_pre_save(void *opaque)
-     }
- }
- 
-+/*
-+ * Determine if a given PVR is a "close enough" match to the CPU
-+ * object.  For TCG and KVM PR it would probably be sufficient to
-+ * require an exact PVR match.  However for KVM HV the user is
-+ * restricted to a PVR exactly matching the host CPU.  The correct way
-+ * to handle this is to put the guest into an architected
-+ * compatibility mode.  However, to allow a more forgiving transition
-+ * and migration from before this was widely done, we allow migration
-+ * between sufficiently similar PVRs, as determined by the CPU class's
-+ * pvr_match() hook.
-+ */
-+static bool pvr_match(PowerPCCPU *cpu, uint32_t pvr)
-+{
-+    PowerPCCPUClass *pcc = POWERPC_CPU_GET_CLASS(cpu);
-+
-+    if (pvr == pcc->pvr) {
-+        return true;
-+    }
-+    if (pcc->pvr_match) {
-+        return pcc->pvr_match(pcc, pvr);
-+    }
-+    return false;
-+}
-+
- static int cpu_post_load(void *opaque, int version_id)
- {
-     PowerPCCPU *cpu = opaque;
-@@ -203,10 +228,31 @@ static int cpu_post_load(void *opaque, int version_id)
-     target_ulong msr;
- 
-     /*
--     * We always ignore the source PVR. The user or management
--     * software has to take care of running QEMU in a compatible mode.
-+     * If we're operating in compat mode, we should be ok as long as
-+     * the destination supports the same compatiblity mode.
-+     *
-+     * Otherwise, however, we require that the destination has exactly
-+     * the same CPU model as the source.
-      */
--    env->spr[SPR_PVR] = env->spr_cb[SPR_PVR].default_value;
-+
-+#if defined(TARGET_PPC64)
-+    if (cpu->compat_pvr) {
-+        Error *local_err = NULL;
-+
-+        ppc_set_compat(cpu, cpu->compat_pvr, &local_err);
-+        if (local_err) {
-+            error_report_err(local_err);
-+            error_free(local_err);
-+            return -1;
-+        }
-+    } else
-+#endif
-+    {
-+        if (!pvr_match(cpu, env->spr[SPR_PVR])) {
-+            return -1;
-+        }
-+    }
-+
-     env->lr = env->spr[SPR_LR];
-     env->ctr = env->spr[SPR_CTR];
-     cpu_write_xer(env, env->spr[SPR_XER]);
-@@ -560,6 +606,25 @@ static const VMStateDescription vmstate_tlbmas = {
-     }
- };
- 
-+static bool compat_needed(void *opaque)
-+{
-+    PowerPCCPU *cpu = opaque;
-+
-+    assert(!(cpu->compat_pvr && !cpu->vhyp));
-+    return (cpu->compat_pvr != 0);
-+}
-+
-+static const VMStateDescription vmstate_compat = {
-+    .name = "cpu/compat",
-+    .version_id = 1,
-+    .minimum_version_id = 1,
-+    .needed = compat_needed,
-+    .fields = (VMStateField[]) {
-+        VMSTATE_UINT32(compat_pvr, PowerPCCPU),
-+        VMSTATE_END_OF_LIST()
-+    }
-+};
-+
- const VMStateDescription vmstate_ppc_cpu = {
-     .name = "cpu",
-     .version_id = 5,
-@@ -613,6 +678,7 @@ const VMStateDescription vmstate_ppc_cpu = {
-         &vmstate_tlb6xx,
-         &vmstate_tlbemb,
-         &vmstate_tlbmas,
-+        &vmstate_compat,
-         NULL
-     }
- };
--- 
-2.9.4
+Thanks
