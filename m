@@ -1,25 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52195)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52704)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcel@redhat.com>) id 1dEFha-00012a-P4
-	for qemu-devel@nongnu.org; Fri, 26 May 2017 09:54:51 -0400
+	(envelope-from <rth7680@gmail.com>) id 1dEFj6-0001tk-Ah
+	for qemu-devel@nongnu.org; Fri, 26 May 2017 09:56:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcel@redhat.com>) id 1dEFhX-0005Pp-MO
-	for qemu-devel@nongnu.org; Fri, 26 May 2017 09:54:50 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:39772)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <marcel@redhat.com>) id 1dEFhX-0005Pg-Cx
-	for qemu-devel@nongnu.org; Fri, 26 May 2017 09:54:47 -0400
-References: <19feea44a3f4010645a1b829b504481f1b574b9a.1495797845.git.maozy.fnst@cn.fujitsu.com>
-From: Marcel Apfelbaum <marcel@redhat.com>
-Message-ID: <45337174-a362-5520-d0ea-7fb20d61e9a7@redhat.com>
-Date: Fri, 26 May 2017 16:54:38 +0300
+	(envelope-from <rth7680@gmail.com>) id 1dEFj5-0008II-Da
+	for qemu-devel@nongnu.org; Fri, 26 May 2017 09:56:24 -0400
+Received: from mail-qt0-x244.google.com ([2607:f8b0:400d:c0d::244]:32777)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1dEFj5-0008HC-7Y
+	for qemu-devel@nongnu.org; Fri, 26 May 2017 09:56:23 -0400
+Received: by mail-qt0-x244.google.com with SMTP id a46so1358924qte.0
+	for <qemu-devel@nongnu.org>; Fri, 26 May 2017 06:56:23 -0700 (PDT)
+Sender: Richard Henderson <rth7680@gmail.com>
+References: <20170525210508.4910-1-aurelien@aurel32.net>
+	<20170525210508.4910-6-aurelien@aurel32.net>
+From: Richard Henderson <rth@twiddle.net>
+Message-ID: <8c979bcf-e99d-5bc0-a4d1-7a7ff94786b2@twiddle.net>
+Date: Fri, 26 May 2017 06:56:19 -0700
 MIME-Version: 1.0
-In-Reply-To: <19feea44a3f4010645a1b829b504481f1b574b9a.1495797845.git.maozy.fnst@cn.fujitsu.com>
-Content-Language: en-US
+In-Reply-To: <20170525210508.4910-6-aurelien@aurel32.net>
 Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2] pci: Set err to errp directly rather
- than through error_porpagate()
+Subject: Re: [Qemu-devel] [PATCH 05/26] target/s390x: implement PACK
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,84 +31,19 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>, qemu-devel@nongnu.org
-Cc: mst@redhat.com, imammedo@redhat.com, armbru@redhat.com
+To: Aurelien Jarno <aurelien@aurel32.net>, qemu-devel@nongnu.org
+Cc: Alexander Graf <agraf@suse.de>
 
-
-
-On 26/05/2017 14:58, Mao Zhongyi wrote:
-> ioh3420_interrupts_init() and its callers rp_realize() fill error
-> message to local_err, then propagate it to errp by error_porpagate(),
-> which's not necessary. So eliminate it and pass errp directly instead
-> of local_err. Of course, error_propagate() also has been removed.
->
-> Signed-off-by: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
+On 05/25/2017 02:04 PM, Aurelien Jarno wrote:
+> Signed-off-by: Aurelien Jarno<aurelien@aurel32.net>
 > ---
-> v2:
-> * Drop the part of wrong handling that ignored the fact that if
->    pci_qdev_realize()'s caller pass errp = NULL.
->
->   hw/pci-bridge/ioh3420.c        | 4 +---
->   hw/pci-bridge/pcie_root_port.c | 7 ++-----
->   2 files changed, 3 insertions(+), 8 deletions(-)
->
-> diff --git a/hw/pci-bridge/ioh3420.c b/hw/pci-bridge/ioh3420.c
-> index da4e5bd..5f56a2f 100644
-> --- a/hw/pci-bridge/ioh3420.c
-> +++ b/hw/pci-bridge/ioh3420.c
-> @@ -64,15 +64,13 @@ static uint8_t ioh3420_aer_vector(const PCIDevice *d)
->   static int ioh3420_interrupts_init(PCIDevice *d, Error **errp)
->   {
->       int rc;
-> -    Error *local_err = NULL;
->   
->       rc = msi_init(d, IOH_EP_MSI_OFFSET, IOH_EP_MSI_NR_VECTOR,
->                     IOH_EP_MSI_SUPPORTED_FLAGS & PCI_MSI_FLAGS_64BIT,
->                     IOH_EP_MSI_SUPPORTED_FLAGS & PCI_MSI_FLAGS_MASKBIT,
-> -                  &local_err);
-> +                  errp);
->       if (rc < 0) {
->           assert(rc == -ENOTSUP);
-> -        error_propagate(errp, local_err);
->       }
->   
->       return rc;
-> diff --git a/hw/pci-bridge/pcie_root_port.c b/hw/pci-bridge/pcie_root_port.c
-> index cf36318..9022996 100644
-> --- a/hw/pci-bridge/pcie_root_port.c
-> +++ b/hw/pci-bridge/pcie_root_port.c
-> @@ -59,7 +59,6 @@ static void rp_realize(PCIDevice *d, Error **errp)
->       PCIDeviceClass *dc = PCI_DEVICE_GET_CLASS(d);
->       PCIERootPortClass *rpc = PCIE_ROOT_PORT_GET_CLASS(d);
->       int rc;
-> -    Error *local_err = NULL;
->   
->       pci_config_set_interrupt_pin(d->config, 1);
->       pci_bridge_initfn(d, TYPE_PCIE_BUS);
-> @@ -72,9 +71,8 @@ static void rp_realize(PCIDevice *d, Error **errp)
->       }
->   
->       if (rpc->interrupts_init) {
-> -        rc = rpc->interrupts_init(d, &local_err);
-> +        rc = rpc->interrupts_init(d, errp);
->           if (rc < 0) {
-> -            error_propagate(errp, local_err);
->               goto err_bridge;
->           }
->       }
-> @@ -98,9 +96,8 @@ static void rp_realize(PCIDevice *d, Error **errp)
->       }
->   
->       rc = pcie_aer_init(d, PCI_ERR_VER, rpc->aer_offset,
-> -                       PCI_ERR_SIZEOF, &local_err);
-> +                       PCI_ERR_SIZEOF, errp);
->       if (rc < 0) {
-> -        error_propagate(errp, local_err);
->           goto err;
->       }
->       pcie_aer_root_init(d);
+>   target/s390x/helper.h      |  1 +
+>   target/s390x/insn-data.def |  5 +++++
+>   target/s390x/mem_helper.c  | 37 +++++++++++++++++++++++++++++++++++++
+>   target/s390x/translate.c   |  8 ++++++++
+>   4 files changed, 51 insertions(+)
 
-Reviewed-by: Marcel Apfelbaum<marcel@redhat.com>
+Reviewed-by: Richard Henderson <rth@twiddle.net>
 
-Thanks,
-Marcel
+
+r~
