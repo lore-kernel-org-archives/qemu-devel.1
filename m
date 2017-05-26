@@ -1,23 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40506)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40518)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dEMbO-0000aW-EI
-	for qemu-devel@nongnu.org; Fri, 26 May 2017 17:16:55 -0400
+	(envelope-from <rth7680@gmail.com>) id 1dEMbP-0000c0-Nm
+	for qemu-devel@nongnu.org; Fri, 26 May 2017 17:16:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dEMbN-0008Jg-80
-	for qemu-devel@nongnu.org; Fri, 26 May 2017 17:16:54 -0400
-Received: from mail-qk0-x241.google.com ([2607:f8b0:400d:c09::241]:33644)
+	(envelope-from <rth7680@gmail.com>) id 1dEMbO-0008K0-J0
+	for qemu-devel@nongnu.org; Fri, 26 May 2017 17:16:55 -0400
+Received: from mail-qk0-x241.google.com ([2607:f8b0:400d:c09::241]:34702)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1dEMbN-0008JX-2W
-	for qemu-devel@nongnu.org; Fri, 26 May 2017 17:16:53 -0400
-Received: by mail-qk0-x241.google.com with SMTP id o85so2668663qkh.0
-	for <qemu-devel@nongnu.org>; Fri, 26 May 2017 14:16:53 -0700 (PDT)
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1dEMbO-0008Js-EI
+	for qemu-devel@nongnu.org; Fri, 26 May 2017 17:16:54 -0400
+Received: by mail-qk0-x241.google.com with SMTP id u75so2652879qka.1
+	for <qemu-devel@nongnu.org>; Fri, 26 May 2017 14:16:54 -0700 (PDT)
 Sender: Richard Henderson <rth7680@gmail.com>
 From: Richard Henderson <rth@twiddle.net>
-Date: Fri, 26 May 2017 14:16:19 -0700
-Message-Id: <20170526211638.32301-8-rth@twiddle.net>
+Date: Fri, 26 May 2017 14:16:20 -0700
+Message-Id: <20170526211638.32301-9-rth@twiddle.net>
 In-Reply-To: <20170526211638.32301-1-rth@twiddle.net>
 References: <20170526211638.32301-1-rth@twiddle.net>
-Subject: [Qemu-devel] [PATCH v7 07/26] target/arm: optimize indirect branches
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH v7 08/26] target/i386: introduce gen_jr helper
+ to generate lookup_and_goto_ptr
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,150 +35,78 @@ Cc: "Emilio G. Cota" <cota@braap.org>
 
 From: "Emilio G. Cota" <cota@braap.org>
 
-Speed up indirect branches by jumping to the target if it is valid.
+This helper will be used by subsequent changes.
 
-Softmmu measurements (see later commit for user-mode results):
-
-Note: baseline (i.e. speedup == 1x) is QEMU v2.9.0.
-
-- Impact on Boot time
-
-| setup  | ARM debian jessie boot+shutdown time | stddev |
-|--------+--------------------------------------+--------|
-| v2.9.0 |                                 8.84 |   0.07 |
-| +cross |                                 8.85 |   0.03 |
-| +jr    |                                 8.83 |   0.06 |
-
--                            NBench, arm-softmmu (debian jessie guest). Host: Intel i7-4790K @ 4.00GHz
-
-  1.3x +-+-------------------------------------------------------------------------------------------------------------+-+
-       |                                                                                                                 |
-       |   cross                                                          ####                                           |
- 1.25x +cross+jr..........................................................#++#.........................................+-+
-       |                                                        ####      #  #                                           |
-       |                                                     +++#  #      #  #                                           |
-       |                                      +++            ****  #      #  #                                           |
-  1.2x +-+...................................####............*..*..#......#..#.........................................+-+
-       |                                  ****  #            *  *  #      #  #     ####                                  |
-       |                                  *  *  #            *  *  #      #  #     #  #                                  |
- 1.15x +-+................................*..*..#............*..*..#......#..#.....#..#................................+-+
-       |                                  *  *  #            *  *  #      #  #     #  #                                  |
-       |                                  *  *  #      ####  *  *  #      #  #     #  #                                  |
-       |                                  *  *  #      #  #  *  *  #      #  #     #  #                         ####     |
-  1.1x +-+................................*..*..#......#..#..*..*..#......#..#.....#..#.........................#..#...+-+
-       |                                  *  *  #      #  #  *  *  #      #  #     #  #                         #  #     |
-       |                                  *  *  #      #  #  *  *  #      #  #     #  #                         #  #     |
- 1.05x +-+..........................####..*..*..#......#..#..*..*..#......#..#.....#..#......+++............*****..#...+-+
-       |                        *****  #  *  *  #      #  #  *  *  #  *****  #     #  #   +++ |    ****###  *   *  #     |
-       |                        *+++*  #  *  *  #      #  #  *  *  #  *+++*  #  ****  #  *****###  *  *  #  *   *  #     |
-       |     *****###  +++####  *   *  #  *  *  #  *****  #  *  *  #  *   *  #  *  *  #  * | *++#  *  *  #  *   *  #     |
-    1x +-++-+*+++*-+#++****++#++*+-+*++#+-*++*++#-+*+++*-+#++*++*++#++*+-+*++#+-*++*++#-+*+++*-+#++*++*++#++*+-+*++#+-++-+
-       |     *   *  #  *  *  #  *   *  #  *  *  #  *   *  #  *  *  #  *   *  #  *  *  #  *   *  #  *  *  #  *   *  #     |
-       |     *   *  #  *  *  #  *   *  #  *  *  #  *   *  #  *  *  #  *   *  #  *  *  #  *   *  #  *  *  #  *   *  #     |
- 0.95x +-+---*****###--****###--*****###--****###--*****###--****###--*****###--****###--*****###--****###--*****###---+-+
-       ASSIGNMENT BITFIELD   FOURFP EMULATION   HUFFMAN   LU DECOMPOSITIONEURAL NNUMERIC SOSTRING SORT     hmean
-  png: http://imgur.com/eOLmZNR
-
-NB. 'cross' represents the previous commit.
-
+Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
 Signed-off-by: Emilio G. Cota <cota@braap.org>
-Message-Id: <1493263764-18657-8-git-send-email-cota@braap.org>
-[rth: Replace gen_jr global variable with DISAS_EXIT state.]
+Message-Id: <1493263764-18657-9-git-send-email-cota@braap.org>
 Signed-off-by: Richard Henderson <rth@twiddle.net>
 ---
- target/arm/translate.c | 25 ++++++++++++++++---------
- target/arm/translate.h |  4 ++++
- 2 files changed, 20 insertions(+), 9 deletions(-)
+ target/i386/translate.c | 25 ++++++++++++++++++++++++-
+ 1 file changed, 24 insertions(+), 1 deletion(-)
 
-diff --git a/target/arm/translate.c b/target/arm/translate.c
-index facb52f..f879da6 100644
---- a/target/arm/translate.c
-+++ b/target/arm/translate.c
-@@ -1178,7 +1178,7 @@ static void gen_exception_internal_insn(DisasContext *s, int offset, int excp)
-     gen_set_condexec(s);
-     gen_set_pc_im(s, s->pc - offset);
-     gen_exception_internal(excp);
--    s->is_jmp = DISAS_JUMP;
-+    s->is_jmp = DISAS_EXC;
- }
+diff --git a/target/i386/translate.c b/target/i386/translate.c
+index 1d1372f..f0e48dc 100644
+--- a/target/i386/translate.c
++++ b/target/i386/translate.c
+@@ -141,6 +141,7 @@ typedef struct DisasContext {
+ } DisasContext;
  
- static void gen_exception_insn(DisasContext *s, int offset, int excp,
-@@ -1187,14 +1187,14 @@ static void gen_exception_insn(DisasContext *s, int offset, int excp,
-     gen_set_condexec(s);
-     gen_set_pc_im(s, s->pc - offset);
-     gen_exception(excp, syn, target_el);
--    s->is_jmp = DISAS_JUMP;
-+    s->is_jmp = DISAS_EXC;
- }
- 
- /* Force a TB lookup after an instruction that changes the CPU state.  */
- static inline void gen_lookup_tb(DisasContext *s)
+ static void gen_eob(DisasContext *s);
++static void gen_jr(DisasContext *s, TCGv dest);
+ static void gen_jmp(DisasContext *s, target_ulong eip);
+ static void gen_jmp_tb(DisasContext *s, target_ulong eip, int tb_num);
+ static void gen_op(DisasContext *s1, int op, TCGMemOp ot, int d);
+@@ -2509,7 +2510,8 @@ static void gen_bnd_jmp(DisasContext *s)
+    If INHIBIT, set HF_INHIBIT_IRQ_MASK if it isn't already set.
+    If RECHECK_TF, emit a rechecking helper for #DB, ignoring the state of
+    S->TF.  This is used by the syscall/sysret insns.  */
+-static void gen_eob_worker(DisasContext *s, bool inhibit, bool recheck_tf)
++static void
++do_gen_eob_worker(DisasContext *s, bool inhibit, bool recheck_tf, TCGv jr)
  {
-     tcg_gen_movi_i32(cpu_R[15], s->pc & ~1);
--    s->is_jmp = DISAS_JUMP;
-+    s->is_jmp = DISAS_EXIT;
+     gen_update_cc_op(s);
+ 
+@@ -2530,12 +2532,27 @@ static void gen_eob_worker(DisasContext *s, bool inhibit, bool recheck_tf)
+         tcg_gen_exit_tb(0);
+     } else if (s->tf) {
+         gen_helper_single_step(cpu_env);
++    } else if (!TCGV_IS_UNUSED(jr)) {
++        TCGv vaddr = tcg_temp_new();
++
++        tcg_gen_add_tl(vaddr, jr, cpu_seg_base[R_CS]);
++        tcg_gen_lookup_and_goto_ptr(vaddr);
++        tcg_temp_free(vaddr);
+     } else {
+         tcg_gen_exit_tb(0);
+     }
+     s->is_jmp = DISAS_TB_JUMP;
  }
  
- static inline void gen_hlt(DisasContext *s, int imm)
-@@ -4146,19 +4146,23 @@ static inline bool use_goto_tb(DisasContext *s, target_ulong dest)
- #endif
- }
- 
--static inline void gen_goto_tb(DisasContext *s, int n, target_ulong dest)
-+static void gen_goto_ptr(void)
++static inline void
++gen_eob_worker(DisasContext *s, bool inhibit, bool recheck_tf)
 +{
-+    TCGv addr = tcg_temp_new();
-+    tcg_gen_extu_i32_tl(addr, cpu_R[15]);
-+    tcg_gen_lookup_and_goto_ptr(addr);
-+    tcg_temp_free(addr);
++    TCGv unused;
++
++    TCGV_UNUSED(unused);
++    do_gen_eob_worker(s, inhibit, recheck_tf, unused);
 +}
 +
-+static void gen_goto_tb(DisasContext *s, int n, target_ulong dest)
- {
-     if (use_goto_tb(s, dest)) {
-         tcg_gen_goto_tb(n);
-         gen_set_pc_im(s, dest);
-         tcg_gen_exit_tb((uintptr_t)s->tb + n);
-     } else {
--        TCGv addr = tcg_temp_new();
--
-         gen_set_pc_im(s, dest);
--        tcg_gen_extu_i32_tl(addr, cpu_R[15]);
--        tcg_gen_lookup_and_goto_ptr(addr);
--        tcg_temp_free(addr);
-+        gen_goto_ptr();
-     }
+ /* End of block.
+    If INHIBIT, set HF_INHIBIT_IRQ_MASK if it isn't already set.  */
+ static void gen_eob_inhibit_irq(DisasContext *s, bool inhibit)
+@@ -2549,6 +2566,12 @@ static void gen_eob(DisasContext *s)
+     gen_eob_worker(s, false, false);
  }
  
-@@ -12091,11 +12095,14 @@ void gen_intermediate_code(CPUARMState *env, TranslationBlock *tb)
-             gen_set_pc_im(dc, dc->pc);
-             /* fall through */
-         case DISAS_JUMP:
-+            gen_goto_ptr();
-+            break;
-         default:
-             /* indicate that the hash table must be used to find the next TB */
-             tcg_gen_exit_tb(0);
-             break;
-         case DISAS_TB_JUMP:
-+        case DISAS_EXC:
-             /* nothing more to generate */
-             break;
-         case DISAS_WFI:
-diff --git a/target/arm/translate.h b/target/arm/translate.h
-index 629dab9..93de13f 100644
---- a/target/arm/translate.h
-+++ b/target/arm/translate.h
-@@ -139,6 +139,10 @@ static void disas_set_insn_syndrome(DisasContext *s, uint32_t syn)
-  * custom end-of-TB code)
-  */
- #define DISAS_BX_EXCRET 11
-+/* For instructions which want an immediate exit to the main loop,
-+ * as opposed to attempting to use lookup_and_goto_ptr.
-+ */
-+#define DISAS_EXIT 12
- 
- #ifdef TARGET_AARCH64
- void a64_translate_init(void);
++/* Jump to register */
++static void gen_jr(DisasContext *s, TCGv dest)
++{
++    do_gen_eob_worker(s, false, false, dest);
++}
++
+ /* generate a jump to eip. No segment change must happen before as a
+    direct call to the next block may occur */
+ static void gen_jmp_tb(DisasContext *s, target_ulong eip, int tb_num)
 -- 
 2.9.4
