@@ -1,14 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56823)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56864)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dE7ik-00080w-Rb
-	for qemu-devel@nongnu.org; Fri, 26 May 2017 01:23:32 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1dE7in-000819-7P
+	for qemu-devel@nongnu.org; Fri, 26 May 2017 01:23:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dE7ij-0007U1-ED
-	for qemu-devel@nongnu.org; Fri, 26 May 2017 01:23:30 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1dE7ij-0007Tp-7S
+	for qemu-devel@nongnu.org; Fri, 26 May 2017 01:23:33 -0400
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Fri, 26 May 2017 15:23:14 +1000
-Message-Id: <20170526052319.28096-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [PATCHv4 0/5] Clean up compatibility mode handling
+Date: Fri, 26 May 2017 15:23:16 +1000
+Message-Id: <20170526052319.28096-3-david@gibson.dropbear.id.au>
+In-Reply-To: <20170526052319.28096-1-david@gibson.dropbear.id.au>
+References: <20170526052319.28096-1-david@gibson.dropbear.id.au>
+Subject: [Qemu-devel] [PATCHv4 2/5] migration: Mark CPU states dirty before
+ incoming migration/loadvm
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,152 +23,173 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: groug@kaod.org, clg@kaod.org, aik@ozlabs.ru, mdroth@linux.vnet.ibm.com, nikunj@linux.vnet.ibm.com
 Cc: agraf@suse.de, abologna@redhat.com, armbru@redhat.com, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, quintela@redhat.com, dgilbert@redhat.com, sursingh@redhat.com, sbobroff@redhat.com, David Gibson <david@gibson.dropbear.id.au>
 
-This is a rebased and revised version of my patches revising CPU
-compatiblity mode handling on ppc, last posted in November.  Since
-then, many of the patches have already been merged (some for 2.9, some
-since).  This is what's left.
+As a rule, CPU internal state should never be updated when
+!cpu->kvm_vcpu_dirty (or the HAX equivalent).  If that is done, then
+subsequent calls to cpu_synchronize_state() - usually safe and idempotent -
+will clobber state.
 
- * There was conceptual confusion about what a compatibility mode
-   means, and how it interacts with the machine type.  This cleans
-   that up, clarifying that a compatibility mode (as an externally set
-   option) only makes sense on machine types that don't permit the
-   guest hypervisor privilege (i.e. 'pseries')
+However, we routinely do this during a loadvm or incoming migration.
+Usually this is called shortly after a reset, which will clear all the cpu
+dirty flags with cpu_synchronize_all_post_reset().  Nothing is expected
+to set the dirty flags again before the cpu state is loaded from the
+incoming stream.
 
- * It was previously the user's (or management layer's) responsibility
-   to determine compatibility of CPUs on either end for migration.
-   This uses the compatibility modes to check that properly during an
-   incoming migration.
+This means that it isn't safe to call cpu_synchronize_state() from a
+post_load handler, which is non-obvious and potentially inconvenient.
 
-This hasn't been extensively tested yet.  There are quite a few
-migration cases to consider, for example:
+We could cpu_synchronize_all_state() before the loadvm, but that would be
+overkill since a) we expect the state to already be synchronized from the
+reset and b) we expect to completely rewrite the state with a call to
+cpu_synchronize_all_post_init() at the end of qemu_loadvm_state().
 
-Basic:
+To clear this up, this patch introduces cpu_synchronize_pre_loadvm() and
+associated helpers, which simply marks the cpu state as dirty without
+actually changing anything.  i.e. it says we want to discard any existing
+KVM (or HAX) state and replace it with what we're going to load.
 
-1) Boot guest with -cpu host
-        Should go into POWER8 compat mode after CAS
-        Previously would have been raw mode
+Cc: Juan Quintela <quintela@redhat.com>
+Cc: Dave Gilbert <dgilbert@redhat.com>
+Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+---
+ cpus.c                    |  9 +++++++++
+ include/sysemu/cpus.h     |  1 +
+ include/sysemu/hax.h      |  1 +
+ include/sysemu/hw_accel.h | 10 ++++++++++
+ include/sysemu/kvm.h      |  1 +
+ kvm-all.c                 | 10 ++++++++++
+ migration/savevm.c        |  2 ++
+ target/i386/hax-all.c     | 10 ++++++++++
+ 8 files changed, 44 insertions(+)
 
-2) Boot guest with -machine pseries,max-cpu-compat=power7 -cpu host
-        Should go into POWER7 compat mode
-
-3) Boot guest with -cpu host,compat=power7
-        Should act as (2), but print a warning
-
-4) Boot guest via libvirt with power7 compat mode specified in XML
-        Should act as (3), (2) once we fix libvirt
-
-5) Hack guest to only advertise power7 compatibility, boot with -cpu host
-        Should go into POWER7 compat mode after CAS
-
-6) Hack guest to only advertise real PVRs
-        Should remain in POWER8 raw mode after CAS
-
-7) Hack guest to only advertise real PVRs
-   Boot with -machine pseries,max-cpu-compat=power8
-        Should fail at CAS time
-
-8) Hack guest to only advertise power7 compatibility, boot with -cpu host
-   Reboot to normal guest
-        Should go to power7 compat mode after CAS of boot 1
-        Should revert to raw mode on reboot
-        SHould go to power8 compat mode after CAS of boot 2
-
-Migration:
-
-9) Boot guest with qemu-2.6 -machine pseries-2.6 -cpu host
-   Migrate to qemu-2.8 -machine pseries-2.6 -cpu host
-        Should work, end up running in power8 raw mode
-
-10) Boot guest with qemu-2.7 -machine pseries-2.7 -cpu host
-    Migrate to qemu-2.8 -machine pseries-2.7 -cpu host
-        Should work, end up running in power8 raw mode
-
-11) Boot guest with qemu-2.7 -machine pseries-2.7 -cpu host,compat=power7
-    Migrate to qemu-2.8 -machine pseries-2.7 -cpu host,compat=power7
-        Should work, be running in POWER7 compat after, but give warning like
-        (3)
-
-12) Boot guest with qemu-2.7 -machine pseries-2.7 -cpu host,compat=power7
-    Migrate to qemu-2.8 -machine pseries-2.7,max-cpu-compat=power7 -cpu host
-        Should work, be running in POWER7 compat after, no warning
-
-13) Boot to SLOF with qemu-2.6 -machine pseries-2.6 -cpu host
-    Migrate to qemu-2.8 -machine pseries-2.6 -cpu host
-
-        ?
-
-14) Boot to SLOF with qemu-2.7 -machine pseries-2.7 -cpu host
-    Migrate to qemu-2.8 -machine pseries-2.7 -cpu host
-        ?
-
-15) Boot to SLOF with qemu-2.7 -machine pseries-2.7 -cpu host,compat=power7
-    Migrate to qemu-2.8 -machine pseries-2.7 -cpu host,compat=power7
-        ?
-
-16) Boot to SLOF with qemu-2.7 -machine pseries-2.7 -cpu host,compat=power7
-    Migrate to qemu-2.8 -machine pseries-2.7,max-cpu-compat=power7 -cpu host
-        ?
-
-17) Boot guest with qemu-2.6 -machine pseries-2.6 -cpu host
-    Migrate to qemu-2.7.z -machine pseries-2.6 -cpu host
-        Should work
-
-18) Hack guest to only advertise power7 compatibility, boot with -cpu host
-    Boot with qemu-2.8, migrate to qemu-2.8
-        Should be in power7 compat mode after CAS on source, and still
-        in power7 compat mode on destination
-
-
-Changes since v3:
-  * Backwards compatible -cpu handling now removes compat= option from
-    options passed on to the cpu, so it doesn't trigger further warnings
-  * Add a migration fix make cpu_synchronize_state() safe in post_load
-    handlers, which in turn fixes a bug in 5/5.
-  * A number of bugfixes and other tweaks suggested by feedback on v2.
-
-Changes since RFCv2:
-  * Many patches dropped, since they're already merged
-  * Rebased, fixed conflicts
-  * Restored support for backwards migration (wasn't as complicated as
-    I thought)
-  * Updated final patch's description to more accurately reflect the
-    logic
-
-Changes since RFCv1:
-  * Change CAS logic to prefer compatibility modes over raw mode
-  * Simplified by giving up on half-hearted attempts to maintain
-    backwards migration
-  * Folded migration stream changes into a single patch
-  * Removed some preliminary patches which are already merged
-
-David Gibson (4):
-  migration: Mark CPU states dirty before incoming migration/loadvm
-  pseries: Move CPU compatibility property to machine
-  pseries: Reset CPU compatibility mode
-  ppc: Rework CPU compatibility testing across migration
-
-Greg Kurz (1):
-  qapi: add explicit null to string input and output visitors
-
- cpus.c                       |   9 ++++
- hw/ppc/spapr.c               |   8 +++-
- hw/ppc/spapr_cpu_core.c      |  62 +++++++++++++++++++++-----
- hw/ppc/spapr_hcall.c         |   8 ++--
- include/hw/ppc/spapr.h       |  12 +++--
- include/sysemu/cpus.h        |   1 +
- include/sysemu/hax.h         |   1 +
- include/sysemu/hw_accel.h    |  10 +++++
- include/sysemu/kvm.h         |   1 +
- kvm-all.c                    |  10 +++++
- migration/savevm.c           |   2 +
- qapi/string-input-visitor.c  |  11 +++++
- qapi/string-output-visitor.c |  14 ++++++
- target/i386/hax-all.c        |  10 +++++
- target/ppc/compat.c          | 102 +++++++++++++++++++++++++++++++++++++++++++
- target/ppc/cpu.h             |   5 ++-
- target/ppc/machine.c         |  72 ++++++++++++++++++++++++++++--
- target/ppc/translate_init.c  |  86 +++++++++++-------------------------
- 18 files changed, 340 insertions(+), 84 deletions(-)
-
+diff --git a/cpus.c b/cpus.c
+index 516e5cb..6398439 100644
+--- a/cpus.c
++++ b/cpus.c
+@@ -921,6 +921,15 @@ void cpu_synchronize_all_post_init(void)
+     }
+ }
+ 
++void cpu_synchronize_all_pre_loadvm(void)
++{
++    CPUState *cpu;
++
++    CPU_FOREACH(cpu) {
++        cpu_synchronize_pre_loadvm(cpu);
++    }
++}
++
+ static int do_vm_stop(RunState state)
+ {
+     int ret = 0;
+diff --git a/include/sysemu/cpus.h b/include/sysemu/cpus.h
+index a8053f1..731756d 100644
+--- a/include/sysemu/cpus.h
++++ b/include/sysemu/cpus.h
+@@ -27,6 +27,7 @@ void qemu_timer_notify_cb(void *opaque, QEMUClockType type);
+ void cpu_synchronize_all_states(void);
+ void cpu_synchronize_all_post_reset(void);
+ void cpu_synchronize_all_post_init(void);
++void cpu_synchronize_all_pre_loadvm(void);
+ 
+ void qtest_clock_warp(int64_t dest);
+ 
+diff --git a/include/sysemu/hax.h b/include/sysemu/hax.h
+index d9f0239..232a68a 100644
+--- a/include/sysemu/hax.h
++++ b/include/sysemu/hax.h
+@@ -33,6 +33,7 @@ int hax_populate_ram(uint64_t va, uint32_t size);
+ void hax_cpu_synchronize_state(CPUState *cpu);
+ void hax_cpu_synchronize_post_reset(CPUState *cpu);
+ void hax_cpu_synchronize_post_init(CPUState *cpu);
++void hax_cpu_synchronize_pre_loadvm(CPUState *cpu);
+ 
+ #ifdef CONFIG_HAX
+ 
+diff --git a/include/sysemu/hw_accel.h b/include/sysemu/hw_accel.h
+index c9b3105..469ffda 100644
+--- a/include/sysemu/hw_accel.h
++++ b/include/sysemu/hw_accel.h
+@@ -45,4 +45,14 @@ static inline void cpu_synchronize_post_init(CPUState *cpu)
+     }
+ }
+ 
++static inline void cpu_synchronize_pre_loadvm(CPUState *cpu)
++{
++    if (kvm_enabled()) {
++        kvm_cpu_synchronize_pre_loadvm(cpu);
++    }
++    if (hax_enabled()) {
++        hax_cpu_synchronize_pre_loadvm(cpu);
++    }
++}
++
+ #endif /* QEMU_HW_ACCEL_H */
+diff --git a/include/sysemu/kvm.h b/include/sysemu/kvm.h
+index 5cc83f2..a45c145 100644
+--- a/include/sysemu/kvm.h
++++ b/include/sysemu/kvm.h
+@@ -459,6 +459,7 @@ int kvm_physical_memory_addr_from_host(KVMState *s, void *ram_addr,
+ void kvm_cpu_synchronize_state(CPUState *cpu);
+ void kvm_cpu_synchronize_post_reset(CPUState *cpu);
+ void kvm_cpu_synchronize_post_init(CPUState *cpu);
++void kvm_cpu_synchronize_pre_loadvm(CPUState *cpu);
+ 
+ void kvm_init_cpu_signals(CPUState *cpu);
+ 
+diff --git a/kvm-all.c b/kvm-all.c
+index 90b8573..a8485bd 100644
+--- a/kvm-all.c
++++ b/kvm-all.c
+@@ -1896,6 +1896,16 @@ void kvm_cpu_synchronize_post_init(CPUState *cpu)
+     run_on_cpu(cpu, do_kvm_cpu_synchronize_post_init, RUN_ON_CPU_NULL);
+ }
+ 
++static void do_kvm_cpu_synchronize_pre_loadvm(CPUState *cpu, run_on_cpu_data arg)
++{
++    cpu->kvm_vcpu_dirty = true;
++}
++
++void kvm_cpu_synchronize_pre_loadvm(CPUState *cpu)
++{
++    run_on_cpu(cpu, do_kvm_cpu_synchronize_pre_loadvm, RUN_ON_CPU_NULL);
++}
++
+ #ifdef KVM_HAVE_MCE_INJECTION
+ static __thread void *pending_sigbus_addr;
+ static __thread int pending_sigbus_code;
+diff --git a/migration/savevm.c b/migration/savevm.c
+index d971e5e..6391131 100644
+--- a/migration/savevm.c
++++ b/migration/savevm.c
+@@ -2011,6 +2011,8 @@ int qemu_loadvm_state(QEMUFile *f)
+         }
+     }
+ 
++    cpu_synchronize_all_pre_loadvm();
++
+     ret = qemu_loadvm_state_main(f, mis);
+     qemu_event_set(&mis->main_thread_load_event);
+ 
+diff --git a/target/i386/hax-all.c b/target/i386/hax-all.c
+index ef13015..1306722 100644
+--- a/target/i386/hax-all.c
++++ b/target/i386/hax-all.c
+@@ -635,6 +635,16 @@ void hax_cpu_synchronize_post_init(CPUState *cpu)
+     run_on_cpu(cpu, do_hax_cpu_synchronize_post_init, RUN_ON_CPU_NULL);
+ }
+ 
++static void do_hax_cpu_synchronize_pre_loadvm(CPUState *cpu, run_on_cpu_data arg)
++{
++    cpu->hax_vcpu_dirty = true;
++}
++
++void hax_cpu_synchronize_pre_loadvm(CPUState *cpu)
++{
++    run_on_cpu(cpu, do_hax_cpu_synchronize_pre_loadvm, RUN_ON_CPU_NULL);
++}
++
+ int hax_smp_cpu_exec(CPUState *cpu)
+ {
+     CPUArchState *env = (CPUArchState *) (cpu->env_ptr);
 -- 
 2.9.4
