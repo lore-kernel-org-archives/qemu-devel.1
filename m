@@ -1,22 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59748)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59773)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <maxime.coquelin@redhat.com>) id 1dEGFH-0001K4-6s
-	for qemu-devel@nongnu.org; Fri, 26 May 2017 10:29:40 -0400
+	(envelope-from <maxime.coquelin@redhat.com>) id 1dEGFS-0001SE-Mq
+	for qemu-devel@nongnu.org; Fri, 26 May 2017 10:29:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <maxime.coquelin@redhat.com>) id 1dEGFD-0008GF-8z
-	for qemu-devel@nongnu.org; Fri, 26 May 2017 10:29:39 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:35558)
+	(envelope-from <maxime.coquelin@redhat.com>) id 1dEGFO-0000II-PB
+	for qemu-devel@nongnu.org; Fri, 26 May 2017 10:29:50 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:5829)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <maxime.coquelin@redhat.com>)
-	id 1dEGFD-0008Dr-3Q
-	for qemu-devel@nongnu.org; Fri, 26 May 2017 10:29:35 -0400
+	id 1dEGFO-0000Fb-Fu
+	for qemu-devel@nongnu.org; Fri, 26 May 2017 10:29:46 -0400
 From: Maxime Coquelin <maxime.coquelin@redhat.com>
-Date: Fri, 26 May 2017 16:28:55 +0200
-Message-Id: <20170526142858.19931-4-maxime.coquelin@redhat.com>
+Date: Fri, 26 May 2017 16:28:56 +0200
+Message-Id: <20170526142858.19931-5-maxime.coquelin@redhat.com>
 In-Reply-To: <20170526142858.19931-1-maxime.coquelin@redhat.com>
 References: <20170526142858.19931-1-maxime.coquelin@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 3/6] vhost: extend ring information update
- for IOTLB to all rings
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v2 4/6] vhost-user: add vhost_user to hold the
+ chr
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,46 +29,84 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: mst@redhat.com, peterx@redhat.com, marcandre.lureau@gmail.com, vkaplans@redhat.com, jasowang@redhat.com, wexu@redhat.com, yuanhan.liu@linux.intel.com, qemu-devel@nongnu.org, jfreiman@redhat.com
-Cc: Maxime Coquelin <maxime.coquelin@redhat.com>
+Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, Maxime Coquelin <maxime.coquelin@redhat.com>
 
-Vhost-kernel backend need to receive IOTLB entry for used ring
-information early, which is done by triggering a miss event on
-its address.
+From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
-This patch extends this behaviour to all rings information, to be
-compatible with vhost-user backend design.
+Next patches will add more fields to the structure
 
+Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 Signed-off-by: Maxime Coquelin <maxime.coquelin@redhat.com>
 ---
-v2:
- - Revert back to existing behaviour, i.e. only send IOTLB updates
-at ring enablement time, not at ring address setting time (mst).
- - Extend IOTLB misses to all ring addresses, not only used ring.
+ hw/virtio/vhost-user.c | 19 ++++++++++++++++---
+ 1 file changed, 16 insertions(+), 3 deletions(-)
 
- hw/virtio/vhost.c | 8 ++++++--
- 1 file changed, 6 insertions(+), 2 deletions(-)
-
-diff --git a/hw/virtio/vhost.c b/hw/virtio/vhost.c
-index 6eddb09..7867034 100644
---- a/hw/virtio/vhost.c
-+++ b/hw/virtio/vhost.c
-@@ -1552,11 +1552,15 @@ int vhost_dev_start(struct vhost_dev *hdev, VirtIODevice *vdev)
-     if (vhost_dev_has_iommu(hdev)) {
-         hdev->vhost_ops->vhost_set_iotlb_callback(hdev, true);
- 
--        /* Update used ring information for IOTLB to work correctly,
--         * vhost-kernel code requires for this.*/
-+        /*
-+         * Update rings information for IOTLB to work correctly,
-+         * vhost-kernel and vhost-user codes require for this.
-+         */
-         for (i = 0; i < hdev->nvqs; ++i) {
-             struct vhost_virtqueue *vq = hdev->vqs + i;
-             vhost_device_iotlb_miss(hdev, vq->used_phys, true);
-+            vhost_device_iotlb_miss(hdev, vq->desc_phys, true);
-+            vhost_device_iotlb_miss(hdev, vq->avail_phys, true);
-         }
-     }
+diff --git a/hw/virtio/vhost-user.c b/hw/virtio/vhost-user.c
+index b87a176..8a602e0 100644
+--- a/hw/virtio/vhost-user.c
++++ b/hw/virtio/vhost-user.c
+@@ -110,6 +110,10 @@ static VhostUserMsg m __attribute__ ((unused));
+ /* The version of the protocol we support */
+ #define VHOST_USER_VERSION    (0x1)
+=20
++struct vhost_user {
++    CharBackend *chr;
++};
++
+ static bool ioeventfd_enabled(void)
+ {
+     return kvm_enabled() && kvm_eventfds_enabled();
+@@ -117,7 +121,8 @@ static bool ioeventfd_enabled(void)
+=20
+ static int vhost_user_read(struct vhost_dev *dev, VhostUserMsg *msg)
+ {
+-    CharBackend *chr =3D dev->opaque;
++    struct vhost_user *u =3D dev->opaque;
++    CharBackend *chr =3D u->chr;
+     uint8_t *p =3D (uint8_t *) msg;
+     int r, size =3D VHOST_USER_HDR_SIZE;
+=20
+@@ -202,7 +207,8 @@ static bool vhost_user_one_time_request(VhostUserRequ=
+est request)
+ static int vhost_user_write(struct vhost_dev *dev, VhostUserMsg *msg,
+                             int *fds, int fd_num)
+ {
+-    CharBackend *chr =3D dev->opaque;
++    struct vhost_user *u =3D dev->opaque;
++    CharBackend *chr =3D u->chr;
+     int ret, size =3D VHOST_USER_HDR_SIZE + msg->size;
+=20
+     /*
+@@ -575,11 +581,14 @@ static int vhost_user_reset_device(struct vhost_dev=
+ *dev)
+ static int vhost_user_init(struct vhost_dev *dev, void *opaque)
+ {
+     uint64_t features;
++    struct vhost_user *u;
+     int err;
+=20
+     assert(dev->vhost_ops->backend_type =3D=3D VHOST_BACKEND_TYPE_USER);
+=20
+-    dev->opaque =3D opaque;
++    u =3D g_new0(struct vhost_user, 1);
++    u->chr =3D opaque;
++    dev->opaque =3D u;
+=20
+     err =3D vhost_user_get_features(dev, &features);
+     if (err < 0) {
+@@ -624,8 +633,12 @@ static int vhost_user_init(struct vhost_dev *dev, vo=
+id *opaque)
+=20
+ static int vhost_user_cleanup(struct vhost_dev *dev)
+ {
++    struct vhost_user *u;
++
+     assert(dev->vhost_ops->backend_type =3D=3D VHOST_BACKEND_TYPE_USER);
+=20
++    u =3D dev->opaque;
++    g_free(u);
+     dev->opaque =3D 0;
+=20
      return 0;
--- 
+--=20
 2.9.4
