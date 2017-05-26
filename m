@@ -1,23 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57711)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60979)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dECJQ-0000lO-Of
-	for qemu-devel@nongnu.org; Fri, 26 May 2017 06:17:41 -0400
+	(envelope-from <marcandre.lureau@gmail.com>) id 1dECVv-0005kL-5x
+	for qemu-devel@nongnu.org; Fri, 26 May 2017 06:30:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dECJP-0006oX-Ur
-	for qemu-devel@nongnu.org; Fri, 26 May 2017 06:17:40 -0400
-Date: Fri, 26 May 2017 12:17:27 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20170526101727.GF7211@noname.str.redhat.com>
-References: <cover.1495536228.git.berto@igalia.com>
-	<142326a3-eaa4-8333-9580-ae0063f8a876@redhat.com>
-	<w51shjutjz7.fsf@maestria.local.igalia.com>
-	<0e3fc298-d47b-4066-c8c8-02f620c50b89@virtuozzo.com>
+	(envelope-from <marcandre.lureau@gmail.com>) id 1dECVt-0004IR-VO
+	for qemu-devel@nongnu.org; Fri, 26 May 2017 06:30:35 -0400
+Received: from mail-lf0-x22c.google.com ([2a00:1450:4010:c07::22c]:34753)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+	id 1dECVt-0004IL-Jz
+	for qemu-devel@nongnu.org; Fri, 26 May 2017 06:30:33 -0400
+Received: by mail-lf0-x22c.google.com with SMTP id 99so3853726lfu.1
+	for <qemu-devel@nongnu.org>; Fri, 26 May 2017 03:30:33 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <0e3fc298-d47b-4066-c8c8-02f620c50b89@virtuozzo.com>
-Subject: Re: [Qemu-devel] [PATCH 0/7] qcow2: Reduce the number of I/O ops
- when doing COW
+References: <1495471335-23707-1-git-send-email-armbru@redhat.com>
+In-Reply-To: <1495471335-23707-1-git-send-email-armbru@redhat.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Fri, 26 May 2017 10:30:21 +0000
+Message-ID: <CAJ+F1CKfHh8hZLnAn8TZaMAYTPUNReVma77D3O9mUzVN+ttAnA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 0/4] qapi: Handle some keyval fallout
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,21 +29,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Anton Nefedov <anton.nefedov@virtuozzo.com>
-Cc: Alberto Garcia <berto@igalia.com>, Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, "Denis V . Lunev" <den@openvz.org>
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
 
-Am 24.05.2017 um 18:09 hat Anton Nefedov geschrieben:
-> I agree; as mentioned we have similar patches and they don't conflict much.
-> We noticed a performance regression on HDD though, for the
-> presumably optimized case (random 4k write over a large backed
-> image); so the patches were put on hold.
+On Mon, May 22, 2017 at 8:45 PM Markus Armbruster <armbru@redhat.com> wrote=
+:
 
-You're talking about your own patches that should do the same thing,
-right? Can you re-do the same test with Berto's patches? Maybe there was
-just an implementation glitch in yours.
+> Markus Armbruster (4):
+>   qobject-input-visitor: Reject non-finite numbers with keyval
+>   qapi: Document visit_type_any() issues with keyval input
+>   tests/qapi-schema: Avoid 'str' in alternate test cases
+>   qapi: Reject alternates that can't work with keyval_parse()
+>
+>  include/qapi/visitor.h                             |  4 ++
+>  qapi/qobject-input-visitor.c                       |  3 +-
+>  scripts/qapi.py                                    | 19 ++++++-
+>  tests/Makefile.include                             |  2 +
+>  tests/qapi-schema/alternate-clash.json             |  2 +-
+>  tests/qapi-schema/alternate-conflict-dict.json     |  2 +-
+>  tests/qapi-schema/alternate-conflict-enum-bool.err |  1 +
+>  .../qapi-schema/alternate-conflict-enum-bool.exit  |  1 +
+>  .../qapi-schema/alternate-conflict-enum-bool.json  |  6 +++
+>  tests/qapi-schema/alternate-conflict-enum-bool.out |  0
+>  tests/qapi-schema/alternate-conflict-enum-int.err  |  1 +
+>  tests/qapi-schema/alternate-conflict-enum-int.exit |  1 +
+>  tests/qapi-schema/alternate-conflict-enum-int.json |  6 +++
+>  tests/qapi-schema/alternate-conflict-enum-int.out  |  0
+>  tests/qapi-schema/alternate-conflict-string.err    |  2 +-
+>  tests/qapi-schema/alternate-conflict-string.json   |  6 +--
+>  tests/qapi-schema/alternate-nested.json            |  2 +-
+>  tests/qapi-schema/args-alternate.json              |  2 +-
+>  tests/qapi-schema/doc-bad-alternate-member.json    |  2 +-
+>  tests/qapi-schema/qapi-schema-test.json            | 13 +++--
+>  tests/qapi-schema/qapi-schema-test.out             | 34 ++++++------
+>  tests/qapi-schema/returns-alternate.json           |  2 +-
+>  tests/test-clone-visitor.c                         | 23 ++++----
+>  tests/test-keyval.c                                | 18 ++++---
+>  tests/test-qobject-input-visitor.c                 | 62
+> ++++++++++++----------
+>  tests/test-qobject-output-visitor.c                |  4 +-
+>  util/keyval.c                                      | 10 ++--
+>  27 files changed, 140 insertions(+), 88 deletions(-)
+>  create mode 100644 tests/qapi-schema/alternate-conflict-enum-bool.err
+>  create mode 100644 tests/qapi-schema/alternate-conflict-enum-bool.exit
+>  create mode 100644 tests/qapi-schema/alternate-conflict-enum-bool.json
+>  create mode 100644 tests/qapi-schema/alternate-conflict-enum-bool.out
+>  create mode 100644 tests/qapi-schema/alternate-conflict-enum-int.err
+>  create mode 100644 tests/qapi-schema/alternate-conflict-enum-int.exit
+>  create mode 100644 tests/qapi-schema/alternate-conflict-enum-int.json
+>  create mode 100644 tests/qapi-schema/alternate-conflict-enum-int.out
+>
+>
+Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
-This approach should very obviously result in a performance improvement,
-and the patches are relatively simple, so I'm very much inclined to
-merge this as soon as possible.
 
-Kevin
+--=20
+Marc-Andr=C3=A9 Lureau
