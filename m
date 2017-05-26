@@ -1,32 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33586)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33587)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dEGNs-0007ft-Qc
-	for qemu-devel@nongnu.org; Fri, 26 May 2017 10:38:34 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1dEGNs-0007fv-Qw
+	for qemu-devel@nongnu.org; Fri, 26 May 2017 10:38:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dEGNp-0000Ui-LZ
+	(envelope-from <pbonzini@redhat.com>) id 1dEGNq-0000Xk-Oc
 	for qemu-devel@nongnu.org; Fri, 26 May 2017 10:38:32 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:56749)
+Received: from mx1.redhat.com ([209.132.183.28]:47514)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1dEGNp-0000SH-CY
-	for qemu-devel@nongnu.org; Fri, 26 May 2017 10:38:29 -0400
-Received: from int-mx14.intmail.prod.int.phx2.redhat.com
-	(int-mx14.intmail.prod.int.phx2.redhat.com [10.5.11.27])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 5949C1C13C2
-	for <qemu-devel@nongnu.org>; Fri, 26 May 2017 14:38:28 +0000 (UTC)
-Received: from donizetti.redhat.com (ovpn-117-65.ams2.redhat.com
-	[10.36.117.65])
-	by int-mx14.intmail.prod.int.phx2.redhat.com (8.14.4/8.14.4) with ESMTP
-	id v4QEcR9g006011
-	for <qemu-devel@nongnu.org>; Fri, 26 May 2017 10:38:27 -0400
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1dEGNq-0000Us-F6
+	for qemu-devel@nongnu.org; Fri, 26 May 2017 10:38:30 -0400
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Fri, 26 May 2017 16:38:23 +0200
-Message-Id: <20170526143826.27780-1-pbonzini@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL v3 00/22] Misc patches for 2017-05-19
+Date: Fri, 26 May 2017 16:38:24 +0200
+Message-Id: <20170526143826.27780-2-pbonzini@redhat.com>
+In-Reply-To: <20170526143826.27780-1-pbonzini@redhat.com>
+References: <20170526143826.27780-1-pbonzini@redhat.com>
+Subject: [Qemu-devel] [PULL 14/22] nbd/client.c: use errp instead of LOG
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,123 +24,214 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 
-The following changes since commit 56821559f0ba682fe6b367815572e6f974d329=
-ab:
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 
-  Merge remote-tracking branch 'dgilbert/tags/pull-hmp-20170517' into sta=
-ging (2017-05-18 13:36:15 +0100)
+Move to modern errp scheme from just LOGging errors.
 
-are available in the git repository at:
+Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-Id: <20170526110913.89098-1-vsementsov@virtuozzo.com>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ block/nbd-client.c         |  7 ++++++-
+ include/block/nbd.h        |  5 +++--
+ nbd/client.c               | 30 +++++++++++++++++-------------
+ qemu-nbd.c                 |  3 ++-
+ tests/qemu-iotests/083.out |  2 ++
+ 5 files changed, 30 insertions(+), 17 deletions(-)
 
-  git://github.com/bonzini/qemu.git tags/for-upstream
-
-for you to fetch changes up to 7860f87b6523324bd35ee5e25f698bf0d779e767:
-
-  sockets: improve error reporting if UNIX socket path is too long (2017-=
-05-26 13:22:52 +0200)
-
-----------------------------------------------------------------
-* virtio-scsi use-after-free fix (Fam)
-* vhost-user-scsi support (Felipe)
-* SMM fixes and improvements for TCG (myself, Mihail)
-* irqchip and AddressSpaceDispatch cleanups and fixes (Peter)
-* Coverity fix (Stefano)
-* NBD cleanups (Vladimir)
-* RTC accuracy improvements and code cleanups (Guangrong+Yunfang)
-* socket error reporting improvement (Daniel)
-
-----------------------------------------------------------------
-
-v2->v3: replaced one NBD patch, added the last two
-
-Daniel P. Berrange (1):
-      sockets: improve error reporting if UNIX socket path is too long
-
-Fam Zheng (1):
-      virtio-scsi: Unset hotplug handler when unrealize
-
-Felipe Franciosi (2):
-      vhost-user-scsi: Introduce vhost-user-scsi host device
-      vhost-user-scsi: Introduce a vhost-user-scsi sample application
-
-Mihail Abakumov (1):
-      i386: fix read/write cr with icount option
-
-Paolo Bonzini (2):
-      target/i386: enable A20 automatically in system management mode
-      target/i386: use multiple CPU AddressSpaces
-
-Peter Xu (4):
-      kvm: irqchip: trace changes on msi add/remove
-      msix: trace control bit write op
-      kvm: irqchip: skip update msi when disabled
-      exec: simplify phys_page_find() params
-
-Stefano Stabellini (1):
-      Check the return value of fcntl in qemu_set_cloexec
-
-Tai Yunfang (1):
-      mc146818rtc: precisely count the clock for periodic timer
-
-Vladimir Sementsov-Ogievskiy (5):
-      nbd: strict nbd_wr_syncv
-      nbd: read_sync and friends: return 0 on success
-      nbd: add errp parameter to nbd_wr_syncv()
-      nbd: add errp to read_sync, write_sync and drop_sync
-      nbd/client.c: use errp instead of LOG
-
-Xiao Guangrong (4):
-      mc146818rtc: update periodic timer only if it is needed
-      mc146818rtc: ensure LOST_TICK_POLICY_SLEW is only enabled on TARGET=
-_I386
-      mc146818rtc: drop unnecessary '#ifdef TARGET_I386'
-      mc146818rtc: embrace all x86 specific code
-
- .gitignore                                |   1 +
- Makefile                                  |   3 +
- Makefile.objs                             |   4 +
- block/nbd-client.c                        |  11 +-
- contrib/libvhost-user/libvhost-user.h     |  11 +-
- contrib/vhost-user-scsi/Makefile.objs     |   1 +
- contrib/vhost-user-scsi/vhost-user-scsi.c | 886 ++++++++++++++++++++++++=
-++++++
- default-configs/pci.mak                   |   1 +
- default-configs/s390x-softmmu.mak         |   1 +
- exec.c                                    |  13 +-
- hw/pci/msix.c                             |  11 +-
- hw/pci/trace-events                       |   3 +
- hw/scsi/Makefile.objs                     |   1 +
- hw/scsi/vhost-user-scsi.c                 | 211 +++++++
- hw/scsi/virtio-scsi.c                     |   3 +
- hw/timer/mc146818rtc.c                    | 206 ++++---
- hw/virtio/virtio-pci.c                    |  54 ++
- hw/virtio/virtio-pci.h                    |  11 +
- include/block/nbd.h                       |   8 +-
- include/hw/virtio/vhost-user-scsi.h       |  35 ++
- include/hw/virtio/virtio-scsi.h           |   2 +
- kvm-all.c                                 |   4 +-
- nbd/client.c                              | 125 ++---
- nbd/common.c                              |  23 +-
- nbd/nbd-internal.h                        |  40 +-
- nbd/server.c                              |  92 ++--
- qemu-nbd.c                                |   3 +-
- target/i386/arch_memory_mapping.c         |  18 +-
- target/i386/cpu.c                         |  15 +-
- target/i386/cpu.h                         |  20 +-
- target/i386/helper.c                      |  96 ++--
- target/i386/kvm.c                         |  12 +-
- target/i386/machine.c                     |   4 -
- target/i386/smm_helper.c                  |  18 -
- target/i386/translate.c                   |  12 +
- tests/qemu-iotests/083.out                |   2 +
- trace-events                              |   3 +-
- util/oslib-posix.c                        |   4 +-
- util/qemu-sockets.c                       |  68 ++-
- 39 files changed, 1703 insertions(+), 333 deletions(-)
- create mode 100644 contrib/vhost-user-scsi/Makefile.objs
- create mode 100644 contrib/vhost-user-scsi/vhost-user-scsi.c
- create mode 100644 hw/scsi/vhost-user-scsi.c
- create mode 100644 include/hw/virtio/vhost-user-scsi.h
---=20
+diff --git a/block/nbd-client.c b/block/nbd-client.c
+index 538d95e031..09d955bc4d 100644
+--- a/block/nbd-client.c
++++ b/block/nbd-client.c
+@@ -28,6 +28,7 @@
+  */
+ 
+ #include "qemu/osdep.h"
++#include "qapi/error.h"
+ #include "nbd-client.h"
+ 
+ #define HANDLE_TO_INDEX(bs, handle) ((handle) ^ ((uint64_t)(intptr_t)bs))
+@@ -70,10 +71,14 @@ static coroutine_fn void nbd_read_reply_entry(void *opaque)
+     NBDClientSession *s = opaque;
+     uint64_t i;
+     int ret;
++    Error *local_err = NULL;
+ 
+     for (;;) {
+         assert(s->reply.handle == 0);
+-        ret = nbd_receive_reply(s->ioc, &s->reply);
++        ret = nbd_receive_reply(s->ioc, &s->reply, &local_err);
++        if (ret < 0) {
++            error_report_err(local_err);
++        }
+         if (ret <= 0) {
+             break;
+         }
+diff --git a/include/block/nbd.h b/include/block/nbd.h
+index 9d385ea564..416257abca 100644
+--- a/include/block/nbd.h
++++ b/include/block/nbd.h
+@@ -133,9 +133,10 @@ int nbd_receive_negotiate(QIOChannel *ioc, const char *name, uint16_t *flags,
+                           QCryptoTLSCreds *tlscreds, const char *hostname,
+                           QIOChannel **outioc,
+                           off_t *size, Error **errp);
+-int nbd_init(int fd, QIOChannelSocket *sioc, uint16_t flags, off_t size);
++int nbd_init(int fd, QIOChannelSocket *sioc, uint16_t flags, off_t size,
++             Error **errp);
+ ssize_t nbd_send_request(QIOChannel *ioc, NBDRequest *request);
+-ssize_t nbd_receive_reply(QIOChannel *ioc, NBDReply *reply);
++ssize_t nbd_receive_reply(QIOChannel *ioc, NBDReply *reply, Error **errp);
+ int nbd_client(int fd);
+ int nbd_disconnect(int fd);
+ 
+diff --git a/nbd/client.c b/nbd/client.c
+index f102375504..595d99ed30 100644
+--- a/nbd/client.c
++++ b/nbd/client.c
+@@ -627,11 +627,13 @@ fail:
+ }
+ 
+ #ifdef __linux__
+-int nbd_init(int fd, QIOChannelSocket *sioc, uint16_t flags, off_t size)
++int nbd_init(int fd, QIOChannelSocket *sioc, uint16_t flags, off_t size,
++             Error **errp)
+ {
+     unsigned long sectors = size / BDRV_SECTOR_SIZE;
+     if (size / BDRV_SECTOR_SIZE != sectors) {
+-        LOG("Export size %lld too large for 32-bit kernel", (long long) size);
++        error_setg(errp, "Export size %lld too large for 32-bit kernel",
++                   (long long) size);
+         return -E2BIG;
+     }
+ 
+@@ -639,7 +641,7 @@ int nbd_init(int fd, QIOChannelSocket *sioc, uint16_t flags, off_t size)
+ 
+     if (ioctl(fd, NBD_SET_SOCK, (unsigned long) sioc->fd) < 0) {
+         int serrno = errno;
+-        LOG("Failed to set NBD socket");
++        error_setg(errp, "Failed to set NBD socket");
+         return -serrno;
+     }
+ 
+@@ -647,7 +649,7 @@ int nbd_init(int fd, QIOChannelSocket *sioc, uint16_t flags, off_t size)
+ 
+     if (ioctl(fd, NBD_SET_BLKSIZE, (unsigned long)BDRV_SECTOR_SIZE) < 0) {
+         int serrno = errno;
+-        LOG("Failed setting NBD block size");
++        error_setg(errp, "Failed setting NBD block size");
+         return -serrno;
+     }
+ 
+@@ -659,7 +661,7 @@ int nbd_init(int fd, QIOChannelSocket *sioc, uint16_t flags, off_t size)
+ 
+     if (ioctl(fd, NBD_SET_SIZE_BLOCKS, sectors) < 0) {
+         int serrno = errno;
+-        LOG("Failed setting size (in blocks)");
++        error_setg(errp, "Failed setting size (in blocks)");
+         return -serrno;
+     }
+ 
+@@ -670,12 +672,12 @@ int nbd_init(int fd, QIOChannelSocket *sioc, uint16_t flags, off_t size)
+ 
+             if (ioctl(fd, BLKROSET, (unsigned long) &read_only) < 0) {
+                 int serrno = errno;
+-                LOG("Failed setting read-only attribute");
++                error_setg(errp, "Failed setting read-only attribute");
+                 return -serrno;
+             }
+         } else {
+             int serrno = errno;
+-            LOG("Failed setting flags");
++            error_setg(errp, "Failed setting flags");
+             return -serrno;
+         }
+     }
+@@ -723,8 +725,10 @@ int nbd_disconnect(int fd)
+ }
+ 
+ #else
+-int nbd_init(int fd, QIOChannelSocket *ioc, uint16_t flags, off_t size)
++int nbd_init(int fd, QIOChannelSocket *ioc, uint16_t flags, off_t size,
++	     Error **errp)
+ {
++    error_setg(errp, "nbd_init is only supported on Linux");
+     return -ENOTSUP;
+ }
+ 
+@@ -758,19 +762,19 @@ ssize_t nbd_send_request(QIOChannel *ioc, NBDRequest *request)
+     return write_sync(ioc, buf, sizeof(buf), NULL);
+ }
+ 
+-ssize_t nbd_receive_reply(QIOChannel *ioc, NBDReply *reply)
++ssize_t nbd_receive_reply(QIOChannel *ioc, NBDReply *reply, Error **errp)
+ {
+     uint8_t buf[NBD_REPLY_SIZE];
+     uint32_t magic;
+     ssize_t ret;
+ 
+-    ret = read_sync_eof(ioc, buf, sizeof(buf), NULL);
++    ret = read_sync_eof(ioc, buf, sizeof(buf), errp);
+     if (ret <= 0) {
+         return ret;
+     }
+ 
+     if (ret != sizeof(buf)) {
+-        LOG("read failed");
++        error_setg(errp, "read failed");
+         return -EINVAL;
+     }
+ 
+@@ -788,7 +792,7 @@ ssize_t nbd_receive_reply(QIOChannel *ioc, NBDReply *reply)
+ 
+     if (reply->error == ESHUTDOWN) {
+         /* This works even on mingw which lacks a native ESHUTDOWN */
+-        LOG("server shutting down");
++        error_setg(errp, "server shutting down");
+         return -EINVAL;
+     }
+     TRACE("Got reply: { magic = 0x%" PRIx32 ", .error = % " PRId32
+@@ -796,7 +800,7 @@ ssize_t nbd_receive_reply(QIOChannel *ioc, NBDReply *reply)
+           magic, reply->error, reply->handle);
+ 
+     if (magic != NBD_REPLY_MAGIC) {
+-        LOG("invalid magic (got 0x%" PRIx32 ")", magic);
++        error_setg(errp, "invalid magic (got 0x%" PRIx32 ")", magic);
+         return -EINVAL;
+     }
+     return sizeof(buf);
+diff --git a/qemu-nbd.c b/qemu-nbd.c
+index b7ab86bfa7..f60842fd86 100644
+--- a/qemu-nbd.c
++++ b/qemu-nbd.c
+@@ -288,8 +288,9 @@ static void *nbd_client_thread(void *arg)
+         goto out_socket;
+     }
+ 
+-    ret = nbd_init(fd, sioc, nbdflags, size);
++    ret = nbd_init(fd, sioc, nbdflags, size, &local_error);
+     if (ret < 0) {
++        error_report_err(local_error);
+         goto out_fd;
+     }
+ 
+diff --git a/tests/qemu-iotests/083.out b/tests/qemu-iotests/083.out
+index 0c13888ba1..a24c6bfece 100644
+--- a/tests/qemu-iotests/083.out
++++ b/tests/qemu-iotests/083.out
+@@ -69,10 +69,12 @@ read failed: Input/output error
+ 
+ === Check disconnect 4 reply ===
+ 
++read failed
+ read failed: Input/output error
+ 
+ === Check disconnect 8 reply ===
+ 
++read failed
+ read failed: Input/output error
+ 
+ === Check disconnect before data ===
+-- 
 2.13.0
