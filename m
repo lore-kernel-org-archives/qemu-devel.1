@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48693)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49126)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dEN8y-0006XV-RP
-	for qemu-devel@nongnu.org; Fri, 26 May 2017 17:51:37 -0400
+	(envelope-from <eblake@redhat.com>) id 1dENAl-0007zL-5Q
+	for qemu-devel@nongnu.org; Fri, 26 May 2017 17:53:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dEN8x-0005jt-TM
-	for qemu-devel@nongnu.org; Fri, 26 May 2017 17:51:36 -0400
+	(envelope-from <eblake@redhat.com>) id 1dENAk-0006Gw-B2
+	for qemu-devel@nongnu.org; Fri, 26 May 2017 17:53:27 -0400
 References: <1495830130-30611-1-git-send-email-kwolf@redhat.com>
-	<1495830130-30611-9-git-send-email-kwolf@redhat.com>
+	<1495830130-30611-10-git-send-email-kwolf@redhat.com>
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <1c80010d-1131-2a8a-360c-b8414e310a2a@redhat.com>
-Date: Fri, 26 May 2017 16:51:26 -0500
+Message-ID: <ae298810-6fc4-5fba-997c-850888c73d1a@redhat.com>
+Date: Fri, 26 May 2017 16:53:17 -0500
 MIME-Version: 1.0
-In-Reply-To: <1495830130-30611-9-git-send-email-kwolf@redhat.com>
+In-Reply-To: <1495830130-30611-10-git-send-email-kwolf@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="HgD7vgV1liBKWv6dkEOWV9LEPcv211dhL"
-Subject: Re: [Qemu-devel] [PATCH 08/29] qed: Remove callback from
- qed_copy_from_backing_file()
+	boundary="jgCd5DmsSELS5seL5IiWVPDQb8P5RTPdd"
+Subject: Re: [Qemu-devel] [PATCH 09/29] qed: Make qed_write_header()
+ synchronous
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,40 +29,31 @@ To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
 Cc: pbonzini@redhat.com, qemu-devel@nongnu.org, stefanha@redhat.com, mreitz@redhat.com
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---HgD7vgV1liBKWv6dkEOWV9LEPcv211dhL
+--jgCd5DmsSELS5seL5IiWVPDQb8P5RTPdd
 From: Eric Blake <eblake@redhat.com>
 To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
 Cc: pbonzini@redhat.com, qemu-devel@nongnu.org, stefanha@redhat.com,
  mreitz@redhat.com
-Message-ID: <1c80010d-1131-2a8a-360c-b8414e310a2a@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 08/29] qed: Remove callback from
- qed_copy_from_backing_file()
+Message-ID: <ae298810-6fc4-5fba-997c-850888c73d1a@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 09/29] qed: Make qed_write_header()
+ synchronous
 References: <1495830130-30611-1-git-send-email-kwolf@redhat.com>
- <1495830130-30611-9-git-send-email-kwolf@redhat.com>
-In-Reply-To: <1495830130-30611-9-git-send-email-kwolf@redhat.com>
+ <1495830130-30611-10-git-send-email-kwolf@redhat.com>
+In-Reply-To: <1495830130-30611-10-git-send-email-kwolf@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
 On 05/26/2017 03:21 PM, Kevin Wolf wrote:
+> Note that this code is generally not running in coroutine context, so
+> this is an actual blocking synchronous operation. We'll fix this in a
+> moment.
+>=20
 > Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 > ---
->  block/qed.c | 57 +++++++++++++++++++++++------------------------------=
-----
->  1 file changed, 23 insertions(+), 34 deletions(-)
+>  block/qed.c | 76 +++++++++++++++++++++++------------------------------=
+--------
+>  1 file changed, 29 insertions(+), 47 deletions(-)
 >=20
-
->  /**
-> - * Populate back untouched region of new data cluster
-> + * Populate untouched regions of new data cluster
->   */
-> -static void qed_aio_write_postfill(void *opaque, int ret)
-> +static void qed_aio_write_cow(void *opaque, int ret)
->  {
-
-It may be worth a mention in the commit message that you are renaming
-things to use more common terminology in the process (in part because
-you reduced a chained callback into one: qed_aio_write_alloc called
-qed_aio_write_prefill called qed_aio_write_postfill).  Up to you.
 
 Reviewed-by: Eric Blake <eblake@redhat.com>
 
@@ -72,7 +63,7 @@ Red Hat, Inc.           +1-919-301-3266
 Virtualization:  qemu.org | libvirt.org
 
 
---HgD7vgV1liBKWv6dkEOWV9LEPcv211dhL
+--jgCd5DmsSELS5seL5IiWVPDQb8P5RTPdd
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
@@ -82,13 +73,13 @@ Version: GnuPG v2
 Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
 Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQEcBAEBCAAGBQJZKKNeAAoJEKeha0olJ0NqiTYIAJjb1FbfI8qVgYCXUI1jwMBj
-nDhFa35bm9HmqV7fNrwdQLuAsMJJ3TROOVnnB3MNr3HBjdsaUumBSueebD/WuQFu
-FAZlCzKxeDbKESdVCI4BBl2rw2ZK61qpYe2tBorOlUbEph0fihbQDQ5o7eCkaa+q
-xZuWKI+CbJIWViINBr3oz/PhlFGeF0Vs4yM48krR6UM5gReZFWnfN6PkDUYV5egJ
-saHbNbThV7hjPi9/ZLQUZ+oN6qv1bJINS5nViwbJp1cMmyYaUhu01pomAPNNDvwz
-rYIdJYVyPQ+yaFJjzB1WZM7GU1XKOBTX9c/Kx7do0smv43xCBh+/CauuFXkXJWo=
-=VZlS
+iQEbBAEBCAAGBQJZKKPNAAoJEKeha0olJ0NqbkcH+P4PyyzZ24lvUp2R9WwRiVhx
+Ht9QTN0mkW5zC94wPAMj17mvtlnhbsJUh3Dvg8su2U86MBBi0HncK0U004fXrx6w
+d8djH53HBjqEqZdmgT+pl+nucL+Ahv/ZpADBrPUTjmisbnbKZ2Iqu4qN7BS8pthl
+xaobeLW7m+3+O6KrWBsG0HSwrchUhtp2pch5T5V4YDXWplzW75GjPUuzIcxbgrfA
+abGZNdMDc0TnL3DF15W3PWf3R0JnH+MET8JPBEXGIO/LLvGsDQzd97wwygxsykgh
+alKG6dU3y+N9r+VJYObemBG10OrZAB8xwiLDUux/5DCyEfLkQodP3HQ490/Y1Q==
+=lJRN
 -----END PGP SIGNATURE-----
 
---HgD7vgV1liBKWv6dkEOWV9LEPcv211dhL--
+--jgCd5DmsSELS5seL5IiWVPDQb8P5RTPdd--
