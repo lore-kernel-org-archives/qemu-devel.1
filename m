@@ -1,28 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39531)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39908)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1dED3R-00047t-MF
-	for qemu-devel@nongnu.org; Fri, 26 May 2017 07:05:14 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1dED4r-0004x1-MU
+	for qemu-devel@nongnu.org; Fri, 26 May 2017 07:06:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1dED3O-0007gr-Hf
-	for qemu-devel@nongnu.org; Fri, 26 May 2017 07:05:13 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:56316)
+	(envelope-from <pbonzini@redhat.com>) id 1dED4q-00081o-TL
+	for qemu-devel@nongnu.org; Fri, 26 May 2017 07:06:41 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:32912)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1dED3O-0007gI-AD
-	for qemu-devel@nongnu.org; Fri, 26 May 2017 07:05:10 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 284B7C04BD3E
-	for <qemu-devel@nongnu.org>; Fri, 26 May 2017 11:05:09 +0000 (UTC)
-From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Fri, 26 May 2017 15:04:55 +0400
-Message-Id: <20170526110456.32004-1-marcandre.lureau@redhat.com>
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1dED4q-00081c-NE
+	for qemu-devel@nongnu.org; Fri, 26 May 2017 07:06:40 -0400
+References: <33183CC9F5247A488A2544077AF19020DA2B906D@DGGEMA505-MBX.china.huawei.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <0d13548e-717d-b90b-7666-58ada1d3c549@redhat.com>
+Date: Fri, 26 May 2017 13:06:35 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH] numa-test: fix query-cpus leaks
+In-Reply-To: <33183CC9F5247A488A2544077AF19020DA2B906D@DGGEMA505-MBX.china.huawei.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC] Is it useful to create a seperate address
+ space for cpu-memory on x86 platform?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,102 +28,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: imammedo@redhat.com, ehabkost@redhat.com, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+To: "Gonglei (Arei)" <arei.gonglei@huawei.com>, "peter.crosthwaite@xilinx.com" <peter.crosthwaite@xilinx.com>, "peter.maydell@linaro.org" <peter.maydell@linaro.org>, "edgar.iglesias@xilinx.com" <edgar.iglesias@xilinx.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "Huangweidong (C)" <weidong.huang@huawei.com>
 
-Fix test leaks introduced in commit 2941020a476.
 
-(and small extra space removed)
 
-Spotted by ASAN.
+On 26/05/2017 11:59, Gonglei (Arei) wrote:
+> The result before this commit:
+> 
+> linux-arei:/mnt/sdb/gonglei/opensource/qemu # ps aux|grep qemu
+> root     12658 17.2  0.0 375996 21412 pts/1    Sl+  12:53   0:00 ./x86_64-softmmu/qemu-system-x86_64 -machine pc-i440fx-2.5,accel=kvm,usb=off -nodefaults
+> 
+> after the commit:
+>  
+> linux-arei:/mnt/sdb/gonglei/opensource/qemu # ps aux|grep qemu
+> root     23201 17.2  0.0 384196 25736 pts/1    Sl+  12:54   0:00 ./x86_64-softmmu/qemu-system-x86_64 -machine pc-i440fx-2.5,accel=kvm,usb=off -nodefaults
+> 
+> I couldn't find any benefits on x86 platform (I'm not familiar with ARM), am I missing something?
 
-Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
----
- tests/numa-test.c | 14 +++++++++-----
- 1 file changed, 9 insertions(+), 5 deletions(-)
+Hi,
 
-diff --git a/tests/numa-test.c b/tests/numa-test.c
-index c3475d6d5e..3f636840b1 100644
---- a/tests/numa-test.c
-+++ b/tests/numa-test.c
-@@ -92,7 +92,7 @@ static QList *get_cpus(QDict **resp)
-     *resp =3D qmp("{ 'execute': 'query-cpus' }");
-     g_assert(*resp);
-     g_assert(qdict_haskey(*resp, "return"));
--    return  qdict_get_qlist(*resp, "return");
-+    return qdict_get_qlist(*resp, "return");
- }
-=20
- static void test_query_cpus(const void *data)
-@@ -100,7 +100,7 @@ static void test_query_cpus(const void *data)
-     char *cli;
-     QDict *resp;
-     QList *cpus;
--    const QObject *e;
-+    QObject *e;
-=20
-     cli =3D make_cli(data, "-smp 8 -numa node,cpus=3D0-3 -numa node,cpus=
-=3D4-7");
-     qtest_start(cli);
-@@ -124,6 +124,7 @@ static void test_query_cpus(const void *data)
-         } else {
-             g_assert_cmpint(node, =3D=3D, 1);
-         }
-+        qobject_decref(e);
-     }
-=20
-     QDECREF(resp);
-@@ -136,7 +137,7 @@ static void pc_numa_cpu(const void *data)
-     char *cli;
-     QDict *resp;
-     QList *cpus;
--    const QObject *e;
-+    QObject *e;
-=20
-     cli =3D make_cli(data, "-cpu pentium -smp 8,sockets=3D2,cores=3D2,th=
-reads=3D2 "
-         "-numa node,nodeid=3D0 -numa node,nodeid=3D1 "
-@@ -176,6 +177,7 @@ static void pc_numa_cpu(const void *data)
-         } else {
-             g_assert(false);
-         }
-+        qobject_decref(e);
-     }
-=20
-     QDECREF(resp);
-@@ -188,7 +190,7 @@ static void spapr_numa_cpu(const void *data)
-     char *cli;
-     QDict *resp;
-     QList *cpus;
--    const QObject *e;
-+    QObject *e;
-=20
-     cli =3D make_cli(data, "-smp 4,cores=3D4 "
-         "-numa node,nodeid=3D0 -numa node,nodeid=3D1 "
-@@ -220,6 +222,7 @@ static void spapr_numa_cpu(const void *data)
-         } else {
-             g_assert(false);
-         }
-+        qobject_decref(e);
-     }
-=20
-     QDECREF(resp);
-@@ -232,7 +235,7 @@ static void aarch64_numa_cpu(const void *data)
-     char *cli;
-     QDict *resp;
-     QList *cpus;
--    const QObject *e;
-+    QObject *e;
-=20
-     cli =3D make_cli(data, "-smp 2 "
-         "-numa node,nodeid=3D0 -numa node,nodeid=3D1 "
-@@ -262,6 +265,7 @@ static void aarch64_numa_cpu(const void *data)
-         } else {
-             g_assert(false);
-         }
-+        qobject_decref(e);
-     }
-=20
-     QDECREF(resp);
---=20
-2.13.0.rc1.16.gd80b50c3f
+this was also reported by Anthony Xu.  I am working on reducing the time
+and space cost of multiple address spaces by sharing the FlatView and
+AddressSpaceDispatch.
+
+Paolo
