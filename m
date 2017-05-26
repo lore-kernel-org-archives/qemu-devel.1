@@ -1,32 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39419)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39555)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dEMU7-0004Eb-J2
-	for qemu-devel@nongnu.org; Fri, 26 May 2017 17:09:24 -0400
+	(envelope-from <rth7680@gmail.com>) id 1dEMVF-0005o3-5y
+	for qemu-devel@nongnu.org; Fri, 26 May 2017 17:10:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dEMU2-0005n6-GP
-	for qemu-devel@nongnu.org; Fri, 26 May 2017 17:09:23 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43570)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1dEMU2-0005my-9l
-	for qemu-devel@nongnu.org; Fri, 26 May 2017 17:09:18 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 58C4E80511
-	for <qemu-devel@nongnu.org>; Fri, 26 May 2017 21:09:17 +0000 (UTC)
-Date: Fri, 26 May 2017 18:09:15 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20170526210915.GA32274@thinpad.lan.raisama.net>
-References: <20170526202316.22736-1-ehabkost@redhat.com>
-	<20170526202316.22736-3-ehabkost@redhat.com>
-	<1bf0456a-f9d1-1e9a-dcd4-ca9b3569b567@redhat.com>
+	(envelope-from <rth7680@gmail.com>) id 1dEMVE-00064u-8g
+	for qemu-devel@nongnu.org; Fri, 26 May 2017 17:10:33 -0400
+Received: from mail-qk0-x241.google.com ([2607:f8b0:400d:c09::241]:34944)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1dEMVE-00064o-3v
+	for qemu-devel@nongnu.org; Fri, 26 May 2017 17:10:32 -0400
+Received: by mail-qk0-x241.google.com with SMTP id k74so2644449qke.2
+	for <qemu-devel@nongnu.org>; Fri, 26 May 2017 14:10:32 -0700 (PDT)
+Sender: Richard Henderson <rth7680@gmail.com>
+References: <20170524220827.21154-1-rth@twiddle.net>
+	<20170524220827.21154-5-rth@twiddle.net>
+	<20170525231259.nkzs2rdmscufnezw@aurel32.net>
+From: Richard Henderson <rth@twiddle.net>
+Message-ID: <b72177b3-fbba-a82c-3ea2-2a3a808026f3@twiddle.net>
+Date: Fri, 26 May 2017 14:10:28 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1bf0456a-f9d1-1e9a-dcd4-ca9b3569b567@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 2/3] qmp: Include 'abstract' field on
- 'qom-list-types' output
+In-Reply-To: <20170525231259.nkzs2rdmscufnezw@aurel32.net>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 4/4] target/s390x: Re-implement a few
+ EXECUTE target insns directly
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,67 +33,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>
+To: Aurelien Jarno <aurelien@aurel32.net>
+Cc: thuth@redhat.com, qemu-devel@nongnu.org
 
-On Fri, May 26, 2017 at 03:51:53PM -0500, Eric Blake wrote:
-> On 05/26/2017 03:23 PM, Eduardo Habkost wrote:
-> > A client may be interested in getting the list of both abstract and
-> > non-abstract types.  Instead of requiring them to make multiple queries
-> > with different filter arguments, just return an 'abstract' field in
-> > 'qom-list-types'.
-> > 
-> > In addition to the new test code for validating this field, update the
-> > abstract-interfaces test case to query for all 'interface' subtypes
-> > (including abstract ones), and to look at the 'abstract' field directly.
-> > 
-> > Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
-> > ---
+On 05/25/2017 04:12 PM, Aurelien Jarno wrote:
+> On 2017-05-24 15:08, Richard Henderson wrote:
+>> While the previous patch is required for proper conformance,
+>> the vast majority of target insns are MVC and XC for implementing
+>> memmove and memset respectively.  The next most common are CLC,
+>> TR, and SVC.
+>>
+>> Implementing these (and a few others for which we already have
+>> an implementation) directly is faster than going through full
+>> translation to a TB.
+>>
+>> Signed-off-by: Richard Henderson <rth@twiddle.net>
+>> ---
+>>   target/s390x/mem_helper.c | 66 ++++++++++++++++++++++++++++++++++++-----------
+>>   1 file changed, 51 insertions(+), 15 deletions(-)
 > 
-> > +++ b/qapi-schema.json
-> > @@ -3056,12 +3056,15 @@
-> >  #
-> >  # @name: the type name found in the search
-> >  #
-> > +# @abstract: the type is abstract and can't be directly instantiated.
-> > +#            Omitted if false. (since 2.10)
-> > +#
-> 
-> A little bit awkward in that libvirt will have to see if ANY entry in
-> the large returned result has "abstract":true before it can assume
-> "abstract":false on the remaining entries (that is, older qemu don't
-> output abstract ever, but still mentions abstract types, so blindly
-> writing code to assume absence of "abstract" means false breaks on those
-> older versions).  Or a query of introspection to see if the field name
-> is even supported would do.  Not insurmountable, though.
+> I have mixed feelings about this patch. On one side it is correct. On
+> the other side, I don't know if it really worth it. With the goto_ptr
+> optimization, it can be executed quite fast once it has been translated
+> once.
 
-True.
+The thing is, I can't identify these being reused at all.  The only case for 
+which that would even seem to make sense is memcpy/memset that happens to use 
+the same size.  But even then doing the hashing to look up the block is more 
+than the decoding required to run the helper directly.
 
-I have the impression that management is not likely to look at
-this field in the near future.  Probably the new field will be
-more useful for automated test code like
-device-instrospect-test.c and the device-crash-test script I
-submitted recently.
 
-> 
-> >  # Since: 1.1
-> >  #
-> >  # Notes: This command is experimental and may change syntax in future releases.
-> 
-> Is this note still helpful, or should we delete it now?
-
-The patch removing this line is already in a pending pull request
-submitted by Markus last Tuesday.
-
-> 
-> >  ##
-> >  { 'struct': 'ObjectTypeInfo',
-> > -  'data': { 'name': 'str' } }
-> > +  'data': { 'name': 'str', '*abstract': 'bool' } }
-> 
-> Reviewed-by: Eric Blake <eblake@redhat.com>
-
-Thanks!
-
--- 
-Eduardo
+r~
