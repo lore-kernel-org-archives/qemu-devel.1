@@ -1,23 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56522)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56940)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dECEC-0004aO-2f
-	for qemu-devel@nongnu.org; Fri, 26 May 2017 06:12:16 -0400
+	(envelope-from <marcandre.lureau@redhat.com>) id 1dECG1-0006dj-Mm
+	for qemu-devel@nongnu.org; Fri, 26 May 2017 06:14:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dECEB-0004o2-34
-	for qemu-devel@nongnu.org; Fri, 26 May 2017 06:12:16 -0400
-Date: Fri, 26 May 2017 12:12:05 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20170526101205.GE7211@noname.str.redhat.com>
-References: <4086b9ad1d1c912298f7c981f2c94a9f9a7026a3.1495536228.git.berto@igalia.com>
-	<5925B107.1060404@virtuozzo.com>
-	<f4437f01-1eb2-d1c1-3df5-ee992fab2036@virtuozzo.com>
-	<w51inkqyt23.fsf@maestria.local.igalia.com>
+	(envelope-from <marcandre.lureau@redhat.com>) id 1dECFw-0005vB-7S
+	for qemu-devel@nongnu.org; Fri, 26 May 2017 06:14:07 -0400
+From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+Date: Fri, 26 May 2017 14:13:37 +0400
+Message-Id: <20170526101337.4096-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <w51inkqyt23.fsf@maestria.local.igalia.com>
-Subject: Re: [Qemu-devel] [PATCH 7/7] qcow2: Merge the writing of the COW
- regions with the guest data
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH] qemu-ga: remove useless allocation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,35 +20,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alberto Garcia <berto@igalia.com>
-Cc: Anton Nefedov <anton.nefedov@virtuozzo.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org, mreitz@redhat.com, stefanha@redhat.com, den@openvz.org
+To: qemu-devel@nongnu.org
+Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, qemu-trivial@nongnu.org, Michael Roth <mdroth@linux.vnet.ibm.com>
 
-Am 24.05.2017 um 21:05 hat Alberto Garcia geschrieben:
-> On Wed 24 May 2017 06:43:31 PM CEST, Anton Nefedov wrote:
-> >> +    if (m->data_qiov) {
-> >> +        qemu_iovec_reset(&qiov);
-> >> +        qemu_iovec_add(&qiov, start_buffer, start->nb_bytes);
-> >> +        qemu_iovec_concat(&qiov, m->data_qiov, 0, data_bytes);
-> >> +        qemu_iovec_add(&qiov, end_buffer, end->nb_bytes);
-> >
-> > Can it be a problem if (m->data_qiov->niov == IOV_MAX)?
-> > We had to add merge-iovecs code for the case (maybe there's better
-> > solution?)
-> 
-> You're right, good catch! I'll add a check for that. To be honest I
-> don't think that's likely to happen in practice, so if it does we can
-> simply fall back to the old behavior (separate writes).
-> 
-> > Also, will this work if allocation is split into several l2metas?
-> > e.g. one has cow_start.nb_bytes and another has cow_end.nb_bytes
-> 
-> The guest request will be merged with the first l2meta that has to copy
-> at least one of the two regions. It doesn't matter if the other one has
-> nb_bytes == 0.
+There is no need to duplicate a fixed string.
 
-I think we can improve this later so that we merge everything together
-(multiple l2metas and guest data) into a single request, but what this
-seris implements is still a very good first step, so we shouldn't let
-this stop us from taking the good rather than waiting for the perfect.
+CC: qemu-trivial@nongnu.org
+Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+---
+ qga/commands-posix.c | 4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
 
-Kevin
+diff --git a/qga/commands-posix.c b/qga/commands-posix.c
+index 284ecc6d7e..d8e412275e 100644
+--- a/qga/commands-posix.c
++++ b/qga/commands-posix.c
+@@ -2197,12 +2197,10 @@ static void transfer_memory_block(GuestMemoryBloc=
+k *mem_blk, bool sys2memblk,
+         }
+     } else {
+         if (mem_blk->online !=3D (strncmp(status, "online", 6) =3D=3D 0)=
+) {
+-            char *new_state =3D mem_blk->online ? g_strdup("online") :
+-                                                g_strdup("offline");
++            const char *new_state =3D mem_blk->online ? "online" : "offl=
+ine";
+=20
+             ga_write_sysfs_file(dirfd, "state", new_state, strlen(new_st=
+ate),
+                                 &local_err);
+-            g_free(new_state);
+             if (local_err) {
+                 error_free(local_err);
+                 result->response =3D
+--=20
+2.13.0.rc1.16.gd80b50c3f
