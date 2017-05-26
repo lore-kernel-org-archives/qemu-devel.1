@@ -1,30 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40780)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43936)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dEMbl-0000y5-U5
-	for qemu-devel@nongnu.org; Fri, 26 May 2017 17:17:18 -0400
+	(envelope-from <eblake@redhat.com>) id 1dEMpn-0001L1-5L
+	for qemu-devel@nongnu.org; Fri, 26 May 2017 17:31:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dEMbl-0008Rr-0P
-	for qemu-devel@nongnu.org; Fri, 26 May 2017 17:17:17 -0400
-Received: from mail-qt0-x243.google.com ([2607:f8b0:400d:c0d::243]:33364)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1dEMbk-0008Re-SI
-	for qemu-devel@nongnu.org; Fri, 26 May 2017 17:17:16 -0400
-Received: by mail-qt0-x243.google.com with SMTP id a46so2854515qte.0
-	for <qemu-devel@nongnu.org>; Fri, 26 May 2017 14:17:16 -0700 (PDT)
-Received: from bigtime.twiddle.net.com
-	([2602:47:d954:1500:5e51:4fff:fe40:9c64])
-	by smtp.gmail.com with ESMTPSA id
-	u19sm1262380qtc.64.2017.05.26.14.17.15 for <qemu-devel@nongnu.org>
-	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Fri, 26 May 2017 14:17:15 -0700 (PDT)
-Sender: Richard Henderson <rth7680@gmail.com>
-From: Richard Henderson <rth@twiddle.net>
-Date: Fri, 26 May 2017 14:16:38 -0700
-Message-Id: <20170526211638.32301-27-rth@twiddle.net>
-In-Reply-To: <20170526211638.32301-1-rth@twiddle.net>
-References: <20170526211638.32301-1-rth@twiddle.net>
-Subject: [Qemu-devel] [PATCH v7 26/26] target/alpha: Use goto_tb for
- fallthru between TBs
+	(envelope-from <eblake@redhat.com>) id 1dEMpm-0004zz-3H
+	for qemu-devel@nongnu.org; Fri, 26 May 2017 17:31:47 -0400
+References: <1495830130-30611-1-git-send-email-kwolf@redhat.com>
+	<1495830130-30611-6-git-send-email-kwolf@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <7ca29a83-b3de-1775-0284-d208a5b3e511@redhat.com>
+Date: Fri, 26 May 2017 16:31:35 -0500
+MIME-Version: 1.0
+In-Reply-To: <1495830130-30611-6-git-send-email-kwolf@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="ts6VNggVG1jNDDWtFdOa8w9kjTF4M3x6P"
+Subject: Re: [Qemu-devel] [PATCH 05/29] qed: Remove callback from
+ qed_find_cluster()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,58 +25,96 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: pbonzini@redhat.com, qemu-devel@nongnu.org, stefanha@redhat.com, mreitz@redhat.com
 
-Signed-off-by: Richard Henderson <rth@twiddle.net>
----
- target/alpha/translate.c | 14 ++++++++++++--
- 1 file changed, 12 insertions(+), 2 deletions(-)
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--ts6VNggVG1jNDDWtFdOa8w9kjTF4M3x6P
+From: Eric Blake <eblake@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: pbonzini@redhat.com, qemu-devel@nongnu.org, stefanha@redhat.com,
+ mreitz@redhat.com
+Message-ID: <7ca29a83-b3de-1775-0284-d208a5b3e511@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 05/29] qed: Remove callback from
+ qed_find_cluster()
+References: <1495830130-30611-1-git-send-email-kwolf@redhat.com>
+ <1495830130-30611-6-git-send-email-kwolf@redhat.com>
+In-Reply-To: <1495830130-30611-6-git-send-email-kwolf@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-diff --git a/target/alpha/translate.c b/target/alpha/translate.c
-index 4523c4c..7c45ae3 100644
---- a/target/alpha/translate.c
-+++ b/target/alpha/translate.c
-@@ -89,6 +89,9 @@ typedef enum {
-        updated the PC for the next instruction to be executed.  */
-     EXIT_PC_STALE,
- 
-+    /* We are exiting the TB due to page crossing or space constraints.  */
-+    EXIT_FALLTHRU,
-+
-     /* We are ending the TB with a noreturn function call, e.g. longjmp.
-        No following code will be executed.  */
-     EXIT_NORETURN,
-@@ -2984,7 +2987,7 @@ void gen_intermediate_code(CPUAlphaState *env, struct TranslationBlock *tb)
-                 || num_insns >= max_insns
-                 || singlestep
-                 || ctx.singlestep_enabled)) {
--            ret = EXIT_PC_STALE;
-+            ret = EXIT_FALLTHRU;
-         }
-     } while (ret == NO_EXIT);
- 
-@@ -2996,6 +2999,13 @@ void gen_intermediate_code(CPUAlphaState *env, struct TranslationBlock *tb)
-     case EXIT_GOTO_TB:
-     case EXIT_NORETURN:
-         break;
-+    case EXIT_FALLTHRU:
-+        if (use_goto_tb(&ctx, ctx.pc)) {
-+            tcg_gen_goto_tb(0);
-+            tcg_gen_movi_i64(cpu_pc, ctx.pc);
-+            tcg_gen_exit_tb((uintptr_t)ctx.tb);
-+        }
-+        /* FALLTHRU */
-     case EXIT_PC_STALE:
-         tcg_gen_movi_i64(cpu_pc, ctx.pc);
-         /* FALLTHRU */
-@@ -3007,7 +3017,7 @@ void gen_intermediate_code(CPUAlphaState *env, struct TranslationBlock *tb)
-         }
-         break;
-     default:
--        abort();
-+        g_assert_not_reached();
-     }
- 
-     gen_tb_end(tb, num_insns);
--- 
-2.9.4
+On 05/26/2017 03:21 PM, Kevin Wolf wrote:
+> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> ---
+>  block/qed-cluster.c | 39 ++++++++++++++++++++++-----------------
+>  block/qed.c         | 20 +++++++++++---------
+>  block/qed.h         |  4 ++--
+>  3 files changed, 35 insertions(+), 28 deletions(-)
+>=20
+
+This diffstat is not as slick as the earlier patches, but the cleanup is
+still worthwhile.
+
+> @@ -93,16 +98,16 @@ void qed_find_cluster(BDRVQEDState *s, QEDRequest *=
+request, uint64_t pos,
+>      /* Limit length to L2 boundary.  Requests are broken up at the L2 =
+boundary
+>       * so that a request acts on one L2 table at a time.
+>       */
+> -    len =3D MIN(len, (((pos >> s->l1_shift) + 1) << s->l1_shift) - pos=
+);
+> +    *len =3D MIN(*len, (((pos >> s->l1_shift) + 1) << s->l1_shift) - p=
+os);
+
+Perhaps a separate cleanup, but wouldn't this be easier to read as:
+*len =3D MIN(*len, QEMU_ALIGN_UP(pos, 1ULL << s->l1_shift) - pos);
+
+(or if there is a direct variable for l1 size, rather than '1ULL <<
+s->l1_shift')
+
+> +++ b/block/qed.h
+> @@ -247,8 +247,8 @@ int qed_write_l2_table_sync(BDRVQEDState *s, QEDReq=
+uest *request,
+>  /**
+>   * Cluster functions
+>   */
+> -void qed_find_cluster(BDRVQEDState *s, QEDRequest *request, uint64_t p=
+os,
+> -                      size_t len, QEDFindClusterFunc *cb, void *opaque=
+);
+> +int qed_find_cluster(BDRVQEDState *s, QEDRequest *request, uint64_t po=
+s,
+> +                     size_t *len, uint64_t *img_offset);
+
+While we're touching this, would it be better to switch to an
+always-64-bit type, rather than using platform-dependent size_t for len?
+ But even so, that cleanup would be a separate patch.
+
+Reviewed-by: Eric Blake <eblake@redhat.com>
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--ts6VNggVG1jNDDWtFdOa8w9kjTF4M3x6P
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEcBAEBCAAGBQJZKJ63AAoJEKeha0olJ0Nq8r8IAICkq4cEkeG0RrHc2DcOEMHi
+BKU9Pn0qkfpOKDv3Xg4RFP5g8FN0pfrHVdSyfFiniBVB3GdgT6W4qm/hfboZMdj9
+Z4S/W13WvStg8Fv3wgrIFOb2GOqOtMaZcBULo3E69j8ibdsWRb62puG8YB1tgXwB
+XVcEiwGNzK7+KxZD/fPSPgfEfZCejJ6Kswf4itFHdrCMn/7tFXOIc9JUma0Htxu/
+hmsBNZ3Ltd94HDAF31nsSx2XG6+1c9CWAs34eERMe+39OLECOfcnQx0nuWxA4gcY
+im+abYoTnFygY9owIOlJbVobK2A+iFEYr9I2K2Kv9o8WYfaMTEMnekm8pAdvwts=
+=n4Jt
+-----END PGP SIGNATURE-----
+
+--ts6VNggVG1jNDDWtFdOa8w9kjTF4M3x6P--
