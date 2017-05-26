@@ -1,29 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56999)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57531)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dEG2z-0000FW-OA
-	for qemu-devel@nongnu.org; Fri, 26 May 2017 10:16:58 -0400
+	(envelope-from <rth7680@gmail.com>) id 1dEG4a-0001J1-Mc
+	for qemu-devel@nongnu.org; Fri, 26 May 2017 10:18:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dEG2y-00085T-VK
-	for qemu-devel@nongnu.org; Fri, 26 May 2017 10:16:57 -0400
-Received: from mail-qt0-x244.google.com ([2607:f8b0:400d:c0d::244]:36293)
+	(envelope-from <rth7680@gmail.com>) id 1dEG4Z-0004MN-V9
+	for qemu-devel@nongnu.org; Fri, 26 May 2017 10:18:36 -0400
+Received: from mail-qk0-x244.google.com ([2607:f8b0:400d:c09::244]:36044)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1dEG2y-00083Y-Qj
-	for qemu-devel@nongnu.org; Fri, 26 May 2017 10:16:56 -0400
-Received: by mail-qt0-x244.google.com with SMTP id j13so1424095qta.3
-	for <qemu-devel@nongnu.org>; Fri, 26 May 2017 07:16:56 -0700 (PDT)
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1dEG4Z-0004L9-PY
+	for qemu-devel@nongnu.org; Fri, 26 May 2017 10:18:35 -0400
+Received: by mail-qk0-x244.google.com with SMTP id y128so1310204qka.3
+	for <qemu-devel@nongnu.org>; Fri, 26 May 2017 07:18:35 -0700 (PDT)
 Sender: Richard Henderson <rth7680@gmail.com>
 References: <20170525210508.4910-1-aurelien@aurel32.net>
-	<20170525210508.4910-11-aurelien@aurel32.net>
+	<20170525210508.4910-12-aurelien@aurel32.net>
 From: Richard Henderson <rth@twiddle.net>
-Message-ID: <719b4318-d43f-51b0-e628-cf9cc3670e95@twiddle.net>
-Date: Fri, 26 May 2017 07:16:53 -0700
+Message-ID: <8d89003e-8505-b19d-2754-c2b01d25d0a6@twiddle.net>
+Date: Fri, 26 May 2017 07:18:32 -0700
 MIME-Version: 1.0
-In-Reply-To: <20170525210508.4910-11-aurelien@aurel32.net>
+In-Reply-To: <20170525210508.4910-12-aurelien@aurel32.net>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 10/26] target/s390x: implement MOVE WITH
- OFFSET
+Subject: Re: [Qemu-devel] [PATCH 11/26] target/s390x: implement MOVE ZONES
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,10 +38,10 @@ On 05/25/2017 02:04 PM, Aurelien Jarno wrote:
 > Signed-off-by: Aurelien Jarno<aurelien@aurel32.net>
 > ---
 >   target/s390x/helper.h      |  1 +
->   target/s390x/insn-data.def |  4 ++++
->   target/s390x/mem_helper.c  | 31 +++++++++++++++++++++++++++++++
+>   target/s390x/insn-data.def |  2 ++
+>   target/s390x/mem_helper.c  | 13 +++++++++++++
 >   target/s390x/translate.c   |  8 ++++++++
->   4 files changed, 44 insertions(+)
+>   4 files changed, 24 insertions(+)
 
 Reviewed-by: Richard Henderson <rth@twiddle.net>
 
