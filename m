@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47402)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47438)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <anton.nefedov@virtuozzo.com>) id 1dEFMW-0002QV-Nx
-	for qemu-devel@nongnu.org; Fri, 26 May 2017 09:33:05 -0400
+	(envelope-from <eblake@redhat.com>) id 1dEFMf-0002UY-Il
+	for qemu-devel@nongnu.org; Fri, 26 May 2017 09:33:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <anton.nefedov@virtuozzo.com>) id 1dEFMV-0005yI-QL
-	for qemu-devel@nongnu.org; Fri, 26 May 2017 09:33:04 -0400
-References: <cover.1495536228.git.berto@igalia.com>
-	<142326a3-eaa4-8333-9580-ae0063f8a876@redhat.com>
-	<w51shjutjz7.fsf@maestria.local.igalia.com>
-	<0e3fc298-d47b-4066-c8c8-02f620c50b89@virtuozzo.com>
-	<20170526101727.GF7211@noname.str.redhat.com>
-	<cc4efd40-46e8-82c0-10f7-148e84ab477a@virtuozzo.com>
-	<w5160gnlq90.fsf@maestria.local.igalia.com>
-From: Anton Nefedov <anton.nefedov@virtuozzo.com>
-Message-ID: <e636f52f-41c1-4682-e8b9-ea2596ac21b0@virtuozzo.com>
-Date: Fri, 26 May 2017 16:32:49 +0300
+	(envelope-from <eblake@redhat.com>) id 1dEFMb-00064I-DA
+	for qemu-devel@nongnu.org; Fri, 26 May 2017 09:33:13 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37828)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dEFMb-00063Y-3l
+	for qemu-devel@nongnu.org; Fri, 26 May 2017 09:33:09 -0400
+References: <19feea44a3f4010645a1b829b504481f1b574b9a.1495797845.git.maozy.fnst@cn.fujitsu.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <caf34cd4-a2cd-395b-f95f-d2588ba1672a@redhat.com>
+Date: Fri, 26 May 2017 08:33:01 -0500
 MIME-Version: 1.0
-In-Reply-To: <w5160gnlq90.fsf@maestria.local.igalia.com>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 0/7] qcow2: Reduce the number of I/O ops
- when doing COW
+In-Reply-To: <19feea44a3f4010645a1b829b504481f1b574b9a.1495797845.git.maozy.fnst@cn.fujitsu.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="itVQSiAHvvtSksIHbwj30Rb0l6ewtIahV"
+Subject: Re: [Qemu-devel] [PATCH v2] pci: Set err to errp directly rather
+ than through error_porpagate()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,28 +28,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alberto Garcia <berto@igalia.com>, Kevin Wolf <kwolf@redhat.com>
-Cc: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, "Denis V . Lunev" <den@openvz.org>
+To: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>, qemu-devel@nongnu.org
+Cc: marcel@redhat.com, imammedo@redhat.com, armbru@redhat.com, mst@redhat.com
 
-On 05/26/2017 04:08 PM, Alberto Garcia wrote:
-> On Fri 26 May 2017 02:47:55 PM CEST, Anton Nefedov wrote:
->> Tried the another machine; about 10% improvement here
->    [...]
->> [root@localhost ~]# fio --name=randwrite --blocksize=4k
->> --filename=/dev/sdb --rw=randwrite --direct=1 --ioengine=libaio
->> --size=2g --io_size=32m
-> 
-> In my tests I sometimes detected slight performance decreases in that
-> HDD scenario but using 'write' instead of 'randwrite' (and --runtime=60
-> instead of --io_size).
-> 
-> Can you try and see how that works for you?
-> 
-> Berto
-> 
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--itVQSiAHvvtSksIHbwj30Rb0l6ewtIahV
+From: Eric Blake <eblake@redhat.com>
+To: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>, qemu-devel@nongnu.org
+Cc: marcel@redhat.com, imammedo@redhat.com, armbru@redhat.com, mst@redhat.com
+Message-ID: <caf34cd4-a2cd-395b-f95f-d2588ba1672a@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2] pci: Set err to errp directly rather than
+ through error_porpagate()
+References: <19feea44a3f4010645a1b829b504481f1b574b9a.1495797845.git.maozy.fnst@cn.fujitsu.com>
+In-Reply-To: <19feea44a3f4010645a1b829b504481f1b574b9a.1495797845.git.maozy.fnst@cn.fujitsu.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-For me it keeps giving pretty much the same result before and after
+On 05/26/2017 06:58 AM, Mao Zhongyi wrote:
 
-  write: io=512736KB, bw=8545.4KB/s, iops=2136, runt= 60004msec
+In the subject: s/porpagate/propagate/
 
-/Anton
+> ioh3420_interrupts_init() and its callers rp_realize() fill error
+> message to local_err, then propagate it to errp by error_porpagate(),
+
+and again
+
+> which's not necessary. So eliminate it and pass errp directly instead
+
+s/which's/which is/ (English does not have the abbreviation which's)
+
+> of local_err. Of course, error_propagate() also has been removed.
+>=20
+> Signed-off-by: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
+> ---
+> v2:
+> * Drop the part of wrong handling that ignored the fact that if=20
+>   pci_qdev_realize()'s caller pass errp =3D NULL.
+>=20
+
+The code portion is fine, so with the commit message fixed (which a
+maintainer might do without needing you to send a v3),
+Reviewed-by: Eric Blake <eblake@redhat.com>
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--itVQSiAHvvtSksIHbwj30Rb0l6ewtIahV
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEbBAEBCAAGBQJZKC6NAAoJEKeha0olJ0NqwQUH+K3AcZCIDlLngZ7LsYCbAkAl
+zI/z4m6mCkhVCn+O8Q3wahghVtElZi1909DraIaBkmDkP1AjyykcpnUflhokuAvR
+x2qVBn8lUqmD641DKLwh/ze61ADswsZ0CSEzozzZJ9QxR39zx5NN77tVsIfvpj7E
+BQrmXrbNxPpPcni4fWyW5c/suDmBNjTyPE4f6LAIOpYEne6kjkMGyhdLbQID6wz8
+uHnoP2dKynr3bXSModkHDOaBudO/OZL9GM0vWFiQ7c2BqHuVWHWabSyYsssMAvus
+Y1m0ZwMMDbbjBzNj+IiNkSa45S4n0mIyekN6SHp97L8XXAhJModt660V95ftzg==
+=rRGK
+-----END PGP SIGNATURE-----
+
+--itVQSiAHvvtSksIHbwj30Rb0l6ewtIahV--
