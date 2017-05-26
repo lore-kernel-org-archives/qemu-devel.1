@@ -1,34 +1,47 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51644)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52253)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dE7D8-0002Wh-ML
-	for qemu-devel@nongnu.org; Fri, 26 May 2017 00:50:51 -0400
+	(envelope-from <dongdwdw@linux.vnet.ibm.com>) id 1dE7Hn-0004bL-Vi
+	for qemu-devel@nongnu.org; Fri, 26 May 2017 00:55:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dE7D4-0003Gs-OQ
-	for qemu-devel@nongnu.org; Fri, 26 May 2017 00:50:50 -0400
-Received: from indium.canonical.com ([91.189.90.7]:51606)
+	(envelope-from <dongdwdw@linux.vnet.ibm.com>) id 1dE7Hk-0004cK-RZ
+	for qemu-devel@nongnu.org; Fri, 26 May 2017 00:55:40 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:44952
+	helo=mx0a-001b2d01.pphosted.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1dE7D4-0003GF-IT
-	for qemu-devel@nongnu.org; Fri, 26 May 2017 00:50:46 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1dE7D3-0008LK-46
-	for <qemu-devel@nongnu.org>; Fri, 26 May 2017 04:50:45 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 1BC7C2E8025
-	for <qemu-devel@nongnu.org>; Fri, 26 May 2017 04:50:45 +0000 (UTC)
+	(Exim 4.71) (envelope-from <dongdwdw@linux.vnet.ibm.com>)
+	id 1dE7Hk-0004c8-LS
+	for qemu-devel@nongnu.org; Fri, 26 May 2017 00:55:36 -0400
+Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v4Q4s2fO194715
+	for <qemu-devel@nongnu.org>; Fri, 26 May 2017 00:55:35 -0400
+Received: from e23smtp03.au.ibm.com (e23smtp03.au.ibm.com [202.81.31.145])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2apchsj8wt-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Fri, 26 May 2017 00:55:35 -0400
+Received: from localhost
+	by e23smtp03.au.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <dongdwdw@linux.vnet.ibm.com>;
+	Fri, 26 May 2017 14:55:29 +1000
+Received: from d23av01.au.ibm.com (d23av01.au.ibm.com [9.190.234.96])
+	by d23relay08.au.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+	v4Q4tJCj58261710
+	for <qemu-devel@nongnu.org>; Fri, 26 May 2017 14:55:27 +1000
+Received: from d23av01.au.ibm.com (localhost [127.0.0.1])
+	by d23av01.au.ibm.com (8.14.4/8.14.4/NCO v10.0 AVout) with ESMTP id
+	v4Q4ssMD017492
+	for <qemu-devel@nongnu.org>; Fri, 26 May 2017 14:54:54 +1000
+References: <f0b11c2d-9f61-c4c2-4b55-58644b760e31@linux.vnet.ibm.com>
+	<f5c021e4-86ce-7476-44dc-d386f2349ed0@redhat.com>
+From: Wang Dong <dongdwdw@linux.vnet.ibm.com>
+Date: Fri, 26 May 2017 12:54:38 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 26 May 2017 04:40:41 -0000
-From: Paul Goyette <1693649@bugs.launchpad.net>
-Reply-To: Bug 1693649 <1693649@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <149575946555.18286.18117412791023512529.malonedeb@chaenomeles.canonical.com>
-Message-Id: <149577364154.17847.3073963205420272418.malone@chaenomeles.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1693649] Re: x86 pause misbehaves with -cpu
- haswell
+In-Reply-To: <f5c021e4-86ce-7476-44dc-d386f2349ed0@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Message-Id: <e4b8f16d-b62d-582c-2659-5e6a049a6813@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] new to qemu with a simple question
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,66 +50,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
 
-Further investigation shows that pause may be working, but very very
-slowly.
 
-The "use-case" in NetBSD is for "hatching" application CPUs.  The target
-CPU runs a loop that does
 
-    while (flag_1 not set)
-        for (i =3D 0; i < 10000; i++)
-            x86_pause();                 /* which is assembly code:  "pause=
-; ret;" */
-    ...
-    set flag_2;
-    return;
+On 05/24/2017 09:30 PM, Eric Blake wrote:
+> On 05/23/2017 09:56 PM, Wang Dong wrote:
+>> Hi guys,
+>>
+>> I am new to qemu. But I need do some job in it right now.
+>>
+>> When I try read qmp code. I found a interesting part against it.
+>>
+>> Some C source code is generate from json file.
+>>
+>> I wonder why this? What is the benefits of this?
+> Boring and repetitive code that is easy to typo is best written by
+> computer, which excels at boring and repetitive tasks.  Writing our
+> description in a more concise higher language and generating C code from
+> that lets us focus on the actual design, rather than the mundane
+> correctness of the code implementing the design.
+>
+> It's the same reason that people use bison/yacc rather than hand-written
+> parsers for complex grammars - you isolate the correctness of the code
+> to the correctness of the generator, and free yourself to now only have
+> to worry about the bigger picture of the input you feed to the
+> generator.  And on another level, it's why we write programs in C
+> instead of assembly.  Abstraction is good.
+>
+Thanks for your reply. I really appreciate it.
 
-The boot CPU executes the following code for each application CPU:
-
-    set flag_1;
-    for (i =3D 0; i < 100000 && flag_2 not set; i++)
-        i8254_delay(10);             /* this should be 10usec per iteration=
-, 1.0 sec total */
-    if (flag_2 not set)
-        panic(cpu did not hatch);
-    ....
-
-So, the 10k executions of x86_pause are taking in excess of 1 sec to
-complete.  Indeed, reducing that constant value from 10k to only 100
-results in the same failure.  So it would seem that the pause
-instruction is taking an extremely long time to complete.  (Further
-reducing the interation count to only 50 results in success, although it
-"feels" very sluggish.)
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1693649
-
-Title:
-  x86 pause misbehaves with -cpu haswell
-
-Status in QEMU:
-  New
-
-Bug description:
-  Using qemu-2.9.0
-
-  When booting NetBSD using '-cpu haswell -smp 4', the system fails to
-  initialize the additional CPUs.  It appears as though the "application
-  processor" enters routine x86_pause() but never returns.
-
-  x86_pause() is simply two assembler instructions: 'pause; ret;'
-
-  Replacing the routine with 'nop; nop; ret;' allows the system to
-  proceed, of course without the benefit of the pause instruction on
-  spin-loops!
-
-  Additionally, booting with '-cpu phenom -smp 4' also works, although
-  the system does seem confused about the type of CPU being used.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1693649/+subscriptions
+-- 
+Best regards. Wang Dong
