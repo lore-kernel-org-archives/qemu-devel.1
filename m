@@ -1,30 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53729)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53900)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dEC1W-000565-NX
-	for qemu-devel@nongnu.org; Fri, 26 May 2017 05:59:11 -0400
+	(envelope-from <arei.gonglei@huawei.com>) id 1dEC26-0005Lo-ME
+	for qemu-devel@nongnu.org; Fri, 26 May 2017 05:59:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dEC1S-0001Bj-SS
-	for qemu-devel@nongnu.org; Fri, 26 May 2017 05:59:10 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:49758)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1dEC1S-0001Ba-MQ
-	for qemu-devel@nongnu.org; Fri, 26 May 2017 05:59:06 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 3D6B6F804C
-	for <qemu-devel@nongnu.org>; Fri, 26 May 2017 09:59:05 +0000 (UTC)
-Date: Fri, 26 May 2017 10:59:01 +0100
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170526095901.GB24484@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <20170526093641.7159-1-pbonzini@redhat.com>
+	(envelope-from <arei.gonglei@huawei.com>) id 1dEC22-0001GZ-DB
+	for qemu-devel@nongnu.org; Fri, 26 May 2017 05:59:46 -0400
+Received: from szxga01-in.huawei.com ([45.249.212.187]:4002)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
+	(envelope-from <arei.gonglei@huawei.com>) id 1dEC21-0001F3-Pu
+	for qemu-devel@nongnu.org; Fri, 26 May 2017 05:59:42 -0400
+From: "Gonglei (Arei)" <arei.gonglei@huawei.com>
+Date: Fri, 26 May 2017 09:59:02 +0000
+Message-ID: <33183CC9F5247A488A2544077AF19020DA2B906D@DGGEMA505-MBX.china.huawei.com>
+Content-Language: zh-CN
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20170526093641.7159-1-pbonzini@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] io: simplify qio_channel_attach_aio_context
+Subject: [Qemu-devel] [RFC] Is it useful to create a seperate address space
+ for cpu-memory on x86 platform?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,46 +26,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: Paolo Bonzini <pbonzini@redhat.com>, "peter.crosthwaite@xilinx.com" <peter.crosthwaite@xilinx.com>, "peter.maydell@linaro.org" <peter.maydell@linaro.org>, "edgar.iglesias@xilinx.com" <edgar.iglesias@xilinx.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "Huangweidong (C)" <weidong.huang@huawei.com>
 
-On Fri, May 26, 2017 at 11:36:41AM +0200, Paolo Bonzini wrote:
-> If properly preceded by qio_channel_detach_aio_context, this function really
-> has nothing to do except setting ioc->ctx.
-> 
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> ---
->  io/channel.c | 10 ++--------
->  1 file changed, 2 insertions(+), 8 deletions(-)
-> 
-> diff --git a/io/channel.c b/io/channel.c
-> index cdf74540c1..1cfb8b33a2 100644
-> --- a/io/channel.c
-> +++ b/io/channel.c
-> @@ -279,15 +279,9 @@ static void qio_channel_set_aio_fd_handlers(QIOChannel *ioc)
->  void qio_channel_attach_aio_context(QIOChannel *ioc,
->                                      AioContext *ctx)
->  {
-> -    AioContext *old_ctx;
-> -    if (ioc->ctx == ctx) {
-> -        return;
-> -    }
-> -
-> -    old_ctx = ioc->ctx ? ioc->ctx : iohandler_get_aio_context();
-> -    qio_channel_set_aio_fd_handler(ioc, old_ctx, NULL, NULL, NULL);
-> +    assert(!ioc->read_coroutine);
-> +    assert(!ioc->write_coroutine);
->      ioc->ctx = ctx;
-> -    qio_channel_set_aio_fd_handlers(ioc);
->  }
->  
->  void qio_channel_detach_aio_context(QIOChannel *ioc)
+Hi all,
 
-Thanks, queued
+I found that the memory consumption increase about 5M since below commit on=
+ Qemu process.
 
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+commit 6731d864f80938e404dc3e5eb7f6b76b891e3e43
+Author: Peter Crosthwaite <peter.crosthwaite@xilinx.com>
+Date:   Thu Jan 21 14:15:06 2016 +0000
+
+    qom/cpu: Add MemoryRegion property
+   =20
+    Add a MemoryRegion property, which if set is used to construct
+    the CPU's initial (default) AddressSpace.
+   =20
+    Signed-off-by: Peter Crosthwaite <peter.crosthwaite@xilinx.com>
+    [PMM: code is moved from qom/cpu.c to exec.c to avoid having to
+     make qom/cpu.o be a non-common object file; code to use the
+     MemoryRegion and to default it to system_memory added.]
+    Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+    Acked-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
+
+The result before this commit:
+
+linux-arei:/mnt/sdb/gonglei/opensource/qemu # ps aux|grep qemu
+root     12658 17.2  0.0 375996 21412 pts/1    Sl+  12:53   0:00 ./x86_64-s=
+oftmmu/qemu-system-x86_64 -machine pc-i440fx-2.5,accel=3Dkvm,usb=3Doff -nod=
+efaults
+
+after the commit:
+=20
+linux-arei:/mnt/sdb/gonglei/opensource/qemu # ps aux|grep qemu
+root     23201 17.2  0.0 384196 25736 pts/1    Sl+  12:54   0:00 ./x86_64-s=
+oftmmu/qemu-system-x86_64 -machine pc-i440fx-2.5,accel=3Dkvm,usb=3Doff -nod=
+efaults
+
+I couldn't find any benefits on x86 platform (I'm not familiar with ARM), a=
+m I missing something?
+
+And It works well if I revert this commit. Can I?
+
+Thanks,
+-Gonglei
