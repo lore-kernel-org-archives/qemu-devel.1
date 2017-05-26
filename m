@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39129)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39871)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1dEAzT-0007HS-VT
-	for qemu-devel@nongnu.org; Fri, 26 May 2017 04:53:01 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1dEB36-0008MR-Ps
+	for qemu-devel@nongnu.org; Fri, 26 May 2017 04:56:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1dEAzQ-00021u-Pp
-	for qemu-devel@nongnu.org; Fri, 26 May 2017 04:52:59 -0400
-Resent-Message-Id: <E1dEAzQ-00021u-Pp@eggs.gnu.org>
-Received: from sender-of-o52.zoho.com ([135.84.80.217]:21447)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1dEAzQ-00021m-I2
-	for qemu-devel@nongnu.org; Fri, 26 May 2017 04:52:56 -0400
-In-Reply-To: <20170526075246.20265-1-famz@redhat.com>
-Message-ID: <149578876368.1464.4970344384500820954@c05f1edc8ed1>
-Reply-To: <qemu-devel@nongnu.org>
+	(envelope-from <vsementsov@virtuozzo.com>) id 1dEB33-000485-Ll
+	for qemu-devel@nongnu.org; Fri, 26 May 2017 04:56:44 -0400
+Received: from mailhub.sw.ru ([195.214.232.25]:20669 helo=relay.sw.ru)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
+	id 1dEB33-00046v-9S
+	for qemu-devel@nongnu.org; Fri, 26 May 2017 04:56:41 -0400
+References: <20170524161147.17846-1-pbonzini@redhat.com>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <3b1e317e-51e3-828a-b2fe-d920ce5edfa2@virtuozzo.com>
+Date: Fri, 26 May 2017 11:56:36 +0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Fri, 26 May 2017 01:52:44 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PULL 00/22] Docker and block patches
+In-Reply-To: <20170524161147.17846-1-pbonzini@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+Subject: Re: [Qemu-devel] [PULL v2 00/20] Misc patches for 2017-05-19
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,87 +28,116 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: famz@redhat.com
-Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org, stefanha@redhat.com
+To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
-c3NhZ2UtaWQ6IDIwMTcwNTI2MDc1MjQ2LjIwMjY1LTEtZmFtekByZWRoYXQuY29tClN1YmplY3Q6
-IFtRZW11LWRldmVsXSBbUFVMTCAwMC8yMl0gRG9ja2VyIGFuZCBibG9jayBwYXRjaGVzCgo9PT0g
-VEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCgpCQVNFPWJhc2UKbj0xCnRvdGFsPSQo
-Z2l0IGxvZyAtLW9uZWxpbmUgJEJBU0UuLiB8IHdjIC1sKQpmYWlsZWQ9MAoKZ2l0IGNvbmZpZyAt
-LWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVz
-IFRydWUKCmNvbW1pdHM9IiQoZ2l0IGxvZyAtLWZvcm1hdD0lSCAtLXJldmVyc2UgJEJBU0UuLiki
-CmZvciBjIGluICRjb21taXRzOyBkbwogICAgZWNobyAiQ2hlY2tpbmcgUEFUQ0ggJG4vJHRvdGFs
-OiAkKGdpdCBsb2cgLW4gMSAtLWZvcm1hdD0lcyAkYykuLi4iCiAgICBpZiAhIGdpdCBzaG93ICRj
-IC0tZm9ybWF0PWVtYWlsIHwgLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFjayAtOyB0
-aGVuCiAgICAgICAgZmFpbGVkPTEKICAgICAgICBlY2hvCiAgICBmaQogICAgbj0kKChuKzEpKQpk
-b25lCgpleGl0ICRmYWlsZWQKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KClVwZGF0aW5nIDNjOGNm
-NWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKRnJvbSBodHRwczovL2dpdGh1Yi5j
-b20vcGF0Y2hldy1wcm9qZWN0L3FlbXUKICogW25ldyB0YWddICAgICAgICAgcGF0Y2hldy8yMDE3
-MDUyNjA4MjkyNS4yODg4LTEtbWFvenkuZm5zdEBjbi5mdWppdHN1LmNvbSAtPiBwYXRjaGV3LzIw
-MTcwNTI2MDgyOTI1LjI4ODgtMS1tYW96eS5mbnN0QGNuLmZ1aml0c3UuY29tClN3aXRjaGVkIHRv
-IGEgbmV3IGJyYW5jaCAndGVzdCcKMTZjYjc0YSBibG9jazogbWFrZSBhY2NvdW50aW5nIHRocmVh
-ZC1zYWZlCjgyMzk2MzUgYmxvY2s6IGludHJvZHVjZSBibG9ja19hY2NvdW50X29uZV9pbwo2M2Jj
-ZjEzIGJsb2NrOiBwcm90ZWN0IG1vZGlmaWNhdGlvbiBvZiBkaXJ0eSBiaXRtYXBzIHdpdGggYSBt
-dXRleApmNTgwOTdjIG1pZ3JhdGlvbi9ibG9jazogcmVzZXQgZGlydHkgYml0bWFwIGJlZm9yZSBy
-ZWFkaW5nCmVkODNkNWUgYmxvY2s6IGludHJvZHVjZSBkaXJ0eV9iaXRtYXBfbXV0ZXgKZjA0NmQ3
-MCBibG9jazogcHJvdGVjdCB0cmFja2VkX3JlcXVlc3RzIGFuZCBmbHVzaF9xdWV1ZSB3aXRoIHJl
-cXNfbG9jawphNzc0NWFlIGJsb2NrOiBhY2Nlc3Mgd3JpdGVfZ2VuIHdpdGggYXRvbWljcwoxNTQx
-OTM4IGJsb2NrOiB1c2UgU3RhdDY0IGZvciB3cl9oaWdoZXN0X29mZnNldAo2ZWJjY2ZjIHV0aWw6
-IGFkZCBzdGF0czY0IG1vZHVsZQpkMGYyMTdkIHRocm90dGxlLWdyb3VwczogcHJvdGVjdCB0aHJv
-dHRsZWQgcmVxdWVzdHMgd2l0aCBhIENvTXV0ZXgKMGUwNmU1YSB0aHJvdHRsZS1ncm91cHM6IGRv
-IG5vdCB1c2UgcWVtdV9jb19lbnRlcl9uZXh0CjMxZDY4NjAgdGhyb3R0bGUtZ3JvdXBzOiBvbmx5
-IHN0YXJ0IG9uZSBjb3JvdXRpbmUgZnJvbSBkcmFpbmVkX2JlZ2luCjY4YzBlMTYgYmxvY2s6IGFj
-Y2VzcyBpb19wbHVnZ2VkIHdpdGggYXRvbWljIG9wcwo2MjFjMzkzIGJsb2NrOiBhY2Nlc3Mgd2Fr
-ZXVwIHdpdGggYXRvbWljIG9wcwpjMWMyOWY2IGJsb2NrOiBhY2Nlc3Mgc2VyaWFsaXNpbmdfaW5f
-ZmxpZ2h0IHdpdGggYXRvbWljIG9wcwo4N2Y2NjU0IGJsb2NrOiBhY2Nlc3MgaW9fbGltaXRzX2Rp
-c2FibGVkIHdpdGggYXRvbWljIG9wcwoxNmU1ZGIxIGJsb2NrOiBhY2Nlc3MgcXVpZXNjZV9jb3Vu
-dGVyIHdpdGggYXRvbWljIG9wcwowMThjYjhiIGJsb2NrOiBhY2Nlc3MgY29weV9vbl9yZWFkIHdp
-dGggYXRvbWljIG9wcwpmNTdiNGIxIGRvY2tlcjogQWRkIGZsZXggYW5kIGJpc29uIHRvIGNlbnRv
-czYgaW1hZ2UKNmFjNTA0NSBkb2NrZXI6IEFkZCBsaWJhaW8gdG8gZmVkb3JhIGltYWdlCjdhMjEw
-M2UgZG9ja2VyOiBBZGQgYnppcDIgYW5kIGhvc3RuYW1lIHRvIGZlZG9yYSBpbWFnZQo3ZTgzMjMy
-IGRvY2tlcjogUnVuIHRlc3RzIHdpdGggY3VycmVudCB1c2VyCgo9PT0gT1VUUFVUIEJFR0lOID09
-PQpDaGVja2luZyBQQVRDSCAxLzIyOiBkb2NrZXI6IFJ1biB0ZXN0cyB3aXRoIGN1cnJlbnQgdXNl
-ci4uLgpDaGVja2luZyBQQVRDSCAyLzIyOiBkb2NrZXI6IEFkZCBiemlwMiBhbmQgaG9zdG5hbWUg
-dG8gZmVkb3JhIGltYWdlLi4uCkNoZWNraW5nIFBBVENIIDMvMjI6IGRvY2tlcjogQWRkIGxpYmFp
-byB0byBmZWRvcmEgaW1hZ2UuLi4KQ2hlY2tpbmcgUEFUQ0ggNC8yMjogZG9ja2VyOiBBZGQgZmxl
-eCBhbmQgYmlzb24gdG8gY2VudG9zNiBpbWFnZS4uLgpDaGVja2luZyBQQVRDSCA1LzIyOiBibG9j
-azogYWNjZXNzIGNvcHlfb25fcmVhZCB3aXRoIGF0b21pYyBvcHMuLi4KQ2hlY2tpbmcgUEFUQ0gg
-Ni8yMjogYmxvY2s6IGFjY2VzcyBxdWllc2NlX2NvdW50ZXIgd2l0aCBhdG9taWMgb3BzLi4uCkNo
-ZWNraW5nIFBBVENIIDcvMjI6IGJsb2NrOiBhY2Nlc3MgaW9fbGltaXRzX2Rpc2FibGVkIHdpdGgg
-YXRvbWljIG9wcy4uLgpDaGVja2luZyBQQVRDSCA4LzIyOiBibG9jazogYWNjZXNzIHNlcmlhbGlz
-aW5nX2luX2ZsaWdodCB3aXRoIGF0b21pYyBvcHMuLi4KQ2hlY2tpbmcgUEFUQ0ggOS8yMjogYmxv
-Y2s6IGFjY2VzcyB3YWtldXAgd2l0aCBhdG9taWMgb3BzLi4uCkNoZWNraW5nIFBBVENIIDEwLzIy
-OiBibG9jazogYWNjZXNzIGlvX3BsdWdnZWQgd2l0aCBhdG9taWMgb3BzLi4uCkNoZWNraW5nIFBB
-VENIIDExLzIyOiB0aHJvdHRsZS1ncm91cHM6IG9ubHkgc3RhcnQgb25lIGNvcm91dGluZSBmcm9t
-IGRyYWluZWRfYmVnaW4uLi4KQ2hlY2tpbmcgUEFUQ0ggMTIvMjI6IHRocm90dGxlLWdyb3Vwczog
-ZG8gbm90IHVzZSBxZW11X2NvX2VudGVyX25leHQuLi4KQ2hlY2tpbmcgUEFUQ0ggMTMvMjI6IHRo
-cm90dGxlLWdyb3VwczogcHJvdGVjdCB0aHJvdHRsZWQgcmVxdWVzdHMgd2l0aCBhIENvTXV0ZXgu
-Li4KQ2hlY2tpbmcgUEFUQ0ggMTQvMjI6IHV0aWw6IGFkZCBzdGF0czY0IG1vZHVsZS4uLgpFUlJP
-UjogbWVtb3J5IGJhcnJpZXIgd2l0aG91dCBjb21tZW50CiMzMzA6IEZJTEU6IHV0aWwvc3RhdHM2
-NC5jOjEwMToKKyAgICAgICAgc21wX3dtYigpOwoKRVJST1I6IG1lbW9yeSBiYXJyaWVyIHdpdGhv
-dXQgY29tbWVudAojMzU5OiBGSUxFOiB1dGlsL3N0YXRzNjQuYzoxMzA6CisgICAgICAgIHNtcF93
-bWIoKTsKCnRvdGFsOiAyIGVycm9ycywgMCB3YXJuaW5ncywgMzM0IGxpbmVzIGNoZWNrZWQKCllv
-dXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRo
-ZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFp
-bmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCkNoZWNraW5nIFBBVENIIDE1LzIy
-OiBibG9jazogdXNlIFN0YXQ2NCBmb3Igd3JfaGlnaGVzdF9vZmZzZXQuLi4KQ2hlY2tpbmcgUEFU
-Q0ggMTYvMjI6IGJsb2NrOiBhY2Nlc3Mgd3JpdGVfZ2VuIHdpdGggYXRvbWljcy4uLgpDaGVja2lu
-ZyBQQVRDSCAxNy8yMjogYmxvY2s6IHByb3RlY3QgdHJhY2tlZF9yZXF1ZXN0cyBhbmQgZmx1c2hf
-cXVldWUgd2l0aCByZXFzX2xvY2suLi4KQ2hlY2tpbmcgUEFUQ0ggMTgvMjI6IGJsb2NrOiBpbnRy
-b2R1Y2UgZGlydHlfYml0bWFwX211dGV4Li4uCkNoZWNraW5nIFBBVENIIDE5LzIyOiBtaWdyYXRp
-b24vYmxvY2s6IHJlc2V0IGRpcnR5IGJpdG1hcCBiZWZvcmUgcmVhZGluZy4uLgpDaGVja2luZyBQ
-QVRDSCAyMC8yMjogYmxvY2s6IHByb3RlY3QgbW9kaWZpY2F0aW9uIG9mIGRpcnR5IGJpdG1hcHMg
-d2l0aCBhIG11dGV4Li4uCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiMzMDY6IEZJ
-TEU6IG1pZ3JhdGlvbi9ibG9jay5jOjUzOToKKyAgICAgICAgICAgIGJkcnZfcmVzZXRfZGlydHlf
-Yml0bWFwX2xvY2tlZChibWRzLT5kaXJ0eV9iaXRtYXAsIHNlY3RvciwgbnJfc2VjdG9ycyk7Cgp0
-b3RhbDogMCBlcnJvcnMsIDEgd2FybmluZ3MsIDI3MiBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNo
-IGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJv
-cnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2Vl
-CkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCkNoZWNraW5nIFBBVENIIDIxLzIyOiBibG9jazog
-aW50cm9kdWNlIGJsb2NrX2FjY291bnRfb25lX2lvLi4uCkNoZWNraW5nIFBBVENIIDIyLzIyOiBi
-bG9jazogbWFrZSBhY2NvdW50aW5nIHRocmVhZC1zYWZlLi4uCj09PSBPVVRQVVQgRU5EID09PQoK
-VGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1
-dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5k
-IHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEBmcmVlbGlzdHMub3Jn
+Hi!
+
+What about this? Looks incomplete, only two patches here...
+
+24.05.2017 19:11, Paolo Bonzini wrote:
+> The following changes since commit 56821559f0ba682fe6b367815572e6f974d329ab:
+>
+>    Merge remote-tracking branch 'dgilbert/tags/pull-hmp-20170517' into staging (2017-05-18 13:36:15 +0100)
+>
+> are available in the git repository at:
+>
+>    git://github.com/bonzini/qemu.git tags/for-upstream
+>
+> for you to fetch changes up to 46465ffebc75edd75091f4eb0963fd48ce7c02b6:
+>
+>    target/i386: use multiple CPU AddressSpaces (2017-05-24 18:09:03 +0200)
+>
+> v2 fixes coding style errors in vhost-user-scsi.
+>
+> ----------------------------------------------------------------
+> * virtio-scsi use-after-free fix (Fam)
+> * vhost-user-scsi support (Felipe)
+> * SMM fixes and improvements for TCG (myself)
+> * irqchip and AddressSpaceDispatch cleanups and fixes (Peter)
+> * Coverity fix (Stefano)
+> * NBD cleanups (Vladimir)
+> * RTC accuracy improvements and code cleanups (Guangrong+Yunfang)
+>
+> ----------------------------------------------------------------
+> Fam Zheng (1):
+>        virtio-scsi: Unset hotplug handler when unrealize
+>
+> Felipe Franciosi (2):
+>        vhost-user-scsi: Introduce vhost-user-scsi host device
+>        vhost-user-scsi: Introduce a vhost-user-scsi sample application
+>
+> Paolo Bonzini (2):
+>        target/i386: enable A20 automatically in system management mode
+>        target/i386: use multiple CPU AddressSpaces
+>
+> Peter Xu (4):
+>        kvm: irqchip: trace changes on msi add/remove
+>        msix: trace control bit write op
+>        kvm: irqchip: skip update msi when disabled
+>        exec: simplify phys_page_find() params
+>
+> Stefano Stabellini (1):
+>        Check the return value of fcntl in qemu_set_cloexec
+>
+> Tai Yunfang (1):
+>        mc146818rtc: precisely count the clock for periodic timer
+>
+> Vladimir Sementsov-Ogievskiy (5):
+>        nbd: strict nbd_wr_syncv
+>        nbd: read_sync and friends: return 0 on success
+>        nbd: add errp parameter to nbd_wr_syncv()
+>        nbd: add errp to read_sync, write_sync and drop_sync
+>        nbd/client.c: use errp instead of LOG
+>
+> Xiao Guangrong (4):
+>        mc146818rtc: update periodic timer only if it is needed
+>        mc146818rtc: ensure LOST_TICK_POLICY_SLEW is only enabled on TARGET_I386
+>        mc146818rtc: drop unnecessary '#ifdef TARGET_I386'
+>        mc146818rtc: embrace all x86 specific code
+>
+>   .gitignore                                |   1 +
+>   Makefile                                  |   3 +
+>   Makefile.objs                             |   4 +
+>   block/nbd-client.c                        |  11 +-
+>   contrib/libvhost-user/libvhost-user.h     |  11 +-
+>   contrib/vhost-user-scsi/Makefile.objs     |   1 +
+>   contrib/vhost-user-scsi/vhost-user-scsi.c | 886 ++++++++++++++++++++++++++++++
+>   default-configs/pci.mak                   |   1 +
+>   default-configs/s390x-softmmu.mak         |   1 +
+>   exec.c                                    |  13 +-
+>   hw/pci/msix.c                             |  11 +-
+>   hw/pci/trace-events                       |   3 +
+>   hw/scsi/Makefile.objs                     |   1 +
+>   hw/scsi/vhost-user-scsi.c                 | 211 +++++++
+>   hw/scsi/virtio-scsi.c                     |   3 +
+>   hw/timer/mc146818rtc.c                    | 206 ++++---
+>   hw/virtio/virtio-pci.c                    |  54 ++
+>   hw/virtio/virtio-pci.h                    |  11 +
+>   include/block/nbd.h                       |   8 +-
+>   include/hw/virtio/vhost-user-scsi.h       |  35 ++
+>   include/hw/virtio/virtio-scsi.h           |   2 +
+>   kvm-all.c                                 |   4 +-
+>   nbd/client.c                              | 125 ++---
+>   nbd/common.c                              |  23 +-
+>   nbd/nbd-internal.h                        |  40 +-
+>   nbd/server.c                              |  92 ++--
+>   qemu-nbd.c                                |   3 +-
+>   target/i386/arch_memory_mapping.c         |  18 +-
+>   target/i386/cpu.c                         |  15 +-
+>   target/i386/cpu.h                         |  20 +-
+>   target/i386/helper.c                      |  96 ++--
+>   target/i386/kvm.c                         |  12 +-
+>   target/i386/machine.c                     |   4 -
+>   target/i386/smm_helper.c                  |  18 -
+>   trace-events                              |   3 +-
+>   util/oslib-posix.c                        |   4 +-
+>   36 files changed, 1643 insertions(+), 311 deletions(-)
+>   create mode 100644 contrib/vhost-user-scsi/Makefile.objs
+>   create mode 100644 contrib/vhost-user-scsi/vhost-user-scsi.c
+>   create mode 100644 hw/scsi/vhost-user-scsi.c
+>   create mode 100644 include/hw/virtio/vhost-user-scsi.h
+
+
+-- 
+Best regards,
+Vladimir
