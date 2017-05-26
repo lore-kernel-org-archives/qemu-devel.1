@@ -1,20 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54854)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55480)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1dEEAQ-0000Tx-IQ
-	for qemu-devel@nongnu.org; Fri, 26 May 2017 08:16:31 -0400
+	(envelope-from <marcandre.lureau@gmail.com>) id 1dEEE6-0002dV-Np
+	for qemu-devel@nongnu.org; Fri, 26 May 2017 08:20:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1dEEAL-00034o-VT
-	for qemu-devel@nongnu.org; Fri, 26 May 2017 08:16:30 -0400
-Received: from [59.151.112.132] (port=42984 helo=heian.cn.fujitsu.com)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1dEEAL-00034H-Jx
-	for qemu-devel@nongnu.org; Fri, 26 May 2017 08:16:25 -0400
-From: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
-Date: Fri, 26 May 2017 20:15:16 +0800
-Message-ID: <20170526121516.6607-1-maozy.fnst@cn.fujitsu.com>
+	(envelope-from <marcandre.lureau@gmail.com>) id 1dEEE5-00041x-Pa
+	for qemu-devel@nongnu.org; Fri, 26 May 2017 08:20:18 -0400
+Received: from mail-lf0-x243.google.com ([2a00:1450:4010:c07::243]:34840)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+	id 1dEEE5-00041k-Hq
+	for qemu-devel@nongnu.org; Fri, 26 May 2017 08:20:17 -0400
+Received: by mail-lf0-x243.google.com with SMTP id 99so866659lfu.2
+	for <qemu-devel@nongnu.org>; Fri, 26 May 2017 05:20:17 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH] pci-bridge/i82801b11: Convert to realize
+References: <20170509113332.4987-1-marcandre.lureau@redhat.com>
+	<20170509113332.4987-9-marcandre.lureau@redhat.com>
+In-Reply-To: <20170509113332.4987-9-marcandre.lureau@redhat.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Fri, 26 May 2017 12:20:05 +0000
+Message-ID: <CAJ+F1C+0TczwOVnfaO8jPVKWeiFXJNa4SiKp4yn662u3Evko0A@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 08/13] be-hci: use backend functions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,62 +31,56 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: marcel@redhat.com, mst@redhat.com, armbru@redhat.com
+Cc: pbonzini@redhat.com, balrog@zabor.org
 
-The pci-birdge device i82801b11 still implements the old
-PCIDeviceClass .init() through i82801b11_bridge_init()
-instead of the new .realize(). All devices need to be
-converted to .realize(). So convert it and rename it to
-i82801b11_bridge_realize().
+On Tue, May 9, 2017 at 3:42 PM Marc-Andr=C3=A9 Lureau <
+marcandre.lureau@redhat.com> wrote:
 
-Signed-off-by: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
----
- hw/pci-bridge/i82801b11.c | 9 ++++-----
- 1 file changed, 4 insertions(+), 5 deletions(-)
+> Avoid accessing CharBackend directly, use qemu_chr_be_* methods instead.
+>
+> be->chr_read should exists if qemu_chr_be_can_write() is true.
+>
+> (use qemu_chr_be_write(), _impl() bypasses replay)
+>
+> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> ---
+>  hw/bt/hci-csr.c | 9 +++------
+>
 
-diff --git a/hw/pci-bridge/i82801b11.c b/hw/pci-bridge/i82801b11.c
-index 2404e7e..dca3162 100644
---- a/hw/pci-bridge/i82801b11.c
-+++ b/hw/pci-bridge/i82801b11.c
-@@ -44,6 +44,7 @@
- #include "qemu/osdep.h"
- #include "hw/pci/pci.h"
- #include "hw/i386/ich9.h"
-+#include "qapi/error.h"
- 
- 
- /*****************************************************************************/
-@@ -58,7 +59,7 @@ typedef struct I82801b11Bridge {
-     /*< public >*/
- } I82801b11Bridge;
- 
--static int i82801b11_bridge_initfn(PCIDevice *d)
-+static void i82801b11_bridge_realize(PCIDevice *d, Error **errp)
- {
-     int rc;
- 
-@@ -70,12 +71,10 @@ static int i82801b11_bridge_initfn(PCIDevice *d)
-         goto err_bridge;
-     }
-     pci_config_set_prog_interface(d->config, PCI_CLASS_BRIDGE_PCI_INF_SUB);
--    return 0;
-+    return;
- 
- err_bridge:
-     pci_bridge_exitfn(d);
--
--    return rc;
- }
- 
- static const VMStateDescription i82801b11_bridge_dev_vmstate = {
-@@ -95,7 +94,7 @@ static void i82801b11_bridge_class_init(ObjectClass *klass, void *data)
-     k->vendor_id = PCI_VENDOR_ID_INTEL;
-     k->device_id = PCI_DEVICE_ID_INTEL_82801BA_11;
-     k->revision = ICH9_D2P_A2_REVISION;
--    k->init = i82801b11_bridge_initfn;
-+    k->realize = i82801b11_bridge_realize;
-     k->config_write = pci_bridge_write_config;
-     dc->vmsd = &i82801b11_bridge_dev_vmstate;
-     set_bit(DEVICE_CATEGORY_BRIDGE, dc->categories);
--- 
-2.9.3
+No maintainer for this file. Andrzej, as author of the file, can you
+review?
+
+
+>  1 file changed, 3 insertions(+), 6 deletions(-)
+>
+> diff --git a/hw/bt/hci-csr.c b/hw/bt/hci-csr.c
+> index 0f2021086d..d13192b9b5 100644
+> --- a/hw/bt/hci-csr.c
+> +++ b/hw/bt/hci-csr.c
+> @@ -82,17 +82,14 @@ enum {
+>
+>  static inline void csrhci_fifo_wake(struct csrhci_s *s)
+>  {
+> -    Chardev *chr =3D (Chardev *)s;
+> -    CharBackend *be =3D chr->be;
+> +    Chardev *chr =3D CHARDEV(s);
+>
+>      if (!s->enable || !s->out_len)
+>          return;
+>
+>      /* XXX: Should wait for s->modem_state & CHR_TIOCM_RTS? */
+> -    if (be && be->chr_can_read && be->chr_can_read(be->opaque) &&
+> -        be->chr_read) {
+> -        be->chr_read(be->opaque,
+> -                     s->outfifo + s->out_start++, 1);
+> +    if (qemu_chr_be_can_write(chr)) {
+> +        qemu_chr_be_write(chr, s->outfifo + s->out_start++, 1);
+>          s->out_len--;
+>          if (s->out_start >=3D s->out_size) {
+>              s->out_start =3D 0;
+> --
+> 2.13.0.rc1.16.gd80b50c3f
+>
+>
+> --
+Marc-Andr=C3=A9 Lureau
