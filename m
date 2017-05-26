@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33362)
-	by lists.gnu.org with esmtp (Exim 4.71) (envelope-from <n54@gmx.com>)
-	id 1dE87R-0006As-2T
-	for qemu-devel@nongnu.org; Fri, 26 May 2017 01:49:01 -0400
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34389)
+	by lists.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <dgibson@ozlabs.org>) id 1dE8EH-0000Dc-Di
+	for qemu-devel@nongnu.org; Fri, 26 May 2017 01:56:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <n54@gmx.com>) id 1dE87N-0000aa-Sh
-	for qemu-devel@nongnu.org; Fri, 26 May 2017 01:49:01 -0400
-Received: from mout.gmx.net ([212.227.17.20]:62711)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <n54@gmx.com>) id 1dE87N-0000a1-I1
-	for qemu-devel@nongnu.org; Fri, 26 May 2017 01:48:57 -0400
-From: Kamil Rytarowski <n54@gmx.com>
-Date: Fri, 26 May 2017 07:40:13 +0200
-Message-Id: <20170526054013.299-1-n54@gmx.com>
-In-Reply-To: <20170513004616.25749-1-n54@gmx.com>
-References: <20170513004616.25749-1-n54@gmx.com>
-Subject: [Qemu-devel] [PATCH] ivshmem-server: ivshmem-clean: Install only
- when eventfd() is available
+	(envelope-from <dgibson@ozlabs.org>) id 1dE8EG-0002W4-CE
+	for qemu-devel@nongnu.org; Fri, 26 May 2017 01:56:05 -0400
+Date: Fri, 26 May 2017 15:55:53 +1000
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20170526055553.GM12929@umbus.fritz.box>
+References: <1495601614-18586-1-git-send-email-bharata@linux.vnet.ibm.com>
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="bZ2MuwyI/0uB8yuJ"
+Content-Disposition: inline
+In-Reply-To: <1495601614-18586-1-git-send-email-bharata@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH v3 0/3] ppc/spapr: Fix migration of radix
+ guests
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,33 +24,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: armbru@redhat.com, peter.maydell@linaro.org, f4bug@amsat.org, Kamil Rytarowski <n54@gmx.com>
+To: Bharata B Rao <bharata@linux.vnet.ibm.com>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, sam.bobroff@au1.ibm.com, rnsastry@linux.vnet.ibm.com, sjitindarsingh@gmail.com
 
-Currently ivshmem requires eventfd() which is Linux specific.
-Do not and build it unconditionally on every Linux/BSD/Solaris.
 
-This patch indirectly fixes build failure on NetBSD, where these tools
-additionally require -lrl for shm_open(3). In future there should be
-added support for NetBSD and the linking addressed appropriately.
+--bZ2MuwyI/0uB8yuJ
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Signed-off-by: Kamil Rytarowski <n54@gmx.com>
----
- configure | 2 ++
- 1 file changed, 2 insertions(+)
+On Wed, May 24, 2017 at 10:23:31AM +0530, Bharata B Rao wrote:
+> This patchset fixes the migration of sPAPR radix guests.
 
-diff --git a/configure b/configure
-index 1a5ee4b909..84d8660354 100755
---- a/configure
-+++ b/configure
-@@ -4928,6 +4928,8 @@ if test "$want_tools" = "yes" ; then
-   tools="qemu-img\$(EXESUF) qemu-io\$(EXESUF) $tools"
-   if [ "$linux" = "yes" -o "$bsd" = "yes" -o "$solaris" = "yes" ] ; then
-     tools="qemu-nbd\$(EXESUF) $tools"
-+  fi
-+  if [ "$eventfd" != "no" ]; then
-     tools="ivshmem-client\$(EXESUF) ivshmem-server\$(EXESUF) $tools"
-   fi
- fi
--- 
-2.13.0
+Since Juan has approved merging the latest spin on the
+unregister_savevm() patch through my tree, I've merged that, along
+with your update 2/3 and 3/3 here.  I did rework 2/3 a bit to remove
+unnecessary code motion.
+
+>=20
+> Changes in v3:
+> --------------
+> - Dropped the patch that made h_register_process_table flags global as
+>   it is not required with the changed logic.
+> - The post load logic is now same for both TCG as well as KVM radix guest=
+s.
+>   Also ensured that radix and future v3 hash migration post load is
+>   treated similarly.
+> - Ensure TCG Radix guest migration isn't broken.
+>=20
+> v2: https://lists.gnu.org/archive/html/qemu-devel/2017-05/msg04491.html
+>=20
+> Bharata B Rao (3):
+>   migration: Introduce unregister_savevm_live()
+>   spapr: Unregister HPT savevm handlers for radix guests
+>   spapr: Fix migration of Radix guests
+>=20
+>  hw/ppc/spapr.c              | 111 +++++++++++++++++++++++++-------------=
+------
+>  include/hw/ppc/spapr.h      |   2 +
+>  include/migration/vmstate.h |   1 +
+>  migration/savevm.c          |  17 ++++++-
+>  4 files changed, 80 insertions(+), 51 deletions(-)
+>=20
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--bZ2MuwyI/0uB8yuJ
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iQIcBAEBCAAGBQJZJ8NmAAoJEGw4ysog2bOS45IQAJtHfPmExU/TIctVaD093nrR
+fIZAPDsuSyVyTvly3G6TRzvgPnNwXuUAvKznD0NEEk/jbhQ1PARWQCRdRyaAewab
+X8aJ4mfbwRBCzMfL0gLct+SEP8PTwfHWtUcaWZbAJJkJgIGvlpkh8IT6UyHKsLei
+owYhh6DVj+a7sAQOt5rRDSr7ZtgIZdK8jhXVeuoMp/IUe8Ri5A3be2pWyE/x8yF7
+lcbC3STxTdM3uwahPDMGyFTpp5DqEmZqEjEUbtGWi3gL71pEYOTwsb4qm0efzBse
+M+TNo4dl7akOxYeoq7Le2X94Ibc+X67GWseJ0r4xFO7PH9dhh+Yz9lPhNCDq4Iyv
+Bwl4rZQ7OMEzxNxbfK4YllKGW0LXDpg7oLWzhbA9bvAPbmsCGCzsyaVe3iELYSPb
+j55yBrfSCDBYyEc1FgKBMOf786aRZxfu0rBNocXKCFUdAGuocJMxfMS2KivB4KhE
+eMXLIuI8CwVywP+pBZqI4A/D3G4OMdrIv4tnSKioP+vk3KWO+NjWqLCOuFCxfXMx
+Nl/FFb+yOtdmApCtxlTW+f/udqipKS3029uttJP6QPHu8vDfOEfYZ0VDruAA+e2f
+FD8f8OCB3rjsSb0sajCgxMYIH8RU0zyclglcCBpAVXFbxMWrAVtYR8gakWFV8mGp
+7jESKnWrMepzHB2Tx7B5
+=dwgp
+-----END PGP SIGNATURE-----
+
+--bZ2MuwyI/0uB8yuJ--
