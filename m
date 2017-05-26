@@ -1,28 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57328)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57512)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1dE7kk-0001F6-41
-	for qemu-devel@nongnu.org; Fri, 26 May 2017 01:25:35 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1dE7lP-0001mu-RL
+	for qemu-devel@nongnu.org; Fri, 26 May 2017 01:26:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1dE7kg-0008E4-3N
-	for qemu-devel@nongnu.org; Fri, 26 May 2017 01:25:34 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34420)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1dE7kf-0008Dc-QW
-	for qemu-devel@nongnu.org; Fri, 26 May 2017 01:25:30 -0400
-References: <1495549241-23380-1-git-send-email-zhangchen.fnst@cn.fujitsu.com>
-	<1495549241-23380-3-git-send-email-zhangchen.fnst@cn.fujitsu.com>
-	<838b8626-c5e4-86d5-a318-ab957bc9bcbe@redhat.com>
-	<f9344c1f-fa0a-4745-bf51-658c37d1d53e@cn.fujitsu.com>
-From: Jason Wang <jasowang@redhat.com>
-Message-ID: <1550e79d-c657-6e9b-d7b0-39ee94c8f7af@redhat.com>
-Date: Fri, 26 May 2017 13:25:19 +0800
+	(envelope-from <dgibson@ozlabs.org>) id 1dE7lO-0008LT-TC
+	for qemu-devel@nongnu.org; Fri, 26 May 2017 01:26:15 -0400
+Date: Fri, 26 May 2017 15:26:06 +1000
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20170526052606.GK12929@umbus.fritz.box>
+References: <20170524121048.10067-1-lvivier@redhat.com>
+	<87k2555sl2.fsf@secure.mitica>
 MIME-Version: 1.0
-In-Reply-To: <f9344c1f-fa0a-4745-bf51-658c37d1d53e@cn.fujitsu.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH V5 2/9] net/filter-mirror.c: Make filter
- mirror support vnet support.
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="/rDaUNvWv5XYRSKj"
+Content-Disposition: inline
+In-Reply-To: <87k2555sl2.fsf@secure.mitica>
+Subject: Re: [Qemu-devel] [PATCH] migration: remove register_savevm()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,103 +24,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>, qemu devel <qemu-devel@nongnu.org>
-Cc: zhanghailiang <zhang.zhanghailiang@huawei.com>, Li Zhijian <lizhijian@cn.fujitsu.com>, weifuqiang <weifuqiang@huawei.com>, "eddie . dong" <eddie.dong@intel.com>, bian naimeng <biannm@cn.fujitsu.com>
+To: Juan Quintela <quintela@redhat.com>
+Cc: Laurent Vivier <lvivier@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, rnsastry@linux.vnet.ibm.com, Bharata B Rao <bharata@linux.vnet.ibm.com>, qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>, Jason Wang <jasowang@redhat.com>, Dmitry Fleytman <dmitry@daynix.com>, Cornelia Huck <cornelia.huck@de.ibm.com>, qemu-ppc@nongnu.org, Samuel Thibault <samuel.thibault@ens-lyon.org>, sam.bobroff@au1.ibm.com, Peter Xu <peterx@redhat.com>
 
 
+--/rDaUNvWv5XYRSKj
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-On 2017=E5=B9=B405=E6=9C=8825=E6=97=A5 20:55, Zhang Chen wrote:
->
->
-> On 05/25/2017 02:04 PM, Jason Wang wrote:
->>
->>
->> On 2017=E5=B9=B405=E6=9C=8823=E6=97=A5 22:20, Zhang Chen wrote:
->>> We add the vnet_hdr option for filter-mirror, default is disable.
->>> If you use virtio-net-pci net driver, please enable it.
->>> You can use it for example:
->>> -object=20
->>> filter-mirror,id=3Dm0,netdev=3Dhn0,queue=3Dtx,outdev=3Dmirror0,vnet_h=
-dr=3Don
->>>
->>> If vnet_hdr=3Don we change the send packet format from
->>> struct {int size; const uint8_t buf[];} to {int size; int=20
->>> vnet_hdr_len; const uint8_t buf[];}.
->>> make other module(like colo-compare) know how to parse net packet=20
->>> correctly.
->>>
->>> Signed-off-by: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
->>> ---
->>>   net/filter-mirror.c | 73=20
->>> +++++++++++++++++++++++++++++++++++++++++++++++++----
->>>   qemu-options.hx     |  5 ++--
->>>   2 files changed, 70 insertions(+), 8 deletions(-)
->>>
->>> diff --git a/net/filter-mirror.c b/net/filter-mirror.c
->>> index 72fa7c2..8df0be6 100644
->>> --- a/net/filter-mirror.c
->>> +++ b/net/filter-mirror.c
->>> @@ -38,15 +38,17 @@ typedef struct MirrorState {
->>>       NetFilterState parent_obj;
->>>       char *indev;
->>>       char *outdev;
->>> +    bool vnet_hdr;
->>>       CharBackend chr_in;
->>>       CharBackend chr_out;
->>>       SocketReadState rs;
->>>   } MirrorState;
->>>   -static int filter_mirror_send(CharBackend *chr_out,
->>> +static int filter_mirror_send(MirrorState *s,
->>>                                 const struct iovec *iov,
->>>                                 int iovcnt)
->>>   {
->>> +    NetFilterState *nf =3D NETFILTER(s);
->>>       int ret =3D 0;
->>>       ssize_t size =3D 0;
->>>       uint32_t len =3D 0;
->>> @@ -58,14 +60,42 @@ static int filter_mirror_send(CharBackend *chr_ou=
-t,
->>>       }
->>>         len =3D htonl(size);
->>> -    ret =3D qemu_chr_fe_write_all(chr_out, (uint8_t *)&len,=20
->>> sizeof(len));
->>> +    ret =3D qemu_chr_fe_write_all(&s->chr_out, (uint8_t *)&len,=20
->>> sizeof(len));
->>>       if (ret !=3D sizeof(len)) {
->>>           goto err;
->>>       }
->>>   +    if (s->vnet_hdr) {
->>> +        /*
->>> +         * If vnet_hdr =3D on, we send vnet header len to make other
->>> +         * module(like colo-compare) know how to parse net
->>> +         * packet correctly.
->>> +         */
->>> +        ssize_t vnet_hdr_len;
->>> +
->>> +        /*
->>> +         * In anytime, nf->netdev and nf->netdev->peer both have a=20
->>> vnet_hdr_len,
->>> +         * Here we just find out which is we need. When filter set=20
->>> RX or TX
->>> +         * that the real vnet_hdr_len are different.
->>> +         */
->>> +        if (nf->netdev->using_vnet_hdr) {
->>> +            vnet_hdr_len =3D nf->netdev->vnet_hdr_len;
->>> +        } else if (nf->netdev->peer->using_vnet_hdr) {
->>> +            vnet_hdr_len =3D nf->netdev->peer->vnet_hdr_len;
->>
->> Rethink about this, looks like what we really want is:
->>
->> - For tx direction, only check nf->netdev->vnet_hdr_len,
->> - For rx direction, only check nf->netdev->peer->vnet_hdr_len
->
-> Agree, So do you means we should remove the using_vnet_hdr related=20
-> codes then just
-> use the nf->direction to choice which we need check?
->
-> Thanks
-> Zhang Chen=20
+On Thu, May 25, 2017 at 09:00:25AM +0200, Juan Quintela wrote:
+> Laurent Vivier <lvivier@redhat.com> wrote:
+> D> We can replace the four remaining calls of register_savevm() by
+> > calls to register_savevm_live(). So we can remove the function and
+> > as we don't allocate anymore the ops pointer with g_new0()
+> > we don't have to free it then.
+> >
+> > Signed-off-by: Laurent Vivier <lvivier@redhat.com>
+>=20
+> Reviewed-by: Juan Quintela <quintela@redhat.com>
+>=20
+> As this is needed for Power, letting them go through their tree.
 
-Maybe.
+Thanks for the ack, I've put this into my ppc-for-2.10 tree.
 
-Thanks
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--/rDaUNvWv5XYRSKj
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iQIcBAEBCAAGBQJZJ7xsAAoJEGw4ysog2bOSd5cP/1L7EG2Wh9rieMZdxnAkf86v
+XQmwQ7pVqc1drByEB4aucM3fNzd+YDruNVEZaCaIxJ/seu084D9/0jAp3iZ0bUQF
+/dpPlxtjuZY4vxbcHET8rtnSy2CYIIcuDnPcIUhI+KV1F37ppGX7lM1AOrLEBfCp
+iQCABkqzqgq3yNlCWlHBg2A3jI0ekjdRihjbBNTD+WZ8z3nRtJbX6Sx6ILWs4cdZ
+rrtvJLqAIINAx6lgMZIB2Lk/zuqpHzqvs7peo1+kc4Lt76qx97MXJN1noBbWS7nJ
+Pgf5VWP9oxIhIVJFLPbCcrRgEFOuu7aTYPFtFqPdnKA1c3jt5Fn5xwM/GUImZJ+s
+MWlK3yaPvTvFieGNM2ev/bIY1E92ZLjo/ETPpfC5HLrcTQ8ZVvktwPixQkWUM/vJ
+LlyHVJEF2gZ+Q/vNXSjc9tSLaGupcw2L1evUMsv8wYf0EXXhX8FaQK2iUr3RT9wT
+5B9TIJPlw9jJrmzqoM+Pz2wxM375bQPtNh498wOZOz3pqFPdCGUULxvf08s+0um6
+9WB1xO4UPOsuJI9yyNjSEyCTYy/lMlujdtpABc6kMPbe98vCBopqMC3m3jKBsrUS
+0wOckuWYZOPFYzVdGLFBbtjlbV5UnnRbXx1X2dcZWMYBAZ8PB+z1kGLJCUIxb3OJ
+JZQPkEVuT5bMoM6YBg6g
+=qeXA
+-----END PGP SIGNATURE-----
+
+--/rDaUNvWv5XYRSKj--
