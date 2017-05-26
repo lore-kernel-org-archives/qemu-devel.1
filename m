@@ -1,22 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57352)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58591)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alarson@ddci.com>) id 1dEOHY-0006RG-HZ
-	for qemu-devel@nongnu.org; Fri, 26 May 2017 19:04:33 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dEOUD-0003f0-Gf
+	for qemu-devel@nongnu.org; Fri, 26 May 2017 19:17:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alarson@ddci.com>) id 1dEOHV-0004wr-Df
-	for qemu-devel@nongnu.org; Fri, 26 May 2017 19:04:32 -0400
-In-Reply-To: <20170513075916.GB13183@umbus.fritz.box>
-References: <201705030257.v432vMO2008047@linux03a.ddci.com>
-	<20170512065204.GJ12908@umbus.fritz.box>
-	<OFFF668533.5CB81117-ON8625811E.004C96EA-8625811E.0050117D@ddci.com>
-	<20170513075916.GB13183@umbus.fritz.box>
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dEOUA-00016O-BD
+	for qemu-devel@nongnu.org; Fri, 26 May 2017 19:17:37 -0400
+Received: from mail-oi0-x244.google.com ([2607:f8b0:4003:c06::244]:33418)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dEOUA-00016G-6b
+	for qemu-devel@nongnu.org; Fri, 26 May 2017 19:17:34 -0400
+Received: by mail-oi0-x244.google.com with SMTP id h4so3871004oib.0
+	for <qemu-devel@nongnu.org>; Fri, 26 May 2017 16:17:34 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20170521032956.27446-1-f4bug@amsat.org>
+	<20170521032956.27446-4-f4bug@amsat.org>
+	<20170524052405.GK12279@lemon.lan>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <9d24ebb8-1759-0c3b-d539-37bd866c7523@amsat.org>
+Date: Fri, 26 May 2017 20:17:31 -0300
 MIME-Version: 1.0
-From: alarson@ddci.com
-Message-ID: <OF77971E2B.E6193BA9-ON8625812C.007D425F-8625812C.007EBDEA@ddci.com>
-Date: Fri, 26 May 2017 18:04:21 -0500
-Content-Type: text/plain; charset="US-ASCII"
-Subject: Re: [Qemu-devel] [PATCH v2] target-ppc: Enable open-pic timers to
- count and generate interrupts
+In-Reply-To: <20170524052405.GK12279@lemon.lan>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v3 03/24] docker: rebuild image if 'extra
+ files' checksum does not match
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,84 +36,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: agraf@suse.de, qemu-devel@nongnu.org, qemu-ppc@nongnu.org
+To: Fam Zheng <famz@redhat.com>
+Cc: qemu-devel@nongnu.org, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
 
-David Gibson <david@gibson.dropbear.id.au> wrote on 05/13/2017 02:59:16 
-AM:
+On 05/24/2017 02:24 AM, Fam Zheng wrote:
+> On Sun, 05/21 00:29, Philippe Mathieu-Daudé wrote:
+>> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+>> ---
+>>  tests/docker/docker.py | 15 ++++++++++++---
+>>  1 file changed, 12 insertions(+), 3 deletions(-)
+>>
+>> diff --git a/tests/docker/docker.py b/tests/docker/docker.py
+>> index eef92a54f1..0dd6a3304f 100755
+>> --- a/tests/docker/docker.py
+>> +++ b/tests/docker/docker.py
+>> @@ -38,6 +38,9 @@ def _text_checksum(text):
+>>      """Calculate a digest string unique to the text content"""
+>>      return hashlib.sha1(text).hexdigest()
+>>
+>> +def _file_checksum(filename):
+>> +    return _text_checksum(open(filename, 'rb').read())
+>> +
+>>  def _guess_docker_command():
+>>      """ Guess a working docker command or raise exception if not found"""
+>>      commands = [["docker"], ["sudo", "-n", "docker"]]
+>> @@ -154,7 +157,7 @@ class Docker(object):
+>>          return labels.get("com.qemu.dockerfile-checksum", "")
+>>
+>>      def build_image(self, tag, docker_dir, dockerfile,
+>> -                    quiet=True, user=False, argv=None):
+>> +                    quiet=True, user=False, argv=None, extra_files_cksum=[]):
+>>          if argv == None:
+>>              argv = []
+>>
+>> @@ -170,7 +173,7 @@ class Docker(object):
+>>
+>>          tmp_df.write("\n")
+>>          tmp_df.write("LABEL com.qemu.dockerfile-checksum=%s" %
+>> -                     _text_checksum(dockerfile))
+>> +                     _text_checksum(dockerfile + "-".join(extra_files_cksum)))
+>
+> Since @dockerfile is the content of the the Dockerfile, how about concatenating
+> with "\n":
+>
+>                         _text_checksum("\n".join([dockerfile] + extra_files_cksum))
+>
+> ?
 
-> From: David Gibson <david@gibson.dropbear.id.au>
-> On Fri, May 12, 2017 at 09:34:33AM -0500, alarson@ddci.com wrote:
-> > David Gibson <david@gibson.dropbear.id.au> wrote on 05/12/2017 
-01:52:04 
+This is only the text to hash, I don't think it will make a difference 
+since it isn't useful even debugging the script, but it may be cleaner 
+so I'll do it (nonetheless python ends up weirdly indented).
 
-Sorry for the long delay getting back to you.  I was out of town for a
-while.
-
-> > > > +    }
-> > > > +    uint64_t ns = ticks_to_ns(val & ~TCCR_TOG);
-> > > > +    /* A count of zero causes a timer to be set to expire 
-> > immediately.  This
-> > > > +       effectively stops the simulation so we don't honor that 
-> > configuration.
-> > > > +       On real hardware, this would generate an interrupt on 
-every 
-> > clock cycle
-> > > > +       if the interrupt was unmasked. */
-> > > 
-> > > Could you also jam up if the count is non-zero but a too-small value
-> > > to make forward progress?  ...
-> > 
-> > The case I'm concerned about is where a transient value is programmed
-> > to the timer and the interrupt is masked.  In that case QEMU will fire
-> > the timer on (potentially) every other clock,
-> 
-> Erm.. TCG doesn't really have "clocks" as such, so I'm not entirely
-> sure what you mean here.
-
-Hopefully its just terminology.  QEMU has QEMU_CLOCK_VIRTUAL which
-drives a timer.  My understanding is that the top level loop in QEMU
-is effectively:
-
-  while 1
-    if timer expired then run the handler
-    else execute some simulated code
-
-If a QEMU timer handler reprograms the timer to expire at "now+0ns",
-then no code is ever executed because the VIRTUAL CLOCK timer is
-always pending.  This is not exactly the same as what would happen on
-real hardware because on hardware the interrupt would be asserted, but
-if it was masked it would have no effect.  In the simulation such a
-situation effectively results in a "hang".
-
-> > > >  static void openpic_tmr_write(void *opaque, hwaddr addr, uint64_t 
-
-> > > > ...
-> > > > -    if (addr == 0x10f0) {
-> > > > +    if (addr == 0) {
-> > > 
-> > > I don't really understand how this change fits in with the rest - it
-> > > appears to be changing existing unrelated behaviour.
-> > 
-> > I debated on changing this.  I needed to make changes to both the
-> > timer read and write code, and the existing code was inconsistent on
-> > the treatment of the offset.  The open-pic has a standard memory map
-> > and the timer block starts at 0x10f0 from the BAR.  Of course the
-> > region in QEMU for the timer is setup such that the timer is at offset
-> > zero in the QEMU timer memory region.  The write code added the offset
-> > to match the hardware, the read code did not, and consequently the
-> > code I added for timer read and write needed to be gratuitously
-> > different because of that.  I chose to update the write to match the
-> > read.  I can undo the change, if you'd like, but it does make the
-> > resulting code harder to understand (IMHO).
-> 
-> So, making the read/write functions use consistent addressing sounds
-> like a good idea.  But I think it would be clearer to do this as a
-> preliminary patch, rather than folded in with adding the timers
-> implementation.
-
-Will do.  Patch to follow shortly.  I assume that once the preliminary
-patch is approved, I should submit a follow up patch with the addition
-of the timer.  BTW, I forgot to mention that the previous timer read
-code was not only inconsistent, but was in error.  Bad enough in error
-that I doubt anyone could have been using the code.
+>
+>
+>>          tmp_df.flush()
+>>
+>>          self._do(["build", "-t", tag, "-f", tmp_df.name] + argv + \
+>> @@ -276,16 +279,22 @@ class BuildCommand(SubCommand):
+>>                      return 1
+>>
+>>              # Include files used by ADD directives found within the Dockerfile.
+>> +            cksum = []
+>>              if args.include_executable:
+>> +                # FIXME: there is no checksum of this executable and the linked
+>> +                # libraries, once the image built any change of this executable
+>> +                # or any library won't trigger another build.
+>>                  _copy_binary_with_libs(args.include_executable, docker_dir)
+>>              for filename in args.include_files or []:
+>>                  _copy_with_mkdir(filename, docker_dir)
+>> +                cksum += [_file_checksum(filename)]
+>>
+>>              argv += ["--build-arg=" + k.lower() + "=" + v
+>>                          for k, v in os.environ.iteritems()
+>>                          if k.lower() in FILTERED_ENV_NAMES]
+>>              dkr.build_image(tag, docker_dir, dockerfile,
+>> -                            quiet=args.quiet, user=args.user, argv=argv)
+>> +                            quiet=args.quiet, user=args.user, argv=argv,
+>> +                            extra_files_cksum=cksum)
+>>
+>>              rmtree(docker_dir)
+>>
+>> --
+>> 2.11.0
+>>
