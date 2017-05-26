@@ -1,26 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48625)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48791)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1dEFRU-0006gO-Jc
-	for qemu-devel@nongnu.org; Fri, 26 May 2017 09:38:13 -0400
+	(envelope-from <eblake@redhat.com>) id 1dEFS3-0006xb-9S
+	for qemu-devel@nongnu.org; Fri, 26 May 2017 09:38:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1dEFRQ-00081V-M0
-	for qemu-devel@nongnu.org; Fri, 26 May 2017 09:38:12 -0400
-From: Alberto Garcia <berto@igalia.com>
-In-Reply-To: <e636f52f-41c1-4682-e8b9-ea2596ac21b0@virtuozzo.com>
-References: <cover.1495536228.git.berto@igalia.com>
-	<142326a3-eaa4-8333-9580-ae0063f8a876@redhat.com>
-	<w51shjutjz7.fsf@maestria.local.igalia.com>
-	<0e3fc298-d47b-4066-c8c8-02f620c50b89@virtuozzo.com>
-	<20170526101727.GF7211@noname.str.redhat.com>
-	<cc4efd40-46e8-82c0-10f7-148e84ab477a@virtuozzo.com>
-	<w5160gnlq90.fsf@maestria.local.igalia.com>
-	<e636f52f-41c1-4682-e8b9-ea2596ac21b0@virtuozzo.com>
-Date: Fri, 26 May 2017 15:38:03 +0200
-Message-ID: <w5137brlow4.fsf@maestria.local.igalia.com>
+	(envelope-from <eblake@redhat.com>) id 1dEFRz-0008Dm-C1
+	for qemu-devel@nongnu.org; Fri, 26 May 2017 09:38:47 -0400
+References: <20170526101337.4096-1-marcandre.lureau@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <86c34b52-15df-8c57-ae43-308c17f321aa@redhat.com>
+Date: Fri, 26 May 2017 08:38:38 -0500
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH 0/7] qcow2: Reduce the number of I/O ops
- when doing COW
+In-Reply-To: <20170526101337.4096-1-marcandre.lureau@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="ALv5RmJNQAKbv7pxmB6XODeFtmmRxN5Fu"
+Subject: Re: [Qemu-devel] [PATCH] qemu-ga: remove useless allocation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,24 +23,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Anton Nefedov <anton.nefedov@virtuozzo.com>, Kevin Wolf <kwolf@redhat.com>
-Cc: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, "Denis V . Lunev" <den@openvz.org>
+To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-trivial@nongnu.org, Michael Roth <mdroth@linux.vnet.ibm.com>
 
-On Fri 26 May 2017 03:32:49 PM CEST, Anton Nefedov wrote:
->>> [root@localhost ~]# fio --name=randwrite --blocksize=4k
->>> --filename=/dev/sdb --rw=randwrite --direct=1 --ioengine=libaio
->>> --size=2g --io_size=32m
->> 
->> In my tests I sometimes detected slight performance decreases in that
->> HDD scenario but using 'write' instead of 'randwrite' (and --runtime=60
->> instead of --io_size).
->> 
->> Can you try and see how that works for you?
->
-> For me it keeps giving pretty much the same result before and after
->
->   write: io=512736KB, bw=8545.4KB/s, iops=2136, runt= 60004msec
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--ALv5RmJNQAKbv7pxmB6XODeFtmmRxN5Fu
+From: Eric Blake <eblake@redhat.com>
+To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
+ qemu-devel@nongnu.org
+Cc: qemu-trivial@nongnu.org, Michael Roth <mdroth@linux.vnet.ibm.com>
+Message-ID: <86c34b52-15df-8c57-ae43-308c17f321aa@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] qemu-ga: remove useless allocation
+References: <20170526101337.4096-1-marcandre.lureau@redhat.com>
+In-Reply-To: <20170526101337.4096-1-marcandre.lureau@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Ok, that's the expected behavior. Good!
+On 05/26/2017 05:13 AM, Marc-Andr=C3=A9 Lureau wrote:
+> There is no need to duplicate a fixed string.
+>=20
+> CC: qemu-trivial@nongnu.org
+> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> ---
+>  qga/commands-posix.c | 4 +---
+>  1 file changed, 1 insertion(+), 3 deletions(-)
+>=20
 
-Berto
+Reviewed-by: Eric Blake <eblake@redhat.com>
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--ALv5RmJNQAKbv7pxmB6XODeFtmmRxN5Fu
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEcBAEBCAAGBQJZKC/eAAoJEKeha0olJ0Nq6GAH/3izaHwACPicTOgbZJPUQvO1
+784vySPqIUZ7RpV6RCs1IY1gIIofi16mOfTlOJAmKkMHifcdTeMfX7zgJ+O4kKUZ
+E5/HCZVBKrzhLplK2SCg7D4HHoxpB+2QWHrcUlnkQLKbkCJ5Uhf8ypxH3tzPD91T
+2xeBVAhY7/nmstzaH10UlEiSyWLAIVYZrrugaROCu1yRZWDThZCMQ6bHu4kaUp0L
+FGsLwYp6MT+8TSCEhZlM5ctVuU/FaropW6GLaiLwaJEUFXJPLnU5msyOeMpuUZB1
+tRaPqfic905sjtJ233+g0RVSZ21V8OFw4R7gngoGJ65P/D8zBzfKOX8REU00Y0A=
+=/OhK
+-----END PGP SIGNATURE-----
+
+--ALv5RmJNQAKbv7pxmB6XODeFtmmRxN5Fu--
