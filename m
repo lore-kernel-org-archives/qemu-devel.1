@@ -1,21 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49463)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57711)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1dEJ47-0000jW-EN
-	for qemu-devel@nongnu.org; Fri, 26 May 2017 13:30:20 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1dEJib-0003gf-VF
+	for qemu-devel@nongnu.org; Fri, 26 May 2017 14:12:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1dEJ46-0007m2-LZ
-	for qemu-devel@nongnu.org; Fri, 26 May 2017 13:30:19 -0400
-References: <20170522195217.12991-1-mreitz@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <d3ad6b89-4666-72e3-faaa-7b80c62a99a3@redhat.com>
-Date: Fri, 26 May 2017 19:30:09 +0200
-MIME-Version: 1.0
-In-Reply-To: <20170522195217.12991-1-mreitz@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="4eofIbdeVmL4x5B12HKWES5IXBmoXjiuW"
-Subject: Re: [Qemu-devel] [PATCH v2 0/3] block: Fix backing paths for
- filenames with colons
+	(envelope-from <ehabkost@redhat.com>) id 1dEJiX-0003ec-SP
+	for qemu-devel@nongnu.org; Fri, 26 May 2017 14:12:09 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:58694)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1dEJiX-0003eR-Js
+	for qemu-devel@nongnu.org; Fri, 26 May 2017 14:12:05 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 8E776C0B39E2
+	for <qemu-devel@nongnu.org>; Fri, 26 May 2017 18:12:03 +0000 (UTC)
+From: Eduardo Habkost <ehabkost@redhat.com>
+Date: Fri, 26 May 2017 15:11:57 -0300
+Message-Id: <20170526181200.17227-1-ehabkost@redhat.com>
+Subject: [Qemu-devel] [PATCH v3 0/3] script for crash-testing -device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,58 +27,121 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Eric Blake <eblake@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: Thomas Huth <thuth@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Markus Armbruster <armbru@redhat.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---4eofIbdeVmL4x5B12HKWES5IXBmoXjiuW
-From: Max Reitz <mreitz@redhat.com>
-To: qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>,
- Eric Blake <eblake@redhat.com>
-Message-ID: <d3ad6b89-4666-72e3-faaa-7b80c62a99a3@redhat.com>
-Subject: Re: [PATCH v2 0/3] block: Fix backing paths for filenames with colons
-References: <20170522195217.12991-1-mreitz@redhat.com>
-In-Reply-To: <20170522195217.12991-1-mreitz@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Changes v2 -> v3:
+* Renamed to scripts/device-crash-test (removed .py suffix)
+* Changed license to GPLv2+
+* whitelist updates:
+  * New whitelist entries
+  * Documented whitelist expectations more clearly
+  * Use loglevel=INFO on unknown exitcode=1 cases
+  * Ignore ide-cd errors on older QEMU versions
+  * Refactor of whitelist lookup code to make it clearer
+* Optimization: when in quick mode, check if machine is usable before
+  testing it using -device
+* Run in verbose mode by default
+* Include exception traceback on the log output.
+* Use lowercase on "skipped:" message for consistency
+* Run on quick mode by default
+* Added --strict option
+* Don't crash if -r argument is too large
+* Eliminate useless genAllCases() wrapper function
+* Eliminate dead pickRandomCase() function
+* Eliminate dead debugging code
+* Include exception details on debug log if a machine fails to run
+* Removed code that tries to detect obsolete entries
+* Update commenst to mention user_creatable instead of the old
+  cannot_instantiate_with_device_add_yet name
+* Coding style updates to make pylint and pep8 happier
 
-On 2017-05-22 21:52, Max Reitz wrote:
-> There are (at least) two issues with filenames that contain colons when=
+Changes v1 -> v2:
+* Use a simpler method to query QEMU exit code in qemu.py
+* Use only qemu.py module, instead of qtest.py
+* New whitelist entries:
+  * "could not find stage1 bootloader"
+  * Segfaults when using devices: a15mpcore_priv, sb16, cs4231a, arm-gicv3
+* Format "success" line using formatTestCase(), and using DEBUG
+  loglevel
+* Reword "test case:" line with "running test case:", for clarity
+* Fix "pc-.*" whitelist to include "q35" too
+* Add --devtype option to test only a specific device type
+* Send all log messages to stdout instead of stderr
+* Avoid printing "obsolete whitelist entry?" messages if we know
+  we are not testing every single accel/machine/device
+  combination
+* --quick mode, to skip cases where failures are always expected,
+  and to print a warning in case we don't get an expected failure
+* Use qemu.QEMUMachine instead of qtest.QEMUQtestMachine, as we don't
+  use any of the QEMUQtestMachine features
+* Fix handling of multiple '-t' options
+* Simplify code that generate random sample of test cases
 
-> trying to use relative backing filenames with them, for each of which
-> there is a patch in this series.
->=20
-> The first patch fixes an issue in the general block layer
-> (path_combine() does not have the same opinion on what constitutes a
-> protocol prefix as path_has_protocl()), the second fixes an issue in
-> file-* (when stripping off the optional "file:" prefix we should not
-> create a filename that seems to have another valid protocol prefix).
->=20
-> The third patch adds a test.
+This series adds scripts/device-crashtest, that can be used to
+crash-test -device with multiple machine/accel/device
+combinations.
 
-Applied to my block tree, with the spelling in patch 3 fixed as
-indicated by Eric.
+The script found a few crashes on some machines/devices. A dump
+of existing cases can be seen here:
+  https://gist.github.com/ehabkost/503b0af0375f0d98d3e84017e8ca54eb
 
-Max
+The script contains a whitelist that can also be useful as
+documentation of existing ways -device can fail or crash.
 
+Note that the script takes a few hours to run on the default mode
+(testing all accel/machine/device combinations), but the "-r N"
+option can be used to make it only test N random samples.
 
---4eofIbdeVmL4x5B12HKWES5IXBmoXjiuW
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+Example script output:
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
+  $ ../scripts/device-crash-test.py -v --shuffle
+  INFO: test case: machine=verdex binary=./aarch64-softmmu/qemu-system-aarch64 device=exynos4210-ehci-usb accel=tcg
+  INFO: test case: machine=none binary=./aarch64-softmmu/qemu-system-aarch64 device=onenand accel=tcg
+  INFO: test case: machine=pc-i440fx-2.2 binary=./x86_64-softmmu/qemu-system-x86_64 device=ide-cd accel=kvm
+  INFO: success: ./x86_64-softmmu/qemu-system-x86_64 -S -machine pc-i440fx-2.2,accel=kvm -device ide-cd
+  INFO: test case: machine=SPARCClassic binary=./sparc-softmmu/qemu-system-sparc device=memory accel=tcg
+  qemu received signal 6: -S -machine SPARCClassic,accel=tcg -device memory
+  ERROR: failed: machine=SPARCClassic binary=./sparc-softmmu/qemu-system-sparc device=memory accel=tcg
+  ERROR: cmdline: ./sparc-softmmu/qemu-system-sparc -S -machine SPARCClassic,accel=tcg -device memory
+  ERROR: log: qemu-system-sparc: /root/qemu-build/exec.c:1500: find_ram_offset: Assertion `size != 0' failed.
+  ERROR: exit code: -6
+  INFO: test case: machine=romulus-bmc binary=./arm-softmmu/qemu-system-arm device=ich9-usb-uhci6 accel=tcg
+  INFO: test case: machine=ref405ep binary=./ppc-softmmu/qemu-system-ppc device=ivshmem-doorbell accel=tcg
+  INFO: test case: machine=romulus-bmc binary=./aarch64-softmmu/qemu-system-aarch64 device=l2x0 accel=tcg
+  INFO: test case: machine=pc-i440fx-1.7 binary=./x86_64-softmmu/qemu-system-x86_64 device=virtio-input-host-pci accel=tcg
+  INFO: test case: machine=none binary=./ppc-softmmu/qemu-system-ppc device=virtio-tablet-pci accel=tcg
+  INFO: test case: machine=terrier binary=./aarch64-softmmu/qemu-system-aarch64 device=sst25vf016b accel=tcg
+  INFO: success: ./aarch64-softmmu/qemu-system-aarch64 -S -machine terrier,accel=tcg -device sst25vf016b
+  INFO: test case: machine=none binary=./i386-softmmu/qemu-system-i386 device=intel-iommu accel=kvm
+  qemu received signal 6: -S -machine none,accel=kvm -device intel-iommu
+  ERROR: failed: machine=none binary=./i386-softmmu/qemu-system-i386 device=intel-iommu accel=kvm
+  ERROR: cmdline: ./i386-softmmu/qemu-system-i386 -S -machine none,accel=kvm -device intel-iommu
+  ERROR: log: /root/qemu-build/hw/i386/intel_iommu.c:2565:vtd_realize: Object 0x7fe117fabfb0 is not an instance of type generic-pc-machine
+  ERROR: exit code: -6
+  INFO: test case: machine=tosa binary=./aarch64-softmmu/qemu-system-aarch64 device=integrator_core accel=tcg
+  INFO: test case: machine=isapc binary=./i386-softmmu/qemu-system-i386 device=i82550 accel=kvm
+  INFO: test case: machine=xlnx-ep108 binary=./aarch64-softmmu/qemu-system-aarch64 device=digic accel=tcg
+  qemu received signal 6: -S -machine xlnx-ep108,accel=tcg -device digic
+  ERROR: failed: machine=xlnx-ep108 binary=./aarch64-softmmu/qemu-system-aarch64 device=digic accel=tcg
+  ERROR: cmdline: ./aarch64-softmmu/qemu-system-aarch64 -S -machine xlnx-ep108,accel=tcg -device digic
+  ERROR: log: audio: Could not init `oss' audio driver
+  ERROR: log: Unexpected error in qemu_chr_fe_init() at /root/qemu-build/chardev/char.c:512:
+  ERROR: log: qemu-system-aarch64: -device digic: Device 'serial0' is in use
+  ERROR: exit code: -6
+  INFO: test case: machine=raspi2 binary=./arm-softmmu/qemu-system-arm device=sd-card accel=tcg
+  INFO: success: ./arm-softmmu/qemu-system-arm -S -machine raspi2,accel=tcg -device sd-card
+  [...]
 
-iQEvBAEBCAAZBQJZKGYhEhxtcmVpdHpAcmVkaGF0LmNvbQAKCRD0B9sAYdXPQDFn
-B/9bZbrgSgRNpSPjF38NViwtaG88p3AY9tdXwas5Htb5VbV5WjW1cIWatnV5YFXP
-8WsvCZRMqjoOfacxLTudXHZFIYPuYZKc99Gz2gn8mg/SEgqHOlTd7UndmzwT2eiJ
-Wyo9/Z9QoX7dSM2D76kI2iv2VCwYwznJ5ulyRG2ksFghFtCY5dlqbnUZFqZUaI4L
-3LZvuXC0z5RI5eCv5pJMy52LTXzqDjkcxecLATV1vSTGEJU+EcDxckUdO0o2JU3t
-Zy+7ZekVNGKmABs2/eyO8yNnManVEbOWiE5UBfnoFdWlZKWn3esj17Qh0RXeAVJI
-TwP8oYjCDZCQZ+Adxjlpkd8b
-=1nH/
------END PGP SIGNATURE-----
+Eduardo Habkost (3):
+  qemu.py: Don't set _popen=None on error/shutdown
+  qemu.py: Add QEMUMachine.exitcode() method
+  scripts: Test script to look for -device crashes
 
---4eofIbdeVmL4x5B12HKWES5IXBmoXjiuW--
+ scripts/qemu.py           |  16 +-
+ scripts/device-crash-test | 624 ++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 635 insertions(+), 5 deletions(-)
+ create mode 100755 scripts/device-crash-test
+
+-- 
+2.11.0.259.g40922b1
