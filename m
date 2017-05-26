@@ -1,22 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34108)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36376)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dEM2H-0007zl-8K
-	for qemu-devel@nongnu.org; Fri, 26 May 2017 16:40:38 -0400
+	(envelope-from <dan.j.williams@intel.com>) id 1dEMBa-0001YJ-TF
+	for qemu-devel@nongnu.org; Fri, 26 May 2017 16:50:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dEM2G-0003Nc-6D
-	for qemu-devel@nongnu.org; Fri, 26 May 2017 16:40:37 -0400
-References: <1495830130-30611-1-git-send-email-kwolf@redhat.com>
-	<1495830130-30611-2-git-send-email-kwolf@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <e290a5f6-665c-79e1-cf34-d9eb622050d9@redhat.com>
-Date: Fri, 26 May 2017 15:40:27 -0500
+	(envelope-from <dan.j.williams@intel.com>) id 1dEMBZ-0007Tk-K7
+	for qemu-devel@nongnu.org; Fri, 26 May 2017 16:50:14 -0400
+Received: from mail-oi0-x22f.google.com ([2607:f8b0:4003:c06::22f]:36094)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <dan.j.williams@intel.com>)
+	id 1dEMBZ-0007TY-DS
+	for qemu-devel@nongnu.org; Fri, 26 May 2017 16:50:13 -0400
+Received: by mail-oi0-x22f.google.com with SMTP id h4so26755006oib.3
+	for <qemu-devel@nongnu.org>; Fri, 26 May 2017 13:50:13 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <1495830130-30611-2-git-send-email-kwolf@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="GAvBAm7ek0SPmwN1N789UfP73Wn1RH84U"
-Subject: Re: [Qemu-devel] [PATCH 01/29] qed: Use bottom half to resume
- waiting requests
+In-Reply-To: <20170526185516.GY32274@thinpad.lan.raisama.net>
+References: <20170526023213.18741-1-haozhong.zhang@intel.com>
+	<20170526023213.18741-2-haozhong.zhang@intel.com>
+	<CAJ+F1C+9o_vv4m7q47gPiaUjmQy7ag_J5ZKaHA9oagxZG2Q5Cg@mail.gmail.com>
+	<20170526065132.ayapfebbft5lyigd@hz-desktop>
+	<CAJ+F1CLDp7O93TRh2XcGQXXM_ZESiku0jDkcgzYUWAkP01wG9g@mail.gmail.com>
+	<20170526071654.kxcqflvpo2tvcrvu@hz-desktop>
+	<CAPcyv4hbf0RrjK5t5eN2Cs271JJUEYuiDNZqvso8g7QG4m4hDw@mail.gmail.com>
+	<20170526185516.GY32274@thinpad.lan.raisama.net>
+From: Dan Williams <dan.j.williams@intel.com>
+Date: Fri, 26 May 2017 13:50:12 -0700
+Message-ID: <CAPcyv4iNrgRWyRsA7+PabxNL1tZRC386eZSLki_-zM9tvrZLwQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [RESEND PATCH 2/2] hostmem-file: add an attribute
+ 'align' to set its alignment
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,74 +37,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-Cc: pbonzini@redhat.com, qemu-devel@nongnu.org, stefanha@redhat.com, mreitz@redhat.com
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: qemu-devel@nongnu.org, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Stefan Hajnoczi <stefanha@gmail.com>, Xiao Guangrong <guangrong.xiao@gmail.com>, Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---GAvBAm7ek0SPmwN1N789UfP73Wn1RH84U
-From: Eric Blake <eblake@redhat.com>
-To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-Cc: pbonzini@redhat.com, qemu-devel@nongnu.org, stefanha@redhat.com,
- mreitz@redhat.com
-Message-ID: <e290a5f6-665c-79e1-cf34-d9eb622050d9@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 01/29] qed: Use bottom half to resume waiting
- requests
-References: <1495830130-30611-1-git-send-email-kwolf@redhat.com>
- <1495830130-30611-2-git-send-email-kwolf@redhat.com>
-In-Reply-To: <1495830130-30611-2-git-send-email-kwolf@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On Fri, May 26, 2017 at 11:55 AM, Eduardo Habkost <ehabkost@redhat.com> wro=
+te:
+> On Fri, May 26, 2017 at 07:24:26AM -0700, Dan Williams wrote:
+>> On Fri, May 26, 2017 at 12:16 AM, Haozhong Zhang
+>> <haozhong.zhang@intel.com> wrote:
+>> > On 05/26/17 07:05 +0000, Marc-Andr=C3=A9 Lureau wrote:
+>> >> Hi
+>> >>
+>> >> On Fri, May 26, 2017 at 10:51 AM Haozhong Zhang <haozhong.zhang@intel=
+.com>
+>> >> wrote:
+>> >>
+>> >> > On 05/26/17 06:39 +0000, Marc-Andr=C3=A9 Lureau wrote:
+>> >> > > Hi
+>> >> > >
+>> >> > > On Fri, May 26, 2017 at 6:34 AM Haozhong Zhang <haozhong.zhang@in=
+tel.com
+>> >> > >
+>> >> > > wrote:
+>> >> > >
+>> >> > > > file_ram_alloc() currently maps the backend file via mmap to a =
+virtual
+>> >> > > > address aligned to the value returned by qemu_fd_getpagesize().=
+ When a
+>> >> > > > DAX device (e.g. /dev/dax0.0) is used as the backend file, its =
+kernel
+>> >> > > > mmap implementation may require an alignment larger than what
+>> >> > > > qemu_fd_get_pagesize() returns (e.g. 2MB vs. 4KB), and mmap may=
+ fail.
+>> >> > > >
+>> >> > >
+>> >> > > How is the accepted value queried? Any chance to configure it
+>> >> > > automatically?
+>> >> >
+>> >> > Take /dev/dax0.0 for example. The value can be read from
+>> >> > /sys/class/dax/dax0.0/device/dax_region/align.
+>> >> >
+>> >>
+>> >> Should this work be left to management layer, or could qemu figure it=
+ out
+>> >> by itself (using udev?)
+>> >>
+>> >
+>> > For DAX device only, QEMU can figure out the proper alignment by
+>> > itself. However, I'm not sure whether there are other non-DAX cases
+>> > requiring non-default alignment, so I think it's better to just add an
+>> > interface (i.e. align attribute) in QEMU and let other management
+>> > tools (e.g. libvirt?) fill a proper value.
+>>
+>> I can't imagine any cases where you would want to specify an
+>> alignment. If it's regular file mmap any alignment is fine, and if
+>> it's device-dax only the configured alignment of the device instance
+>> is allowed. So, I don't think this should be a configurable option,
+>> just read it from the device instance and you're done.
+>
+> Agreed.
+>
+> BTW, there's no generic interface to ask the kernel what's the
+> required mmap() alignment for a file?
 
-On 05/26/2017 03:21 PM, Kevin Wolf wrote:
-> The qed driver serialises allocating write requests. When the active
-> allocation is finished, the AIO callback is called, but after this, the=
+It's only this /dev/dax device-file case where the alignment is
+strictly enforced. The required alignment is advertised in sysfs, for
+example:
 
-> next allocating request is immediately processed instead of leaving the=
-
-> coroutine. Resuming another allocation request in the same request
-> coroutine means that the request now runs in the wrong coroutine.
->=20
-> The following is one of the possible effects of this: The completed
-> request will generally reenter its request coroutine in a bottom half,
-> expecting that it completes the request in bdrv_driver_pwritev().
-> However, if the second request actually yielded before leaving the
-> coroutine, the reused request coroutine is in an entirely different
-> place and is reentered prematurely. Not a good idea.
->=20
-> Let's make sure that we exit the coroutine after completing the first
-> request by resuming the next allocating request only with a bottom
-> half.
->=20
-> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-> ---
->  block/qed.c | 13 ++++++++++---
->  1 file changed, 10 insertions(+), 3 deletions(-)
-
-Reviewed-by: Eric Blake <eblake@redhat.com>
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---GAvBAm7ek0SPmwN1N789UfP73Wn1RH84U
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEcBAEBCAAGBQJZKJK7AAoJEKeha0olJ0NqqsYIAK+8zIN57ZQd6nTZTV6k2E3V
-evoBhzc5ftnHDiiTEokuc2AvUDdh3nzD261Odk5tRpN9rDUUPqEdxPrrAsWiX3l+
-Rj9K92bZEfQkZoWTlHWQlW7SRfgwDdyQNwagliDd3cK6VIa2gwf1HGAWNKsiZS+C
-zHSoRp64U9d6ZG069232EVQYahB8+Cm96ceWoanyQL52GuFGujFBnvxMO+UpAcL+
-MAes0vF0jEe4GeIqubwtusvpKp6SjBLsNfqvLC7Bba8zr30GGld7J2SDT+mXMXAq
-YA9wj9u61rJYX9K8SZtOMNDIrinjDRQ1sI6crIOr7QL2YgV0Q5oytU2xJrOzp30=
-=H0cl
------END PGP SIGNATURE-----
-
---GAvBAm7ek0SPmwN1N789UfP73Wn1RH84U--
+# ls -l /dev/dax0.0
+crw------- 1 root root 253, 0 May 26 06:41 /dev/dax0.0
+# cat /sys/dev/char/253\:0/device/align
+2097152
