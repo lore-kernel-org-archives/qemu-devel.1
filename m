@@ -1,21 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59795)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33586)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <maxime.coquelin@redhat.com>) id 1dEGFY-0001X0-NY
-	for qemu-devel@nongnu.org; Fri, 26 May 2017 10:30:00 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1dEGNs-0007ft-Qc
+	for qemu-devel@nongnu.org; Fri, 26 May 2017 10:38:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <maxime.coquelin@redhat.com>) id 1dEGFX-0000fR-4D
-	for qemu-devel@nongnu.org; Fri, 26 May 2017 10:29:56 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:41248)
+	(envelope-from <pbonzini@redhat.com>) id 1dEGNp-0000Ui-LZ
+	for qemu-devel@nongnu.org; Fri, 26 May 2017 10:38:32 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:56749)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <maxime.coquelin@redhat.com>)
-	id 1dEGFW-0000cM-RX
-	for qemu-devel@nongnu.org; Fri, 26 May 2017 10:29:55 -0400
-From: Maxime Coquelin <maxime.coquelin@redhat.com>
-Date: Fri, 26 May 2017 16:28:58 +0200
-Message-Id: <20170526142858.19931-7-maxime.coquelin@redhat.com>
-In-Reply-To: <20170526142858.19931-1-maxime.coquelin@redhat.com>
-References: <20170526142858.19931-1-maxime.coquelin@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 6/6] spec/vhost-user spec: Add IOMMU support
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1dEGNp-0000SH-CY
+	for qemu-devel@nongnu.org; Fri, 26 May 2017 10:38:29 -0400
+Received: from int-mx14.intmail.prod.int.phx2.redhat.com
+	(int-mx14.intmail.prod.int.phx2.redhat.com [10.5.11.27])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 5949C1C13C2
+	for <qemu-devel@nongnu.org>; Fri, 26 May 2017 14:38:28 +0000 (UTC)
+Received: from donizetti.redhat.com (ovpn-117-65.ams2.redhat.com
+	[10.36.117.65])
+	by int-mx14.intmail.prod.int.phx2.redhat.com (8.14.4/8.14.4) with ESMTP
+	id v4QEcR9g006011
+	for <qemu-devel@nongnu.org>; Fri, 26 May 2017 10:38:27 -0400
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Fri, 26 May 2017 16:38:23 +0200
+Message-Id: <20170526143826.27780-1-pbonzini@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL v3 00/22] Misc patches for 2017-05-19
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,218 +35,124 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: mst@redhat.com, peterx@redhat.com, marcandre.lureau@gmail.com, vkaplans@redhat.com, jasowang@redhat.com, wexu@redhat.com, yuanhan.liu@linux.intel.com, qemu-devel@nongnu.org, jfreiman@redhat.com
-Cc: Maxime Coquelin <maxime.coquelin@redhat.com>
+To: qemu-devel@nongnu.org
 
-This patch specifies and implements the master/slave communication
-to support device IOTLB in slave.
+The following changes since commit 56821559f0ba682fe6b367815572e6f974d329=
+ab:
 
-The vhost_iotlb_msg structure introduced for kernel backends is
-re-used, making the design close between the two backends.
+  Merge remote-tracking branch 'dgilbert/tags/pull-hmp-20170517' into sta=
+ging (2017-05-18 13:36:15 +0100)
 
-An exception is the use of the secondary channel to enable the
-slave to send IOTLB miss requests to the master.
+are available in the git repository at:
 
-Signed-off-by: Maxime Coquelin <maxime.coquelin@redhat.com>
----
+  git://github.com/bonzini/qemu.git tags/for-upstream
 
-v2:
- - spec: fixed possible permission field values
- - spec: rewrote "IOMMU support" section
- docs/specs/vhost-user.txt | 86 +++++++++++++++++++++++++++++++++++++++++++++++
- hw/virtio/vhost-user.c    | 31 +++++++++++++++++
- 2 files changed, 117 insertions(+)
+for you to fetch changes up to 7860f87b6523324bd35ee5e25f698bf0d779e767:
 
-diff --git a/docs/specs/vhost-user.txt b/docs/specs/vhost-user.txt
-index 5fa7016..0799ef1 100644
---- a/docs/specs/vhost-user.txt
-+++ b/docs/specs/vhost-user.txt
-@@ -97,6 +97,25 @@ Depending on the request type, payload can be:
-    log offset: offset from start of supplied file descriptor
-        where logging starts (i.e. where guest address 0 would be logged)
- 
-+ * An IOTLB message
-+   ---------------------------------------------------------
-+   | iova | size | user address | permissions flags | type |
-+   ---------------------------------------------------------
-+
-+   IOVA: a 64-bit I/O virtual address programmed by the guest
-+   Size: a 64-bit size
-+   User address: a 64-bit user address
-+   Permissions: a 8-bit value:
-+    - 0: No access
-+    - 1: Read access
-+    - 2: Write access
-+    - 3: Read/Write access
-+   Type: a 8-bit IOTLB message type:
-+    - 1: IOTLB miss
-+    - 2: IOTLB update
-+    - 3: IOTLB invalidate
-+    - 4: IOTLB access fail
-+
- In QEMU the vhost-user message is implemented with the following struct:
- 
- typedef struct VhostUserMsg {
-@@ -109,6 +128,7 @@ typedef struct VhostUserMsg {
-         struct vhost_vring_addr addr;
-         VhostUserMemory memory;
-         VhostUserLog log;
-+        struct vhost_iotlb_msg iotlb;
-     };
- } QEMU_PACKED VhostUserMsg;
- 
-@@ -253,6 +273,40 @@ Once the source has finished migration, rings will be stopped by
- the source. No further update must be done before rings are
- restarted.
- 
-+IOMMU support
-+-------------
-+
-+When the VIRTIO_F_IOMMU_PLATFORM feature has been negotiated, the master
-+sends IOTLB entries update & invalidation by sending VHOST_USER_IOTLB_MSG
-+requests to the slave with a struct vhost_iotlb_msg as payload. For update
-+events, the iotlb payload has to be filled with the update message type (2),
-+the I/O virtual address, the size, the user virtual address, and the
-+permissions flags. Addresses and size must be within vhost memory regions set
-+via the VHOST_USER_SET_MEM_TABLE request. For invalidation events, the iotlb
-+payload has to be filled with the invalidation message type (3), the I/O virtual
-+address and the size. On success, the slave is expected to reply with a zero
-+payload, non-zero otherwise.
-+
-+The slave relies on the slave communcation channel (see "Slave communication"
-+section below) to send IOTLB miss and access failure events, by sending
-+VHOST_USER_SLAVE_IOTLB_MSG requests to the master with a struct vhost_iotlb_msg
-+as payload. For miss events, the iotlb payload has to be filled with the miss
-+message type (1), the I/O virtual address and the permissions flags. For access
-+failure event, the iotlb payload has to be filled with the access failure
-+message type (4), the I/O virtual address and the permissions flags.
-+For synchronization purpose, the slave may rely on the reply-ack feature,
-+so the master may send a reply when operation is completed if the reply-ack
-+feature is negotiated and slaves requests a reply. For miss events, completed
-+operation means either master sent an update message containing the IOTLB entry
-+containing requested address and permission, or master sent nothing if the IOTLB
-+miss message is invalid (invalid IOVA or permission).
-+
-+The master isn't generally expected to take the initiative to send IOTLB update
-+messages, as the slave sends IOTLB miss messages for the guest virtual memory
-+areas it needs to access. The exception is the rings information addresses
-+shared with the VHOST_USER_SET_VRING_ADDR request, for which the master must
-+send corresponding IOTLB updates before the rings are enabled.
-+
- Slave communication
- -------------------
- 
-@@ -514,6 +568,38 @@ Master message types
-       If VHOST_USER_PROTOCOL_F_REPLY_ACK is negotiated, slave must respond
-       with zero for success, non-zero otherwise.
- 
-+ * VHOST_USER_IOTLB_MSG
-+
-+      Id: 22
-+      Equivalent ioctl: N/A (equivalent to VHOST_IOTLB_MSG message type)
-+      Master payload: struct vhost_iotlb_msg
-+      Slave payload: u64
-+
-+      Send IOTLB messages with struct vhost_iotlb_msg as payload.
-+      Master sends such requests to update and invalidate entries in the device
-+      IOTLB. The slave has to acknowledge the request with sending zero as u64
-+      payload for success, non-zero otherwise.
-+      This request should be send only when VIRTIO_F_IOMMU_PLATFORM feature
-+      has been successfully negotiated.
-+
-+Slave message types
-+-------------------
-+
-+ * VHOST_USER_SLAVE_IOTLB_MSG
-+
-+      Id: 1
-+      Equivalent ioctl: N/A (equivalent to VHOST_IOTLB_MSG message type)
-+      Slave payload: struct vhost_iotlb_msg
-+      Master payload: N/A
-+
-+      Send IOTLB messages with struct vhost_iotlb_msg as payload.
-+      Slave sends such requests to notify of an IOTLB miss, or an IOTLB
-+      access failure. If VHOST_USER_PROTOCOL_F_REPLY_ACK is negotiated,
-+      and slave set the VHOST_USER_NEED_REPLY flag, master must respond with
-+      zero when operation is successfully completed, or non-zero otherwise.
-+      This request should be send only when VIRTIO_F_IOMMU_PLATFORM feature
-+      has been successfully negotiated.
-+
- VHOST_USER_PROTOCOL_F_REPLY_ACK:
- -------------------------------
- The original vhost-user specification only demands replies for certain
-diff --git a/hw/virtio/vhost-user.c b/hw/virtio/vhost-user.c
-index ea988fe..170fa68 100644
---- a/hw/virtio/vhost-user.c
-+++ b/hw/virtio/vhost-user.c
-@@ -62,11 +62,13 @@ typedef enum VhostUserRequest {
-     VHOST_USER_SEND_RARP = 19,
-     VHOST_USER_NET_SET_MTU = 20,
-     VHOST_USER_SET_SLAVE_REQ_FD = 21,
-+    VHOST_USER_IOTLB_MSG = 22,
-     VHOST_USER_MAX
- } VhostUserRequest;
- 
- typedef enum VhostUserSlaveRequest {
-     VHOST_USER_SLAVE_NONE = 0,
-+    VHOST_USER_SLAVE_IOTLB_MSG = 1,
-     VHOST_USER_SLAVE_MAX
- }  VhostUserSlaveRequest;
- 
-@@ -104,6 +106,7 @@ typedef struct VhostUserMsg {
-         struct vhost_vring_addr addr;
-         VhostUserMemory memory;
-         VhostUserLog log;
-+        struct vhost_iotlb_msg iotlb;
-     } payload;
- } QEMU_PACKED VhostUserMsg;
- 
-@@ -615,6 +618,9 @@ static void slave_read(void *opaque)
-     }
- 
-     switch (msg.request) {
-+    case VHOST_USER_SLAVE_IOTLB_MSG:
-+        ret = vhost_backend_handle_iotlb_msg(dev, &msg.payload.iotlb);
-+        break;
-     default:
-         error_report("Received unexpected msg type.");
-         ret = -EINVAL;
-@@ -862,6 +868,29 @@ static int vhost_user_net_set_mtu(struct vhost_dev *dev, uint16_t mtu)
-     return 0;
- }
- 
-+static int vhost_user_send_device_iotlb_msg(struct vhost_dev *dev,
-+                                            struct vhost_iotlb_msg *imsg)
-+{
-+    VhostUserMsg msg = {
-+        .request = VHOST_USER_IOTLB_MSG,
-+        .size = sizeof(msg.payload.iotlb),
-+        .flags = VHOST_USER_VERSION | VHOST_USER_NEED_REPLY_MASK,
-+        .payload.iotlb = *imsg,
-+    };
-+
-+    if (vhost_user_write(dev, &msg, NULL, 0) < 0) {
-+        return -EFAULT;
-+    }
-+
-+    return process_message_reply(dev, msg);
-+}
-+
-+
-+static void vhost_user_set_iotlb_callback(struct vhost_dev *dev, int enabled)
-+{
-+    /* No-op as the receive channel is not dedicated to IOTLB messages. */
-+}
-+
- const VhostOps user_ops = {
-         .backend_type = VHOST_BACKEND_TYPE_USER,
-         .vhost_backend_init = vhost_user_init,
-@@ -886,4 +915,6 @@ const VhostOps user_ops = {
-         .vhost_migration_done = vhost_user_migration_done,
-         .vhost_backend_can_merge = vhost_user_can_merge,
-         .vhost_net_set_mtu = vhost_user_net_set_mtu,
-+        .vhost_set_iotlb_callback = vhost_user_set_iotlb_callback,
-+        .vhost_send_device_iotlb_msg = vhost_user_send_device_iotlb_msg,
- };
--- 
-2.9.4
+  sockets: improve error reporting if UNIX socket path is too long (2017-=
+05-26 13:22:52 +0200)
+
+----------------------------------------------------------------
+* virtio-scsi use-after-free fix (Fam)
+* vhost-user-scsi support (Felipe)
+* SMM fixes and improvements for TCG (myself, Mihail)
+* irqchip and AddressSpaceDispatch cleanups and fixes (Peter)
+* Coverity fix (Stefano)
+* NBD cleanups (Vladimir)
+* RTC accuracy improvements and code cleanups (Guangrong+Yunfang)
+* socket error reporting improvement (Daniel)
+
+----------------------------------------------------------------
+
+v2->v3: replaced one NBD patch, added the last two
+
+Daniel P. Berrange (1):
+      sockets: improve error reporting if UNIX socket path is too long
+
+Fam Zheng (1):
+      virtio-scsi: Unset hotplug handler when unrealize
+
+Felipe Franciosi (2):
+      vhost-user-scsi: Introduce vhost-user-scsi host device
+      vhost-user-scsi: Introduce a vhost-user-scsi sample application
+
+Mihail Abakumov (1):
+      i386: fix read/write cr with icount option
+
+Paolo Bonzini (2):
+      target/i386: enable A20 automatically in system management mode
+      target/i386: use multiple CPU AddressSpaces
+
+Peter Xu (4):
+      kvm: irqchip: trace changes on msi add/remove
+      msix: trace control bit write op
+      kvm: irqchip: skip update msi when disabled
+      exec: simplify phys_page_find() params
+
+Stefano Stabellini (1):
+      Check the return value of fcntl in qemu_set_cloexec
+
+Tai Yunfang (1):
+      mc146818rtc: precisely count the clock for periodic timer
+
+Vladimir Sementsov-Ogievskiy (5):
+      nbd: strict nbd_wr_syncv
+      nbd: read_sync and friends: return 0 on success
+      nbd: add errp parameter to nbd_wr_syncv()
+      nbd: add errp to read_sync, write_sync and drop_sync
+      nbd/client.c: use errp instead of LOG
+
+Xiao Guangrong (4):
+      mc146818rtc: update periodic timer only if it is needed
+      mc146818rtc: ensure LOST_TICK_POLICY_SLEW is only enabled on TARGET=
+_I386
+      mc146818rtc: drop unnecessary '#ifdef TARGET_I386'
+      mc146818rtc: embrace all x86 specific code
+
+ .gitignore                                |   1 +
+ Makefile                                  |   3 +
+ Makefile.objs                             |   4 +
+ block/nbd-client.c                        |  11 +-
+ contrib/libvhost-user/libvhost-user.h     |  11 +-
+ contrib/vhost-user-scsi/Makefile.objs     |   1 +
+ contrib/vhost-user-scsi/vhost-user-scsi.c | 886 ++++++++++++++++++++++++=
+++++++
+ default-configs/pci.mak                   |   1 +
+ default-configs/s390x-softmmu.mak         |   1 +
+ exec.c                                    |  13 +-
+ hw/pci/msix.c                             |  11 +-
+ hw/pci/trace-events                       |   3 +
+ hw/scsi/Makefile.objs                     |   1 +
+ hw/scsi/vhost-user-scsi.c                 | 211 +++++++
+ hw/scsi/virtio-scsi.c                     |   3 +
+ hw/timer/mc146818rtc.c                    | 206 ++++---
+ hw/virtio/virtio-pci.c                    |  54 ++
+ hw/virtio/virtio-pci.h                    |  11 +
+ include/block/nbd.h                       |   8 +-
+ include/hw/virtio/vhost-user-scsi.h       |  35 ++
+ include/hw/virtio/virtio-scsi.h           |   2 +
+ kvm-all.c                                 |   4 +-
+ nbd/client.c                              | 125 ++---
+ nbd/common.c                              |  23 +-
+ nbd/nbd-internal.h                        |  40 +-
+ nbd/server.c                              |  92 ++--
+ qemu-nbd.c                                |   3 +-
+ target/i386/arch_memory_mapping.c         |  18 +-
+ target/i386/cpu.c                         |  15 +-
+ target/i386/cpu.h                         |  20 +-
+ target/i386/helper.c                      |  96 ++--
+ target/i386/kvm.c                         |  12 +-
+ target/i386/machine.c                     |   4 -
+ target/i386/smm_helper.c                  |  18 -
+ target/i386/translate.c                   |  12 +
+ tests/qemu-iotests/083.out                |   2 +
+ trace-events                              |   3 +-
+ util/oslib-posix.c                        |   4 +-
+ util/qemu-sockets.c                       |  68 ++-
+ 39 files changed, 1703 insertions(+), 333 deletions(-)
+ create mode 100644 contrib/vhost-user-scsi/Makefile.objs
+ create mode 100644 contrib/vhost-user-scsi/vhost-user-scsi.c
+ create mode 100644 hw/scsi/vhost-user-scsi.c
+ create mode 100644 include/hw/virtio/vhost-user-scsi.h
+--=20
+2.13.0
