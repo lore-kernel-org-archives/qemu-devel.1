@@ -1,21 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60406)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39118)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dEJvZ-000422-Kt
-	for qemu-devel@nongnu.org; Fri, 26 May 2017 14:25:35 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1dEKOQ-000299-Pg
+	for qemu-devel@nongnu.org; Fri, 26 May 2017 14:55:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dEJvY-0000gv-1V
-	for qemu-devel@nongnu.org; Fri, 26 May 2017 14:25:33 -0400
-Date: Fri, 26 May 2017 15:25:22 -0300
+	(envelope-from <ehabkost@redhat.com>) id 1dEKON-0001aK-OY
+	for qemu-devel@nongnu.org; Fri, 26 May 2017 14:55:22 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40406)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1dEKON-0001ZZ-FP
+	for qemu-devel@nongnu.org; Fri, 26 May 2017 14:55:19 -0400
+Date: Fri, 26 May 2017 15:55:16 -0300
 From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20170526182522.GV32274@thinpad.lan.raisama.net>
-References: <1495550330-34087-1-git-send-email-imammedo@redhat.com>
-	<1495550330-34087-6-git-send-email-imammedo@redhat.com>
+Message-ID: <20170526185516.GY32274@thinpad.lan.raisama.net>
+References: <20170526023213.18741-1-haozhong.zhang@intel.com>
+	<20170526023213.18741-2-haozhong.zhang@intel.com>
+	<CAJ+F1C+9o_vv4m7q47gPiaUjmQy7ag_J5ZKaHA9oagxZG2Q5Cg@mail.gmail.com>
+	<20170526065132.ayapfebbft5lyigd@hz-desktop>
+	<CAJ+F1CLDp7O93TRh2XcGQXXM_ZESiku0jDkcgzYUWAkP01wG9g@mail.gmail.com>
+	<20170526071654.kxcqflvpo2tvcrvu@hz-desktop>
+	<CAPcyv4hbf0RrjK5t5eN2Cs271JJUEYuiDNZqvso8g7QG4m4hDw@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <1495550330-34087-6-git-send-email-imammedo@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 5/5] numa: move numa_node from CPUState
- into target specific classes
+In-Reply-To: <CAPcyv4hbf0RrjK5t5eN2Cs271JJUEYuiDNZqvso8g7QG4m4hDw@mail.gmail.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [RESEND PATCH 2/2] hostmem-file: add an attribute
+ 'align' to set its alignment
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,248 +34,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-arm@nongnu.org, qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, Andrew Jones <drjones@redhat.com>
+To: Dan Williams <dan.j.williams@intel.com>
+Cc: qemu-devel@nongnu.org, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Stefan Hajnoczi <stefanha@gmail.com>, Xiao Guangrong <guangrong.xiao@gmail.com>, Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-On Tue, May 23, 2017 at 04:38:50PM +0200, Igor Mammedov wrote:
-> Move vcpu's assocciated numa_node field out of generic CPUState
-> into inherited classes that actually care about cpu<->numa mapping,
-> i.e: ARMCPU, PowerPCCPU, X86CPU.
-> 
-> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-> ---
->  include/qom/cpu.h       |  2 --
->  target/arm/cpu.h        |  2 ++
->  target/i386/cpu.h       |  1 +
->  target/ppc/cpu.h        |  1 +
->  hw/ppc/spapr.c          | 24 +++++++++++-------------
->  hw/ppc/spapr_cpu_core.c |  4 +++-
->  monitor.c               | 11 +++++++----
->  target/arm/cpu.c        |  2 +-
->  target/i386/cpu.c       |  2 +-
->  9 files changed, 27 insertions(+), 22 deletions(-)
-> 
-> diff --git a/include/qom/cpu.h b/include/qom/cpu.h
-> index 55214ce..89ddb68 100644
-> --- a/include/qom/cpu.h
-> +++ b/include/qom/cpu.h
-> @@ -265,7 +265,6 @@ struct qemu_work_item;
->   * @cpu_index: CPU index (informative).
->   * @nr_cores: Number of cores within this CPU package.
->   * @nr_threads: Number of threads within this CPU.
-> - * @numa_node: NUMA node this CPU is belonging to.
->   * @host_tid: Host thread ID.
->   * @running: #true if CPU is currently running (lockless).
->   * @has_waiter: #true if a CPU is currently waiting for the cpu_exec_end;
-> @@ -314,7 +313,6 @@ struct CPUState {
->  
->      int nr_cores;
->      int nr_threads;
-> -    int numa_node;
->  
->      struct QemuThread *thread;
->  #ifdef _WIN32
-> diff --git a/target/arm/cpu.h b/target/arm/cpu.h
-> index 048faed..5ffc9d8 100644
-> --- a/target/arm/cpu.h
-> +++ b/target/arm/cpu.h
-> @@ -703,6 +703,8 @@ struct ARMCPU {
->  
->      ARMELChangeHook *el_change_hook;
->      void *el_change_hook_opaque;
-> +
-> +    int32_t node_id; /* NUMA node this CPU is belonging to */
->  };
->  
->  static inline ARMCPU *arm_env_get_cpu(CPUARMState *env)
-> diff --git a/target/i386/cpu.h b/target/i386/cpu.h
-> index c4602ca..00f35a0 100644
-> --- a/target/i386/cpu.h
-> +++ b/target/i386/cpu.h
-> @@ -1278,6 +1278,7 @@ struct X86CPU {
->      int32_t socket_id;
->      int32_t core_id;
->      int32_t thread_id;
-> +    int32_t node_id; /* NUMA node this CPU is belonging to */
+On Fri, May 26, 2017 at 07:24:26AM -0700, Dan Williams wrote:
+> On Fri, May 26, 2017 at 12:16 AM, Haozhong Zhang
+> <haozhong.zhang@intel.com> wrote:
+> > On 05/26/17 07:05 +0000, Marc-Andr=E9 Lureau wrote:
+> >> Hi
+> >>
+> >> On Fri, May 26, 2017 at 10:51 AM Haozhong Zhang <haozhong.zhang@inte=
+l.com>
+> >> wrote:
+> >>
+> >> > On 05/26/17 06:39 +0000, Marc-Andr=E9 Lureau wrote:
+> >> > > Hi
+> >> > >
+> >> > > On Fri, May 26, 2017 at 6:34 AM Haozhong Zhang <haozhong.zhang@i=
+ntel.com
+> >> > >
+> >> > > wrote:
+> >> > >
+> >> > > > file_ram_alloc() currently maps the backend file via mmap to a=
+ virtual
+> >> > > > address aligned to the value returned by qemu_fd_getpagesize()=
+. When a
+> >> > > > DAX device (e.g. /dev/dax0.0) is used as the backend file, its=
+ kernel
+> >> > > > mmap implementation may require an alignment larger than what
+> >> > > > qemu_fd_get_pagesize() returns (e.g. 2MB vs. 4KB), and mmap ma=
+y fail.
+> >> > > >
+> >> > >
+> >> > > How is the accepted value queried? Any chance to configure it
+> >> > > automatically?
+> >> >
+> >> > Take /dev/dax0.0 for example. The value can be read from
+> >> > /sys/class/dax/dax0.0/device/dax_region/align.
+> >> >
+> >>
+> >> Should this work be left to management layer, or could qemu figure i=
+t out
+> >> by itself (using udev?)
+> >>
+> >
+> > For DAX device only, QEMU can figure out the proper alignment by
+> > itself. However, I'm not sure whether there are other non-DAX cases
+> > requiring non-default alignment, so I think it's better to just add a=
+n
+> > interface (i.e. align attribute) in QEMU and let other management
+> > tools (e.g. libvirt?) fill a proper value.
+>=20
+> I can't imagine any cases where you would want to specify an
+> alignment. If it's regular file mmap any alignment is fine, and if
+> it's device-dax only the configured alignment of the device instance
+> is allowed. So, I don't think this should be a configurable option,
+> just read it from the device instance and you're done.
 
-I suggest placing this before socket_id, so it follows the
-logical topology order: node, socket, core, thread.
+Agreed.
 
->  };
->  
->  static inline X86CPU *x86_env_get_cpu(CPUX86State *env)
-> diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
-> index 401e10e..31c052d 100644
-> --- a/target/ppc/cpu.h
-> +++ b/target/ppc/cpu.h
-> @@ -1205,6 +1205,7 @@ struct PowerPCCPU {
->      uint32_t compat_pvr;
->      PPCVirtualHypervisor *vhyp;
->      Object *intc;
-> +    int32_t node_id; /* NUMA node this CPU is belonging to */
->  
->      /* Fields related to migration compatibility hacks */
->      bool pre_2_8_migration;
-> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> index c7fee8b..96a2a74 100644
-> --- a/hw/ppc/spapr.c
-> +++ b/hw/ppc/spapr.c
-> @@ -178,25 +178,19 @@ static int spapr_fixup_cpu_smt_dt(void *fdt, int offset, PowerPCCPU *cpu,
->      return ret;
->  }
->  
-> -static int spapr_fixup_cpu_numa_dt(void *fdt, int offset, CPUState *cs)
-> +static int spapr_fixup_cpu_numa_dt(void *fdt, int offset, PowerPCCPU *cpu)
->  {
-> -    int ret = 0;
-> -    PowerPCCPU *cpu = POWERPC_CPU(cs);
->      int index = ppc_get_vcpu_dt_id(cpu);
->      uint32_t associativity[] = {cpu_to_be32(0x5),
->                                  cpu_to_be32(0x0),
->                                  cpu_to_be32(0x0),
->                                  cpu_to_be32(0x0),
-> -                                cpu_to_be32(cs->numa_node),
-> +                                cpu_to_be32(cpu->node_id),
->                                  cpu_to_be32(index)};
->  
->      /* Advertise NUMA via ibm,associativity */
-> -    if (nb_numa_nodes > 1) {
-> -        ret = fdt_setprop(fdt, offset, "ibm,associativity", associativity,
+BTW, there's no generic interface to ask the kernel what's the
+required mmap() alignment for a file?
 
-Commit message says we're just moving fields to other structs.
-If you want to change the existing logic, please do it in a
-separate patch.
-
-> +    return fdt_setprop(fdt, offset, "ibm,associativity", associativity,
->                            sizeof(associativity));
-> -    }
-> -
-> -    return ret;
->  }
->  
->  /* Populate the "ibm,pa-features" property */
-> @@ -321,9 +315,11 @@ static int spapr_fixup_cpu_dt(void *fdt, sPAPRMachineState *spapr)
->              return ret;
->          }
->  
-> -        ret = spapr_fixup_cpu_numa_dt(fdt, offset, cs);
-> -        if (ret < 0) {
-> -            return ret;
-> +        if (nb_numa_nodes > 1) {
-> +            ret = spapr_fixup_cpu_numa_dt(fdt, offset, cpu);
-
-Ditto.
-
-> +            if (ret < 0) {
-> +                return ret;
-> +            }
->          }
->  
->          ret = spapr_fixup_cpu_smt_dt(fdt, offset, cpu, compat_smt);
-> @@ -538,7 +534,9 @@ static void spapr_populate_cpu_dt(CPUState *cs, void *fdt, int offset,
->      _FDT((fdt_setprop(fdt, offset, "ibm,pft-size",
->                        pft_size_prop, sizeof(pft_size_prop))));
->  
-> -    _FDT(spapr_fixup_cpu_numa_dt(fdt, offset, cs));
-> +    if (nb_numa_nodes > 1) {
-
-Ditto.
-
-> +        _FDT(spapr_fixup_cpu_numa_dt(fdt, offset, cpu));
-> +    }
->  
->      _FDT(spapr_fixup_cpu_smt_dt(fdt, offset, cpu, compat_smt));
->  
-> diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
-> index a17ea07..60baf02 100644
-> --- a/hw/ppc/spapr_cpu_core.c
-> +++ b/hw/ppc/spapr_cpu_core.c
-> @@ -183,15 +183,17 @@ static void spapr_cpu_core_realize(DeviceState *dev, Error **errp)
->      for (i = 0; i < cc->nr_threads; i++) {
->          char id[32];
->          CPUState *cs;
-> +        PowerPCCPU *cpu;
->  
->          obj = sc->threads + i * size;
->  
->          object_initialize(obj, size, typename);
->          cs = CPU(obj);
-> +        cpu = POWERPC_CPU(cs);
->          cs->cpu_index = cc->core_id + i;
->  
->          /* Set NUMA node for the threads belonged to core  */
-> -        cs->numa_node = sc->node_id;
-> +        cpu->node_id = sc->node_id;
->  
->          snprintf(id, sizeof(id), "thread[%d]", i);
->          object_property_add_child(OBJECT(sc), id, obj, &local_err);
-> diff --git a/monitor.c b/monitor.c
-> index afbacfe..b053c40 100644
-> --- a/monitor.c
-> +++ b/monitor.c
-> @@ -1697,23 +1697,26 @@ static void hmp_info_mtree(Monitor *mon, const QDict *qdict)
->  static void hmp_info_numa(Monitor *mon, const QDict *qdict)
->  {
->      int i;
-> -    CPUState *cpu;
->      uint64_t *node_mem;
-> +    CpuInfoList *cpu_list, *cpu;
->  
-> +    cpu_list = qmp_query_cpus(&error_abort);
->      node_mem = g_new0(uint64_t, nb_numa_nodes);
->      query_numa_node_mem(node_mem);
->      monitor_printf(mon, "%d nodes\n", nb_numa_nodes);
->      for (i = 0; i < nb_numa_nodes; i++) {
->          monitor_printf(mon, "node %d cpus:", i);
-> -        CPU_FOREACH(cpu) {
-> -            if (cpu->numa_node == i) {
-> -                monitor_printf(mon, " %d", cpu->cpu_index);
-> +        for (cpu = cpu_list; cpu; cpu = cpu->next) {
-> +            if (cpu->value->has_props && cpu->value->props->has_node_id &&
-> +                cpu->value->props->node_id == i) {
-> +                monitor_printf(mon, " %" PRIi64, cpu->value->CPU);
-
-I suggest moving this to a separate patch, too.
-
->              }
->          }
->          monitor_printf(mon, "\n");
->          monitor_printf(mon, "node %d size: %" PRId64 " MB\n", i,
->                         node_mem[i] >> 20);
->      }
-> +    qapi_free_CpuInfoList(cpu_list);
->      g_free(node_mem);
->  }
->  
-> diff --git a/target/arm/cpu.c b/target/arm/cpu.c
-> index c185eb1..09ef3a6 100644
-> --- a/target/arm/cpu.c
-> +++ b/target/arm/cpu.c
-> @@ -1573,7 +1573,7 @@ static Property arm_cpu_properties[] = {
->      DEFINE_PROP_UINT32("midr", ARMCPU, midr, 0),
->      DEFINE_PROP_UINT64("mp-affinity", ARMCPU,
->                          mp_affinity, ARM64_AFFINITY_INVALID),
-> -    DEFINE_PROP_INT32("node-id", CPUState, numa_node, CPU_UNSET_NUMA_NODE_ID),
-> +    DEFINE_PROP_INT32("node-id", ARMCPU, node_id, CPU_UNSET_NUMA_NODE_ID),
->      DEFINE_PROP_END_OF_LIST()
->  };
->  
-> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-> index a41d595..ffb5267 100644
-> --- a/target/i386/cpu.c
-> +++ b/target/i386/cpu.c
-> @@ -3986,7 +3986,7 @@ static Property x86_cpu_properties[] = {
->      DEFINE_PROP_INT32("core-id", X86CPU, core_id, -1),
->      DEFINE_PROP_INT32("socket-id", X86CPU, socket_id, -1),
->  #endif
-> -    DEFINE_PROP_INT32("node-id", CPUState, numa_node, CPU_UNSET_NUMA_NODE_ID),
-> +    DEFINE_PROP_INT32("node-id", X86CPU, node_id, CPU_UNSET_NUMA_NODE_ID),
->      DEFINE_PROP_BOOL("pmu", X86CPU, enable_pmu, false),
->      { .name  = "hv-spinlocks", .info  = &qdev_prop_spinlocks },
->      DEFINE_PROP_BOOL("hv-relaxed", X86CPU, hyperv_relaxed_timing, false),
-> -- 
-> 2.7.4
-> 
-
--- 
+--=20
 Eduardo
