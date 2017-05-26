@@ -1,32 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40194)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43664)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dEEzo-0005VH-RW
-	for qemu-devel@nongnu.org; Fri, 26 May 2017 09:09:38 -0400
+	(envelope-from <eblake@redhat.com>) id 1dEF6I-0001BV-78
+	for qemu-devel@nongnu.org; Fri, 26 May 2017 09:16:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dEEzl-0005Pd-Fw
-	for qemu-devel@nongnu.org; Fri, 26 May 2017 09:09:36 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:42592)
+	(envelope-from <eblake@redhat.com>) id 1dEF6F-0008JF-2F
+	for qemu-devel@nongnu.org; Fri, 26 May 2017 09:16:18 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40892)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dEEzl-0005PD-70
-	for qemu-devel@nongnu.org; Fri, 26 May 2017 09:09:33 -0400
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dEF6E-0008Ig-Ov
+	for qemu-devel@nongnu.org; Fri, 26 May 2017 09:16:14 -0400
 Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
 	[10.5.11.11])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 3CCF33DBEF
-	for <qemu-devel@nongnu.org>; Fri, 26 May 2017 13:09:32 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id A2D36A6DFC
+	for <qemu-devel@nongnu.org>; Fri, 26 May 2017 13:16:13 +0000 (UTC)
 References: <1495649128-10529-1-git-send-email-vyasevic@redhat.com>
-	<1495649128-10529-2-git-send-email-vyasevic@redhat.com>
+	<1495649128-10529-7-git-send-email-vyasevic@redhat.com>
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <97bb0fa8-eddf-5721-6578-7223bc6e6bed@redhat.com>
-Date: Fri, 26 May 2017 08:08:59 -0500
+Message-ID: <86965f80-c0a4-4033-a194-9a9e97c27a0f@redhat.com>
+Date: Fri, 26 May 2017 08:16:06 -0500
 MIME-Version: 1.0
-In-Reply-To: <1495649128-10529-2-git-send-email-vyasevic@redhat.com>
+In-Reply-To: <1495649128-10529-7-git-send-email-vyasevic@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="fWtHMmFxlUJom0o3JiDo4NvNMsUtCIhfM"
-Subject: Re: [Qemu-devel] [PATCH 01/12] migration: Introduce announce
- parameters
+	boundary="RNlfXK9tit889SNoUteUQAGbg1pa1wEUf"
+Subject: Re: [Qemu-devel] [PATCH 06/12] qmp: Expose qemu_announce_self as a
+ qmp command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,153 +39,61 @@ To: Vladislav Yasevich <vyasevic@redhat.com>, qemu-devel@nongnu.org, dgilbert@re
 Cc: germano@redhat.com, lvivier@redhat.com, mst@redhat.com, jasowang@redhat.com, armbru@redhat.com, kashyap@redhat.com, jdenemar@redhat.com
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---fWtHMmFxlUJom0o3JiDo4NvNMsUtCIhfM
+--RNlfXK9tit889SNoUteUQAGbg1pa1wEUf
 From: Eric Blake <eblake@redhat.com>
 To: Vladislav Yasevich <vyasevic@redhat.com>, qemu-devel@nongnu.org,
  dgilbert@redhat.com, quintela@redhat.com
 Cc: germano@redhat.com, lvivier@redhat.com, mst@redhat.com,
  jasowang@redhat.com, armbru@redhat.com, kashyap@redhat.com,
  jdenemar@redhat.com
-Message-ID: <97bb0fa8-eddf-5721-6578-7223bc6e6bed@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 01/12] migration: Introduce announce
- parameters
+Message-ID: <86965f80-c0a4-4033-a194-9a9e97c27a0f@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 06/12] qmp: Expose qemu_announce_self as a
+ qmp command
 References: <1495649128-10529-1-git-send-email-vyasevic@redhat.com>
- <1495649128-10529-2-git-send-email-vyasevic@redhat.com>
-In-Reply-To: <1495649128-10529-2-git-send-email-vyasevic@redhat.com>
+ <1495649128-10529-7-git-send-email-vyasevic@redhat.com>
+In-Reply-To: <1495649128-10529-7-git-send-email-vyasevic@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
 On 05/24/2017 01:05 PM, Vladislav Yasevich wrote:
-> Add parameters that control RARP/GARP announcement timeouts.
-> The parameters structure is added to the QAPI and a qmp command
-> is added to set/get the parameter data.
+> Add a qmp command that can trigger guest announcements.
 >=20
-> Based on work by "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+> Based on work of Germano Veit Michel <germano@redhat.com>
 >=20
 > Signed-off-by: Vladislav Yasevich <vyasevic@redhat.com>
 > ---
+>  migration/savevm.c | 14 ++++++++++++++
+>  qapi-schema.json   | 19 +++++++++++++++++++
+>  2 files changed, 33 insertions(+)
+>=20
 
-Just an interface review for now:
-
-> +++ b/qapi-schema.json
-> @@ -569,6 +569,90 @@
->  ##
->  { 'command': 'query-events', 'returns': ['EventInfo'] }
-> =20
+> +void qmp_announce_self(bool has_params, AnnounceParameters *params,
+> +                       Error **errp)
+> +{
+> +    AnnounceParameters announce_params;
 > +
-> +##
-> +# @AnnounceParameter:
-> +#
-> +# @AnnounceParameter enumeration
-> +#
-> +# @initial: Initial delay (in ms) before sending the first GARP/RARP
-> +#       announcement
-> +#
-> +# @max: Maximum delay (in ms) to between GARP/RARP announcemnt packets=
+> +    memcpy(&announce_params, qemu_get_announce_params(),
+> +           sizeof(announce_params));
 
+Shallow copies of a QAPI type happen to work when the type is all scalar
+(as AnnounceParameters currently is), but it's more robust to use
+QAPI_CLONE() or QAPI_CLONE_MEMBERS() so that any future non-scalar
+additions to the parameters type will be correctly copied without
+introducing memory leaks or double frees.
 
-s/announcemnt/announcement/
-
-> +#
-> +# @rounds: Number of self-announcement attempts
-> +#
-> +# @step: Delay increate (in ms) after each self-announcment attempt
-
-s/increate/increase/
-s/announcment/announcement/
-
-> +#
-> +# Since: 2.10
-> +##
-> +{ 'enum' : 'AnnounceParameter',
-> +  'data' : [ 'initial', 'max', 'rounds', 'step' ] }
-
-Why are we creating an enum here?  Without reading further, it looks
-like you plan on using the enum to delineate members of a union? But
-that feels like it will be overly complicated.  A struct should be
-sufficient (each parameter being an optional member of the struct, where
-you can supply as many or as few on input, but all are reported on output=
-).
+Even this might be better:
+AnnounceParameters announce_params =3D { 0 };
+qemu_set_announce_parameters(&announce_params, qemu_get_announce_params()=
+);
 
 > +
-> +##
-> +# @AnnounceParameters:
-> +#
-> +# Optional members may be omited on input, but all values will be pres=
-ent
-
-s/omited/omitted/
-
-> +# on output.
-> +#          =20
-> +# @initial: Initial delay (in ms) before sending the first GARP/RARP
-> +#       announcement
-> +#
-> +# @max: Maximum delay (in ms) to between GARP/RARP announcemnt packets=
-
-
-s/announcemnt/announcement/
-
-> +#
-> +# @rounds: Number of self-announcement attempts
-> +#
-> +# @step: Delay increate (in ms) after each self-announcment attempt
-
-s/increate/increase/
-s/announcment/announcement/
-
-> +#
-> +# Since: 2.10
-> +##
+> +    if (has_params)
+> +        qemu_set_announce_parameters(&announce_params, params);
 > +
-> +{ 'struct': 'AnnounceParameters',
-> +  'data': { '*initial': 'int',
-> +            '*max': 'int',
-> +            '*rounds': 'int',
-> +            '*step': 'int' } }
-> +
-> +##
-> +# @announce-set-parameters:
-> +#
-> +# Set qemu announce parameters.
-> +#
-> +# Since: 2.10
-> +#
-> +# Example:
-> +#
-> +# -> { "execute": "announce-set-parameters",
-> +#      "arguments": { "announce-rounds": 10 } }
-> +#
-> +##
-> +{ 'command': 'announce-set-parameters', 'boxed': true,
-> +  'data': 'AnnounceParameters' }
-> +
-> +##
-> +# @query-announce-parameters:
-> +#
-> +# Returns information about the current announce parameters
-> +#
-> +# Returns: @AnnounceParameters
-> +#
-> +# Since: 2.10
-> +#
-> +# Example:
-> +#
-> +# -> { "execute": "query-announce-parameters" }
-> +# <- { "return": {
-> +#          "initial": 50,
-> +#          "max": 500,
-> +#          "rounds": 5,
-> +#          "step": 100
-> +#       }
-> +#    }
-> +#
-> +##
-> +{ 'command': 'query-announce-parameters',
-> +  'returns': 'AnnounceParameters' }
-
-Yep, I'm right. The enum is bogus.  The struct is sufficient, so you
-don't need the enum.
+> +    qemu_announce_self(&announce_params);
+> +}
+The QMP changes look okay.  Do you have a testsuite covering the new QMP
+command somewhere in the series?
 
 --=20
 Eric Blake, Principal Software Engineer
@@ -193,7 +101,7 @@ Red Hat, Inc.           +1-919-301-3266
 Virtualization:  qemu.org | libvirt.org
 
 
---fWtHMmFxlUJom0o3JiDo4NvNMsUtCIhfM
+--RNlfXK9tit889SNoUteUQAGbg1pa1wEUf
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
@@ -203,13 +111,13 @@ Version: GnuPG v2
 Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
 Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQEcBAEBCAAGBQJZKCjsAAoJEKeha0olJ0Nq/9AH/3cZ2VBNZdj1QB4mGX/IZBAj
-geiV31YHTG77Ep3ZmrTL+aiIK2cVu8a99IHXpeKDFHvuOTKwPYNMbIaNXKmi3tbw
-mZNPNPNwP6aN/rU86CLh7xpHoQS+cyRXG+hytz76ZgT/luTUdCm531vumFOXp2bI
-MDtfDMzpGpPOH5ba657aS8eCIrcwHfdx6EwSyV1QLnzmttou4QupQhY4jijc/il7
-aaVe+GJzR/OWMrhYY1eW0SXjfl0VJLULz8wvTbib3DtxwyZXoQJt+0aHSfgMFLG9
-osPselLVVfOtiQdkZviXRN/ar+T83T1IxCCDULQzbkfUMk+ZpebCINN33rQoFQY=
-=wx2/
+iQEcBAEBCAAGBQJZKCqWAAoJEKeha0olJ0NqfzcIAKpPZpe6WLyJnAk/6xUDc20v
++MsoL9fxRP8HClZkztKBdeQ57XO47F2fp1WrQiW3tBC7DD5wjW5/SXSSuvf2kQwD
+qGJr6WQNz+xOlHEQS1aIGgcAgNY5j3dUGC16KV468HOKJKqwMmg1nL4ehdOZIdgy
+MebDgJ9YKW270y+KeZjOSDttHIxRz/OkUTMDTQA8ljBhQoOdF50fi+3uH3th9euz
+IrhNyMwUBLCljV83nV6zqqvth35n+ETjnXNqT83MBwCp1694+nUhPjZ308cD79Zt
+AmYLVIdVMtknzdj90fVhu2sZonOPq+s8fD4uwH7LLoGqH45BraX8vWyUW2phIZY=
+=gDg4
 -----END PGP SIGNATURE-----
 
---fWtHMmFxlUJom0o3JiDo4NvNMsUtCIhfM--
+--RNlfXK9tit889SNoUteUQAGbg1pa1wEUf--
