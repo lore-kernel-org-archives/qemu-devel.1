@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41682)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41720)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1dEIX0-0008Tu-GE
-	for qemu-devel@nongnu.org; Fri, 26 May 2017 12:56:07 -0400
+	(envelope-from <mreitz@redhat.com>) id 1dEIX4-00005v-Jn
+	for qemu-devel@nongnu.org; Fri, 26 May 2017 12:56:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1dEIWz-0003jA-Go
-	for qemu-devel@nongnu.org; Fri, 26 May 2017 12:56:06 -0400
+	(envelope-from <mreitz@redhat.com>) id 1dEIX1-0003jq-Ik
+	for qemu-devel@nongnu.org; Fri, 26 May 2017 12:56:10 -0400
 From: Max Reitz <mreitz@redhat.com>
-Date: Fri, 26 May 2017 18:55:11 +0200
-Message-Id: <20170526165518.7580-10-mreitz@redhat.com>
+Date: Fri, 26 May 2017 18:55:12 +0200
+Message-Id: <20170526165518.7580-11-mreitz@redhat.com>
 In-Reply-To: <20170526165518.7580-1-mreitz@redhat.com>
 References: <20170526165518.7580-1-mreitz@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 09/16] block/qcow2: Generalize preallocate()
+Subject: [Qemu-devel] [PATCH v3 10/16] block/qcow2: Lock s->lock in
+ preallocate()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,65 +23,88 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
-This patch adds two new parameters to the preallocate() function so we
-will be able to use it not just for preallocating a new image but also
-for preallocated image growth.
+preallocate() is and will be called only from places that do not lock
+s->lock: Currently that is qcow2_create2(), as of a future patch it will
+be called from qcow2_truncate(), too.
 
-The offset parameter allows the caller to specify a virtual offset from
-which to start preallocating. For newly created images this is always 0,
-but for preallocating growth this will be the old image length.
-
-The new_length parameter specifies the supposed new length of the image
-(basically the "end offset" for preallocation). During image truncation,
-bdrv_getlength() will return the old image length so we cannot rely on
-its return value then.
+It therefore makes sense to move locking that mutex into preallocate()
+itself.
 
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 ---
- block/qcow2.c | 17 ++++++++++++-----
- 1 file changed, 12 insertions(+), 5 deletions(-)
+ block/qcow2.c | 22 +++++++++++++++-------
+ 1 file changed, 15 insertions(+), 7 deletions(-)
 
 diff --git a/block/qcow2.c b/block/qcow2.c
-index 3d4f36d..df953aa 100644
+index df953aa..a8223a0 100644
 --- a/block/qcow2.c
 +++ b/block/qcow2.c
-@@ -2035,17 +2035,24 @@ static int qcow2_change_backing_file(BlockDriverState *bs,
-     return qcow2_update_header(bs);
- }
- 
--static int preallocate(BlockDriverState *bs)
-+/**
-+ * Preallocates metadata structures for data clusters between @offset (in the
-+ * guest disk) and @new_length (which is thus generally the new guest disk
-+ * size).
-+ *
-+ * Returns: 0 on success, -errno on failure.
-+ */
-+static int preallocate(BlockDriverState *bs,
-+                       uint64_t offset, uint64_t new_length)
+@@ -2045,12 +2045,17 @@ static int qcow2_change_backing_file(BlockDriverState *bs,
+ static int preallocate(BlockDriverState *bs,
+                        uint64_t offset, uint64_t new_length)
  {
++    BDRVQcow2State *s = bs->opaque;
      uint64_t bytes;
--    uint64_t offset;
      uint64_t host_offset = 0;
      unsigned int cur_bytes;
      int ret;
      QCowL2Meta *meta;
  
--    bytes = bdrv_getlength(bs);
--    offset = 0;
-+    assert(offset <= new_length);
-+    bytes = new_length - offset;
++    if (qemu_in_coroutine()) {
++        qemu_co_mutex_lock(&s->lock);
++    }
++
+     assert(offset <= new_length);
+     bytes = new_length - offset;
  
-     while (bytes) {
-         cur_bytes = MIN(bytes, INT_MAX);
-@@ -2384,7 +2391,7 @@ static int qcow2_create2(const char *filename, int64_t total_size,
+@@ -2059,7 +2064,7 @@ static int preallocate(BlockDriverState *bs,
+         ret = qcow2_alloc_cluster_offset(bs, offset, &cur_bytes,
+                                          &host_offset, &meta);
+         if (ret < 0) {
+-            return ret;
++            goto done;
+         }
+ 
+         while (meta) {
+@@ -2069,7 +2074,7 @@ static int preallocate(BlockDriverState *bs,
+             if (ret < 0) {
+                 qcow2_free_any_clusters(bs, meta->alloc_offset,
+                                         meta->nb_clusters, QCOW2_DISCARD_NEVER);
+-                return ret;
++                goto done;
+             }
+ 
+             /* There are no dependent requests, but we need to remove our
+@@ -2096,11 +2101,17 @@ static int preallocate(BlockDriverState *bs,
+         ret = bdrv_pwrite(bs->file, (host_offset + cur_bytes) - 1,
+                           &data, 1);
+         if (ret < 0) {
+-            return ret;
++            goto done;
+         }
+     }
+ 
+-    return 0;
++    ret = 0;
++
++done:
++    if (qemu_in_coroutine()) {
++        qemu_co_mutex_unlock(&s->lock);
++    }
++    return ret;
+ }
+ 
+ /* qcow2_refcount_metadata_size:
+@@ -2389,10 +2400,7 @@ static int qcow2_create2(const char *filename, int64_t total_size,
+ 
+     /* And if we're supposed to preallocate metadata, do that now */
      if (prealloc != PREALLOC_MODE_OFF) {
-         BDRVQcow2State *s = blk_bs(blk)->opaque;
-         qemu_co_mutex_lock(&s->lock);
--        ret = preallocate(blk_bs(blk));
-+        ret = preallocate(blk_bs(blk), 0, total_size);
-         qemu_co_mutex_unlock(&s->lock);
+-        BDRVQcow2State *s = blk_bs(blk)->opaque;
+-        qemu_co_mutex_lock(&s->lock);
+         ret = preallocate(blk_bs(blk), 0, total_size);
+-        qemu_co_mutex_unlock(&s->lock);
          if (ret < 0) {
              error_setg_errno(errp, -ret, "Could not preallocate metadata");
+             goto out;
 -- 
 2.9.4
