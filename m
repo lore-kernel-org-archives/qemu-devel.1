@@ -1,17 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46367)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46421)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1dEKqi-0002dj-6v
-	for qemu-devel@nongnu.org; Fri, 26 May 2017 15:24:37 -0400
+	(envelope-from <jcody@redhat.com>) id 1dEKql-0002h6-4I
+	for qemu-devel@nongnu.org; Fri, 26 May 2017 15:24:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1dEKqh-00060k-2B
-	for qemu-devel@nongnu.org; Fri, 26 May 2017 15:24:36 -0400
+	(envelope-from <jcody@redhat.com>) id 1dEKqj-00061q-Uo
+	for qemu-devel@nongnu.org; Fri, 26 May 2017 15:24:39 -0400
 From: Jeff Cody <jcody@redhat.com>
-Date: Fri, 26 May 2017 15:24:03 -0400
-Message-Id: <20170526192404.32186-12-jcody@redhat.com>
+Date: Fri, 26 May 2017 15:24:04 -0400
+Message-Id: <20170526192404.32186-13-jcody@redhat.com>
 In-Reply-To: <20170526192404.32186-1-jcody@redhat.com>
 References: <20170526192404.32186-1-jcody@redhat.com>
-Subject: [Qemu-devel] [PULL 11/12] blockjob: use deferred_to_main_loop to
- indicate the coroutine has ended
+Subject: [Qemu-devel] [PULL 12/12] block/gluster: glfs_lseek() workaround
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,73 +20,106 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-block@nongnu.org
-Cc: peter.maydell@linaro.org, jcody@redhat.com, qemu-devel@nongnu.org, stefanha@redhat.com, Paolo Bonzini <pbonzini@redhat.com>
+Cc: peter.maydell@linaro.org, jcody@redhat.com, qemu-devel@nongnu.org, stefanha@redhat.com
 
-From: Paolo Bonzini <pbonzini@redhat.com>
+On current released versions of glusterfs, glfs_lseek() will sometimes
+return invalid values for SEEK_DATA or SEEK_HOLE.  For SEEK_DATA and
+SEEK_HOLE, the returned value should be >= the passed offset, or < 0 in
+the case of error:
 
-All block jobs are using block_job_defer_to_main_loop as the final
-step just before the coroutine terminates.  At this point,
-block_job_enter should do nothing, but currently it restarts
-the freed coroutine.
+LSEEK(2):
 
-Now, the job->co states should probably be changed to an enum
-(e.g. BEFORE_START, STARTED, YIELDED, COMPLETED) subsuming
-block_job_started, job->deferred_to_main_loop and job->busy.
-For now, this patch eliminates the problematic reenter by
-removing the reset of job->deferred_to_main_loop (which served
-no purpose, as far as I could see) and checking the flag in
-block_job_enter.
+    off_t lseek(int fd, off_t offset, int whence);
 
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-Message-id: 20170508141310.8674-12-pbonzini@redhat.com
+    [...]
+
+    SEEK_HOLE
+              Adjust  the file offset to the next hole in the file greater
+              than or equal to offset.  If offset points into the middle of
+              a hole, then the file offset is set to offset.  If there is no
+              hole past offset, then the file offset is adjusted to the end
+              of the file (i.e., there is  an implicit hole at the end of
+              any file).
+
+    [...]
+
+    RETURN VALUE
+              Upon  successful  completion,  lseek()  returns  the resulting
+              offset location as measured in bytes from the beginning of the
+              file.  On error, the value (off_t) -1 is returned and errno is
+              set to indicate the error
+
+However, occasionally glfs_lseek() for SEEK_HOLE/DATA will return a
+value less than the passed offset, yet greater than zero.
+
+For instance, here are example values observed from this call:
+
+    offs = glfs_lseek(s->fd, start, SEEK_HOLE);
+    if (offs < 0) {
+        return -errno;          /* D1 and (H3 or H4) */
+    }
+
+start == 7608336384
+offs == 7607877632
+
+This causes QEMU to abort on the assert test.  When this value is
+returned, errno is also 0.
+
+This is a reported and known bug to glusterfs:
+https://bugzilla.redhat.com/show_bug.cgi?id=1425293
+
+Although this is being fixed in gluster, we still should work around it
+in QEMU, given that multiple released versions of gluster behave this
+way.
+
+This patch treats the return case of (offs < start) the same as if an
+error value other than ENXIO is returned; we will assume we learned
+nothing, and there are no holes in the file.
+
+Signed-off-by: Jeff Cody <jcody@redhat.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
+Reviewed-by: Niels de Vos <ndevos@redhat.com>
+Message-id: 87c0140e9407c08f6e74b04131b610f2e27c014c.1495560397.git.jcody@redhat.com
 Signed-off-by: Jeff Cody <jcody@redhat.com>
 ---
- blockjob.c                   | 10 ++++++++--
- include/block/blockjob_int.h |  3 ++-
- 2 files changed, 10 insertions(+), 3 deletions(-)
+ block/gluster.c | 18 ++++++++++++++++--
+ 1 file changed, 16 insertions(+), 2 deletions(-)
 
-diff --git a/blockjob.c b/blockjob.c
-index 9a97c73..a0d7e29 100644
---- a/blockjob.c
-+++ b/blockjob.c
-@@ -771,7 +771,14 @@ void block_job_resume_all(void)
- 
- void block_job_enter(BlockJob *job)
- {
--    if (job->co && !job->busy) {
-+    if (!block_job_started(job)) {
-+        return;
-+    }
-+    if (job->deferred_to_main_loop) {
-+        return;
-+    }
+diff --git a/block/gluster.c b/block/gluster.c
+index 7c76cd0..8ba3bcc 100644
+--- a/block/gluster.c
++++ b/block/gluster.c
+@@ -1275,7 +1275,14 @@ static int find_allocation(BlockDriverState *bs, off_t start,
+     if (offs < 0) {
+         return -errno;          /* D3 or D4 */
+     }
+-    assert(offs >= start);
 +
-+    if (!job->busy) {
-         bdrv_coroutine_enter(blk_bs(job->blk), job->co);
-     }
- }
-@@ -899,7 +906,6 @@ static void block_job_defer_to_main_loop_bh(void *opaque)
-         aio_context_acquire(aio_context);
-     }
++    if (offs < start) {
++        /* This is not a valid return by lseek().  We are safe to just return
++         * -EIO in this case, and we'll treat it like D4. Unfortunately some
++         *  versions of gluster server will return offs < start, so an assert
++         *  here will unnecessarily abort QEMU. */
++        return -EIO;
++    }
  
--    data->job->deferred_to_main_loop = false;
-     data->fn(data->job, data->opaque);
+     if (offs > start) {
+         /* D2: in hole, next data at offs */
+@@ -1307,7 +1314,14 @@ static int find_allocation(BlockDriverState *bs, off_t start,
+     if (offs < 0) {
+         return -errno;          /* D1 and (H3 or H4) */
+     }
+-    assert(offs >= start);
++
++    if (offs < start) {
++        /* This is not a valid return by lseek().  We are safe to just return
++         * -EIO in this case, and we'll treat it like H4. Unfortunately some
++         *  versions of gluster server will return offs < start, so an assert
++         *  here will unnecessarily abort QEMU. */
++        return -EIO;
++    }
  
-     if (aio_context != data->aio_context) {
-diff --git a/include/block/blockjob_int.h b/include/block/blockjob_int.h
-index 4f2d2ac..f13ad05 100644
---- a/include/block/blockjob_int.h
-+++ b/include/block/blockjob_int.h
-@@ -241,7 +241,8 @@ typedef void BlockJobDeferToMainLoopFn(BlockJob *job, void *opaque);
-  * @fn: The function to run in the main loop
-  * @opaque: The opaque value that is passed to @fn
-  *
-- * Execute a given function in the main loop with the BlockDriverState
-+ * This function must be called by the main job coroutine just before it
-+ * returns.  @fn is executed in the main loop with the BlockDriverState
-  * AioContext acquired.  Block jobs must call bdrv_unref(), bdrv_close(), and
-  * anything that uses bdrv_drain_all() in the main loop.
-  *
+     if (offs > start) {
+         /*
 -- 
 2.9.3
