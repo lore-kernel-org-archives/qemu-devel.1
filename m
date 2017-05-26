@@ -1,33 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40445)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40462)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dEMbF-0000Td-U4
-	for qemu-devel@nongnu.org; Fri, 26 May 2017 17:16:46 -0400
+	(envelope-from <rth7680@gmail.com>) id 1dEMbH-0000Un-E0
+	for qemu-devel@nongnu.org; Fri, 26 May 2017 17:16:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dEMbF-0008Hx-0n
-	for qemu-devel@nongnu.org; Fri, 26 May 2017 17:16:45 -0400
-Received: from mail-qt0-x243.google.com ([2607:f8b0:400d:c0d::243]:34649)
+	(envelope-from <rth7680@gmail.com>) id 1dEMbG-0008IJ-7o
+	for qemu-devel@nongnu.org; Fri, 26 May 2017 17:16:47 -0400
+Received: from mail-qt0-x242.google.com ([2607:f8b0:400d:c0d::242]:34650)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1dEMbE-0008Hp-SO
-	for qemu-devel@nongnu.org; Fri, 26 May 2017 17:16:44 -0400
-Received: by mail-qt0-x243.google.com with SMTP id l39so2852177qtb.1
-	for <qemu-devel@nongnu.org>; Fri, 26 May 2017 14:16:44 -0700 (PDT)
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1dEMbG-0008IB-2z
+	for qemu-devel@nongnu.org; Fri, 26 May 2017 17:16:46 -0400
+Received: by mail-qt0-x242.google.com with SMTP id l39so2852206qtb.1
+	for <qemu-devel@nongnu.org>; Fri, 26 May 2017 14:16:46 -0700 (PDT)
 Received: from bigtime.twiddle.net.com
 	([2602:47:d954:1500:5e51:4fff:fe40:9c64])
 	by smtp.gmail.com with ESMTPSA id
-	u19sm1262380qtc.64.2017.05.26.14.16.43 for <qemu-devel@nongnu.org>
+	u19sm1262380qtc.64.2017.05.26.14.16.44 for <qemu-devel@nongnu.org>
 	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Fri, 26 May 2017 14:16:43 -0700 (PDT)
+	Fri, 26 May 2017 14:16:44 -0700 (PDT)
 Sender: Richard Henderson <rth7680@gmail.com>
 From: Richard Henderson <rth@twiddle.net>
-Date: Fri, 26 May 2017 14:16:14 -0700
-Message-Id: <20170526211638.32301-3-rth@twiddle.net>
+Date: Fri, 26 May 2017 14:16:15 -0700
+Message-Id: <20170526211638.32301-4-rth@twiddle.net>
 In-Reply-To: <20170526211638.32301-1-rth@twiddle.net>
 References: <20170526211638.32301-1-rth@twiddle.net>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v7 02/26] tcg/sparc: Use the proper compilation
- flags for 32-bit
+Subject: [Qemu-devel] [PATCH v7 03/26] qemu/atomic: Loosen restrictions for
+ 64-bit ILP32 hosts
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,35 +38,111 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-We have required a v9 cpu since 9b9c37c36439ee0452632253dac7a31897f27f70.
-However, the flags we were using did not reliably enable v8plus, which
-meant that the compiler didn't know it could inline 64-bit atomics.
+We need to coordinate with the TCG_OVERSIZED_GUEST test in cputlb.c,
+and allow 64-bit atomics even though sizeof(void *) == 4.
 
 Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
 Signed-off-by: Richard Henderson <rth@twiddle.net>
 ---
- configure | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ include/qemu/atomic.h | 34 ++++++++++++++++++++++++++--------
+ 1 file changed, 26 insertions(+), 8 deletions(-)
 
-diff --git a/configure b/configure
-index 1a5ee4b..376c48e 100755
---- a/configure
-+++ b/configure
-@@ -1212,12 +1212,12 @@ case "$cpu" in
-            LDFLAGS="-m64 $LDFLAGS"
-            ;;
-     sparc)
--           LDFLAGS="-m32 $LDFLAGS"
--           CPU_CFLAGS="-m32 -mcpu=ultrasparc"
-+           CPU_CFLAGS="-m32 -mv8plus -mcpu=ultrasparc"
-+           LDFLAGS="-m32 -mv8plus $LDFLAGS"
-            ;;
-     sparc64)
--           LDFLAGS="-m64 $LDFLAGS"
-            CPU_CFLAGS="-m64 -mcpu=ultrasparc"
-+           LDFLAGS="-m64 $LDFLAGS"
-            ;;
-     s390)
-            CPU_CFLAGS="-m31"
+diff --git a/include/qemu/atomic.h b/include/qemu/atomic.h
+index 878fa07..e07c797 100644
+--- a/include/qemu/atomic.h
++++ b/include/qemu/atomic.h
+@@ -88,6 +88,24 @@
+ #define smp_read_barrier_depends()   barrier()
+ #endif
+ 
++/* Sanity check that the size of an atomic operation isn't "overly large".
++ * Despite the fact that e.g. i686 has 64-bit atomic operations, we do not
++ * want to use them because we ought not need them, and this lets us do a
++ * bit of sanity checking that other 32-bit hosts might build.
++ *
++ * That said, we have a problem on 64-bit ILP32 hosts in that in order to
++ * sync with TCG_OVERSIZED_GUEST, this must match TCG_TARGET_REG_BITS.
++ * We'd prefer not want to pull in everything else TCG related, so handle
++ * those few cases by hand.
++ *
++ * Note that x32 is fully detected with __x64_64__ + _ILP32, and that for
++ * Sparc we always force the use of sparcv9 in configure.
++ */
++#if defined(__x86_64__) || defined(__sparc__)
++# define ATOMIC_REG_SIZE  8
++#else
++# define ATOMIC_REG_SIZE  sizeof(void *)
++#endif
+ 
+ /* Weak atomic operations prevent the compiler moving other
+  * loads/stores past the atomic operation load/store. However there is
+@@ -104,7 +122,7 @@
+ 
+ #define atomic_read(ptr)                              \
+     ({                                                \
+-    QEMU_BUILD_BUG_ON(sizeof(*ptr) > sizeof(void *)); \
++    QEMU_BUILD_BUG_ON(sizeof(*ptr) > ATOMIC_REG_SIZE); \
+     atomic_read__nocheck(ptr);                        \
+     })
+ 
+@@ -112,7 +130,7 @@
+     __atomic_store_n(ptr, i, __ATOMIC_RELAXED)
+ 
+ #define atomic_set(ptr, i)  do {                      \
+-    QEMU_BUILD_BUG_ON(sizeof(*ptr) > sizeof(void *)); \
++    QEMU_BUILD_BUG_ON(sizeof(*ptr) > ATOMIC_REG_SIZE); \
+     atomic_set__nocheck(ptr, i);                      \
+ } while(0)
+ 
+@@ -130,27 +148,27 @@
+ 
+ #define atomic_rcu_read(ptr)                          \
+     ({                                                \
+-    QEMU_BUILD_BUG_ON(sizeof(*ptr) > sizeof(void *)); \
++    QEMU_BUILD_BUG_ON(sizeof(*ptr) > ATOMIC_REG_SIZE); \
+     typeof_strip_qual(*ptr) _val;                     \
+     atomic_rcu_read__nocheck(ptr, &_val);             \
+     _val;                                             \
+     })
+ 
+ #define atomic_rcu_set(ptr, i) do {                   \
+-    QEMU_BUILD_BUG_ON(sizeof(*ptr) > sizeof(void *)); \
++    QEMU_BUILD_BUG_ON(sizeof(*ptr) > ATOMIC_REG_SIZE); \
+     __atomic_store_n(ptr, i, __ATOMIC_RELEASE);       \
+ } while(0)
+ 
+ #define atomic_load_acquire(ptr)                        \
+     ({                                                  \
+-    QEMU_BUILD_BUG_ON(sizeof(*ptr) > sizeof(void *));   \
++    QEMU_BUILD_BUG_ON(sizeof(*ptr) > ATOMIC_REG_SIZE);  \
+     typeof_strip_qual(*ptr) _val;                       \
+     __atomic_load(ptr, &_val, __ATOMIC_ACQUIRE);        \
+     _val;                                               \
+     })
+ 
+ #define atomic_store_release(ptr, i)  do {              \
+-    QEMU_BUILD_BUG_ON(sizeof(*ptr) > sizeof(void *));   \
++    QEMU_BUILD_BUG_ON(sizeof(*ptr) > ATOMIC_REG_SIZE);  \
+     __atomic_store_n(ptr, i, __ATOMIC_RELEASE);         \
+ } while(0)
+ 
+@@ -162,7 +180,7 @@
+ })
+ 
+ #define atomic_xchg(ptr, i)    ({                           \
+-    QEMU_BUILD_BUG_ON(sizeof(*ptr) > sizeof(void *));       \
++    QEMU_BUILD_BUG_ON(sizeof(*ptr) > ATOMIC_REG_SIZE);      \
+     atomic_xchg__nocheck(ptr, i);                           \
+ })
+ 
+@@ -175,7 +193,7 @@
+ })
+ 
+ #define atomic_cmpxchg(ptr, old, new)    ({                             \
+-    QEMU_BUILD_BUG_ON(sizeof(*ptr) > sizeof(void *));                   \
++    QEMU_BUILD_BUG_ON(sizeof(*ptr) > ATOMIC_REG_SIZE);                  \
+     atomic_cmpxchg__nocheck(ptr, old, new);                             \
+ })
+ 
 -- 
 2.9.4
