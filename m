@@ -1,26 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49324)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51644)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <haozhong.zhang@intel.com>) id 1dE6tV-0003Xl-3j
-	for qemu-devel@nongnu.org; Fri, 26 May 2017 00:30:34 -0400
+	(envelope-from <bounces@canonical.com>) id 1dE7D8-0002Wh-ML
+	for qemu-devel@nongnu.org; Fri, 26 May 2017 00:50:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <haozhong.zhang@intel.com>) id 1dE6tQ-0004Cr-AI
-	for qemu-devel@nongnu.org; Fri, 26 May 2017 00:30:33 -0400
-Received: from mga01.intel.com ([192.55.52.88]:36668)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <haozhong.zhang@intel.com>)
-	id 1dE6tQ-0004Ca-2Z
-	for qemu-devel@nongnu.org; Fri, 26 May 2017 00:30:28 -0400
-Date: Fri, 26 May 2017 12:30:24 +0800
-From: Haozhong Zhang <haozhong.zhang@intel.com>
-Message-ID: <20170526043024.zk4msmkcuihb4f4t@hz-desktop>
-References: <20170526023213.18741-1-haozhong.zhang@intel.com>
-	<CAPcyv4gp1CBFA+MMXSjxw1b3nSeHCYkMN1daMP2+r4DpfPmMug@mail.gmail.com>
+	(envelope-from <bounces@canonical.com>) id 1dE7D4-0003Gs-OQ
+	for qemu-devel@nongnu.org; Fri, 26 May 2017 00:50:50 -0400
+Received: from indium.canonical.com ([91.189.90.7]:51606)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1dE7D4-0003GF-IT
+	for qemu-devel@nongnu.org; Fri, 26 May 2017 00:50:46 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1dE7D3-0008LK-46
+	for <qemu-devel@nongnu.org>; Fri, 26 May 2017 04:50:45 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 1BC7C2E8025
+	for <qemu-devel@nongnu.org>; Fri, 26 May 2017 04:50:45 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAPcyv4gp1CBFA+MMXSjxw1b3nSeHCYkMN1daMP2+r4DpfPmMug@mail.gmail.com>
-Subject: Re: [Qemu-devel] [RESEND PATCH 1/2] nvdimm: warn if the backend is
- not a DAX device
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 26 May 2017 04:40:41 -0000
+From: Paul Goyette <1693649@bugs.launchpad.net>
+Reply-To: Bug 1693649 <1693649@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <149575946555.18286.18117412791023512529.malonedeb@chaenomeles.canonical.com>
+Message-Id: <149577364154.17847.3073963205420272418.malone@chaenomeles.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1693649] Re: x86 pause misbehaves with -cpu
+ haswell
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,79 +37,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Dan Williams <dan.j.williams@intel.com>
-Cc: Stefan Hajnoczi <stefanha@gmail.com>, Igor Mammedov <imammedo@redhat.com>, Xiao Guangrong <guangrong.xiao@gmail.com>, qemu-devel@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>
+To: qemu-devel@nongnu.org
 
-On 05/25/17 20:34 -0700, Dan Williams wrote:
-> On Thu, May 25, 2017 at 7:32 PM, Haozhong Zhang
-> <haozhong.zhang@intel.com> wrote:
-> > Applications in Linux guest that use device-dax never trigger flush
-> > that can be trapped by KVM/QEMU. Meanwhile, if the host backend is not
-> > device-dax, QEMU cannot guarantee the persistence of guest writes.
-> > Before solving this flushing problem, QEMU should warn users if the
-> > host backend is not device-dax.
-> 
-> I think this needs to be stronger than a "warn" it needs to be
-> explicitly forbidden when it is known to be unsafe.
->
+Further investigation shows that pause may be working, but very very
+slowly.
 
-I understand your worry and am not object to your suggestion, but
-forbidden will change the existing behavior that allows such unsafe
-usage. Let's wait for other maintainers' comments.
+The "use-case" in NetBSD is for "hatching" application CPUs.  The target
+CPU runs a loop that does
 
-> >
-> > Signed-off-by: Haozhong Zhang <haozhong.zhang@intel.com>
-> > Message-id: CAPcyv4hV2-ZW8SMCRtD0P_86KgR3DHOvNe+6T5SY2u7wXg3gEg@mail.gmail.com
-> > ---
-> > Cc: "Michael S. Tsirkin" <mst@redhat.com>
-> > Cc: Igor Mammedov <imammedo@redhat.com>
-> > Cc: Xiao Guangrong <guangrong.xiao@gmail.com>
-> > Cc: Stefan Hajnoczi <stefanha@gmail.com>
-> > Cc: Dan Williams <dan.j.williams@intel.com>
-> > ---
-> > Resend because the wrong maintainer email address was used.
-> > ---
-> >  hw/mem/nvdimm.c | 37 +++++++++++++++++++++++++++++++++++++
-> >  1 file changed, 37 insertions(+)
-> >
-> > diff --git a/hw/mem/nvdimm.c b/hw/mem/nvdimm.c
-> > index db896b0bb6..c7bb407f33 100644
-> > --- a/hw/mem/nvdimm.c
-> > +++ b/hw/mem/nvdimm.c
-> > @@ -26,6 +26,7 @@
-> >  #include "qapi/error.h"
-> >  #include "qapi/visitor.h"
-> >  #include "hw/mem/nvdimm.h"
-> > +#include "qemu/error-report.h"
-> >
-> >  static void nvdimm_get_label_size(Object *obj, Visitor *v, const char *name,
-> >                                    void *opaque, Error **errp)
-> > @@ -78,12 +79,48 @@ static MemoryRegion *nvdimm_get_memory_region(PCDIMMDevice *dimm)
-> >      return &nvdimm->nvdimm_mr;
-> >  }
-> >
-> > +static void nvdimm_check_dax(HostMemoryBackend *hostmem)
-> > +{
-> > +    char *mem_path =
-> > +        object_property_get_str(OBJECT(hostmem), "mem-path", NULL);
-> > +    char *dev_name = NULL, *sysfs_path = NULL;
-> > +    bool is_dax = false;
-> > +
-> > +    if (!mem_path) {
-> > +        goto out;
-> > +    }
-> > +
-> > +    if (!g_str_has_prefix(mem_path, "/dev/dax")) {
-> > +        goto out;
-> > +    }
-> 
-> What if we're using a symlink to a device-dax instance? The should
-> explicitly be looking up the major / minor number of the device (after
-> following any symlinks) and verifying that it is device-dax by
-> checking /sys/dev/char/$major:$minor refers to a device-dax instance.
-> 
+    while (flag_1 not set)
+        for (i =3D 0; i < 10000; i++)
+            x86_pause();                 /* which is assembly code:  "pause=
+; ret;" */
+    ...
+    set flag_2;
+    return;
 
-I'll follow to your suggestion in the next version.
+The boot CPU executes the following code for each application CPU:
 
-Thanks,
-Haozhong
+    set flag_1;
+    for (i =3D 0; i < 100000 && flag_2 not set; i++)
+        i8254_delay(10);             /* this should be 10usec per iteration=
+, 1.0 sec total */
+    if (flag_2 not set)
+        panic(cpu did not hatch);
+    ....
+
+So, the 10k executions of x86_pause are taking in excess of 1 sec to
+complete.  Indeed, reducing that constant value from 10k to only 100
+results in the same failure.  So it would seem that the pause
+instruction is taking an extremely long time to complete.  (Further
+reducing the interation count to only 50 results in success, although it
+"feels" very sluggish.)
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1693649
+
+Title:
+  x86 pause misbehaves with -cpu haswell
+
+Status in QEMU:
+  New
+
+Bug description:
+  Using qemu-2.9.0
+
+  When booting NetBSD using '-cpu haswell -smp 4', the system fails to
+  initialize the additional CPUs.  It appears as though the "application
+  processor" enters routine x86_pause() but never returns.
+
+  x86_pause() is simply two assembler instructions: 'pause; ret;'
+
+  Replacing the routine with 'nop; nop; ret;' allows the system to
+  proceed, of course without the benefit of the pause instruction on
+  spin-loops!
+
+  Additionally, booting with '-cpu phenom -smp 4' also works, although
+  the system does seem confused about the type of CPU being used.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1693649/+subscriptions
