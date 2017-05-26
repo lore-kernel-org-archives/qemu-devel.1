@@ -1,17 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56940)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57711)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1dECG1-0006dj-Mm
-	for qemu-devel@nongnu.org; Fri, 26 May 2017 06:14:10 -0400
+	(envelope-from <kwolf@redhat.com>) id 1dECJQ-0000lO-Of
+	for qemu-devel@nongnu.org; Fri, 26 May 2017 06:17:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1dECFw-0005vB-7S
-	for qemu-devel@nongnu.org; Fri, 26 May 2017 06:14:07 -0400
-From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Fri, 26 May 2017 14:13:37 +0400
-Message-Id: <20170526101337.4096-1-marcandre.lureau@redhat.com>
+	(envelope-from <kwolf@redhat.com>) id 1dECJP-0006oX-Ur
+	for qemu-devel@nongnu.org; Fri, 26 May 2017 06:17:40 -0400
+Date: Fri, 26 May 2017 12:17:27 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20170526101727.GF7211@noname.str.redhat.com>
+References: <cover.1495536228.git.berto@igalia.com>
+	<142326a3-eaa4-8333-9580-ae0063f8a876@redhat.com>
+	<w51shjutjz7.fsf@maestria.local.igalia.com>
+	<0e3fc298-d47b-4066-c8c8-02f620c50b89@virtuozzo.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH] qemu-ga: remove useless allocation
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <0e3fc298-d47b-4066-c8c8-02f620c50b89@virtuozzo.com>
+Subject: Re: [Qemu-devel] [PATCH 0/7] qcow2: Reduce the number of I/O ops
+ when doing COW
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,38 +26,21 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, qemu-trivial@nongnu.org, Michael Roth <mdroth@linux.vnet.ibm.com>
+To: Anton Nefedov <anton.nefedov@virtuozzo.com>
+Cc: Alberto Garcia <berto@igalia.com>, Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, "Denis V . Lunev" <den@openvz.org>
 
-There is no need to duplicate a fixed string.
+Am 24.05.2017 um 18:09 hat Anton Nefedov geschrieben:
+> I agree; as mentioned we have similar patches and they don't conflict much.
+> We noticed a performance regression on HDD though, for the
+> presumably optimized case (random 4k write over a large backed
+> image); so the patches were put on hold.
 
-CC: qemu-trivial@nongnu.org
-Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
----
- qga/commands-posix.c | 4 +---
- 1 file changed, 1 insertion(+), 3 deletions(-)
+You're talking about your own patches that should do the same thing,
+right? Can you re-do the same test with Berto's patches? Maybe there was
+just an implementation glitch in yours.
 
-diff --git a/qga/commands-posix.c b/qga/commands-posix.c
-index 284ecc6d7e..d8e412275e 100644
---- a/qga/commands-posix.c
-+++ b/qga/commands-posix.c
-@@ -2197,12 +2197,10 @@ static void transfer_memory_block(GuestMemoryBloc=
-k *mem_blk, bool sys2memblk,
-         }
-     } else {
-         if (mem_blk->online !=3D (strncmp(status, "online", 6) =3D=3D 0)=
-) {
--            char *new_state =3D mem_blk->online ? g_strdup("online") :
--                                                g_strdup("offline");
-+            const char *new_state =3D mem_blk->online ? "online" : "offl=
-ine";
-=20
-             ga_write_sysfs_file(dirfd, "state", new_state, strlen(new_st=
-ate),
-                                 &local_err);
--            g_free(new_state);
-             if (local_err) {
-                 error_free(local_err);
-                 result->response =3D
---=20
-2.13.0.rc1.16.gd80b50c3f
+This approach should very obviously result in a performance improvement,
+and the patches are relatively simple, so I'm very much inclined to
+merge this as soon as possible.
+
+Kevin
