@@ -1,30 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40662)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40621)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dEMbc-0000q0-Vt
-	for qemu-devel@nongnu.org; Fri, 26 May 2017 17:17:10 -0400
+	(envelope-from <rth7680@gmail.com>) id 1dEMbZ-0000mD-Iw
+	for qemu-devel@nongnu.org; Fri, 26 May 2017 17:17:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dEMbc-0008Ox-4N
-	for qemu-devel@nongnu.org; Fri, 26 May 2017 17:17:08 -0400
-Received: from mail-qt0-x241.google.com ([2607:f8b0:400d:c0d::241]:34674)
+	(envelope-from <rth7680@gmail.com>) id 1dEMbY-0008O1-J1
+	for qemu-devel@nongnu.org; Fri, 26 May 2017 17:17:05 -0400
+Received: from mail-qt0-x241.google.com ([2607:f8b0:400d:c0d::241]:34671)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1dEMbc-0008Or-0e
-	for qemu-devel@nongnu.org; Fri, 26 May 2017 17:17:08 -0400
-Received: by mail-qt0-x241.google.com with SMTP id l39so2853017qtb.1
-	for <qemu-devel@nongnu.org>; Fri, 26 May 2017 14:17:07 -0700 (PDT)
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1dEMbY-0008Nx-EX
+	for qemu-devel@nongnu.org; Fri, 26 May 2017 17:17:04 -0400
+Received: by mail-qt0-x241.google.com with SMTP id l39so2852863qtb.1
+	for <qemu-devel@nongnu.org>; Fri, 26 May 2017 14:17:04 -0700 (PDT)
 Received: from bigtime.twiddle.net.com
 	([2602:47:d954:1500:5e51:4fff:fe40:9c64])
 	by smtp.gmail.com with ESMTPSA id
-	u19sm1262380qtc.64.2017.05.26.14.17.06 for <qemu-devel@nongnu.org>
+	u19sm1262380qtc.64.2017.05.26.14.17.02 for <qemu-devel@nongnu.org>
 	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Fri, 26 May 2017 14:17:06 -0700 (PDT)
+	Fri, 26 May 2017 14:17:03 -0700 (PDT)
 Sender: Richard Henderson <rth7680@gmail.com>
 From: Richard Henderson <rth@twiddle.net>
-Date: Fri, 26 May 2017 14:16:31 -0700
-Message-Id: <20170526211638.32301-20-rth@twiddle.net>
+Date: Fri, 26 May 2017 14:16:28 -0700
+Message-Id: <20170526211638.32301-17-rth@twiddle.net>
 In-Reply-To: <20170526211638.32301-1-rth@twiddle.net>
 References: <20170526211638.32301-1-rth@twiddle.net>
-Subject: [Qemu-devel] [PATCH v7 19/26] target/s390: Use
- tcg_gen_lookup_and_goto_ptr
+Subject: [Qemu-devel] [PATCH v7 16/26] tcg/arm: Clarify tcg_out_bx for arm4
+ host
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,49 +35,77 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Tested-by: Aurelien Jarno <aurelien@aurel32.net>
-Reviewed-by: Aurelien Jarno <aurelien@aurel32.net>
+In theory this would re-enable usage of QEMU on an armv4 host.
+Whether this is worthwhile is debatable -- we've been unconditionally
+issuing the armv5t BX instruction in the prologue since 2011 without
+complaint.  Possibly we should simply require an armv6 host.
+
 Signed-off-by: Richard Henderson <rth@twiddle.net>
 ---
- target/s390x/translate.c | 17 ++++++++++++-----
- 1 file changed, 12 insertions(+), 5 deletions(-)
+ tcg/arm/tcg-target.inc.c | 29 +++++++++++++++--------------
+ 1 file changed, 15 insertions(+), 14 deletions(-)
 
-diff --git a/target/s390x/translate.c b/target/s390x/translate.c
-index 4c48c59..628fb86 100644
---- a/target/s390x/translate.c
-+++ b/target/s390x/translate.c
-@@ -608,11 +608,16 @@ static void gen_op_calc_cc(DisasContext *s)
-     set_cc_static(s);
+diff --git a/tcg/arm/tcg-target.inc.c b/tcg/arm/tcg-target.inc.c
+index e75a6d4..590c57d 100644
+--- a/tcg/arm/tcg-target.inc.c
++++ b/tcg/arm/tcg-target.inc.c
+@@ -329,11 +329,6 @@ static const uint8_t tcg_cond_to_arm_cond[] = {
+     [TCG_COND_GTU] = COND_HI,
+ };
+ 
+-static inline void tcg_out_bx(TCGContext *s, int cond, int rn)
+-{
+-    tcg_out32(s, (cond << 28) | 0x012fff10 | rn);
+-}
+-
+ static inline void tcg_out_b(TCGContext *s, int cond, int32_t offset)
+ {
+     tcg_out32(s, (cond << 28) | 0x0a000000 |
+@@ -402,6 +397,18 @@ static inline void tcg_out_mov_reg(TCGContext *s, int cond, int rd, int rm)
+     }
  }
  
--static int use_goto_tb(DisasContext *s, uint64_t dest)
-+static bool use_exit_tb(DisasContext *s)
- {
--    if (unlikely(s->singlestep_enabled) ||
--        (s->tb->cflags & CF_LAST_IO) ||
--        (s->tb->flags & FLAG_MASK_PER)) {
-+    return (s->singlestep_enabled ||
-+            (s->tb->cflags & CF_LAST_IO) ||
-+            (s->tb->flags & FLAG_MASK_PER));
++static inline void tcg_out_bx(TCGContext *s, int cond, TCGReg rn)
++{
++    /* Unless the C portion of QEMU is compiled as thumb, we don't
++       actually need true BX semantics; merely a branch to an address
++       held in a register.  */
++    if (use_armv5t_instructions) {
++        tcg_out32(s, (cond << 28) | 0x012fff10 | rn);
++    } else {
++        tcg_out_mov_reg(s, cond, TCG_REG_PC, rn);
++    }
 +}
 +
-+static bool use_goto_tb(DisasContext *s, uint64_t dest)
-+{
-+    if (unlikely(use_exit_tb(s))) {
-         return false;
+ static inline void tcg_out_dat_imm(TCGContext *s,
+                 int cond, int opc, int rd, int rn, int im)
+ {
+@@ -977,7 +984,7 @@ static inline void tcg_out_st8(TCGContext *s, int cond,
+  * with the code buffer limited to 16MB we wouldn't need the long case.
+  * But we also use it for the tail-call to the qemu_ld/st helpers, which does.
+  */
+-static inline void tcg_out_goto(TCGContext *s, int cond, tcg_insn_unit *addr)
++static void tcg_out_goto(TCGContext *s, int cond, tcg_insn_unit *addr)
+ {
+     intptr_t addri = (intptr_t)addr;
+     ptrdiff_t disp = tcg_pcrel_diff(s, addr);
+@@ -987,15 +994,9 @@ static inline void tcg_out_goto(TCGContext *s, int cond, tcg_insn_unit *addr)
+         return;
      }
- #ifndef CONFIG_USER_ONLY
-@@ -5461,8 +5466,10 @@ void gen_intermediate_code(CPUS390XState *env, struct TranslationBlock *tb)
-         /* Exit the TB, either by raising a debug exception or by return.  */
-         if (do_debug) {
-             gen_exception(EXCP_DEBUG);
--        } else {
-+        } else if (use_exit_tb(&dc)) {
-             tcg_gen_exit_tb(0);
-+        } else {
-+            tcg_gen_lookup_and_goto_ptr(psw_addr);
-         }
-         break;
-     default:
+ 
++    assert(use_armv5t_instructions || (addri & 1) == 0);
+     tcg_out_movi32(s, cond, TCG_REG_TMP, addri);
+-    if (use_armv5t_instructions) {
+-        tcg_out_bx(s, cond, TCG_REG_TMP);
+-    } else {
+-        if (addri & 1) {
+-            tcg_abort();
+-        }
+-        tcg_out_mov_reg(s, cond, TCG_REG_PC, TCG_REG_TMP);
+-    }
++    tcg_out_bx(s, cond, TCG_REG_TMP);
+ }
+ 
+ /* The call case is mostly used for helpers - so it's not unreasonable
 -- 
 2.9.4
