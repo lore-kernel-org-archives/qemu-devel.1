@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40715)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42603)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1dED7l-0007BH-6E
-	for qemu-devel@nongnu.org; Fri, 26 May 2017 07:09:42 -0400
+	(envelope-from <kwolf@redhat.com>) id 1dEDET-0002es-2g
+	for qemu-devel@nongnu.org; Fri, 26 May 2017 07:16:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1dED7i-0001FD-1j
-	for qemu-devel@nongnu.org; Fri, 26 May 2017 07:09:41 -0400
-Received: from [59.151.112.132] (port=6334 helo=heian.cn.fujitsu.com)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1dED7h-0001EN-Mw
-	for qemu-devel@nongnu.org; Fri, 26 May 2017 07:09:38 -0400
-References: <20170526082925.2888-1-maozy.fnst@cn.fujitsu.com>
-	<20170526114320.63f4f0b3@nial.brq.redhat.com>
-From: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
-Message-ID: <dc44e747-500b-4fd9-4433-7bdfe6bc5a60@cn.fujitsu.com>
-Date: Fri, 26 May 2017 19:08:25 +0800
+	(envelope-from <kwolf@redhat.com>) id 1dEDEP-0003TU-U1
+	for qemu-devel@nongnu.org; Fri, 26 May 2017 07:16:37 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46424)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1dEDEP-0003TI-OG
+	for qemu-devel@nongnu.org; Fri, 26 May 2017 07:16:33 -0400
+Date: Fri, 26 May 2017 13:16:30 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20170526111630.GG7211@noname.str.redhat.com>
+References: <1495186480-114192-1-git-send-email-anton.nefedov@virtuozzo.com>
+	<1495186480-114192-2-git-send-email-anton.nefedov@virtuozzo.com>
+	<20170526081147.GC7211@noname.str.redhat.com>
+	<2f0f5f9a-23b3-5f67-7675-ecdfe15cc187@virtuozzo.com>
 MIME-Version: 1.0
-In-Reply-To: <20170526114320.63f4f0b3@nial.brq.redhat.com>
-Content-Type: text/plain; charset="windows-1252"; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] pci: Set err to errp directly rather than
- through error_porpagate()
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <2f0f5f9a-23b3-5f67-7675-ecdfe15cc187@virtuozzo.com>
+Subject: Re: [Qemu-devel] [PATCH v1 01/13] qcow2: alloc space for COW in one
+ chunk
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,79 +30,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: qemu-devel@nongnu.org, marcel@redhat.com, armbru@redhat.com, mst@redhat.com
+To: "Denis V. Lunev" <den@virtuozzo.com>
+Cc: Anton Nefedov <anton.nefedov@virtuozzo.com>, qemu-devel@nongnu.org, mreitz@redhat.com, "Denis V. Lunev" <den@openvz.org>
 
-Hi, Markus
+Am 26.05.2017 um 10:57 hat Denis V. Lunev geschrieben:
+> On 05/26/2017 11:11 AM, Kevin Wolf wrote:
+> > It seems much clearer to me that simply unifying the three write
+> > requests into a single one is an improvement. And it's easy to do, I
+> > even had a patch once to do this. The reason that I didn't send it was
+> > that it seemed to conflict with the data cache approach
+> These changes help a lot on 2 patterns:
+> - writing 4Kb into the middle of the block. The bigger the block size,
+>   more we gain
+> - sequential write, which is not sector aligned and comes in 2 requests:
+>   we perform allocation, which should be significantly faster than actual
+>   write and after that both parts of the write can be executed in parallel.
+> At my opinion both cases are frequent and important.
 
-On 05/26/2017 05:43 PM, Igor Mammedov wrote:
-> On Fri, 26 May 2017 16:29:25 +0800
-> Mao Zhongyi <maozy.fnst@cn.fujitsu.com> wrote:
->
->> ioh3420_interrupts_init() and its callers, rp_realize() and
->> pci_qdev_realize() fill error message to local_err, then
->> propagate it to errp by error_porpagate(), which's not necessary.
->> So eliminate it and pass errp directly instead of local_err.
->> Of course, error_propagate() also will be removed.
->>
->> Signed-off-by: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
->> ---
-> [...]
->
->> diff --git a/hw/pci/pci.c b/hw/pci/pci.c
->> index 98ccc27..0d4a3ff 100644
->> --- a/hw/pci/pci.c
->> +++ b/hw/pci/pci.c
->> @@ -1982,7 +1982,6 @@ static void pci_qdev_realize(DeviceState *qdev, Error **errp)
->>  {
->>      PCIDevice *pci_dev = (PCIDevice *)qdev;
->>      PCIDeviceClass *pc = PCI_DEVICE_GET_CLASS(pci_dev);
->> -    Error *local_err = NULL;
->>      PCIBus *bus;
->>      bool is_default_rom;
->>
->> @@ -1999,9 +1998,8 @@ static void pci_qdev_realize(DeviceState *qdev, Error **errp)
->>          return;
->>
->>      if (pc->realize) {
->> -        pc->realize(pci_dev, &local_err);
->> -        if (local_err) {
->> -            error_propagate(errp, local_err);
->> +        pc->realize(pci_dev, errp);
->> +        if (errp && *errp) {
->>              do_pci_unregister_device(pci_dev);
->>              return;
->>          }
->> @@ -2014,9 +2012,8 @@ static void pci_qdev_realize(DeviceState *qdev, Error **errp)
->>          is_default_rom = true;
->>      }
->>
->> -    pci_add_option_rom(pci_dev, is_default_rom, &local_err);
->> -    if (local_err) {
->> -        error_propagate(errp, local_err);
->> +    pci_add_option_rom(pci_dev, is_default_rom, errp);
->> +    if (errp && *errp) {
->>          pci_qdev_unrealize(DEVICE(pci_dev), NULL);
->>          return;
->>      }
->
-> dropping local_error here looks wrong since it's used
-> to check error status inside these functions and to undo
-> side effects in case of failure.
->
-> consider if caller pass errp = NULL
-> then error handling path won't be executed.
+Both cases are helped somewhat by reducing the number of I/O requests.
+So as a first step, I really think we need to get Berto's patches ready
+to be merged.
 
-Thanks for you detailed explanation, I ignored this question
-actually. The specified error message will not be converted to
-Error. Because error handling function returned directly when
-caller pass errp = NULL, right?
+As for this series, there is one important restriction that you don't
+mention: Both cases only benefit from the changes when there is no
+backing file (or the backing file is sparse at the given cluster). The
+main reason why people use qcow2 is for snapshots, so qcow2 without or
+with an empty backing file is actually not my primary concern.
+
+To be honest, I am concerned a bit by the additional complexity brought
+in by this series (which also seemed to be more tacked on rather than
+fully integrated at the first sight), but I'll have to study it in more
+detail.
 
 
-> So keep the rest of the patch but drop above hunks.
+Maybe another thing to keep in mind is that the sequential write case
+can completely avoid COW in theory. I wonder whether we should make
+another attempt at this. Previously, it was the complexity of my own
+prototypes that stopped me from actually merging them.
 
-I will drop this part of wrong process and commit the next
-version right away.
-
-Thanks a lot.
-Mao
+Kevin
