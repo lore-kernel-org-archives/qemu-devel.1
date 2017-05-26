@@ -1,28 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59572)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59702)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dan.j.williams@intel.com>) id 1dEGE6-0000hp-Uj
-	for qemu-devel@nongnu.org; Fri, 26 May 2017 10:28:27 -0400
+	(envelope-from <maxime.coquelin@redhat.com>) id 1dEGF6-0001CH-0h
+	for qemu-devel@nongnu.org; Fri, 26 May 2017 10:29:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dan.j.williams@intel.com>) id 1dEGE6-0005K2-0z
-	for qemu-devel@nongnu.org; Fri, 26 May 2017 10:28:26 -0400
-Received: from mail-oi0-x22f.google.com ([2607:f8b0:4003:c06::22f]:35299)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <dan.j.williams@intel.com>)
-	id 1dEGE5-0005Hi-RV
-	for qemu-devel@nongnu.org; Fri, 26 May 2017 10:28:25 -0400
-Received: by mail-oi0-x22f.google.com with SMTP id l18so14611189oig.2
-	for <qemu-devel@nongnu.org>; Fri, 26 May 2017 07:28:25 -0700 (PDT)
+	(envelope-from <maxime.coquelin@redhat.com>) id 1dEGF2-0007q5-2i
+	for qemu-devel@nongnu.org; Fri, 26 May 2017 10:29:28 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40096)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <maxime.coquelin@redhat.com>)
+	id 1dEGF1-0007nr-Sh
+	for qemu-devel@nongnu.org; Fri, 26 May 2017 10:29:24 -0400
+From: Maxime Coquelin <maxime.coquelin@redhat.com>
+Date: Fri, 26 May 2017 16:28:52 +0200
+Message-Id: <20170526142858.19931-1-maxime.coquelin@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20170526043024.zk4msmkcuihb4f4t@hz-desktop>
-References: <20170526023213.18741-1-haozhong.zhang@intel.com>
-	<CAPcyv4gp1CBFA+MMXSjxw1b3nSeHCYkMN1daMP2+r4DpfPmMug@mail.gmail.com>
-	<20170526043024.zk4msmkcuihb4f4t@hz-desktop>
-From: Dan Williams <dan.j.williams@intel.com>
-Date: Fri, 26 May 2017 07:28:24 -0700
-Message-ID: <CAPcyv4i9yz+CyYeegRN5_zavG15qE2Wf0a--FF2z9hVg5CqWLA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [RESEND PATCH 1/2] nvdimm: warn if the backend is
- not a DAX device
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v2 0/6] vhost-user: Specify and implement
+ device IOTLB support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,30 +26,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Dan Williams <dan.j.williams@intel.com>, Stefan Hajnoczi <stefanha@gmail.com>, Igor Mammedov <imammedo@redhat.com>, Xiao Guangrong <guangrong.xiao@gmail.com>, qemu-devel@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>
+To: mst@redhat.com, peterx@redhat.com, marcandre.lureau@gmail.com, vkaplans@redhat.com, jasowang@redhat.com, wexu@redhat.com, yuanhan.liu@linux.intel.com, qemu-devel@nongnu.org, jfreiman@redhat.com
+Cc: Maxime Coquelin <maxime.coquelin@redhat.com>
 
-On Thu, May 25, 2017 at 9:30 PM, Haozhong Zhang
-<haozhong.zhang@intel.com> wrote:
-> On 05/25/17 20:34 -0700, Dan Williams wrote:
->> On Thu, May 25, 2017 at 7:32 PM, Haozhong Zhang
->> <haozhong.zhang@intel.com> wrote:
->> > Applications in Linux guest that use device-dax never trigger flush
->> > that can be trapped by KVM/QEMU. Meanwhile, if the host backend is not
->> > device-dax, QEMU cannot guarantee the persistence of guest writes.
->> > Before solving this flushing problem, QEMU should warn users if the
->> > host backend is not device-dax.
->>
->> I think this needs to be stronger than a "warn" it needs to be
->> explicitly forbidden when it is known to be unsafe.
->>
->
-> I understand your worry and am not object to your suggestion, but
-> forbidden will change the existing behavior that allows such unsafe
-> usage. Let's wait for other maintainers' comments.
+This series aims at specifying ans implementing the protocol update
+required to support device IOTLB with user backends.
 
-Changing existing behavior is the point. Even if a qemu maintainer
-thought it was acceptable to allow the dangerous behavior with a
-warning I would continue to assert that we need to block it by
-default. I'm not opposed to adding a new configuration option like
-"allow dangerous pmem" to override the new default behavior, but I
-think this patch is incorrect to just emit a message.
+In this second non-RFC version, main changes are:
+ - spec fixes and clarification
+ - rings information update has been restored back to ring enablement tim=
+e
+ - Work around GCC 4.4.7 limitation wrt assignment in unnamed union at
+declaration time.
+
+The series can be tested with vhost_iotlb_proto_v2 branch on my gitlab
+account[0].
+
+The slave requests channel part is re-used from Marc-Andr=C3=A9's series =
+submitted
+last year[1], with main changes from original version being request/featu=
+re
+names renaming and addition of the REPLY_ACK feature support.
+
+Regarding IOTLB protocol, one noticeable change is the IOTLB miss request
+reply made optionnal (i.e. only if slave requests it by setting the
+VHOST_USER_NEED_REPLY flag in the message header). This change provides
+more flexibility in the backend implementation of the feature.
+
+The protocol is very close to kernel backends, except that a new
+communication channel is introduced to enable the slave to send
+requests to the master.
+
+[0]: https://gitlab.com/mcoquelin/dpdk-next-virtio/commits/vhost_iotlb_pr=
+oto_v2
+[1]: https://lists.gnu.org/archive/html/qemu-devel/2016-04/msg00095.html
+
+Marc-Andr=C3=A9 Lureau (2):
+  vhost-user: add vhost_user to hold the chr
+  vhost-user: add slave-req-fd support
+
+Maxime Coquelin (4):
+  vhost: propagate errors in vhost_device_iotlb_miss()
+  vhost: rework IOTLB messaging
+  vhost: extend ring information update for IOTLB to all rings
+  spec/vhost-user spec: Add IOMMU support
+
+ docs/specs/vhost-user.txt         | 118 ++++++++++++++++++++++++-
+ hw/virtio/vhost-backend.c         | 130 ++++++++++++++++------------
+ hw/virtio/vhost-user.c            | 177 ++++++++++++++++++++++++++++++++=
++++++-
+ hw/virtio/vhost.c                 |  27 ++++--
+ include/hw/virtio/vhost-backend.h |  23 +++--
+ include/hw/virtio/vhost.h         |   2 +-
+ 6 files changed, 397 insertions(+), 80 deletions(-)
+
+--=20
+2.9.4
