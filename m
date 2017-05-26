@@ -1,20 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60971)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:32891)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ianloic@google.com>) id 1dEOoc-0006Fs-3Q
-	for qemu-devel@nongnu.org; Fri, 26 May 2017 19:38:43 -0400
+	(envelope-from <ianloic@google.com>) id 1dEOpQ-0006xe-76
+	for qemu-devel@nongnu.org; Fri, 26 May 2017 19:39:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ianloic@google.com>) id 1dEOoZ-00013q-0B
-	for qemu-devel@nongnu.org; Fri, 26 May 2017 19:38:42 -0400
-Received: from mail-pg0-x22b.google.com ([2607:f8b0:400e:c05::22b]:36090)
+	(envelope-from <ianloic@google.com>) id 1dEOpP-0001Lj-D6
+	for qemu-devel@nongnu.org; Fri, 26 May 2017 19:39:32 -0400
+Received: from mail-wr0-x22c.google.com ([2a00:1450:400c:c0c::22c]:36481)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <ianloic@google.com>) id 1dEOoY-00013j-Nv
-	for qemu-devel@nongnu.org; Fri, 26 May 2017 19:38:38 -0400
-Received: by mail-pg0-x22b.google.com with SMTP id x64so144015pgd.3
-	for <qemu-devel@nongnu.org>; Fri, 26 May 2017 16:38:38 -0700 (PDT)
+	(Exim 4.71) (envelope-from <ianloic@google.com>) id 1dEOpP-0001LX-6O
+	for qemu-devel@nongnu.org; Fri, 26 May 2017 19:39:31 -0400
+Received: by mail-wr0-x22c.google.com with SMTP id l50so9051687wrc.3
+	for <qemu-devel@nongnu.org>; Fri, 26 May 2017 16:39:31 -0700 (PDT)
+MIME-Version: 1.0
+References: <20170522180217.18234-1-ianloic@google.com>
+	<1495533796.30747.2.camel@redhat.com>
+	<CA+YAivh=GjS5P_3BXccj5tYSxNSQoHQfeTvjgCQfVtw5QwY=_A@mail.gmail.com>
+	<CA+YAiviJq3VSLR1yCD9Yob7xb5z60Gw59mrSLL1+qFrtnv7OUw@mail.gmail.com>
+	<1495606647.30747.10.camel@redhat.com>
+In-Reply-To: <1495606647.30747.10.camel@redhat.com>
 From: Ian McKellar <ianloic@google.com>
-Date: Fri, 26 May 2017 16:38:16 -0700
-Message-Id: <20170526233816.47627-1-ianloic@google.com>
-Subject: [Qemu-devel] [PATCH] Improve Cocoa modifier key handling
+Date: Fri, 26 May 2017 23:39:17 +0000
+Message-ID: <CA+YAivgJQ6yxy+wN+BMxbXk-NYhMWUWQmpwQZBBeL55vYHZE_A@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH 1/1] Improve Cocoa modifier key handling
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,135 +31,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: kraxel@redhat.com, Ian McKellar <ianloic@google.com>
+To: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org
 
-I had two problems with QEMU on macOS:
- 1) Sometimes when alt-tabbing to QEMU it would act as if the 'a' key
-    was pressed so I'd get 'aaaaaaaaa....'.
- 2) Using Sikuli to programatically send keys to the QEMU window text
-    like "foo_bar" would come out as "fooa-bar".
+Sent another patch that does a better job of toggling caps-lock. I couldn't
+make it fail with the old patch but I think the new patch is somewhat
+better.
 
-They looked similar and after much digging the problem turned out to be
-the same. When QEMU's ui/cocoa.m received an NSFlagsChanged NSEvent it
-looked at the keyCode to determine what modifier key changed. This
-usually works fine but sometimes the keyCode is 0 and the app should
-instead be looking at the modifierFlags bitmask. Key code 0 is the 'a'
-key.
+Ian
 
-I added code that handles keyCode == 0 differently. It checks the
-modifierFlags and if they differ from QEMU's idea of which modifier
-keys are currently pressed it toggles those changed keys.
+On Tue, May 23, 2017 at 11:17 PM Gerd Hoffmann <kraxel@redhat.com> wrote:
 
-This fixes my problems and seems work fine.
-
-Signed-off-by: Ian McKellar <ianloic@google.com>
----
- ui/cocoa.m | 60 ++++++++++++++++++++++++++++++++++++++++++++++++------------
- 1 file changed, 48 insertions(+), 12 deletions(-)
-
-diff --git a/ui/cocoa.m b/ui/cocoa.m
-index 207555edf7..e89020929b 100644
---- a/ui/cocoa.m
-+++ b/ui/cocoa.m
-@@ -52,6 +52,8 @@
- /* macOS 10.12 deprecated many constants, #define the new names for older SDKs */
- #if MAC_OS_X_VERSION_MAX_ALLOWED < MAC_OS_X_VERSION_10_12
- #define NSEventMaskAny                  NSAnyEventMask
-+#define NSEventModifierFlagCapsLock     NSAlphaShiftKeyMask
-+#define NSEventModifierFlagShift        NSShiftKeyMask
- #define NSEventModifierFlagCommand      NSCommandKeyMask
- #define NSEventModifierFlagControl      NSControlKeyMask
- #define NSEventModifierFlagOption       NSAlternateKeyMask
-@@ -268,7 +270,7 @@ static void handleAnyDeviceErrors(Error * err)
-     NSWindow *fullScreenWindow;
-     float cx,cy,cw,ch,cdx,cdy;
-     CGDataProviderRef dataProviderRef;
--    int modifiers_state[256];
-+    BOOL modifiers_state[256];
-     BOOL isMouseGrabbed;
-     BOOL isFullscreen;
-     BOOL isAbsoluteEnabled;
-@@ -536,18 +538,59 @@ QemuCocoaView *cocoaView;
-     }
- }
- 
-+- (void) toggleModifier: (int)keycode {
-+    // Toggle the stored state.
-+    modifiers_state[keycode] = !modifiers_state[keycode];
-+    // Send a keyup or keydown depending on the state.
-+    qemu_input_event_send_key_qcode(dcl->con, keycode, modifiers_state[keycode]);
-+}
-+
-+- (void) toggleStatefulModifier: (int)keycode {
-+    // Toggle the stored state.
-+    modifiers_state[keycode] = !modifiers_state[keycode];
-+    // Generate keydown and keyup.
-+    qemu_input_event_send_key_qcode(dcl->con, keycode, true);
-+    qemu_input_event_send_key_qcode(dcl->con, keycode, false);
-+}
-+
- - (void) handleEvent:(NSEvent *)event
- {
-     COCOA_DEBUG("QemuCocoaView: handleEvent\n");
- 
-     int buttons = 0;
--    int keycode;
-+    int keycode = 0;
-     bool mouse_event = false;
-     NSPoint p = [event locationInWindow];
- 
-     switch ([event type]) {
-         case NSEventTypeFlagsChanged:
--            keycode = cocoa_keycode_to_qemu([event keyCode]);
-+            if ([event keyCode] == 0) {
-+                // When the Cocoa keyCode is zero that means keys should be
-+                // synthesized based on the values in in the eventModifiers
-+                // bitmask.
-+
-+                if (qemu_console_is_graphic(NULL)) {
-+                    NSEventModifierFlags modifiers = [event modifierFlags];
-+
-+                    if (!!(modifiers & NSEventModifierFlagCapsLock) != !!modifiers_state[Q_KEY_CODE_CAPS_LOCK]) {
-+                        [self toggleStatefulModifier:Q_KEY_CODE_CAPS_LOCK];
-+                    }
-+                    if (!!(modifiers & NSEventModifierFlagShift) != !!modifiers_state[Q_KEY_CODE_SHIFT]) {
-+                        [self toggleModifier:Q_KEY_CODE_SHIFT];
-+                    }
-+                    if (!!(modifiers & NSEventModifierFlagControl) != !!modifiers_state[Q_KEY_CODE_CTRL]) {
-+                        [self toggleModifier:Q_KEY_CODE_CTRL];
-+                    }
-+                    if (!!(modifiers & NSEventModifierFlagOption) != !!modifiers_state[Q_KEY_CODE_ALT]) {
-+                        [self toggleModifier:Q_KEY_CODE_ALT];
-+                    }
-+                    if (!!(modifiers & NSEventModifierFlagCommand) != !!modifiers_state[Q_KEY_CODE_META_L]) {
-+                        [self toggleModifier:Q_KEY_CODE_META_L];
-+                    }
-+                }
-+            } else {
-+                keycode = cocoa_keycode_to_qemu([event keyCode]);
-+            }
- 
-             if ((keycode == Q_KEY_CODE_META_L || keycode == Q_KEY_CODE_META_R)
-                && !isMouseGrabbed) {
-@@ -559,16 +602,9 @@ QemuCocoaView *cocoaView;
-                 // emulate caps lock and num lock keydown and keyup
-                 if (keycode == Q_KEY_CODE_CAPS_LOCK ||
-                     keycode == Q_KEY_CODE_NUM_LOCK) {
--                    qemu_input_event_send_key_qcode(dcl->con, keycode, true);
--                    qemu_input_event_send_key_qcode(dcl->con, keycode, false);
-+                    [self toggleStatefulModifier:keycode];
-                 } else if (qemu_console_is_graphic(NULL)) {
--                    if (modifiers_state[keycode] == 0) { // keydown
--                        qemu_input_event_send_key_qcode(dcl->con, keycode, true);
--                        modifiers_state[keycode] = 1;
--                    } else { // keyup
--                        qemu_input_event_send_key_qcode(dcl->con, keycode, false);
--                        modifiers_state[keycode] = 0;
--                    }
-+                  [self toggleModifier:keycode];
-                 }
-             }
- 
--- 
-2.13.0.rc1.294.g07d810a77f-goog
+>   Hi,
+>
+> > After a little more experimentation I think that the approach in this
+> > patch is the right one. modifierFlags doesn't[1] indicate which
+> > instance of a modifier (ie: left or right) is being held.
+>
+> Ok, makes sense.  One more thing:  I think capslock must be handled
+> differently as keydown + keyup toggle state.
+>
+> cheers,
+>   Gerd
+>
+>
