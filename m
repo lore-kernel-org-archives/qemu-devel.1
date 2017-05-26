@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59069)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59128)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dELlw-0005ve-1L
-	for qemu-devel@nongnu.org; Fri, 26 May 2017 16:23:49 -0400
+	(envelope-from <kwolf@redhat.com>) id 1dELm2-0005yw-No
+	for qemu-devel@nongnu.org; Fri, 26 May 2017 16:23:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dELlp-0005Wf-VD
-	for qemu-devel@nongnu.org; Fri, 26 May 2017 16:23:44 -0400
+	(envelope-from <kwolf@redhat.com>) id 1dELm1-0005ZN-Gu
+	for qemu-devel@nongnu.org; Fri, 26 May 2017 16:23:50 -0400
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Fri, 26 May 2017 22:22:05 +0200
-Message-Id: <1495830130-30611-25-git-send-email-kwolf@redhat.com>
+Date: Fri, 26 May 2017 22:22:07 +0200
+Message-Id: <1495830130-30611-27-git-send-email-kwolf@redhat.com>
 In-Reply-To: <1495830130-30611-1-git-send-email-kwolf@redhat.com>
 References: <1495830130-30611-1-git-send-email-kwolf@redhat.com>
-Subject: [Qemu-devel] [PATCH 24/29] qed: Remove recursion in
- qed_aio_next_io()
+Subject: [Qemu-devel] [PATCH 26/29] qed: Use CoQueue for serialising
+ allocations
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,98 +23,141 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, mreitz@redhat.com, pbonzini@redhat.com, stefanha@redhat.com, qemu-devel@nongnu.org
 
-Instead of calling itself recursively as the last thing, just convert
-qed_aio_next_io() into a loop.
+Now that we're running in coroutine context, the ad-hoc serialisation
+code (which drops a request that has to wait out of coroutine context)
+can be replaced by a CoQueue.
 
-This patch is best reviewed with 'git show -w' because most of it is
-just whitespace changes.
+This means that when we resume a serialised request, it is running in
+coroutine context again and its I/O isn't blocking any more.
 
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- block/qed.c | 63 +++++++++++++++++++++++++++++++------------------------------
- 1 file changed, 32 insertions(+), 31 deletions(-)
+ block/qed.c | 49 +++++++++++++++++--------------------------------
+ block/qed.h |  3 ++-
+ 2 files changed, 19 insertions(+), 33 deletions(-)
 
 diff --git a/block/qed.c b/block/qed.c
-index 078591b..6a83df2 100644
+index 29c3dc5..2eee451 100644
 --- a/block/qed.c
 +++ b/block/qed.c
-@@ -1284,45 +1284,46 @@ static void qed_aio_next_io(QEDAIOCB *acb)
-     size_t len;
-     int ret;
+@@ -269,16 +269,10 @@ static void qed_plug_allocating_write_reqs(BDRVQEDState *s)
  
--    trace_qed_aio_next_io(s, acb, 0, acb->cur_pos + acb->cur_qiov.size);
-+    while (1) {
-+        trace_qed_aio_next_io(s, acb, 0, acb->cur_pos + acb->cur_qiov.size);
+ static void qed_unplug_allocating_write_reqs(BDRVQEDState *s)
+ {
+-    QEDAIOCB *acb;
+-
+     assert(s->allocating_write_reqs_plugged);
  
--    if (acb->backing_qiov) {
--        qemu_iovec_destroy(acb->backing_qiov);
--        g_free(acb->backing_qiov);
--        acb->backing_qiov = NULL;
+     s->allocating_write_reqs_plugged = false;
+-
+-    acb = QSIMPLEQ_FIRST(&s->allocating_write_reqs);
+-    if (acb) {
+-        qed_aio_start_io(acb);
 -    }
-+        if (acb->backing_qiov) {
-+            qemu_iovec_destroy(acb->backing_qiov);
-+            g_free(acb->backing_qiov);
-+            acb->backing_qiov = NULL;
-+        }
- 
--    acb->qiov_offset += acb->cur_qiov.size;
--    acb->cur_pos += acb->cur_qiov.size;
--    qemu_iovec_reset(&acb->cur_qiov);
-+        acb->qiov_offset += acb->cur_qiov.size;
-+        acb->cur_pos += acb->cur_qiov.size;
-+        qemu_iovec_reset(&acb->cur_qiov);
- 
--    /* Complete request */
--    if (acb->cur_pos >= acb->end_pos) {
--        qed_aio_complete(acb, 0);
--        return;
--    }
-+        /* Complete request */
-+        if (acb->cur_pos >= acb->end_pos) {
-+            qed_aio_complete(acb, 0);
-+            return;
-+        }
- 
--    /* Find next cluster and start I/O */
--    len = acb->end_pos - acb->cur_pos;
--    ret = qed_find_cluster(s, &acb->request, acb->cur_pos, &len, &offset);
--    if (ret < 0) {
--        qed_aio_complete(acb, ret);
--        return;
--    }
-+        /* Find next cluster and start I/O */
-+        len = acb->end_pos - acb->cur_pos;
-+        ret = qed_find_cluster(s, &acb->request, acb->cur_pos, &len, &offset);
-+        if (ret < 0) {
-+            qed_aio_complete(acb, ret);
-+            return;
-+        }
- 
--    if (acb->flags & QED_AIOCB_WRITE) {
--        ret = qed_aio_write_data(acb, ret, offset, len);
--    } else {
--        ret = qed_aio_read_data(acb, ret, offset, len);
--    }
-+        if (acb->flags & QED_AIOCB_WRITE) {
-+            ret = qed_aio_write_data(acb, ret, offset, len);
-+        } else {
-+            ret = qed_aio_read_data(acb, ret, offset, len);
-+        }
- 
--    if (ret < 0) {
--        if (ret != -EINPROGRESS) {
--            qed_aio_complete(acb, ret);
-+        if (ret < 0) {
-+            if (ret != -EINPROGRESS) {
-+                qed_aio_complete(acb, ret);
-+            }
-+            return;
-         }
--        return;
-     }
--    qed_aio_next_io(acb);
++    qemu_co_enter_next(&s->allocating_write_reqs);
  }
  
- static BlockAIOCB *qed_aio_setup(BlockDriverState *bs,
+ static void qed_clear_need_check(void *opaque, int ret)
+@@ -305,7 +299,7 @@ static void qed_need_check_timer_cb(void *opaque)
+     BDRVQEDState *s = opaque;
+ 
+     /* The timer should only fire when allocating writes have drained */
+-    assert(!QSIMPLEQ_FIRST(&s->allocating_write_reqs));
++    assert(!s->allocating_acb);
+ 
+     trace_qed_need_check_timer_cb(s);
+ 
+@@ -388,7 +382,7 @@ static int bdrv_qed_do_open(BlockDriverState *bs, QDict *options, int flags,
+     int ret;
+ 
+     s->bs = bs;
+-    QSIMPLEQ_INIT(&s->allocating_write_reqs);
++    qemu_co_queue_init(&s->allocating_write_reqs);
+ 
+     ret = bdrv_pread(bs->file, 0, &le_header, sizeof(le_header));
+     if (ret < 0) {
+@@ -910,11 +904,6 @@ static void qed_aio_complete_bh(void *opaque)
+     qed_release(s);
+ }
+ 
+-static void qed_resume_alloc_bh(void *opaque)
+-{
+-    qed_aio_start_io(opaque);
+-}
+-
+ static void qed_aio_complete(QEDAIOCB *acb, int ret)
+ {
+     BDRVQEDState *s = acb_to_s(acb);
+@@ -942,13 +931,10 @@ static void qed_aio_complete(QEDAIOCB *acb, int ret)
+      * next request in the queue.  This ensures that we don't cycle through
+      * requests multiple times but rather finish one at a time completely.
+      */
+-    if (acb == QSIMPLEQ_FIRST(&s->allocating_write_reqs)) {
+-        QEDAIOCB *next_acb;
+-        QSIMPLEQ_REMOVE_HEAD(&s->allocating_write_reqs, next);
+-        next_acb = QSIMPLEQ_FIRST(&s->allocating_write_reqs);
+-        if (next_acb) {
+-            aio_bh_schedule_oneshot(bdrv_get_aio_context(acb->common.bs),
+-                                    qed_resume_alloc_bh, next_acb);
++    if (acb == s->allocating_acb) {
++        s->allocating_acb = NULL;
++        if (!qemu_co_queue_empty(&s->allocating_write_reqs)) {
++            qemu_co_enter_next(&s->allocating_write_reqs);
+         } else if (s->header.features & QED_F_NEED_CHECK) {
+             qed_start_need_check_timer(s);
+         }
+@@ -1124,17 +1110,18 @@ static int qed_aio_write_alloc(QEDAIOCB *acb, size_t len)
+     int ret;
+ 
+     /* Cancel timer when the first allocating request comes in */
+-    if (QSIMPLEQ_EMPTY(&s->allocating_write_reqs)) {
++    if (s->allocating_acb == NULL) {
+         qed_cancel_need_check_timer(s);
+     }
+ 
+     /* Freeze this request if another allocating write is in progress */
+-    if (acb != QSIMPLEQ_FIRST(&s->allocating_write_reqs)) {
+-        QSIMPLEQ_INSERT_TAIL(&s->allocating_write_reqs, acb, next);
+-    }
+-    if (acb != QSIMPLEQ_FIRST(&s->allocating_write_reqs) ||
+-        s->allocating_write_reqs_plugged) {
+-        return -EINPROGRESS; /* wait for existing request to finish */
++    if (s->allocating_acb != acb || s->allocating_write_reqs_plugged) {
++        if (s->allocating_acb != NULL) {
++            qemu_co_queue_wait(&s->allocating_write_reqs, NULL);
++            assert(s->allocating_acb == NULL);
++        }
++        s->allocating_acb = acb;
++        return -EAGAIN; /* start over with looking up table entries */
+     }
+ 
+     acb->cur_nclusters = qed_bytes_to_clusters(s,
+@@ -1317,10 +1304,8 @@ static void qed_aio_next_io(QEDAIOCB *acb)
+             ret = qed_aio_read_data(acb, ret, offset, len);
+         }
+ 
+-        if (ret < 0) {
+-            if (ret != -EINPROGRESS) {
+-                qed_aio_complete(acb, ret);
+-            }
++        if (ret < 0 && ret != -EAGAIN) {
++            qed_aio_complete(acb, ret);
+             return;
+         }
+     }
+diff --git a/block/qed.h b/block/qed.h
+index 8644fed..37558e4 100644
+--- a/block/qed.h
++++ b/block/qed.h
+@@ -163,7 +163,8 @@ typedef struct {
+     uint32_t l2_mask;
+ 
+     /* Allocating write request queue */
+-    QSIMPLEQ_HEAD(, QEDAIOCB) allocating_write_reqs;
++    QEDAIOCB *allocating_acb;
++    CoQueue allocating_write_reqs;
+     bool allocating_write_reqs_plugged;
+ 
+     /* Periodic flush and clear need check flag */
 -- 
 1.8.3.1
