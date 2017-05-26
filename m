@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41742)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41886)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1dEIX6-00007k-HK
-	for qemu-devel@nongnu.org; Fri, 26 May 2017 12:56:13 -0400
+	(envelope-from <mreitz@redhat.com>) id 1dEIXF-0000FT-2S
+	for qemu-devel@nongnu.org; Fri, 26 May 2017 12:56:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1dEIX5-0003kd-Os
-	for qemu-devel@nongnu.org; Fri, 26 May 2017 12:56:12 -0400
+	(envelope-from <mreitz@redhat.com>) id 1dEIXE-0003o6-6v
+	for qemu-devel@nongnu.org; Fri, 26 May 2017 12:56:21 -0400
 From: Max Reitz <mreitz@redhat.com>
-Date: Fri, 26 May 2017 18:55:13 +0200
-Message-Id: <20170526165518.7580-12-mreitz@redhat.com>
+Date: Fri, 26 May 2017 18:55:15 +0200
+Message-Id: <20170526165518.7580-14-mreitz@redhat.com>
 In-Reply-To: <20170526165518.7580-1-mreitz@redhat.com>
 References: <20170526165518.7580-1-mreitz@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 11/16] block/qcow2: Metadata preallocation
- for truncate
+Subject: [Qemu-devel] [PATCH v3 13/16] block/qcow2: Rename "fail_block" to
+ just "fail"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,67 +23,77 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
-We can support PREALLOC_MODE_METADATA by invoking preallocate() in
-qcow2_truncate().
+Now alloc_refcount_block() only contains a single fail label, so it
+makes more sense to just name it "fail" instead of "fail_block".
 
 Signed-off-by: Max Reitz <mreitz@redhat.com>
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 ---
- block/qcow2.c | 24 ++++++++++++++++++++++--
- 1 file changed, 22 insertions(+), 2 deletions(-)
+ block/qcow2-refcount.c | 14 +++++++-------
+ 1 file changed, 7 insertions(+), 7 deletions(-)
 
-diff --git a/block/qcow2.c b/block/qcow2.c
-index a8223a0..2de27c3 100644
---- a/block/qcow2.c
-+++ b/block/qcow2.c
-@@ -2616,10 +2616,11 @@ static int qcow2_truncate(BlockDriverState *bs, int64_t offset,
-                           PreallocMode prealloc, Error **errp)
- {
-     BDRVQcow2State *s = bs->opaque;
-+    uint64_t old_length;
-     int64_t new_l1_size;
-     int ret;
+diff --git a/block/qcow2-refcount.c b/block/qcow2-refcount.c
+index 0872c25..9d109e9 100644
+--- a/block/qcow2-refcount.c
++++ b/block/qcow2-refcount.c
+@@ -381,7 +381,7 @@ static int alloc_refcount_block(BlockDriverState *bs,
+         ret = qcow2_cache_get_empty(bs, s->refcount_block_cache, new_block,
+                                     refcount_block);
+         if (ret < 0) {
+-            goto fail_block;
++            goto fail;
+         }
  
--    if (prealloc != PREALLOC_MODE_OFF) {
-+    if (prealloc != PREALLOC_MODE_OFF && prealloc != PREALLOC_MODE_METADATA) {
-         error_setg(errp, "Unsupported preallocation mode '%s'",
-                    PreallocMode_lookup[prealloc]);
-         return -ENOTSUP;
-@@ -2636,8 +2637,10 @@ static int qcow2_truncate(BlockDriverState *bs, int64_t offset,
-         return -ENOTSUP;
+         memset(*refcount_block, 0, s->cluster_size);
+@@ -396,12 +396,12 @@ static int alloc_refcount_block(BlockDriverState *bs,
+         ret = update_refcount(bs, new_block, s->cluster_size, 1, false,
+                               QCOW2_DISCARD_NEVER);
+         if (ret < 0) {
+-            goto fail_block;
++            goto fail;
+         }
+ 
+         ret = qcow2_cache_flush(bs, s->refcount_block_cache);
+         if (ret < 0) {
+-            goto fail_block;
++            goto fail;
+         }
+ 
+         /* Initialize the new refcount block only after updating its refcount,
+@@ -409,7 +409,7 @@ static int alloc_refcount_block(BlockDriverState *bs,
+         ret = qcow2_cache_get_empty(bs, s->refcount_block_cache, new_block,
+                                     refcount_block);
+         if (ret < 0) {
+-            goto fail_block;
++            goto fail;
+         }
+ 
+         memset(*refcount_block, 0, s->cluster_size);
+@@ -420,7 +420,7 @@ static int alloc_refcount_block(BlockDriverState *bs,
+     qcow2_cache_entry_mark_dirty(bs, s->refcount_block_cache, *refcount_block);
+     ret = qcow2_cache_flush(bs, s->refcount_block_cache);
+     if (ret < 0) {
+-        goto fail_block;
++        goto fail;
      }
  
-+    old_length = bs->total_sectors * 512;
-+
-     /* shrinking is currently not supported */
--    if (offset < bs->total_sectors * 512) {
-+    if (offset < old_length) {
-         error_setg(errp, "qcow2 doesn't support shrinking images yet");
-         return -ENOTSUP;
-     }
-@@ -2649,6 +2652,23 @@ static int qcow2_truncate(BlockDriverState *bs, int64_t offset,
-         return ret;
-     }
+     /* If the refcount table is big enough, just hook the block up there */
+@@ -431,7 +431,7 @@ static int alloc_refcount_block(BlockDriverState *bs,
+             s->refcount_table_offset + refcount_table_index * sizeof(uint64_t),
+             &data64, sizeof(data64));
+         if (ret < 0) {
+-            goto fail_block;
++            goto fail;
+         }
  
-+    switch (prealloc) {
-+    case PREALLOC_MODE_OFF:
-+        break;
-+
-+    case PREALLOC_MODE_METADATA:
-+        ret = preallocate(bs, old_length, offset);
-+        if (ret < 0) {
-+            error_setg_errno(errp, -ret, "Preallocation failed, image may now "
-+                             "occupy more space than necessary");
-+            return ret;
-+        }
-+        break;
-+
-+    default:
-+        g_assert_not_reached();
-+    }
-+
-     /* write updated header.size */
-     offset = cpu_to_be64(offset);
-     ret = bdrv_pwrite_sync(bs->file, offsetof(QCowHeader, size),
+         s->refcount_table[refcount_table_index] = new_block;
+@@ -495,7 +495,7 @@ static int alloc_refcount_block(BlockDriverState *bs,
+      * allocated metadata. Make the caller search some new space. */
+     return -EAGAIN;
+ 
+-fail_block:
++fail:
+     if (*refcount_block != NULL) {
+         qcow2_cache_put(bs, s->refcount_block_cache, refcount_block);
+     }
 -- 
 2.9.4
