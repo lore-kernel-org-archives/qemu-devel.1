@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33587)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33603)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dEGNs-0007fv-Qw
+	(envelope-from <pbonzini@redhat.com>) id 1dEGNt-0007j1-NJ
 	for qemu-devel@nongnu.org; Fri, 26 May 2017 10:38:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dEGNq-0000Xk-Oc
-	for qemu-devel@nongnu.org; Fri, 26 May 2017 10:38:32 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47514)
+	(envelope-from <pbonzini@redhat.com>) id 1dEGNs-0000bU-5M
+	for qemu-devel@nongnu.org; Fri, 26 May 2017 10:38:33 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:39614)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1dEGNq-0000Us-F6
-	for qemu-devel@nongnu.org; Fri, 26 May 2017 10:38:30 -0400
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1dEGNr-0000Yq-VA
+	for qemu-devel@nongnu.org; Fri, 26 May 2017 10:38:32 -0400
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Fri, 26 May 2017 16:38:24 +0200
-Message-Id: <20170526143826.27780-2-pbonzini@redhat.com>
+Date: Fri, 26 May 2017 16:38:25 +0200
+Message-Id: <20170526143826.27780-3-pbonzini@redhat.com>
 In-Reply-To: <20170526143826.27780-1-pbonzini@redhat.com>
 References: <20170526143826.27780-1-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PULL 14/22] nbd/client.c: use errp instead of LOG
+Subject: [Qemu-devel] [PULL 21/22] i386: fix read/write cr with icount option
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,214 +24,54 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Cc: Mihail Abakumov <mikhail.abakumov@ispras.ru>
 
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+From: Mihail Abakumov <mikhail.abakumov@ispras.ru>
 
-Move to modern errp scheme from just LOGging errors.
+Running Windows with icount causes a crash in instruction of write cr.
+This patch fixes it.
 
-Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-Id: <20170526110913.89098-1-vsementsov@virtuozzo.com>
+Reading and writing cr cause an icount read because there are called
+cpu_get_apic_tpr and cpu_set_apic_tpr functions. So, there is need
+gen_io_start()/gen_io_end() calls.
+
+Signed-off-by: Mihail Abakumov <mikhail.abakumov@ispras.ru>
+Message-Id: <ffb376034ff184f2fcbe93d5317d9e76@ispras.ru>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- block/nbd-client.c         |  7 ++++++-
- include/block/nbd.h        |  5 +++--
- nbd/client.c               | 30 +++++++++++++++++-------------
- qemu-nbd.c                 |  3 ++-
- tests/qemu-iotests/083.out |  2 ++
- 5 files changed, 30 insertions(+), 17 deletions(-)
+ target/i386/translate.c | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
 
-diff --git a/block/nbd-client.c b/block/nbd-client.c
-index 538d95e031..09d955bc4d 100644
---- a/block/nbd-client.c
-+++ b/block/nbd-client.c
-@@ -28,6 +28,7 @@
-  */
- 
- #include "qemu/osdep.h"
-+#include "qapi/error.h"
- #include "nbd-client.h"
- 
- #define HANDLE_TO_INDEX(bs, handle) ((handle) ^ ((uint64_t)(intptr_t)bs))
-@@ -70,10 +71,14 @@ static coroutine_fn void nbd_read_reply_entry(void *opaque)
-     NBDClientSession *s = opaque;
-     uint64_t i;
-     int ret;
-+    Error *local_err = NULL;
- 
-     for (;;) {
-         assert(s->reply.handle == 0);
--        ret = nbd_receive_reply(s->ioc, &s->reply);
-+        ret = nbd_receive_reply(s->ioc, &s->reply, &local_err);
-+        if (ret < 0) {
-+            error_report_err(local_err);
-+        }
-         if (ret <= 0) {
-             break;
-         }
-diff --git a/include/block/nbd.h b/include/block/nbd.h
-index 9d385ea564..416257abca 100644
---- a/include/block/nbd.h
-+++ b/include/block/nbd.h
-@@ -133,9 +133,10 @@ int nbd_receive_negotiate(QIOChannel *ioc, const char *name, uint16_t *flags,
-                           QCryptoTLSCreds *tlscreds, const char *hostname,
-                           QIOChannel **outioc,
-                           off_t *size, Error **errp);
--int nbd_init(int fd, QIOChannelSocket *sioc, uint16_t flags, off_t size);
-+int nbd_init(int fd, QIOChannelSocket *sioc, uint16_t flags, off_t size,
-+             Error **errp);
- ssize_t nbd_send_request(QIOChannel *ioc, NBDRequest *request);
--ssize_t nbd_receive_reply(QIOChannel *ioc, NBDReply *reply);
-+ssize_t nbd_receive_reply(QIOChannel *ioc, NBDReply *reply, Error **errp);
- int nbd_client(int fd);
- int nbd_disconnect(int fd);
- 
-diff --git a/nbd/client.c b/nbd/client.c
-index f102375504..595d99ed30 100644
---- a/nbd/client.c
-+++ b/nbd/client.c
-@@ -627,11 +627,13 @@ fail:
- }
- 
- #ifdef __linux__
--int nbd_init(int fd, QIOChannelSocket *sioc, uint16_t flags, off_t size)
-+int nbd_init(int fd, QIOChannelSocket *sioc, uint16_t flags, off_t size,
-+             Error **errp)
- {
-     unsigned long sectors = size / BDRV_SECTOR_SIZE;
-     if (size / BDRV_SECTOR_SIZE != sectors) {
--        LOG("Export size %lld too large for 32-bit kernel", (long long) size);
-+        error_setg(errp, "Export size %lld too large for 32-bit kernel",
-+                   (long long) size);
-         return -E2BIG;
-     }
- 
-@@ -639,7 +641,7 @@ int nbd_init(int fd, QIOChannelSocket *sioc, uint16_t flags, off_t size)
- 
-     if (ioctl(fd, NBD_SET_SOCK, (unsigned long) sioc->fd) < 0) {
-         int serrno = errno;
--        LOG("Failed to set NBD socket");
-+        error_setg(errp, "Failed to set NBD socket");
-         return -serrno;
-     }
- 
-@@ -647,7 +649,7 @@ int nbd_init(int fd, QIOChannelSocket *sioc, uint16_t flags, off_t size)
- 
-     if (ioctl(fd, NBD_SET_BLKSIZE, (unsigned long)BDRV_SECTOR_SIZE) < 0) {
-         int serrno = errno;
--        LOG("Failed setting NBD block size");
-+        error_setg(errp, "Failed setting NBD block size");
-         return -serrno;
-     }
- 
-@@ -659,7 +661,7 @@ int nbd_init(int fd, QIOChannelSocket *sioc, uint16_t flags, off_t size)
- 
-     if (ioctl(fd, NBD_SET_SIZE_BLOCKS, sectors) < 0) {
-         int serrno = errno;
--        LOG("Failed setting size (in blocks)");
-+        error_setg(errp, "Failed setting size (in blocks)");
-         return -serrno;
-     }
- 
-@@ -670,12 +672,12 @@ int nbd_init(int fd, QIOChannelSocket *sioc, uint16_t flags, off_t size)
- 
-             if (ioctl(fd, BLKROSET, (unsigned long) &read_only) < 0) {
-                 int serrno = errno;
--                LOG("Failed setting read-only attribute");
-+                error_setg(errp, "Failed setting read-only attribute");
-                 return -serrno;
-             }
-         } else {
-             int serrno = errno;
--            LOG("Failed setting flags");
-+            error_setg(errp, "Failed setting flags");
-             return -serrno;
-         }
-     }
-@@ -723,8 +725,10 @@ int nbd_disconnect(int fd)
- }
- 
- #else
--int nbd_init(int fd, QIOChannelSocket *ioc, uint16_t flags, off_t size)
-+int nbd_init(int fd, QIOChannelSocket *ioc, uint16_t flags, off_t size,
-+	     Error **errp)
- {
-+    error_setg(errp, "nbd_init is only supported on Linux");
-     return -ENOTSUP;
- }
- 
-@@ -758,19 +762,19 @@ ssize_t nbd_send_request(QIOChannel *ioc, NBDRequest *request)
-     return write_sync(ioc, buf, sizeof(buf), NULL);
- }
- 
--ssize_t nbd_receive_reply(QIOChannel *ioc, NBDReply *reply)
-+ssize_t nbd_receive_reply(QIOChannel *ioc, NBDReply *reply, Error **errp)
- {
-     uint8_t buf[NBD_REPLY_SIZE];
-     uint32_t magic;
-     ssize_t ret;
- 
--    ret = read_sync_eof(ioc, buf, sizeof(buf), NULL);
-+    ret = read_sync_eof(ioc, buf, sizeof(buf), errp);
-     if (ret <= 0) {
-         return ret;
-     }
- 
-     if (ret != sizeof(buf)) {
--        LOG("read failed");
-+        error_setg(errp, "read failed");
-         return -EINVAL;
-     }
- 
-@@ -788,7 +792,7 @@ ssize_t nbd_receive_reply(QIOChannel *ioc, NBDReply *reply)
- 
-     if (reply->error == ESHUTDOWN) {
-         /* This works even on mingw which lacks a native ESHUTDOWN */
--        LOG("server shutting down");
-+        error_setg(errp, "server shutting down");
-         return -EINVAL;
-     }
-     TRACE("Got reply: { magic = 0x%" PRIx32 ", .error = % " PRId32
-@@ -796,7 +800,7 @@ ssize_t nbd_receive_reply(QIOChannel *ioc, NBDReply *reply)
-           magic, reply->error, reply->handle);
- 
-     if (magic != NBD_REPLY_MAGIC) {
--        LOG("invalid magic (got 0x%" PRIx32 ")", magic);
-+        error_setg(errp, "invalid magic (got 0x%" PRIx32 ")", magic);
-         return -EINVAL;
-     }
-     return sizeof(buf);
-diff --git a/qemu-nbd.c b/qemu-nbd.c
-index b7ab86bfa7..f60842fd86 100644
---- a/qemu-nbd.c
-+++ b/qemu-nbd.c
-@@ -288,8 +288,9 @@ static void *nbd_client_thread(void *arg)
-         goto out_socket;
-     }
- 
--    ret = nbd_init(fd, sioc, nbdflags, size);
-+    ret = nbd_init(fd, sioc, nbdflags, size, &local_error);
-     if (ret < 0) {
-+        error_report_err(local_error);
-         goto out_fd;
-     }
- 
-diff --git a/tests/qemu-iotests/083.out b/tests/qemu-iotests/083.out
-index 0c13888ba1..a24c6bfece 100644
---- a/tests/qemu-iotests/083.out
-+++ b/tests/qemu-iotests/083.out
-@@ -69,10 +69,12 @@ read failed: Input/output error
- 
- === Check disconnect 4 reply ===
- 
-+read failed
- read failed: Input/output error
- 
- === Check disconnect 8 reply ===
- 
-+read failed
- read failed: Input/output error
- 
- === Check disconnect before data ===
+diff --git a/target/i386/translate.c b/target/i386/translate.c
+index 1d1372fb43..39912f369f 100644
+--- a/target/i386/translate.c
++++ b/target/i386/translate.c
+@@ -7914,14 +7914,26 @@ static target_ulong disas_insn(CPUX86State *env, DisasContext *s,
+                 gen_update_cc_op(s);
+                 gen_jmp_im(pc_start - s->cs_base);
+                 if (b & 2) {
++                    if (s->tb->cflags & CF_USE_ICOUNT) {
++                        gen_io_start();
++                    }
+                     gen_op_mov_v_reg(ot, cpu_T0, rm);
+                     gen_helper_write_crN(cpu_env, tcg_const_i32(reg),
+                                          cpu_T0);
++                    if (s->tb->cflags & CF_USE_ICOUNT) {
++                        gen_io_end();
++                    }
+                     gen_jmp_im(s->pc - s->cs_base);
+                     gen_eob(s);
+                 } else {
++                    if (s->tb->cflags & CF_USE_ICOUNT) {
++                        gen_io_start();
++                    }
+                     gen_helper_read_crN(cpu_T0, cpu_env, tcg_const_i32(reg));
+                     gen_op_mov_reg_v(ot, rm, cpu_T0);
++                    if (s->tb->cflags & CF_USE_ICOUNT) {
++                        gen_io_end();
++                    }
+                 }
+                 break;
+             default:
 -- 
 2.13.0
