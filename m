@@ -1,21 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35548)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39129)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1dEAeB-0006Ci-EQ
-	for qemu-devel@nongnu.org; Fri, 26 May 2017 04:31:00 -0400
+	(envelope-from <no-reply@patchew.org>) id 1dEAzT-0007HS-VT
+	for qemu-devel@nongnu.org; Fri, 26 May 2017 04:53:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1dEAe6-0003zk-KD
-	for qemu-devel@nongnu.org; Fri, 26 May 2017 04:30:59 -0400
-Received: from [59.151.112.132] (port=62297 helo=heian.cn.fujitsu.com)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1dEAe5-0003zJ-Aq
-	for qemu-devel@nongnu.org; Fri, 26 May 2017 04:30:54 -0400
-From: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
-Date: Fri, 26 May 2017 16:29:25 +0800
-Message-ID: <20170526082925.2888-1-maozy.fnst@cn.fujitsu.com>
+	(envelope-from <no-reply@patchew.org>) id 1dEAzQ-00021u-Pp
+	for qemu-devel@nongnu.org; Fri, 26 May 2017 04:52:59 -0400
+Resent-Message-Id: <E1dEAzQ-00021u-Pp@eggs.gnu.org>
+Received: from sender-of-o52.zoho.com ([135.84.80.217]:21447)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1dEAzQ-00021m-I2
+	for qemu-devel@nongnu.org; Fri, 26 May 2017 04:52:56 -0400
+In-Reply-To: <20170526075246.20265-1-famz@redhat.com>
+Message-ID: <149578876368.1464.4970344384500820954@c05f1edc8ed1>
+Reply-To: <qemu-devel@nongnu.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH] pci: Set err to errp directly rather than
- through error_porpagate()
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Fri, 26 May 2017 01:52:44 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PULL 00/22] Docker and block patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,112 +28,87 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: mst@redhat.com, marcel@redhat.com, armbru@redhat.com
+To: famz@redhat.com
+Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org, stefanha@redhat.com
 
-ioh3420_interrupts_init() and its callers, rp_realize() and
-pci_qdev_realize() fill error message to local_err, then
-propagate it to errp by error_porpagate(), which's not necessary.
-So eliminate it and pass errp directly instead of local_err.
-Of course, error_propagate() also will be removed.
-
-Signed-off-by: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
----
- hw/pci-bridge/ioh3420.c        |  4 +---
- hw/pci-bridge/pcie_root_port.c |  7 ++-----
- hw/pci/pci.c                   | 11 ++++-------
- 3 files changed, 7 insertions(+), 15 deletions(-)
-
-diff --git a/hw/pci-bridge/ioh3420.c b/hw/pci-bridge/ioh3420.c
-index da4e5bd..5f56a2f 100644
---- a/hw/pci-bridge/ioh3420.c
-+++ b/hw/pci-bridge/ioh3420.c
-@@ -64,15 +64,13 @@ static uint8_t ioh3420_aer_vector(const PCIDevice *d)
- static int ioh3420_interrupts_init(PCIDevice *d, Error **errp)
- {
-     int rc;
--    Error *local_err = NULL;
- 
-     rc = msi_init(d, IOH_EP_MSI_OFFSET, IOH_EP_MSI_NR_VECTOR,
-                   IOH_EP_MSI_SUPPORTED_FLAGS & PCI_MSI_FLAGS_64BIT,
-                   IOH_EP_MSI_SUPPORTED_FLAGS & PCI_MSI_FLAGS_MASKBIT,
--                  &local_err);
-+                  errp);
-     if (rc < 0) {
-         assert(rc == -ENOTSUP);
--        error_propagate(errp, local_err);
-     }
- 
-     return rc;
-diff --git a/hw/pci-bridge/pcie_root_port.c b/hw/pci-bridge/pcie_root_port.c
-index cf36318..9022996 100644
---- a/hw/pci-bridge/pcie_root_port.c
-+++ b/hw/pci-bridge/pcie_root_port.c
-@@ -59,7 +59,6 @@ static void rp_realize(PCIDevice *d, Error **errp)
-     PCIDeviceClass *dc = PCI_DEVICE_GET_CLASS(d);
-     PCIERootPortClass *rpc = PCIE_ROOT_PORT_GET_CLASS(d);
-     int rc;
--    Error *local_err = NULL;
- 
-     pci_config_set_interrupt_pin(d->config, 1);
-     pci_bridge_initfn(d, TYPE_PCIE_BUS);
-@@ -72,9 +71,8 @@ static void rp_realize(PCIDevice *d, Error **errp)
-     }
- 
-     if (rpc->interrupts_init) {
--        rc = rpc->interrupts_init(d, &local_err);
-+        rc = rpc->interrupts_init(d, errp);
-         if (rc < 0) {
--            error_propagate(errp, local_err);
-             goto err_bridge;
-         }
-     }
-@@ -98,9 +96,8 @@ static void rp_realize(PCIDevice *d, Error **errp)
-     }
- 
-     rc = pcie_aer_init(d, PCI_ERR_VER, rpc->aer_offset,
--                       PCI_ERR_SIZEOF, &local_err);
-+                       PCI_ERR_SIZEOF, errp);
-     if (rc < 0) {
--        error_propagate(errp, local_err);
-         goto err;
-     }
-     pcie_aer_root_init(d);
-diff --git a/hw/pci/pci.c b/hw/pci/pci.c
-index 98ccc27..0d4a3ff 100644
---- a/hw/pci/pci.c
-+++ b/hw/pci/pci.c
-@@ -1982,7 +1982,6 @@ static void pci_qdev_realize(DeviceState *qdev, Error **errp)
- {
-     PCIDevice *pci_dev = (PCIDevice *)qdev;
-     PCIDeviceClass *pc = PCI_DEVICE_GET_CLASS(pci_dev);
--    Error *local_err = NULL;
-     PCIBus *bus;
-     bool is_default_rom;
- 
-@@ -1999,9 +1998,8 @@ static void pci_qdev_realize(DeviceState *qdev, Error **errp)
-         return;
- 
-     if (pc->realize) {
--        pc->realize(pci_dev, &local_err);
--        if (local_err) {
--            error_propagate(errp, local_err);
-+        pc->realize(pci_dev, errp);
-+        if (errp && *errp) {
-             do_pci_unregister_device(pci_dev);
-             return;
-         }
-@@ -2014,9 +2012,8 @@ static void pci_qdev_realize(DeviceState *qdev, Error **errp)
-         is_default_rom = true;
-     }
- 
--    pci_add_option_rom(pci_dev, is_default_rom, &local_err);
--    if (local_err) {
--        error_propagate(errp, local_err);
-+    pci_add_option_rom(pci_dev, is_default_rom, errp);
-+    if (errp && *errp) {
-         pci_qdev_unrealize(DEVICE(pci_dev), NULL);
-         return;
-     }
--- 
-2.9.3
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
+c3NhZ2UtaWQ6IDIwMTcwNTI2MDc1MjQ2LjIwMjY1LTEtZmFtekByZWRoYXQuY29tClN1YmplY3Q6
+IFtRZW11LWRldmVsXSBbUFVMTCAwMC8yMl0gRG9ja2VyIGFuZCBibG9jayBwYXRjaGVzCgo9PT0g
+VEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCgpCQVNFPWJhc2UKbj0xCnRvdGFsPSQo
+Z2l0IGxvZyAtLW9uZWxpbmUgJEJBU0UuLiB8IHdjIC1sKQpmYWlsZWQ9MAoKZ2l0IGNvbmZpZyAt
+LWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVz
+IFRydWUKCmNvbW1pdHM9IiQoZ2l0IGxvZyAtLWZvcm1hdD0lSCAtLXJldmVyc2UgJEJBU0UuLiki
+CmZvciBjIGluICRjb21taXRzOyBkbwogICAgZWNobyAiQ2hlY2tpbmcgUEFUQ0ggJG4vJHRvdGFs
+OiAkKGdpdCBsb2cgLW4gMSAtLWZvcm1hdD0lcyAkYykuLi4iCiAgICBpZiAhIGdpdCBzaG93ICRj
+IC0tZm9ybWF0PWVtYWlsIHwgLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFjayAtOyB0
+aGVuCiAgICAgICAgZmFpbGVkPTEKICAgICAgICBlY2hvCiAgICBmaQogICAgbj0kKChuKzEpKQpk
+b25lCgpleGl0ICRmYWlsZWQKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KClVwZGF0aW5nIDNjOGNm
+NWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKRnJvbSBodHRwczovL2dpdGh1Yi5j
+b20vcGF0Y2hldy1wcm9qZWN0L3FlbXUKICogW25ldyB0YWddICAgICAgICAgcGF0Y2hldy8yMDE3
+MDUyNjA4MjkyNS4yODg4LTEtbWFvenkuZm5zdEBjbi5mdWppdHN1LmNvbSAtPiBwYXRjaGV3LzIw
+MTcwNTI2MDgyOTI1LjI4ODgtMS1tYW96eS5mbnN0QGNuLmZ1aml0c3UuY29tClN3aXRjaGVkIHRv
+IGEgbmV3IGJyYW5jaCAndGVzdCcKMTZjYjc0YSBibG9jazogbWFrZSBhY2NvdW50aW5nIHRocmVh
+ZC1zYWZlCjgyMzk2MzUgYmxvY2s6IGludHJvZHVjZSBibG9ja19hY2NvdW50X29uZV9pbwo2M2Jj
+ZjEzIGJsb2NrOiBwcm90ZWN0IG1vZGlmaWNhdGlvbiBvZiBkaXJ0eSBiaXRtYXBzIHdpdGggYSBt
+dXRleApmNTgwOTdjIG1pZ3JhdGlvbi9ibG9jazogcmVzZXQgZGlydHkgYml0bWFwIGJlZm9yZSBy
+ZWFkaW5nCmVkODNkNWUgYmxvY2s6IGludHJvZHVjZSBkaXJ0eV9iaXRtYXBfbXV0ZXgKZjA0NmQ3
+MCBibG9jazogcHJvdGVjdCB0cmFja2VkX3JlcXVlc3RzIGFuZCBmbHVzaF9xdWV1ZSB3aXRoIHJl
+cXNfbG9jawphNzc0NWFlIGJsb2NrOiBhY2Nlc3Mgd3JpdGVfZ2VuIHdpdGggYXRvbWljcwoxNTQx
+OTM4IGJsb2NrOiB1c2UgU3RhdDY0IGZvciB3cl9oaWdoZXN0X29mZnNldAo2ZWJjY2ZjIHV0aWw6
+IGFkZCBzdGF0czY0IG1vZHVsZQpkMGYyMTdkIHRocm90dGxlLWdyb3VwczogcHJvdGVjdCB0aHJv
+dHRsZWQgcmVxdWVzdHMgd2l0aCBhIENvTXV0ZXgKMGUwNmU1YSB0aHJvdHRsZS1ncm91cHM6IGRv
+IG5vdCB1c2UgcWVtdV9jb19lbnRlcl9uZXh0CjMxZDY4NjAgdGhyb3R0bGUtZ3JvdXBzOiBvbmx5
+IHN0YXJ0IG9uZSBjb3JvdXRpbmUgZnJvbSBkcmFpbmVkX2JlZ2luCjY4YzBlMTYgYmxvY2s6IGFj
+Y2VzcyBpb19wbHVnZ2VkIHdpdGggYXRvbWljIG9wcwo2MjFjMzkzIGJsb2NrOiBhY2Nlc3Mgd2Fr
+ZXVwIHdpdGggYXRvbWljIG9wcwpjMWMyOWY2IGJsb2NrOiBhY2Nlc3Mgc2VyaWFsaXNpbmdfaW5f
+ZmxpZ2h0IHdpdGggYXRvbWljIG9wcwo4N2Y2NjU0IGJsb2NrOiBhY2Nlc3MgaW9fbGltaXRzX2Rp
+c2FibGVkIHdpdGggYXRvbWljIG9wcwoxNmU1ZGIxIGJsb2NrOiBhY2Nlc3MgcXVpZXNjZV9jb3Vu
+dGVyIHdpdGggYXRvbWljIG9wcwowMThjYjhiIGJsb2NrOiBhY2Nlc3MgY29weV9vbl9yZWFkIHdp
+dGggYXRvbWljIG9wcwpmNTdiNGIxIGRvY2tlcjogQWRkIGZsZXggYW5kIGJpc29uIHRvIGNlbnRv
+czYgaW1hZ2UKNmFjNTA0NSBkb2NrZXI6IEFkZCBsaWJhaW8gdG8gZmVkb3JhIGltYWdlCjdhMjEw
+M2UgZG9ja2VyOiBBZGQgYnppcDIgYW5kIGhvc3RuYW1lIHRvIGZlZG9yYSBpbWFnZQo3ZTgzMjMy
+IGRvY2tlcjogUnVuIHRlc3RzIHdpdGggY3VycmVudCB1c2VyCgo9PT0gT1VUUFVUIEJFR0lOID09
+PQpDaGVja2luZyBQQVRDSCAxLzIyOiBkb2NrZXI6IFJ1biB0ZXN0cyB3aXRoIGN1cnJlbnQgdXNl
+ci4uLgpDaGVja2luZyBQQVRDSCAyLzIyOiBkb2NrZXI6IEFkZCBiemlwMiBhbmQgaG9zdG5hbWUg
+dG8gZmVkb3JhIGltYWdlLi4uCkNoZWNraW5nIFBBVENIIDMvMjI6IGRvY2tlcjogQWRkIGxpYmFp
+byB0byBmZWRvcmEgaW1hZ2UuLi4KQ2hlY2tpbmcgUEFUQ0ggNC8yMjogZG9ja2VyOiBBZGQgZmxl
+eCBhbmQgYmlzb24gdG8gY2VudG9zNiBpbWFnZS4uLgpDaGVja2luZyBQQVRDSCA1LzIyOiBibG9j
+azogYWNjZXNzIGNvcHlfb25fcmVhZCB3aXRoIGF0b21pYyBvcHMuLi4KQ2hlY2tpbmcgUEFUQ0gg
+Ni8yMjogYmxvY2s6IGFjY2VzcyBxdWllc2NlX2NvdW50ZXIgd2l0aCBhdG9taWMgb3BzLi4uCkNo
+ZWNraW5nIFBBVENIIDcvMjI6IGJsb2NrOiBhY2Nlc3MgaW9fbGltaXRzX2Rpc2FibGVkIHdpdGgg
+YXRvbWljIG9wcy4uLgpDaGVja2luZyBQQVRDSCA4LzIyOiBibG9jazogYWNjZXNzIHNlcmlhbGlz
+aW5nX2luX2ZsaWdodCB3aXRoIGF0b21pYyBvcHMuLi4KQ2hlY2tpbmcgUEFUQ0ggOS8yMjogYmxv
+Y2s6IGFjY2VzcyB3YWtldXAgd2l0aCBhdG9taWMgb3BzLi4uCkNoZWNraW5nIFBBVENIIDEwLzIy
+OiBibG9jazogYWNjZXNzIGlvX3BsdWdnZWQgd2l0aCBhdG9taWMgb3BzLi4uCkNoZWNraW5nIFBB
+VENIIDExLzIyOiB0aHJvdHRsZS1ncm91cHM6IG9ubHkgc3RhcnQgb25lIGNvcm91dGluZSBmcm9t
+IGRyYWluZWRfYmVnaW4uLi4KQ2hlY2tpbmcgUEFUQ0ggMTIvMjI6IHRocm90dGxlLWdyb3Vwczog
+ZG8gbm90IHVzZSBxZW11X2NvX2VudGVyX25leHQuLi4KQ2hlY2tpbmcgUEFUQ0ggMTMvMjI6IHRo
+cm90dGxlLWdyb3VwczogcHJvdGVjdCB0aHJvdHRsZWQgcmVxdWVzdHMgd2l0aCBhIENvTXV0ZXgu
+Li4KQ2hlY2tpbmcgUEFUQ0ggMTQvMjI6IHV0aWw6IGFkZCBzdGF0czY0IG1vZHVsZS4uLgpFUlJP
+UjogbWVtb3J5IGJhcnJpZXIgd2l0aG91dCBjb21tZW50CiMzMzA6IEZJTEU6IHV0aWwvc3RhdHM2
+NC5jOjEwMToKKyAgICAgICAgc21wX3dtYigpOwoKRVJST1I6IG1lbW9yeSBiYXJyaWVyIHdpdGhv
+dXQgY29tbWVudAojMzU5OiBGSUxFOiB1dGlsL3N0YXRzNjQuYzoxMzA6CisgICAgICAgIHNtcF93
+bWIoKTsKCnRvdGFsOiAyIGVycm9ycywgMCB3YXJuaW5ncywgMzM0IGxpbmVzIGNoZWNrZWQKCllv
+dXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRo
+ZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFp
+bmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCkNoZWNraW5nIFBBVENIIDE1LzIy
+OiBibG9jazogdXNlIFN0YXQ2NCBmb3Igd3JfaGlnaGVzdF9vZmZzZXQuLi4KQ2hlY2tpbmcgUEFU
+Q0ggMTYvMjI6IGJsb2NrOiBhY2Nlc3Mgd3JpdGVfZ2VuIHdpdGggYXRvbWljcy4uLgpDaGVja2lu
+ZyBQQVRDSCAxNy8yMjogYmxvY2s6IHByb3RlY3QgdHJhY2tlZF9yZXF1ZXN0cyBhbmQgZmx1c2hf
+cXVldWUgd2l0aCByZXFzX2xvY2suLi4KQ2hlY2tpbmcgUEFUQ0ggMTgvMjI6IGJsb2NrOiBpbnRy
+b2R1Y2UgZGlydHlfYml0bWFwX211dGV4Li4uCkNoZWNraW5nIFBBVENIIDE5LzIyOiBtaWdyYXRp
+b24vYmxvY2s6IHJlc2V0IGRpcnR5IGJpdG1hcCBiZWZvcmUgcmVhZGluZy4uLgpDaGVja2luZyBQ
+QVRDSCAyMC8yMjogYmxvY2s6IHByb3RlY3QgbW9kaWZpY2F0aW9uIG9mIGRpcnR5IGJpdG1hcHMg
+d2l0aCBhIG11dGV4Li4uCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiMzMDY6IEZJ
+TEU6IG1pZ3JhdGlvbi9ibG9jay5jOjUzOToKKyAgICAgICAgICAgIGJkcnZfcmVzZXRfZGlydHlf
+Yml0bWFwX2xvY2tlZChibWRzLT5kaXJ0eV9iaXRtYXAsIHNlY3RvciwgbnJfc2VjdG9ycyk7Cgp0
+b3RhbDogMCBlcnJvcnMsIDEgd2FybmluZ3MsIDI3MiBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNo
+IGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJv
+cnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2Vl
+CkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCkNoZWNraW5nIFBBVENIIDIxLzIyOiBibG9jazog
+aW50cm9kdWNlIGJsb2NrX2FjY291bnRfb25lX2lvLi4uCkNoZWNraW5nIFBBVENIIDIyLzIyOiBi
+bG9jazogbWFrZSBhY2NvdW50aW5nIHRocmVhZC1zYWZlLi4uCj09PSBPVVRQVVQgRU5EID09PQoK
+VGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1
+dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5k
+IHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEBmcmVlbGlzdHMub3Jn
