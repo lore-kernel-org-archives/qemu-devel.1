@@ -1,29 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54273)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54304)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dEFpL-0007f2-VG
-	for qemu-devel@nongnu.org; Fri, 26 May 2017 10:02:52 -0400
+	(envelope-from <berrange@redhat.com>) id 1dEFpW-0007qe-KX
+	for qemu-devel@nongnu.org; Fri, 26 May 2017 10:03:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dEFpL-0007vZ-AT
-	for qemu-devel@nongnu.org; Fri, 26 May 2017 10:02:52 -0400
-Received: from mail-qt0-x242.google.com ([2607:f8b0:400d:c0d::242]:33966)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1dEFpL-0007uY-4w
-	for qemu-devel@nongnu.org; Fri, 26 May 2017 10:02:51 -0400
-Received: by mail-qt0-x242.google.com with SMTP id l39so1377850qtb.1
-	for <qemu-devel@nongnu.org>; Fri, 26 May 2017 07:02:51 -0700 (PDT)
-Sender: Richard Henderson <rth7680@gmail.com>
-References: <20170525210508.4910-1-aurelien@aurel32.net>
-	<20170525210508.4910-7-aurelien@aurel32.net>
-From: Richard Henderson <rth@twiddle.net>
-Message-ID: <b58d5377-56cf-a89d-c908-00197bbe2186@twiddle.net>
-Date: Fri, 26 May 2017 07:02:47 -0700
+	(envelope-from <berrange@redhat.com>) id 1dEFpT-0008G3-H4
+	for qemu-devel@nongnu.org; Fri, 26 May 2017 10:03:02 -0400
+Date: Fri, 26 May 2017 15:02:42 +0100
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20170526140242.GK24484@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <20170525163851.8047-1-berrange@redhat.com>
+	<20170525163851.8047-20-berrange@redhat.com>
+	<1acec55c-fd89-ee9d-0082-372a6e967036@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20170525210508.4910-7-aurelien@aurel32.net>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 06/26] target/s390x: implement LOAD PAIR
- FROM QUADWORD
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <1acec55c-fd89-ee9d-0082-372a6e967036@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v7 19/20] qcow2: report encryption specific
+ image information
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,28 +26,91 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Aurelien Jarno <aurelien@aurel32.net>, qemu-devel@nongnu.org
-Cc: Alexander Graf <agraf@suse.de>
+To: Eric Blake <eblake@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Alberto Garcia <berto@igalia.com>, Markus Armbruster <armbru@redhat.com>
 
-On 05/25/2017 02:04 PM, Aurelien Jarno wrote:
-> +static ExitStatus op_lpq(DisasContext *s, DisasOps *o)
-> +{
-> +    /* In a parallel context, stop the world and single step.  */
-> +    if (parallel_cpus) {
-> +        potential_page_fault(s);
-> +        gen_exception(EXCP_ATOMIC);
-> +        return EXIT_NORETURN;
-> +    }
-> +
-> +    /* In a serial context, perform the two loads ... */
-> +    tcg_gen_qemu_ld64(o->out, o->in2, get_mem_index(s));
-> +    tcg_gen_addi_i64(o->in2, o->in2, 8);
-> +    tcg_gen_qemu_ld64(o->out2, o->in2, get_mem_index(s));
-> +    return NO_EXIT;
-> +}
+On Thu, May 25, 2017 at 02:52:30PM -0500, Eric Blake wrote:
+> On 05/25/2017 11:38 AM, Daniel P. Berrange wrote:
+> > Currently 'qemu-img info' reports a simple "encrypted: yes"
+> > field. This is not very useful now that qcow2 can support
+> > multiple encryption formats. Users want to know which format
+> > is in use and some data related to it.
+> > 
+> > Wire up usage of the qcrypto_block_get_info() method so that
+> > 'qemu-img info' can report about the encryption format
+> > and parameters in use
+> > 
+> 
+> > Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
+> > ---
+> >  block/qcow2.c        | 35 ++++++++++++++++++++++++++++++++++-
+> >  qapi/block-core.json | 24 +++++++++++++++++++++++-
+> >  2 files changed, 57 insertions(+), 2 deletions(-)
+> > 
+> > diff --git a/block/qcow2.c b/block/qcow2.c
+> > index 38f9eb5..cb321a2 100644
+> > --- a/block/qcow2.c
+> > +++ b/block/qcow2.c
+> > @@ -3196,8 +3196,17 @@ static int qcow2_get_info(BlockDriverState *bs, BlockDriverInfo *bdi)
+> >  static ImageInfoSpecific *qcow2_get_specific_info(BlockDriverState *bs)
+> >  {
+> >      BDRVQcow2State *s = bs->opaque;
+> > -    ImageInfoSpecific *spec_info = g_new(ImageInfoSpecific, 1);
+> > +    ImageInfoSpecific *spec_info;
+> > +    QCryptoBlockInfo *encrypt_info = NULL;
+> >  
+> > +    if (s->crypto != NULL) {
+> > +        encrypt_info = qcrypto_block_get_info(s->crypto, NULL);
+> 
+> Worth using &error_abort instead of silently ignoring the error?  Is an
+> error even possible in our output visitor [adding Markus for reference]?
 
-This can be implemented in a parallel context with helper_atomic_ldo_be_mmu, 
-though that must be done with a helper function.
+In fact the qcrypto_block_get_info() will never return an error
+right now as implemented. So I guess we could even just remove
+the Error **errp parameter from that call
 
+> 
+> > +        if (!encrypt_info) {
+> > +            return NULL;
+> > +        }
+> 
+> If you use &error_abort, this is a dead check.
+> 
+> > +    }
+> > +
+> > +    spec_info = g_new(ImageInfoSpecific, 1);
 
-r~
+> > +    if (encrypt_info) {
+> > +        ImageInfoSpecificQCow2Encryption *qencrypt =
+> > +            g_new(ImageInfoSpecificQCow2Encryption, 1);
+> > +        switch (encrypt_info->format) {
+> > +        case Q_CRYPTO_BLOCK_FORMAT_QCOW:
+> > +            qencrypt->format = BLOCKDEV_QCOW2_ENCRYPTION_FORMAT_AES;
+> > +            qencrypt->u.aes = encrypt_info->u.qcow;
+> > +            break;
+> > +        case Q_CRYPTO_BLOCK_FORMAT_LUKS:
+> > +            qencrypt->format = BLOCKDEV_QCOW2_ENCRYPTION_FORMAT_LUKS;
+> > +            qencrypt->u.luks = encrypt_info->u.luks;
+> > +            break;
+> > +        default:
+> > +            assert(false);
+> > +        }
+> > +        /* Since we did shallow copy above, erase any pointers
+> > +         * in the original info */
+> > +        memset(&encrypt_info->u, 0, sizeof(encrypt_info->u));
+> > +        qapi_free_QCryptoBlockInfo(encrypt_info);
+> 
+> Does QAPI_CLONE_MEMBERS (commit 4626a19c) make this code any easier to
+> write?  Then again, malloc'ing duplicates to then free the unchanged
+> original is a bit slower than stealing references from the original then
+> making sure the original can be freed without problem.
+
+I don't think CLONE would make a signijficant difference to the size
+of the code, since we have to remap the enum constants regardless.
+
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
