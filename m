@@ -1,23 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51801)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52195)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dEFg8-0008Tp-Gq
-	for qemu-devel@nongnu.org; Fri, 26 May 2017 09:53:21 -0400
+	(envelope-from <marcel@redhat.com>) id 1dEFha-00012a-P4
+	for qemu-devel@nongnu.org; Fri, 26 May 2017 09:54:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dEFg7-0004tH-Ju
-	for qemu-devel@nongnu.org; Fri, 26 May 2017 09:53:20 -0400
-Date: Fri, 26 May 2017 14:53:09 +0100
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170526135309.GI24484@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <20170525163851.8047-1-berrange@redhat.com>
-	<20170525163851.8047-10-berrange@redhat.com>
-	<w51bmqflt9f.fsf@maestria.local.igalia.com>
+	(envelope-from <marcel@redhat.com>) id 1dEFhX-0005Pp-MO
+	for qemu-devel@nongnu.org; Fri, 26 May 2017 09:54:50 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:39772)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <marcel@redhat.com>) id 1dEFhX-0005Pg-Cx
+	for qemu-devel@nongnu.org; Fri, 26 May 2017 09:54:47 -0400
+References: <19feea44a3f4010645a1b829b504481f1b574b9a.1495797845.git.maozy.fnst@cn.fujitsu.com>
+From: Marcel Apfelbaum <marcel@redhat.com>
+Message-ID: <45337174-a362-5520-d0ea-7fb20d61e9a7@redhat.com>
+Date: Fri, 26 May 2017 16:54:38 +0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <w51bmqflt9f.fsf@maestria.local.igalia.com>
-Subject: Re: [Qemu-devel] [PATCH v7 09/20] qcow: convert QCow to use
- QCryptoBlock for encryption
+In-Reply-To: <19feea44a3f4010645a1b829b504481f1b574b9a.1495797845.git.maozy.fnst@cn.fujitsu.com>
+Content-Language: en-US
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2] pci: Set err to errp directly rather
+ than through error_porpagate()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,65 +28,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alberto Garcia <berto@igalia.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, Eric Blake <eblake@redhat.com>, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>
+To: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>, qemu-devel@nongnu.org
+Cc: mst@redhat.com, imammedo@redhat.com, armbru@redhat.com
 
-On Fri, May 26, 2017 at 02:03:40PM +0200, Alberto Garcia wrote:
-> On Thu 25 May 2017 06:38:40 PM CEST, Daniel P. Berrange wrote:
-> > @@ -105,6 +116,13 @@ static int qcow_open(BlockDriverState *bs, QDict *options, int flags,
-> >      int ret;
-> >      QCowHeader header;
-> >      Error *local_err = NULL;
-> > +    QCryptoBlockOpenOptions *crypto_opts = NULL;
-> > +    unsigned int cflags = 0;
-> > +    QDict *encryptopts = NULL;
-> > +    const char *encryptfmt;
-> > +
-> > +    qdict_extract_subqdict(options, &encryptopts, "encrypt.");
-> > +    encryptfmt = qdict_get_try_str(encryptopts, "format");
-> >  
-> >      bs->file = bdrv_open_child(NULL, options, "file", bs, &child_file,
-> >                                 false, errp);
-> >      if (!bs->file) {
-> >          return -EINVAL;
-> >      }
-> 
-> You're leaking encryptopts if the function returns here.
-> 
-> > @@ -873,6 +850,20 @@ static int qcow_create(const char *filename, QemuOpts *opts, Error **errp)
-> >              goto exit;
-> >          }
-> >          header.crypt_method = cpu_to_be32(QCOW_CRYPT_AES);
-> > +
-> > +        crypto_opts = block_crypto_create_opts_init(
-> > +            Q_CRYPTO_BLOCK_FORMAT_QCOW, encryptopts, &local_err);
-> > +        if (local_err) {
-> > +            error_propagate(errp, local_err);
-> > +            ret = -EINVAL;
-> > +            goto exit;
-> > +        }
-> 
-> Not very important, and my fault for not having pointed it out in my
-> previous review, but you can spare the error_propagate() call if you
-> pass errp directly to block_crypto_create_opts_init() and then check if
-> crypto_opts is NULL.
-> 
-> Actually none of the error_propagate() calls in qcow_create() is really
-> necessary, but that could be fixed in a separate patch, if at all (it's
-> not so important).
 
-Since I have to re-post to fix the leak anyway, I'll eliminate the
-intermedia local_err usage - I like to avoid that when not needed
-anyway.
 
-> 
-> The leak however needs to be fixed. With that,
-> 
-> Reviewed-by: Alberto Garcia <berto@igalia.com>
+On 26/05/2017 14:58, Mao Zhongyi wrote:
+> ioh3420_interrupts_init() and its callers rp_realize() fill error
+> message to local_err, then propagate it to errp by error_porpagate(),
+> which's not necessary. So eliminate it and pass errp directly instead
+> of local_err. Of course, error_propagate() also has been removed.
+>
+> Signed-off-by: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
+> ---
+> v2:
+> * Drop the part of wrong handling that ignored the fact that if
+>    pci_qdev_realize()'s caller pass errp = NULL.
+>
+>   hw/pci-bridge/ioh3420.c        | 4 +---
+>   hw/pci-bridge/pcie_root_port.c | 7 ++-----
+>   2 files changed, 3 insertions(+), 8 deletions(-)
+>
+> diff --git a/hw/pci-bridge/ioh3420.c b/hw/pci-bridge/ioh3420.c
+> index da4e5bd..5f56a2f 100644
+> --- a/hw/pci-bridge/ioh3420.c
+> +++ b/hw/pci-bridge/ioh3420.c
+> @@ -64,15 +64,13 @@ static uint8_t ioh3420_aer_vector(const PCIDevice *d)
+>   static int ioh3420_interrupts_init(PCIDevice *d, Error **errp)
+>   {
+>       int rc;
+> -    Error *local_err = NULL;
+>   
+>       rc = msi_init(d, IOH_EP_MSI_OFFSET, IOH_EP_MSI_NR_VECTOR,
+>                     IOH_EP_MSI_SUPPORTED_FLAGS & PCI_MSI_FLAGS_64BIT,
+>                     IOH_EP_MSI_SUPPORTED_FLAGS & PCI_MSI_FLAGS_MASKBIT,
+> -                  &local_err);
+> +                  errp);
+>       if (rc < 0) {
+>           assert(rc == -ENOTSUP);
+> -        error_propagate(errp, local_err);
+>       }
+>   
+>       return rc;
+> diff --git a/hw/pci-bridge/pcie_root_port.c b/hw/pci-bridge/pcie_root_port.c
+> index cf36318..9022996 100644
+> --- a/hw/pci-bridge/pcie_root_port.c
+> +++ b/hw/pci-bridge/pcie_root_port.c
+> @@ -59,7 +59,6 @@ static void rp_realize(PCIDevice *d, Error **errp)
+>       PCIDeviceClass *dc = PCI_DEVICE_GET_CLASS(d);
+>       PCIERootPortClass *rpc = PCIE_ROOT_PORT_GET_CLASS(d);
+>       int rc;
+> -    Error *local_err = NULL;
+>   
+>       pci_config_set_interrupt_pin(d->config, 1);
+>       pci_bridge_initfn(d, TYPE_PCIE_BUS);
+> @@ -72,9 +71,8 @@ static void rp_realize(PCIDevice *d, Error **errp)
+>       }
+>   
+>       if (rpc->interrupts_init) {
+> -        rc = rpc->interrupts_init(d, &local_err);
+> +        rc = rpc->interrupts_init(d, errp);
+>           if (rc < 0) {
+> -            error_propagate(errp, local_err);
+>               goto err_bridge;
+>           }
+>       }
+> @@ -98,9 +96,8 @@ static void rp_realize(PCIDevice *d, Error **errp)
+>       }
+>   
+>       rc = pcie_aer_init(d, PCI_ERR_VER, rpc->aer_offset,
+> -                       PCI_ERR_SIZEOF, &local_err);
+> +                       PCI_ERR_SIZEOF, errp);
+>       if (rc < 0) {
+> -        error_propagate(errp, local_err);
+>           goto err;
+>       }
+>       pcie_aer_root_init(d);
 
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+Reviewed-by: Marcel Apfelbaum<marcel@redhat.com>
+
+Thanks,
+Marcel
