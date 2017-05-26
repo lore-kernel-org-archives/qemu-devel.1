@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57512)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58000)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dE7lP-0001mu-RL
-	for qemu-devel@nongnu.org; Fri, 26 May 2017 01:26:16 -0400
+	(envelope-from <ann.zhuangyanying@huawei.com>) id 1dE7nZ-00052W-KE
+	for qemu-devel@nongnu.org; Fri, 26 May 2017 01:28:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dE7lO-0008LT-TC
-	for qemu-devel@nongnu.org; Fri, 26 May 2017 01:26:15 -0400
-Date: Fri, 26 May 2017 15:26:06 +1000
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20170526052606.GK12929@umbus.fritz.box>
-References: <20170524121048.10067-1-lvivier@redhat.com>
-	<87k2555sl2.fsf@secure.mitica>
+	(envelope-from <ann.zhuangyanying@huawei.com>) id 1dE7nV-0000XI-Ju
+	for qemu-devel@nongnu.org; Fri, 26 May 2017 01:28:29 -0400
+Received: from szxga01-in.huawei.com ([45.249.212.187]:4001)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
+	(envelope-from <ann.zhuangyanying@huawei.com>) id 1dE7nU-0000VW-Vf
+	for qemu-devel@nongnu.org; Fri, 26 May 2017 01:28:25 -0400
+From: Zhuangyanying <ann.zhuangyanying@huawei.com>
+Date: Fri, 26 May 2017 13:16:48 +0800
+Message-ID: <1495775808-10396-1-git-send-email-ann.zhuangyanying@huawei.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="/rDaUNvWv5XYRSKj"
-Content-Disposition: inline
-In-Reply-To: <87k2555sl2.fsf@secure.mitica>
-Subject: Re: [Qemu-devel] [PATCH] migration: remove register_savevm()
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH v3] KVM: x86: Fix nmi injection failure when
+ vcpu got blocked
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,55 +24,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Juan Quintela <quintela@redhat.com>
-Cc: Laurent Vivier <lvivier@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, rnsastry@linux.vnet.ibm.com, Bharata B Rao <bharata@linux.vnet.ibm.com>, qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>, Jason Wang <jasowang@redhat.com>, Dmitry Fleytman <dmitry@daynix.com>, Cornelia Huck <cornelia.huck@de.ibm.com>, qemu-ppc@nongnu.org, Samuel Thibault <samuel.thibault@ens-lyon.org>, sam.bobroff@au1.ibm.com, Peter Xu <peterx@redhat.com>
+To: pbonzini@redhat.com, rkrcmar@redhat.com
+Cc: herongguang.he@huawei.com, qemu-devel@nongnu.org, arei.gonglei@huawei.com, oscar.zhangbo@huawei.com, kvm@vger.kernel.org, ZhuangYanying <ann.zhuangyanying@huawei.com>
 
+From: ZhuangYanying <ann.zhuangyanying@huawei.com>
 
---/rDaUNvWv5XYRSKj
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+When spin_lock_irqsave() deadlock occurs inside the guest, vcpu threads,
+other than the lock-holding one, would enter into S state because of
+pvspinlock. Then inject NMI via libvirt API "inject-nmi", the NMI could
+not be injected into vm.
 
-On Thu, May 25, 2017 at 09:00:25AM +0200, Juan Quintela wrote:
-> Laurent Vivier <lvivier@redhat.com> wrote:
-> D> We can replace the four remaining calls of register_savevm() by
-> > calls to register_savevm_live(). So we can remove the function and
-> > as we don't allocate anymore the ops pointer with g_new0()
-> > we don't have to free it then.
-> >
-> > Signed-off-by: Laurent Vivier <lvivier@redhat.com>
->=20
-> Reviewed-by: Juan Quintela <quintela@redhat.com>
->=20
-> As this is needed for Power, letting them go through their tree.
+The reason is:
+1 It sets nmi_queued to 1 when calling ioctl KVM_NMI in qemu, and sets
+cpu->kvm_vcpu_dirty to true in do_inject_external_nmi() meanwhile.
+2 It sets nmi_queued to 0 in process_nmi(), before entering guest, because
+cpu->kvm_vcpu_dirty is true.
 
-Thanks for the ack, I've put this into my ppc-for-2.10 tree.
+It's not enough just to check nmi_queued to decide whether to stay in
+vcpu_block() or not. NMI should be injected immediately at any situation.
+Add checking nmi_pending, and testing KVM_REQ_NMI replaces nmi_queued
+in vm_vcpu_has_events().
 
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
+Do the same change for SMIs.
 
---/rDaUNvWv5XYRSKj
-Content-Type: application/pgp-signature; name="signature.asc"
+Signed-off-by: Zhuang Yanying <ann.zhuangyanying@huawei.com>
+---
+v1->v2
+  - simplify message. The complete description is here:
+    http://www.spinics.net/lists/kvm/msg150380.html
+  - Testing KVM_REQ_NMI replaces nmi_pending.
+  - Add Testing kvm_x86_ops->nmi_allowed(vcpu).
+v2->v3
+  - Testing KVM_REQ_NMI replaces nmi_queued, not nmi_pending.
+  - Do the same change for SMIs. 
+---
+ arch/x86/kvm/x86.c | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-
-iQIcBAEBCAAGBQJZJ7xsAAoJEGw4ysog2bOSd5cP/1L7EG2Wh9rieMZdxnAkf86v
-XQmwQ7pVqc1drByEB4aucM3fNzd+YDruNVEZaCaIxJ/seu084D9/0jAp3iZ0bUQF
-/dpPlxtjuZY4vxbcHET8rtnSy2CYIIcuDnPcIUhI+KV1F37ppGX7lM1AOrLEBfCp
-iQCABkqzqgq3yNlCWlHBg2A3jI0ekjdRihjbBNTD+WZ8z3nRtJbX6Sx6ILWs4cdZ
-rrtvJLqAIINAx6lgMZIB2Lk/zuqpHzqvs7peo1+kc4Lt76qx97MXJN1noBbWS7nJ
-Pgf5VWP9oxIhIVJFLPbCcrRgEFOuu7aTYPFtFqPdnKA1c3jt5Fn5xwM/GUImZJ+s
-MWlK3yaPvTvFieGNM2ev/bIY1E92ZLjo/ETPpfC5HLrcTQ8ZVvktwPixQkWUM/vJ
-LlyHVJEF2gZ+Q/vNXSjc9tSLaGupcw2L1evUMsv8wYf0EXXhX8FaQK2iUr3RT9wT
-5B9TIJPlw9jJrmzqoM+Pz2wxM375bQPtNh498wOZOz3pqFPdCGUULxvf08s+0um6
-9WB1xO4UPOsuJI9yyNjSEyCTYy/lMlujdtpABc6kMPbe98vCBopqMC3m3jKBsrUS
-0wOckuWYZOPFYzVdGLFBbtjlbV5UnnRbXx1X2dcZWMYBAZ8PB+z1kGLJCUIxb3OJ
-JZQPkEVuT5bMoM6YBg6g
-=qeXA
------END PGP SIGNATURE-----
-
---/rDaUNvWv5XYRSKj--
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 02363e3..a2cd099 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -8394,10 +8394,13 @@ static inline bool kvm_vcpu_has_events(struct kvm_vcpu *vcpu)
+ 	if (vcpu->arch.pv.pv_unhalted)
+ 		return true;
+ 
+-	if (atomic_read(&vcpu->arch.nmi_queued))
++	if (kvm_test_request(KVM_REQ_NMI, vcpu) ||
++	    (vcpu->arch.nmi_pending &&
++	     kvm_x86_ops->nmi_allowed(vcpu)))
+ 		return true;
+ 
+-	if (kvm_test_request(KVM_REQ_SMI, vcpu))
++	if (kvm_test_request(KVM_REQ_SMI, vcpu) ||
++	    (vcpu->arch.smi_pending && !is_smm(vcpu)))
+ 		return true;
+ 
+ 	if (kvm_arch_interrupt_allowed(vcpu) &&
+-- 
+1.8.3.1
