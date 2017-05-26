@@ -1,21 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59734)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59748)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <maxime.coquelin@redhat.com>) id 1dEGFB-0001Fl-2d
-	for qemu-devel@nongnu.org; Fri, 26 May 2017 10:29:37 -0400
+	(envelope-from <maxime.coquelin@redhat.com>) id 1dEGFH-0001K4-6s
+	for qemu-devel@nongnu.org; Fri, 26 May 2017 10:29:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <maxime.coquelin@redhat.com>) id 1dEGF9-00087J-GA
-	for qemu-devel@nongnu.org; Fri, 26 May 2017 10:29:33 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:36428)
+	(envelope-from <maxime.coquelin@redhat.com>) id 1dEGFD-0008GF-8z
+	for qemu-devel@nongnu.org; Fri, 26 May 2017 10:29:39 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:35558)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <maxime.coquelin@redhat.com>)
-	id 1dEGF9-00085F-6t
-	for qemu-devel@nongnu.org; Fri, 26 May 2017 10:29:31 -0400
+	id 1dEGFD-0008Dr-3Q
+	for qemu-devel@nongnu.org; Fri, 26 May 2017 10:29:35 -0400
 From: Maxime Coquelin <maxime.coquelin@redhat.com>
-Date: Fri, 26 May 2017 16:28:54 +0200
-Message-Id: <20170526142858.19931-3-maxime.coquelin@redhat.com>
+Date: Fri, 26 May 2017 16:28:55 +0200
+Message-Id: <20170526142858.19931-4-maxime.coquelin@redhat.com>
 In-Reply-To: <20170526142858.19931-1-maxime.coquelin@redhat.com>
 References: <20170526142858.19931-1-maxime.coquelin@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 2/6] vhost: rework IOTLB messaging
+Subject: [Qemu-devel] [PATCH v2 3/6] vhost: extend ring information update
+ for IOTLB to all rings
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,270 +28,44 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: mst@redhat.com, peterx@redhat.com, marcandre.lureau@gmail.com, vkaplans@redhat.com, jasowang@redhat.com, wexu@redhat.com, yuanhan.liu@linux.intel.com, qemu-devel@nongnu.org, jfreiman@redhat.com
 Cc: Maxime Coquelin <maxime.coquelin@redhat.com>
 
-This patch reworks IOTLB messaging to prepare for vhost-user
-device IOTLB support.
+Vhost-kernel backend need to receive IOTLB entry for used ring
+information early, which is done by triggering a miss event on
+its address.
 
-IOTLB messages handling is extracted from vhost-kernel backend,
-so that only the messages transport remains backend specifics.
+This patch extends this behaviour to all rings information, to be
+compatible with vhost-user backend design.
 
 Signed-off-by: Maxime Coquelin <maxime.coquelin@redhat.com>
 ---
-v2: Work around GCC 4.4.7 limitation wrt to assignment at declaration time
-with unnamed unions:
-https://lists.gnu.org/archive/html/qemu-devel/2017-05/msg02704.html
+v2:
+ - Revert back to existing behaviour, i.e. only send IOTLB updates
+at ring enablement time, not at ring address setting time (mst).
+ - Extend IOTLB misses to all ring addresses, not only used ring.
 
- hw/virtio/vhost-backend.c         | 130 +++++++++++++++++++++-----------------
- hw/virtio/vhost.c                 |   8 +--
- include/hw/virtio/vhost-backend.h |  23 ++++---
- 3 files changed, 92 insertions(+), 69 deletions(-)
+ hw/virtio/vhost.c | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
 
-diff --git a/hw/virtio/vhost-backend.c b/hw/virtio/vhost-backend.c
-index be927b8..4e31de1 100644
---- a/hw/virtio/vhost-backend.c
-+++ b/hw/virtio/vhost-backend.c
-@@ -192,7 +192,6 @@ static void vhost_kernel_iotlb_read(void *opaque)
-     ssize_t len;
- 
-     while ((len = read((uintptr_t)dev->opaque, &msg, sizeof msg)) > 0) {
--        struct vhost_iotlb_msg *imsg = &msg.iotlb;
-         if (len < sizeof msg) {
-             error_report("Wrong vhost message len: %d", (int)len);
-             break;
-@@ -201,70 +200,21 @@ static void vhost_kernel_iotlb_read(void *opaque)
-             error_report("Unknown vhost iotlb message type");
-             break;
-         }
--        switch (imsg->type) {
--        case VHOST_IOTLB_MISS:
--            vhost_device_iotlb_miss(dev, imsg->iova,
--                                    imsg->perm != VHOST_ACCESS_RO);
--            break;
--        case VHOST_IOTLB_UPDATE:
--        case VHOST_IOTLB_INVALIDATE:
--            error_report("Unexpected IOTLB message type");
--            break;
--        case VHOST_IOTLB_ACCESS_FAIL:
--            /* FIXME: report device iotlb error */
--            break;
--        default:
--            break;
--        }
--    }
--}
- 
--static int vhost_kernel_update_device_iotlb(struct vhost_dev *dev,
--                                            uint64_t iova, uint64_t uaddr,
--                                            uint64_t len,
--                                            IOMMUAccessFlags perm)
--{
--    struct vhost_msg msg;
--    msg.type = VHOST_IOTLB_MSG;
--    msg.iotlb.iova =  iova;
--    msg.iotlb.uaddr = uaddr;
--    msg.iotlb.size = len;
--    msg.iotlb.type = VHOST_IOTLB_UPDATE;
--
--    switch (perm) {
--    case IOMMU_RO:
--        msg.iotlb.perm = VHOST_ACCESS_RO;
--        break;
--    case IOMMU_WO:
--        msg.iotlb.perm = VHOST_ACCESS_WO;
--        break;
--    case IOMMU_RW:
--        msg.iotlb.perm = VHOST_ACCESS_RW;
--        break;
--    default:
--        g_assert_not_reached();
--    }
--
--    if (write((uintptr_t)dev->opaque, &msg, sizeof msg) != sizeof msg) {
--        error_report("Fail to update device iotlb");
--        return -EFAULT;
-+        vhost_backend_handle_iotlb_msg(dev, &msg.iotlb);
-     }
--
--    return 0;
- }
- 
--static int vhost_kernel_invalidate_device_iotlb(struct vhost_dev *dev,
--                                                uint64_t iova, uint64_t len)
-+static int vhost_kernel_send_device_iotlb_msg(struct vhost_dev *dev,
-+                                              struct vhost_iotlb_msg *imsg)
- {
-     struct vhost_msg msg;
- 
-     msg.type = VHOST_IOTLB_MSG;
--    msg.iotlb.iova = iova;
--    msg.iotlb.size = len;
--    msg.iotlb.type = VHOST_IOTLB_INVALIDATE;
-+    msg.iotlb = *imsg;
- 
-     if (write((uintptr_t)dev->opaque, &msg, sizeof msg) != sizeof msg) {
--        error_report("Fail to invalidate device iotlb");
-+        error_report("Fail to update device iotlb");
-         return -EFAULT;
-     }
- 
-@@ -311,8 +261,7 @@ static const VhostOps kernel_ops = {
-         .vhost_vsock_set_running = vhost_kernel_vsock_set_running,
- #endif /* CONFIG_VHOST_VSOCK */
-         .vhost_set_iotlb_callback = vhost_kernel_set_iotlb_callback,
--        .vhost_update_device_iotlb = vhost_kernel_update_device_iotlb,
--        .vhost_invalidate_device_iotlb = vhost_kernel_invalidate_device_iotlb,
-+        .vhost_send_device_iotlb_msg = vhost_kernel_send_device_iotlb_msg,
- };
- 
- int vhost_set_backend_type(struct vhost_dev *dev, VhostBackendType backend_type)
-@@ -333,3 +282,70 @@ int vhost_set_backend_type(struct vhost_dev *dev, VhostBackendType backend_type)
- 
-     return r;
- }
-+
-+int vhost_backend_update_device_iotlb(struct vhost_dev *dev,
-+                                             uint64_t iova, uint64_t uaddr,
-+                                             uint64_t len,
-+                                             IOMMUAccessFlags perm)
-+{
-+    struct vhost_iotlb_msg imsg;
-+
-+    imsg.iova =  iova;
-+    imsg.uaddr = uaddr;
-+    imsg.size = len;
-+    imsg.type = VHOST_IOTLB_UPDATE;
-+
-+    switch (perm) {
-+    case IOMMU_RO:
-+        imsg.perm = VHOST_ACCESS_RO;
-+        break;
-+    case IOMMU_WO:
-+        imsg.perm = VHOST_ACCESS_WO;
-+        break;
-+    case IOMMU_RW:
-+        imsg.perm = VHOST_ACCESS_RW;
-+        break;
-+    default:
-+        return -EINVAL;
-+    }
-+
-+    return dev->vhost_ops->vhost_send_device_iotlb_msg(dev, &imsg);
-+}
-+
-+int vhost_backend_invalidate_device_iotlb(struct vhost_dev *dev,
-+                                                 uint64_t iova, uint64_t len)
-+{
-+    struct vhost_iotlb_msg imsg;
-+
-+    imsg.iova = iova;
-+    imsg.size = len;
-+    imsg.type = VHOST_IOTLB_INVALIDATE;
-+
-+    return dev->vhost_ops->vhost_send_device_iotlb_msg(dev, &imsg);
-+}
-+
-+int vhost_backend_handle_iotlb_msg(struct vhost_dev *dev,
-+                                          struct vhost_iotlb_msg *imsg)
-+{
-+    int ret = 0;
-+
-+    switch (imsg->type) {
-+    case VHOST_IOTLB_MISS:
-+        ret = vhost_device_iotlb_miss(dev, imsg->iova,
-+                                      imsg->perm != VHOST_ACCESS_RO);
-+        break;
-+    case VHOST_IOTLB_ACCESS_FAIL:
-+        /* FIXME: report device iotlb error */
-+        error_report("Access failure IOTLB message type not supported");
-+        ret = -ENOTSUP;
-+        break;
-+    case VHOST_IOTLB_UPDATE:
-+    case VHOST_IOTLB_INVALIDATE:
-+    default:
-+        error_report("Unexpected IOTLB message type");
-+        ret = -EINVAL;
-+        break;
-+    }
-+
-+    return ret;
-+}
 diff --git a/hw/virtio/vhost.c b/hw/virtio/vhost.c
-index 8fab12d..6eddb09 100644
+index 6eddb09..7867034 100644
 --- a/hw/virtio/vhost.c
 +++ b/hw/virtio/vhost.c
-@@ -724,8 +724,8 @@ static void vhost_iommu_unmap_notify(IOMMUNotifier *n, IOMMUTLBEntry *iotlb)
-     struct vhost_dev *hdev = iommu->hdev;
-     hwaddr iova = iotlb->iova + iommu->iommu_offset;
+@@ -1552,11 +1552,15 @@ int vhost_dev_start(struct vhost_dev *hdev, VirtIODevice *vdev)
+     if (vhost_dev_has_iommu(hdev)) {
+         hdev->vhost_ops->vhost_set_iotlb_callback(hdev, true);
  
--    if (hdev->vhost_ops->vhost_invalidate_device_iotlb(hdev, iova,
--                                                       iotlb->addr_mask + 1)) {
-+    if (vhost_backend_invalidate_device_iotlb(hdev, iova,
-+                                              iotlb->addr_mask + 1)) {
-         error_report("Fail to invalidate device iotlb");
+-        /* Update used ring information for IOTLB to work correctly,
+-         * vhost-kernel code requires for this.*/
++        /*
++         * Update rings information for IOTLB to work correctly,
++         * vhost-kernel and vhost-user codes require for this.
++         */
+         for (i = 0; i < hdev->nvqs; ++i) {
+             struct vhost_virtqueue *vq = hdev->vqs + i;
+             vhost_device_iotlb_miss(hdev, vq->used_phys, true);
++            vhost_device_iotlb_miss(hdev, vq->desc_phys, true);
++            vhost_device_iotlb_miss(hdev, vq->avail_phys, true);
+         }
      }
- }
-@@ -993,8 +993,8 @@ int vhost_device_iotlb_miss(struct vhost_dev *dev, uint64_t iova, int write)
-         len = MIN(iotlb.addr_mask + 1, len);
-         iova = iova & ~iotlb.addr_mask;
- 
--        ret = dev->vhost_ops->vhost_update_device_iotlb(dev, iova, uaddr,
--                                                      len, iotlb.perm);
-+        ret = vhost_backend_update_device_iotlb(dev, iova, uaddr,
-+                                                len, iotlb.perm);
-         if (ret) {
-             error_report("Fail to update device iotlb");
-             goto out;
-diff --git a/include/hw/virtio/vhost-backend.h b/include/hw/virtio/vhost-backend.h
-index c3cf4a7..a7a5f22 100644
---- a/include/hw/virtio/vhost-backend.h
-+++ b/include/hw/virtio/vhost-backend.h
-@@ -27,6 +27,7 @@ struct vhost_vring_file;
- struct vhost_vring_state;
- struct vhost_vring_addr;
- struct vhost_scsi_target;
-+struct vhost_iotlb_msg;
- 
- typedef int (*vhost_backend_init)(struct vhost_dev *dev, void *opaque);
- typedef int (*vhost_backend_cleanup)(struct vhost_dev *dev);
-@@ -81,12 +82,8 @@ typedef int (*vhost_vsock_set_guest_cid_op)(struct vhost_dev *dev,
- typedef int (*vhost_vsock_set_running_op)(struct vhost_dev *dev, int start);
- typedef void (*vhost_set_iotlb_callback_op)(struct vhost_dev *dev,
-                                            int enabled);
--typedef int (*vhost_update_device_iotlb_op)(struct vhost_dev *dev,
--                                            uint64_t iova, uint64_t uaddr,
--                                            uint64_t len,
--                                            IOMMUAccessFlags perm);
--typedef int (*vhost_invalidate_device_iotlb_op)(struct vhost_dev *dev,
--                                                uint64_t iova, uint64_t len);
-+typedef int (*vhost_send_device_iotlb_msg_op)(struct vhost_dev *dev,
-+                                              struct vhost_iotlb_msg *imsg);
- 
- typedef struct VhostOps {
-     VhostBackendType backend_type;
-@@ -120,8 +117,7 @@ typedef struct VhostOps {
-     vhost_vsock_set_guest_cid_op vhost_vsock_set_guest_cid;
-     vhost_vsock_set_running_op vhost_vsock_set_running;
-     vhost_set_iotlb_callback_op vhost_set_iotlb_callback;
--    vhost_update_device_iotlb_op vhost_update_device_iotlb;
--    vhost_invalidate_device_iotlb_op vhost_invalidate_device_iotlb;
-+    vhost_send_device_iotlb_msg_op vhost_send_device_iotlb_msg;
- } VhostOps;
- 
- extern const VhostOps user_ops;
-@@ -129,4 +125,15 @@ extern const VhostOps user_ops;
- int vhost_set_backend_type(struct vhost_dev *dev,
-                            VhostBackendType backend_type);
- 
-+int vhost_backend_update_device_iotlb(struct vhost_dev *dev,
-+                                             uint64_t iova, uint64_t uaddr,
-+                                             uint64_t len,
-+                                             IOMMUAccessFlags perm);
-+
-+int vhost_backend_invalidate_device_iotlb(struct vhost_dev *dev,
-+                                                 uint64_t iova, uint64_t len);
-+
-+int vhost_backend_handle_iotlb_msg(struct vhost_dev *dev,
-+                                          struct vhost_iotlb_msg *imsg);
-+
- #endif /* VHOST_BACKEND_H */
+     return 0;
 -- 
 2.9.4
