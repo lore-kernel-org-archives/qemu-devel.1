@@ -1,21 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58880)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59436)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1dEjXV-0005RV-Fd
-	for qemu-devel@nongnu.org; Sat, 27 May 2017 17:46:27 -0400
+	(envelope-from <no-reply@patchew.org>) id 1dEjdE-00086i-LT
+	for qemu-devel@nongnu.org; Sat, 27 May 2017 17:52:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1dEjXS-0003Fm-Dv
-	for qemu-devel@nongnu.org; Sat, 27 May 2017 17:46:25 -0400
-Received: from hera.aquilenet.fr ([141.255.128.1]:43416)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1dEjXS-0003Ad-6p
-	for qemu-devel@nongnu.org; Sat, 27 May 2017 17:46:22 -0400
-From: Samuel Thibault <samuel.thibault@ens-lyon.org>
-Date: Sat, 27 May 2017 23:46:15 +0200
-Message-Id: <20170527214618.32626-1-samuel.thibault@ens-lyon.org>
+	(envelope-from <no-reply@patchew.org>) id 1dEjdB-0008UA-E2
+	for qemu-devel@nongnu.org; Sat, 27 May 2017 17:52:20 -0400
+Resent-Message-Id: <E1dEjdB-0008UA-E2@eggs.gnu.org>
+Received: from sender-of-o52.zoho.com ([135.84.80.217]:21343)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1dEjdB-0008Qz-61
+	for qemu-devel@nongnu.org; Sat, 27 May 2017 17:52:17 -0400
+Reply-To: <qemu-devel@nongnu.org>
+In-Reply-To: <20170527214618.32626-1-samuel.thibault@ens-lyon.org>
+Message-ID: <149592192076.333.12993342489316324945@750cb16fd6f2>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 0/3] slirp updates
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Sat, 27 May 2017 14:52:01 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PULL 0/3] slirp updates
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,38 +28,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Samuel Thibault <samuel.thibault@ens-lyon.org>, stefanha@redhat.com, jan.kiszka@siemens.com
+To: samuel.thibault@ens-lyon.org
+Cc: famz@redhat.com, qemu-devel@nongnu.org, stefanha@redhat.com, jan.kiszka@siemens.com
 
-The following changes since commit 9964e96dc9999cf7f7c936ee854a795415d19b=
-60:
-
-  Merge remote-tracking branch 'jasowang/tags/net-pull-request' into stag=
-ing (2017-05-23 15:01:31 +0100)
-
-are available in the git repository at:
-
-  http://people.debian.org/~sthibault/qemu.git tags/samuel-thibault
-
-for you to fetch changes up to 2e30230aa95a2d6cfaadac015bd96c3db19c45e4:
-
-  Fix total IP header length in forwarded TCP packets (2017-05-27 23:35:0=
-0 +0200)
-
-----------------------------------------------------------------
-slirp updates
-
-----------------------------------------------------------------
-Marc-Andr=C3=A9 Lureau (1):
-      slirp: fix leak
-
-Sjors Gielen (1):
-      Fix total IP header length in forwarded TCP packets
-
-Tao Wu (1):
-      slirp: Fix wrong mss bug.
-
- slirp/socket.c    | 3 +++
- slirp/tcp_input.c | 4 ++--
- slirp/tcp_subr.c  | 4 ++--
- 3 files changed, 7 insertions(+), 4 deletions(-)
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKU3ViamVjdDogW1FlbXUt
+ZGV2ZWxdIFtQVUxMIDAvM10gc2xpcnAgdXBkYXRlcwpNZXNzYWdlLWlkOiAyMDE3MDUyNzIxNDYx
+OC4zMjYyNi0xLXNhbXVlbC50aGliYXVsdEBlbnMtbHlvbi5vcmcKVHlwZTogc2VyaWVzCgo9PT0g
+VEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCgpCQVNFPWJhc2UKbj0xCnRvdGFsPSQo
+Z2l0IGxvZyAtLW9uZWxpbmUgJEJBU0UuLiB8IHdjIC1sKQpmYWlsZWQ9MAoKZ2l0IGNvbmZpZyAt
+LWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVz
+IFRydWUKCmNvbW1pdHM9IiQoZ2l0IGxvZyAtLWZvcm1hdD0lSCAtLXJldmVyc2UgJEJBU0UuLiki
+CmZvciBjIGluICRjb21taXRzOyBkbwogICAgZWNobyAiQ2hlY2tpbmcgUEFUQ0ggJG4vJHRvdGFs
+OiAkKGdpdCBsb2cgLW4gMSAtLWZvcm1hdD0lcyAkYykuLi4iCiAgICBpZiAhIGdpdCBzaG93ICRj
+IC0tZm9ybWF0PWVtYWlsIHwgLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFjayAtOyB0
+aGVuCiAgICAgICAgZmFpbGVkPTEKICAgICAgICBlY2hvCiAgICBmaQogICAgbj0kKChuKzEpKQpk
+b25lCgpleGl0ICRmYWlsZWQKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KClVwZGF0aW5nIDNjOGNm
+NWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKRnJvbSBodHRwczovL2dpdGh1Yi5j
+b20vcGF0Y2hldy1wcm9qZWN0L3FlbXUKICogW25ldyB0YWddICAgICAgICAgcGF0Y2hldy8yMDE3
+MDUyNzIxNDYxOC4zMjYyNi0xLXNhbXVlbC50aGliYXVsdEBlbnMtbHlvbi5vcmcgLT4gcGF0Y2hl
+dy8yMDE3MDUyNzIxNDYxOC4zMjYyNi0xLXNhbXVlbC50aGliYXVsdEBlbnMtbHlvbi5vcmcKU3dp
+dGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0Jwo0ODlmNzhhIEZpeCB0b3RhbCBJUCBoZWFkZXIg
+bGVuZ3RoIGluIGZvcndhcmRlZCBUQ1AgcGFja2V0cwpjMDUxNmViIHNsaXJwOiBmaXggbGVhawpm
+YWVkYjcwIHNsaXJwOiBGaXggd3JvbmcgbXNzIGJ1Zy4KCj09PSBPVVRQVVQgQkVHSU4gPT09CkNo
+ZWNraW5nIFBBVENIIDEvMzogc2xpcnA6IEZpeCB3cm9uZyBtc3MgYnVnLi4uLgpFUlJPUjogY29k
+ZSBpbmRlbnQgc2hvdWxkIG5ldmVyIHVzZSB0YWJzCiMyNTogRklMRTogc2xpcnAvdGNwX2lucHV0
+LmM6MTU5MDoKK15JICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgLSBzaXplb2Yoc3RydWN0
+IGlwKTskCgpFUlJPUjogY29kZSBpbmRlbnQgc2hvdWxkIG5ldmVyIHVzZSB0YWJzCiMzMDogRklM
+RTogc2xpcnAvdGNwX2lucHV0LmM6MTU5NDoKK15JICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgLSBzaXplb2Yoc3RydWN0IGlwNik7JAoKdG90YWw6IDIgZXJyb3JzLCAwIHdhcm5pbmdzLCAx
+MyBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJl
+dmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQg
+dGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgpD
+aGVja2luZyBQQVRDSCAyLzM6IHNsaXJwOiBmaXggbGVhay4uLgpFUlJPUjogc3VzcGVjdCBjb2Rl
+IGluZGVudCBmb3IgY29uZGl0aW9uYWwgc3RhdGVtZW50cyAoMiwgNikKIzM4OiBGSUxFOiBzbGly
+cC9zb2NrZXQuYzoxMDM6CisgIGlmIChzby0+c29fdGNwY2IpIHsKKyAgICAgIGZyZWUoc28tPnNv
+X3RjcGNiKTsKCnRvdGFsOiAxIGVycm9ycywgMCB3YXJuaW5ncywgOSBsaW5lcyBjaGVja2VkCgpZ
+b3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0
+aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRh
+aW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgpDaGVja2luZyBQQVRDSCAzLzM6
+IEZpeCB0b3RhbCBJUCBoZWFkZXIgbGVuZ3RoIGluIGZvcndhcmRlZCBUQ1AgcGFja2V0cy4uLgpF
+UlJPUjogY29kZSBpbmRlbnQgc2hvdWxkIG5ldmVyIHVzZSB0YWJzCiMyMzogRklMRTogc2xpcnAv
+dGNwX3N1YnIuYzoyMDc6CiteSSAgICBpcC0+aXBfbGVuID0gbS0+bV9sZW47JAoKRVJST1I6IGNv
+ZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwojMzI6IEZJTEU6IHNsaXJwL3RjcF9zdWJy
+LmM6MjI3OgorXkkgICAgaXA2LT5pcF9wbCA9IHRjcGlwaF9zYXZlLnRpX2xlbjskCgp0b3RhbDog
+MiBlcnJvcnMsIDAgd2FybmluZ3MsIDE2IGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0
+eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUg
+ZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQ
+QVRDSCBpbiBNQUlOVEFJTkVSUy4KCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4
+aXRlZCB3aXRoIGNvZGU6IDEKCgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkg
+UGF0Y2hldyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sg
+dG8gcGF0Y2hldy1kZXZlbEBmcmVlbGlzdHMub3Jn
