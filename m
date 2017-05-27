@@ -1,31 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57902)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60304)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dEeWJ-0003PY-FH
-	for qemu-devel@nongnu.org; Sat, 27 May 2017 12:24:52 -0400
+	id 1dEemC-000663-GY
+	for qemu-devel@nongnu.org; Sat, 27 May 2017 12:41:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dEeWG-0000JT-Ag
-	for qemu-devel@nongnu.org; Sat, 27 May 2017 12:24:51 -0400
-Received: from mail-oi0-x244.google.com ([2607:f8b0:4003:c06::244]:36827)
+	id 1dEem9-0006Xq-BT
+	for qemu-devel@nongnu.org; Sat, 27 May 2017 12:41:16 -0400
+Received: from mail-oi0-x244.google.com ([2607:f8b0:4003:c06::244]:34092)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dEeWG-0000JJ-5q
-	for qemu-devel@nongnu.org; Sat, 27 May 2017 12:24:48 -0400
-Received: by mail-oi0-x244.google.com with SMTP id w138so6035492oiw.3
-	for <qemu-devel@nongnu.org>; Sat, 27 May 2017 09:24:48 -0700 (PDT)
+	id 1dEem9-0006Ww-6P
+	for qemu-devel@nongnu.org; Sat, 27 May 2017 12:41:13 -0400
+Received: by mail-oi0-x244.google.com with SMTP id w10so6090864oif.1
+	for <qemu-devel@nongnu.org>; Sat, 27 May 2017 09:41:13 -0700 (PDT)
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
-References: <df785b3fbff46e0d5b81aa951737ae1cd64dd9d0.1495862779.git.maozy.fnst@cn.fujitsu.com>
+References: <20170526211638.32301-1-rth@twiddle.net>
+	<20170526211638.32301-17-rth@twiddle.net>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <e7d97bfa-1336-0669-32ac-0fdf387ae95e@amsat.org>
-Date: Sat, 27 May 2017 13:24:43 -0300
+Message-ID: <b5d119ec-b354-374a-f61b-284c81c313d5@amsat.org>
+Date: Sat, 27 May 2017 13:41:10 -0300
 MIME-Version: 1.0
-In-Reply-To: <df785b3fbff46e0d5b81aa951737ae1cd64dd9d0.1495862779.git.maozy.fnst@cn.fujitsu.com>
+In-Reply-To: <20170526211638.32301-17-rth@twiddle.net>
 Content-Type: text/plain; charset=windows-1252; format=flowed
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v3] pci: Set err to errp directly rather
- than through error_propagate()
+Subject: Re: [Qemu-devel] [PATCH v7 16/26] tcg/arm: Clarify tcg_out_bx for
+ arm4 host
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,79 +35,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>, qemu-devel@nongnu.org
-Cc: marcel@redhat.com, imammedo@redhat.com, armbru@redhat.com, mst@redhat.com
+To: Richard Henderson <rth@twiddle.net>, qemu-devel@nongnu.org
 
-On 05/27/2017 02:34 AM, Mao Zhongyi wrote:
-> ioh3420_interrupts_init() and its callers rp_realize() fill error
-> message to local_err, then propagate it to errp by error_propagate(),
-> which is not necessary. So eliminate it and pass errp directly instead
-> of local_err. Of course, error_propagate() also has been removed.
->
-> Signed-off-by: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
-> Reviewed-by: Eric Blake <eblake@redhat.com>
-> Reviewed-by: Marcel Apfelbaum <marcel@redhat.com>
+On 05/26/2017 06:16 PM, Richard Henderson wrote:
+> In theory this would re-enable usage of QEMU on an armv4 host.
+> Whether this is worthwhile is debatable -- we've been unconditionally
+> issuing the armv5t BX instruction in the prologue since 2011 without
+> complaint.  Possibly we should simply require an armv6 host.
+ >
+
+I remember having some issue 2 years ago trying to run on a ARM926EJ-S 
+but the gcc/newlib revisions were good candidates to give problem so I 
+didn't go further. Few NAS still run on ARMv4 cpu (some StrongARM).
+Anyway on boards running ARMv4 cpu, problems are more likely to come 
+from available memory to run an OS and QEMU rather than the TCG codebase.
+
+> Signed-off-by: Richard Henderson <rth@twiddle.net>
 
 Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
 > ---
->  hw/pci-bridge/ioh3420.c        | 4 +---
->  hw/pci-bridge/pcie_root_port.c | 7 ++-----
->  2 files changed, 3 insertions(+), 8 deletions(-)
+>  tcg/arm/tcg-target.inc.c | 29 +++++++++++++++--------------
+>  1 file changed, 15 insertions(+), 14 deletions(-)
 >
-> diff --git a/hw/pci-bridge/ioh3420.c b/hw/pci-bridge/ioh3420.c
-> index da4e5bd..5f56a2f 100644
-> --- a/hw/pci-bridge/ioh3420.c
-> +++ b/hw/pci-bridge/ioh3420.c
-> @@ -64,15 +64,13 @@ static uint8_t ioh3420_aer_vector(const PCIDevice *d)
->  static int ioh3420_interrupts_init(PCIDevice *d, Error **errp)
+> diff --git a/tcg/arm/tcg-target.inc.c b/tcg/arm/tcg-target.inc.c
+> index e75a6d4..590c57d 100644
+> --- a/tcg/arm/tcg-target.inc.c
+> +++ b/tcg/arm/tcg-target.inc.c
+> @@ -329,11 +329,6 @@ static const uint8_t tcg_cond_to_arm_cond[] = {
+>      [TCG_COND_GTU] = COND_HI,
+>  };
+>
+> -static inline void tcg_out_bx(TCGContext *s, int cond, int rn)
+> -{
+> -    tcg_out32(s, (cond << 28) | 0x012fff10 | rn);
+> -}
+> -
+>  static inline void tcg_out_b(TCGContext *s, int cond, int32_t offset)
 >  {
->      int rc;
-> -    Error *local_err = NULL;
+>      tcg_out32(s, (cond << 28) | 0x0a000000 |
+> @@ -402,6 +397,18 @@ static inline void tcg_out_mov_reg(TCGContext *s, int cond, int rd, int rm)
+>      }
+>  }
 >
->      rc = msi_init(d, IOH_EP_MSI_OFFSET, IOH_EP_MSI_NR_VECTOR,
->                    IOH_EP_MSI_SUPPORTED_FLAGS & PCI_MSI_FLAGS_64BIT,
->                    IOH_EP_MSI_SUPPORTED_FLAGS & PCI_MSI_FLAGS_MASKBIT,
-> -                  &local_err);
-> +                  errp);
->      if (rc < 0) {
->          assert(rc == -ENOTSUP);
-> -        error_propagate(errp, local_err);
+> +static inline void tcg_out_bx(TCGContext *s, int cond, TCGReg rn)
+> +{
+> +    /* Unless the C portion of QEMU is compiled as thumb, we don't
+> +       actually need true BX semantics; merely a branch to an address
+> +       held in a register.  */
+> +    if (use_armv5t_instructions) {
+> +        tcg_out32(s, (cond << 28) | 0x012fff10 | rn);
+> +    } else {
+> +        tcg_out_mov_reg(s, cond, TCG_REG_PC, rn);
+> +    }
+> +}
+> +
+>  static inline void tcg_out_dat_imm(TCGContext *s,
+>                  int cond, int opc, int rd, int rn, int im)
+>  {
+> @@ -977,7 +984,7 @@ static inline void tcg_out_st8(TCGContext *s, int cond,
+>   * with the code buffer limited to 16MB we wouldn't need the long case.
+>   * But we also use it for the tail-call to the qemu_ld/st helpers, which does.
+>   */
+> -static inline void tcg_out_goto(TCGContext *s, int cond, tcg_insn_unit *addr)
+> +static void tcg_out_goto(TCGContext *s, int cond, tcg_insn_unit *addr)
+>  {
+>      intptr_t addri = (intptr_t)addr;
+>      ptrdiff_t disp = tcg_pcrel_diff(s, addr);
+> @@ -987,15 +994,9 @@ static inline void tcg_out_goto(TCGContext *s, int cond, tcg_insn_unit *addr)
+>          return;
 >      }
 >
->      return rc;
-> diff --git a/hw/pci-bridge/pcie_root_port.c b/hw/pci-bridge/pcie_root_port.c
-> index cf36318..9022996 100644
-> --- a/hw/pci-bridge/pcie_root_port.c
-> +++ b/hw/pci-bridge/pcie_root_port.c
-> @@ -59,7 +59,6 @@ static void rp_realize(PCIDevice *d, Error **errp)
->      PCIDeviceClass *dc = PCI_DEVICE_GET_CLASS(d);
->      PCIERootPortClass *rpc = PCIE_ROOT_PORT_GET_CLASS(d);
->      int rc;
-> -    Error *local_err = NULL;
+> +    assert(use_armv5t_instructions || (addri & 1) == 0);
+>      tcg_out_movi32(s, cond, TCG_REG_TMP, addri);
+> -    if (use_armv5t_instructions) {
+> -        tcg_out_bx(s, cond, TCG_REG_TMP);
+> -    } else {
+> -        if (addri & 1) {
+> -            tcg_abort();
+> -        }
+> -        tcg_out_mov_reg(s, cond, TCG_REG_PC, TCG_REG_TMP);
+> -    }
+> +    tcg_out_bx(s, cond, TCG_REG_TMP);
+>  }
 >
->      pci_config_set_interrupt_pin(d->config, 1);
->      pci_bridge_initfn(d, TYPE_PCIE_BUS);
-> @@ -72,9 +71,8 @@ static void rp_realize(PCIDevice *d, Error **errp)
->      }
->
->      if (rpc->interrupts_init) {
-> -        rc = rpc->interrupts_init(d, &local_err);
-> +        rc = rpc->interrupts_init(d, errp);
->          if (rc < 0) {
-> -            error_propagate(errp, local_err);
->              goto err_bridge;
->          }
->      }
-> @@ -98,9 +96,8 @@ static void rp_realize(PCIDevice *d, Error **errp)
->      }
->
->      rc = pcie_aer_init(d, PCI_ERR_VER, rpc->aer_offset,
-> -                       PCI_ERR_SIZEOF, &local_err);
-> +                       PCI_ERR_SIZEOF, errp);
->      if (rc < 0) {
-> -        error_propagate(errp, local_err);
->          goto err;
->      }
->      pcie_aer_root_init(d);
+>  /* The call case is mostly used for helpers - so it's not unreasonable
 >
