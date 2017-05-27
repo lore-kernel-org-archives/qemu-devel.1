@@ -1,15 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59377)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44581)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dES1q-0006v4-4g
-	for qemu-devel@nongnu.org; Fri, 26 May 2017 23:04:35 -0400
+	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1dEU7s-0006WL-Io
+	for qemu-devel@nongnu.org; Sat, 27 May 2017 01:18:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dES1p-0001a2-6k
-	for qemu-devel@nongnu.org; Fri, 26 May 2017 23:04:34 -0400
-From: Eric Blake <eblake@redhat.com>
-Date: Fri, 26 May 2017 22:04:21 -0500
-Message-Id: <20170527030421.28366-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PATCH] nbd: Fully initialize client in case of failed
- negotiation
+	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1dEU7o-00004z-0A
+	for qemu-devel@nongnu.org; Sat, 27 May 2017 01:18:56 -0400
+Received: from [59.151.112.132] (port=48659 helo=heian.cn.fujitsu.com)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1dEU7n-0008Vy-Kj
+	for qemu-devel@nongnu.org; Sat, 27 May 2017 01:18:51 -0400
+References: <19feea44a3f4010645a1b829b504481f1b574b9a.1495797845.git.maozy.fnst@cn.fujitsu.com>
+	<caf34cd4-a2cd-395b-f95f-d2588ba1672a@redhat.com>
+From: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
+Message-ID: <6bf5b7a2-62e0-4484-c754-fd8de6d5f2cd@cn.fujitsu.com>
+Date: Sat, 27 May 2017 13:17:34 +0800
+MIME-Version: 1.0
+In-Reply-To: <caf34cd4-a2cd-395b-f95f-d2588ba1672a@redhat.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2] pci: Set err to errp directly rather
+ than through error_porpagate()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -18,85 +28,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: pbonzini@redhat.com, qemu-block@nongnu.org
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+Cc: marcel@redhat.com, imammedo@redhat.com, armbru@redhat.com, mst@redhat.com
 
-If a non-NBD client connects to qemu-nbd, we would end up with
-a SIGSEGV in nbd_cilent_put() because we were trying to
-unregister the client's association to the export, even though
-we skipped inserting the client into that list.  Easy trigger
-in two terminals:
 
-$ qemu-nbd -p 30001 --format=raw file
-$ nmap 127.0.0.1 -p 30001
 
-nmap claims that it thinks it connected to a pago-services1
-server (which probably means nmap could be updated to learn the
-NBD protocol and give a more accurate diagnosis of the open
-port - but that's not our problem), then terminates immediately,
-so our call to nbd_negotiate() fails.  The fix is to reorder
-nbd_co_client_start() to ensure that all initialization occurs
-before we ever try talking to a client in nbd_negotiate(), so
-that the teardown sequence on negotiation failure doesn't fault
-while dereferencing a half-initialized object.
+On 05/26/2017 09:33 PM, Eric Blake wrote:
+> On 05/26/2017 06:58 AM, Mao Zhongyi wrote:
+>
+> In the subject: s/porpagate/propagate/
+>
+>> ioh3420_interrupts_init() and its callers rp_realize() fill error
+>> message to local_err, then propagate it to errp by error_porpagate(),
+>
+> and again
 
-While debugging this, I also noticed that nbd_update_server_watch()
-called by nbd_client_closed() was still adding a channel to accept
-the next client, even when the state was no longer RUNNING.  That
-is fixed by making nbd_can_accept() pay attention to the current
-state.
+OK, I see.
+Thanks
 
-Fixes: https://bugzilla.redhat.com/show_bug.cgi?id=1451614
+>
+>> which's not necessary. So eliminate it and pass errp directly instead
+>
+> s/which's/which is/ (English does not have the abbreviation which's)
 
-Signed-off-by: Eric Blake <eblake@redhat.com>
----
+Thanks for your kindly remind. I think that this problem will not
+happen again. :)
 
-I'm planning to run a bisect to see which patch actually introduced
-the problem, but wanted to post the patch first to get review started.
+>
+>> of local_err. Of course, error_propagate() also has been removed.
+>>
+>> Signed-off-by: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
+>> ---
+>> v2:
+>> * Drop the part of wrong handling that ignored the fact that if
+>>   pci_qdev_realize()'s caller pass errp = NULL.
+>>
+>
+> The code portion is fine, so with the commit message fixed (which a
+> maintainer might do without needing you to send a v3),
+> Reviewed-by: Eric Blake <eblake@redhat.com>
+>
 
- nbd/server.c | 14 ++++++--------
- qemu-nbd.c   |  2 +-
- 2 files changed, 7 insertions(+), 9 deletions(-)
+I am very glad to hear that.
+I will fix it again in the v3. After all, it's not good to bother
+others.
 
-diff --git a/nbd/server.c b/nbd/server.c
-index 0c4f456..d8dfac8 100644
---- a/nbd/server.c
-+++ b/nbd/server.c
-@@ -1601,16 +1601,14 @@ static coroutine_fn void nbd_co_client_start(void *opaque)
-
-     if (exp) {
-         nbd_export_get(exp);
--    }
--    if (nbd_negotiate(data)) {
--        client_close(client);
--        goto out;
--    }
--    qemu_co_mutex_init(&client->send_lock);
--
--    if (exp) {
-         QTAILQ_INSERT_TAIL(&exp->clients, client, next);
-     }
-+    qemu_co_mutex_init(&client->send_lock);
-+
-+    if (nbd_negotiate(data)) {
-+        client_close(client);
-+        goto out;
-+    }
-
-     nbd_client_receive_next_request(client);
-
-diff --git a/qemu-nbd.c b/qemu-nbd.c
-index 27a4e3a..5410854 100644
---- a/qemu-nbd.c
-+++ b/qemu-nbd.c
-@@ -322,7 +322,7 @@ out:
-
- static int nbd_can_accept(void)
- {
--    return nb_fds < shared;
-+    return state == RUNNING && nb_fds < shared;
- }
-
- static void nbd_export_closed(NBDExport *exp)
--- 
-2.9.4
+Thanks a lot.
+Mao
