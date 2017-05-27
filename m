@@ -1,21 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48485)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51654)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <arei.gonglei@huawei.com>) id 1dEUvq-0004yq-E0
-	for qemu-devel@nongnu.org; Sat, 27 May 2017 02:10:35 -0400
+	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1dEVhi-0001ws-2F
+	for qemu-devel@nongnu.org; Sat, 27 May 2017 03:00:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <arei.gonglei@huawei.com>) id 1dEUvn-0006Sr-9A
-	for qemu-devel@nongnu.org; Sat, 27 May 2017 02:10:34 -0400
-Received: from szxga02-in.huawei.com ([45.249.212.188]:3939)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <arei.gonglei@huawei.com>) id 1dEUvm-0006SZ-LE
-	for qemu-devel@nongnu.org; Sat, 27 May 2017 02:10:31 -0400
-From: Gonglei <arei.gonglei@huawei.com>
-Date: Sat, 27 May 2017 14:10:08 +0800
-Message-ID: <1495865408-13848-1-git-send-email-arei.gonglei@huawei.com>
+	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1dEVhe-0001B4-8N
+	for qemu-devel@nongnu.org; Sat, 27 May 2017 03:00:01 -0400
+Received: from [59.151.112.132] (port=36745 helo=heian.cn.fujitsu.com)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1dEVhd-0001Al-Rf
+	for qemu-devel@nongnu.org; Sat, 27 May 2017 02:59:58 -0400
+References: <20170526121516.6607-1-maozy.fnst@cn.fujitsu.com>
+	<b98f7c09-257c-6d6f-fd25-7286f4d16eb2@redhat.com>
+From: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
+Message-ID: <5ab8c115-a8de-1d48-155a-3daac7e0d841@cn.fujitsu.com>
+Date: Sat, 27 May 2017 14:58:37 +0800
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH] kvm: don't register smram_listener when smm is
- off
+In-Reply-To: <b98f7c09-257c-6d6f-fd25-7286f4d16eb2@redhat.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] pci-bridge/i82801b11: Convert to realize
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,59 +27,91 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: pbonzini@redhat.com, yechuan@huawei.com, Gonglei <arei.gonglei@huawei.com>
+To: Marcel Apfelbaum <marcel@redhat.com>, qemu-devel@nongnu.org
+Cc: mst@redhat.com, armbru@redhat.com
 
-If the user set disable smm by '-machine smm=off', we
-should not register smram_listener so that we can
-avoid waster memory in kvm since the added sencond
-address space.
 
-Meanwhile we should assign value of the global kvm_state
-before invoking the kvm_arch_init(), because
-pc_machine_is_smm_enabled() may use it by kvm_has_mm().
 
-Signed-off-by: Gonglei <arei.gonglei@huawei.com>
----
- kvm-all.c         | 4 ++--
- target/i386/kvm.c | 3 ++-
- 2 files changed, 4 insertions(+), 3 deletions(-)
+On 05/26/2017 10:08 PM, Marcel Apfelbaum wrote:
+>
+>
+> On 26/05/2017 15:15, Mao Zhongyi wrote:
+>> The pci-birdge device i82801b11 still implements the old
+>> PCIDeviceClass .init() through i82801b11_bridge_init()
+>> instead of the new .realize(). All devices need to be
+>> converted to .realize(). So convert it and rename it to
+>> i82801b11_bridge_realize().
+>>
+>> Signed-off-by: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
+>> ---
+>>   hw/pci-bridge/i82801b11.c | 9 ++++-----
+>>   1 file changed, 4 insertions(+), 5 deletions(-)
+>>
+>> diff --git a/hw/pci-bridge/i82801b11.c b/hw/pci-bridge/i82801b11.c
+>> index 2404e7e..dca3162 100644
+>> --- a/hw/pci-bridge/i82801b11.c
+>> +++ b/hw/pci-bridge/i82801b11.c
+>> @@ -44,6 +44,7 @@
+>>   #include "qemu/osdep.h"
+>>   #include "hw/pci/pci.h"
+>>   #include "hw/i386/ich9.h"
+>> +#include "qapi/error.h"
+>>       /*****************************************************************************/
+>> @@ -58,7 +59,7 @@ typedef struct I82801b11Bridge {
+>>       /*< public >*/
+>>   } I82801b11Bridge;
+>>   -static int i82801b11_bridge_initfn(PCIDevice *d)
+>> +static void i82801b11_bridge_realize(PCIDevice *d, Error **errp)
+>>   {
+>>       int rc;
+>>   @@ -70,12 +71,10 @@ static int i82801b11_bridge_initfn(PCIDevice *d)
+>>           goto err_bridge;
+>>       }
+>>       pci_config_set_prog_interface(d->config, PCI_CLASS_BRIDGE_PCI_INF_SUB);
+>> -    return 0;
+>> +    return;
+>>     err_bridge:
+>>       pci_bridge_exitfn(d);
+>
+> Hi,
+>
+> Since you move to realize, you may want to leverage the errp to add
+> info on errors.
+>
+> Thanks,
+> Marcel
 
-diff --git a/kvm-all.c b/kvm-all.c
-index 90b8573..92bdf2c 100644
---- a/kvm-all.c
-+++ b/kvm-all.c
-@@ -1746,6 +1746,8 @@ static int kvm_init(MachineState *ms)
-     kvm_ioeventfd_any_length_allowed =
-         (kvm_check_extension(s, KVM_CAP_IOEVENTFD_ANY_LENGTH) > 0);
- 
-+    kvm_state = s;
-+
-     ret = kvm_arch_init(ms, s);
-     if (ret < 0) {
-         goto err;
-@@ -1755,8 +1757,6 @@ static int kvm_init(MachineState *ms)
-         kvm_irqchip_create(ms, s);
-     }
- 
--    kvm_state = s;
--
-     if (kvm_eventfds_allowed) {
-         s->memory_listener.listener.eventfd_add = kvm_mem_ioeventfd_add;
-         s->memory_listener.listener.eventfd_del = kvm_mem_ioeventfd_del;
-diff --git a/target/i386/kvm.c b/target/i386/kvm.c
-index 011d4a5..cb5b47e 100644
---- a/target/i386/kvm.c
-+++ b/target/i386/kvm.c
-@@ -1254,7 +1254,8 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
-         }
-     }
- 
--    if (kvm_check_extension(s, KVM_CAP_X86_SMM)) {
-+    if (kvm_check_extension(s, KVM_CAP_X86_SMM) &&
-+            pc_machine_is_smm_enabled(PC_MACHINE(ms))) {
-         smram_machine_done.notify = register_smram_listener;
-         qemu_add_machine_init_done_notifier(&smram_machine_done);
-     }
--- 
-1.8.3.1
+
+Hi, Marcel
+
+Thanks for your quick reply and advice. In fact, I have considered adding an error
+message to errp when an error occurs. But I found that pci_bridge_ssvid_init() has
+reported a specific info when it fails. If the error is reported here again, it seems
+a bit more superfluous, so it's not adopted. Of course, output a readable error info
+to make it easier for users is also a good choice. So, are you sure you want to do
+that?
+
+Look forward to your feedback and suggestion soon.
+
+Thanks a lot.
+Mao
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+>
