@@ -1,24 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57867)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58871)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1dEjMv-0003FM-Gh
-	for qemu-devel@nongnu.org; Sat, 27 May 2017 17:35:30 -0400
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1dEjXU-0005RL-7c
+	for qemu-devel@nongnu.org; Sat, 27 May 2017 17:46:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1dEjMs-0001tf-FM
-	for qemu-devel@nongnu.org; Sat, 27 May 2017 17:35:29 -0400
-Received: from hera.aquilenet.fr ([141.255.128.1]:43375)
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1dEjXT-0003If-7d
+	for qemu-devel@nongnu.org; Sat, 27 May 2017 17:46:24 -0400
+Received: from hera.aquilenet.fr ([2a01:474::1]:47330)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1dEjMs-0001tZ-8Q
-	for qemu-devel@nongnu.org; Sat, 27 May 2017 17:35:26 -0400
-Date: Sat, 27 May 2017 23:35:23 +0200
-From: Samuel Thibault <samuel.thibault@gnu.org>
-Message-ID: <20170527213523.c5ki5dz5zvsr5z46@var.youpi.perso.aquilenet.fr>
-References: <CAPXQAKv-sa4e5gNwPkEQzS5yZM61Lxdip+khwzt0NAYhAYiY9w@mail.gmail.com>
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1dEjXT-0003G9-18
+	for qemu-devel@nongnu.org; Sat, 27 May 2017 17:46:23 -0400
+From: Samuel Thibault <samuel.thibault@ens-lyon.org>
+Date: Sat, 27 May 2017 23:46:16 +0200
+Message-Id: <20170527214618.32626-2-samuel.thibault@ens-lyon.org>
+In-Reply-To: <20170527214618.32626-1-samuel.thibault@ens-lyon.org>
+References: <20170527214618.32626-1-samuel.thibault@ens-lyon.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAPXQAKv-sa4e5gNwPkEQzS5yZM61Lxdip+khwzt0NAYhAYiY9w@mail.gmail.com>
-Subject: Re: [Qemu-devel] [PATCH] [SLIRP] Fix total IP header length in
- forwarded TCP packets
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL 1/3] slirp: Fix wrong mss bug.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,14 +26,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Sjors Gielen <sjors@sjorsgielen.nl>
-Cc: Jan Kiszka <jan.kiszka@siemens.com>, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: Tao Wu <ytht.net@gmail.com>, stefanha@redhat.com, jan.kiszka@siemens.com, Tao Wu <lepton@google.com>
 
-Sjors Gielen, on mer. 24 mai 2017 17:51:12 +0000, wrote:
-> When forwarding TCP packets, the internal tcpiphdr struct length was wrongly
-> used inside the IP header. This commit changes the behaviour to what is used
-> by tcp_output.c, using the correct full IP header + payload length.
+From: Tao Wu <ytht.net@gmail.com>
 
-Indeed, applied, thanks.
+This bug was introduced by https://github.com/qemu/qemu/commit/98c6305
 
-Samuel
+Signed-off-by: Tao Wu <lepton@google.com>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+Signed-off-bu: Samuel Thibault <samuel.thibault@ens-lyon.org>
+---
+ slirp/tcp_input.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/slirp/tcp_input.c b/slirp/tcp_input.c
+index edb98f06f3..07bcbdb2dd 100644
+--- a/slirp/tcp_input.c
++++ b/slirp/tcp_input.c
+@@ -1587,11 +1587,11 @@ tcp_mss(struct tcpcb *tp, u_int offer)
+ 	switch (so->so_ffamily) {
+ 	case AF_INET:
+             mss =3D MIN(IF_MTU, IF_MRU) - sizeof(struct tcphdr)
+-	                              + sizeof(struct ip);
++	                              - sizeof(struct ip);
+ 	    break;
+ 	case AF_INET6:
+             mss =3D MIN(IF_MTU, IF_MRU) - sizeof(struct tcphdr)
+-	                              + sizeof(struct ip6);
++	                              - sizeof(struct ip6);
+ 	    break;
+ 	default:
+ 	    g_assert_not_reached();
+--=20
+2.11.0
