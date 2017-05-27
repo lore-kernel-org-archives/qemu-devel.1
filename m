@@ -1,30 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58801)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59377)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <xiaoguangrong.eric@gmail.com>) id 1dERwb-0005r9-T3
-	for qemu-devel@nongnu.org; Fri, 26 May 2017 22:59:10 -0400
+	(envelope-from <eblake@redhat.com>) id 1dES1q-0006v4-4g
+	for qemu-devel@nongnu.org; Fri, 26 May 2017 23:04:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <xiaoguangrong.eric@gmail.com>) id 1dERwY-0007Fu-TI
-	for qemu-devel@nongnu.org; Fri, 26 May 2017 22:59:09 -0400
-Received: from mail-pf0-x241.google.com ([2607:f8b0:400e:c00::241]:35939)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <xiaoguangrong.eric@gmail.com>)
-	id 1dERwY-0007Ez-MM
-	for qemu-devel@nongnu.org; Fri, 26 May 2017 22:59:06 -0400
-Received: by mail-pf0-x241.google.com with SMTP id n23so6101394pfb.3
-	for <qemu-devel@nongnu.org>; Fri, 26 May 2017 19:59:06 -0700 (PDT)
-References: <20170525031936.8449-1-xiaoguangrong@tencent.com>
-	<210485b2-c6f5-2f57-f196-dc1b25bbe243@redhat.com>
-	<09486d4e-7b21-06bb-ee6a-9b847e94cdd0@gmail.com>
-	<40f3734e-d8c0-811c-5e1a-9a5c53f8323a@redhat.com>
-From: Xiao Guangrong <xiaoguangrong.eric@gmail.com>
-Message-ID: <c242b19b-ab9b-a460-c9e4-868457006269@gmail.com>
-Date: Sat, 27 May 2017 10:59:11 +0800
-MIME-Version: 1.0
-In-Reply-To: <40f3734e-d8c0-811c-5e1a-9a5c53f8323a@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] qtest: add rtc periodic timer test
+	(envelope-from <eblake@redhat.com>) id 1dES1p-0001a2-6k
+	for qemu-devel@nongnu.org; Fri, 26 May 2017 23:04:34 -0400
+From: Eric Blake <eblake@redhat.com>
+Date: Fri, 26 May 2017 22:04:21 -0500
+Message-Id: <20170527030421.28366-1-eblake@redhat.com>
+Subject: [Qemu-devel] [PATCH] nbd: Fully initialize client in case of failed
+ negotiation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,17 +18,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, Xiao Guangrong <guangrong.xiao@gmail.com>, mst@redhat.com, mtosatti@redhat.com
-Cc: Xiao Guangrong <xiaoguangrong@tencent.com>, qemu-devel@nongnu.org, kvm@vger.kernel.org
+To: qemu-devel@nongnu.org
+Cc: pbonzini@redhat.com, qemu-block@nongnu.org
 
+If a non-NBD client connects to qemu-nbd, we would end up with
+a SIGSEGV in nbd_cilent_put() because we were trying to
+unregister the client's association to the export, even though
+we skipped inserting the client into that list.  Easy trigger
+in two terminals:
 
+$ qemu-nbd -p 30001 --format=raw file
+$ nmap 127.0.0.1 -p 30001
 
-On 05/26/2017 07:03 PM, Paolo Bonzini wrote:
+nmap claims that it thinks it connected to a pago-services1
+server (which probably means nmap could be updated to learn the
+NBD protocol and give a more accurate diagnosis of the open
+port - but that's not our problem), then terminates immediately,
+so our call to nbd_negotiate() fails.  The fix is to reorder
+nbd_co_client_start() to ensure that all initialization occurs
+before we ever try talking to a client in nbd_negotiate(), so
+that the teardown sequence on negotiation failure doesn't fault
+while dereferencing a half-initialized object.
 
-> 
-> 
-> Can you send v2 that integrates this in rtc-test.c?
+While debugging this, I also noticed that nbd_update_server_watch()
+called by nbd_client_closed() was still adding a channel to accept
+the next client, even when the state was no longer RUNNING.  That
+is fixed by making nbd_can_accept() pay attention to the current
+state.
 
-Really smart, have posted the v2 out, please review.
+Fixes: https://bugzilla.redhat.com/show_bug.cgi?id=1451614
 
-Thank you, Paolo!
+Signed-off-by: Eric Blake <eblake@redhat.com>
+---
+
+I'm planning to run a bisect to see which patch actually introduced
+the problem, but wanted to post the patch first to get review started.
+
+ nbd/server.c | 14 ++++++--------
+ qemu-nbd.c   |  2 +-
+ 2 files changed, 7 insertions(+), 9 deletions(-)
+
+diff --git a/nbd/server.c b/nbd/server.c
+index 0c4f456..d8dfac8 100644
+--- a/nbd/server.c
++++ b/nbd/server.c
+@@ -1601,16 +1601,14 @@ static coroutine_fn void nbd_co_client_start(void *opaque)
+
+     if (exp) {
+         nbd_export_get(exp);
+-    }
+-    if (nbd_negotiate(data)) {
+-        client_close(client);
+-        goto out;
+-    }
+-    qemu_co_mutex_init(&client->send_lock);
+-
+-    if (exp) {
+         QTAILQ_INSERT_TAIL(&exp->clients, client, next);
+     }
++    qemu_co_mutex_init(&client->send_lock);
++
++    if (nbd_negotiate(data)) {
++        client_close(client);
++        goto out;
++    }
+
+     nbd_client_receive_next_request(client);
+
+diff --git a/qemu-nbd.c b/qemu-nbd.c
+index 27a4e3a..5410854 100644
+--- a/qemu-nbd.c
++++ b/qemu-nbd.c
+@@ -322,7 +322,7 @@ out:
+
+ static int nbd_can_accept(void)
+ {
+-    return nb_fds < shared;
++    return state == RUNNING && nb_fds < shared;
+ }
+
+ static void nbd_export_closed(NBDExport *exp)
+-- 
+2.9.4
