@@ -1,24 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51654)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57276)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1dEVhi-0001ws-2F
-	for qemu-devel@nongnu.org; Sat, 27 May 2017 03:00:03 -0400
+	(envelope-from <stefanha@gmail.com>) id 1dEWZy-0002kg-Pv
+	for qemu-devel@nongnu.org; Sat, 27 May 2017 03:56:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1dEVhe-0001B4-8N
-	for qemu-devel@nongnu.org; Sat, 27 May 2017 03:00:01 -0400
-Received: from [59.151.112.132] (port=36745 helo=heian.cn.fujitsu.com)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1dEVhd-0001Al-Rf
-	for qemu-devel@nongnu.org; Sat, 27 May 2017 02:59:58 -0400
-References: <20170526121516.6607-1-maozy.fnst@cn.fujitsu.com>
-	<b98f7c09-257c-6d6f-fd25-7286f4d16eb2@redhat.com>
-From: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
-Message-ID: <5ab8c115-a8de-1d48-155a-3daac7e0d841@cn.fujitsu.com>
-Date: Sat, 27 May 2017 14:58:37 +0800
+	(envelope-from <stefanha@gmail.com>) id 1dEWZy-0000H5-4f
+	for qemu-devel@nongnu.org; Sat, 27 May 2017 03:56:06 -0400
+Received: from mail-wm0-x22f.google.com ([2a00:1450:400c:c09::22f]:35637)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1dEWZx-0000Gl-St
+	for qemu-devel@nongnu.org; Sat, 27 May 2017 03:56:06 -0400
+Received: by mail-wm0-x22f.google.com with SMTP id b84so9778178wmh.0
+	for <qemu-devel@nongnu.org>; Sat, 27 May 2017 00:56:05 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <b98f7c09-257c-6d6f-fd25-7286f4d16eb2@redhat.com>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] pci-bridge/i82801b11: Convert to realize
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Date: Sat, 27 May 2017 09:56:03 +0200
+Message-ID: <CAJSP0QU1gHgZbeBfL1y15FL9muD4G6r3MBYvVMVXTMj=GCB7oA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: [Qemu-devel] Throttling groups vs filter nodes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,91 +25,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Marcel Apfelbaum <marcel@redhat.com>, qemu-devel@nongnu.org
-Cc: mst@redhat.com, armbru@redhat.com
+To: qemu-devel <qemu-devel@nongnu.org>
+Cc: Manos Pitsidianakis <el13635@mail.ntua.gr>, Kevin Wolf <kwolf@redhat.com>, Alberto Garcia <berto@igalia.com>
 
+Throttling groups allow multiple drives to share the same throttling
+state (i.e. budget) between them.  Manos is working on moving the
+throttling code into a block filter driver so it is no longer
+hardcoded into the I/O code path.
 
+Throttling groups are not defined explicitly using -object syntax.
+Instead they are brought into existence by referring to them by name:
+-drive throttling.group=group0.
 
-On 05/26/2017 10:08 PM, Marcel Apfelbaum wrote:
->
->
-> On 26/05/2017 15:15, Mao Zhongyi wrote:
->> The pci-birdge device i82801b11 still implements the old
->> PCIDeviceClass .init() through i82801b11_bridge_init()
->> instead of the new .realize(). All devices need to be
->> converted to .realize(). So convert it and rename it to
->> i82801b11_bridge_realize().
->>
->> Signed-off-by: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
->> ---
->>   hw/pci-bridge/i82801b11.c | 9 ++++-----
->>   1 file changed, 4 insertions(+), 5 deletions(-)
->>
->> diff --git a/hw/pci-bridge/i82801b11.c b/hw/pci-bridge/i82801b11.c
->> index 2404e7e..dca3162 100644
->> --- a/hw/pci-bridge/i82801b11.c
->> +++ b/hw/pci-bridge/i82801b11.c
->> @@ -44,6 +44,7 @@
->>   #include "qemu/osdep.h"
->>   #include "hw/pci/pci.h"
->>   #include "hw/i386/ich9.h"
->> +#include "qapi/error.h"
->>       /*****************************************************************************/
->> @@ -58,7 +59,7 @@ typedef struct I82801b11Bridge {
->>       /*< public >*/
->>   } I82801b11Bridge;
->>   -static int i82801b11_bridge_initfn(PCIDevice *d)
->> +static void i82801b11_bridge_realize(PCIDevice *d, Error **errp)
->>   {
->>       int rc;
->>   @@ -70,12 +71,10 @@ static int i82801b11_bridge_initfn(PCIDevice *d)
->>           goto err_bridge;
->>       }
->>       pci_config_set_prog_interface(d->config, PCI_CLASS_BRIDGE_PCI_INF_SUB);
->> -    return 0;
->> +    return;
->>     err_bridge:
->>       pci_bridge_exitfn(d);
->
-> Hi,
->
-> Since you move to realize, you may want to leverage the errp to add
-> info on errors.
->
-> Thanks,
-> Marcel
+A quirk in the current implementation is that the throttling limits
+for the group are overwritten by each -drive throttling.group=group0.
+Limits for all but the last -drive in a group are ignored.
 
+There is no way to associate with an existing throttling group while
+keeping current limits in place.  The caller must pass in desired
+limits with at least the last -drive (and with every hotplugged
+drive).
 
-Hi, Marcel
+The new throttling filter node could do things differently:
+If *no* limits were specified (i.e. iops, bps, etc) then keep existing
+limits for the group in place.
 
-Thanks for your quick reply and advice. In fact, I have considered adding an error
-message to errp when an error occurs. But I found that pci_bridge_ssvid_init() has
-reported a specific info when it fails. If the error is reported here again, it seems
-a bit more superfluous, so it's not adopted. Of course, output a readable error info
-to make it easier for users is also a good choice. So, are you sure you want to do
-that?
+These semantics are more convenient - especially for hotplugging
+drives after the guest has launched.
 
-Look forward to your feedback and suggestion soon.
+Manos: I suggest implementing this new behavior when you write the
+throttling filter driver.  The code needs to check that all throttle
+cfg fields are 0.  There are no backwards compatibility concerns since
+the throttle filter is new and existing users don't rely on it.
 
-Thanks a lot.
-Mao
+Thoughts?
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
->
+Stefan
