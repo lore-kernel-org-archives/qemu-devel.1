@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56080)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58138)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhlcindy@gmail.com>) id 1dERWw-0001j5-N0
-	for qemu-devel@nongnu.org; Fri, 26 May 2017 22:32:39 -0400
+	(envelope-from <guangrong.xiao@gmail.com>) id 1dERr2-0004oV-Jt
+	for qemu-devel@nongnu.org; Fri, 26 May 2017 22:53:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zhlcindy@gmail.com>) id 1dERWv-0003Z6-OY
-	for qemu-devel@nongnu.org; Fri, 26 May 2017 22:32:38 -0400
-MIME-Version: 1.0
-In-Reply-To: <20170526132114.6edc006e@nial.brq.redhat.com>
-References: <1495790468-23862-1-git-send-email-zhlcindy@gmail.com>
-	<20170526132114.6edc006e@nial.brq.redhat.com>
-From: Li Zhang <zhlcindy@gmail.com>
-Date: Sat, 27 May 2017 10:32:33 +0800
-Message-ID: <CAD8of+pw5Nh4oSkTuYX4fbJvA8=-CTmn6dgdXHPLERAcQM+Oyw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH 0/3] arm/virt: refine virt.c code and
- implement hot_add_cpu interface
+	(envelope-from <guangrong.xiao@gmail.com>) id 1dERqx-0004lX-PQ
+	for qemu-devel@nongnu.org; Fri, 26 May 2017 22:53:24 -0400
+Received: from mail-pf0-x242.google.com ([2607:f8b0:400e:c00::242]:33187)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <guangrong.xiao@gmail.com>)
+	id 1dERqx-0004jf-GV
+	for qemu-devel@nongnu.org; Fri, 26 May 2017 22:53:19 -0400
+Received: by mail-pf0-x242.google.com with SMTP id f27so6120617pfe.0
+	for <qemu-devel@nongnu.org>; Fri, 26 May 2017 19:53:19 -0700 (PDT)
+From: guangrong.xiao@gmail.com
+Date: Sat, 27 May 2017 10:53:01 +0800
+Message-Id: <20170527025301.23499-1-xiaoguangrong@tencent.com>
+Subject: [Qemu-devel] [PATCH v2] [PATCH] qtest: add rtc periodic timer test
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,73 +24,169 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: peter.maydell@linaro.org, qemu-arm@nongnu.org, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Li Zhang <li.zhang@hxt-semitech.com>
+To: pbonzini@redhat.com, mst@redhat.com, mtosatti@redhat.com
+Cc: qemu-devel@nongnu.org, kvm@vger.kernel.org, Xiao Guangrong <xiaoguangrong@tencent.com>
 
-On Fri, May 26, 2017 at 7:21 PM, Igor Mammedov <imammedo@redhat.com> wrote:
-> On Fri, 26 May 2017 17:21:05 +0800
-> Li Zhang <zhlcindy@gmail.com> wrote:
->
->> From: Li Zhang <li.zhang@hxt-semitech.com>
->>
->> virt machine doesn't support hot_add_cpu interface. This patchset is to implement
->> hot_add_cpu interface. A CPU can be added by QMP command with QEMU monitor.
->>
->> Here is command to add a CPU with QMP command.
->>
->> * qemu-system-aarch64 -machine virt -cpu cortex-a15 -smp 1,maxcpus=4 \
->>     -monitor telnet:127.0.0.1:4444,server,nowait -nographic
->> * connect monitor:      telnet 127.0.0.1 4444
->> * execute qmp command:  cpu-add 1
-> cpu-add command shouldn't be used for new cpu hotplug,
-> pls use generic device_add for that.
+From: Xiao Guangrong <xiaoguangrong@tencent.com>
 
-Ok,  I will drop this command and look at device_add.
+It tests the accuracy of rtc periodic timer which is recently
+improved & fixed by:
+      mc146818rtc: precisely count the clock for periodic timer
+(commit id has not been decided yet)
 
->
-> The last time I looked at it, virt machine needed quite a bit of
-> re-factoring of the way it creates/wires up CPUs.
+Changelog in v2:
+  integrate it with rtc-test by using clock_step_next() to inquire
+  the time in QEMU instead of real time (thanks to Paolo's suggestion)
 
- Yes, I am looking into it and see if I can do something:)
+Signed-off-by: Xiao Guangrong <xiaoguangrong@tencent.com>
+---
+ hw/timer/mc146818rtc.c         | 15 +++----------
+ include/hw/timer/mc146818rtc.h | 19 ++++++++++++++++
+ tests/rtc-test.c               | 49 ++++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 71 insertions(+), 12 deletions(-)
 
->
-> Pls see usage of following callbacks for example on how to implement
-> device_add based cpu hotplug:
->
->   get_hotplug_handler
->   pc_cpu_pre_plug
->   pc_cpu_plug
->   pc_possible_cpu_arch_ids
->
-> and pc_cpus_init() for initial cpu creation with above callbacks in use
->
-Thanks, I will see it. :)
-
->>
->> Currently, when KVM is enabled and add a CPU with QMP command, QEMU
->> reports error "kvm_init_vcpu failed: Device or resourc busy". KVM can't
->> create a new CPU when vgic has been initialized and irqchip_in_kernel in
->> function kvm_arch_vcpu_create. It needs to change KVM code in the future.
-> if KVM isn't capable do it yet, then qemu should refuse cpu hotplug if running
-> with KVM accelarator and allow it only in TCG mode.
-
-OK, I will add an assertion to allow hotplug only in TCG mode.
-
->
->>
->> Li Zhang (3):
->>   arm/virt: Refine fdt_add_cpu_nodes code
->>   arm/virt: Refine code of machvirt_init
->>   arm/virt: Implement hot_add_cpu interface
->>
->>  hw/arm/virt.c | 344 ++++++++++++++++++++++++++++++++++------------------------
->>  1 file changed, 202 insertions(+), 142 deletions(-)
->>
->
-
-
-
+diff --git a/hw/timer/mc146818rtc.c b/hw/timer/mc146818rtc.c
+index 6d0a610..0aba66c 100644
+--- a/hw/timer/mc146818rtc.c
++++ b/hw/timer/mc146818rtc.c
+@@ -120,7 +120,7 @@ static void rtc_coalesced_timer_update(RTCState *s)
+         /* divide each RTC interval to 2 - 8 smaller intervals */
+         int c = MIN(s->irq_coalesced, 7) + 1; 
+         int64_t next_clock = qemu_clock_get_ns(rtc_clock) +
+-            muldiv64(s->period / c, NANOSECONDS_PER_SECOND, RTC_CLOCK_RATE);
++            periodic_clock_to_ns(s->period / c);
+         timer_mod(s->coalesced_timer, next_clock);
+     }
+ }
+@@ -178,16 +178,8 @@ static uint32_t rtc_periodic_clock_ticks(RTCState *s)
+      }
+ 
+     period_code = s->cmos_data[RTC_REG_A] & 0x0f;
+-    if (!period_code) {
+-        return 0;
+-    }
+-
+-    if (period_code <= 2) {
+-        period_code += 7;
+-    }
+ 
+-    /* period in 32 Khz cycles */
+-    return 1 << (period_code - 1);
++    return periodic_period_to_clock(period_code);
+ }
+ 
+ /*
+@@ -266,8 +258,7 @@ periodic_timer_update(RTCState *s, int64_t current_time, uint32_t old_period)
+         assert(lost_clock >= 0 && lost_clock <= period);
+ 
+         next_irq_clock = cur_clock + period - lost_clock;
+-        s->next_periodic_time = muldiv64(next_irq_clock, NANOSECONDS_PER_SECOND,
+-                                         RTC_CLOCK_RATE) + 1;
++        s->next_periodic_time = periodic_clock_to_ns(next_irq_clock) + 1;
+         timer_mod(s->periodic_timer, s->next_periodic_time);
+     } else {
+         s->irq_coalesced = 0;
+diff --git a/include/hw/timer/mc146818rtc.h b/include/hw/timer/mc146818rtc.h
+index 7c8e64b..f23e734 100644
+--- a/include/hw/timer/mc146818rtc.h
++++ b/include/hw/timer/mc146818rtc.h
+@@ -10,4 +10,23 @@ ISADevice *rtc_init(ISABus *bus, int base_year, qemu_irq intercept_irq);
+ void rtc_set_memory(ISADevice *dev, int addr, int val);
+ int rtc_get_memory(ISADevice *dev, int addr);
+ 
++static inline uint32_t periodic_period_to_clock(int period_code)
++{
++    if (!period_code) {
++        return 0;
++   }
++
++    if (period_code <= 2) {
++        period_code += 7;
++    }
++    /* period in 32 Khz cycles */
++   return 1 << (period_code - 1);
++}
++
++#define RTC_CLOCK_RATE            32768
++
++static inline int64_t periodic_clock_to_ns(int64_t clocks)
++{
++    return muldiv64(clocks, NANOSECONDS_PER_SECOND, RTC_CLOCK_RATE);
++}
+ #endif /* MC146818RTC_H */
+diff --git a/tests/rtc-test.c b/tests/rtc-test.c
+index a086efd..0500686 100644
+--- a/tests/rtc-test.c
++++ b/tests/rtc-test.c
+@@ -14,6 +14,7 @@
+ #include "qemu/osdep.h"
+ 
+ #include "libqtest.h"
++#include "hw/timer/mc146818rtc.h"
+ #include "hw/timer/mc146818rtc_regs.h"
+ 
+ static uint8_t base = 0x70;
+@@ -542,6 +543,52 @@ static void register_b_set_flag(void)
+     g_assert_cmpint(cmos_read(RTC_CENTURY), ==, 0x20);
+ }
+ 
++#define RTC_PERIOD_CODE1    13   /* 8 Hz */
++#define RTC_PERIOD_CODE2    15   /* 2 Hz */
++
++#define RTC_PERIOD_TEST_NR  50
++
++static uint64_t wait_periodic_interrupt(uint64_t real_time)
++{
++    while (!get_irq(RTC_ISA_IRQ)) {
++        real_time = clock_step_next();
++    }
++
++    g_assert((cmos_read(RTC_REG_C) & REG_C_PF) != 0);
++    return real_time;
++}
++
++static void periodic_timer(void)
++{
++    int i;
++    uint64_t period_clocks, period_time, start_time, real_time;
++
++    /* disable all interrupts. */
++    cmos_write(RTC_REG_B, cmos_read(RTC_REG_B) &
++                                   ~(REG_B_PIE | REG_B_AIE | REG_B_UIE));
++    cmos_write(RTC_REG_A, RTC_PERIOD_CODE1);
++    /* enable periodic interrupt after properly configure the period. */
++    cmos_write(RTC_REG_B, cmos_read(RTC_REG_B) | REG_B_PIE);
++
++    start_time = real_time = clock_step_next();
++
++    for (i = 0; i < RTC_PERIOD_TEST_NR; i++) {
++        cmos_write(RTC_REG_A, RTC_PERIOD_CODE1);
++        real_time = wait_periodic_interrupt(real_time);
++        cmos_write(RTC_REG_A, RTC_PERIOD_CODE2);
++        real_time = wait_periodic_interrupt(real_time);
++    }
++
++    period_clocks = periodic_period_to_clock(RTC_PERIOD_CODE1) +
++                       periodic_period_to_clock(RTC_PERIOD_CODE2);
++    period_clocks *= RTC_PERIOD_TEST_NR;
++    period_time = periodic_clock_to_ns(period_clocks);
++
++    real_time -= start_time;
++    g_assert_cmpint(ABS((int64_t)(real_time - period_time)), <=,
++                    NANOSECONDS_PER_SECOND * 0.5);
++}
++
+ int main(int argc, char **argv)
+ {
+     QTestState *s = NULL;
+@@ -564,6 +611,8 @@ int main(int argc, char **argv)
+     qtest_add_func("/rtc/set-year/1980", set_year_1980);
+     qtest_add_func("/rtc/misc/register_b_set_flag", register_b_set_flag);
+     qtest_add_func("/rtc/misc/fuzz-registers", fuzz_registers);
++    qtest_add_func("/rtc/periodic/interrupt", periodic_timer);
++
+     ret = g_test_run();
+ 
+     if (s) {
 -- 
-
-Best Regards
--Li
+2.9.4
