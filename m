@@ -1,27 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48654)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56763)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1dEcvr-0007tF-ES
-	for qemu-devel@nongnu.org; Sat, 27 May 2017 10:43:08 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dEeQ3-0006AT-Fv
+	for qemu-devel@nongnu.org; Sat, 27 May 2017 12:18:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1dEcvo-0001tB-8k
-	for qemu-devel@nongnu.org; Sat, 27 May 2017 10:43:07 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60032)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <david@redhat.com>) id 1dEcvn-0001pr-Vn
-	for qemu-devel@nongnu.org; Sat, 27 May 2017 10:43:04 -0400
-References: <1495704132-5675-1-git-send-email-thuth@redhat.com>
-	<b8b5569d-db2a-2c6c-f4c2-6647bb1444e5@redhat.com>
-	<091318e1-6572-9c69-c294-2dab340e03ed@redhat.com>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <fc75573b-555b-3033-0984-7393c68a3271@redhat.com>
-Date: Sat, 27 May 2017 16:42:57 +0200
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dEeQ2-0005cp-Bp
+	for qemu-devel@nongnu.org; Sat, 27 May 2017 12:18:23 -0400
+Received: from mail-oi0-x229.google.com ([2607:f8b0:4003:c06::229]:36365)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dEeQ2-0005cb-7B
+	for qemu-devel@nongnu.org; Sat, 27 May 2017 12:18:22 -0400
+Received: by mail-oi0-x229.google.com with SMTP id h4so42685725oib.3
+	for <qemu-devel@nongnu.org>; Sat, 27 May 2017 09:18:22 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Date: Sat, 27 May 2017 13:17:32 -0300
+Message-Id: <20170527161755.7761-2-f4bug@amsat.org>
+In-Reply-To: <20170527161755.7761-1-f4bug@amsat.org>
+References: <20170527161755.7761-1-f4bug@amsat.org>
 MIME-Version: 1.0
-In-Reply-To: <091318e1-6572-9c69-c294-2dab340e03ed@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2] target/s390x/cpu_models: Allow some
- additional feature bits for the "qemu" CPU
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH v4 01/24] docker: let _copy_with_mkdir()
+ sub_path argument be optional
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,147 +34,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>
-Cc: Alexander Graf <agraf@suse.de>, Aurelien Jarno <aurelien@aurel32.net>
+To: qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Fam Zheng <famz@redhat.com>
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 
-On 26.05.2017 22:14, Thomas Huth wrote:
-> On 26.05.2017 14:14, David Hildenbrand wrote:
->> On 25.05.2017 11:22, Thomas Huth wrote:
->>> Currently we only present the plain z900 feature bits to the guest,
->>> but QEMU already emulates some additional features (but not all of
->>> the next CPU generation, so we can not use the next CPU level as
->>> default yet). Since newer Linux kernels are checking the feature bits
->>> and refuse to work if a required feature is missing, it would be nice
->>> to have a way to present more of the supported features when we are
->>> running with the "qemu" CPU.
->>> This patch now adds the supported features to the "full_feat" bitmap,
->>> so that additional features can be enabled on the command line now,
->>> for example with:
->>>
->>>  qemu-system-s390x -cpu qemu,stfle=true,ldisp=true,eimm=true,stckf=true>
->>> Signed-off-by: Thomas Huth <thuth@redhat.com>
->>> ---
->>>  v2: Mark feats array with "static const"
->>>
->>>  target/s390x/cpu_models.c | 34 +++++++++++++++++++++++++++++++---
->>>  1 file changed, 31 insertions(+), 3 deletions(-)
->>>
->>> diff --git a/target/s390x/cpu_models.c b/target/s390x/cpu_models.c
->>> index 8d27363..e5e005a 100644
->>> --- a/target/s390x/cpu_models.c
->>> +++ b/target/s390x/cpu_models.c
->>> @@ -658,6 +658,30 @@ static void check_compatibility(const S390CPUModel *max_model,
->>>                    "available in the configuration: ");
->>>  }
->>>  
->>> +/**
->>> + * The base TCG CPU model "qemu" is based on the z900. However, we already
->>> + * can also emulate some additional features of later CPU generations, so
->>> + * we add these additional feature bits here.
->>> + */
->>> +static void add_qemu_cpu_model_features(S390FeatBitmap fbm)
->>> +{
->>> +    static const int feats[] = {
->>> +        S390_FEAT_STFLE,
->>> +        S390_FEAT_EXTENDED_IMMEDIATE,
->>> +        S390_FEAT_LONG_DISPLACEMENT,
->>> +        S390_FEAT_LONG_DISPLACEMENT_FAST,
->>> +        S390_FEAT_STORE_CLOCK_FAST,
->>> +        S390_FEAT_GENERAL_INSTRUCTIONS_EXT,
->>> +        S390_FEAT_EXECUTE_EXT,
->>> +        S390_FEAT_STFLE_45,
->>> +    };
->>> +    int i;
->>> +
->>> +    for (i = 0; i < ARRAY_SIZE(feats); i++) {
->>> +        set_bit(feats[i], fbm);
->>> +    }
->>> +}
->>> +
->>>  static S390CPUModel *get_max_cpu_model(Error **errp)
->>>  {
->>>      static S390CPUModel max_model;
->>> @@ -670,10 +694,11 @@ static S390CPUModel *get_max_cpu_model(Error **errp)
->>>      if (kvm_enabled()) {
->>>          kvm_s390_get_host_cpu_model(&max_model, errp);
->>>      } else {
->>> -        /* TCG emulates a z900 */
->>> +        /* TCG emulates a z900 (with some optional additional features) */
->>>          max_model.def = &s390_cpu_defs[0];
->>>          bitmap_copy(max_model.features, max_model.def->default_feat,
->>>                      S390_FEAT_MAX);
->>> +        add_qemu_cpu_model_features(max_model.features);
->>>      }
->>>      if (!*errp) {
->>>          cached = true;
->>> @@ -925,11 +950,14 @@ static void s390_host_cpu_model_initfn(Object *obj)
->>>  
->>>  static void s390_qemu_cpu_model_initfn(Object *obj)
->>>  {
->>> +    static S390CPUDef s390_qemu_cpu_defs;
->>>      S390CPU *cpu = S390_CPU(obj);
->>>  
->>>      cpu->model = g_malloc0(sizeof(*cpu->model));
->>> -    /* TCG emulates a z900 */
->>> -    cpu->model->def = &s390_cpu_defs[0];
->>> +    /* TCG emulates a z900 (with some optional additional features) */
->>> +    memcpy(&s390_qemu_cpu_defs, &s390_cpu_defs[0], sizeof(s390_qemu_cpu_defs));
->>> +    add_qemu_cpu_model_features(s390_qemu_cpu_defs.full_feat);
->>> +    cpu->model->def = &s390_qemu_cpu_defs;
->>>      bitmap_copy(cpu->model->features, cpu->model->def->default_feat,
->>>                  S390_FEAT_MAX);
->>
->> That should work for the general case, at least for now.
->>
->> arch_query_cpu_model_baseline() will still drop the additional featues.
-> 
-> It's only for experimenting with the additional feature right now, not
-> for serious usage yet (since some features are still missing to run
-> Linux kernels that are compiled for something > z900) - so I don't think
-> we need this for QMP already, i.e. IMHO we do not need care too much
-> about arch_query_cpu_model_baseline() yet.
-> 
+Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
+---
+ tests/docker/docker.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Yes, for a short term solution this should be just fine.
-
->> Another option would be to directly bump up the CPU model to a z9, with
->> missing base features (for now). Which looks cleaner in my eyes:
-> 
-> But couldn't this cause issues, too? What if a kernel just assumes that
-> certain features are available with a z9 machine, without having a
-> closer look at the feature bits? Also, what about the features that we
-
-A tcg guest currently only sees the feature part of CPU models. So e.g.
-CPUID is not correctly set. So it most likely makes sense to connect
-that properly to the CPU model, too, before we change the CPU
-generation. (otherwise we will have guest visible changes once we
-connect it - not the features will change but the CPU type/generation).
-
-> already provide, but that were not available in the z9 yet, like
-> S390_FEAT_GENERAL_INSTRUCTIONS_EXT (which was introduced with the z10 as
-> far as I can see)? Don't you have the same issue with
-> arch_query_cpu_model_baseline() there?
-
-Both point are true. In your approach, I don't like creation of fake,
-duplicate CPU definitions. But as this will be a short term "hack" to
-allow enabling these features, this should be fine for now. We should
-just keep in mind that once we want to enable these features
-permanently, that we should get rid of the hacked up CPU definition and
-implement proper migration compatibility support.
-
-So
-Acked-by: David Hildenbrand <david@redhat.com>
-
-Thanks!
-
-
-> 
->  Thomas
-> 
-
-
+diff --git a/tests/docker/docker.py b/tests/docker/docker.py
+index 8747f6a440..6ddc6e4c2a 100755
+--- a/tests/docker/docker.py
++++ b/tests/docker/docker.py
+@@ -52,7 +52,7 @@ def _guess_docker_command():
+     raise Exception("Cannot find working docker command. Tried:\n%s" % \
+                     commands_txt)
+ 
+-def _copy_with_mkdir(src, root_dir, sub_path):
++def _copy_with_mkdir(src, root_dir, sub_path='.'):
+     """Copy src into root_dir, creating sub_path as needed."""
+     dest_dir = os.path.normpath("%s/%s" % (root_dir, sub_path))
+     try:
 -- 
-
-Thanks,
-
-David
+2.11.0
