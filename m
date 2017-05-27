@@ -1,32 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60304)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34349)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dEemC-000663-GY
-	for qemu-devel@nongnu.org; Sat, 27 May 2017 12:41:17 -0400
+	(envelope-from <marcel@redhat.com>) id 1dEf5h-0000nJ-Nk
+	for qemu-devel@nongnu.org; Sat, 27 May 2017 13:01:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dEem9-0006Xq-BT
-	for qemu-devel@nongnu.org; Sat, 27 May 2017 12:41:16 -0400
-Received: from mail-oi0-x244.google.com ([2607:f8b0:4003:c06::244]:34092)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dEem9-0006Ww-6P
-	for qemu-devel@nongnu.org; Sat, 27 May 2017 12:41:13 -0400
-Received: by mail-oi0-x244.google.com with SMTP id w10so6090864oif.1
-	for <qemu-devel@nongnu.org>; Sat, 27 May 2017 09:41:13 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20170526211638.32301-1-rth@twiddle.net>
-	<20170526211638.32301-17-rth@twiddle.net>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <b5d119ec-b354-374a-f61b-284c81c313d5@amsat.org>
-Date: Sat, 27 May 2017 13:41:10 -0300
+	(envelope-from <marcel@redhat.com>) id 1dEf5e-0007BO-M0
+	for qemu-devel@nongnu.org; Sat, 27 May 2017 13:01:25 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:44202)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <marcel@redhat.com>) id 1dEf5e-0007As-Co
+	for qemu-devel@nongnu.org; Sat, 27 May 2017 13:01:22 -0400
+References: <20170526121516.6607-1-maozy.fnst@cn.fujitsu.com>
+	<b98f7c09-257c-6d6f-fd25-7286f4d16eb2@redhat.com>
+	<5ab8c115-a8de-1d48-155a-3daac7e0d841@cn.fujitsu.com>
+From: Marcel Apfelbaum <marcel@redhat.com>
+Message-ID: <19dc61d7-9779-22a6-03cc-0eb718fe2875@redhat.com>
+Date: Sat, 27 May 2017 20:01:13 +0300
 MIME-Version: 1.0
-In-Reply-To: <20170526211638.32301-17-rth@twiddle.net>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v7 16/26] tcg/arm: Clarify tcg_out_bx for
- arm4 host
+In-Reply-To: <5ab8c115-a8de-1d48-155a-3daac7e0d841@cn.fujitsu.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+Subject: Re: [Qemu-devel] [PATCH] pci-bridge/i82801b11: Convert to realize
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,89 +29,116 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <rth@twiddle.net>, qemu-devel@nongnu.org
+To: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>, qemu-devel@nongnu.org
+Cc: mst@redhat.com, armbru@redhat.com
 
-On 05/26/2017 06:16 PM, Richard Henderson wrote:
-> In theory this would re-enable usage of QEMU on an armv4 host.
-> Whether this is worthwhile is debatable -- we've been unconditionally
-> issuing the armv5t BX instruction in the prologue since 2011 without
-> complaint.  Possibly we should simply require an armv6 host.
- >
 
-I remember having some issue 2 years ago trying to run on a ARM926EJ-S 
-but the gcc/newlib revisions were good candidates to give problem so I 
-didn't go further. Few NAS still run on ARMv4 cpu (some StrongARM).
-Anyway on boards running ARMv4 cpu, problems are more likely to come 
-from available memory to run an OS and QEMU rather than the TCG codebase.
 
-> Signed-off-by: Richard Henderson <rth@twiddle.net>
+On 27/05/2017 9:58, Mao Zhongyi wrote:
+>
+>
+> On 05/26/2017 10:08 PM, Marcel Apfelbaum wrote:
+>>
+>>
+>> On 26/05/2017 15:15, Mao Zhongyi wrote:
+>>> The pci-birdge device i82801b11 still implements the old
+>>> PCIDeviceClass .init() through i82801b11_bridge_init()
+>>> instead of the new .realize(). All devices need to be
+>>> converted to .realize(). So convert it and rename it to
+>>> i82801b11_bridge_realize().
+>>>
+>>> Signed-off-by: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
+>>> ---
+>>>   hw/pci-bridge/i82801b11.c | 9 ++++-----
+>>>   1 file changed, 4 insertions(+), 5 deletions(-)
+>>>
+>>> diff --git a/hw/pci-bridge/i82801b11.c b/hw/pci-bridge/i82801b11.c
+>>> index 2404e7e..dca3162 100644
+>>> --- a/hw/pci-bridge/i82801b11.c
+>>> +++ b/hw/pci-bridge/i82801b11.c
+>>> @@ -44,6 +44,7 @@
+>>>   #include "qemu/osdep.h"
+>>>   #include "hw/pci/pci.h"
+>>>   #include "hw/i386/ich9.h"
+>>> +#include "qapi/error.h"
+>>> /*****************************************************************************/
+>>> @@ -58,7 +59,7 @@ typedef struct I82801b11Bridge {
+>>>       /*< public >*/
+>>>   } I82801b11Bridge;
+>>>   -static int i82801b11_bridge_initfn(PCIDevice *d)
+>>> +static void i82801b11_bridge_realize(PCIDevice *d, Error **errp)
+>>>   {
+>>>       int rc;
+>>>   @@ -70,12 +71,10 @@ static int i82801b11_bridge_initfn(PCIDevice *d)
+>>>           goto err_bridge;
+>>>       }
+>>>       pci_config_set_prog_interface(d->config, 
+>>> PCI_CLASS_BRIDGE_PCI_INF_SUB);
+>>> -    return 0;
+>>> +    return;
+>>>     err_bridge:
+>>>       pci_bridge_exitfn(d);
+>>
+>> Hi,
+>>
+>> Since you move to realize, you may want to leverage the errp to add
+>> info on errors.
+>>
+>> Thanks,
+>> Marcel
+>
+>
+> Hi, Marcel
+>
 
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Hi!
+> Thanks for your quick reply and advice. In fact, I have considered 
+> adding an error
+> message to errp when an error occurs. But I found that 
+> pci_bridge_ssvid_init() has
+> reported a specific info when it fails. If the error is reported here 
+> again, it seems
+> a bit more superfluous, so it's not adopted.
 
-> ---
->  tcg/arm/tcg-target.inc.c | 29 +++++++++++++++--------------
->  1 file changed, 15 insertions(+), 14 deletions(-)
+I agree we don't want to see the error twice, but that means we may want
+to pass the error pointer to pci_bridge_ssvid_init and so on.
+One of the main things we achieve when moving to 'realize' is better
+error handling, so if we don't do that maybe is not worth it.
+
+You may need to do several changes you didn't intend to
+in order to do the error propagation right...
+
+Thanks,
+Marcel
+
+> Of course, output a readable error info
+> to make it easier for users is also a good choice. So, are you sure 
+> you want to do
+> that?
 >
-> diff --git a/tcg/arm/tcg-target.inc.c b/tcg/arm/tcg-target.inc.c
-> index e75a6d4..590c57d 100644
-> --- a/tcg/arm/tcg-target.inc.c
-> +++ b/tcg/arm/tcg-target.inc.c
-> @@ -329,11 +329,6 @@ static const uint8_t tcg_cond_to_arm_cond[] = {
->      [TCG_COND_GTU] = COND_HI,
->  };
+> Look forward to your feedback and suggestion soon.
 >
-> -static inline void tcg_out_bx(TCGContext *s, int cond, int rn)
-> -{
-> -    tcg_out32(s, (cond << 28) | 0x012fff10 | rn);
-> -}
-> -
->  static inline void tcg_out_b(TCGContext *s, int cond, int32_t offset)
->  {
->      tcg_out32(s, (cond << 28) | 0x0a000000 |
-> @@ -402,6 +397,18 @@ static inline void tcg_out_mov_reg(TCGContext *s, int cond, int rd, int rm)
->      }
->  }
+> Thanks a lot.
+> Mao
 >
-> +static inline void tcg_out_bx(TCGContext *s, int cond, TCGReg rn)
-> +{
-> +    /* Unless the C portion of QEMU is compiled as thumb, we don't
-> +       actually need true BX semantics; merely a branch to an address
-> +       held in a register.  */
-> +    if (use_armv5t_instructions) {
-> +        tcg_out32(s, (cond << 28) | 0x012fff10 | rn);
-> +    } else {
-> +        tcg_out_mov_reg(s, cond, TCG_REG_PC, rn);
-> +    }
-> +}
-> +
->  static inline void tcg_out_dat_imm(TCGContext *s,
->                  int cond, int opc, int rd, int rn, int im)
->  {
-> @@ -977,7 +984,7 @@ static inline void tcg_out_st8(TCGContext *s, int cond,
->   * with the code buffer limited to 16MB we wouldn't need the long case.
->   * But we also use it for the tail-call to the qemu_ld/st helpers, which does.
->   */
-> -static inline void tcg_out_goto(TCGContext *s, int cond, tcg_insn_unit *addr)
-> +static void tcg_out_goto(TCGContext *s, int cond, tcg_insn_unit *addr)
->  {
->      intptr_t addri = (intptr_t)addr;
->      ptrdiff_t disp = tcg_pcrel_diff(s, addr);
-> @@ -987,15 +994,9 @@ static inline void tcg_out_goto(TCGContext *s, int cond, tcg_insn_unit *addr)
->          return;
->      }
 >
-> +    assert(use_armv5t_instructions || (addri & 1) == 0);
->      tcg_out_movi32(s, cond, TCG_REG_TMP, addri);
-> -    if (use_armv5t_instructions) {
-> -        tcg_out_bx(s, cond, TCG_REG_TMP);
-> -    } else {
-> -        if (addri & 1) {
-> -            tcg_abort();
-> -        }
-> -        tcg_out_mov_reg(s, cond, TCG_REG_PC, TCG_REG_TMP);
-> -    }
-> +    tcg_out_bx(s, cond, TCG_REG_TMP);
->  }
 >
->  /* The call case is mostly used for helpers - so it's not unreasonable
+>
+>
+>
+>
+>
+>
+>
+>
+>
+>
+>
+>
+>
+>
+>
+>
+>>
+>
 >
