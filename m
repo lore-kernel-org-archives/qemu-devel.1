@@ -1,26 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34349)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57867)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcel@redhat.com>) id 1dEf5h-0000nJ-Nk
-	for qemu-devel@nongnu.org; Sat, 27 May 2017 13:01:26 -0400
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1dEjMv-0003FM-Gh
+	for qemu-devel@nongnu.org; Sat, 27 May 2017 17:35:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcel@redhat.com>) id 1dEf5e-0007BO-M0
-	for qemu-devel@nongnu.org; Sat, 27 May 2017 13:01:25 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:44202)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <marcel@redhat.com>) id 1dEf5e-0007As-Co
-	for qemu-devel@nongnu.org; Sat, 27 May 2017 13:01:22 -0400
-References: <20170526121516.6607-1-maozy.fnst@cn.fujitsu.com>
-	<b98f7c09-257c-6d6f-fd25-7286f4d16eb2@redhat.com>
-	<5ab8c115-a8de-1d48-155a-3daac7e0d841@cn.fujitsu.com>
-From: Marcel Apfelbaum <marcel@redhat.com>
-Message-ID: <19dc61d7-9779-22a6-03cc-0eb718fe2875@redhat.com>
-Date: Sat, 27 May 2017 20:01:13 +0300
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1dEjMs-0001tf-FM
+	for qemu-devel@nongnu.org; Sat, 27 May 2017 17:35:29 -0400
+Received: from hera.aquilenet.fr ([141.255.128.1]:43375)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1dEjMs-0001tZ-8Q
+	for qemu-devel@nongnu.org; Sat, 27 May 2017 17:35:26 -0400
+Date: Sat, 27 May 2017 23:35:23 +0200
+From: Samuel Thibault <samuel.thibault@gnu.org>
+Message-ID: <20170527213523.c5ki5dz5zvsr5z46@var.youpi.perso.aquilenet.fr>
+References: <CAPXQAKv-sa4e5gNwPkEQzS5yZM61Lxdip+khwzt0NAYhAYiY9w@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <5ab8c115-a8de-1d48-155a-3daac7e0d841@cn.fujitsu.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH] pci-bridge/i82801b11: Convert to realize
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAPXQAKv-sa4e5gNwPkEQzS5yZM61Lxdip+khwzt0NAYhAYiY9w@mail.gmail.com>
+Subject: Re: [Qemu-devel] [PATCH] [SLIRP] Fix total IP header length in
+ forwarded TCP packets
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,116 +27,14 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>, qemu-devel@nongnu.org
-Cc: mst@redhat.com, armbru@redhat.com
+To: Sjors Gielen <sjors@sjorsgielen.nl>
+Cc: Jan Kiszka <jan.kiszka@siemens.com>, qemu-devel@nongnu.org
 
+Sjors Gielen, on mer. 24 mai 2017 17:51:12 +0000, wrote:
+> When forwarding TCP packets, the internal tcpiphdr struct length was wrongly
+> used inside the IP header. This commit changes the behaviour to what is used
+> by tcp_output.c, using the correct full IP header + payload length.
 
+Indeed, applied, thanks.
 
-On 27/05/2017 9:58, Mao Zhongyi wrote:
->
->
-> On 05/26/2017 10:08 PM, Marcel Apfelbaum wrote:
->>
->>
->> On 26/05/2017 15:15, Mao Zhongyi wrote:
->>> The pci-birdge device i82801b11 still implements the old
->>> PCIDeviceClass .init() through i82801b11_bridge_init()
->>> instead of the new .realize(). All devices need to be
->>> converted to .realize(). So convert it and rename it to
->>> i82801b11_bridge_realize().
->>>
->>> Signed-off-by: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
->>> ---
->>>   hw/pci-bridge/i82801b11.c | 9 ++++-----
->>>   1 file changed, 4 insertions(+), 5 deletions(-)
->>>
->>> diff --git a/hw/pci-bridge/i82801b11.c b/hw/pci-bridge/i82801b11.c
->>> index 2404e7e..dca3162 100644
->>> --- a/hw/pci-bridge/i82801b11.c
->>> +++ b/hw/pci-bridge/i82801b11.c
->>> @@ -44,6 +44,7 @@
->>>   #include "qemu/osdep.h"
->>>   #include "hw/pci/pci.h"
->>>   #include "hw/i386/ich9.h"
->>> +#include "qapi/error.h"
->>> /*****************************************************************************/
->>> @@ -58,7 +59,7 @@ typedef struct I82801b11Bridge {
->>>       /*< public >*/
->>>   } I82801b11Bridge;
->>>   -static int i82801b11_bridge_initfn(PCIDevice *d)
->>> +static void i82801b11_bridge_realize(PCIDevice *d, Error **errp)
->>>   {
->>>       int rc;
->>>   @@ -70,12 +71,10 @@ static int i82801b11_bridge_initfn(PCIDevice *d)
->>>           goto err_bridge;
->>>       }
->>>       pci_config_set_prog_interface(d->config, 
->>> PCI_CLASS_BRIDGE_PCI_INF_SUB);
->>> -    return 0;
->>> +    return;
->>>     err_bridge:
->>>       pci_bridge_exitfn(d);
->>
->> Hi,
->>
->> Since you move to realize, you may want to leverage the errp to add
->> info on errors.
->>
->> Thanks,
->> Marcel
->
->
-> Hi, Marcel
->
-
-Hi!
-> Thanks for your quick reply and advice. In fact, I have considered 
-> adding an error
-> message to errp when an error occurs. But I found that 
-> pci_bridge_ssvid_init() has
-> reported a specific info when it fails. If the error is reported here 
-> again, it seems
-> a bit more superfluous, so it's not adopted.
-
-I agree we don't want to see the error twice, but that means we may want
-to pass the error pointer to pci_bridge_ssvid_init and so on.
-One of the main things we achieve when moving to 'realize' is better
-error handling, so if we don't do that maybe is not worth it.
-
-You may need to do several changes you didn't intend to
-in order to do the error propagation right...
-
-Thanks,
-Marcel
-
-> Of course, output a readable error info
-> to make it easier for users is also a good choice. So, are you sure 
-> you want to do
-> that?
->
-> Look forward to your feedback and suggestion soon.
->
-> Thanks a lot.
-> Mao
->
->
->
->
->
->
->
->
->
->
->
->
->
->
->
->
->
->
->
->>
->
->
+Samuel
