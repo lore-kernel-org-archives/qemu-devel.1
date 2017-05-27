@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57237)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57902)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dEeQs-0006wv-RI
-	for qemu-devel@nongnu.org; Sat, 27 May 2017 12:19:15 -0400
+	id 1dEeWJ-0003PY-FH
+	for qemu-devel@nongnu.org; Sat, 27 May 2017 12:24:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dEeQs-0006Cn-1t
-	for qemu-devel@nongnu.org; Sat, 27 May 2017 12:19:14 -0400
-Received: from mail-oi0-x244.google.com ([2607:f8b0:4003:c06::244]:33177)
+	id 1dEeWG-0000JT-Ag
+	for qemu-devel@nongnu.org; Sat, 27 May 2017 12:24:51 -0400
+Received: from mail-oi0-x244.google.com ([2607:f8b0:4003:c06::244]:36827)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dEeQr-0006Cd-Tp
-	for qemu-devel@nongnu.org; Sat, 27 May 2017 12:19:13 -0400
-Received: by mail-oi0-x244.google.com with SMTP id h4so6041327oib.0
-	for <qemu-devel@nongnu.org>; Sat, 27 May 2017 09:19:13 -0700 (PDT)
+	id 1dEeWG-0000JJ-5q
+	for qemu-devel@nongnu.org; Sat, 27 May 2017 12:24:48 -0400
+Received: by mail-oi0-x244.google.com with SMTP id w138so6035492oiw.3
+	for <qemu-devel@nongnu.org>; Sat, 27 May 2017 09:24:48 -0700 (PDT)
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Sat, 27 May 2017 13:17:55 -0300
-Message-Id: <20170527161755.7761-25-f4bug@amsat.org>
-In-Reply-To: <20170527161755.7761-1-f4bug@amsat.org>
-References: <20170527161755.7761-1-f4bug@amsat.org>
+References: <df785b3fbff46e0d5b81aa951737ae1cd64dd9d0.1495862779.git.maozy.fnst@cn.fujitsu.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <e7d97bfa-1336-0669-32ac-0fdf387ae95e@amsat.org>
+Date: Sat, 27 May 2017 13:24:43 -0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+In-Reply-To: <df785b3fbff46e0d5b81aa951737ae1cd64dd9d0.1495862779.git.maozy.fnst@cn.fujitsu.com>
+Content-Type: text/plain; charset=windows-1252; format=flowed
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v4 24/24] MAINTAINERS: self-appoint me as
- reviewer in build/test automation
+Subject: Re: [Qemu-devel] [PATCH v3] pci: Set err to errp directly rather
+ than through error_propagate()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,26 +34,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Fam Zheng <famz@redhat.com>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+To: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>, qemu-devel@nongnu.org
+Cc: marcel@redhat.com, imammedo@redhat.com, armbru@redhat.com, mst@redhat.com
 
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
----
- MAINTAINERS | 1 +
- 1 file changed, 1 insertion(+)
+On 05/27/2017 02:34 AM, Mao Zhongyi wrote:
+> ioh3420_interrupts_init() and its callers rp_realize() fill error
+> message to local_err, then propagate it to errp by error_propagate(),
+> which is not necessary. So eliminate it and pass errp directly instead
+> of local_err. Of course, error_propagate() also has been removed.
+>
+> Signed-off-by: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
+> Reviewed-by: Eric Blake <eblake@redhat.com>
+> Reviewed-by: Marcel Apfelbaum <marcel@redhat.com>
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 33f47a989b..24b1422231 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -1851,6 +1851,7 @@ Build and test automation
- -------------------------
- M: Alex Bennée <alex.bennee@linaro.org>
- M: Fam Zheng <famz@redhat.com>
-+R: Philippe Mathieu-Daudé <f4bug@amsat.org>
- L: qemu-devel@nongnu.org
- S: Maintained
- F: .travis.yml
--- 
-2.11.0
+Reviewed-by: Philippe Mathieu-Daud� <f4bug@amsat.org>
+
+> ---
+>  hw/pci-bridge/ioh3420.c        | 4 +---
+>  hw/pci-bridge/pcie_root_port.c | 7 ++-----
+>  2 files changed, 3 insertions(+), 8 deletions(-)
+>
+> diff --git a/hw/pci-bridge/ioh3420.c b/hw/pci-bridge/ioh3420.c
+> index da4e5bd..5f56a2f 100644
+> --- a/hw/pci-bridge/ioh3420.c
+> +++ b/hw/pci-bridge/ioh3420.c
+> @@ -64,15 +64,13 @@ static uint8_t ioh3420_aer_vector(const PCIDevice *d)
+>  static int ioh3420_interrupts_init(PCIDevice *d, Error **errp)
+>  {
+>      int rc;
+> -    Error *local_err = NULL;
+>
+>      rc = msi_init(d, IOH_EP_MSI_OFFSET, IOH_EP_MSI_NR_VECTOR,
+>                    IOH_EP_MSI_SUPPORTED_FLAGS & PCI_MSI_FLAGS_64BIT,
+>                    IOH_EP_MSI_SUPPORTED_FLAGS & PCI_MSI_FLAGS_MASKBIT,
+> -                  &local_err);
+> +                  errp);
+>      if (rc < 0) {
+>          assert(rc == -ENOTSUP);
+> -        error_propagate(errp, local_err);
+>      }
+>
+>      return rc;
+> diff --git a/hw/pci-bridge/pcie_root_port.c b/hw/pci-bridge/pcie_root_port.c
+> index cf36318..9022996 100644
+> --- a/hw/pci-bridge/pcie_root_port.c
+> +++ b/hw/pci-bridge/pcie_root_port.c
+> @@ -59,7 +59,6 @@ static void rp_realize(PCIDevice *d, Error **errp)
+>      PCIDeviceClass *dc = PCI_DEVICE_GET_CLASS(d);
+>      PCIERootPortClass *rpc = PCIE_ROOT_PORT_GET_CLASS(d);
+>      int rc;
+> -    Error *local_err = NULL;
+>
+>      pci_config_set_interrupt_pin(d->config, 1);
+>      pci_bridge_initfn(d, TYPE_PCIE_BUS);
+> @@ -72,9 +71,8 @@ static void rp_realize(PCIDevice *d, Error **errp)
+>      }
+>
+>      if (rpc->interrupts_init) {
+> -        rc = rpc->interrupts_init(d, &local_err);
+> +        rc = rpc->interrupts_init(d, errp);
+>          if (rc < 0) {
+> -            error_propagate(errp, local_err);
+>              goto err_bridge;
+>          }
+>      }
+> @@ -98,9 +96,8 @@ static void rp_realize(PCIDevice *d, Error **errp)
+>      }
+>
+>      rc = pcie_aer_init(d, PCI_ERR_VER, rpc->aer_offset,
+> -                       PCI_ERR_SIZEOF, &local_err);
+> +                       PCI_ERR_SIZEOF, errp);
+>      if (rc < 0) {
+> -        error_propagate(errp, local_err);
+>          goto err;
+>      }
+>      pcie_aer_root_init(d);
+>
