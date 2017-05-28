@@ -1,28 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38366)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44533)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rob@landley.net>) id 1dEqbJ-0005Pi-5m
-	for qemu-devel@nongnu.org; Sun, 28 May 2017 01:18:49 -0400
+	(envelope-from <ndevos@redhat.com>) id 1dErjq-0005gJ-DO
+	for qemu-devel@nongnu.org; Sun, 28 May 2017 02:31:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rob@landley.net>) id 1dEqbG-00029f-3F
-	for qemu-devel@nongnu.org; Sun, 28 May 2017 01:18:49 -0400
-Received: from mail-oi0-x22b.google.com ([2607:f8b0:4003:c06::22b]:33956)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <rob@landley.net>) id 1dEqbF-00029E-RA
-	for qemu-devel@nongnu.org; Sun, 28 May 2017 01:18:46 -0400
-Received: by mail-oi0-x22b.google.com with SMTP id b204so50421180oii.1
-	for <qemu-devel@nongnu.org>; Sat, 27 May 2017 22:18:45 -0700 (PDT)
-Received: from [192.168.1.23] (cpe-72-182-52-210.austin.res.rr.com.
-	[72.182.52.210]) by smtp.googlemail.com with ESMTPSA id
-	a22sm2783691ote.34.2017.05.27.22.18.43 for <qemu-devel@nongnu.org>
-	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Sat, 27 May 2017 22:18:43 -0700 (PDT)
-From: Rob Landley <rob@landley.net>
-Message-ID: <1c8f4f4e-65f7-2d12-a391-08781fea651c@landley.net>
-Date: Sun, 28 May 2017 00:18:38 -0500
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] Commit b2a575a1c652 broke i486 support.
+	(envelope-from <ndevos@redhat.com>) id 1dErjp-0002in-7D
+	for qemu-devel@nongnu.org; Sun, 28 May 2017 02:31:42 -0400
+From: Niels de Vos <ndevos@redhat.com>
+Date: Sun, 28 May 2017 12:01:14 +0530
+Message-Id: <20170528063114.28691-1-ndevos@redhat.com>
+Subject: [Qemu-devel] [PATCH v3] gluster: add support for
+ PREALLOC_MODE_FALLOC
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,14 +18,185 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Jeff Cody <jcody@redhat.com>, Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, Niels de Vos <ndevos@redhat.com>
 
-You can't boot a kernel under -cpu 486 since that commit (hangs
-producing no output) because it added a bios image that won't run on
-anything short of pentium II.
+Add missing support for "preallocation=falloc" to the Gluster block
+driver. This change bases its logic on that of block/file-posix.c and
+removed the gluster_supports_zerofill() and qemu_gluster_zerofill()
+functions in favour of #ifdef checks in an easy to read
+switch-statement.
 
-You can try the run-emulator.sh script in
-http://landley.net/aboriginal/downloads/binaries/system-image-i486.tar.gz
-before and after that commit to check for yourself.
+Both glfs_zerofill() and glfs_fallocate() have been introduced with
+GlusterFS 3.5.0 (pkg-config glusterfs-api = 6). A #define for the
+availability of glfs_fallocate() has been added to ./configure.
 
-Rob
+Reported-by: Satheesaran Sundaramoorthi <sasundar@redhat.com>
+URL: https://bugzilla.redhat.com/1450759
+Signed-off-by: Niels de Vos <ndevos@redhat.com>
+---
+v3 typo fixes spotted by Jeff Cody and Eric Blake:
+- typo in the commit message (Eric)
+- copy/paste mistake causing incorrect if-statement (Jeff)
+
+v2 changes requested by Jeff Cody:
+- add CONFIG_GLUSTERFS_FALLOCATE
+- remove unneeded wrapper qemu_gluster_zerofill()
+
+ block/gluster.c | 76 ++++++++++++++++++++++++++++++---------------------------
+ configure       |  6 +++++
+ 2 files changed, 46 insertions(+), 36 deletions(-)
+
+diff --git a/block/gluster.c b/block/gluster.c
+index 7c76cd0..7863991 100644
+--- a/block/gluster.c
++++ b/block/gluster.c
+@@ -964,29 +964,6 @@ static coroutine_fn int qemu_gluster_co_pwrite_zeroes(BlockDriverState *bs,
+     qemu_coroutine_yield();
+     return acb.ret;
+ }
+-
+-static inline bool gluster_supports_zerofill(void)
+-{
+-    return 1;
+-}
+-
+-static inline int qemu_gluster_zerofill(struct glfs_fd *fd, int64_t offset,
+-                                        int64_t size)
+-{
+-    return glfs_zerofill(fd, offset, size);
+-}
+-
+-#else
+-static inline bool gluster_supports_zerofill(void)
+-{
+-    return 0;
+-}
+-
+-static inline int qemu_gluster_zerofill(struct glfs_fd *fd, int64_t offset,
+-                                        int64_t size)
+-{
+-    return 0;
+-}
+ #endif
+ 
+ static int qemu_gluster_create(const char *filename,
+@@ -996,9 +973,10 @@ static int qemu_gluster_create(const char *filename,
+     struct glfs *glfs;
+     struct glfs_fd *fd;
+     int ret = 0;
+-    int prealloc = 0;
++    PreallocMode prealloc;
+     int64_t total_size = 0;
+     char *tmp = NULL;
++    Error *local_err = NULL;
+ 
+     gconf = g_new0(BlockdevOptionsGluster, 1);
+     gconf->debug = qemu_opt_get_number_del(opts, GLUSTER_OPT_DEBUG,
+@@ -1026,13 +1004,12 @@ static int qemu_gluster_create(const char *filename,
+                           BDRV_SECTOR_SIZE);
+ 
+     tmp = qemu_opt_get_del(opts, BLOCK_OPT_PREALLOC);
+-    if (!tmp || !strcmp(tmp, "off")) {
+-        prealloc = 0;
+-    } else if (!strcmp(tmp, "full") && gluster_supports_zerofill()) {
+-        prealloc = 1;
+-    } else {
+-        error_setg(errp, "Invalid preallocation mode: '%s'"
+-                         " or GlusterFS doesn't support zerofill API", tmp);
++    prealloc = qapi_enum_parse(PreallocMode_lookup, tmp,
++                               PREALLOC_MODE__MAX, PREALLOC_MODE_OFF,
++                               &local_err);
++    g_free(tmp);
++    if (local_err) {
++        error_propagate(errp, local_err);
+         ret = -EINVAL;
+         goto out;
+     }
+@@ -1041,21 +1018,48 @@ static int qemu_gluster_create(const char *filename,
+                     O_WRONLY | O_CREAT | O_TRUNC | O_BINARY, S_IRUSR | S_IWUSR);
+     if (!fd) {
+         ret = -errno;
+-    } else {
++        goto out;
++    }
++
++    switch (prealloc) {
++#ifdef CONFIG_GLUSTERFS_FALLOCATE
++    case PREALLOC_MODE_FALLOC:
++        if (glfs_fallocate(fd, 0, 0, total_size)) {
++            error_setg(errp, "Could not preallocate data for the new file");
++            ret = -errno;
++        }
++        break;
++#endif /* CONFIG_GLUSTERFS_FALLOCATE */
++#ifdef CONFIG_GLUSTERFS_ZEROFILL
++    case PREALLOC_MODE_FULL:
+         if (!glfs_ftruncate(fd, total_size)) {
+-            if (prealloc && qemu_gluster_zerofill(fd, 0, total_size)) {
++            if (glfs_zerofill(fd, 0, total_size)) {
++                error_setg(errp, "Could not zerofill the new file");
+                 ret = -errno;
+             }
+         } else {
++            error_setg(errp, "Could not resize file");
+             ret = -errno;
+         }
+-
+-        if (glfs_close(fd) != 0) {
++        break;
++#endif /* CONFIG_GLUSTERFS_ZEROFILL */
++    case PREALLOC_MODE_OFF:
++        if (glfs_ftruncate(fd, total_size) != 0) {
+             ret = -errno;
++            error_setg(errp, "Could not resize file");
+         }
++        break;
++    default:
++        ret = -EINVAL;
++        error_setg(errp, "Unsupported preallocation mode: %s",
++                   PreallocMode_lookup[prealloc]);
++        break;
++    }
++
++    if (glfs_close(fd) != 0) {
++        ret = -errno;
+     }
+ out:
+-    g_free(tmp);
+     qapi_free_BlockdevOptionsGluster(gconf);
+     glfs_clear_preopened(glfs);
+     return ret;
+diff --git a/configure b/configure
+index 7c020c0..8b8291e 100755
+--- a/configure
++++ b/configure
+@@ -300,6 +300,7 @@ seccomp=""
+ glusterfs=""
+ glusterfs_xlator_opt="no"
+ glusterfs_discard="no"
++glusterfs_fallocate="no"
+ glusterfs_zerofill="no"
+ gtk=""
+ gtkabi=""
+@@ -3576,6 +3577,7 @@ if test "$glusterfs" != "no" ; then
+       glusterfs_discard="yes"
+     fi
+     if $pkg_config --atleast-version=6 glusterfs-api; then
++      glusterfs_fallocate="yes"
+       glusterfs_zerofill="yes"
+     fi
+   else
+@@ -5780,6 +5782,10 @@ if test "$glusterfs_discard" = "yes" ; then
+   echo "CONFIG_GLUSTERFS_DISCARD=y" >> $config_host_mak
+ fi
+ 
++if test "$glusterfs_fallocate" = "yes" ; then
++  echo "CONFIG_GLUSTERFS_FALLOCATE=y" >> $config_host_mak
++fi
++
+ if test "$glusterfs_zerofill" = "yes" ; then
+   echo "CONFIG_GLUSTERFS_ZEROFILL=y" >> $config_host_mak
+ fi
+-- 
+2.9.3
