@@ -1,35 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33654)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33639)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pasic@linux.vnet.ibm.com>) id 1dFL90-00087z-NM
+	(envelope-from <pasic@linux.vnet.ibm.com>) id 1dFL8z-00087x-Pp
 	for qemu-devel@nongnu.org; Mon, 29 May 2017 09:55:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pasic@linux.vnet.ibm.com>) id 1dFL8z-0005Ce-6l
-	for qemu-devel@nongnu.org; Mon, 29 May 2017 09:55:38 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:59228)
+	(envelope-from <pasic@linux.vnet.ibm.com>) id 1dFL8v-0005Bu-Qb
+	for qemu-devel@nongnu.org; Mon, 29 May 2017 09:55:37 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:32823)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <pasic@linux.vnet.ibm.com>)
-	id 1dFL8y-0005CN-T5
-	for qemu-devel@nongnu.org; Mon, 29 May 2017 09:55:37 -0400
-Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
+	id 1dFL8v-0005BW-Dp
+	for qemu-devel@nongnu.org; Mon, 29 May 2017 09:55:33 -0400
+Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
 	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v4TDrVnx067503
-	for <qemu-devel@nongnu.org>; Mon, 29 May 2017 09:55:35 -0400
+	v4TDrV4I130409
+	for <qemu-devel@nongnu.org>; Mon, 29 May 2017 09:55:31 -0400
 Received: from e06smtp12.uk.ibm.com (e06smtp12.uk.ibm.com [195.75.94.108])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2arfakp4mn-1
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2arf3hpt4c-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 29 May 2017 09:55:35 -0400
+	for <qemu-devel@nongnu.org>; Mon, 29 May 2017 09:55:31 -0400
 Received: from localhost
 	by e06smtp12.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
 	Only! Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <pasic@linux.vnet.ibm.com>;
-	Mon, 29 May 2017 14:55:33 +0100
+	Mon, 29 May 2017 14:55:28 +0100
 From: Halil Pasic <pasic@linux.vnet.ibm.com>
-Date: Mon, 29 May 2017 15:55:17 +0200
+Date: Mon, 29 May 2017 15:55:14 +0200
 In-Reply-To: <20170529135520.101429-1-pasic@linux.vnet.ibm.com>
 References: <20170529135520.101429-1-pasic@linux.vnet.ibm.com>
-Message-Id: <20170529135520.101429-5-pasic@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH v2 4/7] s390x/css: add missing css state
- conditionally
+Message-Id: <20170529135520.101429-2-pasic@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [PATCH v2 1/7] s390x: vmstatify config migration for
+ virtio-ccw
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -41,178 +41,744 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Cornelia Huck <cornelia.huck@de.ibm.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 Cc: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org, Halil Pasic <pasic@linux.vnet.ibm.com>
 
-Although we have recently vmstatified the migration of some css
-infrastructure,  for some css entities there is still state to be
-migrated left, because the focus was keeping migration stream
-compatibility (that is basically everything as-is).
+Let's vmstatify virtio_ccw_save_config and virtio_ccw_load_config for
+flexibility (extending using subsections) and for fun.
 
-Let us add vmstate helpers and extend existing vmstate descriptions so
-that we have everything we need. Let us guard the added state with via
-css_migration_enabled, so we keep the compatible behavior if css
-migration is disabled.
+To achieve this we need to hack the config_vector, which is VirtIODevice
+(that is common virtio) state, in the middle of the VirtioCcwDevice state
+representation.  This somewhat ugly, but we have no choice because the
+stream format needs to be preserved.
 
-Let's also annotate the bits which do not need to be migrated for better
-readability.
+Almost no changes in behavior. Exception is everything that comes with
+vmstate like extra bookkeeping about what's in the stream, and maybe some
+extra checks and better error reporting.
 
 Signed-off-by: Halil Pasic <pasic@linux.vnet.ibm.com>
 ---
- hw/intc/s390_flic.c | 20 +++++++++++++++
- hw/s390x/css.c      | 74 +++++++++++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 94 insertions(+)
+
+Note: Do not review this here! There is a stand alone patch on the list.
+Having this here is to is just for convenience.
+
+---
+ hw/intc/s390_flic.c          |  28 ++++
+ hw/s390x/ccw-device.c        |  10 ++
+ hw/s390x/ccw-device.h        |   4 +
+ hw/s390x/css.c               | 361 ++++++++++++++++++++++++++-----------------
+ hw/s390x/virtio-ccw.c        | 154 +++++++++---------
+ include/hw/s390x/css.h       |  12 +-
+ include/hw/s390x/s390_flic.h |   5 +
+ 7 files changed, 354 insertions(+), 220 deletions(-)
 
 diff --git a/hw/intc/s390_flic.c b/hw/intc/s390_flic.c
-index 7e7546a576..b889e74571 100644
+index 711c11454f..7e7546a576 100644
 --- a/hw/intc/s390_flic.c
 +++ b/hw/intc/s390_flic.c
-@@ -139,6 +139,22 @@ static void qemu_s390_flic_register_types(void)
+@@ -18,6 +18,7 @@
+ #include "trace.h"
+ #include "hw/qdev.h"
+ #include "qapi/error.h"
++#include "hw/s390x/s390-virtio-ccw.h"
+ 
+ S390FLICState *s390_get_flic(void)
+ {
+@@ -137,3 +138,30 @@ static void qemu_s390_flic_register_types(void)
+ }
  
  type_init(qemu_s390_flic_register_types)
- 
-+static bool adapter_info_so_needed(void *opaque)
-+{
-+    return css_migration_enabled();
-+}
 +
-+const VMStateDescription vmstate_adapter_info_so = {
-+    .name = "s390_adapter_info/summary_offset",
++const VMStateDescription vmstate_adapter_info = {
++    .name = "s390_adapter_info",
 +    .version_id = 1,
 +    .minimum_version_id = 1,
-+    .needed = adapter_info_so_needed,
 +    .fields = (VMStateField[]) {
-+        VMSTATE_UINT32(summary_offset, AdapterInfo),
++        VMSTATE_UINT64(ind_offset, AdapterInfo),
++        /*
++         * We do not have to migrate neither the id nor the addresses.
++         * The id is set by css_register_io_adapter and the addresses
++         * are set based on the IndAddr objects after those get mapped.
++         */
++        VMSTATE_END_OF_LIST()
++    },
++};
++
++const VMStateDescription vmstate_adapter_routes = {
++
++    .name = "s390_adapter_routes",
++    .version_id = 1,
++    .minimum_version_id = 1,
++    .fields = (VMStateField[]) {
++        VMSTATE_STRUCT(adapter, AdapterRoutes, 1, vmstate_adapter_info, \
++                       AdapterInfo),
++        VMSTATE_END_OF_LIST()
++    }
++};
+diff --git a/hw/s390x/ccw-device.c b/hw/s390x/ccw-device.c
+index fb8d640a7e..f9bfa154d6 100644
+--- a/hw/s390x/ccw-device.c
++++ b/hw/s390x/ccw-device.c
+@@ -50,6 +50,16 @@ static void ccw_device_class_init(ObjectClass *klass, void *data)
+     dc->props = ccw_device_properties;
+ }
+ 
++const VMStateDescription vmstate_ccw_dev = {
++    .name = "s390_ccw_dev",
++    .version_id = 1,
++    .minimum_version_id = 1,
++    .fields = (VMStateField[]) {
++        VMSTATE_STRUCT_POINTER(sch, CcwDevice, vmstate_subch_dev, SubchDev),
 +        VMSTATE_END_OF_LIST()
 +    }
 +};
 +
- const VMStateDescription vmstate_adapter_info = {
-     .name = "s390_adapter_info",
-     .version_id = 1,
-@@ -152,6 +168,10 @@ const VMStateDescription vmstate_adapter_info = {
-          */
-         VMSTATE_END_OF_LIST()
-     },
-+    .subsections = (const VMStateDescription * []) {
-+        &vmstate_adapter_info_so,
-+        NULL
-+    }
- };
+ static const TypeInfo ccw_device_info = {
+     .name = TYPE_CCW_DEVICE,
+     .parent = TYPE_DEVICE,
+diff --git a/hw/s390x/ccw-device.h b/hw/s390x/ccw-device.h
+index 89c8e5dff7..4e6af287e7 100644
+--- a/hw/s390x/ccw-device.h
++++ b/hw/s390x/ccw-device.h
+@@ -27,6 +27,10 @@ typedef struct CcwDevice {
+     CssDevId subch_id;
+ } CcwDevice;
  
- const VMStateDescription vmstate_adapter_routes = {
++extern const VMStateDescription vmstate_ccw_dev;
++#define VMSTATE_CCW_DEVICE(_field, _state)                     \
++    VMSTATE_STRUCT(_field, _state, 1, vmstate_ccw_dev, CcwDevice)
++
+ typedef struct CCWDeviceClass {
+     DeviceClass parent_class;
+     void (*unplug)(HotplugHandler *, DeviceState *, Error **);
 diff --git a/hw/s390x/css.c b/hw/s390x/css.c
-index 15517a16e4..a15b58d303 100644
+index 15c4f4b249..15517a16e4 100644
 --- a/hw/s390x/css.c
 +++ b/hw/s390x/css.c
-@@ -27,12 +27,45 @@ typedef struct CrwContainer {
-     QTAILQ_ENTRY(CrwContainer) sibling;
- } CrwContainer;
+@@ -20,6 +20,7 @@
+ #include "hw/s390x/css.h"
+ #include "trace.h"
+ #include "hw/s390x/s390_flic.h"
++#include "hw/s390x/s390-virtio-ccw.h"
  
-+static const VMStateDescription vmstate_crw = {
-+    .name = "s390_crw",
-+    .version_id = 1,
-+    .minimum_version_id = 1,
-+    .fields = (VMStateField[]) {
-+        VMSTATE_UINT16(flags, CRW),
-+        VMSTATE_UINT16(rsid, CRW),
-+        VMSTATE_END_OF_LIST()
-+    },
-+};
-+
-+static const VMStateDescription vmstate_crw_container = {
-+    .name = "s390_crw_container",
-+    .version_id = 1,
-+    .minimum_version_id = 1,
-+    .fields = (VMStateField[]) {
-+        VMSTATE_STRUCT(crw, CrwContainer, 0, vmstate_crw, CRW),
-+        VMSTATE_END_OF_LIST()
-+    },
-+};
-+
- typedef struct ChpInfo {
-     uint8_t in_use;
-     uint8_t type;
-     uint8_t is_virtual;
- } ChpInfo;
+ typedef struct CrwContainer {
+     CRW crw;
+@@ -38,6 +39,177 @@ typedef struct SubchSet {
+     unsigned long devnos_used[BITS_TO_LONGS(MAX_SCHID + 1)];
+ } SubchSet;
  
-+static const VMStateDescription vmstate_chp_info = {
-+    .name = "s390_chp_info",
++static const VMStateDescription vmstate_scsw = {
++    .name = "s390_scsw",
 +    .version_id = 1,
 +    .minimum_version_id = 1,
 +    .fields = (VMStateField[]) {
-+        VMSTATE_UINT8(in_use, ChpInfo),
-+        VMSTATE_UINT8(type, ChpInfo),
-+        VMSTATE_UINT8(is_virtual, ChpInfo),
++        VMSTATE_UINT16(flags, SCSW),
++        VMSTATE_UINT16(ctrl, SCSW),
++        VMSTATE_UINT32(cpa, SCSW),
++        VMSTATE_UINT8(dstat, SCSW),
++        VMSTATE_UINT8(cstat, SCSW),
++        VMSTATE_UINT16(count, SCSW),
 +        VMSTATE_END_OF_LIST()
 +    }
 +};
 +
- typedef struct SubchSet {
-     SubchDev *sch[MAX_SCHID + 1];
-     unsigned long schids_used[BITS_TO_LONGS(MAX_SCHID + 1)];
-@@ -215,6 +248,19 @@ typedef struct CssImage {
++static const VMStateDescription vmstate_pmcw = {
++    .name = "s390_pmcw",
++    .version_id = 1,
++    .minimum_version_id = 1,
++    .fields = (VMStateField[]) {
++        VMSTATE_UINT32(intparm, PMCW),
++        VMSTATE_UINT16(flags, PMCW),
++        VMSTATE_UINT16(devno, PMCW),
++        VMSTATE_UINT8(lpm, PMCW),
++        VMSTATE_UINT8(pnom, PMCW),
++        VMSTATE_UINT8(lpum, PMCW),
++        VMSTATE_UINT8(pim, PMCW),
++        VMSTATE_UINT16(mbi, PMCW),
++        VMSTATE_UINT8(pom, PMCW),
++        VMSTATE_UINT8(pam, PMCW),
++        VMSTATE_UINT8_ARRAY(chpid, PMCW, 8),
++        VMSTATE_UINT32(chars, PMCW),
++        VMSTATE_END_OF_LIST()
++    }
++};
++
++static const VMStateDescription vmstate_schib = {
++    .name = "s390_schib",
++    .version_id = 1,
++    .minimum_version_id = 1,
++    .fields = (VMStateField[]) {
++        VMSTATE_STRUCT(pmcw, SCHIB, 0, vmstate_pmcw, PMCW),
++        VMSTATE_STRUCT(scsw, SCHIB, 0, vmstate_scsw, SCSW),
++        VMSTATE_UINT64(mba, SCHIB),
++        VMSTATE_UINT8_ARRAY(mda, SCHIB, 4),
++        VMSTATE_END_OF_LIST()
++    }
++};
++
++
++static const VMStateDescription vmstate_ccw1 = {
++    .name = "s390_ccw1",
++    .version_id = 1,
++    .minimum_version_id = 1,
++    .fields = (VMStateField[]) {
++        VMSTATE_UINT8(cmd_code, CCW1),
++        VMSTATE_UINT8(flags, CCW1),
++        VMSTATE_UINT16(count, CCW1),
++        VMSTATE_UINT32(cda, CCW1),
++        VMSTATE_END_OF_LIST()
++    }
++};
++
++static const VMStateDescription vmstate_ciw = {
++    .name = "s390_ciw",
++    .version_id = 1,
++    .minimum_version_id = 1,
++    .fields = (VMStateField[]) {
++        VMSTATE_UINT8(type, CIW),
++        VMSTATE_UINT8(command, CIW),
++        VMSTATE_UINT16(count, CIW),
++        VMSTATE_END_OF_LIST()
++    }
++};
++
++static const VMStateDescription vmstate_sense_id = {
++    .name = "s390_sense_id",
++    .version_id = 1,
++    .minimum_version_id = 1,
++    .fields = (VMStateField[]) {
++        VMSTATE_UINT8(reserved, SenseId),
++        VMSTATE_UINT16(cu_type, SenseId),
++        VMSTATE_UINT8(cu_model, SenseId),
++        VMSTATE_UINT16(dev_type, SenseId),
++        VMSTATE_UINT8(dev_model, SenseId),
++        VMSTATE_UINT8(unused, SenseId),
++        VMSTATE_STRUCT_ARRAY(ciw, SenseId, MAX_CIWS, 0, vmstate_ciw, CIW),
++        VMSTATE_END_OF_LIST()
++    }
++};
++
++static int subch_dev_post_load(void *opaque, int version_id);
++static void subch_dev_pre_save(void *opaque);
++
++const VMStateDescription vmstate_subch_dev = {
++    .name = "s390_subch_dev",
++    .version_id = 1,
++    .minimum_version_id = 1,
++    .post_load = subch_dev_post_load,
++    .pre_save = subch_dev_pre_save,
++    .fields = (VMStateField[]) {
++        VMSTATE_UINT8_EQUAL(cssid, SubchDev),
++        VMSTATE_UINT8_EQUAL(ssid, SubchDev),
++        VMSTATE_UINT16(migrated_schid, SubchDev),
++        VMSTATE_UINT16(devno, SubchDev),
++        VMSTATE_BOOL(thinint_active, SubchDev),
++        VMSTATE_STRUCT(curr_status, SubchDev, 0, vmstate_schib, SCHIB),
++        VMSTATE_UINT8_ARRAY(sense_data, SubchDev, 32),
++        VMSTATE_UINT64(channel_prog, SubchDev),
++        VMSTATE_STRUCT(last_cmd, SubchDev, 0, vmstate_ccw1, CCW1),
++        VMSTATE_BOOL(last_cmd_valid, SubchDev),
++        VMSTATE_STRUCT(id, SubchDev, 0, vmstate_sense_id, SenseId),
++        VMSTATE_BOOL(ccw_fmt_1, SubchDev),
++        VMSTATE_UINT8(ccw_no_data_cnt, SubchDev),
++        VMSTATE_END_OF_LIST()
++    }
++};
++
++typedef struct IndAddrPtrTmp {
++    IndAddr **parent;
++    uint64_t addr;
++    int32_t len;
++} IndAddrPtrTmp;
++
++static int post_load_ind_addr(void *opaque, int version_id)
++{
++    IndAddrPtrTmp *ptmp = opaque;
++    IndAddr **ind_addr = ptmp->parent;
++
++    if (ptmp->len != 0) {
++        *ind_addr = get_indicator(ptmp->addr, ptmp->len);
++    } else {
++        *ind_addr = NULL;
++    }
++    return 0;
++}
++
++static void pre_save_ind_addr(void *opaque)
++{
++    IndAddrPtrTmp *ptmp = opaque;
++    IndAddr *ind_addr = *(ptmp->parent);
++
++    if (ind_addr != NULL) {
++        ptmp->len = ind_addr->len;
++        ptmp->addr = ind_addr->addr;
++    } else {
++        ptmp->len = 0;
++        ptmp->addr = 0L;
++    }
++}
++
++const VMStateDescription vmstate_ind_addr_tmp = {
++    .name = "s390_ind_addr_tmp",
++    .pre_save = pre_save_ind_addr,
++    .post_load = post_load_ind_addr,
++
++    .fields = (VMStateField[]) {
++        VMSTATE_INT32(len, IndAddrPtrTmp),
++        VMSTATE_UINT64(addr, IndAddrPtrTmp),
++        VMSTATE_END_OF_LIST()
++    }
++};
++
++const VMStateDescription vmstate_ind_addr = {
++    .name = "s390_ind_addr_tmp",
++    .fields = (VMStateField[]) {
++        VMSTATE_WITH_TMP(IndAddr*, IndAddrPtrTmp, vmstate_ind_addr_tmp),
++        VMSTATE_END_OF_LIST()
++    }
++};
++
+ typedef struct CssImage {
+     SubchSet *sch_set[MAX_SSID + 1];
      ChpInfo chpids[MAX_CHPID + 1];
- } CssImage;
+@@ -75,6 +247,52 @@ static ChannelSubSys channel_subsys = {
+         QTAILQ_HEAD_INITIALIZER(channel_subsys.indicator_addresses),
+ };
  
-+static const VMStateDescription vmstate_css_img = {
-+    .name = "s390_css_img",
-+    .version_id = 1,
-+    .minimum_version_id = 1,
++static void subch_dev_pre_save(void *opaque)
++{
++    SubchDev *s = opaque;
++
++    /* Prepare remote_schid for save */
++    s->migrated_schid = s->schid;
++}
++
++static int subch_dev_post_load(void *opaque, int version_id)
++{
++
++    SubchDev *s = opaque;
++
++    /* Re-assign the subchannel to remote_schid if necessary */
++    if (s->migrated_schid != s->schid) {
++        if (css_find_subch(true, s->cssid, s->ssid, s->schid) == s) {
++            /*
++             * Cleanup the slot before moving to s->migrated_schid provided
++             * it still belongs to us, i.e. it was not changed by previous
++             * invocation of this function.
++             */
++            css_subch_assign(s->cssid, s->ssid, s->schid, s->devno, NULL);
++        }
++        /* It's OK to re-assign without a prior de-assign. */
++        s->schid = s->migrated_schid;
++        css_subch_assign(s->cssid, s->ssid, s->schid, s->devno, s);
++    }
++
++    /*
++     * Hack alert. If we don't migrate the channel subsystem status
++     * we still need to find out if the guest enabled mss/mcss-e.
++     * If the subchannel is enabled, it certainly was able to access it,
++     * so adjust the max_ssid/max_cssid values for relevant ssid/cssid
++     * values. This is not watertight, but better than nothing.
++     */
++    if (s->curr_status.pmcw.flags & PMCW_FLAGS_MASK_ENA) {
++        if (s->ssid) {
++            channel_subsys.max_ssid = MAX_SSID;
++        }
++        if (s->cssid != channel_subsys.default_cssid) {
++            channel_subsys.max_cssid = MAX_CSSID;
++        }
++    }
++    return 0;
++}
++
+ IndAddr *get_indicator(hwaddr ind_addr, int len)
+ {
+     IndAddr *indicator;
+@@ -1662,149 +1880,6 @@ int css_enable_mss(void)
+     return 0;
+ }
+ 
+-void subch_device_save(SubchDev *s, QEMUFile *f)
+-{
+-    int i;
+-
+-    qemu_put_byte(f, s->cssid);
+-    qemu_put_byte(f, s->ssid);
+-    qemu_put_be16(f, s->schid);
+-    qemu_put_be16(f, s->devno);
+-    qemu_put_byte(f, s->thinint_active);
+-    /* SCHIB */
+-    /*     PMCW */
+-    qemu_put_be32(f, s->curr_status.pmcw.intparm);
+-    qemu_put_be16(f, s->curr_status.pmcw.flags);
+-    qemu_put_be16(f, s->curr_status.pmcw.devno);
+-    qemu_put_byte(f, s->curr_status.pmcw.lpm);
+-    qemu_put_byte(f, s->curr_status.pmcw.pnom);
+-    qemu_put_byte(f, s->curr_status.pmcw.lpum);
+-    qemu_put_byte(f, s->curr_status.pmcw.pim);
+-    qemu_put_be16(f, s->curr_status.pmcw.mbi);
+-    qemu_put_byte(f, s->curr_status.pmcw.pom);
+-    qemu_put_byte(f, s->curr_status.pmcw.pam);
+-    qemu_put_buffer(f, s->curr_status.pmcw.chpid, 8);
+-    qemu_put_be32(f, s->curr_status.pmcw.chars);
+-    /*     SCSW */
+-    qemu_put_be16(f, s->curr_status.scsw.flags);
+-    qemu_put_be16(f, s->curr_status.scsw.ctrl);
+-    qemu_put_be32(f, s->curr_status.scsw.cpa);
+-    qemu_put_byte(f, s->curr_status.scsw.dstat);
+-    qemu_put_byte(f, s->curr_status.scsw.cstat);
+-    qemu_put_be16(f, s->curr_status.scsw.count);
+-    qemu_put_be64(f, s->curr_status.mba);
+-    qemu_put_buffer(f, s->curr_status.mda, 4);
+-    /* end SCHIB */
+-    qemu_put_buffer(f, s->sense_data, 32);
+-    qemu_put_be64(f, s->channel_prog);
+-    /* last cmd */
+-    qemu_put_byte(f, s->last_cmd.cmd_code);
+-    qemu_put_byte(f, s->last_cmd.flags);
+-    qemu_put_be16(f, s->last_cmd.count);
+-    qemu_put_be32(f, s->last_cmd.cda);
+-    qemu_put_byte(f, s->last_cmd_valid);
+-    qemu_put_byte(f, s->id.reserved);
+-    qemu_put_be16(f, s->id.cu_type);
+-    qemu_put_byte(f, s->id.cu_model);
+-    qemu_put_be16(f, s->id.dev_type);
+-    qemu_put_byte(f, s->id.dev_model);
+-    qemu_put_byte(f, s->id.unused);
+-    for (i = 0; i < ARRAY_SIZE(s->id.ciw); i++) {
+-        qemu_put_byte(f, s->id.ciw[i].type);
+-        qemu_put_byte(f, s->id.ciw[i].command);
+-        qemu_put_be16(f, s->id.ciw[i].count);
+-    }
+-    qemu_put_byte(f, s->ccw_fmt_1);
+-    qemu_put_byte(f, s->ccw_no_data_cnt);
+-}
+-
+-int subch_device_load(SubchDev *s, QEMUFile *f)
+-{
+-    SubchDev *old_s;
+-    uint16_t old_schid = s->schid;
+-    int i;
+-
+-    s->cssid = qemu_get_byte(f);
+-    s->ssid = qemu_get_byte(f);
+-    s->schid = qemu_get_be16(f);
+-    s->devno = qemu_get_be16(f);
+-    /* Re-assign subch. */
+-    if (old_schid != s->schid) {
+-        old_s = channel_subsys.css[s->cssid]->sch_set[s->ssid]->sch[old_schid];
+-        /*
+-         * (old_s != s) means that some other device has its correct
+-         * subchannel already assigned (in load).
+-         */
+-        if (old_s == s) {
+-            css_subch_assign(s->cssid, s->ssid, old_schid, s->devno, NULL);
+-        }
+-        /* It's OK to re-assign without a prior de-assign. */
+-        css_subch_assign(s->cssid, s->ssid, s->schid, s->devno, s);
+-    }
+-    s->thinint_active = qemu_get_byte(f);
+-    /* SCHIB */
+-    /*     PMCW */
+-    s->curr_status.pmcw.intparm = qemu_get_be32(f);
+-    s->curr_status.pmcw.flags = qemu_get_be16(f);
+-    s->curr_status.pmcw.devno = qemu_get_be16(f);
+-    s->curr_status.pmcw.lpm = qemu_get_byte(f);
+-    s->curr_status.pmcw.pnom  = qemu_get_byte(f);
+-    s->curr_status.pmcw.lpum = qemu_get_byte(f);
+-    s->curr_status.pmcw.pim = qemu_get_byte(f);
+-    s->curr_status.pmcw.mbi = qemu_get_be16(f);
+-    s->curr_status.pmcw.pom = qemu_get_byte(f);
+-    s->curr_status.pmcw.pam = qemu_get_byte(f);
+-    qemu_get_buffer(f, s->curr_status.pmcw.chpid, 8);
+-    s->curr_status.pmcw.chars = qemu_get_be32(f);
+-    /*     SCSW */
+-    s->curr_status.scsw.flags = qemu_get_be16(f);
+-    s->curr_status.scsw.ctrl = qemu_get_be16(f);
+-    s->curr_status.scsw.cpa = qemu_get_be32(f);
+-    s->curr_status.scsw.dstat = qemu_get_byte(f);
+-    s->curr_status.scsw.cstat = qemu_get_byte(f);
+-    s->curr_status.scsw.count = qemu_get_be16(f);
+-    s->curr_status.mba = qemu_get_be64(f);
+-    qemu_get_buffer(f, s->curr_status.mda, 4);
+-    /* end SCHIB */
+-    qemu_get_buffer(f, s->sense_data, 32);
+-    s->channel_prog = qemu_get_be64(f);
+-    /* last cmd */
+-    s->last_cmd.cmd_code = qemu_get_byte(f);
+-    s->last_cmd.flags = qemu_get_byte(f);
+-    s->last_cmd.count = qemu_get_be16(f);
+-    s->last_cmd.cda = qemu_get_be32(f);
+-    s->last_cmd_valid = qemu_get_byte(f);
+-    s->id.reserved = qemu_get_byte(f);
+-    s->id.cu_type = qemu_get_be16(f);
+-    s->id.cu_model = qemu_get_byte(f);
+-    s->id.dev_type = qemu_get_be16(f);
+-    s->id.dev_model = qemu_get_byte(f);
+-    s->id.unused = qemu_get_byte(f);
+-    for (i = 0; i < ARRAY_SIZE(s->id.ciw); i++) {
+-        s->id.ciw[i].type = qemu_get_byte(f);
+-        s->id.ciw[i].command = qemu_get_byte(f);
+-        s->id.ciw[i].count = qemu_get_be16(f);
+-    }
+-    s->ccw_fmt_1 = qemu_get_byte(f);
+-    s->ccw_no_data_cnt = qemu_get_byte(f);
+-    /*
+-     * Hack alert. We don't migrate the channel subsystem status (no
+-     * device!), but we need to find out if the guest enabled mss/mcss-e.
+-     * If the subchannel is enabled, it certainly was able to access it,
+-     * so adjust the max_ssid/max_cssid values for relevant ssid/cssid
+-     * values. This is not watertight, but better than nothing.
+-     */
+-    if (s->curr_status.pmcw.flags & PMCW_FLAGS_MASK_ENA) {
+-        if (s->ssid) {
+-            channel_subsys.max_ssid = MAX_SSID;
+-        }
+-        if (s->cssid != channel_subsys.default_cssid) {
+-            channel_subsys.max_cssid = MAX_CSSID;
+-        }
+-    }
+-    return 0;
+-}
+-
+ void css_reset_sch(SubchDev *sch)
+ {
+     PMCW *p = &sch->curr_status.pmcw;
+diff --git a/hw/s390x/virtio-ccw.c b/hw/s390x/virtio-ccw.c
+index e7167e3d05..a75eedeffb 100644
+--- a/hw/s390x/virtio-ccw.c
++++ b/hw/s390x/virtio-ccw.c
+@@ -34,9 +34,87 @@
+ #include "virtio-ccw.h"
+ #include "trace.h"
+ #include "hw/s390x/css-bridge.h"
++#include "hw/s390x/s390-virtio-ccw.h"
+ 
+ #define NR_CLASSIC_INDICATOR_BITS 64
+ 
++static int virtio_ccw_dev_post_load(void *opaque, int version_id)
++{
++    VirtioCcwDevice *dev = VIRTIO_CCW_DEVICE(opaque);
++    CcwDevice *ccw_dev = CCW_DEVICE(dev);
++    CCWDeviceClass *ck = CCW_DEVICE_GET_CLASS(ccw_dev);
++
++    ccw_dev->sch->driver_data = dev;
++    if (CCW_DEVICE(dev)->sch->thinint_active) {
++        dev->routes.adapter.adapter_id = css_get_adapter_id(
++                                         CSS_IO_ADAPTER_VIRTIO,
++                                         dev->thinint_isc);
++    }
++    /* Re-fill subch_id after loading the subchannel states.*/
++    if (ck->refill_ids) {
++        ck->refill_ids(ccw_dev);
++    }
++    return 0;
++}
++
++typedef struct VirtioCcwDeviceTmp {
++    VirtioCcwDevice *parent;
++    uint16_t config_vector;
++} VirtioCcwDeviceTmp;
++
++static void virtio_ccw_dev_tmp_pre_save(void *opaque)
++{
++    VirtioCcwDeviceTmp *tmp = opaque;
++    VirtioCcwDevice *dev = tmp->parent;
++    VirtIODevice *vdev = virtio_bus_get_device(&dev->bus);
++
++    tmp->config_vector = vdev->config_vector;
++}
++
++static int virtio_ccw_dev_tmp_post_load(void *opaque, int version_id)
++{
++    VirtioCcwDeviceTmp *tmp = opaque;
++    VirtioCcwDevice *dev = tmp->parent;
++    VirtIODevice *vdev = virtio_bus_get_device(&dev->bus);
++
++    vdev->config_vector = tmp->config_vector;
++    return 0;
++}
++
++const VMStateDescription vmstate_virtio_ccw_dev_tmp = {
++    .name = "s390_virtio_ccw_dev_tmp",
++    .pre_save = virtio_ccw_dev_tmp_pre_save,
++    .post_load = virtio_ccw_dev_tmp_post_load,
 +    .fields = (VMStateField[]) {
-+        /* Subchannel sets have no relevant state. */
-+        VMSTATE_STRUCT_ARRAY(chpids, CssImage, MAX_CHPID + 1, 0,
-+                             vmstate_chp_info, ChpInfo),
++        VMSTATE_UINT16(config_vector, VirtioCcwDeviceTmp),
 +        VMSTATE_END_OF_LIST()
 +    }
-+
 +};
 +
- typedef struct IoAdapter {
-     uint32_t id;
-     uint8_t type;
-@@ -232,10 +278,34 @@ typedef struct ChannelSubSys {
-     uint64_t chnmon_area;
-     CssImage *css[MAX_CSSID + 1];
-     uint8_t default_cssid;
-+    /* don't migrate */
-     IoAdapter *io_adapters[CSS_IO_ADAPTER_TYPE_NUMS][MAX_ISC + 1];
-+    /* don't migrate */
-     QTAILQ_HEAD(, IndAddr) indicator_addresses;
- } ChannelSubSys;
- 
-+static const VMStateDescription vmstate_css = {
-+    .name = "s390_css",
++const VMStateDescription vmstate_virtio_ccw_dev = {
++    .name = "s390_virtio_ccw_dev",
 +    .version_id = 1,
 +    .minimum_version_id = 1,
++    .post_load = virtio_ccw_dev_post_load,
 +    .fields = (VMStateField[]) {
-+        VMSTATE_QTAILQ_V(pending_crws, ChannelSubSys, 1, vmstate_crw_container,
-+                         CrwContainer, sibling),
-+        VMSTATE_BOOL(sei_pending, ChannelSubSys),
-+        VMSTATE_BOOL(do_crw_mchk, ChannelSubSys),
-+        VMSTATE_BOOL(crws_lost, ChannelSubSys),
-+        /* These were kind of migrated by virtio */
-+        VMSTATE_UINT8(max_cssid, ChannelSubSys),
-+        VMSTATE_UINT8(max_ssid, ChannelSubSys),
-+        VMSTATE_BOOL(chnmon_active, ChannelSubSys),
-+        VMSTATE_UINT64(chnmon_area, ChannelSubSys),
-+        VMSTATE_ARRAY_OF_POINTER_TO_STRUCT(css, ChannelSubSys, MAX_CSSID + 1,
-+                0, vmstate_css_img, CssImage),
-+        VMSTATE_UINT8(default_cssid, ChannelSubSys),
++        VMSTATE_CCW_DEVICE(parent_obj, VirtioCcwDevice),
++        VMSTATE_PTR_TO_IND_ADDR(indicators, VirtioCcwDevice),
++        VMSTATE_PTR_TO_IND_ADDR(indicators2, VirtioCcwDevice),
++        VMSTATE_PTR_TO_IND_ADDR(summary_indicator, VirtioCcwDevice),
++        /*
++         * Ugly hack because VirtIODevice does not migrate itself.
++         * This also makes legacy via vmstate_save_state possible.
++         */
++        VMSTATE_WITH_TMP(VirtioCcwDevice, VirtioCcwDeviceTmp,
++                         vmstate_virtio_ccw_dev_tmp),
++        VMSTATE_STRUCT(routes, VirtioCcwDevice, 1, vmstate_adapter_routes, \
++                       AdapterRoutes),
++        VMSTATE_UINT8(thinint_isc, VirtioCcwDevice),
++        VMSTATE_INT32(revision, VirtioCcwDevice),
 +        VMSTATE_END_OF_LIST()
 +    }
 +};
 +
- static ChannelSubSys channel_subsys = {
-     .pending_crws = QTAILQ_HEAD_INITIALIZER(channel_subsys.pending_crws),
-     .do_crw_mchk = true,
-@@ -275,6 +345,10 @@ static int subch_dev_post_load(void *opaque, int version_id)
-         css_subch_assign(s->cssid, s->ssid, s->schid, s->devno, s);
-     }
+ static void virtio_ccw_bus_new(VirtioBusState *bus, size_t bus_size,
+                                VirtioCcwDevice *dev);
  
-+    if (css_migration_enabled()) {
-+        /* No compat voodoo to do ;) */
-+        return 0;
-+    }
-     /*
-      * Hack alert. If we don't migrate the channel subsystem status
-      * we still need to find out if the guest enabled mss/mcss-e.
+@@ -1234,85 +1312,13 @@ static int virtio_ccw_load_queue(DeviceState *d, int n, QEMUFile *f)
+ static void virtio_ccw_save_config(DeviceState *d, QEMUFile *f)
+ {
+     VirtioCcwDevice *dev = VIRTIO_CCW_DEVICE(d);
+-    CcwDevice *ccw_dev = CCW_DEVICE(d);
+-    SubchDev *s = ccw_dev->sch;
+-    VirtIODevice *vdev = virtio_ccw_get_vdev(s);
+-
+-    subch_device_save(s, f);
+-    if (dev->indicators != NULL) {
+-        qemu_put_be32(f, dev->indicators->len);
+-        qemu_put_be64(f, dev->indicators->addr);
+-    } else {
+-        qemu_put_be32(f, 0);
+-        qemu_put_be64(f, 0UL);
+-    }
+-    if (dev->indicators2 != NULL) {
+-        qemu_put_be32(f, dev->indicators2->len);
+-        qemu_put_be64(f, dev->indicators2->addr);
+-    } else {
+-        qemu_put_be32(f, 0);
+-        qemu_put_be64(f, 0UL);
+-    }
+-    if (dev->summary_indicator != NULL) {
+-        qemu_put_be32(f, dev->summary_indicator->len);
+-        qemu_put_be64(f, dev->summary_indicator->addr);
+-    } else {
+-        qemu_put_be32(f, 0);
+-        qemu_put_be64(f, 0UL);
+-    }
+-    qemu_put_be16(f, vdev->config_vector);
+-    qemu_put_be64(f, dev->routes.adapter.ind_offset);
+-    qemu_put_byte(f, dev->thinint_isc);
+-    qemu_put_be32(f, dev->revision);
++    vmstate_save_state(f, &vmstate_virtio_ccw_dev, dev, NULL);
+ }
+ 
+ static int virtio_ccw_load_config(DeviceState *d, QEMUFile *f)
+ {
+     VirtioCcwDevice *dev = VIRTIO_CCW_DEVICE(d);
+-    CcwDevice *ccw_dev = CCW_DEVICE(d);
+-    CCWDeviceClass *ck = CCW_DEVICE_GET_CLASS(ccw_dev);
+-    SubchDev *s = ccw_dev->sch;
+-    VirtIODevice *vdev = virtio_ccw_get_vdev(s);
+-    int len;
+-
+-    s->driver_data = dev;
+-    subch_device_load(s, f);
+-    /* Re-fill subch_id after loading the subchannel states.*/
+-    if (ck->refill_ids) {
+-        ck->refill_ids(ccw_dev);
+-    }
+-    len = qemu_get_be32(f);
+-    if (len != 0) {
+-        dev->indicators = get_indicator(qemu_get_be64(f), len);
+-    } else {
+-        qemu_get_be64(f);
+-        dev->indicators = NULL;
+-    }
+-    len = qemu_get_be32(f);
+-    if (len != 0) {
+-        dev->indicators2 = get_indicator(qemu_get_be64(f), len);
+-    } else {
+-        qemu_get_be64(f);
+-        dev->indicators2 = NULL;
+-    }
+-    len = qemu_get_be32(f);
+-    if (len != 0) {
+-        dev->summary_indicator = get_indicator(qemu_get_be64(f), len);
+-    } else {
+-        qemu_get_be64(f);
+-        dev->summary_indicator = NULL;
+-    }
+-    qemu_get_be16s(f, &vdev->config_vector);
+-    dev->routes.adapter.ind_offset = qemu_get_be64(f);
+-    dev->thinint_isc = qemu_get_byte(f);
+-    dev->revision = qemu_get_be32(f);
+-    if (s->thinint_active) {
+-        dev->routes.adapter.adapter_id = css_get_adapter_id(
+-                                         CSS_IO_ADAPTER_VIRTIO,
+-                                         dev->thinint_isc);
+-    }
+-
+-    return 0;
++    return vmstate_load_state(f, &vmstate_virtio_ccw_dev, dev, 1);
+ }
+ 
+ static void virtio_ccw_pre_plugged(DeviceState *d, Error **errp)
+diff --git a/include/hw/s390x/css.h b/include/hw/s390x/css.h
+index e61fa74d9b..d74e44d312 100644
+--- a/include/hw/s390x/css.h
++++ b/include/hw/s390x/css.h
+@@ -88,6 +88,7 @@ struct SubchDev {
+     bool ccw_fmt_1;
+     bool thinint_active;
+     uint8_t ccw_no_data_cnt;
++    uint16_t migrated_schid; /* used for missmatch detection */
+     /* transport-provided data: */
+     int (*ccw_cb) (SubchDev *, CCW1);
+     void (*disable_cb)(SubchDev *);
+@@ -95,22 +96,27 @@ struct SubchDev {
+     void *driver_data;
+ };
+ 
++extern const VMStateDescription vmstate_subch_dev;
++
+ typedef struct IndAddr {
+     hwaddr addr;
+     uint64_t map;
+     unsigned long refcnt;
+-    int len;
++    int32_t len;
+     QTAILQ_ENTRY(IndAddr) sibling;
+ } IndAddr;
+ 
++extern const VMStateDescription vmstate_ind_addr;
++
++#define VMSTATE_PTR_TO_IND_ADDR(_f, _s)                                   \
++    VMSTATE_STRUCT(_f, _s, 1, vmstate_ind_addr, IndAddr*)
++
+ IndAddr *get_indicator(hwaddr ind_addr, int len);
+ void release_indicator(AdapterInfo *adapter, IndAddr *indicator);
+ int map_indicator(AdapterInfo *adapter, IndAddr *indicator);
+ 
+ typedef SubchDev *(*css_subch_cb_func)(uint8_t m, uint8_t cssid, uint8_t ssid,
+                                        uint16_t schid);
+-void subch_device_save(SubchDev *s, QEMUFile *f);
+-int subch_device_load(SubchDev *s, QEMUFile *f);
+ int css_create_css_image(uint8_t cssid, bool default_image);
+ bool css_devno_used(uint8_t cssid, uint8_t ssid, uint16_t devno);
+ void css_subch_assign(uint8_t cssid, uint8_t ssid, uint16_t schid,
+diff --git a/include/hw/s390x/s390_flic.h b/include/hw/s390x/s390_flic.h
+index f9e6890c90..caa6fc608d 100644
+--- a/include/hw/s390x/s390_flic.h
++++ b/include/hw/s390x/s390_flic.h
+@@ -31,6 +31,11 @@ typedef struct AdapterRoutes {
+     int gsi[ADAPTER_ROUTES_MAX_GSI];
+ } AdapterRoutes;
+ 
++extern const VMStateDescription vmstate_adapter_routes;
++
++#define VMSTATE_ADAPTER_ROUTES(_f, _s) \
++    VMSTATE_STRUCT(_f, _s, 1, vmstate_adapter_routes, AdapterRoutes)
++
+ #define TYPE_S390_FLIC_COMMON "s390-flic"
+ #define S390_FLIC_COMMON(obj) \
+     OBJECT_CHECK(S390FLICState, (obj), TYPE_S390_FLIC_COMMON)
 -- 
 2.11.2
