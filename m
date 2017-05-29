@@ -1,32 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58151)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59160)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dFRuk-0007wg-B8
-	for qemu-devel@nongnu.org; Mon, 29 May 2017 17:09:23 -0400
+	(envelope-from <groug@kaod.org>) id 1dFRzd-0000ph-Kf
+	for qemu-devel@nongnu.org; Mon, 29 May 2017 17:14:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dFRuf-0002kd-Bh
-	for qemu-devel@nongnu.org; Mon, 29 May 2017 17:09:22 -0400
-Received: from mail-oi0-x243.google.com ([2607:f8b0:4003:c06::243]:33387)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dFRuf-0002kU-4z
-	for qemu-devel@nongnu.org; Mon, 29 May 2017 17:09:17 -0400
-Received: by mail-oi0-x243.google.com with SMTP id h4so13125914oib.0
-	for <qemu-devel@nongnu.org>; Mon, 29 May 2017 14:09:17 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20170529084546.26500-1-marcandre.lureau@redhat.com>
-	<20170529084546.26500-11-marcandre.lureau@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <9da6bf4c-120f-39e8-3711-79cc0b30277c@amsat.org>
-Date: Mon, 29 May 2017 18:09:14 -0300
+	(envelope-from <groug@kaod.org>) id 1dFRzY-0004Ec-MY
+	for qemu-devel@nongnu.org; Mon, 29 May 2017 17:14:25 -0400
+Received: from 19.mo5.mail-out.ovh.net ([46.105.35.78]:39360)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1dFRzY-0004EL-Bm
+	for qemu-devel@nongnu.org; Mon, 29 May 2017 17:14:20 -0400
+Received: from player799.ha.ovh.net (b9.ovh.net [213.186.33.59])
+	by mo5.mail-out.ovh.net (Postfix) with ESMTP id 992C1FF2C2
+	for <qemu-devel@nongnu.org>; Mon, 29 May 2017 23:14:18 +0200 (CEST)
+Date: Mon, 29 May 2017 23:14:08 +0200
+From: Greg Kurz <groug@kaod.org>
+Message-ID: <20170529231408.43f12e95@bahia.ttt.fr.ibm.com>
+In-Reply-To: <20170525035132.24268-12-david@gibson.dropbear.id.au>
+References: <20170525035132.24268-1-david@gibson.dropbear.id.au>
+	<20170525035132.24268-12-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
-In-Reply-To: <20170529084546.26500-11-marcandre.lureau@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v2 10/14] char: generalize
- qemu_chr_write_all()
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	boundary="Sig_/tZkoXqmSxGAaeCHBu/ph/8s";
+	protocol="application/pgp-signature"
+Subject: Re: [Qemu-devel] [Qemu-ppc] [PULL 11/18] pseries: Split CAS PVR
+ negotiation out into a separate function
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,153 +32,155 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org
-Cc: pbonzini@redhat.com
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: peter.maydell@linaro.org, qemu-devel@nongnu.org, sursingh@redhat.com, mdroth@linux.vnet.ibm.com, qemu-ppc@nongnu.org, sbobroff@redhat.com
 
-Hi Marc-André,
+--Sig_/tZkoXqmSxGAaeCHBu/ph/8s
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-On 05/29/2017 05:45 AM, Marc-André Lureau wrote:
-> qemu_chr_fe_write() is similar to qemu_chr_write_all(): the later write
-> all with a chardev backend.
->
-> Make qemu_chr_write() and qemu_chr_fe_write_buffer() take an 'all'
-> argument. If false, handle 'partial' write the way qemu_chr_fe_write()
-> use to, and call qemu_chr_write() from qemu_chr_fe_write().
->
-> Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
+On Thu, 25 May 2017 13:51:25 +1000
+David Gibson <david@gibson.dropbear.id.au> wrote:
+
+> Guests of the qemu machine type go through a feature negotiation process
+> known as "client architecture support" (CAS) during early boot.  This does
+> a number of things, one of which is finding a CPU compatibility mode which
+> can be supported by both guest and host.
+>=20
+> In fact the CPU negotiation is probably the single most complex part of t=
+he
+> CAS process, so this splits it out into a helper function.  We've recently
+> made some mistakes in maintaining backward compatibility for old machine
+> types here.  Splitting this out will also make it easier to fix this.
+>=20
+> This also adds a possibly useful error message if the negotiation fails
+> (i.e. if there isn't a CPU mode that's suitable for both guest and host).
+>=20
+> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+> Reviewed-by: Laurent Vivier <lvivier@redhat.com>
+> Reviewed-by: Greg Kurz <groug@kaod.org>
 > ---
->  chardev/char.c | 70 +++++++++++++++++++++++-----------------------------------
->  1 file changed, 28 insertions(+), 42 deletions(-)
->
-> diff --git a/chardev/char.c b/chardev/char.c
-> index a747e0279a..9a7c70c7aa 100644
-> --- a/chardev/char.c
-> +++ b/chardev/char.c
-> @@ -96,7 +96,8 @@ static void qemu_chr_fe_write_log(Chardev *s,
->  }
->
->  static int qemu_chr_fe_write_buffer(Chardev *s,
-> -                                    const uint8_t *buf, int len, int *offset)
-> +                                    const uint8_t *buf, int len,
-> +                                    int *offset, bool write_all)
->  {
->      ChardevClass *cc = CHARDEV_GET_CLASS(s);
->      int res = 0;
-> @@ -106,7 +107,7 @@ static int qemu_chr_fe_write_buffer(Chardev *s,
->      while (*offset < len) {
->      retry:
->          res = cc->chr_write(s, buf + *offset, len - *offset);
-> -        if (res < 0 && errno == EAGAIN) {
-> +        if (res < 0 && errno == EAGAIN && write_all) {
->              g_usleep(100);
->              goto retry;
->          }
-> @@ -116,6 +117,9 @@ static int qemu_chr_fe_write_buffer(Chardev *s,
->          }
->
->          *offset += res;
-> +        if (!write_all) {
-> +            break;
-> +        }
+
+Any reason for not seing these patches as well in this pull request ?
+
+pseries: Restore PVR negotiation logic for  pre-2.9 machine types
+pseries: Improve tracing of CPU  compatibility negotiation
+
+>  hw/ppc/spapr_hcall.c | 49 ++++++++++++++++++++++++++++++++--------------=
+---
+>  1 file changed, 32 insertions(+), 17 deletions(-)
+>=20
+> diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
+> index 2daace4..77d2d66 100644
+> --- a/hw/ppc/spapr_hcall.c
+> +++ b/hw/ppc/spapr_hcall.c
+> @@ -1044,19 +1044,13 @@ static target_ulong h_signal_sys_reset(PowerPCCPU=
+ *cpu,
 >      }
->      if (*offset > 0) {
->          qemu_chr_fe_write_log(s, buf, *offset);
-> @@ -130,54 +134,20 @@ static bool qemu_chr_replay(Chardev *chr)
->      return qemu_chr_has_feature(chr, QEMU_CHAR_FEATURE_REPLAY);
 >  }
->
-> -int qemu_chr_fe_write(CharBackend *be, const uint8_t *buf, int len)
-> +static int qemu_chr_write(Chardev *s, const uint8_t *buf, int len,
-> +                          bool write_all)
+> =20
+> -static target_ulong h_client_architecture_support(PowerPCCPU *cpu,
+> -                                                  sPAPRMachineState *spa=
+pr,
+> -                                                  target_ulong opcode,
+> -                                                  target_ulong *args)
+> +static uint32_t cas_check_pvr(PowerPCCPU *cpu, target_ulong *addr,
+> +                              Error **errp)
 >  {
-> -    Chardev *s = be->chr;
-> -    ChardevClass *cc;
-> -    int ret;
-> -
-> -    if (!s) {
-> -        return 0;
-> -    }
-> -
-> -    if (qemu_chr_replay(s) && replay_mode == REPLAY_MODE_PLAY) {
-> -        int offset;
-> -        replay_char_write_event_load(&ret, &offset);
-> -        assert(offset <= len);
-> -        qemu_chr_fe_write_buffer(s, buf, offset, &offset);
-> -        return ret;
-> -    }
-> -
-> -    cc = CHARDEV_GET_CLASS(s);
-> -    qemu_mutex_lock(&s->chr_write_lock);
-> -    ret = cc->chr_write(s, buf, len);
-> -
-> -    if (ret > 0) {
-> -        qemu_chr_fe_write_log(s, buf, ret);
-> -    }
-> -
-> -    qemu_mutex_unlock(&s->chr_write_lock);
-> -
-> -    if (qemu_chr_replay(s) && replay_mode == REPLAY_MODE_RECORD) {
-> -        replay_char_write_event_save(ret, ret < 0 ? 0 : ret);
-> -    }
-> -
-> -    return ret;
-> -}
-> -
-> -int qemu_chr_write_all(Chardev *s, const uint8_t *buf, int len)
-> -{
-> -    int offset;
-> +    int offset = 0;
->      int res;
->
->      if (qemu_chr_replay(s) && replay_mode == REPLAY_MODE_PLAY) {
->          replay_char_write_event_load(&res, &offset);
->          assert(offset <= len);
-> -        qemu_chr_fe_write_buffer(s, buf, offset, &offset);
-> +        qemu_chr_fe_write_buffer(s, buf, offset, &offset, true);
->          return res;
->      }
->
-> -    res = qemu_chr_fe_write_buffer(s, buf, len, &offset);
-> +    res = qemu_chr_fe_write_buffer(s, buf, len, &offset, write_all);
->
->      if (qemu_chr_replay(s) && replay_mode == REPLAY_MODE_RECORD) {
->          replay_char_write_event_save(res, offset);
-> @@ -189,6 +159,22 @@ int qemu_chr_write_all(Chardev *s, const uint8_t *buf, int len)
->      return offset;
->  }
->
-> +int qemu_chr_write_all(Chardev *s, const uint8_t *buf, int len)
-> +{
-> +    return qemu_chr_write(s, buf, len, true);
-> +}
-> +
-> +int qemu_chr_fe_write(CharBackend *be, const uint8_t *buf, int len)
-> +{
-> +    Chardev *s = be->chr;
-> +
-> +    if (!s) {
+> -    target_ulong list =3D ppc64_phys_to_real(args[0]);
+> -    target_ulong ov_table;
+>      bool explicit_match =3D false; /* Matched the CPU's real PVR */
+>      uint32_t max_compat =3D cpu->max_compat;
+>      uint32_t best_compat =3D 0;
+>      int i;
+> -    sPAPROptionVector *ov1_guest, *ov5_guest, *ov5_cas_old, *ov5_updates;
+> -    bool guest_radix;
+> =20
+>      /*
+>       * We scan the supplied table of PVRs looking for two things
+> @@ -1066,9 +1060,9 @@ static target_ulong h_client_architecture_support(P=
+owerPCCPU *cpu,
+>      for (i =3D 0; i < 512; ++i) {
+>          uint32_t pvr, pvr_mask;
+> =20
+> -        pvr_mask =3D ldl_be_phys(&address_space_memory, list);
+> -        pvr =3D ldl_be_phys(&address_space_memory, list + 4);
+> -        list +=3D 8;
+> +        pvr_mask =3D ldl_be_phys(&address_space_memory, *addr);
+> +        pvr =3D ldl_be_phys(&address_space_memory, *addr + 4);
+> +        *addr +=3D 8;
+> =20
+>          if (~pvr_mask & pvr) {
+>              break; /* Terminator record */
+> @@ -1087,17 +1081,38 @@ static target_ulong h_client_architecture_support=
+(PowerPCCPU *cpu,
+>          /* We couldn't find a suitable compatibility mode, and either
+>           * the guest doesn't support "raw" mode for this CPU, or raw
+>           * mode is disabled because a maximum compat mode is set */
+> -        return H_HARDWARE;
+> +        error_setg(errp, "Couldn't negotiate a suitable PVR during CAS");
 > +        return 0;
+>      }
+> =20
+>      /* Parsing finished */
+>      trace_spapr_cas_pvr(cpu->compat_pvr, explicit_match, best_compat);
+> =20
+> -    /* Update CPUs */
+> -    if (cpu->compat_pvr !=3D best_compat) {
+> -        Error *local_err =3D NULL;
+> +    return best_compat;
+> +}
+> =20
+> -        ppc_set_compat_all(best_compat, &local_err);
+> +static target_ulong h_client_architecture_support(PowerPCCPU *cpu,
+> +                                                  sPAPRMachineState *spa=
+pr,
+> +                                                  target_ulong opcode,
+> +                                                  target_ulong *args)
+> +{
+> +    /* Working address in data buffer */
+> +    target_ulong addr =3D ppc64_phys_to_real(args[0]);
+> +    target_ulong ov_table;
+> +    uint32_t cas_pvr;
+> +    sPAPROptionVector *ov1_guest, *ov5_guest, *ov5_cas_old, *ov5_updates;
+> +    bool guest_radix;
+> +    Error *local_err =3D NULL;
+> +
+> +    cas_pvr =3D cas_check_pvr(cpu, &addr, &local_err);
+> +    if (local_err) {
+> +        error_report_err(local_err);
+> +        return H_HARDWARE;
 > +    }
 > +
-> +    return qemu_chr_write(s, buf, len, false);
-> +}
-> +
->  int qemu_chr_fe_write_all(CharBackend *be, const uint8_t *buf, int len)
->  {
->      Chardev *s = be->chr;
-> @@ -197,7 +183,7 @@ int qemu_chr_fe_write_all(CharBackend *be, const uint8_t *buf, int len)
->          return 0;
+> +    /* Update CPUs */
+> +    if (cpu->compat_pvr !=3D cas_pvr) {
+> +        ppc_set_compat_all(cas_pvr, &local_err);
+>          if (local_err) {
+>              error_report_err(local_err);
+>              return H_HARDWARE;
+> @@ -1105,7 +1120,7 @@ static target_ulong h_client_architecture_support(P=
+owerPCCPU *cpu,
 >      }
->
-> -    return qemu_chr_write_all(s, buf, len);
-> +    return qemu_chr_write(s, buf, len, true);
+> =20
+>      /* For the future use: here @ov_table points to the first option vec=
+tor */
+> -    ov_table =3D list;
+> +    ov_table =3D addr;
+> =20
+>      ov1_guest =3D spapr_ovec_parse_vector(ov_table, 1);
+>      ov5_guest =3D spapr_ovec_parse_vector(ov_table, 5);
 
-I think calling qemu_chr_write_all() is more readable.
 
-Either ways:
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+--Sig_/tZkoXqmSxGAaeCHBu/ph/8s
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
 
->  }
->
->  int qemu_chr_fe_read_all(CharBackend *be, uint8_t *buf, int len)
->
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iEYEARECAAYFAlksjyAACgkQAvw66wEB28Il/wCcDMygQeVdrwhyEF8eTlbMlT0a
+358AoIXXOLZ35lnqMWnaenSo8tk1Kos/
+=D/0P
+-----END PGP SIGNATURE-----
+
+--Sig_/tZkoXqmSxGAaeCHBu/ph/8s--
