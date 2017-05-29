@@ -1,23 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59338)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59320)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1dF8OV-00009s-AE
-	for qemu-devel@nongnu.org; Sun, 28 May 2017 20:18:50 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1dF8OU-0006DC-A9
-	for qemu-devel@nongnu.org; Sun, 28 May 2017 20:18:47 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:38662)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1dF8OU-0006C9-4K
+	(envelope-from <mst@redhat.com>) id 1dF8OT-000087-Dk
 	for qemu-devel@nongnu.org; Sun, 28 May 2017 20:18:46 -0400
-Date: Mon, 29 May 2017 03:18:42 +0300
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <mst@redhat.com>) id 1dF8OR-0006AX-J6
+	for qemu-devel@nongnu.org; Sun, 28 May 2017 20:18:45 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:41982)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1dF8OR-00069U-A2
+	for qemu-devel@nongnu.org; Sun, 28 May 2017 20:18:43 -0400
+Date: Mon, 29 May 2017 03:18:41 +0300
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <1496017081-24032-6-git-send-email-mst@redhat.com>
+Message-ID: <1496017081-24032-5-git-send-email-mst@redhat.com>
 References: <1496017081-24032-1-git-send-email-mst@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 In-Reply-To: <1496017081-24032-1-git-send-email-mst@redhat.com>
-Subject: [Qemu-devel] [PULL 05/13] intel_iommu: provide vtd_ce_get_type()
+Subject: [Qemu-devel] [PULL 04/13] intel_iommu: renaming context entry
+ helpers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,40 +32,110 @@ Cc: Peter Maydell <peter.maydell@linaro.org>, Peter Xu <peterx@redhat.com>, Jaso
 
 From: Peter Xu <peterx@redhat.com>
 
-Helper to fetch VT-d context entry type.
+The old names are too long and less ordered. Let's start to use
+vtd_ce_*() as a pattern.
 
 Signed-off-by: Peter Xu <peterx@redhat.com>
 Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 Reviewed-by: Jason Wang <jasowang@redhat.com>
 ---
- hw/i386/intel_iommu.c | 7 ++++++-
- 1 file changed, 6 insertions(+), 1 deletion(-)
+ hw/i386/intel_iommu.c | 24 ++++++++++++------------
+ 1 file changed, 12 insertions(+), 12 deletions(-)
 
 diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
-index f06055f..b477143 100644
+index 4a51df8..f06055f 100644
 --- a/hw/i386/intel_iommu.c
 +++ b/hw/i386/intel_iommu.c
-@@ -595,6 +595,11 @@ static inline uint32_t vtd_ce_get_agaw(VTDContextEntry *ce)
+@@ -512,7 +512,7 @@ static int vtd_get_root_entry(IntelIOMMUState *s, uint8_t index,
+     return 0;
+ }
+ 
+-static inline bool vtd_context_entry_present(VTDContextEntry *context)
++static inline bool vtd_ce_present(VTDContextEntry *context)
+ {
+     return context->lo & VTD_CONTEXT_ENTRY_P;
+ }
+@@ -533,7 +533,7 @@ static int vtd_get_context_entry_from_root(VTDRootEntry *root, uint8_t index,
+     return 0;
+ }
+ 
+-static inline dma_addr_t vtd_get_slpt_base_from_context(VTDContextEntry *ce)
++static inline dma_addr_t vtd_ce_get_slpt_base(VTDContextEntry *ce)
+ {
+     return ce->lo & VTD_CONTEXT_ENTRY_SLPTPTR;
+ }
+@@ -585,19 +585,19 @@ static inline bool vtd_is_level_supported(IntelIOMMUState *s, uint32_t level)
+ /* Get the page-table level that hardware should use for the second-level
+  * page-table walk from the Address Width field of context-entry.
+  */
+-static inline uint32_t vtd_get_level_from_context_entry(VTDContextEntry *ce)
++static inline uint32_t vtd_ce_get_level(VTDContextEntry *ce)
+ {
+     return 2 + (ce->hi & VTD_CONTEXT_ENTRY_AW);
+ }
+ 
+-static inline uint32_t vtd_get_agaw_from_context_entry(VTDContextEntry *ce)
++static inline uint32_t vtd_ce_get_agaw(VTDContextEntry *ce)
+ {
      return 30 + (ce->hi & VTD_CONTEXT_ENTRY_AW) * 9;
  }
  
-+static inline uint32_t vtd_ce_get_type(VTDContextEntry *ce)
-+{
-+    return ce->lo & VTD_CONTEXT_ENTRY_TT;
-+}
-+
  static inline uint64_t vtd_iova_limit(VTDContextEntry *ce)
  {
-     uint32_t ce_agaw = vtd_ce_get_agaw(ce);
-@@ -865,7 +870,7 @@ static int vtd_dev_to_context_entry(IntelIOMMUState *s, uint8_t bus_num,
+-    uint32_t ce_agaw = vtd_get_agaw_from_context_entry(ce);
++    uint32_t ce_agaw = vtd_ce_get_agaw(ce);
+     return 1ULL << MIN(ce_agaw, VTD_MGAW);
+ }
+ 
+@@ -642,8 +642,8 @@ static int vtd_iova_to_slpte(VTDContextEntry *ce, uint64_t iova, bool is_write,
+                              uint64_t *slptep, uint32_t *slpte_level,
+                              bool *reads, bool *writes)
+ {
+-    dma_addr_t addr = vtd_get_slpt_base_from_context(ce);
+-    uint32_t level = vtd_get_level_from_context_entry(ce);
++    dma_addr_t addr = vtd_ce_get_slpt_base(ce);
++    uint32_t level = vtd_ce_get_level(ce);
+     uint32_t offset;
+     uint64_t slpte;
+     uint64_t access_right_check;
+@@ -664,7 +664,7 @@ static int vtd_iova_to_slpte(VTDContextEntry *ce, uint64_t iova, bool is_write,
+             VTD_DPRINTF(GENERAL, "error: fail to access second-level paging "
+                         "entry at level %"PRIu32 " for iova 0x%"PRIx64,
+                         level, iova);
+-            if (level == vtd_get_level_from_context_entry(ce)) {
++            if (level == vtd_ce_get_level(ce)) {
+                 /* Invalid programming of context-entry */
+                 return -VTD_FR_CONTEXT_ENTRY_INV;
+             } else {
+@@ -809,8 +809,8 @@ static int vtd_page_walk(VTDContextEntry *ce, uint64_t start, uint64_t end,
+                          vtd_page_walk_hook hook_fn, void *private,
+                          bool notify_unmap)
+ {
+-    dma_addr_t addr = vtd_get_slpt_base_from_context(ce);
+-    uint32_t level = vtd_get_level_from_context_entry(ce);
++    dma_addr_t addr = vtd_ce_get_slpt_base(ce);
++    uint32_t level = vtd_ce_get_level(ce);
+ 
+     if (!vtd_iova_range_check(start, ce)) {
+         return -VTD_FR_ADDR_BEYOND_MGAW;
+@@ -851,7 +851,7 @@ static int vtd_dev_to_context_entry(IntelIOMMUState *s, uint8_t bus_num,
+         return ret_fr;
+     }
+ 
+-    if (!vtd_context_entry_present(ce)) {
++    if (!vtd_ce_present(ce)) {
+         /* Not error - it's okay we don't have context entry. */
+         trace_vtd_ce_not_present(bus_num, devfn);
+         return -VTD_FR_CONTEXT_ENTRY_P;
+@@ -861,7 +861,7 @@ static int vtd_dev_to_context_entry(IntelIOMMUState *s, uint8_t bus_num,
+         return -VTD_FR_CONTEXT_ENTRY_RSVD;
+     }
+     /* Check if the programming of context-entry is valid */
+-    if (!vtd_is_level_supported(s, vtd_get_level_from_context_entry(ce))) {
++    if (!vtd_is_level_supported(s, vtd_ce_get_level(ce))) {
          trace_vtd_ce_invalid(ce->hi, ce->lo);
          return -VTD_FR_CONTEXT_ENTRY_INV;
      } else {
--        switch (ce->lo & VTD_CONTEXT_ENTRY_TT) {
-+        switch (vtd_ce_get_type(ce)) {
-         case VTD_CONTEXT_TT_MULTI_LEVEL:
-             /* fall through */
-         case VTD_CONTEXT_TT_DEV_IOTLB:
 -- 
 MST
