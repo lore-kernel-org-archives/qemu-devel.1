@@ -1,22 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58441)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35567)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1dFPVu-00056P-25
-	for qemu-devel@nongnu.org; Mon, 29 May 2017 14:35:41 -0400
+	(envelope-from <kchamart@redhat.com>) id 1dFPx0-0002rZ-2A
+	for qemu-devel@nongnu.org; Mon, 29 May 2017 15:03:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1dFPVt-0001AZ-3T
-	for qemu-devel@nongnu.org; Mon, 29 May 2017 14:35:34 -0400
-References: <20170503122539.282182-1-vsementsov@virtuozzo.com>
-	<20170503122539.282182-10-vsementsov@virtuozzo.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <33ce370d-939f-d02e-0177-1184ae9f4fa7@redhat.com>
-Date: Mon, 29 May 2017 20:35:16 +0200
+	(envelope-from <kchamart@redhat.com>) id 1dFPwy-00018u-Qd
+	for qemu-devel@nongnu.org; Mon, 29 May 2017 15:03:34 -0400
+Date: Mon, 29 May 2017 21:03:22 +0200
+From: Kashyap Chamarthy <kchamart@redhat.com>
+Message-ID: <20170529190322.xc2e2uh7wp6hlcs6@eukaryote>
 MIME-Version: 1.0
-In-Reply-To: <20170503122539.282182-10-vsementsov@virtuozzo.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="VJfnXeqQKjsXDHKhrhf4kjXtCmFo9TDaN"
-Subject: Re: [Qemu-devel] [PATCH 09/25] block/dirty-bitmap: add readonly
- field to BdrvDirtyBitmap
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Subject: [Qemu-devel] [RFC] Making 'block-stream',
+ and 'block-commit' accept node-name
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,104 +21,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, armbru@redhat.com, eblake@redhat.com, jsnow@redhat.com, famz@redhat.com, den@openvz.org, stefanha@redhat.com, pbonzini@redhat.com
+To: qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, berto@igalia.com
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---VJfnXeqQKjsXDHKhrhf4kjXtCmFo9TDaN
-From: Max Reitz <mreitz@redhat.com>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, armbru@redhat.com, eblake@redhat.com, jsnow@redhat.com,
- famz@redhat.com, den@openvz.org, stefanha@redhat.com, pbonzini@redhat.com
-Message-ID: <33ce370d-939f-d02e-0177-1184ae9f4fa7@redhat.com>
-Subject: Re: [PATCH 09/25] block/dirty-bitmap: add readonly field to
- BdrvDirtyBitmap
-References: <20170503122539.282182-1-vsementsov@virtuozzo.com>
- <20170503122539.282182-10-vsementsov@virtuozzo.com>
-In-Reply-To: <20170503122539.282182-10-vsementsov@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Observe the following ('qmp-shell', for brevity) invocation of the four
+major types (stream, commit, mirror, backup) of live block operations:
 
-On 2017-05-03 14:25, Vladimir Sementsov-Ogievskiy wrote:
-> It will be needed in following commits for persistent bitmaps.
-> If bitmap is loaded from read-only storage (and we can't mark it
-> "in use" in this storage) corresponding BdrvDirtyBitmap should be
-> read-only.
->=20
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> ---
->  block/dirty-bitmap.c         | 16 ++++++++++++++++
->  include/block/dirty-bitmap.h |  3 +++
->  2 files changed, 19 insertions(+)
+    (QEMU) block-stream device=node-D base=a.qcow2 job-id=job-block-stream
+    (QEMU) block-commit device=node-D base=a.qcow2 top=b.qcow2 job-id=job-block-commit
+    (QEMU) drive-mirror device=node-D target=e.qcow2 sync=full job-id=job-drive-mirror
+    (QEMU) drive-backup device=node-D sync=full target=e.qcow2 job-id=job-drive-backup
+    (QEMU) blockdev-backup device=node-B target=node-E sync=full job-id=job-blockdev-backup
+    (QEMU) blockdev-mirror device=node-D target=node-E sync=full job-id=job-blockdev-mirror
 
-Revisiting this again after the whole series: So you never really make
-sure that the read-only bitmaps are not written to (except for these
-assertions). The idea is that you only set it for read-only BDS and
-read-only BDS are never written to. But that assumption is not true,
-generally, and can be broken e.g. using a commit job:
+While we have `blockdev-{mirror, backup}` as 'node-name'-alternatives
+for `drive-{mirror, backup}`, as the eagle-eyed will, the `block-stream`
+and `block-commit` commands still operate on file names for parameters
+'base' and 'top'. 
 
-$ ./qemu-img create -f qcow2 backing.qcow2 64M
-Formatting 'backing.qcow2', fmt=3Dqcow2 size=3D67108864 encryption=3Doff
-    cluster_size=3D65536 lazy_refcounts=3Doff refcount_bits=3D16
-$ ./qemu-img create -f qcow2 -b backing.qcow2 top.qcow2
-Formatting 'top.qcow2', fmt=3Dqcow2 size=3D67108864
-    backing_file=3Dbacking.qcow2 encryption=3Doff cluster_size=3D65536
-    lazy_refcounts=3Doff refcount_bits=3D16
-$ x86_64-softmmu/qemu-system-x86_64 -qmp stdio
-{"QMP": {"version": {"qemu": {"micro": 50, "minor": 9, "major": 2},
-"package": " (v2.9.0-632-g4a52d43-dirty)"}, "capabilities": []}}
-{'execute': 'qmp_capabilities'}
-{"return": {}}
-{'execute': 'blockdev-add',
- 'arguments': {'node-name': 'backing-node', 'driver': 'qcow2',
-               'file': {'driver': 'file', 'filename': 'backing.qcow2'}}}
-{"return": {}}
-{'execute': 'block-dirty-bitmap-add',
- 'arguments': {'node': 'backing-node', 'name': 'foo',
-               'persistent': true, 'autoload': true}}
-{"return": {}}
-{'execute': 'blockdev-del', 'arguments': {'node-name': 'backing-node'}}
-{"return": {}}
-{'execute': 'blockdev-add',
- 'arguments': {'node-name': 'top-node', 'driver': 'qcow2',
-               'file': {'driver': 'file', 'filename': 'top.qcow2'}}}
-{"return": {}}
-{'execute': 'human-monitor-command',
- 'arguments': {'command-line': 'qemu-io top-node "write 0 64k"'}}
-wrote 65536/65536 bytes at offset 0
-64 KiB, 1 ops; 0.0079 sec (7.852 MiB/sec and 125.6281 ops/sec)
-{"return": ""}
-{'execute': 'block-commit',
- 'arguments': {'device': 'top-node', 'job-id': 'commit-job'}}
-{"return": {}}
-qemu-system-x86_64: block/dirty-bitmap.c:571: bdrv_set_dirty: Assertion
-`!bdrv_dirty_bitmap_readonly(bitmap)' failed.
-[1]    10872 abort (core dumped)  x86_64-softmmu/qemu-system-x86_64 -qmp
-stdio
+When I brought it up on #qemu, OFTC, where Max gave some context, and
+even said: "We just shouldn't use filenames there ['commit', 'stream'],
+simple as that".
 
-So there needs to be something else than just assertions to make sure
-that read-only bitmaps are never written to.
+Does upstream have a plan here for 2.10 / 3.0?  Will there be new
+`blockdev-stream`, and `blockdev-commit`, or will `block-{stream,
+commit}` will be adjusted to take 'node-name'?
 
-Max
+* * *
 
+Then I _vaguely_ remembered reading a thread on the upstream list about
+creating a new 'blockdev-stream' (but I didn't find anything about
+'blockdev-commit'), even if a bit confusing.  Sure enough, when I went
+digging the archives, I found, where Alberto extended the 'device'
+parameter to take 'node-name', and there was an ensuing discussion about
+a new 'blockdev-stream':
 
---VJfnXeqQKjsXDHKhrhf4kjXtCmFo9TDaN
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+    https://lists.gnu.org/archive/html/qemu-devel/2016-10/msg03236.html
+    -- [PATCH v11 00/19] Support streaming to an intermediate layer
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
+And this patch had the said discussion:
 
-iQEvBAEBCAAZBQJZLGnkEhxtcmVpdHpAcmVkaGF0LmNvbQAKCRD0B9sAYdXPQFs5
-B/0aT7kgOFJZiYOASxNF697evrTIYDDS8c7HxBdQ7ZtRpQ1UlOxY/7K09uDVg9e0
-4y0PNJAF9Zzjgqsb/5+7hNO87PkkyPucHD0hTOOcJE28USd9FjAMTe1LTl1U4M1P
-WWr0uidmtV6OibgJAQyNP7NiBkNeyKvfG6TmpxgeFIi53RFf5JuxSbb05Ehh2/Kg
-IPmHZpfQsSnTV4J5VkcYCxEEM6F/JZhoUoi1tLagLTALJ3kD2Nz8RGE7EXWJUZlb
-ElmT7sXOTpNhc4cC9JvqQ7P51+fqypdLt7TEox17zqQ3HyF2HWbqF5/qDBuTYLBK
-Z2nau0ZsPBECRQ1/WIyvIul8
-=hGaX
------END PGP SIGNATURE-----
+    https://lists.gnu.org/archive/html/qemu-block/2016-10/msg00117.html
 
---VJfnXeqQKjsXDHKhrhf4kjXtCmFo9TDaN--
+tl;dr seemed to be: "add a new `blockdev-stream` [and
+`blockdev-commit`?] because it is easy to introspect, and is a 'saner'
+interface".
+
+To recap from that thread, Kevin wrote[1]:
+
+    "Oh, we still have those filename-based parameters? :-/
+
+    "Should we introduce a new, clean blockdev-stream command that fixes
+    this and matches the common name pattern? Of course, block-stream
+    vs.  blockdev-stream could be a bit confusing, too..."
+
+And, Eric seemed agreeable to a new command[2], saying, "a new command
+is easy to introspect".
+
+Markus chimed in[3] with some background context, and a design
+discussion aobut whether it makes sense to extend existing commands vs.
+adding new, giving pros / cons of both.
+
+Finally, Kevin concluded[4]:
+
+    "It has never been a sane interface in the first place (identifying
+    a backing file node by its filename).
+    
+    "We ended up having two versions of all block job commands anyway
+    (one that creates an image file, and later one that just takes a
+    node-name of an existing node), except for image streaming so far.
+    So it would be consistent (and enable consistent naming for the
+    preferred commands) to have it here, too."
+
+[1] https://lists.gnu.org/archive/html/qemu-block/2016-10/msg00319.html
+[2] https://lists.gnu.org/archive/html/qemu-block/2016-10/msg00328.html 
+[3] https://lists.gnu.org/archive/html/qemu-block/2016-10/msg00333.html
+[4] https://lists.gnu.org/archive/html/qemu-block/2016-10/msg00354.html
+
+-- 
+/kashyap
