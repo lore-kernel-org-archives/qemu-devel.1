@@ -1,24 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51402)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56560)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rjones@redhat.com>) id 1dFHgq-0000In-5o
-	for qemu-devel@nongnu.org; Mon, 29 May 2017 06:14:21 -0400
+	(envelope-from <imammedo@redhat.com>) id 1dFI9O-0004on-Se
+	for qemu-devel@nongnu.org; Mon, 29 May 2017 06:43:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rjones@redhat.com>) id 1dFHgo-00029h-U6
-	for qemu-devel@nongnu.org; Mon, 29 May 2017 06:14:20 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:49988)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <rjones@redhat.com>) id 1dFHgo-00029M-OD
-	for qemu-devel@nongnu.org; Mon, 29 May 2017 06:14:18 -0400
-Date: Mon, 29 May 2017 11:14:13 +0100
-From: "Richard W.M. Jones" <rjones@redhat.com>
-Message-ID: <20170529101413.GN16511@redhat.com>
-References: <1c8f4f4e-65f7-2d12-a391-08781fea651c@landley.net>
-	<e55a133d-2ce7-4889-e214-044f0026d096@redhat.com>
+	(envelope-from <imammedo@redhat.com>) id 1dFI9N-0001j4-Uu
+	for qemu-devel@nongnu.org; Mon, 29 May 2017 06:43:50 -0400
+Date: Mon, 29 May 2017 12:43:39 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20170529124339.43eea1c5@nial.brq.redhat.com>
+In-Reply-To: <CAD8of+pw5Nh4oSkTuYX4fbJvA8=-CTmn6dgdXHPLERAcQM+Oyw@mail.gmail.com>
+References: <1495790468-23862-1-git-send-email-zhlcindy@gmail.com>
+	<20170526132114.6edc006e@nial.brq.redhat.com>
+	<CAD8of+pw5Nh4oSkTuYX4fbJvA8=-CTmn6dgdXHPLERAcQM+Oyw@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <e55a133d-2ce7-4889-e214-044f0026d096@redhat.com>
-Subject: Re: [Qemu-devel] Commit b2a575a1c652 broke i486 support.
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 0/3] arm/virt: refine virt.c code and
+ implement hot_add_cpu interface
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,52 +25,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: Rob Landley <rob@landley.net>, qemu-devel@nongnu.org, Marc =?iso-8859-1?Q?Mar=ED?= <markmb@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: Li Zhang <zhlcindy@gmail.com>
+Cc: peter.maydell@linaro.org, qemu-arm@nongnu.org, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Li Zhang <li.zhang@hxt-semitech.com>
 
-On Mon, May 29, 2017 at 11:22:14AM +0200, Thomas Huth wrote:
-> On 28.05.2017 07:18, Rob Landley wrote:
-> > You can't boot a kernel under -cpu 486 since that commit (hangs
-> > producing no output) because it added a bios image that won't run on
-> > anything short of pentium II.
-> > 
-> > You can try the run-emulator.sh script in
-> > http://landley.net/aboriginal/downloads/binaries/system-image-i486.tar.gz
-> > before and after that commit to check for yourself.
+On Sat, 27 May 2017 10:32:33 +0800
+Li Zhang <zhlcindy@gmail.com> wrote:
+
+> On Fri, May 26, 2017 at 7:21 PM, Igor Mammedov <imammedo@redhat.com> wrote:
+> > On Fri, 26 May 2017 17:21:05 +0800
+> > Li Zhang <zhlcindy@gmail.com> wrote:
+> >  
+> >> From: Li Zhang <li.zhang@hxt-semitech.com>
+> >>
+> >> virt machine doesn't support hot_add_cpu interface. This patchset is to implement
+> >> hot_add_cpu interface. A CPU can be added by QMP command with QEMU monitor.
+> >>
+> >> Here is command to add a CPU with QMP command.
+> >>
+> >> * qemu-system-aarch64 -machine virt -cpu cortex-a15 -smp 1,maxcpus=4 \
+> >>     -monitor telnet:127.0.0.1:4444,server,nowait -nographic
+> >> * connect monitor:      telnet 127.0.0.1 4444
+> >> * execute qmp command:  cpu-add 1  
+> > cpu-add command shouldn't be used for new cpu hotplug,
+> > pls use generic device_add for that.  
 > 
->  Hi Rob,
+> Ok,  I will drop this command and look at device_add.
 > 
-> thanks for the bug report ... but to make sure that your mail does not
-> get lost in the high traffic of the qemu-devel mailing list, it might be
-> a good idea to CC: the people from that commit b2a575a1c652 in this case
-> (which I've done now).
+> >
+> > The last time I looked at it, virt machine needed quite a bit of
+> > re-factoring of the way it creates/wires up CPUs.  
+> 
+>  Yes, I am looking into it and see if I can do something:)
+> 
+> >
+> > Pls see usage of following callbacks for example on how to implement
+> > device_add based cpu hotplug:
+> >
+> >   get_hotplug_handler
+> >   pc_cpu_pre_plug
+> >   pc_cpu_plug
+> >   pc_possible_cpu_arch_ids
+> >
+> > and pc_cpus_init() for initial cpu creation with above callbacks in use
+> >  
+> Thanks, I will see it. :)
+> 
+> >>
+> >> Currently, when KVM is enabled and add a CPU with QMP command, QEMU
+> >> reports error "kvm_init_vcpu failed: Device or resourc busy". KVM can't
+> >> create a new CPU when vgic has been initialized and irqchip_in_kernel in
+> >> function kvm_arch_vcpu_create. It needs to change KVM code in the future.  
+> > if KVM isn't capable do it yet, then qemu should refuse cpu hotplug if running
+> > with KVM accelarator and allow it only in TCG mode.  
+> 
+> OK, I will add an assertion to allow hotplug only in TCG mode.
+instead of assert which will crash guest on hotplug,
+just disable hotplug gracefully (for example set error in pre_plug handler)
 
-I see in the disassembly use of cmovne (new in Pentium Pro) and
-bswap (new in 486).
-[http://cse.unl.edu/~goddard/Courses/CSCE351/IntelArchitecture/InstructionSetSummary.pdf]
-
-The cmovne instruction is generated by the compiler (GCC in my case),
-
-The following patch removes the cmovne instruction, so it should work
-on 486 (although I didn't test it).  It's not possible to remove bswap
-without surgery on the inline assembler.
-
---- a/pc-bios/optionrom/Makefile
-+++ b/pc-bios/optionrom/Makefile
-@@ -13,6 +13,7 @@ $(call set-vpath, $(SRC_PATH)/pc-bios/optionrom)
- ifeq ($(lastword $(filter -O%, -O0 $(CFLAGS))),-O0)
- override CFLAGS += -O2
- endif
-+override CFLAGS += -march=i386
- 
- # Drop -fstack-protector and the like
- QEMU_CFLAGS := $(filter -W%, $(QEMU_CFLAGS)) $(CFLAGS_NOPIE) -ffreestanding
-
-
-Rich.
-
--- 
-Richard Jones, Virtualization Group, Red Hat http://people.redhat.com/~rjones
-Read my programming and virtualization blog: http://rwmj.wordpress.com
-virt-builder quickly builds VMs from scratch
-http://libguestfs.org/virt-builder.1.html
+> 
+> >  
+> >>
+> >> Li Zhang (3):
+> >>   arm/virt: Refine fdt_add_cpu_nodes code
+> >>   arm/virt: Refine code of machvirt_init
+> >>   arm/virt: Implement hot_add_cpu interface
+> >>
+> >>  hw/arm/virt.c | 344 ++++++++++++++++++++++++++++++++++------------------------
+> >>  1 file changed, 202 insertions(+), 142 deletions(-)
+> >>  
+> >  
+> 
+> 
+> 
