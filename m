@@ -1,24 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43840)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44071)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1dFJW3-0000Ph-8G
-	for qemu-devel@nongnu.org; Mon, 29 May 2017 08:11:20 -0400
+	(envelope-from <david@redhat.com>) id 1dFJXK-0001IY-2E
+	for qemu-devel@nongnu.org; Mon, 29 May 2017 08:12:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1dFJW1-0001Yg-Ol
-	for qemu-devel@nongnu.org; Mon, 29 May 2017 08:11:19 -0400
-Date: Mon, 29 May 2017 14:11:08 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20170529141108.37bb0cd8@nial.brq.redhat.com>
-In-Reply-To: <20170526145814.GE22043@thinpad.lan.raisama.net>
-References: <1495550330-34087-1-git-send-email-imammedo@redhat.com>
-	<1495550330-34087-5-git-send-email-imammedo@redhat.com>
-	<20170523144854.GF32274@thinpad.lan.raisama.net>
-	<20170523174403.26a69d7c@Igors-MacBook-Pro.local>
-	<20170526145814.GE22043@thinpad.lan.raisama.net>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 4/5] numa: fallback to default NUMA node
- instead of node 0
+	(envelope-from <david@redhat.com>) id 1dFJXG-0001ip-Tl
+	for qemu-devel@nongnu.org; Mon, 29 May 2017 08:12:38 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:59518)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <david@redhat.com>) id 1dFJXG-0001ih-N7
+	for qemu-devel@nongnu.org; Mon, 29 May 2017 08:12:34 -0400
+From: David Hildenbrand <david@redhat.com>
+Date: Mon, 29 May 2017 14:12:28 +0200
+Message-Id: <20170529121228.2789-1-david@redhat.com>
+Subject: [Qemu-devel] [PATCH v1] target/s390x: addressing exceptions are
+ suppressing
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,95 +22,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: Andrew Jones <drjones@redhat.com>, qemu-arm@nongnu.org, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
+To: qemu-devel@nongnu.org
+Cc: rth@twiddle.net, agraf@suse.de, Aurelien Jarno <aurelien@aurel32.net>, thuth@redhat.com, david@redhat.com
 
-On Fri, 26 May 2017 11:58:14 -0300
-Eduardo Habkost <ehabkost@redhat.com> wrote:
+We have to make the address in the old PSW point at the next
+instruction, as addressing exceptions are suppressing and not
+nullifying.
 
-> On Tue, May 23, 2017 at 05:44:03PM +0200, Igor Mammedov wrote:
-> > On Tue, 23 May 2017 11:48:54 -0300
-> > Eduardo Habkost <ehabkost@redhat.com> wrote:
-> >   
-> > > On Tue, May 23, 2017 at 04:38:49PM +0200, Igor Mammedov wrote:  
-> > > > Do the same as we did in commit
-> > > >   (57924bcd8 numa: introduce machine callback for VCPU to node mapping)
-> > > > but only for incomplete mapping usecase, falling back to board
-> > > > provided default cpu to node mapping if user hasn't provided
-> > > > mapping for CPU explicitly.
-> > > > 
-> > > > Signed-off-by: Igor Mammedov <imammedo@redhat.com>  
-> > > 
-> > > This breaks migration compatibility, doesn't it? I understand
-> > > this use case is not supported, but if are going to break stuff
-> > > for people using incomplete mappings (by rejecting the
-> > > configuration on a future release), I would prefer to break it
-> > > only once.  
-> > it's firmware change and we generally don't care nor maintain firmware compat stuff
-> > the same as with above mentioned 
-> >  (57924bcd8 numa: introduce machine callback for VCPU to node mapping)  
-> 
-> 
-> We normally keep resulting NUMA topology compatible, even if NUMA
-> information is implemented only by firmware.  See how we set
-> MachineClass::numa_auto_assign_ram and
-> MachineClass::numa_mem_align_shift in older machine-types, for
-> example.
-it's relative new and pure firmaware change wrt arm/i386,
-but it might influence ABI for spapr, my guess is that's why
-it was compat flags were introduced
-(otherwise they shouldn't have been added).
-So I wouldn't consider this precedent as policy change
-wrt firmware changes.
+I assume that there are a lot of other broken cases (as most instructions
+we care about are suppressing) - all trigger_pgm_exception() specifying
+and explicit number or ILEN_LATER look suspicious, however this is another
+story that might require bigger changes (and I have to understand when
+the address might already have been incremented first).
 
+This is needed to make an upcoming kvm-unit-test work.
+
+Signed-off-by: David Hildenbrand <david@redhat.com>
+---
+ target/s390x/helper.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/target/s390x/helper.c b/target/s390x/helper.c
+index 9978490..c09e391 100644
+--- a/target/s390x/helper.c
++++ b/target/s390x/helper.c
+@@ -204,7 +204,7 @@ int s390_cpu_handle_mmu_fault(CPUState *cs, vaddr orig_vaddr,
+     if (raddr > ram_size) {
+         DPRINTF("%s: raddr %" PRIx64 " > ram_size %" PRIx64 "\n", __func__,
+                 (uint64_t)raddr, (uint64_t)ram_size);
+-        trigger_pgm_exception(env, PGM_ADDRESSING, ILEN_LATER);
++        trigger_pgm_exception(env, PGM_ADDRESSING, ILEN_LATER_INC);
+         return 1;
+     }
  
-> Sometimes we didn't keep compatibility, though (e.g. on commit
-> fb43b73b92 "pc: fix default VCPU to NUMA node mapping").
-and more
-(27111931 acpi: provide _PXM method for CPU devices if QEMU is started numa enabled)
-and this sometimes is more consistent with other firmware
-changes that are not versioned and the general approach
-(I don't see why numa is any more special that any other
-subsystem).
-
-> I wouldn't disagree with this change if we planned to support
-> incomplete mappings forever.  But if we are going to remove
-> support for incomplete mappings soon, I would prefer to break
-> user expectations only once.
-My take on why we can't remove incomplete mappings without
-obsoleting them first is not because of firmware changes but
-that it breaks wrong CLI (i.e. scripts with incomplete mapping
-will fail to start guest). So it's not the same vs firmware
-behavior change.
-
-I'm agreeing to drop this patch just because I don't care much
-about this particular fixup as it's small isolated part in one place
-and doesn't affect the rest of the code.
-
-
-> > >   
-> > > > ---
-> > > >  hw/core/machine.c | 3 ---
-> > > >  1 file changed, 3 deletions(-)
-> > > > 
-> > > > diff --git a/hw/core/machine.c b/hw/core/machine.c
-> > > > index 964b75d..b8df15f 100644
-> > > > --- a/hw/core/machine.c
-> > > > +++ b/hw/core/machine.c
-> > > > @@ -730,9 +730,6 @@ static void machine_numa_finish_init(MachineState *machine)
-> > > >                  g_string_append_printf(s, "%sCPU %d [%s]",
-> > > >                                         s->len ? ", " : "", i, cpu_str);
-> > > >                  g_free(cpu_str);
-> > > > -
-> > > > -                /* non mapped cpus used to fallback to node 0 */
-> > > > -                props.node_id = 0;
-> > > >              }
-> > > >  
-> > > >              props.has_node_id = true;
-> > > > -- 
-> > > > 2.7.4
-> > > >   
-> > >   
-> > 
-> >   
-> 
+-- 
+2.9.3
