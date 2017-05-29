@@ -1,21 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34779)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36186)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dFIlA-00043V-5Q
-	for qemu-devel@nongnu.org; Mon, 29 May 2017 07:22:53 -0400
+	(envelope-from <thuth@redhat.com>) id 1dFItQ-0006AD-7D
+	for qemu-devel@nongnu.org; Mon, 29 May 2017 07:31:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dFIl9-00047l-3E
-	for qemu-devel@nongnu.org; Mon, 29 May 2017 07:22:52 -0400
-References: <1495830130-30611-1-git-send-email-kwolf@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <ceab079c-1d8e-368f-c51a-82e92a0b2852@redhat.com>
-Date: Mon, 29 May 2017 13:22:41 +0200
+	(envelope-from <thuth@redhat.com>) id 1dFItN-0006P6-3K
+	for qemu-devel@nongnu.org; Mon, 29 May 2017 07:31:24 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:36282)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1dFItM-0006Ox-Sy
+	for qemu-devel@nongnu.org; Mon, 29 May 2017 07:31:21 -0400
+References: <20170525210508.4910-1-aurelien@aurel32.net>
+	<20170525210508.4910-27-aurelien@aurel32.net>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <66c633b7-bec7-93ff-3d1a-cd89b98a9e68@redhat.com>
+Date: Mon, 29 May 2017 13:31:13 +0200
 MIME-Version: 1.0
-In-Reply-To: <1495830130-30611-1-git-send-email-kwolf@redhat.com>
+In-Reply-To: <20170525210508.4910-27-aurelien@aurel32.net>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 00/29] qed: Convert to
- coroutines
+Subject: Re: [Qemu-devel] [PATCH 26/26] target/s390x: update maximum TCG
+ model to z800
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,82 +29,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, stefanha@redhat.com, mreitz@redhat.com
+To: Aurelien Jarno <aurelien@aurel32.net>, qemu-devel@nongnu.org
+Cc: Alexander Graf <agraf@suse.de>, Richard Henderson <rth@twiddle.net>, David Hildenbrand <david@redhat.com>
 
-On 26/05/2017 22:21, Kevin Wolf wrote:
-> The qed block driver is one of the last remaining block drivers that use the
-> AIO callback style interfaces. This series converts it to the coroutine model
-> that other drivers are using and removes some AIO functions from the block
-> layer API afterwards.
+On 25.05.2017 23:05, Aurelien Jarno wrote:
+> Now that the extended-translation facility 2 has been fully implemented,
+> it's possible to emulated a most a z800 CPU with TCG.
 > 
-> If this isn't compelling enough, the diffstat should speak for itself.
+> Signed-off-by: Aurelien Jarno <aurelien@aurel32.net>
+> ---
+>  target/s390x/cpu_models.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
 > 
-> This series is relatively long, but it consists mostly of mechanical
-> conversions of one function per patch, so it should be easy to review.
+> diff --git a/target/s390x/cpu_models.c b/target/s390x/cpu_models.c
+> index 8d27363b07..9c4227d2dd 100644
+> --- a/target/s390x/cpu_models.c
+> +++ b/target/s390x/cpu_models.c
+> @@ -670,8 +670,8 @@ static S390CPUModel *get_max_cpu_model(Error **errp)
+>      if (kvm_enabled()) {
+>          kvm_s390_get_host_cpu_model(&max_model, errp);
+>      } else {
+> -        /* TCG emulates a z900 */
+> -        max_model.def = &s390_cpu_defs[0];
+> +        /* TCG emulates at most a z800 */
+> +        max_model.def = &s390_cpu_defs[3];
 
-Looks great, just a few notes:
+These hard-coded offsets into s390_cpu_defs are kind of ugly ...
+Maybe you could use
 
-- There are a couple "Callback from qed_find_cluster()" comments that 
-are obsolete.
+    max_model.def = s390_find_cpu_def(0x2066, 7, 3, NULL);
 
-- qed_acquire/qed_release can be removed as you inline stuff, but this
-should not cause bugs so you can either do it as a final patch or let
-me remove it later.
+instead?
 
-- coroutine_fn annotations are missing.  Also can be done as a final
-patch.  It's a bit ugly that L1/L2 table access can happen both in a
-coroutine (for regular I/O) and outside (for create/check).
-
-- qed_is_allocated_cb can be inlined and QEDIsAllocatedCB removed.  Of
-course a lot more cleanup could be done (I will do a couple more such
-changes when adding a CoMutex to make the driver thread-safe) but this
-one is pretty low-hanging fruit and seems to be in line with the rest
-of the patches.
-
-- qed_co_request doesn't need g_new for the QEDAIOCB.
-
-Paolo
-
-> Kevin Wolf (29):
->   qed: Use bottom half to resume waiting requests
->   qed: Make qed_read_table() synchronous
->   qed: Remove callback from qed_read_table()
->   qed: Remove callback from qed_read_l2_table()
->   qed: Remove callback from qed_find_cluster()
->   qed: Make qed_read_backing_file() synchronous
->   qed: Make qed_copy_from_backing_file() synchronous
->   qed: Remove callback from qed_copy_from_backing_file()
->   qed: Make qed_write_header() synchronous
->   qed: Remove callback from qed_write_header()
->   qed: Make qed_write_table() synchronous
->   qed: Remove GenericCB
->   qed: Remove callback from qed_write_table()
->   qed: Make qed_aio_read_data() synchronous
->   qed: Make qed_aio_write_main() synchronous
->   qed: Inline qed_commit_l2_update()
->   qed: Add return value to qed_aio_write_l1_update()
->   qed: Add return value to qed_aio_write_l2_update()
->   qed: Add return value to qed_aio_write_main()
->   qed: Add return value to qed_aio_write_cow()
->   qed: Add return value to qed_aio_write_inplace/alloc()
->   qed: Add return value to qed_aio_read/write_data()
->   qed: Remove ret argument from qed_aio_next_io()
->   qed: Remove recursion in qed_aio_next_io()
->   qed: Implement .bdrv_co_readv/writev
->   qed: Use CoQueue for serialising allocations
->   qed: Simplify request handling
->   qed: Use a coroutine for need_check_timer
->   block: Remove bdrv_aio_readv/writev_flush()
-> 
->  block/Makefile.objs   |   2 +-
->  block/io.c            | 171 -----------
->  block/qed-cluster.c   | 123 ++++----
->  block/qed-gencb.c     |  33 ---
->  block/qed-table.c     | 261 ++++++-----------
->  block/qed.c           | 763 +++++++++++++++++++-------------------------------
->  block/qed.h           |  53 +---
->  include/block/block.h |   8 -
->  8 files changed, 432 insertions(+), 982 deletions(-)
->  delete mode 100644 block/qed-gencb.c
-> 
+ Thomas
