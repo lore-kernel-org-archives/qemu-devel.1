@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59892)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33421)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dFNER-0007vQ-AP
-	for qemu-devel@nongnu.org; Mon, 29 May 2017 12:09:24 -0400
+	(envelope-from <mreitz@redhat.com>) id 1dFNMP-0001j2-T0
+	for qemu-devel@nongnu.org; Mon, 29 May 2017 12:17:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dFNEQ-0008JV-1e
-	for qemu-devel@nongnu.org; Mon, 29 May 2017 12:09:23 -0400
-From: Thomas Huth <thuth@redhat.com>
-References: <1494585229-9119-1-git-send-email-thuth@redhat.com>
-Message-ID: <8471eebf-e872-6dc6-f3e4-b2709de12bfb@redhat.com>
-Date: Mon, 29 May 2017 18:09:10 +0200
+	(envelope-from <mreitz@redhat.com>) id 1dFNMO-00059w-W4
+	for qemu-devel@nongnu.org; Mon, 29 May 2017 12:17:37 -0400
+References: <20170503122539.282182-1-vsementsov@virtuozzo.com>
+	<20170503122539.282182-11-vsementsov@virtuozzo.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <e3a6e2d5-b33c-9282-69a9-14ee2e8541d8@redhat.com>
+Date: Mon, 29 May 2017 18:17:20 +0200
 MIME-Version: 1.0
-In-Reply-To: <1494585229-9119-1-git-send-email-thuth@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2] blockdev: Print a warning for legacy
- drive options that belong to -device
+In-Reply-To: <20170503122539.282182-11-vsementsov@virtuozzo.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="atIooREXg91sED9f4D332dCpqC6OcfWX0"
+Subject: Re: [Qemu-devel] [PATCH 10/25] qcow2: autoloading dirty bitmaps
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,90 +24,98 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
-Cc: qemu-block@nongnu.org
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, armbru@redhat.com, eblake@redhat.com, jsnow@redhat.com, famz@redhat.com, den@openvz.org, stefanha@redhat.com, pbonzini@redhat.com
 
-On 12.05.2017 12:33, Thomas Huth wrote:
-> We likely do not want to carry these legacy -drive options along forever.
-> Let's emit a deprecation warning for the -drive options that have a
-> replacement with the -device option, so that the (hopefully few) remaining
-> users are aware of this and can adapt their scripts / behaviour accordingly.
-> 
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--atIooREXg91sED9f4D332dCpqC6OcfWX0
+From: Max Reitz <mreitz@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, armbru@redhat.com, eblake@redhat.com, jsnow@redhat.com,
+ famz@redhat.com, den@openvz.org, stefanha@redhat.com, pbonzini@redhat.com
+Message-ID: <e3a6e2d5-b33c-9282-69a9-14ee2e8541d8@redhat.com>
+Subject: Re: [PATCH 10/25] qcow2: autoloading dirty bitmaps
+References: <20170503122539.282182-1-vsementsov@virtuozzo.com>
+ <20170503122539.282182-11-vsementsov@virtuozzo.com>
+In-Reply-To: <20170503122539.282182-11-vsementsov@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 2017-05-03 14:25, Vladimir Sementsov-Ogievskiy wrote:
+> Auto loading bitmaps are bitmaps in Qcow2, with the AUTO flag set. They=
+
+> are loaded when the image is opened and become BdrvDirtyBitmaps for the=
+
+> corresponding drive.
+>=20
+> Extra data in bitmaps is not supported for now.
+>=20
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 > ---
->  v2:
->  - Check for !qtest_enabled() since tests/hd-geo-test still uses these
->  - Added "addr" to the list, too
->  - Also mark the options as deprecated in the documentation
-> 
->  blockdev.c      | 14 ++++++++++++++
->  qemu-options.hx |  5 ++++-
->  2 files changed, 18 insertions(+), 1 deletion(-)
-> 
-> diff --git a/blockdev.c b/blockdev.c
-> index 0b38c3d..aef38f0 100644
-> --- a/blockdev.c
-> +++ b/blockdev.c
-> @@ -50,6 +50,7 @@
->  #include "qmp-commands.h"
->  #include "block/trace.h"
->  #include "sysemu/arch_init.h"
-> +#include "sysemu/qtest.h"
->  #include "qemu/cutils.h"
->  #include "qemu/help_option.h"
->  #include "qemu/throttle-options.h"
-> @@ -797,6 +798,9 @@ DriveInfo *drive_new(QemuOpts *all_opts, BlockInterfaceType block_default_type)
->      const char *filename;
->      Error *local_err = NULL;
->      int i;
-> +    const char *deprecated[] = {
-> +        "serial", "trans", "secs", "heads", "cyls", "addr"
-> +    };
->  
->      /* Change legacy command line options into QMP ones */
->      static const struct {
-> @@ -880,6 +884,16 @@ DriveInfo *drive_new(QemuOpts *all_opts, BlockInterfaceType block_default_type)
->                  "update your scripts.\n");
->      }
->  
-> +    /* Other deprecated options */
-> +    if (!qtest_enabled()) {
-> +        for (i = 0; i < ARRAY_SIZE(deprecated); i++) {
-> +            if (qemu_opt_get(legacy_opts, deprecated[i]) != NULL) {
-> +                error_report("'%s' is deprecated, please use the corresponding "
-> +                             "option of '-device' instead", deprecated[i]);
-> +            }
-> +        }
-> +    }
+>  block/qcow2-bitmap.c | 387 +++++++++++++++++++++++++++++++++++++++++++=
+++++++++
+>  block/qcow2.c        |  17 ++-
+>  block/qcow2.h        |   2 +
+>  3 files changed, 404 insertions(+), 2 deletions(-)
+>=20
+> diff --git a/block/qcow2-bitmap.c b/block/qcow2-bitmap.c
+> index b8e472b3e8..a2522d7ccf 100644
+> --- a/block/qcow2-bitmap.c
+> +++ b/block/qcow2-bitmap.c
+
+[...]
+
+> @@ -437,3 +602,225 @@ out:
+
+[...]
+
+> +/* for g_slist_foreach for GSList of BdrvDirtyBitmap* elements */
+> +static void set_readonly_helper(gpointer bitmap, gpointer unused)
+> +{
+> +    bdrv_dirty_bitmap_set_readonly(bitmap);
+> +}
 > +
->      /* Media type */
->      value = qemu_opt_get(legacy_opts, "media");
->      if (value) {
-> diff --git a/qemu-options.hx b/qemu-options.hx
-> index 9d7964d..2f66f1a 100644
-> --- a/qemu-options.hx
-> +++ b/qemu-options.hx
-> @@ -615,6 +615,8 @@ of available connectors of a given interface type.
->  This option defines the type of the media: disk or cdrom.
->  @item cyls=@var{c},heads=@var{h},secs=@var{s}[,trans=@var{t}]
->  These options have the same definition as they have in @option{-hdachs}.
-> +These parameters are deprecated, use the corresponding parameters
-> +of @code{-device} instead.
->  @item snapshot=@var{snapshot}
->  @var{snapshot} is "on" or "off" and controls snapshot mode for the given drive
->  (see @option{-snapshot}).
-> @@ -631,7 +633,8 @@ an untrusted format header.
->  @item serial=@var{serial}
->  This option specifies the serial number to assign to the device.
->  @item addr=@var{addr}
-> -Specify the controller's PCI address (if=virtio only).
-> +Specify the controller's PCI address (if=virtio only). This parameter is
-> +deprecated, use the corresponding parameter of @code{-device} instead.
->  @item werror=@var{action},rerror=@var{action}
->  Specify which @var{action} to take on write and read errors. Valid actions are:
->  "ignore" (ignore the error and try to continue), "stop" (pause QEMU),
-> 
+> +/* qcow2_load_autoloading_dirty_bitmaps()
+> + * Return value is a hint for caller: true means that Qcow2 header was=
+ updated.
 
-Ping ... any comments on this version of my patch?
+"...that the Qcow2 header..."
 
- Thomas
+> + * (false doesn't mean that header should be updated by caller, it jus=
+t means
+
+"...that the header...", "...by the caller, ..."
+
+> + * that updating was not needed or image can not be written).
+
+"...or the image cannot be written [to]"
+
+> + * On fail the function returns false.
+
+"On failure..."
+
+With these fixed:
+
+Reviewed-by: Max Reitz <mreitz@redhat.com>
+
+
+--atIooREXg91sED9f4D332dCpqC6OcfWX0
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iQEvBAEBCAAZBQJZLEmQEhxtcmVpdHpAcmVkaGF0LmNvbQAKCRD0B9sAYdXPQDH+
+CACoba7Kh92Zq5wYwC1ZuY3kacqYqLJ3p8vHzMd9PMmlT69gUQq46urpoMF/v4P8
++i0/8JXzHRYIeCA0ATzULnQjCV6ZwyUfYKzwJgqInTX6c2AW7JvStOsZ4+giv8qN
+731kjJHr586Qq6dDNHTczGWSFracZTlA6dxCo8CN7rvVt6psBC5Tsz3y1stSg13O
+Vp+IwYFnhglq7Aoj6DDvzCKGZfWmvZuPzDFUZXcIufdcu5JgCJMxspCAYS5+Ai3d
+XU2fOdiTYDWgcxgGYLv92Thm8psGg7MjMLIYF/Lht0kY4dmyVr9uEhJCvOa9sKmI
+zu2wZUtbXvRLbh1haviFB6/2
+=QjMZ
+-----END PGP SIGNATURE-----
+
+--atIooREXg91sED9f4D332dCpqC6OcfWX0--
