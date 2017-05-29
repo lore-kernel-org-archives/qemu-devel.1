@@ -1,17 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45838)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46989)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dFMGZ-0001Z6-78
-	for qemu-devel@nongnu.org; Mon, 29 May 2017 11:07:32 -0400
+	(envelope-from <ben@skyportsystems.com>) id 1dFMK6-0004bv-EZ
+	for qemu-devel@nongnu.org; Mon, 29 May 2017 11:11:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dFMGX-0006WU-Nd
-	for qemu-devel@nongnu.org; Mon, 29 May 2017 11:07:31 -0400
-From: Kevin Wolf <kwolf@redhat.com>
-Date: Mon, 29 May 2017 17:06:54 +0200
-Message-Id: <1496070414-6744-16-git-send-email-kwolf@redhat.com>
-In-Reply-To: <1496070414-6744-1-git-send-email-kwolf@redhat.com>
-References: <1496070414-6744-1-git-send-email-kwolf@redhat.com>
-Subject: [Qemu-devel] [PULL 15/15] block/file-*: *_parse_filename() and
- colons
+	(envelope-from <ben@skyportsystems.com>) id 1dFMK3-0007nG-7x
+	for qemu-devel@nongnu.org; Mon, 29 May 2017 11:11:10 -0400
+Received: from mail-oi0-x22b.google.com ([2607:f8b0:4003:c06::22b]:33502)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <ben@skyportsystems.com>)
+	id 1dFMK3-0007nC-0b
+	for qemu-devel@nongnu.org; Mon, 29 May 2017 11:11:07 -0400
+Received: by mail-oi0-x22b.google.com with SMTP id w10so81926568oif.0
+	for <qemu-devel@nongnu.org>; Mon, 29 May 2017 08:11:06 -0700 (PDT)
+From: ben@skyportsystems.com
+Date: Mon, 29 May 2017 08:10:47 -0700
+Message-Id: <20170529151047.85390-1-ben@skyportsystems.com>
+Subject: [Qemu-devel] [PATCH] tests: Add unit tests for the VM Generation ID
+ feature
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,182 +25,257 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-block@nongnu.org
-Cc: kwolf@redhat.com, qemu-devel@nongnu.org
+To: mst@redhat.com, qemu-devel@nongnu.org
+Cc: imammedo@redhat.com, lersek@redhat.com, Ben Warren <ben@skyportsystems.com>
 
-From: Max Reitz <mreitz@redhat.com>
+From: Ben Warren <ben@skyportsystems.com>
 
-The file drivers' *_parse_filename() implementations just strip the
-optional protocol prefix off the filename. However, for e.g.
-"file:foo:bar", this would lead to "foo:bar" being stored as the BDS's
-filename which looks like it should be managed using the "foo" protocol.
-This is especially troublesome if you then try to resolve a backing
-filename based on "foo:bar".
+The following tests are implemented:
+* test that a GUID passed in by command line is propagated to the guest.
+  Read the GUID from guest memory
+* test that the "auto" argument to the GUID generates a valid GUID, as
+  seen by the guest.
+* test that a GUID passed in can be queried from the monitor
 
-This issue can only occur if the stripped part is a relative filename
-("file:/foo:bar" will be shortened to "/foo:bar" and having a slash
-before the first colon means that "/foo" is not recognized as a protocol
-part). Therefore, we can easily fix it by prepending "./" to such
-filenames.
+  This patch is loosely based on a previous patch from:
+  Gal Hammer <ghammer@redhat.com>  and Igor Mammedov <imammedo@redhat.com>
 
-Before this patch:
-$ ./qemu-img create -f qcow2 backing.qcow2 64M
-Formatting 'backing.qcow2', fmt=qcow2 size=67108864 encryption=off
-    cluster_size=65536 lazy_refcounts=off refcount_bits=16
-$ ./qemu-img create -f qcow2 -b backing.qcow2 file:top:image.qcow2
-Formatting 'file:top:image.qcow2', fmt=qcow2 size=67108864
-    backing_file=backing.qcow2 encryption=off cluster_size=65536
-    lazy_refcounts=off refcount_bits=16
-$ ./qemu-io file:top:image.qcow2
-can't open device file:top:image.qcow2: Could not open backing file:
-    Unknown protocol 'top'
-
-After this patch:
-$ ./qemu-io file:top:image.qcow2
-[no error]
-
-Signed-off-by: Max Reitz <mreitz@redhat.com>
-Message-id: 20170522195217.12991-3-mreitz@redhat.com
-Reviewed-by: Eric Blake <eblake@redhat.com>
-Signed-off-by: Max Reitz <mreitz@redhat.com>
+Signed-off-by: Ben Warren <ben@skyportsystems.com>
+Reviewed-by: Igor Mammedov <imammedo@redhat.com>
 ---
- block.c                   | 35 +++++++++++++++++++++++++++++++++++
- block/file-posix.c        | 17 +++--------------
- block/file-win32.c        | 12 ++----------
- include/block/block_int.h |  3 +++
- 4 files changed, 43 insertions(+), 24 deletions(-)
 
-diff --git a/block.c b/block.c
-index b72b872..fa1d06d 100644
---- a/block.c
-+++ b/block.c
-@@ -197,6 +197,41 @@ void path_combine(char *dest, int dest_size,
-     }
- }
+Unchanged from v8, simply rebased to current top-of-tree
+
+ tests/Makefile.include |   2 +
+ tests/vmgenid-test.c   | 200 +++++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 202 insertions(+)
+ create mode 100644 tests/vmgenid-test.c
+
+diff --git a/tests/Makefile.include b/tests/Makefile.include
+index 75893838e5..79bf960336 100644
+--- a/tests/Makefile.include
++++ b/tests/Makefile.include
+@@ -250,6 +250,7 @@ check-qtest-i386-y += tests/usb-hcd-xhci-test$(EXESUF)
+ gcov-files-i386-y += hw/usb/hcd-xhci.c
+ check-qtest-i386-y += tests/pc-cpu-test$(EXESUF)
+ check-qtest-i386-y += tests/q35-test$(EXESUF)
++check-qtest-i386-y += tests/vmgenid-test$(EXESUF)
+ gcov-files-i386-y += hw/pci-host/q35.c
+ check-qtest-i386-$(CONFIG_VHOST_NET_TEST_i386) += tests/vhost-user-test$(EXESUF)
+ ifeq ($(CONFIG_VHOST_NET_TEST_i386),)
+@@ -758,6 +759,7 @@ tests/test-uuid$(EXESUF): tests/test-uuid.o $(test-util-obj-y)
+ tests/test-arm-mptimer$(EXESUF): tests/test-arm-mptimer.o
+ tests/test-qapi-util$(EXESUF): tests/test-qapi-util.o $(test-util-obj-y)
+ tests/numa-test$(EXESUF): tests/numa-test.o
++tests/vmgenid-test$(EXESUF): tests/vmgenid-test.o tests/acpi-utils.o
  
+ tests/migration/stress$(EXESUF): tests/migration/stress.o
+ 	$(call quiet-command, $(LINKPROG) -static -O3 $(PTHREAD_LIB) -o $@ $< ,"LINK","$(TARGET_DIR)$@")
+diff --git a/tests/vmgenid-test.c b/tests/vmgenid-test.c
+new file mode 100644
+index 0000000000..123beaea13
+--- /dev/null
++++ b/tests/vmgenid-test.c
+@@ -0,0 +1,200 @@
 +/*
-+ * Helper function for bdrv_parse_filename() implementations to remove optional
-+ * protocol prefixes (especially "file:") from a filename and for putting the
-+ * stripped filename into the options QDict if there is such a prefix.
++ * QTest testcase for VM Generation ID
++ *
++ * Copyright (c) 2016 Red Hat, Inc.
++ * Copyright (c) 2017 Skyport Systems
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or later.
++ * See the COPYING file in the top-level directory.
 + */
-+void bdrv_parse_filename_strip_prefix(const char *filename, const char *prefix,
-+                                      QDict *options)
++
++#include <glib.h>
++#include <string.h>
++#include <unistd.h>
++#include "qemu/osdep.h"
++#include "qemu/bitmap.h"
++#include "qemu/uuid.h"
++#include "hw/acpi/acpi-defs.h"
++#include "acpi-utils.h"
++#include "libqtest.h"
++
++#define VGID_GUID "324e6eaf-d1d1-4bf6-bf41-b9bb6c91fb87"
++#define VMGENID_GUID_OFFSET 40   /* allow space for
++                                  * OVMF SDT Header Probe Supressor
++                                  */
++#define RSDP_ADDR_INVALID 0x100000 /* RSDP must be below this address */
++#define RSDP_SLEEP_US     100000   /* Sleep for 100ms between tries */
++#define RSDP_TRIES_MAX    100      /* Max total time is 10 seconds */
++
++typedef struct {
++    AcpiTableHeader header;
++    gchar name_op;
++    gchar vgia[4];
++    gchar val_op;
++    uint32_t vgia_val;
++} QEMU_PACKED VgidTable;
++
++static uint32_t acpi_find_vgia(void)
 +{
-+    if (strstart(filename, prefix, &filename)) {
-+        /* Stripping the explicit protocol prefix may result in a protocol
-+         * prefix being (wrongly) detected (if the filename contains a colon) */
-+        if (path_has_protocol(filename)) {
-+            QString *fat_filename;
++    uint32_t off;
++    AcpiRsdpDescriptor rsdp_table;
++    uint32_t rsdt;
++    AcpiRsdtDescriptorRev1 rsdt_table;
++    int tables_nr;
++    uint32_t *tables;
++    AcpiTableHeader ssdt_table;
++    VgidTable vgid_table;
++    int i;
 +
-+            /* This means there is some colon before the first slash; therefore,
-+             * this cannot be an absolute path */
-+            assert(!path_is_absolute(filename));
++    /* Tables may take a short time to be set up by the guest */
++    for (i = 0; i < RSDP_TRIES_MAX; i++) {
++        off = acpi_find_rsdp_address();
++        if (off < RSDP_ADDR_INVALID) {
++            break;
++        }
++        g_usleep(RSDP_SLEEP_US);
++    }
++    g_assert_cmphex(off, <, RSDP_ADDR_INVALID);
 +
-+            /* And we can thus fix the protocol detection issue by prefixing it
-+             * by "./" */
-+            fat_filename = qstring_from_str("./");
-+            qstring_append(fat_filename, filename);
++    acpi_parse_rsdp_table(off, &rsdp_table);
 +
-+            assert(!path_has_protocol(qstring_get_str(fat_filename)));
++    rsdt = rsdp_table.rsdt_physical_address;
++    /* read the header */
++    ACPI_READ_TABLE_HEADER(&rsdt_table, rsdt);
++    ACPI_ASSERT_CMP(rsdt_table.signature, "RSDT");
 +
-+            qdict_put(options, "filename", fat_filename);
-+        } else {
-+            /* If no protocol prefix was detected, we can use the shortened
-+             * filename as-is */
-+            qdict_put_str(options, "filename", filename);
++    /* compute the table entries in rsdt */
++    tables_nr = (rsdt_table.length - sizeof(AcpiRsdtDescriptorRev1)) /
++                sizeof(uint32_t);
++    g_assert_cmpint(tables_nr, >, 0);
++
++    /* get the addresses of the tables pointed by rsdt */
++    tables = g_new0(uint32_t, tables_nr);
++    ACPI_READ_ARRAY_PTR(tables, tables_nr, rsdt);
++
++    for (i = 0; i < tables_nr; i++) {
++        ACPI_READ_TABLE_HEADER(&ssdt_table, tables[i]);
++        if (!strncmp((char *)ssdt_table.oem_table_id, "VMGENID", 7)) {
++            /* the first entry in the table should be VGIA
++             * That's all we need
++             */
++            ACPI_READ_FIELD(vgid_table.name_op, tables[i]);
++            g_assert(vgid_table.name_op == 0x08);  /* name */
++            ACPI_READ_ARRAY(vgid_table.vgia, tables[i]);
++            g_assert(memcmp(vgid_table.vgia, "VGIA", 4) == 0);
++            ACPI_READ_FIELD(vgid_table.val_op, tables[i]);
++            g_assert(vgid_table.val_op == 0x0C);  /* dword */
++            ACPI_READ_FIELD(vgid_table.vgia_val, tables[i]);
++            /* The GUID is written at a fixed offset into the fw_cfg file
++             * in order to implement the "OVMF SDT Header probe suppressor"
++             * see docs/specs/vmgenid.txt for more details
++             */
++            return vgid_table.vgia_val + VMGENID_GUID_OFFSET;
 +        }
 +    }
++    return 0;
 +}
 +
++static void read_guid_from_memory(QemuUUID *guid)
++{
++    uint32_t vmgenid_addr;
++    int i;
 +
- /* Returns whether the image file is opened as read-only. Note that this can
-  * return false and writing to the image file is still not possible because the
-  * image is inactivated. */
-diff --git a/block/file-posix.c b/block/file-posix.c
-index 4354d49..de2d3a2 100644
---- a/block/file-posix.c
-+++ b/block/file-posix.c
-@@ -381,12 +381,7 @@ static void raw_parse_flags(int bdrv_flags, int *open_flags)
- static void raw_parse_filename(const char *filename, QDict *options,
-                                Error **errp)
- {
--    /* The filename does not have to be prefixed by the protocol name, since
--     * "file" is the default protocol; therefore, the return value of this
--     * function call can be ignored. */
--    strstart(filename, "file:", &filename);
--
--    qdict_put_str(options, "filename", filename);
-+    bdrv_parse_filename_strip_prefix(filename, "file:", options);
- }
- 
- static QemuOptsList raw_runtime_opts = {
-@@ -2395,10 +2390,7 @@ static int check_hdev_writable(BDRVRawState *s)
- static void hdev_parse_filename(const char *filename, QDict *options,
-                                 Error **errp)
- {
--    /* The prefix is optional, just as for "file". */
--    strstart(filename, "host_device:", &filename);
--
--    qdict_put_str(options, "filename", filename);
-+    bdrv_parse_filename_strip_prefix(filename, "host_device:", options);
- }
- 
- static bool hdev_is_sg(BlockDriverState *bs)
-@@ -2697,10 +2689,7 @@ static BlockDriver bdrv_host_device = {
- static void cdrom_parse_filename(const char *filename, QDict *options,
-                                  Error **errp)
- {
--    /* The prefix is optional, just as for "file". */
--    strstart(filename, "host_cdrom:", &filename);
--
--    qdict_put_str(options, "filename", filename);
-+    bdrv_parse_filename_strip_prefix(filename, "host_cdrom:", options);
- }
- #endif
- 
-diff --git a/block/file-win32.c b/block/file-win32.c
-index 8f14f0b..ef2910b 100644
---- a/block/file-win32.c
-+++ b/block/file-win32.c
-@@ -276,12 +276,7 @@ static void raw_parse_flags(int flags, bool use_aio, int *access_flags,
- static void raw_parse_filename(const char *filename, QDict *options,
-                                Error **errp)
- {
--    /* The filename does not have to be prefixed by the protocol name, since
--     * "file" is the default protocol; therefore, the return value of this
--     * function call can be ignored. */
--    strstart(filename, "file:", &filename);
--
--    qdict_put_str(options, "filename", filename);
-+    bdrv_parse_filename_strip_prefix(filename, "file:", options);
- }
- 
- static QemuOptsList raw_runtime_opts = {
-@@ -671,10 +666,7 @@ static int hdev_probe_device(const char *filename)
- static void hdev_parse_filename(const char *filename, QDict *options,
-                                 Error **errp)
- {
--    /* The prefix is optional, just as for "file". */
--    strstart(filename, "host_device:", &filename);
--
--    qdict_put_str(options, "filename", filename);
-+    bdrv_parse_filename_strip_prefix(filename, "host_device:", options);
- }
- 
- static int hdev_open(BlockDriverState *bs, QDict *options, int flags,
-diff --git a/include/block/block_int.h b/include/block/block_int.h
-index 8d3724c..e5eb473 100644
---- a/include/block/block_int.h
-+++ b/include/block/block_int.h
-@@ -682,6 +682,9 @@ int get_tmp_filename(char *filename, int size);
- BlockDriver *bdrv_probe_all(const uint8_t *buf, int buf_size,
-                             const char *filename);
- 
-+void bdrv_parse_filename_strip_prefix(const char *filename, const char *prefix,
-+                                      QDict *options);
++    vmgenid_addr = acpi_find_vgia();
++    g_assert(vmgenid_addr);
 +
- 
- /**
-  * bdrv_add_before_write_notifier:
++    /* Read the GUID directly from guest memory */
++    for (i = 0; i < 16; i++) {
++        guid->data[i] = readb(vmgenid_addr + i);
++    }
++    /* The GUID is in little-endian format in the guest, while QEMU
++     * uses big-endian.  Swap after reading.
++     */
++    qemu_uuid_bswap(guid);
++}
++
++static void read_guid_from_monitor(QemuUUID *guid)
++{
++    QDict *rsp, *rsp_ret;
++    const char *guid_str;
++
++    rsp = qmp("{ 'execute': 'query-vm-generation-id' }");
++    if (qdict_haskey(rsp, "return")) {
++        rsp_ret = qdict_get_qdict(rsp, "return");
++        g_assert(qdict_haskey(rsp_ret, "guid"));
++        guid_str = qdict_get_str(rsp_ret, "guid");
++        g_assert(qemu_uuid_parse(guid_str, guid) == 0);
++    }
++    QDECREF(rsp);
++}
++
++static void vmgenid_set_guid_test(void)
++{
++    QemuUUID expected, measured;
++    gchar *cmd;
++
++    g_assert(qemu_uuid_parse(VGID_GUID, &expected) == 0);
++
++    cmd = g_strdup_printf("-machine accel=tcg -device vmgenid,id=testvgid,"
++                          "guid=%s", VGID_GUID);
++    qtest_start(cmd);
++
++    /* Read the GUID from accessing guest memory */
++    read_guid_from_memory(&measured);
++    g_assert(memcmp(measured.data, expected.data, sizeof(measured.data)) == 0);
++
++    qtest_quit(global_qtest);
++    g_free(cmd);
++}
++
++static void vmgenid_set_guid_auto_test(void)
++{
++    const char *cmd;
++    QemuUUID measured;
++
++    cmd = "-machine accel=tcg -device vmgenid,id=testvgid," "guid=auto";
++    qtest_start(cmd);
++
++    read_guid_from_memory(&measured);
++
++    /* Just check that the GUID is non-null */
++    g_assert(!qemu_uuid_is_null(&measured));
++
++    qtest_quit(global_qtest);
++}
++
++static void vmgenid_query_monitor_test(void)
++{
++    QemuUUID expected, measured;
++    gchar *cmd;
++
++    g_assert(qemu_uuid_parse(VGID_GUID, &expected) == 0);
++
++    cmd = g_strdup_printf("-machine accel=tcg -device vmgenid,id=testvgid,"
++                          "guid=%s", VGID_GUID);
++    qtest_start(cmd);
++
++    /* Read the GUID via the monitor */
++    read_guid_from_monitor(&measured);
++    g_assert(memcmp(measured.data, expected.data, sizeof(measured.data)) == 0);
++
++    qtest_quit(global_qtest);
++    g_free(cmd);
++}
++
++int main(int argc, char **argv)
++{
++    int ret;
++
++    g_test_init(&argc, &argv, NULL);
++
++    qtest_add_func("/vmgenid/vmgenid/set-guid",
++                   vmgenid_set_guid_test);
++    qtest_add_func("/vmgenid/vmgenid/set-guid-auto",
++                   vmgenid_set_guid_auto_test);
++    qtest_add_func("/vmgenid/vmgenid/query-monitor",
++                   vmgenid_query_monitor_test);
++    ret = g_test_run();
++
++    return ret;
++}
 -- 
-1.8.3.1
+2.11.0 (Apple Git-81)
