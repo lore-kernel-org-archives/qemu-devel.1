@@ -1,34 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35670)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36252)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <joserz@linux.vnet.ibm.com>) id 1dFNYm-0004iP-OL
-	for qemu-devel@nongnu.org; Mon, 29 May 2017 12:30:25 -0400
+	(envelope-from <mreitz@redhat.com>) id 1dFNd7-0005gf-EG
+	for qemu-devel@nongnu.org; Mon, 29 May 2017 12:34:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <joserz@linux.vnet.ibm.com>) id 1dFNYj-0000hJ-Js
-	for qemu-devel@nongnu.org; Mon, 29 May 2017 12:30:24 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:38814
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <joserz@linux.vnet.ibm.com>)
-	id 1dFNYj-0000gq-ES
-	for qemu-devel@nongnu.org; Mon, 29 May 2017 12:30:21 -0400
-Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v4TGTmSS083579
-	for <qemu-devel@nongnu.org>; Mon, 29 May 2017 12:30:19 -0400
-Received: from e24smtp01.br.ibm.com (e24smtp01.br.ibm.com [32.104.18.85])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2arha4pdsg-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 29 May 2017 12:30:19 -0400
-Received: from localhost
-	by e24smtp01.br.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <joserz@linux.vnet.ibm.com>;
-	Mon, 29 May 2017 13:30:17 -0300
-From: Jose Ricardo Ziviani <joserz@linux.vnet.ibm.com>
-Date: Mon, 29 May 2017 13:30:04 -0300
-Message-Id: <1496075404-8845-1-git-send-email-joserz@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH] simpletrace: Improve the error message if
- event is not declared
+	(envelope-from <mreitz@redhat.com>) id 1dFNd6-0001f4-PK
+	for qemu-devel@nongnu.org; Mon, 29 May 2017 12:34:53 -0400
+References: <20170503122539.282182-1-vsementsov@virtuozzo.com>
+	<20170503122539.282182-13-vsementsov@virtuozzo.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <38a30b72-850a-9c78-f82c-c3c247836e8b@redhat.com>
+Date: Mon, 29 May 2017 18:34:36 +0200
+MIME-Version: 1.0
+In-Reply-To: <20170503122539.282182-13-vsementsov@virtuozzo.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="5sdOSeNG653bFkgfMgrlpI93PpBdakTqr"
+Subject: Re: [Qemu-devel] [PATCH 12/25] block: bdrv_close: release bitmaps
+ after drv->bdrv_close
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,60 +25,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-trivial@nongnu.org
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, armbru@redhat.com, eblake@redhat.com, jsnow@redhat.com, famz@redhat.com, den@openvz.org, stefanha@redhat.com, pbonzini@redhat.com
 
-Today, if we use a trace-event file which does not declare an event
-existing in the log file we'll get the following error:
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--5sdOSeNG653bFkgfMgrlpI93PpBdakTqr
+From: Max Reitz <mreitz@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, armbru@redhat.com, eblake@redhat.com, jsnow@redhat.com,
+ famz@redhat.com, den@openvz.org, stefanha@redhat.com, pbonzini@redhat.com
+Message-ID: <38a30b72-850a-9c78-f82c-c3c247836e8b@redhat.com>
+Subject: Re: [PATCH 12/25] block: bdrv_close: release bitmaps after
+ drv->bdrv_close
+References: <20170503122539.282182-1-vsementsov@virtuozzo.com>
+ <20170503122539.282182-13-vsementsov@virtuozzo.com>
+In-Reply-To: <20170503122539.282182-13-vsementsov@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-$ scripts/simpletrace.py trace-events trace-68508
-Traceback (most recent call last):
-  File "scripts/simpletrace.py", line 242, in <module>
-    run(Formatter())
-  File "scripts/simpletrace.py", line 217, in run
-    process(events, sys.argv[2], analyzer, read_header=read_header)
-  File "scripts/simpletrace.py", line 192, in process
-    for rec in read_trace_records(edict, log):
-  File "scripts/simpletrace.py", line 107, in read_trace_records
-    rec = read_record(edict, idtoname, fobj)
-  File "scripts/simpletrace.py", line 71, in read_record
-    return get_record(edict, idtoname, rechdr, fobj)
-  File "scripts/simpletrace.py", line 45, in get_record
-    event = edict[name]
-KeyError: 'qemu_mutex_locked'
+On 2017-05-03 14:25, Vladimir Sementsov-Ogievskiy wrote:
+> Release bitmaps after 'if (bs->drv) { ... }' block. This will allow
+> format driver to save persistent bitmaps, which will appear in followin=
+g
+> commits.
+>=20
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> ---
+>  block.c | 6 +++---
+>  1 file changed, 3 insertions(+), 3 deletions(-)
 
-This patch improves this error by adding a hint instead of just that
-KeyError log:
+Reviewed-by: Max Reitz <mreitz@redhat.com>
 
-$ scripts/simpletrace.py trace-events trace-68508
-'qemu_mutex_locked' event is logged but is not declared in the trace
-events file, try using trace-events-all instead.
 
-Signed-off-by: Jose Ricardo Ziviani <joserz@linux.vnet.ibm.com>
----
- scripts/simpletrace.py | 10 +++++++++-
- 1 file changed, 9 insertions(+), 1 deletion(-)
+--5sdOSeNG653bFkgfMgrlpI93PpBdakTqr
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-diff --git a/scripts/simpletrace.py b/scripts/simpletrace.py
-index d60b3a0..f1be6e4 100755
---- a/scripts/simpletrace.py
-+++ b/scripts/simpletrace.py
-@@ -42,7 +42,15 @@ def get_record(edict, idtoname, rechdr, fobj):
-         event_id = rechdr[0]
-         name = idtoname[event_id]
-         rec = (name, rechdr[1], rechdr[3])
--        event = edict[name]
-+        try:
-+            event = edict[name]
-+        except KeyError, e:
-+            import sys
-+            sys.stderr.write('%s event is logged but is not declared ' \
-+                             'in the trace events file, try using ' \
-+                             'trace-events-all instead.\n' % str(e))
-+            sys.exit(1)
-+
-         for type, name in event.args:
-             if is_string(type):
-                 l = fobj.read(4)
--- 
-2.7.4
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iQEvBAEBCAAZBQJZLE2dEhxtcmVpdHpAcmVkaGF0LmNvbQAKCRD0B9sAYdXPQLCi
+B/9D/QL2FeGkBu1l91IBuK1iP4tmT+BaylBZ0O4i/nxltKJ+9v2ltg1UzKc9gsQP
+oDuR19/KVeUW5TOAygwoKUUnIque4kgnPJRwjK7t9N8/qtoq4PWlPGPhkMRP79J+
+Y14yVtZe2gcOBwGVncJW8tN0XgUy3fwoAgiYtGqEULh6Rek08eEHPFilDgRHL4uW
+VB4w2rt/xiprLxxuZRKpZLSXnXfqM7Gm3VK31rTEO6IES0zmnZgazGEiCFFDsLkf
+TOEntIK3hd8KyEHpewa92pOp7QKqvtY21+3jIhGIhVNzG0XJ20uv+2Zh5sjblOmq
+4yArbgG5A2bfdBhKxfBX31Rw
+=OUhd
+-----END PGP SIGNATURE-----
+
+--5sdOSeNG653bFkgfMgrlpI93PpBdakTqr--
