@@ -1,21 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38887)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39002)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aurelien@aurel32.net>) id 1dFQHd-0006U9-R0
+	(envelope-from <aurelien@aurel32.net>) id 1dFQHg-0006V5-1m
 	for qemu-devel@nongnu.org; Mon, 29 May 2017 15:24:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aurelien@aurel32.net>) id 1dFQHa-00075J-IO
-	for qemu-devel@nongnu.org; Mon, 29 May 2017 15:24:53 -0400
-Received: from hall.aurel32.net ([2001:bc8:30d7:100::1]:42924)
+	(envelope-from <aurelien@aurel32.net>) id 1dFQHa-00076X-Ss
+	for qemu-devel@nongnu.org; Mon, 29 May 2017 15:24:56 -0400
+Received: from hall.aurel32.net ([2001:bc8:30d7:100::1]:42952)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <aurelien@aurel32.net>)
-	id 1dFQHa-00072q-4g
+	id 1dFQHa-00073H-Ib
 	for qemu-devel@nongnu.org; Mon, 29 May 2017 15:24:50 -0400
 From: Aurelien Jarno <aurelien@aurel32.net>
-Date: Mon, 29 May 2017 21:24:36 +0200
-Message-Id: <20170529192440.5990-26-aurelien@aurel32.net>
+Date: Mon, 29 May 2017 21:24:32 +0200
+Message-Id: <20170529192440.5990-22-aurelien@aurel32.net>
 In-Reply-To: <20170529192440.5990-1-aurelien@aurel32.net>
 References: <20170529192440.5990-1-aurelien@aurel32.net>
-Subject: [Qemu-devel] [PATCH v2 25/29] target/s390x: implement UNPACK ASCII
+Subject: [Qemu-devel] [PATCH v2 21/29] target/s390x: implement COMPARE
+ LOGICAL LONG UNICODE
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,129 +28,237 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Aurelien Jarno <aurelien@aurel32.net>, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>
 
-Reviewed-by: Richard Henderson <rth@twiddle.net>
+For that we need to make program_interrupt available to qemu-user.
+Fortunately there is almost nothing to change as both kvm_enabled and
+CONFIG_KVM evaluate to false in that case.
+
 Signed-off-by: Aurelien Jarno <aurelien@aurel32.net>
 ---
  target/s390x/helper.h      |  1 +
  target/s390x/insn-data.def |  2 ++
- target/s390x/mem_helper.c  | 51 ++++++++++++++++++++++++++++++++++++++++++++++
- target/s390x/translate.c   | 17 ++++++++++++++++
- 4 files changed, 71 insertions(+)
+ target/s390x/mem_helper.c  | 76 ++++++++++++++++++++++++++++++++++++++--------
+ target/s390x/misc_helper.c |  4 +--
+ target/s390x/translate.c   | 22 ++++++++++++++
+ 5 files changed, 90 insertions(+), 15 deletions(-)
 
 diff --git a/target/s390x/helper.h b/target/s390x/helper.h
-index 6e167d9643..97f03e7b79 100644
+index e717e2284f..3580c6e13d 100644
 --- a/target/s390x/helper.h
 +++ b/target/s390x/helper.h
-@@ -86,6 +86,7 @@ DEF_HELPER_FLAGS_4(pack, TCG_CALL_NO_WG, void, env, i32, i64, i64)
- DEF_HELPER_FLAGS_4(pka, TCG_CALL_NO_WG, void, env, i64, i64, i32)
- DEF_HELPER_FLAGS_4(pku, TCG_CALL_NO_WG, void, env, i64, i64, i32)
- DEF_HELPER_FLAGS_4(unpk, TCG_CALL_NO_WG, void, env, i32, i64, i64)
-+DEF_HELPER_FLAGS_4(unpka, TCG_CALL_NO_WG, i32, env, i64, i32, i64)
- DEF_HELPER_FLAGS_4(tr, TCG_CALL_NO_WG, void, env, i32, i64, i64)
- DEF_HELPER_4(tre, i64, env, i64, i64, i64)
- DEF_HELPER_4(trt, i32, env, i32, i64, i64)
+@@ -24,6 +24,7 @@ DEF_HELPER_FLAGS_4(stam, TCG_CALL_NO_WG, void, env, i32, i64, i32)
+ DEF_HELPER_FLAGS_4(lam, TCG_CALL_NO_WG, void, env, i32, i64, i32)
+ DEF_HELPER_4(mvcle, i32, env, i32, i64, i32)
+ DEF_HELPER_4(clcle, i32, env, i32, i64, i32)
++DEF_HELPER_4(clclu, i32, env, i32, i64, i32)
+ DEF_HELPER_3(cegb, i64, env, s64, i32)
+ DEF_HELPER_3(cdgb, i64, env, s64, i32)
+ DEF_HELPER_3(cxgb, i64, env, s64, i32)
 diff --git a/target/s390x/insn-data.def b/target/s390x/insn-data.def
-index 16f788c86a..33434a31d0 100644
+index 1aa2b8b657..c781a97a3a 100644
 --- a/target/s390x/insn-data.def
 +++ b/target/s390x/insn-data.def
-@@ -875,6 +875,8 @@
-     /* Really format SS_b, but we pack both lengths into one argument
-        for the helper call, so we might as well leave one 8-bit field.  */
-     C(0xf300, UNPK,    SS_a,  Z,   la1, a2, 0, 0, unpk, 0)
-+/* UNPACK ASCII */
-+    C(0xea00, UNPKA,   SS_a,  E2,  la1, a2, 0, 0, unpka, 0)
- 
- #ifndef CONFIG_USER_ONLY
- /* COMPARE AND SWAP AND PURGE */
+@@ -220,6 +220,8 @@
+     C(0x0f00, CLCL,    RR_a,  Z,   0, 0, 0, 0, clcl, 0)
+ /* COMPARE LOGICAL LONG EXTENDED */
+     C(0xa900, CLCLE,   RS_a,  Z,   0, a2, 0, 0, clcle, 0)
++/* COMPARE LOGICAL LONG UNICODE */
++    C(0xeb8f, CLCLU,   RSY_a, E2,  0, a2, 0, 0, clclu, 0)
+ /* COMPARE LOGICAL CHARACTERS UNDER MASK */
+     C(0xbd00, CLM,     RS_b,  Z,   r1_o, a2, 0, 0, clm, 0)
+     C(0xeb21, CLMY,    RSY_b, LD,  r1_o, a2, 0, 0, clm, 0)
 diff --git a/target/s390x/mem_helper.c b/target/s390x/mem_helper.c
-index 4044dc4eb0..261c23733d 100644
+index e41d21fb55..4857f7214e 100644
 --- a/target/s390x/mem_helper.c
 +++ b/target/s390x/mem_helper.c
-@@ -1008,6 +1008,57 @@ void HELPER(unpk)(CPUS390XState *env, uint32_t len, uint64_t dest,
-     }
+@@ -67,6 +67,32 @@ static inline uint32_t adj_len_to_page(uint32_t len, uint64_t addr)
+     return len;
  }
  
-+uint32_t HELPER(unpka)(CPUS390XState *env, uint64_t dest, uint32_t destlen,
-+                       uint64_t src)
++/* Trigger a SPECIFICATION exception if an address or a length is not
++   naturally aligned.  */
++static inline void check_alignment(CPUS390XState *env, uint64_t v,
++                                   int wordsize, uintptr_t ra)
 +{
-+    uintptr_t ra = GETPC();
-+    int i;
-+    uint32_t cc;
-+    uint8_t b;
-+    /* The source operand is always 16 bytes long.  */
-+    const int srclen = 16;
++    if (v % wordsize) {
++        CPUState *cs = CPU(s390_env_get_cpu(env));
++        cpu_restore_state(cs, ra);
++        program_interrupt(env, PGM_SPECIFICATION, 6);
++    }
++}
 +
-+    /* The operands are processed from right to left.  */
-+    src += srclen - 1;
-+    dest += destlen - 1;
-+
-+    /* Check for the sign.  */
-+    b = cpu_ldub_data_ra(env, src, ra);
-+    src--;
-+    switch (b & 0xf) {
-+    case 0xa:
-+    case 0xc:
-+    case 0xe ... 0xf:
-+        cc = 0;  /* plus */
-+        break;
-+    case 0xb:
-+    case 0xd:
-+        cc = 1;  /* minus */
-+        break;
++/* Load a value from memory according to its size.  */
++static inline uint64_t cpu_ldusize_data_ra(CPUS390XState *env, uint64_t addr,
++                                           int wordsize, uintptr_t ra)
++{
++    switch (wordsize) {
++    case 1:
++        return cpu_ldub_data_ra(env, addr, ra);
++    case 2:
++        return cpu_lduw_data_ra(env, addr, ra);
 +    default:
-+    case 0x0 ... 0x9:
-+        cc = 3;  /* invalid */
-+        break;
++        abort();
 +    }
++}
 +
-+    /* Now pad every nibble with 0x30, advancing one nibble at a time. */
-+    for (i = 0; i < destlen; i++) {
-+        if (i == 31) {
-+            /* If length is 32 bytes, the leftmost byte is 0. */
-+            b = 0;
-+        } else if (i % 2) {
-+            b = cpu_ldub_data_ra(env, src, ra);
-+            src--;
-+        } else {
-+            b >>= 4;
-+        }
-+        cpu_stb_data_ra(env, dest, 0x30 + (b & 0xf), ra);
-+        dest--;
-+    }
+ static void fast_memset(CPUS390XState *env, uint64_t dest, uint8_t byte,
+                         uint32_t l, uintptr_t ra)
+ {
+@@ -655,12 +681,14 @@ uint32_t HELPER(mvcle)(CPUS390XState *env, uint32_t r1, uint64_t a2,
+ static inline uint32_t do_clcl(CPUS390XState *env,
+                                uint64_t *src1, uint64_t *src1len,
+                                uint64_t *src3, uint64_t *src3len,
+-                               uint8_t pad, uint64_t limit,
+-                               uintptr_t ra)
++                               uint16_t pad, uint64_t limit,
++                               int wordsize, uintptr_t ra)
+ {
+     uint64_t len = MAX(*src1len, *src3len);
+     uint32_t cc = 0;
+ 
++    check_alignment(env, *src1len | *src3len, wordsize, ra);
++
+     if (!len) {
+         return cc;
+     }
+@@ -672,15 +700,15 @@ static inline uint32_t do_clcl(CPUS390XState *env,
+         cc = 3;
+     }
+ 
+-    for (; len; len--) {
+-        uint8_t v1 = pad;
+-        uint8_t v3 = pad;
++    for (; len; len -= wordsize) {
++        uint16_t v1 = pad;
++        uint16_t v3 = pad;
+ 
+         if (*src1len) {
+-            v1 = cpu_ldub_data_ra(env, *src1, ra);
++            v1 = cpu_ldusize_data_ra(env, *src1, wordsize, ra);
+         }
+         if (*src3len) {
+-            v3 = cpu_ldub_data_ra(env, *src3, ra);
++            v3 = cpu_ldusize_data_ra(env, *src3, wordsize, ra);
+         }
+ 
+         if (v1 != v3) {
+@@ -689,12 +717,12 @@ static inline uint32_t do_clcl(CPUS390XState *env,
+         }
+ 
+         if (*src1len) {
+-            *src1 += 1;
+-            *src1len -= 1;
++            *src1 += wordsize;
++            *src1len -= wordsize;
+         }
+         if (*src3len) {
+-            *src3 += 1;
+-            *src3len -= 1;
++            *src3 += wordsize;
++            *src3len -= wordsize;
+         }
+     }
+ 
+@@ -713,7 +741,7 @@ uint32_t HELPER(clcl)(CPUS390XState *env, uint32_t r1, uint32_t r2)
+     uint8_t pad = env->regs[r2 + 1] >> 24;
+     uint32_t cc;
+ 
+-    cc = do_clcl(env, &src1, &src1len, &src3, &src3len, pad, -1, ra);
++    cc = do_clcl(env, &src1, &src1len, &src3, &src3len, pad, -1, 1, ra);
+ 
+     env->regs[r1 + 1] = deposit64(env->regs[r1 + 1], 0, 24, src1len);
+     env->regs[r2 + 1] = deposit64(env->regs[r2 + 1], 0, 24, src3len);
+@@ -735,7 +763,29 @@ uint32_t HELPER(clcle)(CPUS390XState *env, uint32_t r1, uint64_t a2,
+     uint8_t pad = a2;
+     uint32_t cc;
+ 
+-    cc = do_clcl(env, &src1, &src1len, &src3, &src3len, pad, 0x2000, ra);
++    cc = do_clcl(env, &src1, &src1len, &src3, &src3len, pad, 0x2000, 1, ra);
++
++    set_length(env, r1 + 1, src1len);
++    set_length(env, r3 + 1, src3len);
++    set_address(env, r1, src1);
++    set_address(env, r3, src3);
 +
 +    return cc;
 +}
 +
- static uint32_t do_helper_tr(CPUS390XState *env, uint32_t len, uint64_t array,
-                              uint64_t trans, uintptr_t ra)
++/* compare logical long unicode memcompare insn with padding */
++uint32_t HELPER(clclu)(CPUS390XState *env, uint32_t r1, uint64_t a2,
++                       uint32_t r3)
++{
++    uintptr_t ra = GETPC();
++    uint64_t src1len = get_length(env, r1 + 1);
++    uint64_t src1 = get_address(env, r1);
++    uint64_t src3len = get_length(env, r3 + 1);
++    uint64_t src3 = get_address(env, r3);
++    uint16_t pad = a2;
++    uint32_t cc = 0;
++
++    cc = do_clcl(env, &src1, &src1len, &src3, &src3len, pad, 0x1000, 2, ra);
+ 
+     set_length(env, r1 + 1, src1len);
+     set_length(env, r3 + 1, src3len);
+diff --git a/target/s390x/misc_helper.c b/target/s390x/misc_helper.c
+index 23ec52cf35..f083c8d3cf 100644
+--- a/target/s390x/misc_helper.c
++++ b/target/s390x/misc_helper.c
+@@ -80,8 +80,6 @@ void HELPER(exception)(CPUS390XState *env, uint32_t excp)
+     cpu_loop_exit(cs);
+ }
+ 
+-#ifndef CONFIG_USER_ONLY
+-
+ void program_interrupt(CPUS390XState *env, uint32_t code, int ilen)
+ {
+     S390CPU *cpu = s390_env_get_cpu(env);
+@@ -108,6 +106,8 @@ void program_interrupt(CPUS390XState *env, uint32_t code, int ilen)
+     }
+ }
+ 
++#ifndef CONFIG_USER_ONLY
++
+ /* SCLP service call */
+ uint32_t HELPER(servc)(CPUS390XState *env, uint64_t r1, uint64_t r2)
  {
 diff --git a/target/s390x/translate.c b/target/s390x/translate.c
-index d8b0515f17..2ff666573e 100644
+index 729d25d8f8..892949a05f 100644
 --- a/target/s390x/translate.c
 +++ b/target/s390x/translate.c
-@@ -4357,6 +4357,23 @@ static ExitStatus op_unpk(DisasContext *s, DisasOps *o)
+@@ -1200,6 +1200,7 @@ typedef enum DisasFacility {
+     FAC_ILA,                /* interlocked access facility 1 */
+     FAC_LPP,                /* load-program-parameter */
+     FAC_DAT_ENH,            /* DAT-enhancement */
++    FAC_E2,                 /* extended-translation facility 2 */
+ } DisasFacility;
+ 
+ struct DisasInsn {
+@@ -1957,6 +1958,27 @@ static ExitStatus op_clcle(DisasContext *s, DisasOps *o)
      return NO_EXIT;
  }
  
-+static ExitStatus op_unpka(DisasContext *s, DisasOps *o)
++static ExitStatus op_clclu(DisasContext *s, DisasOps *o)
 +{
-+    int l1 = get_field(s->fields, l1) + 1;
-+    TCGv_i32 l;
++    int r1 = get_field(s->fields, r1);
++    int r3 = get_field(s->fields, r3);
++    TCGv_i32 t1, t3;
 +
-+    /* The length must not exceed 32 bytes.  */
-+    if (l1 > 32) {
++    /* r1 and r3 must be even.  */
++    if (r1 & 1 || r3 & 1) {
 +        gen_program_exception(s, PGM_SPECIFICATION);
 +        return EXIT_NORETURN;
 +    }
-+    l = tcg_const_i32(l1);
-+    gen_helper_unpka(cc_op, cpu_env, o->addr1, l, o->in2);
-+    tcg_temp_free_i32(l);
++
++    t1 = tcg_const_i32(r1);
++    t3 = tcg_const_i32(r3);
++    gen_helper_clclu(cc_op, cpu_env, t1, o->in2, t3);
++    tcg_temp_free_i32(t1);
++    tcg_temp_free_i32(t3);
 +    set_cc_static(s);
 +    return NO_EXIT;
 +}
 +
- static ExitStatus op_xc(DisasContext *s, DisasOps *o)
+ static ExitStatus op_clm(DisasContext *s, DisasOps *o)
  {
-     int d1 = get_field(s->fields, d1);
+     TCGv_i32 m3 = tcg_const_i32(get_field(s->fields, m3));
 -- 
 2.11.0
