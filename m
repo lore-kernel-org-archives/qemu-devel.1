@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38949)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38872)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aurelien@aurel32.net>) id 1dFQHe-0006UH-St
+	(envelope-from <aurelien@aurel32.net>) id 1dFQHd-0006U5-FL
 	for qemu-devel@nongnu.org; Mon, 29 May 2017 15:24:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aurelien@aurel32.net>) id 1dFQHa-00075o-Im
-	for qemu-devel@nongnu.org; Mon, 29 May 2017 15:24:54 -0400
-Received: from hall.aurel32.net ([2001:bc8:30d7:100::1]:42936)
+	(envelope-from <aurelien@aurel32.net>) id 1dFQHa-00074a-C6
+	for qemu-devel@nongnu.org; Mon, 29 May 2017 15:24:53 -0400
+Received: from hall.aurel32.net ([2001:bc8:30d7:100::1]:42868)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <aurelien@aurel32.net>)
-	id 1dFQHa-00072z-59
+	id 1dFQHZ-00072F-Vo
 	for qemu-devel@nongnu.org; Mon, 29 May 2017 15:24:50 -0400
 From: Aurelien Jarno <aurelien@aurel32.net>
-Date: Mon, 29 May 2017 21:24:33 +0200
-Message-Id: <20170529192440.5990-23-aurelien@aurel32.net>
+Date: Mon, 29 May 2017 21:24:23 +0200
+Message-Id: <20170529192440.5990-13-aurelien@aurel32.net>
 In-Reply-To: <20170529192440.5990-1-aurelien@aurel32.net>
 References: <20170529192440.5990-1-aurelien@aurel32.net>
-Subject: [Qemu-devel] [PATCH v2 22/29] target/s390x: implement MOVE LONG
- UNICODE
+Subject: [Qemu-devel] [PATCH v2 12/29] target/s390x: implement MOVE WITH
+ OFFSET
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,149 +28,102 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Aurelien Jarno <aurelien@aurel32.net>, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>
 
+Reviewed-by: Richard Henderson <rth@twiddle.net>
 Signed-off-by: Aurelien Jarno <aurelien@aurel32.net>
 ---
  target/s390x/helper.h      |  1 +
- target/s390x/insn-data.def |  2 ++
- target/s390x/mem_helper.c  | 47 ++++++++++++++++++++++++++++++++++++++++------
- target/s390x/translate.c   | 21 +++++++++++++++++++++
- 4 files changed, 65 insertions(+), 6 deletions(-)
+ target/s390x/insn-data.def |  4 ++++
+ target/s390x/mem_helper.c  | 31 +++++++++++++++++++++++++++++++
+ target/s390x/translate.c   |  8 ++++++++
+ 4 files changed, 44 insertions(+)
 
 diff --git a/target/s390x/helper.h b/target/s390x/helper.h
-index 3580c6e13d..bc6e97de1f 100644
+index a377997df5..e3a438b845 100644
 --- a/target/s390x/helper.h
 +++ b/target/s390x/helper.h
-@@ -23,6 +23,7 @@ DEF_HELPER_4(ex, void, env, i32, i64, i64)
- DEF_HELPER_FLAGS_4(stam, TCG_CALL_NO_WG, void, env, i32, i64, i32)
- DEF_HELPER_FLAGS_4(lam, TCG_CALL_NO_WG, void, env, i32, i64, i32)
- DEF_HELPER_4(mvcle, i32, env, i32, i64, i32)
-+DEF_HELPER_4(mvclu, i32, env, i32, i64, i32)
- DEF_HELPER_4(clcle, i32, env, i32, i64, i32)
- DEF_HELPER_4(clclu, i32, env, i32, i64, i32)
- DEF_HELPER_3(cegb, i64, env, s64, i32)
+@@ -14,6 +14,7 @@ DEF_HELPER_FLAGS_4(divu64, TCG_CALL_NO_WG, i64, env, i64, i64, i64)
+ DEF_HELPER_4(srst, i64, env, i64, i64, i64)
+ DEF_HELPER_4(clst, i64, env, i64, i64, i64)
+ DEF_HELPER_FLAGS_4(mvn, TCG_CALL_NO_WG, void, env, i32, i64, i64)
++DEF_HELPER_FLAGS_4(mvo, TCG_CALL_NO_WG, void, env, i32, i64, i64)
+ DEF_HELPER_FLAGS_4(mvpg, TCG_CALL_NO_WG, i32, env, i64, i64, i64)
+ DEF_HELPER_4(mvst, i64, env, i64, i64, i64)
+ DEF_HELPER_4(ex, void, env, i32, i64, i64)
 diff --git a/target/s390x/insn-data.def b/target/s390x/insn-data.def
-index c781a97a3a..e3b7b78834 100644
+index 6af717648c..47542eeaf3 100644
 --- a/target/s390x/insn-data.def
 +++ b/target/s390x/insn-data.def
-@@ -582,6 +582,8 @@
-     C(0x0e00, MVCL,    RR_a,  Z,   0, 0, 0, 0, mvcl, 0)
- /* MOVE LONG EXTENDED */
-     C(0xa800, MVCLE,   RS_a,  Z,   0, a2, 0, 0, mvcle, 0)
-+/* MOVE LONG UNICODE */
-+    C(0xeb8e, MVCLU,   RSY_a, E2,  0, a2, 0, 0, mvclu, 0)
- /* MOVE NUMERICS */
-     C(0xd100, MVN,     SS_a,  Z,   la1, a2, 0, 0, mvn, 0)
- /* MOVE PAGE */
+@@ -584,6 +584,10 @@
+     C(0xb254, MVPG,    RRE,   Z,   r1_o, r2_o, 0, 0, mvpg, 0)
+ /* MOVE STRING */
+     C(0xb255, MVST,    RRE,   Z,   r1_o, r2_o, 0, 0, mvst, 0)
++/* MOVE WITH OFFSET */
++    /* Really format SS_b, but we pack both lengths into one argument
++       for the helper call, so we might as well leave one 8-bit field.  */
++    C(0xf100, MVO,     SS_a,  Z,   la1, a2, 0, 0, mvo, 0)
+ 
+ /* MULTIPLY */
+     C(0x1c00, MR,      RR_a,  Z,   r1p1_32s, r2_32s, new, r1_D32, mul, 0)
 diff --git a/target/s390x/mem_helper.c b/target/s390x/mem_helper.c
-index 4857f7214e..3d97d250d7 100644
+index 4fb6ff29c3..f748750a55 100644
 --- a/target/s390x/mem_helper.c
 +++ b/target/s390x/mem_helper.c
-@@ -606,7 +606,7 @@ void HELPER(stam)(CPUS390XState *env, uint32_t r1, uint64_t a2, uint32_t r3)
- static inline uint32_t do_mvcl(CPUS390XState *env,
-                                uint64_t *dest, uint64_t *destlen,
-                                uint64_t *src, uint64_t *srclen,
--                               uint8_t pad, uintptr_t ra)
-+                               uint16_t pad, int wordsize, uintptr_t ra)
- {
-     uint64_t len = MIN(*srclen, *destlen);
-     uint32_t cc;
-@@ -627,9 +627,22 @@ static inline uint32_t do_mvcl(CPUS390XState *env,
-     *destlen -= len;
- 
-     /* Pad the remaining area */
--    fast_memset(env, *dest, pad, *destlen, ra);
--    *dest += *destlen;
--    *destlen = 0;
-+    if (wordsize == 1) {
-+        fast_memset(env, *dest, pad, *destlen, ra);
-+        *dest += *destlen;
-+        *destlen = 0;
-+    } else {
-+        /* If remaining length is odd, pad with odd byte first.  */
-+        if (*destlen & 1) {
-+            cpu_stb_data_ra(env, *dest, pad & 0xff, ra);
-+            *dest += 1;
-+            *destlen -= 1;
-+        }
-+        /* The remaining length is even, pad using words.  */
-+        for (; *destlen; *dest += 2, *destlen -= 2) {
-+            cpu_stw_data_ra(env, *dest, pad, ra);
-+        }
-+    }
- 
-     return cc;
+@@ -256,6 +256,37 @@ void HELPER(mvn)(CPUS390XState *env, uint32_t l, uint64_t dest, uint64_t src)
+     }
  }
-@@ -645,7 +658,7 @@ uint32_t HELPER(mvcl)(CPUS390XState *env, uint32_t r1, uint32_t r2)
-     uint8_t pad = env->regs[r2 + 1] >> 24;
-     uint32_t cc;
  
--    cc = do_mvcl(env, &dest, &destlen, &src, &srclen, pad, ra);
-+    cc = do_mvcl(env, &dest, &destlen, &src, &srclen, pad, 1, ra);
- 
-     env->regs[r1 + 1] = deposit64(env->regs[r1 + 1], 0, 24, destlen);
-     env->regs[r2 + 1] = deposit64(env->regs[r2 + 1], 0, 24, srclen);
-@@ -667,7 +680,29 @@ uint32_t HELPER(mvcle)(CPUS390XState *env, uint32_t r1, uint64_t a2,
-     uint8_t pad = a2;
-     uint32_t cc;
- 
--    cc = do_mvcl(env, &dest, &destlen, &src, &srclen, pad, ra);
-+    cc = do_mvcl(env, &dest, &destlen, &src, &srclen, pad, 1, ra);
-+
-+    set_length(env, r1 + 1, destlen);
-+    set_length(env, r3 + 1, srclen);
-+    set_address(env, r1, dest);
-+    set_address(env, r3, src);
-+
-+    return cc;
-+}
-+
-+/* move long unicode */
-+uint32_t HELPER(mvclu)(CPUS390XState *env, uint32_t r1, uint64_t a2,
-+                       uint32_t r3)
++/* move with offset  */
++void HELPER(mvo)(CPUS390XState *env, uint32_t l, uint64_t dest, uint64_t src)
 +{
 +    uintptr_t ra = GETPC();
-+    uint64_t destlen = get_length(env, r1 + 1);
-+    uint64_t dest = get_address(env, r1);
-+    uint64_t srclen = get_length(env, r3 + 1);
-+    uint64_t src = get_address(env, r3);
-+    uint16_t pad = a2;
-+    uint32_t cc;
++    int len_dest = l >> 4;
++    int len_src = l & 0xf;
++    uint8_t byte_dest, byte_src;
++    int i;
 +
-+    cc = do_mvcl(env, &dest, &destlen, &src, &srclen, pad, 2, ra);
- 
-     set_length(env, r1 + 1, destlen);
-     set_length(env, r3 + 1, srclen);
++    src += len_src;
++    dest += len_dest;
++
++    /* Handle rightmost byte */
++    byte_src = cpu_ldub_data_ra(env, src, ra);
++    byte_dest = cpu_ldub_data_ra(env, dest, ra);
++    byte_dest = (byte_dest & 0x0f) | (byte_src << 4);
++    cpu_stb_data_ra(env, dest, byte_dest, ra);
++
++    /* Process remaining bytes from right to left */
++    for (i = 1; i <= len_dest; i++) {
++        byte_dest = byte_src >> 4;
++        if (len_src - i >= 0) {
++            byte_src = cpu_ldub_data_ra(env, src - i, ra);
++        } else {
++            byte_src = 0;
++        }
++        byte_dest |= byte_src << 4;
++        cpu_stb_data_ra(env, dest - i, byte_dest, ra);
++    }
++}
++
+ /* compare unsigned byte arrays */
+ static uint32_t do_helper_clc(CPUS390XState *env, uint32_t l, uint64_t s1,
+                               uint64_t s2, uintptr_t ra)
 diff --git a/target/s390x/translate.c b/target/s390x/translate.c
-index 892949a05f..b160a0cad7 100644
+index 4e7211203a..b1877cf27b 100644
 --- a/target/s390x/translate.c
 +++ b/target/s390x/translate.c
-@@ -3043,6 +3043,27 @@ static ExitStatus op_mvcle(DisasContext *s, DisasOps *o)
+@@ -2998,6 +2998,14 @@ static ExitStatus op_mvn(DisasContext *s, DisasOps *o)
      return NO_EXIT;
  }
  
-+static ExitStatus op_mvclu(DisasContext *s, DisasOps *o)
++static ExitStatus op_mvo(DisasContext *s, DisasOps *o)
 +{
-+    int r1 = get_field(s->fields, r1);
-+    int r3 = get_field(s->fields, r3);
-+    TCGv_i32 t1, t3;
-+
-+    /* r1 and r3 must be even.  */
-+    if (r1 & 1 || r3 & 1) {
-+        gen_program_exception(s, PGM_SPECIFICATION);
-+        return EXIT_NORETURN;
-+    }
-+
-+    t1 = tcg_const_i32(r1);
-+    t3 = tcg_const_i32(r3);
-+    gen_helper_mvclu(cc_op, cpu_env, t1, o->in2, t3);
-+    tcg_temp_free_i32(t1);
-+    tcg_temp_free_i32(t3);
-+    set_cc_static(s);
++    TCGv_i32 l = tcg_const_i32(get_field(s->fields, l1));
++    gen_helper_mvo(cpu_env, l, o->addr1, o->in2);
++    tcg_temp_free_i32(l);
 +    return NO_EXIT;
 +}
 +
- #ifndef CONFIG_USER_ONLY
- static ExitStatus op_mvcp(DisasContext *s, DisasOps *o)
+ static ExitStatus op_mvpg(DisasContext *s, DisasOps *o)
  {
+     gen_helper_mvpg(cc_op, cpu_env, regs[0], o->in1, o->in2);
 -- 
 2.11.0
