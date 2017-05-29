@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38843)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38869)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aurelien@aurel32.net>) id 1dFQHc-0006U1-RV
+	(envelope-from <aurelien@aurel32.net>) id 1dFQHd-0006U4-CX
 	for qemu-devel@nongnu.org; Mon, 29 May 2017 15:24:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aurelien@aurel32.net>) id 1dFQHa-000757-Ht
-	for qemu-devel@nongnu.org; Mon, 29 May 2017 15:24:52 -0400
-Received: from hall.aurel32.net ([2001:bc8:30d7:100::1]:42870)
+	(envelope-from <aurelien@aurel32.net>) id 1dFQHa-00075p-Iz
+	for qemu-devel@nongnu.org; Mon, 29 May 2017 15:24:53 -0400
+Received: from hall.aurel32.net ([2001:bc8:30d7:100::1]:42896)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <aurelien@aurel32.net>)
-	id 1dFQHa-00072G-55
+	id 1dFQHa-00072b-4z
 	for qemu-devel@nongnu.org; Mon, 29 May 2017 15:24:50 -0400
 From: Aurelien Jarno <aurelien@aurel32.net>
-Date: Mon, 29 May 2017 21:24:15 +0200
-Message-Id: <20170529192440.5990-5-aurelien@aurel32.net>
+Date: Mon, 29 May 2017 21:24:30 +0200
+Message-Id: <20170529192440.5990-20-aurelien@aurel32.net>
 In-Reply-To: <20170529192440.5990-1-aurelien@aurel32.net>
 References: <20170529192440.5990-1-aurelien@aurel32.net>
-Subject: [Qemu-devel] [PATCH v2 04/29] target/s390x: implement TEST AND SET
+Subject: [Qemu-devel] [PATCH v2 19/29] target/s390x: fix adj_len_to_page
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,46 +27,26 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Aurelien Jarno <aurelien@aurel32.net>, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>
 
+adj_len_to_page doesn't return the correct result when the address
+is already page aligned and the length is bigger than a page. Fix that.
+
 Signed-off-by: Aurelien Jarno <aurelien@aurel32.net>
 ---
- target/s390x/insn-data.def |  3 +++
- target/s390x/translate.c   | 10 ++++++++++
- 2 files changed, 13 insertions(+)
+ target/s390x/mem_helper.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/target/s390x/insn-data.def b/target/s390x/insn-data.def
-index f818437069..0f70acea5c 100644
---- a/target/s390x/insn-data.def
-+++ b/target/s390x/insn-data.def
-@@ -810,6 +810,9 @@
- /* SUPERVISOR CALL */
-     C(0x0a00, SVC,     I,     Z,   0, 0, 0, 0, svc, 0)
- 
-+/* TEST AND SET */
-+    C(0x9300, TS,      S,     Z,   0, a2, 0, 0, ts, 0)
-+
- /* TEST DATA CLASS */
-     C(0xed10, TCEB,    RXE,   Z,   e1, a2, 0, 0, tceb, 0)
-     C(0xed11, TCDB,    RXE,   Z,   f1_o, a2, 0, 0, tcdb, 0)
-diff --git a/target/s390x/translate.c b/target/s390x/translate.c
-index f160b62c19..0cfa8cc05e 100644
---- a/target/s390x/translate.c
-+++ b/target/s390x/translate.c
-@@ -4129,6 +4129,16 @@ static ExitStatus op_trt(DisasContext *s, DisasOps *o)
-     return NO_EXIT;
- }
- 
-+static ExitStatus op_ts(DisasContext *s, DisasOps *o)
-+{
-+    TCGv_i32 t1 = tcg_const_i32(0xff);
-+    tcg_gen_atomic_xchg_i32(t1, o->in2, t1, get_mem_index(s), MO_UB);
-+    tcg_gen_extract_i32(cc_op, t1, 7, 1);
-+    tcg_temp_free_i32(t1);
-+    set_cc_static(s);
-+    return NO_EXIT;
-+}
-+
- static ExitStatus op_unpk(DisasContext *s, DisasOps *o)
+diff --git a/target/s390x/mem_helper.c b/target/s390x/mem_helper.c
+index edda090116..805794d82f 100644
+--- a/target/s390x/mem_helper.c
++++ b/target/s390x/mem_helper.c
+@@ -61,7 +61,7 @@ static inline uint32_t adj_len_to_page(uint32_t len, uint64_t addr)
  {
-     TCGv_i32 l = tcg_const_i32(get_field(s->fields, l1));
+ #ifndef CONFIG_USER_ONLY
+     if ((addr & ~TARGET_PAGE_MASK) + len - 1 >= TARGET_PAGE_SIZE) {
+-        return -addr & ~TARGET_PAGE_MASK;
++        return -(addr | TARGET_PAGE_MASK);
+     }
+ #endif
+     return len;
 -- 
 2.11.0
