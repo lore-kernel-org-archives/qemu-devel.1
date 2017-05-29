@@ -1,23 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58713)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59569)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dFKr6-0001kV-8J
-	for qemu-devel@nongnu.org; Mon, 29 May 2017 09:37:09 -0400
+	(envelope-from <rkagan@virtuozzo.com>) id 1dFKtw-0003Sc-AZ
+	for qemu-devel@nongnu.org; Mon, 29 May 2017 09:40:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dFKr1-00007h-Bv
-	for qemu-devel@nongnu.org; Mon, 29 May 2017 09:37:08 -0400
-Date: Mon, 29 May 2017 10:36:47 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20170529133647.GD32274@thinpad.lan.raisama.net>
-References: <1494415802-227633-1-git-send-email-imammedo@redhat.com>
-	<1494415802-227633-7-git-send-email-imammedo@redhat.com>
-	<20170526154625.GI22043@thinpad.lan.raisama.net>
-	<20170529151245.3fba6db4@nial.brq.redhat.com>
+	(envelope-from <rkagan@virtuozzo.com>) id 1dFKtr-0001AT-EP
+	for qemu-devel@nongnu.org; Mon, 29 May 2017 09:40:04 -0400
+Received: from mail-db5eur01on0130.outbound.protection.outlook.com
+	([104.47.2.130]:36096
+	helo=EUR01-DB5-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <rkagan@virtuozzo.com>)
+	id 1dFKtq-0001AF-T2
+	for qemu-devel@nongnu.org; Mon, 29 May 2017 09:39:59 -0400
+Date: Mon, 29 May 2017 16:39:46 +0300
+From: Roman Kagan <rkagan@virtuozzo.com>
+Message-ID: <20170529133945.GA30066@rkaganb.sw.ru>
+References: <1496054944-25623-1-git-send-email-dplotnikov@virtuozzo.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset="us-ascii"
 Content-Disposition: inline
-In-Reply-To: <20170529151245.3fba6db4@nial.brq.redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v3 06/18] numa: mirror cpu to node mapping
- in MachineState::possible_cpus
+In-Reply-To: <1496054944-25623-1-git-send-email-dplotnikov@virtuozzo.com>
+Subject: Re: [Qemu-devel] [PATCH v3] kvmclock: update system_time_msr
+ address forcibly
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,84 +30,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Andrew Jones <drjones@redhat.com>, qemu-devel@nongnu.org, qemu-arm@nongnu.org, qemu-ppc@nongnu.org, Shannon Zhao <zhaoshenglong@huawei.com>, Paolo Bonzini <pbonzini@redhat.com>, David Gibson <david@gibson.dropbear.id.au>
+To: Denis Plotnikov <dplotnikov@virtuozzo.com>
+Cc: pbonzini@redhat.com, mtosatti@redhat.com, qemu-devel@nongnu.org, den@virtuozzo.com
 
-On Mon, May 29, 2017 at 03:12:45PM +0200, Igor Mammedov wrote:
-> On Fri, 26 May 2017 12:46:25 -0300
-> Eduardo Habkost <ehabkost@redhat.com> wrote:
+On Mon, May 29, 2017 at 01:49:04PM +0300, Denis Plotnikov wrote:
+> Do an update of system_time_msr address every time before reading
+> the value of tsc_timestamp from guest's kvmclock page.
 > 
-> > On Wed, May 10, 2017 at 01:29:50PM +0200, Igor Mammedov wrote:
-> > [...]
-> > > diff --git a/hw/core/machine.c b/hw/core/machine.c
-> > > index 2482c63..420c8c4 100644
-> > > --- a/hw/core/machine.c
-> > > +++ b/hw/core/machine.c
-> > > @@ -389,6 +389,102 @@ HotpluggableCPUList *machine_query_hotpluggable_cpus(MachineState *machine)  
-> > [...]
-> > > +void machine_set_cpu_numa_node(MachineState *machine,
-> > > +                               const CpuInstanceProperties *props, Error **errp)
-> > > +{  
-> > [...]
-> > > +    /* force board to initialize possible_cpus if it hasn't been done yet */
-> > > +    mc->possible_cpu_arch_ids(machine);  
-> > [...]
-> > > diff --git a/numa.c b/numa.c
-> > > index 7182481..7db5dde 100644
-> > > --- a/numa.c
-> > > +++ b/numa.c
-> > > @@ -170,6 +170,7 @@ static void parse_numa_node(MachineState *ms, NumaNodeOptions *node,
-> > >          exit(1);
-> > >      }
-> > >      for (cpus = node->cpus; cpus; cpus = cpus->next) {
-> > > +        CpuInstanceProperties props;
-> > >          if (cpus->value >= max_cpus) {
-> > >              error_setg(errp,
-> > >                         "CPU index (%" PRIu16 ")"
-> > > @@ -178,6 +179,10 @@ static void parse_numa_node(MachineState *ms, NumaNodeOptions *node,
-> > >              return;
-> > >          }
-> > >          bitmap_set(numa_info[nodenr].node_cpu, cpus->value, 1);
-> > > +        props = mc->cpu_index_to_instance_props(ms, cpus->value);
-> > > +        props.node_id = nodenr;
-> > > +        props.has_node_id = true;
-> > > +        machine_set_cpu_numa_node(ms, &props, &error_fatal);  
-> > 
-> > This triggers a call to possible_cpu_arch_ids() before
-> > nb_numa_nodes is set to the actual number of NUMA nodes in the
-> > machine, breaking the "node_id = ... % nb_numa_nodes"
-> > initialization logic in pc, virt, and spapr.
-> > 
-> > The initialization ordering between possible_cpus and NUMA data
-> > structures looks very subtle and fragile.  I still don't see an
-> > obvious way to untangle that.
-> It's unfixable unless we require specific ordering on CLI,
-> i.e. first go all '-numa node,nodeid=[...]' options and only then
-> the rest of [-numa node,cpus|cpu].
-> We can do that for '-numa cpu' (probably should do enforce it for
-> this new option anyway for saner CLI)
+> There is no other code paths which ensure that qemu has an up-to-date
+> value of system_time_msr. So, force this update on guest's tsc_timestamp
+> reading.
 > 
-> but not for '-numa node,cpus' as it will break existing users
-> that do not declare nodes first.
+> This bug causes effect on those nested setups which turn off TPR access
+> interception for L2 guests and that access being intercepted by L0 doesn't
+> show up in L1.
+> Linux bootstrap initiate kvmclock before APIC initializing causing TPR access.
+> That's why on L1 guests, having TPR interception turned on for L2, the effect
+> of the bug is not revealed.
 > 
-> > I suggest moving the default-NUMA-mapping code to a separate
-> > machine class method, instead of relying on
-> > possible_cpu_arch_ids() to initialize node_id.
-> So as you suggest we have to postpone default values initialization
-> till all the options are parsed:
+> This patch fixes this problem by making sure it knows the correct
+> system_time_msr address every time it is needed.
 > 
-> 1: strait-forward additional machine callback called from
->    machine_run_board_init()
+> Signed-off-by: Denis Plotnikov <dplotnikov@virtuozzo.com>
+> ---
+>  hw/i386/kvm/clock.c | 3 +++
+>  1 file changed, 3 insertions(+)
 > 
-> or:
-> 
-> 2: save extra callback and recalculate not yet set props.node_id-s
->    in possible_cpu_arch_ids() if nb_numa_nodes is changed since
->    the last invocation of possible_cpu_arch_ids()
-> 
-> which one would you prefer?
 
-Option 1 sounds simpler to me.
+Please don't forget the changelog.
 
--- 
-Eduardo
+Reviewed-by: Roman Kagan <rkagan@virtuozzo.com>
