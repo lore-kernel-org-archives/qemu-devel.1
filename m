@@ -1,25 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59456)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59686)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1dFGHw-0005z5-Po
-	for qemu-devel@nongnu.org; Mon, 29 May 2017 04:44:34 -0400
+	(envelope-from <marcandre.lureau@redhat.com>) id 1dFGJL-0006cM-AN
+	for qemu-devel@nongnu.org; Mon, 29 May 2017 04:46:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1dFGHt-0000Xa-Kb
-	for qemu-devel@nongnu.org; Mon, 29 May 2017 04:44:32 -0400
-Resent-Message-Id: <E1dFGHt-0000Xa-Kb@eggs.gnu.org>
-Received: from sender-of-o52.zoho.com ([135.84.80.217]:21368)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1dFGHt-0000XR-9f
-	for qemu-devel@nongnu.org; Mon, 29 May 2017 04:44:29 -0400
-Reply-To: <qemu-devel@nongnu.org>
-In-Reply-To: <1496079043-26694-1-git-send-email-zhi.a.wang@intel.com>
-Message-ID: <149604743678.768.9924357420920171608@750cb16fd6f2>
+	(envelope-from <marcandre.lureau@redhat.com>) id 1dFGJH-0000ml-Sw
+	for qemu-devel@nongnu.org; Mon, 29 May 2017 04:45:59 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53088)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
+	id 1dFGJH-0000me-HB
+	for qemu-devel@nongnu.org; Mon, 29 May 2017 04:45:55 -0400
+From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+Date: Mon, 29 May 2017 12:45:32 +0400
+Message-Id: <20170529084546.26500-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Mon, 29 May 2017 01:43:57 -0700 (PDT)
-Subject: Re: [Qemu-devel] [RFC 0/6] Refine IGD stolen memory support in VFIO
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v2 00/14] chardev: misc clean-ups
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,245 +25,179 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: zhi.a.wang@intel.com
-Cc: famz@redhat.com, qemu-devel@nongnu.org, kevin.tian@intel.com, daniel.vetter@ffwll.ch, joonas.lahtinen@linux.intel.com, zhenyuw@linux.intel.com, zhiyuan.lv@intel.com, chuanxiao.dong@intel.com, xiong.y.zhang@intel.com
+To: qemu-devel@nongnu.org
+Cc: pbonzini@redhat.com, f4bug@amsat.org, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzClN1
-YmplY3Q6IFtRZW11LWRldmVsXSBbUkZDIDAvNl0gUmVmaW5lIElHRCBzdG9sZW4gbWVtb3J5IHN1
-cHBvcnQgaW4gVkZJTwpNZXNzYWdlLWlkOiAxNDk2MDc5MDQzLTI2Njk0LTEtZ2l0LXNlbmQtZW1h
-aWwtemhpLmEud2FuZ0BpbnRlbC5jb20KCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmlu
-L2Jhc2gKCkJBU0U9YmFzZQpuPTEKdG90YWw9JChnaXQgbG9nIC0tb25lbGluZSAkQkFTRS4uIHwg
-d2MgLWwpCmZhaWxlZD0wCgpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdp
-dCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQoKY29tbWl0cz0iJChnaXQgbG9nIC0t
-Zm9ybWF0PSVIIC0tcmV2ZXJzZSAkQkFTRS4uKSIKZm9yIGMgaW4gJGNvbW1pdHM7IGRvCiAgICBl
-Y2hvICJDaGVja2luZyBQQVRDSCAkbi8kdG90YWw6ICQoZ2l0IGxvZyAtbiAxIC0tZm9ybWF0PSVz
-ICRjKS4uLiIKICAgIGlmICEgZ2l0IHNob3cgJGMgLS1mb3JtYXQ9ZW1haWwgfCAuL3NjcmlwdHMv
-Y2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIC07IHRoZW4KICAgICAgICBmYWlsZWQ9MQogICAgICAg
-IGVjaG8KICAgIGZpCiAgICBuPSQoKG4rMSkpCmRvbmUKCmV4aXQgJGZhaWxlZAo9PT0gVEVTVCBT
-Q1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4
-ODcxMzM4NApGcm9tIGh0dHBzOi8vZ2l0aHViLmNvbS9wYXRjaGV3LXByb2plY3QvcWVtdQogKiBb
-bmV3IHRhZ10gICAgICAgICBwYXRjaGV3LzE0OTYwNzkwNDMtMjY2OTQtMS1naXQtc2VuZC1lbWFp
-bC16aGkuYS53YW5nQGludGVsLmNvbSAtPiBwYXRjaGV3LzE0OTYwNzkwNDMtMjY2OTQtMS1naXQt
-c2VuZC1lbWFpbC16aGkuYS53YW5nQGludGVsLmNvbQpTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2gg
-J3Rlc3QnCjgyNzQ1OGEgdmZpbzogU2V0dXAgSUdEIHN0b2xlbiBtZW1vcnkgdW5kZXIgc2Vjb25k
-YXJ5IG1vZGUKNzdiYTg0NCB2ZmlvOiBSZW1vdmUgZXh0cmEgcXVpcmtzIGFuZCBvbGQgZGVmaW5p
-dGlvbnMKMDEyZGVlNSB2ZmlvOiBSZWZpbmUgR0dUVCBjbGVhcmluZwo0NmRkMWM2IHZmaW86IFNl
-dHVwIElHRCBzdG9sZW4gbWVtb3J5CjllNWYwNWUgdmZpbzogU2V0dXAgSUdEIHF1aXJrcyBlYXJs
-aWVyCjQ4ZWQwN2UgdmZpbzogQWRkIEludGVsIHBsYXRmb3JtIGRlZmluaXRpb25zCgo9PT0gT1VU
-UFVUIEJFR0lOID09PQpDaGVja2luZyBQQVRDSCAxLzY6IHZmaW86IEFkZCBJbnRlbCBwbGF0Zm9y
-bSBkZWZpbml0aW9ucy4uLgpFUlJPUjogYnJhY2VzIHt9IGFyZSBuZWNlc3NhcnkgZm9yIGFsbCBh
-cm1zIG9mIHRoaXMgc3RhdGVtZW50CiM3NTogRklMRTogaHcvdmZpby9pbnRlbC1wbGF0Zm9ybS5j
-OjQ1OgorICAgIGlmIChnbWNoIDwgMHgxMSkKWy4uLl0KKyAgICBlbHNlIGlmIChnbWNoIDwgMHgx
-NykKWy4uLl0KKyAgICBlbHNlClsuLi5dCgpFUlJPUjogYnJhY2VzIHt9IGFyZSBuZWNlc3Nhcnkg
-Zm9yIGFsbCBhcm1zIG9mIHRoaXMgc3RhdGVtZW50CiM3NzogRklMRTogaHcvdmZpby9pbnRlbC1w
-bGF0Zm9ybS5jOjQ3OgorICAgIGVsc2UgaWYgKGdtY2ggPCAweDE3KQpbLi4uXQorICAgIGVsc2UK
-Wy4uLl0KCkVSUk9SOiBicmFjZXMge30gYXJlIG5lY2Vzc2FyeSBmb3IgYWxsIGFybXMgb2YgdGhp
-cyBzdGF0ZW1lbnQKIzg4OiBGSUxFOiBody92ZmlvL2ludGVsLXBsYXRmb3JtLmM6NTg6CisgICAg
-aWYgKGdtY2ggPCAweGYwKQpbLi4uXQoKRVJST1I6IGJyYWNlcyB7fSBhcmUgbmVjZXNzYXJ5IGZv
-ciBhbGwgYXJtcyBvZiB0aGlzIHN0YXRlbWVudAojMTA2OiBGSUxFOiBody92ZmlvL2ludGVsLXBs
-YXRmb3JtLmM6NzY6CisgICAgICAgIGlmIChnbWNoKQpbLi4uXQoKRVJST1I6IGJyYWNlcyB7fSBh
-cmUgbmVjZXNzYXJ5IGZvciBhbGwgYXJtcyBvZiB0aGlzIHN0YXRlbWVudAojMTE3OiBGSUxFOiBo
-dy92ZmlvL2ludGVsLXBsYXRmb3JtLmM6ODc6CisgICAgICAgIGlmIChnbWNoKQpbLi4uXQoKRVJS
-T1I6IE1hY3JvcyB3aXRoIGNvbXBsZXggdmFsdWVzIHNob3VsZCBiZSBlbmNsb3NlZCBpbiBwYXJl
-bnRoZXNpcwojMTk1OiBGSUxFOiBody92ZmlvL2ludGVsLXBsYXRmb3JtLmM6MTY1OgorI2RlZmlu
-ZSBJTlRFTF9TTkJfRF9JRFMoaW5mbykgXAorICAgIElOVEVMX1ZHQV9ERVZJQ0UoMHgwMTAyLCBp
-bmZvKSwgXAorICAgIElOVEVMX1ZHQV9ERVZJQ0UoMHgwMTEyLCBpbmZvKSwgXAorICAgIElOVEVM
-X1ZHQV9ERVZJQ0UoMHgwMTIyLCBpbmZvKSwgXAorICAgIElOVEVMX1ZHQV9ERVZJQ0UoMHgwMTBB
-LCBpbmZvKQoKRVJST1I6IE1hY3JvcyB3aXRoIGNvbXBsZXggdmFsdWVzIHNob3VsZCBiZSBlbmNs
-b3NlZCBpbiBwYXJlbnRoZXNpcwojMjAxOiBGSUxFOiBody92ZmlvL2ludGVsLXBsYXRmb3JtLmM6
-MTcxOgorI2RlZmluZSBJTlRFTF9TTkJfTV9JRFMoaW5mbykgXAorICAgIElOVEVMX1ZHQV9ERVZJ
-Q0UoMHgwMTA2LCBpbmZvKSwgXAorICAgIElOVEVMX1ZHQV9ERVZJQ0UoMHgwMTE2LCBpbmZvKSwg
-XAorICAgIElOVEVMX1ZHQV9ERVZJQ0UoMHgwMTI2LCBpbmZvKQoKRVJST1I6IE1hY3JvcyB3aXRo
-IGNvbXBsZXggdmFsdWVzIHNob3VsZCBiZSBlbmNsb3NlZCBpbiBwYXJlbnRoZXNpcwojMjA2OiBG
-SUxFOiBody92ZmlvL2ludGVsLXBsYXRmb3JtLmM6MTc2OgorI2RlZmluZSBJTlRFTF9JVkJfTV9J
-RFMoaW5mbykgXAorICAgIElOVEVMX1ZHQV9ERVZJQ0UoMHgwMTU2LCBpbmZvKSwgLyogR1QxIG1v
-YmlsZSAqLyBcCisgICAgSU5URUxfVkdBX0RFVklDRSgweDAxNjYsIGluZm8pICAvKiBHVDIgbW9i
-aWxlICovCgpFUlJPUjogTWFjcm9zIHdpdGggY29tcGxleCB2YWx1ZXMgc2hvdWxkIGJlIGVuY2xv
-c2VkIGluIHBhcmVudGhlc2lzCiMyMTA6IEZJTEU6IGh3L3ZmaW8vaW50ZWwtcGxhdGZvcm0uYzox
-ODA6CisjZGVmaW5lIElOVEVMX0lWQl9EX0lEUyhpbmZvKSBcCisgICAgSU5URUxfVkdBX0RFVklD
-RSgweDAxNTIsIGluZm8pLCAvKiBHVDEgZGVza3RvcCAqLyBcCisgICAgSU5URUxfVkdBX0RFVklD
-RSgweDAxNjIsIGluZm8pLCAvKiBHVDIgZGVza3RvcCAqLyBcCisgICAgSU5URUxfVkdBX0RFVklD
-RSgweDAxNWEsIGluZm8pLCAvKiBHVDEgc2VydmVyICovIFwKKyAgICBJTlRFTF9WR0FfREVWSUNF
-KDB4MDE2YSwgaW5mbykgIC8qIEdUMiBzZXJ2ZXIgKi8KCkVSUk9SOiBNYWNyb3Mgd2l0aCBjb21w
-bGV4IHZhbHVlcyBzaG91bGQgYmUgZW5jbG9zZWQgaW4gcGFyZW50aGVzaXMKIzIxNjogRklMRTog
-aHcvdmZpby9pbnRlbC1wbGF0Zm9ybS5jOjE4NjoKKyNkZWZpbmUgSU5URUxfSFNXX0lEUyhpbmZv
-KSBcCisgICAgSU5URUxfVkdBX0RFVklDRSgweDA0MDIsIGluZm8pLCAvKiBHVDEgZGVza3RvcCAq
-LyBcCisgICAgSU5URUxfVkdBX0RFVklDRSgweDA0MTIsIGluZm8pLCAvKiBHVDIgZGVza3RvcCAq
-LyBcCisgICAgSU5URUxfVkdBX0RFVklDRSgweDA0MjIsIGluZm8pLCAvKiBHVDMgZGVza3RvcCAq
-LyBcCisgICAgSU5URUxfVkdBX0RFVklDRSgweDA0MGEsIGluZm8pLCAvKiBHVDEgc2VydmVyICov
-IFwKKyAgICBJTlRFTF9WR0FfREVWSUNFKDB4MDQxYSwgaW5mbyksIC8qIEdUMiBzZXJ2ZXIgKi8g
-XAorICAgIElOVEVMX1ZHQV9ERVZJQ0UoMHgwNDJhLCBpbmZvKSwgLyogR1QzIHNlcnZlciAqLyBc
-CisgICAgSU5URUxfVkdBX0RFVklDRSgweDA0MEIsIGluZm8pLCAvKiBHVDEgcmVzZXJ2ZWQgKi8g
-XAorICAgIElOVEVMX1ZHQV9ERVZJQ0UoMHgwNDFCLCBpbmZvKSwgLyogR1QyIHJlc2VydmVkICov
-IFwKKyAgICBJTlRFTF9WR0FfREVWSUNFKDB4MDQyQiwgaW5mbyksIC8qIEdUMyByZXNlcnZlZCAq
-LyBcCisgICAgSU5URUxfVkdBX0RFVklDRSgweDA0MEUsIGluZm8pLCAvKiBHVDEgcmVzZXJ2ZWQg
-Ki8gXAorICAgIElOVEVMX1ZHQV9ERVZJQ0UoMHgwNDFFLCBpbmZvKSwgLyogR1QyIHJlc2VydmVk
-ICovIFwKKyAgICBJTlRFTF9WR0FfREVWSUNFKDB4MDQyRSwgaW5mbyksIC8qIEdUMyByZXNlcnZl
-ZCAqLyBcCisgICAgSU5URUxfVkdBX0RFVklDRSgweDBDMDIsIGluZm8pLCAvKiBTRFYgR1QxIGRl
-c2t0b3AgKi8gXAorICAgIElOVEVMX1ZHQV9ERVZJQ0UoMHgwQzEyLCBpbmZvKSwgLyogU0RWIEdU
-MiBkZXNrdG9wICovIFwKKyAgICBJTlRFTF9WR0FfREVWSUNFKDB4MEMyMiwgaW5mbyksIC8qIFNE
-ViBHVDMgZGVza3RvcCAqLyBcCisgICAgSU5URUxfVkdBX0RFVklDRSgweDBDMEEsIGluZm8pLCAv
-KiBTRFYgR1QxIHNlcnZlciAqLyBcCisgICAgSU5URUxfVkdBX0RFVklDRSgweDBDMUEsIGluZm8p
-LCAvKiBTRFYgR1QyIHNlcnZlciAqLyBcCisgICAgSU5URUxfVkdBX0RFVklDRSgweDBDMkEsIGlu
-Zm8pLCAvKiBTRFYgR1QzIHNlcnZlciAqLyBcCisgICAgSU5URUxfVkdBX0RFVklDRSgweDBDMEIs
-IGluZm8pLCAvKiBTRFYgR1QxIHJlc2VydmVkICovIFwKKyAgICBJTlRFTF9WR0FfREVWSUNFKDB4
-MEMxQiwgaW5mbyksIC8qIFNEViBHVDIgcmVzZXJ2ZWQgKi8gXAorICAgIElOVEVMX1ZHQV9ERVZJ
-Q0UoMHgwQzJCLCBpbmZvKSwgLyogU0RWIEdUMyByZXNlcnZlZCAqLyBcCisgICAgSU5URUxfVkdB
-X0RFVklDRSgweDBDMEUsIGluZm8pLCAvKiBTRFYgR1QxIHJlc2VydmVkICovIFwKKyAgICBJTlRF
-TF9WR0FfREVWSUNFKDB4MEMxRSwgaW5mbyksIC8qIFNEViBHVDIgcmVzZXJ2ZWQgKi8gXAorICAg
-IElOVEVMX1ZHQV9ERVZJQ0UoMHgwQzJFLCBpbmZvKSwgLyogU0RWIEdUMyByZXNlcnZlZCAqLyBc
-CisgICAgSU5URUxfVkdBX0RFVklDRSgweDBBMDIsIGluZm8pLCAvKiBVTFQgR1QxIGRlc2t0b3Ag
-Ki8gXAorICAgIElOVEVMX1ZHQV9ERVZJQ0UoMHgwQTEyLCBpbmZvKSwgLyogVUxUIEdUMiBkZXNr
-dG9wICovIFwKKyAgICBJTlRFTF9WR0FfREVWSUNFKDB4MEEyMiwgaW5mbyksIC8qIFVMVCBHVDMg
-ZGVza3RvcCAqLyBcCisgICAgSU5URUxfVkdBX0RFVklDRSgweDBBMEEsIGluZm8pLCAvKiBVTFQg
-R1QxIHNlcnZlciAqLyBcCisgICAgSU5URUxfVkdBX0RFVklDRSgweDBBMUEsIGluZm8pLCAvKiBV
-TFQgR1QyIHNlcnZlciAqLyBcCisgICAgSU5URUxfVkdBX0RFVklDRSgweDBBMkEsIGluZm8pLCAv
-KiBVTFQgR1QzIHNlcnZlciAqLyBcCisgICAgSU5URUxfVkdBX0RFVklDRSgweDBBMEIsIGluZm8p
-LCAvKiBVTFQgR1QxIHJlc2VydmVkICovIFwKKyAgICBJTlRFTF9WR0FfREVWSUNFKDB4MEExQiwg
-aW5mbyksIC8qIFVMVCBHVDIgcmVzZXJ2ZWQgKi8gXAorICAgIElOVEVMX1ZHQV9ERVZJQ0UoMHgw
-QTJCLCBpbmZvKSwgLyogVUxUIEdUMyByZXNlcnZlZCAqLyBcCisgICAgSU5URUxfVkdBX0RFVklD
-RSgweDBEMDIsIGluZm8pLCAvKiBDUlcgR1QxIGRlc2t0b3AgKi8gXAorICAgIElOVEVMX1ZHQV9E
-RVZJQ0UoMHgwRDEyLCBpbmZvKSwgLyogQ1JXIEdUMiBkZXNrdG9wICovIFwKKyAgICBJTlRFTF9W
-R0FfREVWSUNFKDB4MEQyMiwgaW5mbyksIC8qIENSVyBHVDMgZGVza3RvcCAqLyBcCisgICAgSU5U
-RUxfVkdBX0RFVklDRSgweDBEMEEsIGluZm8pLCAvKiBDUlcgR1QxIHNlcnZlciAqLyBcCisgICAg
-SU5URUxfVkdBX0RFVklDRSgweDBEMUEsIGluZm8pLCAvKiBDUlcgR1QyIHNlcnZlciAqLyBcCisg
-ICAgSU5URUxfVkdBX0RFVklDRSgweDBEMkEsIGluZm8pLCAvKiBDUlcgR1QzIHNlcnZlciAqLyBc
-CisgICAgSU5URUxfVkdBX0RFVklDRSgweDBEMEIsIGluZm8pLCAvKiBDUlcgR1QxIHJlc2VydmVk
-ICovIFwKKyAgICBJTlRFTF9WR0FfREVWSUNFKDB4MEQxQiwgaW5mbyksIC8qIENSVyBHVDIgcmVz
-ZXJ2ZWQgKi8gXAorICAgIElOVEVMX1ZHQV9ERVZJQ0UoMHgwRDJCLCBpbmZvKSwgLyogQ1JXIEdU
-MyByZXNlcnZlZCAqLyBcCisgICAgSU5URUxfVkdBX0RFVklDRSgweDBEMEUsIGluZm8pLCAvKiBD
-UlcgR1QxIHJlc2VydmVkICovIFwKKyAgICBJTlRFTF9WR0FfREVWSUNFKDB4MEQxRSwgaW5mbyks
-IC8qIENSVyBHVDIgcmVzZXJ2ZWQgKi8gXAorICAgIElOVEVMX1ZHQV9ERVZJQ0UoMHgwRDJFLCBp
-bmZvKSwgIC8qIENSVyBHVDMgcmVzZXJ2ZWQgKi8gXAorICAgIElOVEVMX1ZHQV9ERVZJQ0UoMHgw
-NDA2LCBpbmZvKSwgLyogR1QxIG1vYmlsZSAqLyBcCisgICAgSU5URUxfVkdBX0RFVklDRSgweDA0
-MTYsIGluZm8pLCAvKiBHVDIgbW9iaWxlICovIFwKKyAgICBJTlRFTF9WR0FfREVWSUNFKDB4MDQy
-NiwgaW5mbyksIC8qIEdUMiBtb2JpbGUgKi8gXAorICAgIElOVEVMX1ZHQV9ERVZJQ0UoMHgwQzA2
-LCBpbmZvKSwgLyogU0RWIEdUMSBtb2JpbGUgKi8gXAorICAgIElOVEVMX1ZHQV9ERVZJQ0UoMHgw
-QzE2LCBpbmZvKSwgLyogU0RWIEdUMiBtb2JpbGUgKi8gXAorICAgIElOVEVMX1ZHQV9ERVZJQ0Uo
-MHgwQzI2LCBpbmZvKSwgLyogU0RWIEdUMyBtb2JpbGUgKi8gXAorICAgIElOVEVMX1ZHQV9ERVZJ
-Q0UoMHgwQTA2LCBpbmZvKSwgLyogVUxUIEdUMSBtb2JpbGUgKi8gXAorICAgIElOVEVMX1ZHQV9E
-RVZJQ0UoMHgwQTE2LCBpbmZvKSwgLyogVUxUIEdUMiBtb2JpbGUgKi8gXAorICAgIElOVEVMX1ZH
-QV9ERVZJQ0UoMHgwQTI2LCBpbmZvKSwgLyogVUxUIEdUMyBtb2JpbGUgKi8gXAorICAgIElOVEVM
-X1ZHQV9ERVZJQ0UoMHgwQTBFLCBpbmZvKSwgLyogVUxYIEdUMSBtb2JpbGUgKi8gXAorICAgIElO
-VEVMX1ZHQV9ERVZJQ0UoMHgwQTFFLCBpbmZvKSwgLyogVUxYIEdUMiBtb2JpbGUgKi8gXAorICAg
-IElOVEVMX1ZHQV9ERVZJQ0UoMHgwQTJFLCBpbmZvKSwgLyogVUxUIEdUMyByZXNlcnZlZCAqLyBc
-CisgICAgSU5URUxfVkdBX0RFVklDRSgweDBEMDYsIGluZm8pLCAvKiBDUlcgR1QxIG1vYmlsZSAq
-LyBcCisgICAgSU5URUxfVkdBX0RFVklDRSgweDBEMTYsIGluZm8pLCAvKiBDUlcgR1QyIG1vYmls
-ZSAqLyBcCisgICAgSU5URUxfVkdBX0RFVklDRSgweDBEMjYsIGluZm8pICAvKiBDUlcgR1QzIG1v
-YmlsZSAqLwoKRVJST1I6IE1hY3JvcyB3aXRoIGNvbXBsZXggdmFsdWVzIHNob3VsZCBiZSBlbmNs
-b3NlZCBpbiBwYXJlbnRoZXNpcwojMjc4OiBGSUxFOiBody92ZmlvL2ludGVsLXBsYXRmb3JtLmM6
-MjQ4OgorI2RlZmluZSBJTlRFTF9WTFZfSURTKGluZm8pIFwKKyAgICBJTlRFTF9WR0FfREVWSUNF
-KDB4MGYzMCwgaW5mbyksIFwKKyAgICBJTlRFTF9WR0FfREVWSUNFKDB4MGYzMSwgaW5mbyksIFwK
-KyAgICBJTlRFTF9WR0FfREVWSUNFKDB4MGYzMiwgaW5mbyksIFwKKyAgICBJTlRFTF9WR0FfREVW
-SUNFKDB4MGYzMywgaW5mbyksIFwKKyAgICBJTlRFTF9WR0FfREVWSUNFKDB4MDE1NywgaW5mbyks
-IFwKKyAgICBJTlRFTF9WR0FfREVWSUNFKDB4MDE1NSwgaW5mbykKCkVSUk9SOiBNYWNyb3Mgd2l0
-aCBjb21wbGV4IHZhbHVlcyBzaG91bGQgYmUgZW5jbG9zZWQgaW4gcGFyZW50aGVzaXMKIzI4Njog
-RklMRTogaHcvdmZpby9pbnRlbC1wbGF0Zm9ybS5jOjI1NjoKKyNkZWZpbmUgSU5URUxfQkRXX0dU
-MTJfSURTKGluZm8pICBcCisgICAgSU5URUxfVkdBX0RFVklDRSgweDE2MDIsIGluZm8pLCAvKiBH
-VDEgVUxUICovIFwKKyAgICBJTlRFTF9WR0FfREVWSUNFKDB4MTYwNiwgaW5mbyksIC8qIEdUMSBV
-TFQgKi8gXAorICAgIElOVEVMX1ZHQV9ERVZJQ0UoMHgxNjBCLCBpbmZvKSwgLyogR1QxIElyaXMg
-Ki8gXAorICAgIElOVEVMX1ZHQV9ERVZJQ0UoMHgxNjBFLCBpbmZvKSwgLyogR1QxIFVMWCAqLyBc
-CisgICAgSU5URUxfVkdBX0RFVklDRSgweDE2MTIsIGluZm8pLCAvKiBHVDIgSGFsbyAqLyBcCisg
-ICAgSU5URUxfVkdBX0RFVklDRSgweDE2MTYsIGluZm8pLCAvKiBHVDIgVUxUICovIFwKKyAgICBJ
-TlRFTF9WR0FfREVWSUNFKDB4MTYxQiwgaW5mbyksIC8qIEdUMiBVTFQgKi8gXAorICAgIElOVEVM
-X1ZHQV9ERVZJQ0UoMHgxNjFFLCBpbmZvKSwgIC8qIEdUMiBVTFggKi8gXAorICAgIElOVEVMX1ZH
-QV9ERVZJQ0UoMHgxNjBBLCBpbmZvKSwgLyogR1QxIFNlcnZlciAqLyBcCisgICAgSU5URUxfVkdB
-X0RFVklDRSgweDE2MEQsIGluZm8pLCAvKiBHVDEgV29ya3N0YXRpb24gKi8gXAorICAgIElOVEVM
-X1ZHQV9ERVZJQ0UoMHgxNjFBLCBpbmZvKSwgLyogR1QyIFNlcnZlciAqLyBcCisgICAgSU5URUxf
-VkdBX0RFVklDRSgweDE2MUQsIGluZm8pICAvKiBHVDIgV29ya3N0YXRpb24gKi8KCkVSUk9SOiBN
-YWNyb3Mgd2l0aCBjb21wbGV4IHZhbHVlcyBzaG91bGQgYmUgZW5jbG9zZWQgaW4gcGFyZW50aGVz
-aXMKIzMwMDogRklMRTogaHcvdmZpby9pbnRlbC1wbGF0Zm9ybS5jOjI3MDoKKyNkZWZpbmUgSU5U
-RUxfQkRXX0dUM19JRFMoaW5mbykgXAorICAgIElOVEVMX1ZHQV9ERVZJQ0UoMHgxNjIyLCBpbmZv
-KSwgLyogVUxUICovIFwKKyAgICBJTlRFTF9WR0FfREVWSUNFKDB4MTYyNiwgaW5mbyksIC8qIFVM
-VCAqLyBcCisgICAgSU5URUxfVkdBX0RFVklDRSgweDE2MkIsIGluZm8pLCAvKiBJcmlzICovIFwK
-KyAgICBJTlRFTF9WR0FfREVWSUNFKDB4MTYyRSwgaW5mbyksICAvKiBVTFggKi9cCisgICAgSU5U
-RUxfVkdBX0RFVklDRSgweDE2MkEsIGluZm8pLCAvKiBTZXJ2ZXIgKi8gXAorICAgIElOVEVMX1ZH
-QV9ERVZJQ0UoMHgxNjJELCBpbmZvKSAgLyogV29ya3N0YXRpb24gKi8KCkVSUk9SOiBNYWNyb3Mg
-d2l0aCBjb21wbGV4IHZhbHVlcyBzaG91bGQgYmUgZW5jbG9zZWQgaW4gcGFyZW50aGVzaXMKIzMw
-ODogRklMRTogaHcvdmZpby9pbnRlbC1wbGF0Zm9ybS5jOjI3ODoKKyNkZWZpbmUgSU5URUxfQkRX
-X1JTVkRfSURTKGluZm8pIFwKKyAgICBJTlRFTF9WR0FfREVWSUNFKDB4MTYzMiwgaW5mbyksIC8q
-IFVMVCAqLyBcCisgICAgSU5URUxfVkdBX0RFVklDRSgweDE2MzYsIGluZm8pLCAvKiBVTFQgKi8g
-XAorICAgIElOVEVMX1ZHQV9ERVZJQ0UoMHgxNjNCLCBpbmZvKSwgLyogSXJpcyAqLyBcCisgICAg
-SU5URUxfVkdBX0RFVklDRSgweDE2M0UsIGluZm8pLCAvKiBVTFggKi8gXAorICAgIElOVEVMX1ZH
-QV9ERVZJQ0UoMHgxNjNBLCBpbmZvKSwgLyogU2VydmVyICovIFwKKyAgICBJTlRFTF9WR0FfREVW
-SUNFKDB4MTYzRCwgaW5mbykgIC8qIFdvcmtzdGF0aW9uICovCgpFUlJPUjogTWFjcm9zIHdpdGgg
-Y29tcGxleCB2YWx1ZXMgc2hvdWxkIGJlIGVuY2xvc2VkIGluIHBhcmVudGhlc2lzCiMzMTY6IEZJ
-TEU6IGh3L3ZmaW8vaW50ZWwtcGxhdGZvcm0uYzoyODY6CisjZGVmaW5lIElOVEVMX0JEV19JRFMo
-aW5mbykgXAorICAgIElOVEVMX0JEV19HVDEyX0lEUyhpbmZvKSwgXAorICAgIElOVEVMX0JEV19H
-VDNfSURTKGluZm8pLCBcCisgICAgSU5URUxfQkRXX1JTVkRfSURTKGluZm8pCgpFUlJPUjogTWFj
-cm9zIHdpdGggY29tcGxleCB2YWx1ZXMgc2hvdWxkIGJlIGVuY2xvc2VkIGluIHBhcmVudGhlc2lz
-CiMzMjE6IEZJTEU6IGh3L3ZmaW8vaW50ZWwtcGxhdGZvcm0uYzoyOTE6CisjZGVmaW5lIElOVEVM
-X0NIVl9JRFMoaW5mbykgXAorICAgIElOVEVMX1ZHQV9ERVZJQ0UoMHgyMmIwLCBpbmZvKSwgXAor
-ICAgIElOVEVMX1ZHQV9ERVZJQ0UoMHgyMmIxLCBpbmZvKSwgXAorICAgIElOVEVMX1ZHQV9ERVZJ
-Q0UoMHgyMmIyLCBpbmZvKSwgXAorICAgIElOVEVMX1ZHQV9ERVZJQ0UoMHgyMmIzLCBpbmZvKQoK
-RVJST1I6IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwojMzI3OiBGSUxFOiBody92
-ZmlvL2ludGVsLXBsYXRmb3JtLmM6Mjk3OgorI2RlZmluZSBJTlRFTF9TS0xfR1QxX0lEUyhpbmZv
-KV5JXCQKCkVSUk9SOiBNYWNyb3Mgd2l0aCBjb21wbGV4IHZhbHVlcyBzaG91bGQgYmUgZW5jbG9z
-ZWQgaW4gcGFyZW50aGVzaXMKIzMyNzogRklMRTogaHcvdmZpby9pbnRlbC1wbGF0Zm9ybS5jOjI5
-NzoKKyNkZWZpbmUgSU5URUxfU0tMX0dUMV9JRFMoaW5mbykJXAorICAgIElOVEVMX1ZHQV9ERVZJ
-Q0UoMHgxOTA2LCBpbmZvKSwgLyogVUxUIEdUMSAqLyBcCisgICAgSU5URUxfVkdBX0RFVklDRSgw
-eDE5MEUsIGluZm8pLCAvKiBVTFggR1QxICovIFwKKyAgICBJTlRFTF9WR0FfREVWSUNFKDB4MTkw
-MiwgaW5mbyksIC8qIERUICBHVDEgKi8gXAorICAgIElOVEVMX1ZHQV9ERVZJQ0UoMHgxOTBCLCBp
-bmZvKSwgLyogSGFsbyBHVDEgKi8gXAorICAgIElOVEVMX1ZHQV9ERVZJQ0UoMHgxOTBBLCBpbmZv
-KSAvKiBTUlYgR1QxICovCgpFUlJPUjogY29kZSBpbmRlbnQgc2hvdWxkIG5ldmVyIHVzZSB0YWJz
-CiMzMzQ6IEZJTEU6IGh3L3ZmaW8vaW50ZWwtcGxhdGZvcm0uYzozMDQ6CisjZGVmaW5lIElOVEVM
-X1NLTF9HVDJfSURTKGluZm8pXklcJAoKRVJST1I6IE1hY3JvcyB3aXRoIGNvbXBsZXggdmFsdWVz
-IHNob3VsZCBiZSBlbmNsb3NlZCBpbiBwYXJlbnRoZXNpcwojMzM0OiBGSUxFOiBody92ZmlvL2lu
-dGVsLXBsYXRmb3JtLmM6MzA0OgorI2RlZmluZSBJTlRFTF9TS0xfR1QyX0lEUyhpbmZvKQlcCisg
-ICAgSU5URUxfVkdBX0RFVklDRSgweDE5MTYsIGluZm8pLCAvKiBVTFQgR1QyICovIFwKKyAgICBJ
-TlRFTF9WR0FfREVWSUNFKDB4MTkyMSwgaW5mbyksIC8qIFVMVCBHVDJGICovIFwKKyAgICBJTlRF
-TF9WR0FfREVWSUNFKDB4MTkxRSwgaW5mbyksIC8qIFVMWCBHVDIgKi8gXAorICAgIElOVEVMX1ZH
-QV9ERVZJQ0UoMHgxOTEyLCBpbmZvKSwgLyogRFQgIEdUMiAqLyBcCisgICAgSU5URUxfVkdBX0RF
-VklDRSgweDE5MUIsIGluZm8pLCAvKiBIYWxvIEdUMiAqLyBcCisgICAgSU5URUxfVkdBX0RFVklD
-RSgweDE5MUEsIGluZm8pLCAvKiBTUlYgR1QyICovIFwKKyAgICBJTlRFTF9WR0FfREVWSUNFKDB4
-MTkxRCwgaW5mbykgIC8qIFdLUyBHVDIgKi8KCkVSUk9SOiBNYWNyb3Mgd2l0aCBjb21wbGV4IHZh
-bHVlcyBzaG91bGQgYmUgZW5jbG9zZWQgaW4gcGFyZW50aGVzaXMKIzM0MzogRklMRTogaHcvdmZp
-by9pbnRlbC1wbGF0Zm9ybS5jOjMxMzoKKyNkZWZpbmUgSU5URUxfU0tMX0dUM19JRFMoaW5mbykg
-XAorICAgIElOVEVMX1ZHQV9ERVZJQ0UoMHgxOTIzLCBpbmZvKSwgLyogVUxUIEdUMyAqLyBcCisg
-ICAgSU5URUxfVkdBX0RFVklDRSgweDE5MjYsIGluZm8pLCAvKiBVTFQgR1QzICovIFwKKyAgICBJ
-TlRFTF9WR0FfREVWSUNFKDB4MTkyNywgaW5mbyksIC8qIFVMVCBHVDMgKi8gXAorICAgIElOVEVM
-X1ZHQV9ERVZJQ0UoMHgxOTJCLCBpbmZvKSAgLyogSGFsbyBHVDMgKi8gXAorCgpFUlJPUjogTWFj
-cm9zIHdpdGggY29tcGxleCB2YWx1ZXMgc2hvdWxkIGJlIGVuY2xvc2VkIGluIHBhcmVudGhlc2lz
-CiMzNDk6IEZJTEU6IGh3L3ZmaW8vaW50ZWwtcGxhdGZvcm0uYzozMTk6CisjZGVmaW5lIElOVEVM
-X1NLTF9HVDRfSURTKGluZm8pIFwKKyAgICBJTlRFTF9WR0FfREVWSUNFKDB4MTkzMiwgaW5mbyks
-IC8qIERUIEdUNCAqLyBcCisgICAgSU5URUxfVkdBX0RFVklDRSgweDE5M0IsIGluZm8pLCAvKiBI
-YWxvIEdUNCAqLyBcCisgICAgSU5URUxfVkdBX0RFVklDRSgweDE5M0QsIGluZm8pLCAvKiBXS1Mg
-R1Q0ICovIFwKKyAgICBJTlRFTF9WR0FfREVWSUNFKDB4MTkyQSwgaW5mbyksIC8qIFNSViBHVDQg
-Ki8gXAorICAgIElOVEVMX1ZHQV9ERVZJQ0UoMHgxOTNBLCBpbmZvKSAgLyogU1JWIEdUNGUgKi8K
-CkVSUk9SOiBjb2RlIGluZGVudCBzaG91bGQgbmV2ZXIgdXNlIHRhYnMKIzM1NjogRklMRTogaHcv
-dmZpby9pbnRlbC1wbGF0Zm9ybS5jOjMyNjoKKyNkZWZpbmUgSU5URUxfU0tMX0lEUyhpbmZvKV5J
-IFwkCgpFUlJPUjogTWFjcm9zIHdpdGggY29tcGxleCB2YWx1ZXMgc2hvdWxkIGJlIGVuY2xvc2Vk
-IGluIHBhcmVudGhlc2lzCiMzNTY6IEZJTEU6IGh3L3ZmaW8vaW50ZWwtcGxhdGZvcm0uYzozMjY6
-CisjZGVmaW5lIElOVEVMX1NLTF9JRFMoaW5mbykJIFwKKyAgICBJTlRFTF9TS0xfR1QxX0lEUyhp
-bmZvKSwgXAorICAgIElOVEVMX1NLTF9HVDJfSURTKGluZm8pLCBcCisgICAgSU5URUxfU0tMX0dU
-M19JRFMoaW5mbyksIFwKKyAgICBJTlRFTF9TS0xfR1Q0X0lEUyhpbmZvKQoKRVJST1I6IE1hY3Jv
-cyB3aXRoIGNvbXBsZXggdmFsdWVzIHNob3VsZCBiZSBlbmNsb3NlZCBpbiBwYXJlbnRoZXNpcwoj
-MzYyOiBGSUxFOiBody92ZmlvL2ludGVsLXBsYXRmb3JtLmM6MzMyOgorI2RlZmluZSBJTlRFTF9C
-WFRfSURTKGluZm8pIFwKKyAgICBJTlRFTF9WR0FfREVWSUNFKDB4MEE4NCwgaW5mbyksIFwKKyAg
-ICBJTlRFTF9WR0FfREVWSUNFKDB4MUE4NCwgaW5mbyksIFwKKyAgICBJTlRFTF9WR0FfREVWSUNF
-KDB4MUE4NSwgaW5mbyksIFwKKyAgICBJTlRFTF9WR0FfREVWSUNFKDB4NUE4NCwgaW5mbyksIC8q
-IEFQTCBIRCBHcmFwaGljcyA1MDUgKi8gXAorICAgIElOVEVMX1ZHQV9ERVZJQ0UoMHg1QTg1LCBp
-bmZvKSAgLyogQVBMIEhEIEdyYXBoaWNzIDUwMCAqLwoKRVJST1I6IGJyYWNlcyB7fSBhcmUgbmVj
-ZXNzYXJ5IGZvciBhbGwgYXJtcyBvZiB0aGlzIHN0YXRlbWVudAojMzkyOiBGSUxFOiBody92Zmlv
-L2ludGVsLXBsYXRmb3JtLmM6MzYyOgorICAgICAgICBpZiAocGNpaWRsaXN0W2ldLmRldmljZV9p
-ZCA9PSBkZXZpY2VfaWQpClsuLi5dCgp0b3RhbDogMjYgZXJyb3JzLCAwIHdhcm5pbmdzLCA0NjMg
-bGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZp
-ZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRo
-ZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKQ2hl
-Y2tpbmcgUEFUQ0ggMi82OiB2ZmlvOiBTZXR1cCBJR0QgcXVpcmtzIGVhcmxpZXIuLi4KQ2hlY2tp
-bmcgUEFUQ0ggMy82OiB2ZmlvOiBTZXR1cCBJR0Qgc3RvbGVuIG1lbW9yeS4uLgpDaGVja2luZyBQ
-QVRDSCA0LzY6IHZmaW86IFJlZmluZSBHR1RUIGNsZWFyaW5nLi4uCkNoZWNraW5nIFBBVENIIDUv
-NjogdmZpbzogUmVtb3ZlIGV4dHJhIHF1aXJrcyBhbmQgb2xkIGRlZmluaXRpb25zLi4uCkNoZWNr
-aW5nIFBBVENIIDYvNjogdmZpbzogU2V0dXAgSUdEIHN0b2xlbiBtZW1vcnkgdW5kZXIgc2Vjb25k
-YXJ5IG1vZGUuLi4KRVJST1I6IGJyYWNlcyB7fSBhcmUgbmVjZXNzYXJ5IGZvciBhbGwgYXJtcyBv
-ZiB0aGlzIHN0YXRlbWVudAojNDQ6IEZJTEU6IGh3L3ZmaW8vcGNpLXF1aXJrcy5jOjEyNTM6Cisg
-ICAgaWYgKCZ2ZGV2LT5wZGV2ICE9IHBjaV9maW5kX2RldmljZShwY2lfZGV2aWNlX3Jvb3RfYnVz
-KCZ2ZGV2LT5wZGV2KSwKWy4uLl0KCnRvdGFsOiAxIGVycm9ycywgMCB3YXJuaW5ncywgMzMgbGlu
-ZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcu
-ICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0g
-dG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKPT09IE9V
-VFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKCi0tLQpFbWFp
-bCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5vcmcv
-XS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQGZyZWVsaXN0cy5v
-cmc=
+Hi,
+
+This is the last batch of patches I have pending for chardev for
+now. They are mostly windows and headers related, and various small
+improvements.
+
+Comments welcome,
+Thanks
+
+v2:
+- rename skip_free->keep_open, all->write_all
+- add a patch moving char devices to chardev/
+- patch reordering to remove chardev/char.h includes earlier
+- add various r-b tags
+
+Marc-Andr=C3=A9 Lureau (14):
+  char-win: simplify win_chr_read()
+  char-win: remove WinChardev.len
+  char-win: rename win_chr_init/poll win_chr_serial_init/poll
+  char-win: rename hcom->file
+  char-win: close file handle except with console
+  Remove/replace sysemu/char.h inclusion
+  chardev: move headers to include/chardev
+  chardev: serial & parallel declaration to own headers
+  be-hci: use backend functions
+  char: generalize qemu_chr_write_all()
+  char: move CharBackend handling in char-fe unit
+  char: rename functions that are not part of fe
+  char: make chr_fe_deinit() optionaly delete backend
+  char: move char devices to chardev/
+
+ {chardev =3D> include/chardev}/char-fd.h        |   2 +-
+ include/chardev/char-fe.h                     | 251 +++++++++++++
+ {chardev =3D> include/chardev}/char-io.h        |   2 +-
+ {chardev =3D> include/chardev}/char-mux.h       |   3 +-
+ {chardev =3D> include/chardev}/char-parallel.h  |  20 +-
+ {chardev =3D> include/chardev}/char-serial.h    |  22 ++
+ {chardev =3D> include/chardev}/char-win-stdio.h |   0
+ {chardev =3D> include/chardev}/char-win.h       |  14 +-
+ include/chardev/char.h                        | 229 ++++++++++++
+ include/hw/char/bcm2835_aux.h                 |   2 +-
+ include/hw/char/cadence_uart.h                |   2 +-
+ include/hw/char/digic-uart.h                  |   2 +-
+ include/hw/char/imx_serial.h                  |   2 +-
+ include/hw/char/serial.h                      |   4 +-
+ include/hw/char/stm32f2xx_usart.h             |   2 +-
+ include/sysemu/char.h                         | 499 --------------------=
+------
+ backends/rng-egd.c                            |   4 +-
+ {backends =3D> chardev}/baum.c                  |   2 +-
+ chardev/char-console.c                        |   4 +-
+ chardev/char-fd.c                             |   6 +-
+ chardev/char-fe.c                             | 361 +++++++++++++++++++
+ chardev/char-file.c                           |   8 +-
+ chardev/char-io.c                             |   2 +-
+ chardev/char-mux.c                            |   6 +-
+ chardev/char-null.c                           |   2 +-
+ chardev/char-parallel.c                       |   6 +-
+ chardev/char-pipe.c                           |  16 +-
+ chardev/char-pty.c                            |   4 +-
+ chardev/char-ringbuf.c                        |   2 +-
+ chardev/char-serial.c                         |   8 +-
+ chardev/char-socket.c                         |   4 +-
+ chardev/char-stdio.c                          |   8 +-
+ chardev/char-udp.c                            |   4 +-
+ chardev/char-win-stdio.c                      |   4 +-
+ chardev/char-win.c                            |  95 ++---
+ chardev/char.c                                | 386 +-------------------
+ {backends =3D> chardev}/msmouse.c               |   2 +-
+ spice-qemu-char.c =3D> chardev/spice.c          |   4 +-
+ {backends =3D> chardev}/testdev.c               |   2 +-
+ {backends =3D> chardev}/wctablet.c              |   2 +-
+ gdbstub.c                                     |  18 +-
+ hmp.c                                         |   2 +-
+ hw/arm/bcm2835_peripherals.c                  |   1 -
+ hw/arm/fsl-imx25.c                            |   2 +-
+ hw/arm/fsl-imx31.c                            |   2 +-
+ hw/arm/fsl-imx6.c                             |   2 +-
+ hw/arm/omap2.c                                |   2 +-
+ hw/arm/pxa2xx.c                               |   2 +-
+ hw/arm/strongarm.c                            |   3 +-
+ hw/bt/hci-csr.c                               |  11 +-
+ hw/char/cadence_uart.c                        |   3 +-
+ hw/char/debugcon.c                            |   2 +-
+ hw/char/digic-uart.c                          |   2 +-
+ hw/char/escc.c                                |   3 +-
+ hw/char/etraxfs_ser.c                         |   2 +-
+ hw/char/exynos4210_uart.c                     |   3 +-
+ hw/char/grlib_apbuart.c                       |   2 +-
+ hw/char/imx_serial.c                          |   1 -
+ hw/char/ipoctal232.c                          |   2 +-
+ hw/char/lm32_juart.c                          |   2 +-
+ hw/char/lm32_uart.c                           |   2 +-
+ hw/char/mcf_uart.c                            |   2 +-
+ hw/char/milkymist-uart.c                      |   2 +-
+ hw/char/omap_uart.c                           |   2 +-
+ hw/char/parallel.c                            |   3 +-
+ hw/char/pl011.c                               |   2 +-
+ hw/char/sclpconsole-lm.c                      |   2 +-
+ hw/char/sclpconsole.c                         |   2 +-
+ hw/char/serial.c                              |   4 +-
+ hw/char/sh_serial.c                           |   2 +-
+ hw/char/spapr_vty.c                           |   2 +-
+ hw/char/terminal3270.c                        |   2 +-
+ hw/char/virtio-console.c                      |   2 +-
+ hw/char/xen_console.c                         |   4 +-
+ hw/char/xilinx_uartlite.c                     |   2 +-
+ hw/core/qdev-properties-system.c              |   4 +-
+ hw/core/qdev-properties.c                     |   2 +-
+ hw/display/xenfb.c                            |   1 -
+ hw/i386/xen/xen-hvm.c                         |   1 -
+ hw/ipmi/ipmi_bmc_extern.c                     |   2 +-
+ hw/isa/pc87312.c                              |   2 +-
+ hw/mips/boston.c                              |   2 +-
+ hw/mips/mips_fulong2e.c                       |   1 -
+ hw/mips/mips_malta.c                          |   1 -
+ hw/misc/ivshmem.c                             |   2 +-
+ hw/net/xgmac.c                                |   1 -
+ hw/ppc/spapr_events.c                         |   1 -
+ hw/ppc/spapr_rtas.c                           |   1 -
+ hw/sparc/leon3.c                              |   1 -
+ hw/usb/ccid-card-emulated.c                   |   2 +-
+ hw/usb/ccid-card-passthru.c                   |   7 +-
+ hw/usb/dev-serial.c                           |   3 +-
+ hw/usb/redirect.c                             |   6 +-
+ hw/virtio/vhost-user.c                        |   2 +-
+ hw/xen/xen-common.c                           |   2 +-
+ hw/xen/xen_backend.c                          |   1 -
+ hw/xtensa/xtfpga.c                            |   2 +-
+ monitor.c                                     |   4 +-
+ net/colo-compare.c                            |  10 +-
+ net/filter-mirror.c                           |   8 +-
+ net/slirp.c                                   |   2 +-
+ net/vhost-user.c                              |   7 +-
+ qmp.c                                         |   2 +-
+ qtest.c                                       |   2 +-
+ replay/replay-char.c                          |   2 +-
+ slirp/slirp.c                                 |   2 +-
+ tests/postcopy-test.c                         |   2 +-
+ tests/test-char.c                             |  24 +-
+ tests/vhost-user-test.c                       |   6 +-
+ ui/console.c                                  |   2 +-
+ ui/gtk.c                                      |   2 +-
+ util/event_notifier-posix.c                   |   1 -
+ vl.c                                          |   2 +-
+ MAINTAINERS                                   |   5 +-
+ Makefile.objs                                 |   4 +-
+ backends/Makefile.objs                        |   4 -
+ backends/trace-events                         |  10 -
+ chardev/Makefile.objs                         |   7 +
+ chardev/trace-events                          |  18 +
+ trace-events                                  |   7 -
+ 120 files changed, 1124 insertions(+), 1156 deletions(-)
+ rename {chardev =3D> include/chardev}/char-fd.h (98%)
+ create mode 100644 include/chardev/char-fe.h
+ rename {chardev =3D> include/chardev}/char-io.h (98%)
+ rename {chardev =3D> include/chardev}/char-mux.h (97%)
+ rename {chardev =3D> include/chardev}/char-parallel.h (70%)
+ rename {chardev =3D> include/chardev}/char-serial.h (75%)
+ rename {chardev =3D> include/chardev}/char-win-stdio.h (100%)
+ rename {chardev =3D> include/chardev}/char-win.h (84%)
+ create mode 100644 include/chardev/char.h
+ delete mode 100644 include/sysemu/char.h
+ rename {backends =3D> chardev}/baum.c (99%)
+ create mode 100644 chardev/char-fe.c
+ rename {backends =3D> chardev}/msmouse.c (99%)
+ rename spice-qemu-char.c =3D> chardev/spice.c (99%)
+ rename {backends =3D> chardev}/testdev.c (99%)
+ rename {backends =3D> chardev}/wctablet.c (99%)
+ create mode 100644 chardev/trace-events
+
+--=20
+2.13.0.91.g00982b8dd
