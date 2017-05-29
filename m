@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43192)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46752)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1dFO8a-0007kh-TU
-	for qemu-devel@nongnu.org; Mon, 29 May 2017 13:07:25 -0400
+	(envelope-from <mreitz@redhat.com>) id 1dFOW4-0003Ne-PC
+	for qemu-devel@nongnu.org; Mon, 29 May 2017 13:31:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1dFO8a-0002p2-1r
-	for qemu-devel@nongnu.org; Mon, 29 May 2017 13:07:24 -0400
+	(envelope-from <mreitz@redhat.com>) id 1dFOW3-0000rW-W2
+	for qemu-devel@nongnu.org; Mon, 29 May 2017 13:31:40 -0400
 References: <20170503122539.282182-1-vsementsov@virtuozzo.com>
-	<20170503122539.282182-16-vsementsov@virtuozzo.com>
+	<20170503122539.282182-22-vsementsov@virtuozzo.com>
 From: Max Reitz <mreitz@redhat.com>
-Message-ID: <dc462db3-9ad7-62f4-8d71-367e79583a4b@redhat.com>
-Date: Mon, 29 May 2017 19:07:08 +0200
+Message-ID: <def656a8-e0dc-3f72-7152-b12bce9475bb@redhat.com>
+Date: Mon, 29 May 2017 19:31:22 +0200
 MIME-Version: 1.0
-In-Reply-To: <20170503122539.282182-16-vsementsov@virtuozzo.com>
+In-Reply-To: <20170503122539.282182-22-vsementsov@virtuozzo.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="b7OMH5L01upKoTEixbffTCW7WiEVHpauT"
-Subject: Re: [Qemu-devel] [PATCH 15/25] qcow2: add persistent dirty bitmaps
- support
+	boundary="BjVB5dGUhJEbU2MA2Qwt7TgTsiG3o8kgC"
+Subject: Re: [Qemu-devel] [PATCH 21/25] iotests: test qcow2 persistent dirty
+ bitmap
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,35 +29,35 @@ To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.o
 Cc: kwolf@redhat.com, armbru@redhat.com, eblake@redhat.com, jsnow@redhat.com, famz@redhat.com, den@openvz.org, stefanha@redhat.com, pbonzini@redhat.com
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---b7OMH5L01upKoTEixbffTCW7WiEVHpauT
+--BjVB5dGUhJEbU2MA2Qwt7TgTsiG3o8kgC
 From: Max Reitz <mreitz@redhat.com>
 To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
  qemu-block@nongnu.org, qemu-devel@nongnu.org
 Cc: kwolf@redhat.com, armbru@redhat.com, eblake@redhat.com, jsnow@redhat.com,
  famz@redhat.com, den@openvz.org, stefanha@redhat.com, pbonzini@redhat.com
-Message-ID: <dc462db3-9ad7-62f4-8d71-367e79583a4b@redhat.com>
-Subject: Re: [PATCH 15/25] qcow2: add persistent dirty bitmaps support
+Message-ID: <def656a8-e0dc-3f72-7152-b12bce9475bb@redhat.com>
+Subject: Re: [PATCH 21/25] iotests: test qcow2 persistent dirty bitmap
 References: <20170503122539.282182-1-vsementsov@virtuozzo.com>
- <20170503122539.282182-16-vsementsov@virtuozzo.com>
-In-Reply-To: <20170503122539.282182-16-vsementsov@virtuozzo.com>
+ <20170503122539.282182-22-vsementsov@virtuozzo.com>
+In-Reply-To: <20170503122539.282182-22-vsementsov@virtuozzo.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
 On 2017-05-03 14:25, Vladimir Sementsov-Ogievskiy wrote:
-> Store persistent dirty bitmaps in qcow2 image.
->=20
 > Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 > ---
->  block/qcow2-bitmap.c | 475 +++++++++++++++++++++++++++++++++++++++++++=
+>  tests/qemu-iotests/165     | 105 +++++++++++++++++++++++++++++++++++++=
 ++++++++
->  block/qcow2.c        |   9 +
->  block/qcow2.h        |   1 +
->  3 files changed, 485 insertions(+)
+>  tests/qemu-iotests/165.out |   5 +++
+>  tests/qemu-iotests/group   |   1 +
+>  3 files changed, 111 insertions(+)
+>  create mode 100755 tests/qemu-iotests/165
+>  create mode 100644 tests/qemu-iotests/165.out
 
 Reviewed-by: Max Reitz <mreitz@redhat.com>
 
 
---b7OMH5L01upKoTEixbffTCW7WiEVHpauT
+--BjVB5dGUhJEbU2MA2Qwt7TgTsiG3o8kgC
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
@@ -65,14 +65,14 @@ Content-Disposition: attachment; filename="signature.asc"
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v2
 
-iQEvBAEBCAAZBQJZLFU9EhxtcmVpdHpAcmVkaGF0LmNvbQAKCRD0B9sAYdXPQPL9
-B/wI3vCI+5vxmrzDFlsemhDS4CDHt5VCUEGsnC3N2QAV6oZ1Mh1nRnHMRvK5JpTy
-GuDHpqS9hz2dm7jZjTiZ3IBxWLGNYFNiTTUcph/Dik9XK0+ydunGacK1yNkg4Gcn
-olY5u09XyZbX2hUKO3Yg/HItoA28tv/CkN2GOWk7wc76PmNcMB3Gyf+USErCmdWx
-mD4nWx48JfWkFGSgC8dmsu1Jd3ldMUnf3tAX/H4uDfjw11hJ68GRBiNKDTKQLp3V
-16P8IjpuAnBVY3kRMfoO2HiFAusuCdHSvVSS8YUJOv45o5/n167iLSPWZg5uXgpu
-IYARpPaiQnNCIeF/I++YfHmh
-=CH3G
+iQEvBAEBCAAZBQJZLFrqEhxtcmVpdHpAcmVkaGF0LmNvbQAKCRD0B9sAYdXPQLTg
+CACdi5P0BDZFDoPdUOY/iVFcXCMtI4FtcbYiJU7kP64WPshulKQYBUfOVSCOZc+U
+ucJFDKL0GNZ/Aai3teMqV6Mui8cJe2InH1Iuhin/uZEDLq5ga4PFpkdkGShjjJiS
+mixi4OJU/DJ59alC6Q3OBrLnEWGzUYT5fFH2Gdqbs7kNLBAdgLUHOML6+uLIdpn3
+4wpHjbHgvrOWQongH7FbHC3E3Dbex5R4WU7P0viDZ5lGCHmOWC6y60DW/I9JtQwY
+S03NVlbp34TiOnxroC9mNek8XqPc+U7yZ1x6TxGVUeyk2UIUax5618DCEFve+pPz
+kUQa5JFW2i3umsJf+zk+pfvv
+=mGC7
 -----END PGP SIGNATURE-----
 
---b7OMH5L01upKoTEixbffTCW7WiEVHpauT--
+--BjVB5dGUhJEbU2MA2Qwt7TgTsiG3o8kgC--
