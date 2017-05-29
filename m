@@ -1,21 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52519)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53977)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1dFMhP-0001Uk-6C
-	for qemu-devel@nongnu.org; Mon, 29 May 2017 11:35:16 -0400
+	(envelope-from <eblake@redhat.com>) id 1dFMov-0003kA-Ep
+	for qemu-devel@nongnu.org; Mon, 29 May 2017 11:43:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1dFMhO-0007A8-6R
-	for qemu-devel@nongnu.org; Mon, 29 May 2017 11:35:15 -0400
-References: <20170503122539.282182-1-vsementsov@virtuozzo.com>
-	<20170503122539.282182-9-vsementsov@virtuozzo.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <9e1ff654-08b7-4863-0557-6cc4eb905f6f@redhat.com>
-Date: Mon, 29 May 2017 17:34:56 +0200
+	(envelope-from <eblake@redhat.com>) id 1dFMou-0000Nq-Ao
+	for qemu-devel@nongnu.org; Mon, 29 May 2017 11:43:01 -0400
+References: <20170529152316.27647-1-mreitz@redhat.com>
+	<20170529152316.27647-2-mreitz@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <27c8dfc9-cef6-9d55-195a-20ef3a9a85e9@redhat.com>
+Date: Mon, 29 May 2017 10:42:51 -0500
 MIME-Version: 1.0
-In-Reply-To: <20170503122539.282182-9-vsementsov@virtuozzo.com>
+In-Reply-To: <20170529152316.27647-2-mreitz@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="UgalKQUfOJDnLxIFiA4TThAch2HjAipTF"
-Subject: Re: [Qemu-devel] [PATCH 08/25] qcow2: add bitmaps extension
+	boundary="qfl9lkQN6VuMHcT43WSWIldVgQN6Wox7g"
+Subject: Re: [Qemu-devel] [PATCH v3 1/2] iotests: Use absolute paths for
+ executables
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,97 +25,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, armbru@redhat.com, eblake@redhat.com, jsnow@redhat.com, famz@redhat.com, den@openvz.org, stefanha@redhat.com, pbonzini@redhat.com
+To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---UgalKQUfOJDnLxIFiA4TThAch2HjAipTF
-From: Max Reitz <mreitz@redhat.com>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, armbru@redhat.com, eblake@redhat.com, jsnow@redhat.com,
- famz@redhat.com, den@openvz.org, stefanha@redhat.com, pbonzini@redhat.com
-Message-ID: <9e1ff654-08b7-4863-0557-6cc4eb905f6f@redhat.com>
-Subject: Re: [PATCH 08/25] qcow2: add bitmaps extension
-References: <20170503122539.282182-1-vsementsov@virtuozzo.com>
- <20170503122539.282182-9-vsementsov@virtuozzo.com>
-In-Reply-To: <20170503122539.282182-9-vsementsov@virtuozzo.com>
+--qfl9lkQN6VuMHcT43WSWIldVgQN6Wox7g
+From: Eric Blake <eblake@redhat.com>
+To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>
+Message-ID: <27c8dfc9-cef6-9d55-195a-20ef3a9a85e9@redhat.com>
+Subject: Re: [PATCH v3 1/2] iotests: Use absolute paths for executables
+References: <20170529152316.27647-1-mreitz@redhat.com>
+ <20170529152316.27647-2-mreitz@redhat.com>
+In-Reply-To: <20170529152316.27647-2-mreitz@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On 2017-05-03 14:25, Vladimir Sementsov-Ogievskiy wrote:
-> Add bitmap extension as specified in docs/specs/qcow2.txt.
-> For now, just mirror extension header into Qcow2 state and check
-> constraints. Also, calculate refcounts for qcow2 bitmaps, to not break
-> qemu-img check.
+On 05/29/2017 10:23 AM, Max Reitz wrote:
+> A user may specify a relative path for accessing qemu, qemu-img, etc.
+> through environment variables ($QEMU_PROG and friends) or a symlink.
 >=20
-> For now, disable image resize if it has bitmaps. It will be fixed later=
-=2E
+> If a test decides to change its working directory, relative paths will
+> cease to work, however. Work around this by making all of the paths to
+> programs that should undergo testing absolute. Besides "realpath", we
+> also have to use "which" to support programs in $PATH.
+
+'type -p' is more portable than 'which' - especially since our scripts
+are bash scripts, and type is a bash builtin while which is not.
+
 >=20
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> Reviewed-by: Max Reitz <mreitz@redhat.com>
-> Reviewed-by: John Snow <jsnow@redhat.com>
+> As a side effect, this fixes specifying these programs as symlinks for
+> out-of-tree builds: Before, you would have to create two symlinks, one
+> in the build and one in the source tree (the first one for common.confi=
+g
+> to find, the second one for the iotest to use). Now it is sufficient to=
+
+> create one in the build tree because common.config will resolve it.
+>=20
+> Reported-by: Kevin Wolf <kwolf@redhat.com>
+> Signed-off-by: Max Reitz <mreitz@redhat.com>
 > ---
->  block/Makefile.objs    |   2 +-
->  block/qcow2-bitmap.c   | 439 +++++++++++++++++++++++++++++++++++++++++=
-++++++++
->  block/qcow2-refcount.c |   6 +
->  block/qcow2.c          | 124 +++++++++++++-
->  block/qcow2.h          |  27 +++
->  5 files changed, 592 insertions(+), 6 deletions(-)
->  create mode 100644 block/qcow2-bitmap.c
-
-[...]
-
-> diff --git a/block/qcow2.c b/block/qcow2.c
-> index 6a92d2ef3f..6028e9a149 100644
-> --- a/block/qcow2.c
-> +++ b/block/qcow2.c
-
-[...]
-
-> @@ -2542,6 +2649,13 @@ static int qcow2_truncate(BlockDriverState *bs, =
-int64_t offset)
->          return -ENOTSUP;
->      }
+>  tests/qemu-iotests/common.config | 6 ++++++
+>  1 file changed, 6 insertions(+)
+>=20
+> diff --git a/tests/qemu-iotests/common.config b/tests/qemu-iotests/comm=
+on.config
+> index d1b45f5..08aac56 100644
+> --- a/tests/qemu-iotests/common.config
+> +++ b/tests/qemu-iotests/common.config
+> @@ -103,6 +103,12 @@ if [ -z "$QEMU_VXHS_PROG" ]; then
+>      export QEMU_VXHS_PROG=3D"`set_prog_path qnio_server`"
+>  fi
 > =20
-> +    /* cannot proceed if image has bitmaps */
-> +    if (s->nb_bitmaps) {
-> +        /* TODO: resize bitmaps in the image */
-> +        error_report("Can't resize an image which has bitmaps");
+> +export QEMU_PROG=3D$(realpath "$(which "$QEMU_PROG")")
+> +export QEMU_IMG_PROG=3D$(realpath "$(which "$QEMU_IMG_PROG")")
+> +export QEMU_IO_PROG=3D$(realpath "$(which "$QEMU_IO_PROG")")
+> +export QEMU_NBD_PROG=3D$(realpath "$(which "$QEMU_NBD_PROG")")
+> +export QEMU_VXHS_PROG=3D$(realpath "$(which "$QEMU_VXHS_PROG")")
 
-Minor note: This needs to be error_setg(errp, ...); now...
+If you switch all of these to $(realpath -- "$(type -p "$QEMU_...")"),
+you can add:
 
-> +        return -ENOTSUP;
-> +    }
-> +
->      /* shrinking is currently not supported */
->      if (offset < bs->total_sectors * 512) {
->          error_report("qcow2 doesn't support shrinking images yet");
+Reviewed-by: Eric Blake <eblake@redhat.com>
 
-=2E..as does this (which blocks the patch from being applicable).
-
-(But please keep my R-b.)
-
-Max
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
 
 
---UgalKQUfOJDnLxIFiA4TThAch2HjAipTF
+--qfl9lkQN6VuMHcT43WSWIldVgQN6Wox7g
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQEvBAEBCAAZBQJZLD+gEhxtcmVpdHpAcmVkaGF0LmNvbQAKCRD0B9sAYdXPQOfk
-CACzmx7w2H6l1lnC20guhbErYBljXJ985dvjAdMZJIsFBb6S/b/xsFP71c9XgudE
-2S0GbaQvPX4ktbx4IeF/MUMFzn5hSeWshPhGjtDeJ/ccif4Ob3rF/oBT7k6beq34
-XrFqp38JholaJ0qV4plMJF/Fi05AE7BiHKJ/JvxcmIP3LpsE+6XozQj2g/WxhUqK
-uyMYimzx4YDvwY1RGwGrtj40OwGuWbYIq9p4adkq9nr7Ajlyk4fuX6nrweVGuuFC
-eDfcnayjFnTN40yT0rAievaQO+fAi5KXvhFw49Qgr5tXA4YhRwT/JPcc/DLS1Yn+
-1X0hyDTw6ouhbl+7vnG/v0G7
-=QNkG
+iQEcBAEBCAAGBQJZLEF7AAoJEKeha0olJ0NqAQoH/iG6kikU124+l+HHXizQBMTV
+ejeN1hROdC8sNWOEMVN/0eBybLJTrIRVe0wU9Ma1n365zF0QLZDM3BkUEuf1ufuH
+Y4nZvibk/FgOViWHYKdh6atWHDt5TDIHVFUoxc373u+mfSAlNxV7YZ5zp/i36n88
+vBrV0gKh3s97bMLR0iHTx9+fvRaNbycJW3T3ipDqfvdz2K1g3VCE+ybCH4P3P196
+c6N9af2q/fsIZFupCop2IUDpOcNlaTbJXW3yCW9pZ8UwLeQmzufQt90hOHCXJggk
+0gKuggSbBK2GX+0421x6IO3UjsGmWO66akNp5d+2Lgu+9xiDz34ot+PJ6meD7Uk=
+=egvI
 -----END PGP SIGNATURE-----
 
---UgalKQUfOJDnLxIFiA4TThAch2HjAipTF--
+--qfl9lkQN6VuMHcT43WSWIldVgQN6Wox7g--
