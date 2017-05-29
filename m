@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38834)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38853)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aurelien@aurel32.net>) id 1dFQHc-0006U0-N6
-	for qemu-devel@nongnu.org; Mon, 29 May 2017 15:24:56 -0400
+	(envelope-from <aurelien@aurel32.net>) id 1dFQHc-0006U2-Uq
+	for qemu-devel@nongnu.org; Mon, 29 May 2017 15:24:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aurelien@aurel32.net>) id 1dFQHa-00073u-8L
+	(envelope-from <aurelien@aurel32.net>) id 1dFQHa-00075B-GT
 	for qemu-devel@nongnu.org; Mon, 29 May 2017 15:24:52 -0400
-Received: from hall.aurel32.net ([2001:bc8:30d7:100::1]:42846)
+Received: from hall.aurel32.net ([2001:bc8:30d7:100::1]:42866)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <aurelien@aurel32.net>)
-	id 1dFQHZ-000727-VB
+	id 1dFQHa-00072D-4j
 	for qemu-devel@nongnu.org; Mon, 29 May 2017 15:24:50 -0400
 From: Aurelien Jarno <aurelien@aurel32.net>
-Date: Mon, 29 May 2017 21:24:20 +0200
-Message-Id: <20170529192440.5990-10-aurelien@aurel32.net>
+Date: Mon, 29 May 2017 21:24:17 +0200
+Message-Id: <20170529192440.5990-7-aurelien@aurel32.net>
 In-Reply-To: <20170529192440.5990-1-aurelien@aurel32.net>
 References: <20170529192440.5990-1-aurelien@aurel32.net>
-Subject: [Qemu-devel] [PATCH v2 09/29] target/s390x: implement COMPARE AND
- SIGNAL
+Subject: [Qemu-devel] [PATCH v2 06/29] target/s390x: implement PACK
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,117 +27,109 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Aurelien Jarno <aurelien@aurel32.net>, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>
 
-These functions differ from COMPARE by generating an exception for a
-QNaN input. Use the non quiet version of floatXX_compare.
-
+Reviewed-by: Richard Henderson <rth@twiddle.net>
 Signed-off-by: Aurelien Jarno <aurelien@aurel32.net>
 ---
- target/s390x/fpu_helper.c  | 27 +++++++++++++++++++++++++++
- target/s390x/helper.h      |  3 +++
- target/s390x/insn-data.def |  6 ++++++
- target/s390x/translate.c   | 21 +++++++++++++++++++++
- 4 files changed, 57 insertions(+)
+ target/s390x/helper.h      |  1 +
+ target/s390x/insn-data.def |  5 +++++
+ target/s390x/mem_helper.c  | 37 +++++++++++++++++++++++++++++++++++++
+ target/s390x/translate.c   |  8 ++++++++
+ 4 files changed, 51 insertions(+)
 
-diff --git a/target/s390x/fpu_helper.c b/target/s390x/fpu_helper.c
-index e604e9f7be..26f124fe96 100644
---- a/target/s390x/fpu_helper.c
-+++ b/target/s390x/fpu_helper.c
-@@ -585,6 +585,33 @@ uint64_t HELPER(fixb)(CPUS390XState *env, uint64_t ah, uint64_t al, uint32_t m3)
-     return RET128(ret);
- }
- 
-+/* 32-bit FP compare and signal */
-+uint32_t HELPER(keb)(CPUS390XState *env, uint64_t f1, uint64_t f2)
-+{
-+    int cmp = float32_compare(f1, f2, &env->fpu_status);
-+    handle_exceptions(env, GETPC());
-+    return float_comp_to_cc(env, cmp);
-+}
-+
-+/* 64-bit FP compare and signal */
-+uint32_t HELPER(kdb)(CPUS390XState *env, uint64_t f1, uint64_t f2)
-+{
-+    int cmp = float64_compare(f1, f2, &env->fpu_status);
-+    handle_exceptions(env, GETPC());
-+    return float_comp_to_cc(env, cmp);
-+}
-+
-+/* 128-bit FP compare and signal */
-+uint32_t HELPER(kxb)(CPUS390XState *env, uint64_t ah, uint64_t al,
-+                     uint64_t bh, uint64_t bl)
-+{
-+    int cmp = float128_compare(make_float128(ah, al),
-+                               make_float128(bh, bl),
-+                               &env->fpu_status);
-+    handle_exceptions(env, GETPC());
-+    return float_comp_to_cc(env, cmp);
-+}
-+
- /* 32-bit FP multiply and add */
- uint64_t HELPER(maeb)(CPUS390XState *env, uint64_t f1,
-                       uint64_t f2, uint64_t f3)
 diff --git a/target/s390x/helper.h b/target/s390x/helper.h
-index 596fec28ca..65a39163c2 100644
+index 3f5a05d43b..c6fbc3b949 100644
 --- a/target/s390x/helper.h
 +++ b/target/s390x/helper.h
-@@ -89,6 +89,9 @@ DEF_HELPER_FLAGS_1(stfl, TCG_CALL_NO_RWG, void, env)
- DEF_HELPER_2(stfle, i32, env, i64)
- DEF_HELPER_FLAGS_2(lpq, TCG_CALL_NO_WG, i64, env, i64)
- DEF_HELPER_FLAGS_4(stpq, TCG_CALL_NO_WG, void, env, i64, i64, i64)
-+DEF_HELPER_FLAGS_3(keb, TCG_CALL_NO_WG_SE, i32, env, i64, i64)
-+DEF_HELPER_FLAGS_3(kdb, TCG_CALL_NO_WG_SE, i32, env, i64, i64)
-+DEF_HELPER_FLAGS_5(kxb, TCG_CALL_NO_WG_SE, i32, env, i64, i64, i64, i64)
- 
- #ifndef CONFIG_USER_ONLY
- DEF_HELPER_3(servc, i32, env, i64, i64)
+@@ -75,6 +75,7 @@ DEF_HELPER_FLAGS_2(sqeb, TCG_CALL_NO_WG, i64, env, i64)
+ DEF_HELPER_FLAGS_2(sqdb, TCG_CALL_NO_WG, i64, env, i64)
+ DEF_HELPER_FLAGS_3(sqxb, TCG_CALL_NO_WG, i64, env, i64, i64)
+ DEF_HELPER_FLAGS_1(cvd, TCG_CALL_NO_RWG_SE, i64, s32)
++DEF_HELPER_FLAGS_4(pack, TCG_CALL_NO_WG, void, env, i32, i64, i64)
+ DEF_HELPER_FLAGS_4(unpk, TCG_CALL_NO_WG, void, env, i32, i64, i64)
+ DEF_HELPER_FLAGS_4(tr, TCG_CALL_NO_WG, void, env, i32, i64, i64)
+ DEF_HELPER_4(tre, i64, env, i64, i64, i64)
 diff --git a/target/s390x/insn-data.def b/target/s390x/insn-data.def
-index 5314162b3d..01278949fc 100644
+index 170b50ef2e..f92bfde4f8 100644
 --- a/target/s390x/insn-data.def
 +++ b/target/s390x/insn-data.def
-@@ -154,6 +154,12 @@
-     C(0xb349, CXBR,    RRE,   Z,   x1_o, x2_o, 0, 0, cxb, 0)
-     C(0xed09, CEB,     RXE,   Z,   e1, m2_32u, 0, 0, ceb, 0)
-     C(0xed19, CDB,     RXE,   Z,   f1_o, m2_64, 0, 0, cdb, 0)
-+/* COMPARE AND SIGNAL */
-+    C(0xb308, KEBR,    RRE,   Z,   e1, e2, 0, 0, keb, 0)
-+    C(0xb318, KDBR,    RRE,   Z,   f1_o, f2_o, 0, 0, kdb, 0)
-+    C(0xb348, KXBR,    RRE,   Z,   x1_o, x2_o, 0, 0, kxb, 0)
-+    C(0xed08, KEB,     RXE,   Z,   e1, m2_32u, 0, 0, keb, 0)
-+    C(0xed18, KDB,     RXE,   Z,   f1_o, m2_64, 0, 0, kdb, 0)
- /* COMPARE IMMEDIATE */
-     C(0xc20d, CFI,     RIL_a, EI,  r1, i2, 0, 0, 0, cmps32)
-     C(0xc20c, CGFI,    RIL_a, EI,  r1, i2, 0, 0, 0, cmps64)
+@@ -639,6 +639,11 @@
+     C(0x9600, OI,      SI,    Z,   m1_8u, i2_8u, new, m1_8, or, nz64)
+     C(0xeb56, OIY,     SIY,   LD,  m1_8u, i2_8u, new, m1_8, or, nz64)
+ 
++/* PACK */
++    /* Really format SS_b, but we pack both lengths into one argument
++       for the helper call, so we might as well leave one 8-bit field.  */
++    C(0xf200, PACK,    SS_a,  Z,   la1, a2, 0, 0, pack, 0)
++
+ /* PREFETCH */
+     /* Implemented as nops of course.  */
+     C(0xe336, PFD,     RXY_b, GIE, 0, 0, 0, 0, 0, 0)
+diff --git a/target/s390x/mem_helper.c b/target/s390x/mem_helper.c
+index 9fbe7c9ef9..a60893a5ec 100644
+--- a/target/s390x/mem_helper.c
++++ b/target/s390x/mem_helper.c
+@@ -644,6 +644,43 @@ uint64_t HELPER(cksm)(CPUS390XState *env, uint64_t r1,
+     return len;
+ }
+ 
++void HELPER(pack)(CPUS390XState *env, uint32_t len, uint64_t dest, uint64_t src)
++{
++    uintptr_t ra = GETPC();
++    int len_dest = len >> 4;
++    int len_src = len & 0xf;
++    uint8_t b;
++
++    dest += len_dest;
++    src += len_src;
++
++    /* last byte is special, it only flips the nibbles */
++    b = cpu_ldub_data_ra(env, src, ra);
++    cpu_stb_data_ra(env, dest, (b << 4) | (b >> 4), ra);
++    src--;
++    len_src--;
++
++    /* now pack every value */
++    while (len_dest >= 0) {
++        b = 0;
++
++        if (len_src > 0) {
++            b = cpu_ldub_data_ra(env, src, ra) & 0x0f;
++            src--;
++            len_src--;
++        }
++        if (len_src > 0) {
++            b |= cpu_ldub_data_ra(env, src, ra) << 4;
++            src--;
++            len_src--;
++        }
++
++        len_dest--;
++        dest--;
++        cpu_stb_data_ra(env, dest, b, ra);
++    }
++}
++
+ void HELPER(unpk)(CPUS390XState *env, uint32_t len, uint64_t dest,
+                   uint64_t src)
+ {
 diff --git a/target/s390x/translate.c b/target/s390x/translate.c
-index 6635877bbd..30d0575c03 100644
+index 7f265aeb40..00b91c4f3a 100644
 --- a/target/s390x/translate.c
 +++ b/target/s390x/translate.c
-@@ -2369,6 +2369,27 @@ static ExitStatus op_iske(DisasContext *s, DisasOps *o)
+@@ -3139,6 +3139,14 @@ static ExitStatus op_ori(DisasContext *s, DisasOps *o)
+     return NO_EXIT;
  }
- #endif
  
-+static ExitStatus op_keb(DisasContext *s, DisasOps *o)
++static ExitStatus op_pack(DisasContext *s, DisasOps *o)
 +{
-+    gen_helper_keb(cc_op, cpu_env, o->in1, o->in2);
-+    set_cc_static(s);
++    TCGv_i32 l = tcg_const_i32(get_field(s->fields, l1));
++    gen_helper_pack(cpu_env, l, o->addr1, o->in2);
++    tcg_temp_free_i32(l);
 +    return NO_EXIT;
 +}
 +
-+static ExitStatus op_kdb(DisasContext *s, DisasOps *o)
-+{
-+    gen_helper_kdb(cc_op, cpu_env, o->in1, o->in2);
-+    set_cc_static(s);
-+    return NO_EXIT;
-+}
-+
-+static ExitStatus op_kxb(DisasContext *s, DisasOps *o)
-+{
-+    gen_helper_kxb(cc_op, cpu_env, o->out, o->out2, o->in1, o->in2);
-+    set_cc_static(s);
-+    return NO_EXIT;
-+}
-+
- static ExitStatus op_laa(DisasContext *s, DisasOps *o)
+ static ExitStatus op_popcnt(DisasContext *s, DisasOps *o)
  {
-     /* The real output is indeed the original value in memory;
+     gen_helper_popcnt(o->out, o->in2);
 -- 
 2.11.0
