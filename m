@@ -1,30 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46223)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48264)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dFHCL-0001Mt-Ax
-	for qemu-devel@nongnu.org; Mon, 29 May 2017 05:42:50 -0400
+	(envelope-from <armbru@redhat.com>) id 1dFHMN-0004Cc-I2
+	for qemu-devel@nongnu.org; Mon, 29 May 2017 05:53:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dFHCG-0001WC-A2
-	for qemu-devel@nongnu.org; Mon, 29 May 2017 05:42:49 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:38376)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dFHCG-0001UV-1D
-	for qemu-devel@nongnu.org; Mon, 29 May 2017 05:42:44 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id A63E472464
-	for <qemu-devel@nongnu.org>; Mon, 29 May 2017 09:42:42 +0000 (UTC)
+	(envelope-from <armbru@redhat.com>) id 1dFHMM-0005Sn-KK
+	for qemu-devel@nongnu.org; Mon, 29 May 2017 05:53:11 -0400
 From: Markus Armbruster <armbru@redhat.com>
-References: <1494854073-19898-1-git-send-email-peterx@redhat.com>
-	<20170529060813.GF22816@pxdev.xzpeter.org>
-Date: Mon, 29 May 2017 11:42:35 +0200
-In-Reply-To: <20170529060813.GF22816@pxdev.xzpeter.org> (Peter Xu's message of
-	"Mon, 29 May 2017 14:08:13 +0800")
-Message-ID: <87k2506ltg.fsf@dusky.pond.sub.org>
+References: <20170525163851.8047-1-berrange@redhat.com>
+	<20170525163851.8047-20-berrange@redhat.com>
+	<1acec55c-fd89-ee9d-0082-372a6e967036@redhat.com>
+	<20170526140242.GK24484@redhat.com>
+Date: Mon, 29 May 2017 11:53:01 +0200
+In-Reply-To: <20170526140242.GK24484@redhat.com> (Daniel P. Berrange's message
+	of "Fri, 26 May 2017 15:02:42 +0100")
+Message-ID: <87fufo6lc2.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH] msi: remove return code for msi_init()
+Subject: Re: [Qemu-devel] [PATCH v7 19/20] qcow2: report encryption specific
+ image information
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,64 +26,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: qemu-devel@nongnu.org, Marcel Apfelbaum <marcel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>
+To: "Daniel P. Berrange" <berrange@redhat.com>
+Cc: Eric Blake <eblake@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Alberto Garcia <berto@igalia.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>
 
-Peter Xu <peterx@redhat.com> writes:
+"Daniel P. Berrange" <berrange@redhat.com> writes:
 
-> On Mon, May 15, 2017 at 09:14:33PM +0800, Peter Xu wrote:
->> MSI should be supported by all interrupt controllers. Switching the old
->> check for msi_nonbroken into assertion. Do similar thing to
->> pci_add_capability2() below that. Then time to remove *errp.
+> On Thu, May 25, 2017 at 02:52:30PM -0500, Eric Blake wrote:
+>> On 05/25/2017 11:38 AM, Daniel P. Berrange wrote:
+>> > Currently 'qemu-img info' reports a simple "encrypted: yes"
+>> > field. This is not very useful now that qcow2 can support
+>> > multiple encryption formats. Users want to know which format
+>> > is in use and some data related to it.
+>> > 
+>> > Wire up usage of the qcrypto_block_get_info() method so that
+>> > 'qemu-img info' can report about the encryption format
+>> > and parameters in use
+>> > 
 >> 
->> Since msi_init() won't fail now, touch up all the callers to avoid
->> checks against it. One side effect is that we fixed a possible leak in
->> current edu device.
+>> > Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
+>> > ---
+>> >  block/qcow2.c        | 35 ++++++++++++++++++++++++++++++++++-
+>> >  qapi/block-core.json | 24 +++++++++++++++++++++++-
+>> >  2 files changed, 57 insertions(+), 2 deletions(-)
+>> > 
+>> > diff --git a/block/qcow2.c b/block/qcow2.c
+>> > index 38f9eb5..cb321a2 100644
+>> > --- a/block/qcow2.c
+>> > +++ b/block/qcow2.c
+>> > @@ -3196,8 +3196,17 @@ static int qcow2_get_info(BlockDriverState *bs, BlockDriverInfo *bdi)
+>> >  static ImageInfoSpecific *qcow2_get_specific_info(BlockDriverState *bs)
+>> >  {
+>> >      BDRVQcow2State *s = bs->opaque;
+>> > -    ImageInfoSpecific *spec_info = g_new(ImageInfoSpecific, 1);
+>> > +    ImageInfoSpecific *spec_info;
+>> > +    QCryptoBlockInfo *encrypt_info = NULL;
+>> >  
+>> > +    if (s->crypto != NULL) {
+>> > +        encrypt_info = qcrypto_block_get_info(s->crypto, NULL);
 >> 
->> Reported-by: Markus Armbruster <armbru@redhat.com>
->> Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
->> Signed-off-by: Peter Xu <peterx@redhat.com>
->> ---
->>  hw/audio/intel-hda.c               | 18 +-----------------
->>  hw/i386/amd_iommu.c                |  2 +-
->>  hw/ide/ich.c                       |  6 +-----
->>  hw/misc/edu.c                      |  4 +---
->>  hw/net/e1000e.c                    |  6 +-----
->>  hw/net/trace-events                |  1 -
->>  hw/net/vmxnet3.c                   |  8 ++------
->>  hw/pci-bridge/ioh3420.c            | 17 ++++-------------
->>  hw/pci-bridge/pci_bridge_dev.c     | 19 +------------------
->>  hw/pci-bridge/xio3130_downstream.c | 11 +++--------
->>  hw/pci-bridge/xio3130_upstream.c   | 11 +++--------
->>  hw/pci/msi.c                       | 25 ++++++-------------------
->>  hw/scsi/megasas.c                  | 18 +-----------------
->>  hw/scsi/mptsas.c                   | 20 ++------------------
->>  hw/scsi/trace-events               |  1 -
->>  hw/scsi/vmw_pvscsi.c               | 12 +++---------
->>  hw/usb/hcd-xhci.c                  | 16 +---------------
->>  hw/vfio/pci.c                      | 13 ++-----------
->>  include/hw/pci/msi.h               |  6 +++---
->>  19 files changed, 36 insertions(+), 178 deletions(-)
+>> Worth using &error_abort instead of silently ignoring the error?  Is an
+>> error even possible in our output visitor [adding Markus for reference]?
 >
-> Ping?
->
-> Just to mention in case missed - this is also a bug fix for edu
-> device.
->
-> Also CC Markus since he's the reporter and I forgot to CC him in
-> previous post. Sorry.
+> In fact the qcrypto_block_get_info() will never return an error
+> right now as implemented. So I guess we could even just remove
+> the Error **errp parameter from that call
 
-The patch indeed fixes the leak in the edu device.  It might fix similar
-cleanup errors in other devices; I didn't check.
+Do you still need advice on QAPI from me here?
 
-The interesting part is of course having devices assert the interrrupt
-controller isn't broken.  The commit message claims "MSI should be
-supported by all interrupt controllers".  Does that mean "you think it
-is supported", or does it mean "it really should be supported"?
-
-If the former, shouldn't we drop @msi_nonbroken entirely?
-
-If the latter, why is it okay to assert?
-
-The Suggested-by makes me suspect this has been explained elsewhere
-already; feel free to send me just a pointer.
+[...]
