@@ -1,24 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59362)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59322)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1dF8OX-0000A6-JL
-	for qemu-devel@nongnu.org; Sun, 28 May 2017 20:18:50 -0400
+	(envelope-from <mst@redhat.com>) id 1dF8OT-000089-EO
+	for qemu-devel@nongnu.org; Sun, 28 May 2017 20:18:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1dF8OW-0006EX-O8
-	for qemu-devel@nongnu.org; Sun, 28 May 2017 20:18:49 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:59770)
+	(envelope-from <mst@redhat.com>) id 1dF8OQ-00069Q-Cf
+	for qemu-devel@nongnu.org; Sun, 28 May 2017 20:18:45 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53664)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1dF8OW-0006EJ-FP
-	for qemu-devel@nongnu.org; Sun, 28 May 2017 20:18:48 -0400
-Date: Mon, 29 May 2017 03:18:46 +0300
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1dF8OQ-00069B-3l
+	for qemu-devel@nongnu.org; Sun, 28 May 2017 20:18:42 -0400
+Date: Mon, 29 May 2017 03:18:40 +0300
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <1496017081-24032-8-git-send-email-mst@redhat.com>
+Message-ID: <1496017081-24032-4-git-send-email-mst@redhat.com>
 References: <1496017081-24032-1-git-send-email-mst@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 In-Reply-To: <1496017081-24032-1-git-send-email-mst@redhat.com>
-Subject: [Qemu-devel] [PULL 07/13] intel_iommu: allow dev-iotlb context
- entry conditionally
+Subject: [Qemu-devel] [PULL 03/13] x86-iommu: use DeviceClass properties
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,109 +31,82 @@ Cc: Peter Maydell <peter.maydell@linaro.org>, Peter Xu <peterx@redhat.com>, Jaso
 
 From: Peter Xu <peterx@redhat.com>
 
-When device-iotlb is not specified, we should fail this check. A new
-function vtd_ce_type_check() is introduced.
-
-While I'm at it, clean up the vtd_dev_to_context_entry() a bit - replace
-many "else if" usage into direct if check. That'll make the logic more
-clear.
+No reason to keep tens of lines if we can do it actually far shorter.
 
 Signed-off-by: Peter Xu <peterx@redhat.com>
 Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 Reviewed-by: Jason Wang <jasowang@redhat.com>
 ---
- hw/i386/intel_iommu.c | 49 ++++++++++++++++++++++++++++++++++++-------------
- 1 file changed, 36 insertions(+), 13 deletions(-)
+ hw/i386/x86-iommu.c | 47 +++++++----------------------------------------
+ 1 file changed, 7 insertions(+), 40 deletions(-)
 
-diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
-index 3240e5d..aac2cc7 100644
---- a/hw/i386/intel_iommu.c
-+++ b/hw/i386/intel_iommu.c
-@@ -600,6 +600,26 @@ static inline uint32_t vtd_ce_get_type(VTDContextEntry *ce)
-     return ce->lo & VTD_CONTEXT_ENTRY_TT;
+diff --git a/hw/i386/x86-iommu.c b/hw/i386/x86-iommu.c
+index 23dcd3f..02b8825 100644
+--- a/hw/i386/x86-iommu.c
++++ b/hw/i386/x86-iommu.c
+@@ -88,55 +88,22 @@ static void x86_iommu_realize(DeviceState *dev, Error **errp)
+     x86_iommu_set_default(X86_IOMMU_DEVICE(dev));
  }
  
-+/* Return true if check passed, otherwise false */
-+static inline bool vtd_ce_type_check(X86IOMMUState *x86_iommu,
-+                                     VTDContextEntry *ce)
-+{
-+    switch (vtd_ce_get_type(ce)) {
-+    case VTD_CONTEXT_TT_MULTI_LEVEL:
-+        /* Always supported */
-+        break;
-+    case VTD_CONTEXT_TT_DEV_IOTLB:
-+        if (!x86_iommu->dt_supported) {
-+            return false;
-+        }
-+        break;
-+    default:
-+        /* Unknwon type */
-+        return false;
-+    }
-+    return true;
-+}
++static Property x86_iommu_properties[] = {
++    DEFINE_PROP_BOOL("intremap", X86IOMMUState, intr_supported, false),
++    DEFINE_PROP_BOOL("device-iotlb", X86IOMMUState, dt_supported, false),
++    DEFINE_PROP_END_OF_LIST(),
++};
 +
- static inline uint64_t vtd_iova_limit(VTDContextEntry *ce)
+ static void x86_iommu_class_init(ObjectClass *klass, void *data)
  {
-     uint32_t ce_agaw = vtd_ce_get_agaw(ce);
-@@ -836,6 +856,7 @@ static int vtd_dev_to_context_entry(IntelIOMMUState *s, uint8_t bus_num,
- {
-     VTDRootEntry re;
-     int ret_fr;
-+    X86IOMMUState *x86_iommu = X86_IOMMU_DEVICE(s);
- 
-     ret_fr = vtd_get_root_entry(s, bus_num, &re);
-     if (ret_fr) {
-@@ -846,7 +867,9 @@ static int vtd_dev_to_context_entry(IntelIOMMUState *s, uint8_t bus_num,
-         /* Not error - it's okay we don't have root entry. */
-         trace_vtd_re_not_present(bus_num);
-         return -VTD_FR_ROOT_ENTRY_P;
--    } else if (re.rsvd || (re.val & VTD_ROOT_ENTRY_RSVD)) {
-+    }
-+
-+    if (re.rsvd || (re.val & VTD_ROOT_ENTRY_RSVD)) {
-         trace_vtd_re_invalid(re.rsvd, re.val);
-         return -VTD_FR_ROOT_ENTRY_RSVD;
-     }
-@@ -860,26 +883,26 @@ static int vtd_dev_to_context_entry(IntelIOMMUState *s, uint8_t bus_num,
-         /* Not error - it's okay we don't have context entry. */
-         trace_vtd_ce_not_present(bus_num, devfn);
-         return -VTD_FR_CONTEXT_ENTRY_P;
--    } else if ((ce->hi & VTD_CONTEXT_ENTRY_RSVD_HI) ||
--               (ce->lo & VTD_CONTEXT_ENTRY_RSVD_LO)) {
-+    }
-+
-+    if ((ce->hi & VTD_CONTEXT_ENTRY_RSVD_HI) ||
-+        (ce->lo & VTD_CONTEXT_ENTRY_RSVD_LO)) {
-         trace_vtd_ce_invalid(ce->hi, ce->lo);
-         return -VTD_FR_CONTEXT_ENTRY_RSVD;
-     }
-+
-     /* Check if the programming of context-entry is valid */
-     if (!vtd_is_level_supported(s, vtd_ce_get_level(ce))) {
-         trace_vtd_ce_invalid(ce->hi, ce->lo);
-         return -VTD_FR_CONTEXT_ENTRY_INV;
--    } else {
--        switch (vtd_ce_get_type(ce)) {
--        case VTD_CONTEXT_TT_MULTI_LEVEL:
--            /* fall through */
--        case VTD_CONTEXT_TT_DEV_IOTLB:
--            break;
--        default:
--            trace_vtd_ce_invalid(ce->hi, ce->lo);
--            return -VTD_FR_CONTEXT_ENTRY_INV;
--        }
-     }
-+
-+    /* Do translation type check */
-+    if (!vtd_ce_type_check(x86_iommu, ce)) {
-+        trace_vtd_ce_invalid(ce->hi, ce->lo);
-+        return -VTD_FR_CONTEXT_ENTRY_INV;
-+    }
-+
-     return 0;
+     DeviceClass *dc = DEVICE_CLASS(klass);
+     dc->realize = x86_iommu_realize;
+-}
+-
+-static bool x86_iommu_intremap_prop_get(Object *o, Error **errp)
+-{
+-    X86IOMMUState *s = X86_IOMMU_DEVICE(o);
+-    return s->intr_supported;
+-}
+-
+-static void x86_iommu_intremap_prop_set(Object *o, bool value, Error **errp)
+-{
+-    X86IOMMUState *s = X86_IOMMU_DEVICE(o);
+-    s->intr_supported = value;
+-}
+-
+-static bool x86_iommu_device_iotlb_prop_get(Object *o, Error **errp)
+-{
+-    X86IOMMUState *s = X86_IOMMU_DEVICE(o);
+-    return s->dt_supported;
+-}
+-
+-static void x86_iommu_device_iotlb_prop_set(Object *o, bool value, Error **errp)
+-{
+-    X86IOMMUState *s = X86_IOMMU_DEVICE(o);
+-    s->dt_supported = value;
+-}
+-
+-static void x86_iommu_instance_init(Object *o)
+-{
+-    X86IOMMUState *s = X86_IOMMU_DEVICE(o);
+-
+-    /* By default, do not support IR */
+-    s->intr_supported = false;
+-    object_property_add_bool(o, "intremap", x86_iommu_intremap_prop_get,
+-                             x86_iommu_intremap_prop_set, NULL);
+-    s->dt_supported = false;
+-    object_property_add_bool(o, "device-iotlb",
+-                             x86_iommu_device_iotlb_prop_get,
+-                             x86_iommu_device_iotlb_prop_set,
+-                             NULL);
++    dc->props = x86_iommu_properties;
  }
  
+ static const TypeInfo x86_iommu_info = {
+     .name          = TYPE_X86_IOMMU_DEVICE,
+     .parent        = TYPE_SYS_BUS_DEVICE,
+-    .instance_init = x86_iommu_instance_init,
+     .instance_size = sizeof(X86IOMMUState),
+     .class_init    = x86_iommu_class_init,
+     .class_size    = sizeof(X86IOMMUClass),
 -- 
 MST
