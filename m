@@ -1,32 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56718)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58151)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dFRpI-0005ov-I2
-	for qemu-devel@nongnu.org; Mon, 29 May 2017 17:03:47 -0400
+	id 1dFRuk-0007wg-B8
+	for qemu-devel@nongnu.org; Mon, 29 May 2017 17:09:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dFRpF-00011m-Dw
-	for qemu-devel@nongnu.org; Mon, 29 May 2017 17:03:44 -0400
-Received: from mail-oi0-x244.google.com ([2607:f8b0:4003:c06::244]:32917)
+	id 1dFRuf-0002kd-Bh
+	for qemu-devel@nongnu.org; Mon, 29 May 2017 17:09:22 -0400
+Received: from mail-oi0-x243.google.com ([2607:f8b0:4003:c06::243]:33387)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dFRpF-00011h-7S
-	for qemu-devel@nongnu.org; Mon, 29 May 2017 17:03:41 -0400
-Received: by mail-oi0-x244.google.com with SMTP id h4so13109138oib.0
-	for <qemu-devel@nongnu.org>; Mon, 29 May 2017 14:03:41 -0700 (PDT)
+	id 1dFRuf-0002kU-4z
+	for qemu-devel@nongnu.org; Mon, 29 May 2017 17:09:17 -0400
+Received: by mail-oi0-x243.google.com with SMTP id h4so13125914oib.0
+	for <qemu-devel@nongnu.org>; Mon, 29 May 2017 14:09:17 -0700 (PDT)
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 References: <20170529084546.26500-1-marcandre.lureau@redhat.com>
-	<20170529084546.26500-9-marcandre.lureau@redhat.com>
+	<20170529084546.26500-11-marcandre.lureau@redhat.com>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <ae307496-fb76-e2f4-1fd7-446a5a734deb@amsat.org>
-Date: Mon, 29 May 2017 18:03:38 -0300
+Message-ID: <9da6bf4c-120f-39e8-3711-79cc0b30277c@amsat.org>
+Date: Mon, 29 May 2017 18:09:14 -0300
 MIME-Version: 1.0
-In-Reply-To: <20170529084546.26500-9-marcandre.lureau@redhat.com>
+In-Reply-To: <20170529084546.26500-11-marcandre.lureau@redhat.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v2 08/14] chardev: serial & parallel
- declaration to own headers
+Subject: Re: [Qemu-devel] [PATCH v2 10/14] char: generalize
+ qemu_chr_write_all()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,259 +38,150 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org
 Cc: pbonzini@redhat.com
 
-On 05/29/2017 05:45 AM, Marc-André Lureau wrote:
-> Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
+Hi Marc-André,
 
+On 05/29/2017 05:45 AM, Marc-André Lureau wrote:
+> qemu_chr_fe_write() is similar to qemu_chr_write_all(): the later write
+> all with a chardev backend.
+>
+> Make qemu_chr_write() and qemu_chr_fe_write_buffer() take an 'all'
+> argument. If false, handle 'partial' write the way qemu_chr_fe_write()
+> use to, and call qemu_chr_write() from qemu_chr_fe_write().
+>
+> Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
+> ---
+>  chardev/char.c | 70 +++++++++++++++++++++++-----------------------------------
+>  1 file changed, 28 insertions(+), 42 deletions(-)
+>
+> diff --git a/chardev/char.c b/chardev/char.c
+> index a747e0279a..9a7c70c7aa 100644
+> --- a/chardev/char.c
+> +++ b/chardev/char.c
+> @@ -96,7 +96,8 @@ static void qemu_chr_fe_write_log(Chardev *s,
+>  }
+>
+>  static int qemu_chr_fe_write_buffer(Chardev *s,
+> -                                    const uint8_t *buf, int len, int *offset)
+> +                                    const uint8_t *buf, int len,
+> +                                    int *offset, bool write_all)
+>  {
+>      ChardevClass *cc = CHARDEV_GET_CLASS(s);
+>      int res = 0;
+> @@ -106,7 +107,7 @@ static int qemu_chr_fe_write_buffer(Chardev *s,
+>      while (*offset < len) {
+>      retry:
+>          res = cc->chr_write(s, buf + *offset, len - *offset);
+> -        if (res < 0 && errno == EAGAIN) {
+> +        if (res < 0 && errno == EAGAIN && write_all) {
+>              g_usleep(100);
+>              goto retry;
+>          }
+> @@ -116,6 +117,9 @@ static int qemu_chr_fe_write_buffer(Chardev *s,
+>          }
+>
+>          *offset += res;
+> +        if (!write_all) {
+> +            break;
+> +        }
+>      }
+>      if (*offset > 0) {
+>          qemu_chr_fe_write_log(s, buf, *offset);
+> @@ -130,54 +134,20 @@ static bool qemu_chr_replay(Chardev *chr)
+>      return qemu_chr_has_feature(chr, QEMU_CHAR_FEATURE_REPLAY);
+>  }
+>
+> -int qemu_chr_fe_write(CharBackend *be, const uint8_t *buf, int len)
+> +static int qemu_chr_write(Chardev *s, const uint8_t *buf, int len,
+> +                          bool write_all)
+>  {
+> -    Chardev *s = be->chr;
+> -    ChardevClass *cc;
+> -    int ret;
+> -
+> -    if (!s) {
+> -        return 0;
+> -    }
+> -
+> -    if (qemu_chr_replay(s) && replay_mode == REPLAY_MODE_PLAY) {
+> -        int offset;
+> -        replay_char_write_event_load(&ret, &offset);
+> -        assert(offset <= len);
+> -        qemu_chr_fe_write_buffer(s, buf, offset, &offset);
+> -        return ret;
+> -    }
+> -
+> -    cc = CHARDEV_GET_CLASS(s);
+> -    qemu_mutex_lock(&s->chr_write_lock);
+> -    ret = cc->chr_write(s, buf, len);
+> -
+> -    if (ret > 0) {
+> -        qemu_chr_fe_write_log(s, buf, ret);
+> -    }
+> -
+> -    qemu_mutex_unlock(&s->chr_write_lock);
+> -
+> -    if (qemu_chr_replay(s) && replay_mode == REPLAY_MODE_RECORD) {
+> -        replay_char_write_event_save(ret, ret < 0 ? 0 : ret);
+> -    }
+> -
+> -    return ret;
+> -}
+> -
+> -int qemu_chr_write_all(Chardev *s, const uint8_t *buf, int len)
+> -{
+> -    int offset;
+> +    int offset = 0;
+>      int res;
+>
+>      if (qemu_chr_replay(s) && replay_mode == REPLAY_MODE_PLAY) {
+>          replay_char_write_event_load(&res, &offset);
+>          assert(offset <= len);
+> -        qemu_chr_fe_write_buffer(s, buf, offset, &offset);
+> +        qemu_chr_fe_write_buffer(s, buf, offset, &offset, true);
+>          return res;
+>      }
+>
+> -    res = qemu_chr_fe_write_buffer(s, buf, len, &offset);
+> +    res = qemu_chr_fe_write_buffer(s, buf, len, &offset, write_all);
+>
+>      if (qemu_chr_replay(s) && replay_mode == REPLAY_MODE_RECORD) {
+>          replay_char_write_event_save(res, offset);
+> @@ -189,6 +159,22 @@ int qemu_chr_write_all(Chardev *s, const uint8_t *buf, int len)
+>      return offset;
+>  }
+>
+> +int qemu_chr_write_all(Chardev *s, const uint8_t *buf, int len)
+> +{
+> +    return qemu_chr_write(s, buf, len, true);
+> +}
+> +
+> +int qemu_chr_fe_write(CharBackend *be, const uint8_t *buf, int len)
+> +{
+> +    Chardev *s = be->chr;
+> +
+> +    if (!s) {
+> +        return 0;
+> +    }
+> +
+> +    return qemu_chr_write(s, buf, len, false);
+> +}
+> +
+>  int qemu_chr_fe_write_all(CharBackend *be, const uint8_t *buf, int len)
+>  {
+>      Chardev *s = be->chr;
+> @@ -197,7 +183,7 @@ int qemu_chr_fe_write_all(CharBackend *be, const uint8_t *buf, int len)
+>          return 0;
+>      }
+>
+> -    return qemu_chr_write_all(s, buf, len);
+> +    return qemu_chr_write(s, buf, len, true);
+
+I think calling qemu_chr_write_all() is more readable.
+
+Either ways:
 Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
-> ---
->  include/chardev/char-parallel.h | 20 +++++++++++++++++++-
->  include/chardev/char-serial.h   | 22 ++++++++++++++++++++++
->  include/chardev/char.h          | 36 ------------------------------------
->  backends/wctablet.c             |  2 +-
->  hw/arm/strongarm.c              |  2 +-
->  hw/bt/hci-csr.c                 |  2 +-
->  hw/char/cadence_uart.c          |  2 +-
->  hw/char/escc.c                  |  2 +-
->  hw/char/exynos4210_uart.c       |  2 +-
->  hw/char/parallel.c              |  2 +-
->  hw/char/serial.c                |  2 +-
->  hw/usb/dev-serial.c             |  2 +-
->  12 files changed, 50 insertions(+), 46 deletions(-)
+>  }
 >
-> diff --git a/include/chardev/char-parallel.h b/include/chardev/char-parallel.h
-> index 26742f9d5c..3284a1b96b 100644
-> --- a/include/chardev/char-parallel.h
-> +++ b/include/chardev/char-parallel.h
-> @@ -24,9 +24,27 @@
->  #ifndef CHAR_PARALLEL_H
->  #define CHAR_PARALLEL_H
->
-> -#if defined(__linux__) || defined(__FreeBSD__) || \
-> +#include "chardev/char.h"
-> +
-> +#if defined(__linux__) || defined(__FreeBSD__) ||               \
->      defined(__FreeBSD_kernel__) || defined(__DragonFly__)
->  #define HAVE_CHARDEV_PARPORT 1
->  #endif
->
-> +#define CHR_IOCTL_PP_READ_DATA        3
-> +#define CHR_IOCTL_PP_WRITE_DATA       4
-> +#define CHR_IOCTL_PP_READ_CONTROL     5
-> +#define CHR_IOCTL_PP_WRITE_CONTROL    6
-> +#define CHR_IOCTL_PP_READ_STATUS      7
-> +#define CHR_IOCTL_PP_EPP_READ_ADDR    8
-> +#define CHR_IOCTL_PP_EPP_READ         9
-> +#define CHR_IOCTL_PP_EPP_WRITE_ADDR  10
-> +#define CHR_IOCTL_PP_EPP_WRITE       11
-> +#define CHR_IOCTL_PP_DATA_DIR        12
-> +
-> +struct ParallelIOArg {
-> +    void *buffer;
-> +    int count;
-> +};
-> +
->  #endif /* CHAR_PARALLEL_H */
-> diff --git a/include/chardev/char-serial.h b/include/chardev/char-serial.h
-> index 64a27f63b1..cb2e59e82a 100644
-> --- a/include/chardev/char-serial.h
-> +++ b/include/chardev/char-serial.h
-> @@ -24,6 +24,8 @@
->  #ifndef CHAR_SERIAL_H
->  #define CHAR_SERIAL_H
->
-> +#include "chardev/char.h"
-> +
->  #ifdef _WIN32
->  #define HAVE_CHARDEV_SERIAL 1
->  #elif defined(__linux__) || defined(__sun__) || defined(__FreeBSD__)    \
-> @@ -32,4 +34,24 @@
->  #define HAVE_CHARDEV_SERIAL 1
->  #endif
->
-> +#define CHR_IOCTL_SERIAL_SET_PARAMS   1
-> +typedef struct {
-> +    int speed;
-> +    int parity;
-> +    int data_bits;
-> +    int stop_bits;
-> +} QEMUSerialSetParams;
-> +
-> +#define CHR_IOCTL_SERIAL_SET_BREAK    2
-> +
-> +#define CHR_IOCTL_SERIAL_SET_TIOCM   13
-> +#define CHR_IOCTL_SERIAL_GET_TIOCM   14
-> +
-> +#define CHR_TIOCM_CTS   0x020
-> +#define CHR_TIOCM_CAR   0x040
-> +#define CHR_TIOCM_DSR   0x100
-> +#define CHR_TIOCM_RI    0x080
-> +#define CHR_TIOCM_DTR   0x002
-> +#define CHR_TIOCM_RTS   0x004
-> +
->  #endif
-> diff --git a/include/chardev/char.h b/include/chardev/char.h
-> index fffc0f40d4..95273e10ae 100644
-> --- a/include/chardev/char.h
-> +++ b/include/chardev/char.h
-> @@ -27,42 +27,6 @@ typedef enum {
->
->  #define CHR_READ_BUF_LEN 4096
->
-> -#define CHR_IOCTL_SERIAL_SET_PARAMS   1
-> -typedef struct {
-> -    int speed;
-> -    int parity;
-> -    int data_bits;
-> -    int stop_bits;
-> -} QEMUSerialSetParams;
-> -
-> -#define CHR_IOCTL_SERIAL_SET_BREAK    2
-> -
-> -#define CHR_IOCTL_PP_READ_DATA        3
-> -#define CHR_IOCTL_PP_WRITE_DATA       4
-> -#define CHR_IOCTL_PP_READ_CONTROL     5
-> -#define CHR_IOCTL_PP_WRITE_CONTROL    6
-> -#define CHR_IOCTL_PP_READ_STATUS      7
-> -#define CHR_IOCTL_PP_EPP_READ_ADDR    8
-> -#define CHR_IOCTL_PP_EPP_READ         9
-> -#define CHR_IOCTL_PP_EPP_WRITE_ADDR  10
-> -#define CHR_IOCTL_PP_EPP_WRITE       11
-> -#define CHR_IOCTL_PP_DATA_DIR        12
-> -
-> -struct ParallelIOArg {
-> -    void *buffer;
-> -    int count;
-> -};
-> -
-> -#define CHR_IOCTL_SERIAL_SET_TIOCM   13
-> -#define CHR_IOCTL_SERIAL_GET_TIOCM   14
-> -
-> -#define CHR_TIOCM_CTS	0x020
-> -#define CHR_TIOCM_CAR	0x040
-> -#define CHR_TIOCM_DSR	0x100
-> -#define CHR_TIOCM_RI	0x080
-> -#define CHR_TIOCM_DTR	0x002
-> -#define CHR_TIOCM_RTS	0x004
-> -
->  typedef void IOEventHandler(void *opaque, int event);
->
->  typedef enum {
-> diff --git a/backends/wctablet.c b/backends/wctablet.c
-> index 07a4cde956..6c13c2c58a 100644
-> --- a/backends/wctablet.c
-> +++ b/backends/wctablet.c
-> @@ -32,7 +32,7 @@
->
->  #include "qemu/osdep.h"
->  #include "qemu-common.h"
-> -#include "chardev/char.h"
-> +#include "chardev/char-serial.h"
->  #include "ui/console.h"
->  #include "ui/input.h"
->  #include "trace.h"
-> diff --git a/hw/arm/strongarm.c b/hw/arm/strongarm.c
-> index 66cad198d4..967caea749 100644
-> --- a/hw/arm/strongarm.c
-> +++ b/hw/arm/strongarm.c
-> @@ -34,7 +34,7 @@
->  #include "strongarm.h"
->  #include "qemu/error-report.h"
->  #include "hw/arm/arm.h"
-> -#include "chardev/char.h"
-> +#include "chardev/char-serial.h"
->  #include "sysemu/sysemu.h"
->  #include "hw/ssi/ssi.h"
->  #include "qemu/cutils.h"
-> diff --git a/hw/bt/hci-csr.c b/hw/bt/hci-csr.c
-> index cc2087392e..0f2021086d 100644
-> --- a/hw/bt/hci-csr.c
-> +++ b/hw/bt/hci-csr.c
-> @@ -20,7 +20,7 @@
->
->  #include "qemu/osdep.h"
->  #include "qemu-common.h"
-> -#include "chardev/char.h"
-> +#include "chardev/char-serial.h"
->  #include "qemu/timer.h"
->  #include "qemu/bswap.h"
->  #include "hw/irq.h"
-> diff --git a/hw/char/cadence_uart.c b/hw/char/cadence_uart.c
-> index cf4c1d56ff..4bfc185376 100644
-> --- a/hw/char/cadence_uart.c
-> +++ b/hw/char/cadence_uart.c
-> @@ -23,7 +23,7 @@
->
->  #include "qemu/osdep.h"
->  #include "hw/sysbus.h"
-> -#include "chardev/char.h"
-> +#include "chardev/char-serial.h"
->  #include "qemu/timer.h"
->  #include "qemu/log.h"
->  #include "hw/char/cadence_uart.h"
-> diff --git a/hw/char/escc.c b/hw/char/escc.c
-> index df89d58eed..81d792cb47 100644
-> --- a/hw/char/escc.c
-> +++ b/hw/char/escc.c
-> @@ -26,7 +26,7 @@
->  #include "hw/hw.h"
->  #include "hw/sysbus.h"
->  #include "hw/char/escc.h"
-> -#include "chardev/char.h"
-> +#include "chardev/char-serial.h"
->  #include "ui/console.h"
->  #include "ui/input.h"
->  #include "trace.h"
-> diff --git a/hw/char/exynos4210_uart.c b/hw/char/exynos4210_uart.c
-> index 94952fb90f..d93125645a 100644
-> --- a/hw/char/exynos4210_uart.c
-> +++ b/hw/char/exynos4210_uart.c
-> @@ -23,7 +23,7 @@
->  #include "hw/sysbus.h"
->  #include "qemu/error-report.h"
->  #include "sysemu/sysemu.h"
-> -#include "chardev/char.h"
-> +#include "chardev/char-serial.h"
->
->  #include "hw/arm/exynos4210.h"
->
-> diff --git a/hw/char/parallel.c b/hw/char/parallel.c
-> index c926df0bee..1d6c6e9f33 100644
-> --- a/hw/char/parallel.c
-> +++ b/hw/char/parallel.c
-> @@ -25,7 +25,7 @@
->  #include "qemu/osdep.h"
->  #include "qapi/error.h"
->  #include "hw/hw.h"
-> -#include "chardev/char.h"
-> +#include "chardev/char-parallel.h"
->  #include "hw/isa/isa.h"
->  #include "hw/i386/pc.h"
->  #include "sysemu/sysemu.h"
-> diff --git a/hw/char/serial.c b/hw/char/serial.c
-> index aa336333be..23e5fe9d18 100644
-> --- a/hw/char/serial.c
-> +++ b/hw/char/serial.c
-> @@ -25,7 +25,7 @@
->
->  #include "qemu/osdep.h"
->  #include "hw/char/serial.h"
-> -#include "chardev/char.h"
-> +#include "chardev/char-serial.h"
->  #include "qapi/error.h"
->  #include "qemu/timer.h"
->  #include "exec/address-spaces.h"
-> diff --git a/hw/usb/dev-serial.c b/hw/usb/dev-serial.c
-> index 578760e1b3..a145c919e9 100644
-> --- a/hw/usb/dev-serial.c
-> +++ b/hw/usb/dev-serial.c
-> @@ -15,7 +15,7 @@
->  #include "qemu/error-report.h"
->  #include "hw/usb.h"
->  #include "hw/usb/desc.h"
-> -#include "chardev/char.h"
-> +#include "chardev/char-serial.h"
->
->  //#define DEBUG_Serial
->
+>  int qemu_chr_fe_read_all(CharBackend *be, uint8_t *buf, int len)
 >
