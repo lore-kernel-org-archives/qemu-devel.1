@@ -1,29 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59160)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60879)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1dFRzd-0000ph-Kf
-	for qemu-devel@nongnu.org; Mon, 29 May 2017 17:14:26 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dFSA8-0003Tf-Hc
+	for qemu-devel@nongnu.org; Mon, 29 May 2017 17:25:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1dFRzY-0004Ec-MY
-	for qemu-devel@nongnu.org; Mon, 29 May 2017 17:14:25 -0400
-Received: from 19.mo5.mail-out.ovh.net ([46.105.35.78]:39360)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1dFRzY-0004EL-Bm
-	for qemu-devel@nongnu.org; Mon, 29 May 2017 17:14:20 -0400
-Received: from player799.ha.ovh.net (b9.ovh.net [213.186.33.59])
-	by mo5.mail-out.ovh.net (Postfix) with ESMTP id 992C1FF2C2
-	for <qemu-devel@nongnu.org>; Mon, 29 May 2017 23:14:18 +0200 (CEST)
-Date: Mon, 29 May 2017 23:14:08 +0200
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20170529231408.43f12e95@bahia.ttt.fr.ibm.com>
-In-Reply-To: <20170525035132.24268-12-david@gibson.dropbear.id.au>
-References: <20170525035132.24268-1-david@gibson.dropbear.id.au>
-	<20170525035132.24268-12-david@gibson.dropbear.id.au>
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dFSA2-00075t-II
+	for qemu-devel@nongnu.org; Mon, 29 May 2017 17:25:16 -0400
+Received: from mail-oi0-x244.google.com ([2607:f8b0:4003:c06::244]:36525)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dFSA2-00075V-7X
+	for qemu-devel@nongnu.org; Mon, 29 May 2017 17:25:10 -0400
+Received: by mail-oi0-x244.google.com with SMTP id w138so13145921oiw.3
+	for <qemu-devel@nongnu.org>; Mon, 29 May 2017 14:25:10 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20170529084546.26500-1-marcandre.lureau@redhat.com>
+	<20170529084546.26500-12-marcandre.lureau@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <c825313f-be3e-0fee-95d0-a716c8ac7b21@amsat.org>
+Date: Mon, 29 May 2017 18:25:06 -0300
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	boundary="Sig_/tZkoXqmSxGAaeCHBu/ph/8s";
-	protocol="application/pgp-signature"
-Subject: Re: [Qemu-devel] [Qemu-ppc] [PULL 11/18] pseries: Split CAS PVR
- negotiation out into a separate function
+In-Reply-To: <20170529084546.26500-12-marcandre.lureau@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v2 11/14] char: move CharBackend handling
+ in char-fe unit
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,155 +35,2099 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: peter.maydell@linaro.org, qemu-devel@nongnu.org, sursingh@redhat.com, mdroth@linux.vnet.ibm.com, qemu-ppc@nongnu.org, sbobroff@redhat.com
+To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org
+Cc: pbonzini@redhat.com
 
---Sig_/tZkoXqmSxGAaeCHBu/ph/8s
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+Hi Marc-André,
 
-On Thu, 25 May 2017 13:51:25 +1000
-David Gibson <david@gibson.dropbear.id.au> wrote:
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
-> Guests of the qemu machine type go through a feature negotiation process
-> known as "client architecture support" (CAS) during early boot.  This does
-> a number of things, one of which is finding a CPU compatibility mode which
-> can be supported by both guest and host.
->=20
-> In fact the CPU negotiation is probably the single most complex part of t=
-he
-> CAS process, so this splits it out into a helper function.  We've recently
-> made some mistakes in maintaining backward compatibility for old machine
-> types here.  Splitting this out will also make it easier to fix this.
->=20
-> This also adds a possibly useful error message if the negotiation fails
-> (i.e. if there isn't a CPU mode that's suitable for both guest and host).
->=20
-> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-> Reviewed-by: Laurent Vivier <lvivier@redhat.com>
-> Reviewed-by: Greg Kurz <groug@kaod.org>
+On 05/29/2017 05:45 AM, Marc-André Lureau wrote:
+> Move all the fronted struct and methods to a seperate unit. This avoids
+
+"frontend, separate"
+
+> accidentally mixing backend and frontend calls, and helps with readibilty.
+
+"readability"
+
+Indeed this patch makes it much cleaner.
+
+> Make qemu_chr_replay() a macro shared by both char and char-fe.
+>
+> Export qemu_chr_write(), and use a macro for qemu_chr_write_all()
+
+This change seems related to the previous commit, is it possible to move 
+it there?
+
+> (nb: yes, CharBackend is for char frontend :)
+>
+> Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
 > ---
-
-Any reason for not seing these patches as well in this pull request ?
-
-pseries: Restore PVR negotiation logic for  pre-2.9 machine types
-pseries: Improve tracing of CPU  compatibility negotiation
-
->  hw/ppc/spapr_hcall.c | 49 ++++++++++++++++++++++++++++++++--------------=
----
->  1 file changed, 32 insertions(+), 17 deletions(-)
->=20
-> diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
-> index 2daace4..77d2d66 100644
-> --- a/hw/ppc/spapr_hcall.c
-> +++ b/hw/ppc/spapr_hcall.c
-> @@ -1044,19 +1044,13 @@ static target_ulong h_signal_sys_reset(PowerPCCPU=
- *cpu,
->      }
->  }
-> =20
-> -static target_ulong h_client_architecture_support(PowerPCCPU *cpu,
-> -                                                  sPAPRMachineState *spa=
-pr,
-> -                                                  target_ulong opcode,
-> -                                                  target_ulong *args)
-> +static uint32_t cas_check_pvr(PowerPCCPU *cpu, target_ulong *addr,
-> +                              Error **errp)
->  {
-> -    target_ulong list =3D ppc64_phys_to_real(args[0]);
-> -    target_ulong ov_table;
->      bool explicit_match =3D false; /* Matched the CPU's real PVR */
->      uint32_t max_compat =3D cpu->max_compat;
->      uint32_t best_compat =3D 0;
->      int i;
-> -    sPAPROptionVector *ov1_guest, *ov5_guest, *ov5_cas_old, *ov5_updates;
-> -    bool guest_radix;
-> =20
->      /*
->       * We scan the supplied table of PVRs looking for two things
-> @@ -1066,9 +1060,9 @@ static target_ulong h_client_architecture_support(P=
-owerPCCPU *cpu,
->      for (i =3D 0; i < 512; ++i) {
->          uint32_t pvr, pvr_mask;
-> =20
-> -        pvr_mask =3D ldl_be_phys(&address_space_memory, list);
-> -        pvr =3D ldl_be_phys(&address_space_memory, list + 4);
-> -        list +=3D 8;
-> +        pvr_mask =3D ldl_be_phys(&address_space_memory, *addr);
-> +        pvr =3D ldl_be_phys(&address_space_memory, *addr + 4);
-> +        *addr +=3D 8;
-> =20
->          if (~pvr_mask & pvr) {
->              break; /* Terminator record */
-> @@ -1087,17 +1081,38 @@ static target_ulong h_client_architecture_support=
-(PowerPCCPU *cpu,
->          /* We couldn't find a suitable compatibility mode, and either
->           * the guest doesn't support "raw" mode for this CPU, or raw
->           * mode is disabled because a maximum compat mode is set */
-> -        return H_HARDWARE;
-> +        error_setg(errp, "Couldn't negotiate a suitable PVR during CAS");
-> +        return 0;
->      }
-> =20
->      /* Parsing finished */
->      trace_spapr_cas_pvr(cpu->compat_pvr, explicit_match, best_compat);
-> =20
-> -    /* Update CPUs */
-> -    if (cpu->compat_pvr !=3D best_compat) {
-> -        Error *local_err =3D NULL;
-> +    return best_compat;
-> +}
-> =20
-> -        ppc_set_compat_all(best_compat, &local_err);
-> +static target_ulong h_client_architecture_support(PowerPCCPU *cpu,
-> +                                                  sPAPRMachineState *spa=
-pr,
-> +                                                  target_ulong opcode,
-> +                                                  target_ulong *args)
-> +{
-> +    /* Working address in data buffer */
-> +    target_ulong addr =3D ppc64_phys_to_real(args[0]);
-> +    target_ulong ov_table;
-> +    uint32_t cas_pvr;
-> +    sPAPROptionVector *ov1_guest, *ov5_guest, *ov5_cas_old, *ov5_updates;
-> +    bool guest_radix;
-> +    Error *local_err =3D NULL;
+>  include/chardev/char-fe.h         | 249 ++++++++++++++++++++++++++
+>  include/chardev/char-mux.h        |   1 +
+>  include/chardev/char.h            | 242 +-------------------------
+>  include/hw/char/bcm2835_aux.h     |   2 +-
+>  include/hw/char/cadence_uart.h    |   2 +-
+>  include/hw/char/digic-uart.h      |   2 +-
+>  include/hw/char/imx_serial.h      |   2 +-
+>  include/hw/char/serial.h          |   2 +-
+>  include/hw/char/stm32f2xx_usart.h |   2 +-
+>  backends/rng-egd.c                |   2 +-
+>  chardev/char-fe.c                 | 358 ++++++++++++++++++++++++++++++++++++++
+>  chardev/char.c                    | 343 +-----------------------------------
+>  gdbstub.c                         |   1 +
+>  hw/arm/omap2.c                    |   2 +-
+>  hw/arm/pxa2xx.c                   |   2 +-
+>  hw/arm/strongarm.c                |   1 +
+>  hw/char/cadence_uart.c            |   1 +
+>  hw/char/debugcon.c                |   2 +-
+>  hw/char/digic-uart.c              |   2 +-
+>  hw/char/escc.c                    |   1 +
+>  hw/char/etraxfs_ser.c             |   2 +-
+>  hw/char/exynos4210_uart.c         |   1 +
+>  hw/char/grlib_apbuart.c           |   2 +-
+>  hw/char/ipoctal232.c              |   2 +-
+>  hw/char/lm32_juart.c              |   2 +-
+>  hw/char/lm32_uart.c               |   2 +-
+>  hw/char/mcf_uart.c                |   2 +-
+>  hw/char/milkymist-uart.c          |   2 +-
+>  hw/char/parallel.c                |   1 +
+>  hw/char/pl011.c                   |   2 +-
+>  hw/char/sclpconsole-lm.c          |   2 +-
+>  hw/char/sclpconsole.c             |   2 +-
+>  hw/char/sh_serial.c               |   2 +-
+>  hw/char/spapr_vty.c               |   2 +-
+>  hw/char/terminal3270.c            |   2 +-
+>  hw/char/virtio-console.c          |   2 +-
+>  hw/char/xen_console.c             |   2 +-
+>  hw/char/xilinx_uartlite.c         |   2 +-
+>  hw/core/qdev-properties-system.c  |   2 +-
+>  hw/ipmi/ipmi_bmc_extern.c         |   2 +-
+>  hw/misc/ivshmem.c                 |   2 +-
+>  hw/usb/ccid-card-passthru.c       |   2 +-
+>  hw/usb/dev-serial.c               |   1 +
+>  hw/usb/redirect.c                 |   2 +-
+>  hw/virtio/vhost-user.c            |   2 +-
+>  monitor.c                         |   2 +-
+>  net/colo-compare.c                |   2 +-
+>  net/filter-mirror.c               |   2 +-
+>  net/slirp.c                       |   2 +-
+>  net/vhost-user.c                  |   2 +-
+>  qtest.c                           |   2 +-
+>  slirp/slirp.c                     |   2 +-
+>  tests/test-char.c                 |   2 +-
+>  tests/vhost-user-test.c           |   2 +-
+>  ui/console.c                      |   2 +-
+>  chardev/Makefile.objs             |   1 +
+>  56 files changed, 664 insertions(+), 623 deletions(-)
+>  create mode 100644 include/chardev/char-fe.h
+>  create mode 100644 chardev/char-fe.c
+>
+> diff --git a/include/chardev/char-fe.h b/include/chardev/char-fe.h
+> new file mode 100644
+> index 0000000000..bd82093218
+> --- /dev/null
+> +++ b/include/chardev/char-fe.h
+> @@ -0,0 +1,249 @@
+> +#ifndef QEMU_CHAR_FE_H
+> +#define QEMU_CHAR_FE_H
 > +
-> +    cas_pvr =3D cas_check_pvr(cpu, &addr, &local_err);
-> +    if (local_err) {
-> +        error_report_err(local_err);
-> +        return H_HARDWARE;
+> +#include "chardev/char.h"
+> +
+> +typedef void IOEventHandler(void *opaque, int event);
+> +
+> +/* This is the backend as seen by frontend, the actual backend is
+> + * Chardev */
+> +struct CharBackend {
+> +    Chardev *chr;
+> +    IOEventHandler *chr_event;
+> +    IOCanReadHandler *chr_can_read;
+> +    IOReadHandler *chr_read;
+> +    void *opaque;
+> +    int tag;
+> +    int fe_open;
+> +};
+> +
+> +/**
+> + * @qemu_chr_fe_init:
+> + *
+> + * Initializes a front end for the given CharBackend and
+> + * Chardev. Call qemu_chr_fe_deinit() to remove the association and
+> + * release the driver.
+> + *
+> + * Returns: false on error.
+> + */
+> +bool qemu_chr_fe_init(CharBackend *b, Chardev *s, Error **errp);
+> +
+> +/**
+> + * @qemu_chr_fe_deinit:
+> + *
+> + * Dissociate the CharBackend from the Chardev.
+> + *
+> + * Safe to call without associated Chardev.
+> + */
+> +void qemu_chr_fe_deinit(CharBackend *b);
+> +
+> +/**
+> + * @qemu_chr_fe_get_driver:
+> + *
+> + * Returns the driver associated with a CharBackend or NULL if no
+> + * associated Chardev.
+> + */
+> +Chardev *qemu_chr_fe_get_driver(CharBackend *be);
+> +
+> +/**
+> + * @qemu_chr_fe_set_handlers:
+> + * @b: a CharBackend
+> + * @fd_can_read: callback to get the amount of data the frontend may
+> + *               receive
+> + * @fd_read: callback to receive data from char
+> + * @fd_event: event callback
+> + * @opaque: an opaque pointer for the callbacks
+> + * @context: a main loop context or NULL for the default
+> + * @set_open: whether to call qemu_chr_fe_set_open() implicitely when
+> + * any of the handler is non-NULL
+> + *
+> + * Set the front end char handlers. The front end takes the focus if
+> + * any of the handler is non-NULL.
+> + *
+> + * Without associated Chardev, nothing is changed.
+> + */
+> +void qemu_chr_fe_set_handlers(CharBackend *b,
+> +                              IOCanReadHandler *fd_can_read,
+> +                              IOReadHandler *fd_read,
+> +                              IOEventHandler *fd_event,
+> +                              void *opaque,
+> +                              GMainContext *context,
+> +                              bool set_open);
+> +
+> +/**
+> + * @qemu_chr_fe_take_focus:
+> + *
+> + * Take the focus (if the front end is muxed).
+> + *
+> + * Without associated Chardev, nothing is changed.
+> + */
+> +void qemu_chr_fe_take_focus(CharBackend *b);
+> +
+> +/**
+> + * @qemu_chr_fe_accept_input:
+> + *
+> + * Notify that the frontend is ready to receive data
+> + */
+> +void qemu_chr_fe_accept_input(CharBackend *be);
+> +
+> +/**
+> + * @qemu_chr_fe_disconnect:
+> + *
+> + * Close a fd accpeted by character backend.
+> + * Without associated Chardev, do nothing.
+> + */
+> +void qemu_chr_fe_disconnect(CharBackend *be);
+> +
+> +/**
+> + * @qemu_chr_fe_wait_connected:
+> + *
+> + * Wait for characted backend to be connected, return < 0 on error or
+> + * if no assicated Chardev.
+> + */
+> +int qemu_chr_fe_wait_connected(CharBackend *be, Error **errp);
+> +
+> +/**
+> + * @qemu_chr_fe_set_echo:
+> + *
+> + * Ask the backend to override its normal echo setting.  This only really
+> + * applies to the stdio backend and is used by the QMP server such that you
+> + * can see what you type if you try to type QMP commands.
+> + * Without associated Chardev, do nothing.
+> + *
+> + * @echo true to enable echo, false to disable echo
+> + */
+> +void qemu_chr_fe_set_echo(CharBackend *be, bool echo);
+> +
+> +/**
+> + * @qemu_chr_fe_set_open:
+> + *
+> + * Set character frontend open status.  This is an indication that the
+> + * front end is ready (or not) to begin doing I/O.
+> + * Without associated Chardev, do nothing.
+> + */
+> +void qemu_chr_fe_set_open(CharBackend *be, int fe_open);
+> +
+> +/**
+> + * @qemu_chr_fe_printf:
+> + *
+> + * Write to a character backend using a printf style interface.  This
+> + * function is thread-safe. It does nothing without associated
+> + * Chardev.
+> + *
+> + * @fmt see #printf
+> + */
+> +void qemu_chr_fe_printf(CharBackend *be, const char *fmt, ...)
+> +    GCC_FMT_ATTR(2, 3);
+> +
+> +/**
+> + * @qemu_chr_fe_add_watch:
+> + *
+> + * If the backend is connected, create and add a #GSource that fires
+> + * when the given condition (typically G_IO_OUT|G_IO_HUP or G_IO_HUP)
+> + * is active; return the #GSource's tag.  If it is disconnected,
+> + * or without associated Chardev, return 0.
+> + *
+> + * @cond the condition to poll for
+> + * @func the function to call when the condition happens
+> + * @user_data the opaque pointer to pass to @func
+> + *
+> + * Returns: the source tag
+> + */
+> +guint qemu_chr_fe_add_watch(CharBackend *be, GIOCondition cond,
+> +                            GIOFunc func, void *user_data);
+> +
+> +/**
+> + * @qemu_chr_fe_write:
+> + *
+> + * Write data to a character backend from the front end.  This function
+> + * will send data from the front end to the back end.  This function
+> + * is thread-safe.
+> + *
+> + * @buf the data
+> + * @len the number of bytes to send
+> + *
+> + * Returns: the number of bytes consumed (0 if no assicated Chardev)
+> + */
+> +int qemu_chr_fe_write(CharBackend *be, const uint8_t *buf, int len);
+> +
+> +/**
+> + * @qemu_chr_fe_write_all:
+> + *
+> + * Write data to a character backend from the front end.  This function will
+> + * send data from the front end to the back end.  Unlike @qemu_chr_fe_write,
+> + * this function will block if the back end cannot consume all of the data
+> + * attempted to be written.  This function is thread-safe.
+> + *
+> + * @buf the data
+> + * @len the number of bytes to send
+> + *
+> + * Returns: the number of bytes consumed (0 if no assicated Chardev)
+> + */
+> +int qemu_chr_fe_write_all(CharBackend *be, const uint8_t *buf, int len);
+> +
+> +/**
+> + * @qemu_chr_fe_read_all:
+> + *
+> + * Read data to a buffer from the back end.
+> + *
+> + * @buf the data buffer
+> + * @len the number of bytes to read
+> + *
+> + * Returns: the number of bytes read (0 if no assicated Chardev)
+> + */
+> +int qemu_chr_fe_read_all(CharBackend *be, uint8_t *buf, int len);
+> +
+> +/**
+> + * @qemu_chr_fe_ioctl:
+> + *
+> + * Issue a device specific ioctl to a backend.  This function is thread-safe.
+> + *
+> + * @cmd see CHR_IOCTL_*
+> + * @arg the data associated with @cmd
+> + *
+> + * Returns: if @cmd is not supported by the backend or there is no
+> + *          associated Chardev, -ENOTSUP, otherwise the return
+> + *          value depends on the semantics of @cmd
+> + */
+> +int qemu_chr_fe_ioctl(CharBackend *be, int cmd, void *arg);
+> +
+> +/**
+> + * @qemu_chr_fe_get_msgfd:
+> + *
+> + * For backends capable of fd passing, return the latest file descriptor passed
+> + * by a client.
+> + *
+> + * Returns: -1 if fd passing isn't supported or there is no pending file
+> + *          descriptor.  If a file descriptor is returned, subsequent calls to
+> + *          this function will return -1 until a client sends a new file
+> + *          descriptor.
+> + */
+> +int qemu_chr_fe_get_msgfd(CharBackend *be);
+> +
+> +/**
+> + * @qemu_chr_fe_get_msgfds:
+> + *
+> + * For backends capable of fd passing, return the number of file received
+> + * descriptors and fills the fds array up to num elements
+> + *
+> + * Returns: -1 if fd passing isn't supported or there are no pending file
+> + *          descriptors.  If file descriptors are returned, subsequent calls to
+> + *          this function will return -1 until a client sends a new set of file
+> + *          descriptors.
+> + */
+> +int qemu_chr_fe_get_msgfds(CharBackend *be, int *fds, int num);
+> +
+> +/**
+> + * @qemu_chr_fe_set_msgfds:
+> + *
+> + * For backends capable of fd passing, set an array of fds to be passed with
+> + * the next send operation.
+> + * A subsequent call to this function before calling a write function will
+> + * result in overwriting the fd array with the new value without being send.
+> + * Upon writing the message the fd array is freed.
+> + *
+> + * Returns: -1 if fd passing isn't supported or no associated Chardev.
+> + */
+> +int qemu_chr_fe_set_msgfds(CharBackend *be, int *fds, int num);
+> +
+> +#endif /* QEMU_CHAR_FE_H */
+> diff --git a/include/chardev/char-mux.h b/include/chardev/char-mux.h
+> index 45cdfc7e67..8928977897 100644
+> --- a/include/chardev/char-mux.h
+> +++ b/include/chardev/char-mux.h
+> @@ -25,6 +25,7 @@
+>  #define CHAR_MUX_H
+>
+>  #include "chardev/char.h"
+> +#include "chardev/char-fe.h"
+>
+>  extern bool muxes_realized;
+>
+> diff --git a/include/chardev/char.h b/include/chardev/char.h
+> index 95273e10ae..8a9ade4931 100644
+> --- a/include/chardev/char.h
+> +++ b/include/chardev/char.h
+> @@ -16,6 +16,7 @@
+>  #define IAC 255
+>
+>  /* character device */
+> +typedef struct CharBackend CharBackend;
+>
+>  typedef enum {
+>      CHR_EVENT_BREAK, /* serial break char */
+> @@ -27,8 +28,6 @@ typedef enum {
+>
+>  #define CHR_READ_BUF_LEN 4096
+>
+> -typedef void IOEventHandler(void *opaque, int event);
+> -
+>  typedef enum {
+>      /* Whether the chardev peer is able to close and
+>       * reopen the data channel, thus requiring support
+> @@ -44,17 +43,7 @@ typedef enum {
+>      QEMU_CHAR_FEATURE_LAST,
+>  } ChardevFeature;
+>
+> -/* This is the backend as seen by frontend, the actual backend is
+> - * Chardev */
+> -typedef struct CharBackend {
+> -    Chardev *chr;
+> -    IOEventHandler *chr_event;
+> -    IOCanReadHandler *chr_can_read;
+> -    IOReadHandler *chr_read;
+> -    void *opaque;
+> -    int tag;
+> -    int fe_open;
+> -} CharBackend;
+> +#define qemu_chr_replay(chr) qemu_chr_has_feature(chr, QEMU_CHAR_FEATURE_REPLAY)
+>
+>  struct Chardev {
+>      Object parent_obj;
+> @@ -103,15 +92,6 @@ void qemu_chr_parse_common(QemuOpts *opts, ChardevCommon *backend);
+>   */
+>  Chardev *qemu_chr_new(const char *label, const char *filename);
+>
+> -
+> -/**
+> - * @qemu_chr_fe_disconnect:
+> - *
+> - * Close a fd accpeted by character backend.
+> - * Without associated Chardev, do nothing.
+> - */
+> -void qemu_chr_fe_disconnect(CharBackend *be);
+> -
+>  /**
+>   * @qemu_chr_cleanup:
+>   *
+> @@ -120,14 +100,6 @@ void qemu_chr_fe_disconnect(CharBackend *be);
+>  void qemu_chr_cleanup(void);
+>
+>  /**
+> - * @qemu_chr_fe_wait_connected:
+> - *
+> - * Wait for characted backend to be connected, return < 0 on error or
+> - * if no assicated Chardev.
+> - */
+> -int qemu_chr_fe_wait_connected(CharBackend *be, Error **errp);
+> -
+> -/**
+>   * @qemu_chr_new_noreplay:
+>   *
+>   * Create a new character backend from a URI.
+> @@ -142,150 +114,6 @@ int qemu_chr_fe_wait_connected(CharBackend *be, Error **errp);
+>  Chardev *qemu_chr_new_noreplay(const char *label, const char *filename);
+>
+>  /**
+> - * @qemu_chr_fe_set_echo:
+> - *
+> - * Ask the backend to override its normal echo setting.  This only really
+> - * applies to the stdio backend and is used by the QMP server such that you
+> - * can see what you type if you try to type QMP commands.
+> - * Without associated Chardev, do nothing.
+> - *
+> - * @echo true to enable echo, false to disable echo
+> - */
+> -void qemu_chr_fe_set_echo(CharBackend *be, bool echo);
+> -
+> -/**
+> - * @qemu_chr_fe_set_open:
+> - *
+> - * Set character frontend open status.  This is an indication that the
+> - * front end is ready (or not) to begin doing I/O.
+> - * Without associated Chardev, do nothing.
+> - */
+> -void qemu_chr_fe_set_open(CharBackend *be, int fe_open);
+> -
+> -/**
+> - * @qemu_chr_fe_printf:
+> - *
+> - * Write to a character backend using a printf style interface.  This
+> - * function is thread-safe. It does nothing without associated
+> - * Chardev.
+> - *
+> - * @fmt see #printf
+> - */
+> -void qemu_chr_fe_printf(CharBackend *be, const char *fmt, ...)
+> -    GCC_FMT_ATTR(2, 3);
+> -
+> -/**
+> - * @qemu_chr_fe_add_watch:
+> - *
+> - * If the backend is connected, create and add a #GSource that fires
+> - * when the given condition (typically G_IO_OUT|G_IO_HUP or G_IO_HUP)
+> - * is active; return the #GSource's tag.  If it is disconnected,
+> - * or without associated Chardev, return 0.
+> - *
+> - * @cond the condition to poll for
+> - * @func the function to call when the condition happens
+> - * @user_data the opaque pointer to pass to @func
+> - *
+> - * Returns: the source tag
+> - */
+> -guint qemu_chr_fe_add_watch(CharBackend *be, GIOCondition cond,
+> -                            GIOFunc func, void *user_data);
+> -
+> -/**
+> - * @qemu_chr_fe_write:
+> - *
+> - * Write data to a character backend from the front end.  This function
+> - * will send data from the front end to the back end.  This function
+> - * is thread-safe.
+> - *
+> - * @buf the data
+> - * @len the number of bytes to send
+> - *
+> - * Returns: the number of bytes consumed (0 if no assicated Chardev)
+> - */
+> -int qemu_chr_fe_write(CharBackend *be, const uint8_t *buf, int len);
+> -
+> -/**
+> - * @qemu_chr_fe_write_all:
+> - *
+> - * Write data to a character backend from the front end.  This function will
+> - * send data from the front end to the back end.  Unlike @qemu_chr_fe_write,
+> - * this function will block if the back end cannot consume all of the data
+> - * attempted to be written.  This function is thread-safe.
+> - *
+> - * @buf the data
+> - * @len the number of bytes to send
+> - *
+> - * Returns: the number of bytes consumed (0 if no assicated Chardev)
+> - */
+> -int qemu_chr_fe_write_all(CharBackend *be, const uint8_t *buf, int len);
+> -
+> -/**
+> - * @qemu_chr_fe_read_all:
+> - *
+> - * Read data to a buffer from the back end.
+> - *
+> - * @buf the data buffer
+> - * @len the number of bytes to read
+> - *
+> - * Returns: the number of bytes read (0 if no assicated Chardev)
+> - */
+> -int qemu_chr_fe_read_all(CharBackend *be, uint8_t *buf, int len);
+> -
+> -/**
+> - * @qemu_chr_fe_ioctl:
+> - *
+> - * Issue a device specific ioctl to a backend.  This function is thread-safe.
+> - *
+> - * @cmd see CHR_IOCTL_*
+> - * @arg the data associated with @cmd
+> - *
+> - * Returns: if @cmd is not supported by the backend or there is no
+> - *          associated Chardev, -ENOTSUP, otherwise the return
+> - *          value depends on the semantics of @cmd
+> - */
+> -int qemu_chr_fe_ioctl(CharBackend *be, int cmd, void *arg);
+> -
+> -/**
+> - * @qemu_chr_fe_get_msgfd:
+> - *
+> - * For backends capable of fd passing, return the latest file descriptor passed
+> - * by a client.
+> - *
+> - * Returns: -1 if fd passing isn't supported or there is no pending file
+> - *          descriptor.  If a file descriptor is returned, subsequent calls to
+> - *          this function will return -1 until a client sends a new file
+> - *          descriptor.
+> - */
+> -int qemu_chr_fe_get_msgfd(CharBackend *be);
+> -
+> -/**
+> - * @qemu_chr_fe_get_msgfds:
+> - *
+> - * For backends capable of fd passing, return the number of file received
+> - * descriptors and fills the fds array up to num elements
+> - *
+> - * Returns: -1 if fd passing isn't supported or there are no pending file
+> - *          descriptors.  If file descriptors are returned, subsequent calls to
+> - *          this function will return -1 until a client sends a new set of file
+> - *          descriptors.
+> - */
+> -int qemu_chr_fe_get_msgfds(CharBackend *be, int *fds, int num);
+> -
+> -/**
+> - * @qemu_chr_fe_set_msgfds:
+> - *
+> - * For backends capable of fd passing, set an array of fds to be passed with
+> - * the next send operation.
+> - * A subsequent call to this function before calling a write function will
+> - * result in overwriting the fd array with the new value without being send.
+> - * Upon writing the message the fd array is freed.
+> - *
+> - * Returns: -1 if fd passing isn't supported or no associated Chardev.
+> - */
+> -int qemu_chr_fe_set_msgfds(CharBackend *be, int *fds, int num);
+> -
+> -/**
+>   * @qemu_chr_be_can_write:
+>   *
+>   * Determine how much data the front end can currently accept.  This function
+> @@ -328,69 +156,6 @@ void qemu_chr_be_write_impl(Chardev *s, uint8_t *buf, int len);
+>   */
+>  void qemu_chr_be_event(Chardev *s, int event);
+>
+> -/**
+> - * @qemu_chr_fe_init:
+> - *
+> - * Initializes a front end for the given CharBackend and
+> - * Chardev. Call qemu_chr_fe_deinit() to remove the association and
+> - * release the driver.
+> - *
+> - * Returns: false on error.
+> - */
+> -bool qemu_chr_fe_init(CharBackend *b, Chardev *s, Error **errp);
+> -
+> -/**
+> - * @qemu_chr_fe_get_driver:
+> - *
+> - * Returns the driver associated with a CharBackend or NULL if no
+> - * associated Chardev.
+> - */
+> -Chardev *qemu_chr_fe_get_driver(CharBackend *be);
+> -
+> -/**
+> - * @qemu_chr_fe_deinit:
+> - *
+> - * Dissociate the CharBackend from the Chardev.
+> - *
+> - * Safe to call without associated Chardev.
+> - */
+> -void qemu_chr_fe_deinit(CharBackend *b);
+> -
+> -/**
+> - * @qemu_chr_fe_set_handlers:
+> - * @b: a CharBackend
+> - * @fd_can_read: callback to get the amount of data the frontend may
+> - *               receive
+> - * @fd_read: callback to receive data from char
+> - * @fd_event: event callback
+> - * @opaque: an opaque pointer for the callbacks
+> - * @context: a main loop context or NULL for the default
+> - * @set_open: whether to call qemu_chr_fe_set_open() implicitely when
+> - * any of the handler is non-NULL
+> - *
+> - * Set the front end char handlers. The front end takes the focus if
+> - * any of the handler is non-NULL.
+> - *
+> - * Without associated Chardev, nothing is changed.
+> - */
+> -void qemu_chr_fe_set_handlers(CharBackend *b,
+> -                              IOCanReadHandler *fd_can_read,
+> -                              IOReadHandler *fd_read,
+> -                              IOEventHandler *fd_event,
+> -                              void *opaque,
+> -                              GMainContext *context,
+> -                              bool set_open);
+> -
+> -/**
+> - * @qemu_chr_fe_take_focus:
+> - *
+> - * Take the focus (if the front end is muxed).
+> - *
+> - * Without associated Chardev, nothing is changed.
+> - */
+> -void qemu_chr_fe_take_focus(CharBackend *b);
+> -
+> -void qemu_chr_fe_accept_input(CharBackend *be);
+>  int qemu_chr_add_client(Chardev *s, int fd);
+>  Chardev *qemu_chr_find(const char *name);
+>
+> @@ -399,7 +164,8 @@ bool qemu_chr_has_feature(Chardev *chr,
+>  void qemu_chr_set_feature(Chardev *chr,
+>                            ChardevFeature feature);
+>  QemuOpts *qemu_chr_parse_compat(const char *label, const char *filename);
+> -int qemu_chr_write_all(Chardev *s, const uint8_t *buf, int len);
+> +int qemu_chr_write(Chardev *s, const uint8_t *buf, int len, bool write_all);
+> +#define qemu_chr_write_all(s, buf, len) qemu_chr_write(s, buf, len, true)
+
+(change to move to previous commit?)
+
+>  int qemu_chr_wait_connected(Chardev *chr, Error **errp);
+>
+>  #define TYPE_CHARDEV "chardev"
+> diff --git a/include/hw/char/bcm2835_aux.h b/include/hw/char/bcm2835_aux.h
+> index 2a051c5646..cdbf7e3e37 100644
+> --- a/include/hw/char/bcm2835_aux.h
+> +++ b/include/hw/char/bcm2835_aux.h
+> @@ -9,7 +9,7 @@
+>  #define BCM2835_AUX_H
+>
+>  #include "hw/sysbus.h"
+> -#include "chardev/char.h"
+> +#include "chardev/char-fe.h"
+>
+>  #define TYPE_BCM2835_AUX "bcm2835-aux"
+>  #define BCM2835_AUX(obj) OBJECT_CHECK(BCM2835AuxState, (obj), TYPE_BCM2835_AUX)
+> diff --git a/include/hw/char/cadence_uart.h b/include/hw/char/cadence_uart.h
+> index eed7d8d358..118e3f10de 100644
+> --- a/include/hw/char/cadence_uart.h
+> +++ b/include/hw/char/cadence_uart.h
+> @@ -19,7 +19,7 @@
+>  #ifndef CADENCE_UART_H
+>
+>  #include "hw/sysbus.h"
+> -#include "chardev/char.h"
+> +#include "chardev/char-fe.h"
+>  #include "qemu/timer.h"
+>
+>  #define CADENCE_UART_RX_FIFO_SIZE           16
+> diff --git a/include/hw/char/digic-uart.h b/include/hw/char/digic-uart.h
+> index 370b48a6c5..de9a3e3551 100644
+> --- a/include/hw/char/digic-uart.h
+> +++ b/include/hw/char/digic-uart.h
+> @@ -19,7 +19,7 @@
+>  #define HW_CHAR_DIGIC_UART_H
+>
+>  #include "hw/sysbus.h"
+> -#include "chardev/char.h"
+> +#include "chardev/char-fe.h"
+>
+>  #define TYPE_DIGIC_UART "digic-uart"
+>  #define DIGIC_UART(obj) \
+> diff --git a/include/hw/char/imx_serial.h b/include/hw/char/imx_serial.h
+> index 05500f5346..baeec3183f 100644
+> --- a/include/hw/char/imx_serial.h
+> +++ b/include/hw/char/imx_serial.h
+> @@ -19,7 +19,7 @@
+>  #define IMX_SERIAL_H
+>
+>  #include "hw/sysbus.h"
+> -#include "chardev/char.h"
+> +#include "chardev/char-fe.h"
+>
+>  #define TYPE_IMX_SERIAL "imx.serial"
+>  #define IMX_SERIAL(obj) OBJECT_CHECK(IMXSerialState, (obj), TYPE_IMX_SERIAL)
+> diff --git a/include/hw/char/serial.h b/include/hw/char/serial.h
+> index 01dcd2a8d2..c4daf11a14 100644
+> --- a/include/hw/char/serial.h
+> +++ b/include/hw/char/serial.h
+> @@ -28,7 +28,7 @@
+>
+>  #include "hw/hw.h"
+>  #include "sysemu/sysemu.h"
+> -#include "chardev/char.h"
+> +#include "chardev/char-fe.h"
+>  #include "exec/memory.h"
+>  #include "qemu/fifo8.h"
+>  #include "chardev/char.h"
+> diff --git a/include/hw/char/stm32f2xx_usart.h b/include/hw/char/stm32f2xx_usart.h
+> index 4259dbeb1e..9d03a7527c 100644
+> --- a/include/hw/char/stm32f2xx_usart.h
+> +++ b/include/hw/char/stm32f2xx_usart.h
+> @@ -26,7 +26,7 @@
+>  #define HW_STM32F2XX_USART_H
+>
+>  #include "hw/sysbus.h"
+> -#include "chardev/char.h"
+> +#include "chardev/char-fe.h"
+>  #include "hw/hw.h"
+>
+>  #define USART_SR   0x00
+> diff --git a/backends/rng-egd.c b/backends/rng-egd.c
+> index 5448f6e5f5..ad3e1e5edf 100644
+> --- a/backends/rng-egd.c
+> +++ b/backends/rng-egd.c
+> @@ -12,7 +12,7 @@
+>
+>  #include "qemu/osdep.h"
+>  #include "sysemu/rng.h"
+> -#include "chardev/char.h"
+> +#include "chardev/char-fe.h"
+>  #include "qapi/error.h"
+>  #include "qapi/qmp/qerror.h"
+>
+> diff --git a/chardev/char-fe.c b/chardev/char-fe.c
+> new file mode 100644
+> index 0000000000..341221d029
+> --- /dev/null
+> +++ b/chardev/char-fe.c
+> @@ -0,0 +1,358 @@
+> +/*
+> + * QEMU System Emulator
+> + *
+> + * Copyright (c) 2003-2008 Fabrice Bellard
+> + *
+> + * Permission is hereby granted, free of charge, to any person obtaining a copy
+> + * of this software and associated documentation files (the "Software"), to deal
+> + * in the Software without restriction, including without limitation the rights
+> + * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+> + * copies of the Software, and to permit persons to whom the Software is
+> + * furnished to do so, subject to the following conditions:
+> + *
+> + * The above copyright notice and this permission notice shall be included in
+> + * all copies or substantial portions of the Software.
+> + *
+> + * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+> + * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+> + * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+> + * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+> + * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+> + * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+> + * THE SOFTWARE.
+> + */
+> +#include "qemu/osdep.h"
+> +#include "qemu/error-report.h"
+> +#include "qapi/error.h"
+> +#include "qapi-visit.h"
+> +#include "sysemu/replay.h"
+> +
+> +#include "chardev/char-fe.h"
+> +#include "chardev/char-io.h"
+> +#include "chardev/char-mux.h"
+> +
+> +int qemu_chr_fe_write(CharBackend *be, const uint8_t *buf, int len)
+> +{
+> +    Chardev *s = be->chr;
+> +
+> +    if (!s) {
+> +        return 0;
 > +    }
 > +
-> +    /* Update CPUs */
-> +    if (cpu->compat_pvr !=3D cas_pvr) {
-> +        ppc_set_compat_all(cas_pvr, &local_err);
->          if (local_err) {
->              error_report_err(local_err);
->              return H_HARDWARE;
-> @@ -1105,7 +1120,7 @@ static target_ulong h_client_architecture_support(P=
-owerPCCPU *cpu,
+> +    return qemu_chr_write(s, buf, len, false);
+> +}
+> +
+> +int qemu_chr_fe_write_all(CharBackend *be, const uint8_t *buf, int len)
+> +{
+> +    Chardev *s = be->chr;
+> +
+> +    if (!s) {
+> +        return 0;
+> +    }
+> +
+> +    return qemu_chr_write(s, buf, len, true);
+> +}
+> +
+> +int qemu_chr_fe_read_all(CharBackend *be, uint8_t *buf, int len)
+> +{
+> +    Chardev *s = be->chr;
+> +    int offset = 0, counter = 10;
+> +    int res;
+> +
+> +    if (!s || !CHARDEV_GET_CLASS(s)->chr_sync_read) {
+> +        return 0;
+> +    }
+> +
+> +    if (qemu_chr_replay(s) && replay_mode == REPLAY_MODE_PLAY) {
+> +        return replay_char_read_all_load(buf);
+> +    }
+> +
+> +    while (offset < len) {
+> +    retry:
+> +        res = CHARDEV_GET_CLASS(s)->chr_sync_read(s, buf + offset,
+> +                                                  len - offset);
+> +        if (res == -1 && errno == EAGAIN) {
+> +            g_usleep(100);
+> +            goto retry;
+> +        }
+> +
+> +        if (res == 0) {
+> +            break;
+> +        }
+> +
+> +        if (res < 0) {
+> +            if (qemu_chr_replay(s) && replay_mode == REPLAY_MODE_RECORD) {
+> +                replay_char_read_all_save_error(res);
+> +            }
+> +            return res;
+> +        }
+> +
+> +        offset += res;
+> +
+> +        if (!counter--) {
+> +            break;
+> +        }
+> +    }
+> +
+> +    if (qemu_chr_replay(s) && replay_mode == REPLAY_MODE_RECORD) {
+> +        replay_char_read_all_save_buf(buf, offset);
+> +    }
+> +    return offset;
+> +}
+> +
+> +int qemu_chr_fe_ioctl(CharBackend *be, int cmd, void *arg)
+> +{
+> +    Chardev *s = be->chr;
+> +    int res;
+> +
+> +    if (!s || !CHARDEV_GET_CLASS(s)->chr_ioctl || qemu_chr_replay(s)) {
+> +        res = -ENOTSUP;
+> +    } else {
+> +        res = CHARDEV_GET_CLASS(s)->chr_ioctl(s, cmd, arg);
+> +    }
+> +
+> +    return res;
+> +}
+> +
+> +int qemu_chr_fe_get_msgfd(CharBackend *be)
+> +{
+> +    Chardev *s = be->chr;
+> +    int fd;
+> +    int res = (qemu_chr_fe_get_msgfds(be, &fd, 1) == 1) ? fd : -1;
+> +    if (s && qemu_chr_replay(s)) {
+> +        error_report("Replay: get msgfd is not supported "
+> +                     "for serial devices yet");
+> +        exit(1);
+> +    }
+> +    return res;
+> +}
+> +
+> +int qemu_chr_fe_get_msgfds(CharBackend *be, int *fds, int len)
+> +{
+> +    Chardev *s = be->chr;
+> +
+> +    if (!s) {
+> +        return -1;
+> +    }
+> +
+> +    return CHARDEV_GET_CLASS(s)->get_msgfds ?
+> +        CHARDEV_GET_CLASS(s)->get_msgfds(s, fds, len) : -1;
+> +}
+> +
+> +int qemu_chr_fe_set_msgfds(CharBackend *be, int *fds, int num)
+> +{
+> +    Chardev *s = be->chr;
+> +
+> +    if (!s) {
+> +        return -1;
+> +    }
+> +
+> +    return CHARDEV_GET_CLASS(s)->set_msgfds ?
+> +        CHARDEV_GET_CLASS(s)->set_msgfds(s, fds, num) : -1;
+> +}
+> +
+> +void qemu_chr_fe_accept_input(CharBackend *be)
+> +{
+> +    Chardev *s = be->chr;
+> +
+> +    if (!s) {
+> +        return;
+> +    }
+> +
+> +    if (CHARDEV_GET_CLASS(s)->chr_accept_input) {
+> +        CHARDEV_GET_CLASS(s)->chr_accept_input(s);
+> +    }
+> +    qemu_notify_event();
+> +}
+> +
+> +void qemu_chr_fe_printf(CharBackend *be, const char *fmt, ...)
+> +{
+> +    char buf[CHR_READ_BUF_LEN];
+> +    va_list ap;
+> +    va_start(ap, fmt);
+> +    vsnprintf(buf, sizeof(buf), fmt, ap);
+> +    /* XXX this blocks entire thread. Rewrite to use
+> +     * qemu_chr_fe_write and background I/O callbacks */
+> +    qemu_chr_fe_write_all(be, (uint8_t *)buf, strlen(buf));
+> +    va_end(ap);
+> +}
+> +
+> +Chardev *qemu_chr_fe_get_driver(CharBackend *be)
+> +{
+> +    return be->chr;
+> +}
+> +
+> +bool qemu_chr_fe_init(CharBackend *b, Chardev *s, Error **errp)
+> +{
+> +    int tag = 0;
+> +
+> +    if (CHARDEV_IS_MUX(s)) {
+> +        MuxChardev *d = MUX_CHARDEV(s);
+> +
+> +        if (d->mux_cnt >= MAX_MUX) {
+> +            goto unavailable;
+> +        }
+> +
+> +        d->backends[d->mux_cnt] = b;
+> +        tag = d->mux_cnt++;
+> +    } else if (s->be) {
+> +        goto unavailable;
+> +    } else {
+> +        s->be = b;
+> +    }
+> +
+> +    b->fe_open = false;
+> +    b->tag = tag;
+> +    b->chr = s;
+> +    return true;
+> +
+> +unavailable:
+> +    error_setg(errp, QERR_DEVICE_IN_USE, s->label);
+> +    return false;
+> +}
+> +
+> +void qemu_chr_fe_deinit(CharBackend *b)
+> +{
+> +    assert(b);
+> +
+> +    if (b->chr) {
+> +        qemu_chr_fe_set_handlers(b, NULL, NULL, NULL, NULL, NULL, true);
+> +        if (b->chr->be == b) {
+> +            b->chr->be = NULL;
+> +        }
+> +        if (CHARDEV_IS_MUX(b->chr)) {
+> +            MuxChardev *d = MUX_CHARDEV(b->chr);
+> +            d->backends[b->tag] = NULL;
+> +        }
+> +        b->chr = NULL;
+> +    }
+> +}
+> +
+> +void qemu_chr_fe_set_handlers(CharBackend *b,
+> +                              IOCanReadHandler *fd_can_read,
+> +                              IOReadHandler *fd_read,
+> +                              IOEventHandler *fd_event,
+> +                              void *opaque,
+> +                              GMainContext *context,
+> +                              bool set_open)
+> +{
+> +    Chardev *s;
+> +    ChardevClass *cc;
+> +    int fe_open;
+> +
+> +    s = b->chr;
+> +    if (!s) {
+> +        return;
+> +    }
+> +
+> +    cc = CHARDEV_GET_CLASS(s);
+> +    if (!opaque && !fd_can_read && !fd_read && !fd_event) {
+> +        fe_open = 0;
+> +        remove_fd_in_watch(s);
+> +    } else {
+> +        fe_open = 1;
+> +    }
+> +    b->chr_can_read = fd_can_read;
+> +    b->chr_read = fd_read;
+> +    b->chr_event = fd_event;
+> +    b->opaque = opaque;
+> +    if (cc->chr_update_read_handler) {
+> +        cc->chr_update_read_handler(s, context);
+> +    }
+> +
+> +    if (set_open) {
+> +        qemu_chr_fe_set_open(b, fe_open);
+> +    }
+> +
+> +    if (fe_open) {
+> +        qemu_chr_fe_take_focus(b);
+> +        /* We're connecting to an already opened device, so let's make sure we
+> +           also get the open event */
+> +        if (s->be_open) {
+> +            qemu_chr_be_event(s, CHR_EVENT_OPENED);
+> +        }
+> +    }
+> +
+> +    if (CHARDEV_IS_MUX(s)) {
+> +        mux_chr_set_handlers(s, context);
+> +    }
+> +}
+> +
+> +void qemu_chr_fe_take_focus(CharBackend *b)
+> +{
+> +    if (!b->chr) {
+> +        return;
+> +    }
+> +
+> +    if (CHARDEV_IS_MUX(b->chr)) {
+> +        mux_set_focus(b->chr, b->tag);
+> +    }
+> +}
+> +
+> +int qemu_chr_fe_wait_connected(CharBackend *be, Error **errp)
+> +{
+> +    if (!be->chr) {
+> +        error_setg(errp, "missing associated backend");
+> +        return -1;
+> +    }
+> +
+> +    return qemu_chr_wait_connected(be->chr, errp);
+> +}
+> +
+> +void qemu_chr_fe_set_echo(CharBackend *be, bool echo)
+> +{
+> +    Chardev *chr = be->chr;
+> +
+> +    if (chr && CHARDEV_GET_CLASS(chr)->chr_set_echo) {
+> +        CHARDEV_GET_CLASS(chr)->chr_set_echo(chr, echo);
+> +    }
+> +}
+> +
+> +void qemu_chr_fe_set_open(CharBackend *be, int fe_open)
+> +{
+> +    Chardev *chr = be->chr;
+> +
+> +    if (!chr) {
+> +        return;
+> +    }
+> +
+> +    if (be->fe_open == fe_open) {
+> +        return;
+> +    }
+> +    be->fe_open = fe_open;
+> +    if (CHARDEV_GET_CLASS(chr)->chr_set_fe_open) {
+> +        CHARDEV_GET_CLASS(chr)->chr_set_fe_open(chr, fe_open);
+> +    }
+> +}
+> +
+> +guint qemu_chr_fe_add_watch(CharBackend *be, GIOCondition cond,
+> +                            GIOFunc func, void *user_data)
+> +{
+> +    Chardev *s = be->chr;
+> +    GSource *src;
+> +    guint tag;
+> +
+> +    if (!s || CHARDEV_GET_CLASS(s)->chr_add_watch == NULL) {
+> +        return 0;
+> +    }
+> +
+> +    src = CHARDEV_GET_CLASS(s)->chr_add_watch(s, cond);
+> +    if (!src) {
+> +        return 0;
+> +    }
+> +
+> +    g_source_set_callback(src, (GSourceFunc)func, user_data, NULL);
+> +    tag = g_source_attach(src, NULL);
+> +    g_source_unref(src);
+> +
+> +    return tag;
+> +}
+> +
+> +void qemu_chr_fe_disconnect(CharBackend *be)
+> +{
+> +    Chardev *chr = be->chr;
+> +
+> +    if (chr && CHARDEV_GET_CLASS(chr)->chr_disconnect) {
+> +        CHARDEV_GET_CLASS(chr)->chr_disconnect(chr);
+> +    }
+> +}
+> diff --git a/chardev/char.c b/chardev/char.c
+> index 9a7c70c7aa..3d5316166e 100644
+> --- a/chardev/char.c
+> +++ b/chardev/char.c
+> @@ -22,7 +22,6 @@
+>   * THE SOFTWARE.
+>   */
+>  #include "qemu/osdep.h"
+> -#include "qemu-common.h"
+>  #include "qemu/cutils.h"
+>  #include "monitor/monitor.h"
+>  #include "sysemu/sysemu.h"
+> @@ -35,9 +34,6 @@
+>  #include "qemu/help_option.h"
+>
+>  #include "chardev/char-mux.h"
+> -#include "chardev/char-io.h"
+> -#include "chardev/char-parallel.h"
+> -#include "chardev/char-serial.h"
+>
+>  /***********************************************************/
+>  /* character device */
+> @@ -129,13 +125,7 @@ static int qemu_chr_fe_write_buffer(Chardev *s,
+>      return res;
+>  }
+>
+> -static bool qemu_chr_replay(Chardev *chr)
+> -{
+> -    return qemu_chr_has_feature(chr, QEMU_CHAR_FEATURE_REPLAY);
+> -}
+> -
+> -static int qemu_chr_write(Chardev *s, const uint8_t *buf, int len,
+> -                          bool write_all)
+> +int qemu_chr_write(Chardev *s, const uint8_t *buf, int len, bool write_all)
+>  {
+>      int offset = 0;
+>      int res;
+> @@ -159,94 +149,6 @@ static int qemu_chr_write(Chardev *s, const uint8_t *buf, int len,
+>      return offset;
+>  }
+>
+> -int qemu_chr_write_all(Chardev *s, const uint8_t *buf, int len)
+> -{
+> -    return qemu_chr_write(s, buf, len, true);
+> -}
+> -
+> -int qemu_chr_fe_write(CharBackend *be, const uint8_t *buf, int len)
+> -{
+> -    Chardev *s = be->chr;
+> -
+> -    if (!s) {
+> -        return 0;
+> -    }
+> -
+> -    return qemu_chr_write(s, buf, len, false);
+> -}
+> -
+> -int qemu_chr_fe_write_all(CharBackend *be, const uint8_t *buf, int len)
+> -{
+> -    Chardev *s = be->chr;
+> -
+> -    if (!s) {
+> -        return 0;
+> -    }
+> -
+> -    return qemu_chr_write(s, buf, len, true);
+> -}
+> -
+> -int qemu_chr_fe_read_all(CharBackend *be, uint8_t *buf, int len)
+> -{
+> -    Chardev *s = be->chr;
+> -    int offset = 0, counter = 10;
+> -    int res;
+> -
+> -    if (!s || !CHARDEV_GET_CLASS(s)->chr_sync_read) {
+> -        return 0;
+> -    }
+> -
+> -    if (qemu_chr_replay(s) && replay_mode == REPLAY_MODE_PLAY) {
+> -        return replay_char_read_all_load(buf);
+> -    }
+> -
+> -    while (offset < len) {
+> -    retry:
+> -        res = CHARDEV_GET_CLASS(s)->chr_sync_read(s, buf + offset,
+> -                                                  len - offset);
+> -        if (res == -1 && errno == EAGAIN) {
+> -            g_usleep(100);
+> -            goto retry;
+> -        }
+> -
+> -        if (res == 0) {
+> -            break;
+> -        }
+> -
+> -        if (res < 0) {
+> -            if (qemu_chr_replay(s) && replay_mode == REPLAY_MODE_RECORD) {
+> -                replay_char_read_all_save_error(res);
+> -            }
+> -            return res;
+> -        }
+> -
+> -        offset += res;
+> -
+> -        if (!counter--) {
+> -            break;
+> -        }
+> -    }
+> -
+> -    if (qemu_chr_replay(s) && replay_mode == REPLAY_MODE_RECORD) {
+> -        replay_char_read_all_save_buf(buf, offset);
+> -    }
+> -    return offset;
+> -}
+> -
+> -int qemu_chr_fe_ioctl(CharBackend *be, int cmd, void *arg)
+> -{
+> -    Chardev *s = be->chr;
+> -    int res;
+> -
+> -    if (!s || !CHARDEV_GET_CLASS(s)->chr_ioctl || qemu_chr_replay(s)) {
+> -        res = -ENOTSUP;
+> -    } else {
+> -        res = CHARDEV_GET_CLASS(s)->chr_ioctl(s, cmd, arg);
+> -    }
+> -
+> -    return res;
+> -}
+> -
+>  int qemu_chr_be_can_write(Chardev *s)
+>  {
+>      CharBackend *be = s->be;
+> @@ -279,75 +181,12 @@ void qemu_chr_be_write(Chardev *s, uint8_t *buf, int len)
 >      }
-> =20
->      /* For the future use: here @ov_table points to the first option vec=
-tor */
-> -    ov_table =3D list;
-> +    ov_table =3D addr;
-> =20
->      ov1_guest =3D spapr_ovec_parse_vector(ov_table, 1);
->      ov5_guest =3D spapr_ovec_parse_vector(ov_table, 5);
-
-
---Sig_/tZkoXqmSxGAaeCHBu/ph/8s
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-
-iEYEARECAAYFAlksjyAACgkQAvw66wEB28Il/wCcDMygQeVdrwhyEF8eTlbMlT0a
-358AoIXXOLZ35lnqMWnaenSo8tk1Kos/
-=D/0P
------END PGP SIGNATURE-----
-
---Sig_/tZkoXqmSxGAaeCHBu/ph/8s--
+>  }
+>
+> -int qemu_chr_fe_get_msgfd(CharBackend *be)
+> -{
+> -    Chardev *s = be->chr;
+> -    int fd;
+> -    int res = (qemu_chr_fe_get_msgfds(be, &fd, 1) == 1) ? fd : -1;
+> -    if (s && qemu_chr_replay(s)) {
+> -        error_report("Replay: get msgfd is not supported "
+> -                     "for serial devices yet");
+> -        exit(1);
+> -    }
+> -    return res;
+> -}
+> -
+> -int qemu_chr_fe_get_msgfds(CharBackend *be, int *fds, int len)
+> -{
+> -    Chardev *s = be->chr;
+> -
+> -    if (!s) {
+> -        return -1;
+> -    }
+> -
+> -    return CHARDEV_GET_CLASS(s)->get_msgfds ?
+> -        CHARDEV_GET_CLASS(s)->get_msgfds(s, fds, len) : -1;
+> -}
+> -
+> -int qemu_chr_fe_set_msgfds(CharBackend *be, int *fds, int num)
+> -{
+> -    Chardev *s = be->chr;
+> -
+> -    if (!s) {
+> -        return -1;
+> -    }
+> -
+> -    return CHARDEV_GET_CLASS(s)->set_msgfds ?
+> -        CHARDEV_GET_CLASS(s)->set_msgfds(s, fds, num) : -1;
+> -}
+> -
+>  int qemu_chr_add_client(Chardev *s, int fd)
+>  {
+>      return CHARDEV_GET_CLASS(s)->chr_add_client ?
+>          CHARDEV_GET_CLASS(s)->chr_add_client(s, fd) : -1;
+>  }
+>
+> -void qemu_chr_fe_accept_input(CharBackend *be)
+> -{
+> -    Chardev *s = be->chr;
+> -
+> -    if (!s) {
+> -        return;
+> -    }
+> -
+> -    if (CHARDEV_GET_CLASS(s)->chr_accept_input) {
+> -        CHARDEV_GET_CLASS(s)->chr_accept_input(s);
+> -    }
+> -    qemu_notify_event();
+> -}
+> -
+> -void qemu_chr_fe_printf(CharBackend *be, const char *fmt, ...)
+> -{
+> -    char buf[CHR_READ_BUF_LEN];
+> -    va_list ap;
+> -    va_start(ap, fmt);
+> -    vsnprintf(buf, sizeof(buf), fmt, ap);
+> -    /* XXX this blocks entire thread. Rewrite to use
+> -     * qemu_chr_fe_write and background I/O callbacks */
+> -    qemu_chr_fe_write_all(be, (uint8_t *)buf, strlen(buf));
+> -    va_end(ap);
+> -}
+> -
+>  static void qemu_char_open(Chardev *chr, ChardevBackend *backend,
+>                             bool *be_opened, Error **errp)
+>  {
+> @@ -459,40 +298,6 @@ static Notifier muxes_realize_notify = {
+>      .notify = muxes_realize_done,
+>  };
+>
+> -Chardev *qemu_chr_fe_get_driver(CharBackend *be)
+> -{
+> -    return be->chr;
+> -}
+> -
+> -bool qemu_chr_fe_init(CharBackend *b, Chardev *s, Error **errp)
+> -{
+> -    int tag = 0;
+> -
+> -    if (CHARDEV_IS_MUX(s)) {
+> -        MuxChardev *d = MUX_CHARDEV(s);
+> -
+> -        if (d->mux_cnt >= MAX_MUX) {
+> -            goto unavailable;
+> -        }
+> -
+> -        d->backends[d->mux_cnt] = b;
+> -        tag = d->mux_cnt++;
+> -    } else if (s->be) {
+> -        goto unavailable;
+> -    } else {
+> -        s->be = b;
+> -    }
+> -
+> -    b->fe_open = false;
+> -    b->tag = tag;
+> -    b->chr = s;
+> -    return true;
+> -
+> -unavailable:
+> -    error_setg(errp, QERR_DEVICE_IN_USE, s->label);
+> -    return false;
+> -}
+> -
+>  static bool qemu_chr_is_busy(Chardev *s)
+>  {
+>      if (CHARDEV_IS_MUX(s)) {
+> @@ -503,84 +308,6 @@ static bool qemu_chr_is_busy(Chardev *s)
+>      }
+>  }
+>
+> -void qemu_chr_fe_deinit(CharBackend *b)
+> -{
+> -    assert(b);
+> -
+> -    if (b->chr) {
+> -        qemu_chr_fe_set_handlers(b, NULL, NULL, NULL, NULL, NULL, true);
+> -        if (b->chr->be == b) {
+> -            b->chr->be = NULL;
+> -        }
+> -        if (CHARDEV_IS_MUX(b->chr)) {
+> -            MuxChardev *d = MUX_CHARDEV(b->chr);
+> -            d->backends[b->tag] = NULL;
+> -        }
+> -        b->chr = NULL;
+> -    }
+> -}
+> -
+> -void qemu_chr_fe_set_handlers(CharBackend *b,
+> -                              IOCanReadHandler *fd_can_read,
+> -                              IOReadHandler *fd_read,
+> -                              IOEventHandler *fd_event,
+> -                              void *opaque,
+> -                              GMainContext *context,
+> -                              bool set_open)
+> -{
+> -    Chardev *s;
+> -    ChardevClass *cc;
+> -    int fe_open;
+> -
+> -    s = b->chr;
+> -    if (!s) {
+> -        return;
+> -    }
+> -
+> -    cc = CHARDEV_GET_CLASS(s);
+> -    if (!opaque && !fd_can_read && !fd_read && !fd_event) {
+> -        fe_open = 0;
+> -        remove_fd_in_watch(s);
+> -    } else {
+> -        fe_open = 1;
+> -    }
+> -    b->chr_can_read = fd_can_read;
+> -    b->chr_read = fd_read;
+> -    b->chr_event = fd_event;
+> -    b->opaque = opaque;
+> -    if (cc->chr_update_read_handler) {
+> -        cc->chr_update_read_handler(s, context);
+> -    }
+> -
+> -    if (set_open) {
+> -        qemu_chr_fe_set_open(b, fe_open);
+> -    }
+> -
+> -    if (fe_open) {
+> -        qemu_chr_fe_take_focus(b);
+> -        /* We're connecting to an already opened device, so let's make sure we
+> -           also get the open event */
+> -        if (s->be_open) {
+> -            qemu_chr_be_event(s, CHR_EVENT_OPENED);
+> -        }
+> -    }
+> -
+> -    if (CHARDEV_IS_MUX(s)) {
+> -        mux_chr_set_handlers(s, context);
+> -    }
+> -}
+> -
+> -void qemu_chr_fe_take_focus(CharBackend *b)
+> -{
+> -    if (!b->chr) {
+> -        return;
+> -    }
+> -
+> -    if (CHARDEV_IS_MUX(b->chr)) {
+> -        mux_set_focus(b->chr, b->tag);
+> -    }
+> -}
+> -
+>  int qemu_chr_wait_connected(Chardev *chr, Error **errp)
+>  {
+>      ChardevClass *cc = CHARDEV_GET_CLASS(chr);
+> @@ -592,16 +319,6 @@ int qemu_chr_wait_connected(Chardev *chr, Error **errp)
+>      return 0;
+>  }
+>
+> -int qemu_chr_fe_wait_connected(CharBackend *be, Error **errp)
+> -{
+> -    if (!be->chr) {
+> -        error_setg(errp, "missing associated backend");
+> -        return -1;
+> -    }
+> -
+> -    return qemu_chr_wait_connected(be->chr, errp);
+> -}
+> -
+>  QemuOpts *qemu_chr_parse_compat(const char *label, const char *filename)
+>  {
+>      char host[65], port[33], width[8], height[8];
+> @@ -978,64 +695,6 @@ Chardev *qemu_chr_new(const char *label, const char *filename)
+>      return chr;
+>  }
+>
+> -void qemu_chr_fe_set_echo(CharBackend *be, bool echo)
+> -{
+> -    Chardev *chr = be->chr;
+> -
+> -    if (chr && CHARDEV_GET_CLASS(chr)->chr_set_echo) {
+> -        CHARDEV_GET_CLASS(chr)->chr_set_echo(chr, echo);
+> -    }
+> -}
+> -
+> -void qemu_chr_fe_set_open(CharBackend *be, int fe_open)
+> -{
+> -    Chardev *chr = be->chr;
+> -
+> -    if (!chr) {
+> -        return;
+> -    }
+> -
+> -    if (be->fe_open == fe_open) {
+> -        return;
+> -    }
+> -    be->fe_open = fe_open;
+> -    if (CHARDEV_GET_CLASS(chr)->chr_set_fe_open) {
+> -        CHARDEV_GET_CLASS(chr)->chr_set_fe_open(chr, fe_open);
+> -    }
+> -}
+> -
+> -guint qemu_chr_fe_add_watch(CharBackend *be, GIOCondition cond,
+> -                            GIOFunc func, void *user_data)
+> -{
+> -    Chardev *s = be->chr;
+> -    GSource *src;
+> -    guint tag;
+> -
+> -    if (!s || CHARDEV_GET_CLASS(s)->chr_add_watch == NULL) {
+> -        return 0;
+> -    }
+> -
+> -    src = CHARDEV_GET_CLASS(s)->chr_add_watch(s, cond);
+> -    if (!src) {
+> -        return 0;
+> -    }
+> -
+> -    g_source_set_callback(src, (GSourceFunc)func, user_data, NULL);
+> -    tag = g_source_attach(src, NULL);
+> -    g_source_unref(src);
+> -
+> -    return tag;
+> -}
+> -
+> -void qemu_chr_fe_disconnect(CharBackend *be)
+> -{
+> -    Chardev *chr = be->chr;
+> -
+> -    if (chr && CHARDEV_GET_CLASS(chr)->chr_disconnect) {
+> -        CHARDEV_GET_CLASS(chr)->chr_disconnect(chr);
+> -    }
+> -}
+> -
+>  static int qmp_query_chardev_foreach(Object *obj, void *data)
+>  {
+>      Chardev *chr = CHARDEV(obj);
+> diff --git a/gdbstub.c b/gdbstub.c
+> index 6515c635dc..4251d23898 100644
+> --- a/gdbstub.c
+> +++ b/gdbstub.c
+> @@ -26,6 +26,7 @@
+>  #else
+>  #include "monitor/monitor.h"
+>  #include "chardev/char.h"
+> +#include "chardev/char-fe.h"
+>  #include "sysemu/sysemu.h"
+>  #include "exec/gdbstub.h"
+>  #endif
+> diff --git a/hw/arm/omap2.c b/hw/arm/omap2.c
+> index 566749a9eb..4b4c024693 100644
+> --- a/hw/arm/omap2.c
+> +++ b/hw/arm/omap2.c
+> @@ -30,7 +30,7 @@
+>  #include "hw/arm/omap.h"
+>  #include "sysemu/sysemu.h"
+>  #include "qemu/timer.h"
+> -#include "chardev/char.h"
+> +#include "chardev/char-fe.h"
+>  #include "hw/block/flash.h"
+>  #include "hw/arm/soc_dma.h"
+>  #include "hw/sysbus.h"
+> diff --git a/hw/arm/pxa2xx.c b/hw/arm/pxa2xx.c
+> index 0d43cc707c..629e6c64e6 100644
+> --- a/hw/arm/pxa2xx.c
+> +++ b/hw/arm/pxa2xx.c
+> @@ -17,7 +17,7 @@
+>  #include "hw/char/serial.h"
+>  #include "hw/i2c/i2c.h"
+>  #include "hw/ssi/ssi.h"
+> -#include "chardev/char.h"
+> +#include "chardev/char-fe.h"
+>  #include "sysemu/block-backend.h"
+>  #include "sysemu/blockdev.h"
+>  #include "qemu/cutils.h"
+> diff --git a/hw/arm/strongarm.c b/hw/arm/strongarm.c
+> index 967caea749..7683edc9e5 100644
+> --- a/hw/arm/strongarm.c
+> +++ b/hw/arm/strongarm.c
+> @@ -34,6 +34,7 @@
+>  #include "strongarm.h"
+>  #include "qemu/error-report.h"
+>  #include "hw/arm/arm.h"
+> +#include "chardev/char-fe.h"
+>  #include "chardev/char-serial.h"
+>  #include "sysemu/sysemu.h"
+>  #include "hw/ssi/ssi.h"
+> diff --git a/hw/char/cadence_uart.c b/hw/char/cadence_uart.c
+> index 4bfc185376..4a2c124104 100644
+> --- a/hw/char/cadence_uart.c
+> +++ b/hw/char/cadence_uart.c
+> @@ -23,6 +23,7 @@
+>
+>  #include "qemu/osdep.h"
+>  #include "hw/sysbus.h"
+> +#include "chardev/char-fe.h"
+>  #include "chardev/char-serial.h"
+>  #include "qemu/timer.h"
+>  #include "qemu/log.h"
+> diff --git a/hw/char/debugcon.c b/hw/char/debugcon.c
+> index 77d91c8558..762e3d8ada 100644
+> --- a/hw/char/debugcon.c
+> +++ b/hw/char/debugcon.c
+> @@ -27,7 +27,7 @@
+>  #include "qemu/osdep.h"
+>  #include "qapi/error.h"
+>  #include "hw/hw.h"
+> -#include "chardev/char.h"
+> +#include "chardev/char-fe.h"
+>  #include "hw/isa/isa.h"
+>  #include "hw/i386/pc.h"
+>
+> diff --git a/hw/char/digic-uart.c b/hw/char/digic-uart.c
+> index 4f1dec7f1d..34306e11ff 100644
+> --- a/hw/char/digic-uart.c
+> +++ b/hw/char/digic-uart.c
+> @@ -29,7 +29,7 @@
+>  #include "qemu/osdep.h"
+>  #include "hw/hw.h"
+>  #include "hw/sysbus.h"
+> -#include "chardev/char.h"
+> +#include "chardev/char-fe.h"
+>  #include "qemu/log.h"
+>
+>  #include "hw/char/digic-uart.h"
+> diff --git a/hw/char/escc.c b/hw/char/escc.c
+> index 81d792cb47..3f787632c7 100644
+> --- a/hw/char/escc.c
+> +++ b/hw/char/escc.c
+> @@ -26,6 +26,7 @@
+>  #include "hw/hw.h"
+>  #include "hw/sysbus.h"
+>  #include "hw/char/escc.h"
+> +#include "chardev/char-fe.h"
+>  #include "chardev/char-serial.h"
+>  #include "ui/console.h"
+>  #include "ui/input.h"
+> diff --git a/hw/char/etraxfs_ser.c b/hw/char/etraxfs_ser.c
+> index 33e3e16397..c1fba9f50f 100644
+> --- a/hw/char/etraxfs_ser.c
+> +++ b/hw/char/etraxfs_ser.c
+> @@ -24,7 +24,7 @@
+>
+>  #include "qemu/osdep.h"
+>  #include "hw/sysbus.h"
+> -#include "chardev/char.h"
+> +#include "chardev/char-fe.h"
+>  #include "qemu/log.h"
+>
+>  #define D(x)
+> diff --git a/hw/char/exynos4210_uart.c b/hw/char/exynos4210_uart.c
+> index d93125645a..b51d44a321 100644
+> --- a/hw/char/exynos4210_uart.c
+> +++ b/hw/char/exynos4210_uart.c
+> @@ -23,6 +23,7 @@
+>  #include "hw/sysbus.h"
+>  #include "qemu/error-report.h"
+>  #include "sysemu/sysemu.h"
+> +#include "chardev/char-fe.h"
+>  #include "chardev/char-serial.h"
+>
+>  #include "hw/arm/exynos4210.h"
+> diff --git a/hw/char/grlib_apbuart.c b/hw/char/grlib_apbuart.c
+> index 39d1133c61..32d98edf49 100644
+> --- a/hw/char/grlib_apbuart.c
+> +++ b/hw/char/grlib_apbuart.c
+> @@ -24,7 +24,7 @@
+>
+>  #include "qemu/osdep.h"
+>  #include "hw/sysbus.h"
+> -#include "chardev/char.h"
+> +#include "chardev/char-fe.h"
+>
+>  #include "trace.h"
+>
+> diff --git a/hw/char/ipoctal232.c b/hw/char/ipoctal232.c
+> index b8a3c92c9e..337a3e566a 100644
+> --- a/hw/char/ipoctal232.c
+> +++ b/hw/char/ipoctal232.c
+> @@ -11,7 +11,7 @@
+>  #include "qemu/osdep.h"
+>  #include "hw/ipack/ipack.h"
+>  #include "qemu/bitops.h"
+> -#include "chardev/char.h"
+> +#include "chardev/char-fe.h"
+>
+>  /* #define DEBUG_IPOCTAL */
+>
+> diff --git a/hw/char/lm32_juart.c b/hw/char/lm32_juart.c
+> index 6b0633e518..3948dcd332 100644
+> --- a/hw/char/lm32_juart.c
+> +++ b/hw/char/lm32_juart.c
+> @@ -21,7 +21,7 @@
+>  #include "hw/hw.h"
+>  #include "hw/sysbus.h"
+>  #include "trace.h"
+> -#include "chardev/char.h"
+> +#include "chardev/char-fe.h"
+>
+>  #include "hw/char/lm32_juart.h"
+>
+> diff --git a/hw/char/lm32_uart.c b/hw/char/lm32_uart.c
+> index a7610c28ce..cff8c38f90 100644
+> --- a/hw/char/lm32_uart.c
+> +++ b/hw/char/lm32_uart.c
+> @@ -26,7 +26,7 @@
+>  #include "hw/hw.h"
+>  #include "hw/sysbus.h"
+>  #include "trace.h"
+> -#include "chardev/char.h"
+> +#include "chardev/char-fe.h"
+>  #include "qemu/error-report.h"
+>
+>  enum {
+> diff --git a/hw/char/mcf_uart.c b/hw/char/mcf_uart.c
+> index b639b53c83..fe12ad5ccb 100644
+> --- a/hw/char/mcf_uart.c
+> +++ b/hw/char/mcf_uart.c
+> @@ -9,7 +9,7 @@
+>  #include "hw/hw.h"
+>  #include "hw/sysbus.h"
+>  #include "hw/m68k/mcf.h"
+> -#include "chardev/char.h"
+> +#include "chardev/char-fe.h"
+>  #include "exec/address-spaces.h"
+>  #include "qapi/error.h"
+>
+> diff --git a/hw/char/milkymist-uart.c b/hw/char/milkymist-uart.c
+> index 5ef847c5eb..e19d0f6520 100644
+> --- a/hw/char/milkymist-uart.c
+> +++ b/hw/char/milkymist-uart.c
+> @@ -25,7 +25,7 @@
+>  #include "hw/hw.h"
+>  #include "hw/sysbus.h"
+>  #include "trace.h"
+> -#include "chardev/char.h"
+> +#include "chardev/char-fe.h"
+>  #include "qemu/error-report.h"
+>
+>  enum {
+> diff --git a/hw/char/parallel.c b/hw/char/parallel.c
+> index 1d6c6e9f33..75a1a2f55e 100644
+> --- a/hw/char/parallel.c
+> +++ b/hw/char/parallel.c
+> @@ -26,6 +26,7 @@
+>  #include "qapi/error.h"
+>  #include "hw/hw.h"
+>  #include "chardev/char-parallel.h"
+> +#include "chardev/char-fe.h"
+>  #include "hw/isa/isa.h"
+>  #include "hw/i386/pc.h"
+>  #include "sysemu/sysemu.h"
+> diff --git a/hw/char/pl011.c b/hw/char/pl011.c
+> index 1757035bb3..33802f00c8 100644
+> --- a/hw/char/pl011.c
+> +++ b/hw/char/pl011.c
+> @@ -9,7 +9,7 @@
+>
+>  #include "qemu/osdep.h"
+>  #include "hw/sysbus.h"
+> -#include "chardev/char.h"
+> +#include "chardev/char-fe.h"
+>  #include "qemu/log.h"
+>  #include "trace.h"
+>
+> diff --git a/hw/char/sclpconsole-lm.c b/hw/char/sclpconsole-lm.c
+> index 755d514188..1b15046690 100644
+> --- a/hw/char/sclpconsole-lm.c
+> +++ b/hw/char/sclpconsole-lm.c
+> @@ -17,7 +17,7 @@
+>  #include "hw/qdev.h"
+>  #include "qemu/thread.h"
+>  #include "qemu/error-report.h"
+> -#include "chardev/char.h"
+> +#include "chardev/char-fe.h"
+>
+>  #include "hw/s390x/sclp.h"
+>  #include "hw/s390x/event-facility.h"
+> diff --git a/hw/char/sclpconsole.c b/hw/char/sclpconsole.c
+> index 0fd3cb4887..4a107a268d 100644
+> --- a/hw/char/sclpconsole.c
+> +++ b/hw/char/sclpconsole.c
+> @@ -19,7 +19,7 @@
+>
+>  #include "hw/s390x/sclp.h"
+>  #include "hw/s390x/event-facility.h"
+> -#include "chardev/char.h"
+> +#include "chardev/char-fe.h"
+>
+>  typedef struct ASCIIConsoleData {
+>      EventBufferHeader ebh;
+> diff --git a/hw/char/sh_serial.c b/hw/char/sh_serial.c
+> index 80c7696d8d..ca9816d045 100644
+> --- a/hw/char/sh_serial.c
+> +++ b/hw/char/sh_serial.c
+> @@ -27,7 +27,7 @@
+>  #include "qemu/osdep.h"
+>  #include "hw/hw.h"
+>  #include "hw/sh4/sh.h"
+> -#include "chardev/char.h"
+> +#include "chardev/char-fe.h"
+>  #include "exec/address-spaces.h"
+>  #include "qapi/error.h"
+>
+> diff --git a/hw/char/spapr_vty.c b/hw/char/spapr_vty.c
+> index 2317e45404..8f02f3a612 100644
+> --- a/hw/char/spapr_vty.c
+> +++ b/hw/char/spapr_vty.c
+> @@ -4,7 +4,7 @@
+>  #include "qemu-common.h"
+>  #include "cpu.h"
+>  #include "hw/qdev.h"
+> -#include "chardev/char.h"
+> +#include "chardev/char-fe.h"
+>  #include "hw/ppc/spapr.h"
+>  #include "hw/ppc/spapr_vio.h"
+>
+> diff --git a/hw/char/terminal3270.c b/hw/char/terminal3270.c
+> index c043104185..7b10a04f18 100644
+> --- a/hw/char/terminal3270.c
+> +++ b/hw/char/terminal3270.c
+> @@ -13,7 +13,7 @@
+>
+>  #include "qemu/osdep.h"
+>  #include "qapi/error.h"
+> -#include "chardev/char.h"
+> +#include "chardev/char-fe.h"
+>  #include "hw/s390x/3270-ccw.h"
+>
+>  /* Enough spaces for different window sizes. */
+> diff --git a/hw/char/virtio-console.c b/hw/char/virtio-console.c
+> index 8418db6a07..0cb1668c8a 100644
+> --- a/hw/char/virtio-console.c
+> +++ b/hw/char/virtio-console.c
+> @@ -11,7 +11,7 @@
+>   */
+>
+>  #include "qemu/osdep.h"
+> -#include "chardev/char.h"
+> +#include "chardev/char-fe.h"
+>  #include "qemu/error-report.h"
+>  #include "trace.h"
+>  #include "hw/virtio/virtio-serial.h"
+> diff --git a/hw/char/xen_console.c b/hw/char/xen_console.c
+> index 1cdbe59f8a..cb849c2e3e 100644
+> --- a/hw/char/xen_console.c
+> +++ b/hw/char/xen_console.c
+> @@ -25,7 +25,7 @@
+>
+>  #include "qapi/error.h"
+>  #include "hw/hw.h"
+> -#include "chardev/char.h"
+> +#include "chardev/char-fe.h"
+>  #include "hw/xen/xen_backend.h"
+>  #include "qapi/error.h"
+>
+> diff --git a/hw/char/xilinx_uartlite.c b/hw/char/xilinx_uartlite.c
+> index bcebdae3da..71ed2fc1be 100644
+> --- a/hw/char/xilinx_uartlite.c
+> +++ b/hw/char/xilinx_uartlite.c
+> @@ -24,7 +24,7 @@
+>
+>  #include "qemu/osdep.h"
+>  #include "hw/sysbus.h"
+> -#include "chardev/char.h"
+> +#include "chardev/char-fe.h"
+>
+>  #define DUART(x)
+>
+> diff --git a/hw/core/qdev-properties-system.c b/hw/core/qdev-properties-system.c
+> index 4da0c6a24e..a549d39030 100644
+> --- a/hw/core/qdev-properties-system.c
+> +++ b/hw/core/qdev-properties-system.c
+> @@ -20,7 +20,7 @@
+>  #include "hw/block/block.h"
+>  #include "net/hub.h"
+>  #include "qapi/visitor.h"
+> -#include "chardev/char.h"
+> +#include "chardev/char-fe.h"
+>  #include "sysemu/iothread.h"
+>
+>  static void get_pointer(Object *obj, Visitor *v, Property *prop,
+> diff --git a/hw/ipmi/ipmi_bmc_extern.c b/hw/ipmi/ipmi_bmc_extern.c
+> index 35285383fd..329b03e17f 100644
+> --- a/hw/ipmi/ipmi_bmc_extern.c
+> +++ b/hw/ipmi/ipmi_bmc_extern.c
+> @@ -30,7 +30,7 @@
+>  #include "qemu/osdep.h"
+>  #include "qapi/error.h"
+>  #include "qemu/timer.h"
+> -#include "chardev/char.h"
+> +#include "chardev/char-fe.h"
+>  #include "sysemu/sysemu.h"
+>  #include "hw/ipmi/ipmi.h"
+>
+> diff --git a/hw/misc/ivshmem.c b/hw/misc/ivshmem.c
+> index cd064dcf8c..6367d041f0 100644
+> --- a/hw/misc/ivshmem.c
+> +++ b/hw/misc/ivshmem.c
+> @@ -29,7 +29,7 @@
+>  #include "qemu/error-report.h"
+>  #include "qemu/event_notifier.h"
+>  #include "qom/object_interfaces.h"
+> -#include "chardev/char.h"
+> +#include "chardev/char-fe.h"
+>  #include "sysemu/hostmem.h"
+>  #include "sysemu/qtest.h"
+>  #include "qapi/visitor.h"
+> diff --git a/hw/usb/ccid-card-passthru.c b/hw/usb/ccid-card-passthru.c
+> index c2096b25ab..fed3683a50 100644
+> --- a/hw/usb/ccid-card-passthru.c
+> +++ b/hw/usb/ccid-card-passthru.c
+> @@ -9,7 +9,7 @@
+>   */
+>
+>  #include "qemu/osdep.h"
+> -#include "chardev/char.h"
+> +#include "chardev/char-fe.h"
+>  #include "qemu/error-report.h"
+>  #include "qemu/sockets.h"
+>  #include "ccid.h"
+> diff --git a/hw/usb/dev-serial.c b/hw/usb/dev-serial.c
+> index a145c919e9..17d650f35a 100644
+> --- a/hw/usb/dev-serial.c
+> +++ b/hw/usb/dev-serial.c
+> @@ -16,6 +16,7 @@
+>  #include "hw/usb.h"
+>  #include "hw/usb/desc.h"
+>  #include "chardev/char-serial.h"
+> +#include "chardev/char-fe.h"
+>
+>  //#define DEBUG_Serial
+>
+> diff --git a/hw/usb/redirect.c b/hw/usb/redirect.c
+> index c862c1adea..d2b3a84a03 100644
+> --- a/hw/usb/redirect.c
+> +++ b/hw/usb/redirect.c
+> @@ -33,7 +33,7 @@
+>  #include "qapi/qmp/qerror.h"
+>  #include "qemu/error-report.h"
+>  #include "qemu/iov.h"
+> -#include "chardev/char.h"
+> +#include "chardev/char-fe.h"
+>
+>  #include <usbredirparser.h>
+>  #include <usbredirfilter.h>
+> diff --git a/hw/virtio/vhost-user.c b/hw/virtio/vhost-user.c
+> index ff4cee82e6..e60a7a1cfe 100644
+> --- a/hw/virtio/vhost-user.c
+> +++ b/hw/virtio/vhost-user.c
+> @@ -13,7 +13,7 @@
+>  #include "hw/virtio/vhost.h"
+>  #include "hw/virtio/vhost-backend.h"
+>  #include "hw/virtio/virtio-net.h"
+> -#include "chardev/char.h"
+> +#include "chardev/char-fe.h"
+>  #include "sysemu/kvm.h"
+>  #include "qemu/error-report.h"
+>  #include "qemu/sockets.h"
+> diff --git a/monitor.c b/monitor.c
+> index 29b71ff2bc..37f8d5645f 100644
+> --- a/monitor.c
+> +++ b/monitor.c
+> @@ -35,7 +35,7 @@
+>  #include "exec/gdbstub.h"
+>  #include "net/net.h"
+>  #include "net/slirp.h"
+> -#include "chardev/char.h"
+> +#include "chardev/char-fe.h"
+>  #include "ui/qemu-spice.h"
+>  #include "sysemu/numa.h"
+>  #include "monitor/monitor.h"
+> diff --git a/net/colo-compare.c b/net/colo-compare.c
+> index 619335d5e8..2fb75bcca4 100644
+> --- a/net/colo-compare.c
+> +++ b/net/colo-compare.c
+> @@ -25,7 +25,7 @@
+>  #include "qom/object.h"
+>  #include "qemu/typedefs.h"
+>  #include "net/queue.h"
+> -#include "chardev/char.h"
+> +#include "chardev/char-fe.h"
+>  #include "qemu/sockets.h"
+>  #include "qapi-visit.h"
+>  #include "net/colo.h"
+> diff --git a/net/filter-mirror.c b/net/filter-mirror.c
+> index 7adc2c10d2..a20330475c 100644
+> --- a/net/filter-mirror.c
+> +++ b/net/filter-mirror.c
+> @@ -20,7 +20,7 @@
+>  #include "qemu/main-loop.h"
+>  #include "qemu/error-report.h"
+>  #include "trace.h"
+> -#include "chardev/char.h"
+> +#include "chardev/char-fe.h"
+>  #include "qemu/iov.h"
+>  #include "qemu/sockets.h"
+>
+> diff --git a/net/slirp.c b/net/slirp.c
+> index af3e8b22ac..6a6d727999 100644
+> --- a/net/slirp.c
+> +++ b/net/slirp.c
+> @@ -37,7 +37,7 @@
+>  #include "qemu/sockets.h"
+>  #include "slirp/libslirp.h"
+>  #include "slirp/ip6.h"
+> -#include "chardev/char.h"
+> +#include "chardev/char-fe.h"
+>  #include "sysemu/sysemu.h"
+>  #include "qemu/cutils.h"
+>  #include "qapi/error.h"
+> diff --git a/net/vhost-user.c b/net/vhost-user.c
+> index 77d2ce22a6..526290d8c1 100644
+> --- a/net/vhost-user.c
+> +++ b/net/vhost-user.c
+> @@ -12,7 +12,7 @@
+>  #include "clients.h"
+>  #include "net/vhost_net.h"
+>  #include "net/vhost-user.h"
+> -#include "chardev/char.h"
+> +#include "chardev/char-fe.h"
+>  #include "qemu/config-file.h"
+>  #include "qemu/error-report.h"
+>  #include "qmp-commands.h"
+> diff --git a/qtest.c b/qtest.c
+> index dbf70a7018..9a5d1dc50d 100644
+> --- a/qtest.c
+> +++ b/qtest.c
+> @@ -17,7 +17,7 @@
+>  #include "cpu.h"
+>  #include "sysemu/qtest.h"
+>  #include "hw/qdev.h"
+> -#include "chardev/char.h"
+> +#include "chardev/char-fe.h"
+>  #include "exec/ioport.h"
+>  #include "exec/memory.h"
+>  #include "hw/irq.h"
+> diff --git a/slirp/slirp.c b/slirp/slirp.c
+> index 3b92cb54ce..e79345bdfc 100644
+> --- a/slirp/slirp.c
+> +++ b/slirp/slirp.c
+> @@ -25,7 +25,7 @@
+>  #include "qemu-common.h"
+>  #include "qemu/timer.h"
+>  #include "qemu/error-report.h"
+> -#include "chardev/char.h"
+> +#include "chardev/char-fe.h"
+>  #include "slirp.h"
+>  #include "hw/hw.h"
+>  #include "qemu/cutils.h"
+> diff --git a/tests/test-char.c b/tests/test-char.c
+> index 9340c55058..d7ecf1056a 100644
+> --- a/tests/test-char.c
+> +++ b/tests/test-char.c
+> @@ -4,7 +4,7 @@
+>  #include "qemu-common.h"
+>  #include "qemu/config-file.h"
+>  #include "qemu/sockets.h"
+> -#include "chardev/char.h"
+> +#include "chardev/char-fe.h"
+>  #include "sysemu/sysemu.h"
+>  #include "qapi/error.h"
+>  #include "qom/qom-qobject.h"
+> diff --git a/tests/vhost-user-test.c b/tests/vhost-user-test.c
+> index acc392d046..4ca11ae28d 100644
+> --- a/tests/vhost-user-test.c
+> +++ b/tests/vhost-user-test.c
+> @@ -16,7 +16,7 @@
+>  #include "qemu/option.h"
+>  #include "qemu/range.h"
+>  #include "qemu/sockets.h"
+> -#include "chardev/char.h"
+> +#include "chardev/char-fe.h"
+>  #include "sysemu/sysemu.h"
+>  #include "libqos/libqos.h"
+>  #include "libqos/pci-pc.h"
+> diff --git a/ui/console.c b/ui/console.c
+> index 6cf795a23d..d914cced53 100644
+> --- a/ui/console.c
+> +++ b/ui/console.c
+> @@ -27,7 +27,7 @@
+>  #include "hw/qdev-core.h"
+>  #include "qemu/timer.h"
+>  #include "qmp-commands.h"
+> -#include "chardev/char.h"
+> +#include "chardev/char-fe.h"
+>  #include "trace.h"
+>  #include "exec/memory.h"
+>
+> diff --git a/chardev/Makefile.objs b/chardev/Makefile.objs
+> index 1feda0f0ed..e0b37dbfd8 100644
+> --- a/chardev/Makefile.objs
+> +++ b/chardev/Makefile.objs
+> @@ -1,6 +1,7 @@
+>  chardev-obj-y += char.o
+>  chardev-obj-$(CONFIG_WIN32) += char-console.o
+>  chardev-obj-$(CONFIG_POSIX) += char-fd.o
+> +chardev-obj-y += char-fe.o
+>  chardev-obj-y += char-file.o
+>  chardev-obj-y += char-io.o
+>  chardev-obj-y += char-mux.o
