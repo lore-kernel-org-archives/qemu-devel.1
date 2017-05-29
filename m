@@ -1,24 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60840)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33169)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1dFL3M-0006O4-Pl
-	for qemu-devel@nongnu.org; Mon, 29 May 2017 09:49:49 -0400
+	(envelope-from <berto@igalia.com>) id 1dFL6o-0007T8-Pe
+	for qemu-devel@nongnu.org; Mon, 29 May 2017 09:53:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1dFL3L-0003MF-Sr
-	for qemu-devel@nongnu.org; Mon, 29 May 2017 09:49:48 -0400
-Date: Mon, 29 May 2017 15:49:36 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20170529154936.240f579b@nial.brq.redhat.com>
-In-Reply-To: <20170529133647.GD32274@thinpad.lan.raisama.net>
-References: <1494415802-227633-1-git-send-email-imammedo@redhat.com>
-	<1494415802-227633-7-git-send-email-imammedo@redhat.com>
-	<20170526154625.GI22043@thinpad.lan.raisama.net>
-	<20170529151245.3fba6db4@nial.brq.redhat.com>
-	<20170529133647.GD32274@thinpad.lan.raisama.net>
+	(envelope-from <berto@igalia.com>) id 1dFL6k-0004iz-UH
+	for qemu-devel@nongnu.org; Mon, 29 May 2017 09:53:22 -0400
+From: Alberto Garcia <berto@igalia.com>
+In-Reply-To: <20170525163851.8047-21-berrange@redhat.com>
+References: <20170525163851.8047-1-berrange@redhat.com>
+	<20170525163851.8047-21-berrange@redhat.com>
+Date: Mon, 29 May 2017 15:53:15 +0200
+Message-ID: <w51d1ar4vn8.fsf@maestria.local.igalia.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 06/18] numa: mirror cpu to node mapping
- in MachineState::possible_cpus
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v7 20/20] docs: document encryption options
+ for qcow, qcow2 and luks
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,85 +23,15 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Andrew Jones <drjones@redhat.com>, qemu-devel@nongnu.org, qemu-arm@nongnu.org, qemu-ppc@nongnu.org, Shannon Zhao <zhaoshenglong@huawei.com>, Paolo Bonzini <pbonzini@redhat.com>, David Gibson <david@gibson.dropbear.id.au>
+To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Eric Blake <eblake@redhat.com>, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>
 
-On Mon, 29 May 2017 10:36:47 -0300
-Eduardo Habkost <ehabkost@redhat.com> wrote:
+On Thu 25 May 2017 06:38:51 PM CEST, "Daniel P. Berrange" <berrange@redhat.com> wrote:
+> Expand the image format docs to cover the new options for
+> the qcow, qcow2 and luks disk image formats
+>
+> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
 
-> On Mon, May 29, 2017 at 03:12:45PM +0200, Igor Mammedov wrote:
-> > On Fri, 26 May 2017 12:46:25 -0300
-> > Eduardo Habkost <ehabkost@redhat.com> wrote:
-> >   
-> > > On Wed, May 10, 2017 at 01:29:50PM +0200, Igor Mammedov wrote:
-> > > [...]  
-> > > > diff --git a/hw/core/machine.c b/hw/core/machine.c
-> > > > index 2482c63..420c8c4 100644
-> > > > --- a/hw/core/machine.c
-> > > > +++ b/hw/core/machine.c
-> > > > @@ -389,6 +389,102 @@ HotpluggableCPUList *machine_query_hotpluggable_cpus(MachineState *machine)    
-> > > [...]  
-> > > > +void machine_set_cpu_numa_node(MachineState *machine,
-> > > > +                               const CpuInstanceProperties *props, Error **errp)
-> > > > +{    
-> > > [...]  
-> > > > +    /* force board to initialize possible_cpus if it hasn't been done yet */
-> > > > +    mc->possible_cpu_arch_ids(machine);    
-> > > [...]  
-> > > > diff --git a/numa.c b/numa.c
-> > > > index 7182481..7db5dde 100644
-> > > > --- a/numa.c
-> > > > +++ b/numa.c
-> > > > @@ -170,6 +170,7 @@ static void parse_numa_node(MachineState *ms, NumaNodeOptions *node,
-> > > >          exit(1);
-> > > >      }
-> > > >      for (cpus = node->cpus; cpus; cpus = cpus->next) {
-> > > > +        CpuInstanceProperties props;
-> > > >          if (cpus->value >= max_cpus) {
-> > > >              error_setg(errp,
-> > > >                         "CPU index (%" PRIu16 ")"
-> > > > @@ -178,6 +179,10 @@ static void parse_numa_node(MachineState *ms, NumaNodeOptions *node,
-> > > >              return;
-> > > >          }
-> > > >          bitmap_set(numa_info[nodenr].node_cpu, cpus->value, 1);
-> > > > +        props = mc->cpu_index_to_instance_props(ms, cpus->value);
-> > > > +        props.node_id = nodenr;
-> > > > +        props.has_node_id = true;
-> > > > +        machine_set_cpu_numa_node(ms, &props, &error_fatal);    
-> > > 
-> > > This triggers a call to possible_cpu_arch_ids() before
-> > > nb_numa_nodes is set to the actual number of NUMA nodes in the
-> > > machine, breaking the "node_id = ... % nb_numa_nodes"
-> > > initialization logic in pc, virt, and spapr.
-> > > 
-> > > The initialization ordering between possible_cpus and NUMA data
-> > > structures looks very subtle and fragile.  I still don't see an
-> > > obvious way to untangle that.  
-> > It's unfixable unless we require specific ordering on CLI,
-> > i.e. first go all '-numa node,nodeid=[...]' options and only then
-> > the rest of [-numa node,cpus|cpu].
-> > We can do that for '-numa cpu' (probably should do enforce it for
-> > this new option anyway for saner CLI)
-> > 
-> > but not for '-numa node,cpus' as it will break existing users
-> > that do not declare nodes first.
-> >   
-> > > I suggest moving the default-NUMA-mapping code to a separate
-> > > machine class method, instead of relying on
-> > > possible_cpu_arch_ids() to initialize node_id.  
-> > So as you suggest we have to postpone default values initialization
-> > till all the options are parsed:
-> > 
-> > 1: strait-forward additional machine callback called from
-> >    machine_run_board_init()
-> > 
-> > or:
-> > 
-> > 2: save extra callback and recalculate not yet set props.node_id-s
-> >    in possible_cpu_arch_ids() if nb_numa_nodes is changed since
-> >    the last invocation of possible_cpu_arch_ids()
-> > 
-> > which one would you prefer?  
-> 
-> Option 1 sounds simpler to me.
-ok, I'll include fix on cleanups series respin.
+Reviewed-by: Alberto Garcia <berto@igalia.com>
+
+Berto
