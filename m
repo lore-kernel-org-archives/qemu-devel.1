@@ -1,35 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33634)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33655)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pasic@linux.vnet.ibm.com>) id 1dFL8z-00087w-3w
-	for qemu-devel@nongnu.org; Mon, 29 May 2017 09:55:38 -0400
+	(envelope-from <pasic@linux.vnet.ibm.com>) id 1dFL90-000883-Nn
+	for qemu-devel@nongnu.org; Mon, 29 May 2017 09:55:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pasic@linux.vnet.ibm.com>) id 1dFL8v-0005Bg-8o
-	for qemu-devel@nongnu.org; Mon, 29 May 2017 09:55:37 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:57808
-	helo=mx0a-001b2d01.pphosted.com)
+	(envelope-from <pasic@linux.vnet.ibm.com>) id 1dFL8w-0005CB-Qu
+	for qemu-devel@nongnu.org; Mon, 29 May 2017 09:55:38 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:60341)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <pasic@linux.vnet.ibm.com>)
-	id 1dFL8v-0005BX-2h
-	for qemu-devel@nongnu.org; Mon, 29 May 2017 09:55:33 -0400
-Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+	id 1dFL8w-0005Bw-HY
+	for qemu-devel@nongnu.org; Mon, 29 May 2017 09:55:34 -0400
+Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
 	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v4TDrUP9012237
+	v4TDrWM2029658
 	for <qemu-devel@nongnu.org>; Mon, 29 May 2017 09:55:32 -0400
-Received: from e06smtp13.uk.ibm.com (e06smtp13.uk.ibm.com [195.75.94.109])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2arha4gt24-1
+Received: from e06smtp12.uk.ibm.com (e06smtp12.uk.ibm.com [195.75.94.108])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2aqfqk80dt-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
 	for <qemu-devel@nongnu.org>; Mon, 29 May 2017 09:55:31 -0400
 Received: from localhost
-	by e06smtp13.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	by e06smtp12.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
 	Only! Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <pasic@linux.vnet.ibm.com>;
-	Mon, 29 May 2017 14:55:30 +0100
+	Mon, 29 May 2017 14:55:28 +0100
 From: Halil Pasic <pasic@linux.vnet.ibm.com>
-Date: Mon, 29 May 2017 15:55:15 +0200
-In-Reply-To: <20170529135520.101429-1-pasic@linux.vnet.ibm.com>
-References: <20170529135520.101429-1-pasic@linux.vnet.ibm.com>
-Message-Id: <20170529135520.101429-3-pasic@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH v2 2/7] s390x: add helper get_machine_class
+Date: Mon, 29 May 2017 15:55:13 +0200
+Message-Id: <20170529135520.101429-1-pasic@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [PATCH v2 0/7] migration: s390x css migration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -41,85 +38,39 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Cornelia Huck <cornelia.huck@de.ibm.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 Cc: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org, Halil Pasic <pasic@linux.vnet.ibm.com>
 
-We will need the machine class at machine initialization time, so the
-usual way via qdev won't do. Let's cache the machine class and also use
-the default values of the base machine for capability discovery.
+The scope of this patch series is now limited to decoupling channel
+subsystem migration from the migration of virtio-ccw proxies.
 
-Signed-off-by: Halil Pasic <pasic@linux.vnet.ibm.com>
----
- hw/s390x/s390-virtio-ccw.c | 46 +++++++++++++++++++++++-----------------------
- 1 file changed, 23 insertions(+), 23 deletions(-)
+The vmstatifying of virtio-ccw proxies is now done by another series
+currently consisting of a single  patch running under the name 'vmstatify
+config migration for virtio-ccw'. Since this series depends on that
+patch, I have included it here too (for convenience).
 
-diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
-index fdd4384ff0..04148916ed 100644
---- a/hw/s390x/s390-virtio-ccw.c
-+++ b/hw/s390x/s390-virtio-ccw.c
-@@ -242,36 +242,35 @@ static inline void machine_set_dea_key_wrap(Object *obj, bool value,
-     ms->dea_key_wrap = value;
- }
- 
--bool ri_allowed(void)
--{
--    if (kvm_enabled()) {
--        MachineClass *mc = MACHINE_GET_CLASS(qdev_get_machine());
--        if (object_class_dynamic_cast(OBJECT_CLASS(mc),
--                                      TYPE_S390_CCW_MACHINE)) {
--            S390CcwMachineClass *s390mc = S390_MACHINE_CLASS(mc);
-+static S390CcwMachineClass *current_mc;
- 
--            return s390mc->ri_allowed;
--        }
-+static S390CcwMachineClass *get_machine_class(void)
-+{
-+    if (unlikely(!current_mc)) {
-         /*
--         * Make sure the "none" machine can have ri, otherwise it won't * be
--         * unlocked in KVM and therefore the host CPU model might be wrong.
--         */
--        return true;
-+        * No s390 ccw machine was instantiated, we are likely to
-+        * be called for the 'none' machine. The properties will
-+        * have their after-initialization values.
-+        */
-+        current_mc = S390_MACHINE_CLASS(
-+                     object_class_by_name(TYPE_S390_CCW_MACHINE));
-     }
--    return 0;
-+    return current_mc;
- }
- 
--bool cpu_model_allowed(void)
-+bool ri_allowed(void)
- {
--    MachineClass *mc = MACHINE_GET_CLASS(qdev_get_machine());
--    if (object_class_dynamic_cast(OBJECT_CLASS(mc),
--                                  TYPE_S390_CCW_MACHINE)) {
--        S390CcwMachineClass *s390mc = S390_MACHINE_CLASS(mc);
--
--        return s390mc->cpu_model_allowed;
-+    if (!kvm_enabled()) {
-+        return false;
-     }
--    /* allow CPU model qmp queries with the "none" machine */
--    return true;
-+    /* for "none" machine this results in true */
-+    return get_machine_class()->ri_allowed;
-+}
-+
-+bool cpu_model_allowed(void)
-+{
-+    /* for "none" machine this results in true */
-+    return get_machine_class()->cpu_model_allowed;
- }
- 
- static char *machine_get_loadparm(Object *obj, Error **errp)
-@@ -360,6 +359,7 @@ static const TypeInfo ccw_machine_info = {
-     static void ccw_machine_##suffix##_instance_init(Object *obj)             \
-     {                                                                         \
-         MachineState *machine = MACHINE(obj);                                 \
-+        current_mc = S390_MACHINE_CLASS(MACHINE_GET_CLASS(machine));          \
-         ccw_machine_##suffix##_instance_options(machine);                     \
-     }                                                                         \
-     static const TypeInfo ccw_machine_##suffix##_info = {                     \
+The reorganization was requested by Dave.
+
+v1 --> v2:
+* Split out the vmystatify virtio-ccw part, reorganize
+* Use WITH_TMP instead of one-shot VMStateInfo's 
+
+Halil Pasic (7):
+  s390x: vmstatify config migration for virtio-ccw
+  s390x: add helper get_machine_class
+  s390x: add css_migration_enabled to machine class
+  s390x/css: add missing css state conditionally
+  s390x/css: add ORB to SubchDev
+  s390x/css: activate ChannelSubSys migration
+  s390x/css: use SubchDev.orb
+
+ hw/intc/s390_flic.c                |  48 ++++
+ hw/s390x/ccw-device.c              |  10 +
+ hw/s390x/ccw-device.h              |   4 +
+ hw/s390x/css.c                     | 494 +++++++++++++++++++++++++------------
+ hw/s390x/s390-virtio-ccw.c         |  58 +++--
+ hw/s390x/virtio-ccw.c              | 155 ++++++------
+ include/hw/s390x/css.h             |  17 +-
+ include/hw/s390x/s390-virtio-ccw.h |   7 +
+ include/hw/s390x/s390_flic.h       |   5 +
+ 9 files changed, 544 insertions(+), 254 deletions(-)
+
 -- 
 2.11.2
