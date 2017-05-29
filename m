@@ -1,23 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56706)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58612)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dFKdI-0007Xw-FF
-	for qemu-devel@nongnu.org; Mon, 29 May 2017 09:22:54 -0400
+	(envelope-from <mreitz@redhat.com>) id 1dFKqP-0001Sh-FR
+	for qemu-devel@nongnu.org; Mon, 29 May 2017 09:36:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dFKdH-000574-2l
-	for qemu-devel@nongnu.org; Mon, 29 May 2017 09:22:52 -0400
-Date: Mon, 29 May 2017 10:22:41 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20170529132241.GC32274@thinpad.lan.raisama.net>
-References: <1495550330-34087-1-git-send-email-imammedo@redhat.com>
-	<1495550330-34087-4-git-send-email-imammedo@redhat.com>
-	<20170526160630.GT32274@thinpad.lan.raisama.net>
-	<20170529134536.6a558835@nial.brq.redhat.com>
+	(envelope-from <mreitz@redhat.com>) id 1dFKqO-00004q-Mn
+	for qemu-devel@nongnu.org; Mon, 29 May 2017 09:36:25 -0400
+References: <1496060313-30190-1-git-send-email-kwolf@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <7cc1060f-18a7-aaa0-e215-f2e10129f37f@redhat.com>
+Date: Mon, 29 May 2017 15:36:09 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170529134536.6a558835@nial.brq.redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 3/5] numa: make sure that all cpus in
- has has_node_id set if numa is enabled
+In-Reply-To: <1496060313-30190-1-git-send-email-kwolf@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="NJV5IF9USLJvSfFvO2clHVXptLj3RF6gQ"
+Subject: Re: [Qemu-devel] [PATCH] mirror: Drop permissions on s->target on
+ completion
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,245 +24,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: qemu-devel@nongnu.org, Andrew Jones <drjones@redhat.com>, qemu-arm@nongnu.org, qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: pbonzini@redhat.com, famz@redhat.com, ymankad@redhat.com, qemu-devel@nongnu.org, qemu-stable@nongnu.org
 
-On Mon, May 29, 2017 at 01:45:36PM +0200, Igor Mammedov wrote:
-> On Fri, 26 May 2017 13:06:30 -0300
-> Eduardo Habkost <ehabkost@redhat.com> wrote:
-> 
-> > On Tue, May 23, 2017 at 04:38:48PM +0200, Igor Mammedov wrote:
-> > > It fixes/add missing _PXM object for non mapped CPU (x86)
-> > > and missing fdt node (virt-arm).
-> > > 
-> > > It ensures that possible_cpus contains complete mapping if
-> > > numa is enabled by the time machine_init() is executed.
-> > > 
-> > > As result non completely mapped CPUs:
-> > >  1) appear in ACPI/fdt blobs
-> > >  2) QMP query-hotpluggable-cpus command shows bound nodes for such CPUs
-> > >  3) allows to drop checks for has_node_id in numa only code,
-> > >    reducing number of invariants incomplete mapping could produce
-> > >  4) moves fixup/implicit node init from runtime numa_cpu_pre_plug()
-> > >    (when CPU object is created) to machine_numa_finish_init() which
-> > >    helps to fix [1, 2] and make possible_cpus complete source
-> > >    of numa mapping available even before CPUs are created.
-> > > 
-> > > Signed-off-by: Igor Mammedov <imammedo@redhat.com>  
-> > 
-> > Code that will be affected, but will keep the same behavior:
-> > 
-> > * pre_plug handler when node-id is omitted on device_add: it
-> >   already sets node_id=0 if !has_node_id
-> >   * However, pre_plug behavior is being changed when node-id is
-> >     set. See below.
-> > * build_srat() (both x86 and arm): already sets node_id = 0 if
-> >   !has_node_id
-> > * bochs_bios_init(): already uses g_new0(), so already had
-> >   omitted entries set to 0.
-> > 
-> > Affected code that will change behavior with this patch:
-> > 
-> > * pre_plug handler when node-id is set:
-> >   * See my reply to patch 1/5.  This patch restores the old
-> >     behavior that rejected node-id != 0 on omitted CPUs.
-> I'll look into it.
-> 
-> > * ACPI _PXM initialization
-> > * arm/virt.c: numa-node-id will now be set for all CPUs
-> > * QMP/HMP query-hotpluggable-cpus output
-> >   * Desirable change, as now the QMP command will reflect what
-> >     the guest is really seeing
-> > 
-> > Due to the _PXM and FDT changes, I have the same objection I have
-> > for patch 4/5: if we are going to break user expectations when
-> > using incomplete NUMA mappings, let's do that only once (when we
-> > start rejecting incomplete NUMA mappings).
-> 
-> FDT/PXM change is bugfix to firmware that I insist on.
-> Firmware should properly describe all CPUs instead of repeating
-> partial CPU mapping nonsense.
-> 
-> Wrt _PXM change see
-> (27111931 acpi: provide _PXM method for CPU devices if QEMU is started numa enabled)
-> provided we keep 0 node fallback by dropping 4/5
-> linux guest will behave the same as without _PXM.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--NJV5IF9USLJvSfFvO2clHVXptLj3RF6gQ
+From: Max Reitz <mreitz@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: pbonzini@redhat.com, famz@redhat.com, ymankad@redhat.com,
+ qemu-devel@nongnu.org, qemu-stable@nongnu.org
+Message-ID: <7cc1060f-18a7-aaa0-e215-f2e10129f37f@redhat.com>
+Subject: Re: [PATCH] mirror: Drop permissions on s->target on completion
+References: <1496060313-30190-1-git-send-email-kwolf@redhat.com>
+In-Reply-To: <1496060313-30190-1-git-send-email-kwolf@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-If it is a bug fix, then I agree with it.  Also, this doesn't
-change the topology of the virtual hardware, so it shouldn't
-break user expectations anyway.
+On 2017-05-29 14:18, Kevin Wolf wrote:
+> This fixes an assertion failure that was triggered by qemu-iotests 129
+> on some CI host, while the same test case didn't seem to fail on other
+> hosts.
+>=20
+> Essentially the problem is that the blk_unref(s->target) in
+> mirror_exit() doesn't necessarily mean that the BlockBackend goes away
+> immediately. It is possible that the job completion was triggered neste=
+d
+> in mirror_drain(), which looks like this:
+>=20
+>     BlockBackend *target =3D s->target;
+>     blk_ref(target);
+>     blk_drain(target);
+>     blk_unref(target);
+>=20
+> In this case, the write permissions for s->target are retained until
+> after blk_drain(), which makes removing mirror_top_bs fail for the
+> active commit case (can't have a writable backing file in the chain
+> without the filter driver).
+>=20
+> Explicitly dropping the permissions first means that the additional
+> reference doesn't hurt and the job can complete successfully even if
+> called from the nested blk_drain().
+>=20
+> Cc: qemu-stable@nongnu.org
+> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> ---
+>  block/mirror.c | 7 ++++++-
+>  1 file changed, 6 insertions(+), 1 deletion(-)
 
-> 
-> And again there wasn't any compat code around that
-> and guest saw node-id change when it's been restarted.
-> 
-> Wrt FDT change, it's the same and I also talked with
-> Drew about it, his reply was that for ARM target
-> they don't care much about NUMA as not all pieces are
-> there to make pinning work on host side yet.
-> 
-> PS:
-> There wasn't any promise made to keep firmware side
-> bug compatible or versioned so users should not have
-> expectations about it in the first place.
-
-You are right about this.
-
-> 
-> Pls don't push for bug compat stuff in the firmware
-> as it will rise false expectations (at least until
-> we decide to care about it by default).
-
-I won't.  Patch 4/5 is different because it makes firmware
-describe different hardware.  But this one is firmware-only, so
-you are right.
-
-> 
-> (I'd use firmware compat stuff only in cases where
-> it breaks guest horribly, i.e. crash/fail boot)
-> 
-> 
-> > A few extra comments about the has_node_id checks below:
-> > 
-> > > ---
-> > >  hw/arm/virt-acpi-build.c |  4 +---
-> > >  hw/core/machine.c        | 16 ++++++++++------
-> > >  hw/i386/acpi-build.c     |  3 +--
-> > >  hw/i386/pc.c             |  4 +---
-> > >  numa.c                   |  7 +------
-> > >  5 files changed, 14 insertions(+), 20 deletions(-)
-> > > 
-> > > diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
-> > > index e585206..977a794 100644
-> > > --- a/hw/arm/virt-acpi-build.c
-> > > +++ b/hw/arm/virt-acpi-build.c
-> > > @@ -496,12 +496,10 @@ build_srat(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
-> > >      srat->reserved1 = cpu_to_le32(1);
-> > >  
-> > >      for (i = 0; i < cpu_list->len; ++i) {
-> > > -        int node_id = cpu_list->cpus[i].props.has_node_id ?
-> > > -            cpu_list->cpus[i].props.node_id : 0;
-> > >          core = acpi_data_push(table_data, sizeof(*core));
-> > >          core->type = ACPI_SRAT_PROCESSOR_GICC;
-> > >          core->length = sizeof(*core);
-> > > -        core->proximity = cpu_to_le32(node_id);
-> > > +        core->proximity = cpu_to_le32(cpu_list->cpus[i].props.node_id);
-> > >          core->acpi_processor_uid = cpu_to_le32(i);
-> > >          core->flags = cpu_to_le32(1);
-> > >      }
-> > > diff --git a/hw/core/machine.c b/hw/core/machine.c
-> > > index aaf3cff..964b75d 100644
-> > > --- a/hw/core/machine.c
-> > > +++ b/hw/core/machine.c
-> > > @@ -720,19 +720,23 @@ static void machine_numa_finish_init(MachineState *machine)
-> > >          const CPUArchId *cpu_slot = &possible_cpus->cpus[i];
-> > >  
-> > >          if (!cpu_slot->props.has_node_id) {
-> > > -            if (default_mapping) {
-> > > -                /* fetch default mapping from board and enable it */
-> > > -                CpuInstanceProperties props = cpu_slot->props;
-> > > -                props.has_node_id = true;
-> > > -                machine_set_cpu_numa_node(machine, &props, &error_fatal);
-> > > -            } else {
-> > > +            /* fetch default mapping from board and enable it */
-> > > +            CpuInstanceProperties props = cpu_slot->props;
-> > > +
-> > > +            if (!default_mapping) {
-> > >                  /* record slots with not set mapping,
-> > >                   * TODO: make it hard error in future */
-> > >                  char *cpu_str = cpu_slot_to_string(cpu_slot);
-> > >                  g_string_append_printf(s, "%sCPU %d [%s]",
-> > >                                         s->len ? ", " : "", i, cpu_str);
-> > >                  g_free(cpu_str);
-> > > +
-> > > +                /* non mapped cpus used to fallback to node 0 */
-> > > +                props.node_id = 0;
-> > >              }
-> > > +
-> > > +            props.has_node_id = true;
-> > > +            machine_set_cpu_numa_node(machine, &props, &error_fatal);
-> > >          }
-> > >      }
-> > >      if (s->len) {
-> > > diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
-> > > index afcadac..873880d 100644
-> > > --- a/hw/i386/acpi-build.c
-> > > +++ b/hw/i386/acpi-build.c
-> > > @@ -2335,8 +2335,7 @@ build_srat(GArray *table_data, BIOSLinker *linker, MachineState *machine)
-> > >      srat->reserved1 = cpu_to_le32(1);
-> > >  
-> > >      for (i = 0; i < apic_ids->len; i++) {
-> > > -        int node_id = apic_ids->cpus[i].props.has_node_id ?
-> > > -            apic_ids->cpus[i].props.node_id : 0;
-> > > +        int node_id = apic_ids->cpus[i].props.node_id;  
-> > 
-> > What about an assert(props.has_node_id) here?
-> I considered it but dropped idea, as it's mostly useless
-> since build_srat() is called only when numa is enabled.
-
-I just suggested it because I would be more confident that the
-new code that ensures has_node_id is set for all slots is working
-and won't break if we refactor it.  But not a big deal.
-
-> 
-> and sticking asserts in every place just in case doesn't
-> seem to me like good idea as it would lead to absurd 
-> asserts after every line.
-> 
-> Considering the new code behaves the same in case !has_node_id
-> I don't see any reason to put assert here, the same goes
-> for 'Ditto" comment in the next hunk.
-> 
-> But if you insist I can' add assert().
-
-I won't mind if you decide to not add it.
-
-> 
-[...]
-> > >      }
-> > >      for (i = 0; i < nb_numa_nodes; i++) {
-> > >          numa_fw_cfg[pcms->apic_id_limit + 1 + i] =
-> > > diff --git a/numa.c b/numa.c
-> > > index e30702e..4ef6dea 100644
-> > > --- a/numa.c
-> > > +++ b/numa.c
-> > > @@ -513,17 +513,12 @@ void numa_cpu_pre_plug(const CPUArchId *slot, DeviceState *dev, Error **errp)
-> > >      int node_id = object_property_get_int(OBJECT(dev), "node-id", &error_abort);
-> > >  
-> > >      if (node_id == CPU_UNSET_NUMA_NODE_ID) {
-> > > -        /* by default CPUState::numa_node was 0 if it wasn't set explicitly
-> > > -         * TODO: make it error when incomplete numa mapping support is removed
-> > > -         */
-> > > -        node_id = 0;
-> > > -
-> > >          /* due to bug in libvirt, it doesn't pass node-id from props on
-> > >           * device_add as expected, so we have to fix it up here */
-> > >          if (slot->props.has_node_id) {
-> > >              node_id = slot->props.node_id;
-> > > +            object_property_set_int(OBJECT(dev), node_id, "node-id", errp);
-> > >          }
-> > > -        object_property_set_int(OBJECT(dev), node_id, "node-id", errp);  
-> > 
-> > Why not removing the has_node_id check completely, here?
-> because numa_cpu_pre_plug() is called unconditionally
-> As alternative, I can replace has_node_id check with assert
-> and do following from callers:
-> 
->  if (nb_numa_nodes) {
->      numa_cpu_pre_plug()
->  }
-> 
-> 
-> > In case this patch get respun, I suggest also removing the
-> > has_node_id check at: build_cpus_aml() _PXM code.
-> that would be wrong, build_cpus_aml() is called for both
-> numa and non numa use-cases, there shouldn't be _PXM
-> object if numa is not enabled, hence the check.
-> 
->  
-
-Oh, I forgot about the non-NUMA cases.  You're right.
+Reviewed-by: Max Reitz <mreitz@redhat.com>
 
 
--- 
-Eduardo
+--NJV5IF9USLJvSfFvO2clHVXptLj3RF6gQ
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iQEvBAEBCAAZBQJZLCPJEhxtcmVpdHpAcmVkaGF0LmNvbQAKCRD0B9sAYdXPQJrw
+CACzipsTGI8orknBVHMMonAvlCzs454Z6EKIvILy4NL3TQPyr9zY6NT6jFQUw8CO
+78Th/SGlkYwCnFOxBBWWPukOJ36bxKo28XZte3mhg5urJL9YSf2HYmwHcMbsvOAD
+T16h7NSHY4cJN6CzO0eeMM1F+nI9hdWBKx4Y6xL2fiHi3stbRBlr4x8YzyYSIkaM
+T3FMGgJQ36kuKaSzzJIg1cKn+1Adfh4ahjfLlMAhOSAFyoQezQqyGDRvywDzslF4
+3LPbIlH2/KTbNxGr1m/5CjuL+7VuG2nQ1bkSaMGoEBAU972jkVKpu+JG91WRPntA
+ZVxM7Y04hB8n4co6guTXQxML
+=hy7W
+-----END PGP SIGNATURE-----
+
+--NJV5IF9USLJvSfFvO2clHVXptLj3RF6gQ--
