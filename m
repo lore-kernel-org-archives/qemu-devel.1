@@ -1,33 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36183)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36213)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1dFGcv-0001hU-07
-	for qemu-devel@nongnu.org; Mon, 29 May 2017 05:06:17 -0400
+	(envelope-from <groug@kaod.org>) id 1dFGcw-0001id-Bq
+	for qemu-devel@nongnu.org; Mon, 29 May 2017 05:06:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1dFGcq-0006EO-UV
-	for qemu-devel@nongnu.org; Mon, 29 May 2017 05:06:12 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:51718)
+	(envelope-from <groug@kaod.org>) id 1dFGcs-0006F3-BC
+	for qemu-devel@nongnu.org; Mon, 29 May 2017 05:06:14 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:41508
+	helo=mx0a-001b2d01.pphosted.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1dFGcq-0006Ca-Kh
-	for qemu-devel@nongnu.org; Mon, 29 May 2017 05:06:08 -0400
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v4T94E4o059698
-	for <qemu-devel@nongnu.org>; Mon, 29 May 2017 05:06:07 -0400
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1dFGcs-0006Er-5x
+	for qemu-devel@nongnu.org; Mon, 29 May 2017 05:06:10 -0400
+Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v4T94D6X189269
+	for <qemu-devel@nongnu.org>; Mon, 29 May 2017 05:06:09 -0400
 Received: from e06smtp10.uk.ibm.com (e06smtp10.uk.ibm.com [195.75.94.106])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2aqfqjwbwe-1
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2arghb0m05-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 29 May 2017 05:06:07 -0400
+	for <qemu-devel@nongnu.org>; Mon, 29 May 2017 05:06:09 -0400
 Received: from localhost
 	by e06smtp10.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
 	Only! Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <groug@kaod.org>;
-	Mon, 29 May 2017 10:06:04 +0100
+	Mon, 29 May 2017 10:06:07 +0100
 From: Greg Kurz <groug@kaod.org>
-Date: Mon, 29 May 2017 11:05:36 +0200
+Date: Mon, 29 May 2017 11:05:37 +0200
 In-Reply-To: <1496048740-26578-1-git-send-email-groug@kaod.org>
 References: <1496048740-26578-1-git-send-email-groug@kaod.org>
-Message-Id: <1496048740-26578-8-git-send-email-groug@kaod.org>
-Subject: [Qemu-devel] [PULL 07/11] util: drop old utimensat() compat code
+Message-Id: <1496048740-26578-9-git-send-email-groug@kaod.org>
+Subject: [Qemu-devel] [PULL 08/11] 9pfs: check return value of
+ v9fs_co_name_to_path()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,136 +41,102 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Peter Maydell <peter.maydell@linaro.org>, Stefan Hajnoczi <stefanha@redhat.com>, Greg Kurz <groug@kaod.org>
 
-Now that 9pfs and virtfs-proxy-helper have been converted to utimensat(),
-we don't need to keep qemu_utimens() anymore.
+These v9fs_co_name_to_path() call sites have always been around. I guess
+no care was taken to check the return value because the name_to_path
+operation could never fail at the time. This is no longer true: the
+handle and synth backends can already fail this operation, and so will the
+local backend soon.
 
 Signed-off-by: Greg Kurz <groug@kaod.org>
 Reviewed-by: Eric Blake <eblake@redhat.com>
 ---
- configure                 | 22 ----------------------
- include/sysemu/os-posix.h | 11 -----------
- util/oslib-posix.c        | 47 -----------------------------------------------
- 3 files changed, 80 deletions(-)
+ hw/9pfs/9p.c | 36 +++++++++++++++++++++++++-----------
+ 1 file changed, 25 insertions(+), 11 deletions(-)
 
-diff --git a/configure b/configure
-index 1a5ee4b909b8..0586ec9c64de 100755
---- a/configure
-+++ b/configure
-@@ -3629,25 +3629,6 @@ if compile_prog "" "" ; then
-   inotify1=yes
- fi
- 
--# check if utimensat and futimens are supported
--utimens=no
--cat > $TMPC << EOF
--#define _ATFILE_SOURCE
--#include <stddef.h>
--#include <fcntl.h>
--#include <sys/stat.h>
--
--int main(void)
--{
--    utimensat(AT_FDCWD, "foo", NULL, 0);
--    futimens(0, NULL);
--    return 0;
--}
--EOF
--if compile_prog "" "" ; then
--  utimens=yes
--fi
--
- # check if pipe2 is there
- pipe2=no
- cat > $TMPC << EOF
-@@ -5434,9 +5415,6 @@ fi
- if test "$curses" = "yes" ; then
-   echo "CONFIG_CURSES=y" >> $config_host_mak
- fi
--if test "$utimens" = "yes" ; then
--  echo "CONFIG_UTIMENSAT=y" >> $config_host_mak
--fi
- if test "$pipe2" = "yes" ; then
-   echo "CONFIG_PIPE2=y" >> $config_host_mak
- fi
-diff --git a/include/sysemu/os-posix.h b/include/sysemu/os-posix.h
-index 900bdcb45ad0..629c8c648b7a 100644
---- a/include/sysemu/os-posix.h
-+++ b/include/sysemu/os-posix.h
-@@ -51,17 +51,6 @@ int os_mlock(void);
- typedef struct timeval qemu_timeval;
- #define qemu_gettimeofday(tp) gettimeofday(tp, NULL)
- 
--#ifndef CONFIG_UTIMENSAT
--#ifndef UTIME_NOW
--# define UTIME_NOW     ((1l << 30) - 1l)
--#endif
--#ifndef UTIME_OMIT
--# define UTIME_OMIT    ((1l << 30) - 2l)
--#endif
--#endif
--typedef struct timespec qemu_timespec;
--int qemu_utimens(const char *path, const qemu_timespec *times);
--
- bool is_daemonized(void);
- 
- /**
-diff --git a/util/oslib-posix.c b/util/oslib-posix.c
-index 4d9189e9efcf..7e28c161b257 100644
---- a/util/oslib-posix.c
-+++ b/util/oslib-posix.c
-@@ -207,53 +207,6 @@ int qemu_pipe(int pipefd[2])
-     return ret;
+diff --git a/hw/9pfs/9p.c b/hw/9pfs/9p.c
+index a25d31e62f1c..96d268334865 100644
+--- a/hw/9pfs/9p.c
++++ b/hw/9pfs/9p.c
+@@ -2571,7 +2571,10 @@ static int coroutine_fn v9fs_complete_rename(V9fsPDU *pdu, V9fsFidState *fidp,
+             err = -EINVAL;
+             goto out;
+         }
+-        v9fs_co_name_to_path(pdu, &dirfidp->path, name->data, &new_path);
++        err = v9fs_co_name_to_path(pdu, &dirfidp->path, name->data, &new_path);
++        if (err < 0) {
++            goto out;
++        }
+     } else {
+         old_name = fidp->path.data;
+         end = strrchr(old_name, '/');
+@@ -2583,8 +2586,11 @@ static int coroutine_fn v9fs_complete_rename(V9fsPDU *pdu, V9fsFidState *fidp,
+         new_name = g_malloc0(end - old_name + name->size + 1);
+         strncat(new_name, old_name, end - old_name);
+         strncat(new_name + (end - old_name), name->data, name->size);
+-        v9fs_co_name_to_path(pdu, NULL, new_name, &new_path);
++        err = v9fs_co_name_to_path(pdu, NULL, new_name, &new_path);
+         g_free(new_name);
++        if (err < 0) {
++            goto out;
++        }
+     }
+     err = v9fs_co_rename(pdu, &fidp->path, &new_path);
+     if (err < 0) {
+@@ -2664,20 +2670,26 @@ out_nofid:
+     v9fs_string_free(&name);
  }
  
--int qemu_utimens(const char *path, const struct timespec *times)
--{
--    struct timeval tv[2], tv_now;
--    struct stat st;
--    int i;
--#ifdef CONFIG_UTIMENSAT
--    int ret;
--
--    ret = utimensat(AT_FDCWD, path, times, AT_SYMLINK_NOFOLLOW);
--    if (ret != -1 || errno != ENOSYS) {
--        return ret;
--    }
--#endif
--    /* Fallback: use utimes() instead of utimensat() */
--
--    /* happy if special cases */
--    if (times[0].tv_nsec == UTIME_OMIT && times[1].tv_nsec == UTIME_OMIT) {
--        return 0;
--    }
--    if (times[0].tv_nsec == UTIME_NOW && times[1].tv_nsec == UTIME_NOW) {
--        return utimes(path, NULL);
--    }
--
--    /* prepare for hard cases */
--    if (times[0].tv_nsec == UTIME_NOW || times[1].tv_nsec == UTIME_NOW) {
--        gettimeofday(&tv_now, NULL);
--    }
--    if (times[0].tv_nsec == UTIME_OMIT || times[1].tv_nsec == UTIME_OMIT) {
--        stat(path, &st);
--    }
--
--    for (i = 0; i < 2; i++) {
--        if (times[i].tv_nsec == UTIME_NOW) {
--            tv[i].tv_sec = tv_now.tv_sec;
--            tv[i].tv_usec = tv_now.tv_usec;
--        } else if (times[i].tv_nsec == UTIME_OMIT) {
--            tv[i].tv_sec = (i == 0) ? st.st_atime : st.st_mtime;
--            tv[i].tv_usec = 0;
--        } else {
--            tv[i].tv_sec = times[i].tv_sec;
--            tv[i].tv_usec = times[i].tv_nsec / 1000;
--        }
--    }
--
--    return utimes(path, &tv[0]);
--}
--
- char *
- qemu_get_local_state_pathname(const char *relative_pathname)
+-static void coroutine_fn v9fs_fix_fid_paths(V9fsPDU *pdu, V9fsPath *olddir,
+-                                            V9fsString *old_name,
+-                                            V9fsPath *newdir,
+-                                            V9fsString *new_name)
++static int coroutine_fn v9fs_fix_fid_paths(V9fsPDU *pdu, V9fsPath *olddir,
++                                           V9fsString *old_name,
++                                           V9fsPath *newdir,
++                                           V9fsString *new_name)
  {
+     V9fsFidState *tfidp;
+     V9fsPath oldpath, newpath;
+     V9fsState *s = pdu->s;
+-
++    int err;
+ 
+     v9fs_path_init(&oldpath);
+     v9fs_path_init(&newpath);
+-    v9fs_co_name_to_path(pdu, olddir, old_name->data, &oldpath);
+-    v9fs_co_name_to_path(pdu, newdir, new_name->data, &newpath);
++    err = v9fs_co_name_to_path(pdu, olddir, old_name->data, &oldpath);
++    if (err < 0) {
++        goto out;
++    }
++    err = v9fs_co_name_to_path(pdu, newdir, new_name->data, &newpath);
++    if (err < 0) {
++        goto out;
++    }
+ 
+     /*
+      * Fixup fid's pointing to the old name to
+@@ -2689,8 +2701,10 @@ static void coroutine_fn v9fs_fix_fid_paths(V9fsPDU *pdu, V9fsPath *olddir,
+             v9fs_fix_path(&tfidp->path, &newpath, strlen(oldpath.data));
+         }
+     }
++out:
+     v9fs_path_free(&oldpath);
+     v9fs_path_free(&newpath);
++    return err;
+ }
+ 
+ static int coroutine_fn v9fs_complete_renameat(V9fsPDU *pdu, int32_t olddirfid,
+@@ -2724,8 +2738,8 @@ static int coroutine_fn v9fs_complete_renameat(V9fsPDU *pdu, int32_t olddirfid,
+     }
+     if (s->ctx.export_flags & V9FS_PATHNAME_FSCONTEXT) {
+         /* Only for path based fid  we need to do the below fixup */
+-        v9fs_fix_fid_paths(pdu, &olddirfidp->path, old_name,
+-                           &newdirfidp->path, new_name);
++        err = v9fs_fix_fid_paths(pdu, &olddirfidp->path, old_name,
++                                 &newdirfidp->path, new_name);
+     }
+ out:
+     if (olddirfidp) {
 -- 
 2.7.4
