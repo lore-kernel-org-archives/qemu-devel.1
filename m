@@ -1,24 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40202)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40190)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aurelien@aurel32.net>) id 1dFQN1-0002sB-Jp
-	for qemu-devel@nongnu.org; Mon, 29 May 2017 15:30:29 -0400
+	(envelope-from <aurelien@aurel32.net>) id 1dFQN1-0002rn-85
+	for qemu-devel@nongnu.org; Mon, 29 May 2017 15:30:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aurelien@aurel32.net>) id 1dFQN0-0000JJ-Ft
+	(envelope-from <aurelien@aurel32.net>) id 1dFQN0-0000JQ-GK
 	for qemu-devel@nongnu.org; Mon, 29 May 2017 15:30:27 -0400
-Received: from hall.aurel32.net ([2001:bc8:30d7:100::1]:43122)
+Received: from hall.aurel32.net ([2001:bc8:30d7:100::1]:43128)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <aurelien@aurel32.net>)
-	id 1dFQN0-0000Ir-A3
+	id 1dFQN0-0000It-AV
 	for qemu-devel@nongnu.org; Mon, 29 May 2017 15:30:26 -0400
 From: Aurelien Jarno <aurelien@aurel32.net>
-Date: Mon, 29 May 2017 21:30:14 +0200
-Message-Id: <20170529193016.6888-4-aurelien@aurel32.net>
+Date: Mon, 29 May 2017 21:30:13 +0200
+Message-Id: <20170529193016.6888-3-aurelien@aurel32.net>
 In-Reply-To: <20170529193016.6888-1-aurelien@aurel32.net>
 References: <20170529193016.6888-1-aurelien@aurel32.net>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 3/5] target/sh4: introduce DELAY_SLOT_MASK
+Subject: [Qemu-devel] [PULL 2/5] target/sh4: fix reset when using a kernel
+ and an initrd
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,127 +28,49 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Stefan Hajnoczi <stefanha@redhat.com>
 Cc: Aurelien Jarno <aurelien@aurel32.net>, "open list:All patches CC here" <qemu-devel@nongnu.org>
 
-This will make easier the introduction of a new flag in the next
-patches.
+When a masked exception happens, the SH4 CPU generates a non-masked
+reset exception, which then jumps to the reset vector at address
+0xA0000000. While this is emulated correctly in QEMU, this does not
+work when using a kernel and initrd as this address then contain an
+illegal instruction (and there is no guarantee the kernel and initrd
+haven't been overwritten).
 
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Therefore call qemu_system_reset_request to reload the kernel and initrd
+and load the program counter to the kernel entry point.
+
 Reviewed-by: Richard Henderson <rth@twiddle.net>
 Signed-off-by: Aurelien Jarno <aurelien@aurel32.net>
 ---
- target/sh4/cpu.h       |  3 ++-
- target/sh4/helper.c    |  4 ++--
- target/sh4/translate.c | 17 ++++++++---------
- 3 files changed, 12 insertions(+), 12 deletions(-)
+ target/sh4/helper.c | 10 +++++++++-
+ 1 file changed, 9 insertions(+), 1 deletion(-)
 
-diff --git a/target/sh4/cpu.h b/target/sh4/cpu.h
-index 6c07c6b24b..7969c9af98 100644
---- a/target/sh4/cpu.h
-+++ b/target/sh4/cpu.h
-@@ -91,6 +91,7 @@
- #define FPSCR_RM_NEAREST       (0 << 0)
- #define FPSCR_RM_ZERO          (1 << 0)
- 
-+#define DELAY_SLOT_MASK        0x3
- #define DELAY_SLOT             (1 << 0)
- #define DELAY_SLOT_CONDITIONAL (1 << 1)
- 
-@@ -380,7 +381,7 @@ static inline void cpu_get_tb_cpu_state(CPUSH4State *env, target_ulong *pc,
- {
-     *pc = env->pc;
-     *cs_base = 0;
--    *flags = (env->flags & (DELAY_SLOT | DELAY_SLOT_CONDITIONAL)) /* Bits 0-1 */
-+    *flags = (env->flags & DELAY_SLOT_MASK)                    /* Bits  0- 1 */
-             | (env->fpscr & (FPSCR_FR | FPSCR_SZ | FPSCR_PR))  /* Bits 19-21 */
-             | (env->sr & ((1u << SR_MD) | (1u << SR_RB)))      /* Bits 29-30 */
-             | (env->sr & (1u << SR_FD))                        /* Bit 15 */
 diff --git a/target/sh4/helper.c b/target/sh4/helper.c
-index 5296e7cf4e..d420931530 100644
+index 4c024f9529..5296e7cf4e 100644
 --- a/target/sh4/helper.c
 +++ b/target/sh4/helper.c
-@@ -172,11 +172,11 @@ void superh_cpu_do_interrupt(CPUState *cs)
-     env->sgr = env->gregs[15];
-     env->sr |= (1u << SR_BL) | (1u << SR_MD) | (1u << SR_RB);
+@@ -21,6 +21,7 @@
+ #include "cpu.h"
+ #include "exec/exec-all.h"
+ #include "exec/log.h"
++#include "sysemu/sysemu.h"
  
--    if (env->flags & (DELAY_SLOT | DELAY_SLOT_CONDITIONAL)) {
-+    if (env->flags & DELAY_SLOT_MASK) {
-         /* Branch instruction should be executed again before delay slot. */
- 	env->spc -= 2;
- 	/* Clear flags for exception/interrupt routine. */
--        env->flags &= ~(DELAY_SLOT | DELAY_SLOT_CONDITIONAL);
-+        env->flags &= ~DELAY_SLOT_MASK;
-     }
+ #if !defined(CONFIG_USER_ONLY)
+ #include "hw/sh4/sh_intc.h"
+@@ -92,7 +93,14 @@ void superh_cpu_do_interrupt(CPUState *cs)
  
-     if (do_exp) {
-diff --git a/target/sh4/translate.c b/target/sh4/translate.c
-index 0bc2f9ff19..aba316f593 100644
---- a/target/sh4/translate.c
-+++ b/target/sh4/translate.c
-@@ -217,8 +217,7 @@ static inline void gen_save_cpu_state(DisasContext *ctx, bool save_pc)
-     if (ctx->delayed_pc != (uint32_t) -1) {
-         tcg_gen_movi_i32(cpu_delayed_pc, ctx->delayed_pc);
-     }
--    if ((ctx->tbflags & (DELAY_SLOT | DELAY_SLOT_CONDITIONAL))
--        != ctx->envflags) {
-+    if ((ctx->tbflags & DELAY_SLOT_MASK) != ctx->envflags) {
-         tcg_gen_movi_i32(cpu_flags, ctx->envflags);
-     }
- }
-@@ -329,7 +328,7 @@ static inline void gen_store_fpr64 (TCGv_i64 t, int reg)
- #define DREG(x) FREG(x) /* Assumes lsb of (x) is always 0 */
- 
- #define CHECK_NOT_DELAY_SLOT \
--    if (ctx->envflags & (DELAY_SLOT | DELAY_SLOT_CONDITIONAL)) {     \
-+    if (ctx->envflags & DELAY_SLOT_MASK) {                           \
-         gen_save_cpu_state(ctx, true);                               \
-         gen_helper_raise_slot_illegal_instruction(cpu_env);          \
-         ctx->bstate = BS_EXCP;                                       \
-@@ -339,7 +338,7 @@ static inline void gen_store_fpr64 (TCGv_i64 t, int reg)
- #define CHECK_PRIVILEGED                                             \
-     if (IS_USER(ctx)) {                                              \
-         gen_save_cpu_state(ctx, true);                               \
--        if (ctx->envflags & (DELAY_SLOT | DELAY_SLOT_CONDITIONAL)) { \
-+        if (ctx->envflags & DELAY_SLOT_MASK) {                       \
-             gen_helper_raise_slot_illegal_instruction(cpu_env);      \
-         } else {                                                     \
-             gen_helper_raise_illegal_instruction(cpu_env);           \
-@@ -351,7 +350,7 @@ static inline void gen_store_fpr64 (TCGv_i64 t, int reg)
- #define CHECK_FPU_ENABLED                                            \
-     if (ctx->tbflags & (1u << SR_FD)) {                              \
-         gen_save_cpu_state(ctx, true);                               \
--        if (ctx->envflags & (DELAY_SLOT | DELAY_SLOT_CONDITIONAL)) { \
-+        if (ctx->envflags & DELAY_SLOT_MASK) {                       \
-             gen_helper_raise_slot_fpu_disable(cpu_env);              \
-         } else {                                                     \
-             gen_helper_raise_fpu_disable(cpu_env);                   \
-@@ -1784,7 +1783,7 @@ static void _decode_opc(DisasContext * ctx)
-     fflush(stderr);
- #endif
-     gen_save_cpu_state(ctx, true);
--    if (ctx->envflags & (DELAY_SLOT | DELAY_SLOT_CONDITIONAL)) {
-+    if (ctx->envflags & DELAY_SLOT_MASK) {
-         gen_helper_raise_slot_illegal_instruction(cpu_env);
-     } else {
-         gen_helper_raise_illegal_instruction(cpu_env);
-@@ -1798,9 +1797,9 @@ static void decode_opc(DisasContext * ctx)
- 
-     _decode_opc(ctx);
- 
--    if (old_flags & (DELAY_SLOT | DELAY_SLOT_CONDITIONAL)) {
-+    if (old_flags & DELAY_SLOT_MASK) {
-         /* go out of the delay slot */
--        ctx->envflags &= ~(DELAY_SLOT | DELAY_SLOT_CONDITIONAL);
-+        ctx->envflags &= ~DELAY_SLOT_MASK;
-         tcg_gen_movi_i32(cpu_flags, ctx->envflags);
-         ctx->bstate = BS_BRANCH;
-         if (old_flags & DELAY_SLOT_CONDITIONAL) {
-@@ -1824,7 +1823,7 @@ void gen_intermediate_code(CPUSH4State * env, struct TranslationBlock *tb)
-     pc_start = tb->pc;
-     ctx.pc = pc_start;
-     ctx.tbflags = (uint32_t)tb->flags;
--    ctx.envflags = tb->flags & (DELAY_SLOT | DELAY_SLOT_CONDITIONAL);
-+    ctx.envflags = tb->flags & DELAY_SLOT_MASK;
-     ctx.bstate = BS_NONE;
-     ctx.memidx = (ctx.tbflags & (1u << SR_MD)) == 0 ? 1 : 0;
-     /* We don't know if the delayed pc came from a dynamic or static branch,
+     if (env->sr & (1u << SR_BL)) {
+         if (do_exp && cs->exception_index != 0x1e0) {
+-            cs->exception_index = 0x000; /* masked exception -> reset */
++            /* In theory a masked exception generates a reset exception,
++               which in turn jumps to the reset vector. However this only
++               works when using a bootloader. When using a kernel and an
++               initrd, they need to be reloaded and the program counter
++               should be loaded with the kernel entry point.
++               qemu_system_reset_request takes care of that.  */
++            qemu_system_reset_request();
++            return;
+         }
+         if (do_irq && !env->in_sleep) {
+             return; /* masked */
 -- 
 2.11.0
