@@ -1,32 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42759)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43192)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dFO5q-0006Ru-Hf
-	for qemu-devel@nongnu.org; Mon, 29 May 2017 13:04:35 -0400
+	(envelope-from <mreitz@redhat.com>) id 1dFO8a-0007kh-TU
+	for qemu-devel@nongnu.org; Mon, 29 May 2017 13:07:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dFO5m-0001yJ-J1
-	for qemu-devel@nongnu.org; Mon, 29 May 2017 13:04:34 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:51618)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1dFO5m-0001xw-CV
-	for qemu-devel@nongnu.org; Mon, 29 May 2017 13:04:30 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 07AA381233
-	for <qemu-devel@nongnu.org>; Mon, 29 May 2017 17:04:29 +0000 (UTC)
-Date: Mon, 29 May 2017 14:04:25 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20170529170425.GG32274@thinpad.lan.raisama.net>
-References: <20170526181200.17227-1-ehabkost@redhat.com>
-	<20170526181200.17227-3-ehabkost@redhat.com>
-	<874lw3zjs4.fsf@dusky.pond.sub.org>
+	(envelope-from <mreitz@redhat.com>) id 1dFO8a-0002p2-1r
+	for qemu-devel@nongnu.org; Mon, 29 May 2017 13:07:24 -0400
+References: <20170503122539.282182-1-vsementsov@virtuozzo.com>
+	<20170503122539.282182-16-vsementsov@virtuozzo.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <dc462db3-9ad7-62f4-8d71-367e79583a4b@redhat.com>
+Date: Mon, 29 May 2017 19:07:08 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <874lw3zjs4.fsf@dusky.pond.sub.org>
-Subject: Re: [Qemu-devel] [PATCH v3 2/3] qemu.py: Add QEMUMachine.exitcode()
- method
+In-Reply-To: <20170503122539.282182-16-vsementsov@virtuozzo.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="b7OMH5L01upKoTEixbffTCW7WiEVHpauT"
+Subject: Re: [Qemu-devel] [PATCH 15/25] qcow2: add persistent dirty bitmaps
+ support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,57 +25,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: qemu-devel@nongnu.org, Marcel Apfelbaum <marcel@redhat.com>, Thomas Huth <thuth@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, armbru@redhat.com, eblake@redhat.com, jsnow@redhat.com, famz@redhat.com, den@openvz.org, stefanha@redhat.com, pbonzini@redhat.com
 
-On Mon, May 29, 2017 at 06:53:47PM +0200, Markus Armbruster wrote:
-> Eduardo Habkost <ehabkost@redhat.com> writes:
-> 
-> > Allow the exit code of QEMU to be queried by scripts.
-> >
-> > Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
-> > ---
-> >  scripts/qemu.py | 4 ++++
-> >  1 file changed, 4 insertions(+)
-> >
-> > diff --git a/scripts/qemu.py b/scripts/qemu.py
-> > index 16934f1e02..ebe1c4b919 100644
-> > --- a/scripts/qemu.py
-> > +++ b/scripts/qemu.py
-> > @@ -88,6 +88,10 @@ class QEMUMachine(object):
-> >      def is_running(self):
-> >          return self._popen and (self._popen.returncode is None)
-> >  
-> > +    def exitcode(self):
-> > +        if self._popen:
-> > +            return self._popen.returncode
-> > +
-> 
-> Falling off the function's end returns None.  Do we really want to rely
-> on that?
-> 
-> For what it's worth, I checked the Python Language Reference, found it
-> less than clear, so I tried it out, too.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--b7OMH5L01upKoTEixbffTCW7WiEVHpauT
+From: Max Reitz <mreitz@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, armbru@redhat.com, eblake@redhat.com, jsnow@redhat.com,
+ famz@redhat.com, den@openvz.org, stefanha@redhat.com, pbonzini@redhat.com
+Message-ID: <dc462db3-9ad7-62f4-8d71-367e79583a4b@redhat.com>
+Subject: Re: [PATCH 15/25] qcow2: add persistent dirty bitmaps support
+References: <20170503122539.282182-1-vsementsov@virtuozzo.com>
+ <20170503122539.282182-16-vsementsov@virtuozzo.com>
+In-Reply-To: <20170503122539.282182-16-vsementsov@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-I agree that the intent may not be clear when looking at the
-code.  I can squash this in:
+On 2017-05-03 14:25, Vladimir Sementsov-Ogievskiy wrote:
+> Store persistent dirty bitmaps in qcow2 image.
+>=20
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> ---
+>  block/qcow2-bitmap.c | 475 +++++++++++++++++++++++++++++++++++++++++++=
+++++++++
+>  block/qcow2.c        |   9 +
+>  block/qcow2.h        |   1 +
+>  3 files changed, 485 insertions(+)
 
-diff --git a/scripts/qemu.py b/scripts/qemu.py
-index ebe1c4b919..bf00eddab8 100644
---- a/scripts/qemu.py
-+++ b/scripts/qemu.py
-@@ -89,8 +89,9 @@ class QEMUMachine(object):
-         return self._popen and (self._popen.returncode is None)
- 
-     def exitcode(self):
--        if self._popen:
--            return self._popen.returncode
-+        if not self._popen:
-+            return None
-+        return self._popen.returncode
- 
-     def get_pid(self):
-         if not self.is_running():
+Reviewed-by: Max Reitz <mreitz@redhat.com>
 
--- 
-Eduardo
+
+--b7OMH5L01upKoTEixbffTCW7WiEVHpauT
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iQEvBAEBCAAZBQJZLFU9EhxtcmVpdHpAcmVkaGF0LmNvbQAKCRD0B9sAYdXPQPL9
+B/wI3vCI+5vxmrzDFlsemhDS4CDHt5VCUEGsnC3N2QAV6oZ1Mh1nRnHMRvK5JpTy
+GuDHpqS9hz2dm7jZjTiZ3IBxWLGNYFNiTTUcph/Dik9XK0+ydunGacK1yNkg4Gcn
+olY5u09XyZbX2hUKO3Yg/HItoA28tv/CkN2GOWk7wc76PmNcMB3Gyf+USErCmdWx
+mD4nWx48JfWkFGSgC8dmsu1Jd3ldMUnf3tAX/H4uDfjw11hJ68GRBiNKDTKQLp3V
+16P8IjpuAnBVY3kRMfoO2HiFAusuCdHSvVSS8YUJOv45o5/n167iLSPWZg5uXgpu
+IYARpPaiQnNCIeF/I++YfHmh
+=CH3G
+-----END PGP SIGNATURE-----
+
+--b7OMH5L01upKoTEixbffTCW7WiEVHpauT--
