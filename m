@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38809)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38827)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aurelien@aurel32.net>) id 1dFQHc-0006Tt-0r
+	(envelope-from <aurelien@aurel32.net>) id 1dFQHc-0006Ty-KH
 	for qemu-devel@nongnu.org; Mon, 29 May 2017 15:24:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aurelien@aurel32.net>) id 1dFQHa-00074S-AK
+	(envelope-from <aurelien@aurel32.net>) id 1dFQHa-00074I-9d
 	for qemu-devel@nongnu.org; Mon, 29 May 2017 15:24:52 -0400
-Received: from hall.aurel32.net ([2001:bc8:30d7:100::1]:42878)
+Received: from hall.aurel32.net ([2001:bc8:30d7:100::1]:42858)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <aurelien@aurel32.net>)
-	id 1dFQHZ-00072J-Vz
+	id 1dFQHZ-00072B-VO
 	for qemu-devel@nongnu.org; Mon, 29 May 2017 15:24:50 -0400
 From: Aurelien Jarno <aurelien@aurel32.net>
-Date: Mon, 29 May 2017 21:24:28 +0200
-Message-Id: <20170529192440.5990-18-aurelien@aurel32.net>
+Date: Mon, 29 May 2017 21:24:27 +0200
+Message-Id: <20170529192440.5990-17-aurelien@aurel32.net>
 In-Reply-To: <20170529192440.5990-1-aurelien@aurel32.net>
 References: <20170529192440.5990-1-aurelien@aurel32.net>
-Subject: [Qemu-devel] [PATCH v2 17/29] target/s390x: fix COMPARE LOGICAL
- LONG EXTENDED
+Subject: [Qemu-devel] [PATCH v2 16/29] target/s390x: improve 24-bit and
+ 31-bit lengths read/write
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,132 +28,106 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Aurelien Jarno <aurelien@aurel32.net>, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>
 
-There are multiple issues with the COMPARE LOGICAL LONG EXTENDED
-instruction:
-- The test between the two operands is inverted, leading to an inversion
-  of the cc values 1 and 2.
-- The address and length of an operand continue to be decreased after
-  reaching the end of this operand. These values are then wrong write
-  back to the registers.
-- We should limit the amount of bytes to process, so that interrupts can
-  be served correctly.
-
-At the same time rename dest into src1 and src into src3 to match the
-operand names and make the code less confusing.
-
+Reviewed-by: Richard Henderson <rth@twiddle.net>
 Signed-off-by: Aurelien Jarno <aurelien@aurel32.net>
 ---
- target/s390x/mem_helper.c | 54 ++++++++++++++++++++++++++++++++---------------
- target/s390x/translate.c  | 20 +++++++++++++-----
- 2 files changed, 52 insertions(+), 22 deletions(-)
+ target/s390x/mem_helper.c | 47 +++++++++++++++++++++++++++++++++--------------
+ 1 file changed, 33 insertions(+), 14 deletions(-)
 
 diff --git a/target/s390x/mem_helper.c b/target/s390x/mem_helper.c
-index 911c3d7f8e..b3a2ce2252 100644
+index e494b7dfd4..911c3d7f8e 100644
 --- a/target/s390x/mem_helper.c
 +++ b/target/s390x/mem_helper.c
-@@ -666,35 +666,55 @@ uint32_t HELPER(clcle)(CPUS390XState *env, uint32_t r1, uint64_t a2,
+@@ -407,6 +407,31 @@ static inline void set_address(CPUS390XState *env, int reg, uint64_t address)
+     }
+ }
+ 
++static inline uint64_t wrap_length(CPUS390XState *env, uint64_t length)
++{
++    if (!(env->psw.mask & PSW_MASK_64)) {
++        /* 24-Bit and 31-Bit mode */
++        length &= 0x7fffffff;
++    }
++    return length;
++}
++
++static inline uint64_t get_length(CPUS390XState *env, int reg)
++{
++    return wrap_length(env, env->regs[reg]);
++}
++
++static inline void set_length(CPUS390XState *env, int reg, uint64_t length)
++{
++    if (env->psw.mask & PSW_MASK_64) {
++        /* 64-Bit mode */
++        env->regs[reg] = length;
++    } else {
++        /* 24-Bit and 31-Bit mode */
++        env->regs[reg] = deposit64(env->regs[reg], 0, 32, length);
++    }
++}
++
+ /* search string (c is byte to search, r2 is string, r1 end of string) */
+ uint64_t HELPER(srst)(CPUS390XState *env, uint64_t r0, uint64_t end,
+                       uint64_t str)
+@@ -598,19 +623,14 @@ uint32_t HELPER(mvcle)(CPUS390XState *env, uint32_t r1, uint64_t a2,
                         uint32_t r3)
  {
      uintptr_t ra = GETPC();
--    uint64_t destlen = get_length(env, r1 + 1);
--    uint64_t dest = get_address(env, r1);
--    uint64_t srclen = get_length(env, r3 + 1);
--    uint64_t src = get_address(env, r3);
-+    uint64_t src1len = get_length(env, r1 + 1);
-+    uint64_t src1 = get_address(env, r1);
-+    uint64_t src3len = get_length(env, r3 + 1);
-+    uint64_t src3 = get_address(env, r3);
+-    uint64_t destlen = env->regs[r1 + 1];
++    uint64_t destlen = get_length(env, r1 + 1);
+     uint64_t dest = get_address(env, r1);
+-    uint64_t srclen = env->regs[r3 + 1];
++    uint64_t srclen = get_length(env, r3 + 1);
+     uint64_t src = get_address(env, r3);
      uint8_t pad = a2 & 0xff;
-+    uint64_t len = MAX(src1len, src3len);
-     uint32_t cc = 0;
+     uint8_t v;
+     uint32_t cc;
  
--    if (!(destlen || srclen)) {
-+    if (!len) {
-         return cc;
+-    if (!(env->psw.mask & PSW_MASK_64)) {
+-        destlen = (uint32_t)destlen;
+-        srclen = (uint32_t)srclen;
+-    }
+-
+     if (destlen == srclen) {
+         cc = 0;
+     } else if (destlen < srclen) {
+@@ -632,10 +652,9 @@ uint32_t HELPER(mvcle)(CPUS390XState *env, uint32_t r1, uint64_t a2,
+         cpu_stb_data_ra(env, dest, pad, ra);
      }
  
--    if (srclen > destlen) {
--        srclen = destlen;
-+    /* Lest we fail to service interrupts in a timely manner, limit the
-+       amount of work we're willing to do.  For now, let's cap at 8k.  */
-+    if (len > 0x2000) {
-+        len = 0x2000;
-+        cc = 3;
-     }
+-    env->regs[r1 + 1] = destlen;
++    set_length(env, r1 + 1 , destlen);
+     /* can't use srclen here, we trunc'ed it */
+-    /* FIXME: 31-bit mode! */
+-    env->regs[r3 + 1] -= src - env->regs[r3];
++    set_length(env, r3 + 1, env->regs[r3 + 1] - src - env->regs[r3]);
+     set_address(env, r1, dest);
+     set_address(env, r3, src);
  
--    for (; destlen || srclen; src++, dest++, destlen--, srclen--) {
--        uint8_t v1 = srclen ? cpu_ldub_data_ra(env, src, ra) : pad;
--        uint8_t v2 = destlen ? cpu_ldub_data_ra(env, dest, ra) : pad;
--        if (v1 != v2) {
--            cc = (v1 < v2) ? 1 : 2;
-+    for (; len; len--) {
-+        uint8_t v1 = pad;
-+        uint8_t v3 = pad;
-+
-+        if (src1len) {
-+            v1 = cpu_ldub_data_ra(env, src1, ra);
-+        }
-+        if (src3len) {
-+            v3 = cpu_ldub_data_ra(env, src3, ra);
-+        }
-+
-+        if (v1 != v3) {
-+            cc = (v1 < v3) ? 1 : 2;
-             break;
-         }
-+
-+        if (src1len) {
-+            src1++;
-+            src1len--;
-+        }
-+        if (src3len) {
-+            src3++;
-+            src3len--;
-+        }
-     }
- 
--    set_length(env, r1 + 1, destlen);
--    /* can't use srclen here, we trunc'ed it */
--    set_length(env, r3 + 1, env->regs[r3 + 1] - src - env->regs[r3]);
--    set_address(env, r1, dest);
--    set_address(env, r3, src);
-+    set_length(env, r1 + 1, src1len);
-+    set_length(env, r3 + 1, src3len);
-+    set_address(env, r1, src1);
-+    set_address(env, r3, src3);
- 
-     return cc;
- }
-diff --git a/target/s390x/translate.c b/target/s390x/translate.c
-index 95ca53c1ef..9309e58009 100644
---- a/target/s390x/translate.c
-+++ b/target/s390x/translate.c
-@@ -1917,11 +1917,21 @@ static ExitStatus op_clc(DisasContext *s, DisasOps *o)
- 
- static ExitStatus op_clcle(DisasContext *s, DisasOps *o)
+@@ -647,9 +666,9 @@ uint32_t HELPER(clcle)(CPUS390XState *env, uint32_t r1, uint64_t a2,
+                        uint32_t r3)
  {
--    TCGv_i32 r1 = tcg_const_i32(get_field(s->fields, r1));
--    TCGv_i32 r3 = tcg_const_i32(get_field(s->fields, r3));
--    gen_helper_clcle(cc_op, cpu_env, r1, o->in2, r3);
--    tcg_temp_free_i32(r1);
--    tcg_temp_free_i32(r3);
-+    int r1 = get_field(s->fields, r1);
-+    int r3 = get_field(s->fields, r3);
-+    TCGv_i32 t1, t3;
-+
-+    /* r1 and r3 must be even.  */
-+    if (r1 & 1 || r3 & 1) {
-+        gen_program_exception(s, PGM_SPECIFICATION);
-+        return EXIT_NORETURN;
-+    }
-+
-+    t1 = tcg_const_i32(r1);
-+    t3 = tcg_const_i32(r3);
-+    gen_helper_clcle(cc_op, cpu_env, t1, o->in2, t3);
-+    tcg_temp_free_i32(t1);
-+    tcg_temp_free_i32(t3);
-     set_cc_static(s);
-     return NO_EXIT;
- }
+     uintptr_t ra = GETPC();
+-    uint64_t destlen = env->regs[r1 + 1];
++    uint64_t destlen = get_length(env, r1 + 1);
+     uint64_t dest = get_address(env, r1);
+-    uint64_t srclen = env->regs[r3 + 1];
++    uint64_t srclen = get_length(env, r3 + 1);
+     uint64_t src = get_address(env, r3);
+     uint8_t pad = a2 & 0xff;
+     uint32_t cc = 0;
+@@ -671,9 +690,9 @@ uint32_t HELPER(clcle)(CPUS390XState *env, uint32_t r1, uint64_t a2,
+         }
+     }
+ 
+-    env->regs[r1 + 1] = destlen;
++    set_length(env, r1 + 1, destlen);
+     /* can't use srclen here, we trunc'ed it */
+-    env->regs[r3 + 1] -= src - env->regs[r3];
++    set_length(env, r3 + 1, env->regs[r3 + 1] - src - env->regs[r3]);
+     set_address(env, r1, dest);
+     set_address(env, r3, src);
+ 
 -- 
 2.11.0
