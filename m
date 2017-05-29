@@ -1,34 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36081)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36094)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1dFGcn-0001d8-Kw
-	for qemu-devel@nongnu.org; Mon, 29 May 2017 05:06:06 -0400
+	(envelope-from <groug@kaod.org>) id 1dFGcp-0001dU-8A
+	for qemu-devel@nongnu.org; Mon, 29 May 2017 05:06:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1dFGcj-0006AS-Ln
-	for qemu-devel@nongnu.org; Mon, 29 May 2017 05:06:05 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:44627
-	helo=mx0a-001b2d01.pphosted.com)
+	(envelope-from <groug@kaod.org>) id 1dFGcl-0006Av-93
+	for qemu-devel@nongnu.org; Mon, 29 May 2017 05:06:07 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:55339)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1dFGcj-0006AH-GN
-	for qemu-devel@nongnu.org; Mon, 29 May 2017 05:06:01 -0400
-Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1dFGck-0006Aa-Vs
+	for qemu-devel@nongnu.org; Mon, 29 May 2017 05:06:03 -0400
+Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
 	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v4T94D3P051805
+	v4T94Eje109581
 	for <qemu-devel@nongnu.org>; Mon, 29 May 2017 05:06:01 -0400
-Received: from e06smtp15.uk.ibm.com (e06smtp15.uk.ibm.com [195.75.94.111])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2aqf9jnfnd-1
+Received: from e06smtp13.uk.ibm.com (e06smtp13.uk.ibm.com [195.75.94.109])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2aqg1p4k6g-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 29 May 2017 05:06:00 -0400
+	for <qemu-devel@nongnu.org>; Mon, 29 May 2017 05:06:01 -0400
 Received: from localhost
-	by e06smtp15.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	by e06smtp13.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
 	Only! Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <groug@kaod.org>;
-	Mon, 29 May 2017 10:05:59 +0100
+	Mon, 29 May 2017 10:05:58 +0100
 From: Greg Kurz <groug@kaod.org>
-Date: Mon, 29 May 2017 11:05:32 +0200
+Date: Mon, 29 May 2017 11:05:31 +0200
 In-Reply-To: <1496048740-26578-1-git-send-email-groug@kaod.org>
 References: <1496048740-26578-1-git-send-email-groug@kaod.org>
-Message-Id: <1496048740-26578-4-git-send-email-groug@kaod.org>
-Subject: [Qemu-devel] [PULL 03/11] 9pfs: drop pdu_push_and_notify()
+Message-Id: <1496048740-26578-3-git-send-email-groug@kaod.org>
+Subject: [Qemu-devel] [PULL 02/11] fsdev: don't allow unknown format in
+ marshal/unmarshal
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -40,38 +40,36 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Peter Maydell <peter.maydell@linaro.org>, Stefan Hajnoczi <stefanha@redhat.com>, Greg Kurz <groug@kaod.org>
 
-Only pdu_complete() needs to notify the client that a request has completed.
+The code only uses well known format strings. An unknown format token is a
+bug.
 
 Signed-off-by: Greg Kurz <groug@kaod.org>
 Reviewed-by: Stefano Stabellini <sstabellini@kernel.org>
 ---
- hw/9pfs/9p.c | 7 +------
- 1 file changed, 1 insertion(+), 6 deletions(-)
+ fsdev/9p-iov-marshal.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/hw/9pfs/9p.c b/hw/9pfs/9p.c
-index b3048371a8ee..a25d31e62f1c 100644
---- a/hw/9pfs/9p.c
-+++ b/hw/9pfs/9p.c
-@@ -65,11 +65,6 @@ ssize_t pdu_unmarshal(V9fsPDU *pdu, size_t offset, const char *fmt, ...)
-     return ret;
- }
- 
--static void pdu_push_and_notify(V9fsPDU *pdu)
--{
--    pdu->s->transport->push_and_notify(pdu);
--}
--
- static int omode_to_uflags(int8_t mode)
- {
-     int ret = 0;
-@@ -668,7 +663,7 @@ static void coroutine_fn pdu_complete(V9fsPDU *pdu, ssize_t len)
-     pdu->size = len;
-     pdu->id = id;
- 
--    pdu_push_and_notify(pdu);
-+    pdu->s->transport->push_and_notify(pdu);
- 
-     /* Now wakeup anybody waiting in flush for this request */
-     if (!qemu_co_queue_next(&pdu->complete)) {
+diff --git a/fsdev/9p-iov-marshal.c b/fsdev/9p-iov-marshal.c
+index 1d16f8df4bd4..a1c9beddd2e7 100644
+--- a/fsdev/9p-iov-marshal.c
++++ b/fsdev/9p-iov-marshal.c
+@@ -168,7 +168,7 @@ ssize_t v9fs_iov_vunmarshal(struct iovec *out_sg, int out_num, size_t offset,
+             break;
+         }
+         default:
+-            break;
++            g_assert_not_reached();
+         }
+         if (copied < 0) {
+             return copied;
+@@ -281,7 +281,7 @@ ssize_t v9fs_iov_vmarshal(struct iovec *in_sg, int in_num, size_t offset,
+             break;
+         }
+         default:
+-            break;
++            g_assert_not_reached();
+         }
+         if (copied < 0) {
+             return copied;
 -- 
 2.7.4
