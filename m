@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51429)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59269)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dan@kernelim.com>) id 1dExuQ-0007gj-Vf
-	for qemu-devel@nongnu.org; Sun, 28 May 2017 09:07:06 -0400
+	(envelope-from <mst@redhat.com>) id 1dF8OK-0008Uw-Qx
+	for qemu-devel@nongnu.org; Sun, 28 May 2017 20:18:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dan@kernelim.com>) id 1dExuN-0004G4-QM
-	for qemu-devel@nongnu.org; Sun, 28 May 2017 09:07:02 -0400
-Received: from mail-wm0-x233.google.com ([2a00:1450:400c:c09::233]:38856)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <dan@kernelim.com>) id 1dExuN-0004Fw-HC
-	for qemu-devel@nongnu.org; Sun, 28 May 2017 09:06:59 -0400
-Received: by mail-wm0-x233.google.com with SMTP id e127so28036989wmg.1
-	for <qemu-devel@nongnu.org>; Sun, 28 May 2017 06:06:59 -0700 (PDT)
-From: Dan Aloni <dan@kernelim.com>
-Date: Sun, 28 May 2017 16:06:49 +0300
-Message-Id: <20170528130649.28168-1-dan@kernelim.com>
-Subject: [Qemu-devel] [PATCH] nvme: Fix get/set number of queues feature,
- again
+	(envelope-from <mst@redhat.com>) id 1dF8OH-000648-MO
+	for qemu-devel@nongnu.org; Sun, 28 May 2017 20:18:36 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:41926)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1dF8OH-000644-DG
+	for qemu-devel@nongnu.org; Sun, 28 May 2017 20:18:33 -0400
+Date: Mon, 29 May 2017 03:18:30 +0300
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <1496017081-24032-1-git-send-email-mst@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Subject: [Qemu-devel] [PULL 00/13] pci, virtio, vhost: fixes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,52 +25,72 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Alex Friedman <alex@e8storage.com>, Keith Busch <keith.busch@intel.com>, Stefan Hajnoczi <stefanha@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>
 
-The number of queues that should be return by the admin command should:
+The following changes since commit 9964e96dc9999cf7f7c936ee854a795415d19b60:
 
-  1) Only mention the number of non-admin queues.
-  2) It is zero-based, meaning that '0 == one non-admin queue',
-     '1 == two non-admin queues', and so forth.
+  Merge remote-tracking branch 'jasowang/tags/net-pull-request' into staging (2017-05-23 15:01:31 +0100)
 
-Because our `num_queues` means the number of queues _plus_ the admin
-queue, then the right calculation for the number returned from the admin
-command is `num_queues - 2`, combining the two requirements mentioned.
+are available in the git repository at:
 
-The issue was discovered by reducing num_queues from 64 to 8 and running
-a Linux VM with an SMP parameter larger than that (e.g. 22). It tries to
-utilize all queues, and therefore fails with an invalid queue number
-when trying to queue I/Os on the last queue.
+  git://git.kernel.org/pub/scm/virt/kvm/mst/qemu.git tags/for_upstream
 
-Signed-off-by: Dan Aloni <dan@kernelim.com>
-CC: Alex Friedman <alex@e8storage.com>
-CC: Keith Busch <keith.busch@intel.com>
-CC: Stefan Hajnoczi <stefanha@redhat.com>
----
- hw/block/nvme.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+for you to fetch changes up to 811bf15114bff4d46735acedbd72b906616ce365:
 
-diff --git a/hw/block/nvme.c b/hw/block/nvme.c
-index 7428db9f0c91..08ddf3a39e2f 100644
---- a/hw/block/nvme.c
-+++ b/hw/block/nvme.c
-@@ -573,7 +573,7 @@ static uint16_t nvme_get_feature(NvmeCtrl *n, NvmeCmd *cmd, NvmeRequest *req)
-         result = blk_enable_write_cache(n->conf.blk);
-         break;
-     case NVME_NUMBER_OF_QUEUES:
--        result = cpu_to_le32((n->num_queues - 1) | ((n->num_queues - 1) << 16));
-+        result = cpu_to_le32((n->num_queues - 2) | ((n->num_queues - 2) << 16));
-         break;
-     default:
-         return NVME_INVALID_FIELD | NVME_DNR;
-@@ -594,7 +594,7 @@ static uint16_t nvme_set_feature(NvmeCtrl *n, NvmeCmd *cmd, NvmeRequest *req)
-         break;
-     case NVME_NUMBER_OF_QUEUES:
-         req->cqe.result =
--            cpu_to_le32((n->num_queues - 1) | ((n->num_queues - 1) << 16));
-+            cpu_to_le32((n->num_queues - 2) | ((n->num_queues - 2) << 16));
-         break;
-     default:
-         return NVME_INVALID_FIELD | NVME_DNR;
--- 
-2.9.4
+  acpi-test: update expected files (2017-05-29 03:07:57 +0300)
+
+----------------------------------------------------------------
+pci, virtio, vhost: fixes
+
+A bunch of fixes all over the place. Most notably this fixes
+the new MTU feature when using vhost.
+
+Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+
+----------------------------------------------------------------
+Ladi Prosek (1):
+      pc: ACPI BIOS: use highest NUMA node for hotplug mem hole SRAT entry
+
+Maxime Coquelin (2):
+      virtio_net: Bypass backends for MTU feature negotiation
+      vhost-user: pass message as a pointer to process_message_reply()
+
+Michael S. Tsirkin (1):
+      acpi-test: update expected files
+
+Peter Xu (9):
+      memory: tune last param of iommu_ops.translate()
+      memory: remove the last param in memory_region_iommu_replay()
+      x86-iommu: use DeviceClass properties
+      intel_iommu: renaming context entry helpers
+      intel_iommu: provide vtd_ce_get_type()
+      intel_iommu: use IOMMU_ACCESS_FLAG()
+      intel_iommu: allow dev-iotlb context entry conditionally
+      intel_iommu: support passthrough (PT)
+      intel_iommu: turn off pt before 2.9
+
+ hw/i386/intel_iommu_internal.h      |   1 +
+ include/exec/memory.h               |  15 +-
+ include/hw/compat.h                 |   8 +
+ include/hw/i386/x86-iommu.h         |   1 +
+ include/hw/virtio/virtio-net.h      |   1 +
+ include/hw/virtio/virtio.h          |   1 +
+ exec.c                              |   3 +-
+ hw/alpha/typhoon.c                  |   2 +-
+ hw/dma/rc4030.c                     |   2 +-
+ hw/i386/acpi-build.c                |   7 +-
+ hw/i386/amd_iommu.c                 |   4 +-
+ hw/i386/intel_iommu.c               | 313 ++++++++++++++++++++++++++----------
+ hw/i386/x86-iommu.c                 |  48 +-----
+ hw/net/virtio-net.c                 |  17 +-
+ hw/pci-host/apb.c                   |   2 +-
+ hw/ppc/spapr_iommu.c                |   2 +-
+ hw/s390x/s390-pci-bus.c             |   2 +-
+ hw/s390x/s390-pci-inst.c            |   2 +-
+ hw/vfio/common.c                    |   2 +-
+ hw/virtio/vhost-user.c              |  12 +-
+ memory.c                            |   7 +-
+ hw/i386/trace-events                |   2 +
+ tests/acpi-test-data/pc/SRAT.memhp  | Bin 264 -> 264 bytes
+ tests/acpi-test-data/q35/SRAT.memhp | Bin 264 -> 264 bytes
+ 24 files changed, 299 insertions(+), 155 deletions(-)
