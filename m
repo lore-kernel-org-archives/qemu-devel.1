@@ -1,21 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57134)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57168)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhi.a.wang@intel.com>) id 1dFG7K-0005sy-3U
-	for qemu-devel@nongnu.org; Mon, 29 May 2017 04:33:36 -0400
+	(envelope-from <zhi.a.wang@intel.com>) id 1dFG7O-0005vt-86
+	for qemu-devel@nongnu.org; Mon, 29 May 2017 04:33:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zhi.a.wang@intel.com>) id 1dFG7J-00059Y-5h
-	for qemu-devel@nongnu.org; Mon, 29 May 2017 04:33:34 -0400
+	(envelope-from <zhi.a.wang@intel.com>) id 1dFG7N-0005HS-9Z
+	for qemu-devel@nongnu.org; Mon, 29 May 2017 04:33:38 -0400
 Received: from mga02.intel.com ([134.134.136.20]:12385)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <zhi.a.wang@intel.com>)
-	id 1dFG7I-0004sQ-S3
-	for qemu-devel@nongnu.org; Mon, 29 May 2017 04:33:33 -0400
+	id 1dFG7N-0004sQ-0M
+	for qemu-devel@nongnu.org; Mon, 29 May 2017 04:33:37 -0400
 From: Zhi Wang <zhi.a.wang@intel.com>
-Date: Tue, 30 May 2017 01:30:41 +0800
-Message-Id: <1496079043-26694-12-git-send-email-zhi.a.wang@intel.com>
+Date: Tue, 30 May 2017 01:30:43 +0800
+Message-Id: <1496079043-26694-14-git-send-email-zhi.a.wang@intel.com>
 In-Reply-To: <1496079043-26694-1-git-send-email-zhi.a.wang@intel.com>
 References: <1496079043-26694-1-git-send-email-zhi.a.wang@intel.com>
-Subject: [Qemu-devel] [RFC 4/6] vfio: Refine GGTT clearing
+Subject: [Qemu-devel] [RFC 6/6] vfio: Setup IGD stolen memory under
+ secondary mode
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,43 +28,53 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: chuanxiao.dong@intel.com, daniel.vetter@ffwll.ch, xiong.y.zhang@intel.com, joonas.lahtinen@linux.intel.com, zhiyuan.lv@intel.com, zhenyuw@linux.intel.com, kevin.tian@intel.com, Zhi Wang <zhi.a.wang@intel.com>
 
-Clear the whole GGTT page tables after the quirk is initialized. Obtain
-the total size of GGTT and the entry size of one GGTT entry from
-intel_device_info().
+Also setup IGD stolen memory under secondary mode as some HW functions
+might need the stolen memory anyway.
 
 Suggested-by: Xiong Zhang <xiong.y.zhang@intel.com>
 Signed-off-by: Zhi Wang <zhi.a.wang@intel.com>
 ---
- hw/vfio/pci-quirks.c | 10 ++++++----
- 1 file changed, 6 insertions(+), 4 deletions(-)
+ hw/vfio/pci-quirks.c | 18 +++++++++++-------
+ 1 file changed, 11 insertions(+), 7 deletions(-)
 
 diff --git a/hw/vfio/pci-quirks.c b/hw/vfio/pci-quirks.c
-index 5a083c1..618c43c 100644
+index abfcec6..6ddb59a 100644
 --- a/hw/vfio/pci-quirks.c
 +++ b/hw/vfio/pci-quirks.c
-@@ -1365,7 +1365,7 @@ static void vfio_probe_igd_bar4_quirk(VFIOPCIDevice *vdev, int nr)
-     const struct intel_device_info *info;
-     void *stolen;
-     PCIDevice *lpc_bridge;
--    int i, ret;
-+    int i, j, ret;
-     uint64_t bdsm_size;
-     uint32_t gmch;
-     uint16_t cmd_orig, cmd;
-@@ -1570,9 +1570,11 @@ static void vfio_probe_igd_bar4_quirk(VFIOPCIDevice *vdev, int nr)
-                      vdev->vbasedev.name);
-     }
+@@ -1196,16 +1196,11 @@ static void vfio_probe_igd_bar4_quirk(VFIOPCIDevice *vdev, int nr)
+     Error *err = NULL;
  
--    for (i = 1; i < vfio_igd_gtt_max(vdev); i += 4) {
--        vfio_region_write(&vdev->bars[4].region, 0, i, 4);
--        vfio_region_write(&vdev->bars[4].region, 4, 0, 4);
-+    for (i = 1; i < info->get_gtt_size(gmch); i += info->gtt_entry_size) {
-+        for (j = 0; j < info->gtt_entry_size; j += 4) {
-+            vfio_region_write(&vdev->bars[4].region, 0, i + j, 4);
-+            vfio_region_write(&vdev->bars[4].region, 4, 0, 4);
-+        }
-     }
+     /*
+-     * This must be an Intel VGA device at address 00:02.0 for us to even
+-     * consider enabling legacy mode.  The vBIOS has dependencies on the
+-     * PCI bus address.
++     * This must be an Intel VGA device.
+      */
+     if (!vfio_pci_is(vdev, PCI_VENDOR_ID_INTEL, PCI_ANY_ID) ||
+-        !vfio_is_vga(vdev) || nr != 4 ||
+-        &vdev->pdev != pci_find_device(pci_device_root_bus(&vdev->pdev),
+-                                       0, PCI_DEVFN(0x2, 0))) {
++        !vfio_is_vga(vdev) || nr != 4)
+         return;
+-    }
  
-     if (pwrite(vdev->vbasedev.fd, &cmd_orig, sizeof(cmd_orig),
+     /*
+      * IGD is not a standard, they like to change their specs often.  We
+@@ -1251,6 +1246,15 @@ static void vfio_probe_igd_bar4_quirk(VFIOPCIDevice *vdev, int nr)
+     pci_set_long(vdev->emulated_config_bits + IGD_BDSM, ~0);
+ 
+     /*
++     * This must be an Intel VGA device at address 00:02.0 for us to even
++     * consider enabling legacy mode.  The vBIOS has dependencies on the
++     * PCI bus address.
++     */
++    if (&vdev->pdev != pci_find_device(pci_device_root_bus(&vdev->pdev),
++                0, PCI_DEVFN(0x2, 0)))
++        return;
++
++    /*
+      * We need to create an LPC/ISA bridge at PCI bus address 00:1f.0 that we
+      * can stuff host values into, so if there's already one there and it's not
+      * one we can hack on, legacy mode is no-go.  Sorry Q35.
 -- 
 2.7.4
