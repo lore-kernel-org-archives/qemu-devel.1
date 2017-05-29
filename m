@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38890)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38920)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aurelien@aurel32.net>) id 1dFQHd-0006UA-TD
+	(envelope-from <aurelien@aurel32.net>) id 1dFQHe-0006UD-ER
 	for qemu-devel@nongnu.org; Mon, 29 May 2017 15:24:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aurelien@aurel32.net>) id 1dFQHa-000762-Ib
-	for qemu-devel@nongnu.org; Mon, 29 May 2017 15:24:53 -0400
-Received: from hall.aurel32.net ([2001:bc8:30d7:100::1]:42880)
+	(envelope-from <aurelien@aurel32.net>) id 1dFQHa-00075Q-Ho
+	for qemu-devel@nongnu.org; Mon, 29 May 2017 15:24:54 -0400
+Received: from hall.aurel32.net ([2001:bc8:30d7:100::1]:42914)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <aurelien@aurel32.net>)
-	id 1dFQHa-00072K-4e
+	id 1dFQHa-00072l-5B
 	for qemu-devel@nongnu.org; Mon, 29 May 2017 15:24:50 -0400
 From: Aurelien Jarno <aurelien@aurel32.net>
-Date: Mon, 29 May 2017 21:24:13 +0200
-Message-Id: <20170529192440.5990-3-aurelien@aurel32.net>
+Date: Mon, 29 May 2017 21:24:38 +0200
+Message-Id: <20170529192440.5990-28-aurelien@aurel32.net>
 In-Reply-To: <20170529192440.5990-1-aurelien@aurel32.net>
 References: <20170529192440.5990-1-aurelien@aurel32.net>
-Subject: [Qemu-devel] [PATCH v2 02/29] target/s390x: remove some Linux
- assumptions from IPTE
+Subject: [Qemu-devel] [PATCH v2 27/29] target/s390x: implement TEST DECIMAL
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,81 +27,94 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Aurelien Jarno <aurelien@aurel32.net>, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>
 
+Reviewed-by: Richard Henderson <rth@twiddle.net>
 Signed-off-by: Aurelien Jarno <aurelien@aurel32.net>
 ---
- target/s390x/cpu.h        |  2 ++
- target/s390x/mem_helper.c | 17 ++++++++++-------
- target/s390x/mmu_helper.c |  4 +---
- 3 files changed, 13 insertions(+), 10 deletions(-)
+ target/s390x/helper.h      |  1 +
+ target/s390x/insn-data.def |  3 +++
+ target/s390x/mem_helper.c  | 23 +++++++++++++++++++++++
+ target/s390x/translate.c   |  9 +++++++++
+ 4 files changed, 36 insertions(+)
 
-diff --git a/target/s390x/cpu.h b/target/s390x/cpu.h
-index 79235cfa45..d89ad83e71 100644
---- a/target/s390x/cpu.h
-+++ b/target/s390x/cpu.h
-@@ -1033,6 +1033,8 @@ struct sysib_322 {
- #define _SEGMENT_ENTRY_RO       0x200     /* page protection bit              */
- #define _SEGMENT_ENTRY_INV      0x20      /* invalid segment table entry      */
+diff --git a/target/s390x/helper.h b/target/s390x/helper.h
+index b2e269b6a5..c14268494e 100644
+--- a/target/s390x/helper.h
++++ b/target/s390x/helper.h
+@@ -88,6 +88,7 @@ DEF_HELPER_FLAGS_4(pku, TCG_CALL_NO_WG, void, env, i64, i64, i32)
+ DEF_HELPER_FLAGS_4(unpk, TCG_CALL_NO_WG, void, env, i32, i64, i64)
+ DEF_HELPER_FLAGS_4(unpka, TCG_CALL_NO_WG, i32, env, i64, i32, i64)
+ DEF_HELPER_FLAGS_4(unpku, TCG_CALL_NO_WG, i32, env, i64, i32, i64)
++DEF_HELPER_FLAGS_3(tp, TCG_CALL_NO_WG, i32, env, i64, i32)
+ DEF_HELPER_FLAGS_4(tr, TCG_CALL_NO_WG, void, env, i32, i64, i64)
+ DEF_HELPER_4(tre, i64, env, i64, i64, i64)
+ DEF_HELPER_4(trt, i32, env, i32, i64, i64)
+diff --git a/target/s390x/insn-data.def b/target/s390x/insn-data.def
+index 683f91bf7f..7f554ab133 100644
+--- a/target/s390x/insn-data.def
++++ b/target/s390x/insn-data.def
+@@ -856,6 +856,9 @@
+     C(0xed11, TCDB,    RXE,   Z,   f1_o, a2, 0, 0, tcdb, 0)
+     C(0xed12, TCXB,    RXE,   Z,   x1_o, a2, 0, 0, tcxb, 0)
  
-+#define _VADDR_PX               0xff000   /* page index bits                  */
++/* TEST DECIMAL */
++    C(0xebc0, TP,      RSL,   E2,  la1, 0, 0, 0, tp, 0)
 +
- #define _PAGE_RO        0x200            /* HW read-only bit  */
- #define _PAGE_INVALID   0x400            /* HW invalid bit    */
- #define _PAGE_RES0      0x800            /* bit must be zero  */
+ /* TEST UNDER MASK */
+     C(0x9100, TM,      SI,    Z,   m1_8u, i2_8u, 0, 0, 0, tm32)
+     C(0xeb51, TMY,     SIY,   LD,  m1_8u, i2_8u, 0, 0, 0, tm32)
 diff --git a/target/s390x/mem_helper.c b/target/s390x/mem_helper.c
-index e35571e342..0ebd65d9ab 100644
+index 8063f42eb3..73a64bdda3 100644
 --- a/target/s390x/mem_helper.c
 +++ b/target/s390x/mem_helper.c
-@@ -1073,19 +1073,22 @@ uint32_t HELPER(mvcp)(CPUS390XState *env, uint64_t l, uint64_t a1, uint64_t a2)
+@@ -1088,6 +1088,29 @@ uint32_t HELPER(unpku)(CPUS390XState *env, uint64_t dest, uint32_t destlen,
+     return do_unpkau(env, dest, destlen, 2, src, GETPC());
  }
  
- /* invalidate pte */
--void HELPER(ipte)(CPUS390XState *env, uint64_t pte_addr, uint64_t vaddr)
-+void HELPER(ipte)(CPUS390XState *env, uint64_t pto, uint64_t vaddr)
- {
-     CPUState *cs = CPU(s390_env_get_cpu(env));
-     uint64_t page = vaddr & TARGET_PAGE_MASK;
--    uint64_t pte = 0;
-+    uint64_t pte_addr, pte;
- 
-     /* XXX broadcast to other CPUs */
- 
--    /* XXX Linux is nice enough to give us the exact pte address.
--       According to spec we'd have to find it out ourselves */
--    /* XXX Linux is fine with overwriting the pte, the spec requires
--       us to only set the invalid bit */
--    stq_phys(cs->as, pte_addr, pte | _PAGE_INVALID);
-+    /* Compute the page table entry address */
-+    pte_addr = (pto & _SEGMENT_ENTRY_ORIGIN);
-+    pte_addr += (vaddr & _VADDR_PX) >> 9;
++uint32_t HELPER(tp)(CPUS390XState *env, uint64_t dest, uint32_t destlen)
++{
++    uintptr_t ra = GETPC();
++    uint32_t cc = 0;
++    int i;
 +
-+    /* Mark the page table entry as invalid */
-+    pte = ldq_phys(cs->as, pte_addr);
-+    pte |= _PAGE_INVALID;
-+    stq_phys(cs->as, pte_addr, pte);
++    for (i = 0; i < destlen; i++) {
++        uint8_t b = cpu_ldub_data_ra(env, dest + i, ra);
++        /* digit */
++        cc |= (b & 0xf0) > 0x90 ? 2 : 0;
++
++        if (i == (destlen - 1)) {
++            /* sign */
++            cc |= (b & 0xf) < 0xa ? 1 : 0;
++        } else {
++            /* digit */
++            cc |= (b & 0xf) > 0x9 ? 2 : 0;
++        }
++    }
++
++    return cc;
++}
++
+ static uint32_t do_helper_tr(CPUS390XState *env, uint32_t len, uint64_t array,
+                              uint64_t trans, uintptr_t ra)
+ {
+diff --git a/target/s390x/translate.c b/target/s390x/translate.c
+index 747d4ebc10..a7c564fa93 100644
+--- a/target/s390x/translate.c
++++ b/target/s390x/translate.c
+@@ -4313,6 +4313,15 @@ static ExitStatus op_tprot(DisasContext *s, DisasOps *o)
  
-     /* XXX we exploit the fact that Linux passes the exact virtual
-        address here - it's not obliged to! */
-diff --git a/target/s390x/mmu_helper.c b/target/s390x/mmu_helper.c
-index 31eb9efa9b..fb712c8d66 100644
---- a/target/s390x/mmu_helper.c
-+++ b/target/s390x/mmu_helper.c
-@@ -143,8 +143,6 @@ static int mmu_translate_pte(CPUS390XState *env, target_ulong vaddr,
-     return 0;
- }
+ #endif
  
--#define VADDR_PX    0xff000         /* Page index bits */
--
- /* Decode segment table entry */
- static int mmu_translate_segment(CPUS390XState *env, target_ulong vaddr,
-                                  uint64_t asc, uint64_t st_entry,
-@@ -167,7 +165,7 @@ static int mmu_translate_segment(CPUS390XState *env, target_ulong vaddr,
- 
-     /* Look up 4KB page entry */
-     origin = st_entry & _SEGMENT_ENTRY_ORIGIN;
--    offs  = (vaddr & VADDR_PX) >> 9;
-+    offs  = (vaddr & _VADDR_PX) >> 9;
-     pt_entry = ldq_phys(cs->as, origin + offs);
-     PTE_DPRINTF("%s: 0x%" PRIx64 " + 0x%" PRIx64 " => 0x%016" PRIx64 "\n",
-                 __func__, origin, offs, pt_entry);
++static ExitStatus op_tp(DisasContext *s, DisasOps *o)
++{
++    TCGv_i32 l1 = tcg_const_i32(get_field(s->fields, l1) + 1);
++    gen_helper_tp(cc_op, cpu_env, o->addr1, l1);
++    tcg_temp_free_i32(l1);
++    set_cc_static(s);
++    return NO_EXIT;
++}
++
+ static ExitStatus op_tr(DisasContext *s, DisasOps *o)
+ {
+     TCGv_i32 l = tcg_const_i32(get_field(s->fields, l1));
 -- 
 2.11.0
