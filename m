@@ -1,23 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54404)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55309)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1dFMs1-0004TA-PX
-	for qemu-devel@nongnu.org; Mon, 29 May 2017 11:46:14 -0400
+	(envelope-from <mreitz@redhat.com>) id 1dFMvw-0005xq-VN
+	for qemu-devel@nongnu.org; Mon, 29 May 2017 11:50:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1dFMs0-0001JL-UX
-	for qemu-devel@nongnu.org; Mon, 29 May 2017 11:46:13 -0400
-References: <20170529152316.27647-1-mreitz@redhat.com>
-	<20170529152316.27647-2-mreitz@redhat.com>
-	<27c8dfc9-cef6-9d55-195a-20ef3a9a85e9@redhat.com>
+	(envelope-from <mreitz@redhat.com>) id 1dFMvw-0002X0-B7
+	for qemu-devel@nongnu.org; Mon, 29 May 2017 11:50:17 -0400
+References: <20170503122539.282182-1-vsementsov@virtuozzo.com>
+	<20170503122539.282182-10-vsementsov@virtuozzo.com>
 From: Max Reitz <mreitz@redhat.com>
-Message-ID: <a412a3b6-37ec-f321-c6d6-aa754153cfe0@redhat.com>
-Date: Mon, 29 May 2017 17:46:01 +0200
+Message-ID: <fd3bc62d-b738-6944-a9b5-cf0b4f1b231d@redhat.com>
+Date: Mon, 29 May 2017 17:49:56 +0200
 MIME-Version: 1.0
-In-Reply-To: <27c8dfc9-cef6-9d55-195a-20ef3a9a85e9@redhat.com>
+In-Reply-To: <20170503122539.282182-10-vsementsov@virtuozzo.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="bKoosFrkHGw51PIDkTpaHA7S1Xuk6lRvt"
-Subject: Re: [Qemu-devel] [PATCH v3 1/2] iotests: Use absolute paths for
- executables
+	boundary="bShftRWePau3oMRgHq2WmDhAjLmXMGJEM"
+Subject: Re: [Qemu-devel] [PATCH 09/25] block/dirty-bitmap: add readonly
+ field to BdrvDirtyBitmap
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,85 +25,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, armbru@redhat.com, eblake@redhat.com, jsnow@redhat.com, famz@redhat.com, den@openvz.org, stefanha@redhat.com, pbonzini@redhat.com
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---bKoosFrkHGw51PIDkTpaHA7S1Xuk6lRvt
+--bShftRWePau3oMRgHq2WmDhAjLmXMGJEM
 From: Max Reitz <mreitz@redhat.com>
-To: Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>
-Message-ID: <a412a3b6-37ec-f321-c6d6-aa754153cfe0@redhat.com>
-Subject: Re: [PATCH v3 1/2] iotests: Use absolute paths for executables
-References: <20170529152316.27647-1-mreitz@redhat.com>
- <20170529152316.27647-2-mreitz@redhat.com>
- <27c8dfc9-cef6-9d55-195a-20ef3a9a85e9@redhat.com>
-In-Reply-To: <27c8dfc9-cef6-9d55-195a-20ef3a9a85e9@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, armbru@redhat.com, eblake@redhat.com, jsnow@redhat.com,
+ famz@redhat.com, den@openvz.org, stefanha@redhat.com, pbonzini@redhat.com
+Message-ID: <fd3bc62d-b738-6944-a9b5-cf0b4f1b231d@redhat.com>
+Subject: Re: [PATCH 09/25] block/dirty-bitmap: add readonly field to
+ BdrvDirtyBitmap
+References: <20170503122539.282182-1-vsementsov@virtuozzo.com>
+ <20170503122539.282182-10-vsementsov@virtuozzo.com>
+In-Reply-To: <20170503122539.282182-10-vsementsov@virtuozzo.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On 2017-05-29 17:42, Eric Blake wrote:
-> On 05/29/2017 10:23 AM, Max Reitz wrote:
->> A user may specify a relative path for accessing qemu, qemu-img, etc.
->> through environment variables ($QEMU_PROG and friends) or a symlink.
->>
->> If a test decides to change its working directory, relative paths will=
-
->> cease to work, however. Work around this by making all of the paths to=
-
->> programs that should undergo testing absolute. Besides "realpath", we
->> also have to use "which" to support programs in $PATH.
+On 2017-05-03 14:25, Vladimir Sementsov-Ogievskiy wrote:
+> It will be needed in following commits for persistent bitmaps.
+> If bitmap is loaded from read-only storage (and we can't mark it
+> "in use" in this storage) corresponding BdrvDirtyBitmap should be
+> read-only.
 >=20
-> 'type -p' is more portable than 'which' - especially since our scripts
-> are bash scripts, and type is a bash builtin while which is not.
->=20
->>
->> As a side effect, this fixes specifying these programs as symlinks for=
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> ---
+>  block/dirty-bitmap.c         | 16 ++++++++++++++++
+>  include/block/dirty-bitmap.h |  3 +++
+>  2 files changed, 19 insertions(+)
 
->> out-of-tree builds: Before, you would have to create two symlinks, one=
-
->> in the build and one in the source tree (the first one for common.conf=
-ig
->> to find, the second one for the iotest to use). Now it is sufficient t=
-o
->> create one in the build tree because common.config will resolve it.
->>
->> Reported-by: Kevin Wolf <kwolf@redhat.com>
->> Signed-off-by: Max Reitz <mreitz@redhat.com>
->> ---
->>  tests/qemu-iotests/common.config | 6 ++++++
->>  1 file changed, 6 insertions(+)
->>
->> diff --git a/tests/qemu-iotests/common.config b/tests/qemu-iotests/com=
-mon.config
->> index d1b45f5..08aac56 100644
->> --- a/tests/qemu-iotests/common.config
->> +++ b/tests/qemu-iotests/common.config
->> @@ -103,6 +103,12 @@ if [ -z "$QEMU_VXHS_PROG" ]; then
->>      export QEMU_VXHS_PROG=3D"`set_prog_path qnio_server`"
->>  fi
->> =20
->> +export QEMU_PROG=3D$(realpath "$(which "$QEMU_PROG")")
->> +export QEMU_IMG_PROG=3D$(realpath "$(which "$QEMU_IMG_PROG")")
->> +export QEMU_IO_PROG=3D$(realpath "$(which "$QEMU_IO_PROG")")
->> +export QEMU_NBD_PROG=3D$(realpath "$(which "$QEMU_NBD_PROG")")
->> +export QEMU_VXHS_PROG=3D$(realpath "$(which "$QEMU_VXHS_PROG")")
->=20
-> If you switch all of these to $(realpath -- "$(type -p "$QEMU_...")"),
-> you can add:
-
-I'd love to, but this is what type -p outputs for me:
-
-$ type -p qemu-img
-qemu-img is /usr/bin/qemu-img
-
-So I would need to parse the result (and it depends on the locale). If
-that is indeed so, I'd rather stay with which, to be honest...
-
-Max
+Reviewed-by: Max Reitz <mreitz@redhat.com>
 
 
---bKoosFrkHGw51PIDkTpaHA7S1Xuk6lRvt
+--bShftRWePau3oMRgHq2WmDhAjLmXMGJEM
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
@@ -112,14 +67,14 @@ Content-Disposition: attachment; filename="signature.asc"
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v2
 
-iQEvBAEBCAAZBQJZLEI5EhxtcmVpdHpAcmVkaGF0LmNvbQAKCRD0B9sAYdXPQPPX
-B/47zuSukQOjX2mqQveq/RiIOKok9C3ou0OQ5DSlsUf3JJnv0lIPdqYhSE/5t3c2
-x56ittHn2Xpes9LRtCCXFgk136Xqpql3/26txOogcFX0P9/TYzv4W5I35oVMatS5
-9JCfM7LY2nzTbQXGHBmMcSzJa1gpI+tq0kdXUOaM3iwCHJ6MAwcADB/TnLDR8FDM
-9QyOfLKjvFFyl0asxSIzbWtc3+2sm3CdpQvlcJQflIoVr1/iY75apnzxtNa5DkRN
-yMh4woeMV6cj0W5Z89lUi4QEY7Kx6RNOPvlmKkSBOVJQBI0VdpBo4WgVHXcWvi+e
-Jnns72bvIe/Rzy7eCy720veh
-=w9fH
+iQEvBAEBCAAZBQJZLEMkEhxtcmVpdHpAcmVkaGF0LmNvbQAKCRD0B9sAYdXPQLO5
+CAC0HrO1yq0DxnrmOgbodctvL3I4cmESanimgWlYpUh9Q0rqFBRz8x0lOn8u6JhZ
+iHOSCQTUnDaW1ZqCIt3QhSeiNZTB69dAHlWNmpjaMxEEMc8qSdxDgJke0TnV7nqX
++9sOwmvUJQviOpviIuU9XKiEgh2GaWCwjDVgBFxq7OVSj9msBRuEO9S6aBTa5XFv
+AmYbWHMvHpt4HdAwxZ0vUOhER6wfrTLA1uA2bAZDY4Giug9eIXZAJfakKWdsnyn1
+gWi7hiwHbHy9YZtnv2lQrGEIAjtV4qGgiqRnaHPPUXp3R9DEryPxN8WlBVtCQ/ig
+o66qh8Yhw/uVwGMVvF2kl4b/
+=qId3
 -----END PGP SIGNATURE-----
 
---bKoosFrkHGw51PIDkTpaHA7S1Xuk6lRvt--
+--bShftRWePau3oMRgHq2WmDhAjLmXMGJEM--
