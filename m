@@ -1,19 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56997)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57007)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhi.a.wang@intel.com>) id 1dFG71-0005gv-GX
-	for qemu-devel@nongnu.org; Mon, 29 May 2017 04:33:16 -0400
+	(envelope-from <zhi.a.wang@intel.com>) id 1dFG72-0005h1-4N
+	for qemu-devel@nongnu.org; Mon, 29 May 2017 04:33:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zhi.a.wang@intel.com>) id 1dFG6y-0004sF-Dm
-	for qemu-devel@nongnu.org; Mon, 29 May 2017 04:33:15 -0400
-Received: from mga02.intel.com ([134.134.136.20]:62237)
+	(envelope-from <zhi.a.wang@intel.com>) id 1dFG71-0004sm-4k
+	for qemu-devel@nongnu.org; Mon, 29 May 2017 04:33:16 -0400
+Received: from mga02.intel.com ([134.134.136.20]:12385)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <zhi.a.wang@intel.com>)
-	id 1dFG6y-0004s0-5c
-	for qemu-devel@nongnu.org; Mon, 29 May 2017 04:33:12 -0400
+	id 1dFG70-0004sQ-SZ
+	for qemu-devel@nongnu.org; Mon, 29 May 2017 04:33:15 -0400
 From: Zhi Wang <zhi.a.wang@intel.com>
-Date: Tue, 30 May 2017 01:30:30 +0800
-Message-Id: <1496079043-26694-1-git-send-email-zhi.a.wang@intel.com>
-Subject: [Qemu-devel] [RFC 0/6] Refine IGD stolen memory support in VFIO
+Date: Tue, 30 May 2017 01:30:32 +0800
+Message-Id: <1496079043-26694-3-git-send-email-zhi.a.wang@intel.com>
+In-Reply-To: <1496079043-26694-1-git-send-email-zhi.a.wang@intel.com>
+References: <1496079043-26694-1-git-send-email-zhi.a.wang@intel.com>
+Subject: [Qemu-devel] [RFC 2/6] vfio: Setup IGD quirks earlier
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,35 +27,67 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: chuanxiao.dong@intel.com, daniel.vetter@ffwll.ch, xiong.y.zhang@intel.com, joonas.lahtinen@linux.intel.com, zhiyuan.lv@intel.com, zhenyuw@linux.intel.com, kevin.tian@intel.com, Zhi Wang <zhi.a.wang@intel.com>
 
-This patch series are aim to refine the IGD stolen memory support in QEMU.
+Initialize IGD quirks a bit earlier since we're going to support IGD
+stolen memory under both primary mode (legacy mode) and secondary mode
+and we need one extra memory region from IGD quirks.
 
-Some features of Intel HW relies on the stolen memory to work, but some of
-registers used to indicate the base address of stolen memory can only be
-programmed once after system is powered-up. This will cause problems if
-the base of the stolen memory is changed during IGD passthrough.
+Suggested-by: Xiong Zhang <xiong.y.zhang@intel.com>
+Signed-off-by: Zhi Wang <zhi.a.wang@intel.com>
+---
+ hw/vfio/pci-quirks.c | 30 +++++++++++++++++-------------
+ 1 file changed, 17 insertions(+), 13 deletions(-)
 
-The solution of this patch series is allocating a new VM dedicated memory
-as "guest stolen memory" in QEMU for isolation and let the "guest stolen
-memory" sits in the same PA as host.
-
-Also it introduces Intel platform definitions and clears some old funtions
-and definitions.
-
-Zhi Wang (6):
-  vfio: Add Intel platform definitions
-  vfio: Setup IGD quirks earlier
-  vfio: Setup IGD stolen memory
-  vfio: Refine GGTT clearing
-  vfio: Remove extra quirks and old definitions
-  vfio: Setup IGD stolen memory under secondary mode
-
- hw/vfio/Makefile.objs    |   2 +-
- hw/vfio/intel-platform.c | 366 +++++++++++++++++++++++++++++++++++++++++++++++
- hw/vfio/intel-platform.h |  38 +++++
- hw/vfio/pci-quirks.c     | 322 ++++++++---------------------------------
- 4 files changed, 463 insertions(+), 265 deletions(-)
- create mode 100644 hw/vfio/intel-platform.c
- create mode 100644 hw/vfio/intel-platform.h
-
+diff --git a/hw/vfio/pci-quirks.c b/hw/vfio/pci-quirks.c
+index 71360ef..e0a0c13 100644
+--- a/hw/vfio/pci-quirks.c
++++ b/hw/vfio/pci-quirks.c
+@@ -1395,6 +1395,14 @@ static void vfio_probe_igd_bar4_quirk(VFIOPCIDevice *vdev, int nr)
+ 
+     gen = info->gen;
+ 
++    /* Setup our quirk to munge GTT addresses to the VM allocated buffer */
++    quirk = g_malloc0(sizeof(*quirk));
++    igd = quirk->data = g_malloc0(sizeof(*igd));
++    igd->vdev = vdev;
++    igd->index = ~0;
++    igd->bdsm = vfio_pci_read_config(&vdev->pdev, IGD_BDSM, 4);
++    igd->bdsm &= ~((1 << 20) - 1); /* 1MB aligned */
++
+     /*
+      * We need to create an LPC/ISA bridge at PCI bus address 00:1f.0 that we
+      * can stuff host values into, so if there's already one there and it's not
+@@ -1502,23 +1510,19 @@ static void vfio_probe_igd_bar4_quirk(VFIOPCIDevice *vdev, int nr)
+         goto out;
+     }
+ 
+-    /* Setup our quirk to munge GTT addresses to the VM allocated buffer */
+-    quirk = g_malloc0(sizeof(*quirk));
+-    quirk->mem = g_new0(MemoryRegion, 2);
+-    quirk->nr_mem = 2;
+-    igd = quirk->data = g_malloc0(sizeof(*igd));
+-    igd->vdev = vdev;
+-    igd->index = ~0;
+-    igd->bdsm = vfio_pci_read_config(&vdev->pdev, IGD_BDSM, 4);
+-    igd->bdsm &= ~((1 << 20) - 1); /* 1MB aligned */
++    quirk->mem = g_renew(MemoryRegion, quirk->mem, 2);
++
++    memory_region_init_io(&quirk->mem[quirk->nr_mem++], OBJECT(vdev),
++                          &vfio_igd_index_quirk, igd, "vfio-igd-index-quirk",
++                          4);
+ 
+-    memory_region_init_io(&quirk->mem[0], OBJECT(vdev), &vfio_igd_index_quirk,
+-                          igd, "vfio-igd-index-quirk", 4);
+     memory_region_add_subregion_overlap(vdev->bars[nr].region.mem,
+                                         0, &quirk->mem[0], 1);
+ 
+-    memory_region_init_io(&quirk->mem[1], OBJECT(vdev), &vfio_igd_data_quirk,
+-                          igd, "vfio-igd-data-quirk", 4);
++    memory_region_init_io(&quirk->mem[quirk->nr_mem++], OBJECT(vdev),
++                          &vfio_igd_data_quirk, igd, "vfio-igd-data-quirk",
++                          4);
++
+     memory_region_add_subregion_overlap(vdev->bars[nr].region.mem,
+                                         4, &quirk->mem[1], 1);
+ 
 -- 
 2.7.4
