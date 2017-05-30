@@ -1,25 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46067)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46828)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <anton.nefedov@virtuozzo.com>) id 1dFhfc-0005GA-V1
-	for qemu-devel@nongnu.org; Tue, 30 May 2017 09:58:50 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1dFhhQ-0006wL-L6
+	for qemu-devel@nongnu.org; Tue, 30 May 2017 10:00:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <anton.nefedov@virtuozzo.com>) id 1dFhfZ-0007JB-Lb
-	for qemu-devel@nongnu.org; Tue, 30 May 2017 09:58:49 -0400
-Received: from mail-he1eur01on0136.outbound.protection.outlook.com
-	([104.47.0.136]:15171
-	helo=EUR01-HE1-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <anton.nefedov@virtuozzo.com>)
-	id 1dFhfZ-0007GL-99
-	for qemu-devel@nongnu.org; Tue, 30 May 2017 09:58:45 -0400
-From: Anton Nefedov <anton.nefedov@virtuozzo.com>
-Date: Tue, 30 May 2017 16:58:03 +0300
-Message-ID: <1496152683-102751-14-git-send-email-anton.nefedov@virtuozzo.com>
-In-Reply-To: <1496152683-102751-1-git-send-email-anton.nefedov@virtuozzo.com>
-References: <1496152683-102751-1-git-send-email-anton.nefedov@virtuozzo.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1dFhhP-0007tH-Pz
+	for qemu-devel@nongnu.org; Tue, 30 May 2017 10:00:40 -0400
+Received: from mail-wr0-x234.google.com ([2a00:1450:400c:c0c::234]:36825)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1dFhhP-0007sp-JA
+	for qemu-devel@nongnu.org; Tue, 30 May 2017 10:00:39 -0400
+Received: by mail-wr0-x234.google.com with SMTP id j27so1179575wre.3
+	for <qemu-devel@nongnu.org>; Tue, 30 May 2017 07:00:39 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v3 13/13] serial: chardev hotswap support
+In-Reply-To: <82878b52-ee9d-e427-f1f3-d112c693cc49@amsat.org>
+References: <1493122030-32191-1-git-send-email-peter.maydell@linaro.org>
+	<1493122030-32191-6-git-send-email-peter.maydell@linaro.org>
+	<82878b52-ee9d-e427-f1f3-d112c693cc49@amsat.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 30 May 2017 15:00:15 +0100
+Message-ID: <CAFEAcA94KvkXXzhnnhEKK=YswGc7qa7VGMwHZjuM2hXWAHXxvw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 05/13] arm: Don't clear ARM_FEATURE_PMSA
+ for no-mpu configs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,73 +32,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: den@virtuozzo.com, pbonzini@redhat.com, marcandre.lureau@redhat.com, Anton Nefedov <anton.nefedov@virtuozzo.com>, "Michael S . Tsirkin" <mst@redhat.com>
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Alistair Francis <alistair.francis@xilinx.com>, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, "patches@linaro.org" <patches@linaro.org>
 
-for a backend change, a number of ioctls has to be replayed to sync
-the current setup of a frontend to a backend tty. This is hopefully
-enough so we don't have to track, store and replay the whole original
-control byte sequence.
+On 13 May 2017 at 23:37, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> wrot=
+e:
+> On 04/25/2017 09:07 AM, Peter Maydell wrote:
+>>
+>> Fix the handling of QOM properties for PMSA CPUs with no MPU:
+>>
+>> Allow no-MPU to be specified by either:
+>>  * has-mpu =3D false
+>>  * pmsav7_dregion =3D 0
+>> and make setting one imply the other. Don't clear the PMSA
+>> feature bit in this situation.
+>>
+>> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+>> ---
+>>  target/arm/cpu.c | 8 +++++++-
+>>  1 file changed, 7 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/target/arm/cpu.c b/target/arm/cpu.c
+>> index f17e279..8e57498 100644
+>> --- a/target/arm/cpu.c
+>> +++ b/target/arm/cpu.c
+>> @@ -757,8 +757,14 @@ static void arm_cpu_realizefn(DeviceState *dev, Err=
+or
+>> **errp)
+>>          cpu->id_pfr1 &=3D ~0xf000;
+>>      }
+>>
+>> +    /* MPU can be configured out of a PMSA CPU either by setting has-mp=
+u
+>> +     * to false or by setting pmsav7-dregion to 0.
+>> +     */
+>>      if (!cpu->has_mpu) {
+>> -        unset_feature(ARM_FEATURE_PMSA);
+>
+>
+> Oh, fixed here.
 
-Signed-off-by: Anton Nefedov <anton.nefedov@virtuozzo.com>
-Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-CC: Michael S. Tsirkin <mst@redhat.com>
-CC: Paolo Bonzini <pbonzini@redhat.com>
----
- hw/char/serial.c | 32 ++++++++++++++++++++++++++++++--
- 1 file changed, 30 insertions(+), 2 deletions(-)
+Ah, yes, I was wondering why I hadn't noticed an obvious
+compile error. I'll fix up patch 4 so we don't break bisection.
 
-diff --git a/hw/char/serial.c b/hw/char/serial.c
-index 1e6bdeb..ed01637 100644
---- a/hw/char/serial.c
-+++ b/hw/char/serial.c
-@@ -891,9 +891,37 @@ static void serial_reset(void *opaque)
-     s->msr &= ~UART_MSR_ANY_DELTA;
- }
- 
-+static int serial_be_change(void *opaque)
-+{
-+    SerialState *s = opaque;
-+
-+    qemu_chr_fe_set_handlers(&s->chr, serial_can_receive1, serial_receive1,
-+                             serial_event, serial_be_change, s, NULL, true);
-+
-+    serial_update_parameters(s);
-+
-+    qemu_chr_fe_ioctl(&s->chr, CHR_IOCTL_SERIAL_SET_BREAK,
-+                      &s->last_break_enable);
-+
-+    s->poll_msl = (s->ier & UART_IER_MSI) ? 1 : 0;
-+    serial_update_msl(s);
-+
-+    if (s->poll_msl >= 0 && !(s->mcr & UART_MCR_LOOP)) {
-+        serial_update_tiocm(s);
-+    }
-+
-+    if (s->watch_tag > 0) {
-+        g_source_remove(s->watch_tag);
-+        s->watch_tag = qemu_chr_fe_add_watch(&s->chr, G_IO_OUT | G_IO_HUP,
-+                                             serial_watch_cb, s);
-+    }
-+
-+    return 0;
-+}
-+
- void serial_realize_core(SerialState *s, Error **errp)
- {
--    if (!qemu_chr_fe_get_driver(&s->chr)) {
-+    if (!qemu_chr_fe_backend_connected(&s->chr)) {
-         error_setg(errp, "Can't create serial device, empty char device");
-         return;
-     }
-@@ -904,7 +932,7 @@ void serial_realize_core(SerialState *s, Error **errp)
-     qemu_register_reset(serial_reset, s);
- 
-     qemu_chr_fe_set_handlers(&s->chr, serial_can_receive1, serial_receive1,
--                             serial_event, NULL, s, NULL, true);
-+                             serial_event, serial_be_change, s, NULL, true);
-     fifo8_create(&s->recv_fifo, UART_FIFO_LENGTH);
-     fifo8_create(&s->xmit_fifo, UART_FIFO_LENGTH);
-     serial_reset(s);
--- 
-2.7.4
+thanks
+-- PMM
