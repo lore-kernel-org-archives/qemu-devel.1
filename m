@@ -1,21 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59618)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36734)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1dFb6d-0000HF-3V
-	for qemu-devel@nongnu.org; Tue, 30 May 2017 02:58:16 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1dFbd2-0005cb-8l
+	for qemu-devel@nongnu.org; Tue, 30 May 2017 03:31:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1dFb6c-0004xZ-Cy
-	for qemu-devel@nongnu.org; Tue, 30 May 2017 02:58:15 -0400
-Date: Tue, 30 May 2017 08:58:02 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20170530085802.578dc4b3@nial.brq.redhat.com>
-In-Reply-To: <20170529173751.3443-2-drjones@redhat.com>
-References: <20170529173751.3443-1-drjones@redhat.com>
-	<20170529173751.3443-2-drjones@redhat.com>
+	(envelope-from <vsementsov@virtuozzo.com>) id 1dFbd1-0000ye-4K
+	for qemu-devel@nongnu.org; Tue, 30 May 2017 03:31:44 -0400
+Received: from mailhub.sw.ru ([195.214.232.25]:29493 helo=relay.sw.ru)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
+	id 1dFbd0-0000xr-OS
+	for qemu-devel@nongnu.org; Tue, 30 May 2017 03:31:43 -0400
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+References: <20170503122539.282182-1-vsementsov@virtuozzo.com>
+	<20170503122539.282182-10-vsementsov@virtuozzo.com>
+	<33ce370d-939f-d02e-0177-1184ae9f4fa7@redhat.com>
+	<47488066-bd0f-834d-85d8-63d7289cb0fd@virtuozzo.com>
+Message-ID: <5b314adf-2dcb-2390-b68e-5047b68ac8de@virtuozzo.com>
+Date: Tue, 30 May 2017 10:31:22 +0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <47488066-bd0f-834d-85d8-63d7289cb0fd@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 1/2] hw/arm/virt-acpi-build: build SLIT
- when needed
+Content-Language: en-US
+Subject: Re: [Qemu-devel] [PATCH 09/25] block/dirty-bitmap: add readonly
+ field to BdrvDirtyBitmap
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,32 +32,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Andrew Jones <drjones@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org, zhaoshenglong@huawei.com
+To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, armbru@redhat.com, eblake@redhat.com, jsnow@redhat.com, famz@redhat.com, den@openvz.org, stefanha@redhat.com, pbonzini@redhat.com
 
-On Mon, 29 May 2017 19:37:50 +0200
-Andrew Jones <drjones@redhat.com> wrote:
+30.05.2017 09:50, Vladimir Sementsov-Ogievskiy wrote:
+> Thank you for this scenario. Hmm.
+>
+> So, as I need guarantee that image and bitmap are unchanged, 
+> bdrv_set_dirty should return error and fail the whole write. Ok?
 
-> Cc: Shannon Zhao <zhaoshenglong@huawei.com>
-> Signed-off-by: Andrew Jones <drjones@redhat.com>
-Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+No, bad idea. As bdrv_set_dirty is called after write completed.
 
-> ---
->  hw/arm/virt-acpi-build.c | 4 ++++
->  1 file changed, 4 insertions(+)
-> 
-> diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
-> index e5852067f5bd..2079828c22a4 100644
-> --- a/hw/arm/virt-acpi-build.c
-> +++ b/hw/arm/virt-acpi-build.c
-> @@ -776,6 +776,10 @@ void virt_acpi_build(VirtMachineState *vms, AcpiBuildTables *tables)
->      if (nb_numa_nodes > 0) {
->          acpi_add_table(table_offsets, tables_blob);
->          build_srat(tables_blob, tables->linker, vms);
-> +        if (have_numa_distance) {
-> +            acpi_add_table(table_offsets, tables_blob);
-> +            build_slit(tables_blob, tables->linker);
-> +        }
->      }
->  
->      if (its_class_name() && !vmc->no_its) {
+>
+> 29.05.2017 21:35, Max Reitz wrote:
+>> On 2017-05-03 14:25, Vladimir Sementsov-Ogievskiy wrote:
+>>> It will be needed in following commits for persistent bitmaps.
+>>> If bitmap is loaded from read-only storage (and we can't mark it
+>>> "in use" in this storage) corresponding BdrvDirtyBitmap should be
+>>> read-only.
+>>>
+>>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+>>> ---
+>>>   block/dirty-bitmap.c         | 16 ++++++++++++++++
+>>>   include/block/dirty-bitmap.h |  3 +++
+>>>   2 files changed, 19 insertions(+)
+>> Revisiting this again after the whole series: So you never really make
+>> sure that the read-only bitmaps are not written to (except for these
+>> assertions). The idea is that you only set it for read-only BDS and
+>> read-only BDS are never written to. But that assumption is not true,
+>> generally, and can be broken e.g. using a commit job:
+>>
+>> $ ./qemu-img create -f qcow2 backing.qcow2 64M
+>> Formatting 'backing.qcow2', fmt=qcow2 size=67108864 encryption=off
+>>      cluster_size=65536 lazy_refcounts=off refcount_bits=16
+>> $ ./qemu-img create -f qcow2 -b backing.qcow2 top.qcow2
+>> Formatting 'top.qcow2', fmt=qcow2 size=67108864
+>>      backing_file=backing.qcow2 encryption=off cluster_size=65536
+>>      lazy_refcounts=off refcount_bits=16
+>> $ x86_64-softmmu/qemu-system-x86_64 -qmp stdio
+>> {"QMP": {"version": {"qemu": {"micro": 50, "minor": 9, "major": 2},
+>> "package": " (v2.9.0-632-g4a52d43-dirty)"}, "capabilities": []}}
+>> {'execute': 'qmp_capabilities'}
+>> {"return": {}}
+>> {'execute': 'blockdev-add',
+>>   'arguments': {'node-name': 'backing-node', 'driver': 'qcow2',
+>>                 'file': {'driver': 'file', 'filename': 
+>> 'backing.qcow2'}}}
+>> {"return": {}}
+>> {'execute': 'block-dirty-bitmap-add',
+>>   'arguments': {'node': 'backing-node', 'name': 'foo',
+>>                 'persistent': true, 'autoload': true}}
+>> {"return": {}}
+>> {'execute': 'blockdev-del', 'arguments': {'node-name': 'backing-node'}}
+>> {"return": {}}
+>> {'execute': 'blockdev-add',
+>>   'arguments': {'node-name': 'top-node', 'driver': 'qcow2',
+>>                 'file': {'driver': 'file', 'filename': 'top.qcow2'}}}
+>> {"return": {}}
+>> {'execute': 'human-monitor-command',
+>>   'arguments': {'command-line': 'qemu-io top-node "write 0 64k"'}}
+>> wrote 65536/65536 bytes at offset 0
+>> 64 KiB, 1 ops; 0.0079 sec (7.852 MiB/sec and 125.6281 ops/sec)
+>> {"return": ""}
+>> {'execute': 'block-commit',
+>>   'arguments': {'device': 'top-node', 'job-id': 'commit-job'}}
+>> {"return": {}}
+>> qemu-system-x86_64: block/dirty-bitmap.c:571: bdrv_set_dirty: Assertion
+>> `!bdrv_dirty_bitmap_readonly(bitmap)' failed.
+>> [1]    10872 abort (core dumped) x86_64-softmmu/qemu-system-x86_64 -qmp
+>> stdio
+>>
+>> So there needs to be something else than just assertions to make sure
+>> that read-only bitmaps are never written to.
+>>
+>> Max
+>>
+>
+
+-- 
+Best regards,
+Vladimir
