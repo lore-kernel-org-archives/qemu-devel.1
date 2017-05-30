@@ -1,26 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48262)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48661)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <atar4qemu@gmail.com>) id 1dFdmh-0005YG-OU
-	for qemu-devel@nongnu.org; Tue, 30 May 2017 05:49:52 -0400
+	(envelope-from <stefanha@gmail.com>) id 1dFdpN-0006SR-H9
+	for qemu-devel@nongnu.org; Tue, 30 May 2017 05:52:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <atar4qemu@gmail.com>) id 1dFdmg-0004Xa-Kj
-	for qemu-devel@nongnu.org; Tue, 30 May 2017 05:49:51 -0400
-Received: from mail-oi0-x229.google.com ([2607:f8b0:4003:c06::229]:35019)
+	(envelope-from <stefanha@gmail.com>) id 1dFdpJ-0004uT-Lx
+	for qemu-devel@nongnu.org; Tue, 30 May 2017 05:52:37 -0400
+Received: from mail-wm0-x244.google.com ([2a00:1450:400c:c09::244]:36815)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <atar4qemu@gmail.com>) id 1dFdmg-0004XO-Fq
-	for qemu-devel@nongnu.org; Tue, 30 May 2017 05:49:50 -0400
-Received: by mail-oi0-x229.google.com with SMTP id l18so104707760oig.2
-	for <qemu-devel@nongnu.org>; Tue, 30 May 2017 02:49:50 -0700 (PDT)
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1dFdpJ-0004uE-Dx
+	for qemu-devel@nongnu.org; Tue, 30 May 2017 05:52:33 -0400
+Received: by mail-wm0-x244.google.com with SMTP id k15so23944631wmh.3
+	for <qemu-devel@nongnu.org>; Tue, 30 May 2017 02:52:33 -0700 (PDT)
+Date: Tue, 30 May 2017 10:52:30 +0100
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20170530095230.GP11362@stefanha-x1.localdomain>
+References: <20170529193016.6888-1-aurelien@aurel32.net>
+	<20170529193016.6888-2-aurelien@aurel32.net>
 MIME-Version: 1.0
-In-Reply-To: <54ce558d-3571-fb30-db3f-59b58ec979fc@vivier.eu>
-References: <87h90d3sz9.fsf@linaro.org>
-	<54ce558d-3571-fb30-db3f-59b58ec979fc@vivier.eu>
-From: Artyom Tarasenko <atar4qemu@gmail.com>
-Date: Tue, 30 May 2017 11:49:29 +0200
-Message-ID: <CACXAS8Bj5_7H=xYsW2KZi=6Z7zQbAoMdQhyersR2EQeQz7zzXg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] sparc64 linux-user status
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="7ZMy3ZKywLyoHonN"
+Content-Disposition: inline
+In-Reply-To: <20170529193016.6888-2-aurelien@aurel32.net>
+Subject: Re: [Qemu-devel] [PULL 1/5] target/sh4: log unauthorized accesses
+ using qemu_log_mask
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,92 +31,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laurent Vivier <laurent@vivier.eu>
-Cc: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Richard Henderson <rth@twiddle.net>, Fam Zheng <famz@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+To: Aurelien Jarno <aurelien@aurel32.net>
+Cc: Stefan Hajnoczi <stefanha@redhat.com>, "open list:All patches CC here" <qemu-devel@nongnu.org>
 
-On Thu, May 25, 2017 at 9:56 AM, Laurent Vivier <laurent@vivier.eu> wrote:
-> Le 22/05/2017 =C3=A0 15:45, Alex Benn=C3=A9e a =C3=A9crit :
->> Hi,
->>
->> While looking at some of the docker cross-build patches I thought I'd
->> checkout if I could still bootstrap some Debian linux-user images. I
->> made some tweaks to allow debootstrap to bootstrap from Debian's ports
->> to see if I could get the SPARC64 file-system up and running:
->>
->>  https://github.com/stsquad/qemu/commits/docker/sparc64-linux-user
->
-> I was waiting that for a while, thanks!
->>
->> However when I try to run it:
->>
->>   make docker-image-debian-sparc64-user V=3D1
->>
->> It fails:
->>
->>   Step 4 : RUN /debootstrap/debootstrap --second-stage
->>    ---> Running in 2241c809c19f
->>   *** longjmp causes uninitialized stack frame ***: /bin/sh terminated
->>   Illegal instruction (core dumped)
->>   *** longjmp causes uninitialized stack frame ***: /bin/sh terminated
->>   Illegal instruction (core dumped)
->>   *** longjmp causes uninitialized stack frame ***: /bin/sh terminated
->>   Illegal instruction (core dumped)
->>   I: Keyring file not available at /usr/share/keyrings/debian-archive-ke=
-yring.gpg; switching to https mirror https://deb.debian.org/debian
->>   W: Failure trying to run:  dpkg-deb -f /var/cache/apt/archives/dpkg_1.=
-18.24_sparc64.deb Version
->>   W: See //debootstrap/debootstrap.log for details
->>   I: Installing core packages...
->>   W: Failure trying to run:  dpkg --force-depends --install /var/cache/a=
-pt/archives/base-passwd_3.5.43_sparc64.deb
->>   W: See //debootstrap/debootstrap.log for details
->>   Illegal instruction (core dumped)
->>   The command '/bin/sh -c /debootstrap/debootstrap --second-stage' retur=
-ned a non-zero code: 132
->>
->> Although I can manually get the shell at least partially running:
->>
->>   14:43 last:125, alex@zen taken:25, git:docker/sparc64-linux-user, [/ho=
-me/alex/lsrc/qemu/qemu.git]> docker run --rm -it 1084ed198b00 /bin/sh
->>   # uname -a
->>   [1] + Stopped (tty output)       uname -a
->>   # uname -a | cat
->>   [2] + Stopped (tty output)       uname -a | cat
->>   # echo "hello"
->>   hello
->>   #
->>
->> Bringing anything to the foreground hangs the window:
->>
->>   # fg
->>   uname -a | cat
->>   Linux 8cbf3e5e2234 4.4.0-78-generic #99-Ubuntu SMP Thu Apr 27 15:29:09=
- UTC 2017 sun4u GNU/Linux
->>   /bin/sh: 4: fg: Cannot set tty process group (Inappropriate ioctl for =
-device)
->>   *** longjmp causes uninitialized stack frame ***: /bin/sh terminated
->>
->> Which makes me think it might be a linux-user bug rather than the main
->> translation. Is this a tested combination? Any idea what the bug could b=
-e?
->
-> Do you know if the default CPU for linux-user is the good one for
-> debian-sparc64?
 
-Yes, it must be ok. Also the default CPU has a FPU, although I don't
-know if it's used in linux-user mode.
+--7ZMy3ZKywLyoHonN
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-> I used to run linux-user in a container, and I have this kind of problem
-> too. The last time I have checked I think it was because a floating
-> point instruction emulation failure. I don't know how works sparc64, but
->  on some architectures, FPU instructions are emulated by the kernel, so
-> it could explain why it works in softmmu mode and not in linux-user
-> mode: qemu doesn't emulate it because it relies on the kernel for that,
-> and in this case the kernel can't.
+On Mon, May 29, 2017 at 09:30:12PM +0200, Aurelien Jarno wrote:
+> qemu_log_mask() is preferred over fprintf() for logging errors.
+>=20
+> Reviewed-by: Philippe Mathieu-Daud=E9 <f4bug@amsat.org>
+> Reviewed-by: Richard Henderson <rth@twiddle.net>
+> Signed-off-by: Aurelien Jarno <aurelien@aurel32.net>
+> ---
+>  target/sh4/helper.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 
---=20
-Regards,
-Artyom Tarasenko
+I don't see a pull request cover letter but your git repo is up-to-date
+and the pull-target-sh4-20170529 tag is signed correctly.  Therefore I
+have merged this pull request.
 
-SPARC and PPC PReP under qemu blog: http://tyom.blogspot.com/search/label/q=
-emu
+Thanks, applied to my staging tree:
+https://github.com/stefanha/qemu/commits/staging
+
+Stefan
+
+--7ZMy3ZKywLyoHonN
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJZLUDeAAoJEJykq7OBq3PIqREH/iemiCa/nQA8KC+6Vofz7vIi
+Lm9V3KqPSCuevC1KAKSN5vXAmdP4pb+ZRLojUVCBIF12QSjAFZa+JAwUtxGimtKH
+qvqxFs9vulhj85tjcutK0zyBVeYV7Vb7teN2coa8tcehmX2iAv1jq7/F3UTx9Bd/
+3NxQx2Z6VrtG0IpOW3g8L9+iK42Fm0l7u1tt0G/j+NTcJvZAHiEE98WEglK6XkW5
+Lm9x8O4elp1fRKG1hiGjY7RSI/OJWofTGGEOxrfz/Tl9pt9q1d+JgiY+T7FjFm/v
+GmG9NRp9peW+s8HvepgNNJneFppFGDuWXW/qAsdGDjXVsoqtUmdClYcNdCIMc8k=
+=z04B
+-----END PGP SIGNATURE-----
+
+--7ZMy3ZKywLyoHonN--
