@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43936)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46163)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dFfZs-0005cp-M9
-	for qemu-devel@nongnu.org; Tue, 30 May 2017 07:44:45 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1dFfjy-0007xe-1O
+	for qemu-devel@nongnu.org; Tue, 30 May 2017 07:55:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dFfZr-0002gn-NF
-	for qemu-devel@nongnu.org; Tue, 30 May 2017 07:44:44 -0400
-Received: from mail-wm0-x231.google.com ([2a00:1450:400c:c09::231]:36248)
+	(envelope-from <peter.maydell@linaro.org>) id 1dFfjx-0006GQ-7c
+	for qemu-devel@nongnu.org; Tue, 30 May 2017 07:55:10 -0400
+Received: from mail-wm0-x22a.google.com ([2a00:1450:400c:c09::22a]:36927)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1dFfZr-0002gd-Ft
-	for qemu-devel@nongnu.org; Tue, 30 May 2017 07:44:43 -0400
-Received: by mail-wm0-x231.google.com with SMTP id 7so88553697wmo.1
-	for <qemu-devel@nongnu.org>; Tue, 30 May 2017 04:44:43 -0700 (PDT)
+	id 1dFfjx-0006F4-0e
+	for qemu-devel@nongnu.org; Tue, 30 May 2017 07:55:09 -0400
+Received: by mail-wm0-x22a.google.com with SMTP id d127so94730499wmf.0
+	for <qemu-devel@nongnu.org>; Tue, 30 May 2017 04:55:08 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <tencent_025CFFC03619731459E0872A@qq.com>
-References: <tencent_025CFFC03619731459E0872A@qq.com>
+In-Reply-To: <20170524091315.20284-1-drjones@redhat.com>
+References: <20170524091315.20284-1-drjones@redhat.com>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 30 May 2017 12:44:21 +0100
-Message-ID: <CAFEAcA_jd+bJ6TF2_Ep2hA388PSiHCTXTAekVRB+pGPecXTZQw@mail.gmail.com>
+Date: Tue, 30 May 2017 12:54:45 +0100
+Message-ID: <CAFEAcA9dZecVJFBEvU5D9Qm3E7irn4s-v+Ma7jPiR5bNJ2nMUw@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] timer configure for QEMU versatilepb
+Subject: Re: [Qemu-devel] [PATCH] load_uboot_image: don't assume a full
+ header read
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,28 +29,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: heavybird <4345099@qq.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>
+To: Andrew Jones <drjones@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>
 
-On 9 May 2017 at 05:32, heavybird <4345099@qq.com> wrote:
-> Hi Peter and qemu-devel,
+On 24 May 2017 at 10:13, Andrew Jones <drjones@redhat.com> wrote:
+> Don't allow load_uboot_image() to proceed when less bytes than
+> header-size was read.
 >
-> I am trying to port one simple RTOS to QEMU versatilepb,  however, i found
-> the SIC address(actually PIC) is different from the PIC in the
-> integratorcp.c even though they are same arm926, besides, the PIC register
-> bit definition is some different between versatilepb and integratorcp
-> compared by the icp_pic_read/icp_pic_read interface.
+> Signed-off-by: Andrew Jones <drjones@redhat.com>
+> ---
+>  hw/core/loader.c | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
+>
+> diff --git a/hw/core/loader.c b/hw/core/loader.c
+> index bf17b42cbec2..f72930ca4a41 100644
+> --- a/hw/core/loader.c
+> +++ b/hw/core/loader.c
+> @@ -611,8 +611,9 @@ static int load_uboot_image(const char *filename, hwaddr *ep, hwaddr *loadaddr,
+>          return -1;
+>
+>      size = read(fd, hdr, sizeof(uboot_image_header_t));
+> -    if (size < 0)
+> +    if (size < sizeof(uboot_image_header_t)) {
+>          goto out;
+> +    }
+>
+>      bswap_uboot_header(hdr);
+>
 
-These devices are not part of the CPU, so it is expected
-that they will differ from board to board.
 
-> Could you confirm for me PIC register bit definition and the PIC
-> address/timer0 address in the versatilepb QEMU or where i can find some
-> information exactly.
 
-The documentation for the hardware board that we model as the
-'versatilepb' is this one:
-http://infocenter.arm.com/help/topic/com.arm.doc.dui0224i/index.html
+Applied to target-arm.next, thanks.
 
-thanks
 -- PMM
