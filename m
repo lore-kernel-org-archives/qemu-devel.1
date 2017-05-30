@@ -1,31 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53747)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53775)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dFmVA-0002FM-UX
-	for qemu-devel@nongnu.org; Tue, 30 May 2017 15:08:22 -0400
+	(envelope-from <eblake@redhat.com>) id 1dFmVW-0002OX-BD
+	for qemu-devel@nongnu.org; Tue, 30 May 2017 15:08:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dFmV5-0004RH-RW
-	for qemu-devel@nongnu.org; Tue, 30 May 2017 15:08:20 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:45096)
+	(envelope-from <eblake@redhat.com>) id 1dFmVR-0004i1-NJ
+	for qemu-devel@nongnu.org; Tue, 30 May 2017 15:08:42 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:44220)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dFmV5-0004R0-Iu
-	for qemu-devel@nongnu.org; Tue, 30 May 2017 15:08:15 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id B010B80C17
-	for <qemu-devel@nongnu.org>; Tue, 30 May 2017 19:08:14 +0000 (UTC)
-Date: Tue, 30 May 2017 20:08:05 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170530190804.GU2120@work-vm>
-References: <1495649128-10529-1-git-send-email-vyasevic@redhat.com>
-	<1495649128-10529-2-git-send-email-vyasevic@redhat.com>
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dFmVR-0004gv-DO
+	for qemu-devel@nongnu.org; Tue, 30 May 2017 15:08:37 -0400
+References: <20170530184013.31044-1-ehabkost@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <d0daee0d-ad21-1fbf-ce72-be47227f62d5@redhat.com>
+Date: Tue, 30 May 2017 14:08:26 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1495649128-10529-2-git-send-email-vyasevic@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 01/12] migration: Introduce announce
- parameters
+In-Reply-To: <20170530184013.31044-1-ehabkost@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="pU331oHIQeEJI2egXQhCCN1PkccMS0taN"
+Subject: Re: [Qemu-devel] [PATCH] numa: Fix format string for "Invalid node"
+ message
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,263 +28,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladislav Yasevich <vyasevic@redhat.com>, eblake@redhat.com
-Cc: qemu-devel@nongnu.org, quintela@redhat.com, germano@redhat.com, lvivier@redhat.com, jasowang@redhat.com, jdenemar@redhat.com, kashyap@redhat.com, armbru@redhat.com, mst@redhat.com
+To: Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, "Daniel P. Berrange" <berrange@redhat.com>, He Chen <he.chen@linux.intel.com>, Igor Mammedov <imammedo@redhat.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
 
-* Vladislav Yasevich (vyasevic@redhat.com) wrote:
-> Add parameters that control RARP/GARP announcement timeouts.
-> The parameters structure is added to the QAPI and a qmp command
-> is added to set/get the parameter data.
-> 
-> Based on work by "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-> 
-> Signed-off-by: Vladislav Yasevich <vyasevic@redhat.com>
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--pU331oHIQeEJI2egXQhCCN1PkccMS0taN
+From: Eric Blake <eblake@redhat.com>
+To: Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ "Daniel P. Berrange" <berrange@redhat.com>, He Chen
+ <he.chen@linux.intel.com>, Igor Mammedov <imammedo@redhat.com>,
+ =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+Message-ID: <d0daee0d-ad21-1fbf-ce72-be47227f62d5@redhat.com>
+Subject: Re: [PATCH] numa: Fix format string for "Invalid node" message
+References: <20170530184013.31044-1-ehabkost@redhat.com>
+In-Reply-To: <20170530184013.31044-1-ehabkost@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Thanks; this is pretty much duplicating the migrate-parameter code;
-that's OK but I wonder if there's an easier/better way.
-If you made a global gom object with these values as properties, then
-they could be set with either -global or  with 'qom-set'
+On 05/30/2017 01:40 PM, Eduardo Habkost wrote:
+> Some compilers complain about the PRIu16 format string with the
+> MAX(src, dst) and MAX_NODES arguments.  Example output from Apple LLVM
+> version 7.3.0 (clang-703.0.31):
 
-Would that work/be simpler?
-You wouldn't need to add any new commands.
-
-(Some typo spots below)
-
-Dave
-
+>                     ^~~
+> MAX(src, dst) promotes the src and dst arguments to int, and MAX_NODES
+> is an int.  Use %d to silence those warnings.
+>=20
+> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 > ---
->  include/sysemu/sysemu.h |  7 ++++
->  migration/savevm.c      | 98 +++++++++++++++++++++++++++++++++++++++++++++++++
->  qapi-schema.json        | 84 ++++++++++++++++++++++++++++++++++++++++++
->  3 files changed, 189 insertions(+)
-> 
-> diff --git a/include/sysemu/sysemu.h b/include/sysemu/sysemu.h
-> index 83c1ceb..7fd49c4 100644
-> --- a/include/sysemu/sysemu.h
-> +++ b/include/sysemu/sysemu.h
-> @@ -78,6 +78,13 @@ void qemu_remove_machine_init_done_notifier(Notifier *notify);
->  int save_vmstate(const char *name, Error **errp);
->  int load_vmstate(const char *name, Error **errp);
->  
-> +AnnounceParameters *qemu_get_announce_params(void);
-> +void qemu_fill_announce_parameters(AnnounceParameters **to,
-> +                                   AnnounceParameters *from);
-> +bool qemu_validate_announce_parameters(AnnounceParameters *params,
-> +                                       Error **errp);
-> +void qemu_set_announce_parameters(AnnounceParameters *announce_params,
-> +                                  AnnounceParameters *params);
->  void qemu_announce_self(void);
->  
->  /* Subcommands for QEMU_VM_COMMAND */
-> diff --git a/migration/savevm.c b/migration/savevm.c
-> index f5e8194..cee2837 100644
-> --- a/migration/savevm.c
-> +++ b/migration/savevm.c
-> @@ -78,6 +78,104 @@ static struct mig_cmd_args {
->      [MIG_CMD_MAX]              = { .len = -1, .name = "MAX" },
->  };
->  
-> +#define QEMU_ANNOUNCE_INITIAL    50
-> +#define QEMU_ANNOUNCE_MAX       550
-> +#define QEMU_ANNOUNCE_ROUNDS      5
-> +#define QEMU_ANNOUNCE_STEP      100
-> +
-> +AnnounceParameters *qemu_get_announce_params(void)
-> +{
-> +    static AnnounceParameters announce = {
-> +        .initial = QEMU_ANNOUNCE_INITIAL,
-> +        .max = QEMU_ANNOUNCE_MAX,
-> +        .rounds = QEMU_ANNOUNCE_ROUNDS,
-> +        .step = QEMU_ANNOUNCE_STEP,
-> +    };
-> +
-> +    return &announce;
-> +}
-> +
-> +void qemu_fill_announce_parameters(AnnounceParameters **to,
-> +                                   AnnounceParameters *from)
-> +{
-> +    AnnounceParameters *params;
-> +
-> +    params = *to = g_malloc0(sizeof(*params));
-> +    params->has_initial = true;
-> +    params->initial = from->initial;
-> +    params->has_max = true;
-> +    params->max = from->max;
-> +    params->has_rounds = true;
-> +    params->rounds = from->rounds;
-> +    params->has_step = true;
-> +    params->step = from->step;
-> +}
-> +
-> +bool qemu_validate_announce_parameters(AnnounceParameters *params, Error **errp)
-> +{
-> +    if (params->has_initial &&
-> +        (params->initial < 1 || params->initial > 100000)) {
-> +        error_setg(errp, QERR_INVALID_PARAMETER_VALUE, "initial",
-> +                   "is invalid, it should be in the range of 1 to 100000 ms");
-> +        return false;
-> +    }
-> +    if (params->has_max &&
-> +        (params->max < 1 || params->max > 100000)) {
-> +        error_setg(errp, QERR_INVALID_PARAMETER_VALUE, "max",
-> +                   "is invalid, it should be in the range of 1 to 100000 ms");
-> +        return false;
-> +    }
-> +    if (params->has_rounds &&
-> +        (params->rounds < 1 || params->rounds > 1000)) {
-> +        error_setg(errp, QERR_INVALID_PARAMETER_VALUE, "rounds",
-> +                   "is invalid, it should be in the range of 1 to 1000");
-> +        return false;
-> +    }
-> +    if (params->has_step &&
-> +        (params->step < 0 || params->step > 10000)) {
-> +        error_setg(errp, QERR_INVALID_PARAMETER_VALUE, "step",
-> +                   "is invalid, it should be in the range of 1 to 10000 ms");
-> +        return false;
-> +    }
-> +
-> +    return true;
-> +}
-> +
-> +void qemu_set_announce_parameters(AnnounceParameters *announce_params,
-> +                                  AnnounceParameters *params)
-> +{
-> +    if (params->has_initial) {
-> +        announce_params->initial = params->initial;
-> +    }
-> +    if (params->has_max) {
-> +        announce_params->max = params->max;
-> +    }
-> +    if (params->has_rounds) {
-> +        announce_params->rounds = params->rounds;
-> +    }
-> +    if (params->has_step) {
-> +        announce_params->step = params->step;
-> +    }
-> +}
-> +
-> +AnnounceParameters *qmp_query_announce_parameters(Error **errp)
-> +{
-> +    AnnounceParameters *params = NULL;
-> +
-> +    qemu_fill_announce_parameters(&params, qemu_get_announce_params());
-> +    return params;
-> +}
-> +
-> +void qmp_announce_set_parameters(AnnounceParameters *params, Error **errp)
-> +{
-> +    AnnounceParameters *current = qemu_get_announce_params();
-> +
-> +    if (!qemu_validate_announce_parameters(params, errp))
-> +        return;
-> +
-> +    qemu_set_announce_parameters(current, params);
-> +}
-> +
->  static int announce_self_create(uint8_t *buf,
->                                  uint8_t *mac_addr)
->  {
-> diff --git a/qapi-schema.json b/qapi-schema.json
-> index 80603cf..2030087 100644
-> --- a/qapi-schema.json
-> +++ b/qapi-schema.json
-> @@ -569,6 +569,90 @@
->  ##
->  { 'command': 'query-events', 'returns': ['EventInfo'] }
->  
-> +
-> +##
-> +# @AnnounceParameter:
-> +#
-> +# @AnnounceParameter enumeration
-> +#
-> +# @initial: Initial delay (in ms) before sending the first GARP/RARP
-> +#       announcement
-> +#
-> +# @max: Maximum delay (in ms) to between GARP/RARP announcemnt packets
-> +#
-> +# @rounds: Number of self-announcement attempts
-> +#
-> +# @step: Delay increate (in ms) after each self-announcment attempt
-                        ^-s                               ^e
+>  numa.c | 3 +--
+>  1 file changed, 1 insertion(+), 2 deletions(-)
 
-> +#
-> +# Since: 2.10
-> +##
-> +{ 'enum' : 'AnnounceParameter',
-> +  'data' : [ 'initial', 'max', 'rounds', 'step' ] }
-> +
-> +##
-> +# @AnnounceParameters:
-> +#
-> +# Optional members may be omited on input, but all values will be present
-                                ^t
-> +# on output.
-> +#           
-> +# @initial: Initial delay (in ms) before sending the first GARP/RARP
-> +#       announcement
-> +#
-> +# @max: Maximum delay (in ms) to between GARP/RARP announcemnt packets
-> +#
-> +# @rounds: Number of self-announcement attempts
-> +#
-> +# @step: Delay increate (in ms) after each self-announcment attempt
-> +#
-> +# Since: 2.10
-> +##
-> +
-> +{ 'struct': 'AnnounceParameters',
-> +  'data': { '*initial': 'int',
-> +            '*max': 'int',
-> +            '*rounds': 'int',
-> +            '*step': 'int' } }
-> +
-> +##
-> +# @announce-set-parameters:
-> +#
-> +# Set qemu announce parameters.
-> +#
-> +# Since: 2.10
-> +#
-> +# Example:
-> +#
-> +# -> { "execute": "announce-set-parameters",
-> +#      "arguments": { "announce-rounds": 10 } }
-> +#
-> +##
-> +{ 'command': 'announce-set-parameters', 'boxed': true,
-> +  'data': 'AnnounceParameters' }
-> +
-> +##
-> +# @query-announce-parameters:
-> +#
-> +# Returns information about the current announce parameters
-> +#
-> +# Returns: @AnnounceParameters
-> +#
-> +# Since: 2.10
-> +#
-> +# Example:
-> +#
-> +# -> { "execute": "query-announce-parameters" }
-> +# <- { "return": {
-> +#          "initial": 50,
-> +#          "max": 500,
-> +#          "rounds": 5,
-> +#          "step": 100
-> +#       }
-> +#    }
-> +#
-> +##
-> +{ 'command': 'query-announce-parameters',
-> +  'returns': 'AnnounceParameters' }
-> +
->  ##
->  # @MigrationStats:
->  #
-> -- 
-> 2.7.4
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+Reviewed-by: Eric Blake <eblake@redhat.com>
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--pU331oHIQeEJI2egXQhCCN1PkccMS0taN
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEcBAEBCAAGBQJZLcMqAAoJEKeha0olJ0NqaRsIAKeHQHF7QbBzUrWEPTQfLNk/
+dg5zXWJpkaF81/J699JBwTZZeRD1t6D8oD3h00qKwsXKmt7xJA9crTMMfa0RNkg9
+s0J7Fe1YGVn5KiNsgQNLTGnGjdVqw4ulON9UFu6Hikv4FnMnazCtSvb8Kcpvygzs
+cTJpu0soA2iigphs3AjdCaBArF0h8GwxgEKEMQ7cRQuxKQvwb86GTiKsAPuRzfsj
+m4kWOb1P1wWkzUwMUYGv6WI0Fu9JZJAuXQs3ezvrrYGdtOYQrt5O4uY3aBpX863r
+Dqc5WEQixwrrfBgQiHxlCoED4k0kzwUoaJxuMN4ju09vl2vdjL4IVlcv+tzvDaA=
+=MkHa
+-----END PGP SIGNATURE-----
+
+--pU331oHIQeEJI2egXQhCCN1PkccMS0taN--
