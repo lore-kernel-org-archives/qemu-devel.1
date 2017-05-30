@@ -1,22 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33495)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33745)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1dFgo7-00051m-GH
-	for qemu-devel@nongnu.org; Tue, 30 May 2017 09:03:32 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1dFgp7-0005VB-2p
+	for qemu-devel@nongnu.org; Tue, 30 May 2017 09:04:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1dFgo4-0008T9-Dj
-	for qemu-devel@nongnu.org; Tue, 30 May 2017 09:03:31 -0400
-From: Juan Quintela <quintela@redhat.com>
-In-Reply-To: <20170526052319.28096-3-david@gibson.dropbear.id.au> (David
-	Gibson's message of "Fri, 26 May 2017 15:23:16 +1000")
-References: <20170526052319.28096-1-david@gibson.dropbear.id.au>
-	<20170526052319.28096-3-david@gibson.dropbear.id.au>
-Reply-To: quintela@redhat.com
-Date: Tue, 30 May 2017 15:03:23 +0200
-Message-ID: <87tw42fqec.fsf@secure.mitica>
+	(envelope-from <peter.maydell@linaro.org>) id 1dFgp5-0000ke-VF
+	for qemu-devel@nongnu.org; Tue, 30 May 2017 09:04:33 -0400
+Received: from mail-wr0-x229.google.com ([2a00:1450:400c:c0c::229]:34894)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1dFgp5-0000iu-PT
+	for qemu-devel@nongnu.org; Tue, 30 May 2017 09:04:31 -0400
+Received: by mail-wr0-x229.google.com with SMTP id q97so5485586wrb.2
+	for <qemu-devel@nongnu.org>; Tue, 30 May 2017 06:04:31 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCHv4 2/5] migration: Mark CPU states dirty
- before incoming migration/loadvm
+In-Reply-To: <20170408193322.16631-1-slyfox@gentoo.org>
+References: <20170408193322.16631-1-slyfox@gentoo.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 30 May 2017 14:04:10 +0100
+Message-ID: <CAFEAcA9hGET8EyWYUwLvtnMEWzWJn0WCGEdz=nDhO4BCyxS8zg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH] alpha-user: wire epoll_create, epoll_ctl,
+ epoll_wait
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,51 +29,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: groug@kaod.org, clg@kaod.org, aik@ozlabs.ru, mdroth@linux.vnet.ibm.com, nikunj@linux.vnet.ibm.com, agraf@suse.de, abologna@redhat.com, armbru@redhat.com, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, dgilbert@redhat.com, sursingh@redhat.com, sbobroff@redhat.com
+To: Sergei Trofimovich <slyfox@gentoo.org>
+Cc: Riku Voipio <riku.voipio@iki.fi>, QEMU Developers <qemu-devel@nongnu.org>
 
-David Gibson <david@gibson.dropbear.id.au> wrote:
-> As a rule, CPU internal state should never be updated when
-> !cpu->kvm_vcpu_dirty (or the HAX equivalent).  If that is done, then
-> subsequent calls to cpu_synchronize_state() - usually safe and idempotent -
-> will clobber state.
+On 8 April 2017 at 20:33, Sergei Trofimovich <slyfox@gentoo.org> wrote:
+> Noticed when ran GHC on alpha:
+>     $ qemu-alpha -L /usr/alpha-unknown-linux-gnu/ /tmp/a
+>     qemu: Unsupported syscall: 407
 >
-> However, we routinely do this during a loadvm or incoming migration.
-> Usually this is called shortly after a reset, which will clear all the cpu
-> dirty flags with cpu_synchronize_all_post_reset().  Nothing is expected
-> to set the dirty flags again before the cpu state is loaded from the
-> incoming stream.
+> linux-user/syscall.c does have 'epoll_create' wiring,
+> but under nondeprecated name.
 >
-> This means that it isn't safe to call cpu_synchronize_state() from a
-> post_load handler, which is non-obvious and potentially inconvenient.
->
-> We could cpu_synchronize_all_state() before the loadvm, but that would be
-> overkill since a) we expect the state to already be synchronized from the
-> reset and b) we expect to completely rewrite the state with a call to
-> cpu_synchronize_all_post_init() at the end of qemu_loadvm_state().
->
-> To clear this up, this patch introduces cpu_synchronize_pre_loadvm() and
-> associated helpers, which simply marks the cpu state as dirty without
-> actually changing anything.  i.e. it says we want to discard any existing
-> KVM (or HAX) state and replace it with what we're going to load.
->
-> Cc: Juan Quintela <quintela@redhat.com>
-> Cc: Dave Gilbert <dgilbert@redhat.com>
-> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+> Instead of defining both
+>     TARGET_NR_sys_epoll_create
+> and
+>     TARGET_NR_epoll_create
+> I've renamed former to later as old name is not used
+> anywhere else in qemu.
 
-Reviewed-by: Juan Quintela <quintela@redhat.com>
+It's also still used in the linux-user/strace.list
+file:
 
->  
-> +static void do_kvm_cpu_synchronize_pre_loadvm(CPUState *cpu, run_on_cpu_data arg)
-> +{
-> +    cpu->kvm_vcpu_dirty = true;
-> +}
-> +
-> +void kvm_cpu_synchronize_pre_loadvm(CPUState *cpu)
-> +{
-> +    run_on_cpu(cpu, do_kvm_cpu_synchronize_pre_loadvm, RUN_ON_CPU_NULL);
-> +}
+#ifdef TARGET_NR_sys_epoll_create
+{ TARGET_NR_sys_epoll_create, "sys_epoll_create" , NULL, NULL, NULL },
+#endif
+#ifdef TARGET_NR_sys_epoll_ctl
+{ TARGET_NR_sys_epoll_ctl, "sys_epoll_ctl" , NULL, NULL, NULL },
+#endif
+#ifdef TARGET_NR_sys_epoll_wait
+{ TARGET_NR_sys_epoll_wait, "sys_epoll_wait" , NULL, NULL, NULL },
+#endif
 
-They are exactly the same, does it make sense to only have a copy?
+so these sections are now unused and could be deleted.
 
-I don't really know, so I do the reviewed-by anyways.
+> After this change GHC works fine under qemu-alpha:
+>     $ ./alpha-linux-user/qemu-alpha -L /usr/alpha-unknown-linux-gnu/ /tmp/a
+>     ...
+>
+> Cc: Peter Maydell <peter.maydell@linaro.org>
+> Cc: Riku Voipio <riku.voipio@iki.fi>
+> Cc: qemu-devel@nongnu.org
+> Signed-off-by: Sergei Trofimovich <slyfox@gentoo.org>
+> ---
+>  linux-user/alpha/syscall_nr.h | 6 +++---
+>  1 file changed, 3 insertions(+), 3 deletions(-)
+>
+> diff --git a/linux-user/alpha/syscall_nr.h b/linux-user/alpha/syscall_nr.h
+> index 00e14bb6b3..e848154663 100644
+> --- a/linux-user/alpha/syscall_nr.h
+> +++ b/linux-user/alpha/syscall_nr.h
+> @@ -343,9 +343,9 @@
+>  #define TARGET_NR_io_cancel                    402
+>  #define TARGET_NR_exit_group                   405
+>  #define TARGET_NR_lookup_dcookie               406
+> -#define TARGET_NR_sys_epoll_create             407
+> -#define TARGET_NR_sys_epoll_ctl                408
+> -#define TARGET_NR_sys_epoll_wait               409
+> +#define TARGET_NR_epoll_create                 407
+> +#define TARGET_NR_epoll_ctl                    408
+> +#define TARGET_NR_epoll_wait                   409
+>  #define TARGET_NR_remap_file_pages             410
+>  #define TARGET_NR_set_tid_address              411
+>  #define TARGET_NR_restart_syscall              412
+> --
+> 2.12.2
+
+This change is fine though.
+
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+
+thanks
+-- PMM
