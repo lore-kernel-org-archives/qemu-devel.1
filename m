@@ -1,27 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40683)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42085)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dFfIo-0007nP-Mr
-	for qemu-devel@nongnu.org; Tue, 30 May 2017 07:27:12 -0400
+	(envelope-from <famz@redhat.com>) id 1dFfQd-0000rq-7J
+	for qemu-devel@nongnu.org; Tue, 30 May 2017 07:35:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dFfIk-0006i7-M2
-	for qemu-devel@nongnu.org; Tue, 30 May 2017 07:27:06 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:45308)
+	(envelope-from <famz@redhat.com>) id 1dFfQb-0000Qp-Lu
+	for qemu-devel@nongnu.org; Tue, 30 May 2017 07:35:11 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:52390)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dFfIk-0006hj-FW
-	for qemu-devel@nongnu.org; Tue, 30 May 2017 07:27:02 -0400
-Date: Tue, 30 May 2017 12:26:56 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170530112655.GH2120@work-vm>
-References: <1494595886-30912-1-git-send-email-a.perevalov@samsung.com>
-	<CGME20170512133146eucas1p2ba4841cabf508b66410fae6784952eaa@eucas1p2.samsung.com>
-	<1494595886-30912-6-git-send-email-a.perevalov@samsung.com>
-	<43617b5a-0fcc-d171-aa19-4a24a4007e35@redhat.com>
+	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1dFfQb-0000Pi-D1
+	for qemu-devel@nongnu.org; Tue, 30 May 2017 07:35:09 -0400
+Date: Tue, 30 May 2017 19:35:02 +0800
+From: Fam Zheng <famz@redhat.com>
+Message-ID: <20170530113502.GC27787@lemon.lan>
+References: <20170530100736.3338-1-roman.penyaev@profitbricks.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <43617b5a-0fcc-d171-aa19-4a24a4007e35@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH V5 5/9] migration: introduce
- postcopy-blocktime capability
+In-Reply-To: <20170530100736.3338-1-roman.penyaev@profitbricks.com>
+Subject: Re: [Qemu-devel] [PATCH v2 1/1] coroutine-lock: do not touch
+ coroutine after another one has been entered
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,55 +27,156 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: Alexey Perevalov <a.perevalov@samsung.com>, qemu-devel@nongnu.org, i.maximets@samsung.com, peterx@redhat.com
+To: Roman Pen <roman.penyaev@profitbricks.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-* Eric Blake (eblake@redhat.com) wrote:
-> On 05/12/2017 08:31 AM, Alexey Perevalov wrote:
-> > Right now it could be used on destination side to
-> > enable vCPU blocktime calculation for postcopy live migration.
-> > vCPU blocktime - it's time since vCPU thread was put into
-> > interruptible sleep, till memory page was copied and thread awake.
-> > 
-> > Signed-off-by: Alexey Perevalov <a.perevalov@samsung.com>
-> > ---
-> >  include/migration/migration.h | 1 +
-> >  migration/migration.c         | 9 +++++++++
-> >  qapi-schema.json              | 5 ++++-
-> >  3 files changed, 14 insertions(+), 1 deletion(-)
-> > 
+On Tue, 05/30 12:07, Roman Pen wrote:
+> Submission of requests on linux aio is a bit tricky and can lead to
+> requests completions on submission path:
 > 
-> > +++ b/qapi-schema.json
-> > @@ -894,11 +894,14 @@
-> >  # @release-ram: if enabled, qemu will free the migrated ram pages on the source
-> >  #        during postcopy-ram migration. (since 2.9)
-> >  #
-> > +# @postcopy-blocktime: Calculate downtime for postcopy live migration (since 2.10)
-> > +#
-> >  # Since: 1.2
-> >  ##
-> >  { 'enum': 'MigrationCapability',
-> >    'data': ['xbzrle', 'rdma-pin-all', 'auto-converge', 'zero-blocks',
-> > -           'compress', 'events', 'postcopy-ram', 'x-colo', 'release-ram'] }
-> > +           'compress', 'events', 'postcopy-ram', 'x-colo', 'release-ram',
-> > +           'postcopy-blocktime'] }
+> 44713c9e8547 ("linux-aio: Handle io_submit() failure gracefully")
+> 0ed93d84edab ("linux-aio: process completions from ioq_submit()")
 > 
-> Why does this need to be a capability that we have to turn on, and not
-> something that is collected unconditionally? Is there a drawback to
-> having the stat collection always enabled without a capability?
-
-Yes, there was a reasonable CPU/memory overhead.
-(Although it might be lower now).
-
-Dave
-
+> That means that any coroutine which has been yielded in order to wait
+> for completion can be resumed from submission path and be eventually
+> terminated (freed).
+> 
+> The following use-after-free crash was observed when IO throttling
+> was enabled:
+> 
+>  Program received signal SIGSEGV, Segmentation fault.
+>  [Switching to Thread 0x7f5813dff700 (LWP 56417)]
+>  virtqueue_unmap_sg (elem=0x7f5804009a30, len=1, vq=<optimized out>) at virtio.c:252
+>  (gdb) bt
+>  #0  virtqueue_unmap_sg (elem=0x7f5804009a30, len=1, vq=<optimized out>) at virtio.c:252
+>                               ^^^^^^^^^^^^^^
+>                               remember the address
+> 
+>  #1  virtqueue_fill (vq=0x5598b20d21b0, elem=0x7f5804009a30, len=1, idx=0) at virtio.c:282
+>  #2  virtqueue_push (vq=0x5598b20d21b0, elem=elem@entry=0x7f5804009a30, len=<optimized out>) at virtio.c:308
+>  #3  virtio_blk_req_complete (req=req@entry=0x7f5804009a30, status=status@entry=0 '\000') at virtio-blk.c:61
+>  #4  virtio_blk_rw_complete (opaque=<optimized out>, ret=0) at virtio-blk.c:126
+>  #5  blk_aio_complete (acb=0x7f58040068d0) at block-backend.c:923
+>  #6  coroutine_trampoline (i0=<optimized out>, i1=<optimized out>) at coroutine-ucontext.c:78
+> 
+>  (gdb) p * elem
+>  $8 = {index = 77, out_num = 2, in_num = 1,
+>        in_addr = 0x7f5804009ad8, out_addr = 0x7f5804009ae0,
+>        in_sg = 0x0, out_sg = 0x7f5804009a50}
+>        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+>        'in_sg' and 'out_sg' are invalid.
+>        e.g. it is impossible that 'in_sg' is zero,
+>        instead its value must be equal to:
+> 
+>        (gdb) p/x 0x7f5804009ad8 + sizeof(elem->in_addr[0]) + 2 * sizeof(elem->out_addr[0])
+>        $26 = 0x7f5804009af0
+> 
+> Seems 'elem' was corrupted.  Meanwhile another thread raised an abort:
+> 
+>  Thread 12 (Thread 0x7f57f2ffd700 (LWP 56426)):
+>  #0  raise () from /lib/x86_64-linux-gnu/libc.so.6
+>  #1  abort () from /lib/x86_64-linux-gnu/libc.so.6
+>  #2  qemu_coroutine_enter (co=0x7f5804009af0) at qemu-coroutine.c:113
+>  #3  qemu_co_queue_run_restart (co=0x7f5804009a30) at qemu-coroutine-lock.c:60
+>  #4  qemu_coroutine_enter (co=0x7f5804009a30) at qemu-coroutine.c:119
+>                            ^^^^^^^^^^^^^^^^^^
+>                            WTF?? this is equal to elem from crashed thread
+> 
+>  #5  qemu_co_queue_run_restart (co=0x7f57e7f16ae0) at qemu-coroutine-lock.c:60
+>  #6  qemu_coroutine_enter (co=0x7f57e7f16ae0) at qemu-coroutine.c:119
+>  #7  qemu_co_queue_run_restart (co=0x7f5807e112a0) at qemu-coroutine-lock.c:60
+>  #8  qemu_coroutine_enter (co=0x7f5807e112a0) at qemu-coroutine.c:119
+>  #9  qemu_co_queue_run_restart (co=0x7f5807f17820) at qemu-coroutine-lock.c:60
+>  #10 qemu_coroutine_enter (co=0x7f5807f17820) at qemu-coroutine.c:119
+>  #11 qemu_co_queue_run_restart (co=0x7f57e7f18e10) at qemu-coroutine-lock.c:60
+>  #12 qemu_coroutine_enter (co=0x7f57e7f18e10) at qemu-coroutine.c:119
+>  #13 qemu_co_enter_next (queue=queue@entry=0x5598b1e742d0) at qemu-coroutine-lock.c:106
+>  #14 timer_cb (blk=0x5598b1e74280, is_write=<optimized out>) at throttle-groups.c:419
+> 
+> Crash can be explained by access of 'co' object from the loop inside
+> qemu_co_queue_run_restart():
+> 
+>   while ((next = QSIMPLEQ_FIRST(&co->co_queue_wakeup))) {
+>       QSIMPLEQ_REMOVE_HEAD(&co->co_queue_wakeup, co_queue_next);
+>                            ^^^^^^^^^^^^^^^^^^^^
+>                            on each iteration 'co' is accessed,
+>                            but 'co' can be already freed
+> 
+>       qemu_coroutine_enter(next);
+>   }
+> 
+> When 'next' coroutine is resumed (entered) it can in its turn resume
+> 'co', and eventually free it.  That's why we see 'co' (which was freed)
+> has the same address as 'elem' from the first backtrace.
+> 
+> The fix is obvious: use temporary queue and do not touch coroutine after
+> first qemu_coroutine_enter() is invoked.
+> 
+> The issue is quite rare and happens every ~12 hours on very high IO
+> and CPU load (building linux kernel with -j512 inside guest) when IO
+> throttling is enabled.  With the fix applied guest is running ~35 hours
+> and is still alive so far.
+> 
+> Signed-off-by: Roman Pen <roman.penyaev@profitbricks.com>
+> Cc: Paolo Bonzini <pbonzini@redhat.com>
+> Cc: Fam Zheng <famz@redhat.com>
+> Cc: Stefan Hajnoczi <stefanha@redhat.com>
+> Cc: Kevin Wolf <kwolf@redhat.com>
+> Cc: qemu-devel@nongnu.org
+> ---
+>  v2:
+>      Comments tweaks suggested by Paolo.
+> 
+>  util/qemu-coroutine-lock.c | 14 ++++++++++++--
+>  util/qemu-coroutine.c      |  5 +++++
+>  2 files changed, 17 insertions(+), 2 deletions(-)
+> 
+> diff --git a/util/qemu-coroutine-lock.c b/util/qemu-coroutine-lock.c
+> index 6328eed26bc6..d589d8c66d5e 100644
+> --- a/util/qemu-coroutine-lock.c
+> +++ b/util/qemu-coroutine-lock.c
+> @@ -77,10 +77,20 @@ void coroutine_fn qemu_co_queue_wait(CoQueue *queue, CoMutex *mutex)
+>  void qemu_co_queue_run_restart(Coroutine *co)
+>  {
+>      Coroutine *next;
+> +    QSIMPLEQ_HEAD(, Coroutine) tmp_queue_wakeup =
+> +        QSIMPLEQ_HEAD_INITIALIZER(tmp_queue_wakeup);
+>  
+>      trace_qemu_co_queue_run_restart(co);
+> -    while ((next = QSIMPLEQ_FIRST(&co->co_queue_wakeup))) {
+> -        QSIMPLEQ_REMOVE_HEAD(&co->co_queue_wakeup, co_queue_next);
+> +
+> +    /* Because "co" has yielded, any coroutine that we wakeup can resume it.
+> +     * If this happens and "co" terminates, co->co_queue_wakeup becomes
+> +     * invalid memory.  Therefore, use a temporary queue and do not touch
+> +     * the "co" coroutine as soon as you enter another one.
+> +     */
+> +    QSIMPLEQ_CONCAT(&tmp_queue_wakeup, &co->co_queue_wakeup);
+> +
+> +    while ((next = QSIMPLEQ_FIRST(&tmp_queue_wakeup))) {
+> +        QSIMPLEQ_REMOVE_HEAD(&tmp_queue_wakeup, co_queue_next);
+>          qemu_coroutine_enter(next);
+>      }
+>  }
+> diff --git a/util/qemu-coroutine.c b/util/qemu-coroutine.c
+> index 486af9a62275..d6095c1d5aa4 100644
+> --- a/util/qemu-coroutine.c
+> +++ b/util/qemu-coroutine.c
+> @@ -126,6 +126,11 @@ void qemu_aio_coroutine_enter(AioContext *ctx, Coroutine *co)
+>  
+>      qemu_co_queue_run_restart(co);
+>  
+> +    /* Beware, if ret == COROUTINE_YIELD and qemu_co_queue_run_restart()
+> +     * has started any other coroutine, "co" might have been reentered
+> +     * and even freed by now!  So be careful and do not touch it.
+> +     */
+> +
+>      switch (ret) {
+>      case COROUTINE_YIELD:
+>          return;
 > -- 
-> Eric Blake, Principal Software Engineer
-> Red Hat, Inc.           +1-919-301-3266
-> Virtualization:  qemu.org | libvirt.org
+> 2.11.0
+> 
 > 
 
-
-
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+Reviewed-by: Fam Zheng <famz@redhat.com>
