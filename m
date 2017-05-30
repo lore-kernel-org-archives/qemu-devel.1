@@ -1,32 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53677)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54202)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1dFjYm-0008Ev-Jj
-	for qemu-devel@nongnu.org; Tue, 30 May 2017 11:59:53 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1dFjaG-00016s-R1
+	for qemu-devel@nongnu.org; Tue, 30 May 2017 12:01:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1dFjYj-0005dB-Id
-	for qemu-devel@nongnu.org; Tue, 30 May 2017 11:59:52 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:27237)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1dFjYj-0005d4-C5
-	for qemu-devel@nongnu.org; Tue, 30 May 2017 11:59:49 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 269ECC049D57
-	for <qemu-devel@nongnu.org>; Tue, 30 May 2017 15:59:48 +0000 (UTC)
-From: Juan Quintela <quintela@redhat.com>
-In-Reply-To: <1495176212-14446-5-git-send-email-peterx@redhat.com> (Peter Xu's
-	message of "Fri, 19 May 2017 14:43:30 +0800")
-References: <1495176212-14446-1-git-send-email-peterx@redhat.com>
-	<1495176212-14446-5-git-send-email-peterx@redhat.com>
-Reply-To: quintela@redhat.com
-Date: Tue, 30 May 2017 17:59:44 +0200
-Message-ID: <87o9uae3nz.fsf@secure.mitica>
+	(envelope-from <peter.maydell@linaro.org>) id 1dFjaG-00061O-84
+	for qemu-devel@nongnu.org; Tue, 30 May 2017 12:01:24 -0400
+Received: from mail-wr0-x229.google.com ([2a00:1450:400c:c0c::229]:35845)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1dFjaG-00061F-1r
+	for qemu-devel@nongnu.org; Tue, 30 May 2017 12:01:24 -0400
+Received: by mail-wr0-x229.google.com with SMTP id j27so3308549wre.3
+	for <qemu-devel@nongnu.org>; Tue, 30 May 2017 09:01:23 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH RFC 4/6] migration: shut src return path
- unconditionally
+In-Reply-To: <1494697399-352-3-git-send-email-eric.auger@redhat.com>
+References: <1494697399-352-1-git-send-email-eric.auger@redhat.com>
+	<1494697399-352-3-git-send-email-eric.auger@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 30 May 2017 17:01:01 +0100
+Message-ID: <CAFEAcA9P=k88CFwUHeAg=oxsDpY72OTUc=+iyffM9dP5=tzRKg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [RFC v4 2/5] hw/arm/smmuv3: smmuv3 emulation model
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,18 +29,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: qemu-devel@nongnu.org, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+To: Eric Auger <eric.auger@redhat.com>
+Cc: eric.auger.pro@gmail.com, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, prem.mallappa@gmail.com, Andrew Jones <drjones@redhat.com>, Christoffer Dall <christoffer.dall@linaro.org>, Radha.Chintakuntla@cavium.com, Sunil.Goutham@cavium.com, Radha Mohan <mohun106@gmail.com>, Trey Cain <tcain@qti.qualcomm.com>
 
-Peter Xu <peterx@redhat.com> wrote:
-> We were do the shutting off only for postcopy. Now we do this as long as
-> the source return path is there.
+On 13 May 2017 at 18:43, Eric Auger <eric.auger@redhat.com> wrote:
+> From: Prem Mallappa <prem.mallappa@broadcom.com>
 >
-> Moving the cleanup of from_src_file there too.
+> Introduces the SMMUv3 derived model. This is based on
+> System MMUv3 specification (v17).
 >
-> Signed-off-by: Peter Xu <peterx@redhat.com>
+> Signed-off-by: Prem Mallappa <prem.mallappa@broadcom.com>
+> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+>
+> ---
+> v3 -> v4
+> - smmu_irq_update
+> - fix hash key allocation
+> - set smmu_iommu_ops
+> - set SMMU_REG_CR0,
+> - smmuv3_translate: ret.perm not set in bypass mode
+> - use trace events
+> - renamed STM2U64 into L1STD_L2PTR and STMSPAN into L1STD_SPAN
+> - rework smmu_find_ste
+> - fix tg2granule in TT0/0b10 corresponds to 16kB
+>
+> v2 -> v3:
+> - move creation of include/hw/arm/smmuv3.h to this patch to fix compil issue
+> - compilation allowed
+> - fix sbus allocation in smmu_init_pci_iommu
+> - restructure code into headers
+> - misc cleanups
+> ---
+>  hw/arm/Makefile.objs     |    2 +-
+>  hw/arm/smmuv3-internal.h |  603 ++++++++++++++++++++++++
+>  hw/arm/smmuv3.c          | 1134 ++++++++++++++++++++++++++++++++++++++++++++++
+>  hw/arm/trace-events      |   32 ++
+>  include/hw/arm/smmuv3.h  |   87 ++++
+>  5 files changed, 1857 insertions(+), 1 deletion(-)
+>  create mode 100644 hw/arm/smmuv3-internal.h
+>  create mode 100644 hw/arm/smmuv3.c
+>  create mode 100644 include/hw/arm/smmuv3.h
 
-You can also submmit this and previous patch alone and I will integrate
-them.
+This is a bit of a big patch for review for my taste -- are
+there some easy splits into multiple patches possible?
 
-thanks, Juan.
+> +typedef struct SMMUQueue {
+> +     hwaddr base;
+> +     uint32_t prod;
+> +     uint32_t cons;
+> +     union {
+> +          struct {
+> +               uint8_t prod:1;
+> +               uint8_t cons:1;
+> +          };
+> +          uint8_t unused;
+> +     } wrap;
+
+Use of bitfields here seems a bit odd but I haven't
+looked at the code really.
+
+thanks
+-- PMM
