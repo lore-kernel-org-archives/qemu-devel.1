@@ -1,27 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48535)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49605)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dFjFS-0007xi-JF
-	for qemu-devel@nongnu.org; Tue, 30 May 2017 11:39:55 -0400
+	(envelope-from <eblake@redhat.com>) id 1dFjJX-0001fU-Vw
+	for qemu-devel@nongnu.org; Tue, 30 May 2017 11:44:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dFjFR-0008Mu-Oz
-	for qemu-devel@nongnu.org; Tue, 30 May 2017 11:39:54 -0400
-Received: from mail-wm0-x229.google.com ([2a00:1450:400c:c09::229]:36023)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1dFjFR-0008Mj-J8
-	for qemu-devel@nongnu.org; Tue, 30 May 2017 11:39:53 -0400
-Received: by mail-wm0-x229.google.com with SMTP id 7so95278915wmo.1
-	for <qemu-devel@nongnu.org>; Tue, 30 May 2017 08:39:53 -0700 (PDT)
+	(envelope-from <eblake@redhat.com>) id 1dFjJW-00017n-UK
+	for qemu-devel@nongnu.org; Tue, 30 May 2017 11:44:08 -0400
+References: <20170530104857.70083-1-vsementsov@virtuozzo.com>
+	<20170530104857.70083-2-vsementsov@virtuozzo.com>
+	<21763282-556d-4389-29b5-664f6f4f4479@redhat.com>
+	<bd1de229-7eda-be84-c297-920d0de7b85f@virtuozzo.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <8aa69d4f-9f2f-fa70-617d-f92586308408@redhat.com>
+Date: Tue, 30 May 2017 10:43:58 -0500
 MIME-Version: 1.0
-In-Reply-To: <87bmqanz6i.fsf@abhimanyu.i-did-not-set--mail-host-address--so-tickle-me>
-References: <1495444679-7736-1-git-send-email-sandipandas1990@gmail.com>
-	<87bmqanz6i.fsf@abhimanyu.i-did-not-set--mail-host-address--so-tickle-me>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 30 May 2017 16:39:31 +0100
-Message-ID: <CAFEAcA__bsp5_yJZJr3LBbB_5yuALZ4o5ELXhJo4OO5jjz4G3A@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH risu v2] ppc64: Fix patterns for rotate
- doubleword instructions
+In-Reply-To: <bd1de229-7eda-be84-c297-920d0de7b85f@virtuozzo.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="X2o0G3jdQTI5d0IoROsLro5faStjiBGKJ"
+Subject: Re: [Qemu-devel] [PATCH 1/4] block: add bdrv_get_format_alloc_stat
+ format interface
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,26 +27,104 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
-Cc: Sandipan Das <sandipandas1990@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>, Jose Ricardo Ziviani <joserz@linux.vnet.ibm.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: armbru@redhat.com, mreitz@redhat.com, kwolf@redhat.com, den@openvz.org
 
-On 30 May 2017 at 16:26, Nikunj A Dadhania <nikunj@linux.vnet.ibm.com> wrote:
-> Sandipan Das <sandipandas1990@gmail.com> writes:
->
->> The patterns for the following instructions are fixed:
->>  * Rotate Left Doubleword then Clear Right (rldcr[.])
->>  * Rotate Left Doubleword Immediate then Clear Right (rldicr[.])
->>  * Rotate Left Doubleword Immediate then Mask Insert (rldimi[.])
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--X2o0G3jdQTI5d0IoROsLro5faStjiBGKJ
+From: Eric Blake <eblake@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: armbru@redhat.com, mreitz@redhat.com, kwolf@redhat.com, den@openvz.org
+Message-ID: <8aa69d4f-9f2f-fa70-617d-f92586308408@redhat.com>
+Subject: Re: [PATCH 1/4] block: add bdrv_get_format_alloc_stat format
+ interface
+References: <20170530104857.70083-1-vsementsov@virtuozzo.com>
+ <20170530104857.70083-2-vsementsov@virtuozzo.com>
+ <21763282-556d-4389-29b5-664f6f4f4479@redhat.com>
+ <bd1de229-7eda-be84-c297-920d0de7b85f@virtuozzo.com>
+In-Reply-To: <bd1de229-7eda-be84-c297-920d0de7b85f@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 05/30/2017 10:27 AM, Vladimir Sementsov-Ogievskiy wrote:
+> 30.05.2017 17:53, Eric Blake wrote:
+>> On 05/30/2017 05:48 AM, Vladimir Sementsov-Ogievskiy wrote:
+>>> The function should collect statistics, about allocted/unallocated by=
+
+>>> top-level format driver space (in its .file) and allocation status
+>>> (allocated/hole/after eof) of corresponding areas in this .file.
+>>>
+
+>>> +# @alloc_hole: allocated by format driver but actually is a hole in
+>>> +#              underlying file
+>> The portions of the format file in use by the format, but where the
+>> entire cluster is a hole in the underlying file (note that with cluste=
+r
+>> size large enough, you can get a cluster that is part-data/part-hole i=
+n
+>> the underlying file, it looks like you are counting those as data).
+>=20
+> No, I account on sector boundary on bs->file. So it is not cluster-alig=
+ned.
+
+Okay, worth knowing (and therefore worth including in the documentation).=
+
+
+>=20
 >>
->> The first instruction has a typo. For the other two instructions,
->> the extended opcodes are incorrect and the shift field 'sha' is
->> absent. Also, the shift field 'sh' should be used in place of the
->> register field 'rb'.
->>
->> Signed-off-by: Sandipan Das <sandipandas1990@gmail.com>
->
-> Reviewed-by: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
+>>> +#
+>>> +# @alloc_overhead: allocated by format driver after end of
+>>> underlying file
+>> The portions of the format file in use by the format, but where the
+>> entire cluster is beyond the end of the underlying file (the effective=
 
-Thanks; applied to risu master.
+>> hole).  Do we really need to distinguish between hole within the
+>> underlying file and hole beyond the end of the file? Or can this numbe=
+r
+>> be combined with the previous?
+>=20
+> alloc_alloc + alloc_hole + hole_alloc + hole_hole =3D size of bs->file,=
+ I
+> think this is good and clear.
 
--- PMM
+That relationship is worth including in the documentation.
+
+>=20
+> these 4 stats describes bs->file usage in details (not on cluster
+> boundary, but on sector, based on bs->file block status), alloc_overhea=
+d
+> is separate.
+
+I'd lean more towards alloc-overrun than alloc-overhead (we have
+metadata overhead no matter what, but overrun does a nice job of
+explaining offsets that are important to the format but which are not
+present in the underlying protocol).
+
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--X2o0G3jdQTI5d0IoROsLro5faStjiBGKJ
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEcBAEBCAAGBQJZLZM+AAoJEKeha0olJ0NqUXcH/2SHPF2vg2xL2lxvlCf4M1cg
+hQ5Km9EnZDwfy/9yDhyGj+1pxIPEngAIYo5zd8lcpuW6xw3jP0onhB9Z7zvo5fs5
+nRd0dK7wToHhih+pVOc5xLNY+0MsyKzQNrI2z0QguceLM4Vt30RjGfd/CTdLhlsd
+4JIYPhCobVEMNa9p+X7jz/JYiX4ZKK8CNl3CtWJpyMH+anUkTAcAqF/ZXkm13gT6
+2vrZnNMQdZJZkc6l3cTtkRXRdnawR61infEw67JW7p7ZSiFHhjb/VU95hKSj39pz
+HaAJShEih5Mh/FHBr3CVlQNkhpl9fj44dLanQiCePgvn74QM0HNm5vtJQxmCOyI=
+=gMha
+-----END PGP SIGNATURE-----
+
+--X2o0G3jdQTI5d0IoROsLro5faStjiBGKJ--
