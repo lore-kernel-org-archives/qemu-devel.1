@@ -1,13 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48192)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48255)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kchamart@redhat.com>) id 1dFjEl-0007Pg-DY
-	for qemu-devel@nongnu.org; Tue, 30 May 2017 11:39:15 -0400
+	(envelope-from <kchamart@redhat.com>) id 1dFjEr-0007Ux-Ur
+	for qemu-devel@nongnu.org; Tue, 30 May 2017 11:39:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kchamart@redhat.com>) id 1dFjEh-0008BJ-LD
-	for qemu-devel@nongnu.org; Tue, 30 May 2017 11:39:11 -0400
+	(envelope-from <kchamart@redhat.com>) id 1dFjEo-0008Df-Mi
+	for qemu-devel@nongnu.org; Tue, 30 May 2017 11:39:17 -0400
 From: Kashyap Chamarthy <kchamart@redhat.com>
-Date: Tue, 30 May 2017 17:38:43 +0200
-Message-Id: <1496158724-2809-1-git-send-email-kchamart@redhat.com>
+Date: Tue, 30 May 2017 17:38:44 +0200
+Message-Id: <1496158724-2809-2-git-send-email-kchamart@redhat.com>
+In-Reply-To: <1496158724-2809-1-git-send-email-kchamart@redhat.com>
+References: <1496158724-2809-1-git-send-email-kchamart@redhat.com>
 Subject: [Qemu-devel] [PATCH] live-block-ops.txt: Rewrite and improve it
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -55,7 +57,7 @@ All commands showed in this document were tested while documenting.
 
 Thanks: Eric Blake for the section: "A note on points-in-time vs file
 names".  This useful bit was originally articulated by Eric in his
-KVMForum 2015 presentation, so I included that specific bit in this
+KVMForum 2015 presentation, so I included that specific in this
 document.
 
 Signed-off-by: Kashyap Chamarthy <kchamart@redhat.com>
@@ -79,7 +81,7 @@ Signed-off-by: Kashyap Chamarthy <kchamart@redhat.com>
 
 diff --git a/docs/live-block-operations.rst b/docs/live-block-operations.rst
 new file mode 100644
-index 0000000000000000000000000000000000000000..19107776cd1edd20fac17ddda192d677199190d9
+index 0000000..1910777
 --- /dev/null
 +++ b/docs/live-block-operations.rst
 @@ -0,0 +1,757 @@
@@ -842,7 +844,7 @@ index 0000000000000000000000000000000000000000..19107776cd1edd20fac17ddda192d677
 +    "Images are identical"
 diff --git a/docs/live-block-ops.txt b/docs/live-block-ops.txt
 deleted file mode 100644
-index 2211d14428a846f215f4396950a5743a2e3bfe94..0000000000000000000000000000000000000000
+index 2211d14..0000000
 --- a/docs/live-block-ops.txt
 +++ /dev/null
 @@ -1,72 +0,0 @@
