@@ -1,29 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44835)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48660)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1dFc6N-0006ML-OW
-	for qemu-devel@nongnu.org; Tue, 30 May 2017 04:02:11 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1dFcLP-0001HT-LJ
+	for qemu-devel@nongnu.org; Tue, 30 May 2017 04:17:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1dFc6K-0002jc-KM
-	for qemu-devel@nongnu.org; Tue, 30 May 2017 04:02:03 -0400
-Received: from 5.mo5.mail-out.ovh.net ([87.98.173.103]:37598)
+	(envelope-from <vsementsov@virtuozzo.com>) id 1dFcLN-0007Oa-3M
+	for qemu-devel@nongnu.org; Tue, 30 May 2017 04:17:35 -0400
+Received: from mailhub.sw.ru ([195.214.232.25]:44319 helo=relay.sw.ru)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1dFc6K-0002j7-AI
-	for qemu-devel@nongnu.org; Tue, 30 May 2017 04:02:00 -0400
-Received: from player799.ha.ovh.net (b9.ovh.net [213.186.33.59])
-	by mo5.mail-out.ovh.net (Postfix) with ESMTP id B8499FF69F
-	for <qemu-devel@nongnu.org>; Tue, 30 May 2017 10:01:53 +0200 (CEST)
-Date: Tue, 30 May 2017 10:01:36 +0200
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20170530100136.680ce96f@bahia.ttt.fr.ibm.com>
-In-Reply-To: <20170530061852.GE12163@umbus.fritz.box>
-References: <20170526052319.28096-1-david@gibson.dropbear.id.au>
-	<20170530011416.01eea576@bahia.ttt.fr.ibm.com>
-	<20170530061852.GE12163@umbus.fritz.box>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	boundary="Sig_/.n1Odr257agVsaHIAexpfA2";
-	protocol="application/pgp-signature"
-Subject: Re: [Qemu-devel] [PATCHv4 0/5] Clean up compatibility mode handling
+	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
+	id 1dFcLM-0007MU-Op
+	for qemu-devel@nongnu.org; Tue, 30 May 2017 04:17:33 -0400
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Tue, 30 May 2017 11:17:20 +0300
+Message-Id: <20170530081723.29205-23-vsementsov@virtuozzo.com>
+In-Reply-To: <20170530081723.29205-1-vsementsov@virtuozzo.com>
+References: <20170530081723.29205-1-vsementsov@virtuozzo.com>
+Subject: [Qemu-devel] [PATCH 22/25] block/dirty-bitmap: add
+ bdrv_remove_persistent_dirty_bitmap
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,172 +25,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: clg@kaod.org, aik@ozlabs.ru, mdroth@linux.vnet.ibm.com, nikunj@linux.vnet.ibm.com, agraf@suse.de, abologna@redhat.com, armbru@redhat.com, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, quintela@redhat.com, dgilbert@redhat.com, sursingh@redhat.com, sbobroff@redhat.com
+To: qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, mreitz@redhat.com, armbru@redhat.com, eblake@redhat.com, jsnow@redhat.com, famz@redhat.com, den@openvz.org, stefanha@redhat.com, vsementsov@virtuozzo.com, pbonzini@redhat.com
 
---Sig_/.n1Odr257agVsaHIAexpfA2
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+Interface for removing persistent bitmap from its storage.
 
-On Tue, 30 May 2017 16:18:52 +1000
-David Gibson <david@gibson.dropbear.id.au> wrote:
-
-> On Tue, May 30, 2017 at 01:14:16AM +0200, Greg Kurz wrote:
-> > On Fri, 26 May 2017 15:23:14 +1000
-> > David Gibson <david@gibson.dropbear.id.au> wrote:
-> >=20
-> > [...] =20
-> > >=20
-> > >=20
-> > > Changes since v3:
-> > >   * Backwards compatible -cpu handling now removes compat=3D option f=
-rom
-> > >     options passed on to the cpu, so it doesn't trigger further warni=
-ngs =20
-> >=20
-> > This seems to also have another interesting effect.
-> >=20
-> > getset_compat_deprecated() could be called either during CPU realizatio=
-n from:
-> >=20
-> > object_property_parse()
-> > {
-> >     Visitor *v =3D string_input_visitor_new(string);
-> >     object_property_set(obj, v, name, errp);
-> >     ...
-> > }
-> >=20
-> > or during a QOM set operation from:
-> >=20
-> > void object_property_set_qobject(Object *obj, QObject *value,
-> >                                  const char *name, Error **errp)
-> > {
-> >     Visitor *v;
-> >=20
-> >     v =3D qobject_input_visitor_new(value);
-> >     object_property_set(obj, v, name, errp);
-> >     ...
-> > }
-> >=20
-> > or similarly during a QOM get operation with a QObject output visitor.
-> >=20
-> > The realization path no longer exists with patch 2, so you don't need
-> > to implement a null string input visitor anymore. =20
->=20
-> s/patch 2/patch 3/?
->=20
-
-Yes indeed, sorry :)
-
-> Is that true though?  It shouldn't get called through that path in
-> practice, because we strip the compat property from the cpu object
-> properties.  But it could get called if either a) the user explicitly
-> creates a cpu object with -device CPU,compat=3Dwhatever or b) if the
-
-Unless I'm missing something, properties of the CPU objects aren't
-exposed by CPU devices:
-
-qemu-system-ppc64 -machine pseries \
-                  -device POWER8_v2.0-spapr-cpu-core,help
-POWER8_v2.0-spapr-cpu-core.core-id=3Dint
-POWER8_v2.0-spapr-cpu-core.node-id=3Dint32
-POWER8_v2.0-spapr-cpu-core.nr-threads=3Dint
-
-and creation of CPU objects with -object isn't possible either since
-they don't inherit from the TYPE_USER_CREATABLE class.
-
-> user uses the compat=3D property with a machine type other than pseries.
->=20
-
-But yes, it is still possible to go through the object_property_parse()
-path with another machine type indeed.
-
-> Of course the user *shouldn't* do either of those things, but
-> providing a meaningful error if they do is pretty much the whole
-> purpose of this getter/setter method.
->=20
-
-All old non-pseries machine types already complain when started with
-a POWER7 or newer CPU. Providing the extra error message looks weird:
-
-qemu-system-ppc64 -machine ppce500 \
-                  -cpu POWER7,compat=3Dpower6
-qemu-system-ppc64: CPU 'compat' property is deprecated and has no effect;
- use max-cpu-compat machine property instead
-MMU model 983043 not supported by this machine.
-
-but I guess it's better than crashing. :)
-
-> >=20
-> > This means that patch 1 is no longer needed if I get things right but
-> > you probably want Markus to second that.
-> >  =20
-> > >   * Add a migration fix make cpu_synchronize_state() safe in post_load
-> > >     handlers, which in turn fixes a bug in 5/5.
-> > >   * A number of bugfixes and other tweaks suggested by feedback on v2.
-> > >=20
-> > > Changes since RFCv2:
-> > >   * Many patches dropped, since they're already merged
-> > >   * Rebased, fixed conflicts
-> > >   * Restored support for backwards migration (wasn't as complicated as
-> > >     I thought)
-> > >   * Updated final patch's description to more accurately reflect the
-> > >     logic
-> > >=20
-> > > Changes since RFCv1:
-> > >   * Change CAS logic to prefer compatibility modes over raw mode
-> > >   * Simplified by giving up on half-hearted attempts to maintain
-> > >     backwards migration
-> > >   * Folded migration stream changes into a single patch
-> > >   * Removed some preliminary patches which are already merged
-> > >=20
-> > > David Gibson (4):
-> > >   migration: Mark CPU states dirty before incoming migration/loadvm
-> > >   pseries: Move CPU compatibility property to machine
-> > >   pseries: Reset CPU compatibility mode
-> > >   ppc: Rework CPU compatibility testing across migration
-> > >=20
-> > > Greg Kurz (1):
-> > >   qapi: add explicit null to string input and output visitors
-> > >=20
-> > >  cpus.c                       |   9 ++++
-> > >  hw/ppc/spapr.c               |   8 +++-
-> > >  hw/ppc/spapr_cpu_core.c      |  62 +++++++++++++++++++++-----
-> > >  hw/ppc/spapr_hcall.c         |   8 ++--
-> > >  include/hw/ppc/spapr.h       |  12 +++--
-> > >  include/sysemu/cpus.h        |   1 +
-> > >  include/sysemu/hax.h         |   1 +
-> > >  include/sysemu/hw_accel.h    |  10 +++++
-> > >  include/sysemu/kvm.h         |   1 +
-> > >  kvm-all.c                    |  10 +++++
-> > >  migration/savevm.c           |   2 +
-> > >  qapi/string-input-visitor.c  |  11 +++++
-> > >  qapi/string-output-visitor.c |  14 ++++++
-> > >  target/i386/hax-all.c        |  10 +++++
-> > >  target/ppc/compat.c          | 102 +++++++++++++++++++++++++++++++++=
-++++++++++
-> > >  target/ppc/cpu.h             |   5 ++-
-> > >  target/ppc/machine.c         |  72 ++++++++++++++++++++++++++++--
-> > >  target/ppc/translate_init.c  |  86 +++++++++++----------------------=
+Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Reviewed-by: Max Reitz <mreitz@redhat.com>
+Reviewed-by: John Snow <jsnow@redhat.com>
 ---
-> > >  18 files changed, 340 insertions(+), 84 deletions(-)
-> > >  =20
-> >  =20
->=20
->=20
->=20
+ block/dirty-bitmap.c         | 18 ++++++++++++++++++
+ include/block/block_int.h    |  3 +++
+ include/block/dirty-bitmap.h |  3 +++
+ 3 files changed, 24 insertions(+)
 
-
---Sig_/.n1Odr257agVsaHIAexpfA2
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-
-iEYEARECAAYFAlktJuAACgkQAvw66wEB28Lq3ACfQfJeSoQPEpVNx5l9Xb2dXUOr
-Y/MAnjxErnw6/nuWuOoSn9oYZUWThLhN
-=UUkS
------END PGP SIGNATURE-----
-
---Sig_/.n1Odr257agVsaHIAexpfA2--
+diff --git a/block/dirty-bitmap.c b/block/dirty-bitmap.c
+index bf1abe4c3d..996f5fb6fc 100644
+--- a/block/dirty-bitmap.c
++++ b/block/dirty-bitmap.c
+@@ -329,12 +329,30 @@ void bdrv_release_dirty_bitmap(BlockDriverState *bs, BdrvDirtyBitmap *bitmap)
+ /**
+  * Release all named dirty bitmaps attached to a BDS (for use in bdrv_close()).
+  * There must not be any frozen bitmaps attached.
++ * This function does not remove persistent bitmaps from the storage.
+  */
+ void bdrv_release_named_dirty_bitmaps(BlockDriverState *bs)
+ {
+     bdrv_do_release_matching_dirty_bitmap(bs, NULL, true);
+ }
+ 
++/**
++ * Remove persistent dirty bitmap from the storage if it exists.
++ * Absence of bitmap is not an error, because we have the following scenario:
++ * BdrvDirtyBitmap can have .persistent = true but not yet saved and have no
++ * stored version. For such bitmap bdrv_remove_persistent_dirty_bitmap() should
++ * not fail.
++ * This function doesn't release corresponding BdrvDirtyBitmap.
++ */
++void bdrv_remove_persistent_dirty_bitmap(BlockDriverState *bs,
++                                         const char *name,
++                                         Error **errp)
++{
++    if (bs->drv && bs->drv->bdrv_remove_persistent_dirty_bitmap) {
++        bs->drv->bdrv_remove_persistent_dirty_bitmap(bs, name, errp);
++    }
++}
++
+ void bdrv_disable_dirty_bitmap(BdrvDirtyBitmap *bitmap)
+ {
+     assert(!bdrv_dirty_bitmap_frozen(bitmap));
+diff --git a/include/block/block_int.h b/include/block/block_int.h
+index 70b73a98a8..dc63e9560e 100644
+--- a/include/block/block_int.h
++++ b/include/block/block_int.h
+@@ -384,6 +384,9 @@ struct BlockDriver {
+                                             const char *name,
+                                             uint32_t granularity,
+                                             Error **errp);
++    void (*bdrv_remove_persistent_dirty_bitmap)(BlockDriverState *bs,
++                                                const char *name,
++                                                Error **errp);
+ 
+     QLIST_ENTRY(BlockDriver) list;
+ };
+diff --git a/include/block/dirty-bitmap.h b/include/block/dirty-bitmap.h
+index ef81c0b912..69d2ebda9f 100644
+--- a/include/block/dirty-bitmap.h
++++ b/include/block/dirty-bitmap.h
+@@ -25,6 +25,9 @@ BdrvDirtyBitmap *bdrv_find_dirty_bitmap(BlockDriverState *bs,
+ void bdrv_dirty_bitmap_make_anon(BdrvDirtyBitmap *bitmap);
+ void bdrv_release_dirty_bitmap(BlockDriverState *bs, BdrvDirtyBitmap *bitmap);
+ void bdrv_release_named_dirty_bitmaps(BlockDriverState *bs);
++void bdrv_remove_persistent_dirty_bitmap(BlockDriverState *bs,
++                                         const char *name,
++                                         Error **errp);
+ void bdrv_disable_dirty_bitmap(BdrvDirtyBitmap *bitmap);
+ void bdrv_enable_dirty_bitmap(BdrvDirtyBitmap *bitmap);
+ BlockDirtyInfoList *bdrv_query_dirty_bitmaps(BlockDriverState *bs);
+-- 
+2.11.1
