@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37737)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37752)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aurelien@aurel32.net>) id 1dFf4c-0003vc-Gd
-	for qemu-devel@nongnu.org; Tue, 30 May 2017 07:12:27 -0400
+	(envelope-from <aurelien@aurel32.net>) id 1dFf4t-00042C-Ia
+	for qemu-devel@nongnu.org; Tue, 30 May 2017 07:12:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aurelien@aurel32.net>) id 1dFf4b-0003H8-Gs
-	for qemu-devel@nongnu.org; Tue, 30 May 2017 07:12:26 -0400
-Received: from hall.aurel32.net ([2001:bc8:30d7:100::1]:48700)
+	(envelope-from <aurelien@aurel32.net>) id 1dFf4s-0003JO-F1
+	for qemu-devel@nongnu.org; Tue, 30 May 2017 07:12:43 -0400
+Received: from hall.aurel32.net ([2001:bc8:30d7:100::1]:48706)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <aurelien@aurel32.net>)
-	id 1dFf4b-0003H1-Ba
-	for qemu-devel@nongnu.org; Tue, 30 May 2017 07:12:25 -0400
-Date: Tue, 30 May 2017 13:12:23 +0200
+	id 1dFf4s-0003JI-8W
+	for qemu-devel@nongnu.org; Tue, 30 May 2017 07:12:42 -0400
+Date: Tue, 30 May 2017 13:12:40 +0200
 From: Aurelien Jarno <aurelien@aurel32.net>
-Message-ID: <20170530111223.yiibyjcfljjt53b2@aurel32.net>
+Message-ID: <20170530111240.jlcouhb3yheeiove@aurel32.net>
 References: <20170529193016.6888-1-aurelien@aurel32.net>
 	<20170529193016.6888-2-aurelien@aurel32.net>
-	<20170530095230.GP11362@stefanha-x1.localdomain>
+	<20170530101840.GB25884@stefanha-x1.localdomain>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="zsxz7pmqsjel4run"
+	protocol="application/pgp-signature"; boundary="smldxgonidhpi6it"
 Content-Disposition: inline
-In-Reply-To: <20170530095230.GP11362@stefanha-x1.localdomain>
+In-Reply-To: <20170530101840.GB25884@stefanha-x1.localdomain>
 Sender: Aurelien Jarno <aurelien@aurel32.net>
 Subject: Re: [Qemu-devel] [PULL 1/5] target/sh4: log unauthorized accesses
  using qemu_log_mask
@@ -36,12 +36,12 @@ To: Stefan Hajnoczi <stefanha@gmail.com>
 Cc: Stefan Hajnoczi <stefanha@redhat.com>, "open list:All patches CC here" <qemu-devel@nongnu.org>
 
 
---zsxz7pmqsjel4run
+--smldxgonidhpi6it
 Content-Type: text/plain; charset=iso-8859-15
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On 2017-05-30 10:52, Stefan Hajnoczi wrote:
+On 2017-05-30 11:18, Stefan Hajnoczi wrote:
 > On Mon, May 29, 2017 at 09:30:12PM +0200, Aurelien Jarno wrote:
 > > qemu_log_mask() is preferred over fprintf() for logging errors.
 > >=20
@@ -52,35 +52,33 @@ On 2017-05-30 10:52, Stefan Hajnoczi wrote:
 > >  target/sh4/helper.c | 2 +-
 > >  1 file changed, 1 insertion(+), 1 deletion(-)
 >=20
-> I don't see a pull request cover letter but your git repo is up-to-date
-> and the pull-target-sh4-20170529 tag is signed correctly.  Therefore I
-> have merged this pull request.
+> Had to drop this series due to a merge conflict.  Please see my reply
+> regarding qemu_system_reset_request() with info on how to fix it.
 
-Indeed, I send it to your email, but failed to send it to the mailing
-list. Sorry about that. I'll try to do better in the next pull request.
+Ok, I'll do that tonight.
 
 --=20
 Aurelien Jarno                          GPG: 4096R/1DDD8C9B
 aurelien@aurel32.net                 http://www.aurel32.net
 
---zsxz7pmqsjel4run
+--smldxgonidhpi6it
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCgAdFiEEd0YmQqnvlP0Pdxltupx4Bh3djJsFAlktU5YACgkQupx4Bh3d
-jJvJxA/+JQHfELDElf4hL/7BhF6n1Xpk4tyt46ceZlLF8X92Pw0UJ21BCBF8v/OT
-HHPJTVq0USLqYeOtWZmgiTJaedNIX/vb6Sgi6R7WHXZgTMQtsIHvjwAA6STDYv0Q
-xtLRk9BRFkVK9GkxpOm8y7WV2KrW0T7l/f6SnLpCTk4ptFTZhMcIA566omSdkxIB
-lY4teJ9oP/eu1IxXMibeF0z7whJXC9JM/wc2SUc1gnp8mdhjujyAmA7bV0irE2bu
-j931QKkjvGEuymmNsgrA9B4QNpRwP9Do+l5wQxIy4bJTeVHHPwWgHOu6yMB7nvXD
-WTX+7Yj3npBwry+y7hJQ54F34aI4udxUzDPzs3w/fH9xLoG/drZFqe1ammOCoJot
-k1r1KWP9i6fEiGQMc8arXsufntbhrCgQ0Xc6H0tjOnNz91Caox13D0raqiJUfT72
-EcKsugxOF/erUOO+mjQ6h6W/NwQXA9yQCQa1bQFATCxGNdwP8faD+FemYFUHck9d
-RJm7p8H6WJoqUMeBrtUCbtl/8XPXCQSo8FFJ7aN9Qzwhf8qJ3VLe2XDPZPKMdhvP
-hOPbK+re0AamhzBzIOtUa5ANna+itTH4ORbouuQDzYu8QZ38crmRESSVtjk7OlSw
-vwmcLzkk55MGNh3OvhBKUkbOEjcejdOGpRfrxnblKgm7vvU+wuA=
-=mFEv
+iQIzBAEBCgAdFiEEd0YmQqnvlP0Pdxltupx4Bh3djJsFAlktU6gACgkQupx4Bh3d
+jJvp1w/+PKiLICcgZ1v57RR2HPAunqf+00wJwB+cvkc1yEc1eYiTG4J3CmAoCGVL
+Ag/Un+66+W0FMLRIb2kaEUR5z9Vo9qXjbEJq2xRCcbe9el2cM4WlADn0gyAw5QSW
+bE/pGHjkfqHH+xMjc2CUqE3gEWvzxPqgMVJ2lhVcI9u3r5BNBzA6uZ60SVRVu1mI
+JfRqnZpAXLtu+WrWHWGTxHQbv0ZXsHCrnb/KdW4JEUtqee+PNX3XVZwrsOczKGbO
+IIwyjmIVbt8YgPC9QsfGT79B6zaLpmdEO45EsBG8htCGmqJghOS01h8+m+WizTH1
+/1BCCWRPwQOKT3lEG7Gmfs3KpIEY6qw8/mD360uXVMoyBK63TFmhLdu2jbsikYnb
+8ayrf9VdkldO+pkLZWujZ6+LXBdHqTqUiwL2FXpG1XH7PpJ+wTc2jullWX3ENs7W
+YNNw4DCxIGLzeopVNd9XV81bLLES5btY1dWVQCPD3uj7Ew5uNfVTS0E9CgRe2mVF
+T8br2lQFooW6qfqSSagbU8VwqoDh/JxSnHiOIqp993hSusv4l2tBBWdWKjUj00xH
+k/8dbvUcsuQw1mDyYjdy74QwLAZ8M8AY1ljZeRsIqrDaxfoQIiRYEORBYzkMipVN
+9mUFLCDqXRSd6BIAgBMrm9tW7Luir+ksSFveUzw/z0bpbGmDvY8=
+=UYwy
 -----END PGP SIGNATURE-----
 
---zsxz7pmqsjel4run--
+--smldxgonidhpi6it--
