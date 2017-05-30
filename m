@@ -1,33 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34143)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35407)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dFn2L-0000uc-Tq
-	for qemu-devel@nongnu.org; Tue, 30 May 2017 15:42:38 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1dFn7Q-00025k-G0
+	for qemu-devel@nongnu.org; Tue, 30 May 2017 15:47:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dFn2G-0006tv-UA
-	for qemu-devel@nongnu.org; Tue, 30 May 2017 15:42:37 -0400
-Received: from mail-qk0-x242.google.com ([2607:f8b0:400d:c09::242]:34949)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1dFn2G-0006tr-P1
-	for qemu-devel@nongnu.org; Tue, 30 May 2017 15:42:32 -0400
-Received: by mail-qk0-x242.google.com with SMTP id v195so5826408qka.2
-	for <qemu-devel@nongnu.org>; Tue, 30 May 2017 12:42:32 -0700 (PDT)
-Sender: Richard Henderson <rth7680@gmail.com>
-References: <20170525210508.4910-1-aurelien@aurel32.net>
-	<20170525210508.4910-26-aurelien@aurel32.net>
-	<c643c6b9-20fb-af8f-2e2f-9a8b6e4c1159@twiddle.net>
-	<20170529111718.zmwzwy24fk5mhwgl@aurel32.net>
-	<f6104ef5-f9cc-fc1f-553c-d6247cb78dff@twiddle.net>
-	<20170530192507.y77widdbdw3q6p3b@aurel32.net>
-From: Richard Henderson <rth@twiddle.net>
-Message-ID: <846a7bed-d878-a882-38a6-3c33d70fef26@twiddle.net>
-Date: Tue, 30 May 2017 12:42:27 -0700
+	(envelope-from <ehabkost@redhat.com>) id 1dFn7P-0008KZ-Qi
+	for qemu-devel@nongnu.org; Tue, 30 May 2017 15:47:52 -0400
+Date: Tue, 30 May 2017 16:47:42 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20170530194742.GO32274@thinpad.lan.raisama.net>
+References: <1496161442-96665-1-git-send-email-imammedo@redhat.com>
+	<1496161442-96665-6-git-send-email-imammedo@redhat.com>
+	<554eca2d-3c94-c341-299f-d71bcb020edd@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20170530192507.y77widdbdw3q6p3b@aurel32.net>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 25/26] target/s390x: implement TRANSLATE
- ONE/TWO TO ONE/TWO
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <554eca2d-3c94-c341-299f-d71bcb020edd@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v3 5/7] numa: move numa_node from CPUState
+ into target specific classes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,50 +25,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Aurelien Jarno <aurelien@aurel32.net>
-Cc: qemu-devel@nongnu.org, Alexander Graf <agraf@suse.de>
+To: Eric Blake <eblake@redhat.com>
+Cc: Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org, Andrew Jones <drjones@redhat.com>, qemu-arm@nongnu.org, qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
 
-On 05/30/2017 12:25 PM, Aurelien Jarno wrote:
-> On 2017-05-30 09:45, Richard Henderson wrote:
->> On 05/29/2017 04:17 AM, Aurelien Jarno wrote:
->>> On 2017-05-26 10:10, Richard Henderson wrote:
->>>> On 05/25/2017 02:05 PM, Aurelien Jarno wrote:
->>>>> +uint32_t HELPER(trXX)(CPUS390XState *env, uint32_t r1, uint32_t r2,
->>>>> +                      uint32_t sizes)
->>>>> +{
->>>>> +    uintptr_t ra = GETPC();
->>>>> +    int dsize = (sizes & 1) ? 1 : 2;
->>>>> +    int ssize = (sizes & 2) ? 1 : 2;
->>>>> +    uint16_t tst = env->regs[0] & ((1 << (8 * dsize)) - 1);
->>>>
->>>> I think you should pass in tst as an argument.  That way you can pass in an
->>>> out-of-band value when we implement ETF2 and test field M3 bit 3.
->>>
->>> I don't mind passing r0 as an argument. That said if we want to pass tst
->>> or bundle the M3 field, it means we need to use TCG instructions to do
->>> so. I am not sure it brings a lot compare to doing so in the helper
->>> side.
->>
->> Not at all -- the M3 bit test would be a translation-time check.
+On Tue, May 30, 2017 at 11:30:27AM -0500, Eric Blake wrote:
+> On 05/30/2017 11:24 AM, Igor Mammedov wrote:
+> > Move vcpu's assocciated numa_node field out of generic CPUState
 > 
-> I still don't really see the point. On the TCG side it means we need
-> something like that:
+> s/assocciated/associated/
 > 
->      if (m3 & 1) {
->         tcg_gen_movi_tl(r0, -1);
->      } else if (dsize == 1) {
->         tcg_gen_ext8u(r0, regs[0]);
->      } else if (dsize == 2)
->         tcg_gen_ext16u(r0, regs[0]);
->      }
+> > into inherited classes that actually care about cpu<->numa mapping,
+> > i.e: ARMCPU, PowerPCCPU, X86CPU.
+> > 
+> > Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+> > ---
+> 
+> > +++ b/target/arm/cpu.h
+> > @@ -703,6 +703,8 @@ struct ARMCPU {
+> >  
+> >      ARMELChangeHook *el_change_hook;
+> >      void *el_change_hook_opaque;
+> > +
+> > +    int32_t node_id; /* NUMA node this CPU is belonging to */
+> 
+> s/is belonging/belongs/  (multiple places in the patch)
 
-Yes, exactly.
+I have fixed those while applying the patch.  Thanks!
 
-> On the helper side we then need to check if the value passed equals -1
-> or not to get m3 instead of directly accessing the value in register 0.
-
-How's that?  Why would you need to check for -1 at all?  The existing helper 
-test works fine, with -1 not matching any value loaded.
-
-
-r~
+-- 
+Eduardo
