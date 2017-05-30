@@ -1,28 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48496)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48881)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <felipe@nutanix.com>) id 1dFhnY-0003iD-7g
-	for qemu-devel@nongnu.org; Tue, 30 May 2017 10:07:01 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1dFhpR-0005be-Ld
+	for qemu-devel@nongnu.org; Tue, 30 May 2017 10:08:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <felipe@nutanix.com>) id 1dFhnT-0001Sh-6k
-	for qemu-devel@nongnu.org; Tue, 30 May 2017 10:07:00 -0400
-Received: from us-smtp-delivery-101.mimecast.com ([63.128.21.101]:27837)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <felipe@nutanix.com>) id 1dFhnS-0001S7-T2
-	for qemu-devel@nongnu.org; Tue, 30 May 2017 10:06:55 -0400
-From: Felipe Franciosi <felipe@nutanix.com>
-Date: Tue, 30 May 2017 14:06:40 +0000
-Message-ID: <086D6F07-A66C-4DDE-A84F-131EFFB1F56B@nutanix.com>
-References: <20170505101337.4650-1-pbonzini@redhat.com>
-	<20170505101337.4650-22-pbonzini@redhat.com>
-	<20170530131140.GA11356@stefanha-x1.localdomain>
-In-Reply-To: <20170530131140.GA11356@stefanha-x1.localdomain>
-Content-Language: en-US
-Content-ID: <88D4ED65D79E0D43826A5BA633180131@namprd02.prod.outlook.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1dFhpQ-0002JS-O0
+	for qemu-devel@nongnu.org; Tue, 30 May 2017 10:08:57 -0400
+Received: from mail-wr0-x22a.google.com ([2a00:1450:400c:c0c::22a]:34609)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1dFhpQ-0002JM-H9
+	for qemu-devel@nongnu.org; Tue, 30 May 2017 10:08:56 -0400
+Received: by mail-wr0-x22a.google.com with SMTP id g76so1415098wrd.1
+	for <qemu-devel@nongnu.org>; Tue, 30 May 2017 07:08:56 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=WINDOWS-1252
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PULL 21/21] vhost-scsi: create a
- vhost-scsi-common abstraction
+In-Reply-To: <d2b71d89-8741-48f6-dea1-8bed1ebc1f21@redhat.com>
+References: <1490968309-13672-1-git-send-email-peter.maydell@linaro.org>
+	<d2b71d89-8741-48f6-dea1-8bed1ebc1f21@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 30 May 2017 15:08:34 +0100
+Message-ID: <CAFEAcA_3qebN4QRDv+qpHJwjtgQr8B+VpPjGkPZGzASo8dgtBw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH] main_loop: Make main_loop_wait() return
+ void
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,86 +30,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>
+To: Eric Blake <eblake@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, "patches@linaro.org" <patches@linaro.org>
 
-
-> On 30 May 2017, at 14:11, Stefan Hajnoczi <stefanha@gmail.com> wrote:
->=20
-> On Fri, May 05, 2017 at 12:13:37PM +0200, Paolo Bonzini wrote:
->> From: Felipe Franciosi <felipe@nutanix.com>
->>=20
->> In order to introduce a new vhost-user-scsi host device type, it makes
->> sense to abstract part of vhost-scsi into a common parent class. This
->> commit does exactly that.
->>=20
->> Signed-off-by: Felipe Franciosi <felipe@nutanix.com>
->> Message-Id: <1488479153-21203-3-git-send-email-felipe@nutanix.com>
+On 31 March 2017 at 15:10, Eric Blake <eblake@redhat.com> wrote:
+> On 03/31/2017 08:51 AM, Peter Maydell wrote:
+>> In commit e330c118f2a5a the last usage of main_loop_wait() that cared
+>> about the return value was changed to no longer use it. Drop the
+>> now-useless return value and make the function return void.
+>>
+>> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 >> ---
->> hw/scsi/Makefile.objs                 |   2 +-
->> hw/scsi/vhost-scsi-common.c           | 143 +++++++++++++++++++++++++
->> hw/scsi/vhost-scsi.c                  | 194 ++++++++++------------------=
-------
->> include/hw/virtio/vhost-scsi-common.h |  48 +++++++++
->> include/hw/virtio/vhost-scsi.h        |  11 +-
->> include/hw/virtio/virtio-scsi.h       |   2 +
->> 6 files changed, 252 insertions(+), 148 deletions(-)
->> create mode 100644 hw/scsi/vhost-scsi-common.c
->> create mode 100644 include/hw/virtio/vhost-scsi-common.h
->>=20
->> diff --git a/hw/scsi/Makefile.objs b/hw/scsi/Makefile.objs
->> index 5a2248be36..54d8754e9a 100644
->> --- a/hw/scsi/Makefile.objs
->> +++ b/hw/scsi/Makefile.objs
->> @@ -10,5 +10,5 @@ obj-$(CONFIG_PSERIES) +=3D spapr_vscsi.o
->>=20
->> ifeq ($(CONFIG_VIRTIO),y)
->> obj-y +=3D virtio-scsi.o virtio-scsi-dataplane.o
->> -obj-$(CONFIG_VHOST_SCSI) +=3D vhost-scsi.o
->> +obj-$(CONFIG_VHOST_SCSI) +=3D vhost-scsi-common.o vhost-scsi.o
->> endif
->> diff --git a/hw/scsi/vhost-scsi-common.c b/hw/scsi/vhost-scsi-common.c
->> new file mode 100644
->> index 0000000000..e41c0314db
->> --- /dev/null
->> +++ b/hw/scsi/vhost-scsi-common.c
->> @@ -0,0 +1,143 @@
->> +/*
->> + * vhost-scsi-common
->> + *
->> + * Copyright (c) 2016 Nutanix Inc. All rights reserved.
->> + *
->> + * Author:
->> + *  Felipe Franciosi <felipe@nutanix.com>
->> + *
->> + * This work is largely based on the "vhost-scsi" implementation by:
->> + *  Stefan Hajnoczi    <stefanha@linux.vnet.ibm.com>
->> + *  Nicholas Bellinger <nab@risingtidesystems.com>
->> + *
->> + * This work is licensed under the terms of the GNU LGPL, version 2 or =
-later.
->> + * See the COPYING.LIB file in the top-level directory.
->> + *
->> + */
->> +
->> +#include "qemu/osdep.h"
->> +#include <linux/vhost.h>
->=20
-> This breaks the mingw build:
->=20
->  hw/scsi/vhost-scsi-common.c:19:25: fatal error: linux/vhost.h: No such f=
-ile or directory
->   #include <linux/vhost.h>
->                         ^
->  compilation terminated.
+>> Coverity complains (CID 1372464) about main_loop() calling
+>> main_loop_wait() and ignoring its return value. I suspect
+>> this change will just displace that to within main_loop_wait()
+>> itself since the underlying issue there is "the ppoll() that
+>> gets called to poll fds can return an error code, but what
+>> do we do if it does?". Suggestions on that point welcome.
+>
+> At one point, there was a suggestion to introduce an ignore_value()
+> macro that ignores values that the compiler/coverity would otherwise
+> complain about, in contexts where we really are okay ignoring the value.
+>  If making main_loop_wait() return void shifts where Coverity blames,
+> then ignore_value(ppoll()) seems like it might help.
 
-Thanks for the report.
+Mmm, but my question really is "is ignoring the error code
+from the syscall the correct thing to do?"... though I'm
+not sure what else we would want to do (log a warning?
+abort?).
 
-Paolo: I know you wanted this enabled by default whenever virtio was built,=
- but maybe we should stick to a configure switch live vhost-net, vhost-scsi=
- and vhost-vsock?
-
-Let me know what you think and I'll send an extra patch for it straight awa=
-y.
-
-Felipe
+thanks
+-- PMM
