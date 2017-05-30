@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60917)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60997)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1dFjwN-0005rg-NK
-	for qemu-devel@nongnu.org; Tue, 30 May 2017 12:24:16 -0400
+	(envelope-from <imammedo@redhat.com>) id 1dFjwR-0005vt-0i
+	for qemu-devel@nongnu.org; Tue, 30 May 2017 12:24:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1dFjwM-00055H-Ee
-	for qemu-devel@nongnu.org; Tue, 30 May 2017 12:24:15 -0400
+	(envelope-from <imammedo@redhat.com>) id 1dFjwP-00057A-P8
+	for qemu-devel@nongnu.org; Tue, 30 May 2017 12:24:18 -0400
 From: Igor Mammedov <imammedo@redhat.com>
-Date: Tue, 30 May 2017 18:23:56 +0200
-Message-Id: <1496161442-96665-2-git-send-email-imammedo@redhat.com>
+Date: Tue, 30 May 2017 18:23:58 +0200
+Message-Id: <1496161442-96665-4-git-send-email-imammedo@redhat.com>
 In-Reply-To: <1496161442-96665-1-git-send-email-imammedo@redhat.com>
 References: <1496161442-96665-1-git-send-email-imammedo@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 1/7] numa: consolidate cpu_preplug
- fixups/checks for pc/arm/spapr
+Subject: [Qemu-devel] [PATCH v3 3/7] numa: make sure that all cpus have
+ has_node_id set if numa is enabled
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,175 +23,143 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-arm@nongnu.org, qemu-ppc@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Andrew Jones <drjones@redhat.com>
 
-Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
----
-v3:
-  retain opriginal error checking logic in case of
-    "node-id" set && !slot->props.has_node_id
-  it will be cleaned up in a follow up patch
-     Eduardo Habkost <ehabkost@redhat.com>
-v2:
-  user error_abort in numa_cpu_pre_plug()
-     Eduardo Habkost <ehabkost@redhat.com>
----
- include/sysemu/numa.h |  1 +
- hw/arm/virt.c         | 16 ++--------------
- hw/i386/pc.c          | 17 +----------------
- hw/ppc/spapr.c        | 17 +----------------
- numa.c                | 23 +++++++++++++++++++++++
- 5 files changed, 28 insertions(+), 46 deletions(-)
+It fixes/add missing _PXM object for non mapped CPU (x86)
+and missing fdt node (virt-arm).
 
-diff --git a/include/sysemu/numa.h b/include/sysemu/numa.h
-index 7ffde5b..610eece 100644
---- a/include/sysemu/numa.h
-+++ b/include/sysemu/numa.h
-@@ -35,4 +35,5 @@ void numa_legacy_auto_assign_ram(MachineClass *mc, NodeInfo *nodes,
-                                  int nb_nodes, ram_addr_t size);
- void numa_default_auto_assign_ram(MachineClass *mc, NodeInfo *nodes,
-                                   int nb_nodes, ram_addr_t size);
-+void numa_cpu_pre_plug(const CPUArchId *slot, DeviceState *dev, Error **errp);
- #endif
-diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-index c7c8159..ce676df 100644
---- a/hw/arm/virt.c
-+++ b/hw/arm/virt.c
-@@ -1351,7 +1351,6 @@ static void machvirt_init(MachineState *machine)
-     for (n = 0; n < possible_cpus->len; n++) {
-         Object *cpuobj;
-         CPUState *cs;
--        int node_id;
+It ensures that possible_cpus contains complete mapping if
+numa is enabled by the time machine_init() is executed.
+
+As result non completely mapped CPUs:
+ 1) appear in ACPI/fdt blobs
+ 2) QMP query-hotpluggable-cpus command shows bound nodes for such CPUs
+ 3) allows to drop checks for has_node_id in numa only code,
+   reducing number of invariants incomplete mapping could produce
+ 4) moves fixup/implicit node init from runtime numa_cpu_pre_plug()
+   (when CPU object is created) to machine_numa_finish_init() which
+   helps to fix [1, 2] and make possible_cpus complete source
+   of numa mapping available even before CPUs are created.
+
+Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+---
+ hw/arm/virt-acpi-build.c |  4 +---
+ hw/core/machine.c        | 16 ++++++++++------
+ hw/i386/acpi-build.c     |  3 +--
+ hw/i386/pc.c             |  4 +---
+ numa.c                   | 16 +++++-----------
+ 5 files changed, 18 insertions(+), 25 deletions(-)
+
+diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
+index e585206..977a794 100644
+--- a/hw/arm/virt-acpi-build.c
++++ b/hw/arm/virt-acpi-build.c
+@@ -496,12 +496,10 @@ build_srat(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
+     srat->reserved1 = cpu_to_le32(1);
  
-         if (n >= smp_cpus) {
-             break;
-@@ -1364,19 +1363,8 @@ static void machvirt_init(MachineState *machine)
-         cs = CPU(cpuobj);
-         cs->cpu_index = n;
+     for (i = 0; i < cpu_list->len; ++i) {
+-        int node_id = cpu_list->cpus[i].props.has_node_id ?
+-            cpu_list->cpus[i].props.node_id : 0;
+         core = acpi_data_push(table_data, sizeof(*core));
+         core->type = ACPI_SRAT_PROCESSOR_GICC;
+         core->length = sizeof(*core);
+-        core->proximity = cpu_to_le32(node_id);
++        core->proximity = cpu_to_le32(cpu_list->cpus[i].props.node_id);
+         core->acpi_processor_uid = cpu_to_le32(i);
+         core->flags = cpu_to_le32(1);
+     }
+diff --git a/hw/core/machine.c b/hw/core/machine.c
+index aaf3cff..964b75d 100644
+--- a/hw/core/machine.c
++++ b/hw/core/machine.c
+@@ -720,19 +720,23 @@ static void machine_numa_finish_init(MachineState *machine)
+         const CPUArchId *cpu_slot = &possible_cpus->cpus[i];
  
--        node_id = possible_cpus->cpus[cs->cpu_index].props.node_id;
--        if (!possible_cpus->cpus[cs->cpu_index].props.has_node_id) {
--            /* by default CPUState::numa_node was 0 if it's not set via CLI
--             * keep it this way for now but in future we probably should
--             * refuse to start up with incomplete numa mapping */
--             node_id = 0;
--        }
--        if (cs->numa_node == CPU_UNSET_NUMA_NODE_ID) {
--            cs->numa_node = node_id;
--        } else {
--            /* CPU isn't device_add compatible yet, this shouldn't happen */
--            error_setg(&error_abort, "user set node-id not implemented");
--        }
-+        numa_cpu_pre_plug(&possible_cpus->cpus[cs->cpu_index], DEVICE(cpuobj),
-+                          &error_fatal);
+         if (!cpu_slot->props.has_node_id) {
+-            if (default_mapping) {
+-                /* fetch default mapping from board and enable it */
+-                CpuInstanceProperties props = cpu_slot->props;
+-                props.has_node_id = true;
+-                machine_set_cpu_numa_node(machine, &props, &error_fatal);
+-            } else {
++            /* fetch default mapping from board and enable it */
++            CpuInstanceProperties props = cpu_slot->props;
++
++            if (!default_mapping) {
+                 /* record slots with not set mapping,
+                  * TODO: make it hard error in future */
+                 char *cpu_str = cpu_slot_to_string(cpu_slot);
+                 g_string_append_printf(s, "%sCPU %d [%s]",
+                                        s->len ? ", " : "", i, cpu_str);
+                 g_free(cpu_str);
++
++                /* non mapped cpus used to fallback to node 0 */
++                props.node_id = 0;
+             }
++
++            props.has_node_id = true;
++            machine_set_cpu_numa_node(machine, &props, &error_fatal);
+         }
+     }
+     if (s->len) {
+diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
+index afcadac..873880d 100644
+--- a/hw/i386/acpi-build.c
++++ b/hw/i386/acpi-build.c
+@@ -2335,8 +2335,7 @@ build_srat(GArray *table_data, BIOSLinker *linker, MachineState *machine)
+     srat->reserved1 = cpu_to_le32(1);
  
-         if (!vms->secure) {
-             object_property_set_bool(cpuobj, false, "has_el3", NULL);
+     for (i = 0; i < apic_ids->len; i++) {
+-        int node_id = apic_ids->cpus[i].props.has_node_id ?
+-            apic_ids->cpus[i].props.node_id : 0;
++        int node_id = apic_ids->cpus[i].props.node_id;
+         uint32_t apic_id = apic_ids->cpus[i].arch_id;
+ 
+         if (apic_id < 255) {
 diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-index 816bfa8..cf09949 100644
+index cf09949..84f0a6f 100644
 --- a/hw/i386/pc.c
 +++ b/hw/i386/pc.c
-@@ -1893,7 +1893,6 @@ static void pc_cpu_pre_plug(HotplugHandler *hotplug_dev,
-                             DeviceState *dev, Error **errp)
- {
-     int idx;
--    int node_id;
-     CPUState *cs;
-     CPUArchId *cpu_slot;
-     X86CPUTopoInfo topo;
-@@ -1984,21 +1983,7 @@ static void pc_cpu_pre_plug(HotplugHandler *hotplug_dev,
-     cs = CPU(cpu);
-     cs->cpu_index = idx;
- 
--    node_id = cpu_slot->props.node_id;
--    if (!cpu_slot->props.has_node_id) {
--        /* by default CPUState::numa_node was 0 if it's not set via CLI
--         * keep it this way for now but in future we probably should
--         * refuse to start up with incomplete numa mapping */
--        node_id = 0;
--    }
--    if (cs->numa_node == CPU_UNSET_NUMA_NODE_ID) {
--        cs->numa_node = node_id;
--    } else if (cs->numa_node != node_id) {
--            error_setg(errp, "node-id %d must match numa node specified"
--                "with -numa option for cpu-index %d",
--                cs->numa_node, cs->cpu_index);
--            return;
--    }
-+    numa_cpu_pre_plug(cpu_slot, dev, errp);
- }
- 
- static void pc_machine_device_pre_plug_cb(HotplugHandler *hotplug_dev,
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index 0980d73..c7fee8b 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -2831,11 +2831,9 @@ static void spapr_core_pre_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
-     MachineClass *mc = MACHINE_GET_CLASS(hotplug_dev);
-     Error *local_err = NULL;
-     CPUCore *cc = CPU_CORE(dev);
--    sPAPRCPUCore *sc = SPAPR_CPU_CORE(dev);
-     char *base_core_type = spapr_get_cpu_core_type(machine->cpu_model);
-     const char *type = object_get_typename(OBJECT(dev));
-     CPUArchId *core_slot;
--    int node_id;
-     int index;
- 
-     if (dev->hotplugged && !mc->has_hotpluggable_cpus) {
-@@ -2870,20 +2868,7 @@ static void spapr_core_pre_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
-         goto out;
+@@ -788,9 +788,7 @@ static FWCfgState *bochs_bios_init(AddressSpace *as, PCMachineState *pcms)
+     for (i = 0; i < cpus->len; i++) {
+         unsigned int apic_id = cpus->cpus[i].arch_id;
+         assert(apic_id < pcms->apic_id_limit);
+-        if (cpus->cpus[i].props.has_node_id) {
+-            numa_fw_cfg[apic_id + 1] = cpu_to_le64(cpus->cpus[i].props.node_id);
+-        }
++        numa_fw_cfg[apic_id + 1] = cpu_to_le64(cpus->cpus[i].props.node_id);
      }
- 
--    node_id = core_slot->props.node_id;
--    if (!core_slot->props.has_node_id) {
--        /* by default CPUState::numa_node was 0 if it's not set via CLI
--         * keep it this way for now but in future we probably should
--         * refuse to start up with incomplete numa mapping */
--        node_id = 0;
--    }
--    if (sc->node_id == CPU_UNSET_NUMA_NODE_ID) {
--        sc->node_id = node_id;
--    } else if (sc->node_id != node_id) {
--        error_setg(&local_err, "node-id %d must match numa node specified"
--            "with -numa option for cpu-index %d", sc->node_id, cc->core_id);
--        goto out;
--    }
-+    numa_cpu_pre_plug(core_slot, dev, &local_err);
- 
- out:
-     g_free(base_core_type);
+     for (i = 0; i < nb_numa_nodes; i++) {
+         numa_fw_cfg[pcms->apic_id_limit + 1 + i] =
 diff --git a/numa.c b/numa.c
-index ca73145..19fd1e0 100644
+index 45ad70a..abed45c 100644
 --- a/numa.c
 +++ b/numa.c
-@@ -534,6 +534,29 @@ void parse_numa_opts(MachineState *ms)
-     }
- }
+@@ -510,22 +510,16 @@ void parse_numa_opts(MachineState *ms)
  
-+void numa_cpu_pre_plug(const CPUArchId *slot, DeviceState *dev, Error **errp)
-+{
-+    int mapped_node_id; /* set by -numa option */
-+    int node_id = object_property_get_int(OBJECT(dev), "node-id", &error_abort);
-+
-+    /* by default CPUState::numa_node was 0 if it wasn't set explicitly
-+     * TODO: make it error when incomplete numa mapping support is removed
-+     */
-+    mapped_node_id = slot->props.node_id;
-+    if (!slot->props.has_node_id) {
-+         mapped_node_id = 0;
-+    }
-+
-+    if (node_id == CPU_UNSET_NUMA_NODE_ID) {
-+        /* due to bug in libvirt, it doesn't pass node-id from props on
-+         * device_add as expected, so we have to fix it up here */
-+        object_property_set_int(OBJECT(dev), mapped_node_id, "node-id", errp);
-+    } else if (node_id != mapped_node_id) {
-+        error_setg(errp, "node-id=%d must match numa node specified "
-+                   "with -numa option", node_id);
-+    }
-+}
-+
- static void allocate_system_memory_nonnuma(MemoryRegion *mr, Object *owner,
-                                            const char *name,
-                                            uint64_t ram_size)
+ void numa_cpu_pre_plug(const CPUArchId *slot, DeviceState *dev, Error **errp)
+ {
+-    int mapped_node_id; /* set by -numa option */
+     int node_id = object_property_get_int(OBJECT(dev), "node-id", &error_abort);
+ 
+-    /* by default CPUState::numa_node was 0 if it wasn't set explicitly
+-     * TODO: make it error when incomplete numa mapping support is removed
+-     */
+-    mapped_node_id = slot->props.node_id;
+-    if (!slot->props.has_node_id) {
+-         mapped_node_id = 0;
+-    }
+-
+     if (node_id == CPU_UNSET_NUMA_NODE_ID) {
+         /* due to bug in libvirt, it doesn't pass node-id from props on
+          * device_add as expected, so we have to fix it up here */
+-        object_property_set_int(OBJECT(dev), mapped_node_id, "node-id", errp);
+-    } else if (node_id != mapped_node_id) {
++        if (slot->props.has_node_id) {
++            object_property_set_int(OBJECT(dev), slot->props.node_id,
++                                    "node-id", errp);
++        }
++    } else if (node_id != slot->props.node_id) {
+         error_setg(errp, "node-id=%d must match numa node specified "
+                    "with -numa option", node_id);
+     }
 -- 
 2.7.4
