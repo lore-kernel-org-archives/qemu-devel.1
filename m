@@ -1,35 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40434)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40428)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1dFhOi-0007JI-3P
+	(envelope-from <groug@kaod.org>) id 1dFhOh-0007IM-1u
 	for qemu-devel@nongnu.org; Tue, 30 May 2017 09:41:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1dFhOd-00023z-5J
-	for qemu-devel@nongnu.org; Tue, 30 May 2017 09:41:20 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:55563
+	(envelope-from <groug@kaod.org>) id 1dFhOd-00023t-0K
+	for qemu-devel@nongnu.org; Tue, 30 May 2017 09:41:19 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:58093
 	helo=mx0a-001b2d01.pphosted.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1dFhOc-00023m-VT
-	for qemu-devel@nongnu.org; Tue, 30 May 2017 09:41:15 -0400
-Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v4UDceEG051088
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1dFhOc-00023e-Q4
+	for qemu-devel@nongnu.org; Tue, 30 May 2017 09:41:14 -0400
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v4UDcfrV072159
 	for <qemu-devel@nongnu.org>; Tue, 30 May 2017 09:41:14 -0400
 Received: from e06smtp10.uk.ibm.com (e06smtp10.uk.ibm.com [195.75.94.106])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2as73eyn9w-1
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2as8efm32n-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 30 May 2017 09:41:14 -0400
+	for <qemu-devel@nongnu.org>; Tue, 30 May 2017 09:41:13 -0400
 Received: from localhost
 	by e06smtp10.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
 	Only! Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <groug@kaod.org>;
 	Tue, 30 May 2017 14:41:12 +0100
 From: Greg Kurz <groug@kaod.org>
-Date: Tue, 30 May 2017 15:40:38 +0200
+Date: Tue, 30 May 2017 15:40:37 +0200
 In-Reply-To: <1496151640-29919-1-git-send-email-groug@kaod.org>
 References: <1496151640-29919-1-git-send-email-groug@kaod.org>
-Message-Id: <1496151640-29919-10-git-send-email-groug@kaod.org>
-Subject: [Qemu-devel] [PULL v2 09/11] 9pfs: local: resolve special
- directories in paths
+Message-Id: <1496151640-29919-9-git-send-email-groug@kaod.org>
+Subject: [Qemu-devel] [PULL v2 08/11] 9pfs: check return value of
+ v9fs_co_name_to_path()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -41,67 +41,102 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Peter Maydell <peter.maydell@linaro.org>, Stefan Hajnoczi <stefanha@redhat.com>, Greg Kurz <groug@kaod.org>
 
-When using the mapped-file security mode, the creds of a path /foo/bar
-are stored in the /foo/.virtfs_metadata/bar file. This is okay for all
-paths unless they end with '.' or '..', because we cannot create the
-corresponding file in the metadata directory.
-
-This patch ensures that '.' and '..' are resolved in all paths.
-
-The core code only passes path elements (no '/') to the backend, with
-the notable exception of the '/' path, which refers to the virtfs root.
-This patch preserves the current behavior of converting it to '.' so
-that it can be passed to "*at()" syscalls ('/' would mean the host root).
+These v9fs_co_name_to_path() call sites have always been around. I guess
+no care was taken to check the return value because the name_to_path
+operation could never fail at the time. This is no longer true: the
+handle and synth backends can already fail this operation, and so will the
+local backend soon.
 
 Signed-off-by: Greg Kurz <groug@kaod.org>
 Reviewed-by: Eric Blake <eblake@redhat.com>
 ---
- hw/9pfs/9p-local.c | 32 +++++++++++++++++++++++++-------
- 1 file changed, 25 insertions(+), 7 deletions(-)
+ hw/9pfs/9p.c | 36 +++++++++++++++++++++++++-----------
+ 1 file changed, 25 insertions(+), 11 deletions(-)
 
-diff --git a/hw/9pfs/9p-local.c b/hw/9pfs/9p-local.c
-index 226234d38642..68e92652ed73 100644
---- a/hw/9pfs/9p-local.c
-+++ b/hw/9pfs/9p-local.c
-@@ -1134,14 +1134,32 @@ static int local_name_to_path(FsContext *ctx, V9fsPath *dir_path,
-     }
- 
-     if (dir_path) {
--        v9fs_path_sprintf(target, "%s/%s", dir_path->data, name);
--    } else if (strcmp(name, "/")) {
--        v9fs_path_sprintf(target, "%s", name);
-+        if (!strcmp(name, ".")) {
-+            /* "." relative to "foo/bar" is "foo/bar" */
-+            v9fs_path_copy(target, dir_path);
-+        } else if (!strcmp(name, "..")) {
-+            if (!strcmp(dir_path->data, ".")) {
-+                /* ".." relative to the root is "." */
-+                v9fs_path_sprintf(target, ".");
-+            } else {
-+                char *tmp = g_path_get_dirname(dir_path->data);
-+                /* Symbolic links are resolved by the client. We can assume
-+                 * that ".." relative to "foo/bar" is equivalent to "foo"
-+                 */
-+                v9fs_path_sprintf(target, "%s", tmp);
-+                g_free(tmp);
-+            }
-+        } else {
-+            assert(!strchr(name, '/'));
-+            v9fs_path_sprintf(target, "%s/%s", dir_path->data, name);
+diff --git a/hw/9pfs/9p.c b/hw/9pfs/9p.c
+index a25d31e62f1c..96d268334865 100644
+--- a/hw/9pfs/9p.c
++++ b/hw/9pfs/9p.c
+@@ -2571,7 +2571,10 @@ static int coroutine_fn v9fs_complete_rename(V9fsPDU *pdu, V9fsFidState *fidp,
+             err = -EINVAL;
+             goto out;
+         }
+-        v9fs_co_name_to_path(pdu, &dirfidp->path, name->data, &new_path);
++        err = v9fs_co_name_to_path(pdu, &dirfidp->path, name->data, &new_path);
++        if (err < 0) {
++            goto out;
 +        }
-+    } else if (!strcmp(name, "/") || !strcmp(name, ".") ||
-+               !strcmp(name, "..")) {
-+            /* This is the root fid */
-+        v9fs_path_sprintf(target, ".");
      } else {
--        /* We want the path of the export root to be relative, otherwise
--         * "*at()" syscalls would treat it as "/" in the host.
--         */
--        v9fs_path_sprintf(target, "%s", ".");
-+        assert(!strchr(name, '/'));
-+        v9fs_path_sprintf(target, "./%s", name);
+         old_name = fidp->path.data;
+         end = strrchr(old_name, '/');
+@@ -2583,8 +2586,11 @@ static int coroutine_fn v9fs_complete_rename(V9fsPDU *pdu, V9fsFidState *fidp,
+         new_name = g_malloc0(end - old_name + name->size + 1);
+         strncat(new_name, old_name, end - old_name);
+         strncat(new_name + (end - old_name), name->data, name->size);
+-        v9fs_co_name_to_path(pdu, NULL, new_name, &new_path);
++        err = v9fs_co_name_to_path(pdu, NULL, new_name, &new_path);
+         g_free(new_name);
++        if (err < 0) {
++            goto out;
++        }
      }
-     return 0;
+     err = v9fs_co_rename(pdu, &fidp->path, &new_path);
+     if (err < 0) {
+@@ -2664,20 +2670,26 @@ out_nofid:
+     v9fs_string_free(&name);
  }
+ 
+-static void coroutine_fn v9fs_fix_fid_paths(V9fsPDU *pdu, V9fsPath *olddir,
+-                                            V9fsString *old_name,
+-                                            V9fsPath *newdir,
+-                                            V9fsString *new_name)
++static int coroutine_fn v9fs_fix_fid_paths(V9fsPDU *pdu, V9fsPath *olddir,
++                                           V9fsString *old_name,
++                                           V9fsPath *newdir,
++                                           V9fsString *new_name)
+ {
+     V9fsFidState *tfidp;
+     V9fsPath oldpath, newpath;
+     V9fsState *s = pdu->s;
+-
++    int err;
+ 
+     v9fs_path_init(&oldpath);
+     v9fs_path_init(&newpath);
+-    v9fs_co_name_to_path(pdu, olddir, old_name->data, &oldpath);
+-    v9fs_co_name_to_path(pdu, newdir, new_name->data, &newpath);
++    err = v9fs_co_name_to_path(pdu, olddir, old_name->data, &oldpath);
++    if (err < 0) {
++        goto out;
++    }
++    err = v9fs_co_name_to_path(pdu, newdir, new_name->data, &newpath);
++    if (err < 0) {
++        goto out;
++    }
+ 
+     /*
+      * Fixup fid's pointing to the old name to
+@@ -2689,8 +2701,10 @@ static void coroutine_fn v9fs_fix_fid_paths(V9fsPDU *pdu, V9fsPath *olddir,
+             v9fs_fix_path(&tfidp->path, &newpath, strlen(oldpath.data));
+         }
+     }
++out:
+     v9fs_path_free(&oldpath);
+     v9fs_path_free(&newpath);
++    return err;
+ }
+ 
+ static int coroutine_fn v9fs_complete_renameat(V9fsPDU *pdu, int32_t olddirfid,
+@@ -2724,8 +2738,8 @@ static int coroutine_fn v9fs_complete_renameat(V9fsPDU *pdu, int32_t olddirfid,
+     }
+     if (s->ctx.export_flags & V9FS_PATHNAME_FSCONTEXT) {
+         /* Only for path based fid  we need to do the below fixup */
+-        v9fs_fix_fid_paths(pdu, &olddirfidp->path, old_name,
+-                           &newdirfidp->path, new_name);
++        err = v9fs_fix_fid_paths(pdu, &olddirfidp->path, old_name,
++                                 &newdirfidp->path, new_name);
+     }
+ out:
+     if (olddirfidp) {
 -- 
 2.7.5
