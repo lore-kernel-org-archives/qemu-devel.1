@@ -1,24 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45824)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45837)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <anton.nefedov@virtuozzo.com>) id 1dFhfH-0004qQ-Nt
-	for qemu-devel@nongnu.org; Tue, 30 May 2017 09:58:28 -0400
+	(envelope-from <anton.nefedov@virtuozzo.com>) id 1dFhfJ-0004sl-Tc
+	for qemu-devel@nongnu.org; Tue, 30 May 2017 09:58:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <anton.nefedov@virtuozzo.com>) id 1dFhfC-0007B7-PY
-	for qemu-devel@nongnu.org; Tue, 30 May 2017 09:58:27 -0400
-Received: from mail-ve1eur01on0139.outbound.protection.outlook.com
-	([104.47.1.139]:62495
+	(envelope-from <anton.nefedov@virtuozzo.com>) id 1dFhfF-0007CR-Bu
+	for qemu-devel@nongnu.org; Tue, 30 May 2017 09:58:29 -0400
+Received: from mail-ve1eur01on0106.outbound.protection.outlook.com
+	([104.47.1.106]:21120
 	helo=EUR01-VE1-obe.outbound.protection.outlook.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <anton.nefedov@virtuozzo.com>)
-	id 1dFhfC-000798-12
-	for qemu-devel@nongnu.org; Tue, 30 May 2017 09:58:22 -0400
+	id 1dFhfF-0007Bb-0D
+	for qemu-devel@nongnu.org; Tue, 30 May 2017 09:58:25 -0400
 From: Anton Nefedov <anton.nefedov@virtuozzo.com>
-Date: Tue, 30 May 2017 16:57:50 +0300
-Message-ID: <1496152683-102751-1-git-send-email-anton.nefedov@virtuozzo.com>
+Date: Tue, 30 May 2017 16:57:51 +0300
+Message-ID: <1496152683-102751-2-git-send-email-anton.nefedov@virtuozzo.com>
+In-Reply-To: <1496152683-102751-1-git-send-email-anton.nefedov@virtuozzo.com>
+References: <1496152683-102751-1-git-send-email-anton.nefedov@virtuozzo.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v3 00/13] chardevice hotswap
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH v3 01/13] char: move QemuOpts->ChardevBackend
+ translation to a separate func
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,99 +32,125 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: den@virtuozzo.com, pbonzini@redhat.com, marcandre.lureau@redhat.com, Anton Nefedov <anton.nefedov@virtuozzo.com>
 
-Changed in v3:
-  - minor remarks to patch 1 applied
-  - patch 3: avoid using bottom-half, handle syncronously
-    As mentioned, it gets thing complicated and is only a problem for
-    a monitor-connected chardev hotswap and that is not supported for now
-  - tests added (patches 6-9)
+parse function will be used by the following patch
 
-=3D=3D=3D=3D=3D=3D=3D=3D
+Signed-off-by: Anton Nefedov <anton.nefedov@virtuozzo.com>
+Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+---
+ chardev/char.c | 70 ++++++++++++++++++++++++++++++++++++----------------------
+ 1 file changed, 44 insertions(+), 26 deletions(-)
 
-This serie is a v2 of the February submit
-http://lists.nongnu.org/archive/html/qemu-devel/2017-02/msg01989.html
-
-The interface is changed as requested and the changes are slightly reworked
-and split into separate patches.
-
-=3D=3D=3D=3D=3D=3D=3D=3D
-
-The patchset adds support of the character device change without
-a frontend device removal.
-Yet isa-serial and virtio-serial frontends are supported.
-
-The feature can be helpful for e.g. Windows debug allowing to
-establish connection to a live VM from VM with WinDbg.
-
-Anton Nefedov (13):
-  char: move QemuOpts->ChardevBackend translation to a separate func
-  char: add backend hotswap handler
-  char: chardevice hotswap
-  char: forbid direct chardevice access for hotswap devices
-  char: avoid chardevice direct access
-  test-char: unref chardev-udp after test
-  test-char: split char_udp_test
-  test-char: split char_file_test
-  test-char: add hotswap test
-  hmp: add hmp analogue for qmp-chardev-change
-  virtio-console: chardev hotswap support
-  serial: move TIOCM update to a separate function
-  serial: chardev hotswap support
-
- backends/rng-egd.c          |   2 +-
- chardev/char-mux.c          |   1 +
- chardev/char.c              | 212 ++++++++++++++++++++++++++++-------
- gdbstub.c                   |   4 +-
- hmp-commands.hx             |  16 +++
- hmp.c                       |  34 ++++++
- hmp.h                       |   1 +
- hw/arm/pxa2xx.c             |   3 +-
- hw/arm/strongarm.c          |   4 +-
- hw/char/bcm2835_aux.c       |   2 +-
- hw/char/cadence_uart.c      |   4 +-
- hw/char/debugcon.c          |   4 +-
- hw/char/digic-uart.c        |   2 +-
- hw/char/escc.c              |   8 +-
- hw/char/etraxfs_ser.c       |   2 +-
- hw/char/exynos4210_uart.c   |   4 +-
- hw/char/grlib_apbuart.c     |   4 +-
- hw/char/imx_serial.c        |   2 +-
- hw/char/ipoctal232.c        |   4 +-
- hw/char/lm32_juart.c        |   2 +-
- hw/char/lm32_uart.c         |   2 +-
- hw/char/mcf_uart.c          |   2 +-
- hw/char/milkymist-uart.c    |   2 +-
- hw/char/parallel.c          |   2 +-
- hw/char/pl011.c             |   2 +-
- hw/char/sclpconsole-lm.c    |   4 +-
- hw/char/sclpconsole.c       |   4 +-
- hw/char/serial.c            |  63 ++++++++---
- hw/char/sh_serial.c         |   4 +-
- hw/char/spapr_vty.c         |   4 +-
- hw/char/stm32f2xx_usart.c   |   3 +-
- hw/char/terminal3270.c      |   4 +-
- hw/char/virtio-console.c    |  35 +++++-
- hw/char/xen_console.c       |   4 +-
- hw/char/xilinx_uartlite.c   |   2 +-
- hw/ipmi/ipmi_bmc_extern.c   |   4 +-
- hw/mips/boston.c            |   2 +-
- hw/mips/mips_malta.c        |   2 +-
- hw/misc/ivshmem.c           |   6 +-
- hw/usb/ccid-card-passthru.c |   6 +-
- hw/usb/dev-serial.c         |   7 +-
- hw/usb/redirect.c           |   7 +-
- include/sysemu/char.h       |  43 ++++++++
- monitor.c                   |   4 +-
- net/colo-compare.c          |  14 ++-
- net/filter-mirror.c         |   8 +-
- net/slirp.c                 |   2 +-
- net/vhost-user.c            |   7 +-
- qapi-schema.json            |  40 +++++++
- qtest.c                     |   2 +-
- tests/test-char.c           | 263 +++++++++++++++++++++++++++++++++-------=
-----
- tests/vhost-user-test.c     |   2 +-
- 52 files changed, 669 insertions(+), 202 deletions(-)
-
---=20
+diff --git a/chardev/char.c b/chardev/char.c
+index 4e24dc3..3a0f543 100644
+--- a/chardev/char.c
++++ b/chardev/char.c
+@@ -854,17 +854,13 @@ help_string_append(const char *name, void *opaque)
+     g_string_append_printf(str, "\n%s", name);
+ }
+ 
+-Chardev *qemu_chr_new_from_opts(QemuOpts *opts,
+-                                Error **errp)
++static ChardevBackend *qemu_chr_parse_opts(QemuOpts *opts, Error **errp)
+ {
+     Error *local_err = NULL;
+     const ChardevClass *cc;
+-    Chardev *chr;
+     int i;
+     ChardevBackend *backend = NULL;
+     const char *name = qemu_opt_get(opts, "backend");
+-    const char *id = qemu_opts_id(opts);
+-    char *bid = NULL;
+ 
+     if (name == NULL) {
+         error_setg(errp, "chardev: \"%s\" missing backend",
+@@ -872,21 +868,6 @@ Chardev *qemu_chr_new_from_opts(QemuOpts *opts,
+         return NULL;
+     }
+ 
+-    if (is_help_option(name)) {
+-        GString *str = g_string_new("");
+-
+-        chardev_name_foreach(help_string_append, str);
+-
+-        error_report("Available chardev backend types: %s", str->str);
+-        g_string_free(str, true);
+-        exit(0);
+-    }
+-
+-    if (id == NULL) {
+-        error_setg(errp, "chardev: no id specified");
+-        return NULL;
+-    }
+-
+     for (i = 0; i < ARRAY_SIZE(chardev_alias_table); i++) {
+         if (g_strcmp0(chardev_alias_table[i].alias, name) == 0) {
+             name = chardev_alias_table[i].typename;
+@@ -902,16 +883,12 @@ Chardev *qemu_chr_new_from_opts(QemuOpts *opts,
+     backend = g_new0(ChardevBackend, 1);
+     backend->type = CHARDEV_BACKEND_KIND_NULL;
+ 
+-    if (qemu_opt_get_bool(opts, "mux", 0)) {
+-        bid = g_strdup_printf("%s-base", id);
+-    }
+-
+-    chr = NULL;
+     if (cc->parse) {
+         cc->parse(opts, backend, &local_err);
+         if (local_err) {
+             error_propagate(errp, local_err);
+-            goto out;
++            qapi_free_ChardevBackend(backend);
++            return NULL;
+         }
+     } else {
+         ChardevCommon *ccom = g_new0(ChardevCommon, 1);
+@@ -919,6 +896,47 @@ Chardev *qemu_chr_new_from_opts(QemuOpts *opts,
+         backend->u.null.data = ccom; /* Any ChardevCommon member would work */
+     }
+ 
++    return backend;
++}
++
++Chardev *qemu_chr_new_from_opts(QemuOpts *opts, Error **errp)
++{
++    const ChardevClass *cc;
++    Chardev *chr = NULL;
++    ChardevBackend *backend = NULL;
++    const char *name = qemu_opt_get(opts, "backend");
++    const char *id = qemu_opts_id(opts);
++    char *bid = NULL;
++
++    if (name && is_help_option(name)) {
++        GString *str = g_string_new("");
++
++        chardev_name_foreach(help_string_append, str);
++
++        error_report("Available chardev backend types: %s", str->str);
++        g_string_free(str, true);
++        exit(0);
++    }
++
++    if (id == NULL) {
++        error_setg(errp, "chardev: no id specified");
++        return NULL;
++    }
++
++    backend = qemu_chr_parse_opts(opts, errp);
++    if (backend == NULL) {
++        return NULL;
++    }
++
++    cc = char_get_class(name, errp);
++    if (cc == NULL) {
++        goto out;
++    }
++
++    if (qemu_opt_get_bool(opts, "mux", 0)) {
++        bid = g_strdup_printf("%s-base", id);
++    }
++
+     chr = qemu_chardev_new(bid ? bid : id,
+                            object_class_get_name(OBJECT_CLASS(cc)),
+                            backend, errp);
+-- 
 2.7.4
