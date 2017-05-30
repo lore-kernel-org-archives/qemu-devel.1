@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55723)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55727)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aurelien@aurel32.net>) id 1dFmcc-0005Zm-Lb
+	(envelope-from <aurelien@aurel32.net>) id 1dFmcc-0005Zo-Oo
 	for qemu-devel@nongnu.org; Tue, 30 May 2017 15:16:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aurelien@aurel32.net>) id 1dFmcb-0007fi-II
+	(envelope-from <aurelien@aurel32.net>) id 1dFmcb-0007fd-Hh
 	for qemu-devel@nongnu.org; Tue, 30 May 2017 15:16:02 -0400
-Received: from hall.aurel32.net ([2001:bc8:30d7:100::1]:52278)
+Received: from hall.aurel32.net ([2001:bc8:30d7:100::1]:52272)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <aurelien@aurel32.net>)
-	id 1dFmcb-0007em-Ba
+	id 1dFmcb-0007el-BM
 	for qemu-devel@nongnu.org; Tue, 30 May 2017 15:16:01 -0400
 From: Aurelien Jarno <aurelien@aurel32.net>
-Date: Tue, 30 May 2017 21:15:50 +0200
-Message-Id: <20170530191553.31500-3-aurelien@aurel32.net>
+Date: Tue, 30 May 2017 21:15:53 +0200
+Message-Id: <20170530191553.31500-6-aurelien@aurel32.net>
 In-Reply-To: <20170530191553.31500-1-aurelien@aurel32.net>
 References: <20170530191553.31500-1-aurelien@aurel32.net>
-Subject: [Qemu-devel] [PULL v2 2/5] target/sh4: fix reset when using a
- kernel and an initrd
+Subject: [Qemu-devel] [PULL v2 5/5] target/sh4: fix RTE instruction delay
+ slot
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,49 +28,106 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: stefanha@redhat.com, Aurelien Jarno <aurelien@aurel32.net>
 
-When a masked exception happens, the SH4 CPU generates a non-masked
-reset exception, which then jumps to the reset vector at address
-0xA0000000. While this is emulated correctly in QEMU, this does not
-work when using a kernel and initrd as this address then contain an
-illegal instruction (and there is no guarantee the kernel and initrd
-haven't been overwritten).
+The ReTurn from Exception (RTE) instruction loads the system register
+(SR) with the saved system register (SSR). It has a delay slot, and
+behaves specially according to the SH4 manual:
 
-Therefore call qemu_system_reset_request to reload the kernel and initrd
-and load the program counter to the kernel entry point.
+  The SR value accessed by the instruction in the RTE delay slot is the
+  value restored from SSR by the RTE instruction. The SR and MD values
+  defined prior to RTE execution are used to fetch the instruction in
+  the RTE delay slot.
+
+The instruction in the delay slot being often a NOP, it doesn't cause
+any issue most of the time except in some rare cases where the NOP is
+being splitted in a different TB (for example when the TCG op buffer
+is full). In that case the NOP is fetched with the user permissions
+and causes an instruction TLB protection violation exception.
+
+This patches fixes that by introducing a new delay slot flag for the
+RTE instruction. Given it's a privileged instruction, the RTE delay
+slot instruction is always fetched in privileged mode. It is therefore
+enough to to check for this flag in cpu_mmu_index.
 
 Reviewed-by: Richard Henderson <rth@twiddle.net>
 Signed-off-by: Aurelien Jarno <aurelien@aurel32.net>
 ---
- target/sh4/helper.c | 10 +++++++++-
- 1 file changed, 9 insertions(+), 1 deletion(-)
+ target/sh4/cpu.h       | 13 ++++++++++---
+ target/sh4/translate.c |  8 ++++++--
+ 2 files changed, 16 insertions(+), 5 deletions(-)
 
-diff --git a/target/sh4/helper.c b/target/sh4/helper.c
-index 4c024f9529..16fcd1bbf2 100644
---- a/target/sh4/helper.c
-+++ b/target/sh4/helper.c
-@@ -21,6 +21,7 @@
- #include "cpu.h"
- #include "exec/exec-all.h"
- #include "exec/log.h"
-+#include "sysemu/sysemu.h"
+diff --git a/target/sh4/cpu.h b/target/sh4/cpu.h
+index 7969c9af98..ffb91687b8 100644
+--- a/target/sh4/cpu.h
++++ b/target/sh4/cpu.h
+@@ -91,9 +91,10 @@
+ #define FPSCR_RM_NEAREST       (0 << 0)
+ #define FPSCR_RM_ZERO          (1 << 0)
  
- #if !defined(CONFIG_USER_ONLY)
- #include "hw/sh4/sh_intc.h"
-@@ -92,7 +93,14 @@ void superh_cpu_do_interrupt(CPUState *cs)
+-#define DELAY_SLOT_MASK        0x3
++#define DELAY_SLOT_MASK        0x7
+ #define DELAY_SLOT             (1 << 0)
+ #define DELAY_SLOT_CONDITIONAL (1 << 1)
++#define DELAY_SLOT_RTE         (1 << 2)
  
-     if (env->sr & (1u << SR_BL)) {
-         if (do_exp && cs->exception_index != 0x1e0) {
--            cs->exception_index = 0x000; /* masked exception -> reset */
-+            /* In theory a masked exception generates a reset exception,
-+               which in turn jumps to the reset vector. However this only
-+               works when using a bootloader. When using a kernel and an
-+               initrd, they need to be reloaded and the program counter
-+               should be loaded with the kernel entry point.
-+               qemu_system_reset_request takes care of that.  */
-+            qemu_system_reset_request(SHUTDOWN_CAUSE_GUEST_RESET);
-+            return;
-         }
-         if (do_irq && !env->in_sleep) {
-             return; /* masked */
+ typedef struct tlb_t {
+     uint32_t vpn;		/* virtual page number */
+@@ -264,7 +265,13 @@ void cpu_load_tlb(CPUSH4State * env);
+ #define MMU_USER_IDX 1
+ static inline int cpu_mmu_index (CPUSH4State *env, bool ifetch)
+ {
+-    return (env->sr & (1u << SR_MD)) == 0 ? 1 : 0;
++    /* The instruction in a RTE delay slot is fetched in privileged
++       mode, but executed in user mode.  */
++    if (ifetch && (env->flags & DELAY_SLOT_RTE)) {
++        return 0;
++    } else {
++        return (env->sr & (1u << SR_MD)) == 0 ? 1 : 0;
++    }
+ }
+ 
+ #include "exec/cpu-all.h"
+@@ -381,7 +388,7 @@ static inline void cpu_get_tb_cpu_state(CPUSH4State *env, target_ulong *pc,
+ {
+     *pc = env->pc;
+     *cs_base = 0;
+-    *flags = (env->flags & DELAY_SLOT_MASK)                    /* Bits  0- 1 */
++    *flags = (env->flags & DELAY_SLOT_MASK)                    /* Bits  0- 2 */
+             | (env->fpscr & (FPSCR_FR | FPSCR_SZ | FPSCR_PR))  /* Bits 19-21 */
+             | (env->sr & ((1u << SR_MD) | (1u << SR_RB)))      /* Bits 29-30 */
+             | (env->sr & (1u << SR_FD))                        /* Bit 15 */
+diff --git a/target/sh4/translate.c b/target/sh4/translate.c
+index aba316f593..8bc132b27b 100644
+--- a/target/sh4/translate.c
++++ b/target/sh4/translate.c
+@@ -185,6 +185,9 @@ void superh_cpu_dump_state(CPUState *cs, FILE *f,
+     } else if (env->flags & DELAY_SLOT_CONDITIONAL) {
+ 	cpu_fprintf(f, "in conditional delay slot (delayed_pc=0x%08x)\n",
+ 		    env->delayed_pc);
++    } else if (env->flags & DELAY_SLOT_RTE) {
++        cpu_fprintf(f, "in rte delay slot (delayed_pc=0x%08x)\n",
++                    env->delayed_pc);
+     }
+ }
+ 
+@@ -427,8 +430,9 @@ static void _decode_opc(DisasContext * ctx)
+ 	CHECK_NOT_DELAY_SLOT
+         gen_write_sr(cpu_ssr);
+ 	tcg_gen_mov_i32(cpu_delayed_pc, cpu_spc);
+-        ctx->envflags |= DELAY_SLOT;
++        ctx->envflags |= DELAY_SLOT_RTE;
+ 	ctx->delayed_pc = (uint32_t) - 1;
++        ctx->bstate = BS_STOP;
+ 	return;
+     case 0x0058:		/* sets */
+         tcg_gen_ori_i32(cpu_sr, cpu_sr, (1u << SR_S));
+@@ -1804,7 +1808,7 @@ static void decode_opc(DisasContext * ctx)
+         ctx->bstate = BS_BRANCH;
+         if (old_flags & DELAY_SLOT_CONDITIONAL) {
+ 	    gen_delayed_conditional_jump(ctx);
+-        } else if (old_flags & DELAY_SLOT) {
++        } else {
+             gen_jump(ctx);
+ 	}
+ 
 -- 
 2.11.0
