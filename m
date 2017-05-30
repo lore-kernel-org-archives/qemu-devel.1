@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55724)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55717)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aurelien@aurel32.net>) id 1dFmcc-0005Zn-M6
+	(envelope-from <aurelien@aurel32.net>) id 1dFmcc-0005Zk-Gh
 	for qemu-devel@nongnu.org; Tue, 30 May 2017 15:16:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aurelien@aurel32.net>) id 1dFmcb-0007fG-Fx
+	(envelope-from <aurelien@aurel32.net>) id 1dFmcb-0007fN-Gm
 	for qemu-devel@nongnu.org; Tue, 30 May 2017 15:16:02 -0400
-Received: from hall.aurel32.net ([2001:bc8:30d7:100::1]:52282)
+Received: from hall.aurel32.net ([2001:bc8:30d7:100::1]:52286)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <aurelien@aurel32.net>)
-	id 1dFmcb-0007eo-9h
+	id 1dFmcb-0007ep-AX
 	for qemu-devel@nongnu.org; Tue, 30 May 2017 15:16:01 -0400
 From: Aurelien Jarno <aurelien@aurel32.net>
-Date: Tue, 30 May 2017 21:15:51 +0200
-Message-Id: <20170530191553.31500-4-aurelien@aurel32.net>
+Date: Tue, 30 May 2017 21:15:49 +0200
+Message-Id: <20170530191553.31500-2-aurelien@aurel32.net>
 In-Reply-To: <20170530191553.31500-1-aurelien@aurel32.net>
 References: <20170530191553.31500-1-aurelien@aurel32.net>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL v2 3/5] target/sh4: introduce DELAY_SLOT_MASK
+Subject: [Qemu-devel] [PULL v2 1/5] target/sh4: log unauthorized accesses
+ using qemu_log_mask
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,127 +31,27 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: stefanha@redhat.com, Aurelien Jarno <aurelien@aurel32.net>
 
-This will make easier the introduction of a new flag in the next
-patches.
+qemu_log_mask() is preferred over fprintf() for logging errors.
 
 Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 Reviewed-by: Richard Henderson <rth@twiddle.net>
 Signed-off-by: Aurelien Jarno <aurelien@aurel32.net>
 ---
- target/sh4/cpu.h       |  3 ++-
- target/sh4/helper.c    |  4 ++--
- target/sh4/translate.c | 17 ++++++++---------
- 3 files changed, 12 insertions(+), 12 deletions(-)
+ target/sh4/helper.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/target/sh4/cpu.h b/target/sh4/cpu.h
-index 6c07c6b24b..7969c9af98 100644
---- a/target/sh4/cpu.h
-+++ b/target/sh4/cpu.h
-@@ -91,6 +91,7 @@
- #define FPSCR_RM_NEAREST       (0 << 0)
- #define FPSCR_RM_ZERO          (1 << 0)
- 
-+#define DELAY_SLOT_MASK        0x3
- #define DELAY_SLOT             (1 << 0)
- #define DELAY_SLOT_CONDITIONAL (1 << 1)
- 
-@@ -380,7 +381,7 @@ static inline void cpu_get_tb_cpu_state(CPUSH4State *env, target_ulong *pc,
- {
-     *pc = env->pc;
-     *cs_base = 0;
--    *flags = (env->flags & (DELAY_SLOT | DELAY_SLOT_CONDITIONAL)) /* Bits 0-1 */
-+    *flags = (env->flags & DELAY_SLOT_MASK)                    /* Bits  0- 1 */
-             | (env->fpscr & (FPSCR_FR | FPSCR_SZ | FPSCR_PR))  /* Bits 19-21 */
-             | (env->sr & ((1u << SR_MD) | (1u << SR_RB)))      /* Bits 29-30 */
-             | (env->sr & (1u << SR_FD))                        /* Bit 15 */
 diff --git a/target/sh4/helper.c b/target/sh4/helper.c
-index 16fcd1bbf2..5785d6d22a 100644
+index 8f8ce81401..4c024f9529 100644
 --- a/target/sh4/helper.c
 +++ b/target/sh4/helper.c
-@@ -172,11 +172,11 @@ void superh_cpu_do_interrupt(CPUState *cs)
-     env->sgr = env->gregs[15];
-     env->sr |= (1u << SR_BL) | (1u << SR_MD) | (1u << SR_RB);
- 
--    if (env->flags & (DELAY_SLOT | DELAY_SLOT_CONDITIONAL)) {
-+    if (env->flags & DELAY_SLOT_MASK) {
-         /* Branch instruction should be executed again before delay slot. */
- 	env->spc -= 2;
- 	/* Clear flags for exception/interrupt routine. */
--        env->flags &= ~(DELAY_SLOT | DELAY_SLOT_CONDITIONAL);
-+        env->flags &= ~DELAY_SLOT_MASK;
-     }
- 
-     if (do_exp) {
-diff --git a/target/sh4/translate.c b/target/sh4/translate.c
-index 0bc2f9ff19..aba316f593 100644
---- a/target/sh4/translate.c
-+++ b/target/sh4/translate.c
-@@ -217,8 +217,7 @@ static inline void gen_save_cpu_state(DisasContext *ctx, bool save_pc)
-     if (ctx->delayed_pc != (uint32_t) -1) {
-         tcg_gen_movi_i32(cpu_delayed_pc, ctx->delayed_pc);
-     }
--    if ((ctx->tbflags & (DELAY_SLOT | DELAY_SLOT_CONDITIONAL))
--        != ctx->envflags) {
-+    if ((ctx->tbflags & DELAY_SLOT_MASK) != ctx->envflags) {
-         tcg_gen_movi_i32(cpu_flags, ctx->envflags);
-     }
- }
-@@ -329,7 +328,7 @@ static inline void gen_store_fpr64 (TCGv_i64 t, int reg)
- #define DREG(x) FREG(x) /* Assumes lsb of (x) is always 0 */
- 
- #define CHECK_NOT_DELAY_SLOT \
--    if (ctx->envflags & (DELAY_SLOT | DELAY_SLOT_CONDITIONAL)) {     \
-+    if (ctx->envflags & DELAY_SLOT_MASK) {                           \
-         gen_save_cpu_state(ctx, true);                               \
-         gen_helper_raise_slot_illegal_instruction(cpu_env);          \
-         ctx->bstate = BS_EXCP;                                       \
-@@ -339,7 +338,7 @@ static inline void gen_store_fpr64 (TCGv_i64 t, int reg)
- #define CHECK_PRIVILEGED                                             \
-     if (IS_USER(ctx)) {                                              \
-         gen_save_cpu_state(ctx, true);                               \
--        if (ctx->envflags & (DELAY_SLOT | DELAY_SLOT_CONDITIONAL)) { \
-+        if (ctx->envflags & DELAY_SLOT_MASK) {                       \
-             gen_helper_raise_slot_illegal_instruction(cpu_env);      \
-         } else {                                                     \
-             gen_helper_raise_illegal_instruction(cpu_env);           \
-@@ -351,7 +350,7 @@ static inline void gen_store_fpr64 (TCGv_i64 t, int reg)
- #define CHECK_FPU_ENABLED                                            \
-     if (ctx->tbflags & (1u << SR_FD)) {                              \
-         gen_save_cpu_state(ctx, true);                               \
--        if (ctx->envflags & (DELAY_SLOT | DELAY_SLOT_CONDITIONAL)) { \
-+        if (ctx->envflags & DELAY_SLOT_MASK) {                       \
-             gen_helper_raise_slot_fpu_disable(cpu_env);              \
-         } else {                                                     \
-             gen_helper_raise_fpu_disable(cpu_env);                   \
-@@ -1784,7 +1783,7 @@ static void _decode_opc(DisasContext * ctx)
-     fflush(stderr);
- #endif
-     gen_save_cpu_state(ctx, true);
--    if (ctx->envflags & (DELAY_SLOT | DELAY_SLOT_CONDITIONAL)) {
-+    if (ctx->envflags & DELAY_SLOT_MASK) {
-         gen_helper_raise_slot_illegal_instruction(cpu_env);
-     } else {
-         gen_helper_raise_illegal_instruction(cpu_env);
-@@ -1798,9 +1797,9 @@ static void decode_opc(DisasContext * ctx)
- 
-     _decode_opc(ctx);
- 
--    if (old_flags & (DELAY_SLOT | DELAY_SLOT_CONDITIONAL)) {
-+    if (old_flags & DELAY_SLOT_MASK) {
-         /* go out of the delay slot */
--        ctx->envflags &= ~(DELAY_SLOT | DELAY_SLOT_CONDITIONAL);
-+        ctx->envflags &= ~DELAY_SLOT_MASK;
-         tcg_gen_movi_i32(cpu_flags, ctx->envflags);
-         ctx->bstate = BS_BRANCH;
-         if (old_flags & DELAY_SLOT_CONDITIONAL) {
-@@ -1824,7 +1823,7 @@ void gen_intermediate_code(CPUSH4State * env, struct TranslationBlock *tb)
-     pc_start = tb->pc;
-     ctx.pc = pc_start;
-     ctx.tbflags = (uint32_t)tb->flags;
--    ctx.envflags = tb->flags & (DELAY_SLOT | DELAY_SLOT_CONDITIONAL);
-+    ctx.envflags = tb->flags & DELAY_SLOT_MASK;
-     ctx.bstate = BS_NONE;
-     ctx.memidx = (ctx.tbflags & (1u << SR_MD)) == 0 ? 1 : 0;
-     /* We don't know if the delayed pc came from a dynamic or static branch,
+@@ -420,7 +420,7 @@ static int get_physical_address(CPUSH4State * env, target_ulong * physical,
+         if (!(env->sr & (1u << SR_MD))
+ 	    && (address < 0xe0000000 || address >= 0xe4000000)) {
+ 	    /* Unauthorized access in user mode (only store queues are available) */
+-	    fprintf(stderr, "Unauthorized access\n");
++            qemu_log_mask(LOG_GUEST_ERROR, "Unauthorized access\n");
+ 	    if (rw == 0)
+ 		return MMU_DADDR_ERROR_READ;
+ 	    else if (rw == 1)
 -- 
 2.11.0
