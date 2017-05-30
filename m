@@ -1,28 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48661)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49737)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1dFdpN-0006SR-H9
-	for qemu-devel@nongnu.org; Tue, 30 May 2017 05:52:38 -0400
+	(envelope-from <quintela@redhat.com>) id 1dFduv-0007KL-M9
+	for qemu-devel@nongnu.org; Tue, 30 May 2017 05:58:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1dFdpJ-0004uT-Lx
-	for qemu-devel@nongnu.org; Tue, 30 May 2017 05:52:37 -0400
-Received: from mail-wm0-x244.google.com ([2a00:1450:400c:c09::244]:36815)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1dFdpJ-0004uE-Dx
-	for qemu-devel@nongnu.org; Tue, 30 May 2017 05:52:33 -0400
-Received: by mail-wm0-x244.google.com with SMTP id k15so23944631wmh.3
-	for <qemu-devel@nongnu.org>; Tue, 30 May 2017 02:52:33 -0700 (PDT)
-Date: Tue, 30 May 2017 10:52:30 +0100
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20170530095230.GP11362@stefanha-x1.localdomain>
-References: <20170529193016.6888-1-aurelien@aurel32.net>
-	<20170529193016.6888-2-aurelien@aurel32.net>
+	(envelope-from <quintela@redhat.com>) id 1dFdur-0006e2-N0
+	for qemu-devel@nongnu.org; Tue, 30 May 2017 05:58:21 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:32862)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1dFdur-0006de-Db
+	for qemu-devel@nongnu.org; Tue, 30 May 2017 05:58:17 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 27D0E5D68D
+	for <qemu-devel@nongnu.org>; Tue, 30 May 2017 09:58:16 +0000 (UTC)
+From: Juan Quintela <quintela@redhat.com>
+In-Reply-To: <1495649128-10529-2-git-send-email-vyasevic@redhat.com>
+	(Vladislav Yasevich's message of "Wed, 24 May 2017 14:05:17 -0400")
+References: <1495649128-10529-1-git-send-email-vyasevic@redhat.com>
+	<1495649128-10529-2-git-send-email-vyasevic@redhat.com>
+Reply-To: quintela@redhat.com
+Date: Tue, 30 May 2017 11:58:09 +0200
+Message-ID: <87poeqhdji.fsf@secure.mitica>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="7ZMy3ZKywLyoHonN"
-Content-Disposition: inline
-In-Reply-To: <20170529193016.6888-2-aurelien@aurel32.net>
-Subject: Re: [Qemu-devel] [PULL 1/5] target/sh4: log unauthorized accesses
- using qemu_log_mask
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH 01/12] migration: Introduce announce
+ parameters
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,46 +35,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Aurelien Jarno <aurelien@aurel32.net>
-Cc: Stefan Hajnoczi <stefanha@redhat.com>, "open list:All patches CC here" <qemu-devel@nongnu.org>
+To: Vladislav Yasevich <vyasevic@redhat.com>
+Cc: qemu-devel@nongnu.org, dgilbert@redhat.com, germano@redhat.com, lvivier@redhat.com, jasowang@redhat.com, jdenemar@redhat.com, kashyap@redhat.com, armbru@redhat.com, mst@redhat.com
+
+Vladislav Yasevich <vyasevic@redhat.com> wrote:
+> Add parameters that control RARP/GARP announcement timeouts.
+> The parameters structure is added to the QAPI and a qmp command
+> is added to set/get the parameter data.
+>
+> Based on work by "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+>
+> Signed-off-by: Vladislav Yasevich <vyasevic@redhat.com>
+
+Hi
+
+> diff --git a/migration/savevm.c b/migration/savevm.c
+> index f5e8194..cee2837 100644
+> --- a/migration/savevm.c
+> +++ b/migration/savevm.c
+> @@ -78,6 +78,104 @@ static struct mig_cmd_args {
+>      [MIG_CMD_MAX]              = { .len = -1, .name = "MAX" },
+>  };
+>  
+
+Once that you are touching this, shouldn't it be better to be in
+net/<somewhere>?
+They have nothing to do with migration really.
 
 
---7ZMy3ZKywLyoHonN
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+> +#define QEMU_ANNOUNCE_INITIAL    50
+> +#define QEMU_ANNOUNCE_MAX       550
+> +#define QEMU_ANNOUNCE_ROUNDS      5
+> +#define QEMU_ANNOUNCE_STEP      100
+> +
+> +AnnounceParameters *qemu_get_announce_params(void)
+> +{
+> +    static AnnounceParameters announce = {
+> +        .initial = QEMU_ANNOUNCE_INITIAL,
+> +        .max = QEMU_ANNOUNCE_MAX,
+> +        .rounds = QEMU_ANNOUNCE_ROUNDS,
+> +        .step = QEMU_ANNOUNCE_STEP,
+> +    };
+> +
+> +    return &announce;
+> +}
+> +
+> +void qemu_fill_announce_parameters(AnnounceParameters **to,
+> +                                   AnnounceParameters *from)
+> +{
+> +    AnnounceParameters *params;
+> +
+> +    params = *to = g_malloc0(sizeof(*params));
+> +    params->has_initial = true;
+> +    params->initial = from->initial;
+> +    params->has_max = true;
+> +    params->max = from->max;
+> +    params->has_rounds = true;
+> +    params->rounds = from->rounds;
+> +    params->has_step = true;
+> +    params->step = from->step;
+> +}
+> +
+> +bool qemu_validate_announce_parameters(AnnounceParameters *params, Error **errp)
+> +{
+> +    if (params->has_initial &&
+> +        (params->initial < 1 || params->initial > 100000)) {
 
-On Mon, May 29, 2017 at 09:30:12PM +0200, Aurelien Jarno wrote:
-> qemu_log_mask() is preferred over fprintf() for logging errors.
->=20
-> Reviewed-by: Philippe Mathieu-Daud=E9 <f4bug@amsat.org>
-> Reviewed-by: Richard Henderson <rth@twiddle.net>
-> Signed-off-by: Aurelien Jarno <aurelien@aurel32.net>
-> ---
->  target/sh4/helper.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+This is independent of this patch, but we really need a macro:
+  CHECK(field, mininum, maximum)
 
-I don't see a pull request cover letter but your git repo is up-to-date
-and the pull-target-sh4-20170529 tag is signed correctly.  Therefore I
-have merged this pull request.
+We repeat this left and right.
 
-Thanks, applied to my staging tree:
-https://github.com/stefanha/qemu/commits/staging
+> +void qemu_set_announce_parameters(AnnounceParameters *announce_params,
+> +                                  AnnounceParameters *params)
 
-Stefan
+> +void qmp_announce_set_parameters(AnnounceParameters *params, Error **errp)
 
---7ZMy3ZKywLyoHonN
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJZLUDeAAoJEJykq7OBq3PIqREH/iemiCa/nQA8KC+6Vofz7vIi
-Lm9V3KqPSCuevC1KAKSN5vXAmdP4pb+ZRLojUVCBIF12QSjAFZa+JAwUtxGimtKH
-qvqxFs9vulhj85tjcutK0zyBVeYV7Vb7teN2coa8tcehmX2iAv1jq7/F3UTx9Bd/
-3NxQx2Z6VrtG0IpOW3g8L9+iK42Fm0l7u1tt0G/j+NTcJvZAHiEE98WEglK6XkW5
-Lm9x8O4elp1fRKG1hiGjY7RSI/OJWofTGGEOxrfz/Tl9pt9q1d+JgiY+T7FjFm/v
-GmG9NRp9peW+s8HvepgNNJneFppFGDuWXW/qAsdGDjXVsoqtUmdClYcNdCIMc8k=
-=z04B
------END PGP SIGNATURE-----
-
---7ZMy3ZKywLyoHonN--
+Really similar functions name.  I assume by know that the 1st function
+is used somewhere else in the series.
