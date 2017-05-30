@@ -1,31 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60107)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34143)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dFmvu-0006pB-F4
-	for qemu-devel@nongnu.org; Tue, 30 May 2017 15:35:59 -0400
+	(envelope-from <rth7680@gmail.com>) id 1dFn2L-0000uc-Tq
+	for qemu-devel@nongnu.org; Tue, 30 May 2017 15:42:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dFmvq-0004zg-Re
-	for qemu-devel@nongnu.org; Tue, 30 May 2017 15:35:58 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43344)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dFmvq-0004z9-JG
-	for qemu-devel@nongnu.org; Tue, 30 May 2017 15:35:54 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 913984E358
-	for <qemu-devel@nongnu.org>; Tue, 30 May 2017 19:35:53 +0000 (UTC)
-Date: Tue, 30 May 2017 20:35:42 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170530193542.GX2120@work-vm>
-References: <1495649128-10529-1-git-send-email-vyasevic@redhat.com>
-	<1495649128-10529-9-git-send-email-vyasevic@redhat.com>
+	(envelope-from <rth7680@gmail.com>) id 1dFn2G-0006tv-UA
+	for qemu-devel@nongnu.org; Tue, 30 May 2017 15:42:37 -0400
+Received: from mail-qk0-x242.google.com ([2607:f8b0:400d:c09::242]:34949)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1dFn2G-0006tr-P1
+	for qemu-devel@nongnu.org; Tue, 30 May 2017 15:42:32 -0400
+Received: by mail-qk0-x242.google.com with SMTP id v195so5826408qka.2
+	for <qemu-devel@nongnu.org>; Tue, 30 May 2017 12:42:32 -0700 (PDT)
+Sender: Richard Henderson <rth7680@gmail.com>
+References: <20170525210508.4910-1-aurelien@aurel32.net>
+	<20170525210508.4910-26-aurelien@aurel32.net>
+	<c643c6b9-20fb-af8f-2e2f-9a8b6e4c1159@twiddle.net>
+	<20170529111718.zmwzwy24fk5mhwgl@aurel32.net>
+	<f6104ef5-f9cc-fc1f-553c-d6247cb78dff@twiddle.net>
+	<20170530192507.y77widdbdw3q6p3b@aurel32.net>
+From: Richard Henderson <rth@twiddle.net>
+Message-ID: <846a7bed-d878-a882-38a6-3c33d70fef26@twiddle.net>
+Date: Tue, 30 May 2017 12:42:27 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1495649128-10529-9-git-send-email-vyasevic@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 08/12] announce_timer: Add ability to reset
- an existing
+In-Reply-To: <20170530192507.y77widdbdw3q6p3b@aurel32.net>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 25/26] target/s390x: implement TRANSLATE
+ ONE/TWO TO ONE/TWO
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,128 +36,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladislav Yasevich <vyasevic@redhat.com>
-Cc: qemu-devel@nongnu.org, quintela@redhat.com, germano@redhat.com, lvivier@redhat.com, jasowang@redhat.com, jdenemar@redhat.com, kashyap@redhat.com, armbru@redhat.com, mst@redhat.com
+To: Aurelien Jarno <aurelien@aurel32.net>
+Cc: qemu-devel@nongnu.org, Alexander Graf <agraf@suse.de>
 
-* Vladislav Yasevich (vyasevic@redhat.com) wrote:
-> It is now potentially possible to issue annouce-self command in a tight
-> loop.  Instead of doing nother, we can reset the timeout pararameters,
-> especially since each instance may provide it's own values.  This
-> allows the user to  extend or cut short currently runnig timer.
+On 05/30/2017 12:25 PM, Aurelien Jarno wrote:
+> On 2017-05-30 09:45, Richard Henderson wrote:
+>> On 05/29/2017 04:17 AM, Aurelien Jarno wrote:
+>>> On 2017-05-26 10:10, Richard Henderson wrote:
+>>>> On 05/25/2017 02:05 PM, Aurelien Jarno wrote:
+>>>>> +uint32_t HELPER(trXX)(CPUS390XState *env, uint32_t r1, uint32_t r2,
+>>>>> +                      uint32_t sizes)
+>>>>> +{
+>>>>> +    uintptr_t ra = GETPC();
+>>>>> +    int dsize = (sizes & 1) ? 1 : 2;
+>>>>> +    int ssize = (sizes & 2) ? 1 : 2;
+>>>>> +    uint16_t tst = env->regs[0] & ((1 << (8 * dsize)) - 1);
+>>>>
+>>>> I think you should pass in tst as an argument.  That way you can pass in an
+>>>> out-of-band value when we implement ETF2 and test field M3 bit 3.
+>>>
+>>> I don't mind passing r0 as an argument. That said if we want to pass tst
+>>> or bundle the M3 field, it means we need to use TCG instructions to do
+>>> so. I am not sure it brings a lot compare to doing so in the helper
+>>> side.
+>>
+>> Not at all -- the M3 bit test would be a translation-time check.
 > 
-> Signed-off-by: Vladislav Yasevich <vyasevic@redhat.com>
-
-ah ok, you can ignore my comment on the previous patch then!
-
-> ---
->  include/migration/vmstate.h |  1 +
->  migration/savevm.c          | 41 +++++++++++++++++++++++++++++++----------
->  2 files changed, 32 insertions(+), 10 deletions(-)
+> I still don't really see the point. On the TCG side it means we need
+> something like that:
 > 
-> diff --git a/include/migration/vmstate.h b/include/migration/vmstate.h
-> index 689b685..6dfdac3 100644
-> --- a/include/migration/vmstate.h
-> +++ b/include/migration/vmstate.h
-> @@ -1057,6 +1057,7 @@ void vmstate_register_ram_global(struct MemoryRegion *memory);
->  
->  typedef struct AnnounceTimer {
->      QEMUTimer *tm;
-> +    QemuMutex active_lock;
->      struct AnnounceTimer **entry;
->      AnnounceParameters params;
->      QEMUClockType type;
-> diff --git a/migration/savevm.c b/migration/savevm.c
-> index dcba8bd..e43658f 100644
-> --- a/migration/savevm.c
-> +++ b/migration/savevm.c
-> @@ -220,20 +220,29 @@ static void qemu_announce_self_iter(NICState *nic, void *opaque)
->  
->  AnnounceTimer *announce_timers[QEMU_ANNOUNCE__MAX];
->  
-> +static void qemu_announce_timer_destroy(AnnounceTimer *timer)
-> +{
-> +    timer_del(timer->tm);
-> +    timer_free(timer->tm);
-> +    qemu_mutex_destroy(&timer->active_lock);
-
-Can you explain what makes this safe; we're not
-holding the lock at this point are we? Are we guaranteed
-that no one else will try and take it?
-Either way it should be commented to say why it's safe.
-
-Dave
-
-> +    g_free(timer);
-> +}
-> +
->  static void qemu_announce_self_once(void *opaque)
->  {
->      AnnounceTimer *timer = (AnnounceTimer *)opaque;
->  
-> +    qemu_mutex_lock(&timer->active_lock);
->      qemu_foreach_nic(qemu_announce_self_iter, NULL);
->  
-> -    if (--timer->round) {
-> +    if (--timer->round ) {
->          timer_mod(timer->tm, qemu_clock_get_ms(timer->type) +
->                    self_announce_delay(timer));
-> +        qemu_mutex_unlock(&timer->active_lock);
->      } else {
-> -            *(timer->entry) = NULL;
-> -            timer_del(timer->tm);
-> -            timer_free(timer->tm);
-> -            g_free(timer);
-> +        *(timer->entry) = NULL;
-> +        qemu_mutex_unlock(&timer->active_lock);
-> +        qemu_announce_timer_destroy(timer);
+>      if (m3 & 1) {
+>         tcg_gen_movi_tl(r0, -1);
+>      } else if (dsize == 1) {
+>         tcg_gen_ext8u(r0, regs[0]);
+>      } else if (dsize == 2)
+>         tcg_gen_ext16u(r0, regs[0]);
 >      }
->  }
->  
-> @@ -242,6 +251,7 @@ AnnounceTimer *qemu_announce_timer_new(AnnounceParameters *params,
->  {
->      AnnounceTimer *timer = g_new(AnnounceTimer, 1);
->  
-> +    qemu_mutex_init(&timer->active_lock);
->      timer->params = *params;
->      timer->round = params->rounds;
->      timer->type = type;
-> @@ -259,6 +269,21 @@ AnnounceTimer *qemu_announce_timer_create(AnnounceParameters *params,
->      return timer;
->  }
->  
-> +static void qemu_announce_timer_update(AnnounceTimer *timer,
-> +                                       AnnounceParameters *params)
-> +{
-> +    qemu_mutex_lock(&timer->active_lock);
-> +
-> +    /* Update timer paramenter with any new values.
-> +     * Reset the number of rounds to run, and stop the current timer.
-> +     */
-> +    timer->params = *params;
-> +    timer->round = params->rounds;
-> +    timer_del(timer->tm);
-> +
-> +    qemu_mutex_unlock(&timer->active_lock);
-> +}
-> +
->  void qemu_announce_self(AnnounceParameters *params, AnnounceType type)
->  {
->      AnnounceTimer *timer;
-> @@ -270,11 +295,7 @@ void qemu_announce_self(AnnounceParameters *params, AnnounceType type)
->          announce_timers[type] = timer;
->          timer->entry = &announce_timers[type];
->      } else {
-> -        /* For now, don't do anything.  If we want to reset the timer,
-> -         * we'll need to add locking to each announce timer to prevent
-> -         * races between timeout handling and a reset.
-> -         */
-> -        return;
-> +        qemu_announce_timer_update(timer, params);
->      }
->      qemu_announce_self_once(timer);
->  }
-> -- 
-> 2.7.4
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+
+Yes, exactly.
+
+> On the helper side we then need to check if the value passed equals -1
+> or not to get m3 instead of directly accessing the value in register 0.
+
+How's that?  Why would you need to check for -1 at all?  The existing helper 
+test works fine, with -1 not matching any value loaded.
+
+
+r~
