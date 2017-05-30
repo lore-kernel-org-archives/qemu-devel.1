@@ -1,28 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54121)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54132)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1dFeHN-0000er-Qy
-	for qemu-devel@nongnu.org; Tue, 30 May 2017 06:21:34 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1dFeHP-0000f0-Kd
+	for qemu-devel@nongnu.org; Tue, 30 May 2017 06:21:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1dFeHK-0004SX-MO
-	for qemu-devel@nongnu.org; Tue, 30 May 2017 06:21:33 -0400
-Received: from 18.mo5.mail-out.ovh.net ([178.33.45.10]:38866)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1dFeHK-0004S2-G8
-	for qemu-devel@nongnu.org; Tue, 30 May 2017 06:21:30 -0400
-Received: from player799.ha.ovh.net (b9.ovh.net [213.186.33.59])
-	by mo5.mail-out.ovh.net (Postfix) with ESMTP id 5088FEBA69
-	for <qemu-devel@nongnu.org>; Tue, 30 May 2017 12:21:17 +0200 (CEST)
-Date: Tue, 30 May 2017 12:21:12 +0200
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20170530122112.2dc44db9@bahia.ttt.fr.ibm.com>
-In-Reply-To: <20170530094212.GL11362@stefanha-x1.localdomain>
-References: <1496048740-26578-1-git-send-email-groug@kaod.org>
-	<20170530094212.GL11362@stefanha-x1.localdomain>
+	(envelope-from <peter.maydell@linaro.org>) id 1dFeHO-0004Su-Ia
+	for qemu-devel@nongnu.org; Tue, 30 May 2017 06:21:35 -0400
+Received: from mail-wm0-x231.google.com ([2a00:1450:400c:c09::231]:38708)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1dFeHO-0004Sm-BP
+	for qemu-devel@nongnu.org; Tue, 30 May 2017 06:21:34 -0400
+Received: by mail-wm0-x231.google.com with SMTP id e127so93745479wmg.1
+	for <qemu-devel@nongnu.org>; Tue, 30 May 2017 03:21:34 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	boundary="Sig_/_RuTiMkvikCb35EEWTefALn";
-	protocol="application/pgp-signature"
-Subject: Re: [Qemu-devel] [PULL 00/11] 9pfs patches for 2.10 20170525
+In-Reply-To: <87vaox2cvi.fsf@linaro.org>
+References: <591DC93D.2060707@ispras.ru> <87vaox2cvi.fsf@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 30 May 2017 11:21:12 +0100
+Message-ID: <CAFEAcA8H1Kwjnj+A1XdGO=7U-hPhys+W-MRy3yyOTkBoUb0ptg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] EL2\EL3 support for Aarch64
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,77 +29,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@gmail.com>
-Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Stefan Hajnoczi <stefanha@redhat.com>
+To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+Cc: Sergey Smolov <smolov@ispras.ru>, QEMU Developers <qemu-devel@nongnu.org>
 
---Sig_/_RuTiMkvikCb35EEWTefALn
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+On 19 May 2017 at 14:29, Alex Benn=C3=A9e <alex.bennee@linaro.org> wrote:
+>
+> Sergey Smolov <smolov@ispras.ru> writes:
+>
+>> Hello, List!
+>>
+>> Could you tell me, what is the current state for EL2\EL3 (Aarch64)?
+>> Whether they are fully supported, or not?
+>> Am I need to use any command line options to enable them for Aarch64
+>> assembler programs simulation?
+>
+> Sure you can use both. To enable EL2 support:
+>
+>   qemu-system-aarch64 ${QEMU_OPTS} \
+>     -machine gic-version=3D3 \
+>     -machine virtualization=3Dtrue
+>
+> To boot in secure mode you'll need to use -bios and boot a secure
+> firmware (like OPTEE for example).
 
-On Tue, 30 May 2017 10:42:12 +0100
-Stefan Hajnoczi <stefanha@gmail.com> wrote:
+You also need -machine secure=3Dtrue to turn on EL3 in the virt board.
 
-> On Mon, May 29, 2017 at 11:05:29AM +0200, Greg Kurz wrote:
-> > The following changes since commit 9964e96dc9999cf7f7c936ee854a795415d1=
-9b60:
-> >=20
-> >   Merge remote-tracking branch 'jasowang/tags/net-pull-request' into st=
-aging (2017-05-23 15:01:31 +0100)
-> >=20
-> > are available in the git repository at:
-> >=20
-> >   https://github.com/gkurz/qemu.git tags/for-upstream
-> >=20
-> > for you to fetch changes up to f0a4da86cff2e600255324793daddd7ce59b9862:
-> >=20
-> >   9pfs: local: metadata file for the VirtFS root (2017-05-25 10:30:14 +=
-0200)
-> >=20
-> > ----------------------------------------------------------------
-> > Various bugfixes and code cleanups. Most notably, it fixes metadata han=
-dling in
-> > mapped-file security mode (especially for the virtfs root). =20
->=20
-> Please fix the compiler warning reported by patchew.
->=20
+NB that EL2 is currently only supported (1) for AArch64 EL2 and
+(2) with GICv3, not for AArch32 EL2 or with GICv2.
 
-In file included from /var/tmp/patchew-tester-tmp-3cnydauu/src/hw/9pfs/9p-l=
-ocal.c:18:0:
-/var/tmp/patchew-tester-tmp-3cnydauu/src/hw/9pfs/9p-local.c: In function =
-=E2=80=98local_set_mapped_file_attrat=E2=80=99:
-/var/tmp/patchew-tester-tmp-3cnydauu/src/hw/9pfs/9p-util.h:19:5: error: =E2=
-=80=98map_dirfd=E2=80=99 may be used uninitialized in this function [-Werro=
-r=3Dmaybe-uninitialized]
-     close(fd);
-     ^~~~~~~~~
-/var/tmp/patchew-tester-tmp-3cnydauu/src/hw/9pfs/9p-local.c:235:9: note: =
-=E2=80=98map_dirfd=E2=80=99 was declared here
-     int map_dirfd, map_fd;
-         ^~~~~~~~~
-cc1: all warnings being treated as errors
-
-This is a false positive: map_dirfd is necessarily initialized, but I guess
-gcc isn't smart enough to see that :-\
-
-It is acceptable to close(-1) so I guess I'll just do:
-
--    int map_dirfd, map_fd;
-+    int map_dirfd =3D -1, map_fd;
-
-> Thanks,
-> Stefan
-
-
---Sig_/_RuTiMkvikCb35EEWTefALn
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-
-iEYEARECAAYFAlktR5gACgkQAvw66wEB28LJoQCffK2T4EDp4iJB1JuxuG2ytixj
-IsAAnjasTtJxmynSYwsgDOPizveCWlnw
-=sc2g
------END PGP SIGNATURE-----
-
---Sig_/_RuTiMkvikCb35EEWTefALn--
+thanks
+-- PMM
