@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40464)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41111)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1dFlho-0006Yc-4v
-	for qemu-devel@nongnu.org; Tue, 30 May 2017 14:17:21 -0400
+	(envelope-from <mst@redhat.com>) id 1dFllM-0007ig-3r
+	for qemu-devel@nongnu.org; Tue, 30 May 2017 14:21:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1dFlhk-00049K-4p
-	for qemu-devel@nongnu.org; Tue, 30 May 2017 14:17:20 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:27982)
+	(envelope-from <mst@redhat.com>) id 1dFllI-0006Bh-4z
+	for qemu-devel@nongnu.org; Tue, 30 May 2017 14:21:00 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49968)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1dFlhj-00047v-SA
-	for qemu-devel@nongnu.org; Tue, 30 May 2017 14:17:16 -0400
-Date: Tue, 30 May 2017 21:17:02 +0300
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1dFllH-0006BW-Pv
+	for qemu-devel@nongnu.org; Tue, 30 May 2017 14:20:56 -0400
+Date: Tue, 30 May 2017 21:20:45 +0300
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20170530211512-mutt-send-email-mst@kernel.org>
+Message-ID: <20170530211819-mutt-send-email-mst@kernel.org>
 References: <20170526142858.19931-1-maxime.coquelin@redhat.com>
-	<20170526142858.19931-6-maxime.coquelin@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <20170526142858.19931-6-maxime.coquelin@redhat.com>
+In-Reply-To: <20170526142858.19931-1-maxime.coquelin@redhat.com>
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 5/6] vhost-user: add slave-req-fd support
+Subject: Re: [Qemu-devel] [PATCH v2 0/6] vhost-user: Specify and implement
+ device IOTLB support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,294 +29,70 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Maxime Coquelin <maxime.coquelin@redhat.com>
-Cc: peterx@redhat.com, marcandre.lureau@gmail.com, vkaplans@redhat.com, jasowang@redhat.com, wexu@redhat.com, yuanhan.liu@linux.intel.com, qemu-devel@nongnu.org, jfreiman@redhat.com, =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>
+Cc: peterx@redhat.com, marcandre.lureau@gmail.com, vkaplans@redhat.com, jasowang@redhat.com, wexu@redhat.com, yuanhan.liu@linux.intel.com, qemu-devel@nongnu.org, jfreiman@redhat.com
 
-On Fri, May 26, 2017 at 04:28:57PM +0200, Maxime Coquelin wrote:
-> From: Marc-Andr=E9 Lureau <marcandre.lureau@redhat.com>
+On Fri, May 26, 2017 at 04:28:52PM +0200, Maxime Coquelin wrote:
+> This series aims at specifying ans implementing the protocol update
+> required to support device IOTLB with user backends.
 >=20
-> Learn to give a socket to the slave to let him make requests to the
-> master.
+> In this second non-RFC version, main changes are:
+>  - spec fixes and clarification
+>  - rings information update has been restored back to ring enablement t=
+ime
+>  - Work around GCC 4.4.7 limitation wrt assignment in unnamed union at
+> declaration time.
 >=20
-> Signed-off-by: Marc-Andr=E9 Lureau <marcandre.lureau@redhat.com>
-> Signed-off-by: Maxime Coquelin <maxime.coquelin@redhat.com>
-> ---
->  docs/specs/vhost-user.txt |  32 +++++++++++-
->  hw/virtio/vhost-user.c    | 127 ++++++++++++++++++++++++++++++++++++++=
-++++++++
->  2 files changed, 157 insertions(+), 2 deletions(-)
+> The series can be tested with vhost_iotlb_proto_v2 branch on my gitlab
+> account[0].
 >=20
-> diff --git a/docs/specs/vhost-user.txt b/docs/specs/vhost-user.txt
-> index 036890f..5fa7016 100644
-> --- a/docs/specs/vhost-user.txt
-> +++ b/docs/specs/vhost-user.txt
-> @@ -139,6 +139,7 @@ in the ancillary data:
->   * VHOST_USER_SET_VRING_KICK
->   * VHOST_USER_SET_VRING_CALL
->   * VHOST_USER_SET_VRING_ERR
-> + * VHOST_USER_SET_SLAVE_REQ_FD
-> =20
->  If Master is unable to send the full message or receives a wrong reply=
- it will
->  close the connection. An optional reconnection mechanism can be implem=
-ented.
-> @@ -252,6 +253,18 @@ Once the source has finished migration, rings will=
- be stopped by
->  the source. No further update must be done before rings are
->  restarted.
-> =20
-> +Slave communication
-> +-------------------
-> +
-> +An optional communication channel is provided if the slave declares
-> +VHOST_USER_PROTOCOL_F_SLAVE_REQ protocol feature, to allow the slave t=
-o make
-> +requests to the master.
-> +
-> +The fd is provided via VHOST_USER_SET_SLAVE_REQ_FD ancillary data.
-> +
-> +A slave may then send VHOST_USER_SLAVE_* messages to the master
-> +using this fd communication channel.
-> +
->  Protocol features
->  -----------------
-> =20
-> @@ -260,9 +273,10 @@ Protocol features
->  #define VHOST_USER_PROTOCOL_F_RARP           2
->  #define VHOST_USER_PROTOCOL_F_REPLY_ACK      3
->  #define VHOST_USER_PROTOCOL_F_MTU            4
-> +#define VHOST_USER_PROTOCOL_F_SLAVE_REQ      5
-> =20
-> -Message types
-> --------------
-> +Master message types
-> +--------------------
-> =20
->   * VHOST_USER_GET_FEATURES
-> =20
+> The slave requests channel part is re-used from Marc-Andr=E9's series s=
+ubmitted
+> last year[1], with main changes from original version being request/fea=
+ture
+> names renaming and addition of the REPLY_ACK feature support.
+>=20
+> Regarding IOTLB protocol, one noticeable change is the IOTLB miss reque=
+st
+> reply made optionnal (i.e. only if slave requests it by setting the
+> VHOST_USER_NEED_REPLY flag in the message header). This change provides
+> more flexibility in the backend implementation of the feature.
+>=20
+> The protocol is very close to kernel backends, except that a new
+> communication channel is introduced to enable the slave to send
+> requests to the master.
+>=20
+> [0]: https://gitlab.com/mcoquelin/dpdk-next-virtio/commits/vhost_iotlb_=
+proto_v2
+> [1]: https://lists.gnu.org/archive/html/qemu-devel/2016-04/msg00095.htm=
+l
+
+Overall, this looks good to me. I do think patch 3 isn't a good idea
+though, if slave wants something let it request it.
+
+Need to find out why does vhost in kernel want the used ring iotlb at
+start time - especially considering we aren't even guaranteed one entry
+covers the whole ring, and invalidates should affect all addresses at
+least in theory.
 
 
-So down the road, we should make sure a device without
-VHOST_USER_PROTOCOL_F_SLAVE_REQ does not advertise IOMMU
-since you don't handle these messages otherwise.
-
-
-> @@ -486,6 +500,20 @@ Message types
->        If VHOST_USER_PROTOCOL_F_REPLY_ACK is negotiated, slave must res=
-pond
->        with zero in case the specified MTU is valid, or non-zero otherw=
-ise.
-> =20
-> + * VHOST_USER_SET_SLAVE_REQ_FD
-> +
-> +      Id: 21
-> +      Equivalent ioctl: N/A
-> +      Master payload: N/A
-> +
-> +      Set the socket file descriptor for slave initiated requests. It =
-is passed
-> +      in the ancillary data.
-> +      This request should be sent only when VHOST_USER_F_PROTOCOL_FEAT=
-URES
-> +      has been negotiated, and protocol feature bit VHOST_USER_PROTOCO=
-L_F_SLAVE_REQ
-> +      bit is present in VHOST_USER_GET_PROTOCOL_FEATURES.
-> +      If VHOST_USER_PROTOCOL_F_REPLY_ACK is negotiated, slave must res=
-pond
-> +      with zero for success, non-zero otherwise.
-> +
->  VHOST_USER_PROTOCOL_F_REPLY_ACK:
->  -------------------------------
->  The original vhost-user specification only demands replies for certain
-> diff --git a/hw/virtio/vhost-user.c b/hw/virtio/vhost-user.c
-> index 8a602e0..ea988fe 100644
-> --- a/hw/virtio/vhost-user.c
-> +++ b/hw/virtio/vhost-user.c
-> @@ -32,6 +32,7 @@ enum VhostUserProtocolFeature {
->      VHOST_USER_PROTOCOL_F_RARP =3D 2,
->      VHOST_USER_PROTOCOL_F_REPLY_ACK =3D 3,
->      VHOST_USER_PROTOCOL_F_NET_MTU =3D 4,
-> +    VHOST_USER_PROTOCOL_F_SLAVE_REQ =3D 5,
-> =20
->      VHOST_USER_PROTOCOL_F_MAX
->  };
-> @@ -60,9 +61,15 @@ typedef enum VhostUserRequest {
->      VHOST_USER_SET_VRING_ENABLE =3D 18,
->      VHOST_USER_SEND_RARP =3D 19,
->      VHOST_USER_NET_SET_MTU =3D 20,
-> +    VHOST_USER_SET_SLAVE_REQ_FD =3D 21,
->      VHOST_USER_MAX
->  } VhostUserRequest;
-> =20
-> +typedef enum VhostUserSlaveRequest {
-> +    VHOST_USER_SLAVE_NONE =3D 0,
-> +    VHOST_USER_SLAVE_MAX
-> +}  VhostUserSlaveRequest;
-> +
->  typedef struct VhostUserMemoryRegion {
->      uint64_t guest_phys_addr;
->      uint64_t memory_size;
-> @@ -112,6 +119,7 @@ static VhostUserMsg m __attribute__ ((unused));
-> =20
->  struct vhost_user {
->      CharBackend *chr;
-> +    int slave_fd;
->  };
-> =20
->  static bool ioeventfd_enabled(void)
-> @@ -578,6 +586,115 @@ static int vhost_user_reset_device(struct vhost_d=
-ev *dev)
->      return 0;
->  }
-> =20
-> +static void slave_read(void *opaque)
-> +{
-> +    struct vhost_dev *dev =3D opaque;
-> +    struct vhost_user *u =3D dev->opaque;
-> +    VhostUserMsg msg =3D { 0, };
-> +    int size, ret =3D 0;
-> +
-> +    /* Read header */
-> +    size =3D read(u->slave_fd, &msg, VHOST_USER_HDR_SIZE);
-> +    if (size !=3D VHOST_USER_HDR_SIZE) {
-> +        error_report("Failed to read from slave.");
-> +        goto err;
-> +    }
-> +
-> +    if (msg.size > VHOST_USER_PAYLOAD_SIZE) {
-> +        error_report("Failed to read msg header."
-> +                " Size %d exceeds the maximum %zu.", msg.size,
-> +                VHOST_USER_PAYLOAD_SIZE);
-> +        goto err;
-> +    }
-> +
-> +    /* Read payload */
-> +    size =3D read(u->slave_fd, &msg.payload, msg.size);
-> +    if (size !=3D msg.size) {
-> +        error_report("Failed to read payload from slave.");
-> +        goto err;
-> +    }
-> +
-> +    switch (msg.request) {
-> +    default:
-> +        error_report("Received unexpected msg type.");
-> +        ret =3D -EINVAL;
-> +    }
-> +
-> +    /*
-> +     * REPLY_ACK feature handling. Other reply types has to be managed
-> +     * directly in their request handlers.
-> +     */
-> +    if (msg.flags & VHOST_USER_NEED_REPLY_MASK) {
-> +        msg.flags &=3D ~VHOST_USER_NEED_REPLY_MASK;
-> +        msg.flags |=3D VHOST_USER_REPLY_MASK;
-> +
-> +        msg.payload.u64 =3D !!ret;
-> +        msg.size =3D sizeof(msg.payload.u64);
-> +
-> +        size =3D write(u->slave_fd, &msg, VHOST_USER_HDR_SIZE + msg.si=
-ze);
-> +        if (size !=3D VHOST_USER_HDR_SIZE + msg.size) {
-> +            error_report("Failed to send msg reply to slave.");
-> +            goto err;
-> +        }
-> +    }
-> +
-> +    return;
-> +
-> +err:
-> +    qemu_set_fd_handler(u->slave_fd, NULL, NULL, NULL);
-> +    close(u->slave_fd);
-> +    u->slave_fd =3D -1;
-> +    return;
-> +}
-> +
-> +static int vhost_setup_slave_channel(struct vhost_dev *dev)
-> +{
-> +    VhostUserMsg msg =3D {
-> +        .request =3D VHOST_USER_SET_SLAVE_REQ_FD,
-> +        .flags =3D VHOST_USER_VERSION,
-> +    };
-> +    struct vhost_user *u =3D dev->opaque;
-> +    int sv[2], ret =3D 0;
-> +    bool reply_supported =3D virtio_has_feature(dev->protocol_features=
-,
-> +                                              VHOST_USER_PROTOCOL_F_RE=
-PLY_ACK);
-> +
-> +    if (!virtio_has_feature(dev->protocol_features,
-> +                            VHOST_USER_PROTOCOL_F_SLAVE_REQ)) {
-> +        return 0;
-> +    }
-> +
-> +    if (socketpair(PF_UNIX, SOCK_STREAM, 0, sv) =3D=3D -1) {
-> +        error_report("socketpair() failed");
-> +        return -1;
-> +    }
-> +
-> +    u->slave_fd =3D sv[0];
-> +    qemu_set_fd_handler(u->slave_fd, slave_read, NULL, dev);
-> +
-> +    if (reply_supported) {
-> +        msg.flags |=3D VHOST_USER_NEED_REPLY_MASK;
-> +    }
-> +
-> +    ret =3D vhost_user_write(dev, &msg, &sv[1], 1);
-> +    if (ret) {
-> +        goto out;
-> +    }
-> +
-> +    if (reply_supported) {
-> +        ret =3D process_message_reply(dev, msg);
-> +    }
-> +
-> +out:
-> +    close(sv[1]);
-> +    if (ret) {
-> +        qemu_set_fd_handler(u->slave_fd, NULL, NULL, NULL);
-> +        close(u->slave_fd);
-> +        u->slave_fd =3D -1;
-> +    }
-> +
-> +    return ret;
-> +}
-> +
->  static int vhost_user_init(struct vhost_dev *dev, void *opaque)
->  {
->      uint64_t features;
-> @@ -588,6 +705,7 @@ static int vhost_user_init(struct vhost_dev *dev, v=
-oid *opaque)
-> =20
->      u =3D g_new0(struct vhost_user, 1);
->      u->chr =3D opaque;
-> +    u->slave_fd =3D -1;
->      dev->opaque =3D u;
-> =20
->      err =3D vhost_user_get_features(dev, &features);
-> @@ -628,6 +746,11 @@ static int vhost_user_init(struct vhost_dev *dev, =
-void *opaque)
->                     "VHOST_USER_PROTOCOL_F_LOG_SHMFD feature.");
->      }
-> =20
-> +    err =3D vhost_setup_slave_channel(dev);
-> +    if (err < 0) {
-> +        return err;
-> +    }
-> +
->      return 0;
->  }
-> =20
-> @@ -638,6 +761,10 @@ static int vhost_user_cleanup(struct vhost_dev *de=
-v)
->      assert(dev->vhost_ops->backend_type =3D=3D VHOST_BACKEND_TYPE_USER=
-);
-> =20
->      u =3D dev->opaque;
-> +    if (u->slave_fd >=3D 0) {
-> +        close(u->slave_fd);
-> +        u->slave_fd =3D -1;
-> +    }
->      g_free(u);
->      dev->opaque =3D 0;
-> =20
+> Marc-Andr=E9 Lureau (2):
+>   vhost-user: add vhost_user to hold the chr
+>   vhost-user: add slave-req-fd support
+>=20
+> Maxime Coquelin (4):
+>   vhost: propagate errors in vhost_device_iotlb_miss()
+>   vhost: rework IOTLB messaging
+>   vhost: extend ring information update for IOTLB to all rings
+>   spec/vhost-user spec: Add IOMMU support
+>=20
+>  docs/specs/vhost-user.txt         | 118 ++++++++++++++++++++++++-
+>  hw/virtio/vhost-backend.c         | 130 ++++++++++++++++------------
+>  hw/virtio/vhost-user.c            | 177 ++++++++++++++++++++++++++++++=
++++++++-
+>  hw/virtio/vhost.c                 |  27 ++++--
+>  include/hw/virtio/vhost-backend.h |  23 +++--
+>  include/hw/virtio/vhost.h         |   2 +-
+>  6 files changed, 397 insertions(+), 80 deletions(-)
+>=20
 > --=20
 > 2.9.4
