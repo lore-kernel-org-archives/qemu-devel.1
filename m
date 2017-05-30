@@ -1,21 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59011)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59009)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1dFeWI-0005ps-GU
+	(envelope-from <vsementsov@virtuozzo.com>) id 1dFeWI-0005pp-Ft
 	for qemu-devel@nongnu.org; Tue, 30 May 2017 06:37:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1dFeWH-0001R9-B8
+	(envelope-from <vsementsov@virtuozzo.com>) id 1dFeWH-0001RE-CW
 	for qemu-devel@nongnu.org; Tue, 30 May 2017 06:36:58 -0400
-Received: from mailhub.sw.ru ([195.214.232.25]:39146 helo=relay.sw.ru)
+Received: from mailhub.sw.ru ([195.214.232.25]:14489 helo=relay.sw.ru)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
-	id 1dFeWG-0001Qf-W8
+	id 1dFeWH-0001Qh-1T
 	for qemu-devel@nongnu.org; Tue, 30 May 2017 06:36:57 -0400
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Tue, 30 May 2017 13:36:40 +0300
-Message-Id: <20170530103641.68891-4-vsementsov@virtuozzo.com>
+Date: Tue, 30 May 2017 13:36:38 +0300
+Message-Id: <20170530103641.68891-2-vsementsov@virtuozzo.com>
 In-Reply-To: <20170530103641.68891-1-vsementsov@virtuozzo.com>
 References: <20170530103641.68891-1-vsementsov@virtuozzo.com>
-Subject: [Qemu-devel] [PATCH 3/4] qemu-img check: add format allocation info
+Subject: [Qemu-devel] [PATCH 1/4] block: add bdrv_get_format_alloc_stat
+ format interface
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,103 +28,108 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, qemu-block@nongnu.org
 Cc: eblake@redhat.com, armbru@redhat.com, mreitz@redhat.com, kwolf@redhat.com, vsementsov@virtuozzo.com, den@openvz.org
 
+The function should collect statistics, about allocted/unallocated by
+top-level format driver space (in its .file) and allocation status
+(allocated/hole/after eof) of corresponding areas in this .file.
+
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 ---
- qapi/block-core.json |  6 +++++-
- qemu-img.c           | 36 ++++++++++++++++++++++++++++++++++++
- 2 files changed, 41 insertions(+), 1 deletion(-)
+ block.c                   | 16 ++++++++++++++++
+ include/block/block.h     |  3 +++
+ include/block/block_int.h |  2 ++
+ qapi/block-core.json      | 26 ++++++++++++++++++++++++++
+ 4 files changed, 47 insertions(+)
 
-diff --git a/qapi/block-core.json b/qapi/block-core.json
-index 365070b3eb..3357b61811 100644
---- a/qapi/block-core.json
-+++ b/qapi/block-core.json
-@@ -203,6 +203,9 @@
- #                       field is present if the driver for the image format
- #                       supports it
- #
-+# @format-alloc-info: Format-allocation information, see
-+#                     BlockFormatAllocInfo description. (Since: 2.10)
-+#
- # Since: 1.4
- #
- ##
-@@ -211,7 +214,8 @@
-            '*image-end-offset': 'int', '*corruptions': 'int', '*leaks': 'int',
-            '*corruptions-fixed': 'int', '*leaks-fixed': 'int',
-            '*total-clusters': 'int', '*allocated-clusters': 'int',
--           '*fragmented-clusters': 'int', '*compressed-clusters': 'int' } }
-+           '*fragmented-clusters': 'int', '*compressed-clusters': 'int',
-+           '*format-alloc-info': 'BlockFormatAllocInfo' } }
- 
- ##
- # @MapEntry:
-diff --git a/qemu-img.c b/qemu-img.c
-index b506839ef0..55f8c1776c 100644
---- a/qemu-img.c
-+++ b/qemu-img.c
-@@ -560,6 +560,29 @@ static void dump_json_image_check(ImageCheck *check, bool quiet)
-     QDECREF(str);
+diff --git a/block.c b/block.c
+index 50ba264143..7d720ae0c2 100644
+--- a/block.c
++++ b/block.c
+@@ -3407,6 +3407,22 @@ int64_t bdrv_get_allocated_file_size(BlockDriverState *bs)
  }
  
-+static void dump_human_format_alloc_info(BlockFormatAllocInfo *bfai, bool quiet)
+ /**
++ * Collect format allocation info. See BlockFormatAllocInfo definition in
++ * qapi/block-core.json.
++ */
++int bdrv_get_format_alloc_stat(BlockDriverState *bs, BlockFormatAllocInfo *bfai)
 +{
-+    char *alloc_alloc = size_to_str(bfai->alloc_alloc);
-+    char *alloc_hole = size_to_str(bfai->alloc_hole);
-+    char *alloc_overhead = size_to_str(bfai->alloc_overhead);
-+    char *hole_alloc = size_to_str(bfai->hole_alloc);
-+    char *hole_hole = size_to_str(bfai->hole_hole);
-+
-+    qprintf(quiet,
-+            "Format allocation info (including metadata):\n"
-+            "               file-alloc   file-hole   after-eof\n"
-+            "format-alloc   %10s  %10s  %10s\n"
-+            "format-hole    %10s  %10s\n",
-+            alloc_alloc, alloc_hole, alloc_overhead,
-+            hole_alloc, hole_hole);
-+
-+    g_free(alloc_alloc);
-+    g_free(alloc_hole);
-+    g_free(alloc_overhead);
-+    g_free(hole_alloc);
-+    g_free(hole_hole);
++    BlockDriver *drv = bs->drv;
++    if (!drv) {
++        return -ENOMEDIUM;
++    }
++    if (drv->bdrv_get_format_alloc_stat) {
++        return drv->bdrv_get_format_alloc_stat(bs, bfai);
++    }
++    return -ENOTSUP;
 +}
 +
- static void dump_human_image_check(ImageCheck *check, bool quiet)
- {
-     if (!(check->corruptions || check->leaks || check->check_errors)) {
-@@ -601,6 +624,10 @@ static void dump_human_image_check(ImageCheck *check, bool quiet)
-         qprintf(quiet,
-                 "Image end offset: %" PRId64 "\n", check->image_end_offset);
-     }
++/**
+  * Return number of sectors on success, -errno on error.
+  */
+ int64_t bdrv_nb_sectors(BlockDriverState *bs)
+diff --git a/include/block/block.h b/include/block/block.h
+index 9b355e92d8..646376a772 100644
+--- a/include/block/block.h
++++ b/include/block/block.h
+@@ -335,6 +335,9 @@ typedef enum {
+ 
+ int bdrv_check(BlockDriverState *bs, BdrvCheckResult *res, BdrvCheckMode fix);
+ 
++int bdrv_get_format_alloc_stat(BlockDriverState *bs,
++                               BlockFormatAllocInfo *bfai);
 +
-+    if (check->has_format_alloc_info) {
-+        dump_human_format_alloc_info(check->format_alloc_info, quiet);
-+    }
- }
+ /* The units of offset and total_work_size may be chosen arbitrarily by the
+  * block driver; total_work_size may change during the course of the amendment
+  * operation */
+diff --git a/include/block/block_int.h b/include/block/block_int.h
+index 8d3724cce6..458c715e99 100644
+--- a/include/block/block_int.h
++++ b/include/block/block_int.h
+@@ -208,6 +208,8 @@ struct BlockDriver {
+     int64_t (*bdrv_getlength)(BlockDriverState *bs);
+     bool has_variable_length;
+     int64_t (*bdrv_get_allocated_file_size)(BlockDriverState *bs);
++    int (*bdrv_get_format_alloc_stat)(BlockDriverState *bs,
++                                      BlockFormatAllocInfo *bfai);
  
- static int collect_image_check(BlockDriverState *bs,
-@@ -611,6 +638,7 @@ static int collect_image_check(BlockDriverState *bs,
- {
-     int ret;
-     BdrvCheckResult result;
-+    BlockFormatAllocInfo *bfai = g_new0(BlockFormatAllocInfo, 1);
+     int coroutine_fn (*bdrv_co_pwritev_compressed)(BlockDriverState *bs,
+         uint64_t offset, uint64_t bytes, QEMUIOVector *qiov);
+diff --git a/qapi/block-core.json b/qapi/block-core.json
+index ea0b3e8b13..365070b3eb 100644
+--- a/qapi/block-core.json
++++ b/qapi/block-core.json
+@@ -139,6 +139,32 @@
+            '*format-specific': 'ImageInfoSpecific' } }
  
-     ret = bdrv_check(bs, &result, fix);
-     if (ret < 0) {
-@@ -639,6 +667,14 @@ static int collect_image_check(BlockDriverState *bs,
-     check->compressed_clusters      = result.bfi.compressed_clusters;
-     check->has_compressed_clusters  = result.bfi.compressed_clusters != 0;
- 
-+    ret = bdrv_get_format_alloc_stat(bs, bfai);
-+    if (ret < 0) {
-+        qapi_free_BlockFormatAllocInfo(bfai);
-+    } else {
-+        check->has_format_alloc_info = true;
-+        check->format_alloc_info = bfai;
-+    }
+ ##
++# @BlockFormatAllocInfo:
++#
++# Information about allocations, including metadata. All fields are in bytes.
++#
++# @alloc_alloc: allocated by format driver and allocated in underlying file
++#
++# @alloc_hole: allocated by format driver but actually is a hole in
++#              underlying file
++#
++# @alloc_overhead: allocated by format driver after end of underlying file
++#
++# @hole_alloc: not allocated by format driver but allocated in underlying file
++#
++# @hole_hole: not allocated by format driver hole in underlying file
++#
++# Since: 2.10
++#
++##
++{ 'struct': 'BlockFormatAllocInfo',
++  'data': {'alloc_alloc':    'uint64',
++           'alloc_hole':     'uint64',
++           'alloc_overhead': 'uint64',
++           'hole_alloc':     'uint64',
++           'hole_hole':      'uint64' } }
 +
-     return 0;
- }
- 
++##
+ # @ImageCheck:
+ #
+ # Information about a QEMU image file check
 -- 
 2.11.1
