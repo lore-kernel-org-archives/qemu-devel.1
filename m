@@ -1,28 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39178)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39271)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1dFirZ-0000o5-LK
-	for qemu-devel@nongnu.org; Tue, 30 May 2017 11:15:14 -0400
+	(envelope-from <paolo.bonzini@gmail.com>) id 1dFis5-000140-Ou
+	for qemu-devel@nongnu.org; Tue, 30 May 2017 11:15:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1dFirW-00005M-Gf
-	for qemu-devel@nongnu.org; Tue, 30 May 2017 11:15:13 -0400
-Received: from mailhub.sw.ru ([195.214.232.25]:43642 helo=relay.sw.ru)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
-	id 1dFirW-0008U1-16
-	for qemu-devel@nongnu.org; Tue, 30 May 2017 11:15:10 -0400
-References: <20170530143052.165002-1-vsementsov@virtuozzo.com>
-	<20170530143052.165002-12-vsementsov@virtuozzo.com>
-	<20170530150422.GR21566@redhat.com>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <e5f7afa3-c05d-b11c-d02e-5a5b2cb01603@virtuozzo.com>
-Date: Tue, 30 May 2017 18:15:07 +0300
+	(envelope-from <paolo.bonzini@gmail.com>) id 1dFis2-0000Be-Lt
+	for qemu-devel@nongnu.org; Tue, 30 May 2017 11:15:45 -0400
+Received: from mail-wm0-x22f.google.com ([2a00:1450:400c:c09::22f]:37893)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
+	id 1dFis2-0000BI-Fb
+	for qemu-devel@nongnu.org; Tue, 30 May 2017 11:15:42 -0400
+Received: by mail-wm0-x22f.google.com with SMTP id e127so103622930wmg.1
+	for <qemu-devel@nongnu.org>; Tue, 30 May 2017 08:15:42 -0700 (PDT)
+Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
+References: <1495775808-10396-1-git-send-email-ann.zhuangyanying@huawei.com>
+	<20170530133605.GA18926@potion>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <48bd9449-cb91-c585-49b6-e90e7a696297@redhat.com>
+Date: Tue, 30 May 2017 17:15:39 +0200
 MIME-Version: 1.0
-In-Reply-To: <20170530150422.GR21566@redhat.com>
+In-Reply-To: <20170530133605.GA18926@potion>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 11/19] io/channel-socket:
- qio_channel_socket_writev handle EPIPE
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v3] KVM: x86: Fix nmi injection failure
+ when vcpu got blocked
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,68 +33,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>
-Cc: qemu-devel@nongnu.org, pbonzini@redhat.com, den@openvz.org
-
-30.05.2017 18:04, Daniel P. Berrange wrote:
-> On Tue, May 30, 2017 at 05:30:44PM +0300, Vladimir Sementsov-Ogievskiy wrote:
->> Return QIO_CHANNEL_ERR_EPIPE on EPIPE, we will need it to improve error
->> path in nbd server.
->>
->> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
->> ---
->>   include/io/channel.h | 1 +
->>   io/channel-socket.c  | 2 +-
->>   2 files changed, 2 insertions(+), 1 deletion(-)
->>
->> diff --git a/include/io/channel.h b/include/io/channel.h
->> index 5d48906998..5529c2da31 100644
->> --- a/include/io/channel.h
->> +++ b/include/io/channel.h
->> @@ -38,6 +38,7 @@ typedef struct QIOChannel QIOChannel;
->>   typedef struct QIOChannelClass QIOChannelClass;
->>   
->>   #define QIO_CHANNEL_ERR_BLOCK -2
->> +#define QIO_CHANNEL_ERR_EPIPE -3
->>   
->>   typedef enum QIOChannelFeature QIOChannelFeature;
->>   
->> diff --git a/io/channel-socket.c b/io/channel-socket.c
->> index 53386b7ba3..50f9f966c6 100644
->> --- a/io/channel-socket.c
->> +++ b/io/channel-socket.c
->> @@ -542,7 +542,7 @@ static ssize_t qio_channel_socket_writev(QIOChannel *ioc,
->>           }
->>           error_setg_errno(errp, errno,
->>                            "Unable to write to socket");
->> -        return -1;
->> +        return errno == EPIPE ? QIO_CHANNEL_ERR_EPIPE : -1;
->>       }
->>       return ret;
-> Ewwww, no. We don't want to go down the road of special casing
-> further errno values for every error scenario.
-
-I need to distinguish client socket closed without reading nbd server 
-reply from other errors, because this is a valid behavior accordingly to 
-the protocol.
-Any way to do this? Hmm, I can examine the contents of errp, of course, 
-but I'm afraid it would be even less appropriate. This is funny: user 
-has this information in errp message, but the code - doesn't..
-
-Alternatively:
-1. not report errors on sending reply after OPT_ABORT at all
-2. report all errors, (including this EPIPE, which actually is not a 
-failure)
-
-Paolo, what do you think?
-
-(current behavior is (1))
-
->
-> Regards,
-> Daniel
+To: =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>, Zhuangyanying <ann.zhuangyanying@huawei.com>
+Cc: herongguang.he@huawei.com, qemu-devel@nongnu.org, arei.gonglei@huawei.com, oscar.zhangbo@huawei.com, kvm@vger.kernel.org
 
 
--- 
-Best regards,
-Vladimir
+
+On 30/05/2017 15:36, Radim Krčmář wrote:
+>> -	if (atomic_read(&vcpu->arch.nmi_queued))
+>> +	if (kvm_test_request(KVM_REQ_NMI, vcpu) ||
+>> +	    (vcpu->arch.nmi_pending &&
+> I think the logic should be
+> 
+>   	if ((kvm_test_request(KVM_REQ_NMI, vcpu) || vcpu->arch.nmi_pending) &&
+>   			kvm_x86_ops->nmi_allowed(vcpu))
+> 
+> because there is no reason to resume the VCPU if we cannot inject.
+
+KVM_REQ_NMI would be processed anyway, and would clear nmi_queued.  Of
+course, it would very soon go back to sleep.  Even before Yanying's
+patch, nmi_queued > 0 would have woken up the vCPU in this manner.  So
+I'm applying the patch.  Thanks!
+
+Paolo
