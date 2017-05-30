@@ -1,31 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57543)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38524)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dFkyq-0005hD-Ad
-	for qemu-devel@nongnu.org; Tue, 30 May 2017 13:30:53 -0400
+	(envelope-from <no-reply@patchew.org>) id 1dFlZ5-0003Wg-VD
+	for qemu-devel@nongnu.org; Tue, 30 May 2017 14:08:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dFkyj-0008Jp-VJ
-	for qemu-devel@nongnu.org; Tue, 30 May 2017 13:30:52 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:56080)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dFkyj-0008HX-PB
-	for qemu-devel@nongnu.org; Tue, 30 May 2017 13:30:45 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 72673C05972F
-	for <qemu-devel@nongnu.org>; Tue, 30 May 2017 17:30:44 +0000 (UTC)
-Date: Tue, 30 May 2017 18:30:39 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170530173038.GM2120@work-vm>
-References: <20170530083705.15141-1-quintela@redhat.com>
-	<20170530083705.15141-2-quintela@redhat.com>
+	(envelope-from <no-reply@patchew.org>) id 1dFlZ4-0001Hb-UK
+	for qemu-devel@nongnu.org; Tue, 30 May 2017 14:08:19 -0400
+Resent-Message-Id: <E1dFlZ4-0001Hb-UK@eggs.gnu.org>
+Reply-To: <qemu-devel@nongnu.org>
+In-Reply-To: <1496161442-96665-1-git-send-email-imammedo@redhat.com>
+Message-ID: <149616767669.206.10154808044371479020@f98a8425f76e>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170530083705.15141-2-quintela@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 1/3] migration: Use savevm_handlers
- instead of loadvm copy
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Tue, 30 May 2017 11:07:57 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PATCH v3 0/7] numa: code consolidation and fixes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,56 +23,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Juan Quintela <quintela@redhat.com>
-Cc: qemu-devel@nongnu.org, lvivier@redhat.com, peterx@redhat.com
+To: imammedo@redhat.com
+Cc: famz@redhat.com, qemu-devel@nongnu.org, drjones@redhat.com, qemu-arm@nongnu.org, qemu-ppc@nongnu.org, ehabkost@redhat.com, david@gibson.dropbear.id.au
 
-* Juan Quintela (quintela@redhat.com) wrote:
-> There is no reason for having the loadvm_handlers at all.  There is
-> only one use, and we can use the savevm handlers.
-> 
-> We will remove the loadvm handlers on a following patch.
-
-<snip>
-
->      trace_qemu_loadvm_state_section_partend(section_id);
-> -    QLIST_FOREACH(le, &mis->loadvm_handlers, entry) {
-> -        if (le->section_id == section_id) {
-> +    QTAILQ_FOREACH(se, &savevm_state.handlers, entry) {
-> +        if (se->section_id == section_id) {
-
-Isn't this the problem?  What guarantees that the se->section_id
-is the same as the source's section_id - I don't think anything.
-It's just dynamically allocated in register_savevm_live so the
-initialisation order on source/dest could be different and you'd
-get different ID.  You can't update se->section_id
-unless you guaranteed to updated all of them.
-
-Dave
-
->              break;
->          }
->      }
-> -    if (le == NULL) {
-> +    if (se == NULL) {
->          error_report("Unknown savevm section %d", section_id);
->          return -EINVAL;
->      }
->  
-> -    ret = vmstate_load(f, le->se, le->version_id);
-> +    ret = vmstate_load(f, se, se->load_version_id);
->      if (ret < 0) {
->          error_report("error while loading state section id %d(%s)",
-> -                     section_id, le->se->idstr);
-> +                     section_id, se->idstr);
->          return ret;
->      }
-> -    if (!check_section_footer(f, le)) {
-> +    if (!check_section_footer(f, se)) {
->          return -EINVAL;
->      }
->  
-> -- 
-> 2.9.4
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKTWVzc2FnZS1pZDogMTQ5
+NjE2MTQ0Mi05NjY2NS0xLWdpdC1zZW5kLWVtYWlsLWltYW1tZWRvQHJlZGhhdC5jb20KU3ViamVj
+dDogW1FlbXUtZGV2ZWxdIFtQQVRDSCB2MyAwLzddIG51bWE6IGNvZGUgY29uc29saWRhdGlvbiBh
+bmQgZml4ZXMKVHlwZTogc2VyaWVzCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9i
+YXNoCgpCQVNFPWJhc2UKbj0xCnRvdGFsPSQoZ2l0IGxvZyAtLW9uZWxpbmUgJEJBU0UuLiB8IHdj
+IC1sKQpmYWlsZWQ9MAoKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQg
+Y29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKCmNvbW1pdHM9IiQoZ2l0IGxvZyAtLWZv
+cm1hdD0lSCAtLXJldmVyc2UgJEJBU0UuLikiCmZvciBjIGluICRjb21taXRzOyBkbwogICAgZWNo
+byAiQ2hlY2tpbmcgUEFUQ0ggJG4vJHRvdGFsOiAkKGdpdCBsb2cgLW4gMSAtLWZvcm1hdD0lcyAk
+YykuLi4iCiAgICBpZiAhIGdpdCBzaG93ICRjIC0tZm9ybWF0PWVtYWlsIHwgLi9zY3JpcHRzL2No
+ZWNrcGF0Y2gucGwgLS1tYWlsYmFjayAtOyB0aGVuCiAgICAgICAgZmFpbGVkPTEKICAgICAgICBl
+Y2hvCiAgICBmaQogICAgbj0kKChuKzEpKQpkb25lCgpleGl0ICRmYWlsZWQKPT09IFRFU1QgU0NS
+SVBUIEVORCA9PT0KClVwZGF0aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3
+MTMzODQKU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0Jwo5MTM2YTk3IG51bWE6IGNwdTog
+Y2FsY3VsYXRlL3NldCBkZWZhdWx0IG5vZGUtaWRzIGFmdGVyIGFsbCAtbnVtYSBDTEkgb3B0aW9u
+cyBhcmUgcGFyc2VkCjRkNzU1NzQgc3BhcHI6IGNsZWFudXAgc3BhcHJfZml4dXBfY3B1X251bWFf
+ZHQoKSB1c2FnZQpiOTQ2ODQ1IG51bWE6IG1vdmUgbnVtYV9ub2RlIGZyb20gQ1BVU3RhdGUgaW50
+byB0YXJnZXQgc3BlY2lmaWMgY2xhc3Nlcwo2MDkzNDdlIG51bWE6IG1ha2UgaG1wICdpbmZvIG51
+bWEnIGZldGNoIG51bWEgbm9kZXMgZnJvbSBxbXBfcXVlcnlfY3B1cygpIHJlc3VsdAo5ZDJiNTk3
+IG51bWE6IG1ha2Ugc3VyZSB0aGF0IGFsbCBjcHVzIGhhdmUgaGFzX25vZGVfaWQgc2V0IGlmIG51
+bWEgaXMgZW5hYmxlZApjMGQxYWFkIG51bWE6IG1vdmUgZGVmYXVsdCBtYXBwaW5nIGluaXQgdG8g
+bWFjaGluZQo2YzZhZmJmIG51bWE6IGNvbnNvbGlkYXRlIGNwdV9wcmVwbHVnIGZpeHVwcy9jaGVj
+a3MgZm9yIHBjL2FybS9zcGFwcgoKPT09IE9VVFBVVCBCRUdJTiA9PT0KQ2hlY2tpbmcgUEFUQ0gg
+MS83OiBudW1hOiBjb25zb2xpZGF0ZSBjcHVfcHJlcGx1ZyBmaXh1cHMvY2hlY2tzIGZvciBwYy9h
+cm0vc3BhcHIuLi4KRVJST1I6IHN1c3BlY3QgY29kZSBpbmRlbnQgZm9yIGNvbmRpdGlvbmFsIHN0
+YXRlbWVudHMgKDQsIDkpCiMxNDQ6IEZJTEU6IG51bWEuYzo1NDY6CisgICAgaWYgKCFzbG90LT5w
+cm9wcy5oYXNfbm9kZV9pZCkgeworICAgICAgICAgbWFwcGVkX25vZGVfaWQgPSAwOwoKdG90YWw6
+IDEgZXJyb3JzLCAwIHdhcm5pbmdzLCAxMjMgbGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMg
+c3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFy
+ZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVD
+S1BBVENIIGluIE1BSU5UQUlORVJTLgoKQ2hlY2tpbmcgUEFUQ0ggMi83OiBudW1hOiBtb3ZlIGRl
+ZmF1bHQgbWFwcGluZyBpbml0IHRvIG1hY2hpbmUuLi4KQ2hlY2tpbmcgUEFUQ0ggMy83OiBudW1h
+OiBtYWtlIHN1cmUgdGhhdCBhbGwgY3B1cyBoYXZlIGhhc19ub2RlX2lkIHNldCBpZiBudW1hIGlz
+IGVuYWJsZWQuLi4KQ2hlY2tpbmcgUEFUQ0ggNC83OiBudW1hOiBtYWtlIGhtcCAnaW5mbyBudW1h
+JyBmZXRjaCBudW1hIG5vZGVzIGZyb20gcW1wX3F1ZXJ5X2NwdXMoKSByZXN1bHQuLi4KQ2hlY2tp
+bmcgUEFUQ0ggNS83OiBudW1hOiBtb3ZlIG51bWFfbm9kZSBmcm9tIENQVVN0YXRlIGludG8gdGFy
+Z2V0IHNwZWNpZmljIGNsYXNzZXMuLi4KQ2hlY2tpbmcgUEFUQ0ggNi83OiBzcGFwcjogY2xlYW51
+cCBzcGFwcl9maXh1cF9jcHVfbnVtYV9kdCgpIHVzYWdlLi4uCkNoZWNraW5nIFBBVENIIDcvNzog
+bnVtYTogY3B1OiBjYWxjdWxhdGUvc2V0IGRlZmF1bHQgbm9kZS1pZHMgYWZ0ZXIgYWxsIC1udW1h
+IENMSSBvcHRpb25zIGFyZSBwYXJzZWQuLi4KPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1h
+bmQgZXhpdGVkIHdpdGggY29kZTogMQoKCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxs
+eSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVk
+YmFjayB0byBwYXRjaGV3LWRldmVsQGZyZWVsaXN0cy5vcmc=
