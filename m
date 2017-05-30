@@ -1,29 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58397)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58404)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aurelien@aurel32.net>) id 1dFmlT-0002VT-Kq
-	for qemu-devel@nongnu.org; Tue, 30 May 2017 15:25:12 -0400
+	(envelope-from <deller@gmx.de>) id 1dFmlW-0002Z1-4F
+	for qemu-devel@nongnu.org; Tue, 30 May 2017 15:25:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aurelien@aurel32.net>) id 1dFmlS-0002J4-No
-	for qemu-devel@nongnu.org; Tue, 30 May 2017 15:25:11 -0400
-Received: from hall.aurel32.net ([2001:bc8:30d7:100::1]:52356)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <aurelien@aurel32.net>)
-	id 1dFmlS-0002Ia-I4
+	(envelope-from <deller@gmx.de>) id 1dFmlS-0002Ih-6H
+	for qemu-devel@nongnu.org; Tue, 30 May 2017 15:25:14 -0400
+Received: from mout.gmx.net ([212.227.15.15]:51302)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <deller@gmx.de>) id 1dFmlR-0002Fs-SQ
 	for qemu-devel@nongnu.org; Tue, 30 May 2017 15:25:10 -0400
-Date: Tue, 30 May 2017 21:25:07 +0200
-From: Aurelien Jarno <aurelien@aurel32.net>
-Message-ID: <20170530192507.y77widdbdw3q6p3b@aurel32.net>
-References: <20170525210508.4910-1-aurelien@aurel32.net>
-	<20170525210508.4910-26-aurelien@aurel32.net>
-	<c643c6b9-20fb-af8f-2e2f-9a8b6e4c1159@twiddle.net>
-	<20170529111718.zmwzwy24fk5mhwgl@aurel32.net>
-	<f6104ef5-f9cc-fc1f-553c-d6247cb78dff@twiddle.net>
+References: <20170311175019.GA7195@ls3530.fritz.box>
+	<b4ca5292-bee3-1e3b-13ba-7dd6c1f00f8a@twiddle.net>
+	<20170519135905.GA19553@kos.to>
+From: Helge Deller <deller@gmx.de>
+Message-ID: <b9c75e27-1694-5aae-7eb7-30074e6c8b4b@gmx.de>
+Date: Tue, 30 May 2017 21:24:52 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <f6104ef5-f9cc-fc1f-553c-d6247cb78dff@twiddle.net>
-Subject: Re: [Qemu-devel] [PATCH 25/26] target/s390x: implement TRANSLATE
- ONE/TWO TO ONE/TWO
+In-Reply-To: <20170519135905.GA19553@kos.to>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] linux-user: Fix TARGET_MAP* and
+ TARGET_F_??LCK for hppa arch
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,52 +29,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <rth@twiddle.net>
-Cc: qemu-devel@nongnu.org, Alexander Graf <agraf@suse.de>
+To: Riku Voipio <riku.voipio@iki.fi>, Richard Henderson <rth@twiddle.net>
+Cc: qemu-devel@nongnu.org
 
-On 2017-05-30 09:45, Richard Henderson wrote:
-> On 05/29/2017 04:17 AM, Aurelien Jarno wrote:
-> > On 2017-05-26 10:10, Richard Henderson wrote:
-> > > On 05/25/2017 02:05 PM, Aurelien Jarno wrote:
-> > > > +uint32_t HELPER(trXX)(CPUS390XState *env, uint32_t r1, uint32_t r2,
-> > > > +                      uint32_t sizes)
-> > > > +{
-> > > > +    uintptr_t ra = GETPC();
-> > > > +    int dsize = (sizes & 1) ? 1 : 2;
-> > > > +    int ssize = (sizes & 2) ? 1 : 2;
-> > > > +    uint16_t tst = env->regs[0] & ((1 << (8 * dsize)) - 1);
-> > > 
-> > > I think you should pass in tst as an argument.  That way you can pass in an
-> > > out-of-band value when we implement ETF2 and test field M3 bit 3.
-> > 
-> > I don't mind passing r0 as an argument. That said if we want to pass tst
-> > or bundle the M3 field, it means we need to use TCG instructions to do
-> > so. I am not sure it brings a lot compare to doing so in the helper
-> > side.
+On 19.05.2017 15:59, Riku Voipio wrote:
+> On Sun, Mar 12, 2017 at 08:17:46AM +1000, Richard Henderson wrote:
+>> On 03/12/2017 03:50 AM, Helge Deller wrote:
+>>> TARGET_MAP_TYPE needs to be 0x03 instead of 0x0f on the hppa
+>>> architecture, otherwise it conflicts with MAP_FIXED which is 0x04.
+>>>
+>>> Add missing TARGET_MAP_STACK and TARGET_MAP_HUGETLB values.
+>>>
+>>> Fix TARGET_F_RDLCK, TARGET_F_WRLCK and TARGET_F_UNLCK.
+>>>
+>>> Signed-off-by: Helge Deller <deller@gmx.de>
+>>
+>> I applied the MAP_FIXED and TARGET_F_* parts separately in my tree.  I'd
+>> like to see what others think about the other MAP_* defines before including
+>> that.
 > 
-> Not at all -- the M3 bit test would be a translation-time check.
+> What's the current state of these patches? Are these patches still waiting for
+> opinions?
 
-I still don't really see the point. On the TCG side it means we need
-something like that:
+It would be nice to get them included (if it hasn't happened yet).
 
-    if (m3 & 1) {
-       tcg_gen_movi_tl(r0, -1);
-    } else if (dsize == 1) {
-       tcg_gen_ext8u(r0, regs[0]);
-    } else if (dsize == 2) 
-       tcg_gen_ext16u(r0, regs[0]);
-    }
-
-On the helper side we then need to check if the value passed equals -1
-or not to get m3 instead of directly accessing the value in register 0.
-If we want to bundle m3 with something else, it might be better to bundle
-it with the "sizes" argument.
-
-If what worries you is the cast of tst to uint8_t / uint16_t as function
-of dsize in the helper, we can rename trXX into an inline function
-do_trXX and use one helper per instruction instead of a common helper
-for the 3 instructions.
-
--- 
-Aurelien Jarno                          GPG: 4096R/1DDD8C9B
-aurelien@aurel32.net                 http://www.aurel32.net
+Helge
