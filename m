@@ -1,14 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60910)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60938)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1dFjwN-0005rC-6u
-	for qemu-devel@nongnu.org; Tue, 30 May 2017 12:24:16 -0400
+	(envelope-from <imammedo@redhat.com>) id 1dFjwO-0005t0-RX
+	for qemu-devel@nongnu.org; Tue, 30 May 2017 12:24:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1dFjwM-000554-2M
-	for qemu-devel@nongnu.org; Tue, 30 May 2017 12:24:15 -0400
+	(envelope-from <imammedo@redhat.com>) id 1dFjwN-00055t-NV
+	for qemu-devel@nongnu.org; Tue, 30 May 2017 12:24:16 -0400
 From: Igor Mammedov <imammedo@redhat.com>
-Date: Tue, 30 May 2017 18:23:55 +0200
-Message-Id: <1496161442-96665-1-git-send-email-imammedo@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 0/7] numa: code consolidation and fixes
+Date: Tue, 30 May 2017 18:23:57 +0200
+Message-Id: <1496161442-96665-3-git-send-email-imammedo@redhat.com>
+In-Reply-To: <1496161442-96665-1-git-send-email-imammedo@redhat.com>
+References: <1496161442-96665-1-git-send-email-imammedo@redhat.com>
+Subject: [Qemu-devel] [PATCH v3 2/7] numa: move default mapping init to
+ machine
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,65 +23,131 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-arm@nongnu.org, qemu-ppc@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Andrew Jones <drjones@redhat.com>
 
-changelog since v2:
-  (Eduardo)
-     - keep original logic in when moving numa part into helper
-        numa: consolidate cpu_preplug fixups/checks for pc/arm/spapr
-     - drop "numa: fallback to default NUMA node instead of node 0"
-     - split out monitor hunk into separate patch
-     - split out spapr_fixup_cpu_numa_dt refactoring into separate patch
-     - add extra patch to make default node-id calculation more robust
-changelog since v1:
-  (Eduardo)
-     - user error_abort in numa_cpu_pre_plug()
-     - make default_mapping boolean
-     - redo default mapping detection loop as a combo of for/if
-     - return back lost TODO comment
-     - new patch removing numa_node from generic CPUState
-  - drop silence test patch as it's already in pull req on list
-  - new patch [3/5] to fix missing _PXM/fdt nodes for implicitly mapped CPUs
-  - new patch dropping fallback to node 0
+there is no need use cpu_index_to_instance_props() for setting
+default cpu -> node mapping. Generic machine code can do it
+without cpu_index by just enabling already preset defaults
+in possible_cpus.
 
+PS:
+as bonus it makes one less user of cpu_index_to_instance_props()
 
-git repo for testing:
-   https://github.com/imammedo/qemu.git cphp_numa_cfg_follow_up_v3_cleanups_v3
+Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+---
+v2:
+  - make default_mapping boolean, Eduardo Habkost <ehabkost@redhat.com>
+  - redo default mapping detection loop as a combo of
+    for/if, Eduardo Habkost <ehabkost@redhat.com>
+  - return back lost TODO comment, Eduardo Habkost <ehabkost@redhat.com>
+---
+ hw/core/machine.c | 33 +++++++++++++++++++++++----------
+ numa.c            | 26 --------------------------
+ 2 files changed, 23 insertions(+), 36 deletions(-)
 
-CC: qemu-arm@nongnu.org
-CC: qemu-ppc@nongnu.org
-CC: Eduardo Habkost <ehabkost@redhat.com>
-CC: David Gibson <david@gibson.dropbear.id.au>
-CC: Andrew Jones <drjones@redhat.com>
-
-
-Igor Mammedov (7):
-  numa: consolidate cpu_preplug fixups/checks for pc/arm/spapr
-  numa: move default mapping init to machine
-  numa: make sure that all cpus have has_node_id set if numa is enabled
-  numa: make hmp 'info numa' fetch numa nodes from qmp_query_cpus()
-    result
-  numa: move numa_node from CPUState into target specific classes
-  spapr: cleanup spapr_fixup_cpu_numa_dt() usage
-  numa: cpu: calculate/set default node-ids after all -numa CLI options
-    are parsed
-
- include/hw/boards.h      |  3 +++
- include/qom/cpu.h        |  2 --
- include/sysemu/numa.h    | 10 +++++++++
- target/arm/cpu.h         |  2 ++
- target/i386/cpu.h        |  1 +
- target/ppc/cpu.h         |  1 +
- hw/arm/virt-acpi-build.c |  4 +---
- hw/arm/virt.c            | 32 +++++++++------------------
- hw/core/machine.c        | 38 +++++++++++++++++++++++---------
- hw/i386/acpi-build.c     |  3 +--
- hw/i386/pc.c             | 42 ++++++++++++-----------------------
- hw/ppc/spapr.c           | 57 ++++++++++++++++--------------------------------
- hw/ppc/spapr_cpu_core.c  |  4 +++-
- monitor.c                | 11 ++++++----
- numa.c                   | 43 +++++++++++++++---------------------
- target/arm/cpu.c         |  2 +-
- target/i386/cpu.c        |  2 +-
- 17 files changed, 119 insertions(+), 138 deletions(-)
-
+diff --git a/hw/core/machine.c b/hw/core/machine.c
+index fd6a436..aaf3cff 100644
+--- a/hw/core/machine.c
++++ b/hw/core/machine.c
+@@ -700,26 +700,39 @@ static char *cpu_slot_to_string(const CPUArchId *cpu)
+     return g_string_free(s, false);
+ }
+ 
+-static void machine_numa_validate(MachineState *machine)
++static void machine_numa_finish_init(MachineState *machine)
+ {
+     int i;
++    bool default_mapping;
+     GString *s = g_string_new(NULL);
+     MachineClass *mc = MACHINE_GET_CLASS(machine);
+     const CPUArchIdList *possible_cpus = mc->possible_cpu_arch_ids(machine);
+ 
+     assert(nb_numa_nodes);
+     for (i = 0; i < possible_cpus->len; i++) {
++        if (possible_cpus->cpus[i].props.has_node_id) {
++            break;
++        }
++    }
++    default_mapping = (i == possible_cpus->len);
++
++    for (i = 0; i < possible_cpus->len; i++) {
+         const CPUArchId *cpu_slot = &possible_cpus->cpus[i];
+ 
+-        /* at this point numa mappings are initilized by CLI options
+-         * or with default mappings so it's sufficient to list
+-         * all not yet mapped CPUs here */
+-        /* TODO: make it hard error in future */
+         if (!cpu_slot->props.has_node_id) {
+-            char *cpu_str = cpu_slot_to_string(cpu_slot);
+-            g_string_append_printf(s, "%sCPU %d [%s]", s->len ? ", " : "", i,
+-                                   cpu_str);
+-            g_free(cpu_str);
++            if (default_mapping) {
++                /* fetch default mapping from board and enable it */
++                CpuInstanceProperties props = cpu_slot->props;
++                props.has_node_id = true;
++                machine_set_cpu_numa_node(machine, &props, &error_fatal);
++            } else {
++                /* record slots with not set mapping,
++                 * TODO: make it hard error in future */
++                char *cpu_str = cpu_slot_to_string(cpu_slot);
++                g_string_append_printf(s, "%sCPU %d [%s]",
++                                       s->len ? ", " : "", i, cpu_str);
++                g_free(cpu_str);
++            }
+         }
+     }
+     if (s->len) {
+@@ -737,7 +750,7 @@ void machine_run_board_init(MachineState *machine)
+     MachineClass *machine_class = MACHINE_GET_CLASS(machine);
+ 
+     if (nb_numa_nodes) {
+-        machine_numa_validate(machine);
++        machine_numa_finish_init(machine);
+     }
+     machine_class->init(machine);
+ }
+diff --git a/numa.c b/numa.c
+index 19fd1e0..45ad70a 100644
+--- a/numa.c
++++ b/numa.c
+@@ -427,7 +427,6 @@ void numa_default_auto_assign_ram(MachineClass *mc, NodeInfo *nodes,
+ void parse_numa_opts(MachineState *ms)
+ {
+     int i;
+-    const CPUArchIdList *possible_cpus;
+     MachineClass *mc = MACHINE_GET_CLASS(ms);
+ 
+     if (qemu_opts_foreach(qemu_find_opts("numa"), parse_numa, ms, NULL)) {
+@@ -485,31 +484,6 @@ void parse_numa_opts(MachineState *ms)
+ 
+         numa_set_mem_ranges();
+ 
+-        /* assign CPUs to nodes using board provided default mapping */
+-        if (!mc->cpu_index_to_instance_props || !mc->possible_cpu_arch_ids) {
+-            error_report("default CPUs to NUMA node mapping isn't supported");
+-            exit(1);
+-        }
+-
+-        possible_cpus = mc->possible_cpu_arch_ids(ms);
+-        for (i = 0; i < possible_cpus->len; i++) {
+-            if (possible_cpus->cpus[i].props.has_node_id) {
+-                break;
+-            }
+-        }
+-
+-        /* no CPUs are assigned to NUMA nodes */
+-        if (i == possible_cpus->len) {
+-            for (i = 0; i < max_cpus; i++) {
+-                CpuInstanceProperties props;
+-                /* fetch default mapping from board and enable it */
+-                props = mc->cpu_index_to_instance_props(ms, i);
+-                props.has_node_id = true;
+-
+-                machine_set_cpu_numa_node(ms, &props, &error_fatal);
+-            }
+-        }
+-
+         /* QEMU needs at least all unique node pair distances to build
+          * the whole NUMA distance table. QEMU treats the distance table
+          * as symmetric by default, i.e. distance A->B == distance B->A.
 -- 
 2.7.4
