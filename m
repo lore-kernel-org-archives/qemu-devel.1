@@ -1,21 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54295)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54320)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1dFiAp-0005Q8-1O
-	for qemu-devel@nongnu.org; Tue, 30 May 2017 10:31:09 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1dFiAp-0005Qc-F2
+	for qemu-devel@nongnu.org; Tue, 30 May 2017 10:31:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1dFiAm-0000Q3-Pl
-	for qemu-devel@nongnu.org; Tue, 30 May 2017 10:31:02 -0400
-Received: from mailhub.sw.ru ([195.214.232.25]:33734 helo=relay.sw.ru)
+	(envelope-from <vsementsov@virtuozzo.com>) id 1dFiAn-0000QP-0B
+	for qemu-devel@nongnu.org; Tue, 30 May 2017 10:31:03 -0400
+Received: from mailhub.sw.ru ([195.214.232.25]:3338 helo=relay.sw.ru)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
-	id 1dFiAl-0000NI-Uv
+	id 1dFiAl-0000N8-TB
 	for qemu-devel@nongnu.org; Tue, 30 May 2017 10:31:00 -0400
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Tue, 30 May 2017 17:30:39 +0300
-Message-Id: <20170530143052.165002-7-vsementsov@virtuozzo.com>
+Date: Tue, 30 May 2017 17:30:34 +0300
+Message-Id: <20170530143052.165002-2-vsementsov@virtuozzo.com>
 In-Reply-To: <20170530143052.165002-1-vsementsov@virtuozzo.com>
 References: <20170530143052.165002-1-vsementsov@virtuozzo.com>
-Subject: [Qemu-devel] [PATCH 06/19] nbd/server: remove NBDClientNewData
+Subject: [Qemu-devel] [PATCH 01/19] nbd/server: get rid of
+ nbd_negotiate_read and friends
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,82 +28,349 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: pbonzini@redhat.com, berrange@redhat.com, den@openvz.org, vsementsov@virtuozzo.com
 
-"co" field of NBDClientNewData is unused, so let's just use client
-pointer instead of extra structure.
+Functions nbd_negotiate_{read,write,drop_sync} were introduced in
+1a6245a5b, when nbd_wr_syncv was working through qemu_co_sendv_recvv,
+which just yields, without setting any handlers. But now, nbd_wr_syncv
+works through qio_channel_yield() which sets handlers, so watchers
+are redundant in nbd_negotiate_{read,write,drop_sync}, then, let's just
+use {read,write,drop}_sync functions.
 
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 ---
- nbd/server.c | 25 +++++++------------------
- 1 file changed, 7 insertions(+), 18 deletions(-)
+ nbd/client.c       |  26 -------------
+ nbd/common.c       |  26 +++++++++++++
+ nbd/nbd-internal.h |   2 +
+ nbd/server.c       | 107 +++++++++++------------------------------------------
+ 4 files changed, 50 insertions(+), 111 deletions(-)
 
+diff --git a/nbd/client.c b/nbd/client.c
+index f9e1d75be4..3d15596120 100644
+--- a/nbd/client.c
++++ b/nbd/client.c
+@@ -86,32 +86,6 @@ static QTAILQ_HEAD(, NBDExport) exports = QTAILQ_HEAD_INITIALIZER(exports);
+ 
+ */
+ 
+-/* Discard length bytes from channel.  Return -errno on failure and 0 on
+- * success*/
+-static int drop_sync(QIOChannel *ioc, size_t size, Error **errp)
+-{
+-    ssize_t ret = 0;
+-    char small[1024];
+-    char *buffer;
+-
+-    buffer = sizeof(small) >= size ? small : g_malloc(MIN(65536, size));
+-    while (size > 0) {
+-        ssize_t count = MIN(65536, size);
+-        ret = read_sync(ioc, buffer, MIN(65536, size), errp);
+-
+-        if (ret < 0) {
+-            goto cleanup;
+-        }
+-        size -= count;
+-    }
+-
+- cleanup:
+-    if (buffer != small) {
+-        g_free(buffer);
+-    }
+-    return ret;
+-}
+-
+ /* Send an option request.
+  *
+  * The request is for option @opt, with @data containing @len bytes of
+diff --git a/nbd/common.c b/nbd/common.c
+index bd81637ab9..e520aae741 100644
+--- a/nbd/common.c
++++ b/nbd/common.c
+@@ -69,6 +69,32 @@ ssize_t nbd_wr_syncv(QIOChannel *ioc,
+     return done;
+ }
+ 
++/* Discard length bytes from channel.  Return -errno on failure and 0 on
++ * success*/
++int drop_sync(QIOChannel *ioc, size_t size, Error **errp)
++{
++    ssize_t ret = 0;
++    char small[1024];
++    char *buffer;
++
++    buffer = sizeof(small) >= size ? small : g_malloc(MIN(65536, size));
++    while (size > 0) {
++        ssize_t count = MIN(65536, size);
++        ret = read_sync(ioc, buffer, MIN(65536, size), errp);
++
++        if (ret < 0) {
++            goto cleanup;
++        }
++        size -= count;
++    }
++
++ cleanup:
++    if (buffer != small) {
++        g_free(buffer);
++    }
++    return ret;
++}
++
+ 
+ void nbd_tls_handshake(QIOTask *task,
+                        void *opaque)
+diff --git a/nbd/nbd-internal.h b/nbd/nbd-internal.h
+index d6071640a0..01d5778679 100644
+--- a/nbd/nbd-internal.h
++++ b/nbd/nbd-internal.h
+@@ -153,4 +153,6 @@ struct NBDTLSHandshakeData {
+ void nbd_tls_handshake(QIOTask *task,
+                        void *opaque);
+ 
++int drop_sync(QIOChannel *ioc, size_t size, Error **errp);
++
+ #endif
 diff --git a/nbd/server.c b/nbd/server.c
-index 546bf3ae61..3d4cd3d21c 100644
+index ee59e5d234..26096f14e1 100644
 --- a/nbd/server.c
 +++ b/nbd/server.c
-@@ -535,14 +535,8 @@ static int nbd_negotiate_options(NBDClient *client)
-     }
- }
+@@ -104,69 +104,6 @@ struct NBDClient {
  
--typedef struct {
--    NBDClient *client;
--    Coroutine *co;
--} NBDClientNewData;
+ static void nbd_client_receive_next_request(NBDClient *client);
+ 
+-static gboolean nbd_negotiate_continue(QIOChannel *ioc,
+-                                       GIOCondition condition,
+-                                       void *opaque)
+-{
+-    qemu_coroutine_enter(opaque);
+-    return TRUE;
+-}
 -
--static coroutine_fn int nbd_negotiate(NBDClientNewData *data)
-+static coroutine_fn int nbd_negotiate(NBDClient *client)
- {
--    NBDClient *client = data->client;
-     char buf[8 + 8 + 8 + 128];
-     int rc;
-     const uint16_t myflags = (NBD_FLAG_HAS_FLAGS | NBD_FLAG_SEND_TRIM |
-@@ -1268,16 +1262,15 @@ static void nbd_client_receive_next_request(NBDClient *client)
- 
- static coroutine_fn void nbd_co_client_start(void *opaque)
- {
--    NBDClientNewData *data = opaque;
--    NBDClient *client = data->client;
-+    NBDClient *client = opaque;
-     NBDExport *exp = client->exp;
- 
-     if (exp) {
-         nbd_export_get(exp);
-     }
--    if (nbd_negotiate(data)) {
-+    if (nbd_negotiate(client)) {
-         client_close(client);
--        goto out;
-+        return;
-     }
-     qemu_co_mutex_init(&client->send_lock);
- 
-@@ -1286,9 +1279,6 @@ static coroutine_fn void nbd_co_client_start(void *opaque)
-     }
- 
-     nbd_client_receive_next_request(client);
+-static int nbd_negotiate_read(QIOChannel *ioc, void *buffer, size_t size)
+-{
+-    ssize_t ret;
+-    guint watch;
 -
--out:
--    g_free(data);
- }
+-    assert(qemu_in_coroutine());
+-    /* Negotiation are always in main loop. */
+-    watch = qio_channel_add_watch(ioc,
+-                                  G_IO_IN,
+-                                  nbd_negotiate_continue,
+-                                  qemu_coroutine_self(),
+-                                  NULL);
+-    ret = read_sync(ioc, buffer, size, NULL);
+-    g_source_remove(watch);
+-    return ret;
+-
+-}
+-
+-static int nbd_negotiate_write(QIOChannel *ioc, const void *buffer, size_t size)
+-{
+-    ssize_t ret;
+-    guint watch;
+-
+-    assert(qemu_in_coroutine());
+-    /* Negotiation are always in main loop. */
+-    watch = qio_channel_add_watch(ioc,
+-                                  G_IO_OUT,
+-                                  nbd_negotiate_continue,
+-                                  qemu_coroutine_self(),
+-                                  NULL);
+-    ret = write_sync(ioc, buffer, size, NULL);
+-    g_source_remove(watch);
+-    return ret;
+-}
+-
+-static int nbd_negotiate_drop_sync(QIOChannel *ioc, size_t size)
+-{
+-    ssize_t ret;
+-    uint8_t *buffer = g_malloc(MIN(65536, size));
+-
+-    while (size > 0) {
+-        size_t count = MIN(65536, size);
+-        ret = nbd_negotiate_read(ioc, buffer, count);
+-        if (ret < 0) {
+-            g_free(buffer);
+-            return ret;
+-        }
+-
+-        size -= count;
+-    }
+-
+-    g_free(buffer);
+-    return 0;
+-}
+-
+ /* Basic flow for negotiation
  
- void nbd_client_new(NBDExport *exp,
-@@ -1298,7 +1288,7 @@ void nbd_client_new(NBDExport *exp,
-                     void (*close_fn)(NBDClient *))
- {
-     NBDClient *client;
--    NBDClientNewData *data = g_new(NBDClientNewData, 1);
-+    Coroutine *co;
+    Server         Client
+@@ -205,22 +142,22 @@ static int nbd_negotiate_send_rep_len(QIOChannel *ioc, uint32_t type,
+           type, opt, len);
  
-     client = g_malloc0(sizeof(NBDClient));
-     client->refcount = 1;
-@@ -1314,7 +1304,6 @@ void nbd_client_new(NBDExport *exp,
-     object_ref(OBJECT(client->ioc));
-     client->close = close_fn;
+     magic = cpu_to_be64(NBD_REP_MAGIC);
+-    if (nbd_negotiate_write(ioc, &magic, sizeof(magic)) < 0) {
++    if (write_sync(ioc, &magic, sizeof(magic), NULL) < 0) {
+         LOG("write failed (rep magic)");
+         return -EINVAL;
+     }
+     opt = cpu_to_be32(opt);
+-    if (nbd_negotiate_write(ioc, &opt, sizeof(opt)) < 0) {
++    if (write_sync(ioc, &opt, sizeof(opt), NULL) < 0) {
+         LOG("write failed (rep opt)");
+         return -EINVAL;
+     }
+     type = cpu_to_be32(type);
+-    if (nbd_negotiate_write(ioc, &type, sizeof(type)) < 0) {
++    if (write_sync(ioc, &type, sizeof(type), NULL) < 0) {
+         LOG("write failed (rep type)");
+         return -EINVAL;
+     }
+     len = cpu_to_be32(len);
+-    if (nbd_negotiate_write(ioc, &len, sizeof(len)) < 0) {
++    if (write_sync(ioc, &len, sizeof(len), NULL) < 0) {
+         LOG("write failed (rep data length)");
+         return -EINVAL;
+     }
+@@ -255,7 +192,7 @@ nbd_negotiate_send_rep_err(QIOChannel *ioc, uint32_t type,
+     if (ret < 0) {
+         goto out;
+     }
+-    if (nbd_negotiate_write(ioc, msg, len) < 0) {
++    if (write_sync(ioc, msg, len, NULL) < 0) {
+         LOG("write failed (error message)");
+         ret = -EIO;
+     } else {
+@@ -286,15 +223,15 @@ static int nbd_negotiate_send_rep_list(QIOChannel *ioc, NBDExport *exp)
+     }
  
--    data->client = client;
--    data->co = qemu_coroutine_create(nbd_co_client_start, data);
--    qemu_coroutine_enter(data->co);
-+    co = qemu_coroutine_create(nbd_co_client_start, client);
-+    qemu_coroutine_enter(co);
- }
+     len = cpu_to_be32(name_len);
+-    if (nbd_negotiate_write(ioc, &len, sizeof(len)) < 0) {
++    if (write_sync(ioc, &len, sizeof(len), NULL) < 0) {
+         LOG("write failed (name length)");
+         return -EINVAL;
+     }
+-    if (nbd_negotiate_write(ioc, name, name_len) < 0) {
++    if (write_sync(ioc, name, name_len, NULL) < 0) {
+         LOG("write failed (name buffer)");
+         return -EINVAL;
+     }
+-    if (nbd_negotiate_write(ioc, desc, desc_len) < 0) {
++    if (write_sync(ioc, desc, desc_len, NULL) < 0) {
+         LOG("write failed (description buffer)");
+         return -EINVAL;
+     }
+@@ -308,7 +245,7 @@ static int nbd_negotiate_handle_list(NBDClient *client, uint32_t length)
+     NBDExport *exp;
+ 
+     if (length) {
+-        if (nbd_negotiate_drop_sync(client->ioc, length) < 0) {
++        if (drop_sync(client->ioc, length, NULL) < 0) {
+             return -EIO;
+         }
+         return nbd_negotiate_send_rep_err(client->ioc,
+@@ -339,7 +276,7 @@ static int nbd_negotiate_handle_export_name(NBDClient *client, uint32_t length)
+         LOG("Bad length received");
+         goto fail;
+     }
+-    if (nbd_negotiate_read(client->ioc, name, length) < 0) {
++    if (read_sync(client->ioc, name, length, NULL) < 0) {
+         LOG("read failed");
+         goto fail;
+     }
+@@ -372,7 +309,7 @@ static QIOChannel *nbd_negotiate_handle_starttls(NBDClient *client,
+     TRACE("Setting up TLS");
+     ioc = client->ioc;
+     if (length) {
+-        if (nbd_negotiate_drop_sync(ioc, length) < 0) {
++        if (drop_sync(ioc, length, NULL) < 0) {
+             return NULL;
+         }
+         nbd_negotiate_send_rep_err(ioc, NBD_REP_ERR_INVALID, NBD_OPT_STARTTLS,
+@@ -436,7 +373,7 @@ static int nbd_negotiate_options(NBDClient *client)
+         ...           Rest of request
+     */
+ 
+-    if (nbd_negotiate_read(client->ioc, &flags, sizeof(flags)) < 0) {
++    if (read_sync(client->ioc, &flags, sizeof(flags), NULL) < 0) {
+         LOG("read failed");
+         return -EIO;
+     }
+@@ -462,7 +399,7 @@ static int nbd_negotiate_options(NBDClient *client)
+         uint32_t clientflags, length;
+         uint64_t magic;
+ 
+-        if (nbd_negotiate_read(client->ioc, &magic, sizeof(magic)) < 0) {
++        if (read_sync(client->ioc, &magic, sizeof(magic), NULL) < 0) {
+             LOG("read failed");
+             return -EINVAL;
+         }
+@@ -472,15 +409,15 @@ static int nbd_negotiate_options(NBDClient *client)
+             return -EINVAL;
+         }
+ 
+-        if (nbd_negotiate_read(client->ioc, &clientflags,
+-                               sizeof(clientflags)) < 0)
++        if (read_sync(client->ioc, &clientflags,
++                      sizeof(clientflags), NULL) < 0)
+         {
+             LOG("read failed");
+             return -EINVAL;
+         }
+         clientflags = be32_to_cpu(clientflags);
+ 
+-        if (nbd_negotiate_read(client->ioc, &length, sizeof(length)) < 0) {
++        if (read_sync(client->ioc, &length, sizeof(length), NULL) < 0) {
+             LOG("read failed");
+             return -EINVAL;
+         }
+@@ -510,7 +447,7 @@ static int nbd_negotiate_options(NBDClient *client)
+                 return -EINVAL;
+ 
+             default:
+-                if (nbd_negotiate_drop_sync(client->ioc, length) < 0) {
++                if (drop_sync(client->ioc, length, NULL) < 0) {
+                     return -EIO;
+                 }
+                 ret = nbd_negotiate_send_rep_err(client->ioc,
+@@ -548,7 +485,7 @@ static int nbd_negotiate_options(NBDClient *client)
+                 return nbd_negotiate_handle_export_name(client, length);
+ 
+             case NBD_OPT_STARTTLS:
+-                if (nbd_negotiate_drop_sync(client->ioc, length) < 0) {
++                if (drop_sync(client->ioc, length, NULL) < 0) {
+                     return -EIO;
+                 }
+                 if (client->tlscreds) {
+@@ -567,7 +504,7 @@ static int nbd_negotiate_options(NBDClient *client)
+                 }
+                 break;
+             default:
+-                if (nbd_negotiate_drop_sync(client->ioc, length) < 0) {
++                if (drop_sync(client->ioc, length, NULL) < 0) {
+                     return -EIO;
+                 }
+                 ret = nbd_negotiate_send_rep_err(client->ioc,
+@@ -656,12 +593,12 @@ static coroutine_fn int nbd_negotiate(NBDClientNewData *data)
+             TRACE("TLS cannot be enabled with oldstyle protocol");
+             goto fail;
+         }
+-        if (nbd_negotiate_write(client->ioc, buf, sizeof(buf)) < 0) {
++        if (write_sync(client->ioc, buf, sizeof(buf), NULL) < 0) {
+             LOG("write failed");
+             goto fail;
+         }
+     } else {
+-        if (nbd_negotiate_write(client->ioc, buf, 18) < 0) {
++        if (write_sync(client->ioc, buf, 18, NULL) < 0) {
+             LOG("write failed");
+             goto fail;
+         }
+@@ -676,7 +613,7 @@ static coroutine_fn int nbd_negotiate(NBDClientNewData *data)
+         stq_be_p(buf + 18, client->exp->size);
+         stw_be_p(buf + 26, client->exp->nbdflags | myflags);
+         len = client->no_zeroes ? 10 : sizeof(buf) - 18;
+-        if (nbd_negotiate_write(client->ioc, buf + 18, len) < 0) {
++        if (write_sync(client->ioc, buf + 18, len, NULL) < 0) {
+             LOG("write failed");
+             goto fail;
+         }
 -- 
 2.11.1
