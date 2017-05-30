@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46066)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46067)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <anton.nefedov@virtuozzo.com>) id 1dFhfc-0005G9-V4
+	(envelope-from <anton.nefedov@virtuozzo.com>) id 1dFhfc-0005GA-V1
 	for qemu-devel@nongnu.org; Tue, 30 May 2017 09:58:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <anton.nefedov@virtuozzo.com>) id 1dFhfY-0007IN-FH
+	(envelope-from <anton.nefedov@virtuozzo.com>) id 1dFhfZ-0007JB-Lb
 	for qemu-devel@nongnu.org; Tue, 30 May 2017 09:58:49 -0400
 Received: from mail-he1eur01on0136.outbound.protection.outlook.com
 	([104.47.0.136]:15171
 	helo=EUR01-HE1-obe.outbound.protection.outlook.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <anton.nefedov@virtuozzo.com>)
-	id 1dFhfY-0007GL-6u
-	for qemu-devel@nongnu.org; Tue, 30 May 2017 09:58:44 -0400
+	id 1dFhfZ-0007GL-99
+	for qemu-devel@nongnu.org; Tue, 30 May 2017 09:58:45 -0400
 From: Anton Nefedov <anton.nefedov@virtuozzo.com>
-Date: Tue, 30 May 2017 16:58:01 +0300
-Message-ID: <1496152683-102751-12-git-send-email-anton.nefedov@virtuozzo.com>
+Date: Tue, 30 May 2017 16:58:03 +0300
+Message-ID: <1496152683-102751-14-git-send-email-anton.nefedov@virtuozzo.com>
 In-Reply-To: <1496152683-102751-1-git-send-email-anton.nefedov@virtuozzo.com>
 References: <1496152683-102751-1-git-send-email-anton.nefedov@virtuozzo.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v3 11/13] virtio-console: chardev hotswap
- support
+Subject: [Qemu-devel] [PATCH v3 13/13] serial: chardev hotswap support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,89 +29,72 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: den@virtuozzo.com, pbonzini@redhat.com, marcandre.lureau@redhat.com, Anton Nefedov <anton.nefedov@virtuozzo.com>, Amit Shah <amit@kernel.org>
+Cc: den@virtuozzo.com, pbonzini@redhat.com, marcandre.lureau@redhat.com, Anton Nefedov <anton.nefedov@virtuozzo.com>, "Michael S . Tsirkin" <mst@redhat.com>
+
+for a backend change, a number of ioctls has to be replayed to sync
+the current setup of a frontend to a backend tty. This is hopefully
+enough so we don't have to track, store and replay the whole original
+control byte sequence.
 
 Signed-off-by: Anton Nefedov <anton.nefedov@virtuozzo.com>
 Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-CC: Amit Shah <amit@kernel.org>
+CC: Michael S. Tsirkin <mst@redhat.com>
+CC: Paolo Bonzini <pbonzini@redhat.com>
 ---
- hw/char/virtio-console.c | 35 ++++++++++++++++++++++++++++++-----
- 1 file changed, 30 insertions(+), 5 deletions(-)
+ hw/char/serial.c | 32 ++++++++++++++++++++++++++++++--
+ 1 file changed, 30 insertions(+), 2 deletions(-)
 
-diff --git a/hw/char/virtio-console.c b/hw/char/virtio-console.c
-index cf7331d..bd74669 100644
---- a/hw/char/virtio-console.c
-+++ b/hw/char/virtio-console.c
-@@ -49,7 +49,7 @@ static ssize_t flush_buf(VirtIOSerialPort *port,
-     VirtConsole *vcon = VIRTIO_CONSOLE(port);
-     ssize_t ret;
- 
--    if (!qemu_chr_fe_get_driver(&vcon->chr)) {
-+    if (!qemu_chr_fe_backend_connected(&vcon->chr)) {
-         /* If there's no backend, we can just say we consumed all data. */
-         return len;
-     }
-@@ -163,12 +163,35 @@ static void chr_event(void *opaque, int event)
-     }
+diff --git a/hw/char/serial.c b/hw/char/serial.c
+index 1e6bdeb..ed01637 100644
+--- a/hw/char/serial.c
++++ b/hw/char/serial.c
+@@ -891,9 +891,37 @@ static void serial_reset(void *opaque)
+     s->msr &= ~UART_MSR_ANY_DELTA;
  }
  
-+static int chr_be_change(void *opaque)
++static int serial_be_change(void *opaque)
 +{
-+    VirtConsole *vcon = opaque;
-+    VirtIOSerialPort *port = VIRTIO_SERIAL_PORT(vcon);
-+    VirtIOSerialPortClass *k = VIRTIO_SERIAL_PORT_GET_CLASS(port);
++    SerialState *s = opaque;
 +
-+    if (k->is_console) {
-+        qemu_chr_fe_set_handlers(&vcon->chr, chr_can_read, chr_read,
-+                                 NULL, chr_be_change, vcon, NULL, true);
-+    } else {
-+        qemu_chr_fe_set_handlers(&vcon->chr, chr_can_read, chr_read,
-+                                 chr_event, chr_be_change, vcon, NULL, false);
++    qemu_chr_fe_set_handlers(&s->chr, serial_can_receive1, serial_receive1,
++                             serial_event, serial_be_change, s, NULL, true);
++
++    serial_update_parameters(s);
++
++    qemu_chr_fe_ioctl(&s->chr, CHR_IOCTL_SERIAL_SET_BREAK,
++                      &s->last_break_enable);
++
++    s->poll_msl = (s->ier & UART_IER_MSI) ? 1 : 0;
++    serial_update_msl(s);
++
++    if (s->poll_msl >= 0 && !(s->mcr & UART_MCR_LOOP)) {
++        serial_update_tiocm(s);
 +    }
 +
-+    if (vcon->watch) {
-+        g_source_remove(vcon->watch);
-+        vcon->watch = qemu_chr_fe_add_watch(&vcon->chr,
-+                                            G_IO_OUT | G_IO_HUP,
-+                                            chr_write_unblocked, vcon);
++    if (s->watch_tag > 0) {
++        g_source_remove(s->watch_tag);
++        s->watch_tag = qemu_chr_fe_add_watch(&s->chr, G_IO_OUT | G_IO_HUP,
++                                             serial_watch_cb, s);
 +    }
 +
 +    return 0;
 +}
 +
- static void virtconsole_realize(DeviceState *dev, Error **errp)
+ void serial_realize_core(SerialState *s, Error **errp)
  {
-     VirtIOSerialPort *port = VIRTIO_SERIAL_PORT(dev);
-     VirtConsole *vcon = VIRTIO_CONSOLE(dev);
-     VirtIOSerialPortClass *k = VIRTIO_SERIAL_PORT_GET_CLASS(dev);
--    Chardev *chr = qemu_chr_fe_get_driver(&vcon->chr);
- 
-     if (port->id == 0 && !k->is_console) {
-         error_setg(errp, "Port number 0 on virtio-serial devices reserved "
-@@ -176,7 +199,7 @@ static void virtconsole_realize(DeviceState *dev, Error **errp)
+-    if (!qemu_chr_fe_get_driver(&s->chr)) {
++    if (!qemu_chr_fe_backend_connected(&s->chr)) {
+         error_setg(errp, "Can't create serial device, empty char device");
          return;
      }
+@@ -904,7 +932,7 @@ void serial_realize_core(SerialState *s, Error **errp)
+     qemu_register_reset(serial_reset, s);
  
--    if (chr) {
-+    if (qemu_chr_fe_backend_connected(&vcon->chr)) {
-         /*
-          * For consoles we don't block guest data transfer just
-          * because nothing is connected - we'll just let it go
-@@ -188,11 +211,13 @@ static void virtconsole_realize(DeviceState *dev, Error **errp)
-          */
-         if (k->is_console) {
-             qemu_chr_fe_set_handlers(&vcon->chr, chr_can_read, chr_read,
--                                     NULL, NULL, vcon, NULL, true);
-+                                     NULL, chr_be_change,
-+                                     vcon, NULL, true);
-             virtio_serial_open(port);
-         } else {
-             qemu_chr_fe_set_handlers(&vcon->chr, chr_can_read, chr_read,
--                                     chr_event, NULL, vcon, NULL, false);
-+                                     chr_event, chr_be_change,
-+                                     vcon, NULL, false);
-         }
-     }
- }
+     qemu_chr_fe_set_handlers(&s->chr, serial_can_receive1, serial_receive1,
+-                             serial_event, NULL, s, NULL, true);
++                             serial_event, serial_be_change, s, NULL, true);
+     fifo8_create(&s->recv_fifo, UART_FIFO_LENGTH);
+     fifo8_create(&s->xmit_fifo, UART_FIFO_LENGTH);
+     serial_reset(s);
 -- 
 2.7.4
