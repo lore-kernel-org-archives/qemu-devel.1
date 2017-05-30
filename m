@@ -1,22 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59015)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59056)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1dFeWI-0005q8-Nl
-	for qemu-devel@nongnu.org; Tue, 30 May 2017 06:37:03 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1dFeWN-0005uO-Ga
+	for qemu-devel@nongnu.org; Tue, 30 May 2017 06:37:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1dFeWH-0001RY-Sb
-	for qemu-devel@nongnu.org; Tue, 30 May 2017 06:36:58 -0400
-Received: from mailhub.sw.ru ([195.214.232.25]:31337 helo=relay.sw.ru)
+	(envelope-from <vsementsov@virtuozzo.com>) id 1dFeWK-0001S7-9Y
+	for qemu-devel@nongnu.org; Tue, 30 May 2017 06:37:03 -0400
+Received: from mailhub.sw.ru ([195.214.232.25]:2529 helo=relay.sw.ru)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
-	id 1dFeWH-0001Qt-Hg
-	for qemu-devel@nongnu.org; Tue, 30 May 2017 06:36:57 -0400
+	id 1dFeWJ-0001Rv-UZ
+	for qemu-devel@nongnu.org; Tue, 30 May 2017 06:37:00 -0400
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Tue, 30 May 2017 13:36:41 +0300
-Message-Id: <20170530103641.68891-5-vsementsov@virtuozzo.com>
-In-Reply-To: <20170530103641.68891-1-vsementsov@virtuozzo.com>
-References: <20170530103641.68891-1-vsementsov@virtuozzo.com>
-Subject: [Qemu-devel] [PATCH 4/4] qemu-img check: improve
- dump_human_format_alloc_info
+Date: Tue, 30 May 2017 13:36:37 +0300
+Message-Id: <20170530103641.68891-1-vsementsov@virtuozzo.com>
+Subject: [Qemu-devel] [PATCH 0/4] qemu-img check: format allocation info
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,88 +25,41 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, qemu-block@nongnu.org
 Cc: eblake@redhat.com, armbru@redhat.com, mreitz@redhat.com, kwolf@redhat.com, vsementsov@virtuozzo.com, den@openvz.org
 
-Improve dump_human_format_alloc_info() by specifying format names.
+Hi all.
 
-Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
----
- qemu-img.c | 35 ++++++++++++++++++++++++++---------
- 1 file changed, 26 insertions(+), 9 deletions(-)
+These series is a replacement for "qemu-img check: unallocated size"
+series.
 
-diff --git a/qemu-img.c b/qemu-img.c
-index 55f8c1776c..3c03690a4f 100644
---- a/qemu-img.c
-+++ b/qemu-img.c
-@@ -560,7 +560,8 @@ static void dump_json_image_check(ImageCheck *check, bool quiet)
-     QDECREF(str);
- }
- 
--static void dump_human_format_alloc_info(BlockFormatAllocInfo *bfai, bool quiet)
-+static void dump_human_format_alloc_info(BlockDriverState *bs,
-+                                         BlockFormatAllocInfo *bfai, bool quiet)
- {
-     char *alloc_alloc = size_to_str(bfai->alloc_alloc);
-     char *alloc_hole = size_to_str(bfai->alloc_hole);
-@@ -568,13 +569,28 @@ static void dump_human_format_alloc_info(BlockFormatAllocInfo *bfai, bool quiet)
-     char *hole_alloc = size_to_str(bfai->hole_alloc);
-     char *hole_hole = size_to_str(bfai->hole_hole);
- 
-+    const char *format = bdrv_get_format_name(bs);
-+    const char *f_format =
-+        bs->file ? bdrv_get_format_name(bs->file->bs) : "file";
-+    int format_len, cw;
-+
-+    if (format == NULL) {
-+        format = "format";
-+    }
-+    if (f_format == NULL) {
-+        f_format = "file";
-+    }
-+    format_len = strlen(format);
-+    cw = MAX(10, strlen(f_format) + 6);
-+
-     qprintf(quiet,
-             "Format allocation info (including metadata):\n"
--            "               file-alloc   file-hole   after-eof\n"
--            "format-alloc   %10s  %10s  %10s\n"
--            "format-hole    %10s  %10s\n",
--            alloc_alloc, alloc_hole, alloc_overhead,
--            hole_alloc, hole_hole);
-+            "%*s         %*s-alloc  %*s-hole  %*s\n"
-+            "%s-alloc   %*s  %*s  %*s\n"
-+            "%s-hole    %*s  %*s\n",
-+            format_len, "", cw - 6, f_format, cw - 5, f_format, cw, "after-eof",
-+            format, cw, alloc_alloc, cw, alloc_hole, cw, alloc_overhead,
-+            format, cw, hole_alloc, cw, hole_hole);
- 
-     g_free(alloc_alloc);
-     g_free(alloc_hole);
-@@ -583,7 +599,8 @@ static void dump_human_format_alloc_info(BlockFormatAllocInfo *bfai, bool quiet)
-     g_free(hole_hole);
- }
- 
--static void dump_human_image_check(ImageCheck *check, bool quiet)
-+static void dump_human_image_check(BlockDriverState *bs, ImageCheck *check,
-+                                   bool quiet)
- {
-     if (!(check->corruptions || check->leaks || check->check_errors)) {
-         qprintf(quiet, "No errors were found on the image.\n");
-@@ -626,7 +643,7 @@ static void dump_human_image_check(ImageCheck *check, bool quiet)
-     }
- 
-     if (check->has_format_alloc_info) {
--        dump_human_format_alloc_info(check->format_alloc_info, quiet);
-+        dump_human_format_alloc_info(bs, check->format_alloc_info, quiet);
-     }
- }
- 
-@@ -840,7 +857,7 @@ static int img_check(int argc, char **argv)
-     if (!ret) {
-         switch (output_format) {
-         case OFORMAT_HUMAN:
--            dump_human_image_check(check, quiet);
-+            dump_human_image_check(bs, check, quiet);
-             break;
-         case OFORMAT_JSON:
-             dump_json_image_check(check, quiet);
+There was a question, should we account allocated clusters in qcow2 but
+actually holes in underalying file as allocated or not. Instead of
+hiding this information in one-number statistic I've decided to print
+the whole information, 5 numbers:
+
+For allocated by top-level format driver (qcow2 for ex.) clusters, 3
+numbers: number of bytes, which are:
+ - allocated in underlying file
+ - holes in underlying file
+ - after end of underlying file
+
+To account other areas of underlying file, 2 more numbers of bytes:
+ - unallocated by top-level driver but allocated in underlying file
+ - unallocated by top-level driver and holes in underlying file
+
+Vladimir Sementsov-Ogievskiy (4):
+  block: add bdrv_get_format_alloc_stat format interface
+  qcow2: add .bdrv_get_format_alloc_stat
+  qemu-img check: add format allocation info
+  qemu-img check: improve dump_human_format_alloc_info
+
+ block.c                   |  16 ++++++
+ block/qcow2-refcount.c    | 144 ++++++++++++++++++++++++++++++++++++++++++++++
+ block/qcow2.c             |   2 +
+ block/qcow2.h             |   2 +
+ include/block/block.h     |   3 +
+ include/block/block_int.h |   2 +
+ qapi/block-core.json      |  32 ++++++++++-
+ qemu-img.c                |  57 +++++++++++++++++-
+ 8 files changed, 255 insertions(+), 3 deletions(-)
+
 -- 
 2.11.1
