@@ -1,27 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53814)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53812)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1dFceS-0001E4-3h
+	(envelope-from <quintela@redhat.com>) id 1dFceS-0001E3-30
 	for qemu-devel@nongnu.org; Tue, 30 May 2017 04:37:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1dFceN-0005RP-QB
+	(envelope-from <quintela@redhat.com>) id 1dFceN-0005RG-7o
 	for qemu-devel@nongnu.org; Tue, 30 May 2017 04:37:16 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:42152)
+Received: from mx1.redhat.com ([209.132.183.28]:51640)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1dFceN-0005RA-In
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1dFceN-0005Qw-2q
 	for qemu-devel@nongnu.org; Tue, 30 May 2017 04:37:11 -0400
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
 	[10.5.11.15])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 954A8C057FAB
-	for <qemu-devel@nongnu.org>; Tue, 30 May 2017 08:37:10 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id EBBCC448D60
+	for <qemu-devel@nongnu.org>; Tue, 30 May 2017 08:37:08 +0000 (UTC)
 From: Juan Quintela <quintela@redhat.com>
-Date: Tue, 30 May 2017 10:37:03 +0200
-Message-Id: <20170530083705.15141-2-quintela@redhat.com>
-In-Reply-To: <20170530083705.15141-1-quintela@redhat.com>
-References: <20170530083705.15141-1-quintela@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 1/3] migration: Use savevm_handlers instead
- of loadvm copy
+Date: Tue, 30 May 2017 10:37:02 +0200
+Message-Id: <20170530083705.15141-1-quintela@redhat.com>
+Subject: [Qemu-devel] [PATCH v2 0/3] Remove of loadvm handlers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,117 +30,34 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: dgilbert@redhat.com, lvivier@redhat.com, peterx@redhat.com
 
-There is no reason for having the loadvm_handlers at all.  There is
-only one use, and we can use the savevm handlers.
+Hi
 
-We will remove the loadvm handlers on a following patch.
+Changes from v1
+- store load_version_id field to SaveStateHandler
+- Adjust everything to use it
 
-Signed-off-by: Juan Quintela <quintela@redhat.com>
----
- migration/savevm.c | 29 ++++++++++++++++-------------
- 1 file changed, 16 insertions(+), 13 deletions(-)
+Thanks to Laurent to point that to me.
 
-diff --git a/migration/savevm.c b/migration/savevm.c
-index d971e5e..d7c08c3 100644
---- a/migration/savevm.c
-+++ b/migration/savevm.c
-@@ -251,6 +251,8 @@ typedef struct SaveStateEntry {
-     int instance_id;
-     int alias_id;
-     int version_id;
-+    /* version id read from the stream */
-+    int load_version_id;
-     int section_id;
-     SaveVMHandlers *ops;
-     const VMStateDescription *vmsd;
-@@ -1792,7 +1794,7 @@ struct LoadStateEntry {
-  * Returns: true if the footer was good
-  *          false if there is a problem (and calls error_report to say why)
-  */
--static bool check_section_footer(QEMUFile *f, LoadStateEntry *le)
-+static bool check_section_footer(QEMUFile *f, SaveStateEntry *se)
- {
-     uint8_t read_mark;
-     uint32_t read_section_id;
-@@ -1805,15 +1807,15 @@ static bool check_section_footer(QEMUFile *f, LoadStateEntry *le)
-     read_mark = qemu_get_byte(f);
- 
-     if (read_mark != QEMU_VM_SECTION_FOOTER) {
--        error_report("Missing section footer for %s", le->se->idstr);
-+        error_report("Missing section footer for %s", se->idstr);
-         return false;
-     }
- 
-     read_section_id = qemu_get_be32(f);
--    if (read_section_id != le->section_id) {
-+    if (read_section_id != se->section_id) {
-         error_report("Mismatched section id in footer for %s -"
-                      " read 0x%x expected 0x%x",
--                     le->se->idstr, read_section_id, le->section_id);
-+                     se->idstr, read_section_id, se->section_id);
-         return false;
-     }
- 
-@@ -1866,6 +1868,7 @@ qemu_loadvm_section_start_full(QEMUFile *f, MigrationIncomingState *mis)
-                      version_id, idstr, se->version_id);
-         return -EINVAL;
-     }
-+    se->load_version_id = version_id;
- 
-     /* Validate if it is a device's state */
-     if (xen_enabled() && se->is_ram) {
-@@ -1881,13 +1884,13 @@ qemu_loadvm_section_start_full(QEMUFile *f, MigrationIncomingState *mis)
-     le->version_id = version_id;
-     QLIST_INSERT_HEAD(&mis->loadvm_handlers, le, entry);
- 
--    ret = vmstate_load(f, le->se, le->version_id);
-+    ret = vmstate_load(f, se, se->load_version_id);
-     if (ret < 0) {
-         error_report("error while loading state for instance 0x%x of"
-                      " device '%s'", instance_id, idstr);
-         return ret;
-     }
--    if (!check_section_footer(f, le)) {
-+    if (!check_section_footer(f, se)) {
-         return -EINVAL;
-     }
- 
-@@ -1898,29 +1901,29 @@ static int
- qemu_loadvm_section_part_end(QEMUFile *f, MigrationIncomingState *mis)
- {
-     uint32_t section_id;
--    LoadStateEntry *le;
-+    SaveStateEntry *se;
-     int ret;
- 
-     section_id = qemu_get_be32(f);
- 
-     trace_qemu_loadvm_state_section_partend(section_id);
--    QLIST_FOREACH(le, &mis->loadvm_handlers, entry) {
--        if (le->section_id == section_id) {
-+    QTAILQ_FOREACH(se, &savevm_state.handlers, entry) {
-+        if (se->section_id == section_id) {
-             break;
-         }
-     }
--    if (le == NULL) {
-+    if (se == NULL) {
-         error_report("Unknown savevm section %d", section_id);
-         return -EINVAL;
-     }
- 
--    ret = vmstate_load(f, le->se, le->version_id);
-+    ret = vmstate_load(f, se, se->load_version_id);
-     if (ret < 0) {
-         error_report("error while loading state section id %d(%s)",
--                     section_id, le->se->idstr);
-+                     section_id, se->idstr);
-         return ret;
-     }
--    if (!check_section_footer(f, le)) {
-+    if (!check_section_footer(f, se)) {
-         return -EINVAL;
-     }
- 
+Please Review.
+
+[v1]
+We just have a loadvm handlers that are a new list only used in a
+single place.  Just move everything to use the savevm_handlers (yes,
+it is a list, and we could have a better name).
+
+Once there, vmstate_load() had three arguments but only needs two.  Fix that.
+
+Juan Quintela (3):
+  migration: Use savevm_handlers instead of loadvm copy
+  migration: loadvm handlers are not used
+  migration: Remove section_id parameter from vmstate_load
+
+ include/migration/migration.h |  5 ----
+ include/migration/vmstate.h   |  2 --
+ include/qemu/typedefs.h       |  1 -
+ migration/migration.c         |  2 --
+ migration/savevm.c            | 61 ++++++++++++++-----------------------------
+ 5 files changed, 19 insertions(+), 52 deletions(-)
+
 -- 
 2.9.4
