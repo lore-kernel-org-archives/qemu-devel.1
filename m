@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36788)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37090)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dFdGo-0000wN-9m
-	for qemu-devel@nongnu.org; Tue, 30 May 2017 05:16:59 -0400
+	(envelope-from <thuth@redhat.com>) id 1dFdI0-0001tl-Fw
+	for qemu-devel@nongnu.org; Tue, 30 May 2017 05:18:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dFdGn-0000pz-6U
-	for qemu-devel@nongnu.org; Tue, 30 May 2017 05:16:54 -0400
-Date: Tue, 30 May 2017 10:16:48 +0100
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170530091648.GC21566@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <20170525163851.8047-1-berrange@redhat.com>
-	<20170525163851.8047-20-berrange@redhat.com>
-	<1acec55c-fd89-ee9d-0082-372a6e967036@redhat.com>
-	<20170526140242.GK24484@redhat.com>
-	<87fufo6lc2.fsf@dusky.pond.sub.org>
+	(envelope-from <thuth@redhat.com>) id 1dFdHw-0001bA-OA
+	for qemu-devel@nongnu.org; Tue, 30 May 2017 05:18:08 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:33192)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1dFdHw-0001aB-Fc
+	for qemu-devel@nongnu.org; Tue, 30 May 2017 05:18:04 -0400
+References: <20170529192440.5990-1-aurelien@aurel32.net>
+	<20170529192440.5990-30-aurelien@aurel32.net>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <5b84304b-7b41-df26-e845-2f52fb55079f@redhat.com>
+Date: Tue, 30 May 2017 11:18:01 +0200
 MIME-Version: 1.0
+In-Reply-To: <20170529192440.5990-30-aurelien@aurel32.net>
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <87fufo6lc2.fsf@dusky.pond.sub.org>
-Subject: Re: [Qemu-devel] [PATCH v7 19/20] qcow2: report encryption specific
- image information
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 29/29] target/s390x: update maximum TCG
+ model to z800
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,59 +29,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: Eric Blake <eblake@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Alberto Garcia <berto@igalia.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>
+To: Aurelien Jarno <aurelien@aurel32.net>, qemu-devel@nongnu.org
+Cc: Alexander Graf <agraf@suse.de>, Richard Henderson <rth@twiddle.net>
 
-On Mon, May 29, 2017 at 11:53:01AM +0200, Markus Armbruster wrote:
-> "Daniel P. Berrange" <berrange@redhat.com> writes:
+On 29.05.2017 21:24, Aurelien Jarno wrote:
+> At the same time fix the TCG version of get_max_cpu_model to return the
+> maximum model like on KVM. Remove the long-displacement facility from
+> the additional features as it is included in the z800.
 > 
-> > On Thu, May 25, 2017 at 02:52:30PM -0500, Eric Blake wrote:
-> >> On 05/25/2017 11:38 AM, Daniel P. Berrange wrote:
-> >> > Currently 'qemu-img info' reports a simple "encrypted: yes"
-> >> > field. This is not very useful now that qcow2 can support
-> >> > multiple encryption formats. Users want to know which format
-> >> > is in use and some data related to it.
-> >> > 
-> >> > Wire up usage of the qcrypto_block_get_info() method so that
-> >> > 'qemu-img info' can report about the encryption format
-> >> > and parameters in use
-> >> > 
-> >> 
-> >> > Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
-> >> > ---
-> >> >  block/qcow2.c        | 35 ++++++++++++++++++++++++++++++++++-
-> >> >  qapi/block-core.json | 24 +++++++++++++++++++++++-
-> >> >  2 files changed, 57 insertions(+), 2 deletions(-)
-> >> > 
-> >> > diff --git a/block/qcow2.c b/block/qcow2.c
-> >> > index 38f9eb5..cb321a2 100644
-> >> > --- a/block/qcow2.c
-> >> > +++ b/block/qcow2.c
-> >> > @@ -3196,8 +3196,17 @@ static int qcow2_get_info(BlockDriverState *bs, BlockDriverInfo *bdi)
-> >> >  static ImageInfoSpecific *qcow2_get_specific_info(BlockDriverState *bs)
-> >> >  {
-> >> >      BDRVQcow2State *s = bs->opaque;
-> >> > -    ImageInfoSpecific *spec_info = g_new(ImageInfoSpecific, 1);
-> >> > +    ImageInfoSpecific *spec_info;
-> >> > +    QCryptoBlockInfo *encrypt_info = NULL;
-> >> >  
-> >> > +    if (s->crypto != NULL) {
-> >> > +        encrypt_info = qcrypto_block_get_info(s->crypto, NULL);
-> >> 
-> >> Worth using &error_abort instead of silently ignoring the error?  Is an
-> >> error even possible in our output visitor [adding Markus for reference]?
-> >
-> > In fact the qcrypto_block_get_info() will never return an error
-> > right now as implemented. So I guess we could even just remove
-> > the Error **errp parameter from that call
+> Signed-off-by: Aurelien Jarno <aurelien@aurel32.net>
+> ---
+>  target/s390x/cpu_models.c | 12 ++++++------
+>  1 file changed, 6 insertions(+), 6 deletions(-)
 > 
-> Do you still need advice on QAPI from me here?
+> diff --git a/target/s390x/cpu_models.c b/target/s390x/cpu_models.c
+> index e5e005a430..5f2c195d53 100644
+> --- a/target/s390x/cpu_models.c
+> +++ b/target/s390x/cpu_models.c
+> @@ -668,7 +668,6 @@ static void add_qemu_cpu_model_features(S390FeatBitmap fbm)
+>      static const int feats[] = {
+>          S390_FEAT_STFLE,
+>          S390_FEAT_EXTENDED_IMMEDIATE,
+> -        S390_FEAT_LONG_DISPLACEMENT,
+>          S390_FEAT_LONG_DISPLACEMENT_FAST,
+>          S390_FEAT_STORE_CLOCK_FAST,
+>          S390_FEAT_GENERAL_INSTRUCTIONS_EXT,
+> @@ -694,9 +693,9 @@ static S390CPUModel *get_max_cpu_model(Error **errp)
+>      if (kvm_enabled()) {
+>          kvm_s390_get_host_cpu_model(&max_model, errp);
+>      } else {
+> -        /* TCG emulates a z900 (with some optional additional features) */
+> -        max_model.def = &s390_cpu_defs[0];
+> -        bitmap_copy(max_model.features, max_model.def->default_feat,
+> +        /* TCG emulates a z800 (with some optional additional features) */
+> +        max_model.def = s390_find_cpu_def(0x2066, 7, 3, NULL);
+> +        bitmap_copy(max_model.features, max_model.def->full_feat,
+>                      S390_FEAT_MAX);
+>          add_qemu_cpu_model_features(max_model.features);
+>      }
+> @@ -954,8 +953,9 @@ static void s390_qemu_cpu_model_initfn(Object *obj)
+>      S390CPU *cpu = S390_CPU(obj);
+>  
+>      cpu->model = g_malloc0(sizeof(*cpu->model));
+> -    /* TCG emulates a z900 (with some optional additional features) */
+> -    memcpy(&s390_qemu_cpu_defs, &s390_cpu_defs[0], sizeof(s390_qemu_cpu_defs));
+> +    /* TCG emulates a z800 (with some optional additional features) */
+> +    memcpy(&s390_qemu_cpu_defs, s390_find_cpu_def(0x2066, 7, 3, NULL),
+> +           sizeof(s390_qemu_cpu_defs));
+>      add_qemu_cpu_model_features(s390_qemu_cpu_defs.full_feat);
+>      cpu->model->def = &s390_qemu_cpu_defs;
+>      bitmap_copy(cpu->model->features, cpu->model->def->default_feat,
+> 
 
-No need, thanks.
-
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+Reviewed-by: Thomas Huth <thuth@redhat.com>
