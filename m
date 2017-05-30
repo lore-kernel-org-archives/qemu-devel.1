@@ -1,33 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42636)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42750)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vyasevic@redhat.com>) id 1dFhXS-0006Pt-5x
-	for qemu-devel@nongnu.org; Tue, 30 May 2017 09:50:23 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1dFhXs-0006gK-0Y
+	for qemu-devel@nongnu.org; Tue, 30 May 2017 09:50:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vyasevic@redhat.com>) id 1dFhXP-0004g6-26
-	for qemu-devel@nongnu.org; Tue, 30 May 2017 09:50:22 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:35980)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <vyasevic@redhat.com>) id 1dFhXO-0004fw-Sh
-	for qemu-devel@nongnu.org; Tue, 30 May 2017 09:50:18 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id DBB5880C0D
-	for <qemu-devel@nongnu.org>; Tue, 30 May 2017 13:50:17 +0000 (UTC)
-Reply-To: vyasevic@redhat.com
-References: <1495649128-10529-1-git-send-email-vyasevic@redhat.com>
-	<1495649128-10529-7-git-send-email-vyasevic@redhat.com>
-	<87bmqahcx4.fsf@secure.mitica>
-From: Vlad Yasevich <vyasevic@redhat.com>
-Message-ID: <959a41db-7fcd-6f0e-0072-30a570dcb1c3@redhat.com>
-Date: Tue, 30 May 2017 09:49:59 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1dFhXr-0004kG-Aq
+	for qemu-devel@nongnu.org; Tue, 30 May 2017 09:50:48 -0400
+Received: from mail-wm0-x230.google.com ([2a00:1450:400c:c09::230]:34970)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1dFhXr-0004k6-30
+	for qemu-devel@nongnu.org; Tue, 30 May 2017 09:50:47 -0400
+Received: by mail-wm0-x230.google.com with SMTP id b84so92791856wmh.0
+	for <qemu-devel@nongnu.org>; Tue, 30 May 2017 06:50:46 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <87bmqahcx4.fsf@secure.mitica>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 06/12] qmp: Expose qemu_announce_self as a
- qmp command
+In-Reply-To: <fa2c7203-644e-9209-91d8-e37c345b8240@amsat.org>
+References: <1493226792-3237-1-git-send-email-peter.maydell@linaro.org>
+	<1493226792-3237-4-git-send-email-peter.maydell@linaro.org>
+	<fa2c7203-644e-9209-91d8-e37c345b8240@amsat.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 30 May 2017 14:50:25 +0100
+Message-ID: <CAFEAcA9T_JHBu=vw6ohVj6YwqcC5GMQKB0HJA+ZPo746j+db8Q@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH 3/3] hw/intc/arm_gicv3_cpuif:
+ Fix priority masking for NS BPR1
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,48 +32,18 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: quintela@redhat.com
-Cc: qemu-devel@nongnu.org, dgilbert@redhat.com, germano@redhat.com, lvivier@redhat.com, jasowang@redhat.com, jdenemar@redhat.com, kashyap@redhat.com, armbru@redhat.com, mst@redhat.com
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, "patches@linaro.org" <patches@linaro.org>
 
-On 05/30/2017 06:11 AM, Juan Quintela wrote:
-> Vladislav Yasevich <vyasevic@redhat.com> wrote:
->> Add a qmp command that can trigger guest announcements.
->>
->> Based on work of Germano Veit Michel <germano@redhat.com>
->>
->> Signed-off-by: Vladislav Yasevich <vyasevic@redhat.com>
->> ---
->>  migration/savevm.c | 14 ++++++++++++++
->>  qapi-schema.json   | 19 +++++++++++++++++++
->>  2 files changed, 33 insertions(+)
->>
->> diff --git a/migration/savevm.c b/migration/savevm.c
->> index a4097c9..b55ce6a 100644
->> --- a/migration/savevm.c
->> +++ b/migration/savevm.c
->> @@ -265,6 +265,20 @@ void qemu_announce_self(AnnounceParameters *params)
->>      qemu_announce_self_once(timer);
->>  }
->>  
->> +void qmp_announce_self(bool has_params, AnnounceParameters *params,
->> +                       Error **errp)
->> +{
->> +    AnnounceParameters announce_params;
->> +
->> +    memcpy(&announce_params, qemu_get_announce_params(),
->> +           sizeof(announce_params));
->> +
->> +    if (has_params)
->> +        qemu_set_announce_parameters(&announce_params, params);
->> +
->> +    qemu_announce_self(&announce_params);
-> 
-> Are I missreading qemu_annouce_self()?
-> My reading is that it passes announce_params to a timer (i.e. async
-> function), but here announce_params is a local variable here, no?
-> 
+On 14 May 2017 at 06:21, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> wrot=
+e:
+> If you agree with upgrading those comments:
+> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 
-The AnnounceTimer holds a copy since each timer may have it's own values.
+Yes, I agree with all those comment changes. Since they
+were the only changes I've put the updated patchset
+straight into target-arm.next.
 
-Thanks
--vlad
+Thanks for the careful review!
+
+-- PMM
