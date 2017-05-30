@@ -1,33 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55869)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56702)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dan.j.williams@intel.com>) id 1dFmd1-0005ud-Un
-	for qemu-devel@nongnu.org; Tue, 30 May 2017 15:16:28 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1dFmfq-0008UZ-Fr
+	for qemu-devel@nongnu.org; Tue, 30 May 2017 15:19:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dan.j.williams@intel.com>) id 1dFmd1-0007qH-0T
-	for qemu-devel@nongnu.org; Tue, 30 May 2017 15:16:27 -0400
-Received: from mail-oi0-x22d.google.com ([2607:f8b0:4003:c06::22d]:33141)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <dan.j.williams@intel.com>)
-	id 1dFmd0-0007qB-Qv
-	for qemu-devel@nongnu.org; Tue, 30 May 2017 15:16:26 -0400
-Received: by mail-oi0-x22d.google.com with SMTP id w10so124156793oif.0
-	for <qemu-devel@nongnu.org>; Tue, 30 May 2017 12:16:26 -0700 (PDT)
+	(envelope-from <dgilbert@redhat.com>) id 1dFmfm-0000DC-Fu
+	for qemu-devel@nongnu.org; Tue, 30 May 2017 15:19:22 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37086)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dFmfm-0000Cm-5P
+	for qemu-devel@nongnu.org; Tue, 30 May 2017 15:19:18 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 0DC704E35B
+	for <qemu-devel@nongnu.org>; Tue, 30 May 2017 19:19:17 +0000 (UTC)
+Date: Tue, 30 May 2017 20:19:03 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170530191903.GV2120@work-vm>
+References: <1495649128-10529-1-git-send-email-vyasevic@redhat.com>
+	<1495649128-10529-4-git-send-email-vyasevic@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <dcee001b-755c-1a88-234b-0ca663958584@redhat.com>
-References: <20170526023213.18741-1-haozhong.zhang@intel.com>
-	<20170526023213.18741-2-haozhong.zhang@intel.com>
-	<CAJ+F1C+9o_vv4m7q47gPiaUjmQy7ag_J5ZKaHA9oagxZG2Q5Cg@mail.gmail.com>
-	<20170526065132.ayapfebbft5lyigd@hz-desktop>
-	<CAJ+F1CLDp7O93TRh2XcGQXXM_ZESiku0jDkcgzYUWAkP01wG9g@mail.gmail.com>
-	<20170526071654.kxcqflvpo2tvcrvu@hz-desktop>
-	<CAPcyv4hbf0RrjK5t5eN2Cs271JJUEYuiDNZqvso8g7QG4m4hDw@mail.gmail.com>
-	<dcee001b-755c-1a88-234b-0ca663958584@redhat.com>
-From: Dan Williams <dan.j.williams@intel.com>
-Date: Tue, 30 May 2017 12:16:25 -0700
-Message-ID: <CAPcyv4gA5odW2mm0_ogc1tpj2UsjGFRoE2AoiSRZjKxBAyL87g@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [RESEND PATCH 2/2] hostmem-file: add an attribute
- 'align' to set its alignment
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1495649128-10529-4-git-send-email-vyasevic@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 03/12] migration: Switch to using
+ announcement timer
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,31 +34,264 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Stefan Hajnoczi <stefanha@gmail.com>, Xiao Guangrong <guangrong.xiao@gmail.com>, Igor Mammedov <imammedo@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: Vladislav Yasevich <vyasevic@redhat.com>
+Cc: qemu-devel@nongnu.org, quintela@redhat.com, germano@redhat.com, lvivier@redhat.com, jasowang@redhat.com, jdenemar@redhat.com, kashyap@redhat.com, armbru@redhat.com, mst@redhat.com
 
-On Tue, May 30, 2017 at 5:17 AM, Paolo Bonzini <pbonzini@redhat.com> wrote:
->
->
-> On 26/05/2017 16:24, Dan Williams wrote:
->>> For DAX device only, QEMU can figure out the proper alignment by
->>> itself. However, I'm not sure whether there are other non-DAX cases
->>> requiring non-default alignment, so I think it's better to just add an
->>> interface (i.e. align attribute) in QEMU and let other management
->>> tools (e.g. libvirt?) fill a proper value.
->> I can't imagine any cases where you would want to specify an
->> alignment. If it's regular file mmap any alignment is fine, and if
->> it's device-dax only the configured alignment of the device instance
->> is allowed. So, I don't think this should be a configurable option,
->> just read it from the device instance and you're done.
->
-> A 2M or 1G alignment lets KVM use EPT hugepages if the host physical
-> addresses are contiguous and 2M- or 1G-aligned.
->
-> QEMU only does this for hugetlbfs currently, where the requirement on
-> the host physical addresses is always satisfied.  Would the same apply
-> to NVDIMM device DAX?
->
+* Vladislav Yasevich (vyasevic@redhat.com) wrote:
+> Switch qemu_announce_self and virtio annoucements to use
+> the announcement timer framework.  This makes sure that both
+> timers use the same timeouts and number of annoucement attempts
+> 
+> Based on work by Dr. David Alan Gilbert <dgilbert@redhat.com>
+> 
+> Signed-off-by: Vladislav Yasevich <vyasevic@redhat.com>
+> ---
+>  hw/net/virtio-net.c            | 28 ++++++++++++++++------------
+>  include/hw/virtio/virtio-net.h |  3 +--
+>  include/migration/vmstate.h    | 17 +++++++++++------
+>  include/sysemu/sysemu.h        |  2 +-
+>  migration/migration.c          |  2 +-
+>  migration/savevm.c             | 28 ++++++++++++++--------------
+>  6 files changed, 44 insertions(+), 36 deletions(-)
+> 
+> diff --git a/hw/net/virtio-net.c b/hw/net/virtio-net.c
+> index 7d091c9..1c65825 100644
+> --- a/hw/net/virtio-net.c
+> +++ b/hw/net/virtio-net.c
+> @@ -25,6 +25,7 @@
+>  #include "qapi/qmp/qjson.h"
+>  #include "qapi-event.h"
+>  #include "hw/virtio/virtio-access.h"
+> +#include "migration/migration.h"
+>  
+>  #define VIRTIO_NET_VM_VERSION    11
+>  
+> @@ -115,7 +116,7 @@ static void virtio_net_announce_timer(void *opaque)
+>      VirtIONet *n = opaque;
+>      VirtIODevice *vdev = VIRTIO_DEVICE(n);
+>  
+> -    n->announce_counter--;
+> +    n->announce_timer->round--;
+>      n->status |= VIRTIO_NET_S_ANNOUNCE;
+>      virtio_notify_config(vdev);
+>  }
+> @@ -427,8 +428,8 @@ static void virtio_net_reset(VirtIODevice *vdev)
+>      n->nobcast = 0;
+>      /* multiqueue is disabled by default */
+>      n->curr_queues = 1;
+> -    timer_del(n->announce_timer);
+> -    n->announce_counter = 0;
+> +    timer_del(n->announce_timer->tm);
+> +    n->announce_timer->round = 0;
+>      n->status &= ~VIRTIO_NET_S_ANNOUNCE;
+>  
+>      /* Flush any MAC and VLAN filter table state */
+> @@ -872,10 +873,10 @@ static int virtio_net_handle_announce(VirtIONet *n, uint8_t cmd,
+>      if (cmd == VIRTIO_NET_CTRL_ANNOUNCE_ACK &&
+>          n->status & VIRTIO_NET_S_ANNOUNCE) {
+>          n->status &= ~VIRTIO_NET_S_ANNOUNCE;
+> -        if (n->announce_counter) {
+> -            timer_mod(n->announce_timer,
+> +        if (n->announce_timer->round) {
+> +            timer_mod(n->announce_timer->tm,
+>                        qemu_clock_get_ms(QEMU_CLOCK_VIRTUAL) +
+> -                      self_announce_delay(n->announce_counter));
+> +                      self_announce_delay(n->announce_timer));
+>          }
+>          return VIRTIO_NET_OK;
+>      } else {
+> @@ -1615,8 +1616,8 @@ static int virtio_net_post_load_device(void *opaque, int version_id)
+>  
+>      if (virtio_vdev_has_feature(vdev, VIRTIO_NET_F_GUEST_ANNOUNCE) &&
+>          virtio_vdev_has_feature(vdev, VIRTIO_NET_F_CTRL_VQ)) {
+> -        n->announce_counter = SELF_ANNOUNCE_ROUNDS;
+> -        timer_mod(n->announce_timer, qemu_clock_get_ms(QEMU_CLOCK_VIRTUAL));
+> +        n->announce_timer->round = n->announce_timer->params.rounds;
+> +        timer_mod(n->announce_timer->tm, qemu_clock_get_ms(QEMU_CLOCK_VIRTUAL));
 
-Yes, I believe it is similar. Device-dax guarantees and enforces (mmap
-area must be aligned) a given fault granularity.
+Do you think it's worth having a 
+  qemu_announce_timer_init(AnnounceTimer *, QEMU_CLOCK_*)
+that would initialise the round and any other values and 
+do the initial timer_mod ?
+
+>      }
+>  
+>      return 0;
+> @@ -1938,8 +1939,10 @@ static void virtio_net_device_realize(DeviceState *dev, Error **errp)
+>      qemu_macaddr_default_if_unset(&n->nic_conf.macaddr);
+>      memcpy(&n->mac[0], &n->nic_conf.macaddr, sizeof(n->mac));
+>      n->status = VIRTIO_NET_S_LINK_UP;
+> -    n->announce_timer = timer_new_ms(QEMU_CLOCK_VIRTUAL,
+> -                                     virtio_net_announce_timer, n);
+> +    n->announce_timer = qemu_announce_timer_new(qemu_get_announce_params(),
+> +                                                QEMU_CLOCK_VIRTUAL);
+> +    n->announce_timer->tm = timer_new_ms(QEMU_CLOCK_VIRTUAL,
+> +                                          virtio_net_announce_timer, n);
+>  
+>      if (n->netclient_type) {
+>          /*
+> @@ -2001,8 +2004,9 @@ static void virtio_net_device_unrealize(DeviceState *dev, Error **errp)
+>          virtio_net_del_queue(n, i);
+>      }
+>  
+> -    timer_del(n->announce_timer);
+> -    timer_free(n->announce_timer);
+> +    timer_del(n->announce_timer->tm);
+> +    timer_free(n->announce_timer->tm);
+> +    g_free(n->announce_timer);
+
+Hmm, why is this all safe - I guess this is in the BQL?
+
+>      g_free(n->vqs);
+>      qemu_del_nic(n->nic);
+>      virtio_cleanup(vdev);
+> diff --git a/include/hw/virtio/virtio-net.h b/include/hw/virtio/virtio-net.h
+> index 1eec9a2..51dd4c3 100644
+> --- a/include/hw/virtio/virtio-net.h
+> +++ b/include/hw/virtio/virtio-net.h
+> @@ -94,8 +94,7 @@ typedef struct VirtIONet {
+>      char *netclient_name;
+>      char *netclient_type;
+>      uint64_t curr_guest_offloads;
+> -    QEMUTimer *announce_timer;
+> -    int announce_counter;
+> +    AnnounceTimer *announce_timer;
+>      bool needs_vnet_hdr_swap;
+>  } VirtIONet;
+>  
+> diff --git a/include/migration/vmstate.h b/include/migration/vmstate.h
+> index a6bf84d..f8aed9b 100644
+> --- a/include/migration/vmstate.h
+> +++ b/include/migration/vmstate.h
+> @@ -1022,8 +1022,6 @@ extern const VMStateInfo vmstate_info_qtailq;
+>  #define VMSTATE_END_OF_LIST()                                         \
+>      {}
+>  
+> -#define SELF_ANNOUNCE_ROUNDS 5
+> -
+>  void loadvm_free_handlers(MigrationIncomingState *mis);
+>  
+>  int vmstate_load_state(QEMUFile *f, const VMStateDescription *vmsd,
+> @@ -1071,11 +1069,18 @@ AnnounceTimer *qemu_announce_timer_create(AnnounceParameters *params,
+>                                            QEMUTimerCB *cb);
+>  
+>  static inline
+> -int64_t self_announce_delay(int round)
+> +int64_t self_announce_delay(AnnounceTimer *timer)
+>  {
+> -    assert(round < SELF_ANNOUNCE_ROUNDS && round > 0);
+> -    /* delay 50ms, 150ms, 250ms, ... */
+> -    return 50 + (SELF_ANNOUNCE_ROUNDS - round - 1) * 100;
+> +    int64_t ret;
+> +
+> +    ret =  timer->params.initial +
+> +           (timer->params.rounds - timer->round - 1) *
+> +           timer->params.step;
+> +
+> +    if (ret < 0 || ret > timer->params.max) {
+> +        ret = timer->params.max;
+> +    }
+> +    return ret;
+>  }
+
+This feels like it should be with the rest of your code somewhere?
+
+>  void dump_vmstate_json_to_file(FILE *out_fp);
+> diff --git a/include/sysemu/sysemu.h b/include/sysemu/sysemu.h
+> index 7fd49c4..2ef1687 100644
+> --- a/include/sysemu/sysemu.h
+> +++ b/include/sysemu/sysemu.h
+> @@ -85,7 +85,7 @@ bool qemu_validate_announce_parameters(AnnounceParameters *params,
+>                                         Error **errp);
+>  void qemu_set_announce_parameters(AnnounceParameters *announce_params,
+>                                    AnnounceParameters *params);
+> -void qemu_announce_self(void);
+> +void qemu_announce_self(AnnounceParameters *params);
+>  
+>  /* Subcommands for QEMU_VM_COMMAND */
+>  enum qemu_vm_cmd {
+> diff --git a/migration/migration.c b/migration/migration.c
+> index 0304c01..987c1cf 100644
+> --- a/migration/migration.c
+> +++ b/migration/migration.c
+> @@ -345,7 +345,7 @@ static void process_incoming_migration_bh(void *opaque)
+>       * This must happen after all error conditions are dealt with and
+>       * we're sure the VM is going to be running on this host.
+>       */
+> -    qemu_announce_self();
+> +    qemu_announce_self(qemu_get_announce_params());
+>  
+>      /* If global state section was not received or we are in running
+>         state, we need to obey autostart. Any other state is set with
+> diff --git a/migration/savevm.c b/migration/savevm.c
+> index 607b090..555157a 100644
+> --- a/migration/savevm.c
+> +++ b/migration/savevm.c
+> @@ -212,21 +212,19 @@ static void qemu_announce_self_iter(NICState *nic, void *opaque)
+>      qemu_send_packet_raw(qemu_get_queue(nic), buf, len);
+>  }
+>  
+> -
+>  static void qemu_announce_self_once(void *opaque)
+>  {
+> -    static int count = SELF_ANNOUNCE_ROUNDS;
+> -    QEMUTimer *timer = *(QEMUTimer **)opaque;
+> +    AnnounceTimer *timer = (AnnounceTimer *)opaque;
+>  
+>      qemu_foreach_nic(qemu_announce_self_iter, NULL);
+>  
+> -    if (--count) {
+> -        /* delay 50ms, 150ms, 250ms, ... */
+> -        timer_mod(timer, qemu_clock_get_ms(QEMU_CLOCK_REALTIME) +
+> -                  self_announce_delay(count));
+> +    if (--timer->round) {
+> +        timer_mod(timer->tm, qemu_clock_get_ms(timer->type) +
+> +                  self_announce_delay(timer));
+>      } else {
+> -            timer_del(timer);
+> -            timer_free(timer);
+> +            timer_del(timer->tm);
+> +            timer_free(timer->tm);
+> +            g_free(timer);
+
+That's kind of odd in that it doesn't cause the thing the opaque
+pointed to, to be zero'd, so problem if someone free'd it
+in an exit path?  But probably OK in this case.
+
+Dave
+
+>      }
+>  }
+>  
+> @@ -252,11 +250,13 @@ AnnounceTimer *qemu_announce_timer_create(AnnounceParameters *params,
+>      return timer;
+>  }
+>  
+> -void qemu_announce_self(void)
+> +void qemu_announce_self(AnnounceParameters *params)
+>  {
+> -    static QEMUTimer *timer;
+> -    timer = timer_new_ms(QEMU_CLOCK_REALTIME, qemu_announce_self_once, &timer);
+> -    qemu_announce_self_once(&timer);
+> +    AnnounceTimer *timer;
+> +
+> +    timer = qemu_announce_timer_create(params, QEMU_CLOCK_REALTIME,
+> +                                       qemu_announce_self_once);
+> +    qemu_announce_self_once(timer);
+>  }
+>  
+>  /***********************************************************/
+> @@ -1730,7 +1730,7 @@ static void loadvm_postcopy_handle_run_bh(void *opaque)
+>       */
+>      cpu_synchronize_all_post_init();
+>  
+> -    qemu_announce_self();
+> +    qemu_announce_self(qemu_get_announce_params());
+>  
+>      /* Make sure all file formats flush their mutable metadata.
+>       * If we get an error here, just don't restart the VM yet. */
+> -- 
+> 2.7.4
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
