@@ -1,22 +1,38 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34696)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35826)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dFk2U-0002wt-5p
-	for qemu-devel@nongnu.org; Tue, 30 May 2017 12:30:38 -0400
+	(envelope-from <borntraeger@de.ibm.com>) id 1dFk6n-00057w-0A
+	for qemu-devel@nongnu.org; Tue, 30 May 2017 12:35:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dFk2T-0007Tm-AZ
-	for qemu-devel@nongnu.org; Tue, 30 May 2017 12:30:34 -0400
-References: <1496161442-96665-1-git-send-email-imammedo@redhat.com>
-	<1496161442-96665-6-git-send-email-imammedo@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <554eca2d-3c94-c341-299f-d71bcb020edd@redhat.com>
-Date: Tue, 30 May 2017 11:30:27 -0500
+	(envelope-from <borntraeger@de.ibm.com>) id 1dFk6i-0001HD-8o
+	for qemu-devel@nongnu.org; Tue, 30 May 2017 12:35:01 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:36198)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
+	id 1dFk6h-0001Gi-VQ
+	for qemu-devel@nongnu.org; Tue, 30 May 2017 12:34:56 -0400
+Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v4UGYRBM097279
+	for <qemu-devel@nongnu.org>; Tue, 30 May 2017 12:34:54 -0400
+Received: from e15.ny.us.ibm.com (e15.ny.us.ibm.com [129.33.205.205])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2asc6j8gsf-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Tue, 30 May 2017 12:34:54 -0400
+Received: from localhost
+	by e15.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
+	Tue, 30 May 2017 12:34:52 -0400
+References: <149615665491.28067.17765793725374594694.stgit@bahia.lan>
+From: Christian Borntraeger <borntraeger@de.ibm.com>
+Date: Tue, 30 May 2017 18:34:46 +0200
 MIME-Version: 1.0
-In-Reply-To: <1496161442-96665-6-git-send-email-imammedo@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="5XKsjjJH2eTvB5AmFE9sCb9a0qj2cIPiH"
-Subject: Re: [Qemu-devel] [PATCH v3 5/7] numa: move numa_node from CPUState
- into target specific classes
+In-Reply-To: <149615665491.28067.17765793725374594694.stgit@bahia.lan>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Message-Id: <e8fdae1c-9d3c-1059-509a-6b85000e83a9@de.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH] pc-bios/s390-ccw: use STRIP variable in
+ Makefile
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,69 +41,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org
-Cc: Andrew Jones <drjones@redhat.com>, qemu-arm@nongnu.org, qemu-ppc@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, David Gibson <david@gibson.dropbear.id.au>
+To: Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org
+Cc: Cornelia Huck <cornelia.huck@de.ibm.com>, qemu-trivial@nongnu.org, Fam Zheng <famz@redhat.com>, Alexander Graf <agraf@suse.de>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---5XKsjjJH2eTvB5AmFE9sCb9a0qj2cIPiH
-From: Eric Blake <eblake@redhat.com>
-To: Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org
-Cc: Andrew Jones <drjones@redhat.com>, qemu-arm@nongnu.org,
- qemu-ppc@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>,
- David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <554eca2d-3c94-c341-299f-d71bcb020edd@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v3 5/7] numa: move numa_node from CPUState
- into target specific classes
-References: <1496161442-96665-1-git-send-email-imammedo@redhat.com>
- <1496161442-96665-6-git-send-email-imammedo@redhat.com>
-In-Reply-To: <1496161442-96665-6-git-send-email-imammedo@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 05/30/2017 11:24 AM, Igor Mammedov wrote:
-> Move vcpu's assocciated numa_node field out of generic CPUState
-
-s/assocciated/associated/
-
-> into inherited classes that actually care about cpu<->numa mapping,
-> i.e: ARMCPU, PowerPCCPU, X86CPU.
->=20
-> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+On 05/30/2017 05:04 PM, Greg Kurz wrote:
+> The docker-run-test-build@debian-s390x-cross target fails with:
+> 
+> strip --strip-unneeded s390-ccw.elf -o s390-ccw.img
+> strip: Unable to recognise the format of the input file `s390-ccw.elf'
+> 
+> The configure script defines a STRIP makefile variable whose default
+> value is ${cross_prefix}strip. Let's use it.
+> 
+> Signed-off-by: Greg Kurz <groug@kaod.org>
 > ---
+>  pc-bios/s390-ccw/Makefile |    2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/pc-bios/s390-ccw/Makefile b/pc-bios/s390-ccw/Makefile
+> index 79a46b67356f..7af57dad109c 100644
+> --- a/pc-bios/s390-ccw/Makefile
+> +++ b/pc-bios/s390-ccw/Makefile
+> @@ -22,7 +22,7 @@ s390-ccw.elf: $(OBJECTS)
+>  	$(call quiet-command,$(CC) $(LDFLAGS) -o $@ $(OBJECTS),"BUILD","$(TARGET_DIR)$@")
+> 
+>  s390-ccw.img: s390-ccw.elf
+> -	$(call quiet-command,strip --strip-unneeded $< -o $@,"STRIP","$(TARGET_DIR)$@")
+> +	$(call quiet-command,$(STRIP) --strip-unneeded $< -o $@,"STRIP","$(TARGET_DIR)$@")
+> 
+>  $(OBJECTS): Makefile
+> 
+> 
 
-> +++ b/target/arm/cpu.h
-> @@ -703,6 +703,8 @@ struct ARMCPU {
-> =20
->      ARMELChangeHook *el_change_hook;
->      void *el_change_hook_opaque;
-> +
-> +    int32_t node_id; /* NUMA node this CPU is belonging to */
+I was going to apply this, but it fails with --disable-strip like
 
-s/is belonging/belongs/  (multiple places in the patch)
+    /bin/sh: --strip-unneeded: command not found
+    Makefile:25: recipe for target 's390-ccw.img' failed
+    make[1]: *** [s390-ccw.img] Error 127
+    Makefile:354: recipe for target 'romsubdir-s390-ccw' failed
+    make: *** [romsubdir-s390-ccw] Error 2
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---5XKsjjJH2eTvB5AmFE9sCb9a0qj2cIPiH
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEcBAEBCAAGBQJZLZ4kAAoJEKeha0olJ0NquP4IAJCIOJFqVyzigiV02y9vDoOv
-aYjA73MiGNJBIvZfHclFtT0qIiwiYJM/CWvpIg25oZbzGbHpwp3rj+dY/cxIecjP
-D3aQUj6zO1aUPE3ErX1v9got3LtywFb6wu9tJPEtT/1yx+BcawCwNhAOrciA/C2K
-5E3F6wAhd2EEiHe1KBg7SyFaxipvuO4qBR6v0/3g3ttO+QeFZhwLU43WSyf3FmBv
-5AP8E5fj7jJuUn86DRlpbpBbDYDWlZ6mzuFgGoJdEPnFtJGO6Yzuqe/c0K6qAit7
-zRYqyb+W8QvNVym+yt9QPWlCjkPIdDLWasojYph6wrsTsUJCmA3FEmJo5flsx3M=
-=AKeT
------END PGP SIGNATURE-----
-
---5XKsjjJH2eTvB5AmFE9sCb9a0qj2cIPiH--
+Not yet sure whats going on.
