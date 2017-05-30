@@ -1,25 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41111)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41151)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1dFllM-0007ig-3r
-	for qemu-devel@nongnu.org; Tue, 30 May 2017 14:21:04 -0400
+	(envelope-from <eblake@redhat.com>) id 1dFllX-0007mc-Ng
+	for qemu-devel@nongnu.org; Tue, 30 May 2017 14:21:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1dFllI-0006Bh-4z
-	for qemu-devel@nongnu.org; Tue, 30 May 2017 14:21:00 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:49968)
+	(envelope-from <eblake@redhat.com>) id 1dFllT-0006EV-Nd
+	for qemu-devel@nongnu.org; Tue, 30 May 2017 14:21:11 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:33552)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1dFllH-0006BW-Pv
-	for qemu-devel@nongnu.org; Tue, 30 May 2017 14:20:56 -0400
-Date: Tue, 30 May 2017 21:20:45 +0300
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20170530211819-mutt-send-email-mst@kernel.org>
-References: <20170526142858.19931-1-maxime.coquelin@redhat.com>
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dFllT-0006EL-DI
+	for qemu-devel@nongnu.org; Tue, 30 May 2017 14:21:07 -0400
+References: <20170511191843.13784-1-ehabkost@redhat.com>
+	<20170511191843.13784-3-ehabkost@redhat.com>
+	<CAFEAcA-jdbDL1uuhM5W=b4qisPsvpJz7aciR8WQebVy43QuBKQ@mail.gmail.com>
+	<20170530140103.GI32274@thinpad.lan.raisama.net>
+	<5f082e0c-6b89-188f-19d5-dfe476c140fc@redhat.com>
+	<20170530181034.GN32274@thinpad.lan.raisama.net>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <075c20c5-3783-ed72-dfe2-52880fec439b@redhat.com>
+Date: Tue, 30 May 2017 13:21:04 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <20170526142858.19931-1-maxime.coquelin@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 0/6] vhost-user: Specify and implement
- device IOTLB support
+In-Reply-To: <20170530181034.GN32274@thinpad.lan.raisama.net>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="maEVGVqSqnil9TijdEjwDWkAahGNn5uJj"
+Subject: Re: [Qemu-devel] [PULL 02/29] numa: Allow setting NUMA distance for
+ different NUMA nodes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,71 +33,95 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Maxime Coquelin <maxime.coquelin@redhat.com>
-Cc: peterx@redhat.com, marcandre.lureau@gmail.com, vkaplans@redhat.com, jasowang@redhat.com, wexu@redhat.com, yuanhan.liu@linux.intel.com, qemu-devel@nongnu.org, jfreiman@redhat.com
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Igor Mammedov <imammedo@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, He Chen <he.chen@linux.intel.com>
 
-On Fri, May 26, 2017 at 04:28:52PM +0200, Maxime Coquelin wrote:
-> This series aims at specifying ans implementing the protocol update
-> required to support device IOTLB with user backends.
->=20
-> In this second non-RFC version, main changes are:
->  - spec fixes and clarification
->  - rings information update has been restored back to ring enablement t=
-ime
->  - Work around GCC 4.4.7 limitation wrt assignment in unnamed union at
-> declaration time.
->=20
-> The series can be tested with vhost_iotlb_proto_v2 branch on my gitlab
-> account[0].
->=20
-> The slave requests channel part is re-used from Marc-Andr=E9's series s=
-ubmitted
-> last year[1], with main changes from original version being request/fea=
-ture
-> names renaming and addition of the REPLY_ACK feature support.
->=20
-> Regarding IOTLB protocol, one noticeable change is the IOTLB miss reque=
-st
-> reply made optionnal (i.e. only if slave requests it by setting the
-> VHOST_USER_NEED_REPLY flag in the message header). This change provides
-> more flexibility in the backend implementation of the feature.
->=20
-> The protocol is very close to kernel backends, except that a new
-> communication channel is introduced to enable the slave to send
-> requests to the master.
->=20
-> [0]: https://gitlab.com/mcoquelin/dpdk-next-virtio/commits/vhost_iotlb_=
-proto_v2
-> [1]: https://lists.gnu.org/archive/html/qemu-devel/2016-04/msg00095.htm=
-l
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--maEVGVqSqnil9TijdEjwDWkAahGNn5uJj
+From: Eric Blake <eblake@redhat.com>
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Igor Mammedov <imammedo@redhat.com>, QEMU Developers
+ <qemu-devel@nongnu.org>, He Chen <he.chen@linux.intel.com>
+Message-ID: <075c20c5-3783-ed72-dfe2-52880fec439b@redhat.com>
+Subject: Re: [Qemu-devel] [PULL 02/29] numa: Allow setting NUMA distance for
+ different NUMA nodes
+References: <20170511191843.13784-1-ehabkost@redhat.com>
+ <20170511191843.13784-3-ehabkost@redhat.com>
+ <CAFEAcA-jdbDL1uuhM5W=b4qisPsvpJz7aciR8WQebVy43QuBKQ@mail.gmail.com>
+ <20170530140103.GI32274@thinpad.lan.raisama.net>
+ <5f082e0c-6b89-188f-19d5-dfe476c140fc@redhat.com>
+ <20170530181034.GN32274@thinpad.lan.raisama.net>
+In-Reply-To: <20170530181034.GN32274@thinpad.lan.raisama.net>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Overall, this looks good to me. I do think patch 3 isn't a good idea
-though, if slave wants something let it request it.
+On 05/30/2017 01:10 PM, Eduardo Habkost wrote:
+> On Tue, May 30, 2017 at 10:28:21AM -0500, Eric Blake wrote:
+>> On 05/30/2017 09:01 AM, Eduardo Habkost wrote:
+>>
+>>>> The OSX compiler is pickier about format strings than gcc,
+>>>> and neither "MAX_NODES" nor "MAX(anything)" are uint16_t type.
+>>>
+>>> src and dst are both uint16_t, so MAX(src, dst) is also uint16_t,
+>>> isn't it?  It looks like MAX_NODES is the problem.
+>>
+>> No. MAX() invokes arithmetic (both ?: and > operators), and arithmetic=
 
-Need to find out why does vhost in kernel want the used ring iotlb at
-start time - especially considering we aren't even guaranteed one entry
-covers the whole ring, and invalidates should affect all addresses at
-least in theory.
+>> involves default promotion (anything shorter than int becomes 'int').
+>=20
+> Oh, I didn't know that.
+
+And the fact that var-arg passing REQUIRES promotion means you CAN'T
+tell the difference from a true uint16_t argument and an int argument
+which resulted from arithmetic promotion.  Which is why Paolo has argued
+that the MacOS compiler warning is bogus because it is overly picky.
+But we obviously are in no position to get it changed.
+
+>=20
+>>
+>>> +++ b/numa.c
+>>> @@ -232,7 +232,7 @@ static void parse_numa_distance(NumaDistOptions *=
+dist, Error **errp)
+>>>      if (src >=3D MAX_NODES || dst >=3D MAX_NODES) {
+>>>          error_setg(errp,
+>>>                     "Invalid node %" PRIu16
+>>> -                   ", max possible could be %" PRIu16,
+>>> +                   ", max possible could be %d",
+>>
+>> Don't you want %u to match PRIu16, rather than %d?
+>=20
+> Can't this (using %u with an int argument) make more pedantic
+> compilers complain?
+
+Yes, gcc's -Wformat-signedness would (probably) flag it.  But we don't
+use that.  At any rate, ALL uint16_t values are formatted identically
+for both %u and %d, so as long as we have a formula for keeping picky
+compilers silent, I don't care beyond that point.
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
 
 
-> Marc-Andr=E9 Lureau (2):
->   vhost-user: add vhost_user to hold the chr
->   vhost-user: add slave-req-fd support
->=20
-> Maxime Coquelin (4):
->   vhost: propagate errors in vhost_device_iotlb_miss()
->   vhost: rework IOTLB messaging
->   vhost: extend ring information update for IOTLB to all rings
->   spec/vhost-user spec: Add IOMMU support
->=20
->  docs/specs/vhost-user.txt         | 118 ++++++++++++++++++++++++-
->  hw/virtio/vhost-backend.c         | 130 ++++++++++++++++------------
->  hw/virtio/vhost-user.c            | 177 ++++++++++++++++++++++++++++++=
-+++++++-
->  hw/virtio/vhost.c                 |  27 ++++--
->  include/hw/virtio/vhost-backend.h |  23 +++--
->  include/hw/virtio/vhost.h         |   2 +-
->  6 files changed, 397 insertions(+), 80 deletions(-)
->=20
-> --=20
-> 2.9.4
+--maEVGVqSqnil9TijdEjwDWkAahGNn5uJj
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEcBAEBCAAGBQJZLbgQAAoJEKeha0olJ0NqR8sIAITQSKuAwggw95YbKXMQBvtq
+AyGl7Sh/OTU6TwZyFuXUs3m3ElLhABnYM8Q7dCHGoBRMHHaS0hvv1onM1Dp3Uu2k
+X4BE9kxmvA89WGViNlGxvg5FyBfim261bUWK/qqkGJJhOKsEzpcmu8wcSjcYGCws
+6RoZqUD5W83puEtLlN7ilUZxdOsw+Xqk3/ENWK7j8vthhBnGR3aFWnyC/JROcU6p
+IUp40Wg4zUjFtjuCPEykY9ZqRtcjv+NBQkmiS3GJncQeXX6/MLfw1yIHXQ+5uer6
+2jmoX+5C99LYPxkoW2jbpqSx5YGPt4VUtIHr6nBteu6CESd4AjslLFV4CLGNLxY=
+=budu
+-----END PGP SIGNATURE-----
+
+--maEVGVqSqnil9TijdEjwDWkAahGNn5uJj--
