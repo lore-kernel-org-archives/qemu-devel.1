@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53545)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54121)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1dFeEg-0007Up-T0
-	for qemu-devel@nongnu.org; Tue, 30 May 2017 06:18:47 -0400
+	(envelope-from <groug@kaod.org>) id 1dFeHN-0000er-Qy
+	for qemu-devel@nongnu.org; Tue, 30 May 2017 06:21:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1dFeEd-0003dr-P9
-	for qemu-devel@nongnu.org; Tue, 30 May 2017 06:18:46 -0400
-Received: from mail-wm0-x243.google.com ([2a00:1450:400c:c09::243]:33511)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1dFeEd-0003dd-Io
-	for qemu-devel@nongnu.org; Tue, 30 May 2017 06:18:43 -0400
-Received: by mail-wm0-x243.google.com with SMTP id b84so24118816wmh.0
-	for <qemu-devel@nongnu.org>; Tue, 30 May 2017 03:18:43 -0700 (PDT)
-Date: Tue, 30 May 2017 11:18:40 +0100
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20170530101840.GB25884@stefanha-x1.localdomain>
-References: <20170529193016.6888-1-aurelien@aurel32.net>
-	<20170529193016.6888-2-aurelien@aurel32.net>
+	(envelope-from <groug@kaod.org>) id 1dFeHK-0004SX-MO
+	for qemu-devel@nongnu.org; Tue, 30 May 2017 06:21:33 -0400
+Received: from 18.mo5.mail-out.ovh.net ([178.33.45.10]:38866)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1dFeHK-0004S2-G8
+	for qemu-devel@nongnu.org; Tue, 30 May 2017 06:21:30 -0400
+Received: from player799.ha.ovh.net (b9.ovh.net [213.186.33.59])
+	by mo5.mail-out.ovh.net (Postfix) with ESMTP id 5088FEBA69
+	for <qemu-devel@nongnu.org>; Tue, 30 May 2017 12:21:17 +0200 (CEST)
+Date: Tue, 30 May 2017 12:21:12 +0200
+From: Greg Kurz <groug@kaod.org>
+Message-ID: <20170530122112.2dc44db9@bahia.ttt.fr.ibm.com>
+In-Reply-To: <20170530094212.GL11362@stefanha-x1.localdomain>
+References: <1496048740-26578-1-git-send-email-groug@kaod.org>
+	<20170530094212.GL11362@stefanha-x1.localdomain>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="pvezYHf7grwyp3Bc"
-Content-Disposition: inline
-In-Reply-To: <20170529193016.6888-2-aurelien@aurel32.net>
-Subject: Re: [Qemu-devel] [PULL 1/5] target/sh4: log unauthorized accesses
- using qemu_log_mask
+	boundary="Sig_/_RuTiMkvikCb35EEWTefALn";
+	protocol="application/pgp-signature"
+Subject: Re: [Qemu-devel] [PULL 00/11] 9pfs patches for 2.10 20170525
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,43 +31,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Aurelien Jarno <aurelien@aurel32.net>
-Cc: Stefan Hajnoczi <stefanha@redhat.com>, "open list:All patches CC here" <qemu-devel@nongnu.org>
+To: Stefan Hajnoczi <stefanha@gmail.com>
+Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Stefan Hajnoczi <stefanha@redhat.com>
 
-
---pvezYHf7grwyp3Bc
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
+--Sig_/_RuTiMkvikCb35EEWTefALn
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, May 29, 2017 at 09:30:12PM +0200, Aurelien Jarno wrote:
-> qemu_log_mask() is preferred over fprintf() for logging errors.
+On Tue, 30 May 2017 10:42:12 +0100
+Stefan Hajnoczi <stefanha@gmail.com> wrote:
+
+> On Mon, May 29, 2017 at 11:05:29AM +0200, Greg Kurz wrote:
+> > The following changes since commit 9964e96dc9999cf7f7c936ee854a795415d1=
+9b60:
+> >=20
+> >   Merge remote-tracking branch 'jasowang/tags/net-pull-request' into st=
+aging (2017-05-23 15:01:31 +0100)
+> >=20
+> > are available in the git repository at:
+> >=20
+> >   https://github.com/gkurz/qemu.git tags/for-upstream
+> >=20
+> > for you to fetch changes up to f0a4da86cff2e600255324793daddd7ce59b9862:
+> >=20
+> >   9pfs: local: metadata file for the VirtFS root (2017-05-25 10:30:14 +=
+0200)
+> >=20
+> > ----------------------------------------------------------------
+> > Various bugfixes and code cleanups. Most notably, it fixes metadata han=
+dling in
+> > mapped-file security mode (especially for the virtfs root). =20
 >=20
-> Reviewed-by: Philippe Mathieu-Daud=E9 <f4bug@amsat.org>
-> Reviewed-by: Richard Henderson <rth@twiddle.net>
-> Signed-off-by: Aurelien Jarno <aurelien@aurel32.net>
-> ---
->  target/sh4/helper.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+> Please fix the compiler warning reported by patchew.
+>=20
 
-Had to drop this series due to a merge conflict.  Please see my reply
-regarding qemu_system_reset_request() with info on how to fix it.
+In file included from /var/tmp/patchew-tester-tmp-3cnydauu/src/hw/9pfs/9p-l=
+ocal.c:18:0:
+/var/tmp/patchew-tester-tmp-3cnydauu/src/hw/9pfs/9p-local.c: In function =
+=E2=80=98local_set_mapped_file_attrat=E2=80=99:
+/var/tmp/patchew-tester-tmp-3cnydauu/src/hw/9pfs/9p-util.h:19:5: error: =E2=
+=80=98map_dirfd=E2=80=99 may be used uninitialized in this function [-Werro=
+r=3Dmaybe-uninitialized]
+     close(fd);
+     ^~~~~~~~~
+/var/tmp/patchew-tester-tmp-3cnydauu/src/hw/9pfs/9p-local.c:235:9: note: =
+=E2=80=98map_dirfd=E2=80=99 was declared here
+     int map_dirfd, map_fd;
+         ^~~~~~~~~
+cc1: all warnings being treated as errors
 
-Thanks,
-Stefan
+This is a false positive: map_dirfd is necessarily initialized, but I guess
+gcc isn't smart enough to see that :-\
 
---pvezYHf7grwyp3Bc
-Content-Type: application/pgp-signature; name="signature.asc"
+It is acceptable to close(-1) so I guess I'll just do:
+
+-    int map_dirfd, map_fd;
++    int map_dirfd =3D -1, map_fd;
+
+> Thanks,
+> Stefan
+
+
+--Sig_/_RuTiMkvikCb35EEWTefALn
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
 
 -----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
 
-iQEcBAEBAgAGBQJZLUcAAAoJEJykq7OBq3PI9dYH/RVmPHxUP2IV7mOVB0aDvAZ+
-iHyTCsIiuBYv8ulllVgPL8+1kaujvoZzVKWbVi0tzFIwwkpwROtRpG7SjWJXr/IX
-z909TYrwvvXeqIeUwaIrVBTrYjLrYXjnpB/YYvmpkggMLOcwbSsMy5QhQzJnLnyN
-a774dLqqHLenlq3/cTrMqoHi4J3+GiSDAsPVkE8JrsSMwFnzOH1RjhIiX56DnN0A
-/gXmZ0PjaIVFwWBSQUj7uLBIatOlRevNn9LgyB9hvgdKDfXGCU2J9N/pnzq0O2T3
-YyREo6RozGPtSuYjnN8m576yK+2sePvWp8E8Qhly+MkNUFlmafqCQvUrK/NhsCc=
-=ViSM
+iEYEARECAAYFAlktR5gACgkQAvw66wEB28LJoQCffK2T4EDp4iJB1JuxuG2ytixj
+IsAAnjasTtJxmynSYwsgDOPizveCWlnw
+=sc2g
 -----END PGP SIGNATURE-----
 
---pvezYHf7grwyp3Bc--
+--Sig_/_RuTiMkvikCb35EEWTefALn--
