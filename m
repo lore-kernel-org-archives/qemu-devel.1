@@ -1,22 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60167)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60876)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dFohF-0004st-N6
-	for qemu-devel@nongnu.org; Tue, 30 May 2017 17:28:58 -0400
+	(envelope-from <eblake@redhat.com>) id 1dFojg-00060T-Iw
+	for qemu-devel@nongnu.org; Tue, 30 May 2017 17:31:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dFohB-0005hf-5A
-	for qemu-devel@nongnu.org; Tue, 30 May 2017 17:28:57 -0400
-References: <20170526165518.7580-1-mreitz@redhat.com>
-	<20170526165518.7580-11-mreitz@redhat.com>
+	(envelope-from <eblake@redhat.com>) id 1dFojc-0006UL-Cv
+	for qemu-devel@nongnu.org; Tue, 30 May 2017 17:31:28 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:39152)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dFojc-0006Tw-4q
+	for qemu-devel@nongnu.org; Tue, 30 May 2017 17:31:24 -0400
+References: <20170530143052.165002-1-vsementsov@virtuozzo.com>
+	<20170530143052.165002-6-vsementsov@virtuozzo.com>
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <5f17d11e-c32b-6e9c-fdd2-9174affd9e5a@redhat.com>
-Date: Tue, 30 May 2017 16:28:45 -0500
+Message-ID: <6425e4b9-3047-12dc-2698-80921690cdf8@redhat.com>
+Date: Tue, 30 May 2017 16:31:21 -0500
 MIME-Version: 1.0
-In-Reply-To: <20170526165518.7580-11-mreitz@redhat.com>
+In-Reply-To: <20170530143052.165002-6-vsementsov@virtuozzo.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="u0EjiCnmnK33WHhaj8fSscAWCSPQqEiQH"
-Subject: Re: [Qemu-devel] [PATCH v3 10/16] block/qcow2: Lock s->lock in
- preallocate()
+	boundary="O1XauhW01Rxe7FtprAiOKQJX0c3D9LXSV"
+Subject: Re: [Qemu-devel] [PATCH 05/19] nbd/server: refactor
+ nbd_co_receive_request
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,41 +29,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org
+Cc: pbonzini@redhat.com, den@openvz.org
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---u0EjiCnmnK33WHhaj8fSscAWCSPQqEiQH
+--O1XauhW01Rxe7FtprAiOKQJX0c3D9LXSV
 From: Eric Blake <eblake@redhat.com>
-To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org,
- Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <5f17d11e-c32b-6e9c-fdd2-9174affd9e5a@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v3 10/16] block/qcow2: Lock s->lock in
- preallocate()
-References: <20170526165518.7580-1-mreitz@redhat.com>
- <20170526165518.7580-11-mreitz@redhat.com>
-In-Reply-To: <20170526165518.7580-11-mreitz@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-devel@nongnu.org
+Cc: pbonzini@redhat.com, den@openvz.org
+Message-ID: <6425e4b9-3047-12dc-2698-80921690cdf8@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 05/19] nbd/server: refactor
+ nbd_co_receive_request
+References: <20170530143052.165002-1-vsementsov@virtuozzo.com>
+ <20170530143052.165002-6-vsementsov@virtuozzo.com>
+In-Reply-To: <20170530143052.165002-6-vsementsov@virtuozzo.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On 05/26/2017 11:55 AM, Max Reitz wrote:
-> preallocate() is and will be called only from places that do not lock
-
-Maybe: "that do not otherwise need to lock"
-
-> s->lock: Currently that is qcow2_create2(), as of a future patch it wil=
-l
-> be called from qcow2_truncate(), too.
+On 05/30/2017 09:30 AM, Vladimir Sementsov-Ogievskiy wrote:
+> Move function tail, about receiving next request out of the function.
+> Error path is simplified and nbd_co_receive_request becomes more
+> corresponding to its name.
 >=20
-> It therefore makes sense to move locking that mutex into preallocate()
-> itself.
->=20
-> Signed-off-by: Max Reitz <mreitz@redhat.com>
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 > ---
->  block/qcow2.c | 22 +++++++++++++++-------
->  1 file changed, 15 insertions(+), 7 deletions(-)
->=20
+>  nbd/server.c | 41 +++++++++++++----------------------------
+>  1 file changed, 13 insertions(+), 28 deletions(-)
+
+Quite the diffstat.
 
 Reviewed-by: Eric Blake <eblake@redhat.com>
 
@@ -69,7 +67,7 @@ Red Hat, Inc.           +1-919-301-3266
 Virtualization:  qemu.org | libvirt.org
 
 
---u0EjiCnmnK33WHhaj8fSscAWCSPQqEiQH
+--O1XauhW01Rxe7FtprAiOKQJX0c3D9LXSV
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
@@ -79,13 +77,13 @@ Version: GnuPG v2
 Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
 Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQEcBAEBCAAGBQJZLeQNAAoJEKeha0olJ0NqClgH/i55dxSCh0MTtt1/z8QG62sa
-IEs53xaIEFxH9C8tQn8tW4d69y++Px451WBgTdk8tybjk9tA6sr3ggCsgi5+fhGB
-u6ztyTQwP1uPHPQwMtmMNDas/GPfr1n9McuxkqnLImo8gfTrust19D9hDq2G7xit
-xGAXZqpyVQUligC/ot5IufNSTbYqXQ/JviByNPQQEQ8Jam6uiV6hMam0jBtZemjH
-m4mvJ/fw3kHs3oODSfDFDF52n9DLjIhT6AGfmNEwbsW/bPqo4ZkV9hEORVZmOKhb
-YcIRGsqqsRHBrG0k+g3vHHr38TlBvleIskjVtT+rOZuB/QmEDbbpeRHTVTFwTao=
-=8CZU
+iQEcBAEBCAAGBQJZLeSpAAoJEKeha0olJ0NqM0AH/37s/gN2GBwbLzZqi+8IaOTU
+sD6vysPzgiS4gHxh0qDna53TQU3QzkcyVmTCioAP7Aq03A0WOU2In8+IAR8UykMA
+eQuj8cPMJMBaCyuaMMdFNylzAvnKJs5AVUW+KZs3UfTCFi/GiLHy7SuDnToG9XjJ
+TcRygOrUsYcQ1tqnqkq/55ZYJNZpncHHo+lLp/tOmDdLaAQEzcFBXD0ie+i1GfFB
+BLtiBvO+roy3oaxYPGodEy0ALjL4/ONu+0dfG6KiRq0LWqlssN8uNyfRXUAKET2w
+tC3TNNNZ50Tl0NVmc/bKBkp2AzkezFjBheTBohgpAVxpXw7jMF6JgjQQpW/s+ys=
+=WclN
 -----END PGP SIGNATURE-----
 
---u0EjiCnmnK33WHhaj8fSscAWCSPQqEiQH--
+--O1XauhW01Rxe7FtprAiOKQJX0c3D9LXSV--
