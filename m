@@ -1,33 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45226)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49715)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dFZew-0005zu-40
-	for qemu-devel@nongnu.org; Tue, 30 May 2017 01:25:34 -0400
+	(envelope-from <marcandre.lureau@gmail.com>) id 1dFaCS-0002wW-Gu
+	for qemu-devel@nongnu.org; Tue, 30 May 2017 02:00:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dFZes-0001Q5-IF
-	for qemu-devel@nongnu.org; Tue, 30 May 2017 01:25:34 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:59572)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dFZes-0001Pu-CO
-	for qemu-devel@nongnu.org; Tue, 30 May 2017 01:25:30 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 10694C057FAB
-	for <qemu-devel@nongnu.org>; Tue, 30 May 2017 05:25:29 +0000 (UTC)
-From: Markus Armbruster <armbru@redhat.com>
-References: <20170526181200.17227-1-ehabkost@redhat.com>
-	<20170526181200.17227-3-ehabkost@redhat.com>
-	<874lw3zjs4.fsf@dusky.pond.sub.org>
-	<20170529170425.GG32274@thinpad.lan.raisama.net>
-Date: Tue, 30 May 2017 07:25:25 +0200
-In-Reply-To: <20170529170425.GG32274@thinpad.lan.raisama.net> (Eduardo
-	Habkost's message of "Mon, 29 May 2017 14:04:25 -0300")
-Message-ID: <87fufmuda2.fsf@dusky.pond.sub.org>
+	(envelope-from <marcandre.lureau@gmail.com>) id 1dFaCQ-0001Nn-UP
+	for qemu-devel@nongnu.org; Tue, 30 May 2017 02:00:12 -0400
+Received: from mail-lf0-x243.google.com ([2a00:1450:4010:c07::243]:34672)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+	id 1dFaCQ-0001N3-Hf
+	for qemu-devel@nongnu.org; Tue, 30 May 2017 02:00:10 -0400
+Received: by mail-lf0-x243.google.com with SMTP id q24so7829052lfb.1
+	for <qemu-devel@nongnu.org>; Mon, 29 May 2017 23:00:10 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v3 2/3] qemu.py: Add QEMUMachine.exitcode()
- method
+References: <20170529084546.26500-1-marcandre.lureau@redhat.com>
+	<20170529084546.26500-11-marcandre.lureau@redhat.com>
+	<9da6bf4c-120f-39e8-3711-79cc0b30277c@amsat.org>
+In-Reply-To: <9da6bf4c-120f-39e8-3711-79cc0b30277c@amsat.org>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Tue, 30 May 2017 05:59:57 +0000
+Message-ID: <CAJ+F1CKJbt1jJXqyv7PeG6B7CR8oi0TgLJE1frh2vKSNK8gfzA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 10/14] char: generalize
+ qemu_chr_write_all()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,62 +32,169 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: Marcel Apfelbaum <marcel@redhat.com>, Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org
+Cc: pbonzini@redhat.com
 
-Eduardo Habkost <ehabkost@redhat.com> writes:
+Hi
 
-> On Mon, May 29, 2017 at 06:53:47PM +0200, Markus Armbruster wrote:
->> Eduardo Habkost <ehabkost@redhat.com> writes:
->> 
->> > Allow the exit code of QEMU to be queried by scripts.
->> >
->> > Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
->> > ---
->> >  scripts/qemu.py | 4 ++++
->> >  1 file changed, 4 insertions(+)
->> >
->> > diff --git a/scripts/qemu.py b/scripts/qemu.py
->> > index 16934f1e02..ebe1c4b919 100644
->> > --- a/scripts/qemu.py
->> > +++ b/scripts/qemu.py
->> > @@ -88,6 +88,10 @@ class QEMUMachine(object):
->> >      def is_running(self):
->> >          return self._popen and (self._popen.returncode is None)
->> >  
->> > +    def exitcode(self):
->> > +        if self._popen:
->> > +            return self._popen.returncode
->> > +
->> 
->> Falling off the function's end returns None.  Do we really want to rely
->> on that?
->> 
->> For what it's worth, I checked the Python Language Reference, found it
->> less than clear, so I tried it out, too.
+On Tue, May 30, 2017 at 1:09 AM Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.or=
+g>
+wrote:
+
+> Hi Marc-Andr=C3=A9,
 >
-> I agree that the intent may not be clear when looking at the
-> code.  I can squash this in:
+> On 05/29/2017 05:45 AM, Marc-Andr=C3=A9 Lureau wrote:
+> > qemu_chr_fe_write() is similar to qemu_chr_write_all(): the later write
+> > all with a chardev backend.
+> >
+> > Make qemu_chr_write() and qemu_chr_fe_write_buffer() take an 'all'
+> > argument. If false, handle 'partial' write the way qemu_chr_fe_write()
+> > use to, and call qemu_chr_write() from qemu_chr_fe_write().
+> >
+> > Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> > ---
+> >  chardev/char.c | 70
+> +++++++++++++++++++++++-----------------------------------
+> >  1 file changed, 28 insertions(+), 42 deletions(-)
+> >
+> > diff --git a/chardev/char.c b/chardev/char.c
+> > index a747e0279a..9a7c70c7aa 100644
+> > --- a/chardev/char.c
+> > +++ b/chardev/char.c
+> > @@ -96,7 +96,8 @@ static void qemu_chr_fe_write_log(Chardev *s,
+> >  }
+> >
+> >  static int qemu_chr_fe_write_buffer(Chardev *s,
+> > -                                    const uint8_t *buf, int len, int
+> *offset)
+> > +                                    const uint8_t *buf, int len,
+> > +                                    int *offset, bool write_all)
+> >  {
+> >      ChardevClass *cc =3D CHARDEV_GET_CLASS(s);
+> >      int res =3D 0;
+> > @@ -106,7 +107,7 @@ static int qemu_chr_fe_write_buffer(Chardev *s,
+> >      while (*offset < len) {
+> >      retry:
+> >          res =3D cc->chr_write(s, buf + *offset, len - *offset);
+> > -        if (res < 0 && errno =3D=3D EAGAIN) {
+> > +        if (res < 0 && errno =3D=3D EAGAIN && write_all) {
+> >              g_usleep(100);
+> >              goto retry;
+> >          }
+> > @@ -116,6 +117,9 @@ static int qemu_chr_fe_write_buffer(Chardev *s,
+> >          }
+> >
+> >          *offset +=3D res;
+> > +        if (!write_all) {
+> > +            break;
+> > +        }
+> >      }
+> >      if (*offset > 0) {
+> >          qemu_chr_fe_write_log(s, buf, *offset);
+> > @@ -130,54 +134,20 @@ static bool qemu_chr_replay(Chardev *chr)
+> >      return qemu_chr_has_feature(chr, QEMU_CHAR_FEATURE_REPLAY);
+> >  }
+> >
+> > -int qemu_chr_fe_write(CharBackend *be, const uint8_t *buf, int len)
+> > +static int qemu_chr_write(Chardev *s, const uint8_t *buf, int len,
+> > +                          bool write_all)
+> >  {
+> > -    Chardev *s =3D be->chr;
+> > -    ChardevClass *cc;
+> > -    int ret;
+> > -
+> > -    if (!s) {
+> > -        return 0;
+> > -    }
+> > -
+> > -    if (qemu_chr_replay(s) && replay_mode =3D=3D REPLAY_MODE_PLAY) {
+> > -        int offset;
+> > -        replay_char_write_event_load(&ret, &offset);
+> > -        assert(offset <=3D len);
+> > -        qemu_chr_fe_write_buffer(s, buf, offset, &offset);
+> > -        return ret;
+> > -    }
+> > -
+> > -    cc =3D CHARDEV_GET_CLASS(s);
+> > -    qemu_mutex_lock(&s->chr_write_lock);
+> > -    ret =3D cc->chr_write(s, buf, len);
+> > -
+> > -    if (ret > 0) {
+> > -        qemu_chr_fe_write_log(s, buf, ret);
+> > -    }
+> > -
+> > -    qemu_mutex_unlock(&s->chr_write_lock);
+> > -
+> > -    if (qemu_chr_replay(s) && replay_mode =3D=3D REPLAY_MODE_RECORD) {
+> > -        replay_char_write_event_save(ret, ret < 0 ? 0 : ret);
+> > -    }
+> > -
+> > -    return ret;
+> > -}
+> > -
+> > -int qemu_chr_write_all(Chardev *s, const uint8_t *buf, int len)
+> > -{
+> > -    int offset;
+> > +    int offset =3D 0;
+> >      int res;
+> >
+> >      if (qemu_chr_replay(s) && replay_mode =3D=3D REPLAY_MODE_PLAY) {
+> >          replay_char_write_event_load(&res, &offset);
+> >          assert(offset <=3D len);
+> > -        qemu_chr_fe_write_buffer(s, buf, offset, &offset);
+> > +        qemu_chr_fe_write_buffer(s, buf, offset, &offset, true);
+> >          return res;
+> >      }
+> >
+> > -    res =3D qemu_chr_fe_write_buffer(s, buf, len, &offset);
+> > +    res =3D qemu_chr_fe_write_buffer(s, buf, len, &offset, write_all);
+> >
+> >      if (qemu_chr_replay(s) && replay_mode =3D=3D REPLAY_MODE_RECORD) {
+> >          replay_char_write_event_save(res, offset);
+> > @@ -189,6 +159,22 @@ int qemu_chr_write_all(Chardev *s, const uint8_t
+> *buf, int len)
+> >      return offset;
+> >  }
+> >
+> > +int qemu_chr_write_all(Chardev *s, const uint8_t *buf, int len)
+> > +{
+> > +    return qemu_chr_write(s, buf, len, true);
+> > +}
+> > +
+> > +int qemu_chr_fe_write(CharBackend *be, const uint8_t *buf, int len)
+> > +{
+> > +    Chardev *s =3D be->chr;
+> > +
+> > +    if (!s) {
+> > +        return 0;
+> > +    }
+> > +
+> > +    return qemu_chr_write(s, buf, len, false);
+> > +}
+> > +
+> >  int qemu_chr_fe_write_all(CharBackend *be, const uint8_t *buf, int len=
+)
+> >  {
+> >      Chardev *s =3D be->chr;
+> > @@ -197,7 +183,7 @@ int qemu_chr_fe_write_all(CharBackend *be, const
+> uint8_t *buf, int len)
+> >          return 0;
+> >      }
+> >
+> > -    return qemu_chr_write_all(s, buf, len);
+> > +    return qemu_chr_write(s, buf, len, true);
 >
-> diff --git a/scripts/qemu.py b/scripts/qemu.py
-> index ebe1c4b919..bf00eddab8 100644
-> --- a/scripts/qemu.py
-> +++ b/scripts/qemu.py
-> @@ -89,8 +89,9 @@ class QEMUMachine(object):
->          return self._popen and (self._popen.returncode is None)
->  
->      def exitcode(self):
-> -        if self._popen:
-> -            return self._popen.returncode
-> +        if not self._popen:
-> +            return None
-> +        return self._popen.returncode
->  
->      def get_pid(self):
->          if not self.is_running():
+> I think calling qemu_chr_write_all() is more readable.
+>
 
-Works for me.  The equivalent
+ qemu_chr_write_all() would imply that you cannot change the 'all'
+behaviour to me, but this is a matter of taste I guess
 
-    return self._popen and self._popen.returncode
 
-would also work.  Nicely terse.
+> Either ways:
+> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+>
+
+thanks
+--=20
+Marc-Andr=C3=A9 Lureau
