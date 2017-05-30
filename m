@@ -1,27 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51378)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51758)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dFi06-0004sU-Fm
-	for qemu-devel@nongnu.org; Tue, 30 May 2017 10:19:59 -0400
+	(envelope-from <programmingkidx@gmail.com>) id 1dFi1n-00060u-Ch
+	for qemu-devel@nongnu.org; Tue, 30 May 2017 10:21:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dFi02-00053e-DV
-	for qemu-devel@nongnu.org; Tue, 30 May 2017 10:19:58 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:37870)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dFi02-00053P-4O
-	for qemu-devel@nongnu.org; Tue, 30 May 2017 10:19:54 -0400
-References: <20170509173559.31598-1-marcandre.lureau@redhat.com>
-	<20170509173559.31598-5-marcandre.lureau@redhat.com>
-	<8737cbv53y.fsf@dusky.pond.sub.org>
-	<CAJ+F1C+9WAO2RZt-x7hzzh5M6HBv4UjR6svj71vLJD31axC_Zw@mail.gmail.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <731948bf-cd1d-5244-4a4f-dad2b14b85f3@redhat.com>
-Date: Tue, 30 May 2017 09:19:51 -0500
-MIME-Version: 1.0
-In-Reply-To: <CAJ+F1C+9WAO2RZt-x7hzzh5M6HBv4UjR6svj71vLJD31axC_Zw@mail.gmail.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="DqHXklRI23pGID1N9wGlGIBQbPm9AbFsf"
-Subject: Re: [Qemu-devel] [PATCH 04/17] qapi: merge QInt and QFloat in QNum
+	(envelope-from <programmingkidx@gmail.com>) id 1dFi1j-0005d9-Ad
+	for qemu-devel@nongnu.org; Tue, 30 May 2017 10:21:43 -0400
+Received: from mail-it0-x243.google.com ([2607:f8b0:4001:c0b::243]:33117)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <programmingkidx@gmail.com>)
+	id 1dFi1j-0005d2-5T
+	for qemu-devel@nongnu.org; Tue, 30 May 2017 10:21:39 -0400
+Received: by mail-it0-x243.google.com with SMTP id l145so9689893ita.0
+	for <qemu-devel@nongnu.org>; Tue, 30 May 2017 07:21:38 -0700 (PDT)
+In-Reply-To: <CAFEAcA8wCfDuSbs-+o-D8Sogrfda_U6kSCH0x5SrAGfAiknYyQ@mail.gmail.com>
+References: <mailman.73115.1495441935.22737.qemu-devel@nongnu.org>
+	<BBC4E515-FE7D-4600-A5CA-BBCE26059415@gmail.com>
+	<87efvghzb9.fsf@abhimanyu.i-did-not-set--mail-host-address--so-tickle-me>
+	<20170524023303.GA12163@pacoca> <20170525200537.GA12666@pacoca>
+	<CAFEAcA8wCfDuSbs-+o-D8Sogrfda_U6kSCH0x5SrAGfAiknYyQ@mail.gmail.com>
+Mime-Version: 1.0 (Apple Message framework v753.1)
+Content-Type: text/plain; charset=US-ASCII; delsp=yes; format=flowed
+Message-Id: <A81FD5C7-4D51-4003-B1D9-027D7548862D@gmail.com>
+Content-Transfer-Encoding: 7bit
+From: G 3 <programmingkidx@gmail.com>
+Date: Tue, 30 May 2017 10:21:36 -0400
+Subject: Re: [Qemu-devel] [PATCH risu] ppc64: Fix patterns for rotate
+ doubleword instructions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,91 +34,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@gmail.com>, Markus Armbruster <armbru@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Jose Ricardo Ziviani <joserz@linux.vnet.ibm.com>, Sandipan Das <sandipandas1990@gmail.com>, "qemu-devel@nongnu.org qemu-devel" <qemu-devel@nongnu.org>, aNikunj A Dadhania <nikunj@linux.vnet.ibm.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---DqHXklRI23pGID1N9wGlGIBQbPm9AbFsf
-From: Eric Blake <eblake@redhat.com>
-To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@gmail.com>,
- Markus Armbruster <armbru@redhat.com>
-Cc: qemu-devel@nongnu.org
-Message-ID: <731948bf-cd1d-5244-4a4f-dad2b14b85f3@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 04/17] qapi: merge QInt and QFloat in QNum
-References: <20170509173559.31598-1-marcandre.lureau@redhat.com>
- <20170509173559.31598-5-marcandre.lureau@redhat.com>
- <8737cbv53y.fsf@dusky.pond.sub.org>
- <CAJ+F1C+9WAO2RZt-x7hzzh5M6HBv4UjR6svj71vLJD31axC_Zw@mail.gmail.com>
-In-Reply-To: <CAJ+F1C+9WAO2RZt-x7hzzh5M6HBv4UjR6svj71vLJD31axC_Zw@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
 
-On 05/30/2017 02:32 AM, Marc-Andr=C3=A9 Lureau wrote:
-> Hi
->=20
-> On Thu, May 11, 2017 at 6:30 PM Markus Armbruster <armbru@redhat.com> w=
-rote:
->=20
->> Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
+On May 30, 2017, at 8:01 AM, Peter Maydell wrote:
+
+> On 25 May 2017 at 21:05,  <joserz@linux.vnet.ibm.com> wrote:
+>> What do you think about sharing the same ppc64.risu file to ppc
+>> and ppc64/ppc64le. Then, instead of:
 >>
+>> <NAME> PPC64LE 01111...
 >>
->>> + *
->>> + * This work is licensed under the terms of the GNU LGPL, version 2.=
-1
->> or later.
->>> + * See the COPYING.LIB file in the top-level directory.
->>> + */
->>> +
->>> +#ifndef QNUM_H
->>> +#define QNUM_H
->>> +
->>> +#include "qapi/qmp/qobject.h"
->>> +
->>> +typedef enum {
->>> +    QNUM_I64,
->>> +    QNUM_DOUBLE
->>> +} QNumType;
+>> we'd have:
 >>
->> Not bool because you're going to add to it.  Good.
+>> <NAME> PPC 01111...
 >>
+>> So, specific instructions would be:
 >>
-> Hmm? There is no plan to add bool there so far, I am not sure that make=
-s
-> sense.
+>> <NAME> PPC64LE 01111...
+>> <NAME> PPC64 01111...
+>> <NAME> PPC32 01111...
+>>
+>> It will allow users to select the arch by using patterns like: ./ 
+>> risugen
+>> --pattern "PPC64*", or --pattern "PPC32*".
+>
+> I think we should aim to share the files, but that we should
+> have a better mechanism than just a convention on the pattern
+> name (which is easy to make mistakes with and also makes it
+> harder to use the --pattern argument for the purpose it was
+> intended for, since you have to combine your desired pattern
+> with the pattern to select the right bit of the instruction set).
+> This isn't limited to PPC either -- for ARM we'd like to be
+> able to mark instructions as ARMv7/ARMv8/present in some
+> optional instruction set extension, etc.
 
-I think the intent was more along these lines:
+Do you want to add an architecture option?
 
-"Using a two-element enum instead of a bool because a later patch will
-add to the enum" (with the implication that an enum is better for
-representing tri-state than a pair of bools).
+--pattern 'F.*' --arch PPC32
 
-At any rate, the only change I'd make is to add the trailing comma to
-QNUM_DOUBLE (C99 permits trailing commas, and consistently using them
-makes for less churn down the road when extending an enum).
+In this example only the instructions that begin with the letter F  
+and have PPC32 as an encodingname are used.
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+>
+> We could perhaps do that with an optional field in the
+> lines in the risu file to mark what part of the instruction
+> set they're in, and a command line argument to select the
+> instruction set variant(s) desired.
+
+I thought we already had this feature.
+
+ From the readme file:
+
+insnname encodingname bitfield ... [ [ !blockname ] { blocktext } ]
+
+Isn't the encodingname field the field we could use to select the  
+variant we want?
 
 
---DqHXklRI23pGID1N9wGlGIBQbPm9AbFsf
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+> Another possible approach would be to have the PPC32 insns
+> in their own file, and some sort of #include directive to
+> pull them into the PPC64 file.
+>
+> This is all "adding extra features to risu", though, so I
+> don't insist it be done.
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEcBAEBCAAGBQJZLX+HAAoJEKeha0olJ0NqhtwIAIUnUYH9VgAQwfQg7E92IY4V
-5N0oH0gHviMkZYZybtjohepo/sh2lBP5Gaf22CL7CNmIxoKOyKfrwVt0Q0msBlee
-gh9HJDtYJOPHpN7QMQBk39TV8iX1H1X38Qwhhgl901/uFR1qgqdQvW2erTvT1c0S
-sLIfxn7rVx7GQiOXu70RmtjrphljcuH1pRYg2DvUvxJ73QkjByLLRQHkipOiEzsq
-tOOg1upEyp6bJbwvivXVYTYOvDTkNG7Tjci/WES9vWx5pS02zTVcs4m7xBiwDlzp
-Ni2RddQCMzrGClxDHuaovoMjmZ6GKOSWuRwIvylKsS3JPFRc4+ZaFWlUWlBTbJI=
-=8pdY
------END PGP SIGNATURE-----
-
---DqHXklRI23pGID1N9wGlGIBQbPm9AbFsf--
+The #include directive does sound interesting but if you really want  
+one PowerPC risu file then Jose's way would be the way to go. Risu as  
+it is can handle this.
