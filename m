@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54132)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55672)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dFeHP-0000f0-Kd
-	for qemu-devel@nongnu.org; Tue, 30 May 2017 06:21:39 -0400
+	(envelope-from <berrange@redhat.com>) id 1dFeM9-0002N5-Ab
+	for qemu-devel@nongnu.org; Tue, 30 May 2017 06:26:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dFeHO-0004Su-Ia
-	for qemu-devel@nongnu.org; Tue, 30 May 2017 06:21:35 -0400
-Received: from mail-wm0-x231.google.com ([2a00:1450:400c:c09::231]:38708)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1dFeHO-0004Sm-BP
-	for qemu-devel@nongnu.org; Tue, 30 May 2017 06:21:34 -0400
-Received: by mail-wm0-x231.google.com with SMTP id e127so93745479wmg.1
-	for <qemu-devel@nongnu.org>; Tue, 30 May 2017 03:21:34 -0700 (PDT)
+	(envelope-from <berrange@redhat.com>) id 1dFeM5-00069J-KJ
+	for qemu-devel@nongnu.org; Tue, 30 May 2017 06:26:29 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:44858)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1dFeM5-00068j-Ac
+	for qemu-devel@nongnu.org; Tue, 30 May 2017 06:26:25 -0400
+Date: Tue, 30 May 2017 11:26:22 +0100
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20170530102622.GG21566@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <1496048740-26578-1-git-send-email-groug@kaod.org>
+	<20170530094212.GL11362@stefanha-x1.localdomain>
+	<20170530122112.2dc44db9@bahia.ttt.fr.ibm.com>
 MIME-Version: 1.0
-In-Reply-To: <87vaox2cvi.fsf@linaro.org>
-References: <591DC93D.2060707@ispras.ru> <87vaox2cvi.fsf@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 30 May 2017 11:21:12 +0100
-Message-ID: <CAFEAcA8H1Kwjnj+A1XdGO=7U-hPhys+W-MRy3yyOTkBoUb0ptg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20170530122112.2dc44db9@bahia.ttt.fr.ibm.com>
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] EL2\EL3 support for Aarch64
+Subject: Re: [Qemu-devel] [PULL 00/11] 9pfs patches for 2.10 20170525
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,33 +30,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
-Cc: Sergey Smolov <smolov@ispras.ru>, QEMU Developers <qemu-devel@nongnu.org>
+To: Greg Kurz <groug@kaod.org>
+Cc: Stefan Hajnoczi <stefanha@gmail.com>, Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>
 
-On 19 May 2017 at 14:29, Alex Benn=C3=A9e <alex.bennee@linaro.org> wrote:
->
-> Sergey Smolov <smolov@ispras.ru> writes:
->
->> Hello, List!
->>
->> Could you tell me, what is the current state for EL2\EL3 (Aarch64)?
->> Whether they are fully supported, or not?
->> Am I need to use any command line options to enable them for Aarch64
->> assembler programs simulation?
->
-> Sure you can use both. To enable EL2 support:
->
->   qemu-system-aarch64 ${QEMU_OPTS} \
->     -machine gic-version=3D3 \
->     -machine virtualization=3Dtrue
->
-> To boot in secure mode you'll need to use -bios and boot a secure
-> firmware (like OPTEE for example).
+On Tue, May 30, 2017 at 12:21:12PM +0200, Greg Kurz wrote:
+> On Tue, 30 May 2017 10:42:12 +0100
+> Stefan Hajnoczi <stefanha@gmail.com> wrote:
+>=20
+> > On Mon, May 29, 2017 at 11:05:29AM +0200, Greg Kurz wrote:
+> > > The following changes since commit 9964e96dc9999cf7f7c936ee854a7954=
+15d19b60:
+> > >=20
+> > >   Merge remote-tracking branch 'jasowang/tags/net-pull-request' int=
+o staging (2017-05-23 15:01:31 +0100)
+> > >=20
+> > > are available in the git repository at:
+> > >=20
+> > >   https://github.com/gkurz/qemu.git tags/for-upstream
+> > >=20
+> > > for you to fetch changes up to f0a4da86cff2e600255324793daddd7ce59b=
+9862:
+> > >=20
+> > >   9pfs: local: metadata file for the VirtFS root (2017-05-25 10:30:=
+14 +0200)
+> > >=20
+> > > ----------------------------------------------------------------
+> > > Various bugfixes and code cleanups. Most notably, it fixes metadata=
+ handling in
+> > > mapped-file security mode (especially for the virtfs root). =20
+> >=20
+> > Please fix the compiler warning reported by patchew.
+> >=20
+>=20
+> In file included from /var/tmp/patchew-tester-tmp-3cnydauu/src/hw/9pfs/=
+9p-local.c:18:0:
+> /var/tmp/patchew-tester-tmp-3cnydauu/src/hw/9pfs/9p-local.c: In functio=
+n =E2=80=98local_set_mapped_file_attrat=E2=80=99:
+> /var/tmp/patchew-tester-tmp-3cnydauu/src/hw/9pfs/9p-util.h:19:5: error:=
+ =E2=80=98map_dirfd=E2=80=99 may be used uninitialized in this function [=
+-Werror=3Dmaybe-uninitialized]
+>      close(fd);
+>      ^~~~~~~~~
+> /var/tmp/patchew-tester-tmp-3cnydauu/src/hw/9pfs/9p-local.c:235:9: note=
+: =E2=80=98map_dirfd=E2=80=99 was declared here
+>      int map_dirfd, map_fd;
+>          ^~~~~~~~~
+> cc1: all warnings being treated as errors
+>=20
+> This is a false positive: map_dirfd is necessarily initialized, but I g=
+uess
+> gcc isn't smart enough to see that :-\
+>=20
+> It is acceptable to close(-1) so I guess I'll just do:
+>=20
+> -    int map_dirfd, map_fd;
+> +    int map_dirfd =3D -1, map_fd;
 
-You also need -machine secure=3Dtrue to turn on EL3 in the virt board.
+By 'acceptable' I guess you mean it'll return EBADF. I would not
+be surprised, however, if coverity were to then complain if it sees
+code path where we pass -1 to close, since it is indicative of a
+potential bug. So in addition to your initialization, also protecting
+the close() call with '!=3D -1' condition is a safer approach.
 
-NB that EL2 is currently only supported (1) for AArch64 EL2 and
-(2) with GICv3, not for AArch32 EL2 or with GICv2.
-
-thanks
--- PMM
+Regards,
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
+ge :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.c=
+om :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
+ge :|
