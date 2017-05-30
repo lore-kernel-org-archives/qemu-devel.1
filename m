@@ -1,31 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50751)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51454)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dFfy0-00063T-Sq
-	for qemu-devel@nongnu.org; Tue, 30 May 2017 08:09:44 -0400
+	(envelope-from <imammedo@redhat.com>) id 1dFg1s-00071v-P2
+	for qemu-devel@nongnu.org; Tue, 30 May 2017 08:13:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dFfxx-0002o8-OB
-	for qemu-devel@nongnu.org; Tue, 30 May 2017 08:09:40 -0400
-Received: from mail-oi0-x241.google.com ([2607:f8b0:4003:c06::241]:33714)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dFfxx-0002o0-IP
-	for qemu-devel@nongnu.org; Tue, 30 May 2017 08:09:37 -0400
-Received: by mail-oi0-x241.google.com with SMTP id h4so15494897oib.0
-	for <qemu-devel@nongnu.org>; Tue, 30 May 2017 05:09:37 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Tue, 30 May 2017 09:09:19 -0300
-Message-Id: <20170530120919.8874-1-f4bug@amsat.org>
-In-Reply-To: <149604983117.777.3318402617001973219@750cb16fd6f2>
-References: <149604983117.777.3318402617001973219@750cb16fd6f2>
+	(envelope-from <imammedo@redhat.com>) id 1dFg1r-0003iG-NV
+	for qemu-devel@nongnu.org; Tue, 30 May 2017 08:13:40 -0400
+Date: Tue, 30 May 2017 14:13:29 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20170530141329.60d728c6@nial.brq.redhat.com>
+In-Reply-To: <20170526154625.GI22043@thinpad.lan.raisama.net>
+References: <1494415802-227633-1-git-send-email-imammedo@redhat.com>
+	<1494415802-227633-7-git-send-email-imammedo@redhat.com>
+	<20170526154625.GI22043@thinpad.lan.raisama.net>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH] char: cast ARRAY_SIZE() as signed to silent
- warning on empty array
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v3 06/18] numa: mirror cpu to node mapping
+ in MachineState::possible_cpus
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,40 +25,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Andrew Jones <drjones@redhat.com>, qemu-devel@nongnu.org, qemu-arm@nongnu.org, qemu-ppc@nongnu.org, Shannon Zhao <zhaoshenglong@huawei.com>, Paolo Bonzini <pbonzini@redhat.com>, David Gibson <david@gibson.dropbear.id.au>
 
-chardev/char.c: In function 'chardev_name_foreach':
-chardev/char.c:546:19: error: comparison of unsigned expression < 0 is always false [-Werror=type-limits]
-     for (i = 0; i < ARRAY_SIZE(chardev_alias_table); i++) {
-                   ^
+On Fri, 26 May 2017 12:46:25 -0300
+Eduardo Habkost <ehabkost@redhat.com> wrote:
 
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
----
- chardev/char.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+> On Wed, May 10, 2017 at 01:29:50PM +0200, Igor Mammedov wrote:
+> [...]
+> > diff --git a/hw/core/machine.c b/hw/core/machine.c
+> > index 2482c63..420c8c4 100644
+> > --- a/hw/core/machine.c
+> > +++ b/hw/core/machine.c
+> > @@ -389,6 +389,102 @@ HotpluggableCPUList *machine_query_hotpluggable_cpus(MachineState *machine)  
+> [...]
+> > +void machine_set_cpu_numa_node(MachineState *machine,
+> > +                               const CpuInstanceProperties *props, Error **errp)
+> > +{  
+> [...]
+> > +    /* force board to initialize possible_cpus if it hasn't been done yet */
+> > +    mc->possible_cpu_arch_ids(machine);  
+> [...]
+> > diff --git a/numa.c b/numa.c
+> > index 7182481..7db5dde 100644
+> > --- a/numa.c
+> > +++ b/numa.c
+> > @@ -170,6 +170,7 @@ static void parse_numa_node(MachineState *ms, NumaNodeOptions *node,
+> >          exit(1);
+> >      }
+> >      for (cpus = node->cpus; cpus; cpus = cpus->next) {
+> > +        CpuInstanceProperties props;
+> >          if (cpus->value >= max_cpus) {
+> >              error_setg(errp,
+> >                         "CPU index (%" PRIu16 ")"
+> > @@ -178,6 +179,10 @@ static void parse_numa_node(MachineState *ms, NumaNodeOptions *node,
+> >              return;
+> >          }
+> >          bitmap_set(numa_info[nodenr].node_cpu, cpus->value, 1);
+> > +        props = mc->cpu_index_to_instance_props(ms, cpus->value);
+> > +        props.node_id = nodenr;
+> > +        props.has_node_id = true;
+> > +        machine_set_cpu_numa_node(ms, &props, &error_fatal);  
+> 
+> This triggers a call to possible_cpu_arch_ids() before
+> nb_numa_nodes is set to the actual number of NUMA nodes in the
+> machine, breaking the "node_id = ... % nb_numa_nodes"
+> initialization logic in pc, virt, and spapr.
+Looking at it more, in current code this problem theoretically
+affects only partial mapping case. And even there it's masked by 
+fixup to 0 node for non explicitly mapped CPUs and the bug which
+ *) "[PATCH v2 3/5] numa: make sure that all cpus in has  has_node_id set if numa is enabled"
+fixes. So invalid default values for non mapped cpus are stored
+in possible_cpus but not used nor visible elsewhere.
 
-diff --git a/chardev/char.c b/chardev/char.c
-index 4e3808aefc..7aa0210765 100644
---- a/chardev/char.c
-+++ b/chardev/char.c
-@@ -543,7 +543,7 @@ chardev_name_foreach(void (*fn)(const char *name, void *opaque), void *opaque)
- 
-     object_class_foreach(chardev_class_foreach, TYPE_CHARDEV, false, &fe);
- 
--    for (i = 0; i < ARRAY_SIZE(chardev_alias_table); i++) {
-+    for (i = 0; i < (int)ARRAY_SIZE(chardev_alias_table); i++) {
-         fn(chardev_alias_table[i].alias, opaque);
-     }
- }
-@@ -589,7 +589,7 @@ Chardev *qemu_chr_new_from_opts(QemuOpts *opts,
-         return NULL;
-     }
- 
--    for (i = 0; i < ARRAY_SIZE(chardev_alias_table); i++) {
-+    for (i = 0; i < (int)ARRAY_SIZE(chardev_alias_table); i++) {
-         if (g_strcmp0(chardev_alias_table[i].alias, name) == 0) {
-             name = chardev_alias_table[i].typename;
-             break;
--- 
-2.11.0
+[*] as side effect fixes invalid defaults in possible_cpus as well
+by fixup to 0 node that's moved from pre_plug handler.
+
+In future we are going to remove partial mapping with fixup to 0
+and fetch default mappings from possible_cpus where these wrong
+defaults won't exists (or matter) as CPUs are going to either
+ 1) be all explicitly mapped (so all node_id values are overwritten)
+or
+ 2) all default mapped (where defaults will be correct since no
+    -numa cpu=/-numa node,cpus= were called), but that's fragile
+    so I'd add calculate defaults at machine_run_board_init()
+    time anyway.
