@@ -1,34 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52515)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52581)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1dFi4u-0000JT-JT
-	for qemu-devel@nongnu.org; Tue, 30 May 2017 10:24:57 -0400
+	(envelope-from <mst@redhat.com>) id 1dFi55-0000Sb-4G
+	for qemu-devel@nongnu.org; Tue, 30 May 2017 10:25:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1dFi4t-0006wE-Mk
-	for qemu-devel@nongnu.org; Tue, 30 May 2017 10:24:56 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:57904)
+	(envelope-from <mst@redhat.com>) id 1dFi53-0006ya-PP
+	for qemu-devel@nongnu.org; Tue, 30 May 2017 10:25:07 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:33826)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1dFi4t-0006vx-GZ
-	for qemu-devel@nongnu.org; Tue, 30 May 2017 10:24:55 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 4F31C80C15
-	for <qemu-devel@nongnu.org>; Tue, 30 May 2017 14:24:54 +0000 (UTC)
-From: Juan Quintela <quintela@redhat.com>
-In-Reply-To: <959a41db-7fcd-6f0e-0072-30a570dcb1c3@redhat.com> (Vlad
-	Yasevich's message of "Tue, 30 May 2017 09:49:59 -0400")
-References: <1495649128-10529-1-git-send-email-vyasevic@redhat.com>
-	<1495649128-10529-7-git-send-email-vyasevic@redhat.com>
-	<87bmqahcx4.fsf@secure.mitica>
-	<959a41db-7fcd-6f0e-0072-30a570dcb1c3@redhat.com>
-Reply-To: quintela@redhat.com
-Date: Tue, 30 May 2017 16:24:45 +0200
-Message-ID: <87h902fmmq.fsf@secure.mitica>
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1dFi53-0006yI-JS
+	for qemu-devel@nongnu.org; Tue, 30 May 2017 10:25:05 -0400
+Date: Tue, 30 May 2017 17:24:55 +0300
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20170530172211-mutt-send-email-mst@kernel.org>
+References: <1494430493-23119-1-git-send-email-thuth@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH 06/12] qmp: Expose qemu_announce_self as a
- qmp command
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1494430493-23119-1-git-send-email-thuth@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2] hw/i386: Deprecate the machines pc-0.10
+ to pc-1.2
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,67 +27,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vlad Yasevich <vyasevic@redhat.com>
-Cc: qemu-devel@nongnu.org, dgilbert@redhat.com, germano@redhat.com, lvivier@redhat.com, jasowang@redhat.com, jdenemar@redhat.com, kashyap@redhat.com, armbru@redhat.com, mst@redhat.com
+To: Thomas Huth <thuth@redhat.com>
+Cc: qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, kraxel@redhat.com, berrange@redhat.com, dgilbert@redhat.com
 
-Vlad Yasevich <vyasevic@redhat.com> wrote:
-> On 05/30/2017 06:11 AM, Juan Quintela wrote:
->> Vladislav Yasevich <vyasevic@redhat.com> wrote:
->>> Add a qmp command that can trigger guest announcements.
->>>
->>> Based on work of Germano Veit Michel <germano@redhat.com>
->>>
->>> Signed-off-by: Vladislav Yasevich <vyasevic@redhat.com>
->>> ---
->>>  migration/savevm.c | 14 ++++++++++++++
->>>  qapi-schema.json   | 19 +++++++++++++++++++
->>>  2 files changed, 33 insertions(+)
->>>
->>> diff --git a/migration/savevm.c b/migration/savevm.c
->>> index a4097c9..b55ce6a 100644
->>> --- a/migration/savevm.c
->>> +++ b/migration/savevm.c
->>> @@ -265,6 +265,20 @@ void qemu_announce_self(AnnounceParameters *params)
->>>      qemu_announce_self_once(timer);
->>>  }
->>>  
->>> +void qmp_announce_self(bool has_params, AnnounceParameters *params,
->>> +                       Error **errp)
->>> +{
->>> +    AnnounceParameters announce_params;
->>> +
->>> +    memcpy(&announce_params, qemu_get_announce_params(),
->>> +           sizeof(announce_params));
->>> +
->>> +    if (has_params)
->>> +        qemu_set_announce_parameters(&announce_params, params);
->>> +
->>> +    qemu_announce_self(&announce_params);
->> 
->> Are I missreading qemu_annouce_self()?
->> My reading is that it passes announce_params to a timer (i.e. async
->> function), but here announce_params is a local variable here, no?
->> 
->
-> The AnnounceTimer holds a copy since each timer may have it's own values.
+On Wed, May 10, 2017 at 05:34:53PM +0200, Thomas Huth wrote:
+> We don't want to carry along old machine types forever. If we are able to
+> remove the pc machines up to 0.13 one day for example, this would allow
+> us to eventually kill the code for rombar=0 (i.e. where QEMU copies ROM
+> BARs directly to low memory). Everything up to pc-1.2 is also known to
+> have issues with migration.  So let's start with a deprecation message
+> for the old machine types so that the (hopefully) few users of these old
+> systems start switching over to newer machine types instead.
+> 
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> ---
+>  Note: Even if we mark all these old machines as deprecated, this ofcourse
+>  doesn't mean that we also have to remove them all at once later when we
+>  decide to finally really remove some. We could then also start by removing
+>  0.10 and 0.11 only, for example (since there should really be no users left
+>  for these), or only up to 0.13 (to be able to kill rombar=0).
+> 
+>  v2:
+>  - Deprecate machines up to pc-1.2
+> 
+>  hw/i386/pc_piix.c | 9 +++++++++
+>  1 file changed, 9 insertions(+)
+> 
+> diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
+> index 9f102aa..aace378 100644
+> --- a/hw/i386/pc_piix.c
+> +++ b/hw/i386/pc_piix.c
+> @@ -38,6 +38,7 @@
+>  #include "sysemu/kvm.h"
+>  #include "hw/kvm/clock.h"
+>  #include "sysemu/sysemu.h"
+> +#include "sysemu/qtest.h"
+>  #include "hw/sysbus.h"
+>  #include "sysemu/arch_init.h"
+>  #include "sysemu/block-backend.h"
+> @@ -84,6 +85,14 @@ static void pc_init1(MachineState *machine,
+>      MemoryRegion *pci_memory;
+>      MemoryRegion *rom_memory;
+>      ram_addr_t lowmem;
+> +    char *mc_name = MACHINE_CLASS(pcmc)->name;
+> +
+> +    /* Machines pc-0.10 up to pc-1.2 are considered as deprecated */
+> +    if (!qtest_enabled() && (!strncmp(mc_name, "pc-0.", 5)
+> +        || (!strncmp(mc_name, "pc-1.", 5) && mc_name[5] < '3'))) {
+> +        error_report("Machine type '%s' is deprecated, "
+> +                     "please use a newer type instead", mc_name);
+> +    }
+>  
+>      /*
+>       * Calculate ram split, for memory below and above 4G.  It's a bit
+
+Can't we use a standard compat property machinery for this?
+Set a "deprecated" property, then query it in a central place.
+
+We also want a way for management to get this info.
 
 
-
-> AnnounceTimer *qemu_announce_timer_new(AnnounceParameters *params,
->                                        QEMUClockType type)
-> {
->    AnnounceTimer *timer = g_new(AnnounceTimer, 1);
->
->    timer->params = *params;
-
-I have to remomember that C has learn how to copy structures long ago.
-
-<repeat myself one hundred times>
-
-I was missing the "*" on my previous reading, sorry for the noise.
-
->    timer->round = params->rounds;
->    timer->type = type;
->
->    return timer;
->}
+> -- 
+> 1.8.3.1
