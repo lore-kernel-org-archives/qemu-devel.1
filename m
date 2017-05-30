@@ -1,45 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42610)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42682)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <nikunj@linux.vnet.ibm.com>) id 1dFj3a-0006w9-AS
-	for qemu-devel@nongnu.org; Tue, 30 May 2017 11:27:39 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1dFj3x-0007Al-7L
+	for qemu-devel@nongnu.org; Tue, 30 May 2017 11:28:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <nikunj@linux.vnet.ibm.com>) id 1dFj3V-0003V2-DP
-	for qemu-devel@nongnu.org; Tue, 30 May 2017 11:27:38 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:60156)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <nikunj@linux.vnet.ibm.com>)
-	id 1dFj3V-0003Ub-46
-	for qemu-devel@nongnu.org; Tue, 30 May 2017 11:27:33 -0400
-Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v4UFNqHC098960
-	for <qemu-devel@nongnu.org>; Tue, 30 May 2017 11:27:30 -0400
-Received: from e23smtp07.au.ibm.com (e23smtp07.au.ibm.com [202.81.31.140])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2as9ecpsmn-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 30 May 2017 11:27:30 -0400
-Received: from localhost
-	by e23smtp07.au.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <nikunj@linux.vnet.ibm.com>;
-	Wed, 31 May 2017 01:27:24 +1000
-Received: from d23av03.au.ibm.com (d23av03.au.ibm.com [9.190.234.97])
-	by d23relay10.au.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
-	v4UFREC08913198
-	for <qemu-devel@nongnu.org>; Wed, 31 May 2017 01:27:22 +1000
-Received: from d23av03.au.ibm.com (localhost [127.0.0.1])
-	by d23av03.au.ibm.com (8.14.4/8.14.4/NCO v10.0 AVout) with ESMTP id
-	v4UFQggF018533
-	for <qemu-devel@nongnu.org>; Wed, 31 May 2017 01:26:43 +1000
-From: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
-In-Reply-To: <1495444679-7736-1-git-send-email-sandipandas1990@gmail.com>
-References: <1495444679-7736-1-git-send-email-sandipandas1990@gmail.com>
-Date: Tue, 30 May 2017 20:56:29 +0530
+	(envelope-from <vsementsov@virtuozzo.com>) id 1dFj3s-0003mN-9e
+	for qemu-devel@nongnu.org; Tue, 30 May 2017 11:28:01 -0400
+Received: from mailhub.sw.ru ([195.214.232.25]:36315 helo=relay.sw.ru)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
+	id 1dFj3r-0003kK-V4
+	for qemu-devel@nongnu.org; Tue, 30 May 2017 11:27:56 -0400
+References: <20170530104857.70083-1-vsementsov@virtuozzo.com>
+	<20170530104857.70083-2-vsementsov@virtuozzo.com>
+	<21763282-556d-4389-29b5-664f6f4f4479@redhat.com>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <bd1de229-7eda-be84-c297-920d0de7b85f@virtuozzo.com>
+Date: Tue, 30 May 2017 18:27:50 +0300
 MIME-Version: 1.0
-Content-Type: text/plain
-Message-Id: <87bmqanz6i.fsf@abhimanyu.i-did-not-set--mail-host-address--so-tickle-me>
-Subject: Re: [Qemu-devel] [PATCH risu v2] ppc64: Fix patterns for rotate
- doubleword instructions
+In-Reply-To: <21763282-556d-4389-29b5-664f6f4f4479@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+Subject: Re: [Qemu-devel] [PATCH 1/4] block: add bdrv_get_format_alloc_stat
+ format interface
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -48,63 +31,113 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Sandipan Das <sandipandas1990@gmail.com>
-Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org, joserz@linux.vnet.ibm.com
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: armbru@redhat.com, mreitz@redhat.com, kwolf@redhat.com, den@openvz.org
 
-Sandipan Das <sandipandas1990@gmail.com> writes:
+30.05.2017 17:53, Eric Blake wrote:
+> On 05/30/2017 05:48 AM, Vladimir Sementsov-Ogievskiy wrote:
+>> The function should collect statistics, about allocted/unallocated by
+>> top-level format driver space (in its .file) and allocation status
+>> (allocated/hole/after eof) of corresponding areas in this .file.
+>>
+>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+>> ---
+>>   block.c                   | 16 ++++++++++++++++
+>>   include/block/block.h     |  3 +++
+>>   include/block/block_int.h |  2 ++
+>>   qapi/block-core.json      | 26 ++++++++++++++++++++++++++
+>>   4 files changed, 47 insertions(+)
+>>
+>> diff --git a/block.c b/block.c
+>> index 50ba264143..7d720ae0c2 100644
+>> --- a/block.c
+>> +++ b/qapi/block-core.json
+>> @@ -139,6 +139,32 @@
+>>              '*format-specific': 'ImageInfoSpecific' } }
+>>   
+>>   ##
+>> +# @BlockFormatAllocInfo:
+>> +#
+>> +# Information about allocations, including metadata. All fields are in bytes.
+>> +#
+>> +# @alloc_alloc: allocated by format driver and allocated in underlying file
+>> +#
+> New structs should favor naming with '-' rather than '_'. So this should
+> be 'alloc-alloc', if we like the name.
+>
+> So this statistic represents the portions of the format file that are in
+> use by the format, and which are backed by data in the underlying protocol.
+>
+>> +# @alloc_hole: allocated by format driver but actually is a hole in
+>> +#              underlying file
+> The portions of the format file in use by the format, but where the
+> entire cluster is a hole in the underlying file (note that with cluster
+> size large enough, you can get a cluster that is part-data/part-hole in
+> the underlying file, it looks like you are counting those as data).
 
-> The patterns for the following instructions are fixed:
->  * Rotate Left Doubleword then Clear Right (rldcr[.])
->  * Rotate Left Doubleword Immediate then Clear Right (rldicr[.])
->  * Rotate Left Doubleword Immediate then Mask Insert (rldimi[.])
->
-> The first instruction has a typo. For the other two instructions,
-> the extended opcodes are incorrect and the shift field 'sha' is
-> absent. Also, the shift field 'sh' should be used in place of the
-> register field 'rb'.
->
-> Signed-off-by: Sandipan Das <sandipandas1990@gmail.com>
+No, I account on sector boundary on bs->file. So it is not cluster-aligned.
 
-Reviewed-by: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
+>
+>> +#
+>> +# @alloc_overhead: allocated by format driver after end of underlying file
+> The portions of the format file in use by the format, but where the
+> entire cluster is beyond the end of the underlying file (the effective
+> hole).  Do we really need to distinguish between hole within the
+> underlying file and hole beyond the end of the file? Or can this number
+> be combined with the previous?
 
-> ---
->  ppc64.risu | 10 +++++-----
->  1 file changed, 5 insertions(+), 5 deletions(-)
+alloc_alloc + alloc_hole + hole_alloc + hole_hole = size of bs->file, I 
+think this is good and clear.
+
+these 4 stats describes bs->file usage in details (not on cluster 
+boundary, but on sector, based on bs->file block status), alloc_overhead 
+is separate.
+
 >
-> diff --git a/ppc64.risu b/ppc64.risu
-> index 28df9da..dd304e2 100644
-> --- a/ppc64.risu
-> +++ b/ppc64.risu
-> @@ -1451,7 +1451,7 @@ RLDCLd PPC64LE 011110 rs:5 ra:5 rb:5 mb:6 10001 \
->  !constraints { $rs != 1 && $ra != 1 && $rb != 1 && $rs != 13 && $ra != 13 && $rb != 13; }
+>> +#
+>> +# @hole_alloc: not allocated by format driver but allocated in underlying file
+> I'm not sure I like this name.  "Hole" in file-system terminology means
+> "reads-as-zero" - but here we are talking about portions of the format
+> layer that are unallocated (defer to backing file, and we can't
+> guarantee they read as zero unless there is no backing file).
 >
->  # format:MDS book:I page:103 PPC SR rldcr Rotate Left Dword then Clear Right
-> -RLCDR PPC64LE 011110 rs:5 ra:5 rb:5 mb:6 10010 \
-> +RLDCR PPC64LE 011110 rs:5 ra:5 rb:5 mb:6 10010 \
->  !constraints { $rs != 1 && $ra != 1 && $rb != 1 && $rs != 13 && $ra != 13 && $rb != 13; }
->  # format:MDS book:I page:103 PPC SR rldcr Rotate Left Dword then Clear Right
->  RLDCRd PPC64LE 011110 rs:5 ra:5 rb:5 mb:6 10011 \
-> @@ -1472,17 +1472,17 @@ RLDICLd PPC64LE 011110 rs:5 ra:5 sh:5 mb:6 000 sha:1 1 \
->  !constraints { $rs != 1 && $ra != 1 && $rs != 13 && $ra != 13; }
+> This statistic represents the portion of the underlying file that has
+> been previously allocated to hold data, but which is now unused by the
+> format layer (in other words, leaked clusters that can be reclaimed, or
+> which can be reused instead of growing the underlying the file if new
+> clusters are allocated).
 >
->  # format:MD book:I page:105 PPC SR rldicr[.] Rotate Left Dword Immediate then Clear Right
-> -RLDICR PPC64LE 011110 rs:5 ra:5 rb:5 me:6 00010 \
-> +RLDICR PPC64LE 011110 rs:5 ra:5 sh:5 me:6 001 sha:1 0 \
->  !constraints { $rs != 1 && $ra != 1 && $rb != 1 && $rs != 13 && $ra != 13 && $rb != 13; }
->  # format:MD book:I page:105 PPC SR rldicr[.] Rotate Left Dword Immediate then Clear Right
-> -RLDICRd PPC64LE 011110 rs:5 ra:5 rb:5 me:6 00011 \
-> +RLDICRd PPC64LE 011110 rs:5 ra:5 sh:5 me:6 001 sha:1 1 \
->  !constraints { $rs != 1 && $ra != 1 && $rb != 1 && $rs != 13 && $ra != 13 && $rb != 13; }
+>> +#
+>> +# @hole_hole: not allocated by format driver hole in underlying file
+> This statistic represents fragmentation - portions of the format layer
+> that are no longer in use, but which are also occupying no space in the
+> underlying file.  A refragmentation operation (if we ever implemented
+> one) could remove the address space used by these clusters, but would
+> not change the disk usage.
 >
->  # format:MD book:I page:105 PPC SR rldimi[.] Rotate Left Dword Immediate then Mask Insert
-> -RLDIMI PPC64LE 011110 rs:5 ra:5 rb:5 me:6 00110 \
-> +RLDIMI PPC64LE 011110 rs:5 ra:5 sh:5 me:6 011 sha:1 0 \
->  !constraints { $rs != 1 && $ra != 1 && $rb != 1 && $rs != 13 && $ra != 13 && $rb != 13; }
->  # format:MD book:I page:105 PPC SR rldimi[.] Rotate Left Dword Immediate then Mask Insert
-> -RLDIMId PPC64LE 011110 rs:5 ra:5 rb:5 me:6 00111 \
-> +RLDIMId PPC64LE 011110 rs:5 ra:5 sh:5 me:6 011 sha:1 1 \
->  !constraints { $rs != 1 && $ra != 1 && $rb != 1 && $rs != 13 && $ra != 13 && $rb != 13; }
+>> +#
+>> +# Since: 2.10
+>> +#
+>> +##
+>> +{ 'struct': 'BlockFormatAllocInfo',
+>> +  'data': {'alloc_alloc':    'uint64',
+>> +           'alloc_hole':     'uint64',
+>> +           'alloc_overhead': 'uint64',
+>> +           'hole_alloc':     'uint64',
+>> +           'hole_hole':      'uint64' } }
+> The idea seems okay, but the naming needs to be fixed.  Also, I'm not
+> sure if we need all 5, or if 4 is enough; and I'm not sure if we have
+> the right names ("how does alloc-hole differ from hole-alloc?"), or if
+> we can come up with something more descriptive.  Particularly since
+> "hole-" is not a hole in the filesystem sense, so much as unused
+> clusters.  But I'm also not coming up with better names to suggest at
+> the moment.
 >
->  # format:M book:I page:102 v:P1 SR rlwimi[.] Rotate Left Word Immediate then Mask Insert
-> -- 
-> 2.7.4
+yes, naming is a problem. Proposed has the advantage of short names, and 
+easy to use, if you have read documentation) But without reading docs, 
+it is hard to distinguish, what do they mean..
+
+
+-- 
+Best regards,
+Vladimir
