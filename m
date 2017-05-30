@@ -1,20 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44633)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45226)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dFZaG-00049t-Kk
-	for qemu-devel@nongnu.org; Tue, 30 May 2017 01:20:45 -0400
+	(envelope-from <armbru@redhat.com>) id 1dFZew-0005zu-40
+	for qemu-devel@nongnu.org; Tue, 30 May 2017 01:25:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dFZaF-0000oy-91
-	for qemu-devel@nongnu.org; Tue, 30 May 2017 01:20:44 -0400
+	(envelope-from <armbru@redhat.com>) id 1dFZes-0001Q5-IF
+	for qemu-devel@nongnu.org; Tue, 30 May 2017 01:25:34 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:59572)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dFZes-0001Pu-CO
+	for qemu-devel@nongnu.org; Tue, 30 May 2017 01:25:30 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 10694C057FAB
+	for <qemu-devel@nongnu.org>; Tue, 30 May 2017 05:25:29 +0000 (UTC)
 From: Markus Armbruster <armbru@redhat.com>
-References: <1494585229-9119-1-git-send-email-thuth@redhat.com>
-Date: Tue, 30 May 2017 07:20:34 +0200
-In-Reply-To: <1494585229-9119-1-git-send-email-thuth@redhat.com> (Thomas
-	Huth's message of "Fri, 12 May 2017 12:33:49 +0200")
-Message-ID: <87k24yudi5.fsf@dusky.pond.sub.org>
+References: <20170526181200.17227-1-ehabkost@redhat.com>
+	<20170526181200.17227-3-ehabkost@redhat.com>
+	<874lw3zjs4.fsf@dusky.pond.sub.org>
+	<20170529170425.GG32274@thinpad.lan.raisama.net>
+Date: Tue, 30 May 2017 07:25:25 +0200
+In-Reply-To: <20170529170425.GG32274@thinpad.lan.raisama.net> (Eduardo
+	Habkost's message of "Mon, 29 May 2017 14:04:25 -0300")
+Message-ID: <87fufmuda2.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v2] blockdev: Print a warning for legacy
- drive options that belong to -device
+Subject: Re: [Qemu-devel] [PATCH v3 2/3] qemu.py: Add QEMUMachine.exitcode()
+ method
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,123 +36,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: Marcel Apfelbaum <marcel@redhat.com>, Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
 
-Thomas Huth <thuth@redhat.com> writes:
+Eduardo Habkost <ehabkost@redhat.com> writes:
 
-> We likely do not want to carry these legacy -drive options along forever.
-> Let's emit a deprecation warning for the -drive options that have a
-> replacement with the -device option, so that the (hopefully few) remaining
-> users are aware of this and can adapt their scripts / behaviour accordingly.
+> On Mon, May 29, 2017 at 06:53:47PM +0200, Markus Armbruster wrote:
+>> Eduardo Habkost <ehabkost@redhat.com> writes:
+>> 
+>> > Allow the exit code of QEMU to be queried by scripts.
+>> >
+>> > Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+>> > ---
+>> >  scripts/qemu.py | 4 ++++
+>> >  1 file changed, 4 insertions(+)
+>> >
+>> > diff --git a/scripts/qemu.py b/scripts/qemu.py
+>> > index 16934f1e02..ebe1c4b919 100644
+>> > --- a/scripts/qemu.py
+>> > +++ b/scripts/qemu.py
+>> > @@ -88,6 +88,10 @@ class QEMUMachine(object):
+>> >      def is_running(self):
+>> >          return self._popen and (self._popen.returncode is None)
+>> >  
+>> > +    def exitcode(self):
+>> > +        if self._popen:
+>> > +            return self._popen.returncode
+>> > +
+>> 
+>> Falling off the function's end returns None.  Do we really want to rely
+>> on that?
+>> 
+>> For what it's worth, I checked the Python Language Reference, found it
+>> less than clear, so I tried it out, too.
 >
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
-> ---
->  v2:
->  - Check for !qtest_enabled() since tests/hd-geo-test still uses these
->  - Added "addr" to the list, too
->  - Also mark the options as deprecated in the documentation
+> I agree that the intent may not be clear when looking at the
+> code.  I can squash this in:
 >
->  blockdev.c      | 14 ++++++++++++++
->  qemu-options.hx |  5 ++++-
->  2 files changed, 18 insertions(+), 1 deletion(-)
->
-> diff --git a/blockdev.c b/blockdev.c
-> index 0b38c3d..aef38f0 100644
-> --- a/blockdev.c
-> +++ b/blockdev.c
-> @@ -50,6 +50,7 @@
->  #include "qmp-commands.h"
->  #include "block/trace.h"
->  #include "sysemu/arch_init.h"
-> +#include "sysemu/qtest.h"
->  #include "qemu/cutils.h"
->  #include "qemu/help_option.h"
->  #include "qemu/throttle-options.h"
-> @@ -797,6 +798,9 @@ DriveInfo *drive_new(QemuOpts *all_opts, BlockInterfaceType block_default_type)
->      const char *filename;
->      Error *local_err = NULL;
->      int i;
-> +    const char *deprecated[] = {
-> +        "serial", "trans", "secs", "heads", "cyls", "addr"
-> +    };
-
-I know I worked on turning (some of?) these into qdev properties, but
-I've since forgotten the details, so let me review their current state
-real quick:
-
-* "serial": Silently ignored unless the device model chooses to pick it
-  up.  Device models with a serial number should pick it up as a
-  compatibility fallback for their qdev property, with blkconf_serial().
-  Goes back to 2010-2011:
-
-  a8686a9 virtio-blk: Turn drive serial into a qdev property
-  c3a90cb usb-storage: Turn drive serial into a qdev property usb-storage.serial
-  a0fef65 scsi: Turn drive serial into a qdev property scsi-disk.serial
-  6ced55a ide: Turn drive serial into a qdev property ide-drive.serial
-
-* "trans", "secs", "heads", "cyls": Similar, with blkconf_geometry().
-  Goes back to 2012.
-
-  6e6f61a ide: qdev property for BIOS CHS translation
-  ba80196 ide: qdev properties for disk geometry
-  e63e7fd virtio-blk: qdev properties for disk geometry
-  d252df4 scsi-hd: qdev properties for disk geometry
-
-* "addr": Only accepted with if=virtio.  drive_new() desugars it into
-  the qdev property.
-
-Okay.
-
+> diff --git a/scripts/qemu.py b/scripts/qemu.py
+> index ebe1c4b919..bf00eddab8 100644
+> --- a/scripts/qemu.py
+> +++ b/scripts/qemu.py
+> @@ -89,8 +89,9 @@ class QEMUMachine(object):
+>          return self._popen and (self._popen.returncode is None)
 >  
->      /* Change legacy command line options into QMP ones */
->      static const struct {
-> @@ -880,6 +884,16 @@ DriveInfo *drive_new(QemuOpts *all_opts, BlockInterfaceType block_default_type)
-       if (qemu_opt_get(legacy_opts, "boot") != NULL) {
-           fprintf(stderr, "qemu-kvm: boot=on|off is deprecated and will be "
-                   "ignored. Future versions will reject this parameter. Please "
->                  "update your scripts.\n");
-
-Unrelated to this patch: this is ugly.  It's also almost three years
-old.  Can we bury the corpse already?
-
->      }
+>      def exitcode(self):
+> -        if self._popen:
+> -            return self._popen.returncode
+> +        if not self._popen:
+> +            return None
+> +        return self._popen.returncode
 >  
-> +    /* Other deprecated options */
-> +    if (!qtest_enabled()) {
-> +        for (i = 0; i < ARRAY_SIZE(deprecated); i++) {
-> +            if (qemu_opt_get(legacy_opts, deprecated[i]) != NULL) {
-> +                error_report("'%s' is deprecated, please use the corresponding "
-> +                             "option of '-device' instead", deprecated[i]);
-> +            }
-> +        }
-> +    }
-> +
->      /* Media type */
->      value = qemu_opt_get(legacy_opts, "media");
->      if (value) {
-> diff --git a/qemu-options.hx b/qemu-options.hx
-> index 9d7964d..2f66f1a 100644
-> --- a/qemu-options.hx
-> +++ b/qemu-options.hx
-> @@ -615,6 +615,8 @@ of available connectors of a given interface type.
->  This option defines the type of the media: disk or cdrom.
->  @item cyls=@var{c},heads=@var{h},secs=@var{s}[,trans=@var{t}]
->  These options have the same definition as they have in @option{-hdachs}.
-> +These parameters are deprecated, use the corresponding parameters
-> +of @code{-device} instead.
->  @item snapshot=@var{snapshot}
->  @var{snapshot} is "on" or "off" and controls snapshot mode for the given drive
->  (see @option{-snapshot}).
-> @@ -631,7 +633,8 @@ an untrusted format header.
->  @item serial=@var{serial}
->  This option specifies the serial number to assign to the device.
->  @item addr=@var{addr}
-> -Specify the controller's PCI address (if=virtio only).
-> +Specify the controller's PCI address (if=virtio only). This parameter is
-> +deprecated, use the corresponding parameter of @code{-device} instead.
->  @item werror=@var{action},rerror=@var{action}
->  Specify which @var{action} to take on write and read errors. Valid actions are:
->  "ignore" (ignore the error and try to continue), "stop" (pause QEMU),
+>      def get_pid(self):
+>          if not self.is_running():
 
-Reviewed-by: Markus Armbruster <armbru@redhat.com>
+Works for me.  The equivalent
+
+    return self._popen and self._popen.returncode
+
+would also work.  Nicely terse.
