@@ -1,24 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39257)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40312)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rkrcmar@redhat.com>) id 1dFhJn-0005ZW-OG
-	for qemu-devel@nongnu.org; Tue, 30 May 2017 09:36:17 -0400
+	(envelope-from <groug@kaod.org>) id 1dFhOb-0007Df-54
+	for qemu-devel@nongnu.org; Tue, 30 May 2017 09:41:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rkrcmar@redhat.com>) id 1dFhJj-0000gQ-Dg
-	for qemu-devel@nongnu.org; Tue, 30 May 2017 09:36:15 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:45460)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <rkrcmar@redhat.com>) id 1dFhJj-0000gC-7D
-	for qemu-devel@nongnu.org; Tue, 30 May 2017 09:36:11 -0400
-Date: Tue, 30 May 2017 15:36:05 +0200
-From: Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>
-Message-ID: <20170530133605.GA18926@potion>
-References: <1495775808-10396-1-git-send-email-ann.zhuangyanying@huawei.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1495775808-10396-1-git-send-email-ann.zhuangyanying@huawei.com>
-Subject: Re: [Qemu-devel] [PATCH v3] KVM: x86: Fix nmi injection failure
- when vcpu got blocked
+	(envelope-from <groug@kaod.org>) id 1dFhOX-000207-6U
+	for qemu-devel@nongnu.org; Tue, 30 May 2017 09:41:13 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:37636
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1dFhOX-0001zo-17
+	for qemu-devel@nongnu.org; Tue, 30 May 2017 09:41:09 -0400
+Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v4UDct2d169671
+	for <qemu-devel@nongnu.org>; Tue, 30 May 2017 09:41:07 -0400
+Received: from e06smtp12.uk.ibm.com (e06smtp12.uk.ibm.com [195.75.94.108])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2as03rphtm-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Tue, 30 May 2017 09:41:07 -0400
+Received: from localhost
+	by e06smtp12.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <groug@kaod.org>;
+	Tue, 30 May 2017 14:41:05 +0100
+From: Greg Kurz <groug@kaod.org>
+Date: Tue, 30 May 2017 15:40:30 +0200
+In-Reply-To: <1496151640-29919-1-git-send-email-groug@kaod.org>
+References: <1496151640-29919-1-git-send-email-groug@kaod.org>
+Message-Id: <1496151640-29919-2-git-send-email-groug@kaod.org>
+Subject: [Qemu-devel] [PULL v2 01/11] virtio-9p/xen-9p: move 9p specific
+ bits to core 9p code
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,70 +38,103 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Zhuangyanying <ann.zhuangyanying@huawei.com>
-Cc: pbonzini@redhat.com, herongguang.he@huawei.com, qemu-devel@nongnu.org, arei.gonglei@huawei.com, oscar.zhangbo@huawei.com, kvm@vger.kernel.org
+To: qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, Stefan Hajnoczi <stefanha@redhat.com>, Greg Kurz <groug@kaod.org>
 
-2017-05-26 13:16+0800, Zhuangyanying:
-> From: ZhuangYanying <ann.zhuangyanying@huawei.com>
-> 
-> When spin_lock_irqsave() deadlock occurs inside the guest, vcpu threads,
-> other than the lock-holding one, would enter into S state because of
-> pvspinlock. Then inject NMI via libvirt API "inject-nmi", the NMI could
-> not be injected into vm.
-> 
-> The reason is:
-> 1 It sets nmi_queued to 1 when calling ioctl KVM_NMI in qemu, and sets
-> cpu->kvm_vcpu_dirty to true in do_inject_external_nmi() meanwhile.
-> 2 It sets nmi_queued to 0 in process_nmi(), before entering guest, because
-> cpu->kvm_vcpu_dirty is true.
-> 
-> It's not enough just to check nmi_queued to decide whether to stay in
-> vcpu_block() or not. NMI should be injected immediately at any situation.
-> Add checking nmi_pending, and testing KVM_REQ_NMI replaces nmi_queued
-> in vm_vcpu_has_events().
-> 
-> Do the same change for SMIs.
-> 
-> Signed-off-by: Zhuang Yanying <ann.zhuangyanying@huawei.com>
-> ---
-> v1->v2
->   - simplify message. The complete description is here:
->     http://www.spinics.net/lists/kvm/msg150380.html
->   - Testing KVM_REQ_NMI replaces nmi_pending.
->   - Add Testing kvm_x86_ops->nmi_allowed(vcpu).
-> v2->v3
->   - Testing KVM_REQ_NMI replaces nmi_queued, not nmi_pending.
->   - Do the same change for SMIs. 
-> ---
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> @@ -8394,10 +8394,13 @@ static inline bool kvm_vcpu_has_events(struct kvm_vcpu *vcpu)
->  	if (vcpu->arch.pv.pv_unhalted)
->  		return true;
->  
-> -	if (atomic_read(&vcpu->arch.nmi_queued))
-> +	if (kvm_test_request(KVM_REQ_NMI, vcpu) ||
-> +	    (vcpu->arch.nmi_pending &&
+These bits aren't related to the transport so let's move them to the core
+code.
 
-I think the logic should be
+Signed-off-by: Greg Kurz <groug@kaod.org>
+Reviewed-by: Stefano Stabellini <sstabellini@kernel.org>
+---
+ hw/9pfs/9p.c               | 8 +++++++-
+ hw/9pfs/9p.h               | 2 +-
+ hw/9pfs/virtio-9p-device.c | 8 +-------
+ hw/9pfs/xen-9p-backend.c   | 6 +-----
+ 4 files changed, 10 insertions(+), 14 deletions(-)
 
-  	if ((kvm_test_request(KVM_REQ_NMI, vcpu) || vcpu->arch.nmi_pending) &&
-  			kvm_x86_ops->nmi_allowed(vcpu))
-
-because there is no reason to resume the VCPU if we cannot inject.
-
-> +	     kvm_x86_ops->nmi_allowed(vcpu)))
->  		return true;
->  
-> -	if (kvm_test_request(KVM_REQ_SMI, vcpu))
-> +	if (kvm_test_request(KVM_REQ_SMI, vcpu) ||
-> +	    (vcpu->arch.smi_pending && !is_smm(vcpu)))
-
-Ditto.
-
->  		return true;
->  
->  	if (kvm_arch_interrupt_allowed(vcpu) &&
-
-We'll then be consistent with other interrupts,
-
-Thanks.
+diff --git a/hw/9pfs/9p.c b/hw/9pfs/9p.c
+index ab3e22f23130..b3048371a8ee 100644
+--- a/hw/9pfs/9p.c
++++ b/hw/9pfs/9p.c
+@@ -3446,12 +3446,16 @@ static inline bool is_read_only_op(V9fsPDU *pdu)
+     }
+ }
+ 
+-void pdu_submit(V9fsPDU *pdu)
++void pdu_submit(V9fsPDU *pdu, P9MsgHeader *hdr)
+ {
+     Coroutine *co;
+     CoroutineEntry *handler;
+     V9fsState *s = pdu->s;
+ 
++    pdu->size = le32_to_cpu(hdr->size_le);
++    pdu->id = hdr->id;
++    pdu->tag = le16_to_cpu(hdr->tag_le);
++
+     if (pdu->id >= ARRAY_SIZE(pdu_co_handlers) ||
+         (pdu_co_handlers[pdu->id] == NULL)) {
+         handler = v9fs_op_not_supp;
+@@ -3462,6 +3466,8 @@ void pdu_submit(V9fsPDU *pdu)
+     if (is_ro_export(&s->ctx) && !is_read_only_op(pdu)) {
+         handler = v9fs_fs_ro;
+     }
++
++    qemu_co_queue_init(&pdu->complete);
+     co = qemu_coroutine_create(handler, pdu);
+     qemu_coroutine_enter(co);
+ }
+diff --git a/hw/9pfs/9p.h b/hw/9pfs/9p.h
+index 5312d8a42405..c886ba78d2ee 100644
+--- a/hw/9pfs/9p.h
++++ b/hw/9pfs/9p.h
+@@ -347,7 +347,7 @@ ssize_t pdu_marshal(V9fsPDU *pdu, size_t offset, const char *fmt, ...);
+ ssize_t pdu_unmarshal(V9fsPDU *pdu, size_t offset, const char *fmt, ...);
+ V9fsPDU *pdu_alloc(V9fsState *s);
+ void pdu_free(V9fsPDU *pdu);
+-void pdu_submit(V9fsPDU *pdu);
++void pdu_submit(V9fsPDU *pdu, P9MsgHeader *hdr);
+ void v9fs_reset(V9fsState *s);
+ 
+ struct V9fsTransport {
+diff --git a/hw/9pfs/virtio-9p-device.c b/hw/9pfs/virtio-9p-device.c
+index 3782f437029b..245abd8aaef1 100644
+--- a/hw/9pfs/virtio-9p-device.c
++++ b/hw/9pfs/virtio-9p-device.c
+@@ -70,13 +70,7 @@ static void handle_9p_output(VirtIODevice *vdev, VirtQueue *vq)
+             goto out_free_req;
+         }
+ 
+-        pdu->size = le32_to_cpu(out.size_le);
+-
+-        pdu->id = out.id;
+-        pdu->tag = le16_to_cpu(out.tag_le);
+-
+-        qemu_co_queue_init(&pdu->complete);
+-        pdu_submit(pdu);
++        pdu_submit(pdu, &out);
+     }
+ 
+     return;
+diff --git a/hw/9pfs/xen-9p-backend.c b/hw/9pfs/xen-9p-backend.c
+index 5df97c90fae9..922cc967be63 100644
+--- a/hw/9pfs/xen-9p-backend.c
++++ b/hw/9pfs/xen-9p-backend.c
+@@ -243,14 +243,10 @@ static int xen_9pfs_receive(Xen9pfsRing *ring)
+ 
+     /* cannot fail, because we only handle one request per ring at a time */
+     pdu = pdu_alloc(&ring->priv->state);
+-    pdu->size = le32_to_cpu(h.size_le);
+-    pdu->id = h.id;
+-    pdu->tag = le32_to_cpu(h.tag_le);
+     ring->out_size = le32_to_cpu(h.size_le);
+     ring->out_cons = cons + le32_to_cpu(h.size_le);
+ 
+-    qemu_co_queue_init(&pdu->complete);
+-    pdu_submit(pdu);
++    pdu_submit(pdu, &h);
+ 
+     return 0;
+ }
+-- 
+2.7.5
