@@ -1,32 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38494)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39257)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1dFhFH-0004Lr-VS
-	for qemu-devel@nongnu.org; Tue, 30 May 2017 09:31:36 -0400
+	(envelope-from <rkrcmar@redhat.com>) id 1dFhJn-0005ZW-OG
+	for qemu-devel@nongnu.org; Tue, 30 May 2017 09:36:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1dFhFD-0007xp-TR
-	for qemu-devel@nongnu.org; Tue, 30 May 2017 09:31:35 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:36228)
+	(envelope-from <rkrcmar@redhat.com>) id 1dFhJj-0000gQ-Dg
+	for qemu-devel@nongnu.org; Tue, 30 May 2017 09:36:15 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:45460)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1dFhFD-0007xX-Ka
-	for qemu-devel@nongnu.org; Tue, 30 May 2017 09:31:31 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 40EB1C05683F
-	for <qemu-devel@nongnu.org>; Tue, 30 May 2017 13:31:30 +0000 (UTC)
-From: Juan Quintela <quintela@redhat.com>
-In-Reply-To: <1495176212-14446-3-git-send-email-peterx@redhat.com> (Peter Xu's
-	message of "Fri, 19 May 2017 14:43:28 +0800")
-References: <1495176212-14446-1-git-send-email-peterx@redhat.com>
-	<1495176212-14446-3-git-send-email-peterx@redhat.com>
-Reply-To: quintela@redhat.com
-Date: Tue, 30 May 2017 15:31:26 +0200
-Message-ID: <87o9uafp3l.fsf@secure.mitica>
+	(Exim 4.71) (envelope-from <rkrcmar@redhat.com>) id 1dFhJj-0000gC-7D
+	for qemu-devel@nongnu.org; Tue, 30 May 2017 09:36:11 -0400
+Date: Tue, 30 May 2017 15:36:05 +0200
+From: Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>
+Message-ID: <20170530133605.GA18926@potion>
+References: <1495775808-10396-1-git-send-email-ann.zhuangyanying@huawei.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH RFC 2/6] migration: isolate return path on
- src
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1495775808-10396-1-git-send-email-ann.zhuangyanying@huawei.com>
+Subject: Re: [Qemu-devel] [PATCH v3] KVM: x86: Fix nmi injection failure
+ when vcpu got blocked
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,125 +27,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: qemu-devel@nongnu.org, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+To: Zhuangyanying <ann.zhuangyanying@huawei.com>
+Cc: pbonzini@redhat.com, herongguang.he@huawei.com, qemu-devel@nongnu.org, arei.gonglei@huawei.com, oscar.zhangbo@huawei.com, kvm@vger.kernel.org
 
-Peter Xu <peterx@redhat.com> wrote:
-> There are some places that binded "return path" with postcopy. Let's be
-> prepared for its usage even without postcopy. This patch mainly did this
-> on source side.
->
-> This has no functional change. But it'll simplify further patches.
->
-> Signed-off-by: Peter Xu <peterx@redhat.com>
+2017-05-26 13:16+0800, Zhuangyanying:
+> From: ZhuangYanying <ann.zhuangyanying@huawei.com>
+> 
+> When spin_lock_irqsave() deadlock occurs inside the guest, vcpu threads,
+> other than the lock-holding one, would enter into S state because of
+> pvspinlock. Then inject NMI via libvirt API "inject-nmi", the NMI could
+> not be injected into vm.
+> 
+> The reason is:
+> 1 It sets nmi_queued to 1 when calling ioctl KVM_NMI in qemu, and sets
+> cpu->kvm_vcpu_dirty to true in do_inject_external_nmi() meanwhile.
+> 2 It sets nmi_queued to 0 in process_nmi(), before entering guest, because
+> cpu->kvm_vcpu_dirty is true.
+> 
+> It's not enough just to check nmi_queued to decide whether to stay in
+> vcpu_block() or not. NMI should be injected immediately at any situation.
+> Add checking nmi_pending, and testing KVM_REQ_NMI replaces nmi_queued
+> in vm_vcpu_has_events().
+> 
+> Do the same change for SMIs.
+> 
+> Signed-off-by: Zhuang Yanying <ann.zhuangyanying@huawei.com>
 > ---
->  migration/migration.c  | 50 +++++++++++++++++++++++++++++++++++---------------
->  migration/trace-events |  4 ++--
->  2 files changed, 37 insertions(+), 17 deletions(-)
-
-
-
-
+> v1->v2
+>   - simplify message. The complete description is here:
+>     http://www.spinics.net/lists/kvm/msg150380.html
+>   - Testing KVM_REQ_NMI replaces nmi_pending.
+>   - Add Testing kvm_x86_ops->nmi_allowed(vcpu).
+> v2->v3
+>   - Testing KVM_REQ_NMI replaces nmi_queued, not nmi_pending.
+>   - Do the same change for SMIs. 
+> ---
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> @@ -8394,10 +8394,13 @@ static inline bool kvm_vcpu_has_events(struct kvm_vcpu *vcpu)
+>  	if (vcpu->arch.pv.pv_unhalted)
+>  		return true;
 >  
-> +/* Return true if success, otherwise false. */
-> +static bool migrate_return_path_create(MigrationState *s)
-> +{
-> +    /* Whether we should enable return path */
-> +    bool enable_return_path = false;
-> +    /* Whether we should force its success */
-> +    bool force_return_path = false;
-> +
-> +    if (migrate_postcopy_ram()) {
-> +        enable_return_path = true;
-> +        force_return_path = true;
-> +    }
-> +
-> +    if (enable_return_path) {
-> +        if (open_return_path_on_source(s) && force_return_path) {
-> +            error_report("Unable to open return-path");
-> +            return false;
-> +        }
-> +    }
-> +
-> +    return true;
-> +}
-> +
+> -	if (atomic_read(&vcpu->arch.nmi_queued))
+> +	if (kvm_test_request(KVM_REQ_NMI, vcpu) ||
+> +	    (vcpu->arch.nmi_pending &&
 
-what about this 
+I think the logic should be
 
-static bool migrate_return_patch_create(MigrationState *s)
-{
-    if (open_return_path_on_source(s)) {
-        error_report("Unable to open return-path");
-        return false;
-    }
+  	if ((kvm_test_request(KVM_REQ_NMI, vcpu) || vcpu->arch.nmi_pending) &&
+  			kvm_x86_ops->nmi_allowed(vcpu))
 
-    return true;
-}
+because there is no reason to resume the VCPU if we cannot inject.
 
->  void migrate_fd_connect(MigrationState *s)
->  {
->      s->expected_downtime = s->parameters.downtime_limit;
-> @@ -2057,17 +2081,13 @@ void migrate_fd_connect(MigrationState *s)
->      notifier_list_notify(&migration_state_notifiers, s);
+> +	     kvm_x86_ops->nmi_allowed(vcpu)))
+>  		return true;
 >  
->      /*
-> -     * Open the return path; currently for postcopy but other things might
-> -     * also want it.
-> +     * Open the return path.
->       */
-> -    if (migrate_postcopy_ram()) {
-> -        if (open_return_path_on_source(s)) {
-> -            error_report("Unable to open return-path for postcopy");
-> -            migrate_set_state(&s->state, MIGRATION_STATUS_SETUP,
-> -                              MIGRATION_STATUS_FAILED);
-> -            migrate_fd_cleanup(s);
-> -            return;
-> -        }
-> +    if (!migrate_return_path_create(s)) {
-> +        migrate_set_state(&s->state, MIGRATION_STATUS_SETUP,
-> +                          MIGRATION_STATUS_FAILED);
-> +        migrate_fd_cleanup(s);
-> +        return;
->      }
+> -	if (kvm_test_request(KVM_REQ_SMI, vcpu))
+> +	if (kvm_test_request(KVM_REQ_SMI, vcpu) ||
+> +	    (vcpu->arch.smi_pending && !is_smm(vcpu)))
 
+Ditto.
 
-And this?
+>  		return true;
+>  
+>  	if (kvm_arch_interrupt_allowed(vcpu) &&
 
->      /*
-> -     * Open the return path; currently for postcopy but other things might
-> -     * also want it.
-> +     * Open the return path.
->       */
-> -    if (migrate_postcopy_ram()) {
-> -        if (open_return_path_on_source(s)) {
-> -            error_report("Unable to open return-path for postcopy");
-> -            migrate_set_state(&s->state, MIGRATION_STATUS_SETUP,
-> -                              MIGRATION_STATUS_FAILED);
-> -            migrate_fd_cleanup(s);
-> -            return;
-> -        }
-> +    if (!migrate_return_path_create(s)) {
-> +        migrate_set_state(&s->state, MIGRATION_STATUS_SETUP,
-> +                          MIGRATION_STATUS_FAILED);
-> +        migrate_fd_cleanup(s);
-> +        return;
->      }
+We'll then be consistent with other interrupts,
 
-    /*
-     * Open the return path
-     */
-
-    if (migrate_postcopy_ram()) {
-        if (!migrate_return_path_create(s)) {
-            migrate_set_state(&s->state, MIGRATION_STATUS_SETUP,
-                              MIGRATION_STATUS_FAILED);
-            migrate_fd_cleanup(s);
-            return;
-        }
-    }
-
-Two less booleans and same behaviour.  It is also shorter, but that was
-not the idea.
-
-Later, Juan.
+Thanks.
