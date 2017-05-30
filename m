@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59955)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:32984)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dFgeE-0001cX-2C
-	for qemu-devel@nongnu.org; Tue, 30 May 2017 08:53:19 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1dFgl9-00044b-KF
+	for qemu-devel@nongnu.org; Tue, 30 May 2017 09:00:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dFgeA-0006J2-Vy
-	for qemu-devel@nongnu.org; Tue, 30 May 2017 08:53:18 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:40890)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dFgeA-0006Ix-Ml
-	for qemu-devel@nongnu.org; Tue, 30 May 2017 08:53:14 -0400
-References: <20170526054013.299-1-n54@gmx.com>
-	<20170530062022.5841-1-n54@gmx.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <58d04e43-1caa-f623-44fe-749dd351fad9@redhat.com>
-Date: Tue, 30 May 2017 07:53:10 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1dFgl8-0007xB-II
+	for qemu-devel@nongnu.org; Tue, 30 May 2017 09:00:27 -0400
+Received: from mail-wm0-x22a.google.com ([2a00:1450:400c:c09::22a]:37211)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1dFgl8-0007wx-A2
+	for qemu-devel@nongnu.org; Tue, 30 May 2017 09:00:26 -0400
+Received: by mail-wm0-x22a.google.com with SMTP id d127so97091641wmf.0
+	for <qemu-devel@nongnu.org>; Tue, 30 May 2017 06:00:26 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20170530062022.5841-1-n54@gmx.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="cVKH9V8iW4vKqMREltqLeLpLaEjH0HWnC"
-Subject: Re: [Qemu-devel] [PATCH] ivshmem-server: ivshmem-client: Build when
- eventfd() is available
+In-Reply-To: <CAFEAcA9QY253FP9mj6CfyHoxLJ8F-NrxGJOMKiM_yFN-RE2Syw@mail.gmail.com>
+References: <20170507181940.25882-1-krzk@kernel.org>
+	<CAFEAcA9QY253FP9mj6CfyHoxLJ8F-NrxGJOMKiM_yFN-RE2Syw@mail.gmail.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 30 May 2017 14:00:04 +0100
+Message-ID: <CAFEAcA-OQyy-puuGb=tJTA6a4CQgTo3Bj5PB=bUGOcHmk9neJw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v2 0/3] hw/arm/exynos: QOM-ify the SoC
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,70 +29,108 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kamil Rytarowski <n54@gmx.com>, qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, marcandre.lureau@gmail.com, armbru@redhat.com, f4bug@amsat.org
+To: Krzysztof Kozlowski <krzk@kernel.org>
+Cc: Igor Mitsyanko <i.mitsyanko@gmail.com>, qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---cVKH9V8iW4vKqMREltqLeLpLaEjH0HWnC
-From: Eric Blake <eblake@redhat.com>
-To: Kamil Rytarowski <n54@gmx.com>, qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, marcandre.lureau@gmail.com, armbru@redhat.com,
- f4bug@amsat.org
-Message-ID: <58d04e43-1caa-f623-44fe-749dd351fad9@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] ivshmem-server: ivshmem-client: Build when
- eventfd() is available
-References: <20170526054013.299-1-n54@gmx.com>
- <20170530062022.5841-1-n54@gmx.com>
-In-Reply-To: <20170530062022.5841-1-n54@gmx.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On 30 May 2017 at 13:07, Peter Maydell <peter.maydell@linaro.org> wrote:
+> On 7 May 2017 at 19:19, Krzysztof Kozlowski <krzk@kernel.org> wrote:
+>> Hi,
+>>
+>> Changes since v1:
+>> =================
+>> 1. s/RAM/DRAM/ in commit msg of first patch (as suggested by Philippe).
+>> 2. Add Philippe's reviewed-by.
+>>
+>>
+>> Convert the Exynos4210 SoC driver into QOM model.
+>>
+>> No external dependencies, rebased on v2.9.0-363-g0de9191deb14.
+>>
+>> Best regards,
+>> Krzysztof
+>>
+>>
+>> Krzysztof Kozlowski (3):
+>>   hw/arm/exynos: Move DRAM initialization next boards
+>>   hw/arm/exynos: Declare local variables in some order
+>>   hw/arm/exynos: QOM-ify the SoC
+>
+>
+>
+> Applied to target-arm.next, thanks
 
-On 05/30/2017 01:20 AM, Kamil Rytarowski wrote:
-> Currently ivshmem requires eventfd() which is Linux specific.
-> Do not and build it unconditionally on every Linux/BSD/Solaris.
->=20
-> This patch indirectly fixes build failure on NetBSD, where these tools
-> additionally require -lrt for shm_open(3). In future there should be
-> added support for NetBSD and the linking addressed appropriately.
+...unfortunately I've just found that patch 3 breaks "make check":
+tests/device-introspect-test subtest /arm/device/introspect/concrete
+segfaults due to memory corruption. Running it under valgrind:
 
-Is this a v2 patch? If so, it's best to repost it as a new top-level
-thread rather than buried in reply to your v1 patch.  Also, be sure to
-include v2 in the subject line ('git send-email -v2' works wonders for
-that).
+(cd build/x86 && QTEST_QEMU_BINARY="valgrind --vgdb-error=1
+arm-softmmu/qemu-system-arm" QTEST_QEMU_IMG=qemu-img
+MALLOC_PERTURB_=${MALLOC_PERTURB_:-$((RANDOM % 255 + 1))} gtester -k
+--verbose -m=quick tests/device-introspect-test -p
+/arm/device/introspect/concrete)
+TEST: tests/device-introspect-test... (pid=8506)
+  /arm/device/introspect/concrete:
+==8508== Memcheck, a memory error detector
+==8508== Copyright (C) 2002-2015, and GNU GPL'd, by Julian Seward et al.
+==8508== Using Valgrind-3.11.0 and LibVEX; rerun with -h for copyright info
+[etc etc]
+==8508== Thread 2:
+==8508== Invalid read of size 8
+==8508==    at 0x394333: memory_region_unref (memory.c:1540)
+==8508==    by 0x3908D9: flatview_destroy (memory.c:288)
+==8508==    by 0x390951: flatview_unref (memory.c:302)
+==8508==    by 0x8F9F9A: call_rcu_thread (rcu.c:272)
+==8508==    by 0x1DF6E6B9: start_thread (pthread_create.c:333)
+==8508==    by 0x1E28A82C: clone (clone.S:109)
+==8508==  Address 0x2d400668 is 10,952 bytes inside a block of size
+12,512 free'd
+==8508==    at 0x4C2EDEB: free (in
+/usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==8508==    by 0x7D7EDE: object_finalize (object.c:472)
+==8508==    by 0x7D8DD5: object_unref (object.c:903)
+==8508==    by 0x53A71B: qmp_device_list_properties (qmp.c:580)
+==8508==    by 0x52B42E: qmp_marshal_device_list_properties (qmp-marshal.c:1355)
+==8508==    by 0x8CE2B5: do_qmp_dispatch (qmp-dispatch.c:104)
+==8508==    by 0x8CE3ED: qmp_dispatch (qmp-dispatch.c:131)
+==8508==    by 0x3847E9: handle_qmp_command (monitor.c:3824)
+==8508==    by 0x8D5812: json_message_process_token (json-streamer.c:105)
+==8508==    by 0x90100C: json_lexer_feed_char (json-lexer.c:319)
+==8508==    by 0x901154: json_lexer_feed (json-lexer.c:369)
+==8508==    by 0x8D58B9: json_message_parser_feed (json-streamer.c:124)
+==8508==  Block was alloc'd at
+==8508==    at 0x4C2DB8F: malloc (in
+/usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==8508==    by 0x1B7A5718: g_malloc (in
+/lib/x86_64-linux-gnu/libglib-2.0.so.0.4800.2)
+==8508==    by 0x7D7F34: object_new_with_type (object.c:483)
+==8508==    by 0x7D7F90: object_new (object.c:494)
+==8508==    by 0x53A5C6: qmp_device_list_properties (qmp.c:545)
+==8508==    by 0x52B42E: qmp_marshal_device_list_properties (qmp-marshal.c:1355)
+==8508==    by 0x8CE2B5: do_qmp_dispatch (qmp-dispatch.c:104)
+==8508==    by 0x8CE3ED: qmp_dispatch (qmp-dispatch.c:131)
+==8508==    by 0x3847E9: handle_qmp_command (monitor.c:3824)
+==8508==    by 0x8D5812: json_message_process_token (json-streamer.c:105)
+==8508==    by 0x90100C: json_lexer_feed_char (json-lexer.c:319)
+==8508==    by 0x901154: json_lexer_feed (json-lexer.c:369)
+==8508==
 
->=20
-> Signed-off-by: Kamil Rytarowski <n54@gmx.com>
-> Reviewed-by: Markus Armbruster <armbru@redhat.com>
-> ---
+This is because the TYPE_EXYNOS4310 device now creates and maps
+the exynos4220.chipid MemoryRegion into the system memory space
+in its instance_init method, but it doesn't have any code for
+unmapping it when the device is deleted. This test does a
+"create but don't realize; then delete it" for each device, so
+what happens is that the memory for the device is allocated on
+create, freed on object deletion, and then referenced because
+the MR is still in the system memory's flatview.
 
-It also helps in a v2 submission to list here, after the --- separator,
-how it differs from v1.
+For devices like this exynos one which are never going to really
+need to be deleted, the only requirement is that we can at least
+do a create-delete so we can introspect them for information
+about properties. This means that they shouldn't do things
+like adding MRs to the system memory space until the realize
+method. I think that should fix this problem.
 
-More submission hints at http://wiki.qemu.org/Contribute/SubmitAPatch
+I'm dropping this patchset from my queue.
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---cVKH9V8iW4vKqMREltqLeLpLaEjH0HWnC
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEcBAEBCAAGBQJZLWs2AAoJEKeha0olJ0NqXqsH/2/Gda1a6q27zDUgb1BUtSp3
-QITDoF/iD9npLJLTfnQA19EIJJLGOyNp0+sHwL2pJdY27S0KrqVGQUt/T4TazTcw
-YmVXbQewGkLWt5Kk5Ey3GgB8Ql1CIiGHYnDCqv+iiEMCPe3/aQUjkqfHxD7HiEty
-SdJl5avlikQVFqG72gmX9GS80cXwOjniMi9T7Ld9AvEyZUz5BrwgQDlS3AxgIyrT
-km7jdpD2HjOa6Kt3xv8bKLk2TXIa6NAwL/SZL46LN2dyM+bIyQyQcEzl6jBM/Itx
-/pHyIFF0LyQI8C+HBA94IgD+S8XKSAV7S2SWHXbCEOwCq/LfRQgBa80pnnGEHeA=
-=5bPR
------END PGP SIGNATURE-----
-
---cVKH9V8iW4vKqMREltqLeLpLaEjH0HWnC--
+thanks
+-- PMM
