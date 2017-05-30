@@ -1,25 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53775)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54552)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dFmVW-0002OX-BD
-	for qemu-devel@nongnu.org; Tue, 30 May 2017 15:08:43 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1dFmYD-0003VT-9q
+	for qemu-devel@nongnu.org; Tue, 30 May 2017 15:11:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dFmVR-0004i1-NJ
-	for qemu-devel@nongnu.org; Tue, 30 May 2017 15:08:42 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:44220)
+	(envelope-from <ehabkost@redhat.com>) id 1dFmY8-0005iN-Sy
+	for qemu-devel@nongnu.org; Tue, 30 May 2017 15:11:29 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:41522)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dFmVR-0004gv-DO
-	for qemu-devel@nongnu.org; Tue, 30 May 2017 15:08:37 -0400
-References: <20170530184013.31044-1-ehabkost@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <d0daee0d-ad21-1fbf-ce72-be47227f62d5@redhat.com>
-Date: Tue, 30 May 2017 14:08:26 -0500
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1dFmY8-0005i3-Mv
+	for qemu-devel@nongnu.org; Tue, 30 May 2017 15:11:24 -0400
+From: Eduardo Habkost <ehabkost@redhat.com>
+Date: Tue, 30 May 2017 16:11:19 -0300
+Message-Id: <20170530191121.1920-1-ehabkost@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20170530184013.31044-1-ehabkost@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="pU331oHIQeEJI2egXQhCCN1PkccMS0taN"
-Subject: Re: [Qemu-devel] [PATCH] numa: Fix format string for "Invalid node"
- message
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL 0/2] NUMA fixes, 2017-05-30
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,63 +24,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, "Daniel P. Berrange" <berrange@redhat.com>, He Chen <he.chen@linux.intel.com>, Igor Mammedov <imammedo@redhat.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---pU331oHIQeEJI2egXQhCCN1PkccMS0taN
-From: Eric Blake <eblake@redhat.com>
-To: Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- "Daniel P. Berrange" <berrange@redhat.com>, He Chen
- <he.chen@linux.intel.com>, Igor Mammedov <imammedo@redhat.com>,
- =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
-Message-ID: <d0daee0d-ad21-1fbf-ce72-be47227f62d5@redhat.com>
-Subject: Re: [PATCH] numa: Fix format string for "Invalid node" message
-References: <20170530184013.31044-1-ehabkost@redhat.com>
-In-Reply-To: <20170530184013.31044-1-ehabkost@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+The following changes since commit 0748b3526e8cb78b9cd64208426bfc3d54a72b=
+04:
 
-On 05/30/2017 01:40 PM, Eduardo Habkost wrote:
-> Some compilers complain about the PRIu16 format string with the
-> MAX(src, dst) and MAX_NODES arguments.  Example output from Apple LLVM
-> version 7.3.0 (clang-703.0.31):
+  Merge remote-tracking branch 'kwolf/tags/for-upstream' into staging (20=
+17-05-30 14:15:15 +0100)
 
->                     ^~~
-> MAX(src, dst) promotes the src and dst arguments to int, and MAX_NODES
-> is an int.  Use %d to silence those warnings.
->=20
-> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
-> ---
->  numa.c | 3 +--
->  1 file changed, 1 insertion(+), 2 deletions(-)
+are available in the git repository at:
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
+  git://github.com/ehabkost/qemu.git tags/numa-pull-request
+
+for you to fetch changes up to f892291eee376505cfec8b6cade7ccf952a6d3e0:
+
+  numa: Fix format string for "Invalid node" message (2017-05-30 16:09:58=
+ -0300)
+
+----------------------------------------------------------------
+NUMA fixes, 2017-05-30
+
+----------------------------------------------------------------
+
+Eduardo Habkost (1):
+  numa: Fix format string for "Invalid node" message
+
+Marc-Andr=C3=A9 Lureau (1):
+  numa-test: fix query-cpus leaks
+
+ numa.c            |  3 +--
+ tests/numa-test.c | 14 +++++++++-----
+ 2 files changed, 10 insertions(+), 7 deletions(-)
 
 --=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---pU331oHIQeEJI2egXQhCCN1PkccMS0taN
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEcBAEBCAAGBQJZLcMqAAoJEKeha0olJ0NqaRsIAKeHQHF7QbBzUrWEPTQfLNk/
-dg5zXWJpkaF81/J699JBwTZZeRD1t6D8oD3h00qKwsXKmt7xJA9crTMMfa0RNkg9
-s0J7Fe1YGVn5KiNsgQNLTGnGjdVqw4ulON9UFu6Hikv4FnMnazCtSvb8Kcpvygzs
-cTJpu0soA2iigphs3AjdCaBArF0h8GwxgEKEMQ7cRQuxKQvwb86GTiKsAPuRzfsj
-m4kWOb1P1wWkzUwMUYGv6WI0Fu9JZJAuXQs3ezvrrYGdtOYQrt5O4uY3aBpX863r
-Dqc5WEQixwrrfBgQiHxlCoED4k0kzwUoaJxuMN4ju09vl2vdjL4IVlcv+tzvDaA=
-=MkHa
------END PGP SIGNATURE-----
-
---pU331oHIQeEJI2egXQhCCN1PkccMS0taN--
+2.11.0.259.g40922b1
