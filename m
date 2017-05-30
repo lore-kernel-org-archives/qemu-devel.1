@@ -1,26 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47707)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48192)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dFjD8-0006Jw-OX
-	for qemu-devel@nongnu.org; Tue, 30 May 2017 11:37:31 -0400
+	(envelope-from <kchamart@redhat.com>) id 1dFjEl-0007Pg-DY
+	for qemu-devel@nongnu.org; Tue, 30 May 2017 11:39:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dFjD7-0007PV-Vb
-	for qemu-devel@nongnu.org; Tue, 30 May 2017 11:37:30 -0400
-Received: from mail-wm0-x230.google.com ([2a00:1450:400c:c09::230]:37117)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1dFjD7-0007PI-Nz
-	for qemu-devel@nongnu.org; Tue, 30 May 2017 11:37:29 -0400
-Received: by mail-wm0-x230.google.com with SMTP id d127so101406071wmf.0
-	for <qemu-devel@nongnu.org>; Tue, 30 May 2017 08:37:29 -0700 (PDT)
-MIME-Version: 1.0
-In-Reply-To: <1495123889-32301-1-git-send-email-wei@redhat.com>
-References: <1495123889-32301-1-git-send-email-wei@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 30 May 2017 16:37:07 +0100
-Message-ID: <CAFEAcA_FiqcFz_8o-Mavgq8sfkr6dRv3fnRzytaQsr5pJ4Dagg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH 1/1] target/arm: clear PMUVER field of
- AA64DFR0 when vPMU=off
+	(envelope-from <kchamart@redhat.com>) id 1dFjEh-0008BJ-LD
+	for qemu-devel@nongnu.org; Tue, 30 May 2017 11:39:11 -0400
+From: Kashyap Chamarthy <kchamart@redhat.com>
+Date: Tue, 30 May 2017 17:38:43 +0200
+Message-Id: <1496158724-2809-1-git-send-email-kchamart@redhat.com>
+Subject: [Qemu-devel] [PATCH] live-block-ops.txt: Rewrite and improve it
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,41 +17,906 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Wei Huang <wei@redhat.com>
-Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org
+Cc: eblake@redhat.com, armbru@redhat.com, kwolf@redhat.com, mreitz@redhat.com, jsnow@redhat.com, qemu-block@nongnu.org, Kashyap Chamarthy <kchamart@redhat.com>
 
-On 18 May 2017 at 17:11, Wei Huang <wei@redhat.com> wrote:
-> The PMUv3 driver of linux kernel (in arch/arm64/kernel/perf_event.c)
-> relies on the PMUVER field of id_aa64dfr0_el1 to decide if PMU support
-> is present or not. This patch clears the PMUVER field under TCG mode
-> when vPMU=off. Without it, PMUv3 will init insider guest VMs even
-> with vPMU=off. This patch also removes a redundant line inside the
-> if-statement.
->
-> Signed-off-by: Wei Huang <wei@redhat.com>
-> ---
->  target/arm/cpu.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/target/arm/cpu.c b/target/arm/cpu.c
-> index c185eb1..4e8fe1c 100644
-> --- a/target/arm/cpu.c
-> +++ b/target/arm/cpu.c
-> @@ -750,8 +750,8 @@ static void arm_cpu_realizefn(DeviceState *dev, Error **errp)
->      }
->
->      if (!cpu->has_pmu) {
-> -        cpu->has_pmu = false;
->          unset_feature(env, ARM_FEATURE_PMU);
-> +        cpu->id_aa64dfr0 &= ~0xf00;
->      }
->
->      if (!arm_feature(env, ARM_FEATURE_EL2)) {
-> --
-> 1.8.3.1
+This edition documents all four operations:
 
+  - `block-stream`
+  - `block-commit`
+  - `drive-mirror` (& `blockdev-mirror`)
+  - `drive-backup` (& `blockdev-backup`)
 
+Things considered while writing this document:
 
-Applied to target-arm.next, thanks.
+  - Use reStructuredText format.  It is gentler on the eye, and can be
+    trivially converted to different formats.  (Another reason: upstream
+    QEMU is considering to switch to Sphinx, which uses reStructuredText
+    as its markup language.)
 
--- PMM
+  - Raw QMP JSON output vs. 'qmp-shell'.  I debated with myself whether
+    to only show raw QMP JSON output (as that is the canonical
+    representation), or use 'qmp-shell', which takes key-value pairs.  I
+    settled on the approach of: for the first occurance of a command,
+    use raw JSON; for subsequent occurances, use 'qmp-shell', with an
+    occasional exception.
+
+  - Using 'node-name' vs. file path to refer to disks.  While we have
+    `blockdev-{mirror, backup}` as 'node-name'-alternatives for
+    `drive-{mirror, backup}`, the `block-{stream, commit}` commands
+    still operate on file names for parameters 'base' and 'top'.  So I
+    added a caveat at the beginning to that effect.
+
+    Refer this related thread that I started:
+    https://lists.nongnu.org/archive/html/qemu-devel/2017-05/msg06466.html
+    "[RFC] Making 'block-stream', and 'block-commit' accept node-name"
+
+All commands showed in this document were tested while documenting.
+
+Thanks: Eric Blake for the section: "A note on points-in-time vs file
+names".  This useful bit was originally articulated by Eric in his
+KVMForum 2015 presentation, so I included that specific bit in this
+document.
+
+Signed-off-by: Kashyap Chamarthy <kchamart@redhat.com>
+---
+* An HTML rendered version is here:
+  https://kashyapc.fedorapeople.org/virt/qemu/live-block-operations.html
+
+* To keep the document relatively short, I didn't explicitly spell out
+  the complete QMP output for `blockdev-mirror`, and `blockdev-backup`.
+  But I have them locally available here:
+
+  https://kashyapc.fedorapeople.org/virt/qemu/blockdev-backup-and-mirror.html
+
+  So I can trivially update, if the reviewers ask for it.
+---
+ docs/live-block-operations.rst | 757 +++++++++++++++++++++++++++++++++++++++++
+ docs/live-block-ops.txt        |  72 ----
+ 2 files changed, 757 insertions(+), 72 deletions(-)
+ create mode 100644 docs/live-block-operations.rst
+ delete mode 100644 docs/live-block-ops.txt
+
+diff --git a/docs/live-block-operations.rst b/docs/live-block-operations.rst
+new file mode 100644
+index 0000000000000000000000000000000000000000..19107776cd1edd20fac17ddda192d677199190d9
+--- /dev/null
++++ b/docs/live-block-operations.rst
+@@ -0,0 +1,757 @@
++============================
++Live Block Device Operations
++============================
++
++QEMU Block Layer currently (as of QEMU 2.9) supports four major kinds of
++live block device jobs -- stream, commit, mirror, and backup.  These can
++be used to manipulate disk image chains to accomplish certain tasks,
++namely: live copy data from backing files into overlays; shorten long
++disk image chains by merging data from overlays into backing files; live
++synchronize data from a disk image chain (including current active disk)
++to another target image; point-in-time (and incremental) backups of a
++block device.  Below is a description of the said block (QMP)
++primitives, and some (non-exhaustive list of) examples to illustrate
++their use.
++
++NB: The file qapi/block-core.json in the QEMU source tree has the
++canonical QEMU API (QAPI) schema documentation for the QMP primitives
++discussed here.
++
++
++Table of Contents
++=================
++
++(1) `Disk image backing chain notation`_
++(2) `Brief overview of live block QMP primitives`_
++(3) `Interacting with a QEMU instance`_
++(4) `Example disk image chain`_
++(5) `A note on points-in-time vs file names`_
++(6) `Live block streaming -- `block-stream``_
++(7) `QMP invocation for `block-stream``_
++(8) `Live block commit -- `block-commit``_
++(9) `QMP invocation for `block-commit``_
++(10) `Live disk synchronization -- `drive-mirror`&`blockdev-mirror``_
++(11) `QMP invocation for `drive-mirror``_
++(12) `Notes on `blockdev-mirror``_
++(13) `Live disk backup -- `drive-backup`&`blockdev-backup``_
++(14) `QMP invocation for `drive-backup``_
++(15) `Notes on `blockdev-backup``_
++
++
++.. _`Disk image backing chain notation`:
++
++Disk image backing chain notation
++---------------------------------
++
++A simple disk image chain.  (This can be created live, using QMP
++`blockdev-snapshot-sync`, or offline, via `qemu-img`):
++
++.. code-block::
++
++                   (Live QEMU)
++                        |
++                        .
++                        V
++
++            [A] <----- [B]
++
++    (backing file)    (overlay)
++
++Arrow to be read as: Image [A] is the backing file of disk image [B].
++And live QEMU is currently writing to image [B], consequently, it is
++also referred to as the "active layer".
++
++There are two kinds of terminology that is common when referring to
++files in a disk image backing chain:
++
++(1) Directional: 'base' and 'top'.  Given the simple disk image chain
++    above, image [A] can be referred to as 'base', and image [B] as
++    'top'.  (This terminology can be seen in in QAPI schema file,
++    block-core.json.)
++
++(2) Relational: 'backing file' and 'overlay'.  Again, taking the same
++    simple disk image chain from the above, disk image [A] is referred
++    to as the backing file, and image [B] as overlay.
++
++    Throughout this document, we will use the relational terminology.
++
++NB: The base disk image can be raw format; however, all the overlay
++files must be of QCOW2 format.
++
++
++.. _`Brief overview of live block QMP primitives`:
++
++Brief overview of live block QMP primitives
++-------------------------------------------
++
++The following are the four different kinds of live block operations that
++QEMU block layer supports.
++
++- `block-stream`: Live copy data from overlay files into backing images.
++
++- `block-commit`: Live merge data from backing files into overlay
++  images.  Since QEMU 2.0, this includes "active `block-commit`" (i.e.
++  merge the current active layer into the base image).
++
++- `drive-mirror` (and `blockdev-mirror`): Synchronize running disk to
++  another image.
++
++- `drive-backup` (and `blockdev-backup`): Point-in-time (live) copy of a
++  block device to a destination.
++
++
++.. _`Interacting with a QEMU instance`:
++
++Interacting with a QEMU instance
++--------------------------------
++
++To show some example invocations of command-line, we shall use the
++following invocation of QEMU, with a QMP server running over UNIX
++socket:
++
++.. code-block::
++
++    $ ./x86_64-softmmu/qemu-system-x86_64 -display none -nodefconfig \
++        -M q35 -nodefaults -m 512 \
++        -blockdev node-name=node-A,driver=qcow2,file.driver=file,file.filename=./a.qcow2 \
++        -device virtio-blk,drive=node-A,id=virtio0 \
++        -monitor stdio -qmp unix:/tmp/qmp-sock,server,nowait
++
++The `-blockdev` command-line option, used above, is available from QEMU
++2.9 onwards.  In the above invocation, notice the 'node-name' parameter
++that is used to refer to the disk image a.qcow2 ('node-A') -- this is a
++cleaner way to refer to a disk image (as opposed to referring to it by
++spelling out file paths).  So, we shall continue to designate a
++'node-name' to each further disk image created (either via
++`blockdev-snapshot-sync`, or `blockdev-add`) as part of the disk image
++chain, and continue to refer to the disks using their 'node-name' (where
++possible, because `block-stream`, and `block-commit` do not yet, as of
++QEMU 2.9, take 'node-name' parameters) when performing various block
++operations.
++
++To interact with the QEMU instance launched above, we shall use the
++`qmp-shell` (located at: `qemu/scripts/qmp`, as part of the QEMU source
++directory) utility, which takes key-value pairs for QMP commands.
++Invoke it as below (which will also print out the complete raw JSON
++syntax for reference -- examples in the following sections).
++
++.. code-block::
++
++    $ ./qmp-shell -v -p /tmp/qmp-sock
++    (QEMU)
++
++NB: In the event we have to repeat a certain QMP command, we shall:
++for the first occurrence of it, show the the `qmp-shell` invocation,
++*and* the corresponding raw JSON QMP syntax; but for subsequent
++invocations, present just the `qmp-shell` syntax, and omit the
++equivalent JSON output.
++
++
++.. _`Example disk image chain`:
++
++Example disk image chain
++------------------------
++
++We shall use the below disk image chain (and occasionally spelling it
++out where appropriate) when discussing various primitives.
++
++.. code-block::
++
++    [A] <-- [B] <-- [C] <-- [D]
++
++Where [A] is the original base image; [B] and [C] are intermediate
++overlay images; image [D] is the active layer -- i.e. live QEMU is
++writing to it.  (The rule of thumb is: live QEMU will always be pointing
++to the right-most image in a disk image chain.)
++
++The above image chain can be created by invoking
++`blockdev-snapshot-sync` command as following (which shows the creation
++of overlay image [B]) using the `qmp-shell` (our invocation also prints
++the raw JSON invocation of it):
++
++.. .. code-block:: json
++.. code-block::
++
++    (QEMU) blockdev-snapshot-sync node-name=node-A snapshot-file=b.qcow2 snapshot-node-name=node-B format=qcow2
++    {
++        "execute": "blockdev-snapshot-sync",
++        "arguments": {
++            "node-name": "node-A",
++            "snapshot-file": "b.qcow2",
++            "format": "qcow2",
++            "snapshot-node-name": "node-B"
++        }
++    }
++
++Here, "node-A" is the name QEMU internally uses to refer to the base
++image [A] -- it is the backing file, based on which the overlay image,
++[B], is created.
++
++To create the rest of the two overlay images, [C], and [D] (omitted the
++raw JSON output for brevity):
++
++.. code-block::
++
++    (QEMU) blockdev-snapshot-sync node-name=node-B snapshot-file=c.qcow2 snapshot-node-name=node-C format=qcow2
++    (QEMU) blockdev-snapshot-sync node-name=node-C snapshot-file=d.qcow2 snapshot-node-name=node-D format=qcow2
++
++
++.. _`A note on points-in-time vs file names`:
++
++A note on points-in-time vs file names
++--------------------------------------
++
++In our disk disk image chain:
++
++.. code-block::
++
++    [A] <-- [B] <-- [C] <-- [D]
++
++We have *three* points in time and an active layer:
++
++- Point 1: Guest state when [B] was created is contained in file [A]
++- Point 2: Guest state when [C] was created is contained in [A] + [B]
++- Point 3: Guest state when [D] was created is contained in
++  [A] + [B] + [C]
++- Active layer: Current guest state is contained in [A] + [B] + [C] +
++  [D]
++
++Therefore, be aware with naming choices:
++
++- Naming a file after the time it is created is misleading -- the
++  guest data for that point in time is *not* contained in that file
++  (as explained earlier)
++- Rather, think of files as a *delta* from the backing file
++
++
++.. _`Live block streaming -- `block-stream``:
++
++Live block streaming -- `block-stream`
++--------------------------------------
++
++The `block-stream` command allows you to live copy data from backing
++files into overlay images.
++
++Given our example disk image chain from earlier:
++
++.. code-block::
++
++    [A] <-- [B] <-- [C] <-- [D]
++
++The disk image chain can be shortened in one of the following different
++ways (not an exhaustive list).
++
++(1) Merge everything into the active layer: I.e. copy all contents from
++    the base image, [A], and overlay images, [B] and [C], into [D],
++    _while_ the guest is running.  The resulting chain will be a
++    standalone image, [D] -- with contents from [A], [B] and [C] merged
++    into it (where live QEMU writes go to):
++
++    .. code-block::
++
++        [D]
++
++(2) Taking the same example disk image chain mentioned earlier, merge
++    only images [B] and [C] into [D], the active layer.  The result will
++    be contents of images [B] and [C] will be copied into [D], and the
++    backing file pointer of image [D] will be adjusted to point to image
++    [A].  The resulting chain will be:
++
++    .. code-block::
++
++        [A] <-- [D]
++
++(3) Intermediate streaming (available since QEMU 2.8): Continuing with
++    the same example disk image chain, with a total of four images, it
++    is possible to copy contents from image [B] into image [C].  Once
++    the copy is finished, image [B] can now be (optionally) discarded;
++    and the backing file pointer of image [C] will be adjusted to point
++    to [A].  I.e. after performing "intermediate streaming" of [B] into
++    [C], the resulting image chain will be (where live QEMU is writing
++    to [D]):
++
++    .. code-block::
++
++        [A] <-- [C] <-- [D]
++
++.. _`QMP invocation for `block-stream``:
++
++QMP invocation for `block-stream`
++---------------------------------
++
++For case (1), to merge contents of all the backing files into the active
++layer, where 'node-D' is the current active image (by default
++`block-stream` will flatten the entire chain); `qmp-shell` (and its
++corresponding JSON output):
++
++.. code-block::
++
++    (QEMU) block-stream device=node-D job-id=job0
++    {
++        "execute": "block-stream",
++        "arguments": {
++            "device": "node-D",
++            "job-id": "job0"
++        }
++    }
++
++For case (2), merge contents of the images [B] and [C] into [D], where
++image [D] ends up referring to image [A] as its backing file:
++
++.. code-block::
++
++    (QEMU) block-stream device=node-D base=a.qcow2 job-id=job0
++
++And for case (3), of "intermediate" streaming", merge contents of images
++[B] into [C], where [C] ends up referring to [A] as its backing image:
++
++.. code-block::
++
++    (QEMU) block-stream device=node-C base=a.qcow2 job-id=job0
++
++Progress of a `block-stream` operation can be monitored via the QMP
++command:
++
++.. code-block::
++
++    (QEMU) query-block-jobs
++    {
++        "execute": "query-block-jobs",
++        "arguments": {}
++    }
++
++
++Once the `block-stream` operation has completed, QEMU will emit an
++event, `BLOCK_JOB_COMPLETED`.  The intermediate overlays remain valid,
++and can now be (optionally) discarded, or retained to create further
++overlays based on them.  Finally, the `block-stream` jobs can be
++restarted at anytime.
++
++.. _`Live block commit -- `block-commit``:
++
++Live block commit (`block-commit`)
++----------------------------------
++
++The `block-commit` command lets you to live merge data from overlay
++images into backing file(s).  Since QEMU 2.0, this includes "live active
++commit" (i.e. it is possible to merge the "active layer", the right-most
++image in a disk image chain where live QEMU will be writing to, into the
++base image).  This is analogous to `block-stream`, but in opposite
++direction.
++
++Continuing with our example disk image chain, where live QEMU is writing
++to the right-most image in the chain, [D]:
++
++.. code-block::
++
++    [A] <-- [B] <-- [C] <-- [D]
++
++The disk image chain can be shortened in one of the following ways:
++
++(1) Commit content from only image [B] into image [A].  The resulting
++    chain is the following, where the backing file for [D] is adjusted
++    to point at [C]:
++
++    .. code-block::
++
++        [A] <-- [C] <-- [D]
++
++(2) Commit content from images [B] and [C] into image [A].  The
++    resulting chain:
++
++    .. code-block::
++
++        [A] <-- [D]
++
++(3) Commit content from images [B], [C], and the active layer [D] into
++    image [A].  The resulting chain (in this case, a consolidated single
++    image):
++
++    .. code-block::
++
++        [A]
++
++(4) Commit content from image only image [C] into image [B].  The
++    resulting chain:
++
++    .. code-block::
++
++	[A] <-- [B] <-- [D]
++
++(5) Commit content from image [C] and the active layer [D] into image
++    [B].  The resulting chain:
++
++    .. code-block::
++
++	[A] <-- [B]
++
++.. _`QMP invocation for `block-commit``:
++
++QMP invocation for `block-commit`
++---------------------------------
++
++For case (1), from the previous section -- merge contents only from
++image [B] into image [A], the invocation is as following:
++
++.. code-block::
++
++    (QEMU) block-commit device=node-D base=a.qcow2 top=b.qcow2 job-id=job0
++    {
++        "execute": "block-commit",
++        "arguments": {
++            "device": "node-D",
++            "job-id": "job0",
++            "top": "b.qcow2",
++            "base": "a.qcow2"
++        }
++    }
++
++Once the above `block-commit` operation has completed, a
++`BLOCK_JOB_COMPLETED` event will be issued, and no further action is
++required.  The end result being, the backing file of image [D] is
++adjusted to point to image [B], and the original disk image chain will
++end up being transformed to:
++
++.. code-block::
++
++    [A] <-- [B] <-- [D]
++
++NB: The intermdiate image [C] is invalid (as in: no more further
++overlays based on it can be created) and, therefore, should be dropped.
++
++
++However, case (3), the "active `block-commit`", is a *two-phase*
++operation: in the first phase, the content from the active overlay,
++along with the intermediate overlays, is copied into the backing file
++(also called, the base image); in the second phase, adjust the said
++backing file as the current active image -- possible via issuing the
++command `block-job-complete`.  [Optionally, the operation can be
++cancelled, by issuing the command `block-job-cancel`, but be careful
++when doing this.]
++
++Once the 'commit' operation (started by `block-commit`) has completed,
++the event `BLOCK_JOB_READY` is emitted, signalling the synchronization
++has finished, and the job can be gracefully completed, by issuing
++`block-job-complete`.  (Until such a command is issued, the 'commit'
++operation remains active.)
++
++So, the following is the flow for case (3), "active `block-commit`" --
++-- to convert a disk image chain such as this:
++
++.. code-block::
++
++    [A] <-- [B] <-- [C] <-- [D]
++
++Into (where content from all the subsequent overlays, [B], and [C],
++including the active layer, [D], is committed back to [A] -- which is
++where live QEMU is performing all its current writes):
++
++.. code-block::
++
++    [A]
++
++Start the "active `block-commit`" operation:
++
++.. code-block::
++
++    (QEMU) block-commit device=node-D base=a.qcow2 top=d.qcow2 job-id=job0
++    {
++        "execute": "block-commit",
++        "arguments": {
++            "device": "node-D",
++            "job-id": "job0",
++            "top": "d.qcow2",
++            "base": "a.qcow2"
++        }
++    }
++
++
++Once the synchronization has completed, the event `BLOCK_JOB_READY` will
++be emitted
++
++Then, (optionally) query for the status of the active block operations
++(we can see the 'commit' job is now ready to be completed, as indicated
++by the line *"ready": true*):
++
++.. code-block::
++
++    (QEMU) query-block-jobs
++    {
++        "execute": "query-block-jobs",
++        "arguments": {}
++    }
++    {
++        "return": [
++            {
++                "busy": false,
++                "type": "commit",
++                "len": 1376256,
++                "paused": false,
++                "ready": true,
++                "io-status": "ok",
++                "offset": 1376256,
++                "device": "job0",
++                "speed": 0
++            }
++        ]
++    }
++
++Gracefully, complete the 'commit' block device job:
++
++.. code-block::
++
++    (QEMU) block-job-complete device=job0
++    {
++        "execute": "block-job-complete",
++        "arguments": {
++            "device": "job0"
++        }
++    }
++    {
++        "return": {}
++    }
++
++Finally, once the above job is completed, an event `BLOCK_JOB_COMPLETED`
++will be emitted.
++
++[The invocation for rest of all the cases, discussed in the previous
++setion, is omitted for brevity.]
++
++
++.. _`Live disk synchronization -- `drive-mirror`&`blockdev-mirror``:
++
++Live disk synchronization (`drive-mirror` & `blockdev-mirror`)
++--------------------------------------------------------------
++
++Synchronize a running disk image chain (all or part of it) to a target
++image.
++
++Again, given our familiar disk image chain:
++
++.. code-block::
++
++    [A] <-- [B] <-- [C] <-- [D]
++
++The `drive-mirror` (and its newer equivalent `blockdev-mirror`) allows
++you to copy data from the entire chain into a single target image (which
++can be located on a different host).
++
++Once a 'mirror' job has started, there are two possible actions when a
++`drive-mirror` job is active:
++
++(1) Issuing the command `block-job-cancel`: will -- after completing
++    synchronization of the content from the disk image chain to the
++    target image, [E] -- create a point-in-time (which is at the time of
++    *triggering* the cancel command) copy, contained in image [E], of
++    the backing file.
++
++(2) Issuing the command `block-job-complete`: will, after completing
++    synchronization of the content, adjust the guest device (i.e. live
++    QEMU) to point to the target image, and, causing all the new writes
++    from this point on to happen there.  One use case for this is live
++    storage migration.
++
++
++.. _`QMP invocation for `drive-mirror``:
++
++QMP invocation for `drive-mirror`
++~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
++
++To copy the contents of the entire disk image chain, from [A] all the
++way to [D], to a new target, call it [E]:
++
++.. code-block::
++
++    (QEMU) drive-mirror device=node-D target=e.qcow2 sync=full job-id=job0
++    {
++        "execute": "drive-mirror",
++        "arguments": {
++            "device": "node-D",
++            "job-id": "job0",
++            "target": "e.qcow2",
++            "sync": "full"
++        }
++    }
++
++The `"sync": "full"`, from the above, means: copy the *entire* chain to
++the destination.
++
++Following the above, querying for active block jobs will show that a
++'mirror' job is "ready" to be completed:
++
++.. code-block::
++
++    (QEMU) query-block-jobs
++    {
++        "execute": "query-block-jobs",
++        "arguments": {}
++    }
++    {
++        "return": [
++            {
++                "busy": false,
++                "type": "mirror",
++                "len": 21757952,
++                "paused": false,
++                "ready": true,
++                "io-status": "ok",
++                "offset": 21757952,
++                "device": "job0",
++                "speed": 0
++            }
++        ]
++    }
++
++And, as mentioned in the previous section, the two possible options can
++be taken:
++
++(a) Create a point-in-time snapshot by ending the synchronization.  The
++    point-in-time is at the time of *ending* the sync.  (The result of
++    the following being: the target image, [E], will be populated with
++    content from the entire chain, [A] to [D].)
++
++.. code-block::
++
++    (QEMU) block-job-cancel device=job0
++    {
++        "execute": "block-job-cancel",
++        "arguments": {
++            "device": "job0"
++        }
++    }
++
++(b) Or, complete the operation and pivot the live QEMU to the target
++    copy:
++
++.. code-block::
++
++    (QEMU) block-job-complete device=job0
++
++
++In either of the above cases, if you once again run the
++`query-block-jobs` command, there should not be any active block
++operation.
++
++Comparing 'commit' and 'mirror': In both then cases, the overlay images
++can be discarded.  However, with 'commit', the *existing* base image
++will be modified (by updating it with contents from overlays); while in
++the case of 'mirror', a *new* target image is populated with the data
++from the disk image chain.
++
++
++.. _`Notes on `blockdev-mirror``:
++
++Notes on `blockdev-mirror`
++--------------------------
++
++The `blockdev-mirror` command is equivalent in core functionality to
++`drive-mirror`, except that it operates at node-level in a BDS graph.
++
++Also: for `blockdev-mirror`, the 'target' image needs to be explicitly
++created (using `qemu-img`) and attach it to live QEMU via
++`blockdev-add`, which assigns a name to the to-be created target node.
++
++E.g. the sequence of actions to create a point-in-time backup of an
++entire disk image chain, to a target, using `blockdev-mirror` would be:
++
++(0) Create the QCOW2 overlays, to arrive at a backing chain of desired
++    depth
++
++(1) Create the target image (using `qemu-img`), say, backup.qcow2
++
++(2) Attach the above created backup.qcow2 file, run-time, using
++    `blockdev-add` to QEMU
++
++(3) Perform `blockdev-mirror` (use `"sync": "full"` to copy the entire
++    chain to the target).  And observe for the event `BLOCK_JOB_READY`
++
++(4) Optionally, query for active block jobs, there should be a 'mirror'
++    job ready to be completed
++
++(5) Gracefully complete the 'mirror' block device job, and observe for
++    the event `BLOCK_JOB_COMPLETED`
++
++(6) Shutdown the guest, by issuing the QMP `quit` command, so that
++    caches are flushed
++
++(7) Then, finally, compare the contents of the disk image chain, and
++    the target copy with `qemu-img compare`.  You should notice:
++    "Images are identical"
++
++
++.. _`Live disk backup -- `drive-backup`&`blockdev-backup``:
++
++Live disk backup (`drive-backup` & `blockdev-backup`)
++-----------------------------------------------------
++
++The `drive-backup` (and its newer equivalent `blockdev-backup`) allows
++you to create a point-in-time snapshot.
++
++In this case, the point-in-time is when you *start* the `drive-backup`
++(or its newer equivalent `blockdev-backup`) command.
++
++
++.. _`QMP invocation for `drive-backup``:
++
++QMP invocation for `drive-backup`
++---------------------------------
++
++Continuing with our example disk image chain:
++
++.. code-block::
++
++    [A] <-- [B] <-- [C] <-- [D]
++
++To create a target image [E], with content populated from image [A] to
++[D], from the above chain, the following is the syntax.  (If the target
++image does not exist, `drive-backup` will create it.)
++
++.. code-block::
++
++    (QEMU) drive-backup device=node-D sync=full target=e.qcow2 job-id=job0
++    {
++        "execute": "drive-backup",
++        "arguments": {
++            "device": "node-D",
++            "job-id": "job0",
++            "sync": "full",
++            "target": "copy-drive-backup.qcow2"
++        }
++    }
++
++Once the above `drive-backup` has completed, a `BLOCK_JOB_COMPLETED` event
++will be issued, indicating the live block device job operation has
++completed, and no further action is required.
++
++
++.. _`Notes on `blockdev-backup``:
++
++Notes on `blockdev-backup`
++--------------------------
++
++The `blockdev-backup` command is equivalent in functionality to
++`drive-backup`, except that it operates at node-level in a Block Driver
++State (BDS) graph.
++
++E.g. the sequence of actions to create a point-in-time backup
++of an entire disk image chain, to a target, using `blockdev-backup`
++would be:
++
++(0) Create the QCOW2 overlays, to arrive at a backing chain of desired
++    depth
++
++(1) Create the target image (using `qemu-img`), say, backup.qcow2
++
++(2) Attach the above created backup.qcow2 file, run-time, using
++    `blockdev-add` to QEMU
++
++(3) Perform `blockdev-backup` (use `"sync": "full"` to copy the entire
++    chain to the target).  And observe for the event
++    `BLOCK_JOB_COMPLETED`
++
++(4) Shutdown the guest, by issuing the QMP `quit` command, so that
++    caches are flushed
++
++(5) Then, finally, compare the contents of the disk image chain, and
++    the target copy with `qemu-img compare`.  You should notice:
++    "Images are identical"
+diff --git a/docs/live-block-ops.txt b/docs/live-block-ops.txt
+deleted file mode 100644
+index 2211d14428a846f215f4396950a5743a2e3bfe94..0000000000000000000000000000000000000000
+--- a/docs/live-block-ops.txt
++++ /dev/null
+@@ -1,72 +0,0 @@
+-LIVE BLOCK OPERATIONS
+-=====================
+-
+-High level description of live block operations. Note these are not
+-supported for use with the raw format at the moment.
+-
+-Note also that this document is incomplete and it currently only
+-covers the 'stream' operation. Other operations supported by QEMU such
+-as 'commit', 'mirror' and 'backup' are not described here yet. Please
+-refer to the qapi/block-core.json file for an overview of those.
+-
+-Snapshot live merge
+-===================
+-
+-Given a snapshot chain, described in this document in the following
+-format:
+-
+-[A] <- [B] <- [C] <- [D] <- [E]
+-
+-Where the rightmost object ([E] in the example) described is the current
+-image which the guest OS has write access to. To the left of it is its base
+-image, and so on accordingly until the leftmost image, which has no
+-base.
+-
+-The snapshot live merge operation transforms such a chain into a
+-smaller one with fewer elements, such as this transformation relative
+-to the first example:
+-
+-[A] <- [E]
+-
+-Data is copied in the right direction with destination being the
+-rightmost image, but any other intermediate image can be specified
+-instead. In this example data is copied from [C] into [D], so [D] can
+-be backed by [B]:
+-
+-[A] <- [B] <- [D] <- [E]
+-
+-The operation is implemented in QEMU through image streaming facilities.
+-
+-The basic idea is to execute 'block_stream virtio0' while the guest is
+-running. Progress can be monitored using 'info block-jobs'. When the
+-streaming operation completes it raises a QMP event. 'block_stream'
+-copies data from the backing file(s) into the active image. When finished,
+-it adjusts the backing file pointer.
+-
+-The 'base' parameter specifies an image which data need not be
+-streamed from. This image will be used as the backing file for the
+-destination image when the operation is finished.
+-
+-In the first example above, the command would be:
+-
+-(qemu) block_stream virtio0 file-A.img
+-
+-In order to specify a destination image different from the active
+-(rightmost) one we can use its node name instead.
+-
+-In the second example above, the command would be:
+-
+-(qemu) block_stream node-D file-B.img
+-
+-Live block copy
+-===============
+-
+-To copy an in use image to another destination in the filesystem, one
+-should create a live snapshot in the desired destination, then stream
+-into that image. Example:
+-
+-(qemu) snapshot_blkdev ide0-hd0 /new-path/disk.img qcow2
+-
+-(qemu) block_stream ide0-hd0
+-
+-
+-- 
+2.7.4
