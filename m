@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58404)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58498)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <deller@gmx.de>) id 1dFmlW-0002Z1-4F
-	for qemu-devel@nongnu.org; Tue, 30 May 2017 15:25:15 -0400
+	(envelope-from <rob@landley.net>) id 1dFmm2-0002uf-2P
+	for qemu-devel@nongnu.org; Tue, 30 May 2017 15:25:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <deller@gmx.de>) id 1dFmlS-0002Ih-6H
-	for qemu-devel@nongnu.org; Tue, 30 May 2017 15:25:14 -0400
-Received: from mout.gmx.net ([212.227.15.15]:51302)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <deller@gmx.de>) id 1dFmlR-0002Fs-SQ
-	for qemu-devel@nongnu.org; Tue, 30 May 2017 15:25:10 -0400
-References: <20170311175019.GA7195@ls3530.fritz.box>
-	<b4ca5292-bee3-1e3b-13ba-7dd6c1f00f8a@twiddle.net>
-	<20170519135905.GA19553@kos.to>
-From: Helge Deller <deller@gmx.de>
-Message-ID: <b9c75e27-1694-5aae-7eb7-30074e6c8b4b@gmx.de>
-Date: Tue, 30 May 2017 21:24:52 +0200
+	(envelope-from <rob@landley.net>) id 1dFmly-0002N3-4B
+	for qemu-devel@nongnu.org; Tue, 30 May 2017 15:25:46 -0400
+Received: from mail-oi0-x22f.google.com ([2607:f8b0:4003:c06::22f]:34034)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <rob@landley.net>) id 1dFmlx-0002My-UF
+	for qemu-devel@nongnu.org; Tue, 30 May 2017 15:25:42 -0400
+Received: by mail-oi0-x22f.google.com with SMTP id b204so124196078oii.1
+	for <qemu-devel@nongnu.org>; Tue, 30 May 2017 12:25:41 -0700 (PDT)
+References: <619adaac-955d-c6f6-f137-ff627b7cbfb0@landley.net>
+	<CAFEAcA9-Jjnn2mCE56YxiQ4S6+kAb_EpisXtkv9G=Gf-nje+5Q@mail.gmail.com>
+From: Rob Landley <rob@landley.net>
+Message-ID: <189f5322-2aab-7f2c-3f5a-029f811edc0c@landley.net>
+Date: Tue, 30 May 2017 14:25:39 -0500
 MIME-Version: 1.0
-In-Reply-To: <20170519135905.GA19553@kos.to>
-Content-Type: text/plain; charset=windows-1252
+In-Reply-To: <CAFEAcA9-Jjnn2mCE56YxiQ4S6+kAb_EpisXtkv9G=Gf-nje+5Q@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] linux-user: Fix TARGET_MAP* and
- TARGET_F_??LCK for hppa arch
+Subject: Re: [Qemu-devel] How do you -sd squashfs.img without truncating?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,28 +29,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Riku Voipio <riku.voipio@iki.fi>, Richard Henderson <rth@twiddle.net>
-Cc: qemu-devel@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-On 19.05.2017 15:59, Riku Voipio wrote:
-> On Sun, Mar 12, 2017 at 08:17:46AM +1000, Richard Henderson wrote:
->> On 03/12/2017 03:50 AM, Helge Deller wrote:
->>> TARGET_MAP_TYPE needs to be 0x03 instead of 0x0f on the hppa
->>> architecture, otherwise it conflicts with MAP_FIXED which is 0x04.
->>>
->>> Add missing TARGET_MAP_STACK and TARGET_MAP_HUGETLB values.
->>>
->>> Fix TARGET_F_RDLCK, TARGET_F_WRLCK and TARGET_F_UNLCK.
->>>
->>> Signed-off-by: Helge Deller <deller@gmx.de>
+On 05/30/2017 07:17 AM, Peter Maydell wrote:
+> On 8 May 2017 at 06:08, Rob Landley <rob@landley.net> wrote:
+>> As far as I can tell "qemu-system-arm -M vexpress-a9" only implements sd
+>> card, not any conventional hard drive, and it uses an sdcard block size
+>> of 262144 bytes rounded down. This means when I create a squashfs image
+>> and feed it in through the sd card, it truncates it.
 >>
->> I applied the MAP_FIXED and TARGET_F_* parts separately in my tree.  I'd
->> like to see what others think about the other MAP_* defines before including
->> that.
+>> Wouldn't -sd rounding _up_ be more useful?
 > 
-> What's the current state of these patches? Are these patches still waiting for
-> opinions?
+> This vaguely rings a bell but I forget exactly. I think the
+> intention is that you're supposed to pass it a file of
+> exactly the right length, not one that's too short. If we
+> rounded up, then it would create the awkward question of
+> "what happens when the guest writes into the bit of the
+> sd card image that doesn't actually exist in the image file".
+> 
+> I'm not strongly attached to the current behaviour (especially
+> if the behaviour for sd card images doesn't match that for
+> hd images and other kinds of disk), but I think that may have
+> been the "this is more complicated than it appears on the surface"
+> reason that nobody's got round to trying to change the behaviour.
+> It's been years though, so I might just be completely misremembering.
 
-It would be nice to get them included (if it hasn't happened yet).
+I worked around it by switching to the -M virt machine. (The project is
+https://github.com/landley/mkroot if you're curious.)
 
-Helge
+Thanks,
+
+Rob
