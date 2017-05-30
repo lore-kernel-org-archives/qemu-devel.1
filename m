@@ -1,30 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41154)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41529)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1dFbsJ-0002V6-H7
-	for qemu-devel@nongnu.org; Tue, 30 May 2017 03:47:35 -0400
+	(envelope-from <th.huth@gmail.com>) id 1dFbv0-0003Fq-MF
+	for qemu-devel@nongnu.org; Tue, 30 May 2017 03:50:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1dFbsI-0006oU-Ch
-	for qemu-devel@nongnu.org; Tue, 30 May 2017 03:47:31 -0400
-Received: from mailhub.sw.ru ([195.214.232.25]:45003 helo=relay.sw.ru)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
-	id 1dFbsI-0006nr-0k
-	for qemu-devel@nongnu.org; Tue, 30 May 2017 03:47:30 -0400
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-References: <20170503122539.282182-1-vsementsov@virtuozzo.com>
-	<20170503122539.282182-10-vsementsov@virtuozzo.com>
-	<33ce370d-939f-d02e-0177-1184ae9f4fa7@redhat.com>
-	<47488066-bd0f-834d-85d8-63d7289cb0fd@virtuozzo.com>
-	<5b314adf-2dcb-2390-b68e-5047b68ac8de@virtuozzo.com>
-Message-ID: <623bae4a-2936-84e0-0c6f-b46138c51273@virtuozzo.com>
-Date: Tue, 30 May 2017 10:47:12 +0300
+	(envelope-from <th.huth@gmail.com>) id 1dFbuw-0007t5-Pu
+	for qemu-devel@nongnu.org; Tue, 30 May 2017 03:50:18 -0400
+Received: from mail-wm0-f68.google.com ([74.125.82.68]:33266)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <th.huth@gmail.com>) id 1dFbuw-0007sp-Ir
+	for qemu-devel@nongnu.org; Tue, 30 May 2017 03:50:14 -0400
+Received: by mail-wm0-f68.google.com with SMTP id b84so23115401wmh.0
+	for <qemu-devel@nongnu.org>; Tue, 30 May 2017 00:50:12 -0700 (PDT)
+References: <CAKD7DEGotyMPcyptOkfJjJ9fPKqySWLdt20SZDZ16ZHzzovNYw@mail.gmail.com>
+From: Thomas Huth <huth@tuxfamily.org>
+Message-ID: <2d023d00-d42c-ae88-e8d6-1852b1e89ded@tuxfamily.org>
+Date: Tue, 30 May 2017 09:50:09 +0200
 MIME-Version: 1.0
-In-Reply-To: <5b314adf-2dcb-2390-b68e-5047b68ac8de@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <CAKD7DEGotyMPcyptOkfJjJ9fPKqySWLdt20SZDZ16ZHzzovNYw@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH 09/25] block/dirty-bitmap: add readonly
- field to BdrvDirtyBitmap
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] sharing directories with Windows guest - virtio
+ pci p9 on Windows
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,89 +30,15 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, armbru@redhat.com, eblake@redhat.com, jsnow@redhat.com, famz@redhat.com, den@openvz.org, stefanha@redhat.com, pbonzini@redhat.com
+To: Behrooz Shabani <everplays@gmail.com>, qemu-devel@nongnu.org
 
-30.05.2017 10:31, Vladimir Sementsov-Ogievskiy wrote:
-> 30.05.2017 09:50, Vladimir Sementsov-Ogievskiy wrote:
->> Thank you for this scenario. Hmm.
->>
->> So, as I need guarantee that image and bitmap are unchanged, 
->> bdrv_set_dirty should return error and fail the whole write. Ok?
->
-> No, bad idea. As bdrv_set_dirty is called after write completed.
+On 30.05.2017 08:22, Behrooz Shabani wrote:
+[...]
+> Any information on how to have a shared storage between different running
+> VMs that would not require `-net user` is very much appreciated as well.
 
-will just check for readonly bitmaps in all callers of set/reset/clear. 
-They are few.
+If you need the storage just for transferring files, you could also try
+the "-device usb-mtp" ... that emulates a Media Transfer Protocol device
+(similar to a camera / mobile phone).
 
->
->>
->> 29.05.2017 21:35, Max Reitz wrote:
->>> On 2017-05-03 14:25, Vladimir Sementsov-Ogievskiy wrote:
->>>> It will be needed in following commits for persistent bitmaps.
->>>> If bitmap is loaded from read-only storage (and we can't mark it
->>>> "in use" in this storage) corresponding BdrvDirtyBitmap should be
->>>> read-only.
->>>>
->>>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
->>>> ---
->>>>   block/dirty-bitmap.c         | 16 ++++++++++++++++
->>>>   include/block/dirty-bitmap.h |  3 +++
->>>>   2 files changed, 19 insertions(+)
->>> Revisiting this again after the whole series: So you never really make
->>> sure that the read-only bitmaps are not written to (except for these
->>> assertions). The idea is that you only set it for read-only BDS and
->>> read-only BDS are never written to. But that assumption is not true,
->>> generally, and can be broken e.g. using a commit job:
->>>
->>> $ ./qemu-img create -f qcow2 backing.qcow2 64M
->>> Formatting 'backing.qcow2', fmt=qcow2 size=67108864 encryption=off
->>>      cluster_size=65536 lazy_refcounts=off refcount_bits=16
->>> $ ./qemu-img create -f qcow2 -b backing.qcow2 top.qcow2
->>> Formatting 'top.qcow2', fmt=qcow2 size=67108864
->>>      backing_file=backing.qcow2 encryption=off cluster_size=65536
->>>      lazy_refcounts=off refcount_bits=16
->>> $ x86_64-softmmu/qemu-system-x86_64 -qmp stdio
->>> {"QMP": {"version": {"qemu": {"micro": 50, "minor": 9, "major": 2},
->>> "package": " (v2.9.0-632-g4a52d43-dirty)"}, "capabilities": []}}
->>> {'execute': 'qmp_capabilities'}
->>> {"return": {}}
->>> {'execute': 'blockdev-add',
->>>   'arguments': {'node-name': 'backing-node', 'driver': 'qcow2',
->>>                 'file': {'driver': 'file', 'filename': 
->>> 'backing.qcow2'}}}
->>> {"return": {}}
->>> {'execute': 'block-dirty-bitmap-add',
->>>   'arguments': {'node': 'backing-node', 'name': 'foo',
->>>                 'persistent': true, 'autoload': true}}
->>> {"return": {}}
->>> {'execute': 'blockdev-del', 'arguments': {'node-name': 'backing-node'}}
->>> {"return": {}}
->>> {'execute': 'blockdev-add',
->>>   'arguments': {'node-name': 'top-node', 'driver': 'qcow2',
->>>                 'file': {'driver': 'file', 'filename': 'top.qcow2'}}}
->>> {"return": {}}
->>> {'execute': 'human-monitor-command',
->>>   'arguments': {'command-line': 'qemu-io top-node "write 0 64k"'}}
->>> wrote 65536/65536 bytes at offset 0
->>> 64 KiB, 1 ops; 0.0079 sec (7.852 MiB/sec and 125.6281 ops/sec)
->>> {"return": ""}
->>> {'execute': 'block-commit',
->>>   'arguments': {'device': 'top-node', 'job-id': 'commit-job'}}
->>> {"return": {}}
->>> qemu-system-x86_64: block/dirty-bitmap.c:571: bdrv_set_dirty: Assertion
->>> `!bdrv_dirty_bitmap_readonly(bitmap)' failed.
->>> [1]    10872 abort (core dumped) x86_64-softmmu/qemu-system-x86_64 -qmp
->>> stdio
->>>
->>> So there needs to be something else than just assertions to make sure
->>> that read-only bitmaps are never written to.
->>>
->>> Max
->>>
->>
->
-
--- 
-Best regards,
-Vladimir
+ Thomas
