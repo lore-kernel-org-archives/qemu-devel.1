@@ -1,22 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33889)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34095)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1dFeiE-0004o0-0u
-	for qemu-devel@nongnu.org; Tue, 30 May 2017 06:49:19 -0400
+	(envelope-from <famz@redhat.com>) id 1dFejE-0005jj-3R
+	for qemu-devel@nongnu.org; Tue, 30 May 2017 06:50:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1dFeiC-0005IV-V3
-	for qemu-devel@nongnu.org; Tue, 30 May 2017 06:49:18 -0400
-Received: from mailhub.sw.ru ([195.214.232.25]:11975 helo=relay.sw.ru)
+	(envelope-from <famz@redhat.com>) id 1dFejA-0005fv-77
+	for qemu-devel@nongnu.org; Tue, 30 May 2017 06:50:20 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:48472)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
-	id 1dFeiC-0005I7-KJ
-	for qemu-devel@nongnu.org; Tue, 30 May 2017 06:49:16 -0400
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Tue, 30 May 2017 13:48:54 +0300
-Message-Id: <20170530104857.70083-2-vsementsov@virtuozzo.com>
-In-Reply-To: <20170530104857.70083-1-vsementsov@virtuozzo.com>
-References: <20170530104857.70083-1-vsementsov@virtuozzo.com>
-Subject: [Qemu-devel] [PATCH 1/4] block: add bdrv_get_format_alloc_stat
- format interface
+	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1dFej9-0005ff-VF
+	for qemu-devel@nongnu.org; Tue, 30 May 2017 06:50:16 -0400
+Date: Tue, 30 May 2017 18:50:11 +0800
+From: Fam Zheng <famz@redhat.com>
+Message-ID: <20170530105011.GB27787@lemon.lan>
+References: <1496048740-26578-1-git-send-email-groug@kaod.org>
+	<20170530094212.GL11362@stefanha-x1.localdomain>
+	<20170530122112.2dc44db9@bahia.ttt.fr.ibm.com>
+	<20170530102622.GG21566@redhat.com>
+	<20170530123329.4342ba5d@bahia.ttt.fr.ibm.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20170530123329.4342ba5d@bahia.ttt.fr.ibm.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PULL 00/11] 9pfs patches for 2.10 20170525
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,111 +31,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: eblake@redhat.com, armbru@redhat.com, mreitz@redhat.com, kwolf@redhat.com, vsementsov@virtuozzo.com, den@openvz.org
+To: Greg Kurz <groug@kaod.org>
+Cc: "Daniel P. Berrange" <berrange@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>, qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
 
-The function should collect statistics, about allocted/unallocated by
-top-level format driver space (in its .file) and allocation status
-(allocated/hole/after eof) of corresponding areas in this .file.
+On Tue, 05/30 12:33, Greg Kurz wrote:
+> On Tue, 30 May 2017 11:26:22 +0100
+> "Daniel P. Berrange" <berrange@redhat.com> wrote:
+>=20
+> > On Tue, May 30, 2017 at 12:21:12PM +0200, Greg Kurz wrote:
+> > > On Tue, 30 May 2017 10:42:12 +0100
+> > > Stefan Hajnoczi <stefanha@gmail.com> wrote:
+> > >  =20
+> > > > On Mon, May 29, 2017 at 11:05:29AM +0200, Greg Kurz wrote: =20
+> > > > > The following changes since commit 9964e96dc9999cf7f7c936ee854a=
+795415d19b60:
+> > > > >=20
+> > > > >   Merge remote-tracking branch 'jasowang/tags/net-pull-request'=
+ into staging (2017-05-23 15:01:31 +0100)
+> > > > >=20
+> > > > > are available in the git repository at:
+> > > > >=20
+> > > > >   https://github.com/gkurz/qemu.git tags/for-upstream
+> > > > >=20
+> > > > > for you to fetch changes up to f0a4da86cff2e600255324793daddd7c=
+e59b9862:
+> > > > >=20
+> > > > >   9pfs: local: metadata file for the VirtFS root (2017-05-25 10=
+:30:14 +0200)
+> > > > >=20
+> > > > > ---------------------------------------------------------------=
+-
+> > > > > Various bugfixes and code cleanups. Most notably, it fixes meta=
+data handling in
+> > > > > mapped-file security mode (especially for the virtfs root).   =20
+> > > >=20
+> > > > Please fix the compiler warning reported by patchew.
+> > > >  =20
+> > >=20
+> > > In file included from /var/tmp/patchew-tester-tmp-3cnydauu/src/hw/9=
+pfs/9p-local.c:18:0:
+> > > /var/tmp/patchew-tester-tmp-3cnydauu/src/hw/9pfs/9p-local.c: In fun=
+ction =E2=80=98local_set_mapped_file_attrat=E2=80=99:
+> > > /var/tmp/patchew-tester-tmp-3cnydauu/src/hw/9pfs/9p-util.h:19:5: er=
+ror: =E2=80=98map_dirfd=E2=80=99 may be used uninitialized in this functi=
+on [-Werror=3Dmaybe-uninitialized]
+> > >      close(fd);
+> > >      ^~~~~~~~~
+> > > /var/tmp/patchew-tester-tmp-3cnydauu/src/hw/9pfs/9p-local.c:235:9: =
+note: =E2=80=98map_dirfd=E2=80=99 was declared here
+> > >      int map_dirfd, map_fd;
+> > >          ^~~~~~~~~
+> > > cc1: all warnings being treated as errors
+> > >=20
+> > > This is a false positive: map_dirfd is necessarily initialized, but=
+ I guess
+> > > gcc isn't smart enough to see that :-\
+> > >=20
+> > > It is acceptable to close(-1) so I guess I'll just do:
+> > >=20
+> > > -    int map_dirfd, map_fd;
+> > > +    int map_dirfd =3D -1, map_fd; =20
+> >=20
+> > By 'acceptable' I guess you mean it'll return EBADF. I would not
+> > be surprised, however, if coverity were to then complain if it sees
+> > code path where we pass -1 to close, since it is indicative of a
+> > potential bug. So in addition to your initialization, also protecting
+> > the close() call with '!=3D -1' condition is a safer approach.
+> >=20
+>=20
+> Thanks for the tip, I'll do that as well.
+>=20
+> BTW is there a way to run patchew without posting to the list ?
 
-Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
----
- block.c                   | 16 ++++++++++++++++
- include/block/block.h     |  3 +++
- include/block/block_int.h |  2 ++
- qapi/block-core.json      | 26 ++++++++++++++++++++++++++
- 4 files changed, 47 insertions(+)
+Not for the s390 test because there isn't unlimited machine resources,
+unfortunately. :)
 
-diff --git a/block.c b/block.c
-index 50ba264143..7d720ae0c2 100644
---- a/block.c
-+++ b/block.c
-@@ -3407,6 +3407,22 @@ int64_t bdrv_get_allocated_file_size(BlockDriverState *bs)
- }
- 
- /**
-+ * Collect format allocation info. See BlockFormatAllocInfo definition in
-+ * qapi/block-core.json.
-+ */
-+int bdrv_get_format_alloc_stat(BlockDriverState *bs, BlockFormatAllocInfo *bfai)
-+{
-+    BlockDriver *drv = bs->drv;
-+    if (!drv) {
-+        return -ENOMEDIUM;
-+    }
-+    if (drv->bdrv_get_format_alloc_stat) {
-+        return drv->bdrv_get_format_alloc_stat(bs, bfai);
-+    }
-+    return -ENOTSUP;
-+}
-+
-+/**
-  * Return number of sectors on success, -errno on error.
-  */
- int64_t bdrv_nb_sectors(BlockDriverState *bs)
-diff --git a/include/block/block.h b/include/block/block.h
-index 9b355e92d8..646376a772 100644
---- a/include/block/block.h
-+++ b/include/block/block.h
-@@ -335,6 +335,9 @@ typedef enum {
- 
- int bdrv_check(BlockDriverState *bs, BdrvCheckResult *res, BdrvCheckMode fix);
- 
-+int bdrv_get_format_alloc_stat(BlockDriverState *bs,
-+                               BlockFormatAllocInfo *bfai);
-+
- /* The units of offset and total_work_size may be chosen arbitrarily by the
-  * block driver; total_work_size may change during the course of the amendment
-  * operation */
-diff --git a/include/block/block_int.h b/include/block/block_int.h
-index 8d3724cce6..458c715e99 100644
---- a/include/block/block_int.h
-+++ b/include/block/block_int.h
-@@ -208,6 +208,8 @@ struct BlockDriver {
-     int64_t (*bdrv_getlength)(BlockDriverState *bs);
-     bool has_variable_length;
-     int64_t (*bdrv_get_allocated_file_size)(BlockDriverState *bs);
-+    int (*bdrv_get_format_alloc_stat)(BlockDriverState *bs,
-+                                      BlockFormatAllocInfo *bfai);
- 
-     int coroutine_fn (*bdrv_co_pwritev_compressed)(BlockDriverState *bs,
-         uint64_t offset, uint64_t bytes, QEMUIOVector *qiov);
-diff --git a/qapi/block-core.json b/qapi/block-core.json
-index ea0b3e8b13..365070b3eb 100644
---- a/qapi/block-core.json
-+++ b/qapi/block-core.json
-@@ -139,6 +139,32 @@
-            '*format-specific': 'ImageInfoSpecific' } }
- 
- ##
-+# @BlockFormatAllocInfo:
-+#
-+# Information about allocations, including metadata. All fields are in bytes.
-+#
-+# @alloc_alloc: allocated by format driver and allocated in underlying file
-+#
-+# @alloc_hole: allocated by format driver but actually is a hole in
-+#              underlying file
-+#
-+# @alloc_overhead: allocated by format driver after end of underlying file
-+#
-+# @hole_alloc: not allocated by format driver but allocated in underlying file
-+#
-+# @hole_hole: not allocated by format driver hole in underlying file
-+#
-+# Since: 2.10
-+#
-+##
-+{ 'struct': 'BlockFormatAllocInfo',
-+  'data': {'alloc_alloc':    'uint64',
-+           'alloc_hole':     'uint64',
-+           'alloc_overhead': 'uint64',
-+           'hole_alloc':     'uint64',
-+           'hole_hole':      'uint64' } }
-+
-+##
- # @ImageCheck:
- #
- # Information about a QEMU image file check
--- 
-2.11.1
+Fam
