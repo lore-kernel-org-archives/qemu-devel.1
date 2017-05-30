@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42682)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42858)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1dFj3x-0007Al-7L
-	for qemu-devel@nongnu.org; Tue, 30 May 2017 11:28:02 -0400
+	(envelope-from <eblake@redhat.com>) id 1dFj4P-0007YX-9v
+	for qemu-devel@nongnu.org; Tue, 30 May 2017 11:28:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1dFj3s-0003mN-9e
-	for qemu-devel@nongnu.org; Tue, 30 May 2017 11:28:01 -0400
-Received: from mailhub.sw.ru ([195.214.232.25]:36315 helo=relay.sw.ru)
+	(envelope-from <eblake@redhat.com>) id 1dFj4K-00049J-NG
+	for qemu-devel@nongnu.org; Tue, 30 May 2017 11:28:29 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54886)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
-	id 1dFj3r-0003kK-V4
-	for qemu-devel@nongnu.org; Tue, 30 May 2017 11:27:56 -0400
-References: <20170530104857.70083-1-vsementsov@virtuozzo.com>
-	<20170530104857.70083-2-vsementsov@virtuozzo.com>
-	<21763282-556d-4389-29b5-664f6f4f4479@redhat.com>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <bd1de229-7eda-be84-c297-920d0de7b85f@virtuozzo.com>
-Date: Tue, 30 May 2017 18:27:50 +0300
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dFj4K-00049C-DN
+	for qemu-devel@nongnu.org; Tue, 30 May 2017 11:28:24 -0400
+References: <20170511191843.13784-1-ehabkost@redhat.com>
+	<20170511191843.13784-3-ehabkost@redhat.com>
+	<CAFEAcA-jdbDL1uuhM5W=b4qisPsvpJz7aciR8WQebVy43QuBKQ@mail.gmail.com>
+	<20170530140103.GI32274@thinpad.lan.raisama.net>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <5f082e0c-6b89-188f-19d5-dfe476c140fc@redhat.com>
+Date: Tue, 30 May 2017 10:28:21 -0500
 MIME-Version: 1.0
-In-Reply-To: <21763282-556d-4389-29b5-664f6f4f4479@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH 1/4] block: add bdrv_get_format_alloc_stat
- format interface
+In-Reply-To: <20170530140103.GI32274@thinpad.lan.raisama.net>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="NjmLpmVMAw6GoMLuv1ubXpwU82v6xQOmW"
+Subject: Re: [Qemu-devel] [PULL 02/29] numa: Allow setting NUMA distance for
+ different NUMA nodes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,113 +31,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: armbru@redhat.com, mreitz@redhat.com, kwolf@redhat.com, den@openvz.org
+To: Eduardo Habkost <ehabkost@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
+Cc: Igor Mammedov <imammedo@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, He Chen <he.chen@linux.intel.com>
 
-30.05.2017 17:53, Eric Blake wrote:
-> On 05/30/2017 05:48 AM, Vladimir Sementsov-Ogievskiy wrote:
->> The function should collect statistics, about allocted/unallocated by
->> top-level format driver space (in its .file) and allocation status
->> (allocated/hole/after eof) of corresponding areas in this .file.
->>
->> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
->> ---
->>   block.c                   | 16 ++++++++++++++++
->>   include/block/block.h     |  3 +++
->>   include/block/block_int.h |  2 ++
->>   qapi/block-core.json      | 26 ++++++++++++++++++++++++++
->>   4 files changed, 47 insertions(+)
->>
->> diff --git a/block.c b/block.c
->> index 50ba264143..7d720ae0c2 100644
->> --- a/block.c
->> +++ b/qapi/block-core.json
->> @@ -139,6 +139,32 @@
->>              '*format-specific': 'ImageInfoSpecific' } }
->>   
->>   ##
->> +# @BlockFormatAllocInfo:
->> +#
->> +# Information about allocations, including metadata. All fields are in bytes.
->> +#
->> +# @alloc_alloc: allocated by format driver and allocated in underlying file
->> +#
-> New structs should favor naming with '-' rather than '_'. So this should
-> be 'alloc-alloc', if we like the name.
->
-> So this statistic represents the portions of the format file that are in
-> use by the format, and which are backed by data in the underlying protocol.
->
->> +# @alloc_hole: allocated by format driver but actually is a hole in
->> +#              underlying file
-> The portions of the format file in use by the format, but where the
-> entire cluster is a hole in the underlying file (note that with cluster
-> size large enough, you can get a cluster that is part-data/part-hole in
-> the underlying file, it looks like you are counting those as data).
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--NjmLpmVMAw6GoMLuv1ubXpwU82v6xQOmW
+From: Eric Blake <eblake@redhat.com>
+To: Eduardo Habkost <ehabkost@redhat.com>,
+ Peter Maydell <peter.maydell@linaro.org>
+Cc: Igor Mammedov <imammedo@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>, He Chen <he.chen@linux.intel.com>
+Message-ID: <5f082e0c-6b89-188f-19d5-dfe476c140fc@redhat.com>
+Subject: Re: [Qemu-devel] [PULL 02/29] numa: Allow setting NUMA distance for
+ different NUMA nodes
+References: <20170511191843.13784-1-ehabkost@redhat.com>
+ <20170511191843.13784-3-ehabkost@redhat.com>
+ <CAFEAcA-jdbDL1uuhM5W=b4qisPsvpJz7aciR8WQebVy43QuBKQ@mail.gmail.com>
+ <20170530140103.GI32274@thinpad.lan.raisama.net>
+In-Reply-To: <20170530140103.GI32274@thinpad.lan.raisama.net>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-No, I account on sector boundary on bs->file. So it is not cluster-aligned.
+On 05/30/2017 09:01 AM, Eduardo Habkost wrote:
 
->
->> +#
->> +# @alloc_overhead: allocated by format driver after end of underlying file
-> The portions of the format file in use by the format, but where the
-> entire cluster is beyond the end of the underlying file (the effective
-> hole).  Do we really need to distinguish between hole within the
-> underlying file and hole beyond the end of the file? Or can this number
-> be combined with the previous?
+>> The OSX compiler is pickier about format strings than gcc,
+>> and neither "MAX_NODES" nor "MAX(anything)" are uint16_t type.
+>=20
+> src and dst are both uint16_t, so MAX(src, dst) is also uint16_t,
+> isn't it?  It looks like MAX_NODES is the problem.
 
-alloc_alloc + alloc_hole + hole_alloc + hole_hole = size of bs->file, I 
-think this is good and clear.
+No. MAX() invokes arithmetic (both ?: and > operators), and arithmetic
+involves default promotion (anything shorter than int becomes 'int').
 
-these 4 stats describes bs->file usage in details (not on cluster 
-boundary, but on sector, based on bs->file block status), alloc_overhead 
-is separate.
+> +++ b/numa.c
+> @@ -232,7 +232,7 @@ static void parse_numa_distance(NumaDistOptions *di=
+st, Error **errp)
+>      if (src >=3D MAX_NODES || dst >=3D MAX_NODES) {
+>          error_setg(errp,
+>                     "Invalid node %" PRIu16
+> -                   ", max possible could be %" PRIu16,
+> +                   ", max possible could be %d",
 
->
->> +#
->> +# @hole_alloc: not allocated by format driver but allocated in underlying file
-> I'm not sure I like this name.  "Hole" in file-system terminology means
-> "reads-as-zero" - but here we are talking about portions of the format
-> layer that are unallocated (defer to backing file, and we can't
-> guarantee they read as zero unless there is no backing file).
->
-> This statistic represents the portion of the underlying file that has
-> been previously allocated to hold data, but which is now unused by the
-> format layer (in other words, leaked clusters that can be reclaimed, or
-> which can be reused instead of growing the underlying the file if new
-> clusters are allocated).
->
->> +#
->> +# @hole_hole: not allocated by format driver hole in underlying file
-> This statistic represents fragmentation - portions of the format layer
-> that are no longer in use, but which are also occupying no space in the
-> underlying file.  A refragmentation operation (if we ever implemented
-> one) could remove the address space used by these clusters, but would
-> not change the disk usage.
->
->> +#
->> +# Since: 2.10
->> +#
->> +##
->> +{ 'struct': 'BlockFormatAllocInfo',
->> +  'data': {'alloc_alloc':    'uint64',
->> +           'alloc_hole':     'uint64',
->> +           'alloc_overhead': 'uint64',
->> +           'hole_alloc':     'uint64',
->> +           'hole_hole':      'uint64' } }
-> The idea seems okay, but the naming needs to be fixed.  Also, I'm not
-> sure if we need all 5, or if 4 is enough; and I'm not sure if we have
-> the right names ("how does alloc-hole differ from hole-alloc?"), or if
-> we can come up with something more descriptive.  Particularly since
-> "hole-" is not a hole in the filesystem sense, so much as unused
-> clusters.  But I'm also not coming up with better names to suggest at
-> the moment.
->
-yes, naming is a problem. Proposed has the advantage of short names, and 
-easy to use, if you have read documentation) But without reading docs, 
-it is hard to distinguish, what do they mean..
+Don't you want %u to match PRIu16, rather than %d?
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
 
 
--- 
-Best regards,
-Vladimir
+--NjmLpmVMAw6GoMLuv1ubXpwU82v6xQOmW
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEcBAEBCAAGBQJZLY+VAAoJEKeha0olJ0Nq99oH/i7FnPpGV9PzwhUUURLt0J9D
+Nx/nG8/WqDIViGEbNrOUb8Iis33ZXFOAZGd2Z3XAYhqH/H2OyAsFyn4rfWsb7+9C
+cHqOSus5is/dXbqRTT/DabmJ1s1PpnKOC1TWVyCQTgd9M5nmZWQ2Np0/iXPQCi9a
+YO6cOSkpzd+pINLK4+d/ywRL2mRW6LqD6/YUqVe2arN/oKvXoTOrcWZJK5SFqnyr
+6p8N/k1rYSBvbuBgaK+A7az4j7wYNqvTYR7VphOjwiDlcOPKVg2MHyXfLD9e1t1D
+/LpPuKqGHTcC0te6+Zi30FKG8v9kEzt2rSgo1V4dMNGzT+enjinko0YG4m805NY=
+=e2O7
+-----END PGP SIGNATURE-----
+
+--NjmLpmVMAw6GoMLuv1ubXpwU82v6xQOmW--
