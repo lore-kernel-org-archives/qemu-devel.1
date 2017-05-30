@@ -1,29 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42615)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42911)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1dFkRe-00047I-Rq
-	for qemu-devel@nongnu.org; Tue, 30 May 2017 12:56:35 -0400
+	(envelope-from <kwolf@redhat.com>) id 1dFkSJ-0004U4-4Z
+	for qemu-devel@nongnu.org; Tue, 30 May 2017 12:57:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1dFkRa-00048N-Vx
-	for qemu-devel@nongnu.org; Tue, 30 May 2017 12:56:34 -0400
-Received: from 12.mo5.mail-out.ovh.net ([46.105.39.65]:49789)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1dFkRZ-000470-TE
-	for qemu-devel@nongnu.org; Tue, 30 May 2017 12:56:30 -0400
-Received: from player799.ha.ovh.net (b9.ovh.net [213.186.33.59])
-	by mo5.mail-out.ovh.net (Postfix) with ESMTP id BC6D3F7921
-	for <qemu-devel@nongnu.org>; Tue, 30 May 2017 18:56:26 +0200 (CEST)
-Date: Tue, 30 May 2017 18:56:18 +0200
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20170530185618.2e875ebb@bahia.ttt.fr.ibm.com>
-In-Reply-To: <e8fdae1c-9d3c-1059-509a-6b85000e83a9@de.ibm.com>
-References: <149615665491.28067.17765793725374594694.stgit@bahia.lan>
-	<e8fdae1c-9d3c-1059-509a-6b85000e83a9@de.ibm.com>
+	(envelope-from <kwolf@redhat.com>) id 1dFkSH-0004T9-Up
+	for qemu-devel@nongnu.org; Tue, 30 May 2017 12:57:15 -0400
+Date: Tue, 30 May 2017 18:57:05 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20170530165705.GE5210@noname.redhat.com>
+References: <1496157773-10779-1-git-send-email-kwolf@redhat.com>
+	<1496157773-10779-5-git-send-email-kwolf@redhat.com>
+	<20170530155257.GD2665@localhost.localdomain>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	boundary="Sig_/DELfm1Nhd5zmjInezB448lz";
-	protocol="application/pgp-signature"
-Subject: Re: [Qemu-devel] [PATCH] pc-bios/s390-ccw: use STRIP variable in
- Makefile
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170530155257.GD2665@localhost.localdomain>
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v2 4/4] qemu-iotests: Block
+ migration test
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,75 +25,164 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Christian Borntraeger <borntraeger@de.ibm.com>
-Cc: qemu-devel@nongnu.org, Cornelia Huck <cornelia.huck@de.ibm.com>, qemu-trivial@nongnu.org, Fam Zheng <famz@redhat.com>, Alexander Graf <agraf@suse.de>
+To: Jeff Cody <jcody@redhat.com>
+Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org
 
---Sig_/DELfm1Nhd5zmjInezB448lz
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
-
-On Tue, 30 May 2017 18:34:46 +0200
-Christian Borntraeger <borntraeger@de.ibm.com> wrote:
-
-> On 05/30/2017 05:04 PM, Greg Kurz wrote:
-> > The docker-run-test-build@debian-s390x-cross target fails with:
-> >=20
-> > strip --strip-unneeded s390-ccw.elf -o s390-ccw.img
-> > strip: Unable to recognise the format of the input file `s390-ccw.elf'
-> >=20
-> > The configure script defines a STRIP makefile variable whose default
-> > value is ${cross_prefix}strip. Let's use it.
-> >=20
-> > Signed-off-by: Greg Kurz <groug@kaod.org>
+Am 30.05.2017 um 17:52 hat Jeff Cody geschrieben:
+> On Tue, May 30, 2017 at 05:22:53PM +0200, Kevin Wolf wrote:
+> > Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 > > ---
-> >  pc-bios/s390-ccw/Makefile |    2 +-
-> >  1 file changed, 1 insertion(+), 1 deletion(-)
-> >=20
-> > diff --git a/pc-bios/s390-ccw/Makefile b/pc-bios/s390-ccw/Makefile
-> > index 79a46b67356f..7af57dad109c 100644
-> > --- a/pc-bios/s390-ccw/Makefile
-> > +++ b/pc-bios/s390-ccw/Makefile
-> > @@ -22,7 +22,7 @@ s390-ccw.elf: $(OBJECTS)
-> >  	$(call quiet-command,$(CC) $(LDFLAGS) -o $@ $(OBJECTS),"BUILD","$(TAR=
-GET_DIR)$@")
-> >=20
-> >  s390-ccw.img: s390-ccw.elf
-> > -	$(call quiet-command,strip --strip-unneeded $< -o $@,"STRIP","$(TARGE=
-T_DIR)$@")
-> > +	$(call quiet-command,$(STRIP) --strip-unneeded $< -o $@,"STRIP","$(TA=
-RGET_DIR)$@")
-> >=20
-> >  $(OBJECTS): Makefile
-> >=20
-> >  =20
->=20
-> I was going to apply this, but it fails with --disable-strip like
->=20
->     /bin/sh: --strip-unneeded: command not found
->     Makefile:25: recipe for target 's390-ccw.img' failed
->     make[1]: *** [s390-ccw.img] Error 127
->     Makefile:354: recipe for target 'romsubdir-s390-ccw' failed
->     make: *** [romsubdir-s390-ccw] Error 2
->=20
-> Not yet sure whats going on.
->=20
+> >  tests/qemu-iotests/183     | 143 +++++++++++++++++++++++++++++++++++++++++++++
+> >  tests/qemu-iotests/183.out |  46 +++++++++++++++
+> >  tests/qemu-iotests/group   |   1 +
+> >  3 files changed, 190 insertions(+)
+> >  create mode 100755 tests/qemu-iotests/183
+> >  create mode 100644 tests/qemu-iotests/183.out
+> > 
+> > diff --git a/tests/qemu-iotests/183 b/tests/qemu-iotests/183
+> > new file mode 100755
+> > index 0000000..5eda0e9
+> > --- /dev/null
+> > +++ b/tests/qemu-iotests/183
+> > @@ -0,0 +1,143 @@
+> > +#!/bin/bash
+> > +#
+> > +# Test old-style block migration (migrate -b)
+> > +#
+> > +# Copyright (C) 2017 Red Hat, Inc.
+> > +#
+> > +# This program is free software; you can redistribute it and/or modify
+> > +# it under the terms of the GNU General Public License as published by
+> > +# the Free Software Foundation; either version 2 of the License, or
+> > +# (at your option) any later version.
+> > +#
+> > +# This program is distributed in the hope that it will be useful,
+> > +# but WITHOUT ANY WARRANTY; without even the implied warranty of
+> > +# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+> > +# GNU General Public License for more details.
+> > +#
+> > +# You should have received a copy of the GNU General Public License
+> > +# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+> > +#
+> > +
+> > +# creator
+> > +owner=kwolf@redhat.com
+> > +
+> > +seq=`basename $0`
+> > +echo "QA output created by $seq"
+> > +
+> > +here=`pwd`
+> > +status=1	# failure is the default!
+> > +
+> > +MIG_SOCKET="${TEST_DIR}/migrate"
+> > +
+> > +_cleanup()
+> > +{
+> > +    rm -f "${MIG_SOCKET}"
+> > +    rm -f "${TEST_IMG}.dest"
+> > +	_cleanup_test_img
+> > +    _cleanup_qemu
+> > +}
+> > +trap "_cleanup; exit \$status" 0 1 2 3 15
+> > +
+> > +# get standard environment, filters and checks
+> > +. ./common.rc
+> > +. ./common.filter
+> > +. ./common.qemu
+> > +
+> > +_supported_fmt generic
+> 
+> Not sure to what extent we are really keeping the _supported_fmt up to date,
+> but this test will only work on qcow2 and raw, right?
+> 
+> I'd recommend changing this to:
+> 
+> + _supported_fmt qcow2 raw
+> 
+> (that can probably be done when applying, however).
 
-configure doesn't generate STRIP when --disable-strip or --enable-debug... =
-so
-I guess we shouldn't use it here, but rather generate a s390_cross_prefix l=
-ike
-in roms/Makefile ?
+Seems you are right, but I fail to see why the other formats shouldn't
+work? Are these just bugs or do I make any assumption in the test script
+that is invalid for other image formats?
 
---Sig_/DELfm1Nhd5zmjInezB448lz
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
+> > +_supported_proto file
+> > +_supported_os Linux
+> > +
+> > +size=64M
+> > +_make_test_img $size
+> > +TEST_IMG="${TEST_IMG}.dest" _make_test_img $size
+> > +
+> > +echo
+> > +echo === Starting VMs ===
+> > +echo
+> > +
+> > +qemu_comm_method="qmp"
+> > +
+> > +_launch_qemu \
+> > +    -drive file="${TEST_IMG}",cache=${CACHEMODE},driver=$IMGFMT,id=disk
+> > +src=$QEMU_HANDLE
+> > +_send_qemu_cmd $src "{ 'execute': 'qmp_capabilities' }" 'return'
+> > +
+> > +_launch_qemu \
+> > +    -drive file="${TEST_IMG}.dest",cache=${CACHEMODE},driver=$IMGFMT,id=disk \
+> > +    -incoming "unix:${MIG_SOCKET}"
+> > +dest=$QEMU_HANDLE
+> > +_send_qemu_cmd $dest "{ 'execute': 'qmp_capabilities' }" 'return'
+> > +
+> > +echo
+> > +echo === Write something on the source ===
+> > +echo
+> > +
+> > +_send_qemu_cmd $src \
+> > +    "{ 'execute': 'human-monitor-command',
+> > +       'arguments': { 'command-line':
+> > +                      'qemu-io disk \"write -P 0x55 0 64k\"' } }" \
+> > +    'return'
+> > +_send_qemu_cmd $src \
+> > +    "{ 'execute': 'human-monitor-command',
+> > +       'arguments': { 'command-line':
+> > +                      'qemu-io disk \"read -P 0x55 0 64k\"' } }" \
+> > +    'return'
+> > +
+> > +echo
+> > +echo === Do block migration to destination ===
+> > +echo
+> > +
+> > +reply="$(_send_qemu_cmd $src \
+> > +    "{ 'execute': 'migrate',
+> > +       'arguments': { 'uri': 'unix:${MIG_SOCKET}', 'blk': true } }" \
+> > +    'return\|error')"
+> > +echo "$reply"
+> > +if echo "$reply" | grep "compiled without old-style" > /dev/null; then
+> > +    _notrun "migrate -b support not compiled in"
+> > +fi
+> > +
+> > +while _send_qemu_cmd $src "{ 'execute': 'query-migrate' }" "return"  |
+> > +      grep '"status": "active"' > /dev/null
+> > +do
+> > +    sleep 0.1
+> 
+> Would it make sense here to add a timeout?  It would be nice to be able to
+> reply on scripts always failing for git-bisect (rather than potentially
+> hanging at a spot).
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
+What would you think about squashing this in:
 
-iEYEARECAAYFAlktpDMACgkQAvw66wEB28K30ACeOf/P+RdJHUVWKyj3bY7jP2JI
-y2IAnisPII1mIFBVffiJF5L7Ym8pfZV/
-=gst4
------END PGP SIGNATURE-----
+--- a/tests/qemu-iotests/183
++++ b/tests/qemu-iotests/183
+@@ -96,11 +96,8 @@ if echo "$reply" | grep "compiled without old-style" > /dev/null; then
+     _notrun "migrate -b support not compiled in"
+ fi
+ 
+-while _send_qemu_cmd $src "{ 'execute': 'query-migrate' }" "return"  |
+-      grep '"status": "active"' > /dev/null
+-do
+-    sleep 0.1
+-done
++QEMU_COMM_TIMEOUT=0.1 qemu_cmd_repeat=50 silent=yes \
++    _send_qemu_cmd $src "{ 'execute': 'query-migrate' }" '"status": "completed"'
+ _send_qemu_cmd $src "{ 'execute': 'query-status' }" "return"
+ 
+ echo
 
---Sig_/DELfm1Nhd5zmjInezB448lz--
+Kevin
