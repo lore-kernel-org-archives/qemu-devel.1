@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44653)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44799)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dFj8G-0002Pp-T7
-	for qemu-devel@nongnu.org; Tue, 30 May 2017 11:32:29 -0400
+	(envelope-from <jcody@redhat.com>) id 1dFj8r-0002xg-5j
+	for qemu-devel@nongnu.org; Tue, 30 May 2017 11:33:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dFj8G-0005Am-1c
-	for qemu-devel@nongnu.org; Tue, 30 May 2017 11:32:28 -0400
-Date: Tue, 30 May 2017 17:32:17 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20170530153217.GC5210@noname.redhat.com>
-References: <CAJSP0QU1gHgZbeBfL1y15FL9muD4G6r3MBYvVMVXTMj=GCB7oA@mail.gmail.com>
-	<w517f0y2zbl.fsf@maestria.local.igalia.com>
+	(envelope-from <jcody@redhat.com>) id 1dFj8q-0005Lm-Bd
+	for qemu-devel@nongnu.org; Tue, 30 May 2017 11:33:05 -0400
+Date: Tue, 30 May 2017 11:32:56 -0400
+From: Jeff Cody <jcody@redhat.com>
+Message-ID: <20170530153256.GC2665@localhost.localdomain>
+References: <1496157773-10779-1-git-send-email-kwolf@redhat.com>
+	<1496157773-10779-4-git-send-email-kwolf@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <w517f0y2zbl.fsf@maestria.local.igalia.com>
-Subject: Re: [Qemu-devel] Throttling groups vs filter nodes
+In-Reply-To: <1496157773-10779-4-git-send-email-kwolf@redhat.com>
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v2 3/4] migration/block: Clean
+ up BBs in block_save_complete()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,59 +24,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alberto Garcia <berto@igalia.com>
-Cc: Stefan Hajnoczi <stefanha@gmail.com>, qemu-devel <qemu-devel@nongnu.org>, Manos Pitsidianakis <el13635@mail.ntua.gr>, qemu-block@nongnu.org
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org
 
-Am 30.05.2017 um 16:29 hat Alberto Garcia geschrieben:
-> On Sat 27 May 2017 09:56:03 AM CEST, Stefan Hajnoczi wrote:
-> > Throttling groups allow multiple drives to share the same throttling
-> > state (i.e. budget) between them.  Manos is working on moving the
-> > throttling code into a block filter driver so it is no longer
-> > hardcoded into the I/O code path.
+On Tue, May 30, 2017 at 05:22:52PM +0200, Kevin Wolf wrote:
+> We need to release any block migrations BlockBackends on the source
+> before successfully completing the migration because otherwise
+> inactivating the images will fail (inactivation only tolerates device
+> BBs).
 > 
-> Now that we're discussing changes to the throttling code, I'll take the
-> opportunity to describe a feature that I'd like to work on at some point
-> in the future.
+> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> Reviewed-by: Fam Zheng <famz@redhat.com>
+> Reviewed-by: Eric Blake <eblake@redhat.com>
+> ---
+>  migration/block.c | 22 +++++++++++++++++-----
+>  1 file changed, 17 insertions(+), 5 deletions(-)
 > 
-> This is of course out of the scope of the work that Manos is going to
-> do, but I'd like to discuss it briefly to see what people think of this
-> idea and whether it's compatible with the changes that we are now
-> proposing.
+> diff --git a/migration/block.c b/migration/block.c
+> index 13f90d3..deb4b0e 100644
+> --- a/migration/block.c
+> +++ b/migration/block.c
+> @@ -673,16 +673,14 @@ static int64_t get_remaining_dirty(void)
+>      return dirty << BDRV_SECTOR_BITS;
+>  }
+>  
+> -/* Called with iothread lock taken.  */
+>  
+> -static void block_migration_cleanup(void *opaque)
+> +
+> +/* Called with iothread lock taken.  */
+> +static void block_migration_cleanup_bmds(void)
+>  {
+>      BlkMigDevState *bmds;
+> -    BlkMigBlock *blk;
+>      AioContext *ctx;
+>  
+> -    bdrv_drain_all();
+> -
+>      unset_dirty_tracking();
+>  
+>      while ((bmds = QSIMPLEQ_FIRST(&block_mig_state.bmds_list)) != NULL) {
+> @@ -700,6 +698,16 @@ static void block_migration_cleanup(void *opaque)
+>          g_free(bmds->aio_bitmap);
+>          g_free(bmds);
+>      }
+> +}
+> +
+> +/* Called with iothread lock taken.  */
+> +static void block_migration_cleanup(void *opaque)
+> +{
+> +    BlkMigBlock *blk;
+> +
+> +    bdrv_drain_all();
+> +
+> +    block_migration_cleanup_bmds();
+>  
+>      blk_mig_lock();
+>      while ((blk = QSIMPLEQ_FIRST(&block_mig_state.blk_list)) != NULL) {
+> @@ -843,6 +851,10 @@ static int block_save_complete(QEMUFile *f, void *opaque)
+>  
+>      qemu_put_be64(f, BLK_MIG_FLAG_EOS);
+>  
+> +    /* Make sure that our BlockBackends are gone, so that the block driver
+> +     * nodes can be inactivated. */
+> +    block_migration_cleanup_bmds();
+> +
+>      return 0;
+>  }
+>  
+> -- 
+> 1.8.3.1
 > 
-> Currently each block device can have either zero or one set of I/O
-> limits, and that set of limits can be shared among several drives using
-> throttling groups.
-> 
-> I have the following use case that cannot be handled with the current
-> code:
-> 
->    - The provider offers the user different storage types, and each one
->      of them can have a different storage backend and a different set of
->      I/O limits.
-> 
->    - Inside each storage type, the user can have several volumes, each
->      one with its own set of I/O limits.
-> 
->    - So the user could have drive A, B and C, each one of them with its
->      own separate limits, and in addition to that the combination of all
->      three would have a limit specific to the storage type.
-> 
-> I believe that this could be achieved by simply having two filter nodes
-> per drive, one of them would be attached to a throttling object specific
-> to that drive, and the other one would be attached to a throttling
-> object that would be shared by all drives (i.e. it would be a 3-drive
-> throttling group).
-> 
-> I think this should be possible with the -object approach that we are
-> discussing.
+>
 
-Yes, that should be possible. In fact, I don't think it's out of scope
-for Manos' work, but it should just natually fall out of it.
-
-That you can put throttle filter nodes anywhere in the graph (and
-therefore also stack multiple throttle filter nodes on top of each
-other) is the whole point of doing this work, so I would consider this a
-very basic requirement for any configuration interface that we could
-come up wih.
-
-Kevin
+Reviewed-by: Jeff Cody <jcody@redhat.com>
