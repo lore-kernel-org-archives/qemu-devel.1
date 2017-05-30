@@ -1,26 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53880)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55754)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1dFceo-0001ev-AW
-	for qemu-devel@nongnu.org; Tue, 30 May 2017 04:37:39 -0400
+	(envelope-from <stefanha@gmail.com>) id 1dFcmM-0007Tv-J2
+	for qemu-devel@nongnu.org; Tue, 30 May 2017 04:45:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1dFcej-0005Vw-SM
-	for qemu-devel@nongnu.org; Tue, 30 May 2017 04:37:38 -0400
-Received: from mail-wm0-x241.google.com ([2a00:1450:400c:c09::241]:36208)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1dFcej-0005Vg-Ik
-	for qemu-devel@nongnu.org; Tue, 30 May 2017 04:37:33 -0400
-Received: by mail-wm0-x241.google.com with SMTP id k15so23437397wmh.3
-	for <qemu-devel@nongnu.org>; Tue, 30 May 2017 01:37:33 -0700 (PDT)
-Date: Tue, 30 May 2017 09:37:30 +0100
+	(envelope-from <stefanha@gmail.com>) id 1dFcmJ-0007xI-HG
+	for qemu-devel@nongnu.org; Tue, 30 May 2017 04:45:26 -0400
+Date: Tue, 30 May 2017 09:45:20 +0100
 From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20170530083730.GB11362@stefanha-x1.localdomain>
-References: <1495542638-12335-1-git-send-email-armbru@redhat.com>
+Message-ID: <20170530084520.GC11362@stefanha-x1.localdomain>
+References: <20170525035132.24268-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="A6N2fC+uXW/VQSAv"
+	protocol="application/pgp-signature"; boundary="4ZLFUWh1odzi/v6L"
 Content-Disposition: inline
-In-Reply-To: <1495542638-12335-1-git-send-email-armbru@redhat.com>
-Subject: Re: [Qemu-devel] [PULL 0/9] QAPI patches for 2017-05-23
+In-Reply-To: <20170525035132.24268-1-david@gibson.dropbear.id.au>
+Subject: Re: [Qemu-devel] [PULL 00/18] ppc-for-2.10 queue 20170525
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,138 +23,91 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: peter.maydell@linaro.org, qemu-devel@nongnu.org, aik@ozlabs.ru, sursingh@redhat.com, agraf@suse.de, mdroth@linux.vnet.ibm.com, qemu-ppc@nongnu.org, sbobroff@redhat.com
 
 
---A6N2fC+uXW/VQSAv
+--4ZLFUWh1odzi/v6L
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, May 23, 2017 at 02:30:29PM +0200, Markus Armbruster wrote:
-> The following changes since commit 56821559f0ba682fe6b367815572e6f974d329=
-ab:
+On Thu, May 25, 2017 at 01:51:14PM +1000, David Gibson wrote:
+> The following changes since commit 9964e96dc9999cf7f7c936ee854a795415d19b=
+60:
 >=20
->   Merge remote-tracking branch 'dgilbert/tags/pull-hmp-20170517' into sta=
-ging (2017-05-18 13:36:15 +0100)
+>   Merge remote-tracking branch 'jasowang/tags/net-pull-request' into stag=
+ing (2017-05-23 15:01:31 +0100)
 >=20
 > are available in the git repository at:
 >=20
->   git://repo.or.cz/qemu/armbru.git tags/pull-qapi-2017-05-23
+>   git://github.com/dgibson/qemu.git tags/ppc-for-2.10-20170525
 >=20
-> for you to fetch changes up to 8c1bc1e9d770e7576fc272424dd48eb008ebff39:
+> for you to fetch changes up to 62f94fc94f98095173146e753a1f03d7c2cc7ba3:
 >=20
->   qapi-schema: Remove obsolete note from ObjectTypeInfo (2017-05-23 13:28=
-:17 +0200)
->=20
-> ----------------------------------------------------------------
-> QAPI patches for 2017-05-23
+>   xics: add unrealize handler (2017-05-25 11:31:33 +1000)
 >=20
 > ----------------------------------------------------------------
-> Eduardo Habkost (1):
->       qapi-schema: Remove obsolete note from ObjectTypeInfo
+> ppc patch queue 2017-05-25
 >=20
-> Eric Blake (6):
->       shutdown: Simplify shutdown_signal
->       shutdown: Prepare for use of an enum in reset/shutdown_request
->       shutdown: Preserve shutdown cause through replay
->       shutdown: Add source information to SHUTDOWN and RESET
->       shutdown: Expose bool cause in SHUTDOWN and RESET events
->       block: Use QDict helpers for --force-share
+> Assorted accumulated patches.  These are nearly all bugfixes at one
+> level or another - some for longstanding problems, others for some
+> regressions caused by more recent cleanups.
 >=20
-> Greg Kurz (1):
->       scripts/qmp/qom-set: fix the value argument passed to srv.command()
+> This includes preliminary patches towards fixing migration for Radix
+> Page Table guests under POWER9 and also fixing some migration
+> regressions due to the re-organization of the interrupt controller
+> code.  Not all the pieces are there yet, so those still won't quite
+> work, but the preliminary changes make sense on their own.
 >=20
-> Markus Armbruster (1):
->       sockets: Plug memory leak in socket_address_flatten()
+> ----------------------------------------------------------------
+> Bharata B Rao (1):
+>       spapr: Consolidate HPT freeing code into a routine
 >=20
->  hw/acpi/core.c              |  4 +--
->  hw/arm/highbank.c           |  4 +--
->  hw/arm/integratorcp.c       |  2 +-
->  hw/arm/musicpal.c           |  2 +-
->  hw/arm/omap1.c              | 10 ++++---
->  hw/arm/omap2.c              |  2 +-
->  hw/arm/spitz.c              |  2 +-
->  hw/arm/stellaris.c          |  2 +-
->  hw/arm/tosa.c               |  2 +-
->  hw/i386/pc.c                |  2 +-
->  hw/i386/xen/xen-hvm.c       |  9 ++++--
->  hw/input/pckbd.c            |  4 +--
->  hw/ipmi/ipmi.c              |  4 +--
->  hw/isa/lpc_ich9.c           |  2 +-
->  hw/mips/boston.c            |  2 +-
->  hw/mips/mips_malta.c        |  2 +-
->  hw/mips/mips_r4k.c          |  4 +--
->  hw/misc/arm_sysctl.c        |  8 +++---
->  hw/misc/cbus.c              |  2 +-
->  hw/misc/macio/cuda.c        |  4 +--
->  hw/misc/slavio_misc.c       |  4 +--
->  hw/misc/zynq_slcr.c         |  2 +-
->  hw/pci-host/apb.c           |  4 +--
->  hw/pci-host/bonito.c        |  2 +-
->  hw/pci-host/piix.c          |  2 +-
->  hw/ppc/e500.c               |  2 +-
->  hw/ppc/mpc8544_guts.c       |  2 +-
->  hw/ppc/ppc.c                |  2 +-
->  hw/ppc/ppc405_uc.c          |  2 +-
->  hw/ppc/spapr_hcall.c        |  2 +-
->  hw/ppc/spapr_rtas.c         |  4 +--
->  hw/s390x/ipl.c              |  2 +-
->  hw/sh4/r2d.c                |  2 +-
->  hw/timer/etraxfs_timer.c    |  2 +-
->  hw/timer/m48t59.c           |  4 +--
->  hw/timer/milkymist-sysctl.c |  4 +--
->  hw/timer/pxa2xx_timer.c     |  2 +-
->  hw/watchdog/watchdog.c      |  2 +-
->  hw/xenpv/xen_domainbuild.c  |  2 +-
->  hw/xtensa/xtfpga.c          |  2 +-
->  include/sysemu/replay.h     |  3 +-
->  include/sysemu/sysemu.h     | 32 ++++++++++++++++-----
->  kvm-all.c                   |  6 ++--
->  migration/colo.c            |  2 +-
->  migration/savevm.c          |  2 +-
->  os-win32.c                  |  2 +-
->  qapi-schema.json            |  2 --
->  qapi/event.json             | 17 ++++++++---
->  qemu-img.c                  |  7 ++---
->  qemu-io.c                   |  2 +-
->  qmp.c                       |  4 +--
->  replay/replay-internal.h    |  3 +-
->  replay/replay.c             |  9 +++---
->  scripts/qmp/qom-set         |  2 +-
->  target/alpha/sys_helper.c   |  4 +--
->  target/arm/psci.c           |  4 +--
->  target/i386/excp_helper.c   |  2 +-
->  target/i386/hax-all.c       |  6 ++--
->  target/i386/helper.c        |  2 +-
->  target/i386/kvm.c           |  2 +-
->  target/s390x/helper.c       |  2 +-
->  target/s390x/kvm.c          |  4 +--
->  target/s390x/misc_helper.c  |  4 +--
->  target/sparc/int32_helper.c |  2 +-
->  tests/qemu-iotests/071.out  |  4 +--
->  tests/qemu-iotests/081.out  |  2 +-
->  tests/qemu-iotests/087.out  | 12 ++++----
->  tests/qemu-iotests/094.out  |  2 +-
->  tests/qemu-iotests/117.out  |  2 +-
->  tests/qemu-iotests/119.out  |  2 +-
->  tests/qemu-iotests/120.out  |  2 +-
->  tests/qemu-iotests/140.out  |  2 +-
->  tests/qemu-iotests/143.out  |  2 +-
->  tests/qemu-iotests/156.out  |  2 +-
->  trace-events                |  2 +-
->  ui/cocoa.m                  |  2 +-
->  ui/sdl.c                    |  2 +-
->  ui/sdl2.c                   |  4 +--
->  util/qemu-sockets.c         |  4 ++-
->  vl.c                        | 69 ++++++++++++++++++++++++++-------------=
+> Daniel Henrique Barboza (4):
+>       hw/ppc/spapr_events.c: removing 'exception' from sPAPREventLogEntry
+>       hw/ppc: removing drc->detach_cb and drc->detach_cb_opaque
+>       hw/ppc: migrating the DRC state of hotplugged devices
+>       hw/ppc/spapr.c: recover pending LMB unplug info in spapr_lmb_release
+>=20
+> David Gibson (3):
+>       pseries: Split CAS PVR negotiation out into a separate function
+>       pseries: Restore support for total vcpus not a multiple of threads-=
+per-core for old machine types
+>       hw/ppc/spapr.c: adding pending_dimm_unplugs to sPAPRMachineState
+>=20
+> Greg Kurz (8):
+>       ppc/xics: simplify prototype of xics_spapr_init()
+>       spapr: sanitize error handling in spapr_ics_create()
+>       spapr-cpu-core: release ICP object when realization fails
+>       xics_kvm: cache already enabled vCPU ids
+>       spapr: ensure core_slot isn't NULL in spapr_core_unplug()
+>       spapr_cpu_core: drop reference on ICP object during CPU realization
+>       spapr: fix error reporting in xics_system_init()
+>       xics: add unrealize handler
+>=20
+> Laurent Vivier (1):
+>       spapr: add pre_plug function for memory
+>=20
+> Nikunj A Dadhania (1):
+>       target/ppc: reset reservation in do_rfi()
+>=20
+>  hw/intc/xics.c              |   5 +
+>  hw/intc/xics_kvm.c          |  33 ++++--
+>  hw/intc/xics_spapr.c        |   3 +-
+>  hw/ppc/spapr.c              | 239 +++++++++++++++++++++++++++++++-------=
 ------
->  80 files changed, 204 insertions(+), 159 deletions(-)
->=20
-> --=20
-> 2.7.4
->=20
+>  hw/ppc/spapr_cpu_core.c     |  19 ++--
+>  hw/ppc/spapr_drc.c          |  92 ++++++++++++++---
+>  hw/ppc/spapr_events.c       |  52 ++--------
+>  hw/ppc/spapr_hcall.c        |  54 ++++++----
+>  hw/ppc/spapr_pci.c          |   5 +-
+>  include/hw/pci-host/spapr.h |   3 +
+>  include/hw/ppc/spapr.h      |  12 ++-
+>  include/hw/ppc/spapr_drc.h  |   8 +-
+>  include/hw/ppc/xics.h       |   3 +-
+>  target/ppc/excp_helper.c    |   3 +
+>  14 files changed, 349 insertions(+), 182 deletions(-)
 >=20
 
 Thanks, applied to my staging tree:
@@ -168,18 +115,18 @@ https://github.com/stefanha/qemu/commits/staging
 
 Stefan
 
---A6N2fC+uXW/VQSAv
+--4ZLFUWh1odzi/v6L
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEcBAEBAgAGBQJZLS9KAAoJEJykq7OBq3PIukYH/RmbPRmXRiCVsEadnQnlwLNs
-BRzR6j2h1It1MgkpIASpEl0M1/Lv5+KL9OkWw2/dY3JJMpWv8FxRD6U7HG8BDkc0
-mEQ6opeGGZAHCPCoxX53P5Aw/sz5shyBFpQbHo9wJxT0eDSKF9jBVJ4EQLGOgsn7
-dGtOkS8rixyNubushuB0MSm6xiCP2NR+EM40QZDA5a7jKMn6e9QhizVxmBygToa8
-YsQJDCufEb/UU24IP33tgtMmREStmC5Vc+PWIJ0Qr49+lZ/u3XNNAZOAmQCBXfML
-LcyKGuJQuQNlldgKRLV0+1kQWI0Nf1osnvxfgnH3MM2eByWIej/OC1/6jaDGeyE=
-=KPRz
+iQEcBAEBAgAGBQJZLTEgAAoJEJykq7OBq3PIiucIAMRpGotWcYOYo7DpFQMVlndd
+87bE6i3Bs6u4lAT01yDhk/VYlrmw6jRJEEn9yMT6KwlG+Lr3cznAVYRyDEheCJ2n
+v2sfwKKxkhTAuK8ScaxH/ig/CE9djsN4Zi2TeD2gDq8cd5u0p8ru82Umj7SfycNr
+Fymvyp8v29V10/Rhs8fvGhLALptFu9zOoAcFW+1aZkx+7LGEnB6RwPAC5p83mx8o
++3xzwsoDJAEST7BzCeyW6UPGi7c7v19f6BdDT5ViBdr7Mzx87kSxCEY/d/uT0ED7
+gR4IigQrQVZRB3/juSdbI003BApFTA9hvPGLsdDIEklI3hk3NMACPLwk1mUuiF0=
+=rtfE
 -----END PGP SIGNATURE-----
 
---A6N2fC+uXW/VQSAv--
+--4ZLFUWh1odzi/v6L--
