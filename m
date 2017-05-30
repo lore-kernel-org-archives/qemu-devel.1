@@ -1,16 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41722)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42585)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dFizU-0003Zx-Pl
-	for qemu-devel@nongnu.org; Tue, 30 May 2017 11:23:26 -0400
+	(envelope-from <quintela@redhat.com>) id 1dFj3U-0006w4-TY
+	for qemu-devel@nongnu.org; Tue, 30 May 2017 11:27:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dFizT-0002Yz-DW
-	for qemu-devel@nongnu.org; Tue, 30 May 2017 11:23:24 -0400
-From: Kevin Wolf <kwolf@redhat.com>
-Date: Tue, 30 May 2017 17:22:53 +0200
-Message-Id: <1496157773-10779-5-git-send-email-kwolf@redhat.com>
-In-Reply-To: <1496157773-10779-1-git-send-email-kwolf@redhat.com>
-References: <1496157773-10779-1-git-send-email-kwolf@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 4/4] qemu-iotests: Block migration test
+	(envelope-from <quintela@redhat.com>) id 1dFj3P-0003Tf-Te
+	for qemu-devel@nongnu.org; Tue, 30 May 2017 11:27:32 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:27888)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1dFj3P-0003TV-Kr
+	for qemu-devel@nongnu.org; Tue, 30 May 2017 11:27:27 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id A660580C29
+	for <qemu-devel@nongnu.org>; Tue, 30 May 2017 15:27:26 +0000 (UTC)
+From: Juan Quintela <quintela@redhat.com>
+In-Reply-To: <6a45fac0-cbe2-8146-2741-c3589d759c04@redhat.com> (Laurent
+	Vivier's message of "Wed, 24 May 2017 18:20:45 +0200")
+References: <20170518172543.32694-1-quintela@redhat.com>
+	<20170518172543.32694-3-quintela@redhat.com>
+	<6a45fac0-cbe2-8146-2741-c3589d759c04@redhat.com>
+Reply-To: quintela@redhat.com
+Date: Tue, 30 May 2017 17:27:25 +0200
+Message-ID: <87bmqafjqa.fsf@secure.mitica>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 02/11] migration: Remove unneeded includes
+ of migration/vmstate.h
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -19,227 +37,153 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-block@nongnu.org
-Cc: kwolf@redhat.com, eblake@redhat.com, qemu-devel@nongnu.org
+To: Laurent Vivier <lvivier@redhat.com>
+Cc: qemu-devel@nongnu.org, dgilbert@redhat.com, peterx@redhat.com
 
-Signed-off-by: Kevin Wolf <kwolf@redhat.com>
----
- tests/qemu-iotests/183     | 143 +++++++++++++++++++++++++++++++++++++++++++++
- tests/qemu-iotests/183.out |  46 +++++++++++++++
- tests/qemu-iotests/group   |   1 +
- 3 files changed, 190 insertions(+)
- create mode 100755 tests/qemu-iotests/183
- create mode 100644 tests/qemu-iotests/183.out
+Laurent Vivier <lvivier@redhat.com> wrote:
+> On 18/05/2017 19:25, Juan Quintela wrote:
+>> Signed-off-by: Juan Quintela <quintela@redhat.com>
+>> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+>> ---
+>>  hw/core/qdev.c                   | 1 -
+>>  include/hw/acpi/memory_hotplug.h | 1 -
+>>  include/hw/acpi/pcihp.h          | 1 -
+>>  include/hw/pci/shpc.h            | 1 -
+>>  include/net/net.h                | 1 -
+>>  target/alpha/cpu.c               | 1 -
+>>  target/hppa/cpu.c                | 1 -
+>>  target/s390x/cpu.c               | 1 -
+>>  target/tilegx/cpu.c              | 1 -
+>>  9 files changed, 9 deletions(-)
+>>=20
+>> diff --git a/hw/core/qdev.c b/hw/core/qdev.c
+>> index 71ff95f..0ce45a2 100644
+>> --- a/hw/core/qdev.c
+>> +++ b/hw/core/qdev.c
+>> @@ -37,7 +37,6 @@
+>>  #include "hw/boards.h"
+>>  #include "hw/sysbus.h"
+>>  #include "qapi-event.h"
+>> -#include "migration/vmstate.h"
+>>=20=20
+>>  bool qdev_hotplug =3D false;
+>>  static bool qdev_hot_added =3D false;
+>
+> This one uses "VMStateDescription", "vmstate_check_only_migratable",
+> "vmstate_register_with_alias_id" and "vmstate_unregister" from
+> migration/savevm.h
 
-diff --git a/tests/qemu-iotests/183 b/tests/qemu-iotests/183
-new file mode 100755
-index 0000000..5eda0e9
---- /dev/null
-+++ b/tests/qemu-iotests/183
-@@ -0,0 +1,143 @@
-+#!/bin/bash
-+#
-+# Test old-style block migration (migrate -b)
-+#
-+# Copyright (C) 2017 Red Hat, Inc.
-+#
-+# This program is free software; you can redistribute it and/or modify
-+# it under the terms of the GNU General Public License as published by
-+# the Free Software Foundation; either version 2 of the License, or
-+# (at your option) any later version.
-+#
-+# This program is distributed in the hope that it will be useful,
-+# but WITHOUT ANY WARRANTY; without even the implied warranty of
-+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+# GNU General Public License for more details.
-+#
-+# You should have received a copy of the GNU General Public License
-+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-+#
-+
-+# creator
-+owner=kwolf@redhat.com
-+
-+seq=`basename $0`
-+echo "QA output created by $seq"
-+
-+here=`pwd`
-+status=1	# failure is the default!
-+
-+MIG_SOCKET="${TEST_DIR}/migrate"
-+
-+_cleanup()
-+{
-+    rm -f "${MIG_SOCKET}"
-+    rm -f "${TEST_IMG}.dest"
-+	_cleanup_test_img
-+    _cleanup_qemu
-+}
-+trap "_cleanup; exit \$status" 0 1 2 3 15
-+
-+# get standard environment, filters and checks
-+. ./common.rc
-+. ./common.filter
-+. ./common.qemu
-+
-+_supported_fmt generic
-+_supported_proto file
-+_supported_os Linux
-+
-+size=64M
-+_make_test_img $size
-+TEST_IMG="${TEST_IMG}.dest" _make_test_img $size
-+
-+echo
-+echo === Starting VMs ===
-+echo
-+
-+qemu_comm_method="qmp"
-+
-+_launch_qemu \
-+    -drive file="${TEST_IMG}",cache=${CACHEMODE},driver=$IMGFMT,id=disk
-+src=$QEMU_HANDLE
-+_send_qemu_cmd $src "{ 'execute': 'qmp_capabilities' }" 'return'
-+
-+_launch_qemu \
-+    -drive file="${TEST_IMG}.dest",cache=${CACHEMODE},driver=$IMGFMT,id=disk \
-+    -incoming "unix:${MIG_SOCKET}"
-+dest=$QEMU_HANDLE
-+_send_qemu_cmd $dest "{ 'execute': 'qmp_capabilities' }" 'return'
-+
-+echo
-+echo === Write something on the source ===
-+echo
-+
-+_send_qemu_cmd $src \
-+    "{ 'execute': 'human-monitor-command',
-+       'arguments': { 'command-line':
-+                      'qemu-io disk \"write -P 0x55 0 64k\"' } }" \
-+    'return'
-+_send_qemu_cmd $src \
-+    "{ 'execute': 'human-monitor-command',
-+       'arguments': { 'command-line':
-+                      'qemu-io disk \"read -P 0x55 0 64k\"' } }" \
-+    'return'
-+
-+echo
-+echo === Do block migration to destination ===
-+echo
-+
-+reply="$(_send_qemu_cmd $src \
-+    "{ 'execute': 'migrate',
-+       'arguments': { 'uri': 'unix:${MIG_SOCKET}', 'blk': true } }" \
-+    'return\|error')"
-+echo "$reply"
-+if echo "$reply" | grep "compiled without old-style" > /dev/null; then
-+    _notrun "migrate -b support not compiled in"
-+fi
-+
-+while _send_qemu_cmd $src "{ 'execute': 'query-migrate' }" "return"  |
-+      grep '"status": "active"' > /dev/null
-+do
-+    sleep 0.1
-+done
-+_send_qemu_cmd $src "{ 'execute': 'query-status' }" "return"
-+
-+echo
-+echo === Do some I/O on the destination ===
-+echo
-+
-+# It is important that we use the BlockBackend of the guest device here instead
-+# of the node name, which would create a new BlockBackend and not test whether
-+# the guest has the necessary permissions to access the image now
-+silent=yes _send_qemu_cmd $dest "" "100 %"
-+_send_qemu_cmd $dest "{ 'execute': 'query-status' }" "return"
-+_send_qemu_cmd $dest \
-+    "{ 'execute': 'human-monitor-command',
-+       'arguments': { 'command-line':
-+                      'qemu-io disk \"read -P 0x55 0 64k\"' } }" \
-+    'return'
-+_send_qemu_cmd $dest \
-+    "{ 'execute': 'human-monitor-command',
-+       'arguments': { 'command-line':
-+                      'qemu-io disk \"write -P 0x66 1M 64k\"' } }" \
-+    'return'
-+
-+echo
-+echo === Shut down and check image ===
-+echo
-+
-+_send_qemu_cmd $src '{"execute":"quit"}' 'return'
-+_send_qemu_cmd $dest '{"execute":"quit"}' 'return'
-+wait=1 _cleanup_qemu
-+
-+_check_test_img
-+TEST_IMG="${TEST_IMG}.dest" _check_test_img
-+
-+$QEMU_IO -c 'write -P 0x66 1M 64k' "$TEST_IMG" | _filter_qemu_io
-+$QEMU_IMG compare "$TEST_IMG.dest" "$TEST_IMG"
-+
-+# success, all done
-+echo "*** done"
-+rm -f $seq.full
-+status=0
-diff --git a/tests/qemu-iotests/183.out b/tests/qemu-iotests/183.out
-new file mode 100644
-index 0000000..6647488
---- /dev/null
-+++ b/tests/qemu-iotests/183.out
-@@ -0,0 +1,46 @@
-+QA output created by 183
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864
-+Formatting 'TEST_DIR/t.IMGFMT.dest', fmt=IMGFMT size=67108864
-+
-+=== Starting VMs ===
-+
-+{"return": {}}
-+{"return": {}}
-+
-+=== Write something on the source ===
-+
-+wrote 65536/65536 bytes at offset 0
-+64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+{"return": ""}
-+read 65536/65536 bytes at offset 0
-+64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+{"return": ""}
-+
-+=== Do block migration to destination ===
-+
-+{"return": {}}
-+{"return": {"status": "postmigrate", "singlestep": false, "running": false}}
-+
-+=== Do some I/O on the destination ===
-+
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "RESUME"}
-+{"return": {"status": "running", "singlestep": false, "running": true}}
-+read 65536/65536 bytes at offset 0
-+64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+{"return": ""}
-+wrote 65536/65536 bytes at offset 1048576
-+64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+{"return": ""}
-+
-+=== Shut down and check image ===
-+
-+{"return": {}}
-+{"return": {}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN"}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN"}
-+No errors were found on the image.
-+No errors were found on the image.
-+wrote 65536/65536 bytes at offset 1048576
-+64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+Images are identical.
-+*** done
-diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
-index 5c8ea0f..a6acaff 100644
---- a/tests/qemu-iotests/group
-+++ b/tests/qemu-iotests/group
-@@ -174,3 +174,4 @@
- 179 rw auto quick
- 181 rw auto migration
- 182 rw auto quick
-+183 rw auto migration
--- 
-1.8.3.1
+#includes "hw/qdev.h"
+
+which 1st include is
+
+#include "hw/hw.h"
+
+which include "migration/vmstate.h"
+
+After this series the only include file that includes
+migration/vmstate.h is hw/hw.h.  Removing it makes no sense (IMHO)
+because it would mean including it directly in more than half of the tree.
+
+>
+>> diff --git a/include/hw/acpi/memory_hotplug.h b/include/hw/acpi/memory_h=
+otplug.h
+>> index db8ebc9..77c6576 100644
+>> --- a/include/hw/acpi/memory_hotplug.h
+>> +++ b/include/hw/acpi/memory_hotplug.h
+>> @@ -3,7 +3,6 @@
+>>=20=20
+>>  #include "hw/qdev-core.h"
+>>  #include "hw/acpi/acpi.h"
+>> -#include "migration/vmstate.h"
+>>  #include "hw/acpi/aml-build.h"
+>>=20=20
+>>  /**
+>
+> This one uses "VMSTATE_STRUCT()" which is defined in migration/vmstate.h
+
+#include "hw/acpi/acpi.h"
+
+which includes:
+
+#include "hw/acpi/acpi_dev_interface.h"
+
+->
+
+#include "hw/boards.h"
+
+->
+
+#include "hw/hw.h"
+
+>> diff --git a/include/hw/acpi/pcihp.h b/include/hw/acpi/pcihp.h
+>> index 04528b7..8a65f99 100644
+>> --- a/include/hw/acpi/pcihp.h
+>> +++ b/include/hw/acpi/pcihp.h
+>> @@ -28,7 +28,6 @@
+>>  #define HW_ACPI_PCIHP_H
+>>=20=20
+>>  #include "hw/acpi/acpi.h"
+>> -#include "migration/vmstate.h"
+>>  #include "hw/hotplug.h"
+>>=20=20
+>>  #define ACPI_PCIHP_IO_BASE_PROP "acpi-pcihp-io-base"
+>
+> This one uses "VMSTATE_STRUCT()" which is defined in migration/vmstate.h
+
+see previous one
+
+>> diff --git a/include/hw/pci/shpc.h b/include/hw/pci/shpc.h
+>> index b208554..71e836b 100644
+>> --- a/include/hw/pci/shpc.h
+>> +++ b/include/hw/pci/shpc.h
+>> @@ -3,7 +3,6 @@
+>>=20=20
+>>  #include "qemu-common.h"
+>>  #include "exec/memory.h"
+>> -#include "migration/vmstate.h"
+>>  #include "hw/hotplug.h"
+>>  #include "hw/pci/pci.h"
+>
+> This one uses "VMSTATE_BUFFER_UNSAFE_INFO_TEST()" which is defined in
+> migration/vmstate.h.
+
+#include "hw/pci/pci.h"
+->
+#include "hw/qedev.h"
+->
+#included "hw/hw.h"
+
+>>=20=20
+>> diff --git a/include/net/net.h b/include/net/net.h
+>> index 99b28d5..ba663bd 100644
+>> --- a/include/net/net.h
+>> +++ b/include/net/net.h
+>> @@ -6,7 +6,6 @@
+>>  #include "qapi/qmp/qdict.h"
+>>  #include "qemu/option.h"
+>>  #include "net/queue.h"
+>> -#include "migration/vmstate.h"
+>>  #include "qapi-types.h"
+>>=20=20
+>>  #define MAC_FMT "%02X:%02X:%02X:%02X:%02X:%02X"
+>
+> This one uses "vmstate_offset_array()" which is defined in
+> migration/vmstate.h
+>
+> Perhaps you can explain why you think they are unneeded?
+
+In all previous ones, they arrive to hw/hw.h for means that are not
+going to be removed.  For this one, I am getting trouble finding a
+normal chain.
+
+#include "qemu/osdep.h"
+#include "net/net.h"
+
+with this change works.  But I am not able to find *why*.
+
+So, I am dropping this last bit.
+
+Is that ok for you?
+
+Later, Juan.
