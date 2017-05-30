@@ -1,24 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53812)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53844)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1dFceS-0001E3-30
-	for qemu-devel@nongnu.org; Tue, 30 May 2017 04:37:17 -0400
+	(envelope-from <quintela@redhat.com>) id 1dFceW-0001Ov-7x
+	for qemu-devel@nongnu.org; Tue, 30 May 2017 04:37:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1dFceN-0005RG-7o
-	for qemu-devel@nongnu.org; Tue, 30 May 2017 04:37:16 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:51640)
+	(envelope-from <quintela@redhat.com>) id 1dFceS-0005Ta-3q
+	for qemu-devel@nongnu.org; Tue, 30 May 2017 04:37:20 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:35954)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1dFceN-0005Qw-2q
-	for qemu-devel@nongnu.org; Tue, 30 May 2017 04:37:11 -0400
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1dFceR-0005TU-Qv
+	for qemu-devel@nongnu.org; Tue, 30 May 2017 04:37:16 -0400
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
 	[10.5.11.15])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id EBBCC448D60
-	for <qemu-devel@nongnu.org>; Tue, 30 May 2017 08:37:08 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id D50A081235
+	for <qemu-devel@nongnu.org>; Tue, 30 May 2017 08:37:14 +0000 (UTC)
 From: Juan Quintela <quintela@redhat.com>
-Date: Tue, 30 May 2017 10:37:02 +0200
-Message-Id: <20170530083705.15141-1-quintela@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 0/3] Remove of loadvm handlers
+Date: Tue, 30 May 2017 10:37:04 +0200
+Message-Id: <20170530083705.15141-3-quintela@redhat.com>
+In-Reply-To: <20170530083705.15141-1-quintela@redhat.com>
+References: <20170530083705.15141-1-quintela@redhat.com>
+Subject: [Qemu-devel] [PATCH v2 2/3] migration: loadvm handlers are not used
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,34 +32,140 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: dgilbert@redhat.com, lvivier@redhat.com, peterx@redhat.com
 
-Hi
+So we remove all traces of them.
 
-Changes from v1
-- store load_version_id field to SaveStateHandler
-- Adjust everything to use it
-
-Thanks to Laurent to point that to me.
-
-Please Review.
-
-[v1]
-We just have a loadvm handlers that are a new list only used in a
-single place.  Just move everything to use the savevm_handlers (yes,
-it is a list, and we could have a better name).
-
-Once there, vmstate_load() had three arguments but only needs two.  Fix that.
-
-Juan Quintela (3):
-  migration: Use savevm_handlers instead of loadvm copy
-  migration: loadvm handlers are not used
-  migration: Remove section_id parameter from vmstate_load
-
- include/migration/migration.h |  5 ----
+Signed-off-by: Juan Quintela <quintela@redhat.com>
+---
+ include/migration/migration.h |  5 -----
  include/migration/vmstate.h   |  2 --
  include/qemu/typedefs.h       |  1 -
  migration/migration.c         |  2 --
- migration/savevm.c            | 61 ++++++++++++++-----------------------------
- 5 files changed, 19 insertions(+), 52 deletions(-)
+ migration/savevm.c            | 26 --------------------------
+ 5 files changed, 36 deletions(-)
 
+diff --git a/include/migration/migration.h b/include/migration/migration.h
+index 0e807b6..d1a353a 100644
+--- a/include/migration/migration.h
++++ b/include/migration/migration.h
+@@ -50,8 +50,6 @@ enum mig_rp_message_type {
+     MIG_RP_MSG_MAX
+ };
+ 
+-typedef QLIST_HEAD(, LoadStateEntry) LoadStateEntry_Head;
+-
+ /* State for the incoming migration */
+ struct MigrationIncomingState {
+     QEMUFile *from_src_file;
+@@ -89,9 +87,6 @@ struct MigrationIncomingState {
+     /* The coroutine we should enter (back) after failover */
+     Coroutine *migration_incoming_co;
+     QemuSemaphore colo_incoming_sem;
+-
+-    /* See savevm.c */
+-    LoadStateEntry_Head loadvm_handlers;
+ };
+ 
+ MigrationIncomingState *migration_incoming_get_current(void);
+diff --git a/include/migration/vmstate.h b/include/migration/vmstate.h
+index f97411d..6689562 100644
+--- a/include/migration/vmstate.h
++++ b/include/migration/vmstate.h
+@@ -1020,8 +1020,6 @@ extern const VMStateInfo vmstate_info_qtailq;
+ 
+ #define SELF_ANNOUNCE_ROUNDS 5
+ 
+-void loadvm_free_handlers(MigrationIncomingState *mis);
+-
+ int vmstate_load_state(QEMUFile *f, const VMStateDescription *vmsd,
+                        void *opaque, int version_id);
+ void vmstate_save_state(QEMUFile *f, const VMStateDescription *vmsd,
+diff --git a/include/qemu/typedefs.h b/include/qemu/typedefs.h
+index 33a6aa1..51958bf 100644
+--- a/include/qemu/typedefs.h
++++ b/include/qemu/typedefs.h
+@@ -39,7 +39,6 @@ typedef struct I2SCodec I2SCodec;
+ typedef struct ISABus ISABus;
+ typedef struct ISADevice ISADevice;
+ typedef struct IsaDma IsaDma;
+-typedef struct LoadStateEntry LoadStateEntry;
+ typedef struct MACAddr MACAddr;
+ typedef struct MachineClass MachineClass;
+ typedef struct MachineState MachineState;
+diff --git a/migration/migration.c b/migration/migration.c
+index ad29e53..891a260 100644
+--- a/migration/migration.c
++++ b/migration/migration.c
+@@ -121,7 +121,6 @@ MigrationIncomingState *migration_incoming_get_current(void)
+     if (!once) {
+         mis_current.state = MIGRATION_STATUS_NONE;
+         memset(&mis_current, 0, sizeof(MigrationIncomingState));
+-        QLIST_INIT(&mis_current.loadvm_handlers);
+         qemu_mutex_init(&mis_current.rp_mutex);
+         qemu_event_init(&mis_current.main_thread_load_event, false);
+         once = true;
+@@ -134,7 +133,6 @@ void migration_incoming_state_destroy(void)
+     struct MigrationIncomingState *mis = migration_incoming_get_current();
+ 
+     qemu_event_destroy(&mis->main_thread_load_event);
+-    loadvm_free_handlers(mis);
+ }
+ 
+ 
+diff --git a/migration/savevm.c b/migration/savevm.c
+index d7c08c3..14af5ad 100644
+--- a/migration/savevm.c
++++ b/migration/savevm.c
+@@ -1781,13 +1781,6 @@ static int loadvm_process_command(QEMUFile *f)
+     return 0;
+ }
+ 
+-struct LoadStateEntry {
+-    QLIST_ENTRY(LoadStateEntry) entry;
+-    SaveStateEntry *se;
+-    int section_id;
+-    int version_id;
+-};
+-
+ /*
+  * Read a footer off the wire and check that it matches the expected section
+  *
+@@ -1823,22 +1816,11 @@ static bool check_section_footer(QEMUFile *f, SaveStateEntry *se)
+     return true;
+ }
+ 
+-void loadvm_free_handlers(MigrationIncomingState *mis)
+-{
+-    LoadStateEntry *le, *new_le;
+-
+-    QLIST_FOREACH_SAFE(le, &mis->loadvm_handlers, entry, new_le) {
+-        QLIST_REMOVE(le, entry);
+-        g_free(le);
+-    }
+-}
+-
+ static int
+ qemu_loadvm_section_start_full(QEMUFile *f, MigrationIncomingState *mis)
+ {
+     uint32_t instance_id, version_id, section_id;
+     SaveStateEntry *se;
+-    LoadStateEntry *le;
+     char idstr[256];
+     int ret;
+ 
+@@ -1876,14 +1858,6 @@ qemu_loadvm_section_start_full(QEMUFile *f, MigrationIncomingState *mis)
+         return -EINVAL;
+     }
+ 
+-    /* Add entry */
+-    le = g_malloc0(sizeof(*le));
+-
+-    le->se = se;
+-    le->section_id = section_id;
+-    le->version_id = version_id;
+-    QLIST_INSERT_HEAD(&mis->loadvm_handlers, le, entry);
+-
+     ret = vmstate_load(f, se, se->load_version_id);
+     if (ret < 0) {
+         error_report("error while loading state for instance 0x%x of"
 -- 
 2.9.4
