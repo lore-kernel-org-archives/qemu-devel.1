@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46065)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46062)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <anton.nefedov@virtuozzo.com>) id 1dFhfc-0005G8-UK
+	(envelope-from <anton.nefedov@virtuozzo.com>) id 1dFhfc-0005G7-Gf
 	for qemu-devel@nongnu.org; Tue, 30 May 2017 09:58:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <anton.nefedov@virtuozzo.com>) id 1dFhfZ-0007Il-1e
-	for qemu-devel@nongnu.org; Tue, 30 May 2017 09:58:49 -0400
+	(envelope-from <anton.nefedov@virtuozzo.com>) id 1dFhfX-0007IH-Vu
+	for qemu-devel@nongnu.org; Tue, 30 May 2017 09:58:48 -0400
 Received: from mail-he1eur01on0136.outbound.protection.outlook.com
 	([104.47.0.136]:15171
 	helo=EUR01-HE1-obe.outbound.protection.outlook.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <anton.nefedov@virtuozzo.com>)
-	id 1dFhfY-0007GL-MA
-	for qemu-devel@nongnu.org; Tue, 30 May 2017 09:58:44 -0400
+	id 1dFhfX-0007GL-Ny
+	for qemu-devel@nongnu.org; Tue, 30 May 2017 09:58:43 -0400
 From: Anton Nefedov <anton.nefedov@virtuozzo.com>
-Date: Tue, 30 May 2017 16:58:02 +0300
-Message-ID: <1496152683-102751-13-git-send-email-anton.nefedov@virtuozzo.com>
+Date: Tue, 30 May 2017 16:58:00 +0300
+Message-ID: <1496152683-102751-11-git-send-email-anton.nefedov@virtuozzo.com>
 In-Reply-To: <1496152683-102751-1-git-send-email-anton.nefedov@virtuozzo.com>
 References: <1496152683-102751-1-git-send-email-anton.nefedov@virtuozzo.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v3 12/13] serial: move TIOCM update to a
- separate function
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH v3 10/13] hmp: add hmp analogue for
+ qmp-chardev-change
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,80 +30,138 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: den@virtuozzo.com, pbonzini@redhat.com, marcandre.lureau@redhat.com, Anton Nefedov <anton.nefedov@virtuozzo.com>, "Michael S . Tsirkin" <mst@redhat.com>
-
-will be used by the following patch
+Cc: den@virtuozzo.com, pbonzini@redhat.com, marcandre.lureau@redhat.com, Anton Nefedov <anton.nefedov@virtuozzo.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
 
 Signed-off-by: Anton Nefedov <anton.nefedov@virtuozzo.com>
 Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-CC: Michael S. Tsirkin <mst@redhat.com>
-CC: Paolo Bonzini <pbonzini@redhat.com>
-Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+CC: Dr. David Alan Gilbert <dgilbert@redhat.com>
 ---
- hw/char/serial.c | 31 +++++++++++++++++++------------
- 1 file changed, 19 insertions(+), 12 deletions(-)
+ chardev/char.c        |  2 +-
+ hmp-commands.hx       | 16 ++++++++++++++++
+ hmp.c                 | 34 ++++++++++++++++++++++++++++++++++
+ hmp.h                 |  1 +
+ include/sysemu/char.h | 12 ++++++++++++
+ 5 files changed, 64 insertions(+), 1 deletion(-)
 
-diff --git a/hw/char/serial.c b/hw/char/serial.c
-index d8d34d0..1e6bdeb 100644
---- a/hw/char/serial.c
-+++ b/hw/char/serial.c
-@@ -312,6 +312,24 @@ static void serial_write_fcr(SerialState *s, uint8_t v=
-al)
-     }
+diff --git a/chardev/char.c b/chardev/char.c
+index 2d6e204..1e2a2dd 100644
+--- a/chardev/char.c
++++ b/chardev/char.c
+@@ -888,7 +888,7 @@ help_string_append(const char *name, void *opaque)
+     g_string_append_printf(str, "\n%s", name);
  }
-=20
-+static void serial_update_tiocm(SerialState *s)
+ 
+-static ChardevBackend *qemu_chr_parse_opts(QemuOpts *opts, Error **errp)
++ChardevBackend *qemu_chr_parse_opts(QemuOpts *opts, Error **errp)
+ {
+     Error *local_err = NULL;
+     const ChardevClass *cc;
+diff --git a/hmp-commands.hx b/hmp-commands.hx
+index baeac47..19bfddd 100644
+--- a/hmp-commands.hx
++++ b/hmp-commands.hx
+@@ -1727,6 +1727,22 @@ chardev_add accepts the same parameters as the -chardev command line switch.
+ ETEXI
+ 
+     {
++        .name       = "chardev-change",
++        .args_type  = "id:s,args:s",
++        .params     = "id args",
++        .help       = "change chardev",
++        .cmd        = hmp_chardev_change,
++    },
++
++STEXI
++@item chardev-change args
++@findex chardev-change
++chardev_change accepts existing chardev @var{id} and then the same arguments
++as the -chardev command line switch (except for "id").
++
++ETEXI
++
++    {
+         .name       = "chardev-remove",
+         .args_type  = "id:s",
+         .params     = "id",
+diff --git a/hmp.c b/hmp.c
+index 20f5dab..7660495 100644
+--- a/hmp.c
++++ b/hmp.c
+@@ -2224,6 +2224,40 @@ void hmp_chardev_add(Monitor *mon, const QDict *qdict)
+     hmp_handle_error(mon, &err);
+ }
+ 
++void hmp_chardev_change(Monitor *mon, const QDict *qdict)
 +{
-+    int flags;
-+
-+    qemu_chr_fe_ioctl(&s->chr, CHR_IOCTL_SERIAL_GET_TIOCM, &flags);
-+
-+    flags &=3D ~(CHR_TIOCM_RTS | CHR_TIOCM_DTR);
-+
-+    if (s->mcr & UART_MCR_RTS) {
-+        flags |=3D CHR_TIOCM_RTS;
++    const char *args = qdict_get_str(qdict, "args");
++    const char *id;
++    Error *err = NULL;
++    ChardevBackend *backend = NULL;
++    ChardevReturn *ret = NULL;
++    QemuOpts *opts = qemu_opts_parse_noisily(qemu_find_opts("chardev"), args,
++                                             true);
++    if (!opts) {
++        error_setg(&err, "Parsing chardev args failed");
++        goto end;
 +    }
-+    if (s->mcr & UART_MCR_DTR) {
-+        flags |=3D CHR_TIOCM_DTR;
++
++    id = qdict_get_str(qdict, "id");
++    if (qemu_opts_id(opts)) {
++        error_setg(&err, "Unexpected 'id' parameter");
++        goto end;
 +    }
 +
-+    qemu_chr_fe_ioctl(&s->chr, CHR_IOCTL_SERIAL_SET_TIOCM, &flags);
++    backend = qemu_chr_parse_opts(opts, &err);
++    if (!backend) {
++        goto end;
++    }
++
++    ret = qmp_chardev_change(id, backend, &err);
++
++end:
++    qapi_free_ChardevReturn(ret);
++    qapi_free_ChardevBackend(backend);
++    qemu_opts_del(opts);
++    hmp_handle_error(mon, &err);
 +}
 +
- static void serial_ioport_write(void *opaque, hwaddr addr, uint64_t val,
-                                 unsigned size)
+ void hmp_chardev_remove(Monitor *mon, const QDict *qdict)
  {
-@@ -426,24 +444,13 @@ static void serial_ioport_write(void *opaque, hwaddr =
-addr, uint64_t val,
-         break;
-     case 4:
-         {
--            int flags;
-             int old_mcr =3D s->mcr;
-             s->mcr =3D val & 0x1f;
-             if (val & UART_MCR_LOOP)
-                 break;
-=20
-             if (s->poll_msl >=3D 0 && old_mcr !=3D s->mcr) {
--
--                qemu_chr_fe_ioctl(&s->chr, CHR_IOCTL_SERIAL_GET_TIOCM, &fl=
-ags);
--
--                flags &=3D ~(CHR_TIOCM_RTS | CHR_TIOCM_DTR);
--
--                if (val & UART_MCR_RTS)
--                    flags |=3D CHR_TIOCM_RTS;
--                if (val & UART_MCR_DTR)
--                    flags |=3D CHR_TIOCM_DTR;
--
--                qemu_chr_fe_ioctl(&s->chr, CHR_IOCTL_SERIAL_SET_TIOCM, &fl=
-ags);
-+                serial_update_tiocm(s);
-                 /* Update the modem status after a one-character-send wait=
--time, since there may be a response
-                    from the device/computer at the other end of the serial=
- line */
-                 timer_mod(s->modem_status_poll, qemu_clock_get_ns(QEMU_CLO=
-CK_VIRTUAL) + s->char_transmit_time);
---=20
+     Error *local_err = NULL;
+diff --git a/hmp.h b/hmp.h
+index d8b94ce..23e035c 100644
+--- a/hmp.h
++++ b/hmp.h
+@@ -102,6 +102,7 @@ void hmp_nbd_server_start(Monitor *mon, const QDict *qdict);
+ void hmp_nbd_server_add(Monitor *mon, const QDict *qdict);
+ void hmp_nbd_server_stop(Monitor *mon, const QDict *qdict);
+ void hmp_chardev_add(Monitor *mon, const QDict *qdict);
++void hmp_chardev_change(Monitor *mon, const QDict *qdict);
+ void hmp_chardev_remove(Monitor *mon, const QDict *qdict);
+ void hmp_qemu_io(Monitor *mon, const QDict *qdict);
+ void hmp_cpu_add(Monitor *mon, const QDict *qdict);
+diff --git a/include/sysemu/char.h b/include/sysemu/char.h
+index 342f531..18fcd26 100644
+--- a/include/sysemu/char.h
++++ b/include/sysemu/char.h
+@@ -131,6 +131,18 @@ Chardev *qemu_chr_new_from_opts(QemuOpts *opts,
+ void qemu_chr_parse_common(QemuOpts *opts, ChardevCommon *backend);
+ 
+ /**
++ * @qemu_chr_parse_opts:
++ *
++ * Parse the options to the ChardevBackend struct.
++ *
++ * @opts
++ *
++ * Returns: a new backend
++ */
++ChardevBackend *qemu_chr_parse_opts(QemuOpts *opts,
++                                    Error **errp);
++
++/**
+  * @qemu_chr_new:
+  *
+  * Create a new character backend from a URI.
+-- 
 2.7.4
