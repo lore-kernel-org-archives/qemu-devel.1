@@ -1,19 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59056)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59923)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1dFeWN-0005uO-Ga
-	for qemu-devel@nongnu.org; Tue, 30 May 2017 06:37:04 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1dFeZc-0000UM-FL
+	for qemu-devel@nongnu.org; Tue, 30 May 2017 06:40:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1dFeWK-0001S7-9Y
-	for qemu-devel@nongnu.org; Tue, 30 May 2017 06:37:03 -0400
-Received: from mailhub.sw.ru ([195.214.232.25]:2529 helo=relay.sw.ru)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
-	id 1dFeWJ-0001Rv-UZ
-	for qemu-devel@nongnu.org; Tue, 30 May 2017 06:37:00 -0400
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Tue, 30 May 2017 13:36:37 +0300
-Message-Id: <20170530103641.68891-1-vsementsov@virtuozzo.com>
-Subject: [Qemu-devel] [PATCH 0/4] qemu-img check: format allocation info
+	(envelope-from <peter.maydell@linaro.org>) id 1dFeZb-0002WL-HF
+	for qemu-devel@nongnu.org; Tue, 30 May 2017 06:40:24 -0400
+Received: from mail-wm0-x22c.google.com ([2a00:1450:400c:c09::22c]:36928)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1dFeZb-0002WF-AJ
+	for qemu-devel@nongnu.org; Tue, 30 May 2017 06:40:23 -0400
+Received: by mail-wm0-x22c.google.com with SMTP id d127so92059692wmf.0
+	for <qemu-devel@nongnu.org>; Tue, 30 May 2017 03:40:23 -0700 (PDT)
+MIME-Version: 1.0
+In-Reply-To: <87h90d3sz9.fsf@linaro.org>
+References: <87h90d3sz9.fsf@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 30 May 2017 11:40:00 +0100
+Message-ID: <CAFEAcA8hjzRm7-jxQ8zWt6Cuq50EM2sET5OLvRRKRsMKH1BdCw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] sparc64 linux-user status
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,44 +29,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: eblake@redhat.com, armbru@redhat.com, mreitz@redhat.com, kwolf@redhat.com, vsementsov@virtuozzo.com, den@openvz.org
+To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+Cc: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Artyom Tarasenko <atar4qemu@gmail.com>, Richard Henderson <rth@twiddle.net>, Fam Zheng <famz@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
 
-Hi all.
+On 22 May 2017 at 14:45, Alex Benn=C3=A9e <alex.bennee@linaro.org> wrote:
+> While looking at some of the docker cross-build patches I thought I'd
+> checkout if I could still bootstrap some Debian linux-user images. I
+> made some tweaks to allow debootstrap to bootstrap from Debian's ports
+> to see if I could get the SPARC64 file-system up and running:
+>
+>  https://github.com/stsquad/qemu/commits/docker/sparc64-linux-user
+>
+> However when I try to run it:
+>
+>   make docker-image-debian-sparc64-user V=3D1
+>
+> It fails
 
-These series is a replacement for "qemu-img check: unallocated size"
-series.
+Doesn't surprise me very much, IIRC the last time I tried the
+sparc linux-user code it was a bit broken (worked for simple
+stuff, not for more complicated stuff). My pull tests include
+a basic "can we run ls" for sparc64, but nothing more.
 
-There was a question, should we account allocated clusters in qcow2 but
-actually holes in underalying file as allocated or not. Instead of
-hiding this information in one-number statistic I've decided to print
-the whole information, 5 numbers:
+(In particular SPARC is BE so if we messed up on anything that
+needs struct endianness swapping it will hit it.)
 
-For allocated by top-level format driver (qcow2 for ex.) clusters, 3
-numbers: number of bytes, which are:
- - allocated in underlying file
- - holes in underlying file
- - after end of underlying file
-
-To account other areas of underlying file, 2 more numbers of bytes:
- - unallocated by top-level driver but allocated in underlying file
- - unallocated by top-level driver and holes in underlying file
-
-Vladimir Sementsov-Ogievskiy (4):
-  block: add bdrv_get_format_alloc_stat format interface
-  qcow2: add .bdrv_get_format_alloc_stat
-  qemu-img check: add format allocation info
-  qemu-img check: improve dump_human_format_alloc_info
-
- block.c                   |  16 ++++++
- block/qcow2-refcount.c    | 144 ++++++++++++++++++++++++++++++++++++++++++++++
- block/qcow2.c             |   2 +
- block/qcow2.h             |   2 +
- include/block/block.h     |   3 +
- include/block/block_int.h |   2 +
- qapi/block-core.json      |  32 ++++++++++-
- qemu-img.c                |  57 +++++++++++++++++-
- 8 files changed, 255 insertions(+), 3 deletions(-)
-
--- 
-2.11.1
+thanks
+-- PMM
