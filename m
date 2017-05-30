@@ -1,35 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40428)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41410)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1dFhOh-0007IM-1u
-	for qemu-devel@nongnu.org; Tue, 30 May 2017 09:41:24 -0400
+	(envelope-from <vyasevic@redhat.com>) id 1dFhSz-0002n1-He
+	for qemu-devel@nongnu.org; Tue, 30 May 2017 09:45:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1dFhOd-00023t-0K
-	for qemu-devel@nongnu.org; Tue, 30 May 2017 09:41:19 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:58093
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1dFhOc-00023e-Q4
-	for qemu-devel@nongnu.org; Tue, 30 May 2017 09:41:14 -0400
-Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v4UDcfrV072159
-	for <qemu-devel@nongnu.org>; Tue, 30 May 2017 09:41:14 -0400
-Received: from e06smtp10.uk.ibm.com (e06smtp10.uk.ibm.com [195.75.94.106])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2as8efm32n-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 30 May 2017 09:41:13 -0400
-Received: from localhost
-	by e06smtp10.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <groug@kaod.org>;
-	Tue, 30 May 2017 14:41:12 +0100
-From: Greg Kurz <groug@kaod.org>
-Date: Tue, 30 May 2017 15:40:37 +0200
-In-Reply-To: <1496151640-29919-1-git-send-email-groug@kaod.org>
-References: <1496151640-29919-1-git-send-email-groug@kaod.org>
-Message-Id: <1496151640-29919-9-git-send-email-groug@kaod.org>
-Subject: [Qemu-devel] [PULL v2 08/11] 9pfs: check return value of
- v9fs_co_name_to_path()
+	(envelope-from <vyasevic@redhat.com>) id 1dFhSw-0003DC-DP
+	for qemu-devel@nongnu.org; Tue, 30 May 2017 09:45:45 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40028)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <vyasevic@redhat.com>) id 1dFhSw-00039Z-5n
+	for qemu-devel@nongnu.org; Tue, 30 May 2017 09:45:42 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 78D9FC0094F7
+	for <qemu-devel@nongnu.org>; Tue, 30 May 2017 13:45:38 +0000 (UTC)
+Reply-To: vyasevic@redhat.com
+References: <1495649128-10529-1-git-send-email-vyasevic@redhat.com>
+	<1495649128-10529-2-git-send-email-vyasevic@redhat.com>
+	<87poeqhdji.fsf@secure.mitica>
+From: Vlad Yasevich <vyasevic@redhat.com>
+Message-ID: <9c89a465-1268-4213-2ae3-dd8f034b48a7@redhat.com>
+Date: Tue, 30 May 2017 09:45:28 -0400
+MIME-Version: 1.0
+In-Reply-To: <87poeqhdji.fsf@secure.mitica>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 01/12] migration: Introduce announce
+ parameters
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,105 +36,93 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Stefan Hajnoczi <stefanha@redhat.com>, Greg Kurz <groug@kaod.org>
+To: quintela@redhat.com
+Cc: qemu-devel@nongnu.org, dgilbert@redhat.com, germano@redhat.com, lvivier@redhat.com, jasowang@redhat.com, jdenemar@redhat.com, kashyap@redhat.com, armbru@redhat.com, mst@redhat.com
 
-These v9fs_co_name_to_path() call sites have always been around. I guess
-no care was taken to check the return value because the name_to_path
-operation could never fail at the time. This is no longer true: the
-handle and synth backends can already fail this operation, and so will the
-local backend soon.
+On 05/30/2017 05:58 AM, Juan Quintela wrote:
+> Vladislav Yasevich <vyasevic@redhat.com> wrote:
+>> Add parameters that control RARP/GARP announcement timeouts.
+>> The parameters structure is added to the QAPI and a qmp command
+>> is added to set/get the parameter data.
+>>
+>> Based on work by "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+>>
+>> Signed-off-by: Vladislav Yasevich <vyasevic@redhat.com>
+> 
+> Hi
+> 
+>> diff --git a/migration/savevm.c b/migration/savevm.c
+>> index f5e8194..cee2837 100644
+>> --- a/migration/savevm.c
+>> +++ b/migration/savevm.c
+>> @@ -78,6 +78,104 @@ static struct mig_cmd_args {
+>>      [MIG_CMD_MAX]              = { .len = -1, .name = "MAX" },
+>>  };
+>>  
+> 
+> Once that you are touching this, shouldn't it be better to be in
+> net/<somewhere>?
+> They have nothing to do with migration really.
+> 
 
-Signed-off-by: Greg Kurz <groug@kaod.org>
-Reviewed-by: Eric Blake <eblake@redhat.com>
----
- hw/9pfs/9p.c | 36 +++++++++++++++++++++++++-----------
- 1 file changed, 25 insertions(+), 11 deletions(-)
+Yeah, I considered this, but could really find a good slot for them.
+I can either put them into net.c directly or pull them out into their
+own little file.
 
-diff --git a/hw/9pfs/9p.c b/hw/9pfs/9p.c
-index a25d31e62f1c..96d268334865 100644
---- a/hw/9pfs/9p.c
-+++ b/hw/9pfs/9p.c
-@@ -2571,7 +2571,10 @@ static int coroutine_fn v9fs_complete_rename(V9fsPDU *pdu, V9fsFidState *fidp,
-             err = -EINVAL;
-             goto out;
-         }
--        v9fs_co_name_to_path(pdu, &dirfidp->path, name->data, &new_path);
-+        err = v9fs_co_name_to_path(pdu, &dirfidp->path, name->data, &new_path);
-+        if (err < 0) {
-+            goto out;
-+        }
-     } else {
-         old_name = fidp->path.data;
-         end = strrchr(old_name, '/');
-@@ -2583,8 +2586,11 @@ static int coroutine_fn v9fs_complete_rename(V9fsPDU *pdu, V9fsFidState *fidp,
-         new_name = g_malloc0(end - old_name + name->size + 1);
-         strncat(new_name, old_name, end - old_name);
-         strncat(new_name + (end - old_name), name->data, name->size);
--        v9fs_co_name_to_path(pdu, NULL, new_name, &new_path);
-+        err = v9fs_co_name_to_path(pdu, NULL, new_name, &new_path);
-         g_free(new_name);
-+        if (err < 0) {
-+            goto out;
-+        }
-     }
-     err = v9fs_co_rename(pdu, &fidp->path, &new_path);
-     if (err < 0) {
-@@ -2664,20 +2670,26 @@ out_nofid:
-     v9fs_string_free(&name);
- }
- 
--static void coroutine_fn v9fs_fix_fid_paths(V9fsPDU *pdu, V9fsPath *olddir,
--                                            V9fsString *old_name,
--                                            V9fsPath *newdir,
--                                            V9fsString *new_name)
-+static int coroutine_fn v9fs_fix_fid_paths(V9fsPDU *pdu, V9fsPath *olddir,
-+                                           V9fsString *old_name,
-+                                           V9fsPath *newdir,
-+                                           V9fsString *new_name)
- {
-     V9fsFidState *tfidp;
-     V9fsPath oldpath, newpath;
-     V9fsState *s = pdu->s;
--
-+    int err;
- 
-     v9fs_path_init(&oldpath);
-     v9fs_path_init(&newpath);
--    v9fs_co_name_to_path(pdu, olddir, old_name->data, &oldpath);
--    v9fs_co_name_to_path(pdu, newdir, new_name->data, &newpath);
-+    err = v9fs_co_name_to_path(pdu, olddir, old_name->data, &oldpath);
-+    if (err < 0) {
-+        goto out;
-+    }
-+    err = v9fs_co_name_to_path(pdu, newdir, new_name->data, &newpath);
-+    if (err < 0) {
-+        goto out;
-+    }
- 
-     /*
-      * Fixup fid's pointing to the old name to
-@@ -2689,8 +2701,10 @@ static void coroutine_fn v9fs_fix_fid_paths(V9fsPDU *pdu, V9fsPath *olddir,
-             v9fs_fix_path(&tfidp->path, &newpath, strlen(oldpath.data));
-         }
-     }
-+out:
-     v9fs_path_free(&oldpath);
-     v9fs_path_free(&newpath);
-+    return err;
- }
- 
- static int coroutine_fn v9fs_complete_renameat(V9fsPDU *pdu, int32_t olddirfid,
-@@ -2724,8 +2738,8 @@ static int coroutine_fn v9fs_complete_renameat(V9fsPDU *pdu, int32_t olddirfid,
-     }
-     if (s->ctx.export_flags & V9FS_PATHNAME_FSCONTEXT) {
-         /* Only for path based fid  we need to do the below fixup */
--        v9fs_fix_fid_paths(pdu, &olddirfidp->path, old_name,
--                           &newdirfidp->path, new_name);
-+        err = v9fs_fix_fid_paths(pdu, &olddirfidp->path, old_name,
-+                                 &newdirfidp->path, new_name);
-     }
- out:
-     if (olddirfidp) {
--- 
-2.7.5
+> 
+>> +#define QEMU_ANNOUNCE_INITIAL    50
+>> +#define QEMU_ANNOUNCE_MAX       550
+>> +#define QEMU_ANNOUNCE_ROUNDS      5
+>> +#define QEMU_ANNOUNCE_STEP      100
+>> +
+>> +AnnounceParameters *qemu_get_announce_params(void)
+>> +{
+>> +    static AnnounceParameters announce = {
+>> +        .initial = QEMU_ANNOUNCE_INITIAL,
+>> +        .max = QEMU_ANNOUNCE_MAX,
+>> +        .rounds = QEMU_ANNOUNCE_ROUNDS,
+>> +        .step = QEMU_ANNOUNCE_STEP,
+>> +    };
+>> +
+>> +    return &announce;
+>> +}
+>> +
+>> +void qemu_fill_announce_parameters(AnnounceParameters **to,
+>> +                                   AnnounceParameters *from)
+>> +{
+>> +    AnnounceParameters *params;
+>> +
+>> +    params = *to = g_malloc0(sizeof(*params));
+>> +    params->has_initial = true;
+>> +    params->initial = from->initial;
+>> +    params->has_max = true;
+>> +    params->max = from->max;
+>> +    params->has_rounds = true;
+>> +    params->rounds = from->rounds;
+>> +    params->has_step = true;
+>> +    params->step = from->step;
+>> +}
+>> +
+>> +bool qemu_validate_announce_parameters(AnnounceParameters *params, Error **errp)
+>> +{
+>> +    if (params->has_initial &&
+>> +        (params->initial < 1 || params->initial > 100000)) {
+> 
+> This is independent of this patch, but we really need a macro:
+>   CHECK(field, mininum, maximum)
+> 
+> We repeat this left and right.
+> 
+>> +void qemu_set_announce_parameters(AnnounceParameters *announce_params,
+>> +                                  AnnounceParameters *params)
+> 
+>> +void qmp_announce_set_parameters(AnnounceParameters *params, Error **errp)
+> 
+> Really similar functions name.  I assume by know that the 1st function
+> is used somewhere else in the series.
+> 
+
+Yes, the first function is going to be used later.
+
+Thanks
+-vlad
