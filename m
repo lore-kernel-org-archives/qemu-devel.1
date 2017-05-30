@@ -1,24 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34971)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44633)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhlcindy@gmail.com>) id 1dFY4e-00009Z-2u
-	for qemu-devel@nongnu.org; Mon, 29 May 2017 23:44:01 -0400
+	(envelope-from <armbru@redhat.com>) id 1dFZaG-00049t-Kk
+	for qemu-devel@nongnu.org; Tue, 30 May 2017 01:20:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zhlcindy@gmail.com>) id 1dFY4b-0001GZ-0N
-	for qemu-devel@nongnu.org; Mon, 29 May 2017 23:44:00 -0400
-References: <1495790468-23862-1-git-send-email-zhlcindy@gmail.com>
-	<20170526132114.6edc006e@nial.brq.redhat.com>
-	<CAD8of+pw5Nh4oSkTuYX4fbJvA8=-CTmn6dgdXHPLERAcQM+Oyw@mail.gmail.com>
-	<20170529124339.43eea1c5@nial.brq.redhat.com>
-In-Reply-To: <20170529124339.43eea1c5@nial.brq.redhat.com>
-Mime-Version: 1.0 (1.0)
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain;
-	charset=gb2312
-Message-Id: <1B0ED5FF-7254-41AD-B53F-B7EE201C2A15@gmail.com>
-From: Li Zhang <zhlcindy@gmail.com>
-Date: Tue, 30 May 2017 11:43:54 +0800
-Subject: Re: [Qemu-devel] [PATCH 0/3] arm/virt: refine virt.c code and
- implement hot_add_cpu interface
+	(envelope-from <armbru@redhat.com>) id 1dFZaF-0000oy-91
+	for qemu-devel@nongnu.org; Tue, 30 May 2017 01:20:44 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <1494585229-9119-1-git-send-email-thuth@redhat.com>
+Date: Tue, 30 May 2017 07:20:34 +0200
+In-Reply-To: <1494585229-9119-1-git-send-email-thuth@redhat.com> (Thomas
+	Huth's message of "Fri, 12 May 2017 12:33:49 +0200")
+Message-ID: <87k24yudi5.fsf@dusky.pond.sub.org>
+MIME-Version: 1.0
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v2] blockdev: Print a warning for legacy
+ drive options that belong to -device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,94 +23,123 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: peter.maydell@linaro.org, qemu-arm@nongnu.org, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Li Zhang <li.zhang@hxt-semitech.com>
+To: Thomas Huth <thuth@redhat.com>
+Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
 
+Thomas Huth <thuth@redhat.com> writes:
 
+> We likely do not want to carry these legacy -drive options along forever.
+> Let's emit a deprecation warning for the -drive options that have a
+> replacement with the -device option, so that the (hopefully few) remaining
+> users are aware of this and can adapt their scripts / behaviour accordingly.
+>
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> ---
+>  v2:
+>  - Check for !qtest_enabled() since tests/hd-geo-test still uses these
+>  - Added "addr" to the list, too
+>  - Also mark the options as deprecated in the documentation
+>
+>  blockdev.c      | 14 ++++++++++++++
+>  qemu-options.hx |  5 ++++-
+>  2 files changed, 18 insertions(+), 1 deletion(-)
+>
+> diff --git a/blockdev.c b/blockdev.c
+> index 0b38c3d..aef38f0 100644
+> --- a/blockdev.c
+> +++ b/blockdev.c
+> @@ -50,6 +50,7 @@
+>  #include "qmp-commands.h"
+>  #include "block/trace.h"
+>  #include "sysemu/arch_init.h"
+> +#include "sysemu/qtest.h"
+>  #include "qemu/cutils.h"
+>  #include "qemu/help_option.h"
+>  #include "qemu/throttle-options.h"
+> @@ -797,6 +798,9 @@ DriveInfo *drive_new(QemuOpts *all_opts, BlockInterfaceType block_default_type)
+>      const char *filename;
+>      Error *local_err = NULL;
+>      int i;
+> +    const char *deprecated[] = {
+> +        "serial", "trans", "secs", "heads", "cyls", "addr"
+> +    };
 
-> =D4=DA 2017=C4=EA5=D4=C229=C8=D5=A3=AC=CF=C2=CE=E76:43=A3=ACIgor Mammedov <=
-imammedo@redhat.com> =D0=B4=B5=C0=A3=BA
->=20
-> On Sat, 27 May 2017 10:32:33 +0800
-> Li Zhang <zhlcindy@gmail.com> wrote:
->=20
->>> On Fri, May 26, 2017 at 7:21 PM, Igor Mammedov <imammedo@redhat.com> wro=
-te:
->>> On Fri, 26 May 2017 17:21:05 +0800
->>> Li Zhang <zhlcindy@gmail.com> wrote:
->>>=20
->>>> From: Li Zhang <li.zhang@hxt-semitech.com>
->>>>=20
->>>> virt machine doesn't support hot_add_cpu interface. This patchset is to=
- implement
->>>> hot_add_cpu interface. A CPU can be added by QMP command with QEMU moni=
-tor.
->>>>=20
->>>> Here is command to add a CPU with QMP command.
->>>>=20
->>>> * qemu-system-aarch64 -machine virt -cpu cortex-a15 -smp 1,maxcpus=3D4 \=
+I know I worked on turning (some of?) these into qdev properties, but
+I've since forgotten the details, so let me review their current state
+real quick:
 
->>>>    -monitor telnet:127.0.0.1:4444,server,nowait -nographic
->>>> * connect monitor:      telnet 127.0.0.1 4444
->>>> * execute qmp command:  cpu-add 1 =20
->>> cpu-add command shouldn't be used for new cpu hotplug,
->>> pls use generic device_add for that. =20
->>=20
->> Ok,  I will drop this command and look at device_add.
->>=20
->>>=20
->>> The last time I looked at it, virt machine needed quite a bit of
->>> re-factoring of the way it creates/wires up CPUs. =20
->>=20
->> Yes, I am looking into it and see if I can do something:)
->>=20
->>>=20
->>> Pls see usage of following callbacks for example on how to implement
->>> device_add based cpu hotplug:
->>>=20
->>>  get_hotplug_handler
->>>  pc_cpu_pre_plug
->>>  pc_cpu_plug
->>>  pc_possible_cpu_arch_ids
->>>=20
->>> and pc_cpus_init() for initial cpu creation with above callbacks in use
->>>=20
->> Thanks, I will see it. :)
->>=20
->>>>=20
->>>> Currently, when KVM is enabled and add a CPU with QMP command, QEMU
->>>> reports error "kvm_init_vcpu failed: Device or resourc busy". KVM can't=
+* "serial": Silently ignored unless the device model chooses to pick it
+  up.  Device models with a serial number should pick it up as a
+  compatibility fallback for their qdev property, with blkconf_serial().
+  Goes back to 2010-2011:
 
->>>> create a new CPU when vgic has been initialized and irqchip_in_kernel i=
-n
->>>> function kvm_arch_vcpu_create. It needs to change KVM code in the futur=
-e. =20
->>> if KVM isn't capable do it yet, then qemu should refuse cpu hotplug if r=
-unning
->>> with KVM accelarator and allow it only in TCG mode. =20
->>=20
->> OK, I will add an assertion to allow hotplug only in TCG mode.
-> instead of assert which will crash guest on hotplug,
-> just disable hotplug gracefully (for example set error in pre_plug handler=
-)
+  a8686a9 virtio-blk: Turn drive serial into a qdev property
+  c3a90cb usb-storage: Turn drive serial into a qdev property usb-storage.serial
+  a0fef65 scsi: Turn drive serial into a qdev property scsi-disk.serial
+  6ced55a ide: Turn drive serial into a qdev property ide-drive.serial
 
-OK, got it.
+* "trans", "secs", "heads", "cyls": Similar, with blkconf_geometry().
+  Goes back to 2012.
 
->=20
->>=20
->>>=20
->>>>=20
->>>> Li Zhang (3):
->>>>  arm/virt: Refine fdt_add_cpu_nodes code
->>>>  arm/virt: Refine code of machvirt_init
->>>>  arm/virt: Implement hot_add_cpu interface
->>>>=20
->>>> hw/arm/virt.c | 344 ++++++++++++++++++++++++++++++++++-----------------=
--------
->>>> 1 file changed, 202 insertions(+), 142 deletions(-)
->>>>=20
->>>=20
->>=20
->>=20
->>=20
->=20
+  6e6f61a ide: qdev property for BIOS CHS translation
+  ba80196 ide: qdev properties for disk geometry
+  e63e7fd virtio-blk: qdev properties for disk geometry
+  d252df4 scsi-hd: qdev properties for disk geometry
+
+* "addr": Only accepted with if=virtio.  drive_new() desugars it into
+  the qdev property.
+
+Okay.
+
+>  
+>      /* Change legacy command line options into QMP ones */
+>      static const struct {
+> @@ -880,6 +884,16 @@ DriveInfo *drive_new(QemuOpts *all_opts, BlockInterfaceType block_default_type)
+       if (qemu_opt_get(legacy_opts, "boot") != NULL) {
+           fprintf(stderr, "qemu-kvm: boot=on|off is deprecated and will be "
+                   "ignored. Future versions will reject this parameter. Please "
+>                  "update your scripts.\n");
+
+Unrelated to this patch: this is ugly.  It's also almost three years
+old.  Can we bury the corpse already?
+
+>      }
+>  
+> +    /* Other deprecated options */
+> +    if (!qtest_enabled()) {
+> +        for (i = 0; i < ARRAY_SIZE(deprecated); i++) {
+> +            if (qemu_opt_get(legacy_opts, deprecated[i]) != NULL) {
+> +                error_report("'%s' is deprecated, please use the corresponding "
+> +                             "option of '-device' instead", deprecated[i]);
+> +            }
+> +        }
+> +    }
+> +
+>      /* Media type */
+>      value = qemu_opt_get(legacy_opts, "media");
+>      if (value) {
+> diff --git a/qemu-options.hx b/qemu-options.hx
+> index 9d7964d..2f66f1a 100644
+> --- a/qemu-options.hx
+> +++ b/qemu-options.hx
+> @@ -615,6 +615,8 @@ of available connectors of a given interface type.
+>  This option defines the type of the media: disk or cdrom.
+>  @item cyls=@var{c},heads=@var{h},secs=@var{s}[,trans=@var{t}]
+>  These options have the same definition as they have in @option{-hdachs}.
+> +These parameters are deprecated, use the corresponding parameters
+> +of @code{-device} instead.
+>  @item snapshot=@var{snapshot}
+>  @var{snapshot} is "on" or "off" and controls snapshot mode for the given drive
+>  (see @option{-snapshot}).
+> @@ -631,7 +633,8 @@ an untrusted format header.
+>  @item serial=@var{serial}
+>  This option specifies the serial number to assign to the device.
+>  @item addr=@var{addr}
+> -Specify the controller's PCI address (if=virtio only).
+> +Specify the controller's PCI address (if=virtio only). This parameter is
+> +deprecated, use the corresponding parameter of @code{-device} instead.
+>  @item werror=@var{action},rerror=@var{action}
+>  Specify which @var{action} to take on write and read errors. Valid actions are:
+>  "ignore" (ignore the error and try to continue), "stop" (pause QEMU),
+
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
