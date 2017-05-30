@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33847)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33852)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1dFei7-0004hm-Ih
+	(envelope-from <vsementsov@virtuozzo.com>) id 1dFei7-0004ht-Ld
 	for qemu-devel@nongnu.org; Tue, 30 May 2017 06:49:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1dFei6-0005Bh-Ll
+	(envelope-from <vsementsov@virtuozzo.com>) id 1dFei6-0005Bs-Q6
 	for qemu-devel@nongnu.org; Tue, 30 May 2017 06:49:11 -0400
-Received: from mailhub.sw.ru ([195.214.232.25]:6389 helo=relay.sw.ru)
+Received: from mailhub.sw.ru ([195.214.232.25]:18301 helo=relay.sw.ru)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
-	id 1dFei6-0005Am-Ar
+	id 1dFei6-0005Aq-G0
 	for qemu-devel@nongnu.org; Tue, 30 May 2017 06:49:10 -0400
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Tue, 30 May 2017 13:48:57 +0300
-Message-Id: <20170530104857.70083-5-vsementsov@virtuozzo.com>
+Date: Tue, 30 May 2017 13:48:56 +0300
+Message-Id: <20170530104857.70083-4-vsementsov@virtuozzo.com>
 In-Reply-To: <20170530104857.70083-1-vsementsov@virtuozzo.com>
 References: <20170530104857.70083-1-vsementsov@virtuozzo.com>
-Subject: [Qemu-devel] [PATCH 4/4] qemu-img check: improve
- dump_human_format_alloc_info
+Subject: [Qemu-devel] [PATCH 3/4] qemu-img check: add format allocation info
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,88 +27,103 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, qemu-block@nongnu.org
 Cc: eblake@redhat.com, armbru@redhat.com, mreitz@redhat.com, kwolf@redhat.com, vsementsov@virtuozzo.com, den@openvz.org
 
-Improve dump_human_format_alloc_info() by specifying format names.
-
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 ---
- qemu-img.c | 35 ++++++++++++++++++++++++++---------
- 1 file changed, 26 insertions(+), 9 deletions(-)
+ qapi/block-core.json |  6 +++++-
+ qemu-img.c           | 36 ++++++++++++++++++++++++++++++++++++
+ 2 files changed, 41 insertions(+), 1 deletion(-)
 
+diff --git a/qapi/block-core.json b/qapi/block-core.json
+index 365070b3eb..3357b61811 100644
+--- a/qapi/block-core.json
++++ b/qapi/block-core.json
+@@ -203,6 +203,9 @@
+ #                       field is present if the driver for the image format
+ #                       supports it
+ #
++# @format-alloc-info: Format-allocation information, see
++#                     BlockFormatAllocInfo description. (Since: 2.10)
++#
+ # Since: 1.4
+ #
+ ##
+@@ -211,7 +214,8 @@
+            '*image-end-offset': 'int', '*corruptions': 'int', '*leaks': 'int',
+            '*corruptions-fixed': 'int', '*leaks-fixed': 'int',
+            '*total-clusters': 'int', '*allocated-clusters': 'int',
+-           '*fragmented-clusters': 'int', '*compressed-clusters': 'int' } }
++           '*fragmented-clusters': 'int', '*compressed-clusters': 'int',
++           '*format-alloc-info': 'BlockFormatAllocInfo' } }
+ 
+ ##
+ # @MapEntry:
 diff --git a/qemu-img.c b/qemu-img.c
-index 55f8c1776c..3c03690a4f 100644
+index b506839ef0..55f8c1776c 100644
 --- a/qemu-img.c
 +++ b/qemu-img.c
-@@ -560,7 +560,8 @@ static void dump_json_image_check(ImageCheck *check, bool quiet)
+@@ -560,6 +560,29 @@ static void dump_json_image_check(ImageCheck *check, bool quiet)
      QDECREF(str);
  }
  
--static void dump_human_format_alloc_info(BlockFormatAllocInfo *bfai, bool quiet)
-+static void dump_human_format_alloc_info(BlockDriverState *bs,
-+                                         BlockFormatAllocInfo *bfai, bool quiet)
- {
-     char *alloc_alloc = size_to_str(bfai->alloc_alloc);
-     char *alloc_hole = size_to_str(bfai->alloc_hole);
-@@ -568,13 +569,28 @@ static void dump_human_format_alloc_info(BlockFormatAllocInfo *bfai, bool quiet)
-     char *hole_alloc = size_to_str(bfai->hole_alloc);
-     char *hole_hole = size_to_str(bfai->hole_hole);
- 
-+    const char *format = bdrv_get_format_name(bs);
-+    const char *f_format =
-+        bs->file ? bdrv_get_format_name(bs->file->bs) : "file";
-+    int format_len, cw;
++static void dump_human_format_alloc_info(BlockFormatAllocInfo *bfai, bool quiet)
++{
++    char *alloc_alloc = size_to_str(bfai->alloc_alloc);
++    char *alloc_hole = size_to_str(bfai->alloc_hole);
++    char *alloc_overhead = size_to_str(bfai->alloc_overhead);
++    char *hole_alloc = size_to_str(bfai->hole_alloc);
++    char *hole_hole = size_to_str(bfai->hole_hole);
 +
-+    if (format == NULL) {
-+        format = "format";
-+    }
-+    if (f_format == NULL) {
-+        f_format = "file";
-+    }
-+    format_len = strlen(format);
-+    cw = MAX(10, strlen(f_format) + 6);
++    qprintf(quiet,
++            "Format allocation info (including metadata):\n"
++            "               file-alloc   file-hole   after-eof\n"
++            "format-alloc   %10s  %10s  %10s\n"
++            "format-hole    %10s  %10s\n",
++            alloc_alloc, alloc_hole, alloc_overhead,
++            hole_alloc, hole_hole);
 +
-     qprintf(quiet,
-             "Format allocation info (including metadata):\n"
--            "               file-alloc   file-hole   after-eof\n"
--            "format-alloc   %10s  %10s  %10s\n"
--            "format-hole    %10s  %10s\n",
--            alloc_alloc, alloc_hole, alloc_overhead,
--            hole_alloc, hole_hole);
-+            "%*s         %*s-alloc  %*s-hole  %*s\n"
-+            "%s-alloc   %*s  %*s  %*s\n"
-+            "%s-hole    %*s  %*s\n",
-+            format_len, "", cw - 6, f_format, cw - 5, f_format, cw, "after-eof",
-+            format, cw, alloc_alloc, cw, alloc_hole, cw, alloc_overhead,
-+            format, cw, hole_alloc, cw, hole_hole);
- 
-     g_free(alloc_alloc);
-     g_free(alloc_hole);
-@@ -583,7 +599,8 @@ static void dump_human_format_alloc_info(BlockFormatAllocInfo *bfai, bool quiet)
-     g_free(hole_hole);
- }
- 
--static void dump_human_image_check(ImageCheck *check, bool quiet)
-+static void dump_human_image_check(BlockDriverState *bs, ImageCheck *check,
-+                                   bool quiet)
++    g_free(alloc_alloc);
++    g_free(alloc_hole);
++    g_free(alloc_overhead);
++    g_free(hole_alloc);
++    g_free(hole_hole);
++}
++
+ static void dump_human_image_check(ImageCheck *check, bool quiet)
  {
      if (!(check->corruptions || check->leaks || check->check_errors)) {
-         qprintf(quiet, "No errors were found on the image.\n");
-@@ -626,7 +643,7 @@ static void dump_human_image_check(ImageCheck *check, bool quiet)
+@@ -601,6 +624,10 @@ static void dump_human_image_check(ImageCheck *check, bool quiet)
+         qprintf(quiet,
+                 "Image end offset: %" PRId64 "\n", check->image_end_offset);
      }
- 
-     if (check->has_format_alloc_info) {
--        dump_human_format_alloc_info(check->format_alloc_info, quiet);
-+        dump_human_format_alloc_info(bs, check->format_alloc_info, quiet);
-     }
++
++    if (check->has_format_alloc_info) {
++        dump_human_format_alloc_info(check->format_alloc_info, quiet);
++    }
  }
  
-@@ -840,7 +857,7 @@ static int img_check(int argc, char **argv)
-     if (!ret) {
-         switch (output_format) {
-         case OFORMAT_HUMAN:
--            dump_human_image_check(check, quiet);
-+            dump_human_image_check(bs, check, quiet);
-             break;
-         case OFORMAT_JSON:
-             dump_json_image_check(check, quiet);
+ static int collect_image_check(BlockDriverState *bs,
+@@ -611,6 +638,7 @@ static int collect_image_check(BlockDriverState *bs,
+ {
+     int ret;
+     BdrvCheckResult result;
++    BlockFormatAllocInfo *bfai = g_new0(BlockFormatAllocInfo, 1);
+ 
+     ret = bdrv_check(bs, &result, fix);
+     if (ret < 0) {
+@@ -639,6 +667,14 @@ static int collect_image_check(BlockDriverState *bs,
+     check->compressed_clusters      = result.bfi.compressed_clusters;
+     check->has_compressed_clusters  = result.bfi.compressed_clusters != 0;
+ 
++    ret = bdrv_get_format_alloc_stat(bs, bfai);
++    if (ret < 0) {
++        qapi_free_BlockFormatAllocInfo(bfai);
++    } else {
++        check->has_format_alloc_info = true;
++        check->format_alloc_info = bfai;
++    }
++
+     return 0;
+ }
+ 
 -- 
 2.11.1
