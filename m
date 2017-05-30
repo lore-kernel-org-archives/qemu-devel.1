@@ -1,27 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50039)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50090)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <roman.penyaev@profitbricks.com>) id 1dFdwn-0008B6-Ag
-	for qemu-devel@nongnu.org; Tue, 30 May 2017 06:00:18 -0400
+	(envelope-from <quintela@redhat.com>) id 1dFdwu-0008Da-Ra
+	for qemu-devel@nongnu.org; Tue, 30 May 2017 06:00:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <roman.penyaev@profitbricks.com>) id 1dFdwm-0007FP-Fw
-	for qemu-devel@nongnu.org; Tue, 30 May 2017 06:00:17 -0400
-Received: from mail-io0-x22e.google.com ([2607:f8b0:4001:c06::22e]:33972)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <roman.penyaev@profitbricks.com>)
-	id 1dFdwm-0007FI-BC
-	for qemu-devel@nongnu.org; Tue, 30 May 2017 06:00:16 -0400
-Received: by mail-io0-x22e.google.com with SMTP id k91so53390176ioi.1
-	for <qemu-devel@nongnu.org>; Tue, 30 May 2017 03:00:16 -0700 (PDT)
+	(envelope-from <quintela@redhat.com>) id 1dFdwu-0007Gw-5n
+	for qemu-devel@nongnu.org; Tue, 30 May 2017 06:00:24 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34818)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1dFdwt-0007Gm-Vs
+	for qemu-devel@nongnu.org; Tue, 30 May 2017 06:00:24 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id E2F235F7B6
+	for <qemu-devel@nongnu.org>; Tue, 30 May 2017 10:00:22 +0000 (UTC)
+From: Juan Quintela <quintela@redhat.com>
+In-Reply-To: <1495649128-10529-3-git-send-email-vyasevic@redhat.com>
+	(Vladislav Yasevich's message of "Wed, 24 May 2017 14:05:18 -0400")
+References: <1495649128-10529-1-git-send-email-vyasevic@redhat.com>
+	<1495649128-10529-3-git-send-email-vyasevic@redhat.com>
+Reply-To: quintela@redhat.com
+Date: Tue, 30 May 2017 12:00:12 +0200
+Message-ID: <87k24yhdg3.fsf@secure.mitica>
 MIME-Version: 1.0
-In-Reply-To: <3c674491-b570-bed1-6d39-293ce8c5e5fc@redhat.com>
-References: <20170530085346.1730-1-roman.penyaev@profitbricks.com>
-	<3c674491-b570-bed1-6d39-293ce8c5e5fc@redhat.com>
-From: Roman Penyaev <roman.penyaev@profitbricks.com>
-Date: Tue, 30 May 2017 11:59:55 +0200
-Message-ID: <CAJrWOzA-eE8QZ-i_sDQE2Bq_2hxx4gPZst-75gY7S+hjo2WmVQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH 1/1] coroutine-lock: do not touch coroutine
- after another one has been entered
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH 02/12] migration: Introduce announcement
+ timer
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,25 +35,19 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Fam Zheng <famz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Kevin Wolf <kwolf@redhat.com>, qemu-devel <qemu-devel@nongnu.org>
+To: Vladislav Yasevich <vyasevic@redhat.com>
+Cc: qemu-devel@nongnu.org, dgilbert@redhat.com, germano@redhat.com, lvivier@redhat.com, jasowang@redhat.com, jdenemar@redhat.com, kashyap@redhat.com, armbru@redhat.com, mst@redhat.com
 
-On Tue, May 30, 2017 at 11:35 AM, Paolo Bonzini <pbonzini@redhat.com> wrote:
+Vladislav Yasevich <vyasevic@redhat.com> wrote:
+> Introdec an annoucement timer structure and initialization to
+> be used by for self-annoucement.
 >
+> Based on the work by Germano Veit Michel <germano@redhat.com>
 >
-> On 30/05/2017 10:53, Roman Pen wrote:
->> The fix is obvious: use temporal queue and do not touch coroutine after
->> first qemu_coroutine_enter() is invoked.
->>
->> The issue is quite rare and happens every ~12 hours on very high IO load
->> (building linux kernel with -j512 inside guest) when IO throttling is
->> enabled.  With the fix applied guest is running ~35 hours and is still
->> alive so far.
->
-> This is a good one.  Thanks!  Just a couple notes on English below.
+> Signed-off-by: Vlad Yasevich <vyasevic@redhat.com>
 
-I like your variant, thanks, explaining knotty things is my weak point.
-Will resend v2 shortly.
+Please, pretty please, create them in net/somewhere, or at least create
 
---
-Roman
+include/migration/net.h and migration/net.c
+
+Except for that, code looks nice.
