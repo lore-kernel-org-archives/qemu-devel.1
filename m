@@ -1,32 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52034)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52093)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1dFe7J-0003NN-EU
-	for qemu-devel@nongnu.org; Tue, 30 May 2017 06:11:10 -0400
+	(envelope-from <stefanha@gmail.com>) id 1dFe7R-0003R1-QL
+	for qemu-devel@nongnu.org; Tue, 30 May 2017 06:11:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1dFe7G-0001QC-AQ
-	for qemu-devel@nongnu.org; Tue, 30 May 2017 06:11:09 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:52080)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1dFe7G-0001Py-3y
-	for qemu-devel@nongnu.org; Tue, 30 May 2017 06:11:06 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 1686E61B86
-	for <qemu-devel@nongnu.org>; Tue, 30 May 2017 10:11:05 +0000 (UTC)
-From: Juan Quintela <quintela@redhat.com>
-In-Reply-To: <1495649128-10529-4-git-send-email-vyasevic@redhat.com>
-	(Vladislav Yasevich's message of "Wed, 24 May 2017 14:05:19 -0400")
-References: <1495649128-10529-1-git-send-email-vyasevic@redhat.com>
-	<1495649128-10529-4-git-send-email-vyasevic@redhat.com>
-Reply-To: quintela@redhat.com
-Date: Tue, 30 May 2017 12:10:58 +0200
-Message-ID: <87d1aqhcy5.fsf@secure.mitica>
+	(envelope-from <stefanha@gmail.com>) id 1dFe7R-0001T9-3A
+	for qemu-devel@nongnu.org; Tue, 30 May 2017 06:11:17 -0400
+Received: from mail-wm0-x22e.google.com ([2a00:1450:400c:c09::22e]:33406)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1dFe7Q-0001T5-UP
+	for qemu-devel@nongnu.org; Tue, 30 May 2017 06:11:17 -0400
+Received: by mail-wm0-x22e.google.com with SMTP id m7so26422515wmg.0
+	for <qemu-devel@nongnu.org>; Tue, 30 May 2017 03:11:16 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH 03/12] migration: Switch to using
- announcement timer
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Date: Tue, 30 May 2017 11:11:15 +0100
+Message-ID: <CAJSP0QVzoN=2rv_HUNf0oR_FQg=5xJ9UQbLqq0rj8OuYb8ZByw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: [Qemu-devel] [RFC] QEMU 2.10 release schedule
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,22 +25,19 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladislav Yasevich <vyasevic@redhat.com>
-Cc: qemu-devel@nongnu.org, dgilbert@redhat.com, germano@redhat.com, lvivier@redhat.com, jasowang@redhat.com, jdenemar@redhat.com, kashyap@redhat.com, armbru@redhat.com, mst@redhat.com
+To: qemu-devel <qemu-devel@nongnu.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Christian Borntraeger <borntraeger@de.ibm.com>
 
-Vladislav Yasevich <vyasevic@redhat.com> wrote:
-> Switch qemu_announce_self and virtio annoucements to use
-> the announcement timer framework.  This makes sure that both
-> timers use the same timeouts and number of annoucement attempts
->
-> Based on work by Dr. David Alan Gilbert <dgilbert@redhat.com>
->
-> Signed-off-by: Vladislav Yasevich <vyasevic@redhat.com>
+Here is a first stab at the next release schedule:
 
->  static void qemu_announce_self_once(void *opaque)
->  {
-> -    static int count = SELF_ANNOUNCE_ROUNDS;
-> -    QEMUTimer *timer = *(QEMUTimer **)opaque;
-> +    AnnounceTimer *timer = (AnnounceTimer *)opaque;
+Beginning of development phase: 2017-04-20
+Soft feature freeze: 2017-07-18
+-rc0: 2017-07-25
+-rc1: 2017-08-01
+-rc2: 2017-08-08
+-rc3: 2017-08-15
+-rc4: 2017-08-22
 
-Cast from void * is never needed.
+Thoughts?
+
+Stefan
