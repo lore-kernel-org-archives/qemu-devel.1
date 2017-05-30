@@ -1,27 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34664)
-	by lists.gnu.org with esmtp (Exim 4.71) (envelope-from <n54@gmx.com>)
-	id 1dFgu5-0006T7-N3
-	for qemu-devel@nongnu.org; Tue, 30 May 2017 09:09:42 -0400
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35145)
+	by lists.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <stefanha@gmail.com>) id 1dFgw8-00082b-W5
+	for qemu-devel@nongnu.org; Tue, 30 May 2017 09:11:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <n54@gmx.com>) id 1dFgu1-0001vW-N4
-	for qemu-devel@nongnu.org; Tue, 30 May 2017 09:09:41 -0400
-Received: from mout.gmx.net ([212.227.15.18]:50383)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <n54@gmx.com>) id 1dFgu1-0001vL-A9
-	for qemu-devel@nongnu.org; Tue, 30 May 2017 09:09:37 -0400
-References: <20170526054013.299-1-n54@gmx.com>
-	<20170530062022.5841-1-n54@gmx.com>
-	<58d04e43-1caa-f623-44fe-749dd351fad9@redhat.com>
-From: Kamil Rytarowski <n54@gmx.com>
-Message-ID: <42633e66-7ef4-c4ef-18d3-d2be588b816c@gmx.com>
-Date: Tue, 30 May 2017 15:11:25 +0200
+	(envelope-from <stefanha@gmail.com>) id 1dFgw4-0002bc-Ew
+	for qemu-devel@nongnu.org; Tue, 30 May 2017 09:11:48 -0400
+Received: from mail-wm0-x241.google.com ([2a00:1450:400c:c09::241]:36417)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1dFgw4-0002bY-7J
+	for qemu-devel@nongnu.org; Tue, 30 May 2017 09:11:44 -0400
+Received: by mail-wm0-x241.google.com with SMTP id k15so25271575wmh.3
+	for <qemu-devel@nongnu.org>; Tue, 30 May 2017 06:11:44 -0700 (PDT)
+Date: Tue, 30 May 2017 14:11:40 +0100
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20170530131140.GA11356@stefanha-x1.localdomain>
+References: <20170505101337.4650-1-pbonzini@redhat.com>
+	<20170505101337.4650-22-pbonzini@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <58d04e43-1caa-f623-44fe-749dd351fad9@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="GNRanclUi6IWTKL7rOnutXbLLxuLLhDR6"
-Subject: Re: [Qemu-devel] [PATCH] ivshmem-server: ivshmem-client: Build when
- eventfd() is available
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="fdj2RfSjLxBAspz7"
+Content-Disposition: inline
+In-Reply-To: <20170505101337.4650-22-pbonzini@redhat.com>
+Subject: Re: [Qemu-devel] [PULL 21/21] vhost-scsi: create a
+ vhost-scsi-common abstraction
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,79 +31,94 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, marcandre.lureau@gmail.com, armbru@redhat.com, f4bug@amsat.org
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-devel@nongnu.org, Felipe Franciosi <felipe@nutanix.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---GNRanclUi6IWTKL7rOnutXbLLxuLLhDR6
-From: Kamil Rytarowski <n54@gmx.com>
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, marcandre.lureau@gmail.com, armbru@redhat.com,
- f4bug@amsat.org
-Message-ID: <42633e66-7ef4-c4ef-18d3-d2be588b816c@gmx.com>
-Subject: Re: [Qemu-devel] [PATCH] ivshmem-server: ivshmem-client: Build when
- eventfd() is available
-References: <20170526054013.299-1-n54@gmx.com>
- <20170530062022.5841-1-n54@gmx.com>
- <58d04e43-1caa-f623-44fe-749dd351fad9@redhat.com>
-In-Reply-To: <58d04e43-1caa-f623-44fe-749dd351fad9@redhat.com>
-Content-Type: text/plain; charset=utf-8
+
+--fdj2RfSjLxBAspz7
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On 30.05.2017 14:53, Eric Blake wrote:
-> On 05/30/2017 01:20 AM, Kamil Rytarowski wrote:
->> Currently ivshmem requires eventfd() which is Linux specific.
->> Do not and build it unconditionally on every Linux/BSD/Solaris.
->>
->> This patch indirectly fixes build failure on NetBSD, where these tools=
-
->> additionally require -lrt for shm_open(3). In future there should be
->> added support for NetBSD and the linking addressed appropriately.
+On Fri, May 05, 2017 at 12:13:37PM +0200, Paolo Bonzini wrote:
+> From: Felipe Franciosi <felipe@nutanix.com>
 >=20
-> Is this a v2 patch? If so, it's best to repost it as a new top-level
-> thread rather than buried in reply to your v1 patch.  Also, be sure to
-> include v2 in the subject line ('git send-email -v2' works wonders for
-> that).
+> In order to introduce a new vhost-user-scsi host device type, it makes
+> sense to abstract part of vhost-scsi into a common parent class. This
+> commit does exactly that.
 >=20
-
-I reworked it, fixed title and it's more like v3.
-
->>
->> Signed-off-by: Kamil Rytarowski <n54@gmx.com>
->> Reviewed-by: Markus Armbruster <armbru@redhat.com>
->> ---
+> Signed-off-by: Felipe Franciosi <felipe@nutanix.com>
+> Message-Id: <1488479153-21203-3-git-send-email-felipe@nutanix.com>
+> ---
+>  hw/scsi/Makefile.objs                 |   2 +-
+>  hw/scsi/vhost-scsi-common.c           | 143 +++++++++++++++++++++++++
+>  hw/scsi/vhost-scsi.c                  | 194 ++++++++++------------------=
+------
+>  include/hw/virtio/vhost-scsi-common.h |  48 +++++++++
+>  include/hw/virtio/vhost-scsi.h        |  11 +-
+>  include/hw/virtio/virtio-scsi.h       |   2 +
+>  6 files changed, 252 insertions(+), 148 deletions(-)
+>  create mode 100644 hw/scsi/vhost-scsi-common.c
+>  create mode 100644 include/hw/virtio/vhost-scsi-common.h
 >=20
-> It also helps in a v2 submission to list here, after the --- separator,=
+> diff --git a/hw/scsi/Makefile.objs b/hw/scsi/Makefile.objs
+> index 5a2248be36..54d8754e9a 100644
+> --- a/hw/scsi/Makefile.objs
+> +++ b/hw/scsi/Makefile.objs
+> @@ -10,5 +10,5 @@ obj-$(CONFIG_PSERIES) +=3D spapr_vscsi.o
+> =20
+>  ifeq ($(CONFIG_VIRTIO),y)
+>  obj-y +=3D virtio-scsi.o virtio-scsi-dataplane.o
+> -obj-$(CONFIG_VHOST_SCSI) +=3D vhost-scsi.o
+> +obj-$(CONFIG_VHOST_SCSI) +=3D vhost-scsi-common.o vhost-scsi.o
+>  endif
+> diff --git a/hw/scsi/vhost-scsi-common.c b/hw/scsi/vhost-scsi-common.c
+> new file mode 100644
+> index 0000000000..e41c0314db
+> --- /dev/null
+> +++ b/hw/scsi/vhost-scsi-common.c
+> @@ -0,0 +1,143 @@
+> +/*
+> + * vhost-scsi-common
+> + *
+> + * Copyright (c) 2016 Nutanix Inc. All rights reserved.
+> + *
+> + * Author:
+> + *  Felipe Franciosi <felipe@nutanix.com>
+> + *
+> + * This work is largely based on the "vhost-scsi" implementation by:
+> + *  Stefan Hajnoczi    <stefanha@linux.vnet.ibm.com>
+> + *  Nicholas Bellinger <nab@risingtidesystems.com>
+> + *
+> + * This work is licensed under the terms of the GNU LGPL, version 2 or l=
+ater.
+> + * See the COPYING.LIB file in the top-level directory.
+> + *
+> + */
+> +
+> +#include "qemu/osdep.h"
+> +#include <linux/vhost.h>
 
-> how it differs from v1.
->=20
-> More submission hints at http://wiki.qemu.org/Contribute/SubmitAPatch
->=20
+This breaks the mingw build:
 
-Do I still need to resend it?
+  hw/scsi/vhost-scsi-common.c:19:25: fatal error: linux/vhost.h: No such fi=
+le or directory
+   #include <linux/vhost.h>
+                         ^
+  compilation terminated.
 
-
---GNRanclUi6IWTKL7rOnutXbLLxuLLhDR6
+--fdj2RfSjLxBAspz7
 Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
 
-iQIcBAEBCAAGBQJZLW+LAAoJEEuzCOmwLnZs79QP/1jD0oseT0GjmF2v2UazGckf
-qbZvuzqyAxxGyN7aNj7EFFzuSnAxe0oa8bppdg3cJ8sNpEviDJxGzqVWGTljHY6t
-+fRjRtwG+0Qk+3HU+62CGX7+AQGLnnqDJ9JSBBLW9lU2dvg7CrgnbvPsJKx738gH
-9u7z+U3lMPTlTqJxc5JOx7Lz94OGvQOpdsfIsyLf+GrKBFGGbohekropHHWByO60
-mXCzm5pyImObIIEGu5XQ1y8bhu8IagG8y+GsJpp+6lYMvZHbWoBG+VAkq9d0rl0r
-GTVf0h5Mn7N8hrn3+NMrnHI6zEhhS8f3LgLI7Al4sHiwYN5Eg6I36z3XZh332bKe
-uogiIH0IaoiWGZ2ZcA4Rl8PtRBDi/0627tEwIJ7AnJGhZ8rrQ5fwO0DwKnfeAZTD
-Psa8RFZPGGddD940MAfMPumzSSI3gCliu+Ectf6n0VaqaUkavsz42zbA3il3Nlmt
-uI0dUp+yOu6R2Fngj0krV3+Nf/crstSqEiAo2SKzk6+wlCEocmNtgmLYTcnMssF5
-R0095jcuUBrnq39N8xonI41Ad5xNPh8h6wHZ3lMvlyFIikzrFIanByo2yVrk0L+H
-nXQeQulPP6RfDe6fuH4MQqkFIFuGxPReLYNr5De2PN2yT4uEwFllvWwWWE3Qa5Mi
-bHrVciI7y6wZFC9HFzoM
-=VqCq
+iQEcBAEBAgAGBQJZLW+MAAoJEJykq7OBq3PIg0gIALUhwmjNAKD+43Zky8/qfTCY
+mqY5a7LGVsSQEe/QHsVmyl/PqSrGSkHez5AtOkPeP8igs6v9al6wnhZk93TLj/aI
+WvsCf5aJNlV031zf62nBWTh+cd+whrE2xUlu6gqB1h+demc4atqtgMhSEs9H2wi+
+YIp/B2Q47o0d4Qs3XSBEX4uM4Bz4dwWGu7Dodcl77xyuxuIjGcxBuE+1pT+pl+MP
+NW4fGMQMZjA2T/2FF4GWKssbe/007hKRuTQ/y6MkjadDxEEjBzr/8dydY1mV0XAN
+Y6ByzrQA0fZkeWY1+ut0Qeai28oHQQTA/0adgyftmesgaMSjpGR4G7LIJqpx4m8=
+=+NJF
 -----END PGP SIGNATURE-----
 
---GNRanclUi6IWTKL7rOnutXbLLxuLLhDR6--
+--fdj2RfSjLxBAspz7--
