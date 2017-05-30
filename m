@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33852)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33858)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1dFei7-0004ht-Ld
-	for qemu-devel@nongnu.org; Tue, 30 May 2017 06:49:12 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1dFei7-0004i9-W2
+	for qemu-devel@nongnu.org; Tue, 30 May 2017 06:49:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1dFei6-0005Bs-Q6
-	for qemu-devel@nongnu.org; Tue, 30 May 2017 06:49:11 -0400
-Received: from mailhub.sw.ru ([195.214.232.25]:18301 helo=relay.sw.ru)
+	(envelope-from <vsementsov@virtuozzo.com>) id 1dFei6-0005C2-Vg
+	for qemu-devel@nongnu.org; Tue, 30 May 2017 06:49:12 -0400
+Received: from mailhub.sw.ru ([195.214.232.25]:13980 helo=relay.sw.ru)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
-	id 1dFei6-0005Aq-G0
+	id 1dFei6-0005Ao-Fg
 	for qemu-devel@nongnu.org; Tue, 30 May 2017 06:49:10 -0400
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Tue, 30 May 2017 13:48:56 +0300
-Message-Id: <20170530104857.70083-4-vsementsov@virtuozzo.com>
+Date: Tue, 30 May 2017 13:48:55 +0300
+Message-Id: <20170530104857.70083-3-vsementsov@virtuozzo.com>
 In-Reply-To: <20170530104857.70083-1-vsementsov@virtuozzo.com>
 References: <20170530104857.70083-1-vsementsov@virtuozzo.com>
-Subject: [Qemu-devel] [PATCH 3/4] qemu-img check: add format allocation info
+Subject: [Qemu-devel] [PATCH 2/4] qcow2: add .bdrv_get_format_alloc_stat
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,103 +27,190 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, qemu-block@nongnu.org
 Cc: eblake@redhat.com, armbru@redhat.com, mreitz@redhat.com, kwolf@redhat.com, vsementsov@virtuozzo.com, den@openvz.org
 
+Realize .bdrv_get_format_alloc_stat interface.
+
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 ---
- qapi/block-core.json |  6 +++++-
- qemu-img.c           | 36 ++++++++++++++++++++++++++++++++++++
- 2 files changed, 41 insertions(+), 1 deletion(-)
+ block/qcow2-refcount.c | 144 +++++++++++++++++++++++++++++++++++++++++++++++++
+ block/qcow2.c          |   2 +
+ block/qcow2.h          |   2 +
+ 3 files changed, 148 insertions(+)
 
-diff --git a/qapi/block-core.json b/qapi/block-core.json
-index 365070b3eb..3357b61811 100644
---- a/qapi/block-core.json
-+++ b/qapi/block-core.json
-@@ -203,6 +203,9 @@
- #                       field is present if the driver for the image format
- #                       supports it
- #
-+# @format-alloc-info: Format-allocation information, see
-+#                     BlockFormatAllocInfo description. (Since: 2.10)
-+#
- # Since: 1.4
- #
- ##
-@@ -211,7 +214,8 @@
-            '*image-end-offset': 'int', '*corruptions': 'int', '*leaks': 'int',
-            '*corruptions-fixed': 'int', '*leaks-fixed': 'int',
-            '*total-clusters': 'int', '*allocated-clusters': 'int',
--           '*fragmented-clusters': 'int', '*compressed-clusters': 'int' } }
-+           '*fragmented-clusters': 'int', '*compressed-clusters': 'int',
-+           '*format-alloc-info': 'BlockFormatAllocInfo' } }
- 
- ##
- # @MapEntry:
-diff --git a/qemu-img.c b/qemu-img.c
-index b506839ef0..55f8c1776c 100644
---- a/qemu-img.c
-+++ b/qemu-img.c
-@@ -560,6 +560,29 @@ static void dump_json_image_check(ImageCheck *check, bool quiet)
-     QDECREF(str);
+diff --git a/block/qcow2-refcount.c b/block/qcow2-refcount.c
+index 7c06061aae..2010dfa048 100644
+--- a/block/qcow2-refcount.c
++++ b/block/qcow2-refcount.c
+@@ -2931,3 +2931,147 @@ done:
+     qemu_vfree(new_refblock);
+     return ret;
  }
- 
-+static void dump_human_format_alloc_info(BlockFormatAllocInfo *bfai, bool quiet)
++
++typedef struct FormatAllocStatCo {
++    BlockDriverState *bs;
++    BlockFormatAllocInfo *bfai;
++    int64_t ret;
++} FormatAllocStatCo;
++
++static void coroutine_fn qcow2_get_format_alloc_stat_entry(void *opaque)
 +{
-+    char *alloc_alloc = size_to_str(bfai->alloc_alloc);
-+    char *alloc_hole = size_to_str(bfai->alloc_hole);
-+    char *alloc_overhead = size_to_str(bfai->alloc_overhead);
-+    char *hole_alloc = size_to_str(bfai->hole_alloc);
-+    char *hole_hole = size_to_str(bfai->hole_hole);
++    int ret = 0;
++    FormatAllocStatCo *nbco = opaque;
++    BlockDriverState *bs = nbco->bs;
++    BDRVQcow2State *s = bs->opaque;
++    BlockFormatAllocInfo *bfai = nbco->bfai;
++    int64_t cluster, file_sectors, sector;
++    int refcount_block_offset;
++    uint32_t i;
++    bool allocated = false, f_allocated = false;
++    int dif, num = 0, f_num = 0;
 +
-+    qprintf(quiet,
-+            "Format allocation info (including metadata):\n"
-+            "               file-alloc   file-hole   after-eof\n"
-+            "format-alloc   %10s  %10s  %10s\n"
-+            "format-hole    %10s  %10s\n",
-+            alloc_alloc, alloc_hole, alloc_overhead,
-+            hole_alloc, hole_hole);
++    memset(bfai, 0, sizeof(*bfai));
 +
-+    g_free(alloc_alloc);
-+    g_free(alloc_hole);
-+    g_free(alloc_overhead);
-+    g_free(hole_alloc);
-+    g_free(hole_hole);
++    file_sectors = bdrv_nb_sectors(bs->file->bs);
++    if (file_sectors < 0) {
++        nbco->ret = file_sectors;
++        return;
++    }
++
++    qemu_co_mutex_lock(&s->lock);
++
++    for (sector = 0; sector < file_sectors; sector += dif) {
++        if (f_num == 0) {
++            ret = bdrv_is_allocated_above(bs->file->bs, NULL, sector,
++                                          file_sectors - sector, &f_num);
++            if (ret < 0) {
++                goto fail;
++            }
++            f_allocated = ret;
++        }
++
++        if (num == 0) {
++            uint64_t refcount;
++            assert(((sector << BDRV_SECTOR_BITS) & (s->cluster_size - 1)) == 0);
++            ret = qcow2_get_refcount(
++                bs, (sector << BDRV_SECTOR_BITS) >> s->cluster_bits, &refcount);
++            if (ret < 0) {
++                goto fail;
++            }
++            allocated = refcount > 0;
++            num = s->cluster_size >> BDRV_SECTOR_BITS;
++        }
++
++        dif = MIN(f_num, MIN(num, file_sectors - sector));
++        if (allocated) {
++            if (f_allocated) {
++                bfai->alloc_alloc += dif;
++            } else {
++                bfai->alloc_hole += dif;
++            }
++        } else {
++            if (f_allocated) {
++                bfai->hole_alloc += dif;
++            } else {
++                bfai->hole_hole += dif;
++            }
++        }
++        f_num -= dif;
++        num -= dif;
++    }
++
++    assert(f_num == 0);
++
++    if (allocated) {
++        bfai->alloc_overhead += num;
++    }
++
++    cluster = size_to_clusters(s, sector << BDRV_SECTOR_BITS);
++    refcount_block_offset = cluster & (s->refcount_block_size - 1);
++    for (i = cluster >> s->refcount_block_bits;
++         i <= s->max_refcount_table_index; i++)
++    {
++        int j;
++
++        if (!(s->refcount_table[i] & REFT_OFFSET_MASK)) {
++            refcount_block_offset = 0;
++            continue;
++        }
++
++        for (j = refcount_block_offset; j < s->refcount_block_size; j++) {
++            uint64_t refcount;
++            cluster = (i << s->refcount_block_bits) + j;
++
++            ret = qcow2_get_refcount(bs, cluster, &refcount);
++            if (ret < 0) {
++                goto fail;
++            }
++            if (refcount > 0) {
++                bfai->alloc_overhead++;
++            }
++        }
++
++        refcount_block_offset = 0;
++    }
++
++    qemu_co_mutex_unlock(&s->lock);
++
++    bfai->alloc_alloc = bfai->alloc_alloc << BDRV_SECTOR_BITS;
++    bfai->alloc_hole = bfai->alloc_hole << BDRV_SECTOR_BITS;
++    bfai->alloc_overhead = bfai->alloc_overhead << BDRV_SECTOR_BITS;
++
++    bfai->hole_alloc = bfai->hole_alloc << BDRV_SECTOR_BITS;
++    bfai->hole_hole = bfai->hole_hole << BDRV_SECTOR_BITS;
++
++    nbco->ret = 0;
++    return;
++
++fail:
++    nbco->ret = ret;
++    qemu_co_mutex_unlock(&s->lock);
 +}
 +
- static void dump_human_image_check(ImageCheck *check, bool quiet)
- {
-     if (!(check->corruptions || check->leaks || check->check_errors)) {
-@@ -601,6 +624,10 @@ static void dump_human_image_check(ImageCheck *check, bool quiet)
-         qprintf(quiet,
-                 "Image end offset: %" PRId64 "\n", check->image_end_offset);
-     }
++/* qcow2_get_format_alloc_stat()
++ * Fills @bfai struct. In case of failure @bfai content is unpredicted.
++ */
++int qcow2_get_format_alloc_stat(BlockDriverState *bs,
++                                BlockFormatAllocInfo *bfai)
++{
++    FormatAllocStatCo nbco = {
++        .bs = bs,
++        .bfai = bfai,
++        .ret = -EINPROGRESS
++    };
 +
-+    if (check->has_format_alloc_info) {
-+        dump_human_format_alloc_info(check->format_alloc_info, quiet);
-+    }
- }
- 
- static int collect_image_check(BlockDriverState *bs,
-@@ -611,6 +638,7 @@ static int collect_image_check(BlockDriverState *bs,
- {
-     int ret;
-     BdrvCheckResult result;
-+    BlockFormatAllocInfo *bfai = g_new0(BlockFormatAllocInfo, 1);
- 
-     ret = bdrv_check(bs, &result, fix);
-     if (ret < 0) {
-@@ -639,6 +667,14 @@ static int collect_image_check(BlockDriverState *bs,
-     check->compressed_clusters      = result.bfi.compressed_clusters;
-     check->has_compressed_clusters  = result.bfi.compressed_clusters != 0;
- 
-+    ret = bdrv_get_format_alloc_stat(bs, bfai);
-+    if (ret < 0) {
-+        qapi_free_BlockFormatAllocInfo(bfai);
++    if (qemu_in_coroutine()) {
++        qcow2_get_format_alloc_stat_entry(&nbco);
 +    } else {
-+        check->has_format_alloc_info = true;
-+        check->format_alloc_info = bfai;
++        Coroutine *co =
++            qemu_coroutine_create(qcow2_get_format_alloc_stat_entry, &nbco);
++        qemu_coroutine_enter(co);
++        BDRV_POLL_WHILE(bs, nbco.ret == -EINPROGRESS);
 +    }
 +
-     return 0;
- }
++    return nbco.ret;
++}
+diff --git a/block/qcow2.c b/block/qcow2.c
+index a8d61f0981..0e26b548fd 100644
+--- a/block/qcow2.c
++++ b/block/qcow2.c
+@@ -3469,6 +3469,8 @@ BlockDriver bdrv_qcow2 = {
  
+     .bdrv_detach_aio_context  = qcow2_detach_aio_context,
+     .bdrv_attach_aio_context  = qcow2_attach_aio_context,
++
++    .bdrv_get_format_alloc_stat = qcow2_get_format_alloc_stat,
+ };
+ 
+ static void bdrv_qcow2_init(void)
+diff --git a/block/qcow2.h b/block/qcow2.h
+index 1801dc30dc..16d31a8624 100644
+--- a/block/qcow2.h
++++ b/block/qcow2.h
+@@ -598,4 +598,6 @@ int qcow2_cache_get_empty(BlockDriverState *bs, Qcow2Cache *c, uint64_t offset,
+     void **table);
+ void qcow2_cache_put(BlockDriverState *bs, Qcow2Cache *c, void **table);
+ 
++int qcow2_get_format_alloc_stat(BlockDriverState *bs,
++                                BlockFormatAllocInfo *bfai);
+ #endif
 -- 
 2.11.1
