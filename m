@@ -1,26 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37499)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37672)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1dFdJZ-00034R-VB
-	for qemu-devel@nongnu.org; Tue, 30 May 2017 05:19:46 -0400
+	(envelope-from <berrange@redhat.com>) id 1dFdK7-0003bf-3e
+	for qemu-devel@nongnu.org; Tue, 30 May 2017 05:20:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1dFdJW-0002LH-0h
-	for qemu-devel@nongnu.org; Tue, 30 May 2017 05:19:45 -0400
-Received: from mail-wm0-x229.google.com ([2a00:1450:400c:c09::229]:38089)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1dFdJV-0002Kq-Q6
-	for qemu-devel@nongnu.org; Tue, 30 May 2017 05:19:41 -0400
-Received: by mail-wm0-x229.google.com with SMTP id e127so91185179wmg.1
-	for <qemu-devel@nongnu.org>; Tue, 30 May 2017 02:19:41 -0700 (PDT)
-Date: Tue, 30 May 2017 10:19:39 +0100
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20170530091939.GF11362@stefanha-x1.localdomain>
-References: <20170526075246.20265-1-famz@redhat.com>
+	(envelope-from <berrange@redhat.com>) id 1dFdK5-0002dD-Tl
+	for qemu-devel@nongnu.org; Tue, 30 May 2017 05:20:19 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37776)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1dFdK5-0002cj-Ls
+	for qemu-devel@nongnu.org; Tue, 30 May 2017 05:20:17 -0400
+Date: Tue, 30 May 2017 10:20:15 +0100
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20170530092015.GD21566@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <20170526023213.18741-1-haozhong.zhang@intel.com>
+	<CAPcyv4gp1CBFA+MMXSjxw1b3nSeHCYkMN1daMP2+r4DpfPmMug@mail.gmail.com>
+	<20170526143843.GL24484@redhat.com>
+	<CAPcyv4g-=VytzHCw8QzSq5yNW-PLPz0MNzT=vDqxTmEuF_DWHQ@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="K/NRh952CO+2tg14"
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20170526075246.20265-1-famz@redhat.com>
-Subject: Re: [Qemu-devel] [PULL 00/22] Docker and block patches
+In-Reply-To: <CAPcyv4g-=VytzHCw8QzSq5yNW-PLPz0MNzT=vDqxTmEuF_DWHQ@mail.gmail.com>
+Subject: Re: [Qemu-devel] [RESEND PATCH 1/2] nvdimm: warn if the backend is
+ not a DAX device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,49 +31,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>
-Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org, Stefan Hajnoczi <stefanha@redhat.com>
+To: Dan Williams <dan.j.williams@intel.com>
+Cc: Haozhong Zhang <haozhong.zhang@intel.com>, Stefan Hajnoczi <stefanha@gmail.com>, Igor Mammedov <imammedo@redhat.com>, Xiao Guangrong <guangrong.xiao@gmail.com>, qemu-devel@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>
 
+On Fri, May 26, 2017 at 08:25:20AM -0700, Dan Williams wrote:
+> On Fri, May 26, 2017 at 7:38 AM, Daniel P. Berrange <berrange@redhat.com> wrote:
+> > On Thu, May 25, 2017 at 08:34:23PM -0700, Dan Williams wrote:
+> >> On Thu, May 25, 2017 at 7:32 PM, Haozhong Zhang
+> >> <haozhong.zhang@intel.com> wrote:
+> >> > Applications in Linux guest that use device-dax never trigger flush
+> >> > that can be trapped by KVM/QEMU. Meanwhile, if the host backend is not
+> >> > device-dax, QEMU cannot guarantee the persistence of guest writes.
+> >> > Before solving this flushing problem, QEMU should warn users if the
+> >> > host backend is not device-dax.
+> >>
+> >> I think this needs to be stronger than a "warn" it needs to be
+> >> explicitly forbidden when it is known to be unsafe.
+> >
+> > I think users should have the choice in what they want to do -
+> > QEMU should not artifically block it.  There are plenty of things
+> > in QEMU that are potentially unsafe in some usage scenarios, but
+> > we just document how to use them in a safe manner & any caveats
+> > that apply. Higher level applications above QEMU can then consider
+> > how they want to apply a usage policy to meet the needs of their
+> > usage scenario.
+> >
+> > Having an emulated DAX device that doesn't guarantee persistence
+> > is no different to having an emulated disk device that never flushes
+> > to underlying host storage.
+> >
+> 
+> It is different in the sense that the contract of when the guest
+> should assume persistence is specified by when the write completes to
+> the virtual disk. In the case of the virtual NFIT we are currently
+> lying to the guest about that platform persistence guarantee even if
+> the hypervisor is emulating pmem with volatile memory.
 
---K/NRh952CO+2tg14
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+We equally lie to the guest about persistence of disks, when the
+disk is run with certain cache= settings, or when the disk backing file
+is on tmpfs. It is simply a choice the mgmt application makes about
+whether to provide backing storage that is capable of satsifying the
+guarantees implied by the guest device model. So I'm still not seeing
+a compelling reason to artifically block this with DAX.
 
-On Fri, May 26, 2017 at 03:52:24PM +0800, Fam Zheng wrote:
-> The following changes since commit 9964e96dc9999cf7f7c936ee854a795415d19b=
-60:
->=20
->   Merge remote-tracking branch 'jasowang/tags/net-pull-request' into stag=
-ing (2017-05-23 15:01:31 +0100)
->=20
-> are available in the git repository at:
->=20
->   git://github.com/famz/qemu.git tags/docker-and-block-pull-request
->=20
-> for you to fetch changes up to 77269bba94ef97de99ae61fdc98629a8704ae2ed:
->=20
->   block: make accounting thread-safe (2017-05-26 09:25:30 +0800)
->=20
-> ----------------------------------------------------------------
->=20
-> For Paolo's block layer thread safety part I and my docker testing
-> enhancements.
-
-Please fix the checkpatch issues.
-
---K/NRh952CO+2tg14
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJZLTkrAAoJEJykq7OBq3PIHzsIAKjxNH0ut6zrhFQXgQaP9cWQ
-7kUHRjyajPR00B/KqB0vxFBHqmHkG9Vxz/L89B5Xw/uodkFSTEqP5cjKuK9KWBZp
-fAv6/tIUcdOFRdApGMz16KXQSNnx04upDPOfnZmPX86LDD0yG29XpNGBPhlmtA1j
-7KwnTvUPtOCLaaWMe82JW9uQRveLkuE5jKK15aUJnAwTc04R9L6MubHd+bu9Au/J
-4dpIqe5tsCeTVgsuUpct/0SMBFHK5jXgY0zLC/nsRWoXldeQ1Po20NVDTkVF4+5j
-WxWSERnMx6C8ZayhP4PTMpWzHu7yHZfzgLpyC+8ubJ/CLBnpjfA8jTvIQkN1o3g=
-=E+H2
------END PGP SIGNATURE-----
-
---K/NRh952CO+2tg14--
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
