@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54289)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54291)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1dFiAp-0005Q0-02
-	for qemu-devel@nongnu.org; Tue, 30 May 2017 10:31:04 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1dFiAp-0005Q2-0R
+	for qemu-devel@nongnu.org; Tue, 30 May 2017 10:31:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1dFiAl-0000OW-It
+	(envelope-from <vsementsov@virtuozzo.com>) id 1dFiAm-0000P4-3f
 	for qemu-devel@nongnu.org; Tue, 30 May 2017 10:31:02 -0400
-Received: from mailhub.sw.ru ([195.214.232.25]:3571 helo=relay.sw.ru)
+Received: from mailhub.sw.ru ([195.214.232.25]:4692 helo=relay.sw.ru)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
-	id 1dFiAl-0000NA-6U
+	id 1dFiAl-0000NK-Ez
 	for qemu-devel@nongnu.org; Tue, 30 May 2017 10:30:59 -0400
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Tue, 30 May 2017 17:30:36 +0300
-Message-Id: <20170530143052.165002-4-vsementsov@virtuozzo.com>
+Date: Tue, 30 May 2017 17:30:37 +0300
+Message-Id: <20170530143052.165002-5-vsementsov@virtuozzo.com>
 In-Reply-To: <20170530143052.165002-1-vsementsov@virtuozzo.com>
 References: <20170530143052.165002-1-vsementsov@virtuozzo.com>
-Subject: [Qemu-devel] [PATCH 03/19] nbd/server: refactor nbd_co_send_reply
+Subject: [Qemu-devel] [PATCH 04/19] nbd/server: get rid of EAGAIN dead code
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,38 +27,55 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: pbonzini@redhat.com, berrange@redhat.com, den@openvz.org, vsementsov@virtuozzo.com
 
-As write_sync never returns value > 0, we can get rid of extra ret.
+For now read_sync never returns EAGAIN. So, don't handle it.
 
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 ---
- nbd/server.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+ nbd/server.c | 18 +++++++-----------
+ 1 file changed, 7 insertions(+), 11 deletions(-)
 
 diff --git a/nbd/server.c b/nbd/server.c
-index 03880fd501..e18eb020a7 100644
+index e18eb020a7..fcf35f0270 100644
 --- a/nbd/server.c
 +++ b/nbd/server.c
-@@ -972,7 +972,7 @@ void nbd_export_close_all(void)
- static int nbd_co_send_reply(NBDRequestData *req, NBDReply *reply, int len)
+@@ -997,11 +997,12 @@ static int nbd_co_send_reply(NBDRequestData *req, NBDReply *reply, int len)
+     return rc;
+ }
+ 
+-/* Collect a client request.  Return 0 if request looks valid, -EAGAIN
+- * to keep trying the collection, -EIO to drop connection right away,
+- * and any other negative value to report an error to the client
+- * (although the caller may still need to disconnect after reporting
+- * the error).  */
++/* nbd_co_receive_request
++ * Collect a client request. Return 0 if request looks valid, -EIO to drop
++ * connection right away, and any other negative value to report an error to
++ * the client (although the caller may still need to disconnect after reporting
++ * the error).
++ */
+ static int nbd_co_receive_request(NBDRequestData *req, NBDRequest *request)
  {
      NBDClient *client = req->client;
--    int rc, ret;
-+    int rc;
+@@ -1011,9 +1012,7 @@ static int nbd_co_receive_request(NBDRequestData *req, NBDRequest *request)
+     assert(client->recv_coroutine == qemu_coroutine_self());
+     rc = nbd_receive_request(client->ioc, request);
+     if (rc < 0) {
+-        if (rc != -EAGAIN) {
+-            rc = -EIO;
+-        }
++        rc = -EIO;
+         goto out;
+     }
  
-     g_assert(qemu_in_coroutine());
-     qemu_co_mutex_lock(&client->send_lock);
-@@ -983,9 +983,9 @@ static int nbd_co_send_reply(NBDRequestData *req, NBDReply *reply, int len)
-     } else {
-         qio_channel_set_cork(client->ioc, true);
-         rc = nbd_send_reply(client->ioc, reply);
--        if (rc >= 0) {
--            ret = write_sync(client->ioc, req->data, len, NULL);
--            if (ret < 0) {
-+        if (rc == 0) {
-+            rc = write_sync(client->ioc, req->data, len, NULL);
-+            if (rc < 0) {
-                 rc = -EIO;
-             }
-         }
+@@ -1114,9 +1113,6 @@ static coroutine_fn void nbd_trip(void *opaque)
+ 
+     req = nbd_request_get(client);
+     ret = nbd_co_receive_request(req, &request);
+-    if (ret == -EAGAIN) {
+-        goto done;
+-    }
+     if (ret == -EIO) {
+         goto out;
+     }
 -- 
 2.11.1
