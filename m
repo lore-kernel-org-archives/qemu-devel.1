@@ -1,20 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55754)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58229)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1dFcmM-0007Tv-J2
-	for qemu-devel@nongnu.org; Tue, 30 May 2017 04:45:27 -0400
+	(envelope-from <roman.penyaev@profitbricks.com>) id 1dFcuh-0002hd-3X
+	for qemu-devel@nongnu.org; Tue, 30 May 2017 04:54:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1dFcmJ-0007xI-HG
-	for qemu-devel@nongnu.org; Tue, 30 May 2017 04:45:26 -0400
-Date: Tue, 30 May 2017 09:45:20 +0100
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20170530084520.GC11362@stefanha-x1.localdomain>
-References: <20170525035132.24268-1-david@gibson.dropbear.id.au>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="4ZLFUWh1odzi/v6L"
-Content-Disposition: inline
-In-Reply-To: <20170525035132.24268-1-david@gibson.dropbear.id.au>
-Subject: Re: [Qemu-devel] [PULL 00/18] ppc-for-2.10 queue 20170525
+	(envelope-from <roman.penyaev@profitbricks.com>) id 1dFcud-0001Iz-Uy
+	for qemu-devel@nongnu.org; Tue, 30 May 2017 04:54:03 -0400
+Received: from mail-wm0-x22f.google.com ([2a00:1450:400c:c09::22f]:38525)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <roman.penyaev@profitbricks.com>)
+	id 1dFcud-0001Ir-Kw
+	for qemu-devel@nongnu.org; Tue, 30 May 2017 04:53:59 -0400
+Received: by mail-wm0-x22f.google.com with SMTP id e127so90105637wmg.1
+	for <qemu-devel@nongnu.org>; Tue, 30 May 2017 01:53:59 -0700 (PDT)
+From: Roman Pen <roman.penyaev@profitbricks.com>
+Date: Tue, 30 May 2017 10:53:46 +0200
+Message-Id: <20170530085346.1730-1-roman.penyaev@profitbricks.com>
+Subject: [Qemu-devel] [PATCH 1/1] coroutine-lock: do not touch coroutine
+ after another one has been entered
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,110 +25,152 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: peter.maydell@linaro.org, qemu-devel@nongnu.org, aik@ozlabs.ru, sursingh@redhat.com, agraf@suse.de, mdroth@linux.vnet.ibm.com, qemu-ppc@nongnu.org, sbobroff@redhat.com
+Cc: Roman Pen <roman.penyaev@profitbricks.com>, Paolo Bonzini <pbonzini@redhat.com>, Fam Zheng <famz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org
 
+Submission of requests on linux aio is a bit tricky and can lead to
+requests completions on submission path:
 
---4ZLFUWh1odzi/v6L
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+44713c9e8547 ("linux-aio: Handle io_submit() failure gracefully")
+0ed93d84edab ("linux-aio: process completions from ioq_submit()")
 
-On Thu, May 25, 2017 at 01:51:14PM +1000, David Gibson wrote:
-> The following changes since commit 9964e96dc9999cf7f7c936ee854a795415d19b=
-60:
->=20
->   Merge remote-tracking branch 'jasowang/tags/net-pull-request' into stag=
-ing (2017-05-23 15:01:31 +0100)
->=20
-> are available in the git repository at:
->=20
->   git://github.com/dgibson/qemu.git tags/ppc-for-2.10-20170525
->=20
-> for you to fetch changes up to 62f94fc94f98095173146e753a1f03d7c2cc7ba3:
->=20
->   xics: add unrealize handler (2017-05-25 11:31:33 +1000)
->=20
-> ----------------------------------------------------------------
-> ppc patch queue 2017-05-25
->=20
-> Assorted accumulated patches.  These are nearly all bugfixes at one
-> level or another - some for longstanding problems, others for some
-> regressions caused by more recent cleanups.
->=20
-> This includes preliminary patches towards fixing migration for Radix
-> Page Table guests under POWER9 and also fixing some migration
-> regressions due to the re-organization of the interrupt controller
-> code.  Not all the pieces are there yet, so those still won't quite
-> work, but the preliminary changes make sense on their own.
->=20
-> ----------------------------------------------------------------
-> Bharata B Rao (1):
->       spapr: Consolidate HPT freeing code into a routine
->=20
-> Daniel Henrique Barboza (4):
->       hw/ppc/spapr_events.c: removing 'exception' from sPAPREventLogEntry
->       hw/ppc: removing drc->detach_cb and drc->detach_cb_opaque
->       hw/ppc: migrating the DRC state of hotplugged devices
->       hw/ppc/spapr.c: recover pending LMB unplug info in spapr_lmb_release
->=20
-> David Gibson (3):
->       pseries: Split CAS PVR negotiation out into a separate function
->       pseries: Restore support for total vcpus not a multiple of threads-=
-per-core for old machine types
->       hw/ppc/spapr.c: adding pending_dimm_unplugs to sPAPRMachineState
->=20
-> Greg Kurz (8):
->       ppc/xics: simplify prototype of xics_spapr_init()
->       spapr: sanitize error handling in spapr_ics_create()
->       spapr-cpu-core: release ICP object when realization fails
->       xics_kvm: cache already enabled vCPU ids
->       spapr: ensure core_slot isn't NULL in spapr_core_unplug()
->       spapr_cpu_core: drop reference on ICP object during CPU realization
->       spapr: fix error reporting in xics_system_init()
->       xics: add unrealize handler
->=20
-> Laurent Vivier (1):
->       spapr: add pre_plug function for memory
->=20
-> Nikunj A Dadhania (1):
->       target/ppc: reset reservation in do_rfi()
->=20
->  hw/intc/xics.c              |   5 +
->  hw/intc/xics_kvm.c          |  33 ++++--
->  hw/intc/xics_spapr.c        |   3 +-
->  hw/ppc/spapr.c              | 239 +++++++++++++++++++++++++++++++-------=
-------
->  hw/ppc/spapr_cpu_core.c     |  19 ++--
->  hw/ppc/spapr_drc.c          |  92 ++++++++++++++---
->  hw/ppc/spapr_events.c       |  52 ++--------
->  hw/ppc/spapr_hcall.c        |  54 ++++++----
->  hw/ppc/spapr_pci.c          |   5 +-
->  include/hw/pci-host/spapr.h |   3 +
->  include/hw/ppc/spapr.h      |  12 ++-
->  include/hw/ppc/spapr_drc.h  |   8 +-
->  include/hw/ppc/xics.h       |   3 +-
->  target/ppc/excp_helper.c    |   3 +
->  14 files changed, 349 insertions(+), 182 deletions(-)
->=20
+That means that any coroutine which has been yielded in order to wait
+for completion can be resumed from submission path and be eventually
+terminated (freed).
 
-Thanks, applied to my staging tree:
-https://github.com/stefanha/qemu/commits/staging
+The following use-after-free crash was observed when IO throttling
+was enabled:
 
-Stefan
+ Program received signal SIGSEGV, Segmentation fault.
+ [Switching to Thread 0x7f5813dff700 (LWP 56417)]
+ virtqueue_unmap_sg (elem=0x7f5804009a30, len=1, vq=<optimized out>) at virtio.c:252
+ (gdb) bt
+ #0  virtqueue_unmap_sg (elem=0x7f5804009a30, len=1, vq=<optimized out>) at virtio.c:252
+                              ^^^^^^^^^^^^^^
+                              remember the address
 
---4ZLFUWh1odzi/v6L
-Content-Type: application/pgp-signature; name="signature.asc"
+ #1  virtqueue_fill (vq=0x5598b20d21b0, elem=0x7f5804009a30, len=1, idx=0) at virtio.c:282
+ #2  virtqueue_push (vq=0x5598b20d21b0, elem=elem@entry=0x7f5804009a30, len=<optimized out>) at virtio.c:308
+ #3  virtio_blk_req_complete (req=req@entry=0x7f5804009a30, status=status@entry=0 '\000') at virtio-blk.c:61
+ #4  virtio_blk_rw_complete (opaque=<optimized out>, ret=0) at virtio-blk.c:126
+ #5  blk_aio_complete (acb=0x7f58040068d0) at block-backend.c:923
+ #6  coroutine_trampoline (i0=<optimized out>, i1=<optimized out>) at coroutine-ucontext.c:78
 
------BEGIN PGP SIGNATURE-----
+ (gdb) p * elem
+ $8 = {index = 77, out_num = 2, in_num = 1,
+       in_addr = 0x7f5804009ad8, out_addr = 0x7f5804009ae0,
+       in_sg = 0x0, out_sg = 0x7f5804009a50}
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+       'in_sg' and 'out_sg' are invalid.
+       e.g. it is impossible that 'in_sg' is zero,
+       instead its value must be equal to:
 
-iQEcBAEBAgAGBQJZLTEgAAoJEJykq7OBq3PIiucIAMRpGotWcYOYo7DpFQMVlndd
-87bE6i3Bs6u4lAT01yDhk/VYlrmw6jRJEEn9yMT6KwlG+Lr3cznAVYRyDEheCJ2n
-v2sfwKKxkhTAuK8ScaxH/ig/CE9djsN4Zi2TeD2gDq8cd5u0p8ru82Umj7SfycNr
-Fymvyp8v29V10/Rhs8fvGhLALptFu9zOoAcFW+1aZkx+7LGEnB6RwPAC5p83mx8o
-+3xzwsoDJAEST7BzCeyW6UPGi7c7v19f6BdDT5ViBdr7Mzx87kSxCEY/d/uT0ED7
-gR4IigQrQVZRB3/juSdbI003BApFTA9hvPGLsdDIEklI3hk3NMACPLwk1mUuiF0=
-=rtfE
------END PGP SIGNATURE-----
+       (gdb) p/x 0x7f5804009ad8 + sizeof(elem->in_addr[0]) + 2 * sizeof(elem->out_addr[0])
+       $26 = 0x7f5804009af0
 
---4ZLFUWh1odzi/v6L--
+Seems 'elem' was corrupted.  Meanwhile another thread raised an abort:
+
+ Thread 12 (Thread 0x7f57f2ffd700 (LWP 56426)):
+ #0  raise () from /lib/x86_64-linux-gnu/libc.so.6
+ #1  abort () from /lib/x86_64-linux-gnu/libc.so.6
+ #2  qemu_coroutine_enter (co=0x7f5804009af0) at qemu-coroutine.c:113
+ #3  qemu_co_queue_run_restart (co=0x7f5804009a30) at qemu-coroutine-lock.c:60
+ #4  qemu_coroutine_enter (co=0x7f5804009a30) at qemu-coroutine.c:119
+                           ^^^^^^^^^^^^^^^^^^
+                           WTF?? this is equal to elem from crashed thread
+
+ #5  qemu_co_queue_run_restart (co=0x7f57e7f16ae0) at qemu-coroutine-lock.c:60
+ #6  qemu_coroutine_enter (co=0x7f57e7f16ae0) at qemu-coroutine.c:119
+ #7  qemu_co_queue_run_restart (co=0x7f5807e112a0) at qemu-coroutine-lock.c:60
+ #8  qemu_coroutine_enter (co=0x7f5807e112a0) at qemu-coroutine.c:119
+ #9  qemu_co_queue_run_restart (co=0x7f5807f17820) at qemu-coroutine-lock.c:60
+ #10 qemu_coroutine_enter (co=0x7f5807f17820) at qemu-coroutine.c:119
+ #11 qemu_co_queue_run_restart (co=0x7f57e7f18e10) at qemu-coroutine-lock.c:60
+ #12 qemu_coroutine_enter (co=0x7f57e7f18e10) at qemu-coroutine.c:119
+ #13 qemu_co_enter_next (queue=queue@entry=0x5598b1e742d0) at qemu-coroutine-lock.c:106
+ #14 timer_cb (blk=0x5598b1e74280, is_write=<optimized out>) at throttle-groups.c:419
+
+Crash can be explained by access of 'co' object from the loop inside
+qemu_co_queue_run_restart():
+
+  while ((next = QSIMPLEQ_FIRST(&co->co_queue_wakeup))) {
+      QSIMPLEQ_REMOVE_HEAD(&co->co_queue_wakeup, co_queue_next);
+                           ^^^^^^^^^^^^^^^^^^^^
+                           on each iteration 'co' is accessed,
+                           but 'co' can be already freed
+
+      qemu_coroutine_enter(next);
+  }
+
+When 'next' coroutine is resumed (entered) it can in its turn resume
+'co', and eventually free it.  That's why we see 'co' (which was freed)
+has the same address as 'elem' from the first backtrace.
+
+The fix is obvious: use temporal queue and do not touch coroutine after
+first qemu_coroutine_enter() is invoked.
+
+The issue is quite rare and happens every ~12 hours on very high IO load
+(building linux kernel with -j512 inside guest) when IO throttling is
+enabled.  With the fix applied guest is running ~35 hours and is still
+alive so far.
+
+Signed-off-by: Roman Pen <roman.penyaev@profitbricks.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Fam Zheng <famz@redhat.com>
+Cc: Stefan Hajnoczi <stefanha@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>
+Cc: qemu-devel@nongnu.org
+---
+ util/qemu-coroutine-lock.c | 17 +++++++++++++++--
+ util/qemu-coroutine.c      |  7 +++++++
+ 2 files changed, 22 insertions(+), 2 deletions(-)
+
+diff --git a/util/qemu-coroutine-lock.c b/util/qemu-coroutine-lock.c
+index 6328eed26bc6..026f5297f0f9 100644
+--- a/util/qemu-coroutine-lock.c
++++ b/util/qemu-coroutine-lock.c
+@@ -77,10 +77,23 @@ void coroutine_fn qemu_co_queue_wait(CoQueue *queue, CoMutex *mutex)
+ void qemu_co_queue_run_restart(Coroutine *co)
+ {
+     Coroutine *next;
++    QSIMPLEQ_HEAD(, Coroutine) tmp_queue_wakeup =
++        QSIMPLEQ_HEAD_INITIALIZER(tmp_queue_wakeup);
+ 
+     trace_qemu_co_queue_run_restart(co);
+-    while ((next = QSIMPLEQ_FIRST(&co->co_queue_wakeup))) {
+-        QSIMPLEQ_REMOVE_HEAD(&co->co_queue_wakeup, co_queue_next);
++
++    /*
++     * We use temporal queue in order not to touch 'co' after entering
++     * 'next' coroutine.  The thing is that 'next' coroutine can resume
++     * current 'co' coroutine and eventually terminate (free) it (see
++     * linux-aio.c: ioq_submit() where qemu_laio_process_completions()
++     * is invoked).  The rule of thumb is simple: do not touch coroutine
++     * when you enter another one.
++     */
++    QSIMPLEQ_CONCAT(&tmp_queue_wakeup, &co->co_queue_wakeup);
++
++    while ((next = QSIMPLEQ_FIRST(&tmp_queue_wakeup))) {
++        QSIMPLEQ_REMOVE_HEAD(&tmp_queue_wakeup, co_queue_next);
+         qemu_coroutine_enter(next);
+     }
+ }
+diff --git a/util/qemu-coroutine.c b/util/qemu-coroutine.c
+index 486af9a62275..d020b63742af 100644
+--- a/util/qemu-coroutine.c
++++ b/util/qemu-coroutine.c
+@@ -126,6 +126,13 @@ void qemu_aio_coroutine_enter(AioContext *ctx, Coroutine *co)
+ 
+     qemu_co_queue_run_restart(co);
+ 
++    /*
++     * BEWARE: in case of ret == COROUTINE_YIELD here at this point
++     *         after qemu_co_queue_run_restart() 'co' can be already
++     *         freed by other coroutine, which has entered 'co'. So
++     *         be careful and do not touch it.
++     */
++
+     switch (ret) {
+     case COROUTINE_YIELD:
+         return;
+-- 
+2.11.0
