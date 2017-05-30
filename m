@@ -1,26 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45391)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45530)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dFdZt-0005zl-MR
-	for qemu-devel@nongnu.org; Tue, 30 May 2017 05:36:38 -0400
+	(envelope-from <lvivier@redhat.com>) id 1dFdaI-0006FP-QT
+	for qemu-devel@nongnu.org; Tue, 30 May 2017 05:37:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dFdZq-0000Yj-HI
-	for qemu-devel@nongnu.org; Tue, 30 May 2017 05:36:37 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47372)
+	(envelope-from <lvivier@redhat.com>) id 1dFdaF-0000g9-JP
+	for qemu-devel@nongnu.org; Tue, 30 May 2017 05:37:02 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43048)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1dFdZq-0000YR-B0
-	for qemu-devel@nongnu.org; Tue, 30 May 2017 05:36:34 -0400
-References: <20170526075246.20265-1-famz@redhat.com>
-	<20170530091939.GF11362@stefanha-x1.localdomain>
-	<20170530093328.GC20514@lemon.lan>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <0b287344-9ff8-8145-fe69-4d36f79d3557@redhat.com>
-Date: Tue, 30 May 2017 11:36:30 +0200
+	(Exim 4.71) (envelope-from <lvivier@redhat.com>) id 1dFdaF-0000fz-Dc
+	for qemu-devel@nongnu.org; Tue, 30 May 2017 05:36:59 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 70A4980F6D
+	for <qemu-devel@nongnu.org>; Tue, 30 May 2017 09:36:58 +0000 (UTC)
+References: <20170530083705.15141-1-quintela@redhat.com>
+	<20170530083705.15141-4-quintela@redhat.com>
+From: Laurent Vivier <lvivier@redhat.com>
+Message-ID: <520a4a08-1345-b229-8e4b-709334fdf3dd@redhat.com>
+Date: Tue, 30 May 2017 11:36:55 +0200
 MIME-Version: 1.0
-In-Reply-To: <20170530093328.GC20514@lemon.lan>
+In-Reply-To: <20170530083705.15141-4-quintela@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PULL 00/22] Docker and block patches
+Subject: Re: [Qemu-devel] [PATCH v2 3/3] migration: Remove section_id
+ parameter from vmstate_load
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,45 +35,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>
-Cc: peter.maydell@linaro.org, qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>
+To: Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org
+Cc: dgilbert@redhat.com, peterx@redhat.com
 
-
-
-On 30/05/2017 11:33, Fam Zheng wrote:
-> On Tue, 05/30 10:19, Stefan Hajnoczi wrote:
->> On Fri, May 26, 2017 at 03:52:24PM +0800, Fam Zheng wrote:
->>> The following changes since commit 9964e96dc9999cf7f7c936ee854a795415d19b60:
->>>
->>>   Merge remote-tracking branch 'jasowang/tags/net-pull-request' into staging (2017-05-23 15:01:31 +0100)
->>>
->>> are available in the git repository at:
->>>
->>>   git://github.com/famz/qemu.git tags/docker-and-block-pull-request
->>>
->>> for you to fetch changes up to 77269bba94ef97de99ae61fdc98629a8704ae2ed:
->>>
->>>   block: make accounting thread-safe (2017-05-26 09:25:30 +0800)
->>>
->>> ----------------------------------------------------------------
->>>
->>> For Paolo's block layer thread safety part I and my docker testing
->>> enhancements.
->>
->> Please fix the checkpatch issues.
+On 30/05/2017 10:37, Juan Quintela wrote:
+> Everything else assumes that we always load a device from its own
+> savevm handler.
 > 
-> Paolo, could you provide the comments that can be added to the memory barriers?
+> Signed-off-by: Juan Quintela <quintela@redhat.com>
 
-It's a false positive.  The comments are just a couple lines above:
+Reviewed-by: Laurent Vivier <lvivier@redhat.com>
 
-        /* We have to set low before high, just like stat64_max reads
-         * high before low.  The value may become lower temporarily, but
-         * stat64_get does not notice (it takes the lock) and the only ill
-         * effect on stat64_max is that the slow path may be triggered
-         * unnecessarily.
-         */
-        atomic_set(&s->low, (uint32_t)value);
-        smp_wmb();
-        atomic_set(&s->high, value >> 32);
-
-Paolo
+> ---
+>  migration/savevm.c | 10 +++++-----
+>  1 file changed, 5 insertions(+), 5 deletions(-)
+> 
+> diff --git a/migration/savevm.c b/migration/savevm.c
+> index 14af5ad..e5dd7ef 100644
+> --- a/migration/savevm.c
+> +++ b/migration/savevm.c
+> @@ -723,13 +723,13 @@ void vmstate_unregister(DeviceState *dev, const VMStateDescription *vmsd,
+>      }
+>  }
+>  
+> -static int vmstate_load(QEMUFile *f, SaveStateEntry *se, int version_id)
+> +static int vmstate_load(QEMUFile *f, SaveStateEntry *se)
+>  {
+>      trace_vmstate_load(se->idstr, se->vmsd ? se->vmsd->name : "(old)");
+>      if (!se->vmsd) {         /* Old style */
+> -        return se->ops->load_state(f, se->opaque, version_id);
+> +        return se->ops->load_state(f, se->opaque, se->load_version_id);
+>      }
+> -    return vmstate_load_state(f, se->vmsd, se->opaque, version_id);
+> +    return vmstate_load_state(f, se->vmsd, se->opaque, se->load_version_id);
+>  }
+>  
+>  static void vmstate_save_old_style(QEMUFile *f, SaveStateEntry *se, QJSON *vmdesc)
+> @@ -1858,7 +1858,7 @@ qemu_loadvm_section_start_full(QEMUFile *f, MigrationIncomingState *mis)
+>          return -EINVAL;
+>      }
+>  
+> -    ret = vmstate_load(f, se, se->load_version_id);
+> +    ret = vmstate_load(f, se);
+>      if (ret < 0) {
+>          error_report("error while loading state for instance 0x%x of"
+>                       " device '%s'", instance_id, idstr);
+> @@ -1891,7 +1891,7 @@ qemu_loadvm_section_part_end(QEMUFile *f, MigrationIncomingState *mis)
+>          return -EINVAL;
+>      }
+>  
+> -    ret = vmstate_load(f, se, se->load_version_id);
+> +    ret = vmstate_load(f, se);
+>      if (ret < 0) {
+>          error_report("error while loading state section id %d(%s)",
+>                       section_id, se->idstr);
+> 
