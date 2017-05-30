@@ -1,19 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35720)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39757)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dFn8M-0002jy-KM
-	for qemu-devel@nongnu.org; Tue, 30 May 2017 15:48:51 -0400
+	(envelope-from <rth7680@gmail.com>) id 1dFnJ3-0006nC-7u
+	for qemu-devel@nongnu.org; Tue, 30 May 2017 15:59:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dFn8L-0008VX-EZ
-	for qemu-devel@nongnu.org; Tue, 30 May 2017 15:48:50 -0400
-Date: Tue, 30 May 2017 16:48:39 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20170530194838.GQ32274@thinpad.lan.raisama.net>
-References: <1496161442-96665-1-git-send-email-imammedo@redhat.com>
+	(envelope-from <rth7680@gmail.com>) id 1dFnIz-0003xX-As
+	for qemu-devel@nongnu.org; Tue, 30 May 2017 15:59:53 -0400
+Received: from mail-qt0-x244.google.com ([2607:f8b0:400d:c0d::244]:33894)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1dFnIz-0003xP-7P
+	for qemu-devel@nongnu.org; Tue, 30 May 2017 15:59:49 -0400
+Received: by mail-qt0-x244.google.com with SMTP id l39so13693509qtb.1
+	for <qemu-devel@nongnu.org>; Tue, 30 May 2017 12:59:49 -0700 (PDT)
+Sender: Richard Henderson <rth7680@gmail.com>
+References: <20170529192440.5990-1-aurelien@aurel32.net>
+	<20170529192440.5990-4-aurelien@aurel32.net>
+From: Richard Henderson <rth@twiddle.net>
+Message-ID: <561ef414-c293-f106-c65b-7f1051cbb202@twiddle.net>
+Date: Tue, 30 May 2017 12:59:44 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1496161442-96665-1-git-send-email-imammedo@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v3 0/7] numa: code consolidation and fixes
+In-Reply-To: <20170529192440.5990-4-aurelien@aurel32.net>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 03/29] target/s390x: implement
+ local-TLB-clearing in IPTE
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,52 +32,20 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-arm@nongnu.org, qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, Andrew Jones <drjones@redhat.com>
+To: Aurelien Jarno <aurelien@aurel32.net>, qemu-devel@nongnu.org
+Cc: Alexander Graf <agraf@suse.de>
 
-On Tue, May 30, 2017 at 06:23:55PM +0200, Igor Mammedov wrote:
-> changelog since v2:
->   (Eduardo)
->      - keep original logic in when moving numa part into helper
->         numa: consolidate cpu_preplug fixups/checks for pc/arm/spapr
->      - drop "numa: fallback to default NUMA node instead of node 0"
->      - split out monitor hunk into separate patch
->      - split out spapr_fixup_cpu_numa_dt refactoring into separate patch
->      - add extra patch to make default node-id calculation more robust
-> changelog since v1:
->   (Eduardo)
->      - user error_abort in numa_cpu_pre_plug()
->      - make default_mapping boolean
->      - redo default mapping detection loop as a combo of for/if
->      - return back lost TODO comment
->      - new patch removing numa_node from generic CPUState
->   - drop silence test patch as it's already in pull req on list
->   - new patch [3/5] to fix missing _PXM/fdt nodes for implicitly mapped CPUs
->   - new patch dropping fallback to node 0
+On 05/29/2017 12:24 PM, Aurelien Jarno wrote:
+> And at the same time make IPTE SMP aware.
 > 
-> 
-> git repo for testing:
->    https://github.com/imammedo/qemu.git cphp_numa_cfg_follow_up_v3_cleanups_v3
-> 
-> CC: qemu-arm@nongnu.org
-> CC: qemu-ppc@nongnu.org
-> CC: Eduardo Habkost <ehabkost@redhat.com>
-> CC: David Gibson <david@gibson.dropbear.id.au>
-> CC: Andrew Jones <drjones@redhat.com>
-> 
-> 
-> Igor Mammedov (7):
->   numa: consolidate cpu_preplug fixups/checks for pc/arm/spapr
->   numa: move default mapping init to machine
->   numa: make sure that all cpus have has_node_id set if numa is enabled
->   numa: make hmp 'info numa' fetch numa nodes from qmp_query_cpus()
->     result
->   numa: move numa_node from CPUState into target specific classes
->   spapr: cleanup spapr_fixup_cpu_numa_dt() usage
->   numa: cpu: calculate/set default node-ids after all -numa CLI options
->     are parsed
+> Signed-off-by: Aurelien Jarno<aurelien@aurel32.net>
+> ---
+>   target/s390x/helper.h     |  2 +-
+>   target/s390x/mem_helper.c | 19 ++++++++++++-------
+>   target/s390x/translate.c  |  6 +++++-
+>   3 files changed, 18 insertions(+), 9 deletions(-)
 
-Patches 1-6 queued on numa-next.  Thanks.
+Reviewed-by: Richard Henderson <rth@twiddle.net>
 
--- 
-Eduardo
+
+r~
