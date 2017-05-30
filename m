@@ -1,30 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46967)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47167)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1dFjC3-0005Fr-Un
-	for qemu-devel@nongnu.org; Tue, 30 May 2017 11:36:27 -0400
+	(envelope-from <flypie@rocketmail.com>) id 1dFjCS-0005Vp-U0
+	for qemu-devel@nongnu.org; Tue, 30 May 2017 11:36:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1dFjC0-0006u3-38
-	for qemu-devel@nongnu.org; Tue, 30 May 2017 11:36:24 -0400
-Received: from mail-lf0-x229.google.com ([2a00:1450:4010:c07::229]:35508)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1dFjBz-0006td-IZ
-	for qemu-devel@nongnu.org; Tue, 30 May 2017 11:36:20 -0400
-Received: by mail-lf0-x229.google.com with SMTP id a5so51322135lfh.2
-	for <qemu-devel@nongnu.org>; Tue, 30 May 2017 08:36:19 -0700 (PDT)
+	(envelope-from <flypie@rocketmail.com>) id 1dFjCN-00077i-VS
+	for qemu-devel@nongnu.org; Tue, 30 May 2017 11:36:48 -0400
+Received: from nm5-vm1.bullet.mail.ir2.yahoo.com ([212.82.96.108]:40663)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
+	(envelope-from <flypie@rocketmail.com>) id 1dFjCN-00076m-Hh
+	for qemu-devel@nongnu.org; Tue, 30 May 2017 11:36:43 -0400
+Date: Tue, 30 May 2017 16:36:37 +0000
+From: John Bradley <flypie@rocketmail.com>
+Sender: John Bradley <flypie@rocketmail.com>
+Message-ID: <3a2acc21-d494-465c-bb33-6ca4d6c544b8@ONE.local>
 MIME-Version: 1.0
-References: <20170509173559.31598-1-marcandre.lureau@redhat.com>
-	<20170509173559.31598-5-marcandre.lureau@redhat.com>
-	<8737cbv53y.fsf@dusky.pond.sub.org>
-	<CAJ+F1C+9WAO2RZt-x7hzzh5M6HBv4UjR6svj71vLJD31axC_Zw@mail.gmail.com>
-	<87lgpel8z2.fsf@dusky.pond.sub.org>
-In-Reply-To: <87lgpel8z2.fsf@dusky.pond.sub.org>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Tue, 30 May 2017 15:36:07 +0000
-Message-ID: <CAJ+F1C+wcUgiW6QhQUpsA133F+XR8p4wHDHYnr-y11FhRj1Bxg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 04/17] qapi: merge QInt and QFloat in QNum
+Content-Type: text/plain; 
+Subject: [Qemu-devel] [PATCH] Add code to connect to external panel, for ARM
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,489 +24,727 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org, peter.maydell@linaro.org, qemu-arm@nongnu.org
+Cc: flypie@rocketmail.com
 
-Hi
+>From 5f5c186162ef5f56872095318106e9fe360ae310 Mon Sep 17 00:00:00 2001
+From: John Bradley <flypie@rocketmail.com>
+Date: Tue, 23 May 2017 01:43:32 +0100
+Subject: [PATCH] Add code to connect to external panel, for ARM
 
-On Tue, May 30, 2017 at 6:23 PM Markus Armbruster <armbru@redhat.com> wrote=
-:
+Has no effect if panel not found.
 
-> Marc-Andr=C3=A9 Lureau <marcandre.lureau@gmail.com> writes:
->
-> > Hi
-> >
-> > On Thu, May 11, 2017 at 6:30 PM Markus Armbruster <armbru@redhat.com>
-> wrote:
-> >
-> >> Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
-> >>
-> >>
-> >> > + *
-> >> > + * This work is licensed under the terms of the GNU LGPL, version
-> 2.1 or later.
-> >> > + * See the COPYING.LIB file in the top-level directory.
-> >> > + */
-> >> > +
-> >> > +#ifndef QNUM_H
-> >> > +#define QNUM_H
-> >> > +
-> >> > +#include "qapi/qmp/qobject.h"
-> >> > +
-> >> > +typedef enum {
-> >> > +    QNUM_I64,
-> >> > +    QNUM_DOUBLE
-> >> > +} QNumType;
-> >>
-> >> Not bool because you're going to add to it.  Good.
-> >>
-> >>
-> > Hmm? There is no plan to add bool there so far, I am not sure that make=
-s
-> > sense.
->
-> Misunderstanding.  I meant to say something like "defining an
-> enumeration with two values is usually silly, but you're going to add to
-> this one, so it's okay".
->
->
-ok
+GDummyPanel Fix formating issues.
+
+Add inital discussion of protocol version.
+
+Add code to connect with https://github.com/flypie/GDummyPanel The code uses GNU Sockets & Windows
+sockets as on MINGW GNU no available. This is inteded as a Demo for RFC.
 
 
-> >> >  static void qobject_input_type_int64(Visitor *v, const char *name,
-> int64_t *obj,
-> >> > @@ -387,19 +384,19 @@ static void qobject_input_type_int64(Visitor
-> *v, const char *name, int64_t *obj,
-> >> >  {
-> >> >      QObjectInputVisitor *qiv =3D to_qiv(v);
-> >> >      QObject *qobj =3D qobject_input_get_object(qiv, name, true, err=
-p);
-> >> > -    QInt *qint;
-> >> > +    QNum *qnum;
-> >> >
-> >> >      if (!qobj) {
-> >> >          return;
-> >> >      }
-> >> > -    qint =3D qobject_to_qint(qobj);
-> >> > -    if (!qint) {
-> >> > +    qnum =3D qobject_to_qnum(qobj);
-> >> > +    if (!qnum) {
-> >> >          error_setg(errp, QERR_INVALID_PARAMETER_TYPE,
-> >> >                     full_name(qiv, name), "integer");
-> >> >          return;
-> >> >      }
-> >> >
-> >> > -    *obj =3D qint_get_int(qint);
-> >> > +    *obj =3D qnum_get_int(qnum, errp);
-> >>
-> >> Compare the error message a few lines up
-> >>
-> >>     Invalid parameter type for 'NAME', expected: integer
-> >>
-> >> to the one we get here:
-> >>
-> >>     The number is a float
-> >>
-> >> Which number?  There can be quite a few in a QMP command.  We need to
-> >> pass @name to qnum_get_int() for a decent error message, like
-> >>
-> >>     Parameter 'NAME' is not a 64 bit integer
-> >>
-> >>
-> > I suggest we do it the same way as qom/object.c, handle the error and
-> > prepend/modify it. Passing @name feels awkward, since qtypes don't have
-> to
-> > have names.
->
-> I'm afraid prepending leads to inferior error messages.  What exactly do
-> you propose to prepend?
->
+Signed-off-by: John Bradley <flypie@rocketmail.com>
+---
+ hw/gpio/bcm2835_gpio.c         | 136 +++++++++++------
+ include/hw/gpio/bcm2835_gpio.h |   4 +
+ include/qemu/PanelEmu.h        |  53 +++++++
+ util/Makefile.objs             |   1 +
+ util/PanelEmu.c                | 326 +++++++++++++++++++++++++++++++++++++++++
+ 5 files changed, 479 insertions(+), 41 deletions(-)
+ create mode 100644 include/qemu/PanelEmu.h
+ create mode 100644 util/PanelEmu.c
 
-The property @name
-
-
-> Can you point to a call of qnum_get_int() where the appropriate name
-> isn't readily available?
->
->
-I haven't looked closely, but I suppose it's mostly in tests/
-
-
-> If callers of qnum_get_int() have to mess with the error message to get
-> a decent one, chances are qnum_get_int() should leave creating the Error
-> object to its callers by returning just an error code.  If many callers
-> need the same messages, they can share a wrapper.
->
-
-qnum_get_(u)int() has various error messages, they are not that useful
-though. I'll try to remove Error usage.
-
-
-> >> >  int64_t qdict_get_int(const QDict *qdict, const char *key)
-> >> >  {
-> >> > -    return qint_get_int(qobject_to_qint(qdict_get(qdict, key)));
-> >> > +    return qnum_get_int(qobject_to_qnum(qdict_get(qdict, key)),
-> &error_abort);
-> >>
-> >> Line is a bit long for my taste.
-> >>
-> >> >  }
-> >> >
-> >> >  /**
-> >> > @@ -260,15 +248,25 @@ const char *qdict_get_str(const QDict *qdict,
-> const char *key)
-> >> >   * qdict_get_try_int(): Try to get integer mapped by 'key'
-> >> >   *
-> >> >   * Return integer mapped by 'key', if it is not present in
-> >> > - * the dictionary or if the stored object is not of QInt type
-> >> > + * the dictionary or if the stored object is not of QNum type
-> >>
-> >> Actually "is not a QNum representing an integer".
-> >>
-> >> >   * 'def_value' will be returned.
-> >> >   */
-> >> >  int64_t qdict_get_try_int(const QDict *qdict, const char *key,
-> >> >                            int64_t def_value)
-> >> >  {
-> >> > -    QInt *qint =3D qobject_to_qint(qdict_get(qdict, key));
-> >> > +    Error *err =3D NULL;
-> >> > +    QNum *qnum =3D qobject_to_qnum(qdict_get(qdict, key));
-> >> > +    int64_t val =3D def_value;
-> >> > +
-> >> > +    if (qnum) {
-> >> > +        val =3D qnum_get_int(qnum, &err);
-> >> > +    }
-> >> > +    if (err) {
-> >> > +        error_free(err);
-> >> > +        val =3D def_value;
-> >> > +    }
-> >>
-> >> This is a bit inefficient: it creates and destroys an Error object.
-> >> Easily avoided with a predicate qnum_is_int().
-> >
-> > True, but a predicate would have to deal with the same implicit
-> conversion
-> > as qnum_get_int(). Not sure it's worth the duplication.
->
-> I dislike duplicating the (small) switch less than the clumsy signalling
-> of failure by giving the caller an Error object to free.  Matter of
-> taste.  However, it adds to my uneasy feeling about the qnum_get_int()
-> interface.
->
-> Further up, we discussed qnum_get_int() leaving error messages to
-> callers by returning just an error code.  Would also eliminate the
-> clumsiness here.  Hmm.
->
->
-yep
-
-
-> >> >
-> >> > -    return qint ? qint_get_int(qint) : def_value;
-> >> > +    return val;
-> >> >  }
-> >> >
-> >> >  /**
-> >> > diff --git a/qobject/qfloat.c b/qobject/qfloat.c
-> >> > deleted file mode 100644
-> >> > index d5da847701..0000000000
-> >> > --- a/qobject/qfloat.c
-> >> > +++ /dev/null
-> >> > @@ -1,62 +0,0 @@
-> >> > -/*
-> >> > - * QFloat Module
-> >> > - *
-> >> > - * Copyright IBM, Corp. 2009
-> >> > - *
-> >> > - * Authors:
-> >> > - *  Anthony Liguori   <aliguori@us.ibm.com>
-> >> > - *
-> >> > - * This work is licensed under the terms of the GNU LGPL, version
-> 2.1 or later.
-> >> > - * See the COPYING.LIB file in the top-level directory.
-> >> > - *
-> >> > - */
-> >> > -
-> >> > -#include "qemu/osdep.h"
-> >> > -#include "qapi/qmp/qfloat.h"
-> >> > -#include "qapi/qmp/qobject.h"
-> >> > -#include "qemu-common.h"
-> >> > -
-> >> > -/**
-> >> > - * qfloat_from_int(): Create a new QFloat from a float
-> >> > - *
-> >> > - * Return strong reference.
-> >> > - */
-> >> > -QFloat *qfloat_from_double(double value)
-> >> > -{
-> >> > -    QFloat *qf;
-> >> > -
-> >> > -    qf =3D g_malloc(sizeof(*qf));
-> >> > -    qobject_init(QOBJECT(qf), QTYPE_QFLOAT);
-> >> > -    qf->value =3D value;
-> >> > -
-> >> > -    return qf;
-> >> > -}
-> >> > -
-> >> > -/**
-> >> > - * qfloat_get_double(): Get the stored float
-> >> > - */
-> >> > -double qfloat_get_double(const QFloat *qf)
-> >> > -{
-> >> > -    return qf->value;
-> >> > -}
-> >> > -
-> >> > -/**
-> >> > - * qobject_to_qfloat(): Convert a QObject into a QFloat
-> >> > - */
-> >> > -QFloat *qobject_to_qfloat(const QObject *obj)
-> >> > -{
-> >> > -    if (!obj || qobject_type(obj) !=3D QTYPE_QFLOAT) {
-> >> > -        return NULL;
-> >> > -    }
-> >> > -    return container_of(obj, QFloat, base);
-> >> > -}
-> >> > -
-> >> > -/**
-> >> > - * qfloat_destroy_obj(): Free all memory allocated by a
-> >> > - * QFloat object
-> >> > - */
-> >> > -void qfloat_destroy_obj(QObject *obj)
-> >> > -{
-> >> > -    assert(obj !=3D NULL);
-> >> > -    g_free(qobject_to_qfloat(obj));
-> >> > -}
-> >> > diff --git a/qobject/qint.c b/qobject/qint.c
-> >> > deleted file mode 100644
-> >> > index d7d1b3021f..0000000000
-> >> > --- a/qobject/qint.c
-> >> > +++ /dev/null
-> >> > @@ -1,61 +0,0 @@
-> >> > -/*
-> >> > - * QInt Module
-> >> > - *
-> >> > - * Copyright (C) 2009 Red Hat Inc.
-> >> > - *
-> >> > - * Authors:
-> >> > - *  Luiz Capitulino <lcapitulino@redhat.com>
-> >> > - *
-> >> > - * This work is licensed under the terms of the GNU LGPL, version
-> 2.1 or later.
-> >> > - * See the COPYING.LIB file in the top-level directory.
-> >> > - */
-> >> > -
-> >> > -#include "qemu/osdep.h"
-> >> > -#include "qapi/qmp/qint.h"
-> >> > -#include "qapi/qmp/qobject.h"
-> >> > -#include "qemu-common.h"
-> >> > -
-> >> > -/**
-> >> > - * qint_from_int(): Create a new QInt from an int64_t
-> >> > - *
-> >> > - * Return strong reference.
-> >> > - */
-> >> > -QInt *qint_from_int(int64_t value)
-> >> > -{
-> >> > -    QInt *qi;
-> >> > -
-> >> > -    qi =3D g_malloc(sizeof(*qi));
-> >> > -    qobject_init(QOBJECT(qi), QTYPE_QINT);
-> >> > -    qi->value =3D value;
-> >> > -
-> >> > -    return qi;
-> >> > -}
-> >> > -
-> >> > -/**
-> >> > - * qint_get_int(): Get the stored integer
-> >> > - */
-> >> > -int64_t qint_get_int(const QInt *qi)
-> >> > -{
-> >> > -    return qi->value;
-> >> > -}
-> >> > -
-> >> > -/**
-> >> > - * qobject_to_qint(): Convert a QObject into a QInt
-> >> > - */
-> >> > -QInt *qobject_to_qint(const QObject *obj)
-> >> > -{
-> >> > -    if (!obj || qobject_type(obj) !=3D QTYPE_QINT) {
-> >> > -        return NULL;
-> >> > -    }
-> >> > -    return container_of(obj, QInt, base);
-> >> > -}
-> >> > -
-> >> > -/**
-> >> > - * qint_destroy_obj(): Free all memory allocated by a
-> >> > - * QInt object
-> >> > - */
-> >> > -void qint_destroy_obj(QObject *obj)
-> >> > -{
-> >> > -    assert(obj !=3D NULL);
-> >> > -    g_free(qobject_to_qint(obj));
-> >> > -}
-> >> > diff --git a/qobject/qjson.c b/qobject/qjson.c
-> >> > index b2f3bfec53..2e0930884e 100644
-> >> > --- a/qobject/qjson.c
-> >> > +++ b/qobject/qjson.c
-> >> > @@ -132,12 +132,11 @@ static void to_json(const QObject *obj, QStrin=
-g
-> *str, int pretty, int indent)
-> >> >      case QTYPE_QNULL:
-> >> >          qstring_append(str, "null");
-> >> >          break;
-> >> > -    case QTYPE_QINT: {
-> >> > -        QInt *val =3D qobject_to_qint(obj);
-> >> > -        char buffer[1024];
-> >> > -
-> >> > -        snprintf(buffer, sizeof(buffer), "%" PRId64,
-> qint_get_int(val));
-> >> > +    case QTYPE_QNUM: {
-> >> > +        QNum *val =3D qobject_to_qnum(obj);
-> >> > +        char *buffer =3D qnum_to_string(val);
-> >> >          qstring_append(str, buffer);
-> >> > +        g_free(buffer);
-> >> >          break;
-> >> >      }
-> >> >      case QTYPE_QSTRING: {
-> >> > @@ -234,34 +233,6 @@ static void to_json(const QObject *obj, QString
-> *str, int pretty, int indent)
-> >> >          qstring_append(str, "]");
-> >> >          break;
-> >> >      }
-> >> > -    case QTYPE_QFLOAT: {
-> >> > -        QFloat *val =3D qobject_to_qfloat(obj);
-> >> > -        char buffer[1024];
-> >> > -        int len;
-> >> > -
-> >> > -        /* FIXME: snprintf() is locale dependent; but JSON requires
-> >> > -         * numbers to be formatted as if in the C locale. Dependenc=
-e
-> >> > -         * on C locale is a pervasive issue in QEMU. */
-> >> > -        /* FIXME: This risks printing Inf or NaN, which are not val=
-id
-> >> > -         * JSON values. */
-> >> > -        /* FIXME: the default precision of 6 for %f often causes
-> >> > -         * rounding errors; we should be using DBL_DECIMAL_DIG (17)=
-,
-> >> > -         * and only rounding to a shorter number if the result woul=
-d
-> >> > -         * still produce the same floating point value.  */
-> >> > -        len =3D snprintf(buffer, sizeof(buffer), "%f",
-> qfloat_get_double(val));
-> >> > -        while (len > 0 && buffer[len - 1] =3D=3D '0') {
-> >> > -            len--;
-> >> > -        }
-> >> > -
-> >> > -        if (len && buffer[len - 1] =3D=3D '.') {
-> >> > -            buffer[len - 1] =3D 0;
-> >> > -        } else {
-> >> > -            buffer[len] =3D 0;
-> >> > -        }
-> >> > -
-> >> > -        qstring_append(str, buffer);
-> >> > -        break;
-> >> > -    }
-> >> >      case QTYPE_QBOOL: {
-> >> >          QBool *val =3D qobject_to_qbool(obj);
-> >> >
-> >> > diff --git a/qobject/qnum.c b/qobject/qnum.c
-> >> > new file mode 100644
-> >> > index 0000000000..8e9dd38350
-> >> > --- /dev/null
-> >> > +++ b/qobject/qnum.c
-> >> > @@ -0,0 +1,138 @@
-> >> > +/*
-> >> > + * QNum Module
-> >> > + *
-> >> > + * Copyright (C) 2009 Red Hat Inc.
-> >> > + *
-> >> > + * Authors:
-> >> > + *  Luiz Capitulino <lcapitulino@redhat.com>
-> >> > + *  Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> >> > + *
-> >> > + * This work is licensed under the terms of the GNU LGPL, version
-> 2.1 or later.
-> >> > + * See the COPYING.LIB file in the top-level directory.
-> >> > + */
-> >> > +
-> >> > +#include "qemu/osdep.h"
-> >> > +#include "qapi/error.h"
-> >> > +#include "qapi/qmp/qnum.h"
-> >> > +#include "qapi/qmp/qobject.h"
-> >> > +#include "qemu-common.h"
-> >> > +
-> >> > +/**
-> >> > + * qnum_from_int(): Create a new QNum from an int64_t
-> >> > + *
-> >> > + * Return strong reference.
-> >> > + */
-> >> > +QNum *qnum_from_int(int64_t value)
-> >> > +{
-> >> > +    QNum *qn =3D g_new(QNum, 1);
-> >> > +
-> >> > +    qobject_init(QOBJECT(qn), QTYPE_QNUM);
-> >> > +    qn->type =3D QNUM_I64;
-> >> > +    qn->u.i64 =3D value;
-> >> > +
-> >> > +    return qn;
-> >> > +}
-> >> > +
-> >> > +/**
-> >> > + * qnum_from_double(): Create a new QNum from a double
-> >> > + *
-> >> > + * Return strong reference.
-> >> > + */
-> >> > +QNum *qnum_from_double(double value)
-> >> > +{
-> >> > +    QNum *qn =3D g_new(QNum, 1);
-> >> > +
-> >> > +    qobject_init(QOBJECT(qn), QTYPE_QNUM);
-> >> > +    qn->type =3D QNUM_DOUBLE;
-> >> > +    qn->u.dbl =3D value;
-> >> > +
-> >> > +    return qn;
-> >> > +}
-> >> > +
-> >> > +/**
-> >> > + * qnum_get_int(): Get an integer representation of the number
-> >> > + */
-> >> > +int64_t qnum_get_int(const QNum *qn, Error **errp)
-> >> > +{
-> >> > +    switch (qn->type) {
-> >> > +    case QNUM_I64:
-> >> > +        return qn->u.i64;
-> >> > +    case QNUM_DOUBLE:
-> >> > +        error_setg(errp, "The number is a float");
-> >> > +        return 0;
-> >> > +    }
-> >> > +
-> >> > +    g_assert_not_reached();
-> >>
-> >> g_assert_not_reached() is problematic, see "[PATCH] checkpatch: Disall=
-ow
-> >> glib asserts in main code".
-> >>
-> >> Message-Id: <20170427165526.19836-1-dgilbert@redhat.com>
-> >> https://lists.gnu.org/archive/html/qemu-devel/2017-04/msg05499.html
-> >>
-> >>
-> > Actually g_assert() and g_assert_not_reached() are accepted.
->
-> What exactly does g_assert() buy us over plain assert(), and
-> g_assert_not_reached() over assert(0)?
->
-
-g_assert() brings a bit more context, afaik, can be trapped for error
-testing, and error reporting can be handled by an handler. Not that useful
-to qemu, but could be for the graphical UI though.
-
-g_assert_not_reached() is quite more readable than assert(0)
-
-
->
-> qapi/ overwhelmingly uses assert().
->
-
-ok, it's already a mix of assert & g_assert in qemu though
---=20
-Marc-Andr=C3=A9 Lureau
+diff --git a/hw/gpio/bcm2835_gpio.c b/hw/gpio/bcm2835_gpio.c
+index acc2e3cf9e..5df3f4cddf 100644
+--- a/hw/gpio/bcm2835_gpio.c
++++ b/hw/gpio/bcm2835_gpio.c
+@@ -19,6 +19,8 @@
+ #include "hw/sd/sd.h"
+ #include "hw/gpio/bcm2835_gpio.h"
+ 
++
++
+ #define GPFSEL0   0x00
+ #define GPFSEL1   0x04
+ #define GPFSEL2   0x08
+@@ -75,24 +77,24 @@ static void gpfsel_set(BCM2835GpioState *s, uint8_t reg, uint32_t value)
+ 
+     /* SD controller selection (48-53) */
+     if (s->sd_fsel != 0
+-            && (s->fsel[48] == 0) /* SD_CLK_R */
+-            && (s->fsel[49] == 0) /* SD_CMD_R */
+-            && (s->fsel[50] == 0) /* SD_DATA0_R */
+-            && (s->fsel[51] == 0) /* SD_DATA1_R */
+-            && (s->fsel[52] == 0) /* SD_DATA2_R */
+-            && (s->fsel[53] == 0) /* SD_DATA3_R */
+-            ) {
++        && (s->fsel[48] == 0) /* SD_CLK_R */
++        && (s->fsel[49] == 0) /* SD_CMD_R */
++        && (s->fsel[50] == 0) /* SD_DATA0_R */
++        && (s->fsel[51] == 0) /* SD_DATA1_R */
++        && (s->fsel[52] == 0) /* SD_DATA2_R */
++        && (s->fsel[53] == 0) /* SD_DATA3_R */
++        ) {
+         /* SDHCI controller selected */
+         sdbus_reparent_card(s->sdbus_sdhost, s->sdbus_sdhci);
+         s->sd_fsel = 0;
+     } else if (s->sd_fsel != 4
+-            && (s->fsel[48] == 4) /* SD_CLK_R */
+-            && (s->fsel[49] == 4) /* SD_CMD_R */
+-            && (s->fsel[50] == 4) /* SD_DATA0_R */
+-            && (s->fsel[51] == 4) /* SD_DATA1_R */
+-            && (s->fsel[52] == 4) /* SD_DATA2_R */
+-            && (s->fsel[53] == 4) /* SD_DATA3_R */
+-            ) {
++               && (s->fsel[48] == 4) /* SD_CLK_R */
++               && (s->fsel[49] == 4) /* SD_CMD_R */
++               && (s->fsel[50] == 4) /* SD_DATA0_R */
++               && (s->fsel[51] == 4) /* SD_DATA1_R */
++               && (s->fsel[52] == 4) /* SD_DATA2_R */
++               && (s->fsel[53] == 4) /* SD_DATA3_R */
++               ) {
+         /* SDHost controller selected */
+         sdbus_reparent_card(s->sdbus_sdhci, s->sdbus_sdhost);
+         s->sd_fsel = 4;
+@@ -108,7 +110,7 @@ static int gpfsel_is_out(BCM2835GpioState *s, int index)
+ }
+ 
+ static void gpset(BCM2835GpioState *s,
+-        uint32_t val, uint8_t start, uint8_t count, uint32_t *lev)
++                  uint32_t val, uint8_t start, uint8_t count, uint32_t *lev)
+ {
+     uint32_t changes = val & ~*lev;
+     uint32_t cur = 1;
+@@ -125,7 +127,7 @@ static void gpset(BCM2835GpioState *s,
+ }
+ 
+ static void gpclr(BCM2835GpioState *s,
+-        uint32_t val, uint8_t start, uint8_t count, uint32_t *lev)
++                  uint32_t val, uint8_t start, uint8_t count, uint32_t *lev)
+ {
+     uint32_t changes = val & *lev;
+     uint32_t cur = 1;
+@@ -141,11 +143,12 @@ static void gpclr(BCM2835GpioState *s,
+     *lev &= ~val;
+ }
+ 
+-static uint64_t bcm2835_gpio_read(void *opaque, hwaddr offset,
+-        unsigned size)
++static uint64_t bcm2835_gpio_read(void *opaque, hwaddr offset, unsigned size)
+ {
+     BCM2835GpioState *s = (BCM2835GpioState *)opaque;
+ 
++    uint64_t Data;
++
+     switch (offset) {
+     case GPFSEL0:
+     case GPFSEL1:
+@@ -163,8 +166,20 @@ static uint64_t bcm2835_gpio_read(void *opaque, hwaddr offset,
+         /* Write Only */
+         return 0;
+     case GPLEV0:
++        if (s->panel.socket != -1) {
++            if (panel_read(&s->panel, &Data)) {
++                s->lev0 = (uint32_t)Data;
++                s->lev1 = (uint32_t)(Data >> 32);
++            }
++        }
+         return s->lev0;
+     case GPLEV1:
++        if (s->panel.socket != -1) {
++            if (panel_read(&s->panel, &Data)) {
++                s->lev0 = (uint32_t)Data;
++                s->lev1 = (uint32_t)(Data >> 32);
++            }
++        }
+         return s->lev1;
+     case GPEDS0:
+     case GPEDS1:
+@@ -187,7 +202,7 @@ static uint64_t bcm2835_gpio_read(void *opaque, hwaddr offset,
+         return 0;
+     default:
+         qemu_log_mask(LOG_GUEST_ERROR, "%s: Bad offset %"HWADDR_PRIx"\n",
+-                __func__, offset);
++                      __func__, offset);
+         break;
+     }
+ 
+@@ -195,9 +210,11 @@ static uint64_t bcm2835_gpio_read(void *opaque, hwaddr offset,
+ }
+ 
+ static void bcm2835_gpio_write(void *opaque, hwaddr offset,
+-        uint64_t value, unsigned size)
++                               uint64_t value, unsigned size)
+ {
+     BCM2835GpioState *s = (BCM2835GpioState *)opaque;
++    uint64_t Data;
++
+ 
+     switch (offset) {
+     case GPFSEL0:
+@@ -210,15 +227,37 @@ static void bcm2835_gpio_write(void *opaque, hwaddr offset,
+         break;
+     case GPSET0:
+         gpset(s, value, 0, 32, &s->lev0);
++        if (s->panel.socket != -1) {
++            Data = value;
++            /* John Bradley dummy GPIO Panel */
++            senddatatopanel(&s->panel, Data, true);
++        }
+         break;
+     case GPSET1:
+         gpset(s, value, 32, 22, &s->lev1);
++        if (s->panel.socket != -1) {
++            Data = value;
++            Data <<= 32;
++            /* John Bradley dummy GPIO Panel */
++            senddatatopanel(&s->panel, Data, true);
++        }
+         break;
+     case GPCLR0:
+         gpclr(s, value, 0, 32, &s->lev0);
++        if (s->panel.socket != -1) {
++            Data = value;
++            /* John Bradley dummy GPIO Panel */
++            senddatatopanel(&s->panel, Data, false);
++        }
+         break;
+     case GPCLR1:
+         gpclr(s, value, 32, 22, &s->lev1);
++        if (s->panel.socket != -1) {
++            Data = value;
++            Data <<= 32;
++            /* John Bradley dummy GPIO Panel */
++            senddatatopanel(&s->panel, Data, false);
++        }
+         break;
+     case GPLEV0:
+     case GPLEV1:
+@@ -250,7 +289,7 @@ static void bcm2835_gpio_write(void *opaque, hwaddr offset,
+ 
+ err_out:
+     qemu_log_mask(LOG_GUEST_ERROR, "%s: Bad offset %"HWADDR_PRIx"\n",
+-            __func__, offset);
++                  __func__, offset);
+ }
+ 
+ static void bcm2835_gpio_reset(DeviceState *dev)
+@@ -272,21 +311,22 @@ static void bcm2835_gpio_reset(DeviceState *dev)
+ }
+ 
+ static const MemoryRegionOps bcm2835_gpio_ops = {
+-    .read = bcm2835_gpio_read,
+-    .write = bcm2835_gpio_write,
+-    .endianness = DEVICE_NATIVE_ENDIAN,
++        .read = bcm2835_gpio_read,
++        .write = bcm2835_gpio_write,
++        .endianness = DEVICE_NATIVE_ENDIAN,
+ };
+ 
+ static const VMStateDescription vmstate_bcm2835_gpio = {
+-    .name = "bcm2835_gpio",
+-    .version_id = 1,
+-    .minimum_version_id = 1,
+-    .fields = (VMStateField[]) {
+-        VMSTATE_UINT8_ARRAY(fsel, BCM2835GpioState, 54),
+-        VMSTATE_UINT32(lev0, BCM2835GpioState),
+-        VMSTATE_UINT32(lev1, BCM2835GpioState),
+-        VMSTATE_UINT8(sd_fsel, BCM2835GpioState),
+-        VMSTATE_END_OF_LIST()
++        .name = "bcm2835_gpio",
++        .version_id = 1,
++        .minimum_version_id = 1,
++        .fields = (VMStateField[])
++    {
++     VMSTATE_UINT8_ARRAY(fsel, BCM2835GpioState, 54),
++     VMSTATE_UINT32(lev0, BCM2835GpioState),
++     VMSTATE_UINT32(lev1, BCM2835GpioState),
++     VMSTATE_UINT8(sd_fsel, BCM2835GpioState),
++     VMSTATE_END_OF_LIST()
+     }
+ };
+ 
+@@ -300,9 +340,23 @@ static void bcm2835_gpio_init(Object *obj)
+                         TYPE_SD_BUS, DEVICE(s), "sd-bus");
+ 
+     memory_region_init_io(&s->iomem, obj,
+-            &bcm2835_gpio_ops, s, "bcm2835_gpio", 0x1000);
++                          &bcm2835_gpio_ops, s, "bcm2835_gpio", 0x1000);
+     sysbus_init_mmio(sbd, &s->iomem);
+     qdev_init_gpio_out(dev, s->out, 54);
++
++    /* Get access to the GPIO panel, program will quit on fail */
++    if (panel_open(&s->panel)) {
++        /* PI Has 54 Pins */
++        sendpincount(&s->panel, 54);
++        /* Pins 0 & 1 are I2C so disable */
++        sendenabledmap(&s->panel, 0x003FFFFFFFFFFFFC);
++        /* There are no dedicated input pins I know of */
++        sendinputmap(&s->panel, 0x0000000000000000);
++        /* Pin 53 is dedicated output LED */
++        sendoutputmap(&s->panel, 0x0000800000000000);
++    } else {
++        printf("Couldn't connect to a GPIO panel\n");
++    }
+ }
+ 
+ static void bcm2835_gpio_realize(DeviceState *dev, Error **errp)
+@@ -314,7 +368,7 @@ static void bcm2835_gpio_realize(DeviceState *dev, Error **errp)
+     obj = object_property_get_link(OBJECT(dev), "sdbus-sdhci", &err);
+     if (obj == NULL) {
+         error_setg(errp, "%s: required sdhci link not found: %s",
+-                __func__, error_get_pretty(err));
++                   __func__, error_get_pretty(err));
+         return;
+     }
+     s->sdbus_sdhci = SD_BUS(obj);
+@@ -322,7 +376,7 @@ static void bcm2835_gpio_realize(DeviceState *dev, Error **errp)
+     obj = object_property_get_link(OBJECT(dev), "sdbus-sdhost", &err);
+     if (obj == NULL) {
+         error_setg(errp, "%s: required sdhost link not found: %s",
+-                __func__, error_get_pretty(err));
++                   __func__, error_get_pretty(err));
+         return;
+     }
+     s->sdbus_sdhost = SD_BUS(obj);
+@@ -338,11 +392,11 @@ static void bcm2835_gpio_class_init(ObjectClass *klass, void *data)
+ }
+ 
+ static const TypeInfo bcm2835_gpio_info = {
+-    .name          = TYPE_BCM2835_GPIO,
+-    .parent        = TYPE_SYS_BUS_DEVICE,
+-    .instance_size = sizeof(BCM2835GpioState),
+-    .instance_init = bcm2835_gpio_init,
+-    .class_init    = bcm2835_gpio_class_init,
++                                           .name = TYPE_BCM2835_GPIO,
++                                           .parent = TYPE_SYS_BUS_DEVICE,
++                                           .instance_size = sizeof(BCM2835GpioState),
++                                           .instance_init = bcm2835_gpio_init,
++                                           .class_init = bcm2835_gpio_class_init,
+ };
+ 
+ static void bcm2835_gpio_register_types(void)
+diff --git a/include/hw/gpio/bcm2835_gpio.h b/include/hw/gpio/bcm2835_gpio.h
+index 9f8e0c720c..f7d7c79aa2 100644
+--- a/include/hw/gpio/bcm2835_gpio.h
++++ b/include/hw/gpio/bcm2835_gpio.h
+@@ -15,6 +15,7 @@
+ #define BCM2835_GPIO_H
+ 
+ #include "hw/sd/sd.h"
++#include "qemu/PanelEmu.h"
+ 
+ typedef struct BCM2835GpioState {
+     SysBusDevice parent_obj;
+@@ -30,6 +31,9 @@ typedef struct BCM2835GpioState {
+     uint32_t lev0, lev1;
+     uint8_t sd_fsel;
+     qemu_irq out[54];
++
++    panel_connection_t panel;
++
+ } BCM2835GpioState;
+ 
+ #define TYPE_BCM2835_GPIO "bcm2835_gpio"
+diff --git a/include/qemu/PanelEmu.h b/include/qemu/PanelEmu.h
+new file mode 100644
+index 0000000000..1d97a80492
+--- /dev/null
++++ b/include/qemu/PanelEmu.h
+@@ -0,0 +1,53 @@
++/*
++ * To change this license header, choose License Headers in Project Properties.
++ * To change this template file, choose Tools | Templates
++ * and open the template in the editor.
++ */
++
++/*
++ * File:   PanelEmu.h
++ * Author: John Bradley
++ *
++ * Created on 22 April 2017, 22:26
++ */
++
++#ifndef PANELEMU_H
++#define PANELEMU_H
++
++#ifdef __cplusplus
++extern "C" {
++#endif
++
++
++#define DRIVER_NAME "RDC-GPIO: "
++#define PANEL_NAME "GPIO panel: "
++
++
++#define DEFAULT_PORT 0xb1ff       /*45567*/
++
++#define PANEL_PINS 54
++
++    typedef struct panel_connection {
++        int socket; /* socket we'll connect to the panel with */
++        fd_set fds; /* list of descriptors (only the above socket */
++        char last[PANEL_PINS / 8]; /* we don't want to send updates to the panel
++                                   unless something changed */
++        int ProtocolInUse; /*What version of the protocol are we using. */
++    } panel_connection_t;
++
++    bool panel_open(panel_connection_t *h);
++
++    bool panel_read(panel_connection_t *h, uint64_t *pinS);
++    void senddatatopanel(panel_connection_t *h, uint64_t pinS, bool Value);
++    void panel_send_read_command(panel_connection_t *h);
++    void sendpincount(panel_connection_t *h, int Num);
++    void sendenabledmap(panel_connection_t *h, uint64_t pins);
++    void sendinputmap(panel_connection_t *h, uint64_t pins);
++    void sendoutputmap(panel_connection_t *h, uint64_t pins);
++
++#ifdef __cplusplus
++}
++#endif
++
++#endif /* PANELEMU_H */
++
+diff --git a/util/Makefile.objs b/util/Makefile.objs
+index c6205ebf86..8316ed79ba 100644
+--- a/util/Makefile.objs
++++ b/util/Makefile.objs
+@@ -43,3 +43,4 @@ util-obj-y += qdist.o
+ util-obj-y += qht.o
+ util-obj-y += range.o
+ util-obj-y += systemd.o
++util-obj-y += PanelEmu.o
+\ No newline at end of file
+diff --git a/util/PanelEmu.c b/util/PanelEmu.c
+new file mode 100644
+index 0000000000..1aa29c6479
+--- /dev/null
++++ b/util/PanelEmu.c
+@@ -0,0 +1,326 @@
++/*
++ * Emulation for Rasp PI GPIO via Server connected to via Socket
++ *
++ */
++#include "qemu/osdep.h"
++
++#include <stdio.h>
++#include <stdlib.h>
++#include <memory.h>
++#include <errno.h>
++#include <string.h>
++#include <sys/types.h>
++#ifdef __MINGW32__
++#include <winsock2.h>
++#else
++#include <sys/socket.h>
++#include <arpa/inet.h>
++#include <netinet/in.h>
++#endif
++
++#include "qemu/PanelEmu.h"
++
++typedef enum {
++    PROTOCOLDESCFROMQEMU = 0,
++    PROTOCOLDESCFROMPANEL = 1,
++    PINSTOPANEL = 2,
++    READREQ = 3,
++    PINCOUNT = 4,
++    ENABLEMAP = 5,
++    INPUTMAP = 6,
++    OUTPUTMAP = 7,
++    PINSTOQEMU = 8
++} PacketType;
++
++#define MINPROTOCOL 0
++#define MAXPROTOCOL 0
++
++#define MAXPACKET   255
++
++#define PACKETLEN   0  /* Includes Packet Length */
++#define PACKETTYPE  1
++
++typedef struct {
++    unsigned short int Data[MAXPACKET];
++} CommandPacket;
++
++static void panel_command(panel_connection_t *h, CommandPacket *Pkt);
++
++static void panel_send_protocol_command(panel_connection_t *h)
++{
++    CommandPacket Pkt;
++
++    Pkt.Data[PACKETLEN] = 8;
++    Pkt.Data[PACKETTYPE] = PROTOCOLDESCFROMQEMU;
++    Pkt.Data[2] = MINPROTOCOL;
++    Pkt.Data[3] = MAXPROTOCOL;
++
++    panel_command(h, &Pkt);
++}
++
++void panel_send_read_command(panel_connection_t *h)
++{
++    CommandPacket Pkt;
++
++    Pkt.Data[PACKETLEN] = 4;
++    Pkt.Data[PACKETTYPE] = READREQ;
++
++    panel_command(h, &Pkt);
++}
++
++/* Set a pin to a specified value */
++void senddatatopanel(panel_connection_t *h, uint64_t pin, bool val)
++{
++    CommandPacket Pkt;
++
++    Pkt.Data[PACKETLEN] = (char *)&Pkt.Data[6 + 1] - (char *)&Pkt.Data[0];
++    Pkt.Data[PACKETTYPE] = PINSTOPANEL;
++    Pkt.Data[2] = (unsigned short int)(pin & 0xFFFF);
++    Pkt.Data[3] = (unsigned short int)((pin >> 16) & 0xFFFF);
++    Pkt.Data[4] = (unsigned short int)(pin >> 32 & 0xFFFF);
++    Pkt.Data[5] = (unsigned short int)((pin >> 48) & 0xFFFF);
++    Pkt.Data[6] = val;
++
++    panel_command(h, &Pkt);
++}
++
++void sendpincount(panel_connection_t *h, int val)
++{
++    CommandPacket Pkt;
++
++    Pkt.Data[PACKETLEN] = (char *)&Pkt.Data[2 + 1] - (char *)&Pkt.Data[0];
++    Pkt.Data[PACKETTYPE] = PINCOUNT;
++    Pkt.Data[2] = val;
++
++    panel_command(h, &Pkt);
++}
++
++void sendenabledmap(panel_connection_t *h, uint64_t pin)
++{
++    CommandPacket Pkt;
++
++    Pkt.Data[PACKETLEN] = (char *)&Pkt.Data[5 + 1] - (char *)&Pkt.Data[0];
++    Pkt.Data[PACKETTYPE] = ENABLEMAP;
++    Pkt.Data[2] = (unsigned short int)(pin & 0xFFFF);
++    Pkt.Data[3] = (unsigned short int)((pin >> 16) & 0xFFFF);
++    Pkt.Data[4] = (unsigned short int)(pin >> 32 & 0xFFFF);
++    Pkt.Data[5] = (unsigned short int)((pin >> 48) & 0xFFFF);
++
++    panel_command(h, &Pkt);
++}
++
++void sendinputmap(panel_connection_t *h, uint64_t pin)
++{
++    CommandPacket Pkt;
++
++    Pkt.Data[PACKETLEN] = (char *)&Pkt.Data[5 + 1] - (char *)&Pkt.Data[0];
++    Pkt.Data[PACKETTYPE] = INPUTMAP;
++    Pkt.Data[2] = (unsigned short int)(pin & 0xFFFF);
++    Pkt.Data[3] = (unsigned short int)((pin >> 16) & 0xFFFF);
++    Pkt.Data[4] = (unsigned short int)(pin >> 32 & 0xFFFF);
++    Pkt.Data[5] = (unsigned short int)((pin >> 48) & 0xFFFF);
++
++    panel_command(h, &Pkt);
++}
++
++void sendoutputmap(panel_connection_t *h, uint64_t pin)
++{
++    CommandPacket Pkt;
++
++    Pkt.Data[PACKETLEN] = (char *)&Pkt.Data[5 + 1] - (char *)&Pkt.Data[0];
++    Pkt.Data[PACKETTYPE] = OUTPUTMAP;
++    Pkt.Data[2] = (unsigned short int)(pin & 0xFFFF);
++    Pkt.Data[3] = (unsigned short int)((pin >> 16) & 0xFFFF);
++    Pkt.Data[4] = (unsigned short int)(pin >> 32 & 0xFFFF);
++    Pkt.Data[5] = (unsigned short int)((pin >> 48) & 0xFFFF);
++
++    panel_command(h, &Pkt);
++}
++
++static void panel_command(panel_connection_t *h, CommandPacket *Pkt)
++{
++    if (send(h->socket, (char *)Pkt, Pkt->Data[PACKETLEN], 0) == -1) {
++        perror(PANEL_NAME "send");
++#ifdef __MINGW32__
++        closesocket(h->socket);
++#else
++        close(h->socket);
++#endif
++        h->socket = -1; /* act like we never connected */
++    }
++}
++
++/* Wait for values to be read back from panel */
++bool panel_read(panel_connection_t *h, uint64_t* Data)
++{
++    fd_set rfds, efds;
++    int LengthInBuffer;
++    int select_res = 0;
++
++    CommandPacket *PktPtr = (CommandPacket *)malloc(sizeof(CommandPacket));
++    CommandPacket *Pkt;
++    bool NoError = true;
++    bool NewData = false;
++    bool NoData = false;
++    struct timeval timeout;
++
++    int ReadStart = 0;
++    int i , j;
++
++    timeout.tv_sec = 0;
++    timeout.tv_usec = 0;
++
++    if (h->socket != -1) {
++        rfds = h->fds;
++        efds = h->fds;
++
++        Pkt = PktPtr;
++        while (NoError && !NoData) {
++            select_res = select(h->socket + 1, &rfds, NULL, &efds, &timeout);
++            if (select_res > 0) {
++                if (FD_ISSET(h->socket, &rfds)) {
++                    /* receive more data */
++                    LengthInBuffer = recv(h->socket, (char *)&Pkt[ReadStart],
++                                    sizeof(*Pkt) - ReadStart, 0);
++                    if (LengthInBuffer > 0) {
++                        LengthInBuffer += ReadStart;
++                        for (i = 0; LengthInBuffer > 0; i++) {
++                            if (LengthInBuffer >= Pkt->Data[i + PACKETLEN]) {
++                                switch (Pkt->Data[i + PACKETTYPE]) {
++                                case PINSTOQEMU:
++                                    *Data = (uint64_t)Pkt->Data[i + 2];
++                                    *Data |= ((uint64_t)Pkt->Data[i + 3]) << 16;
++                                    *Data |= ((uint64_t)Pkt->Data[i + 4]) << 32;
++                                    *Data |= ((uint64_t)Pkt->Data[i + 5]) << 48;
++
++                                    NewData = true;
++                                    break;
++
++                                case PROTOCOLDESCFROMPANEL:
++                                    h->ProtocolInUse = (int)Pkt->Data[i + 2];
++                                    if (h->ProtocolInUse != -1) {
++                                        printf(PANEL_NAME "Protocol %d\n",
++                                               h->ProtocolInUse);
++                                    } else {
++                                        printf(PANEL_NAME "No Common Pcol\n");
++                                    }
++                                    break;
++
++                                default:
++                                    printf(PANEL_NAME "Invalid data receive\n");
++                                    break;
++                                }
++                                LengthInBuffer -= Pkt->Data[PACKETLEN];
++                                i += Pkt->Data[PACKETLEN];
++                            } else {
++                                ReadStart = LengthInBuffer;
++                                for (j = 0; j < LengthInBuffer; j++) {
++                                    Pkt->Data[j] = Pkt->Data[i + j];
++                                }
++                                printf(PANEL_NAME "Partial Packet Read");
++                            }
++                        }
++                    } else {
++                        if (LengthInBuffer < 0) {
++                            if (errno != EINTR) {
++                                printf(PANEL_NAME "recv");
++                                NoError = FALSE;
++                            }
++                        } else {
++                            printf(PANEL_NAME "closed connection\n");
++                            NoError = FALSE;
++                        }
++                    }
++                }
++            } else if (select_res == 0) {
++                NoData = true;
++            } else if (errno != EINTR) {
++#ifdef __MINGW32__
++                closesocket(h->socket);
++#else
++                close(h->socket);
++#endif
++                h->socket = -1; /* act like we never connected */
++                perror(PANEL_NAME "select error");
++                NoError = FALSE;
++            }
++        }
++    }
++
++    free(PktPtr);
++
++    return NewData;
++}
++
++bool panel_open(panel_connection_t *h)
++{
++    int rv;
++#ifdef __MINGW32__
++    struct sockaddr_in remote;
++#else
++    struct sockaddr_in remote;
++#endif
++
++    bool returnval = false;
++
++#ifdef __MINGW32__
++    printf("__MINGW32__\n");
++#else
++    printf("NOT __MINGW32__\n");
++#endif
++
++    h->socket = -1;
++    h->ProtocolInUse = -1;
++
++#ifdef __MINGW32__
++    WSADATA wsadata;
++    if (WSAStartup(MAKEWORD(1, 1), &wsadata) == SOCKET_ERROR) {
++        printf("Error creating socket.\n");
++    } else {
++#endif
++        h->socket = socket(AF_INET, SOCK_STREAM, 0);
++        if (h->socket != -1) {
++#ifdef __MINGW32__
++            memset((char *)&remote, 0, sizeof(remote));
++            remote.sin_family = AF_INET;
++            remote.sin_port = htons(DEFAULT_PORT);
++            remote.sin_addr.s_addr = inet_addr("127.0.0.1");
++#else
++            memset((char *)&remote, 0, sizeof(remote));
++            remote.sin_family = AF_INET;
++            remote.sin_port = htons(DEFAULT_PORT);
++            remote.sin_addr.s_addr = inet_addr("127.0.0.1");
++#endif
++            rv = connect(h->socket,
++                            (struct sockaddr *)&remote, sizeof(remote));
++            if (rv != -1) {
++#ifdef __MINGW32__
++                char value = 1;
++                setsockopt(h->socket, IPPROTO_TCP, TCP_NODELAY,
++                           &value, sizeof(value));
++#endif
++                FD_ZERO(&h->fds);
++
++                /* Set our connected socket */
++                FD_SET(h->socket, &h->fds);
++
++                printf(PANEL_NAME "Connected OK %d\n", rv);
++
++                panel_send_protocol_command(h);
++
++                returnval = true;
++            } else {
++                printf(PANEL_NAME "connection Fails %d\n", rv);
++#ifdef __MINGW32__
++                closesocket(h->socket);
++#else
++                close(h->socket);
++#endif
++                h->socket = -1;
++            }
++        }
++#ifdef __MINGW32__
++    }
++#endif
++    return returnval;
++}
+-- 
+2.13.0.windows.1
