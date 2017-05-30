@@ -1,22 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52093)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52184)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1dFe7R-0003R1-QL
-	for qemu-devel@nongnu.org; Tue, 30 May 2017 06:11:18 -0400
+	(envelope-from <quintela@redhat.com>) id 1dFe7u-0003kK-7b
+	for qemu-devel@nongnu.org; Tue, 30 May 2017 06:11:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1dFe7R-0001T9-3A
-	for qemu-devel@nongnu.org; Tue, 30 May 2017 06:11:17 -0400
-Received: from mail-wm0-x22e.google.com ([2a00:1450:400c:c09::22e]:33406)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1dFe7Q-0001T5-UP
-	for qemu-devel@nongnu.org; Tue, 30 May 2017 06:11:17 -0400
-Received: by mail-wm0-x22e.google.com with SMTP id m7so26422515wmg.0
-	for <qemu-devel@nongnu.org>; Tue, 30 May 2017 03:11:16 -0700 (PDT)
+	(envelope-from <quintela@redhat.com>) id 1dFe7r-0001bK-3m
+	for qemu-devel@nongnu.org; Tue, 30 May 2017 06:11:46 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:60280)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1dFe7q-0001b2-UE
+	for qemu-devel@nongnu.org; Tue, 30 May 2017 06:11:43 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id D81D3C049D5B
+	for <qemu-devel@nongnu.org>; Tue, 30 May 2017 10:11:41 +0000 (UTC)
+From: Juan Quintela <quintela@redhat.com>
+In-Reply-To: <1495649128-10529-7-git-send-email-vyasevic@redhat.com>
+	(Vladislav Yasevich's message of "Wed, 24 May 2017 14:05:22 -0400")
+References: <1495649128-10529-1-git-send-email-vyasevic@redhat.com>
+	<1495649128-10529-7-git-send-email-vyasevic@redhat.com>
+Reply-To: quintela@redhat.com
+Date: Tue, 30 May 2017 12:11:35 +0200
+Message-ID: <87bmqahcx4.fsf@secure.mitica>
 MIME-Version: 1.0
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Date: Tue, 30 May 2017 11:11:15 +0100
-Message-ID: <CAJSP0QVzoN=2rv_HUNf0oR_FQg=5xJ9UQbLqq0rj8OuYb8ZByw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: [Qemu-devel] [RFC] QEMU 2.10 release schedule
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH 06/12] qmp: Expose qemu_announce_self as a
+ qmp command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,19 +35,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel <qemu-devel@nongnu.org>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Christian Borntraeger <borntraeger@de.ibm.com>
+To: Vladislav Yasevich <vyasevic@redhat.com>
+Cc: qemu-devel@nongnu.org, dgilbert@redhat.com, germano@redhat.com, lvivier@redhat.com, jasowang@redhat.com, jdenemar@redhat.com, kashyap@redhat.com, armbru@redhat.com, mst@redhat.com
 
-Here is a first stab at the next release schedule:
+Vladislav Yasevich <vyasevic@redhat.com> wrote:
+> Add a qmp command that can trigger guest announcements.
+>
+> Based on work of Germano Veit Michel <germano@redhat.com>
+>
+> Signed-off-by: Vladislav Yasevich <vyasevic@redhat.com>
+> ---
+>  migration/savevm.c | 14 ++++++++++++++
+>  qapi-schema.json   | 19 +++++++++++++++++++
+>  2 files changed, 33 insertions(+)
+>
+> diff --git a/migration/savevm.c b/migration/savevm.c
+> index a4097c9..b55ce6a 100644
+> --- a/migration/savevm.c
+> +++ b/migration/savevm.c
+> @@ -265,6 +265,20 @@ void qemu_announce_self(AnnounceParameters *params)
+>      qemu_announce_self_once(timer);
+>  }
+>  
+> +void qmp_announce_self(bool has_params, AnnounceParameters *params,
+> +                       Error **errp)
+> +{
+> +    AnnounceParameters announce_params;
+> +
+> +    memcpy(&announce_params, qemu_get_announce_params(),
+> +           sizeof(announce_params));
+> +
+> +    if (has_params)
+> +        qemu_set_announce_parameters(&announce_params, params);
+> +
+> +    qemu_announce_self(&announce_params);
 
-Beginning of development phase: 2017-04-20
-Soft feature freeze: 2017-07-18
--rc0: 2017-07-25
--rc1: 2017-08-01
--rc2: 2017-08-08
--rc3: 2017-08-15
--rc4: 2017-08-22
-
-Thoughts?
-
-Stefan
+Are I missreading qemu_annouce_self()?
+My reading is that it passes announce_params to a timer (i.e. async
+function), but here announce_params is a local variable here, no?
