@@ -1,30 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48834)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49837)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <maxime.coquelin@redhat.com>) id 1dG5QO-0006hl-KL
-	for qemu-devel@nongnu.org; Wed, 31 May 2017 11:20:41 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dG5SW-0000YM-9Y
+	for qemu-devel@nongnu.org; Wed, 31 May 2017 11:22:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <maxime.coquelin@redhat.com>) id 1dG5QL-000151-Eq
-	for qemu-devel@nongnu.org; Wed, 31 May 2017 11:20:40 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:37550)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <maxime.coquelin@redhat.com>)
-	id 1dG5QL-00014e-5r
-	for qemu-devel@nongnu.org; Wed, 31 May 2017 11:20:37 -0400
-From: Maxime Coquelin <maxime.coquelin@redhat.com>
-References: <20170526142858.19931-1-maxime.coquelin@redhat.com>
-	<20170526142858.19931-4-maxime.coquelin@redhat.com>
-	<20170530210905-mutt-send-email-mst@kernel.org>
-	<1432592b-f0e2-fbf1-0479-03ba7e584b17@redhat.com>
-	<5382c6fc-64e3-8db0-877c-2e9c2facc39f@redhat.com>
-Message-ID: <50c41a96-25dc-180a-11e0-b1207e6f7de9@redhat.com>
-Date: Wed, 31 May 2017 17:20:21 +0200
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dG5ST-0001n0-3g
+	for qemu-devel@nongnu.org; Wed, 31 May 2017 11:22:52 -0400
+Received: from mail-oi0-x243.google.com ([2607:f8b0:4003:c06::243]:36392)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dG5SS-0001mV-Tc
+	for qemu-devel@nongnu.org; Wed, 31 May 2017 11:22:49 -0400
+Received: by mail-oi0-x243.google.com with SMTP id w138so2390294oiw.3
+	for <qemu-devel@nongnu.org>; Wed, 31 May 2017 08:22:48 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20170531150933.10156-1-alex.bennee@linaro.org>
+	<20170531150933.10156-2-alex.bennee@linaro.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <46b87a09-7b7e-8408-9028-49667f6253f1@amsat.org>
+Date: Wed, 31 May 2017 12:22:46 -0300
 MIME-Version: 1.0
-In-Reply-To: <5382c6fc-64e3-8db0-877c-2e9c2facc39f@redhat.com>
+In-Reply-To: <20170531150933.10156-2-alex.bennee@linaro.org>
 Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 3/6] vhost: extend ring information
- update for IOTLB to all rings
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v1 1/2] gdbstub: modernise DEBUG_GDB
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,86 +34,192 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: peterx@redhat.com, marcandre.lureau@gmail.com, vkaplans@redhat.com, jasowang@redhat.com, wexu@redhat.com, yuanhan.liu@linux.intel.com, qemu-devel@nongnu.org, jfreiman@redhat.com
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, pbonzini@redhat.com, doug16k@gmail.com, imbrenda@linux.vnet.ibm.com
+Cc: qemu-devel@nongnu.org
 
-Hi Michael,
+On 05/31/2017 12:09 PM, Alex Bennée wrote:
+> Convert the a gdb_debug helper which compiles away to nothing when not
+> used but still ensures the format strings are checked. There is some
+> minor code motion for the incorrect checksum message to report it
+> before we attempt to send the reply.
+>
+> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 
-On 05/30/2017 11:11 PM, Maxime Coquelin wrote:
-> 
-> 
-> On 05/30/2017 11:06 PM, Maxime Coquelin wrote:
->> Hi Michael,
->>
->> On 05/30/2017 08:12 PM, Michael S. Tsirkin wrote:
->>> On Fri, May 26, 2017 at 04:28:55PM +0200, Maxime Coquelin wrote:
->>>> Vhost-kernel backend need
->>>
->>> needs
->>>
->>>> to receive IOTLB entry for used ring
->>>> information early, which is done by triggering a miss event on
->>>> its address.
->>>>
->>>> This patch extends this behaviour to all rings information, to be
->>>> compatible with vhost-user backend design.
->>>
->>> Why does vhost-user need it though?
->>
->> For vhost-user, this simplifies the backend design because generally,
->> the backend sends IOTLB miss requests from processing threads through
->> the slave channel, and receives resulting IOTLB updates in vhost-user
->> protocol thread.
->>
->> The only exception is for these rings info, where IOTLB miss requests
->> are sent from vhost-user protocol thread (in the SET_VRING_ENABLE
->> request handler), so the resulting IOTLB update is only handled by
->> the backend when the rings are enabled, which is too late.
->>
->> It could be possible to overcome this issue, but I think it would
->> make the design more complex or less efficient. I see several options:
->>
->> 1. Change the IOTLB miss request so that the master sends the IOTLB
->> update as reply, instead of the reply-ack. It would mean that IOTLB
->> updates/invalidations would be sent either via the master channel or
->> the slave channel. On QEMU side, it means diverging from kernel backend
->> implementation. On backend side, it means having possibly multiple
->> threads writing to the IOTLB cache.
->>
->> 2. In vhost-user protocol thread, when handling SET_VRING_ENABLE, send
->> IOTLB miss request without setting the reply-ack flag, and poll the
->> vhost-user socket to read the resulting IOTLB update. The problem is
->> that other requests could be pending in the socket's buffer, and so it
->> would end-up nesting multiple requests handling.
->>
->> 3. Don't interpret rings info in the vhost-user protocol thread, but
->> only in the processing threads. The advantage is that it would address
->> the remark you made on patch 6 that invalidates are not affecting ring
->> info. The downside being the overhead induced by checking whether the
->> ring info are valid every time it is being used. I haven't prototyped
->> this solution, but I expected the performance regression to be a
->> blocker.
->>
->> 4. In SET_VRING_ENABLE, don't enable the ring if needed entries are 
->> not in IOTLB cache. Just send the IOTLB misses without reply-ack flag 
->> and postpone enable when handling IOTLB updates. It will be a little 
->> more complex solution than current one, but it may be the less 
->> impacting compared to the other 3 options.
->>
->>
->> Thinking again, maybe trying solution would be worth the effort, and 
-> 
-> s/solution/solution 4/
-> 
->> could be extended also to disable the rings when receiving invalidates
->> that affect rings info.
->>
->> What do you think?
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
-I have made some tests to see if solution 4 would work, and while it
-could work most of the times, it is really fragile as deadlock would
-happen if either slave or master sockets buffers are full. This is issue
-also impact solution 1 above.
-
-Regards,
-Maxime
+> ---
+>  gdbstub.c | 77 +++++++++++++++++++++++++++------------------------------------
+>  1 file changed, 33 insertions(+), 44 deletions(-)
+>
+> diff --git a/gdbstub.c b/gdbstub.c
+> index 86eed4f97c..a249846954 100644
+> --- a/gdbstub.c
+> +++ b/gdbstub.c
+> @@ -271,7 +271,20 @@ static int gdb_signal_to_target (int sig)
+>          return -1;
+>  }
+>
+> -//#define DEBUG_GDB
+> +/* #define DEBUG_GDB */
+> +
+> +#ifdef DEBUG_GDB
+> +# define DEBUG_GDB_GATE 1
+> +#else
+> +# define DEBUG_GDB_GATE 0
+> +#endif
+> +
+> +#define gdb_debug(fmt, ...) do { \
+> +    if (DEBUG_GDB_GATE) { \
+> +        fprintf(stderr, "%s: " fmt, __func__, ## __VA_ARGS__); \
+> +    } \
+> +} while (0)
+> +
+>
+>  typedef struct GDBRegisterState {
+>      int base_reg;
+> @@ -547,9 +560,7 @@ static int put_packet_binary(GDBState *s, const char *buf, int len)
+>  /* return -1 if error, 0 if OK */
+>  static int put_packet(GDBState *s, const char *buf)
+>  {
+> -#ifdef DEBUG_GDB
+> -    printf("reply='%s'\n", buf);
+> -#endif
+> +    gdb_debug("reply='%s'\n", buf);
+>
+>      return put_packet_binary(s, buf, strlen(buf));
+>  }
+> @@ -955,9 +966,9 @@ static int gdb_handle_packet(GDBState *s, const char *line_buf)
+>      uint8_t *registers;
+>      target_ulong addr, len;
+>
+> -#ifdef DEBUG_GDB
+> -    printf("command='%s'\n", line_buf);
+> -#endif
+> +
+> +    gdb_debug("command='%s'\n", line_buf);
+> +
+>      p = line_buf;
+>      ch = *p++;
+>      switch(ch) {
+> @@ -1518,17 +1529,14 @@ static void gdb_read_byte(GDBState *s, int ch)
+>          /* Waiting for a response to the last packet.  If we see the start
+>             of a new command then abandon the previous response.  */
+>          if (ch == '-') {
+> -#ifdef DEBUG_GDB
+> -            printf("Got NACK, retransmitting\n");
+> -#endif
+> +            gdb_debug("Got NACK, retransmitting\n");
+>              put_buffer(s, (uint8_t *)s->last_packet, s->last_packet_len);
+> +        } else if (ch == '+') {
+> +            gdb_debug("Got ACK\n");
+> +        } else {
+> +            gdb_debug("Got '%c' when expecting ACK/NACK\n", ch);
+>          }
+> -#ifdef DEBUG_GDB
+> -        else if (ch == '+')
+> -            printf("Got ACK\n");
+> -        else
+> -            printf("Got '%c' when expecting ACK/NACK\n", ch);
+> -#endif
+> +
+>          if (ch == '+' || ch == '$')
+>              s->last_packet_len = 0;
+>          if (ch != '$')
+> @@ -1549,9 +1557,7 @@ static void gdb_read_byte(GDBState *s, int ch)
+>                  s->line_sum = 0;
+>                  s->state = RS_GETLINE;
+>              } else {
+> -#ifdef DEBUG_GDB
+> -                printf("gdbstub received garbage between packets: 0x%x\n", ch);
+> -#endif
+> +                gdb_debug("received garbage between packets: 0x%x\n", ch);
+>              }
+>              break;
+>          case RS_GETLINE:
+> @@ -1567,9 +1573,7 @@ static void gdb_read_byte(GDBState *s, int ch)
+>                  /* end of command, start of checksum*/
+>                  s->state = RS_CHKSUM1;
+>              } else if (s->line_buf_index >= sizeof(s->line_buf) - 1) {
+> -#ifdef DEBUG_GDB
+> -                printf("gdbstub command buffer overrun, dropping command\n");
+> -#endif
+> +                gdb_debug("command buffer overrun, dropping command\n");
+>                  s->state = RS_IDLE;
+>              } else {
+>                  /* unescaped command character */
+> @@ -1583,9 +1587,7 @@ static void gdb_read_byte(GDBState *s, int ch)
+>                  s->state = RS_CHKSUM1;
+>              } else if (s->line_buf_index >= sizeof(s->line_buf) - 1) {
+>                  /* command buffer overrun */
+> -#ifdef DEBUG_GDB
+> -                printf("gdbstub command buffer overrun, dropping command\n");
+> -#endif
+> +                gdb_debug("command buffer overrun, dropping command\n");
+>                  s->state = RS_IDLE;
+>              } else {
+>                  /* parse escaped character and leave escape state */
+> @@ -1597,25 +1599,18 @@ static void gdb_read_byte(GDBState *s, int ch)
+>          case RS_GETLINE_RLE:
+>              if (ch < ' ') {
+>                  /* invalid RLE count encoding */
+> -#ifdef DEBUG_GDB
+> -                printf("gdbstub got invalid RLE count: 0x%x\n", ch);
+> -#endif
+> +                gdb_debug("got invalid RLE count: 0x%x\n", ch);
+>                  s->state = RS_GETLINE;
+>              } else {
+>                  /* decode repeat length */
+>                  int repeat = (unsigned char)ch - ' ' + 3;
+>                  if (s->line_buf_index + repeat >= sizeof(s->line_buf) - 1) {
+>                      /* that many repeats would overrun the command buffer */
+> -#ifdef DEBUG_GDB
+> -                    printf("gdbstub command buffer overrun,"
+> -                           " dropping command\n");
+> -#endif
+> +                    gdb_debug("command buffer overrun, dropping command\n");
+>                      s->state = RS_IDLE;
+>                  } else if (s->line_buf_index < 1) {
+>                      /* got a repeat but we have nothing to repeat */
+> -#ifdef DEBUG_GDB
+> -                    printf("gdbstub got invalid RLE sequence\n");
+> -#endif
+> +                    gdb_debug("got invalid RLE sequence\n");
+>                      s->state = RS_GETLINE;
+>                  } else {
+>                      /* repeat the last character */
+> @@ -1630,9 +1625,7 @@ static void gdb_read_byte(GDBState *s, int ch)
+>          case RS_CHKSUM1:
+>              /* get high hex digit of checksum */
+>              if (!isxdigit(ch)) {
+> -#ifdef DEBUG_GDB
+> -                printf("gdbstub got invalid command checksum digit\n");
+> -#endif
+> +                gdb_debug("got invalid command checksum digit\n");
+>                  s->state = RS_GETLINE;
+>                  break;
+>              }
+> @@ -1643,21 +1636,17 @@ static void gdb_read_byte(GDBState *s, int ch)
+>          case RS_CHKSUM2:
+>              /* get low hex digit of checksum */
+>              if (!isxdigit(ch)) {
+> -#ifdef DEBUG_GDB
+> -                printf("gdbstub got invalid command checksum digit\n");
+> -#endif
+> +                gdb_debug("got invalid command checksum digit\n");
+>                  s->state = RS_GETLINE;
+>                  break;
+>              }
+>              s->line_csum |= fromhex(ch);
+>
+>              if (s->line_csum != (s->line_sum & 0xff)) {
+> +                gdb_debug("got command packet with incorrect checksum\n");
+>                  /* send NAK reply */
+>                  reply = '-';
+>                  put_buffer(s, &reply, 1);
+> -#ifdef DEBUG_GDB
+> -                printf("gdbstub got command packet with incorrect checksum\n");
+> -#endif
+>                  s->state = RS_IDLE;
+>              } else {
+>                  /* send ACK reply */
+>
