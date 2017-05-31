@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46542)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47714)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dFwJ5-00018o-EC
-	for qemu-devel@nongnu.org; Wed, 31 May 2017 01:36:33 -0400
+	id 1dFwQG-0002Sg-RU
+	for qemu-devel@nongnu.org; Wed, 31 May 2017 01:43:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dFwJ4-0000af-3u
-	for qemu-devel@nongnu.org; Wed, 31 May 2017 01:36:31 -0400
+	id 1dFwQF-0002vX-35
+	for qemu-devel@nongnu.org; Wed, 31 May 2017 01:43:56 -0400
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 References: <1494949133-2202-1-git-send-email-sundeep.lkml@gmail.com>
-	<d403f33f-647e-a142-4265-7d856d8be6aa@amsat.org>
-	<CALHRZur8Uh0JCnOoY-_mUU_fyzbUgxbmWKtfOoB-GTYR5UcEnQ@mail.gmail.com>
-	<CALHRZuoVHFOYV345JmvSkfJHsVjS7Wv_ySzAUtwo1D7eyoS_XQ@mail.gmail.com>
+	<1494949133-2202-5-git-send-email-sundeep.lkml@gmail.com>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <648515bf-ba1e-3d7f-d5bd-51b243f8c29f@amsat.org>
-Date: Wed, 31 May 2017 02:36:22 -0300
+Message-ID: <553a2ef3-cbf3-f876-cbf0-3d46bb24e14b@amsat.org>
+Date: Wed, 31 May 2017 02:43:46 -0300
 MIME-Version: 1.0
-In-Reply-To: <CALHRZuoVHFOYV345JmvSkfJHsVjS7Wv_ySzAUtwo1D7eyoS_XQ@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [Qemu devel v5 PATCH 0/5] Add support for
- Smartfusion2 SoC
+In-Reply-To: <1494949133-2202-5-git-send-email-sundeep.lkml@gmail.com>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [Qemu devel v5 PATCH 4/5] msf2: Add Smartfusion2
+ SoC.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,192 +28,340 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: sundeep subbaraya <sundeep.lkml@gmail.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Alistair Francis <alistair23@gmail.com>
+To: Subbaraya Sundeep <sundeep.lkml@gmail.com>, qemu-devel@nongnu.org, qemu-arm@nongnu.org
+Cc: peter.maydell@linaro.org, crosthwaite.peter@gmail.com, alistair23@gmail.com
 
-Hi Sundeep,
+Hi Subbaraya,
 
-On 05/29/2017 02:28 AM, sundeep subbaraya wrote:
-> Hi Philippe,
->
-> Any update on this? I will wait for your comments too
-> and send next iteration fixing Alistair comments.
+So far so good!
 
-Sorry I'm supposed to be in holidays ;)
+On 05/16/2017 12:38 PM, Subbaraya Sundeep wrote:
+> Smartfusion2 SoC has hardened Microcontroller subsystem
+> and flash based FPGA fabric. This patch adds support for
+> Microcontroller subsystem in the SoC.
+>
+> Signed-off-by: Subbaraya Sundeep <sundeep.lkml@gmail.com>
+> ---
+>  default-configs/arm-softmmu.mak |   1 +
+>  hw/arm/Makefile.objs            |   1 +
+>  hw/arm/msf2-soc.c               | 201 ++++++++++++++++++++++++++++++++++++++++
+>  include/hw/arm/msf2-soc.h       |  69 ++++++++++++++
+>  4 files changed, 272 insertions(+)
+>  create mode 100644 hw/arm/msf2-soc.c
+>  create mode 100644 include/hw/arm/msf2-soc.h
+>
+> diff --git a/default-configs/arm-softmmu.mak b/default-configs/arm-softmmu.mak
+> index 78d7af0..7062512 100644
+> --- a/default-configs/arm-softmmu.mak
+> +++ b/default-configs/arm-softmmu.mak
+> @@ -122,3 +122,4 @@ CONFIG_ACPI=y
+>  CONFIG_SMBIOS=y
+>  CONFIG_ASPEED_SOC=y
+>  CONFIG_GPIO_KEY=y
+> +CONFIG_MSF2=y
+> diff --git a/hw/arm/Makefile.objs b/hw/arm/Makefile.objs
+> index 4c5c4ee..c828061 100644
+> --- a/hw/arm/Makefile.objs
+> +++ b/hw/arm/Makefile.objs
+> @@ -18,3 +18,4 @@ obj-$(CONFIG_FSL_IMX25) += fsl-imx25.o imx25_pdk.o
+>  obj-$(CONFIG_FSL_IMX31) += fsl-imx31.o kzm.o
+>  obj-$(CONFIG_FSL_IMX6) += fsl-imx6.o sabrelite.o
+>  obj-$(CONFIG_ASPEED_SOC) += aspeed_soc.o aspeed.o
+> +obj-$(CONFIG_MSF2) += msf2-soc.o
+> diff --git a/hw/arm/msf2-soc.c b/hw/arm/msf2-soc.c
+> new file mode 100644
+> index 0000000..329e30c
+> --- /dev/null
+> +++ b/hw/arm/msf2-soc.c
+> @@ -0,0 +1,201 @@
+> +/*
+> + * SmartFusion2 SoC emulation.
+> + *
+> + * Copyright (c) 2017 Subbaraya Sundeep <sundeep.lkml@gmail.com>
+> + *
+> + * Permission is hereby granted, free of charge, to any person obtaining a copy
+> + * of this software and associated documentation files (the "Software"), to deal
+> + * in the Software without restriction, including without limitation the rights
+> + * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+> + * copies of the Software, and to permit persons to whom the Software is
+> + * furnished to do so, subject to the following conditions:
+> + *
+> + * The above copyright notice and this permission notice shall be included in
+> + * all copies or substantial portions of the Software.
+> + *
+> + * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+> + * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+> + * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+> + * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+> + * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+> + * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+> + * THE SOFTWARE.
+> + */
+> +
+> +#include "qemu/osdep.h"
+> +#include "qapi/error.h"
+> +#include "qemu-common.h"
+> +#include "hw/arm/arm.h"
+> +#include "exec/address-spaces.h"
+> +#include "hw/char/serial.h"
+> +#include "hw/boards.h"
+> +#include "sysemu/block-backend.h"
+> +#include "hw/arm/msf2-soc.h"
+> +
+> +#define MSF2_TIMER_BASE     0x40004000
+> +#define MSF2_SYSREG_BASE    0x40038000
+> +
+> +#define MSF2_TIMER_IRQ0     14
+> +#define MSF2_TIMER_IRQ1     15
+> +
+> +static const uint32_t spi_addr[MSF2_NUM_SPIS] = { 0x40001000 , 0x40011000 };
+> +static const uint32_t uart_addr[MSF2_NUM_UARTS] = { 0x40000000 , 0x40010000 };
+> +
+> +static const int spi_irq[MSF2_NUM_SPIS] = { 2, 3 };
+> +static const int uart_irq[MSF2_NUM_UARTS] = { 10, 11 };
 
->
-> Thanks,
-> Sundeep
->
-> On Wed, May 17, 2017 at 3:09 PM, sundeep subbaraya
-> <sundeep.lkml@gmail.com <mailto:sundeep.lkml@gmail.com>> wrote:
->
->     Hi Philippe,
->
->     On Wed, May 17, 2017 at 9:57 AM, Philippe Mathieu-Daudé
->     <f4bug@amsat.org <mailto:f4bug@amsat.org>> wrote:
->
->         Hi Sundeep,
->
->         This patchset is way cleaner!
->         I had a fast look and I like it, I'll try to make some time soon
->         to review details and test it.
->
->
->     Thank you
->
->
->
->
->         Is your work interested on U-Boot or more focused in Linux kernel?
->
->
->     I am interested more in kernel. I had to look into u-boot for first
->     time for Qemu only.
->     I worked only on FPGAs(load kernel with debugger) till now so never
->     got a chance to look into u-boot.
->
->
->         If you compile QEMU with libfdt support you can use the -dtb
->         option to pass the blob to the kernel directly, bypassing the
->         bootloader.
->
->     Yeah for armv7m I could not find any thing like that in tree.
->
->
->         If you need a bootloader you may give a look at coreboot which
->         supports dts well, see how Vladimir Serbinenko used Linux's dt
->         to boot a QEMU Versatile Express board:
->         https://mail.coreboot.org/pipermail/coreboot-gerrit/2016-February/040899.html
->         <https://mail.coreboot.org/pipermail/coreboot-gerrit/2016-February/040899.html>
->
->     Cool. I will look into it.
->
->     Thanks,
->     Sundeep
->
->
->         Regards,
->
->         Phil.
->
->
->         On 05/16/2017 12:38 PM, Subbaraya Sundeep wrote:
->
->             Hi Qemu-devel,
->
->             I am trying to add Smartfusion2 SoC.
->             SoC is from Microsemi and System on Module(SOM)
->             board is from Emcraft systems. Smartfusion2 has hardened
->             Microcontroller(Cortex-M3)based Sub System and FPGA fabric.
->             At the moment only system timer, sysreg and SPI
->             controller are modelled.
->
->             Testing:
->             ./arm-softmmu/qemu-system-arm -M smartfusion2-som -serial
->             mon:stdio \
->             -kernel u-boot.bin -display none -drive
->             file=spi.bin,if=mtd,format=raw
+Maybe you can declare timer_irq[] here instead of the defines, to keep a 
+common style.
 
-I'm not sure the timer is working correctly, U-Boot loops with this pattern:
+> +
+> +static void m2sxxx_soc_initfn(Object *obj)
+> +{
+> +    MSF2State *s = MSF2_SOC(obj);
+> +    int i;
+> +
+> +    object_initialize(&s->armv7m, sizeof(s->armv7m), TYPE_ARMV7M);
+> +    qdev_set_parent_bus(DEVICE(&s->armv7m), sysbus_get_default());
+> +
+> +    object_initialize(&s->sysreg, sizeof(s->sysreg), TYPE_MSF2_SYSREG);
+> +    qdev_set_parent_bus(DEVICE(&s->sysreg), sysbus_get_default());
+> +
+> +    object_initialize(&s->timer, sizeof(s->timer), TYPE_MSS_TIMER);
+> +    qdev_set_parent_bus(DEVICE(&s->timer), sysbus_get_default());
+> +
+> +    for (i = 0; i < MSF2_NUM_SPIS; i++) {
+> +        object_initialize(&s->spi[i], sizeof(s->spi[i]),
+> +                          TYPE_MSS_SPI);
+> +        qdev_set_parent_bus(DEVICE(&s->spi[i]), sysbus_get_default());
+> +    }
+> +}
+> +
+> +static void m2sxxx_soc_realize(DeviceState *dev_soc, Error **errp)
+> +{
+> +    MSF2State *s = MSF2_SOC(dev_soc);
+> +    DeviceState *dev, *armv7m;
+> +    SysBusDevice *busdev;
+> +    Error *err = NULL;
+> +    int i;
+> +
+> +    MemoryRegion *system_memory = get_system_memory();
+> +    MemoryRegion *nvm = g_new(MemoryRegion, 1);
+> +    MemoryRegion *nvm_alias = g_new(MemoryRegion, 1);
+> +    MemoryRegion *sram = g_new(MemoryRegion, 1);
+> +
+> +    memory_region_init_ram(nvm, NULL, "MSF2.eNVM", s->envm_size,
+> +                           &error_fatal);
+> +
+> +    /*
+> +     * On power-on, the eNVM region 0x60000000 is automatically
+> +     * remapped to the Cortex-M3 processor executable region
+> +     * start address (0x0). We do not support remapping other eNVM,
+> +     * eSRAM and DDR regions by guest(via Sysreg) currently.
+> +     */
+> +    memory_region_init_alias(nvm_alias, NULL, "MSF2.eNVM.alias",
+> +                             nvm, 0, s->envm_size);
+> +    vmstate_register_ram_global(nvm);
+> +
+> +    memory_region_set_readonly(nvm, true);
+> +    memory_region_set_readonly(nvm_alias, true);
+> +
+> +    memory_region_add_subregion(system_memory, ENVM_BASE_ADDRESS, nvm);
+> +    memory_region_add_subregion(system_memory, 0, nvm_alias);
+> +
+> +    memory_region_init_ram(sram, NULL, "MSF2.eSRAM", s->esram_size,
+> +                           &error_fatal);
+> +    vmstate_register_ram_global(sram);
+> +    memory_region_add_subregion(system_memory, SRAM_BASE_ADDRESS, sram);
+> +
+> +    armv7m = DEVICE(&s->armv7m);
+> +    qdev_prop_set_uint32(armv7m, "num-irq", 81);
+> +    qdev_prop_set_string(armv7m, "cpu-model", "cortex-m3");
+> +    object_property_set_link(OBJECT(&s->armv7m), OBJECT(get_system_memory()),
+> +                                     "memory", &error_abort);
+> +    object_property_set_bool(OBJECT(&s->armv7m), true, "realized", &err);
+> +    if (err != NULL) {
+> +        error_propagate(errp, err);
+> +        return;
+> +    }
+> +
+> +    for (i = 0; i < MSF2_NUM_UARTS; i++) {
+> +        if (serial_hds[i]) {
+> +            serial_mm_init(get_system_memory(), uart_addr[i], 2,
+> +                           qdev_get_gpio_in(armv7m, uart_irq[i]),
+> +                           115200, serial_hds[i], DEVICE_NATIVE_ENDIAN);
+> +        }
+> +    }
+> +
+> +    dev = DEVICE(&s->timer);
+> +    /* pclk0 is the timer input clock */
+> +    qdev_prop_set_uint32(dev, "clock-frequency", s->pclk0);
+> +    object_property_set_bool(OBJECT(&s->timer), true, "realized", &err);
+> +    if (err != NULL) {
+> +        error_propagate(errp, err);
+> +        return;
+> +    }
+> +    busdev = SYS_BUS_DEVICE(dev);
+> +    sysbus_mmio_map(busdev, 0, MSF2_TIMER_BASE);
+> +    sysbus_connect_irq(busdev, 0,
+> +                           qdev_get_gpio_in(armv7m, MSF2_TIMER_IRQ0));
+> +    sysbus_connect_irq(busdev, 1,
+> +                           qdev_get_gpio_in(armv7m, MSF2_TIMER_IRQ1));
+> +
+> +    dev = DEVICE(&s->sysreg);
+> +    object_property_set_bool(OBJECT(&s->sysreg), true, "realized", &err);
+> +    if (err != NULL) {
+> +        error_propagate(errp, err);
+> +        return;
+> +    }
+> +    busdev = SYS_BUS_DEVICE(dev);
+> +    sysbus_mmio_map(busdev, 0, MSF2_SYSREG_BASE);
+> +
+> +    for (i = 0; i < MSF2_NUM_SPIS; i++) {
+> +        gchar *bus_name = g_strdup_printf("spi%d", i);
+> +
+> +        object_property_set_bool(OBJECT(&s->spi[i]), true, "realized", &err);
+> +        if (err != NULL) {
+> +            g_free(bus_name);
+> +            error_propagate(errp, err);
+> +            return;
+> +        }
+> +
+> +        sysbus_mmio_map(SYS_BUS_DEVICE(&s->spi[i]), 0, spi_addr[i]);
+> +        sysbus_connect_irq(SYS_BUS_DEVICE(&s->spi[i]), 0,
+> +                           qdev_get_gpio_in(armv7m, spi_irq[i]));
+> +
+> +        /* Alias controller SPI bus to the SoC itself */
+> +        object_property_add_alias(OBJECT(s), bus_name,
+> +                                  OBJECT(&s->spi[i]), "spi0",
+> +                                  &error_abort);
+> +        g_free(bus_name);
+> +    }
+> +}
+> +
+> +static Property m2sxxx_soc_properties[] = {
+> +    DEFINE_PROP_STRING("part-name", MSF2State, part_name),
+> +    DEFINE_PROP_UINT64("eNVM-size", MSF2State, envm_size, MSF2_ENVM_SIZE),
+> +    DEFINE_PROP_UINT64("eSRAM-size", MSF2State, esram_size, MSF2_ESRAM_SIZE),
+> +    /* Libero GUI shows 100Mhz as default for clocks */
+> +    DEFINE_PROP_UINT32("pclk0", MSF2State, pclk0, 100 * 1000000),
+> +    DEFINE_PROP_UINT32("pclk1", MSF2State, pclk1, 100 * 1000000),
+> +    DEFINE_PROP_END_OF_LIST(),
+> +};
+> +
+> +static void m2sxxx_soc_class_init(ObjectClass *klass, void *data)
+> +{
+> +    DeviceClass *dc = DEVICE_CLASS(klass);
+> +
+> +    dc->realize = m2sxxx_soc_realize;
+> +    dc->props = m2sxxx_soc_properties;
+> +}
+> +
+> +static const TypeInfo m2sxxx_soc_info = {
+> +    .name          = TYPE_MSF2_SOC,
+> +    .parent        = TYPE_SYS_BUS_DEVICE,
+> +    .instance_size = sizeof(MSF2State),
+> +    .instance_init = m2sxxx_soc_initfn,
+> +    .class_init    = m2sxxx_soc_class_init,
+> +};
+> +
+> +static void m2sxxx_soc_types(void)
+> +{
+> +    type_register_static(&m2sxxx_soc_info);
+> +}
+> +
+> +type_init(m2sxxx_soc_types)
+> diff --git a/include/hw/arm/msf2-soc.h b/include/hw/arm/msf2-soc.h
+> new file mode 100644
+> index 0000000..67adddb
+> --- /dev/null
+> +++ b/include/hw/arm/msf2-soc.h
+> @@ -0,0 +1,69 @@
+> +/*
+> + * Microsemi Smartfusion2 SoC
+> + *
+> + * Copyright (c) 2017 Subbaraya Sundeep <sundeep.lkml@gmail.com>
+> + *
+> + * Permission is hereby granted, free of charge, to any person obtaining a copy
+> + * of this software and associated documentation files (the "Software"), to deal
+> + * in the Software without restriction, including without limitation the rights
+> + * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+> + * copies of the Software, and to permit persons to whom the Software is
+> + * furnished to do so, subject to the following conditions:
+> + *
+> + * The above copyright notice and this permission notice shall be included in
+> + * all copies or substantial portions of the Software.
+> + *
+> + * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+> + * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+> + * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+> + * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+> + * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+> + * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+> + * THE SOFTWARE.
+> + */
+> +
+> +#ifndef HW_ARM_MSF2_SOC_H
+> +#define HW_ARM_MSF2_SOC_H
+> +
+> +#include "hw/misc/msf2-sysreg.h"
+> +#include "hw/timer/mss-timer.h"
+> +#include "hw/ssi/mss-spi.h"
+> +#include "hw/arm/armv7m.h"
+> +#include "qemu/cutils.h"
+> +
+> +#define TYPE_MSF2_SOC     "msf2-soc"
+> +#define MSF2_SOC(obj)     OBJECT_CHECK(MSF2State, (obj), TYPE_MSF2_SOC)
+> +
+> +#define MSF2_NUM_SPIS         2
+> +#define MSF2_NUM_UARTS        2
+> +
 
-msf2_sysreg_read: addr: 0x00000048 data: 0x00000220
-msf2_sysreg_write: addr: 0x00000048 data: 0x00000220
-msf2_sysreg_read: addr: 0x00000048 data: 0x00000220
-msf2_sysreg_write: addr: 0x00000048 data: 0x00000020
-msf2_sysreg_read: addr: 0x00000048 data: 0x00000020
-msf2_sysreg_write: addr: 0x00000048 data: 0x00000000
-msf2_sysreg_read: addr: 0x00000048 data: 0x00000000
-msf2_sysreg_write: addr: 0x00000048 data: 0x00000020
-msf2_sysreg_read: addr: 0x00000048 data: 0x00000020
-msf2_sysreg_write: addr: 0x00000048 data: 0x00000220
+from here ...
 
+> +#define ENVM_BASE_ADDRESS     0x60000000
+> +
+> +#define SRAM_BASE_ADDRESS     0x20000000
+> +
+> +#define MSF2_ENVM_SIZE        (512 * K_BYTE)
+> +#define MSF2_ESRAM_SIZE       (64 * K_BYTE)
+> +
+> +#define M2S010_ENVM_SIZE      (256 * K_BYTE)
+> +#define M2S010_ESRAM_SIZE     (64 * K_BYTE)
+> +
+
+... to here can go in C source.
+
+> +typedef struct MSF2State {
+> +    /*< private >*/
+> +    SysBusDevice parent_obj;
+> +    /*< public >*/
+> +
+> +    ARMv7MState armv7m;
+> +
+> +    char *part_name;
+> +    uint64_t envm_size;
+> +    uint64_t esram_size;
+> +
+> +    uint32_t pclk0;
+> +    uint32_t pclk1;
+> +
+> +    MSF2SysregState sysreg;
+> +    MSSTimerState timer;
+> +    MSSSpiState spi[MSF2_NUM_SPIS];
+> +} MSF2State;
+> +
+> +#endif
 >
->             Binaries u-boot.bin and spi.bin are at:
-
-you can compress spi.bin!
-
-can you share u-boot.elf with debug symbols too?
 
 Regards,
 
 Phil.
-
->             https://github.com/Subbaraya-Sundeep/qemu-test-binaries.git
->             <https://github.com/Subbaraya-Sundeep/qemu-test-binaries.git>
->
->             U-boot is from Emcraft with modified
->                 - SPI driver not to use PDMA.
->                 - ugly hack to pass dtb to kernel in r1.
->             @
->             https://github.com/Subbaraya-Sundeep/emcraft-uboot-sf2.git
->             <https://github.com/Subbaraya-Sundeep/emcraft-uboot-sf2.git>
->
->             Linux is 4.5 linux with Smartfusion2 SoC dts and clocksource
->             driver added by myself @
->             https://github.com/Subbaraya-Sundeep/linux.git
->             <https://github.com/Subbaraya-Sundeep/linux.git>
->
->             v5
->                 As per Philippe comments:
->                     Added abort in Sysreg if guest tries to remap memory
->                     other than default mapping.
->                     Use of CONFIG_MSF2 in Makefile for soc.c
->                     Fixed incorrect logic in timer model.
->                     Renamed msf2-timer.c -> mss-timer.c
->                             msf2-spi.c -> mss-spi.c also type names
->                     Renamed function msf2_init->emcraft_sf2_init in
->             msf2-som.c
->                     Added part-name,eNVM-size,eSRAM-size,pclk0 and pclk1
->                         properties to soc.
->                     Pass soc part-name,memory size and clock rate
->             properties from som.
->             v4:
->                 Fixed build failure by using PRIx macros.
->             v3:
->                 Added SoC file and board file as per Alistair comments.
->             v2:
->                 Added SPI controller so that u-boot loads kernel from
->             spi flash.
->             v1:
->                 Initial patch set with timer and sysreg
->
->             Thanks,
->             Sundeep
->
->             Subbaraya Sundeep (5):
->               msf2: Add Smartfusion2 System timer
->               msf2: Microsemi Smartfusion2 System Register block.
->               msf2: Add Smartfusion2 SPI controller
->               msf2: Add Smartfusion2 SoC.
->               msf2: Add Emcraft's Smartfusion2 SOM kit.
->
->              default-configs/arm-softmmu.mak |   1 +
->              hw/arm/Makefile.objs            |   2 +
->              hw/arm/msf2-soc.c               | 201 +++++++++++++++++++++
->              hw/arm/msf2-som.c               |  89 ++++++++++
->              hw/misc/Makefile.objs           |   1 +
->              hw/misc/msf2-sysreg.c           | 161 +++++++++++++++++
->              hw/ssi/Makefile.objs            |   1 +
->              hw/ssi/mss-spi.c                | 378
->             ++++++++++++++++++++++++++++++++++++++++
->              hw/timer/Makefile.objs          |   1 +
->              hw/timer/mss-timer.c            | 249
->             ++++++++++++++++++++++++++
->              include/hw/arm/msf2-soc.h       |  69 ++++++++
->              include/hw/misc/msf2-sysreg.h   |  80 +++++++++
->              include/hw/ssi/mss-spi.h        | 104 +++++++++++
->              include/hw/timer/mss-timer.h    |  80 +++++++++
->              14 files changed, 1417 insertions(+)
->              create mode 100644 hw/arm/msf2-soc.c
->              create mode 100644 hw/arm/msf2-som.c
->              create mode 100644 hw/misc/msf2-sysreg.c
->              create mode 100644 hw/ssi/mss-spi.c
->              create mode 100644 hw/timer/mss-timer.c
->              create mode 100644 include/hw/arm/msf2-soc.h
->              create mode 100644 include/hw/misc/msf2-sysreg.h
->              create mode 100644 include/hw/ssi/mss-spi.h
->              create mode 100644 include/hw/timer/mss-timer.h
->
->
->
