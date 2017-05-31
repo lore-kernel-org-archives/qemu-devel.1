@@ -1,30 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60224)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33406)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dG93O-00021T-2O
-	for qemu-devel@nongnu.org; Wed, 31 May 2017 15:13:11 -0400
+	(envelope-from <marcandre.lureau@gmail.com>) id 1dG999-0003DH-NQ
+	for qemu-devel@nongnu.org; Wed, 31 May 2017 15:19:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dG93K-0000y0-TL
-	for qemu-devel@nongnu.org; Wed, 31 May 2017 15:13:10 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:41764)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dG93K-0000xY-LQ
-	for qemu-devel@nongnu.org; Wed, 31 May 2017 15:13:06 -0400
-Date: Wed, 31 May 2017 20:12:59 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170531191258.GH3342@work-vm>
-References: <1495539071-12995-1-git-send-email-a.perevalov@samsung.com>
-	<CGME20170523113128eucas1p17a89f8cb47d5731c50f94c3218ba155f@eucas1p1.samsung.com>
-	<1495539071-12995-5-git-send-email-a.perevalov@samsung.com>
-	<20170524023629.GD3873@pxdev.xzpeter.org>
-	<20170524064548.GA12925@aperevalov-ubuntu>
-	<20170524113338.GL3873@pxdev.xzpeter.org>
-	<d4289a31-5661-dcfc-ca08-e7af2eb57ba1@samsung.com>
+	(envelope-from <marcandre.lureau@gmail.com>) id 1dG998-000499-Ey
+	for qemu-devel@nongnu.org; Wed, 31 May 2017 15:19:07 -0400
+Received: from mail-lf0-x242.google.com ([2a00:1450:4010:c07::242]:35232)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+	id 1dG998-00048n-2H
+	for qemu-devel@nongnu.org; Wed, 31 May 2017 15:19:06 -0400
+Received: by mail-lf0-x242.google.com with SMTP id 99so2283113lfu.2
+	for <qemu-devel@nongnu.org>; Wed, 31 May 2017 12:19:05 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <d4289a31-5661-dcfc-ca08-e7af2eb57ba1@samsung.com>
-Subject: Re: [Qemu-devel] [PATCH V6 04/10] migration: split
- ufd_version_check onto receive/request features part
+References: <1496152683-102751-1-git-send-email-anton.nefedov@virtuozzo.com>
+	<1496152683-102751-2-git-send-email-anton.nefedov@virtuozzo.com>
+In-Reply-To: <1496152683-102751-2-git-send-email-anton.nefedov@virtuozzo.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Wed, 31 May 2017 19:18:53 +0000
+Message-ID: <CAJ+F1CK=6RzvKjtK1ErMhKLeDsxRPtxgnj+Cjo_b5O9i-PuLHQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v3 01/13] char: move
+ QemuOpts->ChardevBackend translation to a separate func
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,64 +31,141 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alexey Perevalov <a.perevalov@samsung.com>
-Cc: Peter Xu <peterx@redhat.com>, i.maximets@samsung.com, qemu-devel@nongnu.org
+To: Anton Nefedov <anton.nefedov@virtuozzo.com>, qemu-devel@nongnu.org
+Cc: pbonzini@redhat.com, den@virtuozzo.com
 
-* Alexey Perevalov (a.perevalov@samsung.com) wrote:
-> On 05/24/2017 02:33 PM, Peter Xu wrote:
-> > On Wed, May 24, 2017 at 09:45:48AM +0300, Alexey wrote:
-> > 
-> > [...]
-> > 
-> > > > >           return false;
-> > > > >       }
-> > > > > -    ioctl_mask = (__u64)1 << _UFFDIO_REGISTER |
-> > > > > -                 (__u64)1 << _UFFDIO_UNREGISTER;
-> > > > > +    ioctl_mask = 1 << _UFFDIO_REGISTER |
-> > > > > +                 1 << _UFFDIO_UNREGISTER;
-> > > > Could I ask why we explicitly removed (__u64) here? Since I see the
-> > > > old one better.
-> > > maybe my change not robust, in any case thank to point me, but now I
-> > > think, here should be a constant instead of ioctl_mask, like
-> > > UFFD_API_IOCTLS, the total meaning of that check it's make sure kernel
-> > > returns to us no error and accepted features.
-> > > ok, from the beginning:
-> > > 
-> > > if we request unsupported feature (we check it before) or internal
-> > > state of userfault ctx inside kernel isn't UFFD_STATE_WAIT_API (for
-> > > example we are in the middle of the coping process)
-> > > 	ioctl should end with EINVAL error and ioctls field in
-> > > 	uffdio_api will be empty
-> > > 
-> > > Right now I think ioctls check for UFFD_API is not necessary.
-> > > We just say here, we will use _UFFDIO_REGISTER, _UFFDIO_UNREGISTER,
-> > > but kernel supports it unconditionally, by contrast with
-> > > UFFDIO_REGISTER ioctl - it also returns ioctl field in uffdio_register
-> > > structure, here can be a variations.
-> > Sorry I didn't get the point...
-> I misprinted
-> >We just say here, we will use _UFFDIO_REGISTER
-> 
-> > s/_UFFDIO_REGISTER/_UFFDIO_API/g
-> but the point, ioctl_mask is not necessary here, kernel always returns it.
-> But for _UFFDIO_UNREGISTER, later, not in this function, yes that check is required.
+On Tue, May 30, 2017 at 6:09 PM Anton Nefedov <anton.nefedov@virtuozzo.com>
+wrote:
 
-But Peter's only point was that to build the mask it's better to keep
-the (__u64) cast for safety.
+> parse function will be used by the following patch
+>
+> Signed-off-by: Anton Nefedov <anton.nefedov@virtuozzo.com>
+> Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+>
 
-Dave
+ Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
-> > 
-> > AFAIU here (__u64) makes the constant "1" a 64bit variable. Just like
-> > when we do bit shift we normally have "1ULL<<40". I liked it since
-> > even if _UFFDIO_REGISTER is defined as >32 it will not overflow since
-> > by default a constant "1" is a "int" typed (and it's 32bit width).
-> 
-> > Thanks,
-> > 
-> 
-> -- 
-> Best regards,
-> Alexey Perevalov
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+---
+>  chardev/char.c | 70
+> ++++++++++++++++++++++++++++++++++++----------------------
+>  1 file changed, 44 insertions(+), 26 deletions(-)
+>
+> diff --git a/chardev/char.c b/chardev/char.c
+> index 4e24dc3..3a0f543 100644
+> --- a/chardev/char.c
+> +++ b/chardev/char.c
+> @@ -854,17 +854,13 @@ help_string_append(const char *name, void *opaque)
+>      g_string_append_printf(str, "\n%s", name);
+>  }
+>
+> -Chardev *qemu_chr_new_from_opts(QemuOpts *opts,
+> -                                Error **errp)
+> +static ChardevBackend *qemu_chr_parse_opts(QemuOpts *opts, Error **errp)
+>  {
+>      Error *local_err =3D NULL;
+>      const ChardevClass *cc;
+> -    Chardev *chr;
+>      int i;
+>      ChardevBackend *backend =3D NULL;
+>      const char *name =3D qemu_opt_get(opts, "backend");
+> -    const char *id =3D qemu_opts_id(opts);
+> -    char *bid =3D NULL;
+>
+>      if (name =3D=3D NULL) {
+>          error_setg(errp, "chardev: \"%s\" missing backend",
+> @@ -872,21 +868,6 @@ Chardev *qemu_chr_new_from_opts(QemuOpts *opts,
+>          return NULL;
+>      }
+>
+> -    if (is_help_option(name)) {
+> -        GString *str =3D g_string_new("");
+> -
+> -        chardev_name_foreach(help_string_append, str);
+> -
+> -        error_report("Available chardev backend types: %s", str->str);
+> -        g_string_free(str, true);
+> -        exit(0);
+> -    }
+> -
+> -    if (id =3D=3D NULL) {
+> -        error_setg(errp, "chardev: no id specified");
+> -        return NULL;
+> -    }
+> -
+>      for (i =3D 0; i < ARRAY_SIZE(chardev_alias_table); i++) {
+>          if (g_strcmp0(chardev_alias_table[i].alias, name) =3D=3D 0) {
+>              name =3D chardev_alias_table[i].typename;
+> @@ -902,16 +883,12 @@ Chardev *qemu_chr_new_from_opts(QemuOpts *opts,
+>      backend =3D g_new0(ChardevBackend, 1);
+>      backend->type =3D CHARDEV_BACKEND_KIND_NULL;
+>
+> -    if (qemu_opt_get_bool(opts, "mux", 0)) {
+> -        bid =3D g_strdup_printf("%s-base", id);
+> -    }
+> -
+> -    chr =3D NULL;
+>      if (cc->parse) {
+>          cc->parse(opts, backend, &local_err);
+>          if (local_err) {
+>              error_propagate(errp, local_err);
+> -            goto out;
+> +            qapi_free_ChardevBackend(backend);
+> +            return NULL;
+>          }
+>      } else {
+>          ChardevCommon *ccom =3D g_new0(ChardevCommon, 1);
+> @@ -919,6 +896,47 @@ Chardev *qemu_chr_new_from_opts(QemuOpts *opts,
+>          backend->u.null.data =3D ccom; /* Any ChardevCommon member would
+> work */
+>      }
+>
+> +    return backend;
+> +}
+> +
+> +Chardev *qemu_chr_new_from_opts(QemuOpts *opts, Error **errp)
+> +{
+> +    const ChardevClass *cc;
+> +    Chardev *chr =3D NULL;
+> +    ChardevBackend *backend =3D NULL;
+> +    const char *name =3D qemu_opt_get(opts, "backend");
+> +    const char *id =3D qemu_opts_id(opts);
+> +    char *bid =3D NULL;
+> +
+> +    if (name && is_help_option(name)) {
+> +        GString *str =3D g_string_new("");
+> +
+> +        chardev_name_foreach(help_string_append, str);
+> +
+> +        error_report("Available chardev backend types: %s", str->str);
+> +        g_string_free(str, true);
+> +        exit(0);
+> +    }
+> +
+> +    if (id =3D=3D NULL) {
+> +        error_setg(errp, "chardev: no id specified");
+> +        return NULL;
+> +    }
+> +
+> +    backend =3D qemu_chr_parse_opts(opts, errp);
+> +    if (backend =3D=3D NULL) {
+> +        return NULL;
+> +    }
+> +
+> +    cc =3D char_get_class(name, errp);
+> +    if (cc =3D=3D NULL) {
+> +        goto out;
+> +    }
+> +
+> +    if (qemu_opt_get_bool(opts, "mux", 0)) {
+> +        bid =3D g_strdup_printf("%s-base", id);
+> +    }
+> +
+>      chr =3D qemu_chardev_new(bid ? bid : id,
+>                             object_class_get_name(OBJECT_CLASS(cc)),
+>                             backend, errp);
+> --
+> 2.7.4
+>
+>
+> --
+Marc-Andr=C3=A9 Lureau
