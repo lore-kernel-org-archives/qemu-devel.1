@@ -1,21 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41123)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42535)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dFvjZ-0002KR-TZ
-	for qemu-devel@nongnu.org; Wed, 31 May 2017 00:59:51 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dFvng-0003Sv-4w
+	for qemu-devel@nongnu.org; Wed, 31 May 2017 01:04:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dFvjW-0004ef-PZ
-	for qemu-devel@nongnu.org; Wed, 31 May 2017 00:59:49 -0400
-Date: Wed, 31 May 2017 14:35:57 +1000
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20170531043557.GI12163@umbus.fritz.box>
-References: <20170530160445.12810-1-lvivier@redhat.com>
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dFvnc-0006CG-My
+	for qemu-devel@nongnu.org; Wed, 31 May 2017 01:04:04 -0400
+Received: from mail-oi0-x22b.google.com ([2607:f8b0:4003:c06::22b]:34915)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dFvnc-0006Bx-Ga
+	for qemu-devel@nongnu.org; Wed, 31 May 2017 01:04:00 -0400
+Received: by mail-oi0-x22b.google.com with SMTP id l18so2363156oig.2
+	for <qemu-devel@nongnu.org>; Tue, 30 May 2017 22:04:00 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20170517145259.28979-1-alex.bennee@linaro.org>
+	<20170517145259.28979-2-alex.bennee@linaro.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <0e9874b9-d305-4f21-fd1d-6aff1b99a240@amsat.org>
+Date: Wed, 31 May 2017 02:03:57 -0300
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="U3s59FfKcByyGl+j"
-Content-Disposition: inline
-In-Reply-To: <20170530160445.12810-1-lvivier@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] spapr: manage hotplugged devices while the
- VM is not started
+In-Reply-To: <20170517145259.28979-2-alex.bennee@linaro.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v2 1/6] scripts/replay-dump.py: replay log
+ dumper
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,184 +35,303 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laurent Vivier <lvivier@redhat.com>
-Cc: Thomas Huth <thuth@redhat.com>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, pbonzini@redhat.com, stefanha@redhat.com
+Cc: cota@braap.org, qemu-devel@nongnu.org
 
+On 05/17/2017 11:52 AM, Alex Bennée wrote:
+> This script is a debugging tool for looking through the contents of a
+> replay log file. It is incomplete but should fail gracefully at events
+> it doesn't understand.
+>
+> It currently understands two different log formats as the audio
+> record/replay support was merged during since MTTCG. It was written to
+> help debug what has caused the BQL changes to break replay support.
+>
+> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 
---U3s59FfKcByyGl+j
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Tue, May 30, 2017 at 06:04:45PM +0200, Laurent Vivier wrote:
-> For QEMU, a hotlugged device is a device added using the HMP/QMP
-> interface.
-> For SPAPR, a hotplugged device is a device added while the
-> machine is running. In this case QEMU doesn't update internal
-> state but relies on the OS for this part
->=20
-> In the case of migration, when we (libvirt) hotplug a device
-> on the source guest, we (libvirt) generally hotplug the same
-> device on the destination guest. But in this case, the machine
-> is stopped (RUN_STATE_INMIGRATE) and QEMU must not expect
-> the OS will manage it as an hotplugged device as it will
-> be "imported" by the migration.
->=20
-> This patch changes the meaning of "hotplugged" in spapr.c
-> to manage a QEMU hotplugged device like a "coldplugged" one
-> when the machine is awaiting an incoming migration.
->=20
-> Signed-off-by: Laurent Vivier <lvivier@redhat.com>
-
-So, I think this is a reasonable concept, at least in terms of
-cleanliness and not doing unnecessary work.  However, if it's fixing
-bugs, I suspect that means we still have problems elsewhere.
-
-Specifically, what is it we're doing before the incoming migration
-that's breaking things.  Even if it's unnecessary, anything done there
-should be overwritten by the incoming stream.  That should certainly
-be the case (now) for the DRC state variables.  Maybe not for the
-queued hotplug events - but that means we should update the queue
-migration to make sure we clear anything existing on the destination
-before adding migrated events.
-
-I'm also concerned by the fact that this makes changes for memory and
-cpu hotplug, but not for PCI devices.  Why aren't they also affected
-by this problem?
-
-One nit in the implementation, see below:
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
 > ---
->  hw/ppc/spapr.c | 20 ++++++++++++++------
->  1 file changed, 14 insertions(+), 6 deletions(-)
->=20
-> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> index 0980d73..f1302d0 100644
-> --- a/hw/ppc/spapr.c
-> +++ b/hw/ppc/spapr.c
-> @@ -2511,6 +2511,12 @@ static void spapr_nmi(NMIState *n, int cpu_index, =
-Error **errp)
->      }
->  }
-> =20
-> +static bool spapr_coldplugged(DeviceState *dev)
-> +{
-> +    return runstate_check(RUN_STATE_INMIGRATE) ||
-> +           !dev->hotplugged;
-> +}
+>  scripts/replay-dump.py | 272 +++++++++++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 272 insertions(+)
+>  create mode 100755 scripts/replay-dump.py
+>
+> diff --git a/scripts/replay-dump.py b/scripts/replay-dump.py
+> new file mode 100755
+> index 0000000000..fdd178aba0
+> --- /dev/null
+> +++ b/scripts/replay-dump.py
+> @@ -0,0 +1,272 @@
+> +#!/usr/bin/env python
+> +# -*- coding: utf-8 -*-
+> +#
+> +# Dump the contents of a recorded execution stream
+> +#
+> +#  Copyright (c) 2017 Alex Bennée <alex.bennee@linaro.org>
+> +#
+> +# This library is free software; you can redistribute it and/or
+> +# modify it under the terms of the GNU Lesser General Public
+> +# License as published by the Free Software Foundation; either
+> +# version 2 of the License, or (at your option) any later version.
+> +#
+> +# This library is distributed in the hope that it will be useful,
+> +# but WITHOUT ANY WARRANTY; without even the implied warranty of
+> +# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+> +# Lesser General Public License for more details.
+> +#
+> +# You should have received a copy of the GNU Lesser General Public
+> +# License along with this library; if not, see <http://www.gnu.org/licenses/>.
 > +
->  static void spapr_add_lmbs(DeviceState *dev, uint64_t addr_start, uint64=
-_t size,
->                             uint32_t node, bool dedicated_hp_event_source,
->                             Error **errp)
-> @@ -2521,6 +2527,7 @@ static void spapr_add_lmbs(DeviceState *dev, uint64=
-_t addr_start, uint64_t size,
->      int i, fdt_offset, fdt_size;
->      void *fdt;
->      uint64_t addr =3D addr_start;
-> +    bool coldplugged =3D spapr_coldplugged(dev);
-> =20
->      for (i =3D 0; i < nr_lmbs; i++) {
->          drc =3D spapr_dr_connector_by_id(SPAPR_DR_CONNECTOR_TYPE_LMB,
-> @@ -2532,9 +2539,9 @@ static void spapr_add_lmbs(DeviceState *dev, uint64=
-_t addr_start, uint64_t size,
->                                                  SPAPR_MEMORY_BLOCK_SIZE);
-> =20
->          drck =3D SPAPR_DR_CONNECTOR_GET_CLASS(drc);
-> -        drck->attach(drc, dev, fdt, fdt_offset, !dev->hotplugged, errp);
-> +        drck->attach(drc, dev, fdt, fdt_offset, coldplugged, errp);
->          addr +=3D SPAPR_MEMORY_BLOCK_SIZE;
-> -        if (!dev->hotplugged) {
-> +        if (coldplugged) {
->              /* guests expect coldplugged LMBs to be pre-allocated */
->              drck->set_allocation_state(drc, SPAPR_DR_ALLOCATION_STATE_US=
-ABLE);
->              drck->set_isolation_state(drc, SPAPR_DR_ISOLATION_STATE_UNIS=
-OLATED);
-> @@ -2543,7 +2550,7 @@ static void spapr_add_lmbs(DeviceState *dev, uint64=
-_t addr_start, uint64_t size,
->      /* send hotplug notification to the
->       * guest only in case of hotplugged memory
->       */
-> -    if (dev->hotplugged) {
-> +    if (!coldplugged) {
->          if (dedicated_hp_event_source) {
->              drc =3D spapr_dr_connector_by_id(SPAPR_DR_CONNECTOR_TYPE_LMB,
->                      addr_start / SPAPR_MEMORY_BLOCK_SIZE);
-> @@ -2776,6 +2783,7 @@ static void spapr_core_plug(HotplugHandler *hotplug=
-_dev, DeviceState *dev,
->      int smt =3D kvmppc_smt_threads();
->      CPUArchId *core_slot;
->      int index;
-> +    bool coldplugged =3D spapr_coldplugged(dev);
-> =20
->      core_slot =3D spapr_find_cpu_slot(MACHINE(hotplug_dev), cc->core_id,=
- &index);
->      if (!core_slot) {
-> @@ -2797,7 +2805,7 @@ static void spapr_core_plug(HotplugHandler *hotplug=
-_dev, DeviceState *dev,
-> =20
->      if (drc) {
->          sPAPRDRConnectorClass *drck =3D SPAPR_DR_CONNECTOR_GET_CLASS(drc=
-);
-> -        drck->attach(drc, dev, fdt, fdt_offset, !dev->hotplugged, &local=
-_err);
-> +        drck->attach(drc, dev, fdt, fdt_offset, coldplugged, &local_err);
->          if (local_err) {
->              g_free(fdt);
->              error_propagate(errp, local_err);
-> @@ -2805,7 +2813,7 @@ static void spapr_core_plug(HotplugHandler *hotplug=
-_dev, DeviceState *dev,
->          }
->      }
-> =20
-> -    if (dev->hotplugged) {
-> +    if (!coldplugged) {
->          /*
->           * Send hotplug notification interrupt to the guest only in case
->           * of hotplugged CPUs.
-> @@ -2838,7 +2846,7 @@ static void spapr_core_pre_plug(HotplugHandler *hot=
-plug_dev, DeviceState *dev,
->      int node_id;
->      int index;
-> =20
-> -    if (dev->hotplugged && !mc->has_hotpluggable_cpus) {
-> +    if (!spapr_coldplugged(dev) && !mc->has_hotpluggable_cpus) {
-
-It probably doesn't matter in practice, but in this specific instance,
-I think you want the "raw" qemu meaning of hotplugged rather than the
-spapr meaning.
-
->          error_setg(&local_err, "CPU hotplug not supported for this machi=
-ne");
->          goto out;
->      }
-
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---U3s59FfKcByyGl+j
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-
-iQIcBAEBCAAGBQJZLkgtAAoJEGw4ysog2bOSPzkQAMgpjWWZSE363e/zINUlNwWP
-3QdSbwEyS+QRr5uCyF0DFCSoo/by+8/ftrr5ZzXocTZQ+WINc87k0Qk0uafFCzmh
-uzfMlaFMyKNvVB8rUhKQsMTLaZTsnxbODegg2QP2wYkxeRFogo30Pm1YTVqjsnBv
-iY0hLu6+04Rh+nOy4KHIUwvX1S/Xb6Ibf9WCMBbBkKRab43oENpeYcWQhsEHpQoe
-tWocF0eRW3yB3kAE3HITrzUFiPTpq2UQ3QyFA8SH8bGx2rtiW4bfenANZcdyfpV4
-O93jGBhQFavQEto1itcpFbWf0EwW9ISFR+7UjlfQ/Q6S/F89jYYpMewRBDLaWYCA
-zjICdXTOC9ncsiwKTaoxmqlmGb50NOP5vx/WJoJrKNArivnaZWzbzkCX6HL1cyZN
-zeox+ij7TUz30wYLGc4W0adGaSG4zbZGRoAhZpS7wIJDFCGx+YhHSP5T/oAWsu5c
-s/SjY36jESweA9acQSSIGakoxEM963t7U8hKmytGOgOMfqRFpaP1tBAQRin7wsOk
-RIN4BQub8UmTKSn0F/R2ywGZy13rxFuDAHDO3Mah4ELLvVYTO1XVOR0vOUlwYNTc
-X6nxpsrFRRFLJq0LX9MOvqhWmOcG8bTBJ6xLiqlG5cCu+oNoGKQ9hXf7dlOpaodD
-CDjsnwGqQn0NDsZJzRKu
-=OYYR
------END PGP SIGNATURE-----
-
---U3s59FfKcByyGl+j--
+> +import argparse
+> +import struct
+> +from collections import namedtuple
+> +
+> +# This mirrors some of the global replay state which some of the
+> +# stream loading refers to. Some decoders may read the next event so
+> +# we need handle that case. Calling reuse_event will ensure the next
+> +# event is read from the cache rather than advancing the file.
+> +
+> +class ReplayState(object):
+> +    def __init__(self):
+> +        self.event = -1
+> +        self.event_count = 0
+> +        self.already_read = False
+> +        self.current_checkpoint = 0
+> +        self.checkpoint = 0
+> +
+> +    def set_event(self, ev):
+> +        self.event = ev
+> +        self.event_count += 1
+> +
+> +    def get_event(self):
+> +        self.already_read = False
+> +        return self.event
+> +
+> +    def reuse_event(self, ev):
+> +        self.event = ev
+> +        self.already_read = True
+> +
+> +    def set_checkpoint(self):
+> +        self.checkpoint = self.event - self.checkpoint_start
+> +
+> +    def get_checkpoint(self):
+> +        return self.checkpoint
+> +
+> +replay_state = ReplayState()
+> +
+> +# Simple read functions that mirror replay-internal.c
+> +# The file-stream is big-endian and manually written out a byte at a time.
+> +
+> +def read_byte(fin):
+> +    "Read a single byte"
+> +    return struct.unpack('>B', fin.read(1))[0]
+> +
+> +def read_event(fin):
+> +    "Read a single byte event, but save some state"
+> +    if replay_state.already_read:
+> +        return replay_state.get_event()
+> +    else:
+> +        replay_state.set_event(read_byte(fin))
+> +        return replay_state.event
+> +
+> +def read_word(fin):
+> +    "Read a 16 bit word"
+> +    return struct.unpack('>H', fin.read(2))[0]
+> +
+> +def read_dword(fin):
+> +    "Read a 32 bit word"
+> +    return struct.unpack('>I', fin.read(4))[0]
+> +
+> +def read_qword(fin):
+> +    "Read a 64 bit word"
+> +    return struct.unpack('>Q', fin.read(8))[0]
+> +
+> +# Generic decoder structure
+> +Decoder = namedtuple("Decoder", "eid name fn")
+> +
+> +def call_decode(table, index, dumpfile):
+> +    "Search decode table for next step"
+> +    decoder = next((d for d in table if d.eid == index), None)
+> +    if not decoder:
+> +        print "Could not decode index: %d" % (index)
+> +        print "Entry is: %s" % (decoder)
+> +        print "Decode Table is:\n%s" % (table)
+> +        return False
+> +    else:
+> +        return decoder.fn(decoder.eid, decoder.name, dumpfile)
+> +
+> +# Print event
+> +def print_event(eid, name, string=None, event_count=None):
+> +    "Print event with count"
+> +    if not event_count:
+> +        event_count = replay_state.event_count
+> +
+> +    if string:
+> +        print "%d:%s(%d) %s" % (event_count, name, eid, string)
+> +    else:
+> +        print "%d:%s(%d)" % (event_count, name, eid)
+> +
+> +
+> +# Decoders for each event type
+> +
+> +def decode_unimp(eid, name, _unused_dumpfile):
+> +    "Unimplimented decoder, will trigger exit"
+> +    print "%s not handled - will now stop" % (name)
+> +    return False
+> +
+> +# Checkpoint decoder
+> +def swallow_async_qword(eid, name, dumpfile):
+> +    "Swallow a qword of data without looking at it"
+> +    step_id = read_qword(dumpfile)
+> +    print "  %s(%d) @ %d" % (name, eid, step_id)
+> +    return True
+> +
+> +async_decode_table = [ Decoder(0, "REPLAY_ASYNC_EVENT_BH", swallow_async_qword),
+> +                       Decoder(1, "REPLAY_ASYNC_INPUT", decode_unimp),
+> +                       Decoder(2, "REPLAY_ASYNC_INPUT_SYNC", decode_unimp),
+> +                       Decoder(3, "REPLAY_ASYNC_CHAR_READ", decode_unimp),
+> +                       Decoder(4, "REPLAY_ASYNC_EVENT_BLOCK", decode_unimp),
+> +                       Decoder(5, "REPLAY_ASYNC_EVENT_NET", decode_unimp),
+> +]
+> +# See replay_read_events/replay_read_event
+> +def decode_async(eid, name, dumpfile):
+> +    """Decode an ASYNC event"""
+> +
+> +    print_event(eid, name)
+> +
+> +    async_event_kind = read_byte(dumpfile)
+> +    async_event_checkpoint = read_byte(dumpfile)
+> +
+> +    if async_event_checkpoint != replay_state.current_checkpoint:
+> +        print "  mismatch between checkpoint %d and async data %d" % (
+> +            replay_state.current_checkpoint, async_event_checkpoint)
+> +        return True
+> +
+> +    return call_decode(async_decode_table, async_event_kind, dumpfile)
+> +
+> +
+> +def decode_instruction(eid, name, dumpfile):
+> +    ins_diff = read_dword(dumpfile)
+> +    print_event(eid, name, "0x%x" % (ins_diff))
+> +    return True
+> +
+> +def decode_audio_out(eid, name, dumpfile):
+> +    audio_data = read_dword(dumpfile)
+> +    print_event(eid, name, "%d" % (audio_data))
+> +    return True
+> +
+> +def decode_checkpoint(eid, name, dumpfile):
+> +    """Decode a checkpoint.
+> +
+> +    Checkpoints contain a series of async events with their own specific data.
+> +    """
+> +    replay_state.set_checkpoint()
+> +    # save event count as we peek ahead
+> +    event_number = replay_state.event_count
+> +    next_event = read_event(dumpfile)
+> +
+> +    # if the next event is EVENT_ASYNC there are a bunch of
+> +    # async events to read, otherwise we are done
+> +    if next_event != 3:
+> +        print_event(eid, name, "no additional data", event_number)
+> +    else:
+> +        print_event(eid, name, "more data follows", event_number)
+> +
+> +    replay_state.reuse_event(next_event)
+> +    return True
+> +
+> +def decode_checkpoint_init(eid, name, dumpfile):
+> +    print_event(eid, name)
+> +    return True
+> +
+> +def decode_interrupt(eid, name, dumpfile):
+> +    print_event(eid, name)
+> +    return True
+> +
+> +def decode_clock(eid, name, dumpfile):
+> +    clock_data = read_qword(dumpfile)
+> +    print_event(eid, name, "0x%x" % (clock_data))
+> +    return True
+> +
+> +
+> +# pre-MTTCG merge
+> +v5_event_table = [Decoder(0, "EVENT_INSTRUCTION", decode_instruction),
+> +                  Decoder(1, "EVENT_INTERRUPT", decode_interrupt),
+> +                  Decoder(2, "EVENT_EXCEPTION", decode_unimp),
+> +                  Decoder(3, "EVENT_ASYNC", decode_async),
+> +                  Decoder(4, "EVENT_SHUTDOWN", decode_unimp),
+> +                  Decoder(5, "EVENT_CHAR_WRITE", decode_unimp),
+> +                  Decoder(6, "EVENT_CHAR_READ_ALL", decode_unimp),
+> +                  Decoder(7, "EVENT_CHAR_READ_ALL_ERROR", decode_unimp),
+> +                  Decoder(8, "EVENT_CLOCK_HOST", decode_clock),
+> +                  Decoder(9, "EVENT_CLOCK_VIRTUAL_RT", decode_clock),
+> +                  Decoder(10, "EVENT_CP_CLOCK_WARP_START", decode_checkpoint),
+> +                  Decoder(11, "EVENT_CP_CLOCK_WARP_ACCOUNT", decode_checkpoint),
+> +                  Decoder(12, "EVENT_CP_RESET_REQUESTED", decode_checkpoint),
+> +                  Decoder(13, "EVENT_CP_SUSPEND_REQUESTED", decode_checkpoint),
+> +                  Decoder(14, "EVENT_CP_CLOCK_VIRTUAL", decode_checkpoint),
+> +                  Decoder(15, "EVENT_CP_CLOCK_HOST", decode_checkpoint),
+> +                  Decoder(16, "EVENT_CP_CLOCK_VIRTUAL_RT", decode_checkpoint),
+> +                  Decoder(17, "EVENT_CP_INIT", decode_checkpoint_init),
+> +                  Decoder(18, "EVENT_CP_RESET", decode_checkpoint),
+> +]
+> +
+> +# post-MTTCG merge, AUDIO support added
+> +v6_event_table = [Decoder(0, "EVENT_INSTRUCTION", decode_instruction),
+> +                  Decoder(1, "EVENT_INTERRUPT", decode_interrupt),
+> +                  Decoder(2, "EVENT_EXCEPTION", decode_unimp),
+> +                  Decoder(3, "EVENT_ASYNC", decode_async),
+> +                  Decoder(4, "EVENT_SHUTDOWN", decode_unimp),
+> +                  Decoder(5, "EVENT_CHAR_WRITE", decode_unimp),
+> +                  Decoder(6, "EVENT_CHAR_READ_ALL", decode_unimp),
+> +                  Decoder(7, "EVENT_CHAR_READ_ALL_ERROR", decode_unimp),
+> +                  Decoder(8, "EVENT_AUDIO_OUT", decode_audio_out),
+> +                  Decoder(9, "EVENT_AUDIO_IN", decode_unimp),
+> +                  Decoder(10, "EVENT_CLOCK_HOST", decode_clock),
+> +                  Decoder(11, "EVENT_CLOCK_VIRTUAL_RT", decode_clock),
+> +                  Decoder(12, "EVENT_CP_CLOCK_WARP_START", decode_checkpoint),
+> +                  Decoder(13, "EVENT_CP_CLOCK_WARP_ACCOUNT", decode_checkpoint),
+> +                  Decoder(14, "EVENT_CP_RESET_REQUESTED", decode_checkpoint),
+> +                  Decoder(15, "EVENT_CP_SUSPEND_REQUESTED", decode_checkpoint),
+> +                  Decoder(16, "EVENT_CP_CLOCK_VIRTUAL", decode_checkpoint),
+> +                  Decoder(17, "EVENT_CP_CLOCK_HOST", decode_checkpoint),
+> +                  Decoder(18, "EVENT_CP_CLOCK_VIRTUAL_RT", decode_checkpoint),
+> +                  Decoder(19, "EVENT_CP_INIT", decode_checkpoint_init),
+> +                  Decoder(20, "EVENT_CP_RESET", decode_checkpoint),
+> +]
+> +
+> +def parse_arguments():
+> +    "Grab arguments for script"
+> +    parser = argparse.ArgumentParser()
+> +    parser.add_argument("-f", "--file", help='record/replay dump to read from',
+> +                        required=True)
+> +    return parser.parse_args()
+> +
+> +def decode_file(filename):
+> +    "Decode a record/replay dump"
+> +    dumpfile = open(filename, "rb")
+> +
+> +    # read and throwaway the header
+> +    version = read_dword(dumpfile)
+> +    junk = read_qword(dumpfile)
+> +
+> +    print "HEADER: version 0x%x" % (version)
+> +    if version == 0xe02006:
+> +        event_decode_table = v6_event_table
+> +        replay_state.checkpoint_start = 12
+> +    else:
+> +        event_decode_table = v5_event_table
+> +        replay_state.checkpoint_start = 10
+> +
+> +    try:
+> +        decode_ok = True
+> +        while decode_ok:
+> +            event = read_event(dumpfile)
+> +            decode_ok = call_decode(event_decode_table, event, dumpfile)
+> +    finally:
+> +        dumpfile.close()
+> +
+> +if __name__ == "__main__":
+> +    args = parse_arguments()
+> +    decode_file(args.file)
+>
