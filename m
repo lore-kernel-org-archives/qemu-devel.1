@@ -1,20 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42293)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42878)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1dG3fV-0006ns-GS
-	for qemu-devel@nongnu.org; Wed, 31 May 2017 09:28:10 -0400
+	(envelope-from <groug@kaod.org>) id 1dG3hz-00005B-31
+	for qemu-devel@nongnu.org; Wed, 31 May 2017 09:30:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1dG3fT-0001Z7-T2
-	for qemu-devel@nongnu.org; Wed, 31 May 2017 09:28:09 -0400
-Date: Wed, 31 May 2017 09:27:59 -0400
-From: Jeff Cody <jcody@redhat.com>
-Message-ID: <20170531132759.GB19181@localhost.localdomain>
-References: <1496224367-24935-1-git-send-email-kwolf@redhat.com>
-	<1496224367-24935-5-git-send-email-kwolf@redhat.com>
+	(envelope-from <groug@kaod.org>) id 1dG3hv-0002LC-Pu
+	for qemu-devel@nongnu.org; Wed, 31 May 2017 09:30:43 -0400
+Received: from 19.mo5.mail-out.ovh.net ([46.105.35.78]:34941)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1dG3hv-0002KR-JV
+	for qemu-devel@nongnu.org; Wed, 31 May 2017 09:30:39 -0400
+Received: from player799.ha.ovh.net (b9.ovh.net [213.186.33.59])
+	by mo5.mail-out.ovh.net (Postfix) with ESMTP id EB458FFBAC
+	for <qemu-devel@nongnu.org>; Wed, 31 May 2017 15:30:37 +0200 (CEST)
+Date: Wed, 31 May 2017 15:30:27 +0200
+From: Greg Kurz <groug@kaod.org>
+Message-ID: <20170531153027.6133baef@bahia.lan>
+In-Reply-To: <32546ddf-a725-5dd4-95cb-75a41da8e6ec@redhat.com>
+References: <149615665491.28067.17765793725374594694.stgit@bahia.lan>
+	<e8fdae1c-9d3c-1059-509a-6b85000e83a9@de.ibm.com>
+	<20170530185618.2e875ebb@bahia.ttt.fr.ibm.com>
+	<32546ddf-a725-5dd4-95cb-75a41da8e6ec@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1496224367-24935-5-git-send-email-kwolf@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v3 4/4] qemu-iotests: Block migration test
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	boundary="Sig_/w6Qx23FL5Qi8A.0tYGi_Bgl";
+	protocol="application/pgp-signature"
+Subject: Re: [Qemu-devel] [Qemu-trivial] [PATCH] pc-bios/s390-ccw: use STRIP
+ variable in Makefile
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,228 +34,96 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: qemu-block@nongnu.org, eblake@redhat.com, qemu-devel@nongnu.org
+To: Laurent Vivier <lvivier@redhat.com>
+Cc: Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cornelia.huck@de.ibm.com>, qemu-trivial@nongnu.org, Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org, Alexander Graf <agraf@suse.de>
 
-On Wed, May 31, 2017 at 11:52:47AM +0200, Kevin Wolf wrote:
-> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-> ---
->  tests/qemu-iotests/183     | 140 +++++++++++++++++++++++++++++++++++++++++++++
->  tests/qemu-iotests/183.out |  46 +++++++++++++++
->  tests/qemu-iotests/group   |   1 +
->  3 files changed, 187 insertions(+)
->  create mode 100755 tests/qemu-iotests/183
->  create mode 100644 tests/qemu-iotests/183.out
-> 
-> diff --git a/tests/qemu-iotests/183 b/tests/qemu-iotests/183
-> new file mode 100755
-> index 0000000..0a87541
-> --- /dev/null
-> +++ b/tests/qemu-iotests/183
-> @@ -0,0 +1,140 @@
-> +#!/bin/bash
-> +#
-> +# Test old-style block migration (migrate -b)
-> +#
-> +# Copyright (C) 2017 Red Hat, Inc.
-> +#
-> +# This program is free software; you can redistribute it and/or modify
-> +# it under the terms of the GNU General Public License as published by
-> +# the Free Software Foundation; either version 2 of the License, or
-> +# (at your option) any later version.
-> +#
-> +# This program is distributed in the hope that it will be useful,
-> +# but WITHOUT ANY WARRANTY; without even the implied warranty of
-> +# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-> +# GNU General Public License for more details.
-> +#
-> +# You should have received a copy of the GNU General Public License
-> +# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-> +#
-> +
-> +# creator
-> +owner=kwolf@redhat.com
-> +
-> +seq=`basename $0`
-> +echo "QA output created by $seq"
-> +
-> +here=`pwd`
-> +status=1 # failure is the default!
-> +
-> +MIG_SOCKET="${TEST_DIR}/migrate"
-> +
-> +_cleanup()
-> +{
-> +    rm -f "${MIG_SOCKET}"
-> +    rm -f "${TEST_IMG}.dest"
-> +    _cleanup_test_img
-> +    _cleanup_qemu
-> +}
-> +trap "_cleanup; exit \$status" 0 1 2 3 15
-> +
-> +# get standard environment, filters and checks
-> +. ./common.rc
-> +. ./common.filter
-> +. ./common.qemu
-> +
-> +_supported_fmt qcow2 raw qed dmg quorum
-> +_supported_proto file
-> +_supported_os Linux
-> +
-> +size=64M
-> +_make_test_img $size
-> +TEST_IMG="${TEST_IMG}.dest" _make_test_img $size
-> +
-> +echo
-> +echo === Starting VMs ===
-> +echo
-> +
-> +qemu_comm_method="qmp"
-> +
-> +_launch_qemu \
-> +    -drive file="${TEST_IMG}",cache=${CACHEMODE},driver=$IMGFMT,id=disk
-> +src=$QEMU_HANDLE
-> +_send_qemu_cmd $src "{ 'execute': 'qmp_capabilities' }" 'return'
-> +
-> +_launch_qemu \
-> +    -drive file="${TEST_IMG}.dest",cache=${CACHEMODE},driver=$IMGFMT,id=disk \
-> +    -incoming "unix:${MIG_SOCKET}"
-> +dest=$QEMU_HANDLE
-> +_send_qemu_cmd $dest "{ 'execute': 'qmp_capabilities' }" 'return'
-> +
-> +echo
-> +echo === Write something on the source ===
-> +echo
-> +
-> +_send_qemu_cmd $src \
-> +    "{ 'execute': 'human-monitor-command',
-> +       'arguments': { 'command-line':
-> +                      'qemu-io disk \"write -P 0x55 0 64k\"' } }" \
-> +    'return'
-> +_send_qemu_cmd $src \
-> +    "{ 'execute': 'human-monitor-command',
-> +       'arguments': { 'command-line':
-> +                      'qemu-io disk \"read -P 0x55 0 64k\"' } }" \
-> +    'return'
-> +
-> +echo
-> +echo === Do block migration to destination ===
-> +echo
-> +
-> +reply="$(_send_qemu_cmd $src \
-> +    "{ 'execute': 'migrate',
-> +       'arguments': { 'uri': 'unix:${MIG_SOCKET}', 'blk': true } }" \
-> +    'return\|error')"
-> +echo "$reply"
-> +if echo "$reply" | grep "compiled without old-style" > /dev/null; then
-> +    _notrun "migrate -b support not compiled in"
-> +fi
-> +
-> +QEMU_COMM_TIMEOUT=0.1 qemu_cmd_repeat=50 silent=yes \
-> +    _send_qemu_cmd $src "{ 'execute': 'query-migrate' }" '"status": "completed"'
-> +_send_qemu_cmd $src "{ 'execute': 'query-status' }" "return"
-> +
-> +echo
-> +echo === Do some I/O on the destination ===
-> +echo
-> +
-> +# It is important that we use the BlockBackend of the guest device here instead
-> +# of the node name, which would create a new BlockBackend and not test whether
-> +# the guest has the necessary permissions to access the image now
-> +silent=yes _send_qemu_cmd $dest "" "100 %"
-> +_send_qemu_cmd $dest "{ 'execute': 'query-status' }" "return"
-> +_send_qemu_cmd $dest \
-> +    "{ 'execute': 'human-monitor-command',
-> +       'arguments': { 'command-line':
-> +                      'qemu-io disk \"read -P 0x55 0 64k\"' } }" \
-> +    'return'
-> +_send_qemu_cmd $dest \
-> +    "{ 'execute': 'human-monitor-command',
-> +       'arguments': { 'command-line':
-> +                      'qemu-io disk \"write -P 0x66 1M 64k\"' } }" \
-> +    'return'
-> +
-> +echo
-> +echo === Shut down and check image ===
-> +echo
-> +
-> +_send_qemu_cmd $src '{"execute":"quit"}' 'return'
-> +_send_qemu_cmd $dest '{"execute":"quit"}' 'return'
-> +wait=1 _cleanup_qemu
-> +
-> +_check_test_img
-> +TEST_IMG="${TEST_IMG}.dest" _check_test_img
-> +
-> +$QEMU_IO -c 'write -P 0x66 1M 64k' "$TEST_IMG" | _filter_qemu_io
-> +$QEMU_IMG compare "$TEST_IMG.dest" "$TEST_IMG"
-> +
-> +# success, all done
-> +echo "*** done"
-> +rm -f $seq.full
-> +status=0
-> diff --git a/tests/qemu-iotests/183.out b/tests/qemu-iotests/183.out
-> new file mode 100644
-> index 0000000..103fdc7
-> --- /dev/null
-> +++ b/tests/qemu-iotests/183.out
-> @@ -0,0 +1,46 @@
-> +QA output created by 183
-> +Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864
-> +Formatting 'TEST_DIR/t.IMGFMT.dest', fmt=IMGFMT size=67108864
-> +
-> +=== Starting VMs ===
-> +
-> +{"return": {}}
-> +{"return": {}}
-> +
-> +=== Write something on the source ===
-> +
-> +wrote 65536/65536 bytes at offset 0
-> +64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-> +{"return": ""}
-> +read 65536/65536 bytes at offset 0
-> +64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-> +{"return": ""}
-> +
-> +=== Do block migration to destination ===
-> +
-> +{"return": {}}
-> +{"return": {"status": "postmigrate", "singlestep": false, "running": false}}
-> +
-> +=== Do some I/O on the destination ===
-> +
-> +{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "RESUME"}
-> +{"return": {"status": "running", "singlestep": false, "running": true}}
-> +read 65536/65536 bytes at offset 0
-> +64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-> +{"return": ""}
-> +wrote 65536/65536 bytes at offset 1048576
-> +64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-> +{"return": ""}
-> +
-> +=== Shut down and check image ===
-> +
-> +{"return": {}}
-> +{"return": {}}
-> +{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
-> +{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
-> +No errors were found on the image.
-> +No errors were found on the image.
-> +wrote 65536/65536 bytes at offset 1048576
-> +64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-> +Images are identical.
-> +*** done
-> diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
-> index 5c8ea0f..a6acaff 100644
-> --- a/tests/qemu-iotests/group
-> +++ b/tests/qemu-iotests/group
-> @@ -174,3 +174,4 @@
->  179 rw auto quick
->  181 rw auto migration
->  182 rw auto quick
-> +183 rw auto migration
-> -- 
-> 1.8.3.1
->
+--Sig_/w6Qx23FL5Qi8A.0tYGi_Bgl
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-Reviewed-by: Jeff Cody <jcody@redhat.com>
+On Wed, 31 May 2017 15:15:56 +0200
+Laurent Vivier <lvivier@redhat.com> wrote:
+
+> On 30/05/2017 18:56, Greg Kurz wrote:
+> > On Tue, 30 May 2017 18:34:46 +0200
+> > Christian Borntraeger <borntraeger@de.ibm.com> wrote:
+> >  =20
+> >> On 05/30/2017 05:04 PM, Greg Kurz wrote: =20
+> >>> The docker-run-test-build@debian-s390x-cross target fails with:
+> >>>
+> >>> strip --strip-unneeded s390-ccw.elf -o s390-ccw.img
+> >>> strip: Unable to recognise the format of the input file `s390-ccw.elf'
+> >>>
+> >>> The configure script defines a STRIP makefile variable whose default
+> >>> value is ${cross_prefix}strip. Let's use it.
+> >>>
+> >>> Signed-off-by: Greg Kurz <groug@kaod.org>
+> >>> ---
+> >>>  pc-bios/s390-ccw/Makefile |    2 +-
+> >>>  1 file changed, 1 insertion(+), 1 deletion(-)
+> >>>
+> >>> diff --git a/pc-bios/s390-ccw/Makefile b/pc-bios/s390-ccw/Makefile
+> >>> index 79a46b67356f..7af57dad109c 100644
+> >>> --- a/pc-bios/s390-ccw/Makefile
+> >>> +++ b/pc-bios/s390-ccw/Makefile
+> >>> @@ -22,7 +22,7 @@ s390-ccw.elf: $(OBJECTS)
+> >>>  	$(call quiet-command,$(CC) $(LDFLAGS) -o $@ $(OBJECTS),"BUILD","$(T=
+ARGET_DIR)$@")
+> >>>
+> >>>  s390-ccw.img: s390-ccw.elf
+> >>> -	$(call quiet-command,strip --strip-unneeded $< -o $@,"STRIP","$(TAR=
+GET_DIR)$@")
+> >>> +	$(call quiet-command,$(STRIP) --strip-unneeded $< -o $@,"STRIP","$(=
+TARGET_DIR)$@")
+> >>>
+> >>>  $(OBJECTS): Makefile
+> >>>
+> >>>    =20
+> >>
+> >> I was going to apply this, but it fails with --disable-strip like
+> >>
+> >>     /bin/sh: --strip-unneeded: command not found
+> >>     Makefile:25: recipe for target 's390-ccw.img' failed
+> >>     make[1]: *** [s390-ccw.img] Error 127
+> >>     Makefile:354: recipe for target 'romsubdir-s390-ccw' failed
+> >>     make: *** [romsubdir-s390-ccw] Error 2
+> >>
+> >> Not yet sure whats going on.
+> >> =20
+> >=20
+> > configure doesn't generate STRIP when --disable-strip or --enable-debug=
+... so
+> > I guess we shouldn't use it here, but rather generate a s390_cross_pref=
+ix like
+> > in roms/Makefile ?
+> >  =20
+>=20
+> I experimented the problem when I played with docker, and fixed the
+> problem as you did (with STRIP).
+>=20
+
+I've sent a v2 with a 'STRIP ?=3D strip' line to handle the issue reported
+by Christian.
+
+> But I think it's a good idea to compile s390 rom as it is done for ppc64
+> and ppc roms.
+>=20
+
+Yeah, I was thinking about that too but I don't know all the ins and outs.
+
+> Laurent
+
+
+--Sig_/w6Qx23FL5Qi8A.0tYGi_Bgl
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iEYEARECAAYFAlkuxXQACgkQAvw66wEB28K00wCfdjhi2dR+/3cR0iZQBmtlKBDB
+ND0Anjr+Q7vGgjXN5nOq2tHDPwEXAGur
+=Fbi9
+-----END PGP SIGNATURE-----
+
+--Sig_/w6Qx23FL5Qi8A.0tYGi_Bgl--
