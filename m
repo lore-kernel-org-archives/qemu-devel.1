@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34305)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34380)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1dG1Wk-0006yf-GD
-	for qemu-devel@nongnu.org; Wed, 31 May 2017 07:11:02 -0400
+	(envelope-from <armbru@redhat.com>) id 1dG1XI-0007D8-0z
+	for qemu-devel@nongnu.org; Wed, 31 May 2017 07:11:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1dG1Wj-0004qT-HD
-	for qemu-devel@nongnu.org; Wed, 31 May 2017 07:10:58 -0400
-Received: from mail-lf0-x234.google.com ([2a00:1450:4010:c07::234]:33649)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1dG1Wj-0004qP-8A
-	for qemu-devel@nongnu.org; Wed, 31 May 2017 07:10:57 -0400
-Received: by mail-lf0-x234.google.com with SMTP id m18so6929377lfj.0
-	for <qemu-devel@nongnu.org>; Wed, 31 May 2017 04:10:57 -0700 (PDT)
+	(envelope-from <armbru@redhat.com>) id 1dG1XE-0004uN-TU
+	for qemu-devel@nongnu.org; Wed, 31 May 2017 07:11:32 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42400)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dG1XE-0004u9-NW
+	for qemu-devel@nongnu.org; Wed, 31 May 2017 07:11:28 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <20170526054013.299-1-n54@gmx.com>
+	<20170530062022.5841-1-n54@gmx.com>
+	<58d04e43-1caa-f623-44fe-749dd351fad9@redhat.com>
+	<42633e66-7ef4-c4ef-18d3-d2be588b816c@gmx.com>
+	<6ee03c9d-3c42-4f73-1ca9-313f50be63df@redhat.com>
+Date: Wed, 31 May 2017 13:11:25 +0200
+In-Reply-To: <6ee03c9d-3c42-4f73-1ca9-313f50be63df@redhat.com> (Eric Blake's
+	message of "Tue, 30 May 2017 09:05:05 -0500")
+Message-ID: <87k24xcmci.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-References: <20170509173559.31598-1-marcandre.lureau@redhat.com>
-	<20170509173559.31598-15-marcandre.lureau@redhat.com>
-	<871srmqq46.fsf@dusky.pond.sub.org>
-In-Reply-To: <871srmqq46.fsf@dusky.pond.sub.org>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Wed, 31 May 2017 11:10:45 +0000
-Message-ID: <CAJ+F1CJ8K=i_nZex49Gm7SMs4bPHyw_U_HZ0GNiQaAch9GwtrQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 14/17] acpi: fix s3/s4 disabled type
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH] ivshmem-server: ivshmem-client: Build when
+ eventfd() is available
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,33 +31,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: Eric Blake <eblake@redhat.com>
+Cc: Kamil Rytarowski <n54@gmx.com>, qemu-devel@nongnu.org, peter.maydell@linaro.org, marcandre.lureau@gmail.com, f4bug@amsat.org
 
-On Thu, May 18, 2017 at 4:58 PM Markus Armbruster <armbru@redhat.com> wrote=
-:
+Eric Blake <eblake@redhat.com> writes:
 
-> Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
+> On 05/30/2017 08:11 AM, Kamil Rytarowski wrote:
 >
-> > Use a more specific bool type.
-> >
-> > Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+>>>
+>>> Is this a v2 patch? If so, it's best to repost it as a new top-level
+>>> thread rather than buried in reply to your v1 patch.  Also, be sure to
+>>> include v2 in the subject line ('git send-email -v2' works wonders for
+>>> that).
+>>>
 >
-> Why doesn't this run afoul backward compatibility?  To answer the
-> question, we need to enumerate affected external interfaces.
+>> 
+>> I reworked it, fixed title and it's more like v3.
+>> 
 >
+>> Do I still need to resend it?
+>> 
 >
-Right, this will break if we have users such as:
+> A human maintainer can often (eventually) figure out what's going on if
+> you don't, but resending is easier if you want to ensure the automated
+> patch tools don't lose things.
 
- -global PIIX4_PM.disable_s3=3D2
+Yes.
 
-With this change, it will now error with:
-
-qemu-system-x86_64: can't apply global PIIX4_PM.disable_s3=3D2: Invalid
-parameter type for 'disable_s3', expected: boolean
-
-Acceptable? otherwise, I drop the patch
-
-thanks
---=20
-Marc-Andr=C3=A9 Lureau
+However, ivshmem doesn't have a maintainer.  Since the patch is really
+simple, the easiest path forward could be sending a v3 with
+cc: qemu-trivial@nongnu.org.
