@@ -1,24 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45505)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48026)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dG0O6-00060x-AW
-	for qemu-devel@nongnu.org; Wed, 31 May 2017 05:57:59 -0400
+	(envelope-from <kchamart@redhat.com>) id 1dG0V7-0003EM-Op
+	for qemu-devel@nongnu.org; Wed, 31 May 2017 06:05:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dG0O5-0007Gf-G8
-	for qemu-devel@nongnu.org; Wed, 31 May 2017 05:57:58 -0400
-Date: Wed, 31 May 2017 17:57:46 +0800
-From: Fam Zheng <famz@redhat.com>
-Message-ID: <20170531095746.GC6170@lemon.lan>
-References: <20170419094356.19826-1-famz@redhat.com>
-	<20170419094356.19826-7-famz@redhat.com>
-	<20170511194100.GI24584@stefanha-x1.localdomain>
-	<20170524021844.GG12279@lemon.lan>
-	<20170531093921.GA15666@stefanha-x1.localdomain>
+	(envelope-from <kchamart@redhat.com>) id 1dG0Uy-0001gz-FS
+	for qemu-devel@nongnu.org; Wed, 31 May 2017 06:05:13 -0400
+Date: Wed, 31 May 2017 11:26:44 +0200
+From: Kashyap Chamarthy <kchamart@redhat.com>
+Message-ID: <20170531092644.pdzckatv7u7pg36h@eukaryote>
+References: <1496158724-2809-1-git-send-email-kchamart@redhat.com>
+	<df3d406e-d9e2-73e0-4943-23fac349c1b3@redhat.com>
+	<20170530202428.vtz3f6jopr74huzb@eukaryote>
+	<6696ea97-8bf0-44b0-d515-e760f5ac4803@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20170531093921.GA15666@stefanha-x1.localdomain>
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v2 06/16] backup: Request
- BLK_PERM_AIO_CONTEXT_CHANGE on target
+In-Reply-To: <6696ea97-8bf0-44b0-d515-e760f5ac4803@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] live-block-ops.txt: Rewrite and improve it
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,46 +25,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@gmail.com>
-Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>, Max Reitz <mreitz@redhat.com>
+To: Eric Blake <eblake@redhat.com>
+Cc: qemu-devel@nongnu.org, armbru@redhat.com, kwolf@redhat.com, mreitz@redhat.com, jsnow@redhat.com, qemu-block@nongnu.org
 
-On Wed, 05/31 10:39, Stefan Hajnoczi wrote:
-> On Wed, May 24, 2017 at 10:18:44AM +0800, Fam Zheng wrote:
-> > On Thu, 05/11 15:41, Stefan Hajnoczi wrote:
-> > > On Wed, Apr 19, 2017 at 05:43:46PM +0800, Fam Zheng wrote:
-> > > > What's done in the source's context change notifier is moving the
-> > > > target's context to follow the new one, so we request this permission
-> > > > here.
-> > > 
-> > > It's true that the backup block job must be able to set target's
-> > > AioContext, but does this change also allow other users to set target's
-> > > AioContext while the backup job is running?  If yes, then we need to
-> > > handle that.
-> > 
-> > If through job->target, yes, but I don't think there is any user of job->target.
-> > Otherwise, it's not allowed, because the second parameter of blk_new doesn't
-> > have BLK_PERM_AIO_CONTEXT_CHANGE.
-> > 
-> > So it's okay.
+On Tue, May 30, 2017 at 03:42:08PM -0500, Eric Blake wrote:
+> On 05/30/2017 03:24 PM, Kashyap Chamarthy wrote:
+
+[...]
+
+> > Eric, do you have an opinion:  Now that I _do_ have the notes
+> > available[*], do you think it is worth spelling out the invocation for
+> > QMP `blockdev-{backup, mirror}`?  Or wait for later?
 > 
-> What about blockdev-backup?  It allows the user to specify 'target'.
-> Therefore the user can also run other monitor commands on target.  Some
-> of them could change the AioContext and the backup job wouldn't know!
+> I liked how you compared drive-mirror and blockdev-mirror, but it's
+> probably worth an invocation example in sections 12/15 in addition to
+> "this is how the block version differs from the drive version".
 
-That will be rejected.
+Yes, will address it.
 
-The contract is that any code that wants to change the AioContext of a BDS, in
-this case the "target BDS", must do this:
+Thanks.
 
-1) create its own BB with perm.BLK_PERM_AIO_CONTEXT_CHANGE
-
-2) attach BDS to this BB
-
-3) call blk_set_aio_context and change the AioContext
-
-This is basically how all users of a BDS coordinate through Kevin's new op
-blocker API, and in your concerned case, when a user runs a second monitor
-command that changes AioContext, step 2 will fail, because as in this patch, the
-first job->target BB didn't set shared_perm.BLK_PERM_AIO_CONTEXT_CHANGE.
-
-Fam
+-- 
+/kashyap
