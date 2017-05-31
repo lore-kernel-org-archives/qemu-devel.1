@@ -1,27 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35126)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35150)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1dG9Fi-0007QT-DW
-	for qemu-devel@nongnu.org; Wed, 31 May 2017 15:25:55 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1dG9Fo-0007UX-3K
+	for qemu-devel@nongnu.org; Wed, 31 May 2017 15:26:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1dG9Fh-0007Jw-1o
-	for qemu-devel@nongnu.org; Wed, 31 May 2017 15:25:54 -0400
-Received: from mail-lf0-x242.google.com ([2a00:1450:4010:c07::242]:35577)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1dG9Fg-0007JF-MU
-	for qemu-devel@nongnu.org; Wed, 31 May 2017 15:25:52 -0400
-Received: by mail-lf0-x242.google.com with SMTP id 99so2295906lfu.2
-	for <qemu-devel@nongnu.org>; Wed, 31 May 2017 12:25:52 -0700 (PDT)
+	(envelope-from <dgilbert@redhat.com>) id 1dG9Fj-0007Ky-Ar
+	for qemu-devel@nongnu.org; Wed, 31 May 2017 15:26:00 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:35610)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dG9Fj-0007KN-28
+	for qemu-devel@nongnu.org; Wed, 31 May 2017 15:25:55 -0400
+Date: Wed, 31 May 2017 20:25:44 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170531192543.GI3342@work-vm>
+References: <1495539071-12995-1-git-send-email-a.perevalov@samsung.com>
+	<CGME20170523113130eucas1p1babac9d8659c10abe22ddc7d5b9526ab@eucas1p1.samsung.com>
+	<1495539071-12995-8-git-send-email-a.perevalov@samsung.com>
+	<20170524065736.GF3873@pxdev.xzpeter.org>
+	<20170524075637.GB12925@aperevalov-ubuntu>
+	<20170524120047.GM3873@pxdev.xzpeter.org>
+	<83b23059-7109-3c37-90ae-5595f0b3de68@samsung.com>
+	<20170524233008.GN3873@pxdev.xzpeter.org>
+	<c394ae4f-8b62-b306-d077-7f4305d0d1ce@samsung.com>
+	<20170525072545.GB22816@pxdev.xzpeter.org>
 MIME-Version: 1.0
-References: <1496152683-102751-1-git-send-email-anton.nefedov@virtuozzo.com>
-	<1496152683-102751-10-git-send-email-anton.nefedov@virtuozzo.com>
-In-Reply-To: <1496152683-102751-10-git-send-email-anton.nefedov@virtuozzo.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Wed, 31 May 2017 19:25:40 +0000
-Message-ID: <CAJ+F1C+Ha_Y3+-ka4qZJ_JL+0sVc3OYRrY5p2-PFcGcvgvwXPg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3 09/13] test-char: add hotswap test
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170525072545.GB22816@pxdev.xzpeter.org>
+Subject: Re: [Qemu-devel] [PATCH V6 07/10] migration: add bitmap for copied
+ page
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,119 +36,118 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Anton Nefedov <anton.nefedov@virtuozzo.com>, qemu-devel@nongnu.org
-Cc: pbonzini@redhat.com, den@virtuozzo.com
+To: Peter Xu <peterx@redhat.com>
+Cc: Alexey Perevalov <a.perevalov@samsung.com>, i.maximets@samsung.com, qemu-devel@nongnu.org
 
-Hi
+* Peter Xu (peterx@redhat.com) wrote:
+> On Thu, May 25, 2017 at 09:28:57AM +0300, Alexey Perevalov wrote:
+> > On 05/25/2017 02:30 AM, Peter Xu wrote:
+> > >On Wed, May 24, 2017 at 03:16:23PM +0300, Alexey Perevalov wrote:
+> > >>On 05/24/2017 03:01 PM, Peter Xu wrote:
+> > >>>On Wed, May 24, 2017 at 10:56:37AM +0300, Alexey wrote:
+> > >>>>On Wed, May 24, 2017 at 02:57:36PM +0800, Peter Xu wrote:
+> > >>>>>On Tue, May 23, 2017 at 02:31:08PM +0300, Alexey Perevalov wrote:
+> > >>>>>>This patch adds ability to track down already copied
+> > >>>>>>pages, it's necessary for calculation vCPU block time in
+> > >>>>>>postcopy migration feature and maybe for restore after
+> > >>>>>>postcopy migration failure.
+> > >>>>>>
+> > >>>>>>Functions which work with RAMBlock are placed into ram.c,
+> > >>>>>>due to TARGET_WORDS_BIGENDIAN is poisoned int postcopy-ram.c -
+> > >>>>>>hardware independed code.
+> > >>>>>>
+> > >>>>>>Signed-off-by: Alexey Perevalov <a.perevalov@samsung.com>
+> > >>>>>>---
+> > >>>>>>  include/migration/migration.h | 16 +++++++++++
+> > >>>>>>  migration/postcopy-ram.c      | 22 ++++++++++++---
+> > >>>>>>  migration/ram.c               | 63 +++++++++++++++++++++++++++++++++++++++++++
+> > >>>>>>  3 files changed, 97 insertions(+), 4 deletions(-)
+> > >>>>>>
+> > >>>>>>diff --git a/include/migration/migration.h b/include/migration/migration.h
+> > >>>>>>index 449cb07..4e05c83 100644
+> > >>>>>>--- a/include/migration/migration.h
+> > >>>>>>+++ b/include/migration/migration.h
+> > >>>>>>@@ -101,6 +101,20 @@ struct MigrationIncomingState {
+> > >>>>>>      LoadStateEntry_Head loadvm_handlers;
+> > >>>>>>      /*
+> > >>>>>>+     * bitmap indicates whether page copied,
+> > >>>>>>+     * based on ramblock offset
+> > >>>>>>+     * now it is using only for blocktime calculation in
+> > >>>>>>+     * postcopy migration, so livetime of this entry:
+> > >>>>>>+     * since user requested blocktime calculation,
+> > >>>>>>+     * till the end of postcopy migration
+> > >>>>>>+     * as an example it could represend following memory map
+> > >>>>>>+     * ___________________________________
+> > >>>>>>+     * |4k pages | hugepages | 4k pages
+> > >>>>>Can we really do this?
+> > >>>>>The problem is AFAIU migration stream is sending pages only in target
+> > >>>>>page size, even for huge pages... so even for huge pages we should
+> > >>>>>still need per TARGET_PAGE_SIZE bitmap?
+> > >>>>sending maybe, but copying to userfault fd is doing in hugepage size
+> > >>>Yes you are right. :)
+> > >>>
+> > >>>>in case of hugetlbfs memory backend.
+> > >>>>>(Please refer to ram_state_init() on init of RAMBlock.bmap)
+> > >>>>I thought to use bitmap per ramblock, but I decided to not do it,
+> > >>>>because of following reasons:
+> > >>>>	1. There is only 4k ramblocks, for such ramblock it's not
+> > >>>>	optimal
+> > >>>Could you explain what do you mean by "there is only 4k ramblocks"?
+> > >>sorry, could be ramblocks with 4k size,
+> > >>as example, your's qemu hmp info ramblock shows
+> > >>  Block Name    PSize              Offset Used              Total
+> > >>             /objects/mem    2 MiB  0x0000000000000000 0x0000000020000000
+> > >>0x0000000020000000
+> > >>                 vga.vram    4 KiB  0x0000000020060000 0x0000000001000000
+> > >>0x0000000001000000
+> > >>     /rom@etc/acpi/tables    4 KiB  0x0000000021130000 0x0000000000020000
+> > >>0x0000000000200000
+> > >>                  pc.bios    4 KiB  0x0000000020000000 0x0000000000040000
+> > >>0x0000000000040000
+> > >>   0000:00:03.0/e1000.rom    4 KiB  0x0000000021070000 0x0000000000040000
+> > >>0x0000000000040000
+> > >>   0000:00:04.0/e1000.rom    4 KiB  0x00000000210b0000 0x0000000000040000
+> > >>0x0000000000040000
+> > >>   0000:00:05.0/e1000.rom    4 KiB  0x00000000210f0000 0x0000000000040000
+> > >>0x0000000000040000
+> > >>                   pc.rom    4 KiB  0x0000000020040000 0x0000000000020000
+> > >>0x0000000000020000
+> > >>     0000:00:02.0/vga.rom    4 KiB  0x0000000021060000 0x0000000000010000
+> > >>0x0000000000010000
+> > >>    /rom@etc/table-loader    4 KiB  0x0000000021330000 0x0000000000001000
+> > >>0x0000000000001000
+> > >>       /rom@etc/acpi/rsdp    4 KiB  0x0000000021331000 0x0000000000001000
+> > >>0x0000000000001000
+> > >>
+> > >>/rom@etc/table-loader and /rom@etc/acpi/rsdp has only one 4K page.
+> > >I see. Thanks for explaining this.
+> > >
+> > >A 4k sized ramblock means the bitmap would be only one unsigned long
+> > >width (via bitmap_new(1)). I still don't see why it's not good... :-)
+> > >
+> > Ok, I'll take into account your comment, and I'll place copied
+> > 
+> > bitmap into RAMBlock.
+> 
+> Or we can wait for further comments in case you'll do extra work. :-)
+> 
+> Just to mention that Dave won't be here until next week, so you may
+> need to wait for some days until he can provide some further input.
 
-On Tue, May 30, 2017 at 6:15 PM Anton Nefedov <anton.nefedov@virtuozzo.com>
-wrote:
+(Catches up with mail)
 
-> Signed-off-by: Anton Nefedov <anton.nefedov@virtuozzo.com>
-> ---
->  tests/test-char.c | 68
-> +++++++++++++++++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 68 insertions(+)
->
-> diff --git a/tests/test-char.c b/tests/test-char.c
-> index ed6b18f..cd54f88 100644
-> --- a/tests/test-char.c
-> +++ b/tests/test-char.c
-> @@ -635,6 +635,73 @@ static void char_invalid_test(void)
->      g_assert_null(chr);
->  }
->
-> +static int chardev_change(void *opaque)
-> +{
-> +    return 0;
-> +}
-> +
-> +static int chardev_change_denied(void *opaque)
-> +{
-> +    return -1;
-> +}
-> +
-> +static void char_hotswap_test(void)
-> +{
-> +    char *chr_args;
-> +    Chardev *chr;
-> +    CharBackend be;
-> +
-> +    gchar *tmp_path =3D g_dir_make_tmp("qemu-test-char.XXXXXX", NULL);
-> +    char *filename =3D g_build_filename(tmp_path, "file", NULL);
-> +    ChardevFile file =3D { .out =3D filename };
-> +    ChardevBackend backend =3D { .type =3D CHARDEV_BACKEND_KIND_FILE,
-> +                               .u.file.data =3D &file };
-> +
-> +    int port;
-> +    int sock =3D make_udp_socket(&port);
-> +    g_assert_cmpint(sock, >, 0);
-> +
-> +    chr_args =3D g_strdup_printf("udp:127.0.0.1:%d", port);
-> +
-> +    chr =3D qemu_chr_new("chardev", chr_args);
-> +    qemu_chr_fe_init(&be, chr, &error_abort);
-> +
-> +    /* check that chardev operates correctly */
-> +    char_udp_test_internal(chr, sock);
-> +
-> +    /* set the handler that denies the hotswap */
-> +    qemu_chr_fe_set_handlers(&be, NULL, NULL,
-> +                             NULL, chardev_change_denied, NULL, NULL,
-> true);
-> +
-> +    /* now, change is denied and has to keep the old backend operating *=
-/
-> +    qmp_chardev_change("chardev", &backend, NULL);
->
+So I think I agree with Peter here; if we allocate the bitmap in the
+same way as our other bitmaps it'll perhaps be easier for people to
+understand both of them.
+Especially now Juan has changed that to be individual bitmaps per
+RAMBlock rather than one big bitmap; it avoids having to work out
+offsets into the bitmap.
 
-Please add qapi_free_ChardevReturn(ret);
+Dave
 
-other than that:
-
-Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-
-+    g_assert(be.chr =3D=3D chr);
-> +
-> +    char_udp_test_internal(chr, sock);
-> +
-> +    /* now allow the change */
-> +    qemu_chr_fe_set_handlers(&be, NULL, NULL,
-> +                             NULL, chardev_change, NULL, NULL, true);
-> +
-> +    /* has to succeed now */
-> +    qmp_chardev_change("chardev", &backend, &error_abort);
-> +    g_assert(be.chr !=3D chr);
-> +
-> +    close(sock);
-> +    chr =3D be.chr;
-> +
-> +    /* run the file chardev test */
-> +    char_file_test_internal(chr, filename);
-> +
-> +    object_unparent(OBJECT(chr));
-> +
-> +    g_unlink(filename);
-> +    g_free(filename);
-> +    g_rmdir(tmp_path);
-> +    g_free(tmp_path);
-> +    g_free(chr_args);
-> +}
-> +
->  int main(int argc, char **argv)
->  {
->      qemu_init_main_loop(&error_abort);
-> @@ -666,6 +733,7 @@ int main(int argc, char **argv)
->  #endif
->      g_test_add_func("/char/socket", char_socket_test);
->      g_test_add_func("/char/udp", char_udp_test);
-> +    g_test_add_func("/char/hotswap", char_hotswap_test);
->
->      return g_test_run();
->  }
-> --
-> 2.7.4
->
->
-> --
-Marc-Andr=C3=A9 Lureau
+> Thanks,
+> 
+> -- 
+> Peter Xu
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
