@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53977)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53995)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1dG0yO-0004Zg-4W
-	for qemu-devel@nongnu.org; Wed, 31 May 2017 06:35:29 -0400
+	(envelope-from <quintela@redhat.com>) id 1dG0yP-0004am-Hd
+	for qemu-devel@nongnu.org; Wed, 31 May 2017 06:35:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1dG0yM-000277-Rb
-	for qemu-devel@nongnu.org; Wed, 31 May 2017 06:35:28 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:56930)
+	(envelope-from <quintela@redhat.com>) id 1dG0yO-00027e-Gf
+	for qemu-devel@nongnu.org; Wed, 31 May 2017 06:35:29 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47588)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1dG0yM-00026k-Il
-	for qemu-devel@nongnu.org; Wed, 31 May 2017 06:35:26 -0400
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1dG0yO-00027I-B4
+	for qemu-devel@nongnu.org; Wed, 31 May 2017 06:35:28 -0400
 Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
 	[10.5.11.12])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 90FFF81241
-	for <qemu-devel@nongnu.org>; Wed, 31 May 2017 10:35:25 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 661AAC049D57
+	for <qemu-devel@nongnu.org>; Wed, 31 May 2017 10:35:27 +0000 (UTC)
 From: Juan Quintela <quintela@redhat.com>
-Date: Wed, 31 May 2017 12:35:05 +0200
-Message-Id: <20170531103509.22021-7-quintela@redhat.com>
+Date: Wed, 31 May 2017 12:35:06 +0200
+Message-Id: <20170531103509.22021-8-quintela@redhat.com>
 In-Reply-To: <20170531103509.22021-1-quintela@redhat.com>
 References: <20170531103509.22021-1-quintela@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 06/10] migration: Export tls.c functions in
+Subject: [Qemu-devel] [PATCH v2 07/10] migration: Export rdma.c functions in
  its own file
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -33,123 +33,84 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: dgilbert@redhat.com, lvivier@redhat.com, peterx@redhat.com
 
-Just for the functions exported from tls.c.  Notice that we can't
-remove the migration/migration.h include from tls.c because it access
-directly MigrationState for the tls params.
-
 Signed-off-by: Juan Quintela <quintela@redhat.com>
 ---
- include/migration/migration.h | 10 ----------
- migration/channel.c           |  1 +
- migration/migration.c         |  1 -
- migration/tls.c               |  1 +
- migration/tls.h               | 34 ++++++++++++++++++++++++++++++++++
- 5 files changed, 36 insertions(+), 11 deletions(-)
- create mode 100644 migration/tls.h
+ include/migration/migration.h |  4 ----
+ migration/migration.c         |  1 +
+ migration/rdma.c              |  1 +
+ migration/rdma.h              | 25 +++++++++++++++++++++++++
+ 4 files changed, 27 insertions(+), 4 deletions(-)
+ create mode 100644 migration/rdma.h
 
 diff --git a/include/migration/migration.h b/include/migration/migration.h
-index 9d311ed..29fda5b 100644
+index 29fda5b..8d29bc9 100644
 --- a/include/migration/migration.h
 +++ b/include/migration/migration.h
-@@ -18,7 +18,6 @@
- #include "qemu-common.h"
- #include "qemu/thread.h"
- #include "qemu/notify.h"
--#include "io/channel.h"
- #include "qapi-types.h"
- #include "exec/cpu-common.h"
- #include "qemu/coroutine_int.h"
-@@ -152,15 +151,6 @@ void migration_fd_process_incoming(QEMUFile *f);
+@@ -153,10 +153,6 @@ void qemu_start_incoming_migration(const char *uri, Error **errp);
  
- void qemu_start_incoming_migration(const char *uri, Error **errp);
- 
--void migration_tls_channel_process_incoming(MigrationState *s,
--                                            QIOChannel *ioc,
--                                            Error **errp);
--
--void migration_tls_channel_connect(MigrationState *s,
--                                   QIOChannel *ioc,
--                                   const char *hostname,
--                                   Error **errp);
--
  uint64_t migrate_max_downtime(void);
  
- void rdma_start_outgoing_migration(void *opaque, const char *host_port, Error **errp);
-diff --git a/migration/channel.c b/migration/channel.c
-index 2e78905cc..eae1d9e 100644
---- a/migration/channel.c
-+++ b/migration/channel.c
-@@ -12,6 +12,7 @@
+-void rdma_start_outgoing_migration(void *opaque, const char *host_port, Error **errp);
+-
+-void rdma_start_incoming_migration(const char *host_port, Error **errp);
+-
+ void migrate_fd_error(MigrationState *s, const Error *error);
  
- #include "qemu/osdep.h"
- #include "channel.h"
-+#include "tls.h"
- #include "migration/migration.h"
- #include "qemu-file-channel.h"
- #include "trace.h"
+ void migrate_fd_connect(MigrationState *s);
 diff --git a/migration/migration.c b/migration/migration.c
-index f5140d2..6e11db2 100644
+index 6e11db2..3face58 100644
 --- a/migration/migration.c
 +++ b/migration/migration.c
-@@ -43,7 +43,6 @@
- #include "exec/address-spaces.h"
- #include "exec/target_page.h"
- #include "io/channel-buffer.h"
--#include "io/channel-tls.h"
- #include "migration/colo.h"
- 
- #define MAX_THROTTLE  (32 << 20)      /* Migration transfer speed throttling */
-diff --git a/migration/tls.c b/migration/tls.c
-index 34ad121..bae9aca 100644
---- a/migration/tls.c
-+++ b/migration/tls.c
 @@ -21,6 +21,7 @@
- #include "qemu/osdep.h"
- #include "channel.h"
+ #include "exec.h"
+ #include "fd.h"
+ #include "socket.h"
++#include "rdma.h"
  #include "migration/migration.h"
-+#include "tls.h"
- #include "io/channel-tls.h"
- #include "crypto/tlscreds.h"
- #include "qemu/error-report.h"
-diff --git a/migration/tls.h b/migration/tls.h
+ #include "savevm.h"
+ #include "qemu-file-channel.h"
+diff --git a/migration/rdma.c b/migration/rdma.c
+index 4cb5bf8..fab30ea 100644
+--- a/migration/rdma.c
++++ b/migration/rdma.c
+@@ -17,6 +17,7 @@
+ #include "qapi/error.h"
+ #include "qemu-common.h"
+ #include "qemu/cutils.h"
++#include "rdma.h"
+ #include "migration/migration.h"
+ #include "qemu-file.h"
+ #include "exec/cpu-common.h"
+diff --git a/migration/rdma.h b/migration/rdma.h
 new file mode 100644
-index 0000000..cdd7000
+index 0000000..de2ba09
 --- /dev/null
-+++ b/migration/tls.h
-@@ -0,0 +1,34 @@
++++ b/migration/rdma.h
+@@ -0,0 +1,25 @@
 +/*
-+ * QEMU migration TLS support
++ * RDMA protocol and interfaces
 + *
-+ * Copyright (c) 2015 Red Hat, Inc.
++ * Copyright IBM, Corp. 2010-2013
++ * Copyright Red Hat, Inc. 2015-2016
 + *
-+ * This library is free software; you can redistribute it and/or
-+ * modify it under the terms of the GNU Lesser General Public
-+ * License as published by the Free Software Foundation; either
-+ * version 2 of the License, or (at your option) any later version.
++ * Authors:
++ *  Michael R. Hines <mrhines@us.ibm.com>
++ *  Jiuxing Liu <jl@us.ibm.com>
++ *  Daniel P. Berrange <berrange@redhat.com>
 + *
-+ * This library is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+ * Lesser General Public License for more details.
-+ *
-+ * You should have received a copy of the GNU Lesser General Public
-+ * License along with this library; if not, see <http://www.gnu.org/licenses/>.
++ * This work is licensed under the terms of the GNU GPL, version 2 or
++ * later.  See the COPYING file in the top-level directory.
 + *
 + */
 +
-+#ifndef QEMU_MIGRATION_TLS_H
-+#define QEMU_MIGRATION_TLS_H
++#ifndef QEMU_MIGRATION_RDMA_H
++#define QEMU_MIGRATION_RDMA_H
 +
-+#include "io/channel.h"
-+
-+void migration_tls_channel_process_incoming(MigrationState *s,
-+                                            QIOChannel *ioc,
-+                                            Error **errp);
-+
-+void migration_tls_channel_connect(MigrationState *s,
-+                                   QIOChannel *ioc,
-+                                   const char *hostname,
++void rdma_start_outgoing_migration(void *opaque, const char *host_port,
 +                                   Error **errp);
++
++void rdma_start_incoming_migration(const char *host_port, Error **errp);
++
 +#endif
 -- 
 2.9.4
