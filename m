@@ -1,30 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41584)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41802)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1dG53P-0000QI-Ow
-	for qemu-devel@nongnu.org; Wed, 31 May 2017 10:56:56 -0400
+	(envelope-from <kchamart@redhat.com>) id 1dG540-0000rf-2r
+	for qemu-devel@nongnu.org; Wed, 31 May 2017 10:57:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1dG53L-0001Ha-RK
-	for qemu-devel@nongnu.org; Wed, 31 May 2017 10:56:55 -0400
-Received: from mailhub.sw.ru ([195.214.232.25]:18790 helo=relay.sw.ru)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
-	id 1dG53L-0001H4-Fg
-	for qemu-devel@nongnu.org; Wed, 31 May 2017 10:56:51 -0400
-References: <20170530143052.165002-1-vsementsov@virtuozzo.com>
-	<20170530143052.165002-2-vsementsov@virtuozzo.com>
-	<874e184b-3727-3bbc-0169-1073db203736@redhat.com>
-	<173a697e-274c-a2a7-63d2-f5dbf93f69e7@virtuozzo.com>
-	<e5021317-ec3a-def9-71ea-3dbc947a6e20@redhat.com>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <24d9876f-a555-773c-5277-af438bc45083@virtuozzo.com>
-Date: Wed, 31 May 2017 17:56:49 +0300
+	(envelope-from <kchamart@redhat.com>) id 1dG53z-0001XI-9b
+	for qemu-devel@nongnu.org; Wed, 31 May 2017 10:57:32 -0400
+Date: Wed, 31 May 2017 16:57:20 +0200
+From: Kashyap Chamarthy <kchamart@redhat.com>
+Message-ID: <20170531145720.lc5tlssve5eeyyf4@eukaryote>
+References: <20170529190322.xc2e2uh7wp6hlcs6@eukaryote>
+	<w514lw22y70.fsf@maestria.local.igalia.com>
 MIME-Version: 1.0
-In-Reply-To: <e5021317-ec3a-def9-71ea-3dbc947a6e20@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH 01/19] nbd/server: get rid of
- nbd_negotiate_read and friends
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <w514lw22y70.fsf@maestria.local.igalia.com>
+Subject: Re: [Qemu-devel] [RFC] Making 'block-stream',
+ and 'block-commit' accept node-name
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,69 +24,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
-Cc: pbonzini@redhat.com, den@openvz.org
+To: Alberto Garcia <berto@igalia.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org
 
-31.05.2017 17:39, Eric Blake wrote:
-> On 05/31/2017 08:12 AM, Vladimir Sementsov-Ogievskiy wrote:
->> 30.05.2017 23:10, Eric Blake wrote:
->>> On 05/30/2017 09:30 AM, Vladimir Sementsov-Ogievskiy wrote:
->>>> Functions nbd_negotiate_{read,write,drop_sync} were introduced in
->>>> 1a6245a5b, when nbd_wr_syncv was working through qemu_co_sendv_recvv,
->>> There is no qemu_co_sendv_recvv. Did you mean qemu_co_recv/qemu_co_send?
->> qemu_co_recv is a macro, qemu_co_sendv_recvv - is an actual function,
->> which do something.
-> Oh. I see where I went wrong - I was grepping for 'nbd_co_sendv' and
-> coming up short.
->
->> #define qemu_co_recv(sockfd, buf, bytes) \
->>    qemu_co_send_recv(sockfd, buf, bytes, false)
->>
->> ssize_t coroutine_fn
->> qemu_co_send_recv(int sockfd, void *buf, size_t bytes, bool do_send)
->> {
->>      struct iovec iov = { .iov_base = buf, .iov_len = bytes };
->>      return qemu_co_sendv_recvv(sockfd, &iov, 1, 0, bytes, do_send);
->> }
-> The commit message still makes me chase through several layers of
-> indirection, so I still wonder if referring to qemu_co_recv/qemu_co_send
+On Tue, May 30, 2017 at 04:53:23PM +0200, Alberto Garcia wrote:
+> On Mon 29 May 2017 09:03:22 PM CEST, Kashyap Chamarthy wrote:
+> 
+> > Observe the following ('qmp-shell', for brevity) invocation of the
+> > four major types (stream, commit, mirror, backup) of live block
+> > operations:
+> >
+> >     (QEMU) block-stream device=node-D base=a.qcow2 job-id=job-block-stream
+> >     (QEMU) block-commit device=node-D base=a.qcow2 top=b.qcow2 job-id=job-block-commit
+> >     (QEMU) drive-mirror device=node-D target=e.qcow2 sync=full job-id=job-drive-mirror
+> >     (QEMU) drive-backup device=node-D sync=full target=e.qcow2 job-id=job-drive-backup
+> >     (QEMU) blockdev-backup device=node-B target=node-E sync=full job-id=job-blockdev-backup
+> >     (QEMU) blockdev-mirror device=node-D target=node-E sync=full job-id=job-blockdev-mirror
+> >
+> > While we have `blockdev-{mirror, backup}` as 'node-name'-alternatives
+> > for `drive-{mirror, backup}`, as the eagle-eyed will, the
+> > `block-stream` and `block-commit` commands still operate on file names
+> > for parameters 'base' and 'top'.
+> 
+> block-stream does accept a node name for the top and base images (see
+> 554b614765090f47d and 312fe09cc8af86c).
 
-I'll add a note like "(the path is nbd_wr_sync -> qemu_co_{recv/send} -> 
-qemu_co_send_recv -> qemu_co_sendv_recvv)',
-because I writing that qemu_co_recv yields will be confusing too.
+Ah, I didn't realize `block-stream` accepts 'node-name' for 'base' and
+'top'.  Thanks for the pointers.
 
-> (which is what is directly used in that older commit for nbd_wr_syncv)
-> is any better.  It is probably also worth referring back to commit
-> ff82911cd as the point in time where we switched to the qio_channel
-> code, thereby no longer needing to manage coroutine handlers quite as
-> directly as beforehand.
+But still, I wonder, for consistency's sake: will a new
+`blockdev-{stream, commit}` ever be created.
 
-OK
+> block-commit hasn't changed, but it should be possible to follow a
+> similar approach.
 
->
->
->>>> +int drop_sync(QIOChannel *ioc, size_t size, Error **errp)
->>> As part of moving it into nbd/common.c, please rename this function to
->>> an nbd_ prefix, since non-static functions are more likely to collide
->>> with the rest of the code base if not properly named.  Better yet: do it
->>> in multiple patches:
->>> - rename the static functions and fallout to callers (all of
->>> nbd_drop_sync, nbd_read_sync, and nbd_write_sync)
-> In fact, does the _sync name buy us anything any more, or can we just go
-> with the shorter nbd_drop(), nbd_read(), and nbd_write()?
+Noted.
 
-OK, good idea.
-
->
->>> - code motion (promote nbd_drop_sync from static in client.c to exported
->>> in common.c)
->>> - drop nbd_negotiate_ functions in favor of common nbd_*_sync functions
->> OK
->>
->>> The idea makes sense, but I think there's too much going on in this one
->>> commit.
->>>
+[...]
 
 -- 
-Best regards,
-Vladimir
+/kashyap
