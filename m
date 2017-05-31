@@ -1,24 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36752)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36780)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <riku.voipio@linaro.org>) id 1dG3Mg-0007WO-MM
-	for qemu-devel@nongnu.org; Wed, 31 May 2017 09:08:45 -0400
+	(envelope-from <riku.voipio@linaro.org>) id 1dG3Mj-0007Yh-Ep
+	for qemu-devel@nongnu.org; Wed, 31 May 2017 09:08:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <riku.voipio@linaro.org>) id 1dG3Mf-0003dx-Ig
-	for qemu-devel@nongnu.org; Wed, 31 May 2017 09:08:42 -0400
-Received: from mail-lf0-x22d.google.com ([2a00:1450:4010:c07::22d]:33152)
+	(envelope-from <riku.voipio@linaro.org>) id 1dG3Mh-0003eE-2D
+	for qemu-devel@nongnu.org; Wed, 31 May 2017 09:08:45 -0400
+Received: from mail-lf0-x235.google.com ([2a00:1450:4010:c07::235]:33162)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <riku.voipio@linaro.org>)
-	id 1dG3Mf-0003da-AO
-	for qemu-devel@nongnu.org; Wed, 31 May 2017 09:08:41 -0400
-Received: by mail-lf0-x22d.google.com with SMTP id m18so8645280lfj.0
-	for <qemu-devel@nongnu.org>; Wed, 31 May 2017 06:08:41 -0700 (PDT)
+	id 1dG3Mg-0003e2-Rb
+	for qemu-devel@nongnu.org; Wed, 31 May 2017 09:08:43 -0400
+Received: by mail-lf0-x235.google.com with SMTP id m18so8645909lfj.0
+	for <qemu-devel@nongnu.org>; Wed, 31 May 2017 06:08:42 -0700 (PDT)
 From: riku.voipio@linaro.org
-Date: Wed, 31 May 2017 16:08:18 +0300
-Message-Id: <58de8b9684cc7b4b1fb3cd47678a04d6924b28de.1496234766.git.riku.voipio@linaro.org>
+Date: Wed, 31 May 2017 16:08:19 +0300
+Message-Id: <65424cc45696768442c684c1202d21b7f73f1156.1496234766.git.riku.voipio@linaro.org>
 In-Reply-To: <cover.1496234766.git.riku.voipio@linaro.org>
 References: <cover.1496234766.git.riku.voipio@linaro.org>
-Subject: [Qemu-devel] [PULL 06/15] linux-user: remove all traces of qemu
- from /proc/self/cmdline
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PULL 07/15] linux-user: add strace for getuid(),
+ gettid(), getppid(), geteuid()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,83 +31,83 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, stefanha@redhat.com, Andreas Schwab <schwab@suse.de>
+Cc: peter.maydell@linaro.org, stefanha@redhat.com, =?UTF-8?q?Milo=C5=A1=20Stojanovi=C4=87?= <Milos.Stojanovic@rt-rk.com>
 
-From: Andreas Schwab <schwab@suse.de>
+From: Miloš Stojanović <Milos.Stojanovic@rt-rk.com>
 
-Instead of post-processing the real contents use the remembered target
-argv.  That removes all traces of qemu, including command line options,
-and handles QEMU_ARGV0.
+Improve strace support for syscalls getuid(), gettid(), getppid()
+and geteuid(). Since these system calls don't have arguments, "%s()"
+is added in the corresponding strace.list entry so that no arguments
+are printed.
 
-Signed-off-by: Andreas Schwab <schwab@suse.de>
+getuid:
+Prior to this commit, typical strace output used to look like this:
+4894 getuid(4894,0,0,274886293296,-3689348814741910323,4832615904) = 1000
+After this commit, it looks like this:
+4894 getuid() = 1000
+
+gettid:
+Prior to this commit, typical strace output used to look like this:
+8307 gettid(0,0,64,0,4832630528,4832615840) = 8307
+After this commit, it looks like this:
+8307 gettid() = 8307
+
+getppid:
+Prior to this commit, typical strace output used to look like this:
+20588 getppid(20588,64,0,4832630528,4832615888,0) = 20625
+After this commit, it looks like this:
+20588 getppid() = 20625
+
+geteuid:
+Prior to this commit, typical strace output used to look like this:
+20588 geteuid(64,0,0,4832615888,0,-9151031864016699136) = 1000
+After this commit, it looks like this:
+20588 geteuid() = 1000
+
+Signed-off-by: Miloš Stojanović <Milos.Stojanovic@rt-rk.com>
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 Signed-off-by: Riku Voipio <riku.voipio@linaro.org>
 ---
- linux-user/syscall.c | 47 +++++++----------------------------------------
- 1 file changed, 7 insertions(+), 40 deletions(-)
+ linux-user/strace.list | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-index c8f6efc89c..909dde6de6 100644
---- a/linux-user/syscall.c
-+++ b/linux-user/syscall.c
-@@ -7358,52 +7358,19 @@ int host_to_target_waitstatus(int status)
- 
- static int open_self_cmdline(void *cpu_env, int fd)
- {
--    int fd_orig = -1;
--    bool word_skipped = false;
--
--    fd_orig = open("/proc/self/cmdline", O_RDONLY);
--    if (fd_orig < 0) {
--        return fd_orig;
--    }
-+    CPUState *cpu = ENV_GET_CPU((CPUArchState *)cpu_env);
-+    struct linux_binprm *bprm = ((TaskState *)cpu->opaque)->bprm;
-+    int i;
- 
--    while (true) {
--        ssize_t nb_read;
--        char buf[128];
--        char *cp_buf = buf;
-+    for (i = 0; i < bprm->argc; i++) {
-+        size_t len = strlen(bprm->argv[i]) + 1;
- 
--        nb_read = read(fd_orig, buf, sizeof(buf));
--        if (nb_read < 0) {
--            int e = errno;
--            fd_orig = close(fd_orig);
--            errno = e;
-+        if (write(fd, bprm->argv[i], len) != len) {
-             return -1;
--        } else if (nb_read == 0) {
--            break;
--        }
--
--        if (!word_skipped) {
--            /* Skip the first string, which is the path to qemu-*-static
--               instead of the actual command. */
--            cp_buf = memchr(buf, 0, nb_read);
--            if (cp_buf) {
--                /* Null byte found, skip one string */
--                cp_buf++;
--                nb_read -= cp_buf - buf;
--                word_skipped = true;
--            }
--        }
--
--        if (word_skipped) {
--            if (write(fd, cp_buf, nb_read) != nb_read) {
--                int e = errno;
--                close(fd_orig);
--                errno = e;
--                return -1;
--            }
-         }
-     }
- 
--    return close(fd_orig);
-+    return 0;
- }
- 
- static int open_self_maps(void *cpu_env, int fd)
+diff --git a/linux-user/strace.list b/linux-user/strace.list
+index 3b1282ec1a..6e33788a17 100644
+--- a/linux-user/strace.list
++++ b/linux-user/strace.list
+@@ -290,7 +290,7 @@
+ { TARGET_NR_getegid32, "getegid32" , NULL, NULL, NULL },
+ #endif
+ #ifdef TARGET_NR_geteuid
+-{ TARGET_NR_geteuid, "geteuid" , NULL, NULL, NULL },
++{ TARGET_NR_geteuid, "geteuid" , "%s()", NULL, NULL },
+ #endif
+ #ifdef TARGET_NR_geteuid32
+ { TARGET_NR_geteuid32, "geteuid32" , NULL, NULL, NULL },
+@@ -338,7 +338,7 @@
+ { TARGET_NR_getpmsg, "getpmsg" , NULL, NULL, NULL },
+ #endif
+ #ifdef TARGET_NR_getppid
+-{ TARGET_NR_getppid, "getppid" , NULL, NULL, NULL },
++{ TARGET_NR_getppid, "getppid" , "%s()", NULL, NULL },
+ #endif
+ #ifdef TARGET_NR_getpriority
+ { TARGET_NR_getpriority, "getpriority", "%s(%#x,%#x)", NULL, NULL },
+@@ -381,13 +381,13 @@
+   NULL, NULL },
+ #endif
+ #ifdef TARGET_NR_gettid
+-{ TARGET_NR_gettid, "gettid" , NULL, NULL, NULL },
++{ TARGET_NR_gettid, "gettid" , "%s()", NULL, NULL },
+ #endif
+ #ifdef TARGET_NR_gettimeofday
+ { TARGET_NR_gettimeofday, "gettimeofday" , NULL, NULL, NULL },
+ #endif
+ #ifdef TARGET_NR_getuid
+-{ TARGET_NR_getuid, "getuid" , NULL, NULL, NULL },
++{ TARGET_NR_getuid, "getuid" , "%s()", NULL, NULL },
+ #endif
+ #ifdef TARGET_NR_getuid32
+ { TARGET_NR_getuid32, "getuid32" , NULL, NULL, NULL },
 -- 
 2.11.0
