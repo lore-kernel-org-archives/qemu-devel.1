@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40927)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41488)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbutsykin@virtuozzo.com>) id 1dG50z-0007Vt-Im
-	for qemu-devel@nongnu.org; Wed, 31 May 2017 10:54:26 -0400
+	(envelope-from <mreitz@redhat.com>) id 1dG532-0000Dh-Vp
+	for qemu-devel@nongnu.org; Wed, 31 May 2017 10:56:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbutsykin@virtuozzo.com>) id 1dG50v-0000QP-L8
-	for qemu-devel@nongnu.org; Wed, 31 May 2017 10:54:25 -0400
-References: <20170531144331.30173-1-pbutsykin@virtuozzo.com>
-	<20170531144331.30173-3-pbutsykin@virtuozzo.com>
-From: Pavel Butsykin <pbutsykin@virtuozzo.com>
-Message-ID: <3cc61060-de94-0db5-ca25-6ba4906a3081@virtuozzo.com>
-Date: Wed, 31 May 2017 17:54:05 +0300
+	(envelope-from <mreitz@redhat.com>) id 1dG532-0001AB-8l
+	for qemu-devel@nongnu.org; Wed, 31 May 2017 10:56:33 -0400
+References: <20170524202842.26724-1-eblake@redhat.com>
+	<20170524202842.26724-5-eblake@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <2727f1d6-3c50-de2e-9679-86e0eeb05457@redhat.com>
+Date: Wed, 31 May 2017 16:56:20 +0200
 MIME-Version: 1.0
-In-Reply-To: <20170531144331.30173-3-pbutsykin@virtuozzo.com>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 2/2] qemu-iotests: add reducing image test
- in 025
+In-Reply-To: <20170524202842.26724-5-eblake@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="3GSoxTrhUphFJSJTPP3qGRnukgDGQcqub"
+Subject: Re: [Qemu-devel] [PATCH v2 4/5] block: Simplify use of
+ BDRV_BLOCK_RAW
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,102 +25,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, mreitz@redhat.com, armbru@redhat.com, eblake@redhat.com
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, jsnow@redhat.com, Jeff Cody <jcody@redhat.com>, Kevin Wolf <kwolf@redhat.com>
+
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--3GSoxTrhUphFJSJTPP3qGRnukgDGQcqub
+From: Max Reitz <mreitz@redhat.com>
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, jsnow@redhat.com, Jeff Cody <jcody@redhat.com>,
+ Kevin Wolf <kwolf@redhat.com>
+Message-ID: <2727f1d6-3c50-de2e-9679-86e0eeb05457@redhat.com>
+Subject: Re: [PATCH v2 4/5] block: Simplify use of BDRV_BLOCK_RAW
+References: <20170524202842.26724-1-eblake@redhat.com>
+ <20170524202842.26724-5-eblake@redhat.com>
+In-Reply-To: <20170524202842.26724-5-eblake@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 2017-05-24 22:28, Eric Blake wrote:
+> The lone caller that cares about a return of BDRV_BLOCK_RAW
+> (namely, io.c:bdrv_co_get_block_status) completely replaces the
+> return value, so there is no point in passing BDRV_BLOCK_DATA.
+>=20
+> Signed-off-by: Eric Blake <eblake@redhat.com>
+
+Technically true, but conflicts with the documentation in block.h.
+
+If you really want this changed, you should document in block.h what
+exactly it is that BDRV_BLOCK_RAW does.
+
+Max
 
 
+--3GSoxTrhUphFJSJTPP3qGRnukgDGQcqub
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-On 31.05.2017 17:43, Pavel Butsykin wrote:
-> Signed-off-by: Pavel Butsykin <pbutsykin@virtuozzo.com>
-> ---
->   tests/qemu-iotests/025     | 19 +++++++++++++++++--
->   tests/qemu-iotests/025.out | 12 +++++++++++-
->   2 files changed, 28 insertions(+), 3 deletions(-)
-> 
-> diff --git a/tests/qemu-iotests/025 b/tests/qemu-iotests/025
-> index f5e672e6b3..658601579b 100755
-> --- a/tests/qemu-iotests/025
-> +++ b/tests/qemu-iotests/025
-> @@ -38,7 +38,7 @@ trap "_cleanup; exit \$status" 0 1 2 3 15
->   . ./common.filter
->   . ./common.pattern
->   
-> -_supported_fmt raw qcow2 qed
-> +_supported_fmt raw qcow2
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
 
-I'm not sure, can I so blatantly drop QED here. But this place is very
-suitable for reduce image case. Perhaps the alternative would be adding
-a new test, I just didn't want to copy the tests, which are testing
-almost the same thing.
+iQEvBAEBCAAZBQJZLtmUEhxtcmVpdHpAcmVkaGF0LmNvbQAKCRD0B9sAYdXPQJO0
+B/9jnEK5WU7rcMV2QB/vWH0pR1PCTb9Xlzegt4/P7aY6MlHC3OAo6kUgPxlSY8f8
+M+jNAKjKDq3CPR9sbkZRKjljRtK2OLJ7fK4ya7Ue7w4M1fDvlExsQMFrNUnuzqQ2
+KHRP1A5pScU7wiBlZQ1bN4kndBZ5iCxl7UH05Hkl5DAlnW/XGNkYu2ozO5gIwsF+
+PJ8LN4avUqa/wzErhjzF3NRMiK8k5xeQNoMN3j5gQXkLAIvBipt3LZywzLdCUHtm
+s70njAfzd0AV9G4Ex+tP9pJ2Jte9YnH7DAh3wpb1kCsWvrO9p/C4AFDbwp2xjCeZ
++f3BsuIsZ4QgKpA3ZmzDaXX5
+=kvob
+-----END PGP SIGNATURE-----
 
->   _supported_proto file sheepdog rbd nfs
->   _supported_os Linux
->   
-> @@ -46,6 +46,7 @@ echo "=== Creating image"
->   echo
->   small_size=$((128 * 1024 * 1024))
->   big_size=$((384 * 1024 * 1024))
-> +bigger_size=$((512 * 1024 * 1024))
->   _make_test_img $small_size
->   
->   echo
-> @@ -54,7 +55,20 @@ io_pattern write 0 $small_size 0 1 0xc5
->   _check_test_img
->   
->   echo
-> -echo "=== Resizing image"
-> +echo "=== Growing image"
-> +$QEMU_IO "$TEST_IMG" <<EOF | _filter_qemu_io
-> +length
-> +truncate $bigger_size
-> +length
-> +EOF
-> +_check_test_img
-> +
-> +echo
-> +echo "=== Verifying image size after reopen"
-> +$QEMU_IO -c "length" "$TEST_IMG"
-> +
-> +echo
-> +echo "=== Reducing image"
->   $QEMU_IO "$TEST_IMG" <<EOF | _filter_qemu_io
->   length
->   truncate $big_size
-> @@ -70,6 +84,7 @@ echo
->   echo "=== Verifying resized image"
->   io_pattern read 0 $small_size 0 1 0xc5
->   io_pattern read $small_size $(($big_size - $small_size)) 0 1 0
-> +io_pattern read $big_size $(($bigger_size - $big_size)) 0 1 0
->   
->   # success, all done
->   echo "*** done"
-> diff --git a/tests/qemu-iotests/025.out b/tests/qemu-iotests/025.out
-> index f13fc2863c..a0293711c7 100644
-> --- a/tests/qemu-iotests/025.out
-> +++ b/tests/qemu-iotests/025.out
-> @@ -9,8 +9,16 @@ wrote 134217728/134217728 bytes at offset 0
->   128 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
->   No errors were found on the image.
->   
-> -=== Resizing image
-> +=== Growing image
->   128 MiB
-> +512 MiB
-> +No errors were found on the image.
-> +
-> +=== Verifying image size after reopen
-> +512 MiB
-> +
-> +=== Reducing image
-> +512 MiB
->   384 MiB
->   No errors were found on the image.
->   
-> @@ -24,4 +32,6 @@ read 134217728/134217728 bytes at offset 0
->   === IO: pattern 0
->   read 268435456/268435456 bytes at offset 134217728
->   256 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-> +=== IO: pattern 0
-> +read failed: Input/output error
->   *** done
-> 
+--3GSoxTrhUphFJSJTPP3qGRnukgDGQcqub--
