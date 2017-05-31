@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56398)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58308)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dGAsJ-0004Ql-Hq
-	for qemu-devel@nongnu.org; Wed, 31 May 2017 17:09:52 -0400
+	(envelope-from <jcody@redhat.com>) id 1dGB0d-0006rY-9m
+	for qemu-devel@nongnu.org; Wed, 31 May 2017 17:18:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dGAsI-0000xB-LC
-	for qemu-devel@nongnu.org; Wed, 31 May 2017 17:09:51 -0400
-References: <20170531094330.1808-1-pbonzini@redhat.com>
-	<20170531094330.1808-6-pbonzini@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <d093f3e0-6bfe-adbd-a140-57f16ae63e6d@redhat.com>
-Date: Wed, 31 May 2017 16:09:40 -0500
+	(envelope-from <jcody@redhat.com>) id 1dGB0b-0004uF-Pz
+	for qemu-devel@nongnu.org; Wed, 31 May 2017 17:18:27 -0400
+Date: Wed, 31 May 2017 17:18:18 -0400
+From: Jeff Cody <jcody@redhat.com>
+Message-ID: <20170531211818.GD19181@localhost.localdomain>
+References: <20170528063114.28691-1-ndevos@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20170531094330.1808-6-pbonzini@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="DFQ3XQaIV1gqgBrRvQmBUdqKp0dG1i4I7"
-Subject: Re: [Qemu-devel] [PATCH 05/11] vvfat: make it thread-safe
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170528063114.28691-1-ndevos@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v3] gluster: add support for
+ PREALLOC_MODE_FALLOC
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,55 +23,195 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, famz@redhat.com, qemu-block@nongnu.org, mreitz@redhat.com
+To: Niels de Vos <ndevos@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---DFQ3XQaIV1gqgBrRvQmBUdqKp0dG1i4I7
-From: Eric Blake <eblake@redhat.com>
-To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, famz@redhat.com, qemu-block@nongnu.org,
- mreitz@redhat.com
-Message-ID: <d093f3e0-6bfe-adbd-a140-57f16ae63e6d@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 05/11] vvfat: make it thread-safe
-References: <20170531094330.1808-1-pbonzini@redhat.com>
- <20170531094330.1808-6-pbonzini@redhat.com>
-In-Reply-To: <20170531094330.1808-6-pbonzini@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 05/31/2017 04:43 AM, Paolo Bonzini wrote:
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+On Sun, May 28, 2017 at 12:01:14PM +0530, Niels de Vos wrote:
+> Add missing support for "preallocation=falloc" to the Gluster block
+> driver. This change bases its logic on that of block/file-posix.c and
+> removed the gluster_supports_zerofill() and qemu_gluster_zerofill()
+> functions in favour of #ifdef checks in an easy to read
+> switch-statement.
+> 
+> Both glfs_zerofill() and glfs_fallocate() have been introduced with
+> GlusterFS 3.5.0 (pkg-config glusterfs-api = 6). A #define for the
+> availability of glfs_fallocate() has been added to ./configure.
+> 
+> Reported-by: Satheesaran Sundaramoorthi <sasundar@redhat.com>
+> URL: https://bugzilla.redhat.com/1450759
+> Signed-off-by: Niels de Vos <ndevos@redhat.com>
 > ---
->  block/vvfat.c | 8 +++++++-
->  1 file changed, 7 insertions(+), 1 deletion(-)
->=20
+> v3 typo fixes spotted by Jeff Cody and Eric Blake:
+> - typo in the commit message (Eric)
+> - copy/paste mistake causing incorrect if-statement (Jeff)
+> 
+> v2 changes requested by Jeff Cody:
+> - add CONFIG_GLUSTERFS_FALLOCATE
+> - remove unneeded wrapper qemu_gluster_zerofill()
+> 
+>  block/gluster.c | 76 ++++++++++++++++++++++++++++++---------------------------
+>  configure       |  6 +++++
+>  2 files changed, 46 insertions(+), 36 deletions(-)
+> 
+> diff --git a/block/gluster.c b/block/gluster.c
+> index 7c76cd0..7863991 100644
+> --- a/block/gluster.c
+> +++ b/block/gluster.c
+> @@ -964,29 +964,6 @@ static coroutine_fn int qemu_gluster_co_pwrite_zeroes(BlockDriverState *bs,
+>      qemu_coroutine_yield();
+>      return acb.ret;
+>  }
+> -
+> -static inline bool gluster_supports_zerofill(void)
+> -{
+> -    return 1;
+> -}
+> -
+> -static inline int qemu_gluster_zerofill(struct glfs_fd *fd, int64_t offset,
+> -                                        int64_t size)
+> -{
+> -    return glfs_zerofill(fd, offset, size);
+> -}
+> -
+> -#else
+> -static inline bool gluster_supports_zerofill(void)
+> -{
+> -    return 0;
+> -}
+> -
+> -static inline int qemu_gluster_zerofill(struct glfs_fd *fd, int64_t offset,
+> -                                        int64_t size)
+> -{
+> -    return 0;
+> -}
+>  #endif
+>  
+>  static int qemu_gluster_create(const char *filename,
+> @@ -996,9 +973,10 @@ static int qemu_gluster_create(const char *filename,
+>      struct glfs *glfs;
+>      struct glfs_fd *fd;
+>      int ret = 0;
+> -    int prealloc = 0;
+> +    PreallocMode prealloc;
+>      int64_t total_size = 0;
+>      char *tmp = NULL;
+> +    Error *local_err = NULL;
+>  
+>      gconf = g_new0(BlockdevOptionsGluster, 1);
+>      gconf->debug = qemu_opt_get_number_del(opts, GLUSTER_OPT_DEBUG,
+> @@ -1026,13 +1004,12 @@ static int qemu_gluster_create(const char *filename,
+>                            BDRV_SECTOR_SIZE);
+>  
+>      tmp = qemu_opt_get_del(opts, BLOCK_OPT_PREALLOC);
+> -    if (!tmp || !strcmp(tmp, "off")) {
+> -        prealloc = 0;
+> -    } else if (!strcmp(tmp, "full") && gluster_supports_zerofill()) {
+> -        prealloc = 1;
+> -    } else {
+> -        error_setg(errp, "Invalid preallocation mode: '%s'"
+> -                         " or GlusterFS doesn't support zerofill API", tmp);
+> +    prealloc = qapi_enum_parse(PreallocMode_lookup, tmp,
+> +                               PREALLOC_MODE__MAX, PREALLOC_MODE_OFF,
+> +                               &local_err);
+> +    g_free(tmp);
+> +    if (local_err) {
+> +        error_propagate(errp, local_err);
+>          ret = -EINVAL;
+>          goto out;
+>      }
+> @@ -1041,21 +1018,48 @@ static int qemu_gluster_create(const char *filename,
+>                      O_WRONLY | O_CREAT | O_TRUNC | O_BINARY, S_IRUSR | S_IWUSR);
+>      if (!fd) {
+>          ret = -errno;
+> -    } else {
+> +        goto out;
+> +    }
+> +
+> +    switch (prealloc) {
+> +#ifdef CONFIG_GLUSTERFS_FALLOCATE
+> +    case PREALLOC_MODE_FALLOC:
+> +        if (glfs_fallocate(fd, 0, 0, total_size)) {
+> +            error_setg(errp, "Could not preallocate data for the new file");
+> +            ret = -errno;
+> +        }
+> +        break;
+> +#endif /* CONFIG_GLUSTERFS_FALLOCATE */
+> +#ifdef CONFIG_GLUSTERFS_ZEROFILL
+> +    case PREALLOC_MODE_FULL:
+>          if (!glfs_ftruncate(fd, total_size)) {
+> -            if (prealloc && qemu_gluster_zerofill(fd, 0, total_size)) {
+> +            if (glfs_zerofill(fd, 0, total_size)) {
+> +                error_setg(errp, "Could not zerofill the new file");
+>                  ret = -errno;
+>              }
+>          } else {
+> +            error_setg(errp, "Could not resize file");
+>              ret = -errno;
+>          }
+> -
+> -        if (glfs_close(fd) != 0) {
+> +        break;
+> +#endif /* CONFIG_GLUSTERFS_ZEROFILL */
+> +    case PREALLOC_MODE_OFF:
+> +        if (glfs_ftruncate(fd, total_size) != 0) {
+>              ret = -errno;
+> +            error_setg(errp, "Could not resize file");
+>          }
+> +        break;
+> +    default:
+> +        ret = -EINVAL;
+> +        error_setg(errp, "Unsupported preallocation mode: %s",
+> +                   PreallocMode_lookup[prealloc]);
+> +        break;
+> +    }
+> +
+> +    if (glfs_close(fd) != 0) {
+> +        ret = -errno;
+>      }
+>  out:
+> -    g_free(tmp);
+>      qapi_free_BlockdevOptionsGluster(gconf);
+>      glfs_clear_preopened(glfs);
+>      return ret;
+> diff --git a/configure b/configure
+> index 7c020c0..8b8291e 100755
+> --- a/configure
+> +++ b/configure
+> @@ -300,6 +300,7 @@ seccomp=""
+>  glusterfs=""
+>  glusterfs_xlator_opt="no"
+>  glusterfs_discard="no"
+> +glusterfs_fallocate="no"
+>  glusterfs_zerofill="no"
+>  gtk=""
+>  gtkabi=""
+> @@ -3576,6 +3577,7 @@ if test "$glusterfs" != "no" ; then
+>        glusterfs_discard="yes"
+>      fi
+>      if $pkg_config --atleast-version=6 glusterfs-api; then
+> +      glusterfs_fallocate="yes"
+>        glusterfs_zerofill="yes"
+>      fi
+>    else
+> @@ -5780,6 +5782,10 @@ if test "$glusterfs_discard" = "yes" ; then
+>    echo "CONFIG_GLUSTERFS_DISCARD=y" >> $config_host_mak
+>  fi
+>  
+> +if test "$glusterfs_fallocate" = "yes" ; then
+> +  echo "CONFIG_GLUSTERFS_FALLOCATE=y" >> $config_host_mak
+> +fi
+> +
+>  if test "$glusterfs_zerofill" = "yes" ; then
+>    echo "CONFIG_GLUSTERFS_ZEROFILL=y" >> $config_host_mak
+>  fi
+> -- 
+> 2.9.3
+> 
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
+Thanks,
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+Reviewed, and applied to my block branch:
 
+git://github.com/codyprime/qemu-kvm-jtc block
 
---DFQ3XQaIV1gqgBrRvQmBUdqKp0dG1i4I7
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEcBAEBCAAGBQJZLzEUAAoJEKeha0olJ0NqjSoH/3Oz4gw03G+BpqP/Hpubb1ie
-HKGW25IXjN9VIpoff1csSWFIEW6bKavSUxclxtVQyznobFlO+cRRvlm9eViwf8xF
-6NvTSJf7H3G4c/y6JrGAC4ABQIPJ7ugUBKPDDWc2Xd3flWLamFZZgkoSJjcb3htD
-BxFLqPkW6Qs8yUIeIBrAsEDi/1P0JDLjC8/I6Zv1SE/jP/O/ah23EJHp0N+CqEX4
-BrDp3wn4BpAO3ihdKMuLHjvUK9fQWPeWVEZPHYeWgCroD3oQ/zLFHiD64MwFCtR9
-B8hIMZsc9bYnZVbwSqgHdK8yPL3NN8zVl6OHWhmpT/55e47DIL46QjwG+z39cEc=
-=BQUA
------END PGP SIGNATURE-----
-
---DFQ3XQaIV1gqgBrRvQmBUdqKp0dG1i4I7--
+-Jeff
