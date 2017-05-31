@@ -1,28 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38145)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38964)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1dG3Qa-0002Xl-7K
-	for qemu-devel@nongnu.org; Wed, 31 May 2017 09:12:45 -0400
+	(envelope-from <lvivier@redhat.com>) id 1dG3Ts-0005pZ-6p
+	for qemu-devel@nongnu.org; Wed, 31 May 2017 09:16:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1dG3QX-0004ur-Gp
-	for qemu-devel@nongnu.org; Wed, 31 May 2017 09:12:44 -0400
-Received: from mailhub.sw.ru ([195.214.232.25]:43329 helo=relay.sw.ru)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
-	id 1dG3QX-0004tx-4Y
-	for qemu-devel@nongnu.org; Wed, 31 May 2017 09:12:41 -0400
-References: <20170530143052.165002-1-vsementsov@virtuozzo.com>
-	<20170530143052.165002-2-vsementsov@virtuozzo.com>
-	<874e184b-3727-3bbc-0169-1073db203736@redhat.com>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <173a697e-274c-a2a7-63d2-f5dbf93f69e7@virtuozzo.com>
-Date: Wed, 31 May 2017 16:12:36 +0300
+	(envelope-from <lvivier@redhat.com>) id 1dG3Tm-0005zc-Go
+	for qemu-devel@nongnu.org; Wed, 31 May 2017 09:16:08 -0400
+References: <149615665491.28067.17765793725374594694.stgit@bahia.lan>
+	<e8fdae1c-9d3c-1059-509a-6b85000e83a9@de.ibm.com>
+	<20170530185618.2e875ebb@bahia.ttt.fr.ibm.com>
+From: Laurent Vivier <lvivier@redhat.com>
+Message-ID: <32546ddf-a725-5dd4-95cb-75a41da8e6ec@redhat.com>
+Date: Wed, 31 May 2017 15:15:56 +0200
 MIME-Version: 1.0
-In-Reply-To: <874e184b-3727-3bbc-0169-1073db203736@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <20170530185618.2e875ebb@bahia.ttt.fr.ibm.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH 01/19] nbd/server: get rid of
- nbd_negotiate_read and friends
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [Qemu-trivial] [PATCH] pc-bios/s390-ccw: use STRIP
+ variable in Makefile
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,71 +26,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
-Cc: pbonzini@redhat.com, den@openvz.org
+To: Greg Kurz <groug@kaod.org>, Christian Borntraeger <borntraeger@de.ibm.com>
+Cc: Cornelia Huck <cornelia.huck@de.ibm.com>, qemu-trivial@nongnu.org, Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org, Alexander Graf <agraf@suse.de>
 
-30.05.2017 23:10, Eric Blake wrote:
-> On 05/30/2017 09:30 AM, Vladimir Sementsov-Ogievskiy wrote:
->> Functions nbd_negotiate_{read,write,drop_sync} were introduced in
->> 1a6245a5b, when nbd_wr_syncv was working through qemu_co_sendv_recvv,
-> There is no qemu_co_sendv_recvv. Did you mean qemu_co_recv/qemu_co_send?
+On 30/05/2017 18:56, Greg Kurz wrote:
+> On Tue, 30 May 2017 18:34:46 +0200
+> Christian Borntraeger <borntraeger@de.ibm.com> wrote:
+> 
+>> On 05/30/2017 05:04 PM, Greg Kurz wrote:
+>>> The docker-run-test-build@debian-s390x-cross target fails with:
+>>>
+>>> strip --strip-unneeded s390-ccw.elf -o s390-ccw.img
+>>> strip: Unable to recognise the format of the input file `s390-ccw.elf'
+>>>
+>>> The configure script defines a STRIP makefile variable whose default
+>>> value is ${cross_prefix}strip. Let's use it.
+>>>
+>>> Signed-off-by: Greg Kurz <groug@kaod.org>
+>>> ---
+>>>  pc-bios/s390-ccw/Makefile |    2 +-
+>>>  1 file changed, 1 insertion(+), 1 deletion(-)
+>>>
+>>> diff --git a/pc-bios/s390-ccw/Makefile b/pc-bios/s390-ccw/Makefile
+>>> index 79a46b67356f..7af57dad109c 100644
+>>> --- a/pc-bios/s390-ccw/Makefile
+>>> +++ b/pc-bios/s390-ccw/Makefile
+>>> @@ -22,7 +22,7 @@ s390-ccw.elf: $(OBJECTS)
+>>>  	$(call quiet-command,$(CC) $(LDFLAGS) -o $@ $(OBJECTS),"BUILD","$(TARGET_DIR)$@")
+>>>
+>>>  s390-ccw.img: s390-ccw.elf
+>>> -	$(call quiet-command,strip --strip-unneeded $< -o $@,"STRIP","$(TARGET_DIR)$@")
+>>> +	$(call quiet-command,$(STRIP) --strip-unneeded $< -o $@,"STRIP","$(TARGET_DIR)$@")
+>>>
+>>>  $(OBJECTS): Makefile
+>>>
+>>>   
+>>
+>> I was going to apply this, but it fails with --disable-strip like
+>>
+>>     /bin/sh: --strip-unneeded: command not found
+>>     Makefile:25: recipe for target 's390-ccw.img' failed
+>>     make[1]: *** [s390-ccw.img] Error 127
+>>     Makefile:354: recipe for target 'romsubdir-s390-ccw' failed
+>>     make: *** [romsubdir-s390-ccw] Error 2
+>>
+>> Not yet sure whats going on.
+>>
+> 
+> configure doesn't generate STRIP when --disable-strip or --enable-debug... so
+> I guess we shouldn't use it here, but rather generate a s390_cross_prefix like
+> in roms/Makefile ?
+> 
 
-qemu_co_recv is a macro, qemu_co_sendv_recvv - is an actual function, 
-which do something.
+I experimented the problem when I played with docker, and fixed the
+problem as you did (with STRIP).
 
-#define qemu_co_recv(sockfd, buf, bytes) \
-   qemu_co_send_recv(sockfd, buf, bytes, false)
+But I think it's a good idea to compile s390 rom as it is done for ppc64
+and ppc roms.
 
-ssize_t coroutine_fn
-qemu_co_send_recv(int sockfd, void *buf, size_t bytes, bool do_send)
-{
-     struct iovec iov = { .iov_base = buf, .iov_len = bytes };
-     return qemu_co_sendv_recvv(sockfd, &iov, 1, 0, bytes, do_send);
-}
-
-
->
->> which just yields, without setting any handlers. But now, nbd_wr_syncv
->> works through qio_channel_yield() which sets handlers, so watchers
->> are redundant in nbd_negotiate_{read,write,drop_sync}, then, let's just
->> use {read,write,drop}_sync functions.
-> Makes sense to me.  Note that I have a pending patch that was also
-> related to 1a6245a5, where we introduced an assertion failure (which
-> later morphed into a segfault) if a client hangs up really early during
-> negotiation:
->
-> https://lists.gnu.org/archive/html/qemu-devel/2017-05/msg06240.html
->
->> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
->> ---
->> +++ b/nbd/common.c
->> @@ -69,6 +69,32 @@ ssize_t nbd_wr_syncv(QIOChannel *ioc,
->>       return done;
->>   }
->>   
->> +/* Discard length bytes from channel.  Return -errno on failure and 0 on
->> + * success*/
-> Space before */, if you don't mind (yes, I know this was just code
-> motion, and that the old spot was wrong).
->
->> +int drop_sync(QIOChannel *ioc, size_t size, Error **errp)
-> As part of moving it into nbd/common.c, please rename this function to
-> an nbd_ prefix, since non-static functions are more likely to collide
-> with the rest of the code base if not properly named.  Better yet: do it
-> in multiple patches:
-> - rename the static functions and fallout to callers (all of
-> nbd_drop_sync, nbd_read_sync, and nbd_write_sync)
-> - code motion (promote nbd_drop_sync from static in client.c to exported
-> in common.c)
-> - drop nbd_negotiate_ functions in favor of common nbd_*_sync functions
-
-OK
-
->
-> The idea makes sense, but I think there's too much going on in this one
-> commit.
->
-
--- 
-Best regards,
-Vladimir
+Laurent
