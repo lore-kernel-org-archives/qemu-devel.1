@@ -1,23 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33455)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34305)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dG1Ty-0006Fr-R1
-	for qemu-devel@nongnu.org; Wed, 31 May 2017 07:08:11 -0400
+	(envelope-from <marcandre.lureau@gmail.com>) id 1dG1Wk-0006yf-GD
+	for qemu-devel@nongnu.org; Wed, 31 May 2017 07:11:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dG1Tt-0003q7-EZ
-	for qemu-devel@nongnu.org; Wed, 31 May 2017 07:08:04 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58938)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dG1Tt-0003pk-8T
-	for qemu-devel@nongnu.org; Wed, 31 May 2017 07:08:01 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <20170531070438.14081-1-maozy.fnst@cn.fujitsu.com>
-Date: Wed, 31 May 2017 13:07:52 +0200
-In-Reply-To: <20170531070438.14081-1-maozy.fnst@cn.fujitsu.com> (Mao Zhongyi's
-	message of "Wed, 31 May 2017 15:04:38 +0800")
-Message-ID: <87o9u9cmif.fsf@dusky.pond.sub.org>
+	(envelope-from <marcandre.lureau@gmail.com>) id 1dG1Wj-0004qT-HD
+	for qemu-devel@nongnu.org; Wed, 31 May 2017 07:10:58 -0400
+Received: from mail-lf0-x234.google.com ([2a00:1450:4010:c07::234]:33649)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+	id 1dG1Wj-0004qP-8A
+	for qemu-devel@nongnu.org; Wed, 31 May 2017 07:10:57 -0400
+Received: by mail-lf0-x234.google.com with SMTP id m18so6929377lfj.0
+	for <qemu-devel@nongnu.org>; Wed, 31 May 2017 04:10:57 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH] pci: Fix unreasonable return value check
+References: <20170509173559.31598-1-marcandre.lureau@redhat.com>
+	<20170509173559.31598-15-marcandre.lureau@redhat.com>
+	<871srmqq46.fsf@dusky.pond.sub.org>
+In-Reply-To: <871srmqq46.fsf@dusky.pond.sub.org>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Wed, 31 May 2017 11:10:45 +0000
+Message-ID: <CAJ+F1CJ8K=i_nZex49Gm7SMs4bPHyw_U_HZ0GNiQaAch9GwtrQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 14/17] acpi: fix s3/s4 disabled type
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,69 +31,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
-Cc: qemu-devel@nongnu.org, marcel@redhat.com, mst@redhat.com
+To: Markus Armbruster <armbru@redhat.com>
+Cc: qemu-devel@nongnu.org
 
-This is cleanup, not a bug fix, so:
+On Thu, May 18, 2017 at 4:58 PM Markus Armbruster <armbru@redhat.com> wrote=
+:
 
-    pci: Clean up error checking in pci_add_capability()
-
-Mao Zhongyi <maozy.fnst@cn.fujitsu.com> writes:
-
-> The return value of pci_add_capability2() is only 2 cases, positive
-> on success, nagetive on failure and set error message to Error. In
-
-negative
-
-> other worlds, If Error is filled, the return value must be nagetive.
-
-words, if
-
-> There is no case where errp is set but the return value is a positive.
-> But pci_add_capability() does. So the return value check is illogical.
-
-pci_add_capability2() could use a function comment explaining its return
-value.  Not this patch's job.
-
-> Meanwhile, all other callers of pci_add_capability2() do the same
-> check as this patch. So fix it.
-
-Suggest:
-
-    pci: Clean up error checking in pci_add_capability()
-
-  On success, pci_add_capability2() returns a positive value.  On
-  failure, it sets an error and returns a negative value.
-
-  pci_add_capability() laboriously checks this behavior.  No other
-  caller does.  Drop the checks from pci_add_capability().
-
-> Signed-off-by: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
-> ---
->  hw/pci/pci.c | 6 +-----
->  1 file changed, 1 insertion(+), 5 deletions(-)
+> Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
 >
-> diff --git a/hw/pci/pci.c b/hw/pci/pci.c
-> index 259483b..1faf060 100644
-> --- a/hw/pci/pci.c
-> +++ b/hw/pci/pci.c
-> @@ -2269,12 +2269,8 @@ int pci_add_capability(PCIDevice *pdev, uint8_t cap_id,
->      Error *local_err = NULL;
->  
->      ret = pci_add_capability2(pdev, cap_id, offset, size, &local_err);
-> -    if (local_err) {
-> -        assert(ret < 0);
-> +    if (ret < 0) {
->          error_report_err(local_err);
-> -    } else {
-> -        /* success implies a positive offset in config space */
-> -        assert(ret > 0);
->      }
->      return ret;
->  }
+> > Use a more specific bool type.
+> >
+> > Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+>
+> Why doesn't this run afoul backward compatibility?  To answer the
+> question, we need to enumerate affected external interfaces.
+>
+>
+Right, this will break if we have users such as:
 
-Many functions return distinct error values in addition to setting an
-error.  We usually check one of the two, and assume the other is sane.
-This is one of the few places where we assert it is.  Not wrong, just
-cumbersome.  I'd prefer to drop the assertions, i.e. take this patch.
-But it's up to the PCI maintainers.
+ -global PIIX4_PM.disable_s3=3D2
+
+With this change, it will now error with:
+
+qemu-system-x86_64: can't apply global PIIX4_PM.disable_s3=3D2: Invalid
+parameter type for 'disable_s3', expected: boolean
+
+Acceptable? otherwise, I drop the patch
+
+thanks
+--=20
+Marc-Andr=C3=A9 Lureau
