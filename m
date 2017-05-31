@@ -1,27 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36070)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36671)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1dG3Kn-00064X-5g
-	for qemu-devel@nongnu.org; Wed, 31 May 2017 09:06:46 -0400
+	(envelope-from <riku.voipio@linaro.org>) id 1dG3Ma-0007S6-Fc
+	for qemu-devel@nongnu.org; Wed, 31 May 2017 09:08:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1dG3Kk-000377-HL
-	for qemu-devel@nongnu.org; Wed, 31 May 2017 09:06:45 -0400
-Received: from mail-wm0-x22b.google.com ([2a00:1450:400c:c09::22b]:38749)
+	(envelope-from <riku.voipio@linaro.org>) id 1dG3MZ-0003bt-7L
+	for qemu-devel@nongnu.org; Wed, 31 May 2017 09:08:36 -0400
+Received: from mail-lf0-x232.google.com ([2a00:1450:4010:c07::232]:35553)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1dG3Kk-00036r-Aj
-	for qemu-devel@nongnu.org; Wed, 31 May 2017 09:06:42 -0400
-Received: by mail-wm0-x22b.google.com with SMTP id e127so19400813wmg.1
-	for <qemu-devel@nongnu.org>; Wed, 31 May 2017 06:06:42 -0700 (PDT)
-Date: Wed, 31 May 2017 14:06:38 +0100
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20170531130638.GF16733@stefanha-x1.localdomain>
-References: <CAJSP0QVzoN=2rv_HUNf0oR_FQg=5xJ9UQbLqq0rj8OuYb8ZByw@mail.gmail.com>
-	<eb4f47f8-ed16-f59b-4adc-1e4e94cadf7d@de.ibm.com>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="VuBTcNUPe5zwk2q6"
-Content-Disposition: inline
-In-Reply-To: <eb4f47f8-ed16-f59b-4adc-1e4e94cadf7d@de.ibm.com>
-Subject: Re: [Qemu-devel] [RFC] QEMU 2.10 release schedule
+	(Exim 4.71) (envelope-from <riku.voipio@linaro.org>)
+	id 1dG3MY-0003bT-W4
+	for qemu-devel@nongnu.org; Wed, 31 May 2017 09:08:35 -0400
+Received: by mail-lf0-x232.google.com with SMTP id c184so3857929lfe.2
+	for <qemu-devel@nongnu.org>; Wed, 31 May 2017 06:08:34 -0700 (PDT)
+From: riku.voipio@linaro.org
+Date: Wed, 31 May 2017 16:08:14 +0300
+Message-Id: <562a20b4ef63bdde6e2e5bac0da02302aeb5299f.1496234766.git.riku.voipio@linaro.org>
+In-Reply-To: <cover.1496234766.git.riku.voipio@linaro.org>
+References: <cover.1496234766.git.riku.voipio@linaro.org>
+Subject: [Qemu-devel] [PULL 02/15] linux-user: fix eventfd
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,46 +26,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Christian Borntraeger <borntraeger@de.ibm.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>
+To: qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, stefanha@redhat.com, Laurent Vivier <laurent@vivier.eu>
 
+From: Laurent Vivier <laurent@vivier.eu>
 
---VuBTcNUPe5zwk2q6
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+When a fd is opened using eventfd(), a read provides
+a 64bit counter in the host byte order, and a
+write increase the internal counter by the provided
+64bit value.
 
-On Tue, May 30, 2017 at 01:21:01PM +0200, Christian Borntraeger wrote:
-> On 05/30/2017 12:11 PM, Stefan Hajnoczi wrote:
-> > Here is a first stab at the next release schedule:
-> >=20
-> > Beginning of development phase: 2017-04-20
-> > Soft feature freeze: 2017-07-18
-> > -rc0: 2017-07-25
-> > -rc1: 2017-08-01
-> > -rc2: 2017-08-08
-> > -rc3: 2017-08-15
-> > -rc4: 2017-08-22
-> >=20
->=20
-> - rc4/release or really only rc4?
+Signed-off-by: Laurent Vivier <laurent@vivier.eu>
+Signed-off-by: Riku Voipio <riku.voipio@linaro.org>
+---
+ linux-user/syscall.c | 26 ++++++++++++++++++++++++--
+ 1 file changed, 24 insertions(+), 2 deletions(-)
 
-I had rc4/release in mind.
-
-Stefan
-
---VuBTcNUPe5zwk2q6
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJZLr/eAAoJEJykq7OBq3PI6NkIAJVT18+qsIaeYIoKgkY9lRAw
-JOJrQlPf/3JZj+IVj4erUnUIncBzKEJE7gZMNmDZKev+vzqSmUGtGeowZwiD9CGe
-94GupKPnpUceIAUwonSTw+9RI/XF3FFSuiVJBorkAQ/eSPVdX76Du+EJUI3X6JZS
-7kqSVu44qTQH/Tx8KNSO8KJjL4FO0tMGEHcfpkkGHi/9fMctn1S+90OU+NHCyrAf
-xc++VjQamU3vbdrektgsZYfiEmKgStGM65VZFiAX5bpt/AEhftGLSS5aoN75CfS9
-ZBNPgx0OsE7a6rX1EKQ3Y7/yRygCCqnuHcB+ZxgZku2yhQ61NMGInJGLy5jLckI=
-=9eMb
------END PGP SIGNATURE-----
-
---VuBTcNUPe5zwk2q6--
+diff --git a/linux-user/syscall.c b/linux-user/syscall.c
+index b2b563e388..2da8426aaa 100644
+--- a/linux-user/syscall.c
++++ b/linux-user/syscall.c
+@@ -7671,6 +7671,28 @@ static target_timer_t get_timer_id(abi_long arg)
+     return timerid;
+ }
+ 
++static abi_long swap_data_eventfd(void *buf, size_t len)
++{
++    uint64_t *counter = buf;
++    int i;
++
++    if (len < sizeof(uint64_t)) {
++        return -EINVAL;
++    }
++
++    for (i = 0; i < len; i += sizeof(uint64_t)) {
++        *counter = tswap64(*counter);
++        counter++;
++    }
++
++    return len;
++}
++
++static TargetFdTrans target_eventfd_trans = {
++    .host_to_target_data = swap_data_eventfd,
++    .target_to_host_data = swap_data_eventfd,
++};
++
+ /* do_syscall() should always have a single exit point at the end so
+    that actions, such as logging of syscall results, can be performed.
+    All errnos that do_syscall() returns must be -TARGET_<errcode>. */
+@@ -11876,7 +11898,7 @@ abi_long do_syscall(void *cpu_env, int num, abi_long arg1,
+ #if defined(TARGET_NR_eventfd)
+     case TARGET_NR_eventfd:
+         ret = get_errno(eventfd(arg1, 0));
+-        fd_trans_unregister(ret);
++        fd_trans_register(ret, &target_eventfd_trans);
+         break;
+ #endif
+ #if defined(TARGET_NR_eventfd2)
+@@ -11890,7 +11912,7 @@ abi_long do_syscall(void *cpu_env, int num, abi_long arg1,
+             host_flags |= O_CLOEXEC;
+         }
+         ret = get_errno(eventfd(arg1, host_flags));
+-        fd_trans_unregister(ret);
++        fd_trans_register(ret, &target_eventfd_trans);
+         break;
+     }
+ #endif
+-- 
+2.11.0
