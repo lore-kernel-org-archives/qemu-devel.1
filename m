@@ -1,21 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59168)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59338)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dG71n-0006CT-Hq
-	for qemu-devel@nongnu.org; Wed, 31 May 2017 13:03:24 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1dG72M-0006ey-6v
+	for qemu-devel@nongnu.org; Wed, 31 May 2017 13:03:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dG71m-0006gx-ON
-	for qemu-devel@nongnu.org; Wed, 31 May 2017 13:03:23 -0400
-References: <1496224367-24935-1-git-send-email-kwolf@redhat.com>
-	<1496224367-24935-5-git-send-email-kwolf@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <b50b7d41-684a-023d-e1f2-d25233140d9f@redhat.com>
-Date: Wed, 31 May 2017 12:03:15 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1dG72J-0006vD-0l
+	for qemu-devel@nongnu.org; Wed, 31 May 2017 13:03:58 -0400
+Received: from mailhub.sw.ru ([195.214.232.25]:16660 helo=relay.sw.ru)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
+	id 1dG72I-0006ur-M9
+	for qemu-devel@nongnu.org; Wed, 31 May 2017 13:03:54 -0400
+References: <20170531165541.47338-1-vsementsov@virtuozzo.com>
+	<20170531165541.47338-2-vsementsov@virtuozzo.com>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <3d5ae16d-4973-d45f-3e7b-9f45108e8841@virtuozzo.com>
+Date: Wed, 31 May 2017 20:03:52 +0300
 MIME-Version: 1.0
-In-Reply-To: <1496224367-24935-5-git-send-email-kwolf@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="pluowwwSjlEE18GkGl7Mkoib1aJP26XRb"
-Subject: Re: [Qemu-devel] [PATCH v3 4/4] qemu-iotests: Block migration test
+In-Reply-To: <20170531165541.47338-2-vsementsov@virtuozzo.com>
+Content-Language: en-US
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 01/12] nbd: rename read_sync and friends
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,68 +29,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-Cc: jcody@redhat.com, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: pbonzini@redhat.com, eblake@redhat.com, den@openvz.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---pluowwwSjlEE18GkGl7Mkoib1aJP26XRb
-From: Eric Blake <eblake@redhat.com>
-To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-Cc: jcody@redhat.com, qemu-devel@nongnu.org
-Message-ID: <b50b7d41-684a-023d-e1f2-d25233140d9f@redhat.com>
-Subject: Re: [PATCH v3 4/4] qemu-iotests: Block migration test
-References: <1496224367-24935-1-git-send-email-kwolf@redhat.com>
- <1496224367-24935-5-git-send-email-kwolf@redhat.com>
-In-Reply-To: <1496224367-24935-5-git-send-email-kwolf@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+31.05.2017 19:55, Vladimir Sementsov-Ogievskiy wrote:
+> Rename
+>    nbd_wr_syncv -> nbd_rwv
+>    read_sync -> nbd_read
+>    read_sync_eof -> nbd_read_eof
+>    write_sync -> nbd_write
+>    drop_sync -> nbd_drop
+>
+> 1. nbd_ prefix
+>     read_sync and write_sync are already shared, so it is good to have a
+>     namespace prefix. drop_sync will be shared, and read_sync_eof is
+>     related to read_sync, so let's rename them all.
+>
+> 2. _sync suffix
+>     _sync is related to the fact, that nbd_wr_syncv doesn't return if
+>     write to socket returns EAGAIN. In first implementation nbd_wr_syncv
 
-On 05/31/2017 04:52 AM, Kevin Wolf wrote:
-> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+not bad to add here the following note in parentheses. Please add it in 
+flight, if no more updates required for the series.
+(was wr_sync in 7a5ca8648b)
+
+>     just loops while getting EAGAIN, current implementation yields in
+>     this case.
+>     Why to get rid of it:
+>     - it is normal for r/w functions to be synchronous, so having
+>       additional suffix for it looks redundant (contrariwise, we have
+>       _aio suffix for async functions)
+>     - _sync suffix in block layer is used when function does flush (so
+>       using it for other thing is confusing a bit)
+>     - keep function names short after adding nbd_ prefix
+>
+> 3. for nbd_wr_syncv let's use more common notation 'rw'
+>
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 > ---
->  tests/qemu-iotests/183     | 140 +++++++++++++++++++++++++++++++++++++=
-++++++++
->  tests/qemu-iotests/183.out |  46 +++++++++++++++
->  tests/qemu-iotests/group   |   1 +
->  3 files changed, 187 insertions(+)
->  create mode 100755 tests/qemu-iotests/183
->  create mode 100644 tests/qemu-iotests/183.out
 
-> +qemu_comm_method=3D"qmp"
-> +
-> +_launch_qemu \
-> +    -drive file=3D"${TEST_IMG}",cache=3D${CACHEMODE},driver=3D$IMGFMT,=
-id=3Ddisk
-
-Inconsistent use of ${CACHEMODE} vs. $IMGFMT (I prefer the version with
-less typing, but others prefer always using ${}).  In both _launch_qemu
-lines.  Up to you if you want to tweak it, but either way,
-
-Reviewed-by: Eric Blake <eblake@redhat.com>
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---pluowwwSjlEE18GkGl7Mkoib1aJP26XRb
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEcBAEBCAAGBQJZLvdTAAoJEKeha0olJ0NqJMYIAJEhBWKjSZN9WIaHMXWOz5K1
-fHZ3Ucfhk1sXBM9XKc9ptqk4Vty0m4ZMpRP0+7MS0hZQS2ZIkRHBXaOI0AzZQ5JU
-L9h4j91LoHAWJKj3ld0KGl3R3bXWFD09r2Jw2c+AKErhPCLixSJ9RWPmp+iFb4Ml
-6ro4p3bK+CQGvjfcl9yTWjjqORex/al2U3YlqlxprpaJriBA7Tgs4d5IGz/Tzkf5
-6yLp44VUr/XpN58/DQ/SUGhp7xsSdFkQMFKQOr/LCgfeyn8MrUbbQkQs++S/xsmH
-H+YrZkZ17mZuSJn0Gstudooi3gmGHuW5FNnk7CPoSxgkJAkWhQISpfUoRjImnJY=
-=Fd40
------END PGP SIGNATURE-----
-
---pluowwwSjlEE18GkGl7Mkoib1aJP26XRb--
+-- 
+Best regards,
+Vladimir
