@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34014)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34710)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1dG5zI-0005do-Bu
-	for qemu-devel@nongnu.org; Wed, 31 May 2017 11:56:45 -0400
+	(envelope-from <eblake@redhat.com>) id 1dG61n-0006i8-Kw
+	for qemu-devel@nongnu.org; Wed, 31 May 2017 11:59:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1dG5zH-0008IR-8L
-	for qemu-devel@nongnu.org; Wed, 31 May 2017 11:56:44 -0400
-References: <20170524202842.26724-1-eblake@redhat.com>
-	<20170524202842.26724-2-eblake@redhat.com>
-	<d74bac5d-4fa9-d7cc-9534-0a3fe22af6fc@redhat.com>
-	<8680a378-d19e-55f9-f14b-158907bb9919@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <e20ef1ea-57d1-3592-d1d3-c3f2adfa013b@redhat.com>
-Date: Wed, 31 May 2017 17:56:31 +0200
+	(envelope-from <eblake@redhat.com>) id 1dG61m-0001Lf-KM
+	for qemu-devel@nongnu.org; Wed, 31 May 2017 11:59:19 -0400
+References: <20170509173342.29286-1-berrange@redhat.com>
+	<20170509173342.29286-3-berrange@redhat.com>
+	<f7fef0e4-7703-9b60-3bd9-bf1b12628cae@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <73621dcd-ace7-c7fa-8dd2-701ea7d6d249@redhat.com>
+Date: Wed, 31 May 2017 10:59:08 -0500
 MIME-Version: 1.0
-In-Reply-To: <8680a378-d19e-55f9-f14b-158907bb9919@redhat.com>
+In-Reply-To: <f7fef0e4-7703-9b60-3bd9-bf1b12628cae@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="g1pHd3BiE6G3E7ruJNDjRP9hDqCcTMvTb"
-Subject: Re: [Qemu-devel] [PATCH v2 1/5] qemu-io: Don't die on second open
+	boundary="qub4VeGOm2kvasBo6tFEmM9fHwGIo9Dad"
+Subject: Re: [Qemu-devel] [PATCH v5 2/5] iotests: fix remainining tests to
+ work with LUKS
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,111 +26,111 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, jsnow@redhat.com, Kevin Wolf <kwolf@redhat.com>
+To: Max Reitz <mreitz@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---g1pHd3BiE6G3E7ruJNDjRP9hDqCcTMvTb
-From: Max Reitz <mreitz@redhat.com>
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, jsnow@redhat.com, Kevin Wolf <kwolf@redhat.com>
-Message-ID: <e20ef1ea-57d1-3592-d1d3-c3f2adfa013b@redhat.com>
-Subject: Re: [PATCH v2 1/5] qemu-io: Don't die on second open
-References: <20170524202842.26724-1-eblake@redhat.com>
- <20170524202842.26724-2-eblake@redhat.com>
- <d74bac5d-4fa9-d7cc-9534-0a3fe22af6fc@redhat.com>
- <8680a378-d19e-55f9-f14b-158907bb9919@redhat.com>
-In-Reply-To: <8680a378-d19e-55f9-f14b-158907bb9919@redhat.com>
+--qub4VeGOm2kvasBo6tFEmM9fHwGIo9Dad
+From: Eric Blake <eblake@redhat.com>
+To: Max Reitz <mreitz@redhat.com>, "Daniel P. Berrange"
+ <berrange@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>
+Message-ID: <73621dcd-ace7-c7fa-8dd2-701ea7d6d249@redhat.com>
+Subject: Re: [PATCH v5 2/5] iotests: fix remainining tests to work with LUKS
+References: <20170509173342.29286-1-berrange@redhat.com>
+ <20170509173342.29286-3-berrange@redhat.com>
+ <f7fef0e4-7703-9b60-3bd9-bf1b12628cae@redhat.com>
+In-Reply-To: <f7fef0e4-7703-9b60-3bd9-bf1b12628cae@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On 2017-05-31 17:12, Eric Blake wrote:
-> On 05/31/2017 09:18 AM, Max Reitz wrote:
->> On 2017-05-24 22:28, Eric Blake wrote:
->>> Most callback commands in qemu-io return 0 to keep the interpreter
->>> loop running, or 1 to quit immediately.  However, open_f() just
->>> passed through the return value of openfile(), which has different
->>> semantics of returning 0 if a file was opened, or 1 on any failure.
->>>
->>> As a result of mixing the return semantics, we are forcing the
->>> qemu-io interpreter to exit early on any failures, which is rather
->>> annoying when some of the failures are obviously trying to give
->>> the user a hint of how to proceed (if we didn't then kill qemu-io
->>> out from under the user's feet):
->>>
->>> $ qemu-io
->>> qemu-io> open foo
->>> qemu-io> open foo
->>> file open already, try 'help close'
->>> $ echo $?
->>> 0
->>>
->>> Meanwhile, we WANT openfile() to report failures, as it is the
->>> way that 'qemu-io -c "$something" no_such_file' knows to exit
->>> early rather than attempting $something.  So the solution is to
->>> fix open_f() to always return 0 (when we are in interactive mode,
->>> even failure to open should not end the session), and save the
->>> return value of openfile() for command line use in main().
->>>
->>> This has been awkward since at least as far back as commit
->>> e3aff4f, in 2009.
->>>
->>> Signed-off-by: Eric Blake <eblake@redhat.com>
+On 05/31/2017 10:33 AM, Max Reitz wrote:
+> On 2017-05-09 19:33, Daniel P. Berrange wrote:
+>> The tests 033, 140, 145 and 157 were all broken
+>> when run with LUKS, since they did not correctly use
+>> the required image opts args syntax to specify the
+>> decryption secret. Further, the 120 test simply does
+>> not make sense to run with luks, as the scenario
+>> exercised is not relevant.
 >>
->> This still makes qemu-io -c "$something" no_such_file fail, right. But=
+>> The test 181 was broken when run with LUKS because
+>> it didn't take account of fact that $TEST_IMG was
+>> already in image opts syntax. The launch_qemu
+>> helper also didn't register the secret object
+>> providing the LUKS password.
 
->> now qemu-io -c "open no_such_file" -c "$something" will execute
->> $something; and I'm not sure we can convert all -c open users to not u=
-se
->> that command (maybe we can, now that we have --image-opts).
+>> =20
+>> +if test "$IMGOPTSSYNTAX" =3D "true"
+>> +then
+>> +    SYSEMU_DRIVE_ARG=3Dif=3Dnone,media=3Dcdrom,id=3Ddrv,$TEST_IMG
 >=20
-> Oh, so we do have some uses of -c "open..." -c "$something" (iotest 103=
-
-> for example).
->=20
-> What happens during "$something" if there was no file currently open? I=
-t
-> may be a command-by-command behavior.  But as long as we get graceful
-> secondary failures rather than crashes for those subsequent $somethings=
+> I would like to propose wrapping this (or at least $TEST_IMG) in quotes=
 ,
-> we may be okay.
 
-Sure, but this is arguing against "we want [qemu-io no_such_file] to
-exit early". :-)
+Makes no difference in assignment context (other than consistency that
+it's an easier rule to always quote even when not necessary, than it is
+to remember which contexts don't need quoting).
 
->> I don't think it's absolutely necessary for -c open to exit on error,
->> but you seem to do, if I understand your penultimate paragraph
->> correctly. :-)
+> but I'm aware of the fact that the whole test environment breaks if you=
+
+> have a TEST_DIR with whitespace in it, so I don't mind...
 >=20
-> I don't think it's absolutely necessary either.  You're right that this=
+> (But it is a bit weird to put $TEST_IMG into quotes below and then use
+> $SYSEMU_DRIVE_ARG unquoted.)
 
-> patch is just worried about 'qemu-img name', not 'qemu-img -c "open
-> name"'.  So maybe all I need to do is update the commit message to
-> document that the change in semantics to -c "open..." is a side-effect,=
+Assigning to SYSEMU_DRIVE_ARG without quotes works even if TEST_IMG
+contains spaces, but expanding SYSEMU_DRIVE_ARGS without quotes indeed
+breaks (whether or not you assigned with quotes).
 
-> that may or may not be changed in a followup patch?
+>=20
+>> +    SYSEMU_EXTRA_ARGS=3D""
+>> +else
+>> +    SYSEMU_DRIVE_ARG=3Dif=3Dnone,media=3Dcdrom,id=3Ddrv,file=3D"$TEST=
+_IMG",driver=3D$IMGFMT
+>> +    SYSEMU_EXTRA_ARGS=3D""
+>> +fi
+>> +
+>>  keep_stderr=3Dy \
+>> -_launch_qemu -drive if=3Dnone,media=3Dcdrom,id=3Ddrv,file=3D"$TEST_IM=
+G",format=3D$IMGFMT \
+>> +_launch_qemu $SYSEMU_EXTRA_ARGS -drive $SYSEMU_DRIVE_ARG \
 
-If you're OK with that, I am, too.
-
-Max
+Yes, you want "$SYSEMU_DRIVE_ARG" here.
 
 
---g1pHd3BiE6G3E7ruJNDjRP9hDqCcTMvTb
+> Please use spaces instead of tabs.
+>=20
+> (I know there are a lot of tabs in the test files already, but accordin=
+g
+> to CODING_STYLE, that is just wrong.)
+
+=2Edir-locals.el may need a tweak to be taught that files in qemu-iotests=
+
+should not prefer TABs.
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--qub4VeGOm2kvasBo6tFEmM9fHwGIo9Dad
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQEvBAEBCAAZBQJZLuevEhxtcmVpdHpAcmVkaGF0LmNvbQAKCRD0B9sAYdXPQD1a
-CACEvcluc1oZL0xeBw1wSNCe7fboGN0Fc+hxI/M0/TxBAlGOq0KC+a5b90vcmIMR
-f8Bbezz/st4IJzgNStVqw6scboiN7DMiSxtPNKaZ6ZbYO5kwBUP9JmtKtRmNJApb
-2CyifRRWHwThVSJgqmTOJvQAhW+S4lPmkE2myrF9KBB7EdA/FtMpzCd8+8Fy5so8
-ExVjJY89Cq7HOur6+10mGtVtrPSBOfMsr0HtXLEkCLdMykNyFBZiQYoxkkU0pvBP
-c4LQgLoej6xhSELWXJ5F5Er9SUzaY1XDw7w2HawVuYjP1yJv+7KNEp8+AA8M2qZg
-k7i465DjsWlA6Fc+nv1I5lYJ
-=7rEr
+iQEcBAEBCAAGBQJZLuhMAAoJEKeha0olJ0NqGVQIAJpem1HNh8dZvlO1ONgNnLCw
+LfslPgzVpclS48Cn1UJxZD9yyRJwjpUtRBzn2zT9Md1gNZhCJKYmXirHP6OSzF3O
+h8QM5mtPkWwfDW1WakfyQSu8VsgLLhSBysa4cT43xtgpaS4WpHyN8KC2Ghz3RUhI
+Q9AmSSjS1IhCGY3P8qlFys+MjagQaQXIOGa72PEBcJ3pjKf5Njuq23+cPhYLoBa5
+gl1NcrLzfaAtPNPjyILKAI4YtT9MjeONtVbsFxNuDOYa+ndrSV+LuLmTULhnQrfx
+p6LxUCA1B7T3fHxqWhKctFGf5sI+UTD95O36GgJfw9p9e/W3Jbpdzz2T0AWW/s8=
+=O/HC
 -----END PGP SIGNATURE-----
 
---g1pHd3BiE6G3E7ruJNDjRP9hDqCcTMvTb--
+--qub4VeGOm2kvasBo6tFEmM9fHwGIo9Dad--
