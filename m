@@ -1,34 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53087)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53205)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dG4Bj-0006ot-En
-	for qemu-devel@nongnu.org; Wed, 31 May 2017 10:01:37 -0400
+	(envelope-from <marcandre.lureau@redhat.com>) id 1dG4By-000716-SI
+	for qemu-devel@nongnu.org; Wed, 31 May 2017 10:01:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dG4Bf-0004zg-9Y
-	for qemu-devel@nongnu.org; Wed, 31 May 2017 10:01:27 -0400
-Received: from mail-oi0-x241.google.com ([2607:f8b0:4003:c06::241]:33814)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dG4Bf-0004zY-5I
-	for qemu-devel@nongnu.org; Wed, 31 May 2017 10:01:23 -0400
-Received: by mail-oi0-x241.google.com with SMTP id w10so2021304oif.1
-	for <qemu-devel@nongnu.org>; Wed, 31 May 2017 07:01:22 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20170529084546.26500-1-marcandre.lureau@redhat.com>
-	<20170529084546.26500-15-marcandre.lureau@redhat.com>
-	<436727fa-d35c-cfa9-52b3-f59e58a92bb7@amsat.org>
-	<9a17ac0d-fd7f-8c50-4682-72ef205d80db@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <6a42af36-58f4-97c6-5beb-600740a5ae9e@amsat.org>
-Date: Wed, 31 May 2017 11:01:19 -0300
+	(envelope-from <marcandre.lureau@redhat.com>) id 1dG4Bt-00054v-Dp
+	for qemu-devel@nongnu.org; Wed, 31 May 2017 10:01:42 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37816)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
+	id 1dG4Bt-00054S-8G
+	for qemu-devel@nongnu.org; Wed, 31 May 2017 10:01:37 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 3968A80C0D
+	for <qemu-devel@nongnu.org>; Wed, 31 May 2017 14:01:36 +0000 (UTC)
+From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+Date: Wed, 31 May 2017 17:56:55 +0400
+Message-Id: <20170531135709.345-32-marcandre.lureau@redhat.com>
+In-Reply-To: <20170531135709.345-1-marcandre.lureau@redhat.com>
+References: <20170531135709.345-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <9a17ac0d-fd7f-8c50-4682-72ef205d80db@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v2 14/14] char: move char devices to
- chardev/
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v2 31/45] acpi: use get_uint() for "pci-hole*"
+ properties
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,18 +34,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org
-Cc: pbonzini@redhat.com
+To: qemu-devel@nongnu.org
+Cc: armbru@redhat.com, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
-On 05/30/2017 12:18 PM, Eric Blake wrote:
-> On 05/29/2017 04:31 PM, Philippe Mathieu-Daudé wrote:
->> On 05/29/2017 05:45 AM, Marc-André Lureau wrote:
->>> Suggested by Paolo Bonizini during series review.
->>
->> Bonzini ;) "serie" singular
->
-> No, "serie" is not a word.  "series" is one of those weird English words
-> that is both singular and plural (another such word is "sheep").
+Those properties use visit_type_uint*()
 
-Oh, I thought it was describing "this" particular series so no need to 
-plural. Thank for the clarification :)
+Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+---
+ hw/i386/acpi-build.c | 24 ++++++++++++------------
+ 1 file changed, 12 insertions(+), 12 deletions(-)
+
+diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
+index 8ae0373541..64a277b974 100644
+--- a/hw/i386/acpi-build.c
++++ b/hw/i386/acpi-build.c
+@@ -247,19 +247,19 @@ static void acpi_get_pci_holes(Range *hole, Range *=
+hole64)
+     g_assert(pci_host);
+=20
+     range_set_bounds1(hole,
+-                      object_property_get_int(pci_host,
+-                                              PCI_HOST_PROP_PCI_HOLE_STA=
+RT,
+-                                              NULL),
+-                      object_property_get_int(pci_host,
+-                                              PCI_HOST_PROP_PCI_HOLE_END=
+,
+-                                              NULL));
++                      object_property_get_uint(pci_host,
++                                               PCI_HOST_PROP_PCI_HOLE_ST=
+ART,
++                                               NULL),
++                      object_property_get_uint(pci_host,
++                                               PCI_HOST_PROP_PCI_HOLE_EN=
+D,
++                                               NULL));
+     range_set_bounds1(hole64,
+-                      object_property_get_int(pci_host,
+-                                              PCI_HOST_PROP_PCI_HOLE64_S=
+TART,
+-                                              NULL),
+-                      object_property_get_int(pci_host,
+-                                              PCI_HOST_PROP_PCI_HOLE64_E=
+ND,
+-                                              NULL));
++                      object_property_get_uint(pci_host,
++                                               PCI_HOST_PROP_PCI_HOLE64_=
+START,
++                                               NULL),
++                      object_property_get_uint(pci_host,
++                                               PCI_HOST_PROP_PCI_HOLE64_=
+END,
++                                               NULL));
+ }
+=20
+ #define ACPI_PORT_SMI_CMD           0x00b2 /* TODO: this is APM_CNT_IOPO=
+RT */
+--=20
+2.13.0.91.g00982b8dd
