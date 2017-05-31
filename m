@@ -1,32 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51977)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52035)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dG48b-0003O1-Cx
-	for qemu-devel@nongnu.org; Wed, 31 May 2017 09:58:15 -0400
+	(envelope-from <marcandre.lureau@redhat.com>) id 1dG48j-0003Wl-TI
+	for qemu-devel@nongnu.org; Wed, 31 May 2017 09:58:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dG48Y-0003xw-Ov
-	for qemu-devel@nongnu.org; Wed, 31 May 2017 09:58:13 -0400
-Received: from mail-pf0-x244.google.com ([2607:f8b0:400e:c00::244]:35749)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dG48Y-0003xX-Fw
-	for qemu-devel@nongnu.org; Wed, 31 May 2017 09:58:10 -0400
-Received: by mail-pf0-x244.google.com with SMTP id u26so2623618pfd.2
-	for <qemu-devel@nongnu.org>; Wed, 31 May 2017 06:58:10 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <149623617700.4947.12490877660892961664.stgit@bahia.lan>
-	<c7e20195-8fa4-c081-b63d-02e380e8b909@de.ibm.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <f8165bd2-fb74-4ff9-65bf-fd0ed1a3ffaf@amsat.org>
-Date: Wed, 31 May 2017 10:58:06 -0300
+	(envelope-from <marcandre.lureau@redhat.com>) id 1dG48h-0003zw-9A
+	for qemu-devel@nongnu.org; Wed, 31 May 2017 09:58:21 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47250)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
+	id 1dG48h-0003zm-0S
+	for qemu-devel@nongnu.org; Wed, 31 May 2017 09:58:19 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id B82E2804EE
+	for <qemu-devel@nongnu.org>; Wed, 31 May 2017 13:58:17 +0000 (UTC)
+From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+Date: Wed, 31 May 2017 17:56:32 +0400
+Message-Id: <20170531135709.345-9-marcandre.lureau@redhat.com>
+In-Reply-To: <20170531135709.345-1-marcandre.lureau@redhat.com>
+References: <20170531135709.345-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <c7e20195-8fa4-c081-b63d-02e380e8b909@de.ibm.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2] pc-bios/s390-ccw: use STRIP variable in
- Makefile
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v2 08/45] tests: add more int/number ranges
+ checks
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,51 +34,137 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Christian Borntraeger <borntraeger@de.ibm.com>, Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org
-Cc: Cornelia Huck <cornelia.huck@de.ibm.com>, Fam Zheng <famz@redhat.com>, Alexander Graf <agraf@suse.de>
+To: qemu-devel@nongnu.org
+Cc: armbru@redhat.com, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
-> On 05/31/2017 03:09 PM, Greg Kurz wrote:
->> The docker-run-test-build@debian-s390x-cross target fails with:
->>
->> strip --strip-unneeded s390-ccw.elf -o s390-ccw.img
->> strip: Unable to recognise the format of the input file `s390-ccw.elf'
->>
->> The configure script defines a STRIP makefile variable whose default
->> value is ${cross_prefix}strip. Let's use it.
->>
->> We default to using the non-prefixed strip command in case --enable-debug
->> or --disable-strip was passed to configure during a regular build.
->>
->> Signed-off-by: Greg Kurz <groug@kaod.org>
->> ---
->> v2: - added default value
->>     - no longer Cc: qemu-trivial as it turned out to be not that trivial
->>
->> Philippe,
->>
->> Please give your Reviewed-by again if you're okay with this change.
+Suggested by Markus Armbruster:
 
-I'm Ok but it got applied faster ;)
+We should systematically cover the integers, in particular the
+boundaries (because that's where bugs like to hide):
 
->> ---
->>  pc-bios/s390-ccw/Makefile |    4 +++-
->>  1 file changed, 3 insertions(+), 1 deletion(-)
->>
->> diff --git a/pc-bios/s390-ccw/Makefile b/pc-bios/s390-ccw/Makefile
->> index 79a46b67356f..fb88c13bc742 100644
->> --- a/pc-bios/s390-ccw/Makefile
->> +++ b/pc-bios/s390-ccw/Makefile
->> @@ -21,8 +21,10 @@ build-all: s390-ccw.img
->>  s390-ccw.elf: $(OBJECTS)
->>  	$(call quiet-command,$(CC) $(LDFLAGS) -o $@ $(OBJECTS),"BUILD","$(TARGET_DIR)$@")
->>
->> +STRIP ?= strip
->> +
->>  s390-ccw.img: s390-ccw.elf
->> -	$(call quiet-command,strip --strip-unneeded $< -o $@,"STRIP","$(TARGET_DIR)$@")
->> +	$(call quiet-command,$(STRIP) --strip-unneeded $< -o $@,"STRIP","$(TARGET_DIR)$@")
->>
->>  $(OBJECTS): Makefile
->>
->>
-> applied, thanks.
+* Integers in [-2^63,0) can be visited with visit_type_int() and
+  visit_type_number().
+
+* Integers in [0,2^63) can be visited with visit_type_int(),
+  visit_type_uint64() and visit_type_number().
+
+* Integers in [2^63,2^64) can be visited with visit_type_uint64() and
+  visit_type_number().
+
+* Integers outside [-2^63,2^53) can be visited with visit_type_number().
+
+In any case, visit_type_number() loses precision beyond 53 bits.
+
+Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+---
+ tests/test-qobject-input-visitor.c | 38 ++++++++++++++++++++++++++++++++=
+++++--
+ 1 file changed, 36 insertions(+), 2 deletions(-)
+
+diff --git a/tests/test-qobject-input-visitor.c b/tests/test-qobject-inpu=
+t-visitor.c
+index 83d663d11d..f2ed3161af 100644
+--- a/tests/test-qobject-input-visitor.c
++++ b/tests/test-qobject-input-visitor.c
+@@ -102,11 +102,11 @@ static Visitor *visitor_input_test_init_raw(TestInp=
+utVisitorData *data,
+ {
+     return visitor_input_test_init_internal(data, false, json_string, NU=
+LL);
+ }
+-
+ static void test_visitor_in_int(TestInputVisitorData *data,
+                                 const void *unused)
+ {
+     int64_t res =3D 0;
++    double dbl;
+     int value =3D -42;
+     Visitor *v;
+=20
+@@ -114,6 +114,9 @@ static void test_visitor_in_int(TestInputVisitorData =
+*data,
+=20
+     visit_type_int(v, NULL, &res, &error_abort);
+     g_assert_cmpint(res, =3D=3D, value);
++
++    visit_type_number(v, NULL, &dbl, &error_abort);
++    g_assert_cmpfloat(dbl, =3D=3D, -42.0);
+ }
+=20
+ static void test_visitor_in_uint(TestInputVisitorData *data,
+@@ -121,6 +124,8 @@ static void test_visitor_in_uint(TestInputVisitorData=
+ *data,
+ {
+     Error *err =3D NULL;
+     uint64_t res =3D 0;
++    int64_t i64;
++    double dbl;
+     int value =3D 42;
+     Visitor *v;
+=20
+@@ -129,8 +134,13 @@ static void test_visitor_in_uint(TestInputVisitorDat=
+a *data,
+     visit_type_uint64(v, NULL, &res, &error_abort);
+     g_assert_cmpuint(res, =3D=3D, (uint64_t)value);
+=20
+-    /* BUG: value between INT64_MIN and -1 accepted modulo 2^64 */
++    visit_type_int(v, NULL, &i64, &error_abort);
++    g_assert_cmpint(i64, =3D=3D, value);
+=20
++    visit_type_number(v, NULL, &dbl, &error_abort);
++    g_assert_cmpfloat(dbl, =3D=3D, value);
++
++    /* BUG: value between INT64_MIN and -1 accepted modulo 2^64 */
+     v =3D visitor_input_test_init(data, "%d", -value);
+=20
+     visit_type_uint64(v, NULL, &res, &error_abort);
+@@ -142,6 +152,8 @@ static void test_visitor_in_uint(TestInputVisitorData=
+ *data,
+=20
+     visit_type_uint64(v, NULL, &res, &err);
+     error_free_or_abort(&err);
++
++    visit_type_number(v, NULL, &dbl, &error_abort);
+ }
+=20
+ static void test_visitor_in_int_overflow(TestInputVisitorData *data,
+@@ -260,6 +272,26 @@ static void test_visitor_in_number(TestInputVisitorD=
+ata *data,
+     g_assert_cmpfloat(res, =3D=3D, value);
+ }
+=20
++static void test_visitor_in_large_number(TestInputVisitorData *data,
++                                         const void *unused)
++{
++    Error *err =3D NULL;
++    double res =3D 0;
++    int64_t i64;
++    uint64_t u64;
++    Visitor *v;
++
++    v =3D visitor_input_test_init(data, "-18446744073709551616"); /* -2^=
+64 */
++
++    visit_type_number(v, NULL, &res, &error_abort);
++
++    visit_type_int(v, NULL, &i64, &err);
++    error_free_or_abort(&err);
++
++    visit_type_uint64(v, NULL, &u64, &err);
++    error_free_or_abort(&err);
++}
++
+ static void test_visitor_in_number_keyval(TestInputVisitorData *data,
+                                           const void *unused)
+ {
+@@ -1253,6 +1285,8 @@ int main(int argc, char **argv)
+                            NULL, test_visitor_in_bool_str_fail);
+     input_visitor_test_add("/visitor/input/number",
+                            NULL, test_visitor_in_number);
++    input_visitor_test_add("/visitor/input/large_number",
++                           NULL, test_visitor_in_large_number);
+     input_visitor_test_add("/visitor/input/number_keyval",
+                            NULL, test_visitor_in_number_keyval);
+     input_visitor_test_add("/visitor/input/number_str_keyval",
+--=20
+2.13.0.91.g00982b8dd
