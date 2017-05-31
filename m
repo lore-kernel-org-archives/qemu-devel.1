@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44504)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47961)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1dFsk7-0005CO-Qp
-	for qemu-devel@nongnu.org; Tue, 30 May 2017 21:48:12 -0400
+	(envelope-from <gengdongjiu@huawei.com>) id 1dFtCv-0000Jv-5x
+	for qemu-devel@nongnu.org; Tue, 30 May 2017 22:17:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1dFsk3-00073R-NJ
-	for qemu-devel@nongnu.org; Tue, 30 May 2017 21:48:11 -0400
-Received: from [59.151.112.132] (port=58000 helo=heian.cn.fujitsu.com)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1dFsk2-0006zE-Qx
-	for qemu-devel@nongnu.org; Tue, 30 May 2017 21:48:07 -0400
-References: <20170526121516.6607-1-maozy.fnst@cn.fujitsu.com>
-	<b98f7c09-257c-6d6f-fd25-7286f4d16eb2@redhat.com>
-	<5ab8c115-a8de-1d48-155a-3daac7e0d841@cn.fujitsu.com>
-	<19dc61d7-9779-22a6-03cc-0eb718fe2875@redhat.com>
-	<878tlf7v2i.fsf@dusky.pond.sub.org>
-From: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
-Message-ID: <fef8fbc3-712a-f640-842a-e0bc7a681cbb@cn.fujitsu.com>
-Date: Wed, 31 May 2017 09:46:59 +0800
+	(envelope-from <gengdongjiu@huawei.com>) id 1dFtCs-0005gj-DE
+	for qemu-devel@nongnu.org; Tue, 30 May 2017 22:17:57 -0400
+Received: from szxga01-in.huawei.com ([45.249.212.187]:4003)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
+	(envelope-from <gengdongjiu@huawei.com>) id 1dFtCr-0005Wn-Go
+	for qemu-devel@nongnu.org; Tue, 30 May 2017 22:17:54 -0400
+References: <0184EA26B2509940AA629AE1405DD7F2014105CD@DGGEMA503-MBS.china.huawei.com>
+	<3a791060-170d-9eb7-b2c4-f1cdbb55501f@redhat.com>
+From: gengdongjiu <gengdongjiu@huawei.com>
+Message-ID: <80b71fec-cd6d-fed7-1a86-195deffcdbb0@huawei.com>
+Date: Wed, 31 May 2017 10:13:38 +0800
 MIME-Version: 1.0
-In-Reply-To: <878tlf7v2i.fsf@dusky.pond.sub.org>
-Content-Type: text/plain; charset="windows-1252"; format=flowed
+In-Reply-To: <3a791060-170d-9eb7-b2c4-f1cdbb55501f@redhat.com>
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] pci-bridge/i82801b11: Convert to realize
+Subject: Re: [Qemu-devel] [PATCH v3 1/4] ACPI: Add APEI GHES Table
+ Generation support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,127 +28,124 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>
-Cc: qemu-devel@nongnu.org, mst@redhat.com
+To: Laszlo Ersek <lersek@redhat.com>
+Cc: "ard.biesheuvel@linaro.org" <ard.biesheuvel@linaro.org>, "edk2-devel@lists.01.org" <edk2-devel@lists.01.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Zhaoshenglong <zhaoshenglong@huawei.com>, James
+	Morse <james.morse@arm.com>, Christoffer Dall <cdall@linaro.org>, Xiexiuqi <xiexiuqi@huawei.com>, Marc Zyngier <marc.zyngier@arm.com>, "catalin.marinas@arm.com" <catalin.marinas@arm.com>, "will.deacon@arm.com" <will.deacon@arm.com>, "christoffer.dall@linaro.org" <christoffer.dall@linaro.org>, "rkrcmar@redhat.com" <rkrcmar@redhat.com>, "suzuki.poulose@arm.com" <suzuki.poulose@arm.com>, "andre.przywara@arm.com" <andre.przywara@arm.com>, "mark.rutland@arm.com" <mark.rutland@arm.com>, "vladimir.murzin@arm.com" <vladimir.murzin@arm.com>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "wangxiongfeng (C)" <wangxiongfeng2@huawei.com>, Wuquanming <wuquanming@huawei.com>, Huangshaoyu <huangshaoyu@huawei.com>, "Leif.Lindholm@linaro.com" <Leif.Lindholm@linaro.com>"nd@arm.com" <nd@arm.com>, Michael Tsirkin <mtsirkin@redhat.com>, Igor Mammedov <imammedo@redhat.com>
 
-Hi, Marcel & Markus
+Laszlo,
+   very sorry for that, it was my mistake that missing your name.
+when I reply mail, I copy the "CC" list to the mail reply list, but forget to copy the "To" list.
+I will check your comments in detailed later and reply you. thanks again.
 
-On 05/29/2017 07:37 PM, Markus Armbruster wrote:
-> Marcel Apfelbaum <marcel@redhat.com> writes:
->
->> On 27/05/2017 9:58, Mao Zhongyi wrote:
->>>
->>>
->>> On 05/26/2017 10:08 PM, Marcel Apfelbaum wrote:
->>>>
->>>>
->>>> On 26/05/2017 15:15, Mao Zhongyi wrote:
->>>>> The pci-birdge device i82801b11 still implements the old
->>>>> PCIDeviceClass .init() through i82801b11_bridge_init()
->>>>> instead of the new .realize(). All devices need to be
->>>>> converted to .realize(). So convert it and rename it to
->>>>> i82801b11_bridge_realize().
->>>>>
->>>>> Signed-off-by: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
->>>>> ---
->>>>>   hw/pci-bridge/i82801b11.c | 9 ++++-----
->>>>>   1 file changed, 4 insertions(+), 5 deletions(-)
->>>>>
->>>>> diff --git a/hw/pci-bridge/i82801b11.c b/hw/pci-bridge/i82801b11.c
->>>>> index 2404e7e..dca3162 100644
->>>>> --- a/hw/pci-bridge/i82801b11.c
->>>>> +++ b/hw/pci-bridge/i82801b11.c
->>>>> @@ -44,6 +44,7 @@
->>>>>   #include "qemu/osdep.h"
->>>>>   #include "hw/pci/pci.h"
->>>>>   #include "hw/i386/ich9.h"
->>>>> +#include "qapi/error.h"
->>>>> /*****************************************************************************/
->>>>> @@ -58,7 +59,7 @@ typedef struct I82801b11Bridge {
->>>>>       /*< public >*/
->>>>>   } I82801b11Bridge;
->>>>>   -static int i82801b11_bridge_initfn(PCIDevice *d)
->>>>> +static void i82801b11_bridge_realize(PCIDevice *d, Error **errp)
->>>>>   {
->>>>>       int rc;
->>>>>   @@ -70,12 +71,10 @@ static int i82801b11_bridge_initfn(PCIDevice *d)
->>>>>           goto err_bridge;
->>>>>       }
->>>>>       pci_config_set_prog_interface(d->config,
->>>>> PCI_CLASS_BRIDGE_PCI_INF_SUB);
->>>>> -    return 0;
->>>>> +    return;
->>>>>     err_bridge:
->>>>>       pci_bridge_exitfn(d);
->>>>
->>>> Hi,
->>>>
->>>> Since you move to realize, you may want to leverage the errp to add
->>>> info on errors.
->>>>
->>>> Thanks,
->>>> Marcel
->>>
->>>
->>> Hi, Marcel
->>>
->>
->> Hi!
->>> Thanks for your quick reply and advice. In fact, I have considered
->>> adding an error
->>> message to errp when an error occurs. But I found that
->>> pci_bridge_ssvid_init() has
->>> reported a specific info when it fails. If the error is reported
->>> here again, it seems
->>> a bit more superfluous, so it's not adopted.
->>
->> I agree we don't want to see the error twice, but that means we may want
->> to pass the error pointer to pci_bridge_ssvid_init and so on.
->
-> Yes.
->
-> Callees that report errors differently are a common issue when
-> converting a function to Error.  The correct solution is to convert
-> these callees to Error, too.
->
-> Sometimes, this is just too much to be practical.  Then a "shallow"
-> conversion can make sense as a stop-gap, even though it'll result in
-> clearly inferior error reporting.
->
-> At a glance, this one doesn't look impractical.
->
->> One of the main things we achieve when moving to 'realize' is better
->> error handling, so if we don't do that maybe is not worth it.
->
-> We need to convert all devices to realize() so we can get rid of the old
-> qdev methods.  But you're right in that we better convert them
-> correctly.
->
->> You may need to do several changes you didn't intend to
->> in order to do the error propagation right...
->
-> Yes.  An Error conversion can look simple at first, then balloon into a
-> multi-part series.
->
->>
->> Thanks,
->> Marcel
->>
->>> Of course, output a readable error info
->>> to make it easier for users is also a good choice. So, are you sure
->>> you want to do
->>> that?
->>>
->>> Look forward to your feedback and suggestion soon.
->>>
->>> Thanks a lot.
->>> Mao
->
-> Any help with converting the remaining devices to realize() is much
-> appreciated.
->
 
-Thanks for your detailed explanation, I think I know what to do.
 
-Thanks,
-Mao
+On 2017/5/30 0:03, Laszlo Ersek wrote:
+> Hi,
+> 
+> did you remove me from the To: / Cc: list intentionally, or was that an
+> oversight? I caught your message in my list folders only by luck.
+> 
+> Some followup below:
+> 
+> On 05/29/17 17:27, gengdongjiu wrote:
+> 
+>>> (46) What is "physical_addr" good for? Below I can only see an 
+>>> assignment to it, in ghes_update_guest(). Where is the field read?
+> 
+>> this "physical_addr" address is the physical error address in the
+>> CPER. such as the physical address that happen hwpoison, this address
+>> is delivered by the KVM and QEMU transfer this address to physical.
+> I understand that in the ghes_update_guest() function, you accept a
+> parameter called "physical_address", and you pass it on to
+> ghes_generate_cper_record(). That makes sense, yes.
+> 
+> However, you also assign the same value to "ges.physical_addr". And that
+> structure field is never read. So my point is that the
+> "GhesErrorState.physical_addr" field is superfluous and should be removed.
+> 
+> I checked the other three patches in the series and they don't seem to
+> read that structure member either. Correct me if I'm wrong.
+> 
+>>> (55) What happens if you run out of the preallocated memory?
+> 
+>> if it run out of the preallocated memory. it will overwrite other 
+>> error source. every block's size is fixed. so it does not easy
+>> dynamically extend the size if it is overflow. Anyway I will add a
+>> error report if it happens overwrite.
+> I understand (and agree) that dynamic allocation is not possible here.
+> 
+> But that doesn't justify overwriting the error status data block that
+> belongs to a different data source. (Worse, if this happens with the
+> last error status data block, for error source 10, you could overwrite
+> memory that belongs to the OS.)
+> 
+> If an error status data block becomes full, then we should either wrap
+> back to the start of the same data block, or else stop forwarding errors
+> for that error source.
+> 
+> Does the ACPI spec say anything about this? I.e., about the case when
+> the system runs out of the memory that was reserved for recording
+> hardware errors?
+> 
+>>>>> +
+>>>>> +    mem_err = (struct cper_sec_mem_err *) (gdata + 1);
+>>>>> +
+>>>>> +    /* In order to simplify simulation, hardcode the CPER section to memory
+>>>>> +     * section.
+>>>>> +     */
+>>>>> +    mem_err->validation_bits |= CPER_MEM_VALID_ERROR_TYPE;
+>>>>> +    mem_err->error_type = 3;
+>>>
+>>> (58) Is this supposed to stand for "Multi-bit ECC" (from "N.2.5 Memory 
+>>> Error Section" in UEFI 2.6)? Should we have a macro for that?
+> 
+>> Yes, it is. What do you mean a macro?
+> 
+> A #define for the integer value 3.
+> 
+>> For all the errors that happen in the guest OS, in order to simulate
+>> easy, I abstract all the error section to memory section, even though
+>> the error section is processor or other section.
+> Why is that a valid thing to do? (I'm not doubting it is valid, I'm just
+> asking.) Will that not confuse the ACPI subsystem of the guest OS?
+> 
+>> I do not know whether do you have some suggestion for that.
+> Well I would have thought (without any expertise on the subject) that
+> hardware errors from the host side should be mapped to the guest more or
+> less "type correct". IOW, it looks strange that, say, a CPU error is
+> reported as a memory error. But this is just an uneducated guess.
+> 
+>>>>> +    mem_err->validation_bits |= CPER_MEM_VALID_CARD | CPER_MEM_VALID_MODULE |
+>>>>> +            CPER_MEM_VALID_BANK | CPER_MEM_VALID_ROW |
+>>>>> +            CPER_MEM_VALID_COLUMN | CPER_MEM_VALID_BIT_POSITION;
+>>>>> +    mem_err->card = 1;
+>>>>> +    mem_err->module = 2;
+>>>>> +    mem_err->bank = 3;
+>>>>> +    mem_err->row = 1;
+>>>>> +    mem_err->column = 2;
+>>>>> +    mem_err->bit_pos = 5;
+>>>
+>>> (60) I have no idea where these values come from.
+> 
+>> For all the errors that happen in the guest OS, in order to simulate
+>> easy, I abstract all the error section to memory section, and hard
+>> code the memory section error value as above.
+> Sure, but why is that safe? Will the guest OS not want to do something
+> about these error details? If we are feeding the guest OS invalid error
+> details, will that not lead to confusion?
+> 
+>>> (64) What does "reqr" stand for?
+>> It stand for the request size.
+> Can you please call it "req_size" or something similar? The English
+> expression
+> 
+>   request size
+> 
+> contains only one "r" letter, so it's hard to understand where the
+> second "r" in "reqr" comes from.
+> 
+> Thanks,
+> Laszlo
+> 
+> .
+> 
