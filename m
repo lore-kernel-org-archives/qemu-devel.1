@@ -1,27 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47844)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47883)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1dG5OJ-00050L-O7
-	for qemu-devel@nongnu.org; Wed, 31 May 2017 11:18:32 -0400
+	(envelope-from <eblake@redhat.com>) id 1dG5ON-000533-Ma
+	for qemu-devel@nongnu.org; Wed, 31 May 2017 11:18:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1dG5OG-00004z-KT
-	for qemu-devel@nongnu.org; Wed, 31 May 2017 11:18:31 -0400
-Received: from mail-wm0-x22a.google.com ([2a00:1450:400c:c09::22a]:34452)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1dG5OG-0008W6-CB
-	for qemu-devel@nongnu.org; Wed, 31 May 2017 11:18:28 -0400
-Received: by mail-wm0-x22a.google.com with SMTP id 123so34721806wmg.1
-	for <qemu-devel@nongnu.org>; Wed, 31 May 2017 08:18:28 -0700 (PDT)
-References: <CAJSP0QVzoN=2rv_HUNf0oR_FQg=5xJ9UQbLqq0rj8OuYb8ZByw@mail.gmail.com>
-	<CAFEAcA-AjqsFnk8O3vVO-zhWwowfgZuJi0PWgezPO6K-Ye2cqw@mail.gmail.com>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <CAFEAcA-AjqsFnk8O3vVO-zhWwowfgZuJi0PWgezPO6K-Ye2cqw@mail.gmail.com>
-Date: Wed, 31 May 2017 16:18:41 +0100
-Message-ID: <87zidtrr5a.fsf@linaro.org>
+	(envelope-from <eblake@redhat.com>) id 1dG5OM-00006A-GB
+	for qemu-devel@nongnu.org; Wed, 31 May 2017 11:18:35 -0400
+References: <20170531094330.1808-1-pbonzini@redhat.com>
+	<20170531094330.1808-2-pbonzini@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <886dcc50-9f5f-da6b-502e-81fb94f42fa2@redhat.com>
+Date: Wed, 31 May 2017 10:18:24 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [RFC] QEMU 2.10 release schedule
+In-Reply-To: <20170531094330.1808-2-pbonzini@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="P61F0TPcADt9lSfmk7i0oDXXi5NJbismx"
+Subject: Re: [Qemu-devel] [PATCH 01/11] qcow2: call CoQueue APIs under
+ CoMutex
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,37 +25,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Stefan Hajnoczi <stefanha@gmail.com>, Christian Borntraeger <borntraeger@de.ibm.com>, qemu-devel <qemu-devel@nongnu.org>
+To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, famz@redhat.com, qemu-block@nongnu.org, mreitz@redhat.com
+
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--P61F0TPcADt9lSfmk7i0oDXXi5NJbismx
+From: Eric Blake <eblake@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, famz@redhat.com, qemu-block@nongnu.org,
+ mreitz@redhat.com
+Message-ID: <886dcc50-9f5f-da6b-502e-81fb94f42fa2@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 01/11] qcow2: call CoQueue APIs under CoMutex
+References: <20170531094330.1808-1-pbonzini@redhat.com>
+ <20170531094330.1808-2-pbonzini@redhat.com>
+In-Reply-To: <20170531094330.1808-2-pbonzini@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 05/31/2017 04:43 AM, Paolo Bonzini wrote:
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> ---
+>  block/qcow2.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+>=20
+
+Reviewed-by: Eric Blake <eblake@redhat.com>
+
+> diff --git a/block/qcow2.c b/block/qcow2.c
+> index 1c2697732b..c9193603b9 100644
+> --- a/block/qcow2.c
+> +++ b/block/qcow2.c
+> @@ -1696,8 +1696,6 @@ static coroutine_fn int qcow2_co_pwritev(BlockDri=
+verState *bs, uint64_t offset,
+>      ret =3D 0;
+> =20
+>  fail:
+> -    qemu_co_mutex_unlock(&s->lock);
+> -
+>      while (l2meta !=3D NULL) {
+>          QCowL2Meta *next;
+> =20
+> @@ -1711,6 +1709,8 @@ fail:
+>          l2meta =3D next;
+>      }
+> =20
+> +    qemu_co_mutex_unlock(&s->lock);
+> +
+>      qemu_iovec_destroy(&hd_qiov);
+>      qemu_vfree(cluster_data);
+>      trace_qcow2_writev_done_req(qemu_coroutine_self(), ret);
+>=20
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
 
 
-Peter Maydell <peter.maydell@linaro.org> writes:
+--P61F0TPcADt9lSfmk7i0oDXXi5NJbismx
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-> On 30 May 2017 at 11:11, Stefan Hajnoczi <stefanha@gmail.com> wrote:
->> Here is a first stab at the next release schedule:
->>
->> Beginning of development phase: 2017-04-20
->> Soft feature freeze: 2017-07-18
->> -rc0: 2017-07-25
->> -rc1: 2017-08-01
->> -rc2: 2017-08-08
->> -rc3: 2017-08-15
->> -rc4: 2017-08-22
->
-> Are we going with the same definitions of soft/hard freeze
-> as last time around?
->
-> (I thought last release was a complete mess in terms of
-> getting code in in an orderly manner for the freeze,
-> personally...)
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-Do we want to have a broad plan for the order things need to go in
-before the feature freeze or stick to a first to the gate approach?
+iQEcBAEBCAAGBQJZLt7AAAoJEKeha0olJ0Nq+2gH/jvy1/YISObhmC3tpgaJ9oQ1
+bWyBQ4cQiuYA7Gkxo/7zDYari9AsnmnzrhuBNpJsIfAeKPvq5qjaSarnVCSdCvY8
+gre2wePLtv0ksFNGWcCn0A06sFTWHkCLnIQzmIy7xZHWegAA35zpcFr7DEICHNw3
+5ePHIQoR+Xrm5HLwxJ5b902v+lk4mtrse4sqiFcnaxinCcWzSGDM3NYYyOmCHgo3
+TGAGPlQGN7OVcL+uBjH8irSp4oZNT7+Nv3wJ8ghjlH5Vrp1uJAZ4jxLfDgJ+rRt+
+nSF0040pi49ejtdnBiKBc72xMiWxtJKoXxjvLolSV+qbdR3ZqVU/Zj3/7DJ6WRE=
+=DFPb
+-----END PGP SIGNATURE-----
 
-Obviously we don't want to stall the process waiting for delayed series
-that might end up getting dropped but having the broad sketches might
-make it easier for developers to prioritise what patches queues to drain
-first?
-
---
-Alex Bennée
+--P61F0TPcADt9lSfmk7i0oDXXi5NJbismx--
