@@ -1,36 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59319)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59410)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1dFxfn-0005QQ-0k
-	for qemu-devel@nongnu.org; Wed, 31 May 2017 03:04:04 -0400
+	(envelope-from <eric.auger@redhat.com>) id 1dFxgd-0005q8-Ne
+	for qemu-devel@nongnu.org; Wed, 31 May 2017 03:04:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1dFxfh-0004Ba-Tl
-	for qemu-devel@nongnu.org; Wed, 31 May 2017 03:04:02 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47056)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1dFxfh-0004B1-NZ
-	for qemu-devel@nongnu.org; Wed, 31 May 2017 03:03:57 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 5E4C780C07
-	for <qemu-devel@nongnu.org>; Wed, 31 May 2017 07:03:56 +0000 (UTC)
-Date: Wed, 31 May 2017 15:03:46 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20170531070346.GE14845@pxdev.xzpeter.org>
-References: <1494854073-19898-1-git-send-email-peterx@redhat.com>
-	<20170529060813.GF22816@pxdev.xzpeter.org>
-	<87k2506ltg.fsf@dusky.pond.sub.org>
-	<20170529101331.GA14845@pxdev.xzpeter.org>
-	<87d1ar504h.fsf@dusky.pond.sub.org>
-	<13985c6d-d24a-ac50-2708-fc3b9cc64acd@redhat.com>
-	<87h902l8qd.fsf@dusky.pond.sub.org>
-	<6a6a91cc-7ea1-2b45-a4bd-31aa3cfef917@redhat.com>
+	(envelope-from <eric.auger@redhat.com>) id 1dFxgc-0004Ki-JB
+	for qemu-devel@nongnu.org; Wed, 31 May 2017 03:04:55 -0400
+References: <1494697399-352-1-git-send-email-eric.auger@redhat.com>
+	<1494697399-352-2-git-send-email-eric.auger@redhat.com>
+	<CAFEAcA8SHP+=+hXB2D3XsCdeFg5NMSqTxtjH9aEU0bE5bL-2Dw@mail.gmail.com>
+From: Auger Eric <eric.auger@redhat.com>
+Message-ID: <aa138868-9f59-2023-926b-e2c4bc9219c6@redhat.com>
+Date: Wed, 31 May 2017 09:04:42 +0200
 MIME-Version: 1.0
+In-Reply-To: <CAFEAcA8SHP+=+hXB2D3XsCdeFg5NMSqTxtjH9aEU0bE5bL-2Dw@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <6a6a91cc-7ea1-2b45-a4bd-31aa3cfef917@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] msi: remove return code for msi_init()
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC v4 1/5] hw/arm/smmu-common: smmu base class
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,56 +24,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Markus Armbruster <armbru@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, qemu-devel@nongnu.org, "Michael S . Tsirkin" <mst@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: eric.auger.pro@gmail.com, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, prem.mallappa@gmail.com, Andrew Jones <drjones@redhat.com>, Christoffer Dall <christoffer.dall@linaro.org>, Radha.Chintakuntla@cavium.com, Sunil.Goutham@cavium.com, Radha Mohan <mohun106@gmail.com>, Trey Cain <tcain@qti.qualcomm.com>
 
-On Tue, May 30, 2017 at 04:29:57PM +0200, Paolo Bonzini wrote:
-> 
-> 
-> On 30/05/2017 16:28, Markus Armbruster wrote:
-> > Paolo Bonzini <pbonzini@redhat.com> writes:
-> > 
-> >>> Note that a board that doesn't support MSI can take MSI-capable devices
-> >>> just fine.  Only the broken boards can't.
-> >>>
-> >>> Obviously, broken boards should be fixed.  Once they all are, we can
-> >>> (and should!) remove msi_nonbroken.
-> >>
-> >> That only works if we know what the broken boards are.
-> > 
-> > Yes.
-> > 
-> >> Right now, all boards that do not support MSI hide the capability, which
-> >> is wrong.
-> > 
-> > Agreed.
-> > 
-> >>            I'd prefer to remove msi_nonbroken completely if we don't
-> >> know where the problem is.
-> > 
-> > So you're proposing to (1) remove msi_nonbroken, (2) see which boards
-> > burst into flames, and (3) fix them, or perhaps add a less wrong stop
-> > gap msi_broken just for them?
-> 
-> Yes, adding back msi_broken is one "git revert" away.
+Hi Peter,
 
-Not sure whether I got the point here, but... Adding msi_broken is not
-a "git revert"? Since there is no msi_broken before, only
-msi_supported. And iirc if we want to provide one msi_broken we need
-to know exactly all the borads that are broken with MSI, and that
-blacklist is something we don't have now (as you mentioned above)?
-
-Please correct me if I misunderstood.
-
+On 30/05/2017 17:56, Peter Maydell wrote:
+> On 13 May 2017 at 18:43, Eric Auger <eric.auger@redhat.com> wrote:
+>> Introduces the base device and class for the ARM smmu.
+>> Implements VMSAv8-64 table lookup and translation. VMSAv8-32
+>> is not yet implemented.
+>>
+>> For VFIO integration we will need to notify mapping changes
+>> of an input range and skipped unmapped regions. table walk
+>> helper allows.
+>>
+>> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+>> Signed-off-by: Prem Mallappa <prem.mallappa@broadcom.com>
+>>
+>> +/**
+>> + * smmu_page_walk_level_64 - Walk an IOVA range from a specific level
+>> + * @baseaddr: table base address corresponding to @level
+>> + * @level: level
+>> + * @cfg: translation config
+>> + * @start: end of the IOVA range
+>> + * @end: end of the IOVA range
+>> + * @hook_fn: the hook that to be called for each detected area
+>> + * @private: private data for the hook function
+>> + * @read: whether parent level has read permission
+>> + * @write: whether parent level has write permission
+>> + * @must_translate: indicates whether each iova of the range
+>> + *  must be translated or whether failure is allowed
+>> + * @notify_unmap: whether we should notify invalid entries
+>> + *
+>> + * Return 0 on success, < 0 on errors not related to translation
+>> + * process, > 1 on errors related to translation process (only
+>> + * if must_translate is set)
+>> + */
+>> +static int
+>> +smmu_page_walk_level_64(dma_addr_t baseaddr, int level,
+>> +                        SMMUTransCfg *cfg, uint64_t start, uint64_t end,
+>> +                        smmu_page_walk_hook hook_fn, void *private,
+>> +                        bool read, bool write, bool must_translate,
+>> +                        bool notify_unmap)
+>> +{
 > 
-> Of course, this means the edu memory leak should be fixed in a separate
-> small patch.
+>> +        /* table pte */
+>> +        next_table_baseaddr = get_table_pte_address(pte, granule_sz);
+>> +        trace_smmu_page_walk_level_table_pte(pte, next_table_baseaddr);
+>> +        ret = smmu_page_walk_level_64(next_table_baseaddr, level + 1, cfg,
+>> +                                      iova, MIN(iova_next, end),
+>> +                                      hook_fn, private, read_cur, write_cur,
+>> +                                      must_translate, notify_unmap);
+>> +        if (!ret) {
+>> +            return ret;
+>> +        }
+>> +
+>> +next:
+>> +        iova = iova_next;
+>> +    }
+>> +
+>> +    return SMMU_TRANS_ERR_NONE;
+>> +}
 > 
-> Thanks,
+> It seems a bit odd that this function is recursive -- I was
+> expecting it just to loop through for each successive level
+> until it hits a block/page entry, as the LPAE table walk
+> code in target/arm/helper.c does...
+
+welcome back ;-)
+
+Thanks for the pointer to get_phys_addr_lpae(). Actually I got largely
+inspired of vtd_page_walk and vtd_page_walk_level of
+hw/i386/intel_iommu.c which also use the same recursive form.
+
+The peculiarity compared to get_phys_addr_lpae() is that we scan a range
+of iovas and do not translate a single iova. In case a level entry is
+not implemented we want to jump to the next one at the same level and in
+case the entry matches a table entry we want to scan the next level
+entries matching that iova range.
+
+Does that make more sense?
+
+Thanks
+
+Eric
 > 
-> Paolo
-
-Thanks,
-
--- 
-Peter Xu
+> thanks
+> -- PMM
+> 
