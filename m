@@ -1,30 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33235)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36422)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1dG4ct-0006uu-2B
-	for qemu-devel@nongnu.org; Wed, 31 May 2017 10:29:32 -0400
+	(envelope-from <eblake@redhat.com>) id 1dG4me-00061H-8l
+	for qemu-devel@nongnu.org; Wed, 31 May 2017 10:39:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1dG4cn-0008BD-Hh
-	for qemu-devel@nongnu.org; Wed, 31 May 2017 10:29:31 -0400
-Received: from mailhub.sw.ru ([195.214.232.25]:2655 helo=relay.sw.ru)
+	(envelope-from <eblake@redhat.com>) id 1dG4mZ-00036e-NK
+	for qemu-devel@nongnu.org; Wed, 31 May 2017 10:39:36 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:2448)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
-	id 1dG4cn-0008Af-1B
-	for qemu-devel@nongnu.org; Wed, 31 May 2017 10:29:25 -0400
-References: <20170503122539.282182-1-vsementsov@virtuozzo.com>
-	<20170503122539.282182-10-vsementsov@virtuozzo.com>
-	<33ce370d-939f-d02e-0177-1184ae9f4fa7@redhat.com>
-	<47488066-bd0f-834d-85d8-63d7289cb0fd@virtuozzo.com>
-	<18c4b1ad-bc30-a598-36b8-612c01b00dee@redhat.com>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <67feecd0-ef75-5e26-aa7c-a70b69fde0ef@virtuozzo.com>
-Date: Wed, 31 May 2017 17:29:04 +0300
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dG4mZ-000363-ER
+	for qemu-devel@nongnu.org; Wed, 31 May 2017 10:39:31 -0400
+References: <20170530143052.165002-1-vsementsov@virtuozzo.com>
+	<20170530143052.165002-2-vsementsov@virtuozzo.com>
+	<874e184b-3727-3bbc-0169-1073db203736@redhat.com>
+	<173a697e-274c-a2a7-63d2-f5dbf93f69e7@virtuozzo.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <e5021317-ec3a-def9-71ea-3dbc947a6e20@redhat.com>
+Date: Wed, 31 May 2017 09:39:27 -0500
 MIME-Version: 1.0
-In-Reply-To: <18c4b1ad-bc30-a598-36b8-612c01b00dee@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH 09/25] block/dirty-bitmap: add readonly
- field to BdrvDirtyBitmap
+In-Reply-To: <173a697e-274c-a2a7-63d2-f5dbf93f69e7@virtuozzo.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="vbWbUTjTVQfntp6H24wfnXTIjJn9HrTMu"
+Subject: Re: [Qemu-devel] [PATCH 01/19] nbd/server: get rid of
+ nbd_negotiate_read and friends
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,135 +31,112 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, armbru@redhat.com, eblake@redhat.com, jsnow@redhat.com, famz@redhat.com, den@openvz.org, stefanha@redhat.com, pbonzini@redhat.com
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org
+Cc: pbonzini@redhat.com, den@openvz.org
 
-31.05.2017 16:43, Max Reitz wrote:
-> On 2017-05-30 08:50, Vladimir Sementsov-Ogievskiy wrote:
->> Thank you for this scenario. Hmm.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--vbWbUTjTVQfntp6H24wfnXTIjJn9HrTMu
+From: Eric Blake <eblake@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-devel@nongnu.org
+Cc: pbonzini@redhat.com, den@openvz.org
+Message-ID: <e5021317-ec3a-def9-71ea-3dbc947a6e20@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 01/19] nbd/server: get rid of
+ nbd_negotiate_read and friends
+References: <20170530143052.165002-1-vsementsov@virtuozzo.com>
+ <20170530143052.165002-2-vsementsov@virtuozzo.com>
+ <874e184b-3727-3bbc-0169-1073db203736@redhat.com>
+ <173a697e-274c-a2a7-63d2-f5dbf93f69e7@virtuozzo.com>
+In-Reply-To: <173a697e-274c-a2a7-63d2-f5dbf93f69e7@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 05/31/2017 08:12 AM, Vladimir Sementsov-Ogievskiy wrote:
+> 30.05.2017 23:10, Eric Blake wrote:
+>> On 05/30/2017 09:30 AM, Vladimir Sementsov-Ogievskiy wrote:
+>>> Functions nbd_negotiate_{read,write,drop_sync} were introduced in
+>>> 1a6245a5b, when nbd_wr_syncv was working through qemu_co_sendv_recvv,=
+
+>> There is no qemu_co_sendv_recvv. Did you mean qemu_co_recv/qemu_co_sen=
+d?
+>=20
+> qemu_co_recv is a macro, qemu_co_sendv_recvv - is an actual function,
+> which do something.
+
+Oh. I see where I went wrong - I was grepping for 'nbd_co_sendv' and
+coming up short.
+
+>=20
+> #define qemu_co_recv(sockfd, buf, bytes) \
+>   qemu_co_send_recv(sockfd, buf, bytes, false)
+>=20
+> ssize_t coroutine_fn
+> qemu_co_send_recv(int sockfd, void *buf, size_t bytes, bool do_send)
+> {
+>     struct iovec iov =3D { .iov_base =3D buf, .iov_len =3D bytes };
+>     return qemu_co_sendv_recvv(sockfd, &iov, 1, 0, bytes, do_send);
+> }
+
+The commit message still makes me chase through several layers of
+indirection, so I still wonder if referring to qemu_co_recv/qemu_co_send
+(which is what is directly used in that older commit for nbd_wr_syncv)
+is any better.  It is probably also worth referring back to commit
+ff82911cd as the point in time where we switched to the qio_channel
+code, thereby no longer needing to manage coroutine handlers quite as
+directly as beforehand.
+
+
+>>> +int drop_sync(QIOChannel *ioc, size_t size, Error **errp)
+>> As part of moving it into nbd/common.c, please rename this function to=
+
+>> an nbd_ prefix, since non-static functions are more likely to collide
+>> with the rest of the code base if not properly named.  Better yet: do =
+it
+>> in multiple patches:
+>> - rename the static functions and fallout to callers (all of
+>> nbd_drop_sync, nbd_read_sync, and nbd_write_sync)
+
+In fact, does the _sync name buy us anything any more, or can we just go
+with the shorter nbd_drop(), nbd_read(), and nbd_write()?
+
+>> - code motion (promote nbd_drop_sync from static in client.c to export=
+ed
+>> in common.c)
+>> - drop nbd_negotiate_ functions in favor of common nbd_*_sync function=
+s
+>=20
+> OK
+>=20
 >>
->> So, as I need guarantee that image and bitmap are unchanged,
->> bdrv_set_dirty should return error and fail the whole write. Ok?
-> I don't know. That would mean that you couldn't commit to an image that
-> has a persistent auto-loading bitmap, which doesn't seem very nice to me.
->
-> I'm not quite sure what to do myself. So first I'd definitely want the
-> commit operation to succeed. That means we'd have to automatically make
-> the bitmap non-readonly once we write to it. The "readonly" flag would
-> then be an "unchanged" flag, rather, to signify that the bitmap has not
-> been changed since it was loaded, which means that it does not need to
-> be written back to the image file.
->
-> Now the issue remains that if you modify a persistent bitmap that is
-> stored in an image file that is opened RO when it's closed, you won't be
-> able to write the modifications back.
->
-> So in addition, I guess we'd need to "flush" all persistent bitmaps
-> (that is, write all modifications back to the file and set the
-> "unchanged" flag (you could also call it "dirty" and then mean the
-> opposite) for each bitmap) not only when the image is closed or
-> invalidated, but also when it is reopened read-only.
->
-> (block-commit reopens the backing BDS R/W, then writes to them, thus
-> modifying the dirty bitmaps, and finally reopens the BDS as read-only;
-> before that happens, we will have to flush the modified bitmap data.)
+>> The idea makes sense, but I think there's too much going on in this on=
+e
+>> commit.
+>>
+>=20
 
-Ok, understand.
-
-We need to consider also setting in_use flag in the image. We _must not_ 
-write to image with dirty bitmap,
-if in_use flag of this dirty bitmap is not set, as in case of something 
-fail we will have image with wrong bitmap with
-unset in_use flag (which looks ok).
-
-I see two ways to handle it:
-
-variant 1:
-1. readonly field stays as is (see v19, with normal errors, not only 
-asserts)
-2. immediately after reopening r/w we do "reopening bitmaps r/w", i.e. 
-set in_use in the image and set BdrvDirtyBitmap.readonly = false
-3. in reopen_prepare, if reopening r-o do "reopening bitmaps r-o", i.e. 
-save them into the image and set BdrvDirtyBitmap.readonly = true
-
-variant 2:
-1. instead of 'readonly' add 'dirty' field, set dirty to 0 for all 
-bitmaps on create
-2. before write/discard check this field in all related bitmaps, and if 
-dirty=0 (and persistent=1), write IN_USE flag into the image first, set 
-dirty=1, and only then do write. (if writing IN_USE=1 failed, fail the 
-whole write)
-3. in reopen_prepare, if reopening r-o do "reopening bitmaps r-o", i.e. 
-save them into the image and set BdrvDirtyBitmap.dirty = 0
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
 
 
->
-> Max
->
->> 29.05.2017 21:35, Max Reitz wrote:
->>> On 2017-05-03 14:25, Vladimir Sementsov-Ogievskiy wrote:
->>>> It will be needed in following commits for persistent bitmaps.
->>>> If bitmap is loaded from read-only storage (and we can't mark it
->>>> "in use" in this storage) corresponding BdrvDirtyBitmap should be
->>>> read-only.
->>>>
->>>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
->>>> ---
->>>>    block/dirty-bitmap.c         | 16 ++++++++++++++++
->>>>    include/block/dirty-bitmap.h |  3 +++
->>>>    2 files changed, 19 insertions(+)
->>> Revisiting this again after the whole series: So you never really make
->>> sure that the read-only bitmaps are not written to (except for these
->>> assertions). The idea is that you only set it for read-only BDS and
->>> read-only BDS are never written to. But that assumption is not true,
->>> generally, and can be broken e.g. using a commit job:
->>>
->>> $ ./qemu-img create -f qcow2 backing.qcow2 64M
->>> Formatting 'backing.qcow2', fmt=qcow2 size=67108864 encryption=off
->>>       cluster_size=65536 lazy_refcounts=off refcount_bits=16
->>> $ ./qemu-img create -f qcow2 -b backing.qcow2 top.qcow2
->>> Formatting 'top.qcow2', fmt=qcow2 size=67108864
->>>       backing_file=backing.qcow2 encryption=off cluster_size=65536
->>>       lazy_refcounts=off refcount_bits=16
->>> $ x86_64-softmmu/qemu-system-x86_64 -qmp stdio
->>> {"QMP": {"version": {"qemu": {"micro": 50, "minor": 9, "major": 2},
->>> "package": " (v2.9.0-632-g4a52d43-dirty)"}, "capabilities": []}}
->>> {'execute': 'qmp_capabilities'}
->>> {"return": {}}
->>> {'execute': 'blockdev-add',
->>>    'arguments': {'node-name': 'backing-node', 'driver': 'qcow2',
->>>                  'file': {'driver': 'file', 'filename': 'backing.qcow2'}}}
->>> {"return": {}}
->>> {'execute': 'block-dirty-bitmap-add',
->>>    'arguments': {'node': 'backing-node', 'name': 'foo',
->>>                  'persistent': true, 'autoload': true}}
->>> {"return": {}}
->>> {'execute': 'blockdev-del', 'arguments': {'node-name': 'backing-node'}}
->>> {"return": {}}
->>> {'execute': 'blockdev-add',
->>>    'arguments': {'node-name': 'top-node', 'driver': 'qcow2',
->>>                  'file': {'driver': 'file', 'filename': 'top.qcow2'}}}
->>> {"return": {}}
->>> {'execute': 'human-monitor-command',
->>>    'arguments': {'command-line': 'qemu-io top-node "write 0 64k"'}}
->>> wrote 65536/65536 bytes at offset 0
->>> 64 KiB, 1 ops; 0.0079 sec (7.852 MiB/sec and 125.6281 ops/sec)
->>> {"return": ""}
->>> {'execute': 'block-commit',
->>>    'arguments': {'device': 'top-node', 'job-id': 'commit-job'}}
->>> {"return": {}}
->>> qemu-system-x86_64: block/dirty-bitmap.c:571: bdrv_set_dirty: Assertion
->>> `!bdrv_dirty_bitmap_readonly(bitmap)' failed.
->>> [1]    10872 abort (core dumped)  x86_64-softmmu/qemu-system-x86_64 -qmp
->>> stdio
->>>
->>> So there needs to be something else than just assertions to make sure
->>> that read-only bitmaps are never written to.
->>>
->>> Max
->>>
->
+--vbWbUTjTVQfntp6H24wfnXTIjJn9HrTMu
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
--- 
-Best regards,
-Vladimir
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEcBAEBCAAGBQJZLtWfAAoJEKeha0olJ0NqxiYH/R8NG6OXTXsPrPIBCFBkzQtd
+GijQ1ioreNvYkkau3e8GqW8FrA+Vcnuq92PpmgkfxHUjUO048qHZVmusyr6C1bUU
+d11FuaRkaCvB7aEBVMPAmg+Lr0U+IJVl1WcPjOchkHFUYgMDzkmZmAbwgXv0H9+b
+L4Q0zrbt1WYduy9P5yp6Q1Vv0gVDYxku1FJHC5MkBnzQ6DbEUQSsKRcitBGgm6uI
+zPFUJKvfeH89fMedqMjFSOiKpt6oJrnHeVprCJV2JWSQc9i4mzjehkMQCb6HJjEa
+qwO6v6at1lnMHv3gloao7dBkGUAQyt3r828ZjbrJEGH55WITPNiuPmYLHl4cZvQ=
+=KZXD
+-----END PGP SIGNATURE-----
+
+--vbWbUTjTVQfntp6H24wfnXTIjJn9HrTMu--
