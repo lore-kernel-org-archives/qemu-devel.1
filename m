@@ -1,21 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33091)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33711)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1dFzjK-0007jz-8b
-	for qemu-devel@nongnu.org; Wed, 31 May 2017 05:15:51 -0400
+	(envelope-from <quintela@redhat.com>) id 1dFzks-0000Z2-Vn
+	for qemu-devel@nongnu.org; Wed, 31 May 2017 05:17:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1dFzjJ-0001rz-7Q
-	for qemu-devel@nongnu.org; Wed, 31 May 2017 05:15:50 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:54440)
+	(envelope-from <quintela@redhat.com>) id 1dFzks-0002EO-3d
+	for qemu-devel@nongnu.org; Wed, 31 May 2017 05:17:26 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:36948)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1dFzjI-0001rl-Uc
-	for qemu-devel@nongnu.org; Wed, 31 May 2017 05:15:49 -0400
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1dFzkr-0002EB-Tk
+	for qemu-devel@nongnu.org; Wed, 31 May 2017 05:17:26 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 0883B883B1
+	for <qemu-devel@nongnu.org>; Wed, 31 May 2017 09:17:25 +0000 (UTC)
 From: Juan Quintela <quintela@redhat.com>
-Date: Wed, 31 May 2017 11:15:36 +0200
-Message-Id: <20170531091538.21626-4-quintela@redhat.com>
-In-Reply-To: <20170531091538.21626-1-quintela@redhat.com>
-References: <20170531091538.21626-1-quintela@redhat.com>
-Subject: [Qemu-devel] [PULL 3/5] migration: set dirty_pages_rate before
- autoconverge logic
+Date: Wed, 31 May 2017 11:17:17 +0200
+Message-Id: <20170531091720.21697-1-quintela@redhat.com>
+Subject: [Qemu-devel] [PATCH v3 0/3]  Remove of loadvm handlers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,73 +28,41 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: dgilbert@redhat.com, lvivier@redhat.com, peterx@redhat.com, Felipe Franciosi <felipe@nutanix.com>
+Cc: dgilbert@redhat.com, lvivier@redhat.com, peterx@redhat.com
 
-From: Felipe Franciosi <felipe@nutanix.com>
+Hi
 
-Currently, a "period" in the RAM migration logic is at least a second
-long and accounts for what happened since the last period (or the
-beginning of the migration). The dirty_pages_rate counter is calculated
-at the end this logic.
+Changes from v2
+- also store load_section_id (dave found the problem)
 
-If the auto convergence capability is enabled from the start of the
-migration, it won't be able to use this counter the first time around.
-This calculates dirty_pages_rate as soon as a period is deemed over,
-which allows for it to be used immediately.
+I think that we can remove it now, at least.
 
-Signed-off-by: Felipe Franciosi <felipe@nutanix.com>
-Reviewed-by: Peter Xu <peterx@redhat.com>
-Reviewed-by: Juan Quintela <quintela@redhat.com>
-Signed-off-by: Juan Quintela <quintela@redhat.com>
----
- migration/ram.c | 17 ++++++++++-------
- 1 file changed, 10 insertions(+), 7 deletions(-)
+Thanks, Juan.
 
-diff --git a/migration/ram.c b/migration/ram.c
-index 36bf720..495ecbe 100644
---- a/migration/ram.c
-+++ b/migration/ram.c
-@@ -694,6 +694,10 @@ static void migration_bitmap_sync(RAMState *rs)
- 
-     /* more than 1 second = 1000 millisecons */
-     if (end_time > rs->time_last_bitmap_sync + 1000) {
-+        /* calculate period counters */
-+        rs->dirty_pages_rate = rs->num_dirty_pages_period * 1000
-+            / (end_time - rs->time_last_bitmap_sync);
-+
-         if (migrate_auto_converge()) {
-             /* The following detection logic can be refined later. For now:
-                Check to see if the dirtied bytes is 50% more than the approx.
-@@ -702,15 +706,14 @@ static void migration_bitmap_sync(RAMState *rs)
-                throttling */
-             bytes_xfer_now = ram_bytes_transferred();
- 
--            if (rs->dirty_pages_rate &&
--               (rs->num_dirty_pages_period * TARGET_PAGE_SIZE >
-+            if ((rs->num_dirty_pages_period * TARGET_PAGE_SIZE >
-                    (bytes_xfer_now - rs->bytes_xfer_prev) / 2) &&
--               (rs->dirty_rate_high_cnt++ >= 2)) {
-+                (rs->dirty_rate_high_cnt++ >= 2)) {
-                     trace_migration_throttle();
-                     rs->dirty_rate_high_cnt = 0;
-                     mig_throttle_guest_down();
--             }
--             rs->bytes_xfer_prev = bytes_xfer_now;
-+            }
-+            rs->bytes_xfer_prev = bytes_xfer_now;
-         }
- 
-         if (migrate_use_xbzrle()) {
-@@ -723,8 +726,8 @@ static void migration_bitmap_sync(RAMState *rs)
-             rs->iterations_prev = rs->iterations;
-             rs->xbzrle_cache_miss_prev = rs->xbzrle_cache_miss;
-         }
--        rs->dirty_pages_rate = rs->num_dirty_pages_period * 1000
--            / (end_time - rs->time_last_bitmap_sync);
-+
-+        /* reset period counters */
-         rs->time_last_bitmap_sync = end_time;
-         rs->num_dirty_pages_period = 0;
-     }
+[v2]
+- store load_version_id field to SaveStateHandler
+- Adjust everything to use it
+
+Thanks to Laurent to point that to me.
+
+[v1]
+We just have a loadvm handlers that are a new list only used in a
+single place.  Just move everything to use the savevm_handlers (yes,
+it is a list, and we could have a better name).
+
+Once there, vmstate_load() had three arguments but only needs two.  Fix that.
+
+Juan Quintela (3):
+  migration: Use savevm_handlers instead of loadvm copy
+  migration: loadvm handlers are not used
+  migration: Remove section_id parameter from vmstate_load
+
+ include/migration/migration.h |  5 ----
+ include/migration/vmstate.h   |  2 --
+ include/qemu/typedefs.h       |  1 -
+ migration/migration.c         |  2 --
+ migration/savevm.c            | 64 +++++++++++++++----------------------------
+ 5 files changed, 22 insertions(+), 52 deletions(-)
+
 -- 
 2.9.4
