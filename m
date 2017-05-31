@@ -1,23 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39359)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39366)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aurelien@aurel32.net>) id 1dGBgd-00017H-NO
+	(envelope-from <aurelien@aurel32.net>) id 1dGBgd-00017R-Si
 	for qemu-devel@nongnu.org; Wed, 31 May 2017 18:01:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aurelien@aurel32.net>) id 1dGBgb-0005U1-Ka
+	(envelope-from <aurelien@aurel32.net>) id 1dGBgb-0005U9-MN
 	for qemu-devel@nongnu.org; Wed, 31 May 2017 18:01:51 -0400
-Received: from hall.aurel32.net ([2001:bc8:30d7:100::1]:34928)
+Received: from hall.aurel32.net ([2001:bc8:30d7:100::1]:34982)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <aurelien@aurel32.net>)
-	id 1dGBgb-0005LT-8R
+	id 1dGBgb-0005Ls-8R
 	for qemu-devel@nongnu.org; Wed, 31 May 2017 18:01:49 -0400
 From: Aurelien Jarno <aurelien@aurel32.net>
-Date: Thu,  1 Jun 2017 00:00:59 +0200
-Message-Id: <20170531220129.27724-1-aurelien@aurel32.net>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v3 00/30] target/s390x: fix,
- improve and implement some more instructions
+Date: Thu,  1 Jun 2017 00:01:11 +0200
+Message-Id: <20170531220129.27724-13-aurelien@aurel32.net>
+In-Reply-To: <20170531220129.27724-1-aurelien@aurel32.net>
+References: <20170531220129.27724-1-aurelien@aurel32.net>
+Subject: [Qemu-devel] [PATCH v3 12/30] target/s390x: implement MOVE WITH
+ OFFSET
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,87 +26,104 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Aurelien Jarno <aurelien@aurel32.net>
+Cc: Aurelien Jarno <aurelien@aurel32.net>, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>
 
-This patchset tries to improve the s390x emulation by fixing and
-improving some instructions. It implement some more instructions, from
-the zArchitecture base or from the Extended-Translation Facility 2. The
-last patch updates the maximum TCG CPU to z800, as the ETF2 and
-Long-Displacement Facility are now both fully implemented.
+Reviewed-by: Richard Henderson <rth@twiddle.net>
+Signed-off-by: Aurelien Jarno <aurelien@aurel32.net>
+---
+ target/s390x/helper.h      |  1 +
+ target/s390x/insn-data.def |  4 ++++
+ target/s390x/mem_helper.c  | 31 +++++++++++++++++++++++++++++++
+ target/s390x/translate.c   |  8 ++++++++
+ 4 files changed, 44 insertions(+)
 
-This patch series is based on the s390x unwind and execute patches
-from Richard Henderson and the qemu cpu_models patch from Thomas Huth.
-It includes feedback from both.
-
-v1 -> v2:
-- add a patch to improve IPTE
-- implement local-TLB-clearing in IPTE
-- use tcg_gen_atomic_xchg_i32 in TEST AND SET
-- use gen_op_movi_cc in TEST ADDRESSING MODE
-- use helper_atomic_ldo_be_mmu in LOAD PAIR FROM QUADWORD
-- use helper_atomic_sto_be_mmu in STORE PAIR TO QUADWORD
-- add a patch to implement COMPARE AND SIGNAL
-- rename dest and src into src1 and src3 and check that r1 & r3 are even
-  in COMPARE LOGICAL LONG EXTENDED
-- check that r1 & r2 are even in COMPARE LOGICAL LONG
-- check that r1 & r3 are even in COMPARE LOGICAL LONG UNICODE
-- move the adj_len_to_page patch before MVCL/MVCLE changes and simplify
-  the expression a bit
-- fix indentation in MOVE LONG UNICODE
-- rebase the cpu model upgrade to z800 onto the qemu cpu_models patch
-  from Thomas Huth and use s390_find_cpu_def to get the z800 model.
-
-v2 -> v3:
-- rename _VADDR_PX into VADDR_PX in IPTE patch
-- check for alignment in LOAD PAIR FROM QUADWORD using MO_ALIGN16
-- check for alignment in STORE PAIR TO QUADWORD using MO_ALIGN16
-- remove side effect flags from COMPARE AND SIGNAL helpers
-- pass the tst value as an argument ot the TRANSLATE ONE/TWO TO ONE/TWO
-  helper and check for the M3 value
-- add a patch to enable the ETF2-Enhancement Facility
-
-Aurelien Jarno (30):
-  target/s390x: remove dead code in translate.c
-  target/s390x: remove some Linux assumptions from IPTE
-  target/s390x: implement local-TLB-clearing in IPTE
-  target/s390x: implement TEST AND SET
-  target/s390x: implement TEST ADDRESSING MODE
-  target/s390x: implement PACK
-  target/s390x: implement LOAD PAIR FROM QUADWORD
-  target/s390x: implement STORE PAIR TO QUADWORD
-  target/s390x: implement COMPARE AND SIGNAL
-  target/s390x: implement MOVE INVERSE
-  target/s390x: implement MOVE NUMERICS
-  target/s390x: implement MOVE WITH OFFSET
-  target/s390x: implement MOVE ZONES
-  target/s390x: improve 24-bit and 31-bit addresses read
-  target/s390x: improve 24-bit and 31-bit addresses write
-  target/s390x: improve 24-bit and 31-bit lengths read/write
-  target/s390x: fix COMPARE LOGICAL LONG EXTENDED
-  target/s390x: implement COMPARE LOGICAL LONG
-  target/s390x: fix adj_len_to_page
-  target/s390x: improve MOVE LONG and MOVE LONG EXTENDED
-  target/s390x: implement COMPARE LOGICAL LONG UNICODE
-  target/s390x: implement MOVE LONG UNICODE
-  target/s390x: implement PACK ASCII
-  target/s390x: implement PACK UNICODE
-  target/s390x: implement UNPACK ASCII
-  target/s390x: implement UNPACK UNICODE
-  target/s390x: implement TEST DECIMAL
-  target/s390x: implement TRANSLATE ONE/TWO TO ONE/TWO
-  target/s390x: mark ETF2 and ETF2-ENH facilities as available
-  target/s390x: update maximum TCG model to z800
-
- target/s390x/cpu.h         |   2 +
- target/s390x/cpu_models.c  |  13 +-
- target/s390x/fpu_helper.c  |  27 ++
- target/s390x/helper.h      |  21 +-
- target/s390x/insn-data.def |  57 ++++
- target/s390x/mem_helper.c  | 746 +++++++++++++++++++++++++++++++++++++--------
- target/s390x/misc_helper.c |   4 +-
- target/s390x/mmu_helper.c  |   2 -
- target/s390x/translate.c   | 335 ++++++++++++++++++--
- 9 files changed, 1052 insertions(+), 155 deletions(-)
-
+diff --git a/target/s390x/helper.h b/target/s390x/helper.h
+index e62e45534d..a197b8bc39 100644
+--- a/target/s390x/helper.h
++++ b/target/s390x/helper.h
+@@ -14,6 +14,7 @@ DEF_HELPER_FLAGS_4(divu64, TCG_CALL_NO_WG, i64, env, i64, i64, i64)
+ DEF_HELPER_4(srst, i64, env, i64, i64, i64)
+ DEF_HELPER_4(clst, i64, env, i64, i64, i64)
+ DEF_HELPER_FLAGS_4(mvn, TCG_CALL_NO_WG, void, env, i32, i64, i64)
++DEF_HELPER_FLAGS_4(mvo, TCG_CALL_NO_WG, void, env, i32, i64, i64)
+ DEF_HELPER_FLAGS_4(mvpg, TCG_CALL_NO_WG, i32, env, i64, i64, i64)
+ DEF_HELPER_4(mvst, i64, env, i64, i64, i64)
+ DEF_HELPER_4(ex, void, env, i32, i64, i64)
+diff --git a/target/s390x/insn-data.def b/target/s390x/insn-data.def
+index 6af717648c..47542eeaf3 100644
+--- a/target/s390x/insn-data.def
++++ b/target/s390x/insn-data.def
+@@ -584,6 +584,10 @@
+     C(0xb254, MVPG,    RRE,   Z,   r1_o, r2_o, 0, 0, mvpg, 0)
+ /* MOVE STRING */
+     C(0xb255, MVST,    RRE,   Z,   r1_o, r2_o, 0, 0, mvst, 0)
++/* MOVE WITH OFFSET */
++    /* Really format SS_b, but we pack both lengths into one argument
++       for the helper call, so we might as well leave one 8-bit field.  */
++    C(0xf100, MVO,     SS_a,  Z,   la1, a2, 0, 0, mvo, 0)
+ 
+ /* MULTIPLY */
+     C(0x1c00, MR,      RR_a,  Z,   r1p1_32s, r2_32s, new, r1_D32, mul, 0)
+diff --git a/target/s390x/mem_helper.c b/target/s390x/mem_helper.c
+index 53852784e6..3601bb9cdd 100644
+--- a/target/s390x/mem_helper.c
++++ b/target/s390x/mem_helper.c
+@@ -256,6 +256,37 @@ void HELPER(mvn)(CPUS390XState *env, uint32_t l, uint64_t dest, uint64_t src)
+     }
+ }
+ 
++/* move with offset  */
++void HELPER(mvo)(CPUS390XState *env, uint32_t l, uint64_t dest, uint64_t src)
++{
++    uintptr_t ra = GETPC();
++    int len_dest = l >> 4;
++    int len_src = l & 0xf;
++    uint8_t byte_dest, byte_src;
++    int i;
++
++    src += len_src;
++    dest += len_dest;
++
++    /* Handle rightmost byte */
++    byte_src = cpu_ldub_data_ra(env, src, ra);
++    byte_dest = cpu_ldub_data_ra(env, dest, ra);
++    byte_dest = (byte_dest & 0x0f) | (byte_src << 4);
++    cpu_stb_data_ra(env, dest, byte_dest, ra);
++
++    /* Process remaining bytes from right to left */
++    for (i = 1; i <= len_dest; i++) {
++        byte_dest = byte_src >> 4;
++        if (len_src - i >= 0) {
++            byte_src = cpu_ldub_data_ra(env, src - i, ra);
++        } else {
++            byte_src = 0;
++        }
++        byte_dest |= byte_src << 4;
++        cpu_stb_data_ra(env, dest - i, byte_dest, ra);
++    }
++}
++
+ /* compare unsigned byte arrays */
+ static uint32_t do_helper_clc(CPUS390XState *env, uint32_t l, uint64_t s1,
+                               uint64_t s2, uintptr_t ra)
+diff --git a/target/s390x/translate.c b/target/s390x/translate.c
+index 4e7211203a..b1877cf27b 100644
+--- a/target/s390x/translate.c
++++ b/target/s390x/translate.c
+@@ -2998,6 +2998,14 @@ static ExitStatus op_mvn(DisasContext *s, DisasOps *o)
+     return NO_EXIT;
+ }
+ 
++static ExitStatus op_mvo(DisasContext *s, DisasOps *o)
++{
++    TCGv_i32 l = tcg_const_i32(get_field(s->fields, l1));
++    gen_helper_mvo(cpu_env, l, o->addr1, o->in2);
++    tcg_temp_free_i32(l);
++    return NO_EXIT;
++}
++
+ static ExitStatus op_mvpg(DisasContext *s, DisasOps *o)
+ {
+     gen_helper_mvpg(cc_op, cpu_env, regs[0], o->in1, o->in2);
 -- 
 2.11.0
