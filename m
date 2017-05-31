@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44113)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45237)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lvivier@redhat.com>) id 1dG3lu-00032k-Jo
-	for qemu-devel@nongnu.org; Wed, 31 May 2017 09:34:47 -0400
+	(envelope-from <mreitz@redhat.com>) id 1dG3oe-00044q-8S
+	for qemu-devel@nongnu.org; Wed, 31 May 2017 09:37:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lvivier@redhat.com>) id 1dG3lr-0003nv-9g
-	for qemu-devel@nongnu.org; Wed, 31 May 2017 09:34:46 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:54584)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lvivier@redhat.com>) id 1dG3lr-0003nW-36
-	for qemu-devel@nongnu.org; Wed, 31 May 2017 09:34:43 -0400
-References: <149623617700.4947.12490877660892961664.stgit@bahia.lan>
-From: Laurent Vivier <lvivier@redhat.com>
-Message-ID: <ff8cc302-913c-9db4-1ed5-146db0a45c1a@redhat.com>
-Date: Wed, 31 May 2017 15:34:37 +0200
+	(envelope-from <mreitz@redhat.com>) id 1dG3od-0004pF-CZ
+	for qemu-devel@nongnu.org; Wed, 31 May 2017 09:37:36 -0400
+References: <20170503122539.282182-1-vsementsov@virtuozzo.com>
+	<20170503122539.282182-26-vsementsov@virtuozzo.com>
+	<2329cfc4-d5b3-9fe2-668d-fd6ba1f5d316@redhat.com>
+	<48da970c-8400-346b-6ade-543e9f314197@virtuozzo.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <fd318432-5da7-6554-91a2-38deb78adcf1@redhat.com>
+Date: Wed, 31 May 2017 15:37:18 +0200
 MIME-Version: 1.0
-In-Reply-To: <149623617700.4947.12490877660892961664.stgit@bahia.lan>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2] pc-bios/s390-ccw: use STRIP variable in
- Makefile
+In-Reply-To: <48da970c-8400-346b-6ade-543e9f314197@virtuozzo.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="hk30kO84cWlVvrvORIqVHHW3p7bF5sA2p"
+Subject: Re: [Qemu-devel] [PATCH 25/25] block: release persistent bitmaps on
+ inactivate
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,49 +27,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org
-Cc: Cornelia Huck <cornelia.huck@de.ibm.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Fam Zheng <famz@redhat.com>, Alexander Graf <agraf@suse.de>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, armbru@redhat.com, eblake@redhat.com, jsnow@redhat.com, famz@redhat.com, den@openvz.org, stefanha@redhat.com, pbonzini@redhat.com
 
-On 31/05/2017 15:09, Greg Kurz wrote:
-> The docker-run-test-build@debian-s390x-cross target fails with:
-> 
-> strip --strip-unneeded s390-ccw.elf -o s390-ccw.img
-> strip: Unable to recognise the format of the input file `s390-ccw.elf'
-> 
-> The configure script defines a STRIP makefile variable whose default
-> value is ${cross_prefix}strip. Let's use it.
-> 
-> We default to using the non-prefixed strip command in case --enable-debug
-> or --disable-strip was passed to configure during a regular build.
-> 
-> Signed-off-by: Greg Kurz <groug@kaod.org>
-> ---
-> v2: - added default value
->     - no longer Cc: qemu-trivial as it turned out to be not that trivial
-> 
-> Philippe,
-> 
-> Please give your Reviewed-by again if you're okay with this change.
-> ---
->  pc-bios/s390-ccw/Makefile |    4 +++-
->  1 file changed, 3 insertions(+), 1 deletion(-)
-> 
-> diff --git a/pc-bios/s390-ccw/Makefile b/pc-bios/s390-ccw/Makefile
-> index 79a46b67356f..fb88c13bc742 100644
-> --- a/pc-bios/s390-ccw/Makefile
-> +++ b/pc-bios/s390-ccw/Makefile
-> @@ -21,8 +21,10 @@ build-all: s390-ccw.img
->  s390-ccw.elf: $(OBJECTS)
->  	$(call quiet-command,$(CC) $(LDFLAGS) -o $@ $(OBJECTS),"BUILD","$(TARGET_DIR)$@")
->  
-> +STRIP ?= strip
-> +
->  s390-ccw.img: s390-ccw.elf
-> -	$(call quiet-command,strip --strip-unneeded $< -o $@,"STRIP","$(TARGET_DIR)$@")
-> +	$(call quiet-command,$(STRIP) --strip-unneeded $< -o $@,"STRIP","$(TARGET_DIR)$@")
->  
->  $(OBJECTS): Makefile
->  
-> 
-> 
-Reviewed-by: Laurent Vivier <lvivier@redhat.com>
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--hk30kO84cWlVvrvORIqVHHW3p7bF5sA2p
+From: Max Reitz <mreitz@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, armbru@redhat.com, eblake@redhat.com, jsnow@redhat.com,
+ famz@redhat.com, den@openvz.org, stefanha@redhat.com, pbonzini@redhat.com
+Message-ID: <fd318432-5da7-6554-91a2-38deb78adcf1@redhat.com>
+Subject: Re: [PATCH 25/25] block: release persistent bitmaps on inactivate
+References: <20170503122539.282182-1-vsementsov@virtuozzo.com>
+ <20170503122539.282182-26-vsementsov@virtuozzo.com>
+ <2329cfc4-d5b3-9fe2-668d-fd6ba1f5d316@redhat.com>
+ <48da970c-8400-346b-6ade-543e9f314197@virtuozzo.com>
+In-Reply-To: <48da970c-8400-346b-6ade-543e9f314197@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 2017-05-30 08:30, Vladimir Sementsov-Ogievskiy wrote:
+> 29.05.2017 20:54, Max Reitz wrote:
+>> On 2017-05-03 14:25, Vladimir Sementsov-Ogievskiy wrote:
+>>> We should release them here to reload on invalidate cache.
+>>>
+>>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com=
+>
+>>> ---
+>>>   block.c                      |  4 ++++
+>>>   block/dirty-bitmap.c         | 29 +++++++++++++++++++++++------
+>>>   include/block/dirty-bitmap.h |  1 +
+>>>   3 files changed, 28 insertions(+), 6 deletions(-)
+>>>
+>>> diff --git a/block.c b/block.c
+>>> index 795d36bb64..14896c65fa 100644
+>>> --- a/block.c
+>>> +++ b/block.c
+>>> @@ -4001,6 +4001,10 @@ static int
+>>> bdrv_inactivate_recurse(BlockDriverState *bs,
+>>>       if (setting_flag) {
+>>>           bs->open_flags |=3D BDRV_O_INACTIVE;
+>>>       }
+>>> +
+>>> +    /* At this point persistent bitmaps should be stored by format
+>>> driver */
+>> s/by format driver/by the format driver/
+>>
+>>> +    bdrv_release_persistent_dirty_bitmaps(bs);
+>> Also, as far as I can see, this doesn't store the bitmaps but just
+>> releases them (without storing them). I'm not sure whether that is
+>> right, but it definitely contradicts the comment above.
+>=20
+> I mean they should be _already_ stored.. They actually are stored in=20
+> qcow2_inactivate.
+
+Ah, right, that makes more sense.
+
+However, to be more clear the comment should then read "By this point"
+instead of "At this point"; maybe even "By this point the persistent
+bitmaps should have been stored by the format driver already", or a
+totally different "The format driver's bdrv_inactivate() implementation
+should have stored all persistent bitmaps".
+
+Max
+
+
+--hk30kO84cWlVvrvORIqVHHW3p7bF5sA2p
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iQEvBAEBCAAZBQJZLscOEhxtcmVpdHpAcmVkaGF0LmNvbQAKCRD0B9sAYdXPQI4D
+CACdHY8LrTKbGtIkqKn5aKrzh8VNa/Iqrnnk+2IMHDI6Pa7omcHKzsks12Y2gVVQ
+M/HzbsdKFUIoOmswqXWC68S9QAlNCgZqO4ukLixpqnlRerI4ynPGccHl+Npt6DCY
+uYVn5LuLdtIkoTS7SVLvFpHVmMwlx/jUeesTd2pymGsHDb+SXBrai0llLNlvUIjQ
+pmFQprh43jUp9EB4kD1M+7bSQwjr4ItbBhL3PsArCXGaejAg+aGMpoLSSCbYfChb
+VSsyN1C/vFiDUKOJqUwpxSAtWOvy0AUjfSTsmQ9nbRXp4z7llmwp3UTIR/PDj8KD
+/dynySp97QNIi7wH7RrVmemO
+=swiS
+-----END PGP SIGNATURE-----
+
+--hk30kO84cWlVvrvORIqVHHW3p7bF5sA2p--
