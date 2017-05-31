@@ -1,23 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43279)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44113)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dG3jP-0001AH-AG
-	for qemu-devel@nongnu.org; Wed, 31 May 2017 09:32:12 -0400
+	(envelope-from <lvivier@redhat.com>) id 1dG3lu-00032k-Jo
+	for qemu-devel@nongnu.org; Wed, 31 May 2017 09:34:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dG3jO-0002t0-4T
-	for qemu-devel@nongnu.org; Wed, 31 May 2017 09:32:11 -0400
-Date: Wed, 31 May 2017 10:32:01 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20170531133201.GS32274@thinpad.lan.raisama.net>
-References: <1496161442-96665-1-git-send-email-imammedo@redhat.com>
-	<1496161442-96665-8-git-send-email-imammedo@redhat.com>
-	<20170530200332.GR32274@thinpad.lan.raisama.net>
-	<20170531105027.4dc177f6@nial.brq.redhat.com>
+	(envelope-from <lvivier@redhat.com>) id 1dG3lr-0003nv-9g
+	for qemu-devel@nongnu.org; Wed, 31 May 2017 09:34:46 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54584)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <lvivier@redhat.com>) id 1dG3lr-0003nW-36
+	for qemu-devel@nongnu.org; Wed, 31 May 2017 09:34:43 -0400
+References: <149623617700.4947.12490877660892961664.stgit@bahia.lan>
+From: Laurent Vivier <lvivier@redhat.com>
+Message-ID: <ff8cc302-913c-9db4-1ed5-146db0a45c1a@redhat.com>
+Date: Wed, 31 May 2017 15:34:37 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170531105027.4dc177f6@nial.brq.redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v3 7/7] numa: cpu: calculate/set default
- node-ids after all -numa CLI options are parsed
+In-Reply-To: <149623617700.4947.12490877660892961664.stgit@bahia.lan>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2] pc-bios/s390-ccw: use STRIP variable in
+ Makefile
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,123 +28,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: Andrew Jones <drjones@redhat.com>, qemu-arm@nongnu.org, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
+To: Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org
+Cc: Cornelia Huck <cornelia.huck@de.ibm.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Fam Zheng <famz@redhat.com>, Alexander Graf <agraf@suse.de>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
 
-On Wed, May 31, 2017 at 10:50:27AM +0200, Igor Mammedov wrote:
-> On Tue, 30 May 2017 17:03:32 -0300
-> Eduardo Habkost <ehabkost@redhat.com> wrote:
+On 31/05/2017 15:09, Greg Kurz wrote:
+> The docker-run-test-build@debian-s390x-cross target fails with:
 > 
-> > On Tue, May 30, 2017 at 06:24:02PM +0200, Igor Mammedov wrote:
-> [...]
-> > > diff --git a/include/hw/boards.h b/include/hw/boards.h
-> > > index 76ce021..063f329 100644
-> > > --- a/include/hw/boards.h
-> > > +++ b/include/hw/boards.h
-> > > @@ -94,6 +94,8 @@ typedef struct {
-> > >   *    Returns an array of @CPUArchId architecture-dependent CPU IDs
-> > >   *    which includes CPU IDs for present and possible to hotplug CPUs.
-> > >   *    Caller is responsible for freeing returned list.
-> > > + * @get_default_cpu_node_id:
-> > > + *    returns default board specific node_id value for CPU
-> > >   * @has_hotpluggable_cpus:
-> > >   *    If true, board supports CPUs creation with -device/device_add.
-> > >   * @minimum_page_bits:
-> > > @@ -151,6 +153,7 @@ struct MachineClass {
-> > >      CpuInstanceProperties (*cpu_index_to_instance_props)(MachineState *machine,
-> > >                                                           unsigned cpu_index);
-> > >      const CPUArchIdList *(*possible_cpu_arch_ids)(MachineState *machine);
-> > > +    int64_t (*get_default_cpu_node_id)(const MachineState *ms, int idx);  
-> > 
-> > Aren't we trying to move away from cpu_index-based CPU
-> > identification?  Shouldn't we make this get a CPUArchId argument?
-> it's not cpu-index but index in possible_cpus[],
-> it's possible to pass in CPUArchId argument and then in callbacks
-> compute it's index in possible_cpus[] but that seems
-> a bit unnecessary and would complicate callback impl.
+> strip --strip-unneeded s390-ccw.elf -o s390-ccw.img
+> strip: Unable to recognise the format of the input file `s390-ccw.elf'
 > 
-> Probably I should add doc comment explaining 'idx' meaning.
+> The configure script defines a STRIP makefile variable whose default
+> value is ${cross_prefix}strip. Let's use it.
 > 
-> > >  };
-> > >  
-> > >  /**
-> > > diff --git a/include/sysemu/numa.h b/include/sysemu/numa.h
-> > > index 610eece..ea123ef 100644
-> > > --- a/include/sysemu/numa.h
-> > > +++ b/include/sysemu/numa.h
-> > > @@ -36,4 +36,13 @@ void numa_legacy_auto_assign_ram(MachineClass *mc, NodeInfo *nodes,
-> > >  void numa_default_auto_assign_ram(MachineClass *mc, NodeInfo *nodes,
-> > >                                    int nb_nodes, ram_addr_t size);
-> > >  void numa_cpu_pre_plug(const CPUArchId *slot, DeviceState *dev, Error **errp);
-> > > +
-> > > +static inline void assert_nb_numa_nodes_change(void)  
-> > 
-> > Can you document the purpose of this function?
-> > 
-> > > +{
-> > > +    static int saved_nb_numa_nodes;
-> > > +    assert(nb_numa_nodes);
-> > > +    assert(saved_nb_numa_nodes == 0 || saved_nb_numa_nodes == nb_numa_nodes);
-> > > +    saved_nb_numa_nodes = nb_numa_nodes;
-> > > +}
-> > > +
-> > >  #endif
-> > > diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-> > > index ce676df..74f1453 100644
-> > > --- a/hw/arm/virt.c
-> > > +++ b/hw/arm/virt.c
-> > > @@ -1553,6 +1553,13 @@ virt_cpu_index_to_props(MachineState *ms, unsigned cpu_index)
-> > >      return possible_cpus->cpus[cpu_index].props;
-> > >  }
-> > >  
-> > > +static int64_t virt_get_default_cpu_node_id(const MachineState *ms, int idx)
-> > > +{
-> > > +    assert(nb_numa_nodes);
-> > > +    assert_nb_numa_nodes_change();  
-> > 
-> > I would move this assert to common code instead of copying it to
-> > all implementations.
-> > 
-> > A machine_get_default_cpu_node_id() wrapper that calls
-> > assert_nb_numa_nodes_change() and mc->get_default_cpu_node_id()
-> > would be enough, and it wouldn't even need to be declared in a
-> > header as the only caller would be at hw/core/machine.c.
-> > 
-> > (Or, if you prefer to simply drop the assert(), I think that
-> > would be OK too.)
-> Callbacks are 'public' API and potentially could be called from anywhere.
-
-I don't think that's true.  Just like some struct fields aren't
-supposed to be touched by other code, a callback can be
-considered private and not supposed to be called from other code.
-
-e.g.: it is invalid to call DeviceClass::realize directly outside
-device_set_realized(), or to call MachineClass::init outside
-machine_run_board_init().
-
-
-> Putting asserts inside of callbacks instead of the current single call site
-> should help to catch errors/wrong usage in future if callback were called
-> from elsewhere.
+> We default to using the non-prefixed strip command in case --enable-debug
+> or --disable-strip was passed to configure during a regular build.
 > 
-> So I'd prefer to keep it where it's now or drop it altogether
-> as it's not much of use at the current call site.
-
-I think it's unnecessary complexity.  But if you insist, I won't
-mind as long as you document the purpose of
-assert_nb_numa_nodes_change() clearly.
-
-
+> Signed-off-by: Greg Kurz <groug@kaod.org>
+> ---
+> v2: - added default value
+>     - no longer Cc: qemu-trivial as it turned out to be not that trivial
+> 
+> Philippe,
+> 
+> Please give your Reviewed-by again if you're okay with this change.
+> ---
+>  pc-bios/s390-ccw/Makefile |    4 +++-
+>  1 file changed, 3 insertions(+), 1 deletion(-)
+> 
+> diff --git a/pc-bios/s390-ccw/Makefile b/pc-bios/s390-ccw/Makefile
+> index 79a46b67356f..fb88c13bc742 100644
+> --- a/pc-bios/s390-ccw/Makefile
+> +++ b/pc-bios/s390-ccw/Makefile
+> @@ -21,8 +21,10 @@ build-all: s390-ccw.img
+>  s390-ccw.elf: $(OBJECTS)
+>  	$(call quiet-command,$(CC) $(LDFLAGS) -o $@ $(OBJECTS),"BUILD","$(TARGET_DIR)$@")
 >  
-> > > +    return idx % nb_numa_nodes;
-> > > +}
-> > > +
-> > >  static const CPUArchIdList *virt_possible_cpu_arch_ids(MachineState *ms)
-> > >  {
-> > >      int n;
-> [...]
+> +STRIP ?= strip
+> +
+>  s390-ccw.img: s390-ccw.elf
+> -	$(call quiet-command,strip --strip-unneeded $< -o $@,"STRIP","$(TARGET_DIR)$@")
+> +	$(call quiet-command,$(STRIP) --strip-unneeded $< -o $@,"STRIP","$(TARGET_DIR)$@")
+>  
+>  $(OBJECTS): Makefile
+>  
 > 
 > 
-
--- 
-Eduardo
+Reviewed-by: Laurent Vivier <lvivier@redhat.com>
