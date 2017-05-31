@@ -1,27 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38820)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40840)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1dG4uX-0004FB-HO
-	for qemu-devel@nongnu.org; Wed, 31 May 2017 10:47:46 -0400
+	(envelope-from <mreitz@redhat.com>) id 1dG50d-0007Il-Vf
+	for qemu-devel@nongnu.org; Wed, 31 May 2017 10:54:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1dG4uT-00067E-KS
-	for qemu-devel@nongnu.org; Wed, 31 May 2017 10:47:45 -0400
-Received: from mail-wm0-x229.google.com ([2a00:1450:400c:c09::229]:36346)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1dG4uT-00064U-CT
-	for qemu-devel@nongnu.org; Wed, 31 May 2017 10:47:41 -0400
-Received: by mail-wm0-x229.google.com with SMTP id 7so121608984wmo.1
-	for <qemu-devel@nongnu.org>; Wed, 31 May 2017 07:47:39 -0700 (PDT)
-References: <1487255507-106654-1-git-send-email-pbonzini@redhat.com>
-	<1487255507-106654-10-git-send-email-pbonzini@redhat.com>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <1487255507-106654-10-git-send-email-pbonzini@redhat.com>
-Date: Wed, 31 May 2017 15:47:53 +0100
-Message-ID: <871sr5t752.fsf@linaro.org>
+	(envelope-from <mreitz@redhat.com>) id 1dG50Z-0000DY-Q2
+	for qemu-devel@nongnu.org; Wed, 31 May 2017 10:54:04 -0400
+References: <20170524202842.26724-1-eblake@redhat.com>
+	<20170524202842.26724-4-eblake@redhat.com>
+	<20170525063444.GC27936@lemon.lan>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <6d1ca99c-ea04-1ce1-cf46-7d95d5d0cdb8@redhat.com>
+Date: Wed, 31 May 2017 16:53:39 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PULL 09/23] gdbstub: Fix vCont behaviour
+In-Reply-To: <20170525063444.GC27936@lemon.lan>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="nNT7dSQe8e8sW9ovqNG6Cc5OeiRfKOG8O"
+Subject: Re: [Qemu-devel] [PATCH v2 3/5] block: Allow NULL file for
+ bdrv_get_block_status()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,112 +26,146 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: qemu-devel@nongnu.org, Claudio Imbrenda <imbrenda@linux.vnet.ibm.com>
+To: Fam Zheng <famz@redhat.com>, Eric Blake <eblake@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, jsnow@redhat.com, Stefan Hajnoczi <stefanha@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Jeff Cody <jcody@redhat.com>
+
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--nNT7dSQe8e8sW9ovqNG6Cc5OeiRfKOG8O
+From: Max Reitz <mreitz@redhat.com>
+To: Fam Zheng <famz@redhat.com>, Eric Blake <eblake@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, jsnow@redhat.com,
+ Stefan Hajnoczi <stefanha@redhat.com>, Kevin Wolf <kwolf@redhat.com>,
+ Jeff Cody <jcody@redhat.com>
+Message-ID: <6d1ca99c-ea04-1ce1-cf46-7d95d5d0cdb8@redhat.com>
+Subject: Re: [PATCH v2 3/5] block: Allow NULL file for bdrv_get_block_status()
+References: <20170524202842.26724-1-eblake@redhat.com>
+ <20170524202842.26724-4-eblake@redhat.com> <20170525063444.GC27936@lemon.lan>
+In-Reply-To: <20170525063444.GC27936@lemon.lan>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 2017-05-25 08:34, Fam Zheng wrote:
+> On Wed, 05/24 15:28, Eric Blake wrote:
+>> Not all callers care about which BDS owns the mapping for a given
+>> range of the file.  This patch merely simplifies the callers by
+>> consolidating the logic in the common call point, while guaranteeing
+>> a non-NULL file to all the driver callbacks, for no semantic change.
+>>
+>> However, this will also set the stage for a future cleanup: when a
+>> caller does not care about which BDS owns an offset, it would be
+>> nice to allow the driver to optimize things to not have to return
+>> BDRV_BLOCK_OFFSET_VALID in the first place.  In the case of fragmented=
+
+>> allocation (for example, it's fairly easy to create a qcow2 image
+>> where consecutive guest addresses are not at consecutive host
+>> addresses), the current contract requires bdrv_get_block_status()
+>> to clamp *pnum to the limit where host addresses are no longer
+>> consecutive, but allowing a NULL file means that *pnum could be
+>> set to the full length of known-allocated data.
+>>
+>> Signed-off-by: Eric Blake <eblake@redhat.com>
+>>
+>> ---
+>> v2: new patch
+>=20
+> Yes. any particular reason why this patch is useful, besides simplifyin=
+g
+> callers?
+>=20
+>=20
+>> ---
+>>  block/io.c     | 15 +++++++++------
+>>  block/mirror.c |  3 +--
+>>  block/qcow2.c  |  4 +---
+>>  qemu-img.c     | 10 ++++------
+>>  4 files changed, 15 insertions(+), 17 deletions(-)
+>>
+>> diff --git a/block/io.c b/block/io.c
+>> index 8e6c3fe..eea74cb 100644
+>> --- a/block/io.c
+>> +++ b/block/io.c
+>> @@ -706,7 +706,6 @@ int bdrv_make_zero(BdrvChild *child, BdrvRequestFl=
+ags flags)
+>>  {
+>>      int64_t target_sectors, ret, nb_sectors, sector_num =3D 0;
+>>      BlockDriverState *bs =3D child->bs;
+>> -    BlockDriverState *file;
+>>      int n;
+>>
+>>      target_sectors =3D bdrv_nb_sectors(bs);
+>> @@ -719,7 +718,7 @@ int bdrv_make_zero(BdrvChild *child, BdrvRequestFl=
+ags flags)
+>>          if (nb_sectors <=3D 0) {
+>>              return 0;
+>>          }
+>> -        ret =3D bdrv_get_block_status(bs, sector_num, nb_sectors, &n,=
+ &file);
+>> +        ret =3D bdrv_get_block_status(bs, sector_num, nb_sectors, &n,=
+ NULL);
+>>          if (ret < 0) {
+>>              error_report("error getting block status at sector %" PRI=
+d64 ": %s",
+>>                           sector_num, strerror(-ret));
+>> @@ -1737,8 +1736,9 @@ typedef struct BdrvCoGetBlockStatusData {
+>>   * 'nb_sectors' is the max value 'pnum' should be set to.  If nb_sect=
+ors goes
+>>   * beyond the end of the disk image it will be clamped.
+>>   *
+>> - * If returned value is positive and BDRV_BLOCK_OFFSET_VALID bit is s=
+et, 'file'
+>> - * points to the BDS which the sector range is allocated in.
+>> + * If returned value is positive, BDRV_BLOCK_OFFSET_VALID bit is set,=
+ and
+>> + * 'file' is non-NULL, then '*file' points to the BDS which the secto=
+r range
+>> + * is allocated in.
+>=20
+> Sounds good.
+>=20
+>>   */
+>>  static int64_t coroutine_fn bdrv_co_get_block_status(BlockDriverState=
+ *bs,
+>>                                                       int64_t sector_n=
+um,
+>> @@ -1748,7 +1748,11 @@ static int64_t coroutine_fn bdrv_co_get_block_s=
+tatus(BlockDriverState *bs,
+>>      int64_t total_sectors;
+>>      int64_t n;
+>>      int64_t ret, ret2;
+>> +    BlockDriverState *tmpfile;
+>>
+>> +    if (!file) {
+>> +        file =3D &tmpfile;
+>> +    }
+>=20
+> I don't like this hunk. Instead, how about replacing all "*file =3D ...=
+" with
+> "tmpfile =3D ..." and add "if (file) { *file =3D tmpfile; }" before ret=
+urning?
+
+Sounds fine to me, but in that case I'd like to request a different
+variable name. Maybe do what we have with errp/local_error and make it
+local_file or something?
+
+Max
 
 
-Paolo Bonzini <pbonzini@redhat.com> writes:
+--nNT7dSQe8e8sW9ovqNG6Cc5OeiRfKOG8O
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-> From: Claudio Imbrenda <imbrenda@linux.vnet.ibm.com>
->
-> When GDB issues a "vCont", QEMU was not handling it correctly when
-> multiple VCPUs are active.
-> For vCont, for each thread (VCPU), it can be specified whether to
-> single step, continue or stop that thread. The default is to stop a
-> thread.
-<snip>
->
-> +/**
-> + * gdb_handle_vcont - Parses and handles a vCont packet.
-> + * returns -ENOTSUP if a command is unsupported, -EINVAL or -ERANGE if there is
-> + *         a format error, 0 on success.
-> + */
-> +static int gdb_handle_vcont(GDBState *s, const char *p)
-> +{
-> +    int res, idx, signal = 0;
-> +    char cur_action;
-> +    char *newstates;
-> +    unsigned long tmp;
-> +    CPUState *cpu;
-> +#ifdef CONFIG_USER_ONLY
-> +    int max_cpus = 1; /* global variable max_cpus exists only in system mode */
-> +
-> +    CPU_FOREACH(cpu) {
-> +        max_cpus = max_cpus <= cpu->cpu_index ? cpu->cpu_index + 1 : max_cpus;
-> +    }
-> +#endif
-> +    /* uninitialised CPUs stay 0 */
-> +    newstates = g_new0(char, max_cpus);
-> +
-> +    /* mark valid CPUs with 1 */
-> +    CPU_FOREACH(cpu) {
-> +        newstates[cpu->cpu_index] = 1;
-> +    }
-> +
-> +    /*
-> +     * res keeps track of what error we are returning, with -ENOTSUP meaning
-> +     * that the command is unknown or unsupported, thus returning an empty
-> +     * packet, while -EINVAL and -ERANGE cause an E22 packet, due to invalid,
-> +     *  or incorrect parameters passed.
-> +     */
-> +    res = 0;
-> +    while (*p) {
-> +        if (*p++ != ';') {
-> +            res = -ENOTSUP;
-> +            goto out;
-> +        }
-> +
-> +        cur_action = *p++;
-> +        if (cur_action == 'C' || cur_action == 'S') {
-> +            cur_action = tolower(cur_action);
-> +            res = qemu_strtoul(p + 1, &p, 16, &tmp);
-> +            if (res) {
-> +                goto out;
-> +            }
-> +            signal = gdb_signal_to_target(tmp);
-> +        } else if (cur_action != 'c' && cur_action != 's') {
-> +            /* unknown/invalid/unsupported command */
-> +            res = -ENOTSUP;
-> +            goto out;
-> +        }
-> +        /* thread specification. special values: (none), -1 = all; 0 = any */
-> +        if ((p[0] == ':' && p[1] == '-' && p[2] == '1') || (p[0] != ':')) {
-> +            if (*p == ':') {
-> +                p += 3;
-> +            }
-> +            for (idx = 0; idx < max_cpus; idx++) {
-> +                if (newstates[idx] == 1) {
-> +                    newstates[idx] = cur_action;
-> +                }
-> +            }
-> +        } else if (*p == ':') {
-> +            p++;
-> +            res = qemu_strtoul(p, &p, 16, &tmp);
-> +            if (res) {
-> +                goto out;
-> +            }
-> +            idx = tmp;
-> +            /* 0 means any thread, so we pick the first valid CPU */
-> +            if (!idx) {
-> +                idx = cpu_index(first_cpu);
-> +            }
-> +
-> +            /*
-> +             * If we are in user mode, the thread specified is actually a
-> +             * thread id, and not an index. We need to find the actual
-> +             * CPU first, and only then we can use its index.
-> +             */
-> +            cpu = find_cpu(idx);
-> +            /* invalid CPU/thread specified */
-> +            if (!idx || !cpu) {
-> +                res = -EINVAL;
-> +                goto out;
-> +            }
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
 
-This fails on a packet like vCont;C04:0;c where we do find a cpu but it
-happens to have a internal cpu_index of 0.
+iQEvBAEBCAAZBQJZLtjzEhxtcmVpdHpAcmVkaGF0LmNvbQAKCRD0B9sAYdXPQMPI
+CACe1yQlmG2RdHqMh4EEjgRArfeWrpalybzm+oohtgzFCGrhFWcGa1AlSVInaTva
+h/wXwIlo+sn9WFWiUIj7aTRaAjLyATeIR51EB64WvYuezy4FjmGw9sjAWWvBB9Hi
+c8eIsTIJv613AhUZDFG1nLZsKl1cBjYhrL9kzA5ITsE8C7Dh/Qys7bSU6qECG6gt
+VO2oDrAHRE06gXtELJhxNSzR17q1v9AUUIKXW+wg4EeI70Rx2spnkA7rWTJQWrpm
+d/P6gEDEHrgez6i7utujKdSw1VRgzVHytHuxYZecFGDKtO4vLdgATaJ6MRDMx+Me
+BK4zzA1rtrDcStCiN4gUSdYk
+=dW5j
+-----END PGP SIGNATURE-----
 
-I'm sending a patch.
-
---
-Alex Bennée
+--nNT7dSQe8e8sW9ovqNG6Cc5OeiRfKOG8O--
