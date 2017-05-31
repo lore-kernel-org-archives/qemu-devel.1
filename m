@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54873)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55691)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dG8ha-0005jk-F1
-	for qemu-devel@nongnu.org; Wed, 31 May 2017 14:50:39 -0400
+	(envelope-from <quintela@redhat.com>) id 1dG8jT-0006hn-Nw
+	for qemu-devel@nongnu.org; Wed, 31 May 2017 14:52:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dG8hX-0005ID-AM
-	for qemu-devel@nongnu.org; Wed, 31 May 2017 14:50:38 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:41962)
+	(envelope-from <quintela@redhat.com>) id 1dG8jQ-0006AT-LL
+	for qemu-devel@nongnu.org; Wed, 31 May 2017 14:52:35 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42164)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dG8hX-0005Hk-1N
-	for qemu-devel@nongnu.org; Wed, 31 May 2017 14:50:35 -0400
-References: <20170531165541.47338-1-vsementsov@virtuozzo.com>
-	<20170531165541.47338-4-vsementsov@virtuozzo.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <1ad9ba3c-f7cc-c46b-7126-a2e9be5263f8@redhat.com>
-Date: Wed, 31 May 2017 13:50:32 -0500
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1dG8jQ-00069i-BU
+	for qemu-devel@nongnu.org; Wed, 31 May 2017 14:52:32 -0400
+From: Juan Quintela <quintela@redhat.com>
+In-Reply-To: <20170529135520.101429-5-pasic@linux.vnet.ibm.com> (Halil Pasic's
+	message of "Mon, 29 May 2017 15:55:17 +0200")
+References: <20170529135520.101429-1-pasic@linux.vnet.ibm.com>
+	<20170529135520.101429-5-pasic@linux.vnet.ibm.com>
+Reply-To: quintela@redhat.com
+Date: Wed, 31 May 2017 20:52:29 +0200
+Message-ID: <87a85sc102.fsf@secure.mitica>
 MIME-Version: 1.0
-In-Reply-To: <20170531165541.47338-4-vsementsov@virtuozzo.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="qKTIiWJdC5emPpLoOSiMJl7X2F4mRkfkB"
-Subject: Re: [Qemu-devel] [PATCH 03/12] nbd/server: get rid of
- nbd_negotiate_read and friends
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v2 4/7] s390x/css: add missing css state
+ conditionally
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,84 +29,97 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org
-Cc: pbonzini@redhat.com, den@openvz.org
+To: Halil Pasic <pasic@linux.vnet.ibm.com>
+Cc: Cornelia Huck <cornelia.huck@de.ibm.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, qemu-devel@nongnu.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---qKTIiWJdC5emPpLoOSiMJl7X2F4mRkfkB
-From: Eric Blake <eblake@redhat.com>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-devel@nongnu.org
-Cc: pbonzini@redhat.com, den@openvz.org
-Message-ID: <1ad9ba3c-f7cc-c46b-7126-a2e9be5263f8@redhat.com>
-Subject: Re: [PATCH 03/12] nbd/server: get rid of nbd_negotiate_read and
- friends
-References: <20170531165541.47338-1-vsementsov@virtuozzo.com>
- <20170531165541.47338-4-vsementsov@virtuozzo.com>
-In-Reply-To: <20170531165541.47338-4-vsementsov@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 05/31/2017 11:55 AM, Vladimir Sementsov-Ogievskiy wrote:
-> Functions nbd_negotiate_{read,write,drop_sync} were introduced in
-> 1a6245a5b, when nbd_rwv (was nbd_wr_sync) was working through
-> qemu_co_sendv_recvv (the path is nbd_wr_sync -> qemu_co_{recv/send} ->
-> qemu_co_send_recv -> qemu_co_sendv_recvv), which just yields, without
-> setting any handlers. But starting from ff82911cd nbd_rwv (was
-> nbd_wr_syncv) works through qio_channel_yield() which sets handlers, so=
-
-> watchers are redundant in nbd_negotiate_{read,write,drop_sync}, then,
-> let's just use nbd_{read,write,drop} functions.
->=20
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Halil Pasic <pasic@linux.vnet.ibm.com> wrote:
+> Although we have recently vmstatified the migration of some css
+> infrastructure,  for some css entities there is still state to be
+> migrated left, because the focus was keeping migration stream
+> compatibility (that is basically everything as-is).
+>
+> Let us add vmstate helpers and extend existing vmstate descriptions so
+> that we have everything we need. Let us guard the added state with via
+> css_migration_enabled, so we keep the compatible behavior if css
+> migration is disabled.
+>
+> Let's also annotate the bits which do not need to be migrated for better
+> readability.
+>
+> Signed-off-by: Halil Pasic <pasic@linux.vnet.ibm.com>
 > ---
->  nbd/server.c | 107 ++++++++++++---------------------------------------=
---------
->  1 file changed, 22 insertions(+), 85 deletions(-)
+>  hw/intc/s390_flic.c | 20 +++++++++++++++
+>  hw/s390x/css.c      | 74 +++++++++++++++++++++++++++++++++++++++++++++++++++++
+>  2 files changed, 94 insertions(+)
+
+Reviewed-by: Juan Quintela <quintela@redhat.com>
 
 
->     Server         Client
-> @@ -205,22 +142,22 @@ static int nbd_negotiate_send_rep_len(QIOChannel =
-*ioc, uint32_t type,
->            type, opt, len);
-> =20
->      magic =3D cpu_to_be64(NBD_REP_MAGIC);
-> -    if (nbd_negotiate_write(ioc, &magic, sizeof(magic)) < 0) {
-> +    if (nbd_write(ioc, &magic, sizeof(magic), NULL) < 0) {
->          LOG("write failed (rep magic)");
->          return -EINVAL;
+For the vmstate bits.  I have exactly zero clue about s390
 
-This says that you are ignoring errors (via errp) rather than reporting
-them (because we LOG() it instead).  You do clean it up later, but it
-would be nice to mention that in the commit message.
+> +static const VMStateDescription vmstate_chp_info = {
+> +    .name = "s390_chp_info",
+> +    .version_id = 1,
+> +    .minimum_version_id = 1,
+> +    .fields = (VMStateField[]) {
+> +        VMSTATE_UINT8(in_use, ChpInfo),
+> +        VMSTATE_UINT8(type, ChpInfo),
+> +        VMSTATE_UINT8(is_virtual, ChpInfo),
+> +        VMSTATE_END_OF_LIST()
+> +    }
+> +};
+> +
+>  typedef struct SubchSet {
+>      SubchDev *sch[MAX_SCHID + 1];
+>      unsigned long schids_used[BITS_TO_LONGS(MAX_SCHID + 1)];
+> @@ -215,6 +248,19 @@ typedef struct CssImage {
+>      ChpInfo chpids[MAX_CHPID + 1];
+>  } CssImage;
+>  
+> +static const VMStateDescription vmstate_css_img = {
+> +    .name = "s390_css_img",
+> +    .version_id = 1,
+> +    .minimum_version_id = 1,
+> +    .fields = (VMStateField[]) {
+> +        /* Subchannel sets have no relevant state. */
+> +        VMSTATE_STRUCT_ARRAY(chpids, CssImage, MAX_CHPID + 1, 0,
+> +                             vmstate_chp_info, ChpInfo),
+> +        VMSTATE_END_OF_LIST()
+> +    }
+> +
+> +};
 
-But because we have the later error fixups, I'm okay with:
+> +static const VMStateDescription vmstate_css = {
+> +    .name = "s390_css",
+> +    .version_id = 1,
+> +    .minimum_version_id = 1,
+> +    .fields = (VMStateField[]) {
+> +        VMSTATE_QTAILQ_V(pending_crws, ChannelSubSys, 1, vmstate_crw_container,
+> +                         CrwContainer, sibling),
+> +        VMSTATE_BOOL(sei_pending, ChannelSubSys),
+> +        VMSTATE_BOOL(do_crw_mchk, ChannelSubSys),
+> +        VMSTATE_BOOL(crws_lost, ChannelSubSys),
+> +        /* These were kind of migrated by virtio */
+> +        VMSTATE_UINT8(max_cssid, ChannelSubSys),
+> +        VMSTATE_UINT8(max_ssid, ChannelSubSys),
+> +        VMSTATE_BOOL(chnmon_active, ChannelSubSys),
+> +        VMSTATE_UINT64(chnmon_area, ChannelSubSys),
+> +        VMSTATE_ARRAY_OF_POINTER_TO_STRUCT(css, ChannelSubSys, MAX_CSSID + 1,
+> +                0, vmstate_css_img, CssImage),
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
+I was about to suggest to move css from pointer to an embedded struct,
+and then noticed that MAX_CSSID is .... 65535.  I guess that this is
+going to be sparse, very sparse.  Perhaps there is an easier way to
+transmit it?
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+You are transmiting:
 
+65000 structs each of size MAX_CHPID (255) and each element is byte +
+byte +byte = 65000 * 255 * 3 = 47 MB.
 
---qKTIiWJdC5emPpLoOSiMJl7X2F4mRkfkB
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+If it is really sparse, I think that sending something like a list
+of <index in array> <contents> could make sense, no?
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+Or I am missunderstanding something?
 
-iQEcBAEBCAAGBQJZLxB4AAoJEKeha0olJ0NqMMkH/2EwbXtf80DLraPqbTcsRjGS
-xCbVIBnpi0EVOXCi9KKhPGB54PES2AVTXLA73kVHSfITm463UTbwVzaMINHrm0rx
-5vBs/1UPGUHkeczYuxcoq42rso8C/IhdN673KjDp0o7MAaM9o1WmWLyGhFVlFyqH
-0cWqtxIO15EXQbYYvBhGJAEat5KevcYugfkYTPbCplr+s9ACXBzZmRnyCSXbWa70
-8fm/fwrmbLFahOLsKkLvcVnN1NgMERhB0c01lHG+7+g+dv9VDSIIuaHypnt3Mr9h
-S1PrDlTGFmpIvRrqcjYj1zq0rq/sFd9aNVqG74mQiWGqFBObqgFzaREmRDkw/Tc=
-=2WVs
------END PGP SIGNATURE-----
-
---qKTIiWJdC5emPpLoOSiMJl7X2F4mRkfkB--
+Later, Juan.
