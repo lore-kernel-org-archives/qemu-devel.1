@@ -1,31 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59827)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60328)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1dG5rv-0002Lf-5Y
-	for qemu-devel@nongnu.org; Wed, 31 May 2017 11:49:08 -0400
+	(envelope-from <groug@kaod.org>) id 1dG5tH-00031c-BG
+	for qemu-devel@nongnu.org; Wed, 31 May 2017 11:50:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1dG5rr-0004px-3k
-	for qemu-devel@nongnu.org; Wed, 31 May 2017 11:49:07 -0400
-Received: from mailhub.sw.ru ([195.214.232.25]:40930 helo=relay.sw.ru)
+	(envelope-from <groug@kaod.org>) id 1dG5tD-0005oC-7I
+	for qemu-devel@nongnu.org; Wed, 31 May 2017 11:50:31 -0400
+Received: from 17.mo5.mail-out.ovh.net ([46.105.56.132]:59120)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
-	id 1dG5rq-0004lL-Ni
-	for qemu-devel@nongnu.org; Wed, 31 May 2017 11:49:03 -0400
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-References: <20170530143052.165002-1-vsementsov@virtuozzo.com>
-	<20170530143052.165002-2-vsementsov@virtuozzo.com>
-	<874e184b-3727-3bbc-0169-1073db203736@redhat.com>
-	<173a697e-274c-a2a7-63d2-f5dbf93f69e7@virtuozzo.com>
-	<e5021317-ec3a-def9-71ea-3dbc947a6e20@redhat.com>
-	<24d9876f-a555-773c-5277-af438bc45083@virtuozzo.com>
-Message-ID: <1b2c1c3f-e528-4bd0-848e-d3cccef8fc6e@virtuozzo.com>
-Date: Wed, 31 May 2017 18:48:59 +0300
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1dG5tC-0005n0-UM
+	for qemu-devel@nongnu.org; Wed, 31 May 2017 11:50:27 -0400
+Received: from player799.ha.ovh.net (b9.ovh.net [213.186.33.59])
+	by mo5.mail-out.ovh.net (Postfix) with ESMTP id 6B54FFF8B6
+	for <qemu-devel@nongnu.org>; Wed, 31 May 2017 17:50:25 +0200 (CEST)
+Date: Wed, 31 May 2017 17:50:18 +0200
+From: Greg Kurz <groug@kaod.org>
+Message-ID: <20170531175018.37024b80@bahia.lan>
+In-Reply-To: <20170531150933.10156-2-alex.bennee@linaro.org>
+References: <20170531150933.10156-1-alex.bennee@linaro.org>
+	<20170531150933.10156-2-alex.bennee@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <24d9876f-a555-773c-5277-af438bc45083@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH 01/19] nbd/server: get rid of
- nbd_negotiate_read and friends
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	boundary="Sig_/uB5.lNIzW0/6X26zfPlEYFg";
+	protocol="application/pgp-signature"
+Subject: Re: [Qemu-devel] [PATCH v1 1/2] gdbstub: modernise DEBUG_GDB
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,89 +31,225 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
-Cc: pbonzini@redhat.com, den@openvz.org
+To: Alex =?UTF-8?B?QmVubsOpZQ==?= <alex.bennee@linaro.org>
+Cc: pbonzini@redhat.com, doug16k@gmail.com, imbrenda@linux.vnet.ibm.com, qemu-devel@nongnu.org
 
-31.05.2017 17:56, Vladimir Sementsov-Ogievskiy wrote:
-> 31.05.2017 17:39, Eric Blake wrote:
->> On 05/31/2017 08:12 AM, Vladimir Sementsov-Ogievskiy wrote:
->>> 30.05.2017 23:10, Eric Blake wrote:
->>>> On 05/30/2017 09:30 AM, Vladimir Sementsov-Ogievskiy wrote:
->>>>> Functions nbd_negotiate_{read,write,drop_sync} were introduced in
->>>>> 1a6245a5b, when nbd_wr_syncv was working through qemu_co_sendv_recvv,
->>>> There is no qemu_co_sendv_recvv. Did you mean 
->>>> qemu_co_recv/qemu_co_send?
->>> qemu_co_recv is a macro, qemu_co_sendv_recvv - is an actual function,
->>> which do something.
->> Oh. I see where I went wrong - I was grepping for 'nbd_co_sendv' and
->> coming up short.
->>
->>> #define qemu_co_recv(sockfd, buf, bytes) \
->>>    qemu_co_send_recv(sockfd, buf, bytes, false)
->>>
->>> ssize_t coroutine_fn
->>> qemu_co_send_recv(int sockfd, void *buf, size_t bytes, bool do_send)
->>> {
->>>      struct iovec iov = { .iov_base = buf, .iov_len = bytes };
->>>      return qemu_co_sendv_recvv(sockfd, &iov, 1, 0, bytes, do_send);
->>> }
->> The commit message still makes me chase through several layers of
->> indirection, so I still wonder if referring to qemu_co_recv/qemu_co_send
->
-> I'll add a note like "(the path is nbd_wr_sync -> qemu_co_{recv/send} 
-> -> qemu_co_send_recv -> qemu_co_sendv_recvv)',
-> because I writing that qemu_co_recv yields will be confusing too.
->
->> (which is what is directly used in that older commit for nbd_wr_syncv)
->> is any better.  It is probably also worth referring back to commit
->> ff82911cd as the point in time where we switched to the qio_channel
->> code, thereby no longer needing to manage coroutine handlers quite as
->> directly as beforehand.
->
-> OK
->
->>
->>
->>>>> +int drop_sync(QIOChannel *ioc, size_t size, Error **errp)
->>>> As part of moving it into nbd/common.c, please rename this function to
->>>> an nbd_ prefix, since non-static functions are more likely to collide
->>>> with the rest of the code base if not properly named. Better yet: 
->>>> do it
->>>> in multiple patches:
->>>> - rename the static functions and fallout to callers (all of
->>>> nbd_drop_sync, nbd_read_sync, and nbd_write_sync)
->> In fact, does the _sync name buy us anything any more, or can we just go
->> with the shorter nbd_drop(), nbd_read(), and nbd_write()?
->
-> OK, good idea.
+--Sig_/uB5.lNIzW0/6X26zfPlEYFg
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-nbd_wr_syncv shoud be renamed then too.
+On Wed, 31 May 2017 16:09:32 +0100
+Alex Benn=C3=A9e <alex.bennee@linaro.org> wrote:
 
-As I understand, sync here is related to the fact that on EAGAIN from 
-socket the function doesn't return. now it is also true (but instead of 
-looping the function yields)..
+> Convert the a gdb_debug helper which compiles away to nothing when not
+> used but still ensures the format strings are checked. There is some
+> minor code motion for the incorrect checksum message to report it
+> before we attempt to send the reply.
+>=20
+> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+> ---
 
-On the other hand, it is normal for r/w functions to by synchronous, so 
-having additional suffix for it looks redundant (contrariwise, we have
-_aio suffix for async functions).
+Reviewed-by: Greg Kurz <groug@kaod.org>
 
-also, _sync suffix in block layer is used when function does flush (so 
-using it for other thing is confusing a bit).
->
->>
->>>> - code motion (promote nbd_drop_sync from static in client.c to 
->>>> exported
->>>> in common.c)
->>>> - drop nbd_negotiate_ functions in favor of common nbd_*_sync 
->>>> functions
->>> OK
->>>
->>>> The idea makes sense, but I think there's too much going on in this 
->>>> one
->>>> commit.
->>>>
->
+>  gdbstub.c | 77 +++++++++++++++++++++++++++------------------------------=
+------
+>  1 file changed, 33 insertions(+), 44 deletions(-)
+>=20
+> diff --git a/gdbstub.c b/gdbstub.c
+> index 86eed4f97c..a249846954 100644
+> --- a/gdbstub.c
+> +++ b/gdbstub.c
+> @@ -271,7 +271,20 @@ static int gdb_signal_to_target (int sig)
+>          return -1;
+>  }
+> =20
+> -//#define DEBUG_GDB
+> +/* #define DEBUG_GDB */
+> +
+> +#ifdef DEBUG_GDB
+> +# define DEBUG_GDB_GATE 1
+> +#else
+> +# define DEBUG_GDB_GATE 0
+> +#endif
+> +
+> +#define gdb_debug(fmt, ...) do { \
+> +    if (DEBUG_GDB_GATE) { \
+> +        fprintf(stderr, "%s: " fmt, __func__, ## __VA_ARGS__); \
+> +    } \
+> +} while (0)
+> +
+> =20
+>  typedef struct GDBRegisterState {
+>      int base_reg;
+> @@ -547,9 +560,7 @@ static int put_packet_binary(GDBState *s, const char =
+*buf, int len)
+>  /* return -1 if error, 0 if OK */
+>  static int put_packet(GDBState *s, const char *buf)
+>  {
+> -#ifdef DEBUG_GDB
+> -    printf("reply=3D'%s'\n", buf);
+> -#endif
+> +    gdb_debug("reply=3D'%s'\n", buf);
+> =20
+>      return put_packet_binary(s, buf, strlen(buf));
+>  }
+> @@ -955,9 +966,9 @@ static int gdb_handle_packet(GDBState *s, const char =
+*line_buf)
+>      uint8_t *registers;
+>      target_ulong addr, len;
+> =20
+> -#ifdef DEBUG_GDB
+> -    printf("command=3D'%s'\n", line_buf);
+> -#endif
+> +
+> +    gdb_debug("command=3D'%s'\n", line_buf);
+> +
+>      p =3D line_buf;
+>      ch =3D *p++;
+>      switch(ch) {
+> @@ -1518,17 +1529,14 @@ static void gdb_read_byte(GDBState *s, int ch)
+>          /* Waiting for a response to the last packet.  If we see the sta=
+rt
+>             of a new command then abandon the previous response.  */
+>          if (ch =3D=3D '-') {
+> -#ifdef DEBUG_GDB
+> -            printf("Got NACK, retransmitting\n");
+> -#endif
+> +            gdb_debug("Got NACK, retransmitting\n");
+>              put_buffer(s, (uint8_t *)s->last_packet, s->last_packet_len);
+> +        } else if (ch =3D=3D '+') {
+> +            gdb_debug("Got ACK\n");
+> +        } else {
+> +            gdb_debug("Got '%c' when expecting ACK/NACK\n", ch);
+>          }
+> -#ifdef DEBUG_GDB
+> -        else if (ch =3D=3D '+')
+> -            printf("Got ACK\n");
+> -        else
+> -            printf("Got '%c' when expecting ACK/NACK\n", ch);
+> -#endif
+> +
+>          if (ch =3D=3D '+' || ch =3D=3D '$')
+>              s->last_packet_len =3D 0;
+>          if (ch !=3D '$')
+> @@ -1549,9 +1557,7 @@ static void gdb_read_byte(GDBState *s, int ch)
+>                  s->line_sum =3D 0;
+>                  s->state =3D RS_GETLINE;
+>              } else {
+> -#ifdef DEBUG_GDB
+> -                printf("gdbstub received garbage between packets: 0x%x\n=
+", ch);
+> -#endif
+> +                gdb_debug("received garbage between packets: 0x%x\n", ch=
+);
+>              }
+>              break;
+>          case RS_GETLINE:
+> @@ -1567,9 +1573,7 @@ static void gdb_read_byte(GDBState *s, int ch)
+>                  /* end of command, start of checksum*/
+>                  s->state =3D RS_CHKSUM1;
+>              } else if (s->line_buf_index >=3D sizeof(s->line_buf) - 1) {
+> -#ifdef DEBUG_GDB
+> -                printf("gdbstub command buffer overrun, dropping command=
+\n");
+> -#endif
+> +                gdb_debug("command buffer overrun, dropping command\n");
+>                  s->state =3D RS_IDLE;
+>              } else {
+>                  /* unescaped command character */
+> @@ -1583,9 +1587,7 @@ static void gdb_read_byte(GDBState *s, int ch)
+>                  s->state =3D RS_CHKSUM1;
+>              } else if (s->line_buf_index >=3D sizeof(s->line_buf) - 1) {
+>                  /* command buffer overrun */
+> -#ifdef DEBUG_GDB
+> -                printf("gdbstub command buffer overrun, dropping command=
+\n");
+> -#endif
+> +                gdb_debug("command buffer overrun, dropping command\n");
+>                  s->state =3D RS_IDLE;
+>              } else {
+>                  /* parse escaped character and leave escape state */
+> @@ -1597,25 +1599,18 @@ static void gdb_read_byte(GDBState *s, int ch)
+>          case RS_GETLINE_RLE:
+>              if (ch < ' ') {
+>                  /* invalid RLE count encoding */
+> -#ifdef DEBUG_GDB
+> -                printf("gdbstub got invalid RLE count: 0x%x\n", ch);
+> -#endif
+> +                gdb_debug("got invalid RLE count: 0x%x\n", ch);
+>                  s->state =3D RS_GETLINE;
+>              } else {
+>                  /* decode repeat length */
+>                  int repeat =3D (unsigned char)ch - ' ' + 3;
+>                  if (s->line_buf_index + repeat >=3D sizeof(s->line_buf) =
+- 1) {
+>                      /* that many repeats would overrun the command buffe=
+r */
+> -#ifdef DEBUG_GDB
+> -                    printf("gdbstub command buffer overrun,"
+> -                           " dropping command\n");
+> -#endif
+> +                    gdb_debug("command buffer overrun, dropping command\=
+n");
+>                      s->state =3D RS_IDLE;
+>                  } else if (s->line_buf_index < 1) {
+>                      /* got a repeat but we have nothing to repeat */
+> -#ifdef DEBUG_GDB
+> -                    printf("gdbstub got invalid RLE sequence\n");
+> -#endif
+> +                    gdb_debug("got invalid RLE sequence\n");
+>                      s->state =3D RS_GETLINE;
+>                  } else {
+>                      /* repeat the last character */
+> @@ -1630,9 +1625,7 @@ static void gdb_read_byte(GDBState *s, int ch)
+>          case RS_CHKSUM1:
+>              /* get high hex digit of checksum */
+>              if (!isxdigit(ch)) {
+> -#ifdef DEBUG_GDB
+> -                printf("gdbstub got invalid command checksum digit\n");
+> -#endif
+> +                gdb_debug("got invalid command checksum digit\n");
+>                  s->state =3D RS_GETLINE;
+>                  break;
+>              }
+> @@ -1643,21 +1636,17 @@ static void gdb_read_byte(GDBState *s, int ch)
+>          case RS_CHKSUM2:
+>              /* get low hex digit of checksum */
+>              if (!isxdigit(ch)) {
+> -#ifdef DEBUG_GDB
+> -                printf("gdbstub got invalid command checksum digit\n");
+> -#endif
+> +                gdb_debug("got invalid command checksum digit\n");
+>                  s->state =3D RS_GETLINE;
+>                  break;
+>              }
+>              s->line_csum |=3D fromhex(ch);
+> =20
+>              if (s->line_csum !=3D (s->line_sum & 0xff)) {
+> +                gdb_debug("got command packet with incorrect checksum\n"=
+);
+>                  /* send NAK reply */
+>                  reply =3D '-';
+>                  put_buffer(s, &reply, 1);
+> -#ifdef DEBUG_GDB
+> -                printf("gdbstub got command packet with incorrect checks=
+um\n");
+> -#endif
+>                  s->state =3D RS_IDLE;
+>              } else {
+>                  /* send ACK reply */
 
--- 
-Best regards,
-Vladimir
+
+--Sig_/uB5.lNIzW0/6X26zfPlEYFg
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iEYEARECAAYFAlku5joACgkQAvw66wEB28LhdQCfSg6sYjDdjOblOE/925EP4cdR
+Xc0AnApjXzEDEdwhfEylqYxSx16MHtHP
+=4aQd
+-----END PGP SIGNATURE-----
+
+--Sig_/uB5.lNIzW0/6X26zfPlEYFg--
