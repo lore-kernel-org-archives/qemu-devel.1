@@ -1,25 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33244)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33391)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dG38i-0000Ok-Ad
-	for qemu-devel@nongnu.org; Wed, 31 May 2017 08:54:17 -0400
+	(envelope-from <stefanha@gmail.com>) id 1dG39N-0000mc-0B
+	for qemu-devel@nongnu.org; Wed, 31 May 2017 08:54:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dG38f-0008NA-5B
-	for qemu-devel@nongnu.org; Wed, 31 May 2017 08:54:16 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:59792)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1dG38e-0008N2-V1
-	for qemu-devel@nongnu.org; Wed, 31 May 2017 08:54:13 -0400
-References: <1496212144-14947-1-git-send-email-yang.zhong@intel.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <c5d963e7-ef71-0ed5-aaae-01d492e4fd8b@redhat.com>
-Date: Wed, 31 May 2017 14:54:05 +0200
+	(envelope-from <stefanha@gmail.com>) id 1dG39M-0008TH-D7
+	for qemu-devel@nongnu.org; Wed, 31 May 2017 08:54:57 -0400
+Date: Wed, 31 May 2017 13:54:48 +0100
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20170531125448.GB16733@stefanha-x1.localdomain>
+References: <1495830130-30611-1-git-send-email-kwolf@redhat.com>
+	<1495830130-30611-28-git-send-email-kwolf@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <1496212144-14947-1-git-send-email-yang.zhong@intel.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 0/6] tcg: move the tcg files into tcg/
- subdirectory.
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="1kVeyRzorzGcO9ta"
+Content-Disposition: inline
+In-Reply-To: <1495830130-30611-28-git-send-email-kwolf@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 27/29] qed: Simplify request handling
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,47 +24,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Yang Zhong <yang.zhong@intel.com>, eblake@redhat.com
-Cc: qemu-devel@nongnu.org, anthony.xu@intel.com
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: qemu-block@nongnu.org, pbonzini@redhat.com, qemu-devel@nongnu.org, stefanha@redhat.com, mreitz@redhat.com
 
 
+--1kVeyRzorzGcO9ta
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-On 31/05/2017 08:28, Yang Zhong wrote:
-> Move the tcg related files into tcg/ subdirectory, which will make
-> the code more clean in qemu. Next step, we will base on those changes 
-> to disable tcg.
+On Fri, May 26, 2017 at 10:22:08PM +0200, Kevin Wolf wrote:
+> Now that we process a request in the same coroutine from beginning to
+> end and don't drop out of it any more, we can look like a proper
+> coroutine-based driver and simply call qed_aio_next_io() and get a
+> return value from it instead of spawning an additional coroutine that
+> reenters the parent when it's done.
+>=20
+> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> ---
+>  block/qed.c | 106 ++++++++++++++++--------------------------------------=
+------
+>  block/qed.h |   3 +-
+>  2 files changed, 28 insertions(+), 81 deletions(-)
 
-You should also move cpu-exec.c, cpu-exec-common.c and cputlb.c.
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 
-Also, feel free to squash everything in a single patch.
-Thanks,
+--1kVeyRzorzGcO9ta
+Content-Type: application/pgp-signature; name="signature.asc"
 
-Paolo
+-----BEGIN PGP SIGNATURE-----
 
-> Yang Zhong (6):
->   tcg: move tcg-runtime.c to tcg/ subdirectory
->   tcg: move translate-all.c to tcg/ subdirectory
->   tcg: move tcg header file
->   tcg: move translate-common.c to tcg/ subdirectory
->   tcg: move tci.c to tcg/ subdirectory
->   tcg: change tcg related file's compile definition
-> 
->  Makefile.objs                                | 1 +
->  Makefile.target                              | 8 ++------
->  tcg/Makefile.objs                            | 2 ++
->  tcg-runtime.c => tcg/tcg-runtime.c           | 0
->  tci.c => tcg/tci.c                           | 0
->  tcg/trace-events                             | 6 ++++++
->  translate-all.c => tcg/translate-all.c       | 2 +-
->  translate-all.h => tcg/translate-all.h       | 0
->  translate-common.c => tcg/translate-common.c | 0
->  trace-events                                 | 3 ---
->  10 files changed, 12 insertions(+), 10 deletions(-)
->  create mode 100644 tcg/Makefile.objs
->  rename tcg-runtime.c => tcg/tcg-runtime.c (100%)
->  rename tci.c => tcg/tci.c (100%)
->  create mode 100644 tcg/trace-events
->  rename translate-all.c => tcg/translate-all.c (99%)
->  rename translate-all.h => tcg/translate-all.h (100%)
->  rename translate-common.c => tcg/translate-common.c (100%)
-> 
+iQEcBAEBAgAGBQJZLr0YAAoJEJykq7OBq3PIosQH/3UkUjBDEkBnib5n7Ll3ohb/
+0yWI+Dv/uumIAwqp9wZ7KQ7f+qVL8Eo6CH2u5C9XtGCNftWXQeg4T0KbJNmSVXBy
+0rrdKEdpr7m+hyjFrPwbR/a7t7EjWjMtHbW23ay2wwzrajCKG8vljC9OjEHnWYdI
+sUFQgbHIBCmrAbWAgacwT16yUFH1+4aDNoGtk6qew1m8bfOd9/0CU0lRlDDDYTRN
+H31edkf26RdSx5wn4g3ppKfRfFIky3l68XJNU6P0E2RyvYBbqEAAU+/ieQwemPBw
+B1GkOhdgj3+/l71U2HJWLYMw+ft0zO6X/ngJQLw0WTKJITnU+/M99Jd7NWGAwI0=
+=Ap+l
+-----END PGP SIGNATURE-----
+
+--1kVeyRzorzGcO9ta--
