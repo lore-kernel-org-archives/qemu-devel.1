@@ -1,19 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34161)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35844)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rjones@redhat.com>) id 1dG3Cq-0003Qy-Eh
-	for qemu-devel@nongnu.org; Wed, 31 May 2017 08:58:33 -0400
+	(envelope-from <stefanha@gmail.com>) id 1dG3KK-0005qK-2S
+	for qemu-devel@nongnu.org; Wed, 31 May 2017 09:06:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rjones@redhat.com>) id 1dG3Cn-0000h5-7v
-	for qemu-devel@nongnu.org; Wed, 31 May 2017 08:58:32 -0400
-Date: Wed, 31 May 2017 13:58:26 +0100
-From: "Richard W.M. Jones" <rjones@redhat.com>
-Message-ID: <20170531125826.GE31999@redhat.com>
-References: <20170531124418.15752-1-pbonzini@redhat.com>
+	(envelope-from <stefanha@gmail.com>) id 1dG3KH-0002ys-De
+	for qemu-devel@nongnu.org; Wed, 31 May 2017 09:06:16 -0400
+Received: from mail-wm0-x243.google.com ([2a00:1450:400c:c09::243]:32850)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1dG3KH-0002yW-7N
+	for qemu-devel@nongnu.org; Wed, 31 May 2017 09:06:13 -0400
+Received: by mail-wm0-x243.google.com with SMTP id b84so3511083wmh.0
+	for <qemu-devel@nongnu.org>; Wed, 31 May 2017 06:06:13 -0700 (PDT)
+Date: Wed, 31 May 2017 14:06:10 +0100
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20170531130609.GE16733@stefanha-x1.localdomain>
+References: <20170530100736.3338-1-roman.penyaev@profitbricks.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="+mQKy/8VjtYrTtD4"
 Content-Disposition: inline
-In-Reply-To: <20170531124418.15752-1-pbonzini@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] linuxboot_dma: compile for i486
+In-Reply-To: <20170530100736.3338-1-roman.penyaev@profitbricks.com>
+Subject: Re: [Qemu-devel] [PATCH v2 1/1] coroutine-lock: do not touch
+ coroutine after another one has been entered
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,78 +30,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: qemu-devel@nongnu.org, thuth@redhat.com, rob@landley.net, qemu-stable@nongnu.org
+To: Roman Pen <roman.penyaev@profitbricks.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-On Wed, May 31, 2017 at 02:44:18PM +0200, Paolo Bonzini wrote:
-> The ROM uses the cmovne instruction, which is new in Pentium Pro and does not
-> work when running QEMU with "-cpu 486".  Avoid producing that instruction.
-> 
-> Suggested-by: Richard W.M. Jones <rjones@redhat.com>
-> Suggested-by: Thomas Huth <thuth@redhat.com>
-> Reported-by: Rob Landley <rob@landley.net>
-> Cc: qemu-stable@nongnu.org
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 
-I tested this using the reporter's test image
-(http://landley.net/aboriginal/downloads/binaries/system-image-i486.tar.gz)
-and it fixes the problem over here.
+--+mQKy/8VjtYrTtD4
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-ACK.
+On Tue, May 30, 2017 at 12:07:36PM +0200, Roman Pen wrote:
+> diff --git a/util/qemu-coroutine-lock.c b/util/qemu-coroutine-lock.c
+> index 6328eed26bc6..d589d8c66d5e 100644
+> --- a/util/qemu-coroutine-lock.c
+> +++ b/util/qemu-coroutine-lock.c
+> @@ -77,10 +77,20 @@ void coroutine_fn qemu_co_queue_wait(CoQueue *queue, =
+CoMutex *mutex)
+>  void qemu_co_queue_run_restart(Coroutine *co)
+>  {
+>      Coroutine *next;
+> +    QSIMPLEQ_HEAD(, Coroutine) tmp_queue_wakeup =3D
+> +        QSIMPLEQ_HEAD_INITIALIZER(tmp_queue_wakeup);
+> =20
+>      trace_qemu_co_queue_run_restart(co);
+> -    while ((next =3D QSIMPLEQ_FIRST(&co->co_queue_wakeup))) {
+> -        QSIMPLEQ_REMOVE_HEAD(&co->co_queue_wakeup, co_queue_next);
+> +
+> +    /* Because "co" has yielded, any coroutine that we wakeup can resume=
+ it.
+> +     * If this happens and "co" terminates, co->co_queue_wakeup becomes
+> +     * invalid memory.  Therefore, use a temporary queue and do not touch
+> +     * the "co" coroutine as soon as you enter another one.
+> +     */
+> +    QSIMPLEQ_CONCAT(&tmp_queue_wakeup, &co->co_queue_wakeup);
+> +
+> +    while ((next =3D QSIMPLEQ_FIRST(&tmp_queue_wakeup))) {
+> +        QSIMPLEQ_REMOVE_HEAD(&tmp_queue_wakeup, co_queue_next);
+>          qemu_coroutine_enter(next);
+>      }
+>  }
 
-Rich.
+What happens if co remains alive and qemu_coroutine_enter(next) causes
+additional coroutines to add themselves to co->co_queue_wakeup?
 
->  pc-bios/linuxboot_dma.bin  | Bin 1536 -> 1536 bytes
->  pc-bios/optionrom/Makefile |   1 +
->  2 files changed, 1 insertion(+)
-> 
-> diff --git a/pc-bios/linuxboot_dma.bin b/pc-bios/linuxboot_dma.bin
-> index 218d3ab4a29bfb5ab7125ec7a4d29dad1860c673..d176f62797813e4b926dca9dfce7ce554dc1a4d6 100644
-> GIT binary patch
-> literal 1536
-> zcmeHFL2J`s82-{_T52KL%w~}udiW-YBE*9t=s~ClrIm^s9^6H6Pf%onr07*+kWd=L
-> zpW)d<4G1ZESU1FyUDSCf^YYaxioy<}t?!rmu^#*f?mHxJo;-Qp_kHp#Je^o$|2##;
-> zYs)n)qh6k7XI07O)9TW>>H@3WSgzkI-MW44`qG_Jxhgq7fAt@+rpuZy7{g_FpG^eo
-> zuoD<7Fjn!zK~Uydy3X@Fj1CnQuA}{tXz$^z=7>a?#S!%6CsARNbiO)h=v+Q~y@5O1
-> ze8y7!akTy&-YXMV@p3Es`0q*km+)Mtxe(3DE2)a5;c%$H0|Yu~mbnR0C7dKHR7Zsr
-> zmrccq5lm%U=wXc39<t?-(_m*ZnY&YH(d(0lj;0`jj8e`iWgX(jV5j3gg<B9Cgj2^d
-> zw;W8A$%i@ijhITTF%3U<ui*Zsgx!lc)pgIq-atzea+i1H+3Oj<V?5-VpBVlz4R#!?
-> zV3N_sX!mjsj*#|9H8ozR&D5ajsurT@(W<h&xG*;8UNvYI;`kVzRd@m7;AnvgFCdyy
-> zI>gV6@%Jl!9^%vQ9V0A-7a<bD(|L-BW|R)`qY*CS(3SQRXOVJqcpcuB8NLnUuosH3
-> zi{OJ7mufeeG{^49xY<M4U)CrSC7Fp}TjtSE>UkNnpxu8npp2ruY0}SsKn=BiGN9Y;
-> L*>&K*abWuoMsO(*
-> 
-> literal 1536
-> zcmeHF&ubGw6rN4Dn#RCxYN|nUh%gpJFME=L9)#^}1F5!ps0f07iy|#(O1<iu!xFNH
-> ze}?~naY4vZ57wZB1jMR`ST7r__~R&=_04QYJoq2jIn2&}@6GqV_sv^+G|^@MTxG^<
-> zD>W^nf~VP8b!3b3v@l;?V$SuIwL6uYt5>dGyH&BPBIn1?(K>6@S?eidI1hgSZ^wky
-> zNA%Hz@f^krJcQTH!Ptb+b>Z7QOZy_v)9!Gc_A*CUnxyOgP~7<9qN#In@`mGjfw=z$
-> z*1p4gW?~r|cz_FdqLT)y8y*s0Z-)z#_;!*cE?PD>cN4<HA{;MET(E~F0*Ke4l-T|Q
-> zN3kAs(B4Nz%(_i>CX-n&AUsLGXj9UuS(2NP%(`OENoGw|EGqnf#7ASHq-k?KrExJ~
-> z^CHnSr*VvZO%mMQmY+taei4m+{T$|c^(w4)XlpT*^|#=^eK`aF_0%gE_5j9w)aV=c
-> zk7$UtO_Fkt>S!)b5N*mx5@orPY(na#Hj4<S)0RarUXZ%Tp{&xoU+SGxcuC<|i62e-
-> zaCiw}LGfe}PpSO8%0DRczx~>MfwIDj65o<I`H@FBlkzycj5td1A}41qQPA(<_yF`A
-> z@IINro1ha6gE;8HfA4iFwHr(rWNnH$vl3XJyEGJ>hT<|dXkK7E?qHJ9XdoKqMjysh
-> NXm9N~@Si)N{RVuA8xQ~h
-> 
-> diff --git a/pc-bios/optionrom/Makefile b/pc-bios/optionrom/Makefile
-> index fa53d9e58e..a9a9e5e7eb 100644
-> --- a/pc-bios/optionrom/Makefile
-> +++ b/pc-bios/optionrom/Makefile
-> @@ -13,6 +13,7 @@ $(call set-vpath, $(SRC_PATH)/pc-bios/optionrom)
->  ifeq ($(lastword $(filter -O%, -O0 $(CFLAGS))),-O0)
->  override CFLAGS += -O2
->  endif
-> +override CFLAGS += -march=i486
->  
->  # Drop -fstack-protector and the like
->  QEMU_CFLAGS := $(filter -W%, $(QEMU_CFLAGS)) $(CFLAGS_NOPIE) -ffreestanding
-> -- 
-> 2.13.0
+I think they used to be entered but not anymore after this patch.  Not
+sure if anything depends on this behavior...
 
--- 
-Richard Jones, Virtualization Group, Red Hat http://people.redhat.com/~rjones
-Read my programming and virtualization blog: http://rwmj.wordpress.com
-Fedora Windows cross-compiler. Compile Windows programs, test, and
-build Windows installers. Over 100 libraries supported.
-http://fedoraproject.org/wiki/MinGW
+--+mQKy/8VjtYrTtD4
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJZLr/BAAoJEJykq7OBq3PIjd0H/Auq47nIHuSMOxX2kyl4qkEN
+h6ELhWxWQvvTUgihghtEbmJX2xw2BF+7zd/MNLP3pPePS0uzK3Ml/fpmq0JX6OOE
+LhbduSPAjuHtdjDVU+jNxdJFWHrpOVMKONhvlnO+Ec4Hr0DlGocsiQ5iC6N+LYaQ
+9WCSaFz28Ydflrab1wMF/FSYnRutjnpu2l2GfCevh4pIJUCL87cb34ia744x8iPL
+LPh1qhmIIZR84qGiUxf2chiXfr1xaeCcuuMRbekjN4SftXUd3ze0zLqEtKYRr2Pf
+cSX/AK7eMYG0caYdZp94wOaG67GFR84BQqER+KxJWhe2MY/ip67Qm90LXbwrzMM=
+=7N1Z
+-----END PGP SIGNATURE-----
+
+--+mQKy/8VjtYrTtD4--
