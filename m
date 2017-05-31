@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45955)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47436)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1dG6Rx-0005mp-SK
-	for qemu-devel@nongnu.org; Wed, 31 May 2017 12:26:51 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1dG6T2-0006RN-2p
+	for qemu-devel@nongnu.org; Wed, 31 May 2017 12:29:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1dG6Rb-0007uU-M7
-	for qemu-devel@nongnu.org; Wed, 31 May 2017 12:26:21 -0400
-Received: from mail-wm0-x22e.google.com ([2a00:1450:400c:c09::22e]:36346)
+	(envelope-from <alex.bennee@linaro.org>) id 1dG6SP-00009Z-SG
+	for qemu-devel@nongnu.org; Wed, 31 May 2017 12:27:28 -0400
+Received: from mail-wm0-x234.google.com ([2a00:1450:400c:c09::234]:36775)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1dG6Rb-0007tR-Cx
-	for qemu-devel@nongnu.org; Wed, 31 May 2017 12:25:59 -0400
-Received: by mail-wm0-x22e.google.com with SMTP id 7so125023128wmo.1
-	for <qemu-devel@nongnu.org>; Wed, 31 May 2017 09:25:59 -0700 (PDT)
+	id 1dG6SP-00008E-Kg
+	for qemu-devel@nongnu.org; Wed, 31 May 2017 12:26:49 -0400
+Received: by mail-wm0-x234.google.com with SMTP id 7so125051239wmo.1
+	for <qemu-devel@nongnu.org>; Wed, 31 May 2017 09:26:49 -0700 (PDT)
 References: <20170531150933.10156-1-alex.bennee@linaro.org>
 	<20170531150933.10156-3-alex.bennee@linaro.org>
-	<20170531181737.230cbded@p-imbrenda.boeblingen.de.ibm.com>
+	<20170531181732.13140426@bahia.lan>
 From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <20170531181737.230cbded@p-imbrenda.boeblingen.de.ibm.com>
-Date: Wed, 31 May 2017 17:26:13 +0100
-Message-ID: <87y3tdro0q.fsf@linaro.org>
+In-reply-to: <20170531181732.13140426@bahia.lan>
+Date: Wed, 31 May 2017 17:27:04 +0100
+Message-ID: <87wp8xrnzb.fsf@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 8bit
@@ -32,17 +32,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Claudio Imbrenda <imbrenda@linux.vnet.ibm.com>
-Cc: pbonzini@redhat.com, doug16k@gmail.com, qemu-devel@nongnu.org
+To: Greg Kurz <groug@kaod.org>
+Cc: pbonzini@redhat.com, doug16k@gmail.com, imbrenda@linux.vnet.ibm.com, qemu-devel@nongnu.org
 
 
-Claudio Imbrenda <imbrenda@linux.vnet.ibm.com> writes:
+Greg Kurz <groug@kaod.org> writes:
 
 > On Wed, 31 May 2017 16:09:33 +0100
 > Alex Bennée <alex.bennee@linaro.org> wrote:
 >
 >> The thread-id of 0 means any CPU but we then ignore the fact we find
 >> the first_cpu in this case who can have an index of 0. Instead of
+>
+> The index can never be 0 in system mode actually, but you're right that this
+> check doesn't make sense.
+>
+> The code still looks a bit convoluted IMHO. What about something like the
+> following ?
+>
+>             /* 0 means any thread, so we pick the first valid CPU */
+>             cpu = tmp ? find_cpu(tmp) : first_cpu;
+>
+>             /* invalid CPU/thread specified */
+>             if (!cpu) {
+>                 res = -EINVAL;
+>                 goto out;
+>             }
+
+Yeah that will make it cleaner, I'll apply to v2.
+
+>
+> Anyway, the fix looks ok.
+>
+> Reviewed-by: Greg Kurz <groug@kaod.org>
+>
 >> bailing out just test if we have managed to match up thread-id to a
 >> CPU.
 >>
@@ -59,8 +82,7 @@ Claudio Imbrenda <imbrenda@linux.vnet.ibm.com> writes:
 >> index a249846954..29c9ed3002 100644
 >> --- a/gdbstub.c
 >> +++ b/gdbstub.c
->> @@ -934,8 +934,8 @@ static int gdb_handle_vcont(GDBState *s, const
->> char *p)
+>> @@ -934,8 +934,8 @@ static int gdb_handle_vcont(GDBState *s, const char *p)
 >>               * CPU first, and only then we can use its index.
 >>               */
 >>              cpu = find_cpu(idx);
@@ -71,41 +93,6 @@ Claudio Imbrenda <imbrenda@linux.vnet.ibm.com> writes:
 >>                  res = -EINVAL;
 >>                  goto out;
 >>              }
->
-> This is strange. cpu_index() is defined as:
->
-> static inline int cpu_index(CPUState *cpu)
-> {
-> #if defined(CONFIG_USER_ONLY)
->     return cpu->host_tid;
-> #else
->     return cpu->cpu_index + 1;
-> #endif
-> }
->
-> therefore it shouldn't return 0 under any circumstance, and
-> find_cpu(idx) should also fail if idx == 0, because internally it also
-> uses cpu_index()
->
-> on the other hand, you say that the patch does fix the problem for you,
-> which really confuses me.
-
-Hmm that was me assuming cpu_index(cpu) was the same as cpu->cpu_index.
-However in the CONFIG_USER_ONLY case we return host_tid which is only
-set by clone_func() so I think will not be set for the first cpu.
-
->
->
->
-> (probably) completely unrelatedly, this:
->
-> res = qemu_strtoul(p + 1, &p, 16, &tmp);
->
-> should be like this instead:
->
-> res = qemu_strtoul(p, &p, 16, &tmp);
->
-> but this shouldn't impact you in any way.
 
 
 --
