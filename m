@@ -1,18 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41726)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41759)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1dG0AL-0002W6-1L
-	for qemu-devel@nongnu.org; Wed, 31 May 2017 05:43:46 -0400
+	(envelope-from <paolo.bonzini@gmail.com>) id 1dG0AM-0002Xp-C4
+	for qemu-devel@nongnu.org; Wed, 31 May 2017 05:43:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1dG0AJ-0001mD-WA
-	for qemu-devel@nongnu.org; Wed, 31 May 2017 05:43:45 -0400
+	(envelope-from <paolo.bonzini@gmail.com>) id 1dG0AL-0001oL-71
+	for qemu-devel@nongnu.org; Wed, 31 May 2017 05:43:46 -0400
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Wed, 31 May 2017 11:43:26 +0200
-Message-Id: <20170531094330.1808-8-pbonzini@redhat.com>
+Date: Wed, 31 May 2017 11:43:27 +0200
+Message-Id: <20170531094330.1808-9-pbonzini@redhat.com>
 In-Reply-To: <20170531094330.1808-1-pbonzini@redhat.com>
 References: <20170531094330.1808-1-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PATCH 07/11] qed: move tail of qed_aio_write_main to
- qed_aio_write_{cow, alloc}
+Subject: [Qemu-devel] [PATCH 08/11] block: invoke .bdrv_drain callback in
+ coroutine context and from AioContext
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,119 +24,125 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: kwolf@redhat.com, famz@redhat.com, qemu-block@nongnu.org, mreitz@redhat.com
 
-This part is never called for in-place writes, move it away to avoid
-the "backwards" coding style typical of callback-based code.
+This will let the callback take a CoMutex in the next patch.
 
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- block/qed.c | 68 ++++++++++++++++++++++++++++---------------------------------
- 1 file changed, 31 insertions(+), 37 deletions(-)
+ block/io.c                | 42 +++++++++++++++++++++++++++++++++---------
+ block/qed.c               |  6 +++---
+ include/block/block_int.h |  2 +-
+ 3 files changed, 37 insertions(+), 13 deletions(-)
 
+diff --git a/block/io.c b/block/io.c
+index 03c77da66f..d5d9107885 100644
+--- a/block/io.c
++++ b/block/io.c
+@@ -157,6 +157,37 @@ bool bdrv_requests_pending(BlockDriverState *bs)
+     return false;
+ }
+ 
++typedef struct {
++    Coroutine *co;
++    BlockDriverState *bs;
++    bool done;
++} BdrvCoDrainData;
++
++static void coroutine_fn bdrv_drain_invoke_entry(void *opaque)
++{
++    BdrvCoDrainData *data = opaque;
++    BlockDriverState *bs = data->bs;
++
++    bs->drv->bdrv_co_drain(bs);
++
++    /* Set data->done before reading bs->wakeup.  */
++    atomic_mb_set(&data->done, true);
++    bdrv_wakeup(bs);
++}
++
++static void bdrv_drain_invoke(BlockDriverState *bs)
++{
++    BdrvCoDrainData data = { .bs = bs, .done = false };
++
++    if (!bs->drv || !bs->drv->bdrv_co_drain) {
++        return;
++    }
++
++    data.co = qemu_coroutine_create(bdrv_drain_invoke_entry, &data);
++    bdrv_coroutine_enter(bs, data.co);
++    BDRV_POLL_WHILE(bs, !data.done);
++}
++
+ static bool bdrv_drain_recurse(BlockDriverState *bs)
+ {
+     BdrvChild *child, *tmp;
+@@ -164,9 +195,8 @@ static bool bdrv_drain_recurse(BlockDriverState *bs)
+ 
+     waited = BDRV_POLL_WHILE(bs, atomic_read(&bs->in_flight) > 0);
+ 
+-    if (bs->drv && bs->drv->bdrv_drain) {
+-        bs->drv->bdrv_drain(bs);
+-    }
++    /* Ensure any pending metadata writes are submitted to bs->file.  */
++    bdrv_drain_invoke(bs);
+ 
+     QLIST_FOREACH_SAFE(child, &bs->children, next, tmp) {
+         BlockDriverState *bs = child->bs;
+@@ -192,12 +222,6 @@ static bool bdrv_drain_recurse(BlockDriverState *bs)
+     return waited;
+ }
+ 
+-typedef struct {
+-    Coroutine *co;
+-    BlockDriverState *bs;
+-    bool done;
+-} BdrvCoDrainData;
+-
+ static void bdrv_co_drain_bh_cb(void *opaque)
+ {
+     BdrvCoDrainData *data = opaque;
 diff --git a/block/qed.c b/block/qed.c
-index ab505faa84..83a0973cfb 100644
+index 83a0973cfb..990210cd9c 100644
 --- a/block/qed.c
 +++ b/block/qed.c
-@@ -981,39 +981,11 @@ static int qed_aio_write_main(QEDAIOCB *acb)
-     BDRVQEDState *s = acb_to_s(acb);
-     uint64_t offset = acb->cur_cluster +
-                       qed_offset_into_cluster(s, acb->cur_pos);
--    int ret;
- 
-     trace_qed_aio_write_main(s, acb, 0, offset, acb->cur_qiov.size);
- 
-     BLKDBG_EVENT(s->bs->file, BLKDBG_WRITE_AIO);
--    ret = bdrv_pwritev(s->bs->file, offset, &acb->cur_qiov);
--    if (ret < 0) {
--        return ret;
--    }
--
--    if (acb->find_cluster_ret != QED_CLUSTER_FOUND) {
--        if (s->bs->backing) {
--            /*
--             * Flush new data clusters before updating the L2 table
--             *
--             * This flush is necessary when a backing file is in use.  A crash
--             * during an allocating write could result in empty clusters in the
--             * image.  If the write only touched a subregion of the cluster,
--             * then backing image sectors have been lost in the untouched
--             * region.  The solution is to flush after writing a new data
--             * cluster and before updating the L2 table.
--             */
--            ret = bdrv_flush(s->bs->file->bs);
--            if (ret < 0) {
--                return ret;
--            }
--        }
--        ret = qed_aio_write_l2_update(acb, acb->cur_cluster);
--        if (ret < 0) {
--            return ret;
--        }
--    }
--    return 0;
-+    return bdrv_pwritev(s->bs->file, offset, &acb->cur_qiov);
+@@ -351,7 +351,7 @@ static void bdrv_qed_attach_aio_context(BlockDriverState *bs,
+     }
  }
  
- /**
-@@ -1048,7 +1020,29 @@ static int qed_aio_write_cow(QEDAIOCB *acb)
-         return ret;
-     }
+-static void bdrv_qed_drain(BlockDriverState *bs)
++static void coroutine_fn bdrv_qed_co_drain(BlockDriverState *bs)
+ {
+     BDRVQEDState *s = bs->opaque;
  
--    return qed_aio_write_main(acb);
-+    ret = qed_aio_write_main(acb);
-+    if (ret < 0) {
-+        return ret;
-+    }
-+
-+    if (s->bs->backing) {
-+        /*
-+         * Flush new data clusters before updating the L2 table
-+         *
-+         * This flush is necessary when a backing file is in use.  A crash
-+         * during an allocating write could result in empty clusters in the
-+         * image.  If the write only touched a subregion of the cluster,
-+         * then backing image sectors have been lost in the untouched
-+         * region.  The solution is to flush after writing a new data
-+         * cluster and before updating the L2 table.
-+         */
-+        ret = bdrv_flush(s->bs->file->bs);
-+        if (ret < 0) {
-+            return ret;
-+        }
-+    }
-+
-+    return 0;
+@@ -360,7 +360,7 @@ static void bdrv_qed_drain(BlockDriverState *bs)
+      */
+     if (s->need_check_timer && timer_pending(s->need_check_timer)) {
+         qed_cancel_need_check_timer(s);
+-        qed_need_check_timer_cb(s);
++        qed_need_check_timer_entry(s);
+     }
  }
  
- /**
-@@ -1101,6 +1095,7 @@ static int qed_aio_write_alloc(QEDAIOCB *acb, size_t len)
-         if (acb->find_cluster_ret == QED_CLUSTER_ZERO) {
-             return 0;
-         }
-+        acb->cur_cluster = 1;
-     } else {
-         acb->cur_cluster = qed_alloc_clusters(s, acb->cur_nclusters);
-     }
-@@ -1113,15 +1108,14 @@ static int qed_aio_write_alloc(QEDAIOCB *acb, size_t len)
-         }
-     }
+@@ -1544,7 +1544,7 @@ static BlockDriver bdrv_qed = {
+     .bdrv_check               = bdrv_qed_check,
+     .bdrv_detach_aio_context  = bdrv_qed_detach_aio_context,
+     .bdrv_attach_aio_context  = bdrv_qed_attach_aio_context,
+-    .bdrv_drain               = bdrv_qed_drain,
++    .bdrv_co_drain            = bdrv_qed_co_drain,
+ };
  
--    if (acb->flags & QED_AIOCB_ZERO) {
--        ret = qed_aio_write_l2_update(acb, 1);
--    } else {
-+    if (!(acb->flags & QED_AIOCB_ZERO)) {
-         ret = qed_aio_write_cow(acb);
-+        if (ret < 0) {
-+            return ret;
-+        }
-     }
--    if (ret < 0) {
--        return ret;
--    }
--    return 0;
-+
-+    return qed_aio_write_l2_update(acb, acb->cur_cluster);
- }
+ static void bdrv_qed_init(void)
+diff --git a/include/block/block_int.h b/include/block/block_int.h
+index a150791f0f..b14340d751 100644
+--- a/include/block/block_int.h
++++ b/include/block/block_int.h
+@@ -314,7 +314,7 @@ struct BlockDriver {
+      * Drain and stop any internal sources of requests in the driver, and
+      * remain so until next I/O callback (e.g. bdrv_co_writev) is called.
+      */
+-    void (*bdrv_drain)(BlockDriverState *bs);
++    void coroutine_fn (*bdrv_co_drain)(BlockDriverState *bs);
  
- /**
+     void (*bdrv_add_child)(BlockDriverState *parent, BlockDriverState *child,
+                            Error **errp);
 -- 
 2.13.0
