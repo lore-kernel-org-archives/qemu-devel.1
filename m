@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50985)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51864)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1dFz2C-0001vX-Hp
-	for qemu-devel@nongnu.org; Wed, 31 May 2017 04:31:17 -0400
+	(envelope-from <jasowang@redhat.com>) id 1dFz4p-0003lV-Jh
+	for qemu-devel@nongnu.org; Wed, 31 May 2017 04:34:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1dFz28-0006Ay-6b
-	for qemu-devel@nongnu.org; Wed, 31 May 2017 04:31:16 -0400
-Resent-Message-Id: <E1dFz28-0006Ay-6b@eggs.gnu.org>
-Received: from sender-of-o52.zoho.com ([135.84.80.217]:21483)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1dFz27-0006Af-Tl
-	for qemu-devel@nongnu.org; Wed, 31 May 2017 04:31:12 -0400
-Reply-To: <qemu-devel@nongnu.org>
-In-Reply-To: <20170531075814.4851-1-slyfox@gentoo.org>
-Message-ID: <149621942864.1217.16705181218943765818@f98a8425f76e>
+	(envelope-from <jasowang@redhat.com>) id 1dFz4l-0007H0-Ln
+	for qemu-devel@nongnu.org; Wed, 31 May 2017 04:33:59 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46470)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1dFz4l-0007Ge-FT
+	for qemu-devel@nongnu.org; Wed, 31 May 2017 04:33:55 -0400
+References: <20170526142858.19931-1-maxime.coquelin@redhat.com>
+	<20170530211819-mutt-send-email-mst@kernel.org>
+From: Jason Wang <jasowang@redhat.com>
+Message-ID: <7d4af4dd-270b-605f-9535-7bf8323e74c2@redhat.com>
+Date: Wed, 31 May 2017 16:33:33 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Wed, 31 May 2017 01:30:29 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH v2] alpha-user: wire epoll_create, epoll_ctl,
- epoll_wait
+In-Reply-To: <20170530211819-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 0/6] vhost-user: Specify and implement
+ device IOTLB support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,37 +29,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: slyfox@gentoo.org
-Cc: famz@redhat.com, peter.maydell@linaro.org, riku.voipio@iki.fi, qemu-devel@nongnu.org
+To: "Michael S. Tsirkin" <mst@redhat.com>, Maxime Coquelin <maxime.coquelin@redhat.com>
+Cc: peterx@redhat.com, marcandre.lureau@gmail.com, vkaplans@redhat.com, wexu@redhat.com, yuanhan.liu@linux.intel.com, qemu-devel@nongnu.org, jfreiman@redhat.com
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
-c3NhZ2UtaWQ6IDIwMTcwNTMxMDc1ODE0LjQ4NTEtMS1zbHlmb3hAZ2VudG9vLm9yZwpTdWJqZWN0
-OiBbUWVtdS1kZXZlbF0gW1BBVENIIHYyXSBhbHBoYS11c2VyOiB3aXJlIGVwb2xsX2NyZWF0ZSwg
-ZXBvbGxfY3RsLCBlcG9sbF93YWl0Cgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9i
-YXNoCgpCQVNFPWJhc2UKbj0xCnRvdGFsPSQoZ2l0IGxvZyAtLW9uZWxpbmUgJEJBU0UuLiB8IHdj
-IC1sKQpmYWlsZWQ9MAoKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQg
-Y29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKCmNvbW1pdHM9IiQoZ2l0IGxvZyAtLWZv
-cm1hdD0lSCAtLXJldmVyc2UgJEJBU0UuLikiCmZvciBjIGluICRjb21taXRzOyBkbwogICAgZWNo
-byAiQ2hlY2tpbmcgUEFUQ0ggJG4vJHRvdGFsOiAkKGdpdCBsb2cgLW4gMSAtLWZvcm1hdD0lcyAk
-YykuLi4iCiAgICBpZiAhIGdpdCBzaG93ICRjIC0tZm9ybWF0PWVtYWlsIHwgLi9zY3JpcHRzL2No
-ZWNrcGF0Y2gucGwgLS1tYWlsYmFjayAtOyB0aGVuCiAgICAgICAgZmFpbGVkPTEKICAgICAgICBl
-Y2hvCiAgICBmaQogICAgbj0kKChuKzEpKQpkb25lCgpleGl0ICRmYWlsZWQKPT09IFRFU1QgU0NS
-SVBUIEVORCA9PT0KClVwZGF0aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3
-MTMzODQKU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0Jwo4OTIxN2ZkIGFscGhhLXVzZXI6
-IHdpcmUgZXBvbGxfY3JlYXRlLCBlcG9sbF9jdGwsIGVwb2xsX3dhaXQKCj09PSBPVVRQVVQgQkVH
-SU4gPT09CkNoZWNraW5nIFBBVENIIDEvMTogYWxwaGEtdXNlcjogd2lyZSBlcG9sbF9jcmVhdGUs
-IGVwb2xsX2N0bCwgZXBvbGxfd2FpdC4uLgpFUlJPUjogY29kZSBpbmRlbnQgc2hvdWxkIG5ldmVy
-IHVzZSB0YWJzCiM0MTogRklMRTogbGludXgtdXNlci9hbHBoYS9zeXNjYWxsX25yLmg6MzQ2Ogor
-I2RlZmluZSBUQVJHRVRfTlJfZXBvbGxfY3JlYXRlXkleSV5JNDA3JAoKRVJST1I6IGNvZGUgaW5k
-ZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwojNDI6IEZJTEU6IGxpbnV4LXVzZXIvYWxwaGEvc3lz
-Y2FsbF9uci5oOjM0NzoKKyNkZWZpbmUgVEFSR0VUX05SX2Vwb2xsX2N0bF5JXkleSTQwOCQKCkVS
-Uk9SOiBjb2RlIGluZGVudCBzaG91bGQgbmV2ZXIgdXNlIHRhYnMKIzQzOiBGSUxFOiBsaW51eC11
-c2VyL2FscGhhL3N5c2NhbGxfbnIuaDozNDg6CisjZGVmaW5lIFRBUkdFVF9OUl9lcG9sbF93YWl0
-XkleSV5JNDA5JAoKdG90YWw6IDMgZXJyb3JzLCAwIHdhcm5pbmdzLCAyNyBsaW5lcyBjaGVja2Vk
-CgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBv
-ZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFp
-bnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgo9PT0gT1VUUFVUIEVORCA9
-PT0KClRlc3QgY29tbWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoKLS0tCkVtYWlsIGdlbmVyYXRl
-ZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHA6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ug
-c2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAZnJlZWxpc3RzLm9yZw==
+
+
+On 2017=E5=B9=B405=E6=9C=8831=E6=97=A5 02:20, Michael S. Tsirkin wrote:
+> On Fri, May 26, 2017 at 04:28:52PM +0200, Maxime Coquelin wrote:
+>> This series aims at specifying ans implementing the protocol update
+>> required to support device IOTLB with user backends.
+>>
+>> In this second non-RFC version, main changes are:
+>>   - spec fixes and clarification
+>>   - rings information update has been restored back to ring enablement=
+ time
+>>   - Work around GCC 4.4.7 limitation wrt assignment in unnamed union a=
+t
+>> declaration time.
+>>
+>> The series can be tested with vhost_iotlb_proto_v2 branch on my gitlab
+>> account[0].
+>>
+>> The slave requests channel part is re-used from Marc-Andr=C3=A9's seri=
+es submitted
+>> last year[1], with main changes from original version being request/fe=
+ature
+>> names renaming and addition of the REPLY_ACK feature support.
+>>
+>> Regarding IOTLB protocol, one noticeable change is the IOTLB miss requ=
+est
+>> reply made optionnal (i.e. only if slave requests it by setting the
+>> VHOST_USER_NEED_REPLY flag in the message header). This change provide=
+s
+>> more flexibility in the backend implementation of the feature.
+>>
+>> The protocol is very close to kernel backends, except that a new
+>> communication channel is introduced to enable the slave to send
+>> requests to the master.
+>>
+>> [0]:https://gitlab.com/mcoquelin/dpdk-next-virtio/commits/vhost_iotlb_=
+proto_v2
+>> [1]:https://lists.gnu.org/archive/html/qemu-devel/2016-04/msg00095.htm=
+l
+> Overall, this looks good to me. I do think patch 3 isn't a good idea
+> though, if slave wants something let it request it.
+>
+> Need to find out why does vhost in kernel want the used ring iotlb at
+> start time - especially considering we aren't even guaranteed one entry
+> covers the whole ring, and invalidates should affect all addresses at
+> least in theory.
+>
+>
+
+The reason is probably we want to verify whether or not we could=20
+correctly access used ring in vhost_vq_init_access(). It was there since=20
+vhost_net is introduced. We can think to remove this limitation maybe.
+
+Thanks
