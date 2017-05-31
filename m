@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51744)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51784)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1dG484-0002uF-R1
-	for qemu-devel@nongnu.org; Wed, 31 May 2017 09:57:43 -0400
+	(envelope-from <marcandre.lureau@redhat.com>) id 1dG48H-00032Y-EY
+	for qemu-devel@nongnu.org; Wed, 31 May 2017 09:57:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1dG482-0003q1-UR
-	for qemu-devel@nongnu.org; Wed, 31 May 2017 09:57:40 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43064)
+	(envelope-from <marcandre.lureau@redhat.com>) id 1dG48A-0003rw-0k
+	for qemu-devel@nongnu.org; Wed, 31 May 2017 09:57:47 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34624)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1dG482-0003px-LY
-	for qemu-devel@nongnu.org; Wed, 31 May 2017 09:57:38 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
+	id 1dG489-0003rk-O3
+	for qemu-devel@nongnu.org; Wed, 31 May 2017 09:57:45 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id A05E2C0467C6
-	for <qemu-devel@nongnu.org>; Wed, 31 May 2017 13:57:37 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id AB5B63680E
+	for <qemu-devel@nongnu.org>; Wed, 31 May 2017 13:57:44 +0000 (UTC)
 From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Wed, 31 May 2017 17:56:27 +0400
-Message-Id: <20170531135709.345-4-marcandre.lureau@redhat.com>
+Date: Wed, 31 May 2017 17:56:28 +0400
+Message-Id: <20170531135709.345-5-marcandre.lureau@redhat.com>
 In-Reply-To: <20170531135709.345-1-marcandre.lureau@redhat.com>
 References: <20170531135709.345-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v2 03/45] tests/qapi-schema: Avoid 'str' in
- alternate test cases
+Subject: [Qemu-devel] [PATCH v2 04/45] qapi: Reject alternates that can't
+ work with keyval_parse()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,357 +39,331 @@ Cc: armbru@redhat.com
 
 From: Markus Armbruster <armbru@redhat.com>
 
-The next commit is going to make alternate members of type 'str'
-conflict with other scalar types.  Would break a few test cases that
-don't actually require 'str'.  Flip them from 'str' to 'bool' or
-'EnumOne'.
+Alternates are sum types like unions, but use the JSON type on the
+wire / QType in QObject instead of an explicit tag.  That's why we
+require alternate members to have distinct QTypes.
+
+The recently introduced keyval_parse() (commit d454dbe) can only
+produce string scalars.  The qobject_input_visitor_new_keyval() input
+visitor mostly hides the difference, so code using a QObject input
+visitor doesn't have to care whether its input was parsed from JSON or
+KEY=3DVALUE,...  The difference leaks for alternates, as noted in commit
+0ee9ae7: an non-string, non-enum scalar alternate value can't
+currently be expressed.
+
+In part, this is just our insufficiently sophisticated implementation.
+Consider alternate type 'GuestFileWhence'.  It has an integer member
+and a 'QGASeek' member.  The latter is an enumeration with values
+'set', 'cur', 'end'.  The meaning of b=3Dset, b=3Dcur, b=3Dend, b=3D0, b=3D=
+1 and
+so forth is perfectly obvious.  However, our current implementation
+falls apart at run time for b=3D0, b=3D1, and so forth.  Fixable, but not
+today; add a test case and a TODO comment.
+
+Now consider an alternate type with a string and an integer member.
+What's the meaning of a=3D42?  Is it the string "42" or the integer 42?
+Whichever meaning you pick makes the other inexpressible.  This isn't
+just an implementation problem, it's fundamental.  Our current
+implementation will pick string.
+
+So far, we haven't needed such alternates.  To make sure we stop and
+think before we add one that cannot sanely work with keyval_parse(),
+let's require alternate members to have sufficiently district
+representation in KEY=3DVALUE,... syntax:
+
+* A string member clashes with any other scalar member
+
+* An enumeration member clashes with bool members when it has value
+  'on' or 'off'.
+
+* An enumeration member clashes with numeric members when it has a
+  value that starts with '-', '+', '0' or '9'.  This is a rather lazy
+  approximation of the actual number syntax accepted by the visitor.
+
+  Note that enumeration values starting with '-' and '+' are rejected
+  elsewhere already, but better safe than sorry.
 
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Message-Id: <1495471335-23707-4-git-send-email-armbru@redhat.com>
+Message-Id: <1495471335-23707-5-git-send-email-armbru@redhat.com>
 Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
 ---
- tests/test-clone-visitor.c                      | 23 +++++-----
- tests/test-qobject-input-visitor.c              | 56 ++++++++++++-------=
-------
- tests/test-qobject-output-visitor.c             |  4 +-
- tests/qapi-schema/alternate-clash.json          |  2 +-
- tests/qapi-schema/alternate-nested.json         |  2 +-
- tests/qapi-schema/args-alternate.json           |  2 +-
- tests/qapi-schema/doc-bad-alternate-member.json |  2 +-
- tests/qapi-schema/qapi-schema-test.json         |  9 ++--
- tests/qapi-schema/qapi-schema-test.out          | 30 +++++++------
- tests/qapi-schema/returns-alternate.json        |  2 +-
- 10 files changed, 68 insertions(+), 64 deletions(-)
+ scripts/qapi.py                                     | 19 +++++++++++++++=
+++--
+ tests/test-keyval.c                                 | 18 +++++++++++----=
+---
+ util/keyval.c                                       | 10 +++++-----
+ tests/Makefile.include                              |  2 ++
+ tests/qapi-schema/alternate-conflict-dict.json      |  2 +-
+ tests/qapi-schema/alternate-conflict-enum-bool.err  |  1 +
+ tests/qapi-schema/alternate-conflict-enum-bool.exit |  1 +
+ tests/qapi-schema/alternate-conflict-enum-bool.json |  6 ++++++
+ tests/qapi-schema/alternate-conflict-enum-bool.out  |  0
+ tests/qapi-schema/alternate-conflict-enum-int.err   |  1 +
+ tests/qapi-schema/alternate-conflict-enum-int.exit  |  1 +
+ tests/qapi-schema/alternate-conflict-enum-int.json  |  6 ++++++
+ tests/qapi-schema/alternate-conflict-enum-int.out   |  0
+ tests/qapi-schema/alternate-conflict-string.err     |  2 +-
+ tests/qapi-schema/alternate-conflict-string.json    |  6 ++----
+ tests/qapi-schema/qapi-schema-test.json             |  4 +++-
+ tests/qapi-schema/qapi-schema-test.out              |  4 ++--
+ 17 files changed, 60 insertions(+), 23 deletions(-)
+ create mode 100644 tests/qapi-schema/alternate-conflict-enum-bool.err
+ create mode 100644 tests/qapi-schema/alternate-conflict-enum-bool.exit
+ create mode 100644 tests/qapi-schema/alternate-conflict-enum-bool.json
+ create mode 100644 tests/qapi-schema/alternate-conflict-enum-bool.out
+ create mode 100644 tests/qapi-schema/alternate-conflict-enum-int.err
+ create mode 100644 tests/qapi-schema/alternate-conflict-enum-int.exit
+ create mode 100644 tests/qapi-schema/alternate-conflict-enum-int.json
+ create mode 100644 tests/qapi-schema/alternate-conflict-enum-int.out
 
-diff --git a/tests/test-clone-visitor.c b/tests/test-clone-visitor.c
-index df0c045512..96982163e4 100644
---- a/tests/test-clone-visitor.c
-+++ b/tests/test-clone-visitor.c
-@@ -42,29 +42,28 @@ static void test_clone_struct(void)
+diff --git a/scripts/qapi.py b/scripts/qapi.py
+index 6c4d554165..b7a25e4759 100644
+--- a/scripts/qapi.py
++++ b/scripts/qapi.py
+@@ -812,11 +812,26 @@ def check_alternate(expr, info):
+         if not qtype:
+             raise QAPISemError(info, "Alternate '%s' member '%s' cannot =
+use "
+                                "type '%s'" % (name, key, value))
+-        if qtype in types_seen:
++        conflicting =3D set([qtype])
++        if qtype =3D=3D 'QTYPE_QSTRING':
++            enum_expr =3D enum_types.get(value)
++            if enum_expr:
++                for v in enum_expr['data']:
++                    if v in ['on', 'off']:
++                        conflicting.add('QTYPE_QBOOL')
++                    if re.match(r'[-+0-9.]', v): # lazy, could be tighte=
+ned
++                        conflicting.add('QTYPE_QINT')
++                        conflicting.add('QTYPE_QFLOAT')
++            else:
++                conflicting.add('QTYPE_QINT')
++                conflicting.add('QTYPE_QFLOAT')
++                conflicting.add('QTYPE_QBOOL')
++        if conflicting & set(types_seen):
+             raise QAPISemError(info, "Alternate '%s' member '%s' can't "
+                                "be distinguished from member '%s'"
+                                % (name, key, types_seen[qtype]))
+-        types_seen[qtype] =3D key
++        for qt in conflicting:
++            types_seen[qt] =3D key
 =20
- static void test_clone_alternate(void)
- {
--    AltStrBool *b_src, *s_src, *b_dst, *s_dst;
-+    AltEnumBool *b_src, *s_src, *b_dst, *s_dst;
 =20
--    b_src =3D g_new0(AltStrBool, 1);
-+    b_src =3D g_new0(AltEnumBool, 1);
-     b_src->type =3D QTYPE_QBOOL;
-     b_src->u.b =3D true;
--    s_src =3D g_new0(AltStrBool, 1);
-+    s_src =3D g_new0(AltEnumBool, 1);
-     s_src->type =3D QTYPE_QSTRING;
--    s_src->u.s =3D g_strdup("World");
-+    s_src->u.e =3D ENUM_ONE_VALUE1;
-=20
--    b_dst =3D QAPI_CLONE(AltStrBool, b_src);
-+    b_dst =3D QAPI_CLONE(AltEnumBool, b_src);
-     g_assert(b_dst);
-     g_assert_cmpint(b_dst->type, =3D=3D, b_src->type);
-     g_assert_cmpint(b_dst->u.b, =3D=3D, b_src->u.b);
--    s_dst =3D QAPI_CLONE(AltStrBool, s_src);
-+    s_dst =3D QAPI_CLONE(AltEnumBool, s_src);
-     g_assert(s_dst);
-     g_assert_cmpint(s_dst->type, =3D=3D, s_src->type);
--    g_assert_cmpstr(s_dst->u.s, =3D=3D, s_src->u.s);
--    g_assert(s_dst->u.s !=3D s_src->u.s);
-+    g_assert_cmpint(s_dst->u.e, =3D=3D, s_src->u.e);
-=20
--    qapi_free_AltStrBool(b_src);
--    qapi_free_AltStrBool(s_src);
--    qapi_free_AltStrBool(b_dst);
--    qapi_free_AltStrBool(s_dst);
-+    qapi_free_AltEnumBool(b_src);
-+    qapi_free_AltEnumBool(s_src);
-+    qapi_free_AltEnumBool(b_dst);
-+    qapi_free_AltEnumBool(s_dst);
- }
-=20
- static void test_clone_native_list(void)
-diff --git a/tests/test-qobject-input-visitor.c b/tests/test-qobject-inpu=
-t-visitor.c
-index e2aabbe972..6b997a177d 100644
---- a/tests/test-qobject-input-visitor.c
-+++ b/tests/test-qobject-input-visitor.c
-@@ -537,10 +537,10 @@ static void test_visitor_in_alternate(TestInputVisi=
-torData *data,
-     g_assert_cmpint(tmp->u.i, =3D=3D, 42);
-     qapi_free_UserDefAlternate(tmp);
-=20
--    v =3D visitor_input_test_init(data, "'string'");
-+    v =3D visitor_input_test_init(data, "'value1'");
-     visit_type_UserDefAlternate(v, NULL, &tmp, &error_abort);
-     g_assert_cmpint(tmp->type, =3D=3D, QTYPE_QSTRING);
--    g_assert_cmpstr(tmp->u.s, =3D=3D, "string");
-+    g_assert_cmpint(tmp->u.e, =3D=3D, ENUM_ONE_VALUE1);
-     qapi_free_UserDefAlternate(tmp);
-=20
-     v =3D visitor_input_test_init(data, "{'integer':1, 'string':'str', "
-@@ -565,10 +565,10 @@ static void test_visitor_in_alternate(TestInputVisi=
-torData *data,
-     g_assert_cmpint(wrap->alt->u.i, =3D=3D, 42);
-     qapi_free_WrapAlternate(wrap);
-=20
--    v =3D visitor_input_test_init(data, "{ 'alt': 'string' }");
-+    v =3D visitor_input_test_init(data, "{ 'alt': 'value1' }");
-     visit_type_WrapAlternate(v, NULL, &wrap, &error_abort);
-     g_assert_cmpint(wrap->alt->type, =3D=3D, QTYPE_QSTRING);
--    g_assert_cmpstr(wrap->alt->u.s, =3D=3D, "string");
-+    g_assert_cmpint(wrap->alt->u.e, =3D=3D, ENUM_ONE_VALUE1);
-     qapi_free_WrapAlternate(wrap);
-=20
-     v =3D visitor_input_test_init(data, "{ 'alt': {'integer':1, 'string'=
-:'str', "
-@@ -588,37 +588,37 @@ static void test_visitor_in_alternate_number(TestIn=
-putVisitorData *data,
- {
-     Visitor *v;
+ def check_enum(expr, info):
+diff --git a/tests/test-keyval.c b/tests/test-keyval.c
+index c556b1b117..c3be00524c 100644
+--- a/tests/test-keyval.c
++++ b/tests/test-keyval.c
+@@ -614,22 +614,26 @@ static void test_keyval_visit_alternate(void)
      Error *err =3D NULL;
--    AltStrBool *asb;
--    AltStrNum *asn;
+     Visitor *v;
+     QDict *qdict;
 -    AltNumStr *ans;
--    AltStrInt *asi;
-+    AltEnumBool *aeb;
-+    AltEnumNum *aen;
-+    AltNumEnum *ans;
-+    AltEnumInt *asi;
-     AltIntNum *ain;
++    AltStrObj *aso;
      AltNumInt *ani;
++    AltEnumBool *aeb;
 =20
-     /* Parsing an int */
-=20
-     v =3D visitor_input_test_init(data, "42");
--    visit_type_AltStrBool(v, NULL, &asb, &err);
-+    visit_type_AltEnumBool(v, NULL, &aeb, &err);
-     error_free_or_abort(&err);
--    qapi_free_AltStrBool(asb);
-+    qapi_free_AltEnumBool(aeb);
-=20
-     v =3D visitor_input_test_init(data, "42");
--    visit_type_AltStrNum(v, NULL, &asn, &error_abort);
--    g_assert_cmpint(asn->type, =3D=3D, QTYPE_QFLOAT);
--    g_assert_cmpfloat(asn->u.n, =3D=3D, 42);
--    qapi_free_AltStrNum(asn);
-+    visit_type_AltEnumNum(v, NULL, &aen, &error_abort);
-+    g_assert_cmpint(aen->type, =3D=3D, QTYPE_QFLOAT);
-+    g_assert_cmpfloat(aen->u.n, =3D=3D, 42);
-+    qapi_free_AltEnumNum(aen);
-=20
-     v =3D visitor_input_test_init(data, "42");
--    visit_type_AltNumStr(v, NULL, &ans, &error_abort);
-+    visit_type_AltNumEnum(v, NULL, &ans, &error_abort);
-     g_assert_cmpint(ans->type, =3D=3D, QTYPE_QFLOAT);
-     g_assert_cmpfloat(ans->u.n, =3D=3D, 42);
+     /*
+      * Can't do scalar alternate variants other than string.  You get
+      * the string variant if there is one, else an error.
++     * TODO make it work for unambiguous cases like AltEnumBool below
+      */
+-    qdict =3D keyval_parse("a=3D1,b=3D2", NULL, &error_abort);
++    qdict =3D keyval_parse("a=3D1,b=3D2,c=3Don", NULL, &error_abort);
+     v =3D qobject_input_visitor_new_keyval(QOBJECT(qdict));
+     QDECREF(qdict);
+     visit_start_struct(v, NULL, NULL, 0, &error_abort);
+-    visit_type_AltNumStr(v, "a", &ans, &error_abort);
+-    g_assert_cmpint(ans->type, =3D=3D, QTYPE_QSTRING);
+-    g_assert_cmpstr(ans->u.s, =3D=3D, "1");
 -    qapi_free_AltNumStr(ans);
-+    qapi_free_AltNumEnum(ans);
-=20
-     v =3D visitor_input_test_init(data, "42");
--    visit_type_AltStrInt(v, NULL, &asi, &error_abort);
-+    visit_type_AltEnumInt(v, NULL, &asi, &error_abort);
-     g_assert_cmpint(asi->type, =3D=3D, QTYPE_QINT);
-     g_assert_cmpint(asi->u.i, =3D=3D, 42);
--    qapi_free_AltStrInt(asi);
-+    qapi_free_AltEnumInt(asi);
-=20
-     v =3D visitor_input_test_init(data, "42");
-     visit_type_AltIntNum(v, NULL, &ain, &error_abort);
-@@ -635,26 +635,26 @@ static void test_visitor_in_alternate_number(TestIn=
-putVisitorData *data,
-     /* Parsing a double */
-=20
-     v =3D visitor_input_test_init(data, "42.5");
--    visit_type_AltStrBool(v, NULL, &asb, &err);
-+    visit_type_AltEnumBool(v, NULL, &aeb, &err);
+-    visit_type_AltNumInt(v, "a", &ani, &err);
++    visit_type_AltStrObj(v, "a", &aso, &error_abort);
++    g_assert_cmpint(aso->type, =3D=3D, QTYPE_QSTRING);
++    g_assert_cmpstr(aso->u.s, =3D=3D, "1");
++    qapi_free_AltStrObj(aso);
++    visit_type_AltNumInt(v, "b", &ani, &err);
++    error_free_or_abort(&err);
++    visit_type_AltEnumBool(v, "c", &aeb, &err);
      error_free_or_abort(&err);
--    qapi_free_AltStrBool(asb);
-+    qapi_free_AltEnumBool(aeb);
-=20
-     v =3D visitor_input_test_init(data, "42.5");
--    visit_type_AltStrNum(v, NULL, &asn, &error_abort);
--    g_assert_cmpint(asn->type, =3D=3D, QTYPE_QFLOAT);
--    g_assert_cmpfloat(asn->u.n, =3D=3D, 42.5);
--    qapi_free_AltStrNum(asn);
-+    visit_type_AltEnumNum(v, NULL, &aen, &error_abort);
-+    g_assert_cmpint(aen->type, =3D=3D, QTYPE_QFLOAT);
-+    g_assert_cmpfloat(aen->u.n, =3D=3D, 42.5);
-+    qapi_free_AltEnumNum(aen);
-=20
-     v =3D visitor_input_test_init(data, "42.5");
--    visit_type_AltNumStr(v, NULL, &ans, &error_abort);
-+    visit_type_AltNumEnum(v, NULL, &ans, &error_abort);
-     g_assert_cmpint(ans->type, =3D=3D, QTYPE_QFLOAT);
-     g_assert_cmpfloat(ans->u.n, =3D=3D, 42.5);
--    qapi_free_AltNumStr(ans);
-+    qapi_free_AltNumEnum(ans);
-=20
-     v =3D visitor_input_test_init(data, "42.5");
--    visit_type_AltStrInt(v, NULL, &asi, &err);
-+    visit_type_AltEnumInt(v, NULL, &asi, &err);
-     error_free_or_abort(&err);
--    qapi_free_AltStrInt(asi);
-+    qapi_free_AltEnumInt(asi);
-=20
-     v =3D visitor_input_test_init(data, "42.5");
-     visit_type_AltIntNum(v, NULL, &ain, &error_abort);
-diff --git a/tests/test-qobject-output-visitor.c b/tests/test-qobject-out=
-put-visitor.c
-index 94b9518e40..4e8fdf1397 100644
---- a/tests/test-qobject-output-visitor.c
-+++ b/tests/test-qobject-output-visitor.c
-@@ -406,12 +406,12 @@ static void test_visitor_out_alternate(TestOutputVi=
-sitorData *data,
-     visitor_reset(data);
-     tmp =3D g_new0(UserDefAlternate, 1);
-     tmp->type =3D QTYPE_QSTRING;
--    tmp->u.s =3D g_strdup("hello");
-+    tmp->u.e =3D ENUM_ONE_VALUE1;
-=20
-     visit_type_UserDefAlternate(data->ov, NULL, &tmp, &error_abort);
-     qstr =3D qobject_to_qstring(visitor_get(data));
-     g_assert(qstr);
--    g_assert_cmpstr(qstring_get_str(qstr), =3D=3D, "hello");
-+    g_assert_cmpstr(qstring_get_str(qstr), =3D=3D, "value1");
-=20
-     qapi_free_UserDefAlternate(tmp);
-=20
-diff --git a/tests/qapi-schema/alternate-clash.json b/tests/qapi-schema/a=
-lternate-clash.json
-index 6d73bc527b..9a59b88ced 100644
---- a/tests/qapi-schema/alternate-clash.json
-+++ b/tests/qapi-schema/alternate-clash.json
-@@ -5,4 +5,4 @@
- # the implicit Alt1Kind enum, we would still have a collision with the
- # resulting C union trying to have two members named 'a_b'.
- { 'alternate': 'Alt1',
--  'data': { 'a-b': 'str', 'a_b': 'int' } }
-+  'data': { 'a-b': 'bool', 'a_b': 'int' } }
-diff --git a/tests/qapi-schema/alternate-nested.json b/tests/qapi-schema/=
-alternate-nested.json
-index 8e22186491..f2b9632f75 100644
---- a/tests/qapi-schema/alternate-nested.json
-+++ b/tests/qapi-schema/alternate-nested.json
-@@ -1,5 +1,5 @@
- # we reject a nested alternate branch
- { 'alternate': 'Alt1',
--  'data': { 'name': 'str', 'value': 'int' } }
-+  'data': { 'name': 'bool', 'value': 'int' } }
- { 'alternate': 'Alt2',
-   'data': { 'nested': 'Alt1', 'b': 'bool' } }
-diff --git a/tests/qapi-schema/args-alternate.json b/tests/qapi-schema/ar=
-gs-alternate.json
-index 69e94d4819..824d69c1d5 100644
---- a/tests/qapi-schema/args-alternate.json
-+++ b/tests/qapi-schema/args-alternate.json
-@@ -1,3 +1,3 @@
- # we do not allow alternate arguments
--{ 'alternate': 'Alt', 'data': { 'case1': 'int', 'case2': 'str' } }
-+{ 'alternate': 'Alt', 'data': { 'case1': 'int', 'case2': 'bool' } }
- { 'command': 'oops', 'data': 'Alt' }
-diff --git a/tests/qapi-schema/doc-bad-alternate-member.json b/tests/qapi=
--schema/doc-bad-alternate-member.json
-index 738635ca8f..fa4143da4c 100644
---- a/tests/qapi-schema/doc-bad-alternate-member.json
-+++ b/tests/qapi-schema/doc-bad-alternate-member.json
-@@ -6,4 +6,4 @@
- # @bb: b
- ##
- { 'alternate': 'AorB',
--  'data': { 'a': 'str', 'b': 'int' } }
-+  'data': { 'a': 'bool', 'b': 'int' } }
+     visit_end_struct(v, NULL);
+     visit_free(v);
+diff --git a/util/keyval.c b/util/keyval.c
+index 93d5db6b59..7dbda62305 100644
+--- a/util/keyval.c
++++ b/util/keyval.c
+@@ -65,11 +65,11 @@
+  * denote numbers, true, false or null.  The special QObject input
+  * visitor returned by qobject_input_visitor_new_keyval() mostly hides
+  * this by automatically converting strings to the type the visitor
+- * expects.  Breaks down for alternate types and type 'any', where the
+- * visitor's expectation isn't clear.  Code visiting such types needs
+- * to do the conversion itself, but only when using this keyval
+- * visitor.  Awkward.  Alternate types without a string member don't
+- * work at all.
++ * expects.  Breaks down for type 'any', where the visitor's
++ * expectation isn't clear.  Code visiting 'any' needs to do the
++ * conversion itself, but only when using this keyval visitor.
++ * Awkward.  Note that we carefully restrict alternate types to avoid
++ * similar ambiguity.
+  *
+  * Additional syntax for use with an implied key:
+  *
+diff --git a/tests/Makefile.include b/tests/Makefile.include
+index 75893838e5..f42f3dfa72 100644
+--- a/tests/Makefile.include
++++ b/tests/Makefile.include
+@@ -342,6 +342,8 @@ qapi-schema +=3D alternate-array.json
+ qapi-schema +=3D alternate-base.json
+ qapi-schema +=3D alternate-clash.json
+ qapi-schema +=3D alternate-conflict-dict.json
++qapi-schema +=3D alternate-conflict-enum-bool.json
++qapi-schema +=3D alternate-conflict-enum-int.json
+ qapi-schema +=3D alternate-conflict-string.json
+ qapi-schema +=3D alternate-empty.json
+ qapi-schema +=3D alternate-nested.json
+diff --git a/tests/qapi-schema/alternate-conflict-dict.json b/tests/qapi-=
+schema/alternate-conflict-dict.json
+index d566cca816..3d7881279c 100644
+--- a/tests/qapi-schema/alternate-conflict-dict.json
++++ b/tests/qapi-schema/alternate-conflict-dict.json
+@@ -1,4 +1,4 @@
+-# we reject alternates with multiple object branches
++# alternate branches of object type conflict with each other
+ { 'struct': 'One',
+   'data': { 'name': 'str' } }
+ { 'struct': 'Two',
+diff --git a/tests/qapi-schema/alternate-conflict-enum-bool.err b/tests/q=
+api-schema/alternate-conflict-enum-bool.err
+new file mode 100644
+index 0000000000..0dfc00242d
+--- /dev/null
++++ b/tests/qapi-schema/alternate-conflict-enum-bool.err
+@@ -0,0 +1 @@
++tests/qapi-schema/alternate-conflict-enum-bool.json:4: Alternate 'Alt' m=
+ember 'two' can't be distinguished from member 'one'
+diff --git a/tests/qapi-schema/alternate-conflict-enum-bool.exit b/tests/=
+qapi-schema/alternate-conflict-enum-bool.exit
+new file mode 100644
+index 0000000000..d00491fd7e
+--- /dev/null
++++ b/tests/qapi-schema/alternate-conflict-enum-bool.exit
+@@ -0,0 +1 @@
++1
+diff --git a/tests/qapi-schema/alternate-conflict-enum-bool.json b/tests/=
+qapi-schema/alternate-conflict-enum-bool.json
+new file mode 100644
+index 0000000000..bff25c3147
+--- /dev/null
++++ b/tests/qapi-schema/alternate-conflict-enum-bool.json
+@@ -0,0 +1,6 @@
++# alternate branch of 'enum' type that conflicts with bool
++{ 'enum': 'Enum',
++  'data': [ 'aus', 'off' ] }
++{ 'alternate': 'Alt',
++  'data': { 'one': 'Enum',
++            'two': 'bool' } }
+diff --git a/tests/qapi-schema/alternate-conflict-enum-bool.out b/tests/q=
+api-schema/alternate-conflict-enum-bool.out
+new file mode 100644
+index 0000000000..e69de29bb2
+diff --git a/tests/qapi-schema/alternate-conflict-enum-int.err b/tests/qa=
+pi-schema/alternate-conflict-enum-int.err
+new file mode 100644
+index 0000000000..2cc8e7b9aa
+--- /dev/null
++++ b/tests/qapi-schema/alternate-conflict-enum-int.err
+@@ -0,0 +1 @@
++tests/qapi-schema/alternate-conflict-enum-int.json:4: Alternate 'Alt' me=
+mber 'two' can't be distinguished from member 'one'
+diff --git a/tests/qapi-schema/alternate-conflict-enum-int.exit b/tests/q=
+api-schema/alternate-conflict-enum-int.exit
+new file mode 100644
+index 0000000000..d00491fd7e
+--- /dev/null
++++ b/tests/qapi-schema/alternate-conflict-enum-int.exit
+@@ -0,0 +1 @@
++1
+diff --git a/tests/qapi-schema/alternate-conflict-enum-int.json b/tests/q=
+api-schema/alternate-conflict-enum-int.json
+new file mode 100644
+index 0000000000..beb428c10b
+--- /dev/null
++++ b/tests/qapi-schema/alternate-conflict-enum-int.json
+@@ -0,0 +1,6 @@
++# alternate branches of 'enum' type that conflicts with numbers
++{ 'enum': 'Enum',
++  'data': [ '1', '2', '3' ] }
++{ 'alternate': 'Alt',
++  'data': { 'one': 'Enum',
++            'two': 'int' } }
+diff --git a/tests/qapi-schema/alternate-conflict-enum-int.out b/tests/qa=
+pi-schema/alternate-conflict-enum-int.out
+new file mode 100644
+index 0000000000..e69de29bb2
+diff --git a/tests/qapi-schema/alternate-conflict-string.err b/tests/qapi=
+-schema/alternate-conflict-string.err
+index fc523b0879..fe2f188295 100644
+--- a/tests/qapi-schema/alternate-conflict-string.err
++++ b/tests/qapi-schema/alternate-conflict-string.err
+@@ -1 +1 @@
+-tests/qapi-schema/alternate-conflict-string.json:4: Alternate 'Alt' memb=
+er 'two' can't be distinguished from member 'one'
++tests/qapi-schema/alternate-conflict-string.json:2: Alternate 'Alt' memb=
+er 'two' can't be distinguished from member 'one'
+diff --git a/tests/qapi-schema/alternate-conflict-string.json b/tests/qap=
+i-schema/alternate-conflict-string.json
+index 72f04a820a..85adbd4adc 100644
+--- a/tests/qapi-schema/alternate-conflict-string.json
++++ b/tests/qapi-schema/alternate-conflict-string.json
+@@ -1,6 +1,4 @@
+-# we reject alternates with multiple string-like branches
+-{ 'enum': 'Enum',
+-  'data': [ 'hello', 'world' ] }
++# alternate branches of 'str' type conflict with all scalar types
+ { 'alternate': 'Alt',
+   'data': { 'one': 'str',
+-            'two': 'Enum' } }
++            'two': 'int' } }
 diff --git a/tests/qapi-schema/qapi-schema-test.json b/tests/qapi-schema/=
 qapi-schema-test.json
-index 842ea3c5e3..303f2b23cd 100644
+index 303f2b23cd..17649c6398 100644
 --- a/tests/qapi-schema/qapi-schema-test.json
 +++ b/tests/qapi-schema/qapi-schema-test.json
-@@ -93,16 +93,17 @@
- { 'struct': 'WrapAlternate',
-   'data': { 'alt': 'UserDefAlternate' } }
- { 'alternate': 'UserDefAlternate',
--  'data': { 'udfu': 'UserDefFlatUnion', 's': 'str', 'i': 'int' } }
-+  'data': { 'udfu': 'UserDefFlatUnion', 'e': 'EnumOne', 'i': 'int' } }
-=20
- { 'struct': 'UserDefC',
-   'data': { 'string1': 'str', 'string2': 'str' } }
-=20
+@@ -101,12 +101,14 @@
  # for testing use of 'number' within alternates
--{ 'alternate': 'AltStrBool', 'data': { 's': 'str', 'b': 'bool' } }
--{ 'alternate': 'AltStrNum', 'data': { 's': 'str', 'n': 'number' } }
-+{ 'alternate': 'AltEnumBool', 'data': { 'e': 'EnumOne', 'b': 'bool' } }
-+{ 'alternate': 'AltEnumNum', 'data': { 'e': 'EnumOne', 'n': 'number' } }
- { 'alternate': 'AltNumStr', 'data': { 'n': 'number', 's': 'str' } }
--{ 'alternate': 'AltStrInt', 'data': { 's': 'str', 'i': 'int' } }
-+{ 'alternate': 'AltNumEnum', 'data': { 'n': 'number', 'e': 'EnumOne' } }
-+{ 'alternate': 'AltEnumInt', 'data': { 'e': 'EnumOne', 'i': 'int' } }
+ { 'alternate': 'AltEnumBool', 'data': { 'e': 'EnumOne', 'b': 'bool' } }
+ { 'alternate': 'AltEnumNum', 'data': { 'e': 'EnumOne', 'n': 'number' } }
+-{ 'alternate': 'AltNumStr', 'data': { 'n': 'number', 's': 'str' } }
+ { 'alternate': 'AltNumEnum', 'data': { 'n': 'number', 'e': 'EnumOne' } }
+ { 'alternate': 'AltEnumInt', 'data': { 'e': 'EnumOne', 'i': 'int' } }
  { 'alternate': 'AltIntNum', 'data': { 'i': 'int', 'n': 'number' } }
  { 'alternate': 'AltNumInt', 'data': { 'n': 'number', 'i': 'int' } }
 =20
++# for testing use of 'str' within alternates
++{ 'alternate': 'AltStrObj', 'data': { 's': 'str', 'o': 'TestStruct' } }
++
+ # for testing native lists
+ { 'union': 'UserDefNativeListUnion',
+   'data': { 'integer': ['int'],
 diff --git a/tests/qapi-schema/qapi-schema-test.out b/tests/qapi-schema/q=
 api-schema-test.out
-index 9d99c4eebb..3081091818 100644
+index 3081091818..9f68610dc2 100644
 --- a/tests/qapi-schema/qapi-schema-test.out
 +++ b/tests/qapi-schema/qapi-schema-test.out
-@@ -1,7 +1,23 @@
-+alternate AltEnumBool
-+    tag type
-+    case e: EnumOne
-+    case b: bool
-+alternate AltEnumInt
-+    tag type
-+    case e: EnumOne
-+    case i: int
-+alternate AltEnumNum
-+    tag type
-+    case e: EnumOne
-+    case n: number
- alternate AltIntNum
+@@ -22,10 +22,10 @@ alternate AltNumInt
      tag type
+     case n: number
      case i: int
-     case n: number
-+alternate AltNumEnum
-+    tag type
-+    case n: number
-+    case e: EnumOne
- alternate AltNumInt
+-alternate AltNumStr
++alternate AltStrObj
      tag type
-     case n: number
-@@ -10,18 +26,6 @@ alternate AltNumStr
-     tag type
-     case n: number
-     case s: str
--alternate AltStrBool
--    tag type
--    case s: str
--    case b: bool
--alternate AltStrInt
--    tag type
--    case s: str
--    case i: int
--alternate AltStrNum
--    tag type
--    case s: str
 -    case n: number
+     case s: str
++    case o: TestStruct
  event EVENT_A None
     boxed=3DFalse
  event EVENT_B None
-@@ -66,7 +70,7 @@ object UserDefA
- alternate UserDefAlternate
-     tag type
-     case udfu: UserDefFlatUnion
--    case s: str
-+    case e: EnumOne
-     case i: int
- object UserDefB
-     member intb: int optional=3DFalse
-diff --git a/tests/qapi-schema/returns-alternate.json b/tests/qapi-schema=
-/returns-alternate.json
-index 972390c06b..f87371811b 100644
---- a/tests/qapi-schema/returns-alternate.json
-+++ b/tests/qapi-schema/returns-alternate.json
-@@ -1,3 +1,3 @@
- # we reject returns if it is an alternate type
--{ 'alternate': 'Alt', 'data': { 'a': 'int', 'b': 'str' } }
-+{ 'alternate': 'Alt', 'data': { 'a': 'int', 'b': 'bool' } }
- { 'command': 'oops', 'returns': 'Alt' }
 --=20
 2.13.0.91.g00982b8dd
