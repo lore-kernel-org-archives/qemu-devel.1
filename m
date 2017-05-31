@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37952)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38820)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1dG4rv-0001o9-59
-	for qemu-devel@nongnu.org; Wed, 31 May 2017 10:45:07 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1dG4uX-0004FB-HO
+	for qemu-devel@nongnu.org; Wed, 31 May 2017 10:47:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1dG4rp-0005Gx-Gz
-	for qemu-devel@nongnu.org; Wed, 31 May 2017 10:45:03 -0400
-References: <20170503122539.282182-1-vsementsov@virtuozzo.com>
-	<20170503122539.282182-10-vsementsov@virtuozzo.com>
-	<33ce370d-939f-d02e-0177-1184ae9f4fa7@redhat.com>
-	<47488066-bd0f-834d-85d8-63d7289cb0fd@virtuozzo.com>
-	<18c4b1ad-bc30-a598-36b8-612c01b00dee@redhat.com>
-	<67feecd0-ef75-5e26-aa7c-a70b69fde0ef@virtuozzo.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <15564da8-3aa5-667a-addf-6d3617e64f67@redhat.com>
-Date: Wed, 31 May 2017 16:44:39 +0200
+	(envelope-from <alex.bennee@linaro.org>) id 1dG4uT-00067E-KS
+	for qemu-devel@nongnu.org; Wed, 31 May 2017 10:47:45 -0400
+Received: from mail-wm0-x229.google.com ([2a00:1450:400c:c09::229]:36346)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1dG4uT-00064U-CT
+	for qemu-devel@nongnu.org; Wed, 31 May 2017 10:47:41 -0400
+Received: by mail-wm0-x229.google.com with SMTP id 7so121608984wmo.1
+	for <qemu-devel@nongnu.org>; Wed, 31 May 2017 07:47:39 -0700 (PDT)
+References: <1487255507-106654-1-git-send-email-pbonzini@redhat.com>
+	<1487255507-106654-10-git-send-email-pbonzini@redhat.com>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <1487255507-106654-10-git-send-email-pbonzini@redhat.com>
+Date: Wed, 31 May 2017 15:47:53 +0100
+Message-ID: <871sr5t752.fsf@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <67feecd0-ef75-5e26-aa7c-a70b69fde0ef@virtuozzo.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="1HWcXNcJtofmhbIHfBc5XdtkUXVRup0nx"
-Subject: Re: [Qemu-devel] [PATCH 09/25] block/dirty-bitmap: add readonly
- field to BdrvDirtyBitmap
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PULL 09/23] gdbstub: Fix vCont behaviour
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,135 +30,112 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, armbru@redhat.com, eblake@redhat.com, jsnow@redhat.com, famz@redhat.com, den@openvz.org, stefanha@redhat.com, pbonzini@redhat.com
-
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---1HWcXNcJtofmhbIHfBc5XdtkUXVRup0nx
-From: Max Reitz <mreitz@redhat.com>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, armbru@redhat.com, eblake@redhat.com, jsnow@redhat.com,
- famz@redhat.com, den@openvz.org, stefanha@redhat.com, pbonzini@redhat.com
-Message-ID: <15564da8-3aa5-667a-addf-6d3617e64f67@redhat.com>
-Subject: Re: [PATCH 09/25] block/dirty-bitmap: add readonly field to
- BdrvDirtyBitmap
-References: <20170503122539.282182-1-vsementsov@virtuozzo.com>
- <20170503122539.282182-10-vsementsov@virtuozzo.com>
- <33ce370d-939f-d02e-0177-1184ae9f4fa7@redhat.com>
- <47488066-bd0f-834d-85d8-63d7289cb0fd@virtuozzo.com>
- <18c4b1ad-bc30-a598-36b8-612c01b00dee@redhat.com>
- <67feecd0-ef75-5e26-aa7c-a70b69fde0ef@virtuozzo.com>
-In-Reply-To: <67feecd0-ef75-5e26-aa7c-a70b69fde0ef@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 2017-05-31 16:29, Vladimir Sementsov-Ogievskiy wrote:
-> 31.05.2017 16:43, Max Reitz wrote:
->> On 2017-05-30 08:50, Vladimir Sementsov-Ogievskiy wrote:
->>> Thank you for this scenario. Hmm.
->>>
->>> So, as I need guarantee that image and bitmap are unchanged,
->>> bdrv_set_dirty should return error and fail the whole write. Ok?
->> I don't know. That would mean that you couldn't commit to an image tha=
-t
->> has a persistent auto-loading bitmap, which doesn't seem very nice to =
-me.
->>
->> I'm not quite sure what to do myself. So first I'd definitely want the=
-
->> commit operation to succeed. That means we'd have to automatically mak=
-e
->> the bitmap non-readonly once we write to it. The "readonly" flag would=
-
->> then be an "unchanged" flag, rather, to signify that the bitmap has no=
-t
->> been changed since it was loaded, which means that it does not need to=
-
->> be written back to the image file.
->>
->> Now the issue remains that if you modify a persistent bitmap that is
->> stored in an image file that is opened RO when it's closed, you won't =
-be
->> able to write the modifications back.
->>
->> So in addition, I guess we'd need to "flush" all persistent bitmaps
->> (that is, write all modifications back to the file and set the
->> "unchanged" flag (you could also call it "dirty" and then mean the
->> opposite) for each bitmap) not only when the image is closed or
->> invalidated, but also when it is reopened read-only.
->>
->> (block-commit reopens the backing BDS R/W, then writes to them, thus
->> modifying the dirty bitmaps, and finally reopens the BDS as read-only;=
-
->> before that happens, we will have to flush the modified bitmap data.)
->=20
-> Ok, understand.
->=20
-> We need to consider also setting in_use flag in the image. We _must not=
-_
-> write to image with dirty bitmap,
-> if in_use flag of this dirty bitmap is not set, as in case of something=
-
-> fail we will have image with wrong bitmap with
-> unset in_use flag (which looks ok).
-
-Right.
-
-> I see two ways to handle it:
->=20
-> variant 1:
-> 1. readonly field stays as is (see v19, with normal errors, not only
-> asserts)
-> 2. immediately after reopening r/w we do "reopening bitmaps r/w", i.e.
-> set in_use in the image and set BdrvDirtyBitmap.readonly =3D false
-> 3. in reopen_prepare, if reopening r-o do "reopening bitmaps r-o", i.e.=
-
-> save them into the image and set BdrvDirtyBitmap.readonly =3D true
-
-Sounds good, yes.
-
-> variant 2:
-> 1. instead of 'readonly' add 'dirty' field, set dirty to 0 for all
-> bitmaps on create
-> 2. before write/discard check this field in all related bitmaps, and if=
-
-> dirty=3D0 (and persistent=3D1), write IN_USE flag into the image first,=
- set
-> dirty=3D1, and only then do write. (if writing IN_USE=3D1 failed, fail =
-the
-> whole write)
-> 3. in reopen_prepare, if reopening r-o do "reopening bitmaps r-o", i.e.=
-
-> save them into the image and set BdrvDirtyBitmap.dirty =3D 0
-
-Works, too.
-
-I think the second variant would the more "efficient" way (because you
-only have to flush out dirty dirty bitmaps), but the first one would be
-simpler and has the great advantage of not requiring a write to the
-image file when you just want to set a bit in the in-memory dirty
-bitmap. So I'd personally go for the first variant.
-
-Max
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-devel@nongnu.org, Claudio Imbrenda <imbrenda@linux.vnet.ibm.com>
 
 
---1HWcXNcJtofmhbIHfBc5XdtkUXVRup0nx
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+Paolo Bonzini <pbonzini@redhat.com> writes:
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
+> From: Claudio Imbrenda <imbrenda@linux.vnet.ibm.com>
+>
+> When GDB issues a "vCont", QEMU was not handling it correctly when
+> multiple VCPUs are active.
+> For vCont, for each thread (VCPU), it can be specified whether to
+> single step, continue or stop that thread. The default is to stop a
+> thread.
+<snip>
+>
+> +/**
+> + * gdb_handle_vcont - Parses and handles a vCont packet.
+> + * returns -ENOTSUP if a command is unsupported, -EINVAL or -ERANGE if there is
+> + *         a format error, 0 on success.
+> + */
+> +static int gdb_handle_vcont(GDBState *s, const char *p)
+> +{
+> +    int res, idx, signal = 0;
+> +    char cur_action;
+> +    char *newstates;
+> +    unsigned long tmp;
+> +    CPUState *cpu;
+> +#ifdef CONFIG_USER_ONLY
+> +    int max_cpus = 1; /* global variable max_cpus exists only in system mode */
+> +
+> +    CPU_FOREACH(cpu) {
+> +        max_cpus = max_cpus <= cpu->cpu_index ? cpu->cpu_index + 1 : max_cpus;
+> +    }
+> +#endif
+> +    /* uninitialised CPUs stay 0 */
+> +    newstates = g_new0(char, max_cpus);
+> +
+> +    /* mark valid CPUs with 1 */
+> +    CPU_FOREACH(cpu) {
+> +        newstates[cpu->cpu_index] = 1;
+> +    }
+> +
+> +    /*
+> +     * res keeps track of what error we are returning, with -ENOTSUP meaning
+> +     * that the command is unknown or unsupported, thus returning an empty
+> +     * packet, while -EINVAL and -ERANGE cause an E22 packet, due to invalid,
+> +     *  or incorrect parameters passed.
+> +     */
+> +    res = 0;
+> +    while (*p) {
+> +        if (*p++ != ';') {
+> +            res = -ENOTSUP;
+> +            goto out;
+> +        }
+> +
+> +        cur_action = *p++;
+> +        if (cur_action == 'C' || cur_action == 'S') {
+> +            cur_action = tolower(cur_action);
+> +            res = qemu_strtoul(p + 1, &p, 16, &tmp);
+> +            if (res) {
+> +                goto out;
+> +            }
+> +            signal = gdb_signal_to_target(tmp);
+> +        } else if (cur_action != 'c' && cur_action != 's') {
+> +            /* unknown/invalid/unsupported command */
+> +            res = -ENOTSUP;
+> +            goto out;
+> +        }
+> +        /* thread specification. special values: (none), -1 = all; 0 = any */
+> +        if ((p[0] == ':' && p[1] == '-' && p[2] == '1') || (p[0] != ':')) {
+> +            if (*p == ':') {
+> +                p += 3;
+> +            }
+> +            for (idx = 0; idx < max_cpus; idx++) {
+> +                if (newstates[idx] == 1) {
+> +                    newstates[idx] = cur_action;
+> +                }
+> +            }
+> +        } else if (*p == ':') {
+> +            p++;
+> +            res = qemu_strtoul(p, &p, 16, &tmp);
+> +            if (res) {
+> +                goto out;
+> +            }
+> +            idx = tmp;
+> +            /* 0 means any thread, so we pick the first valid CPU */
+> +            if (!idx) {
+> +                idx = cpu_index(first_cpu);
+> +            }
+> +
+> +            /*
+> +             * If we are in user mode, the thread specified is actually a
+> +             * thread id, and not an index. We need to find the actual
+> +             * CPU first, and only then we can use its index.
+> +             */
+> +            cpu = find_cpu(idx);
+> +            /* invalid CPU/thread specified */
+> +            if (!idx || !cpu) {
+> +                res = -EINVAL;
+> +                goto out;
+> +            }
 
-iQEvBAEBCAAZBQJZLtbXEhxtcmVpdHpAcmVkaGF0LmNvbQAKCRD0B9sAYdXPQMm4
-B/0Wac6csXzaEDu39rkynAHsALRZWzoedBlYPjdazxLW48mq3O8GkY3x1cWqER5m
-C/DJjlyZqpOWJYYk56AZb0pMz0CbqiVcPd5xfkrUufZKakB3cURfk/D3M/pOBWst
-B2OEcfPomjDOgdieTzsGsj0hTf0IdSSkqDNuuWSrNA9fjMDc+B8qNOsZml3S03bw
-SKx3adVkyyWaFjXKa+zSBThBFnUPxRC8v9npOIKik7tBNsPMWrpGhrGBXVQ4jMRS
-aq9BKSURUkl7KEeIWkFRJLAP3on5T1iqrSPO3b/ZPwADNqDbpMjxwrAoEzz7ajbw
-OWN04PHozju34xy3PnBBKac1
-=q/0H
------END PGP SIGNATURE-----
+This fails on a packet like vCont;C04:0;c where we do find a cpu but it
+happens to have a internal cpu_index of 0.
 
---1HWcXNcJtofmhbIHfBc5XdtkUXVRup0nx--
+I'm sending a patch.
+
+--
+Alex Bennée
