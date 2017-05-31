@@ -1,26 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44270)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55325)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhi.a.wang@intel.com>) id 1dGBri-0003PS-MZ
-	for qemu-devel@nongnu.org; Wed, 31 May 2017 18:13:19 -0400
+	(envelope-from <jsnow@redhat.com>) id 1dGCZD-0004kG-Oo
+	for qemu-devel@nongnu.org; Wed, 31 May 2017 18:58:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zhi.a.wang@intel.com>) id 1dGBrf-00028k-Fz
-	for qemu-devel@nongnu.org; Wed, 31 May 2017 18:13:18 -0400
-Received: from mga05.intel.com ([192.55.52.43]:34146)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <zhi.a.wang@intel.com>)
-	id 1dGBrf-00028V-8e
-	for qemu-devel@nongnu.org; Wed, 31 May 2017 18:13:15 -0400
-From: "Wang, Zhi A" <zhi.a.wang@intel.com>
-Date: Wed, 31 May 2017 22:13:03 +0000
-Message-ID: <F3B0350DF4CB6849A642218320DE483D7D575A14@SHSMSX104.ccr.corp.intel.com>
-References: <1496079043-26694-1-git-send-email-zhi.a.wang@intel.com>
-	<592BDBCD.8030605@intel.com>
-In-Reply-To: <592BDBCD.8030605@intel.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	(envelope-from <jsnow@redhat.com>) id 1dGCZC-0005iV-Sq
+	for qemu-devel@nongnu.org; Wed, 31 May 2017 18:58:15 -0400
+From: John Snow <jsnow@redhat.com>
+References: <20170503122539.282182-1-vsementsov@virtuozzo.com>
+	<20170503122539.282182-10-vsementsov@virtuozzo.com>
+	<4b694da7-4fa8-24dc-6808-a47cbf985d82@redhat.com>
+Message-ID: <10d8e0bd-45c1-4009-94d1-872c9e96d4f2@redhat.com>
+Date: Wed, 31 May 2017 18:58:02 -0400
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [RFC 0/6] Refine IGD stolen memory support in VFIO
+In-Reply-To: <4b694da7-4fa8-24dc-6808-a47cbf985d82@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 09/25] block/dirty-bitmap: add readonly
+ field to BdrvDirtyBitmap
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,62 +26,112 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Wang, Zhi A" <zhi.a.wang@intel.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "Tian, Kevin" <kevin.tian@intel.com>, "daniel.vetter@ffwll.ch" <daniel.vetter@ffwll.ch>, "joonas.lahtinen@linux.intel.com" <joonas.lahtinen@linux.intel.com>, "zhenyuw@linux.intel.com" <zhenyuw@linux.intel.com>, Alex Williamson <alex.williamson@redhat.com>, "Lv, Zhiyuan" <zhiyuan.lv@intel.com>, "Dong, Chuanxiao" <chuanxiao.dong@intel.com>, "Zhang, Xiong Y" <xiong.y.zhang@intel.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, famz@redhat.com, armbru@redhat.com, mreitz@redhat.com, stefanha@redhat.com, pbonzini@redhat.com, den@openvz.org
 
-Ping.
 
------Original Message-----
-From: Qemu-devel [mailto:qemu-devel-bounces+zhi.a.wang=3Dintel.com@nongnu.o=
-rg] On Behalf Of Zhi Wang
-Sent: Monday, May 29, 2017 4:29 PM
-To: qemu-devel@nongnu.org
-Cc: Tian, Kevin <kevin.tian@intel.com>; daniel.vetter@ffwll.ch; joonas.laht=
-inen@linux.intel.com; zhenyuw@linux.intel.com; Alex Williamson <alex.willia=
-mson@redhat.com>; Lv, Zhiyuan <zhiyuan.lv@intel.com>; Dong, Chuanxiao <chua=
-nxiao.dong@intel.com>; Zhang, Xiong Y <xiong.y.zhang@intel.com>
-Subject: Re: [Qemu-devel] [RFC 0/6] Refine IGD stolen memory support in VFI=
-O
 
-Hi Alex:
-     This the RFC patch of my ides in previous email. Could you shed some l=
-ights here? :)
+On 05/19/2017 07:02 PM, John Snow wrote:
+> 
+> 
+> On 05/03/2017 08:25 AM, Vladimir Sementsov-Ogievskiy wrote:
+>> It will be needed in following commits for persistent bitmaps.
+>> If bitmap is loaded from read-only storage (and we can't mark it
+>> "in use" in this storage) corresponding BdrvDirtyBitmap should be
+>> read-only.
+>>
+>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+>> ---
+>>  block/dirty-bitmap.c         | 16 ++++++++++++++++
+>>  include/block/dirty-bitmap.h |  3 +++
+>>  2 files changed, 19 insertions(+)
+>>
+>> diff --git a/block/dirty-bitmap.c b/block/dirty-bitmap.c
+>> index 90af37287f..ab6a95cf41 100644
+>> --- a/block/dirty-bitmap.c
+>> +++ b/block/dirty-bitmap.c
+>> @@ -44,6 +44,8 @@ struct BdrvDirtyBitmap {
+>>      int64_t size;               /* Size of the bitmap (Number of sectors) */
+>>      bool disabled;              /* Bitmap is read-only */
+>>      int active_iterators;       /* How many iterators are active */
+>> +    bool readonly;              /* Bitmap is read-only and may be changed only
+>> +                                   by deserialize* functions */
+>>      QLIST_ENTRY(BdrvDirtyBitmap) list;
+>>  };
+>>  
+>> @@ -436,6 +438,7 @@ void bdrv_set_dirty_bitmap(BdrvDirtyBitmap *bitmap,
+>>                             int64_t cur_sector, int64_t nr_sectors)
+>>  {
+>>      assert(bdrv_dirty_bitmap_enabled(bitmap));
+>> +    assert(!bdrv_dirty_bitmap_readonly(bitmap));
+> 
+> Doesn't this change the nature of the assertion?
+> 
+> We're going from
+>     return !(bitmap->disabled || bitmap->successor);
+> to
+> 	!bitmap->readonly
+> 
+> That makes me a little nervous to ACK this patch, because the
+> correctness depends on how readonly is updated and manipulated in the
+> future, which makes it more prone to error.
+> 
 
-Thanks,
-Zhi.
+I must have been *REALLY* tired when I sent this; I had thought you were
+replacing an assertion instead of just adding one.
 
-On 05/30/17 01:30, Zhi Wang wrote:
-> This patch series are aim to refine the IGD stolen memory support in QEMU=
-.
->
-> Some features of Intel HW relies on the stolen memory to work, but=20
-> some of registers used to indicate the base address of stolen memory=20
-> can only be programmed once after system is powered-up. This will=20
-> cause problems if the base of the stolen memory is changed during IGD pas=
-sthrough.
->
-> The solution of this patch series is allocating a new VM dedicated=20
-> memory as "guest stolen memory" in QEMU for isolation and let the=20
-> "guest stolen memory" sits in the same PA as host.
->
-> Also it introduces Intel platform definitions and clears some old=20
-> funtions and definitions.
->
-> Zhi Wang (6):
->    vfio: Add Intel platform definitions
->    vfio: Setup IGD quirks earlier
->    vfio: Setup IGD stolen memory
->    vfio: Refine GGTT clearing
->    vfio: Remove extra quirks and old definitions
->    vfio: Setup IGD stolen memory under secondary mode
->
->   hw/vfio/Makefile.objs    |   2 +-
->   hw/vfio/intel-platform.c | 366 ++++++++++++++++++++++++++++++++++++++++=
-+++++++
->   hw/vfio/intel-platform.h |  38 +++++
->   hw/vfio/pci-quirks.c     | 322 ++++++++--------------------------------=
--
->   4 files changed, 463 insertions(+), 265 deletions(-)
->   create mode 100644 hw/vfio/intel-platform.c
->   create mode 100644 hw/vfio/intel-platform.h
->
+I'm sorry about that.
+
+>>      hbitmap_set(bitmap->bitmap, cur_sector, nr_sectors);
+>>  }
+>>  
+>> @@ -443,12 +446,14 @@ void bdrv_reset_dirty_bitmap(BdrvDirtyBitmap *bitmap,
+>>                               int64_t cur_sector, int64_t nr_sectors)
+>>  {
+>>      assert(bdrv_dirty_bitmap_enabled(bitmap));
+>> +    assert(!bdrv_dirty_bitmap_readonly(bitmap));
+>>      hbitmap_reset(bitmap->bitmap, cur_sector, nr_sectors);
+>>  }
+>>  
+>>  void bdrv_clear_dirty_bitmap(BdrvDirtyBitmap *bitmap, HBitmap **out)
+>>  {
+>>      assert(bdrv_dirty_bitmap_enabled(bitmap));
+>> +    assert(!bdrv_dirty_bitmap_readonly(bitmap));
+>>      if (!out) {
+>>          hbitmap_reset_all(bitmap->bitmap);
+>>      } else {
+>> @@ -519,6 +524,7 @@ void bdrv_set_dirty(BlockDriverState *bs, int64_t cur_sector,
+>>          if (!bdrv_dirty_bitmap_enabled(bitmap)) {
+>>              continue;
+>>          }
+>> +        assert(!bdrv_dirty_bitmap_readonly(bitmap));
+>>          hbitmap_set(bitmap->bitmap, cur_sector, nr_sectors);
+>>      }
+>>  }
+>> @@ -540,3 +546,13 @@ int64_t bdrv_get_meta_dirty_count(BdrvDirtyBitmap *bitmap)
+>>  {
+>>      return hbitmap_count(bitmap->meta);
+>>  }
+>> +
+>> +bool bdrv_dirty_bitmap_readonly(const BdrvDirtyBitmap *bitmap)
+>> +{
+>> +    return bitmap->readonly;
+>> +}
+>> +
+>> +void bdrv_dirty_bitmap_set_readonly(BdrvDirtyBitmap *bitmap)
+>> +{
+>> +    bitmap->readonly = true;
+>> +}
+>> diff --git a/include/block/dirty-bitmap.h b/include/block/dirty-bitmap.h
+>> index 1e17729ac2..0aab5841f5 100644
+>> --- a/include/block/dirty-bitmap.h
+>> +++ b/include/block/dirty-bitmap.h
+>> @@ -75,4 +75,7 @@ void bdrv_dirty_bitmap_deserialize_ones(BdrvDirtyBitmap *bitmap,
+>>                                          bool finish);
+>>  void bdrv_dirty_bitmap_deserialize_finish(BdrvDirtyBitmap *bitmap);
+>>  
+>> +bool bdrv_dirty_bitmap_readonly(const BdrvDirtyBitmap *bitmap);
+>> +void bdrv_dirty_bitmap_set_readonly(BdrvDirtyBitmap *bitmap);
+>> +
+>>  #endif
+>>
