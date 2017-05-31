@@ -1,30 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54167)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54277)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1dG4FI-0001Um-BB
-	for qemu-devel@nongnu.org; Wed, 31 May 2017 10:05:09 -0400
+	(envelope-from <marcandre.lureau@redhat.com>) id 1dG4FX-0001mn-P3
+	for qemu-devel@nongnu.org; Wed, 31 May 2017 10:05:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1dG4FD-0006W1-4k
-	for qemu-devel@nongnu.org; Wed, 31 May 2017 10:05:08 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:36804)
+	(envelope-from <marcandre.lureau@redhat.com>) id 1dG4FV-0006eZ-0m
+	for qemu-devel@nongnu.org; Wed, 31 May 2017 10:05:23 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:48754)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1dG4FC-0006Vu-SB
-	for qemu-devel@nongnu.org; Wed, 31 May 2017 10:05:03 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
+	id 1dG4FU-0006eJ-O5
+	for qemu-devel@nongnu.org; Wed, 31 May 2017 10:05:20 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id D747A15447
-	for <qemu-devel@nongnu.org>; Wed, 31 May 2017 14:05:01 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id C3FC280C1D
+	for <qemu-devel@nongnu.org>; Wed, 31 May 2017 14:05:19 +0000 (UTC)
 From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Wed, 31 May 2017 17:57:08 +0400
-Message-Id: <20170531135709.345-45-marcandre.lureau@redhat.com>
+Date: Wed, 31 May 2017 17:57:09 +0400
+Message-Id: <20170531135709.345-46-marcandre.lureau@redhat.com>
 In-Reply-To: <20170531135709.345-1-marcandre.lureau@redhat.com>
 References: <20170531135709.345-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v2 44/45] RFC: qdict: add uint
+Subject: [Qemu-devel] [PATCH v2 45/45] qobject: move dump_qobject() from
+ block/ to qobject/
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,171 +37,323 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: armbru@redhat.com, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
-Similar to int support, add uint support.
-
-Note this is RFC because this is currently unused in qemu, I haven't
-found a good user for it yet (kaslr qemu-ga code did use it though).
+The dump functions could be generally useful for any qobject user or for
+debugging etc.
 
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 ---
- include/qapi/qmp/qdict.h |  5 +++++
- qobject/qdict.c          | 39 +++++++++++++++++++++++++++++++++++++++
- tests/check-qdict.c      | 39 +++++++++++++++++++++++++++++++++++++++
- 3 files changed, 83 insertions(+)
+ include/qapi/qmp/qdict.h   |  2 ++
+ include/qapi/qmp/qlist.h   |  2 ++
+ include/qapi/qmp/qobject.h |  7 ++++
+ block/qapi.c               | 90 +++-------------------------------------=
+------
+ qobject/qdict.c            | 30 ++++++++++++++++
+ qobject/qlist.c            | 23 ++++++++++++
+ qobject/qobject.c          | 19 ++++++++++
+ tests/check-qjson.c        | 19 ++++++++++
+ 8 files changed, 106 insertions(+), 86 deletions(-)
 
 diff --git a/include/qapi/qmp/qdict.h b/include/qapi/qmp/qdict.h
-index 363e431106..8c7c2b762b 100644
+index 8c7c2b762b..1ef3bc8cda 100644
 --- a/include/qapi/qmp/qdict.h
 +++ b/include/qapi/qmp/qdict.h
-@@ -56,6 +56,8 @@ void qdict_destroy_obj(QObject *obj);
- /* Helpers for int, bool, and string */
- #define qdict_put_int(qdict, key, value) \
-         qdict_put(qdict, key, qnum_from_int(value))
-+#define qdict_put_uint(qdict, key, value)        \
-+        qdict_put(qdict, key, qnum_from_uint(value))
- #define qdict_put_bool(qdict, key, value) \
-         qdict_put(qdict, key, qbool_from_bool(value))
- #define qdict_put_str(qdict, key, value) \
-@@ -64,12 +66,15 @@ void qdict_destroy_obj(QObject *obj);
- /* High level helpers */
- double qdict_get_double(const QDict *qdict, const char *key);
- int64_t qdict_get_int(const QDict *qdict, const char *key);
-+uint64_t qdict_get_uint(const QDict *qdict, const char *key);
- bool qdict_get_bool(const QDict *qdict, const char *key);
- QList *qdict_get_qlist(const QDict *qdict, const char *key);
- QDict *qdict_get_qdict(const QDict *qdict, const char *key);
- const char *qdict_get_str(const QDict *qdict, const char *key);
- int64_t qdict_get_try_int(const QDict *qdict, const char *key,
-                           int64_t def_value);
-+uint64_t qdict_get_try_uint(const QDict *qdict, const char *key,
-+                            uint64_t def_value);
- bool qdict_get_try_bool(const QDict *qdict, const char *key, bool def_va=
-lue);
- const char *qdict_get_try_str(const QDict *qdict, const char *key);
+@@ -91,4 +91,6 @@ QObject *qdict_crumple(const QDict *src, Error **errp);
 =20
+ void qdict_join(QDict *dest, QDict *src, bool overwrite);
+=20
++char *qdict_to_string(QDict *dict, int indent);
++
+ #endif /* QDICT_H */
+diff --git a/include/qapi/qmp/qlist.h b/include/qapi/qmp/qlist.h
+index c4b5fdad9b..c93ac3e15b 100644
+--- a/include/qapi/qmp/qlist.h
++++ b/include/qapi/qmp/qlist.h
+@@ -60,6 +60,8 @@ size_t qlist_size(const QList *qlist);
+ QList *qobject_to_qlist(const QObject *obj);
+ void qlist_destroy_obj(QObject *obj);
+=20
++char *qlist_to_string(QList *list, int indent);
++
+ static inline const QListEntry *qlist_first(const QList *qlist)
+ {
+     return QTAILQ_FIRST(&qlist->head);
+diff --git a/include/qapi/qmp/qobject.h b/include/qapi/qmp/qobject.h
+index b8ddbca405..0d6ae5048a 100644
+--- a/include/qapi/qmp/qobject.h
++++ b/include/qapi/qmp/qobject.h
+@@ -101,4 +101,11 @@ static inline QObject *qnull(void)
+     return &qnull_;
+ }
+=20
++char *qobject_to_string_indent(QObject *obj, int indent);
++
++static inline char *qobject_to_string(QObject *obj)
++{
++    return qobject_to_string_indent(obj, 0);
++}
++
+ #endif /* QOBJECT_H */
+diff --git a/block/qapi.c b/block/qapi.c
+index 2050df29e4..9b7d42e50a 100644
+--- a/block/qapi.c
++++ b/block/qapi.c
+@@ -586,101 +586,19 @@ void bdrv_snapshot_dump(fprintf_function func_fpri=
+ntf, void *f,
+     }
+ }
+=20
+-static void dump_qdict(fprintf_function func_fprintf, void *f, int inden=
+tation,
+-                       QDict *dict);
+-static void dump_qlist(fprintf_function func_fprintf, void *f, int inden=
+tation,
+-                       QList *list);
+-
+-static void dump_qobject(fprintf_function func_fprintf, void *f,
+-                         int comp_indent, QObject *obj)
+-{
+-    switch (qobject_type(obj)) {
+-        case QTYPE_QNUM: {
+-            QNum *value =3D qobject_to_qnum(obj);
+-            char *tmp =3D qnum_to_string(value);
+-            func_fprintf(f, "%s", tmp);
+-            g_free(tmp);
+-            break;
+-        }
+-        case QTYPE_QSTRING: {
+-            QString *value =3D qobject_to_qstring(obj);
+-            func_fprintf(f, "%s", qstring_get_str(value));
+-            break;
+-        }
+-        case QTYPE_QDICT: {
+-            QDict *value =3D qobject_to_qdict(obj);
+-            dump_qdict(func_fprintf, f, comp_indent, value);
+-            break;
+-        }
+-        case QTYPE_QLIST: {
+-            QList *value =3D qobject_to_qlist(obj);
+-            dump_qlist(func_fprintf, f, comp_indent, value);
+-            break;
+-        }
+-        case QTYPE_QBOOL: {
+-            QBool *value =3D qobject_to_qbool(obj);
+-            func_fprintf(f, "%s", qbool_get_bool(value) ? "true" : "fals=
+e");
+-            break;
+-        }
+-        default:
+-            abort();
+-    }
+-}
+-
+-static void dump_qlist(fprintf_function func_fprintf, void *f, int inden=
+tation,
+-                       QList *list)
+-{
+-    const QListEntry *entry;
+-    int i =3D 0;
+-
+-    for (entry =3D qlist_first(list); entry; entry =3D qlist_next(entry)=
+, i++) {
+-        QType type =3D qobject_type(entry->value);
+-        bool composite =3D (type =3D=3D QTYPE_QDICT || type =3D=3D QTYPE=
+_QLIST);
+-        func_fprintf(f, "%*s[%i]:%c", indentation * 4, "", i,
+-                     composite ? '\n' : ' ');
+-        dump_qobject(func_fprintf, f, indentation + 1, entry->value);
+-        if (!composite) {
+-            func_fprintf(f, "\n");
+-        }
+-    }
+-}
+-
+-static void dump_qdict(fprintf_function func_fprintf, void *f, int inden=
+tation,
+-                       QDict *dict)
+-{
+-    const QDictEntry *entry;
+-
+-    for (entry =3D qdict_first(dict); entry; entry =3D qdict_next(dict, =
+entry)) {
+-        QType type =3D qobject_type(entry->value);
+-        bool composite =3D (type =3D=3D QTYPE_QDICT || type =3D=3D QTYPE=
+_QLIST);
+-        char *key =3D g_malloc(strlen(entry->key) + 1);
+-        int i;
+-
+-        /* replace dashes with spaces in key (variable) names */
+-        for (i =3D 0; entry->key[i]; i++) {
+-            key[i] =3D entry->key[i] =3D=3D '-' ? ' ' : entry->key[i];
+-        }
+-        key[i] =3D 0;
+-        func_fprintf(f, "%*s%s:%c", indentation * 4, "", key,
+-                     composite ? '\n' : ' ');
+-        dump_qobject(func_fprintf, f, indentation + 1, entry->value);
+-        if (!composite) {
+-            func_fprintf(f, "\n");
+-        }
+-        g_free(key);
+-    }
+-}
+-
+ void bdrv_image_info_specific_dump(fprintf_function func_fprintf, void *=
+f,
+                                    ImageInfoSpecific *info_spec)
+ {
+     QObject *obj, *data;
+     Visitor *v =3D qobject_output_visitor_new(&obj);
++    char *tmp;
+=20
+     visit_type_ImageInfoSpecific(v, NULL, &info_spec, &error_abort);
+     visit_complete(v, &obj);
+     data =3D qdict_get(qobject_to_qdict(obj), "data");
+-    dump_qobject(func_fprintf, f, 1, data);
++    tmp =3D qobject_to_string_indent(data, 1);
++    func_fprintf(f, "%s", tmp);
++    g_free(tmp);
+     qobject_decref(obj);
+     visit_free(v);
+ }
 diff --git a/qobject/qdict.c b/qobject/qdict.c
-index f62625cbd6..b02dc6b745 100644
+index b02dc6b745..e2cde1255a 100644
 --- a/qobject/qdict.c
 +++ b/qobject/qdict.c
-@@ -208,6 +208,25 @@ int64_t qdict_get_int(const QDict *qdict, const char=
- *key)
+@@ -1067,3 +1067,33 @@ void qdict_join(QDict *dest, QDict *src, bool over=
+write)
+         entry =3D next;
+     }
  }
-=20
- /**
-+ * qdict_get_uint(): Get an unsigned integer mapped by 'key'
-+ *
-+ * This function assumes that 'key' exists and it stores a
-+ * QNum int object.
-+ *
-+ * Return unsigned integer mapped by 'key'.
-+ */
-+uint64_t qdict_get_uint(const QDict *qdict, const char *key)
-+{
-+    uint64_t val;
 +
-+    if (!qnum_get_uint(qobject_to_qnum(qdict_get(qdict, key)), &val)) {
-+        g_assert_not_reached();
++char *qdict_to_string(QDict *dict, int indent)
++{
++    const QDictEntry *entry;
++    GString *str =3D g_string_new(NULL);
++
++    for (entry =3D qdict_first(dict); entry; entry =3D qdict_next(dict, =
+entry)) {
++        QType type =3D qobject_type(entry->value);
++        bool composite =3D (type =3D=3D QTYPE_QDICT || type =3D=3D QTYPE=
+_QLIST);
++        char *key =3D g_malloc(strlen(entry->key) + 1);
++        char *val =3D qobject_to_string_indent(entry->value, indent + 1)=
+;
++        int i;
++
++        /* replace dashes with spaces in key (variable) names */
++        for (i =3D 0; entry->key[i]; i++) {
++            key[i] =3D entry->key[i] =3D=3D '-' ? ' ' : entry->key[i];
++        }
++        key[i] =3D 0;
++        g_string_append_printf(str, "%*s%s:", indent * 4, "", key);
++        g_string_append_c(str, composite ? '\n' : ' ');
++        g_string_append(str, val);
++        if (!composite) {
++            g_string_append_c(str, '\n');
++        }
++        g_free(val);
++        g_free(key);
 +    }
 +
-+    return val;
++    return g_string_free(str, false);
 +}
-+
-+/**
-  * qdict_get_bool(): Get a bool mapped by 'key'
-  *
-  * This function assumes that 'key' exists and it stores a
-@@ -271,6 +290,26 @@ int64_t qdict_get_try_int(const QDict *qdict, const =
-char *key,
- }
+diff --git a/qobject/qlist.c b/qobject/qlist.c
+index 86b60cb88c..b769248290 100644
+--- a/qobject/qlist.c
++++ b/qobject/qlist.c
+@@ -158,3 +158,26 @@ void qlist_destroy_obj(QObject *obj)
 =20
- /**
-+ * qdict_get_try_uint(): Try to get usigned integer mapped by 'key'
-+ *
-+ * Return unsigned integer mapped by 'key', if it is not present in
-+ * the dictionary or if the stored object is not of QNum type
-+ * 'def_value' will be returned.
-+ */
-+uint64_t qdict_get_try_uint(const QDict *qdict, const char *key,
-+                            uint64_t def_value)
-+{
-+    QNum *qnum =3D qobject_to_qnum(qdict_get(qdict, key));
-+    uint64_t val;
+     g_free(qlist);
+ }
 +
-+    if (!qnum || !qnum_get_uint(qnum, &val)) {
-+        val =3D def_value;
++char *qlist_to_string(QList *list, int indent)
++{
++    GString *str =3D g_string_new(NULL);
++    const QListEntry *entry;
++    int i =3D 0;
++
++    for (entry =3D qlist_first(list); entry; entry =3D qlist_next(entry)=
+, i++) {
++        QType type =3D qobject_type(entry->value);
++        bool composite =3D (type =3D=3D QTYPE_QDICT || type =3D=3D QTYPE=
+_QLIST);
++        char *val =3D qobject_to_string_indent(entry->value, indent + 1)=
+;
++
++        g_string_append_printf(str, "%*s[%i]:", indent * 4, "", i);
++        g_string_append_c(str, composite ? '\n' : ' ');
++        g_string_append(str, val);
++        if (!composite) {
++            g_string_append_c(str, '\n');
++        }
++        g_free(val);
 +    }
 +
-+    return val;
++    return g_string_free(str, false);
 +}
+diff --git a/qobject/qobject.c b/qobject/qobject.c
+index b0cafb66f1..64e959c54f 100644
+--- a/qobject/qobject.c
++++ b/qobject/qobject.c
+@@ -27,3 +27,22 @@ void qobject_destroy(QObject *obj)
+     assert(QTYPE_QNULL < obj->type && obj->type < QTYPE__MAX);
+     qdestroy[obj->type](obj);
+ }
 +
-+/**
-  * qdict_get_try_bool(): Try to get a bool mapped by 'key'
-  *
-  * Return bool mapped by 'key', if it is not present in the
-diff --git a/tests/check-qdict.c b/tests/check-qdict.c
-index 889b43b57d..2a5b322509 100644
---- a/tests/check-qdict.c
-+++ b/tests/check-qdict.c
-@@ -109,6 +109,21 @@ static void qdict_get_int_test(void)
-     QDECREF(tests_dict);
++char *qobject_to_string_indent(QObject *obj, int indent)
++{
++    switch (qobject_type(obj)) {
++    case QTYPE_QNUM:
++        return qnum_to_string(qobject_to_qnum(obj));
++    case QTYPE_QSTRING:
++        return g_strdup(qstring_get_str(qobject_to_qstring(obj)));
++    case QTYPE_QDICT:
++        return qdict_to_string(qobject_to_qdict(obj), indent);
++    case QTYPE_QLIST:
++        return qlist_to_string(qobject_to_qlist(obj), indent);
++    case QTYPE_QBOOL:
++        return g_strdup(qbool_get_bool(qobject_to_qbool(obj)) ?
++                        "true" : "false");
++    default:
++        abort();
++    }
++}
+diff --git a/tests/check-qjson.c b/tests/check-qjson.c
+index 6fb14445a3..d12daf39e9 100644
+--- a/tests/check-qjson.c
++++ b/tests/check-qjson.c
+@@ -1365,6 +1365,23 @@ static void simple_whitespace(void)
+     }
  }
 =20
-+static void qdict_get_uint_test(void)
++static void qobject_to_string_test(void)
 +{
-+    uint64_t ret;
-+    const uint64_t value =3D UINT64_MAX;
-+    const char *key =3D "uint";
-+    QDict *tests_dict =3D qdict_new();
++    QObject *obj;
++    char *tmp;
 +
-+    qdict_put_uint(tests_dict, key, value);
-+
-+    ret =3D qdict_get_uint(tests_dict, key);
-+    g_assert(ret =3D=3D value);
-+
-+    QDECREF(tests_dict);
++    obj =3D qobject_from_json("[ 43, { 'c': { 'd' : 12 } }, [ 1, 2 ], 42=
+ ]",
++                            &error_abort);
++    tmp =3D qobject_to_string(obj);
++    g_assert_cmpstr(tmp, =3D=3D,
++                    "[0]: 43\n"
++                    "[1]:\n    c:\n        d: 12\n"
++                    "[2]:\n    [0]: 1\n    [1]: 2\n"
++                    "[3]: 42\n");
++    g_free(tmp);
++    qobject_decref(obj);
 +}
 +
- static void qdict_get_try_int_test(void)
+ static void simple_varargs(void)
  {
-     int ret;
-@@ -131,6 +146,28 @@ static void qdict_get_try_int_test(void)
-     QDECREF(tests_dict);
- }
+     QObject *embedded_obj;
+@@ -1538,5 +1555,7 @@ int main(int argc, char **argv)
+     g_test_add_func("/errors/unterminated/literal", unterminated_literal=
+);
+     g_test_add_func("/errors/limits/nesting", limits_nesting);
 =20
-+static void qdict_get_try_uint_test(void)
-+{
-+    uint64_t ret;
-+    const uint64_t value =3D UINT64_MAX;
-+    const char *key =3D "uint";
-+    QDict *tests_dict =3D qdict_new();
++    g_test_add_func("/qobject/to_string", qobject_to_string_test);
 +
-+    qdict_put_uint(tests_dict, key, value);
-+    qdict_put_str(tests_dict, "string", "test");
-+
-+    ret =3D qdict_get_try_uint(tests_dict, key, 0);
-+    g_assert_cmpuint(ret, =3D=3D, value);
-+
-+    ret =3D qdict_get_try_uint(tests_dict, "missing", 42);
-+    g_assert_cmpuint(ret, =3D=3D, 42);
-+
-+    ret =3D qdict_get_try_uint(tests_dict, "string", 42);
-+    g_assert_cmpuint(ret, =3D=3D, 42);
-+
-+    QDECREF(tests_dict);
-+}
-+
- static void qdict_get_str_test(void)
- {
-     const char *p;
-@@ -866,7 +903,9 @@ int main(int argc, char **argv)
-     /* Continue, but now with fixtures */
-     g_test_add_func("/public/get", qdict_get_test);
-     g_test_add_func("/public/get_int", qdict_get_int_test);
-+    g_test_add_func("/public/get_uint", qdict_get_uint_test);
-     g_test_add_func("/public/get_try_int", qdict_get_try_int_test);
-+    g_test_add_func("/public/get_try_uint", qdict_get_try_uint_test);
-     g_test_add_func("/public/get_str", qdict_get_str_test);
-     g_test_add_func("/public/get_try_str", qdict_get_try_str_test);
-     g_test_add_func("/public/defaults", qdict_defaults_test);
+     return g_test_run();
+ }
 --=20
 2.13.0.91.g00982b8dd
