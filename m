@@ -1,28 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41516)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41709)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <roman.penyaev@profitbricks.com>) id 1dG3dI-0004yK-Kx
-	for qemu-devel@nongnu.org; Wed, 31 May 2017 09:25:53 -0400
+	(envelope-from <marcandre.lureau@gmail.com>) id 1dG3dn-0005Kn-5R
+	for qemu-devel@nongnu.org; Wed, 31 May 2017 09:26:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <roman.penyaev@profitbricks.com>) id 1dG3dH-0000rt-NN
-	for qemu-devel@nongnu.org; Wed, 31 May 2017 09:25:52 -0400
-Received: from mail-io0-x232.google.com ([2607:f8b0:4001:c06::232]:32922)
+	(envelope-from <marcandre.lureau@gmail.com>) id 1dG3dl-00014s-V9
+	for qemu-devel@nongnu.org; Wed, 31 May 2017 09:26:23 -0400
+Received: from mail-lf0-x242.google.com ([2a00:1450:4010:c07::242]:33373)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <roman.penyaev@profitbricks.com>)
-	id 1dG3dH-0000qn-I0
-	for qemu-devel@nongnu.org; Wed, 31 May 2017 09:25:51 -0400
-Received: by mail-io0-x232.google.com with SMTP id p24so15896134ioi.0
-	for <qemu-devel@nongnu.org>; Wed, 31 May 2017 06:25:51 -0700 (PDT)
+	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+	id 1dG3dl-00014e-I2
+	for qemu-devel@nongnu.org; Wed, 31 May 2017 09:26:21 -0400
+Received: by mail-lf0-x242.google.com with SMTP id m18so1417630lfj.0
+	for <qemu-devel@nongnu.org>; Wed, 31 May 2017 06:26:21 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <3066658b-be68-a69a-6f9e-5c8801bc7091@redhat.com>
-References: <20170530100736.3338-1-roman.penyaev@profitbricks.com>
-	<20170531130609.GE16733@stefanha-x1.localdomain>
-	<3066658b-be68-a69a-6f9e-5c8801bc7091@redhat.com>
-From: Roman Penyaev <roman.penyaev@profitbricks.com>
-Date: Wed, 31 May 2017 15:25:30 +0200
-Message-ID: <CAJrWOzBr7epXJopDX6Z7rGf5KV-A_E0itGxZ7VLOvOu4MzJzzg@mail.gmail.com>
+References: <20170509173559.31598-1-marcandre.lureau@redhat.com>
+	<20170509173559.31598-15-marcandre.lureau@redhat.com>
+	<871srmqq46.fsf@dusky.pond.sub.org>
+	<CAJ+F1CJ8K=i_nZex49Gm7SMs4bPHyw_U_HZ0GNiQaAch9GwtrQ@mail.gmail.com>
+	<87efv588ir.fsf@dusky.pond.sub.org>
+In-Reply-To: <87efv588ir.fsf@dusky.pond.sub.org>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Wed, 31 May 2017 13:26:09 +0000
+Message-ID: <CAJ+F1CJGSvgw+oq-WqU84fUC_6UGvfcx00bTVHYdHt0J=SnZVw@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v2 1/1] coroutine-lock: do not touch
- coroutine after another one has been entered
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 14/17] acpi: fix s3/s4 disabled type
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,28 +33,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Stefan Hajnoczi <stefanha@gmail.com>, Kevin Wolf <kwolf@redhat.com>, Fam Zheng <famz@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: qemu-devel@nongnu.org
 
-On Wed, May 31, 2017 at 3:22 PM, Paolo Bonzini <pbonzini@redhat.com> wrote:
->
->
-> On 31/05/2017 15:06, Stefan Hajnoczi wrote:
->>> +
->>> +    while ((next = QSIMPLEQ_FIRST(&tmp_queue_wakeup))) {
->>> +        QSIMPLEQ_REMOVE_HEAD(&tmp_queue_wakeup, co_queue_next);
->>>          qemu_coroutine_enter(next);
->>>      }
->>>  }
->> What happens if co remains alive and qemu_coroutine_enter(next) causes
->> additional coroutines to add themselves to co->co_queue_wakeup?
->
-> Wouldn't that happen only if co is entered again?  Then it will also
-> reenter qemu_co_queue_run_restart, which may cause a different wakeup
-> order but not any missing wakeups.
+On Wed, May 31, 2017 at 5:23 PM Markus Armbruster <armbru@redhat.com> wrote=
+:
 
-Exactly, that what I tried to show with stupid arrows in another mail.
-I am not sure that I've succeeded :)
+> Marc-Andr=C3=A9 Lureau <marcandre.lureau@gmail.com> writes:
+>
+> > On Thu, May 18, 2017 at 4:58 PM Markus Armbruster <armbru@redhat.com>
+> wrote:
+> >
+> >> Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
+> >>
+> >> > Use a more specific bool type.
+> >> >
+> >> > Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> >>
+> >> Why doesn't this run afoul backward compatibility?  To answer the
+> >> question, we need to enumerate affected external interfaces.
+> >>
+> >>
+> > Right, this will break if we have users such as:
+> >
+> >  -global PIIX4_PM.disable_s3=3D2
+> >
+> > With this change, it will now error with:
+> >
+> > qemu-system-x86_64: can't apply global PIIX4_PM.disable_s3=3D2: Invalid
+> > parameter type for 'disable_s3', expected: boolean
+> >
+> > Acceptable? otherwise, I drop the patch
+>
+> Quick grep through libvirt... aha, src/qemu_command.c:
+>
+>     if (def->pm.s3) {
+>         const char *pm_object =3D "PIIX4_PM";
+>
+>         if (qemuDomainIsQ35(def) &&
+>             virQEMUCapsGet(qemuCaps, QEMU_CAPS_ICH9_DISABLE_S3)) {
+>             pm_object =3D "ICH9-LPC";
+>         } else if (!virQEMUCapsGet(qemuCaps, QEMU_CAPS_PIIX_DISABLE_S3)) =
+{
+>             virReportError(VIR_ERR_CONFIG_UNSUPPORTED,
+>                            "%s", _("setting ACPI S3 not supported"));
+>             return -1;
+>         }
+>
+>         virCommandAddArg(cmd, "-global");
+>         virCommandAddArgFormat(cmd, "%s.disable_s3=3D%d",
+>                                pm_object, def->pm.s3 =3D=3D
+> VIR_TRISTATE_BOOL_NO);
+>     }
+>
+> We need to keep at least disable_s3=3D0 and disable_s3=3D1 working.  Let'=
+s
+> drop the patch from this series.
+>
 
---
-Roman
+Ah crap, I thought 0 and 1 where acceptable bool values, it's not the case.=
+.
+--=20
+Marc-Andr=C3=A9 Lureau
