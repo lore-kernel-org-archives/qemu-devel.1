@@ -1,30 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36796)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36917)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1dFyD2-00078C-4v
-	for qemu-devel@nongnu.org; Wed, 31 May 2017 03:38:25 -0400
+	(envelope-from <peterx@redhat.com>) id 1dFyDR-0007Lv-SI
+	for qemu-devel@nongnu.org; Wed, 31 May 2017 03:38:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1dFyD1-0004yY-2w
-	for qemu-devel@nongnu.org; Wed, 31 May 2017 03:38:24 -0400
-Received: from mail-lf0-x243.google.com ([2a00:1450:4010:c07::243]:34387)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1dFyD0-0004yF-Mi
-	for qemu-devel@nongnu.org; Wed, 31 May 2017 03:38:23 -0400
-Received: by mail-lf0-x243.google.com with SMTP id q24so634955lfb.1
-	for <qemu-devel@nongnu.org>; Wed, 31 May 2017 00:38:20 -0700 (PDT)
+	(envelope-from <peterx@redhat.com>) id 1dFyDO-0005CE-J4
+	for qemu-devel@nongnu.org; Wed, 31 May 2017 03:38:49 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:38620)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1dFyDO-0005By-A5
+	for qemu-devel@nongnu.org; Wed, 31 May 2017 03:38:46 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 575AF81241
+	for <qemu-devel@nongnu.org>; Wed, 31 May 2017 07:38:45 +0000 (UTC)
+Date: Wed, 31 May 2017 15:38:41 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20170531073841.GH14845@pxdev.xzpeter.org>
+References: <1495176212-14446-1-git-send-email-peterx@redhat.com>
+	<1495176212-14446-7-git-send-email-peterx@redhat.com>
+	<87shjme3ox.fsf@secure.mitica>
 MIME-Version: 1.0
-References: <20170509173559.31598-1-marcandre.lureau@redhat.com>
-	<20170509173559.31598-8-marcandre.lureau@redhat.com>
-	<87tw4mgr07.fsf@dusky.pond.sub.org>
-	<CAJ+F1CKctXGjPOghFGXQTyTdT9Oaxn8w3x0N+L5vBp4m8U4XCA@mail.gmail.com>
-	<ad923132-af5a-07e4-723c-df115b902538@redhat.com>
-In-Reply-To: <ad923132-af5a-07e4-723c-df115b902538@redhat.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Wed, 31 May 2017 07:38:09 +0000
-Message-ID: <CAJ+F1CJYrRvrVW3_bjUgB0Kq8VDb_M+9za=dpE0a1JfZd7hGgg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 07/17] json: learn to parse uint64 numbers
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <87shjme3ox.fsf@secure.mitica>
+Subject: Re: [Qemu-devel] [PATCH RFC 6/6] migration: enable return path for
+ precopy
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,65 +35,102 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: Juan Quintela <quintela@redhat.com>
+Cc: qemu-devel@nongnu.org, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
 
-Hi
-
-On Tue, May 30, 2017 at 6:22 PM Eric Blake <eblake@redhat.com> wrote:
-
-> On 05/30/2017 06:35 AM, Marc-Andr=C3=A9 Lureau wrote:
-> > Hi
+On Tue, May 30, 2017 at 05:59:10PM +0200, Juan Quintela wrote:
+> Peter Xu <peterx@redhat.com> wrote:
+> > Let this be a flag, default to on. Turn it off for <=2.9 versions.
 > >
-> > On Mon, May 15, 2017 at 6:00 PM Markus Armbruster <armbru@redhat.com>
-> wrote:
+> > After this patch, return path will be on even for pre-copy migration as
+> > long as the transport support, e.g., for socket typed transport
+> > including "tcp|udp|unix" typed.
 > >
-> >> Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
-> >>
-> >>> Switch strtoll() usage to qemu_strtoi64() helper while at it.
-> >>>
-> >>> Replace temporarily the error in qnum_get_int() with values >INT64_MA=
-X
-> >>> until the visitor is updated.
-> >>>
-> >>> Add a few tests for large numbers.
-> >>>
-> >>> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> >>> ---
-> >>>  qobject/json-lexer.c               |  4 ++++
-> >>>  qobject/json-parser.c              | 30 ++++++++++++++++++++++------=
---
-> >>>  qobject/qnum.c                     |  4 ++--
-> >>>  tests/check-qjson.c                | 28 ++++++++++++++++++++++++++++
-> >>>  tests/check-qnum.c                 |  9 +++++----
-> >>>  tests/test-qobject-input-visitor.c |  7 ++-----
-> >>>  6 files changed, 63 insertions(+), 19 deletions(-)
-> >>>
-> >>> diff --git a/qobject/json-lexer.c b/qobject/json-lexer.c
-> >>> index af4a75e05b..a0beb0b106 100644
-> >>> --- a/qobject/json-lexer.c
-> >>> +++ b/qobject/json-lexer.c
-> >>> @@ -227,15 +227,18 @@ static const uint8_t json_lexer[][256] =3D  {
-> >>>      /* escape */
-> >>>      [IN_ESCAPE_LL] =3D {
-> >>>          ['d'] =3D JSON_ESCAPE,
-> >>> +        ['u'] =3D JSON_ESCAPE,
->
-> Do we really want to add MORE escape sequences to our pseudo-JSON escape
-> parser? I had a series a while back that was able to completely kill the
-> pseudo-JSON escapes, in favor of teaching the testsuite how to directly
-> handle %s (which is really the most useful of the escapes - we really
-> aren't using many others).
->
-> If there's interest in removing the JSON parser escape sequences, I can
-> revive my series.
->
+> > This will naturally fix the bug mentioned below, when destination failed
+> > on migration but source assumed it was successful - since now even for
+> > precopy, source will wait for destination's MIG_RP_MSG_SHUT signal,
+> > which will carry the final migration status of destination. Then, when
+> > destination failed at any point of migration, source will know it, and
+> > it'll resume the VM instead of a data lost.
+> >
+> > Bug: https://bugzilla.redhat.com/show_bug.cgi?id=1439147
+> > Signed-off-by: Peter Xu <peterx@redhat.com>
+> > ---
+> >  include/hw/compat.h           |  4 ++++
+> >  include/migration/migration.h |  3 +++
+> >  migration/migration.c         | 15 ++++++++++++++-
+> >  3 files changed, 21 insertions(+), 1 deletion(-)
+> >
+> > diff --git a/include/hw/compat.h b/include/hw/compat.h
+> > index 55b1765..049457b 100644
+> > --- a/include/hw/compat.h
+> > +++ b/include/hw/compat.h
+> > @@ -6,6 +6,10 @@
+> >          .driver   = "pci-bridge",\
+> >          .property = "shpc",\
+> >          .value    = "off",\
+> > +    },{\
+> > +        .driver   = "migration",\
+> > +        .property = "return-path",\
+> > +        .value    = "off",\
+> >      },
+> >  
+> >  #define HW_COMPAT_2_8 \
+> > diff --git a/include/migration/migration.h b/include/migration/migration.h
+> > index 70710de..e44119c 100644
+> > --- a/include/migration/migration.h
+> > +++ b/include/migration/migration.h
+> > @@ -169,6 +169,9 @@ typedef struct MigrationState {
+> >      int64_t colo_checkpoint_time;
+> >      QEMUTimer *colo_delay_timer;
+> >  
+> > +    /* Whether to try to enable return-path even for pre-copy */
+> > +    bool enable_return_path;
+> > +
+> >      /* The last error that occurred */
+> >      Error *error;
+> >  } MigrationState ;
+> > diff --git a/migration/migration.c b/migration/migration.c
+> > index 6df3483..16a856a 100644
+> > --- a/migration/migration.c
+> > +++ b/migration/migration.c
+> > @@ -2046,7 +2046,7 @@ static void *migration_thread(void *opaque)
+> >  static bool migrate_return_path_create(MigrationState *s)
+> >  {
+> >      /* Whether we should enable return path */
+> > -    bool enable_return_path = false;
+> > +    bool enable_return_path = s->enable_return_path;
+> 
+> As you can see on my suggestion for this piece of code, just add the
+> ()s->enable_return_path &&) to the right place on the call?
+> 
+> Thanks, Juan.
 
-I don't have a full picture of what we use it for, but if you can simplify
-it, I am all for it.
+Do you mean this?
 
-In the meantime, I'll keep my change for testing and consistency. If your
-patch goes first, I'll adapt it.
+    /*
+     * Open the return path
+     */
+    if (migrate_postcopy_ram() || s->enable_return_path) {
+        if (!migrate_return_path_create(s)) {
+            migrate_set_state(&s->state, MIGRATION_STATUS_SETUP,
+                              MIGRATION_STATUS_FAILED);
+            migrate_fd_cleanup(s);
+            return;
+        }
+    }
 
---=20
-Marc-Andr=C3=A9 Lureau
+Here what I wanted to achieve is that:
+
+a. for postcopy, we should try to enable return path, and it must
+   succeed
+
+b. for the case when enable_return_path is set, we try to enable return
+   path, but even if it failed, we can still continue
+
+Could we really achieve (b) if with above code? Or anything I missed?
+
+Thanks,
+
+-- 
+Peter Xu
