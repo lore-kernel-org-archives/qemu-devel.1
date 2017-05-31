@@ -1,22 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42995)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43616)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1dG57S-0003WA-03
-	for qemu-devel@nongnu.org; Wed, 31 May 2017 11:01:06 -0400
+	(envelope-from <eblake@redhat.com>) id 1dG5AG-0004kL-Mg
+	for qemu-devel@nongnu.org; Wed, 31 May 2017 11:04:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1dG57O-00031x-Bu
-	for qemu-devel@nongnu.org; Wed, 31 May 2017 11:01:05 -0400
-References: <20170524202842.26724-1-eblake@redhat.com>
-	<20170524202842.26724-6-eblake@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <f9de200d-887d-9203-5ca5-7fd310836cc8@redhat.com>
-Date: Wed, 31 May 2017 17:00:39 +0200
+	(envelope-from <eblake@redhat.com>) id 1dG5AF-0003eh-Kq
+	for qemu-devel@nongnu.org; Wed, 31 May 2017 11:04:00 -0400
+References: <20170531144331.30173-1-pbutsykin@virtuozzo.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <5e241222-95e1-3f7e-7fce-76e7e9a06c8c@redhat.com>
+Date: Wed, 31 May 2017 10:03:51 -0500
 MIME-Version: 1.0
-In-Reply-To: <20170524202842.26724-6-eblake@redhat.com>
+In-Reply-To: <20170531144331.30173-1-pbutsykin@virtuozzo.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="WKFlsrR3DurXqS6iPxQSVo8jp74CHdKNP"
-Subject: Re: [Qemu-devel] [PATCH v2 5/5] blkdebug: Support
- .bdrv_co_get_block_status
+	boundary="4sLfH0kpV9CV320fxC07tRxbOGEdjIcrk"
+Subject: Re: [Qemu-devel] [PATCH 0/2] Add reduce image for qcow2
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,59 +23,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, jsnow@redhat.com, Kevin Wolf <kwolf@redhat.com>
+To: Pavel Butsykin <pbutsykin@virtuozzo.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, mreitz@redhat.com, armbru@redhat.com
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---WKFlsrR3DurXqS6iPxQSVo8jp74CHdKNP
-From: Max Reitz <mreitz@redhat.com>
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, jsnow@redhat.com, Kevin Wolf <kwolf@redhat.com>
-Message-ID: <f9de200d-887d-9203-5ca5-7fd310836cc8@redhat.com>
-Subject: Re: [PATCH v2 5/5] blkdebug: Support .bdrv_co_get_block_status
-References: <20170524202842.26724-1-eblake@redhat.com>
- <20170524202842.26724-6-eblake@redhat.com>
-In-Reply-To: <20170524202842.26724-6-eblake@redhat.com>
+--4sLfH0kpV9CV320fxC07tRxbOGEdjIcrk
+From: Eric Blake <eblake@redhat.com>
+To: Pavel Butsykin <pbutsykin@virtuozzo.com>, qemu-block@nongnu.org,
+ qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, mreitz@redhat.com, armbru@redhat.com
+Message-ID: <5e241222-95e1-3f7e-7fce-76e7e9a06c8c@redhat.com>
+Subject: Re: [PATCH 0/2] Add reduce image for qcow2
+References: <20170531144331.30173-1-pbutsykin@virtuozzo.com>
+In-Reply-To: <20170531144331.30173-1-pbutsykin@virtuozzo.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On 2017-05-24 22:28, Eric Blake wrote:
-> Without a passthrough status of BDRV_BLOCK_RAW, anything wrapped by
-> blkdebug appears 100% allocated as data.  Better is treating it the
-> same as the underlying file being wrapped.
+On 05/31/2017 09:43 AM, Pavel Butsykin wrote:
+> This patch adds the reduction of the image file for qcow2. As a result,=
+ this
+> allows us to reduce the virtual image size and free up space on the dis=
+k without
+> copying the image. Image can be fragmented and reduction is done by pun=
+ching
+> holes in the image file.
 >=20
-> Update iotest 177 for the new expected output.
+> # ./qemu-img create -f qcow2 -o size=3D4G image.qcow2
+> Formatting 'image.qcow2', fmt=3Dqcow2 size=3D4294967296 encryption=3Dof=
+f cluster_size=3D65536 lazy_refcounts=3Doff refcount_bits=3D16
 >=20
-> Signed-off-by: Eric Blake <eblake@redhat.com>
->=20
-> ---
-> v2: tweak commit message
-> ---
->  block/blkdebug.c           | 11 +++++++++++
->  tests/qemu-iotests/177.out |  5 ++++-
->  2 files changed, 15 insertions(+), 1 deletion(-)
+> # ./qemu-io -c "write -P 0x22 0 1G" image.qcow2
 
-Well, depends on the previous patch, but:
+So this is 1G of guest-visible data...
 
-Reviewed-by: Max Reitz <mreitz@redhat.com>
+> # ./qemu-img resize image.qcow2 128M
+> Image resized.
+
+=2E..and you are truncating the image by throwing away guest-visible
+content, with no warning or double-checking (such as requiring a -f
+force parameter or something) about the data loss.  Shrinking images is
+something we should allow, but it feels like is a rare enough operation
+that you don't want it to be casually easy to throw away data.
+
+Is it feasible to require that a shrink operation will not be performed
+unless all clusters being eliminated have been previously discarded (or
+maybe written to zero), as an assurance that the guest did not care
+about the tail of the image?
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
 
 
---WKFlsrR3DurXqS6iPxQSVo8jp74CHdKNP
+--4sLfH0kpV9CV320fxC07tRxbOGEdjIcrk
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQEvBAEBCAAZBQJZLtqXEhxtcmVpdHpAcmVkaGF0LmNvbQAKCRD0B9sAYdXPQOhE
-B/0REldfxMp1IKlnbgkxhUK7WN+O+KEPD10TJew2EHoy+bray8FRN10mmljo/bBl
-32r3CTNapkeE7EqQYwcUyX8+upcs0WX0sTbQx8fdeNEiH25J201o2h0R6V+pNkNI
-LBXA3PFdVHNp4MOvhQ794geHwfocj8EPKZJSlDx/m9iNzh5BE3Nth4mwuq04FTkp
-dpVMejf1MSzdNVdJ+L/AtkV9a8TnbgpNJ3llbyxAF4dydznugyWJO5wCQF7WIOR/
-GKxZza+WhFDx49Bzv98t5szvEcOw39HHWB6ogPL+MPM7D5rxuLETwgYnjvyAoODM
-GON2PFQDHpJrKeVwpoxDFvBn
-=jmoD
+iQEcBAEBCAAGBQJZLttXAAoJEKeha0olJ0NqzbMH/1hHIf1AT+/iubEJbsyjL6up
+sNbRXelGC+XnOJrPHfjRD+Mul45AWhECgpTzoMCpe2xctVgjK438g2yPJRnnu9vB
+X+E16R4zpZS0FWeLpUKoVGXs+tCG2FiSuA34B0H3TiukmNUId3uDCpDCacsUTzSk
+s/nJwr6HeXy+CnnFYHI+rtuGC7ISiiXY8hJ0ThZL8SpjR38ZgirLVqvtwxe4R7jA
+rJHEQD5W4MOAOQdPCIZVpNZSd042O+1Vt41EzZ9r9a+NePZLI5NmOg0VmIA0/8bd
+LCOztFQ4NqM8RLPl/Yi/f4DmZJPz4cCdEXGNa7N52orI1zY8G/QJthcVfZJCvZQ=
+=Lh/m
 -----END PGP SIGNATURE-----
 
---WKFlsrR3DurXqS6iPxQSVo8jp74CHdKNP--
+--4sLfH0kpV9CV320fxC07tRxbOGEdjIcrk--
