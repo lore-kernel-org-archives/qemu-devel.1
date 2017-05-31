@@ -1,22 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34048)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34066)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1dG3C6-0002pk-Aj
-	for qemu-devel@nongnu.org; Wed, 31 May 2017 08:57:47 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1dG3CD-0002ux-4M
+	for qemu-devel@nongnu.org; Wed, 31 May 2017 08:57:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1dG3C5-0000Wb-Mh
-	for qemu-devel@nongnu.org; Wed, 31 May 2017 08:57:46 -0400
-Date: Wed, 31 May 2017 13:57:38 +0100
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20170531125738.GD16733@stefanha-x1.localdomain>
-References: <1495830130-30611-1-git-send-email-kwolf@redhat.com>
-	<1495830130-30611-30-git-send-email-kwolf@redhat.com>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="G/vVCphCGw+yuveY"
-Content-Disposition: inline
-In-Reply-To: <1495830130-30611-30-git-send-email-kwolf@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 29/29] block: Remove
- bdrv_aio_readv/writev_flush()
+	(envelope-from <pbonzini@redhat.com>) id 1dG3C9-0000YC-SS
+	for qemu-devel@nongnu.org; Wed, 31 May 2017 08:57:53 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:44118)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1dG3C9-0000Y4-MR
+	for qemu-devel@nongnu.org; Wed, 31 May 2017 08:57:49 -0400
+Received: from int-mx14.intmail.prod.int.phx2.redhat.com
+	(int-mx14.intmail.prod.int.phx2.redhat.com [10.5.11.27])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 9EF8864D28
+	for <qemu-devel@nongnu.org>; Wed, 31 May 2017 12:57:48 +0000 (UTC)
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Wed, 31 May 2017 14:57:46 +0200
+Message-Id: <20170531125746.17585-1-pbonzini@redhat.com>
+Subject: [Qemu-devel] [PATCH] edu: fix memory leak on msi_broken platforms
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,41 +27,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: qemu-block@nongnu.org, pbonzini@redhat.com, qemu-devel@nongnu.org, stefanha@redhat.com, mreitz@redhat.com
+To: qemu-devel@nongnu.org
+Cc: armbru@redhat.com, Peter Xu <peterx@redhat.com>
 
+If msi_init fails, the thread has already been created and the
+mutex/condvar are not destroyed.  Initialize everything only
+after the point where pci_edu_realize cannot fail.
 
---G/vVCphCGw+yuveY
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Reported-by: Markus Armbruster <armbru@redhat.com>
+Cc: Peter Xu <peterx@redhat.com>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ hw/misc/edu.c | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
 
-On Fri, May 26, 2017 at 10:22:10PM +0200, Kevin Wolf wrote:
-> @@ -2083,28 +2075,6 @@ int bdrv_readv_vmstate(BlockDriverState *bs, QEMUI=
-OVector *qiov, int64_t pos)
->  /**************************************************************/
->  /* async I/Os */
-> =20
-> -BlockAIOCB *bdrv_aio_readv(BdrvChild *child, int64_t sector_num,
-> -                           QEMUIOVector *qiov, int nb_sectors,
-> -                           BlockCompletionFunc *cb, void *opaque)
-> -{
-> -    trace_bdrv_aio_readv(child->bs, sector_num, nb_sectors, opaque);
-
-Please remove unused trace events from the trace-events file.
-
---G/vVCphCGw+yuveY
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJZLr3CAAoJEJykq7OBq3PISM0H/1mhF1W358TewOcekf9HxjI9
-sKJ44HQKHb6GK0B8KppfMoYYsNLQ9uKcGdNfGd0UJT+OGLrdZdMsojWg0EdihN9i
-+awj1TKPCX8Jeb59P4cjBbxAlSbSdcrb6O2QjwOC5GDhOPu/ZZLFq6SvQ9JjelmU
-IffsaOL1Ga4jRDrwse4+5t1cLftEKccmU2l8XolSIklVkv1fXcrdtyiBc0RtAyGG
-Z5s++5wx4awL8DT1CNGRCs/U8JoR1ygLA0dmb6jOMMorG6mGbF7nfRGxIdrvHa7J
-tilWynU/eKNQnD3AJ8qSJvK9jRicJWOwjdC9j9xYDIFQ4QjoqDPKDhFzeOCQ7mQ=
-=ERhy
------END PGP SIGNATURE-----
-
---G/vVCphCGw+yuveY--
+diff --git a/hw/misc/edu.c b/hw/misc/edu.c
+index 401039c100..01acacf142 100644
+--- a/hw/misc/edu.c
++++ b/hw/misc/edu.c
+@@ -343,6 +343,12 @@ static void pci_edu_realize(PCIDevice *pdev, Error **errp)
+     EduState *edu = DO_UPCAST(EduState, pdev, pdev);
+     uint8_t *pci_conf = pdev->config;
+ 
++    pci_config_set_interrupt_pin(pci_conf, 1);
++
++    if (msi_init(pdev, 0, 1, true, false, errp)) {
++        return;
++    }
++
+     timer_init_ms(&edu->dma_timer, QEMU_CLOCK_VIRTUAL, edu_dma_timer, edu);
+ 
+     qemu_mutex_init(&edu->thr_mutex);
+@@ -350,12 +356,6 @@ static void pci_edu_realize(PCIDevice *pdev, Error **errp)
+     qemu_thread_create(&edu->thread, "edu", edu_fact_thread,
+                        edu, QEMU_THREAD_JOINABLE);
+ 
+-    pci_config_set_interrupt_pin(pci_conf, 1);
+-
+-    if (msi_init(pdev, 0, 1, true, false, errp)) {
+-        return;
+-    }
+-
+     memory_region_init_io(&edu->mmio, OBJECT(edu), &edu_mmio_ops, edu,
+                     "edu-mmio", 1 << 20);
+     pci_register_bar(pdev, 0, PCI_BASE_ADDRESS_SPACE_MEMORY, &edu->mmio);
+-- 
+2.13.0
