@@ -1,21 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37356)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38400)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1dG9OK-0002NG-4Y
-	for qemu-devel@nongnu.org; Wed, 31 May 2017 15:34:49 -0400
+	(envelope-from <jcody@redhat.com>) id 1dG9RC-0004SQ-Kg
+	for qemu-devel@nongnu.org; Wed, 31 May 2017 15:37:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1dG9OJ-0003PJ-Bl
-	for qemu-devel@nongnu.org; Wed, 31 May 2017 15:34:48 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34704)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <david@redhat.com>) id 1dG9OJ-0003Ou-6G
-	for qemu-devel@nongnu.org; Wed, 31 May 2017 15:34:47 -0400
-From: David Hildenbrand <david@redhat.com>
-Date: Wed, 31 May 2017 21:34:34 +0200
-Message-Id: <20170531193434.6918-3-david@redhat.com>
-In-Reply-To: <20170531193434.6918-1-david@redhat.com>
-References: <20170531193434.6918-1-david@redhat.com>
-Subject: [Qemu-devel] [PATCH v1 2/2] s390x/cpumodel: improve defintion
- search without an IBC
+	(envelope-from <jcody@redhat.com>) id 1dG9R8-0004iF-Ka
+	for qemu-devel@nongnu.org; Wed, 31 May 2017 15:37:46 -0400
+Date: Wed, 31 May 2017 15:37:37 -0400
+From: Jeff Cody <jcody@redhat.com>
+Message-ID: <20170531193737.GC4395@localhost.localdomain>
+References: <20170531192836.7187-1-jsnow@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170531192836.7187-1-jsnow@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] ide-test: check return of fwrite
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,51 +22,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: rth@twiddle.net, Aurelien Jarno <aurelien@aurel32.net>, thuth@redhat.com, Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cornelia.huck@de.ibm.com>, "Jason J . Herne" <jjherne@linux.vnet.ibm.com>, david@redhat.com
+To: John Snow <jsnow@redhat.com>
+Cc: qemu-trivial@nongnu.org, thuth@redhat.com, qemu-devel@nongnu.org
 
-Currently, under z/VM on a 0x2827, QEMU will detect a 0x2828 if no
-IBC value is provided. QEMU will simply take the last model of that HW
-generation, which happens to be the BC version.
+On Wed, May 31, 2017 at 03:28:36PM -0400, John Snow wrote:
+> To quiet patchew, add an assert for fwrite's return value.
+> 
+> Signed-off-by: John Snow <jsnow@redhat.com>
+> ---
+>  tests/ide-test.c | 8 ++++++--
+>  1 file changed, 6 insertions(+), 2 deletions(-)
+> 
+> diff --git a/tests/ide-test.c b/tests/ide-test.c
+> index 139ebc0..bfd79dd 100644
+> --- a/tests/ide-test.c
+> +++ b/tests/ide-test.c
+> @@ -796,11 +796,13 @@ static void cdrom_pio_impl(int nblocks)
+>      int i, j;
+>      uint8_t data;
+>      uint16_t limit;
+> +    size_t ret;
+>  
+>      /* Prepopulate the CDROM with an interesting pattern */
+>      generate_pattern(pattern, patt_len, ATAPI_BLOCK_SIZE);
+>      fh = fopen(tmp_path, "w+");
+> -    fwrite(pattern, ATAPI_BLOCK_SIZE, patt_blocks, fh);
+> +    ret = fwrite(pattern, ATAPI_BLOCK_SIZE, patt_blocks, fh);
+> +    g_assert_cmpint(ret, ==, patt_blocks);
+>      fclose(fh);
+>  
+>      ide_test_start("-drive if=none,file=%s,media=cdrom,format=raw,id=sr0,index=0 "
+> @@ -880,6 +882,7 @@ static void test_cdrom_pio_large(void)
+>  static void test_cdrom_dma(void)
+>  {
+>      static const size_t len = ATAPI_BLOCK_SIZE;
+> +    size_t ret;
+>      char *pattern = g_malloc(ATAPI_BLOCK_SIZE * 16);
+>      char *rx = g_malloc0(len);
+>      uintptr_t guest_buf;
+> @@ -896,7 +899,8 @@ static void test_cdrom_dma(void)
+>  
+>      generate_pattern(pattern, ATAPI_BLOCK_SIZE * 16, ATAPI_BLOCK_SIZE);
+>      fh = fopen(tmp_path, "w+");
+> -    fwrite(pattern, ATAPI_BLOCK_SIZE, 16, fh);
+> +    ret = fwrite(pattern, ATAPI_BLOCK_SIZE, 16, fh);
+> +    g_assert_cmpint(ret, ==, 16);
+>      fclose(fh);
+>  
+>      send_dma_request(CMD_PACKET, 0, 1, prdt, 1, send_scsi_cdb_read10);
+> -- 
+> 2.9.4
+> 
+>
 
-Let's improve our search for that case by selecting the latest CPU
-definition that matches the CPU type. This might still detect e.g. a
-GA2 version on a GA1 system, but as we don't have further information at
-hand, there isn't too much we can do about it.
-
-Signed-off-by: David Hildenbrand <david@redhat.com>
----
- target/s390x/cpu_models.c | 9 +++++++++
- 1 file changed, 9 insertions(+)
-
-diff --git a/target/s390x/cpu_models.c b/target/s390x/cpu_models.c
-index 9e23535..b6220c8 100644
---- a/target/s390x/cpu_models.c
-+++ b/target/s390x/cpu_models.c
-@@ -184,6 +184,7 @@ const S390CPUDef *s390_find_cpu_def(uint16_t type, uint8_t gen, uint8_t ec_ga,
-                                     S390FeatBitmap features)
- {
-     const S390CPUDef *last_compatible = NULL;
-+    const S390CPUDef *matching_cpu_type = NULL;
-     int i;
- 
-     if (!gen) {
-@@ -218,8 +219,16 @@ const S390CPUDef *s390_find_cpu_def(uint16_t type, uint8_t gen, uint8_t ec_ga,
-         if (def->type == type && def->ec_ga == ec_ga) {
-             return def;
-         }
-+        /* remember if we've at least seen one with the same cpu type */
-+        if (def->type == type) {
-+            matching_cpu_type = def;
-+        }
-         last_compatible = def;
-     }
-+    /* prefer the model with the same cpu type, esp. don't take the BC for EC */
-+    if (matching_cpu_type) {
-+        return matching_cpu_type;
-+    }
-     return last_compatible;
- }
- 
--- 
-2.9.3
+Reviewed-by: Jeff Cody <jcody@redhat.com>
