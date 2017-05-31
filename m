@@ -1,30 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42777)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43625)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dG0E2-00063J-A8
-	for qemu-devel@nongnu.org; Wed, 31 May 2017 05:47:35 -0400
+	(envelope-from <peterx@redhat.com>) id 1dG0H2-0008PH-Lg
+	for qemu-devel@nongnu.org; Wed, 31 May 2017 05:50:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dG0Dz-0003EI-Mr
-	for qemu-devel@nongnu.org; Wed, 31 May 2017 05:47:34 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:39046)
+	(envelope-from <peterx@redhat.com>) id 1dG0Gy-0004I7-Px
+	for qemu-devel@nongnu.org; Wed, 31 May 2017 05:50:40 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:41044)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dG0Dz-0003E2-F5
-	for qemu-devel@nongnu.org; Wed, 31 May 2017 05:47:31 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1dG0Gy-0004Hr-Gb
+	for qemu-devel@nongnu.org; Wed, 31 May 2017 05:50:36 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id C0C20C056791
-	for <qemu-devel@nongnu.org>; Wed, 31 May 2017 09:47:29 +0000 (UTC)
-Date: Wed, 31 May 2017 10:47:20 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170531094719.GE2141@work-vm>
-References: <1495649128-10529-1-git-send-email-vyasevic@redhat.com>
-	<1495649128-10529-11-git-send-email-vyasevic@redhat.com>
+	by mx1.redhat.com (Postfix) with ESMTPS id 7BCC04E4F3
+	for <qemu-devel@nongnu.org>; Wed, 31 May 2017 09:50:35 +0000 (UTC)
+Date: Wed, 31 May 2017 17:50:23 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20170531095023.GL14845@pxdev.xzpeter.org>
+References: <1496223756-24929-1-git-send-email-peterx@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <1495649128-10529-11-git-send-email-vyasevic@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 10/12] hmp: Add hmp_announce_self
+In-Reply-To: <1496223756-24929-1-git-send-email-peterx@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 0/2] Edu leak fix series
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,83 +32,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladislav Yasevich <vyasevic@redhat.com>
-Cc: qemu-devel@nongnu.org, quintela@redhat.com, germano@redhat.com, lvivier@redhat.com, jasowang@redhat.com, jdenemar@redhat.com, kashyap@redhat.com, armbru@redhat.com, mst@redhat.com
+To: qemu-devel@nongnu.org
+Cc: "Michael S . Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-* Vladislav Yasevich (vyasevic@redhat.com) wrote:
-> Add an HMP command to trigger self annocements.
+On Wed, May 31, 2017 at 05:42:34PM +0800, Peter Xu wrote:
+> A whitelist for it does not really makes sense. Let's remove it and
+> then we can introduce a blacklist when really needed, with msi_broken.
+> That's patch 1.
+
+Ok this paragraph does not make sense if not mentioning what's "it"...
+
+Please just read the commit messages of patch 1. It should be much
+better.
+
+Sorry for such a bad cover letter.
+
 > 
-> Signend-off-by: Vladislav Yasevich <vyasevic@redhat.com>
-       ^^
-
-> ---
->  hmp-commands.hx | 14 ++++++++++++++
->  hmp.c           |  5 +++++
->  hmp.h           |  1 +
->  3 files changed, 20 insertions(+)
+> Then, I let the msi_init() always success in patch 2, along with it I
+> removed caller checks around it.
 > 
-> diff --git a/hmp-commands.hx b/hmp-commands.hx
-> index c8dd816..0efe479 100644
-> --- a/hmp-commands.hx
-> +++ b/hmp-commands.hx
-> @@ -939,6 +939,20 @@ Set the parameter @var{parameter} for GARP/RARP announcements.
->  ETEXI
->  
->      {
-> +        .name       = "qemu_announce_self",
-> +        .args_type  = "",
-> +        .params     = "",
-> +        .help       = "Trigger GARP/RARP announcements",
-> +        .cmd        = hmp_announce_self,
-> +    },
-> +
-> +STEXI
-> +@item qemu_announce_self
-> +@findex qemu_announce_self
-> +Trigger GARP/RARP announcements.
-
-Yes, you could probably just call that 'announce_self';
-if I understand then this version doesn't take any parameters
-(unlike the qmp version) you just rely on the preset-configs.
-That's OK if that mechanism stays the same.
-
-Dave
-
-> +ETEXI
-> +
-> +    {
->          .name       = "migrate",
->          .args_type  = "detach:-d,blk:-b,inc:-i,uri:s",
->          .params     = "[-d] [-b] [-i] uri",
-> diff --git a/hmp.c b/hmp.c
-> index 7d41783..f3c1f02 100644
-> --- a/hmp.c
-> +++ b/hmp.c
-> @@ -1509,6 +1509,11 @@ void hmp_announce_set_parameter(Monitor *mon, const QDict *qdict)
->      }
->  }
->  
-> +void hmp_announce_self(Monitor *mon, const QDict *qdict)
-> +{
-> +    qmp_announce_self(false, NULL, NULL);
-> +}
-> +
->  void hmp_migrate_cancel(Monitor *mon, const QDict *qdict)
->  {
->      qmp_migrate_cancel(NULL);
-> diff --git a/hmp.h b/hmp.h
-> index adf017c..fcb4be4 100644
-> --- a/hmp.h
-> +++ b/hmp.h
-> @@ -147,5 +147,6 @@ void hmp_info_ramblock(Monitor *mon, const QDict *qdict);
->  void hmp_hotpluggable_cpus(Monitor *mon, const QDict *qdict);
->  void hmp_info_vm_generation_id(Monitor *mon, const QDict *qdict);
->  void hmp_info_announce_parameters(Monitor *mon, const QDict *qdict);
-> +void hmp_announce_self(Monitor *mon, const QDict *qdict);
->  
->  #endif
+> The goal of this series is to fix the edu device leak. Yeah it's
+> slightly weird, but it's the truth...
+> 
+> Please review. Thanks.
+> 
+> Peter Xu (2):
+>   msi: remove msi_nonbroken
+>   msi: remove return code for msi_init()
+> 
+>  hw/audio/intel-hda.c               | 18 +----------------
+>  hw/i386/amd_iommu.c                |  2 +-
+>  hw/i386/kvm/apic.c                 |  4 ----
+>  hw/i386/xen/xen_apic.c             |  1 -
+>  hw/ide/ich.c                       |  6 +-----
+>  hw/intc/apic.c                     |  2 --
+>  hw/intc/arm_gicv2m.c               |  1 -
+>  hw/intc/arm_gicv3_its_common.c     |  2 --
+>  hw/intc/openpic.c                  |  1 -
+>  hw/intc/openpic_kvm.c              |  1 -
+>  hw/misc/edu.c                      |  4 +---
+>  hw/net/e1000e.c                    |  6 +-----
+>  hw/net/trace-events                |  1 -
+>  hw/net/vmxnet3.c                   |  8 ++------
+>  hw/pci-bridge/ioh3420.c            | 17 ++++------------
+>  hw/pci-bridge/pci_bridge_dev.c     | 19 +-----------------
+>  hw/pci-bridge/xio3130_downstream.c | 11 +++-------
+>  hw/pci-bridge/xio3130_upstream.c   | 11 +++-------
+>  hw/pci/msi.c                       | 41 +++++---------------------------------
+>  hw/pci/msix.c                      |  6 ------
+>  hw/ppc/spapr.c                     |  6 +-----
+>  hw/ppc/spapr_pci.c                 | 12 +++++------
+>  hw/s390x/s390-pci-bus.c            |  1 -
+>  hw/scsi/megasas.c                  | 18 +----------------
+>  hw/scsi/mptsas.c                   | 20 ++-----------------
+>  hw/scsi/trace-events               |  1 -
+>  hw/scsi/vmw_pvscsi.c               | 12 +++--------
+>  hw/usb/hcd-xhci.c                  | 16 +--------------
+>  hw/vfio/pci.c                      | 13 ++----------
+>  include/hw/pci/msi.h               |  8 +++-----
+>  30 files changed, 41 insertions(+), 228 deletions(-)
+> 
 > -- 
 > 2.7.4
 > 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+
+-- 
+Peter Xu
