@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60479)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:32926)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lvivier@redhat.com>) id 1dFxnf-0000Yd-6I
-	for qemu-devel@nongnu.org; Wed, 31 May 2017 03:12:12 -0400
+	(envelope-from <eric.auger@redhat.com>) id 1dFxqu-0001lJ-Ch
+	for qemu-devel@nongnu.org; Wed, 31 May 2017 03:15:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lvivier@redhat.com>) id 1dFxna-0005oa-4u
-	for qemu-devel@nongnu.org; Wed, 31 May 2017 03:12:11 -0400
-References: <20170530160445.12810-1-lvivier@redhat.com>
-	<20170531043557.GI12163@umbus.fritz.box>
-From: Laurent Vivier <lvivier@redhat.com>
-Message-ID: <733c46f8-80f9-6c8d-d2c8-c2086b26a0f3@redhat.com>
-Date: Wed, 31 May 2017 09:12:02 +0200
+	(envelope-from <eric.auger@redhat.com>) id 1dFxqq-0006Yz-Ax
+	for qemu-devel@nongnu.org; Wed, 31 May 2017 03:15:32 -0400
+References: <1494697399-352-1-git-send-email-eric.auger@redhat.com>
+	<1494697399-352-5-git-send-email-eric.auger@redhat.com>
+	<CAFEAcA-GCKfxEpy9p=k7NzoY2zez-KVXNMuAx-ruW5t27ZMgQQ@mail.gmail.com>
+From: Auger Eric <eric.auger@redhat.com>
+Message-ID: <2c81529b-6916-8dd6-eee9-45e5768d82ca@redhat.com>
+Date: Wed, 31 May 2017 09:15:12 +0200
 MIME-Version: 1.0
-In-Reply-To: <20170531043557.GI12163@umbus.fritz.box>
+In-Reply-To: <CAFEAcA-GCKfxEpy9p=k7NzoY2zez-KVXNMuAx-ruW5t27ZMgQQ@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] spapr: manage hotplugged devices while the
- VM is not started
+Subject: Re: [Qemu-devel] [RFC v4 4/5] hw/arm/virt: Add 2.10 machine type
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,89 +24,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: Thomas Huth <thuth@redhat.com>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: eric.auger.pro@gmail.com, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, prem.mallappa@gmail.com, Andrew Jones <drjones@redhat.com>, Christoffer Dall <christoffer.dall@linaro.org>, Radha.Chintakuntla@cavium.com, Sunil.Goutham@cavium.com, Radha Mohan <mohun106@gmail.com>, Trey Cain <tcain@qti.qualcomm.com>
 
-On 31/05/2017 06:35, David Gibson wrote:
-> On Tue, May 30, 2017 at 06:04:45PM +0200, Laurent Vivier wrote:
->> For QEMU, a hotlugged device is a device added using the HMP/QMP
->> interface.
->> For SPAPR, a hotplugged device is a device added while the
->> machine is running. In this case QEMU doesn't update internal
->> state but relies on the OS for this part
->>
->> In the case of migration, when we (libvirt) hotplug a device
->> on the source guest, we (libvirt) generally hotplug the same
->> device on the destination guest. But in this case, the machine
->> is stopped (RUN_STATE_INMIGRATE) and QEMU must not expect
->> the OS will manage it as an hotplugged device as it will
->> be "imported" by the migration.
->>
->> This patch changes the meaning of "hotplugged" in spapr.c
->> to manage a QEMU hotplugged device like a "coldplugged" one
->> when the machine is awaiting an incoming migration.
->>
->> Signed-off-by: Laurent Vivier <lvivier@redhat.com>
+Hi Peter,
+
+On 30/05/2017 18:04, Peter Maydell wrote:
+> On 13 May 2017 at 18:43, Eric Auger <eric.auger@redhat.com> wrote:
+>> The new machine type allows smmuv3 instantiation. A new option
+>> is introduced to turn the feature on/off (off by default).
 > 
-> So, I think this is a reasonable concept, at least in terms of
-> cleanliness and not doing unnecessary work.  However, if it's fixing
-> bugs, I suspect that means we still have problems elsewhere.
+> Should we go for default-on, or would that break guests?
+> For other things added to the virt board I think the
+> approach we've taken has been:
+>  * if this is just an extra device, simply provide it in the
+>    new virt-n.nn machine by default
+>  * if this is something that changes how the machine behaves
+>    even for code that doesn't care about that feature (eg
+>    EL2, EL3, since they change what mode you start in on boot)
+>    then default it to off
+>  * if the feature only works with TCG and not KVM then
+>    maybe default it to off
+
+OK thanks for the guidelines. I put it off by default since it can
+largely degrade the performance in some use cases. Also instantiating
+the smmu can also induce some option changes at other levels: for
+instance virtio-pci devices may be used along with iommu_platform option
+for the guest to use dma ops.
+
+Thanks
+
+Eric
 > 
-> Specifically, what is it we're doing before the incoming migration
-> that's breaking things.  Even if it's unnecessary, anything done there
-> should be overwritten by the incoming stream.  That should certainly
-> be the case (now) for the DRC state variables.  Maybe not for the
-> queued hotplug events - but that means we should update the queue
-> migration to make sure we clear anything existing on the destination
-> before adding migrated events.
+> thanks
+> -- PMM
 > 
-> I'm also concerned by the fact that this makes changes for memory and
-> cpu hotplug, but not for PCI devices.  Why aren't they also affected
-> by this problem?
-
-There are some specific tests for PCI that change the behavior.
-
-For instance, see hw/ppc/spapr_drc.c,
-
-set_allocation_state()
-
-151     if (drc->type != SPAPR_DR_CONNECTOR_TYPE_PCI) {
-152         drc->allocation_state = state;
-153         if (drc->awaiting_release &&
-154             drc->allocation_state == SPAPR_DR_ALLOCATION_STATE_UNUSABLE) {
-155             trace_spapr_drc_set_allocation_state_finalizing(get_index(drc));
-156             drck->detach(drc, DEVICE(drc->dev), drc->detach_cb,
-157                          drc->detach_cb_opaque, NULL);
-158         } else if (drc->allocation_state == SPAPR_DR_ALLOCATION_STATE_USABLE) {
-159             drc->awaiting_allocation = false;
-160         }
-161     }
-
-attach():
-
-394     drc->signalled = (drc->type != SPAPR_DR_CONNECTOR_TYPE_PCI)
-395                      ? true : coldplug;
-396 
-397     if (drc->type != SPAPR_DR_CONNECTOR_TYPE_PCI) {
-398         drc->awaiting_allocation = true;
-399     }
-400 
-
-detach()
-
-442     if (drc->type != SPAPR_DR_CONNECTOR_TYPE_PCI &&
-443         drc->allocation_state != SPAPR_DR_ALLOCATION_STATE_UNUSABLE) {
-444         trace_spapr_drc_awaiting_unusable(get_index(drc));
-445         drc->awaiting_release = true;
-446         return;
-447     }
-
-and more...
-
-> 
-> One nit in the implementation, see below:
-
-I agree, will fix.
-
-Thanks,
-Laurent
