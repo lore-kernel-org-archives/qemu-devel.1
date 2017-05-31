@@ -1,48 +1,45 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44033)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44531)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <nikunj@linux.vnet.ibm.com>) id 1dFvwd-0005EI-E9
-	for qemu-devel@nongnu.org; Wed, 31 May 2017 01:13:20 -0400
+	(envelope-from <nikunj@linux.vnet.ibm.com>) id 1dFvz2-0006A4-L6
+	for qemu-devel@nongnu.org; Wed, 31 May 2017 01:15:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <nikunj@linux.vnet.ibm.com>) id 1dFvwa-0000PU-57
-	for qemu-devel@nongnu.org; Wed, 31 May 2017 01:13:19 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:47849)
+	(envelope-from <nikunj@linux.vnet.ibm.com>) id 1dFvyx-0000yU-JE
+	for qemu-devel@nongnu.org; Wed, 31 May 2017 01:15:48 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:34949
+	helo=mx0a-001b2d01.pphosted.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <nikunj@linux.vnet.ibm.com>)
-	id 1dFvwZ-0000PJ-S4
-	for qemu-devel@nongnu.org; Wed, 31 May 2017 01:13:16 -0400
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v4V595wE049816
-	for <qemu-devel@nongnu.org>; Wed, 31 May 2017 01:13:14 -0400
-Received: from e23smtp07.au.ibm.com (e23smtp07.au.ibm.com [202.81.31.140])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2asj42bsxx-1
+	id 1dFvyx-0000yQ-D5
+	for qemu-devel@nongnu.org; Wed, 31 May 2017 01:15:43 -0400
+Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v4V5EKdO111231
+	for <qemu-devel@nongnu.org>; Wed, 31 May 2017 01:15:41 -0400
+Received: from e23smtp01.au.ibm.com (e23smtp01.au.ibm.com [202.81.31.143])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2aspg3tcy1-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 31 May 2017 01:13:13 -0400
+	for <qemu-devel@nongnu.org>; Wed, 31 May 2017 01:15:41 -0400
 Received: from localhost
-	by e23smtp07.au.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	by e23smtp01.au.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
 	Only! Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <nikunj@linux.vnet.ibm.com>;
-	Wed, 31 May 2017 15:13:10 +1000
-Received: from d23av04.au.ibm.com (d23av04.au.ibm.com [9.190.235.139])
-	by d23relay07.au.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
-	v4V5CxZn51380448
-	for <qemu-devel@nongnu.org>; Wed, 31 May 2017 15:13:07 +1000
-Received: from d23av04.au.ibm.com (localhost [127.0.0.1])
-	by d23av04.au.ibm.com (8.14.4/8.14.4/NCO v10.0 AVout) with ESMTP id
-	v4V5CXI0001750
-	for <qemu-devel@nongnu.org>; Wed, 31 May 2017 15:12:34 +1000
+	Wed, 31 May 2017 15:15:38 +1000
+Received: from d23av02.au.ibm.com (d23av02.au.ibm.com [9.190.235.138])
+	by d23relay09.au.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+	v4V5FTbo65011916
+	for <qemu-devel@nongnu.org>; Wed, 31 May 2017 15:15:37 +1000
+Received: from d23av02.au.ibm.com (localhost [127.0.0.1])
+	by d23av02.au.ibm.com (8.14.4/8.14.4/NCO v10.0 AVout) with ESMTP id
+	v4V5EuA2003857
+	for <qemu-devel@nongnu.org>; Wed, 31 May 2017 15:14:57 +1000
 From: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
-In-Reply-To: <CAFEAcA_EisxJa1710ngcpScjfFVvnSpAr-_2RjdmQngoxw0DJw@mail.gmail.com>
-References: <1495444679-7736-1-git-send-email-sandipandas1990@gmail.com>
-	<87bmqanz6i.fsf@abhimanyu.i-did-not-set--mail-host-address--so-tickle-me>
-	<CAFEAcA__bsp5_yJZJr3LBbB_5yuALZ4o5ELXhJo4OO5jjz4G3A@mail.gmail.com>
-	<CAFEAcA_EisxJa1710ngcpScjfFVvnSpAr-_2RjdmQngoxw0DJw@mail.gmail.com>
-Date: Wed, 31 May 2017 10:42:01 +0530
+In-Reply-To: <1496162375-1571-1-git-send-email-peter.maydell@linaro.org>
+References: <1496162375-1571-1-git-send-email-peter.maydell@linaro.org>
+Date: Wed, 31 May 2017 10:44:06 +0530
 MIME-Version: 1.0
 Content-Type: text/plain
-Message-Id: <87r2z5bof2.fsf@abhimanyu.i-did-not-set--mail-host-address--so-tickle-me>
-Subject: Re: [Qemu-devel] [PATCH risu v2] ppc64: Fix patterns for rotate
- doubleword instructions
+Message-Id: <87o9u9bobl.fsf@abhimanyu.i-did-not-set--mail-host-address--so-tickle-me>
+Subject: Re: [Qemu-devel] [PATCH risu] ppc64.risu: Fix broken constraints
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -51,49 +48,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Sandipan Das <sandipandas1990@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>, Jose Ricardo Ziviani <joserz@linux.vnet.ibm.com>
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
+Cc: patches@linaro.org, Sandipan Das <sandipandas1990@gmail.com>, Jose Ricardo Ziviani <joserz@linux.vnet.ibm.com>, Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
 
 Peter Maydell <peter.maydell@linaro.org> writes:
 
-> On 30 May 2017 at 16:39, Peter Maydell <peter.maydell@linaro.org> wrote:
->> On 30 May 2017 at 16:26, Nikunj A Dadhania <nikunj@linux.vnet.ibm.com> wrote:
->>> Sandipan Das <sandipandas1990@gmail.com> writes:
->>>
->>>> The patterns for the following instructions are fixed:
->>>>  * Rotate Left Doubleword then Clear Right (rldcr[.])
->>>>  * Rotate Left Doubleword Immediate then Clear Right (rldicr[.])
->>>>  * Rotate Left Doubleword Immediate then Mask Insert (rldimi[.])
->>>>
->>>> The first instruction has a typo. For the other two instructions,
->>>> the extended opcodes are incorrect and the shift field 'sha' is
->>>> absent. Also, the shift field 'sh' should be used in place of the
->>>> register field 'rb'.
->>>>
->>>> Signed-off-by: Sandipan Das <sandipandas1990@gmail.com>
->>>
->>> Reviewed-by: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
->>
->> Thanks; applied to risu master.
+> Commit c10b97092 changed some field names in rldicr and rldimi patterns
+> but forgot to update the constraints to match the change. Since the
+> field (previously 'rb' and now 'sh') is an immediate rather than a
+> register number, the correct fix is to just delete the constraint
+> since we don't need to avoid particular values.
 >
-> ...but I foolishly didn't run build-all-archs first, which
-> points out that there's a bug:
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 
-Ouch :(
+Thanks for fixing it.
 
-> Syntax error detected evaluating RLDIMId PPC64LE constraints string:         ]
-> { $rs != 1 && $ra != 1 && $rb != 1 && $rs != 13 && $ra != 13 && $rb != 13; }
-> Global symbol "$rb" requires explicit package name (did you forget to
-> declare "my $rb"?) at (eval 429) line 1.
-> Global symbol "$rb" requires explicit package name (did you forget to
-> declare "my $rb"?) at (eval 429) line 1.
+
+> ---
+>  ppc64.risu | 8 ++++----
+>  1 file changed, 4 insertions(+), 4 deletions(-)
 >
-> You forgot to update the constraints when you changed the
-> field names... I think that the constraints on $rb should
-> be removed rather than just changed to use $sh because this
-> field is an immediate, not a register number, so we don't need
-> to make it avoid 1 and 13. This would bring them into line with
-> the other rotate-immediates. I'll post a patch in a second.
-
-Regards
-Nikunj
+> diff --git a/ppc64.risu b/ppc64.risu
+> index dd304e2..e2fd4f6 100644
+> --- a/ppc64.risu
+> +++ b/ppc64.risu
+> @@ -1473,17 +1473,17 @@ RLDICLd PPC64LE 011110 rs:5 ra:5 sh:5 mb:6 000 sha:1 1 \
+>
+>  # format:MD book:I page:105 PPC SR rldicr[.] Rotate Left Dword Immediate then Clear Right
+>  RLDICR PPC64LE 011110 rs:5 ra:5 sh:5 me:6 001 sha:1 0 \
+> -!constraints { $rs != 1 && $ra != 1 && $rb != 1 && $rs != 13 && $ra != 13 && $rb != 13; }
+> +!constraints { $rs != 1 && $ra != 1 && $rs != 13 && $ra != 13; }
+>  # format:MD book:I page:105 PPC SR rldicr[.] Rotate Left Dword Immediate then Clear Right
+>  RLDICRd PPC64LE 011110 rs:5 ra:5 sh:5 me:6 001 sha:1 1 \
+> -!constraints { $rs != 1 && $ra != 1 && $rb != 1 && $rs != 13 && $ra != 13 && $rb != 13; }
+> +!constraints { $rs != 1 && $ra != 1 && $rs != 13 && $ra != 13; }
+>
+>  # format:MD book:I page:105 PPC SR rldimi[.] Rotate Left Dword Immediate then Mask Insert
+>  RLDIMI PPC64LE 011110 rs:5 ra:5 sh:5 me:6 011 sha:1 0 \
+> -!constraints { $rs != 1 && $ra != 1 && $rb != 1 && $rs != 13 && $ra != 13 && $rb != 13; }
+> +!constraints { $rs != 1 && $ra != 1 && $rs != 13 && $ra != 13; }
+>  # format:MD book:I page:105 PPC SR rldimi[.] Rotate Left Dword Immediate then Mask Insert
+>  RLDIMId PPC64LE 011110 rs:5 ra:5 sh:5 me:6 011 sha:1 1 \
+> -!constraints { $rs != 1 && $ra != 1 && $rb != 1 && $rs != 13 && $ra != 13 && $rb != 13; }
+> +!constraints { $rs != 1 && $ra != 1 && $rs != 13 && $ra != 13; }
+>
+>  # format:M book:I page:102 v:P1 SR rlwimi[.] Rotate Left Word Immediate then Mask Insert
+>  RLWIMI PPC64LE 010100 rs:5 ra:5 sh:5 mb:5 me:5 0 \
+> -- 
+> 2.7.4
