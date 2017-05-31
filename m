@@ -1,21 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41802)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42995)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kchamart@redhat.com>) id 1dG540-0000rf-2r
-	for qemu-devel@nongnu.org; Wed, 31 May 2017 10:57:32 -0400
+	(envelope-from <mreitz@redhat.com>) id 1dG57S-0003WA-03
+	for qemu-devel@nongnu.org; Wed, 31 May 2017 11:01:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kchamart@redhat.com>) id 1dG53z-0001XI-9b
-	for qemu-devel@nongnu.org; Wed, 31 May 2017 10:57:32 -0400
-Date: Wed, 31 May 2017 16:57:20 +0200
-From: Kashyap Chamarthy <kchamart@redhat.com>
-Message-ID: <20170531145720.lc5tlssve5eeyyf4@eukaryote>
-References: <20170529190322.xc2e2uh7wp6hlcs6@eukaryote>
-	<w514lw22y70.fsf@maestria.local.igalia.com>
+	(envelope-from <mreitz@redhat.com>) id 1dG57O-00031x-Bu
+	for qemu-devel@nongnu.org; Wed, 31 May 2017 11:01:05 -0400
+References: <20170524202842.26724-1-eblake@redhat.com>
+	<20170524202842.26724-6-eblake@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <f9de200d-887d-9203-5ca5-7fd310836cc8@redhat.com>
+Date: Wed, 31 May 2017 17:00:39 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <w514lw22y70.fsf@maestria.local.igalia.com>
-Subject: Re: [Qemu-devel] [RFC] Making 'block-stream',
- and 'block-commit' accept node-name
+In-Reply-To: <20170524202842.26724-6-eblake@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="WKFlsrR3DurXqS6iPxQSVo8jp74CHdKNP"
+Subject: Re: [Qemu-devel] [PATCH v2 5/5] blkdebug: Support
+ .bdrv_co_get_block_status
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,43 +25,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alberto Garcia <berto@igalia.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, jsnow@redhat.com, Kevin Wolf <kwolf@redhat.com>
 
-On Tue, May 30, 2017 at 04:53:23PM +0200, Alberto Garcia wrote:
-> On Mon 29 May 2017 09:03:22 PM CEST, Kashyap Chamarthy wrote:
-> 
-> > Observe the following ('qmp-shell', for brevity) invocation of the
-> > four major types (stream, commit, mirror, backup) of live block
-> > operations:
-> >
-> >     (QEMU) block-stream device=node-D base=a.qcow2 job-id=job-block-stream
-> >     (QEMU) block-commit device=node-D base=a.qcow2 top=b.qcow2 job-id=job-block-commit
-> >     (QEMU) drive-mirror device=node-D target=e.qcow2 sync=full job-id=job-drive-mirror
-> >     (QEMU) drive-backup device=node-D sync=full target=e.qcow2 job-id=job-drive-backup
-> >     (QEMU) blockdev-backup device=node-B target=node-E sync=full job-id=job-blockdev-backup
-> >     (QEMU) blockdev-mirror device=node-D target=node-E sync=full job-id=job-blockdev-mirror
-> >
-> > While we have `blockdev-{mirror, backup}` as 'node-name'-alternatives
-> > for `drive-{mirror, backup}`, as the eagle-eyed will, the
-> > `block-stream` and `block-commit` commands still operate on file names
-> > for parameters 'base' and 'top'.
-> 
-> block-stream does accept a node name for the top and base images (see
-> 554b614765090f47d and 312fe09cc8af86c).
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--WKFlsrR3DurXqS6iPxQSVo8jp74CHdKNP
+From: Max Reitz <mreitz@redhat.com>
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, jsnow@redhat.com, Kevin Wolf <kwolf@redhat.com>
+Message-ID: <f9de200d-887d-9203-5ca5-7fd310836cc8@redhat.com>
+Subject: Re: [PATCH v2 5/5] blkdebug: Support .bdrv_co_get_block_status
+References: <20170524202842.26724-1-eblake@redhat.com>
+ <20170524202842.26724-6-eblake@redhat.com>
+In-Reply-To: <20170524202842.26724-6-eblake@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Ah, I didn't realize `block-stream` accepts 'node-name' for 'base' and
-'top'.  Thanks for the pointers.
+On 2017-05-24 22:28, Eric Blake wrote:
+> Without a passthrough status of BDRV_BLOCK_RAW, anything wrapped by
+> blkdebug appears 100% allocated as data.  Better is treating it the
+> same as the underlying file being wrapped.
+>=20
+> Update iotest 177 for the new expected output.
+>=20
+> Signed-off-by: Eric Blake <eblake@redhat.com>
+>=20
+> ---
+> v2: tweak commit message
+> ---
+>  block/blkdebug.c           | 11 +++++++++++
+>  tests/qemu-iotests/177.out |  5 ++++-
+>  2 files changed, 15 insertions(+), 1 deletion(-)
 
-But still, I wonder, for consistency's sake: will a new
-`blockdev-{stream, commit}` ever be created.
+Well, depends on the previous patch, but:
 
-> block-commit hasn't changed, but it should be possible to follow a
-> similar approach.
+Reviewed-by: Max Reitz <mreitz@redhat.com>
 
-Noted.
 
-[...]
+--WKFlsrR3DurXqS6iPxQSVo8jp74CHdKNP
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
--- 
-/kashyap
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iQEvBAEBCAAZBQJZLtqXEhxtcmVpdHpAcmVkaGF0LmNvbQAKCRD0B9sAYdXPQOhE
+B/0REldfxMp1IKlnbgkxhUK7WN+O+KEPD10TJew2EHoy+bray8FRN10mmljo/bBl
+32r3CTNapkeE7EqQYwcUyX8+upcs0WX0sTbQx8fdeNEiH25J201o2h0R6V+pNkNI
+LBXA3PFdVHNp4MOvhQ794geHwfocj8EPKZJSlDx/m9iNzh5BE3Nth4mwuq04FTkp
+dpVMejf1MSzdNVdJ+L/AtkV9a8TnbgpNJ3llbyxAF4dydznugyWJO5wCQF7WIOR/
+GKxZza+WhFDx49Bzv98t5szvEcOw39HHWB6ogPL+MPM7D5rxuLETwgYnjvyAoODM
+GON2PFQDHpJrKeVwpoxDFvBn
+=jmoD
+-----END PGP SIGNATURE-----
+
+--WKFlsrR3DurXqS6iPxQSVo8jp74CHdKNP--
