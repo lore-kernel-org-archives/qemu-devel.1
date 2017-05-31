@@ -1,23 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34710)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35512)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dG61n-0006i8-Kw
-	for qemu-devel@nongnu.org; Wed, 31 May 2017 11:59:20 -0400
+	(envelope-from <abdallah.bouassida@lauterbach.com>)
+	id 1dG63C-0007eY-Pz
+	for qemu-devel@nongnu.org; Wed, 31 May 2017 12:00:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dG61m-0001Lf-KM
-	for qemu-devel@nongnu.org; Wed, 31 May 2017 11:59:19 -0400
-References: <20170509173342.29286-1-berrange@redhat.com>
-	<20170509173342.29286-3-berrange@redhat.com>
-	<f7fef0e4-7703-9b60-3bd9-bf1b12628cae@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <73621dcd-ace7-c7fa-8dd2-701ea7d6d249@redhat.com>
-Date: Wed, 31 May 2017 10:59:08 -0500
+	(envelope-from <abdallah.bouassida@lauterbach.com>)
+	id 1dG639-0001pS-JD
+	for qemu-devel@nongnu.org; Wed, 31 May 2017 12:00:46 -0400
+Received: from smtp1.lauterbach.com ([62.154.241.196]:51428)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <abdallah.bouassida@lauterbach.com>)
+	id 1dG639-0001lu-5E
+	for qemu-devel@nongnu.org; Wed, 31 May 2017 12:00:43 -0400
+From: Abdallah Bouassida <abdallah.bouassida@lauterbach.com>
+Message-ID: <8550033a-3ab0-4fdc-0138-8a3300f29dcc@lauterbach.com>
+Date: Wed, 31 May 2017 17:00:16 +0100
 MIME-Version: 1.0
-In-Reply-To: <f7fef0e4-7703-9b60-3bd9-bf1b12628cae@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="qub4VeGOm2kvasBo6tFEmM9fHwGIo9Dad"
-Subject: Re: [Qemu-devel] [PATCH v5 2/5] iotests: fix remainining tests to
- work with LUKS
+Content-Language: en-US
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: [Qemu-devel] [PATCH] target-x86: Add GDB XML description for SSE
+ registers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,111 +29,245 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>
+To: qemu-devel@nongnu.org, pbonzini@redhat.com
+Cc: Khaled Jmal <khaled.jmal@lauterbach.com>, rth@twiddle.net, ehabkost@redhat.com
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---qub4VeGOm2kvasBo6tFEmM9fHwGIo9Dad
-From: Eric Blake <eblake@redhat.com>
-To: Max Reitz <mreitz@redhat.com>, "Daniel P. Berrange"
- <berrange@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>
-Message-ID: <73621dcd-ace7-c7fa-8dd2-701ea7d6d249@redhat.com>
-Subject: Re: [PATCH v5 2/5] iotests: fix remainining tests to work with LUKS
-References: <20170509173342.29286-1-berrange@redhat.com>
- <20170509173342.29286-3-berrange@redhat.com>
- <f7fef0e4-7703-9b60-3bd9-bf1b12628cae@redhat.com>
-In-Reply-To: <f7fef0e4-7703-9b60-3bd9-bf1b12628cae@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+[Qemu-devel] [PATCH] target-x86: Add GDB XML description for SSE registers
 
-On 05/31/2017 10:33 AM, Max Reitz wrote:
-> On 2017-05-09 19:33, Daniel P. Berrange wrote:
->> The tests 033, 140, 145 and 157 were all broken
->> when run with LUKS, since they did not correctly use
->> the required image opts args syntax to specify the
->> decryption secret. Further, the 120 test simply does
->> not make sense to run with luks, as the scenario
->> exercised is not relevant.
->>
->> The test 181 was broken when run with LUKS because
->> it didn't take account of fact that $TEST_IMG was
->> already in image opts syntax. The launch_qemu
->> helper also didn't register the secret object
->> providing the LUKS password.
+Add an XML description for SSE registers (XMM+MXCSR) for both X86
+and X86-64 architectures in the GDB stub:
+- configure: Define gdb_xml_files for the X86 targets (32 and 64bit).
+- gdb-xml/i386-32bit-sse.xml & gdb-xml/i386-64bit-sse.xml: The XML files
+that contain a description of the XMM + MXCSR registers.
+- gdb-xml/i386-32bit.xml & gdb-xml/i386-64bit.xml: wrappers that include
+the XML file of the core registers and the other XML file of the SSE 
+registers.
+- target/i386/cpu.c: Modify the gdb_core_xml_file to the new XML wrapper,
+   modify the gdb_num_core_regs to fit the registers number defined in each
+   XML file.
 
->> =20
->> +if test "$IMGOPTSSYNTAX" =3D "true"
->> +then
->> +    SYSEMU_DRIVE_ARG=3Dif=3Dnone,media=3Dcdrom,id=3Ddrv,$TEST_IMG
->=20
-> I would like to propose wrapping this (or at least $TEST_IMG) in quotes=
-,
-
-Makes no difference in assignment context (other than consistency that
-it's an easier rule to always quote even when not necessary, than it is
-to remember which contexts don't need quoting).
-
-> but I'm aware of the fact that the whole test environment breaks if you=
-
-> have a TEST_DIR with whitespace in it, so I don't mind...
->=20
-> (But it is a bit weird to put $TEST_IMG into quotes below and then use
-> $SYSEMU_DRIVE_ARG unquoted.)
-
-Assigning to SYSEMU_DRIVE_ARG without quotes works even if TEST_IMG
-contains spaces, but expanding SYSEMU_DRIVE_ARGS without quotes indeed
-breaks (whether or not you assigned with quotes).
-
->=20
->> +    SYSEMU_EXTRA_ARGS=3D""
->> +else
->> +    SYSEMU_DRIVE_ARG=3Dif=3Dnone,media=3Dcdrom,id=3Ddrv,file=3D"$TEST=
-_IMG",driver=3D$IMGFMT
->> +    SYSEMU_EXTRA_ARGS=3D""
->> +fi
->> +
->>  keep_stderr=3Dy \
->> -_launch_qemu -drive if=3Dnone,media=3Dcdrom,id=3Ddrv,file=3D"$TEST_IM=
-G",format=3D$IMGFMT \
->> +_launch_qemu $SYSEMU_EXTRA_ARGS -drive $SYSEMU_DRIVE_ARG \
-
-Yes, you want "$SYSEMU_DRIVE_ARG" here.
+Signed-off-by: Abdallah Bouassida <abdallah.bouassida@lauterbach.com>
+---
+@Paolo: This patch is in response to your hints here:
+https://lists.gnu.org/archive/html/qemu-devel/2017-03/msg03314.html
+Thank you for pointing me on the missing registers!
 
 
-> Please use spaces instead of tabs.
->=20
-> (I know there are a lot of tabs in the test files already, but accordin=
-g
-> to CODING_STYLE, that is just wrong.)
+  configure                  |  4 ++--
+  gdb-xml/i386-32bit-sse.xml | 52 ++++++++++++++++++++++++++++++++++++++++
+  gdb-xml/i386-32bit.xml     | 14 +++++++++++
+  gdb-xml/i386-64bit-sse.xml | 60 
+++++++++++++++++++++++++++++++++++++++++++++++
+  gdb-xml/i386-64bit.xml     | 14 +++++++++++
+  target/i386/cpu.c          |  8 +++----
+  6 files changed, 146 insertions(+), 6 deletions(-)
+  create mode 100644 gdb-xml/i386-32bit-sse.xml
+  create mode 100644 gdb-xml/i386-32bit.xml
+  create mode 100644 gdb-xml/i386-64bit-sse.xml
+  create mode 100644 gdb-xml/i386-64bit.xml
 
-=2Edir-locals.el may need a tweak to be taught that files in qemu-iotests=
+diff --git a/configure b/configure
+index 1a5ee4b..d4f154d 100755
+--- a/configure
++++ b/configure
+@@ -6044,11 +6044,11 @@ TARGET_ABI_DIR=""
 
-should not prefer TABs.
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---qub4VeGOm2kvasBo6tFEmM9fHwGIo9Dad
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEcBAEBCAAGBQJZLuhMAAoJEKeha0olJ0NqGVQIAJpem1HNh8dZvlO1ONgNnLCw
-LfslPgzVpclS48Cn1UJxZD9yyRJwjpUtRBzn2zT9Md1gNZhCJKYmXirHP6OSzF3O
-h8QM5mtPkWwfDW1WakfyQSu8VsgLLhSBysa4cT43xtgpaS4WpHyN8KC2Ghz3RUhI
-Q9AmSSjS1IhCGY3P8qlFys+MjagQaQXIOGa72PEBcJ3pjKf5Njuq23+cPhYLoBa5
-gl1NcrLzfaAtPNPjyILKAI4YtT9MjeONtVbsFxNuDOYa+ndrSV+LuLmTULhnQrfx
-p6LxUCA1B7T3fHxqWhKctFGf5sI+UTD95O36GgJfw9p9e/W3Jbpdzz2T0AWW/s8=
-=O/HC
------END PGP SIGNATURE-----
-
---qub4VeGOm2kvasBo6tFEmM9fHwGIo9Dad--
+  case "$target_name" in
+    i386)
+-    gdb_xml_files="i386-32bit-core.xml"
++    gdb_xml_files="i386-32bit.xml i386-32bit-core.xml i386-32bit-sse.xml"
+    ;;
+    x86_64)
+      TARGET_BASE_ARCH=i386
+-    gdb_xml_files="i386-64bit-core.xml"
++    gdb_xml_files="i386-64bit.xml i386-64bit-core.xml i386-64bit-sse.xml"
+    ;;
+    alpha)
+      mttcg="yes"
+diff --git a/gdb-xml/i386-32bit-sse.xml b/gdb-xml/i386-32bit-sse.xml
+new file mode 100644
+index 0000000..5767847
+--- /dev/null
++++ b/gdb-xml/i386-32bit-sse.xml
+@@ -0,0 +1,52 @@
++<?xml version="1.0"?>
++<!-- Copyright (C) 2010-2017 Free Software Foundation, Inc.
++
++     Copying and distribution of this file, with or without modification,
++     are permitted in any medium without royalty provided the copyright
++     notice and this notice are preserved.  -->
++
++<!DOCTYPE feature SYSTEM "gdb-target.dtd">
++<feature name="org.gnu.gdb.i386.32bit.sse">
++  <vector id="v4f" type="ieee_single" count="4"/>
++  <vector id="v2d" type="ieee_double" count="2"/>
++  <vector id="v16i8" type="int8" count="16"/>
++  <vector id="v8i16" type="int16" count="8"/>
++  <vector id="v4i32" type="int32" count="4"/>
++  <vector id="v2i64" type="int64" count="2"/>
++  <union id="vec128">
++    <field name="v4_float" type="v4f"/>
++    <field name="v2_double" type="v2d"/>
++    <field name="v16_int8" type="v16i8"/>
++    <field name="v8_int16" type="v8i16"/>
++    <field name="v4_int32" type="v4i32"/>
++    <field name="v2_int64" type="v2i64"/>
++    <field name="uint128" type="uint128"/>
++  </union>
++  <flags id="i386_mxcsr" size="4">
++    <field name="IE" start="0" end="0"/>
++    <field name="DE" start="1" end="1"/>
++    <field name="ZE" start="2" end="2"/>
++    <field name="OE" start="3" end="3"/>
++    <field name="UE" start="4" end="4"/>
++    <field name="PE" start="5" end="5"/>
++    <field name="DAZ" start="6" end="6"/>
++    <field name="IM" start="7" end="7"/>
++    <field name="DM" start="8" end="8"/>
++    <field name="ZM" start="9" end="9"/>
++    <field name="OM" start="10" end="10"/>
++    <field name="UM" start="11" end="11"/>
++    <field name="PM" start="12" end="12"/>
++    <field name="FZ" start="15" end="15"/>
++  </flags>
++
++  <reg name="xmm0" bitsize="128" type="vec128" regnum="32"/>
++  <reg name="xmm1" bitsize="128" type="vec128"/>
++  <reg name="xmm2" bitsize="128" type="vec128"/>
++  <reg name="xmm3" bitsize="128" type="vec128"/>
++  <reg name="xmm4" bitsize="128" type="vec128"/>
++  <reg name="xmm5" bitsize="128" type="vec128"/>
++  <reg name="xmm6" bitsize="128" type="vec128"/>
++  <reg name="xmm7" bitsize="128" type="vec128"/>
++
++  <reg name="mxcsr" bitsize="32" type="i386_mxcsr" group="vector"/>
++</feature>
+diff --git a/gdb-xml/i386-32bit.xml b/gdb-xml/i386-32bit.xml
+new file mode 100644
+index 0000000..956fc7f
+--- /dev/null
++++ b/gdb-xml/i386-32bit.xml
+@@ -0,0 +1,14 @@
++<?xml version="1.0"?>
++<!-- Copyright (C) 2010-2017 Free Software Foundation, Inc.
++
++     Copying and distribution of this file, with or without modification,
++     are permitted in any medium without royalty provided the copyright
++     notice and this notice are preserved.  -->
++
++<!-- I386 with SSE -->
++
++<!DOCTYPE target SYSTEM "gdb-target.dtd">
++<feature name="org.gnu.gdb.i386.32bit">
++  <xi:include href="i386-32bit-core.xml"/>
++  <xi:include href="i386-32bit-sse.xml"/>
++</feature>
+diff --git a/gdb-xml/i386-64bit-sse.xml b/gdb-xml/i386-64bit-sse.xml
+new file mode 100644
+index 0000000..e86efc9
+--- /dev/null
++++ b/gdb-xml/i386-64bit-sse.xml
+@@ -0,0 +1,60 @@
++<?xml version="1.0"?>
++<!-- Copyright (C) 2010-2017 Free Software Foundation, Inc.
++
++     Copying and distribution of this file, with or without modification,
++     are permitted in any medium without royalty provided the copyright
++     notice and this notice are preserved.  -->
++
++<!DOCTYPE feature SYSTEM "gdb-target.dtd">
++<feature name="org.gnu.gdb.i386.64bit.sse">
++  <vector id="v4f" type="ieee_single" count="4"/>
++  <vector id="v2d" type="ieee_double" count="2"/>
++  <vector id="v16i8" type="int8" count="16"/>
++  <vector id="v8i16" type="int16" count="8"/>
++  <vector id="v4i32" type="int32" count="4"/>
++  <vector id="v2i64" type="int64" count="2"/>
++  <union id="vec128">
++    <field name="v4_float" type="v4f"/>
++    <field name="v2_double" type="v2d"/>
++    <field name="v16_int8" type="v16i8"/>
++    <field name="v8_int16" type="v8i16"/>
++    <field name="v4_int32" type="v4i32"/>
++    <field name="v2_int64" type="v2i64"/>
++    <field name="uint128" type="uint128"/>
++  </union>
++  <flags id="i386_mxcsr" size="4">
++    <field name="IE" start="0" end="0"/>
++    <field name="DE" start="1" end="1"/>
++    <field name="ZE" start="2" end="2"/>
++    <field name="OE" start="3" end="3"/>
++    <field name="UE" start="4" end="4"/>
++    <field name="PE" start="5" end="5"/>
++    <field name="DAZ" start="6" end="6"/>
++    <field name="IM" start="7" end="7"/>
++    <field name="DM" start="8" end="8"/>
++    <field name="ZM" start="9" end="9"/>
++    <field name="OM" start="10" end="10"/>
++    <field name="UM" start="11" end="11"/>
++    <field name="PM" start="12" end="12"/>
++    <field name="FZ" start="15" end="15"/>
++  </flags>
++
++  <reg name="xmm0" bitsize="128" type="vec128" regnum="40"/>
++  <reg name="xmm1" bitsize="128" type="vec128"/>
++  <reg name="xmm2" bitsize="128" type="vec128"/>
++  <reg name="xmm3" bitsize="128" type="vec128"/>
++  <reg name="xmm4" bitsize="128" type="vec128"/>
++  <reg name="xmm5" bitsize="128" type="vec128"/>
++  <reg name="xmm6" bitsize="128" type="vec128"/>
++  <reg name="xmm7" bitsize="128" type="vec128"/>
++  <reg name="xmm8" bitsize="128" type="vec128"/>
++  <reg name="xmm9" bitsize="128" type="vec128"/>
++  <reg name="xmm10" bitsize="128" type="vec128"/>
++  <reg name="xmm11" bitsize="128" type="vec128"/>
++  <reg name="xmm12" bitsize="128" type="vec128"/>
++  <reg name="xmm13" bitsize="128" type="vec128"/>
++  <reg name="xmm14" bitsize="128" type="vec128"/>
++  <reg name="xmm15" bitsize="128" type="vec128"/>
++
++  <reg name="mxcsr" bitsize="32" type="i386_mxcsr" group="vector"/>
++</feature>
+diff --git a/gdb-xml/i386-64bit.xml b/gdb-xml/i386-64bit.xml
+new file mode 100644
+index 0000000..0b2f00c
+--- /dev/null
++++ b/gdb-xml/i386-64bit.xml
+@@ -0,0 +1,14 @@
++<?xml version="1.0"?>
++<!-- Copyright (C) 2010-2017 Free Software Foundation, Inc.
++
++     Copying and distribution of this file, with or without modification,
++     are permitted in any medium without royalty provided the copyright
++     notice and this notice are preserved.  -->
++
++<!-- I386 64bit -->
++
++<!DOCTYPE target SYSTEM "gdb-target.dtd">
++<feature name="org.gnu.gdb.i386.64bit">
++  <xi:include href="i386-64bit-core.xml"/>
++  <xi:include href="i386-64bit-sse.xml"/>
++</feature>
+diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+index a41d595..2e2661b 100644
+--- a/target/i386/cpu.c
++++ b/target/i386/cpu.c
+@@ -4063,11 +4063,11 @@ static void 
+x86_cpu_common_class_init(ObjectClass *oc, void *data)
+  #endif
+      cc->gdb_arch_name = x86_gdb_arch_name;
+  #ifdef TARGET_X86_64
+-    cc->gdb_core_xml_file = "i386-64bit-core.xml";
+-    cc->gdb_num_core_regs = 40;
++    cc->gdb_core_xml_file = "i386-64bit.xml";
++    cc->gdb_num_core_regs = 57;
+  #else
+-    cc->gdb_core_xml_file = "i386-32bit-core.xml";
+-    cc->gdb_num_core_regs = 32;
++    cc->gdb_core_xml_file = "i386-32bit.xml";
++    cc->gdb_num_core_regs = 41;
+  #endif
+  #ifndef CONFIG_USER_ONLY
+      cc->debug_excp_handler = breakpoint_handler;
+-- 
+1.9.1
