@@ -1,31 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51784)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51804)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1dG48H-00032Y-EY
-	for qemu-devel@nongnu.org; Wed, 31 May 2017 09:57:56 -0400
+	(envelope-from <marcandre.lureau@redhat.com>) id 1dG48L-00039X-PQ
+	for qemu-devel@nongnu.org; Wed, 31 May 2017 09:57:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1dG48A-0003rw-0k
-	for qemu-devel@nongnu.org; Wed, 31 May 2017 09:57:47 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34624)
+	(envelope-from <marcandre.lureau@redhat.com>) id 1dG48K-0003tN-Hh
+	for qemu-devel@nongnu.org; Wed, 31 May 2017 09:57:57 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43828)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1dG489-0003rk-O3
-	for qemu-devel@nongnu.org; Wed, 31 May 2017 09:57:45 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
+	id 1dG48K-0003ss-9H
+	for qemu-devel@nongnu.org; Wed, 31 May 2017 09:57:56 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id AB5B63680E
-	for <qemu-devel@nongnu.org>; Wed, 31 May 2017 13:57:44 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 0CBB7155E4
+	for <qemu-devel@nongnu.org>; Wed, 31 May 2017 13:57:53 +0000 (UTC)
 From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Wed, 31 May 2017 17:56:28 +0400
-Message-Id: <20170531135709.345-5-marcandre.lureau@redhat.com>
+Date: Wed, 31 May 2017 17:56:29 +0400
+Message-Id: <20170531135709.345-6-marcandre.lureau@redhat.com>
 In-Reply-To: <20170531135709.345-1-marcandre.lureau@redhat.com>
 References: <20170531135709.345-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v2 04/45] qapi: Reject alternates that can't
- work with keyval_parse()
+Subject: [Qemu-devel] [PATCH v2 05/45] qdev: remove PropertyInfo.qtype field
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,335 +34,305 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: armbru@redhat.com
+Cc: armbru@redhat.com, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
-From: Markus Armbruster <armbru@redhat.com>
+Remove dependency on qapi qtype, replace a field by a few PropertyInfo
+callbacks to set the default value type (introduced in commit 4f2d3d7).
 
-Alternates are sum types like unions, but use the JSON type on the
-wire / QType in QObject instead of an explicit tag.  That's why we
-require alternate members to have distinct QTypes.
-
-The recently introduced keyval_parse() (commit d454dbe) can only
-produce string scalars.  The qobject_input_visitor_new_keyval() input
-visitor mostly hides the difference, so code using a QObject input
-visitor doesn't have to care whether its input was parsed from JSON or
-KEY=3DVALUE,...  The difference leaks for alternates, as noted in commit
-0ee9ae7: an non-string, non-enum scalar alternate value can't
-currently be expressed.
-
-In part, this is just our insufficiently sophisticated implementation.
-Consider alternate type 'GuestFileWhence'.  It has an integer member
-and a 'QGASeek' member.  The latter is an enumeration with values
-'set', 'cur', 'end'.  The meaning of b=3Dset, b=3Dcur, b=3Dend, b=3D0, b=3D=
-1 and
-so forth is perfectly obvious.  However, our current implementation
-falls apart at run time for b=3D0, b=3D1, and so forth.  Fixable, but not
-today; add a test case and a TODO comment.
-
-Now consider an alternate type with a string and an integer member.
-What's the meaning of a=3D42?  Is it the string "42" or the integer 42?
-Whichever meaning you pick makes the other inexpressible.  This isn't
-just an implementation problem, it's fundamental.  Our current
-implementation will pick string.
-
-So far, we haven't needed such alternates.  To make sure we stop and
-think before we add one that cannot sanely work with keyval_parse(),
-let's require alternate members to have sufficiently district
-representation in KEY=3DVALUE,... syntax:
-
-* A string member clashes with any other scalar member
-
-* An enumeration member clashes with bool members when it has value
-  'on' or 'off'.
-
-* An enumeration member clashes with numeric members when it has a
-  value that starts with '-', '+', '0' or '9'.  This is a rather lazy
-  approximation of the actual number syntax accepted by the visitor.
-
-  Note that enumeration values starting with '-' and '+' are rejected
-  elsewhere already, but better safe than sorry.
-
-Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Message-Id: <1495471335-23707-5-git-send-email-armbru@redhat.com>
-Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 ---
- scripts/qapi.py                                     | 19 +++++++++++++++=
-++--
- tests/test-keyval.c                                 | 18 +++++++++++----=
----
- util/keyval.c                                       | 10 +++++-----
- tests/Makefile.include                              |  2 ++
- tests/qapi-schema/alternate-conflict-dict.json      |  2 +-
- tests/qapi-schema/alternate-conflict-enum-bool.err  |  1 +
- tests/qapi-schema/alternate-conflict-enum-bool.exit |  1 +
- tests/qapi-schema/alternate-conflict-enum-bool.json |  6 ++++++
- tests/qapi-schema/alternate-conflict-enum-bool.out  |  0
- tests/qapi-schema/alternate-conflict-enum-int.err   |  1 +
- tests/qapi-schema/alternate-conflict-enum-int.exit  |  1 +
- tests/qapi-schema/alternate-conflict-enum-int.json  |  6 ++++++
- tests/qapi-schema/alternate-conflict-enum-int.out   |  0
- tests/qapi-schema/alternate-conflict-string.err     |  2 +-
- tests/qapi-schema/alternate-conflict-string.json    |  6 ++----
- tests/qapi-schema/qapi-schema-test.json             |  4 +++-
- tests/qapi-schema/qapi-schema-test.out              |  4 ++--
- 17 files changed, 60 insertions(+), 23 deletions(-)
- create mode 100644 tests/qapi-schema/alternate-conflict-enum-bool.err
- create mode 100644 tests/qapi-schema/alternate-conflict-enum-bool.exit
- create mode 100644 tests/qapi-schema/alternate-conflict-enum-bool.json
- create mode 100644 tests/qapi-schema/alternate-conflict-enum-bool.out
- create mode 100644 tests/qapi-schema/alternate-conflict-enum-int.err
- create mode 100644 tests/qapi-schema/alternate-conflict-enum-int.exit
- create mode 100644 tests/qapi-schema/alternate-conflict-enum-int.json
- create mode 100644 tests/qapi-schema/alternate-conflict-enum-int.out
+ include/hw/qdev-core.h       |  2 +-
+ include/hw/qdev-properties.h |  5 -----
+ hw/core/qdev-properties.c    | 35 ++++++++++++++++++++++++++++++++++-
+ hw/core/qdev.c               | 13 ++-----------
+ 4 files changed, 37 insertions(+), 18 deletions(-)
 
-diff --git a/scripts/qapi.py b/scripts/qapi.py
-index 6c4d554165..b7a25e4759 100644
---- a/scripts/qapi.py
-+++ b/scripts/qapi.py
-@@ -812,11 +812,26 @@ def check_alternate(expr, info):
-         if not qtype:
-             raise QAPISemError(info, "Alternate '%s' member '%s' cannot =
-use "
-                                "type '%s'" % (name, key, value))
--        if qtype in types_seen:
-+        conflicting =3D set([qtype])
-+        if qtype =3D=3D 'QTYPE_QSTRING':
-+            enum_expr =3D enum_types.get(value)
-+            if enum_expr:
-+                for v in enum_expr['data']:
-+                    if v in ['on', 'off']:
-+                        conflicting.add('QTYPE_QBOOL')
-+                    if re.match(r'[-+0-9.]', v): # lazy, could be tighte=
-ned
-+                        conflicting.add('QTYPE_QINT')
-+                        conflicting.add('QTYPE_QFLOAT')
-+            else:
-+                conflicting.add('QTYPE_QINT')
-+                conflicting.add('QTYPE_QFLOAT')
-+                conflicting.add('QTYPE_QBOOL')
-+        if conflicting & set(types_seen):
-             raise QAPISemError(info, "Alternate '%s' member '%s' can't "
-                                "be distinguished from member '%s'"
-                                % (name, key, types_seen[qtype]))
--        types_seen[qtype] =3D key
-+        for qt in conflicting:
-+            types_seen[qt] =3D key
+diff --git a/include/hw/qdev-core.h b/include/hw/qdev-core.h
+index e69489ec6c..9523339762 100644
+--- a/include/hw/qdev-core.h
++++ b/include/hw/qdev-core.h
+@@ -226,7 +226,6 @@ struct Property {
+     PropertyInfo *info;
+     ptrdiff_t    offset;
+     uint8_t      bitnr;
+-    QType        qtype;
+     int64_t      defval;
+     int          arrayoffset;
+     PropertyInfo *arrayinfo;
+@@ -238,6 +237,7 @@ struct PropertyInfo {
+     const char *description;
+     const char * const *enum_table;
+     int (*print)(DeviceState *dev, Property *prop, char *dest, size_t le=
+n);
++    void (*set_default_value)(Object *obj, const Property *prop);
+     ObjectPropertyAccessor *get;
+     ObjectPropertyAccessor *set;
+     ObjectPropertyRelease *release;
+diff --git a/include/hw/qdev-properties.h b/include/hw/qdev-properties.h
+index d206fc93dd..85e68998a9 100644
+--- a/include/hw/qdev-properties.h
++++ b/include/hw/qdev-properties.h
+@@ -42,7 +42,6 @@ extern PropertyInfo qdev_prop_arraylen;
+         .info      =3D &(_prop),                                        =
+  \
+         .offset    =3D offsetof(_state, _field)                         =
+  \
+             + type_check(_type,typeof_field(_state, _field)),           =
+\
+-        .qtype     =3D QTYPE_QINT,                                      =
+  \
+         .defval    =3D (_type)_defval,                                  =
+  \
+         }
+ #define DEFINE_PROP_BIT(_name, _state, _field, _bit, _defval) {  \
+@@ -51,7 +50,6 @@ extern PropertyInfo qdev_prop_arraylen;
+         .bitnr    =3D (_bit),                                      \
+         .offset    =3D offsetof(_state, _field)                    \
+             + type_check(uint32_t,typeof_field(_state, _field)), \
+-        .qtype     =3D QTYPE_QBOOL,                                \
+         .defval    =3D (bool)_defval,                              \
+         }
+ #define DEFINE_PROP_BIT64(_name, _state, _field, _bit, _defval) {       =
+\
+@@ -60,7 +58,6 @@ extern PropertyInfo qdev_prop_arraylen;
+         .bitnr    =3D (_bit),                                           =
+  \
+         .offset    =3D offsetof(_state, _field)                         =
+  \
+             + type_check(uint64_t, typeof_field(_state, _field)),       =
+\
+-        .qtype     =3D QTYPE_QBOOL,                                     =
+  \
+         .defval    =3D (bool)_defval,                                   =
+  \
+         }
 =20
+@@ -69,7 +66,6 @@ extern PropertyInfo qdev_prop_arraylen;
+         .info      =3D &(qdev_prop_bool),                          \
+         .offset    =3D offsetof(_state, _field)                    \
+             + type_check(bool, typeof_field(_state, _field)),    \
+-        .qtype     =3D QTYPE_QBOOL,                                \
+         .defval    =3D (bool)_defval,                              \
+         }
 =20
- def check_enum(expr, info):
-diff --git a/tests/test-keyval.c b/tests/test-keyval.c
-index c556b1b117..c3be00524c 100644
---- a/tests/test-keyval.c
-+++ b/tests/test-keyval.c
-@@ -614,22 +614,26 @@ static void test_keyval_visit_alternate(void)
-     Error *err =3D NULL;
-     Visitor *v;
-     QDict *qdict;
--    AltNumStr *ans;
-+    AltStrObj *aso;
-     AltNumInt *ani;
-+    AltEnumBool *aeb;
+@@ -105,7 +101,6 @@ extern PropertyInfo qdev_prop_arraylen;
+         .info =3D &(qdev_prop_arraylen),                                =
+  \
+         .offset =3D offsetof(_state, _field)                            =
+  \
+             + type_check(uint32_t, typeof_field(_state, _field)),       =
+\
+-        .qtype =3D QTYPE_QINT,                                          =
+  \
+         .arrayinfo =3D &(_arrayprop),                                   =
+  \
+         .arrayfieldsize =3D sizeof(_arraytype),                         =
+  \
+         .arrayoffset =3D offsetof(_state, _arrayfield),                 =
+  \
+diff --git a/hw/core/qdev-properties.c b/hw/core/qdev-properties.c
+index fa3617db2d..482efb2683 100644
+--- a/hw/core/qdev-properties.c
++++ b/hw/core/qdev-properties.c
+@@ -69,6 +69,12 @@ static void set_enum(Object *obj, Visitor *v, const ch=
+ar *name, void *opaque,
+     visit_type_enum(v, prop->name, ptr, prop->info->enum_table, errp);
+ }
 =20
-     /*
-      * Can't do scalar alternate variants other than string.  You get
-      * the string variant if there is one, else an error.
-+     * TODO make it work for unambiguous cases like AltEnumBool below
-      */
--    qdict =3D keyval_parse("a=3D1,b=3D2", NULL, &error_abort);
-+    qdict =3D keyval_parse("a=3D1,b=3D2,c=3Don", NULL, &error_abort);
-     v =3D qobject_input_visitor_new_keyval(QOBJECT(qdict));
-     QDECREF(qdict);
-     visit_start_struct(v, NULL, NULL, 0, &error_abort);
--    visit_type_AltNumStr(v, "a", &ans, &error_abort);
--    g_assert_cmpint(ans->type, =3D=3D, QTYPE_QSTRING);
--    g_assert_cmpstr(ans->u.s, =3D=3D, "1");
--    qapi_free_AltNumStr(ans);
--    visit_type_AltNumInt(v, "a", &ani, &err);
-+    visit_type_AltStrObj(v, "a", &aso, &error_abort);
-+    g_assert_cmpint(aso->type, =3D=3D, QTYPE_QSTRING);
-+    g_assert_cmpstr(aso->u.s, =3D=3D, "1");
-+    qapi_free_AltStrObj(aso);
-+    visit_type_AltNumInt(v, "b", &ani, &err);
-+    error_free_or_abort(&err);
-+    visit_type_AltEnumBool(v, "c", &aeb, &err);
-     error_free_or_abort(&err);
-     visit_end_struct(v, NULL);
-     visit_free(v);
-diff --git a/util/keyval.c b/util/keyval.c
-index 93d5db6b59..7dbda62305 100644
---- a/util/keyval.c
-+++ b/util/keyval.c
-@@ -65,11 +65,11 @@
-  * denote numbers, true, false or null.  The special QObject input
-  * visitor returned by qobject_input_visitor_new_keyval() mostly hides
-  * this by automatically converting strings to the type the visitor
-- * expects.  Breaks down for alternate types and type 'any', where the
-- * visitor's expectation isn't clear.  Code visiting such types needs
-- * to do the conversion itself, but only when using this keyval
-- * visitor.  Awkward.  Alternate types without a string member don't
-- * work at all.
-+ * expects.  Breaks down for type 'any', where the visitor's
-+ * expectation isn't clear.  Code visiting 'any' needs to do the
-+ * conversion itself, but only when using this keyval visitor.
-+ * Awkward.  Note that we carefully restrict alternate types to avoid
-+ * similar ambiguity.
-  *
-  * Additional syntax for use with an implied key:
-  *
-diff --git a/tests/Makefile.include b/tests/Makefile.include
-index 75893838e5..f42f3dfa72 100644
---- a/tests/Makefile.include
-+++ b/tests/Makefile.include
-@@ -342,6 +342,8 @@ qapi-schema +=3D alternate-array.json
- qapi-schema +=3D alternate-base.json
- qapi-schema +=3D alternate-clash.json
- qapi-schema +=3D alternate-conflict-dict.json
-+qapi-schema +=3D alternate-conflict-enum-bool.json
-+qapi-schema +=3D alternate-conflict-enum-int.json
- qapi-schema +=3D alternate-conflict-string.json
- qapi-schema +=3D alternate-empty.json
- qapi-schema +=3D alternate-nested.json
-diff --git a/tests/qapi-schema/alternate-conflict-dict.json b/tests/qapi-=
-schema/alternate-conflict-dict.json
-index d566cca816..3d7881279c 100644
---- a/tests/qapi-schema/alternate-conflict-dict.json
-+++ b/tests/qapi-schema/alternate-conflict-dict.json
-@@ -1,4 +1,4 @@
--# we reject alternates with multiple object branches
-+# alternate branches of object type conflict with each other
- { 'struct': 'One',
-   'data': { 'name': 'str' } }
- { 'struct': 'Two',
-diff --git a/tests/qapi-schema/alternate-conflict-enum-bool.err b/tests/q=
-api-schema/alternate-conflict-enum-bool.err
-new file mode 100644
-index 0000000000..0dfc00242d
---- /dev/null
-+++ b/tests/qapi-schema/alternate-conflict-enum-bool.err
-@@ -0,0 +1 @@
-+tests/qapi-schema/alternate-conflict-enum-bool.json:4: Alternate 'Alt' m=
-ember 'two' can't be distinguished from member 'one'
-diff --git a/tests/qapi-schema/alternate-conflict-enum-bool.exit b/tests/=
-qapi-schema/alternate-conflict-enum-bool.exit
-new file mode 100644
-index 0000000000..d00491fd7e
---- /dev/null
-+++ b/tests/qapi-schema/alternate-conflict-enum-bool.exit
-@@ -0,0 +1 @@
-+1
-diff --git a/tests/qapi-schema/alternate-conflict-enum-bool.json b/tests/=
-qapi-schema/alternate-conflict-enum-bool.json
-new file mode 100644
-index 0000000000..bff25c3147
---- /dev/null
-+++ b/tests/qapi-schema/alternate-conflict-enum-bool.json
-@@ -0,0 +1,6 @@
-+# alternate branch of 'enum' type that conflicts with bool
-+{ 'enum': 'Enum',
-+  'data': [ 'aus', 'off' ] }
-+{ 'alternate': 'Alt',
-+  'data': { 'one': 'Enum',
-+            'two': 'bool' } }
-diff --git a/tests/qapi-schema/alternate-conflict-enum-bool.out b/tests/q=
-api-schema/alternate-conflict-enum-bool.out
-new file mode 100644
-index 0000000000..e69de29bb2
-diff --git a/tests/qapi-schema/alternate-conflict-enum-int.err b/tests/qa=
-pi-schema/alternate-conflict-enum-int.err
-new file mode 100644
-index 0000000000..2cc8e7b9aa
---- /dev/null
-+++ b/tests/qapi-schema/alternate-conflict-enum-int.err
-@@ -0,0 +1 @@
-+tests/qapi-schema/alternate-conflict-enum-int.json:4: Alternate 'Alt' me=
-mber 'two' can't be distinguished from member 'one'
-diff --git a/tests/qapi-schema/alternate-conflict-enum-int.exit b/tests/q=
-api-schema/alternate-conflict-enum-int.exit
-new file mode 100644
-index 0000000000..d00491fd7e
---- /dev/null
-+++ b/tests/qapi-schema/alternate-conflict-enum-int.exit
-@@ -0,0 +1 @@
-+1
-diff --git a/tests/qapi-schema/alternate-conflict-enum-int.json b/tests/q=
-api-schema/alternate-conflict-enum-int.json
-new file mode 100644
-index 0000000000..beb428c10b
---- /dev/null
-+++ b/tests/qapi-schema/alternate-conflict-enum-int.json
-@@ -0,0 +1,6 @@
-+# alternate branches of 'enum' type that conflicts with numbers
-+{ 'enum': 'Enum',
-+  'data': [ '1', '2', '3' ] }
-+{ 'alternate': 'Alt',
-+  'data': { 'one': 'Enum',
-+            'two': 'int' } }
-diff --git a/tests/qapi-schema/alternate-conflict-enum-int.out b/tests/qa=
-pi-schema/alternate-conflict-enum-int.out
-new file mode 100644
-index 0000000000..e69de29bb2
-diff --git a/tests/qapi-schema/alternate-conflict-string.err b/tests/qapi=
--schema/alternate-conflict-string.err
-index fc523b0879..fe2f188295 100644
---- a/tests/qapi-schema/alternate-conflict-string.err
-+++ b/tests/qapi-schema/alternate-conflict-string.err
-@@ -1 +1 @@
--tests/qapi-schema/alternate-conflict-string.json:4: Alternate 'Alt' memb=
-er 'two' can't be distinguished from member 'one'
-+tests/qapi-schema/alternate-conflict-string.json:2: Alternate 'Alt' memb=
-er 'two' can't be distinguished from member 'one'
-diff --git a/tests/qapi-schema/alternate-conflict-string.json b/tests/qap=
-i-schema/alternate-conflict-string.json
-index 72f04a820a..85adbd4adc 100644
---- a/tests/qapi-schema/alternate-conflict-string.json
-+++ b/tests/qapi-schema/alternate-conflict-string.json
-@@ -1,6 +1,4 @@
--# we reject alternates with multiple string-like branches
--{ 'enum': 'Enum',
--  'data': [ 'hello', 'world' ] }
-+# alternate branches of 'str' type conflict with all scalar types
- { 'alternate': 'Alt',
-   'data': { 'one': 'str',
--            'two': 'Enum' } }
-+            'two': 'int' } }
-diff --git a/tests/qapi-schema/qapi-schema-test.json b/tests/qapi-schema/=
-qapi-schema-test.json
-index 303f2b23cd..17649c6398 100644
---- a/tests/qapi-schema/qapi-schema-test.json
-+++ b/tests/qapi-schema/qapi-schema-test.json
-@@ -101,12 +101,14 @@
- # for testing use of 'number' within alternates
- { 'alternate': 'AltEnumBool', 'data': { 'e': 'EnumOne', 'b': 'bool' } }
- { 'alternate': 'AltEnumNum', 'data': { 'e': 'EnumOne', 'n': 'number' } }
--{ 'alternate': 'AltNumStr', 'data': { 'n': 'number', 's': 'str' } }
- { 'alternate': 'AltNumEnum', 'data': { 'n': 'number', 'e': 'EnumOne' } }
- { 'alternate': 'AltEnumInt', 'data': { 'e': 'EnumOne', 'i': 'int' } }
- { 'alternate': 'AltIntNum', 'data': { 'i': 'int', 'n': 'number' } }
- { 'alternate': 'AltNumInt', 'data': { 'n': 'number', 'i': 'int' } }
-=20
-+# for testing use of 'str' within alternates
-+{ 'alternate': 'AltStrObj', 'data': { 's': 'str', 'o': 'TestStruct' } }
++static void set_default_value_enum(Object *obj, const Property *prop)
++{
++    object_property_set_str(obj, prop->info->enum_table[prop->defval],
++                            prop->name, &error_abort);
++}
 +
- # for testing native lists
- { 'union': 'UserDefNativeListUnion',
-   'data': { 'integer': ['int'],
-diff --git a/tests/qapi-schema/qapi-schema-test.out b/tests/qapi-schema/q=
-api-schema-test.out
-index 3081091818..9f68610dc2 100644
---- a/tests/qapi-schema/qapi-schema-test.out
-+++ b/tests/qapi-schema/qapi-schema-test.out
-@@ -22,10 +22,10 @@ alternate AltNumInt
-     tag type
-     case n: number
-     case i: int
--alternate AltNumStr
-+alternate AltStrObj
-     tag type
--    case n: number
-     case s: str
-+    case o: TestStruct
- event EVENT_A None
-    boxed=3DFalse
- event EVENT_B None
+ /* Bit */
+=20
+ static uint32_t qdev_get_prop_mask(Property *prop)
+@@ -120,11 +126,17 @@ static void prop_set_bit(Object *obj, Visitor *v, c=
+onst char *name,
+     bit_prop_set(dev, prop, value);
+ }
+=20
++static void set_default_value_bool(Object *obj, const Property *prop)
++{
++    object_property_set_bool(obj, prop->defval, prop->name, &error_abort=
+);
++}
++
+ PropertyInfo qdev_prop_bit =3D {
+     .name  =3D "bool",
+     .description =3D "on/off",
+     .get   =3D prop_get_bit,
+     .set   =3D prop_set_bit,
++    .set_default_value =3D set_default_value_bool,
+ };
+=20
+ /* Bit64 */
+@@ -183,6 +195,7 @@ PropertyInfo qdev_prop_bit64 =3D {
+     .description =3D "on/off",
+     .get   =3D prop_get_bit64,
+     .set   =3D prop_set_bit64,
++    .set_default_value =3D set_default_value_bool,
+ };
+=20
+ /* --- bool --- */
+@@ -216,6 +229,7 @@ PropertyInfo qdev_prop_bool =3D {
+     .name  =3D "bool",
+     .get   =3D get_bool,
+     .set   =3D set_bool,
++    .set_default_value =3D set_default_value_bool,
+ };
+=20
+ /* --- 8bit integer --- */
+@@ -245,10 +259,16 @@ static void set_uint8(Object *obj, Visitor *v, cons=
+t char *name, void *opaque,
+     visit_type_uint8(v, name, ptr, errp);
+ }
+=20
++static void set_default_value_int(Object *obj, const Property *prop)
++{
++    object_property_set_int(obj, prop->defval, prop->name, &error_abort)=
+;
++}
++
+ PropertyInfo qdev_prop_uint8 =3D {
+     .name  =3D "uint8",
+     .get   =3D get_uint8,
+     .set   =3D set_uint8,
++    .set_default_value =3D set_default_value_int,
+ };
+=20
+ /* --- 16bit integer --- */
+@@ -282,6 +302,7 @@ PropertyInfo qdev_prop_uint16 =3D {
+     .name  =3D "uint16",
+     .get   =3D get_uint16,
+     .set   =3D set_uint16,
++    .set_default_value =3D set_default_value_int,
+ };
+=20
+ /* --- 32bit integer --- */
+@@ -340,12 +361,14 @@ PropertyInfo qdev_prop_uint32 =3D {
+     .name  =3D "uint32",
+     .get   =3D get_uint32,
+     .set   =3D set_uint32,
++    .set_default_value =3D set_default_value_int,
+ };
+=20
+ PropertyInfo qdev_prop_int32 =3D {
+     .name  =3D "int32",
+     .get   =3D get_int32,
+     .set   =3D set_int32,
++    .set_default_value =3D set_default_value_int,
+ };
+=20
+ /* --- 64bit integer --- */
+@@ -379,6 +402,7 @@ PropertyInfo qdev_prop_uint64 =3D {
+     .name  =3D "uint64",
+     .get   =3D get_uint64,
+     .set   =3D set_uint64,
++    .set_default_value =3D set_default_value_int,
+ };
+=20
+ /* --- string --- */
+@@ -526,6 +550,7 @@ PropertyInfo qdev_prop_on_off_auto =3D {
+     .enum_table =3D OnOffAuto_lookup,
+     .get =3D get_enum,
+     .set =3D set_enum,
++    .set_default_value =3D set_default_value_enum,
+ };
+=20
+ /* --- lost tick policy --- */
+@@ -537,6 +562,7 @@ PropertyInfo qdev_prop_losttickpolicy =3D {
+     .enum_table  =3D LostTickPolicy_lookup,
+     .get   =3D get_enum,
+     .set   =3D set_enum,
++    .set_default_value =3D set_default_value_enum,
+ };
+=20
+ /* --- Block device error handling policy --- */
+@@ -550,6 +576,7 @@ PropertyInfo qdev_prop_blockdev_on_error =3D {
+     .enum_table =3D BlockdevOnError_lookup,
+     .get =3D get_enum,
+     .set =3D set_enum,
++    .set_default_value =3D set_default_value_enum,
+ };
+=20
+ /* --- BIOS CHS translation */
+@@ -563,6 +590,7 @@ PropertyInfo qdev_prop_bios_chs_trans =3D {
+     .enum_table =3D BiosAtaTranslation_lookup,
+     .get =3D get_enum,
+     .set =3D set_enum,
++    .set_default_value =3D set_default_value_enum,
+ };
+=20
+ /* --- FDC default drive types */
+@@ -573,7 +601,8 @@ PropertyInfo qdev_prop_fdc_drive_type =3D {
+                    "144/288/120/none/auto",
+     .enum_table =3D FloppyDriveType_lookup,
+     .get =3D get_enum,
+-    .set =3D set_enum
++    .set =3D set_enum,
++    .set_default_value =3D set_default_value_enum,
+ };
+=20
+ /* --- pci address --- */
+@@ -648,6 +677,7 @@ PropertyInfo qdev_prop_pci_devfn =3D {
+     .print =3D print_pci_devfn,
+     .get   =3D get_int32,
+     .set   =3D set_pci_devfn,
++    .set_default_value =3D set_default_value_int,
+ };
+=20
+ /* --- blocksize --- */
+@@ -695,6 +725,7 @@ PropertyInfo qdev_prop_blocksize =3D {
+     .description =3D "A power of two between 512 and 32768",
+     .get   =3D get_uint16,
+     .set   =3D set_blocksize,
++    .set_default_value =3D set_default_value_int,
+ };
+=20
+ /* --- pci host address --- */
+@@ -917,6 +948,7 @@ PropertyInfo qdev_prop_arraylen =3D {
+     .name =3D "uint32",
+     .get =3D get_uint32,
+     .set =3D set_prop_arraylen,
++    .set_default_value =3D set_default_value_int,
+ };
+=20
+ /* --- public helpers --- */
+@@ -1153,4 +1185,5 @@ PropertyInfo qdev_prop_size =3D {
+     .name  =3D "size",
+     .get =3D get_size,
+     .set =3D set_size,
++    .set_default_value =3D set_default_value_int,
+ };
+diff --git a/hw/core/qdev.c b/hw/core/qdev.c
+index 71ff95fd71..6674e11840 100644
+--- a/hw/core/qdev.c
++++ b/hw/core/qdev.c
+@@ -794,17 +794,8 @@ void qdev_property_add_static(DeviceState *dev, Prop=
+erty *prop,
+                                     prop->info->description,
+                                     &error_abort);
+=20
+-    if (prop->qtype =3D=3D QTYPE_NONE) {
+-        return;
+-    }
+-
+-    if (prop->qtype =3D=3D QTYPE_QBOOL) {
+-        object_property_set_bool(obj, prop->defval, prop->name, &error_a=
+bort);
+-    } else if (prop->info->enum_table) {
+-        object_property_set_str(obj, prop->info->enum_table[prop->defval=
+],
+-                                prop->name, &error_abort);
+-    } else if (prop->qtype =3D=3D QTYPE_QINT) {
+-        object_property_set_int(obj, prop->defval, prop->name, &error_ab=
+ort);
++    if (prop->info->set_default_value) {
++        prop->info->set_default_value(obj, prop);
+     }
+ }
+=20
 --=20
 2.13.0.91.g00982b8dd
