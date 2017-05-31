@@ -1,15 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41568)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41642)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1dG0AG-0002RB-Cw
-	for qemu-devel@nongnu.org; Wed, 31 May 2017 05:43:41 -0400
+	(envelope-from <paolo.bonzini@gmail.com>) id 1dG0AI-0002Sz-9O
+	for qemu-devel@nongnu.org; Wed, 31 May 2017 05:43:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1dG0AB-0001hn-GV
-	for qemu-devel@nongnu.org; Wed, 31 May 2017 05:43:40 -0400
+	(envelope-from <paolo.bonzini@gmail.com>) id 1dG0AH-0001ke-N6
+	for qemu-devel@nongnu.org; Wed, 31 May 2017 05:43:42 -0400
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Wed, 31 May 2017 11:43:19 +0200
-Message-Id: <20170531094330.1808-1-pbonzini@redhat.com>
-Subject: [Qemu-devel] [RFC PATCH 00/11] Block layer thread-safety, part 2
+Date: Wed, 31 May 2017 11:43:24 +0200
+Message-Id: <20170531094330.1808-6-pbonzini@redhat.com>
+In-Reply-To: <20170531094330.1808-1-pbonzini@redhat.com>
+References: <20170531094330.1808-1-pbonzini@redhat.com>
+Subject: [Qemu-devel] [PATCH 05/11] vvfat: make it thread-safe
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,60 +23,30 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: kwolf@redhat.com, famz@redhat.com, qemu-block@nongnu.org, mreitz@redhat.com
 
-This part takes care of drivers and devices, making sure that they can
-accept concurrent I/O from multiple AioContext.  Only RFC for now because it
-depends on Kevin's QED conversion to coroutines, which is still in flux.
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ block/vvfat.c | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
 
-The following drivers are thread-safe without using any QemuMutex/CoMutex:
-crypto, gluster, null, rbd, win32-aio.
-
-The following drivers already use mutexes for everything except possibly
-snapshots, which do not (yet?) need protection: bochs, cloop, dmg, qcow,
-parallels, vhdx, vmdk, curl, iscsi, nfs.
-
-The following drivers already use mutexes for _almost_ everything: vpc
-(missing get_block_status), vdi (missing bitmap access), vvfat (missing
-commit), nbd (s->in_flight not protected), qcow2 (must call CoQueue APIs
-under CoMutex).  They are fixed by patches 1-6.
-
-The following drivers must be changed to use CoMutex to protect internal
-data: qed (patches 7-9), sheepdog (patch 10).
-
-The following driver must be changed to support I/O from any AioContext:
-ssh.  It is fixed by patch 11.
-
-Paolo
-
-Paolo Bonzini (11):
-  qcow2: call CoQueue APIs under CoMutex
-  coroutine-lock: add qemu_co_rwlock_downgrade and qemu_co_rwlock_upgrade
-  vdi: make it thread-safe
-  vpc: make it thread-safe
-  vvfat: make it thread-safe
-  nbd: make it thread-safe
-  qed: move tail of qed_aio_write_main to qed_aio_write_{cow,alloc}
-  block: invoke .bdrv_drain callback in coroutine context and from AioContext
-  qed: protect table cache with CoMutex
-  sheepdog: add queue_lock
-  ssh: support I/O from any AioContext
-
- block/io.c                 |  42 +++++++---
- block/nbd-client.c         |  30 +++----
- block/qcow2.c              |   4 +-
- block/qed-cluster.c        |   4 +-
- block/qed-l2-cache.c       |   6 ++
- block/qed-table.c          |  24 ++++--
- block/qed.c                | 195 +++++++++++++++++++++++++++------------------
- block/qed.h                |  11 ++-
- block/sheepdog.c           |  21 ++++-
- block/ssh.c                |  24 ++++--
- block/vdi.c                |  48 +++++------
- block/vpc.c                |  20 ++---
- block/vvfat.c              |   8 +-
- include/block/block_int.h  |   2 +-
- include/qemu/coroutine.h   |  19 +++++
- util/qemu-coroutine-lock.c |  35 ++++++++
- 16 files changed, 326 insertions(+), 167 deletions(-)
-
+diff --git a/block/vvfat.c b/block/vvfat.c
+index 9c82371360..457b73a35c 100644
+--- a/block/vvfat.c
++++ b/block/vvfat.c
+@@ -2983,8 +2983,14 @@ static int coroutine_fn
+ write_target_commit(BlockDriverState *bs, uint64_t offset, uint64_t bytes,
+                     QEMUIOVector *qiov, int flags)
+ {
++    int ret;
++
+     BDRVVVFATState* s = *((BDRVVVFATState**) bs->opaque);
+-    return try_commit(s);
++    qemu_co_mutex_lock(&s->lock);
++    ret = try_commit(s);
++    qemu_co_mutex_unlock(&s->lock);
++
++    return ret;
+ }
+ 
+ static void write_target_close(BlockDriverState *bs) {
 -- 
 2.13.0
