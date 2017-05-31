@@ -1,41 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55629)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56992)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imbrenda@linux.vnet.ibm.com>) id 1dG6q8-0005vD-7C
-	for qemu-devel@nongnu.org; Wed, 31 May 2017 12:51:21 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1dG6uV-0007ps-Pz
+	for qemu-devel@nongnu.org; Wed, 31 May 2017 12:55:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imbrenda@linux.vnet.ibm.com>) id 1dG6q4-0002gc-AI
-	for qemu-devel@nongnu.org; Wed, 31 May 2017 12:51:20 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:41286)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imbrenda@linux.vnet.ibm.com>)
-	id 1dG6q4-0002gK-0y
-	for qemu-devel@nongnu.org; Wed, 31 May 2017 12:51:16 -0400
-Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v4VGmf8o075478
-	for <qemu-devel@nongnu.org>; Wed, 31 May 2017 12:51:14 -0400
-Received: from e06smtp11.uk.ibm.com (e06smtp11.uk.ibm.com [195.75.94.107])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2asu6vbb82-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 31 May 2017 12:51:13 -0400
-Received: from localhost
-	by e06smtp11.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <imbrenda@linux.vnet.ibm.com>;
-	Wed, 31 May 2017 17:51:11 +0100
-Date: Wed, 31 May 2017 18:51:06 +0200
-From: Claudio Imbrenda <imbrenda@linux.vnet.ibm.com>
-In-Reply-To: <20170531183324.03bf98fe@bahia.lan>
-References: <20170531150933.10156-1-alex.bennee@linaro.org>
-	<20170531150933.10156-3-alex.bennee@linaro.org>
-	<20170531181737.230cbded@p-imbrenda.boeblingen.de.ibm.com>
-	<20170531183324.03bf98fe@bahia.lan>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <20170531185106.126f19ac@p-imbrenda.boeblingen.de.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH v1 2/2] gdbstub: don't fail on vCont; C04:0;
- c packets
+	(envelope-from <vsementsov@virtuozzo.com>) id 1dG6uR-00041M-Tj
+	for qemu-devel@nongnu.org; Wed, 31 May 2017 12:55:51 -0400
+Received: from mailhub.sw.ru ([195.214.232.25]:40435 helo=relay.sw.ru)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
+	id 1dG6uR-00040A-HO
+	for qemu-devel@nongnu.org; Wed, 31 May 2017 12:55:47 -0400
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Wed, 31 May 2017 19:55:36 +0300
+Message-Id: <20170531165541.47338-8-vsementsov@virtuozzo.com>
+In-Reply-To: <20170531165541.47338-1-vsementsov@virtuozzo.com>
+References: <20170531165541.47338-1-vsementsov@virtuozzo.com>
+Subject: [Qemu-devel] [PATCH 07/12] nbd/server: refactor
+ nbd_co_receive_request
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -44,89 +25,127 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>
-Cc: Alex =?UTF-8?B?QmVubsOpZQ==?= <alex.bennee@linaro.org>, pbonzini@redhat.com, doug16k@gmail.com, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: pbonzini@redhat.com, eblake@redhat.com, den@openvz.org, vsementsov@virtuozzo.com
 
-On Wed, 31 May 2017 18:33:24 +0200
-Greg Kurz <groug@kaod.org> wrote:
+Move function tail, about receiving next request out of the function.
+Error path is simplified and nbd_co_receive_request becomes more
+corresponding to its name.
 
-> On Wed, 31 May 2017 18:17:37 +0200
-> Claudio Imbrenda <imbrenda@linux.vnet.ibm.com> wrote:
->=20
-> > On Wed, 31 May 2017 16:09:33 +0100
-> > Alex Benn=C3=A9e <alex.bennee@linaro.org> wrote:
-> >  =20
-> > > The thread-id of 0 means any CPU but we then ignore the fact we
-> > > find the first_cpu in this case who can have an index of 0.
-> > > Instead of bailing out just test if we have managed to match up
-> > > thread-id to a CPU.
-> > >=20
-> > > Otherwise you get:
-> > >   gdb_handle_packet: command=3D'vCont;C04:0;c'
-> > >   put_packet: reply=3D'E22'
-> > >=20
-> > > Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-> > > ---
-> > >  gdbstub.c | 4 ++--
-> > >  1 file changed, 2 insertions(+), 2 deletions(-)
-> > >=20
-> > > diff --git a/gdbstub.c b/gdbstub.c
-> > > index a249846954..29c9ed3002 100644
-> > > --- a/gdbstub.c
-> > > +++ b/gdbstub.c
-> > > @@ -934,8 +934,8 @@ static int gdb_handle_vcont(GDBState *s, const
-> > > char *p)
-> > >               * CPU first, and only then we can use its index.
-> > >               */
-> > >              cpu =3D find_cpu(idx);
-> > > -            /* invalid CPU/thread specified */
-> > > -            if (!idx || !cpu) {
-> > > +            /* invalid thread specified, cpu not found. */
-> > > +            if (!cpu) {
-> > >                  res =3D -EINVAL;
-> > >                  goto out;
-> > >              }   =20
-> >=20
-> > This is strange. cpu_index() is defined as:
-> >=20
-> > static inline int cpu_index(CPUState *cpu)
-> > {
-> > #if defined(CONFIG_USER_ONLY)
-> >     return cpu->host_tid;
-> > #else
-> >     return cpu->cpu_index + 1;
-> > #endif
-> > }
-> >=20
-> > therefore it shouldn't return 0 under any circumstance, and =20
->=20
-> I think it is 0 for first_cpu in user mode.
+Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
+---
+ nbd/server.c | 41 +++++++++++++----------------------------
+ 1 file changed, 13 insertions(+), 28 deletions(-)
 
-in linux-user/syscall.c:
-
-info->tid =3D gettid();
-cpu->host_tid =3D info->tid;
-
-kernel thread-ids are system-wide unique and can't be 0
-=20
-> > find_cpu(idx) should also fail if idx =3D=3D 0, because internally it
-> > also uses cpu_index()
-> >=20
-> > on the other hand, you say that the patch does fix the problem for
-> > you, which really confuses me.
-> >=20
-> >=20
-> >=20
-> > (probably) completely unrelatedly, this:
-> >=20
-> > res =3D qemu_strtoul(p + 1, &p, 16, &tmp);
-> >=20
-> > should be like this instead:
-> >=20
-> > res =3D qemu_strtoul(p, &p, 16, &tmp);
-> >=20
-> > but this shouldn't impact you in any way.
-> >=20
-> >=20
-> >  =20
->=20
+diff --git a/nbd/server.c b/nbd/server.c
+index b0bb263596..8ac095d6bc 100644
+--- a/nbd/server.c
++++ b/nbd/server.c
+@@ -1006,14 +1006,11 @@ static int nbd_co_send_reply(NBDRequestData *req, NBDReply *reply, int len)
+ static int nbd_co_receive_request(NBDRequestData *req, NBDRequest *request)
+ {
+     NBDClient *client = req->client;
+-    int rc;
+ 
+     g_assert(qemu_in_coroutine());
+     assert(client->recv_coroutine == qemu_coroutine_self());
+-    rc = nbd_receive_request(client->ioc, request);
+-    if (rc < 0) {
+-        rc = -EIO;
+-        goto out;
++    if (nbd_receive_request(client->ioc, request) < 0) {
++        return -EIO;
+     }
+ 
+     TRACE("Decoding type");
+@@ -1027,8 +1024,7 @@ static int nbd_co_receive_request(NBDRequestData *req, NBDRequest *request)
+         /* Special case: we're going to disconnect without a reply,
+          * whether or not flags, from, or len are bogus */
+         TRACE("Request type is DISCONNECT");
+-        rc = -EIO;
+-        goto out;
++        return -EIO;
+     }
+ 
+     /* Check for sanity in the parameters, part 1.  Defer as many
+@@ -1036,22 +1032,19 @@ static int nbd_co_receive_request(NBDRequestData *req, NBDRequest *request)
+      * payload, so we can try and keep the connection alive.  */
+     if ((request->from + request->len) < request->from) {
+         LOG("integer overflow detected, you're probably being attacked");
+-        rc = -EINVAL;
+-        goto out;
++        return -EINVAL;
+     }
+ 
+     if (request->type == NBD_CMD_READ || request->type == NBD_CMD_WRITE) {
+         if (request->len > NBD_MAX_BUFFER_SIZE) {
+             LOG("len (%" PRIu32" ) is larger than max len (%u)",
+                 request->len, NBD_MAX_BUFFER_SIZE);
+-            rc = -EINVAL;
+-            goto out;
++            return -EINVAL;
+         }
+ 
+         req->data = blk_try_blockalign(client->exp->blk, request->len);
+         if (req->data == NULL) {
+-            rc = -ENOMEM;
+-            goto out;
++            return -ENOMEM;
+         }
+     }
+     if (request->type == NBD_CMD_WRITE) {
+@@ -1059,8 +1052,7 @@ static int nbd_co_receive_request(NBDRequestData *req, NBDRequest *request)
+ 
+         if (nbd_read(client->ioc, req->data, request->len, NULL) < 0) {
+             LOG("reading from socket failed");
+-            rc = -EIO;
+-            goto out;
++            return -EIO;
+         }
+         req->complete = true;
+     }
+@@ -1070,28 +1062,19 @@ static int nbd_co_receive_request(NBDRequestData *req, NBDRequest *request)
+         LOG("operation past EOF; From: %" PRIu64 ", Len: %" PRIu32
+             ", Size: %" PRIu64, request->from, request->len,
+             (uint64_t)client->exp->size);
+-        rc = request->type == NBD_CMD_WRITE ? -ENOSPC : -EINVAL;
+-        goto out;
++        return request->type == NBD_CMD_WRITE ? -ENOSPC : -EINVAL;
+     }
+     if (request->flags & ~(NBD_CMD_FLAG_FUA | NBD_CMD_FLAG_NO_HOLE)) {
+         LOG("unsupported flags (got 0x%x)", request->flags);
+-        rc = -EINVAL;
+-        goto out;
++        return -EINVAL;
+     }
+     if (request->type != NBD_CMD_WRITE_ZEROES &&
+         (request->flags & NBD_CMD_FLAG_NO_HOLE)) {
+         LOG("unexpected flags (got 0x%x)", request->flags);
+-        rc = -EINVAL;
+-        goto out;
++        return -EINVAL;
+     }
+ 
+-    rc = 0;
+-
+-out:
+-    client->recv_coroutine = NULL;
+-    nbd_client_receive_next_request(client);
+-
+-    return rc;
++    return 0;
+ }
+ 
+ /* Owns a reference to the NBDClient passed as opaque.  */
+@@ -1113,6 +1096,8 @@ static coroutine_fn void nbd_trip(void *opaque)
+ 
+     req = nbd_request_get(client);
+     ret = nbd_co_receive_request(req, &request);
++    client->recv_coroutine = NULL;
++    nbd_client_receive_next_request(client);
+     if (ret == -EIO) {
+         goto out;
+     }
+-- 
+2.11.1
