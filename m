@@ -1,31 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36640)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39424)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1dG7L4-0001GT-50
-	for qemu-devel@nongnu.org; Wed, 31 May 2017 13:23:19 -0400
+	(envelope-from <pbutsykin@virtuozzo.com>) id 1dG7bT-0005mF-3B
+	for qemu-devel@nongnu.org; Wed, 31 May 2017 13:40:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1dG7Kz-00065g-Cv
-	for qemu-devel@nongnu.org; Wed, 31 May 2017 13:23:18 -0400
-Received: from mail-wm0-x235.google.com ([2a00:1450:400c:c09::235]:34908)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1dG7Kz-00064f-4j
-	for qemu-devel@nongnu.org; Wed, 31 May 2017 13:23:13 -0400
-Received: by mail-wm0-x235.google.com with SMTP id b84so127456809wmh.0
-	for <qemu-devel@nongnu.org>; Wed, 31 May 2017 10:23:13 -0700 (PDT)
-References: <20170531150933.10156-1-alex.bennee@linaro.org>
-	<20170531150933.10156-3-alex.bennee@linaro.org>
-	<20170531181737.230cbded@p-imbrenda.boeblingen.de.ibm.com>
-	<20170531183324.03bf98fe@bahia.lan>
-	<20170531185106.126f19ac@p-imbrenda.boeblingen.de.ibm.com>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <20170531185106.126f19ac@p-imbrenda.boeblingen.de.ibm.com>
-Date: Wed, 31 May 2017 18:23:28 +0100
-Message-ID: <87shjlrldb.fsf@linaro.org>
+	(envelope-from <pbutsykin@virtuozzo.com>) id 1dG7bP-0007jY-RH
+	for qemu-devel@nongnu.org; Wed, 31 May 2017 13:40:15 -0400
+References: <20170531144331.30173-1-pbutsykin@virtuozzo.com>
+	<5e241222-95e1-3f7e-7fce-76e7e9a06c8c@redhat.com>
+	<a3ee5a6d-b16f-c4fd-b66e-da80d06f30a9@virtuozzo.com>
+	<20170531161026.GG27432@redhat.com>
+From: Pavel Butsykin <pbutsykin@virtuozzo.com>
+Message-ID: <edb2b2f4-03bc-229f-ffad-b0cc4db0b672@virtuozzo.com>
+Date: Wed, 31 May 2017 20:39:58 +0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v1 2/2] gdbstub: don't fail on vCont; C04:0;
- c packets
+In-Reply-To: <20170531161026.GG27432@redhat.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 0/2] Add reduce image for qcow2
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,99 +26,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Claudio Imbrenda <imbrenda@linux.vnet.ibm.com>
-Cc: Greg Kurz <groug@kaod.org>, pbonzini@redhat.com, doug16k@gmail.com, qemu-devel@nongnu.org
+To: "Richard W.M. Jones" <rjones@redhat.com>
+Cc: Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org, kwolf@redhat.com, armbru@redhat.com, mreitz@redhat.com
 
 
-Claudio Imbrenda <imbrenda@linux.vnet.ibm.com> writes:
+On 31.05.2017 19:10, Richard W.M. Jones wrote:
+> On Wed, May 31, 2017 at 06:54:33PM +0300, Pavel Butsykin wrote:
+>> It is assumed that the user has already made a preparatory with the
+>> image:
+>> 1. freeing space at the end of the image
+>> 2. reducing the last partition on the disk
+>> 3. rebuilding fs
+>> Only after these steps, the user can reduce the image by qemu-img.
+> 
+> It's tricky with GPT, as GPT puts a second copy of the header in the
+> last few sectors of the disk.  I always advise people to use trim (or
+> virt-sparsify) instead of trying to adjust virtual disk size.
 
-> On Wed, 31 May 2017 18:33:24 +0200
-> Greg Kurz <groug@kaod.org> wrote:
->
->> On Wed, 31 May 2017 18:17:37 +0200
->> Claudio Imbrenda <imbrenda@linux.vnet.ibm.com> wrote:
->>
->> > On Wed, 31 May 2017 16:09:33 +0100
->> > Alex Bennée <alex.bennee@linaro.org> wrote:
->> >
->> > > The thread-id of 0 means any CPU but we then ignore the fact we
->> > > find the first_cpu in this case who can have an index of 0.
->> > > Instead of bailing out just test if we have managed to match up
->> > > thread-id to a CPU.
->> > >
->> > > Otherwise you get:
->> > >   gdb_handle_packet: command='vCont;C04:0;c'
->> > >   put_packet: reply='E22'
->> > >
->> > > Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
->> > > ---
->> > >  gdbstub.c | 4 ++--
->> > >  1 file changed, 2 insertions(+), 2 deletions(-)
->> > >
->> > > diff --git a/gdbstub.c b/gdbstub.c
->> > > index a249846954..29c9ed3002 100644
->> > > --- a/gdbstub.c
->> > > +++ b/gdbstub.c
->> > > @@ -934,8 +934,8 @@ static int gdb_handle_vcont(GDBState *s, const
->> > > char *p)
->> > >               * CPU first, and only then we can use its index.
->> > >               */
->> > >              cpu = find_cpu(idx);
->> > > -            /* invalid CPU/thread specified */
->> > > -            if (!idx || !cpu) {
->> > > +            /* invalid thread specified, cpu not found. */
->> > > +            if (!cpu) {
->> > >                  res = -EINVAL;
->> > >                  goto out;
->> > >              }
->> >
->> > This is strange. cpu_index() is defined as:
->> >
->> > static inline int cpu_index(CPUState *cpu)
->> > {
->> > #if defined(CONFIG_USER_ONLY)
->> >     return cpu->host_tid;
->> > #else
->> >     return cpu->cpu_index + 1;
->> > #endif
->> > }
->> >
->> > therefore it shouldn't return 0 under any circumstance, and
->>
->> I think it is 0 for first_cpu in user mode.
->
-> in linux-user/syscall.c:
->
-> info->tid = gettid();
-> cpu->host_tid = info->tid;
->
-> kernel thread-ids are system-wide unique and can't be 0
+virt-sparsify is a very useful utility, I use it too :) I agree that the
+trim is much better if the goal is only to free up space on the host
+disk. But there's another goal is to limit further growth of the image.
 
-This only applies to newly cloned threads. The first is unset.
-
->
->> > find_cpu(idx) should also fail if idx == 0, because internally it
->> > also uses cpu_index()
->> >
->> > on the other hand, you say that the patch does fix the problem for
->> > you, which really confuses me.
->> >
->> >
->> >
->> > (probably) completely unrelatedly, this:
->> >
->> > res = qemu_strtoul(p + 1, &p, 16, &tmp);
->> >
->> > should be like this instead:
->> >
->> > res = qemu_strtoul(p, &p, 16, &tmp);
->> >
->> > but this shouldn't impact you in any way.
->> >
->> >
->> >
->>
-
-
---
-Alex Bennée
+> 
+> Nevertheless I don't think we should prevent shrinking qcow2 virtual
+> size.  It's likely useful to someone.
+> 
+> Rich.
+> 
