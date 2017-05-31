@@ -1,34 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:32863)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36640)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dG77S-0002M5-6Y
-	for qemu-devel@nongnu.org; Wed, 31 May 2017 13:09:15 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1dG7L4-0001GT-50
+	for qemu-devel@nongnu.org; Wed, 31 May 2017 13:23:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dG77P-0000dU-0Q
-	for qemu-devel@nongnu.org; Wed, 31 May 2017 13:09:14 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:55142)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dG77O-0000d2-Ok
-	for qemu-devel@nongnu.org; Wed, 31 May 2017 13:09:10 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 97A058124B
-	for <qemu-devel@nongnu.org>; Wed, 31 May 2017 17:09:09 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-116-98.ams2.redhat.com
-	[10.36.116.98])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 6499762923
-	for <qemu-devel@nongnu.org>; Wed, 31 May 2017 17:09:09 +0000 (UTC)
-From: Markus Armbruster <armbru@redhat.com>
-Date: Wed, 31 May 2017 19:09:04 +0200
-Message-Id: <1496250547-20701-2-git-send-email-armbru@redhat.com>
-In-Reply-To: <1496250547-20701-1-git-send-email-armbru@redhat.com>
-References: <1496250547-20701-1-git-send-email-armbru@redhat.com>
+	(envelope-from <alex.bennee@linaro.org>) id 1dG7Kz-00065g-Cv
+	for qemu-devel@nongnu.org; Wed, 31 May 2017 13:23:18 -0400
+Received: from mail-wm0-x235.google.com ([2a00:1450:400c:c09::235]:34908)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1dG7Kz-00064f-4j
+	for qemu-devel@nongnu.org; Wed, 31 May 2017 13:23:13 -0400
+Received: by mail-wm0-x235.google.com with SMTP id b84so127456809wmh.0
+	for <qemu-devel@nongnu.org>; Wed, 31 May 2017 10:23:13 -0700 (PDT)
+References: <20170531150933.10156-1-alex.bennee@linaro.org>
+	<20170531150933.10156-3-alex.bennee@linaro.org>
+	<20170531181737.230cbded@p-imbrenda.boeblingen.de.ibm.com>
+	<20170531183324.03bf98fe@bahia.lan>
+	<20170531185106.126f19ac@p-imbrenda.boeblingen.de.ibm.com>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <20170531185106.126f19ac@p-imbrenda.boeblingen.de.ibm.com>
+Date: Wed, 31 May 2017 18:23:28 +0100
+Message-ID: <87shjlrldb.fsf@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 1/4] qobject-input-visitor: Reject non-finite
- numbers with keyval
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v1 2/2] gdbstub: don't fail on vCont; C04:0;
+ c packets
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,79 +34,99 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Claudio Imbrenda <imbrenda@linux.vnet.ibm.com>
+Cc: Greg Kurz <groug@kaod.org>, pbonzini@redhat.com, doug16k@gmail.com, qemu-devel@nongnu.org
 
-The QObject input visitor can produce only finite numbers when its
-input comes out of the JSON parser, because the the JSON parser
-implements RFC 7159, which provides no syntax for infinity and NaN.
 
-However, it can produce infinity and NaN when its input comes out of
-keyval_parse(), because we parse with strtod() then.
+Claudio Imbrenda <imbrenda@linux.vnet.ibm.com> writes:
 
-The keyval variant should not be able to express things the JSON
-variant can't.  Rejecting non-finite numbers there is the conservative
-fix.  It's also minimally invasive.
+> On Wed, 31 May 2017 18:33:24 +0200
+> Greg Kurz <groug@kaod.org> wrote:
+>
+>> On Wed, 31 May 2017 18:17:37 +0200
+>> Claudio Imbrenda <imbrenda@linux.vnet.ibm.com> wrote:
+>>
+>> > On Wed, 31 May 2017 16:09:33 +0100
+>> > Alex Bennée <alex.bennee@linaro.org> wrote:
+>> >
+>> > > The thread-id of 0 means any CPU but we then ignore the fact we
+>> > > find the first_cpu in this case who can have an index of 0.
+>> > > Instead of bailing out just test if we have managed to match up
+>> > > thread-id to a CPU.
+>> > >
+>> > > Otherwise you get:
+>> > >   gdb_handle_packet: command='vCont;C04:0;c'
+>> > >   put_packet: reply='E22'
+>> > >
+>> > > Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+>> > > ---
+>> > >  gdbstub.c | 4 ++--
+>> > >  1 file changed, 2 insertions(+), 2 deletions(-)
+>> > >
+>> > > diff --git a/gdbstub.c b/gdbstub.c
+>> > > index a249846954..29c9ed3002 100644
+>> > > --- a/gdbstub.c
+>> > > +++ b/gdbstub.c
+>> > > @@ -934,8 +934,8 @@ static int gdb_handle_vcont(GDBState *s, const
+>> > > char *p)
+>> > >               * CPU first, and only then we can use its index.
+>> > >               */
+>> > >              cpu = find_cpu(idx);
+>> > > -            /* invalid CPU/thread specified */
+>> > > -            if (!idx || !cpu) {
+>> > > +            /* invalid thread specified, cpu not found. */
+>> > > +            if (!cpu) {
+>> > >                  res = -EINVAL;
+>> > >                  goto out;
+>> > >              }
+>> >
+>> > This is strange. cpu_index() is defined as:
+>> >
+>> > static inline int cpu_index(CPUState *cpu)
+>> > {
+>> > #if defined(CONFIG_USER_ONLY)
+>> >     return cpu->host_tid;
+>> > #else
+>> >     return cpu->cpu_index + 1;
+>> > #endif
+>> > }
+>> >
+>> > therefore it shouldn't return 0 under any circumstance, and
+>>
+>> I think it is 0 for first_cpu in user mode.
+>
+> in linux-user/syscall.c:
+>
+> info->tid = gettid();
+> cpu->host_tid = info->tid;
+>
+> kernel thread-ids are system-wide unique and can't be 0
 
-We could instead extend our JSON dialect to provide for infinity and
-NaN.  Not today.
+This only applies to newly cloned threads. The first is unset.
 
-Note that the JSON formatter can emit non-finite numbers (marked FIXME
-in commit 6e8e5cb).
+>
+>> > find_cpu(idx) should also fail if idx == 0, because internally it
+>> > also uses cpu_index()
+>> >
+>> > on the other hand, you say that the patch does fix the problem for
+>> > you, which really confuses me.
+>> >
+>> >
+>> >
+>> > (probably) completely unrelatedly, this:
+>> >
+>> > res = qemu_strtoul(p + 1, &p, 16, &tmp);
+>> >
+>> > should be like this instead:
+>> >
+>> > res = qemu_strtoul(p, &p, 16, &tmp);
+>> >
+>> > but this shouldn't impact you in any way.
+>> >
+>> >
+>> >
+>>
 
-Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Message-Id: <1495471335-23707-2-git-send-email-armbru@redhat.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
-Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
----
- qapi/qobject-input-visitor.c       | 3 ++-
- tests/test-qobject-input-visitor.c | 6 ++++++
- 2 files changed, 8 insertions(+), 1 deletion(-)
 
-diff --git a/qapi/qobject-input-visitor.c b/qapi/qobject-input-visitor.c
-index d0f0002..eac40f6 100644
---- a/qapi/qobject-input-visitor.c
-+++ b/qapi/qobject-input-visitor.c
-@@ -13,6 +13,7 @@
-  */
-=20
- #include "qemu/osdep.h"
-+#include <math.h>
- #include "qapi/error.h"
- #include "qapi/qobject-input-visitor.h"
- #include "qapi/visitor-impl.h"
-@@ -568,7 +569,7 @@ static void qobject_input_type_number_keyval(Visitor =
-*v, const char *name,
-=20
-     errno =3D 0;
-     *obj =3D strtod(str, &endp);
--    if (errno || endp =3D=3D str || *endp) {
-+    if (errno || endp =3D=3D str || *endp || !isfinite(*obj)) {
-         /* TODO report -ERANGE more nicely */
-         error_setg(errp, QERR_INVALID_PARAMETER_TYPE,
-                    full_name(qiv, name), "number");
-diff --git a/tests/test-qobject-input-visitor.c b/tests/test-qobject-inpu=
-t-visitor.c
-index f965743..e2aabbe 100644
---- a/tests/test-qobject-input-visitor.c
-+++ b/tests/test-qobject-input-visitor.c
-@@ -278,11 +278,17 @@ static void test_visitor_in_number_str_keyval(TestI=
-nputVisitorData *data,
- {
-     double res =3D 0, value =3D 3.14;
-     Visitor *v;
-+    Error *err =3D NULL;
-=20
-     v =3D visitor_input_test_init_full(data, true, "\"3.14\"");
-=20
-     visit_type_number(v, NULL, &res, &error_abort);
-     g_assert_cmpfloat(res, =3D=3D, value);
-+
-+    v =3D visitor_input_test_init_full(data, true, "\"inf\"");
-+
-+    visit_type_number(v, NULL, &res, &err);
-+    error_free_or_abort(&err);
- }
-=20
- static void test_visitor_in_number_str_fail(TestInputVisitorData *data,
---=20
-2.7.4
+--
+Alex Bennée
