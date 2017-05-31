@@ -1,34 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37752)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37991)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bharata@linux.vnet.ibm.com>) id 1dG1nB-0004QG-HH
-	for qemu-devel@nongnu.org; Wed, 31 May 2017 07:27:58 -0400
+	(envelope-from <groug@kaod.org>) id 1dG1nv-0004yW-3x
+	for qemu-devel@nongnu.org; Wed, 31 May 2017 07:28:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bharata@linux.vnet.ibm.com>) id 1dG1n8-0001KT-5k
-	for qemu-devel@nongnu.org; Wed, 31 May 2017 07:27:57 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:55669)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bharata@linux.vnet.ibm.com>)
-	id 1dG1n7-0001Jc-SA
-	for qemu-devel@nongnu.org; Wed, 31 May 2017 07:27:54 -0400
-Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v4VBOZEG054372
-	for <qemu-devel@nongnu.org>; Wed, 31 May 2017 07:27:52 -0400
-Received: from e23smtp05.au.ibm.com (e23smtp05.au.ibm.com [202.81.31.147])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2asub0md5r-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 31 May 2017 07:27:52 -0400
-Received: from localhost
-	by e23smtp05.au.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <bharata@linux.vnet.ibm.com>;
-	Wed, 31 May 2017 21:27:50 +1000
-From: Bharata B Rao <bharata@linux.vnet.ibm.com>
-Date: Wed, 31 May 2017 16:56:45 +0530
-In-Reply-To: <1496230005-12265-1-git-send-email-bharata@linux.vnet.ibm.com>
-References: <1496230005-12265-1-git-send-email-bharata@linux.vnet.ibm.com>
-Message-Id: <1496230005-12265-3-git-send-email-bharata@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH v4 2/2] spapr: Fix migration of Radix guests
+	(envelope-from <groug@kaod.org>) id 1dG1nr-0001vH-W4
+	for qemu-devel@nongnu.org; Wed, 31 May 2017 07:28:43 -0400
+Received: from 7.mo5.mail-out.ovh.net ([178.32.124.100]:57363)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1dG1nr-0001tH-Mx
+	for qemu-devel@nongnu.org; Wed, 31 May 2017 07:28:39 -0400
+Received: from player799.ha.ovh.net (b9.ovh.net [213.186.33.59])
+	by mo5.mail-out.ovh.net (Postfix) with ESMTP id 7C16EFFE4B
+	for <qemu-devel@nongnu.org>; Wed, 31 May 2017 13:28:31 +0200 (CEST)
+Date: Wed, 31 May 2017 13:28:24 +0200
+From: Greg Kurz <groug@kaod.org>
+Message-ID: <20170531132824.1b27dace@bahia.ttt.fr.ibm.com>
+In-Reply-To: <20170531092516.5112-1-lvivier@redhat.com>
+References: <20170531092516.5112-1-lvivier@redhat.com>
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	boundary="Sig_/W+9cUtFgh.No4ftEbATQ6M5";
+	protocol="application/pgp-signature"
+Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH v2] spapr: manage hotplugged
+ devices while the VM is not started
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,41 +31,142 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-ppc@nongnu.org, david@gibson.dropbear.id.au, sam.bobroff@au1.ibm.com, rnsastry@linux.vnet.ibm.com, sjitindarsingh@gmail.com, Bharata B Rao <bharata@linux.vnet.ibm.com>
+To: Laurent Vivier <lvivier@redhat.com>
+Cc: David Gibson <david@gibson.dropbear.id.au>, Thomas Huth <thuth@redhat.com>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 
-Fix migration of radix guests by ensuring that we issue
-KVM_PPC_CONFIGURE_V3_MMU for radix case post migration.
+--Sig_/W+9cUtFgh.No4ftEbATQ6M5
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-Reported-by: Nageswara R Sastry <rnsastry@linux.vnet.ibm.com>
-Signed-off-by: Bharata B Rao <bharata@linux.vnet.ibm.com>
-Reviewed-by: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
----
- hw/ppc/spapr.c | 12 ++++++++++++
- 1 file changed, 12 insertions(+)
+On Wed, 31 May 2017 11:25:16 +0200
+Laurent Vivier <lvivier@redhat.com> wrote:
 
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index b589ed4..3f66a93 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -1445,6 +1445,18 @@ static int spapr_post_load(void *opaque, int version_id)
-         err = spapr_rtc_import_offset(&spapr->rtc, spapr->rtc_offset);
-     }
- 
-+    if (spapr->patb_entry) {
-+        PowerPCCPU *cpu = POWERPC_CPU(first_cpu);
-+        bool radix = !!(spapr->patb_entry & PATBE1_GR);
-+        bool gtse = !!(cpu->env.spr[SPR_LPCR] & LPCR_GTSE);
-+
-+        err = kvmppc_configure_v3_mmu(cpu, radix, gtse, spapr->patb_entry);
-+        if (err) {
-+            error_report("Process table config unsupported by the host");
-+            return -EINVAL;
-+        }
-+    }
-+
-     return err;
- }
- 
--- 
-2.7.4
+> For QEMU, a hotlugged device is a device added using the HMP/QMP
+> interface.
+> For SPAPR, a hotplugged device is a device added while the
+> machine is running. In this case QEMU doesn't update internal
+> state but relies on the OS for this part
+>=20
+> In the case of migration, when we (libvirt) hotplug a device
+> on the source guest, we (libvirt) generally hotplug the same
+> device on the destination guest. But in this case, the machine
+> is stopped (RUN_STATE_INMIGRATE) and QEMU must not expect
+> the OS will manage it as an hotplugged device as it will
+> be "imported" by the migration.
+>=20
+> This patch changes the meaning of "hotplugged" in spapr.c
+> to manage a QEMU hotplugged device like a "coldplugged" one
+> when the machine is awaiting an incoming migration.
+>=20
+> Signed-off-by: Laurent Vivier <lvivier@redhat.com>
+> ---
+
+Reviewed-by: Greg Kurz <groug@kaod.org>
+
+> v2:
+> - don't replace dev->hotplugged to test if CPU hotplug
+>   is supported.
+>=20
+>  hw/ppc/spapr.c | 18 +++++++++++++-----
+>  1 file changed, 13 insertions(+), 5 deletions(-)
+>=20
+> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> index ab3aab1..f0c543c 100644
+> --- a/hw/ppc/spapr.c
+> +++ b/hw/ppc/spapr.c
+> @@ -2521,6 +2521,12 @@ static void spapr_nmi(NMIState *n, int cpu_index, =
+Error **errp)
+>      }
+>  }
+> =20
+> +static bool spapr_coldplugged(DeviceState *dev)
+> +{
+> +    return runstate_check(RUN_STATE_INMIGRATE) ||
+> +           !dev->hotplugged;
+> +}
+> +
+>  static void spapr_add_lmbs(DeviceState *dev, uint64_t addr_start, uint64=
+_t size,
+>                             uint32_t node, bool dedicated_hp_event_source,
+>                             Error **errp)
+> @@ -2531,6 +2537,7 @@ static void spapr_add_lmbs(DeviceState *dev, uint64=
+_t addr_start, uint64_t size,
+>      int i, fdt_offset, fdt_size;
+>      void *fdt;
+>      uint64_t addr =3D addr_start;
+> +    bool coldplugged =3D spapr_coldplugged(dev);
+> =20
+>      for (i =3D 0; i < nr_lmbs; i++) {
+>          drc =3D spapr_dr_connector_by_id(SPAPR_DR_CONNECTOR_TYPE_LMB,
+> @@ -2542,9 +2549,9 @@ static void spapr_add_lmbs(DeviceState *dev, uint64=
+_t addr_start, uint64_t size,
+>                                                  SPAPR_MEMORY_BLOCK_SIZE);
+> =20
+>          drck =3D SPAPR_DR_CONNECTOR_GET_CLASS(drc);
+> -        drck->attach(drc, dev, fdt, fdt_offset, !dev->hotplugged, errp);
+> +        drck->attach(drc, dev, fdt, fdt_offset, coldplugged, errp);
+>          addr +=3D SPAPR_MEMORY_BLOCK_SIZE;
+> -        if (!dev->hotplugged) {
+> +        if (coldplugged) {
+>              /* guests expect coldplugged LMBs to be pre-allocated */
+>              drck->set_allocation_state(drc, SPAPR_DR_ALLOCATION_STATE_US=
+ABLE);
+>              drck->set_isolation_state(drc, SPAPR_DR_ISOLATION_STATE_UNIS=
+OLATED);
+> @@ -2553,7 +2560,7 @@ static void spapr_add_lmbs(DeviceState *dev, uint64=
+_t addr_start, uint64_t size,
+>      /* send hotplug notification to the
+>       * guest only in case of hotplugged memory
+>       */
+> -    if (dev->hotplugged) {
+> +    if (!coldplugged) {
+>          if (dedicated_hp_event_source) {
+>              drc =3D spapr_dr_connector_by_id(SPAPR_DR_CONNECTOR_TYPE_LMB,
+>                      addr_start / SPAPR_MEMORY_BLOCK_SIZE);
+> @@ -2867,6 +2874,7 @@ static void spapr_core_plug(HotplugHandler *hotplug=
+_dev, DeviceState *dev,
+>      int smt =3D kvmppc_smt_threads();
+>      CPUArchId *core_slot;
+>      int index;
+> +    bool coldplugged =3D spapr_coldplugged(dev);
+> =20
+>      core_slot =3D spapr_find_cpu_slot(MACHINE(hotplug_dev), cc->core_id,=
+ &index);
+>      if (!core_slot) {
+> @@ -2888,7 +2896,7 @@ static void spapr_core_plug(HotplugHandler *hotplug=
+_dev, DeviceState *dev,
+> =20
+>      if (drc) {
+>          sPAPRDRConnectorClass *drck =3D SPAPR_DR_CONNECTOR_GET_CLASS(drc=
+);
+> -        drck->attach(drc, dev, fdt, fdt_offset, !dev->hotplugged, &local=
+_err);
+> +        drck->attach(drc, dev, fdt, fdt_offset, coldplugged, &local_err);
+>          if (local_err) {
+>              g_free(fdt);
+>              error_propagate(errp, local_err);
+> @@ -2896,7 +2904,7 @@ static void spapr_core_plug(HotplugHandler *hotplug=
+_dev, DeviceState *dev,
+>          }
+>      }
+> =20
+> -    if (dev->hotplugged) {
+> +    if (!coldplugged) {
+>          /*
+>           * Send hotplug notification interrupt to the guest only in case
+>           * of hotplugged CPUs.
+
+
+--Sig_/W+9cUtFgh.No4ftEbATQ6M5
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iEYEARECAAYFAlkuqNgACgkQAvw66wEB28J3lwCfcr6vOzd+WXohqvA/eMflMqw9
+pLkAoIL0/yh3BQdO0Dgph3xgmu/dFUX5
+=JIB8
+-----END PGP SIGNATURE-----
+
+--Sig_/W+9cUtFgh.No4ftEbATQ6M5--
