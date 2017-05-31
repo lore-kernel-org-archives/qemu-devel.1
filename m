@@ -1,28 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37991)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40354)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1dG1nv-0004yW-3x
-	for qemu-devel@nongnu.org; Wed, 31 May 2017 07:28:44 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1dG1yY-00019D-QD
+	for qemu-devel@nongnu.org; Wed, 31 May 2017 07:39:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1dG1nr-0001vH-W4
-	for qemu-devel@nongnu.org; Wed, 31 May 2017 07:28:43 -0400
-Received: from 7.mo5.mail-out.ovh.net ([178.32.124.100]:57363)
+	(envelope-from <dgilbert@redhat.com>) id 1dG1yT-0007W0-SL
+	for qemu-devel@nongnu.org; Wed, 31 May 2017 07:39:42 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42480)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1dG1nr-0001tH-Mx
-	for qemu-devel@nongnu.org; Wed, 31 May 2017 07:28:39 -0400
-Received: from player799.ha.ovh.net (b9.ovh.net [213.186.33.59])
-	by mo5.mail-out.ovh.net (Postfix) with ESMTP id 7C16EFFE4B
-	for <qemu-devel@nongnu.org>; Wed, 31 May 2017 13:28:31 +0200 (CEST)
-Date: Wed, 31 May 2017 13:28:24 +0200
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20170531132824.1b27dace@bahia.ttt.fr.ibm.com>
-In-Reply-To: <20170531092516.5112-1-lvivier@redhat.com>
-References: <20170531092516.5112-1-lvivier@redhat.com>
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dG1yT-0007Vd-Je
+	for qemu-devel@nongnu.org; Wed, 31 May 2017 07:39:37 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 433237AE8A
+	for <qemu-devel@nongnu.org>; Wed, 31 May 2017 11:39:36 +0000 (UTC)
+Date: Wed, 31 May 2017 12:39:25 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170531113924.GH2141@work-vm>
+References: <20170531091720.21697-1-quintela@redhat.com>
+	<20170531091720.21697-4-quintela@redhat.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	boundary="Sig_/W+9cUtFgh.No4ftEbATQ6M5";
-	protocol="application/pgp-signature"
-Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH v2] spapr: manage hotplugged
- devices while the VM is not started
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170531091720.21697-4-quintela@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v3 3/3] migration: Remove section_id
+ parameter from vmstate_load
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,142 +34,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laurent Vivier <lvivier@redhat.com>
-Cc: David Gibson <david@gibson.dropbear.id.au>, Thomas Huth <thuth@redhat.com>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+To: Juan Quintela <quintela@redhat.com>
+Cc: qemu-devel@nongnu.org, lvivier@redhat.com, peterx@redhat.com
 
---Sig_/W+9cUtFgh.No4ftEbATQ6M5
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+* Juan Quintela (quintela@redhat.com) wrote:
+> Everything else assumes that we always load a device from its own
+> savevm handler.
 
-On Wed, 31 May 2017 11:25:16 +0200
-Laurent Vivier <lvivier@redhat.com> wrote:
+Except for the title (it's the version_id you're removing not
+section_id) but now I think this series is ok because you're always
+using
+the load_* stuff.
 
-> For QEMU, a hotlugged device is a device added using the HMP/QMP
-> interface.
-> For SPAPR, a hotplugged device is a device added while the
-> machine is running. In this case QEMU doesn't update internal
-> state but relies on the OS for this part
->=20
-> In the case of migration, when we (libvirt) hotplug a device
-> on the source guest, we (libvirt) generally hotplug the same
-> device on the destination guest. But in this case, the machine
-> is stopped (RUN_STATE_INMIGRATE) and QEMU must not expect
-> the OS will manage it as an hotplugged device as it will
-> be "imported" by the migration.
->=20
-> This patch changes the meaning of "hotplugged" in spapr.c
-> to manage a QEMU hotplugged device like a "coldplugged" one
-> when the machine is awaiting an incoming migration.
->=20
-> Signed-off-by: Laurent Vivier <lvivier@redhat.com>
+I guess in manyways the LoadStateEntry list made some sense; it was
+harder to accidentally use version_id rather than load_version_id if
+it was on a different pointer.
+
+But generally now for the series:
+
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+
+
+Dave
+
+> Signed-off-by: Juan Quintela <quintela@redhat.com>
+> Reviewed-by: Laurent Vivier <lvivier@redhat.com>
+> Reviewed-by: Peter Xu <peterx@redhat.com>
 > ---
-
-Reviewed-by: Greg Kurz <groug@kaod.org>
-
-> v2:
-> - don't replace dev->hotplugged to test if CPU hotplug
->   is supported.
->=20
->  hw/ppc/spapr.c | 18 +++++++++++++-----
->  1 file changed, 13 insertions(+), 5 deletions(-)
->=20
-> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> index ab3aab1..f0c543c 100644
-> --- a/hw/ppc/spapr.c
-> +++ b/hw/ppc/spapr.c
-> @@ -2521,6 +2521,12 @@ static void spapr_nmi(NMIState *n, int cpu_index, =
-Error **errp)
+>  migration/savevm.c | 10 +++++-----
+>  1 file changed, 5 insertions(+), 5 deletions(-)
+> 
+> diff --git a/migration/savevm.c b/migration/savevm.c
+> index d96209b..2d1d4bc 100644
+> --- a/migration/savevm.c
+> +++ b/migration/savevm.c
+> @@ -746,13 +746,13 @@ void vmstate_unregister(DeviceState *dev, const VMStateDescription *vmsd,
 >      }
 >  }
-> =20
-> +static bool spapr_coldplugged(DeviceState *dev)
-> +{
-> +    return runstate_check(RUN_STATE_INMIGRATE) ||
-> +           !dev->hotplugged;
-> +}
-> +
->  static void spapr_add_lmbs(DeviceState *dev, uint64_t addr_start, uint64=
-_t size,
->                             uint32_t node, bool dedicated_hp_event_source,
->                             Error **errp)
-> @@ -2531,6 +2537,7 @@ static void spapr_add_lmbs(DeviceState *dev, uint64=
-_t addr_start, uint64_t size,
->      int i, fdt_offset, fdt_size;
->      void *fdt;
->      uint64_t addr =3D addr_start;
-> +    bool coldplugged =3D spapr_coldplugged(dev);
-> =20
->      for (i =3D 0; i < nr_lmbs; i++) {
->          drc =3D spapr_dr_connector_by_id(SPAPR_DR_CONNECTOR_TYPE_LMB,
-> @@ -2542,9 +2549,9 @@ static void spapr_add_lmbs(DeviceState *dev, uint64=
-_t addr_start, uint64_t size,
->                                                  SPAPR_MEMORY_BLOCK_SIZE);
-> =20
->          drck =3D SPAPR_DR_CONNECTOR_GET_CLASS(drc);
-> -        drck->attach(drc, dev, fdt, fdt_offset, !dev->hotplugged, errp);
-> +        drck->attach(drc, dev, fdt, fdt_offset, coldplugged, errp);
->          addr +=3D SPAPR_MEMORY_BLOCK_SIZE;
-> -        if (!dev->hotplugged) {
-> +        if (coldplugged) {
->              /* guests expect coldplugged LMBs to be pre-allocated */
->              drck->set_allocation_state(drc, SPAPR_DR_ALLOCATION_STATE_US=
-ABLE);
->              drck->set_isolation_state(drc, SPAPR_DR_ISOLATION_STATE_UNIS=
-OLATED);
-> @@ -2553,7 +2560,7 @@ static void spapr_add_lmbs(DeviceState *dev, uint64=
-_t addr_start, uint64_t size,
->      /* send hotplug notification to the
->       * guest only in case of hotplugged memory
->       */
-> -    if (dev->hotplugged) {
-> +    if (!coldplugged) {
->          if (dedicated_hp_event_source) {
->              drc =3D spapr_dr_connector_by_id(SPAPR_DR_CONNECTOR_TYPE_LMB,
->                      addr_start / SPAPR_MEMORY_BLOCK_SIZE);
-> @@ -2867,6 +2874,7 @@ static void spapr_core_plug(HotplugHandler *hotplug=
-_dev, DeviceState *dev,
->      int smt =3D kvmppc_smt_threads();
->      CPUArchId *core_slot;
->      int index;
-> +    bool coldplugged =3D spapr_coldplugged(dev);
-> =20
->      core_slot =3D spapr_find_cpu_slot(MACHINE(hotplug_dev), cc->core_id,=
- &index);
->      if (!core_slot) {
-> @@ -2888,7 +2896,7 @@ static void spapr_core_plug(HotplugHandler *hotplug=
-_dev, DeviceState *dev,
-> =20
->      if (drc) {
->          sPAPRDRConnectorClass *drck =3D SPAPR_DR_CONNECTOR_GET_CLASS(drc=
-);
-> -        drck->attach(drc, dev, fdt, fdt_offset, !dev->hotplugged, &local=
-_err);
-> +        drck->attach(drc, dev, fdt, fdt_offset, coldplugged, &local_err);
->          if (local_err) {
->              g_free(fdt);
->              error_propagate(errp, local_err);
-> @@ -2896,7 +2904,7 @@ static void spapr_core_plug(HotplugHandler *hotplug=
-_dev, DeviceState *dev,
->          }
+>  
+> -static int vmstate_load(QEMUFile *f, SaveStateEntry *se, int version_id)
+> +static int vmstate_load(QEMUFile *f, SaveStateEntry *se)
+>  {
+>      trace_vmstate_load(se->idstr, se->vmsd ? se->vmsd->name : "(old)");
+>      if (!se->vmsd) {         /* Old style */
+> -        return se->ops->load_state(f, se->opaque, version_id);
+> +        return se->ops->load_state(f, se->opaque, se->load_version_id);
 >      }
-> =20
-> -    if (dev->hotplugged) {
-> +    if (!coldplugged) {
->          /*
->           * Send hotplug notification interrupt to the guest only in case
->           * of hotplugged CPUs.
-
-
---Sig_/W+9cUtFgh.No4ftEbATQ6M5
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-
-iEYEARECAAYFAlkuqNgACgkQAvw66wEB28J3lwCfcr6vOzd+WXohqvA/eMflMqw9
-pLkAoIL0/yh3BQdO0Dgph3xgmu/dFUX5
-=JIB8
------END PGP SIGNATURE-----
-
---Sig_/W+9cUtFgh.No4ftEbATQ6M5--
+> -    return vmstate_load_state(f, se->vmsd, se->opaque, version_id);
+> +    return vmstate_load_state(f, se->vmsd, se->opaque, se->load_version_id);
+>  }
+>  
+>  static void vmstate_save_old_style(QEMUFile *f, SaveStateEntry *se, QJSON *vmdesc)
+> @@ -1882,7 +1882,7 @@ qemu_loadvm_section_start_full(QEMUFile *f, MigrationIncomingState *mis)
+>          return -EINVAL;
+>      }
+>  
+> -    ret = vmstate_load(f, se, se->load_version_id);
+> +    ret = vmstate_load(f, se);
+>      if (ret < 0) {
+>          error_report("error while loading state for instance 0x%x of"
+>                       " device '%s'", instance_id, idstr);
+> @@ -1915,7 +1915,7 @@ qemu_loadvm_section_part_end(QEMUFile *f, MigrationIncomingState *mis)
+>          return -EINVAL;
+>      }
+>  
+> -    ret = vmstate_load(f, se, se->load_version_id);
+> +    ret = vmstate_load(f, se);
+>      if (ret < 0) {
+>          error_report("error while loading state section id %d(%s)",
+>                       section_id, se->idstr);
+> -- 
+> 2.9.4
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
