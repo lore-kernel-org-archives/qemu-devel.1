@@ -1,29 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37553)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38145)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dG3ON-0000fw-Lw
-	for qemu-devel@nongnu.org; Wed, 31 May 2017 09:10:29 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1dG3Qa-0002Xl-7K
+	for qemu-devel@nongnu.org; Wed, 31 May 2017 09:12:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dG3OK-0004Wj-UC
-	for qemu-devel@nongnu.org; Wed, 31 May 2017 09:10:27 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47988)
+	(envelope-from <vsementsov@virtuozzo.com>) id 1dG3QX-0004ur-Gp
+	for qemu-devel@nongnu.org; Wed, 31 May 2017 09:12:44 -0400
+Received: from mailhub.sw.ru ([195.214.232.25]:43329 helo=relay.sw.ru)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dG3OK-0004Wd-Ly
-	for qemu-devel@nongnu.org; Wed, 31 May 2017 09:10:24 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <20170509173559.31598-1-marcandre.lureau@redhat.com>
-	<20170509173559.31598-9-marcandre.lureau@redhat.com>
-	<87pof86750.fsf@dusky.pond.sub.org>
-	<CAJ+F1CJ1O2OHkq5xi9MKc6Cbo65a05oy2PyJp1tHNtNzS_kwCQ@mail.gmail.com>
-Date: Wed, 31 May 2017 15:10:21 +0200
-In-Reply-To: <CAJ+F1CJ1O2OHkq5xi9MKc6Cbo65a05oy2PyJp1tHNtNzS_kwCQ@mail.gmail.com>
-	(=?utf-8?Q?=22Marc-Andr=C3=A9?= Lureau"'s message of "Tue, 30 May 2017
-	12:28:48 +0000")
-Message-ID: <87o9u9894y.fsf@dusky.pond.sub.org>
+	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
+	id 1dG3QX-0004tx-4Y
+	for qemu-devel@nongnu.org; Wed, 31 May 2017 09:12:41 -0400
+References: <20170530143052.165002-1-vsementsov@virtuozzo.com>
+	<20170530143052.165002-2-vsementsov@virtuozzo.com>
+	<874e184b-3727-3bbc-0169-1073db203736@redhat.com>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <173a697e-274c-a2a7-63d2-f5dbf93f69e7@virtuozzo.com>
+Date: Wed, 31 May 2017 16:12:36 +0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 08/17] qapi: update the qobject visitor to
- use QUInt
+In-Reply-To: <874e184b-3727-3bbc-0169-1073db203736@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+Subject: Re: [Qemu-devel] [PATCH 01/19] nbd/server: get rid of
+ nbd_negotiate_read and friends
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,137 +31,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@gmail.com>
-Cc: qemu-devel@nongnu.org
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+Cc: pbonzini@redhat.com, den@openvz.org
 
-Marc-Andr=C3=A9 Lureau <marcandre.lureau@gmail.com> writes:
+30.05.2017 23:10, Eric Blake wrote:
+> On 05/30/2017 09:30 AM, Vladimir Sementsov-Ogievskiy wrote:
+>> Functions nbd_negotiate_{read,write,drop_sync} were introduced in
+>> 1a6245a5b, when nbd_wr_syncv was working through qemu_co_sendv_recvv,
+> There is no qemu_co_sendv_recvv. Did you mean qemu_co_recv/qemu_co_send?
 
-> Hi
+qemu_co_recv is a macro, qemu_co_sendv_recvv - is an actual function, 
+which do something.
+
+#define qemu_co_recv(sockfd, buf, bytes) \
+   qemu_co_send_recv(sockfd, buf, bytes, false)
+
+ssize_t coroutine_fn
+qemu_co_send_recv(int sockfd, void *buf, size_t bytes, bool do_send)
+{
+     struct iovec iov = { .iov_base = buf, .iov_len = bytes };
+     return qemu_co_sendv_recvv(sockfd, &iov, 1, 0, bytes, do_send);
+}
+
+
 >
-> On Tue, May 16, 2017 at 9:33 PM Markus Armbruster <armbru@redhat.com> wro=
-te:
+>> which just yields, without setting any handlers. But now, nbd_wr_syncv
+>> works through qio_channel_yield() which sets handlers, so watchers
+>> are redundant in nbd_negotiate_{read,write,drop_sync}, then, let's just
+>> use {read,write,drop}_sync functions.
+> Makes sense to me.  Note that I have a pending patch that was also
+> related to 1a6245a5, where we introduced an assertion failure (which
+> later morphed into a segfault) if a client hangs up really early during
+> negotiation:
 >
->> On the subject: there is no such thing as "QUInt".  I guess you mean
->> "uint type" (like in PATCH 06's subject).  Could also say "QNUM_U64".
->>
->> Apropos subject: humor me, and start your subjects with a capital
->> letter, like this:
->>
->>     qapi: Update the qobject visitor ...
->>
->> Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
->>
->> > Switch to use QNum/uint where appropriate to remove i64 limitation.
->> >
->> > The input visitor will cast i64 input to u64 for compatibility
->> > reasons (existing json QMP client already use negative i64 for large
->> > u64, and expect an implicit cast in qemu).
->> >
->> > Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
->> > ---
->> >  qapi/qobject-input-visitor.c        | 13 +++++++++++--
->> >  qapi/qobject-output-visitor.c       |  3 +--
->> >  tests/test-qobject-output-visitor.c | 21 ++++++++++++++++-----
->> >  3 files changed, 28 insertions(+), 9 deletions(-)
->> >
->> > diff --git a/qapi/qobject-input-visitor.c b/qapi/qobject-input-visitor=
-.c
->> > index 785949ebab..72cefcf677 100644
->> > --- a/qapi/qobject-input-visitor.c
->> > +++ b/qapi/qobject-input-visitor.c
->> > @@ -420,9 +420,9 @@ static void qobject_input_type_int64_keyval(Visito=
-r *v, const char *name,
->> >  static void qobject_input_type_uint64(Visitor *v, const char *name,
->> >                                        uint64_t *obj, Error **errp)
->> >  {
->> > -    /* FIXME: qobject_to_qnum mishandles values over INT64_MAX */
->> >      QObjectInputVisitor *qiv =3D to_qiv(v);
->> >      QObject *qobj =3D qobject_input_get_object(qiv, name, true, errp);
->> > +    Error *err =3D NULL;
->> >      QNum *qnum;
->> >
->> >      if (!qobj) {
->> > @@ -435,7 +435,16 @@ static void qobject_input_type_uint64(Visitor *v,=
- const char *name,
->> >          return;
->> >      }
->> >
->> > -    *obj =3D qnum_get_int(qnum, errp);
->> > +    /* XXX: compatibility case, accept negative values as u64 */
->>
->> What does "XXX" signify?
->>
+> https://lists.gnu.org/archive/html/qemu-devel/2017-05/msg06240.html
 >
-> It's a fairly common marker for something similar to FIXME (there are
-> hundreds of them in qemu source tree).
+>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+>> ---
+>> +++ b/nbd/common.c
+>> @@ -69,6 +69,32 @@ ssize_t nbd_wr_syncv(QIOChannel *ioc,
+>>       return done;
+>>   }
+>>   
+>> +/* Discard length bytes from channel.  Return -errno on failure and 0 on
+>> + * success*/
+> Space before */, if you don't mind (yes, I know this was just code
+> motion, and that the old spot was wrong).
 >
-> I'd like to leave a fixme that means that there should be a visitor
-> flag/capability to fix this compatibility behaviour. (this could be expos=
-ed
-> as a qmp capability)
+>> +int drop_sync(QIOChannel *ioc, size_t size, Error **errp)
+> As part of moving it into nbd/common.c, please rename this function to
+> an nbd_ prefix, since non-static functions are more likely to collide
+> with the rest of the code base if not properly named.  Better yet: do it
+> in multiple patches:
+> - rename the static functions and fallout to callers (all of
+> nbd_drop_sync, nbd_read_sync, and nbd_write_sync)
+> - code motion (promote nbd_drop_sync from static in client.c to exported
+> in common.c)
+> - drop nbd_negotiate_ functions in favor of common nbd_*_sync functions
 
-What I don't like about XXX: it doesn't say whether it merely marks
-something we intend to do or something that's actually broken.  The text
-following it should clarify, but let's stick to FIXME for the latter
-case, and TODO for the former.
+OK
 
-A FIXME comment must explain what's broken.  It may explain how to fix
-it.
-
-A TODO comment should explain what we intend to do (d'oh).
-
-Your XXX comment does neither, and that's also why I asked :)
-
->>
->> > +    *obj =3D qnum_get_int(qnum, &err);
->> > +
->>
->> Shouldn't the comment go right here?
->>
->>
-> Above qnum_get_int() is the right place imho.
-
-I may have a stronger opinion once I see the revised comment text.
-
->> > +    if (err) {
->> > +        error_free(err);
->> > +        err =3D NULL;
->> > +        *obj =3D qnum_get_uint(qnum, &err);
->> > +    }
->> > +
->> > +    error_propagate(errp, err);
->> >  }
->> >
->> >  static void qobject_input_type_uint64_keyval(Visitor *v, const char *=
-name,
->> > diff --git a/qapi/qobject-output-visitor.c b/qapi/qobject-output-visit=
-or.c
->> > index 2ca5093b22..70be84ccb5 100644
->> > --- a/qapi/qobject-output-visitor.c
->> > +++ b/qapi/qobject-output-visitor.c
->> > @@ -150,9 +150,8 @@ static void qobject_output_type_int64(Visitor *v, =
-const char *name,
->> >  static void qobject_output_type_uint64(Visitor *v, const char *name,
->> >                                         uint64_t *obj, Error **errp)
->> >  {
->> > -    /* FIXME values larger than INT64_MAX become negative */
->> >      QObjectOutputVisitor *qov =3D to_qov(v);
->> > -    qobject_output_add(qov, name, qnum_from_int(*obj));
->> > +    qobject_output_add(qov, name, qnum_from_uint(*obj));
->>
->> Before the patch, uint64_t values above INT64_MAX are sent as negative
->> values, e.g. UINT64_MAX is sent as -1.
->>
->> After the patch, they are sent unmodified.  Clearly a bug fix, but we
->> have to consider compatibility issues anyway.  Does libvirt expect large
->> integers to be sent as negative integers?  Does it cope with this fix
->> gracefully?  Eric, any idea?
->>
 >
-> The libvirt json parser seems to rely on virStrToLong_ui(), which is a
-> wrapper around strtoul(), so it accepts negative values with -2^63..-1.
-> Changing it to return values larger than INT64_MAX should be ok.
+> The idea makes sense, but I think there's too much going on in this one
+> commit.
+>
 
-Thanks for checking.
-
-[...]
+-- 
+Best regards,
+Vladimir
