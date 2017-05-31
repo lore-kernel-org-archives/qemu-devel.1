@@ -1,24 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33052)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33091)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1dFzjI-0007jj-46
-	for qemu-devel@nongnu.org; Wed, 31 May 2017 05:15:49 -0400
+	(envelope-from <quintela@redhat.com>) id 1dFzjK-0007jz-8b
+	for qemu-devel@nongnu.org; Wed, 31 May 2017 05:15:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1dFzjE-0001qh-Op
-	for qemu-devel@nongnu.org; Wed, 31 May 2017 05:15:48 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:45314)
+	(envelope-from <quintela@redhat.com>) id 1dFzjJ-0001rz-7Q
+	for qemu-devel@nongnu.org; Wed, 31 May 2017 05:15:50 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54440)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1dFzjE-0001nk-IV
-	for qemu-devel@nongnu.org; Wed, 31 May 2017 05:15:44 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 7A0A6C05681A
-	for <qemu-devel@nongnu.org>; Wed, 31 May 2017 09:15:42 +0000 (UTC)
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1dFzjI-0001rl-Uc
+	for qemu-devel@nongnu.org; Wed, 31 May 2017 05:15:49 -0400
 From: Juan Quintela <quintela@redhat.com>
-Date: Wed, 31 May 2017 11:15:33 +0200
-Message-Id: <20170531091538.21626-1-quintela@redhat.com>
-Subject: [Qemu-devel] [PULL 0/5] Migration pull request
+Date: Wed, 31 May 2017 11:15:36 +0200
+Message-Id: <20170531091538.21626-4-quintela@redhat.com>
+In-Reply-To: <20170531091538.21626-1-quintela@redhat.com>
+References: <20170531091538.21626-1-quintela@redhat.com>
+Subject: [Qemu-devel] [PULL 3/5] migration: set dirty_pages_rate before
+ autoconverge logic
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,47 +25,73 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: dgilbert@redhat.com, lvivier@redhat.com, peterx@redhat.com
+Cc: dgilbert@redhat.com, lvivier@redhat.com, peterx@redhat.com, Felipe Franciosi <felipe@nutanix.com>
 
-Hi
+From: Felipe Franciosi <felipe@nutanix.com>
 
-This are the migration patches ready for inclusion:
-- autoconverge improvements: (felipe franciosi)
-- create savem.h
+Currently, a "period" in the RAM migration logic is at least a second
+long and accounts for what happened since the last period (or the
+beginning of the migration). The dirty_pages_rate counter is calculated
+at the end this logic.
 
-Please, Apply.
+If the auto convergence capability is enabled from the start of the
+migration, it won't be able to use this counter the first time around.
+This calculates dirty_pages_rate as soon as a period is deemed over,
+which allows for it to be used immediately.
 
-The following changes since commit 0748b3526e8cb78b9cd64208426bfc3d54a72b04:
+Signed-off-by: Felipe Franciosi <felipe@nutanix.com>
+Reviewed-by: Peter Xu <peterx@redhat.com>
+Reviewed-by: Juan Quintela <quintela@redhat.com>
+Signed-off-by: Juan Quintela <quintela@redhat.com>
+---
+ migration/ram.c | 17 ++++++++++-------
+ 1 file changed, 10 insertions(+), 7 deletions(-)
 
-  Merge remote-tracking branch 'kwolf/tags/for-upstream' into staging (2017-05-30 14:15:15 +0100)
-
-are available in the git repository at:
-
-  git://github.com/juanquintela/qemu.git tags/migration/20170531
-
-for you to fetch changes up to b4a3c64b16856a018869bfd4a9ed3b2a74554541:
-
-  migration: use dirty_rate_high_cnt more aggressively (2017-05-31 09:39:20 +0200)
-
-----------------------------------------------------------------
-migration/next for 20170531
-
-----------------------------------------------------------------
-Felipe Franciosi (4):
-      migration: keep bytes_xfer_prev init'd to zero
-      migration: set dirty_pages_rate before autoconverge logic
-      migration: set bytes_xfer_* outside of autoconverge logic
-      migration: use dirty_rate_high_cnt more aggressively
-
-Juan Quintela (1):
-      migration: Create savevm.h for functions exported from savevm.c
-
- include/sysemu/sysemu.h  | 47 -----------------------------------------------
- migration/colo.c         |  1 +
- migration/migration.c    |  1 +
- migration/postcopy-ram.c |  1 +
- migration/ram.c          | 23 +++++++++++------------
- migration/savevm.c       | 29 +++++++++++++++++++++++++----
- migration/savevm.h       | 41 +++++++++++++++++++++++++++++++++++++++++
- 7 files changed, 80 insertions(+), 63 deletions(-)
- create mode 100644 migration/savevm.h
+diff --git a/migration/ram.c b/migration/ram.c
+index 36bf720..495ecbe 100644
+--- a/migration/ram.c
++++ b/migration/ram.c
+@@ -694,6 +694,10 @@ static void migration_bitmap_sync(RAMState *rs)
+ 
+     /* more than 1 second = 1000 millisecons */
+     if (end_time > rs->time_last_bitmap_sync + 1000) {
++        /* calculate period counters */
++        rs->dirty_pages_rate = rs->num_dirty_pages_period * 1000
++            / (end_time - rs->time_last_bitmap_sync);
++
+         if (migrate_auto_converge()) {
+             /* The following detection logic can be refined later. For now:
+                Check to see if the dirtied bytes is 50% more than the approx.
+@@ -702,15 +706,14 @@ static void migration_bitmap_sync(RAMState *rs)
+                throttling */
+             bytes_xfer_now = ram_bytes_transferred();
+ 
+-            if (rs->dirty_pages_rate &&
+-               (rs->num_dirty_pages_period * TARGET_PAGE_SIZE >
++            if ((rs->num_dirty_pages_period * TARGET_PAGE_SIZE >
+                    (bytes_xfer_now - rs->bytes_xfer_prev) / 2) &&
+-               (rs->dirty_rate_high_cnt++ >= 2)) {
++                (rs->dirty_rate_high_cnt++ >= 2)) {
+                     trace_migration_throttle();
+                     rs->dirty_rate_high_cnt = 0;
+                     mig_throttle_guest_down();
+-             }
+-             rs->bytes_xfer_prev = bytes_xfer_now;
++            }
++            rs->bytes_xfer_prev = bytes_xfer_now;
+         }
+ 
+         if (migrate_use_xbzrle()) {
+@@ -723,8 +726,8 @@ static void migration_bitmap_sync(RAMState *rs)
+             rs->iterations_prev = rs->iterations;
+             rs->xbzrle_cache_miss_prev = rs->xbzrle_cache_miss;
+         }
+-        rs->dirty_pages_rate = rs->num_dirty_pages_period * 1000
+-            / (end_time - rs->time_last_bitmap_sync);
++
++        /* reset period counters */
+         rs->time_last_bitmap_sync = end_time;
+         rs->num_dirty_pages_period = 0;
+     }
+-- 
+2.9.4
