@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58308)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59023)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1dGB0d-0006rY-9m
-	for qemu-devel@nongnu.org; Wed, 31 May 2017 17:18:28 -0400
+	(envelope-from <eblake@redhat.com>) id 1dGB2u-0007zE-F8
+	for qemu-devel@nongnu.org; Wed, 31 May 2017 17:20:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1dGB0b-0004uF-Pz
-	for qemu-devel@nongnu.org; Wed, 31 May 2017 17:18:27 -0400
-Date: Wed, 31 May 2017 17:18:18 -0400
-From: Jeff Cody <jcody@redhat.com>
-Message-ID: <20170531211818.GD19181@localhost.localdomain>
-References: <20170528063114.28691-1-ndevos@redhat.com>
+	(envelope-from <eblake@redhat.com>) id 1dGB2t-0005nU-IH
+	for qemu-devel@nongnu.org; Wed, 31 May 2017 17:20:48 -0400
+References: <20170531094330.1808-1-pbonzini@redhat.com>
+	<20170531094330.1808-7-pbonzini@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <efff984e-284e-4b42-09f9-f81f627133e2@redhat.com>
+Date: Wed, 31 May 2017 16:20:38 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170528063114.28691-1-ndevos@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v3] gluster: add support for
- PREALLOC_MODE_FALLOC
+In-Reply-To: <20170531094330.1808-7-pbonzini@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="Or5qE9OW8uIAKVXCisqJDAamF4GwRLSkS"
+Subject: Re: [Qemu-devel] [PATCH 06/11] nbd: make it thread-safe
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,195 +24,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Niels de Vos <ndevos@redhat.com>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
+To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, famz@redhat.com, qemu-block@nongnu.org, mreitz@redhat.com
 
-On Sun, May 28, 2017 at 12:01:14PM +0530, Niels de Vos wrote:
-> Add missing support for "preallocation=falloc" to the Gluster block
-> driver. This change bases its logic on that of block/file-posix.c and
-> removed the gluster_supports_zerofill() and qemu_gluster_zerofill()
-> functions in favour of #ifdef checks in an easy to read
-> switch-statement.
-> 
-> Both glfs_zerofill() and glfs_fallocate() have been introduced with
-> GlusterFS 3.5.0 (pkg-config glusterfs-api = 6). A #define for the
-> availability of glfs_fallocate() has been added to ./configure.
-> 
-> Reported-by: Satheesaran Sundaramoorthi <sasundar@redhat.com>
-> URL: https://bugzilla.redhat.com/1450759
-> Signed-off-by: Niels de Vos <ndevos@redhat.com>
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--Or5qE9OW8uIAKVXCisqJDAamF4GwRLSkS
+From: Eric Blake <eblake@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, famz@redhat.com, qemu-block@nongnu.org,
+ mreitz@redhat.com
+Message-ID: <efff984e-284e-4b42-09f9-f81f627133e2@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 06/11] nbd: make it thread-safe
+References: <20170531094330.1808-1-pbonzini@redhat.com>
+ <20170531094330.1808-7-pbonzini@redhat.com>
+In-Reply-To: <20170531094330.1808-7-pbonzini@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 05/31/2017 04:43 AM, Paolo Bonzini wrote:
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 > ---
-> v3 typo fixes spotted by Jeff Cody and Eric Blake:
-> - typo in the commit message (Eric)
-> - copy/paste mistake causing incorrect if-statement (Jeff)
-> 
-> v2 changes requested by Jeff Cody:
-> - add CONFIG_GLUSTERFS_FALLOCATE
-> - remove unneeded wrapper qemu_gluster_zerofill()
-> 
->  block/gluster.c | 76 ++++++++++++++++++++++++++++++---------------------------
->  configure       |  6 +++++
->  2 files changed, 46 insertions(+), 36 deletions(-)
-> 
-> diff --git a/block/gluster.c b/block/gluster.c
-> index 7c76cd0..7863991 100644
-> --- a/block/gluster.c
-> +++ b/block/gluster.c
-> @@ -964,29 +964,6 @@ static coroutine_fn int qemu_gluster_co_pwrite_zeroes(BlockDriverState *bs,
->      qemu_coroutine_yield();
->      return acb.ret;
->  }
-> -
-> -static inline bool gluster_supports_zerofill(void)
-> -{
-> -    return 1;
-> -}
-> -
-> -static inline int qemu_gluster_zerofill(struct glfs_fd *fd, int64_t offset,
-> -                                        int64_t size)
-> -{
-> -    return glfs_zerofill(fd, offset, size);
-> -}
-> -
-> -#else
-> -static inline bool gluster_supports_zerofill(void)
-> -{
-> -    return 0;
-> -}
-> -
-> -static inline int qemu_gluster_zerofill(struct glfs_fd *fd, int64_t offset,
-> -                                        int64_t size)
-> -{
-> -    return 0;
-> -}
->  #endif
->  
->  static int qemu_gluster_create(const char *filename,
-> @@ -996,9 +973,10 @@ static int qemu_gluster_create(const char *filename,
->      struct glfs *glfs;
->      struct glfs_fd *fd;
->      int ret = 0;
-> -    int prealloc = 0;
-> +    PreallocMode prealloc;
->      int64_t total_size = 0;
->      char *tmp = NULL;
-> +    Error *local_err = NULL;
->  
->      gconf = g_new0(BlockdevOptionsGluster, 1);
->      gconf->debug = qemu_opt_get_number_del(opts, GLUSTER_OPT_DEBUG,
-> @@ -1026,13 +1004,12 @@ static int qemu_gluster_create(const char *filename,
->                            BDRV_SECTOR_SIZE);
->  
->      tmp = qemu_opt_get_del(opts, BLOCK_OPT_PREALLOC);
-> -    if (!tmp || !strcmp(tmp, "off")) {
-> -        prealloc = 0;
-> -    } else if (!strcmp(tmp, "full") && gluster_supports_zerofill()) {
-> -        prealloc = 1;
-> -    } else {
-> -        error_setg(errp, "Invalid preallocation mode: '%s'"
-> -                         " or GlusterFS doesn't support zerofill API", tmp);
-> +    prealloc = qapi_enum_parse(PreallocMode_lookup, tmp,
-> +                               PREALLOC_MODE__MAX, PREALLOC_MODE_OFF,
-> +                               &local_err);
-> +    g_free(tmp);
-> +    if (local_err) {
-> +        error_propagate(errp, local_err);
->          ret = -EINVAL;
->          goto out;
->      }
-> @@ -1041,21 +1018,48 @@ static int qemu_gluster_create(const char *filename,
->                      O_WRONLY | O_CREAT | O_TRUNC | O_BINARY, S_IRUSR | S_IWUSR);
->      if (!fd) {
->          ret = -errno;
-> -    } else {
-> +        goto out;
+>  block/nbd-client.c | 30 +++++++++---------------------
+>  1 file changed, 9 insertions(+), 21 deletions(-)
+>=20
+> diff --git a/block/nbd-client.c b/block/nbd-client.c
+> index 1e2952fdae..43e0292ac1 100644
+> --- a/block/nbd-client.c
+> +++ b/block/nbd-client.c
+> @@ -114,6 +114,10 @@ static int nbd_co_send_request(BlockDriverState *b=
+s,
+>      int rc, ret, i;
+> =20
+>      qemu_co_mutex_lock(&s->send_mutex);
+> +    while (s->in_flight =3D=3D MAX_NBD_REQUESTS) {
+> +        qemu_co_queue_wait(&s->free_sema, &s->send_mutex);
 > +    }
-> +
-> +    switch (prealloc) {
-> +#ifdef CONFIG_GLUSTERFS_FALLOCATE
-> +    case PREALLOC_MODE_FALLOC:
-> +        if (glfs_fallocate(fd, 0, 0, total_size)) {
-> +            error_setg(errp, "Could not preallocate data for the new file");
-> +            ret = -errno;
-> +        }
-> +        break;
-> +#endif /* CONFIG_GLUSTERFS_FALLOCATE */
-> +#ifdef CONFIG_GLUSTERFS_ZEROFILL
-> +    case PREALLOC_MODE_FULL:
->          if (!glfs_ftruncate(fd, total_size)) {
-> -            if (prealloc && qemu_gluster_zerofill(fd, 0, total_size)) {
-> +            if (glfs_zerofill(fd, 0, total_size)) {
-> +                error_setg(errp, "Could not zerofill the new file");
->                  ret = -errno;
->              }
->          } else {
-> +            error_setg(errp, "Could not resize file");
->              ret = -errno;
->          }
-> -
-> -        if (glfs_close(fd) != 0) {
-> +        break;
-> +#endif /* CONFIG_GLUSTERFS_ZEROFILL */
-> +    case PREALLOC_MODE_OFF:
-> +        if (glfs_ftruncate(fd, total_size) != 0) {
->              ret = -errno;
-> +            error_setg(errp, "Could not resize file");
->          }
-> +        break;
-> +    default:
-> +        ret = -EINVAL;
-> +        error_setg(errp, "Unsupported preallocation mode: %s",
-> +                   PreallocMode_lookup[prealloc]);
-> +        break;
-> +    }
-> +
-> +    if (glfs_close(fd) != 0) {
-> +        ret = -errno;
->      }
->  out:
-> -    g_free(tmp);
->      qapi_free_BlockdevOptionsGluster(gconf);
->      glfs_clear_preopened(glfs);
->      return ret;
-> diff --git a/configure b/configure
-> index 7c020c0..8b8291e 100755
-> --- a/configure
-> +++ b/configure
-> @@ -300,6 +300,7 @@ seccomp=""
->  glusterfs=""
->  glusterfs_xlator_opt="no"
->  glusterfs_discard="no"
-> +glusterfs_fallocate="no"
->  glusterfs_zerofill="no"
->  gtk=""
->  gtkabi=""
-> @@ -3576,6 +3577,7 @@ if test "$glusterfs" != "no" ; then
->        glusterfs_discard="yes"
->      fi
->      if $pkg_config --atleast-version=6 glusterfs-api; then
-> +      glusterfs_fallocate="yes"
->        glusterfs_zerofill="yes"
->      fi
->    else
-> @@ -5780,6 +5782,10 @@ if test "$glusterfs_discard" = "yes" ; then
->    echo "CONFIG_GLUSTERFS_DISCARD=y" >> $config_host_mak
->  fi
->  
-> +if test "$glusterfs_fallocate" = "yes" ; then
-> +  echo "CONFIG_GLUSTERFS_FALLOCATE=y" >> $config_host_mak
-> +fi
-> +
->  if test "$glusterfs_zerofill" = "yes" ; then
->    echo "CONFIG_GLUSTERFS_ZEROFILL=y" >> $config_host_mak
->  fi
-> -- 
-> 2.9.3
-> 
+> +    s->in_flight++;
 
-Thanks,
+Nice - if I'm not mistaken, this also solves
+https://bugzilla.redhat.com/show_bug.cgi?id=3D1454582 - you have a while
+loop here...
 
-Reviewed, and applied to my block branch:
+> -static void nbd_coroutine_start(NBDClientSession *s,
+> -                                NBDRequest *request)
+> -{
+> -    /* Poor man semaphore.  The free_sema is locked when no other requ=
+est
+> -     * can be accepted, and unlocked after receiving one reply.  */
+> -    if (s->in_flight =3D=3D MAX_NBD_REQUESTS) {
+> -        qemu_co_queue_wait(&s->free_sema, NULL);
+> -        assert(s->in_flight < MAX_NBD_REQUESTS);
+> -    }
 
-git://github.com/codyprime/qemu-kvm-jtc block
+=2E..compared to the old code that only tried once, and could therefore
+hit the assertion failure depending on thread load.
 
--Jeff
+Reviewed-by: Eric Blake <eblake@redhat.com>
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--Or5qE9OW8uIAKVXCisqJDAamF4GwRLSkS
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEbBAEBCAAGBQJZLzOmAAoJEKeha0olJ0NqLMgH90wniJrbdA7Z9V5VJpPvLtCS
+i84GCjJy6QUS182UE8hflQ9nsxEBNHtVTSjTea8j+6pmxdrOhHjCmjzkD6WcH1Bn
+H4K1n6IKDCW/Q3OIO0LuF+VCSk8VCo+SfuJ8BTcrbHGbVrEHOU11IJMPr79iMlPx
+FKDAfKOa00yOym0C3O/MQr2U9RZ+Qq/fwTRyzwejztmeDKJGU+FOt0RpKtNxk/wl
+XUFejQRMBAlsDoyt62RUP6s3x0msyzahGOgQ3ksGUJA06tWj7g5e9lP6wRhNKR0y
+vpOr1pPQ5aFHBO0rcqVJQeGXmNPTDlFCCHU3fHOg9SiZJcgfPeQneGgM8nV+kw==
+=8g5B
+-----END PGP SIGNATURE-----
+
+--Or5qE9OW8uIAKVXCisqJDAamF4GwRLSkS--
