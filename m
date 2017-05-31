@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56992)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56993)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1dG6uV-0007ps-Pz
+	(envelope-from <vsementsov@virtuozzo.com>) id 1dG6uV-0007pt-PQ
 	for qemu-devel@nongnu.org; Wed, 31 May 2017 12:55:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1dG6uR-00041M-Tj
+	(envelope-from <vsementsov@virtuozzo.com>) id 1dG6uR-000417-St
 	for qemu-devel@nongnu.org; Wed, 31 May 2017 12:55:51 -0400
-Received: from mailhub.sw.ru ([195.214.232.25]:40435 helo=relay.sw.ru)
+Received: from mailhub.sw.ru ([195.214.232.25]:27998 helo=relay.sw.ru)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
-	id 1dG6uR-00040A-HO
+	id 1dG6uR-000403-H5
 	for qemu-devel@nongnu.org; Wed, 31 May 2017 12:55:47 -0400
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Wed, 31 May 2017 19:55:36 +0300
-Message-Id: <20170531165541.47338-8-vsementsov@virtuozzo.com>
+Date: Wed, 31 May 2017 19:55:35 +0300
+Message-Id: <20170531165541.47338-7-vsementsov@virtuozzo.com>
 In-Reply-To: <20170531165541.47338-1-vsementsov@virtuozzo.com>
 References: <20170531165541.47338-1-vsementsov@virtuozzo.com>
-Subject: [Qemu-devel] [PATCH 07/12] nbd/server: refactor
- nbd_co_receive_request
+Subject: [Qemu-devel] [PATCH 06/12] nbd/server: get rid of EAGAIN dead code
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,122 +27,54 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: pbonzini@redhat.com, eblake@redhat.com, den@openvz.org, vsementsov@virtuozzo.com
 
-Move function tail, about receiving next request out of the function.
-Error path is simplified and nbd_co_receive_request becomes more
-corresponding to its name.
+For now nbd_read never returns EAGAIN. So, don't handle it.
 
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
 ---
- nbd/server.c | 41 +++++++++++++----------------------------
- 1 file changed, 13 insertions(+), 28 deletions(-)
+ nbd/server.c | 18 +++++++-----------
+ 1 file changed, 7 insertions(+), 11 deletions(-)
 
 diff --git a/nbd/server.c b/nbd/server.c
-index b0bb263596..8ac095d6bc 100644
+index dd6b241761..b0bb263596 100644
 --- a/nbd/server.c
 +++ b/nbd/server.c
-@@ -1006,14 +1006,11 @@ static int nbd_co_send_reply(NBDRequestData *req, NBDReply *reply, int len)
+@@ -997,11 +997,12 @@ static int nbd_co_send_reply(NBDRequestData *req, NBDReply *reply, int len)
+     return rc;
+ }
+ 
+-/* Collect a client request.  Return 0 if request looks valid, -EAGAIN
+- * to keep trying the collection, -EIO to drop connection right away,
+- * and any other negative value to report an error to the client
+- * (although the caller may still need to disconnect after reporting
+- * the error).  */
++/* nbd_co_receive_request
++ * Collect a client request. Return 0 if request looks valid, -EIO to drop
++ * connection right away, and any other negative value to report an error to
++ * the client (although the caller may still need to disconnect after reporting
++ * the error).
++ */
  static int nbd_co_receive_request(NBDRequestData *req, NBDRequest *request)
  {
      NBDClient *client = req->client;
--    int rc;
- 
-     g_assert(qemu_in_coroutine());
+@@ -1011,9 +1012,7 @@ static int nbd_co_receive_request(NBDRequestData *req, NBDRequest *request)
      assert(client->recv_coroutine == qemu_coroutine_self());
--    rc = nbd_receive_request(client->ioc, request);
--    if (rc < 0) {
--        rc = -EIO;
--        goto out;
-+    if (nbd_receive_request(client->ioc, request) < 0) {
-+        return -EIO;
-     }
- 
-     TRACE("Decoding type");
-@@ -1027,8 +1024,7 @@ static int nbd_co_receive_request(NBDRequestData *req, NBDRequest *request)
-         /* Special case: we're going to disconnect without a reply,
-          * whether or not flags, from, or len are bogus */
-         TRACE("Request type is DISCONNECT");
--        rc = -EIO;
--        goto out;
-+        return -EIO;
-     }
- 
-     /* Check for sanity in the parameters, part 1.  Defer as many
-@@ -1036,22 +1032,19 @@ static int nbd_co_receive_request(NBDRequestData *req, NBDRequest *request)
-      * payload, so we can try and keep the connection alive.  */
-     if ((request->from + request->len) < request->from) {
-         LOG("integer overflow detected, you're probably being attacked");
--        rc = -EINVAL;
--        goto out;
-+        return -EINVAL;
-     }
- 
-     if (request->type == NBD_CMD_READ || request->type == NBD_CMD_WRITE) {
-         if (request->len > NBD_MAX_BUFFER_SIZE) {
-             LOG("len (%" PRIu32" ) is larger than max len (%u)",
-                 request->len, NBD_MAX_BUFFER_SIZE);
--            rc = -EINVAL;
--            goto out;
-+            return -EINVAL;
-         }
- 
-         req->data = blk_try_blockalign(client->exp->blk, request->len);
-         if (req->data == NULL) {
--            rc = -ENOMEM;
--            goto out;
-+            return -ENOMEM;
-         }
-     }
-     if (request->type == NBD_CMD_WRITE) {
-@@ -1059,8 +1052,7 @@ static int nbd_co_receive_request(NBDRequestData *req, NBDRequest *request)
- 
-         if (nbd_read(client->ioc, req->data, request->len, NULL) < 0) {
-             LOG("reading from socket failed");
+     rc = nbd_receive_request(client->ioc, request);
+     if (rc < 0) {
+-        if (rc != -EAGAIN) {
 -            rc = -EIO;
--            goto out;
-+            return -EIO;
-         }
-         req->complete = true;
-     }
-@@ -1070,28 +1062,19 @@ static int nbd_co_receive_request(NBDRequestData *req, NBDRequest *request)
-         LOG("operation past EOF; From: %" PRIu64 ", Len: %" PRIu32
-             ", Size: %" PRIu64, request->from, request->len,
-             (uint64_t)client->exp->size);
--        rc = request->type == NBD_CMD_WRITE ? -ENOSPC : -EINVAL;
--        goto out;
-+        return request->type == NBD_CMD_WRITE ? -ENOSPC : -EINVAL;
-     }
-     if (request->flags & ~(NBD_CMD_FLAG_FUA | NBD_CMD_FLAG_NO_HOLE)) {
-         LOG("unsupported flags (got 0x%x)", request->flags);
--        rc = -EINVAL;
--        goto out;
-+        return -EINVAL;
-     }
-     if (request->type != NBD_CMD_WRITE_ZEROES &&
-         (request->flags & NBD_CMD_FLAG_NO_HOLE)) {
-         LOG("unexpected flags (got 0x%x)", request->flags);
--        rc = -EINVAL;
--        goto out;
-+        return -EINVAL;
+-        }
++        rc = -EIO;
+         goto out;
      }
  
--    rc = 0;
--
--out:
--    client->recv_coroutine = NULL;
--    nbd_client_receive_next_request(client);
--
--    return rc;
-+    return 0;
- }
- 
- /* Owns a reference to the NBDClient passed as opaque.  */
-@@ -1113,6 +1096,8 @@ static coroutine_fn void nbd_trip(void *opaque)
+@@ -1114,9 +1113,6 @@ static coroutine_fn void nbd_trip(void *opaque)
  
      req = nbd_request_get(client);
      ret = nbd_co_receive_request(req, &request);
-+    client->recv_coroutine = NULL;
-+    nbd_client_receive_next_request(client);
+-    if (ret == -EAGAIN) {
+-        goto done;
+-    }
      if (ret == -EIO) {
          goto out;
      }
