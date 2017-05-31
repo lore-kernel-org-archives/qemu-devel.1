@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44238)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44284)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dG0JF-0001j7-NS
-	for qemu-devel@nongnu.org; Wed, 31 May 2017 05:52:58 -0400
+	(envelope-from <kwolf@redhat.com>) id 1dG0JH-0001l0-7s
+	for qemu-devel@nongnu.org; Wed, 31 May 2017 05:53:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dG0JF-0004pv-10
-	for qemu-devel@nongnu.org; Wed, 31 May 2017 05:52:57 -0400
+	(envelope-from <kwolf@redhat.com>) id 1dG0JG-0004rE-JY
+	for qemu-devel@nongnu.org; Wed, 31 May 2017 05:52:59 -0400
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Wed, 31 May 2017 11:52:44 +0200
-Message-Id: <1496224367-24935-2-git-send-email-kwolf@redhat.com>
+Date: Wed, 31 May 2017 11:52:46 +0200
+Message-Id: <1496224367-24935-4-git-send-email-kwolf@redhat.com>
 In-Reply-To: <1496224367-24935-1-git-send-email-kwolf@redhat.com>
 References: <1496224367-24935-1-git-send-email-kwolf@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 1/4] block: Fix anonymous BBs in
- blk_root_inactivate()
+Subject: [Qemu-devel] [PATCH v3 3/4] migration/block: Clean up BBs in
+ block_save_complete()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,30 +23,69 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, eblake@redhat.com, jcody@redhat.com, qemu-devel@nongnu.org
 
-blk->name isn't an array, but a pointer that can be NULL. Checking for
-an anonymous BB must involve a NULL check first, otherwise we get
-crashes.
+We need to release any block migrations BlockBackends on the source
+before successfully completing the migration because otherwise
+inactivating the images will fail (inactivation only tolerates device
+BBs).
 
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 Reviewed-by: Fam Zheng <famz@redhat.com>
-Reviewed-by: Juan Quintela <quintela@redhat.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
 ---
- block/block-backend.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ migration/block.c | 22 +++++++++++++++++-----
+ 1 file changed, 17 insertions(+), 5 deletions(-)
 
-diff --git a/block/block-backend.c b/block/block-backend.c
-index f3a6008..7d7f369 100644
---- a/block/block-backend.c
-+++ b/block/block-backend.c
-@@ -168,7 +168,7 @@ static int blk_root_inactivate(BdrvChild *child)
-      * this point because the VM is stopped) and unattached monitor-owned
-      * BlockBackends. If there is still any other user like a block job, then
-      * we simply can't inactivate the image. */
--    if (!blk->dev && !blk->name[0]) {
-+    if (!blk->dev && !blk_name(blk)[0]) {
-         return -EPERM;
+diff --git a/migration/block.c b/migration/block.c
+index 13f90d3..deb4b0e 100644
+--- a/migration/block.c
++++ b/migration/block.c
+@@ -673,16 +673,14 @@ static int64_t get_remaining_dirty(void)
+     return dirty << BDRV_SECTOR_BITS;
+ }
+ 
+-/* Called with iothread lock taken.  */
+ 
+-static void block_migration_cleanup(void *opaque)
++
++/* Called with iothread lock taken.  */
++static void block_migration_cleanup_bmds(void)
+ {
+     BlkMigDevState *bmds;
+-    BlkMigBlock *blk;
+     AioContext *ctx;
+ 
+-    bdrv_drain_all();
+-
+     unset_dirty_tracking();
+ 
+     while ((bmds = QSIMPLEQ_FIRST(&block_mig_state.bmds_list)) != NULL) {
+@@ -700,6 +698,16 @@ static void block_migration_cleanup(void *opaque)
+         g_free(bmds->aio_bitmap);
+         g_free(bmds);
      }
++}
++
++/* Called with iothread lock taken.  */
++static void block_migration_cleanup(void *opaque)
++{
++    BlkMigBlock *blk;
++
++    bdrv_drain_all();
++
++    block_migration_cleanup_bmds();
+ 
+     blk_mig_lock();
+     while ((blk = QSIMPLEQ_FIRST(&block_mig_state.blk_list)) != NULL) {
+@@ -843,6 +851,10 @@ static int block_save_complete(QEMUFile *f, void *opaque)
+ 
+     qemu_put_be64(f, BLK_MIG_FLAG_EOS);
+ 
++    /* Make sure that our BlockBackends are gone, so that the block driver
++     * nodes can be inactivated. */
++    block_migration_cleanup_bmds();
++
+     return 0;
+ }
  
 -- 
 1.8.3.1
