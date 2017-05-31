@@ -1,22 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47883)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48834)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dG5ON-000533-Ma
-	for qemu-devel@nongnu.org; Wed, 31 May 2017 11:18:36 -0400
+	(envelope-from <maxime.coquelin@redhat.com>) id 1dG5QO-0006hl-KL
+	for qemu-devel@nongnu.org; Wed, 31 May 2017 11:20:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dG5OM-00006A-GB
-	for qemu-devel@nongnu.org; Wed, 31 May 2017 11:18:35 -0400
-References: <20170531094330.1808-1-pbonzini@redhat.com>
-	<20170531094330.1808-2-pbonzini@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <886dcc50-9f5f-da6b-502e-81fb94f42fa2@redhat.com>
-Date: Wed, 31 May 2017 10:18:24 -0500
+	(envelope-from <maxime.coquelin@redhat.com>) id 1dG5QL-000151-Eq
+	for qemu-devel@nongnu.org; Wed, 31 May 2017 11:20:40 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37550)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <maxime.coquelin@redhat.com>)
+	id 1dG5QL-00014e-5r
+	for qemu-devel@nongnu.org; Wed, 31 May 2017 11:20:37 -0400
+From: Maxime Coquelin <maxime.coquelin@redhat.com>
+References: <20170526142858.19931-1-maxime.coquelin@redhat.com>
+	<20170526142858.19931-4-maxime.coquelin@redhat.com>
+	<20170530210905-mutt-send-email-mst@kernel.org>
+	<1432592b-f0e2-fbf1-0479-03ba7e584b17@redhat.com>
+	<5382c6fc-64e3-8db0-877c-2e9c2facc39f@redhat.com>
+Message-ID: <50c41a96-25dc-180a-11e0-b1207e6f7de9@redhat.com>
+Date: Wed, 31 May 2017 17:20:21 +0200
 MIME-Version: 1.0
-In-Reply-To: <20170531094330.1808-2-pbonzini@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="P61F0TPcADt9lSfmk7i0oDXXi5NJbismx"
-Subject: Re: [Qemu-devel] [PATCH 01/11] qcow2: call CoQueue APIs under
- CoMutex
+In-Reply-To: <5382c6fc-64e3-8db0-877c-2e9c2facc39f@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 3/6] vhost: extend ring information
+ update for IOTLB to all rings
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,80 +33,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, famz@redhat.com, qemu-block@nongnu.org, mreitz@redhat.com
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: peterx@redhat.com, marcandre.lureau@gmail.com, vkaplans@redhat.com, jasowang@redhat.com, wexu@redhat.com, yuanhan.liu@linux.intel.com, qemu-devel@nongnu.org, jfreiman@redhat.com
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---P61F0TPcADt9lSfmk7i0oDXXi5NJbismx
-From: Eric Blake <eblake@redhat.com>
-To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, famz@redhat.com, qemu-block@nongnu.org,
- mreitz@redhat.com
-Message-ID: <886dcc50-9f5f-da6b-502e-81fb94f42fa2@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 01/11] qcow2: call CoQueue APIs under CoMutex
-References: <20170531094330.1808-1-pbonzini@redhat.com>
- <20170531094330.1808-2-pbonzini@redhat.com>
-In-Reply-To: <20170531094330.1808-2-pbonzini@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Hi Michael,
 
-On 05/31/2017 04:43 AM, Paolo Bonzini wrote:
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> ---
->  block/qcow2.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
->=20
+On 05/30/2017 11:11 PM, Maxime Coquelin wrote:
+> 
+> 
+> On 05/30/2017 11:06 PM, Maxime Coquelin wrote:
+>> Hi Michael,
+>>
+>> On 05/30/2017 08:12 PM, Michael S. Tsirkin wrote:
+>>> On Fri, May 26, 2017 at 04:28:55PM +0200, Maxime Coquelin wrote:
+>>>> Vhost-kernel backend need
+>>>
+>>> needs
+>>>
+>>>> to receive IOTLB entry for used ring
+>>>> information early, which is done by triggering a miss event on
+>>>> its address.
+>>>>
+>>>> This patch extends this behaviour to all rings information, to be
+>>>> compatible with vhost-user backend design.
+>>>
+>>> Why does vhost-user need it though?
+>>
+>> For vhost-user, this simplifies the backend design because generally,
+>> the backend sends IOTLB miss requests from processing threads through
+>> the slave channel, and receives resulting IOTLB updates in vhost-user
+>> protocol thread.
+>>
+>> The only exception is for these rings info, where IOTLB miss requests
+>> are sent from vhost-user protocol thread (in the SET_VRING_ENABLE
+>> request handler), so the resulting IOTLB update is only handled by
+>> the backend when the rings are enabled, which is too late.
+>>
+>> It could be possible to overcome this issue, but I think it would
+>> make the design more complex or less efficient. I see several options:
+>>
+>> 1. Change the IOTLB miss request so that the master sends the IOTLB
+>> update as reply, instead of the reply-ack. It would mean that IOTLB
+>> updates/invalidations would be sent either via the master channel or
+>> the slave channel. On QEMU side, it means diverging from kernel backend
+>> implementation. On backend side, it means having possibly multiple
+>> threads writing to the IOTLB cache.
+>>
+>> 2. In vhost-user protocol thread, when handling SET_VRING_ENABLE, send
+>> IOTLB miss request without setting the reply-ack flag, and poll the
+>> vhost-user socket to read the resulting IOTLB update. The problem is
+>> that other requests could be pending in the socket's buffer, and so it
+>> would end-up nesting multiple requests handling.
+>>
+>> 3. Don't interpret rings info in the vhost-user protocol thread, but
+>> only in the processing threads. The advantage is that it would address
+>> the remark you made on patch 6 that invalidates are not affecting ring
+>> info. The downside being the overhead induced by checking whether the
+>> ring info are valid every time it is being used. I haven't prototyped
+>> this solution, but I expected the performance regression to be a
+>> blocker.
+>>
+>> 4. In SET_VRING_ENABLE, don't enable the ring if needed entries are 
+>> not in IOTLB cache. Just send the IOTLB misses without reply-ack flag 
+>> and postpone enable when handling IOTLB updates. It will be a little 
+>> more complex solution than current one, but it may be the less 
+>> impacting compared to the other 3 options.
+>>
+>>
+>> Thinking again, maybe trying solution would be worth the effort, and 
+> 
+> s/solution/solution 4/
+> 
+>> could be extended also to disable the rings when receiving invalidates
+>> that affect rings info.
+>>
+>> What do you think?
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
+I have made some tests to see if solution 4 would work, and while it
+could work most of the times, it is really fragile as deadlock would
+happen if either slave or master sockets buffers are full. This is issue
+also impact solution 1 above.
 
-> diff --git a/block/qcow2.c b/block/qcow2.c
-> index 1c2697732b..c9193603b9 100644
-> --- a/block/qcow2.c
-> +++ b/block/qcow2.c
-> @@ -1696,8 +1696,6 @@ static coroutine_fn int qcow2_co_pwritev(BlockDri=
-verState *bs, uint64_t offset,
->      ret =3D 0;
-> =20
->  fail:
-> -    qemu_co_mutex_unlock(&s->lock);
-> -
->      while (l2meta !=3D NULL) {
->          QCowL2Meta *next;
-> =20
-> @@ -1711,6 +1709,8 @@ fail:
->          l2meta =3D next;
->      }
-> =20
-> +    qemu_co_mutex_unlock(&s->lock);
-> +
->      qemu_iovec_destroy(&hd_qiov);
->      qemu_vfree(cluster_data);
->      trace_qcow2_writev_done_req(qemu_coroutine_self(), ret);
->=20
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---P61F0TPcADt9lSfmk7i0oDXXi5NJbismx
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEcBAEBCAAGBQJZLt7AAAoJEKeha0olJ0Nq+2gH/jvy1/YISObhmC3tpgaJ9oQ1
-bWyBQ4cQiuYA7Gkxo/7zDYari9AsnmnzrhuBNpJsIfAeKPvq5qjaSarnVCSdCvY8
-gre2wePLtv0ksFNGWcCn0A06sFTWHkCLnIQzmIy7xZHWegAA35zpcFr7DEICHNw3
-5ePHIQoR+Xrm5HLwxJ5b902v+lk4mtrse4sqiFcnaxinCcWzSGDM3NYYyOmCHgo3
-TGAGPlQGN7OVcL+uBjH8irSp4oZNT7+Nv3wJ8ghjlH5Vrp1uJAZ4jxLfDgJ+rRt+
-nSF0040pi49ejtdnBiKBc72xMiWxtJKoXxjvLolSV+qbdR3ZqVU/Zj3/7DJ6WRE=
-=DFPb
------END PGP SIGNATURE-----
-
---P61F0TPcADt9lSfmk7i0oDXXi5NJbismx--
+Regards,
+Maxime
