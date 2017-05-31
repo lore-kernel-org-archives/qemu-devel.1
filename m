@@ -1,19 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56999)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56997)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1dG6uV-0007pz-QP
+	(envelope-from <vsementsov@virtuozzo.com>) id 1dG6uV-0007px-Q2
 	for qemu-devel@nongnu.org; Wed, 31 May 2017 12:55:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1dG6uR-000419-TX
+	(envelope-from <vsementsov@virtuozzo.com>) id 1dG6uR-00040x-SX
 	for qemu-devel@nongnu.org; Wed, 31 May 2017 12:55:51 -0400
-Received: from mailhub.sw.ru ([195.214.232.25]:36563 helo=relay.sw.ru)
+Received: from mailhub.sw.ru ([195.214.232.25]:28841 helo=relay.sw.ru)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
-	id 1dG6uR-000407-H9
+	id 1dG6uR-000408-H1
 	for qemu-devel@nongnu.org; Wed, 31 May 2017 12:55:47 -0400
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Wed, 31 May 2017 19:55:29 +0300
-Message-Id: <20170531165541.47338-1-vsementsov@virtuozzo.com>
-Subject: [Qemu-devel] [PATCH 00/12] nbd refactoring part 1
+Date: Wed, 31 May 2017 19:55:34 +0300
+Message-Id: <20170531165541.47338-6-vsementsov@virtuozzo.com>
+In-Reply-To: <20170531165541.47338-1-vsementsov@virtuozzo.com>
+References: <20170531165541.47338-1-vsementsov@virtuozzo.com>
+Subject: [Qemu-devel] [PATCH 05/12] nbd/server: refactor nbd_co_send_reply
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,39 +27,39 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: pbonzini@redhat.com, eblake@redhat.com, den@openvz.org, vsementsov@virtuozzo.com
 
-This is based on my "nbd: error path refactoring" series.
-This is an update of first part of my "nbd errors and traces refactoring"
+As nbd_write never returns value > 0, we can get rid of extra ret.
 
-changes from patches 01-10 of "nbd errors and traces refactoring" (mostly
-proposed by Eric):
-01 new patch
-02-03 - split of old 01
-08 and 12 - minor changes in commit messages
-04-12 - add r-b by Eric
+Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
+---
+ nbd/server.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-also, of course, renaming in 01 is "visible" in other patches.
-
-Vladimir Sementsov-Ogievskiy (12):
-  nbd: rename read_sync and friends
-  nbd: make nbd_drop public
-  nbd/server: get rid of nbd_negotiate_read and friends
-  nbd/server: get rid of ssize_t
-  nbd/server: refactor nbd_co_send_reply
-  nbd/server: get rid of EAGAIN dead code
-  nbd/server: refactor nbd_co_receive_request
-  nbd/server: remove NBDClientNewData
-  nbd/server: nbd_negotiate: fix error path
-  nbd/server: get rid of fail: return rc
-  nbd/server: rename rc to ret
-  nbd/server: refactor nbd_trip
-
- block/nbd-client.c  |   8 +-
- include/block/nbd.h |   8 +-
- nbd/client.c        |  64 ++++-------
- nbd/common.c        |  34 +++++-
- nbd/nbd-internal.h  |  28 ++---
- nbd/server.c        | 319 +++++++++++++++++-----------------------------------
- 6 files changed, 172 insertions(+), 289 deletions(-)
-
+diff --git a/nbd/server.c b/nbd/server.c
+index 8985df86b4..dd6b241761 100644
+--- a/nbd/server.c
++++ b/nbd/server.c
+@@ -972,7 +972,7 @@ void nbd_export_close_all(void)
+ static int nbd_co_send_reply(NBDRequestData *req, NBDReply *reply, int len)
+ {
+     NBDClient *client = req->client;
+-    int rc, ret;
++    int rc;
+ 
+     g_assert(qemu_in_coroutine());
+     qemu_co_mutex_lock(&client->send_lock);
+@@ -983,9 +983,9 @@ static int nbd_co_send_reply(NBDRequestData *req, NBDReply *reply, int len)
+     } else {
+         qio_channel_set_cork(client->ioc, true);
+         rc = nbd_send_reply(client->ioc, reply);
+-        if (rc >= 0) {
+-            ret = nbd_write(client->ioc, req->data, len, NULL);
+-            if (ret < 0) {
++        if (rc == 0) {
++            rc = nbd_write(client->ioc, req->data, len, NULL);
++            if (rc < 0) {
+                 rc = -EIO;
+             }
+         }
 -- 
 2.11.1
