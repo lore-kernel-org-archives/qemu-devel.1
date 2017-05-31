@@ -1,29 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41807)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42815)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1dFyRf-0001yf-1T
-	for qemu-devel@nongnu.org; Wed, 31 May 2017 03:53:32 -0400
+	(envelope-from <slyfox@gentoo.org>) id 1dFyWZ-00039g-9h
+	for qemu-devel@nongnu.org; Wed, 31 May 2017 03:58:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1dFyRc-0002Kg-Eq
-	for qemu-devel@nongnu.org; Wed, 31 May 2017 03:53:31 -0400
-Received: from mail-wr0-x233.google.com ([2a00:1450:400c:c0c::233]:34259)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1dFyRc-0002KP-6P
-	for qemu-devel@nongnu.org; Wed, 31 May 2017 03:53:28 -0400
-Received: by mail-wr0-x233.google.com with SMTP id g76so4284375wrd.1
-	for <qemu-devel@nongnu.org>; Wed, 31 May 2017 00:53:28 -0700 (PDT)
-References: <20170517145259.28979-1-alex.bennee@linaro.org>
-	<20170517145259.28979-7-alex.bennee@linaro.org>
-	<CAJhHMCB0j9=6XBMa0GVaOt+Acf4m5Ow2DhvvvcekKJXhfM+qSg@mail.gmail.com>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <CAJhHMCB0j9=6XBMa0GVaOt+Acf4m5Ow2DhvvvcekKJXhfM+qSg@mail.gmail.com>
-Date: Wed, 31 May 2017 08:53:42 +0100
-Message-ID: <8737bltqbd.fsf@linaro.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v2 6/6] new
- script/analyse-tlb-flushes-simpletrace.py
+	(envelope-from <slyfox@gentoo.org>) id 1dFyWW-0003jl-N8
+	for qemu-devel@nongnu.org; Wed, 31 May 2017 03:58:35 -0400
+Received: from smtp.gentoo.org ([140.211.166.183]:47312)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <slyfox@gentoo.org>) id 1dFyWW-0003jM-Fx
+	for qemu-devel@nongnu.org; Wed, 31 May 2017 03:58:32 -0400
+From: Sergei Trofimovich <slyfox@gentoo.org>
+Date: Wed, 31 May 2017 08:58:14 +0100
+Message-Id: <20170531075814.4851-1-slyfox@gentoo.org>
+In-Reply-To: <CAFEAcA9hGET8EyWYUwLvtnMEWzWJn0WCGEdz=nDhO4BCyxS8zg@mail.gmail.com>
+References: <CAFEAcA9hGET8EyWYUwLvtnMEWzWJn0WCGEdz=nDhO4BCyxS8zg@mail.gmail.com>
+Subject: [Qemu-devel] [PATCH v2] alpha-user: wire epoll_create, epoll_ctl,
+ epoll_wait
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,87 +24,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Pranith Kumar <bobby.prani+qemu@gmail.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, "Emilio G. Cota" <cota@braap.org>, qemu-devel <qemu-devel@nongnu.org>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Sergei Trofimovich <slyfox@gentoo.org>, Riku Voipio <riku.voipio@iki.fi>, qemu-devel@nongnu.org
 
+Noticed when ran GHC on alpha:
+    $ qemu-alpha -L /usr/alpha-unknown-linux-gnu/ /tmp/a
+    qemu: Unsupported syscall: 407
 
-Pranith Kumar <bobby.prani+qemu@gmail.com> writes:
+linux-user/syscall.c does have 'epoll_create' wiring,
+but under nondeprecated name.
 
-> Hi Alex,
->
-> Please find some comments and questions below:
->
-> On Wed, May 17, 2017 at 10:52 AM, Alex Bennée <alex.bennee@linaro.org> wrote:
->> This is a simple helper script to extract TLB flush stats from the a
->> simpletrace file and plot the results.
->>
->> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
->>
->> ---
->> v2
->>   - re-factored for new trace events
->>   - added time and latency graphs
->> ---
->>  scripts/analyse-tlb-flushes-simpletrace.py | 144 +++++++++++++++++++++++++++++
->>  1 file changed, 144 insertions(+)
->>  create mode 100755 scripts/analyse-tlb-flushes-simpletrace.py
->>
->> diff --git a/scripts/analyse-tlb-flushes-simpletrace.py b/scripts/analyse-tlb-flushes-simpletrace.py
->> new file mode 100755
->> index 0000000000..03fab8c86b
->> --- /dev/null
->> +++ b/scripts/analyse-tlb-flushes-simpletrace.py
->
-> <snip>
->
->> +
->> +def get_args():
->> +    "Grab options"
->> +    parser = argparse.ArgumentParser()
->> +    parser.add_argument("--output", "-o", type=str, help="Render plot to file")
->> +    parser.add_argument("--vcpus", type=int, help="Number of vCPUS")
->
-> It is not really clear what this argument is for. I guess you are
-> saying how many cpus the guest from which trace file was generated
-> had? What happens if we pass in less number of vcpus than used for
-> generation?
+Instead of defining both
+    TARGET_NR_sys_epoll_create
+and
+    TARGET_NR_epoll_create
+I've renamed former to later as old name is not used
+anywhere else in qemu (except the linux-user/strace.list).
 
-Yeah it's a bit of a hack. I need to know how many vcpus there are so
-when we save an "all vcpu" event we can set the event in:
+After this change GHC works fine under qemu-alpha:
+    $ ./alpha-linux-user/qemu-alpha -L /usr/alpha-unknown-linux-gnu/ /tmp/a
+    ...
 
-    def __save_queue(self, vcpu, record):
-        self.flush_total += 1
-        # FIXME: don't seem to see -1
-        if vcpu > 0x7fffffff:
-            self.flush_all += 1
-            for i in range(0, self.nvcpus):
-                self.vcpu_last[i].append(record)
-        else:
-            self.vcpu_last[vcpu].append(record)
+Cc: Riku Voipio <riku.voipio@iki.fi>
+Cc: qemu-devel@nongnu.org
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Signed-off-by: Sergei Trofimovich <slyfox@gentoo.org>
+---
+Change since v1:
+- cleaned up 'linux-user/strace.list' from deprecated defines
+ linux-user/alpha/syscall_nr.h | 6 +++---
+ linux-user/strace.list        | 9 ---------
+ 2 files changed, 3 insertions(+), 12 deletions(-)
 
-
->
->> +    parser.add_argument("--graph", choices=['time', 'latency'], default='time')
->
-> What does latency here indicate? I tried this argument on a sample
-> trace file I generated, and it had three empty boxes.
-
-Time just tracks the culmlative total of flush events over time where as
-latency gives a distribution of time from queuing the flush event to it
-being processed.
-
->
->> +    parser.add_argument("events", type=str, help='trace file read from')
->> +    parser.add_argument("tracefile", type=str, help='trace file read from')
->
-> The help text for 'events' file here should be something like 'the
-> trace events file'.
-
-Good catch, will fix.
-
->
-> Thanks,
-
-
---
-Alex Bennée
+diff --git a/linux-user/alpha/syscall_nr.h b/linux-user/alpha/syscall_nr.h
+index 00e14bb6b3..e848154663 100644
+--- a/linux-user/alpha/syscall_nr.h
++++ b/linux-user/alpha/syscall_nr.h
+@@ -343,9 +343,9 @@
+ #define TARGET_NR_io_cancel			402
+ #define TARGET_NR_exit_group			405
+ #define TARGET_NR_lookup_dcookie		406
+-#define TARGET_NR_sys_epoll_create		407
+-#define TARGET_NR_sys_epoll_ctl		408
+-#define TARGET_NR_sys_epoll_wait		409
++#define TARGET_NR_epoll_create			407
++#define TARGET_NR_epoll_ctl			408
++#define TARGET_NR_epoll_wait			409
+ #define TARGET_NR_remap_file_pages		410
+ #define TARGET_NR_set_tid_address		411
+ #define TARGET_NR_restart_syscall		412
+diff --git a/linux-user/strace.list b/linux-user/strace.list
+index 3b1282ec1a..ccfb58b7f4 100644
+--- a/linux-user/strace.list
++++ b/linux-user/strace.list
+@@ -1467,15 +1467,6 @@
+ #ifdef TARGET_NR__sysctl
+ { TARGET_NR__sysctl, "_sysctl" , NULL, NULL, NULL },
+ #endif
+-#ifdef TARGET_NR_sys_epoll_create
+-{ TARGET_NR_sys_epoll_create, "sys_epoll_create" , NULL, NULL, NULL },
+-#endif
+-#ifdef TARGET_NR_sys_epoll_ctl
+-{ TARGET_NR_sys_epoll_ctl, "sys_epoll_ctl" , NULL, NULL, NULL },
+-#endif
+-#ifdef TARGET_NR_sys_epoll_wait
+-{ TARGET_NR_sys_epoll_wait, "sys_epoll_wait" , NULL, NULL, NULL },
+-#endif
+ #ifdef TARGET_NR_sysfs
+ { TARGET_NR_sysfs, "sysfs" , NULL, NULL, NULL },
+ #endif
+-- 
+2.13.0
