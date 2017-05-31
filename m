@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57560)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58149)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1dG4Qi-0003vf-IZ
-	for qemu-devel@nongnu.org; Wed, 31 May 2017 10:16:57 -0400
+	(envelope-from <mreitz@redhat.com>) id 1dG4SI-0005Ef-Rj
+	for qemu-devel@nongnu.org; Wed, 31 May 2017 10:18:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1dG4Qh-0002rJ-EQ
-	for qemu-devel@nongnu.org; Wed, 31 May 2017 10:16:56 -0400
-Resent-Message-Id: <E1dG4Qh-0002rJ-EQ@eggs.gnu.org>
-Reply-To: <qemu-devel@nongnu.org>
-In-Reply-To: <20170531092516.5112-1-lvivier@redhat.com>
-Message-ID: <149624018334.1610.2494574605273755928@f98a8425f76e>
+	(envelope-from <mreitz@redhat.com>) id 1dG4SH-0003hA-Sn
+	for qemu-devel@nongnu.org; Wed, 31 May 2017 10:18:34 -0400
+References: <20170524202842.26724-1-eblake@redhat.com>
+	<20170524202842.26724-2-eblake@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <d74bac5d-4fa9-d7cc-9534-0a3fe22af6fc@redhat.com>
+Date: Wed, 31 May 2017 16:18:24 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Wed, 31 May 2017 07:16:24 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH v2] spapr: manage hotplugged devices while
- the VM is not started
+In-Reply-To: <20170524202842.26724-2-eblake@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="wv6EpmSMfJthLIaNX3HVcwTgP5fadTUpa"
+Subject: Re: [Qemu-devel] [PATCH v2 1/5] qemu-io: Don't die on second open
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,36 +24,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: lvivier@redhat.com
-Cc: famz@redhat.com, david@gibson.dropbear.id.au, thuth@redhat.com, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, groug@kaod.org
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, jsnow@redhat.com, Kevin Wolf <kwolf@redhat.com>
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKU3ViamVjdDogW1FlbXUt
-ZGV2ZWxdIFtQQVRDSCB2Ml0gc3BhcHI6IG1hbmFnZSBob3RwbHVnZ2VkIGRldmljZXMgd2hpbGUg
-dGhlIFZNIGlzIG5vdCBzdGFydGVkClR5cGU6IHNlcmllcwpNZXNzYWdlLWlkOiAyMDE3MDUzMTA5
-MjUxNi41MTEyLTEtbHZpdmllckByZWRoYXQuY29tCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09
-CiMhL2Jpbi9iYXNoCgpCQVNFPWJhc2UKbj0xCnRvdGFsPSQoZ2l0IGxvZyAtLW9uZWxpbmUgJEJB
-U0UuLiB8IHdjIC1sKQpmYWlsZWQ9MAoKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGlt
-aXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKCmNvbW1pdHM9IiQoZ2l0
-IGxvZyAtLWZvcm1hdD0lSCAtLXJldmVyc2UgJEJBU0UuLikiCmZvciBjIGluICRjb21taXRzOyBk
-bwogICAgZWNobyAiQ2hlY2tpbmcgUEFUQ0ggJG4vJHRvdGFsOiAkKGdpdCBsb2cgLW4gMSAtLWZv
-cm1hdD0lcyAkYykuLi4iCiAgICBpZiAhIGdpdCBzaG93ICRjIC0tZm9ybWF0PWVtYWlsIHwgLi9z
-Y3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFjayAtOyB0aGVuCiAgICAgICAgZmFpbGVkPTEK
-ICAgICAgICBlY2hvCiAgICBmaQogICAgbj0kKChuKzEpKQpkb25lCgpleGl0ICRmYWlsZWQKPT09
-IFRFU1QgU0NSSVBUIEVORCA9PT0KClVwZGF0aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3
-ZjQ0YmQ4ODg3MTMzODQKZmF0YWw6IHVuYWJsZSB0byBhY2Nlc3MgJ2h0dHBzOi8vZ2l0aHViLmNv
-bS9wYXRjaGV3LXByb2plY3QvcWVtdS8nOiBGYWlsZWQgdG8gY29ubmVjdCB0byBnaXRodWIuY29t
-IHBvcnQgNDQzOiBDb25uZWN0aW9uIHRpbWVkIG91dAplcnJvcjogQ291bGQgbm90IGZldGNoIDNj
-OGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKVHJhY2ViYWNrIChtb3N0IHJl
-Y2VudCBjYWxsIGxhc3QpOgogIEZpbGUgIi91c3IvYmluL3BhdGNoZXciLCBsaW5lIDQwOSwgaW4g
-dGVzdF9vbmUKICAgIGdpdF9jbG9uZV9yZXBvKGNsb25lLCByWyJyZXBvIl0sIHJbImhlYWQiXSwg
-bG9nZikKICBGaWxlICIvdXNyL2Jpbi9wYXRjaGV3IiwgbGluZSA0OCwgaW4gZ2l0X2Nsb25lX3Jl
-cG8KICAgIHN0ZG91dD1sb2dmLCBzdGRlcnI9bG9nZikKICBGaWxlICIvdXNyL2xpYjY0L3B5dGhv
-bjMuNS9zdWJwcm9jZXNzLnB5IiwgbGluZSA1ODEsIGluIGNoZWNrX2NhbGwKICAgIHJhaXNlIENh
-bGxlZFByb2Nlc3NFcnJvcihyZXRjb2RlLCBjbWQpCnN1YnByb2Nlc3MuQ2FsbGVkUHJvY2Vzc0Vy
-cm9yOiBDb21tYW5kICdbJ2dpdCcsICdyZW1vdGUnLCAnYWRkJywgJy1mJywgJy0tbWlycm9yPWZl
-dGNoJywgJzNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQnLCAnaHR0cHM6
-Ly9naXRodWIuY29tL3BhdGNoZXctcHJvamVjdC9xZW11J10nIHJldHVybmVkIG5vbi16ZXJvIGV4
-aXQgc3RhdHVzIDEKCgoKLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNo
-ZXcgW2h0dHA6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBh
-dGNoZXctZGV2ZWxAZnJlZWxpc3RzLm9yZw==
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--wv6EpmSMfJthLIaNX3HVcwTgP5fadTUpa
+From: Max Reitz <mreitz@redhat.com>
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, jsnow@redhat.com, Kevin Wolf <kwolf@redhat.com>
+Message-ID: <d74bac5d-4fa9-d7cc-9534-0a3fe22af6fc@redhat.com>
+Subject: Re: [PATCH v2 1/5] qemu-io: Don't die on second open
+References: <20170524202842.26724-1-eblake@redhat.com>
+ <20170524202842.26724-2-eblake@redhat.com>
+In-Reply-To: <20170524202842.26724-2-eblake@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 2017-05-24 22:28, Eric Blake wrote:
+> Most callback commands in qemu-io return 0 to keep the interpreter
+> loop running, or 1 to quit immediately.  However, open_f() just
+> passed through the return value of openfile(), which has different
+> semantics of returning 0 if a file was opened, or 1 on any failure.
+>=20
+> As a result of mixing the return semantics, we are forcing the
+> qemu-io interpreter to exit early on any failures, which is rather
+> annoying when some of the failures are obviously trying to give
+> the user a hint of how to proceed (if we didn't then kill qemu-io
+> out from under the user's feet):
+>=20
+> $ qemu-io
+> qemu-io> open foo
+> qemu-io> open foo
+> file open already, try 'help close'
+> $ echo $?
+> 0
+>=20
+> Meanwhile, we WANT openfile() to report failures, as it is the
+> way that 'qemu-io -c "$something" no_such_file' knows to exit
+> early rather than attempting $something.  So the solution is to
+> fix open_f() to always return 0 (when we are in interactive mode,
+> even failure to open should not end the session), and save the
+> return value of openfile() for command line use in main().
+>=20
+> This has been awkward since at least as far back as commit
+> e3aff4f, in 2009.
+>=20
+> Signed-off-by: Eric Blake <eblake@redhat.com>
+
+This still makes qemu-io -c "$something" no_such_file fail, right. But
+now qemu-io -c "open no_such_file" -c "$something" will execute
+$something; and I'm not sure we can convert all -c open users to not use
+that command (maybe we can, now that we have --image-opts).
+
+I don't think it's absolutely necessary for -c open to exit on error,
+but you seem to do, if I understand your penultimate paragraph
+correctly. :-)
+
+Max
+
+
+--wv6EpmSMfJthLIaNX3HVcwTgP5fadTUpa
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iQEvBAEBCAAZBQJZLtCwEhxtcmVpdHpAcmVkaGF0LmNvbQAKCRD0B9sAYdXPQAOs
+B/9pI2siEuKDe/2df45nhiISA8s+UDH7SpyX9/xOLo5FK24Hl+u2nLPB1L+fNEPP
+mAbHkKNZLz1cDf/WQ8AFUtVjIXCpvqaYDhL7V0xr65n8xLsl3r+A4GkcuhCm3cps
+1JhRBmQ1XrXQaMzu9v4OMpW67w5HMvHJ7bMf8rMNgn/YXTGr8VNujAJbpQC0Uefx
+TkDxxRUAv4Lgq9RwnMuOV/uN5DlA1ZET4TnxTtoOVKOEYoZiuEmowXyQaeAlxHDB
+xJ92GoSacLBThmlAHmXPvJ7qXZuXx1zjiiEquUmHGMQe5gh3mfydbeGDN3EHPsbJ
+4LAHKc2gV+H/Q/BY4XQbdaco
+=4VBE
+-----END PGP SIGNATURE-----
+
+--wv6EpmSMfJthLIaNX3HVcwTgP5fadTUpa--
