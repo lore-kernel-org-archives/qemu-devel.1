@@ -1,32 +1,48 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42535)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44033)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dFvng-0003Sv-4w
-	for qemu-devel@nongnu.org; Wed, 31 May 2017 01:04:06 -0400
+	(envelope-from <nikunj@linux.vnet.ibm.com>) id 1dFvwd-0005EI-E9
+	for qemu-devel@nongnu.org; Wed, 31 May 2017 01:13:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dFvnc-0006CG-My
-	for qemu-devel@nongnu.org; Wed, 31 May 2017 01:04:04 -0400
-Received: from mail-oi0-x22b.google.com ([2607:f8b0:4003:c06::22b]:34915)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dFvnc-0006Bx-Ga
-	for qemu-devel@nongnu.org; Wed, 31 May 2017 01:04:00 -0400
-Received: by mail-oi0-x22b.google.com with SMTP id l18so2363156oig.2
-	for <qemu-devel@nongnu.org>; Tue, 30 May 2017 22:04:00 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20170517145259.28979-1-alex.bennee@linaro.org>
-	<20170517145259.28979-2-alex.bennee@linaro.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <0e9874b9-d305-4f21-fd1d-6aff1b99a240@amsat.org>
-Date: Wed, 31 May 2017 02:03:57 -0300
+	(envelope-from <nikunj@linux.vnet.ibm.com>) id 1dFvwa-0000PU-57
+	for qemu-devel@nongnu.org; Wed, 31 May 2017 01:13:19 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:47849)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <nikunj@linux.vnet.ibm.com>)
+	id 1dFvwZ-0000PJ-S4
+	for qemu-devel@nongnu.org; Wed, 31 May 2017 01:13:16 -0400
+Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v4V595wE049816
+	for <qemu-devel@nongnu.org>; Wed, 31 May 2017 01:13:14 -0400
+Received: from e23smtp07.au.ibm.com (e23smtp07.au.ibm.com [202.81.31.140])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2asj42bsxx-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Wed, 31 May 2017 01:13:13 -0400
+Received: from localhost
+	by e23smtp07.au.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <nikunj@linux.vnet.ibm.com>;
+	Wed, 31 May 2017 15:13:10 +1000
+Received: from d23av04.au.ibm.com (d23av04.au.ibm.com [9.190.235.139])
+	by d23relay07.au.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+	v4V5CxZn51380448
+	for <qemu-devel@nongnu.org>; Wed, 31 May 2017 15:13:07 +1000
+Received: from d23av04.au.ibm.com (localhost [127.0.0.1])
+	by d23av04.au.ibm.com (8.14.4/8.14.4/NCO v10.0 AVout) with ESMTP id
+	v4V5CXI0001750
+	for <qemu-devel@nongnu.org>; Wed, 31 May 2017 15:12:34 +1000
+From: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
+In-Reply-To: <CAFEAcA_EisxJa1710ngcpScjfFVvnSpAr-_2RjdmQngoxw0DJw@mail.gmail.com>
+References: <1495444679-7736-1-git-send-email-sandipandas1990@gmail.com>
+	<87bmqanz6i.fsf@abhimanyu.i-did-not-set--mail-host-address--so-tickle-me>
+	<CAFEAcA__bsp5_yJZJr3LBbB_5yuALZ4o5ELXhJo4OO5jjz4G3A@mail.gmail.com>
+	<CAFEAcA_EisxJa1710ngcpScjfFVvnSpAr-_2RjdmQngoxw0DJw@mail.gmail.com>
+Date: Wed, 31 May 2017 10:42:01 +0530
 MIME-Version: 1.0
-In-Reply-To: <20170517145259.28979-2-alex.bennee@linaro.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v2 1/6] scripts/replay-dump.py: replay log
- dumper
+Content-Type: text/plain
+Message-Id: <87r2z5bof2.fsf@abhimanyu.i-did-not-set--mail-host-address--so-tickle-me>
+Subject: Re: [Qemu-devel] [PATCH risu v2] ppc64: Fix patterns for rotate
+ doubleword instructions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,303 +51,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, pbonzini@redhat.com, stefanha@redhat.com
-Cc: cota@braap.org, qemu-devel@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Sandipan Das <sandipandas1990@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>, Jose Ricardo Ziviani <joserz@linux.vnet.ibm.com>
 
-On 05/17/2017 11:52 AM, Alex Bennée wrote:
-> This script is a debugging tool for looking through the contents of a
-> replay log file. It is incomplete but should fail gracefully at events
-> it doesn't understand.
->
-> It currently understands two different log formats as the audio
-> record/replay support was merged during since MTTCG. It was written to
-> help debug what has caused the BQL changes to break replay support.
->
-> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+Peter Maydell <peter.maydell@linaro.org> writes:
 
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+> On 30 May 2017 at 16:39, Peter Maydell <peter.maydell@linaro.org> wrote:
+>> On 30 May 2017 at 16:26, Nikunj A Dadhania <nikunj@linux.vnet.ibm.com> wrote:
+>>> Sandipan Das <sandipandas1990@gmail.com> writes:
+>>>
+>>>> The patterns for the following instructions are fixed:
+>>>>  * Rotate Left Doubleword then Clear Right (rldcr[.])
+>>>>  * Rotate Left Doubleword Immediate then Clear Right (rldicr[.])
+>>>>  * Rotate Left Doubleword Immediate then Mask Insert (rldimi[.])
+>>>>
+>>>> The first instruction has a typo. For the other two instructions,
+>>>> the extended opcodes are incorrect and the shift field 'sha' is
+>>>> absent. Also, the shift field 'sh' should be used in place of the
+>>>> register field 'rb'.
+>>>>
+>>>> Signed-off-by: Sandipan Das <sandipandas1990@gmail.com>
+>>>
+>>> Reviewed-by: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
+>>
+>> Thanks; applied to risu master.
+>
+> ...but I foolishly didn't run build-all-archs first, which
+> points out that there's a bug:
 
-> ---
->  scripts/replay-dump.py | 272 +++++++++++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 272 insertions(+)
->  create mode 100755 scripts/replay-dump.py
+Ouch :(
+
+> Syntax error detected evaluating RLDIMId PPC64LE constraints string:         ]
+> { $rs != 1 && $ra != 1 && $rb != 1 && $rs != 13 && $ra != 13 && $rb != 13; }
+> Global symbol "$rb" requires explicit package name (did you forget to
+> declare "my $rb"?) at (eval 429) line 1.
+> Global symbol "$rb" requires explicit package name (did you forget to
+> declare "my $rb"?) at (eval 429) line 1.
 >
-> diff --git a/scripts/replay-dump.py b/scripts/replay-dump.py
-> new file mode 100755
-> index 0000000000..fdd178aba0
-> --- /dev/null
-> +++ b/scripts/replay-dump.py
-> @@ -0,0 +1,272 @@
-> +#!/usr/bin/env python
-> +# -*- coding: utf-8 -*-
-> +#
-> +# Dump the contents of a recorded execution stream
-> +#
-> +#  Copyright (c) 2017 Alex Bennée <alex.bennee@linaro.org>
-> +#
-> +# This library is free software; you can redistribute it and/or
-> +# modify it under the terms of the GNU Lesser General Public
-> +# License as published by the Free Software Foundation; either
-> +# version 2 of the License, or (at your option) any later version.
-> +#
-> +# This library is distributed in the hope that it will be useful,
-> +# but WITHOUT ANY WARRANTY; without even the implied warranty of
-> +# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-> +# Lesser General Public License for more details.
-> +#
-> +# You should have received a copy of the GNU Lesser General Public
-> +# License along with this library; if not, see <http://www.gnu.org/licenses/>.
-> +
-> +import argparse
-> +import struct
-> +from collections import namedtuple
-> +
-> +# This mirrors some of the global replay state which some of the
-> +# stream loading refers to. Some decoders may read the next event so
-> +# we need handle that case. Calling reuse_event will ensure the next
-> +# event is read from the cache rather than advancing the file.
-> +
-> +class ReplayState(object):
-> +    def __init__(self):
-> +        self.event = -1
-> +        self.event_count = 0
-> +        self.already_read = False
-> +        self.current_checkpoint = 0
-> +        self.checkpoint = 0
-> +
-> +    def set_event(self, ev):
-> +        self.event = ev
-> +        self.event_count += 1
-> +
-> +    def get_event(self):
-> +        self.already_read = False
-> +        return self.event
-> +
-> +    def reuse_event(self, ev):
-> +        self.event = ev
-> +        self.already_read = True
-> +
-> +    def set_checkpoint(self):
-> +        self.checkpoint = self.event - self.checkpoint_start
-> +
-> +    def get_checkpoint(self):
-> +        return self.checkpoint
-> +
-> +replay_state = ReplayState()
-> +
-> +# Simple read functions that mirror replay-internal.c
-> +# The file-stream is big-endian and manually written out a byte at a time.
-> +
-> +def read_byte(fin):
-> +    "Read a single byte"
-> +    return struct.unpack('>B', fin.read(1))[0]
-> +
-> +def read_event(fin):
-> +    "Read a single byte event, but save some state"
-> +    if replay_state.already_read:
-> +        return replay_state.get_event()
-> +    else:
-> +        replay_state.set_event(read_byte(fin))
-> +        return replay_state.event
-> +
-> +def read_word(fin):
-> +    "Read a 16 bit word"
-> +    return struct.unpack('>H', fin.read(2))[0]
-> +
-> +def read_dword(fin):
-> +    "Read a 32 bit word"
-> +    return struct.unpack('>I', fin.read(4))[0]
-> +
-> +def read_qword(fin):
-> +    "Read a 64 bit word"
-> +    return struct.unpack('>Q', fin.read(8))[0]
-> +
-> +# Generic decoder structure
-> +Decoder = namedtuple("Decoder", "eid name fn")
-> +
-> +def call_decode(table, index, dumpfile):
-> +    "Search decode table for next step"
-> +    decoder = next((d for d in table if d.eid == index), None)
-> +    if not decoder:
-> +        print "Could not decode index: %d" % (index)
-> +        print "Entry is: %s" % (decoder)
-> +        print "Decode Table is:\n%s" % (table)
-> +        return False
-> +    else:
-> +        return decoder.fn(decoder.eid, decoder.name, dumpfile)
-> +
-> +# Print event
-> +def print_event(eid, name, string=None, event_count=None):
-> +    "Print event with count"
-> +    if not event_count:
-> +        event_count = replay_state.event_count
-> +
-> +    if string:
-> +        print "%d:%s(%d) %s" % (event_count, name, eid, string)
-> +    else:
-> +        print "%d:%s(%d)" % (event_count, name, eid)
-> +
-> +
-> +# Decoders for each event type
-> +
-> +def decode_unimp(eid, name, _unused_dumpfile):
-> +    "Unimplimented decoder, will trigger exit"
-> +    print "%s not handled - will now stop" % (name)
-> +    return False
-> +
-> +# Checkpoint decoder
-> +def swallow_async_qword(eid, name, dumpfile):
-> +    "Swallow a qword of data without looking at it"
-> +    step_id = read_qword(dumpfile)
-> +    print "  %s(%d) @ %d" % (name, eid, step_id)
-> +    return True
-> +
-> +async_decode_table = [ Decoder(0, "REPLAY_ASYNC_EVENT_BH", swallow_async_qword),
-> +                       Decoder(1, "REPLAY_ASYNC_INPUT", decode_unimp),
-> +                       Decoder(2, "REPLAY_ASYNC_INPUT_SYNC", decode_unimp),
-> +                       Decoder(3, "REPLAY_ASYNC_CHAR_READ", decode_unimp),
-> +                       Decoder(4, "REPLAY_ASYNC_EVENT_BLOCK", decode_unimp),
-> +                       Decoder(5, "REPLAY_ASYNC_EVENT_NET", decode_unimp),
-> +]
-> +# See replay_read_events/replay_read_event
-> +def decode_async(eid, name, dumpfile):
-> +    """Decode an ASYNC event"""
-> +
-> +    print_event(eid, name)
-> +
-> +    async_event_kind = read_byte(dumpfile)
-> +    async_event_checkpoint = read_byte(dumpfile)
-> +
-> +    if async_event_checkpoint != replay_state.current_checkpoint:
-> +        print "  mismatch between checkpoint %d and async data %d" % (
-> +            replay_state.current_checkpoint, async_event_checkpoint)
-> +        return True
-> +
-> +    return call_decode(async_decode_table, async_event_kind, dumpfile)
-> +
-> +
-> +def decode_instruction(eid, name, dumpfile):
-> +    ins_diff = read_dword(dumpfile)
-> +    print_event(eid, name, "0x%x" % (ins_diff))
-> +    return True
-> +
-> +def decode_audio_out(eid, name, dumpfile):
-> +    audio_data = read_dword(dumpfile)
-> +    print_event(eid, name, "%d" % (audio_data))
-> +    return True
-> +
-> +def decode_checkpoint(eid, name, dumpfile):
-> +    """Decode a checkpoint.
-> +
-> +    Checkpoints contain a series of async events with their own specific data.
-> +    """
-> +    replay_state.set_checkpoint()
-> +    # save event count as we peek ahead
-> +    event_number = replay_state.event_count
-> +    next_event = read_event(dumpfile)
-> +
-> +    # if the next event is EVENT_ASYNC there are a bunch of
-> +    # async events to read, otherwise we are done
-> +    if next_event != 3:
-> +        print_event(eid, name, "no additional data", event_number)
-> +    else:
-> +        print_event(eid, name, "more data follows", event_number)
-> +
-> +    replay_state.reuse_event(next_event)
-> +    return True
-> +
-> +def decode_checkpoint_init(eid, name, dumpfile):
-> +    print_event(eid, name)
-> +    return True
-> +
-> +def decode_interrupt(eid, name, dumpfile):
-> +    print_event(eid, name)
-> +    return True
-> +
-> +def decode_clock(eid, name, dumpfile):
-> +    clock_data = read_qword(dumpfile)
-> +    print_event(eid, name, "0x%x" % (clock_data))
-> +    return True
-> +
-> +
-> +# pre-MTTCG merge
-> +v5_event_table = [Decoder(0, "EVENT_INSTRUCTION", decode_instruction),
-> +                  Decoder(1, "EVENT_INTERRUPT", decode_interrupt),
-> +                  Decoder(2, "EVENT_EXCEPTION", decode_unimp),
-> +                  Decoder(3, "EVENT_ASYNC", decode_async),
-> +                  Decoder(4, "EVENT_SHUTDOWN", decode_unimp),
-> +                  Decoder(5, "EVENT_CHAR_WRITE", decode_unimp),
-> +                  Decoder(6, "EVENT_CHAR_READ_ALL", decode_unimp),
-> +                  Decoder(7, "EVENT_CHAR_READ_ALL_ERROR", decode_unimp),
-> +                  Decoder(8, "EVENT_CLOCK_HOST", decode_clock),
-> +                  Decoder(9, "EVENT_CLOCK_VIRTUAL_RT", decode_clock),
-> +                  Decoder(10, "EVENT_CP_CLOCK_WARP_START", decode_checkpoint),
-> +                  Decoder(11, "EVENT_CP_CLOCK_WARP_ACCOUNT", decode_checkpoint),
-> +                  Decoder(12, "EVENT_CP_RESET_REQUESTED", decode_checkpoint),
-> +                  Decoder(13, "EVENT_CP_SUSPEND_REQUESTED", decode_checkpoint),
-> +                  Decoder(14, "EVENT_CP_CLOCK_VIRTUAL", decode_checkpoint),
-> +                  Decoder(15, "EVENT_CP_CLOCK_HOST", decode_checkpoint),
-> +                  Decoder(16, "EVENT_CP_CLOCK_VIRTUAL_RT", decode_checkpoint),
-> +                  Decoder(17, "EVENT_CP_INIT", decode_checkpoint_init),
-> +                  Decoder(18, "EVENT_CP_RESET", decode_checkpoint),
-> +]
-> +
-> +# post-MTTCG merge, AUDIO support added
-> +v6_event_table = [Decoder(0, "EVENT_INSTRUCTION", decode_instruction),
-> +                  Decoder(1, "EVENT_INTERRUPT", decode_interrupt),
-> +                  Decoder(2, "EVENT_EXCEPTION", decode_unimp),
-> +                  Decoder(3, "EVENT_ASYNC", decode_async),
-> +                  Decoder(4, "EVENT_SHUTDOWN", decode_unimp),
-> +                  Decoder(5, "EVENT_CHAR_WRITE", decode_unimp),
-> +                  Decoder(6, "EVENT_CHAR_READ_ALL", decode_unimp),
-> +                  Decoder(7, "EVENT_CHAR_READ_ALL_ERROR", decode_unimp),
-> +                  Decoder(8, "EVENT_AUDIO_OUT", decode_audio_out),
-> +                  Decoder(9, "EVENT_AUDIO_IN", decode_unimp),
-> +                  Decoder(10, "EVENT_CLOCK_HOST", decode_clock),
-> +                  Decoder(11, "EVENT_CLOCK_VIRTUAL_RT", decode_clock),
-> +                  Decoder(12, "EVENT_CP_CLOCK_WARP_START", decode_checkpoint),
-> +                  Decoder(13, "EVENT_CP_CLOCK_WARP_ACCOUNT", decode_checkpoint),
-> +                  Decoder(14, "EVENT_CP_RESET_REQUESTED", decode_checkpoint),
-> +                  Decoder(15, "EVENT_CP_SUSPEND_REQUESTED", decode_checkpoint),
-> +                  Decoder(16, "EVENT_CP_CLOCK_VIRTUAL", decode_checkpoint),
-> +                  Decoder(17, "EVENT_CP_CLOCK_HOST", decode_checkpoint),
-> +                  Decoder(18, "EVENT_CP_CLOCK_VIRTUAL_RT", decode_checkpoint),
-> +                  Decoder(19, "EVENT_CP_INIT", decode_checkpoint_init),
-> +                  Decoder(20, "EVENT_CP_RESET", decode_checkpoint),
-> +]
-> +
-> +def parse_arguments():
-> +    "Grab arguments for script"
-> +    parser = argparse.ArgumentParser()
-> +    parser.add_argument("-f", "--file", help='record/replay dump to read from',
-> +                        required=True)
-> +    return parser.parse_args()
-> +
-> +def decode_file(filename):
-> +    "Decode a record/replay dump"
-> +    dumpfile = open(filename, "rb")
-> +
-> +    # read and throwaway the header
-> +    version = read_dword(dumpfile)
-> +    junk = read_qword(dumpfile)
-> +
-> +    print "HEADER: version 0x%x" % (version)
-> +    if version == 0xe02006:
-> +        event_decode_table = v6_event_table
-> +        replay_state.checkpoint_start = 12
-> +    else:
-> +        event_decode_table = v5_event_table
-> +        replay_state.checkpoint_start = 10
-> +
-> +    try:
-> +        decode_ok = True
-> +        while decode_ok:
-> +            event = read_event(dumpfile)
-> +            decode_ok = call_decode(event_decode_table, event, dumpfile)
-> +    finally:
-> +        dumpfile.close()
-> +
-> +if __name__ == "__main__":
-> +    args = parse_arguments()
-> +    decode_file(args.file)
->
+> You forgot to update the constraints when you changed the
+> field names... I think that the constraints on $rb should
+> be removed rather than just changed to use $sh because this
+> field is an immediate, not a register number, so we don't need
+> to make it avoid 1 and 13. This would bring them into line with
+> the other rotate-immediates. I'll post a patch in a second.
+
+Regards
+Nikunj
