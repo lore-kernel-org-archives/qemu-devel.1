@@ -1,34 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50554)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53838)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1dG8Qu-0000wr-Pa
-	for qemu-devel@nongnu.org; Wed, 31 May 2017 14:33:25 -0400
+	(envelope-from <eblake@redhat.com>) id 1dG8do-00041C-Nf
+	for qemu-devel@nongnu.org; Wed, 31 May 2017 14:46:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1dG8Qq-00049Q-Se
-	for qemu-devel@nongnu.org; Wed, 31 May 2017 14:33:24 -0400
-Received: from 19.mo5.mail-out.ovh.net ([46.105.35.78]:43810)
+	(envelope-from <eblake@redhat.com>) id 1dG8dl-0003Qa-Il
+	for qemu-devel@nongnu.org; Wed, 31 May 2017 14:46:44 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:41270)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1dG8Qq-00048U-M2
-	for qemu-devel@nongnu.org; Wed, 31 May 2017 14:33:20 -0400
-Received: from player799.ha.ovh.net (b9.ovh.net [213.186.33.59])
-	by mo5.mail-out.ovh.net (Postfix) with ESMTP id DCC52FE1E7
-	for <qemu-devel@nongnu.org>; Wed, 31 May 2017 20:33:18 +0200 (CEST)
-Date: Wed, 31 May 2017 20:33:11 +0200
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20170531203311.116e89fc@bahia.lan>
-In-Reply-To: <20170531194046.6d6eed0f@p-imbrenda.boeblingen.de.ibm.com>
-References: <20170531150933.10156-1-alex.bennee@linaro.org>
-	<20170531150933.10156-3-alex.bennee@linaro.org>
-	<20170531181737.230cbded@p-imbrenda.boeblingen.de.ibm.com>
-	<20170531183324.03bf98fe@bahia.lan>
-	<20170531185106.126f19ac@p-imbrenda.boeblingen.de.ibm.com>
-	<20170531190629.1cd2089d@bahia.lan>
-	<20170531194046.6d6eed0f@p-imbrenda.boeblingen.de.ibm.com>
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dG8dl-0003QH-92
+	for qemu-devel@nongnu.org; Wed, 31 May 2017 14:46:41 -0400
+References: <20170531165541.47338-1-vsementsov@virtuozzo.com>
+	<20170531165541.47338-2-vsementsov@virtuozzo.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <70aa332e-c868-15ac-0c4c-23d41a777b6c@redhat.com>
+Date: Wed, 31 May 2017 13:46:38 -0500
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	boundary="Sig_/r/0DcbPLRRvycv6y06Xob//";
-	protocol="application/pgp-signature"
-Subject: Re: [Qemu-devel] [PATCH v1 2/2] gdbstub: don't fail on vCont; C04:0;
- c packets
+In-Reply-To: <20170531165541.47338-2-vsementsov@virtuozzo.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="uK77p4oAj6CRNiODifQd7A6Ovwtg4aPn8"
+Subject: Re: [Qemu-devel] [PATCH 01/12] nbd: rename read_sync and friends
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,84 +28,116 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Claudio Imbrenda <imbrenda@linux.vnet.ibm.com>
-Cc: Alex =?UTF-8?B?QmVubsOpZQ==?= <alex.bennee@linaro.org>, pbonzini@redhat.com, doug16k@gmail.com, qemu-devel@nongnu.org
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org
+Cc: pbonzini@redhat.com, den@openvz.org
 
---Sig_/r/0DcbPLRRvycv6y06Xob//
-Content-Type: text/plain; charset=US-ASCII
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--uK77p4oAj6CRNiODifQd7A6Ovwtg4aPn8
+From: Eric Blake <eblake@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-devel@nongnu.org
+Cc: pbonzini@redhat.com, den@openvz.org
+Message-ID: <70aa332e-c868-15ac-0c4c-23d41a777b6c@redhat.com>
+Subject: Re: [PATCH 01/12] nbd: rename read_sync and friends
+References: <20170531165541.47338-1-vsementsov@virtuozzo.com>
+ <20170531165541.47338-2-vsementsov@virtuozzo.com>
+In-Reply-To: <20170531165541.47338-2-vsementsov@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, 31 May 2017 19:40:46 +0200
-Claudio Imbrenda <imbrenda@linux.vnet.ibm.com> wrote:
-
-> On Wed, 31 May 2017 19:06:29 +0200
-> Greg Kurz <groug@kaod.org> wrote:
+On 05/31/2017 11:55 AM, Vladimir Sementsov-Ogievskiy wrote:
+> Rename
+>   nbd_wr_syncv -> nbd_rwv
+>   read_sync -> nbd_read
+>   read_sync_eof -> nbd_read_eof
+>   write_sync -> nbd_write
+>   drop_sync -> nbd_drop
 >=20
-> > On Wed, 31 May 2017 18:51:06 +0200
-> > Claudio Imbrenda <imbrenda@linux.vnet.ibm.com> wrote:
-> > [...] =20
-> > > > >=20
-> > > > > This is strange. cpu_index() is defined as:
-> > > > >=20
-> > > > > static inline int cpu_index(CPUState *cpu)
-> > > > > {
-> > > > > #if defined(CONFIG_USER_ONLY)
-> > > > >     return cpu->host_tid;
-> > > > > #else
-> > > > >     return cpu->cpu_index + 1;
-> > > > > #endif
-> > > > > }
-> > > > >=20
-> > > > > therefore it shouldn't return 0 under any circumstance,
-> > > > > and       =20
-> > > >=20
-> > > > I think it is 0 for first_cpu in user mode.     =20
-> > >=20
-> > > in linux-user/syscall.c:
-> > >=20
-> > > info->tid =3D gettid();
-> > > cpu->host_tid =3D info->tid;
-> > >=20
-> > > kernel thread-ids are system-wide unique and can't be 0
-> > >     =20
-> >=20
-> > This is correct but these lines are in clone_func(). This gets called
-> > for all threads but the "main" thread which I believe to be
-> > associated to first_cpu. =20
+> 1. nbd_ prefix
+>    read_sync and write_sync are already shared, so it is good to have a=
+
+>    namespace prefix. drop_sync will be shared, and read_sync_eof is
+>    related to read_sync, so let's rename them all.
 >=20
-> then IMHO that is a bug and it needs to be corrected. the host_tid
-> should be, well, the host tid, and not 0, which is never a valid
-> tid for Linux.
+> 2. _sync suffix
+>    _sync is related to the fact, that nbd_wr_syncv doesn't return if
+
+s/fact,/fact/
+
+>    write to socket returns EAGAIN. In first implementation nbd_wr_syncv=
+
+>    just loops while getting EAGAIN, current implementation yields in
+>    this case.
+
+As mentioned in your followup, you may want to rewrite this to:
+
+_sync was originally used (back in commit 7a5ca864 when it was named
+wr_sync) to indicate that we looped rather than returned on EAGAIN.  But
+now we use qio_channel which yields on our behalf rather than giving us
+EAGAIN.
+
+>    Why to get rid of it:
+>    - it is normal for r/w functions to be synchronous, so having
+>      additional suffix for it looks redundant (contrariwise, we have
+>      _aio suffix for async functions)
+>    - _sync suffix in block layer is used when function does flush (so
+>      using it for other thing is confusing a bit)
+>    - keep function names short after adding nbd_ prefix
 >=20
-
-I tend to agree indeed. It isn't a problem for user mode though since it
-doesn't use @host_tid. Only gdbstub does.
-
-$ git grep host_tid
-include/exec/gdbstub.h:    return cpu->host_tid;
-include/qom/cpu.h: * @host_tid: Host thread ID.
-include/qom/cpu.h:    uint32_t host_tid;
-linux-user/syscall.c:    cpu->host_tid =3D info->tid;
-
-> the current behaviour is simply the easiest for the "any CPU" case.
-> Picking the last CPU or a random one would still be correct, and in
-> that case there would be no way to explicitly address the first CPU.
+> 3. for nbd_wr_syncv let's use more common notation 'rw'
 >=20
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> ---
 
-I'm not familiar enough with gdbstub to know if this is a real problem.
-But I guess it is possible to add a "first_cpu->host_tid =3D gettid();" line
-somewhere in linux-user/main.c.
+The maintainer may be willing to tweak the commit message without
+needing a v2.
 
---Sig_/r/0DcbPLRRvycv6y06Xob//
-Content-Type: application/pgp-signature
+
+> +++ b/nbd/nbd-internal.h
+> @@ -94,14 +94,14 @@
+>  #define NBD_ENOSPC     28
+>  #define NBD_ESHUTDOWN  108
+> =20
+> -/* read_sync_eof
+> +/* nbd_read_eof
+>   * Tries to read @size bytes from @ioc. Returns number of bytes actual=
+ly read.
+>   * May return a value >=3D 0 and < size only on EOF, i.e. when iterati=
+vely called
+> - * qio_channel_readv() returns 0. So, there are no needs to call read_=
+sync_eof
+> + * qio_channel_readv() returns 0. So, there are no needs to call nbd_r=
+ead_eof
+
+As long as you are touching this:
+
+s/are no needs/is no need/
+
+Reviewed-by: Eric Blake <eblake@redhat.com>
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--uK77p4oAj6CRNiODifQd7A6Ovwtg4aPn8
+Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iEYEARECAAYFAlkvDGcACgkQAvw66wEB28IihgCgkpgKuEdUcTse+t/oD0cZIzz3
-D70An1rdWEi3VyDQh13Cls8CmVK5nTXf
-=lKFq
+iQEcBAEBCAAGBQJZLw+OAAoJEKeha0olJ0Nq1/MH/2syDbyXkd9brBGi9f9Dtlqj
+EY+9iDVXfGDdsOC6xGxcFXfYBdKds1iCmcYCcwUxL0/A0LNu8v8wu99eiXynqyfa
+A69rD0YjEcUoKlEZwwlk4bGny+bTRm4O1n1zIiPbwLGqsBs5dmazJyDhdU1Iwapa
+cXF21G6uA27HEsZpkNNQA2N9SPRBmX+HoroCdkg2dkSlcn36C0/faJgPCF8+JAEW
+C6H3IK/xFnAYokwUps1ek8y2bj2qF4+M0Xtaf6e5ilK3gVbNgDSRAiwQpY2Jt6kQ
+CKSyhhLpJzVWuG5b7ztL/dWLFZNAOZGes9qwa9Y80nEDUkhW8K7CqZROH2KgxBw=
+=ccGp
 -----END PGP SIGNATURE-----
 
---Sig_/r/0DcbPLRRvycv6y06Xob//--
+--uK77p4oAj6CRNiODifQd7A6Ovwtg4aPn8--
