@@ -1,29 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47436)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51156)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1dG6T2-0006RN-2p
-	for qemu-devel@nongnu.org; Wed, 31 May 2017 12:29:07 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1dG6WZ-0008EC-Ps
+	for qemu-devel@nongnu.org; Wed, 31 May 2017 12:31:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1dG6SP-00009Z-SG
-	for qemu-devel@nongnu.org; Wed, 31 May 2017 12:27:28 -0400
-Received: from mail-wm0-x234.google.com ([2a00:1450:400c:c09::234]:36775)
+	(envelope-from <alex.bennee@linaro.org>) id 1dG6WV-0003L8-7M
+	for qemu-devel@nongnu.org; Wed, 31 May 2017 12:31:07 -0400
+Received: from mail-wm0-x230.google.com ([2a00:1450:400c:c09::230]:37485)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1dG6SP-00008E-Kg
-	for qemu-devel@nongnu.org; Wed, 31 May 2017 12:26:49 -0400
-Received: by mail-wm0-x234.google.com with SMTP id 7so125051239wmo.1
-	for <qemu-devel@nongnu.org>; Wed, 31 May 2017 09:26:49 -0700 (PDT)
-References: <20170531150933.10156-1-alex.bennee@linaro.org>
-	<20170531150933.10156-3-alex.bennee@linaro.org>
-	<20170531181732.13140426@bahia.lan>
+	id 1dG6WU-0003Kp-UI
+	for qemu-devel@nongnu.org; Wed, 31 May 2017 12:31:03 -0400
+Received: by mail-wm0-x230.google.com with SMTP id d127so26543450wmf.0
+	for <qemu-devel@nongnu.org>; Wed, 31 May 2017 09:31:02 -0700 (PDT)
+References: <20170527161755.7761-1-f4bug@amsat.org>
+	<20170527161755.7761-3-f4bug@amsat.org>
 From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <20170531181732.13140426@bahia.lan>
-Date: Wed, 31 May 2017 17:27:04 +0100
-Message-ID: <87wp8xrnzb.fsf@linaro.org>
+In-reply-to: <20170527161755.7761-3-f4bug@amsat.org>
+Date: Wed, 31 May 2017 17:31:17 +0100
+Message-ID: <87vaohrnsa.fsf@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v1 2/2] gdbstub: don't fail on vCont; C04:0;
- c packets
+Subject: Re: [Qemu-devel] [PATCH v4 02/24] docker: add --include-files
+ argument to 'build' command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,67 +31,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>
-Cc: pbonzini@redhat.com, doug16k@gmail.com, imbrenda@linux.vnet.ibm.com, qemu-devel@nongnu.org
+To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Cc: qemu-devel@nongnu.org, Fam Zheng <famz@redhat.com>
 
 
-Greg Kurz <groug@kaod.org> writes:
+Philippe Mathieu-Daudé <f4bug@amsat.org> writes:
 
-> On Wed, 31 May 2017 16:09:33 +0100
-> Alex Bennée <alex.bennee@linaro.org> wrote:
+> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+> ---
+>  tests/docker/Makefile.include |  3 +++
+>  tests/docker/docker.py        | 11 ++++++++---
+>  2 files changed, 11 insertions(+), 3 deletions(-)
 >
->> The thread-id of 0 means any CPU but we then ignore the fact we find
->> the first_cpu in this case who can have an index of 0. Instead of
+> diff --git a/tests/docker/Makefile.include b/tests/docker/Makefile.include
+> index 03eda37bf4..fe1a9a53ff 100644
+> --- a/tests/docker/Makefile.include
+> +++ b/tests/docker/Makefile.include
+> @@ -51,6 +51,7 @@ docker-image-%: $(DOCKER_FILES_DIR)/%.docker
+>  		$(SRC_PATH)/tests/docker/docker.py build qemu:$* $< \
+>  		$(if $V,,--quiet) $(if $(NOCACHE),--no-cache) \
+>  		$(if $(NOUSER),,--add-current-user) \
+> +		$(if $(EXTRA_FILES),--extra-files $(EXTRA_FILES))\
+>  		$(if $(EXECUTABLE),--include-executable=$(EXECUTABLE)),\
+>  		"BUILD","$*")
 >
-> The index can never be 0 in system mode actually, but you're right that this
-> check doesn't make sense.
+> @@ -107,6 +108,8 @@ docker:
+>  	@echo '    NOUSER               Define to disable adding current user to containers passwd.'
+>  	@echo '    NOCACHE=1            Ignore cache when build images.'
+>  	@echo '    EXECUTABLE=<path>    Include executable in image.'
+> +	@echo '    EXTRA_FILES="<path> [... <path>]"'
+> +	@echo '                         Include extra files in image.'
 >
-> The code still looks a bit convoluted IMHO. What about something like the
-> following ?
+>  # This rule if for directly running against an arbitrary docker target.
+>  # It is called by the expanded docker targets (e.g. make
+> diff --git a/tests/docker/docker.py b/tests/docker/docker.py
+> index 6ddc6e4c2a..5401e58fce 100755
+> --- a/tests/docker/docker.py
+> +++ b/tests/docker/docker.py
+> @@ -237,6 +237,10 @@ class BuildCommand(SubCommand):
+>                              help="""Specify a binary that will be copied to the
+>                              container together with all its dependent
+>                              libraries""")
+> +        parser.add_argument("--extra-files", "-f", nargs='*',
+> +                            help="""Specify files that will be copied in the
+> +                            Docker image, fulfilling the ADD directive from the
+> +                            Dockerfile""")
+>          parser.add_argument("--add-current-user", "-u", dest="user",
+>                              action="store_true",
+>                              help="Add the current user to image's passwd")
+> @@ -270,10 +274,11 @@ class BuildCommand(SubCommand):
+>                      print "%s exited with code %d" % (docker_pre, rc)
+>                      return 1
 >
->             /* 0 means any thread, so we pick the first valid CPU */
->             cpu = tmp ? find_cpu(tmp) : first_cpu;
->
->             /* invalid CPU/thread specified */
->             if (!cpu) {
->                 res = -EINVAL;
->                 goto out;
->             }
+> -            # Do we include a extra binary?
+> +            # Include files used by ADD directives found within the
+> Dockerfile.
 
-Yeah that will make it cleaner, I'll apply to v2.
+Minor nit, as we are not actually parsing the Dockerfile here maybe it
+should be re-worded to something like:
 
+  "Copy any extra files into the Docker context. These can be included by the use
+    of the ADD directive in the Dockerfile."?
+
+Anyway:
+
+Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
+
+
+>              if args.include_executable:
+> -                _copy_binary_with_libs(args.include_executable,
+> -                                       docker_dir)
+> +                _copy_binary_with_libs(args.include_executable, docker_dir)
+> +            for filename in args.extra_files or []:
+> +                _copy_with_mkdir(filename, docker_dir)
 >
-> Anyway, the fix looks ok.
->
-> Reviewed-by: Greg Kurz <groug@kaod.org>
->
->> bailing out just test if we have managed to match up thread-id to a
->> CPU.
->>
->> Otherwise you get:
->>   gdb_handle_packet: command='vCont;C04:0;c'
->>   put_packet: reply='E22'
->>
->> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
->> ---
->>  gdbstub.c | 4 ++--
->>  1 file changed, 2 insertions(+), 2 deletions(-)
->>
->> diff --git a/gdbstub.c b/gdbstub.c
->> index a249846954..29c9ed3002 100644
->> --- a/gdbstub.c
->> +++ b/gdbstub.c
->> @@ -934,8 +934,8 @@ static int gdb_handle_vcont(GDBState *s, const char *p)
->>               * CPU first, and only then we can use its index.
->>               */
->>              cpu = find_cpu(idx);
->> -            /* invalid CPU/thread specified */
->> -            if (!idx || !cpu) {
->> +            /* invalid thread specified, cpu not found. */
->> +            if (!cpu) {
->>                  res = -EINVAL;
->>                  goto out;
->>              }
+>              argv += ["--build-arg=" + k.lower() + "=" + v
+>                          for k, v in os.environ.iteritems()
 
 
 --
