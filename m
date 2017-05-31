@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36851)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36853)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <riku.voipio@linaro.org>) id 1dG3Mr-0007gq-RQ
+	(envelope-from <riku.voipio@linaro.org>) id 1dG3Mr-0007gw-SR
 	for qemu-devel@nongnu.org; Wed, 31 May 2017 09:08:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <riku.voipio@linaro.org>) id 1dG3Mp-0003g4-AC
+	(envelope-from <riku.voipio@linaro.org>) id 1dG3Mq-0003gF-UR
 	for qemu-devel@nongnu.org; Wed, 31 May 2017 09:08:53 -0400
-Received: from mail-lf0-x229.google.com ([2a00:1450:4010:c07::229]:34512)
+Received: from mail-lf0-x22b.google.com ([2a00:1450:4010:c07::22b]:34521)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <riku.voipio@linaro.org>)
-	id 1dG3Mp-0003fp-3Y
-	for qemu-devel@nongnu.org; Wed, 31 May 2017 09:08:51 -0400
-Received: by mail-lf0-x229.google.com with SMTP id 99so8623444lfu.1
-	for <qemu-devel@nongnu.org>; Wed, 31 May 2017 06:08:51 -0700 (PDT)
+	id 1dG3Mq-0003g8-NI
+	for qemu-devel@nongnu.org; Wed, 31 May 2017 09:08:52 -0400
+Received: by mail-lf0-x22b.google.com with SMTP id 99so8623986lfu.1
+	for <qemu-devel@nongnu.org>; Wed, 31 May 2017 06:08:52 -0700 (PDT)
 From: riku.voipio@linaro.org
-Date: Wed, 31 May 2017 16:08:25 +0300
-Message-Id: <243e0fe5506d6b830e01d8da727ff7f20fa38502.1496234767.git.riku.voipio@linaro.org>
+Date: Wed, 31 May 2017 16:08:26 +0300
+Message-Id: <f196c3700deb6ea714228209fb2a864bbfa4b67d.1496234767.git.riku.voipio@linaro.org>
+MIME-Version: 1.0
 In-Reply-To: <cover.1496234766.git.riku.voipio@linaro.org>
 References: <cover.1496234766.git.riku.voipio@linaro.org>
-MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 13/15] linux-user: add rt_tgsigqueueinfo() strace
+Subject: [Qemu-devel] [PULL 14/15] linux-user: fix inconsistent spaces in
+ print_siginfo() output
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,59 +35,63 @@ Cc: peter.maydell@linaro.org, stefanha@redhat.com, =?UTF-8?q?Milo=C5=A1=20Stojan
 
 From: Miloš Stojanović <Milos.Stojanovic@rt-rk.com>
 
-This commit improves strace support for syscall rt_tgsigqueueinfo().
+This patch improves the consistentcy of the output from print_siginfo()
+by removing spaces around the equal sign of si_pid, si_uid, si_timer1,
+si_timer2, si_band, si_fd, si_addr, si_status and si_sigval. This way
+they match si_signo and ci_code. Host strace was used as a reference
+for this chage.
 
 Prior to this commit, typical strace output used to look like this:
-7775 rt_tgsigqueueinfo(7775,7775,50,1996483164,0,0) = 0
 
-After this commit, it looks like this:
-7775 rt_tgsigqueueinfo(7775,7775,50,0x76ffea5c) = 0
-
-Signed-off-by: Miloš Stojanović <Milos.Stojanovic@rt-rk.com>
 Signed-off-by: Riku Voipio <riku.voipio@linaro.org>
 ---
- linux-user/strace.c    | 15 +++++++++++++++
- linux-user/strace.list |  2 +-
- 2 files changed, 16 insertions(+), 1 deletion(-)
+ linux-user/strace.c | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
 
 diff --git a/linux-user/strace.c b/linux-user/strace.c
-index f6f76a5bd4..779cda1a5e 100644
+index 779cda1a5e..5fbe067fd5 100644
 --- a/linux-user/strace.c
 +++ b/linux-user/strace.c
-@@ -1915,6 +1915,21 @@ print_rt_sigqueueinfo(const struct syscallname *name,
- }
- #endif
+@@ -206,26 +206,26 @@ static void print_siginfo(const target_siginfo_t *tinfo)
  
-+#ifdef TARGET_NR_rt_tgsigqueueinfo
-+static void
-+print_rt_tgsigqueueinfo(const struct syscallname *name,
-+    abi_long arg0, abi_long arg1, abi_long arg2,
-+    abi_long arg3, abi_long arg4, abi_long arg5)
-+{
-+    print_syscall_prologue(name);
-+    print_raw_param("%d", arg0, 0);
-+    print_raw_param("%d", arg1, 0);
-+    print_signal(arg2, 0);
-+    print_pointer(arg3, 1);
-+    print_syscall_epilogue(name);
-+}
-+#endif
-+
- #ifdef TARGET_NR_syslog
- static void
- print_syslog_action(abi_ulong arg, int last)
-diff --git a/linux-user/strace.list b/linux-user/strace.list
-index 373d43689a..a91e33f7e5 100644
---- a/linux-user/strace.list
-+++ b/linux-user/strace.list
-@@ -1167,7 +1167,7 @@
- { TARGET_NR_rt_sigtimedwait, "rt_sigtimedwait" , NULL, NULL, NULL },
- #endif
- #ifdef TARGET_NR_rt_tgsigqueueinfo
--{ TARGET_NR_rt_tgsigqueueinfo, "rt_tgsigqueueinfo" , NULL, NULL, NULL },
-+{ TARGET_NR_rt_tgsigqueueinfo, "rt_tgsigqueueinfo" , NULL, print_rt_tgsigqueueinfo, NULL },
- #endif
- #ifdef TARGET_NR_sched_getaffinity
- { TARGET_NR_sched_getaffinity, "sched_getaffinity" , NULL, NULL, NULL },
+     switch (si_type) {
+     case QEMU_SI_KILL:
+-        gemu_log(", si_pid = %u, si_uid = %u",
++        gemu_log(", si_pid=%u, si_uid=%u",
+                  (unsigned int)tinfo->_sifields._kill._pid,
+                  (unsigned int)tinfo->_sifields._kill._uid);
+         break;
+     case QEMU_SI_TIMER:
+-        gemu_log(", si_timer1 = %u, si_timer2 = %u",
++        gemu_log(", si_timer1=%u, si_timer2=%u",
+                  tinfo->_sifields._timer._timer1,
+                  tinfo->_sifields._timer._timer2);
+         break;
+     case QEMU_SI_POLL:
+-        gemu_log(", si_band = %d, si_fd = %d",
++        gemu_log(", si_band=%d, si_fd=%d",
+                  tinfo->_sifields._sigpoll._band,
+                  tinfo->_sifields._sigpoll._fd);
+         break;
+     case QEMU_SI_FAULT:
+-        gemu_log(", si_addr = ");
++        gemu_log(", si_addr=");
+         print_pointer(tinfo->_sifields._sigfault._addr, 1);
+         break;
+     case QEMU_SI_CHLD:
+-        gemu_log(", si_pid = %u, si_uid = %u, si_status = %d"
++        gemu_log(", si_pid=%u, si_uid=%u, si_status=%d"
+                  ", si_utime=" TARGET_ABI_FMT_ld
+                  ", si_stime=" TARGET_ABI_FMT_ld,
+                  (unsigned int)(tinfo->_sifields._sigchld._pid),
+@@ -235,7 +235,7 @@ static void print_siginfo(const target_siginfo_t *tinfo)
+                  tinfo->_sifields._sigchld._stime);
+         break;
+     case QEMU_SI_RT:
+-        gemu_log(", si_pid = %u, si_uid = %u, si_sigval = " TARGET_ABI_FMT_ld,
++        gemu_log(", si_pid=%u, si_uid=%u, si_sigval=" TARGET_ABI_FMT_ld,
+                  (unsigned int)tinfo->_sifields._rt._pid,
+                  (unsigned int)tinfo->_sifields._rt._uid,
+                  tinfo->_sifields._rt._sigval.sival_ptr);
 -- 
 2.11.0
