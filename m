@@ -1,21 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33131)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33051)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1dFzjN-0007n5-LU
-	for qemu-devel@nongnu.org; Wed, 31 May 2017 05:15:56 -0400
+	(envelope-from <quintela@redhat.com>) id 1dFzjI-0007ji-46
+	for qemu-devel@nongnu.org; Wed, 31 May 2017 05:15:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1dFzjM-0001wc-S1
-	for qemu-devel@nongnu.org; Wed, 31 May 2017 05:15:53 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:54564)
+	(envelope-from <quintela@redhat.com>) id 1dFzjF-0001qu-Kb
+	for qemu-devel@nongnu.org; Wed, 31 May 2017 05:15:48 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34306)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1dFzjM-0001wX-Ll
-	for qemu-devel@nongnu.org; Wed, 31 May 2017 05:15:52 -0400
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1dFzjF-0001qk-CV
+	for qemu-devel@nongnu.org; Wed, 31 May 2017 05:15:45 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 54D7680C07
+	for <qemu-devel@nongnu.org>; Wed, 31 May 2017 09:15:44 +0000 (UTC)
 From: Juan Quintela <quintela@redhat.com>
-Date: Wed, 31 May 2017 11:15:38 +0200
-Message-Id: <20170531091538.21626-6-quintela@redhat.com>
+Date: Wed, 31 May 2017 11:15:34 +0200
+Message-Id: <20170531091538.21626-2-quintela@redhat.com>
 In-Reply-To: <20170531091538.21626-1-quintela@redhat.com>
 References: <20170531091538.21626-1-quintela@redhat.com>
-Subject: [Qemu-devel] [PULL 5/5] migration: use dirty_rate_high_cnt more
- aggressively
+Subject: [Qemu-devel] [PULL 1/5] migration: Create savevm.h for functions
+ exported from savevm.c
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,37 +31,216 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: dgilbert@redhat.com, lvivier@redhat.com, peterx@redhat.com, Felipe Franciosi <felipe@nutanix.com>
+Cc: dgilbert@redhat.com, lvivier@redhat.com, peterx@redhat.com
 
-From: Felipe Franciosi <felipe@nutanix.com>
+This removes last trace of migration functions from sysemu/sysemu.h.
 
-The commit message from 070afca25 suggests that dirty_rate_high_cnt
-should be used more aggressively to start throttling after two
-iterations instead of four. The code, however, only changes the auto
-convergence behaviour to throttle after three iterations. This makes the
-behaviour more aggressive by kicking off throttling after two iterations
-as originally intended.
-
-Signed-off-by: Felipe Franciosi <felipe@nutanix.com>
-Reviewed-by: Peter Xu <peterx@redhat.com>
-Reviewed-by: Juan Quintela <quintela@redhat.com>
 Signed-off-by: Juan Quintela <quintela@redhat.com>
+Reviewed-by: Laurent Vivier <lvivier@redhat.com>
 ---
- migration/ram.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ include/sysemu/sysemu.h  | 47 -----------------------------------------------
+ migration/colo.c         |  1 +
+ migration/migration.c    |  1 +
+ migration/postcopy-ram.c |  1 +
+ migration/savevm.c       | 29 +++++++++++++++++++++++++----
+ migration/savevm.h       | 41 +++++++++++++++++++++++++++++++++++++++++
+ 6 files changed, 69 insertions(+), 51 deletions(-)
+ create mode 100644 migration/savevm.h
 
-diff --git a/migration/ram.c b/migration/ram.c
-index 1a3d9e6..26e03a5 100644
---- a/migration/ram.c
-+++ b/migration/ram.c
-@@ -708,7 +708,7 @@ static void migration_bitmap_sync(RAMState *rs)
+diff --git a/include/sysemu/sysemu.h b/include/sysemu/sysemu.h
+index 69046eb..723c8dc 100644
+--- a/include/sysemu/sysemu.h
++++ b/include/sysemu/sysemu.h
+@@ -97,53 +97,6 @@ int load_vmstate(const char *name, Error **errp);
  
-             if ((rs->num_dirty_pages_period * TARGET_PAGE_SIZE >
-                    (bytes_xfer_now - rs->bytes_xfer_prev) / 2) &&
--                (rs->dirty_rate_high_cnt++ >= 2)) {
-+                (++rs->dirty_rate_high_cnt >= 2)) {
-                     trace_migration_throttle();
-                     rs->dirty_rate_high_cnt = 0;
-                     mig_throttle_guest_down();
+ void qemu_announce_self(void);
+ 
+-/* Subcommands for QEMU_VM_COMMAND */
+-enum qemu_vm_cmd {
+-    MIG_CMD_INVALID = 0,   /* Must be 0 */
+-    MIG_CMD_OPEN_RETURN_PATH,  /* Tell the dest to open the Return path */
+-    MIG_CMD_PING,              /* Request a PONG on the RP */
+-
+-    MIG_CMD_POSTCOPY_ADVISE,       /* Prior to any page transfers, just
+-                                      warn we might want to do PC */
+-    MIG_CMD_POSTCOPY_LISTEN,       /* Start listening for incoming
+-                                      pages as it's running. */
+-    MIG_CMD_POSTCOPY_RUN,          /* Start execution */
+-
+-    MIG_CMD_POSTCOPY_RAM_DISCARD,  /* A list of pages to discard that
+-                                      were previously sent during
+-                                      precopy but are dirty. */
+-    MIG_CMD_PACKAGED,          /* Send a wrapped stream within this stream */
+-    MIG_CMD_MAX
+-};
+-
+-#define MAX_VM_CMD_PACKAGED_SIZE (1ul << 24)
+-
+-bool qemu_savevm_state_blocked(Error **errp);
+-void qemu_savevm_state_begin(QEMUFile *f);
+-void qemu_savevm_state_header(QEMUFile *f);
+-int qemu_savevm_state_iterate(QEMUFile *f, bool postcopy);
+-void qemu_savevm_state_cleanup(void);
+-void qemu_savevm_state_complete_postcopy(QEMUFile *f);
+-void qemu_savevm_state_complete_precopy(QEMUFile *f, bool iterable_only);
+-void qemu_savevm_state_pending(QEMUFile *f, uint64_t max_size,
+-                               uint64_t *res_non_postcopiable,
+-                               uint64_t *res_postcopiable);
+-void qemu_savevm_command_send(QEMUFile *f, enum qemu_vm_cmd command,
+-                              uint16_t len, uint8_t *data);
+-void qemu_savevm_send_ping(QEMUFile *f, uint32_t value);
+-void qemu_savevm_send_open_return_path(QEMUFile *f);
+-int qemu_savevm_send_packaged(QEMUFile *f, const uint8_t *buf, size_t len);
+-void qemu_savevm_send_postcopy_advise(QEMUFile *f);
+-void qemu_savevm_send_postcopy_listen(QEMUFile *f);
+-void qemu_savevm_send_postcopy_run(QEMUFile *f);
+-
+-void qemu_savevm_send_postcopy_ram_discard(QEMUFile *f, const char *name,
+-                                           uint16_t len,
+-                                           uint64_t *start_list,
+-                                           uint64_t *length_list);
+-
+-int qemu_loadvm_state(QEMUFile *f);
+-
+ extern int autostart;
+ 
+ typedef enum {
+diff --git a/migration/colo.c b/migration/colo.c
+index 8c13a3c..3dd1390 100644
+--- a/migration/colo.c
++++ b/migration/colo.c
+@@ -16,6 +16,7 @@
+ #include "qemu-file-channel.h"
+ #include "migration/migration.h"
+ #include "migration/qemu-file.h"
++#include "savevm.h"
+ #include "migration/colo.h"
+ #include "migration/block.h"
+ #include "io/channel-buffer.h"
+diff --git a/migration/migration.c b/migration/migration.c
+index ad29e53..7087d1a 100644
+--- a/migration/migration.c
++++ b/migration/migration.c
+@@ -19,6 +19,7 @@
+ #include "qemu/main-loop.h"
+ #include "migration/blocker.h"
+ #include "migration/migration.h"
++#include "savevm.h"
+ #include "qemu-file-channel.h"
+ #include "migration/qemu-file.h"
+ #include "migration/vmstate.h"
+diff --git a/migration/postcopy-ram.c b/migration/postcopy-ram.c
+index a37620d..3f9ae1b 100644
+--- a/migration/postcopy-ram.c
++++ b/migration/postcopy-ram.c
+@@ -22,6 +22,7 @@
+ #include "exec/target_page.h"
+ #include "migration/migration.h"
+ #include "migration/qemu-file.h"
++#include "savevm.h"
+ #include "postcopy-ram.h"
+ #include "sysemu/sysemu.h"
+ #include "sysemu/balloon.h"
+diff --git a/migration/savevm.c b/migration/savevm.c
+index a4532b6..a2d4f9c 100644
+--- a/migration/savevm.c
++++ b/migration/savevm.c
+@@ -36,6 +36,7 @@
+ #include "qemu/timer.h"
+ #include "migration/migration.h"
+ #include "qemu-file-channel.h"
++#include "savevm.h"
+ #include "postcopy-ram.h"
+ #include "qapi/qmp/qerror.h"
+ #include "qemu/error-report.h"
+@@ -63,6 +64,26 @@ const unsigned int postcopy_ram_discard_version = 0;
+ 
+ static bool skip_section_footers;
+ 
++/* Subcommands for QEMU_VM_COMMAND */
++enum qemu_vm_cmd {
++    MIG_CMD_INVALID = 0,   /* Must be 0 */
++    MIG_CMD_OPEN_RETURN_PATH,  /* Tell the dest to open the Return path */
++    MIG_CMD_PING,              /* Request a PONG on the RP */
++
++    MIG_CMD_POSTCOPY_ADVISE,       /* Prior to any page transfers, just
++                                      warn we might want to do PC */
++    MIG_CMD_POSTCOPY_LISTEN,       /* Start listening for incoming
++                                      pages as it's running. */
++    MIG_CMD_POSTCOPY_RUN,          /* Start execution */
++
++    MIG_CMD_POSTCOPY_RAM_DISCARD,  /* A list of pages to discard that
++                                      were previously sent during
++                                      precopy but are dirty. */
++    MIG_CMD_PACKAGED,          /* Send a wrapped stream within this stream */
++    MIG_CMD_MAX
++};
++
++#define MAX_VM_CMD_PACKAGED_SIZE (1ul << 24)
+ static struct mig_cmd_args {
+     ssize_t     len; /* -1 = variable */
+     const char *name;
+@@ -807,10 +828,10 @@ static void save_section_footer(QEMUFile *f, SaveStateEntry *se)
+  * @len: Length of associated data
+  * @data: Data associated with command.
+  */
+-void qemu_savevm_command_send(QEMUFile *f,
+-                              enum qemu_vm_cmd command,
+-                              uint16_t len,
+-                              uint8_t *data)
++static void qemu_savevm_command_send(QEMUFile *f,
++                                     enum qemu_vm_cmd command,
++                                     uint16_t len,
++                                     uint8_t *data)
+ {
+     trace_savevm_command_send(command, len);
+     qemu_put_byte(f, QEMU_VM_COMMAND);
+diff --git a/migration/savevm.h b/migration/savevm.h
+new file mode 100644
+index 0000000..eb44877
+--- /dev/null
++++ b/migration/savevm.h
+@@ -0,0 +1,41 @@
++/*
++ * QEMU save vm functions
++ *
++ * Copyright (c) 2003-2008 Fabrice Bellard
++ * Copyright (c) 2009-2017 Red Hat Inc
++ *
++ * Authors:
++ *  Juan Quintela <quintela@redhat.com>
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or later.
++ * See the COPYING file in the top-level directory.
++ */
++
++#ifndef MIGRATION_SAVEVM_H
++#define MIGRATION_SAVEVM_H
++
++bool qemu_savevm_state_blocked(Error **errp);
++void qemu_savevm_state_begin(QEMUFile *f);
++void qemu_savevm_state_header(QEMUFile *f);
++int qemu_savevm_state_iterate(QEMUFile *f, bool postcopy);
++void qemu_savevm_state_cleanup(void);
++void qemu_savevm_state_complete_postcopy(QEMUFile *f);
++void qemu_savevm_state_complete_precopy(QEMUFile *f, bool iterable_only);
++void qemu_savevm_state_pending(QEMUFile *f, uint64_t max_size,
++                               uint64_t *res_non_postcopiable,
++                               uint64_t *res_postcopiable);
++void qemu_savevm_send_ping(QEMUFile *f, uint32_t value);
++void qemu_savevm_send_open_return_path(QEMUFile *f);
++int qemu_savevm_send_packaged(QEMUFile *f, const uint8_t *buf, size_t len);
++void qemu_savevm_send_postcopy_advise(QEMUFile *f);
++void qemu_savevm_send_postcopy_listen(QEMUFile *f);
++void qemu_savevm_send_postcopy_run(QEMUFile *f);
++
++void qemu_savevm_send_postcopy_ram_discard(QEMUFile *f, const char *name,
++                                           uint16_t len,
++                                           uint64_t *start_list,
++                                           uint64_t *length_list);
++
++int qemu_loadvm_state(QEMUFile *f);
++
++#endif
 -- 
 2.9.4
