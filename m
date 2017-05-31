@@ -1,24 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54116)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54381)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1dG0yd-0004lX-JJ
-	for qemu-devel@nongnu.org; Wed, 31 May 2017 06:35:48 -0400
+	(envelope-from <stefanha@gmail.com>) id 1dG0zP-0005Ok-PE
+	for qemu-devel@nongnu.org; Wed, 31 May 2017 06:36:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1dG0yc-0002Aq-FP
-	for qemu-devel@nongnu.org; Wed, 31 May 2017 06:35:43 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58592)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1dG0yc-0002AU-70
-	for qemu-devel@nongnu.org; Wed, 31 May 2017 06:35:42 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 3E04237EEE
-	for <qemu-devel@nongnu.org>; Wed, 31 May 2017 10:35:41 +0000 (UTC)
-From: Peter Xu <peterx@redhat.com>
-Date: Wed, 31 May 2017 18:35:34 +0800
-Message-Id: <1496226934-29752-1-git-send-email-peterx@redhat.com>
-Subject: [Qemu-devel] [PATCH] migration: isolate return path on src
+	(envelope-from <stefanha@gmail.com>) id 1dG0zO-0002Kr-Uy
+	for qemu-devel@nongnu.org; Wed, 31 May 2017 06:36:31 -0400
+Date: Wed, 31 May 2017 11:36:21 +0100
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20170531103621.GH15666@stefanha-x1.localdomain>
+References: <20170526165518.7580-1-mreitz@redhat.com>
+	<20170526165518.7580-13-mreitz@redhat.com>
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="zq44+AAfm4giZpo5"
+Content-Disposition: inline
+In-Reply-To: <20170526165518.7580-13-mreitz@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v3 12/16] block/qcow2: Add
+ qcow2_refcount_area()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,75 +25,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Laurent Vivier <lvivier@redhat.com>, Juan Quintela <quintela@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, peterx@redhat.com
+To: Max Reitz <mreitz@redhat.com>
+Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>
 
-There are some places that binded "return path" with postcopy. Let's be
-prepared for its usage even without postcopy. This patch mainly did this
-on source side.
 
-Signed-off-by: Peter Xu <peterx@redhat.com>
----
-standalone patch isolated from the return path series. ok to be picked
-up in case one day we'll re-face the return path enablement.
-With it, we are ready on source side. The dst side change has been queued.
----
- migration/migration.c  | 11 ++++++-----
- migration/trace-events |  4 ++--
- 2 files changed, 8 insertions(+), 7 deletions(-)
+--zq44+AAfm4giZpo5
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-diff --git a/migration/migration.c b/migration/migration.c
-index ad29e53..96e549e 100644
---- a/migration/migration.c
-+++ b/migration/migration.c
-@@ -1850,13 +1850,12 @@ static void migration_completion(MigrationState *s, int current_active_state,
-      * cleaning everything else up (since if there are no failures
-      * it will wait for the destination to send it's status in
-      * a SHUT command).
--     * Postcopy opens rp if enabled (even if it's not avtivated)
-      */
--    if (migrate_postcopy_ram()) {
-+    if (s->rp_state.from_dst_file) {
-         int rp_error;
--        trace_migration_completion_postcopy_end_before_rp();
-+        trace_migration_return_path_end_before();
-         rp_error = await_return_path_close_on_source(s);
--        trace_migration_completion_postcopy_end_after_rp(rp_error);
-+        trace_migration_return_path_end_after(rp_error);
-         if (rp_error) {
-             goto fail_invalidate;
-         }
-@@ -1931,13 +1930,15 @@ static void *migration_thread(void *opaque)
- 
-     qemu_savevm_state_header(s->to_dst_file);
- 
--    if (migrate_postcopy_ram()) {
-+    if (s->to_dst_file) {
-         /* Now tell the dest that it should open its end so it can reply */
-         qemu_savevm_send_open_return_path(s->to_dst_file);
- 
-         /* And do a ping that will make stuff easier to debug */
-         qemu_savevm_send_ping(s->to_dst_file, 1);
-+    }
- 
-+    if (migrate_postcopy_ram()) {
-         /*
-          * Tell the destination that we *might* want to do postcopy later;
-          * if the other end can't do postcopy it should fail now, nice and
-diff --git a/migration/trace-events b/migration/trace-events
-index 5b8ccf3..38345be 100644
---- a/migration/trace-events
-+++ b/migration/trace-events
-@@ -88,8 +88,8 @@ migrate_send_rp_message(int msg_type, uint16_t len) "%d: len %d"
- migration_completion_file_err(void) ""
- migration_completion_postcopy_end(void) ""
- migration_completion_postcopy_end_after_complete(void) ""
--migration_completion_postcopy_end_before_rp(void) ""
--migration_completion_postcopy_end_after_rp(int rp_error) "%d"
-+migration_return_path_end_before(void) ""
-+migration_return_path_end_after(int rp_error) "%d"
- migration_thread_after_loop(void) ""
- migration_thread_file_err(void) ""
- migration_thread_setup_complete(void) ""
--- 
-2.7.4
+On Fri, May 26, 2017 at 06:55:14PM +0200, Max Reitz wrote:
+> This function creates a collection of self-describing refcount
+> structures (including a new refcount table) at the end of a qcow2 image
+> file. Optionally, these structures can also describe a number of
+> additional clusters beyond themselves; this will be important for
+> preallocated truncation, which will place the data clusters and L2
+> tables there.
+>=20
+> For now, we can use this function to replace the part of
+> alloc_refcount_block() that grows the refcount table (from which it is
+> actually derived).
+>=20
+> Signed-off-by: Max Reitz <mreitz@redhat.com>
+> ---
+>  block/qcow2.h              |   4 +
+>  block/qcow2-refcount.c     | 267 +++++++++++++++++++++++++++++++--------=
+------
+>  block/qcow2.c              |  20 +++-
+>  tests/qemu-iotests/044.out |   2 +-
+>  4 files changed, 204 insertions(+), 89 deletions(-)
+
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+
+--zq44+AAfm4giZpo5
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJZLpylAAoJEJykq7OBq3PI3AAH/jzt8Pm7AoZByWoJFoeo+wzO
+EKC3ykpI4QrrkbjquNxBM0QSVwbKI2JCWUMp1RPWSD7H4qV1xnW0EFm+abcaSMpS
+Qkk6/34D7BTcyhrBdsux/lhrpBG3C/LhzwDZ0t48FUjZ3H+V9R+qvXwdEIR/e3a9
+lFgjEX5TAK2L86eVFrJAQ9FwksCgHF8OkEr6lNJv09PcOg/5KSV9AciCYwIwg7Jq
+HMbJvcgXhYK8JWe6pO1RPwSGMa2/BwJy6MwSGNi9J2H8vXCluxgkT0R/1n92eLEC
+r01OBNpzA9ckfxg0WUbxWNj3jRqOCXppmJGGEB4Dxh3AVamX9xFgXvXbTKuExBc=
+=hbdI
+-----END PGP SIGNATURE-----
+
+--zq44+AAfm4giZpo5--
