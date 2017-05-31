@@ -1,31 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42878)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43279)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1dG3hz-00005B-31
-	for qemu-devel@nongnu.org; Wed, 31 May 2017 09:30:44 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1dG3jP-0001AH-AG
+	for qemu-devel@nongnu.org; Wed, 31 May 2017 09:32:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1dG3hv-0002LC-Pu
-	for qemu-devel@nongnu.org; Wed, 31 May 2017 09:30:43 -0400
-Received: from 19.mo5.mail-out.ovh.net ([46.105.35.78]:34941)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1dG3hv-0002KR-JV
-	for qemu-devel@nongnu.org; Wed, 31 May 2017 09:30:39 -0400
-Received: from player799.ha.ovh.net (b9.ovh.net [213.186.33.59])
-	by mo5.mail-out.ovh.net (Postfix) with ESMTP id EB458FFBAC
-	for <qemu-devel@nongnu.org>; Wed, 31 May 2017 15:30:37 +0200 (CEST)
-Date: Wed, 31 May 2017 15:30:27 +0200
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20170531153027.6133baef@bahia.lan>
-In-Reply-To: <32546ddf-a725-5dd4-95cb-75a41da8e6ec@redhat.com>
-References: <149615665491.28067.17765793725374594694.stgit@bahia.lan>
-	<e8fdae1c-9d3c-1059-509a-6b85000e83a9@de.ibm.com>
-	<20170530185618.2e875ebb@bahia.ttt.fr.ibm.com>
-	<32546ddf-a725-5dd4-95cb-75a41da8e6ec@redhat.com>
+	(envelope-from <ehabkost@redhat.com>) id 1dG3jO-0002t0-4T
+	for qemu-devel@nongnu.org; Wed, 31 May 2017 09:32:11 -0400
+Date: Wed, 31 May 2017 10:32:01 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20170531133201.GS32274@thinpad.lan.raisama.net>
+References: <1496161442-96665-1-git-send-email-imammedo@redhat.com>
+	<1496161442-96665-8-git-send-email-imammedo@redhat.com>
+	<20170530200332.GR32274@thinpad.lan.raisama.net>
+	<20170531105027.4dc177f6@nial.brq.redhat.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	boundary="Sig_/w6Qx23FL5Qi8A.0tYGi_Bgl";
-	protocol="application/pgp-signature"
-Subject: Re: [Qemu-devel] [Qemu-trivial] [PATCH] pc-bios/s390-ccw: use STRIP
- variable in Makefile
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170531105027.4dc177f6@nial.brq.redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v3 7/7] numa: cpu: calculate/set default
+ node-ids after all -numa CLI options are parsed
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,96 +26,123 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laurent Vivier <lvivier@redhat.com>
-Cc: Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cornelia.huck@de.ibm.com>, qemu-trivial@nongnu.org, Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org, Alexander Graf <agraf@suse.de>
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: Andrew Jones <drjones@redhat.com>, qemu-arm@nongnu.org, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
 
---Sig_/w6Qx23FL5Qi8A.0tYGi_Bgl
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+On Wed, May 31, 2017 at 10:50:27AM +0200, Igor Mammedov wrote:
+> On Tue, 30 May 2017 17:03:32 -0300
+> Eduardo Habkost <ehabkost@redhat.com> wrote:
+> 
+> > On Tue, May 30, 2017 at 06:24:02PM +0200, Igor Mammedov wrote:
+> [...]
+> > > diff --git a/include/hw/boards.h b/include/hw/boards.h
+> > > index 76ce021..063f329 100644
+> > > --- a/include/hw/boards.h
+> > > +++ b/include/hw/boards.h
+> > > @@ -94,6 +94,8 @@ typedef struct {
+> > >   *    Returns an array of @CPUArchId architecture-dependent CPU IDs
+> > >   *    which includes CPU IDs for present and possible to hotplug CPUs.
+> > >   *    Caller is responsible for freeing returned list.
+> > > + * @get_default_cpu_node_id:
+> > > + *    returns default board specific node_id value for CPU
+> > >   * @has_hotpluggable_cpus:
+> > >   *    If true, board supports CPUs creation with -device/device_add.
+> > >   * @minimum_page_bits:
+> > > @@ -151,6 +153,7 @@ struct MachineClass {
+> > >      CpuInstanceProperties (*cpu_index_to_instance_props)(MachineState *machine,
+> > >                                                           unsigned cpu_index);
+> > >      const CPUArchIdList *(*possible_cpu_arch_ids)(MachineState *machine);
+> > > +    int64_t (*get_default_cpu_node_id)(const MachineState *ms, int idx);  
+> > 
+> > Aren't we trying to move away from cpu_index-based CPU
+> > identification?  Shouldn't we make this get a CPUArchId argument?
+> it's not cpu-index but index in possible_cpus[],
+> it's possible to pass in CPUArchId argument and then in callbacks
+> compute it's index in possible_cpus[] but that seems
+> a bit unnecessary and would complicate callback impl.
+> 
+> Probably I should add doc comment explaining 'idx' meaning.
+> 
+> > >  };
+> > >  
+> > >  /**
+> > > diff --git a/include/sysemu/numa.h b/include/sysemu/numa.h
+> > > index 610eece..ea123ef 100644
+> > > --- a/include/sysemu/numa.h
+> > > +++ b/include/sysemu/numa.h
+> > > @@ -36,4 +36,13 @@ void numa_legacy_auto_assign_ram(MachineClass *mc, NodeInfo *nodes,
+> > >  void numa_default_auto_assign_ram(MachineClass *mc, NodeInfo *nodes,
+> > >                                    int nb_nodes, ram_addr_t size);
+> > >  void numa_cpu_pre_plug(const CPUArchId *slot, DeviceState *dev, Error **errp);
+> > > +
+> > > +static inline void assert_nb_numa_nodes_change(void)  
+> > 
+> > Can you document the purpose of this function?
+> > 
+> > > +{
+> > > +    static int saved_nb_numa_nodes;
+> > > +    assert(nb_numa_nodes);
+> > > +    assert(saved_nb_numa_nodes == 0 || saved_nb_numa_nodes == nb_numa_nodes);
+> > > +    saved_nb_numa_nodes = nb_numa_nodes;
+> > > +}
+> > > +
+> > >  #endif
+> > > diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+> > > index ce676df..74f1453 100644
+> > > --- a/hw/arm/virt.c
+> > > +++ b/hw/arm/virt.c
+> > > @@ -1553,6 +1553,13 @@ virt_cpu_index_to_props(MachineState *ms, unsigned cpu_index)
+> > >      return possible_cpus->cpus[cpu_index].props;
+> > >  }
+> > >  
+> > > +static int64_t virt_get_default_cpu_node_id(const MachineState *ms, int idx)
+> > > +{
+> > > +    assert(nb_numa_nodes);
+> > > +    assert_nb_numa_nodes_change();  
+> > 
+> > I would move this assert to common code instead of copying it to
+> > all implementations.
+> > 
+> > A machine_get_default_cpu_node_id() wrapper that calls
+> > assert_nb_numa_nodes_change() and mc->get_default_cpu_node_id()
+> > would be enough, and it wouldn't even need to be declared in a
+> > header as the only caller would be at hw/core/machine.c.
+> > 
+> > (Or, if you prefer to simply drop the assert(), I think that
+> > would be OK too.)
+> Callbacks are 'public' API and potentially could be called from anywhere.
 
-On Wed, 31 May 2017 15:15:56 +0200
-Laurent Vivier <lvivier@redhat.com> wrote:
+I don't think that's true.  Just like some struct fields aren't
+supposed to be touched by other code, a callback can be
+considered private and not supposed to be called from other code.
 
-> On 30/05/2017 18:56, Greg Kurz wrote:
-> > On Tue, 30 May 2017 18:34:46 +0200
-> > Christian Borntraeger <borntraeger@de.ibm.com> wrote:
-> >  =20
-> >> On 05/30/2017 05:04 PM, Greg Kurz wrote: =20
-> >>> The docker-run-test-build@debian-s390x-cross target fails with:
-> >>>
-> >>> strip --strip-unneeded s390-ccw.elf -o s390-ccw.img
-> >>> strip: Unable to recognise the format of the input file `s390-ccw.elf'
-> >>>
-> >>> The configure script defines a STRIP makefile variable whose default
-> >>> value is ${cross_prefix}strip. Let's use it.
-> >>>
-> >>> Signed-off-by: Greg Kurz <groug@kaod.org>
-> >>> ---
-> >>>  pc-bios/s390-ccw/Makefile |    2 +-
-> >>>  1 file changed, 1 insertion(+), 1 deletion(-)
-> >>>
-> >>> diff --git a/pc-bios/s390-ccw/Makefile b/pc-bios/s390-ccw/Makefile
-> >>> index 79a46b67356f..7af57dad109c 100644
-> >>> --- a/pc-bios/s390-ccw/Makefile
-> >>> +++ b/pc-bios/s390-ccw/Makefile
-> >>> @@ -22,7 +22,7 @@ s390-ccw.elf: $(OBJECTS)
-> >>>  	$(call quiet-command,$(CC) $(LDFLAGS) -o $@ $(OBJECTS),"BUILD","$(T=
-ARGET_DIR)$@")
-> >>>
-> >>>  s390-ccw.img: s390-ccw.elf
-> >>> -	$(call quiet-command,strip --strip-unneeded $< -o $@,"STRIP","$(TAR=
-GET_DIR)$@")
-> >>> +	$(call quiet-command,$(STRIP) --strip-unneeded $< -o $@,"STRIP","$(=
-TARGET_DIR)$@")
-> >>>
-> >>>  $(OBJECTS): Makefile
-> >>>
-> >>>    =20
-> >>
-> >> I was going to apply this, but it fails with --disable-strip like
-> >>
-> >>     /bin/sh: --strip-unneeded: command not found
-> >>     Makefile:25: recipe for target 's390-ccw.img' failed
-> >>     make[1]: *** [s390-ccw.img] Error 127
-> >>     Makefile:354: recipe for target 'romsubdir-s390-ccw' failed
-> >>     make: *** [romsubdir-s390-ccw] Error 2
-> >>
-> >> Not yet sure whats going on.
-> >> =20
-> >=20
-> > configure doesn't generate STRIP when --disable-strip or --enable-debug=
-... so
-> > I guess we shouldn't use it here, but rather generate a s390_cross_pref=
-ix like
-> > in roms/Makefile ?
-> >  =20
->=20
-> I experimented the problem when I played with docker, and fixed the
-> problem as you did (with STRIP).
->=20
-
-I've sent a v2 with a 'STRIP ?=3D strip' line to handle the issue reported
-by Christian.
-
-> But I think it's a good idea to compile s390 rom as it is done for ppc64
-> and ppc roms.
->=20
-
-Yeah, I was thinking about that too but I don't know all the ins and outs.
-
-> Laurent
+e.g.: it is invalid to call DeviceClass::realize directly outside
+device_set_realized(), or to call MachineClass::init outside
+machine_run_board_init().
 
 
---Sig_/w6Qx23FL5Qi8A.0tYGi_Bgl
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
+> Putting asserts inside of callbacks instead of the current single call site
+> should help to catch errors/wrong usage in future if callback were called
+> from elsewhere.
+> 
+> So I'd prefer to keep it where it's now or drop it altogether
+> as it's not much of use at the current call site.
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
+I think it's unnecessary complexity.  But if you insist, I won't
+mind as long as you document the purpose of
+assert_nb_numa_nodes_change() clearly.
 
-iEYEARECAAYFAlkuxXQACgkQAvw66wEB28K00wCfdjhi2dR+/3cR0iZQBmtlKBDB
-ND0Anjr+Q7vGgjXN5nOq2tHDPwEXAGur
-=Fbi9
------END PGP SIGNATURE-----
 
---Sig_/w6Qx23FL5Qi8A.0tYGi_Bgl--
+>  
+> > > +    return idx % nb_numa_nodes;
+> > > +}
+> > > +
+> > >  static const CPUArchIdList *virt_possible_cpu_arch_ids(MachineState *ms)
+> > >  {
+> > >      int n;
+> [...]
+> 
+> 
+
+-- 
+Eduardo
