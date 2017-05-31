@@ -1,30 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52267)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52295)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1dG49M-000452-UU
-	for qemu-devel@nongnu.org; Wed, 31 May 2017 09:59:03 -0400
+	(envelope-from <marcandre.lureau@redhat.com>) id 1dG49V-0004DG-Mo
+	for qemu-devel@nongnu.org; Wed, 31 May 2017 09:59:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1dG49L-00049A-PK
-	for qemu-devel@nongnu.org; Wed, 31 May 2017 09:59:00 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:40480)
+	(envelope-from <marcandre.lureau@redhat.com>) id 1dG49U-0004AV-Go
+	for qemu-devel@nongnu.org; Wed, 31 May 2017 09:59:09 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:59230)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1dG49L-00048p-Gu
-	for qemu-devel@nongnu.org; Wed, 31 May 2017 09:58:59 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
+	id 1dG49U-0004AJ-85
+	for qemu-devel@nongnu.org; Wed, 31 May 2017 09:59:08 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 787127F6A4
-	for <qemu-devel@nongnu.org>; Wed, 31 May 2017 13:58:58 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 345DA80C15
+	for <qemu-devel@nongnu.org>; Wed, 31 May 2017 13:59:07 +0000 (UTC)
 From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Wed, 31 May 2017 17:56:37 +0400
-Message-Id: <20170531135709.345-14-marcandre.lureau@redhat.com>
+Date: Wed, 31 May 2017 17:56:38 +0400
+Message-Id: <20170531135709.345-15-marcandre.lureau@redhat.com>
 In-Reply-To: <20170531135709.345-1-marcandre.lureau@redhat.com>
 References: <20170531135709.345-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v2 13/45] json: learn to parse uint64 numbers
+Subject: [Qemu-devel] [PATCH v2 14/45] qapi: update the qobject visitor to
+ use QNUM_U64
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,167 +37,173 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: armbru@redhat.com, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
-Switch strtoll() usage to qemu_strtoi64() helper while at it.
+Switch to use QNum/uint where appropriate to remove i64 limitation.
 
-Add a few tests for large numbers.
+The input visitor will cast i64 input to u64 for compatibility
+reasons (existing json QMP client already use negative i64 for large
+u64, and expect an implicit cast in qemu).
 
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 ---
- qobject/json-lexer.c  |  4 ++++
- qobject/json-parser.c | 30 ++++++++++++++++++++++++------
- tests/check-qjson.c   | 37 +++++++++++++++++++++++++++++++++++++
- 3 files changed, 65 insertions(+), 6 deletions(-)
+ hw/i386/acpi-build.c                |  3 +--
+ qapi/qobject-input-visitor.c        | 21 ++++++++++++++++-----
+ qapi/qobject-output-visitor.c       |  3 +--
+ tests/test-qobject-input-visitor.c  |  7 ++-----
+ tests/test-qobject-output-visitor.c | 28 +++++++++++++++++++++-------
+ 5 files changed, 41 insertions(+), 21 deletions(-)
 
-diff --git a/qobject/json-lexer.c b/qobject/json-lexer.c
-index af4a75e05b..980ba159d6 100644
---- a/qobject/json-lexer.c
-+++ b/qobject/json-lexer.c
-@@ -227,15 +227,18 @@ static const uint8_t json_lexer[][256] =3D  {
-     /* escape */
-     [IN_ESCAPE_LL] =3D {
-         ['d'] =3D JSON_ESCAPE,
-+        ['u'] =3D JSON_ESCAPE,
-     },
+diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
+index 1709efdf1c..ba2be1e9da 100644
+--- a/hw/i386/acpi-build.c
++++ b/hw/i386/acpi-build.c
+@@ -2634,10 +2634,9 @@ static bool acpi_get_mcfg(AcpiMcfgInfo *mcfg)
+     if (!o) {
+         return false;
+     }
+-    if (!qnum_get_int(qobject_to_qnum(o), &val)) {
++    if (!qnum_get_uint(qobject_to_qnum(o), &mcfg->mcfg_base)) {
+         g_assert_not_reached();
+     }
+-    mcfg->mcfg_base =3D val;
+     qobject_decref(o);
 =20
-     [IN_ESCAPE_L] =3D {
-         ['d'] =3D JSON_ESCAPE,
-         ['l'] =3D IN_ESCAPE_LL,
-+        ['u'] =3D JSON_ESCAPE,
-     },
-=20
-     [IN_ESCAPE_I64] =3D {
-         ['d'] =3D JSON_ESCAPE,
-+        ['u'] =3D JSON_ESCAPE,
-     },
-=20
-     [IN_ESCAPE_I6] =3D {
-@@ -251,6 +254,7 @@ static const uint8_t json_lexer[][256] =3D  {
-         ['i'] =3D JSON_ESCAPE,
-         ['p'] =3D JSON_ESCAPE,
-         ['s'] =3D JSON_ESCAPE,
-+        ['u'] =3D JSON_ESCAPE,
-         ['f'] =3D JSON_ESCAPE,
-         ['l'] =3D IN_ESCAPE_L,
-         ['I'] =3D IN_ESCAPE_I,
-diff --git a/qobject/json-parser.c b/qobject/json-parser.c
-index b90b2fb45a..62dcac8128 100644
---- a/qobject/json-parser.c
-+++ b/qobject/json-parser.c
-@@ -12,6 +12,7 @@
-  */
-=20
- #include "qemu/osdep.h"
-+#include "qemu/cutils.h"
- #include "qapi/error.h"
- #include "qemu-common.h"
- #include "qapi/qmp/types.h"
-@@ -472,6 +473,13 @@ static QObject *parse_escape(JSONParserContext *ctxt=
-, va_list *ap)
-     } else if (!strcmp(token->str, "%lld") ||
-                !strcmp(token->str, "%I64d")) {
-         return QOBJECT(qnum_from_int(va_arg(*ap, long long)));
-+    } else if (!strcmp(token->str, "%u")) {
-+        return QOBJECT(qnum_from_uint(va_arg(*ap, unsigned int)));
-+    } else if (!strcmp(token->str, "%lu")) {
-+        return QOBJECT(qnum_from_uint(va_arg(*ap, unsigned long)));
-+    } else if (!strcmp(token->str, "%llu") ||
-+               !strcmp(token->str, "%I64u")) {
-+        return QOBJECT(qnum_from_uint(va_arg(*ap, unsigned long long)));
-     } else if (!strcmp(token->str, "%s")) {
-         return QOBJECT(qstring_from_str(va_arg(*ap, const char *)));
-     } else if (!strcmp(token->str, "%f")) {
-@@ -493,20 +501,30 @@ static QObject *parse_literal(JSONParserContext *ct=
-xt)
-     case JSON_INTEGER: {
-         /*
-          * Represent JSON_INTEGER as QNUM_I64 if possible, else as
--         * QNUM_DOUBLE. Note that strtoll() fails with ERANGE when
--         * it's not possible.
-+         * QNUM_U64, else as QNUM_DOUBLE.  Note that qemu_strtoi64()
-+         * and qemu_strtou64 fail with ERANGE when it's not possible.
-          *
-          * qnum_get_int() will then work for any signed 64-bit
--         * JSON_INTEGER, and qnum_get_double both for any JSON_INTEGER
-+         * JSON_INTEGER, qnum_get_uint() for any unsigned 64-bit
-+         * integer, and qnum_get_double() both for any JSON_INTEGER
-          * and any JSON_FLOAT.
-          */
-+        int ret;
-         int64_t value;
-+        uint64_t uvalue;
-=20
--        errno =3D 0; /* strtoll doesn't set errno on success */
--        value =3D strtoll(token->str, NULL, 10);
--        if (errno !=3D ERANGE) {
-+        ret =3D qemu_strtoi64(token->str, NULL, 10, &value);
-+        if (!ret) {
-             return QOBJECT(qnum_from_int(value));
-         }
-+        assert(ret =3D=3D -ERANGE);
+     o =3D object_property_get_qobject(pci_host, PCIE_HOST_MCFG_SIZE, NUL=
+L);
+diff --git a/qapi/qobject-input-visitor.c b/qapi/qobject-input-visitor.c
+index 74835ba339..7f9d6f57a1 100644
+--- a/qapi/qobject-input-visitor.c
++++ b/qapi/qobject-input-visitor.c
+@@ -417,7 +417,6 @@ static void qobject_input_type_int64_keyval(Visitor *=
+v, const char *name,
+ static void qobject_input_type_uint64(Visitor *v, const char *name,
+                                       uint64_t *obj, Error **errp)
+ {
+-    /* FIXME: qobject_to_qnum mishandles values over INT64_MAX */
+     QObjectInputVisitor *qiv =3D to_qiv(v);
+     QObject *qobj =3D qobject_input_get_object(qiv, name, true, errp);
+     QNum *qnum;
+@@ -427,11 +426,23 @@ static void qobject_input_type_uint64(Visitor *v, c=
+onst char *name,
+         return;
+     }
+     qnum =3D qobject_to_qnum(qobj);
+-    if (!qnum || !qnum_get_int(qnum, &val)) {
+-        error_setg(errp, QERR_INVALID_PARAMETER_TYPE,
+-                   full_name(qiv, name), "integer");
++    if (!qnum) {
++        goto err;
++    }
 +
-+        if (token->str[0] !=3D '-') {
-+            ret =3D qemu_strtou64(token->str, NULL, 10, &uvalue);
-+            if (!ret) {
-+                return QOBJECT(qnum_from_uint(uvalue));
-+            }
-+        }
-         /* fall through to JSON_FLOAT */
++    if (qnum_get_uint(qnum, obj)) {
++        return;
      }
-     case JSON_FLOAT:
-diff --git a/tests/check-qjson.c b/tests/check-qjson.c
-index 8ec728a702..6fb14445a3 100644
---- a/tests/check-qjson.c
-+++ b/tests/check-qjson.c
-@@ -906,6 +906,42 @@ static void simple_number(void)
-     }
+-    *obj =3D val;
++
++    /* Need to accept negative values for backward compatibility */
++    if (qnum_get_int(qnum, &val)) {
++        *obj =3D val;
++        return;
++    }
++
++err:
++    error_setg(errp, QERR_INVALID_PARAMETER_VALUE,
++               full_name(qiv, name), "uint64");
  }
 =20
-+static void large_number(void)
-+{
-+    const char *maxu64 =3D "18446744073709551615"; /* 2^64-1 */
-+    const char *gtu64 =3D "18446744073709551616"; /* 2^64 */
-+    const char *range =3D "-9223372036854775809";
-+    QNum *qnum;
-+    QString *str;
-+    uint64_t val;
-+
-+    qnum =3D qobject_to_qnum(qobject_from_json(maxu64, &error_abort));
-+    g_assert(qnum);
-+    g_assert(qnum_get_uint(qnum, &val));
-+    g_assert_cmpuint(val, =3D=3D, 18446744073709551615U);
-+
-+    str =3D qobject_to_json(QOBJECT(qnum));
-+    g_assert_cmpstr(qstring_get_str(str), =3D=3D, maxu64);
-+    QDECREF(str);
-+    QDECREF(qnum);
-+
-+    qnum =3D qobject_to_qnum(qobject_from_json(gtu64, &error_abort));
-+    g_assert(qnum);
-+    g_assert_cmpfloat(qnum_get_double(qnum), >, 0);
-+    g_assert(!qnum_get_uint(qnum, &val));
-+
-+    str =3D qobject_to_json(QOBJECT(qnum));
-+    g_assert_cmpstr(qstring_get_str(str), =3D=3D, gtu64);
-+    QDECREF(str);
-+    QDECREF(qnum);
-+
-+    qnum =3D qobject_to_qnum(qobject_from_json(range, &error_abort));
-+    g_assert(qnum);
-+    g_assert_cmpfloat(qnum_get_double(qnum), <, 0);
-+    g_assert(!qnum_get_uint(qnum, &val));
-+    QDECREF(qnum);
-+}
-+
- static void float_number(void)
+ static void qobject_input_type_uint64_keyval(Visitor *v, const char *nam=
+e,
+diff --git a/qapi/qobject-output-visitor.c b/qapi/qobject-output-visitor.=
+c
+index 2ca5093b22..70be84ccb5 100644
+--- a/qapi/qobject-output-visitor.c
++++ b/qapi/qobject-output-visitor.c
+@@ -150,9 +150,8 @@ static void qobject_output_type_int64(Visitor *v, con=
+st char *name,
+ static void qobject_output_type_uint64(Visitor *v, const char *name,
+                                        uint64_t *obj, Error **errp)
  {
-     int i;
-@@ -1475,6 +1511,7 @@ int main(int argc, char **argv)
-     g_test_add_func("/literals/string/vararg", vararg_string);
+-    /* FIXME values larger than INT64_MAX become negative */
+     QObjectOutputVisitor *qov =3D to_qov(v);
+-    qobject_output_add(qov, name, qnum_from_int(*obj));
++    qobject_output_add(qov, name, qnum_from_uint(*obj));
+ }
 =20
-     g_test_add_func("/literals/number/simple", simple_number);
-+    g_test_add_func("/literals/number/large", large_number);
-     g_test_add_func("/literals/number/float", float_number);
-     g_test_add_func("/literals/number/vararg", vararg_number);
+ static void qobject_output_type_bool(Visitor *v, const char *name, bool =
+*obj,
+diff --git a/tests/test-qobject-input-visitor.c b/tests/test-qobject-inpu=
+t-visitor.c
+index 983c59c474..6f94fc677c 100644
+--- a/tests/test-qobject-input-visitor.c
++++ b/tests/test-qobject-input-visitor.c
+@@ -122,7 +122,6 @@ static void test_visitor_in_int(TestInputVisitorData =
+*data,
+ static void test_visitor_in_uint(TestInputVisitorData *data,
+                                 const void *unused)
+ {
+-    Error *err =3D NULL;
+     uint64_t res =3D 0;
+     int64_t i64;
+     double dbl;
+@@ -146,12 +145,10 @@ static void test_visitor_in_uint(TestInputVisitorDa=
+ta *data,
+     visit_type_uint64(v, NULL, &res, &error_abort);
+     g_assert_cmpuint(res, =3D=3D, (uint64_t)-value);
 =20
+-    /* BUG: value between INT64_MAX+1 and UINT64_MAX rejected */
+-
+     v =3D visitor_input_test_init(data, "18446744073709551574");
+=20
+-    visit_type_uint64(v, NULL, &res, &err);
+-    error_free_or_abort(&err);
++    visit_type_uint64(v, NULL, &res, &error_abort);
++    g_assert_cmpuint(res, =3D=3D, 18446744073709551574U);
+=20
+     visit_type_number(v, NULL, &dbl, &error_abort);
+ }
+diff --git a/tests/test-qobject-output-visitor.c b/tests/test-qobject-out=
+put-visitor.c
+index 3180d8cbde..d9f106d52e 100644
+--- a/tests/test-qobject-output-visitor.c
++++ b/tests/test-qobject-output-visitor.c
+@@ -602,17 +602,31 @@ static void check_native_list(QObject *qobj,
+     qlist =3D qlist_copy(qobject_to_qlist(qdict_get(qdict, "data")));
+=20
+     switch (kind) {
+-    case USER_DEF_NATIVE_LIST_UNION_KIND_S8:
+-    case USER_DEF_NATIVE_LIST_UNION_KIND_S16:
+-    case USER_DEF_NATIVE_LIST_UNION_KIND_S32:
+-    case USER_DEF_NATIVE_LIST_UNION_KIND_S64:
+     case USER_DEF_NATIVE_LIST_UNION_KIND_U8:
+     case USER_DEF_NATIVE_LIST_UNION_KIND_U16:
+     case USER_DEF_NATIVE_LIST_UNION_KIND_U32:
+     case USER_DEF_NATIVE_LIST_UNION_KIND_U64:
+-        /* all integer elements in JSON arrays get stored into QNums whe=
+n
+-         * we convert to QObjects, so we can check them all in the same
+-         * fashion, so simply fall through here
++        for (i =3D 0; i < 32; i++) {
++            QObject *tmp;
++            QNum *qvalue;
++            uint64_t val;
++
++            tmp =3D qlist_peek(qlist);
++            g_assert(tmp);
++            qvalue =3D qobject_to_qnum(tmp);
++            g_assert(qnum_get_uint(qvalue, &val));
++            g_assert_cmpuint(val, =3D=3D, i);
++            qobject_decref(qlist_pop(qlist));
++        }
++        break;
++
++    case USER_DEF_NATIVE_LIST_UNION_KIND_S8:
++    case USER_DEF_NATIVE_LIST_UNION_KIND_S16:
++    case USER_DEF_NATIVE_LIST_UNION_KIND_S32:
++    case USER_DEF_NATIVE_LIST_UNION_KIND_S64:
++        /* All signed integer elements in JSON arrays get stored into
++         * QInts when we convert to QObjects, so we can check them all
++         * in the same fashion, so simply fall through here.
+          */
+     case USER_DEF_NATIVE_LIST_UNION_KIND_INTEGER:
+         for (i =3D 0; i < 32; i++) {
 --=20
 2.13.0.91.g00982b8dd
