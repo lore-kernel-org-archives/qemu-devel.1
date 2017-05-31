@@ -1,25 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50111)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51136)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dFwkF-0005IC-1L
-	for qemu-devel@nongnu.org; Wed, 31 May 2017 02:04:36 -0400
+	(envelope-from <sjitindarsingh@gmail.com>) id 1dFwrW-0006nE-9V
+	for qemu-devel@nongnu.org; Wed, 31 May 2017 02:12:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dFwkD-00021D-Nr
-	for qemu-devel@nongnu.org; Wed, 31 May 2017 02:04:35 -0400
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <1494949133-2202-1-git-send-email-sundeep.lkml@gmail.com>
-	<1494949133-2202-6-git-send-email-sundeep.lkml@gmail.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <6c077dcf-e8a8-aae9-9023-f197007a98dc@amsat.org>
-Date: Wed, 31 May 2017 03:04:25 -0300
-MIME-Version: 1.0
-In-Reply-To: <1494949133-2202-6-git-send-email-sundeep.lkml@gmail.com>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [Qemu devel v5 PATCH 5/5] msf2: Add Emcraft's
- Smartfusion2 SOM kit.
+	(envelope-from <sjitindarsingh@gmail.com>) id 1dFwrT-0005RR-5t
+	for qemu-devel@nongnu.org; Wed, 31 May 2017 02:12:06 -0400
+Received: from mail-pf0-x241.google.com ([2607:f8b0:400e:c00::241]:34449)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <sjitindarsingh@gmail.com>)
+	id 1dFwrS-0005Qg-Uz
+	for qemu-devel@nongnu.org; Wed, 31 May 2017 02:12:03 -0400
+Received: by mail-pf0-x241.google.com with SMTP id w69so1314003pfk.1
+	for <qemu-devel@nongnu.org>; Tue, 30 May 2017 23:12:01 -0700 (PDT)
+From: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
+Date: Wed, 31 May 2017 16:11:50 +1000
+Message-Id: <20170531061150.15755-1-sjitindarsingh@gmail.com>
+Subject: [Qemu-devel] [PATCH] help: Add newline to end of thread option help
+ text
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,130 +25,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Subbaraya Sundeep <sundeep.lkml@gmail.com>, qemu-devel@nongnu.org, qemu-arm@nongnu.org
-Cc: peter.maydell@linaro.org, crosthwaite.peter@gmail.com, alistair23@gmail.com
+To: qemu-devel@nongnu.org
+Cc: sjitindarsingh@gmail.com
 
-Hi Subbaraya,
+The help text for the thread sub option of the accel option is missing
+a newline at the end. This is annoying as it makes it hard to see the
+help text for the next option.
 
-On 05/16/2017 12:38 PM, Subbaraya Sundeep wrote:
-> Emulated Emcraft's Smartfusion2 System On Module starter
-> kit.
->
-> Signed-off-by: Subbaraya Sundeep <sundeep.lkml@gmail.com>
-> ---
->  hw/arm/Makefile.objs |  1 +
->  hw/arm/msf2-som.c    | 89 ++++++++++++++++++++++++++++++++++++++++++++++++++++
->  2 files changed, 90 insertions(+)
->  create mode 100644 hw/arm/msf2-som.c
->
-> diff --git a/hw/arm/Makefile.objs b/hw/arm/Makefile.objs
-> index c828061..4b02093 100644
-> --- a/hw/arm/Makefile.objs
-> +++ b/hw/arm/Makefile.objs
-> @@ -5,6 +5,7 @@ obj-y += omap_sx1.o palm.o realview.o spitz.o stellaris.o
->  obj-y += tosa.o versatilepb.o vexpress.o virt.o xilinx_zynq.o z2.o
->  obj-$(CONFIG_ACPI) += virt-acpi-build.o
->  obj-y += netduino2.o
-> +obj-y += msf2-som.o
->  obj-y += sysbus-fdt.o
->
->  obj-y += armv7m.o exynos4210.o pxa2xx.o pxa2xx_gpio.o pxa2xx_pic.o
-> diff --git a/hw/arm/msf2-som.c b/hw/arm/msf2-som.c
-> new file mode 100644
-> index 0000000..cd2b759
-> --- /dev/null
-> +++ b/hw/arm/msf2-som.c
-> @@ -0,0 +1,89 @@
-> +/*
-> + * SmartFusion2 SOM starter kit(from Emcraft) emulation.
-> + *
-> + * Copyright (c) 2017 Subbaraya Sundeep <sundeep.lkml@gmail.com>
-> + *
-> + * Permission is hereby granted, free of charge, to any person obtaining a copy
-> + * of this software and associated documentation files (the "Software"), to deal
-> + * in the Software without restriction, including without limitation the rights
-> + * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-> + * copies of the Software, and to permit persons to whom the Software is
-> + * furnished to do so, subject to the following conditions:
-> + *
-> + * The above copyright notice and this permission notice shall be included in
-> + * all copies or substantial portions of the Software.
-> + *
-> + * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-> + * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-> + * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
-> + * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-> + * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-> + * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-> + * THE SOFTWARE.
-> + */
-> +
-> +#include "qemu/osdep.h"
-> +#include "qapi/error.h"
-> +#include "hw/boards.h"
-> +#include "hw/arm/msf2-soc.h"
-> +#include "hw/arm/arm.h"
-> +#include "exec/address-spaces.h"
-> +
-> +#define DDR_BASE_ADDRESS      0xA0000000
-> +#define DDR_SIZE              (64 * M_BYTE)
-> +
-> +static void emcraft_sf2_init(MachineState *machine)
-> +{
-> +    DeviceState *dev;
-> +    DeviceState *spi_flash;
-> +    MSF2State *soc;
-> +    DriveInfo *dinfo = drive_get_next(IF_MTD);
-> +    qemu_irq cs_line;
-> +    SSIBus *spi_bus;
-> +    MemoryRegion *sysmem = get_system_memory();
-> +    MemoryRegion *ddr = g_new(MemoryRegion, 1);
-> +
-> +    memory_region_init_ram(ddr, NULL, "ddr-ram", DDR_SIZE,
-> +                           &error_fatal);
-> +    vmstate_register_ram_global(ddr);
-> +    memory_region_add_subregion(sysmem, DDR_BASE_ADDRESS, ddr);
-> +
-> +    dev = qdev_create(NULL, TYPE_MSF2_SOC);
-> +    qdev_prop_set_string(dev, "part-name", "M2S010");
-> +    qdev_prop_set_uint64(dev, "eNVM-size", M2S010_ENVM_SIZE);
-> +    qdev_prop_set_uint64(dev, "eSRAM-size", M2S010_ESRAM_SIZE);
-> +
-> +    /*
-> +     * pclk0 and pclk1 are configurable in Libero.
-> +     * Emcraft's SoM kit comes with these settings by default.
-> +     */
-> +    qdev_prop_set_uint32(dev, "pclk0", 71 * 1000000);
-> +    qdev_prop_set_uint32(dev, "pclk1", 71 * 1000000);
-> +
-> +    object_property_set_bool(OBJECT(dev), true, "realized", &error_fatal);
-> +
-> +    soc = MSF2_SOC(dev);
-> +
-> +    /* Attach SPI flash to SPI0 controller */
-> +    spi_bus = (SSIBus *)qdev_get_child_bus(dev, "spi0");
-> +    spi_flash = ssi_create_slave_no_init(spi_bus, "s25sl12801");
-> +    qdev_prop_set_uint8(spi_flash, "spansion-cr2nv", 1);
-> +    if (dinfo) {
-> +        qdev_prop_set_drive(spi_flash, "drive", blk_by_legacy_dinfo(dinfo),
-> +                                    &error_fatal);
-> +    }
-> +    qdev_init_nofail(spi_flash);
-> +    cs_line = qdev_get_gpio_in_named(spi_flash, SSI_GPIO_CS, 0);
-> +    sysbus_connect_irq(SYS_BUS_DEVICE(&soc->spi[0]), 1, cs_line);
-> +
-> +    armv7m_load_kernel(ARM_CPU(first_cpu), machine->kernel_filename,
-> +                       soc->envm_size);
-> +}
-> +
-> +static void emcraft_sf2_machine_init(MachineClass *mc)
-> +{
-> +    mc->desc = "SmartFusion2 SOM kit from Emcraft";
-> +    mc->init = emcraft_sf2_init;
-> +}
-> +
-> +DEFINE_MACHINE("smartfusion2-som", emcraft_sf2_machine_init)
+Add the new line so that the following option help text (-smp) is
+displayed on a new line rather on the same line and directly after
+the thread help.
 
-Here I still disagree with the machine name, what do you think about 
-"emcraft-sf2" or "emcraft-m2s[-fg484-som]" as described by Emcraft in 
-their website (but shorter is easier to type)?
+Before patch:
+
+-accel [accel=]accelerator[,thread=single|multi]
+                select accelerator (kvm, xen, hax or tcg; use 'help' for a list)
+                thread=single|multi (enable multi-threaded TCG)-smp [cpus=]n[,maxcpus=cpus][,cores=cores][,threads=threads][,sockets=sockets]
+                set the number of CPUs to 'n' [default=1]
+                maxcpus= maximum number of total cpus, including
+                offline CPUs for hotplug, etc
+                cores= number of CPU cores on one socket
+                threads= number of threads on one CPU core
+                sockets= number of discrete sockets in the system
+
+After patch:
+
+-accel [accel=]accelerator[,thread=single|multi]
+                select accelerator (kvm, xen, hax or tcg; use 'help' for a list)
+                thread=single|multi (enable multi-threaded TCG)
+-smp [cpus=]n[,maxcpus=cpus][,cores=cores][,threads=threads][,sockets=sockets]
+                set the number of CPUs to 'n' [default=1]
+                maxcpus= maximum number of total cpus, including
+                offline CPUs for hotplug, etc
+                cores= number of CPU cores on one socket
+                threads= number of threads on one CPU core
+                sockets= number of discrete sockets in the system
+
+Signed-off-by: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
+---
+ qemu-options.hx | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/qemu-options.hx b/qemu-options.hx
+index a6c9b9e..8515db8 100644
+--- a/qemu-options.hx
++++ b/qemu-options.hx
+@@ -102,7 +102,7 @@ ETEXI
+ DEF("accel", HAS_ARG, QEMU_OPTION_accel,
+     "-accel [accel=]accelerator[,thread=single|multi]\n"
+     "                select accelerator (kvm, xen, hax or tcg; use 'help' for a list)\n"
+-    "                thread=single|multi (enable multi-threaded TCG)", QEMU_ARCH_ALL)
++    "                thread=single|multi (enable multi-threaded TCG)\n", QEMU_ARCH_ALL)
+ STEXI
+ @item -accel @var{name}[,prop=@var{value}[,...]]
+ @findex -accel
+-- 
+2.9.4
