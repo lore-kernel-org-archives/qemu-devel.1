@@ -1,24 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57391)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41491)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <malmeida@inf.ufsm.br>) id 1dG6vU-0000Fp-E4
-	for qemu-devel@nongnu.org; Wed, 31 May 2017 12:56:53 -0400
+	(envelope-from <bounces@canonical.com>) id 1dG9dr-0007Vc-QN
+	for qemu-devel@nongnu.org; Wed, 31 May 2017 15:50:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <malmeida@inf.ufsm.br>) id 1dG6vT-0004MW-LG
-	for qemu-devel@nongnu.org; Wed, 31 May 2017 12:56:52 -0400
-Received: from mail-vk0-x231.google.com ([2607:f8b0:400c:c05::231]:34525)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <malmeida@inf.ufsm.br>)
-	id 1dG6vT-0004KC-Er
-	for qemu-devel@nongnu.org; Wed, 31 May 2017 12:56:51 -0400
-Received: by mail-vk0-x231.google.com with SMTP id y190so11815770vkc.1
-	for <qemu-devel@nongnu.org>; Wed, 31 May 2017 09:56:45 -0700 (PDT)
+	(envelope-from <bounces@canonical.com>) id 1dG9do-00024a-Lw
+	for qemu-devel@nongnu.org; Wed, 31 May 2017 15:50:51 -0400
+Received: from indium.canonical.com ([91.189.90.7]:36563)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1dG9do-000245-GF
+	for qemu-devel@nongnu.org; Wed, 31 May 2017 15:50:48 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1dG9dl-0007DK-0y
+	for <qemu-devel@nongnu.org>; Wed, 31 May 2017 19:50:45 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 7470A2E81BD
+	for <qemu-devel@nongnu.org>; Wed, 31 May 2017 19:50:44 +0000 (UTC)
 MIME-Version: 1.0
-From: =?UTF-8?Q?Maur=C3=ADcio_Almeida?= <malmeida@inf.ufsm.br>
-Date: Wed, 31 May 2017 13:56:44 -0300
-Message-ID: <CAEB0U7P0Sk0cNQbPynrzJ5MMdQ5=zdMFnf5neWc6PjfQ1Z=Z2Q@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] Doubts about Kvm architecture
+Date: Wed, 31 May 2017 19:43:31 -0000
+From: Colin Finck <mail@colinfinck.de>
+Reply-To: Bug 1694808 <1694808@bugs.launchpad.net>
+Sender: bounces@canonical.com
+Message-Id: <149625981140.25356.9191241290348673100.malonedeb@soybean.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1694808] [NEW] Passthrough USB Host Keyboard
+ doesn't work on Q35 platform on boot-up
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,32 +36,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, kvm@vger.kernel.org
+To: qemu-devel@nongnu.org
 
-Hello Guys!
-My name is Maur=C3=ADcio, we are making a study about Kvm Paravirtualized a=
-nd
-Full virtualized at our University, we are from University Federal of Santa
-Maria.
+Public bug reported:
 
-Can you give us some papers about how the Kvm or Qemu executes the I/O Netw=
-ork
-with one emulated Device?
+Using qemu-kvm as shipped with Ubuntu 16.04, I cannot get a passed-
+through USB Host Keyboard to work at boot-up using the Q35 platform.
 
-We executed some tests using Virtio Driver and e1000 emulated driver, the
-network output of Virtio is normal and use four of the four Machine Cpu's,
-but the output of e1000 Emulated driver was too low about Virtio and It
-only used one of the four machine cpu's during the network test execution.
+My minimal example to verify this bug is the following:
 
-The Traffic of Virtio was 956 MB/s while e1000 Emulated Driver was 192
-MB/s, both using Packet size of 1518 Bytes.
+  qemu-system-x86_64 -M q35 -m 128 -cdrom mini.iso -usb -usbdevice
+host:04ca:005a -vnc :1 -display none
 
-Why when it used e1000 Emulated Driver the traffic was to low and use only
-one Cpu all the time?
-Do Qemu or Kvm Guest need some specific configuration to use all CPU's?
+Using a noname USB Keyboard with ID 04ca:005a and the Ubuntu 16.04
+NetBoot mini.iso, I can see the boot screen of the Ubuntu ISO through
+VNC, but pressing the arrow keys doesn't do anything.
 
-Do you have any paper where we can find in details if Qemu is limited to
-use one CPU when use Network Emulated Driver?
+By taking out the "-M q35" parameter, QEMU switches to the traditional
+i440FX system. The passed-through USB Host Keyboard works there, but the
+old platform is no option for me.
 
-Thank you
-Att Maur=C3=ADcio Almeida
+** Affects: qemu
+     Importance: Undecided
+         Status: New
+
+** Affects: qemu-kvm (Ubuntu)
+     Importance: Undecided
+         Status: New
+
+** Also affects: qemu-kvm (Ubuntu)
+   Importance: Undecided
+       Status: New
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1694808
+
+Title:
+  Passthrough USB Host Keyboard doesn't work on Q35 platform on boot-up
+
+Status in QEMU:
+  New
+Status in qemu-kvm package in Ubuntu:
+  New
+
+Bug description:
+  Using qemu-kvm as shipped with Ubuntu 16.04, I cannot get a passed-
+  through USB Host Keyboard to work at boot-up using the Q35 platform.
+
+  My minimal example to verify this bug is the following:
+
+    qemu-system-x86_64 -M q35 -m 128 -cdrom mini.iso -usb -usbdevice
+  host:04ca:005a -vnc :1 -display none
+
+  Using a noname USB Keyboard with ID 04ca:005a and the Ubuntu 16.04
+  NetBoot mini.iso, I can see the boot screen of the Ubuntu ISO through
+  VNC, but pressing the arrow keys doesn't do anything.
+
+  By taking out the "-M q35" parameter, QEMU switches to the traditional
+  i440FX system. The passed-through USB Host Keyboard works there, but
+  the old platform is no option for me.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1694808/+subscriptions
