@@ -1,28 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33122)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33394)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1dG5wf-0004Kx-Kr
-	for qemu-devel@nongnu.org; Wed, 31 May 2017 11:54:07 -0400
+	(envelope-from <pbutsykin@virtuozzo.com>) id 1dG5xP-0004h2-Na
+	for qemu-devel@nongnu.org; Wed, 31 May 2017 11:54:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1dG5we-00073L-C8
-	for qemu-devel@nongnu.org; Wed, 31 May 2017 11:54:01 -0400
-References: <20170503122539.282182-1-vsementsov@virtuozzo.com>
-	<20170503122539.282182-10-vsementsov@virtuozzo.com>
-	<33ce370d-939f-d02e-0177-1184ae9f4fa7@redhat.com>
-	<47488066-bd0f-834d-85d8-63d7289cb0fd@virtuozzo.com>
-	<18c4b1ad-bc30-a598-36b8-612c01b00dee@redhat.com>
-	<67feecd0-ef75-5e26-aa7c-a70b69fde0ef@virtuozzo.com>
-	<15564da8-3aa5-667a-addf-6d3617e64f67@redhat.com>
-	<ed412d3c-b675-4e6f-41d8-acca126f4b23@virtuozzo.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <2d9578e6-d61b-551f-8650-3fafee1bfe05@redhat.com>
-Date: Wed, 31 May 2017 17:53:42 +0200
+	(envelope-from <pbutsykin@virtuozzo.com>) id 1dG5xL-0007PM-R5
+	for qemu-devel@nongnu.org; Wed, 31 May 2017 11:54:47 -0400
+References: <20170531144331.30173-1-pbutsykin@virtuozzo.com>
+	<5e241222-95e1-3f7e-7fce-76e7e9a06c8c@redhat.com>
+From: Pavel Butsykin <pbutsykin@virtuozzo.com>
+Message-ID: <a3ee5a6d-b16f-c4fd-b66e-da80d06f30a9@virtuozzo.com>
+Date: Wed, 31 May 2017 18:54:33 +0300
 MIME-Version: 1.0
-In-Reply-To: <ed412d3c-b675-4e6f-41d8-acca126f4b23@virtuozzo.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="e9ProIdlUObi0PpPOxo6NATXgLvDBnfCQ"
-Subject: Re: [Qemu-devel] [PATCH 09/25] block/dirty-bitmap: add readonly
- field to BdrvDirtyBitmap
+In-Reply-To: <5e241222-95e1-3f7e-7fce-76e7e9a06c8c@redhat.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 0/2] Add reduce image for qcow2
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,159 +24,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, armbru@redhat.com, eblake@redhat.com, jsnow@redhat.com, famz@redhat.com, den@openvz.org, stefanha@redhat.com, pbonzini@redhat.com
+To: Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, mreitz@redhat.com, armbru@redhat.com
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---e9ProIdlUObi0PpPOxo6NATXgLvDBnfCQ
-From: Max Reitz <mreitz@redhat.com>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, armbru@redhat.com, eblake@redhat.com, jsnow@redhat.com,
- famz@redhat.com, den@openvz.org, stefanha@redhat.com, pbonzini@redhat.com
-Message-ID: <2d9578e6-d61b-551f-8650-3fafee1bfe05@redhat.com>
-Subject: Re: [PATCH 09/25] block/dirty-bitmap: add readonly field to
- BdrvDirtyBitmap
-References: <20170503122539.282182-1-vsementsov@virtuozzo.com>
- <20170503122539.282182-10-vsementsov@virtuozzo.com>
- <33ce370d-939f-d02e-0177-1184ae9f4fa7@redhat.com>
- <47488066-bd0f-834d-85d8-63d7289cb0fd@virtuozzo.com>
- <18c4b1ad-bc30-a598-36b8-612c01b00dee@redhat.com>
- <67feecd0-ef75-5e26-aa7c-a70b69fde0ef@virtuozzo.com>
- <15564da8-3aa5-667a-addf-6d3617e64f67@redhat.com>
- <ed412d3c-b675-4e6f-41d8-acca126f4b23@virtuozzo.com>
-In-Reply-To: <ed412d3c-b675-4e6f-41d8-acca126f4b23@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 2017-05-31 17:05, Vladimir Sementsov-Ogievskiy wrote:
-> 31.05.2017 17:44, Max Reitz wrote:
->> On 2017-05-31 16:29, Vladimir Sementsov-Ogievskiy wrote:
->>> 31.05.2017 16:43, Max Reitz wrote:
->>>> On 2017-05-30 08:50, Vladimir Sementsov-Ogievskiy wrote:
->>>>> Thank you for this scenario. Hmm.
->>>>>
->>>>> So, as I need guarantee that image and bitmap are unchanged,
->>>>> bdrv_set_dirty should return error and fail the whole write. Ok?
->>>> I don't know. That would mean that you couldn't commit to an image t=
-hat
->>>> has a persistent auto-loading bitmap, which doesn't seem very nice
->>>> to me.
->>>>
->>>> I'm not quite sure what to do myself. So first I'd definitely want t=
-he
->>>> commit operation to succeed. That means we'd have to automatically m=
-ake
->>>> the bitmap non-readonly once we write to it. The "readonly" flag wou=
-ld
->>>> then be an "unchanged" flag, rather, to signify that the bitmap has =
-not
->>>> been changed since it was loaded, which means that it does not need =
-to
->>>> be written back to the image file.
->>>>
->>>> Now the issue remains that if you modify a persistent bitmap that is=
-
->>>> stored in an image file that is opened RO when it's closed, you
->>>> won't be
->>>> able to write the modifications back.
->>>>
->>>> So in addition, I guess we'd need to "flush" all persistent bitmaps
->>>> (that is, write all modifications back to the file and set the
->>>> "unchanged" flag (you could also call it "dirty" and then mean the
->>>> opposite) for each bitmap) not only when the image is closed or
->>>> invalidated, but also when it is reopened read-only.
->>>>
->>>> (block-commit reopens the backing BDS R/W, then writes to them, thus=
-
->>>> modifying the dirty bitmaps, and finally reopens the BDS as read-onl=
-y;
->>>> before that happens, we will have to flush the modified bitmap data.=
-)
->>> Ok, understand.
->>>
->>> We need to consider also setting in_use flag in the image. We _must n=
-ot_
->>> write to image with dirty bitmap,
->>> if in_use flag of this dirty bitmap is not set, as in case of somethi=
-ng
->>> fail we will have image with wrong bitmap with
->>> unset in_use flag (which looks ok).
->> Right.
+On 31.05.2017 18:03, Eric Blake wrote:
+> On 05/31/2017 09:43 AM, Pavel Butsykin wrote:
+>> This patch adds the reduction of the image file for qcow2. As a result, this
+>> allows us to reduce the virtual image size and free up space on the disk without
+>> copying the image. Image can be fragmented and reduction is done by punching
+>> holes in the image file.
 >>
->>> I see two ways to handle it:
->>>
->>> variant 1:
->>> 1. readonly field stays as is (see v19, with normal errors, not only
->>> asserts)
->>> 2. immediately after reopening r/w we do "reopening bitmaps r/w", i.e=
-=2E
->>> set in_use in the image and set BdrvDirtyBitmap.readonly =3D false
->>> 3. in reopen_prepare, if reopening r-o do "reopening bitmaps r-o", i.=
-e.
->>> save them into the image and set BdrvDirtyBitmap.readonly =3D true
->> Sounds good, yes.
+>> # ./qemu-img create -f qcow2 -o size=4G image.qcow2
+>> Formatting 'image.qcow2', fmt=qcow2 size=4294967296 encryption=off cluster_size=65536 lazy_refcounts=off refcount_bits=16
 >>
->>> variant 2:
->>> 1. instead of 'readonly' add 'dirty' field, set dirty to 0 for all
->>> bitmaps on create
->>> 2. before write/discard check this field in all related bitmaps, and =
-if
->>> dirty=3D0 (and persistent=3D1), write IN_USE flag into the image firs=
-t, set
->>> dirty=3D1, and only then do write. (if writing IN_USE=3D1 failed, fai=
-l the
->>> whole write)
->>> 3. in reopen_prepare, if reopening r-o do "reopening bitmaps r-o", i.=
-e.
->>> save them into the image and set BdrvDirtyBitmap.dirty =3D 0
->> Works, too.
->>
->> I think the second variant would the more "efficient" way (because you=
+>> # ./qemu-io -c "write -P 0x22 0 1G" image.qcow2
+> 
+> So this is 1G of guest-visible data...
+> 
+>> # ./qemu-img resize image.qcow2 128M
+>> Image resized.
+> 
+> ...and you are truncating the image by throwing away guest-visible
+> content, with no warning or double-checking (such as requiring a -f
+> force parameter or something) about the data loss.  Shrinking images is
+> something we should allow, but it feels like is a rare enough operation
+> that you don't want it to be casually easy to throw away data.
 
->> only have to flush out dirty dirty bitmaps), but the first one would b=
-e
->> simpler and has the great advantage of not requiring a write to the
->> image file when you just want to set a bit in the in-memory dirty
->> bitmap. So I'd personally go for the first variant.
->=20
-> Hmm, why not requiring? Both 1 and 2 do write in_use=3D1, but (1) do th=
-is
-> on open/reopen, and (2) before the first write to the image.
+It is assumed that the user has already made a preparatory with the
+image:
+1. freeing space at the end of the image
+2. reducing the last partition on the disk
+3. rebuilding fs
+Only after these steps, the user can reduce the image by qemu-img.
 
-Oh, I didn't read the "before write/discard". Yes, if you check it
-before writing, then you won't have to set the flag through
-bdrv_set_dirty().
+I think it's not so rare case, sometimes people run out of disk space 
+and this is another way to solve the problem (along with the use of
+trim).
 
-> "set a bit in the in-memory..." - are you saying about not-persistent
-> dirty bitmaps? In this case, of course, nothing should be written into
-> the image, just set dirty=3D1.
+We already have all the interfaces, left them only to support :)
 
-No, I did mean persistent bitmaps, but bdrv_set_dirty() just sets the
-bit in main memory, of course. It only gets written to the image later
-(on reopen/close/invalidate).
+> Is it feasible to require that a shrink operation will not be performed
+> unless all clusters being eliminated have been previously discarded (or
+> maybe written to zero), as an assurance that the guest did not care
+> about the tail of the image?
+> 
 
-Well, your choice. I think both will work. :-)
+Yes.
 
-Max
+# ./qemu-img create -f qcow2 -o size=4G image.qcow2
 
+# ./qemu-io -c "write -P 0x22 0 1G" image.qcow2
+# ./qemu-io -c "write -P 0x22 1G 1G" image.qcow2
 
---e9ProIdlUObi0PpPOxo6NATXgLvDBnfCQ
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+# qemu-img map ./image.qcow2
+Offset          Length          Mapped to       File
+0               0x20000000      0x50000         ./image.qcow2
+0x20000000      0x20000000      0x20060000      ./image.qcow2
+0x40000000      0x20000000      0x40070000      ./image.qcow2
+0x60000000      0x20000000      0x60080000      ./image.qcow2
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
+# ./qemu-io -c "discard 1G 1G" ./image.qcow2
 
-iQEvBAEBCAAZBQJZLucGEhxtcmVpdHpAcmVkaGF0LmNvbQAKCRD0B9sAYdXPQFQA
-B/0RczQN5cWSIJxLegLOl5yVqmcsN98rQv3XxOmqPj6x/94GZKMoXg5RrmVq3BxT
-fH1huWmJWVomM88MyVAIXRKe4HNSVhy3D4nrXijXtU+vBaj5ZgAx+GOGTV68KqYS
-jspWvFk73iIkCE35OpKA7MMPHKQbCT2iTuv5RUkptpyx2EzbGawFx94cZbgwwJ91
-y7yhm+ofa8X8Vde8MA2RD7GDosjYsK7JVKSyN5UVkBtPF04OWvAnA5+8p7YLKzNA
-AYPJ3dI5KAQm2Pt72dBYVn7hqDpTf5ECRnWI6EyXtih7ua5H/aU45KCYmGPSSwEj
-wpMs9HVP3IJBF6lm6IkyFJDE
-=TnbO
------END PGP SIGNATURE-----
-
---e9ProIdlUObi0PpPOxo6NATXgLvDBnfCQ--
+# qemu-img map ./image.qcow2
+Offset          Length          Mapped to       File0 
+0x20000000      0x50000         ./image.qcow2
+0x20000000      0x20000000      0x20060000      ./image.qcow2
