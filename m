@@ -1,21 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60012)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60479)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1dFxjl-0007Z1-Jh
-	for qemu-devel@nongnu.org; Wed, 31 May 2017 03:08:10 -0400
+	(envelope-from <lvivier@redhat.com>) id 1dFxnf-0000Yd-6I
+	for qemu-devel@nongnu.org; Wed, 31 May 2017 03:12:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1dFxjk-0005OY-Ck
-	for qemu-devel@nongnu.org; Wed, 31 May 2017 03:08:09 -0400
-References: <1494697399-352-1-git-send-email-eric.auger@redhat.com>
-	<1494697399-352-3-git-send-email-eric.auger@redhat.com>
-	<CAFEAcA9P=k88CFwUHeAg=oxsDpY72OTUc=+iyffM9dP5=tzRKg@mail.gmail.com>
-From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <fb9d6e76-2681-76cc-1f99-c70d5cfbcebf@redhat.com>
-Date: Wed, 31 May 2017 09:07:57 +0200
+	(envelope-from <lvivier@redhat.com>) id 1dFxna-0005oa-4u
+	for qemu-devel@nongnu.org; Wed, 31 May 2017 03:12:11 -0400
+References: <20170530160445.12810-1-lvivier@redhat.com>
+	<20170531043557.GI12163@umbus.fritz.box>
+From: Laurent Vivier <lvivier@redhat.com>
+Message-ID: <733c46f8-80f9-6c8d-d2c8-c2086b26a0f3@redhat.com>
+Date: Wed, 31 May 2017 09:12:02 +0200
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA9P=k88CFwUHeAg=oxsDpY72OTUc=+iyffM9dP5=tzRKg@mail.gmail.com>
+In-Reply-To: <20170531043557.GI12163@umbus.fritz.box>
 Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC v4 2/5] hw/arm/smmuv3: smmuv3 emulation model
+Subject: Re: [Qemu-devel] [PATCH] spapr: manage hotplugged devices while the
+ VM is not started
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,77 +25,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: eric.auger.pro@gmail.com, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, prem.mallappa@gmail.com, Andrew Jones <drjones@redhat.com>, Christoffer Dall <christoffer.dall@linaro.org>, Radha.Chintakuntla@cavium.com, Sunil.Goutham@cavium.com, Radha Mohan <mohun106@gmail.com>, Trey Cain <tcain@qti.qualcomm.com>
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: Thomas Huth <thuth@redhat.com>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 
-Hi Peter,
-On 30/05/2017 18:01, Peter Maydell wrote:
-> On 13 May 2017 at 18:43, Eric Auger <eric.auger@redhat.com> wrote:
->> From: Prem Mallappa <prem.mallappa@broadcom.com>
+On 31/05/2017 06:35, David Gibson wrote:
+> On Tue, May 30, 2017 at 06:04:45PM +0200, Laurent Vivier wrote:
+>> For QEMU, a hotlugged device is a device added using the HMP/QMP
+>> interface.
+>> For SPAPR, a hotplugged device is a device added while the
+>> machine is running. In this case QEMU doesn't update internal
+>> state but relies on the OS for this part
 >>
->> Introduces the SMMUv3 derived model. This is based on
->> System MMUv3 specification (v17).
+>> In the case of migration, when we (libvirt) hotplug a device
+>> on the source guest, we (libvirt) generally hotplug the same
+>> device on the destination guest. But in this case, the machine
+>> is stopped (RUN_STATE_INMIGRATE) and QEMU must not expect
+>> the OS will manage it as an hotplugged device as it will
+>> be "imported" by the migration.
 >>
->> Signed-off-by: Prem Mallappa <prem.mallappa@broadcom.com>
->> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+>> This patch changes the meaning of "hotplugged" in spapr.c
+>> to manage a QEMU hotplugged device like a "coldplugged" one
+>> when the machine is awaiting an incoming migration.
 >>
->> ---
->> v3 -> v4
->> - smmu_irq_update
->> - fix hash key allocation
->> - set smmu_iommu_ops
->> - set SMMU_REG_CR0,
->> - smmuv3_translate: ret.perm not set in bypass mode
->> - use trace events
->> - renamed STM2U64 into L1STD_L2PTR and STMSPAN into L1STD_SPAN
->> - rework smmu_find_ste
->> - fix tg2granule in TT0/0b10 corresponds to 16kB
->>
->> v2 -> v3:
->> - move creation of include/hw/arm/smmuv3.h to this patch to fix compil issue
->> - compilation allowed
->> - fix sbus allocation in smmu_init_pci_iommu
->> - restructure code into headers
->> - misc cleanups
->> ---
->>  hw/arm/Makefile.objs     |    2 +-
->>  hw/arm/smmuv3-internal.h |  603 ++++++++++++++++++++++++
->>  hw/arm/smmuv3.c          | 1134 ++++++++++++++++++++++++++++++++++++++++++++++
->>  hw/arm/trace-events      |   32 ++
->>  include/hw/arm/smmuv3.h  |   87 ++++
->>  5 files changed, 1857 insertions(+), 1 deletion(-)
->>  create mode 100644 hw/arm/smmuv3-internal.h
->>  create mode 100644 hw/arm/smmuv3.c
->>  create mode 100644 include/hw/arm/smmuv3.h
+>> Signed-off-by: Laurent Vivier <lvivier@redhat.com>
 > 
-> This is a bit of a big patch for review for my taste -- are
-> there some easy splits into multiple patches possible?
+> So, I think this is a reasonable concept, at least in terms of
+> cleanliness and not doing unnecessary work.  However, if it's fixing
+> bugs, I suspect that means we still have problems elsewhere.
+> 
+> Specifically, what is it we're doing before the incoming migration
+> that's breaking things.  Even if it's unnecessary, anything done there
+> should be overwritten by the incoming stream.  That should certainly
+> be the case (now) for the DRC state variables.  Maybe not for the
+> queued hotplug events - but that means we should update the queue
+> migration to make sure we clear anything existing on the destination
+> before adding migrated events.
+> 
+> I'm also concerned by the fact that this makes changes for memory and
+> cpu hotplug, but not for PCI devices.  Why aren't they also affected
+> by this problem?
 
-Yes I fully understand. I will try to split it to ease the review. Maybe
-I first need to reach a decent level of functionality first and then
-split it.
-> 
->> +typedef struct SMMUQueue {
->> +     hwaddr base;
->> +     uint32_t prod;
->> +     uint32_t cons;
->> +     union {
->> +          struct {
->> +               uint8_t prod:1;
->> +               uint8_t cons:1;
->> +          };
->> +          uint8_t unused;
->> +     } wrap;
-> 
-> Use of bitfields here seems a bit odd but I haven't
-> looked at the code really.
+There are some specific tests for PCI that change the behavior.
 
-OK. I will further look at this part.
+For instance, see hw/ppc/spapr_drc.c,
 
-Thanks
+set_allocation_state()
 
-Eric
+151     if (drc->type != SPAPR_DR_CONNECTOR_TYPE_PCI) {
+152         drc->allocation_state = state;
+153         if (drc->awaiting_release &&
+154             drc->allocation_state == SPAPR_DR_ALLOCATION_STATE_UNUSABLE) {
+155             trace_spapr_drc_set_allocation_state_finalizing(get_index(drc));
+156             drck->detach(drc, DEVICE(drc->dev), drc->detach_cb,
+157                          drc->detach_cb_opaque, NULL);
+158         } else if (drc->allocation_state == SPAPR_DR_ALLOCATION_STATE_USABLE) {
+159             drc->awaiting_allocation = false;
+160         }
+161     }
+
+attach():
+
+394     drc->signalled = (drc->type != SPAPR_DR_CONNECTOR_TYPE_PCI)
+395                      ? true : coldplug;
+396 
+397     if (drc->type != SPAPR_DR_CONNECTOR_TYPE_PCI) {
+398         drc->awaiting_allocation = true;
+399     }
+400 
+
+detach()
+
+442     if (drc->type != SPAPR_DR_CONNECTOR_TYPE_PCI &&
+443         drc->allocation_state != SPAPR_DR_ALLOCATION_STATE_UNUSABLE) {
+444         trace_spapr_drc_awaiting_unusable(get_index(drc));
+445         drc->awaiting_release = true;
+446         return;
+447     }
+
+and more...
+
 > 
-> thanks
-> -- PMM
-> 
+> One nit in the implementation, see below:
+
+I agree, will fix.
+
+Thanks,
+Laurent
