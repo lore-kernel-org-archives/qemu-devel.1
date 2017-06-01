@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35795)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37693)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1dGGEQ-0001n8-I1
-	for qemu-devel@nongnu.org; Wed, 31 May 2017 22:53:06 -0400
+	(envelope-from <peterx@redhat.com>) id 1dGGLI-0003v8-2N
+	for qemu-devel@nongnu.org; Wed, 31 May 2017 23:00:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1dGGEN-00041L-F2
-	for qemu-devel@nongnu.org; Wed, 31 May 2017 22:53:02 -0400
-Received: from [59.151.112.132] (port=38895 helo=heian.cn.fujitsu.com)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1dGGEN-0003yM-2r
-	for qemu-devel@nongnu.org; Wed, 31 May 2017 22:52:59 -0400
-References: <20170531070438.14081-1-maozy.fnst@cn.fujitsu.com>
-	<87o9u9cmif.fsf@dusky.pond.sub.org>
-From: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
-Message-ID: <67ee539b-1298-635f-cde5-e06397795813@cn.fujitsu.com>
-Date: Thu, 1 Jun 2017 10:51:32 +0800
-MIME-Version: 1.0
-In-Reply-To: <87o9u9cmif.fsf@dusky.pond.sub.org>
-Content-Type: text/plain; charset="windows-1252"; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] pci: Fix unreasonable return value check
+	(envelope-from <peterx@redhat.com>) id 1dGGLF-0001eT-1q
+	for qemu-devel@nongnu.org; Wed, 31 May 2017 23:00:08 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40124)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1dGGLE-0001dP-QL
+	for qemu-devel@nongnu.org; Wed, 31 May 2017 23:00:04 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 97370C056827
+	for <qemu-devel@nongnu.org>; Thu,  1 Jun 2017 03:00:03 +0000 (UTC)
+From: Peter Xu <peterx@redhat.com>
+Date: Thu,  1 Jun 2017 10:59:54 +0800
+Message-Id: <1496285994-5390-1-git-send-email-peterx@redhat.com>
+Subject: [Qemu-devel] [PATCH v2] migration: isolate return path on src
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,85 +27,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: qemu-devel@nongnu.org, marcel@redhat.com, mst@redhat.com
+To: qemu-devel@nongnu.org
+Cc: Laurent Vivier <lvivier@redhat.com>, Juan Quintela <quintela@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, peterx@redhat.com
 
-Hi, Markus
+There are some places that binded "return path" with postcopy. Let's be
+prepared for its usage even without postcopy. This patch mainly did this
+on source side.
 
-On 05/31/2017 07:07 PM, Markus Armbruster wrote:
-> This is cleanup, not a bug fix, so:
->
->     pci: Clean up error checking in pci_add_capability()
->
-> Mao Zhongyi <maozy.fnst@cn.fujitsu.com> writes:
->
->> The return value of pci_add_capability2() is only 2 cases, positive
->> on success, nagetive on failure and set error message to Error. In
->
-> negative
->
->> other worlds, If Error is filled, the return value must be nagetive.
->
-> words, if
->
->> There is no case where errp is set but the return value is a positive.
->> But pci_add_capability() does. So the return value check is illogical.
->
-> pci_add_capability2() could use a function comment explaining its return
-> value.  Not this patch's job.
->
+Signed-off-by: Peter Xu <peterx@redhat.com>
+---
+v2
+- s/s->to_dst_file/s->rp_state.from_dst_file/, also add some comment for
+  it [Dave]
+---
+ migration/migration.c  | 15 ++++++++++-----
+ migration/trace-events |  4 ++--
+ 2 files changed, 12 insertions(+), 7 deletions(-)
 
-Thanks, will make a separated patch to explain it.
-
->> Meanwhile, all other callers of pci_add_capability2() do the same
->> check as this patch. So fix it.
->
-> Suggest:
->
->     pci: Clean up error checking in pci_add_capability()
->
->   On success, pci_add_capability2() returns a positive value.  On
->   failure, it sets an error and returns a negative value.
->
->   pci_add_capability() laboriously checks this behavior.  No other
->   caller does.  Drop the checks from pci_add_capability().
-
-Thanks for your perfect suggestion.
-
->
->> Signed-off-by: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
->> ---
->>  hw/pci/pci.c | 6 +-----
->>  1 file changed, 1 insertion(+), 5 deletions(-)
->>
->> diff --git a/hw/pci/pci.c b/hw/pci/pci.c
->> index 259483b..1faf060 100644
->> --- a/hw/pci/pci.c
->> +++ b/hw/pci/pci.c
->> @@ -2269,12 +2269,8 @@ int pci_add_capability(PCIDevice *pdev, uint8_t cap_id,
->>      Error *local_err = NULL;
->>
->>      ret = pci_add_capability2(pdev, cap_id, offset, size, &local_err);
->> -    if (local_err) {
->> -        assert(ret < 0);
->> +    if (ret < 0) {
->>          error_report_err(local_err);
->> -    } else {
->> -        /* success implies a positive offset in config space */
->> -        assert(ret > 0);
->>      }
->>      return ret;
->>  }
->
-> Many functions return distinct error values in addition to setting an
-> error.  We usually check one of the two, and assume the other is sane.
-> This is one of the few places where we assert it is.  Not wrong, just
-> cumbersome.  I'd prefer to drop the assertions, i.e. take this patch.
-> But it's up to the PCI maintainers.
-
-Yes, I also think it really is not necessary. Keeping code as simple as
-practical is desirable. So drop the assertions. Of course, I will listen
-to the views of Marcel and Michael.
-
-Thanks
-Mao
+diff --git a/migration/migration.c b/migration/migration.c
+index ad29e53..70a56ce 100644
+--- a/migration/migration.c
++++ b/migration/migration.c
+@@ -1850,13 +1850,12 @@ static void migration_completion(MigrationState *s, int current_active_state,
+      * cleaning everything else up (since if there are no failures
+      * it will wait for the destination to send it's status in
+      * a SHUT command).
+-     * Postcopy opens rp if enabled (even if it's not avtivated)
+      */
+-    if (migrate_postcopy_ram()) {
++    if (s->rp_state.from_dst_file) {
+         int rp_error;
+-        trace_migration_completion_postcopy_end_before_rp();
++        trace_migration_return_path_end_before();
+         rp_error = await_return_path_close_on_source(s);
+-        trace_migration_completion_postcopy_end_after_rp(rp_error);
++        trace_migration_return_path_end_after(rp_error);
+         if (rp_error) {
+             goto fail_invalidate;
+         }
+@@ -1931,13 +1930,19 @@ static void *migration_thread(void *opaque)
+ 
+     qemu_savevm_state_header(s->to_dst_file);
+ 
+-    if (migrate_postcopy_ram()) {
++    /*
++     * If we opened the return path, we need to make sure dst has it
++     * opened as well.
++     */
++    if (s->rp_state.from_dst_file) {
+         /* Now tell the dest that it should open its end so it can reply */
+         qemu_savevm_send_open_return_path(s->to_dst_file);
+ 
+         /* And do a ping that will make stuff easier to debug */
+         qemu_savevm_send_ping(s->to_dst_file, 1);
++    }
+ 
++    if (migrate_postcopy_ram()) {
+         /*
+          * Tell the destination that we *might* want to do postcopy later;
+          * if the other end can't do postcopy it should fail now, nice and
+diff --git a/migration/trace-events b/migration/trace-events
+index 5b8ccf3..38345be 100644
+--- a/migration/trace-events
++++ b/migration/trace-events
+@@ -88,8 +88,8 @@ migrate_send_rp_message(int msg_type, uint16_t len) "%d: len %d"
+ migration_completion_file_err(void) ""
+ migration_completion_postcopy_end(void) ""
+ migration_completion_postcopy_end_after_complete(void) ""
+-migration_completion_postcopy_end_before_rp(void) ""
+-migration_completion_postcopy_end_after_rp(int rp_error) "%d"
++migration_return_path_end_before(void) ""
++migration_return_path_end_after(int rp_error) "%d"
+ migration_thread_after_loop(void) ""
+ migration_thread_file_err(void) ""
+ migration_thread_setup_complete(void) ""
+-- 
+2.7.4
