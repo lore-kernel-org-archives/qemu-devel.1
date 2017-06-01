@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43268)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43278)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dGOQE-0005oo-8G
+	(envelope-from <dgilbert@redhat.com>) id 1dGOQE-0005pA-Ns
 	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 07:37:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dGOQ9-0000qJ-Rk
+	(envelope-from <dgilbert@redhat.com>) id 1dGOQD-0000wj-EL
 	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 07:37:46 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:45262)
+Received: from mx1.redhat.com ([209.132.183.28]:34732)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dGOQ9-0000oL-K6
-	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 07:37:41 -0400
-References: <20170515194149.16288-1-eblake@redhat.com>
-	<20170515194149.16288-2-eblake@redhat.com>
-	<d9102dbd-9685-fffd-916f-f9bc7850b2f5@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <97f21cbe-2868-3a1e-b69c-745460cd67f0@redhat.com>
-Date: Thu, 1 Jun 2017 06:37:38 -0500
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dGOQD-0000vd-99
+	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 07:37:45 -0400
+Date: Thu, 1 Jun 2017 12:37:40 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170601113740.GH2083@work-vm>
+References: <1495539071-12995-1-git-send-email-a.perevalov@samsung.com>
+	<CGME20170523113132eucas1p19143aceccbb30a0051635cddcf376bb6@eucas1p1.samsung.com>
+	<1495539071-12995-11-git-send-email-a.perevalov@samsung.com>
 MIME-Version: 1.0
-In-Reply-To: <d9102dbd-9685-fffd-916f-f9bc7850b2f5@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="IpLlBnkcI7aLbPr6VDmg1ADLq34xNnBKx"
-Subject: Re: [Qemu-devel] [PATCH v8 1/5] shutdown: Simplify shutdown_signal
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1495539071-12995-11-git-send-email-a.perevalov@samsung.com>
+Subject: Re: [Qemu-devel] [PATCH V6 10/10] migration: postcopy_blocktime
+ documentation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,64 +29,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
-Cc: armbru@redhat.com, berrange@redhat.com, alistair.francis@xilinx.com
+To: Alexey Perevalov <a.perevalov@samsung.com>
+Cc: qemu-devel@nongnu.org, i.maximets@samsung.com, peterx@redhat.com, eblake@redhat.com
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---IpLlBnkcI7aLbPr6VDmg1ADLq34xNnBKx
-From: Eric Blake <eblake@redhat.com>
-To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
-Cc: armbru@redhat.com, berrange@redhat.com, alistair.francis@xilinx.com
-Message-ID: <97f21cbe-2868-3a1e-b69c-745460cd67f0@redhat.com>
-Subject: Re: [PATCH v8 1/5] shutdown: Simplify shutdown_signal
-References: <20170515194149.16288-1-eblake@redhat.com>
- <20170515194149.16288-2-eblake@redhat.com>
- <d9102dbd-9685-fffd-916f-f9bc7850b2f5@redhat.com>
-In-Reply-To: <d9102dbd-9685-fffd-916f-f9bc7850b2f5@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+* Alexey Perevalov (a.perevalov@samsung.com) wrote:
+> Signed-off-by: Alexey Perevalov <a.perevalov@samsung.com>
+> ---
+>  docs/migration.txt | 10 ++++++++++
+>  1 file changed, 10 insertions(+)
+> 
+> diff --git a/docs/migration.txt b/docs/migration.txt
+> index 1b940a8..2207c6d 100644
+> --- a/docs/migration.txt
+> +++ b/docs/migration.txt
+> @@ -402,6 +402,16 @@ will now cause the transition from precopy to postcopy.
+>  It can be issued immediately after migration is started or any
+>  time later on.  Issuing it after the end of a migration is harmless.
+>  
+> +Blocktime is a postcopy live migration metric, intended to show
+> +how long the source vCPU was in state of interruptable sleep due to pagefault.
 
-On 06/01/2017 04:59 AM, Paolo Bonzini wrote:
->=20
->=20
-> On 15/05/2017 21:41, Eric Blake wrote:
->> There is no signal 0 (kill(pid, 0) has special semantics to probe whet=
-her
->> a process is alive), rather than actually sending a signal 0).  So we
->> can use the simpler 0, instead of -1, for our sentinel of whether a
->> shutdown request due to a signal has happened.
->>
+                ^^^^^^
+I think it's just 'how long the vCPU' - I don't think 'source' adds
+anything.
 
->=20
-> Queued, thanks.
->=20
+> +This value is calculated on destination side.
+> +To enable postcopy blocktime calculation, enter following command on destination
+> +monitor:
+> +
+> +migrate_set_capability postcopy-blocktime on
+> +
+> +Postcopy blocktime can be retrieved by query-migrate qmp command.
+> +
 
-Huh? This is v8, but v9 already got committed in master as commit 7af8827=
-9e
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+I think other than that it's OK.
 
 
---IpLlBnkcI7aLbPr6VDmg1ADLq34xNnBKx
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 
-iQEcBAEBCAAGBQJZL/yCAAoJEKeha0olJ0Nqrl0IAIxBJnUJl9AlRyLxcLIJ3ThH
-Fm8HrX4yvtrfXyfsqRVuPwpwIX9CwoCGIqQuIAlISmLVBxXl5qK75YmQc5YHTYmC
-q0uSAs8glN7SMf7DCn/0zcbIlh8u72WoYey27KN2WWPYBngZ2pGj4jnD23iEfnAg
-YuKXgZ4GK6eI6NIVSwxUtoanl8C0yj91WA6HWVxCZGWIq2Y24wk3p0Wzr1kDocUk
-09UBN7Vu9xXcM4JWDMJqizgDXDAvOm1IIn0i0npOmbfOyxHPb78ieIP7VMdIKRqz
-eWERABMxLy8dAdKs7Y6t14rMFRo2QTcjtwcmMpGaAi39xVU74kmwsASy9+7e6Ck=
-=ZJ8s
------END PGP SIGNATURE-----
-
---IpLlBnkcI7aLbPr6VDmg1ADLq34xNnBKx--
+>  Note: During the postcopy phase, the bandwidth limits set using
+>  migrate_set_speed is ignored (to avoid delaying requested pages that
+>  the destination is waiting for).
+> -- 
+> 1.8.3.1
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
