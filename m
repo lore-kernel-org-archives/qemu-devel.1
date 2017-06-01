@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49236)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49623)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dGRij-0004cZ-Eu
-	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 11:09:06 -0400
+	(envelope-from <no-reply@patchew.org>) id 1dGRjz-0005OA-B5
+	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 11:10:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dGRig-0001Aw-9V
-	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 11:09:05 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34464)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dGRig-0001Ak-1I
-	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 11:09:02 -0400
-Date: Thu, 1 Jun 2017 16:08:54 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170601150854.GD2845@work-vm>
-References: <1495229390-18909-1-git-send-email-felipe@nutanix.com>
-	<d643e698-8093-3e46-91de-551db41f3ec3@linux.vnet.ibm.com>
-	<20170601143616.GA2845@work-vm>
-	<9C902EF4-3E10-4326-8D28-412478005F56@nutanix.com>
+	(envelope-from <no-reply@patchew.org>) id 1dGRjw-00021P-47
+	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 11:10:23 -0400
+Resent-Message-Id: <E1dGRjw-00021P-47@eggs.gnu.org>
+Received: from sender-of-o52.zoho.com ([135.84.80.217]:21335)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1dGRjv-00020y-Si
+	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 11:10:20 -0400
+Reply-To: <qemu-devel@nongnu.org>
+In-Reply-To: <1496320911-51305-1-git-send-email-pbonzini@redhat.com>
+Message-ID: <149632977764.4003.4622993772388905103@f98a8425f76e>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <9C902EF4-3E10-4326-8D28-412478005F56@nutanix.com>
-Subject: Re: [Qemu-devel] [PATCH] cpus: reset throttle_thread_scheduled
- after sleep
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Thu, 1 Jun 2017 08:09:38 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PULL 00/33] Misc patches for 2017-06-01
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,98 +28,116 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Felipe Franciosi <felipe@nutanix.com>
-Cc: "Jason J. Herne" <jjherne@linux.vnet.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>, Malcolm Crossley <malcolm@nutanix.com>, Juan Quintela <quintela@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+To: pbonzini@redhat.com
+Cc: famz@redhat.com, qemu-devel@nongnu.org
 
-* Felipe Franciosi (felipe@nutanix.com) wrote:
-> 
-> > On 1 Jun 2017, at 15:36, Dr. David Alan Gilbert <dgilbert@redhat.com> wrote:
-> > 
-> > * Jason J. Herne (jjherne@linux.vnet.ibm.com) wrote:
-> >> On 05/19/2017 05:29 PM, Felipe Franciosi wrote:
-> >>> Currently, the throttle_thread_scheduled flag is reset back to 0 before
-> >>> sleeping (as part of the throttling logic). Given that throttle_timer
-> >>> (well, any timer) may tick with a slight delay, it so happens that under
-> >>> heavy throttling (ie. close or on CPU_THROTTLE_PCT_MAX) the tick may
-> >>> schedule a further cpu_throttle_thread() work item after the flag reset,
-> >>> but before the previous sleep completed. This results on the vCPU thread
-> >>> sleeping continuously for potentially several seconds in a row.
-> >>> 
-> >>> The chances of that happening can be drastically minimised by resetting
-> >>> the flag after the sleep.
-> >>> 
-> >>> Signed-off-by: Felipe Franciosi <felipe@nutanix.com>
-> >>> Signed-off-by: Malcolm Crossley <malcolm@nutanix.com>
-> >>> ---
-> >>> cpus.c | 2 +-
-> >>> 1 file changed, 1 insertion(+), 1 deletion(-)
-> >>> 
-> >>> diff --git a/cpus.c b/cpus.c
-> >>> index 516e5cb..f42eebd 100644
-> >>> --- a/cpus.c
-> >>> +++ b/cpus.c
-> >>> @@ -677,9 +677,9 @@ static void cpu_throttle_thread(CPUState *cpu, run_on_cpu_data opaque)
-> >>>     sleeptime_ns = (long)(throttle_ratio * CPU_THROTTLE_TIMESLICE_NS);
-> >>> 
-> >>>     qemu_mutex_unlock_iothread();
-> >>> -    atomic_set(&cpu->throttle_thread_scheduled, 0);
-> >>>     g_usleep(sleeptime_ns / 1000); /* Convert ns to us for usleep call */
-> >>>     qemu_mutex_lock_iothread();
-> >>> +    atomic_set(&cpu->throttle_thread_scheduled, 0);
-> >>> }
-> >>> 
-> >>> static void cpu_throttle_timer_tick(void *opaque)
-> >>> 
-> >> 
-> >> This seems to make sense to me.
-> >> 
-> >> Acked-by: Jason J. Herne <jjherne@linux.vnet.ibm.com>
-> >> 
-> >> I'm CC'ing Juan, Amit and David as they are all active in the migration area
-> >> and may have
-> >> opinions on this. Juan and David were also reviewers for the original
-> >> series.
-> > 
-> > The description is interesting and sounds reasonable; it'll be
-> > interesting to see what difference it makes to the autoconverge
-> > behaviour for those workloads that need this level of throttle.
-> 
-> To get some hard data, we wrote a little application that:
-> 1) spawns multiple threads (one per vCPU)
-> 2) each thread mmap()s+mlock()s a certain workset (eg. 30GB/#threads for a 32GB VM)
-> 3) each thread writes a word to the beginning of every page in a tight loop
-> 4) the parent thread periodically reports the number of dirtied pages
-> 
-> Even on a dedicated 10G link, that is pretty much guaranteed to require 99% throttle to converge.
-> 
-> Before the patch, Qemu migrates the VM (depicted above) fairly quickly (~40s) after reaching 99% throttle. The application reported a few seconds at a time with lockups which we initially thought was just that thread not running between Qemu-induced vCPU sleeps (and later attributed it to the reported bug).
-> 
-> Then we used a 1G link. This time, the migration had to run for a lot longer even at 99%. That made the bug more likely to happen and we observed soft lockups (reported by the guest's kernel on the console) of 70+ seconds.
-> 
-> Using the patch, and back on a 10G link, the migration completes after a few more iterations than before (took just under 2mins after reaching 99%). If you want further validation of the bug, instrumenting cpus-common.c:process_queued_cpu_work() could be done to show that cpu_throttle_thread() is running back-to-back under these cases.
-
-OK, that's reasonable.
-
-> In summary we believe this patch is immediately required to prevent the lockups.
-
-Yes, agreed.
-
-> A more elaborate throttling solution should be considered as future work. Perhaps a per-vCPU timer which throttles more precisely or a new convergence design altogether.
-
-Dave
-
-> 
-> Thanks,
-> Felipe
-> 
-> > 
-> > Dave
-> > 
-> >> -- 
-> >> -- Jason J. Herne (jjherne@linux.vnet.ibm.com)
-> >> 
-> > --
-> > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
+c3NhZ2UtaWQ6IDE0OTYzMjA5MTEtNTEzMDUtMS1naXQtc2VuZC1lbWFpbC1wYm9uemluaUByZWRo
+YXQuY29tClN1YmplY3Q6IFtRZW11LWRldmVsXSBbUFVMTCAwMC8zM10gTWlzYyBwYXRjaGVzIGZv
+ciAyMDE3LTA2LTAxCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCgpCQVNF
+PWJhc2UKbj0xCnRvdGFsPSQoZ2l0IGxvZyAtLW9uZWxpbmUgJEJBU0UuLiB8IHdjIC1sKQpmYWls
+ZWQ9MAoKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0t
+bG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKCmNvbW1pdHM9IiQoZ2l0IGxvZyAtLWZvcm1hdD0lSCAt
+LXJldmVyc2UgJEJBU0UuLikiCmZvciBjIGluICRjb21taXRzOyBkbwogICAgZWNobyAiQ2hlY2tp
+bmcgUEFUQ0ggJG4vJHRvdGFsOiAkKGdpdCBsb2cgLW4gMSAtLWZvcm1hdD0lcyAkYykuLi4iCiAg
+ICBpZiAhIGdpdCBzaG93ICRjIC0tZm9ybWF0PWVtYWlsIHwgLi9zY3JpcHRzL2NoZWNrcGF0Y2gu
+cGwgLS1tYWlsYmFjayAtOyB0aGVuCiAgICAgICAgZmFpbGVkPTEKICAgICAgICBlY2hvCiAgICBm
+aQogICAgbj0kKChuKzEpKQpkb25lCgpleGl0ICRmYWlsZWQKPT09IFRFU1QgU0NSSVBUIEVORCA9
+PT0KClVwZGF0aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKRnJv
+bSBodHRwczovL2dpdGh1Yi5jb20vcGF0Y2hldy1wcm9qZWN0L3FlbXUKICogW25ldyB0YWddICAg
+ICAgICAgcGF0Y2hldy8yMDE3MDYwMTE0NDkxNS4yMDc3OC0xLWFsZXguYmVubmVlQGxpbmFyby5v
+cmcgLT4gcGF0Y2hldy8yMDE3MDYwMTE0NDkxNS4yMDc3OC0xLWFsZXguYmVubmVlQGxpbmFyby5v
+cmcKU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0JwoxZWJiZjA0IGt2bTogZG9uJ3QgcmVn
+aXN0ZXIgc21yYW1fbGlzdGVuZXIgd2hlbiBzbW0gaXMgb2ZmCmY0YjNmN2MgbmJkOiBtYWtlIGl0
+IHRocmVhZC1zYWZlLCBmaXggcWNvdzIgb3ZlciBuYmQKZDRhMThlOCBody9jb3JlOiBubWkuYyBj
+YW4gYmUgY29tcGlsZWQgYXMgY29tbW9uLW9iaiBub3dhZGF5cwpjMDZjNGFmIHRhcmdldC9pMzg2
+OiBBZGQgR0RCIFhNTCBkZXNjcmlwdGlvbiBmb3IgU1NFIHJlZ2lzdGVycwo0MzQ0YTQ4IGkzODYv
+a3ZtOiBkbyBub3QgemVybyBvdXQgc2VnbWVudCBmbGFncyBpZiBzZWdtZW50IGlzIHVudXNhYmxl
+IG9yIG5vdCBwcmVzZW50CmU4Njg4M2QgZWR1OiBmaXggbWVtb3J5IGxlYWsgb24gbXNpX2Jyb2tl
+biBwbGF0Zm9ybXMKYmU2ZDdmZCBsaW51eGJvb3RfZG1hOiBjb21waWxlIGZvciBpNDg2CjE0OTQ3
+ZDEga3ZtY2xvY2s6IHVwZGF0ZSBzeXN0ZW1fdGltZV9tc3IgYWRkcmVzcyBmb3JjaWJseQo1MDAx
+ZTI3IHF0ZXN0OiBhZGQgcnRjIHBlcmlvZGljIHRpbWVyIHRlc3QKOTdiYjJmYSBuYmQ6IEZ1bGx5
+IGluaXRpYWxpemUgY2xpZW50IGluIGNhc2Ugb2YgZmFpbGVkIG5lZ290aWF0aW9uCjVkOWFlM2Qg
+ZXhlYzogZml4IGFkZHJlc3Nfc3BhY2VfZ2V0X2lvdGxiX2VudHJ5IHBhZ2UgbWFzawpmNzc4ZDI5
+IHNvY2tldHM6IGltcHJvdmUgZXJyb3IgcmVwb3J0aW5nIGlmIFVOSVggc29ja2V0IHBhdGggaXMg
+dG9vIGxvbmcKZDdhNDg1NiBpMzg2OiBmaXggcmVhZC93cml0ZSBjciB3aXRoIGljb3VudCBvcHRp
+b24KMTg4ZGM4MyB0YXJnZXQvaTM4NjogdXNlIG11bHRpcGxlIENQVSBBZGRyZXNzU3BhY2VzCjhl
+ZmRmMTAgdGFyZ2V0L2kzODY6IGVuYWJsZSBBMjAgYXV0b21hdGljYWxseSBpbiBzeXN0ZW0gbWFu
+YWdlbWVudCBtb2RlCmNjNDhmOWEgdmhvc3QtdXNlci1zY3NpOiBJbnRyb2R1Y2UgYSB2aG9zdC11
+c2VyLXNjc2kgc2FtcGxlIGFwcGxpY2F0aW9uCmYyZTI2MTQgdmhvc3QtdXNlci1zY3NpOiBJbnRy
+b2R1Y2Ugdmhvc3QtdXNlci1zY3NpIGhvc3QgZGV2aWNlCjhiMmVjZGYgdmlydGlvLXNjc2k6IFVu
+c2V0IGhvdHBsdWcgaGFuZGxlciB3aGVuIHVucmVhbGl6ZQo3ZDE3MmQ4IGV4ZWM6IHNpbXBsaWZ5
+IHBoeXNfcGFnZV9maW5kKCkgcGFyYW1zCmNjMjRjMGQgbmJkL2NsaWVudC5jOiB1c2UgZXJycCBp
+bnN0ZWFkIG9mIExPRwo4NTgxOTQ3IG5iZDogYWRkIGVycnAgdG8gcmVhZF9zeW5jLCB3cml0ZV9z
+eW5jIGFuZCBkcm9wX3N5bmMKMDQ5ZmE3ZSBuYmQ6IGFkZCBlcnJwIHBhcmFtZXRlciB0byBuYmRf
+d3Jfc3luY3YoKQo2NzE1ZmYzMCBuYmQ6IHJlYWRfc3luYyBhbmQgZnJpZW5kczogcmV0dXJuIDAg
+b24gc3VjY2Vzcwo3ZWJiNzZlIG5iZDogc3RyaWN0IG5iZF93cl9zeW5jdgozZThiNjM1IENoZWNr
+IHRoZSByZXR1cm4gdmFsdWUgb2YgZmNudGwgaW4gcWVtdV9zZXRfY2xvZXhlYwpjYjlhZGE3IGt2
+bTogaXJxY2hpcDogc2tpcCB1cGRhdGUgbXNpIHdoZW4gZGlzYWJsZWQKMzAyZGMzMSBtc2l4OiB0
+cmFjZSBjb250cm9sIGJpdCB3cml0ZSBvcApmYjI5YTI0IGt2bTogaXJxY2hpcDogdHJhY2UgY2hh
+bmdlcyBvbiBtc2kgYWRkL3JlbW92ZQplNmNkMzc0IG1jMTQ2ODE4cnRjOiBlbWJyYWNlIGFsbCB4
+ODYgc3BlY2lmaWMgY29kZQo4OGY3N2MyIG1jMTQ2ODE4cnRjOiBkcm9wIHVubmVjZXNzYXJ5ICcj
+aWZkZWYgVEFSR0VUX0kzODYnCjU0NmFiYmMgbWMxNDY4MThydGM6IGVuc3VyZSBMT1NUX1RJQ0tf
+UE9MSUNZX1NMRVcgaXMgb25seSBlbmFibGVkIG9uIFRBUkdFVF9JMzg2CjFiMjE1MmUgbWMxNDY4
+MThydGM6IHByZWNpc2VseSBjb3VudCB0aGUgY2xvY2sgZm9yIHBlcmlvZGljIHRpbWVyCjQ3MmQ5
+NTkgbWMxNDY4MThydGM6IHVwZGF0ZSBwZXJpb2RpYyB0aW1lciBvbmx5IGlmIGl0IGlzIG5lZWRl
+ZAoKPT09IE9VVFBVVCBCRUdJTiA9PT0KQ2hlY2tpbmcgUEFUQ0ggMS8zMzogbWMxNDY4MThydGM6
+IHVwZGF0ZSBwZXJpb2RpYyB0aW1lciBvbmx5IGlmIGl0IGlzIG5lZWRlZC4uLgpDaGVja2luZyBQ
+QVRDSCAyLzMzOiBtYzE0NjgxOHJ0YzogcHJlY2lzZWx5IGNvdW50IHRoZSBjbG9jayBmb3IgcGVy
+aW9kaWMgdGltZXIuLi4KRVJST1I6IGJyYWNlcyB7fSBhcmUgbmVjZXNzYXJ5IGZvciBhbGwgYXJt
+cyBvZiB0aGlzIHN0YXRlbWVudAojMTI5OiBGSUxFOiBody90aW1lci9tYzE0NjgxOHJ0Yy5jOjIx
+NjoKKyAgICAgICAgaWYgKHMtPmxvc3RfdGlja19wb2xpY3kgPT0gTE9TVF9USUNLX1BPTElDWV9T
+TEVXKSB7ClsuLi5dCisgICAgICAgIH0gZWxzZQpbLi4uXQoKdG90YWw6IDEgZXJyb3JzLCAwIHdh
+cm5pbmdzLCAxODEgbGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMs
+IHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2
+ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5U
+QUlORVJTLgoKQ2hlY2tpbmcgUEFUQ0ggMy8zMzogbWMxNDY4MThydGM6IGVuc3VyZSBMT1NUX1RJ
+Q0tfUE9MSUNZX1NMRVcgaXMgb25seSBlbmFibGVkIG9uIFRBUkdFVF9JMzg2Li4uCkNoZWNraW5n
+IFBBVENIIDQvMzM6IG1jMTQ2ODE4cnRjOiBkcm9wIHVubmVjZXNzYXJ5ICcjaWZkZWYgVEFSR0VU
+X0kzODYnLi4uCkNoZWNraW5nIFBBVENIIDUvMzM6IG1jMTQ2ODE4cnRjOiBlbWJyYWNlIGFsbCB4
+ODYgc3BlY2lmaWMgY29kZS4uLgpDaGVja2luZyBQQVRDSCA2LzMzOiBrdm06IGlycWNoaXA6IHRy
+YWNlIGNoYW5nZXMgb24gbXNpIGFkZC9yZW1vdmUuLi4KQ2hlY2tpbmcgUEFUQ0ggNy8zMzogbXNp
+eDogdHJhY2UgY29udHJvbCBiaXQgd3JpdGUgb3AuLi4KQ2hlY2tpbmcgUEFUQ0ggOC8zMzoga3Zt
+OiBpcnFjaGlwOiBza2lwIHVwZGF0ZSBtc2kgd2hlbiBkaXNhYmxlZC4uLgpDaGVja2luZyBQQVRD
+SCA5LzMzOiBDaGVjayB0aGUgcmV0dXJuIHZhbHVlIG9mIGZjbnRsIGluIHFlbXVfc2V0X2Nsb2V4
+ZWMuLi4KQ2hlY2tpbmcgUEFUQ0ggMTAvMzM6IG5iZDogc3RyaWN0IG5iZF93cl9zeW5jdi4uLgpD
+aGVja2luZyBQQVRDSCAxMS8zMzogbmJkOiByZWFkX3N5bmMgYW5kIGZyaWVuZHM6IHJldHVybiAw
+IG9uIHN1Y2Nlc3MuLi4KQ2hlY2tpbmcgUEFUQ0ggMTIvMzM6IG5iZDogYWRkIGVycnAgcGFyYW1l
+dGVyIHRvIG5iZF93cl9zeW5jdigpLi4uCkNoZWNraW5nIFBBVENIIDEzLzMzOiBuYmQ6IGFkZCBl
+cnJwIHRvIHJlYWRfc3luYywgd3JpdGVfc3luYyBhbmQgZHJvcF9zeW5jLi4uCkNoZWNraW5nIFBB
+VENIIDE0LzMzOiBuYmQvY2xpZW50LmM6IHVzZSBlcnJwIGluc3RlYWQgb2YgTE9HLi4uCkVSUk9S
+OiBjb2RlIGluZGVudCBzaG91bGQgbmV2ZXIgdXNlIHRhYnMKIzEyNjogRklMRTogbmJkL2NsaWVu
+dC5jOjcyOToKK15JICAgICBFcnJvciAqKmVycnApJAoKdG90YWw6IDEgZXJyb3JzLCAwIHdhcm5p
+bmdzLCAxNTggbGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBs
+ZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMg
+cmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlO
+RVJTLgoKQ2hlY2tpbmcgUEFUQ0ggMTUvMzM6IGV4ZWM6IHNpbXBsaWZ5IHBoeXNfcGFnZV9maW5k
+KCkgcGFyYW1zLi4uCkNoZWNraW5nIFBBVENIIDE2LzMzOiB2aXJ0aW8tc2NzaTogVW5zZXQgaG90
+cGx1ZyBoYW5kbGVyIHdoZW4gdW5yZWFsaXplLi4uCkNoZWNraW5nIFBBVENIIDE3LzMzOiB2aG9z
+dC11c2VyLXNjc2k6IEludHJvZHVjZSB2aG9zdC11c2VyLXNjc2kgaG9zdCBkZXZpY2UuLi4KQ2hl
+Y2tpbmcgUEFUQ0ggMTgvMzM6IHZob3N0LXVzZXItc2NzaTogSW50cm9kdWNlIGEgdmhvc3QtdXNl
+ci1zY3NpIHNhbXBsZSBhcHBsaWNhdGlvbi4uLgpDaGVja2luZyBQQVRDSCAxOS8zMzogdGFyZ2V0
+L2kzODY6IGVuYWJsZSBBMjAgYXV0b21hdGljYWxseSBpbiBzeXN0ZW0gbWFuYWdlbWVudCBtb2Rl
+Li4uCkNoZWNraW5nIFBBVENIIDIwLzMzOiB0YXJnZXQvaTM4NjogdXNlIG11bHRpcGxlIENQVSBB
+ZGRyZXNzU3BhY2VzLi4uCkNoZWNraW5nIFBBVENIIDIxLzMzOiBpMzg2OiBmaXggcmVhZC93cml0
+ZSBjciB3aXRoIGljb3VudCBvcHRpb24uLi4KQ2hlY2tpbmcgUEFUQ0ggMjIvMzM6IHNvY2tldHM6
+IGltcHJvdmUgZXJyb3IgcmVwb3J0aW5nIGlmIFVOSVggc29ja2V0IHBhdGggaXMgdG9vIGxvbmcu
+Li4KQ2hlY2tpbmcgUEFUQ0ggMjMvMzM6IGV4ZWM6IGZpeCBhZGRyZXNzX3NwYWNlX2dldF9pb3Rs
+Yl9lbnRyeSBwYWdlIG1hc2suLi4KQ2hlY2tpbmcgUEFUQ0ggMjQvMzM6IG5iZDogRnVsbHkgaW5p
+dGlhbGl6ZSBjbGllbnQgaW4gY2FzZSBvZiBmYWlsZWQgbmVnb3RpYXRpb24uLi4KQ2hlY2tpbmcg
+UEFUQ0ggMjUvMzM6IHF0ZXN0OiBhZGQgcnRjIHBlcmlvZGljIHRpbWVyIHRlc3QuLi4KQ2hlY2tp
+bmcgUEFUQ0ggMjYvMzM6IGt2bWNsb2NrOiB1cGRhdGUgc3lzdGVtX3RpbWVfbXNyIGFkZHJlc3Mg
+Zm9yY2libHkuLi4KQ2hlY2tpbmcgUEFUQ0ggMjcvMzM6IGxpbnV4Ym9vdF9kbWE6IGNvbXBpbGUg
+Zm9yIGk0ODYuLi4KQ2hlY2tpbmcgUEFUQ0ggMjgvMzM6IGVkdTogZml4IG1lbW9yeSBsZWFrIG9u
+IG1zaV9icm9rZW4gcGxhdGZvcm1zLi4uCkNoZWNraW5nIFBBVENIIDI5LzMzOiBpMzg2L2t2bTog
+ZG8gbm90IHplcm8gb3V0IHNlZ21lbnQgZmxhZ3MgaWYgc2VnbWVudCBpcyB1bnVzYWJsZSBvciBu
+b3QgcHJlc2VudC4uLgpDaGVja2luZyBQQVRDSCAzMC8zMzogdGFyZ2V0L2kzODY6IEFkZCBHREIg
+WE1MIGRlc2NyaXB0aW9uIGZvciBTU0UgcmVnaXN0ZXJzLi4uCkNoZWNraW5nIFBBVENIIDMxLzMz
+OiBody9jb3JlOiBubWkuYyBjYW4gYmUgY29tcGlsZWQgYXMgY29tbW9uLW9iaiBub3dhZGF5cy4u
+LgpDaGVja2luZyBQQVRDSCAzMi8zMzogbmJkOiBtYWtlIGl0IHRocmVhZC1zYWZlLCBmaXggcWNv
+dzIgb3ZlciBuYmQuLi4KQ2hlY2tpbmcgUEFUQ0ggMzMvMzM6IGt2bTogZG9uJ3QgcmVnaXN0ZXIg
+c21yYW1fbGlzdGVuZXIgd2hlbiBzbW0gaXMgb2ZmLi4uCj09PSBPVVRQVVQgRU5EID09PQoKVGVz
+dCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9t
+YXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlv
+dXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEBmcmVlbGlzdHMub3Jn
