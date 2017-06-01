@@ -1,24 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59834)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59860)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1dGPQo-0003xg-9a
-	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 08:42:27 -0400
+	(envelope-from <paolo.bonzini@gmail.com>) id 1dGPQq-00043J-8n
+	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 08:42:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1dGPQm-0005nM-VF
-	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 08:42:26 -0400
-Received: from mail-wm0-x242.google.com ([2a00:1450:400c:c09::242]:34154)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1dGPQm-0005n7-LK
-	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 08:42:24 -0400
-Received: by mail-wm0-x242.google.com with SMTP id d127so11021552wmf.1
-	for <qemu-devel@nongnu.org>; Thu, 01 Jun 2017 05:42:24 -0700 (PDT)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1dGPQp-0005oP-3Q
+	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 08:42:28 -0400
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Thu,  1 Jun 2017 14:41:43 +0200
-Message-Id: <1496320911-51305-26-git-send-email-pbonzini@redhat.com>
+Date: Thu,  1 Jun 2017 14:41:45 +0200
+Message-Id: <1496320911-51305-28-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1496320911-51305-1-git-send-email-pbonzini@redhat.com>
 References: <1496320911-51305-1-git-send-email-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PULL 25/33] qtest: add rtc periodic timer test
+Subject: [Qemu-devel] [PULL 27/33] linuxboot_dma: compile for i486
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,165 +21,61 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Xiao Guangrong <xiaoguangrong@tencent.com>
+Cc: qemu-stable@nongnu.org
 
-From: Xiao Guangrong <xiaoguangrong@tencent.com>
+The ROM uses the cmovne instruction, which is new in Pentium Pro and does not
+work when running QEMU with "-cpu 486".  Avoid producing that instruction.
 
-It tests the accuracy of rtc periodic timer which is recently
-improved & fixed by commit 7ffcb539a3 ("mc146818rtc: precisely count
-the clock for periodic timer", 2017-05-19).
-
-Signed-off-by: Xiao Guangrong <xiaoguangrong@tencent.com>
-Message-Id: <20170527025301.23499-1-xiaoguangrong@tencent.com>
+Suggested-by: Richard W.M. Jones <rjones@redhat.com>
+Suggested-by: Thomas Huth <thuth@redhat.com>
+Reported-by: Rob Landley <rob@landley.net>
+Cc: qemu-stable@nongnu.org
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- hw/timer/mc146818rtc.c         | 15 +++----------
- include/hw/timer/mc146818rtc.h | 19 ++++++++++++++++
- tests/rtc-test.c               | 49 ++++++++++++++++++++++++++++++++++++++++++
- 3 files changed, 71 insertions(+), 12 deletions(-)
+ pc-bios/linuxboot_dma.bin  | Bin 1536 -> 1536 bytes
+ pc-bios/optionrom/Makefile |   1 +
+ 2 files changed, 1 insertion(+)
 
-diff --git a/hw/timer/mc146818rtc.c b/hw/timer/mc146818rtc.c
-index 542cd09..1b8d3d7 100644
---- a/hw/timer/mc146818rtc.c
-+++ b/hw/timer/mc146818rtc.c
-@@ -120,7 +120,7 @@ static void rtc_coalesced_timer_update(RTCState *s)
-         /* divide each RTC interval to 2 - 8 smaller intervals */
-         int c = MIN(s->irq_coalesced, 7) + 1; 
-         int64_t next_clock = qemu_clock_get_ns(rtc_clock) +
--            muldiv64(s->period / c, NANOSECONDS_PER_SECOND, RTC_CLOCK_RATE);
-+            periodic_clock_to_ns(s->period / c);
-         timer_mod(s->coalesced_timer, next_clock);
-     }
- }
-@@ -178,16 +178,8 @@ static uint32_t rtc_periodic_clock_ticks(RTCState *s)
-      }
+diff --git a/pc-bios/linuxboot_dma.bin b/pc-bios/linuxboot_dma.bin
+index 218d3ab4a29bfb5ab7125ec7a4d29dad1860c673..d176f62797813e4b926dca9dfce7ce554dc1a4d6 100644
+GIT binary patch
+literal 1536
+zcmeHFL2J`s82-{_T52KL%w~}udiW-YBE*9t=s~ClrIm^s9^6H6Pf%onr07*+kWd=L
+zpW)d<4G1ZESU1FyUDSCf^YYaxioy<}t?!rmu^#*f?mHxJo;-Qp_kHp#Je^o$|2##;
+zYs)n)qh6k7XI07O)9TW>>H@3WSgzkI-MW44`qG_Jxhgq7fAt@+rpuZy7{g_FpG^eo
+zuoD<7Fjn!zK~Uydy3X@Fj1CnQuA}{tXz$^z=7>a?#S!%6CsARNbiO)h=v+Q~y@5O1
+ze8y7!akTy&-YXMV@p3Es`0q*km+)Mtxe(3DE2)a5;c%$H0|Yu~mbnR0C7dKHR7Zsr
+zmrccq5lm%U=wXc39<t?-(_m*ZnY&YH(d(0lj;0`jj8e`iWgX(jV5j3gg<B9Cgj2^d
+zw;W8A$%i@ijhITTF%3U<ui*Zsgx!lc)pgIq-atzea+i1H+3Oj<V?5-VpBVlz4R#!?
+zV3N_sX!mjsj*#|9H8ozR&D5ajsurT@(W<h&xG*;8UNvYI;`kVzRd@m7;AnvgFCdyy
+zI>gV6@%Jl!9^%vQ9V0A-7a<bD(|L-BW|R)`qY*CS(3SQRXOVJqcpcuB8NLnUuosH3
+zi{OJ7mufeeG{^49xY<M4U)CrSC7Fp}TjtSE>UkNnpxu8npp2ruY0}SsKn=BiGN9Y;
+L*>&K*abWuoMsO(*
+
+literal 1536
+zcmeHF&ubGw6rN4Dn#RCxYN|nUh%gpJFME=L9)#^}1F5!ps0f07iy|#(O1<iu!xFNH
+ze}?~naY4vZ57wZB1jMR`ST7r__~R&=_04QYJoq2jIn2&}@6GqV_sv^+G|^@MTxG^<
+zD>W^nf~VP8b!3b3v@l;?V$SuIwL6uYt5>dGyH&BPBIn1?(K>6@S?eidI1hgSZ^wky
+zNA%Hz@f^krJcQTH!Ptb+b>Z7QOZy_v)9!Gc_A*CUnxyOgP~7<9qN#In@`mGjfw=z$
+z*1p4gW?~r|cz_FdqLT)y8y*s0Z-)z#_;!*cE?PD>cN4<HA{;MET(E~F0*Ke4l-T|Q
+zN3kAs(B4Nz%(_i>CX-n&AUsLGXj9UuS(2NP%(`OENoGw|EGqnf#7ASHq-k?KrExJ~
+z^CHnSr*VvZO%mMQmY+taei4m+{T$|c^(w4)XlpT*^|#=^eK`aF_0%gE_5j9w)aV=c
+zk7$UtO_Fkt>S!)b5N*mx5@orPY(na#Hj4<S)0RarUXZ%Tp{&xoU+SGxcuC<|i62e-
+zaCiw}LGfe}PpSO8%0DRczx~>MfwIDj65o<I`H@FBlkzycj5td1A}41qQPA(<_yF`A
+z@IINro1ha6gE;8HfA4iFwHr(rWNnH$vl3XJyEGJ>hT<|dXkK7E?qHJ9XdoKqMjysh
+NXm9N~@Si)N{RVuA8xQ~h
+
+diff --git a/pc-bios/optionrom/Makefile b/pc-bios/optionrom/Makefile
+index fa53d9e..a9a9e5e 100644
+--- a/pc-bios/optionrom/Makefile
++++ b/pc-bios/optionrom/Makefile
+@@ -13,6 +13,7 @@ $(call set-vpath, $(SRC_PATH)/pc-bios/optionrom)
+ ifeq ($(lastword $(filter -O%, -O0 $(CFLAGS))),-O0)
+ override CFLAGS += -O2
+ endif
++override CFLAGS += -march=i486
  
-     period_code = s->cmos_data[RTC_REG_A] & 0x0f;
--    if (!period_code) {
--        return 0;
--    }
--
--    if (period_code <= 2) {
--        period_code += 7;
--    }
- 
--    /* period in 32 Khz cycles */
--    return 1 << (period_code - 1);
-+    return periodic_period_to_clock(period_code);
- }
- 
- /*
-@@ -260,8 +252,7 @@ periodic_timer_update(RTCState *s, int64_t current_time, uint32_t old_period)
-         assert(lost_clock >= 0 && lost_clock <= period);
- 
-         next_irq_clock = cur_clock + period - lost_clock;
--        s->next_periodic_time = muldiv64(next_irq_clock, NANOSECONDS_PER_SECOND,
--                                         RTC_CLOCK_RATE) + 1;
-+        s->next_periodic_time = periodic_clock_to_ns(next_irq_clock) + 1;
-         timer_mod(s->periodic_timer, s->next_periodic_time);
-     } else {
-         s->irq_coalesced = 0;
-diff --git a/include/hw/timer/mc146818rtc.h b/include/hw/timer/mc146818rtc.h
-index 7c8e64b..f23e734 100644
---- a/include/hw/timer/mc146818rtc.h
-+++ b/include/hw/timer/mc146818rtc.h
-@@ -10,4 +10,23 @@ ISADevice *rtc_init(ISABus *bus, int base_year, qemu_irq intercept_irq);
- void rtc_set_memory(ISADevice *dev, int addr, int val);
- int rtc_get_memory(ISADevice *dev, int addr);
- 
-+static inline uint32_t periodic_period_to_clock(int period_code)
-+{
-+    if (!period_code) {
-+        return 0;
-+   }
-+
-+    if (period_code <= 2) {
-+        period_code += 7;
-+    }
-+    /* period in 32 Khz cycles */
-+   return 1 << (period_code - 1);
-+}
-+
-+#define RTC_CLOCK_RATE            32768
-+
-+static inline int64_t periodic_clock_to_ns(int64_t clocks)
-+{
-+    return muldiv64(clocks, NANOSECONDS_PER_SECOND, RTC_CLOCK_RATE);
-+}
- #endif /* MC146818RTC_H */
-diff --git a/tests/rtc-test.c b/tests/rtc-test.c
-index a086efd..0500686 100644
---- a/tests/rtc-test.c
-+++ b/tests/rtc-test.c
-@@ -14,6 +14,7 @@
- #include "qemu/osdep.h"
- 
- #include "libqtest.h"
-+#include "hw/timer/mc146818rtc.h"
- #include "hw/timer/mc146818rtc_regs.h"
- 
- static uint8_t base = 0x70;
-@@ -542,6 +543,52 @@ static void register_b_set_flag(void)
-     g_assert_cmpint(cmos_read(RTC_CENTURY), ==, 0x20);
- }
- 
-+#define RTC_PERIOD_CODE1    13   /* 8 Hz */
-+#define RTC_PERIOD_CODE2    15   /* 2 Hz */
-+
-+#define RTC_PERIOD_TEST_NR  50
-+
-+static uint64_t wait_periodic_interrupt(uint64_t real_time)
-+{
-+    while (!get_irq(RTC_ISA_IRQ)) {
-+        real_time = clock_step_next();
-+    }
-+
-+    g_assert((cmos_read(RTC_REG_C) & REG_C_PF) != 0);
-+    return real_time;
-+}
-+
-+static void periodic_timer(void)
-+{
-+    int i;
-+    uint64_t period_clocks, period_time, start_time, real_time;
-+
-+    /* disable all interrupts. */
-+    cmos_write(RTC_REG_B, cmos_read(RTC_REG_B) &
-+                                   ~(REG_B_PIE | REG_B_AIE | REG_B_UIE));
-+    cmos_write(RTC_REG_A, RTC_PERIOD_CODE1);
-+    /* enable periodic interrupt after properly configure the period. */
-+    cmos_write(RTC_REG_B, cmos_read(RTC_REG_B) | REG_B_PIE);
-+
-+    start_time = real_time = clock_step_next();
-+
-+    for (i = 0; i < RTC_PERIOD_TEST_NR; i++) {
-+        cmos_write(RTC_REG_A, RTC_PERIOD_CODE1);
-+        real_time = wait_periodic_interrupt(real_time);
-+        cmos_write(RTC_REG_A, RTC_PERIOD_CODE2);
-+        real_time = wait_periodic_interrupt(real_time);
-+    }
-+
-+    period_clocks = periodic_period_to_clock(RTC_PERIOD_CODE1) +
-+                       periodic_period_to_clock(RTC_PERIOD_CODE2);
-+    period_clocks *= RTC_PERIOD_TEST_NR;
-+    period_time = periodic_clock_to_ns(period_clocks);
-+
-+    real_time -= start_time;
-+    g_assert_cmpint(ABS((int64_t)(real_time - period_time)), <=,
-+                    NANOSECONDS_PER_SECOND * 0.5);
-+}
-+
- int main(int argc, char **argv)
- {
-     QTestState *s = NULL;
-@@ -564,6 +611,8 @@ int main(int argc, char **argv)
-     qtest_add_func("/rtc/set-year/1980", set_year_1980);
-     qtest_add_func("/rtc/misc/register_b_set_flag", register_b_set_flag);
-     qtest_add_func("/rtc/misc/fuzz-registers", fuzz_registers);
-+    qtest_add_func("/rtc/periodic/interrupt", periodic_timer);
-+
-     ret = g_test_run();
- 
-     if (s) {
+ # Drop -fstack-protector and the like
+ QEMU_CFLAGS := $(filter -W%, $(QEMU_CFLAGS)) $(CFLAGS_NOPIE) -ffreestanding
 -- 
 1.8.3.1
