@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51580)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51657)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <anton.nefedov@virtuozzo.com>) id 1dGRob-0000E9-1W
-	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 11:15:10 -0400
+	(envelope-from <anton.nefedov@virtuozzo.com>) id 1dGRog-0000Mv-OG
+	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 11:15:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <anton.nefedov@virtuozzo.com>) id 1dGRoX-0004fR-Q7
-	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 11:15:09 -0400
-Received: from mail-eopbgr40095.outbound.protection.outlook.com
-	([40.107.4.95]:11349
-	helo=EUR03-DB5-obe.outbound.protection.outlook.com)
+	(envelope-from <anton.nefedov@virtuozzo.com>) id 1dGRod-0004l2-83
+	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 11:15:14 -0400
+Received: from mail-db5eur01on0136.outbound.protection.outlook.com
+	([104.47.2.136]:6143
+	helo=EUR01-DB5-obe.outbound.protection.outlook.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <anton.nefedov@virtuozzo.com>)
-	id 1dGRoX-0004et-AD
-	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 11:15:05 -0400
+	id 1dGRoc-0004jz-Le
+	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 11:15:11 -0400
 From: Anton Nefedov <anton.nefedov@virtuozzo.com>
-Date: Thu, 1 Jun 2017 18:14:23 +0300
-Message-ID: <1496330073-51338-6-git-send-email-anton.nefedov@virtuozzo.com>
+Date: Thu, 1 Jun 2017 18:14:27 +0300
+Message-ID: <1496330073-51338-10-git-send-email-anton.nefedov@virtuozzo.com>
 In-Reply-To: <1496330073-51338-1-git-send-email-anton.nefedov@virtuozzo.com>
 References: <1496330073-51338-1-git-send-email-anton.nefedov@virtuozzo.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v2 05/15] qcow2: do not COW the empty areas
+Subject: [Qemu-devel] [PATCH v2 09/15] qcow2: check space leak at the end of
+ the image
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,241 +30,747 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: den@virtuozzo.com, kwolf@redhat.com, mreitz@redhat.com, eblake@redhat.com, Anton Nefedov <anton.nefedov@virtuozzo.com>, "Denis V . Lunev" <den@openvz.org>
+Cc: den@virtuozzo.com, kwolf@redhat.com, mreitz@redhat.com, eblake@redhat.com, Pavel Butsykin <pbutsykin@virtuozzo.com>, "Denis V .
+	Lunev" <den@openvz.org>, Anton Nefedov <anton.nefedov@virtuozzo.com>
 
-If COW area of the newly allocated cluster is zeroes, there is no reason
-to write zero sectors in perform_cow() again now as whole clusters are
-zeroed out in single chunks by handle_alloc_space().
+From: Pavel Butsykin <pbutsykin@virtuozzo.com>
 
-Introduce QCowL2Meta field "reduced", since the existing fields
-(offset and nb_bytes) still has to keep other write requests from
-simultaneous writing in the area
+Preallocating memory in the image may remain unused after the fall, for
+the qcow2_check adds the ability to identify and fix it, so as not to
+store extra memory on the host.
 
-iotest 060:
-write to the discarded cluster does not trigger COW anymore.
-so, break on write_aio event instead, will work for the test
-(but write won't fail anymore, so update reference output)
-
-iotest 066:
-cluster-alignment areas that were not really COWed are now detected
-as zeroes, hence the initial write has to be exactly the same size for
-the maps to match
-
-performance tests: ===
-
-qemu-io,
-  results in seconds to complete (less is better)
-  random write 4k to empty image, no backing
-    HDD
-      64k cluster
-        128M over 128M image:   160 -> 160 ( x1  )
-        128M over   2G image:    86 ->  84 ( x1  )
-        128M over   8G image:    40 ->  29 ( x1.4 )
-      1M cluster
-         32M over   8G image:    58 ->  23 ( x2.5 )
-
-    SSD
-      64k cluster
-          2G over   2G image:    71 ->  38 (  x1.9 )
-        512M over   8G image:    85 ->   8 ( x10.6 )
-      1M cluster
-        128M over  32G image:   314 ->   2 ( x157  )
-
-  - improvement grows bigger the bigger the cluster size,
-  - first data portions to the fresh image benefit the most
-  (more chance to hit an unallocated cluster)
-  - SSD improvement is close to the IO length reduction rate
-  (e.g. writing only 4k instead of 64k) gives theoretical x16
-  and practical x10 improvement)
-
-fio tests over xfs, empty image (cluster 64k), no backing,
-
-  first megabytes of random writes:
-    randwrite 4k, size=8g:
-
-      HDD (io_size=128m) :  730 ->  1050 IOPS ( x1.45)
-      SSD (io_size=512m) : 1500 ->  7000 IOPS ( x4.7 )
-
-  random writes io_size==image_size:
-    randwrite 4k, size=2g io_size=2g:
-                   HDD   : 200 IOPS (no difference)
-                   SSD   : 7500 ->  9500 IOPS ( x1.3 )
-
-  sequential write:
-    seqwrite 4k, size=4g, iodepth=4
-                   SSD   : 7000 -> 18000 IOPS ( x2.6 )
-
-  - numbers are similar to qemu-io tests, slightly less improvement
-  (damped by fs?)
-
-Signed-off-by: Anton Nefedov <anton.nefedov@virtuozzo.com>
+Signed-off-by: Pavel Butsykin <pbutsykin@virtuozzo.com>
 Signed-off-by: Denis V. Lunev <den@openvz.org>
+Signed-off-by: Anton Nefedov <anton.nefedov@virtuozzo.com>
 ---
- block/qcow2-cluster.c      |  4 +++-
- block/qcow2.c              | 32 ++++++++++++++++++++++++++++++--
- block/qcow2.h              |  4 ++++
- tests/qemu-iotests/060     |  2 +-
- tests/qemu-iotests/060.out |  3 ++-
- tests/qemu-iotests/066     |  2 +-
- tests/qemu-iotests/066.out |  4 ++--
- 7 files changed, 43 insertions(+), 8 deletions(-)
+ block/qcow2.c                      |  31 +++++++++++
+ tests/qemu-iotests/026.out         | 104 ++++++++++++++++++++++++++++---------
+ tests/qemu-iotests/026.out.nocache | 104 ++++++++++++++++++++++++++++---------
+ tests/qemu-iotests/029.out         |   5 +-
+ tests/qemu-iotests/060.out         |  10 +++-
+ tests/qemu-iotests/061.out         |   5 +-
+ tests/qemu-iotests/066.out         |   5 +-
+ tests/qemu-iotests/098.out         |   7 ++-
+ tests/qemu-iotests/108.out         |   5 +-
+ tests/qemu-iotests/112.out         |   5 +-
+ 10 files changed, 225 insertions(+), 56 deletions(-)
 
-diff --git a/block/qcow2-cluster.c b/block/qcow2-cluster.c
-index d779ea1..ba8ce76 100644
---- a/block/qcow2-cluster.c
-+++ b/block/qcow2-cluster.c
-@@ -758,7 +758,7 @@ static int perform_cow(BlockDriverState *bs, QCowL2Meta *m, Qcow2COWRegion *r)
-     BDRVQcow2State *s = bs->opaque;
-     int ret;
- 
--    if (r->nb_bytes == 0) {
-+    if (r->nb_bytes == 0 || r->reduced) {
-         return 0;
-     }
- 
-@@ -1267,10 +1267,12 @@ static int handle_alloc(BlockDriverState *bs, uint64_t guest_offset,
-         .cow_start = {
-             .offset     = 0,
-             .nb_bytes   = offset_into_cluster(s, guest_offset),
-+            .reduced    = false,
-         },
-         .cow_end = {
-             .offset     = nb_bytes,
-             .nb_bytes   = avail_bytes - nb_bytes,
-+            .reduced    = false,
-         },
-     };
-     qemu_co_queue_init(&(*m)->dependent_requests);
 diff --git a/block/qcow2.c b/block/qcow2.c
-index cd5efba..067bb87 100644
+index 33e5455..809102a 100644
 --- a/block/qcow2.c
 +++ b/block/qcow2.c
-@@ -64,6 +64,9 @@ typedef struct {
- #define  QCOW2_EXT_MAGIC_BACKING_FORMAT 0xE2792ACA
- #define  QCOW2_EXT_MAGIC_FEATURE_TABLE 0x6803f857
- 
-+static bool is_zero_sectors(BlockDriverState *bs, int64_t start,
-+                            uint32_t count);
-+
- static int qcow2_probe(const uint8_t *buf, int buf_size, const char *filename)
- {
-     const QCowHeader *cow_header = (const void *)buf;
-@@ -1575,10 +1578,30 @@ fail:
-     return ret;
+@@ -322,6 +322,32 @@ int qcow2_mark_consistent(BlockDriverState *bs)
+     return 0;
  }
  
-+static void handle_cow_reduce(BlockDriverState *bs, QCowL2Meta *m)
++static int qcow2_check_extra_preallocation(BlockDriverState *bs,
++    BdrvCheckResult *res, BdrvCheckMode fix)
 +{
-+    if (bs->encrypted) {
-+        return;
++    BDRVQcow2State *s = bs->opaque;
++    uint64_t img_size = bdrv_getlength(bs->file->bs);
++
++    if (res->image_end_offset < img_size) {
++        uint64_t count =
++            DIV_ROUND_UP(img_size - res->image_end_offset, s->cluster_size);
++        fprintf(stderr, "%s space leaked at the end of the image %jd\n",
++                fix & BDRV_FIX_LEAKS ? "Repairing" : "ERROR",
++                img_size - res->image_end_offset);
++        res->leaks += count;
++        if (fix & BDRV_FIX_LEAKS) {
++            int ret = bdrv_truncate(bs->file, res->image_end_offset, NULL);
++            if (ret < 0) {
++                res->check_errors++;
++                return ret;
++            }
++            res->leaks_fixed += count;
++        }
 +    }
-+    if (!m->cow_start.reduced && m->cow_start.nb_bytes != 0 &&
-+        is_zero_sectors(bs,
-+                        (m->offset + m->cow_start.offset) >> BDRV_SECTOR_BITS,
-+                        m->cow_start.nb_bytes >> BDRV_SECTOR_BITS)) {
-+        m->cow_start.reduced = true;
-+    }
-+    if (!m->cow_end.reduced && m->cow_end.nb_bytes != 0 &&
-+        is_zero_sectors(bs,
-+                        (m->offset + m->cow_end.offset) >> BDRV_SECTOR_BITS,
-+                        m->cow_end.nb_bytes >> BDRV_SECTOR_BITS)) {
-+        m->cow_end.reduced = true;
-+    }
++
++    return 0;
 +}
 +
- static void handle_alloc_space(BlockDriverState *bs, QCowL2Meta *l2meta)
+ static int qcow2_check(BlockDriverState *bs, BdrvCheckResult *result,
+                        BdrvCheckMode fix)
  {
-     BDRVQcow2State *s = bs->opaque;
-     QCowL2Meta *m;
-+    int ret;
- 
-     for (m = l2meta; m != NULL; m = m->next) {
-         uint64_t bytes = m->nb_clusters << s->cluster_bits;
-@@ -1588,8 +1611,13 @@ static void handle_alloc_space(BlockDriverState *bs, QCowL2Meta *l2meta)
-         }
- 
-         /* try to alloc host space in one chunk for better locality */
--        bdrv_co_pwrite_zeroes(bs->file, m->alloc_offset, bytes,
--                              BDRV_REQ_ALLOCATE);
-+        ret = bdrv_co_pwrite_zeroes(bs->file, m->alloc_offset, bytes,
-+                                    BDRV_REQ_ALLOCATE);
-+        if (ret != 0) {
-+            continue;
-+        }
-+
-+        handle_cow_reduce(bs, m);
+@@ -330,6 +356,11 @@ static int qcow2_check(BlockDriverState *bs, BdrvCheckResult *result,
+         return ret;
      }
- }
  
-diff --git a/block/qcow2.h b/block/qcow2.h
-index 1801dc3..ba15c08 100644
---- a/block/qcow2.h
-+++ b/block/qcow2.h
-@@ -305,6 +305,10 @@ typedef struct Qcow2COWRegion {
- 
-     /** Number of bytes to copy */
-     int         nb_bytes;
++    ret = qcow2_check_extra_preallocation(bs, result, fix);
++    if (ret < 0) {
++        return ret;
++    }
 +
-+    /** The region is filled with zeroes and does not require COW
-+     */
-+    bool        reduced;
- } Qcow2COWRegion;
+     if (fix && result->check_errors == 0 && result->corruptions == 0) {
+         ret = qcow2_mark_clean(bs);
+         if (ret < 0) {
+diff --git a/tests/qemu-iotests/026.out b/tests/qemu-iotests/026.out
+index 86a50a2..e8cf348 100644
+--- a/tests/qemu-iotests/026.out
++++ b/tests/qemu-iotests/026.out
+@@ -5,7 +5,10 @@ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1073741824
  
- /**
-diff --git a/tests/qemu-iotests/060 b/tests/qemu-iotests/060
-index 8e95c45..3a0f096 100755
---- a/tests/qemu-iotests/060
-+++ b/tests/qemu-iotests/060
-@@ -160,7 +160,7 @@ poke_file "$TEST_IMG" '131084' "\x00\x00" # 0x2000c
- # any unallocated cluster, leading to an attempt to overwrite the second L2
- # table. Finally, resume the COW write and see it fail (but not crash).
- echo "open -o file.driver=blkdebug $TEST_IMG
--break cow_read 0
-+break write_aio 0
- aio_write 0k 1k
- wait_break 0
- write 64k 64k
+ Event: l1_update; errno: 5; imm: off; once: on; write
+ write failed: Input/output error
+-No errors were found on the image.
++ERROR space leaked at the end of the image 1024
++
++1 leaked clusters were found on the image.
++This means waste of disk space, but no harm to data.
+ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1073741824
+ 
+ Event: l1_update; errno: 5; imm: off; once: on; write -b
+@@ -33,7 +36,10 @@ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1073741824
+ 
+ Event: l1_update; errno: 28; imm: off; once: on; write
+ write failed: No space left on device
+-No errors were found on the image.
++ERROR space leaked at the end of the image 1024
++
++1 leaked clusters were found on the image.
++This means waste of disk space, but no harm to data.
+ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1073741824
+ 
+ Event: l1_update; errno: 28; imm: off; once: on; write -b
+@@ -181,7 +187,10 @@ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1073741824
+ 
+ Event: l2_alloc_write; errno: 5; imm: off; once: on; write
+ write failed: Input/output error
+-No errors were found on the image.
++ERROR space leaked at the end of the image 1024
++
++1 leaked clusters were found on the image.
++This means waste of disk space, but no harm to data.
+ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1073741824
+ 
+ Event: l2_alloc_write; errno: 5; imm: off; once: on; write -b
+@@ -207,7 +216,10 @@ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1073741824
+ 
+ Event: l2_alloc_write; errno: 28; imm: off; once: on; write
+ write failed: No space left on device
+-No errors were found on the image.
++ERROR space leaked at the end of the image 1024
++
++1 leaked clusters were found on the image.
++This means waste of disk space, but no harm to data.
+ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1073741824
+ 
+ Event: l2_alloc_write; errno: 28; imm: off; once: on; write -b
+@@ -468,20 +480,27 @@ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1073741824
+ 
+ Event: refblock_alloc_hookup; errno: 28; imm: off; once: on; write
+ write failed: No space left on device
+-No errors were found on the image.
++ERROR space leaked at the end of the image 33280
++
++65 leaked clusters were found on the image.
++This means waste of disk space, but no harm to data.
+ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1073741824
+ 
+ Event: refblock_alloc_hookup; errno: 28; imm: off; once: on; write -b
+ write failed: No space left on device
+-No errors were found on the image.
++ERROR space leaked at the end of the image 394240
++
++770 leaked clusters were found on the image.
++This means waste of disk space, but no harm to data.
+ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1073741824
+ 
+ Event: refblock_alloc_hookup; errno: 28; imm: off; once: off; write
+ Failed to flush the L2 table cache: No space left on device
+ Failed to flush the refcount block cache: No space left on device
+ write failed: No space left on device
++ERROR space leaked at the end of the image 5120
+ 
+-55 leaked clusters were found on the image.
++65 leaked clusters were found on the image.
+ This means waste of disk space, but no harm to data.
+ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1073741824
+ 
+@@ -489,19 +508,26 @@ Event: refblock_alloc_hookup; errno: 28; imm: off; once: off; write -b
+ Failed to flush the L2 table cache: No space left on device
+ Failed to flush the refcount block cache: No space left on device
+ write failed: No space left on device
++ERROR space leaked at the end of the image 265728
+ 
+-251 leaked clusters were found on the image.
++770 leaked clusters were found on the image.
+ This means waste of disk space, but no harm to data.
+ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1073741824
+ 
+ Event: refblock_alloc_write; errno: 28; imm: off; once: on; write
+ write failed: No space left on device
+-No errors were found on the image.
++ERROR space leaked at the end of the image 33280
++
++65 leaked clusters were found on the image.
++This means waste of disk space, but no harm to data.
+ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1073741824
+ 
+ Event: refblock_alloc_write; errno: 28; imm: off; once: on; write -b
+ write failed: No space left on device
+-No errors were found on the image.
++ERROR space leaked at the end of the image 394240
++
++770 leaked clusters were found on the image.
++This means waste of disk space, but no harm to data.
+ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1073741824
+ 
+ Event: refblock_alloc_write; errno: 28; imm: off; once: off; write
+@@ -520,20 +546,27 @@ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1073741824
+ 
+ Event: refblock_alloc_write_blocks; errno: 28; imm: off; once: on; write
+ write failed: No space left on device
+-No errors were found on the image.
++ERROR space leaked at the end of the image 33280
++
++65 leaked clusters were found on the image.
++This means waste of disk space, but no harm to data.
+ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1073741824
+ 
+ Event: refblock_alloc_write_blocks; errno: 28; imm: off; once: on; write -b
+ write failed: No space left on device
+-No errors were found on the image.
++ERROR space leaked at the end of the image 33280
++
++65 leaked clusters were found on the image.
++This means waste of disk space, but no harm to data.
+ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1073741824
+ 
+ Event: refblock_alloc_write_blocks; errno: 28; imm: off; once: off; write
+ Failed to flush the L2 table cache: No space left on device
+ Failed to flush the refcount block cache: No space left on device
+ write failed: No space left on device
++ERROR space leaked at the end of the image 27648
+ 
+-11 leaked clusters were found on the image.
++65 leaked clusters were found on the image.
+ This means waste of disk space, but no harm to data.
+ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1073741824
+ 
+@@ -541,27 +574,35 @@ Event: refblock_alloc_write_blocks; errno: 28; imm: off; once: off; write -b
+ Failed to flush the L2 table cache: No space left on device
+ Failed to flush the refcount block cache: No space left on device
+ write failed: No space left on device
++ERROR space leaked at the end of the image 21504
+ 
+-23 leaked clusters were found on the image.
++65 leaked clusters were found on the image.
+ This means waste of disk space, but no harm to data.
+ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1073741824
+ 
+ Event: refblock_alloc_write_table; errno: 28; imm: off; once: on; write
+ write failed: No space left on device
+-No errors were found on the image.
++ERROR space leaked at the end of the image 33280
++
++65 leaked clusters were found on the image.
++This means waste of disk space, but no harm to data.
+ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1073741824
+ 
+ Event: refblock_alloc_write_table; errno: 28; imm: off; once: on; write -b
+ write failed: No space left on device
+-No errors were found on the image.
++ERROR space leaked at the end of the image 33280
++
++65 leaked clusters were found on the image.
++This means waste of disk space, but no harm to data.
+ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1073741824
+ 
+ Event: refblock_alloc_write_table; errno: 28; imm: off; once: off; write
+ Failed to flush the L2 table cache: No space left on device
+ Failed to flush the refcount block cache: No space left on device
+ write failed: No space left on device
++ERROR space leaked at the end of the image 27648
+ 
+-11 leaked clusters were found on the image.
++65 leaked clusters were found on the image.
+ This means waste of disk space, but no harm to data.
+ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1073741824
+ 
+@@ -569,27 +610,35 @@ Event: refblock_alloc_write_table; errno: 28; imm: off; once: off; write -b
+ Failed to flush the L2 table cache: No space left on device
+ Failed to flush the refcount block cache: No space left on device
+ write failed: No space left on device
++ERROR space leaked at the end of the image 21504
+ 
+-23 leaked clusters were found on the image.
++65 leaked clusters were found on the image.
+ This means waste of disk space, but no harm to data.
+ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1073741824
+ 
+ Event: refblock_alloc_switch_table; errno: 28; imm: off; once: on; write
+ write failed: No space left on device
+-No errors were found on the image.
++ERROR space leaked at the end of the image 33280
++
++65 leaked clusters were found on the image.
++This means waste of disk space, but no harm to data.
+ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1073741824
+ 
+ Event: refblock_alloc_switch_table; errno: 28; imm: off; once: on; write -b
+ write failed: No space left on device
+-No errors were found on the image.
++ERROR space leaked at the end of the image 33280
++
++65 leaked clusters were found on the image.
++This means waste of disk space, but no harm to data.
+ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1073741824
+ 
+ Event: refblock_alloc_switch_table; errno: 28; imm: off; once: off; write
+ Failed to flush the L2 table cache: No space left on device
+ Failed to flush the refcount block cache: No space left on device
+ write failed: No space left on device
++ERROR space leaked at the end of the image 27648
+ 
+-11 leaked clusters were found on the image.
++65 leaked clusters were found on the image.
+ This means waste of disk space, but no harm to data.
+ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1073741824
+ 
+@@ -597,8 +646,9 @@ Event: refblock_alloc_switch_table; errno: 28; imm: off; once: off; write -b
+ Failed to flush the L2 table cache: No space left on device
+ Failed to flush the refcount block cache: No space left on device
+ write failed: No space left on device
++ERROR space leaked at the end of the image 21504
+ 
+-23 leaked clusters were found on the image.
++65 leaked clusters were found on the image.
+ This means waste of disk space, but no harm to data.
+ 
+ === L1 growth tests ===
+@@ -651,7 +701,10 @@ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1073741824
+ 
+ Event: l1_grow_activate_table; errno: 5; imm: off; once: on
+ write failed: Input/output error
+-No errors were found on the image.
++ERROR space leaked at the end of the image 98304
++
++96 leaked clusters were found on the image.
++This means waste of disk space, but no harm to data.
+ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1073741824
+ 
+ Event: l1_grow_activate_table; errno: 5; imm: off; once: off
+@@ -665,7 +718,10 @@ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1073741824
+ 
+ Event: l1_grow_activate_table; errno: 28; imm: off; once: on
+ write failed: No space left on device
+-No errors were found on the image.
++ERROR space leaked at the end of the image 98304
++
++96 leaked clusters were found on the image.
++This means waste of disk space, but no harm to data.
+ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1073741824
+ 
+ Event: l1_grow_activate_table; errno: 28; imm: off; once: off
+diff --git a/tests/qemu-iotests/026.out.nocache b/tests/qemu-iotests/026.out.nocache
+index ea2e166..820ce0f 100644
+--- a/tests/qemu-iotests/026.out.nocache
++++ b/tests/qemu-iotests/026.out.nocache
+@@ -5,7 +5,10 @@ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1073741824
+ 
+ Event: l1_update; errno: 5; imm: off; once: on; write 
+ write failed: Input/output error
+-No errors were found on the image.
++ERROR space leaked at the end of the image 1024
++
++1 leaked clusters were found on the image.
++This means waste of disk space, but no harm to data.
+ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1073741824 
+ 
+ Event: l1_update; errno: 5; imm: off; once: on; write -b
+@@ -33,7 +36,10 @@ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1073741824
+ 
+ Event: l1_update; errno: 28; imm: off; once: on; write 
+ write failed: No space left on device
+-No errors were found on the image.
++ERROR space leaked at the end of the image 1024
++
++1 leaked clusters were found on the image.
++This means waste of disk space, but no harm to data.
+ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1073741824 
+ 
+ Event: l1_update; errno: 28; imm: off; once: on; write -b
+@@ -189,7 +195,10 @@ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1073741824
+ 
+ Event: l2_alloc_write; errno: 5; imm: off; once: on; write 
+ write failed: Input/output error
+-No errors were found on the image.
++ERROR space leaked at the end of the image 1024
++
++1 leaked clusters were found on the image.
++This means waste of disk space, but no harm to data.
+ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1073741824 
+ 
+ Event: l2_alloc_write; errno: 5; imm: off; once: on; write -b
+@@ -215,7 +224,10 @@ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1073741824
+ 
+ Event: l2_alloc_write; errno: 28; imm: off; once: on; write 
+ write failed: No space left on device
+-No errors were found on the image.
++ERROR space leaked at the end of the image 1024
++
++1 leaked clusters were found on the image.
++This means waste of disk space, but no harm to data.
+ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1073741824 
+ 
+ Event: l2_alloc_write; errno: 28; imm: off; once: on; write -b
+@@ -476,20 +488,27 @@ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1073741824
+ 
+ Event: refblock_alloc_hookup; errno: 28; imm: off; once: on; write 
+ write failed: No space left on device
+-No errors were found on the image.
++ERROR space leaked at the end of the image 33280
++
++65 leaked clusters were found on the image.
++This means waste of disk space, but no harm to data.
+ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1073741824 
+ 
+ Event: refblock_alloc_hookup; errno: 28; imm: off; once: on; write -b
+ write failed: No space left on device
+-No errors were found on the image.
++ERROR space leaked at the end of the image 394240
++
++770 leaked clusters were found on the image.
++This means waste of disk space, but no harm to data.
+ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1073741824 
+ 
+ Event: refblock_alloc_hookup; errno: 28; imm: off; once: off; write 
+ Failed to flush the L2 table cache: No space left on device
+ Failed to flush the refcount block cache: No space left on device
+ write failed: No space left on device
++ERROR space leaked at the end of the image 5120
+ 
+-55 leaked clusters were found on the image.
++65 leaked clusters were found on the image.
+ This means waste of disk space, but no harm to data.
+ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1073741824 
+ 
+@@ -497,19 +516,26 @@ Event: refblock_alloc_hookup; errno: 28; imm: off; once: off; write -b
+ Failed to flush the L2 table cache: No space left on device
+ Failed to flush the refcount block cache: No space left on device
+ write failed: No space left on device
++ERROR space leaked at the end of the image 265728
+ 
+-251 leaked clusters were found on the image.
++770 leaked clusters were found on the image.
+ This means waste of disk space, but no harm to data.
+ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1073741824 
+ 
+ Event: refblock_alloc_write; errno: 28; imm: off; once: on; write 
+ write failed: No space left on device
+-No errors were found on the image.
++ERROR space leaked at the end of the image 33280
++
++65 leaked clusters were found on the image.
++This means waste of disk space, but no harm to data.
+ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1073741824 
+ 
+ Event: refblock_alloc_write; errno: 28; imm: off; once: on; write -b
+ write failed: No space left on device
+-No errors were found on the image.
++ERROR space leaked at the end of the image 394240
++
++770 leaked clusters were found on the image.
++This means waste of disk space, but no harm to data.
+ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1073741824 
+ 
+ Event: refblock_alloc_write; errno: 28; imm: off; once: off; write 
+@@ -528,20 +554,27 @@ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1073741824
+ 
+ Event: refblock_alloc_write_blocks; errno: 28; imm: off; once: on; write 
+ write failed: No space left on device
+-No errors were found on the image.
++ERROR space leaked at the end of the image 33280
++
++65 leaked clusters were found on the image.
++This means waste of disk space, but no harm to data.
+ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1073741824 
+ 
+ Event: refblock_alloc_write_blocks; errno: 28; imm: off; once: on; write -b
+ write failed: No space left on device
+-No errors were found on the image.
++ERROR space leaked at the end of the image 33280
++
++65 leaked clusters were found on the image.
++This means waste of disk space, but no harm to data.
+ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1073741824 
+ 
+ Event: refblock_alloc_write_blocks; errno: 28; imm: off; once: off; write 
+ Failed to flush the L2 table cache: No space left on device
+ Failed to flush the refcount block cache: No space left on device
+ write failed: No space left on device
++ERROR space leaked at the end of the image 27648
+ 
+-11 leaked clusters were found on the image.
++65 leaked clusters were found on the image.
+ This means waste of disk space, but no harm to data.
+ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1073741824 
+ 
+@@ -549,27 +582,35 @@ Event: refblock_alloc_write_blocks; errno: 28; imm: off; once: off; write -b
+ Failed to flush the L2 table cache: No space left on device
+ Failed to flush the refcount block cache: No space left on device
+ write failed: No space left on device
++ERROR space leaked at the end of the image 21504
+ 
+-23 leaked clusters were found on the image.
++65 leaked clusters were found on the image.
+ This means waste of disk space, but no harm to data.
+ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1073741824 
+ 
+ Event: refblock_alloc_write_table; errno: 28; imm: off; once: on; write 
+ write failed: No space left on device
+-No errors were found on the image.
++ERROR space leaked at the end of the image 33280
++
++65 leaked clusters were found on the image.
++This means waste of disk space, but no harm to data.
+ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1073741824 
+ 
+ Event: refblock_alloc_write_table; errno: 28; imm: off; once: on; write -b
+ write failed: No space left on device
+-No errors were found on the image.
++ERROR space leaked at the end of the image 33280
++
++65 leaked clusters were found on the image.
++This means waste of disk space, but no harm to data.
+ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1073741824 
+ 
+ Event: refblock_alloc_write_table; errno: 28; imm: off; once: off; write 
+ Failed to flush the L2 table cache: No space left on device
+ Failed to flush the refcount block cache: No space left on device
+ write failed: No space left on device
++ERROR space leaked at the end of the image 27648
+ 
+-11 leaked clusters were found on the image.
++65 leaked clusters were found on the image.
+ This means waste of disk space, but no harm to data.
+ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1073741824 
+ 
+@@ -577,27 +618,35 @@ Event: refblock_alloc_write_table; errno: 28; imm: off; once: off; write -b
+ Failed to flush the L2 table cache: No space left on device
+ Failed to flush the refcount block cache: No space left on device
+ write failed: No space left on device
++ERROR space leaked at the end of the image 21504
+ 
+-23 leaked clusters were found on the image.
++65 leaked clusters were found on the image.
+ This means waste of disk space, but no harm to data.
+ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1073741824 
+ 
+ Event: refblock_alloc_switch_table; errno: 28; imm: off; once: on; write 
+ write failed: No space left on device
+-No errors were found on the image.
++ERROR space leaked at the end of the image 33280
++
++65 leaked clusters were found on the image.
++This means waste of disk space, but no harm to data.
+ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1073741824 
+ 
+ Event: refblock_alloc_switch_table; errno: 28; imm: off; once: on; write -b
+ write failed: No space left on device
+-No errors were found on the image.
++ERROR space leaked at the end of the image 33280
++
++65 leaked clusters were found on the image.
++This means waste of disk space, but no harm to data.
+ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1073741824 
+ 
+ Event: refblock_alloc_switch_table; errno: 28; imm: off; once: off; write 
+ Failed to flush the L2 table cache: No space left on device
+ Failed to flush the refcount block cache: No space left on device
+ write failed: No space left on device
++ERROR space leaked at the end of the image 27648
+ 
+-11 leaked clusters were found on the image.
++65 leaked clusters were found on the image.
+ This means waste of disk space, but no harm to data.
+ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1073741824 
+ 
+@@ -605,8 +654,9 @@ Event: refblock_alloc_switch_table; errno: 28; imm: off; once: off; write -b
+ Failed to flush the L2 table cache: No space left on device
+ Failed to flush the refcount block cache: No space left on device
+ write failed: No space left on device
++ERROR space leaked at the end of the image 21504
+ 
+-23 leaked clusters were found on the image.
++65 leaked clusters were found on the image.
+ This means waste of disk space, but no harm to data.
+ 
+ === L1 growth tests ===
+@@ -659,7 +709,10 @@ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1073741824
+ 
+ Event: l1_grow_activate_table; errno: 5; imm: off; once: on
+ write failed: Input/output error
+-No errors were found on the image.
++ERROR space leaked at the end of the image 98304
++
++96 leaked clusters were found on the image.
++This means waste of disk space, but no harm to data.
+ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1073741824 
+ 
+ Event: l1_grow_activate_table; errno: 5; imm: off; once: off
+@@ -673,7 +726,10 @@ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1073741824
+ 
+ Event: l1_grow_activate_table; errno: 28; imm: off; once: on
+ write failed: No space left on device
+-No errors were found on the image.
++ERROR space leaked at the end of the image 98304
++
++96 leaked clusters were found on the image.
++This means waste of disk space, but no harm to data.
+ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1073741824 
+ 
+ Event: l1_grow_activate_table; errno: 28; imm: off; once: off
+diff --git a/tests/qemu-iotests/029.out b/tests/qemu-iotests/029.out
+index 5bc93e0..7176e38 100644
+--- a/tests/qemu-iotests/029.out
++++ b/tests/qemu-iotests/029.out
+@@ -6,7 +6,10 @@ is smaller than the current L1 table.
+ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864
+ wrote 4096/4096 bytes at offset 0
+ 4 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+-No errors were found on the image.
++ERROR space leaked at the end of the image 65536
++
++1 leaked clusters were found on the image.
++This means waste of disk space, but no harm to data.
+ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=16777216
+ wrote 4194304/4194304 bytes at offset 0
+ 4 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
 diff --git a/tests/qemu-iotests/060.out b/tests/qemu-iotests/060.out
-index 3bc1461..d057aa1 100644
+index d057aa1..3d4e5b3 100644
 --- a/tests/qemu-iotests/060.out
 +++ b/tests/qemu-iotests/060.out
-@@ -107,7 +107,8 @@ qcow2: Marking image as corrupt: Preventing invalid write on metadata (overlaps
- blkdebug: Suspended request '0'
- write failed: Input/output error
- blkdebug: Resuming request '0'
--aio_write failed: No medium found
-+wrote 1024/1024 bytes at offset 0
-+1 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+@@ -77,20 +77,26 @@ Leaked cluster 9 refcount=1 reference=0
+ Repairing cluster 4 refcount=1 reference=2
+ Repairing cluster 9 refcount=1 reference=0
+ Repairing OFLAG_COPIED data cluster: l2_entry=8000000000040000 refcount=2
++ERROR space leaked at the end of the image 65536
+ The following inconsistencies were found and repaired:
  
- === Testing unallocated image header ===
+     1 leaked clusters
+     2 corruptions
  
-diff --git a/tests/qemu-iotests/066 b/tests/qemu-iotests/066
-index 8638217..3c216a1 100755
---- a/tests/qemu-iotests/066
-+++ b/tests/qemu-iotests/066
-@@ -71,7 +71,7 @@ echo
- _make_test_img $IMG_SIZE
+ Double checking the fixed image now...
+-No errors were found on the image.
++
++1 leaked clusters were found on the image.
++This means waste of disk space, but no harm to data.
+ incompatible_features     0x0
+ wrote 512/512 bytes at offset 0
+ 512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+ incompatible_features     0x0
+ read 512/512 bytes at offset 0
+ 512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+-No errors were found on the image.
++ERROR space leaked at the end of the image 131072
++
++2 leaked clusters were found on the image.
++This means waste of disk space, but no harm to data.
+ read 512/512 bytes at offset 0
+ 512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
  
- # Create data clusters (not aligned to an L2 table)
--$QEMU_IO -c 'write -P 42 1M 256k' "$TEST_IMG" | _filter_qemu_io
-+$QEMU_IO -c "write -P 42 $(((1024 + 32) * 1024)) 192k" "$TEST_IMG" | _filter_qemu_io
- orig_map=$($QEMU_IMG map --output=json "$TEST_IMG")
+diff --git a/tests/qemu-iotests/061.out b/tests/qemu-iotests/061.out
+index a431b7f..69fb929 100644
+--- a/tests/qemu-iotests/061.out
++++ b/tests/qemu-iotests/061.out
+@@ -328,7 +328,10 @@ wrote 131072/131072 bytes at offset 0
+ No errors were found on the image.
+ read 131072/131072 bytes at offset 0
+ 128 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+-No errors were found on the image.
++ERROR space leaked at the end of the image 196608
++
++3 leaked clusters were found on the image.
++This means waste of disk space, but no harm to data.
+ read 131072/131072 bytes at offset 0
+ 128 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
  
- # Convert the data clusters to preallocated zero clusters
 diff --git a/tests/qemu-iotests/066.out b/tests/qemu-iotests/066.out
-index 3d9da9b..093431e 100644
+index 093431e..81ef795 100644
 --- a/tests/qemu-iotests/066.out
 +++ b/tests/qemu-iotests/066.out
-@@ -19,8 +19,8 @@ Offset          Length          Mapped to       File
- === Writing to preallocated zero clusters ===
+@@ -13,7 +13,10 @@ discard 67109376/67109376 bytes at offset 0
+ 64 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+ read 67109376/67109376 bytes at offset 0
+ 64 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+-No errors were found on the image.
++ERROR space leaked at the end of the image 327680
++
++5 leaked clusters were found on the image.
++This means waste of disk space, but no harm to data.
+ Offset          Length          Mapped to       File
  
- Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67109376
--wrote 262144/262144 bytes at offset 1048576
--256 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+wrote 196608/196608 bytes at offset 1081344
-+192 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
- wrote 262144/262144 bytes at offset 1048576
- 256 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
- wrote 196608/196608 bytes at offset 1081344
+ === Writing to preallocated zero clusters ===
+diff --git a/tests/qemu-iotests/098.out b/tests/qemu-iotests/098.out
+index 7634d0e..733249f 100644
+--- a/tests/qemu-iotests/098.out
++++ b/tests/qemu-iotests/098.out
+@@ -20,7 +20,10 @@ Leaked cluster 4 refcount=1 reference=0
+ Leaked cluster 5 refcount=1 reference=0
+ Repairing cluster 4 refcount=1 reference=0
+ Repairing cluster 5 refcount=1 reference=0
+-No errors were found on the image.
++ERROR space leaked at the end of the image 131072
++
++2 leaked clusters were found on the image.
++This means waste of disk space, but no harm to data.
+ 
+ === reftable_update ===
+ 
+@@ -34,6 +37,7 @@ ERROR cluster 1 refcount=0 reference=1
+ ERROR cluster 3 refcount=0 reference=1
+ Rebuilding refcount structure
+ Repairing cluster 1 refcount=1 reference=0
++Repairing space leaked at the end of the image 65536
+ No errors were found on the image.
+ 
+ === refblock_alloc ===
+@@ -48,5 +52,6 @@ ERROR cluster 1 refcount=0 reference=1
+ ERROR cluster 3 refcount=0 reference=1
+ Rebuilding refcount structure
+ Repairing cluster 1 refcount=1 reference=0
++Repairing space leaked at the end of the image 65536
+ No errors were found on the image.
+ *** done
+diff --git a/tests/qemu-iotests/108.out b/tests/qemu-iotests/108.out
+index 75bab8d..d178b1e 100644
+--- a/tests/qemu-iotests/108.out
++++ b/tests/qemu-iotests/108.out
+@@ -68,13 +68,16 @@ Rebuilding refcount structure
+ Repairing cluster 1 refcount=1 reference=0
+ Repairing cluster 2 refcount=1 reference=0
+ Repairing cluster 16 refcount=1 reference=0
++ERROR space leaked at the end of the image 720896
+ The following inconsistencies were found and repaired:
+ 
+     0 leaked clusters
+     2 corruptions
+ 
+ Double checking the fixed image now...
+-No errors were found on the image.
++
++11 leaked clusters were found on the image.
++This means waste of disk space, but no harm to data.
+ 
+ --- Signed overflow after the refblock ---
+ 
+diff --git a/tests/qemu-iotests/112.out b/tests/qemu-iotests/112.out
+index 81b04d1..7386be8 100644
+--- a/tests/qemu-iotests/112.out
++++ b/tests/qemu-iotests/112.out
+@@ -93,7 +93,10 @@ refcount bits: 1
+ 
+ === Amend from refcount_bits=1 to refcount_bits=64 ===
+ 
+-No errors were found on the image.
++ERROR space leaked at the end of the image 131072
++
++2 leaked clusters were found on the image.
++This means waste of disk space, but no harm to data.
+ refcount bits: 64
+ 
+ === Amend to compat=0.10 ===
 -- 
 2.7.4
