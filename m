@@ -1,20 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36502)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36597)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mjt@tls.msk.ru>) id 1dGMtl-00046h-G7
-	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 06:00:10 -0400
+	(envelope-from <ali.saeedi56@gmail.com>) id 1dGMtx-0004J4-17
+	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 06:00:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mjt@tls.msk.ru>) id 1dGMtg-0005V5-Kz
-	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 06:00:09 -0400
-References: <20170531120049.14111-1-n54@gmx.com>
-From: Michael Tokarev <mjt@tls.msk.ru>
-Message-ID: <c967a222-e6f6-67b2-5227-895f8e43af32@msgid.tls.msk.ru>
-Date: Thu, 1 Jun 2017 13:00:03 +0300
+	(envelope-from <ali.saeedi56@gmail.com>) id 1dGMts-0005bM-OC
+	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 06:00:21 -0400
+Received: from mail-qt0-x236.google.com ([2607:f8b0:400d:c0d::236]:33115)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <ali.saeedi56@gmail.com>)
+	id 1dGMts-0005b0-KW
+	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 06:00:16 -0400
+Received: by mail-qt0-x236.google.com with SMTP id t26so32036324qtg.0
+	for <qemu-devel@nongnu.org>; Thu, 01 Jun 2017 03:00:14 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20170531120049.14111-1-n54@gmx.com>
-Content-Type: text/plain; charset=windows-1251
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3] ivshmem-server: ivshmem-client: Build
- when eventfd() is available
+From: ali saeedi <ali.saeedi56@gmail.com>
+Date: Thu, 1 Jun 2017 14:30:13 +0430
+Message-ID: <CAGKXQycLBOd4EXQBQB+KfDnHs7i4ymBRFQo7pJ0QFomTGYu8Eg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: [Qemu-devel] qemu, kvm and qemu-kvm
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,17 +26,8 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kamil Rytarowski <n54@gmx.com>, qemu-trivial@nongnu.org
-Cc: qemu-devel@nongnu.org, armbru@redhat.com, marcandre.lureau@gmail.com, peter.maydell@redhat.com, eblake@redhat.com, f4bug@amsat.org
+To: qemu-devel@nongnu.org
 
-31.05.2017 15:00, Kamil Rytarowski wrote:
-> Currently ivshmem requires eventfd() which is Linux specific.
-> Do not and build it unconditionally on every Linux/BSD/Solaris.
-> 
-> This patch indirectly fixes build failure on NetBSD, where these tools
-> additionally require -lrt for shm_open(3). In future there should be
-> added support for NetBSD and the linking addressed appropriately.
-
-Applied to -trivial, thanks!
-
-/mjt
+Hello
+what are the difference between kvm, qemu and kvm-qemu?
+thanks a lot
