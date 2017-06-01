@@ -1,28 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59600)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59653)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1dGPQV-0003Pn-8v
-	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 08:42:08 -0400
+	(envelope-from <paolo.bonzini@gmail.com>) id 1dGPQc-0003dH-BD
+	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 08:42:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1dGPQQ-0005gq-V9
-	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 08:42:07 -0400
-Received: from mail-wm0-x241.google.com ([2a00:1450:400c:c09::241]:35369)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1dGPQb-0005jv-C6
+	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 08:42:14 -0400
+Received: from mail-wm0-x244.google.com ([2a00:1450:400c:c09::244]:36286)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1dGPQQ-0005gZ-N6
-	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 08:42:02 -0400
-Received: by mail-wm0-x241.google.com with SMTP id g15so11028764wmc.2
-	for <qemu-devel@nongnu.org>; Thu, 01 Jun 2017 05:42:02 -0700 (PDT)
+	id 1dGPQb-0005jj-6Z
+	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 08:42:13 -0400
+Received: by mail-wm0-x244.google.com with SMTP id k15so11049631wmh.3
+	for <qemu-devel@nongnu.org>; Thu, 01 Jun 2017 05:42:13 -0700 (PDT)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Thu,  1 Jun 2017 14:41:24 +0200
-Message-Id: <1496320911-51305-7-git-send-email-pbonzini@redhat.com>
+Date: Thu,  1 Jun 2017 14:41:33 +0200
+Message-Id: <1496320911-51305-16-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1496320911-51305-1-git-send-email-pbonzini@redhat.com>
 References: <1496320911-51305-1-git-send-email-pbonzini@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 06/33] kvm: irqchip: trace changes on msi
- add/remove
+Subject: [Qemu-devel] [PULL 15/33] exec: simplify phys_page_find() params
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,56 +32,55 @@ Cc: Peter Xu <peterx@redhat.com>
 
 From: Peter Xu <peterx@redhat.com>
 
-It'll be nice to know which virq belongs to which device/vector when
-adding msi routes, so adding two more parameters for the add trace.
-
-Meanwhile, releasing virq has no tracing before. Add one for it.
+It really only plays with the dispatchers, so the parameter list does
+not need that complexity. This helps for readability at least.
 
 Signed-off-by: Peter Xu <peterx@redhat.com>
-Message-Id: <1494309644-18743-2-git-send-email-peterx@redhat.com>
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Message-Id: <1494838260-30439-2-git-send-email-peterx@redhat.com>
+Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- kvm-all.c    | 4 +++-
- trace-events | 3 ++-
- 2 files changed, 5 insertions(+), 2 deletions(-)
+ exec.c | 13 ++++++-------
+ 1 file changed, 6 insertions(+), 7 deletions(-)
 
-diff --git a/kvm-all.c b/kvm-all.c
-index 90b8573..2598b1f 100644
---- a/kvm-all.c
-+++ b/kvm-all.c
-@@ -1144,6 +1144,7 @@ void kvm_irqchip_release_virq(KVMState *s, int virq)
-     }
-     clear_gsi(s, virq);
-     kvm_arch_release_virq_post(virq);
-+    trace_kvm_irqchip_release_virq(virq);
+diff --git a/exec.c b/exec.c
+index 96e3ac9..29633cd 100644
+--- a/exec.c
++++ b/exec.c
+@@ -373,10 +373,11 @@ static inline bool section_covers_addr(const MemoryRegionSection *section,
+                              int128_getlo(section->size), addr);
  }
  
- static unsigned int kvm_hash_msi(uint32_t data)
-@@ -1287,7 +1288,8 @@ int kvm_irqchip_add_msi_route(KVMState *s, int vector, PCIDevice *dev)
-         return -EINVAL;
+-static MemoryRegionSection *phys_page_find(PhysPageEntry lp, hwaddr addr,
+-                                           Node *nodes, MemoryRegionSection *sections)
++static MemoryRegionSection *phys_page_find(AddressSpaceDispatch *d, hwaddr addr)
+ {
+-    PhysPageEntry *p;
++    PhysPageEntry lp = d->phys_map, *p;
++    Node *nodes = d->map.nodes;
++    MemoryRegionSection *sections = d->map.sections;
+     hwaddr index = addr >> TARGET_PAGE_BITS;
+     int i;
+ 
+@@ -414,8 +415,7 @@ static MemoryRegionSection *address_space_lookup_region(AddressSpaceDispatch *d,
+         section_covers_addr(section, addr)) {
+         update = false;
+     } else {
+-        section = phys_page_find(d->phys_map, addr, d->map.nodes,
+-                                 d->map.sections);
++        section = phys_page_find(d, addr);
+         update = true;
      }
- 
--    trace_kvm_irqchip_add_msi_route(virq);
-+    trace_kvm_irqchip_add_msi_route(dev ? dev->name : (char *)"N/A",
-+                                    vector, virq);
- 
-     kvm_add_routing_entry(s, &kroute);
-     kvm_arch_add_msi_route_post(&kroute, vector, dev);
-diff --git a/trace-events b/trace-events
-index e582d63..f01ec05 100644
---- a/trace-events
-+++ b/trace-events
-@@ -69,8 +69,9 @@ kvm_device_ioctl(int fd, int type, void *arg) "dev fd %d, type 0x%x, arg %p"
- kvm_failed_reg_get(uint64_t id, const char *msg) "Warning: Unable to retrieve ONEREG %" PRIu64 " from KVM: %s"
- kvm_failed_reg_set(uint64_t id, const char *msg) "Warning: Unable to set ONEREG %" PRIu64 " to KVM: %s"
- kvm_irqchip_commit_routes(void) ""
--kvm_irqchip_add_msi_route(int virq) "Adding MSI route virq=%d"
-+kvm_irqchip_add_msi_route(char *name, int vector, int virq) "dev %s vector %d virq %d"
- kvm_irqchip_update_msi_route(int virq) "Updating MSI route virq=%d"
-+kvm_irqchip_release_virq(int virq) "virq %d"
- 
- # TCG related tracing (mostly disabled by default)
- # cpu-exec.c
+     if (resolve_subpage && section->mr->subpage) {
+@@ -1283,8 +1283,7 @@ static void register_subpage(AddressSpaceDispatch *d, MemoryRegionSection *secti
+     subpage_t *subpage;
+     hwaddr base = section->offset_within_address_space
+         & TARGET_PAGE_MASK;
+-    MemoryRegionSection *existing = phys_page_find(d->phys_map, base,
+-                                                   d->map.nodes, d->map.sections);
++    MemoryRegionSection *existing = phys_page_find(d, base);
+     MemoryRegionSection subsection = {
+         .offset_within_address_space = base,
+         .size = int128_make64(TARGET_PAGE_SIZE),
 -- 
 1.8.3.1
