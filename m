@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38302)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38286)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1dGVh4-0004OK-Sa
-	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 15:23:39 -0400
+	(envelope-from <quintela@redhat.com>) id 1dGVh3-0004NY-Hr
+	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 15:23:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1dGVh4-0004rp-3P
-	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 15:23:38 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34382)
+	(envelope-from <quintela@redhat.com>) id 1dGVh2-0004rD-Fp
+	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 15:23:37 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34326)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1dGVh3-0004rT-To
-	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 15:23:38 -0400
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1dGVh2-0004qk-7C
+	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 15:23:36 -0400
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
 	[10.5.11.13])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id ECCADC0587C1
-	for <qemu-devel@nongnu.org>; Thu,  1 Jun 2017 19:23:36 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 2BAA7C057FA6
+	for <qemu-devel@nongnu.org>; Thu,  1 Jun 2017 19:23:35 +0000 (UTC)
 From: Juan Quintela <quintela@redhat.com>
-Date: Thu,  1 Jun 2017 21:23:15 +0200
-Message-Id: <20170601192327.29712-4-quintela@redhat.com>
+Date: Thu,  1 Jun 2017 21:23:14 +0200
+Message-Id: <20170601192327.29712-3-quintela@redhat.com>
 In-Reply-To: <20170601192327.29712-1-quintela@redhat.com>
 References: <20170601192327.29712-1-quintela@redhat.com>
-Subject: [Qemu-devel] [PULL 03/15] migration: Remove section_id parameter
- from vmstate_load
+Subject: [Qemu-devel] [PULL 02/15] migration: loadvm handlers are not used
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,55 +32,143 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: dgilbert@redhat.com, lvivier@redhat.com, peterx@redhat.com
 
-Everything else assumes that we always load a device from its own
-savevm handler.
+So we remove all traces of them.
 
 Signed-off-by: Juan Quintela <quintela@redhat.com>
 Reviewed-by: Laurent Vivier <lvivier@redhat.com>
 Reviewed-by: Peter Xu <peterx@redhat.com>
 Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 ---
- migration/savevm.c | 10 +++++-----
- 1 file changed, 5 insertions(+), 5 deletions(-)
+ include/migration/migration.h |  5 -----
+ include/migration/vmstate.h   |  2 --
+ include/qemu/typedefs.h       |  1 -
+ migration/migration.c         |  2 --
+ migration/savevm.c            | 26 --------------------------
+ 5 files changed, 36 deletions(-)
 
+diff --git a/include/migration/migration.h b/include/migration/migration.h
+index 0e807b6..d1a353a 100644
+--- a/include/migration/migration.h
++++ b/include/migration/migration.h
+@@ -50,8 +50,6 @@ enum mig_rp_message_type {
+     MIG_RP_MSG_MAX
+ };
+ 
+-typedef QLIST_HEAD(, LoadStateEntry) LoadStateEntry_Head;
+-
+ /* State for the incoming migration */
+ struct MigrationIncomingState {
+     QEMUFile *from_src_file;
+@@ -89,9 +87,6 @@ struct MigrationIncomingState {
+     /* The coroutine we should enter (back) after failover */
+     Coroutine *migration_incoming_co;
+     QemuSemaphore colo_incoming_sem;
+-
+-    /* See savevm.c */
+-    LoadStateEntry_Head loadvm_handlers;
+ };
+ 
+ MigrationIncomingState *migration_incoming_get_current(void);
+diff --git a/include/migration/vmstate.h b/include/migration/vmstate.h
+index f97411d..6689562 100644
+--- a/include/migration/vmstate.h
++++ b/include/migration/vmstate.h
+@@ -1020,8 +1020,6 @@ extern const VMStateInfo vmstate_info_qtailq;
+ 
+ #define SELF_ANNOUNCE_ROUNDS 5
+ 
+-void loadvm_free_handlers(MigrationIncomingState *mis);
+-
+ int vmstate_load_state(QEMUFile *f, const VMStateDescription *vmsd,
+                        void *opaque, int version_id);
+ void vmstate_save_state(QEMUFile *f, const VMStateDescription *vmsd,
+diff --git a/include/qemu/typedefs.h b/include/qemu/typedefs.h
+index 33a6aa1..51958bf 100644
+--- a/include/qemu/typedefs.h
++++ b/include/qemu/typedefs.h
+@@ -39,7 +39,6 @@ typedef struct I2SCodec I2SCodec;
+ typedef struct ISABus ISABus;
+ typedef struct ISADevice ISADevice;
+ typedef struct IsaDma IsaDma;
+-typedef struct LoadStateEntry LoadStateEntry;
+ typedef struct MACAddr MACAddr;
+ typedef struct MachineClass MachineClass;
+ typedef struct MachineState MachineState;
+diff --git a/migration/migration.c b/migration/migration.c
+index 7087d1a..c3218cd 100644
+--- a/migration/migration.c
++++ b/migration/migration.c
+@@ -122,7 +122,6 @@ MigrationIncomingState *migration_incoming_get_current(void)
+     if (!once) {
+         mis_current.state = MIGRATION_STATUS_NONE;
+         memset(&mis_current, 0, sizeof(MigrationIncomingState));
+-        QLIST_INIT(&mis_current.loadvm_handlers);
+         qemu_mutex_init(&mis_current.rp_mutex);
+         qemu_event_init(&mis_current.main_thread_load_event, false);
+         once = true;
+@@ -135,7 +134,6 @@ void migration_incoming_state_destroy(void)
+     struct MigrationIncomingState *mis = migration_incoming_get_current();
+ 
+     qemu_event_destroy(&mis->main_thread_load_event);
+-    loadvm_free_handlers(mis);
+ }
+ 
+ 
 diff --git a/migration/savevm.c b/migration/savevm.c
-index d96209b..2d1d4bc 100644
+index 07646f4..d96209b 100644
 --- a/migration/savevm.c
 +++ b/migration/savevm.c
-@@ -746,13 +746,13 @@ void vmstate_unregister(DeviceState *dev, const VMStateDescription *vmsd,
-     }
+@@ -1804,13 +1804,6 @@ static int loadvm_process_command(QEMUFile *f)
+     return 0;
  }
  
--static int vmstate_load(QEMUFile *f, SaveStateEntry *se, int version_id)
-+static int vmstate_load(QEMUFile *f, SaveStateEntry *se)
+-struct LoadStateEntry {
+-    QLIST_ENTRY(LoadStateEntry) entry;
+-    SaveStateEntry *se;
+-    int section_id;
+-    int version_id;
+-};
+-
+ /*
+  * Read a footer off the wire and check that it matches the expected section
+  *
+@@ -1846,22 +1839,11 @@ static bool check_section_footer(QEMUFile *f, SaveStateEntry *se)
+     return true;
+ }
+ 
+-void loadvm_free_handlers(MigrationIncomingState *mis)
+-{
+-    LoadStateEntry *le, *new_le;
+-
+-    QLIST_FOREACH_SAFE(le, &mis->loadvm_handlers, entry, new_le) {
+-        QLIST_REMOVE(le, entry);
+-        g_free(le);
+-    }
+-}
+-
+ static int
+ qemu_loadvm_section_start_full(QEMUFile *f, MigrationIncomingState *mis)
  {
-     trace_vmstate_load(se->idstr, se->vmsd ? se->vmsd->name : "(old)");
-     if (!se->vmsd) {         /* Old style */
--        return se->ops->load_state(f, se->opaque, version_id);
-+        return se->ops->load_state(f, se->opaque, se->load_version_id);
-     }
--    return vmstate_load_state(f, se->vmsd, se->opaque, version_id);
-+    return vmstate_load_state(f, se->vmsd, se->opaque, se->load_version_id);
- }
+     uint32_t instance_id, version_id, section_id;
+     SaveStateEntry *se;
+-    LoadStateEntry *le;
+     char idstr[256];
+     int ret;
  
- static void vmstate_save_old_style(QEMUFile *f, SaveStateEntry *se, QJSON *vmdesc)
-@@ -1882,7 +1882,7 @@ qemu_loadvm_section_start_full(QEMUFile *f, MigrationIncomingState *mis)
+@@ -1900,14 +1882,6 @@ qemu_loadvm_section_start_full(QEMUFile *f, MigrationIncomingState *mis)
          return -EINVAL;
      }
  
--    ret = vmstate_load(f, se, se->load_version_id);
-+    ret = vmstate_load(f, se);
+-    /* Add entry */
+-    le = g_malloc0(sizeof(*le));
+-
+-    le->se = se;
+-    le->section_id = section_id;
+-    le->version_id = version_id;
+-    QLIST_INSERT_HEAD(&mis->loadvm_handlers, le, entry);
+-
+     ret = vmstate_load(f, se, se->load_version_id);
      if (ret < 0) {
          error_report("error while loading state for instance 0x%x of"
-                      " device '%s'", instance_id, idstr);
-@@ -1915,7 +1915,7 @@ qemu_loadvm_section_part_end(QEMUFile *f, MigrationIncomingState *mis)
-         return -EINVAL;
-     }
- 
--    ret = vmstate_load(f, se, se->load_version_id);
-+    ret = vmstate_load(f, se);
-     if (ret < 0) {
-         error_report("error while loading state section id %d(%s)",
-                      section_id, se->idstr);
 -- 
 2.9.4
