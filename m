@@ -1,25 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36429)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36502)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dGMtI-0003o6-Fz
-	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 05:59:41 -0400
+	(envelope-from <mjt@tls.msk.ru>) id 1dGMtl-00046h-G7
+	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 06:00:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dGMtD-0005Na-Jw
-	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 05:59:40 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:52712)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1dGMtD-0005NV-Cy
-	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 05:59:35 -0400
-References: <20170515194149.16288-1-eblake@redhat.com>
-	<20170515194149.16288-2-eblake@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <d9102dbd-9685-fffd-916f-f9bc7850b2f5@redhat.com>
-Date: Thu, 1 Jun 2017 11:59:30 +0200
+	(envelope-from <mjt@tls.msk.ru>) id 1dGMtg-0005V5-Kz
+	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 06:00:09 -0400
+References: <20170531120049.14111-1-n54@gmx.com>
+From: Michael Tokarev <mjt@tls.msk.ru>
+Message-ID: <c967a222-e6f6-67b2-5227-895f8e43af32@msgid.tls.msk.ru>
+Date: Thu, 1 Jun 2017 13:00:03 +0300
 MIME-Version: 1.0
-In-Reply-To: <20170515194149.16288-2-eblake@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+In-Reply-To: <20170531120049.14111-1-n54@gmx.com>
+Content-Type: text/plain; charset=windows-1251
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v8 1/5] shutdown: Simplify shutdown_signal
+Subject: Re: [Qemu-devel] [PATCH v3] ivshmem-server: ivshmem-client: Build
+ when eventfd() is available
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,61 +23,17 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
-Cc: armbru@redhat.com, berrange@redhat.com, alistair.francis@xilinx.com
+To: Kamil Rytarowski <n54@gmx.com>, qemu-trivial@nongnu.org
+Cc: qemu-devel@nongnu.org, armbru@redhat.com, marcandre.lureau@gmail.com, peter.maydell@redhat.com, eblake@redhat.com, f4bug@amsat.org
 
+31.05.2017 15:00, Kamil Rytarowski wrote:
+> Currently ivshmem requires eventfd() which is Linux specific.
+> Do not and build it unconditionally on every Linux/BSD/Solaris.
+> 
+> This patch indirectly fixes build failure on NetBSD, where these tools
+> additionally require -lrt for shm_open(3). In future there should be
+> added support for NetBSD and the linking addressed appropriately.
 
+Applied to -trivial, thanks!
 
-On 15/05/2017 21:41, Eric Blake wrote:
-> There is no signal 0 (kill(pid, 0) has special semantics to probe whether
-> a process is alive), rather than actually sending a signal 0).  So we
-> can use the simpler 0, instead of -1, for our sentinel of whether a
-> shutdown request due to a signal has happened.
-> 
-> Suggested-by: Markus Armbruster <armbru@redhat.com>
-> Signed-off-by: Eric Blake <eblake@redhat.com>
-> Reviewed-by: Markus Armbruster <armbru@redhat.com>
-> Reviewed-by: Alistair Francis <alistair.francis@xilinx.com>
-> 
-> ---
-> v4-v8: no change
-> v3: new patch
-> ---
->  vl.c | 6 +++---
->  1 file changed, 3 insertions(+), 3 deletions(-)
-> 
-> diff --git a/vl.c b/vl.c
-> index ce2b392..7396748 100644
-> --- a/vl.c
-> +++ b/vl.c
-> @@ -1598,7 +1598,7 @@ void vm_state_notify(int running, RunState state)
->  }
-> 
->  static int reset_requested;
-> -static int shutdown_requested, shutdown_signal = -1;
-> +static int shutdown_requested, shutdown_signal;
->  static pid_t shutdown_pid;
->  static int powerdown_requested;
->  static int debug_requested;
-> @@ -1629,7 +1629,7 @@ static int qemu_shutdown_requested(void)
-> 
->  static void qemu_kill_report(void)
->  {
-> -    if (!qtest_driver() && shutdown_signal != -1) {
-> +    if (!qtest_driver() && shutdown_signal) {
->          if (shutdown_pid == 0) {
->              /* This happens for eg ^C at the terminal, so it's worth
->               * avoiding printing an odd message in that case.
-> @@ -1643,7 +1643,7 @@ static void qemu_kill_report(void)
->                           shutdown_cmd ? shutdown_cmd : "<unknown process>");
->              g_free(shutdown_cmd);
->          }
-> -        shutdown_signal = -1;
-> +        shutdown_signal = 0;
->      }
->  }
-> 
-
-Queued, thanks.
-
-Paolo
+/mjt
