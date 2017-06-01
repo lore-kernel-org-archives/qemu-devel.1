@@ -1,40 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37029)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37953)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1dGSTA-0002wx-1g
-	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 11:57:05 -0400
+	(envelope-from <kwolf@redhat.com>) id 1dGSWG-0004jr-HO
+	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 12:00:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1dGST5-0005A7-6o
-	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 11:57:04 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:56599
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mdroth@linux.vnet.ibm.com>)
-	id 1dGST5-00059u-0O
-	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 11:56:59 -0400
-Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v51FrffB036537
-	for <qemu-devel@nongnu.org>; Thu, 1 Jun 2017 11:56:58 -0400
-Received: from e19.ny.us.ibm.com (e19.ny.us.ibm.com [129.33.205.209])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2atjysa7ag-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Thu, 01 Jun 2017 11:56:57 -0400
-Received: from localhost
-	by e19.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <mdroth@linux.vnet.ibm.com>;
-	Thu, 1 Jun 2017 11:56:57 -0400
-Content-Type: text/plain; charset="utf-8"
+	(envelope-from <kwolf@redhat.com>) id 1dGSWB-00068i-N0
+	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 12:00:16 -0400
+Date: Thu, 1 Jun 2017 17:59:53 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20170601155953.GG4987@noname.redhat.com>
+References: <1495830130-30611-1-git-send-email-kwolf@redhat.com>
+	<1495830130-30611-11-git-send-email-kwolf@redhat.com>
+	<20170531123259.GK16733@stefanha-x1.localdomain>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-From: Michael Roth <mdroth@linux.vnet.ibm.com>
-In-Reply-To: <20170601015218.9299-2-david@gibson.dropbear.id.au>
-References: <20170601015218.9299-1-david@gibson.dropbear.id.au>
-	<20170601015218.9299-2-david@gibson.dropbear.id.au>
-Date: Thu, 01 Jun 2017 10:56:50 -0500
-Message-Id: <149633261057.3207.5755197867144524820@loki>
-Subject: Re: [Qemu-devel] [PATCH 1/4] spapr: Move DRC RTAS calls into
- spapr_drc.c
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="gr/z0/N6AeWAPJVB"
+Content-Disposition: inline
+In-Reply-To: <20170531123259.GK16733@stefanha-x1.localdomain>
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 10/29] qed: Remove callback
+ from qed_write_header()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -43,33 +26,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: lvivier@redhat.com, nikunj@linux.vnet.ibm.com, sursingh@redhat.com, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, bharata@linux.vnet.ibm.com
+To: Stefan Hajnoczi <stefanha@gmail.com>
+Cc: qemu-block@nongnu.org, pbonzini@redhat.com, qemu-devel@nongnu.org, stefanha@redhat.com, mreitz@redhat.com
 
-Quoting David Gibson (2017-05-31 20:52:15)
-> Currently implementations of the RTAS calls related to DRCs are in
-> spapr_rtas.c.  They belong better in spapr_drc.c - that way they're closer
-> to related code, and we'll be able to make some more things local.
-> =
 
-> spapr_rtas.c was intended to contain the RTAS infrastructure and core cal=
-ls
-> that don't belong anywhere else, not every RTAS implementation.
-> =
+--gr/z0/N6AeWAPJVB
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-> Code motion only.
+Am 31.05.2017 um 14:32 hat Stefan Hajnoczi geschrieben:
+> On Fri, May 26, 2017 at 10:21:51PM +0200, Kevin Wolf wrote:
+> >  static void qed_clear_need_check(void *opaque, int ret)
+> >  {
+> >      BDRVQEDState *s =3D opaque;
+> > =20
+> >      if (ret) {
+> > -        qed_unplug_allocating_write_reqs(s);
+> > -        return;
+> > +        goto out;
+> >      }
+> > =20
+> >      s->header.features &=3D ~QED_F_NEED_CHECK;
+> > -    qed_write_header(s, qed_flush_after_clear_need_check, s);
+> > +    ret =3D qed_write_header(s);
+> > +    (void) ret;
+> > +
+> > +    ret =3D bdrv_flush(s->bs);
+> > +    (void) ret;
+> > +
+> > +out:
+> > +    qed_unplug_allocating_write_reqs(s);
+> >  }
+>=20
+> Should we unplug allocating write reqs before flushing?  The async code
+> kicks off a flush but doesn't wait for it to complete.
 
-Technically rtas-get-sensor-state and rtas-set-indicator aren't specific
-to DRCs, but looking through the documented indicators/sensors (tables
-40 and 42 in LoPAPR v11) it doesn't seem too likely we'll ever implement
-any others so the move seems reasonable.
+You're right that moving it up would match the old code. Not sure if it
+would make much of a difference, though, isn't the request queue drained
+in the kernel anyway while doing a flush? But if you prefer, I can
+change it.
 
-> =
+Kevin
 
-> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-> ---
->  hw/ppc/spapr_drc.c  | 322 ++++++++++++++++++++++++++++++++++++++++++++++=
-++++--
->  hw/ppc/spapr_rtas.c | 304 ----------------------------------------------=
----
->  2 files changed, 315 insertions(+), 311 deletions(-)
+--gr/z0/N6AeWAPJVB
+Content-Type: application/pgp-signature
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2.0.22 (GNU/Linux)
+
+iQIcBAEBAgAGBQJZMDn5AAoJEH8JsnLIjy/W1YUP/A6E8qnev4Y0rjqOa1QwCTsf
+AW/Vh1pa3DHA/CcP9gdVbpOVCxAalxQ1pq52aANoVQzs15ELTXhYagM8oijevIjz
+VMCxZVy2CjjkKAaBULKVgcood9FRNvFMrV2tkWjKU8mLHQBMa0KAGeI1ddkYNsfS
+mWuAGUozcwhpl2QOl37Nh3hNCIDWt4EqHvou5LutwjqNIxmz/lYC5kndqlE7pahd
+9IwGX+XUagDrZOpORD6GXq+PycEoR2UUBRwMVHM7HSzzR4BTeGB7SMpAiEF/p74Y
+qyDAg/QjX0bMdojL2pK8Ok4L0KkA9Pq2cH72R2UyZE0dwB0V22fdXJVklRJzQz/O
+9pr+oxWsL8HIICmd0SfF+GXjF4zBY+HZqqagfybzGd95hXMt2ZENYIBkbO1X1/7r
+DvinlC7mbW1MhxpNBCQg1+Z0wWooa/tXjmDmraAZq0KNKRK/aJTqnBf7pd+sSLfA
+DPhuRHBrhNWiRqv/JOQmXvUd6sIeuolt4acklyxiDCqgxFDNtq51H69C5rYbYm1D
+pl+8CpWsKqVl05evyzySsIc7Y/PgxBZ3I9ePtZuUxWlDMesX7mFa2DtVRG7+qB4h
+640zL6CmdPGUjnipEkzKSO+R5yoCTxEw7QpE2cK/m6mFF/Fs4yE99o4r6f0SDJUI
+mNr9yf8ehpOtvWXp9PuY
+=owa+
+-----END PGP SIGNATURE-----
+
+--gr/z0/N6AeWAPJVB--
