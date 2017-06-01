@@ -1,25 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48398)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48410)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dGOiK-0004iS-Nu
-	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 07:56:30 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1dGOiM-0004jI-BR
+	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 07:56:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dGOiJ-0006rm-BE
-	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 07:56:28 -0400
-Date: Thu, 1 Jun 2017 16:52:33 +1000
+	(envelope-from <dgibson@ozlabs.org>) id 1dGOiI-0006rO-FT
+	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 07:56:30 -0400
+Date: Thu, 1 Jun 2017 17:13:04 +1000
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20170601065233.GD13397@umbus.fritz.box>
+Message-ID: <20170601071304.GE13397@umbus.fritz.box>
 References: <20170526052319.28096-1-david@gibson.dropbear.id.au>
-	<20170530011416.01eea576@bahia.ttt.fr.ibm.com>
-	<20170530061852.GE12163@umbus.fritz.box>
-	<20170530100136.680ce96f@bahia.ttt.fr.ibm.com>
-	<20170531025748.GG12163@umbus.fritz.box>
-	<20170531105857.62a25a84@bahia.ttt.fr.ibm.com>
+	<20170526052319.28096-4-david@gibson.dropbear.id.au>
+	<1496295880.4414.1.camel@gmail.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="qGV0fN9tzfkG3CxV"
+	protocol="application/pgp-signature"; boundary="ZRyEpB+iJ+qUx0kp"
 Content-Disposition: inline
-In-Reply-To: <20170531105857.62a25a84@bahia.ttt.fr.ibm.com>
-Subject: Re: [Qemu-devel] [PATCHv4 0/5] Clean up compatibility mode handling
+In-Reply-To: <1496295880.4414.1.camel@gmail.com>
+Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCHv4 3/5] pseries: Move CPU
+ compatibility property to machine
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,51 +26,157 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>
-Cc: clg@kaod.org, aik@ozlabs.ru, mdroth@linux.vnet.ibm.com, nikunj@linux.vnet.ibm.com, agraf@suse.de, abologna@redhat.com, armbru@redhat.com, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, quintela@redhat.com, dgilbert@redhat.com, sursingh@redhat.com, sbobroff@redhat.com
+To: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
+Cc: groug@kaod.org, clg@kaod.org, aik@ozlabs.ru, mdroth@linux.vnet.ibm.com, nikunj@linux.vnet.ibm.com, quintela@redhat.com, sursingh@redhat.com, qemu-devel@nongnu.org, armbru@redhat.com, qemu-ppc@nongnu.org, abologna@redhat.com, sbobroff@redhat.com, dgilbert@redhat.com
 
 
---qGV0fN9tzfkG3CxV
-Content-Type: text/plain; charset=us-ascii
+--ZRyEpB+iJ+qUx0kp
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, May 31, 2017 at 10:58:57AM +0200, Greg Kurz wrote:
-> On Wed, 31 May 2017 12:57:48 +1000
-> David Gibson <david@gibson.dropbear.id.au> wrote:
-> > [...]
-> > > All old non-pseries machine types already complain when started with
-> > > a POWER7 or newer CPU. Providing the extra error message looks weird:
-> > >=20
-> > > qemu-system-ppc64 -machine ppce500 \
-> > >                   -cpu POWER7,compat=3Dpower6
-> > > qemu-system-ppc64: CPU 'compat' property is deprecated and has no eff=
-ect;
-> > >  use max-cpu-compat machine property instead
-> > > MMU model 983043 not supported by this machine.
-> > >=20
-> > > but I guess it's better than crashing. :) =20
+On Thu, Jun 01, 2017 at 03:44:40PM +1000, Suraj Jitindar Singh wrote:
+> On Fri, 2017-05-26 at 15:23 +1000, David Gibson wrote:
+> > Server class POWER CPUs have a "compat" property, which is used to
+> > set the
+> > backwards compatibility mode for the processor.=A0=A0However, this only
+> > makes
+> > sense for machine types which don't give the guest access to
+> > hypervisor
+> > privilege - otherwise the compatibility level is under the guest's
+> > control.
 > >=20
-> > Well, sure POWER7 doesn't make sense for an e500 machine for other
-> > reasons.  But POWER7 or POWER8 _would_ make sense for powernv, where
-> > compat=3D doesn't.
+> > To reflect this, this removes the CPU 'compat' property and instead
+> > creates a 'max-cpu-compat' property on the pseries machine.=A0=A0Strict=
+ly
+> > speaking this breaks compatibility, but AFAIK the 'compat' option was
+> > never (directly) used with -device or device_add.
 > >=20
+> > The option was used with -cpu.=A0=A0So, to maintain compatibility, this
+> > patch adds a hack to the cpu option parsing to strip out any compat
+> > options supplied with -cpu and set them on the machine property
+> > instead of the now deprecated cpu property.
 >=20
-> The powernv machine type doesn't even support CPU features at all:
+> Generally looks good, a couple of comments below.
 >=20
->     chip_typename =3D g_strdup_printf(TYPE_PNV_CHIP "-%s", machine->cpu_m=
-odel);
->     if (!object_class_by_name(chip_typename)) {
->         error_report("invalid CPU model '%s' for %s machine",
->                      machine->cpu_model, MACHINE_GET_CLASS(machine)->name=
-);
->         exit(1);
->     }
+> Suraj
+>=20
+> >=20
+> > Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+> > ---
+> > =A0hw/ppc/spapr.c=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0|=A0=A0=A06 =
+++-
+> > =A0hw/ppc/spapr_cpu_core.c=A0=A0=A0=A0=A0|=A0=A056 ++++++++++++++++++++=
++++-
+> > =A0hw/ppc/spapr_hcall.c=A0=A0=A0=A0=A0=A0=A0=A0|=A0=A0=A08 ++--
+> > =A0include/hw/ppc/spapr.h=A0=A0=A0=A0=A0=A0|=A0=A012 ++++--
+> > =A0target/ppc/compat.c=A0=A0=A0=A0=A0=A0=A0=A0=A0| 102
+> > ++++++++++++++++++++++++++++++++++++++++++++
+> > =A0target/ppc/cpu.h=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0|=A0=A0=A05 ++-
+> > =A0target/ppc/translate_init.c |=A0=A086 +++++++++++-------------------=
+----
+> > ---
+> > =A07 files changed, 202 insertions(+), 73 deletions(-)
+> >=20
+> > diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> > index ab3aab1..3c4e88f 100644
+> > --- a/hw/ppc/spapr.c
+> > +++ b/hw/ppc/spapr.c
+> > @@ -2134,7 +2134,7 @@ static void ppc_spapr_init(MachineState
+> > *machine)
+> > =A0=A0=A0=A0=A0=A0=A0=A0=A0machine->cpu_model =3D kvm_enabled() ? "host=
+" : smc-
+> > >tcg_default_cpu;
+> > =A0=A0=A0=A0=A0}
+> > =A0
+> > -=A0=A0=A0=A0ppc_cpu_parse_features(machine->cpu_model);
+> > +=A0=A0=A0=A0spapr_cpu_parse_features(spapr);
+> > =A0
+> > =A0=A0=A0=A0=A0spapr_init_cpus(spapr);
+> > =A0
+> > @@ -2497,6 +2497,10 @@ static void spapr_machine_initfn(Object *obj)
+> > =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
+=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0" place of standard EPOW events
+> > when possible"
+> > =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
+=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0" (required for memory hot-
+> > unplug support)",
+> > =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
+=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0NULL);
+> > +
+> > +=A0=A0=A0=A0ppc_compat_add_property(obj, "max-cpu-compat", &spapr-
+> > >max_compat_pvr,
+> > +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
+=A0=A0=A0=A0=A0"Maximum permitted CPU compatibility
+> > mode",
+> > +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
+=A0=A0=A0=A0=A0&error_fatal);
+> > =A0}
+> > =A0
+> > =A0static void spapr_machine_finalizefn(Object *obj)
+> > diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
+> > index ff7058e..ab4102b 100644
+> > --- a/hw/ppc/spapr_cpu_core.c
+> > +++ b/hw/ppc/spapr_cpu_core.c
+> > @@ -20,6 +20,58 @@
+> > =A0#include "sysemu/numa.h"
+> > =A0#include "qemu/error-report.h"
+> > =A0
+> > +void spapr_cpu_parse_features(sPAPRMachineState *spapr)
+> > +{
+> > +=A0=A0=A0=A0/*
+> > +=A0=A0=A0=A0=A0* Backwards compatibility hack:
+> > +=A0=A0=A0=A0=A0*
+> > +=A0=A0=A0=A0=A0*=A0=A0=A0CPUs had a "compat=3D" property which didn't =
+make sense for
+> > +=A0=A0=A0=A0=A0*=A0=A0=A0anything except pseries.=A0=A0It was replaced=
+ by "max-cpu-
+> > compat"
+> > +=A0=A0=A0=A0=A0*=A0=A0=A0machine option.=A0=A0This supports old comman=
+d lines like
+> > +=A0=A0=A0=A0=A0*=A0=A0=A0=A0=A0=A0=A0-cpu POWER8,compat=3Dpower7
+> > +=A0=A0=A0=A0=A0*=A0=A0=A0By stripping the compat option and applying i=
+t to the
+> > machine
+> > +=A0=A0=A0=A0=A0*=A0=A0=A0before passing it on to the cpu level parser.
+> > +=A0=A0=A0=A0=A0*/
+> > +=A0=A0=A0=A0gchar **inpieces;
+> > +=A0=A0=A0=A0int i, j;
+> > +=A0=A0=A0=A0gchar *compat_str =3D NULL;
+> > +
+> > +=A0=A0=A0=A0inpieces =3D g_strsplit(MACHINE(spapr)->cpu_model, ",", 0);
+> > +
+> > +=A0=A0=A0=A0/* inpieces[0] is the actual model string */
+> > +=A0=A0=A0=A0i =3D 1;
+> > +=A0=A0=A0=A0j =3D 1;
+> > +=A0=A0=A0=A0while (inpieces[i]) {
+> > +=A0=A0=A0=A0=A0=A0=A0=A0if (g_str_has_prefix(inpieces[i], "compat=3D")=
+) {
+> > +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0/* in case of multiple compat=3D o=
+ptipons */
+>=20
+> s/optipons/options?
 
-Ah, well, that's another bug, but not one that's in scope for this
-series.
+Oops, fixed.
 
+> > +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0g_free(compat_str);
+> > +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0compat_str =3D inpieces[i];
+> > +=A0=A0=A0=A0=A0=A0=A0=A0} else {
+> > +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0j++;
+> > +=A0=A0=A0=A0=A0=A0=A0=A0}
+> > +
+> > +=A0=A0=A0=A0=A0=A0=A0=A0/* Excise compat options from list */
+> > +=A0=A0=A0=A0=A0=A0=A0=A0inpieces[j] =3D inpieces[i];
+>=20
+> it's worth noting that where previously when specifying an invalid
+> option you got:
+>=20
+> qemu-system-ppc64: Expected key=3Dvalue format, found=A0*blah*
+>=20
+> You now get a segfault here.
 
+Sod.  The joy of doing string manipulation in C.  Ok, I think I've
+found and fixed that too.
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -80,25 +184,25 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---qGV0fN9tzfkG3CxV
+--ZRyEpB+iJ+qUx0kp
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v2
 
-iQIcBAEBCAAGBQJZL7mvAAoJEGw4ysog2bOSA44P/iIOBoP3hndqr1b0Aw0ukLyN
-SYxXXKGqL0dgvqpQAEuv3luYNolptQrzF0yWVDziBrMFbc2RlPJ/2TRhKuyPA7Vn
-9H9HUKmzo/JM1zABF+4SGYlF0dwOHLuQy50gPaHJxzz6GFNzVKkn6j9N3MwqvItu
-TPzruznCDJsQXwlnt8BnmSOPdlwkOlC3wkjGL4itlt8zDtaqobmx+5nq530GR/lF
-bf5CJInJ1HUJSE5ZAy8ol7iTo4QxHfmE9CmBSIVgwjQzfyhTVDt5YaVfOP1Dta6P
-UBebjCkXvhuvSBEW7kNLyjuhb2KQNtWj2KxBUG6nr4nKZrCSrMRB7t3vHUb7xWon
-R4EhdXCK9dMRxZi1GzKHvSTd+S/xtCpWNxixNtWBPWs2nsZ2TzxMXbZ771l0gQQs
-HkEMQ1Z4s2kv8Z1k5AxHWgItnUh/8zpSW1cMWYqE1b80imX7yJDV0mDU+7uDX9+2
-Hnv9YyV28H7E9fWt7Ag5/mk7u5ORIfYQkggos35QpovpAiba/3erbRbSQlvctnxh
-qdaSBaAcbaUE1IOb/uhMk1zmBLckrhUk6bJMuVrlMwv6VtngkpSlXz4m6FHi83IN
-LmEYyLG6G0Xq5FCfZOEJ/Flj2f2NK6cmnmFOz/g1XJKyEQIa/1WsTZzDyjslwRFt
-ed+FyfpswsalPiGGyvdT
-=Q0Ri
+iQIcBAEBCAAGBQJZL759AAoJEGw4ysog2bOSqjEQAJfEyH+q5ym+pkajy0GDeYj+
+ZF+3LvIm9tCkpa60vlBnJWfWGxH/WC0DFqmDB7PimAr/1XLZ+Q4eIQ43rCL3Q3nh
+NnQoMdiEFJUZa5HYz/Xc5HCWsiOaMezRImj8CpwCJrHZ8Pj0aT/w4w93XMT6NE1M
+tse2q0zAwnxtcNzNUH5A92rzmpKGGKwObFUn79Okg5l5wbtVJvrtaEBVcSN12sTG
+IsoNLZFnaw+SMIKD9J+68EiCdD7kv/zD3EPvROZilbbkVEu7il8ZzWfBDLsCP8PB
+qToIfCIAeRMCP5lTYlN/jMoJcp59Q+3XwRfEAG7P+NDYCHyiNeBUMw565OQpeSJz
+mIvo0LlW0c1Q8AMjX3uqzMM04xJDZiMeGSgEB3W2/7sqGCqtoIXPZNNCki57THJY
+LmwbeeXiX1/PKs8JRWRcQOEWnpDjXOFMUXnGqjgOl4kP3m6x60+267qHRHPGUCOf
+DNuQ9npM/14UdTcQjHoTCrmn1uF5yJOkLgvb/SZicJLu9e5/293toFxBBSHRIdiM
+lRYQKro5nnME61nQsEW42Karqa6z5H2KLKi4cHt8smsmCFz0Khd0y9VYNYUieP+6
+s0XATXV9vhi8/ApadbmA7vv+mPGmLynROlXOqfFmre5PgmNGWhcQRkvBGrhGfTRX
+/af1r8FP9qgyfmCYv8sU
+=4v5U
 -----END PGP SIGNATURE-----
 
---qGV0fN9tzfkG3CxV--
+--ZRyEpB+iJ+qUx0kp--
