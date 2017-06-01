@@ -1,25 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37618)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38339)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dGTkd-0000Vc-2U
-	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 13:19:11 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1dGTmN-00023G-1s
+	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 13:21:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dGTkc-0002RB-5S
-	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 13:19:11 -0400
-Received: from mail-wm0-x22b.google.com ([2a00:1450:400c:c09::22b]:38873)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1dGTkb-0002Qy-TV
-	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 13:19:10 -0400
-Received: by mail-wm0-x22b.google.com with SMTP id n195so41185197wmg.1
-	for <qemu-devel@nongnu.org>; Thu, 01 Jun 2017 10:19:09 -0700 (PDT)
+	(envelope-from <dgilbert@redhat.com>) id 1dGTmJ-0003Bj-Li
+	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 13:20:58 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42428)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dGTmJ-0003BQ-Bt
+	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 13:20:55 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 41F1C80F96
+	for <qemu-devel@nongnu.org>; Thu,  1 Jun 2017 17:20:54 +0000 (UTC)
+Date: Thu, 1 Jun 2017 18:20:47 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170601172046.GJ2845@work-vm>
+References: <20170509184900.GI2089@work-vm>
+	<1833628273.9365810.1494355970259.JavaMail.zimbra@redhat.com>
+	<20170510133255.GD4230@work-vm>
+	<1509302139.20862844.1495638621196.JavaMail.zimbra@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20170526075246.20265-1-famz@redhat.com>
-References: <20170526075246.20265-1-famz@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 1 Jun 2017 18:18:48 +0100
-Message-ID: <CAFEAcA_LGcKShOrLDi-qU65GaJ8tBcoW43Ev2u-C1x9y0hrN4g@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL 00/22] Docker and block patches
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <1509302139.20862844.1495638621196.JavaMail.zimbra@redhat.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] VhostUserRequest # 20
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,69 +36,100 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>
+To: =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>
+Cc: maxime coquelin <maxime.coquelin@redhat.com>, qemu-devel@nongnu.org
 
-On 26 May 2017 at 08:52, Fam Zheng <famz@redhat.com> wrote:
-> The following changes since commit 9964e96dc9999cf7f7c936ee854a795415d19b60:
->
->   Merge remote-tracking branch 'jasowang/tags/net-pull-request' into staging (2017-05-23 15:01:31 +0100)
->
-> are available in the git repository at:
->
->   git://github.com/famz/qemu.git tags/docker-and-block-pull-request
->
-> for you to fetch changes up to 77269bba94ef97de99ae61fdc98629a8704ae2ed:
->
->   block: make accounting thread-safe (2017-05-26 09:25:30 +0800)
->
-> ----------------------------------------------------------------
->
-> For Paolo's block layer thread safety part I and my docker testing
-> enhancements.
->
-> ----------------------------------------------------------------
+* Marc-Andr=E9 Lureau (marcandre.lureau@redhat.com) wrote:
+> Hi
+>=20
+> ----- Original Message -----
+> > * Marc-Andr=E9 Lureau (marcandre.lureau@redhat.com) wrote:
+> > > HI
+> > >=20
+> > > ----- Original Message -----
+> > > > Hi,
+> > > >   libvhost-user.h defines:
+> > > >    VHOST_USER_INPUT_GET_CONFIG =3D 20,
+> > >=20
+> > > That slipped by mistake from my vhost-user-input series WIP, please=
+ send a
+> > > fix.
+> > > (luckily, this is only internal header for now)
+> >=20
+> > OK, just posted.
+> >=20
+> > However, I just spotted, or should I say gcc just spotted another iss=
+ue:
+> >=20
+> >   CC      tests/vhost-user-bridge.o
+> > /home/dgilbert/git/qemu-world3/tests/vhost-user-bridge.c:228:23: warn=
+ing:
+> > variables 'front' and 'iov' used in loop condition not modified in lo=
+op body
+> > [-Wfor-loop-analysis]
+> >     for (cur =3D front; front !=3D iov; cur++) {
+> >                       ^~~~~    ~~~
+> > 1 warning generated.
+> >=20
+> >=20
+> > static void
+> > iov_restore_front(struct iovec *front, struct iovec *iov, size_t byte=
+s)
+> > {
+> >     struct iovec *cur;
+> >=20
+> >     for (cur =3D front; front !=3D iov; cur++) {
+> >         bytes -=3D cur->iov_len;
+> >     }
+> >=20
+> >     cur->iov_base -=3D bytes;
+> >     cur->iov_len +=3D bytes;
+> > }
+> >=20
+> > What's that actually intending to do?
+>=20
+> It was meant to revert the effect of iov_discard_front()
+>=20
+> The code should read:
+>=20
+> for (cur =3D front; cur !=3D iov; cur++) {
+>=20
+> In practice, it doesn't reach the loop since the front sg buffer is big=
+ enough to discard the header..
+>=20
+> Does that looks correct to you?
 
-Hi. I'm afraid this doesn't build on BSD or OSX:
+OK, so let me check if I understand;  it's supposed to be called with
+'front' being the original struct iovec *, and 'bytes' being the number
+of bytes you shaved off using iov_discard_front?
+If so then yes I think that makes sense; a comment to explain that
+would probably help.
+A sanity check for bytes being >=3D0 after the loop might be worth it as
+well.
 
-libqemuutil.a(stats64.o): In function `stat64_rdlock':
-/root/qemu/util/stats64.c:24: undefined reference to `cpu_relax'
-libqemuutil.a(stats64.o): In funclibqemuutil.a(stats64.o): In function
-`stat64_rdlock':
-/root/qemu/util/stats64.c:24: undefined reference to `cpu_relax'
-libqemuutil.a(stats64.o): In function `stat64_add32_carry':
-/root/qemu/util/stats64.c:64: undefined reference to `cpu_relax'
-libqemuutil.a(stats64.o): In function `stat64_min_slow':
-/root/qemu/util/stats64.c:85: undefined reference to `cpu_relax'
-libqemuutil.a(stats64.o): In function `stat64_max_slow':
-/root/qemu/util/stats64.c:114: undefined reference to `cpu_relax'
-tilibqemuutil.a(stats64.o): In function `stat64_rdlock':
-/root/qemu/util/stats64.c:24: undefined reference to `cpu_relax'
-libqemuutil.a(stats64.o): In function `stat64_add32_carry':
-/root/qemu/util/stats64.c:64: undefined reference to `cpu_relax'
-libqemuutil.a(stats64.o): In function `stat64_min_slow':
-/root/qemu/util/stats64.c:85: undefined reference to `cpu_relax'
-libqemuutil.a(stats64.o): In function `stat64_max_slow':
-/root/qemu/util/stats64.c:114: undefined reference to `cpu_relax'
-on `stat64_add32_carry':
-/root/qemu/util/stats64.c:64: undefined reference to `cpu_relax'
-libqemuutil.a(stats64.o): In function `stat64_min_slow':
-/root/qemu/util/stats64.c:85: undefined reference to `cpu_relax'
-libqemuutil.a(stats64.o): In function `stat64_max_slow':
-/root/qemu/util/stats64.c:114: undefined reference to `cpu_relax'
+Dave
 
-
-and
-/Users/pm215/src/qemu-for-merges/util/stats64.c:24:9: error: implicit
-declaration of function 'cpu_relax' is invalid in C99
-[-Werror,-Wimplicit-function-declaration]
-        cpu_relax();
-        ^
-
-
-Looks like an omitted include of qemu/processor.h ?
-
-I'm not sure why this compiles on Linux...
-
-thanks
--- PMM
+>=20
+>=20
+> thanks
+>=20
+> >=20
+> > Dave
+> >=20
+> > > thanks
+> > >=20
+> > > > while
+> > > >   vhost-user.c defines:
+> > > >    VHOST_USER_NET_SET_MTU =3D 20,
+> > > >=20
+> > > > who wins?
+> > > >=20
+> > > > Dave
+> > > > --
+> > > > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> > > >=20
+> > --
+> > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> >=20
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
