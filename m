@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51762)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52390)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <anton.nefedov@virtuozzo.com>) id 1dGRoq-0000XV-L0
-	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 11:15:26 -0400
+	(envelope-from <imammedo@redhat.com>) id 1dGRqR-0001u5-UJ
+	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 11:17:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <anton.nefedov@virtuozzo.com>) id 1dGRoj-0004nh-Tp
-	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 11:15:24 -0400
-Received: from mail-db5eur01on0122.outbound.protection.outlook.com
-	([104.47.2.122]:10425
-	helo=EUR01-DB5-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <anton.nefedov@virtuozzo.com>)
-	id 1dGRoj-0004n4-Gx
-	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 11:15:17 -0400
-From: Anton Nefedov <anton.nefedov@virtuozzo.com>
-Date: Thu, 1 Jun 2017 18:14:32 +0300
-Message-ID: <1496330073-51338-15-git-send-email-anton.nefedov@virtuozzo.com>
-In-Reply-To: <1496330073-51338-1-git-send-email-anton.nefedov@virtuozzo.com>
-References: <1496330073-51338-1-git-send-email-anton.nefedov@virtuozzo.com>
+	(envelope-from <imammedo@redhat.com>) id 1dGRqO-0005DZ-On
+	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 11:17:03 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:6165)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1dGRqO-0005DS-GL
+	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 11:17:00 -0400
+Date: Thu, 1 Jun 2017 17:16:50 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20170601171650.4a196f36@nial.brq.redhat.com>
+In-Reply-To: <ccc0e728-0348-e386-6f71-0c1c69eaa01d@redhat.com>
+References: <20170601112241.2580-1-ard.biesheuvel@linaro.org>
+	<ccc0e728-0348-e386-6f71-0c1c69eaa01d@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v2 14/15] qcow2: allow concurrent unaligned
- writes to the same clusters
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC PATCH] OvmfPkg/AcpiPlatformDxe: lift 4 GB
+ alloc limit for modern ACPI systems
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,369 +28,170 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: den@virtuozzo.com, kwolf@redhat.com, mreitz@redhat.com, eblake@redhat.com, Anton Nefedov <anton.nefedov@virtuozzo.com>, "Denis V . Lunev" <den@openvz.org>
+To: Laszlo Ersek <lersek@redhat.com>
+Cc: Ard Biesheuvel <ard.biesheuvel@linaro.org>, edk2-devel@lists.01.org, leif.lindholm@linaro.org, jordan.l.justen@intel.com, Shannon Zhao <zhaoshenglong@huawei.com>, "Michael S. Tsirkin" <mst@redhat.com>, qemu devel list <qemu-devel@nongnu.org>, gengdongjiu <gengdongjiu@huawei.com>, Drew Jones <drjones@redhat.com>
 
-If COW area of a write request to unallocated cluster is empty,
-concurrent write requests can be allowed with a little bit of
-extra synchronization; so they don't have to wait until L2 is filled.
+On Thu, 1 Jun 2017 14:25:48 +0200
+Laszlo Ersek <lersek@redhat.com> wrote:
 
-Let qcow2_cluster.c::handle_dependencies() do the most of the job:
-  if there is an in-flight request to the same cluster,
-  and the current request wants to write in its COW area,
-  and its COW area is marked empty,
-  - steal the allocated offset and write concurrently. Let the original
-    request update L2 later when it likes.
+> On 06/01/17 13:22, Ard Biesheuvel wrote:
+> > ACPI supports architectures such as arm64, which did not exist when the
+> > original 32-bit ACPI 1.0 was introduced. These days, ACPI tables can all
+> > support 64-bit memory addresses, and so QEMU has been updated to emit
+> > 64-bit table and entry point types on arm64/mach-virt.  
+> 
+> Do you have commit cb51ac2ffe36 ("hw/arm/virt: generate 64-bit
+> addressable ACPI objects", 2017-04-10) in mind?
+My understanding was that OVMF discards RSDP/[RX]SDT so that commit
+probably irrelevant.
 
-This gives an improvement for parallel misaligned writes to
-unallocated clusters with no backing data:
+Now about FADT or any other blob, do we really need to extend
+loader protocol? Couldn't firmware decide where to allocate
+table based on size in add_pointer commands?
 
-HDD fio over xfs iodepth=4:
-  seqwrite 4k:   18400 -> 22800 IOPS ( x1.24 )
-  seqwrite 68k:   1600 ->  2300 IOPS ( x1.44 )
+That might be a bit complicated but on the bright side is that
+it is firmware only change and it should work both on old and
+new qemu without breaking anything.
 
-Signed-off-by: Anton Nefedov <anton.nefedov@virtuozzo.com>
-Signed-off-by: Denis V. Lunev <den@openvz.org>
----
- block/qcow2-cluster.c | 169 +++++++++++++++++++++++++++++++++++++++++++-------
- block/qcow2.c         |  28 ++++++++-
- block/qcow2.h         |  12 +++-
- 3 files changed, 181 insertions(+), 28 deletions(-)
-
-diff --git a/block/qcow2-cluster.c b/block/qcow2-cluster.c
-index 2fa549d..03b2e6c 100644
---- a/block/qcow2-cluster.c
-+++ b/block/qcow2-cluster.c
-@@ -898,20 +898,32 @@ out:
- 
- /*
-  * Check if there already is an AIO write request in flight which allocates
-- * the same cluster. In this case we need to wait until the previous
-- * request has completed and updated the L2 table accordingly.
-+ * the same cluster.
-+ * In this case, check if that request has explicitly allowed to write
-+ * in its COW area(s).
-+ *   If yes - fill the meta to point to the same cluster.
-+ *   If no  - we need to wait until the previous request has completed and
-+ *            updated the L2 table accordingly or
-+ *            has allowed writing in its COW area(s).
-  * Returns:
-  *   0       if there was no dependency. *cur_bytes indicates the number of
-  *           bytes from guest_offset that can be read before the next
-  *           dependency must be processed (or the request is complete).
-- *           *m is not modified
-+ *           *m, *host_offset are not modified
-+ *
-+ *   1       if there is a dependency but it is possible to write concurrently
-+ *           *m is filled accordingly,
-+ *           *cur_bytes may have decreased and describes
-+ *             the length of the area that can be written to,
-+ *           *host_offset contains the starting host image offset to write to
-  *
-  *   -EAGAIN if we had to wait for another request. The caller
-- *           must start over, so consider *cur_bytes undefined.
-+ *           must start over, so consider *cur_bytes and *host_offset undefined.
-  *           *m is not modified
-  */
- static int handle_dependencies(BlockDriverState *bs, uint64_t guest_offset,
--    uint64_t *cur_bytes, QCowL2Meta **m)
-+                               uint64_t *host_offset, uint64_t *cur_bytes,
-+                               QCowL2Meta **m)
- {
-     BDRVQcow2State *s = bs->opaque;
-     QCowL2Meta *old_alloc;
-@@ -924,7 +936,7 @@ static int handle_dependencies(BlockDriverState *bs, uint64_t guest_offset,
-         const uint64_t old_start = l2meta_cow_start(old_alloc);
-         const uint64_t old_end = l2meta_cow_end(old_alloc);
- 
--        if (end <= old_start || start >= old_end) {
-+        if (end <= old_start || start >= old_end || old_alloc->piggybacked) {
-             /* No intersection */
-             continue;
-         }
-@@ -936,21 +948,95 @@ static int handle_dependencies(BlockDriverState *bs, uint64_t guest_offset,
-             continue;
-         }
- 
--        /* Stop if an l2meta already exists. After yielding, it wouldn't
--         * be valid any more, so we'd have to clean up the old L2Metas
--         * and deal with requests depending on them before starting to
--         * gather new ones. Not worth the trouble. */
--        if (*m) {
-+        /* offsets of the cluster we're intersecting in */
-+        const uint64_t cluster_start = start_of_cluster(s, start);
-+        const uint64_t cluster_end = cluster_start + s->cluster_size;
-+
-+        const uint64_t old_data_start = old_start
-+            + old_alloc->cow_start.nb_bytes;
-+        const uint64_t old_data_end = old_alloc->offset
-+            + old_alloc->cow_end.offset;
-+
-+        const bool conflict_in_data_area =
-+            end > old_data_start && start < old_data_end;
-+        const bool conflict_in_old_cow_start =
-+            /* 1). new write request area is before the old */
-+            start < old_data_start
-+            && /* 2). old request did not allow writing in its cow area */
-+            !old_alloc->cow_start.reduced;
-+        const bool conflict_in_old_cow_end =
-+            /* 1). new write request area is after the old */
-+            start > old_data_start
-+            && /* 2). old request did not allow writing in its cow area */
-+            !old_alloc->cow_end.reduced;
-+
-+        if (conflict_in_data_area ||
-+            conflict_in_old_cow_start || conflict_in_old_cow_end) {
-+
-+            /* Stop if an l2meta already exists. After yielding, it wouldn't
-+             * be valid any more, so we'd have to clean up the old L2Metas
-+             * and deal with requests depending on them before starting to
-+             * gather new ones. Not worth the trouble. */
-+            if (*m) {
-+                /* start must be cluster aligned at this point */
-+                assert(start == cluster_start);
-+                *cur_bytes = 0;
-+                return 0;
-+            }
-+
-+            /* Wait for the dependency to complete. We need to recheck
-+             * the free/allocated clusters when we continue. */
-+            qemu_co_queue_wait(&old_alloc->dependent_requests, &s->lock);
-+            return -EAGAIN;
-+        }
-+
-+        /* allocations do conflict, but the competitor kindly allowed us
-+         * to write concurrently (our data area only, not the whole cluster!)
-+         * Inter alia, this means we must not touch the COW areas */
-+
-+        if (*host_offset) {
-             /* start must be cluster aligned at this point */
--            assert(start == start_of_cluster(s, start));
--            *cur_bytes = 0;
--            return 0;
-+            assert(start == cluster_start);
-+            if ((old_alloc->alloc_offset + (start - old_start))
-+                != *host_offset) {
-+                /* can't extend contiguous allocation */
-+                *cur_bytes = 0;
-+                return 0;
-+            }
-         }
- 
--        /* Wait for the dependency to complete. We need to recheck
--         * the free/allocated clusters when we continue. */
--        qemu_co_queue_wait(&old_alloc->dependent_requests, &s->lock);
--        return -EAGAIN;
-+        QCowL2Meta *old_m = *m;
-+        *m = g_malloc0(sizeof(**m));
-+
-+        **m = (QCowL2Meta) {
-+            .next           = old_m,
-+
-+            .alloc_offset   = old_alloc->alloc_offset
-+                              + (cluster_start - old_start),
-+            .offset         = old_alloc->offset
-+                              + (cluster_start - old_start),
-+            .nb_clusters    = 1,
-+            .piggybacked    = true,
-+            .clusters_are_trailing = false,
-+
-+            /* reduced COW areas. see above */
-+            .cow_start = {
-+                .offset   = 0,
-+                .nb_bytes = start - cluster_start,
-+                .reduced  = true,
-+            },
-+            .cow_end = {
-+                .offset   = MIN(end - cluster_start, s->cluster_size),
-+                .nb_bytes = end < cluster_end ? cluster_end - end : 0,
-+                .reduced  = true,
-+            },
-+        };
-+        qemu_co_queue_init(&(*m)->dependent_requests);
-+        QLIST_INSERT_HEAD(&s->cluster_allocs, *m, next_in_flight);
-+
-+        *host_offset = old_alloc->alloc_offset + (start - old_start);
-+        *cur_bytes = MIN(*cur_bytes, cluster_end - start);
-+        return 1;
-     }
- 
-     /* Make sure that existing clusters and new allocations are only used up to
-@@ -1264,6 +1350,7 @@ static int handle_alloc(BlockDriverState *bs, uint64_t guest_offset,
-         .alloc_offset   = alloc_cluster_offset,
-         .offset         = start_of_cluster(s, guest_offset),
-         .nb_clusters    = nb_clusters,
-+        .piggybacked    = false,
-         .clusters_are_trailing = alloc_cluster_offset >= old_data_end,
- 
-         .keep_old_clusters  = keep_old_clusters,
-@@ -1364,13 +1451,12 @@ again:
-          *         for contiguous clusters (the situation could have changed
-          *         while we were sleeping)
-          *
--         *      c) TODO: Request starts in the same cluster as the in-flight
--         *         allocation ends. Shorten the COW of the in-fight allocation,
--         *         set cluster_offset to write to the same cluster and set up
--         *         the right synchronisation between the in-flight request and
--         *         the new one.
-+         *      c) Overlap with another request's writeable COW area. Use
-+         *         the stolen offset (and let the original request update L2
-+         *         when it pleases)
-+         *
-          */
--        ret = handle_dependencies(bs, start, &cur_bytes, m);
-+        ret = handle_dependencies(bs, start, &cluster_offset, &cur_bytes, m);
-         if (ret == -EAGAIN) {
-             /* Currently handle_dependencies() doesn't yield if we already had
-              * an allocation. If it did, we would have to clean up the L2Meta
-@@ -1379,6 +1465,8 @@ again:
-             goto again;
-         } else if (ret < 0) {
-             return ret;
-+        } else if (ret) {
-+            continue;
-         } else if (cur_bytes == 0) {
-             break;
-         } else {
-@@ -1968,3 +2056,36 @@ void qcow2_update_data_end(BlockDriverState *bs, uint64_t off)
-         s->data_end = off;
-     }
- }
-+
-+/*
-+ * For each @m, wait for its dependency request to finish and check for its
-+ * success, i.e. that L2 table is updated as expected.
-+ */
-+int qcow2_wait_l2table_update(BlockDriverState *bs, const QCowL2Meta *m)
-+{
-+    BDRVQcow2State *s = bs->opaque;
-+    QCowL2Meta *old_alloc;
-+    uint64_t alloc_offset;
-+    unsigned int bytes;
-+    int ret;
-+
-+    for (; m != NULL; m = m->next) {
-+        assert(m->piggybacked);
-+        QLIST_FOREACH(old_alloc, &s->cluster_allocs, next_in_flight) {
-+            uint64_t a_off;
-+            a_off = old_alloc->alloc_offset + (m->offset - old_alloc->offset);
-+            if (!old_alloc->piggybacked && m->offset >= old_alloc->offset &&
-+                a_off == m->alloc_offset) {
-+
-+                qemu_co_queue_wait(&old_alloc->dependent_requests, &s->lock);
-+                break;
-+            }
-+        }
-+        ret = qcow2_get_cluster_offset(bs, m->offset, &bytes, &alloc_offset);
-+        if (ret != QCOW2_CLUSTER_NORMAL ||
-+            alloc_offset != m->alloc_offset) {
-+            return -1;
-+        }
-+    }
-+    return 0;
-+}
-diff --git a/block/qcow2.c b/block/qcow2.c
-index 92d0af6..f02c5e6 100644
---- a/block/qcow2.c
-+++ b/block/qcow2.c
-@@ -1627,6 +1627,8 @@ fail:
- 
- static void handle_cow_reduce(BlockDriverState *bs, QCowL2Meta *m)
- {
-+    bool trimmed = false;
-+
-     if (bs->encrypted) {
-         return;
-     }
-@@ -1635,12 +1637,19 @@ static void handle_cow_reduce(BlockDriverState *bs, QCowL2Meta *m)
-                         (m->offset + m->cow_start.offset) >> BDRV_SECTOR_BITS,
-                         m->cow_start.nb_bytes >> BDRV_SECTOR_BITS)) {
-         m->cow_start.reduced = true;
-+        trimmed = true;
-     }
-     if (!m->cow_end.reduced && m->cow_end.nb_bytes != 0 &&
-         is_zero_sectors(bs,
-                         (m->offset + m->cow_end.offset) >> BDRV_SECTOR_BITS,
-                         m->cow_end.nb_bytes >> BDRV_SECTOR_BITS)) {
-         m->cow_end.reduced = true;
-+        trimmed = true;
-+    }
-+    /* The request is trimmed. Let's try to start dependent
-+       ones, may be we will be lucky */
-+    if (trimmed) {
-+        qemu_co_queue_restart_all(&m->dependent_requests);
-     }
- }
- 
-@@ -1782,6 +1791,10 @@ static void handle_alloc_space(BlockDriverState *bs, QCowL2Meta *l2meta)
-     for (m = l2meta; m != NULL; m = m->next) {
-         uint64_t bytes = m->nb_clusters << s->cluster_bits;
- 
-+        if (m->piggybacked) {
-+            continue;
-+        }
-+
-         if (s->prealloc_size != 0 && handle_prealloc(bs, m)) {
-             handle_cow_reduce(bs, m);
-             continue;
-@@ -1903,9 +1916,18 @@ static coroutine_fn int qcow2_co_pwritev(BlockDriverState *bs, uint64_t offset,
-         while (l2meta != NULL) {
-             QCowL2Meta *next;
- 
--            ret = qcow2_alloc_cluster_link_l2(bs, l2meta);
--            if (ret < 0) {
--                goto fail;
-+            if (!l2meta->piggybacked) {
-+                ret = qcow2_alloc_cluster_link_l2(bs, l2meta);
-+                if (ret < 0) {
-+                    goto fail;
-+                }
-+            } else {
-+                ret = qcow2_wait_l2table_update(bs, l2meta);
-+                if (ret < 0) {
-+                    /* dependency request failed, return general EIO */
-+                    ret = -EIO;
-+                    goto fail;
-+                }
-             }
- 
-             /* Take the request off the list of running requests */
-diff --git a/block/qcow2.h b/block/qcow2.h
-index 2fd8510..5947045 100644
---- a/block/qcow2.h
-+++ b/block/qcow2.h
-@@ -310,7 +310,8 @@ typedef struct Qcow2COWRegion {
-     /** Number of bytes to copy */
-     int         nb_bytes;
- 
--    /** The region is filled with zeroes and does not require COW
-+    /** The region does not require COW
-+     *  (either filled with zeroes or busy with other request)
-      */
-     bool        reduced;
- } Qcow2COWRegion;
-@@ -338,6 +339,13 @@ typedef struct QCowL2Meta
-     bool clusters_are_trailing;
- 
-     /**
-+     * True if the described clusters are being allocated by
-+     * the other concurrent request; so this one must not actually update L2
-+     * or COW but only write its data
-+     */
-+    bool piggybacked;
-+
-+    /**
-      * Requests that overlap with this allocation and wait to be restarted
-      * when the allocating request has completed.
-      */
-@@ -575,6 +583,8 @@ int qcow2_expand_zero_clusters(BlockDriverState *bs,
-                                BlockDriverAmendStatusCB *status_cb,
-                                void *cb_opaque);
- 
-+int qcow2_wait_l2table_update(BlockDriverState *bs, const QCowL2Meta *m);
-+
- /* qcow2-snapshot.c functions */
- int qcow2_snapshot_create(BlockDriverState *bs, QEMUSnapshotInfo *sn_info);
- int qcow2_snapshot_goto(BlockDriverState *bs, const char *snapshot_id);
--- 
-2.7.4
+> 
+> > 
+> > For the UEFI side, this means we no longer have to serve allocation
+> > requests from the 32-bit addressable region. So lift this restriction
+> > when the platform has been configured without ACPI 1.0b support.
+> > 
+> > Contributed-under: TianoCore Contribution Agreement 1.0
+> > Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+> > ---
+> > 
+> > This is an RFC because this change breaks compatibility with older versions
+> > of QEMU. At the least, this means I should sit on this patch for another
+> > while, but perhaps it also means we need some runtime logic to detect which
+> > QEMU we are dealing with? Comments welcome.
+> > 
+> >  OvmfPkg/AcpiPlatformDxe/AcpiPlatformDxe.inf          |  3 +++
+> >  OvmfPkg/AcpiPlatformDxe/QemuFwCfgAcpi.c              | 13 +++++++++++--
+> >  OvmfPkg/AcpiPlatformDxe/QemuFwCfgAcpiPlatformDxe.inf |  3 +++
+> >  3 files changed, 17 insertions(+), 2 deletions(-)  
+> 
+> I guess by compat breakage, you mean the case when new ArmVirtQemu (with
+> this patch) is booted on old QEMU (which lacks commit cb51ac2ffe36) --
+> the 64-bit allocation addresses might not fit into the 4-byte fields
+> generated by QEMU.
+> 
+> Since your QEMU patch (which I did ACK), I've given more thought to the
+> QEMU_LOADER_ALLOCATE linker/loader command. See bullet (68) in:
+> 
+> 
+> http://mid.mail-archive.com/accf8880-f4b0-85f1-9f33-4103c8c26d7a@redhat.com
+> 
+> There are now two reasons to extend the Zone field's meaning:
+> 
+> - The first reason is that the most significant bit in Zone could be
+> repurposed to suppress the SDT header probing implemented in
+> OvmfPkg/AcpiPlatformDxe, in the Process2ndPassCmdAddPointer() function.
+> 
+> - The second reason is that a new value in Zone (with the msb masked
+> off), say QemuLoaderAlloc64Bit=3, could be used to lift the 32-bit
+> allocation limit explicitly.
+> 
+> In QEMU, we could tie both of these extensions to new machine types.
+> 
+> The result would be:
+> 
+>   firmware  QEMU  QEMU machine type  result
+>   --------  ----  -----------------  -----------------------------------
+>   old       new   old                allocate blobs under 4GB
+>   old       new   new                breakage, but that's OK, we can
+>                                        require refreshed firmware for
+>                                        new machine types
+>   new       old   old                allocate blobs under 4GB
+>   new       new   old                allocate blobs under 4GB
+>   new       new   new                allocate blobs from 64-bit space
+> 
+> ... I guess my proposal might be a bit unpolished (and certainly
+> diverges from your original QEMU commit cb51ac2ffe36), but at this
+> point, the need for further *explicit* hints in the ALLOC command is
+> just too obvious to pass them up.
+> 
+> Again, the first extension would be setting aside bit 7, to signify
+> "this blob contains no ACPI tables", and the second extension would be a
+> new zone value (3) to mean "allocate from 64-bit address space".
+> 
+> The first extension would be used by both x86 and arm machine types
+> (2.10+ only), and the second extension would only be used by 2.10+ arm
+> machine types.
+> 
+> What do you think? Can we discuss both of these Zone extensions on
+> qemu-devel as well? Adding qemu-devel, Shannon, Michael, Igor, Drew, and
+> Dongjiu Geng.
+>
+> Thanks
+> Laszlo
+> 
+> > diff --git a/OvmfPkg/AcpiPlatformDxe/AcpiPlatformDxe.inf b/OvmfPkg/AcpiPlatformDxe/AcpiPlatformDxe.inf
+> > index 9a9b2e6bb2e5..9b883871bc23 100644
+> > --- a/OvmfPkg/AcpiPlatformDxe/AcpiPlatformDxe.inf
+> > +++ b/OvmfPkg/AcpiPlatformDxe/AcpiPlatformDxe.inf
+> > @@ -73,5 +73,8 @@ [Pcd]
+> >    gPcAtChipsetPkgTokenSpaceGuid.Pcd8259LegacyModeEdgeLevel
+> >    gUefiOvmfPkgTokenSpaceGuid.PcdOvmfFdBaseAddress
+> >  
+> > +[FixedPcd]
+> > +  gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiExposedTableVersions
+> > +
+> >  [Depex]
+> >    gEfiAcpiTableProtocolGuid
+> > diff --git a/OvmfPkg/AcpiPlatformDxe/QemuFwCfgAcpi.c b/OvmfPkg/AcpiPlatformDxe/QemuFwCfgAcpi.c
+> > index 1bc5fe297a96..97632bc636c0 100644
+> > --- a/OvmfPkg/AcpiPlatformDxe/QemuFwCfgAcpi.c
+> > +++ b/OvmfPkg/AcpiPlatformDxe/QemuFwCfgAcpi.c
+> > @@ -24,6 +24,7 @@
+> >  #include <Library/PcdLib.h>
+> >  #include <Library/OrderedCollectionLib.h>
+> >  #include <IndustryStandard/Acpi.h>
+> > +#include <Protocol/AcpiSystemDescriptionTable.h>
+> >  
+> >  
+> >  //
+> > @@ -173,6 +174,7 @@ ProcessCmdAllocate (
+> >    UINTN                NumPages;
+> >    EFI_PHYSICAL_ADDRESS Address;
+> >    BLOB                 *Blob;
+> > +  EFI_ALLOCATE_TYPE    AllocType;
+> >  
+> >    if (Allocate->File[QEMU_LOADER_FNAME_SIZE - 1] != '\0') {
+> >      DEBUG ((EFI_D_ERROR, "%a: malformed file name\n", __FUNCTION__));
+> > @@ -192,9 +194,16 @@ ProcessCmdAllocate (
+> >      return Status;
+> >    }
+> >  
+> > +  if ((FixedPcdGet32 (PcdAcpiExposedTableVersions) &
+> > +       EFI_ACPI_TABLE_VERSION_1_0B) != 0) {
+> > +    Address = 0xFFFFFFFF;
+> > +    AllocType = AllocateMaxAddress;
+> > +  } else {
+> > +    AllocType = AllocateAnyPages;
+> > +  }
+> > +
+> >    NumPages = EFI_SIZE_TO_PAGES (FwCfgSize);
+> > -  Address = 0xFFFFFFFF;
+> > -  Status = gBS->AllocatePages (AllocateMaxAddress, EfiACPIMemoryNVS, NumPages,
+> > +  Status = gBS->AllocatePages (AllocType, EfiACPIMemoryNVS, NumPages,
+> >                    &Address);
+> >    if (EFI_ERROR (Status)) {
+> >      return Status;
+> > diff --git a/OvmfPkg/AcpiPlatformDxe/QemuFwCfgAcpiPlatformDxe.inf b/OvmfPkg/AcpiPlatformDxe/QemuFwCfgAcpiPlatformDxe.inf
+> > index adc50cfd9f76..64db80dd9cbc 100644
+> > --- a/OvmfPkg/AcpiPlatformDxe/QemuFwCfgAcpiPlatformDxe.inf
+> > +++ b/OvmfPkg/AcpiPlatformDxe/QemuFwCfgAcpiPlatformDxe.inf
+> > @@ -58,5 +58,8 @@ [Guids]
+> >  [Pcd]
+> >    gEfiMdeModulePkgTokenSpaceGuid.PcdPciDisableBusEnumeration
+> >  
+> > +[FixedPcd]
+> > +  gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiExposedTableVersions
+> > +
+> >  [Depex]
+> >    gEfiAcpiTableProtocolGuid
+> >   
+> 
