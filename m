@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50913)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51781)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dGOnf-00009E-IV
-	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 08:02:05 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1dGOpD-0001PP-D2
+	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 08:03:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dGOnb-0000rU-Mb
-	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 08:01:59 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:49604)
+	(envelope-from <dgilbert@redhat.com>) id 1dGOpC-0002Do-Aa
+	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 08:03:35 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:33362)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dGOnb-0000rJ-Em
-	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 08:01:55 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dGOpC-0002Cr-3X
+	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 08:03:34 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 660AA7E9ED
-	for <qemu-devel@nongnu.org>; Thu,  1 Jun 2017 12:01:35 +0000 (UTC)
-Date: Thu, 1 Jun 2017 13:00:10 +0100
+	by mx1.redhat.com (Postfix) with ESMTPS id 2A67D448D6B
+	for <qemu-devel@nongnu.org>; Thu,  1 Jun 2017 12:03:33 +0000 (UTC)
+Date: Thu, 1 Jun 2017 13:03:22 +0100
 From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170601120010.GI2083@work-vm>
+Message-ID: <20170601120321.GJ2083@work-vm>
 References: <20170531103509.22021-1-quintela@redhat.com>
 	<20170531103509.22021-2-quintela@redhat.com>
 MIME-Version: 1.0
