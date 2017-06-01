@@ -1,39 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35913)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35936)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imbrenda@linux.vnet.ibm.com>) id 1dGSQZ-0000i3-Jk
-	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 11:54:25 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dGSQd-0000jR-9l
+	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 11:54:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imbrenda@linux.vnet.ibm.com>) id 1dGSQU-0001xG-MP
-	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 11:54:23 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:38710)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imbrenda@linux.vnet.ibm.com>)
-	id 1dGSQU-0001wt-CG
-	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 11:54:18 -0400
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v51FrhiP033261
-	for <qemu-devel@nongnu.org>; Thu, 1 Jun 2017 11:54:16 -0400
-Received: from e06smtp13.uk.ibm.com (e06smtp13.uk.ibm.com [195.75.94.109])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2atknwfrjr-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Thu, 01 Jun 2017 11:54:16 -0400
-Received: from localhost
-	by e06smtp13.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <imbrenda@linux.vnet.ibm.com>;
-	Thu, 1 Jun 2017 16:54:11 +0100
-Date: Thu, 1 Jun 2017 17:54:07 +0200
-From: Claudio Imbrenda <imbrenda@linux.vnet.ibm.com>
-In-Reply-To: <20170601173213.08fe7e4f@bahia.lan>
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dGSQc-00021r-Aa
+	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 11:54:27 -0400
+Received: from mail-it0-x244.google.com ([2607:f8b0:4001:c0b::244]:36503)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dGSQc-00021d-5w
+	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 11:54:26 -0400
+Received: by mail-it0-x244.google.com with SMTP id i206so6865625ita.3
+	for <qemu-devel@nongnu.org>; Thu, 01 Jun 2017 08:54:26 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
 References: <20170601144915.20778-1-alex.bennee@linaro.org>
-	<20170601144915.20778-4-alex.bennee@linaro.org>
-	<20170601173213.08fe7e4f@bahia.lan>
+	<20170601144915.20778-5-alex.bennee@linaro.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <93f2fcbc-5f8c-6d50-5ddf-18b37efa0785@amsat.org>
+Date: Thu, 1 Jun 2017 12:54:23 -0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <20170601175407.1bb63701@p-imbrenda.boeblingen.de.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH v2 3/4] qom/cpu: remove host_tid field
+In-Reply-To: <20170601144915.20778-5-alex.bennee@linaro.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v2 4/4] gdbstub: don't fail on vCont; C04:0;
+ c packets
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -42,134 +35,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>
-Cc: Alex =?UTF-8?B?QmVubsOpZQ==?= <alex.bennee@linaro.org>, pbonzini@redhat.com, doug16k@gmail.com, Riku Voipio <riku.voipio@iki.fi>, qemu-devel@nongnu.org, Laurent Vivier <laurent@vivier.eu>
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, pbonzini@redhat.com, doug16k@gmail.com, imbrenda@linux.vnet.ibm.com
+Cc: qemu-devel@nongnu.org
 
-On Thu, 1 Jun 2017 17:32:13 +0200
-Greg Kurz <groug@kaod.org> wrote:
-
-> On Thu,  1 Jun 2017 15:49:14 +0100
-> Alex Benn=C3=A9e <alex.bennee@linaro.org> wrote:
->=20
-> > This was only used by the gdbstub and even then was only being set
-> > for subsequent threads. Rather the continue duplicating the number
-> > just make the gdbstub get the information from TaskState structure.
-> >=20
-> > Now the tid is correctly reported for all threads the bug I was
-> > seeing with "vCont;C04:0;c" packets is fixed as the correct tid is
-> > reported to gdb.
-> >=20
-> > I moved cpu_gdb_index into the gdbstub to facilitate easy access to
-> > the TaskState which is used elsewhere in gdbstub.
-> >  =20
->=20
-> FWIW, this change would make more sense in patch 2 since all users
-> are in gdbstub.c and it would avoid to change things twice. No big
-> deal compared to the benefit of dropping the broken @host_tid :)
-
-I agree with this
-
-> > Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-> > --- =20
->=20
-> In any case.
->=20
+On 06/01/2017 11:49 AM, Alex Bennée wrote:
+> The thread-id of 0 means any CPU but we then ignore the fact we find
+> the first_cpu in this case who can have an index of 0. Instead of
+> bailing out just test if we have managed to match up thread-id to a
+> CPU.
+>
+> Otherwise you get:
+>   gdb_handle_packet: command='vCont;C04:0;c'
+>   put_packet: reply='E22'
+>
+> The actual reason for gdb sending vCont;C04:0;c was fixed in a
+> previous commit where we ensure the first_cpu's tid is correctly
+> reported to gdb however we should still behave correctly next time it
+> does send 0.
+>
+> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 > Reviewed-by: Greg Kurz <groug@kaod.org>
 
-and me too
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
-Reviewed-by: Claudio Imbrenda <imbrenda@linux.vnet.ibm.com>
-=20
-> >  gdbstub.c              | 15 +++++++++++++++
-> >  include/exec/gdbstub.h | 14 --------------
-> >  include/qom/cpu.h      |  2 --
-> >  linux-user/syscall.c   |  1 -
-> >  4 files changed, 15 insertions(+), 17 deletions(-)
-> >=20
-> > diff --git a/gdbstub.c b/gdbstub.c
-> > index 026d1fe6bb..45a3a0b16b 100644
-> > --- a/gdbstub.c
-> > +++ b/gdbstub.c
-> > @@ -55,6 +55,21 @@ static inline int
-> > target_memory_rw_debug(CPUState *cpu, target_ulong addr, return
-> > cpu_memory_rw_debug(cpu, addr, buf, len, is_write); }
-> > =20
-> > +/* Return the GDB index for a given vCPU state.
-> > + *
-> > + * For user mode this is simply the thread id. In system mode GDB
-> > + * numbers CPUs from 1 as 0 is reserved as an "any cpu" index.
-> > + */
-> > +static inline int cpu_gdb_index(CPUState *cpu)
-> > +{
-> > +#if defined(CONFIG_USER_ONLY)
-> > +    TaskState *ts =3D (TaskState *) cpu->opaque;
-> > +    return ts->ts_tid;
-> > +#else
-> > +    return cpu->cpu_index + 1;
-> > +#endif
-> > +}
-> > +
-> >  enum {
-> >      GDB_SIGNAL_0 =3D 0,
-> >      GDB_SIGNAL_INT =3D 2,
-> > diff --git a/include/exec/gdbstub.h b/include/exec/gdbstub.h
-> > index c4fe567600..9aa7756d92 100644
-> > --- a/include/exec/gdbstub.h
-> > +++ b/include/exec/gdbstub.h
-> > @@ -58,20 +58,6 @@ void gdb_register_coprocessor(CPUState *cpu,
-> >                                gdb_reg_cb get_reg, gdb_reg_cb
-> > set_reg, int num_regs, const char *xml, int g_pos);
-> > =20
-> > -/* Return the GDB index for a given vCPU state.
-> > - *
-> > - * For user mode this is simply the thread id. In system mode GDB
-> > - * numbers CPUs from 1 as 0 is reserved as an "any cpu" index.
-> > - */
-> > -static inline int cpu_gdb_index(CPUState *cpu)
-> > -{
-> > -#if defined(CONFIG_USER_ONLY)
-> > -    return cpu->host_tid;
-> > -#else
-> > -    return cpu->cpu_index + 1;
-> > -#endif
-> > -}
-> > -
-> >  /* The GDB remote protocol transfers values in target byte order.
-> > This means
-> >   * we can use the raw memory access routines to access the value
-> > buffer.
-> >   * Conveniently, these also handle the case where the buffer is
-> > mis-aligned. diff --git a/include/qom/cpu.h b/include/qom/cpu.h
-> > index 55214ce131..909e7ae994 100644
-> > --- a/include/qom/cpu.h
-> > +++ b/include/qom/cpu.h
-> > @@ -266,7 +266,6 @@ struct qemu_work_item;
-> >   * @nr_cores: Number of cores within this CPU package.
-> >   * @nr_threads: Number of threads within this CPU.
-> >   * @numa_node: NUMA node this CPU is belonging to.
-> > - * @host_tid: Host thread ID.
-> >   * @running: #true if CPU is currently running (lockless).
-> >   * @has_waiter: #true if a CPU is currently waiting for the
-> > cpu_exec_end;
-> >   * valid under cpu_list_lock.
-> > @@ -321,7 +320,6 @@ struct CPUState {
-> >      HANDLE hThread;
-> >  #endif
-> >      int thread_id;
-> > -    uint32_t host_tid;
-> >      bool running, has_waiter;
-> >      struct QemuCond *halt_cond;
-> >      bool thread_kicked;
-> > diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-> > index cec8428589..cada188e58 100644
-> > --- a/linux-user/syscall.c
-> > +++ b/linux-user/syscall.c
-> > @@ -6216,7 +6216,6 @@ static void *clone_func(void *arg)
-> >      thread_cpu =3D cpu;
-> >      ts =3D (TaskState *)cpu->opaque;
-> >      info->tid =3D gettid();
-> > -    cpu->host_tid =3D info->tid;
-> >      task_settid(ts);
-> >      if (info->child_tidptr)
-> >          put_user_u32(info->tid, info->child_tidptr); =20
->=20
+>
+> ---
+> v2
+>   - used Greg's less convoluted suggestion
+>   - expand commit message
+> ---
+>  gdbstub.c | 15 ++++-----------
+>  1 file changed, 4 insertions(+), 11 deletions(-)
+>
+> diff --git a/gdbstub.c b/gdbstub.c
+> index 45a3a0b16b..6b1e72e9f7 100644
+> --- a/gdbstub.c
+> +++ b/gdbstub.c
+> @@ -937,23 +937,16 @@ static int gdb_handle_vcont(GDBState *s, const char *p)
+>              if (res) {
+>                  goto out;
+>              }
+> -            idx = tmp;
+> +
+>              /* 0 means any thread, so we pick the first valid CPU */
+> -            if (!idx) {
+> -                idx = cpu_gdb_index(first_cpu);
+> -            }
+> +            cpu = tmp ? find_cpu(tmp) : first_cpu;
+>
+> -            /*
+> -             * If we are in user mode, the thread specified is actually a
+> -             * thread id, and not an index. We need to find the actual
+> -             * CPU first, and only then we can use its index.
+> -             */
+> -            cpu = find_cpu(idx);
+>              /* invalid CPU/thread specified */
+> -            if (!idx || !cpu) {
+> +            if (!cpu) {
+>                  res = -EINVAL;
+>                  goto out;
+>              }
+> +
+>              /* only use if no previous match occourred */
+>              if (newstates[cpu->cpu_index] == 1) {
+>                  newstates[cpu->cpu_index] = cur_action;
+>
