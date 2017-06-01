@@ -1,28 +1,39 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50016)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50376)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dGNgr-00028I-Ty
-	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 06:50:55 -0400
+	(envelope-from <cornelia.huck@de.ibm.com>) id 1dGNin-0002r7-Fo
+	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 06:52:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dGNgo-0004yH-Nm
-	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 06:50:53 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46868)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dGNgo-0004y5-Fz
-	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 06:50:50 -0400
-Date: Thu, 1 Jun 2017 11:50:42 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170601105041.GE2083@work-vm>
-References: <1495539071-12995-1-git-send-email-a.perevalov@samsung.com>
-	<CGME20170523113131eucas1p24a041de6004237e437f97a24340507e2@eucas1p2.samsung.com>
-	<1495539071-12995-9-git-send-email-a.perevalov@samsung.com>
-	<20170524075305.GG3873@pxdev.xzpeter.org>
-	<20170524093720.GC12925@aperevalov-ubuntu>
+	(envelope-from <cornelia.huck@de.ibm.com>) id 1dGNik-0005bx-A5
+	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 06:52:53 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:39902
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cornelia.huck@de.ibm.com>)
+	id 1dGNik-0005br-1D
+	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 06:52:50 -0400
+Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v51Ampoh133368
+	for <qemu-devel@nongnu.org>; Thu, 1 Jun 2017 06:52:48 -0400
+Received: from e06smtp10.uk.ibm.com (e06smtp10.uk.ibm.com [195.75.94.106])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2at896h7e3-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Thu, 01 Jun 2017 06:52:47 -0400
+Received: from localhost
+	by e06smtp10.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <cornelia.huck@de.ibm.com>;
+	Thu, 1 Jun 2017 11:52:45 +0100
+Date: Thu, 1 Jun 2017 12:52:41 +0200
+From: Cornelia Huck <cornelia.huck@de.ibm.com>
+In-Reply-To: <20170529131716.94338-1-pasic@linux.vnet.ibm.com>
+References: <20170529131716.94338-1-pasic@linux.vnet.ibm.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170524093720.GC12925@aperevalov-ubuntu>
-Subject: Re: [Qemu-devel] [PATCH V6 08/10] migration: calculate vCPU
- blocktime on dst side
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Message-Id: <20170601125241.2c11e95a.cornelia.huck@de.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH 1/1] s390x: vmstatify config migration for
+ virtio-ccw
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,354 +42,774 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alexey <a.perevalov@samsung.com>
-Cc: Peter Xu <peterx@redhat.com>, i.maximets@samsung.com, qemu-devel@nongnu.org
+To: Halil Pasic <pasic@linux.vnet.ibm.com>, Christian Borntraeger <borntraeger@de.ibm.com>
+Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org
 
-* Alexey (a.perevalov@samsung.com) wrote:
-> On Wed, May 24, 2017 at 03:53:05PM +0800, Peter Xu wrote:
-> > On Tue, May 23, 2017 at 02:31:09PM +0300, Alexey Perevalov wrote:
-> > > This patch provides blocktime calculation per vCPU,
-> > > as a summary and as a overlapped value for all vCPUs.
-> > > 
-> > > This approach was suggested by Peter Xu, as an improvements of
-> > > previous approch where QEMU kept tree with faulted page address and cpus bitmask
-> > > in it. Now QEMU is keeping array with faulted page address as value and vCPU
-> > > as index. It helps to find proper vCPU at UFFD_COPY time. Also it keeps
-> > > list for blocktime per vCPU (could be traced with page_fault_addr)
-> > > 
-> > > Blocktime will not calculated if postcopy_blocktime field of
-> > > MigrationIncomingState wasn't initialized.
-> > > 
-> > > Signed-off-by: Alexey Perevalov <a.perevalov@samsung.com>
-> > > ---
-> > >  migration/postcopy-ram.c | 102 ++++++++++++++++++++++++++++++++++++++++++++++-
-> > >  migration/trace-events   |   5 ++-
-> > >  2 files changed, 105 insertions(+), 2 deletions(-)
-> > > 
-> > > diff --git a/migration/postcopy-ram.c b/migration/postcopy-ram.c
-> > > index d647769..e70c44b 100644
-> > > --- a/migration/postcopy-ram.c
-> > > +++ b/migration/postcopy-ram.c
-> > > @@ -23,6 +23,7 @@
-> > >  #include "postcopy-ram.h"
-> > >  #include "sysemu/sysemu.h"
-> > >  #include "sysemu/balloon.h"
-> > > +#include <sys/param.h>
-> > >  #include "qemu/error-report.h"
-> > >  #include "trace.h"
-> > >  
-> > > @@ -577,6 +578,101 @@ static int ram_block_enable_notify(const char *block_name, void *host_addr,
-> > >      return 0;
-> > >  }
-> > >  
-> > > +static int get_mem_fault_cpu_index(uint32_t pid)
-> > > +{
-> > > +    CPUState *cpu_iter;
-> > > +
-> > > +    CPU_FOREACH(cpu_iter) {
-> > > +        if (cpu_iter->thread_id == pid) {
-> > > +            return cpu_iter->cpu_index;
-> > > +        }
-> > > +    }
-> > > +    trace_get_mem_fault_cpu_index(pid);
-> > > +    return -1;
-> > > +}
-> > > +
-> > > +static void mark_postcopy_blocktime_begin(uint64_t addr, uint32_t ptid,
-> > > +        RAMBlock *rb)
-> > > +{
-> > > +    int cpu;
-> > > +    unsigned long int nr_bit;
-> > > +    MigrationIncomingState *mis = migration_incoming_get_current();
-> > > +    PostcopyBlocktimeContext *dc = mis->blocktime_ctx;
-> > > +    int64_t now_ms;
-> > > +
-> > > +    if (!dc || ptid == 0) {
-> > > +        return;
-> > > +    }
-> > > +    cpu = get_mem_fault_cpu_index(ptid);
-> > > +    if (cpu < 0) {
-> > > +        return;
-> > > +    }
-> > > +    nr_bit = get_copied_bit_offset(addr);
-> > > +    if (test_bit(nr_bit, mis->copied_pages)) {
-> > > +        return;
-> > > +    }
-> > > +    now_ms = qemu_clock_get_ms(QEMU_CLOCK_REALTIME);
-> > > +    if (dc->vcpu_addr[cpu] == 0) {
-> > > +        atomic_inc(&dc->smp_cpus_down);
-> > > +    }
-> > > +
-> > > +    atomic_xchg__nocheck(&dc->vcpu_addr[cpu], addr);
-> > > +    atomic_xchg__nocheck(&dc->last_begin, now_ms);
-> > > +    atomic_xchg__nocheck(&dc->page_fault_vcpu_time[cpu], now_ms);
-> > 
-> > Looks like this is not what you and Dave have discussed?
-> > 
-> > (Btw, sorry to have not followed the thread recently, so I just went
-> >  over the discussion again...)
-> > 
-> > What I see that Dave suggested is (I copied from Dave's email):
-> > 
-> > blocktime_start:
-> >    set CPU stall address
-> >    check bitmap entry
-> >      if set then zero stall-address
-> > 
-> > While here it is:
-> > 
-> > blocktime_start:
-> >    check bitmap entry
-> >      if set then return
-> >    set CPU stall address
-> > 
-> > I don't think current version can really solve the risk condition. See
-> > this possible sequence:
-> > 
-> >        receive-thread             fault-thread 
-> >        --------------             ------------
-> >                                   blocktime_start
-> >                                     check bitmap entry,
-> >                                       if set then return
-> >        blocktime_end
-> >          set bitmap entry
-> >          read CPU stall address,
-> >            if none-0 then zero it
-> >                                     set CPU stall address [1]
-> >         
-> > Then imho the address set at [1] will be stall again until forever.
-> > 
-> agree, I check is in incorrect order
-> 
-> > I think we should follow exactly what Dave has suggested.
-> > 
-> > And.. after a second thought, I am afraid even this would not satisfy
-> > all risk conditions. What if we consider the UFFDIO_COPY ioctl in?
-> > AFAIU after UFFDIO_COPY the faulted vcpu can be running again, then
-> > the question is, can it quickly trigger another page fault?
-> >
-> yes, it can
-> 
-> > Firstly, a workable sequence is (adding UFFDIO_COPY ioctl in, and
-> > showing vcpu-thread X as well):
-> > 
-> >   receive-thread       fault-thread        vcpu-thread X
-> >   --------------       ------------        -------------
-> >                                            fault at addr A1
-> >                        fault_addr[X]=A1
-> >   UFFDIO_COPY page A1
-> >   check fault_addr[X] with A1
-> >     if match, clear fault_addr[X]
-> >                                            vcpu X starts
-> > 
-> > This is fine.
-> > 
-> > While since "vcpu X starts" can be right after UFFDIO_COPY, can this
-> > be possible?
-> Previous picture isn't possible, due to mark_postcopy_blocktime_end
-> is being called right after ioctl, and vCPU is waking up
-> inside ioctl, so check fault_addr will be after vcpu X starts.
+On Mon, 29 May 2017 15:17:16 +0200
+Halil Pasic <pasic@linux.vnet.ibm.com> wrote:
 
-It's the optimistic view when you get lucky.
+> Let's vmstatify virtio_ccw_save_config and virtio_ccw_load_config for
+> flexibility (extending using subsections) and for fun.
 
-> > 
-> >   receive-thread       fault-thread        vcpu-thread X
-> >   --------------       ------------        -------------
-> >                                            fault at addr A1
-> >                        fault_addr[X]=A1
-> >   UFFDIO_COPY page A1
-> >                                            vcpu X starts
-> >                                            fault at addr A2
-> >                        fault_addr[X]=A2
-> >   check fault_addr[X] with A1
-> >     if match, clear fault_addr[X]
-> >         ^
-> >         |
-> >         +---------- here it will not match since now fault_addr[X]==A2
-> > 
-> > Then looks like fault_addr[X], which is currently A1, will stall
-> > again?
-> 
-> It will be another address(A2), but probably the same vCPU and if in
-> this case blocktime_start will be called before blocktime_end we lost
-> block time for page A1. Address of the page is unique key in this
-> process, not vCPU ;)
-> Here maybe reasonable to wake up vCPU after blocktime_end.
-
-Yes, that probably works better.
-This ordering is really tricky!
-
-One thing you might want to look for, I suspect there are cases
-where you get faults from vCPUs but then it carries on running
-doing something else because of KVM asynchronous page faults.
-I'm not sure what you end up with when that happens.
-
-Dave
+You have interesting ideas of fun :)
 
 > 
+> To achieve this we need to hack the config_vector, which is VirtIODevice
+> (that is common virtio) state, in the middle of the VirtioCcwDevice state
+> representation.  This somewhat ugly, but we have no choice because the
+> stream format needs to be preserved.
 > 
+> Almost no changes in behavior. Exception is everything that comes with
+> vmstate like extra bookkeeping about what's in the stream, and maybe some
+> extra checks and better error reporting.
 > 
-> > 
-> > (I feel like finally we may need something like a per-cpu lock... or I
-> >  must have missed something)
-> I think no, because locking time of the vCPU is critical in this process.
-> > 
-> > > +
-> > > +    trace_mark_postcopy_blocktime_begin(addr, dc, dc->page_fault_vcpu_time[cpu],
-> > > +            cpu);
-> > > +}
-> > > +
-> > > +static void mark_postcopy_blocktime_end(uint64_t addr)
-> > > +{
-> > > +    MigrationIncomingState *mis = migration_incoming_get_current();
-> > > +    PostcopyBlocktimeContext *dc = mis->blocktime_ctx;
-> > > +    int i, affected_cpu = 0;
-> > > +    int64_t now_ms;
-> > > +    bool vcpu_total_blocktime = false;
-> > > +    unsigned long int nr_bit;
-> > > +
-> > > +    if (!dc) {
-> > > +        return;
-> > > +    }
-> > > +    /* mark that page as copied */
-> > > +    nr_bit = get_copied_bit_offset(addr);
-> > > +    set_bit_atomic(nr_bit, mis->copied_pages);
-> > > +
-> > > +    now_ms = qemu_clock_get_ms(QEMU_CLOCK_REALTIME);
-> > > +
-> > > +    /* lookup cpu, to clear it,
-> > > +     * that algorithm looks straighforward, but it's not
-> > > +     * optimal, more optimal algorithm is keeping tree or hash
-> > > +     * where key is address value is a list of  */
-> > > +    for (i = 0; i < smp_cpus; i++) {
-> > > +        uint64_t vcpu_blocktime = 0;
-> > > +        if (atomic_fetch_add(&dc->vcpu_addr[i], 0) != addr) {
-> > > +            continue;
-> > > +        }
-> > > +        atomic_xchg__nocheck(&dc->vcpu_addr[i], 0);
-> > 
-> > Why use *__nocheck() rather than atomic_xchg() or even atomic_read()?
-> > Same thing happened a lot in current patch.
-> atomic_read/atomic_xchg for mingw/(gcc on arm32) has build time check,
+> Signed-off-by: Halil Pasic <pasic@linux.vnet.ibm.com>
+> ---
 > 
-> QEMU_BUILD_BUG_ON(sizeof(*ptr) > sizeof(void *));
+> This patch is related to the series 'migration: s390x css migration',
+> in a sense that it's basically the compatibility preserving changes
+> split out as requested by Dave.
 > 
-> it prevents using 64 atomic operation on 32 architecture, just mingw I
-> think, but postcopy-ram.c isn't compiling for mingw.
-> On other 32 platforms as I know clang/gcc allow to use 8 bytes
-> long variables in built atomic operations. In arm32 it allows in
-> builtin. But QEMU on arm32 still
-> has that sanity check, and I think it's bug, so I just worked it around.
-> Maybe better was to fix it.
+> Note: This patch can be split in two parts, where the first part is
+> limited to getting rid of the qemu_put's and qemu_gets from
+> subch_device_save and subch_device_load.  With that the scope of the
+> second part would be concerned with the virtio_ccw_save_config and
+> virtio_ccw_load_config. Would it significantly benefit readability
+> -- probably not.
+
+Agreed, probably not. You still have to dig through a zoo of acronyms...
+
+> ---
+>  hw/intc/s390_flic.c          |  28 ++++
+>  hw/s390x/ccw-device.c        |  10 ++
+>  hw/s390x/ccw-device.h        |   4 +
+>  hw/s390x/css.c               | 361 ++++++++++++++++++++++++++-----------------
+>  hw/s390x/virtio-ccw.c        | 154 +++++++++---------
+>  include/hw/s390x/css.h       |  12 +-
+>  include/hw/s390x/s390_flic.h |   5 +
+>  7 files changed, 354 insertions(+), 220 deletions(-)
 > 
-> I tested in docker, using follow command:
-> make docker-test-build@debian-armhf-cross
+> diff --git a/hw/intc/s390_flic.c b/hw/intc/s390_flic.c
+> index 711c11454f..7e7546a576 100644
+> --- a/hw/intc/s390_flic.c
+> +++ b/hw/intc/s390_flic.c
+> @@ -18,6 +18,7 @@
+>  #include "trace.h"
+>  #include "hw/qdev.h"
+>  #include "qapi/error.h"
+> +#include "hw/s390x/s390-virtio-ccw.h"
 > 
-> And got following error
+>  S390FLICState *s390_get_flic(void)
+>  {
+> @@ -137,3 +138,30 @@ static void qemu_s390_flic_register_types(void)
+>  }
 > 
-> /tmp/qemu-test/src/migration/postcopy-ram.c: In function
-> 'mark_postcopy_blocktime_begin':
-> /tmp/qemu-test/src/include/qemu/compiler.h:86:30: error: static
-> assertion failed: "not expecting: sizeof(*&dc->vcpu_addr[cpu]) >
-> sizeof(void *)"
->  #define QEMU_BUILD_BUG_ON(x) _Static_assert(!(x), "not expecting: " #x)
+>  type_init(qemu_s390_flic_register_types)
+> +
+> +const VMStateDescription vmstate_adapter_info = {
+> +    .name = "s390_adapter_info",
+> +    .version_id = 1,
+> +    .minimum_version_id = 1,
+> +    .fields = (VMStateField[]) {
+> +        VMSTATE_UINT64(ind_offset, AdapterInfo),
+> +        /*
+> +         * We do not have to migrate neither the id nor the addresses.
+> +         * The id is set by css_register_io_adapter and the addresses
+> +         * are set based on the IndAddr objects after those get mapped.
+> +         */
+> +        VMSTATE_END_OF_LIST()
+> +    },
+> +};
+> +
+> +const VMStateDescription vmstate_adapter_routes = {
+> +
+> +    .name = "s390_adapter_routes",
+> +    .version_id = 1,
+> +    .minimum_version_id = 1,
+> +    .fields = (VMStateField[]) {
+> +        VMSTATE_STRUCT(adapter, AdapterRoutes, 1, vmstate_adapter_info, \
+> +                       AdapterInfo),
+> +        VMSTATE_END_OF_LIST()
+> +    }
+> +};
+> diff --git a/hw/s390x/ccw-device.c b/hw/s390x/ccw-device.c
+> index fb8d640a7e..f9bfa154d6 100644
+> --- a/hw/s390x/ccw-device.c
+> +++ b/hw/s390x/ccw-device.c
+> @@ -50,6 +50,16 @@ static void ccw_device_class_init(ObjectClass *klass, void *data)
+>      dc->props = ccw_device_properties;
+>  }
 > 
-> when I used atomic_xchg,
-> I agree with you, but I think need to fix atomic.h firstly and add additional
-> #ifdef there.
+> +const VMStateDescription vmstate_ccw_dev = {
+> +    .name = "s390_ccw_dev",
+> +    .version_id = 1,
+> +    .minimum_version_id = 1,
+> +    .fields = (VMStateField[]) {
+> +        VMSTATE_STRUCT_POINTER(sch, CcwDevice, vmstate_subch_dev, SubchDev),
+> +        VMSTATE_END_OF_LIST()
+> +    }
+> +};
+> +
+>  static const TypeInfo ccw_device_info = {
+>      .name = TYPE_CCW_DEVICE,
+>      .parent = TYPE_DEVICE,
+> diff --git a/hw/s390x/ccw-device.h b/hw/s390x/ccw-device.h
+> index 89c8e5dff7..4e6af287e7 100644
+> --- a/hw/s390x/ccw-device.h
+> +++ b/hw/s390x/ccw-device.h
+> @@ -27,6 +27,10 @@ typedef struct CcwDevice {
+>      CssDevId subch_id;
+>  } CcwDevice;
 > 
-> And I didn't want to split 64 bit values onto 32 bit values, but I saw
-> in mailing list people are doing it.
+> +extern const VMStateDescription vmstate_ccw_dev;
+> +#define VMSTATE_CCW_DEVICE(_field, _state)                     \
+> +    VMSTATE_STRUCT(_field, _state, 1, vmstate_ccw_dev, CcwDevice)
+> +
+>  typedef struct CCWDeviceClass {
+>      DeviceClass parent_class;
+>      void (*unplug)(HotplugHandler *, DeviceState *, Error **);
+> diff --git a/hw/s390x/css.c b/hw/s390x/css.c
+> index 15c4f4b249..15517a16e4 100644
+> --- a/hw/s390x/css.c
+> +++ b/hw/s390x/css.c
+> @@ -20,6 +20,7 @@
+>  #include "hw/s390x/css.h"
+>  #include "trace.h"
+>  #include "hw/s390x/s390_flic.h"
+> +#include "hw/s390x/s390-virtio-ccw.h"
 > 
-> > 
-> > Thanks,
-> > 
-> > > +        vcpu_blocktime = now_ms -
-> > > +            atomic_fetch_add(&dc->page_fault_vcpu_time[i], 0);
-> > > +        affected_cpu += 1;
-> > > +        /* we need to know is that mark_postcopy_end was due to
-> > > +         * faulted page, another possible case it's prefetched
-> > > +         * page and in that case we shouldn't be here */
-> > > +        if (!vcpu_total_blocktime &&
-> > > +            atomic_fetch_add(&dc->smp_cpus_down, 0) == smp_cpus) {
-> > > +            vcpu_total_blocktime = true;
-> > > +        }
-> > > +        /* continue cycle, due to one page could affect several vCPUs */
-> > > +        dc->vcpu_blocktime[i] += vcpu_blocktime;
-> > > +    }
-> > > +
-> > > +    atomic_sub(&dc->smp_cpus_down, affected_cpu);
-> > > +    if (vcpu_total_blocktime) {
-> > > +        dc->total_blocktime += now_ms - atomic_fetch_add(&dc->last_begin, 0);
-> > > +    }
-> > > +    trace_mark_postcopy_blocktime_end(addr, dc, dc->total_blocktime);
-> > > +}
-> > > +
-> > >  /*
-> > >   * Handle faults detected by the USERFAULT markings
-> > >   */
-> > > @@ -654,8 +750,11 @@ static void *postcopy_ram_fault_thread(void *opaque)
-> > >          rb_offset &= ~(qemu_ram_pagesize(rb) - 1);
-> > >          trace_postcopy_ram_fault_thread_request(msg.arg.pagefault.address,
-> > >                                                  qemu_ram_get_idstr(rb),
-> > > -                                                rb_offset);
-> > > +                                                rb_offset,
-> > > +                                                msg.arg.pagefault.feat.ptid);
-> > >  
-> > > +        mark_postcopy_blocktime_begin((uintptr_t)(msg.arg.pagefault.address),
-> > > +                msg.arg.pagefault.feat.ptid, rb);
-> > >          /*
-> > >           * Send the request to the source - we want to request one
-> > >           * of our host page sizes (which is >= TPS)
-> > > @@ -750,6 +849,7 @@ int postcopy_place_page(MigrationIncomingState *mis, void *host, void *from,
-> > >  
-> > >          return -e;
-> > >      }
-> > > +    mark_postcopy_blocktime_end((uint64_t)(uintptr_t)host);
-> > >  
-> > >      trace_postcopy_place_page(host);
-> > >      return 0;
-> > > diff --git a/migration/trace-events b/migration/trace-events
-> > > index 5b8ccf3..7bdadbb 100644
-> > > --- a/migration/trace-events
-> > > +++ b/migration/trace-events
-> > > @@ -112,6 +112,8 @@ process_incoming_migration_co_end(int ret, int ps) "ret=%d postcopy-state=%d"
-> > >  process_incoming_migration_co_postcopy_end_main(void) ""
-> > >  migration_set_incoming_channel(void *ioc, const char *ioctype) "ioc=%p ioctype=%s"
-> > >  migration_set_outgoing_channel(void *ioc, const char *ioctype, const char *hostname)  "ioc=%p ioctype=%s hostname=%s"
-> > > +mark_postcopy_blocktime_begin(uint64_t addr, void *dd, int64_t time, int cpu) "addr 0x%" PRIx64 " dd %p time %" PRId64 " cpu %d"
-> > > +mark_postcopy_blocktime_end(uint64_t addr, void *dd, int64_t time) "addr 0x%" PRIx64 " dd %p time %" PRId64
-> > >  
-> > >  # migration/rdma.c
-> > >  qemu_rdma_accept_incoming_migration(void) ""
-> > > @@ -188,7 +190,7 @@ postcopy_ram_enable_notify(void) ""
-> > >  postcopy_ram_fault_thread_entry(void) ""
-> > >  postcopy_ram_fault_thread_exit(void) ""
-> > >  postcopy_ram_fault_thread_quit(void) ""
-> > > -postcopy_ram_fault_thread_request(uint64_t hostaddr, const char *ramblock, size_t offset) "Request for HVA=%" PRIx64 " rb=%s offset=%zx"
-> > > +postcopy_ram_fault_thread_request(uint64_t hostaddr, const char *ramblock, size_t offset, uint32_t pid) "Request for HVA=%" PRIx64 " rb=%s offset=%zx %u"
-> > >  postcopy_ram_incoming_cleanup_closeuf(void) ""
-> > >  postcopy_ram_incoming_cleanup_entry(void) ""
-> > >  postcopy_ram_incoming_cleanup_exit(void) ""
-> > > @@ -197,6 +199,7 @@ save_xbzrle_page_skipping(void) ""
-> > >  save_xbzrle_page_overflow(void) ""
-> > >  ram_save_iterate_big_wait(uint64_t milliconds, int iterations) "big wait: %" PRIu64 " milliseconds, %d iterations"
-> > >  ram_load_complete(int ret, uint64_t seq_iter) "exit_code %d seq iteration %" PRIu64
-> > > +get_mem_fault_cpu_index(uint32_t pid) "pid %u is not vCPU"
-> > >  
-> > >  # migration/exec.c
-> > >  migration_exec_outgoing(const char *cmd) "cmd=%s"
-> > > -- 
-> > > 1.8.3.1
-> > > 
-> > 
-> > -- 
-> > Peter Xu
-> > 
+>  typedef struct CrwContainer {
+>      CRW crw;
+> @@ -38,6 +39,177 @@ typedef struct SubchSet {
+>      unsigned long devnos_used[BITS_TO_LONGS(MAX_SCHID + 1)];
+>  } SubchSet;
 > 
-> -- 
+> +static const VMStateDescription vmstate_scsw = {
+> +    .name = "s390_scsw",
+> +    .version_id = 1,
+> +    .minimum_version_id = 1,
+> +    .fields = (VMStateField[]) {
+> +        VMSTATE_UINT16(flags, SCSW),
+> +        VMSTATE_UINT16(ctrl, SCSW),
+> +        VMSTATE_UINT32(cpa, SCSW),
+> +        VMSTATE_UINT8(dstat, SCSW),
+> +        VMSTATE_UINT8(cstat, SCSW),
+> +        VMSTATE_UINT16(count, SCSW),
+> +        VMSTATE_END_OF_LIST()
+> +    }
+> +};
+> +
+> +static const VMStateDescription vmstate_pmcw = {
+> +    .name = "s390_pmcw",
+> +    .version_id = 1,
+> +    .minimum_version_id = 1,
+> +    .fields = (VMStateField[]) {
+> +        VMSTATE_UINT32(intparm, PMCW),
+> +        VMSTATE_UINT16(flags, PMCW),
+> +        VMSTATE_UINT16(devno, PMCW),
+> +        VMSTATE_UINT8(lpm, PMCW),
+> +        VMSTATE_UINT8(pnom, PMCW),
+> +        VMSTATE_UINT8(lpum, PMCW),
+> +        VMSTATE_UINT8(pim, PMCW),
+> +        VMSTATE_UINT16(mbi, PMCW),
+> +        VMSTATE_UINT8(pom, PMCW),
+> +        VMSTATE_UINT8(pam, PMCW),
+> +        VMSTATE_UINT8_ARRAY(chpid, PMCW, 8),
+> +        VMSTATE_UINT32(chars, PMCW),
+> +        VMSTATE_END_OF_LIST()
+> +    }
+> +};
+> +
+> +static const VMStateDescription vmstate_schib = {
+> +    .name = "s390_schib",
+> +    .version_id = 1,
+> +    .minimum_version_id = 1,
+> +    .fields = (VMStateField[]) {
+> +        VMSTATE_STRUCT(pmcw, SCHIB, 0, vmstate_pmcw, PMCW),
+> +        VMSTATE_STRUCT(scsw, SCHIB, 0, vmstate_scsw, SCSW),
+> +        VMSTATE_UINT64(mba, SCHIB),
+> +        VMSTATE_UINT8_ARRAY(mda, SCHIB, 4),
+> +        VMSTATE_END_OF_LIST()
+> +    }
+> +};
+> +
+> +
+> +static const VMStateDescription vmstate_ccw1 = {
+> +    .name = "s390_ccw1",
+> +    .version_id = 1,
+> +    .minimum_version_id = 1,
+> +    .fields = (VMStateField[]) {
+> +        VMSTATE_UINT8(cmd_code, CCW1),
+> +        VMSTATE_UINT8(flags, CCW1),
+> +        VMSTATE_UINT16(count, CCW1),
+> +        VMSTATE_UINT32(cda, CCW1),
+> +        VMSTATE_END_OF_LIST()
+> +    }
+> +};
+> +
+> +static const VMStateDescription vmstate_ciw = {
+> +    .name = "s390_ciw",
+> +    .version_id = 1,
+> +    .minimum_version_id = 1,
+> +    .fields = (VMStateField[]) {
+> +        VMSTATE_UINT8(type, CIW),
+> +        VMSTATE_UINT8(command, CIW),
+> +        VMSTATE_UINT16(count, CIW),
+> +        VMSTATE_END_OF_LIST()
+> +    }
+> +};
+> +
+> +static const VMStateDescription vmstate_sense_id = {
+> +    .name = "s390_sense_id",
+> +    .version_id = 1,
+> +    .minimum_version_id = 1,
+> +    .fields = (VMStateField[]) {
+> +        VMSTATE_UINT8(reserved, SenseId),
+> +        VMSTATE_UINT16(cu_type, SenseId),
+> +        VMSTATE_UINT8(cu_model, SenseId),
+> +        VMSTATE_UINT16(dev_type, SenseId),
+> +        VMSTATE_UINT8(dev_model, SenseId),
+> +        VMSTATE_UINT8(unused, SenseId),
+
+This is strictly due to stream format preservation, right?
+
+> +        VMSTATE_STRUCT_ARRAY(ciw, SenseId, MAX_CIWS, 0, vmstate_ciw, CIW),
+> +        VMSTATE_END_OF_LIST()
+> +    }
+> +};
+> +
+> +static int subch_dev_post_load(void *opaque, int version_id);
+> +static void subch_dev_pre_save(void *opaque);
+> +
+> +const VMStateDescription vmstate_subch_dev = {
+> +    .name = "s390_subch_dev",
+> +    .version_id = 1,
+> +    .minimum_version_id = 1,
+> +    .post_load = subch_dev_post_load,
+> +    .pre_save = subch_dev_pre_save,
+> +    .fields = (VMStateField[]) {
+> +        VMSTATE_UINT8_EQUAL(cssid, SubchDev),
+> +        VMSTATE_UINT8_EQUAL(ssid, SubchDev),
+> +        VMSTATE_UINT16(migrated_schid, SubchDev),
+> +        VMSTATE_UINT16(devno, SubchDev),
+> +        VMSTATE_BOOL(thinint_active, SubchDev),
+> +        VMSTATE_STRUCT(curr_status, SubchDev, 0, vmstate_schib, SCHIB),
+> +        VMSTATE_UINT8_ARRAY(sense_data, SubchDev, 32),
+> +        VMSTATE_UINT64(channel_prog, SubchDev),
+> +        VMSTATE_STRUCT(last_cmd, SubchDev, 0, vmstate_ccw1, CCW1),
+> +        VMSTATE_BOOL(last_cmd_valid, SubchDev),
+> +        VMSTATE_STRUCT(id, SubchDev, 0, vmstate_sense_id, SenseId),
+> +        VMSTATE_BOOL(ccw_fmt_1, SubchDev),
+> +        VMSTATE_UINT8(ccw_no_data_cnt, SubchDev),
+> +        VMSTATE_END_OF_LIST()
+> +    }
+> +};
+> +
+> +typedef struct IndAddrPtrTmp {
+> +    IndAddr **parent;
+> +    uint64_t addr;
+> +    int32_t len;
+> +} IndAddrPtrTmp;
+> +
+> +static int post_load_ind_addr(void *opaque, int version_id)
+> +{
+> +    IndAddrPtrTmp *ptmp = opaque;
+> +    IndAddr **ind_addr = ptmp->parent;
+> +
+> +    if (ptmp->len != 0) {
+> +        *ind_addr = get_indicator(ptmp->addr, ptmp->len);
+> +    } else {
+> +        *ind_addr = NULL;
+> +    }
+> +    return 0;
+> +}
+> +
+> +static void pre_save_ind_addr(void *opaque)
+> +{
+> +    IndAddrPtrTmp *ptmp = opaque;
+> +    IndAddr *ind_addr = *(ptmp->parent);
+> +
+> +    if (ind_addr != NULL) {
+> +        ptmp->len = ind_addr->len;
+> +        ptmp->addr = ind_addr->addr;
+> +    } else {
+> +        ptmp->len = 0;
+> +        ptmp->addr = 0L;
+> +    }
+> +}
+> +
+> +const VMStateDescription vmstate_ind_addr_tmp = {
+> +    .name = "s390_ind_addr_tmp",
+> +    .pre_save = pre_save_ind_addr,
+> +    .post_load = post_load_ind_addr,
+> +
+> +    .fields = (VMStateField[]) {
+> +        VMSTATE_INT32(len, IndAddrPtrTmp),
+> +        VMSTATE_UINT64(addr, IndAddrPtrTmp),
+> +        VMSTATE_END_OF_LIST()
+> +    }
+> +};
+> +
+> +const VMStateDescription vmstate_ind_addr = {
+> +    .name = "s390_ind_addr_tmp",
+> +    .fields = (VMStateField[]) {
+> +        VMSTATE_WITH_TMP(IndAddr*, IndAddrPtrTmp, vmstate_ind_addr_tmp),
+> +        VMSTATE_END_OF_LIST()
+> +    }
+> +};
+> +
+>  typedef struct CssImage {
+>      SubchSet *sch_set[MAX_SSID + 1];
+>      ChpInfo chpids[MAX_CHPID + 1];
+> @@ -75,6 +247,52 @@ static ChannelSubSys channel_subsys = {
+>          QTAILQ_HEAD_INITIALIZER(channel_subsys.indicator_addresses),
+>  };
 > 
-> BR
-> Alexey
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> +static void subch_dev_pre_save(void *opaque)
+> +{
+> +    SubchDev *s = opaque;
+> +
+> +    /* Prepare remote_schid for save */
+> +    s->migrated_schid = s->schid;
+> +}
+> +
+> +static int subch_dev_post_load(void *opaque, int version_id)
+> +{
+> +
+> +    SubchDev *s = opaque;
+> +
+> +    /* Re-assign the subchannel to remote_schid if necessary */
+> +    if (s->migrated_schid != s->schid) {
+> +        if (css_find_subch(true, s->cssid, s->ssid, s->schid) == s) {
+> +            /*
+> +             * Cleanup the slot before moving to s->migrated_schid provided
+> +             * it still belongs to us, i.e. it was not changed by previous
+> +             * invocation of this function.
+> +             */
+> +            css_subch_assign(s->cssid, s->ssid, s->schid, s->devno, NULL);
+> +        }
+> +        /* It's OK to re-assign without a prior de-assign. */
+> +        s->schid = s->migrated_schid;
+> +        css_subch_assign(s->cssid, s->ssid, s->schid, s->devno, s);
+> +    }
+> +
+> +    /*
+> +     * Hack alert. If we don't migrate the channel subsystem status
+> +     * we still need to find out if the guest enabled mss/mcss-e.
+> +     * If the subchannel is enabled, it certainly was able to access it,
+> +     * so adjust the max_ssid/max_cssid values for relevant ssid/cssid
+> +     * values. This is not watertight, but better than nothing.
+> +     */
+> +    if (s->curr_status.pmcw.flags & PMCW_FLAGS_MASK_ENA) {
+> +        if (s->ssid) {
+> +            channel_subsys.max_ssid = MAX_SSID;
+> +        }
+> +        if (s->cssid != channel_subsys.default_cssid) {
+> +            channel_subsys.max_cssid = MAX_CSSID;
+> +        }
+> +    }
+> +    return 0;
+> +}
+> +
+>  IndAddr *get_indicator(hwaddr ind_addr, int len)
+>  {
+>      IndAddr *indicator;
+> @@ -1662,149 +1880,6 @@ int css_enable_mss(void)
+>      return 0;
+>  }
+> 
+> -void subch_device_save(SubchDev *s, QEMUFile *f)
+> -{
+> -    int i;
+> -
+> -    qemu_put_byte(f, s->cssid);
+> -    qemu_put_byte(f, s->ssid);
+> -    qemu_put_be16(f, s->schid);
+> -    qemu_put_be16(f, s->devno);
+> -    qemu_put_byte(f, s->thinint_active);
+> -    /* SCHIB */
+> -    /*     PMCW */
+> -    qemu_put_be32(f, s->curr_status.pmcw.intparm);
+> -    qemu_put_be16(f, s->curr_status.pmcw.flags);
+> -    qemu_put_be16(f, s->curr_status.pmcw.devno);
+> -    qemu_put_byte(f, s->curr_status.pmcw.lpm);
+> -    qemu_put_byte(f, s->curr_status.pmcw.pnom);
+> -    qemu_put_byte(f, s->curr_status.pmcw.lpum);
+> -    qemu_put_byte(f, s->curr_status.pmcw.pim);
+> -    qemu_put_be16(f, s->curr_status.pmcw.mbi);
+> -    qemu_put_byte(f, s->curr_status.pmcw.pom);
+> -    qemu_put_byte(f, s->curr_status.pmcw.pam);
+> -    qemu_put_buffer(f, s->curr_status.pmcw.chpid, 8);
+> -    qemu_put_be32(f, s->curr_status.pmcw.chars);
+> -    /*     SCSW */
+> -    qemu_put_be16(f, s->curr_status.scsw.flags);
+> -    qemu_put_be16(f, s->curr_status.scsw.ctrl);
+> -    qemu_put_be32(f, s->curr_status.scsw.cpa);
+> -    qemu_put_byte(f, s->curr_status.scsw.dstat);
+> -    qemu_put_byte(f, s->curr_status.scsw.cstat);
+> -    qemu_put_be16(f, s->curr_status.scsw.count);
+> -    qemu_put_be64(f, s->curr_status.mba);
+> -    qemu_put_buffer(f, s->curr_status.mda, 4);
+> -    /* end SCHIB */
+> -    qemu_put_buffer(f, s->sense_data, 32);
+> -    qemu_put_be64(f, s->channel_prog);
+> -    /* last cmd */
+> -    qemu_put_byte(f, s->last_cmd.cmd_code);
+> -    qemu_put_byte(f, s->last_cmd.flags);
+> -    qemu_put_be16(f, s->last_cmd.count);
+> -    qemu_put_be32(f, s->last_cmd.cda);
+> -    qemu_put_byte(f, s->last_cmd_valid);
+> -    qemu_put_byte(f, s->id.reserved);
+> -    qemu_put_be16(f, s->id.cu_type);
+> -    qemu_put_byte(f, s->id.cu_model);
+> -    qemu_put_be16(f, s->id.dev_type);
+> -    qemu_put_byte(f, s->id.dev_model);
+> -    qemu_put_byte(f, s->id.unused);
+> -    for (i = 0; i < ARRAY_SIZE(s->id.ciw); i++) {
+> -        qemu_put_byte(f, s->id.ciw[i].type);
+> -        qemu_put_byte(f, s->id.ciw[i].command);
+> -        qemu_put_be16(f, s->id.ciw[i].count);
+> -    }
+> -    qemu_put_byte(f, s->ccw_fmt_1);
+> -    qemu_put_byte(f, s->ccw_no_data_cnt);
+> -}
+> -
+> -int subch_device_load(SubchDev *s, QEMUFile *f)
+> -{
+> -    SubchDev *old_s;
+> -    uint16_t old_schid = s->schid;
+> -    int i;
+> -
+> -    s->cssid = qemu_get_byte(f);
+> -    s->ssid = qemu_get_byte(f);
+> -    s->schid = qemu_get_be16(f);
+> -    s->devno = qemu_get_be16(f);
+> -    /* Re-assign subch. */
+> -    if (old_schid != s->schid) {
+> -        old_s = channel_subsys.css[s->cssid]->sch_set[s->ssid]->sch[old_schid];
+> -        /*
+> -         * (old_s != s) means that some other device has its correct
+> -         * subchannel already assigned (in load).
+> -         */
+> -        if (old_s == s) {
+> -            css_subch_assign(s->cssid, s->ssid, old_schid, s->devno, NULL);
+> -        }
+> -        /* It's OK to re-assign without a prior de-assign. */
+> -        css_subch_assign(s->cssid, s->ssid, s->schid, s->devno, s);
+> -    }
+> -    s->thinint_active = qemu_get_byte(f);
+> -    /* SCHIB */
+> -    /*     PMCW */
+> -    s->curr_status.pmcw.intparm = qemu_get_be32(f);
+> -    s->curr_status.pmcw.flags = qemu_get_be16(f);
+> -    s->curr_status.pmcw.devno = qemu_get_be16(f);
+> -    s->curr_status.pmcw.lpm = qemu_get_byte(f);
+> -    s->curr_status.pmcw.pnom  = qemu_get_byte(f);
+> -    s->curr_status.pmcw.lpum = qemu_get_byte(f);
+> -    s->curr_status.pmcw.pim = qemu_get_byte(f);
+> -    s->curr_status.pmcw.mbi = qemu_get_be16(f);
+> -    s->curr_status.pmcw.pom = qemu_get_byte(f);
+> -    s->curr_status.pmcw.pam = qemu_get_byte(f);
+> -    qemu_get_buffer(f, s->curr_status.pmcw.chpid, 8);
+> -    s->curr_status.pmcw.chars = qemu_get_be32(f);
+> -    /*     SCSW */
+> -    s->curr_status.scsw.flags = qemu_get_be16(f);
+> -    s->curr_status.scsw.ctrl = qemu_get_be16(f);
+> -    s->curr_status.scsw.cpa = qemu_get_be32(f);
+> -    s->curr_status.scsw.dstat = qemu_get_byte(f);
+> -    s->curr_status.scsw.cstat = qemu_get_byte(f);
+> -    s->curr_status.scsw.count = qemu_get_be16(f);
+> -    s->curr_status.mba = qemu_get_be64(f);
+> -    qemu_get_buffer(f, s->curr_status.mda, 4);
+> -    /* end SCHIB */
+> -    qemu_get_buffer(f, s->sense_data, 32);
+> -    s->channel_prog = qemu_get_be64(f);
+> -    /* last cmd */
+> -    s->last_cmd.cmd_code = qemu_get_byte(f);
+> -    s->last_cmd.flags = qemu_get_byte(f);
+> -    s->last_cmd.count = qemu_get_be16(f);
+> -    s->last_cmd.cda = qemu_get_be32(f);
+> -    s->last_cmd_valid = qemu_get_byte(f);
+> -    s->id.reserved = qemu_get_byte(f);
+> -    s->id.cu_type = qemu_get_be16(f);
+> -    s->id.cu_model = qemu_get_byte(f);
+> -    s->id.dev_type = qemu_get_be16(f);
+> -    s->id.dev_model = qemu_get_byte(f);
+> -    s->id.unused = qemu_get_byte(f);
+> -    for (i = 0; i < ARRAY_SIZE(s->id.ciw); i++) {
+> -        s->id.ciw[i].type = qemu_get_byte(f);
+> -        s->id.ciw[i].command = qemu_get_byte(f);
+> -        s->id.ciw[i].count = qemu_get_be16(f);
+> -    }
+> -    s->ccw_fmt_1 = qemu_get_byte(f);
+> -    s->ccw_no_data_cnt = qemu_get_byte(f);
+> -    /*
+> -     * Hack alert. We don't migrate the channel subsystem status (no
+> -     * device!), but we need to find out if the guest enabled mss/mcss-e.
+> -     * If the subchannel is enabled, it certainly was able to access it,
+> -     * so adjust the max_ssid/max_cssid values for relevant ssid/cssid
+> -     * values. This is not watertight, but better than nothing.
+> -     */
+> -    if (s->curr_status.pmcw.flags & PMCW_FLAGS_MASK_ENA) {
+> -        if (s->ssid) {
+> -            channel_subsys.max_ssid = MAX_SSID;
+> -        }
+> -        if (s->cssid != channel_subsys.default_cssid) {
+> -            channel_subsys.max_cssid = MAX_CSSID;
+> -        }
+> -    }
+> -    return 0;
+> -}
+> -
+>  void css_reset_sch(SubchDev *sch)
+>  {
+>      PMCW *p = &sch->curr_status.pmcw;
+> diff --git a/hw/s390x/virtio-ccw.c b/hw/s390x/virtio-ccw.c
+> index e7167e3d05..a75eedeffb 100644
+> --- a/hw/s390x/virtio-ccw.c
+> +++ b/hw/s390x/virtio-ccw.c
+> @@ -34,9 +34,87 @@
+>  #include "virtio-ccw.h"
+>  #include "trace.h"
+>  #include "hw/s390x/css-bridge.h"
+> +#include "hw/s390x/s390-virtio-ccw.h"
+> 
+>  #define NR_CLASSIC_INDICATOR_BITS 64
+> 
+> +static int virtio_ccw_dev_post_load(void *opaque, int version_id)
+> +{
+> +    VirtioCcwDevice *dev = VIRTIO_CCW_DEVICE(opaque);
+> +    CcwDevice *ccw_dev = CCW_DEVICE(dev);
+> +    CCWDeviceClass *ck = CCW_DEVICE_GET_CLASS(ccw_dev);
+> +
+> +    ccw_dev->sch->driver_data = dev;
+> +    if (CCW_DEVICE(dev)->sch->thinint_active) {
+
+Please use ccw_dev instead of CCW_DEVICE(dev).
+
+> +        dev->routes.adapter.adapter_id = css_get_adapter_id(
+> +                                         CSS_IO_ADAPTER_VIRTIO,
+> +                                         dev->thinint_isc);
+> +    }
+> +    /* Re-fill subch_id after loading the subchannel states.*/
+> +    if (ck->refill_ids) {
+> +        ck->refill_ids(ccw_dev);
+> +    }
+> +    return 0;
+> +}
+> +
+> +typedef struct VirtioCcwDeviceTmp {
+> +    VirtioCcwDevice *parent;
+> +    uint16_t config_vector;
+> +} VirtioCcwDeviceTmp;
+> +
+> +static void virtio_ccw_dev_tmp_pre_save(void *opaque)
+> +{
+> +    VirtioCcwDeviceTmp *tmp = opaque;
+> +    VirtioCcwDevice *dev = tmp->parent;
+> +    VirtIODevice *vdev = virtio_bus_get_device(&dev->bus);
+> +
+> +    tmp->config_vector = vdev->config_vector;
+> +}
+> +
+> +static int virtio_ccw_dev_tmp_post_load(void *opaque, int version_id)
+> +{
+> +    VirtioCcwDeviceTmp *tmp = opaque;
+> +    VirtioCcwDevice *dev = tmp->parent;
+> +    VirtIODevice *vdev = virtio_bus_get_device(&dev->bus);
+> +
+> +    vdev->config_vector = tmp->config_vector;
+> +    return 0;
+> +}
+> +
+> +const VMStateDescription vmstate_virtio_ccw_dev_tmp = {
+> +    .name = "s390_virtio_ccw_dev_tmp",
+> +    .pre_save = virtio_ccw_dev_tmp_pre_save,
+> +    .post_load = virtio_ccw_dev_tmp_post_load,
+> +    .fields = (VMStateField[]) {
+> +        VMSTATE_UINT16(config_vector, VirtioCcwDeviceTmp),
+> +        VMSTATE_END_OF_LIST()
+> +    }
+> +};
+> +
+> +const VMStateDescription vmstate_virtio_ccw_dev = {
+> +    .name = "s390_virtio_ccw_dev",
+> +    .version_id = 1,
+> +    .minimum_version_id = 1,
+> +    .post_load = virtio_ccw_dev_post_load,
+> +    .fields = (VMStateField[]) {
+> +        VMSTATE_CCW_DEVICE(parent_obj, VirtioCcwDevice),
+> +        VMSTATE_PTR_TO_IND_ADDR(indicators, VirtioCcwDevice),
+> +        VMSTATE_PTR_TO_IND_ADDR(indicators2, VirtioCcwDevice),
+> +        VMSTATE_PTR_TO_IND_ADDR(summary_indicator, VirtioCcwDevice),
+> +        /*
+> +         * Ugly hack because VirtIODevice does not migrate itself.
+> +         * This also makes legacy via vmstate_save_state possible.
+> +         */
+> +        VMSTATE_WITH_TMP(VirtioCcwDevice, VirtioCcwDeviceTmp,
+> +                         vmstate_virtio_ccw_dev_tmp),
+> +        VMSTATE_STRUCT(routes, VirtioCcwDevice, 1, vmstate_adapter_routes, \
+> +                       AdapterRoutes),
+> +        VMSTATE_UINT8(thinint_isc, VirtioCcwDevice),
+> +        VMSTATE_INT32(revision, VirtioCcwDevice),
+> +        VMSTATE_END_OF_LIST()
+> +    }
+> +};
+> +
+>  static void virtio_ccw_bus_new(VirtioBusState *bus, size_t bus_size,
+>                                 VirtioCcwDevice *dev);
+> 
+> @@ -1234,85 +1312,13 @@ static int virtio_ccw_load_queue(DeviceState *d, int n, QEMUFile *f)
+>  static void virtio_ccw_save_config(DeviceState *d, QEMUFile *f)
+>  {
+>      VirtioCcwDevice *dev = VIRTIO_CCW_DEVICE(d);
+> -    CcwDevice *ccw_dev = CCW_DEVICE(d);
+> -    SubchDev *s = ccw_dev->sch;
+> -    VirtIODevice *vdev = virtio_ccw_get_vdev(s);
+> -
+> -    subch_device_save(s, f);
+> -    if (dev->indicators != NULL) {
+> -        qemu_put_be32(f, dev->indicators->len);
+> -        qemu_put_be64(f, dev->indicators->addr);
+> -    } else {
+> -        qemu_put_be32(f, 0);
+> -        qemu_put_be64(f, 0UL);
+> -    }
+> -    if (dev->indicators2 != NULL) {
+> -        qemu_put_be32(f, dev->indicators2->len);
+> -        qemu_put_be64(f, dev->indicators2->addr);
+> -    } else {
+> -        qemu_put_be32(f, 0);
+> -        qemu_put_be64(f, 0UL);
+> -    }
+> -    if (dev->summary_indicator != NULL) {
+> -        qemu_put_be32(f, dev->summary_indicator->len);
+> -        qemu_put_be64(f, dev->summary_indicator->addr);
+> -    } else {
+> -        qemu_put_be32(f, 0);
+> -        qemu_put_be64(f, 0UL);
+> -    }
+> -    qemu_put_be16(f, vdev->config_vector);
+> -    qemu_put_be64(f, dev->routes.adapter.ind_offset);
+> -    qemu_put_byte(f, dev->thinint_isc);
+> -    qemu_put_be32(f, dev->revision);
+> +    vmstate_save_state(f, &vmstate_virtio_ccw_dev, dev, NULL);
+>  }
+> 
+>  static int virtio_ccw_load_config(DeviceState *d, QEMUFile *f)
+>  {
+>      VirtioCcwDevice *dev = VIRTIO_CCW_DEVICE(d);
+> -    CcwDevice *ccw_dev = CCW_DEVICE(d);
+> -    CCWDeviceClass *ck = CCW_DEVICE_GET_CLASS(ccw_dev);
+> -    SubchDev *s = ccw_dev->sch;
+> -    VirtIODevice *vdev = virtio_ccw_get_vdev(s);
+> -    int len;
+> -
+> -    s->driver_data = dev;
+> -    subch_device_load(s, f);
+> -    /* Re-fill subch_id after loading the subchannel states.*/
+> -    if (ck->refill_ids) {
+> -        ck->refill_ids(ccw_dev);
+> -    }
+> -    len = qemu_get_be32(f);
+> -    if (len != 0) {
+> -        dev->indicators = get_indicator(qemu_get_be64(f), len);
+> -    } else {
+> -        qemu_get_be64(f);
+> -        dev->indicators = NULL;
+> -    }
+> -    len = qemu_get_be32(f);
+> -    if (len != 0) {
+> -        dev->indicators2 = get_indicator(qemu_get_be64(f), len);
+> -    } else {
+> -        qemu_get_be64(f);
+> -        dev->indicators2 = NULL;
+> -    }
+> -    len = qemu_get_be32(f);
+> -    if (len != 0) {
+> -        dev->summary_indicator = get_indicator(qemu_get_be64(f), len);
+> -    } else {
+> -        qemu_get_be64(f);
+> -        dev->summary_indicator = NULL;
+> -    }
+> -    qemu_get_be16s(f, &vdev->config_vector);
+> -    dev->routes.adapter.ind_offset = qemu_get_be64(f);
+> -    dev->thinint_isc = qemu_get_byte(f);
+> -    dev->revision = qemu_get_be32(f);
+> -    if (s->thinint_active) {
+> -        dev->routes.adapter.adapter_id = css_get_adapter_id(
+> -                                         CSS_IO_ADAPTER_VIRTIO,
+> -                                         dev->thinint_isc);
+> -    }
+> -
+> -    return 0;
+> +    return vmstate_load_state(f, &vmstate_virtio_ccw_dev, dev, 1);
+>  }
+> 
+>  static void virtio_ccw_pre_plugged(DeviceState *d, Error **errp)
+> diff --git a/include/hw/s390x/css.h b/include/hw/s390x/css.h
+> index e61fa74d9b..d74e44d312 100644
+> --- a/include/hw/s390x/css.h
+> +++ b/include/hw/s390x/css.h
+> @@ -88,6 +88,7 @@ struct SubchDev {
+>      bool ccw_fmt_1;
+>      bool thinint_active;
+>      uint8_t ccw_no_data_cnt;
+> +    uint16_t migrated_schid; /* used for missmatch detection */
+>      /* transport-provided data: */
+>      int (*ccw_cb) (SubchDev *, CCW1);
+>      void (*disable_cb)(SubchDev *);
+> @@ -95,22 +96,27 @@ struct SubchDev {
+>      void *driver_data;
+>  };
+> 
+> +extern const VMStateDescription vmstate_subch_dev;
+> +
+>  typedef struct IndAddr {
+>      hwaddr addr;
+>      uint64_t map;
+>      unsigned long refcnt;
+> -    int len;
+> +    int32_t len;
+>      QTAILQ_ENTRY(IndAddr) sibling;
+>  } IndAddr;
+> 
+> +extern const VMStateDescription vmstate_ind_addr;
+> +
+> +#define VMSTATE_PTR_TO_IND_ADDR(_f, _s)                                   \
+> +    VMSTATE_STRUCT(_f, _s, 1, vmstate_ind_addr, IndAddr*)
+> +
+>  IndAddr *get_indicator(hwaddr ind_addr, int len);
+>  void release_indicator(AdapterInfo *adapter, IndAddr *indicator);
+>  int map_indicator(AdapterInfo *adapter, IndAddr *indicator);
+> 
+>  typedef SubchDev *(*css_subch_cb_func)(uint8_t m, uint8_t cssid, uint8_t ssid,
+>                                         uint16_t schid);
+> -void subch_device_save(SubchDev *s, QEMUFile *f);
+> -int subch_device_load(SubchDev *s, QEMUFile *f);
+>  int css_create_css_image(uint8_t cssid, bool default_image);
+>  bool css_devno_used(uint8_t cssid, uint8_t ssid, uint16_t devno);
+>  void css_subch_assign(uint8_t cssid, uint8_t ssid, uint16_t schid,
+> diff --git a/include/hw/s390x/s390_flic.h b/include/hw/s390x/s390_flic.h
+> index f9e6890c90..caa6fc608d 100644
+> --- a/include/hw/s390x/s390_flic.h
+> +++ b/include/hw/s390x/s390_flic.h
+> @@ -31,6 +31,11 @@ typedef struct AdapterRoutes {
+>      int gsi[ADAPTER_ROUTES_MAX_GSI];
+>  } AdapterRoutes;
+> 
+> +extern const VMStateDescription vmstate_adapter_routes;
+> +
+> +#define VMSTATE_ADAPTER_ROUTES(_f, _s) \
+> +    VMSTATE_STRUCT(_f, _s, 1, vmstate_adapter_routes, AdapterRoutes)
+> +
+>  #define TYPE_S390_FLIC_COMMON "s390-flic"
+>  #define S390_FLIC_COMMON(obj) \
+>      OBJECT_CHECK(S390FLICState, (obj), TYPE_S390_FLIC_COMMON)
+
+Other than the nit above, looks good to me. Especially the migration of
+the pmcw & co. is now more readable. So, with the nit fixed,
+
+Reviewed-by: Cornelia Huck <cornelia.huck@de.ibm.com>
+
+Christian, can you please take this?
