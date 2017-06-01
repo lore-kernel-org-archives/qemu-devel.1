@@ -1,25 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52390)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44502)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1dGRqR-0001u5-UJ
-	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 11:17:05 -0400
+	(envelope-from <indiffpig@126.com>) id 1dGRRu-0006Sx-76
+	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 10:51:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1dGRqO-0005DZ-On
-	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 11:17:03 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:6165)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1dGRqO-0005DS-GL
-	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 11:17:00 -0400
-Date: Thu, 1 Jun 2017 17:16:50 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20170601171650.4a196f36@nial.brq.redhat.com>
-In-Reply-To: <ccc0e728-0348-e386-6f71-0c1c69eaa01d@redhat.com>
-References: <20170601112241.2580-1-ard.biesheuvel@linaro.org>
-	<ccc0e728-0348-e386-6f71-0c1c69eaa01d@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC PATCH] OvmfPkg/AcpiPlatformDxe: lift 4 GB
- alloc limit for modern ACPI systems
+	(envelope-from <indiffpig@126.com>) id 1dGRRr-0003Qy-23
+	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 10:51:42 -0400
+Received: from m15-111.126.com ([220.181.15.111]:52512)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <indiffpig@126.com>) id 1dGRRq-0003PB-C2
+	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 10:51:38 -0400
+From: indiffPig@126.com
+Date: Thu,  1 Jun 2017 10:51:27 -0400
+Message-Id: <1496328687-13121-1-git-send-email-indiffPig@126.com>
+Subject: [Qemu-devel] [PATCH] vhost_dev:qemu will quit when vhost_dev is null
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,170 +21,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laszlo Ersek <lersek@redhat.com>
-Cc: Ard Biesheuvel <ard.biesheuvel@linaro.org>, edk2-devel@lists.01.org, leif.lindholm@linaro.org, jordan.l.justen@intel.com, Shannon Zhao <zhaoshenglong@huawei.com>, "Michael S. Tsirkin" <mst@redhat.com>, qemu devel list <qemu-devel@nongnu.org>, gengdongjiu <gengdongjiu@huawei.com>, Drew Jones <drjones@redhat.com>
+To: mst@redhat.com
+Cc: qemu-devel@nongnu.org, "yin.zuowei" <cxasm@qq.com>
 
-On Thu, 1 Jun 2017 14:25:48 +0200
-Laszlo Ersek <lersek@redhat.com> wrote:
+From: "yin.zuowei" <cxasm@qq.com>
 
-> On 06/01/17 13:22, Ard Biesheuvel wrote:
-> > ACPI supports architectures such as arm64, which did not exist when the
-> > original 32-bit ACPI 1.0 was introduced. These days, ACPI tables can all
-> > support 64-bit memory addresses, and so QEMU has been updated to emit
-> > 64-bit table and entry point types on arm64/mach-virt.  
-> 
-> Do you have commit cb51ac2ffe36 ("hw/arm/virt: generate 64-bit
-> addressable ACPI objects", 2017-04-10) in mind?
-My understanding was that OVMF discards RSDP/[RX]SDT so that commit
-probably irrelevant.
+Signed-off-by: yin.zuowei <cxasm@qq.com>
 
-Now about FADT or any other blob, do we really need to extend
-loader protocol? Couldn't firmware decide where to allocate
-table based on size in add_pointer commands?
+when ovdk socket is not ok, this vhost_dev is null ,then qemu will be quit.
+We think ovdk is just a network devices, should not cause an exit .
+---
+ hw/virtio/vhost-user.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-That might be a bit complicated but on the bright side is that
-it is firmware only change and it should work both on old and
-new qemu without breaking anything.
-
-> 
-> > 
-> > For the UEFI side, this means we no longer have to serve allocation
-> > requests from the 32-bit addressable region. So lift this restriction
-> > when the platform has been configured without ACPI 1.0b support.
-> > 
-> > Contributed-under: TianoCore Contribution Agreement 1.0
-> > Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-> > ---
-> > 
-> > This is an RFC because this change breaks compatibility with older versions
-> > of QEMU. At the least, this means I should sit on this patch for another
-> > while, but perhaps it also means we need some runtime logic to detect which
-> > QEMU we are dealing with? Comments welcome.
-> > 
-> >  OvmfPkg/AcpiPlatformDxe/AcpiPlatformDxe.inf          |  3 +++
-> >  OvmfPkg/AcpiPlatformDxe/QemuFwCfgAcpi.c              | 13 +++++++++++--
-> >  OvmfPkg/AcpiPlatformDxe/QemuFwCfgAcpiPlatformDxe.inf |  3 +++
-> >  3 files changed, 17 insertions(+), 2 deletions(-)  
-> 
-> I guess by compat breakage, you mean the case when new ArmVirtQemu (with
-> this patch) is booted on old QEMU (which lacks commit cb51ac2ffe36) --
-> the 64-bit allocation addresses might not fit into the 4-byte fields
-> generated by QEMU.
-> 
-> Since your QEMU patch (which I did ACK), I've given more thought to the
-> QEMU_LOADER_ALLOCATE linker/loader command. See bullet (68) in:
-> 
-> 
-> http://mid.mail-archive.com/accf8880-f4b0-85f1-9f33-4103c8c26d7a@redhat.com
-> 
-> There are now two reasons to extend the Zone field's meaning:
-> 
-> - The first reason is that the most significant bit in Zone could be
-> repurposed to suppress the SDT header probing implemented in
-> OvmfPkg/AcpiPlatformDxe, in the Process2ndPassCmdAddPointer() function.
-> 
-> - The second reason is that a new value in Zone (with the msb masked
-> off), say QemuLoaderAlloc64Bit=3, could be used to lift the 32-bit
-> allocation limit explicitly.
-> 
-> In QEMU, we could tie both of these extensions to new machine types.
-> 
-> The result would be:
-> 
->   firmware  QEMU  QEMU machine type  result
->   --------  ----  -----------------  -----------------------------------
->   old       new   old                allocate blobs under 4GB
->   old       new   new                breakage, but that's OK, we can
->                                        require refreshed firmware for
->                                        new machine types
->   new       old   old                allocate blobs under 4GB
->   new       new   old                allocate blobs under 4GB
->   new       new   new                allocate blobs from 64-bit space
-> 
-> ... I guess my proposal might be a bit unpolished (and certainly
-> diverges from your original QEMU commit cb51ac2ffe36), but at this
-> point, the need for further *explicit* hints in the ALLOC command is
-> just too obvious to pass them up.
-> 
-> Again, the first extension would be setting aside bit 7, to signify
-> "this blob contains no ACPI tables", and the second extension would be a
-> new zone value (3) to mean "allocate from 64-bit address space".
-> 
-> The first extension would be used by both x86 and arm machine types
-> (2.10+ only), and the second extension would only be used by 2.10+ arm
-> machine types.
-> 
-> What do you think? Can we discuss both of these Zone extensions on
-> qemu-devel as well? Adding qemu-devel, Shannon, Michael, Igor, Drew, and
-> Dongjiu Geng.
->
-> Thanks
-> Laszlo
-> 
-> > diff --git a/OvmfPkg/AcpiPlatformDxe/AcpiPlatformDxe.inf b/OvmfPkg/AcpiPlatformDxe/AcpiPlatformDxe.inf
-> > index 9a9b2e6bb2e5..9b883871bc23 100644
-> > --- a/OvmfPkg/AcpiPlatformDxe/AcpiPlatformDxe.inf
-> > +++ b/OvmfPkg/AcpiPlatformDxe/AcpiPlatformDxe.inf
-> > @@ -73,5 +73,8 @@ [Pcd]
-> >    gPcAtChipsetPkgTokenSpaceGuid.Pcd8259LegacyModeEdgeLevel
-> >    gUefiOvmfPkgTokenSpaceGuid.PcdOvmfFdBaseAddress
-> >  
-> > +[FixedPcd]
-> > +  gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiExposedTableVersions
-> > +
-> >  [Depex]
-> >    gEfiAcpiTableProtocolGuid
-> > diff --git a/OvmfPkg/AcpiPlatformDxe/QemuFwCfgAcpi.c b/OvmfPkg/AcpiPlatformDxe/QemuFwCfgAcpi.c
-> > index 1bc5fe297a96..97632bc636c0 100644
-> > --- a/OvmfPkg/AcpiPlatformDxe/QemuFwCfgAcpi.c
-> > +++ b/OvmfPkg/AcpiPlatformDxe/QemuFwCfgAcpi.c
-> > @@ -24,6 +24,7 @@
-> >  #include <Library/PcdLib.h>
-> >  #include <Library/OrderedCollectionLib.h>
-> >  #include <IndustryStandard/Acpi.h>
-> > +#include <Protocol/AcpiSystemDescriptionTable.h>
-> >  
-> >  
-> >  //
-> > @@ -173,6 +174,7 @@ ProcessCmdAllocate (
-> >    UINTN                NumPages;
-> >    EFI_PHYSICAL_ADDRESS Address;
-> >    BLOB                 *Blob;
-> > +  EFI_ALLOCATE_TYPE    AllocType;
-> >  
-> >    if (Allocate->File[QEMU_LOADER_FNAME_SIZE - 1] != '\0') {
-> >      DEBUG ((EFI_D_ERROR, "%a: malformed file name\n", __FUNCTION__));
-> > @@ -192,9 +194,16 @@ ProcessCmdAllocate (
-> >      return Status;
-> >    }
-> >  
-> > +  if ((FixedPcdGet32 (PcdAcpiExposedTableVersions) &
-> > +       EFI_ACPI_TABLE_VERSION_1_0B) != 0) {
-> > +    Address = 0xFFFFFFFF;
-> > +    AllocType = AllocateMaxAddress;
-> > +  } else {
-> > +    AllocType = AllocateAnyPages;
-> > +  }
-> > +
-> >    NumPages = EFI_SIZE_TO_PAGES (FwCfgSize);
-> > -  Address = 0xFFFFFFFF;
-> > -  Status = gBS->AllocatePages (AllocateMaxAddress, EfiACPIMemoryNVS, NumPages,
-> > +  Status = gBS->AllocatePages (AllocType, EfiACPIMemoryNVS, NumPages,
-> >                    &Address);
-> >    if (EFI_ERROR (Status)) {
-> >      return Status;
-> > diff --git a/OvmfPkg/AcpiPlatformDxe/QemuFwCfgAcpiPlatformDxe.inf b/OvmfPkg/AcpiPlatformDxe/QemuFwCfgAcpiPlatformDxe.inf
-> > index adc50cfd9f76..64db80dd9cbc 100644
-> > --- a/OvmfPkg/AcpiPlatformDxe/QemuFwCfgAcpiPlatformDxe.inf
-> > +++ b/OvmfPkg/AcpiPlatformDxe/QemuFwCfgAcpiPlatformDxe.inf
-> > @@ -58,5 +58,8 @@ [Guids]
-> >  [Pcd]
-> >    gEfiMdeModulePkgTokenSpaceGuid.PcdPciDisableBusEnumeration
-> >  
-> > +[FixedPcd]
-> > +  gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiExposedTableVersions
-> > +
-> >  [Depex]
-> >    gEfiAcpiTableProtocolGuid
-> >   
-> 
+diff --git a/hw/virtio/vhost-user.c b/hw/virtio/vhost-user.c
+index dde094a..3a9fdf4 100644
+--- a/hw/virtio/vhost-user.c
++++ b/hw/virtio/vhost-user.c
+@@ -387,6 +387,9 @@ static int vhost_user_set_vring_base(struct vhost_dev *dev,
+ static int vhost_user_set_vring_enable(struct vhost_dev *dev, int enable)
+ {
+     int i;
++    if (!dev) {
++        return -1;
++    }
+ 
+     if (!virtio_has_feature(dev->features, VHOST_USER_F_PROTOCOL_FEATURES)) {
+         return -1;
+-- 
+1.8.3.1
