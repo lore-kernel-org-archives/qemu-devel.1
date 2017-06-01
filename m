@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48073)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53690)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1dGU7H-0005E2-6c
-	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 13:42:36 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1dGUIE-00061E-CR
+	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 13:53:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1dGU77-0001PW-VR
-	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 13:42:30 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:21096)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <david@redhat.com>) id 1dGU77-0001Ox-LC
-	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 13:42:25 -0400
-References: <20170531193434.6918-1-david@redhat.com>
-	<20170531193434.6918-3-david@redhat.com>
-	<e70d08bd-bf75-4997-df7b-e64710046fc3@linux.vnet.ibm.com>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <f1a8957a-9d13-efce-c0c4-b010ae4b6cd8@redhat.com>
-Date: Thu, 1 Jun 2017 19:42:20 +0200
+	(envelope-from <peter.maydell@linaro.org>) id 1dGUID-00083H-12
+	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 13:53:54 -0400
+Received: from mail-wm0-x232.google.com ([2a00:1450:400c:c09::232]:37246)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1dGUIC-00081Z-MA
+	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 13:53:52 -0400
+Received: by mail-wm0-x232.google.com with SMTP id d127so69985952wmf.0
+	for <qemu-devel@nongnu.org>; Thu, 01 Jun 2017 10:53:52 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <e70d08bd-bf75-4997-df7b-e64710046fc3@linux.vnet.ibm.com>
-Content-Type: text/plain; charset=windows-1252
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v1 2/2] s390x/cpumodel: improve defintion
- search without an IBC
+In-Reply-To: <20170601170733.13080-1-pbonzini@redhat.com>
+References: <20170601170733.13080-1-pbonzini@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 1 Jun 2017 18:53:30 +0100
+Message-ID: <CAFEAcA9Yteb5jsB2AJhuhx1Ejg+nwrF8PgetRWv+yFPduLHOgg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL v2 00/34] Misc patches for 2016-06-01
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,102 +28,198 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: jjherne@linux.vnet.ibm.com, qemu-devel@nongnu.org
-Cc: thuth@redhat.com, Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cornelia.huck@de.ibm.com>, Aurelien Jarno <aurelien@aurel32.net>, rth@twiddle.net
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-On 01.06.2017 19:06, Jason J. Herne wrote:
-> On 05/31/2017 03:34 PM, David Hildenbrand wrote:
->> Currently, under z/VM on a 0x2827, QEMU will detect a 0x2828 if no
->> IBC value is provided. QEMU will simply take the last model of that HW
->> generation, which happens to be the BC version.
->>
->> Let's improve our search for that case by selecting the latest CPU
->> definition that matches the CPU type. This might still detect e.g. a
->> GA2 version on a GA1 system, but as we don't have further information at
->> hand, there isn't too much we can do about it.
->>
-> 
-> Isn't it better to choose the earliest machine possible in this case? 
-> Systems
-> are backwards compatible far more often than they are forwards compatible.
-> 
-> Said in a more verbose way, I'd rather pretend to be a GA1 on a GA2 
-> (ignoring
-> some new features) than pretend to be a GA2 on a GA1 and attempt to use
-> something that does not exist.
-> 
-> I'm sure you've thought of all of this though, so what am I missing?
-> 
+On 1 June 2017 at 18:07, Paolo Bonzini <pbonzini@redhat.com> wrote:
+> The following changes since commit 56821559f0ba682fe6b367815572e6f974d329ab:
+>
+>   Merge remote-tracking branch 'dgilbert/tags/pull-hmp-20170517' into staging (2017-05-18 13:36:15 +0100)
+>
+> are available in the git repository at:
+>
+>   git://github.com/bonzini/qemu.git tags/for-upstream
+>
+> for you to fetch changes up to f3c3ad2dc98c6610152355f6a4de1445efc87421:
+>
+>   cpus: reset throttle_thread_scheduled after sleep (2017-06-01 18:01:05 +0200)
+>
+> ----------------------------------------------------------------
+> * virtio-scsi use-after-free fix (Fam)
+> * vhost-user-scsi support (Felipe)
+> * SMM fixes and improvements for TCG (myself, Mihail)
+> * irqchip and AddressSpaceDispatch cleanups and fixes (Peter)
+> * Coverity fix (Stefano)
+> * NBD cleanups and fixes (Vladimir, Eric, myself)
+> * RTC accuracy improvements and code cleanups (Guangrong+Yunfang)
+> * socket error reporting improvement (Daniel)
+> * GDB XML description for SSE registers (Abdallah)
+> * kvmclock update fix (Denis)
+> * SMM memory savings (Gonglei)
+> * -cpu 486 fix (Paolo)
+> * various bugfixes (Roman, Peter, myself, Thomas)
+> * rtc-test improvement (Guangrong)
+> * migration throttling fix (Felipe)
 
-Hi Jason,
+Test failure on OSX:
 
-excellent question. And of course I thought of it:
+TEST: tests/device-introspect-test... (pid=66373)
+  /aarch64/device/introspect/list:                                     OK
+  /aarch64/device/introspect/none:                                     OK
+  /aarch64/device/introspect/abstract:                                 OK
+  /aarch64/device/introspect/concrete:                                 **
+ERROR:/root/qemu/qom/object.c:364:object_initialize_with_type:
+assertion failed: (type != NULL)
+Broken pipe
 
-Fact 1: All GAX models share the same base feature set. A GAX++ might
-support "more features".
+Test failures on FreeBSD:
+  GTESTER check-qtest-aarch64
+**
+ERROR:/Users/pm215/src/qemu-for-merges/qom/object.c:364:void
+object_initialize_with_type(void *, size_t, TypeImpl *): assertion
+failed: (type != NULL)
+Broken pipe
+GTester: last random seed: R02S8983f4bd019deabaf27dbf8281490ab9
+  GTESTER check-qtest-alpha
+**
+ERROR:/Users/pm215/src/qemu-for-merges/qom/object.c:364:void
+object_initialize_with_type(void *, size_t, TypeImpl *): assertion
+failed: (type != NULL)
+Broken pipe
+GTester: last random seed: R02S5ba80c00f420a9cbe79b7926bc90901c
+  GTESTER check-qtest-arm
+**
+ERROR:/Users/pm215/src/qemu-for-merges/qom/object.c:364:void
+object_initialize_with_type(void *, size_t, TypeImpl *): assertion
+failed: (type != NULL)
+Broken pipe
+GTester: last random seed: R02S9a3f10d16d54467f421a79a355a25714
+  GTESTER check-qtest-cris
+  GTESTER check-qtest-i386
+"kvm" accelerator not found.
+"kvm" accelerator not found.
+"kvm" accelerator not found.
+"kvm" accelerator not found.
+"kvm" accelerator not found.
+"kvm" accelerator not found.
+"kvm" accelerator not found.
+"kvm" accelerator not found.
+"kvm" accelerator not found.
+"kvm" accelerator not found.
+**
+ERROR:/Users/pm215/src/qemu-for-merges/qom/object.c:364:void
+object_initialize_with_type(void *, size_t, TypeImpl *): assertion
+failed: (type != NULL)
+Broken pipe
+GTester: last random seed: R02S29797c8935576bfd6237cce3e02075c9
+  GTESTER check-qtest-lm32
+  GTESTER check-qtest-m68k
+  GTESTER check-qtest-microblaze
+  GTESTER check-qtest-microblazeel
+  GTESTER check-qtest-mips
+**
+ERROR:/Users/pm215/src/qemu-for-merges/qom/object.c:364:void
+object_initialize_with_type(void *, size_t, TypeImpl *): assertion
+failed: (type != NULL)
+Broken pipe
+GTester: last random seed: R02S1d5b7d14f648cc07be3bfc003b7c66a2
+  GTESTER check-qtest-mips64
+**
+ERROR:/Users/pm215/src/qemu-for-merges/qom/object.c:364:void
+object_initialize_with_type(void *, size_t, TypeImpl *): assertion
+failed: (type != NULL)
+Broken pipe
+GTester: last random seed: R02S6c9d59bd8f80319effd07c498108c129
+  GTESTER check-qtest-mips64el
+**
+ERROR:/Users/pm215/src/qemu-for-merges/qom/object.c:364:void
+object_initialize_with_type(void *, size_t, TypeImpl *): assertion
+failed: (type != NULL)
+Broken pipe
+GTester: last random seed: R02S530b42302d04c589e6a5f1fc49268dcb
+  GTESTER check-qtest-mipsel
+**
+ERROR:/Users/pm215/src/qemu-for-merges/qom/object.c:364:void
+object_initialize_with_type(void *, size_t, TypeImpl *): assertion
+failed: (type != NULL)
+Broken pipe
+GTester: last random seed: R02S404f19f557f26102621573b7b8641871
+  GTESTER check-qtest-moxie
+  GTESTER check-qtest-nios2
+  GTESTER check-qtest-or1k
+  GTESTER check-qtest-ppc
+**
+ERROR:/Users/pm215/src/qemu-for-merges/qom/object.c:364:void
+object_initialize_with_type(void *, size_t, TypeImpl *): assertion
+failed: (type != NULL)
+Broken pipe
+GTester: last random seed: R02S8a9874d645fde55f36b7df0204c82959
+  GTESTER check-qtest-ppc64
+**
+ERROR:/Users/pm215/src/qemu-for-merges/qom/object.c:364:void
+object_initialize_with_type(void *, size_t, TypeImpl *): assertion
+failed: (type != NULL)
+Broken pipe
+GTester: last random seed: R02S1bf51dd7caadd650ac3be82bd21cbae5
+  GTESTER check-qtest-ppcemb
+**
+ERROR:/Users/pm215/src/qemu-for-merges/qom/object.c:364:void
+object_initialize_with_type(void *, size_t, TypeImpl *): assertion
+failed: (type != NULL)
+Broken pipe
+GTester: last random seed: R02Sbb3adb4867092ddb73e7fc0ecfe68c96
+  GTESTER check-qtest-s390x
+**
+ERROR:/Users/pm215/src/qemu-for-merges/qom/object.c:364:void
+object_initialize_with_type(void *, size_t, TypeImpl *): assertion
+failed: (type != NULL)
+Broken pipe
+GTester: last random seed: R02S2e85df237abb737f12c5aba4c0592c41
+  GTESTER check-qtest-sh4
+**
+ERROR:/Users/pm215/src/qemu-for-merges/qom/object.c:364:void
+object_initialize_with_type(void *, size_t, TypeImpl *): assertion
+failed: (type != NULL)
+Broken pipe
+GTester: last random seed: R02S36667c3c9283bf56a54f105edfd951c4
+  GTESTER check-qtest-sh4eb
+**
+ERROR:/Users/pm215/src/qemu-for-merges/qom/object.c:364:void
+object_initialize_with_type(void *, size_t, TypeImpl *): assertion
+failed: (type != NULL)
+Broken pipe
+GTester: last random seed: R02S7a8f453c29b24767afcbf5af6c890072
+  GTESTER check-qtest-sparc
+  GTESTER check-qtest-sparc64
+**
+ERROR:/Users/pm215/src/qemu-for-merges/qom/object.c:364:void
+object_initialize_with_type(void *, size_t, TypeImpl *): assertion
+failed: (type != NULL)
+Broken pipe
+GTester: last random seed: R02Scf61ab29a9f9630cf0661370bca2f09d
+  GTESTER check-qtest-tricore
+  GTESTER check-qtest-unicore32
+  GTESTER check-qtest-x86_64
+"kvm" accelerator not found.
+"kvm" accelerator not found.
+"kvm" accelerator not found.
+"kvm" accelerator not found.
+"kvm" accelerator not found.
+"kvm" accelerator not found.
+"kvm" accelerator not found.
+"kvm" accelerator not found.
+"kvm" accelerator not found.
+"kvm" accelerator not found.
+**
+ERROR:/Users/pm215/src/qemu-for-merges/qom/object.c:364:void
+object_initialize_with_type(void *, size_t, TypeImpl *): assertion
+failed: (type != NULL)
+Broken pipe
+GTester: last random seed: R02S1639c5bd5af52de8b1b097d44666b889
+  GTESTER check-qtest-xtensa
+  GTESTER check-qtest-xtensaeb
 
-Fact 2: Without an IBC, the guest can't detect the GA version.
+(Yes, the test's error messages are pretty useless.)
 
-a) If we have no IBC (esp. unblocked_ibc == 0), the IBC we will present
-to the guest in read_SCP_info() will be 0. The guest will not know which
-GA version it has. The problem of missing IBC propagates.
-
-b) If we don't have a feature of the GA++ version, also our guest won't
-have it. So in summary, the guest also has no idea of its GA version.
-
-So this gives more "flexibility" and is backwards compatible.
-
-Think about it like this: You're running on 0x2827 GA2.
-
-Old QEMU version indicated "0x2828 GA1 == 0x2827 GA2". After you updated
-QEMU, you suddenly detect "0x2827 GA1". You're previous libvirt guest
-might suddenly refuse to run.
-
-So it boils down to "it's just a QEMU representation that is more
-flexible, the guest can't see the difference".
-
-Thanks!
-
-> 
->> Signed-off-by: David Hildenbrand <david@redhat.com>
->> ---
->>  target/s390x/cpu_models.c | 9 +++++++++
->>  1 file changed, 9 insertions(+)
->>
->> diff --git a/target/s390x/cpu_models.c b/target/s390x/cpu_models.c
->> index 9e23535..b6220c8 100644
->> --- a/target/s390x/cpu_models.c
->> +++ b/target/s390x/cpu_models.c
->> @@ -184,6 +184,7 @@ const S390CPUDef *s390_find_cpu_def(uint16_t type, uint8_t gen, uint8_t ec_ga,
->>                                      S390FeatBitmap features)
->>  {
->>      const S390CPUDef *last_compatible = NULL;
->> +    const S390CPUDef *matching_cpu_type = NULL;
->>      int i;
->>
->>      if (!gen) {
->> @@ -218,8 +219,16 @@ const S390CPUDef *s390_find_cpu_def(uint16_t type, uint8_t gen, uint8_t ec_ga,
->>          if (def->type == type && def->ec_ga == ec_ga) {
->>              return def;
->>          }
->> +        /* remember if we've at least seen one with the same cpu type */
->> +        if (def->type == type) {
->> +            matching_cpu_type = def;
->> +        }
->>          last_compatible = def;
->>      }
->> +    /* prefer the model with the same cpu type, esp. don't take the BC for EC */
->> +    if (matching_cpu_type) {
->> +        return matching_cpu_type;
->> +    }
->>      return last_compatible;
->>  }
->>
-> 
-
-
--- 
-
-Thanks,
-
-David
+thanks
+-- PMM
