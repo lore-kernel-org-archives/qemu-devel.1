@@ -1,26 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55726)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57874)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcel@redhat.com>) id 1dGKm1-0005G3-6p
-	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 03:44:02 -0400
+	(envelope-from <felipe@nutanix.com>) id 1dGKtu-0008VK-EY
+	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 03:52:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcel@redhat.com>) id 1dGKlw-0001Lm-H0
-	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 03:44:01 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:41172)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <marcel@redhat.com>) id 1dGKlw-0001IJ-8O
-	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 03:43:56 -0400
-References: <20170531070438.14081-1-maozy.fnst@cn.fujitsu.com>
-	<87o9u9cmif.fsf@dusky.pond.sub.org>
-	<67ee539b-1298-635f-cde5-e06397795813@cn.fujitsu.com>
-From: Marcel Apfelbaum <marcel@redhat.com>
-Message-ID: <d33d02ea-ee73-e03d-3bb9-1f9851b3265a@redhat.com>
-Date: Thu, 1 Jun 2017 10:43:55 +0300
-MIME-Version: 1.0
-In-Reply-To: <67ee539b-1298-635f-cde5-e06397795813@cn.fujitsu.com>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH] pci: Fix unreasonable return value check
+	(envelope-from <felipe@nutanix.com>) id 1dGKtq-0004dn-I7
+	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 03:52:10 -0400
+From: Felipe Franciosi <felipe@nutanix.com>
+Date: Thu,  1 Jun 2017 08:51:58 +0100
+Message-Id: <1496303518-25638-1-git-send-email-felipe@nutanix.com>
+Subject: [Qemu-devel] [PATCH] spapr: Allow boot from vhost-*-scsi backends
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,101 +17,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>, Markus Armbruster <armbru@redhat.com>
-Cc: qemu-devel@nongnu.org, mst@redhat.com
+To: David Gibson <david@gibson.dropbear.id.au>, Alexey Kardashevskiy <aik@ozlabs.ru>, Alexander Graf <agraf@suse.de>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Felipe Franciosi <felipe@nutanix.com>, Mike Cui <cui@nutanix.com>
 
+This makes VMs bootable on spapr when using vhost-*-scsi.
 
+Signed-off-by: Felipe Franciosi <felipe@nutanix.com>
+Signed-off-by: Mike Cui <cui@nutanix.com>
+---
+ hw/ppc/spapr.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
-On 01/06/2017 5:51, Mao Zhongyi wrote:
-> Hi, Markus
->
-> On 05/31/2017 07:07 PM, Markus Armbruster wrote:
->> This is cleanup, not a bug fix, so:
->>
->>     pci: Clean up error checking in pci_add_capability()
->>
->> Mao Zhongyi <maozy.fnst@cn.fujitsu.com> writes:
->>
->>> The return value of pci_add_capability2() is only 2 cases, positive
->>> on success, nagetive on failure and set error message to Error. In
->>
->> negative
->>
->>> other worlds, If Error is filled, the return value must be nagetive.
->>
->> words, if
->>
->>> There is no case where errp is set but the return value is a positive.
->>> But pci_add_capability() does. So the return value check is illogical.
->>
->> pci_add_capability2() could use a function comment explaining its return
->> value.  Not this patch's job.
->>
->
-> Thanks, will make a separated patch to explain it.
->
->>> Meanwhile, all other callers of pci_add_capability2() do the same
->>> check as this patch. So fix it.
->>
->> Suggest:
->>
->>     pci: Clean up error checking in pci_add_capability()
->>
->>   On success, pci_add_capability2() returns a positive value. On
->>   failure, it sets an error and returns a negative value.
->>
->>   pci_add_capability() laboriously checks this behavior.  No other
->>   caller does.  Drop the checks from pci_add_capability().
->
-> Thanks for your perfect suggestion.
->
->>
->>> Signed-off-by: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
->>> ---
->>>  hw/pci/pci.c | 6 +-----
->>>  1 file changed, 1 insertion(+), 5 deletions(-)
->>>
->>> diff --git a/hw/pci/pci.c b/hw/pci/pci.c
->>> index 259483b..1faf060 100644
->>> --- a/hw/pci/pci.c
->>> +++ b/hw/pci/pci.c
->>> @@ -2269,12 +2269,8 @@ int pci_add_capability(PCIDevice *pdev, 
->>> uint8_t cap_id,
->>>      Error *local_err = NULL;
->>>
->>>      ret = pci_add_capability2(pdev, cap_id, offset, size, &local_err);
->>> -    if (local_err) {
->>> -        assert(ret < 0);
->>> +    if (ret < 0) {
->>>          error_report_err(local_err);
->>> -    } else {
->>> -        /* success implies a positive offset in config space */
->>> -        assert(ret > 0);
->>>      }
->>>      return ret;
->>>  }
->>
->> Many functions return distinct error values in addition to setting an
->> error.  We usually check one of the two, and assume the other is sane.
->> This is one of the few places where we assert it is.  Not wrong, just
->> cumbersome.  I'd prefer to drop the assertions, i.e. take this patch.
->> But it's up to the PCI maintainers.
->
-> Yes, I also think it really is not necessary. Keeping code as simple as
-> practical is desirable. So drop the assertions. Of course, I will listen
-> to the views of Marcel and Michael.
->
-I have nothing against it.
-Thanks for the patch!
-
-With Markus comments:
-     Reviewed-by: Marcel Apfelbaum <marcel@redhat.com>
-
-Thanks,
-Marcel
-
-> Thanks
-> Mao
->
->
->
+diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+index ab3aab1..1c87886 100644
+--- a/hw/ppc/spapr.c
++++ b/hw/ppc/spapr.c
+@@ -57,6 +57,7 @@
+ #include "hw/pci/pci.h"
+ #include "hw/scsi/scsi.h"
+ #include "hw/virtio/virtio-scsi.h"
++#include "hw/virtio/vhost-scsi-common.h"
+ 
+ #include "exec/address-spaces.h"
+ #include "hw/usb.h"
+@@ -2388,6 +2389,7 @@ static char *spapr_get_fw_dev_path(FWPathProvider *p, BusState *bus,
+     ((type *)object_dynamic_cast(OBJECT(obj), (name)))
+     SCSIDevice *d = CAST(SCSIDevice,  dev, TYPE_SCSI_DEVICE);
+     sPAPRPHBState *phb = CAST(sPAPRPHBState, dev, TYPE_SPAPR_PCI_HOST_BRIDGE);
++    VHostSCSICommon *vsc = CAST(VHostSCSICommon, dev, TYPE_VHOST_SCSI_COMMON);
+ 
+     if (d) {
+         void *spapr = CAST(void, bus->parent, "spapr-vscsi");
+@@ -2444,6 +2446,12 @@ static char *spapr_get_fw_dev_path(FWPathProvider *p, BusState *bus,
+         return g_strdup_printf("pci@%"PRIX64, phb->buid);
+     }
+ 
++    if (vsc) {
++        /* Same logic as virtio above */
++        unsigned id = 0x1000000 | (vsc->target << 16) | vsc->lun;
++        return g_strdup_printf("disk@%"PRIX64, (uint64_t)id << 32);
++    }
++
+     return NULL;
+ }
+ 
+-- 
+1.9.5
