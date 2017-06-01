@@ -1,26 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54961)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57932)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dGULD-0006lQ-Jn
-	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 13:57:00 -0400
+	(envelope-from <eblake@redhat.com>) id 1dGUSe-0000DA-1F
+	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 14:04:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dGULC-0000zX-WF
-	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 13:56:59 -0400
-Received: from mail-wm0-x233.google.com ([2a00:1450:400c:c09::233]:36722)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1dGULC-0000zH-PL
-	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 13:56:58 -0400
-Received: by mail-wm0-x233.google.com with SMTP id 7so167142400wmo.1
-	for <qemu-devel@nongnu.org>; Thu, 01 Jun 2017 10:56:58 -0700 (PDT)
+	(envelope-from <eblake@redhat.com>) id 1dGUSd-0007e1-2G
+	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 14:04:40 -0400
+References: <20170601172734.9039-1-berrange@redhat.com>
+	<20170601172734.9039-13-berrange@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <d0a2d5b5-0279-8c05-69da-4ed3d928618f@redhat.com>
+Date: Thu, 1 Jun 2017 13:04:30 -0500
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA9Yteb5jsB2AJhuhx1Ejg+nwrF8PgetRWv+yFPduLHOgg@mail.gmail.com>
-References: <20170601170733.13080-1-pbonzini@redhat.com>
-	<CAFEAcA9Yteb5jsB2AJhuhx1Ejg+nwrF8PgetRWv+yFPduLHOgg@mail.gmail.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 1 Jun 2017 18:56:37 +0100
-Message-ID: <CAFEAcA9zPWDQ8Y6ugAut5WobLXzP3zrUeUUH7RcSUMqdLkkndA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL v2 00/34] Misc patches for 2016-06-01
+In-Reply-To: <20170601172734.9039-13-berrange@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="Q3skkOMDmQWTVQg30g8gBqC0vtD4697SD"
+Subject: Re: [Qemu-devel] [PATCH v8 12/20] qcow2: extend specification to
+ cover LUKS encryption
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,27 +25,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Alberto Garcia <berto@igalia.com>
 
-On 1 June 2017 at 18:53, Peter Maydell <peter.maydell@linaro.org> wrote:
-> Test failure on OSX:
->
-> TEST: tests/device-introspect-test... (pid=66373)
->   /aarch64/device/introspect/list:                                     OK
->   /aarch64/device/introspect/none:                                     OK
->   /aarch64/device/introspect/abstract:                                 OK
->   /aarch64/device/introspect/concrete:                                 **
-> ERROR:/root/qemu/qom/object.c:364:object_initialize_with_type:
-> assertion failed: (type != NULL)
-> Broken pipe
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--Q3skkOMDmQWTVQg30g8gBqC0vtD4697SD
+From: Eric Blake <eblake@redhat.com>
+To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>,
+ Kevin Wolf <kwolf@redhat.com>, Alberto Garcia <berto@igalia.com>
+Message-ID: <d0a2d5b5-0279-8c05-69da-4ed3d928618f@redhat.com>
+Subject: Re: [PATCH v8 12/20] qcow2: extend specification to cover LUKS
+ encryption
+References: <20170601172734.9039-1-berrange@redhat.com>
+ <20170601172734.9039-13-berrange@redhat.com>
+In-Reply-To: <20170601172734.9039-13-berrange@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Got those the wrong way round -- this is the FreeBSD failure
-and the other lot are OSX. Pretty sure it's the same error,
-though -- it's just that for some reason my OSX setup doesn't
-actually cause make to exit with an error when a test fails,
-so it goes on to hit what's probably the same bug in all the
-other check-qtest-$ARCH targets rather than bailing out.
+On 06/01/2017 12:27 PM, Daniel P. Berrange wrote:
+> Update the qcow2 specification to describe how the LUKS header is
+> placed inside a qcow2 file, when using LUKS encryption for the
+> qcow2 payload instead of the legacy AES-CBC encryption
+>=20
+> Reviewed-by: Eric Blake <eblake@redhat.com>
+> Reviewed-by: Alberto Garcia <berto@igalia.com>
+> Reviewed-by: Max Reitz <mreitz@redhat.com>
+> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
+> ---
+>  docs/specs/qcow2.txt | 103 +++++++++++++++++++++++++++++++++++++++++++=
+++++++++
+>  1 file changed, 103 insertions(+)
+>=20
 
-thanks
--- PMM
+> +=3D=3D Data encryption =3D=3D
+> +
+> +When an encryption method is requested in the header, the image payloa=
+d
+> +data must be encrypted/decrypted on every write/read. The image header=
+s
+> +and metadata are never encrypted.
+> +
+> +The algorithms used for encryption vary depending on the method
+> +
+> + - AES:
+> +
+> +   The AES cipher, in CBC mode, with 256 bit keys.
+> +
+> +   Initialization vectors generated using plain64 method, with
+> +   the virtual disk sector as the input tweak.
+> +
+> +   This format is no longer supported in QEMU system emulators, due
+> +   to a number of design flaws affecting it security. It is only
+
+s/affecting it/affecting its/
+
+Can keep my R-b.
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--Q3skkOMDmQWTVQg30g8gBqC0vtD4697SD
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEcBAEBCAAGBQJZMFcuAAoJEKeha0olJ0Nq/1IIAJV2zvfA7/23BgPg0QTeL6aU
+aUEsiESPo/Ct3iwVAcd/HwbM75kzHyKut1P8Krz0WSfn/XJ3S8I08O0O4szjwfw9
+amcEeJiL1jOupCq8UOriBt6jmRg5WR8Vmv7+k67eYL4pJUl+3Ux6Hk3B86Su1M8n
+tzmgFM+XFmikfgqEf+gnzBMarz4e6oooq5oJRc8bKwiySUDHKvaE2D5IqxrGuK4w
+GlDjYhqeaUxeBSuJcO+bUHCGQlloyjNkdITwLuwz+kI0uInG67OVu42t8FDGFaSi
+q4IMwnw+b8plbO/LAyn6sb1i9YuPInOT4dVgH4jxwfMJXlt+GGmk9Q9pGmBnems=
+=THFr
+-----END PGP SIGNATURE-----
+
+--Q3skkOMDmQWTVQg30g8gBqC0vtD4697SD--
