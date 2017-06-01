@@ -1,29 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43044)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43256)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ben@skyportsystems.com>) id 1dGRMs-0002ib-NX
-	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 10:46:31 -0400
+	(envelope-from <famz@redhat.com>) id 1dGRNL-0002xi-UI
+	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 10:47:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ben@skyportsystems.com>) id 1dGRMr-00013H-P9
-	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 10:46:30 -0400
-Received: from mail-oi0-x234.google.com ([2607:f8b0:4003:c06::234]:35084)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <ben@skyportsystems.com>)
-	id 1dGRMr-00012r-JG
-	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 10:46:29 -0400
-Received: by mail-oi0-x234.google.com with SMTP id l18so56549368oig.2
-	for <qemu-devel@nongnu.org>; Thu, 01 Jun 2017 07:46:27 -0700 (PDT)
-Content-Type: text/plain; charset=utf-8
-Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
-From: Ben Warren <ben@skyportsystems.com>
-In-Reply-To: <20170601172020-mutt-send-email-mst@kernel.org>
-Date: Thu, 1 Jun 2017 07:46:24 -0700
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <A14BEB28-9F8C-4E37-BCB1-EC7ED7FFB8E6@skyportsystems.com>
-References: <20170529151047.85390-1-ben@skyportsystems.com>
-	<CAJ+F1C+QFS5YDw7He-p0eEObYbGcq6ra3wwVMVdEu88C0tRqQQ@mail.gmail.com>
-	<20170601172020-mutt-send-email-mst@kernel.org>
-Subject: Re: [Qemu-devel] [PATCH] tests: Add unit tests for the VM
- Generation ID feature
+	(envelope-from <famz@redhat.com>) id 1dGRNL-0001Di-Ab
+	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 10:47:00 -0400
+Date: Thu, 1 Jun 2017 22:46:47 +0800
+From: Fam Zheng <famz@redhat.com>
+Message-ID: <20170601144647.GI13127@lemon.lan>
+References: <1492838021-10538-1-git-send-email-ashijeetacharya@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1492838021-10538-1-git-send-email-ashijeetacharya@gmail.com>
+Subject: Re: [Qemu-devel] [PATCH v4 0/8] Optimize VMDK I/O by allocating
+ multiple clusters
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,59 +23,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: =?utf-8?Q?Marc-Andr=C3=A9_Lureau?= <marcandre.lureau@gmail.com>, qemu devel list <qemu-devel@nongnu.org>, Igor Mammedov <imammedo@redhat.com>, Laszlo Ersek <lersek@redhat.com>
+To: Ashijeet Acharya <ashijeetacharya@gmail.com>
+Cc: kwolf@redhat.com, qemu-block@nongnu.org, stefanha@gmail.com, qemu-devel@nongnu.org, mreitz@redhat.com, jsnow@redhat.com
 
+On Sat, 04/22 10:43, Ashijeet Acharya wrote:
+> Changes in v4:
+> - fix commit message in patch 1 (fam)
+> - drop size_to_clusters() function (fam)
+> - fix grammatical errors in function documentations (fam)
+> - factor out metadata loading coding in a separate patch (patch 4) (fam)
+> - rename vmdk_alloc_cluster_offset() to vmdk_alloc_clusters() (fam)
+> - break patch 4(in v3) into separate patches (patch 3 and 8) (fam)
+> - rename extent_size to extent_end (fam)
+> - use QEMU_ALIGN_UP instead of vmdk_align_offset. (fam)
+> - drop next and simply do m_data = m_data->next (fam)
 
-> On Jun 1, 2017, at 7:21 AM, Michael S. Tsirkin <mst@redhat.com> wrote:
->=20
-> On Thu, Jun 01, 2017 at 08:10:27AM +0000, Marc-Andr=C3=A9 Lureau =
-wrote:
->> Hi
->>=20
->> On Mon, May 29, 2017 at 7:18 PM Ben Warren via Qemu-devel <
->> qemu-devel@nongnu.org> wrote:
->>=20
->>    From: Ben Warren <ben@skyportsystems.com>
->>=20
->>    The following tests are implemented:
->>    * test that a GUID passed in by command line is propagated to the =
-guest.
->>      Read the GUID from guest memory
->>    * test that the "auto" argument to the GUID generates a valid =
-GUID, as
->>      seen by the guest.
->>    * test that a GUID passed in can be queried from the monitor
->>=20
->>      This patch is loosely based on a previous patch from:
->>      Gal Hammer <ghammer@redhat.com>  and Igor Mammedov =
-<imammedo@redhat.com>
->>=20
->>    Signed-off-by: Ben Warren <ben@skyportsystems.com>
->>    Reviewed-by: Igor Mammedov <imammedo@redhat.com>
->>    ---
->=20
-> What happened to indentation here?
->=20
-I don=E2=80=99t know, this is unchanged from the patch that passed =
-through the gauntlet earlier this year, other than rebasing.  If you can =
-please clarify exactly what you see that is wrong, that=E2=80=99ll be =
-helpful.
+I still don't like the m_data linked list but as this is a huge performance
+improvement, I think we can merge this once the few bugs are addressed, then
+clean up things on top.
 
->>    +             * in order to implement the "OVMF SDT Header probe
->>    suppressor"
->>    +             * see docs/specs/vmgenid.txt for more details
->>    +             */
->>    +            return vgid_table.vgia_val + VMGENID_GUID_OFFSET;
->>    +        }
->>=20
->>=20
->> It leaks tables
->> =20
->> Other than that:
->> Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
->=20
-> Ben, are you going to post a version that doesn't leak?
-Yes, I=E2=80=99ll try to get to it today.
+Thanks,
 
-=E2=80=94Ben
+Fam
