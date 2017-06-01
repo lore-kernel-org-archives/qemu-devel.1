@@ -1,34 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43668)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43780)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dGLtd-0001Gw-Fs
-	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 04:55:58 -0400
+	(envelope-from <roman.penyaev@profitbricks.com>) id 1dGLtw-0001Sl-GQ
+	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 04:56:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dGLta-0004qk-EU
-	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 04:55:57 -0400
-Received: from indium.canonical.com ([91.189.90.7]:50490)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1dGLta-0004qO-8a
-	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 04:55:54 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1dGLtY-0001SF-Er
-	for <qemu-devel@nongnu.org>; Thu, 01 Jun 2017 08:55:52 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 5681E2E81AA
-	for <qemu-devel@nongnu.org>; Thu,  1 Jun 2017 08:55:52 +0000 (UTC)
+	(envelope-from <roman.penyaev@profitbricks.com>) id 1dGLtt-0004xW-Ek
+	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 04:56:16 -0400
+Received: from mail-wm0-x22b.google.com ([2a00:1450:400c:c09::22b]:38331)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <roman.penyaev@profitbricks.com>)
+	id 1dGLtt-0004wo-8p
+	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 04:56:13 -0400
+Received: by mail-wm0-x22b.google.com with SMTP id n195so22650233wmg.1
+	for <qemu-devel@nongnu.org>; Thu, 01 Jun 2017 01:56:12 -0700 (PDT)
+From: Roman Pen <roman.penyaev@profitbricks.com>
+Date: Thu,  1 Jun 2017 10:56:04 +0200
+Message-Id: <20170601085604.12980-1-roman.penyaev@profitbricks.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 01 Jun 2017 08:43:00 -0000
-From: Thomas Huth <1694808@bugs.launchpad.net>
-Reply-To: Bug 1694808 <1694808@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <149625981140.25356.9191241290348673100.malonedeb@soybean.canonical.com>
-Message-Id: <149630658030.2833.1386576562847641837.malone@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1694808] Re: Passthrough USB Host Keyboard
- doesn't work on Q35 platform on boot-up
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH 1/1] i386/kvm: do not zero out segment flags if
+ segment is unusable or not present
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,45 +28,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+Cc: Roman Pen <roman.penyaev@profitbricks.com>, Mikhail Sennikovskii <mikhail.sennikovskii@profitbricks.com>, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Rddadim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>, Michael Chapman <mike@very.puzzling.org>, qemu-devel@nongnu.org
 
-Have you tried whether it works with the latest upstream version of QEMU
-(currently version 2.9) - since you've marked this as upstream QEMU
-problem, too?
+This is a fix for the problem [1], where VMCB.CPL was set to 0 and interrupt
+was taken on userspace stack.  The root cause lies in the specific AMD CPU
+behaviour which manifests itself as unusable segment attributes on SYSRET[2].
 
-** Changed in: qemu
-       Status: New =3D> Incomplete
+Here in this patch flags are not touched even segment is unusable or is not
+present, therefore CPL (which is stored in DPL field) should not be lost and
+will be successfully restored on kvm/svm kernel side.
 
--- =
+Also current patch should not break desired behavior described in this commit:
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1694808
+4cae9c97967a ("target-i386: kvm: clear unusable segments' flags in migration")
 
-Title:
-  Passthrough USB Host Keyboard doesn't work on Q35 platform on boot-up
+since present bit will be dropped if segment is unusable or is not present.
 
-Status in QEMU:
-  Incomplete
-Status in qemu-kvm package in Ubuntu:
-  New
+This is the second part of the whole fix of the corresponding problem [1],
+first part is related to kvm/svm kernel side and does exactly the same:
+segment attributes are not zeroed out.
 
-Bug description:
-  Using qemu-kvm as shipped with Ubuntu 16.04, I cannot get a passed-
-  through USB Host Keyboard to work at boot-up using the Q35 platform.
+[1] Message id: CAJrWOzD6Xq==b-zYCDdFLgSRMPM-NkNuTSDFEtX=7MreT45i7Q@mail.gmail.com
+[2] Message id: 5d120f358612d73fc909f5bfa47e7bd082db0af0.1429841474.git.luto@kernel.org
 
-  My minimal example to verify this bug is the following:
+Signed-off-by: Roman Pen <roman.penyaev@profitbricks.com>
+Signed-off-by: Mikhail Sennikovskii <mikhail.sennikovskii@profitbricks.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Rddadim Krčmář <rkrcmar@redhat.com>
+Cc: Michael Chapman <mike@very.puzzling.org>
+Cc: qemu-devel@nongnu.org
+---
+ target/i386/kvm.c | 20 ++++++++------------
+ 1 file changed, 8 insertions(+), 12 deletions(-)
 
-    qemu-system-x86_64 -M q35 -m 128 -cdrom mini.iso -usb -usbdevice
-  host:04ca:005a -vnc :1 -display none
-
-  Using a noname USB Keyboard with ID 04ca:005a and the Ubuntu 16.04
-  NetBoot mini.iso, I can see the boot screen of the Ubuntu ISO through
-  VNC, but pressing the arrow keys doesn't do anything.
-
-  By taking out the "-M q35" parameter, QEMU switches to the traditional
-  i440FX system. The passed-through USB Host Keyboard works there, but
-  the old platform is no option for me.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1694808/+subscriptions
+diff --git a/target/i386/kvm.c b/target/i386/kvm.c
+index 011d4a55b136..faee904d9d59 100644
+--- a/target/i386/kvm.c
++++ b/target/i386/kvm.c
+@@ -1300,18 +1300,14 @@ static void get_seg(SegmentCache *lhs, const struct kvm_segment *rhs)
+     lhs->selector = rhs->selector;
+     lhs->base = rhs->base;
+     lhs->limit = rhs->limit;
+-    if (rhs->unusable) {
+-        lhs->flags = 0;
+-    } else {
+-        lhs->flags = (rhs->type << DESC_TYPE_SHIFT) |
+-                     (rhs->present * DESC_P_MASK) |
+-                     (rhs->dpl << DESC_DPL_SHIFT) |
+-                     (rhs->db << DESC_B_SHIFT) |
+-                     (rhs->s * DESC_S_MASK) |
+-                     (rhs->l << DESC_L_SHIFT) |
+-                     (rhs->g * DESC_G_MASK) |
+-                     (rhs->avl * DESC_AVL_MASK);
+-    }
++    lhs->flags = (rhs->type << DESC_TYPE_SHIFT) |
++                 ((rhs->present && !rhs->unusable) * DESC_P_MASK) |
++                 (rhs->dpl << DESC_DPL_SHIFT) |
++                 (rhs->db << DESC_B_SHIFT) |
++                 (rhs->s * DESC_S_MASK) |
++                 (rhs->l << DESC_L_SHIFT) |
++                 (rhs->g * DESC_G_MASK) |
++                 (rhs->avl * DESC_AVL_MASK);
+ }
+ 
+ static void kvm_getput_reg(__u64 *kvm_reg, target_ulong *qemu_reg, int set)
+-- 
+2.11.0
