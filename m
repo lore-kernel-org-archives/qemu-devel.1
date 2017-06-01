@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41624)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41653)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dGTtO-0000Gg-AP
-	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 13:28:15 -0400
+	(envelope-from <berrange@redhat.com>) id 1dGTtP-0000Iw-PO
+	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 13:28:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dGTtN-00089W-6t
-	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 13:28:14 -0400
+	(envelope-from <berrange@redhat.com>) id 1dGTtN-00089P-4x
+	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 13:28:15 -0400
 From: "Daniel P. Berrange" <berrange@redhat.com>
-Date: Thu,  1 Jun 2017 18:27:22 +0100
-Message-Id: <20170601172734.9039-9-berrange@redhat.com>
+Date: Thu,  1 Jun 2017 18:27:21 +0100
+Message-Id: <20170601172734.9039-8-berrange@redhat.com>
 In-Reply-To: <20170601172734.9039-1-berrange@redhat.com>
 References: <20170601172734.9039-1-berrange@redhat.com>
-Subject: [Qemu-devel] [PATCH v8 08/20] qcow: make encrypt_sectors encrypt in
- place
+Subject: [Qemu-devel] [PATCH v8 07/20] block: deprecate "encryption=on" in
+ favor of "encrypt.format=aes"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,148 +23,492 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-block@nongnu.org, Eric Blake <eblake@redhat.com>, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Alberto Garcia <berto@igalia.com>, "Daniel P. Berrange" <berrange@redhat.com>
 
-Instead of requiring separate input/output buffers for
-encrypting data, change encrypt_sectors() to assume
-use of a single buffer, encrypting in place. One current
-caller uses the same buffer for input/output already
-and the other two callers are easily converted to do so.
+Historically the qcow & qcow2 image formats supported a property
+"encryption=on" to enable their built-in AES encryption. We'll
+soon be supporting LUKS for qcow2, so need a more general purpose
+way to enable encryption, with a choice of formats.
 
-Reviewed-by: Alberto Garcia <berto@igalia.com>
+This introduces an "encrypt.format" option, which will later be
+joined by a number of other "encrypt.XXX" options. The use of
+a "encrypt." prefix instead of "encrypt-" is done to facilitate
+mapping to a nested QAPI schema at later date.
+
+e.g. the preferred syntax is now
+
+  qemu-img create -f qcow2 -o encrypt.format=aes demo.qcow2
+
 Reviewed-by: Eric Blake <eblake@redhat.com>
-Reviewed-by: Max Reitz <mreitz@redhat.com>
-Reviewed-by: Kevin Wolf <kwolf@redhat.com>
+Reviewed-by: Alberto Garcia <berto@igalia.com>
 Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
 ---
- block/qcow.c | 45 +++++++++++++++------------------------------
- 1 file changed, 15 insertions(+), 30 deletions(-)
+ block/qcow.c               | 30 ++++++++++++++---
+ block/qcow2.c              | 33 +++++++++++++++----
+ include/block/block_int.h  |  2 +-
+ qemu-img.c                 |  4 ++-
+ tests/qemu-iotests/082.out | 81 ++++++++++++++++++++++++++++++----------------
+ 5 files changed, 110 insertions(+), 40 deletions(-)
 
 diff --git a/block/qcow.c b/block/qcow.c
-index 42f83b2..90a934c 100644
+index 6738bc7..42f83b2 100644
 --- a/block/qcow.c
 +++ b/block/qcow.c
-@@ -322,11 +322,10 @@ static int qcow_set_key(BlockDriverState *bs, const char *key)
- }
+@@ -803,10 +803,10 @@ static int qcow_create(const char *filename, QemuOpts *opts, Error **errp)
+     uint8_t *tmp;
+     int64_t total_size = 0;
+     char *backing_file = NULL;
+-    int flags = 0;
+     Error *local_err = NULL;
+     int ret;
+     BlockBackend *qcow_blk;
++    const char *encryptfmt = NULL;
  
- /* The crypt function is compatible with the linux cryptoloop
--   algorithm for < 4 GB images. NOTE: out_buf == in_buf is
--   supported */
-+   algorithm for < 4 GB images. */
- static int encrypt_sectors(BDRVQcowState *s, int64_t sector_num,
--                           uint8_t *out_buf, const uint8_t *in_buf,
--                           int nb_sectors, bool enc, Error **errp)
-+                           uint8_t *buf, int nb_sectors, bool enc,
-+                           Error **errp)
+     /* Read out options */
+     total_size = ROUND_UP(qemu_opt_get_size_del(opts, BLOCK_OPT_SIZE, 0),
+@@ -818,8 +818,16 @@ static int qcow_create(const char *filename, QemuOpts *opts, Error **errp)
+     }
+ 
+     backing_file = qemu_opt_get_del(opts, BLOCK_OPT_BACKING_FILE);
+-    if (qemu_opt_get_bool_del(opts, BLOCK_OPT_ENCRYPT, false)) {
+-        flags |= BLOCK_FLAG_ENCRYPT;
++    encryptfmt = qemu_opt_get_del(opts, BLOCK_OPT_ENCRYPT_FORMAT);
++    if (encryptfmt) {
++        if (qemu_opt_get_bool_del(opts, BLOCK_OPT_ENCRYPT, false)) {
++            error_setg(errp, "Options " BLOCK_OPT_ENCRYPT " and "
++                       BLOCK_OPT_ENCRYPT_FORMAT " are mutually exclusive");
++            ret = -EINVAL;
++            goto cleanup;
++        }
++    } else if (qemu_opt_get_bool_del(opts, BLOCK_OPT_ENCRYPT, false)) {
++        encryptfmt = "aes";
+     }
+ 
+     ret = bdrv_create_file(filename, opts, &local_err);
+@@ -872,7 +880,13 @@ static int qcow_create(const char *filename, QemuOpts *opts, Error **errp)
+     l1_size = (total_size + (1LL << shift) - 1) >> shift;
+ 
+     header.l1_table_offset = cpu_to_be64(header_size);
+-    if (flags & BLOCK_FLAG_ENCRYPT) {
++    if (encryptfmt) {
++        if (!g_str_equal(encryptfmt, "aes")) {
++            error_setg(errp, "Unknown encryption format '%s', expected 'aes'",
++                       encryptfmt);
++            ret = -EINVAL;
++            goto exit;
++        }
+         header.crypt_method = cpu_to_be32(QCOW_CRYPT_AES);
+     } else {
+         header.crypt_method = cpu_to_be32(QCOW_CRYPT_NONE);
+@@ -1046,9 +1060,15 @@ static QemuOptsList qcow_create_opts = {
+         {
+             .name = BLOCK_OPT_ENCRYPT,
+             .type = QEMU_OPT_BOOL,
+-            .help = "Encrypt the image",
++            .help = "Encrypt the image with format 'aes'. (Deprecated "
++                    "in favor of " BLOCK_OPT_ENCRYPT_FORMAT "=aes)",
+             .def_value_str = "off"
+         },
++        {
++            .name = BLOCK_OPT_ENCRYPT_FORMAT,
++            .type = QEMU_OPT_STRING,
++            .help = "Encrypt the image, format choices: 'aes'",
++        },
+         { /* end of list */ }
+     }
+ };
+diff --git a/block/qcow2.c b/block/qcow2.c
+index b3ba5da..19dfcd1 100644
+--- a/block/qcow2.c
++++ b/block/qcow2.c
+@@ -2100,7 +2100,7 @@ static int qcow2_create2(const char *filename, int64_t total_size,
+                          const char *backing_file, const char *backing_format,
+                          int flags, size_t cluster_size, PreallocMode prealloc,
+                          QemuOpts *opts, int version, int refcount_order,
+-                         Error **errp)
++                         const char *encryptfmt, Error **errp)
  {
-     union {
-         uint64_t ll[2];
-@@ -345,14 +344,12 @@ static int encrypt_sectors(BDRVQcowState *s, int64_t sector_num,
-         }
-         if (enc) {
-             ret = qcrypto_cipher_encrypt(s->cipher,
--                                         in_buf,
--                                         out_buf,
-+                                         buf, buf,
-                                          512,
-                                          errp);
-         } else {
-             ret = qcrypto_cipher_decrypt(s->cipher,
--                                         in_buf,
--                                         out_buf,
-+                                         buf, buf,
-                                          512,
-                                          errp);
-         }
-@@ -360,8 +357,7 @@ static int encrypt_sectors(BDRVQcowState *s, int64_t sector_num,
-             return -1;
-         }
-         sector_num++;
--        in_buf += 512;
--        out_buf += 512;
-+        buf += 512;
+     int cluster_bits;
+     QDict *options;
+@@ -2229,7 +2229,13 @@ static int qcow2_create2(const char *filename, int64_t total_size,
+         .header_length              = cpu_to_be32(sizeof(*header)),
+     };
+ 
+-    if (flags & BLOCK_FLAG_ENCRYPT) {
++    if (encryptfmt) {
++        if (!g_str_equal(encryptfmt, "aes")) {
++            error_setg(errp, "Unknown encryption format '%s', expected 'aes'",
++                       encryptfmt);
++            ret = -EINVAL;
++            goto out;
++        }
+         header->crypt_method = cpu_to_be32(QCOW_CRYPT_AES);
+     } else {
+         header->crypt_method = cpu_to_be32(QCOW_CRYPT_NONE);
+@@ -2358,6 +2364,7 @@ static int qcow2_create(const char *filename, QemuOpts *opts, Error **errp)
+     int version = 3;
+     uint64_t refcount_bits = 16;
+     int refcount_order;
++    const char *encryptfmt = NULL;
+     Error *local_err = NULL;
+     int ret;
+ 
+@@ -2366,8 +2373,16 @@ static int qcow2_create(const char *filename, QemuOpts *opts, Error **errp)
+                     BDRV_SECTOR_SIZE);
+     backing_file = qemu_opt_get_del(opts, BLOCK_OPT_BACKING_FILE);
+     backing_fmt = qemu_opt_get_del(opts, BLOCK_OPT_BACKING_FMT);
+-    if (qemu_opt_get_bool_del(opts, BLOCK_OPT_ENCRYPT, false)) {
+-        flags |= BLOCK_FLAG_ENCRYPT;
++    encryptfmt = qemu_opt_get_del(opts, BLOCK_OPT_ENCRYPT_FORMAT);
++    if (encryptfmt) {
++        if (qemu_opt_get_bool_del(opts, BLOCK_OPT_ENCRYPT, false)) {
++            error_setg(errp, "Options " BLOCK_OPT_ENCRYPT " and "
++                       BLOCK_OPT_ENCRYPT_FORMAT " are mutually exclusive");
++            ret = -EINVAL;
++            goto finish;
++        }
++    } else if (qemu_opt_get_bool_del(opts, BLOCK_OPT_ENCRYPT, false)) {
++        encryptfmt = "aes";
      }
-     return 0;
- }
-@@ -481,13 +477,12 @@ static uint64_t get_cluster_offset(BlockDriverState *bs,
-                     uint64_t start_sect;
-                     assert(s->cipher);
-                     start_sect = (offset & ~(s->cluster_size - 1)) >> 9;
--                    memset(s->cluster_data + 512, 0x00, 512);
-                     for(i = 0; i < s->cluster_sectors; i++) {
-                         if (i < n_start || i >= n_end) {
-                             Error *err = NULL;
-+                            memset(s->cluster_data, 0x00, 512);
-                             if (encrypt_sectors(s, start_sect + i,
--                                                s->cluster_data,
--                                                s->cluster_data + 512, 1,
-+                                                s->cluster_data, 1,
-                                                 true, &err) < 0) {
-                                 error_free(err);
-                                 errno = EIO;
-@@ -665,7 +660,7 @@ static coroutine_fn int qcow_co_readv(BlockDriverState *bs, int64_t sector_num,
-             }
-             if (bs->encrypted) {
-                 assert(s->cipher);
--                if (encrypt_sectors(s, sector_num, buf, buf,
-+                if (encrypt_sectors(s, sector_num, buf,
-                                     n, false, &err) < 0) {
-                     goto fail;
-                 }
-@@ -700,9 +695,7 @@ static coroutine_fn int qcow_co_writev(BlockDriverState *bs, int64_t sector_num,
-     BDRVQcowState *s = bs->opaque;
-     int index_in_cluster;
-     uint64_t cluster_offset;
--    const uint8_t *src_buf;
-     int ret = 0, n;
--    uint8_t *cluster_data = NULL;
-     struct iovec hd_iov;
-     QEMUIOVector hd_qiov;
-     uint8_t *buf;
-@@ -710,7 +703,9 @@ static coroutine_fn int qcow_co_writev(BlockDriverState *bs, int64_t sector_num,
+     cluster_size = qemu_opt_get_size_del(opts, BLOCK_OPT_CLUSTER_SIZE,
+                                          DEFAULT_CLUSTER_SIZE);
+@@ -2433,7 +2448,7 @@ static int qcow2_create(const char *filename, QemuOpts *opts, Error **errp)
  
-     s->cluster_cache_offset = -1; /* disable compressed cache */
+     ret = qcow2_create2(filename, size, backing_file, backing_fmt, flags,
+                         cluster_size, prealloc, opts, version, refcount_order,
+-                        &local_err);
++                        encryptfmt, &local_err);
+     error_propagate(errp, local_err);
  
--    if (qiov->niov > 1) {
-+    /* We must always copy the iov when encrypting, so we
-+     * don't modify the original data buffer during encryption */
-+    if (bs->encrypted || qiov->niov > 1) {
-         buf = orig_buf = qemu_try_blockalign(bs, qiov->size);
-         if (buf == NULL) {
-             return -ENOMEM;
-@@ -740,21 +735,14 @@ static coroutine_fn int qcow_co_writev(BlockDriverState *bs, int64_t sector_num,
-         if (bs->encrypted) {
-             Error *err = NULL;
-             assert(s->cipher);
--            if (!cluster_data) {
--                cluster_data = g_malloc0(s->cluster_size);
--            }
--            if (encrypt_sectors(s, sector_num, cluster_data, buf,
--                                n, true, &err) < 0) {
-+            if (encrypt_sectors(s, sector_num, buf, n, true, &err) < 0) {
-                 error_free(err);
-                 ret = -EIO;
-                 break;
-             }
--            src_buf = cluster_data;
--        } else {
--            src_buf = buf;
+ finish:
+@@ -3387,10 +3402,16 @@ static QemuOptsList qcow2_create_opts = {
+         {
+             .name = BLOCK_OPT_ENCRYPT,
+             .type = QEMU_OPT_BOOL,
+-            .help = "Encrypt the image",
++            .help = "Encrypt the image with format 'aes'. (Deprecated "
++                    "in favor of " BLOCK_OPT_ENCRYPT_FORMAT "=aes)",
+             .def_value_str = "off"
+         },
+         {
++            .name = BLOCK_OPT_ENCRYPT_FORMAT,
++            .type = QEMU_OPT_STRING,
++            .help = "Encrypt the image, format choices: 'aes'",
++        },
++        {
+             .name = BLOCK_OPT_CLUSTER_SIZE,
+             .type = QEMU_OPT_SIZE,
+             .help = "qcow2 cluster size",
+diff --git a/include/block/block_int.h b/include/block/block_int.h
+index e5eb473..a6844d5 100644
+--- a/include/block/block_int.h
++++ b/include/block/block_int.h
+@@ -36,11 +36,11 @@
+ #include "qemu/main-loop.h"
+ #include "qemu/throttle.h"
+ 
+-#define BLOCK_FLAG_ENCRYPT          1
+ #define BLOCK_FLAG_LAZY_REFCOUNTS   8
+ 
+ #define BLOCK_OPT_SIZE              "size"
+ #define BLOCK_OPT_ENCRYPT           "encryption"
++#define BLOCK_OPT_ENCRYPT_FORMAT    "encrypt.format"
+ #define BLOCK_OPT_COMPAT6           "compat6"
+ #define BLOCK_OPT_HWVERSION         "hwversion"
+ #define BLOCK_OPT_BACKING_FILE      "backing_file"
+diff --git a/qemu-img.c b/qemu-img.c
+index 0ad698d..31dd0cc 100644
+--- a/qemu-img.c
++++ b/qemu-img.c
+@@ -2267,6 +2267,8 @@ static int img_convert(int argc, char **argv)
+     if (s.compressed) {
+         bool encryption =
+             qemu_opt_get_bool(opts, BLOCK_OPT_ENCRYPT, false);
++        const char *encryptfmt =
++            qemu_opt_get(opts, BLOCK_OPT_ENCRYPT_FORMAT);
+         const char *preallocation =
+             qemu_opt_get(opts, BLOCK_OPT_PREALLOC);
+ 
+@@ -2276,7 +2278,7 @@ static int img_convert(int argc, char **argv)
+             goto out;
          }
  
--        hd_iov.iov_base = (void *)src_buf;
-+        hd_iov.iov_base = (void *)buf;
-         hd_iov.iov_len = n * 512;
-         qemu_iovec_init_external(&hd_qiov, &hd_iov, 1);
-         qemu_co_mutex_unlock(&s->lock);
-@@ -773,10 +761,7 @@ static coroutine_fn int qcow_co_writev(BlockDriverState *bs, int64_t sector_num,
-     }
-     qemu_co_mutex_unlock(&s->lock);
- 
--    if (qiov->niov > 1) {
--        qemu_vfree(orig_buf);
--    }
--    g_free(cluster_data);
-+    qemu_vfree(orig_buf);
- 
-     return ret;
- }
+-        if (encryption) {
++        if (encryption || encryptfmt) {
+             error_report("Compression and encryption not supported at "
+                          "the same time");
+             ret = -1;
+diff --git a/tests/qemu-iotests/082.out b/tests/qemu-iotests/082.out
+index a952330..892358c 100644
+--- a/tests/qemu-iotests/082.out
++++ b/tests/qemu-iotests/082.out
+@@ -48,7 +48,8 @@ size             Virtual disk size
+ compat           Compatibility level (0.10 or 1.1)
+ backing_file     File name of a base image
+ backing_fmt      Image format of the base image
+-encryption       Encrypt the image
++encryption       Encrypt the image with format 'aes'. (Deprecated in favor of encrypt.format=aes)
++encrypt.format   Encrypt the image, format choices: 'aes'
+ cluster_size     qcow2 cluster size
+ preallocation    Preallocation mode (allowed values: off, metadata, falloc, full)
+ lazy_refcounts   Postpone refcount updates
+@@ -61,7 +62,8 @@ size             Virtual disk size
+ compat           Compatibility level (0.10 or 1.1)
+ backing_file     File name of a base image
+ backing_fmt      Image format of the base image
+-encryption       Encrypt the image
++encryption       Encrypt the image with format 'aes'. (Deprecated in favor of encrypt.format=aes)
++encrypt.format   Encrypt the image, format choices: 'aes'
+ cluster_size     qcow2 cluster size
+ preallocation    Preallocation mode (allowed values: off, metadata, falloc, full)
+ lazy_refcounts   Postpone refcount updates
+@@ -74,7 +76,8 @@ size             Virtual disk size
+ compat           Compatibility level (0.10 or 1.1)
+ backing_file     File name of a base image
+ backing_fmt      Image format of the base image
+-encryption       Encrypt the image
++encryption       Encrypt the image with format 'aes'. (Deprecated in favor of encrypt.format=aes)
++encrypt.format   Encrypt the image, format choices: 'aes'
+ cluster_size     qcow2 cluster size
+ preallocation    Preallocation mode (allowed values: off, metadata, falloc, full)
+ lazy_refcounts   Postpone refcount updates
+@@ -87,7 +90,8 @@ size             Virtual disk size
+ compat           Compatibility level (0.10 or 1.1)
+ backing_file     File name of a base image
+ backing_fmt      Image format of the base image
+-encryption       Encrypt the image
++encryption       Encrypt the image with format 'aes'. (Deprecated in favor of encrypt.format=aes)
++encrypt.format   Encrypt the image, format choices: 'aes'
+ cluster_size     qcow2 cluster size
+ preallocation    Preallocation mode (allowed values: off, metadata, falloc, full)
+ lazy_refcounts   Postpone refcount updates
+@@ -100,7 +104,8 @@ size             Virtual disk size
+ compat           Compatibility level (0.10 or 1.1)
+ backing_file     File name of a base image
+ backing_fmt      Image format of the base image
+-encryption       Encrypt the image
++encryption       Encrypt the image with format 'aes'. (Deprecated in favor of encrypt.format=aes)
++encrypt.format   Encrypt the image, format choices: 'aes'
+ cluster_size     qcow2 cluster size
+ preallocation    Preallocation mode (allowed values: off, metadata, falloc, full)
+ lazy_refcounts   Postpone refcount updates
+@@ -113,7 +118,8 @@ size             Virtual disk size
+ compat           Compatibility level (0.10 or 1.1)
+ backing_file     File name of a base image
+ backing_fmt      Image format of the base image
+-encryption       Encrypt the image
++encryption       Encrypt the image with format 'aes'. (Deprecated in favor of encrypt.format=aes)
++encrypt.format   Encrypt the image, format choices: 'aes'
+ cluster_size     qcow2 cluster size
+ preallocation    Preallocation mode (allowed values: off, metadata, falloc, full)
+ lazy_refcounts   Postpone refcount updates
+@@ -126,7 +132,8 @@ size             Virtual disk size
+ compat           Compatibility level (0.10 or 1.1)
+ backing_file     File name of a base image
+ backing_fmt      Image format of the base image
+-encryption       Encrypt the image
++encryption       Encrypt the image with format 'aes'. (Deprecated in favor of encrypt.format=aes)
++encrypt.format   Encrypt the image, format choices: 'aes'
+ cluster_size     qcow2 cluster size
+ preallocation    Preallocation mode (allowed values: off, metadata, falloc, full)
+ lazy_refcounts   Postpone refcount updates
+@@ -139,7 +146,8 @@ size             Virtual disk size
+ compat           Compatibility level (0.10 or 1.1)
+ backing_file     File name of a base image
+ backing_fmt      Image format of the base image
+-encryption       Encrypt the image
++encryption       Encrypt the image with format 'aes'. (Deprecated in favor of encrypt.format=aes)
++encrypt.format   Encrypt the image, format choices: 'aes'
+ cluster_size     qcow2 cluster size
+ preallocation    Preallocation mode (allowed values: off, metadata, falloc, full)
+ lazy_refcounts   Postpone refcount updates
+@@ -167,7 +175,8 @@ size             Virtual disk size
+ compat           Compatibility level (0.10 or 1.1)
+ backing_file     File name of a base image
+ backing_fmt      Image format of the base image
+-encryption       Encrypt the image
++encryption       Encrypt the image with format 'aes'. (Deprecated in favor of encrypt.format=aes)
++encrypt.format   Encrypt the image, format choices: 'aes'
+ cluster_size     qcow2 cluster size
+ preallocation    Preallocation mode (allowed values: off, metadata, falloc, full)
+ lazy_refcounts   Postpone refcount updates
+@@ -229,7 +238,8 @@ size             Virtual disk size
+ compat           Compatibility level (0.10 or 1.1)
+ backing_file     File name of a base image
+ backing_fmt      Image format of the base image
+-encryption       Encrypt the image
++encryption       Encrypt the image with format 'aes'. (Deprecated in favor of encrypt.format=aes)
++encrypt.format   Encrypt the image, format choices: 'aes'
+ cluster_size     qcow2 cluster size
+ preallocation    Preallocation mode (allowed values: off, metadata, falloc, full)
+ lazy_refcounts   Postpone refcount updates
+@@ -242,7 +252,8 @@ size             Virtual disk size
+ compat           Compatibility level (0.10 or 1.1)
+ backing_file     File name of a base image
+ backing_fmt      Image format of the base image
+-encryption       Encrypt the image
++encryption       Encrypt the image with format 'aes'. (Deprecated in favor of encrypt.format=aes)
++encrypt.format   Encrypt the image, format choices: 'aes'
+ cluster_size     qcow2 cluster size
+ preallocation    Preallocation mode (allowed values: off, metadata, falloc, full)
+ lazy_refcounts   Postpone refcount updates
+@@ -255,7 +266,8 @@ size             Virtual disk size
+ compat           Compatibility level (0.10 or 1.1)
+ backing_file     File name of a base image
+ backing_fmt      Image format of the base image
+-encryption       Encrypt the image
++encryption       Encrypt the image with format 'aes'. (Deprecated in favor of encrypt.format=aes)
++encrypt.format   Encrypt the image, format choices: 'aes'
+ cluster_size     qcow2 cluster size
+ preallocation    Preallocation mode (allowed values: off, metadata, falloc, full)
+ lazy_refcounts   Postpone refcount updates
+@@ -268,7 +280,8 @@ size             Virtual disk size
+ compat           Compatibility level (0.10 or 1.1)
+ backing_file     File name of a base image
+ backing_fmt      Image format of the base image
+-encryption       Encrypt the image
++encryption       Encrypt the image with format 'aes'. (Deprecated in favor of encrypt.format=aes)
++encrypt.format   Encrypt the image, format choices: 'aes'
+ cluster_size     qcow2 cluster size
+ preallocation    Preallocation mode (allowed values: off, metadata, falloc, full)
+ lazy_refcounts   Postpone refcount updates
+@@ -281,7 +294,8 @@ size             Virtual disk size
+ compat           Compatibility level (0.10 or 1.1)
+ backing_file     File name of a base image
+ backing_fmt      Image format of the base image
+-encryption       Encrypt the image
++encryption       Encrypt the image with format 'aes'. (Deprecated in favor of encrypt.format=aes)
++encrypt.format   Encrypt the image, format choices: 'aes'
+ cluster_size     qcow2 cluster size
+ preallocation    Preallocation mode (allowed values: off, metadata, falloc, full)
+ lazy_refcounts   Postpone refcount updates
+@@ -294,7 +308,8 @@ size             Virtual disk size
+ compat           Compatibility level (0.10 or 1.1)
+ backing_file     File name of a base image
+ backing_fmt      Image format of the base image
+-encryption       Encrypt the image
++encryption       Encrypt the image with format 'aes'. (Deprecated in favor of encrypt.format=aes)
++encrypt.format   Encrypt the image, format choices: 'aes'
+ cluster_size     qcow2 cluster size
+ preallocation    Preallocation mode (allowed values: off, metadata, falloc, full)
+ lazy_refcounts   Postpone refcount updates
+@@ -307,7 +322,8 @@ size             Virtual disk size
+ compat           Compatibility level (0.10 or 1.1)
+ backing_file     File name of a base image
+ backing_fmt      Image format of the base image
+-encryption       Encrypt the image
++encryption       Encrypt the image with format 'aes'. (Deprecated in favor of encrypt.format=aes)
++encrypt.format   Encrypt the image, format choices: 'aes'
+ cluster_size     qcow2 cluster size
+ preallocation    Preallocation mode (allowed values: off, metadata, falloc, full)
+ lazy_refcounts   Postpone refcount updates
+@@ -320,7 +336,8 @@ size             Virtual disk size
+ compat           Compatibility level (0.10 or 1.1)
+ backing_file     File name of a base image
+ backing_fmt      Image format of the base image
+-encryption       Encrypt the image
++encryption       Encrypt the image with format 'aes'. (Deprecated in favor of encrypt.format=aes)
++encrypt.format   Encrypt the image, format choices: 'aes'
+ cluster_size     qcow2 cluster size
+ preallocation    Preallocation mode (allowed values: off, metadata, falloc, full)
+ lazy_refcounts   Postpone refcount updates
+@@ -348,7 +365,8 @@ size             Virtual disk size
+ compat           Compatibility level (0.10 or 1.1)
+ backing_file     File name of a base image
+ backing_fmt      Image format of the base image
+-encryption       Encrypt the image
++encryption       Encrypt the image with format 'aes'. (Deprecated in favor of encrypt.format=aes)
++encrypt.format   Encrypt the image, format choices: 'aes'
+ cluster_size     qcow2 cluster size
+ preallocation    Preallocation mode (allowed values: off, metadata, falloc, full)
+ lazy_refcounts   Postpone refcount updates
+@@ -407,7 +425,8 @@ size             Virtual disk size
+ compat           Compatibility level (0.10 or 1.1)
+ backing_file     File name of a base image
+ backing_fmt      Image format of the base image
+-encryption       Encrypt the image
++encryption       Encrypt the image with format 'aes'. (Deprecated in favor of encrypt.format=aes)
++encrypt.format   Encrypt the image, format choices: 'aes'
+ cluster_size     qcow2 cluster size
+ preallocation    Preallocation mode (allowed values: off, metadata, falloc, full)
+ lazy_refcounts   Postpone refcount updates
+@@ -420,7 +439,8 @@ size             Virtual disk size
+ compat           Compatibility level (0.10 or 1.1)
+ backing_file     File name of a base image
+ backing_fmt      Image format of the base image
+-encryption       Encrypt the image
++encryption       Encrypt the image with format 'aes'. (Deprecated in favor of encrypt.format=aes)
++encrypt.format   Encrypt the image, format choices: 'aes'
+ cluster_size     qcow2 cluster size
+ preallocation    Preallocation mode (allowed values: off, metadata, falloc, full)
+ lazy_refcounts   Postpone refcount updates
+@@ -433,7 +453,8 @@ size             Virtual disk size
+ compat           Compatibility level (0.10 or 1.1)
+ backing_file     File name of a base image
+ backing_fmt      Image format of the base image
+-encryption       Encrypt the image
++encryption       Encrypt the image with format 'aes'. (Deprecated in favor of encrypt.format=aes)
++encrypt.format   Encrypt the image, format choices: 'aes'
+ cluster_size     qcow2 cluster size
+ preallocation    Preallocation mode (allowed values: off, metadata, falloc, full)
+ lazy_refcounts   Postpone refcount updates
+@@ -446,7 +467,8 @@ size             Virtual disk size
+ compat           Compatibility level (0.10 or 1.1)
+ backing_file     File name of a base image
+ backing_fmt      Image format of the base image
+-encryption       Encrypt the image
++encryption       Encrypt the image with format 'aes'. (Deprecated in favor of encrypt.format=aes)
++encrypt.format   Encrypt the image, format choices: 'aes'
+ cluster_size     qcow2 cluster size
+ preallocation    Preallocation mode (allowed values: off, metadata, falloc, full)
+ lazy_refcounts   Postpone refcount updates
+@@ -459,7 +481,8 @@ size             Virtual disk size
+ compat           Compatibility level (0.10 or 1.1)
+ backing_file     File name of a base image
+ backing_fmt      Image format of the base image
+-encryption       Encrypt the image
++encryption       Encrypt the image with format 'aes'. (Deprecated in favor of encrypt.format=aes)
++encrypt.format   Encrypt the image, format choices: 'aes'
+ cluster_size     qcow2 cluster size
+ preallocation    Preallocation mode (allowed values: off, metadata, falloc, full)
+ lazy_refcounts   Postpone refcount updates
+@@ -472,7 +495,8 @@ size             Virtual disk size
+ compat           Compatibility level (0.10 or 1.1)
+ backing_file     File name of a base image
+ backing_fmt      Image format of the base image
+-encryption       Encrypt the image
++encryption       Encrypt the image with format 'aes'. (Deprecated in favor of encrypt.format=aes)
++encrypt.format   Encrypt the image, format choices: 'aes'
+ cluster_size     qcow2 cluster size
+ preallocation    Preallocation mode (allowed values: off, metadata, falloc, full)
+ lazy_refcounts   Postpone refcount updates
+@@ -485,7 +509,8 @@ size             Virtual disk size
+ compat           Compatibility level (0.10 or 1.1)
+ backing_file     File name of a base image
+ backing_fmt      Image format of the base image
+-encryption       Encrypt the image
++encryption       Encrypt the image with format 'aes'. (Deprecated in favor of encrypt.format=aes)
++encrypt.format   Encrypt the image, format choices: 'aes'
+ cluster_size     qcow2 cluster size
+ preallocation    Preallocation mode (allowed values: off, metadata, falloc, full)
+ lazy_refcounts   Postpone refcount updates
+@@ -498,7 +523,8 @@ size             Virtual disk size
+ compat           Compatibility level (0.10 or 1.1)
+ backing_file     File name of a base image
+ backing_fmt      Image format of the base image
+-encryption       Encrypt the image
++encryption       Encrypt the image with format 'aes'. (Deprecated in favor of encrypt.format=aes)
++encrypt.format   Encrypt the image, format choices: 'aes'
+ cluster_size     qcow2 cluster size
+ preallocation    Preallocation mode (allowed values: off, metadata, falloc, full)
+ lazy_refcounts   Postpone refcount updates
+@@ -528,7 +554,8 @@ size             Virtual disk size
+ compat           Compatibility level (0.10 or 1.1)
+ backing_file     File name of a base image
+ backing_fmt      Image format of the base image
+-encryption       Encrypt the image
++encryption       Encrypt the image with format 'aes'. (Deprecated in favor of encrypt.format=aes)
++encrypt.format   Encrypt the image, format choices: 'aes'
+ cluster_size     qcow2 cluster size
+ preallocation    Preallocation mode (allowed values: off, metadata, falloc, full)
+ lazy_refcounts   Postpone refcount updates
 -- 
 2.9.3
