@@ -1,25 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59724)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59732)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1dGPQh-0003pK-QI
-	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 08:42:20 -0400
+	(envelope-from <paolo.bonzini@gmail.com>) id 1dGPQi-0003pf-3C
+	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 08:42:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1dGPQd-0005kc-7o
-	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 08:42:19 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:38276)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1dGPQc-0005kJ-W9
-	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 08:42:15 -0400
-From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Thu,  1 Jun 2017 16:41:42 +0400
-Message-Id: <20170601124143.10915-2-marcandre.lureau@redhat.com>
-In-Reply-To: <20170601124143.10915-1-marcandre.lureau@redhat.com>
-References: <20170601124143.10915-1-marcandre.lureau@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v2 2/2] qapi: add location comment for
- generated types
+	(envelope-from <paolo.bonzini@gmail.com>) id 1dGPQg-0005lg-Q6
+	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 08:42:20 -0400
+Received: from mail-wm0-x242.google.com ([2a00:1450:400c:c09::242]:33598)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
+	id 1dGPQg-0005lJ-H7
+	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 08:42:18 -0400
+Received: by mail-wm0-x242.google.com with SMTP id b84so11064453wmh.0
+	for <qemu-devel@nongnu.org>; Thu, 01 Jun 2017 05:42:18 -0700 (PDT)
+Received: from 640k.lan (94-39-157-43.adsl-ull.clienti.tiscali.it.
+	[94.39.157.43]) by smtp.gmail.com with ESMTPSA id
+	g46sm6271438wrg.69.2017.06.01.05.42.16 for <qemu-devel@nongnu.org>
+	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+	Thu, 01 Jun 2017 05:42:16 -0700 (PDT)
+Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Thu,  1 Jun 2017 14:41:37 +0200
+Message-Id: <1496320911-51305-20-git-send-email-pbonzini@redhat.com>
+In-Reply-To: <1496320911-51305-1-git-send-email-pbonzini@redhat.com>
+References: <1496320911-51305-1-git-send-email-pbonzini@redhat.com>
+Subject: [Qemu-devel] [PULL 19/33] target/i386: enable A20 automatically in
+ system management mode
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,134 +34,288 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, Markus Armbruster <armbru@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>
 
-This may help to find where the origin of the type was declared in the
-json (when greping isn't easy enough).
+Ignore env->a20_mask when running in system management mode.
 
-Generates the following kind of C comment before types:
-
-  /* /home/elmarco/src/qemu/qapi/introspect.json:94 */
-  typedef struct SchemaInfo SchemaInfo;
-
-Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Reported-by: Anthony Xu <anthony.xu@intel.com>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+Message-Id: <1494502528-12670-1-git-send-email-pbonzini@redhat.com>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- scripts/qapi.py       | 12 +++++++++---
- scripts/qapi-event.py |  2 +-
- scripts/qapi-types.py | 18 +++++++++---------
- 3 files changed, 19 insertions(+), 13 deletions(-)
+ target/i386/arch_memory_mapping.c | 18 +++++++++--------
+ target/i386/cpu.h                 |  9 +++++++++
+ target/i386/helper.c              | 42 +++++++++++++++++++++------------------
+ 3 files changed, 42 insertions(+), 27 deletions(-)
 
-diff --git a/scripts/qapi.py b/scripts/qapi.py
-index d37a6157e0..7f9935eec0 100644
---- a/scripts/qapi.py
-+++ b/scripts/qapi.py
-@@ -1852,15 +1852,21 @@ const char *const %(c_name)s_lookup[] =3D {
-     return ret
-=20
-=20
--def gen_enum(name, values, prefix=3DNone):
-+def build_src_loc_comment(info):
-+    if info:
-+        return '\n/* %s:%d */' % (info['file'], info['line'])
-+    else:
-+        return ''
+diff --git a/target/i386/arch_memory_mapping.c b/target/i386/arch_memory_mapping.c
+index 826aee5..647cff2 100644
+--- a/target/i386/arch_memory_mapping.c
++++ b/target/i386/arch_memory_mapping.c
+@@ -272,25 +272,27 @@ void x86_cpu_get_memory_mapping(CPUState *cs, MemoryMappingList *list,
+ {
+     X86CPU *cpu = X86_CPU(cs);
+     CPUX86State *env = &cpu->env;
++    int32_t a20_mask;
+ 
+     if (!cpu_paging_enabled(cs)) {
+         /* paging is disabled */
+         return;
+     }
+ 
++    a20_mask = x86_get_a20_mask(env);
+     if (env->cr[4] & CR4_PAE_MASK) {
+ #ifdef TARGET_X86_64
+         if (env->hflags & HF_LMA_MASK) {
+             if (env->cr[4] & CR4_LA57_MASK) {
+                 hwaddr pml5e_addr;
+ 
+-                pml5e_addr = (env->cr[3] & PLM4_ADDR_MASK) & env->a20_mask;
+-                walk_pml5e(list, cs->as, pml5e_addr, env->a20_mask);
++                pml5e_addr = (env->cr[3] & PLM4_ADDR_MASK) & a20_mask;
++                walk_pml5e(list, cs->as, pml5e_addr, a20_mask);
+             } else {
+                 hwaddr pml4e_addr;
+ 
+-                pml4e_addr = (env->cr[3] & PLM4_ADDR_MASK) & env->a20_mask;
+-                walk_pml4e(list, cs->as, pml4e_addr, env->a20_mask,
++                pml4e_addr = (env->cr[3] & PLM4_ADDR_MASK) & a20_mask;
++                walk_pml4e(list, cs->as, pml4e_addr, a20_mask,
+                         0xffffULL << 48);
+             }
+         } else
+@@ -298,16 +300,16 @@ void x86_cpu_get_memory_mapping(CPUState *cs, MemoryMappingList *list,
+         {
+             hwaddr pdpe_addr;
+ 
+-            pdpe_addr = (env->cr[3] & ~0x1f) & env->a20_mask;
+-            walk_pdpe2(list, cs->as, pdpe_addr, env->a20_mask);
++            pdpe_addr = (env->cr[3] & ~0x1f) & a20_mask;
++            walk_pdpe2(list, cs->as, pdpe_addr, a20_mask);
+         }
+     } else {
+         hwaddr pde_addr;
+         bool pse;
+ 
+-        pde_addr = (env->cr[3] & ~0xfff) & env->a20_mask;
++        pde_addr = (env->cr[3] & ~0xfff) & a20_mask;
+         pse = !!(env->cr[4] & CR4_PSE_MASK);
+-        walk_pde2(list, cs->as, pde_addr, env->a20_mask, pse);
++        walk_pde2(list, cs->as, pde_addr, a20_mask, pse);
+     }
+ }
+ 
+diff --git a/target/i386/cpu.h b/target/i386/cpu.h
+index c4602ca..32a3a0c 100644
+--- a/target/i386/cpu.h
++++ b/target/i386/cpu.h
+@@ -1624,6 +1624,15 @@ static inline MemTxAttrs cpu_get_mem_attrs(CPUX86State *env)
+     return ((MemTxAttrs) { .secure = (env->hflags & HF_SMM_MASK) != 0 });
+ }
+ 
++static inline int32_t x86_get_a20_mask(CPUX86State *env)
++{
++    if (env->hflags & HF_SMM_MASK) {
++        return -1;
++    } else {
++        return env->a20_mask;
++    }
++}
 +
-+def gen_enum(info, name, values, prefix=3DNone):
-     # append automatically generated _MAX value
-     enum_values =3D values + ['_MAX']
-=20
-     ret =3D mcgen('''
--
-+%(comment)s
- typedef enum %(c_name)s {
- ''',
--                c_name=3Dc_name(name))
-+                c_name=3Dc_name(name), comment=3Dbuild_src_loc_comment(i=
-nfo))
-=20
-     i =3D 0
-     for value in enum_values:
-diff --git a/scripts/qapi-event.py b/scripts/qapi-event.py
-index bcbef1035f..cf5e282011 100644
---- a/scripts/qapi-event.py
-+++ b/scripts/qapi-event.py
-@@ -159,7 +159,7 @@ class QAPISchemaGenEventVisitor(QAPISchemaVisitor):
-         self._event_names =3D []
-=20
-     def visit_end(self):
--        self.decl +=3D gen_enum(event_enum_name, self._event_names)
-+        self.decl +=3D gen_enum(None, event_enum_name, self._event_names=
-)
-         self.defn +=3D gen_enum_lookup(event_enum_name, self._event_name=
-s)
-         self._event_names =3D None
-=20
-diff --git a/scripts/qapi-types.py b/scripts/qapi-types.py
-index b45e7b5634..9c8a3e277b 100644
---- a/scripts/qapi-types.py
-+++ b/scripts/qapi-types.py
-@@ -19,12 +19,12 @@ from qapi import *
- objects_seen =3D set()
-=20
-=20
--def gen_fwd_object_or_array(name):
-+def gen_fwd_object_or_array(info, name):
-     return mcgen('''
--
-+%(comment)s
- typedef struct %(c_name)s %(c_name)s;
- ''',
--                 c_name=3Dc_name(name))
-+                 c_name=3Dc_name(name), comment=3Dbuild_src_loc_comment(=
-info))
-=20
-=20
- def gen_array(name, element_type):
-@@ -199,22 +199,22 @@ class QAPISchemaGenTypeVisitor(QAPISchemaVisitor):
-         # Special case for our lone builtin enum type
-         # TODO use something cleaner than existence of info
-         if not info:
--            self._btin +=3D gen_enum(name, values, prefix)
-+            self._btin +=3D gen_enum(None, name, values, prefix)
-             if do_builtins:
-                 self.defn +=3D gen_enum_lookup(name, values, prefix)
-         else:
--            self._fwdecl +=3D gen_enum(name, values, prefix)
-+            self._fwdecl +=3D gen_enum(info, name, values, prefix)
-             self.defn +=3D gen_enum_lookup(name, values, prefix)
-=20
-     def visit_array_type(self, name, info, element_type):
-         if isinstance(element_type, QAPISchemaBuiltinType):
--            self._btin +=3D gen_fwd_object_or_array(name)
-+            self._btin +=3D gen_fwd_object_or_array(None, name)
-             self._btin +=3D gen_array(name, element_type)
-             self._btin +=3D gen_type_cleanup_decl(name)
-             if do_builtins:
-                 self.defn +=3D gen_type_cleanup(name)
-         else:
--            self._fwdecl +=3D gen_fwd_object_or_array(name)
-+            self._fwdecl +=3D gen_fwd_object_or_array(info, name)
-             self.decl +=3D gen_array(name, element_type)
-             self._gen_type_cleanup(name)
-=20
-@@ -222,7 +222,7 @@ class QAPISchemaGenTypeVisitor(QAPISchemaVisitor):
-         # Nothing to do for the special empty builtin
-         if name =3D=3D 'q_empty':
-             return
--        self._fwdecl +=3D gen_fwd_object_or_array(name)
-+        self._fwdecl +=3D gen_fwd_object_or_array(info, name)
-         self.decl +=3D gen_object(name, base, members, variants)
-         if base and not base.is_implicit():
-             self.decl +=3D gen_upcast(name, base)
-@@ -233,7 +233,7 @@ class QAPISchemaGenTypeVisitor(QAPISchemaVisitor):
-             self._gen_type_cleanup(name)
-=20
-     def visit_alternate_type(self, name, info, variants):
--        self._fwdecl +=3D gen_fwd_object_or_array(name)
-+        self._fwdecl +=3D gen_fwd_object_or_array(info, name)
-         self.decl +=3D gen_object(name, None, [variants.tag_member], var=
-iants)
-         self._gen_type_cleanup(name)
-=20
---=20
-2.13.0.91.g00982b8dd
+ /* fpu_helper.c */
+ void cpu_set_mxcsr(CPUX86State *env, uint32_t val);
+ void cpu_set_fpuc(CPUX86State *env, uint16_t val);
+diff --git a/target/i386/helper.c b/target/i386/helper.c
+index f11cac6..6c16e7c 100644
+--- a/target/i386/helper.c
++++ b/target/i386/helper.c
+@@ -724,6 +724,7 @@ int x86_cpu_handle_mmu_fault(CPUState *cs, vaddr addr,
+     X86CPU *cpu = X86_CPU(cs);
+     CPUX86State *env = &cpu->env;
+     uint64_t ptep, pte;
++    int32_t a20_mask;
+     target_ulong pde_addr, pte_addr;
+     int error_code = 0;
+     int is_dirty, prot, page_size, is_write, is_user;
+@@ -739,6 +740,7 @@ int x86_cpu_handle_mmu_fault(CPUState *cs, vaddr addr,
+ #endif
+     is_write = is_write1 & 1;
+ 
++    a20_mask = x86_get_a20_mask(env);
+     if (!(env->cr[0] & CR0_PG_MASK)) {
+         pte = addr;
+ #ifdef TARGET_X86_64
+@@ -777,7 +779,7 @@ int x86_cpu_handle_mmu_fault(CPUState *cs, vaddr addr,
+ 
+             if (la57) {
+                 pml5e_addr = ((env->cr[3] & ~0xfff) +
+-                        (((addr >> 48) & 0x1ff) << 3)) & env->a20_mask;
++                        (((addr >> 48) & 0x1ff) << 3)) & a20_mask;
+                 pml5e = x86_ldq_phys(cs, pml5e_addr);
+                 if (!(pml5e & PG_PRESENT_MASK)) {
+                     goto do_fault;
+@@ -796,7 +798,7 @@ int x86_cpu_handle_mmu_fault(CPUState *cs, vaddr addr,
+             }
+ 
+             pml4e_addr = ((pml5e & PG_ADDRESS_MASK) +
+-                    (((addr >> 39) & 0x1ff) << 3)) & env->a20_mask;
++                    (((addr >> 39) & 0x1ff) << 3)) & a20_mask;
+             pml4e = x86_ldq_phys(cs, pml4e_addr);
+             if (!(pml4e & PG_PRESENT_MASK)) {
+                 goto do_fault;
+@@ -810,7 +812,7 @@ int x86_cpu_handle_mmu_fault(CPUState *cs, vaddr addr,
+             }
+             ptep &= pml4e ^ PG_NX_MASK;
+             pdpe_addr = ((pml4e & PG_ADDRESS_MASK) + (((addr >> 30) & 0x1ff) << 3)) &
+-                env->a20_mask;
++                a20_mask;
+             pdpe = x86_ldq_phys(cs, pdpe_addr);
+             if (!(pdpe & PG_PRESENT_MASK)) {
+                 goto do_fault;
+@@ -835,7 +837,7 @@ int x86_cpu_handle_mmu_fault(CPUState *cs, vaddr addr,
+         {
+             /* XXX: load them when cr3 is loaded ? */
+             pdpe_addr = ((env->cr[3] & ~0x1f) + ((addr >> 27) & 0x18)) &
+-                env->a20_mask;
++                a20_mask;
+             pdpe = x86_ldq_phys(cs, pdpe_addr);
+             if (!(pdpe & PG_PRESENT_MASK)) {
+                 goto do_fault;
+@@ -848,7 +850,7 @@ int x86_cpu_handle_mmu_fault(CPUState *cs, vaddr addr,
+         }
+ 
+         pde_addr = ((pdpe & PG_ADDRESS_MASK) + (((addr >> 21) & 0x1ff) << 3)) &
+-            env->a20_mask;
++            a20_mask;
+         pde = x86_ldq_phys(cs, pde_addr);
+         if (!(pde & PG_PRESENT_MASK)) {
+             goto do_fault;
+@@ -870,7 +872,7 @@ int x86_cpu_handle_mmu_fault(CPUState *cs, vaddr addr,
+             x86_stl_phys_notdirty(cs, pde_addr, pde);
+         }
+         pte_addr = ((pde & PG_ADDRESS_MASK) + (((addr >> 12) & 0x1ff) << 3)) &
+-            env->a20_mask;
++            a20_mask;
+         pte = x86_ldq_phys(cs, pte_addr);
+         if (!(pte & PG_PRESENT_MASK)) {
+             goto do_fault;
+@@ -886,7 +888,7 @@ int x86_cpu_handle_mmu_fault(CPUState *cs, vaddr addr,
+ 
+         /* page directory entry */
+         pde_addr = ((env->cr[3] & ~0xfff) + ((addr >> 20) & 0xffc)) &
+-            env->a20_mask;
++            a20_mask;
+         pde = x86_ldl_phys(cs, pde_addr);
+         if (!(pde & PG_PRESENT_MASK)) {
+             goto do_fault;
+@@ -913,7 +915,7 @@ int x86_cpu_handle_mmu_fault(CPUState *cs, vaddr addr,
+ 
+         /* page directory entry */
+         pte_addr = ((pde & ~0xfff) + ((addr >> 10) & 0xffc)) &
+-            env->a20_mask;
++            a20_mask;
+         pte = x86_ldl_phys(cs, pte_addr);
+         if (!(pte & PG_PRESENT_MASK)) {
+             goto do_fault;
+@@ -992,7 +994,7 @@ do_check_protect_pse36:
+     }
+ 
+  do_mapping:
+-    pte = pte & env->a20_mask;
++    pte = pte & a20_mask;
+ 
+     /* align to page_size */
+     pte &= PG_ADDRESS_MASK & ~(page_size - 1);
+@@ -1039,11 +1041,13 @@ hwaddr x86_cpu_get_phys_page_debug(CPUState *cs, vaddr addr)
+     CPUX86State *env = &cpu->env;
+     target_ulong pde_addr, pte_addr;
+     uint64_t pte;
++    int32_t a20_mask;
+     uint32_t page_offset;
+     int page_size;
+ 
++    a20_mask = x86_get_a20_mask(env);
+     if (!(env->cr[0] & CR0_PG_MASK)) {
+-        pte = addr & env->a20_mask;
++        pte = addr & a20_mask;
+         page_size = 4096;
+     } else if (env->cr[4] & CR4_PAE_MASK) {
+         target_ulong pdpe_addr;
+@@ -1064,7 +1068,7 @@ hwaddr x86_cpu_get_phys_page_debug(CPUState *cs, vaddr addr)
+ 
+             if (la57) {
+                 pml5e_addr = ((env->cr[3] & ~0xfff) +
+-                        (((addr >> 48) & 0x1ff) << 3)) & env->a20_mask;
++                        (((addr >> 48) & 0x1ff) << 3)) & a20_mask;
+                 pml5e = x86_ldq_phys(cs, pml5e_addr);
+                 if (!(pml5e & PG_PRESENT_MASK)) {
+                     return -1;
+@@ -1074,13 +1078,13 @@ hwaddr x86_cpu_get_phys_page_debug(CPUState *cs, vaddr addr)
+             }
+ 
+             pml4e_addr = ((pml5e & PG_ADDRESS_MASK) +
+-                    (((addr >> 39) & 0x1ff) << 3)) & env->a20_mask;
++                    (((addr >> 39) & 0x1ff) << 3)) & a20_mask;
+             pml4e = x86_ldq_phys(cs, pml4e_addr);
+             if (!(pml4e & PG_PRESENT_MASK)) {
+                 return -1;
+             }
+             pdpe_addr = ((pml4e & PG_ADDRESS_MASK) +
+-                         (((addr >> 30) & 0x1ff) << 3)) & env->a20_mask;
++                         (((addr >> 30) & 0x1ff) << 3)) & a20_mask;
+             pdpe = x86_ldq_phys(cs, pdpe_addr);
+             if (!(pdpe & PG_PRESENT_MASK)) {
+                 return -1;
+@@ -1095,14 +1099,14 @@ hwaddr x86_cpu_get_phys_page_debug(CPUState *cs, vaddr addr)
+ #endif
+         {
+             pdpe_addr = ((env->cr[3] & ~0x1f) + ((addr >> 27) & 0x18)) &
+-                env->a20_mask;
++                a20_mask;
+             pdpe = x86_ldq_phys(cs, pdpe_addr);
+             if (!(pdpe & PG_PRESENT_MASK))
+                 return -1;
+         }
+ 
+         pde_addr = ((pdpe & PG_ADDRESS_MASK) +
+-                    (((addr >> 21) & 0x1ff) << 3)) & env->a20_mask;
++                    (((addr >> 21) & 0x1ff) << 3)) & a20_mask;
+         pde = x86_ldq_phys(cs, pde_addr);
+         if (!(pde & PG_PRESENT_MASK)) {
+             return -1;
+@@ -1114,7 +1118,7 @@ hwaddr x86_cpu_get_phys_page_debug(CPUState *cs, vaddr addr)
+         } else {
+             /* 4 KB page */
+             pte_addr = ((pde & PG_ADDRESS_MASK) +
+-                        (((addr >> 12) & 0x1ff) << 3)) & env->a20_mask;
++                        (((addr >> 12) & 0x1ff) << 3)) & a20_mask;
+             page_size = 4096;
+             pte = x86_ldq_phys(cs, pte_addr);
+         }
+@@ -1125,7 +1129,7 @@ hwaddr x86_cpu_get_phys_page_debug(CPUState *cs, vaddr addr)
+         uint32_t pde;
+ 
+         /* page directory entry */
+-        pde_addr = ((env->cr[3] & ~0xfff) + ((addr >> 20) & 0xffc)) & env->a20_mask;
++        pde_addr = ((env->cr[3] & ~0xfff) + ((addr >> 20) & 0xffc)) & a20_mask;
+         pde = x86_ldl_phys(cs, pde_addr);
+         if (!(pde & PG_PRESENT_MASK))
+             return -1;
+@@ -1134,14 +1138,14 @@ hwaddr x86_cpu_get_phys_page_debug(CPUState *cs, vaddr addr)
+             page_size = 4096 * 1024;
+         } else {
+             /* page directory entry */
+-            pte_addr = ((pde & ~0xfff) + ((addr >> 10) & 0xffc)) & env->a20_mask;
++            pte_addr = ((pde & ~0xfff) + ((addr >> 10) & 0xffc)) & a20_mask;
+             pte = x86_ldl_phys(cs, pte_addr);
+             if (!(pte & PG_PRESENT_MASK)) {
+                 return -1;
+             }
+             page_size = 4096;
+         }
+-        pte = pte & env->a20_mask;
++        pte = pte & a20_mask;
+     }
+ 
+ #ifdef TARGET_X86_64
+-- 
+1.8.3.1
