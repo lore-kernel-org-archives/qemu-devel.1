@@ -1,38 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36993)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37655)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcel@redhat.com>) id 1dGLS6-0007Ui-6p
-	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 04:27:31 -0400
+	(envelope-from <berrange@redhat.com>) id 1dGLUP-00087T-0W
+	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 04:29:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcel@redhat.com>) id 1dGLS1-000891-8V
-	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 04:27:30 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:42970)
+	(envelope-from <berrange@redhat.com>) id 1dGLUM-0001Az-F6
+	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 04:29:53 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:44150)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <marcel@redhat.com>) id 1dGLS1-00088Y-2h
-	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 04:27:25 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id E74BB804EB
-	for <qemu-devel@nongnu.org>; Thu,  1 Jun 2017 08:27:23 +0000 (UTC)
-References: <1494854073-19898-1-git-send-email-peterx@redhat.com>
-	<87d1ar504h.fsf@dusky.pond.sub.org>
-	<13985c6d-d24a-ac50-2708-fc3b9cc64acd@redhat.com>
-	<87h902l8qd.fsf@dusky.pond.sub.org>
-	<6a6a91cc-7ea1-2b45-a4bd-31aa3cfef917@redhat.com>
-	<20170531070346.GE14845@pxdev.xzpeter.org>
-	<1633113774.3648008.1496216414543.JavaMail.zimbra@redhat.com>
-	<20170531082651.GJ14845@pxdev.xzpeter.org>
-	<1013114653.3661277.1496219327691.JavaMail.zimbra@redhat.com>
-From: Marcel Apfelbaum <marcel@redhat.com>
-Message-ID: <2c763ebf-d11e-f414-a2cf-f7117ea6d4fb@redhat.com>
-Date: Thu, 1 Jun 2017 11:27:24 +0300
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1dGLUM-0001AT-6b
+	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 04:29:50 -0400
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Date: Thu,  1 Jun 2017 09:29:31 +0100
+Message-Id: <20170601082935.19993-2-berrange@redhat.com>
+In-Reply-To: <20170601082935.19993-1-berrange@redhat.com>
+References: <20170601082935.19993-1-berrange@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <1013114653.3661277.1496219327691.JavaMail.zimbra@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH] msi: remove return code for msi_init()
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v3 1/5] sockets: ensure we can bind to both
+ ipv4 & ipv6 separately
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -41,43 +27,100 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, Peter Xu <peterx@redhat.com>
-Cc: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org, "Michael S . Tsirkin" <mst@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Eric Blake <eblake@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>
 
+When binding to an IPv6 socket we currently force the
+IPV6_V6ONLY flag to off. This means that the IPv6 socket
+will accept both IPv4 & IPv6 sockets when QEMU is launched
+with something like
 
+  -vnc :::1
 
-On 31/05/2017 11:28, Paolo Bonzini wrote:
->> Ok before I move on let's see whether this is what we want...
->>
->> - firstly, find all machine types:
->>
->>    pxdev:qemu [edu-fix]# grep -R ".parent = TYPE_MACHINE" * | wc
->>       49     196    2269
->>
->>    so now we have 49 kinds of machines.
->>
->> - rename msi_nonbroken into msi_broken, then:
->>
->>    - x86/arm/spapr/s390 machines are the only ones that don't need to
->>      set msi_broken since they support MSI and have msi_nonbroken set,
->>      either in board init function or in irq chip init function
->>
->>    - for all the rest of the machines, I should add "msi_broken" in its
->>      machine init() function.
->>
->> Is this really what we want?
-> No, for now I'd rather just go and remove msi_nonbroken.  When someone
-> reports a bug, we can add back "msi_broken".
+While this is good for that case, it is bad for other
+cases. For example if an empty hostname is given,
+getaddrinfo resolves it to 2 addresses 0.0.0.0 and ::,
+in that order. We will thus bind to 0.0.0.0 first, and
+then fail to bind to :: on the same port. The same
+problem can happen if any other hostname lookup causes
+the IPv4 address to be reported before the IPv6 address.
 
-Hi,
-I agree with the direction, but I am concerned msi_nonbroken is there 
-for a reason.
-We might break some (obscure/not in use) machine.
-Maybe we should CC all arch machine maintainers/contributors to give 
-them a chance
-to object...
+When we get an IPv6 bind failure, we should re-try the
+same port, but with IPV6_V6ONLY turned on again, to
+avoid clash with any IPv4 listener.
 
-Thanks,
-Marcel
+This ensures that
 
-> Paolo
+  -vnc :1
+
+will bind successfully to both 0.0.0.0 and ::, and also
+avoid
+
+  -vnc :1,to=3D2
+
+from mistakenly using a 2nd port for the :: listener.
+
+Reviewed-by: Eric Blake <eblake@redhat.com>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
+---
+ util/qemu-sockets.c | 31 +++++++++++++++++++++++--------
+ 1 file changed, 23 insertions(+), 8 deletions(-)
+
+diff --git a/util/qemu-sockets.c b/util/qemu-sockets.c
+index b39ae74..8720097 100644
+--- a/util/qemu-sockets.c
++++ b/util/qemu-sockets.c
+@@ -208,22 +208,37 @@ static int inet_listen_saddr(InetSocketAddress *sad=
+dr,
+         }
+=20
+         socket_set_fast_reuse(slisten);
+-#ifdef IPV6_V6ONLY
+-        if (e->ai_family =3D=3D PF_INET6) {
+-            /* listen on both ipv4 and ipv6 */
+-            const int off =3D 0;
+-            qemu_setsockopt(slisten, IPPROTO_IPV6, IPV6_V6ONLY, &off,
+-                            sizeof(off));
+-        }
+-#endif
+=20
+         port_min =3D inet_getport(e);
+         port_max =3D saddr->has_to ? saddr->to + port_offset : port_min;
+         for (p =3D port_min; p <=3D port_max; p++) {
++#ifdef IPV6_V6ONLY
++            /* listen on both ipv4 and ipv6 */
++            int v6only =3D 0;
++#endif
+             inet_setport(e, p);
++#ifdef IPV6_V6ONLY
++        rebind:
++            if (e->ai_family =3D=3D PF_INET6) {
++                qemu_setsockopt(slisten, IPPROTO_IPV6, IPV6_V6ONLY, &v6o=
+nly,
++                                sizeof(v6only));
++            }
++#endif
+             if (bind(slisten, e->ai_addr, e->ai_addrlen) =3D=3D 0) {
+                 goto listen;
+             }
++
++#ifdef IPV6_V6ONLY
++            /* If we got EADDRINUSE from an IPv6 bind & V6ONLY is unset,
++             * it could be that the IPv4 port is already claimed, so ret=
+ry
++             * with V6ONLY set
++             */
++            if (e->ai_family =3D=3D PF_INET6 && errno =3D=3D EADDRINUSE =
+&& !v6only) {
++                v6only =3D 1;
++                goto rebind;
++            }
++#endif
++
+             if (p =3D=3D port_max) {
+                 if (!e->ai_next) {
+                     error_setg_errno(errp, errno, "Failed to bind socket=
+");
+--=20
+2.9.3
