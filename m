@@ -1,26 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46808)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52556)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1dGQ7P-0003P0-7D
-	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 09:26:28 -0400
+	(envelope-from <lvivier@redhat.com>) id 1dGQHO-0006qJ-6C
+	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 09:36:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1dGQ7O-0008Si-9u
-	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 09:26:27 -0400
-Date: Thu, 1 Jun 2017 14:26:16 +0100
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20170601132616.GB23154@stefanha-x1.localdomain>
-References: <20170419094356.19826-1-famz@redhat.com>
-	<20170419094356.19826-7-famz@redhat.com>
-	<20170511194100.GI24584@stefanha-x1.localdomain>
-	<20170524021844.GG12279@lemon.lan>
-	<20170531093921.GA15666@stefanha-x1.localdomain>
-	<20170531095746.GC6170@lemon.lan>
+	(envelope-from <lvivier@redhat.com>) id 1dGQHJ-0004GR-Da
+	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 09:36:46 -0400
+References: <20170601015218.9299-1-david@gibson.dropbear.id.au>
+	<20170601015218.9299-2-david@gibson.dropbear.id.au>
+From: Laurent Vivier <lvivier@redhat.com>
+Message-ID: <20e745b0-a1ed-8be4-d587-377b4b7610b1@redhat.com>
+Date: Thu, 1 Jun 2017 15:36:36 +0200
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="8P1HSweYDcXXzwPJ"
-Content-Disposition: inline
-In-Reply-To: <20170531095746.GC6170@lemon.lan>
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v2 06/16] backup: Request
- BLK_PERM_AIO_CONTEXT_CHANGE on target
+In-Reply-To: <20170601015218.9299-2-david@gibson.dropbear.id.au>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 1/4] spapr: Move DRC RTAS calls into
+ spapr_drc.c
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,97 +25,244 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>
-Cc: Stefan Hajnoczi <stefanha@gmail.com>, qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
+To: David Gibson <david@gibson.dropbear.id.au>, mdroth@linux.vnet.ibm.com
+Cc: nikunj@linux.vnet.ibm.com, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, bharata@linux.vnet.ibm.com, sursingh@redhat.com
+
+On 01/06/2017 03:52, David Gibson wrote:
+> Currently implementations of the RTAS calls related to DRCs are in
+> spapr_rtas.c.  They belong better in spapr_drc.c - that way they're closer
+> to related code, and we'll be able to make some more things local.
+> 
+> spapr_rtas.c was intended to contain the RTAS infrastructure and core calls
+> that don't belong anywhere else, not every RTAS implementation.
+> 
+> Code motion only.
+> 
+> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+> ---
+>  hw/ppc/spapr_drc.c  | 322 ++++++++++++++++++++++++++++++++++++++++++++++++++--
+>  hw/ppc/spapr_rtas.c | 304 -------------------------------------------------
+>  2 files changed, 315 insertions(+), 311 deletions(-)
+> 
+> diff --git a/hw/ppc/spapr_drc.c b/hw/ppc/spapr_drc.c
+> index cc2400b..ae8800d 100644
+> --- a/hw/ppc/spapr_drc.c
+> +++ b/hw/ppc/spapr_drc.c
+> @@ -27,6 +27,34 @@
+>  #define DRC_INDEX_TYPE_SHIFT 28
+>  #define DRC_INDEX_ID_MASK ((1ULL << DRC_INDEX_TYPE_SHIFT) - 1)
+>  
+> +static sPAPRConfigureConnectorState *spapr_ccs_find(sPAPRMachineState *spapr,
+> +                                                    uint32_t drc_index)
+> +{
+> +    sPAPRConfigureConnectorState *ccs = NULL;
+> +
+> +    QTAILQ_FOREACH(ccs, &spapr->ccs_list, next) {
+> +        if (ccs->drc_index == drc_index) {
+> +            break;
+> +        }
+> +    }
+> +
+> +    return ccs;
+> +}
+> +
+> +static void spapr_ccs_add(sPAPRMachineState *spapr,
+> +                          sPAPRConfigureConnectorState *ccs)
+> +{
+> +    g_assert(!spapr_ccs_find(spapr, ccs->drc_index));
+> +    QTAILQ_INSERT_HEAD(&spapr->ccs_list, ccs, next);
+> +}
+> +
+> +static void spapr_ccs_remove(sPAPRMachineState *spapr,
+> +                             sPAPRConfigureConnectorState *ccs)
+> +{
+> +    QTAILQ_REMOVE(&spapr->ccs_list, ccs, next);
+> +    g_free(ccs);
+> +}
+> +
+>  static sPAPRDRConnectorTypeShift get_type_shift(sPAPRDRConnectorType type)
+>  {
+>      uint32_t shift = 0;
+> @@ -747,13 +775,6 @@ static const TypeInfo spapr_dr_connector_info = {
+>      .class_init    = spapr_dr_connector_class_init,
+>  };
+>  
+> -static void spapr_drc_register_types(void)
+> -{
+> -    type_register_static(&spapr_dr_connector_info);
+> -}
+> -
+> -type_init(spapr_drc_register_types)
+> -
+>  /* helper functions for external users */
+>  
+>  sPAPRDRConnector *spapr_dr_connector_by_index(uint32_t index)
+> @@ -932,3 +953,290 @@ out:
+>  
+>      return ret;
+>  }
+> +
+> +/*
+> + * RTAS calls
+> + */
+> +
+> +static bool sensor_type_is_dr(uint32_t sensor_type)
+> +{
+> +    switch (sensor_type) {
+> +    case RTAS_SENSOR_TYPE_ISOLATION_STATE:
+> +    case RTAS_SENSOR_TYPE_DR:
+> +    case RTAS_SENSOR_TYPE_ALLOCATION_STATE:
+> +        return true;
+> +    }
+> +
+> +    return false;
+> +}
+> +
+> +static void rtas_set_indicator(PowerPCCPU *cpu, sPAPRMachineState *spapr,
+> +                               uint32_t token, uint32_t nargs,
+> +                               target_ulong args, uint32_t nret,
+> +                               target_ulong rets)
+> +{
+> +    uint32_t sensor_type;
+> +    uint32_t sensor_index;
+> +    uint32_t sensor_state;
+> +    uint32_t ret = RTAS_OUT_SUCCESS;
+> +    sPAPRDRConnector *drc;
+> +    sPAPRDRConnectorClass *drck;
+> +
+> +    if (nargs != 3 || nret != 1) {
+> +        ret = RTAS_OUT_PARAM_ERROR;
+> +        goto out;
+> +    }
+> +
+> +    sensor_type = rtas_ld(args, 0);
+> +    sensor_index = rtas_ld(args, 1);
+> +    sensor_state = rtas_ld(args, 2);
+> +
+> +    if (!sensor_type_is_dr(sensor_type)) {
+> +        goto out_unimplemented;
+> +    }
+> +
+> +    /* if this is a DR sensor we can assume sensor_index == drc_index */
+> +    drc = spapr_dr_connector_by_index(sensor_index);
+> +    if (!drc) {
+> +        trace_spapr_rtas_set_indicator_invalid(sensor_index);
+> +        ret = RTAS_OUT_PARAM_ERROR;
+> +        goto out;
+> +    }
+> +    drck = SPAPR_DR_CONNECTOR_GET_CLASS(drc);
+> +
+> +    switch (sensor_type) {
+> +    case RTAS_SENSOR_TYPE_ISOLATION_STATE:
+> +        /* if the guest is configuring a device attached to this
+> +         * DRC, we should reset the configuration state at this
+> +         * point since it may no longer be reliable (guest released
+> +         * device and needs to start over, or unplug occurred so
+> +         * the FDT is no longer valid)
+> +         */
+> +        if (sensor_state == SPAPR_DR_ISOLATION_STATE_ISOLATED) {
+> +            sPAPRConfigureConnectorState *ccs = spapr_ccs_find(spapr,
+> +                                                               sensor_index);
+> +            if (ccs) {
+> +                spapr_ccs_remove(spapr, ccs);
+> +            }
+> +        }
+> +        ret = drck->set_isolation_state(drc, sensor_state);
+> +        break;
+> +    case RTAS_SENSOR_TYPE_DR:
+> +        ret = drck->set_indicator_state(drc, sensor_state);
+> +        break;
+> +    case RTAS_SENSOR_TYPE_ALLOCATION_STATE:
+> +        ret = drck->set_allocation_state(drc, sensor_state);
+> +        break;
+> +    default:
+> +        goto out_unimplemented;
+> +    }
+> +
+> +out:
+> +    rtas_st(rets, 0, ret);
+> +    return;
+> +
+> +out_unimplemented:
+> +    /* currently only DR-related sensors are implemented */
+> +    trace_spapr_rtas_set_indicator_not_supported(sensor_index, sensor_type);
+> +    rtas_st(rets, 0, RTAS_OUT_NOT_SUPPORTED);
+> +}
+> +
+> +static void rtas_get_sensor_state(PowerPCCPU *cpu, sPAPRMachineState *spapr,
+> +                                  uint32_t token, uint32_t nargs,
+> +                                  target_ulong args, uint32_t nret,
+> +                                  target_ulong rets)
+> +{
+> +    uint32_t sensor_type;
+> +    uint32_t sensor_index;
+> +    uint32_t sensor_state = 0;
+> +    sPAPRDRConnector *drc;
+> +    sPAPRDRConnectorClass *drck;
+> +    uint32_t ret = RTAS_OUT_SUCCESS;
+> +
+> +    if (nargs != 2 || nret != 2) {
+> +        ret = RTAS_OUT_PARAM_ERROR;
+> +        goto out;
+> +    }
+> +
+> +    sensor_type = rtas_ld(args, 0);
+> +    sensor_index = rtas_ld(args, 1);
+> +
+> +    if (sensor_type != RTAS_SENSOR_TYPE_ENTITY_SENSE) {
+> +        /* currently only DR-related sensors are implemented */
+> +        trace_spapr_rtas_get_sensor_state_not_supported(sensor_index,
+> +                                                        sensor_type);
+> +        ret = RTAS_OUT_NOT_SUPPORTED;
+> +        goto out;
+> +    }
+> +
+> +    drc = spapr_dr_connector_by_index(sensor_index);
+> +    if (!drc) {
+> +        trace_spapr_rtas_get_sensor_state_invalid(sensor_index);
+> +        ret = RTAS_OUT_PARAM_ERROR;
+> +        goto out;
+> +    }
+> +    drck = SPAPR_DR_CONNECTOR_GET_CLASS(drc);
+> +    ret = drck->entity_sense(drc, &sensor_state);
+> +
+> +out:
+> +    rtas_st(rets, 0, ret);
+> +    rtas_st(rets, 1, sensor_state);
+> +}
+> +
+> +/* configure-connector work area offsets, int32_t units for field
+> + * indexes, bytes for field offset/len values.
+> + *
+> + * as documented by PAPR+ v2.7, 13.5.3.5
+> + */
+> +#define CC_IDX_NODE_NAME_OFFSET 2
+> +#define CC_IDX_PROP_NAME_OFFSET 2
+> +#define CC_IDX_PROP_LEN 3
+> +#define CC_IDX_PROP_DATA_OFFSET 4
+> +#define CC_VAL_DATA_OFFSET ((CC_IDX_PROP_DATA_OFFSET + 1) * 4)
+> +#define CC_WA_LEN 4096
+> +
+> +static void configure_connector_st(target_ulong addr, target_ulong offset,
+> +                                   const void *buf, size_t len)
+> +{
+> +    cpu_physical_memory_write(ppc64_phys_to_real(addr + offset),
+> +                              buf, MIN(len, CC_WA_LEN - offset));
+> +}
+> +
+> +void spapr_ccs_reset_hook(void *opaque)
+> +{
+> +    sPAPRMachineState *spapr = opaque;
+> +    sPAPRConfigureConnectorState *ccs, *ccs_tmp;
+> +
+> +    QTAILQ_FOREACH_SAFE(ccs, &spapr->ccs_list, next, ccs_tmp) {
+> +        spapr_ccs_remove(spapr, ccs);
+> +    }
+> +}
 
 
---8P1HSweYDcXXzwPJ
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Why do you move this function in the middle of the "RTAS calls" whereas
+previously it was with spapr_ccs_find(), spapr_ccs_add() and
+spapr_ccs_remove() and it is only used by a reset handler in spapr.c?
 
-On Wed, May 31, 2017 at 05:57:46PM +0800, Fam Zheng wrote:
-> On Wed, 05/31 10:39, Stefan Hajnoczi wrote:
-> > On Wed, May 24, 2017 at 10:18:44AM +0800, Fam Zheng wrote:
-> > > On Thu, 05/11 15:41, Stefan Hajnoczi wrote:
-> > > > On Wed, Apr 19, 2017 at 05:43:46PM +0800, Fam Zheng wrote:
-> > > > > What's done in the source's context change notifier is moving the
-> > > > > target's context to follow the new one, so we request this permis=
-sion
-> > > > > here.
-> > > >=20
-> > > > It's true that the backup block job must be able to set target's
-> > > > AioContext, but does this change also allow other users to set targ=
-et's
-> > > > AioContext while the backup job is running?  If yes, then we need to
-> > > > handle that.
-> > >=20
-> > > If through job->target, yes, but I don't think there is any user of j=
-ob->target.
-> > > Otherwise, it's not allowed, because the second parameter of blk_new =
-doesn't
-> > > have BLK_PERM_AIO_CONTEXT_CHANGE.
-> > >=20
-> > > So it's okay.
-> >=20
-> > What about blockdev-backup?  It allows the user to specify 'target'.
-> > Therefore the user can also run other monitor commands on target.  Some
-> > of them could change the AioContext and the backup job wouldn't know!
->=20
-> That will be rejected.
->=20
-> The contract is that any code that wants to change the AioContext of a BD=
-S, in
-> this case the "target BDS", must do this:
->=20
-> 1) create its own BB with perm.BLK_PERM_AIO_CONTEXT_CHANGE
->=20
-> 2) attach BDS to this BB
->=20
-> 3) call blk_set_aio_context and change the AioContext
->=20
-> This is basically how all users of a BDS coordinate through Kevin's new op
-> blocker API, and in your concerned case, when a user runs a second monitor
-> command that changes AioContext, step 2 will fail, because as in this pat=
-ch, the
-> first job->target BB didn't set shared_perm.BLK_PERM_AIO_CONTEXT_CHANGE.
-
-I was wondering how that works since do_blockdev_backup() does not use
-BB to access target, but it does check whether a BB is already attached:
-
-    target_bs =3D bdrv_lookup_bs(backup->target, backup->target, errp);
-    if (!target_bs) {
-        goto out;
-    }
-
-    if (bdrv_get_aio_context(target_bs) !=3D aio_context) {
-        if (!bdrv_has_blk(target_bs)) {   <----- fails when job is running
-            /* The target BDS is not attached, we can safely move it to ano=
-ther
-             * AioContext. */
-            bdrv_set_aio_context(target_bs, aio_context);
-        } else {
-            error_setg(errp, "Target is attached to a different thread from=
- "
-                             "source.");
-            goto out;
-        }
-    }
-
-Thanks!
-
---8P1HSweYDcXXzwPJ
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJZMBX4AAoJEJykq7OBq3PIg9sH/jGHmLT8b5Zzm0ChtOF8pWQ0
-HNPDeG/+I1NhZVJGyLjOvrwgh80DE+pjeMe4siRAkuz5VwMdBaMSaVsJSkmwZsFd
-aU+qE6SAUgRzarPLK70E7eboxd5G7/bURl3o09Ckv8TRsjWVsF2OrPhPdp+Bv90l
-AUgvsdsunE8KFx8Ps9XHnI1zc5ThlZ4xulWE14HgOpGmWIBVZ75BHPD85d+9oQKl
-hUUHw8SDxcP4nyzx2HgD1lY30yv7Jy0+p9QSIMqvjt9Q0dLCO9iOqEhPreWRV9V2
-Hv2QP/MegdbEz53vLI7rWfpMhUhNNcZM/04DZ+GThNJYFHfGon13ZLcMS79oecI=
-=qWBM
------END PGP SIGNATURE-----
-
---8P1HSweYDcXXzwPJ--
+Laurent
