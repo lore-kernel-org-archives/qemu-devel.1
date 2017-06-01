@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59560)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59509)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1dGPQS-0003NK-Qd
-	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 08:42:05 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1dGPQR-0005ha-Rb
+	(envelope-from <paolo.bonzini@gmail.com>) id 1dGPQR-0003MV-GZ
 	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 08:42:04 -0400
-Received: from mail-wm0-x243.google.com ([2a00:1450:400c:c09::243]:36263)
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1dGPQN-0005fP-OR
+	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 08:42:03 -0400
+Received: from mail-wm0-x241.google.com ([2a00:1450:400c:c09::241]:34093)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1dGPQR-0005gu-Jz
-	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 08:42:03 -0400
-Received: by mail-wm0-x243.google.com with SMTP id k15so11048712wmh.3
-	for <qemu-devel@nongnu.org>; Thu, 01 Jun 2017 05:42:03 -0700 (PDT)
+	id 1dGPQN-0005f7-I6
+	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 08:41:59 -0400
+Received: by mail-wm0-x241.google.com with SMTP id d127so11018716wmf.1
+	for <qemu-devel@nongnu.org>; Thu, 01 Jun 2017 05:41:59 -0700 (PDT)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Thu,  1 Jun 2017 14:41:25 +0200
-Message-Id: <1496320911-51305-8-git-send-email-pbonzini@redhat.com>
+Date: Thu,  1 Jun 2017 14:41:21 +0200
+Message-Id: <1496320911-51305-4-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1496320911-51305-1-git-send-email-pbonzini@redhat.com>
 References: <1496320911-51305-1-git-send-email-pbonzini@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 07/33] msix: trace control bit write op
+Subject: [Qemu-devel] [PULL 03/33] mc146818rtc: ensure LOST_TICK_POLICY_SLEW
+ is only enabled on TARGET_I386
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,71 +29,50 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Peter Xu <peterx@redhat.com>
+Cc: Xiao Guangrong <xiaoguangrong@tencent.com>
 
-From: Peter Xu <peterx@redhat.com>
+From: Xiao Guangrong <xiaoguangrong@tencent.com>
 
-Meanwhile, abstract a function to detect msix masked bit.
+Any tick policy specified on other platforms rather on TARGET_I386
+will fall back to LOST_TICK_POLICY_DISCARD silently, this patch makes
+sure only TARGET_I386 can enable LOST_TICK_POLICY_SLEW
 
-Signed-off-by: Peter Xu <peterx@redhat.com>
-Message-Id: <1494309644-18743-3-git-send-email-peterx@redhat.com>
-Acked-by: Michael S. Tsirkin <mst@redhat.com>
-Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+After that, we can enable LOST_TICK_POLICY_SLEW in the common code
+which need not use '#ifdef TARGET_I386' to make these code be x86
+specific anymore
+
+Signed-off-by: Xiao Guangrong <xiaoguangrong@tencent.com>
+Message-Id: <20170510083259.3900-4-xiaoguangrong@tencent.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- hw/pci/msix.c       | 11 +++++++++--
- hw/pci/trace-events |  3 +++
- 2 files changed, 12 insertions(+), 2 deletions(-)
+ hw/timer/mc146818rtc.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/hw/pci/msix.c b/hw/pci/msix.c
-index bb54e8b..fc5fe51 100644
---- a/hw/pci/msix.c
-+++ b/hw/pci/msix.c
-@@ -22,6 +22,7 @@
- #include "hw/xen/xen.h"
- #include "qemu/range.h"
- #include "qapi/error.h"
-+#include "trace.h"
+diff --git a/hw/timer/mc146818rtc.c b/hw/timer/mc146818rtc.c
+index aeb60cc..4870a72 100644
+--- a/hw/timer/mc146818rtc.c
++++ b/hw/timer/mc146818rtc.c
+@@ -974,19 +974,19 @@ static void rtc_realizefn(DeviceState *dev, Error **errp)
  
- #define MSIX_CAP_LENGTH 12
+     rtc_set_date_from_host(isadev);
  
-@@ -130,10 +131,14 @@ static void msix_handle_mask_update(PCIDevice *dev, int vector, bool was_masked)
-     }
- }
- 
-+static bool msix_masked(PCIDevice *dev)
-+{
-+    return dev->config[dev->msix_cap + MSIX_CONTROL_OFFSET] & MSIX_MASKALL_MASK;
-+}
-+
- static void msix_update_function_masked(PCIDevice *dev)
- {
--    dev->msix_function_masked = !msix_enabled(dev) ||
--        (dev->config[dev->msix_cap + MSIX_CONTROL_OFFSET] & MSIX_MASKALL_MASK);
-+    dev->msix_function_masked = !msix_enabled(dev) || msix_masked(dev);
- }
- 
- /* Handle MSI-X capability config write. */
-@@ -148,6 +153,8 @@ void msix_write_config(PCIDevice *dev, uint32_t addr,
+-#ifdef TARGET_I386
+     switch (s->lost_tick_policy) {
++#ifdef TARGET_I386
+     case LOST_TICK_POLICY_SLEW:
+         s->coalesced_timer =
+             timer_new_ns(rtc_clock, rtc_coalesced_timer, s);
+         break;
++#endif
+     case LOST_TICK_POLICY_DISCARD:
+         break;
+     default:
+         error_setg(errp, "Invalid lost tick policy.");
          return;
      }
+-#endif
  
-+    trace_msix_write_config(dev->name, msix_enabled(dev), msix_masked(dev));
-+
-     was_masked = dev->msix_function_masked;
-     msix_update_function_masked(dev);
- 
-diff --git a/hw/pci/trace-events b/hw/pci/trace-events
-index 2b9cf24..83c8f5a 100644
---- a/hw/pci/trace-events
-+++ b/hw/pci/trace-events
-@@ -7,3 +7,6 @@ pci_update_mappings_add(void *d, uint32_t bus, uint32_t slot, uint32_t func, int
- # hw/pci/pci_host.c
- pci_cfg_read(const char *dev, unsigned devid, unsigned fnid, unsigned offs, unsigned val) "%s %02u:%u @0x%x -> 0x%x"
- pci_cfg_write(const char *dev, unsigned devid, unsigned fnid, unsigned offs, unsigned val) "%s %02u:%u @0x%x <- 0x%x"
-+
-+# hw/pci/msix.c
-+msix_write_config(char *name, bool enabled, bool masked) "dev %s enabled %d masked %d"
+     s->periodic_timer = timer_new_ns(rtc_clock, rtc_periodic_timer, s);
+     s->update_timer = timer_new_ns(rtc_clock, rtc_update_timer, s);
 -- 
 1.8.3.1
