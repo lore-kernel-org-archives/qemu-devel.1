@@ -1,20 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43256)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43956)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dGRNL-0002xi-UI
-	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 10:47:03 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1dGRPM-0004Xq-5H
+	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 10:49:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dGRNL-0001Di-Ab
-	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 10:47:00 -0400
-Date: Thu, 1 Jun 2017 22:46:47 +0800
-From: Fam Zheng <famz@redhat.com>
-Message-ID: <20170601144647.GI13127@lemon.lan>
-References: <1492838021-10538-1-git-send-email-ashijeetacharya@gmail.com>
+	(envelope-from <alex.bennee@linaro.org>) id 1dGRPI-0002UZ-W0
+	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 10:49:04 -0400
+Received: from mail-wm0-x22a.google.com ([2a00:1450:400c:c09::22a]:38368)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1dGRPI-0002Tg-Q9
+	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 10:49:00 -0400
+Received: by mail-wm0-x22a.google.com with SMTP id n195so35523618wmg.1
+	for <qemu-devel@nongnu.org>; Thu, 01 Jun 2017 07:48:59 -0700 (PDT)
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Date: Thu,  1 Jun 2017 15:49:11 +0100
+Message-Id: <20170601144915.20778-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1492838021-10538-1-git-send-email-ashijeetacharya@gmail.com>
-Subject: Re: [Qemu-devel] [PATCH v4 0/8] Optimize VMDK I/O by allocating
- multiple clusters
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH v2 0/4] some gdbstub fixes for debug and vcont
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,25 +27,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Ashijeet Acharya <ashijeetacharya@gmail.com>
-Cc: kwolf@redhat.com, qemu-block@nongnu.org, stefanha@gmail.com, qemu-devel@nongnu.org, mreitz@redhat.com, jsnow@redhat.com
+To: pbonzini@redhat.com, doug16k@gmail.com, imbrenda@linux.vnet.ibm.com
+Cc: qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 
-On Sat, 04/22 10:43, Ashijeet Acharya wrote:
-> Changes in v4:
-> - fix commit message in patch 1 (fam)
-> - drop size_to_clusters() function (fam)
-> - fix grammatical errors in function documentations (fam)
-> - factor out metadata loading coding in a separate patch (patch 4) (fam)
-> - rename vmdk_alloc_cluster_offset() to vmdk_alloc_clusters() (fam)
-> - break patch 4(in v3) into separate patches (patch 3 and 8) (fam)
-> - rename extent_size to extent_end (fam)
-> - use QEMU_ALIGN_UP instead of vmdk_align_offset. (fam)
-> - drop next and simply do m_data = m_data->next (fam)
+Hi,
 
-I still don't like the m_data linked list but as this is a huge performance
-improvement, I think we can merge this once the few bugs are addressed, then
-clean up things on top.
+This is a follow up v2 of the patches I posted yesterday. There are
+two new patches. The first is a simple name change to make the purpose
+of the function clearer. The second new patch now fixes the bug by
+making the thread-id consistent when reporting it via the gdbstub. It
+also reduces the size of CPUState by avoiding duplication of
+information already available in TaskStruct. The original fix is still
+in the series although its theoretical (but still correct) for my test
+case which now uses the correct thread-id.
 
-Thanks,
+Alex Bennée (4):
+  gdbstub: modernise DEBUG_GDB
+  gdbstub: rename cpu_index -> cpu_gdb_index
+  qom/cpu: remove host_tid field
+  gdbstub: don't fail on vCont;C04:0;c packets
 
-Fam
+ gdbstub.c              | 117 ++++++++++++++++++++++++-------------------------
+ include/exec/gdbstub.h |   9 ----
+ include/qom/cpu.h      |   2 -
+ linux-user/syscall.c   |   1 -
+ 4 files changed, 57 insertions(+), 72 deletions(-)
+
+-- 
+2.13.0
