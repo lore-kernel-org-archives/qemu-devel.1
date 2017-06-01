@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59795)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59802)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1dGPQm-0003w2-VY
-	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 08:42:25 -0400
+	(envelope-from <paolo.bonzini@gmail.com>) id 1dGPQn-0003wU-7B
+	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 08:42:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1dGPQk-0005mo-NR
+	(envelope-from <paolo.bonzini@gmail.com>) id 1dGPQl-0005n3-WC
 	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 08:42:25 -0400
-Received: from mail-wm0-x242.google.com ([2a00:1450:400c:c09::242]:36301)
+Received: from mail-wm0-x229.google.com ([2a00:1450:400c:c09::229]:38412)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1dGPQk-0005mg-GL
-	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 08:42:22 -0400
-Received: by mail-wm0-x242.google.com with SMTP id k15so11050633wmh.3
-	for <qemu-devel@nongnu.org>; Thu, 01 Jun 2017 05:42:22 -0700 (PDT)
+	id 1dGPQl-0005mu-PL
+	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 08:42:23 -0400
+Received: by mail-wm0-x229.google.com with SMTP id n195so30614258wmg.1
+	for <qemu-devel@nongnu.org>; Thu, 01 Jun 2017 05:42:23 -0700 (PDT)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Thu,  1 Jun 2017 14:41:41 +0200
-Message-Id: <1496320911-51305-24-git-send-email-pbonzini@redhat.com>
+Date: Thu,  1 Jun 2017 14:41:42 +0200
+Message-Id: <1496320911-51305-25-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1496320911-51305-1-git-send-email-pbonzini@redhat.com>
 References: <1496320911-51305-1-git-send-email-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PULL 23/33] exec: fix address_space_get_iotlb_entry
- page mask
+Subject: [Qemu-devel] [PULL 24/33] nbd: Fully initialize client in case of
+ failed negotiation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,50 +29,80 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Peter Xu <peterx@redhat.com>
 
-From: Peter Xu <peterx@redhat.com>
+From: Eric Blake <eblake@redhat.com>
 
-The IOTLB that it returned didn't guarantee that page_mask is indeed a
-so-called page mask. That won't affect current usage since now only
-vhost is using it (vhost API allows arbitary IOTLB range). However we
-have IOTLB scemantic and we should best follow it. This patch fixes this
-issue to make sure the page_mask is always a valid page mask.
+If a non-NBD client connects to qemu-nbd, we would end up with
+a SIGSEGV in nbd_cilent_put() because we were trying to
+unregister the client's association to the export, even though
+we skipped inserting the client into that list.  Easy trigger
+in two terminals:
 
-Fixes: a764040 ("exec: abstract address_space_do_translate()")
-Signed-off-by: Peter Xu <peterx@redhat.com>
-Message-Id: <1496212378-22605-1-git-send-email-peterx@redhat.com>
+$ qemu-nbd -p 30001 --format=raw file
+$ nmap 127.0.0.1 -p 30001
+
+nmap claims that it thinks it connected to a pago-services1
+server (which probably means nmap could be updated to learn the
+NBD protocol and give a more accurate diagnosis of the open
+port - but that's not our problem), then terminates immediately,
+so our call to nbd_negotiate() fails.  The fix is to reorder
+nbd_co_client_start() to ensure that all initialization occurs
+before we ever try talking to a client in nbd_negotiate(), so
+that the teardown sequence on negotiation failure doesn't fault
+while dereferencing a half-initialized object.
+
+While debugging this, I also noticed that nbd_update_server_watch()
+called by nbd_client_closed() was still adding a channel to accept
+the next client, even when the state was no longer RUNNING.  That
+is fixed by making nbd_can_accept() pay attention to the current
+state.
+
+Fixes: https://bugzilla.redhat.com/show_bug.cgi?id=1451614
+
+Signed-off-by: Eric Blake <eblake@redhat.com>
+Message-Id: <20170527030421.28366-1-eblake@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- exec.c | 14 ++++++--------
- 1 file changed, 6 insertions(+), 8 deletions(-)
+ nbd/server.c | 8 +++-----
+ qemu-nbd.c   | 2 +-
+ 2 files changed, 4 insertions(+), 6 deletions(-)
 
-diff --git a/exec.c b/exec.c
-index 29633cd..22b8f0c 100644
---- a/exec.c
-+++ b/exec.c
-@@ -528,16 +528,14 @@ IOMMUTLBEntry address_space_get_iotlb_entry(AddressSpace *as, hwaddr addr,
-         section.offset_within_region;
+diff --git a/nbd/server.c b/nbd/server.c
+index ee59e5d..49b55f6 100644
+--- a/nbd/server.c
++++ b/nbd/server.c
+@@ -1358,16 +1358,14 @@ static coroutine_fn void nbd_co_client_start(void *opaque)
  
-     if (plen == (hwaddr)-1) {
--        /*
--         * We use default page size here. Logically it only happens
--         * for identity mappings.
--         */
--        plen = TARGET_PAGE_SIZE;
-+        /* If not specified during translation, use default mask */
-+        plen = TARGET_PAGE_MASK;
-+    } else {
-+        /* Make it a valid page mask */
-+        assert(plen);
-+        plen = pow2floor(plen) - 1;
+     if (exp) {
+         nbd_export_get(exp);
++        QTAILQ_INSERT_TAIL(&exp->clients, client, next);
      }
- 
--    /* Convert to address mask */
--    plen -= 1;
++    qemu_co_mutex_init(&client->send_lock);
++
+     if (nbd_negotiate(data)) {
+         client_close(client);
+         goto out;
+     }
+-    qemu_co_mutex_init(&client->send_lock);
 -
-     return (IOMMUTLBEntry) {
-         .target_as = section.address_space,
-         .iova = addr & ~plen,
+-    if (exp) {
+-        QTAILQ_INSERT_TAIL(&exp->clients, client, next);
+-    }
+ 
+     nbd_client_receive_next_request(client);
+ 
+diff --git a/qemu-nbd.c b/qemu-nbd.c
+index f60842f..651f85e 100644
+--- a/qemu-nbd.c
++++ b/qemu-nbd.c
+@@ -325,7 +325,7 @@ out:
+ 
+ static int nbd_can_accept(void)
+ {
+-    return nb_fds < shared;
++    return state == RUNNING && nb_fds < shared;
+ }
+ 
+ static void nbd_export_closed(NBDExport *exp)
 -- 
 1.8.3.1
