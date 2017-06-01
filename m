@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38389)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38419)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1dGPlQ-00060N-Mc
-	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 09:03:49 -0400
+	(envelope-from <marcandre.lureau@redhat.com>) id 1dGPlb-00068D-HU
+	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 09:03:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1dGPlM-0004EH-Ue
-	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 09:03:44 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:45138)
+	(envelope-from <marcandre.lureau@redhat.com>) id 1dGPlV-0004Gz-7X
+	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 09:03:55 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:2388)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1dGPlM-0004E2-OQ
-	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 09:03:40 -0400
+	id 1dGPlU-0004Gp-Vt
+	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 09:03:49 -0400
 From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Thu,  1 Jun 2017 17:03:22 +0400
-Message-Id: <20170601130325.6433-2-marcandre.lureau@redhat.com>
+Date: Thu,  1 Jun 2017 17:03:23 +0400
+Message-Id: <20170601130325.6433-3-marcandre.lureau@redhat.com>
 In-Reply-To: <20170601130325.6433-1-marcandre.lureau@redhat.com>
 References: <20170601130325.6433-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v2 1/4] dump: add DumpInfo structure
+Subject: [Qemu-devel] [PATCH v2 2/4] dump: add vmcoreinfo ELF note
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,62 +30,237 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: lersek@redhat.com, qiaonuohan@cn.fujitsu.com, anderson@redhat.com, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
-One way or another, the guest could communicate various dump info (via
-guest agent or vmcoreinfo device) and populate that structure. It can
-then be used to augment the dump with various details, as done in the
-following patch.
+Read vmcoreinfo note from guest memory when dump_info provides the
+address, and write it as an ELF note in the dump.
+
+NUMBER(phys_base) in vmcoreinfo has only been recently introduced in
+Linux 4.10 ("kexec: export the value of phys_base instead of symbol
+address"). To accomadate for older kernels, modify the vmcoreinfo to add
+the new fields and help newer crash that will use it.
 
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 ---
- include/sysemu/dump-info.h | 18 ++++++++++++++++++
- dump.c                     |  3 +++
- 2 files changed, 21 insertions(+)
- create mode 100644 include/sysemu/dump-info.h
+ include/sysemu/dump.h |   2 +
+ dump.c                | 133 ++++++++++++++++++++++++++++++++++++++++++++=
+++++++
+ 2 files changed, 135 insertions(+)
 
-diff --git a/include/sysemu/dump-info.h b/include/sysemu/dump-info.h
-new file mode 100644
-index 0000000000..d2378e15e2
---- /dev/null
-+++ b/include/sysemu/dump-info.h
-@@ -0,0 +1,18 @@
-+#ifndef DUMP_INFO_H
-+#define DUMP_INFO_H
-+
-+typedef struct DumpInfo {
-+    bool received;
-+    /* kernel base address */
-+    bool has_phys_base;
-+    uint64_t phys_base;
-+    /* "_text" symbol location */
-+    bool has_text;
-+    uint64_t text;
-+    /* the content of /sys/kernel/vmcoreinfo on Linux */
-+    char *vmcoreinfo;
-+} DumpInfo;
-+
-+extern DumpInfo dump_info;
-+
-+#endif /* DUMP_INFO_H */
+diff --git a/include/sysemu/dump.h b/include/sysemu/dump.h
+index 2672a15f8b..b8a7a1e41d 100644
+--- a/include/sysemu/dump.h
++++ b/include/sysemu/dump.h
+@@ -192,6 +192,8 @@ typedef struct DumpState {
+                                   * this could be used to calculate
+                                   * how much work we have
+                                   * finished. */
++    uint8_t *vmcoreinfo;
++    size_t vmcoreinfo_size;
+ } DumpState;
+=20
+ uint16_t cpu_to_dump16(DumpState *s, uint16_t val);
 diff --git a/dump.c b/dump.c
-index d9090a24cc..bdf3270f02 100644
+index bdf3270f02..6911ffad8b 100644
 --- a/dump.c
 +++ b/dump.c
-@@ -20,6 +20,7 @@
- #include "monitor/monitor.h"
- #include "sysemu/kvm.h"
- #include "sysemu/dump.h"
-+#include "sysemu/dump-info.h"
- #include "sysemu/sysemu.h"
- #include "sysemu/memory_mapping.h"
- #include "sysemu/cpus.h"
-@@ -38,6 +39,8 @@
- #define ELF_MACHINE_UNAME "Unknown"
- #endif
+@@ -27,6 +27,7 @@
+ #include "qapi/qmp/qerror.h"
+ #include "qmp-commands.h"
+ #include "qapi-event.h"
++#include "qemu/error-report.h"
 =20
-+DumpInfo dump_info =3D { 0, };
+ #include <zlib.h>
+ #ifdef CONFIG_LZO
+@@ -88,6 +89,8 @@ static int dump_cleanup(DumpState *s)
+             qemu_mutex_unlock_iothread();
+         }
+     }
++    g_free(s->vmcoreinfo);
++    s->vmcoreinfo =3D NULL;
+=20
+     return 0;
+ }
+@@ -238,6 +241,19 @@ static inline int cpu_index(CPUState *cpu)
+     return cpu->cpu_index + 1;
+ }
+=20
++static void write_vmcoreinfo_note(WriteCoreDumpFunction f, DumpState *s,
++                                  Error **errp)
++{
++    int ret;
 +
- uint16_t cpu_to_dump16(DumpState *s, uint16_t val)
++    if (s->vmcoreinfo) {
++        ret =3D f(s->vmcoreinfo, s->vmcoreinfo_size, s);
++        if (ret < 0) {
++            error_setg(errp, "dump: failed to write vmcoreinfo");
++        }
++    }
++}
++
+ static void write_elf64_notes(WriteCoreDumpFunction f, DumpState *s,
+                               Error **errp)
  {
-     if (s->dump_info.d_endian =3D=3D ELFDATA2LSB) {
+@@ -261,6 +277,8 @@ static void write_elf64_notes(WriteCoreDumpFunction f=
+, DumpState *s,
+             return;
+         }
+     }
++
++    write_vmcoreinfo_note(f, s, errp);
+ }
+=20
+ static void write_elf32_note(DumpState *s, Error **errp)
+@@ -306,6 +324,8 @@ static void write_elf32_notes(WriteCoreDumpFunction f=
+, DumpState *s,
+             return;
+         }
+     }
++
++    write_vmcoreinfo_note(f, s, errp);
+ }
+=20
+ static void write_elf_section(DumpState *s, int type, Error **errp)
+@@ -717,6 +737,50 @@ static int buf_write_note(const void *buf, size_t si=
+ze, void *opaque)
+     return 0;
+ }
+=20
++static void get_note_sizes(DumpState *s, const void *note,
++                           uint64_t *note_head_size,
++                           uint64_t *name_size,
++                           uint64_t *desc_size)
++{
++    uint64_t note_head_sz;
++    uint64_t name_sz;
++    uint64_t desc_sz;
++
++    if (s->dump_info.d_class =3D=3D ELFCLASS64) {
++        const Elf64_Nhdr *hdr =3D note;
++        note_head_sz =3D sizeof(Elf64_Nhdr);
++        name_sz =3D hdr->n_namesz;
++        desc_sz =3D hdr->n_descsz;
++    } else {
++        const Elf32_Nhdr *hdr =3D note;
++        note_head_sz =3D sizeof(Elf32_Nhdr);
++        name_sz =3D hdr->n_namesz;
++        desc_sz =3D hdr->n_descsz;
++    }
++
++    if (note_head_size) {
++        *note_head_size =3D note_head_sz;
++    }
++    if (name_size) {
++        *name_size =3D name_sz;
++    }
++    if (desc_size) {
++        *desc_size =3D desc_sz;
++    }
++}
++
++static void set_note_desc_size(DumpState *s, void *note,
++                               uint64_t desc_size)
++{
++    if (s->dump_info.d_class =3D=3D ELFCLASS64) {
++        Elf64_Nhdr *hdr =3D note;
++        hdr->n_descsz =3D desc_size;
++    } else {
++        Elf32_Nhdr *hdr =3D note;
++        hdr->n_descsz =3D desc_size;
++    }
++}
++
+ /* write common header, sub header and elf note to vmcore */
+ static void create_header32(DumpState *s, Error **errp)
+ {
+@@ -1491,6 +1555,42 @@ static int64_t dump_calculate_size(DumpState *s)
+     return total;
+ }
+=20
++static void vmcoreinfo_add_phys_base(DumpState *s)
++{
++    uint64_t size, note_head_size, name_size;
++    char **lines, *physbase =3D NULL;
++    uint8_t *newvmci, *vmci;
++    size_t i;
++
++    get_note_sizes(s, s->vmcoreinfo, &note_head_size, &name_size, &size)=
+;
++    note_head_size =3D ((note_head_size + 3) / 4) * 4;
++    name_size =3D ((name_size + 3) / 4) * 4;
++    vmci =3D s->vmcoreinfo + note_head_size + name_size;
++    *(vmci + size) =3D '\0';
++    lines =3D g_strsplit((char *)vmci, "\n", -1);
++    for (i =3D 0; lines[i]; i++) {
++        if (g_str_has_prefix(lines[i], "NUMBER(phys_base)=3D")) {
++            goto end;
++        }
++    }
++
++    physbase =3D g_strdup_printf("\nNUMBER(phys_base)=3D%ld",
++                               s->dump_info.phys_base);
++    s->vmcoreinfo_size =3D
++        ((note_head_size + name_size + size + strlen(physbase) + 3) / 4)=
+ * 4;
++
++    newvmci =3D g_malloc(s->vmcoreinfo_size);
++    memcpy(newvmci, s->vmcoreinfo, note_head_size + name_size + size - 1=
+);
++    memcpy(newvmci + note_head_size + name_size + size - 1, physbase,
++           strlen(physbase) + 1);
++    g_free(s->vmcoreinfo);
++    s->vmcoreinfo =3D newvmci;
++    set_note_desc_size(s, s->vmcoreinfo, size + strlen(physbase));
++
++end:
++    g_strfreev(lines);
++}
++
+ static void dump_init(DumpState *s, int fd, bool has_format,
+                       DumpGuestMemoryFormat format, bool paging, bool ha=
+s_filter,
+                       int64_t begin, int64_t length, Error **errp)
+@@ -1566,6 +1666,39 @@ static void dump_init(DumpState *s, int fd, bool h=
+as_format,
+         goto cleanup;
+     }
+=20
++    if (dump_info.has_phys_base) {
++        s->dump_info.phys_base =3D dump_info.phys_base;
++    }
++    if (dump_info.vmcoreinfo) {
++        uint64_t addr, size, note_head_size, name_size, desc_size;
++        int count =3D sscanf(dump_info.vmcoreinfo, "%" PRIx64 " %" PRIx6=
+4,
++                           &addr, &size);
++        if (count !=3D 2) {
++            /* non fatal error */
++            error_report("Failed to parse vmcoreinfo");
++        } else {
++            assert(!s->vmcoreinfo);
++            s->vmcoreinfo =3D g_malloc(size);
++            cpu_physical_memory_read(addr, s->vmcoreinfo, size);
++
++            get_note_sizes(s, s->vmcoreinfo,
++                           &note_head_size, &name_size, &desc_size);
++            s->vmcoreinfo_size =3D ((note_head_size + 3) / 4 +
++                                  (name_size + 3) / 4 +
++                                  (desc_size + 3) / 4) * 4;
++            if (s->vmcoreinfo_size > size) {
++                error_report("Invalid vmcoreinfo header, size mismatch")=
+;
++                g_free(s->vmcoreinfo);
++                s->vmcoreinfo =3D NULL;
++            } else {
++                if (dump_info.has_phys_base) {
++                    vmcoreinfo_add_phys_base(s);
++                }
++                s->note_size +=3D s->vmcoreinfo_size;
++            }
++        }
++    }
++
+     /* get memory mapping */
+     if (paging) {
+         qemu_get_guest_memory_mapping(&s->list, &s->guest_phys_blocks, &=
+err);
 --=20
 2.13.0.91.g00982b8dd
