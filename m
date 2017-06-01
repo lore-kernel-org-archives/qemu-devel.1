@@ -1,32 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51781)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52373)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dGOpD-0001PP-D2
-	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 08:03:41 -0400
+	(envelope-from <yang.zhong@intel.com>) id 1dGOqg-00024G-Dc
+	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 08:05:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dGOpC-0002Do-Aa
-	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 08:03:35 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:33362)
+	(envelope-from <yang.zhong@intel.com>) id 1dGOqc-0002Zf-JX
+	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 08:05:06 -0400
+Received: from mga09.intel.com ([134.134.136.24]:42151)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dGOpC-0002Cr-3X
-	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 08:03:34 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 2A67D448D6B
-	for <qemu-devel@nongnu.org>; Thu,  1 Jun 2017 12:03:33 +0000 (UTC)
-Date: Thu, 1 Jun 2017 13:03:22 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170601120321.GJ2083@work-vm>
-References: <20170531103509.22021-1-quintela@redhat.com>
-	<20170531103509.22021-2-quintela@redhat.com>
+	(Exim 4.71) (envelope-from <yang.zhong@intel.com>)
+	id 1dGOqc-0002ZI-Aj
+	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 08:05:02 -0400
+Date: Thu, 1 Jun 2017 20:04:54 +0800
+From: Zhong Yang <yang.zhong@intel.com>
+Message-ID: <20170601120454.GB18829@yangzhon-Virtual>
+References: <1496212144-14947-1-git-send-email-yang.zhong@intel.com>
+	<c5d963e7-ef71-0ed5-aaae-01d492e4fd8b@redhat.com>
+	<20170601052736.GA17625@yangzhon-Virtual>
+	<fc8f01b6-5b87-bd9e-0648-b489e00a6dfe@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20170531103509.22021-2-quintela@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 01/10] migration: Remove unneeded
- includes of migration/vmstate.h
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <fc8f01b6-5b87-bd9e-0648-b489e00a6dfe@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 0/6] tcg: move the tcg files into tcg/
+ subdirectory.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,125 +32,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Juan Quintela <quintela@redhat.com>
-Cc: qemu-devel@nongnu.org, lvivier@redhat.com, peterx@redhat.com
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Eric Blake <eblake@redhat.com>, Laurent Desnogues <laurent.desnogues@gmail.com>, anthony.xu@intel.com, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 
-* Juan Quintela (quintela@redhat.com) wrote:
-> Signed-off-by: Juan Quintela <quintela@redhat.com>
-> Reviewed-by: Philippe Mathieu-Daud=E9 <f4bug@amsat.org>
+On Thu, Jun 01, 2017 at 10:14:34AM +0200, Paolo Bonzini wrote:
+> 
+> 
+> On 01/06/2017 07:27, Zhong Yang wrote:
+> >   In the first phase, there are three patchsets to
+> >   deal with split code and separate the files.
+> >   1) split the tcg exec code.
+> >      a)split the tcg accelerators from accel.c file and re-name
+> >        tcg accelerator to tcg-all.c, like kvm-all.c did.
+> >      b)create one accel directory, which will include kvm,
+> >        tcg and general exec files.
+> >      c)move tcg exec files into ./accel/tcg directory.
+> >   2) move tcg related backend files into tcg/ directory
+> >      those files include translate-all.(ch), translate-common.c,
+> >      tci.c and tcg-runtime.c.
+> >   3) move kvm exec and exec.c file.
+> >      a)move kvm related exec files into ./accel/kvm directory.
+> >      b)move exec.c in ./accel directory.
+> > 
+> >   after 1) and 3) done, the file tree like below:
+> >   accel/
+> >   ├── accel.c
+> >   ├── exec.c
+> >   ├── kvm
+> >   │   ├── kvm-all.c
+> >   │   ├── kvm-stub.c
+> >   │   ├── Makefile.objs
+> >   │   └── trace-events
+> >   ├── Makefile.objs
+> >   └── tcg
+> >       ├── cpu-exec.c
+> >       ├── cpu-exec-common.c
+> >       ├── cputlb.c
+> >       ├── Makefile.objs
+> >       ├── tcg-all.c
+> >       └── trace-events
+> >   
+> >   please help me check whether this kind of arrange is suitable? 
+> 
+> Oh, I see now.  I think translate-all.[ch] and translate-common.c belong
+> in accel/tcg more than tcg/.
 
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+  okay, i will make those changes into one patchset and send v3 to all, thanks!
 
-> ---
->  hw/core/qdev.c                   | 1 -
->  include/hw/acpi/memory_hotplug.h | 1 -
->  include/hw/acpi/pcihp.h          | 1 -
->  include/hw/pci/shpc.h            | 1 -
->  target/alpha/cpu.c               | 1 -
->  target/hppa/cpu.c                | 1 -
->  target/s390x/cpu.c               | 1 -
->  target/tilegx/cpu.c              | 1 -
->  8 files changed, 8 deletions(-)
->=20
-> diff --git a/hw/core/qdev.c b/hw/core/qdev.c
-> index 71ff95f..0ce45a2 100644
-> --- a/hw/core/qdev.c
-> +++ b/hw/core/qdev.c
-> @@ -37,7 +37,6 @@
->  #include "hw/boards.h"
->  #include "hw/sysbus.h"
->  #include "qapi-event.h"
-> -#include "migration/vmstate.h"
-> =20
->  bool qdev_hotplug =3D false;
->  static bool qdev_hot_added =3D false;
-> diff --git a/include/hw/acpi/memory_hotplug.h b/include/hw/acpi/memory_=
-hotplug.h
-> index db8ebc9..77c6576 100644
-> --- a/include/hw/acpi/memory_hotplug.h
-> +++ b/include/hw/acpi/memory_hotplug.h
-> @@ -3,7 +3,6 @@
-> =20
->  #include "hw/qdev-core.h"
->  #include "hw/acpi/acpi.h"
-> -#include "migration/vmstate.h"
->  #include "hw/acpi/aml-build.h"
-> =20
->  /**
-> diff --git a/include/hw/acpi/pcihp.h b/include/hw/acpi/pcihp.h
-> index 04528b7..8a65f99 100644
-> --- a/include/hw/acpi/pcihp.h
-> +++ b/include/hw/acpi/pcihp.h
-> @@ -28,7 +28,6 @@
->  #define HW_ACPI_PCIHP_H
-> =20
->  #include "hw/acpi/acpi.h"
-> -#include "migration/vmstate.h"
->  #include "hw/hotplug.h"
-> =20
->  #define ACPI_PCIHP_IO_BASE_PROP "acpi-pcihp-io-base"
-> diff --git a/include/hw/pci/shpc.h b/include/hw/pci/shpc.h
-> index b208554..71e836b 100644
-> --- a/include/hw/pci/shpc.h
-> +++ b/include/hw/pci/shpc.h
-> @@ -3,7 +3,6 @@
-> =20
->  #include "qemu-common.h"
->  #include "exec/memory.h"
-> -#include "migration/vmstate.h"
->  #include "hw/hotplug.h"
->  #include "hw/pci/pci.h"
-> =20
-> diff --git a/target/alpha/cpu.c b/target/alpha/cpu.c
-> index b4f9798..8186c9d 100644
-> --- a/target/alpha/cpu.c
-> +++ b/target/alpha/cpu.c
-> @@ -23,7 +23,6 @@
->  #include "qapi/error.h"
->  #include "cpu.h"
->  #include "qemu-common.h"
-> -#include "migration/vmstate.h"
->  #include "exec/exec-all.h"
-> =20
-> =20
-> diff --git a/target/hppa/cpu.c b/target/hppa/cpu.c
-> index 1d791d0..30299e9 100644
-> --- a/target/hppa/cpu.c
-> +++ b/target/hppa/cpu.c
-> @@ -22,7 +22,6 @@
->  #include "qapi/error.h"
->  #include "cpu.h"
->  #include "qemu-common.h"
-> -#include "migration/vmstate.h"
->  #include "exec/exec-all.h"
-> =20
-> =20
-> diff --git a/target/s390x/cpu.c b/target/s390x/cpu.c
-> index a69005d..accef03 100644
-> --- a/target/s390x/cpu.c
-> +++ b/target/s390x/cpu.c
-> @@ -32,7 +32,6 @@
->  #include "qemu/error-report.h"
->  #include "trace.h"
->  #include "qapi/visitor.h"
-> -#include "migration/vmstate.h"
->  #include "exec/exec-all.h"
->  #ifndef CONFIG_USER_ONLY
->  #include "hw/hw.h"
-> diff --git a/target/tilegx/cpu.c b/target/tilegx/cpu.c
-> index d90e38e..4532639 100644
-> --- a/target/tilegx/cpu.c
-> +++ b/target/tilegx/cpu.c
-> @@ -23,7 +23,6 @@
->  #include "cpu.h"
->  #include "qemu-common.h"
->  #include "hw/qdev-properties.h"
-> -#include "migration/vmstate.h"
->  #include "linux-user/syscall_defs.h"
->  #include "exec/exec-all.h"
-> =20
-> --=20
-> 2.9.4
->=20
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+  Yang.
+> 
+> Thanks,
+> 
+> Paolo
