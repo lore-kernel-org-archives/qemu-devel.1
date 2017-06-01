@@ -1,24 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59611)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59600)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1dGPQV-0003QQ-WE
-	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 08:42:09 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1dGPQV-0005ij-4N
+	(envelope-from <paolo.bonzini@gmail.com>) id 1dGPQV-0003Pn-8v
 	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 08:42:08 -0400
-Received: from mail-wm0-x241.google.com ([2a00:1450:400c:c09::241]:35385)
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1dGPQQ-0005gq-V9
+	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 08:42:07 -0400
+Received: from mail-wm0-x241.google.com ([2a00:1450:400c:c09::241]:35369)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1dGPQU-0005iS-VV
-	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 08:42:07 -0400
-Received: by mail-wm0-x241.google.com with SMTP id g15so11029266wmc.2
-	for <qemu-devel@nongnu.org>; Thu, 01 Jun 2017 05:42:06 -0700 (PDT)
+	id 1dGPQQ-0005gZ-N6
+	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 08:42:02 -0400
+Received: by mail-wm0-x241.google.com with SMTP id g15so11028764wmc.2
+	for <qemu-devel@nongnu.org>; Thu, 01 Jun 2017 05:42:02 -0700 (PDT)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Thu,  1 Jun 2017 14:41:28 +0200
-Message-Id: <1496320911-51305-11-git-send-email-pbonzini@redhat.com>
+Date: Thu,  1 Jun 2017 14:41:24 +0200
+Message-Id: <1496320911-51305-7-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1496320911-51305-1-git-send-email-pbonzini@redhat.com>
 References: <1496320911-51305-1-git-send-email-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PULL 10/33] nbd: strict nbd_wr_syncv
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PULL 06/33] kvm: irqchip: trace changes on msi
+ add/remove
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,53 +32,60 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Cc: Peter Xu <peterx@redhat.com>
 
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+From: Peter Xu <peterx@redhat.com>
 
-nbd_wr_syncv is called either from coroutine or from client negotiation
-code, when socket is in blocking mode. So, -EAGAIN is impossible.
+It'll be nice to know which virq belongs to which device/vector when
+adding msi routes, so adding two more parameters for the add trace.
 
-Furthermore, EAGAIN is confusing, as, what to read/write again? With
-EAGAIN as a return code we don't know how much data is already
-read or written by the function, so in case of EAGAIN the whole
-communication is broken.
+Meanwhile, releasing virq has no tracing before. Add one for it.
 
-Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-Id: <20170516094533.6160-2-vsementsov@virtuozzo.com>
+Signed-off-by: Peter Xu <peterx@redhat.com>
+Message-Id: <1494309644-18743-2-git-send-email-peterx@redhat.com>
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- nbd/common.c | 11 ++++++-----
- 1 file changed, 6 insertions(+), 5 deletions(-)
+ kvm-all.c    | 4 +++-
+ trace-events | 3 ++-
+ 2 files changed, 5 insertions(+), 2 deletions(-)
 
-diff --git a/nbd/common.c b/nbd/common.c
-index dccbb8e..4db45b3 100644
---- a/nbd/common.c
-+++ b/nbd/common.c
-@@ -20,6 +20,10 @@
- #include "qapi/error.h"
- #include "nbd-internal.h"
+diff --git a/kvm-all.c b/kvm-all.c
+index 90b8573..2598b1f 100644
+--- a/kvm-all.c
++++ b/kvm-all.c
+@@ -1144,6 +1144,7 @@ void kvm_irqchip_release_virq(KVMState *s, int virq)
+     }
+     clear_gsi(s, virq);
+     kvm_arch_release_virq_post(virq);
++    trace_kvm_irqchip_release_virq(virq);
+ }
  
-+/* nbd_wr_syncv
-+ * The function may be called from coroutine or from non-coroutine context.
-+ * When called from non-coroutine context @ioc must be in blocking mode.
-+ */
- ssize_t nbd_wr_syncv(QIOChannel *ioc,
-                      struct iovec *iov,
-                      size_t niov,
-@@ -42,11 +46,8 @@ ssize_t nbd_wr_syncv(QIOChannel *ioc,
-             len = qio_channel_writev(ioc, local_iov, nlocal_iov, &local_err);
-         }
-         if (len == QIO_CHANNEL_ERR_BLOCK) {
--            if (qemu_in_coroutine()) {
--                qio_channel_yield(ioc, do_read ? G_IO_IN : G_IO_OUT);
--            } else {
--                return -EAGAIN;
--            }
-+            assert(qemu_in_coroutine());
-+            qio_channel_yield(ioc, do_read ? G_IO_IN : G_IO_OUT);
-             continue;
-         }
-         if (len < 0) {
+ static unsigned int kvm_hash_msi(uint32_t data)
+@@ -1287,7 +1288,8 @@ int kvm_irqchip_add_msi_route(KVMState *s, int vector, PCIDevice *dev)
+         return -EINVAL;
+     }
+ 
+-    trace_kvm_irqchip_add_msi_route(virq);
++    trace_kvm_irqchip_add_msi_route(dev ? dev->name : (char *)"N/A",
++                                    vector, virq);
+ 
+     kvm_add_routing_entry(s, &kroute);
+     kvm_arch_add_msi_route_post(&kroute, vector, dev);
+diff --git a/trace-events b/trace-events
+index e582d63..f01ec05 100644
+--- a/trace-events
++++ b/trace-events
+@@ -69,8 +69,9 @@ kvm_device_ioctl(int fd, int type, void *arg) "dev fd %d, type 0x%x, arg %p"
+ kvm_failed_reg_get(uint64_t id, const char *msg) "Warning: Unable to retrieve ONEREG %" PRIu64 " from KVM: %s"
+ kvm_failed_reg_set(uint64_t id, const char *msg) "Warning: Unable to set ONEREG %" PRIu64 " to KVM: %s"
+ kvm_irqchip_commit_routes(void) ""
+-kvm_irqchip_add_msi_route(int virq) "Adding MSI route virq=%d"
++kvm_irqchip_add_msi_route(char *name, int vector, int virq) "dev %s vector %d virq %d"
+ kvm_irqchip_update_msi_route(int virq) "Updating MSI route virq=%d"
++kvm_irqchip_release_virq(int virq) "virq %d"
+ 
+ # TCG related tracing (mostly disabled by default)
+ # cpu-exec.c
 -- 
 1.8.3.1
