@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59802)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59797)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1dGPQn-0003wU-7B
+	(envelope-from <paolo.bonzini@gmail.com>) id 1dGPQm-0003w4-Vu
 	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 08:42:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1dGPQl-0005n3-WC
+	(envelope-from <paolo.bonzini@gmail.com>) id 1dGPQj-0005mc-TB
 	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 08:42:25 -0400
-Received: from mail-wm0-x229.google.com ([2a00:1450:400c:c09::229]:38412)
+Received: from mail-wm0-x242.google.com ([2a00:1450:400c:c09::242]:34150)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1dGPQl-0005mu-PL
-	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 08:42:23 -0400
-Received: by mail-wm0-x229.google.com with SMTP id n195so30614258wmg.1
-	for <qemu-devel@nongnu.org>; Thu, 01 Jun 2017 05:42:23 -0700 (PDT)
+	id 1dGPQj-0005mM-JZ
+	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 08:42:21 -0400
+Received: by mail-wm0-x242.google.com with SMTP id d127so11021262wmf.1
+	for <qemu-devel@nongnu.org>; Thu, 01 Jun 2017 05:42:21 -0700 (PDT)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Thu,  1 Jun 2017 14:41:42 +0200
-Message-Id: <1496320911-51305-25-git-send-email-pbonzini@redhat.com>
+Date: Thu,  1 Jun 2017 14:41:40 +0200
+Message-Id: <1496320911-51305-23-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1496320911-51305-1-git-send-email-pbonzini@redhat.com>
 References: <1496320911-51305-1-git-send-email-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PULL 24/33] nbd: Fully initialize client in case of
- failed negotiation
+Subject: [Qemu-devel] [PULL 22/33] sockets: improve error reporting if UNIX
+ socket path is too long
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,79 +30,169 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-From: Eric Blake <eblake@redhat.com>
+From: "Daniel P. Berrange" <berrange@redhat.com>
 
-If a non-NBD client connects to qemu-nbd, we would end up with
-a SIGSEGV in nbd_cilent_put() because we were trying to
-unregister the client's association to the export, even though
-we skipped inserting the client into that list.  Easy trigger
-in two terminals:
+The 'struct sockaddr_un' only allows 108 bytes for the socket
+path.
 
-$ qemu-nbd -p 30001 --format=raw file
-$ nmap 127.0.0.1 -p 30001
+If the user supplies a path, QEMU uses snprintf() to silently
+truncate it when too long. This is undesirable because the user
+will then be unable to connect to the path they asked for.
 
-nmap claims that it thinks it connected to a pago-services1
-server (which probably means nmap could be updated to learn the
-NBD protocol and give a more accurate diagnosis of the open
-port - but that's not our problem), then terminates immediately,
-so our call to nbd_negotiate() fails.  The fix is to reorder
-nbd_co_client_start() to ensure that all initialization occurs
-before we ever try talking to a client in nbd_negotiate(), so
-that the teardown sequence on negotiation failure doesn't fault
-while dereferencing a half-initialized object.
+If the user doesn't supply a path, QEMU builds one based on
+TMPDIR, but if that leads to an overlong path, it mistakenly
+uses error_setg_errno() with a stale errno value, because
+snprintf() does not set errno on truncation.
 
-While debugging this, I also noticed that nbd_update_server_watch()
-called by nbd_client_closed() was still adding a channel to accept
-the next client, even when the state was no longer RUNNING.  That
-is fixed by making nbd_can_accept() pay attention to the current
-state.
+In solving this the code needed some refactoring to ensure we
+don't pass 'un.sun_path' directly to any APIs which expect
+NUL-terminated strings, because the path is not required to
+be terminated.
 
-Fixes: https://bugzilla.redhat.com/show_bug.cgi?id=1451614
-
-Signed-off-by: Eric Blake <eblake@redhat.com>
-Message-Id: <20170527030421.28366-1-eblake@redhat.com>
+Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
+Message-Id: <20170525155300.22743-1-berrange@redhat.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- nbd/server.c | 8 +++-----
- qemu-nbd.c   | 2 +-
- 2 files changed, 4 insertions(+), 6 deletions(-)
+ util/qemu-sockets.c | 68 ++++++++++++++++++++++++++++++++++++-----------------
+ 1 file changed, 46 insertions(+), 22 deletions(-)
 
-diff --git a/nbd/server.c b/nbd/server.c
-index ee59e5d..49b55f6 100644
---- a/nbd/server.c
-+++ b/nbd/server.c
-@@ -1358,16 +1358,14 @@ static coroutine_fn void nbd_co_client_start(void *opaque)
- 
-     if (exp) {
-         nbd_export_get(exp);
-+        QTAILQ_INSERT_TAIL(&exp->clients, client, next);
-     }
-+    qemu_co_mutex_init(&client->send_lock);
-+
-     if (nbd_negotiate(data)) {
-         client_close(client);
-         goto out;
-     }
--    qemu_co_mutex_init(&client->send_lock);
--
--    if (exp) {
--        QTAILQ_INSERT_TAIL(&exp->clients, client, next);
--    }
- 
-     nbd_client_receive_next_request(client);
- 
-diff --git a/qemu-nbd.c b/qemu-nbd.c
-index f60842f..651f85e 100644
---- a/qemu-nbd.c
-+++ b/qemu-nbd.c
-@@ -325,7 +325,7 @@ out:
- 
- static int nbd_can_accept(void)
+diff --git a/util/qemu-sockets.c b/util/qemu-sockets.c
+index d8183f7..dfaf4e1 100644
+--- a/util/qemu-sockets.c
++++ b/util/qemu-sockets.c
+@@ -845,6 +845,8 @@ static int unix_listen_saddr(UnixSocketAddress *saddr,
  {
--    return nb_fds < shared;
-+    return state == RUNNING && nb_fds < shared;
+     struct sockaddr_un un;
+     int sock, fd;
++    char *pathbuf = NULL;
++    const char *path;
+ 
+     sock = qemu_socket(PF_UNIX, SOCK_STREAM, 0);
+     if (sock < 0) {
+@@ -852,20 +854,22 @@ static int unix_listen_saddr(UnixSocketAddress *saddr,
+         return -1;
+     }
+ 
+-    memset(&un, 0, sizeof(un));
+-    un.sun_family = AF_UNIX;
+-    if (saddr->path && strlen(saddr->path)) {
+-        snprintf(un.sun_path, sizeof(un.sun_path), "%s", saddr->path);
++    if (saddr->path && saddr->path[0]) {
++        path = saddr->path;
+     } else {
+         const char *tmpdir = getenv("TMPDIR");
+         tmpdir = tmpdir ? tmpdir : "/tmp";
+-        if (snprintf(un.sun_path, sizeof(un.sun_path), "%s/qemu-socket-XXXXXX",
+-                     tmpdir) >= sizeof(un.sun_path)) {
+-            error_setg_errno(errp, errno,
+-                             "TMPDIR environment variable (%s) too large", tmpdir);
+-            goto err;
+-        }
++        path = pathbuf = g_strdup_printf("%s/qemu-socket-XXXXXX", tmpdir);
++    }
+ 
++    if (strlen(path) > sizeof(un.sun_path)) {
++        error_setg(errp, "UNIX socket path '%s' is too long", path);
++        error_append_hint(errp, "Path must be less than %zu bytes\n",
++                          sizeof(un.sun_path));
++        goto err;
++    }
++
++    if (pathbuf != NULL) {
+         /*
+          * This dummy fd usage silences the mktemp() unsecure warning.
+          * Using mkstemp() doesn't make things more secure here
+@@ -873,24 +877,25 @@ static int unix_listen_saddr(UnixSocketAddress *saddr,
+          * to unlink first and thus re-open the race window.  The
+          * worst case possible is bind() failing, i.e. a DoS attack.
+          */
+-        fd = mkstemp(un.sun_path);
++        fd = mkstemp(pathbuf);
+         if (fd < 0) {
+             error_setg_errno(errp, errno,
+-                             "Failed to make a temporary socket name in %s", tmpdir);
++                             "Failed to make a temporary socket %s", pathbuf);
+             goto err;
+         }
+         close(fd);
+-        if (update_addr) {
+-            g_free(saddr->path);
+-            saddr->path = g_strdup(un.sun_path);
+-        }
+     }
+ 
+-    if (unlink(un.sun_path) < 0 && errno != ENOENT) {
++    if (unlink(path) < 0 && errno != ENOENT) {
+         error_setg_errno(errp, errno,
+-                         "Failed to unlink socket %s", un.sun_path);
++                         "Failed to unlink socket %s", path);
+         goto err;
+     }
++
++    memset(&un, 0, sizeof(un));
++    un.sun_family = AF_UNIX;
++    strncpy(un.sun_path, path, sizeof(un.sun_path));
++
+     if (bind(sock, (struct sockaddr*) &un, sizeof(un)) < 0) {
+         error_setg_errno(errp, errno, "Failed to bind socket to %s", un.sun_path);
+         goto err;
+@@ -900,9 +905,16 @@ static int unix_listen_saddr(UnixSocketAddress *saddr,
+         goto err;
+     }
+ 
++    if (update_addr && pathbuf) {
++        g_free(saddr->path);
++        saddr->path = pathbuf;
++    } else {
++        g_free(pathbuf);
++    }
+     return sock;
+ 
+ err:
++    g_free(pathbuf);
+     closesocket(sock);
+     return -1;
+ }
+@@ -932,9 +944,16 @@ static int unix_connect_saddr(UnixSocketAddress *saddr,
+         qemu_set_nonblock(sock);
+     }
+ 
++    if (strlen(saddr->path) > sizeof(un.sun_path)) {
++        error_setg(errp, "UNIX socket path '%s' is too long", saddr->path);
++        error_append_hint(errp, "Path must be less than %zu bytes\n",
++                          sizeof(un.sun_path));
++        goto err;
++    }
++
+     memset(&un, 0, sizeof(un));
+     un.sun_family = AF_UNIX;
+-    snprintf(un.sun_path, sizeof(un.sun_path), "%s", saddr->path);
++    strncpy(un.sun_path, saddr->path, sizeof(un.sun_path));
+ 
+     /* connect to peer */
+     do {
+@@ -956,13 +975,18 @@ static int unix_connect_saddr(UnixSocketAddress *saddr,
+     }
+ 
+     if (rc < 0) {
+-        error_setg_errno(errp, -rc, "Failed to connect socket");
+-        close(sock);
+-        sock = -1;
++        error_setg_errno(errp, -rc, "Failed to connect socket %s",
++                         saddr->path);
++        goto err;
+     }
+ 
+     g_free(connect_state);
+     return sock;
++
++ err:
++    close(sock);
++    g_free(connect_state);
++    return -1;
  }
  
- static void nbd_export_closed(NBDExport *exp)
+ #else
 -- 
 1.8.3.1
