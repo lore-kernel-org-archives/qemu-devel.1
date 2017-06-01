@@ -1,27 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59407)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59915)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yang.zhong@intel.com>) id 1dGIeD-0001tt-Pr
-	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 01:27:50 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1dGIh8-00030X-0E
+	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 01:30:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yang.zhong@intel.com>) id 1dGIe9-0003f6-Qw
-	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 01:27:49 -0400
-Received: from mga09.intel.com ([134.134.136.24]:48028)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <yang.zhong@intel.com>)
-	id 1dGIe9-0003aE-I2
-	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 01:27:45 -0400
-Date: Thu, 1 Jun 2017 13:27:36 +0800
-From: Zhong Yang <yang.zhong@intel.com>
-Message-ID: <20170601052736.GA17625@yangzhon-Virtual>
-References: <1496212144-14947-1-git-send-email-yang.zhong@intel.com>
-	<c5d963e7-ef71-0ed5-aaae-01d492e4fd8b@redhat.com>
+	(envelope-from <dgibson@ozlabs.org>) id 1dGIh7-0005YM-4G
+	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 01:30:50 -0400
+Date: Thu, 1 Jun 2017 15:30:37 +1000
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20170601053037.GC13397@umbus.fritz.box>
+References: <20170601015218.9299-1-david@gibson.dropbear.id.au>
+	<20170601040646.GB27525@in.ibm.com>
+	<149629114184.3207.6757927820110284250@loki>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="KDt/GgjP6HVcx58l"
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <c5d963e7-ef71-0ed5-aaae-01d492e4fd8b@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 0/6] tcg: move the tcg files into tcg/
- subdirectory.
+In-Reply-To: <149629114184.3207.6757927820110284250@loki>
+Subject: Re: [Qemu-devel] [PATCH 0/4] spapr:DRC cleanups (part I)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,98 +25,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Eric Blake <eblake@redhat.com>, Laurent Desnogues <laurent.desnogues@gmail.com>, anthony.xu@intel.com, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-
- Wed, May 31, 2017 at 02:54:05PM +0200, Paolo Bonzini wrote:
-> 
-> 
-> On 31/05/2017 08:28, Yang Zhong wrote:
-> > Move the tcg related files into tcg/ subdirectory, which will make
-> > the code more clean in qemu. Next step, we will base on those changes 
-> > to disable tcg.
-> 
-> You should also move cpu-exec.c, cpu-exec-common.c and cputlb.c.
->
-  In fact, there are other two patchsets for those files. Since this patchset
-  is only for moving TCG backend files into tcg/ subdirectory, i firstly upload
-  this patchset.
-
-  Let me explain my plan here, 
-
-  In order to disable tcg, the first phase is to split some
-  tcg code and separate those tcg related files into one
-  directory. The next phase will disable tcg more easily and
-  cleanly.
-
-  In the first phase, there are three patchsets to
-  deal with split code and separate the files.
-  1) split the tcg exec code.
-     a)split the tcg accelerators from accel.c file and re-name
-       tcg accelerator to tcg-all.c, like kvm-all.c did.
-     b)create one accel directory, which will include kvm,
-       tcg and general exec files.
-     c)move tcg exec files into ./accel/tcg directory.
-  2) move tcg related backend files into tcg/ directory
-     those files include translate-all.(ch), translate-common.c,
-     tci.c and tcg-runtime.c.
-  3) move kvm exec and exec.c file.
-     a)move kvm related exec files into ./accel/kvm directory.
-     b)move exec.c in ./accel directory.
-
-  after 1) and 3) done, the file tree like below:
-  accel/
-  ├── accel.c
-  ├── exec.c
-  ├── kvm
-  │   ├── kvm-all.c
-  │   ├── kvm-stub.c
-  │   ├── Makefile.objs
-  │   └── trace-events
-  ├── Makefile.objs
-  └── tcg
-      ├── cpu-exec.c
-      ├── cpu-exec-common.c
-      ├── cputlb.c
-      ├── Makefile.objs
-      ├── tcg-all.c
-      └── trace-events
-  
-  please help me check whether this kind of arrange is suitable? 
+To: Michael Roth <mdroth@linux.vnet.ibm.com>
+Cc: Bharata B Rao <bharata@linux.vnet.ibm.com>, lvivier@redhat.com, nikunj@linux.vnet.ibm.com, sursingh@redhat.com, qemu-devel@nongnu.org, qemu-ppc@nongnu.org
 
 
-> Also, feel free to squash everything in a single patch.
+--KDt/GgjP6HVcx58l
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-  for the tcg/ subdirectory, i will make those 6 patchset to one single patch. thanks!
+On Wed, May 31, 2017 at 11:25:41PM -0500, Michael Roth wrote:
+> Quoting Bharata B Rao (2017-05-31 23:06:46)
+> > On Thu, Jun 01, 2017 at 11:52:14AM +1000, David Gibson wrote:
+> > > The code managing DRCs[0] has quite a few things that are more
+> > > complicated than they need to be.  In particular the object
+> > > representing a DRC has a bunch of method pointers, despite the fact
+> > > that there are currently no subclasses, and even if there were the
+> > > method implementations would be unlikely to differ.
+> >=20
+> > So you are getting rid of a few methods. How about other methods ?
+> > Specially attach and detach which have incorporated all the logic needed
+> > to handle logical and physical DRs into their implementations ?
+>=20
+> I would avoid any methods that incorporate special-casing for
+> physical vs. logical DRCs, since that seems like a good logical
+> starting point for moving to 'physical'/'logical' DRC
+> sub-classes to help simplify the increasingly complicated
+> state-tracking.
 
-> Thanks,
-> 
-> Paolo
-> 
-> > Yang Zhong (6):
-> >   tcg: move tcg-runtime.c to tcg/ subdirectory
-> >   tcg: move translate-all.c to tcg/ subdirectory
-> >   tcg: move tcg header file
-> >   tcg: move translate-common.c to tcg/ subdirectory
-> >   tcg: move tci.c to tcg/ subdirectory
-> >   tcg: change tcg related file's compile definition
-> > 
-> >  Makefile.objs                                | 1 +
-> >  Makefile.target                              | 8 ++------
-> >  tcg/Makefile.objs                            | 2 ++
-> >  tcg-runtime.c => tcg/tcg-runtime.c           | 0
-> >  tci.c => tcg/tci.c                           | 0
-> >  tcg/trace-events                             | 6 ++++++
-> >  translate-all.c => tcg/translate-all.c       | 2 +-
-> >  translate-all.h => tcg/translate-all.h       | 0
-> >  translate-common.c => tcg/translate-common.c | 0
-> >  trace-events                                 | 3 ---
-> >  10 files changed, 12 insertions(+), 10 deletions(-)
-> >  create mode 100644 tcg/Makefile.objs
-> >  rename tcg-runtime.c => tcg/tcg-runtime.c (100%)
-> >  rename tci.c => tcg/tci.c (100%)
-> >  create mode 100644 tcg/trace-events
-> >  rename translate-all.c => tcg/translate-all.c (99%)
-> >  rename translate-all.h => tcg/translate-all.h (100%)
-> >  rename translate-common.c => tcg/translate-common.c (100%)
-> > 
+Right, I'm looking at making subclasses for each of the DRC types.
+Possibly with intermediate subclasses for physical vs. logical, we'll
+see how it works out.
+
+> I also don't think we should expose DRC internal fields to
+> outside callers (which attach/detach would involve).
+
+Well.. just changing attach/detach to plain functions instead of
+methods wouldn't break that.
+
+> This
+> series does that to some extent with the RTAS calls, but
+> since those are now moved to spapr_drc.c it makes more sense.
+
+Right - the semantics of the RTAS calls are tied closely to the DRC
+semantics, so I don't think there's any point considering the RTAS
+calls to be "outside" the DRC code itself.
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--KDt/GgjP6HVcx58l
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iQIcBAEBCAAGBQJZL6Z9AAoJEGw4ysog2bOSiIIQALySJErP00w6yEMhvzCO4xac
+y0lGk0umwb/WdTn4PIXOgxJiqcklzC+Ao9rtmQ6+B18oUN/IfW5H3dKzjomNRIPV
+iDcbgf2w5OR6ulLZwinfO+SKxoBX2jlCAdh4CCkV+D2MIDObJa509Hj0Ls5EqAiz
+H1bNW+Sxemej2Qur/BvlBjHUWVfyI+hPLELw9xAlz17Nyiw7KvsS56o0iVkd29U8
+Msr8J4bVi81pm/OxdbFqs7HvnpxgtsvULqjpYveFscBnWTuHwkT7DVNXGidf3Q1Z
+SaxboRFphnFXYTCLg4WfYAO/U35GG2qWsGROrQnS3hXBf1XTHUc/Md+4jckWdm3Z
+uV0QmCF5luTlOsVbAgYs9VXJz8J08TRw+9ccb40m30u14UV8Uvmas5idqYY4bcD0
+f0Et2UfrXXcXBHDNxCjsnLqkDLrkpk79B5jXM8//dBrx8yvaxRJb4GuA4utrZkbM
+6f1ufVeucXU9Ur2Du6UYaEX4LEesmxte+7BhUWPGQk5uqGCy2xjIlewlH8hkE7GP
+q7n4g7IOsPlQCTfbKMOtrDvpOAW2GruH7EbEkRRY/l+wCkDjxnFlTC5aDfUM29cY
+XUsZN5B7xvsuLlhABjQ95HRjTqxlgP0/HIAvz++RVMwNo9dpKtSq9eG43S0XMvV6
+RWzJ2h/SQCS9VLRtXGSz
+=JbKp
+-----END PGP SIGNATURE-----
+
+--KDt/GgjP6HVcx58l--
