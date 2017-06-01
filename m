@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38554)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38587)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1dGVhR-0004kN-TS
-	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 15:24:05 -0400
+	(envelope-from <quintela@redhat.com>) id 1dGVhV-0004nJ-8V
+	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 15:24:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1dGVhQ-000590-IE
-	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 15:24:01 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:40478)
+	(envelope-from <quintela@redhat.com>) id 1dGVhT-0005Af-2h
+	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 15:24:05 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:41242)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1dGVhQ-00058K-AG
-	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 15:24:00 -0400
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1dGVhS-00059w-Qe
+	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 15:24:03 -0400
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
 	[10.5.11.13])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 5774A142A66
-	for <qemu-devel@nongnu.org>; Thu,  1 Jun 2017 19:23:59 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id CBFD3BB9CF
+	for <qemu-devel@nongnu.org>; Thu,  1 Jun 2017 19:24:01 +0000 (UTC)
 From: Juan Quintela <quintela@redhat.com>
-Date: Thu,  1 Jun 2017 21:23:25 +0200
-Message-Id: <20170601192327.29712-14-quintela@redhat.com>
+Date: Thu,  1 Jun 2017 21:23:26 +0200
+Message-Id: <20170601192327.29712-15-quintela@redhat.com>
 In-Reply-To: <20170601192327.29712-1-quintela@redhat.com>
 References: <20170601192327.29712-1-quintela@redhat.com>
-Subject: [Qemu-devel] [PULL 13/15] migration: Create include for migration
- snapshots
+Subject: [Qemu-devel] [PULL 14/15] migration: Export ram.c functions in its
+ own file
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,185 +33,270 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: dgilbert@redhat.com, lvivier@redhat.com, peterx@redhat.com
 
-Start removing migration code from sysemu/sysemu.h.
+All functions are internal except for ram_mig_init().  Create
+migration/misc.h for this kind of functions.
 
 Signed-off-by: Juan Quintela <quintela@redhat.com>
 Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 ---
- hmp.c                        |  5 +++--
- include/block/block_int.h    |  4 ++--
- include/migration/snapshot.h | 21 +++++++++++++++++++++
- include/sysemu/sysemu.h      |  3 ---
- migration/savevm.c           |  5 +++--
- replay/replay-snapshot.c     |  5 +++--
- vl.c                         |  3 ++-
- 7 files changed, 34 insertions(+), 12 deletions(-)
- create mode 100644 include/migration/snapshot.h
+ include/migration/migration.h | 38 -----------------------
+ include/migration/misc.h      | 21 +++++++++++++
+ migration/migration.c         |  1 +
+ migration/postcopy-ram.c      |  1 +
+ migration/ram.c               |  2 ++
+ migration/ram.h               | 70 +++++++++++++++++++++++++++++++++++++++++++
+ migration/rdma.c              |  2 +-
+ migration/savevm.c            |  1 +
+ vl.c                          |  1 +
+ 9 files changed, 98 insertions(+), 39 deletions(-)
+ create mode 100644 include/migration/misc.h
+ create mode 100644 migration/ram.h
 
-diff --git a/hmp.c b/hmp.c
-index 20f5dab..ad72390 100644
---- a/hmp.c
-+++ b/hmp.c
-@@ -42,6 +42,7 @@
- #include "qemu/error-report.h"
- #include "exec/ramlist.h"
- #include "hw/intc/intc.h"
-+#include "migration/snapshot.h"
+diff --git a/include/migration/migration.h b/include/migration/migration.h
+index 8d29bc9..79b5484 100644
+--- a/include/migration/migration.h
++++ b/include/migration/migration.h
+@@ -171,38 +171,6 @@ bool migration_in_postcopy(void);
+ bool migration_in_postcopy_after_devices(MigrationState *);
+ MigrationState *migrate_get_current(void);
  
- #ifdef CONFIG_SPICE
- #include <spice/enums.h>
-@@ -1284,7 +1285,7 @@ void hmp_loadvm(Monitor *mon, const QDict *qdict)
+-void migrate_compress_threads_create(void);
+-void migrate_compress_threads_join(void);
+-void migrate_decompress_threads_create(void);
+-void migrate_decompress_threads_join(void);
+-uint64_t ram_bytes_remaining(void);
+-uint64_t ram_bytes_transferred(void);
+-uint64_t ram_bytes_total(void);
+-uint64_t ram_dirty_sync_count(void);
+-uint64_t ram_dirty_pages_rate(void);
+-uint64_t ram_postcopy_requests(void);
+-void free_xbzrle_decoded_buf(void);
+-
+-void acct_update_position(QEMUFile *f, size_t size, bool zero);
+-
+-uint64_t dup_mig_pages_transferred(void);
+-uint64_t norm_mig_pages_transferred(void);
+-uint64_t xbzrle_mig_bytes_transferred(void);
+-uint64_t xbzrle_mig_pages_transferred(void);
+-uint64_t xbzrle_mig_pages_overflow(void);
+-uint64_t xbzrle_mig_pages_cache_miss(void);
+-double xbzrle_mig_cache_miss_rate(void);
+-
+-void ram_handle_compressed(void *host, uint8_t ch, uint64_t size);
+-void ram_debug_dump_bitmap(unsigned long *todump, bool expected,
+-                           unsigned long pages);
+-/* For outgoing discard bitmap */
+-int ram_postcopy_send_discard_bitmap(MigrationState *ms);
+-/* For incoming postcopy discard */
+-int ram_discard_range(const char *block_name, uint64_t start, size_t length);
+-int ram_postcopy_incoming_init(MigrationIncomingState *mis);
+-void ram_postcopy_migrated_memory_release(MigrationState *ms);
+-
+ bool migrate_release_ram(void);
+ bool migrate_postcopy_ram(void);
+ bool migrate_zero_blocks(void);
+@@ -213,8 +181,6 @@ int migrate_use_xbzrle(void);
+ int64_t migrate_xbzrle_cache_size(void);
+ bool migrate_colo_enabled(void);
  
-     vm_stop(RUN_STATE_RESTORE_VM);
+-int64_t xbzrle_cache_resize(int64_t new_size);
+-
+ bool migrate_use_block(void);
+ bool migrate_use_block_incremental(void);
  
--    if (load_vmstate(name, &err) == 0 && saved_vm_running) {
-+    if (load_snapshot(name, &err) == 0 && saved_vm_running) {
-         vm_start();
-     }
-     hmp_handle_error(mon, &err);
-@@ -1294,7 +1295,7 @@ void hmp_savevm(Monitor *mon, const QDict *qdict)
- {
-     Error *err = NULL;
+@@ -253,7 +219,6 @@ size_t ram_control_save_page(QEMUFile *f, ram_addr_t block_offset,
+                              ram_addr_t offset, size_t size,
+                              uint64_t *bytes_sent);
  
--    save_vmstate(qdict_get_try_str(qdict, "name"), &err);
-+    save_snapshot(qdict_get_try_str(qdict, "name"), &err);
-     hmp_handle_error(mon, &err);
- }
+-void ram_mig_init(void);
+ void savevm_skip_section_footers(void);
+ void register_global_state(void);
+ void global_state_set_optional(void);
+@@ -261,7 +226,4 @@ void savevm_skip_configuration(void);
+ int global_state_store(void);
+ void global_state_store_running(void);
  
-diff --git a/include/block/block_int.h b/include/block/block_int.h
-index e5eb473..cb78c4f 100644
---- a/include/block/block_int.h
-+++ b/include/block/block_int.h
-@@ -601,8 +601,8 @@ struct BlockDriverState {
-     int copy_on_read;
- 
-     /* If we are reading a disk image, give its size in sectors.
--     * Generally read-only; it is written to by load_vmstate and save_vmstate,
--     * but the block layer is quiescent during those.
-+     * Generally read-only; it is written to by load_snapshot and
-+     * save_snaphost, but the block layer is quiescent during those.
-      */
-     int64_t total_sectors;
- 
-diff --git a/include/migration/snapshot.h b/include/migration/snapshot.h
+-void migration_page_queue_free(void);
+-int ram_save_queue_pages(const char *rbname, ram_addr_t start, ram_addr_t len);
+-uint64_t ram_pagesize_summary(void);
+ #endif
+diff --git a/include/migration/misc.h b/include/migration/misc.h
 new file mode 100644
-index 0000000..c85b6ec
+index 0000000..0b37714
 --- /dev/null
-+++ b/include/migration/snapshot.h
++++ b/include/migration/misc.h
 @@ -0,0 +1,21 @@
 +/*
-+ * QEMU snapshots
++ * QEMU migration miscellaneus exported functions
 + *
-+ * Copyright (c) 2004-2008 Fabrice Bellard
-+ * Copyright (c) 2009-2015 Red Hat Inc
++ * Copyright IBM, Corp. 2008
++ *
++ * Authors:
++ *  Anthony Liguori   <aliguori@us.ibm.com>
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2.  See
++ * the COPYING file in the top-level directory.
++ *
++ */
++
++#ifndef MIGRATION_MISC_H
++#define MIGRATION_MISC_H
++
++/* migration/ram.c */
++
++void ram_mig_init(void);
++
++#endif
+diff --git a/migration/migration.c b/migration/migration.c
+index ec79aff..6e5afa4 100644
+--- a/migration/migration.c
++++ b/migration/migration.c
+@@ -22,6 +22,7 @@
+ #include "fd.h"
+ #include "socket.h"
+ #include "rdma.h"
++#include "ram.h"
+ #include "migration/migration.h"
+ #include "savevm.h"
+ #include "qemu-file-channel.h"
+diff --git a/migration/postcopy-ram.c b/migration/postcopy-ram.c
+index 71f4389..9c41887 100644
+--- a/migration/postcopy-ram.c
++++ b/migration/postcopy-ram.c
+@@ -24,6 +24,7 @@
+ #include "qemu-file.h"
+ #include "savevm.h"
+ #include "postcopy-ram.h"
++#include "ram.h"
+ #include "sysemu/sysemu.h"
+ #include "sysemu/balloon.h"
+ #include "qemu/error-report.h"
+diff --git a/migration/ram.c b/migration/ram.c
+index 390f714..f387e9c 100644
+--- a/migration/ram.c
++++ b/migration/ram.c
+@@ -36,7 +36,9 @@
+ #include "qemu/timer.h"
+ #include "qemu/main-loop.h"
+ #include "xbzrle.h"
++#include "ram.h"
+ #include "migration/migration.h"
++#include "migration/misc.h"
+ #include "qemu-file.h"
+ #include "migration/vmstate.h"
+ #include "postcopy-ram.h"
+diff --git a/migration/ram.h b/migration/ram.h
+new file mode 100644
+index 0000000..c9563d1
+--- /dev/null
++++ b/migration/ram.h
+@@ -0,0 +1,70 @@
++/*
++ * QEMU System Emulator
++ *
++ * Copyright (c) 2003-2008 Fabrice Bellard
++ * Copyright (c) 2011-2015 Red Hat Inc
 + *
 + * Authors:
 + *  Juan Quintela <quintela@redhat.com>
 + *
++ * Permission is hereby granted, free of charge, to any person obtaining a copy
++ * of this software and associated documentation files (the "Software"), to deal
++ * in the Software without restriction, including without limitation the rights
++ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
++ * copies of the Software, and to permit persons to whom the Software is
++ * furnished to do so, subject to the following conditions:
 + *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or later.
-+ * See the COPYING file in the top-level directory.
++ * The above copyright notice and this permission notice shall be included in
++ * all copies or substantial portions of the Software.
++ *
++ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
++ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
++ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
++ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
++ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
++ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
++ * THE SOFTWARE.
 + */
 +
-+#ifndef QEMU_MIGRATION_SNAPSHOT_H
-+#define QEMU_MIGRATION_SNAPSHOT_H
++#ifndef QEMU_MIGRATION_RAM_H
++#define QEMU_MIGRATION_RAM_H
 +
-+int save_snapshot(const char *name, Error **errp);
-+int load_snapshot(const char *name, Error **errp);
++#include "qemu-common.h"
++#include "exec/cpu-common.h"
 +
++int64_t xbzrle_cache_resize(int64_t new_size);
++uint64_t dup_mig_pages_transferred(void);
++uint64_t norm_mig_pages_transferred(void);
++uint64_t xbzrle_mig_bytes_transferred(void);
++uint64_t xbzrle_mig_pages_transferred(void);
++uint64_t xbzrle_mig_pages_cache_miss(void);
++double xbzrle_mig_cache_miss_rate(void);
++uint64_t xbzrle_mig_pages_overflow(void);
++uint64_t ram_bytes_transferred(void);
++uint64_t ram_bytes_remaining(void);
++uint64_t ram_dirty_sync_count(void);
++uint64_t ram_dirty_pages_rate(void);
++uint64_t ram_postcopy_requests(void);
++uint64_t ram_bytes_total(void);
++
++void migrate_compress_threads_create(void);
++void migrate_compress_threads_join(void);
++void migrate_decompress_threads_create(void);
++void migrate_decompress_threads_join(void);
++
++uint64_t ram_pagesize_summary(void);
++void migration_page_queue_free(void);
++int ram_save_queue_pages(const char *rbname, ram_addr_t start, ram_addr_t len);
++void acct_update_position(QEMUFile *f, size_t size, bool zero);
++void free_xbzrle_decoded_buf(void);
++void ram_debug_dump_bitmap(unsigned long *todump, bool expected,
++                           unsigned long pages);
++void ram_postcopy_migrated_memory_release(MigrationState *ms);
++/* For outgoing discard bitmap */
++int ram_postcopy_send_discard_bitmap(MigrationState *ms);
++/* For incoming postcopy discard */
++int ram_discard_range(const char *block_name, uint64_t start, size_t length);
++int ram_postcopy_incoming_init(MigrationIncomingState *mis);
++
++void ram_handle_compressed(void *host, uint8_t ch, uint64_t size);
 +#endif
-diff --git a/include/sysemu/sysemu.h b/include/sysemu/sysemu.h
-index 723c8dc..9841a52 100644
---- a/include/sysemu/sysemu.h
-+++ b/include/sysemu/sysemu.h
-@@ -92,9 +92,6 @@ void qemu_remove_exit_notifier(Notifier *notify);
- void qemu_add_machine_init_done_notifier(Notifier *notify);
- void qemu_remove_machine_init_done_notifier(Notifier *notify);
- 
--int save_vmstate(const char *name, Error **errp);
--int load_vmstate(const char *name, Error **errp);
--
- void qemu_announce_self(void);
- 
- extern int autostart;
+diff --git a/migration/rdma.c b/migration/rdma.c
+index fab30ea..e446c6f 100644
+--- a/migration/rdma.c
++++ b/migration/rdma.c
+@@ -20,7 +20,7 @@
+ #include "rdma.h"
+ #include "migration/migration.h"
+ #include "qemu-file.h"
+-#include "exec/cpu-common.h"
++#include "ram.h"
+ #include "qemu-file-channel.h"
+ #include "qemu/error-report.h"
+ #include "qemu/main-loop.h"
 diff --git a/migration/savevm.c b/migration/savevm.c
-index bb3f9ec..f2664f3 100644
+index f2664f3..9c320f5 100644
 --- a/migration/savevm.c
 +++ b/migration/savevm.c
-@@ -35,6 +35,7 @@
- #include "sysemu/sysemu.h"
+@@ -36,6 +36,7 @@
  #include "qemu/timer.h"
  #include "migration/migration.h"
-+#include "migration/snapshot.h"
+ #include "migration/snapshot.h"
++#include "ram.h"
  #include "qemu-file-channel.h"
  #include "qemu-file.h"
  #include "savevm.h"
-@@ -2067,7 +2068,7 @@ int qemu_loadvm_state(QEMUFile *f)
-     return ret;
- }
- 
--int save_vmstate(const char *name, Error **errp)
-+int save_snapshot(const char *name, Error **errp)
- {
-     BlockDriverState *bs, *bs1;
-     QEMUSnapshotInfo sn1, *sn = &sn1, old_sn1, *old_sn = &old_sn1;
-@@ -2224,7 +2225,7 @@ void qmp_xen_load_devices_state(const char *filename, Error **errp)
-     migration_incoming_state_destroy();
- }
- 
--int load_vmstate(const char *name, Error **errp)
-+int load_snapshot(const char *name, Error **errp)
- {
-     BlockDriverState *bs, *bs_vm_state;
-     QEMUSnapshotInfo sn;
-diff --git a/replay/replay-snapshot.c b/replay/replay-snapshot.c
-index c75cd38..a4ded29 100644
---- a/replay/replay-snapshot.c
-+++ b/replay/replay-snapshot.c
-@@ -19,6 +19,7 @@
- #include "qapi/qmp/qstring.h"
- #include "qemu/error-report.h"
- #include "migration/vmstate.h"
-+#include "migration/snapshot.h"
- 
- static void replay_pre_save(void *opaque)
- {
-@@ -66,13 +67,13 @@ void replay_vmstate_init(void)
- 
-     if (replay_snapshot) {
-         if (replay_mode == REPLAY_MODE_RECORD) {
--            if (save_vmstate(replay_snapshot, &err) != 0) {
-+            if (save_snapshot(replay_snapshot, &err) != 0) {
-                 error_report_err(err);
-                 error_report("Could not create snapshot for icount record");
-                 exit(1);
-             }
-         } else if (replay_mode == REPLAY_MODE_PLAY) {
--            if (load_vmstate(replay_snapshot, &err) != 0) {
-+            if (load_snapshot(replay_snapshot, &err) != 0) {
-                 error_report_err(err);
-                 error_report("Could not load snapshot for icount replay");
-                 exit(1);
 diff --git a/vl.c b/vl.c
-index 993690d..86f6c71 100644
+index 86f6c71..13deeba 100644
 --- a/vl.c
 +++ b/vl.c
 @@ -87,6 +87,7 @@ int main(int argc, char **argv)
  #include "sysemu/blockdev.h"
  #include "hw/block/block.h"
  #include "migration/block.h"
-+#include "migration/snapshot.h"
++#include "migration/misc.h"
+ #include "migration/snapshot.h"
  #include "sysemu/tpm.h"
  #include "sysemu/dma.h"
- #include "hw/audio/soundhw.h"
-@@ -4722,7 +4723,7 @@ int main(int argc, char **argv, char **envp)
-         replay_vmstate_init();
-     } else if (loadvm) {
-         Error *local_err = NULL;
--        if (load_vmstate(loadvm, &local_err) < 0) {
-+        if (load_snapshot(loadvm, &local_err) < 0) {
-             error_report_err(local_err);
-             autostart = 0;
-         }
 -- 
 2.9.4
