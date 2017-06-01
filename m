@@ -1,22 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38801)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39301)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <k.kozlowski.k@gmail.com>) id 1dGTnY-00033w-DU
-	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 13:22:13 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1dGTor-0004bA-Bu
+	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 13:23:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <k.kozlowski.k@gmail.com>) id 1dGTnX-000478-9h
-	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 13:22:12 -0400
-Date: Thu, 1 Jun 2017 19:22:03 +0200
-From: Krzysztof Kozlowski <krzk@kernel.org>
-Message-ID: <20170601172203.4mtc4ekasm6mmk4s@kozik-lap>
+	(envelope-from <peter.maydell@linaro.org>) id 1dGToq-0005MI-Ee
+	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 13:23:33 -0400
+Received: from mail-wm0-x235.google.com ([2a00:1450:400c:c09::235]:35445)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1dGToq-0005Lz-8z
+	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 13:23:32 -0400
+Received: by mail-wm0-x235.google.com with SMTP id b84so167131572wmh.0
+	for <qemu-devel@nongnu.org>; Thu, 01 Jun 2017 10:23:32 -0700 (PDT)
+MIME-Version: 1.0
+In-Reply-To: <20170601171019.j7ist5qnuvllvfhi@kozik-lap>
 References: <20170521152949.15338-1-krzk@kernel.org>
 	<CAFEAcA8qYBAgHWPGdSTry7Rmt1Ai9gmKXdKs+f_x_jQU0+7c5Q@mail.gmail.com>
 	<CAJKOXPebX4GFh06NmAfkt3Vt5D-xwbeJ3UPA-Z+vMc8BtQZcZw@mail.gmail.com>
 	<CAFEAcA8Q8-U9aocQgbUTt2WP4S9Tj_K_iXZuP08x9Ck0LszS3Q@mail.gmail.com>
 	<20170601171019.j7ist5qnuvllvfhi@kozik-lap>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20170601171019.j7ist5qnuvllvfhi@kozik-lap>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 1 Jun 2017 18:23:10 +0100
+Message-ID: <CAFEAcA_3+S8jWsKUjzivBLcJhan1mfBo7o1WzMaG6wo6qa6LuA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Subject: Re: [Qemu-devel] [PATCH v3 00/11] hw: arm: exynos: Bring up
  secondary CPU, QOM-ify Soc, other improvements
 List-Id: <qemu-devel.nongnu.org>
@@ -27,63 +33,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Igor Mitsyanko <i.mitsyanko@gmail.com>, qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+To: Krzysztof Kozlowski <krzk@kernel.org>
+Cc: Igor Mitsyanko <i.mitsyanko@gmail.com>, qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
 
-On Thu, Jun 01, 2017 at 07:10:19PM +0200, Krzysztof Kozlowski wrote:
+On 1 June 2017 at 18:10, Krzysztof Kozlowski <krzk@kernel.org> wrote:
 > On Thu, Jun 01, 2017 at 05:31:41PM +0100, Peter Maydell wrote:
-> > On 31 May 2017 at 09:58, Krzysztof Kozlowski <krzk@kernel.org> wrote:
-> > > On Tue, May 30, 2017 at 2:04 PM, Peter Maydell <peter.maydell@linaro.org> wrote:
-> > >> So is this a regression compared to our current model? I was
-> > >> under the impression from the previous thread that it was,
-> > >> which is why I didn't apply that patchset.
-> > >
-> > > It depends how wide understanding of regression you have. :)
-> > > 1. Before this patch, second CPU could not boot. System was usable but
-> > > worked on only one CPU.
-> > > 2. Before this patch, kernel's IRQ work is broken. None of IRQ work
-> > > are executed which is mostly visible during poweroff - system hangs on
-> > > syncing IRQ works.
-> > > 3. With this patch, second CPU boots and IRQ works properly (so
-> > > poweroff is possible).
-> > > 4. However with this patch, Linux kernel with cpuidle enabled (which
-> > > is also included in many kernel defconfigs), the system is very
-> > > unresponsive.
-> > >
-> > > So overall... a lot of things were broken already. This patches fixes
-> > > them... but breaks different thing.
-> > 
-> > It sounds like it breaks a key thing, ie "boot a single cpu kernel
-> > built from a defconfig", though. That's a regression I'd rather
-> > not have.
-> 
+>> It sounds like it breaks a key thing, ie "boot a single cpu kernel
+>> built from a defconfig", though. That's a regression I'd rather
+>> not have.
+>
 > I am not sure if I understand you correctly... the system previously
 > booted into one CPU mode because second CPU just could not boot. Now by
 > default, second CPU succeeds and this means that *default* settings are
 > indeed more broken than before.
-> 
+>
 > On the other hand, after removing a line from hw/arm/exynos4210.c:
-> 	qdev_prop_set_uint32(dev, "num-cpu", EXYNOS4210_NCPUS);
+>         qdev_prop_set_uint32(dev, "num-cpu", EXYNOS4210_NCPUS);
 > and running qemu with "-accel tcg -smp cpus=1,maxcpus=1,cores=1"
 > everything is okay. Booting of one CPU is unaffected.
 
-Ahh, and one more thing. For forced single CPU mode (mentioned above),
-now it actually behaves better. Fixed GIC mappings means that SGIs are
-working (execution of IRQ work is fixed) thus the system can properly
-power off.
+Ah, I see now.
 
-This means we could hard-code one-cpu for now and get better behavior
-than previously (one CPU but with SGIs).
-
-Best regards,
-Krzysztof
-
-> 
-> > If there's a subset of these patches which don't break
-> > that I'm happy to take those. Otherwise we need to investigate
-> > and fix whatever the problem is that causes that unresponsiveness
-> > before we can apply them.
-> 
+>> If there's a subset of these patches which don't break
+>> that I'm happy to take those. Otherwise we need to investigate
+>> and fix whatever the problem is that causes that unresponsiveness
+>> before we can apply them.
+>
 > Yes, you can take everything except first patch
 > ("hw/intc/exynos4210_gic: Fix GIC memory mappings for secondary CPU")
 > and it should be fine. Rest of patches are just independent.
+
+Can you send a series which has just the patches that don't break,
+please? I think this series needs a respin anyway because of the
+make check problems (noted on the other thread).
+
+thanks
+-- PMM
