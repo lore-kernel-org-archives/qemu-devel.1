@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59590)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59511)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1dGPQU-0003P7-QK
-	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 08:42:07 -0400
+	(envelope-from <paolo.bonzini@gmail.com>) id 1dGPQR-0003MX-Gz
+	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 08:42:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1dGPQU-0005iK-3y
-	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 08:42:06 -0400
-Received: from mail-wm0-x243.google.com ([2a00:1450:400c:c09::243]:33568)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1dGPQQ-0005gf-6c
+	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 08:42:03 -0400
+Received: from mail-wm0-x244.google.com ([2a00:1450:400c:c09::244]:35363)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1dGPQT-0005iD-TI
-	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 08:42:06 -0400
-Received: by mail-wm0-x243.google.com with SMTP id b84so11063081wmh.0
-	for <qemu-devel@nongnu.org>; Thu, 01 Jun 2017 05:42:05 -0700 (PDT)
+	id 1dGPQP-0005fi-T7
+	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 08:42:02 -0400
+Received: by mail-wm0-x244.google.com with SMTP id g15so11028585wmc.2
+	for <qemu-devel@nongnu.org>; Thu, 01 Jun 2017 05:42:01 -0700 (PDT)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Thu,  1 Jun 2017 14:41:27 +0200
-Message-Id: <1496320911-51305-10-git-send-email-pbonzini@redhat.com>
+Date: Thu,  1 Jun 2017 14:41:23 +0200
+Message-Id: <1496320911-51305-6-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1496320911-51305-1-git-send-email-pbonzini@redhat.com>
 References: <1496320911-51305-1-git-send-email-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PULL 09/33] Check the return value of fcntl in
- qemu_set_cloexec
+Subject: [Qemu-devel] [PULL 05/33] mc146818rtc: embrace all x86 specific code
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,39 +28,148 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Stefano Stabellini <sstabellini@kernel.org>, groug@kaod.org, pbonzini@redhat.com, Eric Blake <eblake@redhat.com>
+Cc: Xiao Guangrong <xiaoguangrong@tencent.com>
 
-From: Stefano Stabellini <sstabellini@kernel.org>
+From: Xiao Guangrong <xiaoguangrong@tencent.com>
 
-Assert that the return value is not an error. This issue was found by
-Coverity.
+Introduce a function, rtc_policy_slew_deliver_irq(), which delivers
+irq if LOST_TICK_POLICY_SLEW is used, as which is only supported on
+x86, other platforms call it will trigger a assert
 
-CID: 1374831
+After that, we can move the x86 specific code to the common place
 
-Signed-off-by: Stefano Stabellini <sstabellini@kernel.org>
-CC: groug@kaod.org
-CC: pbonzini@redhat.com
-CC: Eric Blake <eblake@redhat.com>
-Message-Id: <1494356693-13190-2-git-send-email-sstabellini@kernel.org>
+Signed-off-by: Xiao Guangrong <xiaoguangrong@tencent.com>
+Message-Id: <20170510083259.3900-6-xiaoguangrong@tencent.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- util/oslib-posix.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+ hw/timer/mc146818rtc.c | 60 ++++++++++++++++++++++++++------------------------
+ 1 file changed, 31 insertions(+), 29 deletions(-)
 
-diff --git a/util/oslib-posix.c b/util/oslib-posix.c
-index 4d9189e..16894ad 100644
---- a/util/oslib-posix.c
-+++ b/util/oslib-posix.c
-@@ -182,7 +182,9 @@ void qemu_set_cloexec(int fd)
- {
-     int f;
-     f = fcntl(fd, F_GETFD);
--    fcntl(fd, F_SETFD, f | FD_CLOEXEC);
-+    assert(f != -1);
-+    f = fcntl(fd, F_SETFD, f | FD_CLOEXEC);
-+    assert(f != -1);
+diff --git a/hw/timer/mc146818rtc.c b/hw/timer/mc146818rtc.c
+index f9d6181..542cd09 100644
+--- a/hw/timer/mc146818rtc.c
++++ b/hw/timer/mc146818rtc.c
+@@ -125,17 +125,34 @@ static void rtc_coalesced_timer_update(RTCState *s)
+     }
  }
  
- /*
++static QLIST_HEAD(, RTCState) rtc_devices =
++    QLIST_HEAD_INITIALIZER(rtc_devices);
++
+ #ifdef TARGET_I386
++void qmp_rtc_reset_reinjection(Error **errp)
++{
++    RTCState *s;
++
++    QLIST_FOREACH(s, &rtc_devices, link) {
++        s->irq_coalesced = 0;
++    }
++}
++
++static bool rtc_policy_slew_deliver_irq(RTCState *s)
++{
++    apic_reset_irq_delivered();
++    qemu_irq_raise(s->irq);
++    return apic_get_irq_delivered();
++}
++
+ static void rtc_coalesced_timer(void *opaque)
+ {
+     RTCState *s = opaque;
+ 
+     if (s->irq_coalesced != 0) {
+-        apic_reset_irq_delivered();
+         s->cmos_data[RTC_REG_C] |= 0xc0;
+         DPRINTF_C("cmos: injecting from timer\n");
+-        qemu_irq_raise(s->irq);
+-        if (apic_get_irq_delivered()) {
++        if (rtc_policy_slew_deliver_irq(s)) {
+             s->irq_coalesced--;
+             DPRINTF_C("cmos: coalesced irqs decreased to %d\n",
+                       s->irq_coalesced);
+@@ -144,6 +161,12 @@ static void rtc_coalesced_timer(void *opaque)
+ 
+     rtc_coalesced_timer_update(s);
+ }
++#else
++static bool rtc_policy_slew_deliver_irq(RTCState *s)
++{
++    assert(0);
++    return false;
++}
+ #endif
+ 
+ static uint32_t rtc_periodic_clock_ticks(RTCState *s)
+@@ -254,21 +277,17 @@ static void rtc_periodic_timer(void *opaque)
+     s->cmos_data[RTC_REG_C] |= REG_C_PF;
+     if (s->cmos_data[RTC_REG_B] & REG_B_PIE) {
+         s->cmos_data[RTC_REG_C] |= REG_C_IRQF;
+-#ifdef TARGET_I386
+         if (s->lost_tick_policy == LOST_TICK_POLICY_SLEW) {
+             if (s->irq_reinject_on_ack_count >= RTC_REINJECT_ON_ACK_COUNT)
+-                s->irq_reinject_on_ack_count = 0;		
+-            apic_reset_irq_delivered();
+-            qemu_irq_raise(s->irq);
+-            if (!apic_get_irq_delivered()) {
++                s->irq_reinject_on_ack_count = 0;
++            if (!rtc_policy_slew_deliver_irq(s)) {
+                 s->irq_coalesced++;
+                 rtc_coalesced_timer_update(s);
+                 DPRINTF_C("cmos: coalesced irqs increased to %d\n",
+                           s->irq_coalesced);
+             }
+         } else
+-#endif
+-        qemu_irq_raise(s->irq);
++            qemu_irq_raise(s->irq);
+     }
+ }
+ 
+@@ -612,20 +631,6 @@ static void rtc_get_time(RTCState *s, struct tm *tm)
+         rtc_from_bcd(s, s->cmos_data[RTC_CENTURY]) * 100 - 1900;
+ }
+ 
+-static QLIST_HEAD(, RTCState) rtc_devices =
+-    QLIST_HEAD_INITIALIZER(rtc_devices);
+-
+-#ifdef TARGET_I386
+-void qmp_rtc_reset_reinjection(Error **errp)
+-{
+-    RTCState *s;
+-
+-    QLIST_FOREACH(s, &rtc_devices, link) {
+-        s->irq_coalesced = 0;
+-    }
+-}
+-#endif
+-
+ static void rtc_set_time(RTCState *s)
+ {
+     struct tm tm;
+@@ -745,22 +750,19 @@ static uint64_t cmos_ioport_read(void *opaque, hwaddr addr,
+             if (ret & (REG_C_UF | REG_C_AF)) {
+                 check_update_timer(s);
+             }
+-#ifdef TARGET_I386
++
+             if(s->irq_coalesced &&
+                     (s->cmos_data[RTC_REG_B] & REG_B_PIE) &&
+                     s->irq_reinject_on_ack_count < RTC_REINJECT_ON_ACK_COUNT) {
+                 s->irq_reinject_on_ack_count++;
+                 s->cmos_data[RTC_REG_C] |= REG_C_IRQF | REG_C_PF;
+-                apic_reset_irq_delivered();
+                 DPRINTF_C("cmos: injecting on ack\n");
+-                qemu_irq_raise(s->irq);
+-                if (apic_get_irq_delivered()) {
++                if (rtc_policy_slew_deliver_irq(s)) {
+                     s->irq_coalesced--;
+                     DPRINTF_C("cmos: coalesced irqs decreased to %d\n",
+                               s->irq_coalesced);
+                 }
+             }
+-#endif
+             break;
+         default:
+             ret = s->cmos_data[s->cmos_index];
 -- 
 1.8.3.1
