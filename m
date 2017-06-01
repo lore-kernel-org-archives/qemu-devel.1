@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35203)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35371)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1dGTcY-00017C-DH
-	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 13:10:51 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1dGTcd-0001CI-Af
+	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 13:10:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1dGTcX-0006BU-AW
-	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 13:10:50 -0400
-Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:37145)
+	(envelope-from <pm215@archaic.org.uk>) id 1dGTcc-0006Hn-Ji
+	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 13:10:55 -0400
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:37151)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1dGTcX-00067A-1b
-	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 13:10:49 -0400
+	id 1dGTcc-0006Gg-C5
+	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 13:10:54 -0400
 Received: from pm215 by orth.archaic.org.uk with local (Exim 4.84_2)
-	(envelope-from <pm215@archaic.org.uk>) id 1dGTcN-0007OB-00
-	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 18:10:39 +0100
+	(envelope-from <pm215@archaic.org.uk>) id 1dGTcb-0007VY-Au
+	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 18:10:53 +0100
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu,  1 Jun 2017 18:10:12 +0100
-Message-Id: <1496337035-30213-5-git-send-email-peter.maydell@linaro.org>
+Date: Thu,  1 Jun 2017 18:10:33 +0100
+Message-Id: <1496337035-30213-26-git-send-email-peter.maydell@linaro.org>
 In-Reply-To: <1496337035-30213-1-git-send-email-peter.maydell@linaro.org>
 References: <1496337035-30213-1-git-send-email-peter.maydell@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 04/27] hw/intc/arm_gicv3_cpuif: Don't let BPR be
- set below its minimum
+Subject: [Qemu-devel] [PULL 25/27] aspeed: add a temp sensor device on I2C
+ bus 3
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,43 +33,43 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-icc_bpr_write() was not enforcing that writing a value below the
-minimum for the BPR should behave as if the BPR was set to the
-minimum value. This doesn't make a difference for the secure
-BPRs (since we define the minimum for the QEMU implementation
-as zero) but did mean we were allowing the NS BPR1 to be set to
-0 when 1 should be the lowest value.
+From: Cédric Le Goater <clg@kaod.org>
 
+Temperatures can be changed from the monitor with :
+
+	(qemu) qom-set /machine/unattached/device[2] temperature0 12000
+
+Signed-off-by: Cédric Le Goater <clg@kaod.org>
+Message-id: 1494827476-1487-7-git-send-email-clg@kaod.org
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Message-id: 1493226792-3237-3-git-send-email-peter.maydell@linaro.org
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- hw/intc/arm_gicv3_cpuif.c | 6 ++++++
- 1 file changed, 6 insertions(+)
+ hw/arm/aspeed.c | 9 +++++++++
+ 1 file changed, 9 insertions(+)
 
-diff --git a/hw/intc/arm_gicv3_cpuif.c b/hw/intc/arm_gicv3_cpuif.c
-index d31eba0..e660b3f 100644
---- a/hw/intc/arm_gicv3_cpuif.c
-+++ b/hw/intc/arm_gicv3_cpuif.c
-@@ -1388,6 +1388,7 @@ static void icc_bpr_write(CPUARMState *env, const ARMCPRegInfo *ri,
+diff --git a/hw/arm/aspeed.c b/hw/arm/aspeed.c
+index e824ea8..155eeb2 100644
+--- a/hw/arm/aspeed.c
++++ b/hw/arm/aspeed.c
+@@ -239,10 +239,19 @@ static void aspeed_board_init(MachineState *machine,
+ static void palmetto_bmc_i2c_init(AspeedBoardState *bmc)
  {
-     GICv3CPUState *cs = icc_cs_from_env(env);
-     int grp = (ri->crm == 8) ? GICV3_G0 : GICV3_G1;
-+    uint64_t minval;
+     AspeedSoCState *soc = &bmc->soc;
++    DeviceState *dev;
  
-     if (icv_access(env, grp == GICV3_G0 ? HCR_FMO : HCR_IMO)) {
-         icv_bpr_write(env, ri, value);
-@@ -1415,6 +1416,11 @@ static void icc_bpr_write(CPUARMState *env, const ARMCPRegInfo *ri,
-         return;
-     }
- 
-+    minval = (grp == GICV3_G1NS) ? GIC_MIN_BPR_NS : GIC_MIN_BPR;
-+    if (value < minval) {
-+        value = minval;
-+    }
+     /* The palmetto platform expects a ds3231 RTC but a ds1338 is
+      * enough to provide basic RTC features. Alarms will be missing */
+     i2c_create_slave(aspeed_i2c_get_bus(DEVICE(&soc->i2c), 0), "ds1338", 0x68);
 +
-     cs->icc_bpr[grp] = value & 7;
-     gicv3_cpuif_update(cs);
++    /* add a TMP423 temperature sensor */
++    dev = i2c_create_slave(aspeed_i2c_get_bus(DEVICE(&soc->i2c), 2),
++                           "tmp423", 0x4c);
++    object_property_set_int(OBJECT(dev), 31000, "temperature0", &error_abort);
++    object_property_set_int(OBJECT(dev), 28000, "temperature1", &error_abort);
++    object_property_set_int(OBJECT(dev), 20000, "temperature2", &error_abort);
++    object_property_set_int(OBJECT(dev), 110000, "temperature3", &error_abort);
  }
+ 
+ static void palmetto_bmc_init(MachineState *machine)
 -- 
 2.7.4
