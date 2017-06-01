@@ -1,41 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34266)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34304)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1dGO95-0004U8-7S
-	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 07:20:05 -0400
+	(envelope-from <armbru@redhat.com>) id 1dGO97-0004Uh-FK
+	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 07:20:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1dGO92-0000l8-0s
-	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 07:20:03 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:37015)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
-	id 1dGO91-0000kK-MR
-	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 07:19:59 -0400
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v51BJbl7076960
-	for <qemu-devel@nongnu.org>; Thu, 1 Jun 2017 07:19:58 -0400
-Received: from e38.co.us.ibm.com (e38.co.us.ibm.com [32.97.110.159])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2ateqd2wuu-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Thu, 01 Jun 2017 07:19:57 -0400
-Received: from localhost
-	by e38.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
-	Thu, 1 Jun 2017 05:19:57 -0600
-References: <20170529131716.94338-1-pasic@linux.vnet.ibm.com>
-	<20170601125241.2c11e95a.cornelia.huck@de.ibm.com>
-	<49c45fcc-c161-cb47-cf2b-86d39996c3d6@linux.vnet.ibm.com>
-From: Christian Borntraeger <borntraeger@de.ibm.com>
-Date: Thu, 1 Jun 2017 13:19:51 +0200
+	(envelope-from <armbru@redhat.com>) id 1dGO94-0000nS-7T
+	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 07:20:05 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46932)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dGO93-0000mX-Vy
+	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 07:20:02 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id DCECFC04B930
+	for <qemu-devel@nongnu.org>; Thu,  1 Jun 2017 11:20:00 +0000 (UTC)
+From: Markus Armbruster <armbru@redhat.com>
+References: <20170531135709.345-1-marcandre.lureau@redhat.com>
+	<20170531135709.345-6-marcandre.lureau@redhat.com>
+Date: Thu, 01 Jun 2017 13:19:56 +0200
+In-Reply-To: <20170531135709.345-6-marcandre.lureau@redhat.com>
+	(=?utf-8?Q?=22Marc-Andr=C3=A9?=
+	Lureau"'s message of "Wed, 31 May 2017 17:56:29 +0400")
+Message-ID: <878tlct0o3.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <49c45fcc-c161-cb47-cf2b-86d39996c3d6@linux.vnet.ibm.com>
-Content-Type: text/plain; charset=windows-1252
-Content-Language: en-IE
-Content-Transfer-Encoding: 7bit
-Message-Id: <9a244d38-106d-bec1-e379-136395b3fbdd@de.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH 1/1] s390x: vmstatify config migration for
- virtio-ccw
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 05/45] qdev: remove PropertyInfo.qtype
+ field
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -44,310 +36,346 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Halil Pasic <pasic@linux.vnet.ibm.com>, Cornelia Huck <cornelia.huck@de.ibm.com>
-Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org
+To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
+Cc: qemu-devel@nongnu.org
 
-On 06/01/2017 01:02 PM, Halil Pasic wrote:
-> 
-> 
-> On 06/01/2017 12:52 PM, Cornelia Huck wrote:
->> On Mon, 29 May 2017 15:17:16 +0200
->> Halil Pasic <pasic@linux.vnet.ibm.com> wrote:
->>
->>> Let's vmstatify virtio_ccw_save_config and virtio_ccw_load_config for
->>> flexibility (extending using subsections) and for fun.
->>
->> You have interesting ideas of fun :)
->>
->>>
->>> To achieve this we need to hack the config_vector, which is VirtIODevice
->>> (that is common virtio) state, in the middle of the VirtioCcwDevice state
->>> representation.  This somewhat ugly, but we have no choice because the
->>> stream format needs to be preserved.
->>>
->>> Almost no changes in behavior. Exception is everything that comes with
->>> vmstate like extra bookkeeping about what's in the stream, and maybe some
->>> extra checks and better error reporting.
->>>
->>> Signed-off-by: Halil Pasic <pasic@linux.vnet.ibm.com>
->>> ---
-> [..]
->>> --- a/hw/s390x/css.c
->>> +++ b/hw/s390x/css.c
-> [..]
->>> +static const VMStateDescription vmstate_sense_id = {
->>> +    .name = "s390_sense_id",
->>> +    .version_id = 1,
->>> +    .minimum_version_id = 1,
->>> +    .fields = (VMStateField[]) {
->>> +        VMSTATE_UINT8(reserved, SenseId),
->>> +        VMSTATE_UINT16(cu_type, SenseId),
->>> +        VMSTATE_UINT8(cu_model, SenseId),
->>> +        VMSTATE_UINT16(dev_type, SenseId),
->>> +        VMSTATE_UINT8(dev_model, SenseId),
->>> +        VMSTATE_UINT8(unused, SenseId),
->>
->> This is strictly due to stream format preservation, right?
->>
-> 
-> Yes!
-> 
-> [..]
->>> --- a/hw/s390x/virtio-ccw.c
->>> +++ b/hw/s390x/virtio-ccw.c
->>> @@ -34,9 +34,87 @@
->>>  #include "virtio-ccw.h"
->>>  #include "trace.h"
->>>  #include "hw/s390x/css-bridge.h"
->>> +#include "hw/s390x/s390-virtio-ccw.h"
->>>
->>>  #define NR_CLASSIC_INDICATOR_BITS 64
->>>
->>> +static int virtio_ccw_dev_post_load(void *opaque, int version_id)
->>> +{
->>> +    VirtioCcwDevice *dev = VIRTIO_CCW_DEVICE(opaque);
->>> +    CcwDevice *ccw_dev = CCW_DEVICE(dev);
->>> +    CCWDeviceClass *ck = CCW_DEVICE_GET_CLASS(ccw_dev);
->>> +
->>> +    ccw_dev->sch->driver_data = dev;
->>> +    if (CCW_DEVICE(dev)->sch->thinint_active) {
->>
->> Please use ccw_dev instead of CCW_DEVICE(dev).
->>
-> 
-> Sure.
-> 
->>> +        dev->routes.adapter.adapter_id = css_get_adapter_id(
->>> +                                         CSS_IO_ADAPTER_VIRTIO,
->>> +                                         dev->thinint_isc);
->>> +    }
->>> +    /* Re-fill subch_id after loading the subchannel states.*/
->>> +    if (ck->refill_ids) {
->>> +        ck->refill_ids(ccw_dev);
->>> +    }
->>> +    return 0;
->>> +}
->>> +
->>> +typedef struct VirtioCcwDeviceTmp {
->>> +    VirtioCcwDevice *parent;
->>> +    uint16_t config_vector;
->>> +} VirtioCcwDeviceTmp;
->>> +
->>> +static void virtio_ccw_dev_tmp_pre_save(void *opaque)
->>> +{
->>> +    VirtioCcwDeviceTmp *tmp = opaque;
->>> +    VirtioCcwDevice *dev = tmp->parent;
->>> +    VirtIODevice *vdev = virtio_bus_get_device(&dev->bus);
->>> +
->>> +    tmp->config_vector = vdev->config_vector;
->>> +}
->>> +
->>> +static int virtio_ccw_dev_tmp_post_load(void *opaque, int version_id)
->>> +{
->>> +    VirtioCcwDeviceTmp *tmp = opaque;
->>> +    VirtioCcwDevice *dev = tmp->parent;
->>> +    VirtIODevice *vdev = virtio_bus_get_device(&dev->bus);
->>> +
->>> +    vdev->config_vector = tmp->config_vector;
->>> +    return 0;
->>> +}
->>> +
->>> +const VMStateDescription vmstate_virtio_ccw_dev_tmp = {
->>> +    .name = "s390_virtio_ccw_dev_tmp",
->>> +    .pre_save = virtio_ccw_dev_tmp_pre_save,
->>> +    .post_load = virtio_ccw_dev_tmp_post_load,
->>> +    .fields = (VMStateField[]) {
->>> +        VMSTATE_UINT16(config_vector, VirtioCcwDeviceTmp),
->>> +        VMSTATE_END_OF_LIST()
->>> +    }
->>> +};
->>> +
->>> +const VMStateDescription vmstate_virtio_ccw_dev = {
->>> +    .name = "s390_virtio_ccw_dev",
->>> +    .version_id = 1,
->>> +    .minimum_version_id = 1,
->>> +    .post_load = virtio_ccw_dev_post_load,
->>> +    .fields = (VMStateField[]) {
->>> +        VMSTATE_CCW_DEVICE(parent_obj, VirtioCcwDevice),
->>> +        VMSTATE_PTR_TO_IND_ADDR(indicators, VirtioCcwDevice),
->>> +        VMSTATE_PTR_TO_IND_ADDR(indicators2, VirtioCcwDevice),
->>> +        VMSTATE_PTR_TO_IND_ADDR(summary_indicator, VirtioCcwDevice),
->>> +        /*
->>> +         * Ugly hack because VirtIODevice does not migrate itself.
->>> +         * This also makes legacy via vmstate_save_state possible.
->>> +         */
->>> +        VMSTATE_WITH_TMP(VirtioCcwDevice, VirtioCcwDeviceTmp,
->>> +                         vmstate_virtio_ccw_dev_tmp),
->>> +        VMSTATE_STRUCT(routes, VirtioCcwDevice, 1, vmstate_adapter_routes, \
->>> +                       AdapterRoutes),
->>> +        VMSTATE_UINT8(thinint_isc, VirtioCcwDevice),
->>> +        VMSTATE_INT32(revision, VirtioCcwDevice),
->>> +        VMSTATE_END_OF_LIST()
->>> +    }
->>> +};
->>> +
->>>  static void virtio_ccw_bus_new(VirtioBusState *bus, size_t bus_size,
->>>                                 VirtioCcwDevice *dev);
->>>
->>> @@ -1234,85 +1312,13 @@ static int virtio_ccw_load_queue(DeviceState *d, int n, QEMUFile *f)
->>>  static void virtio_ccw_save_config(DeviceState *d, QEMUFile *f)
->>>  {
->>>      VirtioCcwDevice *dev = VIRTIO_CCW_DEVICE(d);
->>> -    CcwDevice *ccw_dev = CCW_DEVICE(d);
->>> -    SubchDev *s = ccw_dev->sch;
->>> -    VirtIODevice *vdev = virtio_ccw_get_vdev(s);
->>> -
->>> -    subch_device_save(s, f);
->>> -    if (dev->indicators != NULL) {
->>> -        qemu_put_be32(f, dev->indicators->len);
->>> -        qemu_put_be64(f, dev->indicators->addr);
->>> -    } else {
->>> -        qemu_put_be32(f, 0);
->>> -        qemu_put_be64(f, 0UL);
->>> -    }
->>> -    if (dev->indicators2 != NULL) {
->>> -        qemu_put_be32(f, dev->indicators2->len);
->>> -        qemu_put_be64(f, dev->indicators2->addr);
->>> -    } else {
->>> -        qemu_put_be32(f, 0);
->>> -        qemu_put_be64(f, 0UL);
->>> -    }
->>> -    if (dev->summary_indicator != NULL) {
->>> -        qemu_put_be32(f, dev->summary_indicator->len);
->>> -        qemu_put_be64(f, dev->summary_indicator->addr);
->>> -    } else {
->>> -        qemu_put_be32(f, 0);
->>> -        qemu_put_be64(f, 0UL);
->>> -    }
->>> -    qemu_put_be16(f, vdev->config_vector);
->>> -    qemu_put_be64(f, dev->routes.adapter.ind_offset);
->>> -    qemu_put_byte(f, dev->thinint_isc);
->>> -    qemu_put_be32(f, dev->revision);
->>> +    vmstate_save_state(f, &vmstate_virtio_ccw_dev, dev, NULL);
->>>  }
->>>
->>>  static int virtio_ccw_load_config(DeviceState *d, QEMUFile *f)
->>>  {
->>>      VirtioCcwDevice *dev = VIRTIO_CCW_DEVICE(d);
->>> -    CcwDevice *ccw_dev = CCW_DEVICE(d);
->>> -    CCWDeviceClass *ck = CCW_DEVICE_GET_CLASS(ccw_dev);
->>> -    SubchDev *s = ccw_dev->sch;
->>> -    VirtIODevice *vdev = virtio_ccw_get_vdev(s);
->>> -    int len;
->>> -
->>> -    s->driver_data = dev;
->>> -    subch_device_load(s, f);
->>> -    /* Re-fill subch_id after loading the subchannel states.*/
->>> -    if (ck->refill_ids) {
->>> -        ck->refill_ids(ccw_dev);
->>> -    }
->>> -    len = qemu_get_be32(f);
->>> -    if (len != 0) {
->>> -        dev->indicators = get_indicator(qemu_get_be64(f), len);
->>> -    } else {
->>> -        qemu_get_be64(f);
->>> -        dev->indicators = NULL;
->>> -    }
->>> -    len = qemu_get_be32(f);
->>> -    if (len != 0) {
->>> -        dev->indicators2 = get_indicator(qemu_get_be64(f), len);
->>> -    } else {
->>> -        qemu_get_be64(f);
->>> -        dev->indicators2 = NULL;
->>> -    }
->>> -    len = qemu_get_be32(f);
->>> -    if (len != 0) {
->>> -        dev->summary_indicator = get_indicator(qemu_get_be64(f), len);
->>> -    } else {
->>> -        qemu_get_be64(f);
->>> -        dev->summary_indicator = NULL;
->>> -    }
->>> -    qemu_get_be16s(f, &vdev->config_vector);
->>> -    dev->routes.adapter.ind_offset = qemu_get_be64(f);
->>> -    dev->thinint_isc = qemu_get_byte(f);
->>> -    dev->revision = qemu_get_be32(f);
->>> -    if (s->thinint_active) {
->>> -        dev->routes.adapter.adapter_id = css_get_adapter_id(
->>> -                                         CSS_IO_ADAPTER_VIRTIO,
->>> -                                         dev->thinint_isc);
->>> -    }
->>> -
->>> -    return 0;
->>> +    return vmstate_load_state(f, &vmstate_virtio_ccw_dev, dev, 1);
->>>  }
->>>
->>>  static void virtio_ccw_pre_plugged(DeviceState *d, Error **errp)
->>> diff --git a/include/hw/s390x/css.h b/include/hw/s390x/css.h
->>> index e61fa74d9b..d74e44d312 100644
->>> --- a/include/hw/s390x/css.h
->>> +++ b/include/hw/s390x/css.h
->>> @@ -88,6 +88,7 @@ struct SubchDev {
->>>      bool ccw_fmt_1;
->>>      bool thinint_active;
->>>      uint8_t ccw_no_data_cnt;
->>> +    uint16_t migrated_schid; /* used for missmatch detection */
->>>      /* transport-provided data: */
->>>      int (*ccw_cb) (SubchDev *, CCW1);
->>>      void (*disable_cb)(SubchDev *);
->>> @@ -95,22 +96,27 @@ struct SubchDev {
->>>      void *driver_data;
->>>  };
->>>
->>> +extern const VMStateDescription vmstate_subch_dev;
->>> +
->>>  typedef struct IndAddr {
->>>      hwaddr addr;
->>>      uint64_t map;
->>>      unsigned long refcnt;
->>> -    int len;
->>> +    int32_t len;
->>>      QTAILQ_ENTRY(IndAddr) sibling;
->>>  } IndAddr;
->>>
->>> +extern const VMStateDescription vmstate_ind_addr;
->>> +
->>> +#define VMSTATE_PTR_TO_IND_ADDR(_f, _s)                                   \
->>> +    VMSTATE_STRUCT(_f, _s, 1, vmstate_ind_addr, IndAddr*)
->>> +
->>>  IndAddr *get_indicator(hwaddr ind_addr, int len);
->>>  void release_indicator(AdapterInfo *adapter, IndAddr *indicator);
->>>  int map_indicator(AdapterInfo *adapter, IndAddr *indicator);
->>>
->>>  typedef SubchDev *(*css_subch_cb_func)(uint8_t m, uint8_t cssid, uint8_t ssid,
->>>                                         uint16_t schid);
->>> -void subch_device_save(SubchDev *s, QEMUFile *f);
->>> -int subch_device_load(SubchDev *s, QEMUFile *f);
->>>  int css_create_css_image(uint8_t cssid, bool default_image);
->>>  bool css_devno_used(uint8_t cssid, uint8_t ssid, uint16_t devno);
->>>  void css_subch_assign(uint8_t cssid, uint8_t ssid, uint16_t schid,
->>> diff --git a/include/hw/s390x/s390_flic.h b/include/hw/s390x/s390_flic.h
->>> index f9e6890c90..caa6fc608d 100644
->>> --- a/include/hw/s390x/s390_flic.h
->>> +++ b/include/hw/s390x/s390_flic.h
->>> @@ -31,6 +31,11 @@ typedef struct AdapterRoutes {
->>>      int gsi[ADAPTER_ROUTES_MAX_GSI];
->>>  } AdapterRoutes;
->>>
->>> +extern const VMStateDescription vmstate_adapter_routes;
->>> +
->>> +#define VMSTATE_ADAPTER_ROUTES(_f, _s) \
->>> +    VMSTATE_STRUCT(_f, _s, 1, vmstate_adapter_routes, AdapterRoutes)
->>> +
->>>  #define TYPE_S390_FLIC_COMMON "s390-flic"
->>>  #define S390_FLIC_COMMON(obj) \
->>>      OBJECT_CHECK(S390FLICState, (obj), TYPE_S390_FLIC_COMMON)
->>
->> Other than the nit above, looks good to me. Especially the migration of
->> the pmcw & co. is now more readable. So, with the nit fixed,
->>
->> Reviewed-by: Cornelia Huck <cornelia.huck@de.ibm.com>
-> 
-> Thanks!
-> 
->>
->> Christian, can you please take this?
->>
-> 
-> Should I do a re-spin with the nit's picked and the r-b's added?
+Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
 
-Yes please. Can you then give me a confirmation that you have tested a migration between 2.9 and this patch set?
+> Remove dependency on qapi qtype, replace a field by a few PropertyInfo
+> callbacks to set the default value type (introduced in commit 4f2d3d7).
+>
+> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> ---
+>  include/hw/qdev-core.h       |  2 +-
+>  include/hw/qdev-properties.h |  5 -----
+>  hw/core/qdev-properties.c    | 35 ++++++++++++++++++++++++++++++++++-
+>  hw/core/qdev.c               | 13 ++-----------
+>  4 files changed, 37 insertions(+), 18 deletions(-)
+>
+> diff --git a/include/hw/qdev-core.h b/include/hw/qdev-core.h
+> index e69489ec6c..9523339762 100644
+> --- a/include/hw/qdev-core.h
+> +++ b/include/hw/qdev-core.h
+> @@ -226,7 +226,6 @@ struct Property {
+>      PropertyInfo *info;
+>      ptrdiff_t    offset;
+>      uint8_t      bitnr;
+> -    QType        qtype;
+>      int64_t      defval;
+>      int          arrayoffset;
+>      PropertyInfo *arrayinfo;
+> @@ -238,6 +237,7 @@ struct PropertyInfo {
+>      const char *description;
+>      const char * const *enum_table;
+>      int (*print)(DeviceState *dev, Property *prop, char *dest, size_t le=
+n);
+> +    void (*set_default_value)(Object *obj, const Property *prop);
+>      ObjectPropertyAccessor *get;
+>      ObjectPropertyAccessor *set;
+>      ObjectPropertyRelease *release;
+> diff --git a/include/hw/qdev-properties.h b/include/hw/qdev-properties.h
+> index d206fc93dd..85e68998a9 100644
+> --- a/include/hw/qdev-properties.h
+> +++ b/include/hw/qdev-properties.h
+> @@ -42,7 +42,6 @@ extern PropertyInfo qdev_prop_arraylen;
+>          .info      =3D &(_prop),                                        =
+  \
+>          .offset    =3D offsetof(_state, _field)                         =
+  \
+>              + type_check(_type,typeof_field(_state, _field)),           \
+> -        .qtype     =3D QTYPE_QINT,                                      =
+  \
+>          .defval    =3D (_type)_defval,                                  =
+  \
+>          }
+>  #define DEFINE_PROP_BIT(_name, _state, _field, _bit, _defval) {  \
+> @@ -51,7 +50,6 @@ extern PropertyInfo qdev_prop_arraylen;
+>          .bitnr    =3D (_bit),                                      \
+>          .offset    =3D offsetof(_state, _field)                    \
+>              + type_check(uint32_t,typeof_field(_state, _field)), \
+> -        .qtype     =3D QTYPE_QBOOL,                                \
+>          .defval    =3D (bool)_defval,                              \
+>          }
+>  #define DEFINE_PROP_BIT64(_name, _state, _field, _bit, _defval) {       \
+> @@ -60,7 +58,6 @@ extern PropertyInfo qdev_prop_arraylen;
+>          .bitnr    =3D (_bit),                                           =
+  \
+>          .offset    =3D offsetof(_state, _field)                         =
+  \
+>              + type_check(uint64_t, typeof_field(_state, _field)),       \
+> -        .qtype     =3D QTYPE_QBOOL,                                     =
+  \
+>          .defval    =3D (bool)_defval,                                   =
+  \
+>          }
+>=20=20
+> @@ -69,7 +66,6 @@ extern PropertyInfo qdev_prop_arraylen;
+>          .info      =3D &(qdev_prop_bool),                          \
+>          .offset    =3D offsetof(_state, _field)                    \
+>              + type_check(bool, typeof_field(_state, _field)),    \
+> -        .qtype     =3D QTYPE_QBOOL,                                \
+>          .defval    =3D (bool)_defval,                              \
+>          }
+>=20=20
+> @@ -105,7 +101,6 @@ extern PropertyInfo qdev_prop_arraylen;
+>          .info =3D &(qdev_prop_arraylen),                                =
+  \
+>          .offset =3D offsetof(_state, _field)                            =
+  \
+>              + type_check(uint32_t, typeof_field(_state, _field)),       \
+> -        .qtype =3D QTYPE_QINT,                                          =
+  \
+>          .arrayinfo =3D &(_arrayprop),                                   =
+  \
+>          .arrayfieldsize =3D sizeof(_arraytype),                         =
+  \
+>          .arrayoffset =3D offsetof(_state, _arrayfield),                 =
+  \
+> diff --git a/hw/core/qdev-properties.c b/hw/core/qdev-properties.c
+> index fa3617db2d..482efb2683 100644
+> --- a/hw/core/qdev-properties.c
+> +++ b/hw/core/qdev-properties.c
+> @@ -69,6 +69,12 @@ static void set_enum(Object *obj, Visitor *v, const ch=
+ar *name, void *opaque,
+>      visit_type_enum(v, prop->name, ptr, prop->info->enum_table, errp);
+>  }
+>=20=20
+> +static void set_default_value_enum(Object *obj, const Property *prop)
+> +{
+> +    object_property_set_str(obj, prop->info->enum_table[prop->defval],
+> +                            prop->name, &error_abort);
+> +}
+> +
+>  /* Bit */
+>=20=20
+>  static uint32_t qdev_get_prop_mask(Property *prop)
+> @@ -120,11 +126,17 @@ static void prop_set_bit(Object *obj, Visitor *v, c=
+onst char *name,
+>      bit_prop_set(dev, prop, value);
+>  }
+>=20=20
+> +static void set_default_value_bool(Object *obj, const Property *prop)
+> +{
+> +    object_property_set_bool(obj, prop->defval, prop->name, &error_abort=
+);
+> +}
+> +
+>  PropertyInfo qdev_prop_bit =3D {
+>      .name  =3D "bool",
+>      .description =3D "on/off",
+>      .get   =3D prop_get_bit,
+>      .set   =3D prop_set_bit,
+> +    .set_default_value =3D set_default_value_bool,
+>  };
+>=20=20
+>  /* Bit64 */
+> @@ -183,6 +195,7 @@ PropertyInfo qdev_prop_bit64 =3D {
+>      .description =3D "on/off",
+>      .get   =3D prop_get_bit64,
+>      .set   =3D prop_set_bit64,
+> +    .set_default_value =3D set_default_value_bool,
+>  };
+>=20=20
+>  /* --- bool --- */
+> @@ -216,6 +229,7 @@ PropertyInfo qdev_prop_bool =3D {
+>      .name  =3D "bool",
+>      .get   =3D get_bool,
+>      .set   =3D set_bool,
+> +    .set_default_value =3D set_default_value_bool,
+>  };
+>=20=20
+>  /* --- 8bit integer --- */
+> @@ -245,10 +259,16 @@ static void set_uint8(Object *obj, Visitor *v, cons=
+t char *name, void *opaque,
+>      visit_type_uint8(v, name, ptr, errp);
+>  }
+>=20=20
+> +static void set_default_value_int(Object *obj, const Property *prop)
+> +{
+> +    object_property_set_int(obj, prop->defval, prop->name, &error_abort);
+> +}
+> +
+>  PropertyInfo qdev_prop_uint8 =3D {
+>      .name  =3D "uint8",
+>      .get   =3D get_uint8,
+>      .set   =3D set_uint8,
+> +    .set_default_value =3D set_default_value_int,
+>  };
+>=20=20
+>  /* --- 16bit integer --- */
+> @@ -282,6 +302,7 @@ PropertyInfo qdev_prop_uint16 =3D {
+>      .name  =3D "uint16",
+>      .get   =3D get_uint16,
+>      .set   =3D set_uint16,
+> +    .set_default_value =3D set_default_value_int,
+>  };
+>=20=20
+>  /* --- 32bit integer --- */
+> @@ -340,12 +361,14 @@ PropertyInfo qdev_prop_uint32 =3D {
+>      .name  =3D "uint32",
+>      .get   =3D get_uint32,
+>      .set   =3D set_uint32,
+> +    .set_default_value =3D set_default_value_int,
+>  };
+>=20=20
+>  PropertyInfo qdev_prop_int32 =3D {
+>      .name  =3D "int32",
+>      .get   =3D get_int32,
+>      .set   =3D set_int32,
+> +    .set_default_value =3D set_default_value_int,
+>  };
+>=20=20
+>  /* --- 64bit integer --- */
+> @@ -379,6 +402,7 @@ PropertyInfo qdev_prop_uint64 =3D {
+>      .name  =3D "uint64",
+>      .get   =3D get_uint64,
+>      .set   =3D set_uint64,
+> +    .set_default_value =3D set_default_value_int,
+>  };
+>=20=20
+>  /* --- string --- */
+> @@ -526,6 +550,7 @@ PropertyInfo qdev_prop_on_off_auto =3D {
+>      .enum_table =3D OnOffAuto_lookup,
+>      .get =3D get_enum,
+>      .set =3D set_enum,
+> +    .set_default_value =3D set_default_value_enum,
+>  };
+>=20=20
+>  /* --- lost tick policy --- */
+> @@ -537,6 +562,7 @@ PropertyInfo qdev_prop_losttickpolicy =3D {
+>      .enum_table  =3D LostTickPolicy_lookup,
+>      .get   =3D get_enum,
+>      .set   =3D set_enum,
+> +    .set_default_value =3D set_default_value_enum,
+>  };
+>=20=20
+>  /* --- Block device error handling policy --- */
+> @@ -550,6 +576,7 @@ PropertyInfo qdev_prop_blockdev_on_error =3D {
+>      .enum_table =3D BlockdevOnError_lookup,
+>      .get =3D get_enum,
+>      .set =3D set_enum,
+> +    .set_default_value =3D set_default_value_enum,
+>  };
+>=20=20
+>  /* --- BIOS CHS translation */
+> @@ -563,6 +590,7 @@ PropertyInfo qdev_prop_bios_chs_trans =3D {
+>      .enum_table =3D BiosAtaTranslation_lookup,
+>      .get =3D get_enum,
+>      .set =3D set_enum,
+> +    .set_default_value =3D set_default_value_enum,
+>  };
+>=20=20
+>  /* --- FDC default drive types */
+> @@ -573,7 +601,8 @@ PropertyInfo qdev_prop_fdc_drive_type =3D {
+>                     "144/288/120/none/auto",
+>      .enum_table =3D FloppyDriveType_lookup,
+>      .get =3D get_enum,
+> -    .set =3D set_enum
+> +    .set =3D set_enum,
+> +    .set_default_value =3D set_default_value_enum,
+>  };
+>=20=20
+>  /* --- pci address --- */
+> @@ -648,6 +677,7 @@ PropertyInfo qdev_prop_pci_devfn =3D {
+>      .print =3D print_pci_devfn,
+>      .get   =3D get_int32,
+>      .set   =3D set_pci_devfn,
+> +    .set_default_value =3D set_default_value_int,
+>  };
+>=20=20
+>  /* --- blocksize --- */
+> @@ -695,6 +725,7 @@ PropertyInfo qdev_prop_blocksize =3D {
+>      .description =3D "A power of two between 512 and 32768",
+>      .get   =3D get_uint16,
+>      .set   =3D set_blocksize,
+> +    .set_default_value =3D set_default_value_int,
+>  };
+>=20=20
+>  /* --- pci host address --- */
+> @@ -917,6 +948,7 @@ PropertyInfo qdev_prop_arraylen =3D {
+>      .name =3D "uint32",
+>      .get =3D get_uint32,
+>      .set =3D set_prop_arraylen,
+> +    .set_default_value =3D set_default_value_int,
+>  };
+>=20=20
+>  /* --- public helpers --- */
+> @@ -1153,4 +1185,5 @@ PropertyInfo qdev_prop_size =3D {
+>      .name  =3D "size",
+>      .get =3D get_size,
+>      .set =3D set_size,
+> +    .set_default_value =3D set_default_value_int,
+>  };
+> diff --git a/hw/core/qdev.c b/hw/core/qdev.c
+> index 71ff95fd71..6674e11840 100644
+> --- a/hw/core/qdev.c
+> +++ b/hw/core/qdev.c
+> @@ -794,17 +794,8 @@ void qdev_property_add_static(DeviceState *dev, Prop=
+erty *prop,
+>                                      prop->info->description,
+>                                      &error_abort);
+>=20=20
+> -    if (prop->qtype =3D=3D QTYPE_NONE) {
+> -        return;
+> -    }
+> -
+> -    if (prop->qtype =3D=3D QTYPE_QBOOL) {
+> -        object_property_set_bool(obj, prop->defval, prop->name, &error_a=
+bort);
+> -    } else if (prop->info->enum_table) {
+> -        object_property_set_str(obj, prop->info->enum_table[prop->defval=
+],
+> -                                prop->name, &error_abort);
+> -    } else if (prop->qtype =3D=3D QTYPE_QINT) {
+> -        object_property_set_int(obj, prop->defval, prop->name, &error_ab=
+ort);
+> +    if (prop->info->set_default_value) {
+> +        prop->info->set_default_value(obj, prop);
+>      }
+>  }
+
+Lovely cleanup.
+
+The interesting part is the move of the bits controlling use of ->defval
+from Property member .qtype (set only by DEFINE_PROP_foo() macros) to
+its PropertyInfo method .info->set_default_value().  No functional
+change if (1) we preserve existing use of ->defval and (2) we don't add
+new uses of ->defval, or at least not uses that matter.
+
+Direction (1) is obvious for DEFINE_PROP_BIT(), DEFINE_PROP_BIT64(),
+DEFINE_PROP_BOOL().  They set .info to &qdev_prop_bit, &qdev_prop_bit64,
+&qdev_prop_bool, respectively.  These all get .set_default_value =3D
+set_default_value_bool, which preserves the effect of .qtype =3D
+QTYPE_BOOL.  Good.
+
+DEFINE_PROP_DEFAULT() sets .info to point to its argument _prop.  The
+following arguments occur:
+
+* In include/hw/qdev-properties.h: qdev_prop_uint8, qdev_prop_uint16,
+  qdev_prop_uint32, qdev_prop_int32, qdev_prop_uint64, qdev_prop_size,
+  qdev_prop_pci_devfn, qdev_prop_on_off_auto, qdev_prop_losttickpolicy,
+  qdev_prop_blockdev_on_error, qdev_prop_bios_chs_trans,
+  qdev_prop_blocksize
+
+* In hw/block/fdc.c: qdev_prop_fdc_drive_type
+
+* In hw/net/e1000e.c: local copies of qdev_prop_uint8, qdev_prop_uint16.
+
+To preserve the effect of .qtype =3D QTYPE_QINT, these PropertyInfo need
+.set_default_value =3D set_default_value_int or .set_default_value =3D
+set_default_value_enum, depending on .enum_table.  They get it.  Good.
+
+DEFINE_PROP_ARRAY() sets .info to &qdev_prop_arraylen.  Needs and gets
+.set_default_value =3D set_default_value_int.  Good.
+
+DEFINE_PROP_ARRAY() also takes a PropertyInfo argument, but it's not
+relevant here, as the .qtype you remove doesn't apply to it.  I'm
+mentioning this, because it confused me briefly.
+
+Direction (2) isn't as visible in the patch.  For each PropertyInfo you
+change, we need to find and check stores into .info not wrapped in the
+DEFINE_PROP_foo() macros you change.
+
+I can't find any.  Good.
+
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
