@@ -1,33 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38339)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38801)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dGTmN-00023G-1s
-	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 13:21:00 -0400
+	(envelope-from <k.kozlowski.k@gmail.com>) id 1dGTnY-00033w-DU
+	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 13:22:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dGTmJ-0003Bj-Li
-	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 13:20:58 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:42428)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dGTmJ-0003BQ-Bt
-	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 13:20:55 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 41F1C80F96
-	for <qemu-devel@nongnu.org>; Thu,  1 Jun 2017 17:20:54 +0000 (UTC)
-Date: Thu, 1 Jun 2017 18:20:47 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170601172046.GJ2845@work-vm>
-References: <20170509184900.GI2089@work-vm>
-	<1833628273.9365810.1494355970259.JavaMail.zimbra@redhat.com>
-	<20170510133255.GD4230@work-vm>
-	<1509302139.20862844.1495638621196.JavaMail.zimbra@redhat.com>
+	(envelope-from <k.kozlowski.k@gmail.com>) id 1dGTnX-000478-9h
+	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 13:22:12 -0400
+Date: Thu, 1 Jun 2017 19:22:03 +0200
+From: Krzysztof Kozlowski <krzk@kernel.org>
+Message-ID: <20170601172203.4mtc4ekasm6mmk4s@kozik-lap>
+References: <20170521152949.15338-1-krzk@kernel.org>
+	<CAFEAcA8qYBAgHWPGdSTry7Rmt1Ai9gmKXdKs+f_x_jQU0+7c5Q@mail.gmail.com>
+	<CAJKOXPebX4GFh06NmAfkt3Vt5D-xwbeJ3UPA-Z+vMc8BtQZcZw@mail.gmail.com>
+	<CAFEAcA8Q8-U9aocQgbUTt2WP4S9Tj_K_iXZuP08x9Ck0LszS3Q@mail.gmail.com>
+	<20170601171019.j7ist5qnuvllvfhi@kozik-lap>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <1509302139.20862844.1495638621196.JavaMail.zimbra@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] VhostUserRequest # 20
+In-Reply-To: <20170601171019.j7ist5qnuvllvfhi@kozik-lap>
+Subject: Re: [Qemu-devel] [PATCH v3 00/11] hw: arm: exynos: Bring up
+ secondary CPU, QOM-ify Soc, other improvements
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,100 +27,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>
-Cc: maxime coquelin <maxime.coquelin@redhat.com>, qemu-devel@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Igor Mitsyanko <i.mitsyanko@gmail.com>, qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 
-* Marc-Andr=E9 Lureau (marcandre.lureau@redhat.com) wrote:
-> Hi
->=20
-> ----- Original Message -----
-> > * Marc-Andr=E9 Lureau (marcandre.lureau@redhat.com) wrote:
-> > > HI
-> > >=20
-> > > ----- Original Message -----
-> > > > Hi,
-> > > >   libvhost-user.h defines:
-> > > >    VHOST_USER_INPUT_GET_CONFIG =3D 20,
-> > >=20
-> > > That slipped by mistake from my vhost-user-input series WIP, please=
- send a
-> > > fix.
-> > > (luckily, this is only internal header for now)
-> >=20
-> > OK, just posted.
-> >=20
-> > However, I just spotted, or should I say gcc just spotted another iss=
-ue:
-> >=20
-> >   CC      tests/vhost-user-bridge.o
-> > /home/dgilbert/git/qemu-world3/tests/vhost-user-bridge.c:228:23: warn=
-ing:
-> > variables 'front' and 'iov' used in loop condition not modified in lo=
-op body
-> > [-Wfor-loop-analysis]
-> >     for (cur =3D front; front !=3D iov; cur++) {
-> >                       ^~~~~    ~~~
-> > 1 warning generated.
-> >=20
-> >=20
-> > static void
-> > iov_restore_front(struct iovec *front, struct iovec *iov, size_t byte=
-s)
-> > {
-> >     struct iovec *cur;
-> >=20
-> >     for (cur =3D front; front !=3D iov; cur++) {
-> >         bytes -=3D cur->iov_len;
-> >     }
-> >=20
-> >     cur->iov_base -=3D bytes;
-> >     cur->iov_len +=3D bytes;
-> > }
-> >=20
-> > What's that actually intending to do?
->=20
-> It was meant to revert the effect of iov_discard_front()
->=20
-> The code should read:
->=20
-> for (cur =3D front; cur !=3D iov; cur++) {
->=20
-> In practice, it doesn't reach the loop since the front sg buffer is big=
- enough to discard the header..
->=20
-> Does that looks correct to you?
+On Thu, Jun 01, 2017 at 07:10:19PM +0200, Krzysztof Kozlowski wrote:
+> On Thu, Jun 01, 2017 at 05:31:41PM +0100, Peter Maydell wrote:
+> > On 31 May 2017 at 09:58, Krzysztof Kozlowski <krzk@kernel.org> wrote:
+> > > On Tue, May 30, 2017 at 2:04 PM, Peter Maydell <peter.maydell@linaro.org> wrote:
+> > >> So is this a regression compared to our current model? I was
+> > >> under the impression from the previous thread that it was,
+> > >> which is why I didn't apply that patchset.
+> > >
+> > > It depends how wide understanding of regression you have. :)
+> > > 1. Before this patch, second CPU could not boot. System was usable but
+> > > worked on only one CPU.
+> > > 2. Before this patch, kernel's IRQ work is broken. None of IRQ work
+> > > are executed which is mostly visible during poweroff - system hangs on
+> > > syncing IRQ works.
+> > > 3. With this patch, second CPU boots and IRQ works properly (so
+> > > poweroff is possible).
+> > > 4. However with this patch, Linux kernel with cpuidle enabled (which
+> > > is also included in many kernel defconfigs), the system is very
+> > > unresponsive.
+> > >
+> > > So overall... a lot of things were broken already. This patches fixes
+> > > them... but breaks different thing.
+> > 
+> > It sounds like it breaks a key thing, ie "boot a single cpu kernel
+> > built from a defconfig", though. That's a regression I'd rather
+> > not have.
+> 
+> I am not sure if I understand you correctly... the system previously
+> booted into one CPU mode because second CPU just could not boot. Now by
+> default, second CPU succeeds and this means that *default* settings are
+> indeed more broken than before.
+> 
+> On the other hand, after removing a line from hw/arm/exynos4210.c:
+> 	qdev_prop_set_uint32(dev, "num-cpu", EXYNOS4210_NCPUS);
+> and running qemu with "-accel tcg -smp cpus=1,maxcpus=1,cores=1"
+> everything is okay. Booting of one CPU is unaffected.
 
-OK, so let me check if I understand;  it's supposed to be called with
-'front' being the original struct iovec *, and 'bytes' being the number
-of bytes you shaved off using iov_discard_front?
-If so then yes I think that makes sense; a comment to explain that
-would probably help.
-A sanity check for bytes being >=3D0 after the loop might be worth it as
-well.
+Ahh, and one more thing. For forced single CPU mode (mentioned above),
+now it actually behaves better. Fixed GIC mappings means that SGIs are
+working (execution of IRQ work is fixed) thus the system can properly
+power off.
 
-Dave
+This means we could hard-code one-cpu for now and get better behavior
+than previously (one CPU but with SGIs).
 
->=20
->=20
-> thanks
->=20
-> >=20
-> > Dave
-> >=20
-> > > thanks
-> > >=20
-> > > > while
-> > > >   vhost-user.c defines:
-> > > >    VHOST_USER_NET_SET_MTU =3D 20,
-> > > >=20
-> > > > who wins?
-> > > >=20
-> > > > Dave
-> > > > --
-> > > > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
-> > > >=20
-> > --
-> > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
-> >=20
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+Best regards,
+Krzysztof
+
+> 
+> > If there's a subset of these patches which don't break
+> > that I'm happy to take those. Otherwise we need to investigate
+> > and fix whatever the problem is that causes that unresponsiveness
+> > before we can apply them.
+> 
+> Yes, you can take everything except first patch
+> ("hw/intc/exynos4210_gic: Fix GIC memory mappings for secondary CPU")
+> and it should be fine. Rest of patches are just independent.
