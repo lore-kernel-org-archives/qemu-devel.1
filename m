@@ -1,26 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58391)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59260)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dGYep-0004DS-A0
-	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 18:33:35 -0400
+	(envelope-from <jsnow@redhat.com>) id 1dGYh5-00052u-VR
+	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 18:35:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dGYeo-0000xP-6C
-	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 18:33:31 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:59416)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dGYen-0000x0-Ty
-	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 18:33:30 -0400
-References: <20170530143052.165002-1-vsementsov@virtuozzo.com>
-	<20170530143052.165002-15-vsementsov@virtuozzo.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <05dd8425-2773-0396-1532-e25c737c3753@redhat.com>
-Date: Thu, 1 Jun 2017 17:33:27 -0500
+	(envelope-from <jsnow@redhat.com>) id 1dGYh4-00034h-Rf
+	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 18:35:52 -0400
+References: <20170503122539.282182-1-vsementsov@virtuozzo.com>
+	<20170503122539.282182-10-vsementsov@virtuozzo.com>
+	<33ce370d-939f-d02e-0177-1184ae9f4fa7@redhat.com>
+	<47488066-bd0f-834d-85d8-63d7289cb0fd@virtuozzo.com>
+	<18c4b1ad-bc30-a598-36b8-612c01b00dee@redhat.com>
+	<67feecd0-ef75-5e26-aa7c-a70b69fde0ef@virtuozzo.com>
+	<15564da8-3aa5-667a-addf-6d3617e64f67@redhat.com>
+	<ed412d3c-b675-4e6f-41d8-acca126f4b23@virtuozzo.com>
+	<2d9578e6-d61b-551f-8650-3fafee1bfe05@redhat.com>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <8dd0157d-e07e-85ea-5772-0afb746342c7@redhat.com>
+Date: Thu, 1 Jun 2017 18:35:38 -0400
 MIME-Version: 1.0
-In-Reply-To: <20170530143052.165002-15-vsementsov@virtuozzo.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="gGNt06uIuPer8oECKcewqxAbijrMh91ci"
-Subject: Re: [Qemu-devel] [PATCH 14/19] nbd/server: nbd_negotiate: return 1
- on NBD_OPT_ABORT
+In-Reply-To: <2d9578e6-d61b-551f-8650-3fafee1bfe05@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 09/25] block/dirty-bitmap: add readonly
+ field to BdrvDirtyBitmap
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,133 +32,108 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org
-Cc: pbonzini@redhat.com, den@openvz.org
-
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---gGNt06uIuPer8oECKcewqxAbijrMh91ci
-From: Eric Blake <eblake@redhat.com>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-devel@nongnu.org
-Cc: pbonzini@redhat.com, den@openvz.org
-Message-ID: <05dd8425-2773-0396-1532-e25c737c3753@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 14/19] nbd/server: nbd_negotiate: return 1 on
- NBD_OPT_ABORT
-References: <20170530143052.165002-1-vsementsov@virtuozzo.com>
- <20170530143052.165002-15-vsementsov@virtuozzo.com>
-In-Reply-To: <20170530143052.165002-15-vsementsov@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 05/30/2017 09:30 AM, Vladimir Sementsov-Ogievskiy wrote:
-> Separate case when client sent NBD_OPT_ABORT from other errors.
-> It will be needed for the following patch, where errors will be
-> reported.
-> Considered case is not actually the error - it honestly follows NBD
-> protocol. Therefore it should not be reported like an error.
-> -EPIPE case means client not read server reply on NBD_OPT_ABORT,
-> which is also OK.
->=20
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> ---
->  nbd/server.c | 20 +++++++++++++++-----
->  1 file changed, 15 insertions(+), 5 deletions(-)
->=20
-> diff --git a/nbd/server.c b/nbd/server.c
-> index 30dfb81a5c..0e53d3dd91 100644
-> --- a/nbd/server.c
-> +++ b/nbd/server.c
-> @@ -369,9 +369,13 @@ static QIOChannel *nbd_negotiate_handle_starttls(N=
-BDClient *client,
->      return QIO_CHANNEL(tioc);
->  }
-> =20
-> -
-> -/* Process all NBD_OPT_* client option commands.
-> - * Return -errno on error, 0 on success. */
-> +/* nbd_negotiate_options
-> + * Process all NBD_OPT_* client option commands.
-> + * Return:
-> + * < 0 on error
-
-Do you want to be specific that this is a negative errno value, or is it
-just any negative value with no correlation to errno?
-
-> + * 0   on successful negotiation
-> + * 1   if client sent NBD_OPT_ABORT, i.e. on legal disconnect
-> + */
->  static int nbd_negotiate_options(NBDClient *client)
->  {
->      int ret;
-> @@ -483,7 +487,7 @@ static int nbd_negotiate_options(NBDClient *client)=
-
->                  }
->                  /* Let the client keep trying, unless they asked to qu=
-it */
->                  if (clientflags =3D=3D NBD_OPT_ABORT) {
-> -                    return -EINVAL;
-> +                    return 1;
->                  }
->                  break;
->              }
-> @@ -502,7 +506,7 @@ static int nbd_negotiate_options(NBDClient *client)=
-
->                   * guests that don't wait for our reply. */
->                  ret =3D nbd_negotiate_send_rep(client->ioc, NBD_REP_AC=
-K,
->                                               clientflags);
-> -                return ret < 0 ? ret : -EINVAL;
-> +                return ret < 0 && ret !=3D -EPIPE ? ret : 1;
-
-This should just be 'return 1;', which means you don't need to capture
-and check 'ret'.
-
-> =20
->              case NBD_OPT_EXPORT_NAME:
->                  return nbd_negotiate_handle_export_name(client, length=
-);
-> @@ -560,6 +564,12 @@ static int nbd_negotiate_options(NBDClient *client=
-)
->      }
->  }
-> =20
-> +/* nbd_negotiate
-> + * Return:
-> + * < 0 on error
-
-Again, if this is reliably a negative errno, specifically document that.
-
-> + * 0   on successful negotiation
-> + * 1   if client sent NBD_OPT_ABORT, i.e. on legal disconnect
-> + */
->  static coroutine_fn int nbd_negotiate(NBDClient *client)
->  {
->      char buf[8 + 8 + 8 + 128];
->=20
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+To: Max Reitz <mreitz@redhat.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, famz@redhat.com, armbru@redhat.com, stefanha@redhat.com, pbonzini@redhat.com, den@openvz.org
 
 
---gGNt06uIuPer8oECKcewqxAbijrMh91ci
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+On 05/31/2017 11:53 AM, Max Reitz wrote:
+> On 2017-05-31 17:05, Vladimir Sementsov-Ogievskiy wrote:
+>> 31.05.2017 17:44, Max Reitz wrote:
+>>> On 2017-05-31 16:29, Vladimir Sementsov-Ogievskiy wrote:
+>>>> 31.05.2017 16:43, Max Reitz wrote:
+>>>>> On 2017-05-30 08:50, Vladimir Sementsov-Ogievskiy wrote:
+>>>>>> Thank you for this scenario. Hmm.
+>>>>>>
+>>>>>> So, as I need guarantee that image and bitmap are unchanged,
+>>>>>> bdrv_set_dirty should return error and fail the whole write. Ok?
+>>>>> I don't know. That would mean that you couldn't commit to an image that
+>>>>> has a persistent auto-loading bitmap, which doesn't seem very nice
+>>>>> to me.
+>>>>>
+>>>>> I'm not quite sure what to do myself. So first I'd definitely want the
+>>>>> commit operation to succeed. That means we'd have to automatically make
+>>>>> the bitmap non-readonly once we write to it. The "readonly" flag would
+>>>>> then be an "unchanged" flag, rather, to signify that the bitmap has not
+>>>>> been changed since it was loaded, which means that it does not need to
+>>>>> be written back to the image file.
+>>>>>
+>>>>> Now the issue remains that if you modify a persistent bitmap that is
+>>>>> stored in an image file that is opened RO when it's closed, you
+>>>>> won't be
+>>>>> able to write the modifications back.
+>>>>>
+>>>>> So in addition, I guess we'd need to "flush" all persistent bitmaps
+>>>>> (that is, write all modifications back to the file and set the
+>>>>> "unchanged" flag (you could also call it "dirty" and then mean the
+>>>>> opposite) for each bitmap) not only when the image is closed or
+>>>>> invalidated, but also when it is reopened read-only.
+>>>>>
+>>>>> (block-commit reopens the backing BDS R/W, then writes to them, thus
+>>>>> modifying the dirty bitmaps, and finally reopens the BDS as read-only;
+>>>>> before that happens, we will have to flush the modified bitmap data.)
+>>>> Ok, understand.
+>>>>
+>>>> We need to consider also setting in_use flag in the image. We _must not_
+>>>> write to image with dirty bitmap,
+>>>> if in_use flag of this dirty bitmap is not set, as in case of something
+>>>> fail we will have image with wrong bitmap with
+>>>> unset in_use flag (which looks ok).
+>>> Right.
+>>>
+>>>> I see two ways to handle it:
+>>>>
+>>>> variant 1:
+>>>> 1. readonly field stays as is (see v19, with normal errors, not only
+>>>> asserts)
+>>>> 2. immediately after reopening r/w we do "reopening bitmaps r/w", i.e.
+>>>> set in_use in the image and set BdrvDirtyBitmap.readonly = false
+>>>> 3. in reopen_prepare, if reopening r-o do "reopening bitmaps r-o", i.e.
+>>>> save them into the image and set BdrvDirtyBitmap.readonly = true
+>>> Sounds good, yes.
+>>>
+>>>> variant 2:
+>>>> 1. instead of 'readonly' add 'dirty' field, set dirty to 0 for all
+>>>> bitmaps on create
+>>>> 2. before write/discard check this field in all related bitmaps, and if
+>>>> dirty=0 (and persistent=1), write IN_USE flag into the image first, set
+>>>> dirty=1, and only then do write. (if writing IN_USE=1 failed, fail the
+>>>> whole write)
+>>>> 3. in reopen_prepare, if reopening r-o do "reopening bitmaps r-o", i.e.
+>>>> save them into the image and set BdrvDirtyBitmap.dirty = 0
+>>> Works, too.
+>>>
+>>> I think the second variant would the more "efficient" way (because you
+>>> only have to flush out dirty dirty bitmaps), but the first one would be
+>>> simpler and has the great advantage of not requiring a write to the
+>>> image file when you just want to set a bit in the in-memory dirty
+>>> bitmap. So I'd personally go for the first variant.
+>>
+>> Hmm, why not requiring? Both 1 and 2 do write in_use=1, but (1) do this
+>> on open/reopen, and (2) before the first write to the image.
+> 
+> Oh, I didn't read the "before write/discard". Yes, if you check it
+> before writing, then you won't have to set the flag through
+> bdrv_set_dirty().
+> 
+>> "set a bit in the in-memory..." - are you saying about not-persistent
+>> dirty bitmaps? In this case, of course, nothing should be written into
+>> the image, just set dirty=1.
+> 
+> No, I did mean persistent bitmaps, but bdrv_set_dirty() just sets the
+> bit in main memory, of course. It only gets written to the image later
+> (on reopen/close/invalidate).
+> 
 
-iQEcBAEBCAAGBQJZMJY3AAoJEKeha0olJ0NqzLsH/24P2TJRBQw63XnR/IMQXAG0
-MMe4ojuWGKX7GNlt4BWJuH2imxjgurgvuWqFygySPiDELZsFzmKUwSFccXxTX8+r
-Rq7jk4lmsIq3MSeL4H8K+XFtp16oQTvtqDBCLYfNm7EVThG7pn31Z8zmFBNavCMp
-hQ59fpERCcEshwU+axSeh+AX6poAhEhSCL9B/vH2cDw0Ekbt8Z6r3G7xeoPI1Qob
-B5G/0s0+eo4vf9tkykfxq8rCHxbrP9r2EHTF1AYP1mnnVAaNt7NXIIRawiOH18go
-HahjiCJu+e0PeGC1stHbxD+/FPufYix0JsiQljSylCTFmCtOrQ6nygrzY0BFqe8=
-=5koE
------END PGP SIGNATURE-----
+There may be some benefit to setting in_use immediately as soon as we
+admit that we are willing to tolerate writes to the bitmap. It's a
+performance hit, but it may help on-disk consistency.
 
---gGNt06uIuPer8oECKcewqxAbijrMh91ci--
+Or maybe that's a fool's errand? This is a design question we've largely
+ignored so far, but it's something that will need investigating sooner
+or later.
+
+> Well, your choice. I think both will work. :-)
+> 
+> Max
+> 
