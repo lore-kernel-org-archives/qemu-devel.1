@@ -1,23 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59585)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59611)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1dGPQU-0003Ov-FT
-	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 08:42:07 -0400
+	(envelope-from <paolo.bonzini@gmail.com>) id 1dGPQV-0003QQ-WE
+	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 08:42:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1dGPQR-0005hi-UT
-	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 08:42:06 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:41406)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1dGPQR-0005gx-Lg
-	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 08:42:03 -0400
-From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Thu,  1 Jun 2017 16:41:41 +0400
-Message-Id: <20170601124143.10915-1-marcandre.lureau@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v2 1/2] scripts: use build_ prefix for string
- not piped through cgen()
+	(envelope-from <paolo.bonzini@gmail.com>) id 1dGPQV-0005ij-4N
+	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 08:42:08 -0400
+Received: from mail-wm0-x241.google.com ([2a00:1450:400c:c09::241]:35385)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
+	id 1dGPQU-0005iS-VV
+	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 08:42:07 -0400
+Received: by mail-wm0-x241.google.com with SMTP id g15so11029266wmc.2
+	for <qemu-devel@nongnu.org>; Thu, 01 Jun 2017 05:42:06 -0700 (PDT)
+Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Thu,  1 Jun 2017 14:41:28 +0200
+Message-Id: <1496320911-51305-11-git-send-email-pbonzini@redhat.com>
+In-Reply-To: <1496320911-51305-1-git-send-email-pbonzini@redhat.com>
+References: <1496320911-51305-1-git-send-email-pbonzini@redhat.com>
+Subject: [Qemu-devel] [PULL 10/33] nbd: strict nbd_wr_syncv
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,129 +28,53 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, Markus Armbruster <armbru@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>
+Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 
-Suggested by Markus Armbruster:
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 
-The gen_ prefix is awkward.  Generated C should go through cgen()
-exactly once (see commit 1f9a7a1).  The common way to get this wrong is
-passing a foo=3Dgen_foo() keyword argument to mcgen().  I'd like us to
-adopt a naming convention where gen_ means "something that's been piped
-through cgen(), and thus must not be passed to cgen() or mcgen()".
-Requires renaming gen_params(), gen_marshal_proto() and
-gen_event_send_proto().
+nbd_wr_syncv is called either from coroutine or from client negotiation
+code, when socket is in blocking mode. So, -EAGAIN is impossible.
 
-Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Furthermore, EAGAIN is confusing, as, what to read/write again? With
+EAGAIN as a return code we don't know how much data is already
+read or written by the function, so in case of EAGAIN the whole
+communication is broken.
+
+Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-Id: <20170516094533.6160-2-vsementsov@virtuozzo.com>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- scripts/qapi.py          |  2 +-
- scripts/qapi-commands.py |  8 ++++----
- scripts/qapi-event.py    | 12 ++++++------
- 3 files changed, 11 insertions(+), 11 deletions(-)
+ nbd/common.c | 11 ++++++-----
+ 1 file changed, 6 insertions(+), 5 deletions(-)
 
-diff --git a/scripts/qapi.py b/scripts/qapi.py
-index 6c4d554165..d37a6157e0 100644
---- a/scripts/qapi.py
-+++ b/scripts/qapi.py
-@@ -1884,7 +1884,7 @@ extern const char *const %(c_name)s_lookup[];
-     return ret
-=20
-=20
--def gen_params(arg_type, boxed, extra):
-+def build_params(arg_type, boxed, extra):
-     if not arg_type:
-         assert not boxed
-         return extra
-diff --git a/scripts/qapi-commands.py b/scripts/qapi-commands.py
-index 1943de4852..974d0a4a80 100644
---- a/scripts/qapi-commands.py
-+++ b/scripts/qapi-commands.py
-@@ -21,7 +21,7 @@ def gen_command_decl(name, arg_type, boxed, ret_type):
- ''',
-                  c_type=3D(ret_type and ret_type.c_type()) or 'void',
-                  c_name=3Dc_name(name),
--                 params=3Dgen_params(arg_type, boxed, 'Error **errp'))
-+                 params=3Dbuild_params(arg_type, boxed, 'Error **errp'))
-=20
-=20
- def gen_call(name, arg_type, boxed, ret_type):
-@@ -82,7 +82,7 @@ static void qmp_marshal_output_%(c_name)s(%(c_type)s re=
-t_in, QObject **ret_out,
-                  c_type=3Dret_type.c_type(), c_name=3Dret_type.c_name())
-=20
-=20
--def gen_marshal_proto(name):
-+def build_marshal_proto(name):
-     return ('void qmp_marshal_%s(QDict *args, QObject **ret, Error **err=
-p)'
-             % c_name(name))
-=20
-@@ -91,7 +91,7 @@ def gen_marshal_decl(name):
-     return mcgen('''
- %(proto)s;
- ''',
--                 proto=3Dgen_marshal_proto(name))
-+                 proto=3Dbuild_marshal_proto(name))
-=20
-=20
- def gen_marshal(name, arg_type, boxed, ret_type):
-@@ -103,7 +103,7 @@ def gen_marshal(name, arg_type, boxed, ret_type):
- {
-     Error *err =3D NULL;
- ''',
--                proto=3Dgen_marshal_proto(name))
-+                proto=3Dbuild_marshal_proto(name))
-=20
-     if ret_type:
-         ret +=3D mcgen('''
-diff --git a/scripts/qapi-event.py b/scripts/qapi-event.py
-index 0485e39145..bcbef1035f 100644
---- a/scripts/qapi-event.py
-+++ b/scripts/qapi-event.py
-@@ -14,10 +14,10 @@
- from qapi import *
-=20
-=20
--def gen_event_send_proto(name, arg_type, boxed):
-+def build_event_send_proto(name, arg_type, boxed):
-     return 'void qapi_event_send_%(c_name)s(%(param)s)' % {
-         'c_name': c_name(name.lower()),
--        'param': gen_params(arg_type, boxed, 'Error **errp')}
-+        'param': build_params(arg_type, boxed, 'Error **errp')}
-=20
-=20
- def gen_event_send_decl(name, arg_type, boxed):
-@@ -25,10 +25,10 @@ def gen_event_send_decl(name, arg_type, boxed):
-=20
- %(proto)s;
- ''',
--                 proto=3Dgen_event_send_proto(name, arg_type, boxed))
-+                 proto=3Dbuild_event_send_proto(name, arg_type, boxed))
-=20
-=20
--# Declare and initialize an object 'qapi' using parameters from gen_para=
-ms()
-+# Declare and initialize an object 'qapi' using parameters from build_pa=
-rams()
- def gen_param_var(typ):
-     assert not typ.variants
-     ret =3D mcgen('''
-@@ -42,7 +42,7 @@ def gen_param_var(typ):
-         if memb.optional:
-             ret +=3D 'has_' + c_name(memb.name) + sep
-         if memb.type.name =3D=3D 'str':
--            # Cast away const added in gen_params()
-+            # Cast away const added in build_params()
-             ret +=3D '(char *)'
-         ret +=3D c_name(memb.name)
-     ret +=3D mcgen('''
-@@ -72,7 +72,7 @@ def gen_event_send(name, arg_type, boxed):
-     Error *err =3D NULL;
-     QMPEventFuncEmit emit;
- ''',
--                proto=3Dgen_event_send_proto(name, arg_type, boxed))
-+                proto=3Dbuild_event_send_proto(name, arg_type, boxed))
-=20
-     if arg_type and not arg_type.is_empty():
-         ret +=3D mcgen('''
---=20
-2.13.0.91.g00982b8dd
+diff --git a/nbd/common.c b/nbd/common.c
+index dccbb8e..4db45b3 100644
+--- a/nbd/common.c
++++ b/nbd/common.c
+@@ -20,6 +20,10 @@
+ #include "qapi/error.h"
+ #include "nbd-internal.h"
+ 
++/* nbd_wr_syncv
++ * The function may be called from coroutine or from non-coroutine context.
++ * When called from non-coroutine context @ioc must be in blocking mode.
++ */
+ ssize_t nbd_wr_syncv(QIOChannel *ioc,
+                      struct iovec *iov,
+                      size_t niov,
+@@ -42,11 +46,8 @@ ssize_t nbd_wr_syncv(QIOChannel *ioc,
+             len = qio_channel_writev(ioc, local_iov, nlocal_iov, &local_err);
+         }
+         if (len == QIO_CHANNEL_ERR_BLOCK) {
+-            if (qemu_in_coroutine()) {
+-                qio_channel_yield(ioc, do_read ? G_IO_IN : G_IO_OUT);
+-            } else {
+-                return -EAGAIN;
+-            }
++            assert(qemu_in_coroutine());
++            qio_channel_yield(ioc, do_read ? G_IO_IN : G_IO_OUT);
+             continue;
+         }
+         if (len < 0) {
+-- 
+1.8.3.1
