@@ -1,22 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57932)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59065)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dGUSe-0000DA-1F
-	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 14:04:41 -0400
+	(envelope-from <lersek@redhat.com>) id 1dGUUi-00012D-C8
+	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 14:06:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dGUSd-0007e1-2G
-	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 14:04:40 -0400
-References: <20170601172734.9039-1-berrange@redhat.com>
-	<20170601172734.9039-13-berrange@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <d0a2d5b5-0279-8c05-69da-4ed3d928618f@redhat.com>
-Date: Thu, 1 Jun 2017 13:04:30 -0500
+	(envelope-from <lersek@redhat.com>) id 1dGUUd-0000Yt-Ej
+	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 14:06:48 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49772)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1dGUUd-0000WT-9J
+	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 14:06:43 -0400
+References: <20170601130325.6433-1-marcandre.lureau@redhat.com>
+	<20170601130325.6433-2-marcandre.lureau@redhat.com>
+From: Laszlo Ersek <lersek@redhat.com>
+Message-ID: <465a7b69-a3c0-1492-8e30-c562a76cd65a@redhat.com>
+Date: Thu, 1 Jun 2017 20:06:38 +0200
 MIME-Version: 1.0
-In-Reply-To: <20170601172734.9039-13-berrange@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="Q3skkOMDmQWTVQg30g8gBqC0vtD4697SD"
-Subject: Re: [Qemu-devel] [PATCH v8 12/20] qcow2: extend specification to
- cover LUKS encryption
+In-Reply-To: <20170601130325.6433-2-marcandre.lureau@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 1/4] dump: add DumpInfo structure
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,86 +28,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Alberto Garcia <berto@igalia.com>
+To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org
+Cc: anderson@redhat.com, qiaonuohan@cn.fujitsu.com
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---Q3skkOMDmQWTVQg30g8gBqC0vtD4697SD
-From: Eric Blake <eblake@redhat.com>
-To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>,
- Kevin Wolf <kwolf@redhat.com>, Alberto Garcia <berto@igalia.com>
-Message-ID: <d0a2d5b5-0279-8c05-69da-4ed3d928618f@redhat.com>
-Subject: Re: [PATCH v8 12/20] qcow2: extend specification to cover LUKS
- encryption
-References: <20170601172734.9039-1-berrange@redhat.com>
- <20170601172734.9039-13-berrange@redhat.com>
-In-Reply-To: <20170601172734.9039-13-berrange@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 06/01/2017 12:27 PM, Daniel P. Berrange wrote:
-> Update the qcow2 specification to describe how the LUKS header is
-> placed inside a qcow2 file, when using LUKS encryption for the
-> qcow2 payload instead of the legacy AES-CBC encryption
+On 06/01/17 15:03, Marc-Andr=C3=A9 Lureau wrote:
+> One way or another, the guest could communicate various dump info (via
+> guest agent or vmcoreinfo device) and populate that structure. It can
+> then be used to augment the dump with various details, as done in the
+> following patch.
 >=20
-> Reviewed-by: Eric Blake <eblake@redhat.com>
-> Reviewed-by: Alberto Garcia <berto@igalia.com>
-> Reviewed-by: Max Reitz <mreitz@redhat.com>
-> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
+> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 > ---
->  docs/specs/qcow2.txt | 103 +++++++++++++++++++++++++++++++++++++++++++=
-++++++++
->  1 file changed, 103 insertions(+)
+>  include/sysemu/dump-info.h | 18 ++++++++++++++++++
+>  dump.c                     |  3 +++
+>  2 files changed, 21 insertions(+)
+>  create mode 100644 include/sysemu/dump-info.h
+>=20
+> diff --git a/include/sysemu/dump-info.h b/include/sysemu/dump-info.h
+> new file mode 100644
+> index 0000000000..d2378e15e2
+> --- /dev/null
+> +++ b/include/sysemu/dump-info.h
+> @@ -0,0 +1,18 @@
+> +#ifndef DUMP_INFO_H
+> +#define DUMP_INFO_H
+> +
+> +typedef struct DumpInfo {
+> +    bool received;
+> +    /* kernel base address */
+> +    bool has_phys_base;
+> +    uint64_t phys_base;
+> +    /* "_text" symbol location */
+> +    bool has_text;
+> +    uint64_t text;
+> +    /* the content of /sys/kernel/vmcoreinfo on Linux */
+> +    char *vmcoreinfo;
+> +} DumpInfo;
+> +
+> +extern DumpInfo dump_info;
+> +
+> +#endif /* DUMP_INFO_H */
+> diff --git a/dump.c b/dump.c
+> index d9090a24cc..bdf3270f02 100644
+> --- a/dump.c
+> +++ b/dump.c
+> @@ -20,6 +20,7 @@
+>  #include "monitor/monitor.h"
+>  #include "sysemu/kvm.h"
+>  #include "sysemu/dump.h"
+> +#include "sysemu/dump-info.h"
+>  #include "sysemu/sysemu.h"
+>  #include "sysemu/memory_mapping.h"
+>  #include "sysemu/cpus.h"
+> @@ -38,6 +39,8 @@
+>  #define ELF_MACHINE_UNAME "Unknown"
+>  #endif
+> =20
+> +DumpInfo dump_info =3D { 0, };
+> +
+>  uint16_t cpu_to_dump16(DumpState *s, uint16_t val)
+>  {
+>      if (s->dump_info.d_endian =3D=3D ELFDATA2LSB) {
 >=20
 
-> +=3D=3D Data encryption =3D=3D
-> +
-> +When an encryption method is requested in the header, the image payloa=
-d
-> +data must be encrypted/decrypted on every write/read. The image header=
-s
-> +and metadata are never encrypted.
-> +
-> +The algorithms used for encryption vary depending on the method
-> +
-> + - AES:
-> +
-> +   The AES cipher, in CBC mode, with 256 bit keys.
-> +
-> +   Initialization vectors generated using plain64 method, with
-> +   the virtual disk sector as the input tweak.
-> +
-> +   This format is no longer supported in QEMU system emulators, due
-> +   to a number of design flaws affecting it security. It is only
+Can you please spell out, in the commit message, the reason for
+introducing a new header file? (I suspect your reason, but it should be
+documented explicitly.)
 
-s/affecting it/affecting its/
-
-Can keep my R-b.
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---Q3skkOMDmQWTVQg30g8gBqC0vtD4697SD
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEcBAEBCAAGBQJZMFcuAAoJEKeha0olJ0Nq/1IIAJV2zvfA7/23BgPg0QTeL6aU
-aUEsiESPo/Ct3iwVAcd/HwbM75kzHyKut1P8Krz0WSfn/XJ3S8I08O0O4szjwfw9
-amcEeJiL1jOupCq8UOriBt6jmRg5WR8Vmv7+k67eYL4pJUl+3Ux6Hk3B86Su1M8n
-tzmgFM+XFmikfgqEf+gnzBMarz4e6oooq5oJRc8bKwiySUDHKvaE2D5IqxrGuK4w
-GlDjYhqeaUxeBSuJcO+bUHCGQlloyjNkdITwLuwz+kI0uInG67OVu42t8FDGFaSi
-q4IMwnw+b8plbO/LAyn6sb1i9YuPInOT4dVgH4jxwfMJXlt+GGmk9Q9pGmBnems=
-=THFr
------END PGP SIGNATURE-----
-
---Q3skkOMDmQWTVQg30g8gBqC0vtD4697SD--
+Thanks
+Laszlo
