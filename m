@@ -1,30 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59925)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60247)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1dGPQw-00049J-Vh
-	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 08:42:36 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1dGPS9-0005E6-Pe
+	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 08:43:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1dGPQt-0005pc-Nx
-	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 08:42:35 -0400
-Received: from mail-wm0-x243.google.com ([2a00:1450:400c:c09::243]:34174)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1dGPQt-0005pM-H7
-	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 08:42:31 -0400
-Received: by mail-wm0-x243.google.com with SMTP id d127so11022233wmf.1
-	for <qemu-devel@nongnu.org>; Thu, 01 Jun 2017 05:42:31 -0700 (PDT)
-Received: from 640k.lan (94-39-157-43.adsl-ull.clienti.tiscali.it.
-	[94.39.157.43]) by smtp.gmail.com with ESMTPSA id
-	g46sm6271438wrg.69.2017.06.01.05.42.29 for <qemu-devel@nongnu.org>
-	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Thu, 01 Jun 2017 05:42:29 -0700 (PDT)
-Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Thu,  1 Jun 2017 14:41:50 +0200
-Message-Id: <1496320911-51305-33-git-send-email-pbonzini@redhat.com>
-In-Reply-To: <1496320911-51305-1-git-send-email-pbonzini@redhat.com>
-References: <1496320911-51305-1-git-send-email-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PULL 32/33] nbd: make it thread-safe,
- fix qcow2 over nbd
+	(envelope-from <dgilbert@redhat.com>) id 1dGPS4-00062I-Tu
+	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 08:43:49 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40398)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dGPS4-00061t-Lw
+	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 08:43:44 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id AFFAF83F42
+	for <qemu-devel@nongnu.org>; Thu,  1 Jun 2017 12:43:43 +0000 (UTC)
+Date: Thu, 1 Jun 2017 13:43:37 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170601124337.GP2083@work-vm>
+References: <20170531103509.22021-1-quintela@redhat.com>
+	<20170531103509.22021-9-quintela@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170531103509.22021-9-quintela@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 08/10] migration: Create include for
+ migration snapshots
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,120 +34,197 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Juan Quintela <quintela@redhat.com>
+Cc: qemu-devel@nongnu.org, lvivier@redhat.com, peterx@redhat.com
 
-NBD is not thread safe, because it accesses s->in_flight without
-a CoMutex.  Fixing this will be required for multiqueue.
-CoQueue doesn't have spurious wakeups but, when another coroutine can
-run between qemu_co_queue_next's wakeup and qemu_co_queue_wait's
-re-locking of the mutex, the wait condition can become false and
-a loop is necessary.
+* Juan Quintela (quintela@redhat.com) wrote:
+> Start removing migration code from sysemu/sysemu.h.
+> 
+> Signed-off-by: Juan Quintela <quintela@redhat.com>
 
-In fact, it turns out that the loop is necessary even without this
-multi-threaded scenario.  A particular sequence of coroutine wakeups
-is happening ~80% of the time when starting a guest with qcow2 image
-served over NBD (i.e. qemu-nbd --format=raw, and QEMU's -drive option
-has -format=qcow2).  This patch fixes that issue too.
+Yes, the names always confused me.
 
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- block/nbd-client.c | 30 +++++++++---------------------
- 1 file changed, 9 insertions(+), 21 deletions(-)
 
-diff --git a/block/nbd-client.c b/block/nbd-client.c
-index 09d955b..87d19c7 100644
---- a/block/nbd-client.c
-+++ b/block/nbd-client.c
-@@ -119,6 +119,10 @@ static int nbd_co_send_request(BlockDriverState *bs,
-     int rc, ret, i;
- 
-     qemu_co_mutex_lock(&s->send_mutex);
-+    while (s->in_flight == MAX_NBD_REQUESTS) {
-+        qemu_co_queue_wait(&s->free_sema, &s->send_mutex);
-+    }
-+    s->in_flight++;
- 
-     for (i = 0; i < MAX_NBD_REQUESTS; i++) {
-         if (s->recv_coroutine[i] == NULL) {
-@@ -181,20 +185,6 @@ static void nbd_co_receive_reply(NBDClientSession *s,
-     }
- }
- 
--static void nbd_coroutine_start(NBDClientSession *s,
--                                NBDRequest *request)
--{
--    /* Poor man semaphore.  The free_sema is locked when no other request
--     * can be accepted, and unlocked after receiving one reply.  */
--    if (s->in_flight == MAX_NBD_REQUESTS) {
--        qemu_co_queue_wait(&s->free_sema, NULL);
--        assert(s->in_flight < MAX_NBD_REQUESTS);
--    }
--    s->in_flight++;
--
--    /* s->recv_coroutine[i] is set as soon as we get the send_lock.  */
--}
--
- static void nbd_coroutine_end(BlockDriverState *bs,
-                               NBDRequest *request)
- {
-@@ -202,13 +192,16 @@ static void nbd_coroutine_end(BlockDriverState *bs,
-     int i = HANDLE_TO_INDEX(s, request->handle);
- 
-     s->recv_coroutine[i] = NULL;
--    s->in_flight--;
--    qemu_co_queue_next(&s->free_sema);
- 
-     /* Kick the read_reply_co to get the next reply.  */
-     if (s->read_reply_co) {
-         aio_co_wake(s->read_reply_co);
-     }
-+
-+    qemu_co_mutex_lock(&s->send_mutex);
-+    s->in_flight--;
-+    qemu_co_queue_next(&s->free_sema);
-+    qemu_co_mutex_unlock(&s->send_mutex);
- }
- 
- int nbd_client_co_preadv(BlockDriverState *bs, uint64_t offset,
-@@ -226,7 +219,6 @@ int nbd_client_co_preadv(BlockDriverState *bs, uint64_t offset,
-     assert(bytes <= NBD_MAX_BUFFER_SIZE);
-     assert(!flags);
- 
--    nbd_coroutine_start(client, &request);
-     ret = nbd_co_send_request(bs, &request, NULL);
-     if (ret < 0) {
-         reply.error = -ret;
-@@ -256,7 +248,6 @@ int nbd_client_co_pwritev(BlockDriverState *bs, uint64_t offset,
- 
-     assert(bytes <= NBD_MAX_BUFFER_SIZE);
- 
--    nbd_coroutine_start(client, &request);
-     ret = nbd_co_send_request(bs, &request, qiov);
-     if (ret < 0) {
-         reply.error = -ret;
-@@ -291,7 +282,6 @@ int nbd_client_co_pwrite_zeroes(BlockDriverState *bs, int64_t offset,
-         request.flags |= NBD_CMD_FLAG_NO_HOLE;
-     }
- 
--    nbd_coroutine_start(client, &request);
-     ret = nbd_co_send_request(bs, &request, NULL);
-     if (ret < 0) {
-         reply.error = -ret;
-@@ -316,7 +306,6 @@ int nbd_client_co_flush(BlockDriverState *bs)
-     request.from = 0;
-     request.len = 0;
- 
--    nbd_coroutine_start(client, &request);
-     ret = nbd_co_send_request(bs, &request, NULL);
-     if (ret < 0) {
-         reply.error = -ret;
-@@ -342,7 +331,6 @@ int nbd_client_co_pdiscard(BlockDriverState *bs, int64_t offset, int count)
-         return 0;
-     }
- 
--    nbd_coroutine_start(client, &request);
-     ret = nbd_co_send_request(bs, &request, NULL);
-     if (ret < 0) {
-         reply.error = -ret;
--- 
-1.8.3.1
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+
+> ---
+>  hmp.c                        |  5 +++--
+>  include/block/block_int.h    |  4 ++--
+>  include/migration/snapshot.h | 21 +++++++++++++++++++++
+>  include/sysemu/sysemu.h      |  3 ---
+>  migration/savevm.c           |  5 +++--
+>  replay/replay-snapshot.c     |  5 +++--
+>  vl.c                         |  3 ++-
+>  7 files changed, 34 insertions(+), 12 deletions(-)
+>  create mode 100644 include/migration/snapshot.h
+> 
+> diff --git a/hmp.c b/hmp.c
+> index 20f5dab..ad72390 100644
+> --- a/hmp.c
+> +++ b/hmp.c
+> @@ -42,6 +42,7 @@
+>  #include "qemu/error-report.h"
+>  #include "exec/ramlist.h"
+>  #include "hw/intc/intc.h"
+> +#include "migration/snapshot.h"
+>  
+>  #ifdef CONFIG_SPICE
+>  #include <spice/enums.h>
+> @@ -1284,7 +1285,7 @@ void hmp_loadvm(Monitor *mon, const QDict *qdict)
+>  
+>      vm_stop(RUN_STATE_RESTORE_VM);
+>  
+> -    if (load_vmstate(name, &err) == 0 && saved_vm_running) {
+> +    if (load_snapshot(name, &err) == 0 && saved_vm_running) {
+>          vm_start();
+>      }
+>      hmp_handle_error(mon, &err);
+> @@ -1294,7 +1295,7 @@ void hmp_savevm(Monitor *mon, const QDict *qdict)
+>  {
+>      Error *err = NULL;
+>  
+> -    save_vmstate(qdict_get_try_str(qdict, "name"), &err);
+> +    save_snapshot(qdict_get_try_str(qdict, "name"), &err);
+>      hmp_handle_error(mon, &err);
+>  }
+>  
+> diff --git a/include/block/block_int.h b/include/block/block_int.h
+> index e5eb473..cb78c4f 100644
+> --- a/include/block/block_int.h
+> +++ b/include/block/block_int.h
+> @@ -601,8 +601,8 @@ struct BlockDriverState {
+>      int copy_on_read;
+>  
+>      /* If we are reading a disk image, give its size in sectors.
+> -     * Generally read-only; it is written to by load_vmstate and save_vmstate,
+> -     * but the block layer is quiescent during those.
+> +     * Generally read-only; it is written to by load_snapshot and
+> +     * save_snaphost, but the block layer is quiescent during those.
+>       */
+>      int64_t total_sectors;
+>  
+> diff --git a/include/migration/snapshot.h b/include/migration/snapshot.h
+> new file mode 100644
+> index 0000000..c85b6ec
+> --- /dev/null
+> +++ b/include/migration/snapshot.h
+> @@ -0,0 +1,21 @@
+> +/*
+> + * QEMU snapshots
+> + *
+> + * Copyright (c) 2004-2008 Fabrice Bellard
+> + * Copyright (c) 2009-2015 Red Hat Inc
+> + *
+> + * Authors:
+> + *  Juan Quintela <quintela@redhat.com>
+> + *
+> + *
+> + * This work is licensed under the terms of the GNU GPL, version 2 or later.
+> + * See the COPYING file in the top-level directory.
+> + */
+> +
+> +#ifndef QEMU_MIGRATION_SNAPSHOT_H
+> +#define QEMU_MIGRATION_SNAPSHOT_H
+> +
+> +int save_snapshot(const char *name, Error **errp);
+> +int load_snapshot(const char *name, Error **errp);
+> +
+> +#endif
+> diff --git a/include/sysemu/sysemu.h b/include/sysemu/sysemu.h
+> index 723c8dc..9841a52 100644
+> --- a/include/sysemu/sysemu.h
+> +++ b/include/sysemu/sysemu.h
+> @@ -92,9 +92,6 @@ void qemu_remove_exit_notifier(Notifier *notify);
+>  void qemu_add_machine_init_done_notifier(Notifier *notify);
+>  void qemu_remove_machine_init_done_notifier(Notifier *notify);
+>  
+> -int save_vmstate(const char *name, Error **errp);
+> -int load_vmstate(const char *name, Error **errp);
+> -
+>  void qemu_announce_self(void);
+>  
+>  extern int autostart;
+> diff --git a/migration/savevm.c b/migration/savevm.c
+> index bb3f9ec..f2664f3 100644
+> --- a/migration/savevm.c
+> +++ b/migration/savevm.c
+> @@ -35,6 +35,7 @@
+>  #include "sysemu/sysemu.h"
+>  #include "qemu/timer.h"
+>  #include "migration/migration.h"
+> +#include "migration/snapshot.h"
+>  #include "qemu-file-channel.h"
+>  #include "qemu-file.h"
+>  #include "savevm.h"
+> @@ -2067,7 +2068,7 @@ int qemu_loadvm_state(QEMUFile *f)
+>      return ret;
+>  }
+>  
+> -int save_vmstate(const char *name, Error **errp)
+> +int save_snapshot(const char *name, Error **errp)
+>  {
+>      BlockDriverState *bs, *bs1;
+>      QEMUSnapshotInfo sn1, *sn = &sn1, old_sn1, *old_sn = &old_sn1;
+> @@ -2224,7 +2225,7 @@ void qmp_xen_load_devices_state(const char *filename, Error **errp)
+>      migration_incoming_state_destroy();
+>  }
+>  
+> -int load_vmstate(const char *name, Error **errp)
+> +int load_snapshot(const char *name, Error **errp)
+>  {
+>      BlockDriverState *bs, *bs_vm_state;
+>      QEMUSnapshotInfo sn;
+> diff --git a/replay/replay-snapshot.c b/replay/replay-snapshot.c
+> index c75cd38..a4ded29 100644
+> --- a/replay/replay-snapshot.c
+> +++ b/replay/replay-snapshot.c
+> @@ -19,6 +19,7 @@
+>  #include "qapi/qmp/qstring.h"
+>  #include "qemu/error-report.h"
+>  #include "migration/vmstate.h"
+> +#include "migration/snapshot.h"
+>  
+>  static void replay_pre_save(void *opaque)
+>  {
+> @@ -66,13 +67,13 @@ void replay_vmstate_init(void)
+>  
+>      if (replay_snapshot) {
+>          if (replay_mode == REPLAY_MODE_RECORD) {
+> -            if (save_vmstate(replay_snapshot, &err) != 0) {
+> +            if (save_snapshot(replay_snapshot, &err) != 0) {
+>                  error_report_err(err);
+>                  error_report("Could not create snapshot for icount record");
+>                  exit(1);
+>              }
+>          } else if (replay_mode == REPLAY_MODE_PLAY) {
+> -            if (load_vmstate(replay_snapshot, &err) != 0) {
+> +            if (load_snapshot(replay_snapshot, &err) != 0) {
+>                  error_report_err(err);
+>                  error_report("Could not load snapshot for icount replay");
+>                  exit(1);
+> diff --git a/vl.c b/vl.c
+> index 993690d..86f6c71 100644
+> --- a/vl.c
+> +++ b/vl.c
+> @@ -87,6 +87,7 @@ int main(int argc, char **argv)
+>  #include "sysemu/blockdev.h"
+>  #include "hw/block/block.h"
+>  #include "migration/block.h"
+> +#include "migration/snapshot.h"
+>  #include "sysemu/tpm.h"
+>  #include "sysemu/dma.h"
+>  #include "hw/audio/soundhw.h"
+> @@ -4722,7 +4723,7 @@ int main(int argc, char **argv, char **envp)
+>          replay_vmstate_init();
+>      } else if (loadvm) {
+>          Error *local_err = NULL;
+> -        if (load_vmstate(loadvm, &local_err) < 0) {
+> +        if (load_snapshot(loadvm, &local_err) < 0) {
+>              error_report_err(local_err);
+>              autostart = 0;
+>          }
+> -- 
+> 2.9.4
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
