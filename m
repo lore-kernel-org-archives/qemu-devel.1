@@ -1,23 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48410)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48988)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dGOiM-0004jI-BR
-	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 07:56:31 -0400
+	(envelope-from <armbru@redhat.com>) id 1dGOkM-0006N3-Br
+	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 07:58:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dGOiI-0006rO-FT
-	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 07:56:30 -0400
-Date: Thu, 1 Jun 2017 17:13:04 +1000
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20170601071304.GE13397@umbus.fritz.box>
-References: <20170526052319.28096-1-david@gibson.dropbear.id.au>
-	<20170526052319.28096-4-david@gibson.dropbear.id.au>
-	<1496295880.4414.1.camel@gmail.com>
+	(envelope-from <armbru@redhat.com>) id 1dGOkL-0007nr-Fa
+	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 07:58:34 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:50322)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dGOkL-0007nf-84
+	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 07:58:33 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 2118880E79
+	for <qemu-devel@nongnu.org>; Thu,  1 Jun 2017 11:58:32 +0000 (UTC)
+From: Markus Armbruster <armbru@redhat.com>
+References: <20170531135709.345-1-marcandre.lureau@redhat.com>
+	<20170531135709.345-8-marcandre.lureau@redhat.com>
+Date: Thu, 01 Jun 2017 13:58:28 +0200
+In-Reply-To: <20170531135709.345-8-marcandre.lureau@redhat.com>
+	(=?utf-8?Q?=22Marc-Andr=C3=A9?=
+	Lureau"'s message of "Wed, 31 May 2017 17:56:31 +0400")
+Message-ID: <87tw3zsyvv.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="ZRyEpB+iJ+qUx0kp"
-Content-Disposition: inline
-In-Reply-To: <1496295880.4414.1.camel@gmail.com>
-Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCHv4 3/5] pseries: Move CPU
- compatibility property to machine
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 07/45] tests: remove alt num-int cases
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,183 +35,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
-Cc: groug@kaod.org, clg@kaod.org, aik@ozlabs.ru, mdroth@linux.vnet.ibm.com, nikunj@linux.vnet.ibm.com, quintela@redhat.com, sursingh@redhat.com, qemu-devel@nongnu.org, armbru@redhat.com, qemu-ppc@nongnu.org, abologna@redhat.com, sbobroff@redhat.com, dgilbert@redhat.com
+To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
+Cc: qemu-devel@nongnu.org
 
+Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
 
---ZRyEpB+iJ+qUx0kp
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+> From: Markus Armbruster <armbru@redhat.com>
+>
+> Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
+>
+>> There are no real users of this case, and it's going to be invalid after
+>> merging of QFloat and QInt use the same QNum type in the following patch.
+>
+> Invalid because our alternate code is insufficiently sophisticated.  In
+> other words fixable.  See "[PATCH 4/4] qapi: Reject alternates that
+> can't work with keyval_parse()" I just posted.
+>
+> My patch's commit message describes two related issues, one fixable and
+> one unfixable.  The fixable one already exists, but only in QGA.  I
+> intend to fix it, but it's not a priority.
+>
+> Fixing the issue you describe seems even less important.  I considered
+> outlawing it in my series (patch appended for your reading pleasure),
+> but decided to leave it to yours.  I don't expect you to replace your
+> patch.  Perhaps my patch helps you with rebasing yours should that
+> become necessary.
+>
+> Message-Id: <87tw4cn7sh.fsf@dusky.pond.sub.org>
 
-On Thu, Jun 01, 2017 at 03:44:40PM +1000, Suraj Jitindar Singh wrote:
-> On Fri, 2017-05-26 at 15:23 +1000, David Gibson wrote:
-> > Server class POWER CPUs have a "compat" property, which is used to
-> > set the
-> > backwards compatibility mode for the processor.=A0=A0However, this only
-> > makes
-> > sense for machine types which don't give the guest access to
-> > hypervisor
-> > privilege - otherwise the compatibility level is under the guest's
-> > control.
-> >=20
-> > To reflect this, this removes the CPU 'compat' property and instead
-> > creates a 'max-cpu-compat' property on the pseries machine.=A0=A0Strict=
-ly
-> > speaking this breaks compatibility, but AFAIK the 'compat' option was
-> > never (directly) used with -device or device_add.
-> >=20
-> > The option was used with -cpu.=A0=A0So, to maintain compatibility, this
-> > patch adds a hack to the cpu option parsing to strip out any compat
-> > options supplied with -cpu and set them on the machine property
-> > instead of the now deprecated cpu property.
->=20
-> Generally looks good, a couple of comments below.
->=20
-> Suraj
->=20
-> >=20
-> > Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-> > ---
-> > =A0hw/ppc/spapr.c=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0|=A0=A0=A06 =
-++-
-> > =A0hw/ppc/spapr_cpu_core.c=A0=A0=A0=A0=A0|=A0=A056 ++++++++++++++++++++=
-+++-
-> > =A0hw/ppc/spapr_hcall.c=A0=A0=A0=A0=A0=A0=A0=A0|=A0=A0=A08 ++--
-> > =A0include/hw/ppc/spapr.h=A0=A0=A0=A0=A0=A0|=A0=A012 ++++--
-> > =A0target/ppc/compat.c=A0=A0=A0=A0=A0=A0=A0=A0=A0| 102
-> > ++++++++++++++++++++++++++++++++++++++++++++
-> > =A0target/ppc/cpu.h=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0|=A0=A0=A05 ++-
-> > =A0target/ppc/translate_init.c |=A0=A086 +++++++++++-------------------=
-----
-> > ---
-> > =A07 files changed, 202 insertions(+), 73 deletions(-)
-> >=20
-> > diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> > index ab3aab1..3c4e88f 100644
-> > --- a/hw/ppc/spapr.c
-> > +++ b/hw/ppc/spapr.c
-> > @@ -2134,7 +2134,7 @@ static void ppc_spapr_init(MachineState
-> > *machine)
-> > =A0=A0=A0=A0=A0=A0=A0=A0=A0machine->cpu_model =3D kvm_enabled() ? "host=
-" : smc-
-> > >tcg_default_cpu;
-> > =A0=A0=A0=A0=A0}
-> > =A0
-> > -=A0=A0=A0=A0ppc_cpu_parse_features(machine->cpu_model);
-> > +=A0=A0=A0=A0spapr_cpu_parse_features(spapr);
-> > =A0
-> > =A0=A0=A0=A0=A0spapr_init_cpus(spapr);
-> > =A0
-> > @@ -2497,6 +2497,10 @@ static void spapr_machine_initfn(Object *obj)
-> > =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
-=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0" place of standard EPOW events
-> > when possible"
-> > =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
-=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0" (required for memory hot-
-> > unplug support)",
-> > =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
-=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0NULL);
-> > +
-> > +=A0=A0=A0=A0ppc_compat_add_property(obj, "max-cpu-compat", &spapr-
-> > >max_compat_pvr,
-> > +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
-=A0=A0=A0=A0=A0"Maximum permitted CPU compatibility
-> > mode",
-> > +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
-=A0=A0=A0=A0=A0&error_fatal);
-> > =A0}
-> > =A0
-> > =A0static void spapr_machine_finalizefn(Object *obj)
-> > diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
-> > index ff7058e..ab4102b 100644
-> > --- a/hw/ppc/spapr_cpu_core.c
-> > +++ b/hw/ppc/spapr_cpu_core.c
-> > @@ -20,6 +20,58 @@
-> > =A0#include "sysemu/numa.h"
-> > =A0#include "qemu/error-report.h"
-> > =A0
-> > +void spapr_cpu_parse_features(sPAPRMachineState *spapr)
-> > +{
-> > +=A0=A0=A0=A0/*
-> > +=A0=A0=A0=A0=A0* Backwards compatibility hack:
-> > +=A0=A0=A0=A0=A0*
-> > +=A0=A0=A0=A0=A0*=A0=A0=A0CPUs had a "compat=3D" property which didn't =
-make sense for
-> > +=A0=A0=A0=A0=A0*=A0=A0=A0anything except pseries.=A0=A0It was replaced=
- by "max-cpu-
-> > compat"
-> > +=A0=A0=A0=A0=A0*=A0=A0=A0machine option.=A0=A0This supports old comman=
-d lines like
-> > +=A0=A0=A0=A0=A0*=A0=A0=A0=A0=A0=A0=A0-cpu POWER8,compat=3Dpower7
-> > +=A0=A0=A0=A0=A0*=A0=A0=A0By stripping the compat option and applying i=
-t to the
-> > machine
-> > +=A0=A0=A0=A0=A0*=A0=A0=A0before passing it on to the cpu level parser.
-> > +=A0=A0=A0=A0=A0*/
-> > +=A0=A0=A0=A0gchar **inpieces;
-> > +=A0=A0=A0=A0int i, j;
-> > +=A0=A0=A0=A0gchar *compat_str =3D NULL;
-> > +
-> > +=A0=A0=A0=A0inpieces =3D g_strsplit(MACHINE(spapr)->cpu_model, ",", 0);
-> > +
-> > +=A0=A0=A0=A0/* inpieces[0] is the actual model string */
-> > +=A0=A0=A0=A0i =3D 1;
-> > +=A0=A0=A0=A0j =3D 1;
-> > +=A0=A0=A0=A0while (inpieces[i]) {
-> > +=A0=A0=A0=A0=A0=A0=A0=A0if (g_str_has_prefix(inpieces[i], "compat=3D")=
-) {
-> > +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0/* in case of multiple compat=3D o=
-ptipons */
->=20
-> s/optipons/options?
+Uh, this got a bit messed up :)
 
-Oops, fixed.
+Your original patch only dropped test cases that will become invalid.
 
-> > +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0g_free(compat_str);
-> > +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0compat_str =3D inpieces[i];
-> > +=A0=A0=A0=A0=A0=A0=A0=A0} else {
-> > +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0j++;
-> > +=A0=A0=A0=A0=A0=A0=A0=A0}
-> > +
-> > +=A0=A0=A0=A0=A0=A0=A0=A0/* Excise compat options from list */
-> > +=A0=A0=A0=A0=A0=A0=A0=A0inpieces[j] =3D inpieces[i];
->=20
-> it's worth noting that where previously when specifying an invalid
-> option you got:
->=20
-> qemu-system-ppc64: Expected key=3Dvalue format, found=A0*blah*
->=20
-> You now get a segfault here.
+In my review, I elaborated a bit on "invalid", and mentioned that I had
+considered outlawing such alternates independently of this series, but
+refrained.  I appended a patch for reference, and in the hope that it
+helps you rebasing your patch.
 
-Sod.  The joy of doing string manipulation in C.  Ok, I think I've
-found and fixed that too.
+It looks like you replaced your patch by mine, and the commit message by
+my review.  The resulting patch does more than just "tests: remove alt
+num-int cases".  It also lacks your S-o-b.
 
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
+I recommend to drop the change to qapi.py, and restore your original
+commit message.  Should effectively be a rebase of your v1.
 
---ZRyEpB+iJ+qUx0kp
-Content-Type: application/pgp-signature; name="signature.asc"
+I further suggest a bit more detail in the commit message, perhaps like
+this:
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
+    tests: Remove test cases for alternates of 'number' and 'int'
 
-iQIcBAEBCAAGBQJZL759AAoJEGw4ysog2bOSqjEQAJfEyH+q5ym+pkajy0GDeYj+
-ZF+3LvIm9tCkpa60vlBnJWfWGxH/WC0DFqmDB7PimAr/1XLZ+Q4eIQ43rCL3Q3nh
-NnQoMdiEFJUZa5HYz/Xc5HCWsiOaMezRImj8CpwCJrHZ8Pj0aT/w4w93XMT6NE1M
-tse2q0zAwnxtcNzNUH5A92rzmpKGGKwObFUn79Okg5l5wbtVJvrtaEBVcSN12sTG
-IsoNLZFnaw+SMIKD9J+68EiCdD7kv/zD3EPvROZilbbkVEu7il8ZzWfBDLsCP8PB
-qToIfCIAeRMCP5lTYlN/jMoJcp59Q+3XwRfEAG7P+NDYCHyiNeBUMw565OQpeSJz
-mIvo0LlW0c1Q8AMjX3uqzMM04xJDZiMeGSgEB3W2/7sqGCqtoIXPZNNCki57THJY
-LmwbeeXiX1/PKs8JRWRcQOEWnpDjXOFMUXnGqjgOl4kP3m6x60+267qHRHPGUCOf
-DNuQ9npM/14UdTcQjHoTCrmn1uF5yJOkLgvb/SZicJLu9e5/293toFxBBSHRIdiM
-lRYQKro5nnME61nQsEW42Karqa6z5H2KLKi4cHt8smsmCFz0Khd0y9VYNYUieP+6
-s0XATXV9vhi8/ApadbmA7vv+mPGmLynROlXOqfFmre5PgmNGWhcQRkvBGrhGfTRX
-/af1r8FP9qgyfmCYv8sU
-=4v5U
------END PGP SIGNATURE-----
+    Alternates with both a 'number' and an 'int' branch will become
+    invalid when the next patch merges of QFloat and QInt into QNum.
+    More sophisticated alternate code could keep them valid, but since
+    we have no users outside tests, simply drop the tests.
 
---ZRyEpB+iJ+qUx0kp--
+    Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+
+You can then add
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
