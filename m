@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56317)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56343)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dGFHr-0007Gl-JM
-	for qemu-devel@nongnu.org; Wed, 31 May 2017 21:52:33 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1dGFHs-0007Gx-VI
+	for qemu-devel@nongnu.org; Wed, 31 May 2017 21:52:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dGFHp-0005ts-NE
-	for qemu-devel@nongnu.org; Wed, 31 May 2017 21:52:31 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1dGFHp-0005ty-PV
+	for qemu-devel@nongnu.org; Wed, 31 May 2017 21:52:32 -0400
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Thu,  1 Jun 2017 11:52:17 +1000
-Message-Id: <20170601015218.9299-4-david@gibson.dropbear.id.au>
+Date: Thu,  1 Jun 2017 11:52:16 +1000
+Message-Id: <20170601015218.9299-3-david@gibson.dropbear.id.au>
 In-Reply-To: <20170601015218.9299-1-david@gibson.dropbear.id.au>
 References: <20170601015218.9299-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [PATCH 3/4] spapr: Abolish DRC set_configured method
+Subject: [Qemu-devel] [PATCH 2/4] spapr: Abolish DRC get_fdt method
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,110 +22,111 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: mdroth@linux.vnet.ibm.com
 Cc: lvivier@redhat.com, nikunj@linux.vnet.ibm.com, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, bharata@linux.vnet.ibm.com, sursingh@redhat.com, David Gibson <david@gibson.dropbear.id.au>
 
-DRConnectorClass has a set_configured method, however:
-  * There is only one implementation, and only ever likely to be one
-  * There's exactly one caller, and that's (now) local
-  * The implementation is very straightforward
+The DRConnectorClass includes a get_fdt method.  However
+  * There's only one implementation, and there's only likely to ever be one
+  * Both callers are local to spapr_drc
+  * Each caller only uses one half of the actual implementation
 
-So abolish the method entirely, and just open-code what we need.  We also
-remove the tracepoints associated with it, since they don't look to be
-terribly useful.
+So abolish get_fdt() entirely, and just open-code what we need.
 
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/ppc/spapr_drc.c         | 20 ++++----------------
- hw/ppc/trace-events        |  2 --
- include/hw/ppc/spapr_drc.h |  3 ---
- 3 files changed, 4 insertions(+), 21 deletions(-)
+ hw/ppc/spapr_drc.c         | 23 ++++++-----------------
+ include/hw/ppc/spapr_drc.h |  1 -
+ 2 files changed, 6 insertions(+), 18 deletions(-)
 
 diff --git a/hw/ppc/spapr_drc.c b/hw/ppc/spapr_drc.c
-index f5b7b68..025453b 100644
+index ae8800d..f5b7b68 100644
 --- a/hw/ppc/spapr_drc.c
 +++ b/hw/ppc/spapr_drc.c
-@@ -199,18 +199,6 @@ static const char *get_name(sPAPRDRConnector *drc)
+@@ -199,14 +199,6 @@ static const char *get_name(sPAPRDRConnector *drc)
      return drc->name;
  }
  
--static void set_configured(sPAPRDRConnector *drc)
+-static const void *get_fdt(sPAPRDRConnector *drc, int *fdt_start_offset)
 -{
--    trace_spapr_drc_set_configured(get_index(drc));
--
--    if (drc->isolation_state != SPAPR_DR_ISOLATION_STATE_UNISOLATED) {
--        /* guest should be not configuring an isolated device */
--        trace_spapr_drc_set_configured_skipping(get_index(drc));
--        return;
+-    if (fdt_start_offset) {
+-        *fdt_start_offset = drc->fdt_start_offset;
 -    }
--    drc->configured = true;
+-    return drc->fdt;
 -}
 -
- /* has the guest been notified of device attachment? */
- static void set_signalled(sPAPRDRConnector *drc)
+ static void set_configured(sPAPRDRConnector *drc)
  {
-@@ -745,7 +733,6 @@ static void spapr_dr_connector_class_init(ObjectClass *k, void *data)
+     trace_spapr_drc_set_configured(get_index(drc));
+@@ -753,7 +745,6 @@ static void spapr_dr_connector_class_init(ObjectClass *k, void *data)
      drck->get_index = get_index;
      drck->get_type = get_type;
      drck->get_name = get_name;
--    drck->set_configured = set_configured;
+-    drck->get_fdt = get_fdt;
+     drck->set_configured = set_configured;
      drck->entity_sense = entity_sense;
      drck->attach = attach;
-     drck->detach = detach;
-@@ -1113,7 +1100,6 @@ static void rtas_ibm_configure_connector(PowerPCCPU *cpu,
-     uint64_t wa_offset;
-     uint32_t drc_index;
-     sPAPRDRConnector *drc;
--    sPAPRDRConnectorClass *drck;
+@@ -1126,7 +1117,6 @@ static void rtas_ibm_configure_connector(PowerPCCPU *cpu,
      sPAPRConfigureConnectorState *ccs;
      sPAPRDRCCResponse resp = SPAPR_DR_CC_RESPONSE_CONTINUE;
      int rc;
-@@ -1133,7 +1119,6 @@ static void rtas_ibm_configure_connector(PowerPCCPU *cpu,
-         goto out;
+-    const void *fdt;
+ 
+     if (nargs != 2 || nret != 1) {
+         rtas_st(rets, 0, RTAS_OUT_PARAM_ERROR);
+@@ -1144,8 +1134,7 @@ static void rtas_ibm_configure_connector(PowerPCCPU *cpu,
      }
  
--    drck = SPAPR_DR_CONNECTOR_GET_CLASS(drc);
-     if (!drc->fdt) {
+     drck = SPAPR_DR_CONNECTOR_GET_CLASS(drc);
+-    fdt = drck->get_fdt(drc, NULL);
+-    if (!fdt) {
++    if (!drc->fdt) {
          trace_spapr_rtas_ibm_configure_connector_missing_fdt(drc_index);
          rc = SPAPR_DR_CC_RESPONSE_NOT_CONFIGURABLE;
-@@ -1170,10 +1155,13 @@ static void rtas_ibm_configure_connector(PowerPCCPU *cpu,
-         case FDT_END_NODE:
-             ccs->fdt_depth--;
-             if (ccs->fdt_depth == 0) {
-+                sPAPRDRIsolationState state = drc->isolation_state;
-                 /* done sending the device tree, don't need to track
-                  * the state anymore
-                  */
--                drck->set_configured(drc);
-+                if (state == SPAPR_DR_ISOLATION_STATE_UNISOLATED) {
-+                    drc->configured = true;
-+                }
-                 spapr_ccs_remove(spapr, ccs);
-                 ccs = NULL;
-                 resp = SPAPR_DR_CC_RESPONSE_SUCCESS;
-diff --git a/hw/ppc/trace-events b/hw/ppc/trace-events
-index 43d265f..96ffc02 100644
---- a/hw/ppc/trace-events
-+++ b/hw/ppc/trace-events
-@@ -42,8 +42,6 @@ spapr_drc_set_isolation_state_deferring(uint32_t index) "drc: 0x%"PRIx32
- spapr_drc_set_indicator_state(uint32_t index, int state) "drc: 0x%"PRIx32", state: 0x%x"
- spapr_drc_set_allocation_state(uint32_t index, int state) "drc: 0x%"PRIx32", state: 0x%x"
- spapr_drc_set_allocation_state_finalizing(uint32_t index) "drc: 0x%"PRIx32
--spapr_drc_set_configured(uint32_t index) "drc: 0x%"PRIx32
--spapr_drc_set_configured_skipping(uint32_t index) "drc: 0x%"PRIx32", isolated device"
- spapr_drc_entity_sense(uint32_t index, int state) "drc: 0x%"PRIx32", state: 0x%x"
- spapr_drc_attach(uint32_t index) "drc: 0x%"PRIx32
- spapr_drc_detach(uint32_t index) "drc: 0x%"PRIx32
+         goto out;
+@@ -1154,7 +1143,7 @@ static void rtas_ibm_configure_connector(PowerPCCPU *cpu,
+     ccs = spapr_ccs_find(spapr, drc_index);
+     if (!ccs) {
+         ccs = g_new0(sPAPRConfigureConnectorState, 1);
+-        (void)drck->get_fdt(drc, &ccs->fdt_offset);
++        ccs->fdt_offset = drc->fdt_start_offset;
+         ccs->drc_index = drc_index;
+         spapr_ccs_add(spapr, ccs);
+     }
+@@ -1165,12 +1154,12 @@ static void rtas_ibm_configure_connector(PowerPCCPU *cpu,
+         const struct fdt_property *prop;
+         int fdt_offset_next, prop_len;
+ 
+-        tag = fdt_next_tag(fdt, ccs->fdt_offset, &fdt_offset_next);
++        tag = fdt_next_tag(drc->fdt, ccs->fdt_offset, &fdt_offset_next);
+ 
+         switch (tag) {
+         case FDT_BEGIN_NODE:
+             ccs->fdt_depth++;
+-            name = fdt_get_name(fdt, ccs->fdt_offset, NULL);
++            name = fdt_get_name(drc->fdt, ccs->fdt_offset, NULL);
+ 
+             /* provide the name of the next OF node */
+             wa_offset = CC_VAL_DATA_OFFSET;
+@@ -1193,9 +1182,9 @@ static void rtas_ibm_configure_connector(PowerPCCPU *cpu,
+             }
+             break;
+         case FDT_PROP:
+-            prop = fdt_get_property_by_offset(fdt, ccs->fdt_offset,
++            prop = fdt_get_property_by_offset(drc->fdt, ccs->fdt_offset,
+                                               &prop_len);
+-            name = fdt_string(fdt, fdt32_to_cpu(prop->nameoff));
++            name = fdt_string(drc->fdt, fdt32_to_cpu(prop->nameoff));
+ 
+             /* provide the name of the next OF property */
+             wa_offset = CC_VAL_DATA_OFFSET;
 diff --git a/include/hw/ppc/spapr_drc.h b/include/hw/ppc/spapr_drc.h
-index 80db955..90f4953 100644
+index 813b9ff..80db955 100644
 --- a/include/hw/ppc/spapr_drc.h
 +++ b/include/hw/ppc/spapr_drc.h
-@@ -177,9 +177,6 @@ typedef struct sPAPRDRConnectorClass {
- 
+@@ -178,7 +178,6 @@ typedef struct sPAPRDRConnectorClass {
      uint32_t (*entity_sense)(sPAPRDRConnector *drc, sPAPRDREntitySense *state);
  
--    /* QEMU interfaces for managing FDT/configure-connector */
--    void (*set_configured)(sPAPRDRConnector *drc);
--
+     /* QEMU interfaces for managing FDT/configure-connector */
+-    const void *(*get_fdt)(sPAPRDRConnector *drc, int *fdt_start_offset);
+     void (*set_configured)(sPAPRDRConnector *drc);
+ 
      /* QEMU interfaces for managing hotplug operations */
-     void (*attach)(sPAPRDRConnector *drc, DeviceState *d, void *fdt,
-                    int fdt_start_offset, bool coldplug, Error **errp);
 -- 
 2.9.4
