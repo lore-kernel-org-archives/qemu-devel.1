@@ -1,25 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43913)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45270)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1dGUzM-0008P1-7D
-	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 14:38:29 -0400
+	(envelope-from <jsnow@redhat.com>) id 1dGV28-000191-L8
+	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 14:41:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1dGUzJ-0007UV-0J
-	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 14:38:28 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:48356)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1dGUzI-0007Tx-N5
-	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 14:38:24 -0400
-References: <20170601130325.6433-1-marcandre.lureau@redhat.com>
-	<20170601130325.6433-3-marcandre.lureau@redhat.com>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <15371905-5159-4e02-284e-08bc636f740d@redhat.com>
-Date: Thu, 1 Jun 2017 20:38:17 +0200
+	(envelope-from <jsnow@redhat.com>) id 1dGV27-0002hS-LG
+	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 14:41:20 -0400
+References: <1496330073-51338-1-git-send-email-anton.nefedov@virtuozzo.com>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <ef7d2624-c65e-2802-5712-bfce7cb9908d@redhat.com>
+Date: Thu, 1 Jun 2017 14:41:09 -0400
 MIME-Version: 1.0
-In-Reply-To: <20170601130325.6433-3-marcandre.lureau@redhat.com>
+In-Reply-To: <1496330073-51338-1-git-send-email-anton.nefedov@virtuozzo.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 2/4] dump: add vmcoreinfo ELF note
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 00/15] qcow2: space preallocation and
+ COW improvements
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,304 +24,90 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org
-Cc: anderson@redhat.com, qiaonuohan@cn.fujitsu.com
+To: Anton Nefedov <anton.nefedov@virtuozzo.com>, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, den@virtuozzo.com, mreitz@redhat.com, Qemu-block <qemu-block@nongnu.org>
 
-On 06/01/17 15:03, Marc-Andr=C3=A9 Lureau wrote:
-> Read vmcoreinfo note from guest memory when dump_info provides the
-> address, and write it as an ELF note in the dump.
->=20
-> NUMBER(phys_base) in vmcoreinfo has only been recently introduced in
-> Linux 4.10 ("kexec: export the value of phys_base instead of symbol
-> address"). To accomadate for older kernels, modify the vmcoreinfo to ad=
-d
-> the new fields and help newer crash that will use it.
+Missing qemu-block@, CCing.
 
-I think here you mean
-
-  modify the DumpState structure
-
-rather than
-
-  modify the vmcoreinfo
-
->=20
-> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> ---
->  include/sysemu/dump.h |   2 +
->  dump.c                | 133 ++++++++++++++++++++++++++++++++++++++++++=
-++++++++
->  2 files changed, 135 insertions(+)
->=20
-> diff --git a/include/sysemu/dump.h b/include/sysemu/dump.h
-> index 2672a15f8b..b8a7a1e41d 100644
-> --- a/include/sysemu/dump.h
-> +++ b/include/sysemu/dump.h
-> @@ -192,6 +192,8 @@ typedef struct DumpState {
->                                    * this could be used to calculate
->                                    * how much work we have
->                                    * finished. */
-> +    uint8_t *vmcoreinfo;
-
-Can you document that this is an ELF note?
-
-> +    size_t vmcoreinfo_size;
->  } DumpState;
-> =20
->  uint16_t cpu_to_dump16(DumpState *s, uint16_t val);
-> diff --git a/dump.c b/dump.c
-> index bdf3270f02..6911ffad8b 100644
-> --- a/dump.c
-> +++ b/dump.c
-> @@ -27,6 +27,7 @@
->  #include "qapi/qmp/qerror.h"
->  #include "qmp-commands.h"
->  #include "qapi-event.h"
-> +#include "qemu/error-report.h"
-> =20
->  #include <zlib.h>
->  #ifdef CONFIG_LZO
-> @@ -88,6 +89,8 @@ static int dump_cleanup(DumpState *s)
->              qemu_mutex_unlock_iothread();
->          }
->      }
-> +    g_free(s->vmcoreinfo);
-> +    s->vmcoreinfo =3D NULL;
-> =20
->      return 0;
->  }
-
-I vaguely feel that this should be moved in front of resuming VM
-execution. I don't have a strong reason, just consistency with the rest
-of the cleanup.
-
-> @@ -238,6 +241,19 @@ static inline int cpu_index(CPUState *cpu)
->      return cpu->cpu_index + 1;
->  }
-> =20
-> +static void write_vmcoreinfo_note(WriteCoreDumpFunction f, DumpState *=
-s,
-> +                                  Error **errp)
-> +{
-> +    int ret;
-> +
-> +    if (s->vmcoreinfo) {
-> +        ret =3D f(s->vmcoreinfo, s->vmcoreinfo_size, s);
-> +        if (ret < 0) {
-> +            error_setg(errp, "dump: failed to write vmcoreinfo");
-> +        }
-> +    }
-> +}
-> +
->  static void write_elf64_notes(WriteCoreDumpFunction f, DumpState *s,
->                                Error **errp)
->  {
-> @@ -261,6 +277,8 @@ static void write_elf64_notes(WriteCoreDumpFunction=
- f, DumpState *s,
->              return;
->          }
->      }
-> +
-> +    write_vmcoreinfo_note(f, s, errp);
->  }
-> =20
->  static void write_elf32_note(DumpState *s, Error **errp)
-> @@ -306,6 +324,8 @@ static void write_elf32_notes(WriteCoreDumpFunction=
- f, DumpState *s,
->              return;
->          }
->      }
-> +
-> +    write_vmcoreinfo_note(f, s, errp);
->  }
-> =20
->  static void write_elf_section(DumpState *s, int type, Error **errp)
-> @@ -717,6 +737,50 @@ static int buf_write_note(const void *buf, size_t =
-size, void *opaque)
->      return 0;
->  }
-> =20
-> +static void get_note_sizes(DumpState *s, const void *note,
-> +                           uint64_t *note_head_size,
-> +                           uint64_t *name_size,
-> +                           uint64_t *desc_size)
-> +{
-
-I'm not happy that I have to reverse engineer what this function does.
-Please document it in the commit message and/or in a function-level
-comment, especially regarding the actual permitted types of *note.
-
-Very similar functionality exists in "target/i386/arch_dump.c" already.
-Is there a (remote) possibility to extract / refactor / share code?
-
-> +    uint64_t note_head_sz;
-> +    uint64_t name_sz;
-> +    uint64_t desc_sz;
-> +
-> +    if (s->dump_info.d_class =3D=3D ELFCLASS64) {
-
-Ugh, this is extremely confusing. This refers to DumpState.dump_info,
-which has type ArchDumpInfo. But in the previous patch we also introduce
-a global "dump_info" variable, of type DumpInfo.
-
-Worse, ArchDumpInfo already has a field called "phys_base" (comment:
-"The target's physmem base"), and it's even filled in in
-"target/arm/arch_dump.c", function cpu_get_dump_info():
-
-/* Take a best guess at the phys_base. If we get it wrong then crash
- * will need '--machdep phys_offset=3D<phys-offset>' added to its command
- * line, which isn't any worse than assuming we can use zero, but being
- * wrong. This is the same algorithm the crash utility uses when
- * attempting to guess as it loads non-dumpfile formatted files.
- */
-
-Looks like we already have some overlapping code / functionality for
-this, for the ARM target?
-
-Sorry, I'm totally lost. It must have been years since I last looked at
-this code. I guess my comments might not make much sense, even.
-
-Please post a version 3, with as detailed as possible commit messages,
-explaining your entire thought process, the data flow, how this feature
-fits into the old code, and all the modifications. Personally at least,
-I need a complete re-introduction to this, to make heads or tails of
-your changes.
-
-I mean I certainly don't *insist* on reviewing this code, it's just that
-if you'd like me to comment on it, you'll have to document all the
-investigative work you've done before / while writing it.
-
-Thanks
-Laszlo
-
-
-
-> +        const Elf64_Nhdr *hdr =3D note;
-> +        note_head_sz =3D sizeof(Elf64_Nhdr);
-> +        name_sz =3D hdr->n_namesz;
-> +        desc_sz =3D hdr->n_descsz;
-> +    } else {
-> +        const Elf32_Nhdr *hdr =3D note;
-> +        note_head_sz =3D sizeof(Elf32_Nhdr);
-> +        name_sz =3D hdr->n_namesz;
-> +        desc_sz =3D hdr->n_descsz;
-> +    }
-> +
-> +    if (note_head_size) {
-> +        *note_head_size =3D note_head_sz;
-> +    }
-> +    if (name_size) {
-> +        *name_size =3D name_sz;
-> +    }
-> +    if (desc_size) {
-> +        *desc_size =3D desc_sz;
-> +    }
-> +}
-> +
-> +static void set_note_desc_size(DumpState *s, void *note,
-> +                               uint64_t desc_size)
-> +{
-> +    if (s->dump_info.d_class =3D=3D ELFCLASS64) {
-> +        Elf64_Nhdr *hdr =3D note;
-> +        hdr->n_descsz =3D desc_size;
-> +    } else {
-> +        Elf32_Nhdr *hdr =3D note;
-> +        hdr->n_descsz =3D desc_size;
-> +    }
-> +}
-> +
->  /* write common header, sub header and elf note to vmcore */
->  static void create_header32(DumpState *s, Error **errp)
->  {
-> @@ -1491,6 +1555,42 @@ static int64_t dump_calculate_size(DumpState *s)
->      return total;
->  }
-> =20
-> +static void vmcoreinfo_add_phys_base(DumpState *s)
-> +{
-> +    uint64_t size, note_head_size, name_size;
-> +    char **lines, *physbase =3D NULL;
-> +    uint8_t *newvmci, *vmci;
-> +    size_t i;
-> +
-> +    get_note_sizes(s, s->vmcoreinfo, &note_head_size, &name_size, &siz=
-e);
-> +    note_head_size =3D ((note_head_size + 3) / 4) * 4;
-> +    name_size =3D ((name_size + 3) / 4) * 4;
-> +    vmci =3D s->vmcoreinfo + note_head_size + name_size;
-> +    *(vmci + size) =3D '\0';
-> +    lines =3D g_strsplit((char *)vmci, "\n", -1);
-> +    for (i =3D 0; lines[i]; i++) {
-> +        if (g_str_has_prefix(lines[i], "NUMBER(phys_base)=3D")) {
-> +            goto end;
-> +        }
-> +    }
-> +
-> +    physbase =3D g_strdup_printf("\nNUMBER(phys_base)=3D%ld",
-> +                               s->dump_info.phys_base);
-> +    s->vmcoreinfo_size =3D
-> +        ((note_head_size + name_size + size + strlen(physbase) + 3) / =
-4) * 4;
-> +
-> +    newvmci =3D g_malloc(s->vmcoreinfo_size);
-> +    memcpy(newvmci, s->vmcoreinfo, note_head_size + name_size + size -=
- 1);
-> +    memcpy(newvmci + note_head_size + name_size + size - 1, physbase,
-> +           strlen(physbase) + 1);
-> +    g_free(s->vmcoreinfo);
-> +    s->vmcoreinfo =3D newvmci;
-> +    set_note_desc_size(s, s->vmcoreinfo, size + strlen(physbase));
-> +
-> +end:
-> +    g_strfreev(lines);
-> +}
-> +
->  static void dump_init(DumpState *s, int fd, bool has_format,
->                        DumpGuestMemoryFormat format, bool paging, bool =
-has_filter,
->                        int64_t begin, int64_t length, Error **errp)
-> @@ -1566,6 +1666,39 @@ static void dump_init(DumpState *s, int fd, bool=
- has_format,
->          goto cleanup;
->      }
-> =20
-> +    if (dump_info.has_phys_base) {
-> +        s->dump_info.phys_base =3D dump_info.phys_base;
-> +    }
-> +    if (dump_info.vmcoreinfo) {
-> +        uint64_t addr, size, note_head_size, name_size, desc_size;
-> +        int count =3D sscanf(dump_info.vmcoreinfo, "%" PRIx64 " %" PRI=
-x64,
-> +                           &addr, &size);
-> +        if (count !=3D 2) {
-> +            /* non fatal error */
-> +            error_report("Failed to parse vmcoreinfo");
-> +        } else {
-> +            assert(!s->vmcoreinfo);
-> +            s->vmcoreinfo =3D g_malloc(size);
-> +            cpu_physical_memory_read(addr, s->vmcoreinfo, size);
-> +
-> +            get_note_sizes(s, s->vmcoreinfo,
-> +                           &note_head_size, &name_size, &desc_size);
-> +            s->vmcoreinfo_size =3D ((note_head_size + 3) / 4 +
-> +                                  (name_size + 3) / 4 +
-> +                                  (desc_size + 3) / 4) * 4;
-> +            if (s->vmcoreinfo_size > size) {
-> +                error_report("Invalid vmcoreinfo header, size mismatch=
-");
-> +                g_free(s->vmcoreinfo);
-> +                s->vmcoreinfo =3D NULL;
-> +            } else {
-> +                if (dump_info.has_phys_base) {
-> +                    vmcoreinfo_add_phys_base(s);
-> +                }
-> +                s->note_size +=3D s->vmcoreinfo_size;
-> +            }
-> +        }
-> +    }
-> +
->      /* get memory mapping */
->      if (paging) {
->          qemu_get_guest_memory_mapping(&s->list, &s->guest_phys_blocks,=
- &err);
->=20
+On 06/01/2017 11:14 AM, Anton Nefedov wrote:
+> Changes in v2:
+>   - introduce new BDRV flag for write_zeroes()
+>       instead of using driver callback directly.
+>     Skipped introducing new functions like bdrv_co_pallocate() for now:
+>       1. it seems ok to keep calling this write_zeroes() as zeroes
+>       are expected;
+>       2. most of the code can be reused now anyway, so changes to
+>       write_zeroes() path are not significant
+>       3. write_zeroes() alignment and max-request limits can also be reused
+> 
+>     As a possible alternative we can have bdrv_co_pallocate() which can
+>     switch to pwrite_zeroes(,flags|=BDRV_REQ_ALLOCATE) early.
+> 
+> ========
+> 
+> This pull request is to address a few performance problems of qcow2 format:
+> 
+>   1. non cluster-aligned write requests (to unallocated clusters) explicitly
+>     pad data with zeroes if there is no backing data. This can be avoided
+>     and the whole clusters are preallocated and zeroed in a single
+>     efficient write_zeroes() operation, also providing better host file
+>     continuity
+> 
+>   2. moreover, efficient write_zeroes() operation can be used to preallocate
+>     space megabytes ahead which gives noticeable improvement on some storage
+>     types (e.g. distributed storages where space allocation operation is
+>     expensive)
+> 
+>   3. preallocating/zeroing the clusters in advance makes possible to enable
+>     simultaneous writes to the same unallocated cluster, which is beneficial
+>     for parallel sequential write operations which are not cluster-aligned
+> 
+> Performance test results are added to commit messages (see patch 3, 12)
+> 
+> Anton Nefedov (11):
+>   block: introduce BDRV_REQ_ALLOCATE flag
+>   file-posix: support BDRV_REQ_ALLOCATE
+>   blkdebug: support BDRV_REQ_ALLOCATE
+>   qcow2: do not COW the empty areas
+>   qcow2: set inactive flag
+>   qcow2: handle_prealloc(): find out if area zeroed by earlier
+>     preallocation
+>   qcow2: fix misleading comment about L2 linking
+>   qcow2-cluster: slightly refactor handle_dependencies()
+>   qcow2-cluster: make handle_dependencies() logic easier to follow
+>   qcow2: allow concurrent unaligned writes to the same clusters
+>   iotest 046: test simultaneous cluster write error case
+> 
+> Denis V. Lunev (3):
+>   qcow2: alloc space for COW in one chunk
+>   qcow2: preallocation at image expand
+>   qcow2: truncate preallocated space
+> 
+> Pavel Butsykin (1):
+>   qcow2: check space leak at the end of the image
+> 
+>  block/blkdebug.c                   |   3 +-
+>  block/file-posix.c                 |   9 +-
+>  block/io.c                         |  19 ++-
+>  block/qcow2-cache.c                |   3 +
+>  block/qcow2-cluster.c              | 218 +++++++++++++++++++++++------
+>  block/qcow2-refcount.c             |  21 +++
+>  block/qcow2.c                      | 273 ++++++++++++++++++++++++++++++++++++-
+>  block/qcow2.h                      |  26 ++++
+>  block/trace-events                 |   1 +
+>  include/block/block.h              |   6 +-
+>  tests/qemu-iotests/026.out         | 104 ++++++++++----
+>  tests/qemu-iotests/026.out.nocache | 104 ++++++++++----
+>  tests/qemu-iotests/029.out         |   5 +-
+>  tests/qemu-iotests/046             |  38 +++++-
+>  tests/qemu-iotests/046.out         |  23 ++++
+>  tests/qemu-iotests/060             |   2 +-
+>  tests/qemu-iotests/060.out         |  13 +-
+>  tests/qemu-iotests/061.out         |   5 +-
+>  tests/qemu-iotests/066             |   2 +-
+>  tests/qemu-iotests/066.out         |   9 +-
+>  tests/qemu-iotests/098.out         |   7 +-
+>  tests/qemu-iotests/108.out         |   5 +-
+>  tests/qemu-iotests/112.out         |   5 +-
+>  23 files changed, 789 insertions(+), 112 deletions(-)
+> 
