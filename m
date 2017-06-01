@@ -1,20 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44798)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45237)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1dGK5J-0008Ie-UG
-	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 02:59:55 -0400
+	(envelope-from <jasowang@redhat.com>) id 1dGK7m-0001Bw-69
+	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 03:02:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1dGK5I-00027m-Up
-	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 02:59:54 -0400
-Resent-Message-Id: <E1dGK5I-00027m-Up@eggs.gnu.org>
-Reply-To: <qemu-devel@nongnu.org>
-In-Reply-To: <20170526052319.28096-1-david@gibson.dropbear.id.au>
-Message-ID: <149630035669.3203.6972871286993356954@f98a8425f76e>
+	(envelope-from <jasowang@redhat.com>) id 1dGK7h-0002iN-A0
+	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 03:02:26 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:45370)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1dGK7h-0002iD-3N
+	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 03:02:21 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id BF8B71A6729
+	for <qemu-devel@nongnu.org>; Thu,  1 Jun 2017 07:02:19 +0000 (UTC)
+References: <1495649128-10529-1-git-send-email-vyasevic@redhat.com>
+	<1495649128-10529-2-git-send-email-vyasevic@redhat.com>
+	<b7f9de2d-e09c-bcf1-24c8-0d961989cd9c@redhat.com>
+	<2687d5d9-9771-97dc-5a32-ac78006472f1@redhat.com>
+	<20170530185713.GT2120@work-vm>
+From: Jason Wang <jasowang@redhat.com>
+Message-ID: <1b1b49c5-f949-9d29-bc36-1c482b4644f3@redhat.com>
+Date: Thu, 1 Jun 2017 15:02:08 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Wed, 31 May 2017 23:59:17 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCHv4 0/5] Clean up compatibility mode handling
+In-Reply-To: <20170530185713.GT2120@work-vm>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 01/12] migration: Introduce announce
+ parameters
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,52 +38,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: david@gibson.dropbear.id.au
-Cc: famz@redhat.com, groug@kaod.org, clg@kaod.org, aik@ozlabs.ru, mdroth@linux.vnet.ibm.com, nikunj@linux.vnet.ibm.com, agraf@suse.de, quintela@redhat.com, sursingh@redhat.com, qemu-devel@nongnu.org, armbru@redhat.com, qemu-ppc@nongnu.org, abologna@redhat.com, sbobroff@redhat.com, dgilbert@redhat.com
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Vlad Yasevich <vyasevic@redhat.com>
+Cc: qemu-devel@nongnu.org, quintela@redhat.com, germano@redhat.com, lvivier@redhat.com, jdenemar@redhat.com, kashyap@redhat.com, armbru@redhat.com, mst@redhat.com
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKTWVzc2FnZS1pZDogMjAx
-NzA1MjYwNTIzMTkuMjgwOTYtMS1kYXZpZEBnaWJzb24uZHJvcGJlYXIuaWQuYXUKVHlwZTogc2Vy
-aWVzClN1YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0h2NCAwLzVdIENsZWFuIHVwIGNvbXBhdGli
-aWxpdHkgbW9kZSBoYW5kbGluZwoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFz
-aAoKQkFTRT1iYXNlCm49MQp0b3RhbD0kKGdpdCBsb2cgLS1vbmVsaW5lICRCQVNFLi4gfCB3YyAt
-bCkKZmFpbGVkPTAKCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNv
-bmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCgpjb21taXRzPSIkKGdpdCBsb2cgLS1mb3Jt
-YXQ9JUggLS1yZXZlcnNlICRCQVNFLi4pIgpmb3IgYyBpbiAkY29tbWl0czsgZG8KICAgIGVjaG8g
-IkNoZWNraW5nIFBBVENIICRuLyR0b3RhbDogJChnaXQgbG9nIC1uIDEgLS1mb3JtYXQ9JXMgJGMp
-Li4uIgogICAgaWYgISBnaXQgc2hvdyAkYyAtLWZvcm1hdD1lbWFpbCB8IC4vc2NyaXB0cy9jaGVj
-a3BhdGNoLnBsIC0tbWFpbGJhY2sgLTsgdGhlbgogICAgICAgIGZhaWxlZD0xCiAgICAgICAgZWNo
-bwogICAgZmkKICAgIG49JCgobisxKSkKZG9uZQoKZXhpdCAkZmFpbGVkCj09PSBURVNUIFNDUklQ
-VCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQxZGVmN2Y0NGJkODg4NzEz
-Mzg0ClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKYWIxZTU0NiBwcGM6IFJld29yayBD
-UFUgY29tcGF0aWJpbGl0eSB0ZXN0aW5nIGFjcm9zcyBtaWdyYXRpb24KOTUwNmQ5YSBwc2VyaWVz
-OiBSZXNldCBDUFUgY29tcGF0aWJpbGl0eSBtb2RlCmM5NzRjNDAgcHNlcmllczogTW92ZSBDUFUg
-Y29tcGF0aWJpbGl0eSBwcm9wZXJ0eSB0byBtYWNoaW5lCmFlNTg3NWQgbWlncmF0aW9uOiBNYXJr
-IENQVSBzdGF0ZXMgZGlydHkgYmVmb3JlIGluY29taW5nIG1pZ3JhdGlvbi9sb2Fkdm0KZTMwODFk
-MCBxYXBpOiBhZGQgZXhwbGljaXQgbnVsbCB0byBzdHJpbmcgaW5wdXQgYW5kIG91dHB1dCB2aXNp
-dG9ycwoKPT09IE9VVFBVVCBCRUdJTiA9PT0KQ2hlY2tpbmcgUEFUQ0ggMS81OiBxYXBpOiBhZGQg
-ZXhwbGljaXQgbnVsbCB0byBzdHJpbmcgaW5wdXQgYW5kIG91dHB1dCB2aXNpdG9ycy4uLgpDaGVj
-a2luZyBQQVRDSCAyLzU6IG1pZ3JhdGlvbjogTWFyayBDUFUgc3RhdGVzIGRpcnR5IGJlZm9yZSBp
-bmNvbWluZyBtaWdyYXRpb24vbG9hZHZtLi4uCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0
-ZXJzCiMxMTk6IEZJTEU6IGt2bS1hbGwuYzoxODk5Ogorc3RhdGljIHZvaWQgZG9fa3ZtX2NwdV9z
-eW5jaHJvbml6ZV9wcmVfbG9hZHZtKENQVVN0YXRlICpjcHUsIHJ1bl9vbl9jcHVfZGF0YSBhcmcp
-CgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojMTUzOiBGSUxFOiB0YXJnZXQvaTM4
-Ni9oYXgtYWxsLmM6NjM4Ogorc3RhdGljIHZvaWQgZG9faGF4X2NwdV9zeW5jaHJvbml6ZV9wcmVf
-bG9hZHZtKENQVVN0YXRlICpjcHUsIHJ1bl9vbl9jcHVfZGF0YSBhcmcpCgp0b3RhbDogMCBlcnJv
-cnMsIDIgd2FybmluZ3MsIDkwIGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHBy
-b2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2Ug
-cG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBp
-biBNQUlOVEFJTkVSUy4KQ2hlY2tpbmcgUEFUQ0ggMy81OiBwc2VyaWVzOiBNb3ZlIENQVSBjb21w
-YXRpYmlsaXR5IHByb3BlcnR5IHRvIG1hY2hpbmUuLi4KQ2hlY2tpbmcgUEFUQ0ggNC81OiBwc2Vy
-aWVzOiBSZXNldCBDUFUgY29tcGF0aWJpbGl0eSBtb2RlLi4uCkNoZWNraW5nIFBBVENIIDUvNTog
-cHBjOiBSZXdvcmsgQ1BVIGNvbXBhdGliaWxpdHkgdGVzdGluZyBhY3Jvc3MgbWlncmF0aW9uLi4u
-CkVSUk9SOiBicmFjZXMge30gYXJlIG5lY2Vzc2FyeSBmb3IgYWxsIGFybXMgb2YgdGhpcyBzdGF0
-ZW1lbnQKIzk3OiBGSUxFOiB0YXJnZXQvcHBjL21hY2hpbmUuYzoyMzk6CisgICAgaWYgKGNwdS0+
-Y29tcGF0X3B2cikgewpbLi4uXQorICAgIH0gZWxzZQpbLi4uXQoKdG90YWw6IDEgZXJyb3JzLCAw
-IHdhcm5pbmdzLCAxMDMgbGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxl
-bXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3Np
-dGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1B
-SU5UQUlORVJTLgoKPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGgg
-Y29kZTogMQoKCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFto
-dHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3
-LWRldmVsQGZyZWVsaXN0cy5vcmc=
+
+
+On 2017=E5=B9=B405=E6=9C=8831=E6=97=A5 02:57, Dr. David Alan Gilbert wrot=
+e:
+> * Vlad Yasevich (vyasevic@redhat.com) wrote:
+>> On 05/26/2017 12:03 AM, Jason Wang wrote:
+>>> On 2017=C3=A5=C2=B9=C2=B405=C3=A6=C5=93=CB=8625=C3=A6=E2=80=94=C2=A5 =
+02:05, Vladislav Yasevich wrote:
+>>>> Add parameters that control RARP/GARP announcement timeouts.
+>>>> The parameters structure is added to the QAPI and a qmp command
+>>>> is added to set/get the parameter data.
+>>>>
+>>>> Based on work by "Dr. David Alan Gilbert"<dgilbert@redhat.com>
+>>>>
+>>>> Signed-off-by: Vladislav Yasevich<vyasevic@redhat.com>
+>>> I think it's better to explain e.g under which condition do we need t=
+o tweak such parameters.
+>>>
+>>> Thanks
+>>>
+>> OK.  I'll rip off what dgilbert wrote in his original series for the d=
+escription.
+>>
+>> Dave, if you have any text to add as to why migration might need to tw=
+eak this, I'd
+>> appreciate it.
+> Pretty much what I originally said;  that the existing values
+> are arbitrary and fixed, and for systems with complex/sluggish
+> network reconfiguration systems they can be too slow.
+>
+> Dave
+>
+
+I agree, but I'm not sure how much it can help in fact unless management=20
+can set configuration specific parameters. And what we did here is best=20
+effort, there's no guarantee that G(R)ARP packet can reach the destinatio=
+n.
+
+Thanks
