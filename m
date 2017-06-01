@@ -1,30 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55140)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56329)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dGP6l-0005Vf-Sr
-	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 08:21:46 -0400
+	(envelope-from <lersek@redhat.com>) id 1dGPAt-0006nQ-TY
+	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 08:26:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dGP6i-0007Fs-N4
-	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 08:21:43 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:48162)
+	(envelope-from <lersek@redhat.com>) id 1dGPAq-0000pz-PY
+	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 08:25:59 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:56410)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dGP6i-0007Fl-Dh
-	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 08:21:40 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 5092FC059735
-	for <qemu-devel@nongnu.org>; Thu,  1 Jun 2017 12:21:39 +0000 (UTC)
-Date: Thu, 1 Jun 2017 13:21:33 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170601122132.GK2083@work-vm>
-References: <20170531103509.22021-1-quintela@redhat.com>
-	<20170531103509.22021-3-quintela@redhat.com>
+	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1dGPAq-0000pA-BW
+	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 08:25:56 -0400
+References: <20170601112241.2580-1-ard.biesheuvel@linaro.org>
+From: Laszlo Ersek <lersek@redhat.com>
+Message-ID: <ccc0e728-0348-e386-6f71-0c1c69eaa01d@redhat.com>
+Date: Thu, 1 Jun 2017 14:25:48 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170531103509.22021-3-quintela@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 02/10] migration: Split qemu-file.h
+In-Reply-To: <20170601112241.2580-1-ard.biesheuvel@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC PATCH] OvmfPkg/AcpiPlatformDxe: lift 4 GB
+ alloc limit for modern ACPI systems
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,659 +28,155 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Juan Quintela <quintela@redhat.com>
-Cc: qemu-devel@nongnu.org, lvivier@redhat.com, peterx@redhat.com
+To: Ard Biesheuvel <ard.biesheuvel@linaro.org>, edk2-devel@lists.01.org
+Cc: leif.lindholm@linaro.org, jordan.l.justen@intel.com, Shannon Zhao <zhaoshenglong@huawei.com>, "Michael S. Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>, qemu devel list <qemu-devel@nongnu.org>, gengdongjiu <gengdongjiu@huawei.com>, Drew Jones <drjones@redhat.com>
 
-* Juan Quintela (quintela@redhat.com) wrote:
-> Split the file into public and internal interfaces.  I have to rename
-> the external one because we can't have two include files with the same
-> name in the same directory.  Build system gets confused.  The only
-> exported functions are the ones that handle basic types.
+On 06/01/17 13:22, Ard Biesheuvel wrote:
+> ACPI supports architectures such as arm64, which did not exist when the
+> original 32-bit ACPI 1.0 was introduced. These days, ACPI tables can all
+> support 64-bit memory addresses, and so QEMU has been updated to emit
+> 64-bit table and entry point types on arm64/mach-virt.
+
+Do you have commit cb51ac2ffe36 ("hw/arm/virt: generate 64-bit
+addressable ACPI objects", 2017-04-10) in mind?
+
 > 
-> Signed-off-by: Juan Quintela <quintela@redhat.com>
-
-Hmm, ok, but I'd like to make qemu-file-types.h private eventually;
-we're down to 193 qemu_put_b*'s outside of migration - of those 72 will
-go when Halil's set goes in.
-
-
-
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-
+> For the UEFI side, this means we no longer have to serve allocation
+> requests from the 32-bit addressable region. So lift this restriction
+> when the platform has been configured without ACPI 1.0b support.
+> 
+> Contributed-under: TianoCore Contribution Agreement 1.0
+> Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 > ---
->  hw/i2c/i2c-ddc.c                             |   1 +
->  hw/intc/s390_flic.c                          |   1 -
->  hw/intc/s390_flic_kvm.c                      |   1 -
->  hw/s390x/s390-skeys.c                        |   1 -
->  include/hw/hw.h                              |   2 +-
->  include/migration/qemu-file-types.h          | 164 +++++++++++++++++++++++++++
->  migration/block.c                            |   2 +-
->  migration/colo.c                             |   2 +-
->  migration/migration.c                        |   2 +-
->  migration/postcopy-ram.c                     |   2 +-
->  migration/qemu-file-channel.c                |   3 +-
->  migration/qemu-file.c                        |   2 +-
->  {include/migration => migration}/qemu-file.h | 157 +------------------------
->  migration/ram.c                              |   2 +-
->  migration/rdma.c                             |   2 +-
->  migration/savevm.c                           |   1 +
->  migration/socket.c                           |   2 +-
->  migration/vmstate-types.c                    |   3 +-
->  migration/vmstate.c                          |   2 +-
->  tests/test-vmstate.c                         |   3 +-
->  20 files changed, 186 insertions(+), 169 deletions(-)
->  create mode 100644 include/migration/qemu-file-types.h
->  rename {include/migration => migration}/qemu-file.h (62%)
 > 
-> diff --git a/hw/i2c/i2c-ddc.c b/hw/i2c/i2c-ddc.c
-> index 66899d7..6b92e95 100644
-> --- a/hw/i2c/i2c-ddc.c
-> +++ b/hw/i2c/i2c-ddc.c
-> @@ -17,6 +17,7 @@
->   */
->  
->  #include "qemu/osdep.h"
-> +#include "qemu-common.h"
->  #include "qemu/log.h"
->  #include "hw/i2c/i2c.h"
->  #include "hw/i2c/i2c-ddc.h"
-> diff --git a/hw/intc/s390_flic.c b/hw/intc/s390_flic.c
-> index 711c114..a26e906 100644
-> --- a/hw/intc/s390_flic.c
-> +++ b/hw/intc/s390_flic.c
-> @@ -13,7 +13,6 @@
->  #include "qemu/osdep.h"
->  #include "qemu/error-report.h"
->  #include "hw/sysbus.h"
-> -#include "migration/qemu-file.h"
->  #include "hw/s390x/s390_flic.h"
->  #include "trace.h"
->  #include "hw/qdev.h"
-> diff --git a/hw/intc/s390_flic_kvm.c b/hw/intc/s390_flic_kvm.c
-> index cc44bc4..b4c61d8 100644
-> --- a/hw/intc/s390_flic_kvm.c
-> +++ b/hw/intc/s390_flic_kvm.c
-> @@ -17,7 +17,6 @@
->  #include "qemu/error-report.h"
->  #include "hw/sysbus.h"
->  #include "sysemu/kvm.h"
-> -#include "migration/qemu-file.h"
->  #include "hw/s390x/s390_flic.h"
->  #include "hw/s390x/adapter.h"
->  #include "trace.h"
-> diff --git a/hw/s390x/s390-skeys.c b/hw/s390x/s390-skeys.c
-> index e2d4e1a..619152c 100644
-> --- a/hw/s390x/s390-skeys.c
-> +++ b/hw/s390x/s390-skeys.c
-> @@ -12,7 +12,6 @@
->  #include "qemu/osdep.h"
->  #include "hw/boards.h"
->  #include "qmp-commands.h"
-> -#include "migration/qemu-file.h"
->  #include "hw/s390x/storage-keys.h"
->  #include "qemu/error-report.h"
->  #include "sysemu/kvm.h"
-> diff --git a/include/hw/hw.h b/include/hw/hw.h
-> index af9eae1..ab4950c 100644
-> --- a/include/hw/hw.h
-> +++ b/include/hw/hw.h
-> @@ -11,7 +11,7 @@
->  #include "exec/memory.h"
->  #include "hw/irq.h"
->  #include "migration/vmstate.h"
-> -#include "migration/qemu-file.h"
-> +#include "migration/qemu-file-types.h"
->  #include "qemu/module.h"
->  #include "sysemu/reset.h"
->  
-> diff --git a/include/migration/qemu-file-types.h b/include/migration/qemu-file-types.h
-> new file mode 100644
-> index 0000000..bd6d7dd
-> --- /dev/null
-> +++ b/include/migration/qemu-file-types.h
-> @@ -0,0 +1,164 @@
-> +/*
-> + * QEMU System Emulator
-> + *
-> + * Copyright (c) 2003-2008 Fabrice Bellard
-> + *
-> + * Permission is hereby granted, free of charge, to any person obtaining a copy
-> + * of this software and associated documentation files (the "Software"), to deal
-> + * in the Software without restriction, including without limitation the rights
-> + * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-> + * copies of the Software, and to permit persons to whom the Software is
-> + * furnished to do so, subject to the following conditions:
-> + *
-> + * The above copyright notice and this permission notice shall be included in
-> + * all copies or substantial portions of the Software.
-> + *
-> + * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-> + * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-> + * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
-> + * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-> + * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-> + * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-> + * THE SOFTWARE.
-> + */
-> +
-> +#ifndef QEMU_FILE_H
-> +#define QEMU_FILE_H
-> +
-> +void qemu_put_buffer(QEMUFile *f, const uint8_t *buf, size_t size);
-> +void qemu_put_byte(QEMUFile *f, int v);
-> +
-> +#define qemu_put_sbyte qemu_put_byte
-> +
-> +void qemu_put_be16(QEMUFile *f, unsigned int v);
-> +void qemu_put_be32(QEMUFile *f, unsigned int v);
-> +void qemu_put_be64(QEMUFile *f, uint64_t v);
-> +size_t qemu_get_buffer(QEMUFile *f, uint8_t *buf, size_t size);
-> +
-> +int qemu_get_byte(QEMUFile *f);
-> +
-> +static inline unsigned int qemu_get_ubyte(QEMUFile *f)
-> +{
-> +    return (unsigned int)qemu_get_byte(f);
-> +}
-> +
-> +#define qemu_get_sbyte qemu_get_byte
-> +
-> +unsigned int qemu_get_be16(QEMUFile *f);
-> +unsigned int qemu_get_be32(QEMUFile *f);
-> +uint64_t qemu_get_be64(QEMUFile *f);
-> +
-> +static inline void qemu_put_be64s(QEMUFile *f, const uint64_t *pv)
-> +{
-> +    qemu_put_be64(f, *pv);
-> +}
-> +
-> +static inline void qemu_put_be32s(QEMUFile *f, const uint32_t *pv)
-> +{
-> +    qemu_put_be32(f, *pv);
-> +}
-> +
-> +static inline void qemu_put_be16s(QEMUFile *f, const uint16_t *pv)
-> +{
-> +    qemu_put_be16(f, *pv);
-> +}
-> +
-> +static inline void qemu_put_8s(QEMUFile *f, const uint8_t *pv)
-> +{
-> +    qemu_put_byte(f, *pv);
-> +}
-> +
-> +static inline void qemu_get_be64s(QEMUFile *f, uint64_t *pv)
-> +{
-> +    *pv = qemu_get_be64(f);
-> +}
-> +
-> +static inline void qemu_get_be32s(QEMUFile *f, uint32_t *pv)
-> +{
-> +    *pv = qemu_get_be32(f);
-> +}
-> +
-> +static inline void qemu_get_be16s(QEMUFile *f, uint16_t *pv)
-> +{
-> +    *pv = qemu_get_be16(f);
-> +}
-> +
-> +static inline void qemu_get_8s(QEMUFile *f, uint8_t *pv)
-> +{
-> +    *pv = qemu_get_byte(f);
-> +}
-> +
-> +/* Signed versions for type safety */
-> +static inline void qemu_put_sbe16(QEMUFile *f, int v)
-> +{
-> +    qemu_put_be16(f, (unsigned int)v);
-> +}
-> +
-> +static inline void qemu_put_sbe32(QEMUFile *f, int v)
-> +{
-> +    qemu_put_be32(f, (unsigned int)v);
-> +}
-> +
-> +static inline void qemu_put_sbe64(QEMUFile *f, int64_t v)
-> +{
-> +    qemu_put_be64(f, (uint64_t)v);
-> +}
-> +
-> +static inline int qemu_get_sbe16(QEMUFile *f)
-> +{
-> +    return (int)qemu_get_be16(f);
-> +}
-> +
-> +static inline int qemu_get_sbe32(QEMUFile *f)
-> +{
-> +    return (int)qemu_get_be32(f);
-> +}
-> +
-> +static inline int64_t qemu_get_sbe64(QEMUFile *f)
-> +{
-> +    return (int64_t)qemu_get_be64(f);
-> +}
-> +
-> +static inline void qemu_put_s8s(QEMUFile *f, const int8_t *pv)
-> +{
-> +    qemu_put_8s(f, (const uint8_t *)pv);
-> +}
-> +
-> +static inline void qemu_put_sbe16s(QEMUFile *f, const int16_t *pv)
-> +{
-> +    qemu_put_be16s(f, (const uint16_t *)pv);
-> +}
-> +
-> +static inline void qemu_put_sbe32s(QEMUFile *f, const int32_t *pv)
-> +{
-> +    qemu_put_be32s(f, (const uint32_t *)pv);
-> +}
-> +
-> +static inline void qemu_put_sbe64s(QEMUFile *f, const int64_t *pv)
-> +{
-> +    qemu_put_be64s(f, (const uint64_t *)pv);
-> +}
-> +
-> +static inline void qemu_get_s8s(QEMUFile *f, int8_t *pv)
-> +{
-> +    qemu_get_8s(f, (uint8_t *)pv);
-> +}
-> +
-> +static inline void qemu_get_sbe16s(QEMUFile *f, int16_t *pv)
-> +{
-> +    qemu_get_be16s(f, (uint16_t *)pv);
-> +}
-> +
-> +static inline void qemu_get_sbe32s(QEMUFile *f, int32_t *pv)
-> +{
-> +    qemu_get_be32s(f, (uint32_t *)pv);
-> +}
-> +
-> +static inline void qemu_get_sbe64s(QEMUFile *f, int64_t *pv)
-> +{
-> +    qemu_get_be64s(f, (uint64_t *)pv);
-> +}
-> +
-> +int qemu_file_rate_limit(QEMUFile *f);
-> +
-> +#endif
-> diff --git a/migration/block.c b/migration/block.c
-> index 13f90d3..3e27499 100644
-> --- a/migration/block.c
-> +++ b/migration/block.c
-> @@ -26,7 +26,7 @@
->  #include "migration/block.h"
->  #include "migration/migration.h"
->  #include "sysemu/blockdev.h"
-> -#include "migration/qemu-file.h"
-> +#include "qemu-file.h"
->  #include "migration/vmstate.h"
->  #include "sysemu/block-backend.h"
->  
-> diff --git a/migration/colo.c b/migration/colo.c
-> index 3dd1390..4f1f3b8 100644
-> --- a/migration/colo.c
-> +++ b/migration/colo.c
-> @@ -15,7 +15,7 @@
->  #include "sysemu/sysemu.h"
->  #include "qemu-file-channel.h"
->  #include "migration/migration.h"
-> -#include "migration/qemu-file.h"
-> +#include "qemu-file.h"
->  #include "savevm.h"
->  #include "migration/colo.h"
->  #include "migration/block.h"
-> diff --git a/migration/migration.c b/migration/migration.c
-> index c3218cd..ea61650 100644
-> --- a/migration/migration.c
-> +++ b/migration/migration.c
-> @@ -21,7 +21,7 @@
->  #include "migration/migration.h"
->  #include "savevm.h"
->  #include "qemu-file-channel.h"
-> -#include "migration/qemu-file.h"
-> +#include "qemu-file.h"
->  #include "migration/vmstate.h"
->  #include "sysemu/sysemu.h"
->  #include "block/block.h"
-> diff --git a/migration/postcopy-ram.c b/migration/postcopy-ram.c
-> index 3f9ae1b..6f239f9 100644
-> --- a/migration/postcopy-ram.c
-> +++ b/migration/postcopy-ram.c
-> @@ -21,7 +21,7 @@
->  #include "qemu-common.h"
->  #include "exec/target_page.h"
->  #include "migration/migration.h"
-> -#include "migration/qemu-file.h"
-> +#include "qemu-file.h"
->  #include "savevm.h"
->  #include "postcopy-ram.h"
->  #include "sysemu/sysemu.h"
-> diff --git a/migration/qemu-file-channel.c b/migration/qemu-file-channel.c
-> index dc991c9..e202d73 100644
-> --- a/migration/qemu-file-channel.c
-> +++ b/migration/qemu-file-channel.c
-> @@ -24,7 +24,8 @@
->  
->  #include "qemu/osdep.h"
->  #include "qemu-file-channel.h"
-> -#include "migration/qemu-file.h"
-> +#include "exec/cpu-common.h"
-> +#include "qemu-file.h"
->  #include "io/channel-socket.h"
->  #include "qemu/iov.h"
->  
-> diff --git a/migration/qemu-file.c b/migration/qemu-file.c
-> index 195fa94..ab26f4e 100644
-> --- a/migration/qemu-file.c
-> +++ b/migration/qemu-file.c
-> @@ -29,7 +29,7 @@
->  #include "qemu/sockets.h"
->  #include "qemu/coroutine.h"
->  #include "migration/migration.h"
-> -#include "migration/qemu-file.h"
-> +#include "qemu-file.h"
->  #include "trace.h"
->  
->  #define IO_BUF_SIZE 32768
-> diff --git a/include/migration/qemu-file.h b/migration/qemu-file.h
-> similarity index 62%
-> rename from include/migration/qemu-file.h
-> rename to migration/qemu-file.h
-> index b5ac800..49fd697 100644
-> --- a/include/migration/qemu-file.h
-> +++ b/migration/qemu-file.h
-> @@ -22,11 +22,8 @@
->   * THE SOFTWARE.
->   */
->  
-> -#ifndef QEMU_FILE_H
-> -#define QEMU_FILE_H
-> -
-> -#include "qemu-common.h"
-> -#include "exec/cpu-common.h"
-> +#ifndef MIGRATION_QEMU_FILE_H
-> +#define MIGRATION_QEMU_FILE_H
->  
->  /* Read a chunk of data from a file at the given position.  The pos argument
->   * can be ignored if the file is only be used for streaming.  The number of
-> @@ -122,8 +119,6 @@ int qemu_get_fd(QEMUFile *f);
->  int qemu_fclose(QEMUFile *f);
->  int64_t qemu_ftell(QEMUFile *f);
->  int64_t qemu_ftell_fast(QEMUFile *f);
-> -void qemu_put_buffer(QEMUFile *f, const uint8_t *buf, size_t size);
-> -void qemu_put_byte(QEMUFile *f, int v);
->  /*
->   * put_buffer without copying the buffer.
->   * The buffer should be available till it is sent asynchronously.
-> @@ -133,19 +128,9 @@ void qemu_put_buffer_async(QEMUFile *f, const uint8_t *buf, size_t size,
->  bool qemu_file_mode_is_not_valid(const char *mode);
->  bool qemu_file_is_writable(QEMUFile *f);
->  
-> +#include "migration/qemu-file-types.h"
->  
-> -static inline void qemu_put_ubyte(QEMUFile *f, unsigned int v)
-> -{
-> -    qemu_put_byte(f, (int)v);
-> -}
-> -
-> -#define qemu_put_sbyte qemu_put_byte
-> -
-> -void qemu_put_be16(QEMUFile *f, unsigned int v);
-> -void qemu_put_be32(QEMUFile *f, unsigned int v);
-> -void qemu_put_be64(QEMUFile *f, uint64_t v);
->  size_t qemu_peek_buffer(QEMUFile *f, uint8_t **buf, size_t size, size_t offset);
-> -size_t qemu_get_buffer(QEMUFile *f, uint8_t *buf, size_t size);
->  size_t qemu_get_buffer_in_place(QEMUFile *f, uint8_t **buf, size_t size);
->  ssize_t qemu_put_compression_data(QEMUFile *f, const uint8_t *p, size_t size,
->                                    int level);
-> @@ -157,22 +142,8 @@ int qemu_put_qemu_file(QEMUFile *f_des, QEMUFile *f_src);
->   * previously peeked +n-1.
->   */
->  int qemu_peek_byte(QEMUFile *f, int offset);
-> -int qemu_get_byte(QEMUFile *f);
->  void qemu_file_skip(QEMUFile *f, int size);
->  void qemu_update_position(QEMUFile *f, size_t size);
-> -
-> -static inline unsigned int qemu_get_ubyte(QEMUFile *f)
-> -{
-> -    return (unsigned int)qemu_get_byte(f);
-> -}
-> -
-> -#define qemu_get_sbyte qemu_get_byte
-> -
-> -unsigned int qemu_get_be16(QEMUFile *f);
-> -unsigned int qemu_get_be32(QEMUFile *f);
-> -uint64_t qemu_get_be64(QEMUFile *f);
-> -
-> -int qemu_file_rate_limit(QEMUFile *f);
->  void qemu_file_reset_rate_limit(QEMUFile *f);
->  void qemu_file_set_rate_limit(QEMUFile *f, int64_t new_rate);
->  int64_t qemu_file_get_rate_limit(QEMUFile *f);
-> @@ -183,127 +154,7 @@ QEMUFile *qemu_file_get_return_path(QEMUFile *f);
->  void qemu_fflush(QEMUFile *f);
->  void qemu_file_set_blocking(QEMUFile *f, bool block);
->  
-> -static inline void qemu_put_be64s(QEMUFile *f, const uint64_t *pv)
-> -{
-> -    qemu_put_be64(f, *pv);
-> -}
-> -
-> -static inline void qemu_put_be32s(QEMUFile *f, const uint32_t *pv)
-> -{
-> -    qemu_put_be32(f, *pv);
-> -}
-> -
-> -static inline void qemu_put_be16s(QEMUFile *f, const uint16_t *pv)
-> -{
-> -    qemu_put_be16(f, *pv);
-> -}
-> -
-> -static inline void qemu_put_8s(QEMUFile *f, const uint8_t *pv)
-> -{
-> -    qemu_put_byte(f, *pv);
-> -}
-> -
-> -static inline void qemu_get_be64s(QEMUFile *f, uint64_t *pv)
-> -{
-> -    *pv = qemu_get_be64(f);
-> -}
-> -
-> -static inline void qemu_get_be32s(QEMUFile *f, uint32_t *pv)
-> -{
-> -    *pv = qemu_get_be32(f);
-> -}
-> -
-> -static inline void qemu_get_be16s(QEMUFile *f, uint16_t *pv)
-> -{
-> -    *pv = qemu_get_be16(f);
-> -}
-> -
-> -static inline void qemu_get_8s(QEMUFile *f, uint8_t *pv)
-> -{
-> -    *pv = qemu_get_byte(f);
-> -}
-> -
-> -// Signed versions for type safety
-> -static inline void qemu_put_sbuffer(QEMUFile *f, const int8_t *buf, size_t size)
-> -{
-> -    qemu_put_buffer(f, (const uint8_t *)buf, size);
-> -}
-> -
-> -static inline void qemu_put_sbe16(QEMUFile *f, int v)
-> -{
-> -    qemu_put_be16(f, (unsigned int)v);
-> -}
-> -
-> -static inline void qemu_put_sbe32(QEMUFile *f, int v)
-> -{
-> -    qemu_put_be32(f, (unsigned int)v);
-> -}
-> -
-> -static inline void qemu_put_sbe64(QEMUFile *f, int64_t v)
-> -{
-> -    qemu_put_be64(f, (uint64_t)v);
-> -}
-> -
-> -static inline size_t qemu_get_sbuffer(QEMUFile *f, int8_t *buf, int size)
-> -{
-> -    return qemu_get_buffer(f, (uint8_t *)buf, size);
-> -}
-> -
-> -static inline int qemu_get_sbe16(QEMUFile *f)
-> -{
-> -    return (int)qemu_get_be16(f);
-> -}
-> -
-> -static inline int qemu_get_sbe32(QEMUFile *f)
-> -{
-> -    return (int)qemu_get_be32(f);
-> -}
-> -
-> -static inline int64_t qemu_get_sbe64(QEMUFile *f)
-> -{
-> -    return (int64_t)qemu_get_be64(f);
-> -}
-> -
-> -static inline void qemu_put_s8s(QEMUFile *f, const int8_t *pv)
-> -{
-> -    qemu_put_8s(f, (const uint8_t *)pv);
-> -}
-> -
-> -static inline void qemu_put_sbe16s(QEMUFile *f, const int16_t *pv)
-> -{
-> -    qemu_put_be16s(f, (const uint16_t *)pv);
-> -}
-> -
-> -static inline void qemu_put_sbe32s(QEMUFile *f, const int32_t *pv)
-> -{
-> -    qemu_put_be32s(f, (const uint32_t *)pv);
-> -}
-> -
-> -static inline void qemu_put_sbe64s(QEMUFile *f, const int64_t *pv)
-> -{
-> -    qemu_put_be64s(f, (const uint64_t *)pv);
-> -}
-> -
-> -static inline void qemu_get_s8s(QEMUFile *f, int8_t *pv)
-> -{
-> -    qemu_get_8s(f, (uint8_t *)pv);
-> -}
-> -
-> -static inline void qemu_get_sbe16s(QEMUFile *f, int16_t *pv)
-> -{
-> -    qemu_get_be16s(f, (uint16_t *)pv);
-> -}
-> -
-> -static inline void qemu_get_sbe32s(QEMUFile *f, int32_t *pv)
-> -{
-> -    qemu_get_be32s(f, (uint32_t *)pv);
-> -}
-> -
-> -static inline void qemu_get_sbe64s(QEMUFile *f, int64_t *pv)
-> -{
-> -    qemu_get_be64s(f, (uint64_t *)pv);
-> -}
-> -
->  size_t qemu_get_counted_string(QEMUFile *f, char buf[256]);
->  
-> +
->  #endif
-> diff --git a/migration/ram.c b/migration/ram.c
-> index 26e03a5..390f714 100644
-> --- a/migration/ram.c
-> +++ b/migration/ram.c
-> @@ -37,7 +37,7 @@
->  #include "qemu/main-loop.h"
->  #include "xbzrle.h"
->  #include "migration/migration.h"
-> -#include "migration/qemu-file.h"
-> +#include "qemu-file.h"
->  #include "migration/vmstate.h"
->  #include "postcopy-ram.h"
->  #include "exec/address-spaces.h"
-> diff --git a/migration/rdma.c b/migration/rdma.c
-> index 166cd60..4cb5bf8 100644
-> --- a/migration/rdma.c
-> +++ b/migration/rdma.c
-> @@ -18,7 +18,7 @@
->  #include "qemu-common.h"
->  #include "qemu/cutils.h"
->  #include "migration/migration.h"
-> -#include "migration/qemu-file.h"
-> +#include "qemu-file.h"
->  #include "exec/cpu-common.h"
->  #include "qemu-file-channel.h"
->  #include "qemu/error-report.h"
-> diff --git a/migration/savevm.c b/migration/savevm.c
-> index 2d1d4bc..bb3f9ec 100644
-> --- a/migration/savevm.c
-> +++ b/migration/savevm.c
-> @@ -36,6 +36,7 @@
->  #include "qemu/timer.h"
->  #include "migration/migration.h"
->  #include "qemu-file-channel.h"
-> +#include "qemu-file.h"
->  #include "savevm.h"
->  #include "postcopy-ram.h"
->  #include "qapi/qmp/qerror.h"
-> diff --git a/migration/socket.c b/migration/socket.c
-> index 53f9d61..3f8ffc9 100644
-> --- a/migration/socket.c
-> +++ b/migration/socket.c
-> @@ -21,7 +21,7 @@
->  #include "qapi/error.h"
->  #include "channel.h"
->  #include "migration/migration.h"
-> -#include "migration/qemu-file.h"
-> +#include "qemu-file.h"
->  #include "io/channel-socket.h"
->  #include "trace.h"
->  
-> diff --git a/migration/vmstate-types.c b/migration/vmstate-types.c
-> index cc95e47..7287c6b 100644
-> --- a/migration/vmstate-types.c
-> +++ b/migration/vmstate-types.c
-> @@ -12,8 +12,9 @@
->  
->  #include "qemu/osdep.h"
->  #include "qemu-common.h"
-> +#include "exec/cpu-common.h"
-> +#include "qemu-file.h"
->  #include "migration/migration.h"
-> -#include "migration/qemu-file.h"
->  #include "migration/vmstate.h"
->  #include "qemu/error-report.h"
->  #include "qemu/queue.h"
-> diff --git a/migration/vmstate.c b/migration/vmstate.c
-> index ff54531..51a19b6 100644
-> --- a/migration/vmstate.c
-> +++ b/migration/vmstate.c
-> @@ -13,8 +13,8 @@
->  #include "qemu/osdep.h"
->  #include "qemu-common.h"
->  #include "migration/migration.h"
-> -#include "migration/qemu-file.h"
->  #include "migration/vmstate.h"
-> +#include "qemu-file.h"
->  #include "qemu/bitops.h"
->  #include "qemu/error-report.h"
->  #include "trace.h"
-> diff --git a/tests/test-vmstate.c b/tests/test-vmstate.c
-> index 25389bc..c52aff9 100644
-> --- a/tests/test-vmstate.c
-> +++ b/tests/test-vmstate.c
-> @@ -27,7 +27,8 @@
->  #include "qemu-common.h"
->  #include "migration/migration.h"
->  #include "migration/vmstate.h"
-> -#include "migration/qemu-file.h"
-> +#include "migration/qemu-file-types.h"
-> +#include "../migration/qemu-file.h"
->  #include "../migration/qemu-file-channel.h"
->  #include "qemu/coroutine.h"
->  #include "io/channel-file.h"
-> -- 
-> 2.9.4
+> This is an RFC because this change breaks compatibility with older versions
+> of QEMU. At the least, this means I should sit on this patch for another
+> while, but perhaps it also means we need some runtime logic to detect which
+> QEMU we are dealing with? Comments welcome.
 > 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+>  OvmfPkg/AcpiPlatformDxe/AcpiPlatformDxe.inf          |  3 +++
+>  OvmfPkg/AcpiPlatformDxe/QemuFwCfgAcpi.c              | 13 +++++++++++--
+>  OvmfPkg/AcpiPlatformDxe/QemuFwCfgAcpiPlatformDxe.inf |  3 +++
+>  3 files changed, 17 insertions(+), 2 deletions(-)
+
+I guess by compat breakage, you mean the case when new ArmVirtQemu (with
+this patch) is booted on old QEMU (which lacks commit cb51ac2ffe36) --
+the 64-bit allocation addresses might not fit into the 4-byte fields
+generated by QEMU.
+
+Since your QEMU patch (which I did ACK), I've given more thought to the
+QEMU_LOADER_ALLOCATE linker/loader command. See bullet (68) in:
+
+
+http://mid.mail-archive.com/accf8880-f4b0-85f1-9f33-4103c8c26d7a@redhat.com
+
+There are now two reasons to extend the Zone field's meaning:
+
+- The first reason is that the most significant bit in Zone could be
+repurposed to suppress the SDT header probing implemented in
+OvmfPkg/AcpiPlatformDxe, in the Process2ndPassCmdAddPointer() function.
+
+- The second reason is that a new value in Zone (with the msb masked
+off), say QemuLoaderAlloc64Bit=3, could be used to lift the 32-bit
+allocation limit explicitly.
+
+In QEMU, we could tie both of these extensions to new machine types.
+
+The result would be:
+
+  firmware  QEMU  QEMU machine type  result
+  --------  ----  -----------------  -----------------------------------
+  old       new   old                allocate blobs under 4GB
+  old       new   new                breakage, but that's OK, we can
+                                       require refreshed firmware for
+                                       new machine types
+  new       old   old                allocate blobs under 4GB
+  new       new   old                allocate blobs under 4GB
+  new       new   new                allocate blobs from 64-bit space
+
+... I guess my proposal might be a bit unpolished (and certainly
+diverges from your original QEMU commit cb51ac2ffe36), but at this
+point, the need for further *explicit* hints in the ALLOC command is
+just too obvious to pass them up.
+
+Again, the first extension would be setting aside bit 7, to signify
+"this blob contains no ACPI tables", and the second extension would be a
+new zone value (3) to mean "allocate from 64-bit address space".
+
+The first extension would be used by both x86 and arm machine types
+(2.10+ only), and the second extension would only be used by 2.10+ arm
+machine types.
+
+What do you think? Can we discuss both of these Zone extensions on
+qemu-devel as well? Adding qemu-devel, Shannon, Michael, Igor, Drew, and
+Dongjiu Geng.
+
+Thanks
+Laszlo
+
+> diff --git a/OvmfPkg/AcpiPlatformDxe/AcpiPlatformDxe.inf b/OvmfPkg/AcpiPlatformDxe/AcpiPlatformDxe.inf
+> index 9a9b2e6bb2e5..9b883871bc23 100644
+> --- a/OvmfPkg/AcpiPlatformDxe/AcpiPlatformDxe.inf
+> +++ b/OvmfPkg/AcpiPlatformDxe/AcpiPlatformDxe.inf
+> @@ -73,5 +73,8 @@ [Pcd]
+>    gPcAtChipsetPkgTokenSpaceGuid.Pcd8259LegacyModeEdgeLevel
+>    gUefiOvmfPkgTokenSpaceGuid.PcdOvmfFdBaseAddress
+>  
+> +[FixedPcd]
+> +  gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiExposedTableVersions
+> +
+>  [Depex]
+>    gEfiAcpiTableProtocolGuid
+> diff --git a/OvmfPkg/AcpiPlatformDxe/QemuFwCfgAcpi.c b/OvmfPkg/AcpiPlatformDxe/QemuFwCfgAcpi.c
+> index 1bc5fe297a96..97632bc636c0 100644
+> --- a/OvmfPkg/AcpiPlatformDxe/QemuFwCfgAcpi.c
+> +++ b/OvmfPkg/AcpiPlatformDxe/QemuFwCfgAcpi.c
+> @@ -24,6 +24,7 @@
+>  #include <Library/PcdLib.h>
+>  #include <Library/OrderedCollectionLib.h>
+>  #include <IndustryStandard/Acpi.h>
+> +#include <Protocol/AcpiSystemDescriptionTable.h>
+>  
+>  
+>  //
+> @@ -173,6 +174,7 @@ ProcessCmdAllocate (
+>    UINTN                NumPages;
+>    EFI_PHYSICAL_ADDRESS Address;
+>    BLOB                 *Blob;
+> +  EFI_ALLOCATE_TYPE    AllocType;
+>  
+>    if (Allocate->File[QEMU_LOADER_FNAME_SIZE - 1] != '\0') {
+>      DEBUG ((EFI_D_ERROR, "%a: malformed file name\n", __FUNCTION__));
+> @@ -192,9 +194,16 @@ ProcessCmdAllocate (
+>      return Status;
+>    }
+>  
+> +  if ((FixedPcdGet32 (PcdAcpiExposedTableVersions) &
+> +       EFI_ACPI_TABLE_VERSION_1_0B) != 0) {
+> +    Address = 0xFFFFFFFF;
+> +    AllocType = AllocateMaxAddress;
+> +  } else {
+> +    AllocType = AllocateAnyPages;
+> +  }
+> +
+>    NumPages = EFI_SIZE_TO_PAGES (FwCfgSize);
+> -  Address = 0xFFFFFFFF;
+> -  Status = gBS->AllocatePages (AllocateMaxAddress, EfiACPIMemoryNVS, NumPages,
+> +  Status = gBS->AllocatePages (AllocType, EfiACPIMemoryNVS, NumPages,
+>                    &Address);
+>    if (EFI_ERROR (Status)) {
+>      return Status;
+> diff --git a/OvmfPkg/AcpiPlatformDxe/QemuFwCfgAcpiPlatformDxe.inf b/OvmfPkg/AcpiPlatformDxe/QemuFwCfgAcpiPlatformDxe.inf
+> index adc50cfd9f76..64db80dd9cbc 100644
+> --- a/OvmfPkg/AcpiPlatformDxe/QemuFwCfgAcpiPlatformDxe.inf
+> +++ b/OvmfPkg/AcpiPlatformDxe/QemuFwCfgAcpiPlatformDxe.inf
+> @@ -58,5 +58,8 @@ [Guids]
+>  [Pcd]
+>    gEfiMdeModulePkgTokenSpaceGuid.PcdPciDisableBusEnumeration
+>  
+> +[FixedPcd]
+> +  gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiExposedTableVersions
+> +
+>  [Depex]
+>    gEfiAcpiTableProtocolGuid
+> 
