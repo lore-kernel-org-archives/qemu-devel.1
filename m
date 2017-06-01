@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60627)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37302)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1dGXfa-0000GO-MY
-	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 17:30:16 -0400
+	(envelope-from <quintela@redhat.com>) id 1dGXq7-0007oL-9c
+	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 17:41:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1dGXfZ-0008L9-9G
-	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 17:30:14 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:59908)
+	(envelope-from <quintela@redhat.com>) id 1dGXq3-0006Zn-S0
+	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 17:41:07 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:51568)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1dGXfY-0008KY-W9
-	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 17:30:13 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1dGXq3-0006Z6-J9
+	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 17:41:03 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id ECCAEC0587C3
-	for <qemu-devel@nongnu.org>; Thu,  1 Jun 2017 21:30:11 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 554F47E9C0
+	for <qemu-devel@nongnu.org>; Thu,  1 Jun 2017 21:41:02 +0000 (UTC)
 From: Juan Quintela <quintela@redhat.com>
-Date: Thu,  1 Jun 2017 23:29:21 +0200
-Message-Id: <20170601212921.30241-12-quintela@redhat.com>
-In-Reply-To: <20170601212921.30241-1-quintela@redhat.com>
-References: <20170601212921.30241-1-quintela@redhat.com>
-Subject: [Qemu-devel] [PATCH 11/11] migration: Remove unneeded includes
+Date: Thu,  1 Jun 2017 23:40:53 +0200
+Message-Id: <20170601214056.30387-2-quintela@redhat.com>
+In-Reply-To: <20170601214056.30387-1-quintela@redhat.com>
+References: <20170601214056.30387-1-quintela@redhat.com>
+Subject: [Qemu-devel] [PATCH 1/4] ram: Unfold get_xbzrle_cache_stats() into
+ populate_ram_info()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,291 +33,79 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: dgilbert@redhat.com, lvivier@redhat.com, peterx@redhat.com
 
+They were called consequtiveley always.
+
 Signed-off-by: Juan Quintela <quintela@redhat.com>
 ---
- include/migration/colo.h  | 3 ---
- include/migration/misc.h  | 2 ++
- migration/block.c         | 6 ------
- migration/colo-failover.c | 2 ++
- migration/colo.c          | 2 --
- migration/exec.c          | 2 --
- migration/fd.c            | 2 --
- migration/global_state.c  | 1 -
- migration/migration.c     | 6 ------
- migration/migration.h     | 2 --
- migration/postcopy-ram.c  | 4 +---
- migration/qemu-file.c     | 2 --
- migration/ram.c           | 4 ----
- migration/savevm.c        | 6 ------
- 14 files changed, 5 insertions(+), 39 deletions(-)
+ migration/migration.c | 29 +++++++++++------------------
+ 1 file changed, 11 insertions(+), 18 deletions(-)
 
-diff --git a/include/migration/colo.h b/include/migration/colo.h
-index ba0bb6e..be6beba 100644
---- a/include/migration/colo.h
-+++ b/include/migration/colo.h
-@@ -14,9 +14,6 @@
- #define QEMU_COLO_H
- 
- #include "qemu-common.h"
--#include "qemu/coroutine_int.h"
--#include "qemu/thread.h"
--#include "qemu/main-loop.h"
- 
- bool colo_supported(void);
- void colo_info_init(void);
-diff --git a/include/migration/misc.h b/include/migration/misc.h
-index d5a433a..65c7070 100644
---- a/include/migration/misc.h
-+++ b/include/migration/misc.h
-@@ -14,6 +14,8 @@
- #ifndef MIGRATION_MISC_H
- #define MIGRATION_MISC_H
- 
-+#include "qemu/notify.h"
-+
- /* migration/ram.c */
- 
- void ram_mig_init(void);
-diff --git a/migration/block.c b/migration/block.c
-index 21c7fac..14a8a84 100644
---- a/migration/block.c
-+++ b/migration/block.c
-@@ -15,19 +15,13 @@
- 
- #include "qemu/osdep.h"
- #include "qapi/error.h"
--#include "qemu-common.h"
--#include "block/block.h"
- #include "qemu/error-report.h"
--#include "qemu/main-loop.h"
--#include "hw/hw.h"
- #include "qemu/cutils.h"
- #include "qemu/queue.h"
--#include "qemu/timer.h"
- #include "block.h"
- #include "migration/misc.h"
- #include "migration.h"
- #include "migration/register.h"
--#include "sysemu/blockdev.h"
- #include "qemu-file.h"
- #include "migration/vmstate.h"
- #include "sysemu/block-backend.h"
-diff --git a/migration/colo-failover.c b/migration/colo-failover.c
-index cc229f5..f991486 100644
---- a/migration/colo-failover.c
-+++ b/migration/colo-failover.c
-@@ -13,6 +13,8 @@
- #include "qemu/osdep.h"
- #include "migration/colo.h"
- #include "migration/failover.h"
-+#include "qemu/main-loop.h"
-+#include "migration.h"
- #include "qmp-commands.h"
- #include "qapi/qmp/qerror.h"
- #include "qemu/error-report.h"
-diff --git a/migration/colo.c b/migration/colo.c
-index 45e9b46..c436d63 100644
---- a/migration/colo.c
-+++ b/migration/colo.c
-@@ -11,7 +11,6 @@
-  */
- 
- #include "qemu/osdep.h"
--#include "qemu/timer.h"
- #include "sysemu/sysemu.h"
- #include "qemu-file-channel.h"
- #include "migration.h"
-@@ -22,7 +21,6 @@
- #include "io/channel-buffer.h"
- #include "trace.h"
- #include "qemu/error-report.h"
--#include "qapi/error.h"
- #include "migration/failover.h"
- #include "replication.h"
- #include "qmp-commands.h"
-diff --git a/migration/exec.c b/migration/exec.c
-index b1de445..08b599e 100644
---- a/migration/exec.c
-+++ b/migration/exec.c
-@@ -19,10 +19,8 @@
- 
- #include "qemu/osdep.h"
- #include "qapi/error.h"
--#include "qemu-common.h"
- #include "channel.h"
- #include "exec.h"
--#include "migration.h"
- #include "io/channel-command.h"
- #include "trace.h"
- 
-diff --git a/migration/fd.c b/migration/fd.c
-index b2384bf..30f5258 100644
---- a/migration/fd.c
-+++ b/migration/fd.c
-@@ -16,10 +16,8 @@
- 
- #include "qemu/osdep.h"
- #include "qapi/error.h"
--#include "qemu-common.h"
- #include "channel.h"
- #include "fd.h"
--#include "migration.h"
- #include "monitor/monitor.h"
- #include "io/channel-util.h"
- #include "trace.h"
-diff --git a/migration/global_state.c b/migration/global_state.c
-index 16ac63f..f792cf5 100644
---- a/migration/global_state.c
-+++ b/migration/global_state.c
-@@ -17,7 +17,6 @@
- #include "qapi/util.h"
- #include "migration/global_state.h"
- #include "migration/vmstate.h"
--#include "sysemu/sysemu.h"
- #include "trace.h"
- 
- typedef struct {
 diff --git a/migration/migration.c b/migration/migration.c
-index 956e36c..60da9d6 100644
+index 60da9d6..fd8b406 100644
 --- a/migration/migration.c
 +++ b/migration/migration.c
-@@ -16,7 +16,6 @@
- #include "qemu/osdep.h"
- #include "qemu/cutils.h"
- #include "qemu/error-report.h"
--#include "qemu/main-loop.h"
- #include "migration/blocker.h"
- #include "exec.h"
- #include "fd.h"
-@@ -30,11 +29,9 @@
- #include "qemu-file-channel.h"
- #include "qemu-file.h"
- #include "migration/vmstate.h"
--#include "sysemu/sysemu.h"
- #include "block/block.h"
- #include "qapi/qmp/qerror.h"
- #include "qapi/util.h"
--#include "qemu/sockets.h"
- #include "qemu/rcu.h"
- #include "block.h"
- #include "postcopy-ram.h"
-@@ -42,9 +39,6 @@
- #include "qmp-commands.h"
- #include "trace.h"
- #include "qapi-event.h"
--#include "qom/cpu.h"
--#include "exec/memory.h"
--#include "exec/address-spaces.h"
- #include "exec/target_page.h"
- #include "io/channel-buffer.h"
- #include "migration/colo.h"
-diff --git a/migration/migration.h b/migration/migration.h
-index 601e4ab..d9a268a 100644
---- a/migration/migration.h
-+++ b/migration/migration.h
-@@ -14,10 +14,8 @@
- #ifndef QEMU_MIGRATION_H
- #define QEMU_MIGRATION_H
+@@ -476,20 +476,6 @@ static bool migration_is_setup_or_active(int state)
+     }
+ }
  
--#include "qapi/qmp/qdict.h"
- #include "qemu-common.h"
- #include "qemu/thread.h"
--#include "qemu/notify.h"
- #include "qapi-types.h"
- #include "exec/cpu-common.h"
- #include "qemu/coroutine_int.h"
-diff --git a/migration/postcopy-ram.c b/migration/postcopy-ram.c
-index c8c4500..922702b 100644
---- a/migration/postcopy-ram.c
-+++ b/migration/postcopy-ram.c
-@@ -17,14 +17,12 @@
-  */
- 
- #include "qemu/osdep.h"
+-static void get_xbzrle_cache_stats(MigrationInfo *info)
+-{
+-    if (migrate_use_xbzrle()) {
+-        info->has_xbzrle_cache = true;
+-        info->xbzrle_cache = g_malloc0(sizeof(*info->xbzrle_cache));
+-        info->xbzrle_cache->cache_size = migrate_xbzrle_cache_size();
+-        info->xbzrle_cache->bytes = xbzrle_mig_bytes_transferred();
+-        info->xbzrle_cache->pages = xbzrle_mig_pages_transferred();
+-        info->xbzrle_cache->cache_miss = xbzrle_mig_pages_cache_miss();
+-        info->xbzrle_cache->cache_miss_rate = xbzrle_mig_cache_miss_rate();
+-        info->xbzrle_cache->overflow = xbzrle_mig_pages_overflow();
+-    }
+-}
 -
--#include "qemu-common.h"
- #include "exec/target_page.h"
- #include "migration.h"
- #include "qemu-file.h"
--#include "savevm.h"
- #include "postcopy-ram.h"
- #include "ram.h"
-+#include "savevm.h"
- #include "sysemu/sysemu.h"
- #include "sysemu/balloon.h"
- #include "qemu/error-report.h"
-diff --git a/migration/qemu-file.c b/migration/qemu-file.c
-index e65c373..2ab2bf3 100644
---- a/migration/qemu-file.c
-+++ b/migration/qemu-file.c
-@@ -26,8 +26,6 @@
- #include "qemu-common.h"
- #include "qemu/error-report.h"
- #include "qemu/iov.h"
--#include "qemu/sockets.h"
--#include "qemu/coroutine.h"
- #include "migration.h"
- #include "qemu-file.h"
- #include "trace.h"
-diff --git a/migration/ram.c b/migration/ram.c
-index fe307ce..db7f4b0 100644
---- a/migration/ram.c
-+++ b/migration/ram.c
-@@ -26,14 +26,12 @@
-  * THE SOFTWARE.
-  */
- #include "qemu/osdep.h"
--#include "qemu-common.h"
- #include "cpu.h"
- #include <zlib.h>
- #include "qapi-event.h"
- #include "qemu/cutils.h"
- #include "qemu/bitops.h"
- #include "qemu/bitmap.h"
--#include "qemu/timer.h"
- #include "qemu/main-loop.h"
- #include "xbzrle.h"
- #include "ram.h"
-@@ -41,9 +39,7 @@
- #include "migration/register.h"
- #include "migration/misc.h"
- #include "qemu-file.h"
--#include "migration/vmstate.h"
- #include "postcopy-ram.h"
--#include "exec/address-spaces.h"
- #include "migration/page_cache.h"
- #include "qemu/error-report.h"
- #include "trace.h"
-diff --git a/migration/savevm.c b/migration/savevm.c
-index ba709bb..8489abf 100644
---- a/migration/savevm.c
-+++ b/migration/savevm.c
-@@ -28,12 +28,8 @@
+ static void populate_ram_info(MigrationInfo *info, MigrationState *s)
+ {
+     info->has_ram = true;
+@@ -507,6 +493,17 @@ static void populate_ram_info(MigrationInfo *info, MigrationState *s)
+     info->ram->postcopy_requests = ram_postcopy_requests();
+     info->ram->page_size = qemu_target_page_size();
  
- #include "qemu/osdep.h"
- #include "hw/boards.h"
--#include "hw/hw.h"
--#include "hw/qdev.h"
- #include "hw/xen/xen.h"
- #include "net/net.h"
--#include "sysemu/sysemu.h"
--#include "qemu/timer.h"
- #include "migration.h"
- #include "migration/snapshot.h"
- #include "migration/misc.h"
-@@ -46,13 +42,11 @@
- #include "postcopy-ram.h"
- #include "qapi/qmp/qerror.h"
- #include "qemu/error-report.h"
--#include "qemu/queue.h"
- #include "sysemu/cpus.h"
- #include "exec/memory.h"
- #include "exec/target_page.h"
- #include "qmp-commands.h"
- #include "trace.h"
--#include "qemu/bitops.h"
- #include "qemu/iov.h"
- #include "block/snapshot.h"
- #include "qemu/cutils.h"
++    if (migrate_use_xbzrle()) {
++        info->has_xbzrle_cache = true;
++        info->xbzrle_cache = g_malloc0(sizeof(*info->xbzrle_cache));
++        info->xbzrle_cache->cache_size = migrate_xbzrle_cache_size();
++        info->xbzrle_cache->bytes = xbzrle_mig_bytes_transferred();
++        info->xbzrle_cache->pages = xbzrle_mig_pages_transferred();
++        info->xbzrle_cache->cache_miss = xbzrle_mig_pages_cache_miss();
++        info->xbzrle_cache->cache_miss_rate = xbzrle_mig_cache_miss_rate();
++        info->xbzrle_cache->overflow = xbzrle_mig_pages_overflow();
++    }
++
+     if (s->state != MIGRATION_STATUS_COMPLETED) {
+         info->ram->remaining = ram_bytes_remaining();
+         info->ram->dirty_pages_rate = ram_dirty_pages_rate();
+@@ -552,7 +549,6 @@ MigrationInfo *qmp_query_migrate(Error **errp)
+             info->cpu_throttle_percentage = cpu_throttle_get_percentage();
+         }
+ 
+-        get_xbzrle_cache_stats(info);
+         break;
+     case MIGRATION_STATUS_POSTCOPY_ACTIVE:
+         /* Mostly the same as active; TODO add some postcopy stats */
+@@ -575,15 +571,12 @@ MigrationInfo *qmp_query_migrate(Error **errp)
+             info->disk->total = blk_mig_bytes_total();
+         }
+ 
+-        get_xbzrle_cache_stats(info);
+         break;
+     case MIGRATION_STATUS_COLO:
+         info->has_status = true;
+         /* TODO: display COLO specific information (checkpoint info etc.) */
+         break;
+     case MIGRATION_STATUS_COMPLETED:
+-        get_xbzrle_cache_stats(info);
+-
+         info->has_status = true;
+         info->has_total_time = true;
+         info->total_time = s->total_time;
 -- 
 2.9.4
