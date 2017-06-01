@@ -1,24 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51328)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51491)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <andrey@xdel.ru>) id 1dGNmy-0004qU-WE
-	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 06:57:13 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1dGNnn-0005IT-IO
+	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 06:58:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <andrey@xdel.ru>) id 1dGNmy-0007AN-0o
-	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 06:57:13 -0400
-Received: from mail-yw0-x232.google.com ([2607:f8b0:4002:c05::232]:33186)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <andrey@xdel.ru>) id 1dGNmx-0007A2-Ju
-	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 06:57:11 -0400
-Received: by mail-yw0-x232.google.com with SMTP id 63so5831556ywr.0
-	for <qemu-devel@nongnu.org>; Thu, 01 Jun 2017 03:57:09 -0700 (PDT)
+	(envelope-from <dgilbert@redhat.com>) id 1dGNnk-0007b3-A2
+	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 06:58:03 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:38222)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dGNnk-0007az-1T
+	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 06:58:00 -0400
+Date: Thu, 1 Jun 2017 11:57:53 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170601105752.GF2083@work-vm>
+References: <1495539071-12995-1-git-send-email-a.perevalov@samsung.com>
+	<CGME20170523113131eucas1p24a041de6004237e437f97a24340507e2@eucas1p2.samsung.com>
+	<1495539071-12995-9-git-send-email-a.perevalov@samsung.com>
 MIME-Version: 1.0
-In-Reply-To: <CAEcfeEx1nB-jZwLO1kmt1Mv+3JoBtrWPVpCaAkSEpLXne6oL1Q@mail.gmail.com>
-References: <CAEcfeEx1nB-jZwLO1kmt1Mv+3JoBtrWPVpCaAkSEpLXne6oL1Q@mail.gmail.com>
-From: Andrey Korolyov <andrey@xdel.ru>
-Date: Thu, 1 Jun 2017 13:56:48 +0300
-Message-ID: <CABYiri8vcRmOiH6ogGjXULuZXMo1Dh2a2nagLhSfUnS_B9+1Vg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] Tracking hugepages usage
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1495539071-12995-9-git-send-email-a.perevalov@samsung.com>
+Subject: Re: [Qemu-devel] [PATCH V6 08/10] migration: calculate vCPU
+ blocktime on dst side
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,34 +29,151 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladyslav Drok <vdrok@mirantis.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+To: Alexey Perevalov <a.perevalov@samsung.com>
+Cc: qemu-devel@nongnu.org, i.maximets@samsung.com, peterx@redhat.com, eblake@redhat.com
 
-On Thu, Jun 1, 2017 at 1:38 PM, Vladyslav Drok <vdrok@mirantis.com> wrote:
-> Hello qemu community!
->
-> I come from openstack world, and one of our customers complains about an
-> issue with huge pages on compute nodes. From the "virsh frepages --all" and
-> "cat /proc/meminfo", they see that 4 huge pages are consumed:
->
-> http://paste.openstack.org/show/611186/
->
-> In total there are 239 1G pages, 120 in numa node 0, and 119 in numa node
-> 1. There are no VMs running at this point.
->
-> When trying to find out what consumes the 4 1G huge pages from node 0, I
-> was suggesting "grep 1048576 /proc/*/numa_maps" to find out which processes
-> are using 1G pages, but in this particular case it shows no processes.
-> While when some VM is running, I can see the qemu process that's consuming
-> huge pages, numa_maps reports the correct amount of pages, corresponding to
-> what has been requested for the VM's RAM.
->
-> Are there any recommended ways for trying to track what consumes these 4
-> "lost" pages? (I might be a bit slow providing more info, as I don't have
-> access to this environment :( )
->
-> Thanks,
-> Vlad
+* Alexey Perevalov (a.perevalov@samsung.com) wrote:
+> This patch provides blocktime calculation per vCPU,
+> as a summary and as a overlapped value for all vCPUs.
+> 
+> This approach was suggested by Peter Xu, as an improvements of
+> previous approch where QEMU kept tree with faulted page address and cpus bitmask
+> in it. Now QEMU is keeping array with faulted page address as value and vCPU
+> as index. It helps to find proper vCPU at UFFD_COPY time. Also it keeps
+> list for blocktime per vCPU (could be traced with page_fault_addr)
+> 
+> Blocktime will not calculated if postcopy_blocktime field of
+> MigrationIncomingState wasn't initialized.
+> 
+> Signed-off-by: Alexey Perevalov <a.perevalov@samsung.com>
 
-Could you please try to walk against /proc/[0-9]/smaps to check that
-these pages are not claimed by any process?
+<snip>
+
+> +    if (dc->vcpu_addr[cpu] == 0) {
+> +        atomic_inc(&dc->smp_cpus_down);
+> +    }
+> +
+> +    atomic_xchg__nocheck(&dc->vcpu_addr[cpu], addr);
+
+I was wondering if this could be done with atomic_cmpxchg with old=0,
+but the behaviour would be different in the case where vcpu_addr[cpu]
+wasn't zero  or the 'addr'; so I think allowing it to cope with that
+case seems better.
+
+Dave
+
+> +    atomic_xchg__nocheck(&dc->last_begin, now_ms);
+> +    atomic_xchg__nocheck(&dc->page_fault_vcpu_time[cpu], now_ms);
+> +
+> +    trace_mark_postcopy_blocktime_begin(addr, dc, dc->page_fault_vcpu_time[cpu],
+> +            cpu);
+> +}
+> +
+> +static void mark_postcopy_blocktime_end(uint64_t addr)
+> +{
+> +    MigrationIncomingState *mis = migration_incoming_get_current();
+> +    PostcopyBlocktimeContext *dc = mis->blocktime_ctx;
+> +    int i, affected_cpu = 0;
+> +    int64_t now_ms;
+> +    bool vcpu_total_blocktime = false;
+> +    unsigned long int nr_bit;
+> +
+> +    if (!dc) {
+> +        return;
+> +    }
+> +    /* mark that page as copied */
+> +    nr_bit = get_copied_bit_offset(addr);
+> +    set_bit_atomic(nr_bit, mis->copied_pages);
+> +
+> +    now_ms = qemu_clock_get_ms(QEMU_CLOCK_REALTIME);
+> +
+> +    /* lookup cpu, to clear it,
+> +     * that algorithm looks straighforward, but it's not
+> +     * optimal, more optimal algorithm is keeping tree or hash
+> +     * where key is address value is a list of  */
+> +    for (i = 0; i < smp_cpus; i++) {
+> +        uint64_t vcpu_blocktime = 0;
+> +        if (atomic_fetch_add(&dc->vcpu_addr[i], 0) != addr) {
+> +            continue;
+> +        }
+> +        atomic_xchg__nocheck(&dc->vcpu_addr[i], 0);
+> +        vcpu_blocktime = now_ms -
+> +            atomic_fetch_add(&dc->page_fault_vcpu_time[i], 0);
+> +        affected_cpu += 1;
+> +        /* we need to know is that mark_postcopy_end was due to
+> +         * faulted page, another possible case it's prefetched
+> +         * page and in that case we shouldn't be here */
+> +        if (!vcpu_total_blocktime &&
+> +            atomic_fetch_add(&dc->smp_cpus_down, 0) == smp_cpus) {
+> +            vcpu_total_blocktime = true;
+> +        }
+> +        /* continue cycle, due to one page could affect several vCPUs */
+> +        dc->vcpu_blocktime[i] += vcpu_blocktime;
+> +    }
+> +
+> +    atomic_sub(&dc->smp_cpus_down, affected_cpu);
+> +    if (vcpu_total_blocktime) {
+> +        dc->total_blocktime += now_ms - atomic_fetch_add(&dc->last_begin, 0);
+> +    }
+> +    trace_mark_postcopy_blocktime_end(addr, dc, dc->total_blocktime);
+> +}
+> +
+>  /*
+>   * Handle faults detected by the USERFAULT markings
+>   */
+> @@ -654,8 +750,11 @@ static void *postcopy_ram_fault_thread(void *opaque)
+>          rb_offset &= ~(qemu_ram_pagesize(rb) - 1);
+>          trace_postcopy_ram_fault_thread_request(msg.arg.pagefault.address,
+>                                                  qemu_ram_get_idstr(rb),
+> -                                                rb_offset);
+> +                                                rb_offset,
+> +                                                msg.arg.pagefault.feat.ptid);
+>  
+> +        mark_postcopy_blocktime_begin((uintptr_t)(msg.arg.pagefault.address),
+> +                msg.arg.pagefault.feat.ptid, rb);
+>          /*
+>           * Send the request to the source - we want to request one
+>           * of our host page sizes (which is >= TPS)
+> @@ -750,6 +849,7 @@ int postcopy_place_page(MigrationIncomingState *mis, void *host, void *from,
+>  
+>          return -e;
+>      }
+> +    mark_postcopy_blocktime_end((uint64_t)(uintptr_t)host);
+>  
+>      trace_postcopy_place_page(host);
+>      return 0;
+> diff --git a/migration/trace-events b/migration/trace-events
+> index 5b8ccf3..7bdadbb 100644
+> --- a/migration/trace-events
+> +++ b/migration/trace-events
+> @@ -112,6 +112,8 @@ process_incoming_migration_co_end(int ret, int ps) "ret=%d postcopy-state=%d"
+>  process_incoming_migration_co_postcopy_end_main(void) ""
+>  migration_set_incoming_channel(void *ioc, const char *ioctype) "ioc=%p ioctype=%s"
+>  migration_set_outgoing_channel(void *ioc, const char *ioctype, const char *hostname)  "ioc=%p ioctype=%s hostname=%s"
+> +mark_postcopy_blocktime_begin(uint64_t addr, void *dd, int64_t time, int cpu) "addr 0x%" PRIx64 " dd %p time %" PRId64 " cpu %d"
+> +mark_postcopy_blocktime_end(uint64_t addr, void *dd, int64_t time) "addr 0x%" PRIx64 " dd %p time %" PRId64
+>  
+>  # migration/rdma.c
+>  qemu_rdma_accept_incoming_migration(void) ""
+> @@ -188,7 +190,7 @@ postcopy_ram_enable_notify(void) ""
+>  postcopy_ram_fault_thread_entry(void) ""
+>  postcopy_ram_fault_thread_exit(void) ""
+>  postcopy_ram_fault_thread_quit(void) ""
+> -postcopy_ram_fault_thread_request(uint64_t hostaddr, const char *ramblock, size_t offset) "Request for HVA=%" PRIx64 " rb=%s offset=%zx"
+> +postcopy_ram_fault_thread_request(uint64_t hostaddr, const char *ramblock, size_t offset, uint32_t pid) "Request for HVA=%" PRIx64 " rb=%s offset=%zx %u"
+>  postcopy_ram_incoming_cleanup_closeuf(void) ""
+>  postcopy_ram_incoming_cleanup_entry(void) ""
+>  postcopy_ram_incoming_cleanup_exit(void) ""
+> @@ -197,6 +199,7 @@ save_xbzrle_page_skipping(void) ""
+>  save_xbzrle_page_overflow(void) ""
+>  ram_save_iterate_big_wait(uint64_t milliconds, int iterations) "big wait: %" PRIu64 " milliseconds, %d iterations"
+>  ram_load_complete(int ret, uint64_t seq_iter) "exit_code %d seq iteration %" PRIu64
+> +get_mem_fault_cpu_index(uint32_t pid) "pid %u is not vCPU"
+>  
+>  # migration/exec.c
+>  migration_exec_outgoing(const char *cmd) "cmd=%s"
+> -- 
+> 1.8.3.1
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
