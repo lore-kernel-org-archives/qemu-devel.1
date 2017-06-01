@@ -1,26 +1,43 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42785)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42930)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dGOOc-0004R8-Ke
-	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 07:36:08 -0400
+	(envelope-from <borntraeger@de.ibm.com>) id 1dGOP1-0004g3-7e
+	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 07:36:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dGOOX-0000SR-Q3
-	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 07:36:06 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43702)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dGOOX-0000SF-BE
-	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 07:36:01 -0400
-Date: Thu, 1 Jun 2017 12:35:54 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170601113553.GG2083@work-vm>
-References: <1495539071-12995-1-git-send-email-a.perevalov@samsung.com>
-	<CGME20170523113131eucas1p1ec4e059c13ce977e3a3872c343e6b858@eucas1p1.samsung.com>
-	<1495539071-12995-10-git-send-email-a.perevalov@samsung.com>
+	(envelope-from <borntraeger@de.ibm.com>) id 1dGOOw-0000Yb-7f
+	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 07:36:31 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:50052)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
+	id 1dGOOv-0000YQ-U5
+	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 07:36:26 -0400
+Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v51BXtnD044767
+	for <qemu-devel@nongnu.org>; Thu, 1 Jun 2017 07:36:24 -0400
+Received: from e32.co.us.ibm.com (e32.co.us.ibm.com [32.97.110.150])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2atdc0fepy-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Thu, 01 Jun 2017 07:36:24 -0400
+Received: from localhost
+	by e32.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
+	Thu, 1 Jun 2017 05:36:23 -0600
+References: <20170529131716.94338-1-pasic@linux.vnet.ibm.com>
+	<20170601125241.2c11e95a.cornelia.huck@de.ibm.com>
+	<49c45fcc-c161-cb47-cf2b-86d39996c3d6@linux.vnet.ibm.com>
+	<9a244d38-106d-bec1-e379-136395b3fbdd@de.ibm.com>
+	<e484af73-c2df-1a09-49e1-80773034f135@linux.vnet.ibm.com>
+From: Christian Borntraeger <borntraeger@de.ibm.com>
+Date: Thu, 1 Jun 2017 13:36:16 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1495539071-12995-10-git-send-email-a.perevalov@samsung.com>
-Subject: Re: [Qemu-devel] [PATCH V6 09/10] migration: add postcopy total
- blocktime into query-migrate
+In-Reply-To: <e484af73-c2df-1a09-49e1-80773034f135@linux.vnet.ibm.com>
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-IE
+Content-Transfer-Encoding: 7bit
+Message-Id: <028543f5-c035-644b-3368-6e396c9662f3@de.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH 1/1] s390x: vmstatify config migration for
+ virtio-ccw
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,299 +46,322 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alexey Perevalov <a.perevalov@samsung.com>
-Cc: qemu-devel@nongnu.org, i.maximets@samsung.com, peterx@redhat.com, eblake@redhat.com
+To: Halil Pasic <pasic@linux.vnet.ibm.com>, Cornelia Huck <cornelia.huck@de.ibm.com>
+Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org
 
-* Alexey Perevalov (a.perevalov@samsung.com) wrote:
-> Postcopy total blocktime is available on destination side only.
-> But query-migrate was possible only for source. This patch
-> adds ability to call query-migrate on destination.
-> To be able to see postcopy blocktime, need to request postcopy-blocktime
-> capability.
+On 06/01/2017 01:28 PM, Halil Pasic wrote:
 > 
-> The query-migrate command will show following sample result:
-> {"return":
->     "postcopy-vcpu-blocktime": [115, 100],
->     "status": "completed",
->     "postcopy-blocktime": 100
-> }}
 > 
-> postcopy_vcpu_blocktime contains list, where the first item is the first
-> vCPU in QEMU.
+> On 06/01/2017 01:19 PM, Christian Borntraeger wrote:
+>> On 06/01/2017 01:02 PM, Halil Pasic wrote:
+>>>
+>>>
+>>> On 06/01/2017 12:52 PM, Cornelia Huck wrote:
+>>>> On Mon, 29 May 2017 15:17:16 +0200
+>>>> Halil Pasic <pasic@linux.vnet.ibm.com> wrote:
+>>>>
+>>>>> Let's vmstatify virtio_ccw_save_config and virtio_ccw_load_config for
+>>>>> flexibility (extending using subsections) and for fun.
+>>>>
+>>>> You have interesting ideas of fun :)
+>>>>
+>>>>>
+>>>>> To achieve this we need to hack the config_vector, which is VirtIODevice
+>>>>> (that is common virtio) state, in the middle of the VirtioCcwDevice state
+>>>>> representation.  This somewhat ugly, but we have no choice because the
+>>>>> stream format needs to be preserved.
+>>>>>
+>>>>> Almost no changes in behavior. Exception is everything that comes with
+>>>>> vmstate like extra bookkeeping about what's in the stream, and maybe some
+>>>>> extra checks and better error reporting.
+>>>>>
+>>>>> Signed-off-by: Halil Pasic <pasic@linux.vnet.ibm.com>
+>>>>> ---
+>>> [..]
+>>>>> --- a/hw/s390x/css.c
+>>>>> +++ b/hw/s390x/css.c
+>>> [..]
+>>>>> +static const VMStateDescription vmstate_sense_id = {
+>>>>> +    .name = "s390_sense_id",
+>>>>> +    .version_id = 1,
+>>>>> +    .minimum_version_id = 1,
+>>>>> +    .fields = (VMStateField[]) {
+>>>>> +        VMSTATE_UINT8(reserved, SenseId),
+>>>>> +        VMSTATE_UINT16(cu_type, SenseId),
+>>>>> +        VMSTATE_UINT8(cu_model, SenseId),
+>>>>> +        VMSTATE_UINT16(dev_type, SenseId),
+>>>>> +        VMSTATE_UINT8(dev_model, SenseId),
+>>>>> +        VMSTATE_UINT8(unused, SenseId),
+>>>>
+>>>> This is strictly due to stream format preservation, right?
+>>>>
+>>>
+>>> Yes!
+>>>
+>>> [..]
+>>>>> --- a/hw/s390x/virtio-ccw.c
+>>>>> +++ b/hw/s390x/virtio-ccw.c
+>>>>> @@ -34,9 +34,87 @@
+>>>>>  #include "virtio-ccw.h"
+>>>>>  #include "trace.h"
+>>>>>  #include "hw/s390x/css-bridge.h"
+>>>>> +#include "hw/s390x/s390-virtio-ccw.h"
+>>>>>
+>>>>>  #define NR_CLASSIC_INDICATOR_BITS 64
+>>>>>
+>>>>> +static int virtio_ccw_dev_post_load(void *opaque, int version_id)
+>>>>> +{
+>>>>> +    VirtioCcwDevice *dev = VIRTIO_CCW_DEVICE(opaque);
+>>>>> +    CcwDevice *ccw_dev = CCW_DEVICE(dev);
+>>>>> +    CCWDeviceClass *ck = CCW_DEVICE_GET_CLASS(ccw_dev);
+>>>>> +
+>>>>> +    ccw_dev->sch->driver_data = dev;
+>>>>> +    if (CCW_DEVICE(dev)->sch->thinint_active) {
+>>>>
+>>>> Please use ccw_dev instead of CCW_DEVICE(dev).
+>>>>
+>>>
+>>> Sure.
+>>>
+>>>>> +        dev->routes.adapter.adapter_id = css_get_adapter_id(
+>>>>> +                                         CSS_IO_ADAPTER_VIRTIO,
+>>>>> +                                         dev->thinint_isc);
+>>>>> +    }
+>>>>> +    /* Re-fill subch_id after loading the subchannel states.*/
+>>>>> +    if (ck->refill_ids) {
+>>>>> +        ck->refill_ids(ccw_dev);
+>>>>> +    }
+>>>>> +    return 0;
+>>>>> +}
+>>>>> +
+>>>>> +typedef struct VirtioCcwDeviceTmp {
+>>>>> +    VirtioCcwDevice *parent;
+>>>>> +    uint16_t config_vector;
+>>>>> +} VirtioCcwDeviceTmp;
+>>>>> +
+>>>>> +static void virtio_ccw_dev_tmp_pre_save(void *opaque)
+>>>>> +{
+>>>>> +    VirtioCcwDeviceTmp *tmp = opaque;
+>>>>> +    VirtioCcwDevice *dev = tmp->parent;
+>>>>> +    VirtIODevice *vdev = virtio_bus_get_device(&dev->bus);
+>>>>> +
+>>>>> +    tmp->config_vector = vdev->config_vector;
+>>>>> +}
+>>>>> +
+>>>>> +static int virtio_ccw_dev_tmp_post_load(void *opaque, int version_id)
+>>>>> +{
+>>>>> +    VirtioCcwDeviceTmp *tmp = opaque;
+>>>>> +    VirtioCcwDevice *dev = tmp->parent;
+>>>>> +    VirtIODevice *vdev = virtio_bus_get_device(&dev->bus);
+>>>>> +
+>>>>> +    vdev->config_vector = tmp->config_vector;
+>>>>> +    return 0;
+>>>>> +}
+>>>>> +
+>>>>> +const VMStateDescription vmstate_virtio_ccw_dev_tmp = {
+>>>>> +    .name = "s390_virtio_ccw_dev_tmp",
+>>>>> +    .pre_save = virtio_ccw_dev_tmp_pre_save,
+>>>>> +    .post_load = virtio_ccw_dev_tmp_post_load,
+>>>>> +    .fields = (VMStateField[]) {
+>>>>> +        VMSTATE_UINT16(config_vector, VirtioCcwDeviceTmp),
+>>>>> +        VMSTATE_END_OF_LIST()
+>>>>> +    }
+>>>>> +};
+>>>>> +
+>>>>> +const VMStateDescription vmstate_virtio_ccw_dev = {
+>>>>> +    .name = "s390_virtio_ccw_dev",
+>>>>> +    .version_id = 1,
+>>>>> +    .minimum_version_id = 1,
+>>>>> +    .post_load = virtio_ccw_dev_post_load,
+>>>>> +    .fields = (VMStateField[]) {
+>>>>> +        VMSTATE_CCW_DEVICE(parent_obj, VirtioCcwDevice),
+>>>>> +        VMSTATE_PTR_TO_IND_ADDR(indicators, VirtioCcwDevice),
+>>>>> +        VMSTATE_PTR_TO_IND_ADDR(indicators2, VirtioCcwDevice),
+>>>>> +        VMSTATE_PTR_TO_IND_ADDR(summary_indicator, VirtioCcwDevice),
+>>>>> +        /*
+>>>>> +         * Ugly hack because VirtIODevice does not migrate itself.
+>>>>> +         * This also makes legacy via vmstate_save_state possible.
+>>>>> +         */
+>>>>> +        VMSTATE_WITH_TMP(VirtioCcwDevice, VirtioCcwDeviceTmp,
+>>>>> +                         vmstate_virtio_ccw_dev_tmp),
+>>>>> +        VMSTATE_STRUCT(routes, VirtioCcwDevice, 1, vmstate_adapter_routes, \
+>>>>> +                       AdapterRoutes),
+>>>>> +        VMSTATE_UINT8(thinint_isc, VirtioCcwDevice),
+>>>>> +        VMSTATE_INT32(revision, VirtioCcwDevice),
+>>>>> +        VMSTATE_END_OF_LIST()
+>>>>> +    }
+>>>>> +};
+>>>>> +
+>>>>>  static void virtio_ccw_bus_new(VirtioBusState *bus, size_t bus_size,
+>>>>>                                 VirtioCcwDevice *dev);
+>>>>>
+>>>>> @@ -1234,85 +1312,13 @@ static int virtio_ccw_load_queue(DeviceState *d, int n, QEMUFile *f)
+>>>>>  static void virtio_ccw_save_config(DeviceState *d, QEMUFile *f)
+>>>>>  {
+>>>>>      VirtioCcwDevice *dev = VIRTIO_CCW_DEVICE(d);
+>>>>> -    CcwDevice *ccw_dev = CCW_DEVICE(d);
+>>>>> -    SubchDev *s = ccw_dev->sch;
+>>>>> -    VirtIODevice *vdev = virtio_ccw_get_vdev(s);
+>>>>> -
+>>>>> -    subch_device_save(s, f);
+>>>>> -    if (dev->indicators != NULL) {
+>>>>> -        qemu_put_be32(f, dev->indicators->len);
+>>>>> -        qemu_put_be64(f, dev->indicators->addr);
+>>>>> -    } else {
+>>>>> -        qemu_put_be32(f, 0);
+>>>>> -        qemu_put_be64(f, 0UL);
+>>>>> -    }
+>>>>> -    if (dev->indicators2 != NULL) {
+>>>>> -        qemu_put_be32(f, dev->indicators2->len);
+>>>>> -        qemu_put_be64(f, dev->indicators2->addr);
+>>>>> -    } else {
+>>>>> -        qemu_put_be32(f, 0);
+>>>>> -        qemu_put_be64(f, 0UL);
+>>>>> -    }
+>>>>> -    if (dev->summary_indicator != NULL) {
+>>>>> -        qemu_put_be32(f, dev->summary_indicator->len);
+>>>>> -        qemu_put_be64(f, dev->summary_indicator->addr);
+>>>>> -    } else {
+>>>>> -        qemu_put_be32(f, 0);
+>>>>> -        qemu_put_be64(f, 0UL);
+>>>>> -    }
+>>>>> -    qemu_put_be16(f, vdev->config_vector);
+>>>>> -    qemu_put_be64(f, dev->routes.adapter.ind_offset);
+>>>>> -    qemu_put_byte(f, dev->thinint_isc);
+>>>>> -    qemu_put_be32(f, dev->revision);
+>>>>> +    vmstate_save_state(f, &vmstate_virtio_ccw_dev, dev, NULL);
+>>>>>  }
+>>>>>
+>>>>>  static int virtio_ccw_load_config(DeviceState *d, QEMUFile *f)
+>>>>>  {
+>>>>>      VirtioCcwDevice *dev = VIRTIO_CCW_DEVICE(d);
+>>>>> -    CcwDevice *ccw_dev = CCW_DEVICE(d);
+>>>>> -    CCWDeviceClass *ck = CCW_DEVICE_GET_CLASS(ccw_dev);
+>>>>> -    SubchDev *s = ccw_dev->sch;
+>>>>> -    VirtIODevice *vdev = virtio_ccw_get_vdev(s);
+>>>>> -    int len;
+>>>>> -
+>>>>> -    s->driver_data = dev;
+>>>>> -    subch_device_load(s, f);
+>>>>> -    /* Re-fill subch_id after loading the subchannel states.*/
+>>>>> -    if (ck->refill_ids) {
+>>>>> -        ck->refill_ids(ccw_dev);
+>>>>> -    }
+>>>>> -    len = qemu_get_be32(f);
+>>>>> -    if (len != 0) {
+>>>>> -        dev->indicators = get_indicator(qemu_get_be64(f), len);
+>>>>> -    } else {
+>>>>> -        qemu_get_be64(f);
+>>>>> -        dev->indicators = NULL;
+>>>>> -    }
+>>>>> -    len = qemu_get_be32(f);
+>>>>> -    if (len != 0) {
+>>>>> -        dev->indicators2 = get_indicator(qemu_get_be64(f), len);
+>>>>> -    } else {
+>>>>> -        qemu_get_be64(f);
+>>>>> -        dev->indicators2 = NULL;
+>>>>> -    }
+>>>>> -    len = qemu_get_be32(f);
+>>>>> -    if (len != 0) {
+>>>>> -        dev->summary_indicator = get_indicator(qemu_get_be64(f), len);
+>>>>> -    } else {
+>>>>> -        qemu_get_be64(f);
+>>>>> -        dev->summary_indicator = NULL;
+>>>>> -    }
+>>>>> -    qemu_get_be16s(f, &vdev->config_vector);
+>>>>> -    dev->routes.adapter.ind_offset = qemu_get_be64(f);
+>>>>> -    dev->thinint_isc = qemu_get_byte(f);
+>>>>> -    dev->revision = qemu_get_be32(f);
+>>>>> -    if (s->thinint_active) {
+>>>>> -        dev->routes.adapter.adapter_id = css_get_adapter_id(
+>>>>> -                                         CSS_IO_ADAPTER_VIRTIO,
+>>>>> -                                         dev->thinint_isc);
+>>>>> -    }
+>>>>> -
+>>>>> -    return 0;
+>>>>> +    return vmstate_load_state(f, &vmstate_virtio_ccw_dev, dev, 1);
+>>>>>  }
+>>>>>
+>>>>>  static void virtio_ccw_pre_plugged(DeviceState *d, Error **errp)
+>>>>> diff --git a/include/hw/s390x/css.h b/include/hw/s390x/css.h
+>>>>> index e61fa74d9b..d74e44d312 100644
+>>>>> --- a/include/hw/s390x/css.h
+>>>>> +++ b/include/hw/s390x/css.h
+>>>>> @@ -88,6 +88,7 @@ struct SubchDev {
+>>>>>      bool ccw_fmt_1;
+>>>>>      bool thinint_active;
+>>>>>      uint8_t ccw_no_data_cnt;
+>>>>> +    uint16_t migrated_schid; /* used for missmatch detection */
+>>>>>      /* transport-provided data: */
+>>>>>      int (*ccw_cb) (SubchDev *, CCW1);
+>>>>>      void (*disable_cb)(SubchDev *);
+>>>>> @@ -95,22 +96,27 @@ struct SubchDev {
+>>>>>      void *driver_data;
+>>>>>  };
+>>>>>
+>>>>> +extern const VMStateDescription vmstate_subch_dev;
+>>>>> +
+>>>>>  typedef struct IndAddr {
+>>>>>      hwaddr addr;
+>>>>>      uint64_t map;
+>>>>>      unsigned long refcnt;
+>>>>> -    int len;
+>>>>> +    int32_t len;
+>>>>>      QTAILQ_ENTRY(IndAddr) sibling;
+>>>>>  } IndAddr;
+>>>>>
+>>>>> +extern const VMStateDescription vmstate_ind_addr;
+>>>>> +
+>>>>> +#define VMSTATE_PTR_TO_IND_ADDR(_f, _s)                                   \
+>>>>> +    VMSTATE_STRUCT(_f, _s, 1, vmstate_ind_addr, IndAddr*)
+>>>>> +
+>>>>>  IndAddr *get_indicator(hwaddr ind_addr, int len);
+>>>>>  void release_indicator(AdapterInfo *adapter, IndAddr *indicator);
+>>>>>  int map_indicator(AdapterInfo *adapter, IndAddr *indicator);
+>>>>>
+>>>>>  typedef SubchDev *(*css_subch_cb_func)(uint8_t m, uint8_t cssid, uint8_t ssid,
+>>>>>                                         uint16_t schid);
+>>>>> -void subch_device_save(SubchDev *s, QEMUFile *f);
+>>>>> -int subch_device_load(SubchDev *s, QEMUFile *f);
+>>>>>  int css_create_css_image(uint8_t cssid, bool default_image);
+>>>>>  bool css_devno_used(uint8_t cssid, uint8_t ssid, uint16_t devno);
+>>>>>  void css_subch_assign(uint8_t cssid, uint8_t ssid, uint16_t schid,
+>>>>> diff --git a/include/hw/s390x/s390_flic.h b/include/hw/s390x/s390_flic.h
+>>>>> index f9e6890c90..caa6fc608d 100644
+>>>>> --- a/include/hw/s390x/s390_flic.h
+>>>>> +++ b/include/hw/s390x/s390_flic.h
+>>>>> @@ -31,6 +31,11 @@ typedef struct AdapterRoutes {
+>>>>>      int gsi[ADAPTER_ROUTES_MAX_GSI];
+>>>>>  } AdapterRoutes;
+>>>>>
+>>>>> +extern const VMStateDescription vmstate_adapter_routes;
+>>>>> +
+>>>>> +#define VMSTATE_ADAPTER_ROUTES(_f, _s) \
+>>>>> +    VMSTATE_STRUCT(_f, _s, 1, vmstate_adapter_routes, AdapterRoutes)
+>>>>> +
+>>>>>  #define TYPE_S390_FLIC_COMMON "s390-flic"
+>>>>>  #define S390_FLIC_COMMON(obj) \
+>>>>>      OBJECT_CHECK(S390FLICState, (obj), TYPE_S390_FLIC_COMMON)
+>>>>
+>>>> Other than the nit above, looks good to me. Especially the migration of
+>>>> the pmcw & co. is now more readable. So, with the nit fixed,
+>>>>
+>>>> Reviewed-by: Cornelia Huck <cornelia.huck@de.ibm.com>
+>>>
+>>> Thanks!
+>>>
+>>>>
+>>>> Christian, can you please take this?
+>>>>
+>>>
+>>> Should I do a re-spin with the nit's picked and the r-b's added?
+>>
+>> Yes please. Can you then give me a confirmation that you have tested a migration between 2.9 and this patch set?
+>>
+>>
 > 
-> This patch has a drawback, it combines states of incoming and
-> outgoing migration. Ongoing migration state will overwrite incoming
-> state. Looks like better to separate query-migrate for incoming and
-> outgoing migration or add parameter to indicate type of migration.
-> 
-> Signed-off-by: Alexey Perevalov <a.perevalov@samsung.com>
-> ---
->  hmp.c                         | 15 +++++++++
->  include/migration/migration.h |  4 +++
->  migration/migration.c         | 40 +++++++++++++++++++++--
->  migration/postcopy-ram.c      | 75 +++++++++++++++++++++++++++++++++++++++++++
->  migration/trace-events        |  1 +
->  qapi-schema.json              |  9 +++++-
->  6 files changed, 140 insertions(+), 4 deletions(-)
-> 
-> diff --git a/hmp.c b/hmp.c
-> index 3dceaf8..25135e7 100644
-> --- a/hmp.c
-> +++ b/hmp.c
-> @@ -260,6 +260,21 @@ void hmp_info_migrate(Monitor *mon, const QDict *qdict)
->                         info->cpu_throttle_percentage);
->      }
->  
-> +    if (info->has_postcopy_blocktime) {
-> +        monitor_printf(mon, "postcopy blocktime: %" PRId64 "\n",
-> +                info->postcopy_blocktime);
-> +    }
-> +
-> +    if (info->has_postcopy_vcpu_blocktime) {
-> +        Visitor *v;
-> +        char *str;
-> +        v = string_output_visitor_new(false, &str);
-> +        visit_type_int64List(v, NULL, &info->postcopy_vcpu_blocktime, NULL);
-> +        visit_complete(v, &str);
-> +        monitor_printf(mon, "postcopy vcpu blocktime: %s\n", str);
-> +        g_free(str);
-> +        visit_free(v);
-> +    }
->      qapi_free_MigrationInfo(info);
->      qapi_free_MigrationCapabilityStatusList(caps);
->  }
-> diff --git a/include/migration/migration.h b/include/migration/migration.h
-> index 4e05c83..c9d4954 100644
-> --- a/include/migration/migration.h
-> +++ b/include/migration/migration.h
-> @@ -123,6 +123,10 @@ struct MigrationIncomingState {
->  
->  MigrationIncomingState *migration_incoming_get_current(void);
->  void migration_incoming_state_destroy(void);
-> +/*
-> + * Functions to work with blocktime context
-> + */
-> +void fill_destination_postcopy_migration_info(MigrationInfo *info);
->  
->  struct MigrationState
->  {
-> diff --git a/migration/migration.c b/migration/migration.c
-> index e10284e..4da0c20 100644
-> --- a/migration/migration.c
-> +++ b/migration/migration.c
-> @@ -651,14 +651,15 @@ static void populate_ram_info(MigrationInfo *info, MigrationState *s)
->      }
->  }
->  
-> -MigrationInfo *qmp_query_migrate(Error **errp)
-> +static void fill_source_migration_info(MigrationInfo *info)
->  {
-> -    MigrationInfo *info = g_malloc0(sizeof(*info));
->      MigrationState *s = migrate_get_current();
->  
->      switch (s->state) {
->      case MIGRATION_STATUS_NONE:
->          /* no migration has happened ever */
-> +        /* do not overwrite destination migration status */
-> +        return;
->          break;
->      case MIGRATION_STATUS_SETUP:
->          info->has_status = true;
-> @@ -744,10 +745,43 @@ MigrationInfo *qmp_query_migrate(Error **errp)
->          break;
->      }
->      info->status = s->state;
-> +}
->  
-> -    return info;
-> +static void fill_destination_migration_info(MigrationInfo *info)
-> +{
-> +    MigrationIncomingState *mis = migration_incoming_get_current();
-> +
-> +    switch (mis->state) {
-> +    case MIGRATION_STATUS_NONE:
-> +        return;
-> +        break;
-> +    case MIGRATION_STATUS_SETUP:
-> +    case MIGRATION_STATUS_CANCELLING:
-> +    case MIGRATION_STATUS_CANCELLED:
-> +    case MIGRATION_STATUS_ACTIVE:
-> +    case MIGRATION_STATUS_POSTCOPY_ACTIVE:
-> +    case MIGRATION_STATUS_FAILED:
-> +    case MIGRATION_STATUS_COLO:
-> +        info->has_status = true;
-> +        break;
-> +    case MIGRATION_STATUS_COMPLETED:
-> +        info->has_status = true;
-> +        fill_destination_postcopy_migration_info(info);
-> +        break;
-> +    }
-> +    info->status = mis->state;
->  }
->  
-> +MigrationInfo *qmp_query_migrate(Error **errp)
-> +{
-> +    MigrationInfo *info = g_malloc0(sizeof(*info));
-> +
-> +    fill_destination_migration_info(info);
-> +    fill_source_migration_info(info);
-> +
-> +    return info;
-> + }
-> +
->  void qmp_migrate_set_capabilities(MigrationCapabilityStatusList *params,
->                                    Error **errp)
->  {
-> diff --git a/migration/postcopy-ram.c b/migration/postcopy-ram.c
-> index e70c44b..3dc3869 100644
-> --- a/migration/postcopy-ram.c
-> +++ b/migration/postcopy-ram.c
-> @@ -139,6 +139,73 @@ static struct PostcopyBlocktimeContext *blocktime_context_new(void)
->      return ctx;
->  }
->  
-> +static int64List *get_vcpu_blocktime_list(PostcopyBlocktimeContext *ctx)
-> +{
-> +    int64List *list = NULL, *entry = NULL;
-> +    int i;
-> +
-> +    for (i = smp_cpus - 1; i >= 0; i--) {
-> +            entry = g_new0(int64List, 1);
-> +            entry->value = ctx->vcpu_blocktime[i];
-> +            entry->next = list;
-> +            list = entry;
-> +    }
-> +
-> +    return list;
-> +}
-> +
-> +/*
-> + * This function just provide calculated blocktime per cpu and trace it.
-> + * Total blocktime is calculated in mark_postcopy_blocktime_end.
-> + *
-> + *
-> + * Assume we have 3 CPU
-> + *
-> + *      S1        E1           S1               E1
-> + * -----***********------------xxx***************------------------------> CPU1
-> + *
-> + *             S2                E2
-> + * ------------****************xxx---------------------------------------> CPU2
-> + *
-> + *                         S3            E3
-> + * ------------------------****xxx********-------------------------------> CPU3
-> + *
-> + * We have sequence S1,S2,E1,S3,S1,E2,E3,E1
-> + * S2,E1 - doesn't match condition due to sequence S1,S2,E1 doesn't include CPU3
-> + * S3,S1,E2 - sequence includes all CPUs, in this case overlap will be S1,E2 -
-> + *            it's a part of total blocktime.
-> + * S1 - here is last_begin
-> + * Legend of the picture is following:
-> + *              * - means blocktime per vCPU
-> + *              x - means overlapped blocktime (total blocktime)
-> + */
+> I have tested between 2.5 and this (2.5 binary and compat both).  I think
+> that should be equivalent with testing with 2.9, but I can give it a
+> couple of spins with 2.9. 
 
-That's probably too much detail for this function - since this function
-now does very little except call the others.
-
-However, other than the comment:
-
-
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-
-> +void fill_destination_postcopy_migration_info(MigrationInfo *info)
-> +{
-> +    MigrationIncomingState *mis = migration_incoming_get_current();
-> +    PostcopyBlocktimeContext *bc = mis->blocktime_ctx;
-> +
-> +    if (!bc) {
-> +        return;
-> +    }
-> +
-> +    info->has_postcopy_blocktime = true;
-> +    info->postcopy_blocktime = bc->total_blocktime;
-> +    info->has_postcopy_vcpu_blocktime = true;
-> +    info->postcopy_vcpu_blocktime = get_vcpu_blocktime_list(bc);
-> +}
-> +
-> +static uint64_t get_postcopy_total_blocktime(void)
-> +{
-> +    MigrationIncomingState *mis = migration_incoming_get_current();
-> +    PostcopyBlocktimeContext *bc = mis->blocktime_ctx;
-> +
-> +    if (!bc) {
-> +        return 0;
-> +    }
-> +
-> +    return bc->total_blocktime;
-> +}
-> +
->  /**
->   * receive_ufd_features: check userfault fd features, to request only supported
->   * features in the future.
-> @@ -497,6 +564,9 @@ int postcopy_ram_incoming_cleanup(MigrationIncomingState *mis)
->      }
->  
->      postcopy_state_set(POSTCOPY_INCOMING_END);
-> +    /* here should be blocktime receiving back operation */
-> +    trace_postcopy_ram_incoming_cleanup_blocktime(
-> +            get_postcopy_total_blocktime());
->      migrate_send_rp_shut(mis, qemu_file_get_error(mis->from_src_file) != 0);
->  
->      if (mis->postcopy_tmp_page) {
-> @@ -926,6 +996,11 @@ void *postcopy_get_tmp_page(MigrationIncomingState *mis)
->  
->  #else
->  /* No target OS support, stubs just fail */
-> +void fill_destination_postcopy_migration_info(MigrationInfo *info)
-> +{
-> +    error_report("%s: No OS support", __func__);
-> +}
-> +
->  bool postcopy_ram_supported_by_host(MigrationIncomingState *mis)
->  {
->      error_report("%s: No OS support", __func__);
-> diff --git a/migration/trace-events b/migration/trace-events
-> index 7bdadbb..55a3b6e 100644
-> --- a/migration/trace-events
-> +++ b/migration/trace-events
-> @@ -195,6 +195,7 @@ postcopy_ram_incoming_cleanup_closeuf(void) ""
->  postcopy_ram_incoming_cleanup_entry(void) ""
->  postcopy_ram_incoming_cleanup_exit(void) ""
->  postcopy_ram_incoming_cleanup_join(void) ""
-> +postcopy_ram_incoming_cleanup_blocktime(uint64_t total) "total blocktime %" PRIu64
->  save_xbzrle_page_skipping(void) ""
->  save_xbzrle_page_overflow(void) ""
->  ram_save_iterate_big_wait(uint64_t milliconds, int iterations) "big wait: %" PRIu64 " milliseconds, %d iterations"
-> diff --git a/qapi-schema.json b/qapi-schema.json
-> index 78617fe..4be0b09 100644
-> --- a/qapi-schema.json
-> +++ b/qapi-schema.json
-> @@ -712,6 +712,11 @@
->  #              @status is 'failed'. Clients should not attempt to parse the
->  #              error strings. (Since 2.7)
->  #
-> +# @postcopy-blocktime: total time when all vCPU were blocked during postcopy
-> +#           live migration (Since 2.10)
-> +#
-> +# @postcopy-vcpu-blocktime: list of the postcopy blocktime per vCPU (Since 2.10)
-> +#
->  # Since: 0.14.0
->  ##
->  { 'struct': 'MigrationInfo',
-> @@ -723,7 +728,9 @@
->             '*downtime': 'int',
->             '*setup-time': 'int',
->             '*cpu-throttle-percentage': 'int',
-> -           '*error-desc': 'str'} }
-> +           '*error-desc': 'str',
-> +           '*postcopy-blocktime' : 'int64',
-> +           '*postcopy-vcpu-blocktime': ['int64']} }
->  
->  ##
->  # @query-migrate:
-> -- 
-> 1.8.3.1
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+Yes, 2.5 is even better.
