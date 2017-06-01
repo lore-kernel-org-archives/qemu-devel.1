@@ -1,19 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35102)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35340)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mjt@tls.msk.ru>) id 1dGMmZ-0001AP-Uh
-	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 05:52:44 -0400
+	(envelope-from <thuth@redhat.com>) id 1dGMo2-0002De-Kn
+	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 05:54:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mjt@tls.msk.ru>) id 1dGMmV-00033i-3A
-	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 05:52:43 -0400
-References: <20170531192836.7187-1-jsnow@redhat.com>
-From: Michael Tokarev <mjt@tls.msk.ru>
-Message-ID: <2a260806-0b89-7e09-c05f-bd6f2097d15d@msgid.tls.msk.ru>
-Date: Thu, 1 Jun 2017 12:52:37 +0300
-MIME-Version: 1.0
-In-Reply-To: <20170531192836.7187-1-jsnow@redhat.com>
-Content-Type: text/plain; charset=windows-1251
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] ide-test: check return of fwrite
+	(envelope-from <thuth@redhat.com>) id 1dGMnx-0003dB-QG
+	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 05:54:14 -0400
+From: Thomas Huth <thuth@redhat.com>
+Date: Thu,  1 Jun 2017 11:54:03 +0200
+Message-Id: <1496310843-28771-1-git-send-email-thuth@redhat.com>
+Subject: [Qemu-devel] [PATCH] hw/core: nmi.c can be compiled as common-obj
+ nowadays
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,12 +18,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>, qemu-trivial@nongnu.org
-Cc: thuth@redhat.com, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org, qemu-trivial@nongnu.org
+Cc: Bandan Das <bsd@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Andrew Jones <drjones@redhat.com>, Juan Quintela <quintela@redhat.com>
 
-31.05.2017 22:28, John Snow wrote:
-> To quiet patchew, add an assert for fwrite's return value.
+The target-specific code in nmi.c has been removed with this commit:
 
-Applied to -trivial, thanks!
+	commit f7e981f29548fe4af7812f5920304fe607e5bf0d
+	nmi: remove x86 specific nmi handling
 
-/mjt
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+---
+ hw/core/Makefile.objs | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/hw/core/Makefile.objs b/hw/core/Makefile.objs
+index 91450b2..f8d7a4a 100644
+--- a/hw/core/Makefile.objs
++++ b/hw/core/Makefile.objs
+@@ -5,7 +5,7 @@ common-obj-y += fw-path-provider.o
+ # irq.o needed for qdev GPIO handling:
+ common-obj-y += irq.o
+ common-obj-y += hotplug.o
+-obj-y += nmi.o
++common-obj-y += nmi.o
+ 
+ common-obj-$(CONFIG_EMPTY_SLOT) += empty_slot.o
+ common-obj-$(CONFIG_XILINX_AXI) += stream.o
+-- 
+1.8.3.1
