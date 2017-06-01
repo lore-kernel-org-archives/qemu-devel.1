@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38989)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41076)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1dGWnJ-0003fn-Cn
-	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 16:34:10 -0400
+	(envelope-from <lersek@redhat.com>) id 1dGWtM-0005HD-Th
+	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 16:40:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1dGWnG-0000zX-74
-	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 16:34:09 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:57676)
+	(envelope-from <lersek@redhat.com>) id 1dGWtJ-0005eb-PA
+	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 16:40:24 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:60352)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
-	id 1dGWnF-0000yd-U0
-	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 16:34:06 -0400
-Date: Thu, 1 Jun 2017 14:34:02 -0600
-From: Alex Williamson <alex.williamson@redhat.com>
-Message-ID: <20170601143402.50ff86a5@w520.home>
-In-Reply-To: <1496079043-26694-3-git-send-email-zhi.a.wang@intel.com>
-References: <1496079043-26694-1-git-send-email-zhi.a.wang@intel.com>
-	<1496079043-26694-3-git-send-email-zhi.a.wang@intel.com>
+	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1dGWtJ-0005du-GF
+	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 16:40:21 -0400
+From: Laszlo Ersek <lersek@redhat.com>
+References: <20170601112241.2580-1-ard.biesheuvel@linaro.org>
+	<ccc0e728-0348-e386-6f71-0c1c69eaa01d@redhat.com>
+Message-ID: <e3a61707-2356-7ad3-0efc-e7d0c4115eea@redhat.com>
+Date: Thu, 1 Jun 2017 22:40:07 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <ccc0e728-0348-e386-6f71-0c1c69eaa01d@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC 2/6] vfio: Setup IGD quirks earlier
+Subject: Re: [Qemu-devel] [RFC PATCH] OvmfPkg/AcpiPlatformDxe: lift 4 GB
+ alloc limit for modern ACPI systems
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,79 +29,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Zhi Wang <zhi.a.wang@intel.com>
-Cc: qemu-devel@nongnu.org, kevin.tian@intel.com, daniel.vetter@ffwll.ch, joonas.lahtinen@linux.intel.com, zhenyuw@linux.intel.com, zhiyuan.lv@intel.com, chuanxiao.dong@intel.com, xiong.y.zhang@intel.com
+To: Ard Biesheuvel <ard.biesheuvel@linaro.org>, edk2-devel@lists.01.org
+Cc: leif.lindholm@linaro.org, jordan.l.justen@intel.com, Shannon Zhao <zhaoshenglong@huawei.com>, "Michael S. Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>, qemu devel list <qemu-devel@nongnu.org>, gengdongjiu <gengdongjiu@huawei.com>, Drew Jones <drjones@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
 
-On Tue, 30 May 2017 01:30:32 +0800
-Zhi Wang <zhi.a.wang@intel.com> wrote:
+On 06/01/17 14:25, Laszlo Ersek wrote:
 
-> Initialize IGD quirks a bit earlier since we're going to support IGD
-> stolen memory under both primary mode (legacy mode) and secondary mode
-> and we need one extra memory region from IGD quirks.
+> In QEMU, we could tie both of these extensions to new machine types.
 > 
-> Suggested-by: Xiong Zhang <xiong.y.zhang@intel.com>
-> Signed-off-by: Zhi Wang <zhi.a.wang@intel.com>
-> ---
->  hw/vfio/pci-quirks.c | 30 +++++++++++++++++-------------
->  1 file changed, 17 insertions(+), 13 deletions(-)
+> The result would be:
 > 
-> diff --git a/hw/vfio/pci-quirks.c b/hw/vfio/pci-quirks.c
-> index 71360ef..e0a0c13 100644
-> --- a/hw/vfio/pci-quirks.c
-> +++ b/hw/vfio/pci-quirks.c
-> @@ -1395,6 +1395,14 @@ static void vfio_probe_igd_bar4_quirk(VFIOPCIDevice *vdev, int nr)
->  
->      gen = info->gen;
->  
-> +    /* Setup our quirk to munge GTT addresses to the VM allocated buffer */
-> +    quirk = g_malloc0(sizeof(*quirk));
-> +    igd = quirk->data = g_malloc0(sizeof(*igd));
-> +    igd->vdev = vdev;
-> +    igd->index = ~0;
-> +    igd->bdsm = vfio_pci_read_config(&vdev->pdev, IGD_BDSM, 4);
-> +    igd->bdsm &= ~((1 << 20) - 1); /* 1MB aligned */
-> +
+>   firmware  QEMU  QEMU machine type  result
+>   --------  ----  -----------------  -----------------------------------
+>   old       new   old                allocate blobs under 4GB
+>   old       new   new                breakage, but that's OK, we can
+>                                        require refreshed firmware for
+>                                        new machine types
+>   new       old   old                allocate blobs under 4GB
+>   new       new   old                allocate blobs under 4GB
+>   new       new   new                allocate blobs from 64-bit space
 
-This patch does not stand on its own, we alloc memory and setup a few
-things earlier, but there are numerous returns before we get to the
-next chunk below.  So the most obvious result of this patch alone is
-that it introduces a memory leak.  Thanks,
+I think the situation is easier than this. We don't have to tie the
+extensions to machine types.
 
-Alex
+The reason is that old firmware is allowed to fail on new QEMU
+(regardless of machine type). Example: the WRITE_POINTER command,
+originally introduced for VMGENID. If you run a SeaBIOS binary without
+WRITE_POINTER support, in a QEMU VM with "-device vmgenid", the device
+will not work. And QEMU doesn't try to prevent that by binding vmgenid
+to machine types. Instead, QEMU bundled a SeaBIOS binary with
+WRITE_POINTER support, for the release that introduced VMGENID.
 
->      /*
->       * We need to create an LPC/ISA bridge at PCI bus address 00:1f.0 that we
->       * can stuff host values into, so if there's already one there and it's not
-> @@ -1502,23 +1510,19 @@ static void vfio_probe_igd_bar4_quirk(VFIOPCIDevice *vdev, int nr)
->          goto out;
->      }
->  
-> -    /* Setup our quirk to munge GTT addresses to the VM allocated buffer */
-> -    quirk = g_malloc0(sizeof(*quirk));
-> -    quirk->mem = g_new0(MemoryRegion, 2);
-> -    quirk->nr_mem = 2;
-> -    igd = quirk->data = g_malloc0(sizeof(*igd));
-> -    igd->vdev = vdev;
-> -    igd->index = ~0;
-> -    igd->bdsm = vfio_pci_read_config(&vdev->pdev, IGD_BDSM, 4);
-> -    igd->bdsm &= ~((1 << 20) - 1); /* 1MB aligned */
-> +    quirk->mem = g_renew(MemoryRegion, quirk->mem, 2);
-> +
-> +    memory_region_init_io(&quirk->mem[quirk->nr_mem++], OBJECT(vdev),
-> +                          &vfio_igd_index_quirk, igd, "vfio-igd-index-quirk",
-> +                          4);
->  
-> -    memory_region_init_io(&quirk->mem[0], OBJECT(vdev), &vfio_igd_index_quirk,
-> -                          igd, "vfio-igd-index-quirk", 4);
->      memory_region_add_subregion_overlap(vdev->bars[nr].region.mem,
->                                          0, &quirk->mem[0], 1);
->  
-> -    memory_region_init_io(&quirk->mem[1], OBJECT(vdev), &vfio_igd_data_quirk,
-> -                          igd, "vfio-igd-data-quirk", 4);
-> +    memory_region_init_io(&quirk->mem[quirk->nr_mem++], OBJECT(vdev),
-> +                          &vfio_igd_data_quirk, igd, "vfio-igd-data-quirk",
-> +                          4);
-> +
->      memory_region_add_subregion_overlap(vdev->bars[nr].region.mem,
->                                          4, &quirk->mem[1], 1);
->  
+(There's no reason for not bundling OVMF and ArmVirtQemu binaries with
+QEMU releases now. Gerd already has a build service up and running, at
+<http://www.kraxel.org/repos/>.)
+
+The scenario that we *should* avoid is new firmware failing on old QEMU.
+And this patch is actually that case, because the new fw would allocate
+blobs with such 8-byte addresses that might not fit into 32-bit blob
+fields. So, the extensions are necessary, but tying them to machine
+types isn't.
+
+  firmware  QEMU  result
+  --------  ----  ------------------------------------------------------
+  old       new   breakage, but that's OK; we can require refreshed
+                    firmware for new QEMU releases
+  new       old   allocate blobs under 4GB (alloc zone extension is
+                    necessary)
+  new       new   allocate blobs from any address range
+
+Thanks
+Laszlo
