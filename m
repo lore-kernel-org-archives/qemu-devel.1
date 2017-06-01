@@ -1,28 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57024)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57173)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dan.j.williams@intel.com>) id 1dGQXu-0004H0-DI
-	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 09:53:51 -0400
+	(envelope-from <mst@redhat.com>) id 1dGQYZ-0004f3-A9
+	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 09:54:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dan.j.williams@intel.com>) id 1dGQXt-0005UE-KR
-	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 09:53:50 -0400
-Received: from mail-oi0-x22c.google.com ([2607:f8b0:4003:c06::22c]:34797)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <dan.j.williams@intel.com>)
-	id 1dGQXt-0005O3-D1
-	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 09:53:49 -0400
-Received: by mail-oi0-x22c.google.com with SMTP id o65so29811054oif.1
-	for <qemu-devel@nongnu.org>; Thu, 01 Jun 2017 06:53:47 -0700 (PDT)
+	(envelope-from <mst@redhat.com>) id 1dGQYV-0006Jw-Cd
+	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 09:54:31 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53940)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1dGQYV-0006Ip-3T
+	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 09:54:27 -0400
+Date: Thu, 1 Jun 2017 16:54:18 +0300
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20170601165026-mutt-send-email-mst@kernel.org>
+References: <20170526142858.19931-1-maxime.coquelin@redhat.com>
+	<20170526142858.19931-4-maxime.coquelin@redhat.com>
+	<20170530210905-mutt-send-email-mst@kernel.org>
+	<1432592b-f0e2-fbf1-0479-03ba7e584b17@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <14af6adf-9076-1368-75bb-8001ed667150@gmail.com>
-References: <20170526023213.18741-1-haozhong.zhang@intel.com>
-	<14af6adf-9076-1368-75bb-8001ed667150@gmail.com>
-From: Dan Williams <dan.j.williams@intel.com>
-Date: Thu, 1 Jun 2017 06:53:45 -0700
-Message-ID: <CAPcyv4jKoc00Oe7+NYngHc96Cahn3LF01ZdwHxVb_amq3p6UGw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RESEND PATCH 1/2] nvdimm: warn if the backend is
- not a DAX device
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1432592b-f0e2-fbf1-0479-03ba7e584b17@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 3/6] vhost: extend ring information
+ update for IOTLB to all rings
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,49 +30,132 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Xiao Guangrong <guangrong.xiao@gmail.com>
-Cc: Haozhong Zhang <haozhong.zhang@intel.com>, qemu-devel@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>, linux-fsdevel <linux-fsdevel@vger.kernel.org>
+To: Maxime Coquelin <maxime.coquelin@redhat.com>
+Cc: peterx@redhat.com, marcandre.lureau@gmail.com, vkaplans@redhat.com, jasowang@redhat.com, wexu@redhat.com, yuanhan.liu@linux.intel.com, qemu-devel@nongnu.org, jfreiman@redhat.com
 
-[ adding linux-fsdevel ]
+On Tue, May 30, 2017 at 11:06:54PM +0200, Maxime Coquelin wrote:
+> Hi Michael,
+> 
+> On 05/30/2017 08:12 PM, Michael S. Tsirkin wrote:
+> > On Fri, May 26, 2017 at 04:28:55PM +0200, Maxime Coquelin wrote:
+> > > Vhost-kernel backend need
+> > 
+> > needs
+> > 
+> > > to receive IOTLB entry for used ring
+> > > information early, which is done by triggering a miss event on
+> > > its address.
+> > > 
+> > > This patch extends this behaviour to all rings information, to be
+> > > compatible with vhost-user backend design.
+> > 
+> > Why does vhost-user need it though?
+> 
+> For vhost-user, this simplifies the backend design because generally,
+> the backend sends IOTLB miss requests from processing threads through
+> the slave channel, and receives resulting IOTLB updates in vhost-user
+> protocol thread.
+> 
+> The only exception is for these rings info, where IOTLB miss requests
+> are sent from vhost-user protocol thread (in the SET_VRING_ENABLE
+> request handler), so the resulting IOTLB update is only handled by
+> the backend when the rings are enabled, which is too late.
+> 
+> It could be possible to overcome this issue, but I think it would
+> make the design more complex or less efficient. I see several options:
+> 
+> 1. Change the IOTLB miss request so that the master sends the IOTLB
+> update as reply, instead of the reply-ack. It would mean that IOTLB
+> updates/invalidations would be sent either via the master channel or
+> the slave channel. On QEMU side, it means diverging from kernel backend
+> implementation. On backend side, it means having possibly multiple
+> threads writing to the IOTLB cache.
+> 
+> 2. In vhost-user protocol thread, when handling SET_VRING_ENABLE, send
+> IOTLB miss request without setting the reply-ack flag, and poll the
+> vhost-user socket to read the resulting IOTLB update. The problem is
+> that other requests could be pending in the socket's buffer, and so it
+> would end-up nesting multiple requests handling.
+> 
+> 3. Don't interpret rings info in the vhost-user protocol thread, but
+> only in the processing threads. The advantage is that it would address
+> the remark you made on patch 6 that invalidates are not affecting ring
+> info. The downside being the overhead induced by checking whether the
+> ring info are valid every time it is being used. I haven't prototyped
+> this solution, but I expected the performance regression to be a
+> blocker.
+> 
+> 4. In SET_VRING_ENABLE, don't enable the ring if needed entries are not in
+> IOTLB cache. Just send the IOTLB misses without reply-ack flag and postpone
+> enable when handling IOTLB updates. It will be a little more complex
+> solution than current one, but it may be the less impacting compared to the
+> other 3 options.
+> 
+> 
+> Thinking again, maybe trying solution would be worth the effort, and could
+> be extended also to disable the rings when receiving invalidates
+> that affect rings info.
+> 
+> What do you think?
 
-On Thu, Jun 1, 2017 at 5:00 AM, Xiao Guangrong <guangrong.xiao@gmail.com> w=
-rote:
->
->
-> On 05/26/2017 10:32 AM, Haozhong Zhang wrote:
->
->> +static void nvdimm_check_dax(HostMemoryBackend *hostmem)
->> +{
->> +    char *mem_path =3D
->> +        object_property_get_str(OBJECT(hostmem), "mem-path", NULL);
->> +    char *dev_name =3D NULL, *sysfs_path =3D NULL;
->> +    bool is_dax =3D false;
->> +
->> +    if (!mem_path) {
->> +        goto out;
->> +    }
->> +
->> +    if (!g_str_has_prefix(mem_path, "/dev/dax")) {
->> +        goto out;
->> +    }
->> +
->> +    dev_name =3D mem_path + strlen("/dev/");
->> +    sysfs_path =3D g_strdup_printf("/sys/class/dax/%s", dev_name);
->> +    if (access(sysfs_path, F_OK)) {
->> +        goto out;
->> +    }
->> +
->> +    is_dax =3D true;
->> +
->
->
-> So only dax raw disk has write-persistence guaranty=EF=BC=8C a pre-alloca=
-ted
-> file which locates on a DAX-enabled filesystem can not?
+I'm fine with 3 or 4 generally. But pls note that if the ring crosses a
+page boundary (e.g. ring size > page size) and when not using
+hugetlbfs, there is no guarantee a single DMA address covers the
+whole ring.
 
-Correct, it is not guaranteed by any existing filesystem. It may work
-by accident today on ext4 with a pre-allocated file, but a filesystem
-is otherwise permitted to drop any writes that have not been synced.
-Until we get an explicit MMAP_SYNC or METADATA_IMMUTABLE feature into
-a filesystem the only interface that we can use to reliably pass
-persistent memory through to a guest is device-dax.
+> > 
+> > > 
+> > > Signed-off-by: Maxime Coquelin <maxime.coquelin@redhat.com>
+> > > ---
+> > > v2:
+> > >   - Revert back to existing behaviour, i.e. only send IOTLB updates
+> > > at ring enablement time, not at ring address setting time (mst).
+> > >   - Extend IOTLB misses to all ring addresses, not only used ring.
+> > > 
+> > >   hw/virtio/vhost.c | 8 ++++++--
+> > >   1 file changed, 6 insertions(+), 2 deletions(-)
+> > > 
+> > > diff --git a/hw/virtio/vhost.c b/hw/virtio/vhost.c
+> > > index 6eddb09..7867034 100644
+> > > --- a/hw/virtio/vhost.c
+> > > +++ b/hw/virtio/vhost.c
+> > > @@ -1552,11 +1552,15 @@ int vhost_dev_start(struct vhost_dev *hdev, VirtIODevice *vdev)
+> > >       if (vhost_dev_has_iommu(hdev)) {
+> > >           hdev->vhost_ops->vhost_set_iotlb_callback(hdev, true);
+> > > -        /* Update used ring information for IOTLB to work correctly,
+> > > -         * vhost-kernel code requires for this.*/
+> > > +        /*
+> > > +         * Update rings information for IOTLB to work correctly,
+> > > +         * vhost-kernel and vhost-user codes require for this.
+> > 
+> > Better just say "Update ring info for vhost iotlb."
+> > 
+> > The rest isn't really informative.
+> 
+> Ok.
+> 
+> > 
+> > 
+> > 
+> > > +         */
+> > >           for (i = 0; i < hdev->nvqs; ++i) {
+> > >               struct vhost_virtqueue *vq = hdev->vqs + i;
+> > >               vhost_device_iotlb_miss(hdev, vq->used_phys, true);
+> > > +            vhost_device_iotlb_miss(hdev, vq->desc_phys, true);
+> > > +            vhost_device_iotlb_miss(hdev, vq->avail_phys, true);
+> > 
+> > So I don't remember why does vhost in kernel want miss on used
+> > at start time.
+> > 
+> > Jason, could you comment on this please?
+> > 
+> > 
+> > 
+> > >           }
+> > >       }
+> > >       return 0;
+> > > -- 
+> > > 2.9.4
+> 
+> Thanks,
+> Maxime
