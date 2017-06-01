@@ -1,29 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52373)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52791)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yang.zhong@intel.com>) id 1dGOqg-00024G-Dc
-	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 08:05:07 -0400
+	(envelope-from <sameeh@daynix.com>) id 1dGOsm-0002o0-8D
+	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 08:07:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yang.zhong@intel.com>) id 1dGOqc-0002Zf-JX
-	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 08:05:06 -0400
-Received: from mga09.intel.com ([134.134.136.24]:42151)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <yang.zhong@intel.com>)
-	id 1dGOqc-0002ZI-Aj
-	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 08:05:02 -0400
-Date: Thu, 1 Jun 2017 20:04:54 +0800
-From: Zhong Yang <yang.zhong@intel.com>
-Message-ID: <20170601120454.GB18829@yangzhon-Virtual>
-References: <1496212144-14947-1-git-send-email-yang.zhong@intel.com>
-	<c5d963e7-ef71-0ed5-aaae-01d492e4fd8b@redhat.com>
-	<20170601052736.GA17625@yangzhon-Virtual>
-	<fc8f01b6-5b87-bd9e-0648-b489e00a6dfe@redhat.com>
+	(envelope-from <sameeh@daynix.com>) id 1dGOsi-0002vY-VF
+	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 08:07:16 -0400
+Received: from mail-vk0-x244.google.com ([2607:f8b0:400c:c05::244]:33867)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <sameeh@daynix.com>) id 1dGOsi-0002vC-N4
+	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 08:07:12 -0400
+Received: by mail-vk0-x244.google.com with SMTP id w1so2627024vkd.1
+	for <qemu-devel@nongnu.org>; Thu, 01 Jun 2017 05:07:11 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <fc8f01b6-5b87-bd9e-0648-b489e00a6dfe@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 0/6] tcg: move the tcg files into tcg/
- subdirectory.
+In-Reply-To: <CAKPgXcH=VQ4aeP9X_GR5ZYtzJ2zS3Uru9JhWXJVgTne8nwbdQQ@mail.gmail.com>
+References: <1493299264-10669-1-git-send-email-daniel@daynix.com>
+	<1493299264-10669-2-git-send-email-daniel@daynix.com>
+	<CAKPgXcHb2TXibijvRQZnYBsyACKmDArvZoEaNBprdkVqqDqsZA@mail.gmail.com>
+	<CAKPgXcH=VQ4aeP9X_GR5ZYtzJ2zS3Uru9JhWXJVgTne8nwbdQQ@mail.gmail.com>
+From: Sameeh Jubran <sameeh@daynix.com>
+Date: Thu, 1 Jun 2017 15:07:10 +0300
+Message-ID: <CAKPgXcGw4CnLnmyihQTCObnoLppw1XzrxWcwNE86dwUEXKsQ=Q@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v2 1/1] qga-win: fix installation on
+ localized windows
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,55 +31,143 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Eric Blake <eblake@redhat.com>, Laurent Desnogues <laurent.desnogues@gmail.com>, anthony.xu@intel.com, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+To: Daniel Rempel <daniel@daynix.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Dmitry Fleytman <dmitry@daynix.com>, Yan Vugenfirer <yan@daynix.com>, Michael Roth <mdroth@linux.vnet.ibm.com>
 
-On Thu, Jun 01, 2017 at 10:14:34AM +0200, Paolo Bonzini wrote:
-> 
-> 
-> On 01/06/2017 07:27, Zhong Yang wrote:
-> >   In the first phase, there are three patchsets to
-> >   deal with split code and separate the files.
-> >   1) split the tcg exec code.
-> >      a)split the tcg accelerators from accel.c file and re-name
-> >        tcg accelerator to tcg-all.c, like kvm-all.c did.
-> >      b)create one accel directory, which will include kvm,
-> >        tcg and general exec files.
-> >      c)move tcg exec files into ./accel/tcg directory.
-> >   2) move tcg related backend files into tcg/ directory
-> >      those files include translate-all.(ch), translate-common.c,
-> >      tci.c and tcg-runtime.c.
-> >   3) move kvm exec and exec.c file.
-> >      a)move kvm related exec files into ./accel/kvm directory.
-> >      b)move exec.c in ./accel directory.
-> > 
-> >   after 1) and 3) done, the file tree like below:
-> >   accel/
-> >   ├── accel.c
-> >   ├── exec.c
-> >   ├── kvm
-> >   │   ├── kvm-all.c
-> >   │   ├── kvm-stub.c
-> >   │   ├── Makefile.objs
-> >   │   └── trace-events
-> >   ├── Makefile.objs
-> >   └── tcg
-> >       ├── cpu-exec.c
-> >       ├── cpu-exec-common.c
-> >       ├── cputlb.c
-> >       ├── Makefile.objs
-> >       ├── tcg-all.c
-> >       └── trace-events
-> >   
-> >   please help me check whether this kind of arrange is suitable? 
-> 
-> Oh, I see now.  I think translate-all.[ch] and translate-common.c belong
-> in accel/tcg more than tcg/.
+Can someone review this patch please?
 
-  okay, i will make those changes into one patchset and send v3 to all, thanks!
+On Thu, May 25, 2017 at 2:06 PM, Sameeh Jubran <sameeh@daynix.com> wrote:
 
-  Yang.
-> 
-> Thanks,
-> 
-> Paolo
+> Ping
+>
+> On Sun, May 14, 2017 at 3:53 PM, Sameeh Jubran <sameeh@daynix.com> wrote:
+>
+>> Reviewed-by: Sameeh Jubran <sameeh@daynix.com>
+>>
+>> On Thu, Apr 27, 2017 at 4:21 PM, Daniel Rempel <daniel@daynix.com> wrote:
+>>
+>>> Bug: https://bugzilla.redhat.com/show_bug.cgi?id=1357789
+>>> Replace hardcoded user and group names ("Administrators", "SYSTEM") with
+>>> the ones acquired from system. Windows uses localized strings for these
+>>> names and it may cause the installation to fail.
+>>> Windows has Well-known SIDs for "Administrators" group and "SYSTEM" user
+>>> so they were used to identify required users and groups.
+>>> Well-known SIDs: https://support.microsoft.com/
+>>> en-us/help/243330/well-known-security-identifiers-in-windows
+>>> -operating-systems
+>>>
+>>> Signed-off-by: Daniel Rempel <daniel@daynix.com>
+>>> ---
+>>>  qga/vss-win32/install.cpp | 35 +++++++++++++++++++++++++++++++++--
+>>>  1 file changed, 33 insertions(+), 2 deletions(-)
+>>>
+>>> diff --git a/qga/vss-win32/install.cpp b/qga/vss-win32/install.cpp
+>>> index f4160a3..1be482a 100644
+>>> --- a/qga/vss-win32/install.cpp
+>>> +++ b/qga/vss-win32/install.cpp
+>>> @@ -18,6 +18,9 @@
+>>>  #include <wbemidl.h>
+>>>  #include <comdef.h>
+>>>  #include <comutil.h>
+>>> +#include <sddl.h>
+>>> +
+>>> +#define BUFFER_SIZE 1024
+>>>
+>>>  extern HINSTANCE g_hinstDll;
+>>>
+>>> @@ -135,6 +138,27 @@ out:
+>>>      return hr;
+>>>  }
+>>>
+>>> +/* Acquire group or user name by SID */
+>>> +static HRESULT getNameByStringSID(
+>>> +    const wchar_t *sid, LPWSTR buffer, LPDWORD bufferLen)
+>>> +{
+>>> +    HRESULT hr = S_OK;
+>>> +    PSID psid = NULL;
+>>> +    SID_NAME_USE groupType;
+>>> +    DWORD domainNameLen = BUFFER_SIZE;
+>>> +    wchar_t domainName[BUFFER_SIZE];
+>>> +
+>>> +    chk(ConvertStringSidToSidW(sid, &psid));
+>>> +    LookupAccountSidW(NULL, psid, buffer, bufferLen,
+>>> +                domainName, &domainNameLen, &groupType);
+>>> +    hr = HRESULT_FROM_WIN32(GetLastError());
+>>> +
+>>> +    LocalFree(psid);
+>>> +
+>>> +out:
+>>> +    return hr;
+>>> +}
+>>> +
+>>>  /* Find and iterate QGA VSS provider in COM+ Application Catalog */
+>>>  static HRESULT QGAProviderFind(
+>>>      HRESULT (*found)(ICatalogCollection *, int, void *), void *arg)
+>>> @@ -216,6 +240,10 @@ STDAPI COMRegister(void)
+>>>      CHAR dllPath[MAX_PATH], tlbPath[MAX_PATH];
+>>>      bool unregisterOnFailure = false;
+>>>      int count = 0;
+>>> +    DWORD bufferLen = BUFFER_SIZE;
+>>> +    wchar_t buffer[BUFFER_SIZE];
+>>> +    const wchar_t *administratorsGroupSID = L"S-1-5-32-544";
+>>> +    const wchar_t *systemUserSID = L"S-1-5-18";
+>>>
+>>>      if (!g_hinstDll) {
+>>>          errmsg(E_FAIL, "Failed to initialize DLL");
+>>> @@ -284,11 +312,12 @@ STDAPI COMRegister(void)
+>>>
+>>>      /* Setup roles of the applicaion */
+>>>
+>>> +    chk(getNameByStringSID(administratorsGroupSID, buffer,
+>>> &bufferLen));
+>>>      chk(pApps->GetCollection(_bstr_t(L"Roles"), key,
+>>>                               (IDispatch **)pRoles.replace()));
+>>>      chk(pRoles->Populate());
+>>>      chk(pRoles->Add((IDispatch **)pObj.replace()));
+>>> -    chk(put_Value(pObj, L"Name",        L"Administrators"));
+>>> +    chk(put_Value(pObj, L"Name", buffer));
+>>>      chk(put_Value(pObj, L"Description", L"Administrators group"));
+>>>      chk(pRoles->SaveChanges(&n));
+>>>      chk(pObj->get_Key(&key));
+>>> @@ -303,8 +332,10 @@ STDAPI COMRegister(void)
+>>>      chk(GetAdminName(&name));
+>>>      chk(put_Value(pObj, L"User", _bstr_t(".\\") + name));
+>>>
+>>> +    bufferLen = BUFFER_SIZE;
+>>> +    chk(getNameByStringSID(systemUserSID, buffer, &bufferLen));
+>>>      chk(pUsersInRole->Add((IDispatch **)pObj.replace()));
+>>> -    chk(put_Value(pObj, L"User", L"SYSTEM"));
+>>> +    chk(put_Value(pObj, L"User", buffer));
+>>>      chk(pUsersInRole->SaveChanges(&n));
+>>>
+>>>  out:
+>>> --
+>>> 2.9.3
+>>>
+>>>
+>>>
+>>
+>>
+>> --
+>> Respectfully,
+>> *Sameeh Jubran*
+>> *Linkedin <https://il.linkedin.com/pub/sameeh-jubran/87/747/a8a>*
+>> *Software Engineer @ Daynix <http://www.daynix.com>.*
+>>
+>
+>
+>
+> --
+> Respectfully,
+> *Sameeh Jubran*
+> *Linkedin <https://il.linkedin.com/pub/sameeh-jubran/87/747/a8a>*
+> *Software Engineer @ Daynix <http://www.daynix.com>.*
+>
+
+
+
+-- 
+Respectfully,
+*Sameeh Jubran*
+*Linkedin <https://il.linkedin.com/pub/sameeh-jubran/87/747/a8a>*
+*Software Engineer @ Daynix <http://www.daynix.com>.*
