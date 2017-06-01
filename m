@@ -1,25 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56329)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57167)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1dGPAt-0006nQ-TY
-	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 08:26:01 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1dGPD5-0007vF-TN
+	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 08:28:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1dGPAq-0000pz-PY
-	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 08:25:59 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:56410)
+	(envelope-from <dgilbert@redhat.com>) id 1dGPD2-0001u7-Qu
+	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 08:28:15 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:38048)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1dGPAq-0000pA-BW
-	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 08:25:56 -0400
-References: <20170601112241.2580-1-ard.biesheuvel@linaro.org>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <ccc0e728-0348-e386-6f71-0c1c69eaa01d@redhat.com>
-Date: Thu, 1 Jun 2017 14:25:48 +0200
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dGPD2-0001sF-Ia
+	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 08:28:12 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id A584C3DBEC
+	for <qemu-devel@nongnu.org>; Thu,  1 Jun 2017 12:28:11 +0000 (UTC)
+Date: Thu, 1 Jun 2017 13:28:05 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170601122805.GL2083@work-vm>
+References: <20170531103509.22021-1-quintela@redhat.com>
+	<20170531103509.22021-4-quintela@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20170601112241.2580-1-ard.biesheuvel@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC PATCH] OvmfPkg/AcpiPlatformDxe: lift 4 GB
- alloc limit for modern ACPI systems
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170531103509.22021-4-quintela@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 03/10] migration: Export exec.c
+ functions in its own file
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,155 +34,95 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Ard Biesheuvel <ard.biesheuvel@linaro.org>, edk2-devel@lists.01.org
-Cc: leif.lindholm@linaro.org, jordan.l.justen@intel.com, Shannon Zhao <zhaoshenglong@huawei.com>, "Michael S. Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>, qemu devel list <qemu-devel@nongnu.org>, gengdongjiu <gengdongjiu@huawei.com>, Drew Jones <drjones@redhat.com>
+To: Juan Quintela <quintela@redhat.com>
+Cc: qemu-devel@nongnu.org, lvivier@redhat.com, peterx@redhat.com
 
-On 06/01/17 13:22, Ard Biesheuvel wrote:
-> ACPI supports architectures such as arm64, which did not exist when the
-> original 32-bit ACPI 1.0 was introduced. These days, ACPI tables can all
-> support 64-bit memory addresses, and so QEMU has been updated to emit
-> 64-bit table and entry point types on arm64/mach-virt.
+* Juan Quintela (quintela@redhat.com) wrote:
 
-Do you have commit cb51ac2ffe36 ("hw/arm/virt: generate 64-bit
-addressable ACPI objects", 2017-04-10) in mind?
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 
-> 
-> For the UEFI side, this means we no longer have to serve allocation
-> requests from the 32-bit addressable region. So lift this restriction
-> when the platform has been configured without ACPI 1.0b support.
-> 
-> Contributed-under: TianoCore Contribution Agreement 1.0
-> Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+> Signed-off-by: Juan Quintela <quintela@redhat.com>
 > ---
+>  include/migration/migration.h |  4 ----
+>  migration/exec.c              |  1 +
+>  migration/exec.h              | 26 ++++++++++++++++++++++++++
+>  migration/migration.c         |  1 +
+>  4 files changed, 28 insertions(+), 4 deletions(-)
+>  create mode 100644 migration/exec.h
 > 
-> This is an RFC because this change breaks compatibility with older versions
-> of QEMU. At the least, this means I should sit on this patch for another
-> while, but perhaps it also means we need some runtime logic to detect which
-> QEMU we are dealing with? Comments welcome.
+> diff --git a/include/migration/migration.h b/include/migration/migration.h
+> index d1a353a..d04f045 100644
+> --- a/include/migration/migration.h
+> +++ b/include/migration/migration.h
+> @@ -163,10 +163,6 @@ void migration_tls_channel_connect(MigrationState *s,
+>  
+>  uint64_t migrate_max_downtime(void);
+>  
+> -void exec_start_incoming_migration(const char *host_port, Error **errp);
+> -
+> -void exec_start_outgoing_migration(MigrationState *s, const char *host_port, Error **errp);
+> -
+>  void tcp_start_incoming_migration(const char *host_port, Error **errp);
+>  
+>  void tcp_start_outgoing_migration(MigrationState *s, const char *host_port, Error **errp);
+> diff --git a/migration/exec.c b/migration/exec.c
+> index 57a9335..9077024 100644
+> --- a/migration/exec.c
+> +++ b/migration/exec.c
+> @@ -21,6 +21,7 @@
+>  #include "qapi/error.h"
+>  #include "qemu-common.h"
+>  #include "channel.h"
+> +#include "exec.h"
+>  #include "migration/migration.h"
+>  #include "io/channel-command.h"
+>  #include "trace.h"
+> diff --git a/migration/exec.h b/migration/exec.h
+> new file mode 100644
+> index 0000000..b210ffd
+> --- /dev/null
+> +++ b/migration/exec.h
+> @@ -0,0 +1,26 @@
+> +/*
+> + * QEMU live migration
+> + *
+> + * Copyright IBM, Corp. 2008
+> + * Copyright Dell MessageOne 2008
+> + * Copyright Red Hat, Inc. 2015-2016
+> + *
+> + * Authors:
+> + *  Anthony Liguori   <aliguori@us.ibm.com>
+> + *  Charles Duffy     <charles_duffy@messageone.com>
+> + *  Daniel P. Berrange <berrange@redhat.com>
+> + *
+> + * This work is licensed under the terms of the GNU GPL, version 2.  See
+> + * the COPYING file in the top-level directory.
+> + *
+> + * Contributions after 2012-01-13 are licensed under the terms of the
+> + * GNU GPL, version 2 or (at your option) any later version.
+> + */
+> +
+> +#ifndef QEMU_MIGRATION_EXEC_H
+> +#define QEMU_MIGRATION_EXEC_H
+> +void exec_start_incoming_migration(const char *host_port, Error **errp);
+> +
+> +void exec_start_outgoing_migration(MigrationState *s, const char *host_port,
+> +                                   Error **errp);
+> +#endif
+> diff --git a/migration/migration.c b/migration/migration.c
+> index ea61650..31fa56f 100644
+> --- a/migration/migration.c
+> +++ b/migration/migration.c
+> @@ -18,6 +18,7 @@
+>  #include "qemu/error-report.h"
+>  #include "qemu/main-loop.h"
+>  #include "migration/blocker.h"
+> +#include "exec.h"
+>  #include "migration/migration.h"
+>  #include "savevm.h"
+>  #include "qemu-file-channel.h"
+> -- 
+> 2.9.4
 > 
->  OvmfPkg/AcpiPlatformDxe/AcpiPlatformDxe.inf          |  3 +++
->  OvmfPkg/AcpiPlatformDxe/QemuFwCfgAcpi.c              | 13 +++++++++++--
->  OvmfPkg/AcpiPlatformDxe/QemuFwCfgAcpiPlatformDxe.inf |  3 +++
->  3 files changed, 17 insertions(+), 2 deletions(-)
-
-I guess by compat breakage, you mean the case when new ArmVirtQemu (with
-this patch) is booted on old QEMU (which lacks commit cb51ac2ffe36) --
-the 64-bit allocation addresses might not fit into the 4-byte fields
-generated by QEMU.
-
-Since your QEMU patch (which I did ACK), I've given more thought to the
-QEMU_LOADER_ALLOCATE linker/loader command. See bullet (68) in:
-
-
-http://mid.mail-archive.com/accf8880-f4b0-85f1-9f33-4103c8c26d7a@redhat.com
-
-There are now two reasons to extend the Zone field's meaning:
-
-- The first reason is that the most significant bit in Zone could be
-repurposed to suppress the SDT header probing implemented in
-OvmfPkg/AcpiPlatformDxe, in the Process2ndPassCmdAddPointer() function.
-
-- The second reason is that a new value in Zone (with the msb masked
-off), say QemuLoaderAlloc64Bit=3, could be used to lift the 32-bit
-allocation limit explicitly.
-
-In QEMU, we could tie both of these extensions to new machine types.
-
-The result would be:
-
-  firmware  QEMU  QEMU machine type  result
-  --------  ----  -----------------  -----------------------------------
-  old       new   old                allocate blobs under 4GB
-  old       new   new                breakage, but that's OK, we can
-                                       require refreshed firmware for
-                                       new machine types
-  new       old   old                allocate blobs under 4GB
-  new       new   old                allocate blobs under 4GB
-  new       new   new                allocate blobs from 64-bit space
-
-... I guess my proposal might be a bit unpolished (and certainly
-diverges from your original QEMU commit cb51ac2ffe36), but at this
-point, the need for further *explicit* hints in the ALLOC command is
-just too obvious to pass them up.
-
-Again, the first extension would be setting aside bit 7, to signify
-"this blob contains no ACPI tables", and the second extension would be a
-new zone value (3) to mean "allocate from 64-bit address space".
-
-The first extension would be used by both x86 and arm machine types
-(2.10+ only), and the second extension would only be used by 2.10+ arm
-machine types.
-
-What do you think? Can we discuss both of these Zone extensions on
-qemu-devel as well? Adding qemu-devel, Shannon, Michael, Igor, Drew, and
-Dongjiu Geng.
-
-Thanks
-Laszlo
-
-> diff --git a/OvmfPkg/AcpiPlatformDxe/AcpiPlatformDxe.inf b/OvmfPkg/AcpiPlatformDxe/AcpiPlatformDxe.inf
-> index 9a9b2e6bb2e5..9b883871bc23 100644
-> --- a/OvmfPkg/AcpiPlatformDxe/AcpiPlatformDxe.inf
-> +++ b/OvmfPkg/AcpiPlatformDxe/AcpiPlatformDxe.inf
-> @@ -73,5 +73,8 @@ [Pcd]
->    gPcAtChipsetPkgTokenSpaceGuid.Pcd8259LegacyModeEdgeLevel
->    gUefiOvmfPkgTokenSpaceGuid.PcdOvmfFdBaseAddress
->  
-> +[FixedPcd]
-> +  gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiExposedTableVersions
-> +
->  [Depex]
->    gEfiAcpiTableProtocolGuid
-> diff --git a/OvmfPkg/AcpiPlatformDxe/QemuFwCfgAcpi.c b/OvmfPkg/AcpiPlatformDxe/QemuFwCfgAcpi.c
-> index 1bc5fe297a96..97632bc636c0 100644
-> --- a/OvmfPkg/AcpiPlatformDxe/QemuFwCfgAcpi.c
-> +++ b/OvmfPkg/AcpiPlatformDxe/QemuFwCfgAcpi.c
-> @@ -24,6 +24,7 @@
->  #include <Library/PcdLib.h>
->  #include <Library/OrderedCollectionLib.h>
->  #include <IndustryStandard/Acpi.h>
-> +#include <Protocol/AcpiSystemDescriptionTable.h>
->  
->  
->  //
-> @@ -173,6 +174,7 @@ ProcessCmdAllocate (
->    UINTN                NumPages;
->    EFI_PHYSICAL_ADDRESS Address;
->    BLOB                 *Blob;
-> +  EFI_ALLOCATE_TYPE    AllocType;
->  
->    if (Allocate->File[QEMU_LOADER_FNAME_SIZE - 1] != '\0') {
->      DEBUG ((EFI_D_ERROR, "%a: malformed file name\n", __FUNCTION__));
-> @@ -192,9 +194,16 @@ ProcessCmdAllocate (
->      return Status;
->    }
->  
-> +  if ((FixedPcdGet32 (PcdAcpiExposedTableVersions) &
-> +       EFI_ACPI_TABLE_VERSION_1_0B) != 0) {
-> +    Address = 0xFFFFFFFF;
-> +    AllocType = AllocateMaxAddress;
-> +  } else {
-> +    AllocType = AllocateAnyPages;
-> +  }
-> +
->    NumPages = EFI_SIZE_TO_PAGES (FwCfgSize);
-> -  Address = 0xFFFFFFFF;
-> -  Status = gBS->AllocatePages (AllocateMaxAddress, EfiACPIMemoryNVS, NumPages,
-> +  Status = gBS->AllocatePages (AllocType, EfiACPIMemoryNVS, NumPages,
->                    &Address);
->    if (EFI_ERROR (Status)) {
->      return Status;
-> diff --git a/OvmfPkg/AcpiPlatformDxe/QemuFwCfgAcpiPlatformDxe.inf b/OvmfPkg/AcpiPlatformDxe/QemuFwCfgAcpiPlatformDxe.inf
-> index adc50cfd9f76..64db80dd9cbc 100644
-> --- a/OvmfPkg/AcpiPlatformDxe/QemuFwCfgAcpiPlatformDxe.inf
-> +++ b/OvmfPkg/AcpiPlatformDxe/QemuFwCfgAcpiPlatformDxe.inf
-> @@ -58,5 +58,8 @@ [Guids]
->  [Pcd]
->    gEfiMdeModulePkgTokenSpaceGuid.PcdPciDisableBusEnumeration
->  
-> +[FixedPcd]
-> +  gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiExposedTableVersions
-> +
->  [Depex]
->    gEfiAcpiTableProtocolGuid
-> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
