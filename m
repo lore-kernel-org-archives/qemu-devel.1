@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59645)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59715)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1dGPQc-0003cX-3I
-	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 08:42:16 -0400
+	(envelope-from <paolo.bonzini@gmail.com>) id 1dGPQg-0003nl-Fa
+	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 08:42:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1dGPQX-0005jA-5u
-	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 08:42:14 -0400
-Received: from mail-wm0-x244.google.com ([2a00:1450:400c:c09::244]:36278)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1dGPQe-0005kt-CQ
+	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 08:42:18 -0400
+Received: from mail-wm0-x234.google.com ([2a00:1450:400c:c09::234]:38327)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1dGPQW-0005j1-QG
-	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 08:42:09 -0400
-Received: by mail-wm0-x244.google.com with SMTP id k15so11049168wmh.3
-	for <qemu-devel@nongnu.org>; Thu, 01 Jun 2017 05:42:08 -0700 (PDT)
+	id 1dGPQe-0005kg-1X
+	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 08:42:16 -0400
+Received: by mail-wm0-x234.google.com with SMTP id n195so30608825wmg.1
+	for <qemu-devel@nongnu.org>; Thu, 01 Jun 2017 05:42:15 -0700 (PDT)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Thu,  1 Jun 2017 14:41:29 +0200
-Message-Id: <1496320911-51305-12-git-send-email-pbonzini@redhat.com>
+Date: Thu,  1 Jun 2017 14:41:35 +0200
+Message-Id: <1496320911-51305-18-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1496320911-51305-1-git-send-email-pbonzini@redhat.com>
 References: <1496320911-51305-1-git-send-email-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PULL 11/33] nbd: read_sync and friends: return 0 on
- success
+Subject: [Qemu-devel] [PULL 17/33] vhost-user-scsi: Introduce
+ vhost-user-scsi host device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,607 +29,480 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Cc: Felipe Franciosi <felipe@nutanix.com>
 
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+From: Felipe Franciosi <felipe@nutanix.com>
 
-functions read_sync, drop_sync, write_sync, and also
-nbd_negotiate_write, nbd_negotiate_read, nbd_negotiate_drop_sync
-returns number of processed bytes. But what this number can be,
-except requested number of bytes?
+This commit introduces a vhost-user device for SCSI. This is based
+on the existing vhost-scsi implementation, but done over vhost-user
+instead. It also uses a chardev to connect to the backend. Unlike
+vhost-scsi (today), VMs using vhost-user-scsi can be live migrated.
 
-Actually, underlying nbd_wr_syncv function returns a value >= 0 and
-!= requested_bytes only on eof on read operation. So, firstly, it is
-impossible on write (let's add an assert) and on read it actually
-means, that communication is broken (except nbd_receive_reply, see
-below).
+To use it, start Qemu with a command line equivalent to:
 
-Most of callers operate like this:
-   if (func(..., size) != size) {
-       /* error path */
-   }
-, i.e.:
-  1. They are not interested in partial success
-  2. Extra duplications in code (especially bad are duplications of
-     magic numbers)
-  3. User doesn't see actual error message, as return code is lost.
-     (this patch doesn't fix this point, but it makes fixing easier)
+qemu-system-x86_64 \
+       -chardev socket,id=vus0,path=/tmp/vus.sock \
+       -device vhost-user-scsi-pci,chardev=vus0,bus=pci.0,addr=...
 
-Several callers handles ret >= 0 and != requested-size separately, by
-just returning EINVAL in this case. This patch makes read_sync and
-friends return EINVAL in this case, so final behavior is the same.
+A separate commit presents a sample application linked with libiscsi to
+provide a backend for vhost-user-scsi.
 
-And only one caller - nbd_receive_reply() does something not so
-obvious. It returns EINVAL for ret > 0 and != requested-size, like
-previous group, but for ret == 0 it returns 0. The only caller of
-nbd_receive_reply() - nbd_read_reply_entry() handles ret == 0 in the
-same way as ret < 0, so for now it doesn't matter. However, in
-following commits error path handling will be improved and we'll need
-to distinguish success from fail in this case too. So, this patch adds
-separate helper for this case - read_sync_eof.
-
-Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-Id: <20170516094533.6160-3-vsementsov@virtuozzo.com>
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+Signed-off-by: Felipe Franciosi <felipe@nutanix.com>
+Message-Id: <1488479153-21203-4-git-send-email-felipe@nutanix.com>
 ---
- nbd/client.c       | 63 ++++++++++++++++------------------------
- nbd/nbd-internal.h | 34 +++++++++++++++++++---
- nbd/server.c       | 84 +++++++++++++++++++++---------------------------------
- 3 files changed, 88 insertions(+), 93 deletions(-)
+ .gitignore                          |   1 +
+ default-configs/pci.mak             |   1 +
+ default-configs/s390x-softmmu.mak   |   1 +
+ hw/scsi/Makefile.objs               |   1 +
+ hw/scsi/vhost-scsi-common.c         |   1 -
+ hw/scsi/vhost-user-scsi.c           | 211 ++++++++++++++++++++++++++++++++++++
+ hw/virtio/virtio-pci.c              |  54 +++++++++
+ hw/virtio/virtio-pci.h              |  11 ++
+ include/hw/virtio/vhost-user-scsi.h |  35 ++++++
+ include/hw/virtio/virtio-scsi.h     |   2 +
+ 10 files changed, 317 insertions(+), 1 deletion(-)
+ create mode 100644 hw/scsi/vhost-user-scsi.c
+ create mode 100644 include/hw/virtio/vhost-user-scsi.h
 
-diff --git a/nbd/client.c b/nbd/client.c
-index a58fb02..6b74a62 100644
---- a/nbd/client.c
-+++ b/nbd/client.c
-@@ -86,9 +86,9 @@ static QTAILQ_HEAD(, NBDExport) exports = QTAILQ_HEAD_INITIALIZER(exports);
+diff --git a/.gitignore b/.gitignore
+index 55a001e..fa96bd2 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -50,6 +50,7 @@
+ /qemu-version.h.tmp
+ /module_block.h
+ /vscclient
++/vhost-user-scsi
+ /fsdev/virtfs-proxy-helper
+ *.[1-9]
+ *.a
+diff --git a/default-configs/pci.mak b/default-configs/pci.mak
+index 60dc651..1c523b8 100644
+--- a/default-configs/pci.mak
++++ b/default-configs/pci.mak
+@@ -42,3 +42,4 @@ CONFIG_VGA=y
+ CONFIG_VGA_PCI=y
+ CONFIG_IVSHMEM=$(CONFIG_EVENTFD)
+ CONFIG_ROCKER=y
++CONFIG_VHOST_USER_SCSI=$(CONFIG_LINUX)
+diff --git a/default-configs/s390x-softmmu.mak b/default-configs/s390x-softmmu.mak
+index 9615a48..1b8aaa4 100644
+--- a/default-configs/s390x-softmmu.mak
++++ b/default-configs/s390x-softmmu.mak
+@@ -1,5 +1,6 @@
+ CONFIG_PCI=y
+ CONFIG_VIRTIO_PCI=y
++CONFIG_VHOST_USER_SCSI=$(CONFIG_LINUX)
+ CONFIG_VIRTIO=y
+ CONFIG_SCLPCONSOLE=y
+ CONFIG_TERMINAL3270=y
+diff --git a/hw/scsi/Makefile.objs b/hw/scsi/Makefile.objs
+index 54d8754..b188f72 100644
+--- a/hw/scsi/Makefile.objs
++++ b/hw/scsi/Makefile.objs
+@@ -11,4 +11,5 @@ obj-$(CONFIG_PSERIES) += spapr_vscsi.o
+ ifeq ($(CONFIG_VIRTIO),y)
+ obj-y += virtio-scsi.o virtio-scsi-dataplane.o
+ obj-$(CONFIG_VHOST_SCSI) += vhost-scsi-common.o vhost-scsi.o
++obj-$(CONFIG_VHOST_USER_SCSI) += vhost-scsi-common.o vhost-user-scsi.o
+ endif
+diff --git a/hw/scsi/vhost-scsi-common.c b/hw/scsi/vhost-scsi-common.c
+index e41c031..d434b3e 100644
+--- a/hw/scsi/vhost-scsi-common.c
++++ b/hw/scsi/vhost-scsi-common.c
+@@ -16,7 +16,6 @@
+  */
  
- */
- 
--/* Discard length bytes from channel.  Return -errno on failure, or
-- * the amount of bytes consumed. */
--static ssize_t drop_sync(QIOChannel *ioc, size_t size)
-+/* Discard length bytes from channel.  Return -errno on failure and 0 on
-+ * success*/
-+static int drop_sync(QIOChannel *ioc, size_t size)
- {
-     ssize_t ret = 0;
-     char small[1024];
-@@ -96,14 +96,13 @@ static ssize_t drop_sync(QIOChannel *ioc, size_t size)
- 
-     buffer = sizeof(small) >= size ? small : g_malloc(MIN(65536, size));
-     while (size > 0) {
--        ssize_t count = read_sync(ioc, buffer, MIN(65536, size));
-+        ssize_t count = MIN(65536, size);
-+        ret = read_sync(ioc, buffer, MIN(65536, size));
- 
--        if (count <= 0) {
-+        if (ret < 0) {
-             goto cleanup;
-         }
--        assert(count <= size);
-         size -= count;
--        ret += count;
-     }
- 
-  cleanup:
-@@ -136,12 +135,12 @@ static int nbd_send_option_request(QIOChannel *ioc, uint32_t opt,
-     stl_be_p(&req.option, opt);
-     stl_be_p(&req.length, len);
- 
--    if (write_sync(ioc, &req, sizeof(req)) != sizeof(req)) {
-+    if (write_sync(ioc, &req, sizeof(req)) < 0) {
-         error_setg(errp, "Failed to send option request header");
-         return -1;
-     }
- 
--    if (len && write_sync(ioc, (char *) data, len) != len) {
-+    if (len && write_sync(ioc, (char *) data, len) < 0) {
-         error_setg(errp, "Failed to send option request data");
-         return -1;
-     }
-@@ -170,7 +169,7 @@ static int nbd_receive_option_reply(QIOChannel *ioc, uint32_t opt,
-                                     nbd_opt_reply *reply, Error **errp)
- {
-     QEMU_BUILD_BUG_ON(sizeof(*reply) != 20);
--    if (read_sync(ioc, reply, sizeof(*reply)) != sizeof(*reply)) {
-+    if (read_sync(ioc, reply, sizeof(*reply)) < 0) {
-         error_setg(errp, "failed to read option reply");
-         nbd_send_opt_abort(ioc);
-         return -1;
-@@ -219,7 +218,7 @@ static int nbd_handle_reply_err(QIOChannel *ioc, nbd_opt_reply *reply,
-             goto cleanup;
-         }
-         msg = g_malloc(reply->length + 1);
--        if (read_sync(ioc, msg, reply->length) != reply->length) {
-+        if (read_sync(ioc, msg, reply->length) < 0) {
-             error_setg(errp, "failed to read option error message");
-             goto cleanup;
-         }
-@@ -321,7 +320,7 @@ static int nbd_receive_list(QIOChannel *ioc, const char *want, bool *match,
-         nbd_send_opt_abort(ioc);
-         return -1;
-     }
--    if (read_sync(ioc, &namelen, sizeof(namelen)) != sizeof(namelen)) {
-+    if (read_sync(ioc, &namelen, sizeof(namelen)) < 0) {
-         error_setg(errp, "failed to read option name length");
-         nbd_send_opt_abort(ioc);
-         return -1;
-@@ -334,7 +333,7 @@ static int nbd_receive_list(QIOChannel *ioc, const char *want, bool *match,
-         return -1;
-     }
-     if (namelen != strlen(want)) {
--        if (drop_sync(ioc, len) != len) {
-+        if (drop_sync(ioc, len) < 0) {
-             error_setg(errp, "failed to skip export name with wrong length");
-             nbd_send_opt_abort(ioc);
-             return -1;
-@@ -343,14 +342,14 @@ static int nbd_receive_list(QIOChannel *ioc, const char *want, bool *match,
-     }
- 
-     assert(namelen < sizeof(name));
--    if (read_sync(ioc, name, namelen) != namelen) {
-+    if (read_sync(ioc, name, namelen) < 0) {
-         error_setg(errp, "failed to read export name");
-         nbd_send_opt_abort(ioc);
-         return -1;
-     }
-     name[namelen] = '\0';
-     len -= namelen;
--    if (drop_sync(ioc, len) != len) {
-+    if (drop_sync(ioc, len) < 0) {
-         error_setg(errp, "failed to read export description");
-         nbd_send_opt_abort(ioc);
-         return -1;
-@@ -477,7 +476,7 @@ int nbd_receive_negotiate(QIOChannel *ioc, const char *name, uint16_t *flags,
-         goto fail;
-     }
- 
--    if (read_sync(ioc, buf, 8) != 8) {
-+    if (read_sync(ioc, buf, 8) < 0) {
-         error_setg(errp, "Failed to read data");
-         goto fail;
-     }
-@@ -503,7 +502,7 @@ int nbd_receive_negotiate(QIOChannel *ioc, const char *name, uint16_t *flags,
-         goto fail;
-     }
- 
--    if (read_sync(ioc, &magic, sizeof(magic)) != sizeof(magic)) {
-+    if (read_sync(ioc, &magic, sizeof(magic)) < 0) {
-         error_setg(errp, "Failed to read magic");
-         goto fail;
-     }
-@@ -515,8 +514,7 @@ int nbd_receive_negotiate(QIOChannel *ioc, const char *name, uint16_t *flags,
-         uint16_t globalflags;
-         bool fixedNewStyle = false;
- 
--        if (read_sync(ioc, &globalflags, sizeof(globalflags)) !=
--            sizeof(globalflags)) {
-+        if (read_sync(ioc, &globalflags, sizeof(globalflags)) < 0) {
-             error_setg(errp, "Failed to read server flags");
-             goto fail;
-         }
-@@ -534,8 +532,7 @@ int nbd_receive_negotiate(QIOChannel *ioc, const char *name, uint16_t *flags,
-         }
-         /* client requested flags */
-         clientflags = cpu_to_be32(clientflags);
--        if (write_sync(ioc, &clientflags, sizeof(clientflags)) !=
--            sizeof(clientflags)) {
-+        if (write_sync(ioc, &clientflags, sizeof(clientflags)) < 0) {
-             error_setg(errp, "Failed to send clientflags field");
-             goto fail;
-         }
-@@ -573,13 +570,13 @@ int nbd_receive_negotiate(QIOChannel *ioc, const char *name, uint16_t *flags,
-         }
- 
-         /* Read the response */
--        if (read_sync(ioc, &s, sizeof(s)) != sizeof(s)) {
-+        if (read_sync(ioc, &s, sizeof(s)) < 0) {
-             error_setg(errp, "Failed to read export length");
-             goto fail;
-         }
-         *size = be64_to_cpu(s);
- 
--        if (read_sync(ioc, flags, sizeof(*flags)) != sizeof(*flags)) {
-+        if (read_sync(ioc, flags, sizeof(*flags)) < 0) {
-             error_setg(errp, "Failed to read export flags");
-             goto fail;
-         }
-@@ -596,14 +593,14 @@ int nbd_receive_negotiate(QIOChannel *ioc, const char *name, uint16_t *flags,
-             goto fail;
-         }
- 
--        if (read_sync(ioc, &s, sizeof(s)) != sizeof(s)) {
-+        if (read_sync(ioc, &s, sizeof(s)) < 0) {
-             error_setg(errp, "Failed to read export length");
-             goto fail;
-         }
-         *size = be64_to_cpu(s);
-         TRACE("Size is %" PRIu64, *size);
- 
--        if (read_sync(ioc, &oldflags, sizeof(oldflags)) != sizeof(oldflags)) {
-+        if (read_sync(ioc, &oldflags, sizeof(oldflags)) < 0) {
-             error_setg(errp, "Failed to read export flags");
-             goto fail;
-         }
-@@ -619,7 +616,7 @@ int nbd_receive_negotiate(QIOChannel *ioc, const char *name, uint16_t *flags,
-     }
- 
-     TRACE("Size is %" PRIu64 ", export flags %" PRIx16, *size, *flags);
--    if (zeroes && drop_sync(ioc, 124) != 124) {
-+    if (zeroes && drop_sync(ioc, 124) < 0) {
-         error_setg(errp, "Failed to read reserved block");
-         goto fail;
-     }
-@@ -744,7 +741,6 @@ int nbd_disconnect(int fd)
- ssize_t nbd_send_request(QIOChannel *ioc, NBDRequest *request)
- {
-     uint8_t buf[NBD_REQUEST_SIZE];
--    ssize_t ret;
- 
-     TRACE("Sending request to server: "
-           "{ .from = %" PRIu64", .len = %" PRIu32 ", .handle = %" PRIu64
-@@ -759,16 +755,7 @@ ssize_t nbd_send_request(QIOChannel *ioc, NBDRequest *request)
-     stq_be_p(buf + 16, request->from);
-     stl_be_p(buf + 24, request->len);
- 
--    ret = write_sync(ioc, buf, sizeof(buf));
--    if (ret < 0) {
--        return ret;
--    }
--
--    if (ret != sizeof(buf)) {
--        LOG("writing to socket failed");
--        return -EINVAL;
--    }
--    return 0;
-+    return write_sync(ioc, buf, sizeof(buf));
- }
- 
- ssize_t nbd_receive_reply(QIOChannel *ioc, NBDReply *reply)
-@@ -777,7 +764,7 @@ ssize_t nbd_receive_reply(QIOChannel *ioc, NBDReply *reply)
-     uint32_t magic;
-     ssize_t ret;
- 
--    ret = read_sync(ioc, buf, sizeof(buf));
-+    ret = read_sync_eof(ioc, buf, sizeof(buf));
-     if (ret <= 0) {
-         return ret;
-     }
-diff --git a/nbd/nbd-internal.h b/nbd/nbd-internal.h
-index f43d990..e6bbc7c 100644
---- a/nbd/nbd-internal.h
-+++ b/nbd/nbd-internal.h
-@@ -94,7 +94,13 @@
- #define NBD_ENOSPC     28
- #define NBD_ESHUTDOWN  108
- 
--static inline ssize_t read_sync(QIOChannel *ioc, void *buffer, size_t size)
-+/* read_sync_eof
-+ * Tries to read @size bytes from @ioc. Returns number of bytes actually read.
-+ * May return a value >= 0 and < size only on EOF, i.e. when iteratively called
-+ * qio_channel_readv() returns 0. So, there are no needs to call read_sync_eof
-+ * iteratively.
+ #include "qemu/osdep.h"
+-#include <linux/vhost.h>
+ #include "qapi/error.h"
+ #include "qemu/error-report.h"
+ #include "migration/migration.h"
+diff --git a/hw/scsi/vhost-user-scsi.c b/hw/scsi/vhost-user-scsi.c
+new file mode 100644
+index 0000000..d27b2ad
+--- /dev/null
++++ b/hw/scsi/vhost-user-scsi.c
+@@ -0,0 +1,211 @@
++/*
++ * vhost-user-scsi host device
++ *
++ * Copyright (c) 2016 Nutanix Inc. All rights reserved.
++ *
++ * Author:
++ *  Felipe Franciosi <felipe@nutanix.com>
++ *
++ * This work is largely based on the "vhost-scsi" implementation by:
++ *  Stefan Hajnoczi    <stefanha@linux.vnet.ibm.com>
++ *  Nicholas Bellinger <nab@risingtidesystems.com>
++ *
++ * This work is licensed under the terms of the GNU LGPL, version 2 or later.
++ * See the COPYING.LIB file in the top-level directory.
++ *
 + */
-+static inline ssize_t read_sync_eof(QIOChannel *ioc, void *buffer, size_t size)
- {
-     struct iovec iov = { .iov_base = buffer, .iov_len = size };
-     /* Sockets are kept in blocking mode in the negotiation phase.  After
-@@ -105,12 +111,32 @@ static inline ssize_t read_sync(QIOChannel *ioc, void *buffer, size_t size)
-     return nbd_wr_syncv(ioc, &iov, 1, size, true);
- }
- 
--static inline ssize_t write_sync(QIOChannel *ioc, const void *buffer,
--                                 size_t size)
-+/* read_sync
-+ * Reads @size bytes from @ioc. Returns 0 on success.
-+ */
-+static inline int read_sync(QIOChannel *ioc, void *buffer, size_t size)
-+{
-+    ssize_t ret = read_sync_eof(ioc, buffer, size);
 +
-+    if (ret >= 0 && ret != size) {
-+        ret = -EINVAL;
++#include "qemu/osdep.h"
++#include "migration/vmstate.h"
++#include "qapi/error.h"
++#include "qemu/error-report.h"
++#include "qemu/typedefs.h"
++#include "qom/object.h"
++#include "hw/fw-path-provider.h"
++#include "hw/qdev-core.h"
++#include "hw/virtio/vhost.h"
++#include "hw/virtio/vhost-backend.h"
++#include "hw/virtio/vhost-user-scsi.h"
++#include "hw/virtio/virtio.h"
++#include "hw/virtio/virtio-access.h"
++#include "sysemu/char.h"
++
++/* Features supported by the host application */
++static const int user_feature_bits[] = {
++    VIRTIO_F_NOTIFY_ON_EMPTY,
++    VIRTIO_RING_F_INDIRECT_DESC,
++    VIRTIO_RING_F_EVENT_IDX,
++    VIRTIO_SCSI_F_HOTPLUG,
++    VHOST_INVALID_FEATURE_BIT
++};
++
++static void vhost_user_scsi_set_status(VirtIODevice *vdev, uint8_t status)
++{
++    VHostUserSCSI *s = (VHostUserSCSI *)vdev;
++    VHostSCSICommon *vsc = VHOST_SCSI_COMMON(s);
++    bool start = (status & VIRTIO_CONFIG_S_DRIVER_OK) && vdev->vm_running;
++
++    if (vsc->dev.started == start) {
++        return;
 +    }
 +
-+    return ret < 0 ? ret : 0;
++    if (start) {
++        int ret;
++
++        ret = vhost_scsi_common_start(vsc);
++        if (ret < 0) {
++            error_report("unable to start vhost-user-scsi: %s", strerror(-ret));
++            exit(1);
++        }
++    } else {
++        vhost_scsi_common_stop(vsc);
++    }
 +}
 +
-+/* write_sync
-+ * Writes @size bytes to @ioc. Returns 0 on success.
++static void vhost_dummy_handle_output(VirtIODevice *vdev, VirtQueue *vq)
++{
++}
++
++static void vhost_user_scsi_save(QEMUFile *f, void *opaque)
++{
++    VirtIODevice *vdev = VIRTIO_DEVICE(opaque);
++    virtio_save(vdev, f);
++}
++
++static int vhost_user_scsi_load(QEMUFile *f, void *opaque, int version_id)
++{
++    VirtIODevice *vdev = VIRTIO_DEVICE(opaque);
++    return virtio_load(vdev, f, version_id);
++}
++
++static void vhost_user_scsi_realize(DeviceState *dev, Error **errp)
++{
++    VirtIOSCSICommon *vs = VIRTIO_SCSI_COMMON(dev);
++    VHostUserSCSI *s = VHOST_USER_SCSI(dev);
++    VHostSCSICommon *vsc = VHOST_SCSI_COMMON(s);
++    static int vhost_user_scsi_id;
++    Error *err = NULL;
++    int ret;
++
++    if (!vs->conf.chardev.chr) {
++        error_setg(errp, "vhost-user-scsi: missing chardev");
++        return;
++    }
++
++    virtio_scsi_common_realize(dev, vhost_dummy_handle_output,
++                               vhost_dummy_handle_output,
++                               vhost_dummy_handle_output, &err);
++    if (err != NULL) {
++        error_propagate(errp, err);
++        return;
++    }
++
++    vsc->dev.nvqs = 2 + vs->conf.num_queues;
++    vsc->dev.vqs = g_new(struct vhost_virtqueue, vsc->dev.nvqs);
++    vsc->dev.vq_index = 0;
++    vsc->dev.backend_features = 0;
++
++    ret = vhost_dev_init(&vsc->dev, (void *)&vs->conf.chardev,
++                         VHOST_BACKEND_TYPE_USER, 0);
++    if (ret < 0) {
++        error_setg(errp, "vhost-user-scsi: vhost initialization failed: %s",
++                   strerror(-ret));
++        return;
++    }
++
++    /* Channel and lun both are 0 for bootable vhost-user-scsi disk */
++    vsc->channel = 0;
++    vsc->lun = 0;
++    vsc->target = vs->conf.boot_tpgt;
++
++    register_savevm(dev, "vhost-user-scsi", vhost_user_scsi_id++, 1,
++                    vhost_user_scsi_save, vhost_user_scsi_load, s);
++}
++
++static void vhost_user_scsi_unrealize(DeviceState *dev, Error **errp)
++{
++    VirtIODevice *vdev = VIRTIO_DEVICE(dev);
++    VHostUserSCSI *s = VHOST_USER_SCSI(dev);
++    VHostSCSICommon *vsc = VHOST_SCSI_COMMON(s);
++
++    /* This will stop the vhost backend. */
++    vhost_user_scsi_set_status(vdev, 0);
++
++    vhost_dev_cleanup(&vsc->dev);
++    g_free(vsc->dev.vqs);
++
++    virtio_scsi_common_unrealize(dev, errp);
++}
++
++static uint64_t vhost_user_scsi_get_features(VirtIODevice *vdev,
++                                             uint64_t features, Error **errp)
++{
++    VHostUserSCSI *s = VHOST_USER_SCSI(vdev);
++
++    /* Turn on predefined features supported by this device */
++    features |= s->host_features;
++
++    return vhost_scsi_common_get_features(vdev, features, errp);
++}
++
++static Property vhost_user_scsi_properties[] = {
++    DEFINE_PROP_CHR("chardev", VirtIOSCSICommon, conf.chardev),
++    DEFINE_PROP_UINT32("boot_tpgt", VirtIOSCSICommon, conf.boot_tpgt, 0),
++    DEFINE_PROP_UINT32("num_queues", VirtIOSCSICommon, conf.num_queues, 1),
++    DEFINE_PROP_UINT32("max_sectors", VirtIOSCSICommon, conf.max_sectors,
++                       0xFFFF),
++    DEFINE_PROP_UINT32("cmd_per_lun", VirtIOSCSICommon, conf.cmd_per_lun, 128),
++    DEFINE_PROP_BIT64("hotplug", VHostUserSCSI, host_features,
++                                                VIRTIO_SCSI_F_HOTPLUG,
++                                                true),
++    DEFINE_PROP_BIT64("param_change", VHostUserSCSI, host_features,
++                                                     VIRTIO_SCSI_F_CHANGE,
++                                                     true),
++    DEFINE_PROP_END_OF_LIST(),
++};
++
++static void vhost_user_scsi_class_init(ObjectClass *klass, void *data)
++{
++    DeviceClass *dc = DEVICE_CLASS(klass);
++    VirtioDeviceClass *vdc = VIRTIO_DEVICE_CLASS(klass);
++    FWPathProviderClass *fwc = FW_PATH_PROVIDER_CLASS(klass);
++
++    dc->props = vhost_user_scsi_properties;
++    set_bit(DEVICE_CATEGORY_STORAGE, dc->categories);
++    vdc->realize = vhost_user_scsi_realize;
++    vdc->unrealize = vhost_user_scsi_unrealize;
++    vdc->get_features = vhost_user_scsi_get_features;
++    vdc->set_config = vhost_scsi_common_set_config;
++    vdc->set_status = vhost_user_scsi_set_status;
++    fwc->get_dev_path = vhost_scsi_common_get_fw_dev_path;
++}
++
++static void vhost_user_scsi_instance_init(Object *obj)
++{
++    VHostSCSICommon *vsc = VHOST_SCSI_COMMON(obj);
++
++    vsc->feature_bits = user_feature_bits;
++
++    /* Add the bootindex property for this object */
++    device_add_bootindex_property(obj, &vsc->bootindex, "bootindex", NULL,
++                                  DEVICE(vsc), NULL);
++}
++
++static const TypeInfo vhost_user_scsi_info = {
++    .name = TYPE_VHOST_USER_SCSI,
++    .parent = TYPE_VHOST_SCSI_COMMON,
++    .instance_size = sizeof(VHostUserSCSI),
++    .class_init = vhost_user_scsi_class_init,
++    .instance_init = vhost_user_scsi_instance_init,
++    .interfaces = (InterfaceInfo[]) {
++        { TYPE_FW_PATH_PROVIDER },
++        { }
++    },
++};
++
++static void virtio_register_types(void)
++{
++    type_register_static(&vhost_user_scsi_info);
++}
++
++type_init(virtio_register_types)
+diff --git a/hw/virtio/virtio-pci.c b/hw/virtio/virtio-pci.c
+index f9b7244..d52faeb 100644
+--- a/hw/virtio/virtio-pci.c
++++ b/hw/virtio/virtio-pci.c
+@@ -2135,6 +2135,59 @@ static const TypeInfo vhost_scsi_pci_info = {
+ };
+ #endif
+ 
++/* vhost-user-scsi-pci */
++static Property vhost_user_scsi_pci_properties[] = {
++    DEFINE_PROP_UINT32("vectors", VirtIOPCIProxy, nvectors,
++                       DEV_NVECTORS_UNSPECIFIED),
++    DEFINE_PROP_END_OF_LIST(),
++};
++
++static void vhost_user_scsi_pci_realize(VirtIOPCIProxy *vpci_dev, Error **errp)
++{
++    VHostUserSCSIPCI *dev = VHOST_USER_SCSI_PCI(vpci_dev);
++    DeviceState *vdev = DEVICE(&dev->vdev);
++    VirtIOSCSICommon *vs = VIRTIO_SCSI_COMMON(vdev);
++
++    if (vpci_dev->nvectors == DEV_NVECTORS_UNSPECIFIED) {
++        vpci_dev->nvectors = vs->conf.num_queues + 3;
++    }
++
++    qdev_set_parent_bus(vdev, BUS(&vpci_dev->bus));
++    object_property_set_bool(OBJECT(vdev), true, "realized", errp);
++}
++
++static void vhost_user_scsi_pci_class_init(ObjectClass *klass, void *data)
++{
++    DeviceClass *dc = DEVICE_CLASS(klass);
++    VirtioPCIClass *k = VIRTIO_PCI_CLASS(klass);
++    PCIDeviceClass *pcidev_k = PCI_DEVICE_CLASS(klass);
++    k->realize = vhost_user_scsi_pci_realize;
++    set_bit(DEVICE_CATEGORY_STORAGE, dc->categories);
++    dc->props = vhost_user_scsi_pci_properties;
++    pcidev_k->vendor_id = PCI_VENDOR_ID_REDHAT_QUMRANET;
++    pcidev_k->device_id = PCI_DEVICE_ID_VIRTIO_SCSI;
++    pcidev_k->revision = 0x00;
++    pcidev_k->class_id = PCI_CLASS_STORAGE_SCSI;
++}
++
++static void vhost_user_scsi_pci_instance_init(Object *obj)
++{
++    VHostUserSCSIPCI *dev = VHOST_USER_SCSI_PCI(obj);
++
++    virtio_instance_init_common(obj, &dev->vdev, sizeof(dev->vdev),
++                                TYPE_VHOST_USER_SCSI);
++    object_property_add_alias(obj, "bootindex", OBJECT(&dev->vdev),
++                              "bootindex", &error_abort);
++}
++
++static const TypeInfo vhost_user_scsi_pci_info = {
++    .name          = TYPE_VHOST_USER_SCSI_PCI,
++    .parent        = TYPE_VIRTIO_PCI,
++    .instance_size = sizeof(VHostUserSCSIPCI),
++    .instance_init = vhost_user_scsi_pci_instance_init,
++    .class_init    = vhost_user_scsi_pci_class_init,
++};
++
+ /* vhost-vsock-pci */
+ 
+ #ifdef CONFIG_VHOST_VSOCK
+@@ -2612,6 +2665,7 @@ static void virtio_pci_register_types(void)
+ #ifdef CONFIG_VHOST_SCSI
+     type_register_static(&vhost_scsi_pci_info);
+ #endif
++    type_register_static(&vhost_user_scsi_pci_info);
+ #ifdef CONFIG_VHOST_VSOCK
+     type_register_static(&vhost_vsock_pci_info);
+ #endif
+diff --git a/hw/virtio/virtio-pci.h b/hw/virtio/virtio-pci.h
+index b095dfc..69f5959 100644
+--- a/hw/virtio/virtio-pci.h
++++ b/hw/virtio/virtio-pci.h
+@@ -26,6 +26,7 @@
+ #include "hw/virtio/virtio-input.h"
+ #include "hw/virtio/virtio-gpu.h"
+ #include "hw/virtio/virtio-crypto.h"
++#include "hw/virtio/vhost-user-scsi.h"
+ 
+ #ifdef CONFIG_VIRTFS
+ #include "hw/9pfs/virtio-9p.h"
+@@ -44,6 +45,7 @@ typedef struct VirtIOBalloonPCI VirtIOBalloonPCI;
+ typedef struct VirtIOSerialPCI VirtIOSerialPCI;
+ typedef struct VirtIONetPCI VirtIONetPCI;
+ typedef struct VHostSCSIPCI VHostSCSIPCI;
++typedef struct VHostUserSCSIPCI VHostUserSCSIPCI;
+ typedef struct VirtIORngPCI VirtIORngPCI;
+ typedef struct VirtIOInputPCI VirtIOInputPCI;
+ typedef struct VirtIOInputHIDPCI VirtIOInputHIDPCI;
+@@ -230,6 +232,15 @@ struct VHostSCSIPCI {
+ };
+ #endif
+ 
++#define TYPE_VHOST_USER_SCSI_PCI "vhost-user-scsi-pci"
++#define VHOST_USER_SCSI_PCI(obj) \
++        OBJECT_CHECK(VHostUserSCSIPCI, (obj), TYPE_VHOST_USER_SCSI_PCI)
++
++struct VHostUserSCSIPCI {
++    VirtIOPCIProxy parent_obj;
++    VHostUserSCSI vdev;
++};
++
+ /*
+  * virtio-blk-pci: This extends VirtioPCIProxy.
+  */
+diff --git a/include/hw/virtio/vhost-user-scsi.h b/include/hw/virtio/vhost-user-scsi.h
+new file mode 100644
+index 0000000..01861f7
+--- /dev/null
++++ b/include/hw/virtio/vhost-user-scsi.h
+@@ -0,0 +1,35 @@
++/*
++ * vhost-user-scsi host device
++ *
++ * Copyright (c) 2016 Nutanix Inc. All rights reserved.
++ *
++ * Author:
++ *  Felipe Franciosi <felipe@nutanix.com>
++ *
++ * This file is largely based on "vhost-scsi.h" by:
++ *  Stefan Hajnoczi   <stefanha@linux.vnet.ibm.com>
++ *
++ * This work is licensed under the terms of the GNU LGPL, version 2 or later.
++ * See the COPYING.LIB file in the top-level directory.
++ *
 + */
-+static inline int write_sync(QIOChannel *ioc, const void *buffer, size_t size)
- {
-     struct iovec iov = { .iov_base = (void *) buffer, .iov_len = size };
- 
--    return nbd_wr_syncv(ioc, &iov, 1, size, false);
-+    ssize_t ret = nbd_wr_syncv(ioc, &iov, 1, size, false);
 +
-+    assert(ret < 0 || ret == size);
++#ifndef VHOST_USER_SCSI_H
++#define VHOST_USER_SCSI_H
 +
-+    return ret < 0 ? ret : 0;
- }
++#include "qemu-common.h"
++#include "hw/qdev.h"
++#include "hw/virtio/virtio-scsi.h"
++#include "hw/virtio/vhost.h"
++#include "hw/virtio/vhost-scsi-common.h"
++
++#define TYPE_VHOST_USER_SCSI "vhost-user-scsi"
++#define VHOST_USER_SCSI(obj) \
++        OBJECT_CHECK(VHostUserSCSI, (obj), TYPE_VHOST_USER_SCSI)
++
++typedef struct VHostUserSCSI {
++    VHostSCSICommon parent_obj;
++    uint64_t host_features;
++} VHostUserSCSI;
++
++#endif /* VHOST_USER_SCSI_H */
+diff --git a/include/hw/virtio/virtio-scsi.h b/include/hw/virtio/virtio-scsi.h
+index eac2013..ca77a42 100644
+--- a/include/hw/virtio/virtio-scsi.h
++++ b/include/hw/virtio/virtio-scsi.h
+@@ -21,6 +21,7 @@
+ #include "hw/virtio/virtio.h"
+ #include "hw/pci/pci.h"
+ #include "hw/scsi/scsi.h"
++#include "sysemu/char.h"
+ #include "sysemu/iothread.h"
  
- struct NBDTLSHandshakeData {
-diff --git a/nbd/server.c b/nbd/server.c
-index 924a1fe..1e1096c 100644
---- a/nbd/server.c
-+++ b/nbd/server.c
-@@ -112,7 +112,7 @@ static gboolean nbd_negotiate_continue(QIOChannel *ioc,
-     return TRUE;
- }
- 
--static ssize_t nbd_negotiate_read(QIOChannel *ioc, void *buffer, size_t size)
-+static int nbd_negotiate_read(QIOChannel *ioc, void *buffer, size_t size)
- {
-     ssize_t ret;
-     guint watch;
-@@ -130,8 +130,7 @@ static ssize_t nbd_negotiate_read(QIOChannel *ioc, void *buffer, size_t size)
- 
- }
- 
--static ssize_t nbd_negotiate_write(QIOChannel *ioc, const void *buffer,
--                                   size_t size)
-+static int nbd_negotiate_write(QIOChannel *ioc, const void *buffer, size_t size)
- {
-     ssize_t ret;
-     guint watch;
-@@ -148,24 +147,24 @@ static ssize_t nbd_negotiate_write(QIOChannel *ioc, const void *buffer,
-     return ret;
- }
- 
--static ssize_t nbd_negotiate_drop_sync(QIOChannel *ioc, size_t size)
-+static int nbd_negotiate_drop_sync(QIOChannel *ioc, size_t size)
- {
--    ssize_t ret, dropped = size;
-+    ssize_t ret;
-     uint8_t *buffer = g_malloc(MIN(65536, size));
- 
-     while (size > 0) {
--        ret = nbd_negotiate_read(ioc, buffer, MIN(65536, size));
-+        size_t count = MIN(65536, size);
-+        ret = nbd_negotiate_read(ioc, buffer, count);
-         if (ret < 0) {
-             g_free(buffer);
-             return ret;
-         }
- 
--        assert(ret <= size);
--        size -= ret;
-+        size -= count;
-     }
- 
-     g_free(buffer);
--    return dropped;
-+    return 0;
- }
- 
- /* Basic flow for negotiation
-@@ -206,22 +205,22 @@ static int nbd_negotiate_send_rep_len(QIOChannel *ioc, uint32_t type,
-           type, opt, len);
- 
-     magic = cpu_to_be64(NBD_REP_MAGIC);
--    if (nbd_negotiate_write(ioc, &magic, sizeof(magic)) != sizeof(magic)) {
-+    if (nbd_negotiate_write(ioc, &magic, sizeof(magic)) < 0) {
-         LOG("write failed (rep magic)");
-         return -EINVAL;
-     }
-     opt = cpu_to_be32(opt);
--    if (nbd_negotiate_write(ioc, &opt, sizeof(opt)) != sizeof(opt)) {
-+    if (nbd_negotiate_write(ioc, &opt, sizeof(opt)) < 0) {
-         LOG("write failed (rep opt)");
-         return -EINVAL;
-     }
-     type = cpu_to_be32(type);
--    if (nbd_negotiate_write(ioc, &type, sizeof(type)) != sizeof(type)) {
-+    if (nbd_negotiate_write(ioc, &type, sizeof(type)) < 0) {
-         LOG("write failed (rep type)");
-         return -EINVAL;
-     }
-     len = cpu_to_be32(len);
--    if (nbd_negotiate_write(ioc, &len, sizeof(len)) != sizeof(len)) {
-+    if (nbd_negotiate_write(ioc, &len, sizeof(len)) < 0) {
-         LOG("write failed (rep data length)");
-         return -EINVAL;
-     }
-@@ -256,7 +255,7 @@ nbd_negotiate_send_rep_err(QIOChannel *ioc, uint32_t type,
-     if (ret < 0) {
-         goto out;
-     }
--    if (nbd_negotiate_write(ioc, msg, len) != len) {
-+    if (nbd_negotiate_write(ioc, msg, len) < 0) {
-         LOG("write failed (error message)");
-         ret = -EIO;
-     } else {
-@@ -287,15 +286,15 @@ static int nbd_negotiate_send_rep_list(QIOChannel *ioc, NBDExport *exp)
-     }
- 
-     len = cpu_to_be32(name_len);
--    if (nbd_negotiate_write(ioc, &len, sizeof(len)) != sizeof(len)) {
-+    if (nbd_negotiate_write(ioc, &len, sizeof(len)) < 0) {
-         LOG("write failed (name length)");
-         return -EINVAL;
-     }
--    if (nbd_negotiate_write(ioc, name, name_len) != name_len) {
-+    if (nbd_negotiate_write(ioc, name, name_len) < 0) {
-         LOG("write failed (name buffer)");
-         return -EINVAL;
-     }
--    if (nbd_negotiate_write(ioc, desc, desc_len) != desc_len) {
-+    if (nbd_negotiate_write(ioc, desc, desc_len) < 0) {
-         LOG("write failed (description buffer)");
-         return -EINVAL;
-     }
-@@ -309,7 +308,7 @@ static int nbd_negotiate_handle_list(NBDClient *client, uint32_t length)
-     NBDExport *exp;
- 
-     if (length) {
--        if (nbd_negotiate_drop_sync(client->ioc, length) != length) {
-+        if (nbd_negotiate_drop_sync(client->ioc, length) < 0) {
-             return -EIO;
-         }
-         return nbd_negotiate_send_rep_err(client->ioc,
-@@ -340,7 +339,7 @@ static int nbd_negotiate_handle_export_name(NBDClient *client, uint32_t length)
-         LOG("Bad length received");
-         goto fail;
-     }
--    if (nbd_negotiate_read(client->ioc, name, length) != length) {
-+    if (nbd_negotiate_read(client->ioc, name, length) < 0) {
-         LOG("read failed");
-         goto fail;
-     }
-@@ -373,7 +372,7 @@ static QIOChannel *nbd_negotiate_handle_starttls(NBDClient *client,
-     TRACE("Setting up TLS");
-     ioc = client->ioc;
-     if (length) {
--        if (nbd_negotiate_drop_sync(ioc, length) != length) {
-+        if (nbd_negotiate_drop_sync(ioc, length) < 0) {
-             return NULL;
-         }
-         nbd_negotiate_send_rep_err(ioc, NBD_REP_ERR_INVALID, NBD_OPT_STARTTLS,
-@@ -437,8 +436,7 @@ static int nbd_negotiate_options(NBDClient *client)
-         ...           Rest of request
-     */
- 
--    if (nbd_negotiate_read(client->ioc, &flags, sizeof(flags)) !=
--        sizeof(flags)) {
-+    if (nbd_negotiate_read(client->ioc, &flags, sizeof(flags)) < 0) {
-         LOG("read failed");
-         return -EIO;
-     }
-@@ -464,8 +462,7 @@ static int nbd_negotiate_options(NBDClient *client)
-         uint32_t clientflags, length;
-         uint64_t magic;
- 
--        if (nbd_negotiate_read(client->ioc, &magic, sizeof(magic)) !=
--            sizeof(magic)) {
-+        if (nbd_negotiate_read(client->ioc, &magic, sizeof(magic)) < 0) {
-             LOG("read failed");
-             return -EINVAL;
-         }
-@@ -476,14 +473,14 @@ static int nbd_negotiate_options(NBDClient *client)
-         }
- 
-         if (nbd_negotiate_read(client->ioc, &clientflags,
--                               sizeof(clientflags)) != sizeof(clientflags)) {
-+                               sizeof(clientflags)) < 0)
-+        {
-             LOG("read failed");
-             return -EINVAL;
-         }
-         clientflags = be32_to_cpu(clientflags);
- 
--        if (nbd_negotiate_read(client->ioc, &length, sizeof(length)) !=
--            sizeof(length)) {
-+        if (nbd_negotiate_read(client->ioc, &length, sizeof(length)) < 0) {
-             LOG("read failed");
-             return -EINVAL;
-         }
-@@ -513,7 +510,7 @@ static int nbd_negotiate_options(NBDClient *client)
-                 return -EINVAL;
- 
-             default:
--                if (nbd_negotiate_drop_sync(client->ioc, length) != length) {
-+                if (nbd_negotiate_drop_sync(client->ioc, length) < 0) {
-                     return -EIO;
-                 }
-                 ret = nbd_negotiate_send_rep_err(client->ioc,
-@@ -551,7 +548,7 @@ static int nbd_negotiate_options(NBDClient *client)
-                 return nbd_negotiate_handle_export_name(client, length);
- 
-             case NBD_OPT_STARTTLS:
--                if (nbd_negotiate_drop_sync(client->ioc, length) != length) {
-+                if (nbd_negotiate_drop_sync(client->ioc, length) < 0) {
-                     return -EIO;
-                 }
-                 if (client->tlscreds) {
-@@ -570,7 +567,7 @@ static int nbd_negotiate_options(NBDClient *client)
-                 }
-                 break;
-             default:
--                if (nbd_negotiate_drop_sync(client->ioc, length) != length) {
-+                if (nbd_negotiate_drop_sync(client->ioc, length) < 0) {
-                     return -EIO;
-                 }
-                 ret = nbd_negotiate_send_rep_err(client->ioc,
-@@ -659,12 +656,12 @@ static coroutine_fn int nbd_negotiate(NBDClientNewData *data)
-             TRACE("TLS cannot be enabled with oldstyle protocol");
-             goto fail;
-         }
--        if (nbd_negotiate_write(client->ioc, buf, sizeof(buf)) != sizeof(buf)) {
-+        if (nbd_negotiate_write(client->ioc, buf, sizeof(buf)) < 0) {
-             LOG("write failed");
-             goto fail;
-         }
-     } else {
--        if (nbd_negotiate_write(client->ioc, buf, 18) != 18) {
-+        if (nbd_negotiate_write(client->ioc, buf, 18) < 0) {
-             LOG("write failed");
-             goto fail;
-         }
-@@ -679,7 +676,7 @@ static coroutine_fn int nbd_negotiate(NBDClientNewData *data)
-         stq_be_p(buf + 18, client->exp->size);
-         stw_be_p(buf + 26, client->exp->nbdflags | myflags);
-         len = client->no_zeroes ? 10 : sizeof(buf) - 18;
--        if (nbd_negotiate_write(client->ioc, buf + 18, len) != len) {
-+        if (nbd_negotiate_write(client->ioc, buf + 18, len) < 0) {
-             LOG("write failed");
-             goto fail;
-         }
-@@ -702,11 +699,6 @@ static ssize_t nbd_receive_request(QIOChannel *ioc, NBDRequest *request)
-         return ret;
-     }
- 
--    if (ret != sizeof(buf)) {
--        LOG("read failed");
--        return -EINVAL;
--    }
--
-     /* Request
-        [ 0 ..  3]   magic   (NBD_REQUEST_MAGIC)
-        [ 4 ..  5]   flags   (NBD_CMD_FLAG_FUA, ...)
-@@ -737,7 +729,6 @@ static ssize_t nbd_receive_request(QIOChannel *ioc, NBDRequest *request)
- static ssize_t nbd_send_reply(QIOChannel *ioc, NBDReply *reply)
- {
-     uint8_t buf[NBD_REPLY_SIZE];
--    ssize_t ret;
- 
-     reply->error = system_errno_to_nbd_errno(reply->error);
- 
-@@ -754,16 +745,7 @@ static ssize_t nbd_send_reply(QIOChannel *ioc, NBDReply *reply)
-     stl_be_p(buf + 4, reply->error);
-     stq_be_p(buf + 8, reply->handle);
- 
--    ret = write_sync(ioc, buf, sizeof(buf));
--    if (ret < 0) {
--        return ret;
--    }
--
--    if (ret != sizeof(buf)) {
--        LOG("writing to socket failed");
--        return -EINVAL;
--    }
--    return 0;
-+    return write_sync(ioc, buf, sizeof(buf));
- }
- 
- #define MAX_NBD_REQUESTS 16
-@@ -1067,7 +1049,7 @@ static ssize_t nbd_co_send_reply(NBDRequestData *req, NBDReply *reply,
-         rc = nbd_send_reply(client->ioc, reply);
-         if (rc >= 0) {
-             ret = write_sync(client->ioc, req->data, len);
--            if (ret != len) {
-+            if (ret < 0) {
-                 rc = -EIO;
-             }
-         }
-@@ -1141,7 +1123,7 @@ static ssize_t nbd_co_receive_request(NBDRequestData *req,
-     if (request->type == NBD_CMD_WRITE) {
-         TRACE("Reading %" PRIu32 " byte(s)", request->len);
- 
--        if (read_sync(client->ioc, req->data, request->len) != request->len) {
-+        if (read_sync(client->ioc, req->data, request->len) < 0) {
-             LOG("reading from socket failed");
-             rc = -EIO;
-             goto out;
+ #define TYPE_VIRTIO_SCSI_COMMON "virtio-scsi-common"
+@@ -53,6 +54,7 @@ struct VirtIOSCSIConf {
+     char *vhostfd;
+     char *wwpn;
+ #endif
++    CharBackend chardev;
+     uint32_t boot_tpgt;
+     IOThread *iothread;
+ };
 -- 
 1.8.3.1
