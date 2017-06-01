@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51609)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51580)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <anton.nefedov@virtuozzo.com>) id 1dGRod-0000Gj-5N
-	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 11:15:17 -0400
+	(envelope-from <anton.nefedov@virtuozzo.com>) id 1dGRob-0000E9-1W
+	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 11:15:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <anton.nefedov@virtuozzo.com>) id 1dGRoa-0004ht-HW
-	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 11:15:11 -0400
-Received: from mail-eopbgr40094.outbound.protection.outlook.com
-	([40.107.4.94]:49888
+	(envelope-from <anton.nefedov@virtuozzo.com>) id 1dGRoX-0004fR-Q7
+	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 11:15:09 -0400
+Received: from mail-eopbgr40095.outbound.protection.outlook.com
+	([40.107.4.95]:11349
 	helo=EUR03-DB5-obe.outbound.protection.outlook.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <anton.nefedov@virtuozzo.com>)
-	id 1dGRoa-0004fj-9z
-	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 11:15:08 -0400
+	id 1dGRoX-0004et-AD
+	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 11:15:05 -0400
 From: Anton Nefedov <anton.nefedov@virtuozzo.com>
-Date: Thu, 1 Jun 2017 18:14:26 +0300
-Message-ID: <1496330073-51338-9-git-send-email-anton.nefedov@virtuozzo.com>
+Date: Thu, 1 Jun 2017 18:14:23 +0300
+Message-ID: <1496330073-51338-6-git-send-email-anton.nefedov@virtuozzo.com>
 In-Reply-To: <1496330073-51338-1-git-send-email-anton.nefedov@virtuozzo.com>
 References: <1496330073-51338-1-git-send-email-anton.nefedov@virtuozzo.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v2 08/15] qcow2: truncate preallocated space
+Subject: [Qemu-devel] [PATCH v2 05/15] qcow2: do not COW the empty areas
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,121 +29,241 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: den@virtuozzo.com, kwolf@redhat.com, mreitz@redhat.com, eblake@redhat.com, "Denis V. Lunev" <den@openvz.org>, Anton Nefedov <anton.nefedov@virtuozzo.com>
+Cc: den@virtuozzo.com, kwolf@redhat.com, mreitz@redhat.com, eblake@redhat.com, Anton Nefedov <anton.nefedov@virtuozzo.com>, "Denis V . Lunev" <den@openvz.org>
 
-From: "Denis V. Lunev" <den@openvz.org>
+If COW area of the newly allocated cluster is zeroes, there is no reason
+to write zero sectors in perform_cow() again now as whole clusters are
+zeroed out in single chunks by handle_alloc_space().
 
-This could be done after calculation of the end of data and metadata in
-the qcow2 image.
+Introduce QCowL2Meta field "reduced", since the existing fields
+(offset and nb_bytes) still has to keep other write requests from
+simultaneous writing in the area
 
-Signed-off-by: Denis V. Lunev <den@openvz.org>
+iotest 060:
+write to the discarded cluster does not trigger COW anymore.
+so, break on write_aio event instead, will work for the test
+(but write won't fail anymore, so update reference output)
+
+iotest 066:
+cluster-alignment areas that were not really COWed are now detected
+as zeroes, hence the initial write has to be exactly the same size for
+the maps to match
+
+performance tests: ===
+
+qemu-io,
+  results in seconds to complete (less is better)
+  random write 4k to empty image, no backing
+    HDD
+      64k cluster
+        128M over 128M image:   160 -> 160 ( x1  )
+        128M over   2G image:    86 ->  84 ( x1  )
+        128M over   8G image:    40 ->  29 ( x1.4 )
+      1M cluster
+         32M over   8G image:    58 ->  23 ( x2.5 )
+
+    SSD
+      64k cluster
+          2G over   2G image:    71 ->  38 (  x1.9 )
+        512M over   8G image:    85 ->   8 ( x10.6 )
+      1M cluster
+        128M over  32G image:   314 ->   2 ( x157  )
+
+  - improvement grows bigger the bigger the cluster size,
+  - first data portions to the fresh image benefit the most
+  (more chance to hit an unallocated cluster)
+  - SSD improvement is close to the IO length reduction rate
+  (e.g. writing only 4k instead of 64k) gives theoretical x16
+  and practical x10 improvement)
+
+fio tests over xfs, empty image (cluster 64k), no backing,
+
+  first megabytes of random writes:
+    randwrite 4k, size=8g:
+
+      HDD (io_size=128m) :  730 ->  1050 IOPS ( x1.45)
+      SSD (io_size=512m) : 1500 ->  7000 IOPS ( x4.7 )
+
+  random writes io_size==image_size:
+    randwrite 4k, size=2g io_size=2g:
+                   HDD   : 200 IOPS (no difference)
+                   SSD   : 7500 ->  9500 IOPS ( x1.3 )
+
+  sequential write:
+    seqwrite 4k, size=4g, iodepth=4
+                   SSD   : 7000 -> 18000 IOPS ( x2.6 )
+
+  - numbers are similar to qemu-io tests, slightly less improvement
+  (damped by fs?)
+
 Signed-off-by: Anton Nefedov <anton.nefedov@virtuozzo.com>
+Signed-off-by: Denis V. Lunev <den@openvz.org>
 ---
- block/qcow2-cluster.c  | 9 +++++++++
- block/qcow2-refcount.c | 7 +++++++
- block/qcow2.c          | 8 ++++++++
- block/qcow2.h          | 3 +++
- 4 files changed, 27 insertions(+)
+ block/qcow2-cluster.c      |  4 +++-
+ block/qcow2.c              | 32 ++++++++++++++++++++++++++++++--
+ block/qcow2.h              |  4 ++++
+ tests/qemu-iotests/060     |  2 +-
+ tests/qemu-iotests/060.out |  3 ++-
+ tests/qemu-iotests/066     |  2 +-
+ tests/qemu-iotests/066.out |  4 ++--
+ 7 files changed, 43 insertions(+), 8 deletions(-)
 
 diff --git a/block/qcow2-cluster.c b/block/qcow2-cluster.c
-index 88dd555..c39e825 100644
+index d779ea1..ba8ce76 100644
 --- a/block/qcow2-cluster.c
 +++ b/block/qcow2-cluster.c
-@@ -1958,3 +1958,12 @@ fail:
-     g_free(l1_table);
-     return ret;
- }
-+
-+void qcow2_update_data_end(BlockDriverState *bs, uint64_t off)
-+{
-+    BDRVQcow2State *s = bs->opaque;
-+
-+    if (s->data_end < off) {
-+        s->data_end = off;
-+    }
-+}
-diff --git a/block/qcow2-refcount.c b/block/qcow2-refcount.c
-index 873a1d2..8156466 100644
---- a/block/qcow2-refcount.c
-+++ b/block/qcow2-refcount.c
-@@ -744,6 +744,9 @@ static int QEMU_WARN_UNUSED_RESULT update_refcount(BlockDriverState *bs,
-             ret = alloc_refcount_block(bs, cluster_index, &refcount_block);
-             if (ret < 0) {
-                 goto fail;
-+            } else {
-+                qcow2_update_data_end(bs, s->refcount_table_offset +
-+                        s->refcount_table_size * sizeof(uint64_t));
-             }
-         }
-         old_table_index = table_index;
-@@ -865,6 +868,8 @@ retry:
-         s->free_cluster_index - 1 > (INT64_MAX >> s->cluster_bits))
-     {
-         return -EFBIG;
-+    } else {
-+        qcow2_update_data_end(bs, s->free_cluster_index << s->cluster_bits);
+@@ -758,7 +758,7 @@ static int perform_cow(BlockDriverState *bs, QCowL2Meta *m, Qcow2COWRegion *r)
+     BDRVQcow2State *s = bs->opaque;
+     int ret;
+ 
+-    if (r->nb_bytes == 0) {
++    if (r->nb_bytes == 0 || r->reduced) {
+         return 0;
      }
  
- #ifdef DEBUG_ALLOC2
-@@ -929,6 +934,8 @@ int64_t qcow2_alloc_clusters_at(BlockDriverState *bs, uint64_t offset,
- 
-     if (ret < 0) {
-         return ret;
-+    } else {
-+        qcow2_update_data_end(bs, offset + (nb_clusters << s->cluster_bits));
-     }
- 
-     return i;
+@@ -1267,10 +1267,12 @@ static int handle_alloc(BlockDriverState *bs, uint64_t guest_offset,
+         .cow_start = {
+             .offset     = 0,
+             .nb_bytes   = offset_into_cluster(s, guest_offset),
++            .reduced    = false,
+         },
+         .cow_end = {
+             .offset     = nb_bytes,
+             .nb_bytes   = avail_bytes - nb_bytes,
++            .reduced    = false,
+         },
+     };
+     qemu_co_queue_init(&(*m)->dependent_requests);
 diff --git a/block/qcow2.c b/block/qcow2.c
-index b090833..33e5455 100644
+index cd5efba..067bb87 100644
 --- a/block/qcow2.c
 +++ b/block/qcow2.c
-@@ -1194,6 +1194,8 @@ static int qcow2_do_open(BlockDriverState *bs, QDict *options, int flags,
-         }
-     }
+@@ -64,6 +64,9 @@ typedef struct {
+ #define  QCOW2_EXT_MAGIC_BACKING_FORMAT 0xE2792ACA
+ #define  QCOW2_EXT_MAGIC_FEATURE_TABLE 0x6803f857
  
-+    s->data_end = bdrv_getlength(bs->file->bs);
++static bool is_zero_sectors(BlockDriverState *bs, int64_t start,
++                            uint32_t count);
 +
- #ifdef DEBUG_ALLOC
-     {
-         BdrvCheckResult result = {0};
-@@ -1941,12 +1943,18 @@ static int qcow2_inactivate(BlockDriverState *bs)
- static void qcow2_close(BlockDriverState *bs)
+ static int qcow2_probe(const uint8_t *buf, int buf_size, const char *filename)
+ {
+     const QCowHeader *cow_header = (const void *)buf;
+@@ -1575,10 +1578,30 @@ fail:
+     return ret;
+ }
+ 
++static void handle_cow_reduce(BlockDriverState *bs, QCowL2Meta *m)
++{
++    if (bs->encrypted) {
++        return;
++    }
++    if (!m->cow_start.reduced && m->cow_start.nb_bytes != 0 &&
++        is_zero_sectors(bs,
++                        (m->offset + m->cow_start.offset) >> BDRV_SECTOR_BITS,
++                        m->cow_start.nb_bytes >> BDRV_SECTOR_BITS)) {
++        m->cow_start.reduced = true;
++    }
++    if (!m->cow_end.reduced && m->cow_end.nb_bytes != 0 &&
++        is_zero_sectors(bs,
++                        (m->offset + m->cow_end.offset) >> BDRV_SECTOR_BITS,
++                        m->cow_end.nb_bytes >> BDRV_SECTOR_BITS)) {
++        m->cow_end.reduced = true;
++    }
++}
++
+ static void handle_alloc_space(BlockDriverState *bs, QCowL2Meta *l2meta)
  {
      BDRVQcow2State *s = bs->opaque;
-+
-     qemu_vfree(s->l1_table);
-     /* else pre-write overlap checks in cache_destroy may crash */
-     s->l1_table = NULL;
+     QCowL2Meta *m;
++    int ret;
  
-     if (!(s->flags & BDRV_O_INACTIVE)) {
-         qcow2_inactivate(bs);
-+
-+        /* truncate preallocated space */
-+        if (!bs->read_only && s->data_end < bdrv_getlength(bs->file->bs)) {
-+            bdrv_truncate(bs->file, s->data_end, NULL);
+     for (m = l2meta; m != NULL; m = m->next) {
+         uint64_t bytes = m->nb_clusters << s->cluster_bits;
+@@ -1588,8 +1611,13 @@ static void handle_alloc_space(BlockDriverState *bs, QCowL2Meta *l2meta)
+         }
+ 
+         /* try to alloc host space in one chunk for better locality */
+-        bdrv_co_pwrite_zeroes(bs->file, m->alloc_offset, bytes,
+-                              BDRV_REQ_ALLOCATE);
++        ret = bdrv_co_pwrite_zeroes(bs->file, m->alloc_offset, bytes,
++                                    BDRV_REQ_ALLOCATE);
++        if (ret != 0) {
++            continue;
 +        }
++
++        handle_cow_reduce(bs, m);
      }
+ }
  
-     cache_clean_timer_del(bs);
 diff --git a/block/qcow2.h b/block/qcow2.h
-index a0d222d..e28c54a 100644
+index 1801dc3..ba15c08 100644
 --- a/block/qcow2.h
 +++ b/block/qcow2.h
-@@ -297,6 +297,7 @@ typedef struct BDRVQcow2State {
-     char *image_backing_format;
+@@ -305,6 +305,10 @@ typedef struct Qcow2COWRegion {
  
-     uint64_t prealloc_size;
-+    uint64_t data_end;
- } BDRVQcow2State;
- 
- typedef struct Qcow2COWRegion {
-@@ -607,4 +608,6 @@ int qcow2_cache_get_empty(BlockDriverState *bs, Qcow2Cache *c, uint64_t offset,
-     void **table);
- void qcow2_cache_put(BlockDriverState *bs, Qcow2Cache *c, void **table);
- 
-+void qcow2_update_data_end(BlockDriverState *bs, uint64_t off);
+     /** Number of bytes to copy */
+     int         nb_bytes;
 +
- #endif
++    /** The region is filled with zeroes and does not require COW
++     */
++    bool        reduced;
+ } Qcow2COWRegion;
+ 
+ /**
+diff --git a/tests/qemu-iotests/060 b/tests/qemu-iotests/060
+index 8e95c45..3a0f096 100755
+--- a/tests/qemu-iotests/060
++++ b/tests/qemu-iotests/060
+@@ -160,7 +160,7 @@ poke_file "$TEST_IMG" '131084' "\x00\x00" # 0x2000c
+ # any unallocated cluster, leading to an attempt to overwrite the second L2
+ # table. Finally, resume the COW write and see it fail (but not crash).
+ echo "open -o file.driver=blkdebug $TEST_IMG
+-break cow_read 0
++break write_aio 0
+ aio_write 0k 1k
+ wait_break 0
+ write 64k 64k
+diff --git a/tests/qemu-iotests/060.out b/tests/qemu-iotests/060.out
+index 3bc1461..d057aa1 100644
+--- a/tests/qemu-iotests/060.out
++++ b/tests/qemu-iotests/060.out
+@@ -107,7 +107,8 @@ qcow2: Marking image as corrupt: Preventing invalid write on metadata (overlaps
+ blkdebug: Suspended request '0'
+ write failed: Input/output error
+ blkdebug: Resuming request '0'
+-aio_write failed: No medium found
++wrote 1024/1024 bytes at offset 0
++1 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+ 
+ === Testing unallocated image header ===
+ 
+diff --git a/tests/qemu-iotests/066 b/tests/qemu-iotests/066
+index 8638217..3c216a1 100755
+--- a/tests/qemu-iotests/066
++++ b/tests/qemu-iotests/066
+@@ -71,7 +71,7 @@ echo
+ _make_test_img $IMG_SIZE
+ 
+ # Create data clusters (not aligned to an L2 table)
+-$QEMU_IO -c 'write -P 42 1M 256k' "$TEST_IMG" | _filter_qemu_io
++$QEMU_IO -c "write -P 42 $(((1024 + 32) * 1024)) 192k" "$TEST_IMG" | _filter_qemu_io
+ orig_map=$($QEMU_IMG map --output=json "$TEST_IMG")
+ 
+ # Convert the data clusters to preallocated zero clusters
+diff --git a/tests/qemu-iotests/066.out b/tests/qemu-iotests/066.out
+index 3d9da9b..093431e 100644
+--- a/tests/qemu-iotests/066.out
++++ b/tests/qemu-iotests/066.out
+@@ -19,8 +19,8 @@ Offset          Length          Mapped to       File
+ === Writing to preallocated zero clusters ===
+ 
+ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67109376
+-wrote 262144/262144 bytes at offset 1048576
+-256 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++wrote 196608/196608 bytes at offset 1081344
++192 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+ wrote 262144/262144 bytes at offset 1048576
+ 256 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+ wrote 196608/196608 bytes at offset 1081344
 -- 
 2.7.4
