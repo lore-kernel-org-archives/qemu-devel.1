@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56255)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57150)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <roman.penyaev@profitbricks.com>) id 1dGMZR-00030a-Ff
-	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 05:39:10 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1dGMcW-0003jZ-TK
+	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 05:42:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <roman.penyaev@profitbricks.com>) id 1dGMZQ-0001rU-N4
-	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 05:39:09 -0400
-Received: from mail-it0-x236.google.com ([2607:f8b0:4001:c0b::236]:38765)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <roman.penyaev@profitbricks.com>)
-	id 1dGMZQ-0001qW-HC
-	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 05:39:08 -0400
-Received: by mail-it0-x236.google.com with SMTP id r63so29312508itc.1
-	for <qemu-devel@nongnu.org>; Thu, 01 Jun 2017 02:39:08 -0700 (PDT)
-MIME-Version: 1.0
-In-Reply-To: <20170530113502.GC27787@lemon.lan>
+	(envelope-from <pbonzini@redhat.com>) id 1dGMcT-0006PQ-Q2
+	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 05:42:20 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:38104)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1dGMcT-0006OK-Js
+	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 05:42:17 -0400
 References: <20170530100736.3338-1-roman.penyaev@profitbricks.com>
 	<20170530113502.GC27787@lemon.lan>
-From: Roman Penyaev <roman.penyaev@profitbricks.com>
-Date: Thu, 1 Jun 2017 11:38:47 +0200
-Message-ID: <CAJrWOzB8FdDo4e0TKuWRDf+VowWQaNntOGpnpQyZ0J5P_-tgdA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+	<CAJrWOzB8FdDo4e0TKuWRDf+VowWQaNntOGpnpQyZ0J5P_-tgdA@mail.gmail.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <12e84311-60c2-d0d7-03f0-2723512987cf@redhat.com>
+Date: Thu, 1 Jun 2017 11:42:12 +0200
+MIME-Version: 1.0
+In-Reply-To: <CAJrWOzB8FdDo4e0TKuWRDf+VowWQaNntOGpnpQyZ0J5P_-tgdA@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Subject: Re: [Qemu-devel] [PATCH v2 1/1] coroutine-lock: do not touch
  coroutine after another one has been entered
 List-Id: <qemu-devel.nongnu.org>
@@ -30,15 +30,19 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: Roman Penyaev <roman.penyaev@profitbricks.com>, Fam Zheng <famz@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>
 
-On Tue, May 30, 2017 at 1:35 PM, Fam Zheng <famz@redhat.com> wrote:
-[cut]
-> Reviewed-by: Fam Zheng <famz@redhat.com>
 
-Do I need to resend the patch with 'reviewed-by' line?  Or it is
-already queued?
 
---
-Roman
+On 01/06/2017 11:38, Roman Penyaev wrote:
+> On Tue, May 30, 2017 at 1:35 PM, Fam Zheng <famz@redhat.com> wrote:
+> [cut]
+>> Reviewed-by: Fam Zheng <famz@redhat.com>
+> 
+> Do I need to resend the patch with 'reviewed-by' line?  Or it is
+> already queued?
+
+No need to resend, thanks!
+
+Paolo
