@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38523)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38554)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1dGVhP-0004i8-Jb
-	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 15:24:00 -0400
+	(envelope-from <quintela@redhat.com>) id 1dGVhR-0004kN-TS
+	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 15:24:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1dGVhO-00056n-IK
-	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 15:23:59 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:40640)
+	(envelope-from <quintela@redhat.com>) id 1dGVhQ-000590-IE
+	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 15:24:01 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40478)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1dGVhO-00055o-Bm
-	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 15:23:58 -0400
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1dGVhQ-00058K-AG
+	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 15:24:00 -0400
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
 	[10.5.11.13])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 613F47FD44
-	for <qemu-devel@nongnu.org>; Thu,  1 Jun 2017 19:23:57 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 5774A142A66
+	for <qemu-devel@nongnu.org>; Thu,  1 Jun 2017 19:23:59 +0000 (UTC)
 From: Juan Quintela <quintela@redhat.com>
-Date: Thu,  1 Jun 2017 21:23:24 +0200
-Message-Id: <20170601192327.29712-13-quintela@redhat.com>
+Date: Thu,  1 Jun 2017 21:23:25 +0200
+Message-Id: <20170601192327.29712-14-quintela@redhat.com>
 In-Reply-To: <20170601192327.29712-1-quintela@redhat.com>
 References: <20170601192327.29712-1-quintela@redhat.com>
-Subject: [Qemu-devel] [PULL 12/15] migration: Export rdma.c functions in its
- own file
+Subject: [Qemu-devel] [PULL 13/15] migration: Create include for migration
+ snapshots
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,85 +33,185 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: dgilbert@redhat.com, lvivier@redhat.com, peterx@redhat.com
 
+Start removing migration code from sysemu/sysemu.h.
+
 Signed-off-by: Juan Quintela <quintela@redhat.com>
 Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 ---
- include/migration/migration.h |  4 ----
- migration/migration.c         |  1 +
- migration/rdma.c              |  1 +
- migration/rdma.h              | 25 +++++++++++++++++++++++++
- 4 files changed, 27 insertions(+), 4 deletions(-)
- create mode 100644 migration/rdma.h
+ hmp.c                        |  5 +++--
+ include/block/block_int.h    |  4 ++--
+ include/migration/snapshot.h | 21 +++++++++++++++++++++
+ include/sysemu/sysemu.h      |  3 ---
+ migration/savevm.c           |  5 +++--
+ replay/replay-snapshot.c     |  5 +++--
+ vl.c                         |  3 ++-
+ 7 files changed, 34 insertions(+), 12 deletions(-)
+ create mode 100644 include/migration/snapshot.h
 
-diff --git a/include/migration/migration.h b/include/migration/migration.h
-index 29fda5b..8d29bc9 100644
---- a/include/migration/migration.h
-+++ b/include/migration/migration.h
-@@ -153,10 +153,6 @@ void qemu_start_incoming_migration(const char *uri, Error **errp);
+diff --git a/hmp.c b/hmp.c
+index 20f5dab..ad72390 100644
+--- a/hmp.c
++++ b/hmp.c
+@@ -42,6 +42,7 @@
+ #include "qemu/error-report.h"
+ #include "exec/ramlist.h"
+ #include "hw/intc/intc.h"
++#include "migration/snapshot.h"
  
- uint64_t migrate_max_downtime(void);
+ #ifdef CONFIG_SPICE
+ #include <spice/enums.h>
+@@ -1284,7 +1285,7 @@ void hmp_loadvm(Monitor *mon, const QDict *qdict)
  
--void rdma_start_outgoing_migration(void *opaque, const char *host_port, Error **errp);
--
--void rdma_start_incoming_migration(const char *host_port, Error **errp);
--
- void migrate_fd_error(MigrationState *s, const Error *error);
+     vm_stop(RUN_STATE_RESTORE_VM);
  
- void migrate_fd_connect(MigrationState *s);
-diff --git a/migration/migration.c b/migration/migration.c
-index fe6dc18..ec79aff 100644
---- a/migration/migration.c
-+++ b/migration/migration.c
-@@ -21,6 +21,7 @@
- #include "exec.h"
- #include "fd.h"
- #include "socket.h"
-+#include "rdma.h"
- #include "migration/migration.h"
- #include "savevm.h"
- #include "qemu-file-channel.h"
-diff --git a/migration/rdma.c b/migration/rdma.c
-index 4cb5bf8..fab30ea 100644
---- a/migration/rdma.c
-+++ b/migration/rdma.c
-@@ -17,6 +17,7 @@
- #include "qapi/error.h"
- #include "qemu-common.h"
- #include "qemu/cutils.h"
-+#include "rdma.h"
- #include "migration/migration.h"
- #include "qemu-file.h"
- #include "exec/cpu-common.h"
-diff --git a/migration/rdma.h b/migration/rdma.h
+-    if (load_vmstate(name, &err) == 0 && saved_vm_running) {
++    if (load_snapshot(name, &err) == 0 && saved_vm_running) {
+         vm_start();
+     }
+     hmp_handle_error(mon, &err);
+@@ -1294,7 +1295,7 @@ void hmp_savevm(Monitor *mon, const QDict *qdict)
+ {
+     Error *err = NULL;
+ 
+-    save_vmstate(qdict_get_try_str(qdict, "name"), &err);
++    save_snapshot(qdict_get_try_str(qdict, "name"), &err);
+     hmp_handle_error(mon, &err);
+ }
+ 
+diff --git a/include/block/block_int.h b/include/block/block_int.h
+index e5eb473..cb78c4f 100644
+--- a/include/block/block_int.h
++++ b/include/block/block_int.h
+@@ -601,8 +601,8 @@ struct BlockDriverState {
+     int copy_on_read;
+ 
+     /* If we are reading a disk image, give its size in sectors.
+-     * Generally read-only; it is written to by load_vmstate and save_vmstate,
+-     * but the block layer is quiescent during those.
++     * Generally read-only; it is written to by load_snapshot and
++     * save_snaphost, but the block layer is quiescent during those.
+      */
+     int64_t total_sectors;
+ 
+diff --git a/include/migration/snapshot.h b/include/migration/snapshot.h
 new file mode 100644
-index 0000000..de2ba09
+index 0000000..c85b6ec
 --- /dev/null
-+++ b/migration/rdma.h
-@@ -0,0 +1,25 @@
++++ b/include/migration/snapshot.h
+@@ -0,0 +1,21 @@
 +/*
-+ * RDMA protocol and interfaces
++ * QEMU snapshots
 + *
-+ * Copyright IBM, Corp. 2010-2013
-+ * Copyright Red Hat, Inc. 2015-2016
++ * Copyright (c) 2004-2008 Fabrice Bellard
++ * Copyright (c) 2009-2015 Red Hat Inc
 + *
 + * Authors:
-+ *  Michael R. Hines <mrhines@us.ibm.com>
-+ *  Jiuxing Liu <jl@us.ibm.com>
-+ *  Daniel P. Berrange <berrange@redhat.com>
++ *  Juan Quintela <quintela@redhat.com>
 + *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or
-+ * later.  See the COPYING file in the top-level directory.
 + *
++ * This work is licensed under the terms of the GNU GPL, version 2 or later.
++ * See the COPYING file in the top-level directory.
 + */
 +
-+#ifndef QEMU_MIGRATION_RDMA_H
-+#define QEMU_MIGRATION_RDMA_H
++#ifndef QEMU_MIGRATION_SNAPSHOT_H
++#define QEMU_MIGRATION_SNAPSHOT_H
 +
-+void rdma_start_outgoing_migration(void *opaque, const char *host_port,
-+                                   Error **errp);
-+
-+void rdma_start_incoming_migration(const char *host_port, Error **errp);
++int save_snapshot(const char *name, Error **errp);
++int load_snapshot(const char *name, Error **errp);
 +
 +#endif
+diff --git a/include/sysemu/sysemu.h b/include/sysemu/sysemu.h
+index 723c8dc..9841a52 100644
+--- a/include/sysemu/sysemu.h
++++ b/include/sysemu/sysemu.h
+@@ -92,9 +92,6 @@ void qemu_remove_exit_notifier(Notifier *notify);
+ void qemu_add_machine_init_done_notifier(Notifier *notify);
+ void qemu_remove_machine_init_done_notifier(Notifier *notify);
+ 
+-int save_vmstate(const char *name, Error **errp);
+-int load_vmstate(const char *name, Error **errp);
+-
+ void qemu_announce_self(void);
+ 
+ extern int autostart;
+diff --git a/migration/savevm.c b/migration/savevm.c
+index bb3f9ec..f2664f3 100644
+--- a/migration/savevm.c
++++ b/migration/savevm.c
+@@ -35,6 +35,7 @@
+ #include "sysemu/sysemu.h"
+ #include "qemu/timer.h"
+ #include "migration/migration.h"
++#include "migration/snapshot.h"
+ #include "qemu-file-channel.h"
+ #include "qemu-file.h"
+ #include "savevm.h"
+@@ -2067,7 +2068,7 @@ int qemu_loadvm_state(QEMUFile *f)
+     return ret;
+ }
+ 
+-int save_vmstate(const char *name, Error **errp)
++int save_snapshot(const char *name, Error **errp)
+ {
+     BlockDriverState *bs, *bs1;
+     QEMUSnapshotInfo sn1, *sn = &sn1, old_sn1, *old_sn = &old_sn1;
+@@ -2224,7 +2225,7 @@ void qmp_xen_load_devices_state(const char *filename, Error **errp)
+     migration_incoming_state_destroy();
+ }
+ 
+-int load_vmstate(const char *name, Error **errp)
++int load_snapshot(const char *name, Error **errp)
+ {
+     BlockDriverState *bs, *bs_vm_state;
+     QEMUSnapshotInfo sn;
+diff --git a/replay/replay-snapshot.c b/replay/replay-snapshot.c
+index c75cd38..a4ded29 100644
+--- a/replay/replay-snapshot.c
++++ b/replay/replay-snapshot.c
+@@ -19,6 +19,7 @@
+ #include "qapi/qmp/qstring.h"
+ #include "qemu/error-report.h"
+ #include "migration/vmstate.h"
++#include "migration/snapshot.h"
+ 
+ static void replay_pre_save(void *opaque)
+ {
+@@ -66,13 +67,13 @@ void replay_vmstate_init(void)
+ 
+     if (replay_snapshot) {
+         if (replay_mode == REPLAY_MODE_RECORD) {
+-            if (save_vmstate(replay_snapshot, &err) != 0) {
++            if (save_snapshot(replay_snapshot, &err) != 0) {
+                 error_report_err(err);
+                 error_report("Could not create snapshot for icount record");
+                 exit(1);
+             }
+         } else if (replay_mode == REPLAY_MODE_PLAY) {
+-            if (load_vmstate(replay_snapshot, &err) != 0) {
++            if (load_snapshot(replay_snapshot, &err) != 0) {
+                 error_report_err(err);
+                 error_report("Could not load snapshot for icount replay");
+                 exit(1);
+diff --git a/vl.c b/vl.c
+index 993690d..86f6c71 100644
+--- a/vl.c
++++ b/vl.c
+@@ -87,6 +87,7 @@ int main(int argc, char **argv)
+ #include "sysemu/blockdev.h"
+ #include "hw/block/block.h"
+ #include "migration/block.h"
++#include "migration/snapshot.h"
+ #include "sysemu/tpm.h"
+ #include "sysemu/dma.h"
+ #include "hw/audio/soundhw.h"
+@@ -4722,7 +4723,7 @@ int main(int argc, char **argv, char **envp)
+         replay_vmstate_init();
+     } else if (loadvm) {
+         Error *local_err = NULL;
+-        if (load_vmstate(loadvm, &local_err) < 0) {
++        if (load_snapshot(loadvm, &local_err) < 0) {
+             error_report_err(local_err);
+             autostart = 0;
+         }
 -- 
 2.9.4
