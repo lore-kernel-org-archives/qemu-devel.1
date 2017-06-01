@@ -1,28 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35081)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35107)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1dGTcU-00013Z-LK
-	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 13:10:47 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1dGTcV-00014Y-Ln
+	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 13:10:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1dGTcT-00068F-RQ
-	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 13:10:46 -0400
-Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:37144)
+	(envelope-from <pm215@archaic.org.uk>) id 1dGTcU-00068X-An
+	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 13:10:47 -0400
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:37145)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1dGTcT-00064g-KB
-	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 13:10:45 -0400
+	id 1dGTcU-00067A-2G
+	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 13:10:46 -0400
 Received: from pm215 by orth.archaic.org.uk with local (Exim 4.84_2)
-	(envelope-from <pm215@archaic.org.uk>) id 1dGTcS-0007QX-Rb
-	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 18:10:44 +0100
+	(envelope-from <pm215@archaic.org.uk>) id 1dGTcQ-0007Pp-Qw
+	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 18:10:42 +0100
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu,  1 Jun 2017 18:10:21 +0100
-Message-Id: <1496337035-30213-14-git-send-email-peter.maydell@linaro.org>
+Date: Thu,  1 Jun 2017 18:10:18 +0100
+Message-Id: <1496337035-30213-11-git-send-email-peter.maydell@linaro.org>
 In-Reply-To: <1496337035-30213-1-git-send-email-peter.maydell@linaro.org>
 References: <1496337035-30213-1-git-send-email-peter.maydell@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 13/27] arm: Remove unnecessary check on
- cpu->pmsav7_dregion
+Subject: [Qemu-devel] [PULL 10/27] arm: Clean up handling of no-MPU PMSA CPUs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,33 +32,174 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Now that we enforce both:
- * pmsav7_dregion == 0 implies has_mpu == false
- * PMSA with has_mpu == false means SCTLR.M cannot be set
-we can remove a check on pmsav7_dregion from get_phys_addr_pmsav7(),
-because we can only reach this code path if the MPU is enabled
-(and so region_translation_disabled() returned false).
+ARM CPUs come in two flavours:
+ * proper MMU ("VMSA")
+ * only an MPU ("PMSA")
+For PMSA, the MPU may be implemented, or not (in which case there
+is default "always acts the same" behaviour, but it isn't guest
+programmable).
+
+QEMU is a bit confused about how we indicate this: we have an
+ARM_FEATURE_MPU, but it's not clear whether this indicates
+"PMSA, not VMSA" or "PMSA and MPU present" , and sometimes we
+use it for one purpose and sometimes the other.
+
+Currently trying to implement a PMSA-without-MPU core won't
+work correctly because we turn off the ARM_FEATURE_MPU bit
+and then a lot of things which should still exist get
+turned off too.
+
+As the first step in cleaning this up, rename the feature
+bit to ARM_FEATURE_PMSA, which indicates a PMSA CPU (with
+or without MPU).
 
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+Reviewed-by: Alistair Francis <alistair.francis@xilinx.com>
 Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Message-id: 1493122030-32191-8-git-send-email-peter.maydell@linaro.org
+Message-id: 1493122030-32191-5-git-send-email-peter.maydell@linaro.org
 ---
- target/arm/helper.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+ target/arm/cpu.h     |  2 +-
+ target/arm/cpu.c     | 12 ++++++------
+ target/arm/helper.c  | 12 ++++++------
+ target/arm/machine.c |  2 +-
+ 4 files changed, 14 insertions(+), 14 deletions(-)
 
+diff --git a/target/arm/cpu.h b/target/arm/cpu.h
+index cadec09..cb1d696 100644
+--- a/target/arm/cpu.h
++++ b/target/arm/cpu.h
+@@ -1181,7 +1181,7 @@ enum arm_features {
+     ARM_FEATURE_V6K,
+     ARM_FEATURE_V7,
+     ARM_FEATURE_THUMB2,
+-    ARM_FEATURE_MPU,    /* Only has Memory Protection Unit, not full MMU.  */
++    ARM_FEATURE_PMSA,   /* no MMU; may have Memory Protection Unit */
+     ARM_FEATURE_VFP3,
+     ARM_FEATURE_VFP_FP16,
+     ARM_FEATURE_NEON,
+diff --git a/target/arm/cpu.c b/target/arm/cpu.c
+index 4e8fe1c..f844af5 100644
+--- a/target/arm/cpu.c
++++ b/target/arm/cpu.c
+@@ -593,7 +593,7 @@ static void arm_cpu_post_init(Object *obj)
+                                  &error_abort);
+     }
+ 
+-    if (arm_feature(&cpu->env, ARM_FEATURE_MPU)) {
++    if (arm_feature(&cpu->env, ARM_FEATURE_PMSA)) {
+         qdev_property_add_static(DEVICE(obj), &arm_cpu_has_mpu_property,
+                                  &error_abort);
+         if (arm_feature(&cpu->env, ARM_FEATURE_V7)) {
+@@ -689,7 +689,7 @@ static void arm_cpu_realizefn(DeviceState *dev, Error **errp)
+ 
+     if (arm_feature(env, ARM_FEATURE_V7) &&
+         !arm_feature(env, ARM_FEATURE_M) &&
+-        !arm_feature(env, ARM_FEATURE_MPU)) {
++        !arm_feature(env, ARM_FEATURE_PMSA)) {
+         /* v7VMSA drops support for the old ARMv5 tiny pages, so we
+          * can use 4K pages.
+          */
+@@ -764,10 +764,10 @@ static void arm_cpu_realizefn(DeviceState *dev, Error **errp)
+     }
+ 
+     if (!cpu->has_mpu) {
+-        unset_feature(env, ARM_FEATURE_MPU);
++        unset_feature(env, ARM_FEATURE_PMSA);
+     }
+ 
+-    if (arm_feature(env, ARM_FEATURE_MPU) &&
++    if (arm_feature(env, ARM_FEATURE_PMSA) &&
+         arm_feature(env, ARM_FEATURE_V7)) {
+         uint32_t nr = cpu->pmsav7_dregion;
+ 
+@@ -867,7 +867,7 @@ static void arm946_initfn(Object *obj)
+ 
+     cpu->dtb_compatible = "arm,arm946";
+     set_feature(&cpu->env, ARM_FEATURE_V5);
+-    set_feature(&cpu->env, ARM_FEATURE_MPU);
++    set_feature(&cpu->env, ARM_FEATURE_PMSA);
+     set_feature(&cpu->env, ARM_FEATURE_DUMMY_C15_REGS);
+     cpu->midr = 0x41059461;
+     cpu->ctr = 0x0f004006;
+@@ -1079,7 +1079,7 @@ static void cortex_r5_initfn(Object *obj)
+     set_feature(&cpu->env, ARM_FEATURE_THUMB_DIV);
+     set_feature(&cpu->env, ARM_FEATURE_ARM_DIV);
+     set_feature(&cpu->env, ARM_FEATURE_V7MP);
+-    set_feature(&cpu->env, ARM_FEATURE_MPU);
++    set_feature(&cpu->env, ARM_FEATURE_PMSA);
+     cpu->midr = 0x411fc153; /* r1p3 */
+     cpu->id_pfr0 = 0x0131;
+     cpu->id_pfr1 = 0x001;
 diff --git a/target/arm/helper.c b/target/arm/helper.c
-index f0f25c8..5c044d0 100644
+index 791332c..404bfdb 100644
 --- a/target/arm/helper.c
 +++ b/target/arm/helper.c
-@@ -8227,8 +8227,7 @@ static bool get_phys_addr_pmsav7(CPUARMState *env, uint32_t address,
-         }
+@@ -485,7 +485,7 @@ static void contextidr_write(CPUARMState *env, const ARMCPRegInfo *ri,
+ {
+     ARMCPU *cpu = arm_env_get_cpu(env);
  
-         if (n == -1) { /* no hits */
--            if (cpu->pmsav7_dregion &&
--                (is_user || !(regime_sctlr(env, mmu_idx) & SCTLR_BR))) {
-+            if (is_user || !(regime_sctlr(env, mmu_idx) & SCTLR_BR)) {
-                 /* background fault */
-                 *fsr = 0;
-                 return true;
+-    if (raw_read(env, ri) != value && !arm_feature(env, ARM_FEATURE_MPU)
++    if (raw_read(env, ri) != value && !arm_feature(env, ARM_FEATURE_PMSA)
+         && !extended_addresses_enabled(env)) {
+         /* For VMSA (when not using the LPAE long descriptor page table
+          * format) this register includes the ASID, so do a TLB flush.
+@@ -4615,7 +4615,7 @@ void register_cp_regs_for_features(ARMCPU *cpu)
+         define_arm_cp_regs(cpu, v6k_cp_reginfo);
+     }
+     if (arm_feature(env, ARM_FEATURE_V7MP) &&
+-        !arm_feature(env, ARM_FEATURE_MPU)) {
++        !arm_feature(env, ARM_FEATURE_PMSA)) {
+         define_arm_cp_regs(cpu, v7mp_cp_reginfo);
+     }
+     if (arm_feature(env, ARM_FEATURE_V7)) {
+@@ -4969,7 +4969,7 @@ void register_cp_regs_for_features(ARMCPU *cpu)
+         }
+     }
+ 
+-    if (arm_feature(env, ARM_FEATURE_MPU)) {
++    if (arm_feature(env, ARM_FEATURE_PMSA)) {
+         if (arm_feature(env, ARM_FEATURE_V6)) {
+             /* PMSAv6 not implemented */
+             assert(arm_feature(env, ARM_FEATURE_V7));
+@@ -5131,7 +5131,7 @@ void register_cp_regs_for_features(ARMCPU *cpu)
+             define_arm_cp_regs(cpu, id_pre_v8_midr_cp_reginfo);
+         }
+         define_arm_cp_regs(cpu, id_cp_reginfo);
+-        if (!arm_feature(env, ARM_FEATURE_MPU)) {
++        if (!arm_feature(env, ARM_FEATURE_PMSA)) {
+             define_one_arm_cp_reg(cpu, &id_tlbtr_reginfo);
+         } else if (arm_feature(env, ARM_FEATURE_V7)) {
+             define_one_arm_cp_reg(cpu, &id_mpuir_reginfo);
+@@ -8442,7 +8442,7 @@ static bool get_phys_addr(CPUARMState *env, target_ulong address,
+     /* pmsav7 has special handling for when MPU is disabled so call it before
+      * the common MMU/MPU disabled check below.
+      */
+-    if (arm_feature(env, ARM_FEATURE_MPU) &&
++    if (arm_feature(env, ARM_FEATURE_PMSA) &&
+         arm_feature(env, ARM_FEATURE_V7)) {
+         *page_size = TARGET_PAGE_SIZE;
+         return get_phys_addr_pmsav7(env, address, access_type, mmu_idx,
+@@ -8457,7 +8457,7 @@ static bool get_phys_addr(CPUARMState *env, target_ulong address,
+         return 0;
+     }
+ 
+-    if (arm_feature(env, ARM_FEATURE_MPU)) {
++    if (arm_feature(env, ARM_FEATURE_PMSA)) {
+         /* Pre-v7 MPU */
+         *page_size = TARGET_PAGE_SIZE;
+         return get_phys_addr_pmsav5(env, address, access_type, mmu_idx,
+diff --git a/target/arm/machine.c b/target/arm/machine.c
+index d8094a8..ac6b758 100644
+--- a/target/arm/machine.c
++++ b/target/arm/machine.c
+@@ -142,7 +142,7 @@ static bool pmsav7_needed(void *opaque)
+     ARMCPU *cpu = opaque;
+     CPUARMState *env = &cpu->env;
+ 
+-    return arm_feature(env, ARM_FEATURE_MPU) &&
++    return arm_feature(env, ARM_FEATURE_PMSA) &&
+            arm_feature(env, ARM_FEATURE_V7);
+ }
+ 
 -- 
 2.7.4
