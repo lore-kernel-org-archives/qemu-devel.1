@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38605)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42758)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1dGVhW-0004oR-Fr
-	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 15:24:07 -0400
+	(envelope-from <cota@braap.org>) id 1dGVqU-0004F6-OL
+	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 15:33:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1dGVhV-0005C1-CZ
-	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 15:24:06 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:57190)
+	(envelope-from <cota@braap.org>) id 1dGVqS-0004C4-3e
+	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 15:33:22 -0400
+Received: from out1-smtp.messagingengine.com ([66.111.4.25]:37033)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1dGVhV-0005BL-4i
-	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 15:24:05 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 2C1E5C04B30E
-	for <qemu-devel@nongnu.org>; Thu,  1 Jun 2017 19:24:04 +0000 (UTC)
-From: Juan Quintela <quintela@redhat.com>
-Date: Thu,  1 Jun 2017 21:23:27 +0200
-Message-Id: <20170601192327.29712-16-quintela@redhat.com>
-In-Reply-To: <20170601192327.29712-1-quintela@redhat.com>
-References: <20170601192327.29712-1-quintela@redhat.com>
-Subject: [Qemu-devel] [PULL 15/15] migration: Move include/migration/block.h
- into migration/
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1dGVqR-00046w-Ti
+	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 15:33:20 -0400
+Date: Thu, 1 Jun 2017 15:33:17 -0400
+From: "Emilio G. Cota" <cota@braap.org>
+Message-ID: <20170601193317.GA10517@flamenco>
+References: <148434048970.31446.17153056211582691244.stgit@frigg.lan>
+	<148434051502.31446.15856830123123961768.stgit@frigg.lan>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <148434051502.31446.15856830123123961768.stgit@frigg.lan>
+Subject: Re: [Qemu-devel] [PATCH v7 4/7] exec: [tcg] Use different TBs
+ according to the vCPU's dynamic tracing state
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,114 +29,135 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: dgilbert@redhat.com, lvivier@redhat.com, peterx@redhat.com
+To: =?iso-8859-1?Q?Llu=EDs?= Vilanova <vilanova@ac.upc.edu>
+Cc: qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-All functions were internal, except blk_mig_init() that is exported in
-misc.h now.
+On Fri, Jan 13, 2017 at 21:48:35 +0100, Lluís Vilanova wrote:
+>  9 files changed, 54 insertions(+), 11 deletions(-)
+> 
+> diff --git a/cpu-exec.c b/cpu-exec.c
+> index 4188fed3c6..36709cba1f 100644
+> --- a/cpu-exec.c
+> +++ b/cpu-exec.c
+> @@ -261,6 +261,7 @@ struct tb_desc {
+>      CPUArchState *env;
+>      tb_page_addr_t phys_page1;
+>      uint32_t flags;
+> +    TRACE_QHT_VCPU_DSTATE_TYPE trace_vcpu_dstate;
+(snip)
+> diff --git a/include/exec/exec-all.h b/include/exec/exec-all.h
+> index 57cd978578..ae74f61ea2 100644
+> --- a/include/exec/exec-all.h
+> +++ b/include/exec/exec-all.h
+> @@ -200,6 +200,10 @@ static inline void tlb_flush_by_mmuidx(CPUState *cpu, ...)
+>  #define USE_DIRECT_JUMP
+>  #endif
+>  
+> +/**
+> + * TranslationBlock:
+> + * @trace_vcpu_dstate: Per-vCPU dynamic tracing state used to generate this TB.
+> + */
+>  struct TranslationBlock {
+>      target_ulong pc;   /* simulated PC corresponding to this block (EIP + CS base) */
+>      target_ulong cs_base; /* CS base for this block */
+> @@ -215,6 +219,7 @@ struct TranslationBlock {
+>  #define CF_IGNORE_ICOUNT 0x40000 /* Do not generate icount code */
+>  
+>      uint16_t invalid;
+> +    TRACE_QHT_VCPU_DSTATE_TYPE trace_vcpu_dstate;
+(snip)
+> --- a/include/exec/tb-hash-xx.h
+> +++ b/include/exec/tb-hash-xx.h
+> @@ -35,6 +35,7 @@
+>  #define EXEC_TB_HASH_XX_H
+>  
+>  #include "qemu/bitops.h"
+> +#include "qemu-common.h"
+>  
+>  #define PRIME32_1   2654435761U
+>  #define PRIME32_2   2246822519U
+> @@ -49,7 +50,8 @@
+>   * contiguous in memory.
+>   */
+>  static inline
+> -uint32_t tb_hash_func5(uint64_t a0, uint64_t b0, uint32_t e)
+> +uint32_t tb_hash_func6(uint64_t a0, uint64_t b0, uint32_t e,
+> +                       TRACE_QHT_VCPU_DSTATE_TYPE f)
 
-Signed-off-by: Juan Quintela <quintela@redhat.com>
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
----
- include/migration/misc.h                 | 8 ++++++++
- migration/block.c                        | 3 ++-
- {include/migration => migration}/block.h | 2 --
- migration/colo.c                         | 2 +-
- migration/migration.c                    | 2 +-
- vl.c                                     | 1 -
- 6 files changed, 12 insertions(+), 6 deletions(-)
- rename {include/migration => migration}/block.h (93%)
+I find this typedef unnecessary. Why not use u32 everywhere?
+If ever we need more bits, then we'll add additional u32's here
+as well.
 
-diff --git a/include/migration/misc.h b/include/migration/misc.h
-index 0b37714..d7892b7 100644
---- a/include/migration/misc.h
-+++ b/include/migration/misc.h
-@@ -18,4 +18,12 @@
- 
- void ram_mig_init(void);
- 
-+/* migration/block.c */
-+
-+#ifdef CONFIG_LIVE_BLOCK_MIGRATION
-+void blk_mig_init(void);
-+#else
-+static inline void blk_mig_init(void) {}
-+#endif
-+
- #endif
-diff --git a/migration/block.c b/migration/block.c
-index 3e27499..4d8c2e9 100644
---- a/migration/block.c
-+++ b/migration/block.c
-@@ -23,7 +23,8 @@
- #include "qemu/cutils.h"
- #include "qemu/queue.h"
- #include "qemu/timer.h"
--#include "migration/block.h"
-+#include "block.h"
-+#include "migration/misc.h"
- #include "migration/migration.h"
- #include "sysemu/blockdev.h"
- #include "qemu-file.h"
-diff --git a/include/migration/block.h b/migration/block.h
-similarity index 93%
-rename from include/migration/block.h
-rename to migration/block.h
-index 28cff53..22ebe94 100644
---- a/include/migration/block.h
-+++ b/migration/block.h
-@@ -15,14 +15,12 @@
- #define MIGRATION_BLOCK_H
- 
- #ifdef CONFIG_LIVE_BLOCK_MIGRATION
--void blk_mig_init(void);
- int blk_mig_active(void);
- uint64_t blk_mig_bytes_transferred(void);
- uint64_t blk_mig_bytes_remaining(void);
- uint64_t blk_mig_bytes_total(void);
- 
- #else
--static inline void blk_mig_init(void) { }
- static inline int blk_mig_active(void)
- {
-     return false;
-diff --git a/migration/colo.c b/migration/colo.c
-index 4f1f3b8..111b715 100644
---- a/migration/colo.c
-+++ b/migration/colo.c
-@@ -18,7 +18,7 @@
- #include "qemu-file.h"
- #include "savevm.h"
- #include "migration/colo.h"
--#include "migration/block.h"
-+#include "block.h"
- #include "io/channel-buffer.h"
- #include "trace.h"
- #include "qemu/error-report.h"
-diff --git a/migration/migration.c b/migration/migration.c
-index 6e5afa4..48c94c9 100644
---- a/migration/migration.c
-+++ b/migration/migration.c
-@@ -34,7 +34,7 @@
- #include "qapi/util.h"
- #include "qemu/sockets.h"
- #include "qemu/rcu.h"
--#include "migration/block.h"
-+#include "block.h"
- #include "postcopy-ram.h"
- #include "qemu/thread.h"
- #include "qmp-commands.h"
-diff --git a/vl.c b/vl.c
-index 13deeba..80b86c0 100644
---- a/vl.c
-+++ b/vl.c
-@@ -86,7 +86,6 @@ int main(int argc, char **argv)
- #include "qemu/log.h"
- #include "sysemu/blockdev.h"
- #include "hw/block/block.h"
--#include "migration/block.h"
- #include "migration/misc.h"
- #include "migration/snapshot.h"
- #include "sysemu/tpm.h"
--- 
-2.9.4
+Also, including above qemu-common.h goes against the spirit of
+keeping this file (as well as tb-hash.h) free of external
+dependences. (originally tb-hash.h's contents were in exec-all.h)
+
+If we're worried about forgetting to update the hash function,
+we could have a compile-time check + a comment elsewhere
+(e.g. translate-all.c).
+
+>  {
+>      uint32_t v1 = TB_HASH_XX_SEED + PRIME32_1 + PRIME32_2;
+>      uint32_t v2 = TB_HASH_XX_SEED + PRIME32_2;
+> @@ -83,6 +85,10 @@ uint32_t tb_hash_func5(uint64_t a0, uint64_t b0, uint32_t e)
+Right here you should also do:
+
+@@ -78,7 +78,7 @@ uint32_t tb_hash_func5(uint64_t a0, uint64_t b0, uint32_t e)
+     v4 *= PRIME32_1;
+
+     h32 = rol32(v1, 1) + rol32(v2, 7) + rol32(v3, 12) + rol32(v4, 18);
+-    h32 += 20;
++    h32 += 24;
+
+to take into account the newly added parameter.
+
+>      h32 += e * PRIME32_3;
+>      h32  = rol32(h32, 17) * PRIME32_4;
+>  
+> +    QEMU_BUILD_BUG_ON(sizeof(TRACE_QHT_VCPU_DSTATE_TYPE) != sizeof(uint32_t));
+> +    h32 += f * PRIME32_3;
+> +    h32  = rol32(h32, 17) * PRIME32_4;
+
+If we get rid of the typedef, this compile-time check will go away too.
+
+(snip)
+> diff --git a/include/qemu-common.h b/include/qemu-common.h
+> index 1430390eb6..aaaa73a6fe 100644
+> --- a/include/qemu-common.h
+> +++ b/include/qemu-common.h
+> @@ -151,4 +151,7 @@ void page_size_init(void);
+>   * returned. */
+>  bool dump_in_progress(void);
+>  
+> +/* Use a macro to allow safe changes to its size in the future */
+> +#define TRACE_QHT_VCPU_DSTATE_TYPE uint32_t
+> +
+(snip)
+> diff --git a/translate-all.c b/translate-all.c
+> index 29ccb9e546..6e1b1d474c 100644
+> --- a/translate-all.c
+> +++ b/translate-all.c
+> @@ -54,6 +54,7 @@
+>  #include "exec/tb-hash.h"
+>  #include "translate-all.h"
+>  #include "qemu/bitmap.h"
+> +#include "qemu/error-report.h"
+>  #include "qemu/timer.h"
+>  #include "exec/log.h"
+>  
+> @@ -813,6 +814,12 @@ static void tb_htable_init(void)
+>  {
+>      unsigned int mode = QHT_MODE_AUTO_RESIZE;
+>  
+> +    /* Ensure TB hash function covers the bitmap size */
+> +    if (DIV_ROUND_UP(trace_get_vcpu_event_count(), BITS_PER_BYTE) >
+> +        sizeof(TRACE_QHT_VCPU_DSTATE_TYPE)) {
+> +        error_report("too many 'vcpu' events for the TB hash function");
+> +    }
+> +
+
+This is a better place to do the above check, I think.
+
+Thanks,
+
+		Emilio
