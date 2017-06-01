@@ -1,29 +1,39 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38452)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39219)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dGN0m-0008JQ-GZ
-	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 06:07:25 -0400
+	(envelope-from <borntraeger@de.ibm.com>) id 1dGN3h-0001bi-JQ
+	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 06:10:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dGN0j-0007WP-Cz
-	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 06:07:24 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53434)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dGN0j-0007W5-6r
-	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 06:07:21 -0400
-Date: Thu, 1 Jun 2017 11:07:13 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170601100713.GD2083@work-vm>
-References: <1495539071-12995-1-git-send-email-a.perevalov@samsung.com>
-	<CGME20170523113131eucas1p24a041de6004237e437f97a24340507e2@eucas1p2.samsung.com>
-	<1495539071-12995-9-git-send-email-a.perevalov@samsung.com>
-	<20170524075305.GG3873@pxdev.xzpeter.org>
-	<20170524093720.GC12925@aperevalov-ubuntu>
-	<20170524112220.GJ3873@pxdev.xzpeter.org>
+	(envelope-from <borntraeger@de.ibm.com>) id 1dGN3e-000050-EE
+	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 06:10:25 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:46081
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
+	id 1dGN3e-0008WJ-8d
+	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 06:10:22 -0400
+Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v51A8s39068687
+	for <qemu-devel@nongnu.org>; Thu, 1 Jun 2017 06:10:21 -0400
+Received: from e12.ny.us.ibm.com (e12.ny.us.ibm.com [129.33.205.202])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2atfhpceq7-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Thu, 01 Jun 2017 06:10:21 -0400
+Received: from localhost
+	by e12.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
+	Thu, 1 Jun 2017 06:10:20 -0400
+References: <20170531193434.6918-1-david@redhat.com>
+From: Christian Borntraeger <borntraeger@de.ibm.com>
+Date: Thu, 1 Jun 2017 12:10:15 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170524112220.GJ3873@pxdev.xzpeter.org>
-Subject: Re: [Qemu-devel] [PATCH V6 08/10] migration: calculate vCPU
- blocktime on dst side
+In-Reply-To: <20170531193434.6918-1-david@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-IE
+Content-Transfer-Encoding: 7bit
+Message-Id: <b6efd549-0cab-ed67-c39c-b62b833cfef8@de.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH v1 0/2] s390x cpu model improvements for KVM
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,59 +42,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: Alexey <a.perevalov@samsung.com>, i.maximets@samsung.com, qemu-devel@nongnu.org
+To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
+Cc: rth@twiddle.net, Aurelien Jarno <aurelien@aurel32.net>, thuth@redhat.com, Cornelia Huck <cornelia.huck@de.ibm.com>, "Jason J . Herne" <jjherne@linux.vnet.ibm.com>
 
-* Peter Xu (peterx@redhat.com) wrote:
-
-> > > Why use *__nocheck() rather than atomic_xchg() or even atomic_read()?
-> > > Same thing happened a lot in current patch.
-> > atomic_read/atomic_xchg for mingw/(gcc on arm32) has build time check,
-> > 
-> > QEMU_BUILD_BUG_ON(sizeof(*ptr) > sizeof(void *));
-> > 
-> > it prevents using 64 atomic operation on 32 architecture, just mingw I
-> > think, but postcopy-ram.c isn't compiling for mingw.
-> > On other 32 platforms as I know clang/gcc allow to use 8 bytes
-> > long variables in built atomic operations. In arm32 it allows in
-> > builtin. But QEMU on arm32 still
-> > has that sanity check, and I think it's bug, so I just worked it around.
-> > Maybe better was to fix it.
-> > 
-> > I tested in docker, using follow command:
-> > make docker-test-build@debian-armhf-cross
-> > 
-> > And got following error
-> > 
-> > /tmp/qemu-test/src/migration/postcopy-ram.c: In function
-> > 'mark_postcopy_blocktime_begin':
-> > /tmp/qemu-test/src/include/qemu/compiler.h:86:30: error: static
-> > assertion failed: "not expecting: sizeof(*&dc->vcpu_addr[cpu]) >
-> > sizeof(void *)"
-> >  #define QEMU_BUILD_BUG_ON(x) _Static_assert(!(x), "not expecting: " #x)
-> > 
-> > when I used atomic_xchg,
-> > I agree with you, but I think need to fix atomic.h firstly and add additional
-> > #ifdef there.
-> > 
-> > And I didn't want to split 64 bit values onto 32 bit values, but I saw
-> > in mailing list people are doing it.
+On 05/31/2017 09:34 PM, David Hildenbrand wrote:
+> We should properly forward the CPUID format bit. CPU model
+> detection on systems without IBC might select a model with a wrong
+> CPU type (esp. selecting the business class (BC) model on an enterprise
+> class (EC) machine). So let's improve that, too.
 > 
-> If this is a bug, then I guess the best way is to fix it. But before
-> that - can a 32bit system really do 64bit atomic ops? Is it really a
-> bug at all?
-
-Some can, but not all.
-ARM has 'ldrexd' for 64bit atomics; but I can't remember which subset
-of ARMs has it; I think most recent stuff.
-I don't think you can guarantee it's on all architectures though, but it
-might be on any we care about.
-
-Dave
-
-> Thanks,
+> I am also preparing a patch to properly indicate the correct cpu type
+> to the guest via STORE CPU ID and STORE HYPERVISOR INFORMATION for the
+> TCG case, but will send that separately after I tested it (want to write a
+> kvm-unit-test for STORE CPU ID).
 > 
-> -- 
-> Peter Xu
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> David Hildenbrand (2):
+>   s390x/cpumodel: take care of the cpuid format bit for KVM
+>   s390x/cpumodel: improve defintion search without an IBC
+> 
+>  target/s390x/cpu_models.c | 10 ++++++++++
+>  target/s390x/cpu_models.h | 10 +++++++---
+>  target/s390x/kvm.c        |  1 +
+>  3 files changed, 18 insertions(+), 3 deletions(-)
+> 
+
+I like both patches in terms of "yes, its the right thing to do".
+Jason can you have a look? I might need some days to catch up
+with other things before I can look into the patches.
