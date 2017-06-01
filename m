@@ -1,32 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34591)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34778)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dGSOP-0007me-WC
-	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 11:52:10 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dGSPH-0008Jd-BI
+	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 11:53:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dGSOL-0000qC-3B
-	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 11:52:10 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:32794)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dGSOK-0000pP-Pr
-	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 11:52:05 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 762548553C
-	for <qemu-devel@nongnu.org>; Thu,  1 Jun 2017 15:52:03 +0000 (UTC)
-Date: Thu, 1 Jun 2017 16:51:58 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170601155157.GG2845@work-vm>
-References: <20170531103509.22021-1-quintela@redhat.com>
-	<20170531103509.22021-8-quintela@redhat.com>
-	<20170601124631.GR2083@work-vm> <87shjj7mx2.fsf@secure.mitica>
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dGSPG-0001H9-Ax
+	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 11:53:03 -0400
+Received: from mail-it0-x244.google.com ([2607:f8b0:4001:c0b::244]:35119)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dGSPG-0001Fk-3V
+	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 11:53:02 -0400
+Received: by mail-it0-x244.google.com with SMTP id 67so6827284itx.2
+	for <qemu-devel@nongnu.org>; Thu, 01 Jun 2017 08:53:00 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20170601144915.20778-1-alex.bennee@linaro.org>
+	<20170601144915.20778-4-alex.bennee@linaro.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <ffaa048b-5a20-15d6-91bb-5d577226bb70@amsat.org>
+Date: Thu, 1 Jun 2017 12:52:55 -0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <87shjj7mx2.fsf@secure.mitica>
-Subject: Re: [Qemu-devel] [PATCH v2 07/10] migration: Export rdma.c
- functions in its own file
+In-Reply-To: <20170601144915.20778-4-alex.bennee@linaro.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v2 3/4] qom/cpu: remove host_tid field
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,97 +34,113 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Juan Quintela <quintela@redhat.com>
-Cc: qemu-devel@nongnu.org, lvivier@redhat.com, peterx@redhat.com
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, pbonzini@redhat.com, doug16k@gmail.com, imbrenda@linux.vnet.ibm.com
+Cc: Riku Voipio <riku.voipio@iki.fi>, qemu-devel@nongnu.org, Laurent Vivier <laurent@vivier.eu>
 
-* Juan Quintela (quintela@redhat.com) wrote:
-> "Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
-> > * Juan Quintela (quintela@redhat.com) wrote:
-> >> Signed-off-by: Juan Quintela <quintela@redhat.com>
-> >> ---
-> >>  include/migration/migration.h |  4 ----
-> >>  migration/migration.c         |  1 +
-> >>  migration/rdma.c              |  1 +
-> >>  migration/rdma.h              | 25 +++++++++++++++++++++++++
-> >>  4 files changed, 27 insertions(+), 4 deletions(-)
-> >>  create mode 100644 migration/rdma.h
-> >> 
-> >> diff --git a/include/migration/migration.h b/include/migration/migration.h
-> >> index 29fda5b..8d29bc9 100644
-> >> --- a/include/migration/migration.h
-> >> +++ b/include/migration/migration.h
-> >> @@ -153,10 +153,6 @@ void qemu_start_incoming_migration(const char
-> >> *uri, Error **errp);
-> >>  
-> >>  uint64_t migrate_max_downtime(void);
-> >>  
-> >> -void rdma_start_outgoing_migration(void *opaque, const char
-> >> *host_port, Error **errp);
-> >> -
-> >> -void rdma_start_incoming_migration(const char *host_port, Error **errp);
-> >> -
-> >>  void migrate_fd_error(MigrationState *s, const Error *error);
-> >>  
-> >>  void migrate_fd_connect(MigrationState *s);
-> >> diff --git a/migration/migration.c b/migration/migration.c
-> >> index 6e11db2..3face58 100644
-> >> --- a/migration/migration.c
-> >> +++ b/migration/migration.c
-> >> @@ -21,6 +21,7 @@
-> >>  #include "exec.h"
-> >>  #include "fd.h"
-> >>  #include "socket.h"
-> >> +#include "rdma.h"
-> >>  #include "migration/migration.h"
-> >>  #include "savevm.h"
-> >>  #include "qemu-file-channel.h"
-> >> diff --git a/migration/rdma.c b/migration/rdma.c
-> >> index 4cb5bf8..fab30ea 100644
-> >> --- a/migration/rdma.c
-> >> +++ b/migration/rdma.c
-> >> @@ -17,6 +17,7 @@
-> >>  #include "qapi/error.h"
-> >>  #include "qemu-common.h"
-> >>  #include "qemu/cutils.h"
-> >> +#include "rdma.h"
-> >>  #include "migration/migration.h"
-> >>  #include "qemu-file.h"
-> >>  #include "exec/cpu-common.h"
-> >> diff --git a/migration/rdma.h b/migration/rdma.h
-> >> new file mode 100644
-> >> index 0000000..de2ba09
-> >> --- /dev/null
-> >> +++ b/migration/rdma.h
-> >> @@ -0,0 +1,25 @@
-> >> +/*
-> >> + * RDMA protocol and interfaces
-> >> + *
-> >> + * Copyright IBM, Corp. 2010-2013
-> >> + * Copyright Red Hat, Inc. 2015-2016
-> >> + *
-> >> + * Authors:
-> >> + *  Michael R. Hines <mrhines@us.ibm.com>
-> >> + *  Jiuxing Liu <jl@us.ibm.com>
-> >> + *  Daniel P. Berrange <berrange@redhat.com>
-> >> + *
-> >> + * This work is licensed under the terms of the GNU GPL, version 2 or
-> >> + * later.  See the COPYING file in the top-level directory.
-> >> + *
-> >> + */
-> >
-> > Hmm, are we allowed to v2-or-later that?  migration.h is v2
-> 
-> That is the header file of rdma.c
-> 
-> And we only have two functions exported from that file, so I think that
-> it is a safe assumption that they are covered by that copyright.
+On 06/01/2017 11:49 AM, Alex Bennée wrote:
+> This was only used by the gdbstub and even then was only being set for
+> subsequent threads. Rather the continue duplicating the number just
+> make the gdbstub get the information from TaskState structure.
+>
+> Now the tid is correctly reported for all threads the bug I was seeing
+> with "vCont;C04:0;c" packets is fixed as the correct tid is reported
+> to gdb.
+>
+> I moved cpu_gdb_index into the gdbstub to facilitate easy access to
+> the TaskState which is used elsewhere in gdbstub.
+>
+> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 
-OK, that's fair:
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
-
-
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-
-> Later, Juan.
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> ---
+>  gdbstub.c              | 15 +++++++++++++++
+>  include/exec/gdbstub.h | 14 --------------
+>  include/qom/cpu.h      |  2 --
+>  linux-user/syscall.c   |  1 -
+>  4 files changed, 15 insertions(+), 17 deletions(-)
+>
+> diff --git a/gdbstub.c b/gdbstub.c
+> index 026d1fe6bb..45a3a0b16b 100644
+> --- a/gdbstub.c
+> +++ b/gdbstub.c
+> @@ -55,6 +55,21 @@ static inline int target_memory_rw_debug(CPUState *cpu, target_ulong addr,
+>      return cpu_memory_rw_debug(cpu, addr, buf, len, is_write);
+>  }
+>
+> +/* Return the GDB index for a given vCPU state.
+> + *
+> + * For user mode this is simply the thread id. In system mode GDB
+> + * numbers CPUs from 1 as 0 is reserved as an "any cpu" index.
+> + */
+> +static inline int cpu_gdb_index(CPUState *cpu)
+> +{
+> +#if defined(CONFIG_USER_ONLY)
+> +    TaskState *ts = (TaskState *) cpu->opaque;
+> +    return ts->ts_tid;
+> +#else
+> +    return cpu->cpu_index + 1;
+> +#endif
+> +}
+> +
+>  enum {
+>      GDB_SIGNAL_0 = 0,
+>      GDB_SIGNAL_INT = 2,
+> diff --git a/include/exec/gdbstub.h b/include/exec/gdbstub.h
+> index c4fe567600..9aa7756d92 100644
+> --- a/include/exec/gdbstub.h
+> +++ b/include/exec/gdbstub.h
+> @@ -58,20 +58,6 @@ void gdb_register_coprocessor(CPUState *cpu,
+>                                gdb_reg_cb get_reg, gdb_reg_cb set_reg,
+>                                int num_regs, const char *xml, int g_pos);
+>
+> -/* Return the GDB index for a given vCPU state.
+> - *
+> - * For user mode this is simply the thread id. In system mode GDB
+> - * numbers CPUs from 1 as 0 is reserved as an "any cpu" index.
+> - */
+> -static inline int cpu_gdb_index(CPUState *cpu)
+> -{
+> -#if defined(CONFIG_USER_ONLY)
+> -    return cpu->host_tid;
+> -#else
+> -    return cpu->cpu_index + 1;
+> -#endif
+> -}
+> -
+>  /* The GDB remote protocol transfers values in target byte order.  This means
+>   * we can use the raw memory access routines to access the value buffer.
+>   * Conveniently, these also handle the case where the buffer is mis-aligned.
+> diff --git a/include/qom/cpu.h b/include/qom/cpu.h
+> index 55214ce131..909e7ae994 100644
+> --- a/include/qom/cpu.h
+> +++ b/include/qom/cpu.h
+> @@ -266,7 +266,6 @@ struct qemu_work_item;
+>   * @nr_cores: Number of cores within this CPU package.
+>   * @nr_threads: Number of threads within this CPU.
+>   * @numa_node: NUMA node this CPU is belonging to.
+> - * @host_tid: Host thread ID.
+>   * @running: #true if CPU is currently running (lockless).
+>   * @has_waiter: #true if a CPU is currently waiting for the cpu_exec_end;
+>   * valid under cpu_list_lock.
+> @@ -321,7 +320,6 @@ struct CPUState {
+>      HANDLE hThread;
+>  #endif
+>      int thread_id;
+> -    uint32_t host_tid;
+>      bool running, has_waiter;
+>      struct QemuCond *halt_cond;
+>      bool thread_kicked;
+> diff --git a/linux-user/syscall.c b/linux-user/syscall.c
+> index cec8428589..cada188e58 100644
+> --- a/linux-user/syscall.c
+> +++ b/linux-user/syscall.c
+> @@ -6216,7 +6216,6 @@ static void *clone_func(void *arg)
+>      thread_cpu = cpu;
+>      ts = (TaskState *)cpu->opaque;
+>      info->tid = gettid();
+> -    cpu->host_tid = info->tid;
+>      task_settid(ts);
+>      if (info->child_tidptr)
+>          put_user_u32(info->tid, info->child_tidptr);
+>
