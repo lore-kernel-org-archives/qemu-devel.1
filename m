@@ -1,30 +1,41 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38071)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40545)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <anton.nefedov@virtuozzo.com>) id 1dGODq-0007ZS-1c
-	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 07:24:59 -0400
+	(envelope-from <pasic@linux.vnet.ibm.com>) id 1dGOHe-0000Zr-7r
+	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 07:28:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <anton.nefedov@virtuozzo.com>) id 1dGODm-0004Jv-Rp
-	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 07:24:58 -0400
-Received: from mail-eopbgr20099.outbound.protection.outlook.com
-	([40.107.2.99]:21600
-	helo=EUR02-VE1-obe.outbound.protection.outlook.com)
+	(envelope-from <pasic@linux.vnet.ibm.com>) id 1dGOHb-0006Of-29
+	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 07:28:54 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:51840)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <anton.nefedov@virtuozzo.com>)
-	id 1dGODm-0004IE-CQ
-	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 07:24:54 -0400
-References: <1496152683-102751-1-git-send-email-anton.nefedov@virtuozzo.com>
-	<1496152683-102751-11-git-send-email-anton.nefedov@virtuozzo.com>
-	<CAJ+F1CLQ_Yi_rzRPSez2xJJVMV_cD_bX79vLVPyWuga8-_T50w@mail.gmail.com>
-From: Anton Nefedov <anton.nefedov@virtuozzo.com>
-Message-ID: <b4652581-1e1c-91b0-4326-699528d7b0af@virtuozzo.com>
-Date: Thu, 1 Jun 2017 14:24:46 +0300
+	(Exim 4.71) (envelope-from <pasic@linux.vnet.ibm.com>)
+	id 1dGOHa-0006OQ-OZ
+	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 07:28:50 -0400
+Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v51BOnUv115776
+	for <qemu-devel@nongnu.org>; Thu, 1 Jun 2017 07:28:49 -0400
+Received: from e06smtp14.uk.ibm.com (e06smtp14.uk.ibm.com [195.75.94.110])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2atfwheyf4-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Thu, 01 Jun 2017 07:28:48 -0400
+Received: from localhost
+	by e06smtp14.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <pasic@linux.vnet.ibm.com>;
+	Thu, 1 Jun 2017 12:28:45 +0100
+References: <20170529131716.94338-1-pasic@linux.vnet.ibm.com>
+	<20170601125241.2c11e95a.cornelia.huck@de.ibm.com>
+	<49c45fcc-c161-cb47-cf2b-86d39996c3d6@linux.vnet.ibm.com>
+	<9a244d38-106d-bec1-e379-136395b3fbdd@de.ibm.com>
+From: Halil Pasic <pasic@linux.vnet.ibm.com>
+Date: Thu, 1 Jun 2017 13:28:41 +0200
 MIME-Version: 1.0
-In-Reply-To: <CAJ+F1CLQ_Yi_rzRPSez2xJJVMV_cD_bX79vLVPyWuga8-_T50w@mail.gmail.com>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3 10/13] hmp: add hmp analogue for
- qmp-chardev-change
+In-Reply-To: <9a244d38-106d-bec1-e379-136395b3fbdd@de.ibm.com>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 8bit
+Message-Id: <e484af73-c2df-1a09-49e1-80773034f135@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH 1/1] s390x: vmstatify config migration for
+ virtio-ccw
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,205 +44,327 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@gmail.com>, qemu-devel@nongnu.org
-Cc: pbonzini@redhat.com, den@virtuozzo.com, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+To: Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cornelia.huck@de.ibm.com>
+Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org
 
 
 
-On 06/01/2017 10:12 AM, Marc-Andr=C3=A9 Lureau wrote:
-> Hi
->=20
-> On Tue, May 30, 2017 at 6:08 PM Anton Nefedov=20
-> <anton.nefedov@virtuozzo.com <mailto:anton.nefedov@virtuozzo.com>> wrote:
->=20
->     Signed-off-by: Anton Nefedov <anton.nefedov@virtuozzo.com
->     <mailto:anton.nefedov@virtuozzo.com>>
->     Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com
->     <mailto:vsementsov@virtuozzo.com>>
->     CC: Dr. David Alan Gilbert <dgilbert@redhat.com
->     <mailto:dgilbert@redhat.com>>
->     ---
->       chardev/char.c        |  2 +-
->       hmp-commands.hx       | 16 ++++++++++++++++
->       hmp.c                 | 34 ++++++++++++++++++++++++++++++++++
->       hmp.h                 |  1 +
->       include/sysemu/char.h | 12 ++++++++++++
->       5 files changed, 64 insertions(+), 1 deletion(-)
->=20
->     diff --git a/chardev/char.c b/chardev/char.c
->     index 2d6e204..1e2a2dd 100644
->     --- a/chardev/char.c
->     +++ b/chardev/char.c
->     @@ -888,7 +888,7 @@ help_string_append(const char *name, void *opaque=
-)
->           g_string_append_printf(str, "\n%s", name);
->       }
->=20
->     -static ChardevBackend *qemu_chr_parse_opts(QemuOpts *opts, Error
->     **errp)
->     +ChardevBackend *qemu_chr_parse_opts(QemuOpts *opts, Error **errp)
->       {
->           Error *local_err =3D NULL;
->           const ChardevClass *cc;
->     diff --git a/hmp-commands.hx b/hmp-commands.hx
->     index baeac47..19bfddd 100644
->     --- a/hmp-commands.hx
->     +++ b/hmp-commands.hx
->     @@ -1727,6 +1727,22 @@ chardev_add accepts the same parameters as
->     the -chardev command line switch.
->       ETEXI
->=20
->           {
->     +        .name       =3D "chardev-change",
->     +        .args_type  =3D "id:s,args:s",
->     +        .params     =3D "id args",
->     +        .help       =3D "change chardev",
->     +        .cmd        =3D hmp_chardev_change,
->     +    },
->     +
->     +STEXI
->     +@item chardev-change args
->     +@findex chardev-change
->     +chardev_change accepts existing chardev @var{id} and then the same
->     arguments
->=20
->=20
-> chardev_change vs chardev-change. Apparently, there is this difference=20
-> for chardev-add too
->=20
+On 06/01/2017 01:19 PM, Christian Borntraeger wrote:
+> On 06/01/2017 01:02 PM, Halil Pasic wrote:
+>>
+>>
+>> On 06/01/2017 12:52 PM, Cornelia Huck wrote:
+>>> On Mon, 29 May 2017 15:17:16 +0200
+>>> Halil Pasic <pasic@linux.vnet.ibm.com> wrote:
+>>>
+>>>> Let's vmstatify virtio_ccw_save_config and virtio_ccw_load_config for
+>>>> flexibility (extending using subsections) and for fun.
+>>>
+>>> You have interesting ideas of fun :)
+>>>
+>>>>
+>>>> To achieve this we need to hack the config_vector, which is VirtIODevice
+>>>> (that is common virtio) state, in the middle of the VirtioCcwDevice state
+>>>> representation.  This somewhat ugly, but we have no choice because the
+>>>> stream format needs to be preserved.
+>>>>
+>>>> Almost no changes in behavior. Exception is everything that comes with
+>>>> vmstate like extra bookkeeping about what's in the stream, and maybe some
+>>>> extra checks and better error reporting.
+>>>>
+>>>> Signed-off-by: Halil Pasic <pasic@linux.vnet.ibm.com>
+>>>> ---
+>> [..]
+>>>> --- a/hw/s390x/css.c
+>>>> +++ b/hw/s390x/css.c
+>> [..]
+>>>> +static const VMStateDescription vmstate_sense_id = {
+>>>> +    .name = "s390_sense_id",
+>>>> +    .version_id = 1,
+>>>> +    .minimum_version_id = 1,
+>>>> +    .fields = (VMStateField[]) {
+>>>> +        VMSTATE_UINT8(reserved, SenseId),
+>>>> +        VMSTATE_UINT16(cu_type, SenseId),
+>>>> +        VMSTATE_UINT8(cu_model, SenseId),
+>>>> +        VMSTATE_UINT16(dev_type, SenseId),
+>>>> +        VMSTATE_UINT8(dev_model, SenseId),
+>>>> +        VMSTATE_UINT8(unused, SenseId),
+>>>
+>>> This is strictly due to stream format preservation, right?
+>>>
+>>
+>> Yes!
+>>
+>> [..]
+>>>> --- a/hw/s390x/virtio-ccw.c
+>>>> +++ b/hw/s390x/virtio-ccw.c
+>>>> @@ -34,9 +34,87 @@
+>>>>  #include "virtio-ccw.h"
+>>>>  #include "trace.h"
+>>>>  #include "hw/s390x/css-bridge.h"
+>>>> +#include "hw/s390x/s390-virtio-ccw.h"
+>>>>
+>>>>  #define NR_CLASSIC_INDICATOR_BITS 64
+>>>>
+>>>> +static int virtio_ccw_dev_post_load(void *opaque, int version_id)
+>>>> +{
+>>>> +    VirtioCcwDevice *dev = VIRTIO_CCW_DEVICE(opaque);
+>>>> +    CcwDevice *ccw_dev = CCW_DEVICE(dev);
+>>>> +    CCWDeviceClass *ck = CCW_DEVICE_GET_CLASS(ccw_dev);
+>>>> +
+>>>> +    ccw_dev->sch->driver_data = dev;
+>>>> +    if (CCW_DEVICE(dev)->sch->thinint_active) {
+>>>
+>>> Please use ccw_dev instead of CCW_DEVICE(dev).
+>>>
+>>
+>> Sure.
+>>
+>>>> +        dev->routes.adapter.adapter_id = css_get_adapter_id(
+>>>> +                                         CSS_IO_ADAPTER_VIRTIO,
+>>>> +                                         dev->thinint_isc);
+>>>> +    }
+>>>> +    /* Re-fill subch_id after loading the subchannel states.*/
+>>>> +    if (ck->refill_ids) {
+>>>> +        ck->refill_ids(ccw_dev);
+>>>> +    }
+>>>> +    return 0;
+>>>> +}
+>>>> +
+>>>> +typedef struct VirtioCcwDeviceTmp {
+>>>> +    VirtioCcwDevice *parent;
+>>>> +    uint16_t config_vector;
+>>>> +} VirtioCcwDeviceTmp;
+>>>> +
+>>>> +static void virtio_ccw_dev_tmp_pre_save(void *opaque)
+>>>> +{
+>>>> +    VirtioCcwDeviceTmp *tmp = opaque;
+>>>> +    VirtioCcwDevice *dev = tmp->parent;
+>>>> +    VirtIODevice *vdev = virtio_bus_get_device(&dev->bus);
+>>>> +
+>>>> +    tmp->config_vector = vdev->config_vector;
+>>>> +}
+>>>> +
+>>>> +static int virtio_ccw_dev_tmp_post_load(void *opaque, int version_id)
+>>>> +{
+>>>> +    VirtioCcwDeviceTmp *tmp = opaque;
+>>>> +    VirtioCcwDevice *dev = tmp->parent;
+>>>> +    VirtIODevice *vdev = virtio_bus_get_device(&dev->bus);
+>>>> +
+>>>> +    vdev->config_vector = tmp->config_vector;
+>>>> +    return 0;
+>>>> +}
+>>>> +
+>>>> +const VMStateDescription vmstate_virtio_ccw_dev_tmp = {
+>>>> +    .name = "s390_virtio_ccw_dev_tmp",
+>>>> +    .pre_save = virtio_ccw_dev_tmp_pre_save,
+>>>> +    .post_load = virtio_ccw_dev_tmp_post_load,
+>>>> +    .fields = (VMStateField[]) {
+>>>> +        VMSTATE_UINT16(config_vector, VirtioCcwDeviceTmp),
+>>>> +        VMSTATE_END_OF_LIST()
+>>>> +    }
+>>>> +};
+>>>> +
+>>>> +const VMStateDescription vmstate_virtio_ccw_dev = {
+>>>> +    .name = "s390_virtio_ccw_dev",
+>>>> +    .version_id = 1,
+>>>> +    .minimum_version_id = 1,
+>>>> +    .post_load = virtio_ccw_dev_post_load,
+>>>> +    .fields = (VMStateField[]) {
+>>>> +        VMSTATE_CCW_DEVICE(parent_obj, VirtioCcwDevice),
+>>>> +        VMSTATE_PTR_TO_IND_ADDR(indicators, VirtioCcwDevice),
+>>>> +        VMSTATE_PTR_TO_IND_ADDR(indicators2, VirtioCcwDevice),
+>>>> +        VMSTATE_PTR_TO_IND_ADDR(summary_indicator, VirtioCcwDevice),
+>>>> +        /*
+>>>> +         * Ugly hack because VirtIODevice does not migrate itself.
+>>>> +         * This also makes legacy via vmstate_save_state possible.
+>>>> +         */
+>>>> +        VMSTATE_WITH_TMP(VirtioCcwDevice, VirtioCcwDeviceTmp,
+>>>> +                         vmstate_virtio_ccw_dev_tmp),
+>>>> +        VMSTATE_STRUCT(routes, VirtioCcwDevice, 1, vmstate_adapter_routes, \
+>>>> +                       AdapterRoutes),
+>>>> +        VMSTATE_UINT8(thinint_isc, VirtioCcwDevice),
+>>>> +        VMSTATE_INT32(revision, VirtioCcwDevice),
+>>>> +        VMSTATE_END_OF_LIST()
+>>>> +    }
+>>>> +};
+>>>> +
+>>>>  static void virtio_ccw_bus_new(VirtioBusState *bus, size_t bus_size,
+>>>>                                 VirtioCcwDevice *dev);
+>>>>
+>>>> @@ -1234,85 +1312,13 @@ static int virtio_ccw_load_queue(DeviceState *d, int n, QEMUFile *f)
+>>>>  static void virtio_ccw_save_config(DeviceState *d, QEMUFile *f)
+>>>>  {
+>>>>      VirtioCcwDevice *dev = VIRTIO_CCW_DEVICE(d);
+>>>> -    CcwDevice *ccw_dev = CCW_DEVICE(d);
+>>>> -    SubchDev *s = ccw_dev->sch;
+>>>> -    VirtIODevice *vdev = virtio_ccw_get_vdev(s);
+>>>> -
+>>>> -    subch_device_save(s, f);
+>>>> -    if (dev->indicators != NULL) {
+>>>> -        qemu_put_be32(f, dev->indicators->len);
+>>>> -        qemu_put_be64(f, dev->indicators->addr);
+>>>> -    } else {
+>>>> -        qemu_put_be32(f, 0);
+>>>> -        qemu_put_be64(f, 0UL);
+>>>> -    }
+>>>> -    if (dev->indicators2 != NULL) {
+>>>> -        qemu_put_be32(f, dev->indicators2->len);
+>>>> -        qemu_put_be64(f, dev->indicators2->addr);
+>>>> -    } else {
+>>>> -        qemu_put_be32(f, 0);
+>>>> -        qemu_put_be64(f, 0UL);
+>>>> -    }
+>>>> -    if (dev->summary_indicator != NULL) {
+>>>> -        qemu_put_be32(f, dev->summary_indicator->len);
+>>>> -        qemu_put_be64(f, dev->summary_indicator->addr);
+>>>> -    } else {
+>>>> -        qemu_put_be32(f, 0);
+>>>> -        qemu_put_be64(f, 0UL);
+>>>> -    }
+>>>> -    qemu_put_be16(f, vdev->config_vector);
+>>>> -    qemu_put_be64(f, dev->routes.adapter.ind_offset);
+>>>> -    qemu_put_byte(f, dev->thinint_isc);
+>>>> -    qemu_put_be32(f, dev->revision);
+>>>> +    vmstate_save_state(f, &vmstate_virtio_ccw_dev, dev, NULL);
+>>>>  }
+>>>>
+>>>>  static int virtio_ccw_load_config(DeviceState *d, QEMUFile *f)
+>>>>  {
+>>>>      VirtioCcwDevice *dev = VIRTIO_CCW_DEVICE(d);
+>>>> -    CcwDevice *ccw_dev = CCW_DEVICE(d);
+>>>> -    CCWDeviceClass *ck = CCW_DEVICE_GET_CLASS(ccw_dev);
+>>>> -    SubchDev *s = ccw_dev->sch;
+>>>> -    VirtIODevice *vdev = virtio_ccw_get_vdev(s);
+>>>> -    int len;
+>>>> -
+>>>> -    s->driver_data = dev;
+>>>> -    subch_device_load(s, f);
+>>>> -    /* Re-fill subch_id after loading the subchannel states.*/
+>>>> -    if (ck->refill_ids) {
+>>>> -        ck->refill_ids(ccw_dev);
+>>>> -    }
+>>>> -    len = qemu_get_be32(f);
+>>>> -    if (len != 0) {
+>>>> -        dev->indicators = get_indicator(qemu_get_be64(f), len);
+>>>> -    } else {
+>>>> -        qemu_get_be64(f);
+>>>> -        dev->indicators = NULL;
+>>>> -    }
+>>>> -    len = qemu_get_be32(f);
+>>>> -    if (len != 0) {
+>>>> -        dev->indicators2 = get_indicator(qemu_get_be64(f), len);
+>>>> -    } else {
+>>>> -        qemu_get_be64(f);
+>>>> -        dev->indicators2 = NULL;
+>>>> -    }
+>>>> -    len = qemu_get_be32(f);
+>>>> -    if (len != 0) {
+>>>> -        dev->summary_indicator = get_indicator(qemu_get_be64(f), len);
+>>>> -    } else {
+>>>> -        qemu_get_be64(f);
+>>>> -        dev->summary_indicator = NULL;
+>>>> -    }
+>>>> -    qemu_get_be16s(f, &vdev->config_vector);
+>>>> -    dev->routes.adapter.ind_offset = qemu_get_be64(f);
+>>>> -    dev->thinint_isc = qemu_get_byte(f);
+>>>> -    dev->revision = qemu_get_be32(f);
+>>>> -    if (s->thinint_active) {
+>>>> -        dev->routes.adapter.adapter_id = css_get_adapter_id(
+>>>> -                                         CSS_IO_ADAPTER_VIRTIO,
+>>>> -                                         dev->thinint_isc);
+>>>> -    }
+>>>> -
+>>>> -    return 0;
+>>>> +    return vmstate_load_state(f, &vmstate_virtio_ccw_dev, dev, 1);
+>>>>  }
+>>>>
+>>>>  static void virtio_ccw_pre_plugged(DeviceState *d, Error **errp)
+>>>> diff --git a/include/hw/s390x/css.h b/include/hw/s390x/css.h
+>>>> index e61fa74d9b..d74e44d312 100644
+>>>> --- a/include/hw/s390x/css.h
+>>>> +++ b/include/hw/s390x/css.h
+>>>> @@ -88,6 +88,7 @@ struct SubchDev {
+>>>>      bool ccw_fmt_1;
+>>>>      bool thinint_active;
+>>>>      uint8_t ccw_no_data_cnt;
+>>>> +    uint16_t migrated_schid; /* used for missmatch detection */
+>>>>      /* transport-provided data: */
+>>>>      int (*ccw_cb) (SubchDev *, CCW1);
+>>>>      void (*disable_cb)(SubchDev *);
+>>>> @@ -95,22 +96,27 @@ struct SubchDev {
+>>>>      void *driver_data;
+>>>>  };
+>>>>
+>>>> +extern const VMStateDescription vmstate_subch_dev;
+>>>> +
+>>>>  typedef struct IndAddr {
+>>>>      hwaddr addr;
+>>>>      uint64_t map;
+>>>>      unsigned long refcnt;
+>>>> -    int len;
+>>>> +    int32_t len;
+>>>>      QTAILQ_ENTRY(IndAddr) sibling;
+>>>>  } IndAddr;
+>>>>
+>>>> +extern const VMStateDescription vmstate_ind_addr;
+>>>> +
+>>>> +#define VMSTATE_PTR_TO_IND_ADDR(_f, _s)                                   \
+>>>> +    VMSTATE_STRUCT(_f, _s, 1, vmstate_ind_addr, IndAddr*)
+>>>> +
+>>>>  IndAddr *get_indicator(hwaddr ind_addr, int len);
+>>>>  void release_indicator(AdapterInfo *adapter, IndAddr *indicator);
+>>>>  int map_indicator(AdapterInfo *adapter, IndAddr *indicator);
+>>>>
+>>>>  typedef SubchDev *(*css_subch_cb_func)(uint8_t m, uint8_t cssid, uint8_t ssid,
+>>>>                                         uint16_t schid);
+>>>> -void subch_device_save(SubchDev *s, QEMUFile *f);
+>>>> -int subch_device_load(SubchDev *s, QEMUFile *f);
+>>>>  int css_create_css_image(uint8_t cssid, bool default_image);
+>>>>  bool css_devno_used(uint8_t cssid, uint8_t ssid, uint16_t devno);
+>>>>  void css_subch_assign(uint8_t cssid, uint8_t ssid, uint16_t schid,
+>>>> diff --git a/include/hw/s390x/s390_flic.h b/include/hw/s390x/s390_flic.h
+>>>> index f9e6890c90..caa6fc608d 100644
+>>>> --- a/include/hw/s390x/s390_flic.h
+>>>> +++ b/include/hw/s390x/s390_flic.h
+>>>> @@ -31,6 +31,11 @@ typedef struct AdapterRoutes {
+>>>>      int gsi[ADAPTER_ROUTES_MAX_GSI];
+>>>>  } AdapterRoutes;
+>>>>
+>>>> +extern const VMStateDescription vmstate_adapter_routes;
+>>>> +
+>>>> +#define VMSTATE_ADAPTER_ROUTES(_f, _s) \
+>>>> +    VMSTATE_STRUCT(_f, _s, 1, vmstate_adapter_routes, AdapterRoutes)
+>>>> +
+>>>>  #define TYPE_S390_FLIC_COMMON "s390-flic"
+>>>>  #define S390_FLIC_COMMON(obj) \
+>>>>      OBJECT_CHECK(S390FLICState, (obj), TYPE_S390_FLIC_COMMON)
+>>>
+>>> Other than the nit above, looks good to me. Especially the migration of
+>>> the pmcw & co. is now more readable. So, with the nit fixed,
+>>>
+>>> Reviewed-by: Cornelia Huck <cornelia.huck@de.ibm.com>
+>>
+>> Thanks!
+>>
+>>>
+>>> Christian, can you please take this?
+>>>
+>>
+>> Should I do a re-spin with the nit's picked and the r-b's added?
+> 
+> Yes please. Can you then give me a confirmation that you have tested a migration between 2.9 and this patch set?
+> 
+> 
 
-Done.
+I have tested between 2.5 and this (2.5 binary and compat both).  I think
+that should be equivalent with testing with 2.9, but I can give it a
+couple of spins with 2.9. 
 
->     +as the -chardev command line switch (except for "id").
->     +
->     +ETEXI
->     +
->     +    {
->               .name       =3D "chardev-remove",
->               .args_type  =3D "id:s",
->               .params     =3D "id",
->     diff --git a/hmp.c b/hmp.c
->     index 20f5dab..7660495 100644
->     --- a/hmp.c
->     +++ b/hmp.c
->     @@ -2224,6 +2224,40 @@ void hmp_chardev_add(Monitor *mon, const
->     QDict *qdict)
->           hmp_handle_error(mon, &err);
->       }
->=20
->     +void hmp_chardev_change(Monitor *mon, const QDict *qdict)
->     +{
->     +    const char *args =3D qdict_get_str(qdict, "args");
->     +    const char *id;
->     +    Error *err =3D NULL;
->     +    ChardevBackend *backend =3D NULL;
->     +    ChardevReturn *ret =3D NULL;
->     +    QemuOpts *opts =3D
->     qemu_opts_parse_noisily(qemu_find_opts("chardev"), args,
->     +                                             true);
->     +    if (!opts) {
->     +        error_setg(&err, "Parsing chardev args failed");
->     +        goto end;
->     +    }
->     +
->     +    id =3D qdict_get_str(qdict, "id");
->     +    if (qemu_opts_id(opts)) {
->     +        error_setg(&err, "Unexpected 'id' parameter");
->=20
->=20
-> enlighten me, how is this triggered?
->=20
+Though my tests are semi automated at best. Given the nature of changes I
+do not expect problems, but from the methodology perspective it ain't
+really satisfactory.  It could might make sense to throw some well
+designed test-suite at it.
 
-correct variant:
-
-   chardev-change char2 pipe,path=3D/tmp/cent.fifo
-
-vs. (without this check)
-
-   (qemu) chardev-change char2 pipe,id=3Dchar2,path=3D/tmp/cent.fifo
-   chardev-change char2 pipe,id=3Dchar2,path=3D/tmp/cent.fifo
-   Duplicate ID 'char2' for chardev
-   Parsing chardev args failed
-
-or
-
-   (qemu) chardev-change char2 pipe,id=3Dnewchar3,path=3D/tmp/cent.fifo
-
-the command would succeed but the user might expect the id to change,
-but it wouldn't
-
->     +        goto end;
->     +    }
->     +
->     +    backend =3D qemu_chr_parse_opts(opts, &err);
->     +    if (!backend) {
->     +        goto end;
->     +    }
->     +
->     +    ret =3D qmp_chardev_change(id, backend, &err);
->     +
->     +end:
->     +    qapi_free_ChardevReturn(ret);
->     +    qapi_free_ChardevBackend(backend);
->     +    qemu_opts_del(opts);
->     +    hmp_handle_error(mon, &err);
->     +}
->     +
->       void hmp_chardev_remove(Monitor *mon, const QDict *qdict)
->       {
->           Error *local_err =3D NULL;
->     diff --git a/hmp.h b/hmp.h
->     index d8b94ce..23e035c 100644
->     --- a/hmp.h
->     +++ b/hmp.h
->     @@ -102,6 +102,7 @@ void hmp_nbd_server_start(Monitor *mon, const
->     QDict *qdict);
->       void hmp_nbd_server_add(Monitor *mon, const QDict *qdict);
->       void hmp_nbd_server_stop(Monitor *mon, const QDict *qdict);
->       void hmp_chardev_add(Monitor *mon, const QDict *qdict);
->     +void hmp_chardev_change(Monitor *mon, const QDict *qdict);
->       void hmp_chardev_remove(Monitor *mon, const QDict *qdict);
->       void hmp_qemu_io(Monitor *mon, const QDict *qdict);
->       void hmp_cpu_add(Monitor *mon, const QDict *qdict);
->     diff --git a/include/sysemu/char.h b/include/sysemu/char.h
->     index 342f531..18fcd26 100644
->     --- a/include/sysemu/char.h
->     +++ b/include/sysemu/char.h
->     @@ -131,6 +131,18 @@ Chardev *qemu_chr_new_from_opts(QemuOpts *opts,
->       void qemu_chr_parse_common(QemuOpts *opts, ChardevCommon *backend);
->=20
->       /**
->     + * @qemu_chr_parse_opts:
->     + *
->     + * Parse the options to the ChardevBackend struct.
->     + *
->     + * @opts
->     + *
->=20
->=20
-> You may remove that line
->=20
->     + * Returns: a new backend
->=20
->=20
-> or NULL on error
->=20
-
-Done.
-
->     + */
->     +ChardevBackend *qemu_chr_parse_opts(QemuOpts *opts,
->     +                                    Error **errp);
->     +
->     +/**
->        * @qemu_chr_new:
->        *
->        * Create a new character backend from a URI.
->     --
->     2.7.4
->=20
->=20
-> --=20
-> Marc-Andr=C3=A9 Lureau
-
-/Anton
+Cheers,
+Halil
