@@ -1,15 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35340)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36429)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dGMo2-0002De-Kn
-	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 05:54:15 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1dGMtI-0003o6-Fz
+	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 05:59:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dGMnx-0003dB-QG
-	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 05:54:14 -0400
-From: Thomas Huth <thuth@redhat.com>
-Date: Thu,  1 Jun 2017 11:54:03 +0200
-Message-Id: <1496310843-28771-1-git-send-email-thuth@redhat.com>
-Subject: [Qemu-devel] [PATCH] hw/core: nmi.c can be compiled as common-obj
- nowadays
+	(envelope-from <pbonzini@redhat.com>) id 1dGMtD-0005Na-Jw
+	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 05:59:40 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:52712)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1dGMtD-0005NV-Cy
+	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 05:59:35 -0400
+References: <20170515194149.16288-1-eblake@redhat.com>
+	<20170515194149.16288-2-eblake@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <d9102dbd-9685-fffd-916f-f9bc7850b2f5@redhat.com>
+Date: Thu, 1 Jun 2017 11:59:30 +0200
+MIME-Version: 1.0
+In-Reply-To: <20170515194149.16288-2-eblake@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v8 1/5] shutdown: Simplify shutdown_signal
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -18,31 +28,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, qemu-trivial@nongnu.org
-Cc: Bandan Das <bsd@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Andrew Jones <drjones@redhat.com>, Juan Quintela <quintela@redhat.com>
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+Cc: armbru@redhat.com, berrange@redhat.com, alistair.francis@xilinx.com
 
-The target-specific code in nmi.c has been removed with this commit:
 
-	commit f7e981f29548fe4af7812f5920304fe607e5bf0d
-	nmi: remove x86 specific nmi handling
 
-Signed-off-by: Thomas Huth <thuth@redhat.com>
----
- hw/core/Makefile.objs | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+On 15/05/2017 21:41, Eric Blake wrote:
+> There is no signal 0 (kill(pid, 0) has special semantics to probe whether
+> a process is alive), rather than actually sending a signal 0).  So we
+> can use the simpler 0, instead of -1, for our sentinel of whether a
+> shutdown request due to a signal has happened.
+> 
+> Suggested-by: Markus Armbruster <armbru@redhat.com>
+> Signed-off-by: Eric Blake <eblake@redhat.com>
+> Reviewed-by: Markus Armbruster <armbru@redhat.com>
+> Reviewed-by: Alistair Francis <alistair.francis@xilinx.com>
+> 
+> ---
+> v4-v8: no change
+> v3: new patch
+> ---
+>  vl.c | 6 +++---
+>  1 file changed, 3 insertions(+), 3 deletions(-)
+> 
+> diff --git a/vl.c b/vl.c
+> index ce2b392..7396748 100644
+> --- a/vl.c
+> +++ b/vl.c
+> @@ -1598,7 +1598,7 @@ void vm_state_notify(int running, RunState state)
+>  }
+> 
+>  static int reset_requested;
+> -static int shutdown_requested, shutdown_signal = -1;
+> +static int shutdown_requested, shutdown_signal;
+>  static pid_t shutdown_pid;
+>  static int powerdown_requested;
+>  static int debug_requested;
+> @@ -1629,7 +1629,7 @@ static int qemu_shutdown_requested(void)
+> 
+>  static void qemu_kill_report(void)
+>  {
+> -    if (!qtest_driver() && shutdown_signal != -1) {
+> +    if (!qtest_driver() && shutdown_signal) {
+>          if (shutdown_pid == 0) {
+>              /* This happens for eg ^C at the terminal, so it's worth
+>               * avoiding printing an odd message in that case.
+> @@ -1643,7 +1643,7 @@ static void qemu_kill_report(void)
+>                           shutdown_cmd ? shutdown_cmd : "<unknown process>");
+>              g_free(shutdown_cmd);
+>          }
+> -        shutdown_signal = -1;
+> +        shutdown_signal = 0;
+>      }
+>  }
+> 
 
-diff --git a/hw/core/Makefile.objs b/hw/core/Makefile.objs
-index 91450b2..f8d7a4a 100644
---- a/hw/core/Makefile.objs
-+++ b/hw/core/Makefile.objs
-@@ -5,7 +5,7 @@ common-obj-y += fw-path-provider.o
- # irq.o needed for qdev GPIO handling:
- common-obj-y += irq.o
- common-obj-y += hotplug.o
--obj-y += nmi.o
-+common-obj-y += nmi.o
- 
- common-obj-$(CONFIG_EMPTY_SLOT) += empty_slot.o
- common-obj-$(CONFIG_XILINX_AXI) += stream.o
--- 
-1.8.3.1
+Queued, thanks.
+
+Paolo
