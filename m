@@ -1,26 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37731)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39425)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1dGLUj-0008Of-Hh
-	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 04:30:18 -0400
+	(envelope-from <berrange@redhat.com>) id 1dGLbE-0004Eq-EU
+	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 04:36:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1dGLUf-0001NG-G4
-	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 04:30:13 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:42006)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <david@redhat.com>) id 1dGLUf-0001LU-AS
-	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 04:30:09 -0400
-References: <20170524220827.21154-1-rth@twiddle.net>
-	<20170524220827.21154-2-rth@twiddle.net>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <357e5120-7da0-283d-b2ec-4619550a473a@redhat.com>
-Date: Thu, 1 Jun 2017 10:30:05 +0200
+	(envelope-from <berrange@redhat.com>) id 1dGLbD-0004Ym-CT
+	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 04:36:56 -0400
+Date: Thu, 1 Jun 2017 09:36:44 +0100
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20170601083644.GC1490@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <20170509173342.29286-1-berrange@redhat.com>
+	<20170509173342.29286-3-berrange@redhat.com>
+	<f7fef0e4-7703-9b60-3bd9-bf1b12628cae@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20170524220827.21154-2-rth@twiddle.net>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 1/4] target/s390x: Save current ilen during
- translation
+Content-Disposition: inline
+In-Reply-To: <f7fef0e4-7703-9b60-3bd9-bf1b12628cae@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v5 2/5] iotests: fix remainining tests to
+ work with LUKS
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,70 +26,112 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <rth@twiddle.net>, qemu-devel@nongnu.org
-Cc: thuth@redhat.com, aurelien@aurel32.net
+To: Max Reitz <mreitz@redhat.com>
+Cc: qemu-devel@nongnu.org, Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>
 
-On 25.05.2017 00:08, Richard Henderson wrote:
-> Use this saved value instead of recomputing from next_pc difference.
+On Wed, May 31, 2017 at 05:33:26PM +0200, Max Reitz wrote:
+> On 2017-05-09 19:33, Daniel P. Berrange wrote:
+> > The tests 033, 140, 145 and 157 were all broken
+> > when run with LUKS, since they did not correctly use
+> > the required image opts args syntax to specify the
+> > decryption secret. Further, the 120 test simply does
+> > not make sense to run with luks, as the scenario
+> > exercised is not relevant.
+> > 
+> > The test 181 was broken when run with LUKS because
+> > it didn't take account of fact that $TEST_IMG was
+> > already in image opts syntax. The launch_qemu
+> > helper also didn't register the secret object
+> > providing the LUKS password.
+> > 
+> > Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
+> > ---
+> >  tests/qemu-iotests/033         | 12 ++++++++++--
+> >  tests/qemu-iotests/120         |  1 +
+> >  tests/qemu-iotests/140         | 11 ++++++++++-
+> >  tests/qemu-iotests/145         | 19 +++++++++++++++++--
+> >  tests/qemu-iotests/157         | 17 ++++++++++++++---
+> >  tests/qemu-iotests/157.out     | 16 ++++++++--------
+> >  tests/qemu-iotests/174         |  2 +-
+> >  tests/qemu-iotests/181         | 21 ++++++++++++++++-----
+> >  tests/qemu-iotests/common.qemu |  9 +++++++--
+> >  9 files changed, 84 insertions(+), 24 deletions(-)
 > 
-> Signed-off-by: Richard Henderson <rth@twiddle.net>
-> ---
->  target/s390x/translate.c | 8 +++++---
->  1 file changed, 5 insertions(+), 3 deletions(-)
+> [...]
 > 
-> diff --git a/target/s390x/translate.c b/target/s390x/translate.c
-> index 4bd16d9..5b8333f 100644
-> --- a/target/s390x/translate.c
-> +++ b/target/s390x/translate.c
-> @@ -58,6 +58,7 @@ struct DisasContext {
->      const DisasInsn *insn;
->      DisasFields *fields;
->      uint64_t pc, next_pc;
-> +    uint32_t ilen;
->      enum cc_op cc_op;
->      bool singlestep_enabled;
->  };
-> @@ -349,7 +350,7 @@ static void gen_program_exception(DisasContext *s, int code)
->      tcg_gen_st_i32(tmp, cpu_env, offsetof(CPUS390XState, int_pgm_code));
->      tcg_temp_free_i32(tmp);
->  
-> -    tmp = tcg_const_i32(s->next_pc - s->pc);
-> +    tmp = tcg_const_i32(s->ilen);
->      tcg_gen_st_i32(tmp, cpu_env, offsetof(CPUS390XState, int_pgm_ilen));
->      tcg_temp_free_i32(tmp);
->  
-> @@ -2207,7 +2208,7 @@ static ExitStatus op_ex(DisasContext *s, DisasOps *o)
->          v1 = regs[r1];
->      }
->  
-> -    ilen = tcg_const_i32(s->next_pc - s->pc);
-> +    ilen = tcg_const_i32(s->ilen);
->      gen_helper_ex(cpu_env, ilen, v1, o->in2);
->      tcg_temp_free_i32(ilen);
->  
-> @@ -4052,7 +4053,7 @@ static ExitStatus op_svc(DisasContext *s, DisasOps *o)
->      tcg_gen_st_i32(t, cpu_env, offsetof(CPUS390XState, int_svc_code));
->      tcg_temp_free_i32(t);
->  
-> -    t = tcg_const_i32(s->next_pc - s->pc);
-> +    t = tcg_const_i32(s->ilen);
->      tcg_gen_st_i32(t, cpu_env, offsetof(CPUS390XState, int_svc_ilen));
->      tcg_temp_free_i32(t);
->  
-> @@ -5191,6 +5192,7 @@ static const DisasInsn *extract_insn(CPUS390XState *env, DisasContext *s,
->      op = (insn >> 8) & 0xff;
->      ilen = get_ilen(op);
->      s->next_pc = s->pc + ilen;
-> +    s->ilen = ilen;
->  
->      switch (ilen) {
->      case 2:
+> > diff --git a/tests/qemu-iotests/140 b/tests/qemu-iotests/140
+> > index 8c80a5a..0a2105c 100755
+> > --- a/tests/qemu-iotests/140
+> > +++ b/tests/qemu-iotests/140
+> > @@ -52,8 +52,17 @@ _make_test_img 64k
+> >  
+> >  $QEMU_IO -c 'write -P 42 0 64k' "$TEST_IMG" | _filter_qemu_io
+> >  
+> > +if test "$IMGOPTSSYNTAX" = "true"
+> > +then
+> > +    SYSEMU_DRIVE_ARG=if=none,media=cdrom,id=drv,$TEST_IMG
 > 
+> I would like to propose wrapping this (or at least $TEST_IMG) in quotes,
+> but I'm aware of the fact that the whole test environment breaks if you
+> have a TEST_DIR with whitespace in it, so I don't mind...
+> 
+> (But it is a bit weird to put $TEST_IMG into quotes below and then use
+> $SYSEMU_DRIVE_ARG unquoted.)
 
-Reviewed-by: David Hildenbrand <david@redhat.com>
+Yep, consistency is good.
 
+> 
+> > +    SYSEMU_EXTRA_ARGS=""
+> > +else
+> > +    SYSEMU_DRIVE_ARG=if=none,media=cdrom,id=drv,file="$TEST_IMG",driver=$IMGFMT
+> > +    SYSEMU_EXTRA_ARGS=""
+> > +fi
+> > +
+> >  keep_stderr=y \
+> > -_launch_qemu -drive if=none,media=cdrom,id=drv,file="$TEST_IMG",format=$IMGFMT \
+> > +_launch_qemu $SYSEMU_EXTRA_ARGS -drive $SYSEMU_DRIVE_ARG \
+> 
+> But could you drop the $SYSEMU_EXTRA_ARGS? It doesn't seem to serve a
+> purpose (anymore, now that you added this to _launch_qemu itself).
+
+Opps, yes, forgot to remove this when i last refactored.
+
+> 
+> >      2> >(_filter_nbd)
+> >  
+> >  _send_qemu_cmd $QEMU_HANDLE \
+> > diff --git a/tests/qemu-iotests/145 b/tests/qemu-iotests/145
+> > index e6c6bc4..9cfa940 100755
+> > --- a/tests/qemu-iotests/145
+> > +++ b/tests/qemu-iotests/145
+> > @@ -43,8 +43,23 @@ _supported_proto generic
+> >  _supported_os Linux
+> >  
+> >  _make_test_img 1M
+> > -echo quit | $QEMU -nographic -hda "$TEST_IMG" -incoming 'exec:true' -snapshot -serial none -monitor stdio |
+> > -    _filter_qemu | _filter_hmp
+> > +
+> > +if test "$IMGOPTSSYNTAX" = "true"
+> > +then
+> > +    SYSEMU_DRIVE_ARG=if=none,$TEST_IMG
+> > +    SYSEMU_EXTRA_ARGS=""
+> > +    if [ -n "$IMGKEYSECRET" ]; then
+> > +	SECRET_ARG="secret,id=keysec0,data=$IMGKEYSECRET"
+> > +	SYSEMU_EXTRA_ARGS="-object $SECRET_ARG"
+> 
+> Please use spaces instead of tabs.
+
+Will do.
+
+> (I know there are a lot of tabs in the test files already, but according
+> to CODING_STYLE, that is just wrong.)
+
+I wish we'd clean up existing files one day....
+
+
+Regards,
+Daniel
 -- 
-
-Thanks,
-
-David
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
