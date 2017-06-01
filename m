@@ -1,21 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50444)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50641)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dGSxo-0004uM-6o
-	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 12:28:45 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1dGSyM-0005CV-PG
+	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 12:29:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dGSxn-0004bM-7f
-	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 12:28:44 -0400
-Date: Thu, 1 Jun 2017 18:28:33 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20170601162833.GH4987@noname.redhat.com>
-References: <1495830130-30611-1-git-send-email-kwolf@redhat.com>
-	<ceab079c-1d8e-368f-c51a-82e92a0b2852@redhat.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1dGSyM-0004j1-2J
+	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 12:29:18 -0400
+Received: from mail-wm0-x22e.google.com ([2a00:1450:400c:c09::22e]:37361)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1dGSyL-0004ih-R7
+	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 12:29:17 -0400
+Received: by mail-wm0-x22e.google.com with SMTP id d127so67085932wmf.0
+	for <qemu-devel@nongnu.org>; Thu, 01 Jun 2017 09:29:17 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ceab079c-1d8e-368f-c51a-82e92a0b2852@redhat.com>
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 00/29] qed: Convert to
- coroutines
+In-Reply-To: <20170529173751.3443-1-drjones@redhat.com>
+References: <20170529173751.3443-1-drjones@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 1 Jun 2017 17:28:56 +0100
+Message-ID: <CAFEAcA-fEFnLuKsAxqbCeRFXf_EtQWLT+UfyBBYF2UsOLM4xhw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH 0/2] hw/arm/virt: numa: provide distance
+ info when needed
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,60 +29,20 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, stefanha@redhat.com, mreitz@redhat.com
+To: Andrew Jones <drjones@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Shannon Zhao <zhaoshenglong@huawei.com>
 
-Am 29.05.2017 um 13:22 hat Paolo Bonzini geschrieben:
-> On 26/05/2017 22:21, Kevin Wolf wrote:
-> > The qed block driver is one of the last remaining block drivers that use the
-> > AIO callback style interfaces. This series converts it to the coroutine model
-> > that other drivers are using and removes some AIO functions from the block
-> > layer API afterwards.
-> > 
-> > If this isn't compelling enough, the diffstat should speak for itself.
-> > 
-> > This series is relatively long, but it consists mostly of mechanical
-> > conversions of one function per patch, so it should be easy to review.
-> 
-> Looks great, just a few notes:
-> 
-> - There are a couple "Callback from qed_find_cluster()" comments that 
-> are obsolete.
+On 29 May 2017 at 18:37, Andrew Jones <drjones@redhat.com> wrote:
+> Andrew Jones (2):
+>   hw/arm/virt-acpi-build: build SLIT when needed
+>   hw/arm/virt: fdt: generate distance-map when needed
+>
+>  hw/arm/virt-acpi-build.c |  4 ++++
+>  hw/arm/virt.c            | 21 +++++++++++++++++++++
+>  2 files changed, 25 insertions(+)
 
-Fixed.
 
-> - qed_acquire/qed_release can be removed as you inline stuff, but this
-> should not cause bugs so you can either do it as a final patch or let
-> me remove it later.
 
-To be honest, I don't completely understand what they are protecting in
-the first place. The places where they are look quite strange to me. So
-I tried to simply leave them alone.
+Applied to target-arm.next, thanks.
 
-What is the reason that we can remove them when we inline stuff?
-Shouldn't the inlining be semantically equivalent?
-
-I guess the answer is important for the case in patch 5, where Stefan
-commented that I moved some code out of the lock.
-
-> - coroutine_fn annotations are missing.  Also can be done as a final
-> patch.  It's a bit ugly that L1/L2 table access can happen both in a
-> coroutine (for regular I/O) and outside (for create/check).
-
-Create is coroutine-based these days. Maybe we should convert check,
-too.
-
-> - qed_is_allocated_cb can be inlined and QEDIsAllocatedCB removed.  Of
-> course a lot more cleanup could be done (I will do a couple more such
-> changes when adding a CoMutex to make the driver thread-safe) but this
-> one is pretty low-hanging fruit and seems to be in line with the rest
-> of the patches.
-> 
-> - qed_co_request doesn't need g_new for the QEDAIOCB.
-
-I stopped intentionally when the thing was fully coroutine based
-because I thought the series is already long enough. There are many more
-cleanups that could be done (e.g. QEDAIOCB should be completely
-avoided), but let's do that on top.
-
-Kevin
+-- PMM
