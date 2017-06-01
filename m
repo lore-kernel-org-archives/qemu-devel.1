@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43967)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43954)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1dGRPM-0004Y9-JT
-	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 10:49:07 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1dGRPM-0004Xp-4i
+	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 10:49:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1dGRPK-0002Vc-Ny
+	(envelope-from <alex.bennee@linaro.org>) id 1dGRPK-0002VR-B4
 	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 10:49:04 -0400
-Received: from mail-wm0-x234.google.com ([2a00:1450:400c:c09::234]:35591)
+Received: from mail-wm0-x22f.google.com ([2a00:1450:400c:c09::22f]:37314)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1dGRPK-0002VC-EE
+	id 1dGRPK-0002U3-4Y
 	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 10:49:02 -0400
-Received: by mail-wm0-x234.google.com with SMTP id b84so161718946wmh.0
-	for <qemu-devel@nongnu.org>; Thu, 01 Jun 2017 07:49:02 -0700 (PDT)
+Received: by mail-wm0-x22f.google.com with SMTP id d127so63402976wmf.0
+	for <qemu-devel@nongnu.org>; Thu, 01 Jun 2017 07:49:00 -0700 (PDT)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Thu,  1 Jun 2017 15:49:12 +0100
-Message-Id: <20170601144915.20778-2-alex.bennee@linaro.org>
+Date: Thu,  1 Jun 2017 15:49:14 +0100
+Message-Id: <20170601144915.20778-4-alex.bennee@linaro.org>
 In-Reply-To: <20170601144915.20778-1-alex.bennee@linaro.org>
 References: <20170601144915.20778-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v2 1/4] gdbstub: modernise DEBUG_GDB
+Subject: [Qemu-devel] [PATCH v2 3/4] qom/cpu: remove host_tid field
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,190 +30,109 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: pbonzini@redhat.com, doug16k@gmail.com, imbrenda@linux.vnet.ibm.com
-Cc: qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Cc: qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>
 
-Convert the a gdb_debug helper which compiles away to nothing when not
-used but still ensures the format strings are checked. There is some
-minor code motion for the incorrect checksum message to report it
-before we attempt to send the reply.
+This was only used by the gdbstub and even then was only being set for
+subsequent threads. Rather the continue duplicating the number just
+make the gdbstub get the information from TaskState structure.
+
+Now the tid is correctly reported for all threads the bug I was seeing
+with "vCont;C04:0;c" packets is fixed as the correct tid is reported
+to gdb.
+
+I moved cpu_gdb_index into the gdbstub to facilitate easy access to
+the TaskState which is used elsewhere in gdbstub.
 
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Reviewed-by: Greg Kurz <groug@kaod.org>
 ---
- gdbstub.c | 77 +++++++++++++++++++++++++++------------------------------------
- 1 file changed, 33 insertions(+), 44 deletions(-)
+ gdbstub.c              | 15 +++++++++++++++
+ include/exec/gdbstub.h | 14 --------------
+ include/qom/cpu.h      |  2 --
+ linux-user/syscall.c   |  1 -
+ 4 files changed, 15 insertions(+), 17 deletions(-)
 
 diff --git a/gdbstub.c b/gdbstub.c
-index 86eed4f97c..a249846954 100644
+index 026d1fe6bb..45a3a0b16b 100644
 --- a/gdbstub.c
 +++ b/gdbstub.c
-@@ -271,7 +271,20 @@ static int gdb_signal_to_target (int sig)
-         return -1;
+@@ -55,6 +55,21 @@ static inline int target_memory_rw_debug(CPUState *cpu, target_ulong addr,
+     return cpu_memory_rw_debug(cpu, addr, buf, len, is_write);
  }
  
--//#define DEBUG_GDB
-+/* #define DEBUG_GDB */
-+
-+#ifdef DEBUG_GDB
-+# define DEBUG_GDB_GATE 1
++/* Return the GDB index for a given vCPU state.
++ *
++ * For user mode this is simply the thread id. In system mode GDB
++ * numbers CPUs from 1 as 0 is reserved as an "any cpu" index.
++ */
++static inline int cpu_gdb_index(CPUState *cpu)
++{
++#if defined(CONFIG_USER_ONLY)
++    TaskState *ts = (TaskState *) cpu->opaque;
++    return ts->ts_tid;
 +#else
-+# define DEBUG_GDB_GATE 0
++    return cpu->cpu_index + 1;
 +#endif
++}
 +
-+#define gdb_debug(fmt, ...) do { \
-+    if (DEBUG_GDB_GATE) { \
-+        fprintf(stderr, "%s: " fmt, __func__, ## __VA_ARGS__); \
-+    } \
-+} while (0)
-+
+ enum {
+     GDB_SIGNAL_0 = 0,
+     GDB_SIGNAL_INT = 2,
+diff --git a/include/exec/gdbstub.h b/include/exec/gdbstub.h
+index c4fe567600..9aa7756d92 100644
+--- a/include/exec/gdbstub.h
++++ b/include/exec/gdbstub.h
+@@ -58,20 +58,6 @@ void gdb_register_coprocessor(CPUState *cpu,
+                               gdb_reg_cb get_reg, gdb_reg_cb set_reg,
+                               int num_regs, const char *xml, int g_pos);
  
- typedef struct GDBRegisterState {
-     int base_reg;
-@@ -547,9 +560,7 @@ static int put_packet_binary(GDBState *s, const char *buf, int len)
- /* return -1 if error, 0 if OK */
- static int put_packet(GDBState *s, const char *buf)
- {
--#ifdef DEBUG_GDB
--    printf("reply='%s'\n", buf);
+-/* Return the GDB index for a given vCPU state.
+- *
+- * For user mode this is simply the thread id. In system mode GDB
+- * numbers CPUs from 1 as 0 is reserved as an "any cpu" index.
+- */
+-static inline int cpu_gdb_index(CPUState *cpu)
+-{
+-#if defined(CONFIG_USER_ONLY)
+-    return cpu->host_tid;
+-#else
+-    return cpu->cpu_index + 1;
 -#endif
-+    gdb_debug("reply='%s'\n", buf);
- 
-     return put_packet_binary(s, buf, strlen(buf));
- }
-@@ -955,9 +966,9 @@ static int gdb_handle_packet(GDBState *s, const char *line_buf)
-     uint8_t *registers;
-     target_ulong addr, len;
- 
--#ifdef DEBUG_GDB
--    printf("command='%s'\n", line_buf);
--#endif
-+
-+    gdb_debug("command='%s'\n", line_buf);
-+
-     p = line_buf;
-     ch = *p++;
-     switch(ch) {
-@@ -1518,17 +1529,14 @@ static void gdb_read_byte(GDBState *s, int ch)
-         /* Waiting for a response to the last packet.  If we see the start
-            of a new command then abandon the previous response.  */
-         if (ch == '-') {
--#ifdef DEBUG_GDB
--            printf("Got NACK, retransmitting\n");
--#endif
-+            gdb_debug("Got NACK, retransmitting\n");
-             put_buffer(s, (uint8_t *)s->last_packet, s->last_packet_len);
-+        } else if (ch == '+') {
-+            gdb_debug("Got ACK\n");
-+        } else {
-+            gdb_debug("Got '%c' when expecting ACK/NACK\n", ch);
-         }
--#ifdef DEBUG_GDB
--        else if (ch == '+')
--            printf("Got ACK\n");
--        else
--            printf("Got '%c' when expecting ACK/NACK\n", ch);
--#endif
-+
-         if (ch == '+' || ch == '$')
-             s->last_packet_len = 0;
-         if (ch != '$')
-@@ -1549,9 +1557,7 @@ static void gdb_read_byte(GDBState *s, int ch)
-                 s->line_sum = 0;
-                 s->state = RS_GETLINE;
-             } else {
--#ifdef DEBUG_GDB
--                printf("gdbstub received garbage between packets: 0x%x\n", ch);
--#endif
-+                gdb_debug("received garbage between packets: 0x%x\n", ch);
-             }
-             break;
-         case RS_GETLINE:
-@@ -1567,9 +1573,7 @@ static void gdb_read_byte(GDBState *s, int ch)
-                 /* end of command, start of checksum*/
-                 s->state = RS_CHKSUM1;
-             } else if (s->line_buf_index >= sizeof(s->line_buf) - 1) {
--#ifdef DEBUG_GDB
--                printf("gdbstub command buffer overrun, dropping command\n");
--#endif
-+                gdb_debug("command buffer overrun, dropping command\n");
-                 s->state = RS_IDLE;
-             } else {
-                 /* unescaped command character */
-@@ -1583,9 +1587,7 @@ static void gdb_read_byte(GDBState *s, int ch)
-                 s->state = RS_CHKSUM1;
-             } else if (s->line_buf_index >= sizeof(s->line_buf) - 1) {
-                 /* command buffer overrun */
--#ifdef DEBUG_GDB
--                printf("gdbstub command buffer overrun, dropping command\n");
--#endif
-+                gdb_debug("command buffer overrun, dropping command\n");
-                 s->state = RS_IDLE;
-             } else {
-                 /* parse escaped character and leave escape state */
-@@ -1597,25 +1599,18 @@ static void gdb_read_byte(GDBState *s, int ch)
-         case RS_GETLINE_RLE:
-             if (ch < ' ') {
-                 /* invalid RLE count encoding */
--#ifdef DEBUG_GDB
--                printf("gdbstub got invalid RLE count: 0x%x\n", ch);
--#endif
-+                gdb_debug("got invalid RLE count: 0x%x\n", ch);
-                 s->state = RS_GETLINE;
-             } else {
-                 /* decode repeat length */
-                 int repeat = (unsigned char)ch - ' ' + 3;
-                 if (s->line_buf_index + repeat >= sizeof(s->line_buf) - 1) {
-                     /* that many repeats would overrun the command buffer */
--#ifdef DEBUG_GDB
--                    printf("gdbstub command buffer overrun,"
--                           " dropping command\n");
--#endif
-+                    gdb_debug("command buffer overrun, dropping command\n");
-                     s->state = RS_IDLE;
-                 } else if (s->line_buf_index < 1) {
-                     /* got a repeat but we have nothing to repeat */
--#ifdef DEBUG_GDB
--                    printf("gdbstub got invalid RLE sequence\n");
--#endif
-+                    gdb_debug("got invalid RLE sequence\n");
-                     s->state = RS_GETLINE;
-                 } else {
-                     /* repeat the last character */
-@@ -1630,9 +1625,7 @@ static void gdb_read_byte(GDBState *s, int ch)
-         case RS_CHKSUM1:
-             /* get high hex digit of checksum */
-             if (!isxdigit(ch)) {
--#ifdef DEBUG_GDB
--                printf("gdbstub got invalid command checksum digit\n");
--#endif
-+                gdb_debug("got invalid command checksum digit\n");
-                 s->state = RS_GETLINE;
-                 break;
-             }
-@@ -1643,21 +1636,17 @@ static void gdb_read_byte(GDBState *s, int ch)
-         case RS_CHKSUM2:
-             /* get low hex digit of checksum */
-             if (!isxdigit(ch)) {
--#ifdef DEBUG_GDB
--                printf("gdbstub got invalid command checksum digit\n");
--#endif
-+                gdb_debug("got invalid command checksum digit\n");
-                 s->state = RS_GETLINE;
-                 break;
-             }
-             s->line_csum |= fromhex(ch);
- 
-             if (s->line_csum != (s->line_sum & 0xff)) {
-+                gdb_debug("got command packet with incorrect checksum\n");
-                 /* send NAK reply */
-                 reply = '-';
-                 put_buffer(s, &reply, 1);
--#ifdef DEBUG_GDB
--                printf("gdbstub got command packet with incorrect checksum\n");
--#endif
-                 s->state = RS_IDLE;
-             } else {
-                 /* send ACK reply */
+-}
+-
+ /* The GDB remote protocol transfers values in target byte order.  This means
+  * we can use the raw memory access routines to access the value buffer.
+  * Conveniently, these also handle the case where the buffer is mis-aligned.
+diff --git a/include/qom/cpu.h b/include/qom/cpu.h
+index 55214ce131..909e7ae994 100644
+--- a/include/qom/cpu.h
++++ b/include/qom/cpu.h
+@@ -266,7 +266,6 @@ struct qemu_work_item;
+  * @nr_cores: Number of cores within this CPU package.
+  * @nr_threads: Number of threads within this CPU.
+  * @numa_node: NUMA node this CPU is belonging to.
+- * @host_tid: Host thread ID.
+  * @running: #true if CPU is currently running (lockless).
+  * @has_waiter: #true if a CPU is currently waiting for the cpu_exec_end;
+  * valid under cpu_list_lock.
+@@ -321,7 +320,6 @@ struct CPUState {
+     HANDLE hThread;
+ #endif
+     int thread_id;
+-    uint32_t host_tid;
+     bool running, has_waiter;
+     struct QemuCond *halt_cond;
+     bool thread_kicked;
+diff --git a/linux-user/syscall.c b/linux-user/syscall.c
+index cec8428589..cada188e58 100644
+--- a/linux-user/syscall.c
++++ b/linux-user/syscall.c
+@@ -6216,7 +6216,6 @@ static void *clone_func(void *arg)
+     thread_cpu = cpu;
+     ts = (TaskState *)cpu->opaque;
+     info->tid = gettid();
+-    cpu->host_tid = info->tid;
+     task_settid(ts);
+     if (info->child_tidptr)
+         put_user_u32(info->tid, info->child_tidptr);
 -- 
 2.13.0
