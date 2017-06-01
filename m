@@ -1,17 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59860)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59864)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1dGPQq-00043J-8n
+	(envelope-from <paolo.bonzini@gmail.com>) id 1dGPQq-00043K-Ky
 	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 08:42:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1dGPQp-0005oP-3Q
+	(envelope-from <paolo.bonzini@gmail.com>) id 1dGPQp-0005oY-Qd
 	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 08:42:28 -0400
+Received: from mail-wm0-x234.google.com ([2a00:1450:400c:c09::234]:37416)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
+	id 1dGPQp-0005oL-JM
+	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 08:42:27 -0400
+Received: by mail-wm0-x234.google.com with SMTP id d127so58788403wmf.0
+	for <qemu-devel@nongnu.org>; Thu, 01 Jun 2017 05:42:27 -0700 (PDT)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Thu,  1 Jun 2017 14:41:45 +0200
-Message-Id: <1496320911-51305-28-git-send-email-pbonzini@redhat.com>
+Date: Thu,  1 Jun 2017 14:41:46 +0200
+Message-Id: <1496320911-51305-29-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1496320911-51305-1-git-send-email-pbonzini@redhat.com>
 References: <1496320911-51305-1-git-send-email-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PULL 27/33] linuxboot_dma: compile for i486
+Subject: [Qemu-devel] [PULL 28/33] edu: fix memory leak on msi_broken
+ platforms
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,61 +29,48 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: qemu-stable@nongnu.org
+Cc: Peter Xu <peterx@redhat.com>
 
-The ROM uses the cmovne instruction, which is new in Pentium Pro and does not
-work when running QEMU with "-cpu 486".  Avoid producing that instruction.
+If msi_init fails, the thread has already been created and the
+mutex/condvar are not destroyed.  Initialize everything only
+after the point where pci_edu_realize cannot fail.
 
-Suggested-by: Richard W.M. Jones <rjones@redhat.com>
-Suggested-by: Thomas Huth <thuth@redhat.com>
-Reported-by: Rob Landley <rob@landley.net>
-Cc: qemu-stable@nongnu.org
+Reported-by: Markus Armbruster <armbru@redhat.com>
+Cc: Peter Xu <peterx@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- pc-bios/linuxboot_dma.bin  | Bin 1536 -> 1536 bytes
- pc-bios/optionrom/Makefile |   1 +
- 2 files changed, 1 insertion(+)
+ hw/misc/edu.c | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
 
-diff --git a/pc-bios/linuxboot_dma.bin b/pc-bios/linuxboot_dma.bin
-index 218d3ab4a29bfb5ab7125ec7a4d29dad1860c673..d176f62797813e4b926dca9dfce7ce554dc1a4d6 100644
-GIT binary patch
-literal 1536
-zcmeHFL2J`s82-{_T52KL%w~}udiW-YBE*9t=s~ClrIm^s9^6H6Pf%onr07*+kWd=L
-zpW)d<4G1ZESU1FyUDSCf^YYaxioy<}t?!rmu^#*f?mHxJo;-Qp_kHp#Je^o$|2##;
-zYs)n)qh6k7XI07O)9TW>>H@3WSgzkI-MW44`qG_Jxhgq7fAt@+rpuZy7{g_FpG^eo
-zuoD<7Fjn!zK~Uydy3X@Fj1CnQuA}{tXz$^z=7>a?#S!%6CsARNbiO)h=v+Q~y@5O1
-ze8y7!akTy&-YXMV@p3Es`0q*km+)Mtxe(3DE2)a5;c%$H0|Yu~mbnR0C7dKHR7Zsr
-zmrccq5lm%U=wXc39<t?-(_m*ZnY&YH(d(0lj;0`jj8e`iWgX(jV5j3gg<B9Cgj2^d
-zw;W8A$%i@ijhITTF%3U<ui*Zsgx!lc)pgIq-atzea+i1H+3Oj<V?5-VpBVlz4R#!?
-zV3N_sX!mjsj*#|9H8ozR&D5ajsurT@(W<h&xG*;8UNvYI;`kVzRd@m7;AnvgFCdyy
-zI>gV6@%Jl!9^%vQ9V0A-7a<bD(|L-BW|R)`qY*CS(3SQRXOVJqcpcuB8NLnUuosH3
-zi{OJ7mufeeG{^49xY<M4U)CrSC7Fp}TjtSE>UkNnpxu8npp2ruY0}SsKn=BiGN9Y;
-L*>&K*abWuoMsO(*
-
-literal 1536
-zcmeHF&ubGw6rN4Dn#RCxYN|nUh%gpJFME=L9)#^}1F5!ps0f07iy|#(O1<iu!xFNH
-ze}?~naY4vZ57wZB1jMR`ST7r__~R&=_04QYJoq2jIn2&}@6GqV_sv^+G|^@MTxG^<
-zD>W^nf~VP8b!3b3v@l;?V$SuIwL6uYt5>dGyH&BPBIn1?(K>6@S?eidI1hgSZ^wky
-zNA%Hz@f^krJcQTH!Ptb+b>Z7QOZy_v)9!Gc_A*CUnxyOgP~7<9qN#In@`mGjfw=z$
-z*1p4gW?~r|cz_FdqLT)y8y*s0Z-)z#_;!*cE?PD>cN4<HA{;MET(E~F0*Ke4l-T|Q
-zN3kAs(B4Nz%(_i>CX-n&AUsLGXj9UuS(2NP%(`OENoGw|EGqnf#7ASHq-k?KrExJ~
-z^CHnSr*VvZO%mMQmY+taei4m+{T$|c^(w4)XlpT*^|#=^eK`aF_0%gE_5j9w)aV=c
-zk7$UtO_Fkt>S!)b5N*mx5@orPY(na#Hj4<S)0RarUXZ%Tp{&xoU+SGxcuC<|i62e-
-zaCiw}LGfe}PpSO8%0DRczx~>MfwIDj65o<I`H@FBlkzycj5td1A}41qQPA(<_yF`A
-z@IINro1ha6gE;8HfA4iFwHr(rWNnH$vl3XJyEGJ>hT<|dXkK7E?qHJ9XdoKqMjysh
-NXm9N~@Si)N{RVuA8xQ~h
-
-diff --git a/pc-bios/optionrom/Makefile b/pc-bios/optionrom/Makefile
-index fa53d9e..a9a9e5e 100644
---- a/pc-bios/optionrom/Makefile
-+++ b/pc-bios/optionrom/Makefile
-@@ -13,6 +13,7 @@ $(call set-vpath, $(SRC_PATH)/pc-bios/optionrom)
- ifeq ($(lastword $(filter -O%, -O0 $(CFLAGS))),-O0)
- override CFLAGS += -O2
- endif
-+override CFLAGS += -march=i486
+diff --git a/hw/misc/edu.c b/hw/misc/edu.c
+index 401039c..01acacf 100644
+--- a/hw/misc/edu.c
++++ b/hw/misc/edu.c
+@@ -343,6 +343,12 @@ static void pci_edu_realize(PCIDevice *pdev, Error **errp)
+     EduState *edu = DO_UPCAST(EduState, pdev, pdev);
+     uint8_t *pci_conf = pdev->config;
  
- # Drop -fstack-protector and the like
- QEMU_CFLAGS := $(filter -W%, $(QEMU_CFLAGS)) $(CFLAGS_NOPIE) -ffreestanding
++    pci_config_set_interrupt_pin(pci_conf, 1);
++
++    if (msi_init(pdev, 0, 1, true, false, errp)) {
++        return;
++    }
++
+     timer_init_ms(&edu->dma_timer, QEMU_CLOCK_VIRTUAL, edu_dma_timer, edu);
+ 
+     qemu_mutex_init(&edu->thr_mutex);
+@@ -350,12 +356,6 @@ static void pci_edu_realize(PCIDevice *pdev, Error **errp)
+     qemu_thread_create(&edu->thread, "edu", edu_fact_thread,
+                        edu, QEMU_THREAD_JOINABLE);
+ 
+-    pci_config_set_interrupt_pin(pci_conf, 1);
+-
+-    if (msi_init(pdev, 0, 1, true, false, errp)) {
+-        return;
+-    }
+-
+     memory_region_init_io(&edu->mmio, OBJECT(edu), &edu_mmio_ops, edu,
+                     "edu-mmio", 1 << 20);
+     pci_register_bar(pdev, 0, PCI_BASE_ADDRESS_SPACE_MEMORY, &edu->mmio);
 -- 
 1.8.3.1
