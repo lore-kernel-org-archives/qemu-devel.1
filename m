@@ -1,21 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45270)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53163)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1dGV28-000191-L8
-	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 14:41:21 -0400
+	(envelope-from <jsnow@redhat.com>) id 1dGVGV-0004O9-LP
+	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 14:56:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1dGV27-0002hS-LG
-	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 14:41:20 -0400
-References: <1496330073-51338-1-git-send-email-anton.nefedov@virtuozzo.com>
+	(envelope-from <jsnow@redhat.com>) id 1dGVGU-0001XI-UZ
+	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 14:56:11 -0400
+References: <20170530081723.29205-1-vsementsov@virtuozzo.com>
+	<20170530081723.29205-10-vsementsov@virtuozzo.com>
+	<04df6354-c902-9514-f56f-9063168a6a75@redhat.com>
+	<72e09ee4-ef22-ed79-b881-bed1ad255392@virtuozzo.com>
 From: John Snow <jsnow@redhat.com>
-Message-ID: <ef7d2624-c65e-2802-5712-bfce7cb9908d@redhat.com>
-Date: Thu, 1 Jun 2017 14:41:09 -0400
+Message-ID: <5be97c54-ad91-b770-91ed-405a5de84c26@redhat.com>
+Date: Thu, 1 Jun 2017 14:55:51 -0400
 MIME-Version: 1.0
-In-Reply-To: <1496330073-51338-1-git-send-email-anton.nefedov@virtuozzo.com>
+In-Reply-To: <72e09ee4-ef22-ed79-b881-bed1ad255392@virtuozzo.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 00/15] qcow2: space preallocation and
- COW improvements
+Subject: Re: [Qemu-devel] [PATCH 09/25] block/dirty-bitmap: add readonly
+ field to BdrvDirtyBitmap
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,90 +27,17 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Anton Nefedov <anton.nefedov@virtuozzo.com>, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, den@virtuozzo.com, mreitz@redhat.com, Qemu-block <qemu-block@nongnu.org>
+To: Sementsov-Ogievskiy Vladimir <vsementsov@virtuozzo.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, famz@redhat.com, armbru@redhat.com, mreitz@redhat.com, stefanha@redhat.com, pbonzini@redhat.com, den@openvz.org
 
-Missing qemu-block@, CCing.
 
-On 06/01/2017 11:14 AM, Anton Nefedov wrote:
-> Changes in v2:
->   - introduce new BDRV flag for write_zeroes()
->       instead of using driver callback directly.
->     Skipped introducing new functions like bdrv_co_pallocate() for now:
->       1. it seems ok to keep calling this write_zeroes() as zeroes
->       are expected;
->       2. most of the code can be reused now anyway, so changes to
->       write_zeroes() path are not significant
->       3. write_zeroes() alignment and max-request limits can also be reused
+
+On 06/01/2017 03:30 AM, Sementsov-Ogievskiy Vladimir wrote:
+> Hi John!
 > 
->     As a possible alternative we can have bdrv_co_pallocate() which can
->     switch to pwrite_zeroes(,flags|=BDRV_REQ_ALLOCATE) early.
+> Look at our discussion about this in v18 thread.
 > 
-> ========
-> 
-> This pull request is to address a few performance problems of qcow2 format:
-> 
->   1. non cluster-aligned write requests (to unallocated clusters) explicitly
->     pad data with zeroes if there is no backing data. This can be avoided
->     and the whole clusters are preallocated and zeroed in a single
->     efficient write_zeroes() operation, also providing better host file
->     continuity
-> 
->   2. moreover, efficient write_zeroes() operation can be used to preallocate
->     space megabytes ahead which gives noticeable improvement on some storage
->     types (e.g. distributed storages where space allocation operation is
->     expensive)
-> 
->   3. preallocating/zeroing the clusters in advance makes possible to enable
->     simultaneous writes to the same unallocated cluster, which is beneficial
->     for parallel sequential write operations which are not cluster-aligned
-> 
-> Performance test results are added to commit messages (see patch 3, 12)
-> 
-> Anton Nefedov (11):
->   block: introduce BDRV_REQ_ALLOCATE flag
->   file-posix: support BDRV_REQ_ALLOCATE
->   blkdebug: support BDRV_REQ_ALLOCATE
->   qcow2: do not COW the empty areas
->   qcow2: set inactive flag
->   qcow2: handle_prealloc(): find out if area zeroed by earlier
->     preallocation
->   qcow2: fix misleading comment about L2 linking
->   qcow2-cluster: slightly refactor handle_dependencies()
->   qcow2-cluster: make handle_dependencies() logic easier to follow
->   qcow2: allow concurrent unaligned writes to the same clusters
->   iotest 046: test simultaneous cluster write error case
-> 
-> Denis V. Lunev (3):
->   qcow2: alloc space for COW in one chunk
->   qcow2: preallocation at image expand
->   qcow2: truncate preallocated space
-> 
-> Pavel Butsykin (1):
->   qcow2: check space leak at the end of the image
-> 
->  block/blkdebug.c                   |   3 +-
->  block/file-posix.c                 |   9 +-
->  block/io.c                         |  19 ++-
->  block/qcow2-cache.c                |   3 +
->  block/qcow2-cluster.c              | 218 +++++++++++++++++++++++------
->  block/qcow2-refcount.c             |  21 +++
->  block/qcow2.c                      | 273 ++++++++++++++++++++++++++++++++++++-
->  block/qcow2.h                      |  26 ++++
->  block/trace-events                 |   1 +
->  include/block/block.h              |   6 +-
->  tests/qemu-iotests/026.out         | 104 ++++++++++----
->  tests/qemu-iotests/026.out.nocache | 104 ++++++++++----
->  tests/qemu-iotests/029.out         |   5 +-
->  tests/qemu-iotests/046             |  38 +++++-
->  tests/qemu-iotests/046.out         |  23 ++++
->  tests/qemu-iotests/060             |   2 +-
->  tests/qemu-iotests/060.out         |  13 +-
->  tests/qemu-iotests/061.out         |   5 +-
->  tests/qemu-iotests/066             |   2 +-
->  tests/qemu-iotests/066.out         |   9 +-
->  tests/qemu-iotests/098.out         |   7 +-
->  tests/qemu-iotests/108.out         |   5 +-
->  tests/qemu-iotests/112.out         |   5 +-
->  23 files changed, 789 insertions(+), 112 deletions(-)
-> 
+
+I'm batting zero today; I literally missed that entire subthread.
+
+Sigh, thanks, I'll go back and read.
