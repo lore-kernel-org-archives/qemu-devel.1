@@ -1,24 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53277)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54400)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1dGp4J-0002GZ-GY
-	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 12:04:56 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1dGp7w-0005wl-8R
+	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 12:08:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1dGp4I-0003HH-J5
-	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 12:04:55 -0400
-Date: Fri, 2 Jun 2017 17:04:44 +0100
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20170602160444.GB11626@stefanha-x1.localdomain>
-References: <1495830130-30611-1-git-send-email-kwolf@redhat.com>
-	<1495830130-30611-11-git-send-email-kwolf@redhat.com>
-	<20170531123259.GK16733@stefanha-x1.localdomain>
-	<20170601155953.GG4987@noname.redhat.com>
+	(envelope-from <alex.bennee@linaro.org>) id 1dGp7u-0004yo-V8
+	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 12:08:40 -0400
+Received: from mail-wm0-x236.google.com ([2a00:1450:400c:c09::236]:35830)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1dGp7u-0004yQ-OA
+	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 12:08:38 -0400
+Received: by mail-wm0-x236.google.com with SMTP id b84so29299893wmh.0
+	for <qemu-devel@nongnu.org>; Fri, 02 Jun 2017 09:08:38 -0700 (PDT)
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Date: Fri,  2 Jun 2017 17:08:40 +0100
+Message-Id: <20170602160848.4913-3-alex.bennee@linaro.org>
+In-Reply-To: <20170602160848.4913-1-alex.bennee@linaro.org>
+References: <20170602160848.4913-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="MfFXiAuoTsnnDAfZ"
-Content-Disposition: inline
-In-Reply-To: <20170601155953.GG4987@noname.redhat.com>
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 10/29] qed: Remove callback
- from qed_write_header()
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [RISU PATCH v4 02/10] build-all-archs: support cross
+ building via docker
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,64 +30,131 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: qemu-block@nongnu.org, pbonzini@redhat.com, qemu-devel@nongnu.org, stefanha@redhat.com, mreitz@redhat.com
+To: peter.maydell@linaro.org
+Cc: qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 
+If we want to link to any other libraries we might find using simple
+cross toolchains doesn't work so well. One way around this is to use a
+dockerised cross-toolchain which then won't clash with your host
+system. If the user specifies --use-docker the obvious will be done.
 
---MfFXiAuoTsnnDAfZ
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+By default we use the QEMU projects qemu:debian-FOO-cross images as
+RISU hackers are likely to be QEMU developers too. However any docker
+tag can be passed on the command line.
 
-On Thu, Jun 01, 2017 at 05:59:53PM +0200, Kevin Wolf wrote:
-> Am 31.05.2017 um 14:32 hat Stefan Hajnoczi geschrieben:
-> > On Fri, May 26, 2017 at 10:21:51PM +0200, Kevin Wolf wrote:
-> > >  static void qed_clear_need_check(void *opaque, int ret)
-> > >  {
-> > >      BDRVQEDState *s =3D opaque;
-> > > =20
-> > >      if (ret) {
-> > > -        qed_unplug_allocating_write_reqs(s);
-> > > -        return;
-> > > +        goto out;
-> > >      }
-> > > =20
-> > >      s->header.features &=3D ~QED_F_NEED_CHECK;
-> > > -    qed_write_header(s, qed_flush_after_clear_need_check, s);
-> > > +    ret =3D qed_write_header(s);
-> > > +    (void) ret;
-> > > +
-> > > +    ret =3D bdrv_flush(s->bs);
-> > > +    (void) ret;
-> > > +
-> > > +out:
-> > > +    qed_unplug_allocating_write_reqs(s);
-> > >  }
-> >=20
-> > Should we unplug allocating write reqs before flushing?  The async code
-> > kicks off a flush but doesn't wait for it to complete.
->=20
-> You're right that moving it up would match the old code. Not sure if it
-> would make much of a difference, though, isn't the request queue drained
-> in the kernel anyway while doing a flush? But if you prefer, I can
-> change it.
+If none of the docker images have usable compilers we fall back to
+checking the host path.
 
-I prefer keeping the behavior of the existing code where possible.
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+---
+ build-all-archs | 72 ++++++++++++++++++++++++++++++++++++++++++++++++++++-----
+ 1 file changed, 66 insertions(+), 6 deletions(-)
 
-Stefan
-
---MfFXiAuoTsnnDAfZ
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJZMYycAAoJEJykq7OBq3PIb1cIAIBa5/L4hYdQ7iQtKOQ9IwN6
-RbBdxudEaDQGq6DH6gG0gLjZwlywA/1Zj5d+JSwKfLVIDcK61Nq7CFT+SWl6D6Zh
-7grVzNTE6A3QFHDF3ZRlbuK5QZgZKXxSwUZyYH6w9JEkp5gTabz7Zo/KVmoHXPu5
-YT5TfzGiYyKk5tJqI5fVJOa4+7VhJeQy/1QgwihapVa37adKZekuXUtBzWX0IPAL
-2UJsDyMqVWUXPvb3H2b4UIOIi3du0Qyeg32rt3iVijKJkiJUK6Q692z6iPrqDXv8
-CfVAqCZvoJmerPeLoZpo40BPPnUr4YEJ8JalT56sNzRn0fNImJOX5NXpC/y3GzQ=
-=bQXl
------END PGP SIGNATURE-----
-
---MfFXiAuoTsnnDAfZ--
+diff --git a/build-all-archs b/build-all-archs
+index 2768727..78f062e 100755
+--- a/build-all-archs
++++ b/build-all-archs
+@@ -11,15 +11,65 @@
+ # Contributors:
+ #     Peter Maydell (Linaro) - initial implementation
+ 
+-# So we notice risugen failing even though it's in a pipeline
+-set -o pipefail
++# Simple usage
++usage() {
++    cat <<-EOF
++	Usage: $0 [options]
++
++	Options include:
++	    --use-docker[=tags]    use docker cross compile
++
++        If specifying docker the default will be to use the any
++        qemu:debian-FOO-cross targets available on your system.
++EOF
++    exit 1
++}
++
++while [[ "$1" = -* ]]; do
++    opt="$1"; shift
++    arg=
++    if [[ "$opt" = *=* ]]; then
++	arg="${opt#*=}"
++	opt="${opt%%=*}"
++    fi
++    case "$opt" in
++	--use-docker)
++            if [ -z "$arg" ]; then
++                default_tags=$(docker images qemu --format "{{.Repository}}:{{.Tag}}" | grep "\(arm\|power\).*cross$")
++                docker_tags=$(echo $default_tags | sed 's/\n/\s/g' )
++            else
++	        docker_tags="$arg"
++            fi
++	    ;;
++	--help)
++	    usage
++	    ;;
++	*)
++	    usage
++	    ;;
++    esac
++done
+ 
+ # Debian stretch and Ubuntu Xenial have cross compiler packages for
+ # all of these:
+-# gcc-arm-linux-gnueabihf gcc-aarch64-linux-gnu gcc-m68k-linux-gnu
+-# gcc-powerpc64le-linux-gnu gcc-powerpc64-linux-gnu
++#   gcc-arm-linux-gnueabihf gcc-aarch64-linux-gnu gcc-m68k-linux-gnu
++#   gcc-powerpc64le-linux-gnu gcc-powerpc64-linux-gnu
++# If docker is enabled we just brute force the various images until we
++# can set the one that has a workable cross compiler.
++
++DOCKER_RUN="docker run --rm -t -u $(id -u) -v $(pwd):$(pwd) -w $(pwd)"
+ 
+ program_exists() {
++    if [ ! -z "$docker_tags" ]; then
++        use_docker_tag=""
++        for tag in $docker_tags; do
++            if ${DOCKER_RUN} ${tag} /bin/bash -c "command -v $1 >/dev/null"; then
++                use_docker_tag=$tag
++                return
++            fi
++        done
++    fi
++
+     command -v "$1" >/dev/null 2>&1
+ }
+ 
+@@ -30,19 +80,29 @@ for triplet in aarch64-linux-gnu arm-linux-gnueabihf m68k-linux-gnu \
+     if ! program_exists "${triplet}-gcc"; then
+         echo "Skipping ${triplet}: no compiler found"
+         continue
++    else
++        echo "Building ${triplet} on ${use_docker_tag:-host}..."
+     fi
+ 
+     # Do a complete rebuild from scratch, because it's cheap enough.
+     rm -rf build/${triplet}
+     mkdir -p build/${triplet}
+ 
+-    (cd build/${triplet} && CROSS_PREFIX="${triplet}-"  ../../configure)
+-    make -C build/${triplet} EXTRA_CFLAGS=-Werror
++    CONFIGURE="cd build/${triplet} && CROSS_PREFIX="${triplet}-"  ../../configure"
++    MAKE="make -C build/${triplet} EXTRA_CFLAGS=-Werror"
+ 
++    if [ -z "$use_docker_tag" ]; then
++        /bin/bash -c "${CONFIGURE}"
++        ${MAKE}
++    else
++        ${DOCKER_RUN} $use_docker_tag /bin/bash -c "${CONFIGURE}"
++        ${DOCKER_RUN} $use_docker_tag /bin/bash -c "${MAKE}"
++    fi
+ done
+ 
+ # Now run risugen for all architectures
+ mkdir -p build/risuout
++set -o pipefail # detect failures in pipeline
+ 
+ for f in *.risu; do
+     echo "Running risugen on $f..."
+-- 
+2.13.0
