@@ -1,32 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53062)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53203)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dGhaW-0006ny-Rj
-	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 04:05:41 -0400
+	(envelope-from <paolo.bonzini@gmail.com>) id 1dGhb7-00077E-7O
+	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 04:06:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dGhaR-0006iW-T5
-	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 04:05:40 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43592)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dGhaR-0006i6-N6
-	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 04:05:35 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id B074281F07
-	for <qemu-devel@nongnu.org>; Fri,  2 Jun 2017 08:05:34 +0000 (UTC)
-From: Markus Armbruster <armbru@redhat.com>
-References: <20170531135709.345-1-marcandre.lureau@redhat.com>
-	<20170531135709.345-13-marcandre.lureau@redhat.com>
-Date: Fri, 02 Jun 2017 10:05:31 +0200
-In-Reply-To: <20170531135709.345-13-marcandre.lureau@redhat.com>
-	(=?utf-8?Q?=22Marc-Andr=C3=A9?=
-	Lureau"'s message of "Wed, 31 May 2017 17:56:36 +0400")
-Message-ID: <8737bike5w.fsf@dusky.pond.sub.org>
+	(envelope-from <paolo.bonzini@gmail.com>) id 1dGhb6-000788-DR
+	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 04:06:17 -0400
+Received: from mail-wm0-x244.google.com ([2a00:1450:400c:c09::244]:34036)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
+	id 1dGhb6-00076o-61
+	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 04:06:16 -0400
+Received: by mail-wm0-x244.google.com with SMTP id d127so16966606wmf.1
+	for <qemu-devel@nongnu.org>; Fri, 02 Jun 2017 01:06:16 -0700 (PDT)
+Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
+References: <20170601170733.13080-1-pbonzini@redhat.com>
+	<CAFEAcA9Yteb5jsB2AJhuhx1Ejg+nwrF8PgetRWv+yFPduLHOgg@mail.gmail.com>
+	<CAFEAcA9zPWDQ8Y6ugAut5WobLXzP3zrUeUUH7RcSUMqdLkkndA@mail.gmail.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <2b22afa9-d3fa-99d3-c53d-696215041ffa@redhat.com>
+Date: Fri, 2 Jun 2017 10:06:13 +0200
 MIME-Version: 1.0
+In-Reply-To: <CAFEAcA9zPWDQ8Y6ugAut5WobLXzP3zrUeUUH7RcSUMqdLkkndA@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 12/45] qnum: add uint type
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PULL v2 00/34] Misc patches for 2016-06-01
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,21 +33,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
+On 01/06/2017 19:56, Peter Maydell wrote:
+> On 1 June 2017 at 18:53, Peter Maydell <peter.maydell@linaro.org> wrote:
+>> Test failure on OSX:
+>>
+>> TEST: tests/device-introspect-test... (pid=66373)
+>>   /aarch64/device/introspect/list:                                     OK
+>>   /aarch64/device/introspect/none:                                     OK
+>>   /aarch64/device/introspect/abstract:                                 OK
+>>   /aarch64/device/introspect/concrete:                                 **
+>> ERROR:/root/qemu/qom/object.c:364:object_initialize_with_type:
+>> assertion failed: (type != NULL)
+>> Broken pipe
+> 
+> Got those the wrong way round -- this is the FreeBSD failure
+> and the other lot are OSX. Pretty sure it's the same error,
+> though -- it's just that for some reason my OSX setup doesn't
+> actually cause make to exit with an error when a test fails,
+> so it goes on to hit what's probably the same bug in all the
+> other check-qtest-$ARCH targets rather than bailing out.
 
-> In order to store integer values superior to INT64_MAX, add a u64
+Thanks, any chance you can bisect these?  I'll install a FreeBSD VM next
+week.
 
-"superior" sounds odd.  What about "above"?  Or perhaps "between
-INT64_MAX and UINT64_MAX".
-
-s/a u64/a uint64_t/
-
-> internal representation.
->
-> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-
-With the commit message tidied up:
-Reviewed-by: Markus Armbruster <armbru@redhat.com>
+Paolo
