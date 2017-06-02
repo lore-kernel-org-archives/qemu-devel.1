@@ -1,25 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39315)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39781)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1dGmei-0000fy-FN
-	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 09:30:21 -0400
+	(envelope-from <eblake@redhat.com>) id 1dGmgr-0001k0-3O
+	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 09:32:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1dGmeh-0004xF-EI
-	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 09:30:20 -0400
-Received: from mail-wm0-x242.google.com ([2a00:1450:400c:c09::242]:32789)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1dGmeh-0004wF-7p
-	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 09:30:19 -0400
-Received: by mail-wm0-x242.google.com with SMTP id b84so19048018wmh.0
-	for <qemu-devel@nongnu.org>; Fri, 02 Jun 2017 06:30:19 -0700 (PDT)
+	(envelope-from <eblake@redhat.com>) id 1dGmgn-0007JH-Vk
+	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 09:32:33 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:33510)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dGmgn-0007I0-Mp
+	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 09:32:29 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id A86F07F6AC
+	for <qemu-devel@nongnu.org>; Fri,  2 Jun 2017 13:32:28 +0000 (UTC)
+References: <20170601214056.30387-1-quintela@redhat.com>
+	<20170601214056.30387-2-quintela@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <c4d3ba90-9369-4eb6-7a54-f794238275b7@redhat.com>
+Date: Fri, 2 Jun 2017 08:32:25 -0500
 MIME-Version: 1.0
-In-Reply-To: <311628499.16967933.1496398433571.JavaMail.zimbra@redhat.com>
-References: <20170602095424.9064-1-stefanha@redhat.com>
-	<311628499.16967933.1496398433571.JavaMail.zimbra@redhat.com>
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Date: Fri, 2 Jun 2017 14:30:17 +0100
-Message-ID: <CAJSP0QVWi+D6o9yHobHtEP8bA=RsgLbxQwbjwyTSjbr-fKwTag@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH] virtio-serial: fix segfault on disconnect
+In-Reply-To: <20170601214056.30387-2-quintela@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="vm0XGseiCvEceGIw7B6n71QOEqSFBUGEd"
+Subject: Re: [Qemu-devel] [PATCH 1/4] ram: Unfold get_xbzrle_cache_stats()
+ into populate_ram_info()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,68 +35,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Pankaj Gupta <pagupta@redhat.com>
-Cc: Stefan Hajnoczi <stefanha@redhat.com>, Ladi Prosek <lprosek@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, Amit Shah <amit@kernel.org>, "Michael S. Tsirkin" <mst@redhat.com>
+To: Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org
+Cc: lvivier@redhat.com, dgilbert@redhat.com, peterx@redhat.com
 
-On Fri, Jun 2, 2017 at 11:13 AM, Pankaj Gupta <pagupta@redhat.com> wrote:
->> Since commit d4c19cdeeb2f1e474bc426a6da261f1d7346eb5b ("virtio-serial:
->> add missing virtio_detach_element() call") the following commands may
->> cause QEMU to segfault:
->>
->>   $ qemu -M accel=kvm -cpu host -m 1G \
->>          -drive if=virtio,file=test.img,format=raw \
->>          -device virtio-serial-pci,id=virtio-serial0 \
->>          -chardev socket,id=channel1,path=/tmp/chardev.sock,server,nowait \
->>          -device
->>          virtserialport,chardev=channel1,bus=virtio-serial0.0,id=port1
->>   $ nc -U /tmp/chardev.sock
->>   ^C
->>
->>   (guest)$ cat /dev/zero >/dev/vport0p1
->>
->> The segfault is non-deterministic: if the event loop notices the socket
->> has been closed then there is no crash.  The disconnect has to happen
->> right before QEMU attempts to write data to the socket.
->>
->> The backtrace is as follows:
->>
->>   Thread 1 "qemu-system-x86" received signal SIGSEGV, Segmentation fault.
->>   0x00005555557e0698 in do_flush_queued_data (port=0x5555582cedf0,
->>   vq=0x7fffcc854290, vdev=0x55555807b1d0) at hw/char/virtio-serial-bus.c:180
->>   180           for (i = port->iov_idx; i < port->elem->out_num; i++) {
->>   #1  0x000055555580d363 in virtio_queue_notify_vq (vq=0x7fffcc854290) at
->>   hw/virtio/virtio.c:1524
->>   #2  0x000055555580d363 in virtio_queue_host_notifier_read
->>   (n=0x7fffcc8542f8) at hw/virtio/virtio.c:2430
->>   #3  0x0000555555b3482c in aio_dispatch_handlers
->>   (ctx=ctx@entry=0x5555566b8c80) at util/aio-posix.c:399
->>   #4  0x0000555555b350d8 in aio_dispatch (ctx=0x5555566b8c80) at
->>   util/aio-posix.c:430
->>   #5  0x0000555555b3212e in aio_ctx_dispatch (source=<optimized out>,
->>   callback=<optimized out>, user_data=<optimized out>) at util/async.c:261
->>   #6  0x00007fffde71de52 in g_main_context_dispatch () at
->>   /lib64/libglib-2.0.so.0
->>   #7  0x0000555555b34353 in glib_pollfds_poll () at util/main-loop.c:213
->>   #8  0x0000555555b34353 in os_host_main_loop_wait (timeout=<optimized out>)
->>   at util/main-loop.c:261
->>   #9  0x0000555555b34353 in main_loop_wait (nonblocking=<optimized out>) at
->>   util/main-loop.c:517
->>   #10 0x0000555555773207 in main_loop () at vl.c:1917
->>   #11 0x0000555555773207 in main (argc=<optimized out>, argv=<optimized out>,
->>   envp=<optimized out>) at vl.c:4751
->>
->> The do_flush_queued_data() function does not anticipate chardev close
->> events during vsc->have_data().  It expects port->elem to remain
->> non-NULL for the duration its for loop.
->
-> Just thinking if there is still data to flush, should we close/free the port.
-> Or it can get close automatically.
->
-> Or I am missing anything here?
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--vm0XGseiCvEceGIw7B6n71QOEqSFBUGEd
+From: Eric Blake <eblake@redhat.com>
+To: Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org
+Cc: lvivier@redhat.com, dgilbert@redhat.com, peterx@redhat.com
+Message-ID: <c4d3ba90-9369-4eb6-7a54-f794238275b7@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 1/4] ram: Unfold get_xbzrle_cache_stats()
+ into populate_ram_info()
+References: <20170601214056.30387-1-quintela@redhat.com>
+ <20170601214056.30387-2-quintela@redhat.com>
+In-Reply-To: <20170601214056.30387-2-quintela@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-virtio_serial_close() was already called by
-virtio-console.c:chr_event().  Both port->elem and the entire output
-virtqueue have been discarded.  No further data will be transferred
-and do_flush_queued_data() doesn't need to do anything.
+On 06/01/2017 04:40 PM, Juan Quintela wrote:
+> They were called consequtiveley always.
 
-Stefan
+s/consequtiveley/consecutively/
+
+>=20
+> Signed-off-by: Juan Quintela <quintela@redhat.com>
+> ---
+>  migration/migration.c | 29 +++++++++++------------------
+>  1 file changed, 11 insertions(+), 18 deletions(-)
+>=20
+
+Reviewed-by: Eric Blake <eblake@redhat.com>
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--vm0XGseiCvEceGIw7B6n71QOEqSFBUGEd
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEcBAEBCAAGBQJZMWjpAAoJEKeha0olJ0NqotoH/1Tz4cUS81/dP2bTWR6XRM3B
+xNU8sbk38CujH8EePa2y1kqlsO3zCWaDQnhvxCExUBDYKwjJAckHPiZZQ8ngfgNF
+XtVMWM3f8xNezPyxrktc/QbeHEsJq7RN8e0Ls9htkowhVPJ6frPCV4rbbCM/qWXJ
+yh6bIuDz9653WhM55e/S6PzZobF4McqzNg+vXDch6bhjlAMfmP+TyrIZcX98SvJB
+x4s8l6S7HxwsGgFb8Oe7scc6whEg7vC/IPyU/2Fok6XbD+1frE4VhJZPAw7s1jw3
+fJV2I4Pvvobu4/mPOCByqUgsnEcxYAB4h4wilLsqnbUHB2HbG1/v64pV+tOnjzY=
+=QO88
+-----END PGP SIGNATURE-----
+
+--vm0XGseiCvEceGIw7B6n71QOEqSFBUGEd--
