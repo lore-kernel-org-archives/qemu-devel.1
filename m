@@ -1,23 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58959)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40528)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <anichang@protonmail.ch>) id 1dGZzG-0005ZS-1b
-	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 19:58:43 -0400
+	(envelope-from <quwenruo@cn.fujitsu.com>) id 1dGbh6-0008Ra-73
+	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 21:48:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <anichang@protonmail.ch>) id 1dGZzC-0006nx-62
-	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 19:58:42 -0400
-Received: from mail4.protonmail.ch ([185.70.40.27]:19258)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <anichang@protonmail.ch>)
-	id 1dGZzB-0006kU-NF
-	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 19:58:38 -0400
-Date: Thu, 01 Jun 2017 19:58:28 -0400
-From: Anichang <anichang@protonmail.ch>
-Reply-To: Anichang <anichang@protonmail.ch>
-Message-ID: <icD95dr50LL5pxbekfpmcGyk2KH2jNIcPUswAsm9MC6uuMh2Cc7LlXnkpqHlLKhq36ZUCtrsM1yRluCkQbW4aYowQnUvfTjqjcDfYab7FX8=@protonmail.ch>
+	(envelope-from <quwenruo@cn.fujitsu.com>) id 1dGbh5-0002ug-Fw
+	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 21:48:04 -0400
+From: Qu Wenruo <quwenruo@cn.fujitsu.com>
+Message-ID: <b3375e1d-a304-237c-124c-21b7f482b6ab@cn.fujitsu.com>
+Date: Fri, 2 Jun 2017 09:47:41 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: base64
-Subject: [Qemu-devel] Target AVR
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: [Qemu-devel] NVME: is there any plan to support SGL data transfer?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,44 +21,20 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org, qemu-block@nongnu.org
 
-SGkgYWxsLAoKSSBqdXN0IHJlc3VycmVjdGVkIHRoZSB0YXJnZXQtYXZyIHBhdGNoc2V0IGZyb20g
-TWljaGFlbCBSb2xuaWsuIEZvbGxvd2luZyB0aGUgZGV0YWlsczoKCmNvbW1pdCBmMmJjYTE3OWRi
-ZmMzZjM3OGIxMzFlZDYxOWQwN2RiOTQ2YmFlNTk4Ck1lcmdlOiA0Mzc3MWQ1IGVkMjUwYzAKQXV0
-aG9yOiBBbmkgQ2hhbmcgPGFuaWNoYW5nQHByb3Rvbm1haWwuY2g+CkRhdGU6IEZyaSBKdW4gMiAw
-MToxNzozNCAyMDE3ICswMjAwCgp0YXJnZXQvYXZyOiByZXN1cnJlY3RlZCAoc2VlIG1haWxpbmcg
-bGlzdCBxZW11LWRldmVsLCBSaWNoYXJkIEhlbmRlcnNvbiBvbiBTZXAgMjAsIDIwMTYgYXQgODoz
-NXBtKQphbmQgZml4ZWQgKGl0IGJ1aWxkcykuCgpEZXRhaWxzOgotIG1lcmdlIHJlbW90ZSBnaXQ6
-Ly9naXRodWIuY29tL3J0aDc2ODAvcWVtdS5naXQgdGFncy9wdWxsLWF2ci0yMDE2MDkyMCBpbnRv
-IG1hc3RlcgotIGZpeGVkIGluY2x1ZGUvc3lzZW11L2FyY2hfaW5pdC5oIChpLmUuOiBidW1wIFFF
-TVVfQVJDSF9BVlIgZnJvbSAxPDwxNyB0byAxPDwxOCkKLSBmaXhlZCB0YXJnZXQvYXZyL2NwdS5j
-IChpLmUuOiByZW1vdmUgb25lIGZ1bmN0aW9uIGFyZykKLSBmaXhlZCB0YXJnZXQvYXZyL21hY2hp
-bmUuYyAoaS5lLjogZml4IGEgYnVuY2ggb2YgZ2V0dGVycy9zZXR0ZXJzIHNpZ25hdHVyZXMpCgpS
-dW5uaW5nIHRoZSBzYW1wbGUgYm9hcmQgb3V0cHV0czoKCiQgLi9xZW11LXN5c3RlbS1hdnIKVW5l
-eHBlY3RlZCBlcnJvciBpbiBvYmplY3RfcHJvcGVydHlfYWRkKCkgYXQgcW9tL29iamVjdC5jOjk0
-MDoKcWVtdS1zeXN0ZW0tYXZyOiBhdHRlbXB0IHRvIGFkZCBkdXBsaWNhdGUgcHJvcGVydHkgJ21l
-bW9yeScgdG8gb2JqZWN0ICh0eXBlICdhdnI1LWF2cicpCkFib3J0ZWQgKGNvcmUgZHVtcGVkKQok
-CgpTaWduZWQtb2ZmLWJ5OiBBbmkgQ2hhbmcgPGFuaWNoYW5nQHByb3Rvbm1haWwuY2g+Cgpjb21t
-aXQgNDM3NzFkNWQ5MjMxMjUwNDMwNWMxOWFiZTI5ZWM1YmZhYmQ1NWYwMQpNZXJnZTogYzA3N2E5
-OSBjMDY0NDc3CkF1dGhvcjogUGV0ZXIgTWF5ZGVsbCA8cGV0ZXIubWF5ZGVsbEBsaW5hcm8ub3Jn
-PgpEYXRlOiBUaHUgSnVuIDEgMTY6Mzk6MTYgMjAxNyArMDEwMAoKTWVyZ2UgcmVtb3RlLXRyYWNr
-aW5nIGJyYW5jaCAncmVtb3Rlcy9hcm1icnUvdGFncy9wdWxsLXFhcGktMjAxNy0wNS0zMScgaW50
-byBzdGFnaW5nCi4uLgotLS0KCkZvbGxvd2luZyB0aGUgb3V0cHV0IG9mICdtYWtlIGNoZWNrJy4K
-Ci4uLgpHVEVTVEVSIGNoZWNrLXF0ZXN0LWF2cgpVbmV4cGVjdGVkIGVycm9yIGluIG9iamVjdF9w
-cm9wZXJ0eV9hZGQoKSBhdCBxb20vb2JqZWN0LmM6OTQwOgphdHRlbXB0IHRvIGFkZCBkdXBsaWNh
-dGUgcHJvcGVydHkgJ21lbW9yeScgdG8gb2JqZWN0ICh0eXBlICd4bWVnYTctYXZyJykKQnJva2Vu
-IHBpcGUKR1Rlc3RlcjogbGFzdCByYW5kb20gc2VlZDogUjAyU2I3MTI3Zjg4MzM3ZWZhNzY3YjVl
-OTZhODgwNDZlYmMxClVuZXhwZWN0ZWQgZXJyb3IgaW4gb2JqZWN0X3Byb3BlcnR5X2FkZCgpIGF0
-IHFvbS9vYmplY3QuYzo5NDA6CnFlbXUtc3lzdGVtLWF2cjogYXR0ZW1wdCB0byBhZGQgZHVwbGlj
-YXRlIHByb3BlcnR5ICdtZW1vcnknIHRvIG9iamVjdCAodHlwZSAnYXZyNS1hdnInKQpCcm9rZW4g
-cGlwZQpHVGVzdGVyOiBsYXN0IHJhbmRvbSBzZWVkOiBSMDJTOTRhYTY0MDI5OGE4ZDVhNzFkMTEy
-MDhiOTUzNjNlZGQKVW5leHBlY3RlZCBlcnJvciBpbiBvYmplY3RfcHJvcGVydHlfYWRkKCkgYXQg
-cW9tL29iamVjdC5jOjk0MDoKcWVtdS1zeXN0ZW0tYXZyOiBhdHRlbXB0IHRvIGFkZCBkdXBsaWNh
-dGUgcHJvcGVydHkgJ21lbW9yeScgdG8gb2JqZWN0ICh0eXBlICdhdnI1LWF2cicpCkJyb2tlbiBw
-aXBlCkdUZXN0ZXI6IGxhc3QgcmFuZG9tIHNlZWQ6IFIwMlM3NmM2MmQ2N2UyMmZiYjIzN2EzNDMx
-MzU4ZTY1ZDZjMgovcWVtdS10ZXN0L3Rlc3RzL01ha2VmaWxlLmluY2x1ZGU6ODI0OiByZWNpcGUg
-Zm9yIHRhcmdldCAnY2hlY2stcXRlc3QtYXZyJyBmYWlsZWQKbWFrZTogKioqIFtjaGVjay1xdGVz
-dC1hdnJdIEVycm9yIDEKJAotLS0KCkkgaGF2ZSBubyBpZGVhIHdoYXQgdG8gZG8gZnJvbSBoZXJl
-LiBIb3cgdG8gc29sdmUgdGhlICJhdHRlbXB0IHRvIGFkZCBkdXBsaWNhdGUgcHJvcGVydHkgJ21l
-bW9yeScgdG8gb2JqZWN0IiBlcnJvcj8KClJlZ2FyZHM=
+Hi,
+
+When going through NVMe specification and hw/block/nvme.c,
+I found that it seems that NVMe qemu implementation only support PRP for 
+sq entry.
+And NvmeRwCmd doesn't even use union to define DPTR, but just prp1 and prp2.
+
+Although I am just a newbie, but I'm quite interested in NVMe and want 
+to try to implement SGL support for qemu NVMe.
+
+Is there anyone already doing such work? Or is there any plan on 
+implement such feature?
+
+Thanks,
+Qu
