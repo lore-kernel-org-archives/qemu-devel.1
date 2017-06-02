@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35268)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35829)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dGrRI-0003RN-Oq
-	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 14:36:50 -0400
+	id 1dGrTP-0005UY-CF
+	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 14:39:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dGrRH-0004qR-NW
-	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 14:36:48 -0400
+	id 1dGrTO-0006iU-DC
+	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 14:38:59 -0400
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 References: <20170602162857.6065-1-krzk@kernel.org>
 	<20170602163618.6369-1-krzk@kernel.org>
-	<20170602163618.6369-3-krzk@kernel.org>
+	<20170602163618.6369-9-krzk@kernel.org>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <bda550c9-b9e1-83d0-9cdb-e198cb754a2f@amsat.org>
-Date: Fri, 2 Jun 2017 15:36:44 -0300
+Message-ID: <81d64387-003a-2b21-9229-37b3c0feb676@amsat.org>
+Date: Fri, 2 Jun 2017 15:38:55 -0300
 MIME-Version: 1.0
-In-Reply-To: <20170602163618.6369-3-krzk@kernel.org>
+In-Reply-To: <20170602163618.6369-9-krzk@kernel.org>
 Content-Type: text/plain; charset=windows-1252; format=flowed
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v4 3/9] hw/timer/exynos4210_mct: Cleanup
- indentation and empty new lines
+Subject: Re: [Qemu-devel] [PATCH v4 9/9] hw/misc/exynos4210_pmu: Add support
+ for system poweroff
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,9 +32,29 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Krzysztof Kozlowski <krzk@kernel.org>, Igor Mitsyanko <i.mitsyanko@gmail.com>, Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-devel@nongnu.org
 
 On 06/02/2017 01:36 PM, Krzysztof Kozlowski wrote:
-> Statements under 'case' were in some places wrongly indented bringing
-> confusion and making the code less readable.  Remove also few unneeded
-> blank lines.  No functional changes.
+> On all Exynos-based boards, the system powers down itself by driving
+> PS_HOLD signal low - eight bit in PS_HOLD_CONTROL register of PMU.
+> Handle writing to respective PMU register to fix power off failure:
+>
+>     reboot: Power down
+>     Unable to poweroff system
+>     shutdown: 31 output lines suppressed due to ratelimiting
+>     Kernel panic - not syncing: Attempted to kill init! exitcode=0x00000000
+>
+>     CPU: 0 PID: 1 Comm: shutdown Not tainted 4.11.0-rc8 #846
+>     Hardware name: SAMSUNG EXYNOS (Flattened Device Tree)
+>     [<c031050c>] (unwind_backtrace) from [<c030ba6c>] (show_stack+0x10/0x14)
+>     [<c030ba6c>] (show_stack) from [<c05b2800>] (dump_stack+0x88/0x9c)
+>     [<c05b2800>] (dump_stack) from [<c03d3140>] (panic+0xdc/0x268)
+>     [<c03d3140>] (panic) from [<c0343614>] (do_exit+0xa90/0xab4)
+>     [<c0343614>] (do_exit) from [<c035f2dc>] (SyS_reboot+0x164/0x1d0)
+>     [<c035f2dc>] (SyS_reboot) from [<c0307c80>] (ret_fast_syscall+0x0/0x3c)
+>
+> Additionally the initial value of PS_HOLD has to be changed because
+> recent Linux kernel (v4.12-rc1) uses regmap cache for this access.
+> When the register is kept at reset value, the kernel will not issue a
+> write to it.  Usually the bootloader sets the eight bit of PS_HOLD high
+> so mimic its existence here.
 >
 > Signed-off-by: Krzysztof Kozlowski <krzk@kernel.org>
 > Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
@@ -42,111 +62,59 @@ On 06/02/2017 01:36 PM, Krzysztof Kozlowski wrote:
 Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
 > ---
->  hw/timer/exynos4210_mct.c | 45 ++++++++++++++++++++-------------------------
->  1 file changed, 20 insertions(+), 25 deletions(-)
+>  hw/misc/exynos4210_pmu.c | 20 +++++++++++++++++++-
+>  1 file changed, 19 insertions(+), 1 deletion(-)
 >
-> diff --git a/hw/timer/exynos4210_mct.c b/hw/timer/exynos4210_mct.c
-> index 2404fb737ac4..ea5f99d9a41b 100644
-> --- a/hw/timer/exynos4210_mct.c
-> +++ b/hw/timer/exynos4210_mct.c
-> @@ -1016,9 +1016,9 @@ static uint64_t exynos4210_mct_read(void *opaque, hwaddr offset,
+> diff --git a/hw/misc/exynos4210_pmu.c b/hw/misc/exynos4210_pmu.c
+> index 63a8ccd35559..0d7b64c5b3a3 100644
+> --- a/hw/misc/exynos4210_pmu.c
+> +++ b/hw/misc/exynos4210_pmu.c
+> @@ -26,6 +26,7 @@
 >
->      case G_COMP_L(0): case G_COMP_L(1): case G_COMP_L(2): case G_COMP_L(3):
->      case G_COMP_U(0): case G_COMP_U(1): case G_COMP_U(2): case G_COMP_U(3):
-> -    index = GET_G_COMP_IDX(offset);
-> -    shift = 8 * (offset & 0x4);
-> -    value = UINT32_MAX & (s->g_timer.reg.comp[index] >> shift);
-> +        index = GET_G_COMP_IDX(offset);
-> +        shift = 8 * (offset & 0x4);
-> +        value = UINT32_MAX & (s->g_timer.reg.comp[index] >> shift);
->      break;
+>  #include "qemu/osdep.h"
+>  #include "hw/sysbus.h"
+> +#include "sysemu/sysemu.h"
 >
->      case G_TCON:
-> @@ -1067,7 +1067,6 @@ static uint64_t exynos4210_mct_read(void *opaque, hwaddr offset,
->          lt_i = GET_L_TIMER_IDX(offset);
+>  #ifndef DEBUG_PMU
+>  #define DEBUG_PMU           0
+> @@ -350,7 +351,11 @@ static const Exynos4210PmuReg exynos4210_pmu_regs[] = {
+>      {"PAD_RETENTION_MMCB_OPTION", PAD_RETENTION_MMCB_OPTION, 0x00000000},
+>      {"PAD_RETENTION_EBIA_OPTION", PAD_RETENTION_EBIA_OPTION, 0x00000000},
+>      {"PAD_RETENTION_EBIB_OPTION", PAD_RETENTION_EBIB_OPTION, 0x00000000},
+> -    {"PS_HOLD_CONTROL", PS_HOLD_CONTROL, 0x00005200},
+> +    /*
+> +     * PS_HOLD_CONTROL: reset value and manually toggle high the DATA bit.
+> +     * DATA bit high, set usually by bootloader, keeps system on.
+> +     */
+> +    {"PS_HOLD_CONTROL", PS_HOLD_CONTROL, 0x00005200 | BIT(8)},
+>      {"XUSBXTI_CONFIGURATION", XUSBXTI_CONFIGURATION, 0x00000001},
+>      {"XUSBXTI_STATUS", XUSBXTI_STATUS, 0x00000001},
+>      {"XUSBXTI_DURATION", XUSBXTI_DURATION, 0xFFF00000},
+> @@ -397,6 +402,12 @@ typedef struct Exynos4210PmuState {
+>      uint32_t reg[PMU_NUM_OF_REGISTERS];
+>  } Exynos4210PmuState;
 >
->          value = exynos4210_lfrc_get_count(&s->l_timer[lt_i]);
-> -
->          break;
->
->      case L0_TCON: case L1_TCON:
-> @@ -1153,23 +1152,23 @@ static void exynos4210_mct_write(void *opaque, hwaddr offset,
->
->      case G_COMP_L(0): case G_COMP_L(1): case G_COMP_L(2): case G_COMP_L(3):
->      case G_COMP_U(0): case G_COMP_U(1): case G_COMP_U(2): case G_COMP_U(3):
-> -    index = GET_G_COMP_IDX(offset);
-> -    shift = 8 * (offset & 0x4);
-> -    s->g_timer.reg.comp[index] =
-> -            (s->g_timer.reg.comp[index] &
-> -            (((uint64_t)UINT32_MAX << 32) >> shift)) +
-> -            (value << shift);
-> +        index = GET_G_COMP_IDX(offset);
-> +        shift = 8 * (offset & 0x4);
-> +        s->g_timer.reg.comp[index] =
-> +                (s->g_timer.reg.comp[index] &
-> +                (((uint64_t)UINT32_MAX << 32) >> shift)) +
-> +                (value << shift);
->
-> -    DPRINTF("comparator %d write 0x%llx val << %d\n", index, value, shift);
-> +        DPRINTF("comparator %d write 0x%llx val << %d\n", index, value, shift);
->
-> -    if (offset & 0x4) {
-> -        s->g_timer.reg.wstat |= G_WSTAT_COMP_U(index);
-> -    } else {
-> -        s->g_timer.reg.wstat |= G_WSTAT_COMP_L(index);
-> -    }
-> +        if (offset & 0x4) {
-> +            s->g_timer.reg.wstat |= G_WSTAT_COMP_U(index);
-> +        } else {
-> +            s->g_timer.reg.wstat |= G_WSTAT_COMP_L(index);
-> +        }
->
-> -    exynos4210_gfrc_restart(s);
-> -    break;
-> +        exynos4210_gfrc_restart(s);
-> +        break;
->
->      case G_TCON:
->          old_val = s->g_timer.reg.tcon;
-> @@ -1207,7 +1206,6 @@ static void exynos4210_mct_write(void *opaque, hwaddr offset,
->          break;
->
->      case G_INT_ENB:
-> -
->          /* Raise IRQ if transition from disabled to enabled and CSTAT pending */
->          for (i = 0; i < MCT_GT_CMP_NUM; i++) {
->              if ((value & G_INT_ENABLE(i)) > (s->g_timer.reg.tcon &
-> @@ -1288,7 +1286,6 @@ static void exynos4210_mct_write(void *opaque, hwaddr offset,
->          break;
->
->      case L0_TCNTB: case L1_TCNTB:
-> -
->          lt_i = GET_L_TIMER_IDX(offset);
->          index = GET_L_TIMER_CNT_REG_IDX(offset, lt_i);
->
-> @@ -1316,7 +1313,6 @@ static void exynos4210_mct_write(void *opaque, hwaddr offset,
->          break;
->
->      case L0_ICNTB: case L1_ICNTB:
-> -
->          lt_i = GET_L_TIMER_IDX(offset);
->          index = GET_L_TIMER_CNT_REG_IDX(offset, lt_i);
->
-> @@ -1353,13 +1349,12 @@ static void exynos4210_mct_write(void *opaque, hwaddr offset,
->          if (icntb_max[lt_i] < value) {
->              icntb_max[lt_i] = value;
+> +static void exynos4210_pmu_poweroff(void)
+> +{
+> +    PRINT_DEBUG("QEMU PMU: PS_HOLD bit down, powering off\n");
+> +    qemu_system_shutdown_request(SHUTDOWN_CAUSE_GUEST_SHUTDOWN);
+> +}
+> +
+>  static uint64_t exynos4210_pmu_read(void *opaque, hwaddr offset,
+>                                      unsigned size)
+>  {
+> @@ -428,6 +439,13 @@ static void exynos4210_pmu_write(void *opaque, hwaddr offset,
+>              PRINT_DEBUG_EXTEND("%s <0x%04x> <- 0x%04x\n", reg_p->name,
+>                      (uint32_t)offset, (uint32_t)val);
+>              s->reg[i] = val;
+> +            if ((offset == PS_HOLD_CONTROL) && ((val & BIT(8)) == 0)) {
+> +                /*
+> +                 * We are interested only in setting data bit
+> +                 * of PS_HOLD_CONTROL register to indicate power off request.
+> +                 */
+> +                exynos4210_pmu_poweroff();
+> +            }
+>              return;
 >          }
-> -DPRINTF("local timer[%d] ICNTB write %llx; max=%x, min=%x\n\n",
-> -        lt_i, value, icntb_max[lt_i], icntb_min[lt_i]);
-> +        DPRINTF("local timer[%d] ICNTB write %llx; max=%x, min=%x\n\n",
-> +                lt_i, value, icntb_max[lt_i], icntb_min[lt_i]);
->  #endif
-> -break;
-> +        break;
->
->      case L0_FRCNTB: case L1_FRCNTB:
-> -
->          lt_i = GET_L_TIMER_IDX(offset);
->          index = GET_L_TIMER_CNT_REG_IDX(offset, lt_i);
->
+>          reg_p++;
 >
