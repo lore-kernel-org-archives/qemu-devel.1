@@ -1,18 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35345)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37591)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <krzk@kernel.org>) id 1dGpZF-0001KM-Mh
-	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 12:36:57 -0400
+	(envelope-from <mst@redhat.com>) id 1dGphR-0001RZ-2P
+	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 12:45:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <krzk@kernel.org>) id 1dGpZE-0007mV-JO
-	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 12:36:53 -0400
-From: Krzysztof Kozlowski <krzk@kernel.org>
-Date: Fri,  2 Jun 2017 18:36:18 +0200
-Message-Id: <20170602163618.6369-9-krzk@kernel.org>
-In-Reply-To: <20170602163618.6369-1-krzk@kernel.org>
-References: <20170602162857.6065-1-krzk@kernel.org>
-	<20170602163618.6369-1-krzk@kernel.org>
-Subject: [Qemu-devel] [PATCH v4 9/9] hw/misc/exynos4210_pmu: Add support for
- system poweroff
+	(envelope-from <mst@redhat.com>) id 1dGphM-0004nu-Vf
+	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 12:45:21 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:41626)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1dGphM-0004n2-Mi
+	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 12:45:16 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 93B0380472
+	for <qemu-devel@nongnu.org>; Fri,  2 Jun 2017 16:45:15 +0000 (UTC)
+Date: Fri, 2 Jun 2017 19:45:05 +0300
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20170602193713-mutt-send-email-mst@kernel.org>
+References: <1496404254-17429-1-git-send-email-peterx@redhat.com>
+	<1496404254-17429-2-git-send-email-peterx@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1496404254-17429-2-git-send-email-peterx@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 1/3] exec: add page_mask for
+ address_space_do_translate
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,90 +34,147 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mitsyanko <i.mitsyanko@gmail.com>, Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-devel@nongnu.org
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Eric Blake <eblake@redhat.com>, Krzysztof Kozlowski <krzk@kernel.org>
+To: Peter Xu <peterx@redhat.com>
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Maxime Coquelin <maxime.coquelin@redhat.com>, Jason Wang <jasowang@redhat.com>
 
-On all Exynos-based boards, the system powers down itself by driving
-PS_HOLD signal low - eight bit in PS_HOLD_CONTROL register of PMU.
-Handle writing to respective PMU register to fix power off failure:
+On Fri, Jun 02, 2017 at 07:50:52PM +0800, Peter Xu wrote:
+> The function is originally used for address_space_translate() and what
+> we care about most is (xlat, plen) range. However for iotlb requests, we
+> don't really care about "plen", but the size of the page that "xlat" is
+> located on. While, plen cannot really contain this information.
+> 
+> A simple example to show why "plen" is not good for IOTLB translations:
+> 
+> E.g., for huge pages, it is possible that guest mapped 1G huge page on
+> device side that used this GPA range:
+> 
+>   0x100000000 - 0x13fffffff
+> 
+> Then let's say we want to translate one IOVA that finally mapped to GPA
+> 0x13ffffe00 (which is located on this 1G huge page). Then here we'll
+> get:
+> 
+>   (xlat, plen) = (0x13fffe00, 0x200)
+> 
+> So the IOTLB would be only covering a very small range since from
+> "plen" (which is 0x200 bytes) we cannot tell the size of the page.
+> 
+> Actually we can really know that this is a huge page - we just throw the
+> information away in address_space_do_translate().
+> 
+> This patch introduced "page_mask" optional parameter to capture that
+> page mask info. Also, I made "plen" an optional parameter as well, with
+> some comments for the whole function.
+> 
+> No functional change yet.
+> 
+> Signed-off-by: Peter Xu <peterx@redhat.com>
+> ---
+>  exec.c | 46 ++++++++++++++++++++++++++++++++++++++++------
+>  1 file changed, 40 insertions(+), 6 deletions(-)
+> 
+> diff --git a/exec.c b/exec.c
+> index 8fc0e78..63a3ff0 100644
+> --- a/exec.c
+> +++ b/exec.c
+> @@ -465,21 +465,45 @@ address_space_translate_internal(AddressSpaceDispatch *d, hwaddr addr, hwaddr *x
+>      return section;
+>  }
+>  
+> -/* Called from RCU critical section */
+> +/**
+> + * address_space_do_translate - translate an address in AddressSpace
+> + *
+> + * @as: the address space that we want to translate on
+> + * @addr: the address to be translated in above address space
+> + * @xlat: the translated address offset within memory region. It
+> + *        cannot be @NULL.
+> + * @plen_out: valid read/write length of the translated address. It
+> + *            can be @NULL when we don't care about it.
+> + * @page_mask_out: page mask for the translated address. This
+> + *            should only be meaningful for IOMMU translated
+> + *            addresses, since there may be huge pages that this bit
+> + *            would tell. It can be @NULL if we don't care about it.
 
-    reboot: Power down
-    Unable to poweroff system
-    shutdown: 31 output lines suppressed due to ratelimiting
-    Kernel panic - not syncing: Attempted to kill init! exitcode=0x00000000
+Why do we need plen or mask at all? It seems MemoryRegionSection
+has address and length already. So if you want to find out
+distance to section end, do section.size - xlat and you are done.
 
-    CPU: 0 PID: 1 Comm: shutdown Not tainted 4.11.0-rc8 #846
-    Hardware name: SAMSUNG EXYNOS (Flattened Device Tree)
-    [<c031050c>] (unwind_backtrace) from [<c030ba6c>] (show_stack+0x10/0x14)
-    [<c030ba6c>] (show_stack) from [<c05b2800>] (dump_stack+0x88/0x9c)
-    [<c05b2800>] (dump_stack) from [<c03d3140>] (panic+0xdc/0x268)
-    [<c03d3140>] (panic) from [<c0343614>] (do_exit+0xa90/0xab4)
-    [<c0343614>] (do_exit) from [<c035f2dc>] (SyS_reboot+0x164/0x1d0)
-    [<c035f2dc>] (SyS_reboot) from [<c0307c80>] (ret_fast_syscall+0x0/0x3c)
 
-Additionally the initial value of PS_HOLD has to be changed because
-recent Linux kernel (v4.12-rc1) uses regmap cache for this access.
-When the register is kept at reset value, the kernel will not issue a
-write to it.  Usually the bootloader sets the eight bit of PS_HOLD high
-so mimic its existence here.
-
-Signed-off-by: Krzysztof Kozlowski <krzk@kernel.org>
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
----
- hw/misc/exynos4210_pmu.c | 20 +++++++++++++++++++-
- 1 file changed, 19 insertions(+), 1 deletion(-)
-
-diff --git a/hw/misc/exynos4210_pmu.c b/hw/misc/exynos4210_pmu.c
-index 63a8ccd35559..0d7b64c5b3a3 100644
---- a/hw/misc/exynos4210_pmu.c
-+++ b/hw/misc/exynos4210_pmu.c
-@@ -26,6 +26,7 @@
- 
- #include "qemu/osdep.h"
- #include "hw/sysbus.h"
-+#include "sysemu/sysemu.h"
- 
- #ifndef DEBUG_PMU
- #define DEBUG_PMU           0
-@@ -350,7 +351,11 @@ static const Exynos4210PmuReg exynos4210_pmu_regs[] = {
-     {"PAD_RETENTION_MMCB_OPTION", PAD_RETENTION_MMCB_OPTION, 0x00000000},
-     {"PAD_RETENTION_EBIA_OPTION", PAD_RETENTION_EBIA_OPTION, 0x00000000},
-     {"PAD_RETENTION_EBIB_OPTION", PAD_RETENTION_EBIB_OPTION, 0x00000000},
--    {"PS_HOLD_CONTROL", PS_HOLD_CONTROL, 0x00005200},
-+    /*
-+     * PS_HOLD_CONTROL: reset value and manually toggle high the DATA bit.
-+     * DATA bit high, set usually by bootloader, keeps system on.
-+     */
-+    {"PS_HOLD_CONTROL", PS_HOLD_CONTROL, 0x00005200 | BIT(8)},
-     {"XUSBXTI_CONFIGURATION", XUSBXTI_CONFIGURATION, 0x00000001},
-     {"XUSBXTI_STATUS", XUSBXTI_STATUS, 0x00000001},
-     {"XUSBXTI_DURATION", XUSBXTI_DURATION, 0xFFF00000},
-@@ -397,6 +402,12 @@ typedef struct Exynos4210PmuState {
-     uint32_t reg[PMU_NUM_OF_REGISTERS];
- } Exynos4210PmuState;
- 
-+static void exynos4210_pmu_poweroff(void)
-+{
-+    PRINT_DEBUG("QEMU PMU: PS_HOLD bit down, powering off\n");
-+    qemu_system_shutdown_request(SHUTDOWN_CAUSE_GUEST_SHUTDOWN);
-+}
-+
- static uint64_t exynos4210_pmu_read(void *opaque, hwaddr offset,
-                                     unsigned size)
- {
-@@ -428,6 +439,13 @@ static void exynos4210_pmu_write(void *opaque, hwaddr offset,
-             PRINT_DEBUG_EXTEND("%s <0x%04x> <- 0x%04x\n", reg_p->name,
-                     (uint32_t)offset, (uint32_t)val);
-             s->reg[i] = val;
-+            if ((offset == PS_HOLD_CONTROL) && ((val & BIT(8)) == 0)) {
-+                /*
-+                 * We are interested only in setting data bit
-+                 * of PS_HOLD_CONTROL register to indicate power off request.
-+                 */
-+                exynos4210_pmu_poweroff();
-+            }
-             return;
-         }
-         reg_p++;
--- 
-2.9.3
+> + * @is_write: whether the translation operation is for write
+> + * @is_mmio: whether this can be MMIO, set true if it can
+> + *
+> + * This function is called from RCU critical section
+> + */
+>  static MemoryRegionSection address_space_do_translate(AddressSpace *as,
+>                                                        hwaddr addr,
+>                                                        hwaddr *xlat,
+> -                                                      hwaddr *plen,
+> +                                                      hwaddr *plen_out,
+> +                                                      hwaddr *page_mask_out,
+>                                                        bool is_write,
+>                                                        bool is_mmio)
+>  {
+>      IOMMUTLBEntry iotlb;
+>      MemoryRegionSection *section;
+>      MemoryRegion *mr;
+> +    hwaddr page_mask = TARGET_PAGE_MASK;
+> +    hwaddr plen = (hwaddr)(-1);
+> +
+> +    if (plen_out) {
+> +        plen = *plen_out;
+> +    }
+>  
+>      for (;;) {
+>          AddressSpaceDispatch *d = atomic_rcu_read(&as->dispatch);
+> -        section = address_space_translate_internal(d, addr, &addr, plen, is_mmio);
+> +        section = address_space_translate_internal(d, addr, &addr, &plen, is_mmio);
+>          mr = section->mr;
+>  
+>          if (!mr->iommu_ops) {
+> @@ -490,7 +514,8 @@ static MemoryRegionSection address_space_do_translate(AddressSpace *as,
+>                                           IOMMU_WO : IOMMU_RO);
+>          addr = ((iotlb.translated_addr & ~iotlb.addr_mask)
+>                  | (addr & iotlb.addr_mask));
+> -        *plen = MIN(*plen, (addr | iotlb.addr_mask) - addr + 1);
+> +        page_mask = iotlb.addr_mask;
+> +        plen = MIN(plen, (addr | iotlb.addr_mask) - addr + 1);
+>          if (!(iotlb.perm & (1 << is_write))) {
+>              goto translate_fail;
+>          }
+> @@ -500,6 +525,14 @@ static MemoryRegionSection address_space_do_translate(AddressSpace *as,
+>  
+>      *xlat = addr;
+>  
+> +    if (page_mask_out) {
+> +        *page_mask_out = page_mask;
+> +    }
+> +
+> +    if (plen_out) {
+> +        *plen_out = plen;
+> +    }
+> +
+>      return *section;
+>  
+>  translate_fail:
+> @@ -518,7 +551,7 @@ IOMMUTLBEntry address_space_get_iotlb_entry(AddressSpace *as, hwaddr addr,
+>  
+>      /* This can never be MMIO. */
+>      section = address_space_do_translate(as, addr, &xlat, &plen,
+> -                                         is_write, false);
+> +                                         NULL, is_write, false);
+>  
+>      /* Illegal translation */
+>      if (section.mr == &io_mem_unassigned) {
+> @@ -560,7 +593,8 @@ MemoryRegion *address_space_translate(AddressSpace *as, hwaddr addr,
+>      MemoryRegionSection section;
+>  
+>      /* This can be MMIO, so setup MMIO bit. */
+> -    section = address_space_do_translate(as, addr, xlat, plen, is_write, true);
+> +    section = address_space_do_translate(as, addr, xlat, plen,
+> +                                         NULL, is_write, true);
+>      mr = section.mr;
+>  
+>      if (xen_enabled() && memory_access_is_direct(mr, is_write)) {
+> -- 
+> 2.7.4
