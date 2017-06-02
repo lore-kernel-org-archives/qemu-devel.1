@@ -1,22 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48290)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48328)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbutsykin@virtuozzo.com>) id 1dGjHX-0004qC-Cm
-	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 05:54:12 -0400
+	(envelope-from <stefanha@redhat.com>) id 1dGjHu-00051y-QJ
+	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 05:54:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbutsykin@virtuozzo.com>) id 1dGjHU-0004LI-9w
-	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 05:54:11 -0400
-References: <20170531144331.30173-1-pbutsykin@virtuozzo.com>
-	<20170531144331.30173-2-pbutsykin@virtuozzo.com>
-	<20170601144106.GF4987@noname.redhat.com>
-From: Pavel Butsykin <pbutsykin@virtuozzo.com>
-Message-ID: <7a88366b-7520-5e37-60e7-8ea307ff9be3@virtuozzo.com>
-Date: Fri, 2 Jun 2017 12:53:42 +0300
-MIME-Version: 1.0
-In-Reply-To: <20170601144106.GF4987@noname.redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 1/2] qcow2: add reduce image support
+	(envelope-from <stefanha@redhat.com>) id 1dGjHr-00055S-O6
+	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 05:54:34 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:57288)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1dGjHr-00054S-FR
+	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 05:54:31 -0400
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Date: Fri,  2 Jun 2017 10:54:24 +0100
+Message-Id: <20170602095424.9064-1-stefanha@redhat.com>
+Subject: [Qemu-devel] [PATCH] virtio-serial: fix segfault on disconnect
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,71 +21,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, mreitz@redhat.com, armbru@redhat.com, eblake@redhat.com
+To: qemu-devel@nongnu.org
+Cc: lprosek@redhat.com, Amit Shah <amit@kernel.org>, "Michael S. Tsirkin" <mst@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
+Since commit d4c19cdeeb2f1e474bc426a6da261f1d7346eb5b ("virtio-serial:
+add missing virtio_detach_element() call") the following commands may
+cause QEMU to segfault:
 
+  $ qemu -M accel=kvm -cpu host -m 1G \
+         -drive if=virtio,file=test.img,format=raw \
+         -device virtio-serial-pci,id=virtio-serial0 \
+         -chardev socket,id=channel1,path=/tmp/chardev.sock,server,nowait \
+         -device virtserialport,chardev=channel1,bus=virtio-serial0.0,id=port1
+  $ nc -U /tmp/chardev.sock
+  ^C
 
-On 01.06.2017 17:41, Kevin Wolf wrote:
-> Am 31.05.2017 um 16:43 hat Pavel Butsykin geschrieben:
->> This patch adds the reduction of the image file for qcow2. As a result, this
->> allows us to reduce the virtual image size and free up space on the disk without
->> copying the image. Image can be fragmented and reduction is done by punching
->> holes in the image file.
->>
->> Signed-off-by: Pavel Butsykin <pbutsykin@virtuozzo.com>
->> ---
->>   block/qcow2-cache.c    |  8 +++++
->>   block/qcow2-cluster.c  | 83 ++++++++++++++++++++++++++++++++++++++++++++++++++
->>   block/qcow2-refcount.c | 65 +++++++++++++++++++++++++++++++++++++++
->>   block/qcow2.c          | 40 ++++++++++++++++++------
->>   block/qcow2.h          |  4 +++
->>   qapi/block-core.json   |  4 ++-
->>   6 files changed, 193 insertions(+), 11 deletions(-)
->>
->> diff --git a/block/qcow2-cache.c b/block/qcow2-cache.c
->> index 1d25147392..da55118ca7 100644
->> --- a/block/qcow2-cache.c
->> +++ b/block/qcow2-cache.c
->> @@ -411,3 +411,11 @@ void qcow2_cache_entry_mark_dirty(BlockDriverState *bs, Qcow2Cache *c,
->>       assert(c->entries[i].offset != 0);
->>       c->entries[i].dirty = true;
->>   }
->> +
->> +void qcow2_cache_entry_mark_clean(BlockDriverState *bs, Qcow2Cache *c,
->> +     void *table)
->> +{
->> +    int i = qcow2_cache_get_table_idx(bs, c, table);
->> +    assert(c->entries[i].offset != 0);
->> +    c->entries[i].dirty = false;
->> +}
-> 
-> This is an interesting function. We can use it whenever we're not
-> interested in the content of the table any more. However, we still keep
-> that data in the cache and may even evict other tables before this one.
-> The data in the cache also becomes inconsistent with the data in the
-> file, which should not be a problem in theory (because nobody should be
-> using it), but it surely could be confusing when debugging something in
-> the cache.
-> 
+  (guest)$ cat /dev/zero >/dev/vport0p1
 
-Good idea!
+The segfault is non-deterministic: if the event loop notices the socket
+has been closed then there is no crash.  The disconnect has to happen
+right before QEMU attempts to write data to the socket.
 
-> We can easily improve this a little: Make it qcow2_cache_discard(), a
-> function that gets a cluster offset, asserts that a table at this
-> offset isn't in use (not cached or ref == 0), and then just directly
-> drops it from the cache. This can be called from update_refcount()
-> whenever a refcount goes to 0, immediately before or after calling
-> update_refcount_discard() - those two are closely related. Then this
-> would automatically also be used for L2 tables.
-> 
+The backtrace is as follows:
 
-Did I understand correctly? Every time we need to check the incoming
-offset to make sure it is offset to L2/refcount table (not to the guest 
-data) ?
+  Thread 1 "qemu-system-x86" received signal SIGSEGV, Segmentation fault.
+  0x00005555557e0698 in do_flush_queued_data (port=0x5555582cedf0, vq=0x7fffcc854290, vdev=0x55555807b1d0) at hw/char/virtio-serial-bus.c:180
+  180           for (i = port->iov_idx; i < port->elem->out_num; i++) {
+  #1  0x000055555580d363 in virtio_queue_notify_vq (vq=0x7fffcc854290) at hw/virtio/virtio.c:1524
+  #2  0x000055555580d363 in virtio_queue_host_notifier_read (n=0x7fffcc8542f8) at hw/virtio/virtio.c:2430
+  #3  0x0000555555b3482c in aio_dispatch_handlers (ctx=ctx@entry=0x5555566b8c80) at util/aio-posix.c:399
+  #4  0x0000555555b350d8 in aio_dispatch (ctx=0x5555566b8c80) at util/aio-posix.c:430
+  #5  0x0000555555b3212e in aio_ctx_dispatch (source=<optimized out>, callback=<optimized out>, user_data=<optimized out>) at util/async.c:261
+  #6  0x00007fffde71de52 in g_main_context_dispatch () at /lib64/libglib-2.0.so.0
+  #7  0x0000555555b34353 in glib_pollfds_poll () at util/main-loop.c:213
+  #8  0x0000555555b34353 in os_host_main_loop_wait (timeout=<optimized out>) at util/main-loop.c:261
+  #9  0x0000555555b34353 in main_loop_wait (nonblocking=<optimized out>) at util/main-loop.c:517
+  #10 0x0000555555773207 in main_loop () at vl.c:1917
+  #11 0x0000555555773207 in main (argc=<optimized out>, argv=<optimized out>, envp=<optimized out>) at vl.c:4751
 
-> Adding this mechanism could be a patch of its own
-...
-> 
-> Kevin
-> 
+The do_flush_queued_data() function does not anticipate chardev close
+events during vsc->have_data().  It expects port->elem to remain
+non-NULL for the duration its for loop.
+
+The fix is simply to return from do_flush_queued_data() if the port
+closes because the close event already frees port->elem and drains the
+virtqueue - there is nothing left for do_flush_queued_data() to do.
+
+Reported-by: Sitong Liu <siliu@redhat.com>
+Reported-by: Min Deng <mdeng@redhat.com>
+Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+---
+ hw/char/virtio-serial-bus.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/hw/char/virtio-serial-bus.c b/hw/char/virtio-serial-bus.c
+index d797a67..c5aa26c 100644
+--- a/hw/char/virtio-serial-bus.c
++++ b/hw/char/virtio-serial-bus.c
+@@ -186,6 +186,9 @@ static void do_flush_queued_data(VirtIOSerialPort *port, VirtQueue *vq,
+                                   port->elem->out_sg[i].iov_base
+                                   + port->iov_offset,
+                                   buf_size);
++            if (!port->elem) { /* bail if we got disconnected */
++                return;
++            }
+             if (port->throttled) {
+                 port->iov_idx = i;
+                 if (ret > 0) {
+-- 
+2.9.4
