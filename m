@@ -1,26 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54532)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55487)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1dGp84-000671-RD
-	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 12:08:50 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1dGpAx-0000Ex-Vg
+	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 12:11:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1dGp82-00054t-NB
-	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 12:08:48 -0400
-Received: from mail-wm0-x232.google.com ([2a00:1450:400c:c09::232]:37139)
+	(envelope-from <alex.bennee@linaro.org>) id 1dGpAu-0006cw-MN
+	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 12:11:47 -0400
+Received: from mail-wm0-x229.google.com ([2a00:1450:400c:c09::229]:36780)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1dGp82-00054A-Gs
-	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 12:08:46 -0400
-Received: by mail-wm0-x232.google.com with SMTP id d127so30559941wmf.0
-	for <qemu-devel@nongnu.org>; Fri, 02 Jun 2017 09:08:46 -0700 (PDT)
-From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Fri,  2 Jun 2017 17:08:48 +0100
-Message-Id: <20170602160848.4913-11-alex.bennee@linaro.org>
-In-Reply-To: <20170602160848.4913-1-alex.bennee@linaro.org>
-References: <20170602160848.4913-1-alex.bennee@linaro.org>
+	id 1dGpAu-0006ce-FY
+	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 12:11:44 -0400
+Received: by mail-wm0-x229.google.com with SMTP id 7so29321544wmo.1
+	for <qemu-devel@nongnu.org>; Fri, 02 Jun 2017 09:11:44 -0700 (PDT)
+References: <1493314727-6951-1-git-send-email-wei@redhat.com>
+	<CAFEAcA-KKvhspYza=8TNNuFtqzco=ChhtS6Aa5hnn8=Cb036-Q@mail.gmail.com>
+	<4dbaaea9-7576-9acf-5327-b22db6f00ed2@redhat.com>
+	<CAFEAcA8K9DENSPqJD2Okqjqyi7T8RhSBmhCa3ztooJK5xdcZVg@mail.gmail.com>
+	<8b782ee5-3545-3cb5-3b09-209fcffee7e4@redhat.com>
+	<CAFEAcA8GY3yqZCVHihcFaFS-EkmEy+FRJ9+Kq_xRRdzD7+6DnQ@mail.gmail.com>
+	<87k24us83w.fsf@linaro.org>
+	<CAFEAcA8OgWtafU+9Jy02VLdfWhdA=LymQrHsR-1SKxGZQFPW0w@mail.gmail.com>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <CAFEAcA8OgWtafU+9Jy02VLdfWhdA=LymQrHsR-1SKxGZQFPW0w@mail.gmail.com>
+Date: Fri, 02 Jun 2017 17:12:02 +0100
+Message-ID: <87inkes71p.fsf@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [RISU PATCH v4 10/10] new: run_risu.sh script
+Subject: Re: [Qemu-devel] [PATCH 0/2] Fix compilation dependency issues of
+ CONFIG_ARM_V7M
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,81 +37,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: peter.maydell@linaro.org
-Cc: qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Wei Huang <wei@redhat.com>, qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
 
-A simple script to work through running all of a bunch of files with
-record/playback traces. Dumps a summary and the number of failed tests
-at the end.
 
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+Peter Maydell <peter.maydell@linaro.org> writes:
 
----
-v3
-  - tweak to allow specifying RISU binary
----
- run_risu.sh | 53 +++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 53 insertions(+)
- create mode 100755 run_risu.sh
+> On 2 June 2017 at 16:49, Alex Bennée <alex.bennee@linaro.org> wrote:
+>> Peter Maydell <peter.maydell@linaro.org> writes:
+>>> We seem to run into "CONFIG_FOO is defined for make but not
+>>> for the C preprocessor" from time to time, so maybe we should
+>>> fix that?
+>>
+>> Hmm is should be auto-generated from config-(host|target).mak but I've
+>> never quite figured out why we need timestamps rather than a straight
+>> dependency check in rules.mk:
+>>
+>>   # Generate timestamp files for .h include files
+>>
+>>   config-%.h: config-%.h-timestamp
+>>           @cmp $< $@ >/dev/null 2>&1 || cp $< $@
+>>
+>>   config-%.h-timestamp: config-%.mak $(SRC_PATH)/scripts/create_config
+>>           $(call quiet-command, sh $(SRC_PATH)/scripts/create_config < $< > $@,"GEN","$(TARGET_DIR)config-$*.h")
+>>
+>> This seems to be one of those things that goes away on a make clean && rebuild
+>
+> Not the issue in this case -- what happens is that these CONFIG_*
+> defines are defined in config-devices.mak, but we don't have any
+> equivalent config-devices.h which would expose them to the C code.
 
-diff --git a/run_risu.sh b/run_risu.sh
-new file mode 100755
-index 0000000..7740d6f
---- /dev/null
-+++ b/run_risu.sh
-@@ -0,0 +1,53 @@
-+#!/bin/bash
-+#
-+# Run risu against a set of binaries + trace files
-+#
-+#
-+#set -e
-+
-+passed=()
-+failed=()
-+missing=()
-+
-+if test -z "$RISU"; then
-+    script_dir=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd -P)
-+    RISU=${script_dir}/risu
-+fi
-+
-+for f in $@; do
-+    t="$f.trace"
-+    echo "Running $f against $t"
-+    if [ -e $t ]; then
-+        ${QEMU} ${RISU} $f -t $t
-+        if [ $? == 0 ]; then
-+            passed=( "${passed[@]}" $f )
-+        else
-+            failed=( "${failed[@]}" $f )
-+        fi
-+    else
-+        missing=( "${missing[@]}" $f )
-+    fi
-+done
-+
-+if test ${#missing[@]} -gt 0; then
-+    echo "Tests missing ${#missing[@]} trace files:"
-+    for m in "${missing[@]}"; do
-+        echo "$m"
-+    done
-+fi
-+
-+if test ${#passed[@]} -gt 0; then
-+    echo "Passed ${#passed[@]} tests:"
-+    for p in "${passed[@]}"; do
-+        echo "$p"
-+    done
-+fi
-+
-+if test ${#failed[@]} -gt 0; then
-+    echo "Failed ${#failed[@]} tests:"
-+    for f in "${failed[@]}"; do
-+        echo "$f"
-+    done
-+fi
-+
-+exit ${#failed[@]}
--- 
-2.13.0
+Ahh I see. So I guess once the relevant dependencies are added alongside:
+
+  %/config-devices.mak: default-configs/%.mak $(SRC_PATH)/scripts/make_device_config.sh
+
+The default rules should pick it up and generate the right things.
+
+> (I assume the rules.mak stuff is attempting to avoid having a
+> not-an-actual-change to the .h file result in rebuilding the whole
+> world.)
+
+OK that makes sense.
+
+--
+Alex Bennée
