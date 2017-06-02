@@ -1,30 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51242)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51763)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1dGnKj-0008Uw-Ck
-	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 10:13:46 -0400
+	(envelope-from <eblake@redhat.com>) id 1dGnMK-0001Xv-46
+	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 10:15:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1dGnKg-0004Db-4P
-	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 10:13:45 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:33674)
+	(envelope-from <eblake@redhat.com>) id 1dGnMH-0005jB-UH
+	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 10:15:24 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:45862)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1dGnKf-0004CH-S3
-	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 10:13:42 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id EDBD0142A70
-	for <qemu-devel@nongnu.org>; Fri,  2 Jun 2017 14:13:40 +0000 (UTC)
-From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Fri,  2 Jun 2017 18:12:29 +0400
-Message-Id: <20170602141229.15326-10-marcandre.lureau@redhat.com>
-In-Reply-To: <20170602141229.15326-1-marcandre.lureau@redhat.com>
-References: <20170602141229.15326-1-marcandre.lureau@redhat.com>
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dGnMH-0005iU-LX
+	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 10:15:21 -0400
+References: <20170531165541.47338-1-vsementsov@virtuozzo.com>
+	<20170531165541.47338-2-vsementsov@virtuozzo.com>
+	<70aa332e-c868-15ac-0c4c-23d41a777b6c@redhat.com>
+	<76a74826-f9ed-825e-0d3d-3043943d636c@virtuozzo.com>
+	<8e900b35-65a9-789f-2cf4-9de6d16460a3@virtuozzo.com>
+	<40ed0b31-84b7-380f-65ce-bc79de780c04@redhat.com>
+	<ec8e6b9b-29e5-dc07-17cb-bdcd2ad8fc14@virtuozzo.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <0eaa8f22-e16f-8701-cf55-992b7116c80f@redhat.com>
+Date: Fri, 2 Jun 2017 09:15:18 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v3 9/9] tests: use memfd in vhost-user-test
+In-Reply-To: <ec8e6b9b-29e5-dc07-17cb-bdcd2ad8fc14@virtuozzo.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="WrtgqPrDk0Ufvf1XBvJgRiGnXfkjej9If"
+Subject: Re: [Qemu-devel] [PATCH 01/12] nbd: rename read_sync and friends
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,194 +33,96 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: imammedo@redhat.com, ehabkost@redhat.com, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org
+Cc: pbonzini@redhat.com, den@openvz.org
 
-This will exercise the memfd memory backend and should generally be
-better for testing than memory-backend-file (thanks to anonymous files
-and sealing).
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--WrtgqPrDk0Ufvf1XBvJgRiGnXfkjej9If
+From: Eric Blake <eblake@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-devel@nongnu.org
+Cc: pbonzini@redhat.com, den@openvz.org
+Message-ID: <0eaa8f22-e16f-8701-cf55-992b7116c80f@redhat.com>
+Subject: Re: [PATCH 01/12] nbd: rename read_sync and friends
+References: <20170531165541.47338-1-vsementsov@virtuozzo.com>
+ <20170531165541.47338-2-vsementsov@virtuozzo.com>
+ <70aa332e-c868-15ac-0c4c-23d41a777b6c@redhat.com>
+ <76a74826-f9ed-825e-0d3d-3043943d636c@virtuozzo.com>
+ <8e900b35-65a9-789f-2cf4-9de6d16460a3@virtuozzo.com>
+ <40ed0b31-84b7-380f-65ce-bc79de780c04@redhat.com>
+ <ec8e6b9b-29e5-dc07-17cb-bdcd2ad8fc14@virtuozzo.com>
+In-Reply-To: <ec8e6b9b-29e5-dc07-17cb-bdcd2ad8fc14@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
----
- tests/vhost-user-test.c | 68 ++++++++++++++++++++++++++++++++-----------=
-------
- 1 file changed, 44 insertions(+), 24 deletions(-)
+On 06/02/2017 08:54 AM, Vladimir Sementsov-Ogievskiy wrote:
+>>> Finally, are you OK with my wording? If I reroll, can I add your r-b?=
 
-diff --git a/tests/vhost-user-test.c b/tests/vhost-user-test.c
-index 9095af267e..6924716a30 100644
---- a/tests/vhost-user-test.c
-+++ b/tests/vhost-user-test.c
-@@ -16,6 +16,7 @@
- #include "qemu/option.h"
- #include "qemu/range.h"
- #include "qemu/sockets.h"
-+#include "qemu/memfd.h"
- #include "sysemu/char.h"
- #include "sysemu/sysemu.h"
- #include "libqos/libqos.h"
-@@ -40,15 +41,14 @@
- #define HAVE_MONOTONIC_TIME
- #endif
-=20
--#define QEMU_CMD_MEM    " -m %d -object memory-backend-file,id=3Dmem,siz=
-e=3D%dM,"\
-+#define QEMU_CMD_MEM    " -m %d -object memory-backend-file,id=3Dmem,siz=
-e=3D%dM," \
-                         "mem-path=3D%s,share=3Don -numa node,memdev=3Dme=
-m"
-+#define QEMU_CMD_MEMFD  " -m %d -object memory-backend-memfd,id=3Dmem,si=
-ze=3D%dM," \
-+                        " -numa node,memdev=3Dmem"
- #define QEMU_CMD_CHR    " -chardev socket,id=3D%s,path=3D%s%s"
- #define QEMU_CMD_NETDEV " -netdev vhost-user,id=3Dnet0,chardev=3D%s,vhos=
-tforce"
- #define QEMU_CMD_NET    " -device virtio-net-pci,netdev=3Dnet0"
-=20
--#define QEMU_CMD        QEMU_CMD_MEM QEMU_CMD_CHR \
--                        QEMU_CMD_NETDEV QEMU_CMD_NET
--
- #define HUGETLBFS_MAGIC       0x958458f6
-=20
- /*********** FROM hw/virtio/vhost-user.c *******************************=
-******/
-@@ -159,6 +159,22 @@ typedef struct TestServer {
- static const char *tmpfs;
- static const char *root;
-=20
-+static char *get_qemu_cmd(TestServer *s, int mem, const char *mem_path,
-+                          const char *chr_opts, const char *extra)
-+{
-+    if (qemu_memfd_check()) {
-+        return g_strdup_printf(QEMU_CMD_MEMFD QEMU_CMD_CHR
-+                               QEMU_CMD_NETDEV QEMU_CMD_NET "%s", mem, m=
-em,
-+                               s->chr_name, s->socket_path,
-+                               chr_opts, s->chr_name, extra);
-+    } else {
-+        return g_strdup_printf(QEMU_CMD_MEM QEMU_CMD_CHR
-+                               QEMU_CMD_NETDEV QEMU_CMD_NET "%s", mem, m=
-em,
-+                               mem_path, s->chr_name, s->socket_path,
-+                               chr_opts, s->chr_name, extra);
-+    }
-+}
-+
- static void init_virtio_dev(TestServer *s)
- {
-     QVirtioPCIDevice *dev;
-@@ -477,14 +493,6 @@ static inline void test_server_connect(TestServer *s=
-erver)
-     test_server_create_chr(server, ",reconnect=3D1");
- }
-=20
--#define GET_QEMU_CMD(s)                                         \
--    g_strdup_printf(QEMU_CMD, 512, 512, (root), (s)->chr_name,  \
--                    (s)->socket_path, "", (s)->chr_name)
--
--#define GET_QEMU_CMDE(s, mem, chr_opts, extra, ...)                     =
-\
--    g_strdup_printf(QEMU_CMD extra, (mem), (mem), (root), (s)->chr_name,=
- \
--                    (s)->socket_path, (chr_opts), (s)->chr_name, ##__VA_=
-ARGS__)
--
- static gboolean _test_server_free(TestServer *server)
- {
-     int i;
-@@ -630,7 +638,7 @@ static void test_migrate(void)
-     char *uri =3D g_strdup_printf("%s%s", "unix:", dest->mig_path);
-     QTestState *global =3D global_qtest, *from, *to;
-     GSource *source;
--    gchar *cmd;
-+    gchar *cmd, *tmp;
-     QDict *rsp;
-     guint8 *log;
-     guint64 size;
-@@ -638,7 +646,7 @@ static void test_migrate(void)
-     test_server_listen(s);
-     test_server_listen(dest);
-=20
--    cmd =3D GET_QEMU_CMDE(s, 2, "", "");
-+    cmd =3D get_qemu_cmd(s, 2, root, "", "");
-     from =3D qtest_start(cmd);
-     g_free(cmd);
-=20
-@@ -647,7 +655,9 @@ static void test_migrate(void)
-     size =3D get_log_size(s);
-     g_assert_cmpint(size, =3D=3D, (2 * 1024 * 1024) / (VHOST_LOG_PAGE * =
-8));
-=20
--    cmd =3D GET_QEMU_CMDE(dest, 2, "", " -incoming %s", uri);
-+    tmp =3D g_strdup_printf(" -incoming %s", uri);
-+    cmd =3D get_qemu_cmd(dest, 2, root, "", tmp);
-+    g_free(tmp);
-     to =3D qtest_init(cmd);
-     g_free(cmd);
-=20
-@@ -753,7 +763,7 @@ static void test_reconnect_subprocess(void)
-     char *cmd;
-=20
-     g_thread_new("connect", connect_thread, s);
--    cmd =3D GET_QEMU_CMDE(s, 2, ",server", "");
-+    cmd =3D get_qemu_cmd(s, 2, root, ",server", "");
-     qtest_start(cmd);
-     g_free(cmd);
-=20
-@@ -789,7 +799,7 @@ static void test_connect_fail_subprocess(void)
-=20
-     s->test_fail =3D true;
-     g_thread_new("connect", connect_thread, s);
--    cmd =3D GET_QEMU_CMDE(s, 2, ",server", "");
-+    cmd =3D get_qemu_cmd(s, 2, root, ",server", "");
-     qtest_start(cmd);
-     g_free(cmd);
-=20
-@@ -817,7 +827,7 @@ static void test_flags_mismatch_subprocess(void)
-=20
-     s->test_flags =3D TEST_FLAGS_DISCONNECT;
-     g_thread_new("connect", connect_thread, s);
--    cmd =3D GET_QEMU_CMDE(s, 2, ",server", "");
-+    cmd =3D get_qemu_cmd(s, 2, root, ",server", "");
-     qtest_start(cmd);
-     g_free(cmd);
-=20
-@@ -885,11 +895,21 @@ static void test_multiqueue(void)
-     s->queues =3D queues;
-     test_server_listen(s);
-=20
--    cmd =3D g_strdup_printf(QEMU_CMD_MEM QEMU_CMD_CHR QEMU_CMD_NETDEV ",=
-queues=3D%d "
--                          "-device virtio-net-pci,netdev=3Dnet0,mq=3Don,=
-vectors=3D%d",
--                          512, 512, root, s->chr_name,
--                          s->socket_path, "", s->chr_name,
--                          queues, queues * 2 + 2);
-+    if (qemu_memfd_check()) {
-+        cmd =3D g_strdup_printf(
-+            QEMU_CMD_MEMFD QEMU_CMD_CHR QEMU_CMD_NETDEV ",queues=3D%d "
-+            "-device virtio-net-pci,netdev=3Dnet0,mq=3Don,vectors=3D%d",
-+            512, 512, s->chr_name,
-+            s->socket_path, "", s->chr_name,
-+            queues, queues * 2 + 2);
-+    } else {
-+        cmd =3D g_strdup_printf(
-+            QEMU_CMD_MEM QEMU_CMD_CHR QEMU_CMD_NETDEV ",queues=3D%d "
-+            "-device virtio-net-pci,netdev=3Dnet0,mq=3Don,vectors=3D%d",
-+            512, 512, root, s->chr_name,
-+            s->socket_path, "", s->chr_name,
-+            queues, queues * 2 + 2);
-+    }
-     qtest_start(cmd);
-     g_free(cmd);
-=20
-@@ -955,7 +975,7 @@ int main(int argc, char **argv)
-     /* run the main loop thread so the chardev may operate */
-     thread =3D g_thread_new(NULL, thread_function, loop);
-=20
--    qemu_cmd =3D GET_QEMU_CMD(server);
-+    qemu_cmd =3D get_qemu_cmd(server, 512, root, "", "");
-=20
-     s =3D qtest_start(qemu_cmd);
-     g_free(qemu_cmd);
+>> What final wording are you proposing (full paragraph, not a snippet)?
+>=20
+> 2. _sync suffix
+>    _sync is related to the fact that nbd_wr_syncv doesn't return if
+
+s/if/if a/
+
+>    write to socket returns EAGAIN. In first implementation nbd_wr_syncv=
+
+
+s/In first implementation/The first implementation of/
+
+>    (was wr_sync in 7a5ca8648b) just loops while getting EAGAIN, current=
+
+
+s/current/the current/
+
+>    implementation yields in this case.
+>    Why to get rid of it:
+
+maybe: s/Why/Why we want/
+
+>    - it is normal for r/w functions to be synchronous, so having
+
+s/having/having an/
+
+>      additional suffix for it looks redundant (contrariwise, we have
+>      _aio suffix for async functions)
+>    - _sync suffix in block layer is used when function does flush (so
+>      using it for other thing is confusing a bit)
+>    - keep function names short after adding nbd_ prefix
+
+Thanks for bearing with me, and letting me help on the grammar subtleties=
+=2E
+
+>>
+>>>>> Reviewed-by: Eric Blake <eblake@redhat.com>
+>> At any rate, I already gave R-b for the code, so finessing the commit
+>> message doesn't change that if the code remains unchanged.
+>>
+>=20
+
 --=20
-2.13.0.91.g00982b8dd
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--WrtgqPrDk0Ufvf1XBvJgRiGnXfkjej9If
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEcBAEBCAAGBQJZMXL2AAoJEKeha0olJ0NqgpUH/2RoFdnxlw+MulsEIa3xFblm
+J1TQKEuVlSKYQU2dm36xpDLjUY4Qw5n/p9MQExRmyw1REzKmQdpq/jVy15uyNa2A
+Si9p1Xw9Wz8qEXmuOPsLmpeP8ZZkkvhxw69yysVUIPKtbimnDyJI/xbblOMq3Fsx
+c4gR0J/lwBSBpaiZhuIX3aVXr35tnYpZLiY8Bp1iNhA4m7wXAlgHjYw7UTGlRE6l
+WyRnG2e6pGJPckqvyJLepoF0efch3Hjpd+eztBQxu76K4TXkSgkdbbpdUGPhgNvQ
+BGpj1lH6wlS50+r7Y3ZgjYddWsUQ6jXf+ajTEGNekumUqGLaL2un8I59SWwSnDs=
+=aWYu
+-----END PGP SIGNATURE-----
+
+--WrtgqPrDk0Ufvf1XBvJgRiGnXfkjej9If--
