@@ -1,18 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60961)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33072)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <krzk@kernel.org>) id 1dGpRn-0005Ym-G9
-	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 12:29:12 -0400
+	(envelope-from <mst@redhat.com>) id 1dGpT8-0006Kv-Ca
+	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 12:30:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <krzk@kernel.org>) id 1dGpRm-0002K2-Gv
-	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 12:29:11 -0400
-From: Krzysztof Kozlowski <krzk@kernel.org>
-Date: Fri,  2 Jun 2017 18:28:48 +0200
-Message-Id: <20170602162857.6065-1-krzk@kernel.org>
+	(envelope-from <mst@redhat.com>) id 1dGpT5-00031e-OY
+	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 12:30:34 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:58202)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1dGpT5-00030u-G6
+	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 12:30:31 -0400
+Date: Fri, 2 Jun 2017 19:30:28 +0300
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20170602191230-mutt-send-email-mst@kernel.org>
+References: <c76b36de-ebf9-c662-d454-0a95b43901e8@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v4 0/9] hw: arm: exynos: Improvements and
- cleanups
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <c76b36de-ebf9-c662-d454-0a95b43901e8@redhat.com>
+Subject: Re: [Qemu-devel] allocation zone extensions for the firmware
+ linker/loader
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,52 +27,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mitsyanko <i.mitsyanko@gmail.com>, Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-devel@nongnu.org
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Eric Blake <eblake@redhat.com>, Krzysztof Kozlowski <krzk@kernel.org>
+To: Laszlo Ersek <lersek@redhat.com>
+Cc: SeaBIOS devel list <SeaBIOS@seabios.org>, qemu devel list <qemu-devel@nongnu.org>, edk2-devel-ml01 <edk2-devel@ml01.01.org>, Kevin O'Connor <kevin@koconnor.net>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Ben Warren <ben@skyportsystems.com>, Dongjiu Geng <gengdongjiu@huawei.com>, Igor Mammedov <imammedo@redhat.com>, "Jordan Justen (Intel address)" <jordan.l.justen@intel.com>, "Leif Lindholm (Linaro address)" <leif.lindholm@linaro.org>, Shannon Zhao <zhaoshenglong@huawei.com>, Stefan Berger <stefanb@linux.vnet.ibm.com>, Xiao Guangrong <guangrong.xiao@linux.intel.com>
 
-Hi,
+On Fri, Jun 02, 2017 at 05:45:21PM +0200, Laszlo Ersek wrote:
+> Hi,
+> 
+> this message is cross-posted to three lists (qemu, seabios, edk2). I'll
+> follow up with three patch series, one series for each project. I'll
+> cross-post all of the patches as well, but I'll add the project name in
+> the "bag of tags" in the subject lines.
+> 
+> The QEMU series introduces two extensions to the ALLOCATE firmware
+> linker/loader command.
+> 
+> One extension is a new allocation zone, with value 3, for allowing the
+> firmware to allocate the fw_cfg blobs in 64-bit address space.
 
-I split non-intrusive changes from my previous attempts [1].
+Seems to make sense. I guess it's safe to do this if no
+pointers to this table are 32 bit, right?
+Is there a chance we'll ever be able to use this on PC
+assuming the need to support 32 bit guests?
 
-This patchset contains only cleanups, minor improvements and support for
-power off. Power off itself will not happen because kernel will hang
-before trying it, on syncing IRQ works (fix for this is [2], but this wil=
-l
-be separate).
+> The other extension is a repurposing of the most significant bit (bit 7)
+> in the zone field. This bit becomes orthogonal to the rest of the zone
+> field. If the bit is set, it means that QEMU promises the firmware that
+> the blob referenced by the ALLOCATE command contains no ACPI tables at all.
 
-Changes since v3:
-1. Rebase on current master (API for shutdown changed).
-2. Apply Peter's reviewed-by tag.
+This one is a bit strange in that it does not seem to be about
+allocations - it seems to be about content.
+
+I'd like to better understand what makes ACPI special.
+
+I see two other things that make acpi special, but I'd like to make sure
+1. I think that RSDT from qemu is more or less ignored by OVMF, it
+   builds it from tables supplied. Thus pointers from RSDT only serve to
+   find beginning of tables - they are not really patched in. So ACPI
+   tables are special in that their actual addresses are unused. As a
+   result they can be moved at will after linker runs.
+2. Some tables can go into AddressRangeACPI, some into AddressRangeNVS,
+   but they never need to be in AddressRangeReserved.
+   It would be simple if we could just say "allocate this table
+   from AddressRangeACPI". But I am not sure this is true
+   since e.g. stuff used for power management can't go into
+   AddressRangeACPI.  Thoughts?
 
 
-Best regards,
-Krzysztof
-
-
-[1] https://lists.gnu.org/archive/html/qemu-devel/2017-05/msg04821.html
-[2] https://lists.gnu.org/archive/html/qemu-devel/2017-05/msg04818.html
-
-Krzysztof Kozlowski (9):
-  hw/intc/exynos4210_gic: Use more meaningful name for local variable
-  hw/timer/exynos4210_mct: Fix checkpatch style errors
-  hw/timer/exynos4210_mct: Cleanup indentation and empty new lines
-  hw/timer/exynos4210_mct: Remove unused defines
-  hw/arm/exynos: Move DRAM initialization next boards
-  hw/arm/exynos: Declare local variables in some order
-  hw/arm/exynos: Use type define instead of hard-coded a9mpcore_priv
-    string
-  hw/intc/exynos4210_gic: Constify array of combiner interrupts
-  hw/misc/exynos4210_pmu: Add support for system poweroff
-
- hw/arm/exynos4210.c         | 27 +++++-------------------
- hw/arm/exynos4_boards.c     | 50 ++++++++++++++++++++++++++++++++++++++-=
-------
- hw/intc/exynos4210_gic.c    | 14 ++++++-------
- hw/misc/exynos4210_pmu.c    | 20 +++++++++++++++++-
- hw/timer/exynos4210_mct.c   | 50 +++++++++++++++++++--------------------=
-------
- include/hw/arm/exynos4210.h |  5 +----
- 6 files changed, 96 insertions(+), 70 deletions(-)
-
---=20
-2.9.3
+> After introducing these, the QEMU series puts them to use, covering all
+> of the currently generated ALLOCATE commands, as appropriate. Among the
+> benefits we can mention
+> - the removal of the OVMF ACPI SDT Header Probe suppressor from VMGENID
+> (and from any similar future devices),
+> - and the fact that the "virt" machine type (and maybe other machine
+> types) of the arm/aarch64 target will no longer require RAM under 4GB
+> for ACPI to work.
+> 
+> Both of these extensions are irrelevant for SeaBIOS, therefore the
+> SeaBIOS patches simply mask out bit 7 (for ignoring the "no ACPI
+> content" hint), and fall back to the HIGH zone (= 32-bit address space)
+> when the 64-bit zone is permitted.
+> 
+> In other words, SeaBIOS needs some patches to recognize the new zone
+> values, but beyond that, the behavior is unchanged.
+> 
+> Both extensions are important for virtual UEFI firmware (OVMF in x86
+> guests and ArmVirtQemu in aarch64 guests). The edk2 patches add support
+> to OvmfPkg/AcpiPlatformDxe for the extensions. Please see the commit
+> messages for details (all the extensions are explained in detail in the
+> relevant patches for all of the projects).
+> 
+> The patches can cause linker/loader breakage when old firmware is booted
+> on new QEMU. However, that's no problem (it's nothing new), the next
+> release of QEMU should bundle the new firmware binaries as always.
+> 
+> New firmware will continue running on old QEMU without issues.
+> 
+> (In case you have sent me emails about this in the last few tens of
+> hours, please know that I'm not ignoring them, I just haven't seen /
+> read them. Reading emails every five minutes makes focused work
+> impossible, so when I'm busy, I tend to read email once per day.)
+> 
+> Thanks
+> Laszlo
