@@ -1,23 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34468)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34482)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1dGpX7-0007uZ-Qe
-	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 12:34:42 -0400
+	(envelope-from <mst@redhat.com>) id 1dGpX8-0007uz-Gw
+	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 12:34:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1dGpX5-0006LE-74
-	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 12:34:41 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53678)
+	(envelope-from <mst@redhat.com>) id 1dGpX7-0006OK-Ma
+	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 12:34:42 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:33178)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1dGpX4-0006KI-VZ
-	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 12:34:39 -0400
-Date: Fri, 2 Jun 2017 19:34:35 +0300
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1dGpX7-0006NQ-Eh
+	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 12:34:41 -0400
+Date: Fri, 2 Jun 2017 19:34:38 +0300
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <1496421247-857-4-git-send-email-mst@redhat.com>
+Message-ID: <1496421247-857-5-git-send-email-mst@redhat.com>
 References: <1496421247-857-1-git-send-email-mst@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 In-Reply-To: <1496421247-857-1-git-send-email-mst@redhat.com>
-Subject: [Qemu-devel] [PULL 3/8] virtio-serial: fix segfault on disconnect
+Subject: [Qemu-devel] [PULL 4/8] vhost: propagate errors in
+ vhost_device_iotlb_miss()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,75 +28,78 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Stefan Hajnoczi <stefanha@redhat.com>, Sitong Liu <siliu@redhat.com>, Min Deng <mdeng@redhat.com>, Amit Shah <amit@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Maxime Coquelin <maxime.coquelin@redhat.com>
 
-From: Stefan Hajnoczi <stefanha@redhat.com>
+From: Maxime Coquelin <maxime.coquelin@redhat.com>
 
-Since commit d4c19cdeeb2f1e474bc426a6da261f1d7346eb5b ("virtio-serial:
-add missing virtio_detach_element() call") the following commands may
-cause QEMU to segfault:
+Some backends might want to know when things went wrong.
 
-  $ qemu -M accel=kvm -cpu host -m 1G \
-         -drive if=virtio,file=test.img,format=raw \
-         -device virtio-serial-pci,id=virtio-serial0 \
-         -chardev socket,id=channel1,path=/tmp/chardev.sock,server,nowait \
-         -device virtserialport,chardev=channel1,bus=virtio-serial0.0,id=port1
-  $ nc -U /tmp/chardev.sock
-  ^C
-
-  (guest)$ cat /dev/zero >/dev/vport0p1
-
-The segfault is non-deterministic: if the event loop notices the socket
-has been closed then there is no crash.  The disconnect has to happen
-right before QEMU attempts to write data to the socket.
-
-The backtrace is as follows:
-
-  Thread 1 "qemu-system-x86" received signal SIGSEGV, Segmentation fault.
-  0x00005555557e0698 in do_flush_queued_data (port=0x5555582cedf0, vq=0x7fffcc854290, vdev=0x55555807b1d0) at hw/char/virtio-serial-bus.c:180
-  180           for (i = port->iov_idx; i < port->elem->out_num; i++) {
-  #1  0x000055555580d363 in virtio_queue_notify_vq (vq=0x7fffcc854290) at hw/virtio/virtio.c:1524
-  #2  0x000055555580d363 in virtio_queue_host_notifier_read (n=0x7fffcc8542f8) at hw/virtio/virtio.c:2430
-  #3  0x0000555555b3482c in aio_dispatch_handlers (ctx=ctx@entry=0x5555566b8c80) at util/aio-posix.c:399
-  #4  0x0000555555b350d8 in aio_dispatch (ctx=0x5555566b8c80) at util/aio-posix.c:430
-  #5  0x0000555555b3212e in aio_ctx_dispatch (source=<optimized out>, callback=<optimized out>, user_data=<optimized out>) at util/async.c:261
-  #6  0x00007fffde71de52 in g_main_context_dispatch () at /lib64/libglib-2.0.so.0
-  #7  0x0000555555b34353 in glib_pollfds_poll () at util/main-loop.c:213
-  #8  0x0000555555b34353 in os_host_main_loop_wait (timeout=<optimized out>) at util/main-loop.c:261
-  #9  0x0000555555b34353 in main_loop_wait (nonblocking=<optimized out>) at util/main-loop.c:517
-  #10 0x0000555555773207 in main_loop () at vl.c:1917
-  #11 0x0000555555773207 in main (argc=<optimized out>, argv=<optimized out>, envp=<optimized out>) at vl.c:4751
-
-The do_flush_queued_data() function does not anticipate chardev close
-events during vsc->have_data().  It expects port->elem to remain
-non-NULL for the duration its for loop.
-
-The fix is simply to return from do_flush_queued_data() if the port
-closes because the close event already frees port->elem and drains the
-virtqueue - there is nothing left for do_flush_queued_data() to do.
-
-Reported-by: Sitong Liu <siliu@redhat.com>
-Reported-by: Min Deng <mdeng@redhat.com>
-Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+Signed-off-by: Maxime Coquelin <maxime.coquelin@redhat.com>
 Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 ---
- hw/char/virtio-serial-bus.c | 3 +++
- 1 file changed, 3 insertions(+)
+ include/hw/virtio/vhost.h |  2 +-
+ hw/virtio/vhost.c         | 15 ++++++++++-----
+ 2 files changed, 11 insertions(+), 6 deletions(-)
 
-diff --git a/hw/char/virtio-serial-bus.c b/hw/char/virtio-serial-bus.c
-index aa9c11a..f5bc173 100644
---- a/hw/char/virtio-serial-bus.c
-+++ b/hw/char/virtio-serial-bus.c
-@@ -186,6 +186,9 @@ static void do_flush_queued_data(VirtIOSerialPort *port, VirtQueue *vq,
-                                   port->elem->out_sg[i].iov_base
-                                   + port->iov_offset,
-                                   buf_size);
-+            if (!port->elem) { /* bail if we got disconnected */
-+                return;
-+            }
-             if (port->throttled) {
-                 port->iov_idx = i;
-                 if (ret > 0) {
+diff --git a/include/hw/virtio/vhost.h b/include/hw/virtio/vhost.h
+index a450321..467dc77 100644
+--- a/include/hw/virtio/vhost.h
++++ b/include/hw/virtio/vhost.h
+@@ -105,5 +105,5 @@ bool vhost_has_free_slot(void);
+ int vhost_net_set_backend(struct vhost_dev *hdev,
+                           struct vhost_vring_file *file);
+ 
+-void vhost_device_iotlb_miss(struct vhost_dev *dev, uint64_t iova, int write);
++int vhost_device_iotlb_miss(struct vhost_dev *dev, uint64_t iova, int write);
+ #endif
+diff --git a/hw/virtio/vhost.c b/hw/virtio/vhost.c
+index 03a46a7..8fab12d 100644
+--- a/hw/virtio/vhost.c
++++ b/hw/virtio/vhost.c
+@@ -971,18 +971,20 @@ static int vhost_memory_region_lookup(struct vhost_dev *hdev,
+     return -EFAULT;
+ }
+ 
+-void vhost_device_iotlb_miss(struct vhost_dev *dev, uint64_t iova, int write)
++int vhost_device_iotlb_miss(struct vhost_dev *dev, uint64_t iova, int write)
+ {
+     IOMMUTLBEntry iotlb;
+     uint64_t uaddr, len;
++    int ret = -EFAULT;
+ 
+     rcu_read_lock();
+ 
+     iotlb = address_space_get_iotlb_entry(dev->vdev->dma_as,
+                                           iova, write);
+     if (iotlb.target_as != NULL) {
+-        if (vhost_memory_region_lookup(dev, iotlb.translated_addr,
+-                                       &uaddr, &len)) {
++        ret = vhost_memory_region_lookup(dev, iotlb.translated_addr,
++                                         &uaddr, &len);
++        if (ret) {
+             error_report("Fail to lookup the translated address "
+                          "%"PRIx64, iotlb.translated_addr);
+             goto out;
+@@ -991,14 +993,17 @@ void vhost_device_iotlb_miss(struct vhost_dev *dev, uint64_t iova, int write)
+         len = MIN(iotlb.addr_mask + 1, len);
+         iova = iova & ~iotlb.addr_mask;
+ 
+-        if (dev->vhost_ops->vhost_update_device_iotlb(dev, iova, uaddr,
+-                                                      len, iotlb.perm)) {
++        ret = dev->vhost_ops->vhost_update_device_iotlb(dev, iova, uaddr,
++                                                      len, iotlb.perm);
++        if (ret) {
+             error_report("Fail to update device iotlb");
+             goto out;
+         }
+     }
+ out:
+     rcu_read_unlock();
++
++    return ret;
+ }
+ 
+ static int vhost_virtqueue_start(struct vhost_dev *dev,
 -- 
 MST
