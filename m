@@ -1,22 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50430)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57304)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1dGut7-0004uC-FQ
-	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 18:17:46 -0400
+	(envelope-from <lersek@redhat.com>) id 1dGvFB-0001v7-0O
+	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 18:40:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1dGut6-0007y7-HN
-	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 18:17:45 -0400
-References: <20170602112158.232757-1-vsementsov@virtuozzo.com>
-	<20170602112158.232757-14-vsementsov@virtuozzo.com>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <4930d026-75c1-6843-ea45-e87c55e5e986@redhat.com>
-Date: Fri, 2 Jun 2017 18:17:31 -0400
+	(envelope-from <lersek@redhat.com>) id 1dGvF7-0007q9-RW
+	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 18:40:33 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:59548)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1dGvF7-0007og-I7
+	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 18:40:29 -0400
+References: <20170601112241.2580-1-ard.biesheuvel@linaro.org>
+	<ccc0e728-0348-e386-6f71-0c1c69eaa01d@redhat.com>
+	<e3a61707-2356-7ad3-0efc-e7d0c4115eea@redhat.com>
+	<1496415382.16895.4.camel@redhat.com>
+From: Laszlo Ersek <lersek@redhat.com>
+Message-ID: <eb98217b-5559-51a0-0e42-559b85b5fba7@redhat.com>
+Date: Sat, 3 Jun 2017 00:40:20 +0200
 MIME-Version: 1.0
-In-Reply-To: <20170602112158.232757-14-vsementsov@virtuozzo.com>
+In-Reply-To: <1496415382.16895.4.camel@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v20 13/30] block: new
- bdrv_reopen_bitmaps_rw interface
+Subject: Re: [Qemu-devel] [RFC PATCH] OvmfPkg/AcpiPlatformDxe: lift 4 GB
+ alloc limit for modern ACPI systems
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,98 +31,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, famz@redhat.com, armbru@redhat.com, mreitz@redhat.com, stefanha@redhat.com, pbonzini@redhat.com, den@openvz.org
+To: Gerd Hoffmann <kraxel@redhat.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, edk2-devel@lists.01.org
+Cc: leif.lindholm@linaro.org, jordan.l.justen@intel.com, Shannon Zhao <zhaoshenglong@huawei.com>, "Michael S. Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>, qemu devel list <qemu-devel@nongnu.org>, gengdongjiu <gengdongjiu@huawei.com>, Drew Jones <drjones@redhat.com>
 
-
-
-On 06/02/2017 07:21 AM, Vladimir Sementsov-Ogievskiy wrote:
-> Add format driver handler, which should mark loaded read-only
-> bitmaps as 'IN_USE' in the image and unset read_only field in
-> corresponding BdrvDirtyBitmap's.
+On 06/02/17 16:56, Gerd Hoffmann wrote:
+>   Hi,
 > 
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> ---
->  block.c                   | 17 +++++++++++++++++
->  include/block/block_int.h |  7 +++++++
->  2 files changed, 24 insertions(+)
+>>  The reason is that old firmware is allowed to fail on new QEMU
+>> (regardless of machine type). Example: the WRITE_POINTER command,
+>> originally introduced for VMGENID. If you run a SeaBIOS binary
+>> without
+>> WRITE_POINTER support, in a QEMU VM with "-device vmgenid", the
+>> device
+>> will not work.
 > 
-> diff --git a/block.c b/block.c
-> index 04af7697dc..161db9e32a 100644
-> --- a/block.c
-> +++ b/block.c
-> @@ -2946,12 +2946,16 @@ void bdrv_reopen_commit(BDRVReopenState *reopen_state)
->  {
->      BlockDriver *drv;
->      BlockDriverState *bs;
-> +    bool old_can_write, new_can_write;
->  
->      assert(reopen_state != NULL);
->      bs = reopen_state->bs;
->      drv = bs->drv;
->      assert(drv != NULL);
->  
-> +    old_can_write =
-> +        !bdrv_is_read_only(bs) && !(bdrv_get_flags(bs) & BDRV_O_INACTIVE);
-> +
->      /* If there are any driver level actions to take */
->      if (drv->bdrv_reopen_commit) {
->          drv->bdrv_reopen_commit(reopen_state);
-> @@ -2965,6 +2969,19 @@ void bdrv_reopen_commit(BDRVReopenState *reopen_state)
->      bs->read_only = !(reopen_state->flags & BDRV_O_RDWR);
->  
->      bdrv_refresh_limits(bs, NULL);
-> +
-> +    new_can_write =
-> +        !bdrv_is_read_only(bs) && !(bdrv_get_flags(bs) & BDRV_O_INACTIVE);
-> +    if (!old_can_write && new_can_write && drv->bdrv_reopen_bitmaps_rw) {
-> +        Error *local_err = NULL;
-> +        if (drv->bdrv_reopen_bitmaps_rw(bs, &local_err) < 0) {
-> +            /* This is not fatal, bitmaps just left read-only, so all following
-> +             * writes will fail. User can remove read-only bitmaps to unblock
-> +             * writes.
-> +             */
-> +            error_report_err(local_err);
-> +        }
-> +    }
->  }
->  
->  /*
-> diff --git a/include/block/block_int.h b/include/block/block_int.h
-> index 8d3724cce6..1dc6f2e90d 100644
-> --- a/include/block/block_int.h
-> +++ b/include/block/block_int.h
-> @@ -380,6 +380,13 @@ struct BlockDriver {
->                               uint64_t parent_perm, uint64_t parent_shared,
->                               uint64_t *nperm, uint64_t *nshared);
->  
-> +    /**
-> +     * Bitmaps should be marked as 'IN_USE' in the image on reopening image
-> +     * as rw. This handler should realize it. It also should unset readonly
-> +     * field of BlockDirtyBitmap's in case of success.
-> +     */
-> +    int (*bdrv_reopen_bitmaps_rw)(BlockDriverState *bs, Error **errp);
-> +
-
-Hmm, do we need a new top-level hook for this? We already have
-.bdrv_reopen_commit and .bdrv_reopen_prepare which inform the
-blockdriver that a reopen event is occurring.
-
-Can't we just amend qcow2_reopen_prepare and qcow2_reopen_commit to do
-the necessary tasks of either:
-
-(A) Flushing the bitmap in preparation for reopening as RO, or
-(B) Writing in_use and removing the RO flag in preparation for reopening
-as RW
-
->      QLIST_ENTRY(BlockDriver) list;
->  };
->  
+> Old seabios will work just fine on new qemu as long as you don't use
+> the vmgenid device.
 > 
+> Only when using new features (which require firmware support) new
+> seabios is needed, and usually we update seabios for that reason.  We
+> want the new features be usable of course.  But in general there are no
+> lockstep updates for qemu and seabios (any more).
+> 
+>> And this patch is actually that case, because the new fw would
+>> allocate
+>> blobs with such 8-byte addresses that might not fit into 32-bit blob
+>> fields.
+> 
+> I think ovmf simply checking whenever the pointer fields are 32bit or
+> 64bit, then doing allocations accordingly (as Igor suggested) would be
+> the best.  Why ask qemu for a hint when ovmf can figure on its own?
+> That adds a new interface and new config knobs for IMO no good reason.
 
+There is a good reason: the reason is that OVMF should not be forced to
+reverse-engineer such information with a third, separate pass over the
+linker/loader script, adding yet more complexity.
 
-Well, design issues aside, I will at least confirm that I think this
-patch should work as designed, and I will leave the design critiques to
-Max and Kevin:
+The linker/loader interface was designed for SeaBIOS, without any regard
+to OVMF / ArmVirtQemu. For example, SeaBIOS gets hints like HIGH vs.
+FSEG (which distinction is irrelevant for OVMF / ArmVirtQemu) despite
+the fact that SeaBIOS could also figure that out one way or another if
+it really wanted to. OVMF / ArmVirtQemu need different kinds of hints,
+and I think they should get them at this point.
 
-Reviewed-by: John Snow <jsnow@redhat.com>
+Even now, OVMF deduces the starts of individual ACPI tables in the blobs
+by using somewhat messy heuristics. (OVMF *must* know where the tables
+start.) The heuristics incur no false negatives, but a chance exists for
+false positives, unless QEMU takes extra precautions. But Igor happens
+to hate those precautions, and the TCPA and NVDIMM authors have
+completely missed them. So we should have fewer of these heuristics and
+workarounds, not more.
+
+And, as I replied to Igor earlier, the other blob allocation hint (the
+"no ACPI content" hint that allows QEMU to drop precisely the above
+obscure precautions, i.e. the "ACPI SDT header probe suppressor"),
+necessitates extending the ALLOCATE command anyway.
+
+Would it help if I made these extensions dependent on 2.10+ machine
+types? (Obviously existing generators like TCPA, NVDIMM and VMGENID
+would not be modified then, because the old stuff would have to be
+preserved for old machine types anyway.)
+
+Thanks
+Laszlo
