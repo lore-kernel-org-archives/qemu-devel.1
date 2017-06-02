@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35983)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35984)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1dGo5Q-0001Fa-Ik
-	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 11:02:02 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1dGo5Q-0001Fb-JT
+	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 11:02:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1dGo5M-0002gr-0e
+	(envelope-from <vsementsov@virtuozzo.com>) id 1dGo5L-0002fz-N9
 	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 11:02:00 -0400
-Received: from mailhub.sw.ru ([195.214.232.25]:34852 helo=relay.sw.ru)
+Received: from mailhub.sw.ru ([195.214.232.25]:4805 helo=relay.sw.ru)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
-	id 1dGo5L-0002f9-K6
+	id 1dGo5L-0002em-B8
 	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 11:01:55 -0400
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Fri,  2 Jun 2017 18:01:50 +0300
-Message-Id: <20170602150150.258222-13-vsementsov@virtuozzo.com>
+Date: Fri,  2 Jun 2017 18:01:46 +0300
+Message-Id: <20170602150150.258222-9-vsementsov@virtuozzo.com>
 In-Reply-To: <20170602150150.258222-1-vsementsov@virtuozzo.com>
 References: <20170602150150.258222-1-vsementsov@virtuozzo.com>
-Subject: [Qemu-devel] [PATCH v2 12/12] nbd/server: refactor nbd_trip
+Subject: [Qemu-devel] [PATCH v2 08/12] nbd/server: remove NBDClientNewData
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,168 +27,84 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: pbonzini@redhat.com, eblake@redhat.com, den@openvz.org, vsementsov@virtuozzo.com
 
-- do not use 'goto error_reply' outside a switch to jump into the
-  middle of the switch's default case label
-- reduce code duplication
+"co" field of NBDClientNewData has never been used, all the way back to
+its declaration in commit 1a6245a5. So let's just use client pointer
+instead of extra structure.
 
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
 ---
- nbd/server.c | 53 ++++++++++++++++++++---------------------------------
- 1 file changed, 20 insertions(+), 33 deletions(-)
+ nbd/server.c | 25 +++++++------------------
+ 1 file changed, 7 insertions(+), 18 deletions(-)
 
 diff --git a/nbd/server.c b/nbd/server.c
-index 209a3d4e1e..198eabe338 100644
+index 8ac095d6bc..d376563527 100644
 --- a/nbd/server.c
 +++ b/nbd/server.c
-@@ -1078,6 +1078,7 @@ static coroutine_fn void nbd_trip(void *opaque)
-     NBDReply reply;
-     int ret;
-     int flags;
-+    int reply_data_len = 0;
+@@ -535,14 +535,8 @@ static int nbd_negotiate_options(NBDClient *client)
+     }
+ }
  
-     TRACE("Reading request.");
-     if (client->closing) {
-@@ -1090,7 +1091,7 @@ static coroutine_fn void nbd_trip(void *opaque)
-     client->recv_coroutine = NULL;
-     nbd_client_receive_next_request(client);
-     if (ret == -EIO) {
+-typedef struct {
+-    NBDClient *client;
+-    Coroutine *co;
+-} NBDClientNewData;
+-
+-static coroutine_fn int nbd_negotiate(NBDClientNewData *data)
++static coroutine_fn int nbd_negotiate(NBDClient *client)
+ {
+-    NBDClient *client = data->client;
+     char buf[8 + 8 + 8 + 128];
+     int rc;
+     const uint16_t myflags = (NBD_FLAG_HAS_FLAGS | NBD_FLAG_SEND_TRIM |
+@@ -1268,16 +1262,15 @@ static void nbd_client_receive_next_request(NBDClient *client)
+ 
+ static coroutine_fn void nbd_co_client_start(void *opaque)
+ {
+-    NBDClientNewData *data = opaque;
+-    NBDClient *client = data->client;
++    NBDClient *client = opaque;
+     NBDExport *exp = client->exp;
+ 
+     if (exp) {
+         nbd_export_get(exp);
+     }
+-    if (nbd_negotiate(data)) {
++    if (nbd_negotiate(client)) {
+         client_close(client);
 -        goto out;
-+        goto disconnect;
++        return;
+     }
+     qemu_co_mutex_init(&client->send_lock);
+ 
+@@ -1286,9 +1279,6 @@ static coroutine_fn void nbd_co_client_start(void *opaque)
      }
  
-     reply.handle = request.handle;
-@@ -1098,7 +1099,7 @@ static coroutine_fn void nbd_trip(void *opaque)
- 
-     if (ret < 0) {
-         reply.error = -ret;
--        goto error_reply;
-+        goto reply;
-     }
- 
-     if (client->closing) {
-@@ -1119,7 +1120,7 @@ static coroutine_fn void nbd_trip(void *opaque)
-             if (ret < 0) {
-                 LOG("flush failed");
-                 reply.error = -ret;
--                goto error_reply;
-+                break;
-             }
-         }
- 
-@@ -1128,12 +1129,12 @@ static coroutine_fn void nbd_trip(void *opaque)
-         if (ret < 0) {
-             LOG("reading from file failed");
-             reply.error = -ret;
--            goto error_reply;
-+            break;
-         }
- 
-+        reply_data_len = request.len;
-         TRACE("Read %" PRIu32" byte(s)", request.len);
--        if (nbd_co_send_reply(req, &reply, request.len) < 0)
--            goto out;
-+
-         break;
-     case NBD_CMD_WRITE:
-         TRACE("Request type is WRITE");
-@@ -1141,7 +1142,7 @@ static coroutine_fn void nbd_trip(void *opaque)
-         if (exp->nbdflags & NBD_FLAG_READ_ONLY) {
-             TRACE("Server is read-only, return error");
-             reply.error = EROFS;
--            goto error_reply;
-+            break;
-         }
- 
-         TRACE("Writing to device");
-@@ -1155,21 +1156,16 @@ static coroutine_fn void nbd_trip(void *opaque)
-         if (ret < 0) {
-             LOG("writing to file failed");
-             reply.error = -ret;
--            goto error_reply;
-         }
- 
--        if (nbd_co_send_reply(req, &reply, 0) < 0) {
--            goto out;
--        }
-         break;
+     nbd_client_receive_next_request(client);
 -
-     case NBD_CMD_WRITE_ZEROES:
-         TRACE("Request type is WRITE_ZEROES");
- 
-         if (exp->nbdflags & NBD_FLAG_READ_ONLY) {
-             TRACE("Server is read-only, return error");
-             reply.error = EROFS;
--            goto error_reply;
-+            break;
-         }
- 
-         TRACE("Writing to device");
-@@ -1186,14 +1182,9 @@ static coroutine_fn void nbd_trip(void *opaque)
-         if (ret < 0) {
-             LOG("writing to file failed");
-             reply.error = -ret;
--            goto error_reply;
-         }
- 
--        if (nbd_co_send_reply(req, &reply, 0) < 0) {
--            goto out;
--        }
-         break;
--
-     case NBD_CMD_DISC:
-         /* unreachable, thanks to special case in nbd_co_receive_request() */
-         abort();
-@@ -1206,9 +1197,7 @@ static coroutine_fn void nbd_trip(void *opaque)
-             LOG("flush failed");
-             reply.error = -ret;
-         }
--        if (nbd_co_send_reply(req, &reply, 0) < 0) {
--            goto out;
--        }
-+
-         break;
-     case NBD_CMD_TRIM:
-         TRACE("Request type is TRIM");
-@@ -1218,21 +1207,19 @@ static coroutine_fn void nbd_trip(void *opaque)
-             LOG("discard failed");
-             reply.error = -ret;
-         }
--        if (nbd_co_send_reply(req, &reply, 0) < 0) {
--            goto out;
--        }
-+
-         break;
-     default:
-         LOG("invalid request type (%" PRIu32 ") received", request.type);
-         reply.error = EINVAL;
--    error_reply:
--        /* We must disconnect after NBD_CMD_WRITE if we did not
--         * read the payload.
--         */
--        if (nbd_co_send_reply(req, &reply, 0) < 0 || !req->complete) {
--            goto out;
--        }
--        break;
-+    }
-+
-+reply:
-+    /* We must disconnect after NBD_CMD_WRITE if we did not
-+     * read the payload.
-+     */
-+    if (nbd_co_send_reply(req, &reply, reply_data_len) < 0 || !req->complete) {
-+        goto disconnect;
-     }
- 
-     TRACE("Request/Reply complete");
-@@ -1242,7 +1229,7 @@ done:
-     nbd_client_put(client);
-     return;
- 
 -out:
-+disconnect:
-     nbd_request_put(req);
-     client_close(client);
-     nbd_client_put(client);
+-    g_free(data);
+ }
+ 
+ void nbd_client_new(NBDExport *exp,
+@@ -1298,7 +1288,7 @@ void nbd_client_new(NBDExport *exp,
+                     void (*close_fn)(NBDClient *))
+ {
+     NBDClient *client;
+-    NBDClientNewData *data = g_new(NBDClientNewData, 1);
++    Coroutine *co;
+ 
+     client = g_malloc0(sizeof(NBDClient));
+     client->refcount = 1;
+@@ -1314,7 +1304,6 @@ void nbd_client_new(NBDExport *exp,
+     object_ref(OBJECT(client->ioc));
+     client->close = close_fn;
+ 
+-    data->client = client;
+-    data->co = qemu_coroutine_create(nbd_co_client_start, data);
+-    qemu_coroutine_enter(data->co);
++    co = qemu_coroutine_create(nbd_co_client_start, client);
++    qemu_coroutine_enter(co);
+ }
 -- 
 2.11.1
