@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46406)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46425)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1dGhCY-0005e7-Cr
-	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 03:40:55 -0400
+	(envelope-from <marcandre.lureau@redhat.com>) id 1dGhCh-0005kK-8Z
+	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 03:41:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1dGhCX-00048F-Cq
-	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 03:40:54 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:56262)
+	(envelope-from <marcandre.lureau@redhat.com>) id 1dGhCe-000497-0k
+	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 03:41:03 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:58882)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1dGhCX-00047U-6g
-	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 03:40:53 -0400
+	id 1dGhCd-000492-NW
+	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 03:40:59 -0400
 From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Fri,  2 Jun 2017 11:40:26 +0400
-Message-Id: <20170602074040.7400-2-marcandre.lureau@redhat.com>
+Date: Fri,  2 Jun 2017 11:40:27 +0400
+Message-Id: <20170602074040.7400-3-marcandre.lureau@redhat.com>
 In-Reply-To: <20170602074040.7400-1-marcandre.lureau@redhat.com>
 References: <20170602074040.7400-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 01/15] char: cast ARRAY_SIZE() as signed to
- silent warning on empty array
+Subject: [Qemu-devel] [PULL 02/15] char-win: simplify win_chr_read()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,45 +28,103 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, pbonzini@redhat.com, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Cc: peter.maydell@linaro.org, pbonzini@redhat.com, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
-From: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+win_chr_read_poll() is always used before win_chr_read().
+We can easily fold win_chr_readfile() too.
 
-chardev/char.c: In function 'chardev_name_foreach':
-chardev/char.c:546:19: error: comparison of unsigned expression < 0 is al=
-ways false [-Werror=3Dtype-limits]
-     for (i =3D 0; i < ARRAY_SIZE(chardev_alias_table); i++) {
-                   ^
-Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-Message-Id: <20170530120919.8874-1-f4bug@amsat.org>
-Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 ---
- chardev/char.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ chardev/char-win.h |  2 +-
+ chardev/char-win.c | 35 +++++++++--------------------------
+ 2 files changed, 10 insertions(+), 27 deletions(-)
 
-diff --git a/chardev/char.c b/chardev/char.c
-index 4e24dc39af..26607c1c6b 100644
---- a/chardev/char.c
-+++ b/chardev/char.c
-@@ -841,7 +841,7 @@ chardev_name_foreach(void (*fn)(const char *name, voi=
-d *opaque), void *opaque)
+diff --git a/chardev/char-win.h b/chardev/char-win.h
+index d78a7d7972..73a0e3caef 100644
+--- a/chardev/char-win.h
++++ b/chardev/char-win.h
+@@ -28,7 +28,7 @@
 =20
-     object_class_foreach(chardev_class_foreach, TYPE_CHARDEV, false, &fe=
-);
+ typedef struct {
+     Chardev parent;
+-    int max_size;
++
+     HANDLE hcom, hrecv, hsend;
+     OVERLAPPED orecv;
+     BOOL fpipe;
+diff --git a/chardev/char-win.c b/chardev/char-win.c
+index e4b6957ded..a46d878ef8 100644
+--- a/chardev/char-win.c
++++ b/chardev/char-win.c
+@@ -26,14 +26,21 @@
+ #include "qapi/error.h"
+ #include "char-win.h"
 =20
--    for (i =3D 0; i < ARRAY_SIZE(chardev_alias_table); i++) {
-+    for (i =3D 0; i < (int)ARRAY_SIZE(chardev_alias_table); i++) {
-         fn(chardev_alias_table[i].alias, opaque);
+-static void win_chr_readfile(Chardev *chr)
++static void win_chr_read(Chardev *chr)
+ {
+     WinChardev *s =3D WIN_CHARDEV(chr);
+-
++    int max_size =3D qemu_chr_be_can_write(chr);
+     int ret, err;
+     uint8_t buf[CHR_READ_BUF_LEN];
+     DWORD size;
+=20
++    if (s->len > max_size) {
++        s->len =3D max_size;
++    }
++    if (s->len =3D=3D 0) {
++        return;
++    }
++
+     ZeroMemory(&s->orecv, sizeof(s->orecv));
+     s->orecv.hEvent =3D s->hrecv;
+     ret =3D ReadFile(s->hcom, buf, s->len, &size, &s->orecv);
+@@ -49,28 +56,6 @@ static void win_chr_readfile(Chardev *chr)
      }
  }
-@@ -887,7 +887,7 @@ Chardev *qemu_chr_new_from_opts(QemuOpts *opts,
-         return NULL;
-     }
 =20
--    for (i =3D 0; i < ARRAY_SIZE(chardev_alias_table); i++) {
-+    for (i =3D 0; i < (int)ARRAY_SIZE(chardev_alias_table); i++) {
-         if (g_strcmp0(chardev_alias_table[i].alias, name) =3D=3D 0) {
-             name =3D chardev_alias_table[i].typename;
-             break;
+-static void win_chr_read(Chardev *chr)
+-{
+-    WinChardev *s =3D WIN_CHARDEV(chr);
+-
+-    if (s->len > s->max_size) {
+-        s->len =3D s->max_size;
+-    }
+-    if (s->len =3D=3D 0) {
+-        return;
+-    }
+-
+-    win_chr_readfile(chr);
+-}
+-
+-static int win_chr_read_poll(Chardev *chr)
+-{
+-    WinChardev *s =3D WIN_CHARDEV(chr);
+-
+-    s->max_size =3D qemu_chr_be_can_write(chr);
+-    return s->max_size;
+-}
+-
+ static int win_chr_poll(void *opaque)
+ {
+     Chardev *chr =3D CHARDEV(opaque);
+@@ -81,7 +66,6 @@ static int win_chr_poll(void *opaque)
+     ClearCommError(s->hcom, &comerr, &status);
+     if (status.cbInQue > 0) {
+         s->len =3D status.cbInQue;
+-        win_chr_read_poll(chr);
+         win_chr_read(chr);
+         return 1;
+     }
+@@ -163,7 +147,6 @@ int win_chr_pipe_poll(void *opaque)
+     PeekNamedPipe(s->hcom, NULL, 0, NULL, &size, NULL);
+     if (size > 0) {
+         s->len =3D size;
+-        win_chr_read_poll(chr);
+         win_chr_read(chr);
+         return 1;
+     }
 --=20
 2.13.0.91.g00982b8dd
