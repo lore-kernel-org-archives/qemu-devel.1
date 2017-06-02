@@ -1,29 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43313)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44022)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1dGoRG-0006Ll-2x
-	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 11:24:35 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1dGoTn-0007SB-9Y
+	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 11:27:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1dGoRC-0004Ad-QV
-	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 11:24:33 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:55590)
+	(envelope-from <vsementsov@virtuozzo.com>) id 1dGoTk-0005xo-4n
+	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 11:27:11 -0400
+Received: from mailhub.sw.ru ([195.214.232.25]:29705 helo=relay.sw.ru)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1dGoRC-0004A2-H9
-	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 11:24:30 -0400
-Date: Fri, 2 Jun 2017 18:24:24 +0300
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20170602180458-mutt-send-email-mst@kernel.org>
-References: <20170526142858.19931-1-maxime.coquelin@redhat.com>
-	<20170530211819-mutt-send-email-mst@kernel.org>
-	<7d4af4dd-270b-605f-9535-7bf8323e74c2@redhat.com>
-	<20170601165540-mutt-send-email-mst@kernel.org>
-	<04975954-9972-d900-0a88-b0a2587766e1@redhat.com>
+	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
+	id 1dGoTj-0005xH-OQ
+	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 11:27:08 -0400
+References: <20170530104857.70083-1-vsementsov@virtuozzo.com>
+	<20170530104857.70083-2-vsementsov@virtuozzo.com>
+	<21763282-556d-4389-29b5-664f6f4f4479@redhat.com>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <b1e2e189-c195-0f54-ffe8-45287d8d522f@virtuozzo.com>
+Date: Fri, 2 Jun 2017 18:26:57 +0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <04975954-9972-d900-0a88-b0a2587766e1@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 0/6] vhost-user: Specify and implement
- device IOTLB support
+In-Reply-To: <21763282-556d-4389-29b5-664f6f4f4479@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+Subject: Re: [Qemu-devel] [PATCH 1/4] block: add bdrv_get_format_alloc_stat
+ format interface
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,125 +31,118 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jason Wang <jasowang@redhat.com>
-Cc: yuanhan.liu@linux.intel.com, qemu-devel@nongnu.org, peterx@redhat.com, Maxime Coquelin <maxime.coquelin@redhat.com>, marcandre.lureau@gmail.com, wexu@redhat.com, vkaplans@redhat.com, jfreiman@redhat.com
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: armbru@redhat.com, mreitz@redhat.com, kwolf@redhat.com, den@openvz.org
 
-On Fri, Jun 02, 2017 at 01:53:11PM +0800, Jason Wang wrote:
->=20
->=20
-> On 2017=E5=B9=B406=E6=9C=8801=E6=97=A5 21:59, Michael S. Tsirkin wrote:
-> > On Wed, May 31, 2017 at 04:33:33PM +0800, Jason Wang wrote:
-> > >=20
-> > > On 2017=E5=B9=B405=E6=9C=8831=E6=97=A5 02:20, Michael S. Tsirkin wr=
-ote:
-> > > > On Fri, May 26, 2017 at 04:28:52PM +0200, Maxime Coquelin wrote:
-> > > > > This series aims at specifying ans implementing the protocol up=
-date
-> > > > > required to support device IOTLB with user backends.
-> > > > >=20
-> > > > > In this second non-RFC version, main changes are:
-> > > > >    - spec fixes and clarification
-> > > > >    - rings information update has been restored back to ring en=
-ablement time
-> > > > >    - Work around GCC 4.4.7 limitation wrt assignment in unnamed=
- union at
-> > > > > declaration time.
-> > > > >=20
-> > > > > The series can be tested with vhost_iotlb_proto_v2 branch on my=
- gitlab
-> > > > > account[0].
-> > > > >=20
-> > > > > The slave requests channel part is re-used from Marc-Andr=C3=A9=
-'s series submitted
-> > > > > last year[1], with main changes from original version being req=
-uest/feature
-> > > > > names renaming and addition of the REPLY_ACK feature support.
-> > > > >=20
-> > > > > Regarding IOTLB protocol, one noticeable change is the IOTLB mi=
-ss request
-> > > > > reply made optionnal (i.e. only if slave requests it by setting=
- the
-> > > > > VHOST_USER_NEED_REPLY flag in the message header). This change =
-provides
-> > > > > more flexibility in the backend implementation of the feature.
-> > > > >=20
-> > > > > The protocol is very close to kernel backends, except that a ne=
-w
-> > > > > communication channel is introduced to enable the slave to send
-> > > > > requests to the master.
-> > > > >=20
-> > > > > [0]:https://gitlab.com/mcoquelin/dpdk-next-virtio/commits/vhost=
-_iotlb_proto_v2
-> > > > > [1]:https://lists.gnu.org/archive/html/qemu-devel/2016-04/msg00=
-095.html
-> > > > Overall, this looks good to me. I do think patch 3 isn't a good i=
-dea
-> > > > though, if slave wants something let it request it.
-> > > >=20
-> > > > Need to find out why does vhost in kernel want the used ring iotl=
-b at
-> > > > start time - especially considering we aren't even guaranteed one=
- entry
-> > > > covers the whole ring, and invalidates should affect all addresse=
-s at
-> > > > least in theory.
-> > > >=20
-> > > >=20
-> > > The reason is probably we want to verify whether or not we could co=
-rrectly
-> > > access used ring in vhost_vq_init_access(). It was there since vhos=
-t_net is
-> > > introduced. We can think to remove this limitation maybe.
-> > >=20
-> > > Thanks
-> >=20
-> > Well that's only called if iotlb is disabled:
-> >=20
-> >          if (!vq->iotlb &&
-> >              !access_ok(VERIFY_READ, &vq->used->idx, sizeof vq->used-=
->idx)) {
-> >                  r =3D -EFAULT;
-> >                  goto err;
-> >          }
-> >=20
-> > Could you try removing that and see what breaks?
-> >=20
->=20
-> Looks not, the issue is vhost_update_used_flags() which needs device IO=
-TLB
-> translation. If we don't fill IOTLB in advance, it will return -EFAULT.
+30.05.2017 17:53, Eric Blake wrote:
+> On 05/30/2017 05:48 AM, Vladimir Sementsov-Ogievskiy wrote:
+>> The function should collect statistics, about allocted/unallocated by
+>> top-level format driver space (in its .file) and allocation status
+>> (allocated/hole/after eof) of corresponding areas in this .file.
+>>
+>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+>> ---
+>>   block.c                   | 16 ++++++++++++++++
+>>   include/block/block.h     |  3 +++
+>>   include/block/block_int.h |  2 ++
+>>   qapi/block-core.json      | 26 ++++++++++++++++++++++++++
+>>   4 files changed, 47 insertions(+)
+>>
+>> diff --git a/block.c b/block.c
+>> index 50ba264143..7d720ae0c2 100644
+>> --- a/block.c
+>> +++ b/qapi/block-core.json
+>> @@ -139,6 +139,32 @@
+>>              '*format-specific': 'ImageInfoSpecific' } }
+>>   
+>>   ##
+>> +# @BlockFormatAllocInfo:
+>> +#
+>> +# Information about allocations, including metadata. All fields are in bytes.
 
-Same for vhost_get_used, right?
+s/All fields are in bytes./All fields are in bytes and aligned by sector 
+(512 bytes)./
 
->=20
-> For simplicity, I don't implement control path device IOTLB miss.
+- ok? to emphasize that there is nothing about clusters... Or may be 
+better to write that they are aligned by byte.
+
+>> +#
+>> +# @alloc_alloc: allocated by format driver and allocated in underlying file
+>> +#
+> New structs should favor naming with '-' rather than '_'. So this should
+> be 'alloc-alloc', if we like the name.
+>
+> So this statistic represents the portions of the format file that are in
+> use by the format, and which are backed by data in the underlying protocol.
+>
+>> +# @alloc_hole: allocated by format driver but actually is a hole in
+>> +#              underlying file
+> The portions of the format file in use by the format, but where the
+> entire cluster is a hole in the underlying file (note that with cluster
+> size large enough, you can get a cluster that is part-data/part-hole in
+> the underlying file, it looks like you are counting those as data).
+>
+>> +#
+>> +# @alloc_overhead: allocated by format driver after end of underlying file
+> The portions of the format file in use by the format, but where the
+> entire cluster is beyond the end of the underlying file (the effective
+> hole).  Do we really need to distinguish between hole within the
+> underlying file and hole beyond the end of the file? Or can this number
+> be combined with the previous?
+>
+>> +#
+>> +# @hole_alloc: not allocated by format driver but allocated in underlying file
+> I'm not sure I like this name.  "Hole" in file-system terminology means
+> "reads-as-zero" - but here we are talking about portions of the format
+> layer that are unallocated (defer to backing file, and we can't
+> guarantee they read as zero unless there is no backing file).
+>
+> This statistic represents the portion of the underlying file that has
+> been previously allocated to hold data, but which is now unused by the
+> format layer (in other words, leaked clusters that can be reclaimed, or
+> which can be reused instead of growing the underlying the file if new
+> clusters are allocated).
+>
+>> +#
+>> +# @hole_hole: not allocated by format driver hole in underlying file
+> This statistic represents fragmentation - portions of the format layer
+> that are no longer in use, but which are also occupying no space in the
+> underlying file.  A refragmentation operation (if we ever implemented
+> one) could remove the address space used by these clusters, but would
+> not change the disk usage.
+>
+>> +#
+>> +# Since: 2.10
+>> +#
+>> +##
+>> +{ 'struct': 'BlockFormatAllocInfo',
+>> +  'data': {'alloc_alloc':    'uint64',
+>> +           'alloc_hole':     'uint64',
+>> +           'alloc_overhead': 'uint64',
+>> +           'hole_alloc':     'uint64',
+>> +           'hole_hole':      'uint64' } }
+> The idea seems okay, but the naming needs to be fixed.  Also, I'm not
+> sure if we need all 5, or if 4 is enough; and I'm not sure if we have
+> the right names ("how does alloc-hole differ from hole-alloc?"), or if
+> we can come up with something more descriptive.  Particularly since
+> "hole-" is not a hole in the filesystem sense, so much as unused
+> clusters.  But I'm also not coming up with better names to suggest at
+> the moment.
+>
+how about:
+
+used-allocated
+used-discarded
+used-overrun
+
+unused-allocated
+unused-discarded
 
 
-OK so this should be documented in vhost.h.  SET_BACKEND immediately
-writes and reads used ring. User must know this and pre-fault used flags
-and index before setting backend.
+also, do you mention that your detailed wordings should be included into 
+block-core.json or you just clarify things?
 
-> If you
-> care about the incomplete length, we can refine vhost_iotlb_miss() to m=
-ake
-> sure it covers all size.
->=20
-> Thanks
 
-No need imho, it's only the used flags field that's written, and the
-index that's read right?  BTW I don't really know why do we do the write
-when event index is setup.  We probably shouldn't, should we?
-
-It's worth considering whether we want this write into used ring at all.
-I put it there originally to help make sure we don't miss the first exit,=
- but
-event index seems to get by fine without this. So why does non event
-index code want it?
-
-I think that if we could get rid of both accesses, it would be
-nice. Would need a feature bit naturally and we'd need to
-support old kernels but at least it will be contained and
-well documented.
-
---=20
-MST
+-- 
+Best regards,
+Vladimir
