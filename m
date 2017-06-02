@@ -1,34 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55487)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60961)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1dGpAx-0000Ex-Vg
-	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 12:11:48 -0400
+	(envelope-from <krzk@kernel.org>) id 1dGpRn-0005Ym-G9
+	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 12:29:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1dGpAu-0006cw-MN
-	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 12:11:47 -0400
-Received: from mail-wm0-x229.google.com ([2a00:1450:400c:c09::229]:36780)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1dGpAu-0006ce-FY
-	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 12:11:44 -0400
-Received: by mail-wm0-x229.google.com with SMTP id 7so29321544wmo.1
-	for <qemu-devel@nongnu.org>; Fri, 02 Jun 2017 09:11:44 -0700 (PDT)
-References: <1493314727-6951-1-git-send-email-wei@redhat.com>
-	<CAFEAcA-KKvhspYza=8TNNuFtqzco=ChhtS6Aa5hnn8=Cb036-Q@mail.gmail.com>
-	<4dbaaea9-7576-9acf-5327-b22db6f00ed2@redhat.com>
-	<CAFEAcA8K9DENSPqJD2Okqjqyi7T8RhSBmhCa3ztooJK5xdcZVg@mail.gmail.com>
-	<8b782ee5-3545-3cb5-3b09-209fcffee7e4@redhat.com>
-	<CAFEAcA8GY3yqZCVHihcFaFS-EkmEy+FRJ9+Kq_xRRdzD7+6DnQ@mail.gmail.com>
-	<87k24us83w.fsf@linaro.org>
-	<CAFEAcA8OgWtafU+9Jy02VLdfWhdA=LymQrHsR-1SKxGZQFPW0w@mail.gmail.com>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <CAFEAcA8OgWtafU+9Jy02VLdfWhdA=LymQrHsR-1SKxGZQFPW0w@mail.gmail.com>
-Date: Fri, 02 Jun 2017 17:12:02 +0100
-Message-ID: <87inkes71p.fsf@linaro.org>
+	(envelope-from <krzk@kernel.org>) id 1dGpRm-0002K2-Gv
+	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 12:29:11 -0400
+From: Krzysztof Kozlowski <krzk@kernel.org>
+Date: Fri,  2 Jun 2017 18:28:48 +0200
+Message-Id: <20170602162857.6065-1-krzk@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 0/2] Fix compilation dependency issues of
- CONFIG_ARM_V7M
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v4 0/9] hw: arm: exynos: Improvements and
+ cleanups
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,47 +21,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Wei Huang <wei@redhat.com>, qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
+To: Igor Mitsyanko <i.mitsyanko@gmail.com>, Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-devel@nongnu.org
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Eric Blake <eblake@redhat.com>, Krzysztof Kozlowski <krzk@kernel.org>
+
+Hi,
+
+I split non-intrusive changes from my previous attempts [1].
+
+This patchset contains only cleanups, minor improvements and support for
+power off. Power off itself will not happen because kernel will hang
+before trying it, on syncing IRQ works (fix for this is [2], but this wil=
+l
+be separate).
+
+Changes since v3:
+1. Rebase on current master (API for shutdown changed).
+2. Apply Peter's reviewed-by tag.
 
 
-Peter Maydell <peter.maydell@linaro.org> writes:
+Best regards,
+Krzysztof
 
-> On 2 June 2017 at 16:49, Alex Bennée <alex.bennee@linaro.org> wrote:
->> Peter Maydell <peter.maydell@linaro.org> writes:
->>> We seem to run into "CONFIG_FOO is defined for make but not
->>> for the C preprocessor" from time to time, so maybe we should
->>> fix that?
->>
->> Hmm is should be auto-generated from config-(host|target).mak but I've
->> never quite figured out why we need timestamps rather than a straight
->> dependency check in rules.mk:
->>
->>   # Generate timestamp files for .h include files
->>
->>   config-%.h: config-%.h-timestamp
->>           @cmp $< $@ >/dev/null 2>&1 || cp $< $@
->>
->>   config-%.h-timestamp: config-%.mak $(SRC_PATH)/scripts/create_config
->>           $(call quiet-command, sh $(SRC_PATH)/scripts/create_config < $< > $@,"GEN","$(TARGET_DIR)config-$*.h")
->>
->> This seems to be one of those things that goes away on a make clean && rebuild
->
-> Not the issue in this case -- what happens is that these CONFIG_*
-> defines are defined in config-devices.mak, but we don't have any
-> equivalent config-devices.h which would expose them to the C code.
 
-Ahh I see. So I guess once the relevant dependencies are added alongside:
+[1] https://lists.gnu.org/archive/html/qemu-devel/2017-05/msg04821.html
+[2] https://lists.gnu.org/archive/html/qemu-devel/2017-05/msg04818.html
 
-  %/config-devices.mak: default-configs/%.mak $(SRC_PATH)/scripts/make_device_config.sh
+Krzysztof Kozlowski (9):
+  hw/intc/exynos4210_gic: Use more meaningful name for local variable
+  hw/timer/exynos4210_mct: Fix checkpatch style errors
+  hw/timer/exynos4210_mct: Cleanup indentation and empty new lines
+  hw/timer/exynos4210_mct: Remove unused defines
+  hw/arm/exynos: Move DRAM initialization next boards
+  hw/arm/exynos: Declare local variables in some order
+  hw/arm/exynos: Use type define instead of hard-coded a9mpcore_priv
+    string
+  hw/intc/exynos4210_gic: Constify array of combiner interrupts
+  hw/misc/exynos4210_pmu: Add support for system poweroff
 
-The default rules should pick it up and generate the right things.
+ hw/arm/exynos4210.c         | 27 +++++-------------------
+ hw/arm/exynos4_boards.c     | 50 ++++++++++++++++++++++++++++++++++++++-=
+------
+ hw/intc/exynos4210_gic.c    | 14 ++++++-------
+ hw/misc/exynos4210_pmu.c    | 20 +++++++++++++++++-
+ hw/timer/exynos4210_mct.c   | 50 +++++++++++++++++++--------------------=
+------
+ include/hw/arm/exynos4210.h |  5 +----
+ 6 files changed, 96 insertions(+), 70 deletions(-)
 
-> (I assume the rules.mak stuff is attempting to avoid having a
-> not-an-actual-change to the .h file result in rebuilding the whole
-> world.)
-
-OK that makes sense.
-
---
-Alex Bennée
+--=20
+2.9.3
