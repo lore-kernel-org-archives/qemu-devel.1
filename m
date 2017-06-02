@@ -1,21 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41900)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43509)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dGgxh-0006j3-7s
-	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 03:25:34 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1dGh1z-0008Rg-Q2
+	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 03:30:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dGgxf-0004YW-TD
-	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 03:25:33 -0400
-Date: Fri, 2 Jun 2017 17:23:18 +1000
+	(envelope-from <dgibson@ozlabs.org>) id 1dGh1y-0006k2-QY
+	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 03:29:59 -0400
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20170602072318.GO13397@umbus.fritz.box>
-References: <20170602031507.29881-1-david@gibson.dropbear.id.au>
-	<149637571900.4027.16202778059216626774@f98a8425f76e>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="O3WNCzIuUImKerqE"
-Content-Disposition: inline
-In-Reply-To: <149637571900.4027.16202778059216626774@f98a8425f76e>
-Subject: Re: [Qemu-devel] [PATCHv5 0/4] Clean up compatibility mode handling
+Date: Fri,  2 Jun 2017 17:29:52 +1000
+Message-Id: <20170602072952.25454-6-david@gibson.dropbear.id.au>
+In-Reply-To: <20170602072952.25454-1-david@gibson.dropbear.id.au>
+References: <20170602072952.25454-1-david@gibson.dropbear.id.au>
+Subject: [Qemu-devel] [PATCH 5/5] spapr: Remove some non-useful properties
+ on DRC objects
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,101 +20,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: famz@redhat.com, groug@kaod.org, clg@kaod.org, mdroth@linux.vnet.ibm.com, sursingh@redhat.com, bharata@linux.vnet.ibm.com, nikunj@linux.vnet.ibm.com, qemu-ppc@nongnu.org, abologna@redhat.com, sbobroff@redhat.com
+To: mdroth@linux.vnet.ibm.com
+Cc: lvivier@redhat.com, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, bharata@linux.vnet.ibm.com, sursingh@redhat.com, groug@kaod.org, David Gibson <david@gibson.dropbear.id.au>
 
+ * 'connector_type' is easily derived from the 'index' property, so there's
+   no point to it (it's also implicit in the QOM type of the DRC)
+ * 'isolation-state', 'indicator-state' and 'allocation-state' are
+   part of the transaction between qemu and guest during PAPR hotplug
+   operations, and outside tools really have no business looking at it
+   (especially not changing, and these were RW properties)
+ * 'entity-sense' is basically just a weird PAPR encoding of whether there
+   is a device connected to this DRC
 
---O3WNCzIuUImKerqE
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Strictly speaking removing these properties is breaking the qemu interface.
+However, I'm pretty sure no management tools have ever used these.  For
+debugging there are better alternatives.  Therefore, I think removing these
+broken interfaces is the better option.
 
-On Thu, Jun 01, 2017 at 08:55:19PM -0700, no-reply@patchew.org wrote:
-> Hi,
->=20
-> This series seems to have some coding style problems. See output below for
-> more information:
->=20
-> Type: series
-> Message-id: 20170602031507.29881-1-david@gibson.dropbear.id.au
-> Subject: [Qemu-devel] [PATCHv5 0/4] Clean up compatibility mode handling
->=20
-> =3D=3D=3D TEST SCRIPT BEGIN =3D=3D=3D
-> #!/bin/bash
->=20
-> BASE=3Dbase
-> n=3D1
-> total=3D$(git log --oneline $BASE.. | wc -l)
-> failed=3D0
->=20
-> git config --local diff.renamelimit 0
-> git config --local diff.renames True
->=20
-> commits=3D"$(git log --format=3D%H --reverse $BASE..)"
-> for c in $commits; do
->     echo "Checking PATCH $n/$total: $(git log -n 1 --format=3D%s $c)..."
->     if ! git show $c --format=3Demail | ./scripts/checkpatch.pl --mailbac=
-k -; then
->         failed=3D1
->         echo
->     fi
->     n=3D$((n+1))
-> done
->=20
-> exit $failed
-> =3D=3D=3D TEST SCRIPT END =3D=3D=3D
->=20
-> Updating 3c8cf5a9c21ff8782164d1def7f44bd888713384
-> Switched to a new branch 'test'
-> 6ccf47f ppc: Rework CPU compatibility testing across migration
-> 2b75df3 pseries: Reset CPU compatibility mode
-> 282a89c pseries: Move CPU compatibility property to machine
-> 8741a73 qapi: add explicit null to string input and output visitors
->=20
-> =3D=3D=3D OUTPUT BEGIN =3D=3D=3D
-> Checking PATCH 1/4: qapi: add explicit null to string input and output vi=
-sitors...
-> Checking PATCH 2/4: pseries: Move CPU compatibility property to machine...
-> Checking PATCH 3/4: pseries: Reset CPU compatibility mode...
-> Checking PATCH 4/4: ppc: Rework CPU compatibility testing across migratio=
-n...
-> ERROR: braces {} are necessary for all arms of this statement
-> #94: FILE: target/ppc/machine.c:236:
-> +    if (cpu->compat_pvr) {
-> [...]
-> +    } else
-> [...]
->=20
-> total: 1 errors, 0 warnings, 100 lines checked
+Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+---
+ hw/ppc/spapr_drc.c | 29 -----------------------------
+ 1 file changed, 29 deletions(-)
 
-This is a false positive triggered by an #ifdef intersecting the
-if/else.
-
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---O3WNCzIuUImKerqE
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-
-iQIcBAEBCAAGBQJZMRJjAAoJEGw4ysog2bOSOYMQAMzOjjxL554Qa054Pj57d3oM
-Z5mVgavSIf1HE+edKG1k+LBCAZThl2wcyal60CgSHfNVOCZVpsri2erABxHtxJdR
-wRfiqF1Mf5Zx4lsxGwgyTtdfC8GnctBybHPsumggmM7u9XuN8gjk9wZVmeuX0AXY
-bcXbUGt3ya345iIcBnLBgOdBmbJpIx1l0gWR4uplGAyTBWV8CyOddhmOYOiCZj/q
-V04PgOJdKPNMv2/Yc+2HMxAAdwADBaW0iiiorLmc1sxqhzzktxE9uGMkzT9+TI2p
-6XUdeLlhMReajWFCWWBSIukX3m0BaWUp5GAXP3klTcZPCJ38XfKUZHGpBiKad+3M
-UcE4itoW7OLwRjvvlJRpDzdy4aKDlYfBNDMM2BM+KAoyhlUWwmd0ohuifLUlMvgG
-wg0gmwBGaux6orEiZZbi6AzwxjKHJgj0tQnJavJlf/pDNqxtkBMbkqAphYWHYCqX
-bPA1YtptY6lg9Jmp3txRk1PwPIA6bjYqcKdGz7rKZnn7d2uTivMRGJT+wx98PRPg
-fJpxirtmq7MjrvokFI17Ts8T/Fi7WrxQBGlj1HQqRzV88paRTo96zzJsw0Pu0tel
-Mi+toq2n5HxjX0clBnB5TQfpAS7L9oDp1Jd6GGOQwTi+WorOdc7EKhKdso+G5ViC
-5G6t6lt7map/nG2PgrhB
-=d4ou
------END PGP SIGNATURE-----
-
---O3WNCzIuUImKerqE--
+diff --git a/hw/ppc/spapr_drc.c b/hw/ppc/spapr_drc.c
+index d43c9cd..4dd26a8 100644
+--- a/hw/ppc/spapr_drc.c
++++ b/hw/ppc/spapr_drc.c
+@@ -228,14 +228,6 @@ static void prop_get_index(Object *obj, Visitor *v, const char *name,
+     visit_type_uint32(v, name, &value, errp);
+ }
+ 
+-static void prop_get_type(Object *obj, Visitor *v, const char *name,
+-                          void *opaque, Error **errp)
+-{
+-    sPAPRDRConnector *drc = SPAPR_DR_CONNECTOR(obj);
+-    uint32_t value = (uint32_t)spapr_drc_type(drc);
+-    visit_type_uint32(v, name, &value, errp);
+-}
+-
+ static char *prop_get_name(Object *obj, Error **errp)
+ {
+     sPAPRDRConnector *drc = SPAPR_DR_CONNECTOR(obj);
+@@ -243,17 +235,6 @@ static char *prop_get_name(Object *obj, Error **errp)
+     return g_strdup(drck->get_name(drc));
+ }
+ 
+-static void prop_get_entity_sense(Object *obj, Visitor *v, const char *name,
+-                                  void *opaque, Error **errp)
+-{
+-    sPAPRDRConnector *drc = SPAPR_DR_CONNECTOR(obj);
+-    sPAPRDRConnectorClass *drck = SPAPR_DR_CONNECTOR_GET_CLASS(drc);
+-    uint32_t value;
+-
+-    drck->entity_sense(drc, &value);
+-    visit_type_uint32(v, name, &value, errp);
+-}
+-
+ static void prop_get_fdt(Object *obj, Visitor *v, const char *name,
+                          void *opaque, Error **errp)
+ {
+@@ -670,20 +651,10 @@ static void spapr_dr_connector_instance_init(Object *obj)
+ {
+     sPAPRDRConnector *drc = SPAPR_DR_CONNECTOR(obj);
+ 
+-    object_property_add_uint32_ptr(obj, "isolation-state",
+-                                   &drc->isolation_state, NULL);
+-    object_property_add_uint32_ptr(obj, "indicator-state",
+-                                   &drc->indicator_state, NULL);
+-    object_property_add_uint32_ptr(obj, "allocation-state",
+-                                   &drc->allocation_state, NULL);
+     object_property_add_uint32_ptr(obj, "id", &drc->id, NULL);
+     object_property_add(obj, "index", "uint32", prop_get_index,
+                         NULL, NULL, NULL, NULL);
+-    object_property_add(obj, "connector_type", "uint32", prop_get_type,
+-                        NULL, NULL, NULL, NULL);
+     object_property_add_str(obj, "name", prop_get_name, NULL, NULL);
+-    object_property_add(obj, "entity-sense", "uint32", prop_get_entity_sense,
+-                        NULL, NULL, NULL, NULL);
+     object_property_add(obj, "fdt", "struct", prop_get_fdt,
+                         NULL, NULL, NULL, NULL);
+ }
+-- 
+2.9.4
