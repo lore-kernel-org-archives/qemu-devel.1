@@ -1,25 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52699)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55007)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dGldi-0003Cq-Ll
-	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 08:25:15 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1dGlkZ-0004j5-DY
+	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 08:32:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dGldh-0005cc-FX
-	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 08:25:14 -0400
-Received: from mail-wm0-x232.google.com ([2a00:1450:400c:c09::232]:34854)
+	(envelope-from <peter.maydell@linaro.org>) id 1dGlkY-0000Jk-Cm
+	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 08:32:19 -0400
+Received: from mail-wm0-x231.google.com ([2a00:1450:400c:c09::231]:37551)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1dGldh-0005ah-9B
-	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 08:25:13 -0400
-Received: by mail-wm0-x232.google.com with SMTP id b84so24051153wmh.0
-	for <qemu-devel@nongnu.org>; Fri, 02 Jun 2017 05:25:13 -0700 (PDT)
+	id 1dGlkY-0000JQ-4y
+	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 08:32:18 -0400
+Received: by mail-wm0-x231.google.com with SMTP id d127so25404789wmf.0
+	for <qemu-devel@nongnu.org>; Fri, 02 Jun 2017 05:32:17 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20170418191817.10430-1-bobby.prani@gmail.com>
-References: <20170418191817.10430-1-bobby.prani@gmail.com>
+In-Reply-To: <1494860396-24930-3-git-send-email-Milos.Stojanovic@rt-rk.com>
+References: <1494860396-24930-1-git-send-email-Milos.Stojanovic@rt-rk.com>
+	<1494860396-24930-3-git-send-email-Milos.Stojanovic@rt-rk.com>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 2 Jun 2017 13:24:51 +0100
-Message-ID: <CAFEAcA-M6etMjBBY1GyDHA9AhM+O=1NWKRn6QwRsHhNgofYxPw@mail.gmail.com>
+Date: Fri, 2 Jun 2017 13:31:56 +0100
+Message-ID: <CAFEAcA9H0WW7URH0mmLVEwuUXUXZNn6nurXkxUMVgc41QgsKOw@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH] timer.h: Provide better monotonic time
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 02/16] linux-user: add tkill(),
+ tgkill() and rt_sigqueueinfo() strace
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,41 +31,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Pranith Kumar <bobby.prani@gmail.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Cao jin <caoj.fnst@cn.fujitsu.com>, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, Michael Tokarev <mjt@tls.msk.ru>, "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>, "open list:All patches CC here" <qemu-devel@nongnu.org>
+To: =?UTF-8?B?TWlsb8WhIFN0b2phbm92acSH?= <Milos.Stojanovic@rt-rk.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Riku Voipio <riku.voipio@iki.fi>, Miodrag.Dinic@rt-rk.com, Laurent Vivier <laurent@vivier.eu>, Petar Jovanovic <Petar.Jovanovic@rt-rk.com>, Aleksandar Markovic <Aleksandar.Markovic@rt-rk.com>, Yongbok Kim <yongbok.kim@imgtec.com>
 
-On 18 April 2017 at 20:18, Pranith Kumar <bobby.prani@gmail.com> wrote:
-> Tested and confirmed that the stretch i386 debian qcow2 image on a
-> raspberry pi 2 works.
+On 15 May 2017 at 15:59, Milo=C5=A1 Stojanovi=C4=87 <Milos.Stojanovic@rt-rk=
+.com> wrote:
+> Improve strace support for syscall tkill(), tgkill() and rt_sigqueueinfo(=
+)
+> by implementing print functions that match arguments types of the system
+> calls and add them to the corresponding starce.list entry.
 >
-> Fixes: LP#: 893208 <https://bugs.launchpad.net/qemu/+bug/893208/>
-> Signed-off-by: Pranith Kumar <bobby.prani@gmail.com>
-> ---
->  include/qemu/timer.h | 5 ++---
->  1 file changed, 2 insertions(+), 3 deletions(-)
+> tkill:
+> Prior to this commit, typical strace output used to look like this:
+> 4886 tkill(4886,50,0,4832615904,0,-9151031864016699136) =3D 0
+> After this commit, it looks like this:
+> 4886 tkill(4886,50) =3D 0
 >
-> diff --git a/include/qemu/timer.h b/include/qemu/timer.h
-> index 8a1eb74839..1b518bca30 100644
-> --- a/include/qemu/timer.h
-> +++ b/include/qemu/timer.h
-> @@ -1020,10 +1020,9 @@ static inline int64_t cpu_get_host_ticks(void)
->  /* The host CPU doesn't have an easily accessible cycle counter.
->     Just return a monotonically increasing value.  This will be
->     totally wrong, but hopefully better than nothing.  */
-> -static inline int64_t cpu_get_host_ticks (void)
-> +static inline int64_t cpu_get_host_ticks(void)
->  {
-> -    static int64_t ticks = 0;
-> -    return ticks++;
-> +    return get_clock();
->  }
->  #endif
+> tgkill:
+> Prior to this commit, typical strace output used to look like this:
+> 4890 tgkill(4890,4890,50,8,4832630528,4832615904) =3D 0
+> After this commit, it looks like this:
+> 4890 tgkill(4890,4890,50) =3D 0
+>
+> rt_sigqueueinfo:
+> Prior to this commit, typical strace output used to look like this:
+> 8307 rt_sigqueueinfo(8307,50,1996483164,0,0,50) =3D 0
+> After this commit, it looks like this:
+> 8307 rt_sigqueueinfo(8307,50,0x00000040007ff6b0) =3D 0
+>
+> Signed-off-by: Milo=C5=A1 Stojanovi=C4=87 <Milos.Stojanovic@rt-rk.com>
 
-Hmm, it looks like this patch got lost. Paolo, did you want to
-give it a reviewed-by? From the discussion on v1 it sounded
-like you had the best grip on the timer code ;-)
-
-(Does the comment on the function need updating ?)
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 
 thanks
 -- PMM
