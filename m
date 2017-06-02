@@ -1,26 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35829)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37478)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dGrTP-0005UY-CF
-	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 14:39:00 -0400
+	id 1dGrZW-0007Ax-44
+	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 14:45:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dGrTO-0006iU-DC
-	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 14:38:59 -0400
+	id 1dGrZV-0001Zn-Bx
+	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 14:45:18 -0400
+Received: from mail-oi0-x22f.google.com ([2607:f8b0:4003:c06::22f]:36333)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dGrZV-0001Zd-5n
+	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 14:45:17 -0400
+Received: by mail-oi0-x22f.google.com with SMTP id h4so102334606oib.3
+	for <qemu-devel@nongnu.org>; Fri, 02 Jun 2017 11:45:17 -0700 (PDT)
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
-References: <20170602162857.6065-1-krzk@kernel.org>
-	<20170602163618.6369-1-krzk@kernel.org>
-	<20170602163618.6369-9-krzk@kernel.org>
+References: <20170602074040.7400-1-marcandre.lureau@redhat.com>
+	<CAFEAcA8nOzdR=ZHdkvX+aD-oCvDFcUvmgEJdE1CcUyOVMoEP8w@mail.gmail.com>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <81d64387-003a-2b21-9229-37b3c0feb676@amsat.org>
-Date: Fri, 2 Jun 2017 15:38:55 -0300
+Message-ID: <a0923eb1-825e-39d7-9726-b45b4d06bae3@amsat.org>
+Date: Fri, 2 Jun 2017 15:45:14 -0300
 MIME-Version: 1.0
-In-Reply-To: <20170602163618.6369-9-krzk@kernel.org>
-Content-Type: text/plain; charset=windows-1252; format=flowed
+In-Reply-To: <CAFEAcA8nOzdR=ZHdkvX+aD-oCvDFcUvmgEJdE1CcUyOVMoEP8w@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v4 9/9] hw/misc/exynos4210_pmu: Add support
- for system poweroff
+Subject: Re: [Qemu-devel] [PULL 00/15] chardev patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,92 +34,22 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Krzysztof Kozlowski <krzk@kernel.org>, Igor Mitsyanko <i.mitsyanko@gmail.com>, Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-devel@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
 
-On 06/02/2017 01:36 PM, Krzysztof Kozlowski wrote:
-> On all Exynos-based boards, the system powers down itself by driving
-> PS_HOLD signal low - eight bit in PS_HOLD_CONTROL register of PMU.
-> Handle writing to respective PMU register to fix power off failure:
+On 06/02/2017 12:36 PM, Peter Maydell wrote:
+> On 2 June 2017 at 08:40, Marc-AndrÃ© Lureau <marcandre.lureau@redhat.com> wrote:
+>> The following changes since commit 43771d5d92312504305c19abe29ec5bfabd55f01:
+>>
+>>   Merge remote-tracking branch 'remotes/armbru/tags/pull-qapi-2017-05-31' into staging (2017-06-01 16:39:16 +0100)
+>>
+>> are available in the git repository at:
+>>
+>>   github/chrfe chrfe-pull-request
 >
->     reboot: Power down
->     Unable to poweroff system
->     shutdown: 31 output lines suppressed due to ratelimiting
->     Kernel panic - not syncing: Attempted to kill init! exitcode=0x00000000
+> Hi -- this isn't a valid git URL...
 >
->     CPU: 0 PID: 1 Comm: shutdown Not tainted 4.11.0-rc8 #846
->     Hardware name: SAMSUNG EXYNOS (Flattened Device Tree)
->     [<c031050c>] (unwind_backtrace) from [<c030ba6c>] (show_stack+0x10/0x14)
->     [<c030ba6c>] (show_stack) from [<c05b2800>] (dump_stack+0x88/0x9c)
->     [<c05b2800>] (dump_stack) from [<c03d3140>] (panic+0xdc/0x268)
->     [<c03d3140>] (panic) from [<c0343614>] (do_exit+0xa90/0xab4)
->     [<c0343614>] (do_exit) from [<c035f2dc>] (SyS_reboot+0x164/0x1d0)
->     [<c035f2dc>] (SyS_reboot) from [<c0307c80>] (ret_fast_syscall+0x0/0x3c)
->
-> Additionally the initial value of PS_HOLD has to be changed because
-> recent Linux kernel (v4.12-rc1) uses regmap cache for this access.
-> When the register is kept at reset value, the kernel will not issue a
-> write to it.  Usually the bootloader sets the eight bit of PS_HOLD high
-> so mimic its existence here.
->
-> Signed-off-by: Krzysztof Kozlowski <krzk@kernel.org>
-> Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+ >> for you to fetch changes up to 6b10e573d15ef82dbc5c5b3726028e6642e134f6:
 
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-
-> ---
->  hw/misc/exynos4210_pmu.c | 20 +++++++++++++++++++-
->  1 file changed, 19 insertions(+), 1 deletion(-)
->
-> diff --git a/hw/misc/exynos4210_pmu.c b/hw/misc/exynos4210_pmu.c
-> index 63a8ccd35559..0d7b64c5b3a3 100644
-> --- a/hw/misc/exynos4210_pmu.c
-> +++ b/hw/misc/exynos4210_pmu.c
-> @@ -26,6 +26,7 @@
->
->  #include "qemu/osdep.h"
->  #include "hw/sysbus.h"
-> +#include "sysemu/sysemu.h"
->
->  #ifndef DEBUG_PMU
->  #define DEBUG_PMU           0
-> @@ -350,7 +351,11 @@ static const Exynos4210PmuReg exynos4210_pmu_regs[] = {
->      {"PAD_RETENTION_MMCB_OPTION", PAD_RETENTION_MMCB_OPTION, 0x00000000},
->      {"PAD_RETENTION_EBIA_OPTION", PAD_RETENTION_EBIA_OPTION, 0x00000000},
->      {"PAD_RETENTION_EBIB_OPTION", PAD_RETENTION_EBIB_OPTION, 0x00000000},
-> -    {"PS_HOLD_CONTROL", PS_HOLD_CONTROL, 0x00005200},
-> +    /*
-> +     * PS_HOLD_CONTROL: reset value and manually toggle high the DATA bit.
-> +     * DATA bit high, set usually by bootloader, keeps system on.
-> +     */
-> +    {"PS_HOLD_CONTROL", PS_HOLD_CONTROL, 0x00005200 | BIT(8)},
->      {"XUSBXTI_CONFIGURATION", XUSBXTI_CONFIGURATION, 0x00000001},
->      {"XUSBXTI_STATUS", XUSBXTI_STATUS, 0x00000001},
->      {"XUSBXTI_DURATION", XUSBXTI_DURATION, 0xFFF00000},
-> @@ -397,6 +402,12 @@ typedef struct Exynos4210PmuState {
->      uint32_t reg[PMU_NUM_OF_REGISTERS];
->  } Exynos4210PmuState;
->
-> +static void exynos4210_pmu_poweroff(void)
-> +{
-> +    PRINT_DEBUG("QEMU PMU: PS_HOLD bit down, powering off\n");
-> +    qemu_system_shutdown_request(SHUTDOWN_CAUSE_GUEST_SHUTDOWN);
-> +}
-> +
->  static uint64_t exynos4210_pmu_read(void *opaque, hwaddr offset,
->                                      unsigned size)
->  {
-> @@ -428,6 +439,13 @@ static void exynos4210_pmu_write(void *opaque, hwaddr offset,
->              PRINT_DEBUG_EXTEND("%s <0x%04x> <- 0x%04x\n", reg_p->name,
->                      (uint32_t)offset, (uint32_t)val);
->              s->reg[i] = val;
-> +            if ((offset == PS_HOLD_CONTROL) && ((val & BIT(8)) == 0)) {
-> +                /*
-> +                 * We are interested only in setting data bit
-> +                 * of PS_HOLD_CONTROL register to indicate power off request.
-> +                 */
-> +                exynos4210_pmu_poweroff();
-> +            }
->              return;
->          }
->          reg_p++;
->
+The pull request tag is missing however the branch is still available at:
+git@github.com/elmarco/qemu.git chrfe
