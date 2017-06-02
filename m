@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54740)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54763)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dGhgm-00020H-QP
-	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 04:12:13 -0400
+	(envelope-from <famz@redhat.com>) id 1dGhgr-0002Dm-RQ
+	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 04:12:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dGhgl-0002R6-RY
-	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 04:12:08 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60010)
+	(envelope-from <famz@redhat.com>) id 1dGhgq-0002TR-9a
+	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 04:12:13 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:51522)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1dGhgl-0002Qf-Kp
-	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 04:12:07 -0400
+	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1dGhgp-0002TB-W3
+	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 04:12:12 -0400
 From: Fam Zheng <famz@redhat.com>
-Date: Fri,  2 Jun 2017 16:11:13 +0800
-Message-Id: <20170602081120.3497-16-famz@redhat.com>
+Date: Fri,  2 Jun 2017 16:11:15 +0800
+Message-Id: <20170602081120.3497-18-famz@redhat.com>
 In-Reply-To: <20170602081120.3497-1-famz@redhat.com>
 References: <20170602081120.3497-1-famz@redhat.com>
-Subject: [Qemu-devel] [PULL v2 15/22] block: use Stat64 for wr_highest_offset
+Subject: [Qemu-devel] [PULL v2 17/22] block: protect tracked_requests and
+ flush_queue with reqs_lock
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,73 +31,139 @@ From: Paolo Bonzini <pbonzini@redhat.com>
 
 Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-Message-Id: <20170525163225.29954-12-pbonzini@redhat.com>
+Message-Id: <20170525163225.29954-14-pbonzini@redhat.com>
 Signed-off-by: Fam Zheng <famz@redhat.com>
 ---
- block/io.c                | 4 +---
- block/qapi.c              | 2 +-
- include/block/block_int.h | 7 ++++---
- 3 files changed, 6 insertions(+), 7 deletions(-)
+ block.c                   |  1 +
+ block/io.c                | 16 ++++++++++++++--
+ include/block/block_int.h | 14 +++++++++-----
+ 3 files changed, 24 insertions(+), 7 deletions(-)
 
+diff --git a/block.c b/block.c
+index 361005c..a5cbd45 100644
+--- a/block.c
++++ b/block.c
+@@ -320,6 +320,7 @@ BlockDriverState *bdrv_new(void)
+         QLIST_INIT(&bs->op_blockers[i]);
+     }
+     notifier_with_return_list_init(&bs->before_write_notifiers);
++    qemu_co_mutex_init(&bs->reqs_lock);
+     bs->refcnt = 1;
+     bs->aio_context = qemu_get_aio_context();
+ 
 diff --git a/block/io.c b/block/io.c
-index bb1c9c5..bc69b4c 100644
+index 036f5a4..91611ff 100644
 --- a/block/io.c
 +++ b/block/io.c
-@@ -1405,9 +1405,7 @@ static int coroutine_fn bdrv_aligned_pwritev(BdrvChild *child,
-     ++bs->write_gen;
-     bdrv_set_dirty(bs, start_sector, end_sector - start_sector);
- 
--    if (bs->wr_highest_offset < offset + bytes) {
--        bs->wr_highest_offset = offset + bytes;
--    }
-+    stat64_max(&bs->wr_highest_offset, offset + bytes);
- 
-     if (ret >= 0) {
-         bs->total_sectors = MAX(bs->total_sectors, end_sector);
-diff --git a/block/qapi.c b/block/qapi.c
-index a40922e..14b60ae 100644
---- a/block/qapi.c
-+++ b/block/qapi.c
-@@ -441,7 +441,7 @@ static BlockStats *bdrv_query_bds_stats(const BlockDriverState *bs,
-         s->node_name = g_strdup(bdrv_get_node_name(bs));
+@@ -378,8 +378,10 @@ static void tracked_request_end(BdrvTrackedRequest *req)
+         atomic_dec(&req->bs->serialising_in_flight);
      }
  
--    s->stats->wr_highest_offset = bs->wr_highest_offset;
-+    s->stats->wr_highest_offset = stat64_get(&bs->wr_highest_offset);
++    qemu_co_mutex_lock(&req->bs->reqs_lock);
+     QLIST_REMOVE(req, list);
+     qemu_co_queue_restart_all(&req->wait_queue);
++    qemu_co_mutex_unlock(&req->bs->reqs_lock);
+ }
  
-     if (bs->file) {
-         s->has_parent = true;
+ /**
+@@ -404,7 +406,9 @@ static void tracked_request_begin(BdrvTrackedRequest *req,
+ 
+     qemu_co_queue_init(&req->wait_queue);
+ 
++    qemu_co_mutex_lock(&bs->reqs_lock);
+     QLIST_INSERT_HEAD(&bs->tracked_requests, req, list);
++    qemu_co_mutex_unlock(&bs->reqs_lock);
+ }
+ 
+ static void mark_request_serialising(BdrvTrackedRequest *req, uint64_t align)
+@@ -526,6 +530,7 @@ static bool coroutine_fn wait_serialising_requests(BdrvTrackedRequest *self)
+ 
+     do {
+         retry = false;
++        qemu_co_mutex_lock(&bs->reqs_lock);
+         QLIST_FOREACH(req, &bs->tracked_requests, list) {
+             if (req == self || (!req->serialising && !self->serialising)) {
+                 continue;
+@@ -544,7 +549,7 @@ static bool coroutine_fn wait_serialising_requests(BdrvTrackedRequest *self)
+                  * (instead of producing a deadlock in the former case). */
+                 if (!req->waiting_for) {
+                     self->waiting_for = req;
+-                    qemu_co_queue_wait(&req->wait_queue, NULL);
++                    qemu_co_queue_wait(&req->wait_queue, &bs->reqs_lock);
+                     self->waiting_for = NULL;
+                     retry = true;
+                     waited = true;
+@@ -552,6 +557,7 @@ static bool coroutine_fn wait_serialising_requests(BdrvTrackedRequest *self)
+                 }
+             }
+         }
++        qemu_co_mutex_unlock(&bs->reqs_lock);
+     } while (retry);
+ 
+     return waited;
+@@ -2291,14 +2297,17 @@ int coroutine_fn bdrv_co_flush(BlockDriverState *bs)
+         goto early_exit;
+     }
+ 
++    qemu_co_mutex_lock(&bs->reqs_lock);
+     current_gen = atomic_read(&bs->write_gen);
+ 
+     /* Wait until any previous flushes are completed */
+     while (bs->active_flush_req) {
+-        qemu_co_queue_wait(&bs->flush_queue, NULL);
++        qemu_co_queue_wait(&bs->flush_queue, &bs->reqs_lock);
+     }
+ 
++    /* Flushes reach this point in nondecreasing current_gen order.  */
+     bs->active_flush_req = true;
++    qemu_co_mutex_unlock(&bs->reqs_lock);
+ 
+     /* Write back all layers by calling one driver function */
+     if (bs->drv->bdrv_co_flush) {
+@@ -2370,9 +2379,12 @@ out:
+     if (ret == 0) {
+         bs->flushed_gen = current_gen;
+     }
++
++    qemu_co_mutex_lock(&bs->reqs_lock);
+     bs->active_flush_req = false;
+     /* Return value is ignored - it's ok if wait queue is empty */
+     qemu_co_queue_next(&bs->flush_queue);
++    qemu_co_mutex_unlock(&bs->reqs_lock);
+ 
+ early_exit:
+     bdrv_dec_in_flight(bs);
 diff --git a/include/block/block_int.h b/include/block/block_int.h
-index d11417e..8f36d1f 100644
+index 8a9bc0b..31fb364 100644
 --- a/include/block/block_int.h
 +++ b/include/block/block_int.h
-@@ -29,6 +29,7 @@
- #include "qemu/option.h"
- #include "qemu/queue.h"
- #include "qemu/coroutine.h"
-+#include "qemu/stats64.h"
- #include "qemu/timer.h"
- #include "qapi-types.h"
- #include "qemu/hbitmap.h"
-@@ -604,9 +605,6 @@ struct BlockDriverState {
-     /* Callback before write request is processed */
-     NotifierWithReturnList before_write_notifiers;
- 
--    /* Offset after the highest byte written to */
--    uint64_t wr_highest_offset;
--
-     /* threshold limit for writes, in bytes. "High water mark". */
+@@ -609,11 +609,6 @@ struct BlockDriverState {
      uint64_t write_threshold_offset;
      NotifierWithReturn write_threshold_notifier;
-@@ -619,6 +617,9 @@ struct BlockDriverState {
  
+-    QLIST_HEAD(, BdrvTrackedRequest) tracked_requests;
+-    CoQueue flush_queue;                  /* Serializing flush queue */
+-    bool active_flush_req;                /* Flush request in flight? */
+-    unsigned int flushed_gen;             /* Flushed write generation */
+-
      QLIST_HEAD(, BdrvDirtyBitmap) dirty_bitmaps;
  
-+    /* Offset after the highest byte written to */
-+    Stat64 wr_highest_offset;
+     /* Offset after the highest byte written to */
+@@ -647,6 +642,15 @@ struct BlockDriverState {
+     /* Accessed with atomic ops.  */
+     int quiesce_counter;
+     unsigned int write_gen;               /* Current data generation */
 +
-     /* If true, copy read backing sectors into image.  Can be >1 if more
-      * than one client has requested copy-on-read.  Accessed with atomic
-      * ops.
++    /* Protected by reqs_lock.  */
++    CoMutex reqs_lock;
++    QLIST_HEAD(, BdrvTrackedRequest) tracked_requests;
++    CoQueue flush_queue;                  /* Serializing flush queue */
++    bool active_flush_req;                /* Flush request in flight? */
++
++    /* Only read/written by whoever has set active_flush_req to true.  */
++    unsigned int flushed_gen;             /* Flushed write generation */
+ };
+ 
+ struct BlockBackendRootState {
 -- 
 2.9.4
