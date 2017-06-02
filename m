@@ -1,23 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48561)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49248)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1dGolb-0008Jr-Sf
-	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 11:45:37 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1dGooq-0001wI-8G
+	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 11:48:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1dGolW-0007fq-Tb
-	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 11:45:35 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:50452)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1dGolW-0007cY-LR
-	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 11:45:30 -0400
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <c76b36de-ebf9-c662-d454-0a95b43901e8@redhat.com>
-Date: Fri, 2 Jun 2017 17:45:21 +0200
+	(envelope-from <alex.bennee@linaro.org>) id 1dGool-0001no-B3
+	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 11:48:56 -0400
+Received: from mail-wm0-x233.google.com ([2a00:1450:400c:c09::233]:35080)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1dGool-0001mn-5D
+	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 11:48:51 -0400
+Received: by mail-wm0-x233.google.com with SMTP id b84so28898774wmh.0
+	for <qemu-devel@nongnu.org>; Fri, 02 Jun 2017 08:48:49 -0700 (PDT)
+References: <1493314727-6951-1-git-send-email-wei@redhat.com>
+	<CAFEAcA-KKvhspYza=8TNNuFtqzco=ChhtS6Aa5hnn8=Cb036-Q@mail.gmail.com>
+	<4dbaaea9-7576-9acf-5327-b22db6f00ed2@redhat.com>
+	<CAFEAcA8K9DENSPqJD2Okqjqyi7T8RhSBmhCa3ztooJK5xdcZVg@mail.gmail.com>
+	<8b782ee5-3545-3cb5-3b09-209fcffee7e4@redhat.com>
+	<CAFEAcA8GY3yqZCVHihcFaFS-EkmEy+FRJ9+Kq_xRRdzD7+6DnQ@mail.gmail.com>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <CAFEAcA8GY3yqZCVHihcFaFS-EkmEy+FRJ9+Kq_xRRdzD7+6DnQ@mail.gmail.com>
+Date: Fri, 02 Jun 2017 16:49:07 +0100
+Message-ID: <87k24us83w.fsf@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] allocation zone extensions for the firmware
- linker/loader
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 0/2] Fix compilation dependency issues of
+ CONFIG_ARM_V7M
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,60 +35,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: SeaBIOS devel list <SeaBIOS@seabios.org>, qemu devel list <qemu-devel@nongnu.org>, edk2-devel-ml01 <edk2-devel@ml01.01.org>
-Cc: Kevin O'Connor <kevin@koconnor.net>, "Michael S. Tsirkin" <mst@redhat.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Ben Warren <ben@skyportsystems.com>, Dongjiu Geng <gengdongjiu@huawei.com>, Igor Mammedov <imammedo@redhat.com>, "Jordan Justen (Intel address)" <jordan.l.justen@intel.com>, "Leif Lindholm (Linaro address)" <leif.lindholm@linaro.org>, Shannon Zhao <zhaoshenglong@huawei.com>, Stefan Berger <stefanb@linux.vnet.ibm.com>, Xiao Guangrong <guangrong.xiao@linux.intel.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Wei Huang <wei@redhat.com>, qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
 
-Hi,
 
-this message is cross-posted to three lists (qemu, seabios, edk2). I'll
-follow up with three patch series, one series for each project. I'll
-cross-post all of the patches as well, but I'll add the project name in
-the "bag of tags" in the subject lines.
+Peter Maydell <peter.maydell@linaro.org> writes:
 
-The QEMU series introduces two extensions to the ALLOCATE firmware
-linker/loader command.
+> On 28 April 2017 at 14:58, Wei Huang <wei@redhat.com> wrote:
+>> Using #ifdef is indeed a cleaner solution. However I can't use "#ifdef
+>> CONFIG_ARM_V7M" & co inside target/arm/cpu.c file because CONFIG_xxx
+>> aren't available as preprocessor directives. From what I saw the
+>> CONFIG_xxx options can only control compiling source file. One solution
+>> is to extract out all v7M code into separate files and use
+>> CONFIG_ARM_V7M to direct compilation. A bit messy though. Any other
+>> suggestions?
+>
+> We seem to run into "CONFIG_FOO is defined for make but not
+> for the C preprocessor" from time to time, so maybe we should
+> fix that?
 
-One extension is a new allocation zone, with value 3, for allowing the
-firmware to allocate the fw_cfg blobs in 64-bit address space.
+Hmm is should be auto-generated from config-(host|target).mak but I've
+never quite figured out why we need timestamps rather than a straight
+dependency check in rules.mk:
 
-The other extension is a repurposing of the most significant bit (bit 7)
-in the zone field. This bit becomes orthogonal to the rest of the zone
-field. If the bit is set, it means that QEMU promises the firmware that
-the blob referenced by the ALLOCATE command contains no ACPI tables at all.
+  # Generate timestamp files for .h include files
 
-After introducing these, the QEMU series puts them to use, covering all
-of the currently generated ALLOCATE commands, as appropriate. Among the
-benefits we can mention
-- the removal of the OVMF ACPI SDT Header Probe suppressor from VMGENID
-(and from any similar future devices),
-- and the fact that the "virt" machine type (and maybe other machine
-types) of the arm/aarch64 target will no longer require RAM under 4GB
-for ACPI to work.
+  config-%.h: config-%.h-timestamp
+          @cmp $< $@ >/dev/null 2>&1 || cp $< $@
 
-Both of these extensions are irrelevant for SeaBIOS, therefore the
-SeaBIOS patches simply mask out bit 7 (for ignoring the "no ACPI
-content" hint), and fall back to the HIGH zone (= 32-bit address space)
-when the 64-bit zone is permitted.
+  config-%.h-timestamp: config-%.mak $(SRC_PATH)/scripts/create_config
+          $(call quiet-command, sh $(SRC_PATH)/scripts/create_config < $< > $@,"GEN","$(TARGET_DIR)config-$*.h")
 
-In other words, SeaBIOS needs some patches to recognize the new zone
-values, but beyond that, the behavior is unchanged.
+This seems to be one of those things that goes away on a make clean && rebuild
 
-Both extensions are important for virtual UEFI firmware (OVMF in x86
-guests and ArmVirtQemu in aarch64 guests). The edk2 patches add support
-to OvmfPkg/AcpiPlatformDxe for the extensions. Please see the commit
-messages for details (all the extensions are explained in detail in the
-relevant patches for all of the projects).
-
-The patches can cause linker/loader breakage when old firmware is booted
-on new QEMU. However, that's no problem (it's nothing new), the next
-release of QEMU should bundle the new firmware binaries as always.
-
-New firmware will continue running on old QEMU without issues.
-
-(In case you have sent me emails about this in the last few tens of
-hours, please know that I'm not ignoring them, I just haven't seen /
-read them. Reading emails every five minutes makes focused work
-impossible, so when I'm busy, I tend to read email once per day.)
-
-Thanks
-Laszlo
+--
+Alex Bennée
