@@ -1,23 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36305)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36546)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <anton.nefedov@virtuozzo.com>) id 1dGmOW-0004SC-Pc
-	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 09:13:37 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1dGmPG-0004xm-Hs
+	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 09:14:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <anton.nefedov@virtuozzo.com>) id 1dGmOV-0007XO-VY
-	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 09:13:36 -0400
-References: <1496330073-51338-1-git-send-email-anton.nefedov@virtuozzo.com>
-	<1496330073-51338-4-git-send-email-anton.nefedov@virtuozzo.com>
-	<dc70b146-4a16-428f-e2f3-ea9ea09ecc06@redhat.com>
-From: Anton Nefedov <anton.nefedov@virtuozzo.com>
-Message-ID: <ed77ab63-6203-8ec1-4d9a-cb2751e2edaa@virtuozzo.com>
-Date: Fri, 2 Jun 2017 16:13:23 +0300
+	(envelope-from <vsementsov@virtuozzo.com>) id 1dGmPC-00088c-IM
+	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 09:14:22 -0400
+Received: from mailhub.sw.ru ([195.214.232.25]:9645 helo=relay.sw.ru)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
+	id 1dGmPC-00086r-6M
+	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 09:14:18 -0400
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+References: <20170530143052.165002-1-vsementsov@virtuozzo.com>
+	<20170530143052.165002-15-vsementsov@virtuozzo.com>
+	<05dd8425-2773-0396-1532-e25c737c3753@redhat.com>
+	<7c60e29b-6e78-7bc7-c19e-294dbf11756e@virtuozzo.com>
+Message-ID: <87962fd0-ebf4-73ad-f2a0-a44e4fc9e16d@virtuozzo.com>
+Date: Fri, 2 Jun 2017 16:14:15 +0300
 MIME-Version: 1.0
-In-Reply-To: <dc70b146-4a16-428f-e2f3-ea9ea09ecc06@redhat.com>
+In-Reply-To: <7c60e29b-6e78-7bc7-c19e-294dbf11756e@virtuozzo.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 03/15] blkdebug: support
- BDRV_REQ_ALLOCATE
+Content-Language: en-US
+Subject: Re: [Qemu-devel] [PATCH 14/19] nbd/server: nbd_negotiate: return 1
+ on NBD_OPT_ABORT
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,45 +33,99 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
-Cc: den@virtuozzo.com, kwolf@redhat.com, mreitz@redhat.com, qemu-block@nongnu.org
+Cc: pbonzini@redhat.com, den@openvz.org
 
+02.06.2017 15:55, Vladimir Sementsov-Ogievskiy wrote:
+> 02.06.2017 01:33, Eric Blake wrote:
+>> On 05/30/2017 09:30 AM, Vladimir Sementsov-Ogievskiy wrote:
+>>> Separate case when client sent NBD_OPT_ABORT from other errors.
+>>> It will be needed for the following patch, where errors will be
+>>> reported.
+>>> Considered case is not actually the error - it honestly follows NBD
+>>> protocol. Therefore it should not be reported like an error.
+>>> -EPIPE case means client not read server reply on NBD_OPT_ABORT,
+>>> which is also OK.
+>>>
+>>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+>>> ---
+>>>   nbd/server.c | 20 +++++++++++++++-----
+>>>   1 file changed, 15 insertions(+), 5 deletions(-)
+>>>
+>>> diff --git a/nbd/server.c b/nbd/server.c
+>>> index 30dfb81a5c..0e53d3dd91 100644
+>>> --- a/nbd/server.c
+>>> +++ b/nbd/server.c
+>>> @@ -369,9 +369,13 @@ static QIOChannel 
+>>> *nbd_negotiate_handle_starttls(NBDClient *client,
+>>>       return QIO_CHANNEL(tioc);
+>>>   }
+>>>   -
+>>> -/* Process all NBD_OPT_* client option commands.
+>>> - * Return -errno on error, 0 on success. */
+>>> +/* nbd_negotiate_options
+>>> + * Process all NBD_OPT_* client option commands.
+>>> + * Return:
+>>> + * < 0 on error
+>> Do you want to be specific that this is a negative errno value, or is it
+>> just any negative value with no correlation to errno?
+>
+> nothing here (except blk_write and friends, but their errors are not 
+> returned by any function) correlates with errno, because core function 
+> - nbd_wr_syncv returns EIO on any error. Underlying io_channel returns 
+> -1 or QIO_CHANNEL_ERR_BLOCK...
 
+changed to "-errno  on error"
 
-On 06/01/2017 10:50 PM, Eric Blake wrote:
-> On 06/01/2017 10:14 AM, Anton Nefedov wrote:
->> Support the flag if the underlying BDS supports it
+>
+>
 >>
->> Signed-off-by: Anton Nefedov <anton.nefedov@virtuozzo.com>
->> ---
->>   block/blkdebug.c | 3 ++-
->>   1 file changed, 2 insertions(+), 1 deletion(-)
-> 
-> Shouldn't other passthrough drivers (like raw-format.c) make this change
-> as well?
-> 
-
-Right.
-
-Wonder why they even enumerate those instead of just
-
-bs->supported_zero_flags = bs->file->bs->supported_zero_flags;
-
+>>> + * 0   on successful negotiation
+>>> + * 1   if client sent NBD_OPT_ABORT, i.e. on legal disconnect
+>>> + */
+>>>   static int nbd_negotiate_options(NBDClient *client)
+>>>   {
+>>>       int ret;
+>>> @@ -483,7 +487,7 @@ static int nbd_negotiate_options(NBDClient *client)
+>>>                   }
+>>>                   /* Let the client keep trying, unless they asked 
+>>> to quit */
+>>>                   if (clientflags == NBD_OPT_ABORT) {
+>>> -                    return -EINVAL;
+>>> +                    return 1;
+>>>                   }
+>>>                   break;
+>>>               }
+>>> @@ -502,7 +506,7 @@ static int nbd_negotiate_options(NBDClient *client)
+>>>                    * guests that don't wait for our reply. */
+>>>                   ret = nbd_negotiate_send_rep(client->ioc, 
+>>> NBD_REP_ACK,
+>>>                                                clientflags);
+>>> -                return ret < 0 ? ret : -EINVAL;
+>>> +                return ret < 0 && ret != -EPIPE ? ret : 1;
+>> This should just be 'return 1;', which means you don't need to capture
+>> and check 'ret'.
 >>
->> diff --git a/block/blkdebug.c b/block/blkdebug.c
->> index a5196e8..8b1401b 100644
->> --- a/block/blkdebug.c
->> +++ b/block/blkdebug.c
->> @@ -415,7 +415,8 @@ static int blkdebug_open(BlockDriverState *bs, QDict *options, int flags,
->>   
->>       bs->supported_write_flags = BDRV_REQ_FUA &
->>           bs->file->bs->supported_write_flags;
->> -    bs->supported_zero_flags = (BDRV_REQ_FUA | BDRV_REQ_MAY_UNMAP) &
->> +    bs->supported_zero_flags =
->> +        (BDRV_REQ_FUA | BDRV_REQ_MAY_UNMAP | BDRV_REQ_ALLOCATE) &
->>           bs->file->bs->supported_zero_flags;
->>       ret = -EINVAL;
->>   
+>>>                 case NBD_OPT_EXPORT_NAME:
+>>>                   return nbd_negotiate_handle_export_name(client, 
+>>> length);
+>>> @@ -560,6 +564,12 @@ static int nbd_negotiate_options(NBDClient 
+>>> *client)
+>>>       }
+>>>   }
+>>>   +/* nbd_negotiate
+>>> + * Return:
+>>> + * < 0 on error
+>> Again, if this is reliably a negative errno, specifically document that.
 >>
-> 
+>>> + * 0   on successful negotiation
+>>> + * 1   if client sent NBD_OPT_ABORT, i.e. on legal disconnect
+>>> + */
+>>>   static coroutine_fn int nbd_negotiate(NBDClient *client)
+>>>   {
+>>>       char buf[8 + 8 + 8 + 128];
+>>>
+>
 
-/Anton
+-- 
+Best regards,
+Vladimir
