@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36185)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36186)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1dGkej-0006Ho-CI
-	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 07:22:15 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1dGkej-0006Hp-Cn
+	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 07:22:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1dGkef-0005c6-MU
+	(envelope-from <vsementsov@virtuozzo.com>) id 1dGkef-0005b1-1a
 	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 07:22:13 -0400
-Received: from mailhub.sw.ru ([195.214.232.25]:40873 helo=relay.sw.ru)
+Received: from mailhub.sw.ru ([195.214.232.25]:47962 helo=relay.sw.ru)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
-	id 1dGkef-0005Yy-9e
-	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 07:22:09 -0400
+	id 1dGkee-0005Wj-Mn
+	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 07:22:08 -0400
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Fri,  2 Jun 2017 14:21:41 +0300
-Message-Id: <20170602112158.232757-14-vsementsov@virtuozzo.com>
+Date: Fri,  2 Jun 2017 14:21:43 +0300
+Message-Id: <20170602112158.232757-16-vsementsov@virtuozzo.com>
 In-Reply-To: <20170602112158.232757-1-vsementsov@virtuozzo.com>
 References: <20170602112158.232757-1-vsementsov@virtuozzo.com>
-Subject: [Qemu-devel] [PATCH v20 13/30] block: new bdrv_reopen_bitmaps_rw
- interface
+Subject: [Qemu-devel] [PATCH v20 15/30] block/dirty-bitmap: add autoload
+ field to BdrvDirtyBitmap
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,74 +28,87 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org, qemu-devel@nongnu.org
 Cc: kwolf@redhat.com, mreitz@redhat.com, armbru@redhat.com, eblake@redhat.com, jsnow@redhat.com, famz@redhat.com, den@openvz.org, stefanha@redhat.com, vsementsov@virtuozzo.com, pbonzini@redhat.com
 
-Add format driver handler, which should mark loaded read-only
-bitmaps as 'IN_USE' in the image and unset read_only field in
-corresponding BdrvDirtyBitmap's.
+Mirror AUTO flag from Qcow2 bitmap in BdrvDirtyBitmap. This will be
+needed in future, to save this flag back to Qcow2 for persistent
+bitmaps.
 
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Reviewed-by: Max Reitz <mreitz@redhat.com>
+Reviewed-by: John Snow <jsnow@redhat.com>
 ---
- block.c                   | 17 +++++++++++++++++
- include/block/block_int.h |  7 +++++++
- 2 files changed, 24 insertions(+)
+ block/dirty-bitmap.c         | 15 +++++++++++++++
+ block/qcow2-bitmap.c         |  2 ++
+ include/block/dirty-bitmap.h |  3 +++
+ 3 files changed, 20 insertions(+)
 
-diff --git a/block.c b/block.c
-index 04af7697dc..161db9e32a 100644
---- a/block.c
-+++ b/block.c
-@@ -2946,12 +2946,16 @@ void bdrv_reopen_commit(BDRVReopenState *reopen_state)
- {
-     BlockDriver *drv;
-     BlockDriverState *bs;
-+    bool old_can_write, new_can_write;
- 
-     assert(reopen_state != NULL);
-     bs = reopen_state->bs;
-     drv = bs->drv;
-     assert(drv != NULL);
- 
-+    old_can_write =
-+        !bdrv_is_read_only(bs) && !(bdrv_get_flags(bs) & BDRV_O_INACTIVE);
-+
-     /* If there are any driver level actions to take */
-     if (drv->bdrv_reopen_commit) {
-         drv->bdrv_reopen_commit(reopen_state);
-@@ -2965,6 +2969,19 @@ void bdrv_reopen_commit(BDRVReopenState *reopen_state)
-     bs->read_only = !(reopen_state->flags & BDRV_O_RDWR);
- 
-     bdrv_refresh_limits(bs, NULL);
-+
-+    new_can_write =
-+        !bdrv_is_read_only(bs) && !(bdrv_get_flags(bs) & BDRV_O_INACTIVE);
-+    if (!old_can_write && new_can_write && drv->bdrv_reopen_bitmaps_rw) {
-+        Error *local_err = NULL;
-+        if (drv->bdrv_reopen_bitmaps_rw(bs, &local_err) < 0) {
-+            /* This is not fatal, bitmaps just left read-only, so all following
-+             * writes will fail. User can remove read-only bitmaps to unblock
-+             * writes.
-+             */
-+            error_report_err(local_err);
-+        }
-+    }
- }
- 
- /*
-diff --git a/include/block/block_int.h b/include/block/block_int.h
-index 8d3724cce6..1dc6f2e90d 100644
---- a/include/block/block_int.h
-+++ b/include/block/block_int.h
-@@ -380,6 +380,13 @@ struct BlockDriver {
-                              uint64_t parent_perm, uint64_t parent_shared,
-                              uint64_t *nperm, uint64_t *nshared);
- 
-+    /**
-+     * Bitmaps should be marked as 'IN_USE' in the image on reopening image
-+     * as rw. This handler should realize it. It also should unset readonly
-+     * field of BlockDirtyBitmap's in case of success.
-+     */
-+    int (*bdrv_reopen_bitmaps_rw)(BlockDriverState *bs, Error **errp);
-+
-     QLIST_ENTRY(BlockDriver) list;
+diff --git a/block/dirty-bitmap.c b/block/dirty-bitmap.c
+index 1c9ffb292a..8a380308c3 100644
+--- a/block/dirty-bitmap.c
++++ b/block/dirty-bitmap.c
+@@ -51,6 +51,8 @@ struct BdrvDirtyBitmap {
+                                    (writes and discards), if bitmap is readonly
+                                    such operations must fail and not change
+                                    image or this bitmap */
++    bool autoload;              /* For persistent bitmaps: bitmap must be
++                                   autoloaded on image opening */
+     QLIST_ENTRY(BdrvDirtyBitmap) list;
  };
  
+@@ -77,6 +79,7 @@ void bdrv_dirty_bitmap_make_anon(BdrvDirtyBitmap *bitmap)
+     assert(!bdrv_dirty_bitmap_frozen(bitmap));
+     g_free(bitmap->name);
+     bitmap->name = NULL;
++    bitmap->autoload = false;
+ }
+ 
+ BdrvDirtyBitmap *bdrv_create_dirty_bitmap(BlockDriverState *bs,
+@@ -245,6 +248,8 @@ BdrvDirtyBitmap *bdrv_dirty_bitmap_abdicate(BlockDriverState *bs,
+     bitmap->name = NULL;
+     successor->name = name;
+     bitmap->successor = NULL;
++    successor->autoload = bitmap->autoload;
++    bitmap->autoload = false;
+     bdrv_release_dirty_bitmap(bs, bitmap);
+ 
+     return successor;
+@@ -573,3 +578,13 @@ bool bdrv_has_readonly_bitmaps(BlockDriverState *bs)
+ 
+     return false;
+ }
++
++void bdrv_dirty_bitmap_set_autoload(BdrvDirtyBitmap *bitmap, bool autoload)
++{
++    bitmap->autoload = autoload;
++}
++
++bool bdrv_dirty_bitmap_get_autoload(const BdrvDirtyBitmap *bitmap)
++{
++    return bitmap->autoload;
++}
+diff --git a/block/qcow2-bitmap.c b/block/qcow2-bitmap.c
+index a21fab8ce8..ee6d8f75a9 100644
+--- a/block/qcow2-bitmap.c
++++ b/block/qcow2-bitmap.c
+@@ -793,6 +793,8 @@ bool qcow2_load_autoloading_dirty_bitmaps(BlockDriverState *bs, Error **errp)
+             if (bitmap == NULL) {
+                 goto fail;
+             }
++
++            bdrv_dirty_bitmap_set_autoload(bitmap, true);
+             bm->flags |= BME_FLAG_IN_USE;
+             created_dirty_bitmaps =
+                     g_slist_append(created_dirty_bitmaps, bitmap);
+diff --git a/include/block/dirty-bitmap.h b/include/block/dirty-bitmap.h
+index aa6d47ee00..9416f9233f 100644
+--- a/include/block/dirty-bitmap.h
++++ b/include/block/dirty-bitmap.h
+@@ -79,4 +79,7 @@ bool bdrv_dirty_bitmap_readonly(const BdrvDirtyBitmap *bitmap);
+ void bdrv_dirty_bitmap_set_readonly(BdrvDirtyBitmap *bitmap, bool value);
+ bool bdrv_has_readonly_bitmaps(BlockDriverState *bs);
+ 
++void bdrv_dirty_bitmap_set_autoload(BdrvDirtyBitmap *bitmap, bool autoload);
++bool bdrv_dirty_bitmap_get_autoload(const BdrvDirtyBitmap *bitmap);
++
+ #endif
 -- 
 2.11.1
