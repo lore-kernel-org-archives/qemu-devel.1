@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46645)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46693)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1dGhD9-000647-9o
-	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 03:41:32 -0400
+	(envelope-from <marcandre.lureau@redhat.com>) id 1dGhDJ-0006Ce-K5
+	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 03:41:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1dGhD8-0004Xf-9h
-	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 03:41:31 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:57222)
+	(envelope-from <marcandre.lureau@redhat.com>) id 1dGhDG-0004eJ-Dt
+	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 03:41:41 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:59468)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1dGhD8-0004XK-0C
-	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 03:41:30 -0400
+	id 1dGhDG-0004eB-4w
+	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 03:41:38 -0400
 From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Fri,  2 Jun 2017 11:40:31 +0400
-Message-Id: <20170602074040.7400-7-marcandre.lureau@redhat.com>
+Date: Fri,  2 Jun 2017 11:40:32 +0400
+Message-Id: <20170602074040.7400-8-marcandre.lureau@redhat.com>
 In-Reply-To: <20170602074040.7400-1-marcandre.lureau@redhat.com>
 References: <20170602074040.7400-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 06/15] char-win: close file handle except with
- console
+Subject: [Qemu-devel] [PULL 07/15] Remove/replace sysemu/char.h inclusion
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,113 +30,182 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: peter.maydell@linaro.org, pbonzini@redhat.com, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
-Only the console handle shouldn't be closed, however, the "file" handle
-should.
+Those are apparently unnecessary includes.
 
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 ---
- chardev/char-win.h     |  5 ++---
- chardev/char-console.c |  2 +-
- chardev/char-file.c    |  2 +-
- chardev/char-win.c     | 12 ++++--------
- 4 files changed, 8 insertions(+), 13 deletions(-)
+ hw/arm/bcm2835_peripherals.c | 1 -
+ hw/char/imx_serial.c         | 1 -
+ hw/display/xenfb.c           | 1 -
+ hw/i386/xen/xen-hvm.c        | 1 -
+ hw/mips/mips_fulong2e.c      | 1 -
+ hw/mips/mips_malta.c         | 1 -
+ hw/net/xgmac.c               | 1 -
+ hw/ppc/spapr_events.c        | 1 -
+ hw/ppc/spapr_rtas.c          | 1 -
+ hw/sparc/leon3.c             | 1 -
+ hw/usb/ccid-card-emulated.c  | 2 +-
+ hw/xen/xen_backend.c         | 1 -
+ util/event_notifier-posix.c  | 1 -
+ 13 files changed, 1 insertion(+), 13 deletions(-)
 
-diff --git a/chardev/char-win.h b/chardev/char-win.h
-index 888be2b3ca..4994425e9e 100644
---- a/chardev/char-win.h
-+++ b/chardev/char-win.h
-@@ -29,14 +29,13 @@
- typedef struct {
-     Chardev parent;
+diff --git a/hw/arm/bcm2835_peripherals.c b/hw/arm/bcm2835_peripherals.c
+index 369ef1e3bd..502f04c02a 100644
+--- a/hw/arm/bcm2835_peripherals.c
++++ b/hw/arm/bcm2835_peripherals.c
+@@ -13,7 +13,6 @@
+ #include "hw/arm/bcm2835_peripherals.h"
+ #include "hw/misc/bcm2835_mbox_defs.h"
+ #include "hw/arm/raspi_platform.h"
+-#include "sysemu/char.h"
+ #include "sysemu/sysemu.h"
 =20
-+    bool keep_open; /* console do not close file */
-     HANDLE file, hrecv, hsend;
-     OVERLAPPED orecv;
-     BOOL fpipe;
+ /* Peripheral base address on the VC (GPU) system bus */
+diff --git a/hw/char/imx_serial.c b/hw/char/imx_serial.c
+index 52e67f8dc9..af250305be 100644
+--- a/hw/char/imx_serial.c
++++ b/hw/char/imx_serial.c
+@@ -21,7 +21,6 @@
+ #include "qemu/osdep.h"
+ #include "hw/char/imx_serial.h"
+ #include "sysemu/sysemu.h"
+-#include "sysemu/char.h"
+ #include "qemu/log.h"
 =20
-     /* Protected by the Chardev chr_write_lock.  */
-     OVERLAPPED osend;
--    /* FIXME: file/console do not finalize */
--    bool skip_free;
- } WinChardev;
+ #ifndef DEBUG_IMX_UART
+diff --git a/hw/display/xenfb.c b/hw/display/xenfb.c
+index 7a8727aa21..e76c0d805c 100644
+--- a/hw/display/xenfb.c
++++ b/hw/display/xenfb.c
+@@ -28,7 +28,6 @@
 =20
- #define NSENDBUF 2048
-@@ -45,7 +44,7 @@ typedef struct {
- #define TYPE_CHARDEV_WIN "chardev-win"
- #define WIN_CHARDEV(obj) OBJECT_CHECK(WinChardev, (obj), TYPE_CHARDEV_WI=
-N)
+ #include "hw/hw.h"
+ #include "ui/console.h"
+-#include "sysemu/char.h"
+ #include "hw/xen/xen_backend.h"
 =20
--void qemu_chr_open_win_file(Chardev *chr, HANDLE fd_out);
-+void win_chr_set_file(Chardev *chr, HANDLE file, bool keep_open);
- int win_chr_serial_init(Chardev *chr, const char *filename, Error **errp=
-);
- int win_chr_pipe_poll(void *opaque);
+ #include <xen/event_channel.h>
+diff --git a/hw/i386/xen/xen-hvm.c b/hw/i386/xen/xen-hvm.c
+index 919f09b694..1acd4de405 100644
+--- a/hw/i386/xen/xen-hvm.c
++++ b/hw/i386/xen/xen-hvm.c
+@@ -18,7 +18,6 @@
+ #include "hw/xen/xen_backend.h"
+ #include "qmp-commands.h"
 =20
-diff --git a/chardev/char-console.c b/chardev/char-console.c
-index c824937fe6..8d972c1506 100644
---- a/chardev/char-console.c
-+++ b/chardev/char-console.c
-@@ -29,7 +29,7 @@ static void qemu_chr_open_win_con(Chardev *chr,
-                                   bool *be_opened,
-                                   Error **errp)
- {
--    qemu_chr_open_win_file(chr, GetStdHandle(STD_OUTPUT_HANDLE));
-+    win_chr_set_file(chr, GetStdHandle(STD_OUTPUT_HANDLE), true);
- }
+-#include "sysemu/char.h"
+ #include "qemu/error-report.h"
+ #include "qemu/range.h"
+ #include "sysemu/xen-mapcache.h"
+diff --git a/hw/mips/mips_fulong2e.c b/hw/mips/mips_fulong2e.c
+index e636c3abaa..dbe2805acb 100644
+--- a/hw/mips/mips_fulong2e.c
++++ b/hw/mips/mips_fulong2e.c
+@@ -32,7 +32,6 @@
+ #include "hw/mips/mips.h"
+ #include "hw/mips/cpudevs.h"
+ #include "hw/pci/pci.h"
+-#include "sysemu/char.h"
+ #include "sysemu/sysemu.h"
+ #include "audio/audio.h"
+ #include "qemu/log.h"
+diff --git a/hw/mips/mips_malta.c b/hw/mips/mips_malta.c
+index 7814c39654..95cdabb2dd 100644
+--- a/hw/mips/mips_malta.c
++++ b/hw/mips/mips_malta.c
+@@ -37,7 +37,6 @@
+ #include "hw/mips/mips.h"
+ #include "hw/mips/cpudevs.h"
+ #include "hw/pci/pci.h"
+-#include "sysemu/char.h"
+ #include "sysemu/sysemu.h"
+ #include "sysemu/arch_init.h"
+ #include "qemu/log.h"
+diff --git a/hw/net/xgmac.c b/hw/net/xgmac.c
+index 46b1aa17fa..0843bf185c 100644
+--- a/hw/net/xgmac.c
++++ b/hw/net/xgmac.c
+@@ -26,7 +26,6 @@
 =20
- static void char_console_class_init(ObjectClass *oc, void *data)
-diff --git a/chardev/char-file.c b/chardev/char-file.c
-index 8bae25350d..aed4ae1569 100644
---- a/chardev/char-file.c
-+++ b/chardev/char-file.c
-@@ -65,7 +65,7 @@ static void qmp_chardev_open_file(Chardev *chr,
-         return;
-     }
+ #include "qemu/osdep.h"
+ #include "hw/sysbus.h"
+-#include "sysemu/char.h"
+ #include "qemu/log.h"
+ #include "net/net.h"
+ #include "net/checksum.h"
+diff --git a/hw/ppc/spapr_events.c b/hw/ppc/spapr_events.c
+index 73e2a1884f..57acd85a87 100644
+--- a/hw/ppc/spapr_events.c
++++ b/hw/ppc/spapr_events.c
+@@ -28,7 +28,6 @@
+ #include "qapi/error.h"
+ #include "cpu.h"
+ #include "sysemu/sysemu.h"
+-#include "sysemu/char.h"
+ #include "hw/qdev.h"
+ #include "sysemu/device_tree.h"
 =20
--    qemu_chr_open_win_file(chr, out);
-+    win_chr_set_file(chr, out, false);
- #else
-     int flags, in =3D -1, out;
+diff --git a/hw/ppc/spapr_rtas.c b/hw/ppc/spapr_rtas.c
+index 128d993d04..b666a4c15c 100644
+--- a/hw/ppc/spapr_rtas.c
++++ b/hw/ppc/spapr_rtas.c
+@@ -29,7 +29,6 @@
+ #include "qemu/log.h"
+ #include "qemu/error-report.h"
+ #include "sysemu/sysemu.h"
+-#include "sysemu/char.h"
+ #include "hw/qdev.h"
+ #include "sysemu/device_tree.h"
+ #include "sysemu/cpus.h"
+diff --git a/hw/sparc/leon3.c b/hw/sparc/leon3.c
+index 6e16478413..f415997649 100644
+--- a/hw/sparc/leon3.c
++++ b/hw/sparc/leon3.c
+@@ -28,7 +28,6 @@
+ #include "hw/hw.h"
+ #include "qemu/timer.h"
+ #include "hw/ptimer.h"
+-#include "sysemu/char.h"
+ #include "sysemu/sysemu.h"
+ #include "sysemu/qtest.h"
+ #include "hw/boards.h"
+diff --git a/hw/usb/ccid-card-emulated.c b/hw/usb/ccid-card-emulated.c
+index 99627860a3..e646eb243b 100644
+--- a/hw/usb/ccid-card-emulated.c
++++ b/hw/usb/ccid-card-emulated.c
+@@ -33,7 +33,7 @@
+ #include <vcard_emul.h>
 =20
-diff --git a/chardev/char-win.c b/chardev/char-win.c
-index a7e3296909..ec9a731be9 100644
---- a/chardev/char-win.c
-+++ b/chardev/char-win.c
-@@ -192,17 +192,13 @@ static void char_win_finalize(Object *obj)
-     Chardev *chr =3D CHARDEV(obj);
-     WinChardev *s =3D WIN_CHARDEV(chr);
+ #include "qemu/thread.h"
+-#include "sysemu/char.h"
++#include "qemu/main-loop.h"
+ #include "ccid.h"
 =20
--    if (s->skip_free) {
--        return;
--    }
--
-     if (s->hsend) {
-         CloseHandle(s->hsend);
-     }
-     if (s->hrecv) {
-         CloseHandle(s->hrecv);
-     }
--    if (s->file) {
-+    if (!s->keep_open && s->file) {
-         CloseHandle(s->file);
-     }
-     if (s->fpipe) {
-@@ -214,12 +210,12 @@ static void char_win_finalize(Object *obj)
-     qemu_chr_be_event(chr, CHR_EVENT_CLOSED);
- }
+ #define DPRINTF(card, lvl, fmt, ...) \
+diff --git a/hw/xen/xen_backend.c b/hw/xen/xen_backend.c
+index 3570f37e56..c46cbb0759 100644
+--- a/hw/xen/xen_backend.c
++++ b/hw/xen/xen_backend.c
+@@ -28,7 +28,6 @@
+ #include "hw/hw.h"
+ #include "hw/sysbus.h"
+ #include "hw/boards.h"
+-#include "sysemu/char.h"
+ #include "qemu/log.h"
+ #include "qapi/error.h"
+ #include "hw/xen/xen_backend.h"
+diff --git a/util/event_notifier-posix.c b/util/event_notifier-posix.c
+index acdbe3b483..73c4046b58 100644
+--- a/util/event_notifier-posix.c
++++ b/util/event_notifier-posix.c
+@@ -14,7 +14,6 @@
+ #include "qemu-common.h"
+ #include "qemu/cutils.h"
+ #include "qemu/event_notifier.h"
+-#include "sysemu/char.h"
+ #include "qemu/main-loop.h"
 =20
--void qemu_chr_open_win_file(Chardev *chr, HANDLE fd_out)
-+void win_chr_set_file(Chardev *chr, HANDLE file, bool keep_open)
- {
-     WinChardev *s =3D WIN_CHARDEV(chr);
-=20
--    s->skip_free =3D true;
--    s->file =3D fd_out;
-+    s->keep_open =3D keep_open;
-+    s->file =3D file;
- }
-=20
- static void char_win_class_init(ObjectClass *oc, void *data)
+ #ifdef CONFIG_EVENTFD
 --=20
 2.13.0.91.g00982b8dd
