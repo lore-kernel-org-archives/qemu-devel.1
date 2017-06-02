@@ -1,21 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35317)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35345)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <krzk@kernel.org>) id 1dGpZD-0001He-M3
-	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 12:36:53 -0400
+	(envelope-from <krzk@kernel.org>) id 1dGpZF-0001KM-Mh
+	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 12:36:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <krzk@kernel.org>) id 1dGpZC-0007l1-Iy
-	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 12:36:51 -0400
+	(envelope-from <krzk@kernel.org>) id 1dGpZE-0007mV-JO
+	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 12:36:53 -0400
 From: Krzysztof Kozlowski <krzk@kernel.org>
-Date: Fri,  2 Jun 2017 18:36:14 +0200
-Message-Id: <20170602163618.6369-5-krzk@kernel.org>
+Date: Fri,  2 Jun 2017 18:36:18 +0200
+Message-Id: <20170602163618.6369-9-krzk@kernel.org>
 In-Reply-To: <20170602163618.6369-1-krzk@kernel.org>
 References: <20170602162857.6065-1-krzk@kernel.org>
 	<20170602163618.6369-1-krzk@kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v4 5/9] hw/arm/exynos: Move DRAM initialization
- next boards
+Subject: [Qemu-devel] [PATCH v4 9/9] hw/misc/exynos4210_pmu: Add support for
+ system poweroff
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,187 +24,87 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Igor Mitsyanko <i.mitsyanko@gmail.com>, Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-devel@nongnu.org
 Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Eric Blake <eblake@redhat.com>, Krzysztof Kozlowski <krzk@kernel.org>
 
-Before QOM-ifying the Exynos4 SoC model, move the DRAM initialization
-from exynos4210.c to exynos4_boards.c because DRAM is board specific,
-not SoC.
+On all Exynos-based boards, the system powers down itself by driving
+PS_HOLD signal low - eight bit in PS_HOLD_CONTROL register of PMU.
+Handle writing to respective PMU register to fix power off failure:
+
+    reboot: Power down
+    Unable to poweroff system
+    shutdown: 31 output lines suppressed due to ratelimiting
+    Kernel panic - not syncing: Attempted to kill init! exitcode=0x00000000
+
+    CPU: 0 PID: 1 Comm: shutdown Not tainted 4.11.0-rc8 #846
+    Hardware name: SAMSUNG EXYNOS (Flattened Device Tree)
+    [<c031050c>] (unwind_backtrace) from [<c030ba6c>] (show_stack+0x10/0x14)
+    [<c030ba6c>] (show_stack) from [<c05b2800>] (dump_stack+0x88/0x9c)
+    [<c05b2800>] (dump_stack) from [<c03d3140>] (panic+0xdc/0x268)
+    [<c03d3140>] (panic) from [<c0343614>] (do_exit+0xa90/0xab4)
+    [<c0343614>] (do_exit) from [<c035f2dc>] (SyS_reboot+0x164/0x1d0)
+    [<c035f2dc>] (SyS_reboot) from [<c0307c80>] (ret_fast_syscall+0x0/0x3c)
+
+Additionally the initial value of PS_HOLD has to be changed because
+recent Linux kernel (v4.12-rc1) uses regmap cache for this access.
+When the register is kept at reset value, the kernel will not issue a
+write to it.  Usually the bootloader sets the eight bit of PS_HOLD high
+so mimic its existence here.
 
 Signed-off-by: Krzysztof Kozlowski <krzk@kernel.org>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- hw/arm/exynos4210.c         | 20 +-----------------
- hw/arm/exynos4_boards.c     | 50 ++++++++++++++++++++++++++++++++++++++-=
-------
- include/hw/arm/exynos4210.h |  5 +----
- 3 files changed, 45 insertions(+), 30 deletions(-)
+ hw/misc/exynos4210_pmu.c | 20 +++++++++++++++++++-
+ 1 file changed, 19 insertions(+), 1 deletion(-)
 
-diff --git a/hw/arm/exynos4210.c b/hw/arm/exynos4210.c
-index 960f27e45a36..0da877f8db0a 100644
---- a/hw/arm/exynos4210.c
-+++ b/hw/arm/exynos4210.c
-@@ -160,13 +160,11 @@ static uint64_t exynos4210_calc_affinity(int cpu)
-     return mp_affinity;
- }
-=20
--Exynos4210State *exynos4210_init(MemoryRegion *system_mem,
--        unsigned long ram_size)
-+Exynos4210State *exynos4210_init(MemoryRegion *system_mem)
- {
-     int i, n;
-     Exynos4210State *s =3D g_new(Exynos4210State, 1);
-     qemu_irq gate_irq[EXYNOS4210_NCPUS][EXYNOS4210_IRQ_GATE_NINPUTS];
--    unsigned long mem_size;
-     DeviceState *dev;
-     SysBusDevice *busdev;
-     ObjectClass *cpu_oc;
-@@ -299,22 +297,6 @@ Exynos4210State *exynos4210_init(MemoryRegion *syste=
-m_mem,
-     memory_region_add_subregion(system_mem, EXYNOS4210_IRAM_BASE_ADDR,
-                                 &s->iram_mem);
-=20
--    /* DRAM */
--    mem_size =3D ram_size;
--    if (mem_size > EXYNOS4210_DRAM_MAX_SIZE) {
--        memory_region_init_ram(&s->dram1_mem, NULL, "exynos4210.dram1",
--                mem_size - EXYNOS4210_DRAM_MAX_SIZE, &error_fatal);
--        vmstate_register_ram_global(&s->dram1_mem);
--        memory_region_add_subregion(system_mem, EXYNOS4210_DRAM1_BASE_AD=
-DR,
--                &s->dram1_mem);
--        mem_size =3D EXYNOS4210_DRAM_MAX_SIZE;
--    }
--    memory_region_init_ram(&s->dram0_mem, NULL, "exynos4210.dram0", mem_=
-size,
--                           &error_fatal);
--    vmstate_register_ram_global(&s->dram0_mem);
--    memory_region_add_subregion(system_mem, EXYNOS4210_DRAM0_BASE_ADDR,
--            &s->dram0_mem);
--
-    /* PMU.
-     * The only reason of existence at the moment is that secondary CPU b=
-oot
-     * loader uses PMU INFORM5 register as a holding pen.
-diff --git a/hw/arm/exynos4_boards.c b/hw/arm/exynos4_boards.c
-index 4853c318023c..6240b26839cd 100644
---- a/hw/arm/exynos4_boards.c
-+++ b/hw/arm/exynos4_boards.c
-@@ -22,6 +22,7 @@
-  */
-=20
+diff --git a/hw/misc/exynos4210_pmu.c b/hw/misc/exynos4210_pmu.c
+index 63a8ccd35559..0d7b64c5b3a3 100644
+--- a/hw/misc/exynos4210_pmu.c
++++ b/hw/misc/exynos4210_pmu.c
+@@ -26,6 +26,7 @@
+ 
  #include "qemu/osdep.h"
-+#include "qapi/error.h"
- #include "qemu/error-report.h"
- #include "qemu-common.h"
- #include "cpu.h"
-@@ -56,6 +57,12 @@ typedef enum Exynos4BoardType {
-     EXYNOS4_NUM_OF_BOARDS
- } Exynos4BoardType;
-=20
-+typedef struct Exynos4BoardState {
-+    Exynos4210State *soc;
-+    MemoryRegion dram0_mem;
-+    MemoryRegion dram1_mem;
-+} Exynos4BoardState;
-+
- static int exynos4_board_id[EXYNOS4_NUM_OF_BOARDS] =3D {
-     [EXYNOS4_BOARD_NURI]     =3D 0xD33,
-     [EXYNOS4_BOARD_SMDKC210] =3D 0xB16,
-@@ -96,9 +103,34 @@ static void lan9215_init(uint32_t base, qemu_irq irq)
-     }
- }
-=20
--static Exynos4210State *exynos4_boards_init_common(MachineState *machine=
-,
--                                                   Exynos4BoardType boar=
-d_type)
-+static void exynos4_boards_init_ram(Exynos4BoardState *s,
-+                                    MemoryRegion *system_mem,
-+                                    unsigned long ram_size)
+ #include "hw/sysbus.h"
++#include "sysemu/sysemu.h"
+ 
+ #ifndef DEBUG_PMU
+ #define DEBUG_PMU           0
+@@ -350,7 +351,11 @@ static const Exynos4210PmuReg exynos4210_pmu_regs[] = {
+     {"PAD_RETENTION_MMCB_OPTION", PAD_RETENTION_MMCB_OPTION, 0x00000000},
+     {"PAD_RETENTION_EBIA_OPTION", PAD_RETENTION_EBIA_OPTION, 0x00000000},
+     {"PAD_RETENTION_EBIB_OPTION", PAD_RETENTION_EBIB_OPTION, 0x00000000},
+-    {"PS_HOLD_CONTROL", PS_HOLD_CONTROL, 0x00005200},
++    /*
++     * PS_HOLD_CONTROL: reset value and manually toggle high the DATA bit.
++     * DATA bit high, set usually by bootloader, keeps system on.
++     */
++    {"PS_HOLD_CONTROL", PS_HOLD_CONTROL, 0x00005200 | BIT(8)},
+     {"XUSBXTI_CONFIGURATION", XUSBXTI_CONFIGURATION, 0x00000001},
+     {"XUSBXTI_STATUS", XUSBXTI_STATUS, 0x00000001},
+     {"XUSBXTI_DURATION", XUSBXTI_DURATION, 0xFFF00000},
+@@ -397,6 +402,12 @@ typedef struct Exynos4210PmuState {
+     uint32_t reg[PMU_NUM_OF_REGISTERS];
+ } Exynos4210PmuState;
+ 
++static void exynos4210_pmu_poweroff(void)
 +{
-+    unsigned long mem_size =3D ram_size;
-+
-+    if (mem_size > EXYNOS4210_DRAM_MAX_SIZE) {
-+        memory_region_init_ram(&s->dram1_mem, NULL, "exynos4210.dram1",
-+                               mem_size - EXYNOS4210_DRAM_MAX_SIZE,
-+                               &error_fatal);
-+        vmstate_register_ram_global(&s->dram1_mem);
-+        memory_region_add_subregion(system_mem, EXYNOS4210_DRAM1_BASE_AD=
-DR,
-+                                    &s->dram1_mem);
-+        mem_size =3D EXYNOS4210_DRAM_MAX_SIZE;
-+    }
-+
-+    memory_region_init_ram(&s->dram0_mem, NULL, "exynos4210.dram0", mem_=
-size,
-+                           &error_fatal);
-+    vmstate_register_ram_global(&s->dram0_mem);
-+    memory_region_add_subregion(system_mem, EXYNOS4210_DRAM0_BASE_ADDR,
-+                                &s->dram0_mem);
++    PRINT_DEBUG("QEMU PMU: PS_HOLD bit down, powering off\n");
++    qemu_system_shutdown_request(SHUTDOWN_CAUSE_GUEST_SHUTDOWN);
 +}
 +
-+static Exynos4BoardState *
-+exynos4_boards_init_common(MachineState *machine,
-+                           Exynos4BoardType board_type)
+ static uint64_t exynos4210_pmu_read(void *opaque, hwaddr offset,
+                                     unsigned size)
  {
-+    Exynos4BoardState *s =3D g_new(Exynos4BoardState, 1);
-     MachineClass *mc =3D MACHINE_GET_CLASS(machine);
-=20
-     if (smp_cpus !=3D EXYNOS4210_NCPUS && !qtest_enabled()) {
-@@ -127,8 +159,12 @@ static Exynos4210State *exynos4_boards_init_common(M=
-achineState *machine,
-             machine->kernel_cmdline,
-             machine->initrd_filename);
-=20
--    return exynos4210_init(get_system_memory(),
--            exynos4_board_ram_size[board_type]);
-+    exynos4_boards_init_ram(s, get_system_memory(),
-+                            exynos4_board_ram_size[board_type]);
-+
-+    s->soc =3D exynos4210_init(get_system_memory());
-+
-+    return s;
- }
-=20
- static void nuri_init(MachineState *machine)
-@@ -140,11 +176,11 @@ static void nuri_init(MachineState *machine)
-=20
- static void smdkc210_init(MachineState *machine)
- {
--    Exynos4210State *s =3D exynos4_boards_init_common(machine,
--                                                    EXYNOS4_BOARD_SMDKC2=
-10);
-+    Exynos4BoardState *s =3D exynos4_boards_init_common(machine,
-+                                                      EXYNOS4_BOARD_SMDK=
-C210);
-=20
-     lan9215_init(SMDK_LAN9118_BASE_ADDR,
--            qemu_irq_invert(s->irq_table[exynos4210_get_irq(37, 1)]));
-+            qemu_irq_invert(s->soc->irq_table[exynos4210_get_irq(37, 1)]=
-));
-     arm_load_kernel(ARM_CPU(first_cpu), &exynos4_board_binfo);
- }
-=20
-diff --git a/include/hw/arm/exynos4210.h b/include/hw/arm/exynos4210.h
-index d9e08014d6ff..098a69ec73d3 100644
---- a/include/hw/arm/exynos4210.h
-+++ b/include/hw/arm/exynos4210.h
-@@ -93,8 +93,6 @@ typedef struct Exynos4210State {
-     MemoryRegion iram_mem;
-     MemoryRegion irom_mem;
-     MemoryRegion irom_alias_mem;
--    MemoryRegion dram0_mem;
--    MemoryRegion dram1_mem;
-     MemoryRegion boot_secondary;
-     MemoryRegion bootreg_mem;
-     I2CBus *i2c_if[EXYNOS4210_I2C_NUMBER];
-@@ -103,8 +101,7 @@ typedef struct Exynos4210State {
- void exynos4210_write_secondary(ARMCPU *cpu,
-         const struct arm_boot_info *info);
-=20
--Exynos4210State *exynos4210_init(MemoryRegion *system_mem,
--        unsigned long ram_size);
-+Exynos4210State *exynos4210_init(MemoryRegion *system_mem);
-=20
- /* Initialize exynos4210 IRQ subsystem stub */
- qemu_irq *exynos4210_init_irq(Exynos4210Irq *env);
---=20
+@@ -428,6 +439,13 @@ static void exynos4210_pmu_write(void *opaque, hwaddr offset,
+             PRINT_DEBUG_EXTEND("%s <0x%04x> <- 0x%04x\n", reg_p->name,
+                     (uint32_t)offset, (uint32_t)val);
+             s->reg[i] = val;
++            if ((offset == PS_HOLD_CONTROL) && ((val & BIT(8)) == 0)) {
++                /*
++                 * We are interested only in setting data bit
++                 * of PS_HOLD_CONTROL register to indicate power off request.
++                 */
++                exynos4210_pmu_poweroff();
++            }
+             return;
+         }
+         reg_p++;
+-- 
 2.9.3
