@@ -1,28 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49736)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51074)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1dGjO3-0008Q0-2K
-	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 06:00:56 -0400
+	(envelope-from <groug@kaod.org>) id 1dGjWl-0002aq-4l
+	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 06:09:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1dGjO0-000405-2v
-	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 06:00:55 -0400
-Received: from mailhub.sw.ru ([195.214.232.25]:15074 helo=relay.sw.ru)
+	(envelope-from <groug@kaod.org>) id 1dGjWg-0006iX-5n
+	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 06:09:55 -0400
+Received: from 2.mo5.mail-out.ovh.net ([178.33.109.111]:44693)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
-	id 1dGjNz-0003zJ-N3
-	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 06:00:52 -0400
-References: <20170530143052.165002-1-vsementsov@virtuozzo.com>
-	<20170530143052.165002-14-vsementsov@virtuozzo.com>
-	<6795a44e-a0c4-2c09-390b-af07f675363b@redhat.com>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <9f30e34f-2420-b909-a4c9-594b951b0c11@virtuozzo.com>
-Date: Fri, 2 Jun 2017 13:00:48 +0300
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1dGjWf-0006i2-Va
+	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 06:09:50 -0400
+Received: from player760.ha.ovh.net (b6.ovh.net [213.186.33.56])
+	by mo5.mail-out.ovh.net (Postfix) with ESMTP id 7396D101064
+	for <qemu-devel@nongnu.org>; Fri,  2 Jun 2017 12:09:48 +0200 (CEST)
+From: Greg Kurz <groug@kaod.org>
+Date: Fri, 02 Jun 2017 12:09:35 +0200
+Message-ID: <149639817593.15167.7338592152743589651.stgit@bahia.lan>
 MIME-Version: 1.0
-In-Reply-To: <6795a44e-a0c4-2c09-390b-af07f675363b@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH 13/19] nbd/server: return original error
- codes
+Subject: [Qemu-devel] [PATCH] spapr/drc: don't migrate DRC of cold-plugged
+ CPUs and LMBs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,61 +28,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
-Cc: pbonzini@redhat.com, den@openvz.org
+To: qemu-devel@nongnu.org
+Cc: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>, qemu-ppc@nongnu.org, Michael Roth <mdroth@linux.vnet.ibm.com>, David Gibson <david@gibson.dropbear.id.au>
 
-02.06.2017 01:29, Eric Blake wrote:
-> On 05/30/2017 09:30 AM, Vladimir Sementsov-Ogievskiy wrote:
->> The code in many cases return -EINVAL or -EIO instead of original error
->> code from, for example, write_sync(). Following patch will need EPIPE
->> handling, so, let's refactor this where possible (the only exclusion
->> is nbd_co_receive_request, with own return-code convention)
-> Do we still want/need EPIPE handling, given the discussion on the
-> previous two patches?
+As explained in commit 5c0139a8c2f0 ("spapr: fix default DRC state for
+coldplugged LMBs"), guests expect cold-plugged LMBs to be pre-allocated
+and unisolated. The same goes for cold-plugged CPUs.
 
-Looks like this patch should be dropped. If EPIPE is not accepted 
-(previous discussion), so error code is always EIO, no needs to save it 
-into a variable..
+While here, let's convert g_assert(false) to the better self documenting
+g_assert_not_reached().
 
->
->> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
->> ---
->>   nbd/server.c | 124 +++++++++++++++++++++++++++++++++++++----------------------
->>   1 file changed, 77 insertions(+), 47 deletions(-)
->>
-> Feels weird to have a net gain in code, but maybe worthwhile.
->
->> diff --git a/nbd/server.c b/nbd/server.c
->> index a47f13e4fb..30dfb81a5c 100644
->> --- a/nbd/server.c
->> +++ b/nbd/server.c
->> @@ -136,30 +136,38 @@ static void nbd_client_receive_next_request(NBDClient *client);
->>   static int nbd_negotiate_send_rep_len(QIOChannel *ioc, uint32_t type,
->>                                         uint32_t opt, uint32_t len)
->>   {
->> +    int ret;
->>       uint64_t magic;
->>   
->>       TRACE("Reply opt=%" PRIx32 " type=%" PRIx32 " len=%" PRIu32,
->>             type, opt, len);
->>   
->>       magic = cpu_to_be64(NBD_REP_MAGIC);
->> -    if (write_sync(ioc, &magic, sizeof(magic), NULL) < 0) {
->> +    ret = write_sync(ioc, &magic, sizeof(magic), NULL);
->> +    if (ret < 0) {
->>           LOG("write failed (rep magic)");
->> -        return -EINVAL;
->> +        return ret;
->>       }
-> Constructs like this should get shorter once we plumb errp all the way
-> through.  Okay, I can live with the temporary verbosity.
->
-> You may still have to make changes due to rebasing (in which case I'll
-> definitely want to review again); but if this patch doesn't need further
-> rework, you can add:
-> Reviewed-by: Eric Blake <eblake@redhat.com>
->
+Signed-off-by: Greg Kurz <groug@kaod.org>
+---
 
--- 
-Best regards,
-Vladimir
+FWIW
+
+$ git grep -i -E '(g_)?assert\((0|false)\)' | wc -l
+100
+$ git grep g_assert_not_reached | wc -l
+244
+---
+ hw/ppc/spapr_drc.c |   10 +++-------
+ 1 file changed, 3 insertions(+), 7 deletions(-)
+
+diff --git a/hw/ppc/spapr_drc.c b/hw/ppc/spapr_drc.c
+index cc2400bcd57f..ab5f7cdf569c 100644
+--- a/hw/ppc/spapr_drc.c
++++ b/hw/ppc/spapr_drc.c
+@@ -538,20 +538,16 @@ static bool spapr_drc_needed(void *opaque)
+      */
+     switch (drc->type) {
+     case SPAPR_DR_CONNECTOR_TYPE_PCI:
+-        rc = !((drc->isolation_state == SPAPR_DR_ISOLATION_STATE_UNISOLATED) &&
+-               (drc->allocation_state == SPAPR_DR_ALLOCATION_STATE_USABLE) &&
+-               drc->configured && drc->signalled && !drc->awaiting_release);
+-        break;
+     case SPAPR_DR_CONNECTOR_TYPE_CPU:
+     case SPAPR_DR_CONNECTOR_TYPE_LMB:
+-        rc = !((drc->isolation_state == SPAPR_DR_ISOLATION_STATE_ISOLATED) &&
+-               (drc->allocation_state == SPAPR_DR_ALLOCATION_STATE_UNUSABLE) &&
++        rc = !((drc->isolation_state == SPAPR_DR_ISOLATION_STATE_UNISOLATED) &&
++               (drc->allocation_state == SPAPR_DR_ALLOCATION_STATE_USABLE) &&
+                drc->configured && drc->signalled && !drc->awaiting_release);
+         break;
+     case SPAPR_DR_CONNECTOR_TYPE_PHB:
+     case SPAPR_DR_CONNECTOR_TYPE_VIO:
+     default:
+-        g_assert(false);
++        g_assert_not_reached();
+     }
+     return rc;
+ }
