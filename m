@@ -1,14 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52253)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52306)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dGd3V-0006yJ-60
-	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 23:15:18 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1dGd3X-0006yy-Mv
+	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 23:15:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dGd3T-0002Ds-Sv
-	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 23:15:17 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1dGd3T-0002DG-LZ
+	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 23:15:19 -0400
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Fri,  2 Jun 2017 13:15:03 +1000
-Message-Id: <20170602031507.29881-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [PATCHv5 0/4] Clean up compatibility mode handling
+Date: Fri,  2 Jun 2017 13:15:06 +1000
+Message-Id: <20170602031507.29881-4-david@gibson.dropbear.id.au>
+In-Reply-To: <20170602031507.29881-1-david@gibson.dropbear.id.au>
+References: <20170602031507.29881-1-david@gibson.dropbear.id.au>
+Subject: [Qemu-devel] [PATCHv5 3/4] pseries: Reset CPU compatibility mode
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,148 +22,58 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: groug@kaod.org, clg@kaod.org, mdroth@linux.vnet.ibm.com, sursingh@redhat.com, bharata@linux.vnet.ibm.com, nikunj@linux.vnet.ibm.com
 Cc: abologna@redhat.com, sbobroff@redhat.com, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
 
-This is a rebased and revised version of my patches revising CPU
-compatiblity mode handling on ppc, last posted in November.  Since
-then, many of the patches have already been merged (some for 2.9, some
-since).  This is what's left.
+Currently, the CPU compatibility mode is set when the cpu is initialized,
+then again when the guest negotiates features.  This means if a guest
+negotiates a compatibility mode, then reboots, that compatibility mode
+will be retained across the reset.
 
- * There was conceptual confusion about what a compatibility mode
-   means, and how it interacts with the machine type.  This cleans
-   that up, clarifying that a compatibility mode (as an externally set
-   option) only makes sense on machine types that don't permit the
-   guest hypervisor privilege (i.e. 'pseries')
+Usually that will get overridden when features are negotiated on the next
+boot, but it's still not really correct.  This patch moves the initial set
+up of the compatibility mode from cpu init to reset time.  The mode *is*
+retained if the reboot was caused by the feature negotiation (it might
+be important in that case, though it's unlikely).
 
- * It was previously the user's (or management layer's) responsibility
-   to determine compatibility of CPUs on either end for migration.
-   This uses the compatibility modes to check that properly during an
-   incoming migration.
+Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+Reviewed-by: Alexey Kardashevskiy <aik@ozlabs.ru>
+Reviewed-by: Michael Roth <mdroth@linux.vnet.ibm.com>
+---
+ hw/ppc/spapr.c          |  2 ++
+ hw/ppc/spapr_cpu_core.c | 10 ----------
+ 2 files changed, 2 insertions(+), 10 deletions(-)
 
-This hasn't been extensively tested yet.  There are quite a few
-migration cases to consider, for example:
-
-Basic:
-
-1) Boot guest with -cpu host
-        Should go into POWER8 compat mode after CAS
-        Previously would have been raw mode
-
-2) Boot guest with -machine pseries,max-cpu-compat=power7 -cpu host
-        Should go into POWER7 compat mode
-
-3) Boot guest with -cpu host,compat=power7
-        Should act as (2), but print a warning
-
-4) Boot guest via libvirt with power7 compat mode specified in XML
-        Should act as (3), (2) once we fix libvirt
-
-5) Hack guest to only advertise power7 compatibility, boot with -cpu host
-        Should go into POWER7 compat mode after CAS
-
-6) Hack guest to only advertise real PVRs
-        Should remain in POWER8 raw mode after CAS
-
-7) Hack guest to only advertise real PVRs
-   Boot with -machine pseries,max-cpu-compat=power8
-        Should fail at CAS time
-
-8) Hack guest to only advertise power7 compatibility, boot with -cpu host
-   Reboot to normal guest
-        Should go to power7 compat mode after CAS of boot 1
-        Should revert to raw mode on reboot
-        SHould go to power8 compat mode after CAS of boot 2
-
-Migration:
-
-9) Boot guest with qemu-2.6 -machine pseries-2.6 -cpu host
-   Migrate to qemu-2.8 -machine pseries-2.6 -cpu host
-        Should work, end up running in power8 raw mode
-
-10) Boot guest with qemu-2.7 -machine pseries-2.7 -cpu host
-    Migrate to qemu-2.8 -machine pseries-2.7 -cpu host
-        Should work, end up running in power8 raw mode
-
-11) Boot guest with qemu-2.7 -machine pseries-2.7 -cpu host,compat=power7
-    Migrate to qemu-2.8 -machine pseries-2.7 -cpu host,compat=power7
-        Should work, be running in POWER7 compat after, but give warning like
-        (3)
-
-12) Boot guest with qemu-2.7 -machine pseries-2.7 -cpu host,compat=power7
-    Migrate to qemu-2.8 -machine pseries-2.7,max-cpu-compat=power7 -cpu host
-        Should work, be running in POWER7 compat after, no warning
-
-13) Boot to SLOF with qemu-2.6 -machine pseries-2.6 -cpu host
-    Migrate to qemu-2.8 -machine pseries-2.6 -cpu host
-
-        ?
-
-14) Boot to SLOF with qemu-2.7 -machine pseries-2.7 -cpu host
-    Migrate to qemu-2.8 -machine pseries-2.7 -cpu host
-        ?
-
-15) Boot to SLOF with qemu-2.7 -machine pseries-2.7 -cpu host,compat=power7
-    Migrate to qemu-2.8 -machine pseries-2.7 -cpu host,compat=power7
-        ?
-
-16) Boot to SLOF with qemu-2.7 -machine pseries-2.7 -cpu host,compat=power7
-    Migrate to qemu-2.8 -machine pseries-2.7,max-cpu-compat=power7 -cpu host
-        ?
-
-17) Boot guest with qemu-2.6 -machine pseries-2.6 -cpu host
-    Migrate to qemu-2.7.z -machine pseries-2.6 -cpu host
-        Should work
-
-18) Hack guest to only advertise power7 compatibility, boot with -cpu host
-    Boot with qemu-2.8, migrate to qemu-2.8
-        Should be in power7 compat mode after CAS on source, and still
-        in power7 compat mode on destination
-
-Changes since v4:
-  * Fixed a crash bug in the smp option compatiblity mangling
-  * Removed an unnecessary fallback for missing pvr_match
-  * Some spelling corrections
-  * Migration core patch removed (alread merged to ppc-for-2.10)
-
-Changes since v3:
-  * Backwards compatible -cpu handling now removes compat= option from
-    options passed on to the cpu, so it doesn't trigger further warnings
-  * Add a migration fix make cpu_synchronize_state() safe in post_load
-    handlers, which in turn fixes a bug in 5/5.
-  * A number of bugfixes and other tweaks suggested by feedback on v2.
-
-Changes since RFCv2:
-  * Many patches dropped, since they're already merged
-  * Rebased, fixed conflicts
-  * Restored support for backwards migration (wasn't as complicated as
-    I thought)
-  * Updated final patch's description to more accurately reflect the
-    logic
-
-Changes since RFCv1:
-  * Change CAS logic to prefer compatibility modes over raw mode
-  * Simplified by giving up on half-hearted attempts to maintain
-    backwards migration
-  * Folded migration stream changes into a single patch
-  * Removed some preliminary patches which are already merged
-
-David Gibson (3):
-  pseries: Move CPU compatibility property to machine
-  pseries: Reset CPU compatibility mode
-  ppc: Rework CPU compatibility testing across migration
-
-Greg Kurz (1):
-  qapi: add explicit null to string input and output visitors
-
- hw/ppc/spapr.c               |   8 +++-
- hw/ppc/spapr_cpu_core.c      |  61 +++++++++++++++++++++-----
- hw/ppc/spapr_hcall.c         |   8 ++--
- include/hw/ppc/spapr.h       |  12 +++--
- qapi/string-input-visitor.c  |  11 +++++
- qapi/string-output-visitor.c |  14 ++++++
- target/ppc/compat.c          | 102 +++++++++++++++++++++++++++++++++++++++++++
- target/ppc/cpu.h             |   5 ++-
- target/ppc/machine.c         |  69 +++++++++++++++++++++++++++--
- target/ppc/translate_init.c  |  86 +++++++++++-------------------------
- 10 files changed, 292 insertions(+), 84 deletions(-)
-
+diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+index 3c4e88f..2821b7e 100644
+--- a/hw/ppc/spapr.c
++++ b/hw/ppc/spapr.c
+@@ -1348,6 +1348,8 @@ static void ppc_spapr_reset(void)
+     if (!spapr->cas_reboot) {
+         spapr_ovec_cleanup(spapr->ov5_cas);
+         spapr->ov5_cas = spapr_ovec_new();
++
++        ppc_set_compat_all(spapr->max_compat_pvr, &error_abort);
+     }
+ 
+     fdt = spapr_build_fdt(spapr, rtas_addr, spapr->rtas_size);
+diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
+index 846d9e7..7970871 100644
+--- a/hw/ppc/spapr_cpu_core.c
++++ b/hw/ppc/spapr_cpu_core.c
+@@ -121,16 +121,6 @@ static void spapr_cpu_init(sPAPRMachineState *spapr, PowerPCCPU *cpu,
+     /* Enable PAPR mode in TCG or KVM */
+     cpu_ppc_set_papr(cpu, PPC_VIRTUAL_HYPERVISOR(spapr));
+ 
+-    if (spapr->max_compat_pvr) {
+-        Error *local_err = NULL;
+-
+-        ppc_set_compat(cpu, spapr->max_compat_pvr, &local_err);
+-        if (local_err) {
+-            error_propagate(errp, local_err);
+-            return;
+-        }
+-    }
+-
+     qemu_register_reset(spapr_cpu_reset, cpu);
+     spapr_cpu_reset(cpu);
+ }
 -- 
 2.9.4
