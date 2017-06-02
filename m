@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36071)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36073)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1dGkeh-0006F5-5O
-	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 07:22:13 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1dGkeh-0006F7-5N
+	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 07:22:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1dGked-0005Yp-GM
+	(envelope-from <vsementsov@virtuozzo.com>) id 1dGked-0005Yu-GF
 	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 07:22:11 -0400
-Received: from mailhub.sw.ru ([195.214.232.25]:15350 helo=relay.sw.ru)
+Received: from mailhub.sw.ru ([195.214.232.25]:48900 helo=relay.sw.ru)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
-	id 1dGked-0005WT-4k
+	id 1dGked-0005Wb-3m
 	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 07:22:07 -0400
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Fri,  2 Jun 2017 14:21:34 +0300
-Message-Id: <20170602112158.232757-7-vsementsov@virtuozzo.com>
+Date: Fri,  2 Jun 2017 14:21:33 +0300
+Message-Id: <20170602112158.232757-6-vsementsov@virtuozzo.com>
 In-Reply-To: <20170602112158.232757-1-vsementsov@virtuozzo.com>
 References: <20170602112158.232757-1-vsementsov@virtuozzo.com>
-Subject: [Qemu-devel] [PATCH v20 06/30] block/dirty-bitmap: add
- deserialize_ones func
+Subject: [Qemu-devel] [PATCH v20 05/30] block: fix
+ bdrv_dirty_bitmap_granularity signature
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,105 +28,43 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org, qemu-devel@nongnu.org
 Cc: kwolf@redhat.com, mreitz@redhat.com, armbru@redhat.com, eblake@redhat.com, jsnow@redhat.com, famz@redhat.com, den@openvz.org, stefanha@redhat.com, vsementsov@virtuozzo.com, pbonzini@redhat.com
 
-Add bdrv_dirty_bitmap_deserialize_ones() function, which is needed for
-qcow2 bitmap loading, to handle unallocated bitmap parts, marked as
-all-ones.
+Make getter signature const-correct. This allows other functions with
+const dirty bitmap parameter use bdrv_dirty_bitmap_granularity().
 
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Reviewed-by: Kevin Wolf <kwolf@redhat.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
 Reviewed-by: John Snow <jsnow@redhat.com>
+Reviewed-by: Kevin Wolf <kwolf@redhat.com>
 ---
- block/dirty-bitmap.c         |  7 +++++++
- include/block/dirty-bitmap.h |  3 +++
- include/qemu/hbitmap.h       | 15 +++++++++++++++
- util/hbitmap.c               | 17 +++++++++++++++++
- 4 files changed, 42 insertions(+)
+ block/dirty-bitmap.c         | 2 +-
+ include/block/dirty-bitmap.h | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/block/dirty-bitmap.c b/block/dirty-bitmap.c
-index 186941cfc3..90af37287f 100644
+index 519737c8d3..186941cfc3 100644
 --- a/block/dirty-bitmap.c
 +++ b/block/dirty-bitmap.c
-@@ -499,6 +499,13 @@ void bdrv_dirty_bitmap_deserialize_zeroes(BdrvDirtyBitmap *bitmap,
-     hbitmap_deserialize_zeroes(bitmap->bitmap, start, count, finish);
+@@ -388,7 +388,7 @@ uint32_t bdrv_get_default_bitmap_granularity(BlockDriverState *bs)
+     return granularity;
  }
  
-+void bdrv_dirty_bitmap_deserialize_ones(BdrvDirtyBitmap *bitmap,
-+                                        uint64_t start, uint64_t count,
-+                                        bool finish)
-+{
-+    hbitmap_deserialize_ones(bitmap->bitmap, start, count, finish);
-+}
-+
- void bdrv_dirty_bitmap_deserialize_finish(BdrvDirtyBitmap *bitmap)
+-uint32_t bdrv_dirty_bitmap_granularity(BdrvDirtyBitmap *bitmap)
++uint32_t bdrv_dirty_bitmap_granularity(const BdrvDirtyBitmap *bitmap)
  {
-     hbitmap_deserialize_finish(bitmap->bitmap);
+     return BDRV_SECTOR_SIZE << hbitmap_granularity(bitmap->bitmap);
+ }
 diff --git a/include/block/dirty-bitmap.h b/include/block/dirty-bitmap.h
-index 7cbe623ba7..1e17729ac2 100644
+index 9dea14ba03..7cbe623ba7 100644
 --- a/include/block/dirty-bitmap.h
 +++ b/include/block/dirty-bitmap.h
-@@ -70,6 +70,9 @@ void bdrv_dirty_bitmap_deserialize_part(BdrvDirtyBitmap *bitmap,
- void bdrv_dirty_bitmap_deserialize_zeroes(BdrvDirtyBitmap *bitmap,
-                                           uint64_t start, uint64_t count,
-                                           bool finish);
-+void bdrv_dirty_bitmap_deserialize_ones(BdrvDirtyBitmap *bitmap,
-+                                        uint64_t start, uint64_t count,
-+                                        bool finish);
- void bdrv_dirty_bitmap_deserialize_finish(BdrvDirtyBitmap *bitmap);
- 
- #endif
-diff --git a/include/qemu/hbitmap.h b/include/qemu/hbitmap.h
-index 6b04391266..b52304ac29 100644
---- a/include/qemu/hbitmap.h
-+++ b/include/qemu/hbitmap.h
-@@ -229,6 +229,21 @@ void hbitmap_deserialize_zeroes(HBitmap *hb, uint64_t start, uint64_t count,
-                                 bool finish);
- 
- /**
-+ * hbitmap_deserialize_ones
-+ * @hb: HBitmap to operate on.
-+ * @start: First bit to restore.
-+ * @count: Number of bits to restore.
-+ * @finish: Whether to call hbitmap_deserialize_finish automatically.
-+ *
-+ * Fills the bitmap with ones.
-+ *
-+ * If @finish is false, caller must call hbitmap_serialize_finish before using
-+ * the bitmap.
-+ */
-+void hbitmap_deserialize_ones(HBitmap *hb, uint64_t start, uint64_t count,
-+                              bool finish);
-+
-+/**
-  * hbitmap_deserialize_finish
-  * @hb: HBitmap to operate on.
-  *
-diff --git a/util/hbitmap.c b/util/hbitmap.c
-index 0b38817505..0c1591a594 100644
---- a/util/hbitmap.c
-+++ b/util/hbitmap.c
-@@ -551,6 +551,23 @@ void hbitmap_deserialize_zeroes(HBitmap *hb, uint64_t start, uint64_t count,
-     }
- }
- 
-+void hbitmap_deserialize_ones(HBitmap *hb, uint64_t start, uint64_t count,
-+                              bool finish)
-+{
-+    uint64_t el_count;
-+    unsigned long *first;
-+
-+    if (!count) {
-+        return;
-+    }
-+    serialization_chunk(hb, start, count, &first, &el_count);
-+
-+    memset(first, 0xff, el_count * sizeof(unsigned long));
-+    if (finish) {
-+        hbitmap_deserialize_finish(hb);
-+    }
-+}
-+
- void hbitmap_deserialize_finish(HBitmap *bitmap)
- {
-     int64_t i, size, prev_size;
+@@ -29,7 +29,7 @@ void bdrv_disable_dirty_bitmap(BdrvDirtyBitmap *bitmap);
+ void bdrv_enable_dirty_bitmap(BdrvDirtyBitmap *bitmap);
+ BlockDirtyInfoList *bdrv_query_dirty_bitmaps(BlockDriverState *bs);
+ uint32_t bdrv_get_default_bitmap_granularity(BlockDriverState *bs);
+-uint32_t bdrv_dirty_bitmap_granularity(BdrvDirtyBitmap *bitmap);
++uint32_t bdrv_dirty_bitmap_granularity(const BdrvDirtyBitmap *bitmap);
+ uint32_t bdrv_dirty_bitmap_meta_granularity(BdrvDirtyBitmap *bitmap);
+ bool bdrv_dirty_bitmap_enabled(BdrvDirtyBitmap *bitmap);
+ bool bdrv_dirty_bitmap_frozen(BdrvDirtyBitmap *bitmap);
 -- 
 2.11.1
