@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40119)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40132)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dGrlB-0002Ku-C9
-	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 14:57:22 -0400
+	id 1dGrlD-0002NF-Gc
+	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 14:57:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dGrlA-0006SW-Oj
-	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 14:57:21 -0400
-Received: from mail-oi0-x242.google.com ([2607:f8b0:4003:c06::242]:33788)
+	id 1dGrlC-0006Uk-Kb
+	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 14:57:23 -0400
+Received: from mail-oi0-x233.google.com ([2607:f8b0:4003:c06::233]:36513)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dGrlA-0006SB-KD
-	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 14:57:20 -0400
-Received: by mail-oi0-x242.google.com with SMTP id h4so13124996oib.0
-	for <qemu-devel@nongnu.org>; Fri, 02 Jun 2017 11:57:20 -0700 (PDT)
+	id 1dGrlC-0006Tv-Em
+	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 14:57:22 -0400
+Received: by mail-oi0-x233.google.com with SMTP id h4so102681289oib.3
+	for <qemu-devel@nongnu.org>; Fri, 02 Jun 2017 11:57:22 -0700 (PDT)
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Fri,  2 Jun 2017 15:56:23 -0300
-Message-Id: <20170602185630.5059-18-f4bug@amsat.org>
+Date: Fri,  2 Jun 2017 15:56:24 -0300
+Message-Id: <20170602185630.5059-19-f4bug@amsat.org>
 In-Reply-To: <20170602185630.5059-1-f4bug@amsat.org>
 References: <20170602185630.5059-1-f4bug@amsat.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v5 17/24] shippable: build using all available
- cpus
+Subject: [Qemu-devel] [PATCH v5 18/24] shippable: do not initialize
+ submodules automatically
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,26 +37,58 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Fam Zheng <famz@redhat.com>
 Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 
-As of this commit:
+instead do it in the 'ci' target when needed.
 
-$ echo "container proc:" `getconf _NPROCESSORS_ONLN` `getconf _NPROCESSORS_CONF`
-container proc: 2 2
+for mips64el-softmmu target:
+use dtc submodule if distrib packages are too old.
+
+example with outdated libfdt on mips64el-softmmu target (required is >= 1.4.2):
+ # dpkg-query --showformat='${Version}\n' --show libfdt-dev
+ 1.4.0+dfsg-1
+
+shippable output:
+----------------
+  LINK    mips64el-softmmu/qemu-system-mips64el
+../hw/core/loader-fit.o: In function `load_fit':
+/root/src/github.com/philmd/qemu/hw/core/loader-fit.c:278: undefined reference to `fdt_first_subnode'
+/root/src/github.com/philmd/qemu/hw/core/loader-fit.c:286: undefined reference to `fdt_next_subnode'
+/root/src/github.com/philmd/qemu/hw/core/loader-fit.c:277: undefined reference to `fdt_first_subnode'
+collect2: error: ld returned 1 exit status
+Makefile:201: recipe for target 'qemu-system-mips64el' failed
+make[1]: *** [qemu-system-mips64el] Error 1
+Makefile:327: recipe for target 'subdir-mips64el-softmmu' failed
+make: *** [subdir-mips64el-softmmu] Error 2
 
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
 ---
- .shippable.yml | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ .shippable.yml | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
 
 diff --git a/.shippable.yml b/.shippable.yml
-index 231c29b620..1e3ae35dd9 100644
+index 1e3ae35dd9..46adfa030f 100644
 --- a/.shippable.yml
 +++ b/.shippable.yml
-@@ -20,4 +20,4 @@ build:
+@@ -1,4 +1,6 @@
+ language: c
++git:
++   submodules: false
+ env:
+   global:
+     - LC_ALL=C
+@@ -19,5 +21,13 @@ build:
+     options: "-e HOME=/root"
    ci:
      - unset CC
++    # some targets require newer up to date packages, for example TARGET_LIST matching
++    # aarch64*-softmmu|arm*-softmmu|ppc*-softmmu|microblaze*-softmmu|mips64el-softmmu)
++    # see the configure script:
++    #    error_exit "DTC (libfdt) version >= 1.4.2 not present. Your options:"
++    #    "  (1) Preferred: Install the DTC (libfdt) devel package"
++    #    "  (2) Fetch the DTC submodule, using:"
++    #    "      git submodule update --init dtc"
++    - dpkg --compare-versions `dpkg-query --showformat='${Version}' --show libfdt-dev` ge 1.4.2 || git submodule update --init dtc
      - ./configure ${QEMU_CONFIGURE_OPTS} --target-list=${TARGET_LIST}
--    - make -j2
-+    - make -j$(($(getconf _NPROCESSORS_ONLN) + 1))
+     - make -j$(($(getconf _NPROCESSORS_ONLN) + 1))
 -- 
 2.11.0
