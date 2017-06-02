@@ -1,32 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56850)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57003)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dGnfP-0004DE-Lm
-	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 10:35:11 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1dGng1-0004gY-Bn
+	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 10:35:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dGnfK-0003GK-Ma
-	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 10:35:07 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:40000)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1dGnfK-0003CY-HX
-	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 10:35:02 -0400
-References: <20170531220129.27724-1-aurelien@aurel32.net>
-	<20170531220129.27724-31-aurelien@aurel32.net>
-	<ea25b082-923d-6c7d-bca3-b4adbd412419@redhat.com>
-	<781667e0-740c-8e43-d94b-387092eab0e6@redhat.com>
-	<20170601191718.6cftzl5ama4s3es3@aurel32.net>
-	<c3c65598-59ca-c80e-1f8d-340ab19d902f@redhat.com>
-	<207db011-5035-acb3-2032-8408b4ec38e6@redhat.com>
-	<20170602140429.elahcu5olntw7ypi@aurel32.net>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <503b3cb8-4867-62a3-85c8-21a0e6adf88f@redhat.com>
-Date: Fri, 2 Jun 2017 16:34:54 +0200
-MIME-Version: 1.0
-In-Reply-To: <20170602140429.elahcu5olntw7ypi@aurel32.net>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 30/30] target/s390x: update maximum TCG
- model to z800
+	(envelope-from <pm215@archaic.org.uk>) id 1dGng0-0003w8-I5
+	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 10:35:45 -0400
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:37160)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
+	id 1dGng0-0003uW-Ai
+	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 10:35:44 -0400
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri,  2 Jun 2017 15:35:38 +0100
+Message-Id: <1496414138-7622-1-git-send-email-peter.maydell@linaro.org>
+Subject: [Qemu-devel] [PATCH] configure: Define NCURSES_WIDECHAR if we're
+ using curses
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,17 +23,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Aurelien Jarno <aurelien@aurel32.net>, David Hildenbrand <david@redhat.com>
-Cc: qemu-devel@nongnu.org, Alexander Graf <agraf@suse.de>, Richard Henderson <rth@twiddle.net>
+To: qemu-devel@nongnu.org
+Cc: patches@linaro.org, Chad Joan <chadjoan@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Laszlo Ersek <lersek@redhat.com>, =?UTF-8?q?Rainer=20M=C3=BCller?= <raimue@codingfarm.de>
 
-On 02.06.2017 16:04, Aurelien Jarno wrote:
-[...]
-> I understand your point. That said I doubt we will support the SIE
-> instruction soon (it looks quite complicated and I can't find any doc).
+We want the wide character functions from the ncurses header.
+Unfortunately it doesn't provide them by default, but only
+if either:
+ * NCURSES_WIDECHAR is defined (for ncurses 20111030 and up)
+ * _XOPEN_SOURCE/_XOPEN_SOURCE_EXTENDED are suitably defined
 
-There is unfortunately no public documentation for the SIE instruction.
-The only spec that is available is a very old one from the S/370 age:
+So far we have been implicitly relying on the latter, because
+for GNU libc when we define _GNU_SOURCE this causes libc
+to define the _XOPEN_SOURCE macros for us. Unfortunately
+this doesn't work on all libcs, because some (like OSX and
+musl libc) do not define _XOPEN_SOURCE when _GNU_SOURCE
+is defined.
 
-http://bitsavers.trailing-edge.com/pdf/ibm/370/princOps/SA22-7095-0_370-XA_Interpretive_Execution_Jan84.pdf
+We can't fix this by defining _XOPEN_SOURCE ourselves, because
+that also means "and don't provide any functions that aren't in
+that standard", and not all libcs provide any way to override
+that to also get the non-standard functions. In particular
+FreeBSD has no such mechanism, and OSX's _DARWIN_C_SOURCE
+doesn't reenable everything (for instance getpagesize()
+is still not prototyped if _DARWIN_C_SOURCE and _XOPEN_SOURCE
+are both defined).
 
- Thomas
+So we have to define NCURSES_WIDECHAR. (This will only work
+if your ncurses is at least 20111030, as older versions
+don't honour this macro.)
+
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+---
+Testing from the people with musl libc and OSX-with-ncurses
+appreciated, as I don't have any systems which have the bug
+which this patch is attempting to fix...
+
+ configure | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/configure b/configure
+index 0586ec9..6aca5d1 100755
+--- a/configure
++++ b/configure
+@@ -3053,6 +3053,8 @@ int main(void) {
+ EOF
+   IFS=:
+   for curses_inc in $curses_inc_list; do
++    # Make sure we get the wide character prototypes
++    curses_inc="-DNCURSES_WIDECHAR $curses_inc"
+     IFS=:
+     for curses_lib in $curses_lib_list; do
+       unset IFS
+-- 
+2.7.4
