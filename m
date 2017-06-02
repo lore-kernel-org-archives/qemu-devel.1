@@ -1,25 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51074)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51834)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1dGjWl-0002aq-4l
-	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 06:09:56 -0400
+	(envelope-from <pagupta@redhat.com>) id 1dGjap-0003ZO-5y
+	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 06:14:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1dGjWg-0006iX-5n
-	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 06:09:55 -0400
-Received: from 2.mo5.mail-out.ovh.net ([178.33.109.111]:44693)
+	(envelope-from <pagupta@redhat.com>) id 1dGjak-0008V4-6Y
+	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 06:14:07 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:48128)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1dGjWf-0006i2-Va
-	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 06:09:50 -0400
-Received: from player760.ha.ovh.net (b6.ovh.net [213.186.33.56])
-	by mo5.mail-out.ovh.net (Postfix) with ESMTP id 7396D101064
-	for <qemu-devel@nongnu.org>; Fri,  2 Jun 2017 12:09:48 +0200 (CEST)
-From: Greg Kurz <groug@kaod.org>
-Date: Fri, 02 Jun 2017 12:09:35 +0200
-Message-ID: <149639817593.15167.7338592152743589651.stgit@bahia.lan>
+	(Exim 4.71) (envelope-from <pagupta@redhat.com>) id 1dGjaj-0008TP-Te
+	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 06:14:02 -0400
+Date: Fri, 2 Jun 2017 06:13:53 -0400 (EDT)
+From: Pankaj Gupta <pagupta@redhat.com>
+Message-ID: <311628499.16967933.1496398433571.JavaMail.zimbra@redhat.com>
+In-Reply-To: <20170602095424.9064-1-stefanha@redhat.com>
+References: <20170602095424.9064-1-stefanha@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] [PATCH] spapr/drc: don't migrate DRC of cold-plugged
- CPUs and LMBs
+Subject: Re: [Qemu-devel] [PATCH] virtio-serial: fix segfault on disconnect
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,54 +26,96 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>, qemu-ppc@nongnu.org, Michael Roth <mdroth@linux.vnet.ibm.com>, David Gibson <david@gibson.dropbear.id.au>
+To: Stefan Hajnoczi <stefanha@redhat.com>
+Cc: qemu-devel@nongnu.org, lprosek@redhat.com, "Michael S. Tsirkin" <mst@redhat.com>, Amit Shah <amit@kernel.org>
 
-As explained in commit 5c0139a8c2f0 ("spapr: fix default DRC state for
-coldplugged LMBs"), guests expect cold-plugged LMBs to be pre-allocated
-and unisolated. The same goes for cold-plugged CPUs.
 
-While here, let's convert g_assert(false) to the better self documenting
-g_assert_not_reached().
+Hello Stefan,
 
-Signed-off-by: Greg Kurz <groug@kaod.org>
----
+> 
+> Since commit d4c19cdeeb2f1e474bc426a6da261f1d7346eb5b ("virtio-serial:
+> add missing virtio_detach_element() call") the following commands may
+> cause QEMU to segfault:
+> 
+>   $ qemu -M accel=kvm -cpu host -m 1G \
+>          -drive if=virtio,file=test.img,format=raw \
+>          -device virtio-serial-pci,id=virtio-serial0 \
+>          -chardev socket,id=channel1,path=/tmp/chardev.sock,server,nowait \
+>          -device
+>          virtserialport,chardev=channel1,bus=virtio-serial0.0,id=port1
+>   $ nc -U /tmp/chardev.sock
+>   ^C
+> 
+>   (guest)$ cat /dev/zero >/dev/vport0p1
+> 
+> The segfault is non-deterministic: if the event loop notices the socket
+> has been closed then there is no crash.  The disconnect has to happen
+> right before QEMU attempts to write data to the socket.
+> 
+> The backtrace is as follows:
+> 
+>   Thread 1 "qemu-system-x86" received signal SIGSEGV, Segmentation fault.
+>   0x00005555557e0698 in do_flush_queued_data (port=0x5555582cedf0,
+>   vq=0x7fffcc854290, vdev=0x55555807b1d0) at hw/char/virtio-serial-bus.c:180
+>   180           for (i = port->iov_idx; i < port->elem->out_num; i++) {
+>   #1  0x000055555580d363 in virtio_queue_notify_vq (vq=0x7fffcc854290) at
+>   hw/virtio/virtio.c:1524
+>   #2  0x000055555580d363 in virtio_queue_host_notifier_read
+>   (n=0x7fffcc8542f8) at hw/virtio/virtio.c:2430
+>   #3  0x0000555555b3482c in aio_dispatch_handlers
+>   (ctx=ctx@entry=0x5555566b8c80) at util/aio-posix.c:399
+>   #4  0x0000555555b350d8 in aio_dispatch (ctx=0x5555566b8c80) at
+>   util/aio-posix.c:430
+>   #5  0x0000555555b3212e in aio_ctx_dispatch (source=<optimized out>,
+>   callback=<optimized out>, user_data=<optimized out>) at util/async.c:261
+>   #6  0x00007fffde71de52 in g_main_context_dispatch () at
+>   /lib64/libglib-2.0.so.0
+>   #7  0x0000555555b34353 in glib_pollfds_poll () at util/main-loop.c:213
+>   #8  0x0000555555b34353 in os_host_main_loop_wait (timeout=<optimized out>)
+>   at util/main-loop.c:261
+>   #9  0x0000555555b34353 in main_loop_wait (nonblocking=<optimized out>) at
+>   util/main-loop.c:517
+>   #10 0x0000555555773207 in main_loop () at vl.c:1917
+>   #11 0x0000555555773207 in main (argc=<optimized out>, argv=<optimized out>,
+>   envp=<optimized out>) at vl.c:4751
+> 
+> The do_flush_queued_data() function does not anticipate chardev close
+> events during vsc->have_data().  It expects port->elem to remain
+> non-NULL for the duration its for loop.
 
-FWIW
+Just thinking if there is still data to flush, should we close/free the port.
+Or it can get close automatically.
 
-$ git grep -i -E '(g_)?assert\((0|false)\)' | wc -l
-100
-$ git grep g_assert_not_reached | wc -l
-244
----
- hw/ppc/spapr_drc.c |   10 +++-------
- 1 file changed, 3 insertions(+), 7 deletions(-)
-
-diff --git a/hw/ppc/spapr_drc.c b/hw/ppc/spapr_drc.c
-index cc2400bcd57f..ab5f7cdf569c 100644
---- a/hw/ppc/spapr_drc.c
-+++ b/hw/ppc/spapr_drc.c
-@@ -538,20 +538,16 @@ static bool spapr_drc_needed(void *opaque)
-      */
-     switch (drc->type) {
-     case SPAPR_DR_CONNECTOR_TYPE_PCI:
--        rc = !((drc->isolation_state == SPAPR_DR_ISOLATION_STATE_UNISOLATED) &&
--               (drc->allocation_state == SPAPR_DR_ALLOCATION_STATE_USABLE) &&
--               drc->configured && drc->signalled && !drc->awaiting_release);
--        break;
-     case SPAPR_DR_CONNECTOR_TYPE_CPU:
-     case SPAPR_DR_CONNECTOR_TYPE_LMB:
--        rc = !((drc->isolation_state == SPAPR_DR_ISOLATION_STATE_ISOLATED) &&
--               (drc->allocation_state == SPAPR_DR_ALLOCATION_STATE_UNUSABLE) &&
-+        rc = !((drc->isolation_state == SPAPR_DR_ISOLATION_STATE_UNISOLATED) &&
-+               (drc->allocation_state == SPAPR_DR_ALLOCATION_STATE_USABLE) &&
-                drc->configured && drc->signalled && !drc->awaiting_release);
-         break;
-     case SPAPR_DR_CONNECTOR_TYPE_PHB:
-     case SPAPR_DR_CONNECTOR_TYPE_VIO:
-     default:
--        g_assert(false);
-+        g_assert_not_reached();
-     }
-     return rc;
- }
+Or I am missing anything here?
+> 
+> The fix is simply to return from do_flush_queued_data() if the port
+> closes because the close event already frees port->elem and drains the
+> virtqueue - there is nothing left for do_flush_queued_data() to do.
+> 
+> Reported-by: Sitong Liu <siliu@redhat.com>
+> Reported-by: Min Deng <mdeng@redhat.com>
+> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+> ---
+>  hw/char/virtio-serial-bus.c | 3 +++
+>  1 file changed, 3 insertions(+)
+> 
+> diff --git a/hw/char/virtio-serial-bus.c b/hw/char/virtio-serial-bus.c
+> index d797a67..c5aa26c 100644
+> --- a/hw/char/virtio-serial-bus.c
+> +++ b/hw/char/virtio-serial-bus.c
+> @@ -186,6 +186,9 @@ static void do_flush_queued_data(VirtIOSerialPort *port,
+> VirtQueue *vq,
+>                                    port->elem->out_sg[i].iov_base
+>                                    + port->iov_offset,
+>                                    buf_size);
+> +            if (!port->elem) { /* bail if we got disconnected */
+> +                return;
+> +            }
+>              if (port->throttled) {
+>                  port->iov_idx = i;
+>                  if (ret > 0) {
+> --
+> 2.9.4
+> 
+> 
+> 
