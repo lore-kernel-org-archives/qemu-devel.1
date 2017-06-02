@@ -1,15 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39407)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39641)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alarson@ddci.com>) id 1dGkpQ-0000Lk-9M
-	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 07:33:17 -0400
+	(envelope-from <mlureau@redhat.com>) id 1dGkqc-0001TK-ON
+	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 07:34:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alarson@ddci.com>) id 1dGkpM-00047u-Bc
-	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 07:33:16 -0400
-Date: Fri, 2 Jun 2017 04:32:59 -0700
-From: Aaron Larson <alarson@ddci.com>
-Message-Id: <201706021132.v52BWx1t027533@linux03a.ddci.com>
-Subject: [Qemu-devel] [PATCH] target-ppc: Fix openpic timer read register
- offset
+	(envelope-from <mlureau@redhat.com>) id 1dGkqY-0004mv-RA
+	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 07:34:30 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:56128)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mlureau@redhat.com>) id 1dGkqY-0004lV-II
+	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 07:34:26 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id C818161B90
+	for <qemu-devel@nongnu.org>; Fri,  2 Jun 2017 11:34:24 +0000 (UTC)
+Date: Fri, 2 Jun 2017 07:34:23 -0400 (EDT)
+From: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
+Message-ID: <1931640309.27713353.1496403263560.JavaMail.zimbra@redhat.com>
+In-Reply-To: <8737bifxfx.fsf@dusky.pond.sub.org>
+References: <20170531135709.345-1-marcandre.lureau@redhat.com>
+	<20170531135709.345-15-marcandre.lureau@redhat.com>
+	<8737bifxfx.fsf@dusky.pond.sub.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 14/45] qapi: update the qobject visitor
+ to use QNUM_U64
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -18,95 +35,90 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: agraf@suse.de, alarson@ddci.com, david@gibson.dropbear.id.au, qemu-devel@nongnu.org, qemu-ppc@nongnu.org
+To: Markus Armbruster <armbru@redhat.com>
+Cc: qemu-devel@nongnu.org
 
 
-openpic_tmr_read() is incorrectly computing register offset of the
-TCCR, TBCR, TVPR, and TDR registers when accessing the open pic timer
-registers.  Specifically the offset of timer registers for
-openpic_tmr_read() is not accounting for the timer frequency reporting
-register (TFFR) which is the first register in the "tmr" memory
-region.
 
-openpic_tmr_write() *is* correctly computing the offset by adding
-0x10f0 to the address prior to computing the register index.  This
-patch instead subtracts 0x10 in both the read and write routines and
-eliminates some other gratuitous differences between the functions.
+----- Original Message -----
+> One more nitpick:
+>=20
+> Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
+>=20
+> > Switch to use QNum/uint where appropriate to remove i64 limitation.
+> >
+> > The input visitor will cast i64 input to u64 for compatibility
+> > reasons (existing json QMP client already use negative i64 for large
+> > u64, and expect an implicit cast in qemu).
+> >
+> > Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> [...]
+> > diff --git a/tests/test-qobject-output-visitor.c
+> > b/tests/test-qobject-output-visitor.c
+> > index 3180d8cbde..d9f106d52e 100644
+> > --- a/tests/test-qobject-output-visitor.c
+> > +++ b/tests/test-qobject-output-visitor.c
+> > @@ -602,17 +602,31 @@ static void check_native_list(QObject *qobj,
+> >      qlist =3D qlist_copy(qobject_to_qlist(qdict_get(qdict, "data")));
+> > =20
+> >      switch (kind) {
+> > -    case USER_DEF_NATIVE_LIST_UNION_KIND_S8:
+> > -    case USER_DEF_NATIVE_LIST_UNION_KIND_S16:
+> > -    case USER_DEF_NATIVE_LIST_UNION_KIND_S32:
+> > -    case USER_DEF_NATIVE_LIST_UNION_KIND_S64:
+> >      case USER_DEF_NATIVE_LIST_UNION_KIND_U8:
+> >      case USER_DEF_NATIVE_LIST_UNION_KIND_U16:
+> >      case USER_DEF_NATIVE_LIST_UNION_KIND_U32:
+> >      case USER_DEF_NATIVE_LIST_UNION_KIND_U64:
+> > -        /* all integer elements in JSON arrays get stored into QNums w=
+hen
+> > -         * we convert to QObjects, so we can check them all in the sam=
+e
+> > -         * fashion, so simply fall through here
+> > +        for (i =3D 0; i < 32; i++) {
+> > +            QObject *tmp;
+> > +            QNum *qvalue;
+> > +            uint64_t val;
+> > +
+> > +            tmp =3D qlist_peek(qlist);
+> > +            g_assert(tmp);
+> > +            qvalue =3D qobject_to_qnum(tmp);
+> > +            g_assert(qnum_get_uint(qvalue, &val));
+> > +            g_assert_cmpuint(val, =3D=3D, i);
+> > +            qobject_decref(qlist_pop(qlist));
+> > +        }
+> > +        break;
+> > +
+> > +    case USER_DEF_NATIVE_LIST_UNION_KIND_S8:
+> > +    case USER_DEF_NATIVE_LIST_UNION_KIND_S16:
+> > +    case USER_DEF_NATIVE_LIST_UNION_KIND_S32:
+> > +    case USER_DEF_NATIVE_LIST_UNION_KIND_S64:
+> > +        /* All signed integer elements in JSON arrays get stored into
+> > +         * QInts when we convert to QObjects, so we can check them all
+> > +         * in the same fashion, so simply fall through here.
+> >           */
+> >      case USER_DEF_NATIVE_LIST_UNION_KIND_INTEGER:
+> >          for (i =3D 0; i < 32; i++) {
+>=20
+> Wing both ends of the comment, please.
 
-Signed-off-by: Aaron Larson <alarson@ddci.com>
----
- hw/intc/openpic.c | 22 ++++++++++------------
- 1 file changed, 10 insertions(+), 12 deletions(-)
+You want this: ?
 
-diff --git a/hw/intc/openpic.c b/hw/intc/openpic.c
-index 4349e45..f966d06 100644
---- a/hw/intc/openpic.c
-+++ b/hw/intc/openpic.c
-@@ -796,27 +796,24 @@ static uint64_t openpic_gbl_read(void *opaque, hwaddr addr, unsigned len)
- }
- 
- static void openpic_tmr_write(void *opaque, hwaddr addr, uint64_t val,
--                                unsigned len)
-+                              unsigned len)
- {
-     OpenPICState *opp = opaque;
-     int idx;
- 
--    addr += 0x10f0;
--
-     DPRINTF("%s: addr %#" HWADDR_PRIx " <= %08" PRIx64 "\n",
--            __func__, addr, val);
-+            __func__, (addr + 0x10f0), val);
-     if (addr & 0xF) {
-         return;
-     }
- 
--    if (addr == 0x10f0) {
-+    if (addr == 0) {
-         /* TFRR */
-         opp->tfrr = val;
-         return;
-     }
--
-+    addr -= 0x10;  /* correct for TFRR */
-     idx = (addr >> 6) & 0x3;
--    addr = addr & 0x30;
- 
-     switch (addr & 0x30) {
-     case 0x00: /* TCCR */
-@@ -844,16 +841,17 @@ static uint64_t openpic_tmr_read(void *opaque, hwaddr addr, unsigned len)
-     uint32_t retval = -1;
-     int idx;
- 
--    DPRINTF("%s: addr %#" HWADDR_PRIx "\n", __func__, addr);
-+    DPRINTF("%s: addr %#" HWADDR_PRIx "\n", __func__, addr + 0x10f0);
-     if (addr & 0xF) {
-         goto out;
-     }
--    idx = (addr >> 6) & 0x3;
--    if (addr == 0x0) {
-+    if (addr == 0) {
-         /* TFRR */
-         retval = opp->tfrr;
-         goto out;
-     }
-+    addr -= 0x10;  /* correct for TFRR */
-+    idx = (addr >> 6) & 0x3;
-     switch (addr & 0x30) {
-     case 0x00: /* TCCR */
-         retval = opp->timers[idx].tccr;
-@@ -861,10 +859,10 @@ static uint64_t openpic_tmr_read(void *opaque, hwaddr addr, unsigned len)
-     case 0x10: /* TBCR */
-         retval = opp->timers[idx].tbcr;
-         break;
--    case 0x20: /* TIPV */
-+    case 0x20: /* TVPR */
-         retval = read_IRQreg_ivpr(opp, opp->irq_tim0 + idx);
-         break;
--    case 0x30: /* TIDE (TIDR) */
-+    case 0x30: /* TDR */
-         retval = read_IRQreg_idr(opp, opp->irq_tim0 + idx);
-         break;
-     }
--- 
-2.7.4
+/* All signed integer elements in JSON arrays get stored into */
+/* QInts when we convert to QObjects, so we can check them all */
+...
+
+I think this is quite annoying for refilling with emacs
+
+Perhaps rather
+
+/* All signed integer elements in JSON arrays get stored into
+ * QInts when we convert to QObjects, so we can check them all */
+
+quite uglier to me, but I don't care
+
+However, I'd prefer if either we have a common rule in qemu or we don't bik=
+e-sched over that...
+
+(even better would be to have this somehow automated with tools like git-cl=
+ang-format)
