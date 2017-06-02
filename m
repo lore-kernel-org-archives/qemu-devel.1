@@ -1,33 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58659)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58941)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1dGnlE-0008JT-4k
-	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 10:41:09 -0400
+	(envelope-from <cota@braap.org>) id 1dGnmg-00017t-Qk
+	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 10:42:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1dGnlB-0007iv-2k
-	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 10:41:08 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:38780)
+	(envelope-from <cota@braap.org>) id 1dGnmd-0000SM-Dr
+	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 10:42:38 -0400
+Received: from out1-smtp.messagingengine.com ([66.111.4.25]:50943)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <david@redhat.com>) id 1dGnlA-0007hp-RE
-	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 10:41:04 -0400
-References: <20170531220129.27724-1-aurelien@aurel32.net>
-	<20170531220129.27724-31-aurelien@aurel32.net>
-	<ea25b082-923d-6c7d-bca3-b4adbd412419@redhat.com>
-	<781667e0-740c-8e43-d94b-387092eab0e6@redhat.com>
-	<20170601191718.6cftzl5ama4s3es3@aurel32.net>
-	<c3c65598-59ca-c80e-1f8d-340ab19d902f@redhat.com>
-	<207db011-5035-acb3-2032-8408b4ec38e6@redhat.com>
-	<20170602140429.elahcu5olntw7ypi@aurel32.net>
-	<503b3cb8-4867-62a3-85c8-21a0e6adf88f@redhat.com>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <21305f68-7d1c-7dfd-7ebf-69eb4d418c4c@redhat.com>
-Date: Fri, 2 Jun 2017 16:41:01 +0200
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1dGnmd-0000RS-2X
+	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 10:42:35 -0400
+Date: Fri, 2 Jun 2017 10:42:33 -0400
+From: "Emilio G. Cota" <cota@braap.org>
+Message-ID: <20170602144233.GA4868@flamenco>
+References: <1487097476-14259-1-git-send-email-nutarojj@ornl.gov>
 MIME-Version: 1.0
-In-Reply-To: <503b3cb8-4867-62a3-85c8-21a0e6adf88f@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 30/30] target/s390x: update maximum TCG
- model to z800
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1487097476-14259-1-git-send-email-nutarojj@ornl.gov>
+Subject: Re: [Qemu-devel] [PATCH V8] qqq: module for synchronizing with a
+ simulation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,30 +27,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>
-Cc: qemu-devel@nongnu.org, Alexander Graf <agraf@suse.de>, Richard Henderson <rth@twiddle.net>
+To: "James J. Nutaro" <nutarojj@ornl.gov>
+Cc: qemu-devel@nongnu.org, pbonzini@redhat.com
 
-On 02.06.2017 16:34, Thomas Huth wrote:
-> On 02.06.2017 16:04, Aurelien Jarno wrote:
-> [...]
->> I understand your point. That said I doubt we will support the SIE
->> instruction soon (it looks quite complicated and I can't find any doc).
-> 
-> There is unfortunately no public documentation for the SIE instruction.
-> The only spec that is available is a very old one from the S/370 age:
-> 
-> http://bitsavers.trailing-edge.com/pdf/ibm/370/princOps/SA22-7095-0_370-XA_Interpretive_Execution_Jan84.pdf
-> 
+On Tue, Feb 14, 2017 at 13:37:56 -0500, James J. Nutaro wrote:
+> This patch adds an interface for pacing the execution of QEMU to match an external
+> simulation clock. Its aim is to permit QEMU to be used as a module within a
+> larger simulation system.
+(snip)
+> +++ b/docs/simulation-sync.txt
+> @@ -0,0 +1,59 @@
+> += Synchronizing the virtual clock with an external source =
+> +
+> +QEMU has a protocol for synchronizing its virtual clock
+> +with the clock of a simulator in which QEMU is embedded
+> +as a component. This options is enabled with the -qqq
+> +argument, and it should generally be accompanied by the
+> +following additional command line arguments:
+> +
+> +-icount 1,sleep=off -rtc clock=vm
+> +  or
+> +-enable-kvm -rtc clock=vm
 
-And of course the kvm (esp. vsie) implementation is very helpful
-understanding how it works and what some bits mean :)
+Isn't this a KVM-only feature though? I don't see calls to qqq_sync()
+anywhere but from kvm-all.c, but maybe I'm missing something.
 
->  Thomas
-> 
+Also, a few more comments:
 
+- Why "qqq" as the name for this feature? I fail to see any
+  connection between the name and the feature.
 
--- 
+- If Windows users ever wanted this feature, would we have to
+  change the user-facing API (i.e. the -qqq parameter)?
+
+- As is, isn't the code Unix-only rather than Linux-only?
 
 Thanks,
 
-David
+		Emilio
