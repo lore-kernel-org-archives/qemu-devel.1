@@ -1,20 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54849)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55635)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dGhh4-0002jF-CO
-	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 04:12:27 -0400
+	(envelope-from <marcandre.lureau@redhat.com>) id 1dGhkE-0005dp-UC
+	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 04:15:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dGhgy-0002Zx-Kr
-	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 04:12:26 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60362)
+	(envelope-from <marcandre.lureau@redhat.com>) id 1dGhk9-0004HM-VN
+	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 04:15:42 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:44316)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1dGhgy-0002ZS-BI
-	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 04:12:20 -0400
-From: Fam Zheng <famz@redhat.com>
-Date: Fri,  2 Jun 2017 16:11:19 +0800
-Message-Id: <20170602081120.3497-22-famz@redhat.com>
-In-Reply-To: <20170602081120.3497-1-famz@redhat.com>
-References: <20170602081120.3497-1-famz@redhat.com>
-Subject: [Qemu-devel] [PULL v2 21/22] block: introduce block_account_one_io
+	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
+	id 1dGhk9-0004HE-Pd
+	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 04:15:37 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id CEB1E659AD
+	for <qemu-devel@nongnu.org>; Fri,  2 Jun 2017 08:15:36 +0000 (UTC)
+From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+Date: Fri,  2 Jun 2017 12:15:19 +0400
+Message-Id: <20170602081519.15648-1-marcandre.lureau@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH] vhost-user-bridge: fix iov_restore_front()
+ warning
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,102 +33,60 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, Stefan Hajnoczi <stefanha@redhat.com>
+Cc: dgilbert@redhat.com, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
-From: Paolo Bonzini <pbonzini@redhat.com>
+  CC      tests/vhost-user-bridge.o
+/home/dgilbert/git/qemu-world3/tests/vhost-user-bridge.c:228:23: warning:=
+ variables 'front' and 'iov' used in loop condition not modified in loop =
+body [-Wfor-loop-analysis]
+    for (cur =3D front; front !=3D iov; cur++) {
+                      ^~~~~    ~~~
+1 warning generated.
 
-This is the common code to account operations that produced actual I/O.
+Fix the loop, document the function, and fix some related assert().
 
-Reviewed-by: Alberto Garcia <berto@igalia.com>
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-Message-Id: <20170525163225.29954-18-pbonzini@redhat.com>
-Signed-off-by: Fam Zheng <famz@redhat.com>
+In practice, the loop bug was harmless because the front sg buffer is
+enough to discard/restore the header size.
+
+Reported-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 ---
- block/accounting.c | 51 ++++++++++++++++++++++-----------------------------
- 1 file changed, 22 insertions(+), 29 deletions(-)
+ tests/vhost-user-bridge.c | 11 +++++++++--
+ 1 file changed, 9 insertions(+), 2 deletions(-)
 
-diff --git a/block/accounting.c b/block/accounting.c
-index 3f457c4..a279e0b 100644
---- a/block/accounting.c
-+++ b/block/accounting.c
-@@ -86,7 +86,8 @@ void block_acct_start(BlockAcctStats *stats, BlockAcctCookie *cookie,
-     cookie->type = type;
+diff --git a/tests/vhost-user-bridge.c b/tests/vhost-user-bridge.c
+index 8618c20d53..1e5b5ca3da 100644
+--- a/tests/vhost-user-bridge.c
++++ b/tests/vhost-user-bridge.c
+@@ -220,12 +220,18 @@ vubr_handle_tx(VuDev *dev, int qidx)
+     free(elem);
  }
- 
--void block_acct_done(BlockAcctStats *stats, BlockAcctCookie *cookie)
-+static void block_account_one_io(BlockAcctStats *stats, BlockAcctCookie *cookie,
-+                                 bool failed)
- {
-     BlockAcctTimedStats *s;
-     int64_t time_ns = qemu_clock_get_ns(clock_type);
-@@ -98,31 +99,14 @@ void block_acct_done(BlockAcctStats *stats, BlockAcctCookie *cookie)
- 
-     assert(cookie->type < BLOCK_MAX_IOTYPE);
- 
--    stats->nr_bytes[cookie->type] += cookie->bytes;
--    stats->nr_ops[cookie->type]++;
--    stats->total_time_ns[cookie->type] += latency_ns;
--    stats->last_access_time_ns = time_ns;
--
--    QSLIST_FOREACH(s, &stats->intervals, entries) {
--        timed_average_account(&s->latency[cookie->type], latency_ns);
-+    if (failed) {
-+        stats->failed_ops[cookie->type]++;
-+    } else {
-+        stats->nr_bytes[cookie->type] += cookie->bytes;
-+        stats->nr_ops[cookie->type]++;
-     }
--}
--
--void block_acct_failed(BlockAcctStats *stats, BlockAcctCookie *cookie)
--{
--    assert(cookie->type < BLOCK_MAX_IOTYPE);
--
--    stats->failed_ops[cookie->type]++;
--
--    if (stats->account_failed) {
--        BlockAcctTimedStats *s;
--        int64_t time_ns = qemu_clock_get_ns(clock_type);
--        int64_t latency_ns = time_ns - cookie->start_time_ns;
--
--        if (qtest_enabled()) {
--            latency_ns = qtest_latency_ns;
--        }
- 
-+    if (!failed || stats->account_failed) {
-         stats->total_time_ns[cookie->type] += latency_ns;
-         stats->last_access_time_ns = time_ns;
- 
-@@ -132,15 +116,24 @@ void block_acct_failed(BlockAcctStats *stats, BlockAcctCookie *cookie)
-     }
- }
- 
-+void block_acct_done(BlockAcctStats *stats, BlockAcctCookie *cookie)
-+{
-+    block_account_one_io(stats, cookie, false);
-+}
+=20
 +
-+void block_acct_failed(BlockAcctStats *stats, BlockAcctCookie *cookie)
-+{
-+    block_account_one_io(stats, cookie, true);
-+}
-+
- void block_acct_invalid(BlockAcctStats *stats, enum BlockAcctType type)
++/* this function reverse the effect of iov_discard_front() it must be
++ * called with 'front' being the original struct iovec and 'bytes'
++ * being the number of bytes you shaved off
++ */
+ static void
+ iov_restore_front(struct iovec *front, struct iovec *iov, size_t bytes)
  {
-     assert(type < BLOCK_MAX_IOTYPE);
- 
--    /* block_acct_done() and block_acct_failed() update
--     * total_time_ns[], but this one does not. The reason is that
--     * invalid requests are accounted during their submission,
--     * therefore there's no actual I/O involved. */
--
-+    /* block_account_one_io() updates total_time_ns[], but this one does
-+     * not.  The reason is that invalid requests are accounted during their
-+     * submission, therefore there's no actual I/O involved.
-+     */
-     stats->invalid_ops[type]++;
- 
-     if (stats->account_invalid) {
--- 
-2.9.4
+     struct iovec *cur;
+=20
+-    for (cur =3D front; front !=3D iov; cur++) {
++    for (cur =3D front; cur !=3D iov; cur++) {
++        assert(bytes >=3D cur->iov_len);
+         bytes -=3D cur->iov_len;
+     }
+=20
+@@ -302,7 +308,8 @@ vubr_backend_recv_cb(int sock, void *ctx)
+             }
+             iov_from_buf(sg, elem->in_num, 0, &hdr, sizeof hdr);
+             total +=3D hdrlen;
+-            assert(iov_discard_front(&sg, &num, hdrlen) =3D=3D hdrlen);
++            ret =3D iov_discard_front(&sg, &num, hdrlen);
++            assert(ret =3D=3D hdrlen);
+         }
+=20
+         struct msghdr msg =3D {
+--=20
+2.13.0.91.g00982b8dd
