@@ -1,33 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35329)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35341)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dGkbc-0004Xi-Nh
+	(envelope-from <marcandre.lureau@gmail.com>) id 1dGkbd-0004Xn-Gp
 	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 07:19:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dGkbX-0003Wr-P4
+	(envelope-from <marcandre.lureau@gmail.com>) id 1dGkbc-0003aE-Bq
+	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 07:19:01 -0400
+Received: from mail-lf0-x22d.google.com ([2a00:1450:4010:c07::22d]:34454)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+	id 1dGkbb-0003Z2-Ul
 	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 07:19:00 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:41262)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dGkbX-0003WQ-Fq
-	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 07:18:55 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 7CFE580F94
-	for <qemu-devel@nongnu.org>; Fri,  2 Jun 2017 11:18:54 +0000 (UTC)
-From: Markus Armbruster <armbru@redhat.com>
-References: <20170531135709.345-1-marcandre.lureau@redhat.com>
-	<20170531135709.345-15-marcandre.lureau@redhat.com>
-Date: Fri, 02 Jun 2017 13:18:50 +0200
-In-Reply-To: <20170531135709.345-15-marcandre.lureau@redhat.com>
-	(=?utf-8?Q?=22Marc-Andr=C3=A9?=
-	Lureau"'s message of "Wed, 31 May 2017 17:56:38 +0400")
-Message-ID: <877f0ufxid.fsf@dusky.pond.sub.org>
+Received: by mail-lf0-x22d.google.com with SMTP id v20so9209806lfa.1
+	for <qemu-devel@nongnu.org>; Fri, 02 Jun 2017 04:18:59 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+References: <20170509173559.31598-1-marcandre.lureau@redhat.com>
+	<20170509173559.31598-5-marcandre.lureau@redhat.com>
+	<8737cbv53y.fsf@dusky.pond.sub.org>
+	<CAJ+F1C+9WAO2RZt-x7hzzh5M6HBv4UjR6svj71vLJD31axC_Zw@mail.gmail.com>
+	<87lgpel8z2.fsf@dusky.pond.sub.org>
+	<CAJ+F1C+wcUgiW6QhQUpsA133F+XR8p4wHDHYnr-y11FhRj1Bxg@mail.gmail.com>
+	<87h8zyoq92.fsf@dusky.pond.sub.org>
+In-Reply-To: <87h8zyoq92.fsf@dusky.pond.sub.org>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Fri, 02 Jun 2017 11:18:47 +0000
+Message-ID: <CAJ+F1CLbKy1YcoHtjTt9noX0EcbA4uc3M6ooXhM3tiSQbLexxA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 14/45] qapi: update the qobject visitor
- to use QNUM_U64
+Subject: Re: [Qemu-devel] [PATCH 04/17] qapi: merge QInt and QFloat in QNum
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,189 +35,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>
 Cc: qemu-devel@nongnu.org
 
-Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
+Hi
 
-> Switch to use QNum/uint where appropriate to remove i64 limitation.
+On Fri, Jun 2, 2017 at 10:30 AM Markus Armbruster <armbru@redhat.com> wrote=
+:
+
+> Marc-Andr=C3=A9 Lureau <marcandre.lureau@gmail.com> writes:
 >
-> The input visitor will cast i64 input to u64 for compatibility
-> reasons (existing json QMP client already use negative i64 for large
-> u64, and expect an implicit cast in qemu).
+> > Hi
+> >
+> > On Tue, May 30, 2017 at 6:23 PM Markus Armbruster <armbru@redhat.com>
+> wrote:
+> >
+> >> Marc-Andr=C3=A9 Lureau <marcandre.lureau@gmail.com> writes:
+> >>
+> >> > Hi
+> >> >
+> >> > On Thu, May 11, 2017 at 6:30 PM Markus Armbruster <armbru@redhat.com=
 >
-> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> ---
->  hw/i386/acpi-build.c                |  3 +--
->  qapi/qobject-input-visitor.c        | 21 ++++++++++++++++-----
->  qapi/qobject-output-visitor.c       |  3 +--
->  tests/test-qobject-input-visitor.c  |  7 ++-----
->  tests/test-qobject-output-visitor.c | 28 +++++++++++++++++++++-------
->  5 files changed, 41 insertions(+), 21 deletions(-)
+> wrote:
+> [...]
+> >> >> g_assert_not_reached() is problematic, see "[PATCH] checkpatch:
+> Disallow
+> >> >> glib asserts in main code".
+> >> >>
+> >> >> Message-Id: <20170427165526.19836-1-dgilbert@redhat.com>
+> >> >> https://lists.gnu.org/archive/html/qemu-devel/2017-04/msg05499.html
+> >> >>
+> >> >>
+> >> > Actually g_assert() and g_assert_not_reached() are accepted.
+> >>
+> >> What exactly does g_assert() buy us over plain assert(), and
+> >> g_assert_not_reached() over assert(0)?
+> >>
+> >
+> > g_assert() brings a bit more context, afaik, can be trapped for error
+> > testing, and error reporting can be handled by an handler. Not that
+> useful
+> > to qemu, but could be for the graphical UI though.
+> >
+> > g_assert_not_reached() is quite more readable than assert(0)
 >
-> diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
-> index 1709efdf1c..ba2be1e9da 100644
-> --- a/hw/i386/acpi-build.c
-> +++ b/hw/i386/acpi-build.c
-> @@ -2634,10 +2634,9 @@ static bool acpi_get_mcfg(AcpiMcfgInfo *mcfg)
->      if (!o) {
->          return false;
->      }
-> -    if (!qnum_get_int(qobject_to_qnum(o), &val)) {
-> +    if (!qnum_get_uint(qobject_to_qnum(o), &mcfg->mcfg_base)) {
->          g_assert_not_reached();
->      }
-> -    mcfg->mcfg_base =3D val;
->      qobject_decref(o);
->=20=20
->      o =3D object_property_get_qobject(pci_host, PCIE_HOST_MCFG_SIZE, NUL=
-L);
-> diff --git a/qapi/qobject-input-visitor.c b/qapi/qobject-input-visitor.c
-> index 74835ba339..7f9d6f57a1 100644
-> --- a/qapi/qobject-input-visitor.c
-> +++ b/qapi/qobject-input-visitor.c
-> @@ -417,7 +417,6 @@ static void qobject_input_type_int64_keyval(Visitor *=
-v, const char *name,
->  static void qobject_input_type_uint64(Visitor *v, const char *name,
->                                        uint64_t *obj, Error **errp)
->  {
-> -    /* FIXME: qobject_to_qnum mishandles values over INT64_MAX */
->      QObjectInputVisitor *qiv =3D to_qiv(v);
->      QObject *qobj =3D qobject_input_get_object(qiv, name, true, errp);
->      QNum *qnum;
-> @@ -427,11 +426,23 @@ static void qobject_input_type_uint64(Visitor *v, c=
-onst char *name,
->          return;
->      }
->      qnum =3D qobject_to_qnum(qobj);
-> -    if (!qnum || !qnum_get_int(qnum, &val)) {
-> -        error_setg(errp, QERR_INVALID_PARAMETER_TYPE,
-> -                   full_name(qiv, name), "integer");
-> +    if (!qnum) {
-> +        goto err;
-> +    }
-> +
-> +    if (qnum_get_uint(qnum, obj)) {
-> +        return;
->      }
-> -    *obj =3D val;
-> +
-> +    /* Need to accept negative values for backward compatibility */
-> +    if (qnum_get_int(qnum, &val)) {
-> +        *obj =3D val;
-> +        return;
-> +    }
-> +
-> +err:
-> +    error_setg(errp, QERR_INVALID_PARAMETER_VALUE,
-> +               full_name(qiv, name), "uint64");
->  }
->=20=20
->  static void qobject_input_type_uint64_keyval(Visitor *v, const char *nam=
-e,
-> diff --git a/qapi/qobject-output-visitor.c b/qapi/qobject-output-visitor.c
-> index 2ca5093b22..70be84ccb5 100644
-> --- a/qapi/qobject-output-visitor.c
-> +++ b/qapi/qobject-output-visitor.c
-> @@ -150,9 +150,8 @@ static void qobject_output_type_int64(Visitor *v, con=
-st char *name,
->  static void qobject_output_type_uint64(Visitor *v, const char *name,
->                                         uint64_t *obj, Error **errp)
->  {
-> -    /* FIXME values larger than INT64_MAX become negative */
->      QObjectOutputVisitor *qov =3D to_qov(v);
-> -    qobject_output_add(qov, name, qnum_from_int(*obj));
-> +    qobject_output_add(qov, name, qnum_from_uint(*obj));
->  }
->=20=20
+> I'm all for making intent explicit, but what else could assert(0)
+> possibly mean?
+>
+> >> qapi/ overwhelmingly uses assert().
+> >>
+> >
+> > ok, it's already a mix of assert & g_assert in qemu though
+>
+> True.
+>
+> In my opinion, we should use only one outside tests.  g_assert() if it
+> adds value, else plain assert().  "Outside tests", because g_assert()
+> might add sufficient value in tests even when it doesn't elsewhere.
+>
+>
+g_assert*() is useful in the unit under test, so you can check the assert
+behaviour. This could be useful in particular for the assertions under
+qapi/ since we have unit tests for those
 
-Before the patch, uint64_t values above INT64_MAX are sent as negative
-values, e.g. UINT64_MAX is sent as -1.
 
-After the patch, they are sent unmodified.  Clearly a bug fix, but we
-have to consider compatibility issues anyway.  You wrote that libvirt
-should cope fine, because its parsing of unsigned integers accepts
-negative values modulo 2^64.  There's hope that other clients will, too.
+> Until then, I prefer to use only one *locally*.  In qapi/, that's plain
+> assert() now.
+>
 
-There's one thing left to do: please document the incompatible bug fix
-in the commit message.
-
->  static void qobject_output_type_bool(Visitor *v, const char *name, bool =
-*obj,
-> diff --git a/tests/test-qobject-input-visitor.c b/tests/test-qobject-inpu=
-t-visitor.c
-> index 983c59c474..6f94fc677c 100644
-> --- a/tests/test-qobject-input-visitor.c
-> +++ b/tests/test-qobject-input-visitor.c
-> @@ -122,7 +122,6 @@ static void test_visitor_in_int(TestInputVisitorData =
-*data,
->  static void test_visitor_in_uint(TestInputVisitorData *data,
->                                  const void *unused)
->  {
-> -    Error *err =3D NULL;
->      uint64_t res =3D 0;
->      int64_t i64;
->      double dbl;
-> @@ -146,12 +145,10 @@ static void test_visitor_in_uint(TestInputVisitorDa=
-ta *data,
->      visit_type_uint64(v, NULL, &res, &error_abort);
->      g_assert_cmpuint(res, =3D=3D, (uint64_t)-value);
->=20=20
-> -    /* BUG: value between INT64_MAX+1 and UINT64_MAX rejected */
-> -
->      v =3D visitor_input_test_init(data, "18446744073709551574");
->=20=20
-> -    visit_type_uint64(v, NULL, &res, &err);
-> -    error_free_or_abort(&err);
-> +    visit_type_uint64(v, NULL, &res, &error_abort);
-> +    g_assert_cmpuint(res, =3D=3D, 18446744073709551574U);
->=20=20
->      visit_type_number(v, NULL, &dbl, &error_abort);
->  }
-> diff --git a/tests/test-qobject-output-visitor.c b/tests/test-qobject-out=
-put-visitor.c
-> index 3180d8cbde..d9f106d52e 100644
-> --- a/tests/test-qobject-output-visitor.c
-> +++ b/tests/test-qobject-output-visitor.c
-> @@ -602,17 +602,31 @@ static void check_native_list(QObject *qobj,
->      qlist =3D qlist_copy(qobject_to_qlist(qdict_get(qdict, "data")));
->=20=20
->      switch (kind) {
-> -    case USER_DEF_NATIVE_LIST_UNION_KIND_S8:
-> -    case USER_DEF_NATIVE_LIST_UNION_KIND_S16:
-> -    case USER_DEF_NATIVE_LIST_UNION_KIND_S32:
-> -    case USER_DEF_NATIVE_LIST_UNION_KIND_S64:
->      case USER_DEF_NATIVE_LIST_UNION_KIND_U8:
->      case USER_DEF_NATIVE_LIST_UNION_KIND_U16:
->      case USER_DEF_NATIVE_LIST_UNION_KIND_U32:
->      case USER_DEF_NATIVE_LIST_UNION_KIND_U64:
-> -        /* all integer elements in JSON arrays get stored into QNums when
-> -         * we convert to QObjects, so we can check them all in the same
-> -         * fashion, so simply fall through here
-> +        for (i =3D 0; i < 32; i++) {
-> +            QObject *tmp;
-> +            QNum *qvalue;
-> +            uint64_t val;
-> +
-> +            tmp =3D qlist_peek(qlist);
-> +            g_assert(tmp);
-> +            qvalue =3D qobject_to_qnum(tmp);
-> +            g_assert(qnum_get_uint(qvalue, &val));
-> +            g_assert_cmpuint(val, =3D=3D, i);
-> +            qobject_decref(qlist_pop(qlist));
-> +        }
-> +        break;
-> +
-> +    case USER_DEF_NATIVE_LIST_UNION_KIND_S8:
-> +    case USER_DEF_NATIVE_LIST_UNION_KIND_S16:
-> +    case USER_DEF_NATIVE_LIST_UNION_KIND_S32:
-> +    case USER_DEF_NATIVE_LIST_UNION_KIND_S64:
-> +        /* All signed integer elements in JSON arrays get stored into
-> +         * QInts when we convert to QObjects, so we can check them all
-> +         * in the same fashion, so simply fall through here.
->           */
->      case USER_DEF_NATIVE_LIST_UNION_KIND_INTEGER:
->          for (i =3D 0; i < 32; i++) {
-
-With the incompatible fix explained in the commit message:
-Reviewed-by: Markus Armbruster <armbru@redhat.com>
+ok, fair enough
+--=20
+Marc-Andr=C3=A9 Lureau
