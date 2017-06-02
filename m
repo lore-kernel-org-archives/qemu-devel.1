@@ -1,33 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41115)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41557)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dGmn7-0005d0-TG
-	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 09:39:02 -0400
+	(envelope-from <aurelien@aurel32.net>) id 1dGmoX-0006bX-4E
+	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 09:40:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dGmn3-0007Jn-0p
-	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 09:39:01 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:41084)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dGmn2-0007If-Rf
-	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 09:38:56 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id C426E334584
-	for <qemu-devel@nongnu.org>; Fri,  2 Jun 2017 13:38:55 +0000 (UTC)
-From: Markus Armbruster <armbru@redhat.com>
-References: <20170531135709.345-1-marcandre.lureau@redhat.com>
-	<20170531135709.345-18-marcandre.lureau@redhat.com>
-Date: Fri, 02 Jun 2017 15:38:51 +0200
-In-Reply-To: <20170531135709.345-18-marcandre.lureau@redhat.com>
-	(=?utf-8?Q?=22Marc-Andr=C3=A9?=
-	Lureau"'s message of "Wed, 31 May 2017 17:56:41 +0400")
-Message-ID: <877f0ucxw4.fsf@dusky.pond.sub.org>
+	(envelope-from <aurelien@aurel32.net>) id 1dGmoV-0000je-Rn
+	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 09:40:29 -0400
+Received: from hall.aurel32.net ([2001:bc8:30d7:100::1]:51578)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <aurelien@aurel32.net>)
+	id 1dGmoV-0000ai-Lo
+	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 09:40:27 -0400
+Date: Fri, 2 Jun 2017 15:40:16 +0200
+From: Aurelien Jarno <aurelien@aurel32.net>
+Message-ID: <20170602134016.leo6bq5wy36vbh6v@aurel32.net>
+References: <20170531220129.27724-1-aurelien@aurel32.net>
+	<20170531220129.27724-31-aurelien@aurel32.net>
+	<ea25b082-923d-6c7d-bca3-b4adbd412419@redhat.com>
+	<20170601191702.feantajorjt33lsc@aurel32.net>
+	<42f7b144-4576-33e9-b385-e95e1432d93d@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 17/45] object: use more specific
- property type names
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <42f7b144-4576-33e9-b385-e95e1432d93d@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v3 30/30] target/s390x: update maximum TCG
+ model to z800
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,53 +32,105 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: David Hildenbrand <david@redhat.com>
+Cc: qemu-devel@nongnu.org, Alexander Graf <agraf@suse.de>, Richard Henderson <rth@twiddle.net>
 
-Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
+On 2017-06-01 21:56, David Hildenbrand wrote:
+> On 01.06.2017 21:17, Aurelien Jarno wrote:
+> > On 2017-06-01 10:38, David Hildenbrand wrote:
+> >> On 01.06.2017 00:01, Aurelien Jarno wrote:
+> >>> At the same time fix the TCG version of get_max_cpu_model to return the
+> >>> maximum model like on KVM. Remove the ETF2 and long-displacement
+> >>
+> >> I don't understand the part
+> >> "fix the TCG version of get_max_cpu_model to return the maximum model
+> >> like on KVM".
+> >>
+> >> Can you elaborate?
+> > 
+> > Currently get_max_cpu_model returns the features of the base model, so
+> > for example the one of a z900 even on a z800. This makes impossible to
+> > enable the features that are provided by a z800 like etf2 or ldisp.
+> > 
+> 
+> Right, you can always change the max_cpu_model, e.g. bumping up the
+> version or adding new features, that is just fine.
+> 
+> > For what I understand from the KVM code (but I haven't tested), the
+> > function return all the features that are supported by the current CPU,
+> > not all the features that are supported by the base model of the current
+> > CPU.
+> 
+> Correct, for KVM it is the detected model, that means: Base features +
+> optional features.
+> 
+> 
+> > 
+> > 
+> >>> facilities from the additional features as it is included in the z800.
+> >>>
+> >>> Signed-off-by: Aurelien Jarno <aurelien@aurel32.net>
+> >>> ---
+> >>>  target/s390x/cpu_models.c | 13 ++++++-------
+> >>>  1 file changed, 6 insertions(+), 7 deletions(-)
+> >>>
+> >>> diff --git a/target/s390x/cpu_models.c b/target/s390x/cpu_models.c
+> >>> index fc3cb25cc3..c13bbd852c 100644
+> >>> --- a/target/s390x/cpu_models.c
+> >>> +++ b/target/s390x/cpu_models.c
+> >>> @@ -668,8 +668,6 @@ static void add_qemu_cpu_model_features(S390FeatBitmap fbm)
+> >>>      static const int feats[] = {
+> >>>          S390_FEAT_STFLE,
+> >>>          S390_FEAT_EXTENDED_IMMEDIATE,
+> >>> -        S390_FEAT_EXTENDED_TRANSLATION_2,
+> >>> -        S390_FEAT_LONG_DISPLACEMENT,
+> >>>          S390_FEAT_LONG_DISPLACEMENT_FAST,
+> >>>          S390_FEAT_ETF2_ENH,
+> >>>          S390_FEAT_STORE_CLOCK_FAST,
+> >>> @@ -696,9 +694,9 @@ static S390CPUModel *get_max_cpu_model(Error **errp)
+> >>>      if (kvm_enabled()) {
+> >>>          kvm_s390_get_host_cpu_model(&max_model, errp);
+> >>>      } else {
+> >>> -        /* TCG emulates a z900 (with some optional additional features) */
+> >>> -        max_model.def = &s390_cpu_defs[0];
+> >>> -        bitmap_copy(max_model.features, max_model.def->default_feat,
+> >>> +        /* TCG emulates a z800 (with some optional additional features) */
+> >>> +        max_model.def = s390_find_cpu_def(0x2066, 7, 3, NULL);
+> >>> +        bitmap_copy(max_model.features, max_model.def->full_feat,
+> >>>                      S390_FEAT_MAX);
+> >>>          add_qemu_cpu_model_features(max_model.features);
+> >>>      }
+> >>> @@ -956,8 +954,9 @@ static void s390_qemu_cpu_model_initfn(Object *obj)
+> >>>      S390CPU *cpu = S390_CPU(obj);
+> >>>  
+> >>>      cpu->model = g_malloc0(sizeof(*cpu->model));
+> >>> -    /* TCG emulates a z900 (with some optional additional features) */
+> >>> -    memcpy(&s390_qemu_cpu_defs, &s390_cpu_defs[0], sizeof(s390_qemu_cpu_defs));
+> >>> +    /* TCG emulates a z800 (with some optional additional features) */
+> >>> +    memcpy(&s390_qemu_cpu_defs, s390_find_cpu_def(0x2066, 7, 3, NULL),
+> >>> +           sizeof(s390_qemu_cpu_defs));
+> >>
+> >> No changing the qemu model without compatibility handling.
+> > 
+> > This patch series is based on the patch from Thomas Huth. It means the
+> > QEMU model is still based on a z900, but that it is possible to enable
+> > some more features like etf2.
+> 
+> Thomas' code did neither change features nor the "model definition". It
+> just allows for some more feature to be set. It is a hack.
+> 
+> I am pretty sure that expanding the "qemu" CPU model now (QMP
+> query-cpu-model-expansion) will indicate a z800, not a z900.
+> 
+> See cpu_info_from_model(). And that is a problem, because the QEMU CPU
+> model is a "migration-safe" CPU model, meaning it must remain equal for
+> every compatibility machine.
+> 
 
-> Use the actual unsigned integer type name (this should't break since
-> property type aren't directly accessed from outside it seems).
+Ok, I get what you mean now.
 
-I checked.  Uses of Object member @type outside qom/object.c:
+Aurelien
 
-* vl.c's machine_help_func() puts it in help for -machine NAME,help.
-  Fine.
-
-* QMP command qom-list exposes it in ObjectPropertyInfo member @type.
-  Your commit message is wrong :)
-
-* QMP command device-list-properties exposes it in DevicePropertyInfo
-  member @type.
-
-* spapr_drc_populate_dt() compares it to "link<", which may or may not
-  be a good idea, but isn't affected by your patch.
-
-Uses in qom/object.c:
-
-* object_property_is_child() compares it to "child<".  Not affected by
-  your patch.
-
-* object_property_get_enum() takes it as argument.  Shouldn't be
-  affected by your patch, as only enumeration type names should occur
-  here.  Double-checking: I can see "HostMemPolicy", "DummyAnimal",
-  "BadAnimal" (the latter two in tests/, don't worry).  Okay.
-
-* object_property_get_type() returns it.
-
-  - qdev_print_props() only checks whether it succeeds.  Not affected by
-    your patch.
-
-  - object_resolve_link() requires it to be of the form "link<%s>".  Not
-    affected by your patch unless we violate this precondition (and then
-    we have worse problems).
-
-* object_property_add_alias() copies it, possibly rewriting "child<%s>"
-  to "link<%s>".  Shouldn't be affected by your patch.
-
-> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-
-Rewrite the commit message to explain impact on -machine, qom-list and
-device-list-properties, and you may add
-
-Reviewed-by: Markus Armbruster <armbru@redhat.com>
+-- 
+Aurelien Jarno                          GPG: 4096R/1DDD8C9B
+aurelien@aurel32.net                 http://www.aurel32.net
