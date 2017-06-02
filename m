@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40825)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42084)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1dGkv6-0005aa-41
-	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 07:39:09 -0400
+	(envelope-from <marcandre.lureau@gmail.com>) id 1dGkz2-00013B-JN
+	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 07:43:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1dGkv2-0000Ku-Rx
-	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 07:39:08 -0400
-Resent-Message-Id: <E1dGkv2-0000Ku-Rx@eggs.gnu.org>
-Received: from sender-of-o52.zoho.com ([135.84.80.217]:21414)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1dGkv2-0000KR-Jj
-	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 07:39:04 -0400
-Reply-To: <qemu-devel@nongnu.org>
-In-Reply-To: <20170602081120.3497-1-famz@redhat.com>
-Message-ID: <149640353153.4078.12133676529633625501@f98a8425f76e>
+	(envelope-from <marcandre.lureau@gmail.com>) id 1dGkyz-0002qj-Dv
+	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 07:43:12 -0400
+Received: from mail-lf0-x243.google.com ([2a00:1450:4010:c07::243]:36774)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+	id 1dGkyz-0002pz-1a
+	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 07:43:09 -0400
+Received: by mail-lf0-x243.google.com with SMTP id h4so6494153lfj.3
+	for <qemu-devel@nongnu.org>; Fri, 02 Jun 2017 04:43:08 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Fri, 2 Jun 2017 04:38:52 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PULL v2 00/22] Docker and block patches
+References: <20170601124746.32140-1-t.lamprecht@proxmox.com>
+In-Reply-To: <20170601124746.32140-1-t.lamprecht@proxmox.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Fri, 02 Jun 2017 11:42:56 +0000
+Message-ID: <CAJ+F1C+AmJCgtrSTxzhztmBpaNB2Y07grhXvq8DV+8z0Mj6YwA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [RFC 1/1] qemu-ga: add missing libpcre to MSI build
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,84 +29,93 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: famz@redhat.com
-Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org, stefanha@redhat.com
+To: Thomas Lamprecht <t.lamprecht@proxmox.com>, qemu-devel@nongnu.org
+Cc: Stefan Weil <sw@weilnetz.de>, Michael Roth <mdroth@linux.vnet.ibm.com>
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
-c3NhZ2UtaWQ6IDIwMTcwNjAyMDgxMTIwLjM0OTctMS1mYW16QHJlZGhhdC5jb20KU3ViamVjdDog
-W1FlbXUtZGV2ZWxdIFtQVUxMIHYyIDAwLzIyXSBEb2NrZXIgYW5kIGJsb2NrIHBhdGNoZXMKCj09
-PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKCkJBU0U9YmFzZQpuPTEKdG90YWw9
-JChnaXQgbG9nIC0tb25lbGluZSAkQkFTRS4uIHwgd2MgLWwpCmZhaWxlZD0wCgpnaXQgY29uZmln
-IC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFt
-ZXMgVHJ1ZQoKY29tbWl0cz0iJChnaXQgbG9nIC0tZm9ybWF0PSVIIC0tcmV2ZXJzZSAkQkFTRS4u
-KSIKZm9yIGMgaW4gJGNvbW1pdHM7IGRvCiAgICBlY2hvICJDaGVja2luZyBQQVRDSCAkbi8kdG90
-YWw6ICQoZ2l0IGxvZyAtbiAxIC0tZm9ybWF0PSVzICRjKS4uLiIKICAgIGlmICEgZ2l0IHNob3cg
-JGMgLS1mb3JtYXQ9ZW1haWwgfCAuL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIC07
-IHRoZW4KICAgICAgICBmYWlsZWQ9MQogICAgICAgIGVjaG8KICAgIGZpCiAgICBuPSQoKG4rMSkp
-CmRvbmUKCmV4aXQgJGZhaWxlZAo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4
-Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApTd2l0Y2hlZCB0byBhIG5ldyBi
-cmFuY2ggJ3Rlc3QnCjU5NDE1ZTQgYmxvY2s6IG1ha2UgYWNjb3VudGluZyB0aHJlYWQtc2FmZQoz
-OGU5NWU1IGJsb2NrOiBpbnRyb2R1Y2UgYmxvY2tfYWNjb3VudF9vbmVfaW8KNTA0MDc4NSBibG9j
-azogcHJvdGVjdCBtb2RpZmljYXRpb24gb2YgZGlydHkgYml0bWFwcyB3aXRoIGEgbXV0ZXgKOTgz
-NzNkNyBtaWdyYXRpb24vYmxvY2s6IHJlc2V0IGRpcnR5IGJpdG1hcCBiZWZvcmUgcmVhZGluZwoy
-YTBlNjZmIGJsb2NrOiBpbnRyb2R1Y2UgZGlydHlfYml0bWFwX211dGV4CmM3YjJmNjMgYmxvY2s6
-IHByb3RlY3QgdHJhY2tlZF9yZXF1ZXN0cyBhbmQgZmx1c2hfcXVldWUgd2l0aCByZXFzX2xvY2sK
-Y2MwZWY2YyBibG9jazogYWNjZXNzIHdyaXRlX2dlbiB3aXRoIGF0b21pY3MKNGRlYzdhNyBibG9j
-azogdXNlIFN0YXQ2NCBmb3Igd3JfaGlnaGVzdF9vZmZzZXQKYTc4Yjk3OSB1dGlsOiBhZGQgc3Rh
-dHM2NCBtb2R1bGUKMmZlMjVkNiB0aHJvdHRsZS1ncm91cHM6IHByb3RlY3QgdGhyb3R0bGVkIHJl
-cXVlc3RzIHdpdGggYSBDb011dGV4CmMzZTQzMDcgdGhyb3R0bGUtZ3JvdXBzOiBkbyBub3QgdXNl
-IHFlbXVfY29fZW50ZXJfbmV4dAo1MzY1NDU1IHRocm90dGxlLWdyb3Vwczogb25seSBzdGFydCBv
-bmUgY29yb3V0aW5lIGZyb20gZHJhaW5lZF9iZWdpbgplZDQ5OTU0IGJsb2NrOiBhY2Nlc3MgaW9f
-cGx1Z2dlZCB3aXRoIGF0b21pYyBvcHMKYTdlNzY3YiBibG9jazogYWNjZXNzIHdha2V1cCB3aXRo
-IGF0b21pYyBvcHMKYWRjNTgyOCBibG9jazogYWNjZXNzIHNlcmlhbGlzaW5nX2luX2ZsaWdodCB3
-aXRoIGF0b21pYyBvcHMKNzYwMWUyYSBibG9jazogYWNjZXNzIGlvX2xpbWl0c19kaXNhYmxlZCB3
-aXRoIGF0b21pYyBvcHMKMGIzMjNlNyBibG9jazogYWNjZXNzIHF1aWVzY2VfY291bnRlciB3aXRo
-IGF0b21pYyBvcHMKMGE2ODg1OCBibG9jazogYWNjZXNzIGNvcHlfb25fcmVhZCB3aXRoIGF0b21p
-YyBvcHMKZThmNzc1MSBkb2NrZXI6IEFkZCBmbGV4IGFuZCBiaXNvbiB0byBjZW50b3M2IGltYWdl
-CjQwYzYzZmUgZG9ja2VyOiBBZGQgbGliYWlvIHRvIGZlZG9yYSBpbWFnZQphMTE4ODU4IGRvY2tl
-cjogQWRkIGJ6aXAyIGFuZCBob3N0bmFtZSB0byBmZWRvcmEgaW1hZ2UKMWFiNTllOCBkb2NrZXI6
-IFJ1biB0ZXN0cyB3aXRoIGN1cnJlbnQgdXNlcgoKPT09IE9VVFBVVCBCRUdJTiA9PT0KQ2hlY2tp
-bmcgUEFUQ0ggMS8yMjogZG9ja2VyOiBSdW4gdGVzdHMgd2l0aCBjdXJyZW50IHVzZXIuLi4KQ2hl
-Y2tpbmcgUEFUQ0ggMi8yMjogZG9ja2VyOiBBZGQgYnppcDIgYW5kIGhvc3RuYW1lIHRvIGZlZG9y
-YSBpbWFnZS4uLgpDaGVja2luZyBQQVRDSCAzLzIyOiBkb2NrZXI6IEFkZCBsaWJhaW8gdG8gZmVk
-b3JhIGltYWdlLi4uCkNoZWNraW5nIFBBVENIIDQvMjI6IGRvY2tlcjogQWRkIGZsZXggYW5kIGJp
-c29uIHRvIGNlbnRvczYgaW1hZ2UuLi4KQ2hlY2tpbmcgUEFUQ0ggNS8yMjogYmxvY2s6IGFjY2Vz
-cyBjb3B5X29uX3JlYWQgd2l0aCBhdG9taWMgb3BzLi4uCkNoZWNraW5nIFBBVENIIDYvMjI6IGJs
-b2NrOiBhY2Nlc3MgcXVpZXNjZV9jb3VudGVyIHdpdGggYXRvbWljIG9wcy4uLgpDaGVja2luZyBQ
-QVRDSCA3LzIyOiBibG9jazogYWNjZXNzIGlvX2xpbWl0c19kaXNhYmxlZCB3aXRoIGF0b21pYyBv
-cHMuLi4KQ2hlY2tpbmcgUEFUQ0ggOC8yMjogYmxvY2s6IGFjY2VzcyBzZXJpYWxpc2luZ19pbl9m
-bGlnaHQgd2l0aCBhdG9taWMgb3BzLi4uCkNoZWNraW5nIFBBVENIIDkvMjI6IGJsb2NrOiBhY2Nl
-c3Mgd2FrZXVwIHdpdGggYXRvbWljIG9wcy4uLgpDaGVja2luZyBQQVRDSCAxMC8yMjogYmxvY2s6
-IGFjY2VzcyBpb19wbHVnZ2VkIHdpdGggYXRvbWljIG9wcy4uLgpDaGVja2luZyBQQVRDSCAxMS8y
-MjogdGhyb3R0bGUtZ3JvdXBzOiBvbmx5IHN0YXJ0IG9uZSBjb3JvdXRpbmUgZnJvbSBkcmFpbmVk
-X2JlZ2luLi4uCkNoZWNraW5nIFBBVENIIDEyLzIyOiB0aHJvdHRsZS1ncm91cHM6IGRvIG5vdCB1
-c2UgcWVtdV9jb19lbnRlcl9uZXh0Li4uCkNoZWNraW5nIFBBVENIIDEzLzIyOiB0aHJvdHRsZS1n
-cm91cHM6IHByb3RlY3QgdGhyb3R0bGVkIHJlcXVlc3RzIHdpdGggYSBDb011dGV4Li4uCkNoZWNr
-aW5nIFBBVENIIDE0LzIyOiB1dGlsOiBhZGQgc3RhdHM2NCBtb2R1bGUuLi4KRVJST1I6IG1lbW9y
-eSBiYXJyaWVyIHdpdGhvdXQgY29tbWVudAojMzMyOiBGSUxFOiB1dGlsL3N0YXRzNjQuYzoxMDI6
-CisgICAgICAgIHNtcF93bWIoKTsKCkVSUk9SOiBtZW1vcnkgYmFycmllciB3aXRob3V0IGNvbW1l
-bnQKIzM2MTogRklMRTogdXRpbC9zdGF0czY0LmM6MTMxOgorICAgICAgICBzbXBfd21iKCk7Cgp0
-b3RhbDogMiBlcnJvcnMsIDAgd2FybmluZ3MsIDMzNSBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNo
-IGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJv
-cnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2Vl
-CkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgpDaGVja2luZyBQQVRDSCAxNS8yMjogYmxvY2s6
-IHVzZSBTdGF0NjQgZm9yIHdyX2hpZ2hlc3Rfb2Zmc2V0Li4uCkNoZWNraW5nIFBBVENIIDE2LzIy
-OiBibG9jazogYWNjZXNzIHdyaXRlX2dlbiB3aXRoIGF0b21pY3MuLi4KQ2hlY2tpbmcgUEFUQ0gg
-MTcvMjI6IGJsb2NrOiBwcm90ZWN0IHRyYWNrZWRfcmVxdWVzdHMgYW5kIGZsdXNoX3F1ZXVlIHdp
-dGggcmVxc19sb2NrLi4uCkNoZWNraW5nIFBBVENIIDE4LzIyOiBibG9jazogaW50cm9kdWNlIGRp
-cnR5X2JpdG1hcF9tdXRleC4uLgpDaGVja2luZyBQQVRDSCAxOS8yMjogbWlncmF0aW9uL2Jsb2Nr
-OiByZXNldCBkaXJ0eSBiaXRtYXAgYmVmb3JlIHJlYWRpbmcuLi4KQ2hlY2tpbmcgUEFUQ0ggMjAv
-MjI6IGJsb2NrOiBwcm90ZWN0IG1vZGlmaWNhdGlvbiBvZiBkaXJ0eSBiaXRtYXBzIHdpdGggYSBt
-dXRleC4uLgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojMzA2OiBGSUxFOiBtaWdy
-YXRpb24vYmxvY2suYzo1Mzk6CisgICAgICAgICAgICBiZHJ2X3Jlc2V0X2RpcnR5X2JpdG1hcF9s
-b2NrZWQoYm1kcy0+ZGlydHlfYml0bWFwLCBzZWN0b3IsIG5yX3NlY3RvcnMpOwoKdG90YWw6IDAg
-ZXJyb3JzLCAxIHdhcm5pbmdzLCAyNzIgbGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5
-bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBm
-YWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BB
-VENIIGluIE1BSU5UQUlORVJTLgpDaGVja2luZyBQQVRDSCAyMS8yMjogYmxvY2s6IGludHJvZHVj
-ZSBibG9ja19hY2NvdW50X29uZV9pby4uLgpDaGVja2luZyBQQVRDSCAyMi8yMjogYmxvY2s6IG1h
-a2UgYWNjb3VudGluZyB0aHJlYWQtc2FmZS4uLgo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29t
-bWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoKLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNh
-bGx5IGJ5IFBhdGNoZXcgW2h0dHA6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZl
-ZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAZnJlZWxpc3RzLm9yZw==
+Hi
+
+On Thu, Jun 1, 2017 at 5:08 PM Thomas Lamprecht <t.lamprecht@proxmox.com>
+wrote:
+
+> glib depends on libpcre which was not shipped with the MSI, thus
+> starting of the qemu-ga.exe failed with the respective error message.
+>
+> Tell WIXL to ship this library with the MSI to avoid this problem.
+>
+> Signed-off-by: Thomas Lamprecht <t.lamprecht@proxmox.com>
+> CC: Stefan Weil <sw@weilnetz.de>
+> CC: Michael Roth <mdroth@linux.vnet.ibm.com>
+>
+
+
+It depends on your glib build, but since Fedora is one of the most
+maintained cross mingw- distrib, it make sense to fix the build there.
+
+Other solutions would involve either using wixl-specific require
+preprocessor directive (which comes with a bunch of unused files since
+those are mostly generated from mingw*- packages), or coming up with some
+kind of dynamic dependency resolution (approach similar to Richard W.M.
+Jones nsiswrapper). However this last approach is quite limited, since it
+doesn't reach to data files etc.
+
+In the meantime:
+ Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+
+
+> I haven't done much with the qga or WIXL, so I send this as a RFC.
+> I hope that I guessed the right people to get CC'ed from MAINTAINERS.
+>
+> This fixes a current qemu-ga MSI build, I tested it successfully with
+> Windows 7
+> and Windows 10 as guest OS.
+>
+> I cross built from a Fedora 25 LXC container.
+>
+> The Guid for the libpcre was generated by https://www.guidgen.com/ as
+> suggested
+> by:
+>
+> http://wixtoolset.org/documentation/manual/v3/howtos/general/generate_gui=
+ds.html
+>
+>  qga/installer/qemu-ga.wxs | 4 ++++
+>  1 file changed, 4 insertions(+)
+>
+> diff --git a/qga/installer/qemu-ga.wxs b/qga/installer/qemu-ga.wxs
+> index fa2260cafa..5af11627f8 100644
+> --- a/qga/installer/qemu-ga.wxs
+> +++ b/qga/installer/qemu-ga.wxs
+> @@ -125,6 +125,9 @@
+>            <Component Id=3D"libwinpthread"
+> Guid=3D"{6C117C78-0F47-4B07-8F34-6BEE11643829}">
+>              <File Id=3D"libwinpthread_1.dll" Name=3D"libwinpthread-1.dll=
+"
+> Source=3D"$(var.Mingw_bin)/libwinpthread-1.dll" KeyPath=3D"yes" DiskId=3D=
+"1"/>
+>            </Component>
+> +          <Component Id=3D"libpcre"
+> Guid=3D"{7A86B45E-A009-489A-A849-CE3BACF03CD0}">
+> +            <File Id=3D"libpcre_1.dll" Name=3D"libpcre-1.dll"
+> Source=3D"$(var.Mingw_bin)/libpcre-1.dll" KeyPath=3D"yes" DiskId=3D"1"/>
+> +          </Component>
+>            <Component Id=3D"registry_entries"
+> Guid=3D"{D075D109-51CA-11E3-9F8B-000C29858960}">
+>              <RegistryKey Root=3D"HKLM"
+>
+> Key=3D"Software\$(env.QEMU_GA_MANUFACTURER)\$(env.QEMU_GA_DISTRO)\Tools\Q=
+emuGA">
+> @@ -173,6 +176,7 @@
+>        <ComponentRef Id=3D"libssp" />
+>        <ComponentRef Id=3D"libwinpthread" />
+>        <ComponentRef Id=3D"registry_entries" />
+> +      <ComponentRef Id=3D"libpcre" />
+>      </Feature>
+>
+>      <InstallExecuteSequence>
+> --
+> 2.11.0
+>
+>
+>
+> --
+Marc-Andr=C3=A9 Lureau
