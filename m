@@ -1,22 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34363)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34408)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1dGpWz-0007qt-Hr
-	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 12:34:34 -0400
+	(envelope-from <mst@redhat.com>) id 1dGpX2-0007rU-Ai
+	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 12:34:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1dGpWw-00068n-VV
-	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 12:34:33 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:50328)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1dGpWw-00067S-PC
-	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 12:34:30 -0400
-Date: Fri, 2 Jun 2017 19:34:28 +0300
+	(envelope-from <mst@redhat.com>) id 1dGpX1-0006Gd-FD
+	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 12:34:36 -0400
+Date: Fri, 2 Jun 2017 19:34:29 +0300
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <1496421247-857-1-git-send-email-mst@redhat.com>
+Message-ID: <1496421247-857-2-git-send-email-mst@redhat.com>
+References: <1496421247-857-1-git-send-email-mst@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 0/8] virtio, vhost: fixes, features
+In-Reply-To: <1496421247-857-1-git-send-email-mst@redhat.com>
+Subject: [Qemu-devel] [PULL 1/8] virtio-serial-bus: Unset hotplug handler
+ when unrealize
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,58 +24,43 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Ladi Prosek <lprosek@redhat.com>, qemu-stable@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Fam Zheng <famz@redhat.com>, Amit Shah <amit@kernel.org>
 
-The following changes since commit d47a851caeda96d5979bf48d4bae6a87784ad9=
-1d:
+From: Ladi Prosek <lprosek@redhat.com>
 
-  Merge remote-tracking branch 'remotes/juanquintela/tags/migration/20170=
-601' into staging (2017-06-02 14:07:53 +0100)
+Virtio serial device controls the lifetime of virtio-serial-bus and
+virtio-serial-bus links back to the device via its hotplug-handler
+property. This extra ref-count prevents the device from getting
+finalized, leaving the VirtIODevice memory listener registered and
+leading to use-after-free later on.
 
-are available in the git repository at:
+This patch addresses the same issue as Fam Zheng's
+"virtio-scsi: Unset hotplug handler when unrealize"
+only for a different virtio device.
 
-  git://git.kernel.org/pub/scm/virt/kvm/mst/qemu.git tags/for_upstream
-
-for you to fetch changes up to 6dcdd06e3b0d0c5651219013ec975348e2050041:
-
-  spec/vhost-user spec: Add IOMMU support (2017-06-02 18:57:17 +0300)
-
-----------------------------------------------------------------
-virtio, vhost: fixes, features
-
-IOTLB support in vhost-user.
-A bunch of fixes all over the place.
-
+Cc: qemu-stable@nongnu.org
+Signed-off-by: Ladi Prosek <lprosek@redhat.com>
+Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
+Reviewed-by: Fam Zheng <famz@redhat.com>
+---
+ hw/char/virtio-serial-bus.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-----------------------------------------------------------------
-Ladi Prosek (1):
-      virtio-serial-bus: Unset hotplug handler when unrealize
-
-Marc-Andr=C3=A9 Lureau (2):
-      vhost-user: add vhost_user to hold the chr
-      vhost-user: add slave-req-fd support
-
-Maxime Coquelin (3):
-      vhost: propagate errors in vhost_device_iotlb_miss()
-      vhost: rework IOTLB messaging
-      spec/vhost-user spec: Add IOMMU support
-
-Paolo Bonzini (1):
-      virtio: add virtqueue_alloc_element tracepoint
-
-Stefan Hajnoczi (1):
-      virtio-serial: fix segfault on disconnect
-
- docs/specs/vhost-user.txt         | 116 ++++++++++++++++++++++-
- include/hw/virtio/vhost-backend.h |  23 +++--
- include/hw/virtio/vhost.h         |   2 +-
- hw/char/virtio-serial-bus.c       |   6 ++
- hw/net/vhost_net.c                |   1 +
- hw/virtio/vhost-backend.c         | 130 ++++++++++++++-----------
- hw/virtio/vhost-user.c            | 194 ++++++++++++++++++++++++++++++++=
-++++--
- hw/virtio/vhost.c                 |  19 ++--
- hw/virtio/virtio.c                |   1 +
- hw/virtio/trace-events            |   1 +
- 10 files changed, 412 insertions(+), 81 deletions(-)
+diff --git a/hw/char/virtio-serial-bus.c b/hw/char/virtio-serial-bus.c
+index d797a67..aa9c11a 100644
+--- a/hw/char/virtio-serial-bus.c
++++ b/hw/char/virtio-serial-bus.c
+@@ -1121,6 +1121,9 @@ static void virtio_serial_device_unrealize(DeviceState *dev, Error **errp)
+         timer_free(vser->post_load->timer);
+         g_free(vser->post_load);
+     }
++
++    qbus_set_hotplug_handler(BUS(&vser->bus), NULL, errp);
++
+     virtio_cleanup(vdev);
+ }
+ 
+-- 
+MST
