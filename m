@@ -1,17 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52248)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52253)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dGd3U-0006yH-TS
+	(envelope-from <dgibson@ozlabs.org>) id 1dGd3V-0006yJ-60
 	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 23:15:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dGd3T-0002DN-Lp
-	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 23:15:16 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1dGd3T-0002Ds-Sv
+	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 23:15:17 -0400
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Fri,  2 Jun 2017 13:15:07 +1000
-Message-Id: <20170602031507.29881-5-david@gibson.dropbear.id.au>
-In-Reply-To: <20170602031507.29881-1-david@gibson.dropbear.id.au>
-References: <20170602031507.29881-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [PATCHv5 4/4] ppc: Rework CPU compatibility testing
- across migration
+Date: Fri,  2 Jun 2017 13:15:03 +1000
+Message-Id: <20170602031507.29881-1-david@gibson.dropbear.id.au>
+Subject: [Qemu-devel] [PATCHv5 0/4] Clean up compatibility mode handling
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,149 +20,148 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: groug@kaod.org, clg@kaod.org, mdroth@linux.vnet.ibm.com, sursingh@redhat.com, bharata@linux.vnet.ibm.com, nikunj@linux.vnet.ibm.com
 Cc: abologna@redhat.com, sbobroff@redhat.com, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
 
-Migrating between different CPU versions is a bit complicated for ppc.
-A long time ago, we ensured identical CPU versions at either end by
-checking the PVR had the same value.  However, this breaks under KVM
-HV, because we always have to use the host's PVR - it's not
-virtualized.  That would mean we couldn't migrate between hosts with
-different PVRs, even if the CPUs are close enough to compatible in
-practice (sometimes identical cores with different surrounding logic
-have different PVRs, so this happens in practice quite often).
+This is a rebased and revised version of my patches revising CPU
+compatiblity mode handling on ppc, last posted in November.  Since
+then, many of the patches have already been merged (some for 2.9, some
+since).  This is what's left.
 
-So, we removed the PVR check, but instead checked that several flags
-indicating supported instructions matched.  This turns out to be a bad
-idea, because those instruction masks are not architected information, but
-essentially a TCG implementation detail.  So changes to qemu internal CPU
-modelling can break migration - this happened between qemu-2.6 and
-qemu-2.7.  That was addressed by 146c11f1 "target-ppc: Allow eventual
-removal of old migration mistakes".
+ * There was conceptual confusion about what a compatibility mode
+   means, and how it interacts with the machine type.  This cleans
+   that up, clarifying that a compatibility mode (as an externally set
+   option) only makes sense on machine types that don't permit the
+   guest hypervisor privilege (i.e. 'pseries')
 
-Now, verification of CPU compatibility across a migration basically doesn't
-happen.  We simply ignore the PVR of the incoming migration, and hope the
-cpu on the destination is close enough to work.
+ * It was previously the user's (or management layer's) responsibility
+   to determine compatibility of CPUs on either end for migration.
+   This uses the compatibility modes to check that properly during an
+   incoming migration.
 
-Now that we've cleaned up handling of processor compatibility modes for
-pseries machine type, we can do better.  We allow migration if:
+This hasn't been extensively tested yet.  There are quite a few
+migration cases to consider, for example:
 
-    * The source and destination PVRs are for the same type of CPU, as
-      determined by CPU class's pvr_match function
-OR  * When the source was in a compatibility mode, and the destination CPU
-      supports the same compatibility mode
+Basic:
 
-Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-Reviewed-by: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
----
- target/ppc/machine.c | 69 +++++++++++++++++++++++++++++++++++++++++++++++++---
- 1 file changed, 66 insertions(+), 3 deletions(-)
+1) Boot guest with -cpu host
+        Should go into POWER8 compat mode after CAS
+        Previously would have been raw mode
 
-diff --git a/target/ppc/machine.c b/target/ppc/machine.c
-index 6cb3a48..a29aabe 100644
---- a/target/ppc/machine.c
-+++ b/target/ppc/machine.c
-@@ -8,6 +8,7 @@
- #include "helper_regs.h"
- #include "mmu-hash64.h"
- #include "migration/cpu.h"
-+#include "qapi/error.h"
- 
- static int cpu_load_old(QEMUFile *f, void *opaque, int version_id)
- {
-@@ -195,6 +196,27 @@ static void cpu_pre_save(void *opaque)
-     }
- }
- 
-+/*
-+ * Determine if a given PVR is a "close enough" match to the CPU
-+ * object.  For TCG and KVM PR it would probably be sufficient to
-+ * require an exact PVR match.  However for KVM HV the user is
-+ * restricted to a PVR exactly matching the host CPU.  The correct way
-+ * to handle this is to put the guest into an architected
-+ * compatibility mode.  However, to allow a more forgiving transition
-+ * and migration from before this was widely done, we allow migration
-+ * between sufficiently similar PVRs, as determined by the CPU class's
-+ * pvr_match() hook.
-+ */
-+static bool pvr_match(PowerPCCPU *cpu, uint32_t pvr)
-+{
-+    PowerPCCPUClass *pcc = POWERPC_CPU_GET_CLASS(cpu);
-+
-+    if (pvr == pcc->pvr) {
-+        return true;
-+    }
-+    return pcc->pvr_match(pcc, pvr);
-+}
-+
- static int cpu_post_load(void *opaque, int version_id)
- {
-     PowerPCCPU *cpu = opaque;
-@@ -203,10 +225,31 @@ static int cpu_post_load(void *opaque, int version_id)
-     target_ulong msr;
- 
-     /*
--     * We always ignore the source PVR. The user or management
--     * software has to take care of running QEMU in a compatible mode.
-+     * If we're operating in compat mode, we should be ok as long as
-+     * the destination supports the same compatiblity mode.
-+     *
-+     * Otherwise, however, we require that the destination has exactly
-+     * the same CPU model as the source.
-      */
--    env->spr[SPR_PVR] = env->spr_cb[SPR_PVR].default_value;
-+
-+#if defined(TARGET_PPC64)
-+    if (cpu->compat_pvr) {
-+        Error *local_err = NULL;
-+
-+        ppc_set_compat(cpu, cpu->compat_pvr, &local_err);
-+        if (local_err) {
-+            error_report_err(local_err);
-+            error_free(local_err);
-+            return -1;
-+        }
-+    } else
-+#endif
-+    {
-+        if (!pvr_match(cpu, env->spr[SPR_PVR])) {
-+            return -1;
-+        }
-+    }
-+
-     env->lr = env->spr[SPR_LR];
-     env->ctr = env->spr[SPR_CTR];
-     cpu_write_xer(env, env->spr[SPR_XER]);
-@@ -560,6 +603,25 @@ static const VMStateDescription vmstate_tlbmas = {
-     }
- };
- 
-+static bool compat_needed(void *opaque)
-+{
-+    PowerPCCPU *cpu = opaque;
-+
-+    assert(!(cpu->compat_pvr && !cpu->vhyp));
-+    return (cpu->compat_pvr != 0);
-+}
-+
-+static const VMStateDescription vmstate_compat = {
-+    .name = "cpu/compat",
-+    .version_id = 1,
-+    .minimum_version_id = 1,
-+    .needed = compat_needed,
-+    .fields = (VMStateField[]) {
-+        VMSTATE_UINT32(compat_pvr, PowerPCCPU),
-+        VMSTATE_END_OF_LIST()
-+    }
-+};
-+
- const VMStateDescription vmstate_ppc_cpu = {
-     .name = "cpu",
-     .version_id = 5,
-@@ -613,6 +675,7 @@ const VMStateDescription vmstate_ppc_cpu = {
-         &vmstate_tlb6xx,
-         &vmstate_tlbemb,
-         &vmstate_tlbmas,
-+        &vmstate_compat,
-         NULL
-     }
- };
+2) Boot guest with -machine pseries,max-cpu-compat=power7 -cpu host
+        Should go into POWER7 compat mode
+
+3) Boot guest with -cpu host,compat=power7
+        Should act as (2), but print a warning
+
+4) Boot guest via libvirt with power7 compat mode specified in XML
+        Should act as (3), (2) once we fix libvirt
+
+5) Hack guest to only advertise power7 compatibility, boot with -cpu host
+        Should go into POWER7 compat mode after CAS
+
+6) Hack guest to only advertise real PVRs
+        Should remain in POWER8 raw mode after CAS
+
+7) Hack guest to only advertise real PVRs
+   Boot with -machine pseries,max-cpu-compat=power8
+        Should fail at CAS time
+
+8) Hack guest to only advertise power7 compatibility, boot with -cpu host
+   Reboot to normal guest
+        Should go to power7 compat mode after CAS of boot 1
+        Should revert to raw mode on reboot
+        SHould go to power8 compat mode after CAS of boot 2
+
+Migration:
+
+9) Boot guest with qemu-2.6 -machine pseries-2.6 -cpu host
+   Migrate to qemu-2.8 -machine pseries-2.6 -cpu host
+        Should work, end up running in power8 raw mode
+
+10) Boot guest with qemu-2.7 -machine pseries-2.7 -cpu host
+    Migrate to qemu-2.8 -machine pseries-2.7 -cpu host
+        Should work, end up running in power8 raw mode
+
+11) Boot guest with qemu-2.7 -machine pseries-2.7 -cpu host,compat=power7
+    Migrate to qemu-2.8 -machine pseries-2.7 -cpu host,compat=power7
+        Should work, be running in POWER7 compat after, but give warning like
+        (3)
+
+12) Boot guest with qemu-2.7 -machine pseries-2.7 -cpu host,compat=power7
+    Migrate to qemu-2.8 -machine pseries-2.7,max-cpu-compat=power7 -cpu host
+        Should work, be running in POWER7 compat after, no warning
+
+13) Boot to SLOF with qemu-2.6 -machine pseries-2.6 -cpu host
+    Migrate to qemu-2.8 -machine pseries-2.6 -cpu host
+
+        ?
+
+14) Boot to SLOF with qemu-2.7 -machine pseries-2.7 -cpu host
+    Migrate to qemu-2.8 -machine pseries-2.7 -cpu host
+        ?
+
+15) Boot to SLOF with qemu-2.7 -machine pseries-2.7 -cpu host,compat=power7
+    Migrate to qemu-2.8 -machine pseries-2.7 -cpu host,compat=power7
+        ?
+
+16) Boot to SLOF with qemu-2.7 -machine pseries-2.7 -cpu host,compat=power7
+    Migrate to qemu-2.8 -machine pseries-2.7,max-cpu-compat=power7 -cpu host
+        ?
+
+17) Boot guest with qemu-2.6 -machine pseries-2.6 -cpu host
+    Migrate to qemu-2.7.z -machine pseries-2.6 -cpu host
+        Should work
+
+18) Hack guest to only advertise power7 compatibility, boot with -cpu host
+    Boot with qemu-2.8, migrate to qemu-2.8
+        Should be in power7 compat mode after CAS on source, and still
+        in power7 compat mode on destination
+
+Changes since v4:
+  * Fixed a crash bug in the smp option compatiblity mangling
+  * Removed an unnecessary fallback for missing pvr_match
+  * Some spelling corrections
+  * Migration core patch removed (alread merged to ppc-for-2.10)
+
+Changes since v3:
+  * Backwards compatible -cpu handling now removes compat= option from
+    options passed on to the cpu, so it doesn't trigger further warnings
+  * Add a migration fix make cpu_synchronize_state() safe in post_load
+    handlers, which in turn fixes a bug in 5/5.
+  * A number of bugfixes and other tweaks suggested by feedback on v2.
+
+Changes since RFCv2:
+  * Many patches dropped, since they're already merged
+  * Rebased, fixed conflicts
+  * Restored support for backwards migration (wasn't as complicated as
+    I thought)
+  * Updated final patch's description to more accurately reflect the
+    logic
+
+Changes since RFCv1:
+  * Change CAS logic to prefer compatibility modes over raw mode
+  * Simplified by giving up on half-hearted attempts to maintain
+    backwards migration
+  * Folded migration stream changes into a single patch
+  * Removed some preliminary patches which are already merged
+
+David Gibson (3):
+  pseries: Move CPU compatibility property to machine
+  pseries: Reset CPU compatibility mode
+  ppc: Rework CPU compatibility testing across migration
+
+Greg Kurz (1):
+  qapi: add explicit null to string input and output visitors
+
+ hw/ppc/spapr.c               |   8 +++-
+ hw/ppc/spapr_cpu_core.c      |  61 +++++++++++++++++++++-----
+ hw/ppc/spapr_hcall.c         |   8 ++--
+ include/hw/ppc/spapr.h       |  12 +++--
+ qapi/string-input-visitor.c  |  11 +++++
+ qapi/string-output-visitor.c |  14 ++++++
+ target/ppc/compat.c          | 102 +++++++++++++++++++++++++++++++++++++++++++
+ target/ppc/cpu.h             |   5 ++-
+ target/ppc/machine.c         |  69 +++++++++++++++++++++++++++--
+ target/ppc/translate_init.c  |  86 +++++++++++-------------------------
+ 10 files changed, 292 insertions(+), 84 deletions(-)
+
 -- 
 2.9.4
