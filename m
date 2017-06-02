@@ -1,30 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35686)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35985)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dGo4L-0000gT-PR
-	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 11:00:54 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1dGo5Q-0001Fc-J4
+	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 11:02:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dGo4L-0002Oj-3W
-	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 11:00:53 -0400
-Received: from mail-wr0-x22f.google.com ([2a00:1450:400c:c0c::22f]:36513)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1dGo4K-0002OX-QT
-	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 11:00:53 -0400
-Received: by mail-wr0-x22f.google.com with SMTP id v111so1808903wrc.3
-	for <qemu-devel@nongnu.org>; Fri, 02 Jun 2017 08:00:52 -0700 (PDT)
-MIME-Version: 1.0
-In-Reply-To: <8b782ee5-3545-3cb5-3b09-209fcffee7e4@redhat.com>
-References: <1493314727-6951-1-git-send-email-wei@redhat.com>
-	<CAFEAcA-KKvhspYza=8TNNuFtqzco=ChhtS6Aa5hnn8=Cb036-Q@mail.gmail.com>
-	<4dbaaea9-7576-9acf-5327-b22db6f00ed2@redhat.com>
-	<CAFEAcA8K9DENSPqJD2Okqjqyi7T8RhSBmhCa3ztooJK5xdcZVg@mail.gmail.com>
-	<8b782ee5-3545-3cb5-3b09-209fcffee7e4@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 2 Jun 2017 16:00:30 +0100
-Message-ID: <CAFEAcA8GY3yqZCVHihcFaFS-EkmEy+FRJ9+Kq_xRRdzD7+6DnQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH 0/2] Fix compilation dependency issues of
- CONFIG_ARM_V7M
+	(envelope-from <vsementsov@virtuozzo.com>) id 1dGo5L-0002g9-Oi
+	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 11:02:00 -0400
+Received: from mailhub.sw.ru ([195.214.232.25]:15159 helo=relay.sw.ru)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
+	id 1dGo5L-0002el-CT
+	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 11:01:55 -0400
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Fri,  2 Jun 2017 18:01:45 +0300
+Message-Id: <20170602150150.258222-8-vsementsov@virtuozzo.com>
+In-Reply-To: <20170602150150.258222-1-vsementsov@virtuozzo.com>
+References: <20170602150150.258222-1-vsementsov@virtuozzo.com>
+Subject: [Qemu-devel] [PATCH v2 07/12] nbd/server: refactor
+ nbd_co_receive_request
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,21 +25,127 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Wei Huang <wei@redhat.com>
-Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org
+Cc: pbonzini@redhat.com, eblake@redhat.com, den@openvz.org, vsementsov@virtuozzo.com
 
-On 28 April 2017 at 14:58, Wei Huang <wei@redhat.com> wrote:
-> Using #ifdef is indeed a cleaner solution. However I can't use "#ifdef
-> CONFIG_ARM_V7M" & co inside target/arm/cpu.c file because CONFIG_xxx
-> aren't available as preprocessor directives. From what I saw the
-> CONFIG_xxx options can only control compiling source file. One solution
-> is to extract out all v7M code into separate files and use
-> CONFIG_ARM_V7M to direct compilation. A bit messy though. Any other
-> suggestions?
+Move function tail, about receiving next request out of the function.
+Error path is simplified and nbd_co_receive_request becomes more
+corresponding to its name.
 
-We seem to run into "CONFIG_FOO is defined for make but not
-for the C preprocessor" from time to time, so maybe we should
-fix that?
+Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
+---
+ nbd/server.c | 41 +++++++++++++----------------------------
+ 1 file changed, 13 insertions(+), 28 deletions(-)
 
-thanks
--- PMM
+diff --git a/nbd/server.c b/nbd/server.c
+index b0bb263596..8ac095d6bc 100644
+--- a/nbd/server.c
++++ b/nbd/server.c
+@@ -1006,14 +1006,11 @@ static int nbd_co_send_reply(NBDRequestData *req, NBDReply *reply, int len)
+ static int nbd_co_receive_request(NBDRequestData *req, NBDRequest *request)
+ {
+     NBDClient *client = req->client;
+-    int rc;
+ 
+     g_assert(qemu_in_coroutine());
+     assert(client->recv_coroutine == qemu_coroutine_self());
+-    rc = nbd_receive_request(client->ioc, request);
+-    if (rc < 0) {
+-        rc = -EIO;
+-        goto out;
++    if (nbd_receive_request(client->ioc, request) < 0) {
++        return -EIO;
+     }
+ 
+     TRACE("Decoding type");
+@@ -1027,8 +1024,7 @@ static int nbd_co_receive_request(NBDRequestData *req, NBDRequest *request)
+         /* Special case: we're going to disconnect without a reply,
+          * whether or not flags, from, or len are bogus */
+         TRACE("Request type is DISCONNECT");
+-        rc = -EIO;
+-        goto out;
++        return -EIO;
+     }
+ 
+     /* Check for sanity in the parameters, part 1.  Defer as many
+@@ -1036,22 +1032,19 @@ static int nbd_co_receive_request(NBDRequestData *req, NBDRequest *request)
+      * payload, so we can try and keep the connection alive.  */
+     if ((request->from + request->len) < request->from) {
+         LOG("integer overflow detected, you're probably being attacked");
+-        rc = -EINVAL;
+-        goto out;
++        return -EINVAL;
+     }
+ 
+     if (request->type == NBD_CMD_READ || request->type == NBD_CMD_WRITE) {
+         if (request->len > NBD_MAX_BUFFER_SIZE) {
+             LOG("len (%" PRIu32" ) is larger than max len (%u)",
+                 request->len, NBD_MAX_BUFFER_SIZE);
+-            rc = -EINVAL;
+-            goto out;
++            return -EINVAL;
+         }
+ 
+         req->data = blk_try_blockalign(client->exp->blk, request->len);
+         if (req->data == NULL) {
+-            rc = -ENOMEM;
+-            goto out;
++            return -ENOMEM;
+         }
+     }
+     if (request->type == NBD_CMD_WRITE) {
+@@ -1059,8 +1052,7 @@ static int nbd_co_receive_request(NBDRequestData *req, NBDRequest *request)
+ 
+         if (nbd_read(client->ioc, req->data, request->len, NULL) < 0) {
+             LOG("reading from socket failed");
+-            rc = -EIO;
+-            goto out;
++            return -EIO;
+         }
+         req->complete = true;
+     }
+@@ -1070,28 +1062,19 @@ static int nbd_co_receive_request(NBDRequestData *req, NBDRequest *request)
+         LOG("operation past EOF; From: %" PRIu64 ", Len: %" PRIu32
+             ", Size: %" PRIu64, request->from, request->len,
+             (uint64_t)client->exp->size);
+-        rc = request->type == NBD_CMD_WRITE ? -ENOSPC : -EINVAL;
+-        goto out;
++        return request->type == NBD_CMD_WRITE ? -ENOSPC : -EINVAL;
+     }
+     if (request->flags & ~(NBD_CMD_FLAG_FUA | NBD_CMD_FLAG_NO_HOLE)) {
+         LOG("unsupported flags (got 0x%x)", request->flags);
+-        rc = -EINVAL;
+-        goto out;
++        return -EINVAL;
+     }
+     if (request->type != NBD_CMD_WRITE_ZEROES &&
+         (request->flags & NBD_CMD_FLAG_NO_HOLE)) {
+         LOG("unexpected flags (got 0x%x)", request->flags);
+-        rc = -EINVAL;
+-        goto out;
++        return -EINVAL;
+     }
+ 
+-    rc = 0;
+-
+-out:
+-    client->recv_coroutine = NULL;
+-    nbd_client_receive_next_request(client);
+-
+-    return rc;
++    return 0;
+ }
+ 
+ /* Owns a reference to the NBDClient passed as opaque.  */
+@@ -1113,6 +1096,8 @@ static coroutine_fn void nbd_trip(void *opaque)
+ 
+     req = nbd_request_get(client);
+     ret = nbd_co_receive_request(req, &request);
++    client->recv_coroutine = NULL;
++    nbd_client_receive_next_request(client);
+     if (ret == -EIO) {
+         goto out;
+     }
+-- 
+2.11.1
