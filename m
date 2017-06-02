@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36175)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36171)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1dGkej-0006HZ-3Q
+	(envelope-from <vsementsov@virtuozzo.com>) id 1dGkej-0006HY-29
 	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 07:22:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1dGkef-0005bB-2S
-	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 07:22:13 -0400
-Received: from mailhub.sw.ru ([195.214.232.25]:12422 helo=relay.sw.ru)
+	(envelope-from <vsementsov@virtuozzo.com>) id 1dGkef-0005b6-1b
+	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 07:22:12 -0400
+Received: from mailhub.sw.ru ([195.214.232.25]:30799 helo=relay.sw.ru)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
-	id 1dGkee-0005WR-Nk
+	id 1dGkee-0005Wy-ML
 	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 07:22:08 -0400
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Fri,  2 Jun 2017 14:21:50 +0300
-Message-Id: <20170602112158.232757-23-vsementsov@virtuozzo.com>
+Date: Fri,  2 Jun 2017 14:21:49 +0300
+Message-Id: <20170602112158.232757-22-vsementsov@virtuozzo.com>
 In-Reply-To: <20170602112158.232757-1-vsementsov@virtuozzo.com>
 References: <20170602112158.232757-1-vsementsov@virtuozzo.com>
-Subject: [Qemu-devel] [PATCH v20 22/30] qcow2: add
- .bdrv_can_store_new_dirty_bitmap
+Subject: [Qemu-devel] [PATCH v20 21/30] block: add
+ bdrv_can_store_new_dirty_bitmap
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,101 +28,75 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org, qemu-devel@nongnu.org
 Cc: kwolf@redhat.com, mreitz@redhat.com, armbru@redhat.com, eblake@redhat.com, jsnow@redhat.com, famz@redhat.com, den@openvz.org, stefanha@redhat.com, vsementsov@virtuozzo.com, pbonzini@redhat.com
 
-Realize .bdrv_can_store_new_dirty_bitmap interface.
+This will be needed to check some restrictions before making bitmap
+persistent in qmp-block-dirty-bitmap-add (this functionality will be
+added by future patch)
 
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Reviewed-by: John Snow <jsnow@redhat.com>
 Reviewed-by: Max Reitz <mreitz@redhat.com>
+Reviewed-by: John Snow <jsnow@redhat.com>
 ---
- block/qcow2-bitmap.c | 51 +++++++++++++++++++++++++++++++++++++++++++++++++++
- block/qcow2.c        |  1 +
- block/qcow2.h        |  4 ++++
- 3 files changed, 56 insertions(+)
+ block.c                   | 22 ++++++++++++++++++++++
+ include/block/block.h     |  3 +++
+ include/block/block_int.h |  4 ++++
+ 3 files changed, 29 insertions(+)
 
-diff --git a/block/qcow2-bitmap.c b/block/qcow2-bitmap.c
-index 7912a82c8c..f45324e584 100644
---- a/block/qcow2-bitmap.c
-+++ b/block/qcow2-bitmap.c
-@@ -1387,3 +1387,54 @@ int qcow2_reopen_bitmaps_ro(BlockDriverState *bs, Error **errp)
+diff --git a/block.c b/block.c
+index b35387241a..a1e67759b9 100644
+--- a/block.c
++++ b/block.c
+@@ -4908,3 +4908,25 @@ void bdrv_del_child(BlockDriverState *parent_bs, BdrvChild *child, Error **errp)
  
-     return 0;
+     parent_bs->drv->bdrv_del_child(parent_bs, child, errp);
  }
 +
-+bool qcow2_can_store_new_dirty_bitmap(BlockDriverState *bs,
-+                                      const char *name,
-+                                      uint32_t granularity,
-+                                      Error **errp)
++bool bdrv_can_store_new_dirty_bitmap(BlockDriverState *bs, const char *name,
++                                     uint32_t granularity, Error **errp)
 +{
-+    BDRVQcow2State *s = bs->opaque;
-+    bool found;
-+    Qcow2BitmapList *bm_list;
++    BlockDriver *drv = bs->drv;
 +
-+    if (check_constraints_on_bitmap(bs, name, granularity, errp) != 0) {
-+        goto fail;
++    if (!drv) {
++        error_setg_errno(errp, ENOMEDIUM,
++                         "Can't store persistent bitmaps to %s",
++                         bdrv_get_device_or_node_name(bs));
++        return false;
 +    }
 +
-+    if (s->nb_bitmaps == 0) {
-+        return true;
++    if (!drv->bdrv_can_store_new_dirty_bitmap) {
++        error_setg_errno(errp, ENOTSUP,
++                         "Can't store persistent bitmaps to %s",
++                         bdrv_get_device_or_node_name(bs));
++        return false;
 +    }
 +
-+    if (s->nb_bitmaps >= QCOW2_MAX_BITMAPS) {
-+        error_setg(errp,
-+                   "Maximum number of persistent bitmaps is already reached");
-+        goto fail;
-+    }
-+
-+    if (s->bitmap_directory_size + calc_dir_entry_size(strlen(name), 0) >
-+        QCOW2_MAX_BITMAP_DIRECTORY_SIZE)
-+    {
-+        error_setg(errp, "Not enough space in the bitmap directory");
-+        goto fail;
-+    }
-+
-+    bm_list = bitmap_list_load(bs, s->bitmap_directory_offset,
-+                               s->bitmap_directory_size, errp);
-+    if (bm_list == NULL) {
-+        goto fail;
-+    }
-+
-+    found = find_bitmap_by_name(bm_list, name);
-+    bitmap_list_free(bm_list);
-+    if (found) {
-+        error_setg(errp, "Bitmap with the same name is already stored");
-+        goto fail;
-+    }
-+
-+    return true;
-+
-+fail:
-+    error_prepend(errp, "Can't make bitmap '%s' persistent in '%s': ",
-+                  name, bdrv_get_device_or_node_name(bs));
-+    return false;
++    return drv->bdrv_can_store_new_dirty_bitmap(bs, name, granularity, errp);
 +}
-diff --git a/block/qcow2.c b/block/qcow2.c
-index 76603903ff..77260df512 100644
---- a/block/qcow2.c
-+++ b/block/qcow2.c
-@@ -3612,6 +3612,7 @@ BlockDriver bdrv_qcow2 = {
-     .bdrv_attach_aio_context  = qcow2_attach_aio_context,
+diff --git a/include/block/block.h b/include/block/block.h
+index 9b355e92d8..ee320db909 100644
+--- a/include/block/block.h
++++ b/include/block/block.h
+@@ -629,4 +629,7 @@ void bdrv_add_child(BlockDriverState *parent, BlockDriverState *child,
+                     Error **errp);
+ void bdrv_del_child(BlockDriverState *parent, BdrvChild *child, Error **errp);
  
-     .bdrv_reopen_bitmaps_rw = qcow2_reopen_bitmaps_rw,
-+    .bdrv_can_store_new_dirty_bitmap = qcow2_can_store_new_dirty_bitmap,
- };
- 
- static void bdrv_qcow2_init(void)
-diff --git a/block/qcow2.h b/block/qcow2.h
-index 7d0a20c053..8b2f66f8b6 100644
---- a/block/qcow2.h
-+++ b/block/qcow2.h
-@@ -633,5 +633,9 @@ bool qcow2_load_autoloading_dirty_bitmaps(BlockDriverState *bs, Error **errp);
- int qcow2_reopen_bitmaps_rw(BlockDriverState *bs, Error **errp);
- void qcow2_store_persistent_dirty_bitmaps(BlockDriverState *bs, Error **errp);
- int qcow2_reopen_bitmaps_ro(BlockDriverState *bs, Error **errp);
-+bool qcow2_can_store_new_dirty_bitmap(BlockDriverState *bs,
-+                                      const char *name,
-+                                      uint32_t granularity,
-+                                      Error **errp);
- 
++bool bdrv_can_store_new_dirty_bitmap(BlockDriverState *bs, const char *name,
++                                     uint32_t granularity, Error **errp);
++
  #endif
+diff --git a/include/block/block_int.h b/include/block/block_int.h
+index 1dc6f2e90d..adda0894c7 100644
+--- a/include/block/block_int.h
++++ b/include/block/block_int.h
+@@ -386,6 +386,10 @@ struct BlockDriver {
+      * field of BlockDirtyBitmap's in case of success.
+      */
+     int (*bdrv_reopen_bitmaps_rw)(BlockDriverState *bs, Error **errp);
++    bool (*bdrv_can_store_new_dirty_bitmap)(BlockDriverState *bs,
++                                            const char *name,
++                                            uint32_t granularity,
++                                            Error **errp);
+ 
+     QLIST_ENTRY(BlockDriver) list;
+ };
 -- 
 2.11.1
