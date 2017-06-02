@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53410)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34919)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dGqnv-00020F-7z
-	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 13:56:08 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dGrQL-000313-8Z
+	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 14:35:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dGqns-0005ue-5f
-	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 13:56:07 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:45102)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1dGqnr-0005uS-SE
-	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 13:56:04 -0400
-Date: Fri, 2 Jun 2017 14:55:55 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20170602175555.GI4294@thinpad.lan.raisama.net>
-References: <20170602141229.15326-1-marcandre.lureau@redhat.com>
-	<20170602141229.15326-4-marcandre.lureau@redhat.com>
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dGrQK-00040L-BR
+	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 14:35:49 -0400
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20170602162857.6065-1-krzk@kernel.org>
+	<20170602163618.6369-1-krzk@kernel.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <f6e9e185-14b8-64bf-e295-803a1c0d1dae@amsat.org>
+Date: Fri, 2 Jun 2017 15:35:43 -0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <20170602141229.15326-4-marcandre.lureau@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3 3/9] exec: split
- qemu_ram_alloc_from_file()
+In-Reply-To: <20170602163618.6369-1-krzk@kernel.org>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v4 1/9] hw/intc/exynos4210_gic: Use more
+ meaningful name for local variable
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,140 +28,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>
-Cc: qemu-devel@nongnu.org, imammedo@redhat.com, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Richard Henderson <rth@twiddle.net>
+To: Krzysztof Kozlowski <krzk@kernel.org>, Igor Mitsyanko <i.mitsyanko@gmail.com>, Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-devel@nongnu.org
 
-On Fri, Jun 02, 2017 at 06:12:23PM +0400, Marc-Andr=E9 Lureau wrote:
-> Add qemu_ram_alloc_from_fd(), which can be use to allocate ramblock fro=
-m
-> fd only.
->=20
-> Signed-off-by: Marc-Andr=E9 Lureau <marcandre.lureau@redhat.com>
+On 06/02/2017 01:36 PM, Krzysztof Kozlowski wrote:
+> There are to SysBusDevice variables in exynos4210_gic_realize()
+> function: one for the device itself and second for arm_gic device.  Add
+> a prefix "gic" to the second one so it will be easier to understand the
+> code.
+>
+> While at it, put local uninitialized 'i' variable at the end, next to
+> other uninitialized ones.
+>
+> Signed-off-by: Krzysztof Kozlowski <krzk@kernel.org>
+> Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+
 > ---
->  include/exec/ram_addr.h |  3 +++
->  exec.c                  | 45 ++++++++++++++++++++++++++++++-----------=
-----
->  2 files changed, 33 insertions(+), 15 deletions(-)
->=20
-> diff --git a/include/exec/ram_addr.h b/include/exec/ram_addr.h
-> index 140efa840c..73d1bea8b6 100644
-> --- a/include/exec/ram_addr.h
-> +++ b/include/exec/ram_addr.h
-> @@ -65,6 +65,9 @@ unsigned long last_ram_page(void);
->  RAMBlock *qemu_ram_alloc_from_file(ram_addr_t size, MemoryRegion *mr,
->                                     bool share, const char *mem_path,
->                                     Error **errp);
-> +RAMBlock *qemu_ram_alloc_from_fd(ram_addr_t size, MemoryRegion *mr,
-> +                                 bool share, int fd,
-> +                                 Error **errp);
->  RAMBlock *qemu_ram_alloc_from_ptr(ram_addr_t size, void *host,
->                                    MemoryRegion *mr, Error **errp);
->  RAMBlock *qemu_ram_alloc(ram_addr_t size, MemoryRegion *mr, Error **er=
-rp);
-> diff --git a/exec.c b/exec.c
-> index 97e01d75f0..8cd3153450 100644
-> --- a/exec.c
-> +++ b/exec.c
-> @@ -1915,14 +1915,12 @@ static void ram_block_add(RAMBlock *new_block, =
-Error **errp)
->  }
-> =20
->  #ifdef __linux__
-> -RAMBlock *qemu_ram_alloc_from_file(ram_addr_t size, MemoryRegion *mr,
-> -                                   bool share, const char *mem_path,
-> -                                   Error **errp)
-> +RAMBlock *qemu_ram_alloc_from_fd(ram_addr_t size, MemoryRegion *mr,
-> +                                 bool share, int fd,
-> +                                 Error **errp)
->  {
->      RAMBlock *new_block;
->      Error *local_err =3D NULL;
-> -    int fd;
-> -    bool created;
->      int64_t file_size;
-> =20
->      if (xen_enabled()) {
-> @@ -1947,18 +1945,12 @@ RAMBlock *qemu_ram_alloc_from_file(ram_addr_t s=
-ize, MemoryRegion *mr,
->          return NULL;
->      }
-> =20
-> -    fd =3D file_ram_open(mem_path, memory_region_name(mr), &created, e=
-rrp);
-> -    if (fd < 0) {
-> -        return NULL;
-> -    }
-> -
-
-I like this, because it gets us one step closer to moving the
-file creation/opening logic in file_ram_open() to hostmem-file.c.
-Then both memfd and hostmem-file could use
-memory_region_init_ram_from_fd(), and we won't need
-memory_region_init_ram_from_file() anymore.
-
-
->      size =3D HOST_PAGE_ALIGN(size);
->      file_size =3D get_file_size(fd);
->      if (file_size > 0 && file_size < size) {
->          error_setg(errp, "backing store %s size 0x%" PRIx64
->                     " does not match 'size' option 0x" RAM_ADDR_FMT,
->                     mem_path, file_size, size);
-> -        close(fd);
->          return NULL;
->      }
-> =20
-> @@ -1969,10 +1961,6 @@ RAMBlock *qemu_ram_alloc_from_file(ram_addr_t si=
-ze, MemoryRegion *mr,
->      new_block->flags =3D share ? RAM_SHARED : 0;
->      new_block->host =3D file_ram_alloc(new_block, size, fd, !file_size=
-, errp);
->      if (!new_block->host) {
-> -        if (created) {
-> -            unlink(mem_path);
-> -        }
-> -        close(fd);
->          g_free(new_block);
->          return NULL;
->      }
-> @@ -1984,6 +1972,33 @@ RAMBlock *qemu_ram_alloc_from_file(ram_addr_t si=
-ze, MemoryRegion *mr,
->          return NULL;
->      }
->      return new_block;
-> +
-> +}
-> +
-> +
-> +RAMBlock *qemu_ram_alloc_from_file(ram_addr_t size, MemoryRegion *mr,
-> +                                   bool share, const char *mem_path,
-> +                                   Error **errp)
-> +{
-> +    int fd;
-> +    bool created;
-> +    RAMBlock *block;
-> +
-> +    fd =3D file_ram_open(mem_path, memory_region_name(mr), &created, e=
-rrp);
-> +    if (fd < 0) {
-> +        return NULL;
-> +    }
-> +
-> +    block =3D qemu_ram_alloc_from_fd(size, mr, share, fd, errp);
-> +    if (!block) {
-> +        if (created) {
-> +            unlink(mem_path);
-> +        }
-> +        close(fd);
-> +        return NULL;
-> +    }
-> +
-> +    return block;
->  }
->  #endif
-> =20
-> --=20
-> 2.13.0.91.g00982b8dd
->=20
-
---=20
-Eduardo
+>  hw/intc/exynos4210_gic.c | 12 ++++++------
+>  1 file changed, 6 insertions(+), 6 deletions(-)
+>
+> diff --git a/hw/intc/exynos4210_gic.c b/hw/intc/exynos4210_gic.c
+> index 2a55817b7660..62acede72f62 100644
+> --- a/hw/intc/exynos4210_gic.c
+> +++ b/hw/intc/exynos4210_gic.c
+> @@ -286,21 +286,21 @@ static void exynos4210_gic_init(Object *obj)
+>      DeviceState *dev = DEVICE(obj);
+>      Exynos4210GicState *s = EXYNOS4210_GIC(obj);
+>      SysBusDevice *sbd = SYS_BUS_DEVICE(obj);
+> -    uint32_t i;
+>      const char cpu_prefix[] = "exynos4210-gic-alias_cpu";
+>      const char dist_prefix[] = "exynos4210-gic-alias_dist";
+>      char cpu_alias_name[sizeof(cpu_prefix) + 3];
+>      char dist_alias_name[sizeof(cpu_prefix) + 3];
+> -    SysBusDevice *busdev;
+> +    SysBusDevice *gicbusdev;
+> +    uint32_t i;
+>
+>      s->gic = qdev_create(NULL, "arm_gic");
+>      qdev_prop_set_uint32(s->gic, "num-cpu", s->num_cpu);
+>      qdev_prop_set_uint32(s->gic, "num-irq", EXYNOS4210_GIC_NIRQ);
+>      qdev_init_nofail(s->gic);
+> -    busdev = SYS_BUS_DEVICE(s->gic);
+> +    gicbusdev = SYS_BUS_DEVICE(s->gic);
+>
+>      /* Pass through outbound IRQ lines from the GIC */
+> -    sysbus_pass_irq(sbd, busdev);
+> +    sysbus_pass_irq(sbd, gicbusdev);
+>
+>      /* Pass through inbound GPIO lines to the GIC */
+>      qdev_init_gpio_in(dev, exynos4210_gic_set_irq,
+> @@ -316,7 +316,7 @@ static void exynos4210_gic_init(Object *obj)
+>          sprintf(cpu_alias_name, "%s%x", cpu_prefix, i);
+>          memory_region_init_alias(&s->cpu_alias[i], obj,
+>                                   cpu_alias_name,
+> -                                 sysbus_mmio_get_region(busdev, 1),
+> +                                 sysbus_mmio_get_region(gicbusdev, 1),
+>                                   0,
+>                                   EXYNOS4210_GIC_CPU_REGION_SIZE);
+>          memory_region_add_subregion(&s->cpu_container,
+> @@ -326,7 +326,7 @@ static void exynos4210_gic_init(Object *obj)
+>          sprintf(dist_alias_name, "%s%x", dist_prefix, i);
+>          memory_region_init_alias(&s->dist_alias[i], obj,
+>                                   dist_alias_name,
+> -                                 sysbus_mmio_get_region(busdev, 0),
+> +                                 sysbus_mmio_get_region(gicbusdev, 0),
+>                                   0,
+>                                   EXYNOS4210_GIC_DIST_REGION_SIZE);
+>          memory_region_add_subregion(&s->dist_container,
+>
