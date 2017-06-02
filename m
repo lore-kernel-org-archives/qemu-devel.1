@@ -1,27 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38827)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38958)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vdrok@mirantis.com>) id 1dGkmz-0006gl-OL
-	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 07:30:47 -0400
+	(envelope-from <david@redhat.com>) id 1dGknL-000701-Mc
+	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 07:31:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vdrok@mirantis.com>) id 1dGkmy-0002yG-6c
-	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 07:30:45 -0400
-Received: from mail-qt0-x22d.google.com ([2607:f8b0:400d:c0d::22d]:34782)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <vdrok@mirantis.com>) id 1dGkmy-0002y1-06
-	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 07:30:44 -0400
-Received: by mail-qt0-x22d.google.com with SMTP id c13so56773272qtc.1
-	for <qemu-devel@nongnu.org>; Fri, 02 Jun 2017 04:30:42 -0700 (PDT)
+	(envelope-from <david@redhat.com>) id 1dGknH-0003AE-OD
+	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 07:31:07 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37928)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <david@redhat.com>) id 1dGknH-00039h-An
+	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 07:31:03 -0400
+References: <20170531220129.27724-1-aurelien@aurel32.net>
+	<20170531220129.27724-31-aurelien@aurel32.net>
+	<ea25b082-923d-6c7d-bca3-b4adbd412419@redhat.com>
+	<781667e0-740c-8e43-d94b-387092eab0e6@redhat.com>
+	<20170601191718.6cftzl5ama4s3es3@aurel32.net>
+	<c3c65598-59ca-c80e-1f8d-340ab19d902f@redhat.com>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <207db011-5035-acb3-2032-8408b4ec38e6@redhat.com>
+Date: Fri, 2 Jun 2017 13:30:59 +0200
 MIME-Version: 1.0
-In-Reply-To: <CAEcfeEyK58zmcggGVmU4k7htQeo-0+s609Wngm=7k9nKCP=WVg@mail.gmail.com>
-References: <CAEcfeEx1nB-jZwLO1kmt1Mv+3JoBtrWPVpCaAkSEpLXne6oL1Q@mail.gmail.com>
-	<CABYiri8vcRmOiH6ogGjXULuZXMo1Dh2a2nagLhSfUnS_B9+1Vg@mail.gmail.com>
-	<CAEcfeEysi6TDp1RwRmvVh4RHO=VcXZ0-1JyMYC3uoTFjgoSDbg@mail.gmail.com>
-	<CAEcfeEyK58zmcggGVmU4k7htQeo-0+s609Wngm=7k9nKCP=WVg@mail.gmail.com>
-From: Vladyslav Drok <vdrok@mirantis.com>
-Date: Fri, 2 Jun 2017 14:30:41 +0300
-Message-ID: <CAEcfeEwLuK2=U9gOzOiCwLJGUxqShK7Ev-qCDFR7V5MhVPYxCA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] Tracking hugepages usage
+In-Reply-To: <c3c65598-59ca-c80e-1f8d-340ab19d902f@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v3 30/30] target/s390x: update maximum TCG
+ model to z800
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,90 +33,140 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, andrey@xdel.ru
+To: Thomas Huth <thuth@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>
+Cc: qemu-devel@nongnu.org, Alexander Graf <agraf@suse.de>, Richard Henderson <rth@twiddle.net>
 
-On Thu, Jun 1, 2017 at 7:24 PM, Vladyslav Drok <vdrok@mirantis.com> wrote:
-
->
->
-> On Thu, Jun 1, 2017 at 2:55 PM, Vladyslav Drok <vdrok@mirantis.com> wrote:
->
->>
->>
->> On Thu, Jun 1, 2017 at 1:56 PM, Andrey Korolyov <andrey@xdel.ru> wrote:
->>
->>> On Thu, Jun 1, 2017 at 1:38 PM, Vladyslav Drok <vdrok@mirantis.com>
->>> wrote:
->>> > Hello qemu community!
->>> >
->>> > I come from openstack world, and one of our customers complains about
->>> an
->>> > issue with huge pages on compute nodes. From the "virsh frepages
->>> --all" and
->>> > "cat /proc/meminfo", they see that 4 huge pages are consumed:
->>> >
->>> > http://paste.openstack.org/show/611186/
->>> >
->>> > In total there are 239 1G pages, 120 in numa node 0, and 119 in numa
->>> node
->>> > 1. There are no VMs running at this point.
->>> >
->>> > When trying to find out what consumes the 4 1G huge pages from node 0,
->>> I
->>> > was suggesting "grep 1048576 /proc/*/numa_maps" to find out which
->>> processes
->>> > are using 1G pages, but in this particular case it shows no processes.
->>> > While when some VM is running, I can see the qemu process that's
->>> consuming
->>> > huge pages, numa_maps reports the correct amount of pages,
->>> corresponding to
->>> > what has been requested for the VM's RAM.
->>> >
->>> > Are there any recommended ways for trying to track what consumes these
->>> 4
->>> > "lost" pages? (I might be a bit slow providing more info, as I don't
->>> have
->>> > access to this environment :( )
->>> >
->>> > Thanks,
->>> > Vlad
+On 02.06.2017 10:09, Thomas Huth wrote:
+> On 01.06.2017 21:17, Aurelien Jarno wrote:
+>> On 2017-06-01 11:04, David Hildenbrand wrote:
+>>> On 01.06.2017 10:38, David Hildenbrand wrote:
+>>>> On 01.06.2017 00:01, Aurelien Jarno wrote:
+>>>>> At the same time fix the TCG version of get_max_cpu_model to return the
+>>>>> maximum model like on KVM. Remove the ETF2 and long-displacement
+>>>>
+>>>> I don't understand the part
+>>>> "fix the TCG version of get_max_cpu_model to return the maximum model
+>>>> like on KVM".
+>>>>
+>>>> Can you elaborate?
+>>>>
+>>>>> facilities from the additional features as it is included in the z800.
+>>>>>
+>>>>> Signed-off-by: Aurelien Jarno <aurelien@aurel32.net>
+>>>>> ---
+>>>>>  target/s390x/cpu_models.c | 13 ++++++-------
+>>>>>  1 file changed, 6 insertions(+), 7 deletions(-)
+>>>>>
+>>>>> diff --git a/target/s390x/cpu_models.c b/target/s390x/cpu_models.c
+>>>>> index fc3cb25cc3..c13bbd852c 100644
+>>>>> --- a/target/s390x/cpu_models.c
+>>>>> +++ b/target/s390x/cpu_models.c
+>>>>> @@ -668,8 +668,6 @@ static void add_qemu_cpu_model_features(S390FeatBitmap fbm)
+>>>>>      static const int feats[] = {
+>>>>>          S390_FEAT_STFLE,
+>>>>>          S390_FEAT_EXTENDED_IMMEDIATE,
+>>>>> -        S390_FEAT_EXTENDED_TRANSLATION_2,
+>>>>> -        S390_FEAT_LONG_DISPLACEMENT,
+>>>>>          S390_FEAT_LONG_DISPLACEMENT_FAST,
+>>>>>          S390_FEAT_ETF2_ENH,
+>>>>>          S390_FEAT_STORE_CLOCK_FAST,
+>>>>> @@ -696,9 +694,9 @@ static S390CPUModel *get_max_cpu_model(Error **errp)
+>>>>>      if (kvm_enabled()) {
+>>>>>          kvm_s390_get_host_cpu_model(&max_model, errp);
+>>>>>      } else {
+>>>>> -        /* TCG emulates a z900 (with some optional additional features) */
+>>>>> -        max_model.def = &s390_cpu_defs[0];
+>>>>> -        bitmap_copy(max_model.features, max_model.def->default_feat,
+>>>>> +        /* TCG emulates a z800 (with some optional additional features) */
+>>>>> +        max_model.def = s390_find_cpu_def(0x2066, 7, 3, NULL);
+>>>>> +        bitmap_copy(max_model.features, max_model.def->full_feat,
+>>>>>                      S390_FEAT_MAX);
 >>>
->>> Could you please try to walk against /proc/[0-9]/smaps to check that
->>> these pages are not claimed by any process?
+>>> This is most likely wrong: you're indicating features here that are not
+>>> available on tcg. esp. S390_FEAT_SIE_F2 and friends.
 >>>
+>>> I think should only copy the base features and add whatever else is
+>>> available via add_qemu_cpu_model_features() as already done.
 >>
->> Thanks for the suggestion! Will provide the results as soon as I have it.
+>> The patch series added all the z800 features exposed via STFL/STFLE.
+>> Indeed the SIE features are missing, but anyway QEMU doesn't emulate SIE
+>> at all so the lack of these features are not exposed to the guest. In that
+>> regard QEMU already wrongly claim to emulate a z900.
+
+Please note that:
+
+a) SIE features were never part of the max model. QEMU never claimed
+that. With your change one could suddenly do a -cpu z900,sie_f2=on,
+which is wrong.
+
+b) The SIE_F2 feature tells the guest that the SIE instruction is
+available. E.g. Linux will look at this bit and show SIE support in
+/proc/cpuinfo and unlock the KVM module.
+
+Please, just don't add features to the MAX model that we don't implement.
+
 >>
->> So, here (in the attachment, is is a bit lengthy so, sorry, was not able
-> to use paste :)) is an output of ps -F and smaps for processes that have
-> any entry with KernelPageSize: 1048576 kB. In this case, there are two
-> instances running on this compute node, 16 GB and 32 GB. The usage reported
-> by qemu processes seems to report huge page count correctly. In case of
-> ovs-vswitchd process, I'm not sure how to interpret the output, as if I
-> just add up the number of pages used by that, it is much bigger than it's
-> reported as used, any hint on that would be much appreciated :) Though the
-> ovs-vswitchd process is run with --huge-dir /mnt/huge_ovs_2M which is where
-> 2 mb pages are mounted, so I supposed it should not use the 1G pages.
->
+>>
+>>>>>          add_qemu_cpu_model_features(max_model.features);
+>>>>>      }
+>>>>> @@ -956,8 +954,9 @@ static void s390_qemu_cpu_model_initfn(Object *obj)
+>>>>>      S390CPU *cpu = S390_CPU(obj);
+>>>>>  
+>>>>>      cpu->model = g_malloc0(sizeof(*cpu->model));
+>>>>> -    /* TCG emulates a z900 (with some optional additional features) */
+>>>>> -    memcpy(&s390_qemu_cpu_defs, &s390_cpu_defs[0], sizeof(s390_qemu_cpu_defs));
+>>>>> +    /* TCG emulates a z800 (with some optional additional features) */
+>>>>> +    memcpy(&s390_qemu_cpu_defs, s390_find_cpu_def(0x2066, 7, 3, NULL),
+>>>>> +           sizeof(s390_qemu_cpu_defs));
+>>>>
+>>>> No changing the qemu model without compatibility handling.
+>>>>
+>>> Please have a look at the following mail for a possible solution:
+>>>
+>>> https://lists.gnu.org/archive/html/qemu-devel/2017-05/msg06030.html
+>>>
+>>> This could be moved to a separate patch. So this patch really should
+>>> just care about the maximum model, not the qemu model.
+>>
+>> From what I understand from this thread, the patch from Thomas Huth was
+>> finally considered acceptable. I am adding him in Cc: so that he can
+>> comment.
+> 
+> In the 2nd version of my patch, I only changed the full_feat of the
+> model definitions, but not the base_feat and default_feat fields, so
+> that the CPU stays the same when you run QEMU without "-cpu" parameter
+> (or simply with "-cpu qemu").
+> 
+> Consider that the following scenario should work: Start a QEMU v2.10
+> with "-M s390-ccw-virtio-2.9" and a QEMU v2.9 with "-M
+> s390-ccw-virtio-2.9 -incoming ...". Then it should be possible to
+> migrate from the v2.10 to the v2.9 instance without problems. This won't
+> work anymore if you changed the default feature bits unconditionally.
+> 
+>  Thomas
+> 
 
-Reuploaded it on google drive just in case, here -
-https://drive.google.com/a/mirantis.com/file/d/0BwCsFeCyKJjMYjdTNFJ0Tnd6OFU/view?usp=sharing
+The following can be used to make sure the model does not change:
+
+s390x-softmmu/qemu-system-s390x -S -qmp stdio
+
+-> { "execute": "qmp_capabilities" }
+-> { "execute": "query-cpu-model-expansion", "arguments": { "type":
+"static", "model": { "name": "qemu" } } }
+
+With existing compat machines, this has to give
+-> "{"return": {"model": {"name": "z900-base"}}}"
 
 
->
-> I'll also try to request the output for a compute that does not have any
-> instances running but still having some pages used, so the problem is a bit
-> more clear.
->
+Also, is there any specific reason why to go for a z800 and not a z900.3
+? (IBM zSeries 900 GA3).
 
-So here is the paste for the compute node that does not have any instances
-(smaller and easier to notice a problem) -
-http://paste.openstack.org/show/cvT96Bp0Lu1zpwqS0jDa/, smaps does not
-report any processes using 1G pages, while there are 4 used by something as
-reported by meminfo.
+z900 GA3 is the EC model, z800 GA1 is the BC model. Both have same
+features and capabilities. EC always smells more powerful ;) In the end
+it doesn't matter.
 
+-- 
 
->
-> Thanks,
-> Vlad
->
+Thanks,
+
+David
