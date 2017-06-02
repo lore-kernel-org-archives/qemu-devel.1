@@ -1,20 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42536)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47545)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1dGdgh-00005l-RJ
-	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 23:55:49 -0400
+	(envelope-from <quwenruo@cn.fujitsu.com>) id 1dGdtN-0002lX-TI
+	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 00:08:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1dGdgg-00006R-TM
-	for qemu-devel@nongnu.org; Thu, 01 Jun 2017 23:55:47 -0400
-Resent-Message-Id: <E1dGdgg-00006R-TM@eggs.gnu.org>
-Reply-To: <qemu-devel@nongnu.org>
-In-Reply-To: <20170602031507.29881-1-david@gibson.dropbear.id.au>
-Message-ID: <149637571900.4027.16202778059216626774@f98a8425f76e>
+	(envelope-from <quwenruo@cn.fujitsu.com>) id 1dGdtJ-00032U-TQ
+	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 00:08:53 -0400
+Received: from [59.151.112.132] (port=56405 helo=heian.cn.fujitsu.com)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <quwenruo@cn.fujitsu.com>) id 1dGdtJ-00030I-IA
+	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 00:08:49 -0400
+Received: from G08CNEXCHPEKD02.g08.fujitsu.local (unknown [10.167.33.83])
+	by cn.fujitsu.com (Postfix) with ESMTP id 1BA6D47C6523
+	for <qemu-devel@nongnu.org>; Fri,  2 Jun 2017 12:08:42 +0800 (CST)
+From: Qu Wenruo <quwenruo@cn.fujitsu.com>
+Date: Fri, 2 Jun 2017 12:08:38 +0800
+Message-ID: <20170602040838.29995-1-quwenruo@cn.fujitsu.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Thu, 1 Jun 2017 20:55:19 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCHv5 0/4] Clean up compatibility mode handling
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH] gitignore: Ignore vim per-project config and
+ clang complete
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,40 +27,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: david@gibson.dropbear.id.au
-Cc: famz@redhat.com, groug@kaod.org, clg@kaod.org, mdroth@linux.vnet.ibm.com, sursingh@redhat.com, bharata@linux.vnet.ibm.com, nikunj@linux.vnet.ibm.com, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, abologna@redhat.com, sbobroff@redhat.com
+To: qemu-devel@nongnu.org
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
-c3NhZ2UtaWQ6IDIwMTcwNjAyMDMxNTA3LjI5ODgxLTEtZGF2aWRAZ2lic29uLmRyb3BiZWFyLmlk
-LmF1ClN1YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0h2NSAwLzRdIENsZWFuIHVwIGNvbXBhdGli
-aWxpdHkgbW9kZSBoYW5kbGluZwoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFz
-aAoKQkFTRT1iYXNlCm49MQp0b3RhbD0kKGdpdCBsb2cgLS1vbmVsaW5lICRCQVNFLi4gfCB3YyAt
-bCkKZmFpbGVkPTAKCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNv
-bmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCgpjb21taXRzPSIkKGdpdCBsb2cgLS1mb3Jt
-YXQ9JUggLS1yZXZlcnNlICRCQVNFLi4pIgpmb3IgYyBpbiAkY29tbWl0czsgZG8KICAgIGVjaG8g
-IkNoZWNraW5nIFBBVENIICRuLyR0b3RhbDogJChnaXQgbG9nIC1uIDEgLS1mb3JtYXQ9JXMgJGMp
-Li4uIgogICAgaWYgISBnaXQgc2hvdyAkYyAtLWZvcm1hdD1lbWFpbCB8IC4vc2NyaXB0cy9jaGVj
-a3BhdGNoLnBsIC0tbWFpbGJhY2sgLTsgdGhlbgogICAgICAgIGZhaWxlZD0xCiAgICAgICAgZWNo
-bwogICAgZmkKICAgIG49JCgobisxKSkKZG9uZQoKZXhpdCAkZmFpbGVkCj09PSBURVNUIFNDUklQ
-VCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQxZGVmN2Y0NGJkODg4NzEz
-Mzg0ClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKNmNjZjQ3ZiBwcGM6IFJld29yayBD
-UFUgY29tcGF0aWJpbGl0eSB0ZXN0aW5nIGFjcm9zcyBtaWdyYXRpb24KMmI3NWRmMyBwc2VyaWVz
-OiBSZXNldCBDUFUgY29tcGF0aWJpbGl0eSBtb2RlCjI4MmE4OWMgcHNlcmllczogTW92ZSBDUFUg
-Y29tcGF0aWJpbGl0eSBwcm9wZXJ0eSB0byBtYWNoaW5lCjg3NDFhNzMgcWFwaTogYWRkIGV4cGxp
-Y2l0IG51bGwgdG8gc3RyaW5nIGlucHV0IGFuZCBvdXRwdXQgdmlzaXRvcnMKCj09PSBPVVRQVVQg
-QkVHSU4gPT09CkNoZWNraW5nIFBBVENIIDEvNDogcWFwaTogYWRkIGV4cGxpY2l0IG51bGwgdG8g
-c3RyaW5nIGlucHV0IGFuZCBvdXRwdXQgdmlzaXRvcnMuLi4KQ2hlY2tpbmcgUEFUQ0ggMi80OiBw
-c2VyaWVzOiBNb3ZlIENQVSBjb21wYXRpYmlsaXR5IHByb3BlcnR5IHRvIG1hY2hpbmUuLi4KQ2hl
-Y2tpbmcgUEFUQ0ggMy80OiBwc2VyaWVzOiBSZXNldCBDUFUgY29tcGF0aWJpbGl0eSBtb2RlLi4u
-CkNoZWNraW5nIFBBVENIIDQvNDogcHBjOiBSZXdvcmsgQ1BVIGNvbXBhdGliaWxpdHkgdGVzdGlu
-ZyBhY3Jvc3MgbWlncmF0aW9uLi4uCkVSUk9SOiBicmFjZXMge30gYXJlIG5lY2Vzc2FyeSBmb3Ig
-YWxsIGFybXMgb2YgdGhpcyBzdGF0ZW1lbnQKIzk0OiBGSUxFOiB0YXJnZXQvcHBjL21hY2hpbmUu
-YzoyMzY6CisgICAgaWYgKGNwdS0+Y29tcGF0X3B2cikgewpbLi4uXQorICAgIH0gZWxzZQpbLi4u
-XQoKdG90YWw6IDEgZXJyb3JzLCAwIHdhcm5pbmdzLCAxMDAgbGluZXMgY2hlY2tlZAoKWW91ciBw
-YXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2Ug
-ZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIs
-IHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0
-IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21h
-dGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91
-ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQGZyZWVsaXN0cy5vcmc=
+Since we have already ignored ctags, ignoring .clangcomplete for
+vim-clang_completion is quite reasonable for me.
+(Not to mention vim-clang_completion provides better and more accurate
+completion and definition search)
+
+Also, qemu coding style is using 4 space as indent other than 8-space
+tab, it also makes sense to ignore per-project vim config file.
+
+Signed-off-by: Qu Wenruo <quwenruo@cn.fujitsu.com>
+---
+ .gitignore | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/.gitignore b/.gitignore
+index 55a001e3b8..c7c6eec0b6 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -113,6 +113,8 @@
+ cscope.*
+ tags
+ TAGS
++.vim*
++.clang_complete
+ docker-src.*
+ *~
+ trace.h
+-- 
+2.13.0
