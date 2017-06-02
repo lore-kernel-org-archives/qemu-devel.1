@@ -1,21 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36133)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36194)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1dGkei-0006GV-Kz
-	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 07:22:15 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1dGkej-0006Hs-F5
+	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 07:22:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1dGkee-0005ab-Qo
-	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 07:22:12 -0400
-Received: from mailhub.sw.ru ([195.214.232.25]:8899 helo=relay.sw.ru)
+	(envelope-from <vsementsov@virtuozzo.com>) id 1dGkef-0005by-JL
+	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 07:22:13 -0400
+Received: from mailhub.sw.ru ([195.214.232.25]:44144 helo=relay.sw.ru)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
-	id 1dGkee-0005Wh-FJ
-	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 07:22:08 -0400
+	id 1dGkef-0005ZH-8l
+	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 07:22:09 -0400
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Fri,  2 Jun 2017 14:21:40 +0300
-Message-Id: <20170602112158.232757-13-vsementsov@virtuozzo.com>
+Date: Fri,  2 Jun 2017 14:21:55 +0300
+Message-Id: <20170602112158.232757-28-vsementsov@virtuozzo.com>
 In-Reply-To: <20170602112158.232757-1-vsementsov@virtuozzo.com>
 References: <20170602112158.232757-1-vsementsov@virtuozzo.com>
-Subject: [Qemu-devel] [PATCH v20 12/30] block: refactor bdrv_reopen_commit
+Subject: [Qemu-devel] [PATCH v20 27/30] block/dirty-bitmap: add
+ bdrv_remove_persistent_dirty_bitmap
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,48 +28,79 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org, qemu-devel@nongnu.org
 Cc: kwolf@redhat.com, mreitz@redhat.com, armbru@redhat.com, eblake@redhat.com, jsnow@redhat.com, famz@redhat.com, den@openvz.org, stefanha@redhat.com, vsementsov@virtuozzo.com, pbonzini@redhat.com
 
-Add bs local variable to simplify code.
+Interface for removing persistent bitmap from its storage.
 
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Reviewed-by: Max Reitz <mreitz@redhat.com>
+Reviewed-by: John Snow <jsnow@redhat.com>
 ---
- block.c | 14 ++++++++------
- 1 file changed, 8 insertions(+), 6 deletions(-)
+ block/dirty-bitmap.c         | 18 ++++++++++++++++++
+ include/block/block_int.h    |  3 +++
+ include/block/dirty-bitmap.h |  3 +++
+ 3 files changed, 24 insertions(+)
 
-diff --git a/block.c b/block.c
-index 50ba264143..04af7697dc 100644
---- a/block.c
-+++ b/block.c
-@@ -2945,9 +2945,11 @@ error:
- void bdrv_reopen_commit(BDRVReopenState *reopen_state)
+diff --git a/block/dirty-bitmap.c b/block/dirty-bitmap.c
+index 2ae64fc9e8..6b43ad04fc 100644
+--- a/block/dirty-bitmap.c
++++ b/block/dirty-bitmap.c
+@@ -334,12 +334,30 @@ void bdrv_release_dirty_bitmap(BlockDriverState *bs, BdrvDirtyBitmap *bitmap)
+ /**
+  * Release all named dirty bitmaps attached to a BDS (for use in bdrv_close()).
+  * There must not be any frozen bitmaps attached.
++ * This function does not remove persistent bitmaps from the storage.
+  */
+ void bdrv_release_named_dirty_bitmaps(BlockDriverState *bs)
  {
-     BlockDriver *drv;
-+    BlockDriverState *bs;
- 
-     assert(reopen_state != NULL);
--    drv = reopen_state->bs->drv;
-+    bs = reopen_state->bs;
-+    drv = bs->drv;
-     assert(drv != NULL);
- 
-     /* If there are any driver level actions to take */
-@@ -2956,13 +2958,13 @@ void bdrv_reopen_commit(BDRVReopenState *reopen_state)
-     }
- 
-     /* set BDS specific flags now */
--    QDECREF(reopen_state->bs->explicit_options);
-+    QDECREF(bs->explicit_options);
- 
--    reopen_state->bs->explicit_options   = reopen_state->explicit_options;
--    reopen_state->bs->open_flags         = reopen_state->flags;
--    reopen_state->bs->read_only = !(reopen_state->flags & BDRV_O_RDWR);
-+    bs->explicit_options   = reopen_state->explicit_options;
-+    bs->open_flags         = reopen_state->flags;
-+    bs->read_only = !(reopen_state->flags & BDRV_O_RDWR);
- 
--    bdrv_refresh_limits(reopen_state->bs, NULL);
-+    bdrv_refresh_limits(bs, NULL);
+     bdrv_do_release_matching_dirty_bitmap(bs, NULL, true);
  }
  
- /*
++/**
++ * Remove persistent dirty bitmap from the storage if it exists.
++ * Absence of bitmap is not an error, because we have the following scenario:
++ * BdrvDirtyBitmap can have .persistent = true but not yet saved and have no
++ * stored version. For such bitmap bdrv_remove_persistent_dirty_bitmap() should
++ * not fail.
++ * This function doesn't release corresponding BdrvDirtyBitmap.
++ */
++void bdrv_remove_persistent_dirty_bitmap(BlockDriverState *bs,
++                                         const char *name,
++                                         Error **errp)
++{
++    if (bs->drv && bs->drv->bdrv_remove_persistent_dirty_bitmap) {
++        bs->drv->bdrv_remove_persistent_dirty_bitmap(bs, name, errp);
++    }
++}
++
+ void bdrv_disable_dirty_bitmap(BdrvDirtyBitmap *bitmap)
+ {
+     assert(!bdrv_dirty_bitmap_frozen(bitmap));
+diff --git a/include/block/block_int.h b/include/block/block_int.h
+index adda0894c7..953107f095 100644
+--- a/include/block/block_int.h
++++ b/include/block/block_int.h
+@@ -390,6 +390,9 @@ struct BlockDriver {
+                                             const char *name,
+                                             uint32_t granularity,
+                                             Error **errp);
++    void (*bdrv_remove_persistent_dirty_bitmap)(BlockDriverState *bs,
++                                                const char *name,
++                                                Error **errp);
+ 
+     QLIST_ENTRY(BlockDriver) list;
+ };
+diff --git a/include/block/dirty-bitmap.h b/include/block/dirty-bitmap.h
+index 00b298330c..5fac2d8411 100644
+--- a/include/block/dirty-bitmap.h
++++ b/include/block/dirty-bitmap.h
+@@ -25,6 +25,9 @@ BdrvDirtyBitmap *bdrv_find_dirty_bitmap(BlockDriverState *bs,
+ void bdrv_dirty_bitmap_make_anon(BdrvDirtyBitmap *bitmap);
+ void bdrv_release_dirty_bitmap(BlockDriverState *bs, BdrvDirtyBitmap *bitmap);
+ void bdrv_release_named_dirty_bitmaps(BlockDriverState *bs);
++void bdrv_remove_persistent_dirty_bitmap(BlockDriverState *bs,
++                                         const char *name,
++                                         Error **errp);
+ void bdrv_disable_dirty_bitmap(BdrvDirtyBitmap *bitmap);
+ void bdrv_enable_dirty_bitmap(BdrvDirtyBitmap *bitmap);
+ BlockDirtyInfoList *bdrv_query_dirty_bitmaps(BlockDriverState *bs);
 -- 
 2.11.1
