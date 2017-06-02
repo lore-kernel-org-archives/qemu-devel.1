@@ -1,32 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40511)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41115)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dGmkI-00041K-K9
-	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 09:36:07 -0400
+	(envelope-from <armbru@redhat.com>) id 1dGmn7-0005d0-TG
+	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 09:39:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dGmkH-0004mb-Lq
-	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 09:36:06 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:33828)
+	(envelope-from <armbru@redhat.com>) id 1dGmn3-0007Jn-0p
+	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 09:39:01 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:41084)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dGmkH-0004lX-Db
-	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 09:36:05 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dGmn2-0007If-Rf
+	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 09:38:56 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 7549061E48
-	for <qemu-devel@nongnu.org>; Fri,  2 Jun 2017 13:36:04 +0000 (UTC)
-References: <20170601214056.30387-1-quintela@redhat.com>
-	<20170601214056.30387-5-quintela@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <a8269150-c182-24d6-089d-9bafdd3dd5ac@redhat.com>
-Date: Fri, 2 Jun 2017 08:36:01 -0500
+	by mx1.redhat.com (Postfix) with ESMTPS id C426E334584
+	for <qemu-devel@nongnu.org>; Fri,  2 Jun 2017 13:38:55 +0000 (UTC)
+From: Markus Armbruster <armbru@redhat.com>
+References: <20170531135709.345-1-marcandre.lureau@redhat.com>
+	<20170531135709.345-18-marcandre.lureau@redhat.com>
+Date: Fri, 02 Jun 2017 15:38:51 +0200
+In-Reply-To: <20170531135709.345-18-marcandre.lureau@redhat.com>
+	(=?utf-8?Q?=22Marc-Andr=C3=A9?=
+	Lureau"'s message of "Wed, 31 May 2017 17:56:41 +0400")
+Message-ID: <877f0ucxw4.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <20170601214056.30387-5-quintela@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="NRCM42Sf8h6V7KsWgvLvRSulcHjA1UDQ1"
-Subject: Re: [Qemu-devel] [PATCH 4/4] ram: Now POSTCOPY_ACTIVE is the same
- that STATUS_ACTIVE
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 17/45] object: use more specific
+ property type names
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,56 +36,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org
-Cc: lvivier@redhat.com, dgilbert@redhat.com, peterx@redhat.com
+To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
+Cc: qemu-devel@nongnu.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---NRCM42Sf8h6V7KsWgvLvRSulcHjA1UDQ1
-From: Eric Blake <eblake@redhat.com>
-To: Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org
-Cc: lvivier@redhat.com, dgilbert@redhat.com, peterx@redhat.com
-Message-ID: <a8269150-c182-24d6-089d-9bafdd3dd5ac@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 4/4] ram: Now POSTCOPY_ACTIVE is the same
- that STATUS_ACTIVE
-References: <20170601214056.30387-1-quintela@redhat.com>
- <20170601214056.30387-5-quintela@redhat.com>
-In-Reply-To: <20170601214056.30387-5-quintela@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
 
-On 06/01/2017 04:40 PM, Juan Quintela wrote:
-> Merge them.
->=20
-> Signed-off-by: Juan Quintela <quintela@redhat.com>
-> ---
->  migration/migration.c | 12 ------------
->  1 file changed, 12 deletions(-)
+> Use the actual unsigned integer type name (this should't break since
+> property type aren't directly accessed from outside it seems).
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
+I checked.  Uses of Object member @type outside qom/object.c:
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+* vl.c's machine_help_func() puts it in help for -machine NAME,help.
+  Fine.
 
+* QMP command qom-list exposes it in ObjectPropertyInfo member @type.
+  Your commit message is wrong :)
 
---NRCM42Sf8h6V7KsWgvLvRSulcHjA1UDQ1
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+* QMP command device-list-properties exposes it in DevicePropertyInfo
+  member @type.
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+* spapr_drc_populate_dt() compares it to "link<", which may or may not
+  be a good idea, but isn't affected by your patch.
 
-iQEcBAEBCAAGBQJZMWnBAAoJEKeha0olJ0NqjhgH/1sMtwYGeLX+UzShLy5Apv/f
-mekS3r4FfWasCu9sFEx060TliC3rUvfzIOoDy/B5jt/4L6pNFKyYPBn7IDn4Mgkr
-Ay4AmyD5hHsC3NG64j2iMCOLxSCy48fJ37REoTT6Le6Hp9lul8IDjsFlBsxjHZ0l
-8NOIIiCRk7FYaRfEQMM4XYB5hHipUzKH3HtU7F0CWn9rgVpSZjiy3AMncLCVDVCJ
-qF5fBA0oMitk6gStIz2lneT8Xq6HAB50oBTOHFpGaU4mOPhZfWlvtRQkcosSLui0
-71+fnBVMbh2wURbrJh/n84kKcB22JA86eQ7DhccEVqqIWUijng/WyohyV1Mq72A=
-=P82N
------END PGP SIGNATURE-----
+Uses in qom/object.c:
 
---NRCM42Sf8h6V7KsWgvLvRSulcHjA1UDQ1--
+* object_property_is_child() compares it to "child<".  Not affected by
+  your patch.
+
+* object_property_get_enum() takes it as argument.  Shouldn't be
+  affected by your patch, as only enumeration type names should occur
+  here.  Double-checking: I can see "HostMemPolicy", "DummyAnimal",
+  "BadAnimal" (the latter two in tests/, don't worry).  Okay.
+
+* object_property_get_type() returns it.
+
+  - qdev_print_props() only checks whether it succeeds.  Not affected by
+    your patch.
+
+  - object_resolve_link() requires it to be of the form "link<%s>".  Not
+    affected by your patch unless we violate this precondition (and then
+    we have worse problems).
+
+* object_property_add_alias() copies it, possibly rewriting "child<%s>"
+  to "link<%s>".  Shouldn't be affected by your patch.
+
+> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+
+Rewrite the commit message to explain impact on -machine, qom-list and
+device-list-properties, and you may add
+
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
