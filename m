@@ -1,31 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49447)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49736)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1dGjMk-0007Mz-C5
-	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 05:59:35 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1dGjO3-0008Q0-2K
+	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 06:00:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1dGjMh-0003K5-D8
-	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 05:59:34 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58042)
+	(envelope-from <vsementsov@virtuozzo.com>) id 1dGjO0-000405-2v
+	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 06:00:55 -0400
+Received: from mailhub.sw.ru ([195.214.232.25]:15074 helo=relay.sw.ru)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1dGjMh-0003Iy-6m
-	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 05:59:31 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id ED1AB7FD47
-	for <qemu-devel@nongnu.org>; Fri,  2 Jun 2017 09:59:29 +0000 (UTC)
-Date: Fri, 2 Jun 2017 17:59:23 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20170602095923.GD4056@pxdev.xzpeter.org>
-References: <1496320911-51305-1-git-send-email-pbonzini@redhat.com>
-	<1496320911-51305-24-git-send-email-pbonzini@redhat.com>
+	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
+	id 1dGjNz-0003zJ-N3
+	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 06:00:52 -0400
+References: <20170530143052.165002-1-vsementsov@virtuozzo.com>
+	<20170530143052.165002-14-vsementsov@virtuozzo.com>
+	<6795a44e-a0c4-2c09-390b-af07f675363b@redhat.com>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <9f30e34f-2420-b909-a4c9-594b951b0c11@virtuozzo.com>
+Date: Fri, 2 Jun 2017 13:00:48 +0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <1496320911-51305-24-git-send-email-pbonzini@redhat.com>
-Subject: Re: [Qemu-devel] [PULL 23/33] exec: fix
- address_space_get_iotlb_entry page mask
+In-Reply-To: <6795a44e-a0c4-2c09-390b-af07f675363b@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+Subject: Re: [Qemu-devel] [PATCH 13/19] nbd/server: return original error
+ codes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,64 +31,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+Cc: pbonzini@redhat.com, den@openvz.org
 
-On Thu, Jun 01, 2017 at 02:41:41PM +0200, Paolo Bonzini wrote:
-> From: Peter Xu <peterx@redhat.com>
-> 
-> The IOTLB that it returned didn't guarantee that page_mask is indeed a
-> so-called page mask. That won't affect current usage since now only
-> vhost is using it (vhost API allows arbitary IOTLB range). However we
-> have IOTLB scemantic and we should best follow it. This patch fixes this
-> issue to make sure the page_mask is always a valid page mask.
-> 
-> Fixes: a764040 ("exec: abstract address_space_do_translate()")
-> Signed-off-by: Peter Xu <peterx@redhat.com>
-> Message-Id: <1496212378-22605-1-git-send-email-peterx@redhat.com>
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> ---
->  exec.c | 14 ++++++--------
->  1 file changed, 6 insertions(+), 8 deletions(-)
-> 
-> diff --git a/exec.c b/exec.c
-> index 29633cd..22b8f0c 100644
-> --- a/exec.c
-> +++ b/exec.c
-> @@ -528,16 +528,14 @@ IOMMUTLBEntry address_space_get_iotlb_entry(AddressSpace *as, hwaddr addr,
->          section.offset_within_region;
->  
->      if (plen == (hwaddr)-1) {
-> -        /*
-> -         * We use default page size here. Logically it only happens
-> -         * for identity mappings.
-> -         */
-> -        plen = TARGET_PAGE_SIZE;
-> +        /* If not specified during translation, use default mask */
-> +        plen = TARGET_PAGE_MASK;
-> +    } else {
-> +        /* Make it a valid page mask */
-> +        assert(plen);
-> +        plen = pow2floor(plen) - 1;
->      }
->  
-> -    /* Convert to address mask */
-> -    plen -= 1;
-> -
->      return (IOMMUTLBEntry) {
->          .target_as = section.address_space,
->          .iova = addr & ~plen,
-> -- 
-> 1.8.3.1
+02.06.2017 01:29, Eric Blake wrote:
+> On 05/30/2017 09:30 AM, Vladimir Sementsov-Ogievskiy wrote:
+>> The code in many cases return -EINVAL or -EIO instead of original error
+>> code from, for example, write_sync(). Following patch will need EPIPE
+>> handling, so, let's refactor this where possible (the only exclusion
+>> is nbd_co_receive_request, with own return-code convention)
+> Do we still want/need EPIPE handling, given the discussion on the
+> previous two patches?
 
-Paolo,
+Looks like this patch should be dropped. If EPIPE is not accepted 
+(previous discussion), so error code is always EIO, no needs to save it 
+into a variable..
 
-I got a better idea on refactoring address_space_get_iotlb_entry(). If
-you haven't started preparing another pull request, please feel free
-to drop this one (it fixed the problem but not that complete).
-Otherwise I'll just work upon it, which is fine as well.
-
-Sorry for the troublesome.
+>
+>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+>> ---
+>>   nbd/server.c | 124 +++++++++++++++++++++++++++++++++++++----------------------
+>>   1 file changed, 77 insertions(+), 47 deletions(-)
+>>
+> Feels weird to have a net gain in code, but maybe worthwhile.
+>
+>> diff --git a/nbd/server.c b/nbd/server.c
+>> index a47f13e4fb..30dfb81a5c 100644
+>> --- a/nbd/server.c
+>> +++ b/nbd/server.c
+>> @@ -136,30 +136,38 @@ static void nbd_client_receive_next_request(NBDClient *client);
+>>   static int nbd_negotiate_send_rep_len(QIOChannel *ioc, uint32_t type,
+>>                                         uint32_t opt, uint32_t len)
+>>   {
+>> +    int ret;
+>>       uint64_t magic;
+>>   
+>>       TRACE("Reply opt=%" PRIx32 " type=%" PRIx32 " len=%" PRIu32,
+>>             type, opt, len);
+>>   
+>>       magic = cpu_to_be64(NBD_REP_MAGIC);
+>> -    if (write_sync(ioc, &magic, sizeof(magic), NULL) < 0) {
+>> +    ret = write_sync(ioc, &magic, sizeof(magic), NULL);
+>> +    if (ret < 0) {
+>>           LOG("write failed (rep magic)");
+>> -        return -EINVAL;
+>> +        return ret;
+>>       }
+> Constructs like this should get shorter once we plumb errp all the way
+> through.  Okay, I can live with the temporary verbosity.
+>
+> You may still have to make changes due to rebasing (in which case I'll
+> definitely want to review again); but if this patch doesn't need further
+> rework, you can add:
+> Reviewed-by: Eric Blake <eblake@redhat.com>
+>
 
 -- 
-Peter Xu
+Best regards,
+Vladimir
