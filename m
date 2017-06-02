@@ -1,24 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34426)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34468)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1dGpX3-0007rz-5i
-	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 12:34:37 -0400
+	(envelope-from <mst@redhat.com>) id 1dGpX7-0007uZ-Qe
+	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 12:34:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1dGpX2-0006ID-8M
-	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 12:34:37 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:50496)
+	(envelope-from <mst@redhat.com>) id 1dGpX5-0006LE-74
+	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 12:34:41 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53678)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1dGpX2-0006Gk-2R
-	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 12:34:36 -0400
-Date: Fri, 2 Jun 2017 19:34:34 +0300
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1dGpX4-0006KI-VZ
+	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 12:34:39 -0400
+Date: Fri, 2 Jun 2017 19:34:35 +0300
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <1496421247-857-3-git-send-email-mst@redhat.com>
+Message-ID: <1496421247-857-4-git-send-email-mst@redhat.com>
 References: <1496421247-857-1-git-send-email-mst@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 In-Reply-To: <1496421247-857-1-git-send-email-mst@redhat.com>
-Subject: [Qemu-devel] [PULL 2/8] virtio: add virtqueue_alloc_element
- tracepoint
+Subject: [Qemu-devel] [PULL 3/8] virtio-serial: fix segfault on disconnect
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,44 +27,75 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Stefan Hajnoczi <stefanha@redhat.com>, Sitong Liu <siliu@redhat.com>, Min Deng <mdeng@redhat.com>, Amit Shah <amit@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>
 
-From: Paolo Bonzini <pbonzini@redhat.com>
+From: Stefan Hajnoczi <stefanha@redhat.com>
 
-This tracepoint can help diagnosing failures due to memory
-fragmentation in the guest.
+Since commit d4c19cdeeb2f1e474bc426a6da261f1d7346eb5b ("virtio-serial:
+add missing virtio_detach_element() call") the following commands may
+cause QEMU to segfault:
 
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+  $ qemu -M accel=kvm -cpu host -m 1G \
+         -drive if=virtio,file=test.img,format=raw \
+         -device virtio-serial-pci,id=virtio-serial0 \
+         -chardev socket,id=channel1,path=/tmp/chardev.sock,server,nowait \
+         -device virtserialport,chardev=channel1,bus=virtio-serial0.0,id=port1
+  $ nc -U /tmp/chardev.sock
+  ^C
+
+  (guest)$ cat /dev/zero >/dev/vport0p1
+
+The segfault is non-deterministic: if the event loop notices the socket
+has been closed then there is no crash.  The disconnect has to happen
+right before QEMU attempts to write data to the socket.
+
+The backtrace is as follows:
+
+  Thread 1 "qemu-system-x86" received signal SIGSEGV, Segmentation fault.
+  0x00005555557e0698 in do_flush_queued_data (port=0x5555582cedf0, vq=0x7fffcc854290, vdev=0x55555807b1d0) at hw/char/virtio-serial-bus.c:180
+  180           for (i = port->iov_idx; i < port->elem->out_num; i++) {
+  #1  0x000055555580d363 in virtio_queue_notify_vq (vq=0x7fffcc854290) at hw/virtio/virtio.c:1524
+  #2  0x000055555580d363 in virtio_queue_host_notifier_read (n=0x7fffcc8542f8) at hw/virtio/virtio.c:2430
+  #3  0x0000555555b3482c in aio_dispatch_handlers (ctx=ctx@entry=0x5555566b8c80) at util/aio-posix.c:399
+  #4  0x0000555555b350d8 in aio_dispatch (ctx=0x5555566b8c80) at util/aio-posix.c:430
+  #5  0x0000555555b3212e in aio_ctx_dispatch (source=<optimized out>, callback=<optimized out>, user_data=<optimized out>) at util/async.c:261
+  #6  0x00007fffde71de52 in g_main_context_dispatch () at /lib64/libglib-2.0.so.0
+  #7  0x0000555555b34353 in glib_pollfds_poll () at util/main-loop.c:213
+  #8  0x0000555555b34353 in os_host_main_loop_wait (timeout=<optimized out>) at util/main-loop.c:261
+  #9  0x0000555555b34353 in main_loop_wait (nonblocking=<optimized out>) at util/main-loop.c:517
+  #10 0x0000555555773207 in main_loop () at vl.c:1917
+  #11 0x0000555555773207 in main (argc=<optimized out>, argv=<optimized out>, envp=<optimized out>) at vl.c:4751
+
+The do_flush_queued_data() function does not anticipate chardev close
+events during vsc->have_data().  It expects port->elem to remain
+non-NULL for the duration its for loop.
+
+The fix is simply to return from do_flush_queued_data() if the port
+closes because the close event already frees port->elem and drains the
+virtqueue - there is nothing left for do_flush_queued_data() to do.
+
+Reported-by: Sitong Liu <siliu@redhat.com>
+Reported-by: Min Deng <mdeng@redhat.com>
+Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
 Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 ---
- hw/virtio/virtio.c     | 1 +
- hw/virtio/trace-events | 1 +
- 2 files changed, 2 insertions(+)
+ hw/char/virtio-serial-bus.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
-index f99d99f..464947f 100644
---- a/hw/virtio/virtio.c
-+++ b/hw/virtio/virtio.c
-@@ -815,6 +815,7 @@ static void *virtqueue_alloc_element(size_t sz, unsigned out_num, unsigned in_nu
- 
-     assert(sz >= sizeof(VirtQueueElement));
-     elem = g_malloc(out_sg_end);
-+    trace_virtqueue_alloc_element(elem, sz, in_num, out_num);
-     elem->out_num = out_num;
-     elem->in_num = in_num;
-     elem->in_addr = (void *)elem + in_addr_ofs;
-diff --git a/hw/virtio/trace-events b/hw/virtio/trace-events
-index 1f7a7c1..e24d8fa 100644
---- a/hw/virtio/trace-events
-+++ b/hw/virtio/trace-events
-@@ -1,6 +1,7 @@
- # See docs/tracing.txt for syntax documentation.
- 
- # hw/virtio/virtio.c
-+virtqueue_alloc_element(void *elem, size_t sz, unsigned in_num, unsigned out_num) "elem %p size %zd in_num %u out_num %u"
- virtqueue_fill(void *vq, const void *elem, unsigned int len, unsigned int idx) "vq %p elem %p len %u idx %u"
- virtqueue_flush(void *vq, unsigned int count) "vq %p count %u"
- virtqueue_pop(void *vq, void *elem, unsigned int in_num, unsigned int out_num) "vq %p elem %p in_num %u out_num %u"
+diff --git a/hw/char/virtio-serial-bus.c b/hw/char/virtio-serial-bus.c
+index aa9c11a..f5bc173 100644
+--- a/hw/char/virtio-serial-bus.c
++++ b/hw/char/virtio-serial-bus.c
+@@ -186,6 +186,9 @@ static void do_flush_queued_data(VirtIOSerialPort *port, VirtQueue *vq,
+                                   port->elem->out_sg[i].iov_base
+                                   + port->iov_offset,
+                                   buf_size);
++            if (!port->elem) { /* bail if we got disconnected */
++                return;
++            }
+             if (port->throttled) {
+                 port->iov_idx = i;
+                 if (ret > 0) {
 -- 
 MST
