@@ -1,30 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45456)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45512)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1dGn2e-0006nI-L3
-	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 09:55:05 -0400
+	(envelope-from <armbru@redhat.com>) id 1dGn2q-0006w7-DK
+	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 09:55:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1dGn2a-0004Et-OQ
-	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 09:55:04 -0400
-Received: from mailhub.sw.ru ([195.214.232.25]:25529 helo=relay.sw.ru)
+	(envelope-from <armbru@redhat.com>) id 1dGn2m-0004X1-F4
+	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 09:55:16 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:33384)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
-	id 1dGn2a-0004D6-CW
-	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 09:55:00 -0400
-References: <20170531165541.47338-1-vsementsov@virtuozzo.com>
-	<20170531165541.47338-2-vsementsov@virtuozzo.com>
-	<70aa332e-c868-15ac-0c4c-23d41a777b6c@redhat.com>
-	<76a74826-f9ed-825e-0d3d-3043943d636c@virtuozzo.com>
-	<8e900b35-65a9-789f-2cf4-9de6d16460a3@virtuozzo.com>
-	<40ed0b31-84b7-380f-65ce-bc79de780c04@redhat.com>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <ec8e6b9b-29e5-dc07-17cb-bdcd2ad8fc14@virtuozzo.com>
-Date: Fri, 2 Jun 2017 16:54:56 +0300
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dGn2m-0004W2-5w
+	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 09:55:12 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 14CE960C3
+	for <qemu-devel@nongnu.org>; Fri,  2 Jun 2017 13:55:11 +0000 (UTC)
+From: Markus Armbruster <armbru@redhat.com>
+References: <20170531135709.345-1-marcandre.lureau@redhat.com>
+	<20170531135709.345-20-marcandre.lureau@redhat.com>
+Date: Fri, 02 Jun 2017 15:55:06 +0200
+In-Reply-To: <20170531135709.345-20-marcandre.lureau@redhat.com>
+	(=?utf-8?Q?=22Marc-Andr=C3=A9?=
+	Lureau"'s message of "Wed, 31 May 2017 17:56:43 +0400")
+Message-ID: <87y3tabikl.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <40ed0b31-84b7-380f-65ce-bc79de780c04@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH 01/12] nbd: rename read_sync and friends
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 19/45] qdev: add unsigned properties
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,55 +35,262 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
-Cc: pbonzini@redhat.com, den@openvz.org
+To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
+Cc: qemu-devel@nongnu.org
 
-02.06.2017 16:49, Eric Blake wrote:
-> On 06/02/2017 07:00 AM, Vladimir Sementsov-Ogievskiy wrote:
+Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
+
+> Add and use unsigned type for various properties.
 >
->>>>> 2. _sync suffix
->>>>>      _sync is related to the fact, that nbd_wr_syncv doesn't return if
->>>> s/fact,/fact/
->>>>
->>>>>      write to socket returns EAGAIN. In first implementation
->>>>> nbd_wr_syncv
->>>>>      just loops while getting EAGAIN, current implementation yields in
->>>>>      this case.
->>>> As mentioned in your followup, you may want to rewrite this to:
->>>>
->>>> _sync was originally used (back in commit 7a5ca864 when it was named
->>>> wr_sync) to indicate that we looped rather than returned on EAGAIN.  But
->>>> now we use qio_channel which yields on our behalf rather than giving us
->>>> EAGAIN.
->>> hmm, I like my wording (with adding note "... implementaion
->>> nbd_wr_syncv (was wr_sync in 7a5ca8648b) just ...")  more, because:
->>> 1. not only nbd_wr_syncv has that suffix, so nbd_wr_syncv should be
->>> mentioned (as we mention wr_sync)
->>> 2. I don't say about contrast between old and current, I say that they
->>> are similar.
->>>
->> Finally, are you OK with my wording? If I reroll, can I add your r-b?
-> What final wording are you proposing (full paragraph, not a snippet)?
+> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
-2. _sync suffix
-    _sync is related to the fact that nbd_wr_syncv doesn't return if
-    write to socket returns EAGAIN. In first implementation nbd_wr_syncv
-    (was wr_sync in 7a5ca8648b) just loops while getting EAGAIN, current
-    implementation yields in this case.
-    Why to get rid of it:
-    - it is normal for r/w functions to be synchronous, so having
-      additional suffix for it looks redundant (contrariwise, we have
-      _aio suffix for async functions)
-    - _sync suffix in block layer is used when function does flush (so
-      using it for other thing is confusing a bit)
-    - keep function names short after adding nbd_ prefix
+The commit message is a bit misleading.  We don't "add unsigned
+properties", we clean up the property code to avoid type casts between
+signed and unsigned.
 
+I'm not sure that's worth the churn by itself.  But perhaps it helps
+later in this series.  If yes, can you give me a hint?
+
+> ---
+>  include/hw/qdev-core.h       |  1 +
+>  include/hw/qdev-properties.h | 51 +++++++++++++++++++++++++++-----------=
+------
+>  hw/core/qdev-properties.c    | 23 ++++++++++++--------
+>  3 files changed, 46 insertions(+), 29 deletions(-)
 >
->>>> Reviewed-by: Eric Blake <eblake@redhat.com>
-> At any rate, I already gave R-b for the code, so finessing the commit
-> message doesn't change that if the code remains unchanged.
->
+> diff --git a/include/hw/qdev-core.h b/include/hw/qdev-core.h
+> index 784971b8d8..9d7c1c0e9b 100644
+> --- a/include/hw/qdev-core.h
+> +++ b/include/hw/qdev-core.h
+> @@ -228,6 +228,7 @@ struct Property {
+>      uint8_t      bitnr;
+>      union {
+>          int64_t i;
+> +        uint64_t u;
+>      } defval;
+>      int          arrayoffset;
+>      PropertyInfo *arrayinfo;
+> diff --git a/include/hw/qdev-properties.h b/include/hw/qdev-properties.h
+> index 6663a547ea..16d3ada8df 100644
+> --- a/include/hw/qdev-properties.h
+> +++ b/include/hw/qdev-properties.h
+> @@ -37,6 +37,7 @@ extern PropertyInfo qdev_prop_arraylen;
+>          .offset    =3D offsetof(_state, _field)                    \
+>              + type_check(_type, typeof_field(_state, _field)),   \
+>          }
+> +
+>  #define DEFINE_PROP_INT(_name, _state, _field, _defval, _prop, _type) { \
+>          .name      =3D (_name),                                         =
+  \
+>          .info      =3D &(_prop),                                        =
+  \
+> @@ -44,29 +45,39 @@ extern PropertyInfo qdev_prop_arraylen;
+>              + type_check(_type,typeof_field(_state, _field)),           \
+>          .defval.i  =3D (_type)_defval,                                  =
+  \
+>          }
+> -#define DEFINE_PROP_BIT(_name, _state, _field, _bit, _defval) {  \
+> -        .name      =3D (_name),                                    \
+> -        .info      =3D &(qdev_prop_bit),                           \
+> -        .bitnr    =3D (_bit),                                      \
+> -        .offset    =3D offsetof(_state, _field)                    \
+> -            + type_check(uint32_t,typeof_field(_state, _field)), \
+> -        .defval.i  =3D (bool)_defval,                              \
+> +
+> +#define DEFINE_PROP_BIT(_name, _state, _field, _bit, _defval) {         \
+> +        .name      =3D (_name),                                         =
+  \
+> +        .info      =3D &(qdev_prop_bit),                                =
+  \
+> +        .bitnr    =3D (_bit),                                           =
+  \
+> +        .offset    =3D offsetof(_state, _field)                         =
+  \
+> +            + type_check(uint32_t, typeof_field(_state, _field)),       =
+ \
+> +        .defval.u   =3D (bool)_defval,                                  =
+  \
+>          }
 
--- 
-Best regards,
-Vladimir
+Let's keep the backslashes where they are to reduce churn.
+
+> +
+> +#define DEFINE_PROP_UINT(_name, _state, _field, _defval, _prop, _type) {=
+ \
+> +        .name      =3D (_name),                                         =
+  \
+> +        .info      =3D &(_prop),                                        =
+  \
+> +        .offset    =3D offsetof(_state, _field)                         =
+  \
+> +            + type_check(_type, typeof_field(_state, _field)),          \
+> +        .defval.u  =3D (_type)_defval,                                  =
+  \
+> +        }
+> +
+>  #define DEFINE_PROP_BIT64(_name, _state, _field, _bit, _defval) {       \
+>          .name      =3D (_name),                                         =
+  \
+>          .info      =3D &(qdev_prop_bit64),                              =
+  \
+>          .bitnr    =3D (_bit),                                           =
+  \
+>          .offset    =3D offsetof(_state, _field)                         =
+  \
+>              + type_check(uint64_t, typeof_field(_state, _field)),       \
+> -        .defval.i  =3D (bool)_defval,                                   =
+  \
+> +        .defval.u  =3D (bool)_defval,                                   =
+  \
+>          }
+>=20=20
+> -#define DEFINE_PROP_BOOL(_name, _state, _field, _defval) {       \
+> -        .name      =3D (_name),                                    \
+> -        .info      =3D &(qdev_prop_bool),                          \
+> -        .offset    =3D offsetof(_state, _field)                    \
+> -            + type_check(bool, typeof_field(_state, _field)),    \
+> -        .defval.i  =3D (bool)_defval,                              \
+> +#define DEFINE_PROP_BOOL(_name, _state, _field, _defval) {      \
+> +        .name      =3D (_name),                                   \
+> +        .info      =3D &(qdev_prop_bool),                         \
+> +        .offset    =3D offsetof(_state, _field)                   \
+> +            + type_check(bool, typeof_field(_state, _field)),   \
+> +        .defval.u    =3D (bool)_defval,                           \
+>          }
+
+Likewise.
+
+>=20=20
+>  #define PROP_ARRAY_LEN_PREFIX "len-"
+> @@ -107,17 +118,17 @@ extern PropertyInfo qdev_prop_arraylen;
+>          }
+>=20=20
+>  #define DEFINE_PROP_UINT8(_n, _s, _f, _d)                       \
+> -    DEFINE_PROP_INT(_n, _s, _f, _d, qdev_prop_uint8, uint8_t)
+> +    DEFINE_PROP_UINT(_n, _s, _f, _d, qdev_prop_uint8, uint8_t)
+>  #define DEFINE_PROP_UINT16(_n, _s, _f, _d)                      \
+> -    DEFINE_PROP_INT(_n, _s, _f, _d, qdev_prop_uint16, uint16_t)
+> +    DEFINE_PROP_UINT(_n, _s, _f, _d, qdev_prop_uint16, uint16_t)
+>  #define DEFINE_PROP_UINT32(_n, _s, _f, _d)                      \
+> -    DEFINE_PROP_INT(_n, _s, _f, _d, qdev_prop_uint32, uint32_t)
+> +    DEFINE_PROP_UINT(_n, _s, _f, _d, qdev_prop_uint32, uint32_t)
+>  #define DEFINE_PROP_INT32(_n, _s, _f, _d)                      \
+>      DEFINE_PROP_INT(_n, _s, _f, _d, qdev_prop_int32, int32_t)
+>  #define DEFINE_PROP_UINT64(_n, _s, _f, _d)                      \
+> -    DEFINE_PROP_INT(_n, _s, _f, _d, qdev_prop_uint64, uint64_t)
+> +    DEFINE_PROP_UINT(_n, _s, _f, _d, qdev_prop_uint64, uint64_t)
+>  #define DEFINE_PROP_SIZE(_n, _s, _f, _d)                       \
+> -    DEFINE_PROP_INT(_n, _s, _f, _d, qdev_prop_size, uint64_t)
+> +    DEFINE_PROP_UINT(_n, _s, _f, _d, qdev_prop_size, uint64_t)
+>  #define DEFINE_PROP_PCI_DEVFN(_n, _s, _f, _d)                   \
+>      DEFINE_PROP_INT(_n, _s, _f, _d, qdev_prop_pci_devfn, int32_t)
+>=20=20
+> @@ -163,7 +174,7 @@ extern PropertyInfo qdev_prop_arraylen;
+>  #define DEFINE_PROP_BIOS_CHS_TRANS(_n, _s, _f, _d) \
+>      DEFINE_PROP_INT(_n, _s, _f, _d, qdev_prop_bios_chs_trans, int)
+>  #define DEFINE_PROP_BLOCKSIZE(_n, _s, _f) \
+> -    DEFINE_PROP_INT(_n, _s, _f, 0, qdev_prop_blocksize, uint16_t)
+> +    DEFINE_PROP_UINT(_n, _s, _f, 0, qdev_prop_blocksize, uint16_t)
+>  #define DEFINE_PROP_PCI_HOST_DEVADDR(_n, _s, _f) \
+>      DEFINE_PROP(_n, _s, _f, qdev_prop_pci_host_devaddr, PCIHostDeviceAdd=
+ress)
+>=20=20
+> diff --git a/hw/core/qdev-properties.c b/hw/core/qdev-properties.c
+> index 952cda7758..92fb43cb0d 100644
+> --- a/hw/core/qdev-properties.c
+> +++ b/hw/core/qdev-properties.c
+> @@ -71,7 +71,7 @@ static void set_enum(Object *obj, Visitor *v, const cha=
+r *name, void *opaque,
+>=20=20
+>  static void set_default_value_enum(Object *obj, const Property *prop)
+>  {
+> -    object_property_set_str(obj, prop->info->enum_table[prop->defval.i],
+> +    object_property_set_str(obj, prop->info->enum_table[prop->defval.u],
+>                              prop->name, &error_abort);
+>  }
+>=20=20
+> @@ -128,7 +128,7 @@ static void prop_set_bit(Object *obj, Visitor *v, con=
+st char *name,
+>=20=20
+>  static void set_default_value_bool(Object *obj, const Property *prop)
+>  {
+> -    object_property_set_bool(obj, prop->defval.i, prop->name, &error_abo=
+rt);
+> +    object_property_set_bool(obj, prop->defval.u, prop->name, &error_abo=
+rt);
+>  }
+>=20=20
+>  PropertyInfo qdev_prop_bit =3D {
+> @@ -264,11 +264,16 @@ static void set_default_value_int(Object *obj, cons=
+t Property *prop)
+>      object_property_set_int(obj, prop->defval.i, prop->name, &error_abor=
+t);
+>  }
+>=20=20
+> +static void set_default_value_uint(Object *obj, const Property *prop)
+> +{
+> +    object_property_set_uint(obj, prop->defval.u, prop->name, &error_abo=
+rt);
+> +}
+> +
+>  PropertyInfo qdev_prop_uint8 =3D {
+>      .name  =3D "uint8",
+>      .get   =3D get_uint8,
+>      .set   =3D set_uint8,
+> -    .set_default_value =3D set_default_value_int,
+> +    .set_default_value =3D set_default_value_uint,
+>  };
+>=20=20
+>  /* --- 16bit integer --- */
+> @@ -302,7 +307,7 @@ PropertyInfo qdev_prop_uint16 =3D {
+>      .name  =3D "uint16",
+>      .get   =3D get_uint16,
+>      .set   =3D set_uint16,
+> -    .set_default_value =3D set_default_value_int,
+> +    .set_default_value =3D set_default_value_uint,
+>  };
+>=20=20
+>  /* --- 32bit integer --- */
+> @@ -361,7 +366,7 @@ PropertyInfo qdev_prop_uint32 =3D {
+>      .name  =3D "uint32",
+>      .get   =3D get_uint32,
+>      .set   =3D set_uint32,
+> -    .set_default_value =3D set_default_value_int,
+> +    .set_default_value =3D set_default_value_uint,
+>  };
+>=20=20
+>  PropertyInfo qdev_prop_int32 =3D {
+> @@ -402,7 +407,7 @@ PropertyInfo qdev_prop_uint64 =3D {
+>      .name  =3D "uint64",
+>      .get   =3D get_uint64,
+>      .set   =3D set_uint64,
+> -    .set_default_value =3D set_default_value_int,
+> +    .set_default_value =3D set_default_value_uint,
+>  };
+>=20=20
+>  /* --- string --- */
+> @@ -725,7 +730,7 @@ PropertyInfo qdev_prop_blocksize =3D {
+>      .description =3D "A power of two between 512 and 32768",
+>      .get   =3D get_uint16,
+>      .set   =3D set_blocksize,
+> -    .set_default_value =3D set_default_value_int,
+> +    .set_default_value =3D set_default_value_uint,
+>  };
+>=20=20
+>  /* --- pci host address --- */
+> @@ -948,7 +953,7 @@ PropertyInfo qdev_prop_arraylen =3D {
+>      .name =3D "uint32",
+>      .get =3D get_uint32,
+>      .set =3D set_prop_arraylen,
+> -    .set_default_value =3D set_default_value_int,
+> +    .set_default_value =3D set_default_value_uint,
+>  };
+>=20=20
+>  /* --- public helpers --- */
+> @@ -1185,5 +1190,5 @@ PropertyInfo qdev_prop_size =3D {
+>      .name  =3D "size",
+>      .get =3D get_size,
+>      .set =3D set_size,
+> -    .set_default_value =3D set_default_value_int,
+> +    .set_default_value =3D set_default_value_uint,
+>  };
