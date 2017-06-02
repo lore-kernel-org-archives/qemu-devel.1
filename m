@@ -1,28 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60625)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33018)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1dGm73-0003JY-2j
-	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 08:55:34 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1dGmBg-0004ce-5E
+	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 09:00:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1dGm6y-00061x-6X
-	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 08:55:33 -0400
-Received: from mailhub.sw.ru ([195.214.232.25]:6982 helo=relay.sw.ru)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
-	id 1dGm6x-0005yh-Qm
-	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 08:55:28 -0400
-References: <20170530143052.165002-1-vsementsov@virtuozzo.com>
-	<20170530143052.165002-15-vsementsov@virtuozzo.com>
-	<05dd8425-2773-0396-1532-e25c737c3753@redhat.com>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <7c60e29b-6e78-7bc7-c19e-294dbf11756e@virtuozzo.com>
-Date: Fri, 2 Jun 2017 15:55:23 +0300
+	(envelope-from <peter.maydell@linaro.org>) id 1dGmBa-0000SP-Co
+	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 09:00:20 -0400
+Received: from mail-wm0-x22b.google.com ([2a00:1450:400c:c09::22b]:35049)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1dGmBa-0000RQ-5A
+	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 09:00:14 -0400
+Received: by mail-wm0-x22b.google.com with SMTP id b84so25195511wmh.0
+	for <qemu-devel@nongnu.org>; Fri, 02 Jun 2017 06:00:13 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <05dd8425-2773-0396-1532-e25c737c3753@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH 14/19] nbd/server: nbd_negotiate: return 1
- on NBD_OPT_ABORT
+In-Reply-To: <1494860396-24930-1-git-send-email-Milos.Stojanovic@rt-rk.com>
+References: <1494860396-24930-1-git-send-email-Milos.Stojanovic@rt-rk.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 2 Jun 2017 13:59:52 +0100
+Message-ID: <CAFEAcA_mdff9cLQYv76_0HLUX9Fs3iaGNVR73QZE+Yv=k=+=eg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 00/16] Augment support for signal
+ handling
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,93 +30,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
-Cc: pbonzini@redhat.com, den@openvz.org
+To: =?UTF-8?B?TWlsb8WhIFN0b2phbm92acSH?= <Milos.Stojanovic@rt-rk.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Riku Voipio <riku.voipio@iki.fi>, Miodrag.Dinic@rt-rk.com, Laurent Vivier <laurent@vivier.eu>, Petar Jovanovic <Petar.Jovanovic@rt-rk.com>, Aleksandar Markovic <Aleksandar.Markovic@rt-rk.com>, Yongbok Kim <yongbok.kim@imgtec.com>
 
-02.06.2017 01:33, Eric Blake wrote:
-> On 05/30/2017 09:30 AM, Vladimir Sementsov-Ogievskiy wrote:
->> Separate case when client sent NBD_OPT_ABORT from other errors.
->> It will be needed for the following patch, where errors will be
->> reported.
->> Considered case is not actually the error - it honestly follows NBD
->> protocol. Therefore it should not be reported like an error.
->> -EPIPE case means client not read server reply on NBD_OPT_ABORT,
->> which is also OK.
->>
->> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
->> ---
->>   nbd/server.c | 20 +++++++++++++++-----
->>   1 file changed, 15 insertions(+), 5 deletions(-)
->>
->> diff --git a/nbd/server.c b/nbd/server.c
->> index 30dfb81a5c..0e53d3dd91 100644
->> --- a/nbd/server.c
->> +++ b/nbd/server.c
->> @@ -369,9 +369,13 @@ static QIOChannel *nbd_negotiate_handle_starttls(NBDClient *client,
->>       return QIO_CHANNEL(tioc);
->>   }
->>   
->> -
->> -/* Process all NBD_OPT_* client option commands.
->> - * Return -errno on error, 0 on success. */
->> +/* nbd_negotiate_options
->> + * Process all NBD_OPT_* client option commands.
->> + * Return:
->> + * < 0 on error
-> Do you want to be specific that this is a negative errno value, or is it
-> just any negative value with no correlation to errno?
-
-nothing here (except blk_write and friends, but their errors are not 
-returned by any function) correlates with errno, because core function - 
-nbd_wr_syncv returns EIO on any error. Underlying io_channel returns -1 
-or QIO_CHANNEL_ERR_BLOCK...
-
-
+On 15 May 2017 at 15:59, Milo=C5=A1 Stojanovi=C4=87 <Milos.Stojanovic@rt-rk=
+.com> wrote:
+> D. Add support for larger target signal range (RFC patches 10-16):
 >
->> + * 0   on successful negotiation
->> + * 1   if client sent NBD_OPT_ABORT, i.e. on legal disconnect
->> + */
->>   static int nbd_negotiate_options(NBDClient *client)
->>   {
->>       int ret;
->> @@ -483,7 +487,7 @@ static int nbd_negotiate_options(NBDClient *client)
->>                   }
->>                   /* Let the client keep trying, unless they asked to quit */
->>                   if (clientflags == NBD_OPT_ABORT) {
->> -                    return -EINVAL;
->> +                    return 1;
->>                   }
->>                   break;
->>               }
->> @@ -502,7 +506,7 @@ static int nbd_negotiate_options(NBDClient *client)
->>                    * guests that don't wait for our reply. */
->>                   ret = nbd_negotiate_send_rep(client->ioc, NBD_REP_ACK,
->>                                                clientflags);
->> -                return ret < 0 ? ret : -EINVAL;
->> +                return ret < 0 && ret != -EPIPE ? ret : 1;
-> This should just be 'return 1;', which means you don't need to capture
-> and check 'ret'.
+>    Add target signal mask tracking and multiplexing of target signals out
+>    of the host range. The patches are marked as RFC because they introduc=
+e
+>    significant new functionalities regarding signal handling in QEMU.
 >
->>   
->>               case NBD_OPT_EXPORT_NAME:
->>                   return nbd_negotiate_handle_export_name(client, length);
->> @@ -560,6 +564,12 @@ static int nbd_negotiate_options(NBDClient *client)
->>       }
->>   }
->>   
->> +/* nbd_negotiate
->> + * Return:
->> + * < 0 on error
-> Again, if this is reliably a negative errno, specifically document that.
+>    Currently, QEMU has a copy of the host signal and suspend masks and
+>    that is usually enough, since most of the time the signal mask of the
+>    target architecture is either the same length or narrower. If however
+>    the signal mask is wider, then part of it won't be tracked. The signal=
+s
+>    that are in the target range but out of the host range were treated li=
+ke
+>    faulty signals and couldn't be used. This problem is solved by enablin=
+g
+>    the usage of one of the host signals as a multiplex for all the target
+>    signals that are out of range. In order to have the target signal mask=
+s
+>    available, tracking of target signal masks is implemented.
 >
->> + * 0   on successful negotiation
->> + * 1   if client sent NBD_OPT_ABORT, i.e. on legal disconnect
->> + */
->>   static coroutine_fn int nbd_negotiate(NBDClient *client)
->>   {
->>       char buf[8 + 8 + 8 + 128];
->>
+>    The rt_sigqueueinfo()/rt_tgsigqueueinfo() system calls multiplex targe=
+t
+>    signals by setting the si_errno value to the actual value of the signa=
+l
+>    and sending the signal to a predefined host signal number.
+>    The host_signal_handler() will pull out the multiplexed signals and se=
+t
+>    their signal number to the correct value. The si_errno field is used
+>    here but this implementation can be replaced with any other unused fie=
+ld
+>    in the uinfo structure. Using this implementation both rt_sigqueueinfo=
+(),
+>    rt_tgsigqueueinfo(), as well as kill() (for pid > 0) and tgkill() can =
+be
+>    emulated.
+>
+>    The tkill() system call and kill() with the argument pid <=3D 0 couldn=
+'t
+>    be implemented simply using this method because it requires acquiring
+>    information about, and sending simultaneous signals to multiple thread=
+s
+>    or processes. These functionalities are out of the scope of
+>    rt_sigqueueinfo()/rt_tgsigqueueinfo().
 
--- 
-Best regards,
-Vladimir
+This certainly sounds good -- can it fix our problems with clashes
+between the host libc and guest libc use of signals?
+
+I do wonder if this is opening up subtle bugs, though: if the
+guest does:
+  * block signal X
+  * some syscall
+  * unblock X
+
+then we shouldn't interrupt the syscall if signal X arrives.
+That works when we use host signal X for guest signal X because
+we just block host signal X. But I don't see how it works if X
+has to be multiplexed.
+
+As an implementation point: I see you've implemented this with
+ifdefs. I think that if we're going to do it we should do it
+always, because it's always the case that there are guest signals
+that we can't directly represent with host signals, because of
+the host libc stealing a couple for its internal use, so we always
+need to multiplex at least a few signals. It also makes it easier
+to reason about and test if everything is using the same code paths.
+
+thanks
+-- PMM
