@@ -1,30 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40158)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40199)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dGrlF-0002PL-Hx
-	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 14:57:26 -0400
+	id 1dGrlK-0002S6-83
+	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 14:57:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dGrlE-0006Wb-RV
-	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 14:57:25 -0400
-Received: from mail-oi0-x242.google.com ([2607:f8b0:4003:c06::242]:35126)
+	id 1dGrlJ-0006am-5z
+	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 14:57:30 -0400
+Received: from mail-oi0-x243.google.com ([2607:f8b0:4003:c06::243]:34496)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dGrlE-0006WJ-NM
-	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 14:57:24 -0400
-Received: by mail-oi0-x242.google.com with SMTP id f206so3400538oig.2
-	for <qemu-devel@nongnu.org>; Fri, 02 Jun 2017 11:57:24 -0700 (PDT)
+	id 1dGrlJ-0006ab-1I
+	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 14:57:29 -0400
+Received: by mail-oi0-x243.google.com with SMTP id d99so1533006oic.1
+	for <qemu-devel@nongnu.org>; Fri, 02 Jun 2017 11:57:28 -0700 (PDT)
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Fri,  2 Jun 2017 15:56:26 -0300
-Message-Id: <20170602185630.5059-21-f4bug@amsat.org>
+Date: Fri,  2 Jun 2017 15:56:29 -0300
+Message-Id: <20170602185630.5059-24-f4bug@amsat.org>
 In-Reply-To: <20170602185630.5059-1-f4bug@amsat.org>
 References: <20170602185630.5059-1-f4bug@amsat.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v5 20/24] shippable: add armeb-linux-user target
+Subject: [Qemu-devel] [PATCH v5 23/24] MAINTAINERS: add Shippable automation
+ platform URL
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,21 +40,20 @@ Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
 ---
- .shippable.yml | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ MAINTAINERS | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/.shippable.yml b/.shippable.yml
-index fe360f85cb..2070c4d827 100644
---- a/.shippable.yml
-+++ b/.shippable.yml
-@@ -6,7 +6,7 @@ env:
-     - LC_ALL=C
-   matrix:
-     - IMAGE=debian-armhf-cross
--      TARGET_LIST=arm-softmmu,arm-linux-user
-+      TARGET_LIST=arm-softmmu,arm-linux-user,armeb-linux-user
-     - IMAGE=debian-arm64-cross
-       TARGET_LIST=aarch64-softmmu,aarch64-linux-user
-     - IMAGE=debian-s390x-cross
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 7df088259b..d578504294 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -1865,6 +1865,7 @@ F: .travis.yml
+ F: .shippable.yml
+ F: tests/docker/
+ W: https://travis-ci.org/qemu/qemu
++W: https://app.shippable.com/github/qemu/qemu
+ W: http://patchew.org/QEMU/
+ 
+ Documentation
 -- 
 2.11.0
