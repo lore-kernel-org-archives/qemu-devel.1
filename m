@@ -1,28 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47423)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48035)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1dGn8Z-0001ak-Js
-	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 10:01:13 -0400
+	(envelope-from <aurelien@aurel32.net>) id 1dGnBq-0002c0-D3
+	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 10:04:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1dGn8X-0004kW-Ax
-	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 10:01:11 -0400
-Received: from mail-lf0-x242.google.com ([2a00:1450:4010:c07::242]:33769)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1dGn8W-0004jm-PY
-	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 10:01:09 -0400
-Received: by mail-lf0-x242.google.com with SMTP id u62so4599560lfg.0
-	for <qemu-devel@nongnu.org>; Fri, 02 Jun 2017 07:01:08 -0700 (PDT)
+	(envelope-from <aurelien@aurel32.net>) id 1dGnBo-0006uO-V2
+	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 10:04:34 -0400
+Received: from hall.aurel32.net ([2001:bc8:30d7:100::1]:51772)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <aurelien@aurel32.net>)
+	id 1dGnBo-0006u9-M3
+	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 10:04:32 -0400
+Date: Fri, 2 Jun 2017 16:04:29 +0200
+From: Aurelien Jarno <aurelien@aurel32.net>
+Message-ID: <20170602140429.elahcu5olntw7ypi@aurel32.net>
+References: <20170531220129.27724-1-aurelien@aurel32.net>
+	<20170531220129.27724-31-aurelien@aurel32.net>
+	<ea25b082-923d-6c7d-bca3-b4adbd412419@redhat.com>
+	<781667e0-740c-8e43-d94b-387092eab0e6@redhat.com>
+	<20170601191718.6cftzl5ama4s3es3@aurel32.net>
+	<c3c65598-59ca-c80e-1f8d-340ab19d902f@redhat.com>
+	<207db011-5035-acb3-2032-8408b4ec38e6@redhat.com>
 MIME-Version: 1.0
-References: <20170531135709.345-1-marcandre.lureau@redhat.com>
-	<20170531135709.345-20-marcandre.lureau@redhat.com>
-	<87y3tabikl.fsf@dusky.pond.sub.org>
-In-Reply-To: <87y3tabikl.fsf@dusky.pond.sub.org>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Fri, 02 Jun 2017 14:00:55 +0000
-Message-ID: <CAJ+F1CKUTua8M17pLpDpCBcvaRHtHC-ONqZX-P6_7-WWmaoH3A@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 19/45] qdev: add unsigned properties
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <207db011-5035-acb3-2032-8408b4ec38e6@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v3 30/30] target/s390x: update maximum TCG
+ model to z800
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,286 +34,158 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: David Hildenbrand <david@redhat.com>
+Cc: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, Alexander Graf <agraf@suse.de>, Richard Henderson <rth@twiddle.net>
 
-On Fri, Jun 2, 2017 at 5:55 PM Markus Armbruster <armbru@redhat.com> wrote:
+On 2017-06-02 13:30, David Hildenbrand wrote:
+> On 02.06.2017 10:09, Thomas Huth wrote:
+> > On 01.06.2017 21:17, Aurelien Jarno wrote:
+> >> On 2017-06-01 11:04, David Hildenbrand wrote:
+> >>> On 01.06.2017 10:38, David Hildenbrand wrote:
+> >>>> On 01.06.2017 00:01, Aurelien Jarno wrote:
+> >>>>> At the same time fix the TCG version of get_max_cpu_model to return the
+> >>>>> maximum model like on KVM. Remove the ETF2 and long-displacement
+> >>>>
+> >>>> I don't understand the part
+> >>>> "fix the TCG version of get_max_cpu_model to return the maximum model
+> >>>> like on KVM".
+> >>>>
+> >>>> Can you elaborate?
+> >>>>
+> >>>>> facilities from the additional features as it is included in the z800.
+> >>>>>
+> >>>>> Signed-off-by: Aurelien Jarno <aurelien@aurel32.net>
+> >>>>> ---
+> >>>>>  target/s390x/cpu_models.c | 13 ++++++-------
+> >>>>>  1 file changed, 6 insertions(+), 7 deletions(-)
+> >>>>>
+> >>>>> diff --git a/target/s390x/cpu_models.c b/target/s390x/cpu_models.c
+> >>>>> index fc3cb25cc3..c13bbd852c 100644
+> >>>>> --- a/target/s390x/cpu_models.c
+> >>>>> +++ b/target/s390x/cpu_models.c
+> >>>>> @@ -668,8 +668,6 @@ static void add_qemu_cpu_model_features(S390FeatBitmap fbm)
+> >>>>>      static const int feats[] = {
+> >>>>>          S390_FEAT_STFLE,
+> >>>>>          S390_FEAT_EXTENDED_IMMEDIATE,
+> >>>>> -        S390_FEAT_EXTENDED_TRANSLATION_2,
+> >>>>> -        S390_FEAT_LONG_DISPLACEMENT,
+> >>>>>          S390_FEAT_LONG_DISPLACEMENT_FAST,
+> >>>>>          S390_FEAT_ETF2_ENH,
+> >>>>>          S390_FEAT_STORE_CLOCK_FAST,
+> >>>>> @@ -696,9 +694,9 @@ static S390CPUModel *get_max_cpu_model(Error **errp)
+> >>>>>      if (kvm_enabled()) {
+> >>>>>          kvm_s390_get_host_cpu_model(&max_model, errp);
+> >>>>>      } else {
+> >>>>> -        /* TCG emulates a z900 (with some optional additional features) */
+> >>>>> -        max_model.def = &s390_cpu_defs[0];
+> >>>>> -        bitmap_copy(max_model.features, max_model.def->default_feat,
+> >>>>> +        /* TCG emulates a z800 (with some optional additional features) */
+> >>>>> +        max_model.def = s390_find_cpu_def(0x2066, 7, 3, NULL);
+> >>>>> +        bitmap_copy(max_model.features, max_model.def->full_feat,
+> >>>>>                      S390_FEAT_MAX);
+> >>>
+> >>> This is most likely wrong: you're indicating features here that are not
+> >>> available on tcg. esp. S390_FEAT_SIE_F2 and friends.
+> >>>
+> >>> I think should only copy the base features and add whatever else is
+> >>> available via add_qemu_cpu_model_features() as already done.
+> >>
+> >> The patch series added all the z800 features exposed via STFL/STFLE.
+> >> Indeed the SIE features are missing, but anyway QEMU doesn't emulate SIE
+> >> at all so the lack of these features are not exposed to the guest. In that
+> >> regard QEMU already wrongly claim to emulate a z900.
+> 
+> Please note that:
+> 
+> a) SIE features were never part of the max model. QEMU never claimed
+> that. With your change one could suddenly do a -cpu z900,sie_f2=on,
+> which is wrong.
+> 
+> b) The SIE_F2 feature tells the guest that the SIE instruction is
+> available. E.g. Linux will look at this bit and show SIE support in
+> /proc/cpuinfo and unlock the KVM module.
 
-> Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
->
-> > Add and use unsigned type for various properties.
-> >
-> > Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
->
-> The commit message is a bit misleading.  We don't "add unsigned
-> properties", we clean up the property code to avoid type casts between
-> signed and unsigned.
->
+I understand your point. That said I doubt we will support the SIE
+instruction soon (it looks quite complicated and I can't find any doc).
+As we are going to emulate more facilities to QEMU, it will be more and
+more difficult to select a modern CPU. One will have to use -cpu,z900,
+etf2=on,ldisp=on,...,eimm=on. I think we have to provide users with an
+easier way to do that.
 
-That in itself is imho a good reason for the cleanup :)
+One possibility would be to filter the features that are not emulated by
+QEMU (like on the ppc64 target) or to allow the user to specify a higher
+model provided the non emulated features are disabled. Something like
+-cpu z800,sie_f2=off.
 
->
-> I'm not sure that's worth the churn by itself.  But perhaps it helps
-> later in this series.  If yes, can you give me a hint?
->
+> Please, just don't add features to the MAX model that we don't implement.
 
-Churn is quite minimal though.
+Please note that QEMU does not fully implement S390_FEAT_ESAN3 (though
+that is addressed in this patchset) and S390_FEAT_ZARCH, despite
+claiming it.
 
+> >>>>>          add_qemu_cpu_model_features(max_model.features);
+> >>>>>      }
+> >>>>> @@ -956,8 +954,9 @@ static void s390_qemu_cpu_model_initfn(Object *obj)
+> >>>>>      S390CPU *cpu = S390_CPU(obj);
+> >>>>>  
+> >>>>>      cpu->model = g_malloc0(sizeof(*cpu->model));
+> >>>>> -    /* TCG emulates a z900 (with some optional additional features) */
+> >>>>> -    memcpy(&s390_qemu_cpu_defs, &s390_cpu_defs[0], sizeof(s390_qemu_cpu_defs));
+> >>>>> +    /* TCG emulates a z800 (with some optional additional features) */
+> >>>>> +    memcpy(&s390_qemu_cpu_defs, s390_find_cpu_def(0x2066, 7, 3, NULL),
+> >>>>> +           sizeof(s390_qemu_cpu_defs));
+> >>>>
+> >>>> No changing the qemu model without compatibility handling.
+> >>>>
+> >>> Please have a look at the following mail for a possible solution:
+> >>>
+> >>> https://lists.gnu.org/archive/html/qemu-devel/2017-05/msg06030.html
+> >>>
+> >>> This could be moved to a separate patch. So this patch really should
+> >>> just care about the maximum model, not the qemu model.
+> >>
+> >> From what I understand from this thread, the patch from Thomas Huth was
+> >> finally considered acceptable. I am adding him in Cc: so that he can
+> >> comment.
+> > 
+> > In the 2nd version of my patch, I only changed the full_feat of the
+> > model definitions, but not the base_feat and default_feat fields, so
+> > that the CPU stays the same when you run QEMU without "-cpu" parameter
+> > (or simply with "-cpu qemu").
+> > 
+> > Consider that the following scenario should work: Start a QEMU v2.10
+> > with "-M s390-ccw-virtio-2.9" and a QEMU v2.9 with "-M
+> > s390-ccw-virtio-2.9 -incoming ...". Then it should be possible to
+> > migrate from the v2.10 to the v2.9 instance without problems. This won't
+> > work anymore if you changed the default feature bits unconditionally.
+> > 
+> >  Thomas
+> > 
+> 
+> The following can be used to make sure the model does not change:
+> 
+> s390x-softmmu/qemu-system-s390x -S -qmp stdio
+> 
+> -> { "execute": "qmp_capabilities" }
+> -> { "execute": "query-cpu-model-expansion", "arguments": { "type":
+> "static", "model": { "name": "qemu" } } }
+> 
+> With existing compat machines, this has to give
+> -> "{"return": {"model": {"name": "z900-base"}}}"
 
->
-> > ---
-> >  include/hw/qdev-core.h       |  1 +
-> >  include/hw/qdev-properties.h | 51
-> +++++++++++++++++++++++++++-----------------
-> >  hw/core/qdev-properties.c    | 23 ++++++++++++--------
-> >  3 files changed, 46 insertions(+), 29 deletions(-)
-> >
-> > diff --git a/include/hw/qdev-core.h b/include/hw/qdev-core.h
-> > index 784971b8d8..9d7c1c0e9b 100644
-> > --- a/include/hw/qdev-core.h
-> > +++ b/include/hw/qdev-core.h
-> > @@ -228,6 +228,7 @@ struct Property {
-> >      uint8_t      bitnr;
-> >      union {
-> >          int64_t i;
-> > +        uint64_t u;
-> >      } defval;
-> >      int          arrayoffset;
-> >      PropertyInfo *arrayinfo;
-> > diff --git a/include/hw/qdev-properties.h b/include/hw/qdev-properties.=
-h
-> > index 6663a547ea..16d3ada8df 100644
-> > --- a/include/hw/qdev-properties.h
-> > +++ b/include/hw/qdev-properties.h
-> > @@ -37,6 +37,7 @@ extern PropertyInfo qdev_prop_arraylen;
-> >          .offset    =3D offsetof(_state, _field)                    \
-> >              + type_check(_type, typeof_field(_state, _field)),   \
-> >          }
-> > +
-> >  #define DEFINE_PROP_INT(_name, _state, _field, _defval, _prop, _type) =
-{
-> \
-> >          .name      =3D (_name),
->  \
-> >          .info      =3D &(_prop),
-> \
-> > @@ -44,29 +45,39 @@ extern PropertyInfo qdev_prop_arraylen;
-> >              + type_check(_type,typeof_field(_state, _field)),
->  \
-> >          .defval.i  =3D (_type)_defval,
-> \
-> >          }
-> > -#define DEFINE_PROP_BIT(_name, _state, _field, _bit, _defval) {  \
-> > -        .name      =3D (_name),                                    \
-> > -        .info      =3D &(qdev_prop_bit),                           \
-> > -        .bitnr    =3D (_bit),                                      \
-> > -        .offset    =3D offsetof(_state, _field)                    \
-> > -            + type_check(uint32_t,typeof_field(_state, _field)), \
-> > -        .defval.i  =3D (bool)_defval,                              \
-> > +
-> > +#define DEFINE_PROP_BIT(_name, _state, _field, _bit, _defval) {
->  \
-> > +        .name      =3D (_name),
->  \
-> > +        .info      =3D &(qdev_prop_bit),
-> \
-> > +        .bitnr    =3D (_bit),
->  \
-> > +        .offset    =3D offsetof(_state, _field)
->  \
-> > +            + type_check(uint32_t, typeof_field(_state, _field)),
->   \
-> > +        .defval.u   =3D (bool)_defval,
-> \
-> >          }
->
-> Let's keep the backslashes where they are to reduce churn.
->
-> > +
-> > +#define DEFINE_PROP_UINT(_name, _state, _field, _defval, _prop, _type)
-> { \
-> > +        .name      =3D (_name),
->  \
-> > +        .info      =3D &(_prop),
-> \
-> > +        .offset    =3D offsetof(_state, _field)
->  \
-> > +            + type_check(_type, typeof_field(_state, _field)),
-> \
-> > +        .defval.u  =3D (_type)_defval,
-> \
-> > +        }
-> > +
-> >  #define DEFINE_PROP_BIT64(_name, _state, _field, _bit, _defval) {
->  \
-> >          .name      =3D (_name),
->  \
-> >          .info      =3D &(qdev_prop_bit64),
-> \
-> >          .bitnr    =3D (_bit),
->  \
-> >          .offset    =3D offsetof(_state, _field)
->  \
-> >              + type_check(uint64_t, typeof_field(_state, _field)),
->  \
-> > -        .defval.i  =3D (bool)_defval,
->  \
-> > +        .defval.u  =3D (bool)_defval,
->  \
-> >          }
-> >
-> > -#define DEFINE_PROP_BOOL(_name, _state, _field, _defval) {       \
-> > -        .name      =3D (_name),                                    \
-> > -        .info      =3D &(qdev_prop_bool),                          \
-> > -        .offset    =3D offsetof(_state, _field)                    \
-> > -            + type_check(bool, typeof_field(_state, _field)),    \
-> > -        .defval.i  =3D (bool)_defval,                              \
-> > +#define DEFINE_PROP_BOOL(_name, _state, _field, _defval) {      \
-> > +        .name      =3D (_name),                                   \
-> > +        .info      =3D &(qdev_prop_bool),                         \
-> > +        .offset    =3D offsetof(_state, _field)                   \
-> > +            + type_check(bool, typeof_field(_state, _field)),   \
-> > +        .defval.u    =3D (bool)_defval,                           \
-> >          }
->
-> Likewise.
->
-> >
-> >  #define PROP_ARRAY_LEN_PREFIX "len-"
-> > @@ -107,17 +118,17 @@ extern PropertyInfo qdev_prop_arraylen;
-> >          }
-> >
-> >  #define DEFINE_PROP_UINT8(_n, _s, _f, _d)                       \
-> > -    DEFINE_PROP_INT(_n, _s, _f, _d, qdev_prop_uint8, uint8_t)
-> > +    DEFINE_PROP_UINT(_n, _s, _f, _d, qdev_prop_uint8, uint8_t)
-> >  #define DEFINE_PROP_UINT16(_n, _s, _f, _d)                      \
-> > -    DEFINE_PROP_INT(_n, _s, _f, _d, qdev_prop_uint16, uint16_t)
-> > +    DEFINE_PROP_UINT(_n, _s, _f, _d, qdev_prop_uint16, uint16_t)
-> >  #define DEFINE_PROP_UINT32(_n, _s, _f, _d)                      \
-> > -    DEFINE_PROP_INT(_n, _s, _f, _d, qdev_prop_uint32, uint32_t)
-> > +    DEFINE_PROP_UINT(_n, _s, _f, _d, qdev_prop_uint32, uint32_t)
-> >  #define DEFINE_PROP_INT32(_n, _s, _f, _d)                      \
-> >      DEFINE_PROP_INT(_n, _s, _f, _d, qdev_prop_int32, int32_t)
-> >  #define DEFINE_PROP_UINT64(_n, _s, _f, _d)                      \
-> > -    DEFINE_PROP_INT(_n, _s, _f, _d, qdev_prop_uint64, uint64_t)
-> > +    DEFINE_PROP_UINT(_n, _s, _f, _d, qdev_prop_uint64, uint64_t)
-> >  #define DEFINE_PROP_SIZE(_n, _s, _f, _d)                       \
-> > -    DEFINE_PROP_INT(_n, _s, _f, _d, qdev_prop_size, uint64_t)
-> > +    DEFINE_PROP_UINT(_n, _s, _f, _d, qdev_prop_size, uint64_t)
-> >  #define DEFINE_PROP_PCI_DEVFN(_n, _s, _f, _d)                   \
-> >      DEFINE_PROP_INT(_n, _s, _f, _d, qdev_prop_pci_devfn, int32_t)
-> >
-> > @@ -163,7 +174,7 @@ extern PropertyInfo qdev_prop_arraylen;
-> >  #define DEFINE_PROP_BIOS_CHS_TRANS(_n, _s, _f, _d) \
-> >      DEFINE_PROP_INT(_n, _s, _f, _d, qdev_prop_bios_chs_trans, int)
-> >  #define DEFINE_PROP_BLOCKSIZE(_n, _s, _f) \
-> > -    DEFINE_PROP_INT(_n, _s, _f, 0, qdev_prop_blocksize, uint16_t)
-> > +    DEFINE_PROP_UINT(_n, _s, _f, 0, qdev_prop_blocksize, uint16_t)
-> >  #define DEFINE_PROP_PCI_HOST_DEVADDR(_n, _s, _f) \
-> >      DEFINE_PROP(_n, _s, _f, qdev_prop_pci_host_devaddr,
-> PCIHostDeviceAddress)
-> >
-> > diff --git a/hw/core/qdev-properties.c b/hw/core/qdev-properties.c
-> > index 952cda7758..92fb43cb0d 100644
-> > --- a/hw/core/qdev-properties.c
-> > +++ b/hw/core/qdev-properties.c
-> > @@ -71,7 +71,7 @@ static void set_enum(Object *obj, Visitor *v, const
-> char *name, void *opaque,
-> >
-> >  static void set_default_value_enum(Object *obj, const Property *prop)
-> >  {
-> > -    object_property_set_str(obj, prop->info->enum_table[prop->defval.i=
-],
-> > +    object_property_set_str(obj, prop->info->enum_table[prop->defval.u=
-],
-> >                              prop->name, &error_abort);
-> >  }
-> >
-> > @@ -128,7 +128,7 @@ static void prop_set_bit(Object *obj, Visitor *v,
-> const char *name,
-> >
-> >  static void set_default_value_bool(Object *obj, const Property *prop)
-> >  {
-> > -    object_property_set_bool(obj, prop->defval.i, prop->name,
-> &error_abort);
-> > +    object_property_set_bool(obj, prop->defval.u, prop->name,
-> &error_abort);
-> >  }
-> >
-> >  PropertyInfo qdev_prop_bit =3D {
-> > @@ -264,11 +264,16 @@ static void set_default_value_int(Object *obj,
-> const Property *prop)
-> >      object_property_set_int(obj, prop->defval.i, prop->name,
-> &error_abort);
-> >  }
-> >
-> > +static void set_default_value_uint(Object *obj, const Property *prop)
-> > +{
-> > +    object_property_set_uint(obj, prop->defval.u, prop->name,
-> &error_abort);
-> > +}
-> > +
-> >  PropertyInfo qdev_prop_uint8 =3D {
-> >      .name  =3D "uint8",
-> >      .get   =3D get_uint8,
-> >      .set   =3D set_uint8,
-> > -    .set_default_value =3D set_default_value_int,
-> > +    .set_default_value =3D set_default_value_uint,
-> >  };
-> >
-> >  /* --- 16bit integer --- */
-> > @@ -302,7 +307,7 @@ PropertyInfo qdev_prop_uint16 =3D {
-> >      .name  =3D "uint16",
-> >      .get   =3D get_uint16,
-> >      .set   =3D set_uint16,
-> > -    .set_default_value =3D set_default_value_int,
-> > +    .set_default_value =3D set_default_value_uint,
-> >  };
-> >
-> >  /* --- 32bit integer --- */
-> > @@ -361,7 +366,7 @@ PropertyInfo qdev_prop_uint32 =3D {
-> >      .name  =3D "uint32",
-> >      .get   =3D get_uint32,
-> >      .set   =3D set_uint32,
-> > -    .set_default_value =3D set_default_value_int,
-> > +    .set_default_value =3D set_default_value_uint,
-> >  };
-> >
-> >  PropertyInfo qdev_prop_int32 =3D {
-> > @@ -402,7 +407,7 @@ PropertyInfo qdev_prop_uint64 =3D {
-> >      .name  =3D "uint64",
-> >      .get   =3D get_uint64,
-> >      .set   =3D set_uint64,
-> > -    .set_default_value =3D set_default_value_int,
-> > +    .set_default_value =3D set_default_value_uint,
-> >  };
-> >
-> >  /* --- string --- */
-> > @@ -725,7 +730,7 @@ PropertyInfo qdev_prop_blocksize =3D {
-> >      .description =3D "A power of two between 512 and 32768",
-> >      .get   =3D get_uint16,
-> >      .set   =3D set_blocksize,
-> > -    .set_default_value =3D set_default_value_int,
-> > +    .set_default_value =3D set_default_value_uint,
-> >  };
-> >
-> >  /* --- pci host address --- */
-> > @@ -948,7 +953,7 @@ PropertyInfo qdev_prop_arraylen =3D {
-> >      .name =3D "uint32",
-> >      .get =3D get_uint32,
-> >      .set =3D set_prop_arraylen,
-> > -    .set_default_value =3D set_default_value_int,
-> > +    .set_default_value =3D set_default_value_uint,
-> >  };
-> >
-> >  /* --- public helpers --- */
-> > @@ -1185,5 +1190,5 @@ PropertyInfo qdev_prop_size =3D {
-> >      .name  =3D "size",
-> >      .get =3D get_size,
-> >      .set =3D set_size,
-> > -    .set_default_value =3D set_default_value_int,
-> > +    .set_default_value =3D set_default_value_uint,
-> >  };
->
-> --
-Marc-Andr=C3=A9 Lureau
+Thanks for the hint.
+ 
+> Also, is there any specific reason why to go for a z800 and not a z900.3
+> ? (IBM zSeries 900 GA3).
+> 
+> z900 GA3 is the EC model, z800 GA1 is the BC model. Both have same
+> features and capabilities. EC always smells more powerful ;) In the end
+> it doesn't matter.
+
+No real reason. It is further in the list, so it looks better to me.
+
+Aurelien
+
+-- 
+Aurelien Jarno                          GPG: 4096R/1DDD8C9B
+aurelien@aurel32.net                 http://www.aurel32.net
