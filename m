@@ -1,35 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56319)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57245)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dGlp7-0007FO-B1
-	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 08:37:02 -0400
+	(envelope-from <jfreiman@redhat.com>) id 1dGlv6-0000Kr-8I
+	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 08:43:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dGlp4-0002cg-7O
-	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 08:37:01 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:49766)
+	(envelope-from <jfreiman@redhat.com>) id 1dGlv3-0004nX-54
+	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 08:43:12 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:32794)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dGlp3-0002cF-U8
-	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 08:36:58 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
+	(Exim 4.71) (envelope-from <jfreiman@redhat.com>) id 1dGlv2-0004m2-Tp
+	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 08:43:09 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id B9AC9624B3
-	for <qemu-devel@nongnu.org>; Fri,  2 Jun 2017 12:36:56 +0000 (UTC)
-From: Markus Armbruster <armbru@redhat.com>
-References: <20170531135709.345-1-marcandre.lureau@redhat.com>
-	<20170531135709.345-15-marcandre.lureau@redhat.com>
-	<8737bifxfx.fsf@dusky.pond.sub.org>
-	<1931640309.27713353.1496403263560.JavaMail.zimbra@redhat.com>
-Date: Fri, 02 Jun 2017 14:36:51 +0200
-In-Reply-To: <1931640309.27713353.1496403263560.JavaMail.zimbra@redhat.com>
-	(=?utf-8?Q?=22Marc-Andr=C3=A9?= Lureau"'s message of "Fri, 2 Jun 2017
-	07:34:23 -0400 (EDT)")
-Message-ID: <87k24ud0rg.fsf@dusky.pond.sub.org>
+	by mx1.redhat.com (Postfix) with ESMTPS id 38C1F7D4EF
+	for <qemu-devel@nongnu.org>; Fri,  2 Jun 2017 12:43:06 +0000 (UTC)
+Date: Fri, 2 Jun 2017 14:43:02 +0200
+From: Jens Freimann <jfreiman@redhat.com>
+Message-ID: <20170602124302.optdetf6256cjbyf@dhcp-192-218.str.redhat.com>
+References: <20170602081519.15648-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <20170602081519.15648-1-marcandre.lureau@redhat.com>
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 14/45] qapi: update the qobject visitor
- to use QNUM_U64
+Subject: Re: [Qemu-devel] [PATCH] vhost-user-bridge: fix iov_restore_front()
+ warning
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,109 +34,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>
+Cc: qemu-devel@nongnu.org, dgilbert@redhat.com
 
-Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
+On Fri, Jun 02, 2017 at 12:15:19PM +0400, Marc-Andr=E9 Lureau wrote:
+>   CC      tests/vhost-user-bridge.o
+> /home/dgilbert/git/qemu-world3/tests/vhost-user-bridge.c:228:23: warnin=
+g: variables 'front' and 'iov' used in loop condition not modified in loo=
+p body [-Wfor-loop-analysis]
+>     for (cur =3D front; front !=3D iov; cur++) {
+>                       ^~~~~    ~~~
+> 1 warning generated.
+>=20
+> Fix the loop, document the function, and fix some related assert().
+>=20
+> In practice, the loop bug was harmless because the front sg buffer is
+> enough to discard/restore the header size.
+>=20
+> Reported-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> Signed-off-by: Marc-Andr=E9 Lureau <marcandre.lureau@redhat.com>
+> ---
+>  tests/vhost-user-bridge.c | 11 +++++++++--
+>  1 file changed, 9 insertions(+), 2 deletions(-)
+>=20
+> diff --git a/tests/vhost-user-bridge.c b/tests/vhost-user-bridge.c
+> index 8618c20d53..1e5b5ca3da 100644
+> --- a/tests/vhost-user-bridge.c
+> +++ b/tests/vhost-user-bridge.c
+> @@ -220,12 +220,18 @@ vubr_handle_tx(VuDev *dev, int qidx)
+>      free(elem);
+>  }
+> =20
+> +
+> +/* this function reverse the effect of iov_discard_front() it must be
+> + * called with 'front' being the original struct iovec and 'bytes'
+> + * being the number of bytes you shaved off
+> + */
+>  static void
+>  iov_restore_front(struct iovec *front, struct iovec *iov, size_t bytes=
+)
+>  {
+>      struct iovec *cur;
+> =20
+> -    for (cur =3D front; front !=3D iov; cur++) {
+> +    for (cur =3D front; cur !=3D iov; cur++) {
+> +        assert(bytes >=3D cur->iov_len);
+>          bytes -=3D cur->iov_len;
 
-> ----- Original Message -----
->> One more nitpick:
->>=20
->> Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
->>=20
->> > Switch to use QNum/uint where appropriate to remove i64 limitation.
->> >
->> > The input visitor will cast i64 input to u64 for compatibility
->> > reasons (existing json QMP client already use negative i64 for large
->> > u64, and expect an implicit cast in qemu).
->> >
->> > Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
->> [...]
->> > diff --git a/tests/test-qobject-output-visitor.c
->> > b/tests/test-qobject-output-visitor.c
->> > index 3180d8cbde..d9f106d52e 100644
->> > --- a/tests/test-qobject-output-visitor.c
->> > +++ b/tests/test-qobject-output-visitor.c
->> > @@ -602,17 +602,31 @@ static void check_native_list(QObject *qobj,
->> >      qlist =3D qlist_copy(qobject_to_qlist(qdict_get(qdict, "data")));
->> >=20=20
->> >      switch (kind) {
->> > -    case USER_DEF_NATIVE_LIST_UNION_KIND_S8:
->> > -    case USER_DEF_NATIVE_LIST_UNION_KIND_S16:
->> > -    case USER_DEF_NATIVE_LIST_UNION_KIND_S32:
->> > -    case USER_DEF_NATIVE_LIST_UNION_KIND_S64:
->> >      case USER_DEF_NATIVE_LIST_UNION_KIND_U8:
->> >      case USER_DEF_NATIVE_LIST_UNION_KIND_U16:
->> >      case USER_DEF_NATIVE_LIST_UNION_KIND_U32:
->> >      case USER_DEF_NATIVE_LIST_UNION_KIND_U64:
->> > -        /* all integer elements in JSON arrays get stored into QNums =
-when
->> > -         * we convert to QObjects, so we can check them all in the sa=
-me
->> > -         * fashion, so simply fall through here
->> > +        for (i =3D 0; i < 32; i++) {
->> > +            QObject *tmp;
->> > +            QNum *qvalue;
->> > +            uint64_t val;
->> > +
->> > +            tmp =3D qlist_peek(qlist);
->> > +            g_assert(tmp);
->> > +            qvalue =3D qobject_to_qnum(tmp);
->> > +            g_assert(qnum_get_uint(qvalue, &val));
->> > +            g_assert_cmpuint(val, =3D=3D, i);
->> > +            qobject_decref(qlist_pop(qlist));
->> > +        }
->> > +        break;
->> > +
->> > +    case USER_DEF_NATIVE_LIST_UNION_KIND_S8:
->> > +    case USER_DEF_NATIVE_LIST_UNION_KIND_S16:
->> > +    case USER_DEF_NATIVE_LIST_UNION_KIND_S32:
->> > +    case USER_DEF_NATIVE_LIST_UNION_KIND_S64:
->> > +        /* All signed integer elements in JSON arrays get stored into
->> > +         * QInts when we convert to QObjects, so we can check them all
->> > +         * in the same fashion, so simply fall through here.
->> >           */
->> >      case USER_DEF_NATIVE_LIST_UNION_KIND_INTEGER:
->> >          for (i =3D 0; i < 32; i++) {
->>=20
->> Wing both ends of the comment, please.
->
-> You want this: ?
->
-> /* All signed integer elements in JSON arrays get stored into */
-> /* QInts when we convert to QObjects, so we can check them all */
-> ...
+This fixes a problem I saw when trying to pxe-boot
+with vhost-user and vhost-user-bridge. It was running in an endless
+loop here. Fixed with this patch. =20
 
-Ewww!
+Tested-by: Jens Freimann <jfreiman@redhat.com>
 
-> I think this is quite annoying for refilling with emacs
-
-Yup.
-
-> Perhaps rather
->
-> /* All signed integer elements in JSON arrays get stored into
->  * QInts when we convert to QObjects, so we can check them all */
->
-> quite uglier to me, but I don't care
-
-I'm asking for this:
-
-              /*
-               * All signed integer elements in JSON arrays get stored into
-               * QInts when we convert to QObjects, so we can check them all
-               * in the same fashion, so simply fall through here.
-               */
-
-This comment style is commonly called "winged".  It's fairly widespread
-in QEMU.
-
-> However, I'd prefer if either we have a common rule in qemu or we don't b=
-ike-sched over that...
->
-> (even better would be to have this somehow automated with tools like git-=
-clang-format)
-
-Tool support would be easier if we didn't insist on inventing our very
-own coding style, then fail to enforce it uniformly.  Oh well, we'll
-muddle on.
+regards,
+Jens=20
