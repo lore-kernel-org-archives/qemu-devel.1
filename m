@@ -1,27 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54400)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54397)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1dGp7w-0005wl-8R
+	(envelope-from <alex.bennee@linaro.org>) id 1dGp7w-0005wR-2F
 	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 12:08:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1dGp7u-0004yo-V8
+	(envelope-from <alex.bennee@linaro.org>) id 1dGp7s-0004xz-PJ
 	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 12:08:40 -0400
-Received: from mail-wm0-x236.google.com ([2a00:1450:400c:c09::236]:35830)
+Received: from mail-wm0-x22a.google.com ([2a00:1450:400c:c09::22a]:38198)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1dGp7u-0004yQ-OA
-	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 12:08:38 -0400
-Received: by mail-wm0-x236.google.com with SMTP id b84so29299893wmh.0
-	for <qemu-devel@nongnu.org>; Fri, 02 Jun 2017 09:08:38 -0700 (PDT)
+	id 1dGp7s-0004xZ-Hb
+	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 12:08:36 -0400
+Received: by mail-wm0-x22a.google.com with SMTP id n195so30607498wmg.1
+	for <qemu-devel@nongnu.org>; Fri, 02 Jun 2017 09:08:36 -0700 (PDT)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Fri,  2 Jun 2017 17:08:40 +0100
-Message-Id: <20170602160848.4913-3-alex.bennee@linaro.org>
-In-Reply-To: <20170602160848.4913-1-alex.bennee@linaro.org>
-References: <20170602160848.4913-1-alex.bennee@linaro.org>
+Date: Fri,  2 Jun 2017 17:08:38 +0100
+Message-Id: <20170602160848.4913-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [RISU PATCH v4 02/10] build-all-archs: support cross
- building via docker
+Subject: [Qemu-devel] [RISU PATCH v4 00/10] record/replay patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,128 +30,50 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: peter.maydell@linaro.org
 Cc: qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 
-If we want to link to any other libraries we might find using simple
-cross toolchains doesn't work so well. One way around this is to use a
-dockerised cross-toolchain which then won't clash with your host
-system. If the user specifies --use-docker the obvious will be done.
+Hi,
 
-By default we use the QEMU projects qemu:debian-FOO-cross images as
-RISU hackers are likely to be QEMU developers too. However any docker
-tag can be passed on the command line.
+After much messing about I finally got this re-base working. The
+recent re-factoring work has made the code a lot simple. I also
+ran into problems getting a decent cross-compiler that could link
+against a zlib. This was manly down to multi-arch conflicts when I try
+and install zlib1g-dev:arm64 on my Ubuntu 16.04 dev box. Happily we
+already have a decent cross compile solution for QEMU so I tweaked the
+build-all-archs script to offer a --use-docker option.
 
-If none of the docker images have usable compilers we fall back to
-checking the host path.
+The paramterise patch is a little white space messy due to the
+inconsistent formatting. Maybe it would be easier to nail down what
+the indent should be and run indent over the source tree?
 
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
----
- build-all-archs | 72 ++++++++++++++++++++++++++++++++++++++++++++++++++++-----
- 1 file changed, 66 insertions(+), 6 deletions(-)
+Regards,
 
-diff --git a/build-all-archs b/build-all-archs
-index 2768727..78f062e 100755
---- a/build-all-archs
-+++ b/build-all-archs
-@@ -11,15 +11,65 @@
- # Contributors:
- #     Peter Maydell (Linaro) - initial implementation
- 
--# So we notice risugen failing even though it's in a pipeline
--set -o pipefail
-+# Simple usage
-+usage() {
-+    cat <<-EOF
-+	Usage: $0 [options]
-+
-+	Options include:
-+	    --use-docker[=tags]    use docker cross compile
-+
-+        If specifying docker the default will be to use the any
-+        qemu:debian-FOO-cross targets available on your system.
-+EOF
-+    exit 1
-+}
-+
-+while [[ "$1" = -* ]]; do
-+    opt="$1"; shift
-+    arg=
-+    if [[ "$opt" = *=* ]]; then
-+	arg="${opt#*=}"
-+	opt="${opt%%=*}"
-+    fi
-+    case "$opt" in
-+	--use-docker)
-+            if [ -z "$arg" ]; then
-+                default_tags=$(docker images qemu --format "{{.Repository}}:{{.Tag}}" | grep "\(arm\|power\).*cross$")
-+                docker_tags=$(echo $default_tags | sed 's/\n/\s/g' )
-+            else
-+	        docker_tags="$arg"
-+            fi
-+	    ;;
-+	--help)
-+	    usage
-+	    ;;
-+	*)
-+	    usage
-+	    ;;
-+    esac
-+done
- 
- # Debian stretch and Ubuntu Xenial have cross compiler packages for
- # all of these:
--# gcc-arm-linux-gnueabihf gcc-aarch64-linux-gnu gcc-m68k-linux-gnu
--# gcc-powerpc64le-linux-gnu gcc-powerpc64-linux-gnu
-+#   gcc-arm-linux-gnueabihf gcc-aarch64-linux-gnu gcc-m68k-linux-gnu
-+#   gcc-powerpc64le-linux-gnu gcc-powerpc64-linux-gnu
-+# If docker is enabled we just brute force the various images until we
-+# can set the one that has a workable cross compiler.
-+
-+DOCKER_RUN="docker run --rm -t -u $(id -u) -v $(pwd):$(pwd) -w $(pwd)"
- 
- program_exists() {
-+    if [ ! -z "$docker_tags" ]; then
-+        use_docker_tag=""
-+        for tag in $docker_tags; do
-+            if ${DOCKER_RUN} ${tag} /bin/bash -c "command -v $1 >/dev/null"; then
-+                use_docker_tag=$tag
-+                return
-+            fi
-+        done
-+    fi
-+
-     command -v "$1" >/dev/null 2>&1
- }
- 
-@@ -30,19 +80,29 @@ for triplet in aarch64-linux-gnu arm-linux-gnueabihf m68k-linux-gnu \
-     if ! program_exists "${triplet}-gcc"; then
-         echo "Skipping ${triplet}: no compiler found"
-         continue
-+    else
-+        echo "Building ${triplet} on ${use_docker_tag:-host}..."
-     fi
- 
-     # Do a complete rebuild from scratch, because it's cheap enough.
-     rm -rf build/${triplet}
-     mkdir -p build/${triplet}
- 
--    (cd build/${triplet} && CROSS_PREFIX="${triplet}-"  ../../configure)
--    make -C build/${triplet} EXTRA_CFLAGS=-Werror
-+    CONFIGURE="cd build/${triplet} && CROSS_PREFIX="${triplet}-"  ../../configure"
-+    MAKE="make -C build/${triplet} EXTRA_CFLAGS=-Werror"
- 
-+    if [ -z "$use_docker_tag" ]; then
-+        /bin/bash -c "${CONFIGURE}"
-+        ${MAKE}
-+    else
-+        ${DOCKER_RUN} $use_docker_tag /bin/bash -c "${CONFIGURE}"
-+        ${DOCKER_RUN} $use_docker_tag /bin/bash -c "${MAKE}"
-+    fi
- done
- 
- # Now run risugen for all architectures
- mkdir -p build/risuout
-+set -o pipefail # detect failures in pipeline
- 
- for f in *.risu; do
-     echo "Running risugen on $f..."
+Alex Bennée (10):
+  .gitignore: ignore build directories
+  build-all-archs: support cross building via docker
+  build-all-archs: support --static flag
+  risu: a bit more verbosity when running
+  risu: paramterise send/receive functions
+  risu: add header to trace stream
+  risu: add simple trace and replay support
+  risu: add support compressed tracefiles
+  new: record_traces.sh helper script
+  new: run_risu.sh script
+
+ .gitignore       |   1 +
+ Makefile         |   4 +-
+ build-all-archs  |  76 ++++++++++++++++++++++--
+ configure        |  55 +++++++++++++++++-
+ record_traces.sh |  20 +++++++
+ reginfo.c        | 173 ++++++++++++++++++++++++++++++++-----------------------
+ risu.c           | 147 ++++++++++++++++++++++++++++++++++++++++++----
+ risu.h           |  23 +++++++-
+ risu_aarch64.c   |   8 +++
+ risu_arm.c       |   8 +++
+ risu_m68k.c      |   5 ++
+ risu_ppc64.c     |   5 ++
+ run_risu.sh      |  53 +++++++++++++++++
+ 13 files changed, 484 insertions(+), 94 deletions(-)
+ create mode 100755 record_traces.sh
+ create mode 100755 run_risu.sh
+
 -- 
 2.13.0
