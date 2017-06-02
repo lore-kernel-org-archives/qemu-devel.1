@@ -1,23 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37272)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37274)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dGgcn-0008DE-Dv
+	(envelope-from <dgibson@ozlabs.org>) id 1dGgcn-0008DJ-IL
 	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 03:03:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dGgcm-0000s6-4f
+	(envelope-from <dgibson@ozlabs.org>) id 1dGgcm-0000rx-51
 	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 03:03:57 -0400
-Date: Fri, 2 Jun 2017 13:24:37 +1000
+Date: Fri, 2 Jun 2017 13:35:41 +1000
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20170602032437.GK13397@umbus.fritz.box>
+Message-ID: <20170602033541.GM13397@umbus.fritz.box>
 References: <20170601015218.9299-1-david@gibson.dropbear.id.au>
-	<20170601015218.9299-2-david@gibson.dropbear.id.au>
-	<149633261057.3207.5755197867144524820@loki>
+	<20170601040646.GB27525@in.ibm.com>
+	<149629114184.3207.6757927820110284250@loki>
+	<20170601053037.GC13397@umbus.fritz.box>
+	<d8d8aa98-46de-ae2e-1da9-25e9a53fd89b@linux.vnet.ibm.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="T4Djgzn3z2HSNnx0"
+	protocol="application/pgp-signature"; boundary="um2V5WpqCyd73IVb"
 Content-Disposition: inline
-In-Reply-To: <149633261057.3207.5755197867144524820@loki>
-Subject: Re: [Qemu-devel] [PATCH 1/4] spapr: Move DRC RTAS calls into
- spapr_drc.c
+In-Reply-To: <d8d8aa98-46de-ae2e-1da9-25e9a53fd89b@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH 0/4] spapr:DRC cleanups (part I)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,40 +27,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Michael Roth <mdroth@linux.vnet.ibm.com>
-Cc: lvivier@redhat.com, nikunj@linux.vnet.ibm.com, sursingh@redhat.com, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, bharata@linux.vnet.ibm.com
+To: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
+Cc: Michael Roth <mdroth@linux.vnet.ibm.com>, lvivier@redhat.com, sursingh@redhat.com, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Bharata B Rao <bharata@linux.vnet.ibm.com>
 
 
---T4Djgzn3z2HSNnx0
+--um2V5WpqCyd73IVb
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Jun 01, 2017 at 10:56:50AM -0500, Michael Roth wrote:
-> Quoting David Gibson (2017-05-31 20:52:15)
-> > Currently implementations of the RTAS calls related to DRCs are in
-> > spapr_rtas.c.  They belong better in spapr_drc.c - that way they're clo=
-ser
-> > to related code, and we'll be able to make some more things local.
-> >=20
-> > spapr_rtas.c was intended to contain the RTAS infrastructure and core c=
-alls
-> > that don't belong anywhere else, not every RTAS implementation.
-> >=20
-> > Code motion only.
+On Thu, Jun 01, 2017 at 12:41:40PM -0300, Daniel Henrique Barboza wrote:
 >=20
-> Technically rtas-get-sensor-state and rtas-set-indicator aren't specific
-> to DRCs, but looking through the documented indicators/sensors (tables
-> 40 and 42 in LoPAPR v11) it doesn't seem too likely we'll ever implement
-> any others so the move seems reasonable.
+>=20
+> On 06/01/2017 02:30 AM, David Gibson wrote:
+> > On Wed, May 31, 2017 at 11:25:41PM -0500, Michael Roth wrote:
+> > > Quoting Bharata B Rao (2017-05-31 23:06:46)
+> > > > On Thu, Jun 01, 2017 at 11:52:14AM +1000, David Gibson wrote:
+> > > > > The code managing DRCs[0] has quite a few things that are more
+> > > > > complicated than they need to be.  In particular the object
+> > > > > representing a DRC has a bunch of method pointers, despite the fa=
+ct
+> > > > > that there are currently no subclasses, and even if there were the
+> > > > > method implementations would be unlikely to differ.
+> > > > So you are getting rid of a few methods. How about other methods ?
+> > > > Specially attach and detach which have incorporated all the logic n=
+eeded
+> > > > to handle logical and physical DRs into their implementations ?
+> > > I would avoid any methods that incorporate special-casing for
+> > > physical vs. logical DRCs, since that seems like a good logical
+> > > starting point for moving to 'physical'/'logical' DRC
+> > > sub-classes to help simplify the increasingly complicated
+> > > state-tracking.
+> > Right, I'm looking at making subclasses for each of the DRC types.
+> > Possibly with intermediate subclasses for physical vs. logical, we'll
+> > see how it works out.
+>=20
+> Back in the DRC migration patch series I talked with Mike about refactori=
+ng
+> the DRC code in such fashion (physical DRC and logical DRC). But first I
+> would
+> implement some kind of unit testing in this code to avoid breaking too mu=
+ch
+> stuff during this refactoring.
 
-True, I realised that a little after I posted.
+So, I'd love to have good unit tests, but everything takes time.
 
-Even if we did implement other sensors, though, the natural way to
-split this would be to have the generic set-indicator function check
-simply that the indicator is a DR related one, and pass the options
-straight to a function in the DRC code, rather doing preliminary
-looking into DRC internals as it does now.
+> I am not sure about the effort to implementing unit test in the
+> current DRC code.  This series is simplifying the DRC code, making
+> it more minimalist and possibly easier to be tested. In the end it
+> would be a first step towards unit testing.
+
+=2E.and as you say, extra complexity in the code makes testing and
+reliability harder.
+
+>=20
+> However, there is the issue of backward compatibility. I fear this DRC
+> refactoring
+> of Logical/Physical DRC would be too drastic to maintain such compatibili=
+ty
+> (assuming that it is not already broken). If this refactor goes live only=
+ in
+> 2.11 then
+> we will have a hard time to migrate from 2.11 to 2.10.
+
+Right such a rework could break migration.
+
+> All that said, I believe we can live without unit testing for a little
+> longer and if
+> we're going for this Physical/DRC refactoring, we need to push it for 2.1=
+0.
+> We can
+> think about unit test later with the refactored code. Feel free to send to
+> me any
+> unfinished/beta DRC refactoring code you might be working on and want
+> tested. I can help in the refactoring too, just let me know.
+
+So like you I think getting it into 2.10 would be a good idea, before
+we have any released version with DRC migration to break.
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -67,25 +111,25 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---T4Djgzn3z2HSNnx0
+--um2V5WpqCyd73IVb
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v2
 
-iQIcBAEBCAAGBQJZMNp1AAoJEGw4ysog2bOS498P+wUuoumhhKky/vwXZkeos3JF
-3sD7M6WcoWh1KwbLLlb27/HFBFpRbU095LjWHAfwY7Tyi1zU1ktsIdw0iAPLSUeF
-i/hZDJN35vU2jxrr9MT2U2Ak0vozYkhFa6OQbMMlC4miyLAdbk/8PN61lh69d9MJ
-Bt1augQ5Vt67HzV+c8xrQZsNULRNOUO3xVmFfvQGUJYDjq92je17W9Ptx/AARWd9
-zNrq6UGyen6Vbk03dIcSKjYkzX39tU6KIbhYYwibuUjWTrPCfI+aalb6qi/J9Tvy
-WOad+4z8NEnHm1q5Wi4p8jAEwc7u85VaEDYDRHy/GOlp/G7AnPhQMnzHVVYwyv2P
-jDSSyN/vAhUWGKae479510T5TXncpzrCNcHxRAyjXyqza1QpUoAVMKIRxocwuwJw
-wnrsCbOLfqi+CK9tXKrnPC2+HtP/P8EcTu/w1haCvgLPgHhK+uGwzoq9elDma6Gr
-V0od3xQxvOOBNlUtbYcn3LvSa5Myi1vuGcGQK0DZykYaRXkZiyz9it5ImjFKNga2
-j3HtgjYpDiyM6f95m+KD035LhS3awrAO+XoX/nmr7WvwhQz6kLiXnTyLkCQ1T1+P
-l3yUwjM/wtCmWEYuBgBUqbQ8X/9PChAwE8Ncx/BwXE4Ry5MW/qYkM38cz092yGUu
-DJ11ipmBZ2sdujpsnxxz
-=Kywt
+iQIcBAEBCAAGBQJZMN0NAAoJEGw4ysog2bOSLscP/3DWRgFG010ngzbRpBDtq0nv
+i3xVA/DjO4s3pnWnoGWPl28e2IQWz0mRws4bNQSfhVWQRMNHHJ443/JFkI/Zqji+
+qDFPybaj8gxygnLTbWfEBk4/zfRtklKzPMmKBOApVWTIkCYdeZ0AVlt8FtduSTJz
+Nb56ZMwMhhANw2k9LiUA5mP9ia0MQKETy8OJSS0xTt82YXCOQw5xKKxhKXp0nO3T
+m6bIgWj3WlmWCP50GcuE41blXdNfQP/BHoV2v2MaKRwlnvKwdhyLMtRv29IlANCp
+EgBN2DKfM+eeIIczJ361zrWuTvm1nTABnt+i9pX3TF9PU1nvJrDgaWDIvG10xLeA
+4ZJacphHB5/xMtxRe5tMnq6oPwxCco8g5Q3jYqRMHWNFvMW26zDEJiJIa9+qdjOj
+OWHPZ9vRJpLwm8mrMBTmJjyqqr8jgPwCmUCIZOjMe9THT8Fu7O8MydR3qUUu49aQ
+Bt8RwDbf+j2wbpZ6jQdbOx54ezgA9YgvnPQnt0qjaEj9tf6I9qsL2nfrLw3k3saB
+TTlDsGF6JcEBE2LZ8NCC1eCM8R9S0glVTHOYWeOq0yoa8GrloLRnRsigcgvTEZ1z
+oqix6LF0aTQdoIWKOJYEoFJ8ZpT1GU/W/71FEuM9S8L5/8BcPs8OYfCitsltxatE
+cbaDKH3ZRiNn2/34LVrr
+=uN13
 -----END PGP SIGNATURE-----
 
---T4Djgzn3z2HSNnx0--
+--um2V5WpqCyd73IVb--
