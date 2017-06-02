@@ -1,28 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37891)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39887)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1dGrb1-0007jK-Gk
-	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 14:46:53 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dGrkp-0001uB-5D
+	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 14:57:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1dGrb0-00024u-G6
-	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 14:46:51 -0400
-References: <20170530081723.29205-1-vsementsov@virtuozzo.com>
-	<20170530081723.29205-10-vsementsov@virtuozzo.com>
-	<04df6354-c902-9514-f56f-9063168a6a75@redhat.com>
-	<72e09ee4-ef22-ed79-b881-bed1ad255392@virtuozzo.com>
-	<c232fd02-524c-29c4-6577-37101a2638e5@redhat.com>
-	<d587d556-4807-46ff-3596-4c1c99edbcef@virtuozzo.com>
-	<b5d84158-b1f9-d497-3231-be76565cb3b3@virtuozzo.com>
-	<30533fc6-e32f-9d9c-6030-d923e0734ce7@virtuozzo.com>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <450ae852-a5c4-17f1-2027-f68bf91262aa@redhat.com>
-Date: Fri, 2 Jun 2017 14:46:37 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dGrko-0006Cd-D4
+	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 14:56:59 -0400
+Received: from mail-oi0-x234.google.com ([2607:f8b0:4003:c06::234]:36307)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dGrko-0006CM-8P
+	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 14:56:58 -0400
+Received: by mail-oi0-x234.google.com with SMTP id h4so102669670oib.3
+	for <qemu-devel@nongnu.org>; Fri, 02 Jun 2017 11:56:58 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Date: Fri,  2 Jun 2017 15:56:07 -0300
+Message-Id: <20170602185630.5059-2-f4bug@amsat.org>
+In-Reply-To: <20170602185630.5059-1-f4bug@amsat.org>
+References: <20170602185630.5059-1-f4bug@amsat.org>
 MIME-Version: 1.0
-In-Reply-To: <30533fc6-e32f-9d9c-6030-d923e0734ce7@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 09/25] block/dirty-bitmap: add readonly
- field to BdrvDirtyBitmap
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH v5 01/24] docker: let _copy_with_mkdir()
+ sub_path argument be optional
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,61 +34,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, famz@redhat.com, armbru@redhat.com, mreitz@redhat.com, stefanha@redhat.com, pbonzini@redhat.com, den@openvz.org
+To: qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Fam Zheng <famz@redhat.com>
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 
+Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
+---
+ tests/docker/docker.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-
-On 06/02/2017 05:45 AM, Vladimir Sementsov-Ogievskiy wrote:
-> 02.06.2017 12:01, Vladimir Sementsov-Ogievskiy wrote:
->> 02.06.2017 11:56, Vladimir Sementsov-Ogievskiy wrote:
->>> 02.06.2017 02:25, John Snow wrote:
->>>>
->>>> On 06/01/2017 03:30 AM, Sementsov-Ogievskiy Vladimir wrote:
->>>>> Hi John!
->>>>>
->>>>> Look at our discussion about this in v18 thread.
->>>>>> Shortly: readonly is not the same as disabled. disabled= bitmap just
->>>>> ignores all writes. readonly= writes are not allowed at all.
->>>>>
->>>>> And I think, I'll try to go through way 2: "dirty" field instead of
->>>>> "readonly" (look at v18 discussion), as it a bit more flexible.
->>>>>
->>>> Not sure which I prefer...
->>>>
->>>> Method 1 is attractive in that it is fairly simple, and enforces fairly
->>>> loudly the inability to write to devices with RO bitmaps. It's a
->>>> natural
->>>> extension of your current approach.
->>>
->>> For now I decided to realize this one, I think I'll publish it today.
->>> Also, I'm going to rename s/readonly/in_use - to avoid the confuse
->>> with disabled. So let this field just be mirror of IN_USE in the
->>> image and just say "persistent storage knows, that bitmap is in use
->>> and may be dirty".
-> 
-> Finally it would be readonly. in_use is bad for created (not loaded)
-> bitmaps. I'll add more descriptive comments for disabled and readonly.
-> 
-
-Makes sense. It sounds like "readonly" is simply a stricter superset of
-"disabled," where "disabled" doesn't care if the bitmap gets out of sync
-with the data, but "readonly" attempts to preserve that semantic
-relationship.
-
->>>
->>> Also, optimization with 'dirty' flag may be added later.
->>
-
-Yes, I agree.
-
->> And, also, I don't want to influence this "first write", on which we
->> will set "IN_USE" in all bitmaps (for way (2). Reopening rw is less
->> performance-demanding place than write.
->>
-
-"And, also," -- I think you've been reading my emails too much, you're
-picking up my 'isms ;)
-
-Thanks,
---John
+diff --git a/tests/docker/docker.py b/tests/docker/docker.py
+index 8747f6a440..6ddc6e4c2a 100755
+--- a/tests/docker/docker.py
++++ b/tests/docker/docker.py
+@@ -52,7 +52,7 @@ def _guess_docker_command():
+     raise Exception("Cannot find working docker command. Tried:\n%s" % \
+                     commands_txt)
+ 
+-def _copy_with_mkdir(src, root_dir, sub_path):
++def _copy_with_mkdir(src, root_dir, sub_path='.'):
+     """Copy src into root_dir, creating sub_path as needed."""
+     dest_dir = os.path.normpath("%s/%s" % (root_dir, sub_path))
+     try:
+-- 
+2.11.0
