@@ -1,23 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34570)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35003)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1dGpXP-0008BY-48
-	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 12:35:00 -0400
+	(envelope-from <quintela@redhat.com>) id 1dGpYl-0000sS-5i
+	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 12:36:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1dGpXM-0006VE-FN
-	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 12:34:59 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:39854)
+	(envelope-from <quintela@redhat.com>) id 1dGpYj-0007IN-DV
+	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 12:36:23 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37664)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1dGpXM-0006Up-5N
-	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 12:34:56 -0400
-Date: Fri, 2 Jun 2017 19:34:51 +0300
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <1496421247-857-9-git-send-email-mst@redhat.com>
-References: <1496421247-857-1-git-send-email-mst@redhat.com>
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1dGpYj-0007HY-50
+	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 12:36:21 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 5A74A85365
+	for <qemu-devel@nongnu.org>; Fri,  2 Jun 2017 16:36:19 +0000 (UTC)
+From: Juan Quintela <quintela@redhat.com>
+In-Reply-To: <6d275b7f-5f31-0f41-21e4-4d1abe96d7f7@redhat.com> (Eric Blake's
+	message of "Fri, 2 Jun 2017 10:15:41 -0500")
+References: <20170601220813.30535-1-quintela@redhat.com>
+	<20170601220813.30535-4-quintela@redhat.com>
+	<6d275b7f-5f31-0f41-21e4-4d1abe96d7f7@redhat.com>
+Reply-To: quintela@redhat.com
+Date: Fri, 02 Jun 2017 18:36:16 +0200
+Message-ID: <87y3tas5xb.fsf@secure.mitica>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1496421247-857-1-git-send-email-mst@redhat.com>
-Subject: [Qemu-devel] [PULL 8/8] spec/vhost-user spec: Add IOMMU support
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH 3/5] migration: Print statistics about the
+ number of remaining target pages
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,271 +36,129 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Maxime Coquelin <maxime.coquelin@redhat.com>, Jason Wang <jasowang@redhat.com>
+To: Eric Blake <eblake@redhat.com>
+Cc: qemu-devel@nongnu.org, lvivier@redhat.com, dgilbert@redhat.com, peterx@redhat.com
 
-From: Maxime Coquelin <maxime.coquelin@redhat.com>
+Eric Blake <eblake@redhat.com> wrote:
+> On 06/01/2017 05:08 PM, Juan Quintela wrote:
+>> Signed-off-by: Juan Quintela <quintela@redhat.com>
+>> ---
+>>  migration/migration.c | 4 +++-
+>>  migration/ram.c       | 4 ++--
+>>  migration/ram.h       | 2 +-
+>>  qapi-schema.json      | 6 +++++-
+>>  4 files changed, 11 insertions(+), 5 deletions(-)
+>> 
+>> diff --git a/migration/migration.c b/migration/migration.c
+>> index ea3d41c..2c13217 100644
+>> --- a/migration/migration.c
+>> +++ b/migration/migration.c
+>> @@ -518,7 +518,9 @@ static void populate_ram_info(MigrationInfo *info, MigrationState *s)
+>>      }
+>>  
+>>      if (s->state != MIGRATION_STATUS_COMPLETED) {
+>> -        info->ram->remaining = ram_bytes_remaining();
+>> +        info->ram->remaining_pages = ram_pages_remaining();
+>> +        info->ram->remaining = ram_pages_remaining() *
+>> +            qemu_target_page_size();
+>
+> Why not the opposite direction, of:
+>
+> info->ram->remaining_pages = ram_bytes_remaining() /
+> qemu_target_page_size();
+> info->ram->remaining = ram_bytes_remaining();
+>
+> ?
 
-This patch specifies and implements the master/slave communication
-to support device IOTLB in slave.
+On migration, everything is on pages (TARGET_PAGE_SIZE).  It is the real
+unit and the easier to calculate.  So, we can have:
+- number of dirty pages independent of the statistics
+  notice that migration code really use that number, it don't use almost
+  none of the others.
+- put number of dirty bytes and be dividing/multiplying all around
+- change the statistics and also print the number of bytes.
 
-The vhost_iotlb_msg structure introduced for kernel backends is
-re-used, making the design close between the two backends.
+I know that you are changing the interfaces for block devices to be byte
+based, but (I guess) you have more options of sector size.  On
+migration, everything is on TARGET_PAGE_SIZE, or multiples, and the code
+of multiples is not clear that works in all cases :-(
 
-An exception is the use of the secondary channel to enable the
-slave to send IOTLB miss requests to the master.
+I.e. I am not sure that everything works when you had a 4kb guest on a
+64 kb host (or the other way around).
 
-Signed-off-by: Maxime Coquelin <maxime.coquelin@redhat.com>
-Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
-Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
----
- docs/specs/vhost-user.txt | 84 +++++++++++++++++++++++++++++++++++++++++++++++
- hw/net/vhost_net.c        |  1 +
- hw/virtio/vhost-user.c    | 48 +++++++++++++++++++++++++--
- 3 files changed, 130 insertions(+), 3 deletions(-)
+>> +++ b/migration/ram.h
+>> @@ -41,7 +41,7 @@ uint64_t xbzrle_mig_pages_cache_miss(void);
+>>  double xbzrle_mig_cache_miss_rate(void);
+>>  uint64_t xbzrle_mig_pages_overflow(void);
+>>  uint64_t ram_bytes_transferred(void);
+>> -uint64_t ram_bytes_remaining(void);
+>> +uint64_t ram_pages_remaining(void);
+>>  uint64_t ram_dirty_sync_count(void);
+>>  uint64_t ram_dirty_pages_rate(void);
+>>  uint64_t ram_postcopy_requests(void);
+>
+> I know we already have a mishmash of which interfaces are byte-based vs.
+> page-based, but using byte-based everywhere seems like a better goal,
+> and this feels like we are going backwards from that goal.
 
-diff --git a/docs/specs/vhost-user.txt b/docs/specs/vhost-user.txt
-index 5fa7016..481ab56 100644
---- a/docs/specs/vhost-user.txt
-+++ b/docs/specs/vhost-user.txt
-@@ -97,6 +97,25 @@ Depending on the request type, payload can be:
-    log offset: offset from start of supplied file descriptor
-        where logging starts (i.e. where guest address 0 would be logged)
- 
-+ * An IOTLB message
-+   ---------------------------------------------------------
-+   | iova | size | user address | permissions flags | type |
-+   ---------------------------------------------------------
-+
-+   IOVA: a 64-bit I/O virtual address programmed by the guest
-+   Size: a 64-bit size
-+   User address: a 64-bit user address
-+   Permissions: a 8-bit value:
-+    - 0: No access
-+    - 1: Read access
-+    - 2: Write access
-+    - 3: Read/Write access
-+   Type: a 8-bit IOTLB message type:
-+    - 1: IOTLB miss
-+    - 2: IOTLB update
-+    - 3: IOTLB invalidate
-+    - 4: IOTLB access fail
-+
- In QEMU the vhost-user message is implemented with the following struct:
- 
- typedef struct VhostUserMsg {
-@@ -109,6 +128,7 @@ typedef struct VhostUserMsg {
-         struct vhost_vring_addr addr;
-         VhostUserMemory memory;
-         VhostUserLog log;
-+        struct vhost_iotlb_msg iotlb;
-     };
- } QEMU_PACKED VhostUserMsg;
- 
-@@ -253,6 +273,38 @@ Once the source has finished migration, rings will be stopped by
- the source. No further update must be done before rings are
- restarted.
- 
-+IOMMU support
-+-------------
-+
-+When the VIRTIO_F_IOMMU_PLATFORM feature has been negotiated, the master
-+sends IOTLB entries update & invalidation by sending VHOST_USER_IOTLB_MSG
-+requests to the slave with a struct vhost_iotlb_msg as payload. For update
-+events, the iotlb payload has to be filled with the update message type (2),
-+the I/O virtual address, the size, the user virtual address, and the
-+permissions flags. Addresses and size must be within vhost memory regions set
-+via the VHOST_USER_SET_MEM_TABLE request. For invalidation events, the iotlb
-+payload has to be filled with the invalidation message type (3), the I/O virtual
-+address and the size. On success, the slave is expected to reply with a zero
-+payload, non-zero otherwise.
-+
-+The slave relies on the slave communcation channel (see "Slave communication"
-+section below) to send IOTLB miss and access failure events, by sending
-+VHOST_USER_SLAVE_IOTLB_MSG requests to the master with a struct vhost_iotlb_msg
-+as payload. For miss events, the iotlb payload has to be filled with the miss
-+message type (1), the I/O virtual address and the permissions flags. For access
-+failure event, the iotlb payload has to be filled with the access failure
-+message type (4), the I/O virtual address and the permissions flags.
-+For synchronization purpose, the slave may rely on the reply-ack feature,
-+so the master may send a reply when operation is completed if the reply-ack
-+feature is negotiated and slaves requests a reply. For miss events, completed
-+operation means either master sent an update message containing the IOTLB entry
-+containing requested address and permission, or master sent nothing if the IOTLB
-+miss message is invalid (invalid IOVA or permission).
-+
-+The master isn't expected to take the initiative to send IOTLB update messages,
-+as the slave sends IOTLB miss messages for the guest virtual memory areas it
-+needs to access.
-+
- Slave communication
- -------------------
- 
-@@ -514,6 +566,38 @@ Master message types
-       If VHOST_USER_PROTOCOL_F_REPLY_ACK is negotiated, slave must respond
-       with zero for success, non-zero otherwise.
- 
-+ * VHOST_USER_IOTLB_MSG
-+
-+      Id: 22
-+      Equivalent ioctl: N/A (equivalent to VHOST_IOTLB_MSG message type)
-+      Master payload: struct vhost_iotlb_msg
-+      Slave payload: u64
-+
-+      Send IOTLB messages with struct vhost_iotlb_msg as payload.
-+      Master sends such requests to update and invalidate entries in the device
-+      IOTLB. The slave has to acknowledge the request with sending zero as u64
-+      payload for success, non-zero otherwise.
-+      This request should be send only when VIRTIO_F_IOMMU_PLATFORM feature
-+      has been successfully negotiated.
-+
-+Slave message types
-+-------------------
-+
-+ * VHOST_USER_SLAVE_IOTLB_MSG
-+
-+      Id: 1
-+      Equivalent ioctl: N/A (equivalent to VHOST_IOTLB_MSG message type)
-+      Slave payload: struct vhost_iotlb_msg
-+      Master payload: N/A
-+
-+      Send IOTLB messages with struct vhost_iotlb_msg as payload.
-+      Slave sends such requests to notify of an IOTLB miss, or an IOTLB
-+      access failure. If VHOST_USER_PROTOCOL_F_REPLY_ACK is negotiated,
-+      and slave set the VHOST_USER_NEED_REPLY flag, master must respond with
-+      zero when operation is successfully completed, or non-zero otherwise.
-+      This request should be send only when VIRTIO_F_IOMMU_PLATFORM feature
-+      has been successfully negotiated.
-+
- VHOST_USER_PROTOCOL_F_REPLY_ACK:
- -------------------------------
- The original vhost-user specification only demands replies for certain
-diff --git a/hw/net/vhost_net.c b/hw/net/vhost_net.c
-index 22874a9..e037db6 100644
---- a/hw/net/vhost_net.c
-+++ b/hw/net/vhost_net.c
-@@ -77,6 +77,7 @@ static const int user_feature_bits[] = {
-     VIRTIO_NET_F_HOST_UFO,
-     VIRTIO_NET_F_MRG_RXBUF,
-     VIRTIO_NET_F_MTU,
-+    VIRTIO_F_IOMMU_PLATFORM,
- 
-     /* This bit implies RARP isn't sent by QEMU out of band */
-     VIRTIO_NET_F_GUEST_ANNOUNCE,
-diff --git a/hw/virtio/vhost-user.c b/hw/virtio/vhost-user.c
-index 6a35600..7a9bb1d 100644
---- a/hw/virtio/vhost-user.c
-+++ b/hw/virtio/vhost-user.c
-@@ -62,11 +62,13 @@ typedef enum VhostUserRequest {
-     VHOST_USER_SEND_RARP = 19,
-     VHOST_USER_NET_SET_MTU = 20,
-     VHOST_USER_SET_SLAVE_REQ_FD = 21,
-+    VHOST_USER_IOTLB_MSG = 22,
-     VHOST_USER_MAX
- } VhostUserRequest;
- 
- typedef enum VhostUserSlaveRequest {
-     VHOST_USER_SLAVE_NONE = 0,
-+    VHOST_USER_SLAVE_IOTLB_MSG = 1,
-     VHOST_USER_SLAVE_MAX
- }  VhostUserSlaveRequest;
- 
-@@ -104,6 +106,7 @@ typedef struct VhostUserMsg {
-         struct vhost_vring_addr addr;
-         VhostUserMemory memory;
-         VhostUserLog log;
-+        struct vhost_iotlb_msg iotlb;
-     } payload;
- } QEMU_PACKED VhostUserMsg;
- 
-@@ -615,6 +618,9 @@ static void slave_read(void *opaque)
-     }
- 
-     switch (msg.request) {
-+    case VHOST_USER_SLAVE_IOTLB_MSG:
-+        ret = vhost_backend_handle_iotlb_msg(dev, &msg.payload.iotlb);
-+        break;
-     default:
-         error_report("Received unexpected msg type.");
-         ret = -EINVAL;
-@@ -697,7 +703,7 @@ out:
- 
- static int vhost_user_init(struct vhost_dev *dev, void *opaque)
- {
--    uint64_t features;
-+    uint64_t features, protocol_features;
-     struct vhost_user *u;
-     int err;
- 
-@@ -717,12 +723,13 @@ static int vhost_user_init(struct vhost_dev *dev, void *opaque)
-         dev->backend_features |= 1ULL << VHOST_USER_F_PROTOCOL_FEATURES;
- 
-         err = vhost_user_get_u64(dev, VHOST_USER_GET_PROTOCOL_FEATURES,
--                                 &features);
-+                                 &protocol_features);
-         if (err < 0) {
-             return err;
-         }
- 
--        dev->protocol_features = features & VHOST_USER_PROTOCOL_FEATURE_MASK;
-+        dev->protocol_features =
-+            protocol_features & VHOST_USER_PROTOCOL_FEATURE_MASK;
-         err = vhost_user_set_protocol_features(dev, dev->protocol_features);
-         if (err < 0) {
-             return err;
-@@ -736,6 +743,16 @@ static int vhost_user_init(struct vhost_dev *dev, void *opaque)
-                 return err;
-             }
-         }
-+
-+        if (virtio_has_feature(features, VIRTIO_F_IOMMU_PLATFORM) &&
-+                !(virtio_has_feature(dev->protocol_features,
-+                    VHOST_USER_PROTOCOL_F_SLAVE_REQ) &&
-+                 virtio_has_feature(dev->protocol_features,
-+                    VHOST_USER_PROTOCOL_F_REPLY_ACK))) {
-+            error_report("IOMMU support requires reply-ack and "
-+                         "slave-req protocol features.");
-+            return -1;
-+        }
-     }
- 
-     if (dev->migration_blocker == NULL &&
-@@ -862,6 +879,29 @@ static int vhost_user_net_set_mtu(struct vhost_dev *dev, uint16_t mtu)
-     return 0;
- }
- 
-+static int vhost_user_send_device_iotlb_msg(struct vhost_dev *dev,
-+                                            struct vhost_iotlb_msg *imsg)
-+{
-+    VhostUserMsg msg = {
-+        .request = VHOST_USER_IOTLB_MSG,
-+        .size = sizeof(msg.payload.iotlb),
-+        .flags = VHOST_USER_VERSION | VHOST_USER_NEED_REPLY_MASK,
-+        .payload.iotlb = *imsg,
-+    };
-+
-+    if (vhost_user_write(dev, &msg, NULL, 0) < 0) {
-+        return -EFAULT;
-+    }
-+
-+    return process_message_reply(dev, &msg);
-+}
-+
-+
-+static void vhost_user_set_iotlb_callback(struct vhost_dev *dev, int enabled)
-+{
-+    /* No-op as the receive channel is not dedicated to IOTLB messages. */
-+}
-+
- const VhostOps user_ops = {
-         .backend_type = VHOST_BACKEND_TYPE_USER,
-         .vhost_backend_init = vhost_user_init,
-@@ -886,4 +926,6 @@ const VhostOps user_ops = {
-         .vhost_migration_done = vhost_user_migration_done,
-         .vhost_backend_can_merge = vhost_user_can_merge,
-         .vhost_net_set_mtu = vhost_user_net_set_mtu,
-+        .vhost_set_iotlb_callback = vhost_user_set_iotlb_callback,
-+        .vhost_send_device_iotlb_msg = vhost_user_send_device_iotlb_msg,
- };
--- 
-MST
+On migration, the only one that is really byte based is the compression
+one and the xbzrle one, because they don't use multiple of target page
+size.  The other ones are indiferent.
+
+
+>
+>> diff --git a/qapi-schema.json b/qapi-schema.json
+>> index 4b50b65..ff1c048 100644
+>> --- a/qapi-schema.json
+>> +++ b/qapi-schema.json
+>> @@ -601,6 +601,9 @@
+>>  # @page-size: The number of bytes per page for the various page-based
+>>  #        statistics (since 2.10)
+>>  #
+>> +# @remaining-pages: amount of pages remaining to be transferred to the target VM
+>> +#        (since 2.10)
+>> +#
+>>  # Since: 0.14.0
+>>  ##
+>>  { 'struct': 'MigrationStats',
+>> @@ -608,7 +611,8 @@
+>>             'duplicate': 'int', 'skipped': 'int', 'normal': 'int',
+>>             'normal-bytes': 'int', 'dirty-pages-rate' : 'int',
+>>             'mbps' : 'number', 'dirty-sync-count' : 'int',
+>> -           'postcopy-requests' : 'int', 'page-size' : 'int' } }
+>> +           'postcopy-requests' : 'int', 'page-size' : 'int',
+>> +           'remaining-pages' : 'int' } }
+>
+> We already have 'remaining'; why do we need a redundant stat
+> 'remaining-pages'?
+
+See next patch.  I have that other stat, or I have to use a different
+place for statistics for dirty number of pages.  Notice that it kind of
+make sense because that is the only stat that is used for migration
+code.
+
+So far:
+- I can't be consistent, there are already things that are on bytes, and
+  things that are on target_page_size
+- All stats can be used on Migration stats *except* for dirty number of
+  pages.
+
+As far as I know:
+- I can export the number of remaining pages, like this patch does
+  (information is reduntdant, but that already happens, notice 'normal':
+  number of pages, and 'normal-bytes': number of bytes).
+- I can have the dirty_number_pages as a different variable in
+  ram_stats, so it don't feel like the other counters.
+
+As far as I can see one way is bad and the other is worse, none is good.
+For me this movement makes it a bit more consistent, but the difference
+is not big.
+
+Suggestions?
+
+Independently of this patch, that is for statistics, in migration code
+it is more natural to use pages, otherwise we need to be dividing the
+"offset" between the page size, as the basic unit is the dirty bitmap
+that is in pages.
+
+Later, Juan.
