@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44026)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44049)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1dGl7R-000871-0L
+	(envelope-from <peterx@redhat.com>) id 1dGl7R-00087l-Sv
 	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 07:51:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1dGl7L-0007gT-VB
+	(envelope-from <peterx@redhat.com>) id 1dGl7Q-0007jV-Ux
 	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 07:51:53 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:44204)
+Received: from mx1.redhat.com ([209.132.183.28]:52474)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1dGl7L-0007fu-MH
-	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 07:51:47 -0400
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1dGl7Q-0007jM-PU
+	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 07:51:52 -0400
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
 	[10.5.11.13])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 8CF9D334593
-	for <qemu-devel@nongnu.org>; Fri,  2 Jun 2017 11:51:46 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id B945380E7B
+	for <qemu-devel@nongnu.org>; Fri,  2 Jun 2017 11:51:51 +0000 (UTC)
 From: Peter Xu <peterx@redhat.com>
-Date: Fri,  2 Jun 2017 19:50:52 +0800
-Message-Id: <1496404254-17429-2-git-send-email-peterx@redhat.com>
+Date: Fri,  2 Jun 2017 19:50:53 +0800
+Message-Id: <1496404254-17429-3-git-send-email-peterx@redhat.com>
 In-Reply-To: <1496404254-17429-1-git-send-email-peterx@redhat.com>
 References: <1496404254-17429-1-git-send-email-peterx@redhat.com>
-Subject: [Qemu-devel] [PATCH 1/3] exec: add page_mask for
- address_space_do_translate
+Subject: [Qemu-devel] [PATCH 2/3] exec: simplify
+ address_space_get_iotlb_entry
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,137 +33,66 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: "Michael S . Tsirkin" <mst@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Maxime Coquelin <maxime.coquelin@redhat.com>, peterx@redhat.com, Jason Wang <jasowang@redhat.com>
 
-The function is originally used for address_space_translate() and what
-we care about most is (xlat, plen) range. However for iotlb requests, we
-don't really care about "plen", but the size of the page that "xlat" is
-located on. While, plen cannot really contain this information.
+This patch let address_space_get_iotlb_entry() to use the newly
+introduced page_mask parameter in address_space_do_translate(). Then we
+will be sure the IOTLB can be aligned to page mask, also we should
+nicely support huge pages now when introducing a764040.
 
-A simple example to show why "plen" is not good for IOTLB translations:
-
-E.g., for huge pages, it is possible that guest mapped 1G huge page on
-device side that used this GPA range:
-
-  0x100000000 - 0x13fffffff
-
-Then let's say we want to translate one IOVA that finally mapped to GPA
-0x13ffffe00 (which is located on this 1G huge page). Then here we'll
-get:
-
-  (xlat, plen) = (0x13fffe00, 0x200)
-
-So the IOTLB would be only covering a very small range since from
-"plen" (which is 0x200 bytes) we cannot tell the size of the page.
-
-Actually we can really know that this is a huge page - we just throw the
-information away in address_space_do_translate().
-
-This patch introduced "page_mask" optional parameter to capture that
-page mask info. Also, I made "plen" an optional parameter as well, with
-some comments for the whole function.
-
-No functional change yet.
-
+Fixes: a764040 ("exec: abstract address_space_do_translate()")
 Signed-off-by: Peter Xu <peterx@redhat.com>
 ---
- exec.c | 46 ++++++++++++++++++++++++++++++++++++++++------
- 1 file changed, 40 insertions(+), 6 deletions(-)
+ exec.c | 29 ++++++++++-------------------
+ 1 file changed, 10 insertions(+), 19 deletions(-)
 
 diff --git a/exec.c b/exec.c
-index 8fc0e78..63a3ff0 100644
+index 63a3ff0..1f86253 100644
 --- a/exec.c
 +++ b/exec.c
-@@ -465,21 +465,45 @@ address_space_translate_internal(AddressSpaceDispatch *d, hwaddr addr, hwaddr *x
-     return section;
- }
- 
--/* Called from RCU critical section */
-+/**
-+ * address_space_do_translate - translate an address in AddressSpace
-+ *
-+ * @as: the address space that we want to translate on
-+ * @addr: the address to be translated in above address space
-+ * @xlat: the translated address offset within memory region. It
-+ *        cannot be @NULL.
-+ * @plen_out: valid read/write length of the translated address. It
-+ *            can be @NULL when we don't care about it.
-+ * @page_mask_out: page mask for the translated address. This
-+ *            should only be meaningful for IOMMU translated
-+ *            addresses, since there may be huge pages that this bit
-+ *            would tell. It can be @NULL if we don't care about it.
-+ * @is_write: whether the translation operation is for write
-+ * @is_mmio: whether this can be MMIO, set true if it can
-+ *
-+ * This function is called from RCU critical section
-+ */
- static MemoryRegionSection address_space_do_translate(AddressSpace *as,
-                                                       hwaddr addr,
-                                                       hwaddr *xlat,
--                                                      hwaddr *plen,
-+                                                      hwaddr *plen_out,
-+                                                      hwaddr *page_mask_out,
-                                                       bool is_write,
-                                                       bool is_mmio)
+@@ -544,14 +544,14 @@ IOMMUTLBEntry address_space_get_iotlb_entry(AddressSpace *as, hwaddr addr,
+                                             bool is_write)
  {
-     IOMMUTLBEntry iotlb;
-     MemoryRegionSection *section;
-     MemoryRegion *mr;
-+    hwaddr page_mask = TARGET_PAGE_MASK;
-+    hwaddr plen = (hwaddr)(-1);
-+
-+    if (plen_out) {
-+        plen = *plen_out;
-+    }
+     MemoryRegionSection section;
+-    hwaddr xlat, plen;
++    hwaddr xlat, page_mask;
  
-     for (;;) {
-         AddressSpaceDispatch *d = atomic_rcu_read(&as->dispatch);
--        section = address_space_translate_internal(d, addr, &addr, plen, is_mmio);
-+        section = address_space_translate_internal(d, addr, &addr, &plen, is_mmio);
-         mr = section->mr;
- 
-         if (!mr->iommu_ops) {
-@@ -490,7 +514,8 @@ static MemoryRegionSection address_space_do_translate(AddressSpace *as,
-                                          IOMMU_WO : IOMMU_RO);
-         addr = ((iotlb.translated_addr & ~iotlb.addr_mask)
-                 | (addr & iotlb.addr_mask));
--        *plen = MIN(*plen, (addr | iotlb.addr_mask) - addr + 1);
-+        page_mask = iotlb.addr_mask;
-+        plen = MIN(plen, (addr | iotlb.addr_mask) - addr + 1);
-         if (!(iotlb.perm & (1 << is_write))) {
-             goto translate_fail;
-         }
-@@ -500,6 +525,14 @@ static MemoryRegionSection address_space_do_translate(AddressSpace *as,
- 
-     *xlat = addr;
- 
-+    if (page_mask_out) {
-+        *page_mask_out = page_mask;
-+    }
-+
-+    if (plen_out) {
-+        *plen_out = plen;
-+    }
-+
-     return *section;
- 
- translate_fail:
-@@ -518,7 +551,7 @@ IOMMUTLBEntry address_space_get_iotlb_entry(AddressSpace *as, hwaddr addr,
- 
-     /* This can never be MMIO. */
-     section = address_space_do_translate(as, addr, &xlat, &plen,
--                                         is_write, false);
-+                                         NULL, is_write, false);
+-    /* Try to get maximum page mask during translation. */
+-    plen = (hwaddr)-1;
+-
+-    /* This can never be MMIO. */
+-    section = address_space_do_translate(as, addr, &xlat, &plen,
+-                                         NULL, is_write, false);
++    /*
++     * This can never be MMIO, and we don't really care about plen,
++     * but page mask.
++     */
++    section = address_space_do_translate(as, addr, &xlat, NULL,
++                                         &page_mask, is_write, false);
  
      /* Illegal translation */
      if (section.mr == &io_mem_unassigned) {
-@@ -560,7 +593,8 @@ MemoryRegion *address_space_translate(AddressSpace *as, hwaddr addr,
-     MemoryRegionSection section;
+@@ -562,20 +562,11 @@ IOMMUTLBEntry address_space_get_iotlb_entry(AddressSpace *as, hwaddr addr,
+     xlat += section.offset_within_address_space -
+         section.offset_within_region;
  
-     /* This can be MMIO, so setup MMIO bit. */
--    section = address_space_do_translate(as, addr, xlat, plen, is_write, true);
-+    section = address_space_do_translate(as, addr, xlat, plen,
-+                                         NULL, is_write, true);
-     mr = section.mr;
- 
-     if (xen_enabled() && memory_access_is_direct(mr, is_write)) {
+-    if (plen == (hwaddr)-1) {
+-        /* If not specified during translation, use default mask */
+-        plen = TARGET_PAGE_MASK;
+-    } else {
+-        /* Make it a valid page mask */
+-        assert(plen);
+-        plen = pow2floor(plen) - 1;
+-    }
+-
+     return (IOMMUTLBEntry) {
+         .target_as = section.address_space,
+-        .iova = addr & ~plen,
+-        .translated_addr = xlat & ~plen,
+-        .addr_mask = plen,
++        .iova = addr & ~page_mask,
++        .translated_addr = xlat & ~page_mask,
++        .addr_mask = page_mask,
+         /* IOTLBs are for DMAs, and DMA only allows on RAMs. */
+         .perm = IOMMU_RW,
+     };
 -- 
 2.7.4
