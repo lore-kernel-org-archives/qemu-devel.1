@@ -1,27 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44171)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46598)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1dGl7e-0008JH-5C
-	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 07:52:07 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1dGlG0-0003fb-5C
+	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 08:00:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1dGl7Z-0007mn-66
-	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 07:52:06 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53390)
+	(envelope-from <vsementsov@virtuozzo.com>) id 1dGlFv-0003aC-6H
+	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 08:00:44 -0400
+Received: from mailhub.sw.ru ([195.214.232.25]:36658 helo=relay.sw.ru)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1dGl7Y-0007ma-U5
-	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 07:52:01 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id E04D47AE81
-	for <qemu-devel@nongnu.org>; Fri,  2 Jun 2017 11:51:59 +0000 (UTC)
-From: Peter Xu <peterx@redhat.com>
-Date: Fri,  2 Jun 2017 19:50:54 +0800
-Message-Id: <1496404254-17429-4-git-send-email-peterx@redhat.com>
-In-Reply-To: <1496404254-17429-1-git-send-email-peterx@redhat.com>
-References: <1496404254-17429-1-git-send-email-peterx@redhat.com>
-Subject: [Qemu-devel] [PATCH 3/3] vhost: iommu: cache static mapping if
- there is
+	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
+	id 1dGlFu-0003Yc-Q5
+	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 08:00:39 -0400
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+References: <20170531165541.47338-1-vsementsov@virtuozzo.com>
+	<20170531165541.47338-2-vsementsov@virtuozzo.com>
+	<70aa332e-c868-15ac-0c4c-23d41a777b6c@redhat.com>
+	<76a74826-f9ed-825e-0d3d-3043943d636c@virtuozzo.com>
+Message-ID: <8e900b35-65a9-789f-2cf4-9de6d16460a3@virtuozzo.com>
+Date: Fri, 2 Jun 2017 15:00:34 +0300
+MIME-Version: 1.0
+In-Reply-To: <76a74826-f9ed-825e-0d3d-3043943d636c@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+Subject: Re: [Qemu-devel] [PATCH 01/12] nbd: rename read_sync and friends
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,135 +31,95 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: "Michael S . Tsirkin" <mst@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Maxime Coquelin <maxime.coquelin@redhat.com>, peterx@redhat.com, Jason Wang <jasowang@redhat.com>
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+Cc: pbonzini@redhat.com, den@openvz.org
 
-This patch pre-heat vhost iotlb cache when passthrough mode enabled.
+01.06.2017 11:03, Sementsov-Ogievskiy Vladimir wrote:
+>
+>
+> On 31.05.2017 21:46, Eric Blake wrote:
+>> On 05/31/2017 11:55 AM, Vladimir Sementsov-Ogievskiy wrote:
+>>> Rename
+>>>    nbd_wr_syncv -> nbd_rwv
+>>>    read_sync -> nbd_read
+>>>    read_sync_eof -> nbd_read_eof
+>>>    write_sync -> nbd_write
+>>>    drop_sync -> nbd_drop
+>>>
+>>> 1. nbd_ prefix
+>>>     read_sync and write_sync are already shared, so it is good to 
+>>> have a
+>>>     namespace prefix. drop_sync will be shared, and read_sync_eof is
+>>>     related to read_sync, so let's rename them all.
+>>>
+>>> 2. _sync suffix
+>>>     _sync is related to the fact, that nbd_wr_syncv doesn't return if
+>> s/fact,/fact/
+>>
+>>>     write to socket returns EAGAIN. In first implementation 
+>>> nbd_wr_syncv
+>>>     just loops while getting EAGAIN, current implementation yields in
+>>>     this case.
+>> As mentioned in your followup, you may want to rewrite this to:
+>>
+>> _sync was originally used (back in commit 7a5ca864 when it was named
+>> wr_sync) to indicate that we looped rather than returned on EAGAIN.  But
+>> now we use qio_channel which yields on our behalf rather than giving us
+>> EAGAIN.
+>
+> hmm, I like my wording (with adding note "... implementaion 
+> nbd_wr_syncv (was wr_sync in 7a5ca8648b) just ...")  more, because:
+> 1. not only nbd_wr_syncv has that suffix, so nbd_wr_syncv should be 
+> mentioned (as we mention wr_sync)
+> 2. I don't say about contrast between old and current, I say that they 
+> are similar.
+>
 
-Sometimes, even if user specified iommu_platform for vhost devices,
-IOMMU might still be disabled. One case is passthrough mode in VT-d
-implementation. We can detect this by observing iommu_list. If it's
-empty, it means IOMMU translation is disabled, then we can actually
-pre-heat the translation (it'll be static mapping then) by first
-invalidating all IOTLB, then cache existing memory ranges into vhost
-backend iotlb using 1:1 mapping.
+Finally, are you OK with my wording? If I reroll, can I add your r-b?
 
-Reviewed-by: Jason Wang <jasowang@redhat.com>
-Signed-off-by: Peter Xu <peterx@redhat.com>
----
- hw/virtio/trace-events |  4 +++
- hw/virtio/vhost.c      | 66 ++++++++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 70 insertions(+)
+>
+>>
+>>>     Why to get rid of it:
+>>>     - it is normal for r/w functions to be synchronous, so having
+>>>       additional suffix for it looks redundant (contrariwise, we have
+>>>       _aio suffix for async functions)
+>>>     - _sync suffix in block layer is used when function does flush (so
+>>>       using it for other thing is confusing a bit)
+>>>     - keep function names short after adding nbd_ prefix
+>>>
+>>> 3. for nbd_wr_syncv let's use more common notation 'rw'
+>>>
+>>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+>>> ---
+>> The maintainer may be willing to tweak the commit message without
+>> needing a v2.
+>
+> I hope for it)
+>
+>>
+>>
+>>> +++ b/nbd/nbd-internal.h
+>>> @@ -94,14 +94,14 @@
+>>>   #define NBD_ENOSPC     28
+>>>   #define NBD_ESHUTDOWN  108
+>>>   -/* read_sync_eof
+>>> +/* nbd_read_eof
+>>>    * Tries to read @size bytes from @ioc. Returns number of bytes 
+>>> actually read.
+>>>    * May return a value >= 0 and < size only on EOF, i.e. when 
+>>> iteratively called
+>>> - * qio_channel_readv() returns 0. So, there are no needs to call 
+>>> read_sync_eof
+>>> + * qio_channel_readv() returns 0. So, there are no needs to call 
+>>> nbd_read_eof
+>> As long as you are touching this:
+>>
+>> s/are no needs/is no need/
+>>
+>> Reviewed-by: Eric Blake <eblake@redhat.com>
+>>
+>
 
-diff --git a/hw/virtio/trace-events b/hw/virtio/trace-events
-index 1f7a7c1..54dcbb3 100644
---- a/hw/virtio/trace-events
-+++ b/hw/virtio/trace-events
-@@ -24,3 +24,7 @@ virtio_balloon_handle_output(const char *name, uint64_t gpa) "section name: %s g
- virtio_balloon_get_config(uint32_t num_pages, uint32_t actual) "num_pages: %d actual: %d"
- virtio_balloon_set_config(uint32_t actual, uint32_t oldactual) "actual: %d oldactual: %d"
- virtio_balloon_to_target(uint64_t target, uint32_t num_pages) "balloon target: %"PRIx64" num_pages: %d"
-+
-+# hw/virtio/vhost.c
-+vhost_iommu_commit(void) ""
-+vhost_iommu_static_preheat(void) ""
-diff --git a/hw/virtio/vhost.c b/hw/virtio/vhost.c
-index 03a46a7..d03d720 100644
---- a/hw/virtio/vhost.c
-+++ b/hw/virtio/vhost.c
-@@ -27,6 +27,7 @@
- #include "hw/virtio/virtio-access.h"
- #include "migration/blocker.h"
- #include "sysemu/dma.h"
-+#include "trace.h"
- 
- /* enabled until disconnected backend stabilizes */
- #define _VHOST_DEBUG 1
-@@ -730,6 +731,11 @@ static void vhost_iommu_unmap_notify(IOMMUNotifier *n, IOMMUTLBEntry *iotlb)
-     }
- }
- 
-+static bool vhost_iommu_mr_enabled(struct vhost_dev *dev)
-+{
-+    return !QLIST_EMPTY(&dev->iommu_list);
-+}
-+
- static void vhost_iommu_region_add(MemoryListener *listener,
-                                    MemoryRegionSection *section)
- {
-@@ -782,6 +788,65 @@ static void vhost_iommu_region_del(MemoryListener *listener,
-     }
- }
- 
-+static void vhost_iommu_commit(MemoryListener *listener)
-+{
-+    struct vhost_dev *dev = container_of(listener, struct vhost_dev,
-+                                         iommu_listener);
-+    struct vhost_memory_region *r;
-+    int i;
-+
-+    trace_vhost_iommu_commit();
-+
-+    if (!vhost_iommu_mr_enabled(dev)) {
-+        /*
-+        * This means iommu_platform is enabled, however iommu memory
-+        * region is disabled, e.g., when device passthrough is setup.
-+        * Then, no translation is needed any more.
-+        *
-+        * Let's first invalidate the whole IOTLB, then pre-heat the
-+        * static mapping by looping over vhost memory ranges.
-+        */
-+
-+        if (dev->vhost_ops->vhost_invalidate_device_iotlb(dev, 0,
-+                                                          UINT64_MAX)) {
-+            error_report("%s: flush existing IOTLB failed", __func__);
-+            return;
-+        }
-+
-+        /*
-+         * Current VHOST_IOTLB_INVALIDATE API has a small defect that
-+         * the invalidation for (start=0, size=UINT64_MAX) cannot
-+         * really invalidate an cached range of (start=UINT64_MAX-1,
-+         * size=1). We send this 2nd invalidation to workaround this.
-+         * But, frankly speaking for QEMU we don't have a problem with
-+         * this since we will never have a vhost cache with range
-+         * (start=UINT64_MAX-1, size=1) - if you see
-+         * address_space_get_iotlb_entry() all IOTLBs are page
-+         * aligned.
-+         */
-+        if (dev->vhost_ops->vhost_invalidate_device_iotlb(dev, UINT64_MAX,
-+                                                          1)) {
-+            error_report("%s: flush existing IOTLB failed", __func__);
-+            return;
-+        }
-+
-+        for (i = 0; i < dev->mem->nregions; i++) {
-+            r = &dev->mem->regions[i];
-+            /* Vhost regions are writable RAM, so IOMMU_RW suites. */
-+            if (dev->vhost_ops->vhost_update_device_iotlb(dev,
-+                                                          r->guest_phys_addr,
-+                                                          r->userspace_addr,
-+                                                          r->memory_size,
-+                                                          IOMMU_RW)) {
-+                error_report("%s: pre-heat static mapping failed", __func__);
-+                return;
-+            }
-+        }
-+
-+        trace_vhost_iommu_static_preheat();
-+    }
-+}
-+
- static void vhost_region_nop(MemoryListener *listener,
-                              MemoryRegionSection *section)
- {
-@@ -1298,6 +1363,7 @@ int vhost_dev_init(struct vhost_dev *hdev, void *opaque,
-     hdev->iommu_listener = (MemoryListener) {
-         .region_add = vhost_iommu_region_add,
-         .region_del = vhost_iommu_region_del,
-+        .commit = vhost_iommu_commit,
-     };
- 
-     if (hdev->migration_blocker == NULL) {
 -- 
-2.7.4
+Best regards,
+Vladimir
