@@ -1,33 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35618)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36067)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dGkcx-0005M7-V5
-	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 07:20:24 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1dGkeh-0006F0-4O
+	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 07:22:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dGkcx-0004aD-0r
-	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 07:20:23 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:35652)
+	(envelope-from <vsementsov@virtuozzo.com>) id 1dGked-0005YZ-82
+	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 07:22:11 -0400
+Received: from mailhub.sw.ru ([195.214.232.25]:35919 helo=relay.sw.ru)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dGkcw-0004Zv-PL
-	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 07:20:22 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id B2DA45702D
-	for <qemu-devel@nongnu.org>; Fri,  2 Jun 2017 11:20:21 +0000 (UTC)
-From: Markus Armbruster <armbru@redhat.com>
-References: <20170531135709.345-1-marcandre.lureau@redhat.com>
-	<20170531135709.345-15-marcandre.lureau@redhat.com>
-Date: Fri, 02 Jun 2017 13:20:18 +0200
-In-Reply-To: <20170531135709.345-15-marcandre.lureau@redhat.com>
-	(=?utf-8?Q?=22Marc-Andr=C3=A9?=
-	Lureau"'s message of "Wed, 31 May 2017 17:56:38 +0400")
-Message-ID: <8737bifxfx.fsf@dusky.pond.sub.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 14/45] qapi: update the qobject visitor
- to use QNUM_U64
+	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
+	id 1dGkec-0005Wi-S0
+	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 07:22:07 -0400
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Fri,  2 Jun 2017 14:21:30 +0300
+Message-Id: <20170602112158.232757-3-vsementsov@virtuozzo.com>
+In-Reply-To: <20170602112158.232757-1-vsementsov@virtuozzo.com>
+References: <20170602112158.232757-1-vsementsov@virtuozzo.com>
+Subject: [Qemu-devel] [PATCH v20 02/30] specs/qcow2: do not use wording
+ 'bitmap header'
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,64 +25,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, mreitz@redhat.com, armbru@redhat.com, eblake@redhat.com, jsnow@redhat.com, famz@redhat.com, den@openvz.org, stefanha@redhat.com, vsementsov@virtuozzo.com, pbonzini@redhat.com
 
-One more nitpick:
+A bitmap directory entry is sometimes called a 'bitmap header'. This
+patch leaves only one name - 'bitmap directory entry'. The name 'bitmap
+header' creates misunderstandings with 'qcow2 header' and 'qcow2 bitmap
+header extension' (which is extension of qcow2 header)
 
-Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
+Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
+Reviewed-by: John Snow <jsnow@redhat.com>
+---
+ docs/specs/qcow2.txt | 5 ++---
+ 1 file changed, 2 insertions(+), 3 deletions(-)
 
-> Switch to use QNum/uint where appropriate to remove i64 limitation.
->
-> The input visitor will cast i64 input to u64 for compatibility
-> reasons (existing json QMP client already use negative i64 for large
-> u64, and expect an implicit cast in qemu).
->
-> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-[...]
-> diff --git a/tests/test-qobject-output-visitor.c b/tests/test-qobject-out=
-put-visitor.c
-> index 3180d8cbde..d9f106d52e 100644
-> --- a/tests/test-qobject-output-visitor.c
-> +++ b/tests/test-qobject-output-visitor.c
-> @@ -602,17 +602,31 @@ static void check_native_list(QObject *qobj,
->      qlist =3D qlist_copy(qobject_to_qlist(qdict_get(qdict, "data")));
->=20=20
->      switch (kind) {
-> -    case USER_DEF_NATIVE_LIST_UNION_KIND_S8:
-> -    case USER_DEF_NATIVE_LIST_UNION_KIND_S16:
-> -    case USER_DEF_NATIVE_LIST_UNION_KIND_S32:
-> -    case USER_DEF_NATIVE_LIST_UNION_KIND_S64:
->      case USER_DEF_NATIVE_LIST_UNION_KIND_U8:
->      case USER_DEF_NATIVE_LIST_UNION_KIND_U16:
->      case USER_DEF_NATIVE_LIST_UNION_KIND_U32:
->      case USER_DEF_NATIVE_LIST_UNION_KIND_U64:
-> -        /* all integer elements in JSON arrays get stored into QNums when
-> -         * we convert to QObjects, so we can check them all in the same
-> -         * fashion, so simply fall through here
-> +        for (i =3D 0; i < 32; i++) {
-> +            QObject *tmp;
-> +            QNum *qvalue;
-> +            uint64_t val;
-> +
-> +            tmp =3D qlist_peek(qlist);
-> +            g_assert(tmp);
-> +            qvalue =3D qobject_to_qnum(tmp);
-> +            g_assert(qnum_get_uint(qvalue, &val));
-> +            g_assert_cmpuint(val, =3D=3D, i);
-> +            qobject_decref(qlist_pop(qlist));
-> +        }
-> +        break;
-> +
-> +    case USER_DEF_NATIVE_LIST_UNION_KIND_S8:
-> +    case USER_DEF_NATIVE_LIST_UNION_KIND_S16:
-> +    case USER_DEF_NATIVE_LIST_UNION_KIND_S32:
-> +    case USER_DEF_NATIVE_LIST_UNION_KIND_S64:
-> +        /* All signed integer elements in JSON arrays get stored into
-> +         * QInts when we convert to QObjects, so we can check them all
-> +         * in the same fashion, so simply fall through here.
->           */
->      case USER_DEF_NATIVE_LIST_UNION_KIND_INTEGER:
->          for (i =3D 0; i < 32; i++) {
-
-Wing both ends of the comment, please.
+diff --git a/docs/specs/qcow2.txt b/docs/specs/qcow2.txt
+index dda53dd2a3..8874e8c774 100644
+--- a/docs/specs/qcow2.txt
++++ b/docs/specs/qcow2.txt
+@@ -201,7 +201,7 @@ The fields of the bitmaps extension are:
+ 
+           8 - 15:  bitmap_directory_size
+                    Size of the bitmap directory in bytes. It is the cumulative
+-                   size of all (nb_bitmaps) bitmap headers.
++                   size of all (nb_bitmaps) bitmap directory entries.
+ 
+          16 - 23:  bitmap_directory_offset
+                    Offset into the image file at which the bitmap directory
+@@ -426,8 +426,7 @@ Each bitmap saved in the image is described in a bitmap directory entry. The
+ bitmap directory is a contiguous area in the image file, whose starting offset
+ and length are given by the header extension fields bitmap_directory_offset and
+ bitmap_directory_size. The entries of the bitmap directory have variable
+-length, depending on the lengths of the bitmap name and extra data. These
+-entries are also called bitmap headers.
++length, depending on the lengths of the bitmap name and extra data.
+ 
+ Structure of a bitmap directory entry:
+ 
+-- 
+2.11.1
