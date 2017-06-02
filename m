@@ -1,28 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59050)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59151)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dGkBI-00068m-HK
-	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 06:51:49 -0400
+	(envelope-from <david@redhat.com>) id 1dGkBn-0006Mh-La
+	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 06:52:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dGkBH-0000TU-AY
-	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 06:51:48 -0400
-Received: from mail-wm0-x231.google.com ([2a00:1450:400c:c09::231]:37051)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1dGkBH-0000T3-3c
-	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 06:51:47 -0400
-Received: by mail-wm0-x231.google.com with SMTP id d127so22210277wmf.0
-	for <qemu-devel@nongnu.org>; Fri, 02 Jun 2017 03:51:46 -0700 (PDT)
+	(envelope-from <david@redhat.com>) id 1dGkBj-0000kG-PL
+	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 06:52:18 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:59690)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <david@redhat.com>) id 1dGkBj-0000jU-Ii
+	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 06:52:15 -0400
+References: <20170601101438.28732-1-david@redhat.com>
+	<20170601192011.crq6igwuln4hyjw5@aurel32.net>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <714c789a-a8e9-b1d4-07ca-b7f36b657984@redhat.com>
+Date: Fri, 2 Jun 2017 12:52:11 +0200
 MIME-Version: 1.0
-In-Reply-To: <1494827476-1487-6-git-send-email-clg@kaod.org>
-References: <1494827476-1487-1-git-send-email-clg@kaod.org>
-	<1494827476-1487-6-git-send-email-clg@kaod.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 2 Jun 2017 11:51:25 +0100
-Message-ID: <CAFEAcA915cbt97g9f1iyTJ8CjZ96c1hbwHK2E-_57311dHSEuw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 5/6] hw/misc: add a TMP42{1, 2,
- 3} device model
+In-Reply-To: <20170601192011.crq6igwuln4hyjw5@aurel32.net>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v1] s390x/cpumodel: wire up cpu type + id
+ for TCG
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,118 +29,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>
-Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
+To: Aurelien Jarno <aurelien@aurel32.net>
+Cc: qemu-devel@nongnu.org, rth@twiddle.net, agraf@suse.de, thuth@redhat.com
 
-On 15 May 2017 at 06:51, C=C3=A9dric Le Goater <clg@kaod.org> wrote:
-> Largely inspired by the TMP105 temperature sensor, here is a model for
-> the TMP42{1,2,3} temperature sensors.
->
-> Specs can be found here :
->
->         http://www.ti.com/lit/gpn/tmp421
->
-> Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
 
-This turns out to segfault on OSX and BSD...
+>> +
+>> +#ifndef CONFIG_USER_ONLY
+>> +void HELPER(stidp)(CPUS390XState *env, uint64_t addr)
+>> +{
+>> +    S390CPU *cpu = s390_env_get_cpu(env);
+>> +    uint64_t cpuid = s390_cpuid_from_cpu_model(cpu->model);
+>> +
+>> +    if (addr & 0x7) {
+>> +        program_interrupt(env, PGM_SPECIFICATION, ILEN_LATER_INC);
+>> +        return;
+>> +    }
+>> +
+>> +    /* basic mode, write the cpu address into the first 4 bit of the ID */
+>> +    cpuid |= ((uint64_t)env->cpu_num & 0xf) << 54;
+>> +    cpu_stq_data(env, addr, cpuid);
+>> +}
+>> +#endif
+> 
+> I don't really see the point of using an helper instead of just updating
+> the existing code. From what I understand the cpuid does not change at
+> runtime, so the s390_cpuid_from_cpu_model function can also be called 
+> from translate.c.
+> 
+> Aurelien
+> 
 
-> +static void tmp421_class_init(ObjectClass *klass, void *data)
-> +{
-> +    DeviceClass *dc =3D DEVICE_CLASS(klass);
-> +    I2CSlaveClass *k =3D I2C_SLAVE_CLASS(klass);
-> +    TMP421Class *sc =3D TMP421_CLASS(klass);
-> +
-> +    k->init =3D tmp421_init;
-> +    k->event =3D tmp421_event;
-> +    k->recv =3D tmp421_rx;
-> +    k->send =3D tmp421_tx;
-> +    dc->vmsd =3D &vmstate_tmp421;
-> +    sc->dev =3D (DeviceInfo *) data;
+>From what I can see, conditional exceptions are more complicated to
+implement without helpers (involves generating compares, jumps and so
+on). As this function is not expected to be executed on hot paths, I
+think moving it into a helper is the right thing to do.
 
-...because this write to sc->dev is off the end of a
-malloced block. You can see this with valgrind on Linux:
+-- 
 
-$ valgrind ./build/x86/aarch64-softmmu/qemu-system-aarch64
-=3D=3D14009=3D=3D Memcheck, a memory error detector
-[...]
-=3D=3D14009=3D=3D Invalid write of size 8
-=3D=3D14009=3D=3D    at 0x67D3D9: tmp421_class_init (tmp421.c:374)
-=3D=3D14009=3D=3D    by 0x80CD51: type_initialize (object.c:334)
-=3D=3D14009=3D=3D    by 0x80CABC: type_initialize (object.c:286)
-=3D=3D14009=3D=3D    by 0x80DF49: object_class_foreach_tramp (object.c:805)
-=3D=3D14009=3D=3D    by 0x1B7AE33F: g_hash_table_foreach (in
-/lib/x86_64-linux-gnu/libglib-2.0.so.0.4800.2)
-=3D=3D14009=3D=3D    by 0x80E028: object_class_foreach (object.c:827)
-=3D=3D14009=3D=3D    by 0x80E1F7: object_class_get_list (object.c:881)
-=3D=3D14009=3D=3D    by 0x5500A8: find_default_machine (vl.c:1488)
-=3D=3D14009=3D=3D    by 0x554039: select_machine (vl.c:2745)
-=3D=3D14009=3D=3D    by 0x55730E: main (vl.c:4091)
-=3D=3D14009=3D=3D  Address 0x2b4e7cd0 is 0 bytes after a block of size 224 =
-alloc'd
-=3D=3D14009=3D=3D    at 0x4C2FB55: calloc (in
-/usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
-=3D=3D14009=3D=3D    by 0x1B7C4770: g_malloc0 (in
-/lib/x86_64-linux-gnu/libglib-2.0.so.0.4800.2)
-=3D=3D14009=3D=3D    by 0x80CA8A: type_initialize (object.c:282)
-=3D=3D14009=3D=3D    by 0x80CABC: type_initialize (object.c:286)
-=3D=3D14009=3D=3D    by 0x80DF49: object_class_foreach_tramp (object.c:805)
-=3D=3D14009=3D=3D    by 0x1B7AE33F: g_hash_table_foreach (in
-/lib/x86_64-linux-gnu/libglib-2.0.so.0.4800.2)
-=3D=3D14009=3D=3D    by 0x80E028: object_class_foreach (object.c:827)
-=3D=3D14009=3D=3D    by 0x80E1F7: object_class_get_list (object.c:881)
-=3D=3D14009=3D=3D    by 0x5500A8: find_default_machine (vl.c:1488)
-=3D=3D14009=3D=3D    by 0x554039: select_machine (vl.c:2745)
-=3D=3D14009=3D=3D    by 0x55730E: main (vl.c:4091)
-=3D=3D14009=3D=3D
+Thanks,
 
-> +}
-> +
-> +static const TypeInfo tmp421_info =3D {
-> +    .name          =3D TYPE_TMP421,
-> +    .parent        =3D TYPE_I2C_SLAVE,
-> +    .instance_size =3D sizeof(TMP421State),
-> +    .instance_init =3D tmp421_initfn,
-> +    .class_init    =3D tmp421_class_init,
-
-...which is because this TypeInfo doesn't set the
-.class_size field, so only sizeof(I2CSlaveClass) is
-allocated, not sizeof(TMP421Class).
-
-(http://wiki.qemu.org/Documentation/QOMConventions
-lists this as one of the things you need to do for a class
-that has a class struct).
-
-> +};
-> +
-> +static void tmp421_register_types(void)
-> +{
-> +    int i;
-> +
-> +    type_register_static(&tmp421_info);
-> +    for (i =3D 0; i < ARRAY_SIZE(devices); ++i) {
-> +        TypeInfo ti =3D {
-> +            .name       =3D devices[i].name,
-> +            .parent     =3D TYPE_TMP421,
-> +            .class_init =3D tmp421_class_init,
-> +            .class_data =3D (void *) &devices[i],
-
-This TypeInfo is a bit odd too, looking more closely at it.
-It defines a type that's a subclass of TYPE_TMP421, but which
-has a class_init method that's the same function as TYPE_TMP421's
-class_init method. That means we call it twice for the same
-class, which doesn't seem right.
-
-> +        };
-> +        type_register(&ti);
-> +    }
-> +}
-> +
-> +type_init(tmp421_register_types)
-> --
-> 2.7.4
-
-I'm going to drop this patch and the next one from my arm
-queue, but leave 1-4 in.
-
-thanks
--- PMM
+David
