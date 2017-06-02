@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54485)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54504)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1dGp81-00062D-Dx
+	(envelope-from <alex.bennee@linaro.org>) id 1dGp82-000631-5J
 	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 12:08:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1dGp80-000536-43
-	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 12:08:45 -0400
-Received: from mail-wr0-x230.google.com ([2a00:1450:400c:c0c::230]:34477)
+	(envelope-from <alex.bennee@linaro.org>) id 1dGp80-00053O-PV
+	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 12:08:46 -0400
+Received: from mail-wm0-x234.google.com ([2a00:1450:400c:c09::234]:34836)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1dGp7z-00052T-Q5
+	id 1dGp80-00052s-GR
 	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 12:08:44 -0400
-Received: by mail-wr0-x230.google.com with SMTP id g76so9356778wrd.1
-	for <qemu-devel@nongnu.org>; Fri, 02 Jun 2017 09:08:43 -0700 (PDT)
+Received: by mail-wm0-x234.google.com with SMTP id b84so29301844wmh.0
+	for <qemu-devel@nongnu.org>; Fri, 02 Jun 2017 09:08:44 -0700 (PDT)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Fri,  2 Jun 2017 17:08:46 +0100
-Message-Id: <20170602160848.4913-9-alex.bennee@linaro.org>
+Date: Fri,  2 Jun 2017 17:08:45 +0100
+Message-Id: <20170602160848.4913-8-alex.bennee@linaro.org>
 In-Reply-To: <20170602160848.4913-1-alex.bennee@linaro.org>
 References: <20170602160848.4913-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [RISU PATCH v4 08/10] risu: add support compressed
- tracefiles
+Subject: [Qemu-devel] [RISU PATCH v4 07/10] risu: add simple trace and
+ replay support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,239 +33,231 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: peter.maydell@linaro.org
 Cc: qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 
-This uses the magic of zlib's gzread/write interface to wrap the
-tracefile in compression. The code changes are tiny. I spent more time
-messing about with the configure/linker stuff to auto-detect bits.
+This adds a very dumb and easily breakable trace and replay support. In
+--master mode the various risu ops trigger a write of register/memory
+state into a binary file which can be played back to an apprentice.
+Currently there is no validation of the image source so feeding the
+wrong image will fail straight away.
 
-As you need decent multi-arch support or a correctly setup cross
-toolchain we fall back if we can't compile with zlib. This
-unfortunately needs some #ifdef hackery around the zlib bits in
-risu.c.
+The trace files will get very big for any appreciable sized test file
+and this will be addressed in later patches.
 
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 
---
-v4
-  - removed redundant config.h output, added HAVE_ZLIB
-  - added BUILD_INC to deal with out-of-tree builds
 ---
- Makefile  |  4 ++--
- configure | 55 +++++++++++++++++++++++++++++++++++++++++++++++++++++--
- risu.c    | 30 +++++++++++++++++++++++++++---
- 3 files changed, 82 insertions(+), 7 deletions(-)
+v4
+  - fix formatting mess
+  - abort() instead of reporting de-sync
+  - don't fake return for compiler
+v3
+  - fix options parsing
+  - re-factored so no need for copy & paste
+v2
+  - moved read/write functions into main risu.c
+  - cleaned up formatting
+  - report more in apprentice --trace mode
+---
+ risu.c | 97 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++---------
+ 1 file changed, 84 insertions(+), 13 deletions(-)
 
-diff --git a/Makefile b/Makefile
-index 9a29bb4..ca80eef 100644
---- a/Makefile
-+++ b/Makefile
-@@ -17,7 +17,7 @@ VPATH=$(SRCDIR)
- 
- CFLAGS ?= -g
- 
--ALL_CFLAGS = -Wall -D_GNU_SOURCE -DARCH=$(ARCH) $(CFLAGS) $(EXTRA_CFLAGS)
-+ALL_CFLAGS = -Wall -D_GNU_SOURCE -DARCH=$(ARCH) $(BUILD_INC) $(CFLAGS) $(EXTRA_CFLAGS)
- 
- PROG=risu
- SRCS=risu.c comms.c reginfo.c risu_$(ARCH).c risu_reginfo_$(ARCH).c
-@@ -35,7 +35,7 @@ all: $(PROG) $(BINS)
- dump: $(RISU_ASMS)
- 
- $(PROG): $(OBJS)
--	$(CC) $(STATIC) $(ALL_CFLAGS) -o $@ $^
-+	$(CC) $(STATIC) $(ALL_CFLAGS) -o $@ $^ $(LDFLAGS)
- 
- %.risu.asm: %.risu.bin
- 	${OBJDUMP} -b binary -m $(ARCH) -D $^ > $@
-diff --git a/configure b/configure
-index c4b5adb..1dc527b 100755
---- a/configure
-+++ b/configure
-@@ -32,6 +32,10 @@ compile() {
-     $CC $CFLAGS -c -o ${1}.o ${1}.c 2>/dev/null
- }
- 
-+link() {
-+    $LD $LDFLAGS -l${2} -o ${1} ${1}.o 2>/dev/null
-+}
-+
- check_define() {
-     c=${tmp_dir}/check_define_${1}
-     cat > ${c}.c <<EOF
-@@ -58,6 +62,48 @@ guess_arch() {
-     fi
- }
- 
-+check_type() {
-+    c=${tmp_dir}/check_type_${1}
-+    cat > ${c}.c <<EOF
-+#include <inttypes.h>
-+#include <stdint.h>
-+#include <sys/types.h>
-+#include <sys/socket.h>
-+
-+int main(void) { $1 thisone; return 0; }
-+EOF
-+    compile $c
-+}
-+
-+check_lib() {
-+    c=${tmp_dir}/check_lib${1}
-+    cat > ${c}.c <<EOF
-+#include <stdint.h>
-+#include <$2.h>
-+
-+int main(void) { $3; return 0; }
-+EOF
-+    compile $c && link $c $1
-+}
-+
-+generate_config() {
-+    cfg=config.h
-+    echo "generating config.h..."
-+
-+    echo "/* config.h - generated by the 'configure' script */" > $cfg
-+    echo "#ifndef CONFIG_H" >> $cfg
-+    echo "#define CONFIG_H 1" >> $cfg
-+
-+    if check_lib z zlib "zlibVersion()"; then
-+        echo "#define HAVE_ZLIB 1" >> $cfg
-+        LDFLAGS=-lz
-+    fi
-+
-+    echo "#endif /* CONFIG_H */" >> $cfg
-+
-+    echo "...done"
-+}
-+
- generate_makefilein() {
-     m=Makefile.in
-     echo "generating Makefile.in..."
-@@ -65,11 +111,13 @@ generate_makefilein() {
-     echo "# Makefile.in - generated by the 'configure' script" > $m
-     echo "ARCH:=${ARCH}" >> $m
-     echo "CC:=${CC}" >> $m
-+    echo "LDFLAGS:=${LDFLAGS}" >> $m
-     echo "AS:=${AS}" >> $m
-     echo "OBJCOPY:=${OBJCOPY}" >> $m
-     echo "OBJDUMP:=${OBJDUMP}" >> $m
-     echo "STATIC:=${STATIC}" >> $m
-     echo "SRCDIR:=${SRCDIR}" >> $m
-+    echo "BUILD_INC:=${BUILD_INC}" >> $m
- 
-     echo "...done"
- }
-@@ -118,6 +166,7 @@ done
- 
- CC="${CC-${CROSS_PREFIX}gcc}"
- AS="${AS-${CROSS_PREFIX}as}"
-+LD="${LD-${CROSS_PREFIX}ld}"
- OBJCOPY="${OBJCOPY-${CROSS_PREFIX}objcopy}"
- OBJDUMP="${OBJDUMP-${CROSS_PREFIX}objdump}"
- 
-@@ -125,15 +174,17 @@ if test "x${ARCH}" = "x"; then
-     guess_arch
- fi
- 
--generate_makefilein
--
- # Are we in a separate build tree? If so, link the Makefile
- # so that 'make' works.
- if test ! -e Makefile; then
-     echo "linking Makefile..."
-+    BUILD_INC="-I $(pwd)"
-     ln -s "${SRCDIR}/Makefile" .
- fi
- 
-+generate_config
-+generate_makefilein
-+
- rm -r "$tmp_dir"
- 
- echo "type 'make' to start the build"
 diff --git a/risu.c b/risu.c
-index 137cbbf..275c5a9 100644
+index 22571cd..137cbbf 100644
 --- a/risu.c
 +++ b/risu.c
-@@ -26,6 +26,8 @@
- #include <fcntl.h>
- #include <string.h>
- 
-+#include "config.h"
-+
- #include "risu.h"
- 
+@@ -31,6 +31,7 @@
  void *memblock = 0;
-@@ -33,6 +35,11 @@ void *memblock = 0;
- int apprentice_socket, master_socket;
- int trace_file = 0;
  
-+#ifdef HAVE_ZLIB
-+#include <zlib.h>
-+gzFile gz_trace_file;
-+#endif
-+
+ int apprentice_socket, master_socket;
++int trace_file = 0;
+ 
  sigjmp_buf jmpbuf;
  
- /* Should we test for FP exception status bits? */
-@@ -59,7 +66,11 @@ int read_sock(void *ptr, size_t bytes)
- 
- int write_trace(void *ptr, size_t bytes)
+@@ -40,10 +41,12 @@ int test_fp_exc = 0;
+ long executed_tests = 0;
+ void report_test_status(void *pc)
  {
-+#ifdef HAVE_ZLIB
-+   size_t res = gzwrite(gz_trace_file, ptr, bytes);
-+#else
-    size_t res = write(trace_file, ptr, bytes);
-+#endif
-    return (res == bytes) ? 0 : 1;
+-   executed_tests += 1;
+-   if (executed_tests % 100 == 0) {
+-      fprintf(stderr,"Executed %ld test instructions (pc=%p)\r",
+-              executed_tests, pc);
++   if (ismaster || trace_file) {
++      executed_tests += 1;
++      if (executed_tests % 100 == 0) {
++         fprintf(stderr,"Executed %ld test instructions (pc=%p)\r",
++                 executed_tests, pc);
++      }
+    }
  }
  
-@@ -77,7 +88,11 @@ int write_sock(void *ptr, size_t bytes)
- 
- int read_trace(void *ptr, size_t bytes)
- {
-+#ifdef HAVE_ZLIB
-+   size_t res = gzread(gz_trace_file, ptr, bytes);
-+#else
-    size_t res = read(trace_file, ptr, bytes);
-+#endif
-    return (res == bytes) ? 0 : 1;
+@@ -54,6 +57,12 @@ int read_sock(void *ptr, size_t bytes)
+    return recv_data_pkt(master_socket, ptr, bytes);
  }
  
-@@ -202,9 +217,12 @@ int master(int sock)
++int write_trace(void *ptr, size_t bytes)
++{
++   size_t res = write(trace_file, ptr, bytes);
++   return (res == bytes) ? 0 : 1;
++}
++
+ void respond_sock(int r)
+ {
+    send_response_byte(master_socket, r);
+@@ -66,9 +75,36 @@ int write_sock(void *ptr, size_t bytes)
+    return send_data_pkt(apprentice_socket, ptr, bytes);
+ }
+ 
++int read_trace(void *ptr, size_t bytes)
++{
++   size_t res = read(trace_file, ptr, bytes);
++   return (res == bytes) ? 0 : 1;
++}
++
++void respond_trace(int r)
++{
++   switch (r) {
++      case 0: /* test ok */
++      case 1: /* end of test */
++         break;
++      default:
++         /* should not get here */
++         abort();
++         break;
++   }
++}
++
+ void master_sigill(int sig, siginfo_t *si, void *uc)
+ {
+-   switch (recv_and_compare_register_info(read_sock, respond_sock, uc))
++   int r;
++
++   if (trace_file) {
++      r = send_register_info(write_trace, uc);
++   } else {
++      r = recv_and_compare_register_info(read_sock, respond_sock, uc);
++   }
++
++   switch (r)
+    {
+       case 0:
+          /* match OK */
+@@ -82,7 +118,15 @@ void master_sigill(int sig, siginfo_t *si, void *uc)
+ 
+ void apprentice_sigill(int sig, siginfo_t *si, void *uc)
+ {
+-   switch (send_register_info(write_sock, uc))
++   int r;
++
++   if (trace_file) {
++      r = recv_and_compare_register_info(read_trace, respond_trace, uc);
++   } else {
++      r = send_register_info(write_sock, uc);
++   }
++
++   switch (r)
+    {
+       case 0:
+          /* match OK */
+@@ -94,6 +138,9 @@ void apprentice_sigill(int sig, siginfo_t *si, void *uc)
+          exit(0);
+       default:
+          /* mismatch */
++         if (trace_file) {
++            report_match_status();
++         }
+          exit(1);
+    }
+ }
+@@ -155,7 +202,13 @@ int master(int sock)
  {
     if (sigsetjmp(jmpbuf, 1))
     {
--      if (trace_file) {
--         close(trace_file);
--         fprintf(stderr,"\nDone...\n");
-+      if (trace_file)
+-      return report_match_status();
++      if (trace_file) {
++         close(trace_file);
++         fprintf(stderr,"\nDone...\n");
++         return 0;
++      } else {
++         return report_match_status();
++      }
+    }
+    master_socket = sock;
+    set_sigill_handler(&master_sigill);
+@@ -184,6 +237,7 @@ void usage (void)
+    fprintf(stderr, "between master and apprentice risu processes.\n\n");
+    fprintf(stderr, "Options:\n");
+    fprintf(stderr, "  --master          Be the master (server)\n");
++   fprintf(stderr, "  -t, --trace=FILE  Record/playback trace file\n");
+    fprintf(stderr, "  -h, --host=HOST   Specify master host machine (apprentice only)\n");
+    fprintf(stderr, "  -p, --port=PORT   Specify the port to connect to/listen on (default 9191)\n");
+ }
+@@ -194,6 +248,7 @@ int main(int argc, char **argv)
+    uint16_t port = 9191;
+    char *hostname = "localhost";
+    char *imgfile;
++   char *trace_fn = NULL;
+    int sock;
+ 
+    // TODO clean this up later
+@@ -204,13 +259,14 @@ int main(int argc, char **argv)
+          {
+             { "help", no_argument, 0, '?'},
+             { "master", no_argument, &ismaster, 1 },
++            { "trace", required_argument, 0, 't' },
+             { "host", required_argument, 0, 'h' },
+             { "port", required_argument, 0, 'p' },
+             { "test-fp-exc", no_argument, &test_fp_exc, 1 },
+             { 0,0,0,0 }
+          };
+       int optidx = 0;
+-      int c = getopt_long(argc, argv, "h:p:", longopts, &optidx);
++      int c = getopt_long(argc, argv, "h:p:t:", longopts, &optidx);
+       if (c == -1)
+       {
+          break;
+@@ -223,6 +279,11 @@ int main(int argc, char **argv)
+             /* flag set by getopt_long, do nothing */
+             break;
+          }
++         case 't':
++         {
++           trace_fn = optarg;
++           break;
++         }
+          case 'h':
+          {
+             hostname = optarg;
+@@ -253,17 +314,27 @@ int main(int argc, char **argv)
+    }
+ 
+    load_image(imgfile);
+-   
++
+    if (ismaster)
+    {
+-      fprintf(stderr, "master port %d\n", port);
+-      sock = master_connect(port);
++      if (trace_fn)
 +      {
-+#ifdef HAVE_ZLIB
-+         gzclose(gz_trace_file);
-+#endif
-+         fprintf(stderr,"Done...\n");
-          return 0;
-       } else {
-          return report_match_status();
-@@ -320,6 +338,9 @@ int main(int argc, char **argv)
-       if (trace_fn)
-       {
-          trace_file = open(trace_fn, O_WRONLY|O_CREAT, S_IRWXU);
-+#ifdef HAVE_ZLIB
-+         gz_trace_file = gzdopen(trace_file, "wb9");
-+#endif
-       } else {
-          fprintf(stderr, "master port %d\n", port);
-          sock = master_connect(port);
-@@ -331,6 +352,9 @@ int main(int argc, char **argv)
-       if (trace_fn)
-       {
-          trace_file = open(trace_fn, O_RDONLY);
-+#ifdef HAVE_ZLIB
-+         gz_trace_file = gzdopen(trace_file, "rb");
-+#endif
-       } else {
-          fprintf(stderr, "apprentice host %s port %d\n", hostname, port);
-          sock = apprentice_connect(hostname, port);
++         trace_file = open(trace_fn, O_WRONLY|O_CREAT, S_IRWXU);
++      } else {
++         fprintf(stderr, "master port %d\n", port);
++         sock = master_connect(port);
++      }
+       return master(sock);
+    }
+    else
+    {
+-      fprintf(stderr, "apprentice host %s port %d\n", hostname, port);
+-      sock = apprentice_connect(hostname, port);
++      if (trace_fn)
++      {
++         trace_file = open(trace_fn, O_RDONLY);
++      } else {
++         fprintf(stderr, "apprentice host %s port %d\n", hostname, port);
++         sock = apprentice_connect(hostname, port);
++      }
+       return apprentice(sock);
+    }
+ }
 -- 
 2.13.0
