@@ -1,31 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37591)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37642)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1dGphR-0001RZ-2P
-	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 12:45:22 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1dGphW-0001VK-9s
+	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 12:45:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1dGphM-0004nu-Vf
-	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 12:45:21 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:41626)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1dGphM-0004n2-Mi
-	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 12:45:16 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 93B0380472
-	for <qemu-devel@nongnu.org>; Fri,  2 Jun 2017 16:45:15 +0000 (UTC)
-Date: Fri, 2 Jun 2017 19:45:05 +0300
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20170602193713-mutt-send-email-mst@kernel.org>
-References: <1496404254-17429-1-git-send-email-peterx@redhat.com>
-	<1496404254-17429-2-git-send-email-peterx@redhat.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1dGphV-0004te-EG
+	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 12:45:26 -0400
+Received: from mail-wm0-x229.google.com ([2a00:1450:400c:c09::229]:35775)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1dGphV-0004sy-88
+	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 12:45:25 -0400
+Received: by mail-wm0-x229.google.com with SMTP id b84so30010345wmh.0
+	for <qemu-devel@nongnu.org>; Fri, 02 Jun 2017 09:45:25 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1496404254-17429-2-git-send-email-peterx@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 1/3] exec: add page_mask for
- address_space_do_translate
+In-Reply-To: <2b22afa9-d3fa-99d3-c53d-696215041ffa@redhat.com>
+References: <20170601170733.13080-1-pbonzini@redhat.com>
+	<CAFEAcA9Yteb5jsB2AJhuhx1Ejg+nwrF8PgetRWv+yFPduLHOgg@mail.gmail.com>
+	<CAFEAcA9zPWDQ8Y6ugAut5WobLXzP3zrUeUUH7RcSUMqdLkkndA@mail.gmail.com>
+	<2b22afa9-d3fa-99d3-c53d-696215041ffa@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 2 Jun 2017 17:45:03 +0100
+Message-ID: <CAFEAcA8BLcP3sdz=+SDk0r6tH4ZoM+87RyfD8w0AnTe8T_gJvA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL v2 00/34] Misc patches for 2016-06-01
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,147 +31,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Maxime Coquelin <maxime.coquelin@redhat.com>, Jason Wang <jasowang@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-On Fri, Jun 02, 2017 at 07:50:52PM +0800, Peter Xu wrote:
-> The function is originally used for address_space_translate() and what
-> we care about most is (xlat, plen) range. However for iotlb requests, we
-> don't really care about "plen", but the size of the page that "xlat" is
-> located on. While, plen cannot really contain this information.
-> 
-> A simple example to show why "plen" is not good for IOTLB translations:
-> 
-> E.g., for huge pages, it is possible that guest mapped 1G huge page on
-> device side that used this GPA range:
-> 
->   0x100000000 - 0x13fffffff
-> 
-> Then let's say we want to translate one IOVA that finally mapped to GPA
-> 0x13ffffe00 (which is located on this 1G huge page). Then here we'll
-> get:
-> 
->   (xlat, plen) = (0x13fffe00, 0x200)
-> 
-> So the IOTLB would be only covering a very small range since from
-> "plen" (which is 0x200 bytes) we cannot tell the size of the page.
-> 
-> Actually we can really know that this is a huge page - we just throw the
-> information away in address_space_do_translate().
-> 
-> This patch introduced "page_mask" optional parameter to capture that
-> page mask info. Also, I made "plen" an optional parameter as well, with
-> some comments for the whole function.
-> 
-> No functional change yet.
-> 
-> Signed-off-by: Peter Xu <peterx@redhat.com>
-> ---
->  exec.c | 46 ++++++++++++++++++++++++++++++++++++++++------
->  1 file changed, 40 insertions(+), 6 deletions(-)
-> 
-> diff --git a/exec.c b/exec.c
-> index 8fc0e78..63a3ff0 100644
-> --- a/exec.c
-> +++ b/exec.c
-> @@ -465,21 +465,45 @@ address_space_translate_internal(AddressSpaceDispatch *d, hwaddr addr, hwaddr *x
->      return section;
->  }
->  
-> -/* Called from RCU critical section */
-> +/**
-> + * address_space_do_translate - translate an address in AddressSpace
-> + *
-> + * @as: the address space that we want to translate on
-> + * @addr: the address to be translated in above address space
-> + * @xlat: the translated address offset within memory region. It
-> + *        cannot be @NULL.
-> + * @plen_out: valid read/write length of the translated address. It
-> + *            can be @NULL when we don't care about it.
-> + * @page_mask_out: page mask for the translated address. This
-> + *            should only be meaningful for IOMMU translated
-> + *            addresses, since there may be huge pages that this bit
-> + *            would tell. It can be @NULL if we don't care about it.
+On 2 June 2017 at 09:06, Paolo Bonzini <pbonzini@redhat.com> wrote:
+> On 01/06/2017 19:56, Peter Maydell wrote:
+>> On 1 June 2017 at 18:53, Peter Maydell <peter.maydell@linaro.org> wrote:
+>>> Test failure on OSX:
+>>>
+>>> TEST: tests/device-introspect-test... (pid=66373)
+>>>   /aarch64/device/introspect/list:                                     OK
+>>>   /aarch64/device/introspect/none:                                     OK
+>>>   /aarch64/device/introspect/abstract:                                 OK
+>>>   /aarch64/device/introspect/concrete:                                 **
+>>> ERROR:/root/qemu/qom/object.c:364:object_initialize_with_type:
+>>> assertion failed: (type != NULL)
+>>> Broken pipe
+>>
+>> Got those the wrong way round -- this is the FreeBSD failure
+>> and the other lot are OSX. Pretty sure it's the same error,
+>> though -- it's just that for some reason my OSX setup doesn't
+>> actually cause make to exit with an error when a test fails,
+>> so it goes on to hit what's probably the same bug in all the
+>> other check-qtest-$ARCH targets rather than bailing out.
+>
+> Thanks, any chance you can bisect these?  I'll install a FreeBSD VM next
+> week.
 
-Why do we need plen or mask at all? It seems MemoryRegionSection
-has address and length already. So if you want to find out
-distance to section end, do section.size - xlat and you are done.
+No bisection, but using QTEST_LOG:
 
+QTEST_LOG=1 QTEST_QEMU_BINARY=aarch64-softmmu/qemu-system-aarch64
+QTEST_QEMU_IMG=qemu-img MALLOC_PERTURB_=${MALLOC_PERTURB_:-$((RANDOM %
+255 + 1))} gtester -k --verbose -m=quick tests/device-introspect-test
+-p=/aarch64/device/introspect/concrete
+[...]
+{"return": "/machine (none-machine)\r\n  /peripheral (container)\r\n
+/peripheral-anon (container)\r\n  /unattached (container)\r\n
+/io[0] (qemu:memory-region)\r\n    /sysbus (System)\r\n    /system[0]
+(qemu:memory-region)\r\n"}{"execute": "device-list-properties",
+"arguments": {"typename": "vhost-user-scsi-pci"}}
 
-> + * @is_write: whether the translation operation is for write
-> + * @is_mmio: whether this can be MMIO, set true if it can
-> + *
-> + * This function is called from RCU critical section
-> + */
->  static MemoryRegionSection address_space_do_translate(AddressSpace *as,
->                                                        hwaddr addr,
->                                                        hwaddr *xlat,
-> -                                                      hwaddr *plen,
-> +                                                      hwaddr *plen_out,
-> +                                                      hwaddr *page_mask_out,
->                                                        bool is_write,
->                                                        bool is_mmio)
->  {
->      IOMMUTLBEntry iotlb;
->      MemoryRegionSection *section;
->      MemoryRegion *mr;
-> +    hwaddr page_mask = TARGET_PAGE_MASK;
-> +    hwaddr plen = (hwaddr)(-1);
-> +
-> +    if (plen_out) {
-> +        plen = *plen_out;
-> +    }
->  
->      for (;;) {
->          AddressSpaceDispatch *d = atomic_rcu_read(&as->dispatch);
-> -        section = address_space_translate_internal(d, addr, &addr, plen, is_mmio);
-> +        section = address_space_translate_internal(d, addr, &addr, &plen, is_mmio);
->          mr = section->mr;
->  
->          if (!mr->iommu_ops) {
-> @@ -490,7 +514,8 @@ static MemoryRegionSection address_space_do_translate(AddressSpace *as,
->                                           IOMMU_WO : IOMMU_RO);
->          addr = ((iotlb.translated_addr & ~iotlb.addr_mask)
->                  | (addr & iotlb.addr_mask));
-> -        *plen = MIN(*plen, (addr | iotlb.addr_mask) - addr + 1);
-> +        page_mask = iotlb.addr_mask;
-> +        plen = MIN(plen, (addr | iotlb.addr_mask) - addr + 1);
->          if (!(iotlb.perm & (1 << is_write))) {
->              goto translate_fail;
->          }
-> @@ -500,6 +525,14 @@ static MemoryRegionSection address_space_do_translate(AddressSpace *as,
->  
->      *xlat = addr;
->  
-> +    if (page_mask_out) {
-> +        *page_mask_out = page_mask;
-> +    }
-> +
-> +    if (plen_out) {
-> +        *plen_out = plen;
-> +    }
-> +
->      return *section;
->  
->  translate_fail:
-> @@ -518,7 +551,7 @@ IOMMUTLBEntry address_space_get_iotlb_entry(AddressSpace *as, hwaddr addr,
->  
->      /* This can never be MMIO. */
->      section = address_space_do_translate(as, addr, &xlat, &plen,
-> -                                         is_write, false);
-> +                                         NULL, is_write, false);
->  
->      /* Illegal translation */
->      if (section.mr == &io_mem_unassigned) {
-> @@ -560,7 +593,8 @@ MemoryRegion *address_space_translate(AddressSpace *as, hwaddr addr,
->      MemoryRegionSection section;
->  
->      /* This can be MMIO, so setup MMIO bit. */
-> -    section = address_space_do_translate(as, addr, xlat, plen, is_write, true);
-> +    section = address_space_do_translate(as, addr, xlat, plen,
-> +                                         NULL, is_write, true);
->      mr = section.mr;
->  
->      if (xen_enabled() && memory_access_is_direct(mr, is_write)) {
-> -- 
-> 2.7.4
+**
+ERROR:/Users/pm215/src/qemu-for-merges/qom/object.c:364:void
+object_initialize_with_type(void *, size_t, TypeImpl *): assertion
+failed: (type != NULL)
+Broken pipe
+FAIL
+
+suggests that there's a bug in the new vhost-user-scsi-pci
+device. Specifically in commit 550811c37e0f2
+("vhost-user-scsi: Introduce vhost-user-scsi host device")
+hw/virtio/virtio-pci.c is changed to unconditionally call
+type_register_static(&vhost_user_scsi_pci_info), whose
+instance_init method tries to use TYPE_VHOST_USER_SCSI,
+but hw/scsi/vhost-user-scsi.c (where that type is defined)
+is only compiled if CONFIG_VHOST_USER_SCSI is set (which
+only happens for Linux).
+
+thanks
+-- PMM
