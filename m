@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36076)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36133)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1dGkeh-0006FE-6Q
-	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 07:22:14 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1dGkei-0006GV-Kz
+	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 07:22:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1dGkee-0005a8-KA
-	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 07:22:11 -0400
-Received: from mailhub.sw.ru ([195.214.232.25]:25651 helo=relay.sw.ru)
+	(envelope-from <vsementsov@virtuozzo.com>) id 1dGkee-0005ab-Qo
+	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 07:22:12 -0400
+Received: from mailhub.sw.ru ([195.214.232.25]:8899 helo=relay.sw.ru)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
-	id 1dGkee-0005Wa-97
+	id 1dGkee-0005Wh-FJ
 	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 07:22:08 -0400
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Fri,  2 Jun 2017 14:21:44 +0300
-Message-Id: <20170602112158.232757-17-vsementsov@virtuozzo.com>
+Date: Fri,  2 Jun 2017 14:21:40 +0300
+Message-Id: <20170602112158.232757-13-vsementsov@virtuozzo.com>
 In-Reply-To: <20170602112158.232757-1-vsementsov@virtuozzo.com>
 References: <20170602112158.232757-1-vsementsov@virtuozzo.com>
-Subject: [Qemu-devel] [PATCH v20 16/30] block: bdrv_close: release bitmaps
- after drv->bdrv_close
+Subject: [Qemu-devel] [PATCH v20 12/30] block: refactor bdrv_reopen_commit
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,39 +27,48 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org, qemu-devel@nongnu.org
 Cc: kwolf@redhat.com, mreitz@redhat.com, armbru@redhat.com, eblake@redhat.com, jsnow@redhat.com, famz@redhat.com, den@openvz.org, stefanha@redhat.com, vsementsov@virtuozzo.com, pbonzini@redhat.com
 
-Release bitmaps after 'if (bs->drv) { ... }' block. This will allow
-format driver to save persistent bitmaps, which will appear in following
-commits.
+Add bs local variable to simplify code.
 
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Reviewed-by: Max Reitz <mreitz@redhat.com>
 ---
- block.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ block.c | 14 ++++++++------
+ 1 file changed, 8 insertions(+), 6 deletions(-)
 
 diff --git a/block.c b/block.c
-index 161db9e32a..b35387241a 100644
+index 50ba264143..04af7697dc 100644
 --- a/block.c
 +++ b/block.c
-@@ -3015,9 +3015,6 @@ static void bdrv_close(BlockDriverState *bs)
-     bdrv_flush(bs);
-     bdrv_drain(bs); /* in case flush left pending I/O */
+@@ -2945,9 +2945,11 @@ error:
+ void bdrv_reopen_commit(BDRVReopenState *reopen_state)
+ {
+     BlockDriver *drv;
++    BlockDriverState *bs;
  
--    bdrv_release_named_dirty_bitmaps(bs);
--    assert(QLIST_EMPTY(&bs->dirty_bitmaps));
--
-     if (bs->drv) {
-         BdrvChild *child, *next;
+     assert(reopen_state != NULL);
+-    drv = reopen_state->bs->drv;
++    bs = reopen_state->bs;
++    drv = bs->drv;
+     assert(drv != NULL);
  
-@@ -3056,6 +3053,9 @@ static void bdrv_close(BlockDriverState *bs)
-         bs->full_open_options = NULL;
+     /* If there are any driver level actions to take */
+@@ -2956,13 +2958,13 @@ void bdrv_reopen_commit(BDRVReopenState *reopen_state)
      }
  
-+    bdrv_release_named_dirty_bitmaps(bs);
-+    assert(QLIST_EMPTY(&bs->dirty_bitmaps));
-+
-     QLIST_FOREACH_SAFE(ban, &bs->aio_notifiers, list, ban_next) {
-         g_free(ban);
-     }
+     /* set BDS specific flags now */
+-    QDECREF(reopen_state->bs->explicit_options);
++    QDECREF(bs->explicit_options);
+ 
+-    reopen_state->bs->explicit_options   = reopen_state->explicit_options;
+-    reopen_state->bs->open_flags         = reopen_state->flags;
+-    reopen_state->bs->read_only = !(reopen_state->flags & BDRV_O_RDWR);
++    bs->explicit_options   = reopen_state->explicit_options;
++    bs->open_flags         = reopen_state->flags;
++    bs->read_only = !(reopen_state->flags & BDRV_O_RDWR);
+ 
+-    bdrv_refresh_limits(reopen_state->bs, NULL);
++    bdrv_refresh_limits(bs, NULL);
+ }
+ 
+ /*
 -- 
 2.11.1
