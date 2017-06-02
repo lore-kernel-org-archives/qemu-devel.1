@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35978)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35986)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1dGo5Q-0001FX-I7
+	(envelope-from <vsementsov@virtuozzo.com>) id 1dGo5Q-0001Fd-It
 	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 11:02:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1dGo5L-0002fu-MQ
+	(envelope-from <vsementsov@virtuozzo.com>) id 1dGo5L-0002gg-VA
 	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 11:02:00 -0400
-Received: from mailhub.sw.ru ([195.214.232.25]:41401 helo=relay.sw.ru)
+Received: from mailhub.sw.ru ([195.214.232.25]:17246 helo=relay.sw.ru)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
-	id 1dGo5L-0002ez-Bk
+	id 1dGo5L-0002eb-HY
 	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 11:01:55 -0400
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Fri,  2 Jun 2017 18:01:47 +0300
-Message-Id: <20170602150150.258222-10-vsementsov@virtuozzo.com>
+Date: Fri,  2 Jun 2017 18:01:42 +0300
+Message-Id: <20170602150150.258222-5-vsementsov@virtuozzo.com>
 In-Reply-To: <20170602150150.258222-1-vsementsov@virtuozzo.com>
 References: <20170602150150.258222-1-vsementsov@virtuozzo.com>
-Subject: [Qemu-devel] [PATCH v2 09/12] nbd/server: nbd_negotiate: fix error
- path
+Subject: [Qemu-devel] [PATCH v2 04/12] nbd/server: get rid of ssize_t
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,28 +27,77 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: pbonzini@redhat.com, eblake@redhat.com, den@openvz.org, vsementsov@virtuozzo.com
 
-Current code will return 0 on this nbd_write fail, as rc is 0
-after successful nbd_negotiate_options. Fix this.
+Now nbd_read and friends return int, so get rid of ssize_t.
 
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
 ---
- nbd/server.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ nbd/server.c | 18 ++++++++----------
+ 1 file changed, 8 insertions(+), 10 deletions(-)
 
 diff --git a/nbd/server.c b/nbd/server.c
-index d376563527..ec163ad829 100644
+index b830cd23d3..8985df86b4 100644
 --- a/nbd/server.c
 +++ b/nbd/server.c
-@@ -607,7 +607,8 @@ static coroutine_fn int nbd_negotiate(NBDClient *client)
-         stq_be_p(buf + 18, client->exp->size);
-         stw_be_p(buf + 26, client->exp->nbdflags | myflags);
-         len = client->no_zeroes ? 10 : sizeof(buf) - 18;
--        if (nbd_write(client->ioc, buf + 18, len, NULL) < 0) {
-+        rc = nbd_write(client->ioc, buf + 18, len, NULL);
-+        if (rc < 0) {
-             LOG("write failed");
-             goto fail;
-         }
+@@ -625,11 +625,11 @@ fail:
+     return rc;
+ }
+ 
+-static ssize_t nbd_receive_request(QIOChannel *ioc, NBDRequest *request)
++static int nbd_receive_request(QIOChannel *ioc, NBDRequest *request)
+ {
+     uint8_t buf[NBD_REQUEST_SIZE];
+     uint32_t magic;
+-    ssize_t ret;
++    int ret;
+ 
+     ret = nbd_read(ioc, buf, sizeof(buf), NULL);
+     if (ret < 0) {
+@@ -663,7 +663,7 @@ static ssize_t nbd_receive_request(QIOChannel *ioc, NBDRequest *request)
+     return 0;
+ }
+ 
+-static ssize_t nbd_send_reply(QIOChannel *ioc, NBDReply *reply)
++static int nbd_send_reply(QIOChannel *ioc, NBDReply *reply)
+ {
+     uint8_t buf[NBD_REPLY_SIZE];
+ 
+@@ -969,11 +969,10 @@ void nbd_export_close_all(void)
+     }
+ }
+ 
+-static ssize_t nbd_co_send_reply(NBDRequestData *req, NBDReply *reply,
+-                                 int len)
++static int nbd_co_send_reply(NBDRequestData *req, NBDReply *reply, int len)
+ {
+     NBDClient *client = req->client;
+-    ssize_t rc, ret;
++    int rc, ret;
+ 
+     g_assert(qemu_in_coroutine());
+     qemu_co_mutex_lock(&client->send_lock);
+@@ -1003,11 +1002,10 @@ static ssize_t nbd_co_send_reply(NBDRequestData *req, NBDReply *reply,
+  * and any other negative value to report an error to the client
+  * (although the caller may still need to disconnect after reporting
+  * the error).  */
+-static ssize_t nbd_co_receive_request(NBDRequestData *req,
+-                                      NBDRequest *request)
++static int nbd_co_receive_request(NBDRequestData *req, NBDRequest *request)
+ {
+     NBDClient *client = req->client;
+-    ssize_t rc;
++    int rc;
+ 
+     g_assert(qemu_in_coroutine());
+     assert(client->recv_coroutine == qemu_coroutine_self());
+@@ -1105,7 +1103,7 @@ static coroutine_fn void nbd_trip(void *opaque)
+     NBDRequestData *req;
+     NBDRequest request = { 0 };    /* GCC thinks it can be used uninitialized */
+     NBDReply reply;
+-    ssize_t ret;
++    int ret;
+     int flags;
+ 
+     TRACE("Reading request.");
 -- 
 2.11.1
