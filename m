@@ -1,32 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55911)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56850)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dGnbO-0002ZU-7A
-	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 10:30:59 -0400
+	(envelope-from <thuth@redhat.com>) id 1dGnfP-0004DE-Lm
+	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 10:35:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dGnbJ-0000Xi-6Z
-	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 10:30:58 -0400
-Received: from indium.canonical.com ([91.189.90.7]:51019)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1dGnbJ-0000XE-0b
-	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 10:30:53 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1dGnbH-0004vx-Uw
-	for <qemu-devel@nongnu.org>; Fri, 02 Jun 2017 14:30:52 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id DA2B02E8194
-	for <qemu-devel@nongnu.org>; Fri,  2 Jun 2017 14:30:51 +0000 (UTC)
+	(envelope-from <thuth@redhat.com>) id 1dGnfK-0003GK-Ma
+	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 10:35:07 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40000)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1dGnfK-0003CY-HX
+	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 10:35:02 -0400
+References: <20170531220129.27724-1-aurelien@aurel32.net>
+	<20170531220129.27724-31-aurelien@aurel32.net>
+	<ea25b082-923d-6c7d-bca3-b4adbd412419@redhat.com>
+	<781667e0-740c-8e43-d94b-387092eab0e6@redhat.com>
+	<20170601191718.6cftzl5ama4s3es3@aurel32.net>
+	<c3c65598-59ca-c80e-1f8d-340ab19d902f@redhat.com>
+	<207db011-5035-acb3-2032-8408b4ec38e6@redhat.com>
+	<20170602140429.elahcu5olntw7ypi@aurel32.net>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <503b3cb8-4867-62a3-85c8-21a0e6adf88f@redhat.com>
+Date: Fri, 2 Jun 2017 16:34:54 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 02 Jun 2017 14:20:32 -0000
-From: Anatol Pomozov <1695286@bugs.launchpad.net>
-Reply-To: Bug 1695286 <1695286@bugs.launchpad.net>
-Sender: bounces@canonical.com
-Message-Id: <149641323250.2944.14553765614287047216.malonedeb@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1695286] [NEW] Add multiboot2 support
+In-Reply-To: <20170602140429.elahcu5olntw7ypi@aurel32.net>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v3 30/30] target/s390x: update maximum TCG
+ model to z800
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,48 +35,17 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Aurelien Jarno <aurelien@aurel32.net>, David Hildenbrand <david@redhat.com>
+Cc: qemu-devel@nongnu.org, Alexander Graf <agraf@suse.de>, Richard Henderson <rth@twiddle.net>
 
-Public bug reported:
+On 02.06.2017 16:04, Aurelien Jarno wrote:
+[...]
+> I understand your point. That said I doubt we will support the SIE
+> instruction soon (it looks quite complicated and I can't find any doc).
 
-multiboot2 is a recent specification that resolves some of the issues of
-multiboot. Multiboot2 is supported by some tools already (e.g. grub).
+There is unfortunately no public documentation for the SIE instruction.
+The only spec that is available is a very old one from the S/370 age:
 
-It would be great if one can run OS with multiboot2 using '-kernel'
-option, similar as it is done now with multiboot images.
+http://bitsavers.trailing-edge.com/pdf/ibm/370/princOps/SA22-7095-0_370-XA_Interpretive_Execution_Jan84.pdf
 
-Quick googling shows there is a Debian bug and patch that adds multiboot
-support https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=3D621529 Would
-it be possible to integrate it to QEMU upstream?
-
-** Affects: qemu
-     Importance: Undecided
-         Status: New
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1695286
-
-Title:
-  Add multiboot2 support
-
-Status in QEMU:
-  New
-
-Bug description:
-  multiboot2 is a recent specification that resolves some of the issues
-  of multiboot. Multiboot2 is supported by some tools already (e.g.
-  grub).
-
-  It would be great if one can run OS with multiboot2 using '-kernel'
-  option, similar as it is done now with multiboot images.
-
-  Quick googling shows there is a Debian bug and patch that adds
-  multiboot support https://bugs.debian.org/cgi-
-  bin/bugreport.cgi?bug=3D621529 Would it be possible to integrate it to
-  QEMU upstream?
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1695286/+subscriptions
+ Thomas
