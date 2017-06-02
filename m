@@ -1,30 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40073)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40057)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dGrl6-0002EE-38
+	id 1dGrl4-0002Di-Qy
 	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 14:57:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dGrl5-0006Ok-EF
-	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 14:57:16 -0400
-Received: from mail-oi0-x242.google.com ([2607:f8b0:4003:c06::242]:36450)
+	id 1dGrl4-0006O3-3p
+	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 14:57:14 -0400
+Received: from mail-oi0-x244.google.com ([2607:f8b0:4003:c06::244]:36445)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dGrl5-0006OV-AW
-	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 14:57:15 -0400
-Received: by mail-oi0-x242.google.com with SMTP id w138so13111417oiw.3
-	for <qemu-devel@nongnu.org>; Fri, 02 Jun 2017 11:57:15 -0700 (PDT)
+	id 1dGrl3-0006NN-VH
+	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 14:57:14 -0400
+Received: by mail-oi0-x244.google.com with SMTP id w138so13111307oiw.3
+	for <qemu-devel@nongnu.org>; Fri, 02 Jun 2017 11:57:13 -0700 (PDT)
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Fri,  2 Jun 2017 15:56:19 -0300
-Message-Id: <20170602185630.5059-14-f4bug@amsat.org>
+Date: Fri,  2 Jun 2017 15:56:18 -0300
+Message-Id: <20170602185630.5059-13-f4bug@amsat.org>
 In-Reply-To: <20170602185630.5059-1-f4bug@amsat.org>
 References: <20170602185630.5059-1-f4bug@amsat.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v5 13/24] docker: add extra libs to s390x
+Subject: [Qemu-devel] [PATCH v5 12/24] docker: add extra libs to arm64
  target to extend codebase coverage
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -40,26 +40,27 @@ Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
 ---
- tests/docker/dockerfiles/debian-s390x-cross.docker | 10 ++++++++++
- 1 file changed, 10 insertions(+)
+ tests/docker/dockerfiles/debian-arm64-cross.docker | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
 
-diff --git a/tests/docker/dockerfiles/debian-s390x-cross.docker b/tests/docker/dockerfiles/debian-s390x-cross.docker
-index 3a687feda0..cfc354ce5d 100644
---- a/tests/docker/dockerfiles/debian-s390x-cross.docker
-+++ b/tests/docker/dockerfiles/debian-s390x-cross.docker
-@@ -20,3 +20,13 @@ RUN apt install -yy gcc-multilib-s390x-linux-gnu binutils-multiarch
+diff --git a/tests/docker/dockerfiles/debian-arm64-cross.docker b/tests/docker/dockerfiles/debian-arm64-cross.docker
+index f3db7f4f55..45b891d57a 100644
+--- a/tests/docker/dockerfiles/debian-arm64-cross.docker
++++ b/tests/docker/dockerfiles/debian-arm64-cross.docker
+@@ -16,3 +16,14 @@ RUN DEBIAN_FRONTEND=noninteractive eatmydata \
  
  # Specify the cross prefix for this image (see tests/docker/common.rc)
- ENV QEMU_CONFIGURE_OPTS --cross-prefix=s390x-linux-gnu-
+ ENV QEMU_CONFIGURE_OPTS --cross-prefix=aarch64-linux-gnu-
 +
-+RUN DEBIAN_FRONTEND=noninteractive \
++RUN DEBIAN_FRONTEND=noninteractive eatmydata \
 +    apt-get install -y --no-install-recommends \
-+        glusterfs-common:s390x \
-+        libbz2-dev:s390x \
-+        liblzo2-dev:s390x \
-+        libncursesw5-dev:s390x \
-+        libnfs-dev:s390x \
-+        librdmacm-dev:s390x \
-+        libsnappy-dev:s390x
++        glusterfs-common:arm64 \
++        libbz2-dev:arm64 \
++        liblzo2-dev:arm64 \
++        libncursesw5-dev:arm64 \
++        libnfs-dev:arm64 \
++        librdmacm-dev:arm64 \
++        libsnappy-dev:arm64 \
++        libxen-dev:arm64
 -- 
 2.11.0
