@@ -1,22 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39121)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42701)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1dGvhF-0001zw-8q
-	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 19:09:34 -0400
+	(envelope-from <lersek@redhat.com>) id 1dGvsQ-0004xj-5z
+	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 19:21:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1dGvhE-0000Wh-7I
-	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 19:09:33 -0400
-References: <20170602112158.232757-1-vsementsov@virtuozzo.com>
-	<20170602112158.232757-15-vsementsov@virtuozzo.com>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <1f43ffc1-200d-2b5c-8e36-a1e48f816a92@redhat.com>
-Date: Fri, 2 Jun 2017 19:09:19 -0400
+	(envelope-from <lersek@redhat.com>) id 1dGvsN-00022D-0g
+	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 19:21:06 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:50856)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1dGvsM-00020p-I6
+	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 19:21:02 -0400
+References: <c76b36de-ebf9-c662-d454-0a95b43901e8@redhat.com>
+	<20170602191230-mutt-send-email-mst@kernel.org>
+From: Laszlo Ersek <lersek@redhat.com>
+Message-ID: <c2f1189a-48cf-4e01-c761-c20fe50ab67d@redhat.com>
+Date: Sat, 3 Jun 2017 01:20:54 +0200
 MIME-Version: 1.0
-In-Reply-To: <20170602112158.232757-15-vsementsov@virtuozzo.com>
+In-Reply-To: <20170602191230-mutt-send-email-mst@kernel.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v20 14/30] qcow2: support
- .bdrv_reopen_bitmaps_rw
+Subject: Re: [Qemu-devel] allocation zone extensions for the firmware
+ linker/loader
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,115 +29,174 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, famz@redhat.com, armbru@redhat.com, mreitz@redhat.com, stefanha@redhat.com, pbonzini@redhat.com, den@openvz.org
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: SeaBIOS devel list <SeaBIOS@seabios.org>, qemu devel list <qemu-devel@nongnu.org>, edk2-devel-ml01 <edk2-devel@ml01.01.org>, Kevin O'Connor <kevin@koconnor.net>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Ben Warren <ben@skyportsystems.com>, Dongjiu Geng <gengdongjiu@huawei.com>, Igor Mammedov <imammedo@redhat.com>, "Jordan Justen (Intel address)" <jordan.l.justen@intel.com>, "Leif Lindholm (Linaro address)" <leif.lindholm@linaro.org>, Shannon Zhao <zhaoshenglong@huawei.com>, Stefan Berger <stefanb@linux.vnet.ibm.com>, Xiao Guangrong <guangrong.xiao@linux.intel.com>
 
-
-
-On 06/02/2017 07:21 AM, Vladimir Sementsov-Ogievskiy wrote:
-> Realize bdrv_reopen_bitmaps_rw interface.
+On 06/02/17 18:30, Michael S. Tsirkin wrote:
+> On Fri, Jun 02, 2017 at 05:45:21PM +0200, Laszlo Ersek wrote:
+>> Hi,
+>>
+>> this message is cross-posted to three lists (qemu, seabios, edk2). I'll
+>> follow up with three patch series, one series for each project. I'll
+>> cross-post all of the patches as well, but I'll add the project name in
+>> the "bag of tags" in the subject lines.
+>>
+>> The QEMU series introduces two extensions to the ALLOCATE firmware
+>> linker/loader command.
+>>
+>> One extension is a new allocation zone, with value 3, for allowing the
+>> firmware to allocate the fw_cfg blobs in 64-bit address space.
 > 
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> Seems to make sense. I guess it's safe to do this if no
+> pointers to this table are 32 bit, right?
 
-Reviewed-by: John Snow <jsnow@redhat.com>
+That's right. For example, the TCPA patch (6 of 7) in the QEMU series
+does this, because the ACPI_BUILD_TPMLOG_FILE is only referenced by a
+64-bit pointer.
 
-> ---
->  block/qcow2-bitmap.c | 61 ++++++++++++++++++++++++++++++++++++++++++++++++++++
->  block/qcow2.c        |  2 ++
->  block/qcow2.h        |  1 +
->  3 files changed, 64 insertions(+)
+> Is there a chance we'll ever be able to use this on PC
+> assuming the need to support 32 bit guests?
+
+Well, sticking with the TCPA example, if an ACPI table defines *only* an
+8-byte pointer to some memory area, that seems to preclude support for
+32-bit guests already, generally speaking, no?
+
+But otherwise I agree, requiring support for 32-bit guests makes this
+allocation zone a lot less useful.
+
+>> The other extension is a repurposing of the most significant bit (bit 7)
+>> in the zone field. This bit becomes orthogonal to the rest of the zone
+>> field. If the bit is set, it means that QEMU promises the firmware that
+>> the blob referenced by the ALLOCATE command contains no ACPI tables at all.
 > 
-> diff --git a/block/qcow2-bitmap.c b/block/qcow2-bitmap.c
-> index 2c7b057e21..a21fab8ce8 100644
-> --- a/block/qcow2-bitmap.c
-> +++ b/block/qcow2-bitmap.c
-> @@ -826,3 +826,64 @@ fail:
->  
->      return false;
->  }
-> +
-> +int qcow2_reopen_bitmaps_rw(BlockDriverState *bs, Error **errp)
-> +{
-> +    BDRVQcow2State *s = bs->opaque;
-> +    Qcow2BitmapList *bm_list;
-> +    Qcow2Bitmap *bm;
-> +    GSList *ro_dirty_bitmaps = NULL;
-> +    int ret = 0;
-> +
-> +    if (s->nb_bitmaps == 0) {
-> +        /* No bitmaps - nothing to do */
-> +        return 0;
-> +    }
-> +
-> +    if (!can_write(bs)) {
-> +        error_setg(errp, "Can't write to the image on reopening bitmaps rw");
-> +        return -EINVAL;
-> +    }
-> +
-> +    bm_list = bitmap_list_load(bs, s->bitmap_directory_offset,
-> +                               s->bitmap_directory_size, errp);
-> +    if (bm_list == NULL) {
-> +        return -EINVAL;
-> +    }
-> +
-> +    QSIMPLEQ_FOREACH(bm, bm_list, entry) {
-> +        if (!(bm->flags & BME_FLAG_IN_USE)) {
-> +            BdrvDirtyBitmap *bitmap = bdrv_find_dirty_bitmap(bs, bm->name);
-> +            if (bitmap == NULL) {
-> +                continue;
-> +            }
-> +
-> +            if (!bdrv_dirty_bitmap_readonly(bitmap)) {
-> +                error_setg(errp, "Bitmap %s is not readonly but not marked"
-> +                                 "'IN_USE' in the image. Something went wrong,"
-> +                                 "all the bitmaps may be corrupted", bm->name);
-> +                ret = -EINVAL;
-> +                goto out;
-> +            }
-> +
-> +            bm->flags |= BME_FLAG_IN_USE;
-> +            ro_dirty_bitmaps = g_slist_append(ro_dirty_bitmaps, bitmap);
-> +        }
-> +    }
-> +
-> +    if (ro_dirty_bitmaps != NULL) {
-> +        /* in_use flags must be updated */
-> +        ret = update_ext_header_and_dir_in_place(bs, bm_list);
-> +        if (ret < 0) {
-> +            error_setg_errno(errp, -ret, "Can't update bitmap directory");
-> +            goto out;
-> +        }
-> +        g_slist_foreach(ro_dirty_bitmaps, set_readonly_helper, false);
-> +    }
-> +
-> +out:
-> +    g_slist_free(ro_dirty_bitmaps);
-> +    bitmap_list_free(bm_list);
-> +
-> +    return ret;
-> +}
-> diff --git a/block/qcow2.c b/block/qcow2.c
-> index a70d284b75..ec00db7e49 100644
-> --- a/block/qcow2.c
-> +++ b/block/qcow2.c
-> @@ -3596,6 +3596,8 @@ BlockDriver bdrv_qcow2 = {
->  
->      .bdrv_detach_aio_context  = qcow2_detach_aio_context,
->      .bdrv_attach_aio_context  = qcow2_attach_aio_context,
-> +
-> +    .bdrv_reopen_bitmaps_rw = qcow2_reopen_bitmaps_rw,
->  };
->  
->  static void bdrv_qcow2_init(void)
-> diff --git a/block/qcow2.h b/block/qcow2.h
-> index 67c61de008..3e23bb7361 100644
-> --- a/block/qcow2.h
-> +++ b/block/qcow2.h
-> @@ -630,5 +630,6 @@ int qcow2_check_bitmaps_refcounts(BlockDriverState *bs, BdrvCheckResult *res,
->                                    void **refcount_table,
->                                    int64_t *refcount_table_size);
->  bool qcow2_load_autoloading_dirty_bitmaps(BlockDriverState *bs, Error **errp);
-> +int qcow2_reopen_bitmaps_rw(BlockDriverState *bs, Error **errp);
->  
->  #endif
->
+> This one is a bit strange in that it does not seem to be about
+> allocations - it seems to be about content.
+
+Sure, I only stuffed it in the Zone field because that's where I found a
+free bit :)
+
+> 
+> I'd like to better understand what makes ACPI special.
+> 
+> I see two other things that make acpi special, but I'd like to make sure
+> 1. I think that RSDT from qemu is more or less ignored by OVMF, it
+>    builds it from tables supplied. Thus pointers from RSDT only serve to
+>    find beginning of tables - they are not really patched in. So ACPI
+>    tables are special in that their actual addresses are unused. As a
+>    result they can be moved at will after linker runs.
+
+Sort of. OVMF performs two passes on the linker/loader script. The first
+pass is fully identical to what SeaBIOS does, so the RSDT too is
+allocated (as part of its containing fw_cfg blob, of course) and its
+fields are patched like anything else.
+
+In the second pass, the (now relocated) pointers are checked again,
+based on the ADD_POINTER commands. Wherever the (now relocated) pointers
+point, we probe for ACPI table headers. If the target passes the probe
+(i.e., it looks like an ACPI table), we call
+EFI_ACPI_TABLE_PROTOCOL.InstallAcpiTable() with it. This installs a
+separate copy of that table, maintaining RSDT and XSDT internally.
+
+Now, the RSD PTR table has a pointer to the RSDT, so normally we'd
+invoke InstallAcpiTable() with the RSDT as well, in the second pass. To
+prevent that, we have a quirk that recognizes RSDT and XSDT, and skips them.
+
+So you can say that the RSDT from QEMU is *ultimately* ignored in OVMF,
+but for the first pass to complete (which is identical to SeaBIOS's only
+pass), OVMF uses the RSDT (as embedded in its containing fw_cfg blob) too.
+
+There are more details about the second pass. If a (relocated) pointer
+points to some stuff that doesn't look like an ACPI table header, then
+we don't install that thing with InstallAcpiTable(). Instead, we think
+that at that location the containing fw_cfg blob contains an
+opregion-like area, so its actual absolute address is relevant (remember
+we are past the first pass, which completed all the relocations). So in
+this case, the containing fw_cfg blob is marked as "non-releasable", and
+we'll keep it forever (in AcpiNVS memory). Otherwise, if at the end of
+processing a blob is marked as releasable (the default), because all
+pointers into it pointed only at ACPI table headers, we free the blob.
+
+There are more details about the second pass. There can be several
+pointers that point to the same address (= same offset of the same
+pointed-to fw_cfg blob). In such cases, only the first encounter is
+honored with an InstallAcpiTable() call, further surfacings of the same
+target address are skipped.
+
+Now, the heuristics to determine whether a pointed-to location is an
+ACPI table header or not, is not fool-proof. It recognizes all valid
+headers (so no false negatives), I think, but it could also
+mis-recognize random garbage in an opregion-like blob as an ACPI table
+header (so there's a chance for false positives). In order to suppress
+these false positives deterministically, there are two methods:
+
+- prefix all such areas in the pointed-to blobs with a sufficient number
+of zeroes so that the probe would fail, guaranteed. However, this means
+that you have to keep the ADD_POINTER commands pointed at the zeroes,
+not at the real opregion, so you need to add the offset in the AML code
+at runtime, to actually access the opregion.
+
+- the other method is the "no ACPI content" hint, proposed here. In this
+case whenever an ADD_POINTER command is found, in the 2nd pass, to point
+into a blob that had this "no ACPI content" hint at ALLOCATE time, the
+probing is skipped immediately.
+
+> 2. Some tables can go into AddressRangeACPI, some into AddressRangeNVS,
+>    but they never need to be in AddressRangeReserved.
+>    It would be simple if we could just say "allocate this table
+>    from AddressRangeACPI". But I am not sure this is true
+>    since e.g. stuff used for power management can't go into
+>    AddressRangeACPI.  Thoughts?
+
+For the first pass, OVMF allocates all the blobs in AcpiNVS memory. Most
+of these blobs are ultimately released (because they only contain ACPI
+tables, of which EFI_ACPI_TABLE_PROTOCOL.InstallAcpiTable() creates deep
+copies). The blobs that are marked as non-releasable (see above) are
+preserved in AcpiNVS memory.
+
+Regarding the tables that EFI_ACPI_TABLE_PROTOCOL.InstallAcpiTable()
+installs -- this protocol member function has internal knowledge about
+what table should be allocated in what kind of memory. It cannot be
+influenced from the outside. Years ago I proposed and
+EFI_ACPI_TABLE_PROTOCOL2 on the USWG list, in which the
+InstallAcpiTable() member would additionally take the memory type to
+place the copied / installed table into. I received zero feedback.
+
+Thanks
+Laszlo
+
+>> After introducing these, the QEMU series puts them to use, covering all
+>> of the currently generated ALLOCATE commands, as appropriate. Among the
+>> benefits we can mention
+>> - the removal of the OVMF ACPI SDT Header Probe suppressor from VMGENID
+>> (and from any similar future devices),
+>> - and the fact that the "virt" machine type (and maybe other machine
+>> types) of the arm/aarch64 target will no longer require RAM under 4GB
+>> for ACPI to work.
+>>
+>> Both of these extensions are irrelevant for SeaBIOS, therefore the
+>> SeaBIOS patches simply mask out bit 7 (for ignoring the "no ACPI
+>> content" hint), and fall back to the HIGH zone (= 32-bit address space)
+>> when the 64-bit zone is permitted.
+>>
+>> In other words, SeaBIOS needs some patches to recognize the new zone
+>> values, but beyond that, the behavior is unchanged.
+>>
+>> Both extensions are important for virtual UEFI firmware (OVMF in x86
+>> guests and ArmVirtQemu in aarch64 guests). The edk2 patches add support
+>> to OvmfPkg/AcpiPlatformDxe for the extensions. Please see the commit
+>> messages for details (all the extensions are explained in detail in the
+>> relevant patches for all of the projects).
+>>
+>> The patches can cause linker/loader breakage when old firmware is booted
+>> on new QEMU. However, that's no problem (it's nothing new), the next
+>> release of QEMU should bundle the new firmware binaries as always.
+>>
+>> New firmware will continue running on old QEMU without issues.
+>>
+>> (In case you have sent me emails about this in the last few tens of
+>> hours, please know that I'm not ignoring them, I just haven't seen /
+>> read them. Reading emails every five minutes makes focused work
+>> impossible, so when I'm busy, I tend to read email once per day.)
+>>
+>> Thanks
+>> Laszlo
