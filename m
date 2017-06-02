@@ -1,21 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35980)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40504)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1dGo5Q-0001FZ-Ia
-	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 11:02:06 -0400
+	(envelope-from <eblake@redhat.com>) id 1dGoIo-0002l0-Vi
+	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 11:15:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1dGo5M-0002gx-1r
-	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 11:02:00 -0400
-Received: from mailhub.sw.ru ([195.214.232.25]:24307 helo=relay.sw.ru)
+	(envelope-from <eblake@redhat.com>) id 1dGoIl-0001kj-08
+	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 11:15:50 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:58570)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
-	id 1dGo5L-0002eX-F4
-	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 11:01:56 -0400
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Fri,  2 Jun 2017 18:01:39 +0300
-Message-Id: <20170602150150.258222-2-vsementsov@virtuozzo.com>
-In-Reply-To: <20170602150150.258222-1-vsementsov@virtuozzo.com>
-References: <20170602150150.258222-1-vsementsov@virtuozzo.com>
-Subject: [Qemu-devel] [PATCH v2 01/12] nbd: rename read_sync and friends
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dGoIk-0001kW-Ng
+	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 11:15:46 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id DE1CDC04B948
+	for <qemu-devel@nongnu.org>; Fri,  2 Jun 2017 15:15:44 +0000 (UTC)
+References: <20170601220813.30535-1-quintela@redhat.com>
+	<20170601220813.30535-4-quintela@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <6d275b7f-5f31-0f41-21e4-4d1abe96d7f7@redhat.com>
+Date: Fri, 2 Jun 2017 10:15:41 -0500
+MIME-Version: 1.0
+In-Reply-To: <20170601220813.30535-4-quintela@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="CWfXwcR8D3eXSHRfFcuRCnmL9sUavepj7"
+Subject: Re: [Qemu-devel] [PATCH 3/5] migration: Print statistics about the
+ number of remaining target pages
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,419 +35,118 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: pbonzini@redhat.com, eblake@redhat.com, den@openvz.org, vsementsov@virtuozzo.com
+To: Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org
+Cc: lvivier@redhat.com, dgilbert@redhat.com, peterx@redhat.com
 
-Rename
-  nbd_wr_syncv -> nbd_rwv
-  read_sync -> nbd_read
-  read_sync_eof -> nbd_read_eof
-  write_sync -> nbd_write
-  drop_sync -> nbd_drop
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--CWfXwcR8D3eXSHRfFcuRCnmL9sUavepj7
+From: Eric Blake <eblake@redhat.com>
+To: Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org
+Cc: lvivier@redhat.com, dgilbert@redhat.com, peterx@redhat.com
+Message-ID: <6d275b7f-5f31-0f41-21e4-4d1abe96d7f7@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 3/5] migration: Print statistics about the
+ number of remaining target pages
+References: <20170601220813.30535-1-quintela@redhat.com>
+ <20170601220813.30535-4-quintela@redhat.com>
+In-Reply-To: <20170601220813.30535-4-quintela@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-1. nbd_ prefix
-   read_sync and write_sync are already shared, so it is good to have a
-   namespace prefix. drop_sync will be shared, and read_sync_eof is
-   related to read_sync, so let's rename them all.
+On 06/01/2017 05:08 PM, Juan Quintela wrote:
+> Signed-off-by: Juan Quintela <quintela@redhat.com>
+> ---
+>  migration/migration.c | 4 +++-
+>  migration/ram.c       | 4 ++--
+>  migration/ram.h       | 2 +-
+>  qapi-schema.json      | 6 +++++-
+>  4 files changed, 11 insertions(+), 5 deletions(-)
+>=20
+> diff --git a/migration/migration.c b/migration/migration.c
+> index ea3d41c..2c13217 100644
+> --- a/migration/migration.c
+> +++ b/migration/migration.c
+> @@ -518,7 +518,9 @@ static void populate_ram_info(MigrationInfo *info, =
+MigrationState *s)
+>      }
+> =20
+>      if (s->state !=3D MIGRATION_STATUS_COMPLETED) {
+> -        info->ram->remaining =3D ram_bytes_remaining();
+> +        info->ram->remaining_pages =3D ram_pages_remaining();
+> +        info->ram->remaining =3D ram_pages_remaining() *
+> +            qemu_target_page_size();
 
-2. _sync suffix
-   _sync is related to the fact that nbd_wr_syncv doesn't return if a
-   write to socket returns EAGAIN. The first implementation of
-   nbd_wr_syncv (was wr_sync in 7a5ca8648b) just loops while getting
-   EAGAIN, the current implementation yields in this case.
-   Why we want to get rid of it:
-   - it is normal for r/w functions to be synchronous, so having an
-     additional suffix for it looks redundant (contrariwise, we have
-     _aio suffix for async functions)
-   - _sync suffix in block layer is used when function does flush (so
-     using it for other thing is confusing a bit)
-   - keep function names short after adding nbd_ prefix
+Why not the opposite direction, of:
 
-3. for nbd_wr_syncv let's use more common notation 'rw'
+info->ram->remaining_pages =3D ram_bytes_remaining() /
+qemu_target_page_size();
+info->ram->remaining =3D ram_bytes_remaining();
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
-Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
----
- block/nbd-client.c  |  8 ++++----
- include/block/nbd.h |  8 ++------
- nbd/client.c        | 42 +++++++++++++++++++++---------------------
- nbd/common.c        |  8 ++------
- nbd/nbd-internal.h  | 26 +++++++++++++-------------
- nbd/server.c        | 12 ++++++------
- 6 files changed, 48 insertions(+), 56 deletions(-)
+?
 
-diff --git a/block/nbd-client.c b/block/nbd-client.c
-index 09d955bc4d..3e080ca7f0 100644
---- a/block/nbd-client.c
-+++ b/block/nbd-client.c
-@@ -140,8 +140,8 @@ static int nbd_co_send_request(BlockDriverState *bs,
-         qio_channel_set_cork(s->ioc, true);
-         rc = nbd_send_request(s->ioc, request);
-         if (rc >= 0) {
--            ret = nbd_wr_syncv(s->ioc, qiov->iov, qiov->niov, request->len,
--                               false, NULL);
-+            ret = nbd_rwv(s->ioc, qiov->iov, qiov->niov, request->len, false,
-+                          NULL);
-             if (ret != request->len) {
-                 rc = -EIO;
-             }
-@@ -169,8 +169,8 @@ static void nbd_co_receive_reply(NBDClientSession *s,
-         reply->error = EIO;
-     } else {
-         if (qiov && reply->error == 0) {
--            ret = nbd_wr_syncv(s->ioc, qiov->iov, qiov->niov, request->len,
--                               true, NULL);
-+            ret = nbd_rwv(s->ioc, qiov->iov, qiov->niov, request->len, true,
-+                          NULL);
-             if (ret != request->len) {
-                 reply->error = EIO;
-             }
-diff --git a/include/block/nbd.h b/include/block/nbd.h
-index e0c64e4981..0a5ecd0e5c 100644
---- a/include/block/nbd.h
-+++ b/include/block/nbd.h
-@@ -123,12 +123,8 @@ enum {
-  * aren't overflowing some other buffer. */
- #define NBD_MAX_NAME_SIZE 256
- 
--ssize_t nbd_wr_syncv(QIOChannel *ioc,
--                     struct iovec *iov,
--                     size_t niov,
--                     size_t length,
--                     bool do_read,
--                     Error **errp);
-+ssize_t nbd_rwv(QIOChannel *ioc, struct iovec *iov, size_t niov, size_t length,
-+                bool do_read, Error **errp);
- int nbd_receive_negotiate(QIOChannel *ioc, const char *name, uint16_t *flags,
-                           QCryptoTLSCreds *tlscreds, const char *hostname,
-                           QIOChannel **outioc,
-diff --git a/nbd/client.c b/nbd/client.c
-index f9e1d75be4..08050c39b3 100644
---- a/nbd/client.c
-+++ b/nbd/client.c
-@@ -88,7 +88,7 @@ static QTAILQ_HEAD(, NBDExport) exports = QTAILQ_HEAD_INITIALIZER(exports);
- 
- /* Discard length bytes from channel.  Return -errno on failure and 0 on
-  * success*/
--static int drop_sync(QIOChannel *ioc, size_t size, Error **errp)
-+static int nbd_drop(QIOChannel *ioc, size_t size, Error **errp)
- {
-     ssize_t ret = 0;
-     char small[1024];
-@@ -97,7 +97,7 @@ static int drop_sync(QIOChannel *ioc, size_t size, Error **errp)
-     buffer = sizeof(small) >= size ? small : g_malloc(MIN(65536, size));
-     while (size > 0) {
-         ssize_t count = MIN(65536, size);
--        ret = read_sync(ioc, buffer, MIN(65536, size), errp);
-+        ret = nbd_read(ioc, buffer, MIN(65536, size), errp);
- 
-         if (ret < 0) {
-             goto cleanup;
-@@ -135,12 +135,12 @@ static int nbd_send_option_request(QIOChannel *ioc, uint32_t opt,
-     stl_be_p(&req.option, opt);
-     stl_be_p(&req.length, len);
- 
--    if (write_sync(ioc, &req, sizeof(req), errp) < 0) {
-+    if (nbd_write(ioc, &req, sizeof(req), errp) < 0) {
-         error_prepend(errp, "Failed to send option request header");
-         return -1;
-     }
- 
--    if (len && write_sync(ioc, (char *) data, len, errp) < 0) {
-+    if (len && nbd_write(ioc, (char *) data, len, errp) < 0) {
-         error_prepend(errp, "Failed to send option request data");
-         return -1;
-     }
-@@ -169,7 +169,7 @@ static int nbd_receive_option_reply(QIOChannel *ioc, uint32_t opt,
-                                     nbd_opt_reply *reply, Error **errp)
- {
-     QEMU_BUILD_BUG_ON(sizeof(*reply) != 20);
--    if (read_sync(ioc, reply, sizeof(*reply), errp) < 0) {
-+    if (nbd_read(ioc, reply, sizeof(*reply), errp) < 0) {
-         error_prepend(errp, "failed to read option reply");
-         nbd_send_opt_abort(ioc);
-         return -1;
-@@ -218,7 +218,7 @@ static int nbd_handle_reply_err(QIOChannel *ioc, nbd_opt_reply *reply,
-             goto cleanup;
-         }
-         msg = g_malloc(reply->length + 1);
--        if (read_sync(ioc, msg, reply->length, errp) < 0) {
-+        if (nbd_read(ioc, msg, reply->length, errp) < 0) {
-             error_prepend(errp, "failed to read option error message");
-             goto cleanup;
-         }
-@@ -320,7 +320,7 @@ static int nbd_receive_list(QIOChannel *ioc, const char *want, bool *match,
-         nbd_send_opt_abort(ioc);
-         return -1;
-     }
--    if (read_sync(ioc, &namelen, sizeof(namelen), errp) < 0) {
-+    if (nbd_read(ioc, &namelen, sizeof(namelen), errp) < 0) {
-         error_prepend(errp, "failed to read option name length");
-         nbd_send_opt_abort(ioc);
-         return -1;
-@@ -333,7 +333,7 @@ static int nbd_receive_list(QIOChannel *ioc, const char *want, bool *match,
-         return -1;
-     }
-     if (namelen != strlen(want)) {
--        if (drop_sync(ioc, len, errp) < 0) {
-+        if (nbd_drop(ioc, len, errp) < 0) {
-             error_prepend(errp, "failed to skip export name with wrong length");
-             nbd_send_opt_abort(ioc);
-             return -1;
-@@ -342,14 +342,14 @@ static int nbd_receive_list(QIOChannel *ioc, const char *want, bool *match,
-     }
- 
-     assert(namelen < sizeof(name));
--    if (read_sync(ioc, name, namelen, errp) < 0) {
-+    if (nbd_read(ioc, name, namelen, errp) < 0) {
-         error_prepend(errp, "failed to read export name");
-         nbd_send_opt_abort(ioc);
-         return -1;
-     }
-     name[namelen] = '\0';
-     len -= namelen;
--    if (drop_sync(ioc, len, errp) < 0) {
-+    if (nbd_drop(ioc, len, errp) < 0) {
-         error_prepend(errp, "failed to read export description");
-         nbd_send_opt_abort(ioc);
-         return -1;
-@@ -476,7 +476,7 @@ int nbd_receive_negotiate(QIOChannel *ioc, const char *name, uint16_t *flags,
-         goto fail;
-     }
- 
--    if (read_sync(ioc, buf, 8, errp) < 0) {
-+    if (nbd_read(ioc, buf, 8, errp) < 0) {
-         error_prepend(errp, "Failed to read data");
-         goto fail;
-     }
-@@ -502,7 +502,7 @@ int nbd_receive_negotiate(QIOChannel *ioc, const char *name, uint16_t *flags,
-         goto fail;
-     }
- 
--    if (read_sync(ioc, &magic, sizeof(magic), errp) < 0) {
-+    if (nbd_read(ioc, &magic, sizeof(magic), errp) < 0) {
-         error_prepend(errp, "Failed to read magic");
-         goto fail;
-     }
-@@ -514,7 +514,7 @@ int nbd_receive_negotiate(QIOChannel *ioc, const char *name, uint16_t *flags,
-         uint16_t globalflags;
-         bool fixedNewStyle = false;
- 
--        if (read_sync(ioc, &globalflags, sizeof(globalflags), errp) < 0) {
-+        if (nbd_read(ioc, &globalflags, sizeof(globalflags), errp) < 0) {
-             error_prepend(errp, "Failed to read server flags");
-             goto fail;
-         }
-@@ -532,7 +532,7 @@ int nbd_receive_negotiate(QIOChannel *ioc, const char *name, uint16_t *flags,
-         }
-         /* client requested flags */
-         clientflags = cpu_to_be32(clientflags);
--        if (write_sync(ioc, &clientflags, sizeof(clientflags), errp) < 0) {
-+        if (nbd_write(ioc, &clientflags, sizeof(clientflags), errp) < 0) {
-             error_prepend(errp, "Failed to send clientflags field");
-             goto fail;
-         }
-@@ -570,13 +570,13 @@ int nbd_receive_negotiate(QIOChannel *ioc, const char *name, uint16_t *flags,
-         }
- 
-         /* Read the response */
--        if (read_sync(ioc, &s, sizeof(s), errp) < 0) {
-+        if (nbd_read(ioc, &s, sizeof(s), errp) < 0) {
-             error_prepend(errp, "Failed to read export length");
-             goto fail;
-         }
-         *size = be64_to_cpu(s);
- 
--        if (read_sync(ioc, flags, sizeof(*flags), errp) < 0) {
-+        if (nbd_read(ioc, flags, sizeof(*flags), errp) < 0) {
-             error_prepend(errp, "Failed to read export flags");
-             goto fail;
-         }
-@@ -593,14 +593,14 @@ int nbd_receive_negotiate(QIOChannel *ioc, const char *name, uint16_t *flags,
-             goto fail;
-         }
- 
--        if (read_sync(ioc, &s, sizeof(s), errp) < 0) {
-+        if (nbd_read(ioc, &s, sizeof(s), errp) < 0) {
-             error_prepend(errp, "Failed to read export length");
-             goto fail;
-         }
-         *size = be64_to_cpu(s);
-         TRACE("Size is %" PRIu64, *size);
- 
--        if (read_sync(ioc, &oldflags, sizeof(oldflags), errp) < 0) {
-+        if (nbd_read(ioc, &oldflags, sizeof(oldflags), errp) < 0) {
-             error_prepend(errp, "Failed to read export flags");
-             goto fail;
-         }
-@@ -616,7 +616,7 @@ int nbd_receive_negotiate(QIOChannel *ioc, const char *name, uint16_t *flags,
-     }
- 
-     TRACE("Size is %" PRIu64 ", export flags %" PRIx16, *size, *flags);
--    if (zeroes && drop_sync(ioc, 124, errp) < 0) {
-+    if (zeroes && nbd_drop(ioc, 124, errp) < 0) {
-         error_prepend(errp, "Failed to read reserved block");
-         goto fail;
-     }
-@@ -759,7 +759,7 @@ ssize_t nbd_send_request(QIOChannel *ioc, NBDRequest *request)
-     stq_be_p(buf + 16, request->from);
-     stl_be_p(buf + 24, request->len);
- 
--    return write_sync(ioc, buf, sizeof(buf), NULL);
-+    return nbd_write(ioc, buf, sizeof(buf), NULL);
- }
- 
- ssize_t nbd_receive_reply(QIOChannel *ioc, NBDReply *reply, Error **errp)
-@@ -768,7 +768,7 @@ ssize_t nbd_receive_reply(QIOChannel *ioc, NBDReply *reply, Error **errp)
-     uint32_t magic;
-     ssize_t ret;
- 
--    ret = read_sync_eof(ioc, buf, sizeof(buf), errp);
-+    ret = nbd_read_eof(ioc, buf, sizeof(buf), errp);
-     if (ret <= 0) {
-         return ret;
-     }
-diff --git a/nbd/common.c b/nbd/common.c
-index bd81637ab9..d6b719ddaa 100644
---- a/nbd/common.c
-+++ b/nbd/common.c
-@@ -24,12 +24,8 @@
-  * The function may be called from coroutine or from non-coroutine context.
-  * When called from non-coroutine context @ioc must be in blocking mode.
-  */
--ssize_t nbd_wr_syncv(QIOChannel *ioc,
--                     struct iovec *iov,
--                     size_t niov,
--                     size_t length,
--                     bool do_read,
--                     Error **errp)
-+ssize_t nbd_rwv(QIOChannel *ioc, struct iovec *iov, size_t niov, size_t length,
-+                bool do_read, Error **errp)
- {
-     ssize_t done = 0;
-     struct iovec *local_iov = g_new(struct iovec, niov);
-diff --git a/nbd/nbd-internal.h b/nbd/nbd-internal.h
-index d6071640a0..753cb9d9c5 100644
---- a/nbd/nbd-internal.h
-+++ b/nbd/nbd-internal.h
-@@ -94,14 +94,14 @@
- #define NBD_ENOSPC     28
- #define NBD_ESHUTDOWN  108
- 
--/* read_sync_eof
-+/* nbd_read_eof
-  * Tries to read @size bytes from @ioc. Returns number of bytes actually read.
-  * May return a value >= 0 and < size only on EOF, i.e. when iteratively called
-- * qio_channel_readv() returns 0. So, there are no needs to call read_sync_eof
-+ * qio_channel_readv() returns 0. So, there is no need to call nbd_read_eof
-  * iteratively.
-  */
--static inline ssize_t read_sync_eof(QIOChannel *ioc, void *buffer, size_t size,
--                                    Error **errp)
-+static inline ssize_t nbd_read_eof(QIOChannel *ioc, void *buffer, size_t size,
-+                                   Error **errp)
- {
-     struct iovec iov = { .iov_base = buffer, .iov_len = size };
-     /* Sockets are kept in blocking mode in the negotiation phase.  After
-@@ -109,16 +109,16 @@ static inline ssize_t read_sync_eof(QIOChannel *ioc, void *buffer, size_t size,
-      * our request/reply.  Synchronization is done with recv_coroutine, so
-      * that this is coroutine-safe.
-      */
--    return nbd_wr_syncv(ioc, &iov, 1, size, true, errp);
-+    return nbd_rwv(ioc, &iov, 1, size, true, errp);
- }
- 
--/* read_sync
-+/* nbd_read
-  * Reads @size bytes from @ioc. Returns 0 on success.
-  */
--static inline int read_sync(QIOChannel *ioc, void *buffer, size_t size,
--                            Error **errp)
-+static inline int nbd_read(QIOChannel *ioc, void *buffer, size_t size,
-+                           Error **errp)
- {
--    ssize_t ret = read_sync_eof(ioc, buffer, size, errp);
-+    ssize_t ret = nbd_read_eof(ioc, buffer, size, errp);
- 
-     if (ret >= 0 && ret != size) {
-         ret = -EINVAL;
-@@ -128,15 +128,15 @@ static inline int read_sync(QIOChannel *ioc, void *buffer, size_t size,
-     return ret < 0 ? ret : 0;
- }
- 
--/* write_sync
-+/* nbd_write
-  * Writes @size bytes to @ioc. Returns 0 on success.
-  */
--static inline int write_sync(QIOChannel *ioc, const void *buffer, size_t size,
--                             Error **errp)
-+static inline int nbd_write(QIOChannel *ioc, const void *buffer, size_t size,
-+                            Error **errp)
- {
-     struct iovec iov = { .iov_base = (void *) buffer, .iov_len = size };
- 
--    ssize_t ret = nbd_wr_syncv(ioc, &iov, 1, size, false, errp);
-+    ssize_t ret = nbd_rwv(ioc, &iov, 1, size, false, errp);
- 
-     assert(ret < 0 || ret == size);
- 
-diff --git a/nbd/server.c b/nbd/server.c
-index ee59e5d234..abaf9fb890 100644
---- a/nbd/server.c
-+++ b/nbd/server.c
-@@ -124,7 +124,7 @@ static int nbd_negotiate_read(QIOChannel *ioc, void *buffer, size_t size)
-                                   nbd_negotiate_continue,
-                                   qemu_coroutine_self(),
-                                   NULL);
--    ret = read_sync(ioc, buffer, size, NULL);
-+    ret = nbd_read(ioc, buffer, size, NULL);
-     g_source_remove(watch);
-     return ret;
- 
-@@ -142,7 +142,7 @@ static int nbd_negotiate_write(QIOChannel *ioc, const void *buffer, size_t size)
-                                   nbd_negotiate_continue,
-                                   qemu_coroutine_self(),
-                                   NULL);
--    ret = write_sync(ioc, buffer, size, NULL);
-+    ret = nbd_write(ioc, buffer, size, NULL);
-     g_source_remove(watch);
-     return ret;
- }
-@@ -694,7 +694,7 @@ static ssize_t nbd_receive_request(QIOChannel *ioc, NBDRequest *request)
-     uint32_t magic;
-     ssize_t ret;
- 
--    ret = read_sync(ioc, buf, sizeof(buf), NULL);
-+    ret = nbd_read(ioc, buf, sizeof(buf), NULL);
-     if (ret < 0) {
-         return ret;
-     }
-@@ -745,7 +745,7 @@ static ssize_t nbd_send_reply(QIOChannel *ioc, NBDReply *reply)
-     stl_be_p(buf + 4, reply->error);
-     stq_be_p(buf + 8, reply->handle);
- 
--    return write_sync(ioc, buf, sizeof(buf), NULL);
-+    return nbd_write(ioc, buf, sizeof(buf), NULL);
- }
- 
- #define MAX_NBD_REQUESTS 16
-@@ -1048,7 +1048,7 @@ static ssize_t nbd_co_send_reply(NBDRequestData *req, NBDReply *reply,
-         qio_channel_set_cork(client->ioc, true);
-         rc = nbd_send_reply(client->ioc, reply);
-         if (rc >= 0) {
--            ret = write_sync(client->ioc, req->data, len, NULL);
-+            ret = nbd_write(client->ioc, req->data, len, NULL);
-             if (ret < 0) {
-                 rc = -EIO;
-             }
-@@ -1123,7 +1123,7 @@ static ssize_t nbd_co_receive_request(NBDRequestData *req,
-     if (request->type == NBD_CMD_WRITE) {
-         TRACE("Reading %" PRIu32 " byte(s)", request->len);
- 
--        if (read_sync(client->ioc, req->data, request->len, NULL) < 0) {
-+        if (nbd_read(client->ioc, req->data, request->len, NULL) < 0) {
-             LOG("reading from socket failed");
-             rc = -EIO;
-             goto out;
--- 
-2.11.1
+> +++ b/migration/ram.h
+> @@ -41,7 +41,7 @@ uint64_t xbzrle_mig_pages_cache_miss(void);
+>  double xbzrle_mig_cache_miss_rate(void);
+>  uint64_t xbzrle_mig_pages_overflow(void);
+>  uint64_t ram_bytes_transferred(void);
+> -uint64_t ram_bytes_remaining(void);
+> +uint64_t ram_pages_remaining(void);
+>  uint64_t ram_dirty_sync_count(void);
+>  uint64_t ram_dirty_pages_rate(void);
+>  uint64_t ram_postcopy_requests(void);
+
+I know we already have a mishmash of which interfaces are byte-based vs.
+page-based, but using byte-based everywhere seems like a better goal,
+and this feels like we are going backwards from that goal.
+
+> diff --git a/qapi-schema.json b/qapi-schema.json
+> index 4b50b65..ff1c048 100644
+> --- a/qapi-schema.json
+> +++ b/qapi-schema.json
+> @@ -601,6 +601,9 @@
+>  # @page-size: The number of bytes per page for the various page-based
+>  #        statistics (since 2.10)
+>  #
+> +# @remaining-pages: amount of pages remaining to be transferred to the=
+ target VM
+> +#        (since 2.10)
+> +#
+>  # Since: 0.14.0
+>  ##
+>  { 'struct': 'MigrationStats',
+> @@ -608,7 +611,8 @@
+>             'duplicate': 'int', 'skipped': 'int', 'normal': 'int',
+>             'normal-bytes': 'int', 'dirty-pages-rate' : 'int',
+>             'mbps' : 'number', 'dirty-sync-count' : 'int',
+> -           'postcopy-requests' : 'int', 'page-size' : 'int' } }
+> +           'postcopy-requests' : 'int', 'page-size' : 'int',
+> +           'remaining-pages' : 'int' } }
+
+We already have 'remaining'; why do we need a redundant stat
+'remaining-pages'?
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--CWfXwcR8D3eXSHRfFcuRCnmL9sUavepj7
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEcBAEBCAAGBQJZMYEdAAoJEKeha0olJ0NqvhEIAJJFtxQlvqZgRbXWxuRDodqt
+vpZjG7NbvwRw03fDsniHBX2SLD9AemAD5P9w0lcEClIwDI1wcBcDLigax6UyJ9ZH
+bD4QOzJcpLc1tdKCxnqXG0YNru4RNYPBTOXlDbYuAuyg9MKI0ffSOO/bwraTxcrZ
+6Wpyu2LJe6VvblV7mfigRwZv+RsCHTwcLnnpJlgAS0xTSk+kB+XWtzEQF4D1X7lL
+MPTrlC8gRBkH2qK40o252CjpMD0ZZ5TTnE5zvY74foTckLfobZhGKjfwwI5xPXQs
+6LqRcSYwh8JWY93t9ImG3kxwzccYEPgoLYm6DL8aNzuUAiImmbHpvzd8OcMNOLg=
+=Q/kA
+-----END PGP SIGNATURE-----
+
+--CWfXwcR8D3eXSHRfFcuRCnmL9sUavepj7--
