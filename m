@@ -1,34 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56021)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59437)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dGfo2-0004ly-3Z
-	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 02:11:31 -0400
+	(envelope-from <armbru@redhat.com>) id 1dGg6r-0001lL-Sp
+	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 02:30:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dGfnw-0004CO-V6
-	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 02:11:30 -0400
-Received: from indium.canonical.com ([91.189.90.7]:34314)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1dGfnw-0004C5-P4
-	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 02:11:24 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1dGfnv-0001dI-UH
-	for <qemu-devel@nongnu.org>; Fri, 02 Jun 2017 06:11:23 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id E172D2E8199
-	for <qemu-devel@nongnu.org>; Fri,  2 Jun 2017 06:11:23 +0000 (UTC)
+	(envelope-from <armbru@redhat.com>) id 1dGg6n-0000ou-VB
+	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 02:30:57 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:33594)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dGg6n-0000oe-OX
+	for qemu-devel@nongnu.org; Fri, 02 Jun 2017 02:30:53 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <20170509173559.31598-1-marcandre.lureau@redhat.com>
+	<20170509173559.31598-5-marcandre.lureau@redhat.com>
+	<8737cbv53y.fsf@dusky.pond.sub.org>
+	<CAJ+F1C+9WAO2RZt-x7hzzh5M6HBv4UjR6svj71vLJD31axC_Zw@mail.gmail.com>
+	<87lgpel8z2.fsf@dusky.pond.sub.org>
+	<CAJ+F1C+wcUgiW6QhQUpsA133F+XR8p4wHDHYnr-y11FhRj1Bxg@mail.gmail.com>
+Date: Fri, 02 Jun 2017 08:30:49 +0200
+In-Reply-To: <CAJ+F1C+wcUgiW6QhQUpsA133F+XR8p4wHDHYnr-y11FhRj1Bxg@mail.gmail.com>
+	(=?utf-8?Q?=22Marc-Andr=C3=A9?= Lureau"'s message of "Tue, 30 May 2017
+	15:36:07 +0000")
+Message-ID: <87h8zyoq92.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Date: Fri, 02 Jun 2017 06:02:59 -0000
-From: ChristianEhrhardt <1694808@bugs.launchpad.net>
-Reply-To: Bug 1694808 <1694808@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <149625981140.25356.9191241290348673100.malonedeb@soybean.canonical.com>
-Message-Id: <149638337962.24782.5922810078863937613.malone@soybean.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1694808] Re: Passthrough USB Host Keyboard
- doesn't work on Q35 platform on boot-up
+Subject: Re: [Qemu-devel] [PATCH 04/17] qapi: merge QInt and QFloat in QNum
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,43 +33,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@gmail.com>
+Cc: qemu-devel@nongnu.org
 
-Thanks Thomas, definitely worth to check.
-@Colin - if you want a quick and easy short with qemu 2.8 you can try  [1].
+Marc-Andr=C3=A9 Lureau <marcandre.lureau@gmail.com> writes:
 
-[1]: https://wiki.ubuntu.com/OpenStack/CloudArchive
+> Hi
+>
+> On Tue, May 30, 2017 at 6:23 PM Markus Armbruster <armbru@redhat.com> wro=
+te:
+>
+>> Marc-Andr=C3=A9 Lureau <marcandre.lureau@gmail.com> writes:
+>>
+>> > Hi
+>> >
+>> > On Thu, May 11, 2017 at 6:30 PM Markus Armbruster <armbru@redhat.com> =
+wrote:
+[...]
+>> >> g_assert_not_reached() is problematic, see "[PATCH] checkpatch: Disal=
+low
+>> >> glib asserts in main code".
+>> >>
+>> >> Message-Id: <20170427165526.19836-1-dgilbert@redhat.com>
+>> >> https://lists.gnu.org/archive/html/qemu-devel/2017-04/msg05499.html
+>> >>
+>> >>
+>> > Actually g_assert() and g_assert_not_reached() are accepted.
+>>
+>> What exactly does g_assert() buy us over plain assert(), and
+>> g_assert_not_reached() over assert(0)?
+>>
+>
+> g_assert() brings a bit more context, afaik, can be trapped for error
+> testing, and error reporting can be handled by an handler. Not that useful
+> to qemu, but could be for the graphical UI though.
+>
+> g_assert_not_reached() is quite more readable than assert(0)
 
--- =
+I'm all for making intent explicit, but what else could assert(0)
+possibly mean?
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1694808
+>> qapi/ overwhelmingly uses assert().
+>>
+>
+> ok, it's already a mix of assert & g_assert in qemu though
 
-Title:
-  Passthrough USB Host Keyboard doesn't work on Q35 platform on boot-up
+True.
 
-Status in QEMU:
-  Incomplete
-Status in qemu-kvm package in Ubuntu:
-  New
+In my opinion, we should use only one outside tests.  g_assert() if it
+adds value, else plain assert().  "Outside tests", because g_assert()
+might add sufficient value in tests even when it doesn't elsewhere.
 
-Bug description:
-  Using qemu-kvm as shipped with Ubuntu 16.04, I cannot get a passed-
-  through USB Host Keyboard to work at boot-up using the Q35 platform.
-
-  My minimal example to verify this bug is the following:
-
-    qemu-system-x86_64 -M q35 -m 128 -cdrom mini.iso -usb -usbdevice
-  host:04ca:005a -vnc :1 -display none
-
-  Using a noname USB Keyboard with ID 04ca:005a and the Ubuntu 16.04
-  NetBoot mini.iso, I can see the boot screen of the Ubuntu ISO through
-  VNC, but pressing the arrow keys doesn't do anything.
-
-  By taking out the "-M q35" parameter, QEMU switches to the traditional
-  i440FX system. The passed-through USB Host Keyboard works there, but
-  the old platform is no option for me.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1694808/+subscriptions
+Until then, I prefer to use only one *locally*.  In qapi/, that's plain
+assert() now.
