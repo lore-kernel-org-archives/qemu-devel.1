@@ -1,21 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48692)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50695)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ashijeetacharya@gmail.com>) id 1dH7Xw-0007yv-I9
-	for qemu-devel@nongnu.org; Sat, 03 Jun 2017 07:48:45 -0400
+	(envelope-from <lersek@redhat.com>) id 1dH7l3-0003Ct-96
+	for qemu-devel@nongnu.org; Sat, 03 Jun 2017 08:02:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ashijeetacharya@gmail.com>) id 1dH7Xv-0004io-EI
-	for qemu-devel@nongnu.org; Sat, 03 Jun 2017 07:48:44 -0400
+	(envelope-from <lersek@redhat.com>) id 1dH7l0-0004F9-VU
+	for qemu-devel@nongnu.org; Sat, 03 Jun 2017 08:02:15 -0400
+From: Laszlo Ersek <lersek@redhat.com>
+References: <1493530506-26833-1-git-send-email-gengdongjiu@huawei.com>
+	<4dde45bb-a730-82b1-dc49-ad00a6b73d85@redhat.com>
+	<accf8880-f4b0-85f1-9f33-4103c8c26d7a@redhat.com>
+Message-ID: <e90c5fb8-e68b-a620-9023-f4fcfdd68e97@redhat.com>
+Date: Sat, 3 Jun 2017 14:01:45 +0200
 MIME-Version: 1.0
-In-Reply-To: <20170601135758.GG13127@lemon.lan>
-References: <1492838021-10538-1-git-send-email-ashijeetacharya@gmail.com>
-	<1492838021-10538-7-git-send-email-ashijeetacharya@gmail.com>
-	<20170601135758.GG13127@lemon.lan>
-From: Ashijeet Acharya <ashijeetacharya@gmail.com>
-Date: Sat, 3 Jun 2017 17:18:37 +0530
-Message-ID: <CAC2QTZaFDpJMoUTDyxm9ukkY1aji40oZxjJWQ3SnoRb=aqfr4Q@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v4 6/8] vmdk: New functions to assist
- allocating multiple clusters
+In-Reply-To: <accf8880-f4b0-85f1-9f33-4103c8c26d7a@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v3 1/4] ACPI: Add APEI GHES Table
+ Generation support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,135 +26,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu block <qemu-block@nongnu.org>, Stefan Hajnoczi <stefanha@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>, John Snow <jsnow@redhat.com>
+To: Dongjiu Geng <gengdongjiu@huawei.com>
+Cc: james.morse@arm.com, marc.zyngier@arm.com, christoffer.dall@linaro.org, rkrcmar@redhat.com, linux@armlinux.org.uk, tbaicar@codeaurora.org, imammedo@redhat.com, zhaoshenglong@huawei.com, peter.maydell@linaro.org, pbonzini@redhat.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, ard.biesheuvel@linaro.org, mtsirkin@redhat.com, drjones@redhat.com, ben@skyportsystems.com, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, songwenjun@huawei.com, wuquanming@huawei.com, huangshaoyu@huawei.com, wangxiongfeng2@huawei.com, xiexiuqi@huawei.com
 
-On Thu, Jun 1, 2017 at 7:27 PM, Fam Zheng <famz@redhat.com> wrote:
-> On Sat, 04/22 10:43, Ashijeet Acharya wrote:
->> Introduce two new helper functions handle_alloc() and
->> vmdk_alloc_cluster_offset(). handle_alloc() helps to allocate multiple
->> clusters at once starting from a given offset on disk and performs COW
->> if necessary for first and last allocated clusters.
->> vmdk_alloc_cluster_offset() helps to return the offset of the first of
->> the many newly allocated clusters. Also, provide proper documentation
->> for both.
->>
->> Signed-off-by: Ashijeet Acharya <ashijeetacharya@gmail.com>
->> ---
->>  block/vmdk.c | 192 +++++++++++++++++++++++++++++++++++++++++++++++++++++++----
->>  1 file changed, 182 insertions(+), 10 deletions(-)
->>
->> diff --git a/block/vmdk.c b/block/vmdk.c
->> index 7862791..8d34cd9 100644
->> --- a/block/vmdk.c
->> +++ b/block/vmdk.c
->> @@ -136,6 +136,7 @@ typedef struct VmdkMetaData {
->>      unsigned int l2_offset;
->>      int valid;
->>      uint32_t *l2_cache_entry;
->> +    uint32_t nb_clusters;
->>  } VmdkMetaData;
->>
->>  typedef struct VmdkGrainMarker {
->> @@ -1242,6 +1243,174 @@ static int get_cluster_table(VmdkExtent *extent, uint64_t offset,
->>      return VMDK_OK;
->>  }
->>
->> +/*
->> + * handle_alloc
->> + *
->> + * Allocate new clusters for an area that either is yet unallocated or needs a
->> + * copy on write. If *cluster_offset is non_zero, clusters are only allocated if
->> + * the new allocation can match the specified host offset.
->> + *
->> + * Returns:
->> + *   VMDK_OK:       if new clusters were allocated, *bytes may be decreased if
->> + *                  the new allocation doesn't cover all of the requested area.
->> + *                  *cluster_offset is updated to contain the offset of the
->> + *                  first newly allocated cluster.
->> + *
->> + *   VMDK_UNALLOC:  if no clusters could be allocated. *cluster_offset is left
->> + *                  unchanged.
->> + *
->> + *   VMDK_ERROR:    in error cases
->> + */
->> +static int handle_alloc(BlockDriverState *bs, VmdkExtent *extent,
->> +                        uint64_t offset, uint64_t *cluster_offset,
->> +                        int64_t *bytes, VmdkMetaData *m_data,
->> +                        bool allocate, uint32_t *total_alloc_clusters)
->
-> Not super important but personally I always prefer to stick to a "vmdk_" prefix
-> when naming local identifiers, so that ctags and git grep can take it easy.
+On 05/22/17 16:23, Laszlo Ersek wrote:
+> Keeping some context:
+> 
+> On 05/12/17 23:00, Laszlo Ersek wrote:
+>> On 04/30/17 07:35, Dongjiu Geng wrote:
 
-Done.
+> (68) In the code below, you are not taking an "OVMF header probe
+> suppressor" into account.
+> 
+> But, we have already planned to replace that quirk with a separate,
+> dedicated allocation hint or command, so I'm not going to describe what
+> an "OVMF header probe suppressor" is; instead, I'll describe the
+> replacement for it.
+> 
+> [...]
 
->
->> +{
->> +    int l1_index, l2_offset, l2_index;
->> +    uint32_t *l2_table;
->> +    uint32_t cluster_sector;
->> +    uint32_t nb_clusters;
->> +    bool zeroed = false;
->> +    uint64_t skip_start_bytes, skip_end_bytes;
->> +    int ret;
->> +
->> +    ret = get_cluster_table(extent, offset, &l1_index, &l2_offset,
->> +                            &l2_index, &l2_table);
->> +    if (ret < 0) {
->> +        return ret;
->> +    }
->> +
->> +    cluster_sector = le32_to_cpu(l2_table[l2_index]);
->> +
->> +    skip_start_bytes = vmdk_find_offset_in_cluster(extent, offset);
->> +    /* Calculate the number of clusters to look for. Here we truncate the last
->> +     * cluster, i.e. 1 less than the actual value calculated as we may need to
->> +     * perform COW for the last one. */
->> +    nb_clusters = DIV_ROUND_UP(skip_start_bytes + *bytes,
->> +                            extent->cluster_sectors << BDRV_SECTOR_BITS) - 1;
->
-> Alignment could be improved: here ^
+So, the NOACPI allocation hint is a no-go at the moment, based on the
+discussion in the following threads:
 
-Done.
+http://mid.mail-archive.com/20170601112241.2580-1-ard.biesheuvel@linaro.org
 
->
->> +
->> +    nb_clusters = MIN(nb_clusters, extent->l2_size - l2_index);
->> +    assert(nb_clusters <= INT_MAX);
->> +
->> +    /* update bytes according to final nb_clusters value */
->> +    if (nb_clusters != 0) {
->> +        *bytes = ((nb_clusters * extent->cluster_sectors) << 9)
->
-> Better use BDRV_SECTOR_BITS instead of 9.
+http://mid.mail-archive.com/c76b36de-ebf9-c662-d454-0a95b43901e8@redhat.com
 
-Done.
+Therefore the header probe suppression remains necessary.
 
->
->> +                                            - skip_start_bytes;
->> +    } else {
->> +        nb_clusters = 1;
->> +    }
->> +    *total_alloc_clusters += nb_clusters;
->
-> It is weird that you increment *total_alloc_clusters instead of simply assigning
-> to it, because it's not clear why before reading the caller code.
->
-I am incrementing it because we allocate clusters in every iteration
-and *total_alloc_clusters contains number of clusters allocated in
-total and not just in one iteration. So basically it is a sum of all
-the m_data->nb_clusters present in every element of the linked list I
-prepare.
+In this case, it is not hard to do, you just have to reorder the
+following two ADD_POINTER additions a bit:
 
-> It's better if you just return nb_clusters from this function (either as a
-> return value, or assign to *total_alloc_clusters), then do the accumulation in
-> vmdk_pwritev by adding m_data->nb_clusters, which is simpler.
+>>> +
+>>> +        bios_linker_loader_add_pointer(linker, GHES_ERRORS_FW_CFG_FILE,
+>>> +                                sizeof(uint64_t) * i, sizeof(uint64_t),
+>>> +                                GHES_ERRORS_FW_CFG_FILE,
+>>> +                                MAX_ERROR_SOURCE_COUNT_V6 * sizeof(uint64_t) +
+>>> +                                i * MAX_RAW_DATA_LENGTH);
 
-If I understood it correctly, you mean to say that I should add all
-the m_data->nb_clusters present in my linked list inside
-vmdk_pwritev() using a loop? If yes, I think that's what I have been
-doing earlier by incrementing *total_alloc_clusters there itself and
-is better, no?
-Also, please correct me if I am wrong :-)
+This one should be moved out to a separate loop, after the current loop.
 
-Ashijeet
+>>> +        bios_linker_loader_add_pointer(linker, ACPI_BUILD_TABLE_FILE,
+>>> +                    address_registers_offset
+>>> +                    + i * sizeof(AcpiGenericHardwareErrorSource),
+>>> +                    sizeof(uint32_t), GHES_ERRORS_FW_CFG_FILE,
+>>> +                    i * sizeof(uint64_t));
+
+This one should be kept in the first (i.e., current) loop.
+
+The idea is, when you first point the HEST/GHES_n entries in
+ACPI_BUILD_TABLE_FILE to the "address registers" in
+GHES_ERRORS_FW_CFG_FILE, all those address registers will still be
+zero-filled. This will fail the ACPI table header probe in
+OvmfPkg/AcpiPlatformDxe, which is what we want.
+
+After this is done, the address registers in GHES_ERRORS_FW_CFG_FILE
+should be pointed to the error status data blocks in the same fw_cfg
+blob, in a separate loop. (Those error status data blocks will again be
+zero-filled, so no ACPI table headers will be mistakenly recognized in
+them.)
+
+Thanks
+Laszlo
