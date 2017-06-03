@@ -1,33 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53267)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53305)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1dHIHr-0003fO-Tz
-	for qemu-devel@nongnu.org; Sat, 03 Jun 2017 19:16:52 -0400
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1dHIHv-0003gG-5e
+	for qemu-devel@nongnu.org; Sat, 03 Jun 2017 19:16:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1dHIHo-0002Dc-PX
-	for qemu-devel@nongnu.org; Sat, 03 Jun 2017 19:16:51 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:39928
-	helo=mx0a-001b2d01.pphosted.com)
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1dHIHs-0002EV-14
+	for qemu-devel@nongnu.org; Sat, 03 Jun 2017 19:16:55 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:44699)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <mdroth@linux.vnet.ibm.com>)
-	id 1dHIHo-0002DL-Iy
-	for qemu-devel@nongnu.org; Sat, 03 Jun 2017 19:16:48 -0400
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v53NDjB7022361
-	for <qemu-devel@nongnu.org>; Sat, 3 Jun 2017 19:16:47 -0400
-Received: from e16.ny.us.ibm.com (e16.ny.us.ibm.com [129.33.205.206])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2auuhs0q4d-1
+	id 1dHIHr-0002E6-OJ
+	for qemu-devel@nongnu.org; Sat, 03 Jun 2017 19:16:51 -0400
+Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v53NDkH5131438
+	for <qemu-devel@nongnu.org>; Sat, 3 Jun 2017 19:16:50 -0400
+Received: from e33.co.us.ibm.com (e33.co.us.ibm.com [32.97.110.151])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2auv447cy5-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Sat, 03 Jun 2017 19:16:46 -0400
+	for <qemu-devel@nongnu.org>; Sat, 03 Jun 2017 19:16:50 -0400
 Received: from localhost
-	by e16.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	by e33.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
 	Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <mdroth@linux.vnet.ibm.com>;
-	Sat, 3 Jun 2017 19:16:46 -0400
+	Sat, 3 Jun 2017 17:16:49 -0600
 From: Michael Roth <mdroth@linux.vnet.ibm.com>
-Date: Sat,  3 Jun 2017 18:13:30 -0500
-Message-Id: <1496531612-22166-1-git-send-email-mdroth@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH v5 0/2] Fixes/tests for hmp_object_del()
+Date: Sat,  3 Jun 2017 18:13:32 -0500
+In-Reply-To: <1496531612-22166-1-git-send-email-mdroth@linux.vnet.ibm.com>
+References: <1496531612-22166-1-git-send-email-mdroth@linux.vnet.ibm.com>
+Message-Id: <1496531612-22166-3-git-send-email-mdroth@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [PATCH v5 2/2] monitor: fix object_del for
+ command-line-created objects
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,39 +39,95 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: armbru@redhat.com
+Cc: armbru@redhat.com, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Eric Blake <eblake@redhat.com>, Daniel Berrange <berrange@redhat.com>, qemu-stable@nongnu.org
 
-hmp_object_del() followed by a subsequent hmp_object_add() can trigger a
-duplicate ID error if the previous object shared the same ID and was added
-via the command-line. Please see patch 2/2 for more details.
+Currently objects specified on the command-line are only partially
+cleaned up when 'object_del' is issued in either HMP or QMP: the
+object itself is fully finalized, but the QemuOpts are not removed.
+This results in the following behavior:
 
-This patchset fixes the issue in question and adds some general unit tests
-for object created via -object, which we later extend to verify the fix in
-question.
+  x86_64-softmmu/qemu-system-x86_64 -monitor stdio \
+    -object memory-backend-ram,id=ram1,size=256M
 
-Changes since v4:
+  QEMU 2.7.91 monitor - type 'help' for more information
+  (qemu) object_del ram1
+  (qemu) object_del ram1
+  object 'ram1' not found
+  (qemu) object_add memory-backend-ram,id=ram1,size=256M
+  Duplicate ID 'ram1' for object
+  Try "help object_add" for more information
 
-  - Rebased on master and re-tested
+which can be an issue for use-cases like memory hotplug.
 
-Changes since v3:
+This happens on the HMP side because hmp_object_add() attempts to
+create a temporary QemuOpts entry with ID 'ram1', which ends up
+conflicting with the command-line-created entry, since it was never
+cleaned up during the previous hmp_object_del() call.
 
-  - Fixed up comment formating (Markus)
-  - Instead of segfaulting, use &error_abort if assumptions about
-    'object' property group existence change (Markus)
-  - Use g_assert_null in place of g_assert(... == NULL) (Markus)
+We address this by adding a check in user_creatable_del(), which
+is called by both qmp_object_del() and hmp_object_del() to handle
+the actual object cleanup, to determine whether an option group entry
+matching the object's ID is present and removing it if it is.
 
-Changes since v2:
+Note that qmp_object_add() never attempts to create a temporary
+QemuOpts entry, so it does not encounter the duplicate ID error,
+which is why this isn't generally visible in libvirt.
 
-  - Moved the generic unit tests ahead of the fix patch, with a FIXME
-    in place of the actual check for the failure addressed in patch
-    2/2 (Daniel/Markus)
-  - Dropped check for existence of objects' QemuOptsList (Markus)
-  - Dropped unintended whitespace removal in PATCH 1/2
-  - Slight rewording of commit messages to reflect the changes and fix
-    minor grammar errors.
+Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: Markus Armbruster <armbru@redhat.com>
+Cc: Eric Blake <eblake@redhat.com>
+Cc: Daniel Berrange <berrange@redhat.com>
+Cc: qemu-stable@nongnu.org
+Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
+Reviewed-by: Daniel P. Berrange <berrange@redhat.com>
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
+---
+ qom/object_interfaces.c    | 9 +++++++++
+ tests/check-qom-proplist.c | 4 ++--
+ 2 files changed, 11 insertions(+), 2 deletions(-)
 
-Changes since v1:
-
-  - Moved QemuOpt cleanup out of {qmp,hmp}_object_del() and into common
-    user_creatable_del() path (Daniel, David)
-  - Added corresponding test case in check-qom-proplist
+diff --git a/qom/object_interfaces.c b/qom/object_interfaces.c
+index d4253a8..ff27e06 100644
+--- a/qom/object_interfaces.c
++++ b/qom/object_interfaces.c
+@@ -4,6 +4,7 @@
+ #include "qemu/module.h"
+ #include "qapi-visit.h"
+ #include "qapi/opts-visitor.h"
++#include "qemu/config-file.h"
+ 
+ void user_creatable_complete(Object *obj, Error **errp)
+ {
+@@ -181,6 +182,14 @@ void user_creatable_del(const char *id, Error **errp)
+         error_setg(errp, "object '%s' is in use, can not be deleted", id);
+         return;
+     }
++
++    /*
++     * if object was defined on the command-line, remove its corresponding
++     * option group entry
++     */
++    qemu_opts_del(qemu_opts_find(qemu_find_opts_err("object", &error_abort),
++                                 id));
++
+     object_unparent(obj);
+ }
+ 
+diff --git a/tests/check-qom-proplist.c b/tests/check-qom-proplist.c
+index e3f56ca..ddec574 100644
+--- a/tests/check-qom-proplist.c
++++ b/tests/check-qom-proplist.c
+@@ -437,9 +437,9 @@ static void test_dummy_createcmdl(void)
+      * check for this in user_creatable_del() and remove the QemuOpts if
+      * it is present.
+      *
+-     * FIXME: add an assert to verify that the QemuOpts is cleaned up
+-     * once the corresponding cleanup code is added.
++     * The below check ensures this works as expected.
+      */
++    g_assert_null(qemu_opts_find(&qemu_object_opts, "dev0"));
+ }
+ 
+ static void test_dummy_badenum(void)
+-- 
+2.7.4
