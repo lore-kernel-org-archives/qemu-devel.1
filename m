@@ -1,41 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38574)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51823)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1dHA0r-0000QO-0x
-	for qemu-devel@nongnu.org; Sat, 03 Jun 2017 10:26:46 -0400
+	(envelope-from <lersek@redhat.com>) id 1dHBaz-0002JO-QU
+	for qemu-devel@nongnu.org; Sat, 03 Jun 2017 12:08:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1dHA0n-0006dG-3o
-	for qemu-devel@nongnu.org; Sat, 03 Jun 2017 10:26:45 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:51155
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanb@linux.vnet.ibm.com>)
-	id 1dHA0m-0006cQ-TG
-	for qemu-devel@nongnu.org; Sat, 03 Jun 2017 10:26:41 -0400
-Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v53ENfim082106
-	for <qemu-devel@nongnu.org>; Sat, 3 Jun 2017 10:26:38 -0400
-Received: from e37.co.us.ibm.com (e37.co.us.ibm.com [32.97.110.158])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2auurgn5dq-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Sat, 03 Jun 2017 10:26:38 -0400
-Received: from localhost
-	by e37.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <stefanb@linux.vnet.ibm.com>;
-	Sat, 3 Jun 2017 08:26:37 -0600
-References: <c76b36de-ebf9-c662-d454-0a95b43901e8@redhat.com>
-	<20170602191230-mutt-send-email-mst@kernel.org>
-	<c2f1189a-48cf-4e01-c761-c20fe50ab67d@redhat.com>
-From: Stefan Berger <stefanb@linux.vnet.ibm.com>
-Date: Sat, 3 Jun 2017 10:26:27 -0400
+	(envelope-from <lersek@redhat.com>) id 1dHBaw-0005N3-Lm
+	for qemu-devel@nongnu.org; Sat, 03 Jun 2017 12:08:09 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:39034)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1dHBaw-0005L3-Cn
+	for qemu-devel@nongnu.org; Sat, 03 Jun 2017 12:08:06 -0400
+References: <1496414138-7622-1-git-send-email-peter.maydell@linaro.org>
+	<31f800cb-846d-e627-9d1f-f898a0948652@redhat.com>
+	<53bc1565-7ea2-0e13-65ab-db72e3dd9867@gmx.com>
+From: Laszlo Ersek <lersek@redhat.com>
+Message-ID: <c8c45b4f-3dcc-9aab-2918-1d388cf6bec9@redhat.com>
+Date: Sat, 3 Jun 2017 18:08:00 +0200
 MIME-Version: 1.0
-In-Reply-To: <c2f1189a-48cf-4e01-c761-c20fe50ab67d@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <53bc1565-7ea2-0e13-65ab-db72e3dd9867@gmx.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Message-Id: <a3d4cc14-056c-3157-4add-525e36e29c41@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] allocation zone extensions for the firmware
- linker/loader
+Subject: Re: [Qemu-devel] [PATCH] configure: Define NCURSES_WIDECHAR if
+ we're using curses
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -44,41 +30,108 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laszlo Ersek <lersek@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Ben Warren <ben@skyportsystems.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Xiao Guangrong <guangrong.xiao@linux.intel.com>, "Jordan Justen (Intel address)" <jordan.l.justen@intel.com>, edk2-devel-ml01 <edk2-devel@ml01.01.org>, SeaBIOS devel list <SeaBIOS@seabios.org>, qemu devel list <qemu-devel@nongnu.org>, "Leif Lindholm (Linaro address)" <leif.lindholm@linaro.org>, Dongjiu Geng <gengdongjiu@huawei.com>, Kevin O'Connor <kevin@koconnor.net>, Shannon Zhao <zhaoshenglong@huawei.com>, Igor Mammedov <imammedo@redhat.com>
+To: Kamil Rytarowski <n54@gmx.com>, Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Chad Joan <chadjoan@gmail.com>, =?UTF-8?Q?Rainer_M=c3=bcller?= <raimue@codingfarm.de>, patches@linaro.org
 
-On 06/02/2017 07:20 PM, Laszlo Ersek wrote:
-> On 06/02/17 18:30, Michael S. Tsirkin wrote:
->> On Fri, Jun 02, 2017 at 05:45:21PM +0200, Laszlo Ersek wrote:
->>> Hi,
+On 06/03/17 11:43, Kamil Rytarowski wrote:
+> On 02.06.2017 23:58, Laszlo Ersek wrote:
+>> On 06/02/17 16:35, Peter Maydell wrote:
+>>> We want the wide character functions from the ncurses header.
+>>> Unfortunately it doesn't provide them by default, but only
+>>> if either:
+>>>  * NCURSES_WIDECHAR is defined (for ncurses 20111030 and up)
+>>>  * _XOPEN_SOURCE/_XOPEN_SOURCE_EXTENDED are suitably defined
 >>>
->>> this message is cross-posted to three lists (qemu, seabios, edk2). I'll
->>> follow up with three patch series, one series for each project. I'll
->>> cross-post all of the patches as well, but I'll add the project name in
->>> the "bag of tags" in the subject lines.
+>>> So far we have been implicitly relying on the latter, because
+>>> for GNU libc when we define _GNU_SOURCE this causes libc
+>>> to define the _XOPEN_SOURCE macros for us. Unfortunately
+>>> this doesn't work on all libcs, because some (like OSX and
+>>> musl libc) do not define _XOPEN_SOURCE when _GNU_SOURCE
+>>> is defined.
 >>>
->>> The QEMU series introduces two extensions to the ALLOCATE firmware
->>> linker/loader command.
+>>> We can't fix this by defining _XOPEN_SOURCE ourselves, because
+>>> that also means "and don't provide any functions that aren't in
+>>> that standard", and not all libcs provide any way to override
+>>> that to also get the non-standard functions. In particular
+>>> FreeBSD has no such mechanism, and OSX's _DARWIN_C_SOURCE
+>>> doesn't reenable everything (for instance getpagesize()
+>>> is still not prototyped if _DARWIN_C_SOURCE and _XOPEN_SOURCE
+>>> are both defined).
 >>>
->>> One extension is a new allocation zone, with value 3, for allowing the
->>> firmware to allocate the fw_cfg blobs in 64-bit address space.
->> Seems to make sense. I guess it's safe to do this if no
->> pointers to this table are 32 bit, right?
-> That's right. For example, the TCPA patch (6 of 7) in the QEMU series
-> does this, because the ACPI_BUILD_TPMLOG_FILE is only referenced by a
-> 64-bit pointer.
+>>> So we have to define NCURSES_WIDECHAR. (This will only work
+>>> if your ncurses is at least 20111030, as older versions
+>>> don't honour this macro.)
+>>>
+>>> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+>>> ---
+>>> Testing from the people with musl libc and OSX-with-ncurses
+>>> appreciated, as I don't have any systems which have the bug
+>>> which this patch is attempting to fix...
+>>>
+>>>  configure | 2 ++
+>>>  1 file changed, 2 insertions(+)
+>>>
+>>> diff --git a/configure b/configure
+>>> index 0586ec9..6aca5d1 100755
+>>> --- a/configure
+>>> +++ b/configure
+>>> @@ -3053,6 +3053,8 @@ int main(void) {
+>>>  EOF
+>>>    IFS=:
+>>>    for curses_inc in $curses_inc_list; do
+>>> +    # Make sure we get the wide character prototypes
+>>> +    curses_inc="-DNCURSES_WIDECHAR $curses_inc"
+>>>      IFS=:
+>>>      for curses_lib in $curses_lib_list; do
+>>>        unset IFS
+>>>
+>>
+>> Given that we're already consciously using non-portable functions,
+>> this solution looks the least messy to me.
+>>
 >
->> Is there a chance we'll ever be able to use this on PC
->> assuming the need to support 32 bit guests?
-> Well, sticking with the TCPA example, if an ACPI table defines *only* an
-> 8-byte pointer to some memory area, that seems to preclude support for
-> 32-bit guests already, generally speaking, no?
+> These functions are enough portable to work on NetBSD curses(3).
 
-I just tested this, giving 8G of memory to a VM and running i386 Fedora 
-in it. The memory allocated for the TCPA log seems to be in 32bit 
-memory, so not out of reach of i386 guests. I guess it's important what 
-the firmware does with it, whether it strictly follows the 64bit and 
-allocates memory as far up as possible or provides compatibility. 
-SeaBIOS (1.10.0) seems to do the right thing.
+Sorry, that's not what I meant by "non-portable functions".
 
-    Stefan
+Peter wrote,
+
+>>> We can't fix this by defining _XOPEN_SOURCE ourselves, because
+>>> that also means "and don't provide any functions that aren't in
+>>> that standard", and not all libcs provide any way to override
+>>> that to also get the non-standard functions.
+
+So basically, if we only used standard (SUSv2, SUSv3 or SUSv4, i.e.
+_XOPEN_SOURCE=500, =600 or =700) functions, then the wide char curses
+functions could also be declared just through _XOPEN_SOURCE:
+
+  http://pubs.opengroup.org/onlinepubs/007908799/xcurses/implement.html
+
+(
+
+Note that X/Open Curses, Issue 4 Version 2, does provide the wide char
+stuff; see for example the add_wch() function at
+<http://pubs.opengroup.org/onlinepubs/007908799/xcurses/add_wch.html>,
+and my "/usr/include/curses.h" has:
+
+  #ifndef NCURSES_WIDECHAR
+  #if defined(_XOPEN_SOURCE_EXTENDED) || (defined(_XOPEN_SOURCE) && (_XOPEN_SOURCE - 0 >= 500))
+  #define NCURSES_WIDECHAR 1
+  #else
+  #define NCURSES_WIDECHAR 0
+  #endif
+  #endif /* NCURSES_WIDECHAR */
+  ...
+  #if NCURSES_WIDECHAR
+  ...
+  extern NCURSES_EXPORT(int) add_wch (const cchar_t *);                   /* generated:WIDEC */
+
+)
+
+Since we can't use _XOPEN_SOURCE (because of our reliance on non-std
+functions), we have to go with "whatever works" (basically abandoning
+any benefit that the SUS / POSIX standardization brings), and then
+NCURSES_WIDECHAR looks simple enough.
+
+Thanks
+Laszlo
