@@ -1,22 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58988)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60723)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1dHCJ1-0004v8-5k
-	for qemu-devel@nongnu.org; Sat, 03 Jun 2017 12:53:40 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1dHCRx-0008Gt-7t
+	for qemu-devel@nongnu.org; Sat, 03 Jun 2017 13:02:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1dHCIy-0001cQ-3R
-	for qemu-devel@nongnu.org; Sat, 03 Jun 2017 12:53:39 -0400
-References: <20170602112158.232757-1-vsementsov@virtuozzo.com>
-	<20170602112158.232757-14-vsementsov@virtuozzo.com>
-	<4930d026-75c1-6843-ea45-e87c55e5e986@redhat.com>
+	(envelope-from <vsementsov@virtuozzo.com>) id 1dHCRs-0001Md-Cd
+	for qemu-devel@nongnu.org; Sat, 03 Jun 2017 13:02:53 -0400
+References: <20170530081723.29205-1-vsementsov@virtuozzo.com>
+	<20170530081723.29205-10-vsementsov@virtuozzo.com>
+	<04df6354-c902-9514-f56f-9063168a6a75@redhat.com>
+	<72e09ee4-ef22-ed79-b881-bed1ad255392@virtuozzo.com>
+	<c232fd02-524c-29c4-6577-37101a2638e5@redhat.com>
+	<d587d556-4807-46ff-3596-4c1c99edbcef@virtuozzo.com>
+	<b5d84158-b1f9-d497-3231-be76565cb3b3@virtuozzo.com>
+	<30533fc6-e32f-9d9c-6030-d923e0734ce7@virtuozzo.com>
+	<450ae852-a5c4-17f1-2027-f68bf91262aa@redhat.com>
 From: Sementsov-Ogievskiy Vladimir <vsementsov@virtuozzo.com>
-Message-ID: <d3560aae-bb8c-f95f-e2b1-78427c6bf8ac@virtuozzo.com>
-Date: Sat, 3 Jun 2017 19:53:23 +0300
+Message-ID: <c35f6975-428b-8d07-9f37-bdb8a1e06bdf@virtuozzo.com>
+Date: Sat, 3 Jun 2017 20:02:39 +0300
 MIME-Version: 1.0
-In-Reply-To: <4930d026-75c1-6843-ea45-e87c55e5e986@redhat.com>
+In-Reply-To: <450ae852-a5c4-17f1-2027-f68bf91262aa@redhat.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v20 13/30] block: new
- bdrv_reopen_bitmaps_rw interface
+Subject: Re: [Qemu-devel] [PATCH 09/25] block/dirty-bitmap: add readonly
+ field to BdrvDirtyBitmap
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,104 +36,60 @@ Cc: kwolf@redhat.com, famz@redhat.com, armbru@redhat.com, mreitz@redhat.com, ste
 
 
 
-On 03.06.2017 01:17, John Snow wrote:
+On 02.06.2017 21:46, John Snow wrote:
 >
-> On 06/02/2017 07:21 AM, Vladimir Sementsov-Ogievskiy wrote:
->> Add format driver handler, which should mark loaded read-only
->> bitmaps as 'IN_USE' in the image and unset read_only field in
->> corresponding BdrvDirtyBitmap's.
+> On 06/02/2017 05:45 AM, Vladimir Sementsov-Ogievskiy wrote:
+>> 02.06.2017 12:01, Vladimir Sementsov-Ogievskiy wrote:
+>>> 02.06.2017 11:56, Vladimir Sementsov-Ogievskiy wrote:
+>>>> 02.06.2017 02:25, John Snow wrote:
+>>>>> On 06/01/2017 03:30 AM, Sementsov-Ogievskiy Vladimir wrote:
+>>>>>> Hi John!
+>>>>>>
+>>>>>> Look at our discussion about this in v18 thread.
+>>>>>>> Shortly: readonly is not the same as disabled. disabled= bitmap just
+>>>>>> ignores all writes. readonly= writes are not allowed at all.
+>>>>>>
+>>>>>> And I think, I'll try to go through way 2: "dirty" field instead of
+>>>>>> "readonly" (look at v18 discussion), as it a bit more flexible.
+>>>>>>
+>>>>> Not sure which I prefer...
+>>>>>
+>>>>> Method 1 is attractive in that it is fairly simple, and enforces fairly
+>>>>> loudly the inability to write to devices with RO bitmaps. It's a
+>>>>> natural
+>>>>> extension of your current approach.
+>>>> For now I decided to realize this one, I think I'll publish it today.
+>>>> Also, I'm going to rename s/readonly/in_use - to avoid the confuse
+>>>> with disabled. So let this field just be mirror of IN_USE in the
+>>>> image and just say "persistent storage knows, that bitmap is in use
+>>>> and may be dirty".
+>> Finally it would be readonly. in_use is bad for created (not loaded)
+>> bitmaps. I'll add more descriptive comments for disabled and readonly.
 >>
->> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
->> ---
->>   block.c                   | 17 +++++++++++++++++
->>   include/block/block_int.h |  7 +++++++
->>   2 files changed, 24 insertions(+)
->>
->> diff --git a/block.c b/block.c
->> index 04af7697dc..161db9e32a 100644
->> --- a/block.c
->> +++ b/block.c
->> @@ -2946,12 +2946,16 @@ void bdrv_reopen_commit(BDRVReopenState *reopen_state)
->>   {
->>       BlockDriver *drv;
->>       BlockDriverState *bs;
->> +    bool old_can_write, new_can_write;
->>   
->>       assert(reopen_state != NULL);
->>       bs = reopen_state->bs;
->>       drv = bs->drv;
->>       assert(drv != NULL);
->>   
->> +    old_can_write =
->> +        !bdrv_is_read_only(bs) && !(bdrv_get_flags(bs) & BDRV_O_INACTIVE);
->> +
->>       /* If there are any driver level actions to take */
->>       if (drv->bdrv_reopen_commit) {
->>           drv->bdrv_reopen_commit(reopen_state);
->> @@ -2965,6 +2969,19 @@ void bdrv_reopen_commit(BDRVReopenState *reopen_state)
->>       bs->read_only = !(reopen_state->flags & BDRV_O_RDWR);
->>   
->>       bdrv_refresh_limits(bs, NULL);
->> +
->> +    new_can_write =
->> +        !bdrv_is_read_only(bs) && !(bdrv_get_flags(bs) & BDRV_O_INACTIVE);
->> +    if (!old_can_write && new_can_write && drv->bdrv_reopen_bitmaps_rw) {
->> +        Error *local_err = NULL;
->> +        if (drv->bdrv_reopen_bitmaps_rw(bs, &local_err) < 0) {
->> +            /* This is not fatal, bitmaps just left read-only, so all following
->> +             * writes will fail. User can remove read-only bitmaps to unblock
->> +             * writes.
->> +             */
->> +            error_report_err(local_err);
->> +        }
->> +    }
->>   }
->>   
->>   /*
->> diff --git a/include/block/block_int.h b/include/block/block_int.h
->> index 8d3724cce6..1dc6f2e90d 100644
->> --- a/include/block/block_int.h
->> +++ b/include/block/block_int.h
->> @@ -380,6 +380,13 @@ struct BlockDriver {
->>                                uint64_t parent_perm, uint64_t parent_shared,
->>                                uint64_t *nperm, uint64_t *nshared);
->>   
->> +    /**
->> +     * Bitmaps should be marked as 'IN_USE' in the image on reopening image
->> +     * as rw. This handler should realize it. It also should unset readonly
->> +     * field of BlockDirtyBitmap's in case of success.
->> +     */
->> +    int (*bdrv_reopen_bitmaps_rw)(BlockDriverState *bs, Error **errp);
->> +
-> Hmm, do we need a new top-level hook for this? We already have
-> .bdrv_reopen_commit and .bdrv_reopen_prepare which inform the
-> blockdriver that a reopen event is occurring.
->
-> Can't we just amend qcow2_reopen_prepare and qcow2_reopen_commit to do
-> the necessary tasks of either:
->
-> (A) Flushing the bitmap in preparation for reopening as RO, or
-> (B) Writing in_use and removing the RO flag in preparation for reopening
-> as RW
+> Makes sense. It sounds like "readonly" is simply a stricter superset of
+> "disabled," where "disabled" doesn't care if the bitmap gets out of sync
+> with the data, but "readonly" attempts to preserve that semantic
+> relationship.
 
-(A) is done (see patch about reopen RO)
-
-(B) - We can't do it, as on this preparation the image is still RO, and 
-I've created new handler, write 'in_use' _after_ the point when new 
-flags was set.
+should we add separate "READONLY" bitmap status for qapi? I'm sure that 
+I don't want to call them "disabled" as it is not the same. "active" is 
+better (as when image is RW they are active, when image is RO, they are 
+active in RO image - not bad too I think. So, may be such addition to 
+qapi would be redundant.
 
 >
->>       QLIST_ENTRY(BlockDriver) list;
->>   };
->>   
->>
+>>>> Also, optimization with 'dirty' flag may be added later.
+> Yes, I agree.
 >
-> Well, design issues aside, I will at least confirm that I think this
-> patch should work as designed, and I will leave the design critiques to
-> Max and Kevin:
+>>> And, also, I don't want to influence this "first write", on which we
+>>> will set "IN_USE" in all bitmaps (for way (2). Reopening rw is less
+>>> performance-demanding place than write.
+>>>
+> "And, also," -- I think you've been reading my emails too much, you're
+> picking up my 'isms ;)
 >
-> Reviewed-by: John Snow <jsnow@redhat.com>
->
+> Thanks,
+> --John
 
 -- 
 Best regards,
