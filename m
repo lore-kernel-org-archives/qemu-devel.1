@@ -1,22 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35323)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44336)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1dHCiy-00042I-1V
-	for qemu-devel@nongnu.org; Sat, 03 Jun 2017 13:20:29 -0400
+	(envelope-from <eblake@redhat.com>) id 1dHGsb-0000JF-Eq
+	for qemu-devel@nongnu.org; Sat, 03 Jun 2017 17:46:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1dHCiu-0007Po-0A
-	for qemu-devel@nongnu.org; Sat, 03 Jun 2017 13:20:28 -0400
-References: <20170602112158.232757-1-vsementsov@virtuozzo.com>
-	<20170602112158.232757-11-vsementsov@virtuozzo.com>
-	<ccd143a1-e6dd-a08c-5747-cd46bbbf0429@redhat.com>
-From: Sementsov-Ogievskiy Vladimir <vsementsov@virtuozzo.com>
-Message-ID: <404eb3a5-4700-8e0e-dbe2-99ef4783b766@virtuozzo.com>
-Date: Sat, 3 Jun 2017 20:19:52 +0300
+	(envelope-from <eblake@redhat.com>) id 1dHGsX-00049F-7Q
+	for qemu-devel@nongnu.org; Sat, 03 Jun 2017 17:46:41 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49314)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dHGsW-000479-U4
+	for qemu-devel@nongnu.org; Sat, 03 Jun 2017 17:46:37 -0400
+References: <20170530143052.165002-1-vsementsov@virtuozzo.com>
+	<20170530143052.165002-16-vsementsov@virtuozzo.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <eadf1060-4198-a5c4-f337-003a2ec0c917@redhat.com>
+Date: Sat, 3 Jun 2017 16:46:31 -0500
 MIME-Version: 1.0
-In-Reply-To: <ccd143a1-e6dd-a08c-5747-cd46bbbf0429@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v20 10/30] block/dirty-bitmap: add readonly
- field to BdrvDirtyBitmap
+In-Reply-To: <20170530143052.165002-16-vsementsov@virtuozzo.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="cet8NQpBFu5nJ41puk0fsr2vh6u3o56xP"
+Subject: Re: [Qemu-devel] [PATCH 15/19] nbd/server: use errp instead of LOG
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,213 +28,160 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, famz@redhat.com, armbru@redhat.com, mreitz@redhat.com, stefanha@redhat.com, pbonzini@redhat.com, den@openvz.org
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org
+Cc: pbonzini@redhat.com, den@openvz.org
+
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--cet8NQpBFu5nJ41puk0fsr2vh6u3o56xP
+From: Eric Blake <eblake@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-devel@nongnu.org
+Cc: pbonzini@redhat.com, den@openvz.org
+Message-ID: <eadf1060-4198-a5c4-f337-003a2ec0c917@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 15/19] nbd/server: use errp instead of LOG
+References: <20170530143052.165002-1-vsementsov@virtuozzo.com>
+ <20170530143052.165002-16-vsementsov@virtuozzo.com>
+In-Reply-To: <20170530143052.165002-16-vsementsov@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 05/30/2017 09:30 AM, Vladimir Sementsov-Ogievskiy wrote:
+> Move to modern errp scheme from just LOGging errors.
+>=20
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> ---
+>  nbd/server.c | 257 ++++++++++++++++++++++++++++++++++-----------------=
+--------
+>  1 file changed, 150 insertions(+), 107 deletions(-)
+>=20
+
+> @@ -143,30 +143,30 @@ static int nbd_negotiate_send_rep_len(QIOChannel =
+*ioc, uint32_t type,
+>            type, opt, len);
+> =20
+>      magic =3D cpu_to_be64(NBD_REP_MAGIC);
+> -    ret =3D write_sync(ioc, &magic, sizeof(magic), NULL);
+> +    ret =3D write_sync(ioc, &magic, sizeof(magic), errp);
+>      if (ret < 0) {
+> -        LOG("write failed (rep magic)");
+> +        error_prepend(errp, "write failed (rep magic): ");
+>          return ret;
+>      }
+
+I'm wondering how much we really want to use error_prepend(), or if we
+could just get away with using the original error message unchanged.
+I'm not saying to rewrite the patch now that you've done the work, so
+much as asking aloud whether the additional information in the error
+messages will prove useful.
+
+There are definitely some ripple effects from your v2 posting of the
+first half of the series that will require you to rebase this, but the
+overall idea is sound.
+
+>  /* Send an error reply.
+>   * Return -errno on error, 0 on success. */
+> -static int GCC_FMT_ATTR(4, 5)
+> +static int GCC_FMT_ATTR(5, 6)
+>  nbd_negotiate_send_rep_err(QIOChannel *ioc, uint32_t type,
+> -                           uint32_t opt, const char *fmt, ...)
+> +                           uint32_t opt, Error **errp, const char *fmt=
+, ...)
+
+Having errp not be the last argument is unusual, but I don't see how you
+can do any differently with the var-args nature of the call.
+
+> @@ -505,26 +515,33 @@ static int nbd_negotiate_options(NBDClient *clien=
+t)
+>                   * disconnecting, but that we must also tolerate
+>                   * guests that don't wait for our reply. */
+>                  ret =3D nbd_negotiate_send_rep(client->ioc, NBD_REP_AC=
+K,
+> -                                             clientflags);
+> -                return ret < 0 && ret !=3D -EPIPE ? ret : 1;
+> +                                             clientflags, &local_err);=
+
+> +
+> +                if (ret < 0 && ret !=3D -EPIPE) {
+> +                    error_propagate(errp, local_err);
+> +                    return ret;
+> +                }
+> +
+> +                error_free(local_err);
+> +                return 1;
+
+Of course, you'll have to simplify this portion.  This is probably the
+one place where you actually DO want to use:
+
+nbd_negotiate_send_rep(client->ioc, NBD_REP_ACK,
+                       clientflags, NULL)
+
+because you truly do not care whether you had an error.
+
+> @@ -1090,18 +1113,18 @@ static int nbd_co_receive_request(NBDRequestDat=
+a *req, NBDRequest *request)
+> =20
+>      /* Sanity checks, part 2. */
+>      if (request->from + request->len > client->exp->size) {
+> -        LOG("operation past EOF; From: %" PRIu64 ", Len: %" PRIu32
+> -            ", Size: %" PRIu64, request->from, request->len,
+> -            (uint64_t)client->exp->size);
+> +        error_setg(errp, "operation past EOF; From: %" PRIu64 ", Len: =
+%" PRIu32
+> +                   ", Size: %" PRIu64, request->from, request->len,
+> +                   (uint64_t)client->exp->size);
+>          return request->type =3D=3D NBD_CMD_WRITE ? -ENOSPC : -EINVAL;=
 
 
+Question - now that we are consistently setting a decent errp, do we
+have any callers that care about specific -errno return values, or could
+we further simplify the functions by just returning -1 (instead of
+worrying about -errno) on failures?
 
-On 03.06.2017 00:02, John Snow wrote:
->
-> On 06/02/2017 07:21 AM, Vladimir Sementsov-Ogievskiy wrote:
->> It will be needed in following commits for persistent bitmaps.
->> If bitmap is loaded from read-only storage (and we can't mark it
->> "in use" in this storage) corresponding BdrvDirtyBitmap should be
->> read-only.
->>
->> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
->> ---
->>   block/dirty-bitmap.c         | 32 ++++++++++++++++++++++++++++++++
->>   block/io.c                   |  8 ++++++++
->>   blockdev.c                   |  6 ++++++
->>   include/block/dirty-bitmap.h |  4 ++++
->>   4 files changed, 50 insertions(+)
->>
->> diff --git a/block/dirty-bitmap.c b/block/dirty-bitmap.c
->> index f25428868c..1c9ffb292a 100644
->> --- a/block/dirty-bitmap.c
->> +++ b/block/dirty-bitmap.c
->> @@ -45,6 +45,12 @@ struct BdrvDirtyBitmap {
->>       bool disabled;              /* Bitmap is disabled. It skips all writes to
->>                                      the device */
->>       int active_iterators;       /* How many iterators are active */
->> +    bool readonly;              /* Bitmap is read-only and may be changed only
->> +                                   by deserialize* functions. This field blocks
-> In what way do the deserialize functions change the bitmaps, again?
 
-Hmm, I mean loading bitmap from file, but actually, bitmap is set 
-readonly after loading, so this sentence half can be dropped and asserts 
-added to deserialize* functions too (however, deserialize should never 
-be applied to the bitmap already loaded, or created from qmp, 
-deserialize should be used with newly created bitmap, by the code like 
-bitmap-loading or bitmap-incoming-migration, so such asserts may be a 
-bit strange)
+> @@ -1244,21 +1268,33 @@ static coroutine_fn void nbd_trip(void *opaque)=
 
->
->> +                                   any changing operations on owning image
->> +                                   (writes and discards), if bitmap is readonly
->> +                                   such operations must fail and not change
->> +                                   image or this bitmap */
->>       QLIST_ENTRY(BdrvDirtyBitmap) list;
->>   };
->>   
->> @@ -437,6 +443,7 @@ void bdrv_set_dirty_bitmap(BdrvDirtyBitmap *bitmap,
->>                              int64_t cur_sector, int64_t nr_sectors)
->>   {
->>       assert(bdrv_dirty_bitmap_enabled(bitmap));
->> +    assert(!bdrv_dirty_bitmap_readonly(bitmap));
-> I still feel as if bdrv_dirty_bitmap_enabled() can return false if
-> bdrv_dirty_bitmap_readonly is true, and you wouldn't have to edit these
-> parts, but I don't care enough to press the issue.
->
->>       hbitmap_set(bitmap->bitmap, cur_sector, nr_sectors);
->>   }
->>   
->> @@ -444,12 +451,14 @@ void bdrv_reset_dirty_bitmap(BdrvDirtyBitmap *bitmap,
->>                                int64_t cur_sector, int64_t nr_sectors)
->>   {
->>       assert(bdrv_dirty_bitmap_enabled(bitmap));
->> +    assert(!bdrv_dirty_bitmap_readonly(bitmap));
->>       hbitmap_reset(bitmap->bitmap, cur_sector, nr_sectors);
->>   }
->>   
->>   void bdrv_clear_dirty_bitmap(BdrvDirtyBitmap *bitmap, HBitmap **out)
->>   {
->>       assert(bdrv_dirty_bitmap_enabled(bitmap));
->> +    assert(!bdrv_dirty_bitmap_readonly(bitmap));
->>       if (!out) {
->>           hbitmap_reset_all(bitmap->bitmap);
->>       } else {
->> @@ -520,6 +529,7 @@ void bdrv_set_dirty(BlockDriverState *bs, int64_t cur_sector,
->>           if (!bdrv_dirty_bitmap_enabled(bitmap)) {
->>               continue;
->>           }
->> +        assert(!bdrv_dirty_bitmap_readonly(bitmap));
-> Highlighting the difference in strictness between "disabled" and "readonly."
 
-this case also show that we cant include !readonly-check into 
-bdrv_dirty_bitmap_enabled()
+> =20
+>  reply:
+> +    if (local_err) {
+> +        error_report_err(local_err);
+> +        local_err =3D NULL;
+> +    }
 
->
->>           hbitmap_set(bitmap->bitmap, cur_sector, nr_sectors);
->>       }
->>   }
->> @@ -541,3 +551,25 @@ int64_t bdrv_get_meta_dirty_count(BdrvDirtyBitmap *bitmap)
->>   {
->>       return hbitmap_count(bitmap->meta);
->>   }
->> +
->> +bool bdrv_dirty_bitmap_readonly(const BdrvDirtyBitmap *bitmap)
->> +{
->> +    return bitmap->readonly;
->> +}
->> +
->> +void bdrv_dirty_bitmap_set_readonly(BdrvDirtyBitmap *bitmap, bool value)
->> +{
->> +    bitmap->readonly = value;
->> +}
->> +
->> +bool bdrv_has_readonly_bitmaps(BlockDriverState *bs)
->> +{
->> +    BdrvDirtyBitmap *bm;
->> +    QLIST_FOREACH(bm, &bs->dirty_bitmaps, list) {
->> +        if (bm->readonly) {
->> +            return true;
->> +        }
->> +    }
->> +
->> +    return false;
->> +}
->> diff --git a/block/io.c b/block/io.c
->> index fdd7485c22..0e28a1f595 100644
->> --- a/block/io.c
->> +++ b/block/io.c
->> @@ -1349,6 +1349,10 @@ static int coroutine_fn bdrv_aligned_pwritev(BdrvChild *child,
->>       uint64_t bytes_remaining = bytes;
->>       int max_transfer;
->>   
->> +    if (bdrv_has_readonly_bitmaps(bs)) {
->> +        return -EPERM;
->> +    }
->> +
-> Should this be a dynamic error, or an assertion? We should probably
-> endeavor to never actually hit this circumstance (we should not have
-> readonly bitmaps on a RW node.)
+This says that after we detect an error, we report it,
 
-if on reopening rw write of 'in_use=1' flag failed, we are stay with 
-readonly bitmaps in rw image. So this is possible.
+> +
+> +    if (nbd_co_send_reply(req, &reply, reply_data_len) < 0) {
+> +        error_setg(&local_err, "Failed to send reply");
+> +        goto disconnect;
+> +    }
 
-two notes:
-1. we can't fail bdrv_reopen_commit if we failed writing 'in_use=1' flag 
-into image
-2. may be this is not bad: user can remove bitmaps to unblock write, or 
-he can retry operation leading to reopening rw which should lead to 
-retrying of writing 'in_use=1' into the image.
+=2E..but then blindly try to send the reply anyways, forgetting that we
+ever detected the original error.  Is that going to bite us?
 
->
->>       assert(is_power_of_2(align));
->>       assert((offset & (align - 1)) == 0);
->>       assert((bytes & (align - 1)) == 0);
->> @@ -2437,6 +2441,10 @@ int coroutine_fn bdrv_co_pdiscard(BlockDriverState *bs, int64_t offset,
->>           return -ENOMEDIUM;
->>       }
->>   
->> +    if (bdrv_has_readonly_bitmaps(bs)) {
->> +        return -EPERM;
->> +    }
->> +
->>       ret = bdrv_check_byte_request(bs, offset, count);
->>       if (ret < 0) {
->>           return ret;
->> diff --git a/blockdev.c b/blockdev.c
->> index c63f4e82c7..2b397abf66 100644
->> --- a/blockdev.c
->> +++ b/blockdev.c
->> @@ -2033,6 +2033,9 @@ static void block_dirty_bitmap_clear_prepare(BlkActionState *common,
->>       } else if (!bdrv_dirty_bitmap_enabled(state->bitmap)) {
->>           error_setg(errp, "Cannot clear a disabled bitmap");
->>           return;
->> +    } else if (bdrv_dirty_bitmap_readonly(state->bitmap)) {
->> +        error_setg(errp, "Cannot clear a readonly bitmap");
->> +        return;
->>       }
-> Probably getting close to easier to specify what state we DO allow
-> bitmaps to be cleared in (enabled/active, not frozen, disabled or readonly.)
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
 
-and should we add "readonly" state to qapi? (see my comment on v19)
 
->
->>   
->>       bdrv_clear_dirty_bitmap(state->bitmap, &state->backup);
->> @@ -2813,6 +2816,9 @@ void qmp_block_dirty_bitmap_clear(const char *node, const char *name,
->>                      "Bitmap '%s' is currently disabled and cannot be cleared",
->>                      name);
->>           goto out;
->> +    } else if (bdrv_dirty_bitmap_readonly(bitmap)) {
->> +        error_setg(errp, "Bitmap '%s' is readonly and cannot be cleared", name);
->> +        goto out;
->>       }
-> Random thought, maybe qmp_block_dirty_bitmap_clear should utilize the
-> transactional action core to perform this action instead of
-> reimplementing it. This has nothing to do with you, though.
->
->>   
->>       bdrv_clear_dirty_bitmap(bitmap, NULL);
->> diff --git a/include/block/dirty-bitmap.h b/include/block/dirty-bitmap.h
->> index 1e17729ac2..aa6d47ee00 100644
->> --- a/include/block/dirty-bitmap.h
->> +++ b/include/block/dirty-bitmap.h
->> @@ -75,4 +75,8 @@ void bdrv_dirty_bitmap_deserialize_ones(BdrvDirtyBitmap *bitmap,
->>                                           bool finish);
->>   void bdrv_dirty_bitmap_deserialize_finish(BdrvDirtyBitmap *bitmap);
->>   
->> +bool bdrv_dirty_bitmap_readonly(const BdrvDirtyBitmap *bitmap);
->> +void bdrv_dirty_bitmap_set_readonly(BdrvDirtyBitmap *bitmap, bool value);
->> +bool bdrv_has_readonly_bitmaps(BlockDriverState *bs);
->> +
->>   #endif
->>
-> Reviewed-by: John Snow <jsnow@redhat.com>
+--cet8NQpBFu5nJ41puk0fsr2vh6u3o56xP
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
--- 
-Best regards,
-Vladimir.
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEcBAEBCAAGBQJZMy43AAoJEKeha0olJ0NqkhcH/RgIwx/oZoPx0Dp6Ij2Rce0N
+IJThHkGtCxoDATcKLO0cplXuz1nnq65jCZrg3PdJi2XM3Y8AItcyEDVkDsZ6uSgD
+MAr6n98RqO89+OD1SLJNkdlMnXYAQtN78eKxgWBBBQbR++zkkcoxAj3mAdlyaj44
+lzEJ+h2g87ZSBCl6rY7r6frGrszP3sU4NQ8cgjJl+eZb1cZmVIn+EbrAs2l7slsk
+86vHrtFC5gLmczNhetcCa0a81jXR8S6YuRsZJQJcKykpq9UBXnvlGvN7g50CIx7t
+2pHAv3V6D8+uT0NOdxEjiuBwUx9ElVnHQH/A7hlFxXOj6k7TTS+7czSJzIgxq4o=
+=xM/s
+-----END PGP SIGNATURE-----
+
+--cet8NQpBFu5nJ41puk0fsr2vh6u3o56xP--
