@@ -1,26 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38876)
-	by lists.gnu.org with esmtp (Exim 4.71) (envelope-from <n54@gmx.com>)
-	id 1dH668-00073k-73
-	for qemu-devel@nongnu.org; Sat, 03 Jun 2017 06:15:57 -0400
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48692)
+	by lists.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <ashijeetacharya@gmail.com>) id 1dH7Xw-0007yv-I9
+	for qemu-devel@nongnu.org; Sat, 03 Jun 2017 07:48:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <n54@gmx.com>) id 1dH664-00071f-U0
-	for qemu-devel@nongnu.org; Sat, 03 Jun 2017 06:15:56 -0400
-Received: from mout.gmx.net ([212.227.17.21]:50840)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <n54@gmx.com>) id 1dH664-00071X-I6
-	for qemu-devel@nongnu.org; Sat, 03 Jun 2017 06:15:52 -0400
-References: <1496414138-7622-1-git-send-email-peter.maydell@linaro.org>
-	<ed2675f7-08f7-5bcd-2ed3-3ecb865e54fe@codingfarm.de>
-From: Kamil Rytarowski <n54@gmx.com>
-Message-ID: <962c8e37-8cc1-ff7d-d88d-ff3e2934146b@gmx.com>
-Date: Sat, 3 Jun 2017 12:17:42 +0200
+	(envelope-from <ashijeetacharya@gmail.com>) id 1dH7Xv-0004io-EI
+	for qemu-devel@nongnu.org; Sat, 03 Jun 2017 07:48:44 -0400
 MIME-Version: 1.0
-In-Reply-To: <ed2675f7-08f7-5bcd-2ed3-3ecb865e54fe@codingfarm.de>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="umNvTrjRdamrNXaWplvT8aXKNCFIGEMhq"
-Subject: Re: [Qemu-devel] [PATCH] configure: Define NCURSES_WIDECHAR if
- we're using curses
+In-Reply-To: <20170601135758.GG13127@lemon.lan>
+References: <1492838021-10538-1-git-send-email-ashijeetacharya@gmail.com>
+	<1492838021-10538-7-git-send-email-ashijeetacharya@gmail.com>
+	<20170601135758.GG13127@lemon.lan>
+From: Ashijeet Acharya <ashijeetacharya@gmail.com>
+Date: Sat, 3 Jun 2017 17:18:37 +0530
+Message-ID: <CAC2QTZaFDpJMoUTDyxm9ukkY1aji40oZxjJWQ3SnoRb=aqfr4Q@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v4 6/8] vmdk: New functions to assist
+ allocating multiple clusters
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,79 +24,135 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Rainer_M=c3=bcller?= <raimue@codingfarm.de>, Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Chad Joan <chadjoan@gmail.com>, Laszlo Ersek <lersek@redhat.com>, patches@linaro.org
+To: Fam Zheng <famz@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu block <qemu-block@nongnu.org>, Stefan Hajnoczi <stefanha@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>, John Snow <jsnow@redhat.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---umNvTrjRdamrNXaWplvT8aXKNCFIGEMhq
-From: Kamil Rytarowski <n54@gmx.com>
-To: =?UTF-8?Q?Rainer_M=c3=bcller?= <raimue@codingfarm.de>,
- Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Chad Joan <chadjoan@gmail.com>,
- Laszlo Ersek <lersek@redhat.com>, patches@linaro.org
-Message-ID: <962c8e37-8cc1-ff7d-d88d-ff3e2934146b@gmx.com>
-Subject: Re: [Qemu-devel] [PATCH] configure: Define NCURSES_WIDECHAR if we're
- using curses
-References: <1496414138-7622-1-git-send-email-peter.maydell@linaro.org>
- <ed2675f7-08f7-5bcd-2ed3-3ecb865e54fe@codingfarm.de>
-In-Reply-To: <ed2675f7-08f7-5bcd-2ed3-3ecb865e54fe@codingfarm.de>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 03.06.2017 12:13, Rainer M=C3=BCller wrote:
-> On 2017-06-02 16:35, Peter Maydell wrote:
->> diff --git a/configure b/configure
->> index 0586ec9..6aca5d1 100755
->> --- a/configure
->> +++ b/configure
->> @@ -3053,6 +3053,8 @@ int main(void) {
->>  EOF
->>    IFS=3D:
->>    for curses_inc in $curses_inc_list; do
->> +    # Make sure we get the wide character prototypes
->> +    curses_inc=3D"-DNCURSES_WIDECHAR $curses_inc"
->>      IFS=3D:
->>      for curses_lib in $curses_lib_list; do
->>        unset IFS
+On Thu, Jun 1, 2017 at 7:27 PM, Fam Zheng <famz@redhat.com> wrote:
+> On Sat, 04/22 10:43, Ashijeet Acharya wrote:
+>> Introduce two new helper functions handle_alloc() and
+>> vmdk_alloc_cluster_offset(). handle_alloc() helps to allocate multiple
+>> clusters at once starting from a given offset on disk and performs COW
+>> if necessary for first and last allocated clusters.
+>> vmdk_alloc_cluster_offset() helps to return the offset of the first of
+>> the many newly allocated clusters. Also, provide proper documentation
+>> for both.
 >>
->=20
-> Thank you for getting back to this. I can confirm that this patch fixes=
+>> Signed-off-by: Ashijeet Acharya <ashijeetacharya@gmail.com>
+>> ---
+>>  block/vmdk.c | 192 +++++++++++++++++++++++++++++++++++++++++++++++++++++++----
+>>  1 file changed, 182 insertions(+), 10 deletions(-)
+>>
+>> diff --git a/block/vmdk.c b/block/vmdk.c
+>> index 7862791..8d34cd9 100644
+>> --- a/block/vmdk.c
+>> +++ b/block/vmdk.c
+>> @@ -136,6 +136,7 @@ typedef struct VmdkMetaData {
+>>      unsigned int l2_offset;
+>>      int valid;
+>>      uint32_t *l2_cache_entry;
+>> +    uint32_t nb_clusters;
+>>  } VmdkMetaData;
+>>
+>>  typedef struct VmdkGrainMarker {
+>> @@ -1242,6 +1243,174 @@ static int get_cluster_table(VmdkExtent *extent, uint64_t offset,
+>>      return VMDK_OK;
+>>  }
+>>
+>> +/*
+>> + * handle_alloc
+>> + *
+>> + * Allocate new clusters for an area that either is yet unallocated or needs a
+>> + * copy on write. If *cluster_offset is non_zero, clusters are only allocated if
+>> + * the new allocation can match the specified host offset.
+>> + *
+>> + * Returns:
+>> + *   VMDK_OK:       if new clusters were allocated, *bytes may be decreased if
+>> + *                  the new allocation doesn't cover all of the requested area.
+>> + *                  *cluster_offset is updated to contain the offset of the
+>> + *                  first newly allocated cluster.
+>> + *
+>> + *   VMDK_UNALLOC:  if no clusters could be allocated. *cluster_offset is left
+>> + *                  unchanged.
+>> + *
+>> + *   VMDK_ERROR:    in error cases
+>> + */
+>> +static int handle_alloc(BlockDriverState *bs, VmdkExtent *extent,
+>> +                        uint64_t offset, uint64_t *cluster_offset,
+>> +                        int64_t *bytes, VmdkMetaData *m_data,
+>> +                        bool allocate, uint32_t *total_alloc_clusters)
+>
+> Not super important but personally I always prefer to stick to a "vmdk_" prefix
+> when naming local identifiers, so that ctags and git grep can take it easy.
 
-> --enable-curses for me on Mac OS X.
->=20
-> Although this already works as is, I would use -DNCURSES_WIDECHAR=3D1 a=
-s
-> ncurses.h uses #if and not #ifdef to check for this.
->=20
+Done.
 
--DNCURSES_WIDECHAR evaluates to 1 for #if
+>
+>> +{
+>> +    int l1_index, l2_offset, l2_index;
+>> +    uint32_t *l2_table;
+>> +    uint32_t cluster_sector;
+>> +    uint32_t nb_clusters;
+>> +    bool zeroed = false;
+>> +    uint64_t skip_start_bytes, skip_end_bytes;
+>> +    int ret;
+>> +
+>> +    ret = get_cluster_table(extent, offset, &l1_index, &l2_offset,
+>> +                            &l2_index, &l2_table);
+>> +    if (ret < 0) {
+>> +        return ret;
+>> +    }
+>> +
+>> +    cluster_sector = le32_to_cpu(l2_table[l2_index]);
+>> +
+>> +    skip_start_bytes = vmdk_find_offset_in_cluster(extent, offset);
+>> +    /* Calculate the number of clusters to look for. Here we truncate the last
+>> +     * cluster, i.e. 1 less than the actual value calculated as we may need to
+>> +     * perform COW for the last one. */
+>> +    nb_clusters = DIV_ROUND_UP(skip_start_bytes + *bytes,
+>> +                            extent->cluster_sectors << BDRV_SECTOR_BITS) - 1;
+>
+> Alignment could be improved: here ^
 
-> Rainer
->=20
+Done.
 
+>
+>> +
+>> +    nb_clusters = MIN(nb_clusters, extent->l2_size - l2_index);
+>> +    assert(nb_clusters <= INT_MAX);
+>> +
+>> +    /* update bytes according to final nb_clusters value */
+>> +    if (nb_clusters != 0) {
+>> +        *bytes = ((nb_clusters * extent->cluster_sectors) << 9)
+>
+> Better use BDRV_SECTOR_BITS instead of 9.
 
+Done.
 
---umNvTrjRdamrNXaWplvT8aXKNCFIGEMhq
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+>
+>> +                                            - skip_start_bytes;
+>> +    } else {
+>> +        nb_clusters = 1;
+>> +    }
+>> +    *total_alloc_clusters += nb_clusters;
+>
+> It is weird that you increment *total_alloc_clusters instead of simply assigning
+> to it, because it's not clear why before reading the caller code.
+>
+I am incrementing it because we allocate clusters in every iteration
+and *total_alloc_clusters contains number of clusters allocated in
+total and not just in one iteration. So basically it is a sum of all
+the m_data->nb_clusters present in every element of the linked list I
+prepare.
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
+> It's better if you just return nb_clusters from this function (either as a
+> return value, or assign to *total_alloc_clusters), then do the accumulation in
+> vmdk_pwritev by adding m_data->nb_clusters, which is simpler.
 
-iQIcBAEBCAAGBQJZMozTAAoJEEuzCOmwLnZsBYQP/R5O9I1EeI3S3xcwlOrJhvaR
-pR1KjXYnHaRbfbSOG6hoeON74bavwLvNfTxu6z8Ou3wv93g49pxDRJ9eFRl7lis9
-da8MnxvN1c2H4a1x5jwbOMJ1PfSqjWydHqxf1dCgQwjFjV63QPmUKR1Vwp3oo1ma
-bNLBK6JKYsV4wt3Z7gpQDMykfeZKpp44Ej1GBwvyo5bkUqHJRGmqSoFtyIeqYzMs
-p+PRL4PBB0MYHLkVqP9iERq/Q13S7yqRUNV4ZRoZ6gfKPBdL6n71O/lqrAz1aUAg
-vRGvEoos70KbnI8ejJMYtLvPacqkv3C2L6HazQNYMEJQ1R9D+U8TpJq/3SciQNyl
-YkOeLGWDN9cYohf6Boa3piLThKMBkTtdFQdYXycyputi02MWCfEuNifDlo/AeruW
-7VF+VhyXxQQZmUSQMwNs1FmkDAyLjhYLIWFLKKVr8RSE2wBhz5AGFq1cFGf610qP
-t+p77pTsQ+r3ksYzEU65pHltxCU5A0JOqCCTcLp2MB21Oc5UUHIf+Ri9NHZmqyTR
-EsJisilzd1O82S81gtoIZj9/Rd5ZDMN/vdu1nyc3ZtgvXrxLGgSeT5qNQbZUsJ7B
-GE+VdoH97nlWlPx3b11JJVHXIG5pylWbAPoL/I0fkh0ADn1VOSPRlYB9icom0JvY
-KTld5s9LCeel/uQPf24J
-=PUJv
------END PGP SIGNATURE-----
+If I understood it correctly, you mean to say that I should add all
+the m_data->nb_clusters present in my linked list inside
+vmdk_pwritev() using a loop? If yes, I think that's what I have been
+doing earlier by incrementing *total_alloc_clusters there itself and
+is better, no?
+Also, please correct me if I am wrong :-)
 
---umNvTrjRdamrNXaWplvT8aXKNCFIGEMhq--
+Ashijeet
