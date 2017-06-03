@@ -1,23 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50695)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55587)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1dH7l3-0003Ct-96
-	for qemu-devel@nongnu.org; Sat, 03 Jun 2017 08:02:18 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1dH8UV-00045I-Cd
+	for qemu-devel@nongnu.org; Sat, 03 Jun 2017 08:49:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1dH7l0-0004F9-VU
-	for qemu-devel@nongnu.org; Sat, 03 Jun 2017 08:02:15 -0400
-From: Laszlo Ersek <lersek@redhat.com>
-References: <1493530506-26833-1-git-send-email-gengdongjiu@huawei.com>
-	<4dde45bb-a730-82b1-dc49-ad00a6b73d85@redhat.com>
-	<accf8880-f4b0-85f1-9f33-4103c8c26d7a@redhat.com>
-Message-ID: <e90c5fb8-e68b-a620-9023-f4fcfdd68e97@redhat.com>
-Date: Sat, 3 Jun 2017 14:01:45 +0200
+	(envelope-from <dgibson@ozlabs.org>) id 1dH8UU-0007HM-4e
+	for qemu-devel@nongnu.org; Sat, 03 Jun 2017 08:49:15 -0400
+Date: Sat, 3 Jun 2017 21:54:44 +1000
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20170603115444.GT13397@umbus.fritz.box>
+References: <1496303518-25638-1-git-send-email-felipe@nutanix.com>
 MIME-Version: 1.0
-In-Reply-To: <accf8880-f4b0-85f1-9f33-4103c8c26d7a@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 1/4] ACPI: Add APEI GHES Table
- Generation support
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="HtRZva1Vzv8iP5ye"
+Content-Disposition: inline
+In-Reply-To: <1496303518-25638-1-git-send-email-felipe@nutanix.com>
+Subject: Re: [Qemu-devel] [PATCH] spapr: Allow boot from vhost-*-scsi
+ backends
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,65 +24,90 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Dongjiu Geng <gengdongjiu@huawei.com>
-Cc: james.morse@arm.com, marc.zyngier@arm.com, christoffer.dall@linaro.org, rkrcmar@redhat.com, linux@armlinux.org.uk, tbaicar@codeaurora.org, imammedo@redhat.com, zhaoshenglong@huawei.com, peter.maydell@linaro.org, pbonzini@redhat.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, ard.biesheuvel@linaro.org, mtsirkin@redhat.com, drjones@redhat.com, ben@skyportsystems.com, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, songwenjun@huawei.com, wuquanming@huawei.com, huangshaoyu@huawei.com, wangxiongfeng2@huawei.com, xiexiuqi@huawei.com
+To: Felipe Franciosi <felipe@nutanix.com>
+Cc: Alexey Kardashevskiy <aik@ozlabs.ru>, Alexander Graf <agraf@suse.de>, Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Mike Cui <cui@nutanix.com>
 
-On 05/22/17 16:23, Laszlo Ersek wrote:
-> Keeping some context:
-> 
-> On 05/12/17 23:00, Laszlo Ersek wrote:
->> On 04/30/17 07:35, Dongjiu Geng wrote:
 
-> (68) In the code below, you are not taking an "OVMF header probe
-> suppressor" into account.
-> 
-> But, we have already planned to replace that quirk with a separate,
-> dedicated allocation hint or command, so I'm not going to describe what
-> an "OVMF header probe suppressor" is; instead, I'll describe the
-> replacement for it.
-> 
-> [...]
+--HtRZva1Vzv8iP5ye
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-So, the NOACPI allocation hint is a no-go at the moment, based on the
-discussion in the following threads:
+On Thu, Jun 01, 2017 at 08:51:58AM +0100, Felipe Franciosi wrote:
+> This makes VMs bootable on spapr when using vhost-*-scsi.
 
-http://mid.mail-archive.com/20170601112241.2580-1-ard.biesheuvel@linaro.org
+This commit message needs more information: what previously prevented
+vhost-*-scsi from working?
 
-http://mid.mail-archive.com/c76b36de-ebf9-c662-d454-0a95b43901e8@redhat.com
+> Signed-off-by: Felipe Franciosi <felipe@nutanix.com>
+> Signed-off-by: Mike Cui <cui@nutanix.com>
+> ---
+>  hw/ppc/spapr.c | 8 ++++++++
+>  1 file changed, 8 insertions(+)
+>=20
+> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> index ab3aab1..1c87886 100644
+> --- a/hw/ppc/spapr.c
+> +++ b/hw/ppc/spapr.c
+> @@ -57,6 +57,7 @@
+>  #include "hw/pci/pci.h"
+>  #include "hw/scsi/scsi.h"
+>  #include "hw/virtio/virtio-scsi.h"
+> +#include "hw/virtio/vhost-scsi-common.h"
+> =20
+>  #include "exec/address-spaces.h"
+>  #include "hw/usb.h"
+> @@ -2388,6 +2389,7 @@ static char *spapr_get_fw_dev_path(FWPathProvider *=
+p, BusState *bus,
+>      ((type *)object_dynamic_cast(OBJECT(obj), (name)))
+>      SCSIDevice *d =3D CAST(SCSIDevice,  dev, TYPE_SCSI_DEVICE);
+>      sPAPRPHBState *phb =3D CAST(sPAPRPHBState, dev, TYPE_SPAPR_PCI_HOST_=
+BRIDGE);
+> +    VHostSCSICommon *vsc =3D CAST(VHostSCSICommon, dev, TYPE_VHOST_SCSI_=
+COMMON);
+> =20
+>      if (d) {
+>          void *spapr =3D CAST(void, bus->parent, "spapr-vscsi");
+> @@ -2444,6 +2446,12 @@ static char *spapr_get_fw_dev_path(FWPathProvider =
+*p, BusState *bus,
+>          return g_strdup_printf("pci@%"PRIX64, phb->buid);
+>      }
+> =20
+> +    if (vsc) {
+> +        /* Same logic as virtio above */
+> +        unsigned id =3D 0x1000000 | (vsc->target << 16) | vsc->lun;
+> +        return g_strdup_printf("disk@%"PRIX64, (uint64_t)id << 32);
+> +    }
+> +
+>      return NULL;
+>  }
+> =20
 
-Therefore the header probe suppression remains necessary.
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
 
-In this case, it is not hard to do, you just have to reorder the
-following two ADD_POINTER additions a bit:
+--HtRZva1Vzv8iP5ye
+Content-Type: application/pgp-signature; name="signature.asc"
 
->>> +
->>> +        bios_linker_loader_add_pointer(linker, GHES_ERRORS_FW_CFG_FILE,
->>> +                                sizeof(uint64_t) * i, sizeof(uint64_t),
->>> +                                GHES_ERRORS_FW_CFG_FILE,
->>> +                                MAX_ERROR_SOURCE_COUNT_V6 * sizeof(uint64_t) +
->>> +                                i * MAX_RAW_DATA_LENGTH);
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
 
-This one should be moved out to a separate loop, after the current loop.
+iQIcBAEBCAAGBQJZMqOEAAoJEGw4ysog2bOSiUMP/iBmCJSDdE1jd+gFwGcBedJT
+gEnrsxwz4H4TkTaws6SmoqlRdjBAQ47UuB0vVmHYnUGAxCKNWzsNtTVDVvroMDuh
+Q7NwvnD3un+0VgUImsQilHvrZ201XskT1lpf0tKg9ivVNeyOITZ35RIucP5T7w4Z
+b1irq+iFOlP/aVqitDiukBLrWjk483IJjesiblcvlnZ907N4R6VK9+4Cizw7qI2h
+noMaB7zxw+Nxfy+zGRDYpjE6kCzat26Eg6SxBxeIk/Peg1+VZvSp8Qen5wgUcviG
+aew7qAEN4+S5iS8pwIq3Iey33mXJGJQJVRt4JcLulsGxjUjH7yGKuG20dxUuBUaE
+NYPYLpnUKj2wzNQz3cn7K8TOtK64ErJFHNGvsFpxETSL9NAl9dXLS+eDyS+fcs2S
+DGg3Hq+LfrsmThT2Fwq11+Y2nwIuWjYwj7snnSOHl65y+eP5XkT0wcfM5Eb9izrr
+ob/V9ioCY7jODkDkst9zSDD8VbLGuRAIyBlLAjuUsSEER0Fu8D3eJtmdC1DAze0a
+0Z9NwZAMcz7iWC3qamrcLH+JhFACpWX4DO51ju+2PG2s8JSbDivUX1dUrpiXPr1R
+j9uRYt0G/9U368y4dbEgFJ8Rl64MbrAQdjKyEaX+dnJgtgliTYfCBws2Q30j0nmB
+xEQ0xU5nSRrNeTpbY052
+=2nQl
+-----END PGP SIGNATURE-----
 
->>> +        bios_linker_loader_add_pointer(linker, ACPI_BUILD_TABLE_FILE,
->>> +                    address_registers_offset
->>> +                    + i * sizeof(AcpiGenericHardwareErrorSource),
->>> +                    sizeof(uint32_t), GHES_ERRORS_FW_CFG_FILE,
->>> +                    i * sizeof(uint64_t));
-
-This one should be kept in the first (i.e., current) loop.
-
-The idea is, when you first point the HEST/GHES_n entries in
-ACPI_BUILD_TABLE_FILE to the "address registers" in
-GHES_ERRORS_FW_CFG_FILE, all those address registers will still be
-zero-filled. This will fail the ACPI table header probe in
-OvmfPkg/AcpiPlatformDxe, which is what we want.
-
-After this is done, the address registers in GHES_ERRORS_FW_CFG_FILE
-should be pointed to the error status data blocks in the same fw_cfg
-blob, in a separate loop. (Those error status data blocks will again be
-zero-filled, so no ACPI table headers will be mistakenly recognized in
-them.)
-
-Thanks
-Laszlo
+--HtRZva1Vzv8iP5ye--
