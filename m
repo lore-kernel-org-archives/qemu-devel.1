@@ -1,26 +1,39 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45131)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48740)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dHH0m-0002ss-7Q
-	for qemu-devel@nongnu.org; Sat, 03 Jun 2017 17:55:09 -0400
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1dHHd8-0001jW-7S
+	for qemu-devel@nongnu.org; Sat, 03 Jun 2017 18:34:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dHH0i-0003WO-3a
-	for qemu-devel@nongnu.org; Sat, 03 Jun 2017 17:55:08 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53502)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dHH0h-0003W1-RZ
-	for qemu-devel@nongnu.org; Sat, 03 Jun 2017 17:55:04 -0400
-References: <20170530143052.165002-1-vsementsov@virtuozzo.com>
-	<20170530143052.165002-18-vsementsov@virtuozzo.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <9dc3fd5c-45ab-3d32-bd72-bbb0a6986bee@redhat.com>
-Date: Sat, 3 Jun 2017 16:55:01 -0500
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1dHHd5-000392-ID
+	for qemu-devel@nongnu.org; Sat, 03 Jun 2017 18:34:46 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:59892)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mdroth@linux.vnet.ibm.com>)
+	id 1dHHd5-00037D-9b
+	for qemu-devel@nongnu.org; Sat, 03 Jun 2017 18:34:43 -0400
+Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v53MY5jn071672
+	for <qemu-devel@nongnu.org>; Sat, 3 Jun 2017 18:34:41 -0400
+Received: from e34.co.us.ibm.com (e34.co.us.ibm.com [32.97.110.152])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2auv446hnp-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Sat, 03 Jun 2017 18:34:41 -0400
+Received: from localhost
+	by e34.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <mdroth@linux.vnet.ibm.com>;
+	Sat, 3 Jun 2017 16:34:40 -0600
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-In-Reply-To: <20170530143052.165002-18-vsementsov@virtuozzo.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="wgwLEUWMUVwCCAVpXXdfksEOSFW6nnqtW"
-Subject: Re: [Qemu-devel] [PATCH 17/19] nbd/common: nbd_tls_handshake: use
- error_reportf_err instead of TRACE
+Content-Transfer-Encoding: quoted-printable
+From: Michael Roth <mdroth@linux.vnet.ibm.com>
+In-Reply-To: <20170602072952.25454-6-david@gibson.dropbear.id.au>
+References: <20170602072952.25454-1-david@gibson.dropbear.id.au>
+	<20170602072952.25454-6-david@gibson.dropbear.id.au>
+Date: Sat, 03 Jun 2017 17:34:26 -0500
+Message-Id: <149652926658.2695.5793892804950077026@loki>
+Subject: Re: [Qemu-devel] [PATCH 5/5] spapr: Remove some non-useful
+ properties on DRC objects
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,74 +42,109 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org
-Cc: pbonzini@redhat.com, den@openvz.org
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: lvivier@redhat.com, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, bharata@linux.vnet.ibm.com, sursingh@redhat.com, groug@kaod.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---wgwLEUWMUVwCCAVpXXdfksEOSFW6nnqtW
-From: Eric Blake <eblake@redhat.com>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-devel@nongnu.org
-Cc: pbonzini@redhat.com, den@openvz.org
-Message-ID: <9dc3fd5c-45ab-3d32-bd72-bbb0a6986bee@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 17/19] nbd/common: nbd_tls_handshake: use
- error_reportf_err instead of TRACE
-References: <20170530143052.165002-1-vsementsov@virtuozzo.com>
- <20170530143052.165002-18-vsementsov@virtuozzo.com>
-In-Reply-To: <20170530143052.165002-18-vsementsov@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Quoting David Gibson (2017-06-02 02:29:52)
+>  * 'connector_type' is easily derived from the 'index' property, so there=
+'s
+>    no point to it (it's also implicit in the QOM type of the DRC)
+>  * 'isolation-state', 'indicator-state' and 'allocation-state' are
+>    part of the transaction between qemu and guest during PAPR hotplug
+>    operations, and outside tools really have no business looking at it
+>    (especially not changing, and these were RW properties)
+>  * 'entity-sense' is basically just a weird PAPR encoding of whether there
+>    is a device connected to this DRC
+> =
 
-On 05/30/2017 09:30 AM, Vladimir Sementsov-Ogievskiy wrote:
-> Use error_reportf_err instead of TRACE in case of fail.
->=20
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> Strictly speaking removing these properties is breaking the qemu interfac=
+e.
+> However, I'm pretty sure no management tools have ever used these.  For
+> debugging there are better alternatives.  Therefore, I think removing the=
+se
+> broken interfaces is the better option.
+
+Debugging was indeed the primary motivation behind these. I agree these
+don't really serve any useful purpose now and probably should've just
+been traces from the start.
+
+> =
+
+> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+
+Reviewed-by: Michael Roth <mdroth@linux.vnet.ibm.com>
+
 > ---
->  nbd/common.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+>  hw/ppc/spapr_drc.c | 29 -----------------------------
+>  1 file changed, 29 deletions(-)
+> =
+
+> diff --git a/hw/ppc/spapr_drc.c b/hw/ppc/spapr_drc.c
+> index d43c9cd..4dd26a8 100644
+> --- a/hw/ppc/spapr_drc.c
+> +++ b/hw/ppc/spapr_drc.c
+> @@ -228,14 +228,6 @@ static void prop_get_index(Object *obj, Visitor *v, =
+const char *name,
+>      visit_type_uint32(v, name, &value, errp);
+>  }
+> =
+
+> -static void prop_get_type(Object *obj, Visitor *v, const char *name,
+> -                          void *opaque, Error **errp)
+> -{
+> -    sPAPRDRConnector *drc =3D SPAPR_DR_CONNECTOR(obj);
+> -    uint32_t value =3D (uint32_t)spapr_drc_type(drc);
+> -    visit_type_uint32(v, name, &value, errp);
+> -}
+> -
+>  static char *prop_get_name(Object *obj, Error **errp)
+>  {
+>      sPAPRDRConnector *drc =3D SPAPR_DR_CONNECTOR(obj);
+> @@ -243,17 +235,6 @@ static char *prop_get_name(Object *obj, Error **errp)
+>      return g_strdup(drck->get_name(drc));
+>  }
+> =
+
+> -static void prop_get_entity_sense(Object *obj, Visitor *v, const char *n=
+ame,
+> -                                  void *opaque, Error **errp)
+> -{
+> -    sPAPRDRConnector *drc =3D SPAPR_DR_CONNECTOR(obj);
+> -    sPAPRDRConnectorClass *drck =3D SPAPR_DR_CONNECTOR_GET_CLASS(drc);
+> -    uint32_t value;
+> -
+> -    drck->entity_sense(drc, &value);
+> -    visit_type_uint32(v, name, &value, errp);
+> -}
+> -
+>  static void prop_get_fdt(Object *obj, Visitor *v, const char *name,
+>                           void *opaque, Error **errp)
+>  {
+> @@ -670,20 +651,10 @@ static void spapr_dr_connector_instance_init(Object=
+ *obj)
+>  {
+>      sPAPRDRConnector *drc =3D SPAPR_DR_CONNECTOR(obj);
+> =
+
+> -    object_property_add_uint32_ptr(obj, "isolation-state",
+> -                                   &drc->isolation_state, NULL);
+> -    object_property_add_uint32_ptr(obj, "indicator-state",
+> -                                   &drc->indicator_state, NULL);
+> -    object_property_add_uint32_ptr(obj, "allocation-state",
+> -                                   &drc->allocation_state, NULL);
+>      object_property_add_uint32_ptr(obj, "id", &drc->id, NULL);
+>      object_property_add(obj, "index", "uint32", prop_get_index,
+>                          NULL, NULL, NULL, NULL);
+> -    object_property_add(obj, "connector_type", "uint32", prop_get_type,
+> -                        NULL, NULL, NULL, NULL);
+>      object_property_add_str(obj, "name", prop_get_name, NULL, NULL);
+> -    object_property_add(obj, "entity-sense", "uint32", prop_get_entity_s=
+ense,
+> -                        NULL, NULL, NULL, NULL);
+>      object_property_add(obj, "fdt", "struct", prop_get_fdt,
+>                          NULL, NULL, NULL, NULL);
+>  }
+> -- =
+
+> 2.9.4
 >=20
-> diff --git a/nbd/common.c b/nbd/common.c
-> index 88e0297fb2..574a551abe 100644
-> --- a/nbd/common.c
-> +++ b/nbd/common.c
-> @@ -102,7 +102,7 @@ void nbd_tls_handshake(QIOTask *task,
->      struct NBDTLSHandshakeData *data =3D opaque;
-> =20
->      if (qio_task_propagate_error(task, &data->error)) {
-> -        TRACE("TLS failed %s", error_get_pretty(data->error));
-> +        error_reportf_err(data->error, "TLS failed");
-
-I don't think this is right. You already populated &data->error(), which
-means you have the error message available to the caller, and should let
-the caller handle the message rather than blindly reporting it here
-yourself (especially since if the caller also reports it, you've now
-doubled up error messages).  Converting this TRACE() into a proper
-tracepoint may be okay, but it may also be sufficient to just delete
-this TRACE() since the caller should already be handling the failure.
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---wgwLEUWMUVwCCAVpXXdfksEOSFW6nnqtW
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEcBAEBCAAGBQJZMzA1AAoJEKeha0olJ0NqpUIH/2uiDjQ+z+/kF3Oz9nglK762
-d9FFv3KYJCdowPerjNRC4og68fPXB0hJfNx7Rbg1yHe97aiRFX2EAIP6VaoNdRyD
-LCyKi7jUtqOEsJeQraGXhL7SBK9scmVNBXetcOWZ8dt0lZumuc6Taykfc4uSIHDN
-iWs60gFy+VCiM8l+yk4G/kSE9vfeJK1r61FA2Te01zvd8xJt6+usePm3tmVBeB7E
-A9rqXAbnqlwN5Ml8NKh4qWfw7vGXYTVrrSnyrfzFV9HOnaInUD0u/uRoj8ff8ysz
-WkEr0g5/vnxPKFh4OI3oTQ6Mje7GGYQ4tjHs5pmrarmN0UfTMPn7bLUXac5O1DQ=
-=Brml
------END PGP SIGNATURE-----
-
---wgwLEUWMUVwCCAVpXXdfksEOSFW6nnqtW--
