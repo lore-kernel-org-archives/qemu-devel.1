@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50279)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50333)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dHZRV-0007gq-JP
-	for qemu-devel@nongnu.org; Sun, 04 Jun 2017 13:35:59 -0400
+	(envelope-from <rth7680@gmail.com>) id 1dHZRY-0007jn-9r
+	for qemu-devel@nongnu.org; Sun, 04 Jun 2017 13:36:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dHZRS-0003JC-Sk
-	for qemu-devel@nongnu.org; Sun, 04 Jun 2017 13:35:57 -0400
-Received: from mail-pf0-x244.google.com ([2607:f8b0:400e:c00::244]:34651)
+	(envelope-from <rth7680@gmail.com>) id 1dHZRX-0003Nw-0L
+	for qemu-devel@nongnu.org; Sun, 04 Jun 2017 13:36:00 -0400
+Received: from mail-pg0-x243.google.com ([2607:f8b0:400e:c05::243]:35887)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1dHZRS-0003I2-Hh
-	for qemu-devel@nongnu.org; Sun, 04 Jun 2017 13:35:54 -0400
-Received: by mail-pf0-x244.google.com with SMTP id w69so18143457pfk.1
-	for <qemu-devel@nongnu.org>; Sun, 04 Jun 2017 10:35:54 -0700 (PDT)
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1dHZRW-0003NA-OC
+	for qemu-devel@nongnu.org; Sun, 04 Jun 2017 13:35:58 -0400
+Received: by mail-pg0-x243.google.com with SMTP id v18so3986170pgb.3
+	for <qemu-devel@nongnu.org>; Sun, 04 Jun 2017 10:35:58 -0700 (PDT)
 Sender: Richard Henderson <rth7680@gmail.com>
 From: Richard Henderson <rth@twiddle.net>
-Date: Sun,  4 Jun 2017 10:34:30 -0700
-Message-Id: <20170604173509.29684-31-rth@twiddle.net>
+Date: Sun,  4 Jun 2017 10:34:33 -0700
+Message-Id: <20170604173509.29684-34-rth@twiddle.net>
 In-Reply-To: <20170604173509.29684-1-rth@twiddle.net>
 References: <20170604173509.29684-1-rth@twiddle.net>
-Subject: [Qemu-devel] [PULL 30/69] target/s390x: Use unwind data for
- helper_mvcs/mvcp
+Subject: [Qemu-devel] [PULL 33/69] target/s390x: Use atomic operations for
+ COMPARE SWAP PURGE
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,73 +30,152 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: peter.maydell@linaro.org, aurelien@aurel32.net
 
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+Also provide the cross-cpu tlb flushing required by the PoO.
+
 Reviewed-by: Aurelien Jarno <aurelien@aurel32.net>
 Signed-off-by: Richard Henderson <rth@twiddle.net>
 ---
- target/s390x/mem_helper.c | 8 ++++++--
- target/s390x/translate.c  | 2 --
- 2 files changed, 6 insertions(+), 4 deletions(-)
+ target/s390x/helper.h      |  2 +-
+ target/s390x/insn-data.def |  2 +-
+ target/s390x/mem_helper.c  | 32 ++++++++------------------------
+ target/s390x/translate.c   | 42 ++++++++++++++++++++++++++++++++++++++----
+ 4 files changed, 48 insertions(+), 30 deletions(-)
 
+diff --git a/target/s390x/helper.h b/target/s390x/helper.h
+index 3819409..cc451c7 100644
+--- a/target/s390x/helper.h
++++ b/target/s390x/helper.h
+@@ -107,13 +107,13 @@ DEF_HELPER_FLAGS_2(tprot, TCG_CALL_NO_RWG, i32, i64, i64)
+ DEF_HELPER_FLAGS_2(iske, TCG_CALL_NO_RWG_SE, i64, env, i64)
+ DEF_HELPER_FLAGS_3(sske, TCG_CALL_NO_RWG, void, env, i64, i64)
+ DEF_HELPER_FLAGS_2(rrbe, TCG_CALL_NO_RWG, i32, env, i64)
+-DEF_HELPER_3(csp, i32, env, i32, i64)
+ DEF_HELPER_4(mvcs, i32, env, i64, i64, i64)
+ DEF_HELPER_4(mvcp, i32, env, i64, i64, i64)
+ DEF_HELPER_4(sigp, i32, env, i64, i32, i64)
+ DEF_HELPER_FLAGS_2(sacf, TCG_CALL_NO_WG, void, env, i64)
+ DEF_HELPER_FLAGS_3(ipte, TCG_CALL_NO_RWG, void, env, i64, i64)
+ DEF_HELPER_FLAGS_1(ptlb, TCG_CALL_NO_RWG, void, env)
++DEF_HELPER_FLAGS_1(purge, TCG_CALL_NO_RWG, void, env)
+ DEF_HELPER_2(lra, i64, env, i64)
+ DEF_HELPER_FLAGS_2(lura, TCG_CALL_NO_WG, i64, env, i64)
+ DEF_HELPER_FLAGS_2(lurag, TCG_CALL_NO_WG, i64, env, i64)
+diff --git a/target/s390x/insn-data.def b/target/s390x/insn-data.def
+index 3c3541c..4c91f30 100644
+--- a/target/s390x/insn-data.def
++++ b/target/s390x/insn-data.def
+@@ -837,7 +837,7 @@
+ 
+ #ifndef CONFIG_USER_ONLY
+ /* COMPARE AND SWAP AND PURGE */
+-    C(0xb250, CSP,     RRE,   Z,   0, ra2, 0, 0, csp, 0)
++    D(0xb250, CSP,     RRE,   Z,   r1_32u, ra2, r1_P, 0, csp, 0, MO_TEUL)
+ /* DIAGNOSE (KVM hypercall) */
+     C(0x8300, DIAG,    RSI,   Z,   0, 0, 0, 0, diag, 0)
+ /* INSERT STORAGE KEY EXTENDED */
 diff --git a/target/s390x/mem_helper.c b/target/s390x/mem_helper.c
-index 17d8257..a73d486 100644
+index fa03129..4b96c27 100644
 --- a/target/s390x/mem_helper.c
 +++ b/target/s390x/mem_helper.c
-@@ -1082,6 +1082,7 @@ uint32_t HELPER(csp)(CPUS390XState *env, uint32_t r1, uint64_t r2)
+@@ -1056,30 +1056,6 @@ uint32_t HELPER(rrbe)(CPUS390XState *env, uint64_t r2)
+     return re >> 1;
+ }
  
+-/* compare and swap and purge */
+-uint32_t HELPER(csp)(CPUS390XState *env, uint32_t r1, uint64_t r2)
+-{
+-    S390CPU *cpu = s390_env_get_cpu(env);
+-    uint32_t cc;
+-    uint32_t o1 = env->regs[r1];
+-    uint64_t a2 = r2 & ~3ULL;
+-    uint32_t o2 = cpu_ldl_data(env, a2);
+-
+-    if (o1 == o2) {
+-        cpu_stl_data(env, a2, env->regs[(r1 + 1) & 15]);
+-        if (r2 & 0x3) {
+-            /* flush TLB / ALB */
+-            tlb_flush(CPU(cpu));
+-        }
+-        cc = 0;
+-    } else {
+-        env->regs[r1] = (env->regs[r1] & 0xffffffff00000000ULL) | o2;
+-        cc = 1;
+-    }
+-
+-    return cc;
+-}
+-
  uint32_t HELPER(mvcs)(CPUS390XState *env, uint64_t l, uint64_t a1, uint64_t a2)
  {
-+    uintptr_t ra = GETPC();
-     int cc = 0, i;
+     uintptr_t ra = GETPC();
+@@ -1161,6 +1137,14 @@ void HELPER(ptlb)(CPUS390XState *env)
+     tlb_flush(CPU(cpu));
+ }
  
-     HELPER_LOG("%s: %16" PRIx64 " %16" PRIx64 " %16" PRIx64 "\n",
-@@ -1095,7 +1096,8 @@ uint32_t HELPER(mvcs)(CPUS390XState *env, uint64_t l, uint64_t a1, uint64_t a2)
- 
-     /* XXX replace w/ memcpy */
-     for (i = 0; i < l; i++) {
--        cpu_stb_secondary(env, a1 + i, cpu_ldub_primary(env, a2 + i));
-+        uint8_t x = cpu_ldub_primary_ra(env, a2 + i, ra);
-+        cpu_stb_secondary_ra(env, a1 + i, x, ra);
-     }
- 
-     return cc;
-@@ -1103,6 +1105,7 @@ uint32_t HELPER(mvcs)(CPUS390XState *env, uint64_t l, uint64_t a1, uint64_t a2)
- 
- uint32_t HELPER(mvcp)(CPUS390XState *env, uint64_t l, uint64_t a1, uint64_t a2)
++/* flush global tlb */
++void HELPER(purge)(CPUS390XState *env)
++{
++    S390CPU *cpu = s390_env_get_cpu(env);
++
++    tlb_flush_all_cpus_synced(CPU(cpu));
++}
++
+ /* load using real address */
+ uint64_t HELPER(lura)(CPUS390XState *env, uint64_t addr)
  {
-+    uintptr_t ra = GETPC();
-     int cc = 0, i;
- 
-     HELPER_LOG("%s: %16" PRIx64 " %16" PRIx64 " %16" PRIx64 "\n",
-@@ -1116,7 +1119,8 @@ uint32_t HELPER(mvcp)(CPUS390XState *env, uint64_t l, uint64_t a1, uint64_t a2)
- 
-     /* XXX replace w/ memcpy */
-     for (i = 0; i < l; i++) {
--        cpu_stb_primary(env, a1 + i, cpu_ldub_secondary(env, a2 + i));
-+        uint8_t x = cpu_ldub_secondary_ra(env, a2 + i, ra);
-+        cpu_stb_primary_ra(env, a1 + i, x, ra);
-     }
- 
-     return cc;
 diff --git a/target/s390x/translate.c b/target/s390x/translate.c
-index 141be22..422bbf1 100644
+index b7b4843..a3fb324 100644
 --- a/target/s390x/translate.c
 +++ b/target/s390x/translate.c
-@@ -2889,7 +2889,6 @@ static ExitStatus op_mvcp(DisasContext *s, DisasOps *o)
+@@ -2001,11 +2001,45 @@ static ExitStatus op_cdsg(DisasContext *s, DisasOps *o)
+ #ifndef CONFIG_USER_ONLY
+ static ExitStatus op_csp(DisasContext *s, DisasOps *o)
  {
-     int r1 = get_field(s->fields, l1);
+-    TCGv_i32 r1 = tcg_const_i32(get_field(s->fields, r1));
++    TCGMemOp mop = s->insn->data;
++    TCGv_i64 addr, old, cc;
++    TCGLabel *lab = gen_new_label();
++
++    /* Note that in1 = R1 (zero-extended expected value),
++       out = R1 (original reg), out2 = R1+1 (new value).  */
++
      check_privileged(s);
--    potential_page_fault(s);
-     gen_helper_mvcp(cc_op, cpu_env, regs[r1], o->addr1, o->in2);
-     set_cc_static(s);
+-    gen_helper_csp(cc_op, cpu_env, r1, o->in2);
+-    tcg_temp_free_i32(r1);
+-    set_cc_static(s);
++    addr = tcg_temp_new_i64();
++    old = tcg_temp_new_i64();
++    tcg_gen_andi_i64(addr, o->in2, -1ULL << (mop & MO_SIZE));
++    tcg_gen_atomic_cmpxchg_i64(old, addr, o->in1, o->out2,
++                               get_mem_index(s), mop | MO_ALIGN);
++    tcg_temp_free_i64(addr);
++
++    /* Are the memory and expected values (un)equal?  */
++    cc = tcg_temp_new_i64();
++    tcg_gen_setcond_i64(TCG_COND_NE, cc, o->in1, old);
++    tcg_gen_extrl_i64_i32(cc_op, cc);
++
++    /* Write back the output now, so that it happens before the
++       following branch, so that we don't need local temps.  */
++    if ((mop & MO_SIZE) == MO_32) {
++        tcg_gen_deposit_i64(o->out, o->out, old, 0, 32);
++    } else {
++        tcg_gen_mov_i64(o->out, old);
++    }
++    tcg_temp_free_i64(old);
++
++    /* If the comparison was equal, and the LSB of R2 was set,
++       then we need to flush the TLB (for all cpus).  */
++    tcg_gen_xori_i64(cc, cc, 1);
++    tcg_gen_and_i64(cc, cc, o->in2);
++    tcg_gen_brcondi_i64(TCG_COND_EQ, cc, 0, lab);
++    tcg_temp_free_i64(cc);
++
++    gen_helper_purge(cpu_env);
++    gen_set_label(lab);
++
      return NO_EXIT;
-@@ -2899,7 +2898,6 @@ static ExitStatus op_mvcs(DisasContext *s, DisasOps *o)
- {
-     int r1 = get_field(s->fields, l1);
-     check_privileged(s);
--    potential_page_fault(s);
-     gen_helper_mvcs(cc_op, cpu_env, regs[r1], o->addr1, o->in2);
-     set_cc_static(s);
-     return NO_EXIT;
+ }
+ #endif
 -- 
 2.9.4
