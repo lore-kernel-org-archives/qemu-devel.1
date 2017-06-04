@@ -1,18 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60924)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33529)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mjt@tls.msk.ru>) id 1dHXpW-0006qh-95
-	for qemu-devel@nongnu.org; Sun, 04 Jun 2017 11:52:39 -0400
+	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1dHXsr-0001IC-QI
+	for qemu-devel@nongnu.org; Sun, 04 Jun 2017 11:56:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mjt@tls.msk.ru>) id 1dHXpS-0004yy-BP
-	for qemu-devel@nongnu.org; Sun, 04 Jun 2017 11:52:38 -0400
-From: Michael Tokarev <mjt@tls.msk.ru>
-Date: Sun,  4 Jun 2017 18:45:23 +0300
-Message-Id: <543f8f13e256a081dd820375e9575439b659ccd8.1496591095.git.mjt@msgid.tls.msk.ru>
-In-Reply-To: <cover.1496591095.git.mjt@msgid.tls.msk.ru>
-References: <cover.1496591095.git.mjt@msgid.tls.msk.ru>
-In-Reply-To: <cover.1496591095.git.mjt@msgid.tls.msk.ru>
-References: <cover.1496591095.git.mjt@msgid.tls.msk.ru>
-Subject: [Qemu-devel] [PULL 19/22] ide-test: check return of fwrite
+	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1dHXso-0007oM-M5
+	for qemu-devel@nongnu.org; Sun, 04 Jun 2017 11:56:05 -0400
+Received: from [59.151.112.132] (port=24108 helo=heian.cn.fujitsu.com)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1dHXsn-0007m9-UC
+	for qemu-devel@nongnu.org; Sun, 04 Jun 2017 11:56:02 -0400
+References: <20170601130325.6433-1-marcandre.lureau@redhat.com>
+	<20170601130325.6433-2-marcandre.lureau@redhat.com>
+	<465a7b69-a3c0-1492-8e30-c562a76cd65a@redhat.com>
+	<0a434f41-1131-713d-1fc9-a9edba425f7a@redhat.com>
+	<CAJ+F1CKL6OXetG6Liwf3NrpNv3K8PR6_SQ5=rfjyRwa3pJ7nuA@mail.gmail.com>
+	<CAJ+F1CKhaNuBO8O-X=u8aWV47q+smG2weo2qqoMojio+fJva_g@mail.gmail.com>
+	<584abbba-669d-0fac-2144-5f7010b1a7ae@redhat.com>
+From: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
+Message-ID: <671cbc52-dfa5-38a3-e4a8-73152af4bada@cn.fujitsu.com>
+Date: Sun, 4 Jun 2017 23:56:49 +0800
+MIME-Version: 1.0
+In-Reply-To: <584abbba-669d-0fac-2144-5f7010b1a7ae@redhat.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v2 1/4] dump: add DumpInfo structure
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,57 +32,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: John Snow <jsnow@redhat.com>, qemu-trivial@nongnu.org, Michael Tokarev <mjt@tls.msk.ru>
+To: Laszlo Ersek <lersek@redhat.com>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@gmail.com>, Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org, "wencongyang2@huawei.com" <wencongyang2@huawei.com>
+Cc: zhangchen.fnst@cn.fujitsu.com, anderson@redhat.com, qiaonuohan <qiaonuohan@huawei.com>
 
-From: John Snow <jsnow@redhat.com>
 
-To quiet patchew, add an assert for fwrite's return value.
 
-Signed-off-by: John Snow <jsnow@redhat.com>
-Reviewed-by: Jeff Cody <jcody@redhat.com>
-Reviewed-by: Laurent Vivier <lvivier@redhat.com>
-Signed-off-by: Michael Tokarev <mjt@tls.msk.ru>
----
- tests/ide-test.c | 8 ++++++--
- 1 file changed, 6 insertions(+), 2 deletions(-)
+On 06/03/2017 06:49 AM, Laszlo Ersek wrote:
+> On 06/02/17 11:55, Marc-André Lureau wrote:
+>> Hi
+>>
+>> On Fri, Jun 2, 2017 at 1:46 PM Marc-André Lureau <marcandre.lureau@gmail.com>
+>> wrote:
+>>
+>>> Hi
+>>>
+>>> On Thu, Jun 1, 2017 at 10:19 PM Eric Blake <eblake@redhat.com> wrote:
+>>>
+>>>> On 06/01/2017 01:06 PM, Laszlo Ersek wrote:
+>>>>> On 06/01/17 15:03, Marc-André Lureau wrote:
+>>>>>> One way or another, the guest could communicate various dump info (via
+>>>>>> guest agent or vmcoreinfo device) and populate that structure. It can
+>>>>>> then be used to augment the dump with various details, as done in the
+>>>>>> following patch.
+>>>>>>
+>>>>>> Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
+>>>>>> ---
+>>>>>>   include/sysemu/dump-info.h | 18 ++++++++++++++++++
+>>>>>>   dump.c                     |  3 +++
+>>>>>>   2 files changed, 21 insertions(+)
+>>>>>>   create mode 100644 include/sysemu/dump-info.h
+>>>>>>
+>>>>>> diff --git a/include/sysemu/dump-info.h b/include/sysemu/dump-info.h
+>>>>>> new file mode 100644
+>>>>>> index 0000000000..d2378e15e2
+>>>>>> --- /dev/null
+>>>>>> +++ b/include/sysemu/dump-info.h
+>>>>>> @@ -0,0 +1,18 @@
+>>>>>> +#ifndef DUMP_INFO_H
+>>>>>> +#define DUMP_INFO_H
+>>>>> Can you please spell out, in the commit message, the reason for
+>>>>> introducing a new header file? (I suspect your reason, but it should be
+>>>>> documented explicitly.)
+>>>> Also, should you have a copyright header in the new file?  And does
+>>>> MAINTAINERS cover it?
+>>>>
+>>> None of the dump support is covered. Based on commit history, I can
+>>> suggest Wen Congyang, as original author.
+>>> Sadly, Qiao Nuohan cannot be reached with his mail today (anyone knows if
+>>> he is still contributing?). Laszlo has done significant changes and reviews
+>>> too. I can also propose myself to help with reviews.
+>>>
+>>> Wen or Laszla, do you want to be the main maintainer?
 
-diff --git a/tests/ide-test.c b/tests/ide-test.c
-index 139ebc0ec6..bfd79ddbdc 100644
---- a/tests/ide-test.c
-+++ b/tests/ide-test.c
-@@ -796,11 +796,13 @@ static void cdrom_pio_impl(int nblocks)
-     int i, j;
-     uint8_t data;
-     uint16_t limit;
-+    size_t ret;
- 
-     /* Prepopulate the CDROM with an interesting pattern */
-     generate_pattern(pattern, patt_len, ATAPI_BLOCK_SIZE);
-     fh = fopen(tmp_path, "w+");
--    fwrite(pattern, ATAPI_BLOCK_SIZE, patt_blocks, fh);
-+    ret = fwrite(pattern, ATAPI_BLOCK_SIZE, patt_blocks, fh);
-+    g_assert_cmpint(ret, ==, patt_blocks);
-     fclose(fh);
- 
-     ide_test_start("-drive if=none,file=%s,media=cdrom,format=raw,id=sr0,index=0 "
-@@ -880,6 +882,7 @@ static void test_cdrom_pio_large(void)
- static void test_cdrom_dma(void)
- {
-     static const size_t len = ATAPI_BLOCK_SIZE;
-+    size_t ret;
-     char *pattern = g_malloc(ATAPI_BLOCK_SIZE * 16);
-     char *rx = g_malloc0(len);
-     uintptr_t guest_buf;
-@@ -896,7 +899,8 @@ static void test_cdrom_dma(void)
- 
-     generate_pattern(pattern, ATAPI_BLOCK_SIZE * 16, ATAPI_BLOCK_SIZE);
-     fh = fopen(tmp_path, "w+");
--    fwrite(pattern, ATAPI_BLOCK_SIZE, 16, fh);
-+    ret = fwrite(pattern, ATAPI_BLOCK_SIZE, 16, fh);
-+    g_assert_cmpint(ret, ==, 16);
-     fclose(fh);
- 
-     send_dma_request(CMD_PACKET, 0, 1, prdt, 1, send_scsi_cdb_read10);
+I can cc Qiao Nuohan<qiaonuohan@huawei.com>...
+
+Thanks
+Zhang Chen
+
+>>>
+>> (sorry for the typo)
+>>
+>> or rather "Supported" ("Someone is actually paid to look after this"
+>> according to MAINTAINERS)
+>>
+> Thanks, but I don't wish to have an official responsibility for this
+> feature. My current responsibilities are more than enough to keep me busy.
+>
+> If you'd like to volunteer for maintaining the dump stuff, you have my
+> blessing of course (whatever weight that might carry).
+>
+> Thanks
+> Laszlo
+>
+>
+>
+>
+
 -- 
-2.11.0
+Thanks
+Zhang Chen
