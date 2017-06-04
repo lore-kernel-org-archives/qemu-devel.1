@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50038)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50014)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dHZR2-0007Jy-3f
-	for qemu-devel@nongnu.org; Sun, 04 Jun 2017 13:35:29 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dHZR1-0002n1-5q
+	(envelope-from <rth7680@gmail.com>) id 1dHZR1-0007J8-6R
 	for qemu-devel@nongnu.org; Sun, 04 Jun 2017 13:35:28 -0400
-Received: from mail-pg0-x244.google.com ([2607:f8b0:400e:c05::244]:35862)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1dHZR1-0002mk-0w
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <rth7680@gmail.com>) id 1dHZQy-0002kz-Kr
 	for qemu-devel@nongnu.org; Sun, 04 Jun 2017 13:35:27 -0400
-Received: by mail-pg0-x244.google.com with SMTP id v18so3985269pgb.3
-	for <qemu-devel@nongnu.org>; Sun, 04 Jun 2017 10:35:26 -0700 (PDT)
+Received: from mail-pg0-x241.google.com ([2607:f8b0:400e:c05::241]:35861)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1dHZQy-0002kd-Em
+	for qemu-devel@nongnu.org; Sun, 04 Jun 2017 13:35:24 -0400
+Received: by mail-pg0-x241.google.com with SMTP id v18so3985198pgb.3
+	for <qemu-devel@nongnu.org>; Sun, 04 Jun 2017 10:35:24 -0700 (PDT)
 Sender: Richard Henderson <rth7680@gmail.com>
 From: Richard Henderson <rth@twiddle.net>
-Date: Sun,  4 Jun 2017 10:34:10 -0700
-Message-Id: <20170604173509.29684-11-rth@twiddle.net>
+Date: Sun,  4 Jun 2017 10:34:08 -0700
+Message-Id: <20170604173509.29684-9-rth@twiddle.net>
 In-Reply-To: <20170604173509.29684-1-rth@twiddle.net>
 References: <20170604173509.29684-1-rth@twiddle.net>
-Subject: [Qemu-devel] [PULL 10/69] target/s390x: Use unwind data for
- helper_srst
+Subject: [Qemu-devel] [PULL 08/69] target/s390x: Use unwind data for
+ helper_clc
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,46 +30,87 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: peter.maydell@linaro.org, aurelien@aurel32.net
 
-Reviewed-by: Thomas Huth <thuth@redhat.com>
 Reviewed-by: Aurelien Jarno <aurelien@aurel32.net>
 Signed-off-by: Richard Henderson <rth@twiddle.net>
 ---
- target/s390x/mem_helper.c | 3 ++-
- target/s390x/translate.c  | 1 -
- 2 files changed, 2 insertions(+), 2 deletions(-)
+ target/s390x/mem_helper.c | 29 +++++++++++++++++------------
+ target/s390x/translate.c  |  1 -
+ 2 files changed, 17 insertions(+), 13 deletions(-)
 
 diff --git a/target/s390x/mem_helper.c b/target/s390x/mem_helper.c
-index 3e75cae..33d83e5 100644
+index 78a9ac1..50689bb 100644
 --- a/target/s390x/mem_helper.c
 +++ b/target/s390x/mem_helper.c
-@@ -327,6 +327,7 @@ static inline uint64_t get_address_31fix(CPUS390XState *env, int reg)
- uint64_t HELPER(srst)(CPUS390XState *env, uint64_t r0, uint64_t end,
-                       uint64_t str)
- {
-+    uintptr_t ra = GETPC();
-     uint32_t len;
-     uint8_t v, c = r0;
+@@ -233,32 +233,37 @@ void HELPER(mvc)(CPUS390XState *env, uint32_t l, uint64_t dest, uint64_t src)
+ }
  
-@@ -344,7 +345,7 @@ uint64_t HELPER(srst)(CPUS390XState *env, uint64_t r0, uint64_t end,
-             env->cc_op = 2;
-             return end;
+ /* compare unsigned byte arrays */
+-uint32_t HELPER(clc)(CPUS390XState *env, uint32_t l, uint64_t s1, uint64_t s2)
++static uint32_t do_helper_clc(CPUS390XState *env, uint32_t l, uint64_t s1,
++                              uint64_t s2, uintptr_t ra)
+ {
+-    int i;
+-    unsigned char x, y;
+-    uint32_t cc;
++    uint32_t i;
++    uint32_t cc = 0;
+ 
+     HELPER_LOG("%s l %d s1 %" PRIx64 " s2 %" PRIx64 "\n",
+                __func__, l, s1, s2);
++
+     for (i = 0; i <= l; i++) {
+-        x = cpu_ldub_data(env, s1 + i);
+-        y = cpu_ldub_data(env, s2 + i);
++        uint8_t x = cpu_ldub_data_ra(env, s1 + i, ra);
++        uint8_t y = cpu_ldub_data_ra(env, s2 + i, ra);
+         HELPER_LOG("%02x (%c)/%02x (%c) ", x, x, y, y);
+         if (x < y) {
+             cc = 1;
+-            goto done;
++            break;
+         } else if (x > y) {
+             cc = 2;
+-            goto done;
++            break;
          }
--        v = cpu_ldub_data(env, str + len);
-+        v = cpu_ldub_data_ra(env, str + len, ra);
-         if (v == c) {
-             /* Character found.  Set R1 to the location; R2 is unmodified.  */
-             env->cc_op = 1;
+     }
+-    cc = 0;
+- done:
++
+     HELPER_LOG("\n");
+     return cc;
+ }
+ 
++uint32_t HELPER(clc)(CPUS390XState *env, uint32_t l, uint64_t s1, uint64_t s2)
++{
++    return do_helper_clc(env, l, s1, s2, GETPC());
++}
++
+ /* compare logical under mask */
+ uint32_t HELPER(clm)(CPUS390XState *env, uint32_t r1, uint32_t mask,
+                      uint64_t addr)
+@@ -1237,8 +1242,8 @@ uint32_t HELPER(ex)(CPUS390XState *env, uint32_t cc, uint64_t v1,
+                               get_address(env, 0, b2, d2), 0);
+             break;
+         case 0x500:
+-            cc = helper_clc(env, l, get_address(env, 0, b1, d1),
+-                            get_address(env, 0, b2, d2));
++            cc = do_helper_clc(env, l, get_address(env, 0, b1, d1),
++                               get_address(env, 0, b2, d2), 0);
+             break;
+         case 0x600:
+             cc = do_helper_oc(env, l, get_address(env, 0, b1, d1),
 diff --git a/target/s390x/translate.c b/target/s390x/translate.c
-index 34ccc22..cd33c51 100644
+index 729924a..0f9148a 100644
 --- a/target/s390x/translate.c
 +++ b/target/s390x/translate.c
-@@ -3972,7 +3972,6 @@ static ExitStatus op_stmh(DisasContext *s, DisasOps *o)
- 
- static ExitStatus op_srst(DisasContext *s, DisasOps *o)
- {
--    potential_page_fault(s);
-     gen_helper_srst(o->in1, cpu_env, regs[0], o->in1, o->in2);
-     set_cc_static(s);
-     return_low128(o->in2);
+@@ -1901,7 +1901,6 @@ static ExitStatus op_clc(DisasContext *s, DisasOps *o)
+         tcg_gen_qemu_ld64(cc_dst, o->in2, get_mem_index(s));
+         break;
+     default:
+-        potential_page_fault(s);
+         vl = tcg_const_i32(l);
+         gen_helper_clc(cc_op, cpu_env, vl, o->addr1, o->in2);
+         tcg_temp_free_i32(vl);
 -- 
 2.9.4
