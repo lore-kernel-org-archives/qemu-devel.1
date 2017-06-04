@@ -1,23 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56779)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56782)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dHSli-0001Eo-Ak
+	(envelope-from <dgibson@ozlabs.org>) id 1dHSli-0001Ep-Fk
 	for qemu-devel@nongnu.org; Sun, 04 Jun 2017 06:28:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dHSlg-0004eR-DU
+	(envelope-from <dgibson@ozlabs.org>) id 1dHSlg-0004eW-Ds
 	for qemu-devel@nongnu.org; Sun, 04 Jun 2017 06:28:22 -0400
-Date: Sun, 4 Jun 2017 20:26:34 +1000
+Date: Sun, 4 Jun 2017 20:25:26 +1000
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20170604102634.GV13397@umbus.fritz.box>
+Message-ID: <20170604102526.GU13397@umbus.fritz.box>
 References: <20170602072952.25454-1-david@gibson.dropbear.id.au>
-	<20170602072952.25454-4-david@gibson.dropbear.id.au>
-	<149652866302.2695.12952845962822730814@loki>
+	<20170602072952.25454-2-david@gibson.dropbear.id.au>
+	<149652752600.2695.3428447675588324712@loki>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="jfWagoTHmfL/c8Ax"
+	protocol="application/pgp-signature"; boundary="WcQ7DTTOeW3GIUV5"
 Content-Disposition: inline
-In-Reply-To: <149652866302.2695.12952845962822730814@loki>
-Subject: Re: [Qemu-devel] [PATCH 3/5] spapr: Move configure-connector state
- into DRC
+In-Reply-To: <149652752600.2695.3428447675588324712@loki>
+Subject: Re: [Qemu-devel] [PATCH 1/5] spapr: Introduce DRC subclasses
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,264 +29,499 @@ To: Michael Roth <mdroth@linux.vnet.ibm.com>
 Cc: lvivier@redhat.com, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, bharata@linux.vnet.ibm.com, sursingh@redhat.com, groug@kaod.org
 
 
---jfWagoTHmfL/c8Ax
+--WcQ7DTTOeW3GIUV5
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Sat, Jun 03, 2017 at 05:24:23PM -0500, Michael Roth wrote:
-> Quoting David Gibson (2017-06-02 02:29:50)
-> > Currently the sPAPRMachineState contains a of sPAPRConfigureConnector
->=20
-> "contains a list"?
-
-Ta, corrected.
-
-> > structures which store intermediate state for the ibm,configure-connect=
-or
-> > RTAS call.
+On Sat, Jun 03, 2017 at 05:05:26PM -0500, Michael Roth wrote:
+> Quoting David Gibson (2017-06-02 02:29:48)
+> > Currently we only have a single QOM type for all DRCs, but lots of
+> > places where we switch behaviour based on the DRC's PAPR defined type.
+> > This is a poor use of our existing type system.
 > >=20
-> > This was an attempt to separate this state from the core of the DRC sta=
-te.
-> > However the configure connector process is intimately tied to the DRC
-> > model, so there's really no point trying to have two levels of interface
-> > here.
+> > So, instead create QOM subclasses for each PAPR defined DRC type.  We
+> > also introduce intermediate subclasses for physical and logical DRCs,
+> > a division which will be useful later on.
 > >=20
-> > Moving the configure-connector state into its corresponding DRC allows
-> > removal of a number of helpers for maintaining the anciliary list.
+> > Instead of being stored in the DRC object itself, the PAPR type is now
+> > stored in the class structure.  There are still many places where we
+> > switch directly on the PAPR type value, but this at least provides the
+> > basis to start to remove those.
 > >=20
 > > Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
->=20
-> Reviewed-by: Michael Roth <mdroth@linux.vnet.ibm.com>
->=20
 > > ---
-> >  hw/ppc/spapr.c             |  4 ---
-> >  hw/ppc/spapr_drc.c         | 73 ++++++++++++--------------------------=
+> >  hw/ppc/spapr.c             |   5 +-
+> >  hw/ppc/spapr_drc.c         | 120 +++++++++++++++++++++++++++++++++----=
 --------
-> >  include/hw/ppc/spapr.h     | 14 ---------
-> >  include/hw/ppc/spapr_drc.h |  7 +++++
-> >  4 files changed, 25 insertions(+), 73 deletions(-)
+> >  hw/ppc/spapr_pci.c         |   3 +-
+> >  include/hw/ppc/spapr_drc.h |  47 ++++++++++++++++--
+> >  4 files changed, 136 insertions(+), 39 deletions(-)
 > >=20
 > > diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> > index 7aac3b9..6234dbd 100644
+> > index 5d10366..456f9e7 100644
 > > --- a/hw/ppc/spapr.c
 > > +++ b/hw/ppc/spapr.c
-> > @@ -2339,10 +2339,6 @@ static void ppc_spapr_init(MachineState *machine)
-> >      register_savevm_live(NULL, "spapr/htab", -1, 1,
-> >                           &savevm_htab_handlers, spapr);
+> > @@ -1911,7 +1911,7 @@ static void spapr_create_lmb_dr_connectors(sPAPRM=
+achineState *spapr)
+> >          uint64_t addr;
 > >=20
-> > -    /* used by RTAS */
-> > -    QTAILQ_INIT(&spapr->ccs_list);
-> > -    qemu_register_reset(spapr_ccs_reset_hook, spapr);
-> > -
-> >      qemu_register_boot_set(spapr_boot_set, spapr);
+> >          addr =3D i * lmb_size + spapr->hotplug_memory.base;
+> > -        drc =3D spapr_dr_connector_new(OBJECT(spapr), SPAPR_DR_CONNECT=
+OR_TYPE_LMB,
+> > +        drc =3D spapr_dr_connector_new(OBJECT(spapr), TYPE_SPAPR_DRC_L=
+MB,
+> >                                       addr/lmb_size);
+> >          qemu_register_reset(spapr_drc_reset, drc);
+> >      }
+> > @@ -2008,8 +2008,7 @@ static void spapr_init_cpus(sPAPRMachineState *sp=
+apr)
 > >=20
-> >      if (kvm_enabled()) {
+> >          if (mc->has_hotpluggable_cpus) {
+> >              sPAPRDRConnector *drc =3D
+> > -                spapr_dr_connector_new(OBJECT(spapr),
+> > -                                       SPAPR_DR_CONNECTOR_TYPE_CPU,
+> > +                spapr_dr_connector_new(OBJECT(spapr), TYPE_SPAPR_DRC_C=
+PU,
+> >                                         (core_id / smp_threads) * smt);
+> >=20
+> >              qemu_register_reset(spapr_drc_reset, drc);
 > > diff --git a/hw/ppc/spapr_drc.c b/hw/ppc/spapr_drc.c
-> > index 2514f87..27d4bd3 100644
+> > index a35314e..690b41f 100644
 > > --- a/hw/ppc/spapr_drc.c
 > > +++ b/hw/ppc/spapr_drc.c
-> > @@ -27,34 +27,6 @@
-> >  #define DRC_INDEX_TYPE_SHIFT 28
-> >  #define DRC_INDEX_ID_MASK ((1ULL << DRC_INDEX_TYPE_SHIFT) - 1)
-> >=20
-> > -static sPAPRConfigureConnectorState *spapr_ccs_find(sPAPRMachineState =
-*spapr,
-> > -                                                    uint32_t drc_index)
-> > -{
-> > -    sPAPRConfigureConnectorState *ccs =3D NULL;
-> > -
-> > -    QTAILQ_FOREACH(ccs, &spapr->ccs_list, next) {
-> > -        if (ccs->drc_index =3D=3D drc_index) {
-> > -            break;
-> > -        }
-> > -    }
-> > -
-> > -    return ccs;
-> > -}
-> > -
-> > -static void spapr_ccs_add(sPAPRMachineState *spapr,
-> > -                          sPAPRConfigureConnectorState *ccs)
-> > -{
-> > -    g_assert(!spapr_ccs_find(spapr, ccs->drc_index));
-> > -    QTAILQ_INSERT_HEAD(&spapr->ccs_list, ccs, next);
-> > -}
-> > -
-> > -static void spapr_ccs_remove(sPAPRMachineState *spapr,
-> > -                             sPAPRConfigureConnectorState *ccs)
-> > -{
-> > -    QTAILQ_REMOVE(&spapr->ccs_list, ccs, next);
-> > -    g_free(ccs);
-> > -}
-> > -
-> >  sPAPRDRConnectorType spapr_drc_type(sPAPRDRConnector *drc)
-> >  {
-> >      sPAPRDRConnectorClass *drck =3D SPAPR_DR_CONNECTOR_GET_CLASS(drc);
-> > @@ -81,6 +53,16 @@ static uint32_t set_isolation_state(sPAPRDRConnector=
- *drc,
-> >=20
-> >      trace_spapr_drc_set_isolation_state(spapr_drc_index(drc), state);
-> >=20
-> > +    /* if the guest is configuring a device attached to this DRC, we
-> > +     * should reset the configuration state at this point since it may
-> > +     * no longer be reliable (guest released device and needs to start
-> > +     * over, or unplug occurred so the FDT is no longer valid)
-> > +     */
-> > +    if (state =3D=3D SPAPR_DR_ISOLATION_STATE_ISOLATED) {
-> > +        g_free(drc->ccs);
-> > +        drc->ccs =3D NULL;
-> > +    }
-> > +
-> >      if (state =3D=3D SPAPR_DR_ISOLATION_STATE_UNISOLATED) {
-> >          /* cannot unisolate a non-existent resource, and, or resources
-> >           * which are in an 'UNUSABLE' allocation state. (PAPR 2.7, 13.=
-5.3.5)
-> > @@ -485,6 +467,10 @@ static void reset(DeviceState *d)
-> >      sPAPRDREntitySense state;
-> >=20
-> >      trace_spapr_drc_reset(spapr_drc_index(drc));
-> > +
-> > +    g_free(drc->ccs);
-> > +    drc->ccs =3D NULL;
-> > +
-> >      /* immediately upon reset we can safely assume DRCs whose devices
-> >       * are pending removal can be safely removed, and that they will
-> >       * subsequently be left in an ISOLATED state. move the DRC to this
-> > @@ -1020,19 +1006,6 @@ static void rtas_set_indicator(PowerPCCPU *cpu, =
-sPAPRMachineState *spapr,
-> >=20
-> >      switch (sensor_type) {
-> >      case RTAS_SENSOR_TYPE_ISOLATION_STATE:
-> > -        /* if the guest is configuring a device attached to this
-> > -         * DRC, we should reset the configuration state at this
-> > -         * point since it may no longer be reliable (guest released
-> > -         * device and needs to start over, or unplug occurred so
-> > -         * the FDT is no longer valid)
-> > -         */
-> > -        if (sensor_state =3D=3D SPAPR_DR_ISOLATION_STATE_ISOLATED) {
-> > -            sPAPRConfigureConnectorState *ccs =3D spapr_ccs_find(spapr,
-> > -                                                               sensor_=
-index);
-> > -            if (ccs) {
-> > -                spapr_ccs_remove(spapr, ccs);
-> > -            }
-> > -        }
-> >          ret =3D drck->set_isolation_state(drc, sensor_state);
-> >          break;
-> >      case RTAS_SENSOR_TYPE_DR:
-> > @@ -1116,16 +1089,6 @@ static void configure_connector_st(target_ulong =
-addr, target_ulong offset,
-> >                                buf, MIN(len, CC_WA_LEN - offset));
+> > @@ -70,14 +70,23 @@ static sPAPRDRConnectorTypeShift get_type_shift(sPA=
+PRDRConnectorType type)
+> >      return shift;
 > >  }
 > >=20
-> > -void spapr_ccs_reset_hook(void *opaque)
+> > +sPAPRDRConnectorType spapr_drc_type(sPAPRDRConnector *drc)
+> > +{
+> > +    sPAPRDRConnectorClass *drck =3D SPAPR_DR_CONNECTOR_GET_CLASS(drc);
+> > +
+> > +    return 1 << drck->typeshift;
+> > +}
+> > +
+> >  uint32_t spapr_drc_index(sPAPRDRConnector *drc)
+> >  {
+> > +    sPAPRDRConnectorClass *drck =3D SPAPR_DR_CONNECTOR_GET_CLASS(drc);
+> > +
+> >      /* no set format for a drc index: it only needs to be globally
+> >       * unique. this is how we encode the DRC type on bare-metal
+> >       * however, so might as well do that here
+> >       */
+> > -    return (get_type_shift(drc->type) << DRC_INDEX_TYPE_SHIFT) |
+> > -            (drc->id & DRC_INDEX_ID_MASK);
+> > +    return (drck->typeshift << DRC_INDEX_TYPE_SHIFT)
+> > +        | (drc->id & DRC_INDEX_ID_MASK);
+> >  }
+> >=20
+> >  static uint32_t set_isolation_state(sPAPRDRConnector *drc,
+> > @@ -107,7 +116,7 @@ static uint32_t set_isolation_state(sPAPRDRConnecto=
+r *drc,
+> >       * If the LMB being removed doesn't belong to a DIMM device that is
+> >       * actually being unplugged, fail the isolation request here.
+> >       */
+> > -    if (drc->type =3D=3D SPAPR_DR_CONNECTOR_TYPE_LMB) {
+> > +    if (spapr_drc_type(drc) =3D=3D SPAPR_DR_CONNECTOR_TYPE_LMB) {
+> >          if ((state =3D=3D SPAPR_DR_ISOLATION_STATE_ISOLATED) &&
+> >               !drc->awaiting_release) {
+> >              return RTAS_OUT_HW_ERROR;
+> > @@ -177,7 +186,7 @@ static uint32_t set_allocation_state(sPAPRDRConnect=
+or *drc,
+> >          }
+> >      }
+> >=20
+> > -    if (drc->type !=3D SPAPR_DR_CONNECTOR_TYPE_PCI) {
+> > +    if (spapr_drc_type(drc) !=3D SPAPR_DR_CONNECTOR_TYPE_PCI) {
+> >          drc->allocation_state =3D state;
+> >          if (drc->awaiting_release &&
+> >              drc->allocation_state =3D=3D SPAPR_DR_ALLOCATION_STATE_UNU=
+SABLE) {
+> > @@ -191,11 +200,6 @@ static uint32_t set_allocation_state(sPAPRDRConnec=
+tor *drc,
+> >      return RTAS_OUT_SUCCESS;
+> >  }
+> >=20
+> > -sPAPRDRConnectorType spapr_drc_type(sPAPRDRConnector *drc)
 > > -{
-> > -    sPAPRMachineState *spapr =3D opaque;
-> > -    sPAPRConfigureConnectorState *ccs, *ccs_tmp;
-> > -
-> > -    QTAILQ_FOREACH_SAFE(ccs, &spapr->ccs_list, next, ccs_tmp) {
-> > -        spapr_ccs_remove(spapr, ccs);
-> > -    }
+> > -    return drc->type;
 > > -}
 > > -
-> >  static void rtas_ibm_configure_connector(PowerPCCPU *cpu,
-> >                                           sPAPRMachineState *spapr,
-> >                                           uint32_t token, uint32_t narg=
-s,
-> > @@ -1161,12 +1124,11 @@ static void rtas_ibm_configure_connector(PowerP=
-CCPU *cpu,
-> >          goto out;
+> >  static const char *get_name(sPAPRDRConnector *drc)
+> >  {
+> >      return drc->name;
+> > @@ -217,7 +221,7 @@ static void set_signalled(sPAPRDRConnector *drc)
+> >  static uint32_t entity_sense(sPAPRDRConnector *drc, sPAPRDREntitySense=
+ *state)
+> >  {
+> >      if (drc->dev) {
+> > -        if (drc->type !=3D SPAPR_DR_CONNECTOR_TYPE_PCI &&
+> > +        if (spapr_drc_type(drc) !=3D SPAPR_DR_CONNECTOR_TYPE_PCI &&
+> >              drc->allocation_state =3D=3D SPAPR_DR_ALLOCATION_STATE_UNU=
+SABLE) {
+> >              /* for logical DR, we return a state of UNUSABLE
+> >               * iff the allocation state UNUSABLE.
+> > @@ -235,7 +239,7 @@ static uint32_t entity_sense(sPAPRDRConnector *drc,=
+ sPAPRDREntitySense *state)
+> >              *state =3D SPAPR_DR_ENTITY_SENSE_PRESENT;
+> >          }
+> >      } else {
+> > -        if (drc->type =3D=3D SPAPR_DR_CONNECTOR_TYPE_PCI) {
+> > +        if (spapr_drc_type(drc) =3D=3D SPAPR_DR_CONNECTOR_TYPE_PCI) {
+> >              /* PCI devices, and only PCI devices, use EMPTY
+> >               * in cases where we'd otherwise use UNUSABLE
+> >               */
+> > @@ -368,7 +372,7 @@ static void attach(sPAPRDRConnector *drc, DeviceSta=
+te *d, void *fdt,
+> >          error_setg(errp, "an attached device is still awaiting release=
+");
+> >          return;
+> >      }
+> > -    if (drc->type =3D=3D SPAPR_DR_CONNECTOR_TYPE_PCI) {
+> > +    if (spapr_drc_type(drc) =3D=3D SPAPR_DR_CONNECTOR_TYPE_PCI) {
+> >          g_assert(drc->allocation_state =3D=3D SPAPR_DR_ALLOCATION_STAT=
+E_USABLE);
+> >      }
+> >      g_assert(fdt || coldplug);
+> > @@ -380,7 +384,7 @@ static void attach(sPAPRDRConnector *drc, DeviceSta=
+te *d, void *fdt,
+> >       * may be accessing the device, we can easily crash the guest, so =
+we
+> >       * we defer completion of removal in such cases to the reset() hoo=
+k.
+> >       */
+> > -    if (drc->type =3D=3D SPAPR_DR_CONNECTOR_TYPE_PCI) {
+> > +    if (spapr_drc_type(drc) =3D=3D SPAPR_DR_CONNECTOR_TYPE_PCI) {
+> >          drc->isolation_state =3D SPAPR_DR_ISOLATION_STATE_UNISOLATED;
+> >      }
+> >      drc->indicator_state =3D SPAPR_DR_INDICATOR_STATE_ACTIVE;
+> > @@ -398,10 +402,10 @@ static void attach(sPAPRDRConnector *drc, DeviceS=
+tate *d, void *fdt,
+> >       * 'physical' DR resources such as PCI where each device/resource =
+is
+> >       * signalled individually.
+> >       */
+> > -    drc->signalled =3D (drc->type !=3D SPAPR_DR_CONNECTOR_TYPE_PCI)
+> > +    drc->signalled =3D (spapr_drc_type(drc) !=3D SPAPR_DR_CONNECTOR_TY=
+PE_PCI)
+> >                       ? true : coldplug;
+> >=20
+> > -    if (drc->type !=3D SPAPR_DR_CONNECTOR_TYPE_PCI) {
+> > +    if (spapr_drc_type(drc) !=3D SPAPR_DR_CONNECTOR_TYPE_PCI) {
+> >          drc->awaiting_allocation =3D true;
 > >      }
 > >=20
-> > -    ccs =3D spapr_ccs_find(spapr, drc_index);
-> > +    ccs =3D drc->ccs;
-> >      if (!ccs) {
-> >          ccs =3D g_new0(sPAPRConfigureConnectorState, 1);
-> >          ccs->fdt_offset =3D drc->fdt_start_offset;
-> > -        ccs->drc_index =3D drc_index;
-> > -        spapr_ccs_add(spapr, ccs);
-> > +        drc->ccs =3D ccs;
+> > @@ -441,7 +445,7 @@ static void detach(sPAPRDRConnector *drc, DeviceSta=
+te *d, Error **errp)
+> >          return;
 > >      }
 > >=20
-> >      do {
-> > @@ -1203,7 +1165,8 @@ static void rtas_ibm_configure_connector(PowerPCC=
-PU *cpu,
-> >                      /* guest should be not configuring an isolated dev=
-ice */
-> >                      trace_spapr_drc_set_configured_skipping(drc_index);
-> >                  }
-> > -                spapr_ccs_remove(spapr, ccs);
-> > +                g_free(ccs);
-> > +                drc->ccs =3D NULL;
-> >                  ccs =3D NULL;
-> >                  resp =3D SPAPR_DR_CC_RESPONSE_SUCCESS;
-> >              } else {
-> > diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
-> > index 98fb78b..f973b02 100644
-> > --- a/include/hw/ppc/spapr.h
-> > +++ b/include/hw/ppc/spapr.h
-> > @@ -11,7 +11,6 @@
-> >  struct VIOsPAPRBus;
-> >  struct sPAPRPHBState;
-> >  struct sPAPRNVRAM;
-> > -typedef struct sPAPRConfigureConnectorState sPAPRConfigureConnectorSta=
-te;
-> >  typedef struct sPAPREventLogEntry sPAPREventLogEntry;
-> >  typedef struct sPAPREventSource sPAPREventSource;
+> > -    if (drc->type !=3D SPAPR_DR_CONNECTOR_TYPE_PCI &&
+> > +    if (spapr_drc_type(drc) !=3D SPAPR_DR_CONNECTOR_TYPE_PCI &&
+> >          drc->allocation_state !=3D SPAPR_DR_ALLOCATION_STATE_UNUSABLE)=
+ {
+> >          trace_spapr_drc_awaiting_unusable(spapr_drc_index(drc));
+> >          drc->awaiting_release =3D true;
+> > @@ -458,8 +462,8 @@ static void detach(sPAPRDRConnector *drc, DeviceSta=
+te *d, Error **errp)
 > >=20
-> > @@ -102,9 +101,6 @@ struct sPAPRMachineState {
-> >      bool htab_first_pass;
-> >      int htab_fd;
+> >      drc->indicator_state =3D SPAPR_DR_INDICATOR_STATE_INACTIVE;
 > >=20
-> > -    /* RTAS state */
-> > -    QTAILQ_HEAD(, sPAPRConfigureConnectorState) ccs_list;
+> > -    /* Calling release callbacks based on drc->type. */
+> > -    switch (drc->type) {
+> > +    /* Calling release callbacks based on spapr_drc_type(drc). */
+> > +    switch (spapr_drc_type(drc)) {
+> >      case SPAPR_DR_CONNECTOR_TYPE_CPU:
+> >          spapr_core_release(drc->dev);
+> >          break;
+> > @@ -515,7 +519,7 @@ static void reset(DeviceState *d)
+> >          }
+> >=20
+> >          /* non-PCI devices may be awaiting a transition to UNUSABLE */
+> > -        if (drc->type !=3D SPAPR_DR_CONNECTOR_TYPE_PCI &&
+> > +        if (spapr_drc_type(drc) !=3D SPAPR_DR_CONNECTOR_TYPE_PCI &&
+> >              drc->awaiting_release) {
+> >              drck->set_allocation_state(drc, SPAPR_DR_ALLOCATION_STATE_=
+UNUSABLE);
+> >          }
+> > @@ -544,7 +548,7 @@ static bool spapr_drc_needed(void *opaque)
+> >       * If there is dev plugged in, we need to migrate the DRC state wh=
+en
+> >       * it is different from cold-plugged state
+> >       */
+> > -    switch (drc->type) {
+> > +    switch (spapr_drc_type(drc)) {
+> >      case SPAPR_DR_CONNECTOR_TYPE_PCI:
+> >          rc =3D !((drc->isolation_state =3D=3D SPAPR_DR_ISOLATION_STATE=
+_UNISOLATED) &&
+> >                 (drc->allocation_state =3D=3D SPAPR_DR_ALLOCATION_STATE=
+_USABLE) &&
+> > @@ -630,17 +634,12 @@ static void unrealize(DeviceState *d, Error **err=
+p)
+> >      }
+> >  }
+> >=20
+> > -sPAPRDRConnector *spapr_dr_connector_new(Object *owner,
+> > -                                         sPAPRDRConnectorType type,
+> > +sPAPRDRConnector *spapr_dr_connector_new(Object *owner, const char *ty=
+pe,
+> >                                           uint32_t id)
+> >  {
+> > -    sPAPRDRConnector *drc =3D
+> > -        SPAPR_DR_CONNECTOR(object_new(TYPE_SPAPR_DR_CONNECTOR));
+> > +    sPAPRDRConnector *drc =3D SPAPR_DR_CONNECTOR(object_new(type));
+> >      char *prop_name;
+> >=20
+> > -    g_assert(type);
 > > -
-> >      /* Pending DIMM unplug cache. It is populated when a LMB
-> >       * unplug starts. It can be regenerated if a migration
-> >       * occurs during the unplug process. */
-> > @@ -646,16 +642,6 @@ void *spapr_populate_hotplug_cpu_dt(CPUState *cs, =
-int *fdt_offset,
-> >  void spapr_core_release(DeviceState *dev);
-> >  void spapr_lmb_release(DeviceState *dev);
+> > -    drc->type =3D type;
+> >      drc->id =3D id;
+> >      drc->owner =3D owner;
+> >      prop_name =3D g_strdup_printf("dr-connector[%"PRIu32"]",
+> > @@ -670,7 +669,7 @@ sPAPRDRConnector *spapr_dr_connector_new(Object *ow=
+ner,
+> >       * DRC names as documented by PAPR+ v2.7, 13.5.2.4
+> >       * location codes as documented by PAPR+ v2.7, 12.3.1.5
+> >       */
+> > -    switch (drc->type) {
+> > +    switch (spapr_drc_type(drc)) {
+> >      case SPAPR_DR_CONNECTOR_TYPE_CPU:
+> >          drc->name =3D g_strdup_printf("CPU %d", id);
+> >          break;
+> > @@ -689,7 +688,7 @@ sPAPRDRConnector *spapr_dr_connector_new(Object *ow=
+ner,
+> >      }
 > >=20
-> > -/* rtas-configure-connector state */
-> > -struct sPAPRConfigureConnectorState {
-> > -    uint32_t drc_index;
-> > -    int fdt_offset;
-> > -    int fdt_depth;
-> > -    QTAILQ_ENTRY(sPAPRConfigureConnectorState) next;
-> > -};
-> > -
-> > -void spapr_ccs_reset_hook(void *opaque);
-> > -
-> >  void spapr_rtc_read(sPAPRRTCState *rtc, struct tm *tm, uint32_t *ns);
-> >  int spapr_rtc_import_offset(sPAPRRTCState *rtc, int64_t legacy_offset);
+> >      /* PCI slot always start in a USABLE state, and stay there */
+> > -    if (drc->type =3D=3D SPAPR_DR_CONNECTOR_TYPE_PCI) {
+> > +    if (spapr_drc_type(drc) =3D=3D SPAPR_DR_CONNECTOR_TYPE_PCI) {
+> >          drc->allocation_state =3D SPAPR_DR_ALLOCATION_STATE_USABLE;
+> >      }
 > >=20
+> > @@ -741,6 +740,27 @@ static void spapr_dr_connector_class_init(ObjectCl=
+ass *k, void *data)
+> >      dk->user_creatable =3D false;
+> >  }
+> >=20
+> > +static void spapr_drc_cpu_class_init(ObjectClass *k, void *data)
+> > +{
+> > +    sPAPRDRConnectorClass *drck =3D SPAPR_DR_CONNECTOR_CLASS(k);
+> > +
+> > +    drck->typeshift =3D SPAPR_DR_CONNECTOR_TYPE_SHIFT_CPU;
+> > +}
+> > +
+> > +static void spapr_drc_pci_class_init(ObjectClass *k, void *data)
+> > +{
+> > +    sPAPRDRConnectorClass *drck =3D SPAPR_DR_CONNECTOR_CLASS(k);
+> > +
+> > +    drck->typeshift =3D SPAPR_DR_CONNECTOR_TYPE_SHIFT_PCI;
+> > +}
+> > +
+> > +static void spapr_drc_lmb_class_init(ObjectClass *k, void *data)
+> > +{
+> > +    sPAPRDRConnectorClass *drck =3D SPAPR_DR_CONNECTOR_CLASS(k);
+> > +
+> > +    drck->typeshift =3D SPAPR_DR_CONNECTOR_TYPE_SHIFT_LMB;
+> > +}
+> > +
+> >  static const TypeInfo spapr_dr_connector_info =3D {
+> >      .name          =3D TYPE_SPAPR_DR_CONNECTOR,
+> >      .parent        =3D TYPE_DEVICE,
+> > @@ -750,6 +770,39 @@ static const TypeInfo spapr_dr_connector_info =3D {
+> >      .class_init    =3D spapr_dr_connector_class_init,
+> >  };
+> >=20
+> > +static const TypeInfo spapr_drc_physical_info =3D {
+> > +    .name          =3D TYPE_SPAPR_DRC_PHYSICAL,
+> > +    .parent        =3D TYPE_SPAPR_DR_CONNECTOR,
+> > +    .instance_size =3D sizeof(sPAPRDRConnector),
+> > +};
+> > +
+> > +static const TypeInfo spapr_drc_logical_info =3D {
+> > +    .name          =3D TYPE_SPAPR_DRC_LOGICAL,
+> > +    .parent        =3D TYPE_SPAPR_DR_CONNECTOR,
+> > +    .instance_size =3D sizeof(sPAPRDRConnector),
+> > +};
+>=20
+> It doesn't look like there's any intent of being able to instantiate
+> a "generic" logical/physical DRC for future types, so I think these
+> should be marked .abstract =3D true.
+
+Ah, good idea.
+
+> > +
+> > +static const TypeInfo spapr_drc_cpu_info =3D {
+> > +    .name          =3D TYPE_SPAPR_DRC_CPU,
+> > +    .parent        =3D TYPE_SPAPR_DRC_LOGICAL,
+> > +    .instance_size =3D sizeof(sPAPRDRConnector),
+> > +    .class_init    =3D spapr_drc_cpu_class_init,
+> > +};
+> > +
+> > +static const TypeInfo spapr_drc_pci_info =3D {
+> > +    .name          =3D TYPE_SPAPR_DRC_PCI,
+> > +    .parent        =3D TYPE_SPAPR_DRC_PHYSICAL,
+> > +    .instance_size =3D sizeof(sPAPRDRConnector),
+> > +    .class_init    =3D spapr_drc_pci_class_init,
+> > +};
+> > +
+> > +static const TypeInfo spapr_drc_lmb_info =3D {
+> > +    .name          =3D TYPE_SPAPR_DRC_LMB,
+> > +    .parent        =3D TYPE_SPAPR_DRC_LOGICAL,
+> > +    .instance_size =3D sizeof(sPAPRDRConnector),
+> > +    .class_init    =3D spapr_drc_lmb_class_init,
+> > +};
+> > +
+> >  /* helper functions for external users */
+> >=20
+> >  sPAPRDRConnector *spapr_dr_connector_by_index(uint32_t index)
+> > @@ -858,7 +911,7 @@ int spapr_drc_populate_dt(void *fdt, int fdt_offset=
+, Object *owner,
+> >              continue;
+> >          }
+> >=20
+> > -        if ((drc->type & drc_type_mask) =3D=3D 0) {
+> > +        if ((spapr_drc_type(drc) & drc_type_mask) =3D=3D 0) {
+> >              continue;
+> >          }
+> >=20
+> > @@ -878,7 +931,7 @@ int spapr_drc_populate_dt(void *fdt, int fdt_offset=
+, Object *owner,
+> >=20
+> >          /* ibm,drc-types */
+> >          drc_types =3D g_string_append(drc_types,
+> > -                                    spapr_drc_get_type_str(drc->type));
+> > +                                    spapr_drc_get_type_str(spapr_drc_t=
+ype(drc)));
+> >          drc_types =3D g_string_insert_len(drc_types, -1, "\0", 1);
+> >      }
+> >=20
+> > @@ -1210,6 +1263,11 @@ out:
+> >  static void spapr_drc_register_types(void)
+> >  {
+> >      type_register_static(&spapr_dr_connector_info);
+> > +    type_register_static(&spapr_drc_physical_info);
+> > +    type_register_static(&spapr_drc_logical_info);
+> > +    type_register_static(&spapr_drc_cpu_info);
+> > +    type_register_static(&spapr_drc_pci_info);
+> > +    type_register_static(&spapr_drc_lmb_info);
+> >=20
+> >      spapr_rtas_register(RTAS_SET_INDICATOR, "set-indicator",
+> >                          rtas_set_indicator);
+> > diff --git a/hw/ppc/spapr_pci.c b/hw/ppc/spapr_pci.c
+> > index 7a208a7..50d673b 100644
+> > --- a/hw/ppc/spapr_pci.c
+> > +++ b/hw/ppc/spapr_pci.c
+> > @@ -1761,8 +1761,7 @@ static void spapr_phb_realize(DeviceState *dev, E=
+rror **errp)
+> >      /* allocate connectors for child PCI devices */
+> >      if (sphb->dr_enabled) {
+> >          for (i =3D 0; i < PCI_SLOT_MAX * 8; i++) {
+> > -            spapr_dr_connector_new(OBJECT(phb),
+> > -                                   SPAPR_DR_CONNECTOR_TYPE_PCI,
+> > +            spapr_dr_connector_new(OBJECT(phb), TYPE_SPAPR_DRC_PCI,
+> >                                     (sphb->index << 16) | i);
+> >          }
+> >      }
 > > diff --git a/include/hw/ppc/spapr_drc.h b/include/hw/ppc/spapr_drc.h
-> > index d8cb84b..53b0f8b 100644
+> > index 10e7c24..f77be38 100644
 > > --- a/include/hw/ppc/spapr_drc.h
 > > +++ b/include/hw/ppc/spapr_drc.h
-> > @@ -172,6 +172,12 @@ typedef enum {
-> >      SPAPR_DR_CC_RESPONSE_NOT_CONFIGURABLE =3D -9003,
-> >  } sPAPRDRCCResponse;
+> > @@ -26,6 +26,48 @@
+> >  #define SPAPR_DR_CONNECTOR(obj) OBJECT_CHECK(sPAPRDRConnector, (obj), \
+> >                                               TYPE_SPAPR_DR_CONNECTOR)
 > >=20
-> > +/* rtas-configure-connector state */
-> > +typedef struct sPAPRConfigureConnectorState {
-> > +    int fdt_offset;
-> > +    int fdt_depth;
-> > +} sPAPRConfigureConnectorState;
+> > +#define TYPE_SPAPR_DRC_PHYSICAL "spapr-drc-physical"
+> > +#define SPAPR_DRC_PHSYICALGET_CLASS(obj) \
+>=20
+> typo                 ^
+>=20
+> > +        OBJECT_GET_CLASS(sPAPRDRConnectorClass, obj, TYPE_SPAPR_DRC_PH=
+YSICAL)
+> > +#define SPAPR_DRC_PHYSICAL_CLASS(klass) \
+> > +        OBJECT_CLASS_CHECK(sPAPRDRConnectorClass, klass, \
+> > +                           TYPE_SPAPR_DRC_PHSYICAL)
+>=20
+> typo                                         ^
+>=20
+> > +#define SPAPR_DRC_PHYSICAL(obj) OBJECT_CHECK(sPAPRDRConnector, (obj), \
+> > +                                             TYPE_SPAPR_DRC_PHYSICAL)
 > > +
-> >  typedef struct sPAPRDRConnector {
+> > +#define TYPE_SPAPR_DRC_LOGICAL "spapr-drc-logical"
+> > +#define SPAPR_DRC_LOGICAL_GET_CLASS(obj) \
+> > +        OBJECT_GET_CLASS(sPAPRDRConnectorClass, obj, TYPE_SPAPR_DRC_LO=
+GICAL)
+> > +#define SPAPR_DRC_LOGICAL_CLASS(klass) \
+> > +        OBJECT_CLASS_CHECK(sPAPRDRConnectorClass, klass, \
+> > +                           TYPE_SPAPR_DRC_PHSYICAL)
+>=20
+> *LOGICAL
+
+Thank you, corrected.
+
+> > +#define SPAPR_DRC_LOGICAL(obj) OBJECT_CHECK(sPAPRDRConnector, (obj), \
+> > +                                             TYPE_SPAPR_DRC_LOGICAL)
+> > +
+> > +#define TYPE_SPAPR_DRC_CPU "spapr-drc-cpu"
+> > +#define SPAPR_DRC_CPU_GET_CLASS(obj) \
+> > +        OBJECT_GET_CLASS(sPAPRDRConnectorClass, obj, TYPE_SPAPR_DRC_CP=
+U)
+> > +#define SPAPR_DRC_CPU_CLASS(klass) \
+> > +        OBJECT_CLASS_CHECK(sPAPRDRConnectorClass, klass, TYPE_SPAPR_DR=
+C_CPU)
+> > +#define SPAPR_DRC_CPU(obj) OBJECT_CHECK(sPAPRDRConnector, (obj), \
+> > +                                        TYPE_SPAPR_DRC_CPU)
+> > +
+> > +#define TYPE_SPAPR_DRC_PCI "spapr-drc-pci"
+> > +#define SPAPR_DRC_PCI_GET_CLASS(obj) \
+> > +        OBJECT_GET_CLASS(sPAPRDRConnectorClass, obj, TYPE_SPAPR_DRC_PC=
+I)
+> > +#define SPAPR_DRC_PCI_CLASS(klass) \
+> > +        OBJECT_CLASS_CHECK(sPAPRDRConnectorClass, klass, TYPE_SPAPR_DR=
+C_PCI)
+> > +#define SPAPR_DRC_PCI(obj) OBJECT_CHECK(sPAPRDRConnector, (obj), \
+> > +                                        TYPE_SPAPR_DRC_PCI)
+> > +
+> > +#define TYPE_SPAPR_DRC_LMB "spapr-drc-lmb"
+> > +#define SPAPR_DRC_LMB_GET_CLASS(obj) \
+> > +        OBJECT_GET_CLASS(sPAPRDRConnectorClass, obj, TYPE_SPAPR_DRC_LM=
+B)
+> > +#define SPAPR_DRC_LMB_CLASS(klass) \
+> > +        OBJECT_CLASS_CHECK(sPAPRDRConnectorClass, klass, TYPE_SPAPR_DR=
+C_LMB)
+> > +#define SPAPR_DRC_LMB(obj) OBJECT_CHECK(sPAPRDRConnector, (obj), \
+> > +                                        TYPE_SPAPR_DRC_LMB)
+> > +
+> >  /*
+> >   * Various hotplug types managed by sPAPRDRConnector
+> >   *
+> > @@ -134,7 +176,6 @@ typedef struct sPAPRDRConnector {
 > >      /*< private >*/
 > >      DeviceState parent;
-> > @@ -189,6 +195,7 @@ typedef struct sPAPRDRConnector {
-> >      void *fdt;
-> >      int fdt_start_offset;
-> >      bool configured;
-> > +    sPAPRConfigureConnectorState *ccs;
 > >=20
-> >      bool awaiting_release;
-> >      bool signalled;
+> > -    sPAPRDRConnectorType type;
+> >      uint32_t id;
+> >      Object *owner;
+> >      const char *name;
+> > @@ -163,6 +204,7 @@ typedef struct sPAPRDRConnectorClass {
+> >      DeviceClass parent;
+> >=20
+> >      /*< public >*/
+> > +    sPAPRDRConnectorTypeShift typeshift;
+> >=20
+> >      /* accessors for guest-visible (generally via RTAS) DR state */
+> >      uint32_t (*set_isolation_state)(sPAPRDRConnector *drc,
+> > @@ -186,8 +228,7 @@ typedef struct sPAPRDRConnectorClass {
+> >  uint32_t spapr_drc_index(sPAPRDRConnector *drc);
+> >  sPAPRDRConnectorType spapr_drc_type(sPAPRDRConnector *drc);
+> >=20
+> > -sPAPRDRConnector *spapr_dr_connector_new(Object *owner,
+> > -                                         sPAPRDRConnectorType type,
+> > +sPAPRDRConnector *spapr_dr_connector_new(Object *owner, const char *ty=
+pe,
+> >                                           uint32_t id);
+> >  sPAPRDRConnector *spapr_dr_connector_by_index(uint32_t index);
+> >  sPAPRDRConnector *spapr_dr_connector_by_id(sPAPRDRConnectorType type,
 >=20
 
 --=20
@@ -296,25 +530,25 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---jfWagoTHmfL/c8Ax
+--WcQ7DTTOeW3GIUV5
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v2
 
-iQIcBAEBCAAGBQJZM+BaAAoJEGw4ysog2bOShHUP/iHm53gj6LJSxdRPtju1MXsC
-E11e8JdqXOLdfZN9FvOCq7W+cF1JJoT3rbKhdmXToeSHFvfiMgin40j7pylmbH9r
-xZlJiIrM8om75bAgy/6OUgW9hgN8q3kIbMCX0GBhnRpsxvkm+JzBwpEMEPDlgoKH
-QukijT35We9A87S8NNxBXANUosfitKrqXKML0qOeEmDhQebuauJVa10aMXWdJE3A
-WY3zH8aKCZm2PPTudblg5dCBMMPZqxvwa11LySsKu55MzqLsqqjx33TcUw0P3KDc
-IBNHxrXd5aVfP1/NmzDq1gxBw9npWxLQWbnllbWr6i/x8Y9WcG98Xt0FuRDmEtAd
-pQR4c2rwRtclzR42oXWZfxHvkTcO0eB2cktfOfDtusP8K8FTrwJujtc5iKltg0CG
-iKKvHm9DpHt2Xivjcysqbzic6xUZVJ2LireS+BWSwK27p/Ubht9XZI5OzxrB+9do
-8+YxAQkiZc0oHZwtnFk0uORgHUShAZk/6Jagc819fIVyFjfU4KsMr54igTz4Tf3G
-gtJBl3afK6hppgECv7bgz/5z1RbgOeISHakNurKwJvWEQ9IMe4JxryhREa6VgJ74
-n5J2wir50jWu9Sryq5H7/AUPKUY6sB1x8+yK99ExxZBjCb9KqzR+D/GFrHtT1YPT
-OzAoX/2kp/o2ZZkb8Zb0
-=qpcB
+iQIcBAEBCAAGBQJZM+AUAAoJEGw4ysog2bOS6AsP/jiJlq2AB90cGRoM0k4RfZbk
+kAOMuQ9MlE74AeF7UMURXSW/FDRY8NLZjJjFpHqwkIedjefUeqRNAdCjWA+xUjbk
+UNDxg4dSoApkwTb6UGPWYQARHx8XBzUAjRK4Czt5+9t2mCxKMkku1g/rOFpW+2js
+1EJdPicWBlGjQ64z1MTAd5lmVKhDXc+fwXBm+RcFeK+W9ibx7I3sSvoBfyYw90t4
+XCXPx8G7Rx3hzvjpikv86NkaTdsIKfFWvmZo/frncCiKU6ADu3Vu4K/pJnA4SXGA
+xihQlJptV9tMU11o0XQpyXG+c5joiHVFXNq0Y55kJY5xg+wwRb4VZXYUEZ64zBNw
+XLR6kyr7yoDeQC5O7mYgOF/OnlGWNoc3Q2DFcvvfQ1IuHpAkYOS8fDnIXg3Nrr8y
+/ZVUixmMd19glZOlCvkplm0TaUVYuLvsyBanjC3mm3Q87mBGadxcyYyUh20c7SNz
+f3klGucN28sSGds7YP7+WL1vI3iIden5qIYv6vy+UvfcTd2ek+7zq/GpUKvkVZ5i
+/BZEYHMeYxI3IfISkMtJTVqx3eRViPPWLZ+NBA0kacVM8olT9eMFXao2a5svgmEq
++CYhxHUo4GhKCROWCHkZv8O0MLd+dQcYwWG6/dBOPtRXoTWyVYGnbcrrDF2gdeFa
+tJsYuaIFRAQw/EvxsV9O
+=IOpD
 -----END PGP SIGNATURE-----
 
---jfWagoTHmfL/c8Ax--
+--WcQ7DTTOeW3GIUV5--
