@@ -1,29 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33529)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35101)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1dHXsr-0001IC-QI
-	for qemu-devel@nongnu.org; Sun, 04 Jun 2017 11:56:06 -0400
+	(envelope-from <mjt@tls.msk.ru>) id 1dHXzC-00071V-QY
+	for qemu-devel@nongnu.org; Sun, 04 Jun 2017 12:02:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1dHXso-0007oM-M5
-	for qemu-devel@nongnu.org; Sun, 04 Jun 2017 11:56:05 -0400
-Received: from [59.151.112.132] (port=24108 helo=heian.cn.fujitsu.com)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1dHXsn-0007m9-UC
-	for qemu-devel@nongnu.org; Sun, 04 Jun 2017 11:56:02 -0400
-References: <20170601130325.6433-1-marcandre.lureau@redhat.com>
-	<20170601130325.6433-2-marcandre.lureau@redhat.com>
-	<465a7b69-a3c0-1492-8e30-c562a76cd65a@redhat.com>
-	<0a434f41-1131-713d-1fc9-a9edba425f7a@redhat.com>
-	<CAJ+F1CKL6OXetG6Liwf3NrpNv3K8PR6_SQ5=rfjyRwa3pJ7nuA@mail.gmail.com>
-	<CAJ+F1CKhaNuBO8O-X=u8aWV47q+smG2weo2qqoMojio+fJva_g@mail.gmail.com>
-	<584abbba-669d-0fac-2144-5f7010b1a7ae@redhat.com>
-From: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
-Message-ID: <671cbc52-dfa5-38a3-e4a8-73152af4bada@cn.fujitsu.com>
-Date: Sun, 4 Jun 2017 23:56:49 +0800
-MIME-Version: 1.0
-In-Reply-To: <584abbba-669d-0fac-2144-5f7010b1a7ae@redhat.com>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v2 1/4] dump: add DumpInfo structure
+	(envelope-from <mjt@tls.msk.ru>) id 1dHXz9-0003wH-QV
+	for qemu-devel@nongnu.org; Sun, 04 Jun 2017 12:02:38 -0400
+From: Michael Tokarev <mjt@tls.msk.ru>
+Date: Sun,  4 Jun 2017 18:45:19 +0300
+Message-Id: <244d04db580da5972b27a4dbf8f38b949c7d916c.1496591095.git.mjt@msgid.tls.msk.ru>
+In-Reply-To: <cover.1496591095.git.mjt@msgid.tls.msk.ru>
+References: <cover.1496591095.git.mjt@msgid.tls.msk.ru>
+In-Reply-To: <cover.1496591095.git.mjt@msgid.tls.msk.ru>
+References: <cover.1496591095.git.mjt@msgid.tls.msk.ru>
+Subject: [Qemu-devel] [PULL 15/22] qapi: Fix some QMP documentation
+ regressions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,82 +22,103 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laszlo Ersek <lersek@redhat.com>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@gmail.com>, Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org, "wencongyang2@huawei.com" <wencongyang2@huawei.com>
-Cc: zhangchen.fnst@cn.fujitsu.com, anderson@redhat.com, qiaonuohan <qiaonuohan@huawei.com>
+To: qemu-devel@nongnu.org
+Cc: Eric Blake <eblake@redhat.com>, qemu-trivial@nongnu.org, Michael Tokarev <mjt@tls.msk.ru>
 
+From: Eric Blake <eblake@redhat.com>
 
+In the process of getting rid of docs/qmp-commands.txt, we managed
+to regress on some of the text that changed after the point where
+the move was first branched and when the move actually occurred.
+For example, commit 3282eca for blockdev-snapshot re-added the
+extra "options" layer which had been cleaned up in commit 0153d2f.
 
-On 06/03/2017 06:49 AM, Laszlo Ersek wrote:
-> On 06/02/17 11:55, Marc-André Lureau wrote:
->> Hi
->>
->> On Fri, Jun 2, 2017 at 1:46 PM Marc-André Lureau <marcandre.lureau@gmail.com>
->> wrote:
->>
->>> Hi
->>>
->>> On Thu, Jun 1, 2017 at 10:19 PM Eric Blake <eblake@redhat.com> wrote:
->>>
->>>> On 06/01/2017 01:06 PM, Laszlo Ersek wrote:
->>>>> On 06/01/17 15:03, Marc-André Lureau wrote:
->>>>>> One way or another, the guest could communicate various dump info (via
->>>>>> guest agent or vmcoreinfo device) and populate that structure. It can
->>>>>> then be used to augment the dump with various details, as done in the
->>>>>> following patch.
->>>>>>
->>>>>> Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
->>>>>> ---
->>>>>>   include/sysemu/dump-info.h | 18 ++++++++++++++++++
->>>>>>   dump.c                     |  3 +++
->>>>>>   2 files changed, 21 insertions(+)
->>>>>>   create mode 100644 include/sysemu/dump-info.h
->>>>>>
->>>>>> diff --git a/include/sysemu/dump-info.h b/include/sysemu/dump-info.h
->>>>>> new file mode 100644
->>>>>> index 0000000000..d2378e15e2
->>>>>> --- /dev/null
->>>>>> +++ b/include/sysemu/dump-info.h
->>>>>> @@ -0,0 +1,18 @@
->>>>>> +#ifndef DUMP_INFO_H
->>>>>> +#define DUMP_INFO_H
->>>>> Can you please spell out, in the commit message, the reason for
->>>>> introducing a new header file? (I suspect your reason, but it should be
->>>>> documented explicitly.)
->>>> Also, should you have a copyright header in the new file?  And does
->>>> MAINTAINERS cover it?
->>>>
->>> None of the dump support is covered. Based on commit history, I can
->>> suggest Wen Congyang, as original author.
->>> Sadly, Qiao Nuohan cannot be reached with his mail today (anyone knows if
->>> he is still contributing?). Laszlo has done significant changes and reviews
->>> too. I can also propose myself to help with reviews.
->>>
->>> Wen or Laszla, do you want to be the main maintainer?
+This clears up all regressions identified over the range
+02b351d..bd6092e:
+https://lists.gnu.org/archive/html/qemu-devel/2017-05/msg05127.html
+as well as a cleanup to x-blockdev-remove-medium to prefer
+'id' over 'device' (matching the cleanup for 'eject').
 
-I can cc Qiao Nuohan<qiaonuohan@huawei.com>...
+Signed-off-by: Eric Blake <eblake@redhat.com>
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
+Signed-off-by: Michael Tokarev <mjt@tls.msk.ru>
+---
+ qapi/block-core.json | 28 ++++++++++++++--------------
+ qapi/block.json      |  2 +-
+ 2 files changed, 15 insertions(+), 15 deletions(-)
 
-Thanks
-Zhang Chen
-
->>>
->> (sorry for the typo)
->>
->> or rather "Supported" ("Someone is actually paid to look after this"
->> according to MAINTAINERS)
->>
-> Thanks, but I don't wish to have an official responsibility for this
-> feature. My current responsibilities are more than enough to keep me busy.
->
-> If you'd like to volunteer for maintaining the dump stuff, you have my
-> blessing of course (whatever weight that might carry).
->
-> Thanks
-> Laszlo
->
->
->
->
-
+diff --git a/qapi/block-core.json b/qapi/block-core.json
+index 309b1df214..88a7471a23 100644
+--- a/qapi/block-core.json
++++ b/qapi/block-core.json
+@@ -1206,11 +1206,11 @@
+ # Example:
+ #
+ # -> { "execute": "blockdev-add",
+-#      "arguments": { "options": { "driver": "qcow2",
+-#                                  "node-name": "node1534",
+-#                                  "file": { "driver": "file",
+-#                                            "filename": "hd1.qcow2" },
+-#                                  "backing": "" } } }
++#      "arguments": { "driver": "qcow2",
++#                     "node-name": "node1534",
++#                     "file": { "driver": "file",
++#                               "filename": "hd1.qcow2" },
++#                     "backing": "" } }
+ #
+ # <- { "return": {} }
+ #
+@@ -3214,7 +3214,7 @@
+ # <- { "return": {} }
+ #
+ # -> { "execute": "x-blockdev-remove-medium",
+-#      "arguments": { "device": "ide0-1-0" } }
++#      "arguments": { "id": "ide0-1-0" } }
+ #
+ # <- { "return": {} }
+ #
+@@ -3245,10 +3245,10 @@
+ #
+ # -> { "execute": "blockdev-add",
+ #      "arguments": {
+-#          "options": { "node-name": "node0",
+-#                       "driver": "raw",
+-#                       "file": { "driver": "file",
+-#                                 "filename": "fedora.iso" } } } }
++#          "node-name": "node0",
++#          "driver": "raw",
++#          "file": { "driver": "file",
++#                    "filename": "fedora.iso" } } }
+ # <- { "return": {} }
+ #
+ # -> { "execute": "x-blockdev-insert-medium",
+@@ -3701,10 +3701,10 @@
+ # 1. Add a new node to a quorum
+ # -> { "execute": "blockdev-add",
+ #      "arguments": {
+-#          "options": { "driver": "raw",
+-#                       "node-name": "new_node",
+-#                        "file": { "driver": "file",
+-#                                  "filename": "test.raw" } } } }
++#          "driver": "raw",
++#          "node-name": "new_node",
++#          "file": { "driver": "file",
++#                    "filename": "test.raw" } } }
+ # <- { "return": {} }
+ # -> { "execute": "x-blockdev-change",
+ #      "arguments": { "parent": "disk1",
+diff --git a/qapi/block.json b/qapi/block.json
+index 6a2fdc73f7..414b61bde7 100644
+--- a/qapi/block.json
++++ b/qapi/block.json
+@@ -180,7 +180,7 @@
+ #
+ # Example:
+ #
+-# -> { "execute": "eject", "arguments": { "device": "ide1-0-1" } }
++# -> { "execute": "eject", "arguments": { "id": "ide1-0-1" } }
+ # <- { "return": {} }
+ ##
+ { 'command': 'eject',
 -- 
-Thanks
-Zhang Chen
+2.11.0
