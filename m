@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50430)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50474)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dHZRf-0007qf-E3
-	for qemu-devel@nongnu.org; Sun, 04 Jun 2017 13:36:09 -0400
+	(envelope-from <rth7680@gmail.com>) id 1dHZRg-0007qp-Vg
+	for qemu-devel@nongnu.org; Sun, 04 Jun 2017 13:36:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dHZRe-0003Y6-5S
-	for qemu-devel@nongnu.org; Sun, 04 Jun 2017 13:36:07 -0400
-Received: from mail-pg0-x241.google.com ([2607:f8b0:400e:c05::241]:35795)
+	(envelope-from <rth7680@gmail.com>) id 1dHZRf-0003a2-J4
+	for qemu-devel@nongnu.org; Sun, 04 Jun 2017 13:36:08 -0400
+Received: from mail-pg0-x243.google.com ([2607:f8b0:400e:c05::243]:35904)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1dHZRd-0003XQ-T0
-	for qemu-devel@nongnu.org; Sun, 04 Jun 2017 13:36:06 -0400
-Received: by mail-pg0-x241.google.com with SMTP id f127so7256164pgc.2
-	for <qemu-devel@nongnu.org>; Sun, 04 Jun 2017 10:36:05 -0700 (PDT)
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1dHZRf-0003Yw-CV
+	for qemu-devel@nongnu.org; Sun, 04 Jun 2017 13:36:07 -0400
+Received: by mail-pg0-x243.google.com with SMTP id v18so3986547pgb.3
+	for <qemu-devel@nongnu.org>; Sun, 04 Jun 2017 10:36:07 -0700 (PDT)
 Sender: Richard Henderson <rth7680@gmail.com>
 From: Richard Henderson <rth@twiddle.net>
-Date: Sun,  4 Jun 2017 10:34:38 -0700
-Message-Id: <20170604173509.29684-39-rth@twiddle.net>
+Date: Sun,  4 Jun 2017 10:34:39 -0700
+Message-Id: <20170604173509.29684-40-rth@twiddle.net>
 In-Reply-To: <20170604173509.29684-1-rth@twiddle.net>
 References: <20170604173509.29684-1-rth@twiddle.net>
-Subject: [Qemu-devel] [PULL 38/69] target/s390x: Re-implement a few EXECUTE
- target insns directly
+Subject: [Qemu-devel] [PULL 39/69] target/s390x/cpu_models: Allow some
+ additional feature bits for the "qemu" CPU
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,138 +28,96 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, aurelien@aurel32.net
+Cc: peter.maydell@linaro.org, aurelien@aurel32.net, Thomas Huth <thuth@redhat.com>
 
-While the previous patch is required for proper conformance,
-the vast majority of target insns are MVC and XC for implementing
-memmove and memset respectively.  The next most common are CLC,
-TR, and SVC.
+From: Thomas Huth <thuth@redhat.com>
 
-Implementing these (and a few others for which we already have
-an implementation) directly is faster than going through full
-translation to a TB.
+Currently we only present the plain z900 feature bits to the guest,
+but QEMU already emulates some additional features (but not all of
+the next CPU generation, so we can not use the next CPU level as
+default yet). Since newer Linux kernels are checking the feature bits
+and refuse to work if a required feature is missing, it would be nice
+to have a way to present more of the supported features when we are
+running with the "qemu" CPU.
+This patch now adds the supported features to the "full_feat" bitmap,
+so that additional features can be enabled on the command line now,
+for example with:
 
+ qemu-system-s390x -cpu qemu,stfle=true,ldisp=true,eimm=true,stckf=true
+
+Acked-by: David Hildenbrand <david@redhat.com>
 Reviewed-by: Aurelien Jarno <aurelien@aurel32.net>
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+Message-Id: <1495704132-5675-1-git-send-email-thuth@redhat.com>
 Signed-off-by: Richard Henderson <rth@twiddle.net>
 ---
- target/s390x/mem_helper.c | 66 ++++++++++++++++++++++++++++++++++++-----------
- 1 file changed, 51 insertions(+), 15 deletions(-)
+ target/s390x/cpu_models.c | 34 +++++++++++++++++++++++++++++++---
+ 1 file changed, 31 insertions(+), 3 deletions(-)
 
-diff --git a/target/s390x/mem_helper.c b/target/s390x/mem_helper.c
-index 3a77edc..e35571e 100644
---- a/target/s390x/mem_helper.c
-+++ b/target/s390x/mem_helper.c
-@@ -200,31 +200,30 @@ uint32_t HELPER(oc)(CPUS390XState *env, uint32_t l, uint64_t dest,
+diff --git a/target/s390x/cpu_models.c b/target/s390x/cpu_models.c
+index 8d27363..e5e005a 100644
+--- a/target/s390x/cpu_models.c
++++ b/target/s390x/cpu_models.c
+@@ -658,6 +658,30 @@ static void check_compatibility(const S390CPUModel *max_model,
+                   "available in the configuration: ");
  }
  
- /* memmove */
--static void do_helper_mvc(CPUS390XState *env, uint32_t l, uint64_t dest,
--                          uint64_t src, uintptr_t ra)
-+static uint32_t do_helper_mvc(CPUS390XState *env, uint32_t l, uint64_t dest,
-+                              uint64_t src, uintptr_t ra)
- {
-     uint32_t i;
- 
-     HELPER_LOG("%s l %d dest %" PRIx64 " src %" PRIx64 "\n",
-                __func__, l, dest, src);
- 
-+    /* mvc and memmove do not behave the same when areas overlap! */
-     /* mvc with source pointing to the byte after the destination is the
-        same as memset with the first source byte */
-     if (dest == src + 1) {
-         fast_memset(env, dest, cpu_ldub_data_ra(env, src, ra), l + 1, ra);
--        return;
--    }
--
--    /* mvc and memmove do not behave the same when areas overlap! */
--    if (dest < src || src + l < dest) {
-+    } else if (dest < src || src + l < dest) {
-         fast_memmove(env, dest, src, l + 1, ra);
--        return;
-+    } else {
-+        /* slow version with byte accesses which always work */
-+        for (i = 0; i <= l; i++) {
-+            uint8_t x = cpu_ldub_data_ra(env, src + i, ra);
-+            cpu_stb_data_ra(env, dest + i, x, ra);
-+        }
-     }
- 
--    /* slow version with byte accesses which always work */
--    for (i = 0; i <= l; i++) {
--        cpu_stb_data_ra(env, dest + i, cpu_ldub_data_ra(env, src + i, ra), ra);
--    }
-+    return env->cc_op;
- }
- 
- void HELPER(mvc)(CPUS390XState *env, uint32_t l, uint64_t dest, uint64_t src)
-@@ -692,8 +691,8 @@ void HELPER(unpk)(CPUS390XState *env, uint32_t len, uint64_t dest,
-     }
- }
- 
--static void do_helper_tr(CPUS390XState *env, uint32_t len, uint64_t array,
--                         uint64_t trans, uintptr_t ra)
-+static uint32_t do_helper_tr(CPUS390XState *env, uint32_t len, uint64_t array,
-+                             uint64_t trans, uintptr_t ra)
- {
-     uint32_t i;
- 
-@@ -702,12 +701,14 @@ static void do_helper_tr(CPUS390XState *env, uint32_t len, uint64_t array,
-         uint8_t new_byte = cpu_ldub_data_ra(env, trans + byte, ra);
-         cpu_stb_data_ra(env, array + i, new_byte, ra);
-     }
++/**
++ * The base TCG CPU model "qemu" is based on the z900. However, we already
++ * can also emulate some additional features of later CPU generations, so
++ * we add these additional feature bits here.
++ */
++static void add_qemu_cpu_model_features(S390FeatBitmap fbm)
++{
++    static const int feats[] = {
++        S390_FEAT_STFLE,
++        S390_FEAT_EXTENDED_IMMEDIATE,
++        S390_FEAT_LONG_DISPLACEMENT,
++        S390_FEAT_LONG_DISPLACEMENT_FAST,
++        S390_FEAT_STORE_CLOCK_FAST,
++        S390_FEAT_GENERAL_INSTRUCTIONS_EXT,
++        S390_FEAT_EXECUTE_EXT,
++        S390_FEAT_STFLE_45,
++    };
++    int i;
 +
-+    return env->cc_op;
- }
- 
- void HELPER(tr)(CPUS390XState *env, uint32_t len, uint64_t array,
-                 uint64_t trans)
- {
--    return do_helper_tr(env, len, array, trans, GETPC());
-+    do_helper_tr(env, len, array, trans, GETPC());
- }
- 
- uint64_t HELPER(tre)(CPUS390XState *env, uint64_t array,
-@@ -1221,6 +1222,41 @@ void HELPER(ex)(CPUS390XState *env, uint32_t ilen, uint64_t r1, uint64_t addr)
-         g_assert_not_reached();
-     }
- 
-+    /* The very most common cases can be sped up by avoiding a new TB.  */
-+    if ((opc & 0xf0) == 0xd0) {
-+        typedef uint32_t (*dx_helper)(CPUS390XState *, uint32_t, uint64_t,
-+                                      uint64_t, uintptr_t);
-+        static const dx_helper dx[16] = {
-+            [0x2] = do_helper_mvc,
-+            [0x4] = do_helper_nc,
-+            [0x5] = do_helper_clc,
-+            [0x6] = do_helper_oc,
-+            [0x7] = do_helper_xc,
-+            [0xc] = do_helper_tr,
-+            [0xd] = do_helper_trt,
-+        };
-+        dx_helper helper = dx[opc & 0xf];
-+
-+        if (helper) {
-+            uint32_t l = extract64(insn, 48, 8);
-+            uint32_t b1 = extract64(insn, 44, 4);
-+            uint32_t d1 = extract64(insn, 32, 12);
-+            uint32_t b2 = extract64(insn, 28, 4);
-+            uint32_t d2 = extract64(insn, 16, 12);
-+            uint64_t a1 = get_address(env, 0, b1, d1);
-+            uint64_t a2 = get_address(env, 0, b2, d2);
-+
-+            env->cc_op = helper(env, l, a1, a2, 0);
-+            env->psw.addr += ilen;
-+            return;
-+        }
-+    } else if (opc == 0x0a) {
-+        env->int_svc_code = extract64(insn, 48, 8);
-+        env->int_svc_ilen = ilen;
-+        helper_exception(env, EXCP_SVC);
-+        g_assert_not_reached();
++    for (i = 0; i < ARRAY_SIZE(feats); i++) {
++        set_bit(feats[i], fbm);
 +    }
++}
 +
-     /* Record the insn we want to execute as well as the ilen to use
-        during the execution of the target insn.  This will also ensure
-        that ex_value is non-zero, which flags that we are in a state
+ static S390CPUModel *get_max_cpu_model(Error **errp)
+ {
+     static S390CPUModel max_model;
+@@ -670,10 +694,11 @@ static S390CPUModel *get_max_cpu_model(Error **errp)
+     if (kvm_enabled()) {
+         kvm_s390_get_host_cpu_model(&max_model, errp);
+     } else {
+-        /* TCG emulates a z900 */
++        /* TCG emulates a z900 (with some optional additional features) */
+         max_model.def = &s390_cpu_defs[0];
+         bitmap_copy(max_model.features, max_model.def->default_feat,
+                     S390_FEAT_MAX);
++        add_qemu_cpu_model_features(max_model.features);
+     }
+     if (!*errp) {
+         cached = true;
+@@ -925,11 +950,14 @@ static void s390_host_cpu_model_initfn(Object *obj)
+ 
+ static void s390_qemu_cpu_model_initfn(Object *obj)
+ {
++    static S390CPUDef s390_qemu_cpu_defs;
+     S390CPU *cpu = S390_CPU(obj);
+ 
+     cpu->model = g_malloc0(sizeof(*cpu->model));
+-    /* TCG emulates a z900 */
+-    cpu->model->def = &s390_cpu_defs[0];
++    /* TCG emulates a z900 (with some optional additional features) */
++    memcpy(&s390_qemu_cpu_defs, &s390_cpu_defs[0], sizeof(s390_qemu_cpu_defs));
++    add_qemu_cpu_model_features(s390_qemu_cpu_defs.full_feat);
++    cpu->model->def = &s390_qemu_cpu_defs;
+     bitmap_copy(cpu->model->features, cpu->model->def->default_feat,
+                 S390_FEAT_MAX);
+ }
 -- 
 2.9.4
