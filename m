@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35101)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35100)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mjt@tls.msk.ru>) id 1dHXzC-00071V-QY
+	(envelope-from <mjt@tls.msk.ru>) id 1dHXzC-00071U-QV
 	for qemu-devel@nongnu.org; Sun, 04 Jun 2017 12:02:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mjt@tls.msk.ru>) id 1dHXz9-0003wH-QV
+	(envelope-from <mjt@tls.msk.ru>) id 1dHXz9-0003w6-Mc
 	for qemu-devel@nongnu.org; Sun, 04 Jun 2017 12:02:38 -0400
 From: Michael Tokarev <mjt@tls.msk.ru>
-Date: Sun,  4 Jun 2017 18:45:19 +0300
-Message-Id: <244d04db580da5972b27a4dbf8f38b949c7d916c.1496591095.git.mjt@msgid.tls.msk.ru>
+Date: Sun,  4 Jun 2017 18:45:22 +0300
+Message-Id: <f603164ae409d23e1fba012ded3b5dda33f9df5a.1496591095.git.mjt@msgid.tls.msk.ru>
 In-Reply-To: <cover.1496591095.git.mjt@msgid.tls.msk.ru>
 References: <cover.1496591095.git.mjt@msgid.tls.msk.ru>
 In-Reply-To: <cover.1496591095.git.mjt@msgid.tls.msk.ru>
 References: <cover.1496591095.git.mjt@msgid.tls.msk.ru>
-Subject: [Qemu-devel] [PULL 15/22] qapi: Fix some QMP documentation
- regressions
+Subject: [Qemu-devel] [PULL 18/22] help: Add newline to end of thread option
+ help text
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,102 +23,61 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Eric Blake <eblake@redhat.com>, qemu-trivial@nongnu.org, Michael Tokarev <mjt@tls.msk.ru>
+Cc: Suraj Jitindar Singh <sjitindarsingh@gmail.com>, qemu-trivial@nongnu.org, Michael Tokarev <mjt@tls.msk.ru>
 
-From: Eric Blake <eblake@redhat.com>
+From: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
 
-In the process of getting rid of docs/qmp-commands.txt, we managed
-to regress on some of the text that changed after the point where
-the move was first branched and when the move actually occurred.
-For example, commit 3282eca for blockdev-snapshot re-added the
-extra "options" layer which had been cleaned up in commit 0153d2f.
+The help text for the thread sub option of the accel option is missing
+a newline at the end. This is annoying as it makes it hard to see the
+help text for the next option.
 
-This clears up all regressions identified over the range
-02b351d..bd6092e:
-https://lists.gnu.org/archive/html/qemu-devel/2017-05/msg05127.html
-as well as a cleanup to x-blockdev-remove-medium to prefer
-'id' over 'device' (matching the cleanup for 'eject').
+Add the new line so that the following option help text (-smp) is
+displayed on a new line rather on the same line and directly after
+the thread help.
 
-Signed-off-by: Eric Blake <eblake@redhat.com>
-Reviewed-by: Markus Armbruster <armbru@redhat.com>
+Before patch:
+
+-accel [accel=]accelerator[,thread=single|multi]
+                select accelerator (kvm, xen, hax or tcg; use 'help' for a list)
+                thread=single|multi (enable multi-threaded TCG)-smp [cpus=]n[,maxcpus=cpus][,cores=cores][,threads=threads][,sockets=sockets]
+                set the number of CPUs to 'n' [default=1]
+                maxcpus= maximum number of total cpus, including
+                offline CPUs for hotplug, etc
+                cores= number of CPU cores on one socket
+                threads= number of threads on one CPU core
+                sockets= number of discrete sockets in the system
+
+After patch:
+
+-accel [accel=]accelerator[,thread=single|multi]
+                select accelerator (kvm, xen, hax or tcg; use 'help' for a list)
+                thread=single|multi (enable multi-threaded TCG)
+-smp [cpus=]n[,maxcpus=cpus][,cores=cores][,threads=threads][,sockets=sockets]
+                set the number of CPUs to 'n' [default=1]
+                maxcpus= maximum number of total cpus, including
+                offline CPUs for hotplug, etc
+                cores= number of CPU cores on one socket
+                threads= number of threads on one CPU core
+                sockets= number of discrete sockets in the system
+
+Signed-off-by: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
 Signed-off-by: Michael Tokarev <mjt@tls.msk.ru>
 ---
- qapi/block-core.json | 28 ++++++++++++++--------------
- qapi/block.json      |  2 +-
- 2 files changed, 15 insertions(+), 15 deletions(-)
+ qemu-options.hx | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/qapi/block-core.json b/qapi/block-core.json
-index 309b1df214..88a7471a23 100644
---- a/qapi/block-core.json
-+++ b/qapi/block-core.json
-@@ -1206,11 +1206,11 @@
- # Example:
- #
- # -> { "execute": "blockdev-add",
--#      "arguments": { "options": { "driver": "qcow2",
--#                                  "node-name": "node1534",
--#                                  "file": { "driver": "file",
--#                                            "filename": "hd1.qcow2" },
--#                                  "backing": "" } } }
-+#      "arguments": { "driver": "qcow2",
-+#                     "node-name": "node1534",
-+#                     "file": { "driver": "file",
-+#                               "filename": "hd1.qcow2" },
-+#                     "backing": "" } }
- #
- # <- { "return": {} }
- #
-@@ -3214,7 +3214,7 @@
- # <- { "return": {} }
- #
- # -> { "execute": "x-blockdev-remove-medium",
--#      "arguments": { "device": "ide0-1-0" } }
-+#      "arguments": { "id": "ide0-1-0" } }
- #
- # <- { "return": {} }
- #
-@@ -3245,10 +3245,10 @@
- #
- # -> { "execute": "blockdev-add",
- #      "arguments": {
--#          "options": { "node-name": "node0",
--#                       "driver": "raw",
--#                       "file": { "driver": "file",
--#                                 "filename": "fedora.iso" } } } }
-+#          "node-name": "node0",
-+#          "driver": "raw",
-+#          "file": { "driver": "file",
-+#                    "filename": "fedora.iso" } } }
- # <- { "return": {} }
- #
- # -> { "execute": "x-blockdev-insert-medium",
-@@ -3701,10 +3701,10 @@
- # 1. Add a new node to a quorum
- # -> { "execute": "blockdev-add",
- #      "arguments": {
--#          "options": { "driver": "raw",
--#                       "node-name": "new_node",
--#                        "file": { "driver": "file",
--#                                  "filename": "test.raw" } } } }
-+#          "driver": "raw",
-+#          "node-name": "new_node",
-+#          "file": { "driver": "file",
-+#                    "filename": "test.raw" } } }
- # <- { "return": {} }
- # -> { "execute": "x-blockdev-change",
- #      "arguments": { "parent": "disk1",
-diff --git a/qapi/block.json b/qapi/block.json
-index 6a2fdc73f7..414b61bde7 100644
---- a/qapi/block.json
-+++ b/qapi/block.json
-@@ -180,7 +180,7 @@
- #
- # Example:
- #
--# -> { "execute": "eject", "arguments": { "device": "ide1-0-1" } }
-+# -> { "execute": "eject", "arguments": { "id": "ide1-0-1" } }
- # <- { "return": {} }
- ##
- { 'command': 'eject',
+diff --git a/qemu-options.hx b/qemu-options.hx
+index 10995dc932..30c4f9850f 100644
+--- a/qemu-options.hx
++++ b/qemu-options.hx
+@@ -102,7 +102,7 @@ ETEXI
+ DEF("accel", HAS_ARG, QEMU_OPTION_accel,
+     "-accel [accel=]accelerator[,thread=single|multi]\n"
+     "                select accelerator (kvm, xen, hax or tcg; use 'help' for a list)\n"
+-    "                thread=single|multi (enable multi-threaded TCG)", QEMU_ARCH_ALL)
++    "                thread=single|multi (enable multi-threaded TCG)\n", QEMU_ARCH_ALL)
+ STEXI
+ @item -accel @var{name}[,prop=@var{value}[,...]]
+ @findex -accel
 -- 
 2.11.0
