@@ -1,19 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39338)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48986)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mjt@tls.msk.ru>) id 1dHYIb-00021Z-GX
-	for qemu-devel@nongnu.org; Sun, 04 Jun 2017 12:22:42 -0400
+	(envelope-from <rth7680@gmail.com>) id 1dHZGs-0004oX-7i
+	for qemu-devel@nongnu.org; Sun, 04 Jun 2017 13:24:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mjt@tls.msk.ru>) id 1dHYIW-0004Qg-LQ
-	for qemu-devel@nongnu.org; Sun, 04 Jun 2017 12:22:41 -0400
-From: Michael Tokarev <mjt@tls.msk.ru>
-Date: Sun,  4 Jun 2017 18:45:13 +0300
-Message-Id: <f85d66f47feffc1a223d8336022b17a3c7aafd47.1496591095.git.mjt@msgid.tls.msk.ru>
-In-Reply-To: <cover.1496591095.git.mjt@msgid.tls.msk.ru>
-References: <cover.1496591095.git.mjt@msgid.tls.msk.ru>
-In-Reply-To: <cover.1496591095.git.mjt@msgid.tls.msk.ru>
-References: <cover.1496591095.git.mjt@msgid.tls.msk.ru>
-Subject: [Qemu-devel] [PULL 09/22] block: Correct documentation for
- BLOCK_WRITE_THRESHOLD
+	(envelope-from <rth7680@gmail.com>) id 1dHZGo-0004B3-AU
+	for qemu-devel@nongnu.org; Sun, 04 Jun 2017 13:24:58 -0400
+Received: from mail-pg0-x242.google.com ([2607:f8b0:400e:c05::242]:36470)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1dHZGo-00049m-5I
+	for qemu-devel@nongnu.org; Sun, 04 Jun 2017 13:24:54 -0400
+Received: by mail-pg0-x242.google.com with SMTP id v18so3971045pgb.3
+	for <qemu-devel@nongnu.org>; Sun, 04 Jun 2017 10:24:52 -0700 (PDT)
+Sender: Richard Henderson <rth7680@gmail.com>
+References: <20170529121228.2789-1-david@redhat.com>
+From: Richard Henderson <rth@twiddle.net>
+Message-ID: <44928323-0869-a258-a100-ab97c1beffc2@twiddle.net>
+Date: Sun, 4 Jun 2017 10:24:47 -0700
+MIME-Version: 1.0
+In-Reply-To: <20170529121228.2789-1-david@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v1] target/s390x: addressing exceptions are
+ suppressing
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,31 +31,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Eric Blake <eblake@redhat.com>, qemu-trivial@nongnu.org, Michael Tokarev <mjt@tls.msk.ru>
+To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
+Cc: agraf@suse.de, Aurelien Jarno <aurelien@aurel32.net>, thuth@redhat.com
 
-From: Eric Blake <eblake@redhat.com>
+On 05/29/2017 05:12 AM, David Hildenbrand wrote:
+> We have to make the address in the old PSW point at the next
+> instruction, as addressing exceptions are suppressing and not
+> nullifying.
+> 
+> I assume that there are a lot of other broken cases (as most instructions
+> we care about are suppressing) - all trigger_pgm_exception() specifying
+> and explicit number or ILEN_LATER look suspicious, however this is another
+> story that might require bigger changes (and I have to understand when
+> the address might already have been incremented first).
+> 
+> This is needed to make an upcoming kvm-unit-test work.
+> 
+> Signed-off-by: David Hildenbrand<david@redhat.com>
+> ---
+>   target/s390x/helper.c | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
 
-Use the correct command name.
+Applied, thanks.
 
-Signed-off-by: Eric Blake <eblake@redhat.com>
-Signed-off-by: Michael Tokarev <mjt@tls.msk.ru>
----
- qapi/block-core.json | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/qapi/block-core.json b/qapi/block-core.json
-index ea0b3e8b13..309b1df214 100644
---- a/qapi/block-core.json
-+++ b/qapi/block-core.json
-@@ -3624,7 +3624,7 @@
- # means the device should be extended to avoid pausing for
- # disk exhaustion.
- # The event is one shot. Once triggered, it needs to be
--# re-registered with another block-set-threshold command.
-+# re-registered with another block-set-write-threshold command.
- #
- # @node-name: graph node name on which the threshold was exceeded.
- #
--- 
-2.11.0
+r~
