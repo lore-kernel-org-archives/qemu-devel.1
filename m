@@ -1,19 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39320)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39318)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mjt@tls.msk.ru>) id 1dHYIa-00021C-S3
+	(envelope-from <mjt@tls.msk.ru>) id 1dHYIa-000216-NQ
 	for qemu-devel@nongnu.org; Sun, 04 Jun 2017 12:22:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mjt@tls.msk.ru>) id 1dHYIW-0004Qv-M4
+	(envelope-from <mjt@tls.msk.ru>) id 1dHYIW-0004Qb-Kl
 	for qemu-devel@nongnu.org; Sun, 04 Jun 2017 12:22:40 -0400
 From: Michael Tokarev <mjt@tls.msk.ru>
-Date: Sun,  4 Jun 2017 18:45:20 +0300
-Message-Id: <3975bb56a7d39ba26211fc5fe4211cef766fd838.1496591095.git.mjt@msgid.tls.msk.ru>
+Date: Sun,  4 Jun 2017 18:45:16 +0300
+Message-Id: <1f6fb58d053a2c23e562b00d4b0d2d3a75ced461.1496591095.git.mjt@msgid.tls.msk.ru>
 In-Reply-To: <cover.1496591095.git.mjt@msgid.tls.msk.ru>
 References: <cover.1496591095.git.mjt@msgid.tls.msk.ru>
 In-Reply-To: <cover.1496591095.git.mjt@msgid.tls.msk.ru>
 References: <cover.1496591095.git.mjt@msgid.tls.msk.ru>
-Subject: [Qemu-devel] [PULL 16/22] scsi/lsi53c895a: Remove unused
- lsi_mem_*() return value
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL 12/22] hw/sparc: use ARRAY_SIZE() macro
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,55 +25,31 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>, qemu-trivial@nongnu.org, Michael Tokarev <mjt@tls.msk.ru>
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-trivial@nongnu.org, Michael Tokarev <mjt@tls.msk.ru>
 
-From: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
+From: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 
-lsi_mem_read/write() always return 0 about which their
-callers actually don't care. Change the function type
-to void.
-
-Signed-off-by: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
+Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
 Signed-off-by: Michael Tokarev <mjt@tls.msk.ru>
 ---
- hw/scsi/lsi53c895a.c | 10 ++++------
- 1 file changed, 4 insertions(+), 6 deletions(-)
+ hw/sparc64/sun4u.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/hw/scsi/lsi53c895a.c b/hw/scsi/lsi53c895a.c
-index 595c26017a..3e56ab267c 100644
---- a/hw/scsi/lsi53c895a.c
-+++ b/hw/scsi/lsi53c895a.c
-@@ -408,27 +408,25 @@ static void lsi_reg_writeb(LSIState *s, int offset, uint8_t val);
- static void lsi_execute_script(LSIState *s);
- static void lsi_reselect(LSIState *s, lsi_request *p);
- 
--static inline int lsi_mem_read(LSIState *s, dma_addr_t addr,
-+static inline void lsi_mem_read(LSIState *s, dma_addr_t addr,
-                                void *buf, dma_addr_t len)
- {
-     if (s->dmode & LSI_DMODE_SIOM) {
-         address_space_read(&s->pci_io_as, addr, MEMTXATTRS_UNSPECIFIED,
-                            buf, len);
--        return 0;
-     } else {
--        return pci_dma_read(PCI_DEVICE(s), addr, buf, len);
-+        pci_dma_read(PCI_DEVICE(s), addr, buf, len);
-     }
- }
- 
--static inline int lsi_mem_write(LSIState *s, dma_addr_t addr,
-+static inline void lsi_mem_write(LSIState *s, dma_addr_t addr,
-                                 const void *buf, dma_addr_t len)
- {
-     if (s->dmode & LSI_DMODE_DIOM) {
-         address_space_write(&s->pci_io_as, addr, MEMTXATTRS_UNSPECIFIED,
-                             buf, len);
--        return 0;
-     } else {
--        return pci_dma_write(PCI_DEVICE(s), addr, buf, len);
-+        pci_dma_write(PCI_DEVICE(s), addr, buf, len);
-     }
- }
- 
--- 
+diff --git a/hw/sparc64/sun4u.c b/hw/sparc64/sun4u.c
+index 18b8f8bcba..69f565db25 100644
+--- a/hw/sparc64/sun4u.c
++++ b/hw/sparc64/sun4u.c
+@@ -214,7 +214,7 @@ static void isa_irq_handler(void *opaque, int n, int =
+level)
+     qemu_irq *irqs =3D opaque;
+     int ivec;
+=20
+-    assert(n < 16);
++    assert(n < ARRAY_SIZE(isa_irq_to_ivec));
+     ivec =3D isa_irq_to_ivec[n];
+     EBUS_DPRINTF("Set ISA IRQ %d level %d -> ivec 0x%x\n", n, level, ive=
+c);
+     if (ivec) {
+--=20
 2.11.0
