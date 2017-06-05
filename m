@@ -1,35 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46602)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47131)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <haoqf@linux.vnet.ibm.com>) id 1dHpZe-0004fq-0l
-	for qemu-devel@nongnu.org; Mon, 05 Jun 2017 06:49:26 -0400
+	(envelope-from <marcandre.lureau@gmail.com>) id 1dHpag-0005R1-5y
+	for qemu-devel@nongnu.org; Mon, 05 Jun 2017 06:50:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <haoqf@linux.vnet.ibm.com>) id 1dHpZa-0006Mx-BX
-	for qemu-devel@nongnu.org; Mon, 05 Jun 2017 06:49:26 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:35415)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <haoqf@linux.vnet.ibm.com>)
-	id 1dHpZa-0006MD-1m
-	for qemu-devel@nongnu.org; Mon, 05 Jun 2017 06:49:22 -0400
-Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v55AmZVr092665
-	for <qemu-devel@nongnu.org>; Mon, 5 Jun 2017 06:49:19 -0400
-Received: from e06smtp14.uk.ibm.com (e06smtp14.uk.ibm.com [195.75.94.110])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2aw1fnt1q3-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 05 Jun 2017 06:49:19 -0400
-Received: from localhost
-	by e06smtp14.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <haoqf@linux.vnet.ibm.com>;
-	Mon, 5 Jun 2017 11:49:17 +0100
-From: QingFeng Hao <haoqf@linux.vnet.ibm.com>
-Date: Mon,  5 Jun 2017 12:48:51 +0200
-In-Reply-To: <20170605104851.61818-1-haoqf@linux.vnet.ibm.com>
-References: <20170605104851.61818-1-haoqf@linux.vnet.ibm.com>
-Message-Id: <20170605104851.61818-2-haoqf@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH v1 1/1] qemu/migration: fix the double free
- problem on from_src_file
+	(envelope-from <marcandre.lureau@gmail.com>) id 1dHpaf-0006h1-3k
+	for qemu-devel@nongnu.org; Mon, 05 Jun 2017 06:50:30 -0400
+Received: from mail-lf0-x243.google.com ([2a00:1450:4010:c07::243]:34768)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+	id 1dHpae-0006gk-Ma
+	for qemu-devel@nongnu.org; Mon, 05 Jun 2017 06:50:29 -0400
+Received: by mail-lf0-x243.google.com with SMTP id o28so666242lfk.1
+	for <qemu-devel@nongnu.org>; Mon, 05 Jun 2017 03:50:28 -0700 (PDT)
+MIME-Version: 1.0
+References: <20170602074040.7400-1-marcandre.lureau@redhat.com>
+	<CAFEAcA8nOzdR=ZHdkvX+aD-oCvDFcUvmgEJdE1CcUyOVMoEP8w@mail.gmail.com>
+	<CAJ+F1CK5MVbEE6tMT0djyH7Rr0mWcZGdZh+rYp-qpSDoQuDtUQ@mail.gmail.com>
+	<CAFEAcA8k9UoaV2Dg0E13Xq_Rzg2qGv-xArD5oFtG0oJO7iyU4w@mail.gmail.com>
+In-Reply-To: <CAFEAcA8k9UoaV2Dg0E13Xq_Rzg2qGv-xArD5oFtG0oJO7iyU4w@mail.gmail.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Mon, 05 Jun 2017 10:50:16 +0000
+Message-ID: <CAJ+F1C+v1rkNj9XgFOGjkGoEqC-Wz6FukXJnfunzcTtBXmo-3g@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PULL 00/15] chardev patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,47 +32,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: peterx@redhat.com, borntraeger@de.ibm.com, cornelia.huck@de.ibm.com, liujbjl@linux.vnet.ibm.com, kwolf@redhat.com, famz@redhat.com, QingFeng Hao <haoqf@linux.vnet.ibm.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
 
-In load_vmstate, mis->from_src_file is freed twice, the first free is by
-qemu_fclose, the second is by migration_incoming_state_destroy and
-it causes Illegal instruction exception. The fix is just to remove the
-first free.
+Hi
 
-This problem is found by qemu-iotests case 068 since commit
-"660819b migration: shut src return path unconditionally". The error is:
-068 1s ... - output mismatch (see 068.out.bad)
-    --- tests/qemu-iotests/068.out	2017-05-06 01:00:26.417270437 +0200
-    +++ 068.out.bad	2017-06-03 13:59:55.360274640 +0200
-    @@ -6,6 +6,8 @@
-     QEMU X.Y.Z monitor - type 'help' for more information
-     (qemu) savevm 0
-     (qemu) quit
-    +./common.config: line 107: 242472 Illegal instruction     (core dumped) ( if [ -n "${QEMU_NEED_PID}" ]; then
-    +    echo $BASHPID > "${QEMU_TEST_DIR}/qemu-${_QEMU_HANDLE}.pid";
-    +fi; exec "$QEMU_PROG" $QEMU_OPTIONS "$@" )
-     QEMU X.Y.Z monitor - type 'help' for more information
-    -(qemu) quit
-    -*** done
-    +(qemu) *** done
+On Mon, Jun 5, 2017 at 2:15 PM Peter Maydell <peter.maydell@linaro.org>
+wrote:
 
-Signed-off-by: QingFeng Hao <haoqf@linux.vnet.ibm.com>
----
- migration/savevm.c | 1 -
- 1 file changed, 1 deletion(-)
+> On 2 June 2017 at 20:15, Marc-Andr=C3=A9 Lureau <marcandre.lureau@gmail.c=
+om>
+> wrote:
+> > Sorry, git-publish printed an error on invalid remote, but keep going. =
+I
+> > should fix it. Here is the new pull request:
+> >
+> > The following changes since commit
+> 43771d5d92312504305c19abe29ec5bfabd55f01:
+> >
+> >   Merge remote-tracking branch 'remotes/armbru/tags/pull-qapi-2017-05-3=
+1'
+> > into staging (2017-06-01 16:39:16 +0100)
+> >
+> > are available in the git repository at:
+> >
+> >   https://github.com/elmarco/qemu.git tags/chrfe-pull-request
+> >
+> >
+> > for you to fetch changes up to 6b10e573d15ef82dbc5c5b3726028e6642e134f6=
+:
+> >
+> >   char: move char devices to chardev/ (2017-06-02 11:33:53 +0400)
+>
+> Thanks, applied to master.
+>
+> You forgot to add your signed-off-by line as submaintainer to the
+> commit from Philippe -- since it's a two line patch I didn't think it
+>
 
-diff --git a/migration/savevm.c b/migration/savevm.c
-index 9c320f59d0..853e14e34e 100644
---- a/migration/savevm.c
-+++ b/migration/savevm.c
-@@ -2290,7 +2290,6 @@ int load_snapshot(const char *name, Error **errp)
- 
-     aio_context_acquire(aio_context);
-     ret = qemu_loadvm_state(f);
--    qemu_fclose(f);
-     aio_context_release(aio_context);
- 
-     migration_incoming_state_destroy();
--- 
-2.11.2
+Oh I didn't know I have to add my sign-off too, I thought reviewed-by was
+enough. Ok
+
+
+> was worth pushing back for a respin, but it's worth adding an
+> automated "check all commits have my signoff" to your "make a pull
+> request" script I think.
+>
+> For example, see lines 98--109 in my script:
+>
+> https://git.linaro.org/people/peter.maydell/misc-scripts.git/tree/make-pu=
+llreq
+
+
+Ok, I am using git-publish (btw, Stefan merged a fix to avoid the previous
+pullreq issue), and it seems -s will add missing sign-off during
+format-patch.
+
+Thanks,
+
+
+>
+>
+> thanks
+> -- PMM
+>
+--=20
+Marc-Andr=C3=A9 Lureau
