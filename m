@@ -1,31 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52723)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53415)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dHyMe-0000xI-FV
-	for qemu-devel@nongnu.org; Mon, 05 Jun 2017 16:12:37 -0400
+	id 1dHyOS-00023o-55
+	for qemu-devel@nongnu.org; Mon, 05 Jun 2017 16:14:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dHyMb-0007Fu-Nk
-	for qemu-devel@nongnu.org; Mon, 05 Jun 2017 16:12:36 -0400
-Received: from mail-oi0-x242.google.com ([2607:f8b0:4003:c06::242]:34521)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dHyMb-0007FN-HR
-	for qemu-devel@nongnu.org; Mon, 05 Jun 2017 16:12:33 -0400
-Received: by mail-oi0-x242.google.com with SMTP id d99so11614645oic.1
-	for <qemu-devel@nongnu.org>; Mon, 05 Jun 2017 13:12:33 -0700 (PDT)
+	id 1dHyOR-000055-8H
+	for qemu-devel@nongnu.org; Mon, 05 Jun 2017 16:14:28 -0400
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
-References: <2b2311b1b070a0b03973e39deccf4682de4a6cd4.1496686997.git.alistair.francis@xilinx.com>
+References: <1496682098-1540-1-git-send-email-peter.maydell@linaro.org>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <cb3e62b0-9f76-5ccc-90b8-047d1a67f2be@amsat.org>
-Date: Mon, 5 Jun 2017 17:12:27 -0300
+Message-ID: <a627c97e-3529-95b9-2672-49abad94cb75@amsat.org>
+Date: Mon, 5 Jun 2017 17:14:17 -0300
 MIME-Version: 1.0
-In-Reply-To: <2b2311b1b070a0b03973e39deccf4682de4a6cd4.1496686997.git.alistair.francis@xilinx.com>
+In-Reply-To: <1496682098-1540-1-git-send-email-peter.maydell@linaro.org>
 Content-Type: text/plain; charset=windows-1252; format=flowed
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v1 1/1] char-socket: Don't report TCP
- socket waiting as an error
+Subject: Re: [Qemu-devel] [PATCH] block/gluster.c: Handle
+ qdict_array_entries() failure
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,42 +27,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alistair Francis <alistair.francis@xilinx.com>, qemu-devel@nongnu.org, pbonzini@redhat.com, marcandre.lureau@redhat.com
-Cc: alistair23@gmail.com
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, Jeff Cody <jcody@redhat.com>, Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org, patches@linaro.org
 
-On 06/05/2017 03:34 PM, Alistair Francis wrote:
-> When QEMU is waiting for a TCP socket connection it reports that message as
-> an error. This isn't an error though, so let's change the report to just
-> use qemu_log().
+On 06/05/2017 02:01 PM, Peter Maydell wrote:
+> In qemu_gluster_parse_json(), the call to qdict_array_entries()
+> could return a negative error code, which we were ignoring
+> because we assigned the result to an unsigned variable.
+> Fix this by using the 'int' type instead, which matches the
+> return type of qdict_array_entries() and also the type
+> we use for the loop enumeration variable 'i'.
 >
-> Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
+> (Spotted by Coverity, CID 1360960.)
+>
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 
 Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
 > ---
+>  block/gluster.c | 3 +--
+>  1 file changed, 1 insertion(+), 2 deletions(-)
 >
->  chardev/char-socket.c | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
+> diff --git a/block/gluster.c b/block/gluster.c
+> index 031596a..addceed 100644
+> --- a/block/gluster.c
+> +++ b/block/gluster.c
+> @@ -493,8 +493,7 @@ static int qemu_gluster_parse_json(BlockdevOptionsGluster *gconf,
+>      Error *local_err = NULL;
+>      char *str = NULL;
+>      const char *ptr;
+> -    size_t num_servers;
+> -    int i, type;
+> +    int i, type, num_servers;
 >
-> diff --git a/chardev/char-socket.c b/chardev/char-socket.c
-> index ccc499cfa1..a9884fa85b 100644
-> --- a/chardev/char-socket.c
-> +++ b/chardev/char-socket.c
-> @@ -27,6 +27,7 @@
->  #include "io/channel-tls.h"
->  #include "qemu/error-report.h"
->  #include "qapi/error.h"
-> +#include "qemu/log.h"
->  #include "qapi/clone-visitor.h"
->
->  #include "chardev/char-io.h"
-> @@ -765,7 +766,7 @@ static int tcp_chr_wait_connected(Chardev *chr, Error **errp)
->       * in TLS and telnet cases, only wait for an accepted socket */
->      while (!s->ioc) {
->          if (s->is_listen) {
-> -            error_report("QEMU waiting for connection on: %s",
-> +            qemu_log("QEMU waiting for connection on: %s",
->                           chr->filename);
->              qio_channel_set_blocking(QIO_CHANNEL(s->listen_ioc), true, NULL);
->              tcp_chr_accept(QIO_CHANNEL(s->listen_ioc), G_IO_IN, chr);
+>      /* create opts info from runtime_json_opts list */
+>      opts = qemu_opts_create(&runtime_json_opts, NULL, 0, &error_abort);
 >
