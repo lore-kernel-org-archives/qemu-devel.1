@@ -1,27 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37143)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37541)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <felipe@nutanix.com>) id 1dHuMd-000441-Te
-	for qemu-devel@nongnu.org; Mon, 05 Jun 2017 11:56:21 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1dHuNN-0004gH-GR
+	for qemu-devel@nongnu.org; Mon, 05 Jun 2017 11:57:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <felipe@nutanix.com>) id 1dHuMa-0000A6-S0
-	for qemu-devel@nongnu.org; Mon, 05 Jun 2017 11:56:19 -0400
-Received: from us-smtp-delivery-101.mimecast.com ([216.205.24.101]:29214)
+	(envelope-from <ehabkost@redhat.com>) id 1dHuNK-0000pJ-EH
+	for qemu-devel@nongnu.org; Mon, 05 Jun 2017 11:57:05 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47309)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <felipe@nutanix.com>) id 1dHuMa-00009Q-HU
-	for qemu-devel@nongnu.org; Mon, 05 Jun 2017 11:56:16 -0400
-From: Felipe Franciosi <felipe@nutanix.com>
-Date: Mon, 5 Jun 2017 15:56:10 +0000
-Message-ID: <BACDAB45-08B3-4726-9106-A8650A7A692B@nutanix.com>
-References: <1496303518-25638-1-git-send-email-felipe@nutanix.com>
-	<20170603115444.GT13397@umbus.fritz.box>
-In-Reply-To: <20170603115444.GT13397@umbus.fritz.box>
-Content-Language: en-US
-Content-ID: <40027F75AEC18A41A2A9E5344828BE7C@namprd02.prod.outlook.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=WINDOWS-1252
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] spapr: Allow boot from vhost-*-scsi
- backends
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1dHuNK-0000on-6a
+	for qemu-devel@nongnu.org; Mon, 05 Jun 2017 11:57:02 -0400
+From: Eduardo Habkost <ehabkost@redhat.com>
+Date: Mon,  5 Jun 2017 12:56:55 -0300
+Message-Id: <20170605155655.19315-1-ehabkost@redhat.com>
+Subject: [Qemu-devel] [PATCH] pc: Use "min-[x]level" on compat_props
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,72 +21,212 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: Felipe Franciosi <felipe@nutanix.com>, Alexey Kardashevskiy <aik@ozlabs.ru>, Alexander Graf <agraf@suse.de>, Paolo Bonzini <pbonzini@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>, Mike Cui <cui@nutanix.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org
+Cc: Richard Henderson <rth@twiddle.net>, Igor Mammedov <imammedo@redhat.com>
 
+Since the automatic cpuid-level code was introduced in commit
+c39c0edf9bb3b968ba95484465a50c7b19f4aa3a, the CPU model tables just
+define the default CPUID level code (set using "min-level").  Setting
+"[x]level" forces CPUID level to a specific value and disable the
+automatic-level logic.
 
-> On 3 Jun 2017, at 12:54, David Gibson <david@gibson.dropbear.id.au> wrote=
-:
->=20
-> On Thu, Jun 01, 2017 at 08:51:58AM +0100, Felipe Franciosi wrote:
->> This makes VMs bootable on spapr when using vhost-*-scsi.
->=20
-> This commit message needs more information: what previously prevented
-> vhost-*-scsi from working?
+But the PC compat code was not updated and the existing "[x]level"
+compat properties broke compatibility for people using features that
+triggered the auto-level code.  To keep previous behavior, we should set
+"min-[x]level" instead of "[x]level" on compat_props.
 
-Fair point. I elaborated on the commit message and sent a v2.
+This was not a problem for most cases, because old machine-types don't
+have full-cpuid-auto-level enabled.  The only common use case it broke
+was the CPUID[7] auto-level code, that was already enabled since the
+first CPUID[7] feature was introduced (in QEMU 1.4.0).
 
-Thanks,
-F.
+This causes the regression reported at:
+https://bugzilla.redhat.com/show_bug.cgi?id=1454641
 
->=20
->> Signed-off-by: Felipe Franciosi <felipe@nutanix.com>
->> Signed-off-by: Mike Cui <cui@nutanix.com>
->> ---
->> hw/ppc/spapr.c | 8 ++++++++
->> 1 file changed, 8 insertions(+)
->>=20
->> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
->> index ab3aab1..1c87886 100644
->> --- a/hw/ppc/spapr.c
->> +++ b/hw/ppc/spapr.c
->> @@ -57,6 +57,7 @@
->> #include "hw/pci/pci.h"
->> #include "hw/scsi/scsi.h"
->> #include "hw/virtio/virtio-scsi.h"
->> +#include "hw/virtio/vhost-scsi-common.h"
->>=20
->> #include "exec/address-spaces.h"
->> #include "hw/usb.h"
->> @@ -2388,6 +2389,7 @@ static char *spapr_get_fw_dev_path(FWPathProvider =
-*p, BusState *bus,
->>     ((type *)object_dynamic_cast(OBJECT(obj), (name)))
->>     SCSIDevice *d =3D CAST(SCSIDevice,  dev, TYPE_SCSI_DEVICE);
->>     sPAPRPHBState *phb =3D CAST(sPAPRPHBState, dev, TYPE_SPAPR_PCI_HOST_=
-BRIDGE);
->> +    VHostSCSICommon *vsc =3D CAST(VHostSCSICommon, dev, TYPE_VHOST_SCSI=
-_COMMON);
->>=20
->>     if (d) {
->>         void *spapr =3D CAST(void, bus->parent, "spapr-vscsi");
->> @@ -2444,6 +2446,12 @@ static char *spapr_get_fw_dev_path(FWPathProvider=
- *p, BusState *bus,
->>         return g_strdup_printf("pci@%"PRIX64, phb->buid);
->>     }
->>=20
->> +    if (vsc) {
->> +        /* Same logic as virtio above */
->> +        unsigned id =3D 0x1000000 | (vsc->target << 16) | vsc->lun;
->> +        return g_strdup_printf("disk@%"PRIX64, (uint64_t)id << 32);
->> +    }
->> +
->>     return NULL;
->> }
->>=20
->=20
-> --=20
-> David Gibson=09=09=09| I'll have my music baroque, and my code
-> david AT gibson.dropbear.id.au=09| minimalist, thank you.  NOT _the_ _oth=
-er_
-> =09=09=09=09| _way_ _around_!
-> http://www.ozlabs.org/~dgibson
+Change the PC compat code to use "min-[x]level" instead of "[x]level" on
+compat_props, and add new test cases to ensure we don't break this
+again.
+
+Reported-by: "Guo, Zhiyi" <zhguo@redhat.com>
+Signd-off-by: Eduardo Habkost <ehabkost@redhat.com>
+---
+ include/hw/i386/pc.h          | 42 +++++++++++++++++++++---------------------
+ tests/test-x86-cpuid-compat.c | 38 ++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 59 insertions(+), 21 deletions(-)
+
+diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
+index e447f5d8f4..d071c9c0e9 100644
+--- a/include/hw/i386/pc.h
++++ b/include/hw/i386/pc.h
+@@ -566,75 +566,75 @@ bool e820_get_entry(int, uint32_t, uint64_t *, uint64_t *);
+         .value    = "off",\
+     },{\
+         .driver   = "qemu64" "-" TYPE_X86_CPU,\
+-        .property = "level",\
++        .property = "min-level",\
+         .value    = stringify(4),\
+     },{\
+         .driver   = "kvm64" "-" TYPE_X86_CPU,\
+-        .property = "level",\
++        .property = "min-level",\
+         .value    = stringify(5),\
+     },{\
+         .driver   = "pentium3" "-" TYPE_X86_CPU,\
+-        .property = "level",\
++        .property = "min-level",\
+         .value    = stringify(2),\
+     },{\
+         .driver   = "n270" "-" TYPE_X86_CPU,\
+-        .property = "level",\
++        .property = "min-level",\
+         .value    = stringify(5),\
+     },{\
+         .driver   = "Conroe" "-" TYPE_X86_CPU,\
+-        .property = "level",\
++        .property = "min-level",\
+         .value    = stringify(4),\
+     },{\
+         .driver   = "Penryn" "-" TYPE_X86_CPU,\
+-        .property = "level",\
++        .property = "min-level",\
+         .value    = stringify(4),\
+     },{\
+         .driver   = "Nehalem" "-" TYPE_X86_CPU,\
+-        .property = "level",\
++        .property = "min-level",\
+         .value    = stringify(4),\
+     },{\
+         .driver   = "n270" "-" TYPE_X86_CPU,\
+-        .property = "xlevel",\
++        .property = "min-xlevel",\
+         .value    = stringify(0x8000000a),\
+     },{\
+         .driver   = "Penryn" "-" TYPE_X86_CPU,\
+-        .property = "xlevel",\
++        .property = "min-xlevel",\
+         .value    = stringify(0x8000000a),\
+     },{\
+         .driver   = "Conroe" "-" TYPE_X86_CPU,\
+-        .property = "xlevel",\
++        .property = "min-xlevel",\
+         .value    = stringify(0x8000000a),\
+     },{\
+         .driver   = "Nehalem" "-" TYPE_X86_CPU,\
+-        .property = "xlevel",\
++        .property = "min-xlevel",\
+         .value    = stringify(0x8000000a),\
+     },{\
+         .driver   = "Westmere" "-" TYPE_X86_CPU,\
+-        .property = "xlevel",\
++        .property = "min-xlevel",\
+         .value    = stringify(0x8000000a),\
+     },{\
+         .driver   = "SandyBridge" "-" TYPE_X86_CPU,\
+-        .property = "xlevel",\
++        .property = "min-xlevel",\
+         .value    = stringify(0x8000000a),\
+     },{\
+         .driver   = "IvyBridge" "-" TYPE_X86_CPU,\
+-        .property = "xlevel",\
++        .property = "min-xlevel",\
+         .value    = stringify(0x8000000a),\
+     },{\
+         .driver   = "Haswell" "-" TYPE_X86_CPU,\
+-        .property = "xlevel",\
++        .property = "min-xlevel",\
+         .value    = stringify(0x8000000a),\
+     },{\
+         .driver   = "Haswell-noTSX" "-" TYPE_X86_CPU,\
+-        .property = "xlevel",\
++        .property = "min-xlevel",\
+         .value    = stringify(0x8000000a),\
+     },{\
+         .driver   = "Broadwell" "-" TYPE_X86_CPU,\
+-        .property = "xlevel",\
++        .property = "min-xlevel",\
+         .value    = stringify(0x8000000a),\
+     },{\
+         .driver   = "Broadwell-noTSX" "-" TYPE_X86_CPU,\
+-        .property = "xlevel",\
++        .property = "min-xlevel",\
+         .value    = stringify(0x8000000a),\
+     },{\
+         .driver = TYPE_X86_CPU,\
+@@ -860,7 +860,7 @@ bool e820_get_entry(int, uint32_t, uint64_t *, uint64_t *);
+         .value    = stringify(2),\
+     },{\
+         .driver   = "Conroe-" TYPE_X86_CPU,\
+-        .property = "level",\
++        .property = "min-level",\
+         .value    = stringify(2),\
+     },{\
+         .driver   = "Penryn-" TYPE_X86_CPU,\
+@@ -868,7 +868,7 @@ bool e820_get_entry(int, uint32_t, uint64_t *, uint64_t *);
+         .value    = stringify(2),\
+     },{\
+         .driver   = "Penryn-" TYPE_X86_CPU,\
+-        .property = "level",\
++        .property = "min-level",\
+         .value    = stringify(2),\
+     },{\
+         .driver   = "Nehalem-" TYPE_X86_CPU,\
+@@ -876,7 +876,7 @@ bool e820_get_entry(int, uint32_t, uint64_t *, uint64_t *);
+         .value    = stringify(2),\
+     },{\
+         .driver   = "Nehalem-" TYPE_X86_CPU,\
+-        .property = "level",\
++        .property = "min-level",\
+         .value    = stringify(2),\
+     },{\
+         .driver   = "virtio-net-pci",\
+diff --git a/tests/test-x86-cpuid-compat.c b/tests/test-x86-cpuid-compat.c
+index 6c71e46391..652216f531 100644
+--- a/tests/test-x86-cpuid-compat.c
++++ b/tests/test-x86-cpuid-compat.c
+@@ -313,6 +313,44 @@ int main(int argc, char **argv)
+     add_cpuid_test("x86/cpuid/auto-xlevel2/pc-2.7",
+                    "-machine pc-i440fx-2.7 -cpu 486,+xstore",
+                    "xlevel2", 0);
++    /*
++     * QEMU 1.4.0 had auto-level enabled for CPUID[7], already,
++     * and the compat code that sets default level shouldn't
++     * disable the auto-level=7 code:
++     */
++    add_cpuid_test("x86/cpuid/auto-level7/pc-i440fx-1.4/off",
++                   "-machine pc-i440fx-1.4 -cpu Nehalem",
++                   "level", 2);
++    add_cpuid_test("x86/cpuid/auto-level7/pc-i440fx-1.5/on",
++                   "-machine pc-i440fx-1.4 -cpu Nehalem,+smap",
++                   "level", 7);
++    add_cpuid_test("x86/cpuid/auto-level7/pc-i440fx-2.3/off",
++                   "-machine pc-i440fx-2.3 -cpu Penryn",
++                   "level", 4);
++    add_cpuid_test("x86/cpuid/auto-level7/pc-i440fx-2.3/on",
++                   "-machine pc-i440fx-2.3 -cpu Penryn,+erms",
++                   "level", 7);
++    add_cpuid_test("x86/cpuid/auto-level7/pc-i440fx-2.9/off",
++                   "-machine pc-i440fx-2.9 -cpu Conroe",
++                   "level", 10);
++    add_cpuid_test("x86/cpuid/auto-level7/pc-i440fx-2.9/on",
++                   "-machine pc-i440fx-2.9 -cpu Conroe,+erms",
++                   "level", 10);
++
++    /*
++     * xlevel don't have any feature that triggers auto-level
++     * code on old machine-types.  Just check if the compat code
++     * is working correctly:
++     */
++    add_cpuid_test("x86/cpuid/xlevel-compat/pc-i440fx-2.3",
++                   "-machine pc-i440fx-2.3 -cpu SandyBridge",
++                   "xlevel", 0x8000000a);
++    add_cpuid_test("x86/cpuid/xlevel-compat/pc-i440fx-2.4/npt-off",
++                   "-machine pc-i440fx-2.4 -cpu SandyBridge,",
++                   "xlevel", 0x80000008);
++    add_cpuid_test("x86/cpuid/xlevel-compat/pc-i440fx-2.4/npt-on",
++                   "-machine pc-i440fx-2.4 -cpu SandyBridge,+npt",
++                   "xlevel", 0x80000008);
+ 
+     /* Test feature parsing */
+     add_feature_test("x86/cpuid/features/plus",
+-- 
+2.11.0.259.g40922b1
