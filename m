@@ -1,32 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51706)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52195)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1dHiUH-0000GF-Tr
-	for qemu-devel@nongnu.org; Sun, 04 Jun 2017 23:15:27 -0400
+	(envelope-from <peterx@redhat.com>) id 1dHiZ8-0001Kx-N2
+	for qemu-devel@nongnu.org; Sun, 04 Jun 2017 23:20:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1dHiUD-0007aY-Uj
-	for qemu-devel@nongnu.org; Sun, 04 Jun 2017 23:15:25 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:49060)
+	(envelope-from <peterx@redhat.com>) id 1dHiZ4-00020N-EA
+	for qemu-devel@nongnu.org; Sun, 04 Jun 2017 23:20:26 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:59744)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1dHiUD-0007a1-Oh
-	for qemu-devel@nongnu.org; Sun, 04 Jun 2017 23:15:21 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1dHiZ4-0001zn-7w
+	for qemu-devel@nongnu.org; Sun, 04 Jun 2017 23:20:22 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 6D63880C04
-	for <qemu-devel@nongnu.org>; Mon,  5 Jun 2017 03:15:20 +0000 (UTC)
-Date: Mon, 5 Jun 2017 11:15:11 +0800
+	by mx1.redhat.com (Postfix) with ESMTPS id F3FA081233
+	for <qemu-devel@nongnu.org>; Mon,  5 Jun 2017 03:20:20 +0000 (UTC)
+Date: Mon, 5 Jun 2017 11:20:13 +0800
 From: Peter Xu <peterx@redhat.com>
-Message-ID: <20170605031511.GG4056@pxdev.xzpeter.org>
+Message-ID: <20170605032013.GH4056@pxdev.xzpeter.org>
 References: <1496404254-17429-1-git-send-email-peterx@redhat.com>
-	<1496404254-17429-4-git-send-email-peterx@redhat.com>
-	<20170602184329-mutt-send-email-mst@kernel.org>
+	<20170602174804-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20170602184329-mutt-send-email-mst@kernel.org>
-Subject: Re: [Qemu-devel] [PATCH 3/3] vhost: iommu: cache static mapping if
- there is
+In-Reply-To: <20170602174804-mutt-send-email-mst@kernel.org>
+Subject: Re: [Qemu-devel] [PATCH 0/3] exec: further refine
+ address_space_get_iotlb_entry()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,35 +37,56 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: "Michael S. Tsirkin" <mst@redhat.com>
 Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Maxime Coquelin <maxime.coquelin@redhat.com>, Jason Wang <jasowang@redhat.com>
 
-On Fri, Jun 02, 2017 at 06:45:05PM +0300, Michael S. Tsirkin wrote:
-> On Fri, Jun 02, 2017 at 07:50:54PM +0800, Peter Xu wrote:
-> > This patch pre-heat vhost iotlb cache when passthrough mode enabled.
+On Fri, Jun 02, 2017 at 05:51:07PM +0300, Michael S. Tsirkin wrote:
+> On Fri, Jun 02, 2017 at 07:50:51PM +0800, Peter Xu wrote:
+> > With the patch applied:
 > > 
-> > Sometimes, even if user specified iommu_platform for vhost devices,
-> > IOMMU might still be disabled. One case is passthrough mode in VT-d
-> > implementation. We can detect this by observing iommu_list. If it's
-> > empty, it means IOMMU translation is disabled, then we can actually
-> > pre-heat the translation (it'll be static mapping then) by first
-> > invalidating all IOTLB, then cache existing memory ranges into vhost
-> > backend iotlb using 1:1 mapping.
+> >   [PATCH v3] exec: fix address_space_get_iotlb_entry page mask
+> >   (already in Paolo's pull request but not yet merged)
 > > 
-> > Reviewed-by: Jason Wang <jasowang@redhat.com>
-> > Signed-off-by: Peter Xu <peterx@redhat.com>
+> > Now we can have valid address masks. However it is still not ideal,
+> > considering that the mask may not be aligned to guest page sizes. One
+> > example would be when huge page is used in guest (please see commit
+> > message in patch 1 for details). It applies to normal pages too. So we
+> > not only need a valid address mask, we should make sure it is page
+> > mask (for x86, it should be either 4K/2M/1G pages).
 > 
-> This is still a hack I think. What if there's an invalidation?
-> I think the right thing is to send updates only when requested,
-> but sent the largest mapping including the iova, not from iova until end
-> of page. Thoughts?
+> Why should we? To get better performance, right?
 
-Indeed it's kind of a hack, but it does not hurt anything but will
-definitely boost performance in most cases...
+IMHO one point is for performance, the other point is on how we should
+define the IOTLB interface. My opinion is that it is better valid
+masks.
 
-Yes "sent the largest mapping including the iova" is okay, but the
-first IO on one region would be delayed as well, so IMHO it's not the
-best solution as well. I think the best solution should be (for sure)
-that vhost knows it's PT, then it just skips the translation
-completely. I just don't sure whether there's simple/good way to do
-this.
+> 
+> > Patch 1+2 fixes the problem. Tested with both kernel net driver or
+> > testpmd, on either 4K/2M pages, to make sure the page mask is correct.
+> > 
+> > Patch 3 is cherry picked from PT series, after fixing from 1+2, we'll
+> > definitely want patch 3 now. Here's the simplest TCP streaming test
+> > using vhost dmar and iommu=pt in guest:
+> > 
+> >   without patch 3:    12.0Gbps
+> 
+> And what happens without patches 1-2?
+
+Without 1-2, performance is good. But I think it is hacky to have such
+a good result (I explained why the performance is good in the VT-d PT
+support thread with some logs)...
+
+> 
+> >   with patch 3:       33.5Gbps
+> 
+> This is the part I don't get. Patches 1-2 will return a bigger region to
+> callers. The result should be better performance - instead it seems to
+> slow down vhost for some reason and we need tricks to get
+> performance back. What's going on?
+
+Yes. The problem is that if without patch 1/2 I think the codes lacks
+correctness. With correctness, we lost performance, then I picked
+patch 3 as well.
+
+Again, I think the first thing we need to settle is what should be the
+best definition for IOTLB (addr_mask or arbitary length).
 
 Thanks,
 
