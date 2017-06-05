@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56741)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56802)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dHvFQ-0004V9-CE
-	for qemu-devel@nongnu.org; Mon, 05 Jun 2017 12:52:57 -0400
+	(envelope-from <rth7680@gmail.com>) id 1dHvFS-0004Wz-EP
+	for qemu-devel@nongnu.org; Mon, 05 Jun 2017 12:52:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dHvFO-0003oQ-T0
-	for qemu-devel@nongnu.org; Mon, 05 Jun 2017 12:52:56 -0400
-Received: from mail-qt0-x244.google.com ([2607:f8b0:400d:c0d::244]:36145)
+	(envelope-from <rth7680@gmail.com>) id 1dHvFR-0003pk-95
+	for qemu-devel@nongnu.org; Mon, 05 Jun 2017 12:52:58 -0400
+Received: from mail-qt0-x244.google.com ([2607:f8b0:400d:c0d::244]:36153)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1dHvFO-0003oL-N8
-	for qemu-devel@nongnu.org; Mon, 05 Jun 2017 12:52:54 -0400
-Received: by mail-qt0-x244.google.com with SMTP id s33so9907132qtg.3
-	for <qemu-devel@nongnu.org>; Mon, 05 Jun 2017 09:52:54 -0700 (PDT)
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1dHvFR-0003pW-3a
+	for qemu-devel@nongnu.org; Mon, 05 Jun 2017 12:52:57 -0400
+Received: by mail-qt0-x244.google.com with SMTP id s33so9907366qtg.3
+	for <qemu-devel@nongnu.org>; Mon, 05 Jun 2017 09:52:56 -0700 (PDT)
 Sender: Richard Henderson <rth7680@gmail.com>
 From: Richard Henderson <rth@twiddle.net>
-Date: Mon,  5 Jun 2017 09:52:19 -0700
-Message-Id: <20170605165233.4135-13-rth@twiddle.net>
+Date: Mon,  5 Jun 2017 09:52:21 -0700
+Message-Id: <20170605165233.4135-15-rth@twiddle.net>
 In-Reply-To: <20170605165233.4135-1-rth@twiddle.net>
 References: <20170605165233.4135-1-rth@twiddle.net>
-Subject: [Qemu-devel] [PULL 12/26] tcg/ppc: Implement goto_ptr
+Subject: [Qemu-devel] [PULL 14/26] tcg/sparc: Implement goto_ptr
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,48 +31,52 @@ Cc: peter.maydell@linaro.org
 
 Signed-off-by: Richard Henderson <rth@twiddle.net>
 ---
- tcg/ppc/tcg-target.h     | 2 +-
- tcg/ppc/tcg-target.inc.c | 7 +++++++
- 2 files changed, 8 insertions(+), 1 deletion(-)
+ tcg/sparc/tcg-target.h     |  2 +-
+ tcg/sparc/tcg-target.inc.c | 11 ++++++++++-
+ 2 files changed, 11 insertions(+), 2 deletions(-)
 
-diff --git a/tcg/ppc/tcg-target.h b/tcg/ppc/tcg-target.h
-index a9aa974..5f4a40a 100644
---- a/tcg/ppc/tcg-target.h
-+++ b/tcg/ppc/tcg-target.h
-@@ -82,7 +82,7 @@ extern bool have_isa_3_00;
- #define TCG_TARGET_HAS_muls2_i32        0
- #define TCG_TARGET_HAS_muluh_i32        1
- #define TCG_TARGET_HAS_mulsh_i32        1
+diff --git a/tcg/sparc/tcg-target.h b/tcg/sparc/tcg-target.h
+index 9348ddd..854a0af 100644
+--- a/tcg/sparc/tcg-target.h
++++ b/tcg/sparc/tcg-target.h
+@@ -123,7 +123,7 @@ extern bool use_vis3_instructions;
+ #define TCG_TARGET_HAS_muls2_i32        1
+ #define TCG_TARGET_HAS_muluh_i32        0
+ #define TCG_TARGET_HAS_mulsh_i32        0
 -#define TCG_TARGET_HAS_goto_ptr         0
 +#define TCG_TARGET_HAS_goto_ptr         1
  
- #if TCG_TARGET_REG_BITS == 64
- #define TCG_TARGET_HAS_add2_i32         0
-diff --git a/tcg/ppc/tcg-target.inc.c b/tcg/ppc/tcg-target.inc.c
-index 64f67d2..8d50f18 100644
---- a/tcg/ppc/tcg-target.inc.c
-+++ b/tcg/ppc/tcg-target.inc.c
-@@ -1932,6 +1932,7 @@ static void tcg_target_qemu_prologue(TCGContext *s)
+ #define TCG_TARGET_HAS_extrl_i64_i32    1
+ #define TCG_TARGET_HAS_extrh_i64_i32    1
+diff --git a/tcg/sparc/tcg-target.inc.c b/tcg/sparc/tcg-target.inc.c
+index 3785d77..18afce2 100644
+--- a/tcg/sparc/tcg-target.inc.c
++++ b/tcg/sparc/tcg-target.inc.c
+@@ -1003,7 +1003,11 @@ static void tcg_target_qemu_prologue(TCGContext *s)
+     /* delay slot */
+     tcg_out_nop(s);
  
-     /* Epilogue */
-     tcg_debug_assert(tb_ret_addr == s->code_ptr);
-+    s->code_gen_epilogue = tb_ret_addr;
+-    /* No epilogue required.  We issue ret + restore directly in the TB.  */
++    /* Epilogue for goto_ptr.  */
++    s->code_gen_epilogue = s->code_ptr;
++    tcg_out_arithi(s, TCG_REG_G0, TCG_REG_I7, 8, RETURN);
++    /* delay slot */
++    tcg_out_movi_imm13(s, TCG_REG_O0, 0);
  
-     tcg_out_ld(s, TCG_TYPE_PTR, TCG_REG_R0, TCG_REG_R1, FRAME_SIZE+LR_OFFSET);
-     for (i = 0; i < ARRAY_SIZE(tcg_target_callee_save_regs); ++i) {
-@@ -1986,6 +1987,11 @@ static void tcg_out_op(TCGContext *s, TCGOpcode opc, const TCGArg *args,
- #endif
-         s->tb_jmp_reset_offset[args[0]] = tcg_current_code_size(s);
+ #ifdef CONFIG_SOFTMMU
+     build_trampolines(s);
+@@ -1288,6 +1292,10 @@ static void tcg_out_op(TCGContext *s, TCGOpcode opc,
+         tcg_out_nop(s);
+         s->tb_jmp_reset_offset[a0] = tcg_current_code_size(s);
          break;
 +    case INDEX_op_goto_ptr:
-+        tcg_out32(s, MTSPR | RS(args[0]) | CTR);
-+        tcg_out_movi(s, TCG_TYPE_PTR, TCG_REG_R3, 0);
-+        tcg_out32(s, BCCTR | BO_ALWAYS);
++        tcg_out_arithi(s, TCG_REG_G0, a0, 0, JMPL);
++        tcg_out_nop(s);
 +        break;
      case INDEX_op_br:
-         {
-             TCGLabel *l = arg_label(args[0]);
-@@ -2555,6 +2561,7 @@ static const TCGTargetOpDef ppc_op_defs[] = {
+         tcg_out_bpcc(s, COND_A, BPCC_PT, arg_label(a0));
+         tcg_out_nop(s);
+@@ -1513,6 +1521,7 @@ static const TCGTargetOpDef sparc_op_defs[] = {
      { INDEX_op_exit_tb, { } },
      { INDEX_op_goto_tb, { } },
      { INDEX_op_br, { } },
