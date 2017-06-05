@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34779)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35492)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <douly.fnst@cn.fujitsu.com>) id 1dHof7-0004JG-Un
-	for qemu-devel@nongnu.org; Mon, 05 Jun 2017 05:51:03 -0400
+	(envelope-from <imammedo@redhat.com>) id 1dHoin-0005Tb-5j
+	for qemu-devel@nongnu.org; Mon, 05 Jun 2017 05:54:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <douly.fnst@cn.fujitsu.com>) id 1dHof3-0007wf-Sr
-	for qemu-devel@nongnu.org; Mon, 05 Jun 2017 05:51:01 -0400
-Received: from [59.151.112.132] (port=22822 helo=heian.cn.fujitsu.com)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <douly.fnst@cn.fujitsu.com>) id 1dHof3-0007us-Em
-	for qemu-devel@nongnu.org; Mon, 05 Jun 2017 05:50:57 -0400
-References: <1ee3ccf0-2d91-86ec-628c-d50ae3ffbe22@cn.fujitsu.com>
-	<20170605104508.1419d7af@nial.brq.redhat.com>
-From: Dou Liyang <douly.fnst@cn.fujitsu.com>
-Message-ID: <f035d329-aa35-953c-9eb3-29b2a03555db@cn.fujitsu.com>
-Date: Mon, 5 Jun 2017 17:50:45 +0800
+	(envelope-from <imammedo@redhat.com>) id 1dHoij-00020s-5R
+	for qemu-devel@nongnu.org; Mon, 05 Jun 2017 05:54:49 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37570)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1dHoii-0001zg-Si
+	for qemu-devel@nongnu.org; Mon, 05 Jun 2017 05:54:45 -0400
+Date: Mon, 5 Jun 2017 11:54:29 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20170605115429.29c252f6@nial.brq.redhat.com>
+In-Reply-To: <2ff62b03-d71b-93c4-79bf-10682b229758@redhat.com>
+References: <c76b36de-ebf9-c662-d454-0a95b43901e8@redhat.com>
+	<2ff62b03-d71b-93c4-79bf-10682b229758@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20170605104508.1419d7af@nial.brq.redhat.com>
-Content-Type: text/plain; charset="windows-1252"; format=flowed
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] Memory Hotplug : Does QEmu support cold-plugged
- memory?
+Subject: Re: [Qemu-devel] allocation zone extensions for the firmware
+ linker/loader
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,83 +28,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>, Thomas Huth <thuth@redhat.com>, Andrew Jones <drjones@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Michal Hocko <mhocko@kernel.org>
+To: Laszlo Ersek <lersek@redhat.com>
+Cc: SeaBIOS devel list <SeaBIOS@seabios.org>, qemu devel list <qemu-devel@nongnu.org>, edk2-devel-ml01 <edk2-devel@ml01.01.org>, Stefan Berger <stefanb@linux.vnet.ibm.com>, Ben Warren <ben@skyportsystems.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Xiao Guangrong <guangrong.xiao@linux.intel.com>, "Jordan Justen (Intel address)" <jordan.l.justen@intel.com>, "Michael S. Tsirkin" <mst@redhat.com>, "Dr.
+	David Alan Gilbert" <dgilbert@redhat.com>, "Leif Lindholm (Linaro
+	address)" <leif.lindholm@linaro.org>, Dongjiu Geng <gengdongjiu@huawei.com>, Kevin O'Connor <kevin@koconnor.net>, Gerd Hoffmann <kraxel@redhat.com>, Shannon Zhao <zhaoshenglong@huawei.com>
 
-Hi Igor,
+On Sat, 3 Jun 2017 09:36:23 +0200
+Laszlo Ersek <lersek@redhat.com> wrote:
 
-At 06/05/2017 04:45 PM, Igor Mammedov wrote:
-> On Mon, 5 Jun 2017 15:53:02 +0800
-> Dou Liyang <douly.fnst@cn.fujitsu.com> wrote:
->
->> Hi all,
->>
->> I want to boot up a system with some removable memory.
->>
->> So, i used '-object' and '-device' to cold-plug memory
->> in QEmu as following :
->>
->> ./x86_64-softmmu/qemu-system-x86_64 \
->> 	...
->> 	-object memory-backend-ram,id=mem3,size=128M \
->> 	-device pc-dimm,id=dimm3,memdev=mem3 \
->> 	...
->>
->> then i want to hot-remove this memory by 'device-del' and
->> 'object-del'.
->>
->> But, unfortunately, I can't remove the memory device.
->>
->> And, in guest OS, I found the memory's removable feature is 0,
->> But, in QEmu monitor with 'info memory-devices', I found the
->> hotplugged is false and hotpluggable is true.
-> It's issue in the guest side kernel.
-> In short it's not guarantied that guest kernel would be able
-> to hotremove DIMM module (even if hardware is capable of) since
-> kernel might use its memory as not MOVABLE, so DIMM might be
-> temporally or permanently pinned by kernel allocations.
->
+> On 06/02/17 17:45, Laszlo Ersek wrote:
+> 
+> > The patches can cause linker/loader breakage when old firmware is booted
+> > on new QEMU. However, that's no problem (it's nothing new), the next
+> > release of QEMU should bundle the new firmware binaries as always.  
+> 
+> Dave made a good point (which I should have realized myself, really!),
+> namely if you launch old fw on old qemu, then migrate the guest to a new
+> qemu and then reboot the guest on the target host, within the migrated
+> VM, things will break.
+[...]
 
-I see.
+> Regarding the NOACPI hint, I guess I'm dropping that. I only meant
+> NOACPI for addressing Igor's long-standing dislike for the "ACPI SDT
+> header probe suppression" in VMGENID (and future similar devices). But,
+> there's no actual *technical* need to eliminate that 
+I'd consider eliminating wasting space technical need,
+but there are not a lot of tables that need it so far and
+implementing NOACPI hint would lead to all out compat
+logic impl. along with it (either negotiation or machine versioning).
+The later seem to me too much so I wouldn't bother with it yet.
 
-> There is ongoing refactoring/cleanup work upstream, that
-> tries to make memhotplug behavior consistent/reasonable.
->
-> If you are interested, I'd suggest to review/test changes that
-> Michal works on upstream, to make sure that refactoring won't
-> break your usecase.
+> (unlike the technical need for 64-bit blob allocations which should really be
+> solved)
+here I disagree, having 32bit pointer is sufficient enough hint.
+Yep, firmware have to scan linker script to determine limits
+before doing allocations but it's totally upto firmware to decide
+where to allocate tables.
+It also helps to avoid in qemu 2 points where we'd have to specify
+that table is "64 bit-able" in add_pointer and allocate.
 
-OK, I will.
+BTW:
+how OVMF would deal with booting 32-bit OS if it would allocate
+ACPI tables above 4Gb?
+For BIOS on baremetal I'd expect some switch in settings, something
+like "Disable 32-bit OS support".
 
->
-> You can find the latest series Michal posted at:
-> http://www.mail-archive.com/linux-kernel@vger.kernel.org/msg1410289.html
->
-
-um, I found the patchset, and I am reading the discussions and test
-cases you gave in v2.
-
->
->>
->> Could you help me:
->>
->> 1, Can the ram based memory-backend be plugged like above?
-> yes, it can be used as above
->
->> 2, Does the 'info memory-devices' command show a wrong info?
-> nope,
-> command shows hotpluggable status the way hw (qemu) sees it
->
->> 3, Can file memory backend(memory-backend-file) be cold-plugged?
-> yes, it can.
->
-> [...]
->
-
-Thanks a lot ;)
-
-Thanks,
-	dou.
-
->
->
+> Self-nack for this set of sets.
+> 
+> Thanks for the feedback,
+> Laszlo
+> 
