@@ -1,23 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56507)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56663)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dHvFH-0004CC-1u
-	for qemu-devel@nongnu.org; Mon, 05 Jun 2017 12:52:48 -0400
+	(envelope-from <rth7680@gmail.com>) id 1dHvFK-0004Kk-L1
+	for qemu-devel@nongnu.org; Mon, 05 Jun 2017 12:52:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dHvFF-0003f6-MA
-	for qemu-devel@nongnu.org; Mon, 05 Jun 2017 12:52:46 -0400
-Received: from mail-qt0-x242.google.com ([2607:f8b0:400d:c0d::242]:34320)
+	(envelope-from <rth7680@gmail.com>) id 1dHvFJ-0003kS-FQ
+	for qemu-devel@nongnu.org; Mon, 05 Jun 2017 12:52:50 -0400
+Received: from mail-qt0-x241.google.com ([2607:f8b0:400d:c0d::241]:33463)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1dHvFF-0003e7-HZ
-	for qemu-devel@nongnu.org; Mon, 05 Jun 2017 12:52:45 -0400
-Received: by mail-qt0-x242.google.com with SMTP id o21so13465089qtb.1
-	for <qemu-devel@nongnu.org>; Mon, 05 Jun 2017 09:52:45 -0700 (PDT)
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1dHvFJ-0003js-9r
+	for qemu-devel@nongnu.org; Mon, 05 Jun 2017 12:52:49 -0400
+Received: by mail-qt0-x241.google.com with SMTP id w1so17234949qtg.0
+	for <qemu-devel@nongnu.org>; Mon, 05 Jun 2017 09:52:49 -0700 (PDT)
 Sender: Richard Henderson <rth7680@gmail.com>
 From: Richard Henderson <rth@twiddle.net>
-Date: Mon,  5 Jun 2017 09:52:12 -0700
-Message-Id: <20170605165233.4135-6-rth@twiddle.net>
+Date: Mon,  5 Jun 2017 09:52:15 -0700
+Message-Id: <20170605165233.4135-9-rth@twiddle.net>
 In-Reply-To: <20170605165233.4135-1-rth@twiddle.net>
 References: <20170605165233.4135-1-rth@twiddle.net>
-Subject: [Qemu-devel] [PULL 05/26] tcg/i386: implement goto_ptr
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PULL 08/26] target/i386: introduce gen_jr helper to
+ generate lookup_and_goto_ptr
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,92 +35,78 @@ Cc: peter.maydell@linaro.org, "Emilio G. Cota" <cota@braap.org>
 
 From: "Emilio G. Cota" <cota@braap.org>
 
-Suggested-by: Richard Henderson <rth@twiddle.net>
-Reviewed-by: Richard Henderson <rth@twiddle.net>
+This helper will be used by subsequent changes.
+
+Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
 Signed-off-by: Emilio G. Cota <cota@braap.org>
-Message-Id: <1493263764-18657-6-git-send-email-cota@braap.org>
-[rth: Reuse goto_ptr epilogue for exit_tb 0.]
+Message-Id: <1493263764-18657-9-git-send-email-cota@braap.org>
 Signed-off-by: Richard Henderson <rth@twiddle.net>
 ---
- tcg/i386/tcg-target.h     |  2 +-
- tcg/i386/tcg-target.inc.c | 24 ++++++++++++++++++++++--
- 2 files changed, 23 insertions(+), 3 deletions(-)
+ target/i386/translate.c | 25 ++++++++++++++++++++++++-
+ 1 file changed, 24 insertions(+), 1 deletion(-)
 
-diff --git a/tcg/i386/tcg-target.h b/tcg/i386/tcg-target.h
-index 59d9835..73a15f7 100644
---- a/tcg/i386/tcg-target.h
-+++ b/tcg/i386/tcg-target.h
-@@ -107,7 +107,7 @@ extern bool have_popcnt;
- #define TCG_TARGET_HAS_muls2_i32        1
- #define TCG_TARGET_HAS_muluh_i32        0
- #define TCG_TARGET_HAS_mulsh_i32        0
--#define TCG_TARGET_HAS_goto_ptr         0
-+#define TCG_TARGET_HAS_goto_ptr         1
+diff --git a/target/i386/translate.c b/target/i386/translate.c
+index 1d1372f..f0e48dc 100644
+--- a/target/i386/translate.c
++++ b/target/i386/translate.c
+@@ -141,6 +141,7 @@ typedef struct DisasContext {
+ } DisasContext;
  
- #if TCG_TARGET_REG_BITS == 64
- #define TCG_TARGET_HAS_extrl_i64_i32    0
-diff --git a/tcg/i386/tcg-target.inc.c b/tcg/i386/tcg-target.inc.c
-index 5918008..01e3b4e 100644
---- a/tcg/i386/tcg-target.inc.c
-+++ b/tcg/i386/tcg-target.inc.c
-@@ -1882,8 +1882,13 @@ static inline void tcg_out_op(TCGContext *s, TCGOpcode opc,
- 
-     switch (opc) {
-     case INDEX_op_exit_tb:
--        tcg_out_movi(s, TCG_TYPE_PTR, TCG_REG_EAX, a0);
--        tcg_out_jmp(s, tb_ret_addr);
-+        /* Reuse the zeroing that exists for goto_ptr.  */
-+        if (a0 == 0) {
-+            tcg_out_jmp(s, s->code_gen_epilogue);
-+        } else {
-+            tcg_out_movi(s, TCG_TYPE_PTR, TCG_REG_EAX, a0);
-+            tcg_out_jmp(s, tb_ret_addr);
-+        }
-         break;
-     case INDEX_op_goto_tb:
-         if (s->tb_jmp_insn_offset) {
-@@ -1906,6 +1911,10 @@ static inline void tcg_out_op(TCGContext *s, TCGOpcode opc,
-         }
-         s->tb_jmp_reset_offset[a0] = tcg_current_code_size(s);
-         break;
-+    case INDEX_op_goto_ptr:
-+        /* jmp to the given host address (could be epilogue) */
-+        tcg_out_modrm(s, OPC_GRP5, EXT5_JMPN_Ev, a0);
-+        break;
-     case INDEX_op_br:
-         tcg_out_jxx(s, JCC_JMP, arg_label(a0), 0);
-         break;
-@@ -2277,6 +2286,7 @@ static inline void tcg_out_op(TCGContext *s, TCGOpcode opc,
- 
- static const TCGTargetOpDef *tcg_target_op_def(TCGOpcode op)
+ static void gen_eob(DisasContext *s);
++static void gen_jr(DisasContext *s, TCGv dest);
+ static void gen_jmp(DisasContext *s, target_ulong eip);
+ static void gen_jmp_tb(DisasContext *s, target_ulong eip, int tb_num);
+ static void gen_op(DisasContext *s1, int op, TCGMemOp ot, int d);
+@@ -2509,7 +2510,8 @@ static void gen_bnd_jmp(DisasContext *s)
+    If INHIBIT, set HF_INHIBIT_IRQ_MASK if it isn't already set.
+    If RECHECK_TF, emit a rechecking helper for #DB, ignoring the state of
+    S->TF.  This is used by the syscall/sysret insns.  */
+-static void gen_eob_worker(DisasContext *s, bool inhibit, bool recheck_tf)
++static void
++do_gen_eob_worker(DisasContext *s, bool inhibit, bool recheck_tf, TCGv jr)
  {
-+    static const TCGTargetOpDef r = { .args_ct_str = { "r" } };
-     static const TCGTargetOpDef ri_r = { .args_ct_str = { "ri", "r" } };
-     static const TCGTargetOpDef re_r = { .args_ct_str = { "re", "r" } };
-     static const TCGTargetOpDef qi_r = { .args_ct_str = { "qi", "r" } };
-@@ -2299,6 +2309,9 @@ static const TCGTargetOpDef *tcg_target_op_def(TCGOpcode op)
-         = { .args_ct_str = { "L", "L", "L", "L" } };
+     gen_update_cc_op(s);
  
-     switch (op) {
-+    case INDEX_op_goto_ptr:
-+        return &r;
+@@ -2530,12 +2532,27 @@ static void gen_eob_worker(DisasContext *s, bool inhibit, bool recheck_tf)
+         tcg_gen_exit_tb(0);
+     } else if (s->tf) {
+         gen_helper_single_step(cpu_env);
++    } else if (!TCGV_IS_UNUSED(jr)) {
++        TCGv vaddr = tcg_temp_new();
 +
-     case INDEX_op_ld8u_i32:
-     case INDEX_op_ld8u_i64:
-     case INDEX_op_ld8s_i32:
-@@ -2567,6 +2580,13 @@ static void tcg_target_qemu_prologue(TCGContext *s)
-     tcg_out_modrm(s, OPC_GRP5, EXT5_JMPN_Ev, tcg_target_call_iarg_regs[1]);
- #endif
++        tcg_gen_add_tl(vaddr, jr, cpu_seg_base[R_CS]);
++        tcg_gen_lookup_and_goto_ptr(vaddr);
++        tcg_temp_free(vaddr);
+     } else {
+         tcg_gen_exit_tb(0);
+     }
+     s->is_jmp = DISAS_TB_JUMP;
+ }
  
-+    /*
-+     * Return path for goto_ptr. Set return value to 0, a-la exit_tb,
-+     * and fall through to the rest of the epilogue.
-+     */
-+    s->code_gen_epilogue = s->code_ptr;
-+    tcg_out_movi(s, TCG_TYPE_REG, TCG_REG_EAX, 0);
++static inline void
++gen_eob_worker(DisasContext *s, bool inhibit, bool recheck_tf)
++{
++    TCGv unused;
 +
-     /* TB epilogue */
-     tb_ret_addr = s->code_ptr;
++    TCGV_UNUSED(unused);
++    do_gen_eob_worker(s, inhibit, recheck_tf, unused);
++}
++
+ /* End of block.
+    If INHIBIT, set HF_INHIBIT_IRQ_MASK if it isn't already set.  */
+ static void gen_eob_inhibit_irq(DisasContext *s, bool inhibit)
+@@ -2549,6 +2566,12 @@ static void gen_eob(DisasContext *s)
+     gen_eob_worker(s, false, false);
+ }
  
++/* Jump to register */
++static void gen_jr(DisasContext *s, TCGv dest)
++{
++    do_gen_eob_worker(s, false, false, dest);
++}
++
+ /* generate a jump to eip. No segment change must happen before as a
+    direct call to the next block may occur */
+ static void gen_jmp_tb(DisasContext *s, target_ulong eip, int tb_num)
 -- 
 2.9.4
