@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58148)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58618)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <amarnath.valluri@intel.com>) id 1dHmLP-00053D-9N
-	for qemu-devel@nongnu.org; Mon, 05 Jun 2017 03:22:32 -0400
+	(envelope-from <drjones@redhat.com>) id 1dHmNd-0005q5-Ty
+	for qemu-devel@nongnu.org; Mon, 05 Jun 2017 03:24:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <amarnath.valluri@intel.com>) id 1dHmLM-0008QY-1Y
-	for qemu-devel@nongnu.org; Mon, 05 Jun 2017 03:22:31 -0400
-Received: from mga11.intel.com ([192.55.52.93]:7808)
+	(envelope-from <drjones@redhat.com>) id 1dHmNa-00029F-MX
+	for qemu-devel@nongnu.org; Mon, 05 Jun 2017 03:24:49 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:45098)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <amarnath.valluri@intel.com>)
-	id 1dHmLL-0008Lp-Lt
-	for qemu-devel@nongnu.org; Mon, 05 Jun 2017 03:22:27 -0400
-From: "Valluri, Amarnath" <amarnath.valluri@intel.com>
-Date: Mon, 5 Jun 2017 07:22:19 +0000
-Message-ID: <1496647406.25318.13.camel@intel.com>
-References: <1494921494-33717-1-git-send-email-amarnath.valluri@intel.com>
-	<1494921494-33717-2-git-send-email-amarnath.valluri@intel.com>
-	<CAJ+F1CL8gFP7QaNRWMJd+HQExtsKCXzGexB-uQH7UzDz6Ru3yg@mail.gmail.com>
-In-Reply-To: <CAJ+F1CL8gFP7QaNRWMJd+HQExtsKCXzGexB-uQH7UzDz6Ru3yg@mail.gmail.com>
-Content-Language: en-US
+	(Exim 4.71) (envelope-from <drjones@redhat.com>) id 1dHmNa-00025S-Fl
+	for qemu-devel@nongnu.org; Mon, 05 Jun 2017 03:24:46 -0400
+Date: Mon, 5 Jun 2017 09:24:38 +0200
+From: Andrew Jones <drjones@redhat.com>
+Message-ID: <20170605072438.qvxosyib2vpwl3a7@kamzik.brq.redhat.com>
+References: <20170601130325.6433-1-marcandre.lureau@redhat.com>
+	<20170601130325.6433-2-marcandre.lureau@redhat.com>
+	<465a7b69-a3c0-1492-8e30-c562a76cd65a@redhat.com>
+	<0a434f41-1131-713d-1fc9-a9edba425f7a@redhat.com>
+	<CAJ+F1CKL6OXetG6Liwf3NrpNv3K8PR6_SQ5=rfjyRwa3pJ7nuA@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Subject: Re: [Qemu-devel] [PATCH v4 1/8] tpm-backend: Remove unneeded member
- variable from backend class
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <CAJ+F1CKL6OXetG6Liwf3NrpNv3K8PR6_SQ5=rfjyRwa3pJ7nuA@mail.gmail.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 1/4] dump: add DumpInfo structure
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,50 +31,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "marcandre.lureau@gmail.com" <marcandre.lureau@gmail.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+To: =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@gmail.com>
+Cc: Eric Blake <eblake@redhat.com>, Laszlo Ersek <lersek@redhat.com>, qemu-devel@nongnu.org, Wen Congyang <wency@cn.fujitsu.com>, anderson@redhat.com, peterx@redhat.com
 
-T24gV2VkLCAyMDE3LTA1LTI0IGF0IDE0OjM0ICswMDAwLCBNYXJjLUFuZHLDqSBMdXJlYXUgd3Jv
-dGU6DQpIaQ0KDQpPbiBUdWUsIE1heSAxNiwgMjAxNyBhdCAxMjowMCBQTSBBbWFybmF0aCBWYWxs
-dXJpIDxhbWFybmF0aC52YWxsdXJpQGludGVsLmNvbTxtYWlsdG86YW1hcm5hdGgudmFsbHVyaUBp
-bnRlbC5jb20+PiB3cm90ZToNClRQTURyaXZlck9wcyBpbnNpZGUgVFBNQmFja2VuZCBpcyBub3Qg
-cmVxdWlyZWQsIGFzIGl0IGlzIHN1cHBvc2VkIHRvIGJlIGEgY2xhc3MNCm1lbWJlci4gVGhlIG9u
-bHkgcG9zc2libGUgcmVhc29uIGZvciBrZWVwaW5nIGluIFRQTUJhY2tlbmQgd2FzLCB0byBnZXQg
-dGhlDQpiYWNrZW5kIHR5cGUgaW4gdHBtLmMgd2hlcmUgZGVkaWNhdGVkIGJhY2tlbmQgYXBpLCB0
-cG1fYmFja2VuZF9nZXRfdHlwZSgpIGlzDQpwcmVzZW50Lg0KDQpTaWduZWQtb2ZmLWJ5OiBBbWFy
-bmF0aCBWYWxsdXJpIDxhbWFybmF0aC52YWxsdXJpQGludGVsLmNvbTxtYWlsdG86YW1hcm5hdGgu
-dmFsbHVyaUBpbnRlbC5jb20+Pg0KDQpQbGVhc2UgYWRkICYga2VlcCBteSByLWIgdGFncyBmcm9t
-IHByZXZpb3VzIGl0ZXJhdGlvbnMgaW4gY29tbWl0IG1lc3NhZ2UgaWYgdGhleSBhcmUgbm8gb3Ig
-b25seSBtaW5vciBjaGFuZ2VzLg0KTWFyYywgZG8geW91IG1lYW4gdG8gcmVzZW5kIHRoZSBwYXRj
-aCBzZXQgYnkga2VlcGluZyAnUmV2aWV3ZWQtYnk6JyB0YWcgZm9yIGNvbW1pdHMuDQoNCi0gQW1h
-cm5hdGgNCg0KDQoNCi0tLQ0KIGh3L3RwbS90cG1fcGFzc3Rocm91Z2guYyAgICAgfCA0IC0tLS0N
-CiBpbmNsdWRlL3N5c2VtdS90cG1fYmFja2VuZC5oIHwgMSAtDQogdHBtLmMgICAgICAgICAgICAg
-ICAgICAgICAgICB8IDIgKy0NCiAzIGZpbGVzIGNoYW5nZWQsIDEgaW5zZXJ0aW9uKCspLCA2IGRl
-bGV0aW9ucygtKQ0KDQpkaWZmIC0tZ2l0IGEvaHcvdHBtL3RwbV9wYXNzdGhyb3VnaC5jIGIvaHcv
-dHBtL3RwbV9wYXNzdGhyb3VnaC5jDQppbmRleCA5MjM0ZWIzLi5hMGJhZjVmIDEwMDY0NA0KLS0t
-IGEvaHcvdHBtL3RwbV9wYXNzdGhyb3VnaC5jDQorKysgYi9ody90cG0vdHBtX3Bhc3N0aHJvdWdo
-LmMNCkBAIC00Niw4ICs0Niw2IEBADQogI2RlZmluZSBUUE1fUEFTU1RIUk9VR0gob2JqKSBcDQog
-ICAgIE9CSkVDVF9DSEVDSyhUUE1QYXNzdGhydVN0YXRlLCAob2JqKSwgVFlQRV9UUE1fUEFTU1RI
-Uk9VR0gpDQoNCi1zdGF0aWMgY29uc3QgVFBNRHJpdmVyT3BzIHRwbV9wYXNzdGhyb3VnaF9kcml2
-ZXI7DQotDQogLyogZGF0YSBzdHJ1Y3R1cmVzICovDQogdHlwZWRlZiBzdHJ1Y3QgVFBNUGFzc3Ro
-cnVUaHJlYWRQYXJhbXMgew0KICAgICBUUE1TdGF0ZSAqdHBtX3N0YXRlOw0KQEAgLTQ2Miw4ICs0
-NjAsNiBAQCBzdGF0aWMgVFBNQmFja2VuZCAqdHBtX3Bhc3N0aHJvdWdoX2NyZWF0ZShRZW11T3B0
-cyAqb3B0cywgY29uc3QgY2hhciAqaWQpDQogICAgIC8qIGxldCBmcm9udGVuZCBzZXQgdGhlIGZl
-X21vZGVsIHRvIHByb3BlciB2YWx1ZSAqLw0KICAgICB0Yi0+ZmVfbW9kZWwgPSAtMTsNCg0KLSAg
-ICB0Yi0+b3BzID0gJnRwbV9wYXNzdGhyb3VnaF9kcml2ZXI7DQotDQogICAgIGlmICh0cG1fcGFz
-c3Rocm91Z2hfaGFuZGxlX2RldmljZV9vcHRzKG9wdHMsIHRiKSkgew0KICAgICAgICAgZ290byBl
-cnJfZXhpdDsNCiAgICAgfQ0KZGlmZiAtLWdpdCBhL2luY2x1ZGUvc3lzZW11L3RwbV9iYWNrZW5k
-LmggYi9pbmNsdWRlL3N5c2VtdS90cG1fYmFja2VuZC5oDQppbmRleCBiNThmNTJkLi5lN2Y1OTBk
-IDEwMDY0NA0KLS0tIGEvaW5jbHVkZS9zeXNlbXUvdHBtX2JhY2tlbmQuaA0KKysrIGIvaW5jbHVk
-ZS9zeXNlbXUvdHBtX2JhY2tlbmQuaA0KQEAgLTUwLDcgKzUwLDYgQEAgc3RydWN0IFRQTUJhY2tl
-bmQgew0KICAgICBlbnVtIFRwbU1vZGVsIGZlX21vZGVsOw0KICAgICBjaGFyICpwYXRoOw0KICAg
-ICBjaGFyICpjYW5jZWxfcGF0aDsNCi0gICAgY29uc3QgVFBNRHJpdmVyT3BzICpvcHM7DQoNCiAg
-ICAgUUxJU1RfRU5UUlkoVFBNQmFja2VuZCkgbGlzdDsNCiB9Ow0KZGlmZiAtLWdpdCBhL3RwbS5j
-IGIvdHBtLmMNCmluZGV4IDlhN2M3MTEuLjBlZTAyMWEgMTAwNjQ0DQotLS0gYS90cG0uYw0KKysr
-IGIvdHBtLmMNCkBAIC0yNTgsNyArMjU4LDcgQEAgc3RhdGljIFRQTUluZm8gKnFtcF9xdWVyeV90
-cG1faW5zdChUUE1CYWNrZW5kICpkcnYpDQogICAgIHJlcy0+bW9kZWwgPSBkcnYtPmZlX21vZGVs
-Ow0KICAgICByZXMtPm9wdGlvbnMgPSBnX25ldzAoVHBtVHlwZU9wdGlvbnMsIDEpOw0KDQotICAg
-IHN3aXRjaCAoZHJ2LT5vcHMtPnR5cGUpIHsNCisgICAgc3dpdGNoICh0cG1fYmFja2VuZF9nZXRf
-dHlwZShkcnYpKSB7DQogICAgIGNhc2UgVFBNX1RZUEVfUEFTU1RIUk9VR0g6DQogICAgICAgICBy
-ZXMtPm9wdGlvbnMtPnR5cGUgPSBUUE1fVFlQRV9PUFRJT05TX0tJTkRfUEFTU1RIUk9VR0g7DQog
-ICAgICAgICB0cG8gPSBnX25ldzAoVFBNUGFzc3Rocm91Z2hPcHRpb25zLCAxKTsNCi0tDQoyLjcu
-NA0KDQoNCg0KLS0NCk1hcmMtQW5kcsOpIEx1cmVhdQ0K
+On Fri, Jun 02, 2017 at 09:46:35AM +0000, Marc-Andr=E9 Lureau wrote:
+> Hi
+>=20
+> On Thu, Jun 1, 2017 at 10:19 PM Eric Blake <eblake@redhat.com> wrote:
+>=20
+> > On 06/01/2017 01:06 PM, Laszlo Ersek wrote:
+> > > On 06/01/17 15:03, Marc-Andr=E9 Lureau wrote:
+> > >> One way or another, the guest could communicate various dump info =
+(via
+> > >> guest agent or vmcoreinfo device) and populate that structure. It =
+can
+> > >> then be used to augment the dump with various details, as done in =
+the
+> > >> following patch.
+> > >>
+> > >> Signed-off-by: Marc-Andr=E9 Lureau <marcandre.lureau@redhat.com>
+> > >> ---
+> > >>  include/sysemu/dump-info.h | 18 ++++++++++++++++++
+> > >>  dump.c                     |  3 +++
+> > >>  2 files changed, 21 insertions(+)
+> > >>  create mode 100644 include/sysemu/dump-info.h
+> > >>
+> > >> diff --git a/include/sysemu/dump-info.h b/include/sysemu/dump-info=
+.h
+> > >> new file mode 100644
+> > >> index 0000000000..d2378e15e2
+> > >> --- /dev/null
+> > >> +++ b/include/sysemu/dump-info.h
+> > >> @@ -0,0 +1,18 @@
+> > >> +#ifndef DUMP_INFO_H
+> > >> +#define DUMP_INFO_H
+> >
+> > >>
+> > >
+> > > Can you please spell out, in the commit message, the reason for
+> > > introducing a new header file? (I suspect your reason, but it shoul=
+d be
+> > > documented explicitly.)
+> >
+> > Also, should you have a copyright header in the new file?  And does
+> > MAINTAINERS cover it?
+> >
+>=20
+> None of the dump support is covered. Based on commit history, I can sug=
+gest
+> Wen Congyang, as original author.
+> Sadly, Qiao Nuohan cannot be reached with his mail today (anyone knows =
+if
+> he is still contributing?). Laszlo has done significant changes and rev=
+iews
+> too. I can also propose myself to help with reviews.
+>=20
+> Wen or Laszla, do you want to be the main maintainer?
+
+What about Peter Xu (CC'ed)? He'll have to state whether he has time and
+interest, but I see he's contributed quite a bit to dump.c.
+
+Thanks,
+drew
