@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44883)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49013)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1dHxsW-0007ot-GU
-	for qemu-devel@nongnu.org; Mon, 05 Jun 2017 15:41:29 -0400
+	(envelope-from <eblake@redhat.com>) id 1dHy9Y-0005FM-92
+	for qemu-devel@nongnu.org; Mon, 05 Jun 2017 15:59:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1dHxsV-0004R2-8f
-	for qemu-devel@nongnu.org; Mon, 05 Jun 2017 15:41:28 -0400
-References: <20170511022036.32225-1-eblake@redhat.com>
-	<1037fc82-c0f3-859b-0702-74bdd845720f@redhat.com>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <0bdbebc3-01ed-4d31-3681-215d1188d095@redhat.com>
-Date: Mon, 5 Jun 2017 15:41:18 -0400
+	(envelope-from <eblake@redhat.com>) id 1dHy9W-0005vl-KI
+	for qemu-devel@nongnu.org; Mon, 05 Jun 2017 15:59:04 -0400
+References: <20170605190824.25184-1-eblake@redhat.com>
+	<20170605190824.25184-2-eblake@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <dbe7598c-77bb-eb1c-ba0c-59ebb600ae57@redhat.com>
+Date: Mon, 5 Jun 2017 14:58:47 -0500
 MIME-Version: 1.0
-In-Reply-To: <1037fc82-c0f3-859b-0702-74bdd845720f@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 00/20] make bdrv_is_allocated[_above]
- byte-based
+In-Reply-To: <20170605190824.25184-2-eblake@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="nIRhip3BG4ri9r5Dibpci9psP7fL0S97N"
+Subject: Re: [Qemu-devel] [PATCH v3 1/4] qemu-io: Don't die on second open
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,98 +24,95 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, jsnow@redhat.com, qemu-block@nongnu.org, mreitz@redhat.com
+
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--nIRhip3BG4ri9r5Dibpci9psP7fL0S97N
+From: Eric Blake <eblake@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, jsnow@redhat.com, qemu-block@nongnu.org,
+ mreitz@redhat.com
+Message-ID: <dbe7598c-77bb-eb1c-ba0c-59ebb600ae57@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v3 1/4] qemu-io: Don't die on second open
+References: <20170605190824.25184-1-eblake@redhat.com>
+ <20170605190824.25184-2-eblake@redhat.com>
+In-Reply-To: <20170605190824.25184-2-eblake@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 06/05/2017 02:08 PM, Eric Blake wrote:
+
+>=20
+> Note, however, that we do have some qemu-iotests that do 'qemu-io
+> -c "open file" -c "$something"'; such tests will now proceed to
+> attempt $something whether or not the open succeeded, the same way
+> as if the two commands had been attempted in interactive mode; but it
+> also means that it is now possible to use -c close and have a single
+> qemu-io command line operate on more than one file even without
+> using interactive mode.  Although the '-c open' action is a subtle
+> change in behavior, remember that qemu-io is for debugging purposes,
+> so as long as it serves the needs of qemu-iotests while still being
+> reasonable for interactive use, it should not be a problem.
+
+Bummer - iotest 60 catches me:
+
++++ 060.out.bad	2017-06-05 14:55:48.336814834 -0500
+@@ -21,6 +21,7 @@
+     refcount bits: 16
+     corrupt: true
+ can't open device TEST_DIR/t.IMGFMT: IMGFMT: Image is corrupt; cannot
+be opened read/write
++no file open, try 'help open'
+ read 512/512 bytes at offset 0
+ 512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+
+Looks like 114 and 153 as well.  I'll have to post a v4 (serves me right
+for JUST testing 177).
+
+Also, I'm seeing a segfault on 68 that exists on current master:
+
+068 1s ... - output mismatch (see 068.out.bad)
+--- /home/eblake/qemu/tests/qemu-iotests/068.out	2017-06-01
+17:01:25.113094957 -0500
++++ 068.out.bad	2017-06-05 14:55:54.140835402 -0500
+@@ -6,6 +6,8 @@
+ QEMU X.Y.Z monitor - type 'help' for more information
+ (qemu) savevm 0
+ (qemu) quit
++./common.config: line 107: 13333 Segmentation fault      (core dumped)
+( if [ -n "${QEMU_NEED_PID}" ]; then
++    echo $BASHPID > "${QEMU_TEST_DIR}/qemu-${_QEMU_HANDLE}.pid";
++fi; exec "$QEMU_PROG" $QEMU_OPTIONS "$@" )
+ QEMU X.Y.Z monitor - type 'help' for more information
+-(qemu) quit
+-*** done
++(qemu) *** done
 
 
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
 
-On 06/05/2017 03:39 PM, Eric Blake wrote:
-> ping
-> 
 
-ACK.
+--nIRhip3BG4ri9r5Dibpci9psP7fL0S97N
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-> On 05/10/2017 09:20 PM, Eric Blake wrote:
->> There are patches floating around to add NBD_CMD_BLOCK_STATUS,
->> but NBD wants to report status on byte granularity (even if the
->> reporting will probably be naturally aligned to sectors or even
->> much higher levels).  I've therefore started the task of
->> converting our block status code to report at a byte granularity
->> rather than sectors.
->>
->> This is part one of that conversion: bdrv_is_allocated().
->> Other parts still need a v2, but here's the link to their v1:
->> tracking dirty bitmaps by bytes:
->> https://lists.gnu.org/archive/html/qemu-devel/2017-04/msg02163.html
->> replacing bdrv_get_block_status() with a byte based callback
->> in all the drivers:
->> https://lists.gnu.org/archive/html/qemu-devel/2017-04/msg02642.html
->>
->> Available as a tag at:
->> git fetch git://repo.or.cz/qemu/ericb.git nbd-byte-allocated-v2
->>
->> Since v1:
->> - Add R-b from John as appropriate
->> - Couple of new patches for cleanups he noticed
->> - Rebase to Max's block branch
->>
->> 001/20:[----] [--] 'blockjob: Track job ratelimits via bytes, not sectors'
->> 002/20:[----] [--] 'trace: Show blockjob actions via bytes, not sectors'
->> 003/20:[----] [--] 'stream: Switch stream_populate() to byte-based'
->> 004/20:[----] [--] 'stream: Switch stream_run() to byte-based'
->> 005/20:[----] [--] 'commit: Switch commit_populate() to byte-based'
->> 006/20:[----] [--] 'commit: Switch commit_run() to byte-based'
->> 007/20:[----] [--] 'mirror: Switch MirrorBlockJob to byte-based'
->> 008/20:[----] [--] 'mirror: Switch mirror_do_zero_or_discard() to byte-based'
->> 009/20:[down] 'mirror: Update signature of mirror_clip_sectors()'
->> 010/20:[0013] [FC] 'mirror: Switch mirror_cow_align() to byte-based'
->> 011/20:[----] [-C] 'mirror: Switch mirror_do_read() to byte-based'
->> 012/20:[0014] [FC] 'mirror: Switch mirror_iteration() to byte-based'
->> 013/20:[----] [--] 'block: Drop unused bdrv_round_sectors_to_clusters()'
->> 014/20:[----] [--] 'backup: Switch BackupBlockJob to byte-based'
->> 015/20:[0008] [FC] 'backup: Switch block_backup.h to byte-based'
->> 016/20:[----] [--] 'backup: Switch backup_do_cow() to byte-based'
->> 017/20:[----] [--] 'backup: Switch backup_run() to byte-based'
->> 018/20:[0039] [FC] 'block: Make bdrv_is_allocated() byte-based'
->> 019/20:[down] 'block: Minimize raw use of bds->total_sectors'
->> 020/20:[0026] [FC] 'block: Make bdrv_is_allocated_above() byte-based'
->>
->> Eric Blake (20):
->>   blockjob: Track job ratelimits via bytes, not sectors
->>   trace: Show blockjob actions via bytes, not sectors
->>   stream: Switch stream_populate() to byte-based
->>   stream: Switch stream_run() to byte-based
->>   commit: Switch commit_populate() to byte-based
->>   commit: Switch commit_run() to byte-based
->>   mirror: Switch MirrorBlockJob to byte-based
->>   mirror: Switch mirror_do_zero_or_discard() to byte-based
->>   mirror: Update signature of mirror_clip_sectors()
->>   mirror: Switch mirror_cow_align() to byte-based
->>   mirror: Switch mirror_do_read() to byte-based
->>   mirror: Switch mirror_iteration() to byte-based
->>   block: Drop unused bdrv_round_sectors_to_clusters()
->>   backup: Switch BackupBlockJob to byte-based
->>   backup: Switch block_backup.h to byte-based
->>   backup: Switch backup_do_cow() to byte-based
->>   backup: Switch backup_run() to byte-based
->>   block: Make bdrv_is_allocated() byte-based
->>   block: Minimize raw use of bds->total_sectors
->>   block: Make bdrv_is_allocated_above() byte-based
->>
->>  include/block/block.h        |  10 +-
->>  include/block/block_backup.h |  11 +-
->>  include/qemu/ratelimit.h     |   3 +-
->>  block/backup.c               | 130 ++++++++-----------
->>  block/commit.c               |  54 ++++----
->>  block/io.c                   |  92 +++++++------
->>  block/mirror.c               | 300 ++++++++++++++++++++++---------------------
->>  block/replication.c          |  29 +++--
->>  block/stream.c               |  35 +++--
->>  block/vvfat.c                |  34 +++--
->>  migration/block.c            |   9 +-
->>  qemu-img.c                   |  15 ++-
->>  qemu-io-cmds.c               |  70 +++++-----
->>  block/trace-events           |  14 +-
->>  14 files changed, 396 insertions(+), 410 deletions(-)
->>
-> 
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEcBAEBCAAGBQJZNbf3AAoJEKeha0olJ0NqsuMIAKkDmsu8rpOBFaOHeUk+Of83
+AhwbN8//WtZvP8yzO9Pq1vI7tOulbXcahxvMVB7Se+rmIHbJZG4YQfkXctGCQMtS
+dSuI2g29ueNOJdE/PsN1UUJmmydkSXBytxRcII1E8N8p4SMuwfPlvmmvILbx/Nq0
+vH3Og2AZ8hLZbApWHGA9AJ7o1TMDEhKr1FunCI7h9HaMKDxTGK6TP6dsz4ErF2xW
+fTcbGJPP9s/n6EOIOOTbb+H3gd803McVO2Fwic8IwbrWXk7nGeO6IEN8oSqXfiRs
+sXMH5HjZ5xtNoj74W8zS92ej+2oSp5VLXkPR3W9glANZOEw6Y/25hPtDIg1VP9g=
+=mFga
+-----END PGP SIGNATURE-----
+
+--nIRhip3BG4ri9r5Dibpci9psP7fL0S97N--
