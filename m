@@ -1,38 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51073)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51706)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bjsdjshi@linux.vnet.ibm.com>) id 1dHiOn-0006cI-Ju
-	for qemu-devel@nongnu.org; Sun, 04 Jun 2017 23:09:46 -0400
+	(envelope-from <peterx@redhat.com>) id 1dHiUH-0000GF-Tr
+	for qemu-devel@nongnu.org; Sun, 04 Jun 2017 23:15:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bjsdjshi@linux.vnet.ibm.com>) id 1dHiOi-00035N-Ko
-	for qemu-devel@nongnu.org; Sun, 04 Jun 2017 23:09:45 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:37441)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bjsdjshi@linux.vnet.ibm.com>)
-	id 1dHiOi-00032U-Bp
-	for qemu-devel@nongnu.org; Sun, 04 Jun 2017 23:09:40 -0400
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v5539Kfe114413
-	for <qemu-devel@nongnu.org>; Sun, 4 Jun 2017 23:09:38 -0400
-Received: from e36.co.us.ibm.com (e36.co.us.ibm.com [32.97.110.154])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2avx6nt0v2-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Sun, 04 Jun 2017 23:09:38 -0400
-Received: from localhost
-	by e36.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <bjsdjshi@linux.vnet.ibm.com>;
-	Sun, 4 Jun 2017 21:09:37 -0600
-Date: Mon, 5 Jun 2017 11:09:31 +0800
-From: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
-References: <20170602140531.48332-1-pasic@linux.vnet.ibm.com>
+	(envelope-from <peterx@redhat.com>) id 1dHiUD-0007aY-Uj
+	for qemu-devel@nongnu.org; Sun, 04 Jun 2017 23:15:25 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49060)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1dHiUD-0007a1-Oh
+	for qemu-devel@nongnu.org; Sun, 04 Jun 2017 23:15:21 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 6D63880C04
+	for <qemu-devel@nongnu.org>; Mon,  5 Jun 2017 03:15:20 +0000 (UTC)
+Date: Mon, 5 Jun 2017 11:15:11 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20170605031511.GG4056@pxdev.xzpeter.org>
+References: <1496404254-17429-1-git-send-email-peterx@redhat.com>
+	<1496404254-17429-4-git-send-email-peterx@redhat.com>
+	<20170602184329-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20170602140531.48332-1-pasic@linux.vnet.ibm.com>
-Message-Id: <20170605030931.GA8262@bjsdjshi@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH v2 1/1] s390x: vmstatify config migration
- for virtio-ccw
+In-Reply-To: <20170602184329-mutt-send-email-mst@kernel.org>
+Subject: Re: [Qemu-devel] [PATCH 3/3] vhost: iommu: cache static mapping if
+ there is
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -41,118 +35,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Halil Pasic <pasic@linux.vnet.ibm.com>
-Cc: Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cornelia.huck@de.ibm.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, "Jason J . Herne" <jjherne@linux.vnet.ibm.com>, qemu-devel@nongnu.org
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Maxime Coquelin <maxime.coquelin@redhat.com>, Jason Wang <jasowang@redhat.com>
 
-* Halil Pasic <pasic@linux.vnet.ibm.com> [2017-06-02 16:05:31 +0200]:
-
-Hi Halil,
-
-Sorry for the late show up. I just found some nits, which could be
-ignored for me.
-
-> Let's vmstatify virtio_ccw_save_config and virtio_ccw_load_config for
-> flexibility (extending using subsections) and for fun.
+On Fri, Jun 02, 2017 at 06:45:05PM +0300, Michael S. Tsirkin wrote:
+> On Fri, Jun 02, 2017 at 07:50:54PM +0800, Peter Xu wrote:
+> > This patch pre-heat vhost iotlb cache when passthrough mode enabled.
+> > 
+> > Sometimes, even if user specified iommu_platform for vhost devices,
+> > IOMMU might still be disabled. One case is passthrough mode in VT-d
+> > implementation. We can detect this by observing iommu_list. If it's
+> > empty, it means IOMMU translation is disabled, then we can actually
+> > pre-heat the translation (it'll be static mapping then) by first
+> > invalidating all IOTLB, then cache existing memory ranges into vhost
+> > backend iotlb using 1:1 mapping.
+> > 
+> > Reviewed-by: Jason Wang <jasowang@redhat.com>
+> > Signed-off-by: Peter Xu <peterx@redhat.com>
 > 
-> To achieve this we need to hack the config_vector, which is VirtIODevice
-> (that is common virtio) state, in the middle of the VirtioCcwDevice state
-> representation.  This is somewhat ugly, but we have no choice because the
-                 ^^
-Nit:-------------++
+> This is still a hack I think. What if there's an invalidation?
+> I think the right thing is to send updates only when requested,
+> but sent the largest mapping including the iova, not from iova until end
+> of page. Thoughts?
 
-> stream format needs to be preserved.
-> 
-> Almost no changes in behavior. Exception is everything that comes with
-> vmstate like extra bookkeeping about what's in the stream, and maybe some
-> extra checks and better error reporting.
-> 
-[...]
+Indeed it's kind of a hack, but it does not hurt anything but will
+definitely boost performance in most cases...
 
-> diff --git a/hw/intc/s390_flic.c b/hw/intc/s390_flic.c
-> index 711c11454f..7e7546a576 100644
-> --- a/hw/intc/s390_flic.c
-> +++ b/hw/intc/s390_flic.c
-> @@ -18,6 +18,7 @@
->  #include "trace.h"
->  #include "hw/qdev.h"
->  #include "qapi/error.h"
-> +#include "hw/s390x/s390-virtio-ccw.h"
-> 
->  S390FLICState *s390_get_flic(void)
->  {
-> @@ -137,3 +138,30 @@ static void qemu_s390_flic_register_types(void)
->  }
-> 
->  type_init(qemu_s390_flic_register_types)
-> +
-> +const VMStateDescription vmstate_adapter_info = {
-> +    .name = "s390_adapter_info",
-> +    .version_id = 1,
-> +    .minimum_version_id = 1,
-> +    .fields = (VMStateField[]) {
-> +        VMSTATE_UINT64(ind_offset, AdapterInfo),
-> +        /*
-> +         * We do not have to migrate neither the id nor the addresses.
-> +         * The id is set by css_register_io_adapter and the addresses
-> +         * are set based on the IndAddr objects after those get mapped.
-> +         */
-> +        VMSTATE_END_OF_LIST()
-> +    },
-> +};
-> +
-> +const VMStateDescription vmstate_adapter_routes = {
-> +
-> +    .name = "s390_adapter_routes",
-> +    .version_id = 1,
-> +    .minimum_version_id = 1,
-> +    .fields = (VMStateField[]) {
-> +        VMSTATE_STRUCT(adapter, AdapterRoutes, 1, vmstate_adapter_info, \
-                                                                          ^^
-Nit:----------------------------------------------------------------------++
+Yes "sent the largest mapping including the iova" is okay, but the
+first IO on one region would be delayed as well, so IMHO it's not the
+best solution as well. I think the best solution should be (for sure)
+that vhost knows it's PT, then it just skips the translation
+completely. I just don't sure whether there's simple/good way to do
+this.
 
-> +                       AdapterInfo),
-> +        VMSTATE_END_OF_LIST()
-> +    }
-> +};
-[...]
-
-> diff --git a/hw/s390x/css.c b/hw/s390x/css.c
-> index 1e2f26b65a..348129e1b2 100644
-> --- a/hw/s390x/css.c
-> +++ b/hw/s390x/css.c
-[...]
-
-> +const VMStateDescription vmstate_virtio_ccw_dev = {
-> +    .name = "s390_virtio_ccw_dev",
-> +    .version_id = 1,
-> +    .minimum_version_id = 1,
-> +    .post_load = virtio_ccw_dev_post_load,
-> +    .fields = (VMStateField[]) {
-> +        VMSTATE_CCW_DEVICE(parent_obj, VirtioCcwDevice),
-> +        VMSTATE_PTR_TO_IND_ADDR(indicators, VirtioCcwDevice),
-> +        VMSTATE_PTR_TO_IND_ADDR(indicators2, VirtioCcwDevice),
-> +        VMSTATE_PTR_TO_IND_ADDR(summary_indicator, VirtioCcwDevice),
-> +        /*
-> +         * Ugly hack because VirtIODevice does not migrate itself.
-> +         * This also makes legacy via vmstate_save_state possible.
-> +         */
-> +        VMSTATE_WITH_TMP(VirtioCcwDevice, VirtioCcwDeviceTmp,
-> +                         vmstate_virtio_ccw_dev_tmp),
-> +        VMSTATE_STRUCT(routes, VirtioCcwDevice, 1, vmstate_adapter_routes, \
-                                                                             ^^
-Nit:-------------------------------------------------------------------------++
-
-> +                       AdapterRoutes),
-> +        VMSTATE_UINT8(thinint_isc, VirtioCcwDevice),
-> +        VMSTATE_INT32(revision, VirtioCcwDevice),
-> +        VMSTATE_END_OF_LIST()
-> +    }
-> +};
-> +
->  static void virtio_ccw_bus_new(VirtioBusState *bus, size_t bus_size,
->                                 VirtioCcwDevice *dev);
-> 
-[...]
+Thanks,
 
 -- 
-Dong Jia Shi
+Peter Xu
