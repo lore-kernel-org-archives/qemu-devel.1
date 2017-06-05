@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:32831)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:32833)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dHxEC-0001rI-Jt
-	for qemu-devel@nongnu.org; Mon, 05 Jun 2017 14:59:50 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1dHxEC-0001rg-Ui
+	for qemu-devel@nongnu.org; Mon, 05 Jun 2017 14:59:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dHxEA-0007zW-FB
-	for qemu-devel@nongnu.org; Mon, 05 Jun 2017 14:59:48 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:35526)
+	(envelope-from <ehabkost@redhat.com>) id 1dHxEC-000828-5T
+	for qemu-devel@nongnu.org; Mon, 05 Jun 2017 14:59:49 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:36804)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1dHxEA-0007yE-6a
-	for qemu-devel@nongnu.org; Mon, 05 Jun 2017 14:59:46 -0400
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1dHxEB-00081J-VD
+	for qemu-devel@nongnu.org; Mon, 05 Jun 2017 14:59:48 -0400
 From: Eduardo Habkost <ehabkost@redhat.com>
-Date: Mon,  5 Jun 2017 15:59:21 -0300
-Message-Id: <20170605185927.12111-5-ehabkost@redhat.com>
+Date: Mon,  5 Jun 2017 15:59:22 -0300
+Message-Id: <20170605185927.12111-6-ehabkost@redhat.com>
 In-Reply-To: <20170605185927.12111-1-ehabkost@redhat.com>
 References: <20170605185927.12111-1-ehabkost@redhat.com>
-Subject: [Qemu-devel] [PULL 04/10] numa: make sure that all cpus have
- has_node_id set if numa is enabled
+Subject: [Qemu-devel] [PULL 05/10] numa: make hmp 'info numa' fetch numa
+ nodes from qmp_query_cpus() result
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,145 +29,54 @@ Cc: qemu-devel@nongnu.org, Igor Mammedov <imammedo@redhat.com>
 
 From: Igor Mammedov <imammedo@redhat.com>
 
-It fixes/add missing _PXM object for non mapped CPU (x86)
-and missing fdt node (virt-arm).
-
-It ensures that possible_cpus contains complete mapping if
-numa is enabled by the time machine_init() is executed.
-
-As result non completely mapped CPUs:
- 1) appear in ACPI/fdt blobs
- 2) QMP query-hotpluggable-cpus command shows bound nodes for such CPUs
- 3) allows to drop checks for has_node_id in numa only code,
-   reducing number of invariants incomplete mapping could produce
- 4) moves fixup/implicit node init from runtime numa_cpu_pre_plug()
-   (when CPU object is created) to machine_numa_finish_init() which
-   helps to fix [1, 2] and make possible_cpus complete source
-   of numa mapping available even before CPUs are created.
+HMP command 'info numa' is the last external user that access
+CPUState::numa_node field directly. In order to move it to CPU
+classes that actually use it, eliminate direct access and use
+an alternative approach by using result of qmp_query_cpus(),
+which provides topology properties CPU threads are associated
+with (including node-id).
 
 Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-Message-Id: <1496161442-96665-4-git-send-email-imammedo@redhat.com>
+Message-Id: <1496161442-96665-5-git-send-email-imammedo@redhat.com>
 Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 ---
- hw/arm/virt-acpi-build.c |  4 +---
- hw/core/machine.c        | 16 ++++++++++------
- hw/i386/acpi-build.c     |  3 +--
- hw/i386/pc.c             |  4 +---
- numa.c                   | 16 +++++-----------
- 5 files changed, 18 insertions(+), 25 deletions(-)
+ monitor.c | 11 +++++++----
+ 1 file changed, 7 insertions(+), 4 deletions(-)
 
-diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
-index 2079828c22..3d78ff68e6 100644
---- a/hw/arm/virt-acpi-build.c
-+++ b/hw/arm/virt-acpi-build.c
-@@ -496,12 +496,10 @@ build_srat(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
-     srat->reserved1 = cpu_to_le32(1);
- 
-     for (i = 0; i < cpu_list->len; ++i) {
--        int node_id = cpu_list->cpus[i].props.has_node_id ?
--            cpu_list->cpus[i].props.node_id : 0;
-         core = acpi_data_push(table_data, sizeof(*core));
-         core->type = ACPI_SRAT_PROCESSOR_GICC;
-         core->length = sizeof(*core);
--        core->proximity = cpu_to_le32(node_id);
-+        core->proximity = cpu_to_le32(cpu_list->cpus[i].props.node_id);
-         core->acpi_processor_uid = cpu_to_le32(i);
-         core->flags = cpu_to_le32(1);
-     }
-diff --git a/hw/core/machine.c b/hw/core/machine.c
-index c1434e6a69..2e7e9778cd 100644
---- a/hw/core/machine.c
-+++ b/hw/core/machine.c
-@@ -721,19 +721,23 @@ static void machine_numa_finish_init(MachineState *machine)
-         const CPUArchId *cpu_slot = &possible_cpus->cpus[i];
- 
-         if (!cpu_slot->props.has_node_id) {
--            if (default_mapping) {
--                /* fetch default mapping from board and enable it */
--                CpuInstanceProperties props = cpu_slot->props;
--                props.has_node_id = true;
--                machine_set_cpu_numa_node(machine, &props, &error_fatal);
--            } else {
-+            /* fetch default mapping from board and enable it */
-+            CpuInstanceProperties props = cpu_slot->props;
-+
-+            if (!default_mapping) {
-                 /* record slots with not set mapping,
-                  * TODO: make it hard error in future */
-                 char *cpu_str = cpu_slot_to_string(cpu_slot);
-                 g_string_append_printf(s, "%sCPU %d [%s]",
-                                        s->len ? ", " : "", i, cpu_str);
-                 g_free(cpu_str);
-+
-+                /* non mapped cpus used to fallback to node 0 */
-+                props.node_id = 0;
-             }
-+
-+            props.has_node_id = true;
-+            machine_set_cpu_numa_node(machine, &props, &error_fatal);
-         }
-     }
-     if (s->len && !qtest_enabled()) {
-diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
-index 82bd44f38e..ce74c84460 100644
---- a/hw/i386/acpi-build.c
-+++ b/hw/i386/acpi-build.c
-@@ -2335,8 +2335,7 @@ build_srat(GArray *table_data, BIOSLinker *linker, MachineState *machine)
-     srat->reserved1 = cpu_to_le32(1);
- 
-     for (i = 0; i < apic_ids->len; i++) {
--        int node_id = apic_ids->cpus[i].props.has_node_id ?
--            apic_ids->cpus[i].props.node_id : 0;
-+        int node_id = apic_ids->cpus[i].props.node_id;
-         uint32_t apic_id = apic_ids->cpus[i].arch_id;
- 
-         if (apic_id < 255) {
-diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-index 5b07be61cf..5b8c6fbbea 100644
---- a/hw/i386/pc.c
-+++ b/hw/i386/pc.c
-@@ -788,9 +788,7 @@ static FWCfgState *bochs_bios_init(AddressSpace *as, PCMachineState *pcms)
-     for (i = 0; i < cpus->len; i++) {
-         unsigned int apic_id = cpus->cpus[i].arch_id;
-         assert(apic_id < pcms->apic_id_limit);
--        if (cpus->cpus[i].props.has_node_id) {
--            numa_fw_cfg[apic_id + 1] = cpu_to_le64(cpus->cpus[i].props.node_id);
--        }
-+        numa_fw_cfg[apic_id + 1] = cpu_to_le64(cpus->cpus[i].props.node_id);
-     }
-     for (i = 0; i < nb_numa_nodes; i++) {
-         numa_fw_cfg[pcms->apic_id_limit + 1 + i] =
-diff --git a/numa.c b/numa.c
-index 4ec3eaf687..65701cb6c8 100644
---- a/numa.c
-+++ b/numa.c
-@@ -509,22 +509,16 @@ void parse_numa_opts(MachineState *ms)
- 
- void numa_cpu_pre_plug(const CPUArchId *slot, DeviceState *dev, Error **errp)
+diff --git a/monitor.c b/monitor.c
+index 75e7cd26d0..1e63ace2d4 100644
+--- a/monitor.c
++++ b/monitor.c
+@@ -1696,23 +1696,26 @@ static void hmp_info_mtree(Monitor *mon, const QDict *qdict)
+ static void hmp_info_numa(Monitor *mon, const QDict *qdict)
  {
--    int mapped_node_id; /* set by -numa option */
-     int node_id = object_property_get_int(OBJECT(dev), "node-id", &error_abort);
+     int i;
+-    CPUState *cpu;
+     uint64_t *node_mem;
++    CpuInfoList *cpu_list, *cpu;
  
--    /* by default CPUState::numa_node was 0 if it wasn't set explicitly
--     * TODO: make it error when incomplete numa mapping support is removed
--     */
--    mapped_node_id = slot->props.node_id;
--    if (!slot->props.has_node_id) {
--        mapped_node_id = 0;
--    }
--
-     if (node_id == CPU_UNSET_NUMA_NODE_ID) {
-         /* due to bug in libvirt, it doesn't pass node-id from props on
-          * device_add as expected, so we have to fix it up here */
--        object_property_set_int(OBJECT(dev), mapped_node_id, "node-id", errp);
--    } else if (node_id != mapped_node_id) {
-+        if (slot->props.has_node_id) {
-+            object_property_set_int(OBJECT(dev), slot->props.node_id,
-+                                    "node-id", errp);
-+        }
-+    } else if (node_id != slot->props.node_id) {
-         error_setg(errp, "node-id=%d must match numa node specified "
-                    "with -numa option", node_id);
++    cpu_list = qmp_query_cpus(&error_abort);
+     node_mem = g_new0(uint64_t, nb_numa_nodes);
+     query_numa_node_mem(node_mem);
+     monitor_printf(mon, "%d nodes\n", nb_numa_nodes);
+     for (i = 0; i < nb_numa_nodes; i++) {
+         monitor_printf(mon, "node %d cpus:", i);
+-        CPU_FOREACH(cpu) {
+-            if (cpu->numa_node == i) {
+-                monitor_printf(mon, " %d", cpu->cpu_index);
++        for (cpu = cpu_list; cpu; cpu = cpu->next) {
++            if (cpu->value->has_props && cpu->value->props->has_node_id &&
++                cpu->value->props->node_id == i) {
++                monitor_printf(mon, " %" PRIi64, cpu->value->CPU);
+             }
+         }
+         monitor_printf(mon, "\n");
+         monitor_printf(mon, "node %d size: %" PRId64 " MB\n", i,
+                        node_mem[i] >> 20);
      }
++    qapi_free_CpuInfoList(cpu_list);
+     g_free(node_mem);
+ }
+ 
 -- 
 2.11.0.259.g40922b1
