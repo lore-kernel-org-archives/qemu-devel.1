@@ -1,26 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56031)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60797)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dHtqx-0008Lg-8S
-	for qemu-devel@nongnu.org; Mon, 05 Jun 2017 11:23:36 -0400
+	(envelope-from <clg@kaod.org>) id 1dHu3s-0003yc-UN
+	for qemu-devel@nongnu.org; Mon, 05 Jun 2017 11:36:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dHtqt-0000ym-5z
-	for qemu-devel@nongnu.org; Mon, 05 Jun 2017 11:23:35 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:45480)
+	(envelope-from <clg@kaod.org>) id 1dHu3p-0002UY-Ng
+	for qemu-devel@nongnu.org; Mon, 05 Jun 2017 11:36:56 -0400
+Received: from 16.mo3.mail-out.ovh.net ([188.165.56.217]:55122)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dHtqs-0000xy-So
-	for qemu-devel@nongnu.org; Mon, 05 Jun 2017 11:23:31 -0400
-References: <20170530143052.165002-1-vsementsov@virtuozzo.com>
-	<20170530143052.165002-20-vsementsov@virtuozzo.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <ca6625b0-1be4-fa44-f6fe-da935621d6b3@redhat.com>
-Date: Mon, 5 Jun 2017 10:23:24 -0500
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1dHu3p-0002OL-He
+	for qemu-devel@nongnu.org; Mon, 05 Jun 2017 11:36:53 -0400
+Received: from player158.ha.ovh.net (b6.ovh.net [213.186.33.56])
+	by mo3.mail-out.ovh.net (Postfix) with ESMTP id 6A3BBE94ED
+	for <qemu-devel@nongnu.org>; Mon,  5 Jun 2017 17:36:44 +0200 (CEST)
+References: <20170424015927.8933-1-david@gibson.dropbear.id.au>
+	<20170424015927.8933-42-david@gibson.dropbear.id.au>
+	<CAFEAcA8FvmfwwhbNEz4qvGCjoPEQn6bJh-WiwRM7Ot0uEV8ACg@mail.gmail.com>
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <3dfac1c5-b23d-8f8a-912a-974b6a96b203@kaod.org>
+Date: Mon, 5 Jun 2017 17:36:34 +0200
 MIME-Version: 1.0
-In-Reply-To: <20170530143052.165002-20-vsementsov@virtuozzo.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="rlE9UGKlNrTbPcgDaVfacDtEOJLFFi4s0"
-Subject: Re: [Qemu-devel] [PATCH 19/19] nbd: use generic trace subsystem
- instead of TRACE macro
+In-Reply-To: <CAFEAcA8FvmfwwhbNEz4qvGCjoPEQn6bJh-WiwRM7Ot0uEV8ACg@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PULL 41/47] ppc/pnv: populate device tree for
+ IPMI BT devices
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,164 +32,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org
-Cc: pbonzini@redhat.com, den@openvz.org, Stefan Hajnoczi <stefanha@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>, David Gibson <david@gibson.dropbear.id.au>
+Cc: Alexander Graf <agraf@suse.de>, Michael Roth <mdroth@linux.vnet.ibm.com>, Alexey Kardashevskiy <aik@ozlabs.ru>, QEMU Developers <qemu-devel@nongnu.org>, "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---rlE9UGKlNrTbPcgDaVfacDtEOJLFFi4s0
-From: Eric Blake <eblake@redhat.com>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-devel@nongnu.org
-Cc: pbonzini@redhat.com, den@openvz.org, Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <ca6625b0-1be4-fa44-f6fe-da935621d6b3@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 19/19] nbd: use generic trace subsystem
- instead of TRACE macro
-References: <20170530143052.165002-1-vsementsov@virtuozzo.com>
- <20170530143052.165002-20-vsementsov@virtuozzo.com>
-In-Reply-To: <20170530143052.165002-20-vsementsov@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On 06/05/2017 04:33 PM, Peter Maydell wrote:
+> On 24 April 2017 at 02:59, David Gibson <david@gibson.dropbear.id.au> w=
+rote:
+>> From: C=C3=A9dric Le Goater <clg@kaod.org>
+>>
+>> When an ipmi-bt device [1] is defined on the ISA bus, we need to
+>> populate the device tree with the object properties. Such devices are
+>> created with the command line options :
+>>
+>>    -device ipmi-bmc-sim,id=3Dbmc0 -device isa-ipmi-bt,bmc=3Dbmc0,irq=3D=
+10
+>>
+>> [1] https://lists.gnu.org/archive/html/qemu-devel/2015-11/msg03168.htm=
+l
+>>
+>> Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
+>> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+>> ---
+>>  hw/ppc/pnv.c | 35 +++++++++++++++++++++++++++++++++++
+>>  1 file changed, 35 insertions(+)
+>>
+>> diff --git a/hw/ppc/pnv.c b/hw/ppc/pnv.c
+>> index dfa21e4..977e126 100644
+>> --- a/hw/ppc/pnv.c
+>> +++ b/hw/ppc/pnv.c
+>> @@ -354,6 +354,39 @@ static void powernv_populate_serial(ISADevice *d,=
+ void *fdt, int lpc_off)
+>>      _FDT((fdt_setprop_string(fdt, node, "device_type", "serial")));
+>>  }
+>>
+>> +static void powernv_populate_ipmi_bt(ISADevice *d, void *fdt, int lpc=
+_off)
+>> +{
+>> +    const char compatible[] =3D "bt\0ipmi-bt";
+>> +    uint32_t io_base;
+>> +    uint32_t io_regs[] =3D {
+>> +        cpu_to_be32(1),
+>> +        0, /* 'io_base' retrieved from the 'ioport' property of 'isa-=
+ipmi-bt' */
+>> +        cpu_to_be32(3)
+>> +    };
+>> +    uint32_t irq;
+>> +    char *name;
+>> +    int node;
+>> +
+>> +    io_base =3D object_property_get_int(OBJECT(d), "ioport", &error_f=
+atal);
+>> +    io_regs[1] =3D cpu_to_be32(io_base);
+>> +
+>> +    irq =3D object_property_get_int(OBJECT(d), "irq", &error_fatal);
+>> +
+>> +    name =3D g_strdup_printf("%s@i%x", qdev_fw_name(DEVICE(d)), io_ba=
+se);
+>> +    node =3D fdt_add_subnode(fdt, lpc_off, name);
+>> +    _FDT(node);
+>> +    g_free(name);
+>> +
+>> +    fdt_setprop(fdt, node, "reg", io_regs, sizeof(io_regs));
+>> +    fdt_setprop(fdt, node, "compatible", compatible, sizeof(compatibl=
+e));
+>> +
+>> +    /* Mark it as reserved to avoid Linux trying to claim it */
+>> +    _FDT((fdt_setprop_string(fdt, node, "status", "reserved")));
+>> +    _FDT((fdt_setprop_cell(fdt, node, "interrupts", irq)));
+>> +    _FDT((fdt_setprop_cell(fdt, node, "interrupt-parent",
+>> +                           fdt_get_phandle(fdt, lpc_off))));
+>> +}
+>=20
+> Hi -- Coverity points out (CID 1374832) that the fdt_setprop() calls
+> in this function to set "reg" and "compatible" don't check whether the
+> function returns an error. Is there any reason why these calls
+> haven't been wrapped with the barf-on-errors _FDT() macro like the
+> other fdt_setprop* calls in the function?
 
-[adding Stefan as trace maintainer]
+none. I will send a fix for it.=20
 
-On 05/30/2017 09:30 AM, Vladimir Sementsov-Ogievskiy wrote:
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> ---
->  Makefile.objs      |  1 +
->  nbd/client.c       | 77 ++++++++++++++++++++++++----------------------=
-------
->  nbd/nbd-internal.h | 19 -------------
->  nbd/server.c       | 79 ++++++++++++++++++++++++++--------------------=
---------
->  nbd/trace-events   | 67 +++++++++++++++++++++++++++++++++++++++++++++
->  5 files changed, 141 insertions(+), 102 deletions(-)
->  create mode 100644 nbd/trace-events
+Thanks,
 
-I like where you're headed with this one.
-
-Can you please include an example command line usage in the commit
-message of how you are enabling the traces (the old way was to recompile
-with CFLAGS=3D-DDEBUG_NBD; the new way no longer requires recompilation,
-but listing a formula for easy tracing as part of the commit message
-can't hurt).  And if I'm correct, we already have the same command-line
-tracing framework hooked up for all of qemu-nbd, qemu-io, and qemu
-proper, right?
-
-> @@ -453,8 +452,7 @@ int nbd_receive_negotiate(QIOChannel *ioc, const ch=
-ar *name, uint16_t *flags,
->      int rc;
->      bool zeroes =3D true;
-> =20
-> -    TRACE("Receiving negotiation tlscreds=3D%p hostname=3D%s.",
-
-Most trace messages don't have a trailing '.'; you can remove this one
-as part of moving it to trace-events.
-
-> @@ -477,7 +475,7 @@ int nbd_receive_negotiate(QIOChannel *ioc, const ch=
-ar *name, uint16_t *flags,
->          goto fail;
->      }
-> =20
-> -    TRACE("Magic is %s", nbd_magic_to_string(print_buf, buf, 9));
-> +    trace_nbd_receive_negotiate_magic(nbd_magic_to_string(print_buf, b=
-uf, 9));
-> =20
->      if (memcmp(buf, "NBDMAGIC", 8) !=3D 0) {
-
-See my review on 18/19; I think it is sufficient to trace an 8-byte hex
-number, instead of trying to string-ize things.  Yeah, the magic number
-happens to be an ASCII string, but treating it as a number is no real
-loss of information.
-
->          error_setg(errp, "Invalid magic received");
-> @@ -489,7 +487,7 @@ int nbd_receive_negotiate(QIOChannel *ioc, const ch=
-ar *name, uint16_t *flags,
->          goto fail;
->      }
->      magic =3D be64_to_cpu(magic);
-> -    TRACE("Magic is 0x%" PRIx64, magic);
-> +    trace_nbd_receive_negotiate_magic2(magic);
-
-In fact, I think you only need one trace function for tracing an 8-byte
-magic number, that can be called from more than one spot.
-
-> @@ -501,15 +499,16 @@ int nbd_receive_negotiate(QIOChannel *ioc, const =
-char *name, uint16_t *flags,
->              goto fail;
->          }
->          globalflags =3D be16_to_cpu(globalflags);
-> -        TRACE("Global flags are %" PRIx32, globalflags);
-> +        trace_nbd_receive_negotiate_server_flags(
-> +            globalflags,
-> +            !!(globalflags & NBD_FLAG_FIXED_NEWSTYLE),
-> +            !!(globalflags & NBD_FLAG_NO_ZEROES));
-
-Why do we have to trace particular bits within the flags, when we are
-already tracing the flags as a whole?  It is just redundant information
-(yes, it makes it a bit harder to read the trace to learn whether a
-given flag is set when you only have the hex number, but I don't think
-that is a real loss).
-
->          if (globalflags & NBD_FLAG_FIXED_NEWSTYLE) {
->              fixedNewStyle =3D true;
-> -            TRACE("Server supports fixed new style");
->              clientflags |=3D NBD_FLAG_C_FIXED_NEWSTYLE;
->          }
->          if (globalflags & NBD_FLAG_NO_ZEROES) {
->              zeroes =3D false;
-> -            TRACE("Server supports no zeroes");
->              clientflags |=3D NBD_FLAG_C_NO_ZEROES;
->          }
-
-I agree with dropping these two TRACE() in favor of the overall trace of
-the flags above (this exercise is a good place to figure out where
-TRACE() was too chatty).
-
-> @@ -580,7 +579,7 @@ int nbd_receive_negotiate(QIOChannel *ioc, const ch=
-ar *name, uint16_t *flags,
->              goto fail;
->          }
->          *size =3D be64_to_cpu(s);
-> -        TRACE("Size is %" PRIu64, *size);
-> +        trace_nbd_receive_negotiate_export_size(*size);
-> =20
->          if (read_sync(ioc, &oldflags, sizeof(oldflags), errp) < 0) {
->              error_prepend(errp, "Failed to read export flags");
-> @@ -597,7 +596,7 @@ int nbd_receive_negotiate(QIOChannel *ioc, const ch=
-ar *name, uint16_t *flags,
->          goto fail;
->      }
-> =20
-> -    TRACE("Size is %" PRIu64 ", export flags %" PRIx16, *size, *flags)=
-;
-> +    trace_nbd_receive_negotiate_size_flags(*size, *flags);
-
-Can we share the same trace for these two callers, by having the first
-one use trace_nbd_receive_negotiate_size_flags(*size, 0)?
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---rlE9UGKlNrTbPcgDaVfacDtEOJLFFi4s0
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEcBAEBCAAGBQJZNXdsAAoJEKeha0olJ0NqgFYH/jaEr2+f7CTGW1+thQxR3Z5j
-R+9Dm0DeiUTcQLjoWo9LjHHRVpp7pyB1pqiwgHqJ1dx0zdUZ41qEtM5b7Ejuejjb
-9ntpLFppxZqOZU/YvCJ3WovLm6wWxPiwRKmhb2FcT6GHI9hMXycmqWzh55kKs3oH
-b5RZ+/syfuiJ3He3+iGJLKpq5TJCGtakc9F8V4PDTofEctjQA09SWlhlg4T4IONG
-f86Ysf/7yFVj6K7/l7LB+VfSJVaGKwlQu+ZKVnnuCeGkl5DsZLm2U7DvK/xy53io
-ihcplzFnYnlx8ax/PoNNjCt9gksOQTOPU7x2XU2P6yxTsdj4KVU971jz+neGkAM=
-=JfJW
------END PGP SIGNATURE-----
-
---rlE9UGKlNrTbPcgDaVfacDtEOJLFFi4s0--
+C.=20
