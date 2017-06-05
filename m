@@ -1,34 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47421)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48655)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <a.perevalov@samsung.com>) id 1dHlY0-0001ne-Dj
-	for qemu-devel@nongnu.org; Mon, 05 Jun 2017 02:31:29 -0400
+	(envelope-from <famz@redhat.com>) id 1dHlg0-0003m1-Ts
+	for qemu-devel@nongnu.org; Mon, 05 Jun 2017 02:39:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <a.perevalov@samsung.com>) id 1dHlXx-0003RF-8U
-	for qemu-devel@nongnu.org; Mon, 05 Jun 2017 02:31:28 -0400
-Received: from mailout3.w1.samsung.com ([210.118.77.13]:28187)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <a.perevalov@samsung.com>)
-	id 1dHlXw-0003Q6-TY
-	for qemu-devel@nongnu.org; Mon, 05 Jun 2017 02:31:25 -0400
-Received: from eucas1p2.samsung.com (unknown [182.198.249.207])
-	by mailout3.w1.samsung.com
-	(Oracle Communications Messaging Server 7.0.5.31.0 64bit (built May 5
-	2014)) with ESMTP id <0OR2008BKA487R00@mailout3.w1.samsung.com> for
-	qemu-devel@nongnu.org; Mon, 05 Jun 2017 07:31:20 +0100 (BST)
-From: Alexey Perevalov <a.perevalov@samsung.com>
-Message-id: <785a1f3a-c364-51ce-b969-029ff2489fc1@samsung.com>
-Date: Mon, 05 Jun 2017 09:31:17 +0300
-MIME-version: 1.0
-In-reply-to: <20170524033122.GE3873@pxdev.xzpeter.org>
-Content-type: text/plain; charset=utf-8; format=flowed
-Content-transfer-encoding: 7bit
-Content-language: en-GB
-References: <1495539071-12995-1-git-send-email-a.perevalov@samsung.com>
-	<CGME20170523113129eucas1p179082f20f41d1069f5fbd0f37535fae9@eucas1p1.samsung.com>
-	<1495539071-12995-7-git-send-email-a.perevalov@samsung.com>
-	<20170524033122.GE3873@pxdev.xzpeter.org>
-Subject: Re: [Qemu-devel] [PATCH V6 06/10] migration: add postcopy blocktime
- ctx into MigrationIncomingState
+	(envelope-from <famz@redhat.com>) id 1dHlfz-0008UH-TE
+	for qemu-devel@nongnu.org; Mon, 05 Jun 2017 02:39:44 -0400
+Date: Mon, 5 Jun 2017 14:39:30 +0800
+From: Fam Zheng <famz@redhat.com>
+Message-ID: <20170605063930.GB14337@lemon.lan>
+References: <1496642007-8309-1-git-send-email-ashijeetacharya@gmail.com>
+	<1496642007-8309-7-git-send-email-ashijeetacharya@gmail.com>
+	<CAC2QTZZgzsQPVgcwNrFqy3vov-rx8DTUucoJ5JfsSaTUeOuQCQ@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAC2QTZZgzsQPVgcwNrFqy3vov-rx8DTUucoJ5JfsSaTUeOuQCQ@mail.gmail.com>
+Subject: Re: [Qemu-devel] [PATCH v5 6/8] vmdk: New functions to assist
+ allocating multiple clusters
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,204 +25,111 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: qemu-devel@nongnu.org, i.maximets@samsung.com, eblake@redhat.com, dgilbert@redhat.com
+To: Ashijeet Acharya <ashijeetacharya@gmail.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, John Snow <jsnow@redhat.com>, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>, qemu block <qemu-block@nongnu.org>
 
-On 05/24/2017 06:31 AM, Peter Xu wrote:
-> On Tue, May 23, 2017 at 02:31:07PM +0300, Alexey Perevalov wrote:
->> This patch adds request to kernel space for UFFD_FEATURE_THREAD_ID,
->> in case when this feature is provided by kernel.
->>
->> PostcopyBlocktimeContext is incapsulated inside postcopy-ram.c,
->> due to it's postcopy only feature.
->> Also it defines PostcopyBlocktimeContext's instance live time.
->> Information from PostcopyBlocktimeContext instance will be provided
->> much after postcopy migration end, instance of PostcopyBlocktimeContext
->> will live till QEMU exit, but part of it (vcpu_addr,
->> page_fault_vcpu_time) used only during calculation, will be released
->> when postcopy ended or failed.
->>
->> To enable postcopy blocktime calculation on destination, need to request
->> proper capabiltiy (Patch for documentation will be at the tail of the patch
->> set).
->>
->> As an example following command enable that capability, assume QEMU was
->> started with
->> -chardev socket,id=charmonitor,path=/var/lib/migrate-vm-monitor.sock
->> option to control it
->>
->> [root@host]#printf "{\"execute\" : \"qmp_capabilities\"}\r\n \
->> {\"execute\": \"migrate-set-capabilities\" , \"arguments\":   {
->> \"capabilities\": [ { \"capability\": \"postcopy-blocktime\", \"state\":
->> true } ] } }" | nc -U /var/lib/migrate-vm-monitor.sock
->>
->> Or just with HMP
->> (qemu) migrate_set_capability postcopy-blocktime on
->>
->> Signed-off-by: Alexey Perevalov <a.perevalov@samsung.com>
->> ---
->>   include/migration/migration.h |  8 +++++
->>   migration/postcopy-ram.c      | 80 +++++++++++++++++++++++++++++++++++++++++++
->>   2 files changed, 88 insertions(+)
->>
->> diff --git a/include/migration/migration.h b/include/migration/migration.h
->> index 2951253..449cb07 100644
->> --- a/include/migration/migration.h
->> +++ b/include/migration/migration.h
->> @@ -57,6 +57,8 @@ enum mig_rp_message_type {
->>   
->>   typedef QLIST_HEAD(, LoadStateEntry) LoadStateEntry_Head;
->>   
->> +struct PostcopyBlocktimeContext;
->> +
->>   /* State for the incoming migration */
->>   struct MigrationIncomingState {
->>       QEMUFile *from_src_file;
->> @@ -97,6 +99,12 @@ struct MigrationIncomingState {
->>   
->>       /* See savevm.c */
->>       LoadStateEntry_Head loadvm_handlers;
->> +
->> +    /*
->> +     * PostcopyBlocktimeContext to keep information for postcopy
->> +     * live migration, to calculate vCPU block time
->> +     * */
->> +    struct PostcopyBlocktimeContext *blocktime_ctx;
->>   };
->>   
->>   MigrationIncomingState *migration_incoming_get_current(void);
->> diff --git a/migration/postcopy-ram.c b/migration/postcopy-ram.c
->> index 4f3f495..5435a40 100644
->> --- a/migration/postcopy-ram.c
->> +++ b/migration/postcopy-ram.c
->> @@ -59,6 +59,73 @@ struct PostcopyDiscardState {
->>   #include <sys/eventfd.h>
->>   #include <linux/userfaultfd.h>
->>   
->> +typedef struct PostcopyBlocktimeContext {
->> +    /* time when page fault initiated per vCPU */
->> +    int64_t *page_fault_vcpu_time;
->> +    /* page address per vCPU */
->> +    uint64_t *vcpu_addr;
->> +    int64_t total_blocktime;
->> +    /* blocktime per vCPU */
->> +    int64_t *vcpu_blocktime;
->> +    /* point in time when last page fault was initiated */
->> +    int64_t last_begin;
->> +    /* number of vCPU are suspended */
->> +    int smp_cpus_down;
->> +
->> +    /*
->> +     * Handler for exit event, necessary for
->> +     * releasing whole blocktime_ctx
->> +     */
->> +    Notifier exit_notifier;
->> +    /*
->> +     * Handler for postcopy event, necessary for
->> +     * releasing unnecessary part of blocktime_ctx
->> +     */
->> +    Notifier postcopy_notifier;
->> +} PostcopyBlocktimeContext;
->> +
->> +static void destroy_blocktime_context(struct PostcopyBlocktimeContext *ctx)
->> +{
->> +    g_free(ctx->page_fault_vcpu_time);
->> +    g_free(ctx->vcpu_addr);
->> +    g_free(ctx->vcpu_blocktime);
->> +    g_free(ctx);
->> +}
->> +
->> +static void postcopy_migration_cb(Notifier *n, void *data)
->> +{
->> +    PostcopyBlocktimeContext *ctx = container_of(n, PostcopyBlocktimeContext,
->> +                                               postcopy_notifier);
->> +    MigrationState *s = data;
->> +    if (migration_has_finished(s) || migration_has_failed(s)) {
->> +        g_free(ctx->page_fault_vcpu_time);
->> +        /* g_free is NULL robust */
->> +        ctx->page_fault_vcpu_time = NULL;
->> +        g_free(ctx->vcpu_addr);
->> +        ctx->vcpu_addr = NULL;
->> +    }
->> +}
->> +
->> +static void migration_exit_cb(Notifier *n, void *data)
->> +{
->> +    PostcopyBlocktimeContext *ctx = container_of(n, PostcopyBlocktimeContext,
->> +                                               exit_notifier);
->> +    destroy_blocktime_context(ctx);
->> +}
->> +
->> +static struct PostcopyBlocktimeContext *blocktime_context_new(void)
->> +{
->> +    PostcopyBlocktimeContext *ctx = g_new0(PostcopyBlocktimeContext, 1);
->> +    ctx->page_fault_vcpu_time = g_new0(int64_t, smp_cpus);
->> +    ctx->vcpu_addr = g_new0(uint64_t, smp_cpus);
->> +    ctx->vcpu_blocktime = g_new0(int64_t, smp_cpus);
->> +
->> +    ctx->exit_notifier.notify = migration_exit_cb;
->> +    ctx->postcopy_notifier.notify = postcopy_migration_cb;
->> +    qemu_add_exit_notifier(&ctx->exit_notifier);
->> +    add_migration_state_change_notifier(&ctx->postcopy_notifier);
-> I think we just need a global MAX_VCPUS macro, then we can just make
-> the whole struct static. But I admit this is out of topic for current
-> thread. The point is indeed I see no much point on such fine-grained
-> management of memory on this... only for a summary of, say a maximum
-> of 1K vcpus, no more than 8B*3*1K=24KB memory...
->
-> IMHO This just made things complicated.
->
->> +    return ctx;
->> +}
->>   
->>   /**
->>    * receive_ufd_features: check userfault fd features, to request only supported
->> @@ -151,6 +218,19 @@ static bool ufd_check_and_apply(int ufd, MigrationIncomingState *mis)
->>           }
->>       }
->>   
->> +#ifdef UFFD_FEATURE_THREAD_ID
->> +    if (migrate_postcopy_blocktime() && mis &&
->> +            UFFD_FEATURE_THREAD_ID & supported_features) {
-> (indent)
->
->> +        /* kernel supports that feature */
->> +        /* don't create blocktime_context if it exists */
->> +        if (!mis->blocktime_ctx) {
-> If it does existed, then maybe we'll have problem - in the state
-> change notifier we cleaned up ->page_fault_vcpu_time and ->vcpu_addr,
-> but blocktime_ctx was there. So will it possible when we reached here
-> we'll get blocktime_ctx != NULL but
-> blocktime_ctx->page_fault_vcpu_time == NULL and also
-> blocktime_ctx->vcpu_addr == NULL?
->
-> Maybe we can just drop the state change notifier, and one single exit
-> notifier would be enough to cleanup everything?
-When I did that I had a doubt too.
-On one hand, yes, implementation complexity, but not
-so high and possibility of use after free, but I tried to prevent it,
-on other hand I didn't want to keep that auxiliary memory, but as you
-truly noticed that memory overhead isn't big,
-ok, for the sake of robustness and simplicity, I'll free that memory at
-QEMU's exit.
+On Mon, 06/05 11:37, Ashijeet Acharya wrote:
+> On Mon, Jun 5, 2017 at 11:23 AM, Ashijeet Acharya
+> <ashijeetacharya@gmail.com> wrote:
+> > Introduce two new helper functions handle_alloc() and
+> > vmdk_alloc_cluster_offset(). handle_alloc() helps to allocate multiple
+> > clusters at once starting from a given offset on disk and performs COW
+> > if necessary for first and last allocated clusters.
+> > vmdk_alloc_cluster_offset() helps to return the offset of the first of
+> > the many newly allocated clusters. Also, provide proper documentation
+> > for both.
+> >
+> > Signed-off-by: Ashijeet Acharya <ashijeetacharya@gmail.com>
+> > ---
+> >  block/vmdk.c | 192 +++++++++++++++++++++++++++++++++++++++++++++++++++++++----
+> >  1 file changed, 182 insertions(+), 10 deletions(-)
+> >
+> > diff --git a/block/vmdk.c b/block/vmdk.c
+> > index fe2046b..b671dc9 100644
+> > --- a/block/vmdk.c
+> > +++ b/block/vmdk.c
+> > @@ -136,6 +136,7 @@ typedef struct VmdkMetaData {
+> >      unsigned int l2_offset;
+> >      int valid;
+> >      uint32_t *l2_cache_entry;
+> > +    uint32_t nb_clusters;
+> >  } VmdkMetaData;
+> >
+> >  typedef struct VmdkGrainMarker {
+> > @@ -1242,6 +1243,174 @@ static int get_cluster_table(VmdkExtent *extent, uint64_t offset,
+> >      return VMDK_OK;
+> >  }
+> >
+> > +/*
+> > + * vmdk_handle_alloc
+> > + *
+> > + * Allocate new clusters for an area that either is yet unallocated or needs a
+> > + * copy on write. If *cluster_offset is non_zero, clusters are only allocated if
+> > + * the new allocation can match the specified host offset.
+> > + *
+> > + * Returns:
+> > + *   VMDK_OK:       if new clusters were allocated, *bytes may be decreased if
+> > + *                  the new allocation doesn't cover all of the requested area.
+> > + *                  *cluster_offset is updated to contain the offset of the
+> > + *                  first newly allocated cluster.
+> > + *
+> > + *   VMDK_UNALLOC:  if no clusters could be allocated. *cluster_offset is left
+> > + *                  unchanged.
+> > + *
+> > + *   VMDK_ERROR:    in error cases
+> > + */
+> > +static int vmdk_handle_alloc(BlockDriverState *bs, VmdkExtent *extent,
+> > +                             uint64_t offset, uint64_t *cluster_offset,
+> > +                             int64_t *bytes, VmdkMetaData *m_data,
+> > +                             bool allocate, uint32_t *total_alloc_clusters)
+> > +{
+> > +    int l1_index, l2_offset, l2_index;
+> > +    uint32_t *l2_table;
+> > +    uint32_t cluster_sector;
+> > +    uint32_t nb_clusters;
+> > +    bool zeroed = false;
+> > +    uint64_t skip_start_bytes, skip_end_bytes;
+> > +    int ret;
+> > +
+> > +    ret = get_cluster_table(extent, offset, &l1_index, &l2_offset,
+> > +                            &l2_index, &l2_table);
+> > +    if (ret < 0) {
+> > +        return ret;
+> > +    }
+> > +
+> > +    cluster_sector = le32_to_cpu(l2_table[l2_index]);
+> > +
+> > +    skip_start_bytes = vmdk_find_offset_in_cluster(extent, offset);
+> > +    /* Calculate the number of clusters to look for. Here we truncate the last
+> > +     * cluster, i.e. 1 less than the actual value calculated as we may need to
+> > +     * perform COW for the last one. */
+> > +    nb_clusters = DIV_ROUND_UP(skip_start_bytes + *bytes,
+> > +                               extent->cluster_sectors << BDRV_SECTOR_BITS) - 1;
+> > +
+> > +    nb_clusters = MIN(nb_clusters, extent->l2_size - l2_index);
+> > +    assert(nb_clusters <= INT_MAX);
+> > +
+> > +    /* update bytes according to final nb_clusters value */
+> > +    if (nb_clusters != 0) {
+> > +        *bytes = ((nb_clusters * extent->cluster_sectors) << BDRV_SECTOR_BITS)
+> > +                 - skip_start_bytes;
+> > +    } else {
+> > +        nb_clusters = 1;
+> > +    }
+> > +    *total_alloc_clusters += nb_clusters;
+> 
+> I have left it as it is for now as I wasn't sure about what you meant.
+> You can check my query I posted on v4 of this thread for more so that
+> we can solve this soon. :-)
 
->
->> +            mis->blocktime_ctx = blocktime_context_new();
->> +        }
->> +
->> +        asked_features |= UFFD_FEATURE_THREAD_ID;
->> +    }
->> +#endif
->> +
->>       /*
->>        * request features, even if asked_features is 0, due to
->>        * kernel expects UFFD_API before UFFDIO_REGISTER, per
->> -- 
->> 1.8.3.1
->>
-> Thanks,
->
+What I meant is to change this to "*total_alloc_clusters = nb_clusters" here,
+and pass in a temporary variable from vmdk_pwritev, then do a
+"total_alloc_clusters += temp" there. This is more readable than the current
+way.
 
--- 
-Best regards,
-Alexey Perevalov
+Alternatively, rename "total_alloc_clusters" parameter of this function to
+"alloc_clusters_counter" and be done.
+
+Ideally a function's interface should be as localized and stateless as possible.
+
+Fam
