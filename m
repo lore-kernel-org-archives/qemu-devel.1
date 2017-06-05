@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60276)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60343)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dHym9-0001jy-Bk
-	for qemu-devel@nongnu.org; Mon, 05 Jun 2017 16:38:58 -0400
+	(envelope-from <eblake@redhat.com>) id 1dHymF-0001oT-2Y
+	for qemu-devel@nongnu.org; Mon, 05 Jun 2017 16:39:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dHym8-00015y-31
-	for qemu-devel@nongnu.org; Mon, 05 Jun 2017 16:38:57 -0400
+	(envelope-from <eblake@redhat.com>) id 1dHymE-0001Ah-1x
+	for qemu-devel@nongnu.org; Mon, 05 Jun 2017 16:39:03 -0400
 From: Eric Blake <eblake@redhat.com>
-Date: Mon,  5 Jun 2017 15:38:42 -0500
-Message-Id: <20170605203845.24351-2-eblake@redhat.com>
+Date: Mon,  5 Jun 2017 15:38:43 -0500
+Message-Id: <20170605203845.24351-3-eblake@redhat.com>
 In-Reply-To: <20170605203845.24351-1-eblake@redhat.com>
 References: <20170605203845.24351-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PATCH v4 1/4] qemu-io: Don't die on second open
+Subject: [Qemu-devel] [PATCH v4 2/4] block: Guarantee that *file is set on
+ bdrv_get_block_status()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,169 +21,107 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: jsnow@redhat.com, mreitz@redhat.com, qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>
+Cc: jsnow@redhat.com, mreitz@redhat.com, qemu-block@nongnu.org, qemu-stable@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>, Fam Zheng <famz@redhat.com>, Kevin Wolf <kwolf@redhat.com>
 
-Most callback commands in qemu-io return 0 to keep the interpreter
-loop running, or 1 to quit immediately.  However, open_f() just
-passed through the return value of openfile(), which has different
-semantics of returning 0 if a file was opened, or 1 on any failure.
+We document that *file is valid if the return is not an error and
+includes BDRV_BLOCK_OFFSET_VALID, but forgot to obey this contract
+when a driver (such as blkdebug) lacks a callback.  Messed up in
+commit 67a0fd2 (v2.6), when we added the file parameter.
 
-As a result of mixing the return semantics, we are forcing the
-qemu-io interpreter to exit early on any failures, which is rather
-annoying when some of the failures are obviously trying to give
-the user a hint of how to proceed (if we didn't then kill qemu-io
-out from under the user's feet):
+Enhance qemu-iotest 177 to cover this, using a sequence that would
+print garbage or even SEGV, because it was dererefencing through
+uninitialized memory.  [The resulting test output shows that we
+have less-than-ideal block status from the blkdebug driver, but
+that's a separate fix coming up soon.]
 
-$ qemu-io
-qemu-io> open foo
-qemu-io> open foo
-file open already, try 'help close'
-$ echo $?
-0
+Setting *file on all paths that return BDRV_BLOCK_OFFSET_VALID is
+enough to fix the crash, but we can go one step further: always
+setting *file, even on error, means that a broken caller that
+blindly dereferences file without checking for error is now more
+likely to get a reliable SEGV instead of randomly acting on garbage,
+making it easier to diagnose such buggy callers.  Adding an
+assertion that file is set where expected doesn't hurt either.
 
-In general, we WANT openfile() to report failures, since it is the
-function used in the form 'qemu-io -c "$something" no_such_file'
-for performing one or more -c options on a single file, and it is
-not worth attempting $something if the file itself cannot be opened.
-So the solution is to fix open_f() to always return 0 (when we are
-in interactive mode, even failure to open should not end the
-session), and save the return value of openfile() for command line
-use in main().
-
-Note, however, that we do have some qemu-iotests that do 'qemu-io
--c "open file" -c "$something"'; such tests will now proceed to
-attempt $something whether or not the open succeeded, the same way
-as if the two commands had been attempted in interactive mode.  As
-such, the expected output for those tests has to be modified.  But it
-also means that it is now possible to use -c close and have a single
-qemu-io command line operate on more than one file even without
-using interactive mode.  Although the '-c open' action is a subtle
-change in behavior, remember that qemu-io is for debugging purposes,
-so as long as it serves the needs of qemu-iotests while still being
-reasonable for interactive use, it should not be a problem that we
-are changing tests to the new behavior.
-
-This has been awkward since at least as far back as commit
-e3aff4f, in 2009.
-
+CC: qemu-stable@nongnu.org
 Signed-off-by: Eric Blake <eblake@redhat.com>
 Reviewed-by: Fam Zheng <famz@redhat.com>
+Reviewed-by: Max Reitz <mreitz@redhat.com>
 
 ---
-v4: cover ALL qemu-iotests
-v3: tweak commit message to distinguish that '-c open' has a subtle
-new behavior from the command line
-v2: fix open_f(), not openfile()
+v3: tweak commit message [Max], rebase test to pass
+v2: drop redundant assignment
 ---
- qemu-io.c                  | 7 ++++---
- tests/qemu-iotests/060.out | 1 +
- tests/qemu-iotests/114.out | 5 +++--
- tests/qemu-iotests/153.out | 6 ++++++
- 4 files changed, 14 insertions(+), 5 deletions(-)
+ block/io.c                 | 5 +++--
+ tests/qemu-iotests/177     | 3 +++
+ tests/qemu-iotests/177.out | 2 ++
+ 3 files changed, 8 insertions(+), 2 deletions(-)
 
-diff --git a/qemu-io.c b/qemu-io.c
-index 8e38b28..8074656 100644
---- a/qemu-io.c
-+++ b/qemu-io.c
-@@ -230,13 +230,14 @@ static int open_f(BlockBackend *blk, int argc, char **argv)
-     qemu_opts_reset(&empty_opts);
+diff --git a/block/io.c b/block/io.c
+index ed31810..ce6cb0c 100644
+--- a/block/io.c
++++ b/block/io.c
+@@ -1736,6 +1736,7 @@ static int64_t coroutine_fn bdrv_co_get_block_status(BlockDriverState *bs,
+     int64_t n;
+     int64_t ret, ret2;
 
-     if (optind == argc - 1) {
--        return openfile(argv[optind], flags, writethrough, force_share, opts);
-+        openfile(argv[optind], flags, writethrough, force_share, opts);
-     } else if (optind == argc) {
--        return openfile(NULL, flags, writethrough, force_share, opts);
-+        openfile(NULL, flags, writethrough, force_share, opts);
-     } else {
-         QDECREF(opts);
--        return qemuio_command_usage(&open_cmd);
-+        qemuio_command_usage(&open_cmd);
++    *file = NULL;
+     total_sectors = bdrv_nb_sectors(bs);
+     if (total_sectors < 0) {
+         return total_sectors;
+@@ -1756,11 +1757,11 @@ static int64_t coroutine_fn bdrv_co_get_block_status(BlockDriverState *bs,
+         ret = BDRV_BLOCK_DATA | BDRV_BLOCK_ALLOCATED;
+         if (bs->drv->protocol_name) {
+             ret |= BDRV_BLOCK_OFFSET_VALID | (sector_num * BDRV_SECTOR_SIZE);
++            *file = bs;
+         }
+         return ret;
      }
-+    return 0;
+
+-    *file = NULL;
+     bdrv_inc_in_flight(bs);
+     ret = bs->drv->bdrv_co_get_block_status(bs, sector_num, nb_sectors, pnum,
+                                             file);
+@@ -1770,7 +1771,7 @@ static int64_t coroutine_fn bdrv_co_get_block_status(BlockDriverState *bs,
+     }
+
+     if (ret & BDRV_BLOCK_RAW) {
+-        assert(ret & BDRV_BLOCK_OFFSET_VALID);
++        assert(ret & BDRV_BLOCK_OFFSET_VALID && *file);
+         ret = bdrv_co_get_block_status(*file, ret >> BDRV_SECTOR_BITS,
+                                        *pnum, pnum, file);
+         goto out;
+diff --git a/tests/qemu-iotests/177 b/tests/qemu-iotests/177
+index 2005c17..f8ed8fb 100755
+--- a/tests/qemu-iotests/177
++++ b/tests/qemu-iotests/177
+@@ -43,6 +43,7 @@ _supported_proto file
+ CLUSTER_SIZE=1M
+ size=128M
+ options=driver=blkdebug,image.driver=qcow2
++nested_opts=image.file.driver=file,image.file.filename=$TEST_IMG
+
+ echo
+ echo "== setting up files =="
+@@ -106,6 +107,8 @@ function verify_io()
  }
 
- static int quit_f(BlockBackend *blk, int argc, char **argv)
-diff --git a/tests/qemu-iotests/060.out b/tests/qemu-iotests/060.out
-index 3bc1461..5ca3af4 100644
---- a/tests/qemu-iotests/060.out
-+++ b/tests/qemu-iotests/060.out
-@@ -21,6 +21,7 @@ Format specific information:
-     refcount bits: 16
-     corrupt: true
- can't open device TEST_DIR/t.IMGFMT: IMGFMT: Image is corrupt; cannot be opened read/write
-+no file open, try 'help open'
- read 512/512 bytes at offset 0
- 512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+ verify_io | $QEMU_IO -r "$TEST_IMG" | _filter_qemu_io
++$QEMU_IMG map --image-opts "$options,$nested_opts,align=4k" \
++    | _filter_qemu_img_map
 
-diff --git a/tests/qemu-iotests/114.out b/tests/qemu-iotests/114.out
-index b6d10e4..1a47a52 100644
---- a/tests/qemu-iotests/114.out
-+++ b/tests/qemu-iotests/114.out
-@@ -1,6 +1,6 @@
- QA output created by 114
--Formatting 'TEST_DIR/t.IMGFMT.base', fmt=IMGFMT size=67108864 
--Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864 backing_file=TEST_DIR/t.IMGFMT.base 
-+Formatting 'TEST_DIR/t.IMGFMT.base', fmt=IMGFMT size=67108864
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864 backing_file=TEST_DIR/t.IMGFMT.base
- image: TEST_DIR/t.IMGFMT
- file format: IMGFMT
- virtual size: 64M (67108864 bytes)
-@@ -8,6 +8,7 @@ cluster_size: 65536
- backing file: TEST_DIR/t.IMGFMT.base
- backing file format: foo
- can't open device TEST_DIR/t.qcow2: Could not open backing file: Unknown driver 'foo'
-+no file open, try 'help open'
- read 4096/4096 bytes at offset 0
- 4 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+ _check_test_img
+
+diff --git a/tests/qemu-iotests/177.out b/tests/qemu-iotests/177.out
+index e887542..fcfbfa3 100644
+--- a/tests/qemu-iotests/177.out
++++ b/tests/qemu-iotests/177.out
+@@ -45,5 +45,7 @@ read 30408704/30408704 bytes at offset 80740352
+ 29 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+ read 23068672/23068672 bytes at offset 111149056
+ 22 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++Offset          Length          File
++0               0x8000000       json:{"image": {"driver": "IMGFMT", "file": {"driver": "file", "filename": "TEST_DIR/t.IMGFMT"}}, "driver": "blkdebug", "align": "4k"}
+ No errors were found on the image.
  *** done
-diff --git a/tests/qemu-iotests/153.out b/tests/qemu-iotests/153.out
-index 5ba0b63..5b917b1 100644
---- a/tests/qemu-iotests/153.out
-+++ b/tests/qemu-iotests/153.out
-@@ -33,10 +33,12 @@ Is another process using the image?
- _qemu_io_wrapper -c open  TEST_DIR/t.qcow2 -c read 0 512
- can't open device TEST_DIR/t.qcow2: Failed to get "write" lock
- Is another process using the image?
-+no file open, try 'help open'
-
- _qemu_io_wrapper -c open -r  TEST_DIR/t.qcow2 -c read 0 512
- can't open device TEST_DIR/t.qcow2: Failed to get shared "write" lock
- Is another process using the image?
-+no file open, try 'help open'
-
- _qemu_img_wrapper info TEST_DIR/t.qcow2
- qemu-img: Could not open 'TEST_DIR/t.qcow2': Failed to get shared "write" lock
-@@ -99,6 +101,7 @@ _qemu_io_wrapper -U -r -c read 0 512 TEST_DIR/t.qcow2
-
- _qemu_io_wrapper -c open -U TEST_DIR/t.qcow2 -c read 0 512
- can't open device TEST_DIR/t.qcow2: force-share=on can only be used with read-only images
-+no file open, try 'help open'
-
- _qemu_io_wrapper -c open -r -U TEST_DIR/t.qcow2 -c read 0 512
-
-@@ -166,6 +169,7 @@ _qemu_io_wrapper -r -c read 0 512 TEST_DIR/t.qcow2
- _qemu_io_wrapper -c open  TEST_DIR/t.qcow2 -c read 0 512
- can't open device TEST_DIR/t.qcow2: Failed to get "write" lock
- Is another process using the image?
-+no file open, try 'help open'
-
- _qemu_io_wrapper -c open -r  TEST_DIR/t.qcow2 -c read 0 512
-
-@@ -214,6 +218,7 @@ _qemu_io_wrapper -U -r -c read 0 512 TEST_DIR/t.qcow2
-
- _qemu_io_wrapper -c open -U TEST_DIR/t.qcow2 -c read 0 512
- can't open device TEST_DIR/t.qcow2: force-share=on can only be used with read-only images
-+no file open, try 'help open'
-
- _qemu_io_wrapper -c open -r -U TEST_DIR/t.qcow2 -c read 0 512
-
-@@ -313,6 +318,7 @@ _qemu_io_wrapper -U -r -c read 0 512 TEST_DIR/t.qcow2
-
- _qemu_io_wrapper -c open -U TEST_DIR/t.qcow2 -c read 0 512
- can't open device TEST_DIR/t.qcow2: force-share=on can only be used with read-only images
-+no file open, try 'help open'
-
- _qemu_io_wrapper -c open -r -U TEST_DIR/t.qcow2 -c read 0 512
-
 -- 
 2.9.4
