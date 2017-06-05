@@ -1,21 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45464)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52844)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dHw7Z-00014D-5f
-	for qemu-devel@nongnu.org; Mon, 05 Jun 2017 13:48:54 -0400
+	(envelope-from <no-reply@patchew.org>) id 1dHweG-0007tR-Nz
+	for qemu-devel@nongnu.org; Mon, 05 Jun 2017 14:22:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dHw7Y-0001qs-9i
-	for qemu-devel@nongnu.org; Mon, 05 Jun 2017 13:48:53 -0400
-References: <1496682098-1540-1-git-send-email-peter.maydell@linaro.org>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <9aa7798d-e205-97ac-c3bb-14c13e4e91c0@redhat.com>
-Date: Mon, 5 Jun 2017 12:48:42 -0500
+	(envelope-from <no-reply@patchew.org>) id 1dHweD-00005q-HT
+	for qemu-devel@nongnu.org; Mon, 05 Jun 2017 14:22:40 -0400
+Resent-Message-Id: <E1dHweD-00005q-HT@eggs.gnu.org>
+Received: from sender-of-o52.zoho.com ([135.84.80.217]:21462)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1dHweD-000050-8O
+	for qemu-devel@nongnu.org; Mon, 05 Jun 2017 14:22:37 -0400
+Reply-To: <qemu-devel@nongnu.org>
+In-Reply-To: <1496679576-14336-1-git-send-email-peter.maydell@linaro.org>
+Message-ID: <149668694016.4708.11851416343525102830@f98a8425f76e>
 MIME-Version: 1.0
-In-Reply-To: <1496682098-1540-1-git-send-email-peter.maydell@linaro.org>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="paaWjxP0NvV7XLQhGbAg8wferWTHs7HVw"
-Subject: Re: [Qemu-devel] [PATCH] block/gluster.c: Handle
- qdict_array_entries() failure
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Mon, 5 Jun 2017 11:22:20 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PATCH 0/2] slirp: handle errors in sosendoob()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,63 +28,100 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, Jeff Cody <jcody@redhat.com>, Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org, patches@linaro.org
+To: peter.maydell@linaro.org
+Cc: famz@redhat.com, qemu-devel@nongnu.org, samuel.thibault@ens-lyon.org, jan.kiszka@siemens.com, patches@linaro.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---paaWjxP0NvV7XLQhGbAg8wferWTHs7HVw
-From: Eric Blake <eblake@redhat.com>
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, Jeff Cody <jcody@redhat.com>,
- Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org, patches@linaro.org
-Message-ID: <9aa7798d-e205-97ac-c3bb-14c13e4e91c0@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] block/gluster.c: Handle
- qdict_array_entries() failure
-References: <1496682098-1540-1-git-send-email-peter.maydell@linaro.org>
-In-Reply-To: <1496682098-1540-1-git-send-email-peter.maydell@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 06/05/2017 12:01 PM, Peter Maydell wrote:
-> In qemu_gluster_parse_json(), the call to qdict_array_entries()
-> could return a negative error code, which we were ignoring
-> because we assigned the result to an unsigned variable.
-> Fix this by using the 'int' type instead, which matches the
-> return type of qdict_array_entries() and also the type
-> we use for the loop enumeration variable 'i'.
->=20
-> (Spotted by Coverity, CID 1360960.)
->=20
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-> ---
->  block/gluster.c | 3 +--
->  1 file changed, 1 insertion(+), 2 deletions(-)
-
-Reviewed-by: Eric Blake <eblake@redhat.com>
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---paaWjxP0NvV7XLQhGbAg8wferWTHs7HVw
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEcBAEBCAAGBQJZNZl6AAoJEKeha0olJ0NqT40IAJ/zVA2O0aCN171OqSYshJs2
-UFdw8RXOtLQzv9ool/E2FW1NIBqlhgnqbM6sVvwenLr1ZEShsym7IWAIUbNc92IH
-v8Ylslen5iQpqYPNG9lBWnUutBmsf7y1LIntV3pF3hpgAxzzTi86FSHxfmyhrSMy
-1KZ7Z64tABMO767a5wjZSNEnLOold1QU3XgJu/5aVJ7QU1d/yspCNDG3o53E/pU4
-pXR95v7eEJkwEtHc+kzWLKNcNTvI4mCovKJc4xee7IFXVjAqjqQax4Xn+wjNWGrT
-ljPoZOWRk2AJeuVcIy4iwMj1Ah5denv9CBcfxoErYMygfmeHg5oG9GC5ckU5Mqk=
-=Asp8
------END PGP SIGNATURE-----
-
---paaWjxP0NvV7XLQhGbAg8wferWTHs7HVw--
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKTWVzc2FnZS1pZDogMTQ5
+NjY3OTU3Ni0xNDMzNi0xLWdpdC1zZW5kLWVtYWlsLXBldGVyLm1heWRlbGxAbGluYXJvLm9yZwpT
+dWJqZWN0OiBbUWVtdS1kZXZlbF0gW1BBVENIIDAvMl0gc2xpcnA6IGhhbmRsZSBlcnJvcnMgaW4g
+c29zZW5kb29iKCkKVHlwZTogc2VyaWVzCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jp
+bi9iYXNoCgpCQVNFPWJhc2UKbj0xCnRvdGFsPSQoZ2l0IGxvZyAtLW9uZWxpbmUgJEJBU0UuLiB8
+IHdjIC1sKQpmYWlsZWQ9MAoKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApn
+aXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKCmNvbW1pdHM9IiQoZ2l0IGxvZyAt
+LWZvcm1hdD0lSCAtLXJldmVyc2UgJEJBU0UuLikiCmZvciBjIGluICRjb21taXRzOyBkbwogICAg
+ZWNobyAiQ2hlY2tpbmcgUEFUQ0ggJG4vJHRvdGFsOiAkKGdpdCBsb2cgLW4gMSAtLWZvcm1hdD0l
+cyAkYykuLi4iCiAgICBpZiAhIGdpdCBzaG93ICRjIC0tZm9ybWF0PWVtYWlsIHwgLi9zY3JpcHRz
+L2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFjayAtOyB0aGVuCiAgICAgICAgZmFpbGVkPTEKICAgICAg
+ICBlY2hvCiAgICBmaQogICAgbj0kKChuKzEpKQpkb25lCgpleGl0ICRmYWlsZWQKPT09IFRFU1Qg
+U0NSSVBUIEVORCA9PT0KClVwZGF0aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4
+ODg3MTMzODQKU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0Jwo5YWYxZWQwIHNsaXJwOiBI
+YW5kbGUgZXJyb3IgcmV0dXJucyBmcm9tIHNvc2VuZG9vYigpCmJhMzZjODYgc2xpcnA6IEhhbmRs
+ZSBlcnJvciByZXR1cm5zIGZyb20gc2xpcnBfc2VuZCgpIGluIHNvc2VuZG9vYigpCgo9PT0gT1VU
+UFVUIEJFR0lOID09PQpDaGVja2luZyBQQVRDSCAxLzI6IHNsaXJwOiBIYW5kbGUgZXJyb3IgcmV0
+dXJucyBmcm9tIHNsaXJwX3NlbmQoKSBpbiBzb3NlbmRvb2IoKS4uLgpFUlJPUjogY29kZSBpbmRl
+bnQgc2hvdWxkIG5ldmVyIHVzZSB0YWJzCiMzMzogRklMRTogc2xpcnAvc29ja2V0LmM6MzU0Ogor
+XkleSXVpbnQzMl90IHVyZ2MgPSBzby0+c29fdXJnYzskCgpFUlJPUjogY29kZSBpbmRlbnQgc2hv
+dWxkIG5ldmVyIHVzZSB0YWJzCiMzNjogRklMRTogc2xpcnAvc29ja2V0LmM6MzU2OgorXkleSWlm
+IChsZW4gPiB1cmdjKSB7JAoKRVJST1I6IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFi
+cwojMzc6IEZJTEU6IHNsaXJwL3NvY2tldC5jOjM1NzoKK15JXkleSWxlbiA9IHVyZ2M7JAoKRVJS
+T1I6IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwojMzg6IEZJTEU6IHNsaXJwL3Nv
+Y2tldC5jOjM1ODoKK15JXkl9JAoKRVJST1I6IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2Ug
+dGFicwojNDI6IEZJTEU6IHNsaXJwL3NvY2tldC5jOjM2MDoKK15JXkl1cmdjIC09IGxlbjskCgpF
+UlJPUjogY29kZSBpbmRlbnQgc2hvdWxkIG5ldmVyIHVzZSB0YWJzCiM0MzogRklMRTogc2xpcnAv
+c29ja2V0LmM6MzYxOgorXkleSWlmICh1cmdjKSB7JAoKRVJST1I6IGNvZGUgaW5kZW50IHNob3Vs
+ZCBuZXZlciB1c2UgdGFicwojNDY6IEZJTEU6IHNsaXJwL3NvY2tldC5jOjM2MzoKK15JXkleSWlm
+IChuID4gdXJnYykgeyQKCkVSUk9SOiBjb2RlIGluZGVudCBzaG91bGQgbmV2ZXIgdXNlIHRhYnMK
+IzQ3OiBGSUxFOiBzbGlycC9zb2NrZXQuYzozNjQ6CiteSV5JXkleSW4gPSB1cmdjOyQKCkVSUk9S
+OiBjb2RlIGluZGVudCBzaG91bGQgbmV2ZXIgdXNlIHRhYnMKIzQ4OiBGSUxFOiBzbGlycC9zb2Nr
+ZXQuYzozNjU6CiteSV5JXkl9JAoKRVJST1I6IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2Ug
+dGFicwojNTQ6IEZJTEU6IHNsaXJwL3NvY2tldC5jOjM3MDoKK15JfSQKCkVSUk9SOiBjb2RlIGlu
+ZGVudCBzaG91bGQgbmV2ZXIgdXNlIHRhYnMKIzU5OiBGSUxFOiBzbGlycC9zb2NrZXQuYzozNzM6
+CiteSWlmIChuICE9IGxlbikgeyQKCkVSUk9SOiBjb2RlIGluZGVudCBzaG91bGQgbmV2ZXIgdXNl
+IHRhYnMKIzYwOiBGSUxFOiBzbGlycC9zb2NrZXQuYzozNzQ6CiteSV5JREVCVUdfRVJST1IoKGRm
+ZCwgIkRpZG4ndCBzZW5kIGFsbCBkYXRhIHVyZ2VudGx5IFhYWFhYXG4iKSk7JAoKRVJST1I6IGNv
+ZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwojNjE6IEZJTEU6IHNsaXJwL3NvY2tldC5j
+OjM3NToKK15JfSQKCkVSUk9SOiBjb2RlIGluZGVudCBzaG91bGQgbmV2ZXIgdXNlIHRhYnMKIzY0
+OiBGSUxFOiBzbGlycC9zb2NrZXQuYzozNzc6CiteSWlmIChuIDwgMCkgeyQKCkVSUk9SOiBjb2Rl
+IGluZGVudCBzaG91bGQgbmV2ZXIgdXNlIHRhYnMKIzY1OiBGSUxFOiBzbGlycC9zb2NrZXQuYzoz
+Nzg6CiteSV5JcmV0dXJuIG47JAoKRVJST1I6IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2Ug
+dGFicwojNjc6IEZJTEU6IHNsaXJwL3NvY2tldC5jOjM4MDoKK15Jc28tPnNvX3VyZ2MgLT0gbjsk
+CgpFUlJPUjogbGluZSBvdmVyIDkwIGNoYXJhY3RlcnMKIzY4OiBGSUxFOiBzbGlycC9zb2NrZXQu
+YzozODE6CisJREVCVUdfTUlTQygoZGZkLCAiIC0tLTIgc2VudCAlZCBieXRlcyB1cmdlbnQgZGF0
+YSwgJWQgdXJnZW50IGJ5dGVzIGxlZnRcbiIsIG4sIHNvLT5zb191cmdjKSk7CgpFUlJPUjogY29k
+ZSBpbmRlbnQgc2hvdWxkIG5ldmVyIHVzZSB0YWJzCiM2ODogRklMRTogc2xpcnAvc29ja2V0LmM6
+MzgxOgorXklERUJVR19NSVNDKChkZmQsICIgLS0tMiBzZW50ICVkIGJ5dGVzIHVyZ2VudCBkYXRh
+LCAlZCB1cmdlbnQgYnl0ZXMgbGVmdFxuIiwgbiwgc28tPnNvX3VyZ2MpKTskCgp0b3RhbDogMTgg
+ZXJyb3JzLCAwIHdhcm5pbmdzLCA1MSBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHls
+ZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZh
+bHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFU
+Q0ggaW4gTUFJTlRBSU5FUlMuCgpDaGVja2luZyBQQVRDSCAyLzI6IHNsaXJwOiBIYW5kbGUgZXJy
+b3IgcmV0dXJucyBmcm9tIHNvc2VuZG9vYigpLi4uCkVSUk9SOiBjb2RlIGluZGVudCBzaG91bGQg
+bmV2ZXIgdXNlIHRhYnMKIzI1OiBGSUxFOiBzbGlycC9zYnVmLmM6OTQ6CiteSV5JKHZvaWQpc29z
+ZW5kb29iKHNvKTskCgpFUlJPUjogY29kZSBpbmRlbnQgc2hvdWxkIG5ldmVyIHVzZSB0YWJzCiMz
+ODogRklMRTogc2xpcnAvc29ja2V0LmM6NDA3OgorXkleSWlmIChzb3NlbmRvb2Ioc28pIDwgc28t
+PnNvX3VyZ2MpIHskCgpFUlJPUjogY29kZSBpbmRlbnQgc2hvdWxkIG5ldmVyIHVzZSB0YWJzCiMz
+OTogRklMRTogc2xpcnAvc29ja2V0LmM6NDA4OgorXkleSV5JLyogVHJlYXQgYSBzaG9ydCB3cml0
+ZSBhcyBhIGZhdGFsIGVycm9yIHRvbywkCgpFUlJPUjogY29kZSBpbmRlbnQgc2hvdWxkIG5ldmVy
+IHVzZSB0YWJzCiM0MDogRklMRTogc2xpcnAvc29ja2V0LmM6NDA5OgorXkleSV5JICogcmF0aGVy
+IHRoYW4gY29udGludWluZyBvbiBhbmQgc2VuZGluZyB0aGUgdXJnZW50JAoKRVJST1I6IGNvZGUg
+aW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwojNDE6IEZJTEU6IHNsaXJwL3NvY2tldC5jOjQx
+MDoKK15JXkleSSAqIGRhdGEgYXMgaWYgaXQgd2VyZSBub24tdXJnZW50IGFuZCBsZWF2aW5nIHRo
+ZSQKCkVSUk9SOiBjb2RlIGluZGVudCBzaG91bGQgbmV2ZXIgdXNlIHRhYnMKIzQyOiBGSUxFOiBz
+bGlycC9zb2NrZXQuYzo0MTE6CiteSV5JXkkgKiBzb191cmdjIGNvdW50IHdyb25nLiQKCkVSUk9S
+OiBjb2RlIGluZGVudCBzaG91bGQgbmV2ZXIgdXNlIHRhYnMKIzQzOiBGSUxFOiBzbGlycC9zb2Nr
+ZXQuYzo0MTI6CiteSV5JXkkgKi8kCgpFUlJPUjogY29kZSBpbmRlbnQgc2hvdWxkIG5ldmVyIHVz
+ZSB0YWJzCiM0NDogRklMRTogc2xpcnAvc29ja2V0LmM6NDEzOgorXkleSV5JZ290byBlcnJfZGlz
+Y29ubmVjdGVkOyQKCkVSUk9SOiBjb2RlIGluZGVudCBzaG91bGQgbmV2ZXIgdXNlIHRhYnMKIzQ1
+OiBGSUxFOiBzbGlycC9zb2NrZXQuYzo0MTQ6CiteSV5JfSQKCkVSUk9SOiBjb2RlIGluZGVudCBz
+aG91bGQgbmV2ZXIgdXNlIHRhYnMKIzU4OiBGSUxFOiBzbGlycC9zb2NrZXQuYzo0NTg6CiteSV5J
+Z290byBlcnJfZGlzY29ubmVjdGVkOyQKCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJz
+CiM2ODogRklMRTogc2xpcnAvc29ja2V0LmM6NDg3OgorCURFQlVHX01JU0MoKGRmZCwgIiAtLS0g
+c293cml0ZSBkaXNjb25uZWN0ZWQsIHNvLT5zb19zdGF0ZSA9ICV4LCBlcnJubyA9ICVkXG4iLAoK
+RVJST1I6IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwojNjg6IEZJTEU6IHNsaXJw
+L3NvY2tldC5jOjQ4NzoKK15JREVCVUdfTUlTQygoZGZkLCAiIC0tLSBzb3dyaXRlIGRpc2Nvbm5l
+Y3RlZCwgc28tPnNvX3N0YXRlID0gJXgsIGVycm5vID0gJWRcbiIsJAoKRVJST1I6IGNvZGUgaW5k
+ZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwojNjk6IEZJTEU6IHNsaXJwL3NvY2tldC5jOjQ4ODoK
+K15JXkkgICAgc28tPnNvX3N0YXRlLCBlcnJubykpOyQKCkVSUk9SOiBjb2RlIGluZGVudCBzaG91
+bGQgbmV2ZXIgdXNlIHRhYnMKIzcwOiBGSUxFOiBzbGlycC9zb2NrZXQuYzo0ODk6CiteSXNvZmNh
+bnRzZW5kbW9yZShzbyk7JAoKRVJST1I6IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFi
+cwojNzE6IEZJTEU6IHNsaXJwL3NvY2tldC5jOjQ5MDoKK15JdGNwX3NvY2tjbG9zZWQoc290b3Rj
+cGNiKHNvKSk7JAoKRVJST1I6IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwojNzI6
+IEZJTEU6IHNsaXJwL3NvY2tldC5jOjQ5MToKK15JcmV0dXJuIC0xOyQKCnRvdGFsOiAxNSBlcnJv
+cnMsIDEgd2FybmluZ3MsIDQ4IGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHBy
+b2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2Ug
+cG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBp
+biBNQUlOVEFJTkVSUy4KCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3
+aXRoIGNvZGU6IDEKCgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hl
+dyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0
+Y2hldy1kZXZlbEBmcmVlbGlzdHMub3Jn
