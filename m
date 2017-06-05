@@ -1,16 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60988)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:32777)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dHxE0-0001ht-PO
-	for qemu-devel@nongnu.org; Mon, 05 Jun 2017 14:59:38 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1dHxE3-0001je-Qs
+	for qemu-devel@nongnu.org; Mon, 05 Jun 2017 14:59:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dHxDy-0007k8-SG
-	for qemu-devel@nongnu.org; Mon, 05 Jun 2017 14:59:36 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1dHxE2-0007oh-Do
+	for qemu-devel@nongnu.org; Mon, 05 Jun 2017 14:59:39 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:33688)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1dHxE2-0007nr-4o
+	for qemu-devel@nongnu.org; Mon, 05 Jun 2017 14:59:38 -0400
 From: Eduardo Habkost <ehabkost@redhat.com>
-Date: Mon,  5 Jun 2017 15:59:18 -0300
-Message-Id: <20170605185927.12111-2-ehabkost@redhat.com>
+Date: Mon,  5 Jun 2017 15:59:19 -0300
+Message-Id: <20170605185927.12111-3-ehabkost@redhat.com>
 In-Reply-To: <20170605185927.12111-1-ehabkost@redhat.com>
 References: <20170605185927.12111-1-ehabkost@redhat.com>
-Subject: [Qemu-devel] [PULL 01/10] pc: Use "min-[x]level" on compat_props
+Subject: [Qemu-devel] [PULL 02/10] numa: consolidate cpu_preplug
+ fixups/checks for pc/arm/spapr
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,215 +25,173 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Peter Maydell <peter.maydell@linaro.org>, Stefan Hajnoczi <stefanha@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-stable@nongnu.org
+Cc: qemu-devel@nongnu.org, Igor Mammedov <imammedo@redhat.com>
 
-Since the automatic cpuid-level code was introduced in commit
-c39c0edf9bb3b968ba95484465a50c7b19f4aa3a ("target-i386: Automatically
-set level/xlevel/xlevel2 when needed"), the CPU model tables just define
-the default CPUID level code (set using "min-level").  Setting
-"[x]level" forces CPUID level to a specific value and disable the
-automatic-level logic.
+From: Igor Mammedov <imammedo@redhat.com>
 
-But the PC compat code was not updated and the existing "[x]level"
-compat properties broke compatibility for people using features that
-triggered the auto-level code.  To keep previous behavior, we should set
-"min-[x]level" instead of "[x]level" on compat_props.
-
-This was not a problem for most cases, because old machine-types don't
-have full-cpuid-auto-level enabled.  The only common use case it broke
-was the CPUID[7] auto-level code, that was already enabled since the
-first CPUID[7] feature was introduced (in QEMU 1.4.0).
-
-This causes the regression reported at:
-https://bugzilla.redhat.com/show_bug.cgi?id=1454641
-
-Change the PC compat code to use "min-[x]level" instead of "[x]level" on
-compat_props, and add new test cases to ensure we don't break this
-again.
-
-Reported-by: "Guo, Zhiyi" <zhguo@redhat.com>
-Fixes: c39c0edf9bb ("target-i386: Automatically set level/xlevel/xlevel2 when needed")
-Cc: qemu-stable@nongnu.org
-Acked-by: Michael S. Tsirkin <mst@redhat.com>
+Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
+Message-Id: <1496161442-96665-2-git-send-email-imammedo@redhat.com>
+[ehabkost: Fix indentation]
 Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 ---
- include/hw/i386/pc.h          | 42 +++++++++++++++++++++---------------------
- tests/test-x86-cpuid-compat.c | 38 ++++++++++++++++++++++++++++++++++++++
- 2 files changed, 59 insertions(+), 21 deletions(-)
+ include/sysemu/numa.h |  1 +
+ hw/arm/virt.c         | 16 ++--------------
+ hw/i386/pc.c          | 17 +----------------
+ hw/ppc/spapr.c        | 17 +----------------
+ numa.c                | 23 +++++++++++++++++++++++
+ 5 files changed, 28 insertions(+), 46 deletions(-)
 
-diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
-index e447f5d8f4..d071c9c0e9 100644
---- a/include/hw/i386/pc.h
-+++ b/include/hw/i386/pc.h
-@@ -566,75 +566,75 @@ bool e820_get_entry(int, uint32_t, uint64_t *, uint64_t *);
-         .value    = "off",\
-     },{\
-         .driver   = "qemu64" "-" TYPE_X86_CPU,\
--        .property = "level",\
-+        .property = "min-level",\
-         .value    = stringify(4),\
-     },{\
-         .driver   = "kvm64" "-" TYPE_X86_CPU,\
--        .property = "level",\
-+        .property = "min-level",\
-         .value    = stringify(5),\
-     },{\
-         .driver   = "pentium3" "-" TYPE_X86_CPU,\
--        .property = "level",\
-+        .property = "min-level",\
-         .value    = stringify(2),\
-     },{\
-         .driver   = "n270" "-" TYPE_X86_CPU,\
--        .property = "level",\
-+        .property = "min-level",\
-         .value    = stringify(5),\
-     },{\
-         .driver   = "Conroe" "-" TYPE_X86_CPU,\
--        .property = "level",\
-+        .property = "min-level",\
-         .value    = stringify(4),\
-     },{\
-         .driver   = "Penryn" "-" TYPE_X86_CPU,\
--        .property = "level",\
-+        .property = "min-level",\
-         .value    = stringify(4),\
-     },{\
-         .driver   = "Nehalem" "-" TYPE_X86_CPU,\
--        .property = "level",\
-+        .property = "min-level",\
-         .value    = stringify(4),\
-     },{\
-         .driver   = "n270" "-" TYPE_X86_CPU,\
--        .property = "xlevel",\
-+        .property = "min-xlevel",\
-         .value    = stringify(0x8000000a),\
-     },{\
-         .driver   = "Penryn" "-" TYPE_X86_CPU,\
--        .property = "xlevel",\
-+        .property = "min-xlevel",\
-         .value    = stringify(0x8000000a),\
-     },{\
-         .driver   = "Conroe" "-" TYPE_X86_CPU,\
--        .property = "xlevel",\
-+        .property = "min-xlevel",\
-         .value    = stringify(0x8000000a),\
-     },{\
-         .driver   = "Nehalem" "-" TYPE_X86_CPU,\
--        .property = "xlevel",\
-+        .property = "min-xlevel",\
-         .value    = stringify(0x8000000a),\
-     },{\
-         .driver   = "Westmere" "-" TYPE_X86_CPU,\
--        .property = "xlevel",\
-+        .property = "min-xlevel",\
-         .value    = stringify(0x8000000a),\
-     },{\
-         .driver   = "SandyBridge" "-" TYPE_X86_CPU,\
--        .property = "xlevel",\
-+        .property = "min-xlevel",\
-         .value    = stringify(0x8000000a),\
-     },{\
-         .driver   = "IvyBridge" "-" TYPE_X86_CPU,\
--        .property = "xlevel",\
-+        .property = "min-xlevel",\
-         .value    = stringify(0x8000000a),\
-     },{\
-         .driver   = "Haswell" "-" TYPE_X86_CPU,\
--        .property = "xlevel",\
-+        .property = "min-xlevel",\
-         .value    = stringify(0x8000000a),\
-     },{\
-         .driver   = "Haswell-noTSX" "-" TYPE_X86_CPU,\
--        .property = "xlevel",\
-+        .property = "min-xlevel",\
-         .value    = stringify(0x8000000a),\
-     },{\
-         .driver   = "Broadwell" "-" TYPE_X86_CPU,\
--        .property = "xlevel",\
-+        .property = "min-xlevel",\
-         .value    = stringify(0x8000000a),\
-     },{\
-         .driver   = "Broadwell-noTSX" "-" TYPE_X86_CPU,\
--        .property = "xlevel",\
-+        .property = "min-xlevel",\
-         .value    = stringify(0x8000000a),\
-     },{\
-         .driver = TYPE_X86_CPU,\
-@@ -860,7 +860,7 @@ bool e820_get_entry(int, uint32_t, uint64_t *, uint64_t *);
-         .value    = stringify(2),\
-     },{\
-         .driver   = "Conroe-" TYPE_X86_CPU,\
--        .property = "level",\
-+        .property = "min-level",\
-         .value    = stringify(2),\
-     },{\
-         .driver   = "Penryn-" TYPE_X86_CPU,\
-@@ -868,7 +868,7 @@ bool e820_get_entry(int, uint32_t, uint64_t *, uint64_t *);
-         .value    = stringify(2),\
-     },{\
-         .driver   = "Penryn-" TYPE_X86_CPU,\
--        .property = "level",\
-+        .property = "min-level",\
-         .value    = stringify(2),\
-     },{\
-         .driver   = "Nehalem-" TYPE_X86_CPU,\
-@@ -876,7 +876,7 @@ bool e820_get_entry(int, uint32_t, uint64_t *, uint64_t *);
-         .value    = stringify(2),\
-     },{\
-         .driver   = "Nehalem-" TYPE_X86_CPU,\
--        .property = "level",\
-+        .property = "min-level",\
-         .value    = stringify(2),\
-     },{\
-         .driver   = "virtio-net-pci",\
-diff --git a/tests/test-x86-cpuid-compat.c b/tests/test-x86-cpuid-compat.c
-index 6c71e46391..4166ce54b7 100644
---- a/tests/test-x86-cpuid-compat.c
-+++ b/tests/test-x86-cpuid-compat.c
-@@ -313,6 +313,44 @@ int main(int argc, char **argv)
-     add_cpuid_test("x86/cpuid/auto-xlevel2/pc-2.7",
-                    "-machine pc-i440fx-2.7 -cpu 486,+xstore",
-                    "xlevel2", 0);
-+    /*
-+     * QEMU 1.4.0 had auto-level enabled for CPUID[7], already,
-+     * and the compat code that sets default level shouldn't
-+     * disable the auto-level=7 code:
-+     */
-+    add_cpuid_test("x86/cpuid/auto-level7/pc-i440fx-1.4/off",
-+                   "-machine pc-i440fx-1.4 -cpu Nehalem",
-+                   "level", 2);
-+    add_cpuid_test("x86/cpuid/auto-level7/pc-i440fx-1.5/on",
-+                   "-machine pc-i440fx-1.4 -cpu Nehalem,+smap",
-+                   "level", 7);
-+    add_cpuid_test("x86/cpuid/auto-level7/pc-i440fx-2.3/off",
-+                   "-machine pc-i440fx-2.3 -cpu Penryn",
-+                   "level", 4);
-+    add_cpuid_test("x86/cpuid/auto-level7/pc-i440fx-2.3/on",
-+                   "-machine pc-i440fx-2.3 -cpu Penryn,+erms",
-+                   "level", 7);
-+    add_cpuid_test("x86/cpuid/auto-level7/pc-i440fx-2.9/off",
-+                   "-machine pc-i440fx-2.9 -cpu Conroe",
-+                   "level", 10);
-+    add_cpuid_test("x86/cpuid/auto-level7/pc-i440fx-2.9/on",
-+                   "-machine pc-i440fx-2.9 -cpu Conroe,+erms",
-+                   "level", 10);
-+
-+    /*
-+     * xlevel doesn't have any feature that triggers auto-level
-+     * code on old machine-types.  Just check that the compat code
-+     * is working correctly:
-+     */
-+    add_cpuid_test("x86/cpuid/xlevel-compat/pc-i440fx-2.3",
-+                   "-machine pc-i440fx-2.3 -cpu SandyBridge",
-+                   "xlevel", 0x8000000a);
-+    add_cpuid_test("x86/cpuid/xlevel-compat/pc-i440fx-2.4/npt-off",
-+                   "-machine pc-i440fx-2.4 -cpu SandyBridge,",
-+                   "xlevel", 0x80000008);
-+    add_cpuid_test("x86/cpuid/xlevel-compat/pc-i440fx-2.4/npt-on",
-+                   "-machine pc-i440fx-2.4 -cpu SandyBridge,+npt",
-+                   "xlevel", 0x80000008);
+diff --git a/include/sysemu/numa.h b/include/sysemu/numa.h
+index 7ffde5b119..610eece211 100644
+--- a/include/sysemu/numa.h
++++ b/include/sysemu/numa.h
+@@ -35,4 +35,5 @@ void numa_legacy_auto_assign_ram(MachineClass *mc, NodeInfo *nodes,
+                                  int nb_nodes, ram_addr_t size);
+ void numa_default_auto_assign_ram(MachineClass *mc, NodeInfo *nodes,
+                                   int nb_nodes, ram_addr_t size);
++void numa_cpu_pre_plug(const CPUArchId *slot, DeviceState *dev, Error **errp);
+ #endif
+diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+index 4db2d4207c..010f7244bf 100644
+--- a/hw/arm/virt.c
++++ b/hw/arm/virt.c
+@@ -1372,7 +1372,6 @@ static void machvirt_init(MachineState *machine)
+     for (n = 0; n < possible_cpus->len; n++) {
+         Object *cpuobj;
+         CPUState *cs;
+-        int node_id;
  
-     /* Test feature parsing */
-     add_feature_test("x86/cpuid/features/plus",
+         if (n >= smp_cpus) {
+             break;
+@@ -1385,19 +1384,8 @@ static void machvirt_init(MachineState *machine)
+         cs = CPU(cpuobj);
+         cs->cpu_index = n;
+ 
+-        node_id = possible_cpus->cpus[cs->cpu_index].props.node_id;
+-        if (!possible_cpus->cpus[cs->cpu_index].props.has_node_id) {
+-            /* by default CPUState::numa_node was 0 if it's not set via CLI
+-             * keep it this way for now but in future we probably should
+-             * refuse to start up with incomplete numa mapping */
+-             node_id = 0;
+-        }
+-        if (cs->numa_node == CPU_UNSET_NUMA_NODE_ID) {
+-            cs->numa_node = node_id;
+-        } else {
+-            /* CPU isn't device_add compatible yet, this shouldn't happen */
+-            error_setg(&error_abort, "user set node-id not implemented");
+-        }
++        numa_cpu_pre_plug(&possible_cpus->cpus[cs->cpu_index], DEVICE(cpuobj),
++                          &error_fatal);
+ 
+         if (!vms->secure) {
+             object_property_set_bool(cpuobj, false, "has_el3", NULL);
+diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+index 107a34125b..5b07be61cf 100644
+--- a/hw/i386/pc.c
++++ b/hw/i386/pc.c
+@@ -1893,7 +1893,6 @@ static void pc_cpu_pre_plug(HotplugHandler *hotplug_dev,
+                             DeviceState *dev, Error **errp)
+ {
+     int idx;
+-    int node_id;
+     CPUState *cs;
+     CPUArchId *cpu_slot;
+     X86CPUTopoInfo topo;
+@@ -1984,21 +1983,7 @@ static void pc_cpu_pre_plug(HotplugHandler *hotplug_dev,
+     cs = CPU(cpu);
+     cs->cpu_index = idx;
+ 
+-    node_id = cpu_slot->props.node_id;
+-    if (!cpu_slot->props.has_node_id) {
+-        /* by default CPUState::numa_node was 0 if it's not set via CLI
+-         * keep it this way for now but in future we probably should
+-         * refuse to start up with incomplete numa mapping */
+-        node_id = 0;
+-    }
+-    if (cs->numa_node == CPU_UNSET_NUMA_NODE_ID) {
+-        cs->numa_node = node_id;
+-    } else if (cs->numa_node != node_id) {
+-            error_setg(errp, "node-id %d must match numa node specified"
+-                "with -numa option for cpu-index %d",
+-                cs->numa_node, cs->cpu_index);
+-            return;
+-    }
++    numa_cpu_pre_plug(cpu_slot, dev, errp);
+ }
+ 
+ static void pc_machine_device_pre_plug_cb(HotplugHandler *hotplug_dev,
+diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+index ab3aab1279..94563cd8f5 100644
+--- a/hw/ppc/spapr.c
++++ b/hw/ppc/spapr.c
+@@ -2922,11 +2922,9 @@ static void spapr_core_pre_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
+     MachineClass *mc = MACHINE_GET_CLASS(hotplug_dev);
+     Error *local_err = NULL;
+     CPUCore *cc = CPU_CORE(dev);
+-    sPAPRCPUCore *sc = SPAPR_CPU_CORE(dev);
+     char *base_core_type = spapr_get_cpu_core_type(machine->cpu_model);
+     const char *type = object_get_typename(OBJECT(dev));
+     CPUArchId *core_slot;
+-    int node_id;
+     int index;
+ 
+     if (dev->hotplugged && !mc->has_hotpluggable_cpus) {
+@@ -2967,20 +2965,7 @@ static void spapr_core_pre_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
+         goto out;
+     }
+ 
+-    node_id = core_slot->props.node_id;
+-    if (!core_slot->props.has_node_id) {
+-        /* by default CPUState::numa_node was 0 if it's not set via CLI
+-         * keep it this way for now but in future we probably should
+-         * refuse to start up with incomplete numa mapping */
+-        node_id = 0;
+-    }
+-    if (sc->node_id == CPU_UNSET_NUMA_NODE_ID) {
+-        sc->node_id = node_id;
+-    } else if (sc->node_id != node_id) {
+-        error_setg(&local_err, "node-id %d must match numa node specified"
+-            "with -numa option for cpu-index %d", sc->node_id, cc->core_id);
+-        goto out;
+-    }
++    numa_cpu_pre_plug(core_slot, dev, &local_err);
+ 
+ out:
+     g_free(base_core_type);
+diff --git a/numa.c b/numa.c
+index be50c62aa9..1c35a79b57 100644
+--- a/numa.c
++++ b/numa.c
+@@ -533,6 +533,29 @@ void parse_numa_opts(MachineState *ms)
+     }
+ }
+ 
++void numa_cpu_pre_plug(const CPUArchId *slot, DeviceState *dev, Error **errp)
++{
++    int mapped_node_id; /* set by -numa option */
++    int node_id = object_property_get_int(OBJECT(dev), "node-id", &error_abort);
++
++    /* by default CPUState::numa_node was 0 if it wasn't set explicitly
++     * TODO: make it error when incomplete numa mapping support is removed
++     */
++    mapped_node_id = slot->props.node_id;
++    if (!slot->props.has_node_id) {
++        mapped_node_id = 0;
++    }
++
++    if (node_id == CPU_UNSET_NUMA_NODE_ID) {
++        /* due to bug in libvirt, it doesn't pass node-id from props on
++         * device_add as expected, so we have to fix it up here */
++        object_property_set_int(OBJECT(dev), mapped_node_id, "node-id", errp);
++    } else if (node_id != mapped_node_id) {
++        error_setg(errp, "node-id=%d must match numa node specified "
++                   "with -numa option", node_id);
++    }
++}
++
+ static void allocate_system_memory_nonnuma(MemoryRegion *mr, Object *owner,
+                                            const char *name,
+                                            uint64_t ram_size)
 -- 
 2.11.0.259.g40922b1
