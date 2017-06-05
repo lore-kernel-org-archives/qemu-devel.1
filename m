@@ -1,20 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41835)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43043)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dHrIF-0000BY-J0
-	for qemu-devel@nongnu.org; Mon, 05 Jun 2017 08:39:36 -0400
+	(envelope-from <amarnath.valluri@intel.com>) id 1dHrN0-0004ls-Ut
+	for qemu-devel@nongnu.org; Mon, 05 Jun 2017 08:44:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dHrIE-0006C5-GE
-	for qemu-devel@nongnu.org; Mon, 05 Jun 2017 08:39:35 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:55654)
+	(envelope-from <amarnath.valluri@intel.com>) id 1dHrMy-00019A-Ba
+	for qemu-devel@nongnu.org; Mon, 05 Jun 2017 08:44:31 -0400
+Received: from mga07.intel.com ([134.134.136.100]:63497)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1dHrIE-0006As-7c
-	for qemu-devel@nongnu.org; Mon, 05 Jun 2017 08:39:34 -0400
-From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Mon,  5 Jun 2017 14:39:08 +0200
-Message-Id: <20170605123908.18777-20-pbonzini@redhat.com>
-In-Reply-To: <20170605123908.18777-1-pbonzini@redhat.com>
-References: <20170605123908.18777-1-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PATCH 19/19] block: make accounting thread-safe
+	(Exim 4.71) (envelope-from <amarnath.valluri@intel.com>)
+	id 1dHrMy-00017x-2R
+	for qemu-devel@nongnu.org; Mon, 05 Jun 2017 08:44:28 -0400
+From: Amarnath Valluri <amarnath.valluri@intel.com>
+Date: Mon,  5 Jun 2017 15:45:04 +0300
+Message-Id: <1496666711-14630-2-git-send-email-amarnath.valluri@intel.com>
+In-Reply-To: <1496666711-14630-1-git-send-email-amarnath.valluri@intel.com>
+References: <1496666711-14630-1-git-send-email-amarnath.valluri@intel.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH v5 1/8] tpm-backend: Remove unneeded member
+ variable from backend class
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,146 +29,68 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: famz@redhat.com, Alberto Garcia <berto@igalia.com>
+Cc: marcandre.lureau@gmail.com, Amarnath Valluri <amarnath.valluri@intel.com>
 
-I'm not trying too hard yet.  Later, with multiqueue support,
-this may cause mutex contention or cacheline bouncing.
+TPMDriverOps inside TPMBackend is not required, as it is supposed to be a class
+member. The only possible reason for keeping in TPMBackend was, to get the
+backend type in tpm.c where dedicated backend api, tpm_backend_get_type() is
+present.
 
-Cc: Alberto Garcia <berto@igalia.com>
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+Signed-off-by: Amarnath Valluri <amarnath.valluri@intel.com>
+Reviewed-by: Marc-André Lureau <marcandre.lureau@redhat.com>
+Reviewed-by: Stefan Berger <stefanb@linux.vnet.ibm.com>
 ---
- block/accounting.c         | 16 ++++++++++++++++
- include/block/accounting.h |  8 ++++++--
- 2 files changed, 22 insertions(+), 2 deletions(-)
+ hw/tpm/tpm_passthrough.c     | 4 ----
+ include/sysemu/tpm_backend.h | 1 -
+ tpm.c                        | 2 +-
+ 3 files changed, 1 insertion(+), 6 deletions(-)
 
-diff --git a/block/accounting.c b/block/accounting.c
-index ce6dbf7760..87ef5bbfaa 100644
---- a/block/accounting.c
-+++ b/block/accounting.c
-@@ -34,6 +34,7 @@ static const int qtest_latency_ns = NANOSECONDS_PER_SECOND / 1000;
+diff --git a/hw/tpm/tpm_passthrough.c b/hw/tpm/tpm_passthrough.c
+index 9234eb3..a0baf5f 100644
+--- a/hw/tpm/tpm_passthrough.c
++++ b/hw/tpm/tpm_passthrough.c
+@@ -46,8 +46,6 @@
+ #define TPM_PASSTHROUGH(obj) \
+     OBJECT_CHECK(TPMPassthruState, (obj), TYPE_TPM_PASSTHROUGH)
  
- void block_acct_init(BlockAcctStats *stats)
- {
-+    qemu_mutex_init(&stats->lock);
-     if (qtest_enabled()) {
-         clock_type = QEMU_CLOCK_VIRTUAL;
+-static const TPMDriverOps tpm_passthrough_driver;
+-
+ /* data structures */
+ typedef struct TPMPassthruThreadParams {
+     TPMState *tpm_state;
+@@ -462,8 +460,6 @@ static TPMBackend *tpm_passthrough_create(QemuOpts *opts, const char *id)
+     /* let frontend set the fe_model to proper value */
+     tb->fe_model = -1;
+ 
+-    tb->ops = &tpm_passthrough_driver;
+-
+     if (tpm_passthrough_handle_device_opts(opts, tb)) {
+         goto err_exit;
      }
-@@ -52,6 +53,7 @@ void block_acct_cleanup(BlockAcctStats *stats)
-     QSLIST_FOREACH_SAFE(s, &stats->intervals, entries, next) {
-         g_free(s);
-     }
-+    qemu_mutex_destroy(&stats->lock);
- }
+diff --git a/include/sysemu/tpm_backend.h b/include/sysemu/tpm_backend.h
+index b58f52d..e7f590d 100644
+--- a/include/sysemu/tpm_backend.h
++++ b/include/sysemu/tpm_backend.h
+@@ -50,7 +50,6 @@ struct TPMBackend {
+     enum TpmModel fe_model;
+     char *path;
+     char *cancel_path;
+-    const TPMDriverOps *ops;
  
- void block_acct_add_interval(BlockAcctStats *stats, unsigned interval_length)
-@@ -61,12 +63,15 @@ void block_acct_add_interval(BlockAcctStats *stats, unsigned interval_length)
- 
-     s = g_new0(BlockAcctTimedStats, 1);
-     s->interval_length = interval_length;
-+    s->stats = stats;
-+    qemu_mutex_lock(&stats->lock);
-     QSLIST_INSERT_HEAD(&stats->intervals, s, entries);
- 
-     for (i = 0; i < BLOCK_MAX_IOTYPE; i++) {
-         timed_average_init(&s->latency[i], clock_type,
-                            (uint64_t) interval_length * NANOSECONDS_PER_SECOND);
-     }
-+    qemu_mutex_unlock(&stats->lock);
- }
- 
- BlockAcctTimedStats *block_acct_interval_next(BlockAcctStats *stats,
-@@ -102,6 +107,8 @@ static void block_account_one_io(BlockAcctStats *stats, BlockAcctCookie *cookie,
- 
-     assert(cookie->type < BLOCK_MAX_IOTYPE);
- 
-+    qemu_mutex_lock(&stats->lock);
-+
-     if (failed) {
-         stats->failed_ops[cookie->type]++;
-     } else {
-@@ -117,6 +124,8 @@ static void block_account_one_io(BlockAcctStats *stats, BlockAcctCookie *cookie,
-             timed_average_account(&s->latency[cookie->type], latency_ns);
-         }
-     }
-+
-+    qemu_mutex_unlock(&stats->lock);
- }
- 
- void block_acct_done(BlockAcctStats *stats, BlockAcctCookie *cookie)
-@@ -137,18 +146,23 @@ void block_acct_invalid(BlockAcctStats *stats, enum BlockAcctType type)
-      * not.  The reason is that invalid requests are accounted during their
-      * submission, therefore there's no actual I/O involved.
-      */
-+    qemu_mutex_lock(&stats->lock);
-     stats->invalid_ops[type]++;
- 
-     if (stats->account_invalid) {
-         stats->last_access_time_ns = qemu_clock_get_ns(clock_type);
-     }
-+    qemu_mutex_unlock(&stats->lock);
- }
- 
- void block_acct_merge_done(BlockAcctStats *stats, enum BlockAcctType type,
-                       int num_requests)
- {
-     assert(type < BLOCK_MAX_IOTYPE);
-+
-+    qemu_mutex_lock(&stats->lock);
-     stats->merged[type] += num_requests;
-+    qemu_mutex_unlock(&stats->lock);
- }
- 
- int64_t block_acct_idle_time_ns(BlockAcctStats *stats)
-@@ -163,7 +177,9 @@ double block_acct_queue_depth(BlockAcctTimedStats *stats,
- 
-     assert(type < BLOCK_MAX_IOTYPE);
- 
-+    qemu_mutex_lock(&stats->stats->lock);
-     sum = timed_average_sum(&stats->latency[type], &elapsed);
-+    qemu_mutex_unlock(&stats->stats->lock);
- 
-     return (double) sum / elapsed;
- }
-diff --git a/include/block/accounting.h b/include/block/accounting.h
-index 55cb06fdb6..b833d26d6c 100644
---- a/include/block/accounting.h
-+++ b/include/block/accounting.h
-@@ -26,8 +26,10 @@
- #define BLOCK_ACCOUNTING_H
- 
- #include "qemu/timed-average.h"
-+#include "qemu/thread.h"
- 
- typedef struct BlockAcctTimedStats BlockAcctTimedStats;
-+typedef struct BlockAcctStats BlockAcctStats;
- 
- enum BlockAcctType {
-     BLOCK_ACCT_READ,
-@@ -37,12 +39,14 @@ enum BlockAcctType {
+     QLIST_ENTRY(TPMBackend) list;
  };
+diff --git a/tpm.c b/tpm.c
+index 9a7c711..0ee021a 100644
+--- a/tpm.c
++++ b/tpm.c
+@@ -258,7 +258,7 @@ static TPMInfo *qmp_query_tpm_inst(TPMBackend *drv)
+     res->model = drv->fe_model;
+     res->options = g_new0(TpmTypeOptions, 1);
  
- struct BlockAcctTimedStats {
-+    BlockAcctStats *stats;
-     TimedAverage latency[BLOCK_MAX_IOTYPE];
-     unsigned interval_length; /* in seconds */
-     QSLIST_ENTRY(BlockAcctTimedStats) entries;
- };
- 
--typedef struct BlockAcctStats {
-+struct BlockAcctStats {
-+    QemuMutex lock;
-     uint64_t nr_bytes[BLOCK_MAX_IOTYPE];
-     uint64_t nr_ops[BLOCK_MAX_IOTYPE];
-     uint64_t invalid_ops[BLOCK_MAX_IOTYPE];
-@@ -53,7 +57,7 @@ typedef struct BlockAcctStats {
-     QSLIST_HEAD(, BlockAcctTimedStats) intervals;
-     bool account_invalid;
-     bool account_failed;
--} BlockAcctStats;
-+};
- 
- typedef struct BlockAcctCookie {
-     int64_t bytes;
+-    switch (drv->ops->type) {
++    switch (tpm_backend_get_type(drv)) {
+     case TPM_TYPE_PASSTHROUGH:
+         res->options->type = TPM_TYPE_OPTIONS_KIND_PASSTHROUGH;
+         tpo = g_new0(TPMPassthroughOptions, 1);
 -- 
-2.13.0
+2.7.4
