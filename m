@@ -1,22 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43874)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43893)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1dHujJ-0006R7-Bg
-	for qemu-devel@nongnu.org; Mon, 05 Jun 2017 12:19:46 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1dHujK-0006Tt-Da
+	for qemu-devel@nongnu.org; Mon, 05 Jun 2017 12:19:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1dHujI-0000rZ-C0
-	for qemu-devel@nongnu.org; Mon, 05 Jun 2017 12:19:45 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1dHujJ-0000sW-7V
+	for qemu-devel@nongnu.org; Mon, 05 Jun 2017 12:19:46 -0400
 Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:37196)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1dHujI-0000nn-4Z
-	for qemu-devel@nongnu.org; Mon, 05 Jun 2017 12:19:44 -0400
+	id 1dHujJ-0000nn-1B
+	for qemu-devel@nongnu.org; Mon, 05 Jun 2017 12:19:45 -0400
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon,  5 Jun 2017 17:19:36 +0100
-Message-Id: <1496679576-14336-3-git-send-email-peter.maydell@linaro.org>
-In-Reply-To: <1496679576-14336-1-git-send-email-peter.maydell@linaro.org>
-References: <1496679576-14336-1-git-send-email-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PATCH 2/2] slirp: Handle error returns from
- sosendoob()
+Date: Mon,  5 Jun 2017 17:19:34 +0100
+Message-Id: <1496679576-14336-1-git-send-email-peter.maydell@linaro.org>
+Subject: [Qemu-devel] [PATCH 0/2] slirp: handle errors in sosendoob()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,78 +25,40 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: patches@linaro.org, Samuel Thibault <samuel.thibault@ens-lyon.org>, Jan Kiszka <jan.kiszka@siemens.com>
 
-sosendoob() can return a failure code, but all its callers ignore it.
-This is OK in sbappend(), as the comment there states -- we will try
-again later in sowrite(). Add a (void) cast to tell Coverity so.
-In sowrite() we do need to check the return value -- we should handle
-a write failure in sosendoob() the same way we handle a write failure
-for the normal data.
+At the moment the slirp sosendoob() function doesn't properly
+handle errors from slirp_send(), and its callers don't do
+anything with its return value either. (Coverity spots the
+latter as CID 1005633.)
 
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
----
+This patchset attempts to fix that. In the first patch we
+fix sosendoob() itself so that we return errors to the caller
+and treat short writes as reducing the amount of urgent data
+to be sent. In the second patch we make the call in sowrite()
+treat any return form sosendoob() which didn't transfer all
+the urgent data as a "disconnect the socket" error in the
+same way that it already handles errors for writes of
+non-urgent data. The call to sosendoob() in sbappend() can
+safely ignore any failures as in this case sowrite() will be
+called shortly and will deal with them.
+
+Coding style: I've opted to stick with the tab-indent
+that the slirp code uses rather than reindent to QEMU standard.
+Happy to go the other way if the maintainer prefers.
+
+Disclaimer: I have not tested these patches very hard and
+in particular they deal with error paths and with urgent
+data, neither of which I have any test case for...
+
+thanks
+-- PMM
+
+Peter Maydell (2):
+  slirp: Handle error returns from slirp_send() in sosendoob()
+  slirp: Handle error returns from sosendoob()
+
  slirp/sbuf.c   |  2 +-
- slirp/socket.c | 22 ++++++++++++++++------
- 2 files changed, 17 insertions(+), 7 deletions(-)
+ slirp/socket.c | 51 ++++++++++++++++++++++++++++++++++-----------------
+ 2 files changed, 35 insertions(+), 18 deletions(-)
 
-diff --git a/slirp/sbuf.c b/slirp/sbuf.c
-index 10119d3..912f235 100644
---- a/slirp/sbuf.c
-+++ b/slirp/sbuf.c
-@@ -91,7 +91,7 @@ sbappend(struct socket *so, struct mbuf *m)
- 	if (so->so_urgc) {
- 		sbappendsb(&so->so_rcv, m);
- 		m_free(m);
--		sosendoob(so);
-+		(void)sosendoob(so);
- 		return;
- 	}
- 
-diff --git a/slirp/socket.c b/slirp/socket.c
-index a17caa9..84cf13a 100644
---- a/slirp/socket.c
-+++ b/slirp/socket.c
-@@ -404,7 +404,14 @@ sowrite(struct socket *so)
- 	DEBUG_ARG("so = %p", so);
- 
- 	if (so->so_urgc) {
--		sosendoob(so);
-+		if (sosendoob(so) < so->so_urgc) {
-+			/* Treat a short write as a fatal error too,
-+			 * rather than continuing on and sending the urgent
-+			 * data as if it were non-urgent and leaving the
-+			 * so_urgc count wrong.
-+			 */
-+			goto err_disconnected;
-+		}
- 		if (sb->sb_cc == 0)
- 			return 0;
- 	}
-@@ -448,11 +455,7 @@ sowrite(struct socket *so)
- 		return 0;
- 
- 	if (nn <= 0) {
--		DEBUG_MISC((dfd, " --- sowrite disconnected, so->so_state = %x, errno = %d\n",
--			so->so_state, errno));
--		sofcantsendmore(so);
--		tcp_sockclosed(sototcpcb(so));
--		return -1;
-+		goto err_disconnected;
- 	}
- 
- #ifndef HAVE_READV
-@@ -479,6 +482,13 @@ sowrite(struct socket *so)
- 		sofcantsendmore(so);
- 
- 	return nn;
-+
-+err_disconnected:
-+	DEBUG_MISC((dfd, " --- sowrite disconnected, so->so_state = %x, errno = %d\n",
-+		    so->so_state, errno));
-+	sofcantsendmore(so);
-+	tcp_sockclosed(sototcpcb(so));
-+	return -1;
- }
- 
- /*
 -- 
 2.7.4
