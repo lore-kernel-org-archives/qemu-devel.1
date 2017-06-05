@@ -1,21 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39456)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39812)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <douly.fnst@cn.fujitsu.com>) id 1dHmpG-0005UR-5m
-	for qemu-devel@nongnu.org; Mon, 05 Jun 2017 03:53:23 -0400
+	(envelope-from <ashijeetacharya@gmail.com>) id 1dHmqV-00061t-0n
+	for qemu-devel@nongnu.org; Mon, 05 Jun 2017 03:54:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <douly.fnst@cn.fujitsu.com>) id 1dHmpD-00013M-36
-	for qemu-devel@nongnu.org; Mon, 05 Jun 2017 03:53:22 -0400
-Received: from [59.151.112.132] (port=43759 helo=heian.cn.fujitsu.com)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <douly.fnst@cn.fujitsu.com>) id 1dHmpC-0000uB-MC
-	for qemu-devel@nongnu.org; Mon, 05 Jun 2017 03:53:19 -0400
-From: Dou Liyang <douly.fnst@cn.fujitsu.com>
-Message-ID: <1ee3ccf0-2d91-86ec-628c-d50ae3ffbe22@cn.fujitsu.com>
-Date: Mon, 5 Jun 2017 15:53:02 +0800
-MIME-Version: 1.0
-Content-Type: text/plain; charset="gbk"; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] Memory Hotplug : Does QEmu support cold-plugged memory?
+	(envelope-from <ashijeetacharya@gmail.com>) id 1dHmqR-0002O0-Ua
+	for qemu-devel@nongnu.org; Mon, 05 Jun 2017 03:54:39 -0400
+From: Ashijeet Acharya <ashijeetacharya@gmail.com>
+Date: Mon,  5 Jun 2017 13:22:44 +0530
+Message-Id: <1496649172-26982-1-git-send-email-ashijeetacharya@gmail.com>
+Subject: [Qemu-devel] [PATCH v6 0/8] Optimize VMDK I/O by allocating
+ multiple clusters
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,62 +18,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel <qemu-devel@nongnu.org>
-Cc: Eduardo Habkost <ehabkost@redhat.com>, Igor Mammedov <imammedo@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Andrew Jones <drjones@redhat.com>, Thomas Huth <thuth@redhat.com>
+To: famz@redhat.com
+Cc: kwolf@redhat.com, jsnow@redhat.com, mreitz@redhat.com, stefanha@gmail.com, qemu-devel@nongnu.org, qemu-block@nongnu.org, Ashijeet Acharya <ashijeetacharya@gmail.com>
 
-Hi all,
+Previously posted series patches:
+v1 - http://lists.nongnu.org/archive/html/qemu-devel/2017-03/msg02044.html
+v2 - http://lists.nongnu.org/archive/html/qemu-devel/2017-03/msg05080.html
+v3 - http://lists.nongnu.org/archive/html/qemu-devel/2017-04/msg00074.html
+v4 - http://lists.nongnu.org/archive/html/qemu-devel/2017-04/msg03851.html
+v5 - http://lists.nongnu.org/archive/html/qemu-devel/2017-06/msg00929.html
 
-I want to boot up a system with some removable memory.
+This series helps to optimize the I/O performance of VMDK driver.
 
-So, i used '-object' and '-device' to cold-plug memory
-in QEmu as following :
+Patch 1 helps us to move vmdk_find_offset_in_cluster.
 
-./x86_64-softmmu/qemu-system-x86_64 \
-	...
-	-object memory-backend-ram,id=mem3,size=128M \
-	-device pc-dimm,id=dimm3,memdev=mem3 \
-	...
+Patch 2 & 3 perform a simple function re-naming tasks.
 
-then i want to hot-remove this memory by 'device-del' and
-'object-del'.
+Patch 4 is used to factor out metadata loading code and implement it in separate
+functions. This will help us to avoid code duplication in future patches of this
+series.
 
-But, unfortunately, I can't remove the memory device.
+Patch 5 helps to set the upper limit of the bytes handled in one cycle.
 
-And, in guest OS, I found the memory's removable feature is 0,
-But, in QEmu monitor with 'info memory-devices', I found the
-hotplugged is false and hotpluggable is true.
+Patch 6 adds new functions to help us allocate multiple clusters according to
+the size requested, perform COW if required and return the offset of the first
+newly allocated cluster.
 
-Could you help me:
+Patch 7 changes the metadata update code to update the L2 tables for multiple
+clusters at once.
 
-1, Can the ram based memory-backend be plugged like above?
+Patch 8 helps us to finally change vmdk_get_cluster_offset() to find cluster offset
+only as cluster allocation task is now handled by vmdk_alloc_clusters()
 
-2, Does the 'info memory-devices' command show a wrong info?
+Optimization test results:
 
-3, Can file memory backend(memory-backend-file) be cold-plugged?
+This patch series improves 128 KB sequential write performance to an
+empty VMDK file by 54%
 
+Benchmark command: ./qemu-img bench -w -c 1024 -s 128K -d 1 -t none -f
+vmdk test.vmdk
 
-PS: here is my whole script:
-----
-gdb --arg ./x86_64-softmmu/qemu-system-x86_64 \
-	-hda /image/fedora.img \
-	-m 256M,slots=4,maxmem=1G \
-	-enable-kvm \
-	-smp 2,maxcpus=16,sockets=2,cores=2,threads=2\
-	-object memory-backend-ram,id=mem1,size=128M \
-	-object memory-backend-ram,id=mem2,size=128M \
-	-object memory-backend-ram,id=mem3,size=128M \
-	-device pc-dimm,id=dimm3,memdev=mem3 \
-	-device qemu64-x86_64-cpu,id=cpu2,socket-id=0,core-id=1,thread-id=0 \
-	-device qemu64-x86_64-cpu,id=cpu3,socket-id=0,core-id=1,thread-id=1 \
-	-numa node,memdev=mem1,nodeid=0 \
-	-numa node,memdev=mem2,nodeid=1 \
-	-serial stdio \
-	-monitor telnet:127.0.0.1:4444,server,nowait \
-	-kernel /home/douly/openSource/orignal_linux/arch/x86_64/boot/bzImage \
-	-append "root=/dev/mapper/fedora_s3101490-root mem=256M movable_node 
-nokaslr earlyprintk=serial,ttyS0,115200" \
-	-initrd /home/douly/openSource/initramfs_image/4.12.0-rc3.img \
-----
+Changes in v6:
+- rename total_alloc_clusters as alloc_clusters_counter (fam)
 
-Thanks,
-	dou.
+Changes in v5:
+- fix commit message and comment in patch 4 (fam)
+- add vmdk_ prefix to handle_alloc() (fam)
+- fix alignment issue in patch 6 (fam)
+- use BDRV_SECTOR_BITS (fam)
+- fix endianness calculation in patch 7 (fam)
+
+Changes in v4:
+- fix commit message in patch 1 (fam)
+- drop size_to_clusters() function (fam)
+- fix grammatical errors in function documentations (fam)
+- factor out metadata loading coding in a separate patch (patch 4) (fam)
+- rename vmdk_alloc_cluster_offset() to vmdk_alloc_clusters() (fam)
+- break patch 4(in v3) into separate patches (patch 3 and 8) (fam)
+- rename extent_size to extent_end (fam)
+- use QEMU_ALIGN_UP instead of vmdk_align_offset. (fam)
+- drop next and simply do m_data = m_data->next (fam)
+
+Changes in v3:
+- move size_to_clusters() from patch 1 to 3 (fam)
+- use DIV_ROUND_UP in size_to_clusters (fam)
+- make patch 2 compilable (fam)
+- rename vmdk_L2update as vmdk_l2update and use UINT32_MAX (fam)
+- combine patch 3 and patch 4 (as in v2) to make them compilable (fam)
+- call bdrv_pwrite_sync() for batches of atmost 512 clusters at once (fam)
+
+Changes in v2:
+- segregate the ugly Patch 1 in v1 into 6 readable and sensible patches
+- include benchmark test results in v2
+
+Ashijeet Acharya (8):
+  vmdk: Move vmdk_find_offset_in_cluster() to the top
+  vmdk: Rename get_whole_cluster() to vmdk_perform_cow()
+  vmdk: Rename get_cluster_offset() to vmdk_get_cluster_offset()
+  vmdk: Factor out metadata loading code out of
+    vmdk_get_cluster_offset()
+  vmdk: Set maximum bytes allocated in one cycle
+  vmdk: New functions to assist allocating multiple clusters
+  vmdk: Update metadata for multiple clusters
+  vmdk: Make vmdk_get_cluster_offset() return cluster offset only
+
+ block/vmdk.c | 529 +++++++++++++++++++++++++++++++++++++++++++++--------------
+ 1 file changed, 407 insertions(+), 122 deletions(-)
+
+-- 
+2.6.2
