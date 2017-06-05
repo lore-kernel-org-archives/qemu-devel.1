@@ -1,23 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56857)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56885)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dHvFV-0004fk-H6
-	for qemu-devel@nongnu.org; Mon, 05 Jun 2017 12:53:02 -0400
+	(envelope-from <rth7680@gmail.com>) id 1dHvFZ-0004jT-06
+	for qemu-devel@nongnu.org; Mon, 05 Jun 2017 12:53:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dHvFU-0003tb-MQ
-	for qemu-devel@nongnu.org; Mon, 05 Jun 2017 12:53:01 -0400
-Received: from mail-qt0-x243.google.com ([2607:f8b0:400d:c0d::243]:34363)
+	(envelope-from <rth7680@gmail.com>) id 1dHvFY-0003y2-8E
+	for qemu-devel@nongnu.org; Mon, 05 Jun 2017 12:53:05 -0400
+Received: from mail-qt0-x243.google.com ([2607:f8b0:400d:c0d::243]:36176)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1dHvFU-0003t2-Hm
-	for qemu-devel@nongnu.org; Mon, 05 Jun 2017 12:53:00 -0400
-Received: by mail-qt0-x243.google.com with SMTP id o21so13466588qtb.1
-	for <qemu-devel@nongnu.org>; Mon, 05 Jun 2017 09:53:00 -0700 (PDT)
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1dHvFY-0003xa-3y
+	for qemu-devel@nongnu.org; Mon, 05 Jun 2017 12:53:04 -0400
+Received: by mail-qt0-x243.google.com with SMTP id s33so9908071qtg.3
+	for <qemu-devel@nongnu.org>; Mon, 05 Jun 2017 09:53:03 -0700 (PDT)
 Sender: Richard Henderson <rth7680@gmail.com>
 From: Richard Henderson <rth@twiddle.net>
-Date: Mon,  5 Jun 2017 09:52:24 -0700
-Message-Id: <20170605165233.4135-18-rth@twiddle.net>
+Date: Mon,  5 Jun 2017 09:52:27 -0700
+Message-Id: <20170605165233.4135-21-rth@twiddle.net>
 In-Reply-To: <20170605165233.4135-1-rth@twiddle.net>
 References: <20170605165233.4135-1-rth@twiddle.net>
-Subject: [Qemu-devel] [PULL 17/26] tcg/arm: Implement goto_ptr
+Subject: [Qemu-devel] [PULL 20/26] target/hppa: Use
+ tcg_gen_lookup_and_goto_ptr
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,80 +32,48 @@ Cc: peter.maydell@linaro.org
 
 Signed-off-by: Richard Henderson <rth@twiddle.net>
 ---
- tcg/arm/tcg-target.h     |  2 +-
- tcg/arm/tcg-target.inc.c | 25 +++++++++++++++++++++----
- 2 files changed, 22 insertions(+), 5 deletions(-)
+ target/hppa/translate.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/tcg/arm/tcg-target.h b/tcg/arm/tcg-target.h
-index c114df7..5ef1086 100644
---- a/tcg/arm/tcg-target.h
-+++ b/tcg/arm/tcg-target.h
-@@ -123,7 +123,7 @@ extern bool use_idiv_instructions;
- #define TCG_TARGET_HAS_mulsh_i32        0
- #define TCG_TARGET_HAS_div_i32          use_idiv_instructions
- #define TCG_TARGET_HAS_rem_i32          0
--#define TCG_TARGET_HAS_goto_ptr         0
-+#define TCG_TARGET_HAS_goto_ptr         1
- 
- enum {
-     TCG_AREG0 = TCG_REG_R6,
-diff --git a/tcg/arm/tcg-target.inc.c b/tcg/arm/tcg-target.inc.c
-index 590c57d..9f5cb66 100644
---- a/tcg/arm/tcg-target.inc.c
-+++ b/tcg/arm/tcg-target.inc.c
-@@ -1655,8 +1655,14 @@ static inline void tcg_out_op(TCGContext *s, TCGOpcode opc,
- 
-     switch (opc) {
-     case INDEX_op_exit_tb:
--        tcg_out_movi32(s, COND_AL, TCG_REG_R0, args[0]);
--        tcg_out_goto(s, COND_AL, tb_ret_addr);
-+        /* Reuse the zeroing that exists for goto_ptr.  */
-+        a0 = args[0];
-+        if (a0 == 0) {
-+            tcg_out_goto(s, COND_AL, s->code_gen_epilogue);
-+        } else {
-+            tcg_out_movi32(s, COND_AL, TCG_REG_R0, args[0]);
-+            tcg_out_goto(s, COND_AL, tb_ret_addr);
-+        }
-         break;
-     case INDEX_op_goto_tb:
-         if (s->tb_jmp_insn_offset) {
-@@ -1671,6 +1677,9 @@ static inline void tcg_out_op(TCGContext *s, TCGOpcode opc,
+diff --git a/target/hppa/translate.c b/target/hppa/translate.c
+index 9e8c233..e10abc5 100644
+--- a/target/hppa/translate.c
++++ b/target/hppa/translate.c
+@@ -517,7 +517,7 @@ static void gen_goto_tb(DisasContext *ctx, int which,
+         if (ctx->singlestep_enabled) {
+             gen_excp_1(EXCP_DEBUG);
+         } else {
+-            tcg_gen_exit_tb(0);
++            tcg_gen_lookup_and_goto_ptr(cpu_iaoq_f);
          }
-         s->tb_jmp_reset_offset[args[0]] = tcg_current_code_size(s);
+     }
+ }
+@@ -1510,7 +1510,7 @@ static ExitStatus do_ibranch(DisasContext *ctx, TCGv dest,
+     } else if (is_n && use_nullify_skip(ctx)) {
+         /* The (conditional) branch, B, nullifies the next insn, N,
+            and we're allowed to skip execution N (no single-step or
+-           tracepoint in effect).  Since the exit_tb that we must use
++           tracepoint in effect).  Since the goto_ptr that we must use
+            for the indirect branch consumes no special resources, we
+            can (conditionally) skip B and continue execution.  */
+         /* The use_nullify_skip test implies we have a known control path.  */
+@@ -1527,7 +1527,7 @@ static ExitStatus do_ibranch(DisasContext *ctx, TCGv dest,
+         if (link != 0) {
+             tcg_gen_movi_tl(cpu_gr[link], ctx->iaoq_n);
+         }
+-        tcg_gen_exit_tb(0);
++        tcg_gen_lookup_and_goto_ptr(cpu_iaoq_f);
+         return nullify_end(ctx, NO_EXIT);
+     } else {
+         cond_prep(&ctx->null_cond);
+@@ -3885,7 +3885,7 @@ void gen_intermediate_code(CPUHPPAState *env, struct TranslationBlock *tb)
+         if (ctx.singlestep_enabled) {
+             gen_excp_1(EXCP_DEBUG);
+         } else {
+-            tcg_gen_exit_tb(0);
++            tcg_gen_lookup_and_goto_ptr(cpu_iaoq_f);
+         }
          break;
-+    case INDEX_op_goto_ptr:
-+        tcg_out_bx(s, COND_AL, args[0]);
-+        break;
-     case INDEX_op_br:
-         tcg_out_goto_label(s, COND_AL, arg_label(args[0]));
-         break;
-@@ -1961,6 +1970,7 @@ static const TCGTargetOpDef arm_op_defs[] = {
-     { INDEX_op_exit_tb, { } },
-     { INDEX_op_goto_tb, { } },
-     { INDEX_op_br, { } },
-+    { INDEX_op_goto_ptr, { "r" } },
- 
-     { INDEX_op_ld8u_i32, { "r", "r" } },
-     { INDEX_op_ld8s_i32, { "r", "r" } },
-@@ -2136,9 +2146,16 @@ static void tcg_target_qemu_prologue(TCGContext *s)
-     tcg_out_mov(s, TCG_TYPE_PTR, TCG_AREG0, tcg_target_call_iarg_regs[0]);
- 
-     tcg_out_bx(s, COND_AL, tcg_target_call_iarg_regs[1]);
--    tb_ret_addr = s->code_ptr;
- 
--    /* Epilogue.  We branch here via tb_ret_addr.  */
-+    /*
-+     * Return path for goto_ptr. Set return value to 0, a-la exit_tb,
-+     * and fall through to the rest of the epilogue.
-+     */
-+    s->code_gen_epilogue = s->code_ptr;
-+    tcg_out_movi(s, TCG_TYPE_PTR, TCG_REG_R0, 0);
-+
-+    /* TB epilogue */
-+    tb_ret_addr = s->code_ptr;
-     tcg_out_dat_rI(s, COND_AL, ARITH_ADD, TCG_REG_CALL_STACK,
-                    TCG_REG_CALL_STACK, stack_addend, 1);
- 
+     default:
 -- 
 2.9.4
