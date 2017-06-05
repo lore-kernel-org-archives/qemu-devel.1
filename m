@@ -1,30 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35892)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36501)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1dHolk-0006ef-A1
-	for qemu-devel@nongnu.org; Mon, 05 Jun 2017 05:57:53 -0400
+	(envelope-from <laurent@vivier.eu>) id 1dHooS-0007Rk-V2
+	for qemu-devel@nongnu.org; Mon, 05 Jun 2017 06:00:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1dHolj-0003il-6l
-	for qemu-devel@nongnu.org; Mon, 05 Jun 2017 05:57:52 -0400
-Received: from mail-lf0-x244.google.com ([2a00:1450:4010:c07::244]:35652)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1dHolh-0003eI-82
-	for qemu-devel@nongnu.org; Mon, 05 Jun 2017 05:57:51 -0400
-Received: by mail-lf0-x244.google.com with SMTP id v20so6217480lfa.2
-	for <qemu-devel@nongnu.org>; Mon, 05 Jun 2017 02:57:47 -0700 (PDT)
-MIME-Version: 1.0
-References: <1494921494-33717-1-git-send-email-amarnath.valluri@intel.com>
-	<1494921494-33717-2-git-send-email-amarnath.valluri@intel.com>
-	<CAJ+F1CL8gFP7QaNRWMJd+HQExtsKCXzGexB-uQH7UzDz6Ru3yg@mail.gmail.com>
-	<1496647406.25318.13.camel@intel.com>
-In-Reply-To: <1496647406.25318.13.camel@intel.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Mon, 05 Jun 2017 09:57:34 +0000
-Message-ID: <CAJ+F1CJrXwyPOEJC8tQWk-H2MTdU7BgGVmvDef2HckMh2FR22Q@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v4 1/8] tpm-backend: Remove unneeded member
- variable from backend class
+	(envelope-from <laurent@vivier.eu>) id 1dHooP-0005tl-TA
+	for qemu-devel@nongnu.org; Mon, 05 Jun 2017 06:00:41 -0400
+Received: from mout.kundenserver.de ([212.227.126.130]:60222)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1dHooP-0005rI-Ed
+	for qemu-devel@nongnu.org; Mon, 05 Jun 2017 06:00:37 -0400
+From: Laurent Vivier <laurent@vivier.eu>
+Date: Mon,  5 Jun 2017 12:00:14 +0200
+Message-Id: <20170605100014.22981-1-laurent@vivier.eu>
+Subject: [Qemu-devel] [PATCH] target/m68k: implement rtd
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,39 +21,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Valluri, Amarnath" <amarnath.valluri@intel.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org
+Cc: Richard Henderson <rth@twiddle.net>, Laurent Vivier <laurent@vivier.eu>
 
-Hi
+Add "Return and Deallocate" (rtd) instruction.
 
-On Mon, Jun 5, 2017 at 11:22 AM Valluri, Amarnath <
-amarnath.valluri@intel.com> wrote:
+  RTD #d
 
-> On Wed, 2017-05-24 at 14:34 +0000, Marc-Andr=C3=A9 Lureau wrote:
->
-> Hi
->
-> On Tue, May 16, 2017 at 12:00 PM Amarnath Valluri <
-> amarnath.valluri@intel.com> wrote:
->
-> TPMDriverOps inside TPMBackend is not required, as it is supposed to be a
-> class
-> member. The only possible reason for keeping in TPMBackend was, to get th=
-e
-> backend type in tpm.c where dedicated backend api, tpm_backend_get_type()
-> is
-> present.
->
-> Signed-off-by: Amarnath Valluri <amarnath.valluri@intel.com>
->
->
-> Please add & keep my r-b tags from previous iterations in commit message
-> if they are no or only minor changes.
->
-> Marc, do you mean to resend the patch set by keeping 'Reviewed-by:' tag
-> for commits.
->
+    (SP) -> PC
+    SP + 4 + d -> SP
 
- On the patches I gave a "Reviewed-by", you should add it to the commit
-message. Next resend of the series should have them.
---=20
-Marc-Andr=C3=A9 Lureau
+Signed-off-by: Laurent Vivier <laurent@vivier.eu>
+---
+ target/m68k/cpu.c       |  2 ++
+ target/m68k/cpu.h       |  1 +
+ target/m68k/translate.c | 11 +++++++++++
+ 3 files changed, 14 insertions(+)
+
+diff --git a/target/m68k/cpu.c b/target/m68k/cpu.c
+index fa10b6e..f068922 100644
+--- a/target/m68k/cpu.c
++++ b/target/m68k/cpu.c
+@@ -130,6 +130,7 @@ static void m68020_cpu_initfn(Object *obj)
+     m68k_set_feature(env, M68K_FEATURE_FPU);
+     m68k_set_feature(env, M68K_FEATURE_CAS);
+     m68k_set_feature(env, M68K_FEATURE_BKPT);
++    m68k_set_feature(env, M68K_FEATURE_RTD);
+ }
+ #define m68030_cpu_initfn m68020_cpu_initfn
+ #define m68040_cpu_initfn m68020_cpu_initfn
+@@ -151,6 +152,7 @@ static void m68060_cpu_initfn(Object *obj)
+     m68k_set_feature(env, M68K_FEATURE_FPU);
+     m68k_set_feature(env, M68K_FEATURE_CAS);
+     m68k_set_feature(env, M68K_FEATURE_BKPT);
++    m68k_set_feature(env, M68K_FEATURE_RTD);
+ }
+ 
+ static void m5208_cpu_initfn(Object *obj)
+diff --git a/target/m68k/cpu.h b/target/m68k/cpu.h
+index 8095822..384ec5d 100644
+--- a/target/m68k/cpu.h
++++ b/target/m68k/cpu.h
+@@ -251,6 +251,7 @@ enum m68k_features {
+     M68K_FEATURE_FPU,
+     M68K_FEATURE_CAS,
+     M68K_FEATURE_BKPT,
++    M68K_FEATURE_RTD,
+ };
+ 
+ static inline int m68k_feature(CPUM68KState *env, int feature)
+diff --git a/target/m68k/translate.c b/target/m68k/translate.c
+index 9f60fbc..ad4d4ef 100644
+--- a/target/m68k/translate.c
++++ b/target/m68k/translate.c
+@@ -2483,6 +2483,16 @@ DISAS_INSN(nop)
+ {
+ }
+ 
++DISAS_INSN(rtd)
++{
++    TCGv tmp;
++    int16_t offset = read_im16(env, s);
++
++    tmp = gen_load(s, OS_LONG, QREG_SP, 0);
++    tcg_gen_addi_i32(QREG_SP, QREG_SP, offset + 4);
++    gen_jmp(s, tmp);
++}
++
+ DISAS_INSN(rts)
+ {
+     TCGv tmp;
+@@ -4904,6 +4914,7 @@ void register_m68k_insns (CPUM68KState *env)
+     BASE(nop,       4e71, ffff);
+     BASE(stop,      4e72, ffff);
+     BASE(rte,       4e73, ffff);
++    INSN(rtd,       4e74, ffff, RTD);
+     BASE(rts,       4e75, ffff);
+     INSN(movec,     4e7b, ffff, CF_ISA_A);
+     BASE(jump,      4e80, ffc0);
+-- 
+2.9.4
