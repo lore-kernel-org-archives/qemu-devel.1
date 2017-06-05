@@ -1,21 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52382)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52426)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dI1ph-0001BS-4K
-	for qemu-devel@nongnu.org; Mon, 05 Jun 2017 19:54:50 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1dI1pj-0001Bm-Ga
+	for qemu-devel@nongnu.org; Mon, 05 Jun 2017 19:54:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dI1pg-00038m-1E
-	for qemu-devel@nongnu.org; Mon, 05 Jun 2017 19:54:49 -0400
-Date: Tue, 6 Jun 2017 09:19:25 +1000
+	(envelope-from <dgibson@ozlabs.org>) id 1dI1pf-00038C-Ki
+	for qemu-devel@nongnu.org; Mon, 05 Jun 2017 19:54:51 -0400
+Date: Tue, 6 Jun 2017 09:19:58 +1000
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20170605231925.GA13397@umbus.fritz.box>
-References: <1496675657-11599-1-git-send-email-peter.maydell@linaro.org>
+Message-ID: <20170605231958.GC13397@umbus.fritz.box>
+References: <1496678118-27350-1-git-send-email-felipe@nutanix.com>
+	<1496678118-27350-2-git-send-email-felipe@nutanix.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="cDyoBSpeMmeqjtIY"
+	protocol="application/pgp-signature"; boundary="RyB1I56Pcq42iZjE"
 Content-Disposition: inline
-In-Reply-To: <1496675657-11599-1-git-send-email-peter.maydell@linaro.org>
-Subject: Re: [Qemu-devel] [PATCH] spapr_nvram: Check return value from
- blk_getlength()
+In-Reply-To: <1496678118-27350-2-git-send-email-felipe@nutanix.com>
+Subject: Re: [Qemu-devel] [PATCH v2] spapr: Allow boot from vhost-*-scsi
+ backends
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,51 +25,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-devel@nongnu.org, patches@linaro.org, qemu-ppc@nongnu.org, Alexander Graf <agraf@suse.de>
+To: Felipe Franciosi <felipe@nutanix.com>
+Cc: Alexey Kardashevskiy <aik@ozlabs.ru>, Alexander Graf <agraf@suse.de>, Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Mike Cui <cui@nutanix.com>
 
 
---cDyoBSpeMmeqjtIY
+--RyB1I56Pcq42iZjE
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Jun 05, 2017 at 04:14:17PM +0100, Peter Maydell wrote:
-> The blk_getlength() function can return an error value if the
-> image size cannot be determined. Check for this rather than
-> ploughing on and trying to g_malloc0() a negative number.
-> (Spotted by Coverity, CID 1288484.)
+On Mon, Jun 05, 2017 at 04:55:18PM +0100, Felipe Franciosi wrote:
+> The current implementation of spapr_get_fw_dev_path() doesn't take into
+> consideration vhost-*-scsi devices. This makes said devices unbootable
+> on PPC as SLOF is unable to work out the path to scan boot disks.
 >=20
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> This makes VMs bootable on spapr when using vhost-*-scsi by implementing
+> a disk path for VHostSCSICommon (which currently includes both
+> vhost-user-scsi and vhost-scsi).
+>=20
+> Signed-off-by: Felipe Franciosi <felipe@nutanix.com>
+> Signed-off-by: Mike Cui <cui@nutanix.com>
 
 Applied to ppc-for-2.10, thanks.
 
 > ---
->  hw/nvram/spapr_nvram.c | 10 +++++++++-
->  1 file changed, 9 insertions(+), 1 deletion(-)
+>  hw/ppc/spapr.c | 8 ++++++++
+>  1 file changed, 8 insertions(+)
 >=20
-> diff --git a/hw/nvram/spapr_nvram.c b/hw/nvram/spapr_nvram.c
-> index aa5d2c1..bc355a4 100644
-> --- a/hw/nvram/spapr_nvram.c
-> +++ b/hw/nvram/spapr_nvram.c
-> @@ -144,7 +144,15 @@ static void spapr_nvram_realize(VIOsPAPRDevice *dev,=
- Error **errp)
->      int ret;
+> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> index ab3aab1..1c87886 100644
+> --- a/hw/ppc/spapr.c
+> +++ b/hw/ppc/spapr.c
+> @@ -57,6 +57,7 @@
+>  #include "hw/pci/pci.h"
+>  #include "hw/scsi/scsi.h"
+>  #include "hw/virtio/virtio-scsi.h"
+> +#include "hw/virtio/vhost-scsi-common.h"
 > =20
->      if (nvram->blk) {
-> -        nvram->size =3D blk_getlength(nvram->blk);
-> +        int64_t len =3D blk_getlength(nvram->blk);
-> +
-> +        if (len < 0) {
-> +            error_setg_errno(errp, -len,
-> +                             "could not get length of backing image");
-> +            return;
-> +        }
-> +
-> +        nvram->size =3D len;
+>  #include "exec/address-spaces.h"
+>  #include "hw/usb.h"
+> @@ -2388,6 +2389,7 @@ static char *spapr_get_fw_dev_path(FWPathProvider *=
+p, BusState *bus,
+>      ((type *)object_dynamic_cast(OBJECT(obj), (name)))
+>      SCSIDevice *d =3D CAST(SCSIDevice,  dev, TYPE_SCSI_DEVICE);
+>      sPAPRPHBState *phb =3D CAST(sPAPRPHBState, dev, TYPE_SPAPR_PCI_HOST_=
+BRIDGE);
+> +    VHostSCSICommon *vsc =3D CAST(VHostSCSICommon, dev, TYPE_VHOST_SCSI_=
+COMMON);
 > =20
->          ret =3D blk_set_perm(nvram->blk,
->                             BLK_PERM_CONSISTENT_READ | BLK_PERM_WRITE,
+>      if (d) {
+>          void *spapr =3D CAST(void, bus->parent, "spapr-vscsi");
+> @@ -2444,6 +2446,12 @@ static char *spapr_get_fw_dev_path(FWPathProvider =
+*p, BusState *bus,
+>          return g_strdup_printf("pci@%"PRIX64, phb->buid);
+>      }
+> =20
+> +    if (vsc) {
+> +        /* Same logic as virtio above */
+> +        unsigned id =3D 0x1000000 | (vsc->target << 16) | vsc->lun;
+> +        return g_strdup_printf("disk@%"PRIX64, (uint64_t)id << 32);
+> +    }
+> +
+>      return NULL;
+>  }
+> =20
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -76,25 +96,25 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---cDyoBSpeMmeqjtIY
+--RyB1I56Pcq42iZjE
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v2
 
-iQIcBAEBCAAGBQJZNeb7AAoJEGw4ysog2bOSkTEP/0cQL5bnYx54dVLIaqMwZlEP
-LVlYWWZuuEi11jLBLCyoKEX06+Uckh8zDHarnKPKnkWLCq0SifOcGFoCvg+LGc8a
-myBuVQ4W7G9wj3BzOBVVm/g0rne1tkdyBirQIOqK1nImLX6DJn4B/zt3qPSN5EGd
-r6elbqBm2U5GPHyxCk24qY9s4fZ8eKssWCXbqITCOJBDqiK/kPe99Dd8gYWo8v0t
-B1C1Kqg0y+4PQ9Se1fOeJllzsOV7qiKgYG4tjsx/Od+dP9lW9dVDLrinVIv4tWis
-7vat9WmKIqnC2UF9bhfiBY71cNsCiMWu+amJ1y/SWnxU6TiCwgalWDH7FJ8TN+Fc
-KWCqf29t1v7UIxFUQQ0cttiGQj1fjfIbaP+FtbKe6JJuk0Ax7tmAfJL6aEXsD4aL
-1Rq/iO8RCieTNoaeucvIZcjzW/SSDlF26wM/bx+p/adLA/4d96ozBryINHuBlMNT
-MZOVLQU2AAte6z35D6NKzRje2AeSbh7y69MAOsnigeKOzIiWF0hhteOWDwUXcFRF
-+dBIUgXuoqERq7vlXaUJb+L6T/V5NFDcWaXPNt2FZCDDEmC9NVs0Rp5k6herxhtZ
-Jvt8kTCZm832X9OISsKd8Nxkbjuj7m9n2jbeiMo8K/IsOyofpTP5DdD9uDCBKlkO
-TxxTBylSxY/yYaN/SPJK
-=/GZC
+iQIcBAEBCAAGBQJZNeceAAoJEGw4ysog2bOSNVsP/jKUosNJdQy+tyfcfBRX87fU
+gi8mqgmQDKsecAOQMKI965oT2tq6xoSsdhf2dOXtzbyrBxkXDx2+dWbaJhkd+Cx6
+SuOUC73EOZQK9tUoyMCbC6glJOrhZtIiuLyTr5UbYbKRsQDxeWwangq+IX6s3ajR
+JA3X2ENLsNZMIeOxuvNeLteJtK0pHlzyz+4YyyqnQi3RlnQAo09fi+io5Ziyv/nw
+++LiPgZD/gdnZYenM3TrAuaXbjMry3dXLJThfnpi4k0tuo8PUBjy6XSuAnZCtZwD
+85HZXOWmGW2IVumG2Z5uAPBAoDReaA3eLTHn8g2ed+MMwlmqhIHB2XfaJxxUiNv6
+8cVE+OH/wybvej8/Zv8JtvNZq8ysP/oyNgV3zURvG4sGsHnlPhPCei+vU6qE/Ckf
+tw8KWaKRUV0S4ApeByFfEclQTuAmpEgloE9ia5aSlW0HUIa7Z+qExMVNVcEBXQIn
+kQPY9bGTLPlDvH6vqjzxMIU7wppjHb7jFh93ARkTRUHg855oGVuRO3+apaYY/1rk
+xuwck3mfZBTyJ1fQPLm1lKcefBKkO2wdEJN2B7es3tBdjHLv/PXMGzeA3i+YqrmP
+OQBrzwjlAptP0mUuyl9ZG4JmoO/Cm9rTd2DXQpafmuZ3dnh/8SbWRl/w9K4iJaHJ
+uPt/5JT5lKWFZweXPoA6
+=QUZS
 -----END PGP SIGNATURE-----
 
---cDyoBSpeMmeqjtIY--
+--RyB1I56Pcq42iZjE--
