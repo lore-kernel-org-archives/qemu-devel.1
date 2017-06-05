@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53930)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54423)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dHq7q-0005Dv-Sy
-	for qemu-devel@nongnu.org; Mon, 05 Jun 2017 07:24:47 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1dHqAU-0006gW-MB
+	for qemu-devel@nongnu.org; Mon, 05 Jun 2017 07:27:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dHq7n-0007GB-M5
-	for qemu-devel@nongnu.org; Mon, 05 Jun 2017 07:24:46 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43516)
+	(envelope-from <dgilbert@redhat.com>) id 1dHqAL-0008OY-88
+	for qemu-devel@nongnu.org; Mon, 05 Jun 2017 07:27:24 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49484)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dHq7n-0007Ex-DG
-	for qemu-devel@nongnu.org; Mon, 05 Jun 2017 07:24:43 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dHqAK-0008Nq-W8
+	for qemu-devel@nongnu.org; Mon, 05 Jun 2017 07:27:21 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 59FF280C10
-	for <qemu-devel@nongnu.org>; Mon,  5 Jun 2017 11:24:42 +0000 (UTC)
-Date: Mon, 5 Jun 2017 12:24:37 +0100
+	by mx1.redhat.com (Postfix) with ESMTPS id CC1A3C057FAD
+	for <qemu-devel@nongnu.org>; Mon,  5 Jun 2017 11:27:17 +0000 (UTC)
+Date: Mon, 5 Jun 2017 12:27:12 +0100
 From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170605112436.GH2109@work-vm>
+Message-ID: <20170605112712.GI2109@work-vm>
 References: <20170601220813.30535-1-quintela@redhat.com>
-	<20170601220813.30535-2-quintela@redhat.com>
+	<20170601220813.30535-3-quintela@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20170601220813.30535-2-quintela@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 1/5] ram: Call migration_page_queue_free()
- at ram_migration_cleanup()
+In-Reply-To: <20170601220813.30535-3-quintela@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 2/5] ram: Move ZERO_TARGET_PAGE inside
+ XBZRLE
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,86 +38,69 @@ To: Juan Quintela <quintela@redhat.com>
 Cc: qemu-devel@nongnu.org, lvivier@redhat.com, peterx@redhat.com
 
 * Juan Quintela (quintela@redhat.com) wrote:
-> We shouldn't be using memory later than that.
+> It was only used by XBZRLE anyways.
 > 
 > Signed-off-by: Juan Quintela <quintela@redhat.com>
-
-Yes, I think I agree:
-
-   migration_completion calls await_return_path_close_on_source that
-makes sure there's no more incoming requests.
-
-   migration_completion is called prior to the call to qemu_savevm_state_cleanup
-qemu_savevm_state_cleanup calls the ram_migration_cleanup.
-
-So you're moving it later which should be safe:
-
 
 Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 
 > ---
->  migration/migration.c | 2 --
->  migration/ram.c       | 5 +++--
->  migration/ram.h       | 1 -
->  3 files changed, 3 insertions(+), 5 deletions(-)
+>  migration/ram.c | 11 ++++++-----
+>  1 file changed, 6 insertions(+), 5 deletions(-)
 > 
-> diff --git a/migration/migration.c b/migration/migration.c
-> index af4c2cc..ea3d41c 100644
-> --- a/migration/migration.c
-> +++ b/migration/migration.c
-> @@ -814,8 +814,6 @@ static void migrate_fd_cleanup(void *opaque)
->      qemu_bh_delete(s->cleanup_bh);
->      s->cleanup_bh = NULL;
->  
-> -    migration_page_queue_free();
-> -
->      if (s->to_dst_file) {
->          trace_migrate_fd_cleanup();
->          qemu_mutex_unlock_iothread();
 > diff --git a/migration/ram.c b/migration/ram.c
-> index db7f4b0..e503277 100644
+> index e503277..04b55a7 100644
 > --- a/migration/ram.c
 > +++ b/migration/ram.c
-> @@ -1181,10 +1181,9 @@ static bool get_queued_page(RAMState *rs, PageSearchStatus *pss)
->   * be some left.  in case that there is any page left, we drop it.
->   *
->   */
-> -void migration_page_queue_free(void)
-> +static void migration_page_queue_free(RAMState *rs)
->  {
->      struct RAMSrcPageRequest *mspr, *next_mspr;
-> -    RAMState *rs = &ram_state;
->      /* This queue generally should be empty - but in the case of a failed
->       * migration might have some droppings in.
->       */
-> @@ -1434,6 +1433,7 @@ void free_xbzrle_decoded_buf(void)
+> @@ -66,8 +66,6 @@
+>  /* 0x80 is reserved in migration.h start with 0x100 next */
+>  #define RAM_SAVE_FLAG_COMPRESS_PAGE    0x100
 >  
->  static void ram_migration_cleanup(void *opaque)
+> -static uint8_t *ZERO_TARGET_PAGE;
+> -
+>  static inline bool is_zero_range(uint8_t *p, uint64_t size)
 >  {
-> +    RAMState *rs = opaque;
->      RAMBlock *block;
+>      return buffer_is_zero(p, size);
+> @@ -83,6 +81,8 @@ static struct {
+>      /* Cache for XBZRLE, Protected by lock. */
+>      PageCache *cache;
+>      QemuMutex lock;
+> +    /* it will store a page full of zeros */
+> +    uint8_t *zero_target_page;
+>  } XBZRLE;
 >  
->      /* caller have hold iothread lock or is in a bh, so there is
-> @@ -1459,6 +1459,7 @@ static void ram_migration_cleanup(void *opaque)
->          XBZRLE.current_buf = NULL;
->      }
->      XBZRLE_cache_unlock();
-> +    migration_page_queue_free(rs);
+>  /* buffer used for XBZRLE decoding */
+> @@ -509,7 +509,7 @@ static void xbzrle_cache_zero_page(RAMState *rs, ram_addr_t current_addr)
+>  
+>      /* We don't care if this fails to allocate a new cache page
+>       * as long as it updated an old one */
+> -    cache_insert(XBZRLE.cache, current_addr, ZERO_TARGET_PAGE,
+> +    cache_insert(XBZRLE.cache, current_addr, XBZRLE.zero_target_page,
+>                   rs->bitmap_sync_count);
 >  }
 >  
->  static void ram_state_reset(RAMState *rs)
-> diff --git a/migration/ram.h b/migration/ram.h
-> index c9563d1..d4da419 100644
-> --- a/migration/ram.h
-> +++ b/migration/ram.h
-> @@ -53,7 +53,6 @@ void migrate_decompress_threads_create(void);
->  void migrate_decompress_threads_join(void);
+> @@ -1453,10 +1453,11 @@ static void ram_migration_cleanup(void *opaque)
+>          cache_fini(XBZRLE.cache);
+>          g_free(XBZRLE.encoded_buf);
+>          g_free(XBZRLE.current_buf);
+> -        g_free(ZERO_TARGET_PAGE);
+> +        g_free(XBZRLE.zero_target_page);
+>          XBZRLE.cache = NULL;
+>          XBZRLE.encoded_buf = NULL;
+>          XBZRLE.current_buf = NULL;
+> +        XBZRLE.zero_target_page = NULL;
+>      }
+>      XBZRLE_cache_unlock();
+>      migration_page_queue_free(rs);
+> @@ -1877,7 +1878,7 @@ static int ram_state_init(RAMState *rs)
 >  
->  uint64_t ram_pagesize_summary(void);
-> -void migration_page_queue_free(void);
->  int ram_save_queue_pages(const char *rbname, ram_addr_t start, ram_addr_t len);
->  void acct_update_position(QEMUFile *f, size_t size, bool zero);
->  void free_xbzrle_decoded_buf(void);
+>      if (migrate_use_xbzrle()) {
+>          XBZRLE_cache_lock();
+> -        ZERO_TARGET_PAGE = g_malloc0(TARGET_PAGE_SIZE);
+> +        XBZRLE.zero_target_page = g_malloc0(TARGET_PAGE_SIZE);
+>          XBZRLE.cache = cache_init(migrate_xbzrle_cache_size() /
+>                                    TARGET_PAGE_SIZE,
+>                                    TARGET_PAGE_SIZE);
 > -- 
 > 2.9.4
 > 
