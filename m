@@ -1,17 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41865)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42473)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mjt@tls.msk.ru>) id 1dHsx1-0003vd-F7
-	for qemu-devel@nongnu.org; Mon, 05 Jun 2017 10:25:48 -0400
+	(envelope-from <eblake@redhat.com>) id 1dHszM-0004oz-IQ
+	for qemu-devel@nongnu.org; Mon, 05 Jun 2017 10:28:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mjt@tls.msk.ru>) id 1dHsww-0004Ns-K0
-	for qemu-devel@nongnu.org; Mon, 05 Jun 2017 10:25:47 -0400
-From: Michael Tokarev <mjt@tls.msk.ru>
-Date: Mon,  5 Jun 2017 17:25:36 +0300
-Message-Id: <cover.1496672631.git.mjt@msgid.tls.msk.ru>
+	(envelope-from <eblake@redhat.com>) id 1dHszJ-0006dE-0R
+	for qemu-devel@nongnu.org; Mon, 05 Jun 2017 10:28:12 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:57670)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dHszI-0006bF-Mh
+	for qemu-devel@nongnu.org; Mon, 05 Jun 2017 10:28:08 -0400
+References: <1496330073-51338-1-git-send-email-anton.nefedov@virtuozzo.com>
+	<1496330073-51338-5-git-send-email-anton.nefedov@virtuozzo.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <73fcc353-6e95-f28d-9f61-be3c4674b122@redhat.com>
+Date: Mon, 5 Jun 2017 09:28:01 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 00/21] Trivial patches for 2017-06-05
+In-Reply-To: <1496330073-51338-5-git-send-email-anton.nefedov@virtuozzo.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="D2HUWBUwq7JIlC00O8xqsGTbP1gTMDEtS"
+Subject: Re: [Qemu-devel] [PATCH v2 04/15] qcow2: alloc space for COW in one
+ chunk
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,104 +29,133 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Michael Tokarev <mjt@tls.msk.ru>, qemu-trivial@nongnu.org
+To: Anton Nefedov <anton.nefedov@virtuozzo.com>, qemu-devel@nongnu.org
+Cc: den@virtuozzo.com, kwolf@redhat.com, mreitz@redhat.com, "Denis V. Lunev" <den@openvz.org>
 
-This is a resend of the yesterday's trivial-patches queue, without
-an ivshmem change which broke static build (will take a look at
-that later). The rest is exactly the same, so sending only the
-cover letter.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--D2HUWBUwq7JIlC00O8xqsGTbP1gTMDEtS
+From: Eric Blake <eblake@redhat.com>
+To: Anton Nefedov <anton.nefedov@virtuozzo.com>, qemu-devel@nongnu.org
+Cc: den@virtuozzo.com, kwolf@redhat.com, mreitz@redhat.com,
+ "Denis V. Lunev" <den@openvz.org>
+Message-ID: <73fcc353-6e95-f28d-9f61-be3c4674b122@redhat.com>
+Subject: Re: [PATCH v2 04/15] qcow2: alloc space for COW in one chunk
+References: <1496330073-51338-1-git-send-email-anton.nefedov@virtuozzo.com>
+ <1496330073-51338-5-git-send-email-anton.nefedov@virtuozzo.com>
+In-Reply-To: <1496330073-51338-5-git-send-email-anton.nefedov@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Thanks,
+On 06/01/2017 10:14 AM, Anton Nefedov wrote:
+> From: "Denis V. Lunev" <den@openvz.org>
+>=20
+> Currently each single write operation can result in 3 write operations
 
-/mjt
+Maybe:
 
-The following changes since commit c6e84fbd447a51e1161d74d71566a5f67b47ea=
-c5:
+Currently each single guest write operation can result in up to 3 host
+write operations
 
-  Merge remote-tracking branch 'remotes/mst/tags/for_upstream' into stagi=
-ng (2017-06-02 17:46:22 +0100)
+> if guest offsets are not cluster aligned. One write is performed for th=
+e
+> real payload and two for COW-ed areas. Thus the data possibly lays
+> non-contiguously on the host filesystem. This will reduce further
+> sequential read performance significantly.
+>=20
+> The patch allocates the space in the file with cluster granularity,
+> ensuring
+>   1. better host offset locality
+>   2. less space allocation operations
+>      (which can be expensive on distributed storage)
+>=20
+> Signed-off-by: Denis V. Lunev <den@openvz.org>
+> Signed-off-by: Anton Nefedov <anton.nefedov@virtuozzo.com>
+> ---
+>  block/qcow2.c | 24 +++++++++++++++++++++++-
+>  1 file changed, 23 insertions(+), 1 deletion(-)
+>=20
+> diff --git a/block/qcow2.c b/block/qcow2.c
+> index b3ba5da..cd5efba 100644
+> --- a/block/qcow2.c
+> +++ b/block/qcow2.c
+> @@ -1575,6 +1575,24 @@ fail:
+>      return ret;
+>  }
+> =20
+> +static void handle_alloc_space(BlockDriverState *bs, QCowL2Meta *l2met=
+a)
+> +{
+> +    BDRVQcow2State *s =3D bs->opaque;
+> +    QCowL2Meta *m;
+> +
+> +    for (m =3D l2meta; m !=3D NULL; m =3D m->next) {
+> +        uint64_t bytes =3D m->nb_clusters << s->cluster_bits;
+> +
+> +        if (m->cow_start.nb_bytes =3D=3D 0 && m->cow_end.nb_bytes =3D=3D=
+ 0) {
+> +            continue;
+> +        }
+> +
+> +        /* try to alloc host space in one chunk for better locality */=
 
-are available in the git repository at:
+> +        bdrv_co_pwrite_zeroes(bs->file, m->alloc_offset, bytes,
+> +                              BDRV_REQ_ALLOCATE);
 
-  git://git.corpit.ru/qemu.git tags/trivial-patches-fetch
+Is it worth a trace point, to easily track when we are using
+handle_alloc_space()?  Or do existing trace points in
+bdrv_co_pwrite_zeroes already sufficiently serve the purpose?
 
-for you to fetch changes up to 03e947f9c2264356aef037e6bf9c496b5deae2d2:
+> +    }
+> +}
+> +
+>  static coroutine_fn int qcow2_co_pwritev(BlockDriverState *bs, uint64_=
+t offset,
+>                                           uint64_t bytes, QEMUIOVector =
+*qiov,
+>                                           int flags)
+> @@ -1656,8 +1674,12 @@ static coroutine_fn int qcow2_co_pwritev(BlockDr=
+iverState *bs, uint64_t offset,
+>          if (ret < 0) {
+>              goto fail;
+>          }
+> -
+>          qemu_co_mutex_unlock(&s->lock);
+> +
+> +        if (bs->file->bs->supported_zero_flags & BDRV_REQ_ALLOCATE) {
+> +            handle_alloc_space(bs, l2meta);
+> +        }
+> +
 
-  hw/core: nmi.c can be compiled as common-obj nowadays (2017-06-05 17:23=
-:36 +0300)
+This certainly looks better than v1!
 
-----------------------------------------------------------------
-trivial patches for 2017-06-05
+>          BLKDBG_EVENT(bs->file, BLKDBG_WRITE_AIO);
+>          trace_qcow2_writev_data(qemu_coroutine_self(),
+>                                  cluster_offset + offset_in_cluster);
+>=20
 
-----------------------------------------------------------------
-Eric Blake (2):
-      block: Correct documentation for BLOCK_WRITE_THRESHOLD
-      qapi: Fix some QMP documentation regressions
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
 
-John Snow (1):
-      ide-test: check return of fwrite
 
-Juan Quintela (1):
-      trivial: Remove unneeded ifndef in memory.h
+--D2HUWBUwq7JIlC00O8xqsGTbP1gTMDEtS
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-Kamil Rytarowski (1):
-      configure: Detect native NetBSD curses(3)
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-Luc MICHEL (1):
-      target/arm: add data cache invalidation cp15 instruction to cortex-=
-r5
+iQEcBAEBCAAGBQJZNWpxAAoJEKeha0olJ0NqB3gH/2YMen7i7B+aCbaV4Qz1FQXi
+lF5aKh1q+xpldR9ridkYksITGnQrwSfKG0R04PJuD2MFzUg7aVVSiuZa0NeLbrdz
+6/4HWYVDKSFPcXF1q33Ko7U3qnmDdAw8UyJimreZayp2tFO63HLtS4H+mY9F0gfs
+q1ed4LrokBQCUI5ksRjRSpBNyCUEovnc1Pyi4QHRDGX+P01/iOD5vRwEqcZXqIEA
+U8ud7v449Mbn2gDxpN2rRu5ptCX7QKl8a8XQlPQmBTaqkPHvD0N0rql0y6FnoCo1
+NYAMIZ/R5WhOw5ApUHAFSLV/ZwjeQ4FWI3QX8xiAclOpRTsIcCoyjziTQddpQH8=
+=q/2j
+-----END PGP SIGNATURE-----
 
-Mao Zhongyi (1):
-      scsi/lsi53c895a: Remove unused lsi_mem_*() return value
-
-Marc-Andr=C3=A9 Lureau (2):
-      qemu-ga: remove useless allocation
-      dump: fix memory_mapping_filter leak
-
-Markus Armbruster (2):
-      docs qemu-doc: Avoid ide-drive, it's deprecated
-      docs/qdev-device-use.txt: update section Default Devices
-
-Max Filippov (1):
-      hw/xtensa: sim: use g_string/g_new
-
-Paolo Bonzini (1):
-      altera_timer: fix incorrect memset
-
-Philippe Mathieu-Daud=C3=A9 (3):
-      hw/sparc: use ARRAY_SIZE() macro
-      register: display register prefix (name) since it is available
-      hw/mips: add missing include
-
-Suraj Jitindar Singh (1):
-      help: Add newline to end of thread option help text
-
-Thomas Huth (4):
-      qemu-doc: Move the qemu-ga description into a separate chapter
-      qemu-doc: Add hyperlinks to further license information
-      tests/libqtest: Print error instead of aborting when env variable i=
-s missing
-      hw/core: nmi.c can be compiled as common-obj nowadays
-
- configure                |  3 +--
- docs/bootindex.txt       |  2 +-
- docs/qdev-device-use.txt | 13 +++++++------
- hw/core/Makefile.objs    |  2 +-
- hw/core/register.c       |  8 ++++----
- hw/scsi/lsi53c895a.c     | 10 ++++------
- hw/sparc64/sun4u.c       |  2 +-
- hw/timer/altera_timer.c  |  2 +-
- hw/xtensa/sim.c          | 10 +++++-----
- include/exec/memory.h    |  2 --
- include/hw/mips/mips.h   |  1 +
- memory_mapping.c         |  1 +
- qapi/block-core.json     | 30 +++++++++++++++---------------
- qapi/block.json          |  2 +-
- qemu-doc.texi            | 21 +++++++++++----------
- qemu-options.hx          |  4 ++--
- qga/commands-posix.c     |  4 +---
- target/arm/cpu.c         |  2 ++
- tests/ide-test.c         |  8 ++++++--
- tests/libqtest.c         |  5 ++++-
- 20 files changed, 69 insertions(+), 63 deletions(-)
+--D2HUWBUwq7JIlC00O8xqsGTbP1gTMDEtS--
