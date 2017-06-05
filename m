@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35484)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35719)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1dHuDl-000121-9u
-	for qemu-devel@nongnu.org; Mon, 05 Jun 2017 11:47:10 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1dHuFo-0002Gb-VJ
+	for qemu-devel@nongnu.org; Mon, 05 Jun 2017 11:49:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1dHuDi-0000Pq-97
-	for qemu-devel@nongnu.org; Mon, 05 Jun 2017 11:47:09 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:52706)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1dHuDi-0000PL-2y
-	for qemu-devel@nongnu.org; Mon, 05 Jun 2017 11:47:06 -0400
-Date: Mon, 5 Jun 2017 18:47:03 +0300
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20170605184525-mutt-send-email-mst@kernel.org>
-References: <1496653049-44530-1-git-send-email-wei.w.wang@intel.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1dHuFo-00023R-4j
+	for qemu-devel@nongnu.org; Mon, 05 Jun 2017 11:49:17 -0400
+Received: from mail-wm0-x22a.google.com ([2a00:1450:400c:c09::22a]:35667)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1dHuFn-00022P-T9
+	for qemu-devel@nongnu.org; Mon, 05 Jun 2017 11:49:16 -0400
+Received: by mail-wm0-x22a.google.com with SMTP id x70so16112822wme.0
+	for <qemu-devel@nongnu.org>; Mon, 05 Jun 2017 08:49:15 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1496653049-44530-1-git-send-email-wei.w.wang@intel.com>
-Subject: Re: [Qemu-devel] [PATCH v1] virtio-net: enable configurable tx
- queue size
+In-Reply-To: <cover.1496672631.git.mjt@msgid.tls.msk.ru>
+References: <cover.1496672631.git.mjt@msgid.tls.msk.ru>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 5 Jun 2017 16:48:54 +0100
+Message-ID: <CAFEAcA80HS0qo7wHdRvvxPEbtbkGrdj3G7fQKoHtDiQzzTQvUQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL 00/21] Trivial patches for 2017-06-05
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,32 +28,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Wei Wang <wei.w.wang@intel.com>
-Cc: jasowang@redhat.com, stefanha@gmail.com, marcandre.lureau@gmail.com, pbonzini@redhat.com, virtio-dev@lists.oasis-open.org, qemu-devel@nongnu.org, jan.scheurich@ericsson.com
+To: Michael Tokarev <mjt@tls.msk.ru>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, QEMU Trivial <qemu-trivial@nongnu.org>
 
-On Mon, Jun 05, 2017 at 04:57:29PM +0800, Wei Wang wrote:
-> @@ -1910,6 +1958,17 @@ static void virtio_net_device_realize(DeviceState *dev, Error **errp)
->          return;
->      }
->  
-> +    if (n->net_conf.tx_queue_size < VIRTIO_NET_TX_QUEUE_MIN_SIZE ||
-> +        n->net_conf.tx_queue_size > VIRTQUEUE_MAX_SIZE ||
-> +        (n->net_conf.tx_queue_size & (n->net_conf.tx_queue_size - 1))) {
-> +        error_setg(errp, "Invalid tx_queue_size (= %" PRIu16 "), "
-> +                   "must be a power of 2 between %d and %d.",
-> +                   n->net_conf.tx_queue_size, VIRTIO_NET_TX_QUEUE_MIN_SIZE,
-> +                   VIRTQUEUE_MAX_SIZE);
-> +        virtio_cleanup(vdev);
-> +        return;
-> +    }
-> +
->      n->max_queues = MAX(n->nic_conf.peers.queues, 1);
->      if (n->max_queues * 2 + 1 > VIRTIO_QUEUE_MAX) {
->          error_setg(errp, "Invalid number of queues (= %" PRIu32 "), "
+On 5 June 2017 at 15:25, Michael Tokarev <mjt@tls.msk.ru> wrote:
+> This is a resend of the yesterday's trivial-patches queue, without
+> an ivshmem change which broke static build (will take a look at
+> that later). The rest is exactly the same, so sending only the
+> cover letter.
+>
+> Thanks,
+>
+> /mjt
+>
+> The following changes since commit c6e84fbd447a51e1161d74d71566a5f67b47eac5:
+>
+>   Merge remote-tracking branch 'remotes/mst/tags/for_upstream' into staging (2017-06-02 17:46:22 +0100)
+>
+> are available in the git repository at:
+>
+>   git://git.corpit.ru/qemu.git tags/trivial-patches-fetch
+>
+> for you to fetch changes up to 03e947f9c2264356aef037e6bf9c496b5deae2d2:
+>
+>   hw/core: nmi.c can be compiled as common-obj nowadays (2017-06-05 17:23:36 +0300)
+>
+> ----------------------------------------------------------------
+> trivial patches for 2017-06-05
+>
+> ----------------------------------------------------------------
 
-Given that some configurations (e.g. legacy guest) ignore the value,
-I'm inclined to say just force the value to be within a reasonable
-limit.
+Applied, thanks.
 
--- 
-MST
+-- PMM
