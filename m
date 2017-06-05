@@ -1,17 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42624)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43556)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ashijeetacharya@gmail.com>) id 1dHkx5-0006VI-K3
-	for qemu-devel@nongnu.org; Mon, 05 Jun 2017 01:53:20 -0400
+	(envelope-from <a.perevalov@samsung.com>) id 1dHl3C-00038k-3t
+	for qemu-devel@nongnu.org; Mon, 05 Jun 2017 01:59:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ashijeetacharya@gmail.com>) id 1dHkx3-0008DF-Tc
-	for qemu-devel@nongnu.org; Mon, 05 Jun 2017 01:53:19 -0400
-From: Ashijeet Acharya <ashijeetacharya@gmail.com>
-Date: Mon,  5 Jun 2017 11:23:27 +0530
-Message-Id: <1496642007-8309-9-git-send-email-ashijeetacharya@gmail.com>
-In-Reply-To: <1496642007-8309-1-git-send-email-ashijeetacharya@gmail.com>
-References: <1496642007-8309-1-git-send-email-ashijeetacharya@gmail.com>
-Subject: [Qemu-devel] [PATCH v5 8/8] vmdk: Make vmdk_get_cluster_offset()
- return cluster offset only
+	(envelope-from <a.perevalov@samsung.com>) id 1dHl39-0005dA-2R
+	for qemu-devel@nongnu.org; Mon, 05 Jun 2017 01:59:38 -0400
+Received: from mailout3.w1.samsung.com ([210.118.77.13]:27041)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <a.perevalov@samsung.com>)
+	id 1dHl38-0005ZU-OY
+	for qemu-devel@nongnu.org; Mon, 05 Jun 2017 01:59:35 -0400
+Received: from eucas1p1.samsung.com (unknown [182.198.249.206])
+	by mailout3.w1.samsung.com
+	(Oracle Communications Messaging Server 7.0.5.31.0 64bit (built May 5
+	2014)) with ESMTP id <0OR2005NC8N58Q70@mailout3.w1.samsung.com> for
+	qemu-devel@nongnu.org; Mon, 05 Jun 2017 06:59:29 +0100 (BST)
+From: Alexey Perevalov <a.perevalov@samsung.com>
+Message-id: <11a333fa-83ae-3982-9473-197d7876d33a@samsung.com>
+Date: Mon, 05 Jun 2017 08:59:26 +0300
+MIME-version: 1.0
+In-reply-to: <20170531175458.GG3342@work-vm>
+Content-type: text/plain; charset=utf-8; format=flowed
+Content-transfer-encoding: 7bit
+Content-language: en-GB
+References: <1495539071-12995-1-git-send-email-a.perevalov@samsung.com>
+	<CGME20170523113127eucas1p22dba0fddcc9bcf70e554bf659272f947@eucas1p2.samsung.com>
+	<1495539071-12995-3-git-send-email-a.perevalov@samsung.com>
+	<20170531175458.GG3342@work-vm>
+Subject: Re: [Qemu-devel] [PATCH V6 02/10] migration: pass
+ MigrationIncomingState* into migration check functions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,127 +37,132 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: famz@redhat.com
-Cc: kwolf@redhat.com, jsnow@redhat.com, mreitz@redhat.com, stefanha@gmail.com, qemu-devel@nongnu.org, qemu-block@nongnu.org, Ashijeet Acharya <ashijeetacharya@gmail.com>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: qemu-devel@nongnu.org, i.maximets@samsung.com, peterx@redhat.com, eblake@redhat.com
 
-vmdk_alloc_clusters() introduced earlier now handles the task of
-allocating clusters and performing COW when needed. Thus we can change
-vmdk_get_cluster_offset() to stick to the sole purpose of returning
-cluster offset using sector number. Update the changes at all call
-sites.
+On 05/31/2017 08:54 PM, Dr. David Alan Gilbert wrote:
+> * Alexey Perevalov (a.perevalov@samsung.com) wrote:
+>> That tiny refactoring is necessary to be able to set
+>> UFFD_FEATURE_THREAD_ID while requesting features, and then
+>> to create downtime context in case when kernel supports it.
+>>
+>> Signed-off-by: Alexey Perevalov <a.perevalov@samsung.com>
+>> ---
+>>   migration/migration.c    |  2 +-
+>>   migration/postcopy-ram.c | 10 +++++-----
+>>   migration/postcopy-ram.h |  2 +-
+>>   migration/savevm.c       |  2 +-
+>>   4 files changed, 8 insertions(+), 8 deletions(-)
+>>
+>> diff --git a/migration/migration.c b/migration/migration.c
+>> index 0304c01..d735976 100644
+>> --- a/migration/migration.c
+>> +++ b/migration/migration.c
+>> @@ -789,7 +789,7 @@ void qmp_migrate_set_capabilities(MigrationCapabilityStatusList *params,
+>>            * special support.
+>>            */
+>>           if (!old_postcopy_cap && runstate_check(RUN_STATE_INMIGRATE) &&
+>> -            !postcopy_ram_supported_by_host()) {
+>> +            !postcopy_ram_supported_by_host(NULL)) {
+> Why is that NULL rather than migration_incoming_get_current()?
+> That's on the destination.
+In current implementation, AFAIU,
+migrate-set-capabilities with postcopy-ram argument should be done on 
+source machine only,
+and it's not required on destination. And it is unnecessary requirement 
+to support userfaultfd on
+source and check it there.
 
-Signed-off-by: Ashijeet Acharya <ashijeetacharya@gmail.com>
----
- block/vmdk.c | 56 ++++++++++++--------------------------------------------
- 1 file changed, 12 insertions(+), 44 deletions(-)
+>
+> Dave
+>
+>>               /* postcopy_ram_supported_by_host will have emitted a more
+>>                * detailed message
+>>                */
+>> diff --git a/migration/postcopy-ram.c b/migration/postcopy-ram.c
+>> index a0489f6..4adab36 100644
+>> --- a/migration/postcopy-ram.c
+>> +++ b/migration/postcopy-ram.c
+>> @@ -59,7 +59,7 @@ struct PostcopyDiscardState {
+>>   #include <sys/eventfd.h>
+>>   #include <linux/userfaultfd.h>
+>>   
+>> -static bool ufd_version_check(int ufd)
+>> +static bool ufd_version_check(int ufd, MigrationIncomingState *mis)
+>>   {
+>>       struct uffdio_api api_struct;
+>>       uint64_t ioctl_mask;
+>> @@ -112,7 +112,7 @@ static int test_range_shared(const char *block_name, void *host_addr,
+>>    * normally fine since if the postcopy succeeds it gets turned back on at the
+>>    * end.
+>>    */
+>> -bool postcopy_ram_supported_by_host(void)
+>> +bool postcopy_ram_supported_by_host(MigrationIncomingState *mis)
+>>   {
+>>       long pagesize = getpagesize();
+>>       int ufd = -1;
+>> @@ -135,7 +135,7 @@ bool postcopy_ram_supported_by_host(void)
+>>       }
+>>   
+>>       /* Version and features check */
+>> -    if (!ufd_version_check(ufd)) {
+>> +    if (!ufd_version_check(ufd, mis)) {
+>>           goto out;
+>>       }
+>>   
+>> @@ -512,7 +512,7 @@ int postcopy_ram_enable_notify(MigrationIncomingState *mis)
+>>        * Although the host check already tested the API, we need to
+>>        * do the check again as an ABI handshake on the new fd.
+>>        */
+>> -    if (!ufd_version_check(mis->userfault_fd)) {
+>> +    if (!ufd_version_check(mis->userfault_fd, mis)) {
+>>           return -1;
+>>       }
+>>   
+>> @@ -650,7 +650,7 @@ void *postcopy_get_tmp_page(MigrationIncomingState *mis)
+>>   
+>>   #else
+>>   /* No target OS support, stubs just fail */
+>> -bool postcopy_ram_supported_by_host(void)
+>> +bool postcopy_ram_supported_by_host(MigrationIncomingState *mis)
+>>   {
+>>       error_report("%s: No OS support", __func__);
+>>       return false;
+>> diff --git a/migration/postcopy-ram.h b/migration/postcopy-ram.h
+>> index 52d51e8..587a8b8 100644
+>> --- a/migration/postcopy-ram.h
+>> +++ b/migration/postcopy-ram.h
+>> @@ -14,7 +14,7 @@
+>>   #define QEMU_POSTCOPY_RAM_H
+>>   
+>>   /* Return true if the host supports everything we need to do postcopy-ram */
+>> -bool postcopy_ram_supported_by_host(void);
+>> +bool postcopy_ram_supported_by_host(MigrationIncomingState *mis);
+>>   
+>>   /*
+>>    * Make all of RAM sensitive to accesses to areas that haven't yet been written
+>> diff --git a/migration/savevm.c b/migration/savevm.c
+>> index f5e8194..61a6df7 100644
+>> --- a/migration/savevm.c
+>> +++ b/migration/savevm.c
+>> @@ -1356,7 +1356,7 @@ static int loadvm_postcopy_handle_advise(MigrationIncomingState *mis)
+>>           return -1;
+>>       }
+>>   
+>> -    if (!postcopy_ram_supported_by_host()) {
+>> +    if (!postcopy_ram_supported_by_host(mis)) {
+>>           postcopy_state_set(POSTCOPY_INCOMING_NONE);
+>>           return -1;
+>>       }
+>> -- 
+>> 1.8.3.1
+>>
+> --
+> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+>
+>
+>
 
-diff --git a/block/vmdk.c b/block/vmdk.c
-index 9fa2414..accf1c3 100644
---- a/block/vmdk.c
-+++ b/block/vmdk.c
-@@ -1485,25 +1485,16 @@ static int vmdk_alloc_clusters(BlockDriverState *bs,
-  * For flat extents, the start offset as parsed from the description file is
-  * returned.
-  *
-- * For sparse extents, look up in L1, L2 table. If allocate is true, return an
-- * offset for a new cluster and update L2 cache. If there is a backing file,
-- * COW is done before returning; otherwise, zeroes are written to the allocated
-- * cluster. Both COW and zero writing skips the sector range
-- * [@skip_start_sector, @skip_end_sector) passed in by caller, because caller
-- * has new data to write there.
-+ * For sparse extents, look up the L1, L2 table.
-  *
-  * Returns: VMDK_OK if cluster exists and mapped in the image.
-- *          VMDK_UNALLOC if cluster is not mapped and @allocate is false.
-- *          VMDK_ERROR if failed.
-+ *          VMDK_UNALLOC if cluster is not mapped.
-+ *          VMDK_ERROR if failed
-  */
- static int vmdk_get_cluster_offset(BlockDriverState *bs,
-                                    VmdkExtent *extent,
--                                   VmdkMetaData *m_data,
-                                    uint64_t offset,
--                                   bool allocate,
--                                   uint64_t *cluster_offset,
--                                   uint64_t skip_start_bytes,
--                                   uint64_t skip_end_bytes)
-+                                   uint64_t *cluster_offset)
- {
-     int l1_index, l2_offset, l2_index;
-     uint32_t *l2_table;
-@@ -1528,31 +1519,9 @@ static int vmdk_get_cluster_offset(BlockDriverState *bs,
-     }
- 
-     if (!cluster_sector || zeroed) {
--        if (!allocate) {
--            return zeroed ? VMDK_ZEROED : VMDK_UNALLOC;
--        }
--
--        cluster_sector = extent->next_cluster_sector;
--        extent->next_cluster_sector += extent->cluster_sectors;
--
--        /* First of all we write grain itself, to avoid race condition
--         * that may to corrupt the image.
--         * This problem may occur because of insufficient space on host disk
--         * or inappropriate VM shutdown.
--         */
--        ret = vmdk_perform_cow(bs, extent, cluster_sector * BDRV_SECTOR_SIZE,
--                                offset, skip_start_bytes, skip_end_bytes);
--        if (ret) {
--            return ret;
--        }
--        if (m_data) {
--            m_data->valid = 1;
--            m_data->l1_index = l1_index;
--            m_data->l2_index = l2_index;
--            m_data->l2_offset = l2_offset;
--            m_data->l2_cache_entry = &l2_table[l2_index];
--        }
-+        return zeroed ? VMDK_ZEROED : VMDK_UNALLOC;
-     }
-+
-     *cluster_offset = cluster_sector << BDRV_SECTOR_BITS;
-     return VMDK_OK;
- }
-@@ -1595,9 +1564,7 @@ static int64_t coroutine_fn vmdk_co_get_block_status(BlockDriverState *bs,
-         return 0;
-     }
-     qemu_co_mutex_lock(&s->lock);
--    ret = vmdk_get_cluster_offset(bs, extent, NULL,
--                                  sector_num * 512, false, &offset,
--                                  0, 0);
-+    ret = vmdk_get_cluster_offset(bs, extent, sector_num * 512, &offset);
-     qemu_co_mutex_unlock(&s->lock);
- 
-     index_in_cluster = vmdk_find_index_in_cluster(extent, sector_num);
-@@ -1788,13 +1755,14 @@ vmdk_co_preadv(BlockDriverState *bs, uint64_t offset, uint64_t bytes,
-             ret = -EIO;
-             goto fail;
-         }
--        ret = vmdk_get_cluster_offset(bs, extent, NULL,
--                                      offset, false, &cluster_offset, 0, 0);
-+
-         offset_in_cluster = vmdk_find_offset_in_cluster(extent, offset);
- 
-         n_bytes = MIN(bytes, extent->cluster_sectors * BDRV_SECTOR_SIZE
-                              - offset_in_cluster);
- 
-+        ret = vmdk_get_cluster_offset(bs, extent, offset, &cluster_offset);
-+
-         if (ret != VMDK_OK) {
-             /* if not allocated, try to read from parent image, if exist */
-             if (bs->backing && ret != VMDK_ZEROED) {
-@@ -2541,9 +2509,9 @@ static int vmdk_check(BlockDriverState *bs, BdrvCheckResult *result,
-                     sector_num);
-             break;
-         }
--        ret = vmdk_get_cluster_offset(bs, extent, NULL,
-+        ret = vmdk_get_cluster_offset(bs, extent,
-                                       sector_num << BDRV_SECTOR_BITS,
--                                      false, &cluster_offset, 0, 0);
-+                                      &cluster_offset);
-         if (ret == VMDK_ERROR) {
-             fprintf(stderr,
-                     "ERROR: could not get cluster_offset for sector %"
 -- 
-2.6.2
+Best regards,
+Alexey Perevalov
