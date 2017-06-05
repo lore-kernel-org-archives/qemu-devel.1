@@ -1,17 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35215)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35218)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dHxMr-0000gV-5C
+	(envelope-from <eblake@redhat.com>) id 1dHxMr-0000gZ-86
 	for qemu-devel@nongnu.org; Mon, 05 Jun 2017 15:08:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dHxMq-0004AL-AH
+	(envelope-from <eblake@redhat.com>) id 1dHxMq-0004AS-Ay
 	for qemu-devel@nongnu.org; Mon, 05 Jun 2017 15:08:45 -0400
 From: Eric Blake <eblake@redhat.com>
-Date: Mon,  5 Jun 2017 14:08:24 -0500
-Message-Id: <20170605190824.25184-5-eblake@redhat.com>
+Date: Mon,  5 Jun 2017 14:08:23 -0500
+Message-Id: <20170605190824.25184-4-eblake@redhat.com>
 In-Reply-To: <20170605190824.25184-1-eblake@redhat.com>
 References: <20170605190824.25184-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 4/4] blkdebug: Support
- .bdrv_co_get_block_status
+Subject: [Qemu-devel] [PATCH v3 3/4] block: Simplify use of BDRV_BLOCK_RAW
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,69 +20,93 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: jsnow@redhat.com, mreitz@redhat.com, qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>
+Cc: jsnow@redhat.com, mreitz@redhat.com, qemu-block@nongnu.org, Jeff Cody <jcody@redhat.com>, Kevin Wolf <kwolf@redhat.com>
 
-Without a passthrough status of BDRV_BLOCK_RAW, anything wrapped by
-blkdebug appears 100% allocated as data.  Better is treating it the
-same as the underlying file being wrapped.
-
-Update iotest 177 for the new expected output.
+The lone caller that cares about a return of BDRV_BLOCK_RAW
+(namely, io.c:bdrv_co_get_block_status) completely replaces the
+return value, so there is no point in passing BDRV_BLOCK_DATA.
 
 Signed-off-by: Eric Blake <eblake@redhat.com>
-Reviewed-by: Fam Zheng <famz@redhat.com>
-Reviewed-by: Max Reitz <mreitz@redhat.com>
 
 ---
-v3: rebase to earlier changes
-v2: tweak commit message
+v3: further document BDRV_BLOCK_RAW
+v2: fix subject, tweak commit message
 ---
- block/blkdebug.c           | 11 +++++++++++
- tests/qemu-iotests/177.out |  5 ++++-
- 2 files changed, 15 insertions(+), 1 deletion(-)
+ include/block/block.h | 6 +++---
+ block/commit.c        | 2 +-
+ block/mirror.c        | 2 +-
+ block/raw-format.c    | 2 +-
+ block/vpc.c           | 2 +-
+ 5 files changed, 7 insertions(+), 7 deletions(-)
 
-diff --git a/block/blkdebug.c b/block/blkdebug.c
-index a5196e8..1ad8d65 100644
---- a/block/blkdebug.c
-+++ b/block/blkdebug.c
-@@ -642,6 +642,16 @@ static int coroutine_fn blkdebug_co_pdiscard(BlockDriverState *bs,
-     return bdrv_co_pdiscard(bs->file->bs, offset, count);
+diff --git a/include/block/block.h b/include/block/block.h
+index 9b355e9..0a60444 100644
+--- a/include/block/block.h
++++ b/include/block/block.h
+@@ -131,9 +131,9 @@ typedef struct HDGeometry {
+  *                       layer (short for DATA || ZERO), set by block layer
+  *
+  * Internal flag:
+- * BDRV_BLOCK_RAW: used internally to indicate that the request was
+- *                 answered by a passthrough driver such as raw and that the
+- *                 block layer should recompute the answer from bs->file.
++ * BDRV_BLOCK_RAW: for use by passthrough drivers, such as raw, to request
++ *                 that the block layer recompute the answer from the returned
++ *                 BDS; must be accompanied by just BDRV_BLOCK_OFFSET_VALID.
+  *
+  * If BDRV_BLOCK_OFFSET_VALID is set, bits 9-62 (BDRV_BLOCK_OFFSET_MASK)
+  * represent the offset in the returned BDS that is allocated for the
+diff --git a/block/commit.c b/block/commit.c
+index a3028b2..f56745b 100644
+--- a/block/commit.c
++++ b/block/commit.c
+@@ -239,7 +239,7 @@ static int64_t coroutine_fn bdrv_commit_top_get_block_status(
+ {
+     *pnum = nb_sectors;
+     *file = bs->backing->bs;
+-    return BDRV_BLOCK_RAW | BDRV_BLOCK_OFFSET_VALID | BDRV_BLOCK_DATA |
++    return BDRV_BLOCK_RAW | BDRV_BLOCK_OFFSET_VALID |
+            (sector_num << BDRV_SECTOR_BITS);
  }
 
-+static int64_t coroutine_fn blkdebug_co_get_block_status(
-+    BlockDriverState *bs, int64_t sector_num, int nb_sectors, int *pnum,
-+    BlockDriverState **file)
-+{
-+    *pnum = nb_sectors;
-+    *file = bs->file->bs;
-+    return BDRV_BLOCK_RAW | BDRV_BLOCK_OFFSET_VALID |
-+        (sector_num << BDRV_SECTOR_BITS);
-+}
-+
- static void blkdebug_close(BlockDriverState *bs)
+diff --git a/block/mirror.c b/block/mirror.c
+index a2a9703..892d53a 100644
+--- a/block/mirror.c
++++ b/block/mirror.c
+@@ -1052,7 +1052,7 @@ static int64_t coroutine_fn bdrv_mirror_top_get_block_status(
  {
-     BDRVBlkdebugState *s = bs->opaque;
-@@ -912,6 +922,7 @@ static BlockDriver bdrv_blkdebug = {
-     .bdrv_co_flush_to_disk  = blkdebug_co_flush,
-     .bdrv_co_pwrite_zeroes  = blkdebug_co_pwrite_zeroes,
-     .bdrv_co_pdiscard       = blkdebug_co_pdiscard,
-+    .bdrv_co_get_block_status = blkdebug_co_get_block_status,
+     *pnum = nb_sectors;
+     *file = bs->backing->bs;
+-    return BDRV_BLOCK_RAW | BDRV_BLOCK_OFFSET_VALID | BDRV_BLOCK_DATA |
++    return BDRV_BLOCK_RAW | BDRV_BLOCK_OFFSET_VALID |
+            (sector_num << BDRV_SECTOR_BITS);
+ }
 
-     .bdrv_debug_event           = blkdebug_debug_event,
-     .bdrv_debug_breakpoint      = blkdebug_debug_breakpoint,
-diff --git a/tests/qemu-iotests/177.out b/tests/qemu-iotests/177.out
-index fcfbfa3..43a7778 100644
---- a/tests/qemu-iotests/177.out
-+++ b/tests/qemu-iotests/177.out
-@@ -46,6 +46,9 @@ read 30408704/30408704 bytes at offset 80740352
- read 23068672/23068672 bytes at offset 111149056
- 22 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
- Offset          Length          File
--0               0x8000000       json:{"image": {"driver": "IMGFMT", "file": {"driver": "file", "filename": "TEST_DIR/t.IMGFMT"}}, "driver": "blkdebug", "align": "4k"}
-+0               0x800000        TEST_DIR/t.IMGFMT
-+0x900000        0x2400000       TEST_DIR/t.IMGFMT
-+0x3c00000       0x1100000       TEST_DIR/t.IMGFMT
-+0x6a00000       0x1600000       TEST_DIR/t.IMGFMT
- No errors were found on the image.
- *** done
+diff --git a/block/raw-format.c b/block/raw-format.c
+index 36e6503..1136eba 100644
+--- a/block/raw-format.c
++++ b/block/raw-format.c
+@@ -259,7 +259,7 @@ static int64_t coroutine_fn raw_co_get_block_status(BlockDriverState *bs,
+     *pnum = nb_sectors;
+     *file = bs->file->bs;
+     sector_num += s->offset / BDRV_SECTOR_SIZE;
+-    return BDRV_BLOCK_RAW | BDRV_BLOCK_OFFSET_VALID | BDRV_BLOCK_DATA |
++    return BDRV_BLOCK_RAW | BDRV_BLOCK_OFFSET_VALID |
+            (sector_num << BDRV_SECTOR_BITS);
+ }
+
+diff --git a/block/vpc.c b/block/vpc.c
+index 4240ba9..b313c68 100644
+--- a/block/vpc.c
++++ b/block/vpc.c
+@@ -701,7 +701,7 @@ static int64_t coroutine_fn vpc_co_get_block_status(BlockDriverState *bs,
+     if (be32_to_cpu(footer->type) == VHD_FIXED) {
+         *pnum = nb_sectors;
+         *file = bs->file->bs;
+-        return BDRV_BLOCK_RAW | BDRV_BLOCK_OFFSET_VALID | BDRV_BLOCK_DATA |
++        return BDRV_BLOCK_RAW | BDRV_BLOCK_OFFSET_VALID |
+                (sector_num << BDRV_SECTOR_BITS);
+     }
+
 -- 
 2.9.4
