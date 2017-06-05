@@ -1,21 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34762)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45293)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dHgLF-0006FS-Hb
-	for qemu-devel@nongnu.org; Sun, 04 Jun 2017 20:57:58 -0400
+	(envelope-from <mst@redhat.com>) id 1dHhdz-0003h2-Mp
+	for qemu-devel@nongnu.org; Sun, 04 Jun 2017 22:21:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dHgLE-0006yx-Gv
-	for qemu-devel@nongnu.org; Sun, 04 Jun 2017 20:57:57 -0400
-Date: Mon, 5 Jun 2017 10:57:39 +1000
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20170605005739.GY13397@umbus.fritz.box>
-References: <20170605004951.1009-1-sjitindarsingh@gmail.com>
+	(envelope-from <mst@redhat.com>) id 1dHhdw-0004a7-Iy
+	for qemu-devel@nongnu.org; Sun, 04 Jun 2017 22:21:23 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:56938)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1dHhdw-0004Yd-Ac
+	for qemu-devel@nongnu.org; Sun, 04 Jun 2017 22:21:20 -0400
+Date: Mon, 5 Jun 2017 05:21:16 +0300
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20170605050901-mutt-send-email-mst@kernel.org>
+References: <3d9e8375-fbaa-c011-8242-b37cd971069b@redhat.com>
+	<5924136A.4090004@intel.com>
+	<7636d3d0-a0de-f9a6-47f8-2d09a448b978@redhat.com>
+	<592544D9.5010100@intel.com>
+	<23dac05e-ba3d-df6d-4831-feab9be1c6d2@redhat.com>
+	<5926C7AC.4080603@intel.com>
+	<6a6ecbcd-e9ae-1cf0-ccd9-14294cd0cf86@redhat.com>
+	<5367a1b2-b3cc-8df2-c9ec-99fb60a57666@redhat.com>
+	<20170525204018-mutt-send-email-mst@kernel.org>
+	<5933E245.3030903@intel.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="Zzd9Wh/bp6DhMAqJ"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20170605004951.1009-1-sjitindarsingh@gmail.com>
-Subject: Re: [Qemu-devel] [PATCH] target/ppc: Fixup set_spr error in
- h_register_process_table
+In-Reply-To: <5933E245.3030903@intel.com>
+Subject: Re: [Qemu-devel] [virtio-dev] Re: [virtio-dev] Re: [virtio-dev] Re:
+ [PATCH v2 00/16] Vhost-pci for inter-VM communication
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,87 +36,87 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, agraf@suse.de
+To: Wei Wang <wei.w.wang@intel.com>
+Cc: Jason Wang <jasowang@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>, "virtio-dev@lists.oasis-open.org" <virtio-dev@lists.oasis-open.org>, "marcandre.lureau@gmail.com" <marcandre.lureau@gmail.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "pbonzini@redhat.com" <pbonzini@redhat.com>
+
+On Sun, Jun 04, 2017 at 06:34:45PM +0800, Wei Wang wrote:
+> On 05/26/2017 01:57 AM, Michael S. Tsirkin wrote:
+> > 
+> > I think that's a very valid point. Linux isn't currently optimized to
+> > handle packets in device BAR.
+> > There are several issues here and you do need to address them in the
+> > kernel, no way around that:
+> > 
+> > 1. lots of drivers set protection to
+> >          vma->vm_page_prot = pgprot_noncached(vma->vm_page_prot);
+> > 
+> Sorry for my late reply.
+> 
+> In the implementation tests, I didn't find an issue when letting the
+> guest directly access the bar MMIO returned by ioremap_cache().
+> If that's conventionally improper, we can probably make a new
+> function similar to ioremap_cache, as the 2nd comment suggests
+> below.
+
+Right. And just disable the driver on architectures that don't support it.
+
+> So, in any case, the vhost-pci driver uses ioremap_cache() or a similar
+> function, which sets the memory type to WB.
+> 
+
+And that's great. AFAIK VFIO doesn't though, you will need to
+teach it to do that to use userspace drivers.
+
+> 
+> >     vfio certainly does, and so I think does pci sysfs.
+> >     You won't get good performance with this, you want to use
+> >     a cacheable mapping.
+> >     This needs to be addressed for pmd to work well.
+> 
+> In case it's useful for the discussion here, introduce a little background
+> about how the bar MMIO is used in vhost-pci:
+> The device in QEMU sets up the MemoryRegion of the bar as  "ram" type,
+> which will finally have translation mappings created in EPT. So, the memory
+> setup of the bar is the same as adding a regular RAM. It's like we are
+> passing through a bar memory to the guest which allows the guest to
+> directly access to the bar memory.
+> 
+> Back to the comments, why it is not cacheable memory when the
+> vhost-pci driver explicitly uses ioremap_cache()?
+
+It is. But when you write a userspace driver, you will need
+to teach vfio to allow cacheable access from userspace.
+
+> > 
+> > 2. linux mostly assumes PCI BAR isn't memory, ioremap_cache returns __iomem
+> >     pointers which aren't supposed to be dereferenced directly.
+> >     You want a new API that does direct remap or copy if not possible.
+> >     Alternatively remap or fail, kind of like pci_remap_iospace.
+> >     Maybe there's already something like that - I'm not sure.
+> > 
+> 
+> For the vhost-pci case, the bar is known to be a portion physical memory.
+
+Yes but AFAIK __iomem mappings still can't be portably dereferenced on all
+architectures. ioremap_cache simply doesn't always give you
+a dereferencable address.
+
+> So, in this case, would it be an issue if the driver directly accesses to
+> it?
+> (as mentioned above, the implementation functions correctly)
+> 
+> Best,
+> Wei
+
+you mean like this:
+        void __iomem *baseptr = ioremap_cache(....);
+
+        unsigned long signature = *(unsigned int *)baseptr;
 
 
---Zzd9Wh/bp6DhMAqJ
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+It works on intel. sparse will complain though. See
+Documentation/bus-virt-phys-mapping.txt
 
-On Mon, Jun 05, 2017 at 10:49:51AM +1000, Suraj Jitindar Singh wrote:
-> set_spr is used in the function h_register_process_table() to update the
-> LPCR_GTSE and LPCR_UPRT values based on the flags passed by the guest.
-> The set_spr function takes the last two arguments mask and value used to
-> mask and set the value of the spr respectively.
->=20
-> The current call site passes these arguments in the wrong order and thus
-> bot GTSE and UPRT will be set irrespective, which is obviously
-> incorrect.
->=20
-> Rearrange the function call so that these arguments are passed in the
-> correct order and the correct behaviour is exhibited.
->=20
-> It is worth noting that this wasn't detected earlier since these were
-> always both set in all cases where this H_CALL was made.
->=20
-> Fixes: 6de833070ca2 ("target/ppc: Set UPRT and GTSE on all cpus in H_REGI=
-STER_PROCESS_TABLE")
->=20
-> Signed-off-by: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
 
-Applied to ppc-for-2.10, thanks.
-
-> ---
->  hw/ppc/spapr_hcall.c | 5 +++--
->  1 file changed, 3 insertions(+), 2 deletions(-)
->=20
-> diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
-> index aae5a62..aa1ffea 100644
-> --- a/hw/ppc/spapr_hcall.c
-> +++ b/hw/ppc/spapr_hcall.c
-> @@ -992,9 +992,10 @@ static target_ulong h_register_process_table(PowerPC=
-CPU *cpu,
-> =20
->      /* Update the UPRT and GTSE bits in the LPCR for all cpus */
->      CPU_FOREACH(cs) {
-> -        set_spr(cs, SPR_LPCR, LPCR_UPRT | LPCR_GTSE,
-> +        set_spr(cs, SPR_LPCR,
->                  ((flags & (FLAG_RADIX | FLAG_HASH_PROC_TBL)) ? LPCR_UPRT=
- : 0) |
-> -                ((flags & FLAG_GTSE) ? LPCR_GTSE : 0));
-> +                ((flags & FLAG_GTSE) ? LPCR_GTSE : 0),
-> +                LPCR_UPRT | LPCR_GTSE);
->      }
-> =20
->      if (kvm_enabled()) {
-
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---Zzd9Wh/bp6DhMAqJ
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-
-iQIcBAEBCAAGBQJZNKyDAAoJEGw4ysog2bOSI1MQAOcoiFvOIsVN49N1qk3TvGz8
-EsRIugZtBbecLQMHdV9nP1pvzNUu5hz+HKnp8RLjw4bg9UTVKvvS1Ne5zQ/PPPua
-2+e+pdAaQ3+xm8u5MtEt60BRmY56t5ySaWsB/V2tqv+nGfS+C7mCHzSoet00/dmV
-CWlK8LnaRH7JQ8XN5/n/UA4REBRg0K1ngT4Ea1Lp/J+o53mN47qzSvDGv0wb7rDo
-e7ZzZ31ny4fcp7hV70FXhLiHH+MNtdHoJiEn26RQPUYkbsNh/PwYI/MXe3FPpunk
-x1AeTB8F+bmQQZise0tgT5aQDem7Alec89V7dSgdQE0E5OsSDkBiCnjjgPL38EUn
-pWjebLyY/5rxN+e3dgQlPGp24UcgqoPU0zZYByg2dLUENeJY6ccBfQ0KCeAr3tIr
-IWVVafG1/29Qa1g6fDTiBy8S9uJC73yprRTrwoTxJCKq2IAA0GKF8DXpy9SpM2s0
-vuJzFGhijsd+dDYSKYZN/dSdGDzbOKDi8AuXfpiIrlSBYkFrJVDuwBE6AtgypvXn
-7t343tV+o4xFQdRuxFtLPxKO4+rzbVAGXknNz7mySUStGtYDwB7xd+gwDNjhIErv
-qqEooQrfPvabgYbpd18FRKvRHPGpv8yITxPZvhl+CmmWgKVRX7ivLUSY3jEx+eDn
-RMyuSskTilYE62zhRqgU
-=nSK2
------END PGP SIGNATURE-----
-
---Zzd9Wh/bp6DhMAqJ--
+-- 
+MST
