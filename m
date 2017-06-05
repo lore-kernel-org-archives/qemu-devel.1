@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41819)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41835)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dHrIE-00009n-52
-	for qemu-devel@nongnu.org; Mon, 05 Jun 2017 08:39:35 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1dHrIF-0000BY-J0
+	for qemu-devel@nongnu.org; Mon, 05 Jun 2017 08:39:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dHrID-0006A5-B2
-	for qemu-devel@nongnu.org; Mon, 05 Jun 2017 08:39:34 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:49560)
+	(envelope-from <pbonzini@redhat.com>) id 1dHrIE-0006C5-GE
+	for qemu-devel@nongnu.org; Mon, 05 Jun 2017 08:39:35 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55654)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1dHrID-00068n-2b
-	for qemu-devel@nongnu.org; Mon, 05 Jun 2017 08:39:33 -0400
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1dHrIE-0006As-7c
+	for qemu-devel@nongnu.org; Mon, 05 Jun 2017 08:39:34 -0400
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Mon,  5 Jun 2017 14:39:07 +0200
-Message-Id: <20170605123908.18777-19-pbonzini@redhat.com>
+Date: Mon,  5 Jun 2017 14:39:08 +0200
+Message-Id: <20170605123908.18777-20-pbonzini@redhat.com>
 In-Reply-To: <20170605123908.18777-1-pbonzini@redhat.com>
 References: <20170605123908.18777-1-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PATCH 18/19] block: split BlockAcctStats creation and
- setup
+Subject: [Qemu-devel] [PATCH 19/19] block: make accounting thread-safe
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,88 +26,144 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: famz@redhat.com, Alberto Garcia <berto@igalia.com>
 
-block_acct_destroy is called unconditionally in blk_delete, but there is
-no BlockAcctStats function that is called unconditionally in blk_new.
-Split block_acct_init in two, so that it will be possible to create a
-QemuMutex in block_acct_init and destroy it in block_acct_cleanup.
+I'm not trying too hard yet.  Later, with multiqueue support,
+this may cause mutex contention or cacheline bouncing.
 
 Cc: Alberto Garcia <berto@igalia.com>
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- block/accounting.c         | 13 ++++++++-----
- block/block-backend.c      |  1 +
- blockdev.c                 |  2 +-
- include/block/accounting.h |  3 ++-
- 4 files changed, 12 insertions(+), 7 deletions(-)
+ block/accounting.c         | 16 ++++++++++++++++
+ include/block/accounting.h |  8 ++++++--
+ 2 files changed, 22 insertions(+), 2 deletions(-)
 
 diff --git a/block/accounting.c b/block/accounting.c
-index a279e0b124..ce6dbf7760 100644
+index ce6dbf7760..87ef5bbfaa 100644
 --- a/block/accounting.c
 +++ b/block/accounting.c
-@@ -32,17 +32,20 @@
- static QEMUClockType clock_type = QEMU_CLOCK_REALTIME;
- static const int qtest_latency_ns = NANOSECONDS_PER_SECOND / 1000;
+@@ -34,6 +34,7 @@ static const int qtest_latency_ns = NANOSECONDS_PER_SECOND / 1000;
  
--void block_acct_init(BlockAcctStats *stats, bool account_invalid,
--                     bool account_failed)
-+void block_acct_init(BlockAcctStats *stats)
+ void block_acct_init(BlockAcctStats *stats)
  {
--    stats->account_invalid = account_invalid;
--    stats->account_failed = account_failed;
--
++    qemu_mutex_init(&stats->lock);
      if (qtest_enabled()) {
          clock_type = QEMU_CLOCK_VIRTUAL;
      }
+@@ -52,6 +53,7 @@ void block_acct_cleanup(BlockAcctStats *stats)
+     QSLIST_FOREACH_SAFE(s, &stats->intervals, entries, next) {
+         g_free(s);
+     }
++    qemu_mutex_destroy(&stats->lock);
  }
  
-+void block_acct_setup(BlockAcctStats *stats, bool account_invalid,
-+                      bool account_failed)
-+{
-+    stats->account_invalid = account_invalid;
-+    stats->account_failed = account_failed;
-+}
+ void block_acct_add_interval(BlockAcctStats *stats, unsigned interval_length)
+@@ -61,12 +63,15 @@ void block_acct_add_interval(BlockAcctStats *stats, unsigned interval_length)
+ 
+     s = g_new0(BlockAcctTimedStats, 1);
+     s->interval_length = interval_length;
++    s->stats = stats;
++    qemu_mutex_lock(&stats->lock);
+     QSLIST_INSERT_HEAD(&stats->intervals, s, entries);
+ 
+     for (i = 0; i < BLOCK_MAX_IOTYPE; i++) {
+         timed_average_init(&s->latency[i], clock_type,
+                            (uint64_t) interval_length * NANOSECONDS_PER_SECOND);
+     }
++    qemu_mutex_unlock(&stats->lock);
+ }
+ 
+ BlockAcctTimedStats *block_acct_interval_next(BlockAcctStats *stats,
+@@ -102,6 +107,8 @@ static void block_account_one_io(BlockAcctStats *stats, BlockAcctCookie *cookie,
+ 
+     assert(cookie->type < BLOCK_MAX_IOTYPE);
+ 
++    qemu_mutex_lock(&stats->lock);
 +
- void block_acct_cleanup(BlockAcctStats *stats)
- {
-     BlockAcctTimedStats *s, *next;
-diff --git a/block/block-backend.c b/block/block-backend.c
-index be2ddf173a..828497e27a 100644
---- a/block/block-backend.c
-+++ b/block/block-backend.c
-@@ -219,6 +219,7 @@ BlockBackend *blk_new(uint64_t perm, uint64_t shared_perm)
-     qemu_co_mutex_init(&blk->public.throttled_reqs_lock);
-     qemu_co_queue_init(&blk->public.throttled_reqs[0]);
-     qemu_co_queue_init(&blk->public.throttled_reqs[1]);
-+    block_acct_init(&blk->stats);
- 
-     notifier_list_init(&blk->remove_bs_notifiers);
-     notifier_list_init(&blk->insert_bs_notifiers);
-diff --git a/blockdev.c b/blockdev.c
-index 6e7c8a678c..0fa2e7e571 100644
---- a/blockdev.c
-+++ b/blockdev.c
-@@ -595,7 +595,7 @@ static BlockBackend *blockdev_init(const char *file, QDict *bs_opts,
-             autostart = 0;
+     if (failed) {
+         stats->failed_ops[cookie->type]++;
+     } else {
+@@ -117,6 +124,8 @@ static void block_account_one_io(BlockAcctStats *stats, BlockAcctCookie *cookie,
+             timed_average_account(&s->latency[cookie->type], latency_ns);
          }
+     }
++
++    qemu_mutex_unlock(&stats->lock);
+ }
  
--        block_acct_init(blk_get_stats(blk), account_invalid, account_failed);
-+        block_acct_setup(blk_get_stats(blk), account_invalid, account_failed);
+ void block_acct_done(BlockAcctStats *stats, BlockAcctCookie *cookie)
+@@ -137,18 +146,23 @@ void block_acct_invalid(BlockAcctStats *stats, enum BlockAcctType type)
+      * not.  The reason is that invalid requests are accounted during their
+      * submission, therefore there's no actual I/O involved.
+      */
++    qemu_mutex_lock(&stats->lock);
+     stats->invalid_ops[type]++;
  
-         if (!parse_stats_intervals(blk_get_stats(blk), interval_list, errp)) {
-             blk_unref(blk);
+     if (stats->account_invalid) {
+         stats->last_access_time_ns = qemu_clock_get_ns(clock_type);
+     }
++    qemu_mutex_unlock(&stats->lock);
+ }
+ 
+ void block_acct_merge_done(BlockAcctStats *stats, enum BlockAcctType type,
+                       int num_requests)
+ {
+     assert(type < BLOCK_MAX_IOTYPE);
++
++    qemu_mutex_lock(&stats->lock);
+     stats->merged[type] += num_requests;
++    qemu_mutex_unlock(&stats->lock);
+ }
+ 
+ int64_t block_acct_idle_time_ns(BlockAcctStats *stats)
+@@ -163,7 +177,9 @@ double block_acct_queue_depth(BlockAcctTimedStats *stats,
+ 
+     assert(type < BLOCK_MAX_IOTYPE);
+ 
++    qemu_mutex_lock(&stats->stats->lock);
+     sum = timed_average_sum(&stats->latency[type], &elapsed);
++    qemu_mutex_unlock(&stats->stats->lock);
+ 
+     return (double) sum / elapsed;
+ }
 diff --git a/include/block/accounting.h b/include/block/accounting.h
-index 20891639d5..55cb06fdb6 100644
+index 55cb06fdb6..b833d26d6c 100644
 --- a/include/block/accounting.h
 +++ b/include/block/accounting.h
-@@ -61,7 +61,8 @@ typedef struct BlockAcctCookie {
-     enum BlockAcctType type;
- } BlockAcctCookie;
+@@ -26,8 +26,10 @@
+ #define BLOCK_ACCOUNTING_H
  
--void block_acct_init(BlockAcctStats *stats, bool account_invalid,
-+void block_acct_init(BlockAcctStats *stats);
-+void block_acct_setup(BlockAcctStats *stats, bool account_invalid,
-                      bool account_failed);
- void block_acct_cleanup(BlockAcctStats *stats);
- void block_acct_add_interval(BlockAcctStats *stats, unsigned interval_length);
+ #include "qemu/timed-average.h"
++#include "qemu/thread.h"
+ 
+ typedef struct BlockAcctTimedStats BlockAcctTimedStats;
++typedef struct BlockAcctStats BlockAcctStats;
+ 
+ enum BlockAcctType {
+     BLOCK_ACCT_READ,
+@@ -37,12 +39,14 @@ enum BlockAcctType {
+ };
+ 
+ struct BlockAcctTimedStats {
++    BlockAcctStats *stats;
+     TimedAverage latency[BLOCK_MAX_IOTYPE];
+     unsigned interval_length; /* in seconds */
+     QSLIST_ENTRY(BlockAcctTimedStats) entries;
+ };
+ 
+-typedef struct BlockAcctStats {
++struct BlockAcctStats {
++    QemuMutex lock;
+     uint64_t nr_bytes[BLOCK_MAX_IOTYPE];
+     uint64_t nr_ops[BLOCK_MAX_IOTYPE];
+     uint64_t invalid_ops[BLOCK_MAX_IOTYPE];
+@@ -53,7 +57,7 @@ typedef struct BlockAcctStats {
+     QSLIST_HEAD(, BlockAcctTimedStats) intervals;
+     bool account_invalid;
+     bool account_failed;
+-} BlockAcctStats;
++};
+ 
+ typedef struct BlockAcctCookie {
+     int64_t bytes;
 -- 
 2.13.0
