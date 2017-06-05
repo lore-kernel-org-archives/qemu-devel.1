@@ -1,34 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43556)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44505)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <a.perevalov@samsung.com>) id 1dHl3C-00038k-3t
-	for qemu-devel@nongnu.org; Mon, 05 Jun 2017 01:59:39 -0400
+	(envelope-from <ashijeetacharya@gmail.com>) id 1dHlAg-0005zn-8c
+	for qemu-devel@nongnu.org; Mon, 05 Jun 2017 02:07:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <a.perevalov@samsung.com>) id 1dHl39-0005dA-2R
-	for qemu-devel@nongnu.org; Mon, 05 Jun 2017 01:59:38 -0400
-Received: from mailout3.w1.samsung.com ([210.118.77.13]:27041)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <a.perevalov@samsung.com>)
-	id 1dHl38-0005ZU-OY
-	for qemu-devel@nongnu.org; Mon, 05 Jun 2017 01:59:35 -0400
-Received: from eucas1p1.samsung.com (unknown [182.198.249.206])
-	by mailout3.w1.samsung.com
-	(Oracle Communications Messaging Server 7.0.5.31.0 64bit (built May 5
-	2014)) with ESMTP id <0OR2005NC8N58Q70@mailout3.w1.samsung.com> for
-	qemu-devel@nongnu.org; Mon, 05 Jun 2017 06:59:29 +0100 (BST)
-From: Alexey Perevalov <a.perevalov@samsung.com>
-Message-id: <11a333fa-83ae-3982-9473-197d7876d33a@samsung.com>
-Date: Mon, 05 Jun 2017 08:59:26 +0300
-MIME-version: 1.0
-In-reply-to: <20170531175458.GG3342@work-vm>
-Content-type: text/plain; charset=utf-8; format=flowed
-Content-transfer-encoding: 7bit
-Content-language: en-GB
-References: <1495539071-12995-1-git-send-email-a.perevalov@samsung.com>
-	<CGME20170523113127eucas1p22dba0fddcc9bcf70e554bf659272f947@eucas1p2.samsung.com>
-	<1495539071-12995-3-git-send-email-a.perevalov@samsung.com>
-	<20170531175458.GG3342@work-vm>
-Subject: Re: [Qemu-devel] [PATCH V6 02/10] migration: pass
- MigrationIncomingState* into migration check functions
+	(envelope-from <ashijeetacharya@gmail.com>) id 1dHlAe-0002vH-OE
+	for qemu-devel@nongnu.org; Mon, 05 Jun 2017 02:07:22 -0400
+MIME-Version: 1.0
+In-Reply-To: <1496642007-8309-7-git-send-email-ashijeetacharya@gmail.com>
+References: <1496642007-8309-1-git-send-email-ashijeetacharya@gmail.com>
+	<1496642007-8309-7-git-send-email-ashijeetacharya@gmail.com>
+From: Ashijeet Acharya <ashijeetacharya@gmail.com>
+Date: Mon, 5 Jun 2017 11:37:19 +0530
+Message-ID: <CAC2QTZZgzsQPVgcwNrFqy3vov-rx8DTUucoJ5JfsSaTUeOuQCQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v5 6/8] vmdk: New functions to assist
+ allocating multiple clusters
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,132 +23,269 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: qemu-devel@nongnu.org, i.maximets@samsung.com, peterx@redhat.com, eblake@redhat.com
+To: Fam Zheng <famz@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, John Snow <jsnow@redhat.com>, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>, qemu block <qemu-block@nongnu.org>, Ashijeet Acharya <ashijeetacharya@gmail.com>
 
-On 05/31/2017 08:54 PM, Dr. David Alan Gilbert wrote:
-> * Alexey Perevalov (a.perevalov@samsung.com) wrote:
->> That tiny refactoring is necessary to be able to set
->> UFFD_FEATURE_THREAD_ID while requesting features, and then
->> to create downtime context in case when kernel supports it.
->>
->> Signed-off-by: Alexey Perevalov <a.perevalov@samsung.com>
->> ---
->>   migration/migration.c    |  2 +-
->>   migration/postcopy-ram.c | 10 +++++-----
->>   migration/postcopy-ram.h |  2 +-
->>   migration/savevm.c       |  2 +-
->>   4 files changed, 8 insertions(+), 8 deletions(-)
->>
->> diff --git a/migration/migration.c b/migration/migration.c
->> index 0304c01..d735976 100644
->> --- a/migration/migration.c
->> +++ b/migration/migration.c
->> @@ -789,7 +789,7 @@ void qmp_migrate_set_capabilities(MigrationCapabilityStatusList *params,
->>            * special support.
->>            */
->>           if (!old_postcopy_cap && runstate_check(RUN_STATE_INMIGRATE) &&
->> -            !postcopy_ram_supported_by_host()) {
->> +            !postcopy_ram_supported_by_host(NULL)) {
-> Why is that NULL rather than migration_incoming_get_current()?
-> That's on the destination.
-In current implementation, AFAIU,
-migrate-set-capabilities with postcopy-ram argument should be done on 
-source machine only,
-and it's not required on destination. And it is unnecessary requirement 
-to support userfaultfd on
-source and check it there.
+On Mon, Jun 5, 2017 at 11:23 AM, Ashijeet Acharya
+<ashijeetacharya@gmail.com> wrote:
+> Introduce two new helper functions handle_alloc() and
+> vmdk_alloc_cluster_offset(). handle_alloc() helps to allocate multiple
+> clusters at once starting from a given offset on disk and performs COW
+> if necessary for first and last allocated clusters.
+> vmdk_alloc_cluster_offset() helps to return the offset of the first of
+> the many newly allocated clusters. Also, provide proper documentation
+> for both.
+>
+> Signed-off-by: Ashijeet Acharya <ashijeetacharya@gmail.com>
+> ---
+>  block/vmdk.c | 192 +++++++++++++++++++++++++++++++++++++++++++++++++++++++----
+>  1 file changed, 182 insertions(+), 10 deletions(-)
+>
+> diff --git a/block/vmdk.c b/block/vmdk.c
+> index fe2046b..b671dc9 100644
+> --- a/block/vmdk.c
+> +++ b/block/vmdk.c
+> @@ -136,6 +136,7 @@ typedef struct VmdkMetaData {
+>      unsigned int l2_offset;
+>      int valid;
+>      uint32_t *l2_cache_entry;
+> +    uint32_t nb_clusters;
+>  } VmdkMetaData;
+>
+>  typedef struct VmdkGrainMarker {
+> @@ -1242,6 +1243,174 @@ static int get_cluster_table(VmdkExtent *extent, uint64_t offset,
+>      return VMDK_OK;
+>  }
+>
+> +/*
+> + * vmdk_handle_alloc
+> + *
+> + * Allocate new clusters for an area that either is yet unallocated or needs a
+> + * copy on write. If *cluster_offset is non_zero, clusters are only allocated if
+> + * the new allocation can match the specified host offset.
+> + *
+> + * Returns:
+> + *   VMDK_OK:       if new clusters were allocated, *bytes may be decreased if
+> + *                  the new allocation doesn't cover all of the requested area.
+> + *                  *cluster_offset is updated to contain the offset of the
+> + *                  first newly allocated cluster.
+> + *
+> + *   VMDK_UNALLOC:  if no clusters could be allocated. *cluster_offset is left
+> + *                  unchanged.
+> + *
+> + *   VMDK_ERROR:    in error cases
+> + */
+> +static int vmdk_handle_alloc(BlockDriverState *bs, VmdkExtent *extent,
+> +                             uint64_t offset, uint64_t *cluster_offset,
+> +                             int64_t *bytes, VmdkMetaData *m_data,
+> +                             bool allocate, uint32_t *total_alloc_clusters)
+> +{
+> +    int l1_index, l2_offset, l2_index;
+> +    uint32_t *l2_table;
+> +    uint32_t cluster_sector;
+> +    uint32_t nb_clusters;
+> +    bool zeroed = false;
+> +    uint64_t skip_start_bytes, skip_end_bytes;
+> +    int ret;
+> +
+> +    ret = get_cluster_table(extent, offset, &l1_index, &l2_offset,
+> +                            &l2_index, &l2_table);
+> +    if (ret < 0) {
+> +        return ret;
+> +    }
+> +
+> +    cluster_sector = le32_to_cpu(l2_table[l2_index]);
+> +
+> +    skip_start_bytes = vmdk_find_offset_in_cluster(extent, offset);
+> +    /* Calculate the number of clusters to look for. Here we truncate the last
+> +     * cluster, i.e. 1 less than the actual value calculated as we may need to
+> +     * perform COW for the last one. */
+> +    nb_clusters = DIV_ROUND_UP(skip_start_bytes + *bytes,
+> +                               extent->cluster_sectors << BDRV_SECTOR_BITS) - 1;
+> +
+> +    nb_clusters = MIN(nb_clusters, extent->l2_size - l2_index);
+> +    assert(nb_clusters <= INT_MAX);
+> +
+> +    /* update bytes according to final nb_clusters value */
+> +    if (nb_clusters != 0) {
+> +        *bytes = ((nb_clusters * extent->cluster_sectors) << BDRV_SECTOR_BITS)
+> +                 - skip_start_bytes;
+> +    } else {
+> +        nb_clusters = 1;
+> +    }
+> +    *total_alloc_clusters += nb_clusters;
 
+I have left it as it is for now as I wasn't sure about what you meant.
+You can check my query I posted on v4 of this thread for more so that
+we can solve this soon. :-)
+
+Ashijeet
+
+> +    skip_end_bytes = skip_start_bytes + MIN(*bytes,
+> +                     extent->cluster_sectors * BDRV_SECTOR_SIZE
+> +                                    - skip_start_bytes);
+> +
+> +    if (extent->has_zero_grain && cluster_sector == VMDK_GTE_ZEROED) {
+> +        zeroed = true;
+> +    }
+> +
+> +    if (!cluster_sector || zeroed) {
+> +        if (!allocate) {
+> +            return zeroed ? VMDK_ZEROED : VMDK_UNALLOC;
+> +        }
+> +
+> +        cluster_sector = extent->next_cluster_sector;
+> +        extent->next_cluster_sector += extent->cluster_sectors
+> +                                                * nb_clusters;
+> +
+> +        ret = vmdk_perform_cow(bs, extent, cluster_sector * BDRV_SECTOR_SIZE,
+> +                               offset, skip_start_bytes,
+> +                               skip_end_bytes);
+> +        if (ret < 0) {
+> +            return ret;
+> +        }
+> +        if (m_data) {
+> +            m_data->valid = 1;
+> +            m_data->l1_index = l1_index;
+> +            m_data->l2_index = l2_index;
+> +            m_data->l2_offset = l2_offset;
+> +            m_data->l2_cache_entry = &l2_table[l2_index];
+> +            m_data->nb_clusters = nb_clusters;
+> +        }
+> +    }
+> +    *cluster_offset = cluster_sector << BDRV_SECTOR_BITS;
+> +    return VMDK_OK;
+> +}
+> +
+> +/*
+> + * vmdk_alloc_clusters
+> + *
+> + * For a given offset on the virtual disk, find the cluster offset in vmdk
+> + * file. If the offset is not found, allocate a new cluster.
+> + *
+> + * If the cluster is newly allocated, m_data->nb_clusters is set to the number
+> + * of contiguous clusters that have been allocated. In this case, the other
+> + * fields of m_data are valid and contain information about the first allocated
+> + * cluster.
+> + *
+> + * Returns:
+> + *
+> + *   VMDK_OK:           on success and @cluster_offset was set
+> + *
+> + *   VMDK_UNALLOC:      if no clusters were allocated and @cluster_offset is
+> + *                      set to zero
+> + *
+> + *   VMDK_ERROR:        in error cases
+> + */
+> +static int vmdk_alloc_clusters(BlockDriverState *bs,
+> +                               VmdkExtent *extent,
+> +                               VmdkMetaData *m_data, uint64_t offset,
+> +                               bool allocate, uint64_t *cluster_offset,
+> +                               int64_t bytes,
+> +                               uint32_t *total_alloc_clusters)
+> +{
+> +    uint64_t start, remaining;
+> +    uint64_t new_cluster_offset;
+> +    int64_t n_bytes;
+> +    int ret;
+> +
+> +    if (extent->flat) {
+> +        *cluster_offset = extent->flat_start_offset;
+> +        return VMDK_OK;
+> +    }
+> +
+> +    start = offset;
+> +    remaining = bytes;
+> +    new_cluster_offset = 0;
+> +    *cluster_offset = 0;
+> +    n_bytes = 0;
+> +    if (m_data) {
+> +        m_data->valid = 0;
+> +    }
+> +
+> +    /* due to L2 table margins all bytes may not get allocated at once */
+> +    while (true) {
+> +
+> +        if (!*cluster_offset) {
+> +            *cluster_offset = new_cluster_offset;
+> +        }
+> +
+> +        start              += n_bytes;
+> +        remaining          -= n_bytes;
+> +        new_cluster_offset += n_bytes;
+> +
+> +        if (remaining == 0) {
+> +            break;
+> +        }
+> +
+> +        n_bytes = remaining;
+> +
+> +        ret = vmdk_handle_alloc(bs, extent, start, &new_cluster_offset, &n_bytes,
+> +                                m_data, allocate, total_alloc_clusters);
+> +
+> +        if (ret < 0) {
+> +            return ret;
+> +
+> +        }
+> +    }
+> +
+> +    return VMDK_OK;
+> +}
+> +
+>  /**
+>   * vmdk_get_cluster_offset
+>   *
+> @@ -1625,6 +1794,7 @@ static int vmdk_pwritev(BlockDriverState *bs, uint64_t offset,
+>      uint64_t bytes_done = 0;
+>      VmdkMetaData m_data;
+>      uint64_t extent_end;
+> +    uint32_t total_alloc_clusters = 0;
 >
-> Dave
+>      if (DIV_ROUND_UP(offset, BDRV_SECTOR_SIZE) > bs->total_sectors) {
+>          error_report("Wrong offset: offset=0x%" PRIx64
+> @@ -1650,10 +1820,10 @@ static int vmdk_pwritev(BlockDriverState *bs, uint64_t offset,
+>              n_bytes = MIN(bytes, extent_end - offset);
+>          }
 >
->>               /* postcopy_ram_supported_by_host will have emitted a more
->>                * detailed message
->>                */
->> diff --git a/migration/postcopy-ram.c b/migration/postcopy-ram.c
->> index a0489f6..4adab36 100644
->> --- a/migration/postcopy-ram.c
->> +++ b/migration/postcopy-ram.c
->> @@ -59,7 +59,7 @@ struct PostcopyDiscardState {
->>   #include <sys/eventfd.h>
->>   #include <linux/userfaultfd.h>
->>   
->> -static bool ufd_version_check(int ufd)
->> +static bool ufd_version_check(int ufd, MigrationIncomingState *mis)
->>   {
->>       struct uffdio_api api_struct;
->>       uint64_t ioctl_mask;
->> @@ -112,7 +112,7 @@ static int test_range_shared(const char *block_name, void *host_addr,
->>    * normally fine since if the postcopy succeeds it gets turned back on at the
->>    * end.
->>    */
->> -bool postcopy_ram_supported_by_host(void)
->> +bool postcopy_ram_supported_by_host(MigrationIncomingState *mis)
->>   {
->>       long pagesize = getpagesize();
->>       int ufd = -1;
->> @@ -135,7 +135,7 @@ bool postcopy_ram_supported_by_host(void)
->>       }
->>   
->>       /* Version and features check */
->> -    if (!ufd_version_check(ufd)) {
->> +    if (!ufd_version_check(ufd, mis)) {
->>           goto out;
->>       }
->>   
->> @@ -512,7 +512,7 @@ int postcopy_ram_enable_notify(MigrationIncomingState *mis)
->>        * Although the host check already tested the API, we need to
->>        * do the check again as an ABI handshake on the new fd.
->>        */
->> -    if (!ufd_version_check(mis->userfault_fd)) {
->> +    if (!ufd_version_check(mis->userfault_fd, mis)) {
->>           return -1;
->>       }
->>   
->> @@ -650,7 +650,7 @@ void *postcopy_get_tmp_page(MigrationIncomingState *mis)
->>   
->>   #else
->>   /* No target OS support, stubs just fail */
->> -bool postcopy_ram_supported_by_host(void)
->> +bool postcopy_ram_supported_by_host(MigrationIncomingState *mis)
->>   {
->>       error_report("%s: No OS support", __func__);
->>       return false;
->> diff --git a/migration/postcopy-ram.h b/migration/postcopy-ram.h
->> index 52d51e8..587a8b8 100644
->> --- a/migration/postcopy-ram.h
->> +++ b/migration/postcopy-ram.h
->> @@ -14,7 +14,7 @@
->>   #define QEMU_POSTCOPY_RAM_H
->>   
->>   /* Return true if the host supports everything we need to do postcopy-ram */
->> -bool postcopy_ram_supported_by_host(void);
->> +bool postcopy_ram_supported_by_host(MigrationIncomingState *mis);
->>   
->>   /*
->>    * Make all of RAM sensitive to accesses to areas that haven't yet been written
->> diff --git a/migration/savevm.c b/migration/savevm.c
->> index f5e8194..61a6df7 100644
->> --- a/migration/savevm.c
->> +++ b/migration/savevm.c
->> @@ -1356,7 +1356,7 @@ static int loadvm_postcopy_handle_advise(MigrationIncomingState *mis)
->>           return -1;
->>       }
->>   
->> -    if (!postcopy_ram_supported_by_host()) {
->> +    if (!postcopy_ram_supported_by_host(mis)) {
->>           postcopy_state_set(POSTCOPY_INCOMING_NONE);
->>           return -1;
->>       }
->> -- 
->> 1.8.3.1
->>
+> -        ret = vmdk_get_cluster_offset(bs, extent, &m_data, offset,
+> -                                      !(extent->compressed || zeroed),
+> -                                      &cluster_offset, offset_in_cluster,
+> -                                      offset_in_cluster + n_bytes);
+> +        ret = vmdk_alloc_clusters(bs, extent, &m_data, offset,
+> +                                  !(extent->compressed || zeroed),
+> +                                  &cluster_offset, n_bytes,
+> +                                  &total_alloc_clusters);
+>          if (extent->compressed) {
+>              if (ret == VMDK_OK) {
+>                  /* Refuse write to allocated cluster for streamOptimized */
+> @@ -1662,8 +1832,9 @@ static int vmdk_pwritev(BlockDriverState *bs, uint64_t offset,
+>                  return -EIO;
+>              } else {
+>                  /* allocate */
+> -                ret = vmdk_get_cluster_offset(bs, extent, &m_data, offset,
+> -                                              true, &cluster_offset, 0, 0);
+> +                ret = vmdk_alloc_clusters(bs, extent, &m_data, offset,
+> +                                          true, &cluster_offset, n_bytes,
+> +                                          &total_alloc_clusters);
+>              }
+>          }
+>          if (ret == VMDK_ERROR) {
+> @@ -1671,10 +1842,11 @@ static int vmdk_pwritev(BlockDriverState *bs, uint64_t offset,
+>          }
+>          if (zeroed) {
+>              /* Do zeroed write, buf is ignored */
+> -            if (extent->has_zero_grain &&
+> -                    offset_in_cluster == 0 &&
+> -                    n_bytes >= extent->cluster_sectors * BDRV_SECTOR_SIZE) {
+> -                n_bytes = extent->cluster_sectors * BDRV_SECTOR_SIZE;
+> +            if (extent->has_zero_grain && offset_in_cluster == 0 &&
+> +                    n_bytes >= extent->cluster_sectors * BDRV_SECTOR_SIZE *
+> +                        total_alloc_clusters) {
+> +                n_bytes = extent->cluster_sectors * BDRV_SECTOR_SIZE *
+> +                                        total_alloc_clusters;
+>                  if (!zero_dry_run) {
+>                      /* update L2 tables */
+>                      if (vmdk_L2update(extent, &m_data, VMDK_GTE_ZEROED)
 > --
-> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> 2.6.2
 >
->
->
-
--- 
-Best regards,
-Alexey Perevalov
