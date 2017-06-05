@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35156)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35215)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dHxMi-0000Z4-Se
-	for qemu-devel@nongnu.org; Mon, 05 Jun 2017 15:08:38 -0400
+	(envelope-from <eblake@redhat.com>) id 1dHxMr-0000gV-5C
+	for qemu-devel@nongnu.org; Mon, 05 Jun 2017 15:08:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dHxMh-00043K-Qr
-	for qemu-devel@nongnu.org; Mon, 05 Jun 2017 15:08:36 -0400
+	(envelope-from <eblake@redhat.com>) id 1dHxMq-0004AL-AH
+	for qemu-devel@nongnu.org; Mon, 05 Jun 2017 15:08:45 -0400
 From: Eric Blake <eblake@redhat.com>
-Date: Mon,  5 Jun 2017 14:08:21 -0500
-Message-Id: <20170605190824.25184-2-eblake@redhat.com>
+Date: Mon,  5 Jun 2017 14:08:24 -0500
+Message-Id: <20170605190824.25184-5-eblake@redhat.com>
 In-Reply-To: <20170605190824.25184-1-eblake@redhat.com>
 References: <20170605190824.25184-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 1/4] qemu-io: Don't die on second open
+Subject: [Qemu-devel] [PATCH v3 4/4] blkdebug: Support
+ .bdrv_co_get_block_status
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,79 +23,67 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: jsnow@redhat.com, mreitz@redhat.com, qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>
 
-Most callback commands in qemu-io return 0 to keep the interpreter
-loop running, or 1 to quit immediately.  However, open_f() just
-passed through the return value of openfile(), which has different
-semantics of returning 0 if a file was opened, or 1 on any failure.
+Without a passthrough status of BDRV_BLOCK_RAW, anything wrapped by
+blkdebug appears 100% allocated as data.  Better is treating it the
+same as the underlying file being wrapped.
 
-As a result of mixing the return semantics, we are forcing the
-qemu-io interpreter to exit early on any failures, which is rather
-annoying when some of the failures are obviously trying to give
-the user a hint of how to proceed (if we didn't then kill qemu-io
-out from under the user's feet):
-
-$ qemu-io
-qemu-io> open foo
-qemu-io> open foo
-file open already, try 'help close'
-$ echo $?
-0
-
-In general, we WANT openfile() to report failures, since it is the
-function used in the form 'qemu-io -c "$something" no_such_file'
-for performing one or more -c options on a single file, and it is
-not worth attempting $something if the file itself cannot be opened.
-So the solution is to fix open_f() to always return 0 (when we are
-in interactive mode, even failure to open should not end the
-session), and save the return value of openfile() for command line
-use in main().
-
-Note, however, that we do have some qemu-iotests that do 'qemu-io
--c "open file" -c "$something"'; such tests will now proceed to
-attempt $something whether or not the open succeeded, the same way
-as if the two commands had been attempted in interactive mode; but it
-also means that it is now possible to use -c close and have a single
-qemu-io command line operate on more than one file even without
-using interactive mode.  Although the '-c open' action is a subtle
-change in behavior, remember that qemu-io is for debugging purposes,
-so as long as it serves the needs of qemu-iotests while still being
-reasonable for interactive use, it should not be a problem.
-
-This has been awkward since at least as far back as commit
-e3aff4f, in 2009.
+Update iotest 177 for the new expected output.
 
 Signed-off-by: Eric Blake <eblake@redhat.com>
 Reviewed-by: Fam Zheng <famz@redhat.com>
+Reviewed-by: Max Reitz <mreitz@redhat.com>
 
 ---
-v3: tweak commit message to distinguish that '-c open' has a subtle
-new behavior from the command line
-v2: fix open_f(), not openfile()
+v3: rebase to earlier changes
+v2: tweak commit message
 ---
- qemu-io.c | 7 ++++---
- 1 file changed, 4 insertions(+), 3 deletions(-)
+ block/blkdebug.c           | 11 +++++++++++
+ tests/qemu-iotests/177.out |  5 ++++-
+ 2 files changed, 15 insertions(+), 1 deletion(-)
 
-diff --git a/qemu-io.c b/qemu-io.c
-index 8e38b28..8074656 100644
---- a/qemu-io.c
-+++ b/qemu-io.c
-@@ -230,13 +230,14 @@ static int open_f(BlockBackend *blk, int argc, char **argv)
-     qemu_opts_reset(&empty_opts);
-
-     if (optind == argc - 1) {
--        return openfile(argv[optind], flags, writethrough, force_share, opts);
-+        openfile(argv[optind], flags, writethrough, force_share, opts);
-     } else if (optind == argc) {
--        return openfile(NULL, flags, writethrough, force_share, opts);
-+        openfile(NULL, flags, writethrough, force_share, opts);
-     } else {
-         QDECREF(opts);
--        return qemuio_command_usage(&open_cmd);
-+        qemuio_command_usage(&open_cmd);
-     }
-+    return 0;
+diff --git a/block/blkdebug.c b/block/blkdebug.c
+index a5196e8..1ad8d65 100644
+--- a/block/blkdebug.c
++++ b/block/blkdebug.c
+@@ -642,6 +642,16 @@ static int coroutine_fn blkdebug_co_pdiscard(BlockDriverState *bs,
+     return bdrv_co_pdiscard(bs->file->bs, offset, count);
  }
 
- static int quit_f(BlockBackend *blk, int argc, char **argv)
++static int64_t coroutine_fn blkdebug_co_get_block_status(
++    BlockDriverState *bs, int64_t sector_num, int nb_sectors, int *pnum,
++    BlockDriverState **file)
++{
++    *pnum = nb_sectors;
++    *file = bs->file->bs;
++    return BDRV_BLOCK_RAW | BDRV_BLOCK_OFFSET_VALID |
++        (sector_num << BDRV_SECTOR_BITS);
++}
++
+ static void blkdebug_close(BlockDriverState *bs)
+ {
+     BDRVBlkdebugState *s = bs->opaque;
+@@ -912,6 +922,7 @@ static BlockDriver bdrv_blkdebug = {
+     .bdrv_co_flush_to_disk  = blkdebug_co_flush,
+     .bdrv_co_pwrite_zeroes  = blkdebug_co_pwrite_zeroes,
+     .bdrv_co_pdiscard       = blkdebug_co_pdiscard,
++    .bdrv_co_get_block_status = blkdebug_co_get_block_status,
+
+     .bdrv_debug_event           = blkdebug_debug_event,
+     .bdrv_debug_breakpoint      = blkdebug_debug_breakpoint,
+diff --git a/tests/qemu-iotests/177.out b/tests/qemu-iotests/177.out
+index fcfbfa3..43a7778 100644
+--- a/tests/qemu-iotests/177.out
++++ b/tests/qemu-iotests/177.out
+@@ -46,6 +46,9 @@ read 30408704/30408704 bytes at offset 80740352
+ read 23068672/23068672 bytes at offset 111149056
+ 22 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+ Offset          Length          File
+-0               0x8000000       json:{"image": {"driver": "IMGFMT", "file": {"driver": "file", "filename": "TEST_DIR/t.IMGFMT"}}, "driver": "blkdebug", "align": "4k"}
++0               0x800000        TEST_DIR/t.IMGFMT
++0x900000        0x2400000       TEST_DIR/t.IMGFMT
++0x3c00000       0x1100000       TEST_DIR/t.IMGFMT
++0x6a00000       0x1600000       TEST_DIR/t.IMGFMT
+ No errors were found on the image.
+ *** done
 -- 
 2.9.4
