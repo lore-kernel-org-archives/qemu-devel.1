@@ -1,17 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35221)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39063)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dHxMr-0000hD-J5
-	for qemu-devel@nongnu.org; Mon, 05 Jun 2017 15:08:46 -0400
+	(envelope-from <zuban32s@gmail.com>) id 1dHxaE-0008TA-Nd
+	for qemu-devel@nongnu.org; Mon, 05 Jun 2017 15:22:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dHxMq-0004AZ-Bw
-	for qemu-devel@nongnu.org; Mon, 05 Jun 2017 15:08:45 -0400
-From: Eric Blake <eblake@redhat.com>
-Date: Mon,  5 Jun 2017 14:08:22 -0500
-Message-Id: <20170605190824.25184-3-eblake@redhat.com>
-In-Reply-To: <20170605190824.25184-1-eblake@redhat.com>
-References: <20170605190824.25184-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 2/4] block: Guarantee that *file is set on
- bdrv_get_block_status()
+	(envelope-from <zuban32s@gmail.com>) id 1dHxaD-0007De-Rd
+	for qemu-devel@nongnu.org; Mon, 05 Jun 2017 15:22:34 -0400
+Received: from mail-pf0-x22a.google.com ([2607:f8b0:400e:c00::22a]:35095)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <zuban32s@gmail.com>) id 1dHxaD-0007CM-MF
+	for qemu-devel@nongnu.org; Mon, 05 Jun 2017 15:22:33 -0400
+Received: by mail-pf0-x22a.google.com with SMTP id l89so13001769pfi.2
+	for <qemu-devel@nongnu.org>; Mon, 05 Jun 2017 12:22:32 -0700 (PDT)
+MIME-Version: 1.0
+From: Alexander Bezzubikov <zuban32s@gmail.com>
+Date: Mon, 5 Jun 2017 22:22:30 +0300
+Message-ID: <CAKSfGUDzjxisJ-69ft=0Y7oCnCaxAeBO43a33H6i7ZRoZCZz-w@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: [Qemu-devel] SHPC in pci-bridge
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,107 +26,14 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: jsnow@redhat.com, mreitz@redhat.com, qemu-block@nongnu.org, qemu-stable@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>, Fam Zheng <famz@redhat.com>, Kevin Wolf <kwolf@redhat.com>
 
-We document that *file is valid if the return is not an error and
-includes BDRV_BLOCK_OFFSET_VALID, but forgot to obey this contract
-when a driver (such as blkdebug) lacks a callback.  Messed up in
-commit 67a0fd2 (v2.6), when we added the file parameter.
+Hi everyone,
+Does anyone use pci-bridge built-in SHPC and found it working (especially
+on x86 machines)? I really want to hear about such cases. When I'm trying
+to hotplug anything into the bridge without using ACPI on x86 machine, none
+of my linux guests can see it in lspci, and dmesg contains nothing about
+this insertion.
 
-Enhance qemu-iotest 177 to cover this, using a sequence that would
-print garbage or even SEGV, because it was dererefencing through
-uninitialized memory.  [The resulting test output shows that we
-have less-than-ideal block status from the blkdebug driver, but
-that's a separate fix coming up soon.]
-
-Setting *file on all paths that return BDRV_BLOCK_OFFSET_VALID is
-enough to fix the crash, but we can go one step further: always
-setting *file, even on error, means that a broken caller that
-blindly dereferences file without checking for error is now more
-likely to get a reliable SEGV instead of randomly acting on garbage,
-making it easier to diagnose such buggy callers.  Adding an
-assertion that file is set where expected doesn't hurt either.
-
-CC: qemu-stable@nongnu.org
-Signed-off-by: Eric Blake <eblake@redhat.com>
-Reviewed-by: Fam Zheng <famz@redhat.com>
-Reviewed-by: Max Reitz <mreitz@redhat.com>
-
----
-v3: tweak commit message [Max], rebase test to pass
-v2: drop redundant assignment
----
- block/io.c                 | 5 +++--
- tests/qemu-iotests/177     | 3 +++
- tests/qemu-iotests/177.out | 2 ++
- 3 files changed, 8 insertions(+), 2 deletions(-)
-
-diff --git a/block/io.c b/block/io.c
-index ed31810..ce6cb0c 100644
---- a/block/io.c
-+++ b/block/io.c
-@@ -1736,6 +1736,7 @@ static int64_t coroutine_fn bdrv_co_get_block_status(BlockDriverState *bs,
-     int64_t n;
-     int64_t ret, ret2;
-
-+    *file = NULL;
-     total_sectors = bdrv_nb_sectors(bs);
-     if (total_sectors < 0) {
-         return total_sectors;
-@@ -1756,11 +1757,11 @@ static int64_t coroutine_fn bdrv_co_get_block_status(BlockDriverState *bs,
-         ret = BDRV_BLOCK_DATA | BDRV_BLOCK_ALLOCATED;
-         if (bs->drv->protocol_name) {
-             ret |= BDRV_BLOCK_OFFSET_VALID | (sector_num * BDRV_SECTOR_SIZE);
-+            *file = bs;
-         }
-         return ret;
-     }
-
--    *file = NULL;
-     bdrv_inc_in_flight(bs);
-     ret = bs->drv->bdrv_co_get_block_status(bs, sector_num, nb_sectors, pnum,
-                                             file);
-@@ -1770,7 +1771,7 @@ static int64_t coroutine_fn bdrv_co_get_block_status(BlockDriverState *bs,
-     }
-
-     if (ret & BDRV_BLOCK_RAW) {
--        assert(ret & BDRV_BLOCK_OFFSET_VALID);
-+        assert(ret & BDRV_BLOCK_OFFSET_VALID && *file);
-         ret = bdrv_co_get_block_status(*file, ret >> BDRV_SECTOR_BITS,
-                                        *pnum, pnum, file);
-         goto out;
-diff --git a/tests/qemu-iotests/177 b/tests/qemu-iotests/177
-index 2005c17..f8ed8fb 100755
---- a/tests/qemu-iotests/177
-+++ b/tests/qemu-iotests/177
-@@ -43,6 +43,7 @@ _supported_proto file
- CLUSTER_SIZE=1M
- size=128M
- options=driver=blkdebug,image.driver=qcow2
-+nested_opts=image.file.driver=file,image.file.filename=$TEST_IMG
-
- echo
- echo "== setting up files =="
-@@ -106,6 +107,8 @@ function verify_io()
- }
-
- verify_io | $QEMU_IO -r "$TEST_IMG" | _filter_qemu_io
-+$QEMU_IMG map --image-opts "$options,$nested_opts,align=4k" \
-+    | _filter_qemu_img_map
-
- _check_test_img
-
-diff --git a/tests/qemu-iotests/177.out b/tests/qemu-iotests/177.out
-index e887542..fcfbfa3 100644
---- a/tests/qemu-iotests/177.out
-+++ b/tests/qemu-iotests/177.out
-@@ -45,5 +45,7 @@ read 30408704/30408704 bytes at offset 80740352
- 29 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
- read 23068672/23068672 bytes at offset 111149056
- 22 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+Offset          Length          File
-+0               0x8000000       json:{"image": {"driver": "IMGFMT", "file": {"driver": "file", "filename": "TEST_DIR/t.IMGFMT"}}, "driver": "blkdebug", "align": "4k"}
- No errors were found on the image.
- *** done
+Thanks
 -- 
-2.9.4
+Alexander Bezzubikov
