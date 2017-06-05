@@ -1,25 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52844)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56804)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1dHweG-0007tR-Nz
-	for qemu-devel@nongnu.org; Mon, 05 Jun 2017 14:22:42 -0400
+	(envelope-from <alistai@xilinx.com>) id 1dHwsN-0003a1-8I
+	for qemu-devel@nongnu.org; Mon, 05 Jun 2017 14:37:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1dHweD-00005q-HT
-	for qemu-devel@nongnu.org; Mon, 05 Jun 2017 14:22:40 -0400
-Resent-Message-Id: <E1dHweD-00005q-HT@eggs.gnu.org>
-Received: from sender-of-o52.zoho.com ([135.84.80.217]:21462)
+	(envelope-from <alistai@xilinx.com>) id 1dHwsI-0000MJ-AM
+	for qemu-devel@nongnu.org; Mon, 05 Jun 2017 14:37:15 -0400
+Received: from mail-bl2nam02on0087.outbound.protection.outlook.com
+	([104.47.38.87]:61945
+	helo=NAM02-BL2-obe.outbound.protection.outlook.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1dHweD-000050-8O
-	for qemu-devel@nongnu.org; Mon, 05 Jun 2017 14:22:37 -0400
-Reply-To: <qemu-devel@nongnu.org>
-In-Reply-To: <1496679576-14336-1-git-send-email-peter.maydell@linaro.org>
-Message-ID: <149668694016.4708.11851416343525102830@f98a8425f76e>
+	(Exim 4.71) (envelope-from <alistai@xilinx.com>) id 1dHwsI-0000Lf-24
+	for qemu-devel@nongnu.org; Mon, 05 Jun 2017 14:37:10 -0400
+From: Alistair Francis <alistair.francis@xilinx.com>
+Date: Mon, 5 Jun 2017 11:34:11 -0700
+Message-ID: <2b2311b1b070a0b03973e39deccf4682de4a6cd4.1496686997.git.alistair.francis@xilinx.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Mon, 5 Jun 2017 11:22:20 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH 0/2] slirp: handle errors in sosendoob()
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH v1 1/1] char-socket: Don't report TCP socket
+ waiting as an error
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,100 +26,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: peter.maydell@linaro.org
-Cc: famz@redhat.com, qemu-devel@nongnu.org, samuel.thibault@ens-lyon.org, jan.kiszka@siemens.com, patches@linaro.org
+To: qemu-devel@nongnu.org, pbonzini@redhat.com, marcandre.lureau@redhat.com
+Cc: alistair.francis@xilinx.com, alistair23@gmail.com
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKTWVzc2FnZS1pZDogMTQ5
-NjY3OTU3Ni0xNDMzNi0xLWdpdC1zZW5kLWVtYWlsLXBldGVyLm1heWRlbGxAbGluYXJvLm9yZwpT
-dWJqZWN0OiBbUWVtdS1kZXZlbF0gW1BBVENIIDAvMl0gc2xpcnA6IGhhbmRsZSBlcnJvcnMgaW4g
-c29zZW5kb29iKCkKVHlwZTogc2VyaWVzCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jp
-bi9iYXNoCgpCQVNFPWJhc2UKbj0xCnRvdGFsPSQoZ2l0IGxvZyAtLW9uZWxpbmUgJEJBU0UuLiB8
-IHdjIC1sKQpmYWlsZWQ9MAoKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApn
-aXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKCmNvbW1pdHM9IiQoZ2l0IGxvZyAt
-LWZvcm1hdD0lSCAtLXJldmVyc2UgJEJBU0UuLikiCmZvciBjIGluICRjb21taXRzOyBkbwogICAg
-ZWNobyAiQ2hlY2tpbmcgUEFUQ0ggJG4vJHRvdGFsOiAkKGdpdCBsb2cgLW4gMSAtLWZvcm1hdD0l
-cyAkYykuLi4iCiAgICBpZiAhIGdpdCBzaG93ICRjIC0tZm9ybWF0PWVtYWlsIHwgLi9zY3JpcHRz
-L2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFjayAtOyB0aGVuCiAgICAgICAgZmFpbGVkPTEKICAgICAg
-ICBlY2hvCiAgICBmaQogICAgbj0kKChuKzEpKQpkb25lCgpleGl0ICRmYWlsZWQKPT09IFRFU1Qg
-U0NSSVBUIEVORCA9PT0KClVwZGF0aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4
-ODg3MTMzODQKU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0Jwo5YWYxZWQwIHNsaXJwOiBI
-YW5kbGUgZXJyb3IgcmV0dXJucyBmcm9tIHNvc2VuZG9vYigpCmJhMzZjODYgc2xpcnA6IEhhbmRs
-ZSBlcnJvciByZXR1cm5zIGZyb20gc2xpcnBfc2VuZCgpIGluIHNvc2VuZG9vYigpCgo9PT0gT1VU
-UFVUIEJFR0lOID09PQpDaGVja2luZyBQQVRDSCAxLzI6IHNsaXJwOiBIYW5kbGUgZXJyb3IgcmV0
-dXJucyBmcm9tIHNsaXJwX3NlbmQoKSBpbiBzb3NlbmRvb2IoKS4uLgpFUlJPUjogY29kZSBpbmRl
-bnQgc2hvdWxkIG5ldmVyIHVzZSB0YWJzCiMzMzogRklMRTogc2xpcnAvc29ja2V0LmM6MzU0Ogor
-XkleSXVpbnQzMl90IHVyZ2MgPSBzby0+c29fdXJnYzskCgpFUlJPUjogY29kZSBpbmRlbnQgc2hv
-dWxkIG5ldmVyIHVzZSB0YWJzCiMzNjogRklMRTogc2xpcnAvc29ja2V0LmM6MzU2OgorXkleSWlm
-IChsZW4gPiB1cmdjKSB7JAoKRVJST1I6IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFi
-cwojMzc6IEZJTEU6IHNsaXJwL3NvY2tldC5jOjM1NzoKK15JXkleSWxlbiA9IHVyZ2M7JAoKRVJS
-T1I6IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwojMzg6IEZJTEU6IHNsaXJwL3Nv
-Y2tldC5jOjM1ODoKK15JXkl9JAoKRVJST1I6IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2Ug
-dGFicwojNDI6IEZJTEU6IHNsaXJwL3NvY2tldC5jOjM2MDoKK15JXkl1cmdjIC09IGxlbjskCgpF
-UlJPUjogY29kZSBpbmRlbnQgc2hvdWxkIG5ldmVyIHVzZSB0YWJzCiM0MzogRklMRTogc2xpcnAv
-c29ja2V0LmM6MzYxOgorXkleSWlmICh1cmdjKSB7JAoKRVJST1I6IGNvZGUgaW5kZW50IHNob3Vs
-ZCBuZXZlciB1c2UgdGFicwojNDY6IEZJTEU6IHNsaXJwL3NvY2tldC5jOjM2MzoKK15JXkleSWlm
-IChuID4gdXJnYykgeyQKCkVSUk9SOiBjb2RlIGluZGVudCBzaG91bGQgbmV2ZXIgdXNlIHRhYnMK
-IzQ3OiBGSUxFOiBzbGlycC9zb2NrZXQuYzozNjQ6CiteSV5JXkleSW4gPSB1cmdjOyQKCkVSUk9S
-OiBjb2RlIGluZGVudCBzaG91bGQgbmV2ZXIgdXNlIHRhYnMKIzQ4OiBGSUxFOiBzbGlycC9zb2Nr
-ZXQuYzozNjU6CiteSV5JXkl9JAoKRVJST1I6IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2Ug
-dGFicwojNTQ6IEZJTEU6IHNsaXJwL3NvY2tldC5jOjM3MDoKK15JfSQKCkVSUk9SOiBjb2RlIGlu
-ZGVudCBzaG91bGQgbmV2ZXIgdXNlIHRhYnMKIzU5OiBGSUxFOiBzbGlycC9zb2NrZXQuYzozNzM6
-CiteSWlmIChuICE9IGxlbikgeyQKCkVSUk9SOiBjb2RlIGluZGVudCBzaG91bGQgbmV2ZXIgdXNl
-IHRhYnMKIzYwOiBGSUxFOiBzbGlycC9zb2NrZXQuYzozNzQ6CiteSV5JREVCVUdfRVJST1IoKGRm
-ZCwgIkRpZG4ndCBzZW5kIGFsbCBkYXRhIHVyZ2VudGx5IFhYWFhYXG4iKSk7JAoKRVJST1I6IGNv
-ZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwojNjE6IEZJTEU6IHNsaXJwL3NvY2tldC5j
-OjM3NToKK15JfSQKCkVSUk9SOiBjb2RlIGluZGVudCBzaG91bGQgbmV2ZXIgdXNlIHRhYnMKIzY0
-OiBGSUxFOiBzbGlycC9zb2NrZXQuYzozNzc6CiteSWlmIChuIDwgMCkgeyQKCkVSUk9SOiBjb2Rl
-IGluZGVudCBzaG91bGQgbmV2ZXIgdXNlIHRhYnMKIzY1OiBGSUxFOiBzbGlycC9zb2NrZXQuYzoz
-Nzg6CiteSV5JcmV0dXJuIG47JAoKRVJST1I6IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2Ug
-dGFicwojNjc6IEZJTEU6IHNsaXJwL3NvY2tldC5jOjM4MDoKK15Jc28tPnNvX3VyZ2MgLT0gbjsk
-CgpFUlJPUjogbGluZSBvdmVyIDkwIGNoYXJhY3RlcnMKIzY4OiBGSUxFOiBzbGlycC9zb2NrZXQu
-YzozODE6CisJREVCVUdfTUlTQygoZGZkLCAiIC0tLTIgc2VudCAlZCBieXRlcyB1cmdlbnQgZGF0
-YSwgJWQgdXJnZW50IGJ5dGVzIGxlZnRcbiIsIG4sIHNvLT5zb191cmdjKSk7CgpFUlJPUjogY29k
-ZSBpbmRlbnQgc2hvdWxkIG5ldmVyIHVzZSB0YWJzCiM2ODogRklMRTogc2xpcnAvc29ja2V0LmM6
-MzgxOgorXklERUJVR19NSVNDKChkZmQsICIgLS0tMiBzZW50ICVkIGJ5dGVzIHVyZ2VudCBkYXRh
-LCAlZCB1cmdlbnQgYnl0ZXMgbGVmdFxuIiwgbiwgc28tPnNvX3VyZ2MpKTskCgp0b3RhbDogMTgg
-ZXJyb3JzLCAwIHdhcm5pbmdzLCA1MSBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHls
-ZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZh
-bHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFU
-Q0ggaW4gTUFJTlRBSU5FUlMuCgpDaGVja2luZyBQQVRDSCAyLzI6IHNsaXJwOiBIYW5kbGUgZXJy
-b3IgcmV0dXJucyBmcm9tIHNvc2VuZG9vYigpLi4uCkVSUk9SOiBjb2RlIGluZGVudCBzaG91bGQg
-bmV2ZXIgdXNlIHRhYnMKIzI1OiBGSUxFOiBzbGlycC9zYnVmLmM6OTQ6CiteSV5JKHZvaWQpc29z
-ZW5kb29iKHNvKTskCgpFUlJPUjogY29kZSBpbmRlbnQgc2hvdWxkIG5ldmVyIHVzZSB0YWJzCiMz
-ODogRklMRTogc2xpcnAvc29ja2V0LmM6NDA3OgorXkleSWlmIChzb3NlbmRvb2Ioc28pIDwgc28t
-PnNvX3VyZ2MpIHskCgpFUlJPUjogY29kZSBpbmRlbnQgc2hvdWxkIG5ldmVyIHVzZSB0YWJzCiMz
-OTogRklMRTogc2xpcnAvc29ja2V0LmM6NDA4OgorXkleSV5JLyogVHJlYXQgYSBzaG9ydCB3cml0
-ZSBhcyBhIGZhdGFsIGVycm9yIHRvbywkCgpFUlJPUjogY29kZSBpbmRlbnQgc2hvdWxkIG5ldmVy
-IHVzZSB0YWJzCiM0MDogRklMRTogc2xpcnAvc29ja2V0LmM6NDA5OgorXkleSV5JICogcmF0aGVy
-IHRoYW4gY29udGludWluZyBvbiBhbmQgc2VuZGluZyB0aGUgdXJnZW50JAoKRVJST1I6IGNvZGUg
-aW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwojNDE6IEZJTEU6IHNsaXJwL3NvY2tldC5jOjQx
-MDoKK15JXkleSSAqIGRhdGEgYXMgaWYgaXQgd2VyZSBub24tdXJnZW50IGFuZCBsZWF2aW5nIHRo
-ZSQKCkVSUk9SOiBjb2RlIGluZGVudCBzaG91bGQgbmV2ZXIgdXNlIHRhYnMKIzQyOiBGSUxFOiBz
-bGlycC9zb2NrZXQuYzo0MTE6CiteSV5JXkkgKiBzb191cmdjIGNvdW50IHdyb25nLiQKCkVSUk9S
-OiBjb2RlIGluZGVudCBzaG91bGQgbmV2ZXIgdXNlIHRhYnMKIzQzOiBGSUxFOiBzbGlycC9zb2Nr
-ZXQuYzo0MTI6CiteSV5JXkkgKi8kCgpFUlJPUjogY29kZSBpbmRlbnQgc2hvdWxkIG5ldmVyIHVz
-ZSB0YWJzCiM0NDogRklMRTogc2xpcnAvc29ja2V0LmM6NDEzOgorXkleSV5JZ290byBlcnJfZGlz
-Y29ubmVjdGVkOyQKCkVSUk9SOiBjb2RlIGluZGVudCBzaG91bGQgbmV2ZXIgdXNlIHRhYnMKIzQ1
-OiBGSUxFOiBzbGlycC9zb2NrZXQuYzo0MTQ6CiteSV5JfSQKCkVSUk9SOiBjb2RlIGluZGVudCBz
-aG91bGQgbmV2ZXIgdXNlIHRhYnMKIzU4OiBGSUxFOiBzbGlycC9zb2NrZXQuYzo0NTg6CiteSV5J
-Z290byBlcnJfZGlzY29ubmVjdGVkOyQKCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJz
-CiM2ODogRklMRTogc2xpcnAvc29ja2V0LmM6NDg3OgorCURFQlVHX01JU0MoKGRmZCwgIiAtLS0g
-c293cml0ZSBkaXNjb25uZWN0ZWQsIHNvLT5zb19zdGF0ZSA9ICV4LCBlcnJubyA9ICVkXG4iLAoK
-RVJST1I6IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwojNjg6IEZJTEU6IHNsaXJw
-L3NvY2tldC5jOjQ4NzoKK15JREVCVUdfTUlTQygoZGZkLCAiIC0tLSBzb3dyaXRlIGRpc2Nvbm5l
-Y3RlZCwgc28tPnNvX3N0YXRlID0gJXgsIGVycm5vID0gJWRcbiIsJAoKRVJST1I6IGNvZGUgaW5k
-ZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwojNjk6IEZJTEU6IHNsaXJwL3NvY2tldC5jOjQ4ODoK
-K15JXkkgICAgc28tPnNvX3N0YXRlLCBlcnJubykpOyQKCkVSUk9SOiBjb2RlIGluZGVudCBzaG91
-bGQgbmV2ZXIgdXNlIHRhYnMKIzcwOiBGSUxFOiBzbGlycC9zb2NrZXQuYzo0ODk6CiteSXNvZmNh
-bnRzZW5kbW9yZShzbyk7JAoKRVJST1I6IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFi
-cwojNzE6IEZJTEU6IHNsaXJwL3NvY2tldC5jOjQ5MDoKK15JdGNwX3NvY2tjbG9zZWQoc290b3Rj
-cGNiKHNvKSk7JAoKRVJST1I6IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwojNzI6
-IEZJTEU6IHNsaXJwL3NvY2tldC5jOjQ5MToKK15JcmV0dXJuIC0xOyQKCnRvdGFsOiAxNSBlcnJv
-cnMsIDEgd2FybmluZ3MsIDQ4IGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHBy
-b2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2Ug
-cG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBp
-biBNQUlOVEFJTkVSUy4KCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3
-aXRoIGNvZGU6IDEKCgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hl
-dyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0
-Y2hldy1kZXZlbEBmcmVlbGlzdHMub3Jn
+When QEMU is waiting for a TCP socket connection it reports that message as
+an error. This isn't an error though, so let's change the report to just
+use qemu_log().
+
+Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
+---
+
+ chardev/char-socket.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/chardev/char-socket.c b/chardev/char-socket.c
+index ccc499cfa1..a9884fa85b 100644
+--- a/chardev/char-socket.c
++++ b/chardev/char-socket.c
+@@ -27,6 +27,7 @@
+ #include "io/channel-tls.h"
+ #include "qemu/error-report.h"
+ #include "qapi/error.h"
++#include "qemu/log.h"
+ #include "qapi/clone-visitor.h"
+ 
+ #include "chardev/char-io.h"
+@@ -765,7 +766,7 @@ static int tcp_chr_wait_connected(Chardev *chr, Error **errp)
+      * in TLS and telnet cases, only wait for an accepted socket */
+     while (!s->ioc) {
+         if (s->is_listen) {
+-            error_report("QEMU waiting for connection on: %s",
++            qemu_log("QEMU waiting for connection on: %s",
+                          chr->filename);
+             qio_channel_set_blocking(QIO_CHANNEL(s->listen_ioc), true, NULL);
+             tcp_chr_accept(QIO_CHANNEL(s->listen_ioc), G_IO_IN, chr);
+-- 
+2.11.0
