@@ -1,20 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60043)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60057)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcmvbkbc@gmail.com>) id 1dHvNw-0005qS-3v
-	for qemu-devel@nongnu.org; Mon, 05 Jun 2017 13:01:44 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1dHvNx-0005rV-Af
+	for qemu-devel@nongnu.org; Mon, 05 Jun 2017 13:01:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcmvbkbc@gmail.com>) id 1dHvNr-00012h-Fa
-	for qemu-devel@nongnu.org; Mon, 05 Jun 2017 13:01:44 -0400
-Received: from mail-lf0-x244.google.com ([2a00:1450:4010:c07::244]:35227)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <jcmvbkbc@gmail.com>) id 1dHvNr-00010N-8H
-	for qemu-devel@nongnu.org; Mon, 05 Jun 2017 13:01:39 -0400
-Received: by mail-lf0-x244.google.com with SMTP id v20so7070945lfa.2
-	for <qemu-devel@nongnu.org>; Mon, 05 Jun 2017 10:01:37 -0700 (PDT)
-From: Max Filippov <jcmvbkbc@gmail.com>
-Date: Mon,  5 Jun 2017 10:01:17 -0700
-Message-Id: <1496682077-32144-1-git-send-email-jcmvbkbc@gmail.com>
-Subject: [Qemu-devel] [PULL 0/4] target/xtensa fixes
+	(envelope-from <pm215@archaic.org.uk>) id 1dHvNw-00017O-Kk
+	for qemu-devel@nongnu.org; Mon, 05 Jun 2017 13:01:45 -0400
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon,  5 Jun 2017 18:01:38 +0100
+Message-Id: <1496682098-1540-1-git-send-email-peter.maydell@linaro.org>
+Subject: [Qemu-devel] [PATCH] block/gluster.c: Handle qdict_array_entries()
+ failure
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,44 +19,35 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Max Filippov <jcmvbkbc@gmail.com>
+Cc: patches@linaro.org, Jeff Cody <jcody@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
 
-Hi Peter,
+In qemu_gluster_parse_json(), the call to qdict_array_entries()
+could return a negative error code, which we were ignoring
+because we assigned the result to an unsigned variable.
+Fix this by using the 'int' type instead, which matches the
+return type of qdict_array_entries() and also the type
+we use for the loop enumeration variable 'i'.
 
-please pull my current target/xtensa queue:
+(Spotted by Coverity, CID 1360960.)
 
-The following changes since commit c6e84fbd447a51e1161d74d71566a5f67b47eac5:
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+---
+ block/gluster.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-  Merge remote-tracking branch 'remotes/mst/tags/for_upstream' into staging (2017-06-02 17:46:22 +0100)
-
-are available in the git repository at:
-
-  git://github.com/OSLL/qemu-xtensa.git tags/20170605-xtensa
-
-for you to fetch changes up to aa717e657f3ef2e676803676eaa268ec0108a453:
-
-  target/xtensa: handle unknown registers in gdbstub (2017-06-03 02:16:18 -0700)
-
-----------------------------------------------------------------
-target/xtensa fixes:
-
-- fix read/write simcall mapping flags and return value;
-- use -serial option to direct console output of sim machine to QEMU chardev;
-- fix handling of unknown registers in the gdbstub.
-
-----------------------------------------------------------------
-Max Filippov (4):
-      target/xtensa: fix mapping direction in read/write simcalls
-      target/xtensa: fix return value of read/write simcalls
-      target/xtensa: support output to chardev console
-      target/xtensa: handle unknown registers in gdbstub
-
- hw/xtensa/sim.c             |  4 ++
- target/xtensa/cpu.h         |  1 +
- target/xtensa/gdbstub.c     | 13 +++++--
- target/xtensa/xtensa-semi.c | 91 +++++++++++++++++++++++++++++++++++----------
- 4 files changed, 87 insertions(+), 22 deletions(-)
-
+diff --git a/block/gluster.c b/block/gluster.c
+index 031596a..addceed 100644
+--- a/block/gluster.c
++++ b/block/gluster.c
+@@ -493,8 +493,7 @@ static int qemu_gluster_parse_json(BlockdevOptionsGluster *gconf,
+     Error *local_err = NULL;
+     char *str = NULL;
+     const char *ptr;
+-    size_t num_servers;
+-    int i, type;
++    int i, type, num_servers;
+ 
+     /* create opts info from runtime_json_opts list */
+     opts = qemu_opts_create(&runtime_json_opts, NULL, 0, &error_abort);
 -- 
-Thanks.
--- Max
+2.7.4
