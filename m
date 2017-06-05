@@ -1,22 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48655)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58148)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dHlg0-0003m1-Ts
-	for qemu-devel@nongnu.org; Mon, 05 Jun 2017 02:39:46 -0400
+	(envelope-from <amarnath.valluri@intel.com>) id 1dHmLP-00053D-9N
+	for qemu-devel@nongnu.org; Mon, 05 Jun 2017 03:22:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dHlfz-0008UH-TE
-	for qemu-devel@nongnu.org; Mon, 05 Jun 2017 02:39:44 -0400
-Date: Mon, 5 Jun 2017 14:39:30 +0800
-From: Fam Zheng <famz@redhat.com>
-Message-ID: <20170605063930.GB14337@lemon.lan>
-References: <1496642007-8309-1-git-send-email-ashijeetacharya@gmail.com>
-	<1496642007-8309-7-git-send-email-ashijeetacharya@gmail.com>
-	<CAC2QTZZgzsQPVgcwNrFqy3vov-rx8DTUucoJ5JfsSaTUeOuQCQ@mail.gmail.com>
+	(envelope-from <amarnath.valluri@intel.com>) id 1dHmLM-0008QY-1Y
+	for qemu-devel@nongnu.org; Mon, 05 Jun 2017 03:22:31 -0400
+Received: from mga11.intel.com ([192.55.52.93]:7808)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <amarnath.valluri@intel.com>)
+	id 1dHmLL-0008Lp-Lt
+	for qemu-devel@nongnu.org; Mon, 05 Jun 2017 03:22:27 -0400
+From: "Valluri, Amarnath" <amarnath.valluri@intel.com>
+Date: Mon, 5 Jun 2017 07:22:19 +0000
+Message-ID: <1496647406.25318.13.camel@intel.com>
+References: <1494921494-33717-1-git-send-email-amarnath.valluri@intel.com>
+	<1494921494-33717-2-git-send-email-amarnath.valluri@intel.com>
+	<CAJ+F1CL8gFP7QaNRWMJd+HQExtsKCXzGexB-uQH7UzDz6Ru3yg@mail.gmail.com>
+In-Reply-To: <CAJ+F1CL8gFP7QaNRWMJd+HQExtsKCXzGexB-uQH7UzDz6Ru3yg@mail.gmail.com>
+Content-Language: en-US
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAC2QTZZgzsQPVgcwNrFqy3vov-rx8DTUucoJ5JfsSaTUeOuQCQ@mail.gmail.com>
-Subject: Re: [Qemu-devel] [PATCH v5 6/8] vmdk: New functions to assist
- allocating multiple clusters
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Subject: Re: [Qemu-devel] [PATCH v4 1/8] tpm-backend: Remove unneeded member
+ variable from backend class
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,111 +31,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Ashijeet Acharya <ashijeetacharya@gmail.com>
-Cc: Kevin Wolf <kwolf@redhat.com>, John Snow <jsnow@redhat.com>, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>, qemu block <qemu-block@nongnu.org>
+To: "marcandre.lureau@gmail.com" <marcandre.lureau@gmail.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 
-On Mon, 06/05 11:37, Ashijeet Acharya wrote:
-> On Mon, Jun 5, 2017 at 11:23 AM, Ashijeet Acharya
-> <ashijeetacharya@gmail.com> wrote:
-> > Introduce two new helper functions handle_alloc() and
-> > vmdk_alloc_cluster_offset(). handle_alloc() helps to allocate multiple
-> > clusters at once starting from a given offset on disk and performs COW
-> > if necessary for first and last allocated clusters.
-> > vmdk_alloc_cluster_offset() helps to return the offset of the first of
-> > the many newly allocated clusters. Also, provide proper documentation
-> > for both.
-> >
-> > Signed-off-by: Ashijeet Acharya <ashijeetacharya@gmail.com>
-> > ---
-> >  block/vmdk.c | 192 +++++++++++++++++++++++++++++++++++++++++++++++++++++++----
-> >  1 file changed, 182 insertions(+), 10 deletions(-)
-> >
-> > diff --git a/block/vmdk.c b/block/vmdk.c
-> > index fe2046b..b671dc9 100644
-> > --- a/block/vmdk.c
-> > +++ b/block/vmdk.c
-> > @@ -136,6 +136,7 @@ typedef struct VmdkMetaData {
-> >      unsigned int l2_offset;
-> >      int valid;
-> >      uint32_t *l2_cache_entry;
-> > +    uint32_t nb_clusters;
-> >  } VmdkMetaData;
-> >
-> >  typedef struct VmdkGrainMarker {
-> > @@ -1242,6 +1243,174 @@ static int get_cluster_table(VmdkExtent *extent, uint64_t offset,
-> >      return VMDK_OK;
-> >  }
-> >
-> > +/*
-> > + * vmdk_handle_alloc
-> > + *
-> > + * Allocate new clusters for an area that either is yet unallocated or needs a
-> > + * copy on write. If *cluster_offset is non_zero, clusters are only allocated if
-> > + * the new allocation can match the specified host offset.
-> > + *
-> > + * Returns:
-> > + *   VMDK_OK:       if new clusters were allocated, *bytes may be decreased if
-> > + *                  the new allocation doesn't cover all of the requested area.
-> > + *                  *cluster_offset is updated to contain the offset of the
-> > + *                  first newly allocated cluster.
-> > + *
-> > + *   VMDK_UNALLOC:  if no clusters could be allocated. *cluster_offset is left
-> > + *                  unchanged.
-> > + *
-> > + *   VMDK_ERROR:    in error cases
-> > + */
-> > +static int vmdk_handle_alloc(BlockDriverState *bs, VmdkExtent *extent,
-> > +                             uint64_t offset, uint64_t *cluster_offset,
-> > +                             int64_t *bytes, VmdkMetaData *m_data,
-> > +                             bool allocate, uint32_t *total_alloc_clusters)
-> > +{
-> > +    int l1_index, l2_offset, l2_index;
-> > +    uint32_t *l2_table;
-> > +    uint32_t cluster_sector;
-> > +    uint32_t nb_clusters;
-> > +    bool zeroed = false;
-> > +    uint64_t skip_start_bytes, skip_end_bytes;
-> > +    int ret;
-> > +
-> > +    ret = get_cluster_table(extent, offset, &l1_index, &l2_offset,
-> > +                            &l2_index, &l2_table);
-> > +    if (ret < 0) {
-> > +        return ret;
-> > +    }
-> > +
-> > +    cluster_sector = le32_to_cpu(l2_table[l2_index]);
-> > +
-> > +    skip_start_bytes = vmdk_find_offset_in_cluster(extent, offset);
-> > +    /* Calculate the number of clusters to look for. Here we truncate the last
-> > +     * cluster, i.e. 1 less than the actual value calculated as we may need to
-> > +     * perform COW for the last one. */
-> > +    nb_clusters = DIV_ROUND_UP(skip_start_bytes + *bytes,
-> > +                               extent->cluster_sectors << BDRV_SECTOR_BITS) - 1;
-> > +
-> > +    nb_clusters = MIN(nb_clusters, extent->l2_size - l2_index);
-> > +    assert(nb_clusters <= INT_MAX);
-> > +
-> > +    /* update bytes according to final nb_clusters value */
-> > +    if (nb_clusters != 0) {
-> > +        *bytes = ((nb_clusters * extent->cluster_sectors) << BDRV_SECTOR_BITS)
-> > +                 - skip_start_bytes;
-> > +    } else {
-> > +        nb_clusters = 1;
-> > +    }
-> > +    *total_alloc_clusters += nb_clusters;
-> 
-> I have left it as it is for now as I wasn't sure about what you meant.
-> You can check my query I posted on v4 of this thread for more so that
-> we can solve this soon. :-)
-
-What I meant is to change this to "*total_alloc_clusters = nb_clusters" here,
-and pass in a temporary variable from vmdk_pwritev, then do a
-"total_alloc_clusters += temp" there. This is more readable than the current
-way.
-
-Alternatively, rename "total_alloc_clusters" parameter of this function to
-"alloc_clusters_counter" and be done.
-
-Ideally a function's interface should be as localized and stateless as possible.
-
-Fam
+T24gV2VkLCAyMDE3LTA1LTI0IGF0IDE0OjM0ICswMDAwLCBNYXJjLUFuZHLDqSBMdXJlYXUgd3Jv
+dGU6DQpIaQ0KDQpPbiBUdWUsIE1heSAxNiwgMjAxNyBhdCAxMjowMCBQTSBBbWFybmF0aCBWYWxs
+dXJpIDxhbWFybmF0aC52YWxsdXJpQGludGVsLmNvbTxtYWlsdG86YW1hcm5hdGgudmFsbHVyaUBp
+bnRlbC5jb20+PiB3cm90ZToNClRQTURyaXZlck9wcyBpbnNpZGUgVFBNQmFja2VuZCBpcyBub3Qg
+cmVxdWlyZWQsIGFzIGl0IGlzIHN1cHBvc2VkIHRvIGJlIGEgY2xhc3MNCm1lbWJlci4gVGhlIG9u
+bHkgcG9zc2libGUgcmVhc29uIGZvciBrZWVwaW5nIGluIFRQTUJhY2tlbmQgd2FzLCB0byBnZXQg
+dGhlDQpiYWNrZW5kIHR5cGUgaW4gdHBtLmMgd2hlcmUgZGVkaWNhdGVkIGJhY2tlbmQgYXBpLCB0
+cG1fYmFja2VuZF9nZXRfdHlwZSgpIGlzDQpwcmVzZW50Lg0KDQpTaWduZWQtb2ZmLWJ5OiBBbWFy
+bmF0aCBWYWxsdXJpIDxhbWFybmF0aC52YWxsdXJpQGludGVsLmNvbTxtYWlsdG86YW1hcm5hdGgu
+dmFsbHVyaUBpbnRlbC5jb20+Pg0KDQpQbGVhc2UgYWRkICYga2VlcCBteSByLWIgdGFncyBmcm9t
+IHByZXZpb3VzIGl0ZXJhdGlvbnMgaW4gY29tbWl0IG1lc3NhZ2UgaWYgdGhleSBhcmUgbm8gb3Ig
+b25seSBtaW5vciBjaGFuZ2VzLg0KTWFyYywgZG8geW91IG1lYW4gdG8gcmVzZW5kIHRoZSBwYXRj
+aCBzZXQgYnkga2VlcGluZyAnUmV2aWV3ZWQtYnk6JyB0YWcgZm9yIGNvbW1pdHMuDQoNCi0gQW1h
+cm5hdGgNCg0KDQoNCi0tLQ0KIGh3L3RwbS90cG1fcGFzc3Rocm91Z2guYyAgICAgfCA0IC0tLS0N
+CiBpbmNsdWRlL3N5c2VtdS90cG1fYmFja2VuZC5oIHwgMSAtDQogdHBtLmMgICAgICAgICAgICAg
+ICAgICAgICAgICB8IDIgKy0NCiAzIGZpbGVzIGNoYW5nZWQsIDEgaW5zZXJ0aW9uKCspLCA2IGRl
+bGV0aW9ucygtKQ0KDQpkaWZmIC0tZ2l0IGEvaHcvdHBtL3RwbV9wYXNzdGhyb3VnaC5jIGIvaHcv
+dHBtL3RwbV9wYXNzdGhyb3VnaC5jDQppbmRleCA5MjM0ZWIzLi5hMGJhZjVmIDEwMDY0NA0KLS0t
+IGEvaHcvdHBtL3RwbV9wYXNzdGhyb3VnaC5jDQorKysgYi9ody90cG0vdHBtX3Bhc3N0aHJvdWdo
+LmMNCkBAIC00Niw4ICs0Niw2IEBADQogI2RlZmluZSBUUE1fUEFTU1RIUk9VR0gob2JqKSBcDQog
+ICAgIE9CSkVDVF9DSEVDSyhUUE1QYXNzdGhydVN0YXRlLCAob2JqKSwgVFlQRV9UUE1fUEFTU1RI
+Uk9VR0gpDQoNCi1zdGF0aWMgY29uc3QgVFBNRHJpdmVyT3BzIHRwbV9wYXNzdGhyb3VnaF9kcml2
+ZXI7DQotDQogLyogZGF0YSBzdHJ1Y3R1cmVzICovDQogdHlwZWRlZiBzdHJ1Y3QgVFBNUGFzc3Ro
+cnVUaHJlYWRQYXJhbXMgew0KICAgICBUUE1TdGF0ZSAqdHBtX3N0YXRlOw0KQEAgLTQ2Miw4ICs0
+NjAsNiBAQCBzdGF0aWMgVFBNQmFja2VuZCAqdHBtX3Bhc3N0aHJvdWdoX2NyZWF0ZShRZW11T3B0
+cyAqb3B0cywgY29uc3QgY2hhciAqaWQpDQogICAgIC8qIGxldCBmcm9udGVuZCBzZXQgdGhlIGZl
+X21vZGVsIHRvIHByb3BlciB2YWx1ZSAqLw0KICAgICB0Yi0+ZmVfbW9kZWwgPSAtMTsNCg0KLSAg
+ICB0Yi0+b3BzID0gJnRwbV9wYXNzdGhyb3VnaF9kcml2ZXI7DQotDQogICAgIGlmICh0cG1fcGFz
+c3Rocm91Z2hfaGFuZGxlX2RldmljZV9vcHRzKG9wdHMsIHRiKSkgew0KICAgICAgICAgZ290byBl
+cnJfZXhpdDsNCiAgICAgfQ0KZGlmZiAtLWdpdCBhL2luY2x1ZGUvc3lzZW11L3RwbV9iYWNrZW5k
+LmggYi9pbmNsdWRlL3N5c2VtdS90cG1fYmFja2VuZC5oDQppbmRleCBiNThmNTJkLi5lN2Y1OTBk
+IDEwMDY0NA0KLS0tIGEvaW5jbHVkZS9zeXNlbXUvdHBtX2JhY2tlbmQuaA0KKysrIGIvaW5jbHVk
+ZS9zeXNlbXUvdHBtX2JhY2tlbmQuaA0KQEAgLTUwLDcgKzUwLDYgQEAgc3RydWN0IFRQTUJhY2tl
+bmQgew0KICAgICBlbnVtIFRwbU1vZGVsIGZlX21vZGVsOw0KICAgICBjaGFyICpwYXRoOw0KICAg
+ICBjaGFyICpjYW5jZWxfcGF0aDsNCi0gICAgY29uc3QgVFBNRHJpdmVyT3BzICpvcHM7DQoNCiAg
+ICAgUUxJU1RfRU5UUlkoVFBNQmFja2VuZCkgbGlzdDsNCiB9Ow0KZGlmZiAtLWdpdCBhL3RwbS5j
+IGIvdHBtLmMNCmluZGV4IDlhN2M3MTEuLjBlZTAyMWEgMTAwNjQ0DQotLS0gYS90cG0uYw0KKysr
+IGIvdHBtLmMNCkBAIC0yNTgsNyArMjU4LDcgQEAgc3RhdGljIFRQTUluZm8gKnFtcF9xdWVyeV90
+cG1faW5zdChUUE1CYWNrZW5kICpkcnYpDQogICAgIHJlcy0+bW9kZWwgPSBkcnYtPmZlX21vZGVs
+Ow0KICAgICByZXMtPm9wdGlvbnMgPSBnX25ldzAoVHBtVHlwZU9wdGlvbnMsIDEpOw0KDQotICAg
+IHN3aXRjaCAoZHJ2LT5vcHMtPnR5cGUpIHsNCisgICAgc3dpdGNoICh0cG1fYmFja2VuZF9nZXRf
+dHlwZShkcnYpKSB7DQogICAgIGNhc2UgVFBNX1RZUEVfUEFTU1RIUk9VR0g6DQogICAgICAgICBy
+ZXMtPm9wdGlvbnMtPnR5cGUgPSBUUE1fVFlQRV9PUFRJT05TX0tJTkRfUEFTU1RIUk9VR0g7DQog
+ICAgICAgICB0cG8gPSBnX25ldzAoVFBNUGFzc3Rocm91Z2hPcHRpb25zLCAxKTsNCi0tDQoyLjcu
+NA0KDQoNCg0KLS0NCk1hcmMtQW5kcsOpIEx1cmVhdQ0K
