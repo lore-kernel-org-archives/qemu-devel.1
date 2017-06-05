@@ -1,19 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45931)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45953)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wang.yong155@zte.com.cn>) id 1dHpWN-0003lA-EK
-	for qemu-devel@nongnu.org; Mon, 05 Jun 2017 06:46:04 -0400
+	(envelope-from <wang.yong155@zte.com.cn>) id 1dHpWP-0003mm-VQ
+	for qemu-devel@nongnu.org; Mon, 05 Jun 2017 06:46:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wang.yong155@zte.com.cn>) id 1dHpWK-0003z9-5z
-	for qemu-devel@nongnu.org; Mon, 05 Jun 2017 06:46:03 -0400
-Received: from out1.zte.com.cn ([202.103.147.172]:60908)
+	(envelope-from <wang.yong155@zte.com.cn>) id 1dHpWL-000403-B9
+	for qemu-devel@nongnu.org; Mon, 05 Jun 2017 06:46:06 -0400
+Received: from mxhk.zte.com.cn ([63.217.80.70]:37696)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wang.yong155@zte.com.cn>) id 1dHpWJ-0003tQ-Ru
-	for qemu-devel@nongnu.org; Mon, 05 Jun 2017 06:46:00 -0400
+	(envelope-from <wang.yong155@zte.com.cn>) id 1dHpWK-0003yW-MJ
+	for qemu-devel@nongnu.org; Mon, 05 Jun 2017 06:46:01 -0400
 From: Yong Wang <wang.yong155@zte.com.cn>
-Date: Mon, 5 Jun 2017 18:44:49 +0800
-Message-Id: <1496659493-1105-1-git-send-email-wang.yong155@zte.com.cn>
-Subject: [Qemu-devel] [PATCHv2 00/04] Replace the COLO comparing thread with
- IOThread
+Date: Mon, 5 Jun 2017 18:44:53 +0800
+Message-Id: <1496659493-1105-5-git-send-email-wang.yong155@zte.com.cn>
+In-Reply-To: <1496659493-1105-1-git-send-email-wang.yong155@zte.com.cn>
+References: <1496659493-1105-1-git-send-email-wang.yong155@zte.com.cn>
+Subject: [Qemu-devel] [PATCHv2 04/04] colo-compare: Update the COLO document
+ to fix the processing of secondary packets in the main thread
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,27 +27,33 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: zhang.zhanghailiang@huawei.com, jasowang@redhat.com, zhangchen.fnst@cn.fujitsu.com
 Cc: lizhijian@cn.fujitsu.com, qemu-devel@nongnu.org, wang.yong155@zte.com.cn, wang.guang55@zte.com.cn
 
-It's a good idea to use IOThread instead of COLO comparing thread.
-comparing thread can be completely replaced by IOThread, so this idea came.
+From: Wang Yong <wang.yong155@zte.com.cn>
 
-This series of updates mainly include the old packet regularly check and
-primary/secondary network packets compare all into the IOThread processing.
+In my test, secondary does not process the packets comparing in the IOThread
+but in the qemu main thread processing.
+secondary's configuration " -chardev socket,id=compare1,host=3.3.3.3,port=9004,server,nowait"
+here,we should use 'wait' instead of 'nowait' configuration .
+after use  'wait' configuration ,packets can be process in the IOThread from the secondary,
+not in the qemu main thread.
 
-Please review,thanks.
+Signed-off-by: Wang Yong<wang.yong155@zte.com.cn>
+Signed-off-by: Wang Guang<wang.guang55@zte.com.cn>
+---
+ docs/colo-proxy.txt | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-wangyong(4):
-colo-compare: Use IOThread context timer to Check old packet
- regularly
-colo-compare: Process pactkets in the IOThread of the primary
-colo-compare: Update the COLO document to add the IOThread
- configuration
-colo-compare: Update the COLO document to fix the processing
- of secondary packets in the main thread
-
- docs/colo-proxy.txt |   5 +-
- net/colo-compare.c  | 175 ++++++++++++++++++++++++++++++++++++++--------------
- net/colo.h          |   1 +
- 3 files changed, 134 insertions(+), 47 deletions(-)
-
---
+diff --git a/docs/colo-proxy.txt b/docs/colo-proxy.txt
+index ce3f783..567cc8b 100644
+--- a/docs/colo-proxy.txt
++++ b/docs/colo-proxy.txt
+@@ -165,7 +165,7 @@ Primary(ip:3.3.3.3):
+ -netdev tap,id=hn0,vhost=off,script=/etc/qemu-ifup,downscript=/etc/qemu-ifdown
+ -device e1000,id=e0,netdev=hn0,mac=52:a4:00:12:78:66
+ -chardev socket,id=mirror0,host=3.3.3.3,port=9003,server,nowait
+--chardev socket,id=compare1,host=3.3.3.3,port=9004,server,nowait
++-chardev socket,id=compare1,host=3.3.3.3,port=9004,server,wait
+ -chardev socket,id=compare0,host=3.3.3.3,port=9001,server,nowait
+ -chardev socket,id=compare0-0,host=3.3.3.3,port=9001
+ -chardev socket,id=compare_out,host=3.3.3.3,port=9005,server,nowait
+-- 
 1.8.3.1
