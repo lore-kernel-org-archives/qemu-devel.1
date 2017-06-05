@@ -1,21 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50282)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53930)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dHps1-0002FB-CT
-	for qemu-devel@nongnu.org; Mon, 05 Jun 2017 07:08:26 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1dHq7q-0005Dv-Sy
+	for qemu-devel@nongnu.org; Mon, 05 Jun 2017 07:24:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dHps0-0001sh-Af
-	for qemu-devel@nongnu.org; Mon, 05 Jun 2017 07:08:25 -0400
-Date: Mon, 5 Jun 2017 12:08:09 +0100
+	(envelope-from <dgilbert@redhat.com>) id 1dHq7n-0007GB-M5
+	for qemu-devel@nongnu.org; Mon, 05 Jun 2017 07:24:46 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43516)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dHq7n-0007Ex-DG
+	for qemu-devel@nongnu.org; Mon, 05 Jun 2017 07:24:43 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 59FF280C10
+	for <qemu-devel@nongnu.org>; Mon,  5 Jun 2017 11:24:42 +0000 (UTC)
+Date: Mon, 5 Jun 2017 12:24:37 +0100
 From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170605110809.GA2666@work-vm>
-References: <20170605104851.61818-1-haoqf@linux.vnet.ibm.com>
-	<20170605104851.61818-2-haoqf@linux.vnet.ibm.com>
+Message-ID: <20170605112436.GH2109@work-vm>
+References: <20170601220813.30535-1-quintela@redhat.com>
+	<20170601220813.30535-2-quintela@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20170605104851.61818-2-haoqf@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH v1 1/1] qemu/migration: fix the double free
- problem on from_src_file
+In-Reply-To: <20170601220813.30535-2-quintela@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 1/5] ram: Call migration_page_queue_free()
+ at ram_migration_cleanup()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,57 +34,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: QingFeng Hao <haoqf@linux.vnet.ibm.com>
-Cc: qemu-devel@nongnu.org, quintela@redhat.com, qemu-block@nongnu.org, kwolf@redhat.com, famz@redhat.com, liujbjl@linux.vnet.ibm.com, peterx@redhat.com, borntraeger@de.ibm.com, cornelia.huck@de.ibm.com
+To: Juan Quintela <quintela@redhat.com>
+Cc: qemu-devel@nongnu.org, lvivier@redhat.com, peterx@redhat.com
 
-* QingFeng Hao (haoqf@linux.vnet.ibm.com) wrote:
-> In load_vmstate, mis->from_src_file is freed twice, the first free is by
-> qemu_fclose, the second is by migration_incoming_state_destroy and
-> it causes Illegal instruction exception. The fix is just to remove the
-> first free.
+* Juan Quintela (quintela@redhat.com) wrote:
+> We shouldn't be using memory later than that.
 > 
-> This problem is found by qemu-iotests case 068 since commit
-> "660819b migration: shut src return path unconditionally". The error is:
-> 068 1s ... - output mismatch (see 068.out.bad)
->     --- tests/qemu-iotests/068.out	2017-05-06 01:00:26.417270437 +0200
->     +++ 068.out.bad	2017-06-03 13:59:55.360274640 +0200
->     @@ -6,6 +6,8 @@
->      QEMU X.Y.Z monitor - type 'help' for more information
->      (qemu) savevm 0
->      (qemu) quit
->     +./common.config: line 107: 242472 Illegal instruction     (core dumped) ( if [ -n "${QEMU_NEED_PID}" ]; then
->     +    echo $BASHPID > "${QEMU_TEST_DIR}/qemu-${_QEMU_HANDLE}.pid";
->     +fi; exec "$QEMU_PROG" $QEMU_OPTIONS "$@" )
->      QEMU X.Y.Z monitor - type 'help' for more information
->     -(qemu) quit
->     -*** done
->     +(qemu) *** done
-> 
-> Signed-off-by: QingFeng Hao <haoqf@linux.vnet.ibm.com>
-> ---
->  migration/savevm.c | 1 -
->  1 file changed, 1 deletion(-)
-> 
-> diff --git a/migration/savevm.c b/migration/savevm.c
-> index 9c320f59d0..853e14e34e 100644
-> --- a/migration/savevm.c
-> +++ b/migration/savevm.c
-> @@ -2290,7 +2290,6 @@ int load_snapshot(const char *name, Error **errp)
->  
->      aio_context_acquire(aio_context);
->      ret = qemu_loadvm_state(f);
-> -    qemu_fclose(f);
->      aio_context_release(aio_context);
+> Signed-off-by: Juan Quintela <quintela@redhat.com>
 
-Thanks!
+Yes, I think I agree:
+
+   migration_completion calls await_return_path_close_on_source that
+makes sure there's no more incoming requests.
+
+   migration_completion is called prior to the call to qemu_savevm_state_cleanup
+qemu_savevm_state_cleanup calls the ram_migration_cleanup.
+
+So you're moving it later which should be safe:
+
 
 Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 
->  
->      migration_incoming_state_destroy();
-> -- 
-> 2.11.2
+> ---
+>  migration/migration.c | 2 --
+>  migration/ram.c       | 5 +++--
+>  migration/ram.h       | 1 -
+>  3 files changed, 3 insertions(+), 5 deletions(-)
 > 
+> diff --git a/migration/migration.c b/migration/migration.c
+> index af4c2cc..ea3d41c 100644
+> --- a/migration/migration.c
+> +++ b/migration/migration.c
+> @@ -814,8 +814,6 @@ static void migrate_fd_cleanup(void *opaque)
+>      qemu_bh_delete(s->cleanup_bh);
+>      s->cleanup_bh = NULL;
+>  
+> -    migration_page_queue_free();
+> -
+>      if (s->to_dst_file) {
+>          trace_migrate_fd_cleanup();
+>          qemu_mutex_unlock_iothread();
+> diff --git a/migration/ram.c b/migration/ram.c
+> index db7f4b0..e503277 100644
+> --- a/migration/ram.c
+> +++ b/migration/ram.c
+> @@ -1181,10 +1181,9 @@ static bool get_queued_page(RAMState *rs, PageSearchStatus *pss)
+>   * be some left.  in case that there is any page left, we drop it.
+>   *
+>   */
+> -void migration_page_queue_free(void)
+> +static void migration_page_queue_free(RAMState *rs)
+>  {
+>      struct RAMSrcPageRequest *mspr, *next_mspr;
+> -    RAMState *rs = &ram_state;
+>      /* This queue generally should be empty - but in the case of a failed
+>       * migration might have some droppings in.
+>       */
+> @@ -1434,6 +1433,7 @@ void free_xbzrle_decoded_buf(void)
+>  
+>  static void ram_migration_cleanup(void *opaque)
+>  {
+> +    RAMState *rs = opaque;
+>      RAMBlock *block;
+>  
+>      /* caller have hold iothread lock or is in a bh, so there is
+> @@ -1459,6 +1459,7 @@ static void ram_migration_cleanup(void *opaque)
+>          XBZRLE.current_buf = NULL;
+>      }
+>      XBZRLE_cache_unlock();
+> +    migration_page_queue_free(rs);
+>  }
+>  
+>  static void ram_state_reset(RAMState *rs)
+> diff --git a/migration/ram.h b/migration/ram.h
+> index c9563d1..d4da419 100644
+> --- a/migration/ram.h
+> +++ b/migration/ram.h
+> @@ -53,7 +53,6 @@ void migrate_decompress_threads_create(void);
+>  void migrate_decompress_threads_join(void);
+>  
+>  uint64_t ram_pagesize_summary(void);
+> -void migration_page_queue_free(void);
+>  int ram_save_queue_pages(const char *rbname, ram_addr_t start, ram_addr_t len);
+>  void acct_update_position(QEMUFile *f, size_t size, bool zero);
+>  void free_xbzrle_decoded_buf(void);
+> -- 
+> 2.9.4
 > 
 --
 Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
