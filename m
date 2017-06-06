@@ -1,25 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38226)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38574)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1dICIY-00052v-LV
-	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 07:05:19 -0400
+	(envelope-from <berrange@redhat.com>) id 1dICJO-0005hN-CB
+	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 07:06:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1dICIO-0002gd-Sd
-	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 07:05:18 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:36034)
+	(envelope-from <berrange@redhat.com>) id 1dICJN-0002x4-4q
+	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 07:06:10 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:45662)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1dICIO-0002fD-N6
-	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 07:05:08 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 97AAD7D0FB
-	for <qemu-devel@nongnu.org>; Tue,  6 Jun 2017 11:05:07 +0000 (UTC)
-From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Tue,  6 Jun 2017 13:04:55 +0200
-Message-Id: <20170606110459.9771-1-kraxel@redhat.com>
-Subject: [Qemu-devel] [PATCH 0/4] ui/opengl: add and use helper functions to
- handle framebuffers
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1dICJM-0002wz-Uc
+	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 07:06:09 -0400
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Date: Tue,  6 Jun 2017 12:05:56 +0100
+Message-Id: <20170606110556.12922-3-berrange@redhat.com>
+In-Reply-To: <20170606110556.12922-1-berrange@redhat.com>
+References: <20170606110556.12922-1-berrange@redhat.com>
+Subject: [Qemu-devel] [PATCH v2 2/2] docs: document support lifetime for
+ features
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,29 +25,75 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Gerd Hoffmann <kraxel@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Stefan Hajnoczi <stefanha@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>
 
-  Hi,
+There is currently no explicit guidance on the duration of support
+for features such as versioned machine types, which have a finite
+useful lifespan. Thus apps / users cannot predict how much time
+they might be able to use a feature for, before it is removed (if
+ever).
 
-All UIs with opengl support have simliar code to handle opengl
-framebuffers.  Create some helpers and put them into use to reduce
-code duplication.
+This adds a new appendix that lists items which have finite lifecycles,
+such as machine types. For items which are generally expected to be
+supported indefinitely, it sets out the policy around deprecation
+and removal, should it be needed.
 
-Gerd Hoffmann (4):
-  egl-helpers: add helpers to handle opengl framebuffers
-  egl-headless: use framebuffer helper functions.
-  sdl2: use framebuffer helper functions.
-  gtk: use framebuffer helper functions.
+Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
+---
+ qemu-doc.texi | 34 ++++++++++++++++++++++++++++++++++
+ 1 file changed, 34 insertions(+)
 
- include/ui/egl-helpers.h | 14 ++++++++++
- include/ui/gtk.h         |  4 +--
- include/ui/sdl2.h        |  8 ++++--
- ui/egl-headless.c        | 67 ++++++++++++----------------------------------
- ui/egl-helpers.c         | 69 ++++++++++++++++++++++++++++++++++++++++++++++++
- ui/gtk-egl.c             | 38 ++++++--------------------
- ui/gtk-gl-area.c         | 26 +++++-------------
- ui/sdl2-gl.c             | 38 ++++++--------------------
- 8 files changed, 131 insertions(+), 133 deletions(-)
-
+diff --git a/qemu-doc.texi b/qemu-doc.texi
+index 29f89d8..e3c6400 100644
+--- a/qemu-doc.texi
++++ b/qemu-doc.texi
+@@ -37,6 +37,7 @@
+ * QEMU Guest Agent::
+ * QEMU User space emulator::
+ * Implementation notes::
++* Support lifetime::
+ * Deprecations::
+ * License::
+ * Index::
+@@ -3017,6 +3018,39 @@ Run the emulation in single step mode.
+ 
+ @include qemu-tech.texi
+ 
++@node Support lifetime
++@appendix Support lifetime
++
++Features provided by QEMU are subject to varying support lifetimes.
++
++In general features are intended to be supported indefinitely once
++introduced. In the event that a feature needs to be removed, there
++will be some period in which it will be marked as deprecated before
++eventual removal. All deprecated features will be listed in the
++``Deprecations'' appendix of this document. They may also generate
++warnings on the console when QEMU starts up, or if activated via
++a monitor command.
++
++Certain features will have an inherently finite lifetime, and thus
++will be removed on a fixed schedule.
++
++@node Machine types
++@section Machine types
++
++For architectures which aim to support live migration compatibility
++across releases, each release will introduce a new versioned machine
++type. For example, the 2.8.0 release introduced machine types
++``pc-i440fx-2.8'' and ``pc-q35-2.8' 'for the x86_64/i686 architectures.
++
++To allow live migration of a guest running on a 2.8.0 release to a
++2.9.0, the QEMU 2.9.0 version must support the ``pc-i440fx-2.8'' and
++``pc-q35-2.8''.  To allow users live migrating VMs to skip multiple
++intermediate releases when upgrading, new releases of QEMU will
++support machine types from many previous versions.
++
++The supported lifetime for machine types is 12 releases, which is
++equivalent to 4 years worth of previous QEMU releases.
++
+ @node Deprecations
+ @appendix Deprecations
+ 
 -- 
 2.9.3
