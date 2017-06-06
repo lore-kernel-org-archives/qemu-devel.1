@@ -1,23 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40637)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41910)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ali.saeedi56@gmail.com>) id 1dIFtM-0003vd-JG
-	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 10:55:33 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1dIFy4-0006GL-DL
+	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 11:00:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ali.saeedi56@gmail.com>) id 1dIFtL-0002ba-RT
-	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 10:55:32 -0400
-Received: from mail-qt0-x233.google.com ([2607:f8b0:400d:c0d::233]:34423)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <ali.saeedi56@gmail.com>)
-	id 1dIFtL-0002bR-Mx
-	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 10:55:31 -0400
-Received: by mail-qt0-x233.google.com with SMTP id c10so77831701qtd.1
-	for <qemu-devel@nongnu.org>; Tue, 06 Jun 2017 07:55:30 -0700 (PDT)
-MIME-Version: 1.0
-From: ali saeedi <ali.saeedi56@gmail.com>
-Date: Tue, 6 Jun 2017 19:25:29 +0430
-Message-ID: <CAGKXQycwBnuFGKeOVYa0fbQ7zRbFsFKKSYUaOQmUUDtk+5uZQQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: [Qemu-devel] MemoryRegion and RamBlock
+	(envelope-from <pbonzini@redhat.com>) id 1dIFy0-0004Le-Ho
+	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 11:00:24 -0400
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Tue,  6 Jun 2017 17:00:16 +0200
+Message-Id: <20170606150016.17143-1-pbonzini@redhat.com>
+Subject: [Qemu-devel] [PATCH] qemu-doc: do not refer to years-old version
+ numbers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,7 +19,31 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: qemu-trivial@nongnu.org
 
-Hello all
-what does these concepts 'MemoryRegion' and 'RamBlock' mean?
-thanks a lot
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ qemu-doc.texi | 8 +++-----
+ 1 file changed, 3 insertions(+), 5 deletions(-)
+
+diff --git a/qemu-doc.texi b/qemu-doc.texi
+index 8e5c4a951f..51046ef9d1 100644
+--- a/qemu-doc.texi
++++ b/qemu-doc.texi
+@@ -386,11 +386,9 @@ CPU registers by prefixing them with @emph{$}.
+ @node disk_images
+ @section Disk Images
+ 
+-Since version 0.6.1, QEMU supports many disk image formats, including
+-growable disk images (their size increase as non empty sectors are
+-written), compressed and encrypted disk images. Version 0.8.3 added
+-the new qcow2 disk image format which is essential to support VM
+-snapshots.
++QEMU supports many disk image formats, including growable disk images
++(their size increase as non empty sectors are written), compressed and
++encrypted disk images.
+ 
+ @menu
+ * disk_images_quickstart::    Quick start for disk image creation
+-- 
+2.13.0
