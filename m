@@ -1,31 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53628)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54893)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dIHs7-0005hF-AL
-	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 13:02:29 -0400
+	(envelope-from <no-reply@patchew.org>) id 1dIHx0-00075z-Uc
+	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 13:07:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dIHs6-0000TW-Nt
-	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 13:02:23 -0400
-Received: from mail-qt0-x22e.google.com ([2607:f8b0:400d:c0d::22e]:34164)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1dIHs6-0000TQ-Id
-	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 13:02:22 -0400
-Received: by mail-qt0-x22e.google.com with SMTP id c10so82594185qtd.1
-	for <qemu-devel@nongnu.org>; Tue, 06 Jun 2017 10:02:22 -0700 (PDT)
-Sender: Richard Henderson <rth7680@gmail.com>
-References: <1496702979-26132-1-git-send-email-cota@braap.org>
-	<1496702979-26132-4-git-send-email-cota@braap.org>
-	<015d442b-a44e-0ebc-470c-e3289b109ca6@twiddle.net>
-	<20170606162508.GB6109@flamenco>
-From: Richard Henderson <rth@twiddle.net>
-Message-ID: <e03d566d-25c4-5052-68ba-2a07b64bbfdd@twiddle.net>
-Date: Tue, 6 Jun 2017 10:02:17 -0700
+	(envelope-from <no-reply@patchew.org>) id 1dIHwx-0002Ia-QI
+	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 13:07:26 -0400
+Resent-Message-Id: <E1dIHwx-0002Ia-QI@eggs.gnu.org>
+Received: from sender-of-o52.zoho.com ([135.84.80.217]:21458)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1dIHwx-0002IK-JJ
+	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 13:07:23 -0400
+Reply-To: <qemu-devel@nongnu.org>
+In-Reply-To: <20170606121747.25356-1-pbonzini@redhat.com>
+Message-ID: <149676882877.4849.9151155301030733942@f98a8425f76e>
 MIME-Version: 1.0
-In-Reply-To: <20170606162508.GB6109@flamenco>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 3/3] tcg: allocate TB structs before the
- corresponding translated code
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Tue, 6 Jun 2017 10:07:09 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PATCH 0/7] megasas: fix TOCTOU and segmentation
+ fault bugs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,17 +29,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Emilio G. Cota" <cota@braap.org>
-Cc: qemu-devel@nongnu.org, alex.bennee@linaro.org, Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, Pranith Kumar <bobby.prani@gmail.com>
+To: pbonzini@redhat.com
+Cc: famz@redhat.com, qemu-devel@nongnu.org, zyy4013@stu.ouc.edu.cn, hare@suse.de, ppandit@redhat.com
 
-On 06/06/2017 09:25 AM, Emilio G. Cota wrote:
-> For this particular case we can get away without padding the structs if
-> we're OK with having the end of a TB struct immediately followed
-> by its translated code, instead of having that code on the following
-> cache line.
-
-Uh, no, if you can manually pad before the struct, you can manually pad after 
-the struct too.
-
-
-r~
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
+c3NhZ2UtaWQ6IDIwMTcwNjA2MTIxNzQ3LjI1MzU2LTEtcGJvbnppbmlAcmVkaGF0LmNvbQpTdWJq
+ZWN0OiBbUWVtdS1kZXZlbF0gW1BBVENIIDAvN10gbWVnYXNhczogZml4IFRPQ1RPVSBhbmQgc2Vn
+bWVudGF0aW9uIGZhdWx0IGJ1Z3MKCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jh
+c2gKCkJBU0U9YmFzZQpuPTEKdG90YWw9JChnaXQgbG9nIC0tb25lbGluZSAkQkFTRS4uIHwgd2Mg
+LWwpCmZhaWxlZD0wCgpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBj
+b25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQoKY29tbWl0cz0iJChnaXQgbG9nIC0tZm9y
+bWF0PSVIIC0tcmV2ZXJzZSAkQkFTRS4uKSIKZm9yIGMgaW4gJGNvbW1pdHM7IGRvCiAgICBlY2hv
+ICJDaGVja2luZyBQQVRDSCAkbi8kdG90YWw6ICQoZ2l0IGxvZyAtbiAxIC0tZm9ybWF0PSVzICRj
+KS4uLiIKICAgIGlmICEgZ2l0IHNob3cgJGMgLS1mb3JtYXQ9ZW1haWwgfCAuL3NjcmlwdHMvY2hl
+Y2twYXRjaC5wbCAtLW1haWxiYWNrIC07IHRoZW4KICAgICAgICBmYWlsZWQ9MQogICAgICAgIGVj
+aG8KICAgIGZpCiAgICBuPSQoKG4rMSkpCmRvbmUKCmV4aXQgJGZhaWxlZAo9PT0gVEVTVCBTQ1JJ
+UFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcx
+MzM4NApGcm9tIGh0dHBzOi8vZ2l0aHViLmNvbS9wYXRjaGV3LXByb2plY3QvcWVtdQogLSBbdGFn
+IHVwZGF0ZV0gICAgICBwYXRjaGV3LzE0OTY3NjU1NDQ4OC40MTM0LjE2MDk1MDQ0NTYyMzM0MTAy
+NzQyLnN0Z2l0QGJhaGlhLmxhYi50b3Vsb3VzZS1zdGcuZnIuaWJtLmNvbSAtPiBwYXRjaGV3LzE0
+OTY3NjU1NDQ4OC40MTM0LjE2MDk1MDQ0NTYyMzM0MTAyNzQyLnN0Z2l0QGJhaGlhLmxhYi50b3Vs
+b3VzZS1zdGcuZnIuaWJtLmNvbQogKiBbbmV3IHRhZ10gICAgICAgICBwYXRjaGV3LzIwMTcwNjA2
+MTYyNjUyLjExMjEyMi0xLXZzZW1lbnRzb3ZAdmlydHVvenpvLmNvbSAtPiBwYXRjaGV3LzIwMTcw
+NjA2MTYyNjUyLjExMjEyMi0xLXZzZW1lbnRzb3ZAdmlydHVvenpvLmNvbQpTd2l0Y2hlZCB0byBh
+IG5ldyBicmFuY2ggJ3Rlc3QnCjBiODJlNDcgbWVnYXNhczogYWx3YXlzIHN0b3JlIFNDU0lSZXF1
+ZXN0KiBpbnRvIE1lZ2FzYXNDbWQKMmNlNTFiYSBtZWdhc2FzOiBkbyBub3QgcmVhZCBTQ1NJIHJl
+cSBwYXJhbWV0ZXJzIG1vcmUgdGhhbiBvbmNlIGZyb20gZnJhbWUKNjFiNWVjNCBtZWdhc2FzOiBk
+byBub3QgcmVhZCBjb21tYW5kIG1vcmUgdGhhbiBvbmNlIGZyb20gZnJhbWUKNTRhZjE2NyBtZWdh
+c2FzOiBkbyBub3QgcmVhZCBEQ01EIG9wY29kZSBtb3JlIHRoYW4gb25jZSBmcm9tIGZyYW1lCjZi
+MDIwOTEgbWVnYXNhczogZG8gbm90IHJlYWQgaW92ZWMgY291bnQgbW9yZSB0aGFuIG9uY2UgZnJv
+bSBmcmFtZQo0ODQwMWMyIG1lZ2FzYXM6IGRvIG5vdCByZWFkIHNlbnNlIGxlbmd0aCBtb3JlIHRo
+YW4gb25jZSBmcm9tIGZyYW1lCjk1MjA0NzIgbWVnYXNhczogYWRkIHF0ZXN0Cgo9PT0gT1VUUFVU
+IEJFR0lOID09PQpDaGVja2luZyBQQVRDSCAxLzc6IG1lZ2FzYXM6IGFkZCBxdGVzdC4uLgpDaGVj
+a2luZyBQQVRDSCAyLzc6IG1lZ2FzYXM6IGRvIG5vdCByZWFkIHNlbnNlIGxlbmd0aCBtb3JlIHRo
+YW4gb25jZSBmcm9tIGZyYW1lLi4uCkNoZWNraW5nIFBBVENIIDMvNzogbWVnYXNhczogZG8gbm90
+IHJlYWQgaW92ZWMgY291bnQgbW9yZSB0aGFuIG9uY2UgZnJvbSBmcmFtZS4uLgpDaGVja2luZyBQ
+QVRDSCA0Lzc6IG1lZ2FzYXM6IGRvIG5vdCByZWFkIERDTUQgb3Bjb2RlIG1vcmUgdGhhbiBvbmNl
+IGZyb20gZnJhbWUuLi4KQ2hlY2tpbmcgUEFUQ0ggNS83OiBtZWdhc2FzOiBkbyBub3QgcmVhZCBj
+b21tYW5kIG1vcmUgdGhhbiBvbmNlIGZyb20gZnJhbWUuLi4KQ2hlY2tpbmcgUEFUQ0ggNi83OiBt
+ZWdhc2FzOiBkbyBub3QgcmVhZCBTQ1NJIHJlcSBwYXJhbWV0ZXJzIG1vcmUgdGhhbiBvbmNlIGZy
+b20gZnJhbWUuLi4KQ2hlY2tpbmcgUEFUQ0ggNy83OiBtZWdhc2FzOiBhbHdheXMgc3RvcmUgU0NT
+SVJlcXVlc3QqIGludG8gTWVnYXNhc0NtZC4uLgpFUlJPUjogc3BhY2UgcmVxdWlyZWQgYWZ0ZXIg
+dGhhdCAnLCcgKGN0eDpWeFYpCiMxMzk6IEZJTEU6IHRlc3RzL21lZ2FzYXMtdGVzdC5jOjU2Ogor
+ICAgIGRldiA9IHFwY2lfZGV2aWNlX2ZpbmQocXMtPnBjaWJ1cywgUVBDSV9ERVZGTig0LDApKTsK
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIF4KCnRv
+dGFsOiAxIGVycm9ycywgMCB3YXJuaW5ncywgMTQwIGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2gg
+aGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9y
+cwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUK
+Q0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21t
+YW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2Fs
+bHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVl
+ZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEBmcmVlbGlzdHMub3Jn
