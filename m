@@ -1,26 +1,43 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44649)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46321)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1dIIxd-0001al-7G
-	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 14:12:10 -0400
+	(envelope-from <pasic@linux.vnet.ibm.com>) id 1dIJ2z-0004Ne-8x
+	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 14:17:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1dIIxa-0002zj-2O
-	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 14:12:09 -0400
-Resent-Message-Id: <E1dIIxa-0002zj-2O@eggs.gnu.org>
-Received: from sender-of-o52.zoho.com ([135.84.80.217]:21347)
+	(envelope-from <pasic@linux.vnet.ibm.com>) id 1dIJ2w-0005jp-2x
+	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 14:17:41 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:56826
+	helo=mx0a-001b2d01.pphosted.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1dIIxZ-0002zH-QG
-	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 14:12:05 -0400
-Reply-To: <qemu-devel@nongnu.org>
-In-Reply-To: <cover.1496755908.git.tgolembi@redhat.com>
-Message-ID: <149677270703.4876.7369866221010548936@f98a8425f76e>
+	(Exim 4.71) (envelope-from <pasic@linux.vnet.ibm.com>)
+	id 1dIJ2v-0005jj-PL
+	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 14:17:38 -0400
+Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v56IDu5p131590
+	for <qemu-devel@nongnu.org>; Tue, 6 Jun 2017 14:17:36 -0400
+Received: from e06smtp11.uk.ibm.com (e06smtp11.uk.ibm.com [195.75.94.107])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2awp6c57jh-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Tue, 06 Jun 2017 14:17:35 -0400
+Received: from localhost
+	by e06smtp11.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <pasic@linux.vnet.ibm.com>;
+	Tue, 6 Jun 2017 19:17:34 +0100
+References: <20170602140531.48332-1-pasic@linux.vnet.ibm.com>
+	<ad85aa78-b9f1-a2d7-08f6-798601307152@de.ibm.com>
+	<36a993c4-f667-28c0-2d45-69fc6a42ed79@linux.vnet.ibm.com>
+	<89a75c33-b27d-704f-896e-2fe19a999d82@de.ibm.com>
+From: Halil Pasic <pasic@linux.vnet.ibm.com>
+Date: Tue, 6 Jun 2017 20:17:29 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Tue, 6 Jun 2017 11:11:47 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH v4 0/1] qemu-ga: add guest-get-osinfo
- command
+In-Reply-To: <89a75c33-b27d-704f-896e-2fe19a999d82@de.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Message-Id: <2936d7ee-b163-2d29-4853-9c0d0fc34f97@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH v2 1/1] s390x: vmstatify config migration
+ for virtio-ccw
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,57 +46,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: tgolembi@redhat.com
-Cc: famz@redhat.com, marcandre.lureau@gmail.com, eblake@redhat.com, mdroth@linux.vnet.ibm.com, vfeenstr@redhat.com, qemu-devel@nongnu.org
+To: Christian Borntraeger <borntraeger@de.ibm.com>
+Cc: Cornelia Huck <cornelia.huck@de.ibm.com>, Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, "Jason J . Herne" <jjherne@linux.vnet.ibm.com>, qemu-devel@nongnu.org
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzClN1
-YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0ggdjQgMC8xXSBxZW11LWdhOiBhZGQgZ3Vlc3QtZ2V0
-LW9zaW5mbyBjb21tYW5kCk1lc3NhZ2UtaWQ6IGNvdmVyLjE0OTY3NTU5MDguZ2l0LnRnb2xlbWJp
-QHJlZGhhdC5jb20KCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKCkJBU0U9
-YmFzZQpuPTEKdG90YWw9JChnaXQgbG9nIC0tb25lbGluZSAkQkFTRS4uIHwgd2MgLWwpCmZhaWxl
-ZD0wCgpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1s
-b2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQoKY29tbWl0cz0iJChnaXQgbG9nIC0tZm9ybWF0PSVIIC0t
-cmV2ZXJzZSAkQkFTRS4uKSIKZm9yIGMgaW4gJGNvbW1pdHM7IGRvCiAgICBlY2hvICJDaGVja2lu
-ZyBQQVRDSCAkbi8kdG90YWw6ICQoZ2l0IGxvZyAtbiAxIC0tZm9ybWF0PSVzICRjKS4uLiIKICAg
-IGlmICEgZ2l0IHNob3cgJGMgLS1mb3JtYXQ9ZW1haWwgfCAuL3NjcmlwdHMvY2hlY2twYXRjaC5w
-bCAtLW1haWxiYWNrIC07IHRoZW4KICAgICAgICBmYWlsZWQ9MQogICAgICAgIGVjaG8KICAgIGZp
-CiAgICBuPSQoKG4rMSkpCmRvbmUKCmV4aXQgJGZhaWxlZAo9PT0gVEVTVCBTQ1JJUFQgRU5EID09
-PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApTd2l0
-Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCjUwYWFiYTIgcWVtdS1nYTogYWRkIGd1ZXN0LWdl
-dC1vc2luZm8gY29tbWFuZAoKPT09IE9VVFBVVCBCRUdJTiA9PT0KQ2hlY2tpbmcgUEFUQ0ggMS8x
-OiBxZW11LWdhOiBhZGQgZ3Vlc3QtZ2V0LW9zaW5mbyBjb21tYW5kLi4uCkVSUk9SOiAiZm9vKiBi
-YXIiIHNob3VsZCBiZSAiZm9vICpiYXIiCiM1ODogRklMRTogcWdhL2NvbW1hbmRzLXBvc2l4LmM6
-MjU4MzoKK3N0YXRpYyBHSGFzaFRhYmxlKiBnYV9wYXJzZV9vc3JlbGVhc2UoY29uc3QgY2hhciAq
-Zm5hbWUpCgpFUlJPUjogImZvbyogYmFyIiBzaG91bGQgYmUgImZvbyAqYmFyIgojNjI6IEZJTEU6
-IHFnYS9jb21tYW5kcy1wb3NpeC5jOjI1ODc6CisgICAgR0RhdGFJbnB1dFN0cmVhbSogZGlzID0g
-TlVMTDsKCkVSUk9SOiBzcGFjZSByZXF1aXJlZCBiZWZvcmUgdGhlIG9wZW4gcGFyZW50aGVzaXMg
-JygnCiM5NDogRklMRTogcWdhL2NvbW1hbmRzLXBvc2l4LmM6MjYxOToKKyAgICAgICAgfSBlbHNl
-IGlmKChsZW5ndGggPT0gMCkgfHwgKGxpbmVbMF0gPT0gJyMnKSkgewoKRVJST1I6IHN3aXRjaCBh
-bmQgY2FzZSBzaG91bGQgYmUgYXQgdGhlIHNhbWUgaW5kZW50CiMxMTI6IEZJTEU6IHFnYS9jb21t
-YW5kcy1wb3NpeC5jOjI2Mzc6CisgICAgICAgICAgICAgICAgICAgIHN3aXRjaCgqKHArMSkpIHsK
-KyAgICAgICAgICAgICAgICAgICAgICAgIGNhc2UgJ1wnJzoKKyAgICAgICAgICAgICAgICAgICAg
-ICAgIGNhc2UgJyInOgorICAgICAgICAgICAgICAgICAgICAgICAgY2FzZSAnJCc6CisgICAgICAg
-ICAgICAgICAgICAgICAgICBjYXNlICdgJzoKWy4uLl0KKyAgICAgICAgICAgICAgICAgICAgICAg
-IGRlZmF1bHQ6CgpFUlJPUjogc3BhY2VzIHJlcXVpcmVkIGFyb3VuZCB0aGF0ICcrJyAoY3R4OlZ4
-VikKIzExMjogRklMRTogcWdhL2NvbW1hbmRzLXBvc2l4LmM6MjYzNzoKKyAgICAgICAgICAgICAg
-ICAgICAgc3dpdGNoKCoocCsxKSkgewogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXgoK
-RVJST1I6IHNwYWNlIHJlcXVpcmVkIGJlZm9yZSB0aGUgb3BlbiBwYXJlbnRoZXNpcyAnKCcKIzEx
-MjogRklMRTogcWdhL2NvbW1hbmRzLXBvc2l4LmM6MjYzNzoKKyAgICAgICAgICAgICAgICAgICAg
-c3dpdGNoKCoocCsxKSkgewoKRVJST1I6IHNwYWNlcyByZXF1aXJlZCBhcm91bmQgdGhhdCAnKycg
-KGN0eDpWeFYpCiMxMTc6IEZJTEU6IHFnYS9jb21tYW5kcy1wb3NpeC5jOjI2NDI6CisgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgbWVtbW92ZShwLCBwKzEsIHN0cmxlbihwKzEpKTsKICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBeCgpFUlJPUjogc3BhY2VzIHJlcXVp
-cmVkIGFyb3VuZCB0aGF0ICcrJyAoY3R4OlZ4VikKIzExNzogRklMRTogcWdhL2NvbW1hbmRzLXBv
-c2l4LmM6MjY0MjoKKyAgICAgICAgICAgICAgICAgICAgICAgICAgICBtZW1tb3ZlKHAsIHArMSwg
-c3RybGVuKHArMSkpOwogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgIF4KCkVSUk9SOiB0cmFpbGluZyB3aGl0ZXNwYWNlCiM0MTg6IEZJTEU6IHFnYS9x
-YXBpLXNjaGVtYS5qc29uOjExNTE6CisjICQKCkVSUk9SOiB0cmFpbGluZyB3aGl0ZXNwYWNlCiM0
-MjE6IEZJTEU6IHFnYS9xYXBpLXNjaGVtYS5qc29uOjExNTQ6CisjICQKCnRvdGFsOiAxMCBlcnJv
-cnMsIDAgd2FybmluZ3MsIDQxMSBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBw
-cm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNl
-IHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0gg
-aW4gTUFJTlRBSU5FUlMuCgo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFuZCBleGl0ZWQg
-d2l0aCBjb2RlOiAxCgoKLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNo
-ZXcgW2h0dHA6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBh
-dGNoZXctZGV2ZWxAZnJlZWxpc3RzLm9yZw==
+
+
+On 06/06/2017 08:07 PM, Christian Borntraeger wrote:
+> On 06/06/2017 08:02 PM, Halil Pasic wrote:
+>>
+>>
+>> On 06/06/2017 10:21 AM, Christian Borntraeger wrote:
+>>> On 06/02/2017 04:05 PM, Halil Pasic wrote:
+>>>> Let's vmstatify virtio_ccw_save_config and virtio_ccw_load_config for
+>>>> flexibility (extending using subsections) and for fun.
+>>>>
+>>>> To achieve this we need to hack the config_vector, which is VirtIODevice
+>>>> (that is common virtio) state, in the middle of the VirtioCcwDevice state
+>>>> representation.  This is somewhat ugly, but we have no choice because the
+>>>> stream format needs to be preserved.
+>>>>
+>>>> Almost no changes in behavior. Exception is everything that comes with
+>>>> vmstate like extra bookkeeping about what's in the stream, and maybe some
+>>>> extra checks and better error reporting.
+>>>>
+>>>> Signed-off-by: Halil Pasic <pasic@linux.vnet.ibm.com>
+>>>> Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+>>>> Reviewed-by: Juan Quintela <quintela@redhat.com>
+>>>> Reviewed-by: Cornelia Huck <cornelia.huck@de.ibm.com>
+>>>> ---
+>>>> @Christian: I have re-tested with 2.5 (because of the rebase).
+>>>> AFAIU this is pretty much ready to be picked.
+>>>
+>>>
+>>> I wanted to pick this, but it collides with yout patch
+>>>    s390x/css: catch section mismatch on load
+>>>
+>>>
+>>> Can you rebase it on this patch
+>>> (see https://github.com/borntraeger/qemu/commits/s390-next)
+>>>
+>>>
+>>
+>> Hm, that's tricky because I actually have to do the equivalent
+>> of 's390x/css: catch section mismatch on load' as part of this.
+>> I have just sent out an RFC showing in that direction. There
+>> however I have to touch common vmstate stuff. I have initially
+>> hoped 's390x/css: catch section mismatch on load' into master
+>> soon and I can do a 2 patch series on top of that (first
+>> patch common vmstate stuff, second patch the adaptation of
+>> this patch).
+>>
+>> Here is a link to my RFC:
+>>
+>> https://lists.nongnu.org/archive/html/qemu-devel/2017-06/msg01413.html
+>>
+>> What is in your opinion the best way to resolve this?
+> 
+> I have "s390x/css: catch section mismatch on load" on my next branch and the vmstatify patch
+> is the only reason why I did not yet send the pull request for the pending patches since I
+> hoped that I can send both. Since the section mismatch contains cc stable, I actually want it
+> applied before and a separate patch.
+> So I will just go ahead and send my patch queue tomorrow (with a pull request on friday) and we 
+> will handle this patch with the next chunk?
+> 
+> 
+
+That's my preferred solution too. It's possible that the RFC
+mentioned above, although fairly straightforward, will have
+to take a couple of rounds. Having a firm use case is also
+beneficial.
+
+Regards,
+Halil
