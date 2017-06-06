@@ -1,19 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38588)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38661)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dICJQ-0005j8-Ie
-	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 07:06:13 -0400
+	(envelope-from <kraxel@redhat.com>) id 1dICJd-0005tR-9y
+	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 07:06:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dICJL-0002wa-17
-	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 07:06:12 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:59538)
+	(envelope-from <kraxel@redhat.com>) id 1dICJc-00030S-9I
+	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 07:06:25 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46938)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1dICJK-0002wP-Qz
-	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 07:06:06 -0400
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Date: Tue,  6 Jun 2017 12:05:54 +0100
-Message-Id: <20170606110556.12922-1-berrange@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 0/2] Document deprecated features & support
- lifecycle
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1dICJc-00030B-3v
+	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 07:06:24 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 37314C83E
+	for <qemu-devel@nongnu.org>; Tue,  6 Jun 2017 11:06:23 +0000 (UTC)
+From: Gerd Hoffmann <kraxel@redhat.com>
+Date: Tue,  6 Jun 2017 13:06:18 +0200
+Message-Id: <20170606110618.10393-1-kraxel@redhat.com>
+Subject: [Qemu-devel] [PATCH] spice: don't enter opengl mode in case another
+ UI provides opengl support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,27 +29,60 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Stefan Hajnoczi <stefanha@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>
+Cc: Gerd Hoffmann <kraxel@redhat.com>
 
-This is a followup to
+Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+---
+ include/ui/spice-display.h | 2 ++
+ ui/spice-core.c            | 1 +
+ ui/spice-display.c         | 3 ++-
+ 3 files changed, 5 insertions(+), 1 deletion(-)
 
-  v1: https://lists.gnu.org/archive/html/qemu-devel/2017-05/msg02390.html
-
-The goal is to clarify to users & app developers what they can expect
-from QEMU in terms of feature lifecycle & any deprecation policy should
-it be neccessary to remove features.
-
-Changed in v2:
-
- - Split into 2 patches so we can consider each suggested addition
-   independantly.
-
-Daniel P. Berrange (2):
-  docs: document deprecated features in appendix
-  docs: document support lifetime for features
-
- qemu-doc.texi | 48 ++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 48 insertions(+)
-
+diff --git a/include/ui/spice-display.h b/include/ui/spice-display.h
+index 184d4c373a..4ba9444dba 100644
+--- a/include/ui/spice-display.h
++++ b/include/ui/spice-display.h
+@@ -140,6 +140,8 @@ struct SimpleSpiceCursor {
+     QXLCursor cursor;
+ };
+ 
++extern bool spice_opengl;
++
+ int qemu_spice_rect_is_empty(const QXLRect* r);
+ void qemu_spice_rect_union(QXLRect *dest, const QXLRect *r);
+ 
+diff --git a/ui/spice-core.c b/ui/spice-core.c
+index 804abc5c0f..7c9ec0f0dd 100644
+--- a/ui/spice-core.c
++++ b/ui/spice-core.c
+@@ -847,6 +847,7 @@ void qemu_spice_init(void)
+             exit(1);
+         }
+         display_opengl = 1;
++        spice_opengl = 1;
+     }
+ #endif
+ }
+diff --git a/ui/spice-display.c b/ui/spice-display.c
+index b353445f58..042292cc90 100644
+--- a/ui/spice-display.c
++++ b/ui/spice-display.c
+@@ -27,6 +27,7 @@
+ #include "ui/spice-display.h"
+ 
+ static int debug = 0;
++bool spice_opengl;
+ 
+ static void GCC_FMT_ATTR(2, 3) dprint(int level, const char *fmt, ...)
+ {
+@@ -1013,7 +1014,7 @@ static void qemu_spice_display_init_one(QemuConsole *con)
+ 
+     ssd->dcl.ops = &display_listener_ops;
+ #ifdef HAVE_SPICE_GL
+-    if (display_opengl) {
++    if (spice_opengl) {
+         ssd->dcl.ops = &display_listener_gl_ops;
+         ssd->gl_unblock_bh = qemu_bh_new(qemu_spice_gl_unblock_bh, ssd);
+         ssd->gl_unblock_timer = timer_new_ms(QEMU_CLOCK_REALTIME,
 -- 
 2.9.3
