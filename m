@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54277)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54309)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dI4ax-0003Ut-IC
-	for qemu-devel@nongnu.org; Mon, 05 Jun 2017 22:51:49 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1dI4ay-0003VG-8s
+	for qemu-devel@nongnu.org; Mon, 05 Jun 2017 22:51:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dI4aw-0002yS-Bq
-	for qemu-devel@nongnu.org; Mon, 05 Jun 2017 22:51:47 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1dI4aw-0002yX-Cx
+	for qemu-devel@nongnu.org; Mon, 05 Jun 2017 22:51:48 -0400
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Tue,  6 Jun 2017 12:51:25 +1000
-Message-Id: <20170606025135.2685-8-david@gibson.dropbear.id.au>
+Date: Tue,  6 Jun 2017 12:51:26 +1000
+Message-Id: <20170606025135.2685-9-david@gibson.dropbear.id.au>
 In-Reply-To: <20170606025135.2685-1-david@gibson.dropbear.id.au>
 References: <20170606025135.2685-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [PULL 07/17] target-ppc: Fix openpic timer read
- register offset
+Subject: [Qemu-devel] [PULL 08/17] target/ppc: Fixup set_spr error in
+ h_register_process_table
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,97 +21,49 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org
-Cc: agraf@suse.de, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, mdroth@linux.vnet.ibm.com, Aaron Larson <alarson@ddci.com>, David Gibson <david@gibson.dropbear.id.au>
+Cc: agraf@suse.de, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, mdroth@linux.vnet.ibm.com, Suraj Jitindar Singh <sjitindarsingh@gmail.com>, David Gibson <david@gibson.dropbear.id.au>
 
-From: Aaron Larson <alarson@ddci.com>
+From: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
 
-openpic_tmr_read() is incorrectly computing register offset of the
-TCCR, TBCR, TVPR, and TDR registers when accessing the open pic timer
-registers.  Specifically the offset of timer registers for
-openpic_tmr_read() is not accounting for the timer frequency reporting
-register (TFFR) which is the first register in the "tmr" memory
-region.
+set_spr is used in the function h_register_process_table() to update the
+LPCR_GTSE and LPCR_UPRT values based on the flags passed by the guest.
+The set_spr function takes the last two arguments mask and value used to
+mask and set the value of the spr respectively.
 
-openpic_tmr_write() *is* correctly computing the offset by adding
-0x10f0 to the address prior to computing the register index.  This
-patch instead subtracts 0x10 in both the read and write routines and
-eliminates some other gratuitous differences between the functions.
+The current call site passes these arguments in the wrong order and thus
+bot GTSE and UPRT will be set irrespective, which is obviously
+incorrect.
 
-Signed-off-by: Aaron Larson <alarson@ddci.com>
+Rearrange the function call so that these arguments are passed in the
+correct order and the correct behaviour is exhibited.
+
+It is worth noting that this wasn't detected earlier since these were
+always both set in all cases where this H_CALL was made.
+
+Fixes: 6de833070ca2 ("target/ppc: Set UPRT and GTSE on all cpus in H_REGISTER_PROCESS_TABLE")
+
+Signed-off-by: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/intc/openpic.c | 22 ++++++++++------------
- 1 file changed, 10 insertions(+), 12 deletions(-)
+ hw/ppc/spapr_hcall.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
-diff --git a/hw/intc/openpic.c b/hw/intc/openpic.c
-index 4349e45..f966d06 100644
---- a/hw/intc/openpic.c
-+++ b/hw/intc/openpic.c
-@@ -796,27 +796,24 @@ static uint64_t openpic_gbl_read(void *opaque, hwaddr addr, unsigned len)
- }
+diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
+index aae5a62..aa1ffea 100644
+--- a/hw/ppc/spapr_hcall.c
++++ b/hw/ppc/spapr_hcall.c
+@@ -992,9 +992,10 @@ static target_ulong h_register_process_table(PowerPCCPU *cpu,
  
- static void openpic_tmr_write(void *opaque, hwaddr addr, uint64_t val,
--                                unsigned len)
-+                              unsigned len)
- {
-     OpenPICState *opp = opaque;
-     int idx;
- 
--    addr += 0x10f0;
--
-     DPRINTF("%s: addr %#" HWADDR_PRIx " <= %08" PRIx64 "\n",
--            __func__, addr, val);
-+            __func__, (addr + 0x10f0), val);
-     if (addr & 0xF) {
-         return;
+     /* Update the UPRT and GTSE bits in the LPCR for all cpus */
+     CPU_FOREACH(cs) {
+-        set_spr(cs, SPR_LPCR, LPCR_UPRT | LPCR_GTSE,
++        set_spr(cs, SPR_LPCR,
+                 ((flags & (FLAG_RADIX | FLAG_HASH_PROC_TBL)) ? LPCR_UPRT : 0) |
+-                ((flags & FLAG_GTSE) ? LPCR_GTSE : 0));
++                ((flags & FLAG_GTSE) ? LPCR_GTSE : 0),
++                LPCR_UPRT | LPCR_GTSE);
      }
  
--    if (addr == 0x10f0) {
-+    if (addr == 0) {
-         /* TFRR */
-         opp->tfrr = val;
-         return;
-     }
--
-+    addr -= 0x10;  /* correct for TFRR */
-     idx = (addr >> 6) & 0x3;
--    addr = addr & 0x30;
- 
-     switch (addr & 0x30) {
-     case 0x00: /* TCCR */
-@@ -844,16 +841,17 @@ static uint64_t openpic_tmr_read(void *opaque, hwaddr addr, unsigned len)
-     uint32_t retval = -1;
-     int idx;
- 
--    DPRINTF("%s: addr %#" HWADDR_PRIx "\n", __func__, addr);
-+    DPRINTF("%s: addr %#" HWADDR_PRIx "\n", __func__, addr + 0x10f0);
-     if (addr & 0xF) {
-         goto out;
-     }
--    idx = (addr >> 6) & 0x3;
--    if (addr == 0x0) {
-+    if (addr == 0) {
-         /* TFRR */
-         retval = opp->tfrr;
-         goto out;
-     }
-+    addr -= 0x10;  /* correct for TFRR */
-+    idx = (addr >> 6) & 0x3;
-     switch (addr & 0x30) {
-     case 0x00: /* TCCR */
-         retval = opp->timers[idx].tccr;
-@@ -861,10 +859,10 @@ static uint64_t openpic_tmr_read(void *opaque, hwaddr addr, unsigned len)
-     case 0x10: /* TBCR */
-         retval = opp->timers[idx].tbcr;
-         break;
--    case 0x20: /* TIPV */
-+    case 0x20: /* TVPR */
-         retval = read_IRQreg_ivpr(opp, opp->irq_tim0 + idx);
-         break;
--    case 0x30: /* TIDE (TIDR) */
-+    case 0x30: /* TDR */
-         retval = read_IRQreg_idr(opp, opp->irq_tim0 + idx);
-         break;
-     }
+     if (kvm_enabled()) {
 -- 
 2.9.4
