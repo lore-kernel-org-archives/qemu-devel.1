@@ -1,41 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43164)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44382)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1dIIsz-0007xN-Qv
-	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 14:07:22 -0400
+	(envelope-from <lersek@redhat.com>) id 1dIIwH-00011f-Bo
+	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 14:10:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1dIIsw-0001VF-K8
-	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 14:07:21 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:55816)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
-	id 1dIIsw-0001Uf-7R
-	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 14:07:18 -0400
-Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v56I6PuZ060087
-	for <qemu-devel@nongnu.org>; Tue, 6 Jun 2017 14:07:16 -0400
-Received: from e17.ny.us.ibm.com (e17.ny.us.ibm.com [129.33.205.207])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2aww80x9jn-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 06 Jun 2017 14:07:16 -0400
-Received: from localhost
-	by e17.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
-	Tue, 6 Jun 2017 14:07:14 -0400
-References: <20170602140531.48332-1-pasic@linux.vnet.ibm.com>
-	<ad85aa78-b9f1-a2d7-08f6-798601307152@de.ibm.com>
-	<36a993c4-f667-28c0-2d45-69fc6a42ed79@linux.vnet.ibm.com>
-From: Christian Borntraeger <borntraeger@de.ibm.com>
-Date: Tue, 6 Jun 2017 20:07:08 +0200
+	(envelope-from <lersek@redhat.com>) id 1dIIwE-0002oV-5b
+	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 14:10:45 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:38424)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1dIIwD-0002oN-TJ
+	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 14:10:42 -0400
+References: <c76b36de-ebf9-c662-d454-0a95b43901e8@redhat.com>
+	<2ff62b03-d71b-93c4-79bf-10682b229758@redhat.com>
+	<20170605185815-mutt-send-email-mst@kernel.org>
+From: Laszlo Ersek <lersek@redhat.com>
+Message-ID: <e3c4defa-69ff-45db-dc7a-427dbb521c18@redhat.com>
+Date: Tue, 6 Jun 2017 20:10:17 +0200
 MIME-Version: 1.0
-In-Reply-To: <36a993c4-f667-28c0-2d45-69fc6a42ed79@linux.vnet.ibm.com>
+In-Reply-To: <20170605185815-mutt-send-email-mst@kernel.org>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-IE
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Message-Id: <89a75c33-b27d-704f-896e-2fe19a999d82@de.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH v2 1/1] s390x: vmstatify config migration
- for virtio-ccw
+Subject: Re: [Qemu-devel] allocation zone extensions for the firmware
+ linker/loader
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -44,62 +30,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Halil Pasic <pasic@linux.vnet.ibm.com>
-Cc: Cornelia Huck <cornelia.huck@de.ibm.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, "Jason J . Herne" <jjherne@linux.vnet.ibm.com>, qemu-devel@nongnu.org
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: SeaBIOS devel list <SeaBIOS@seabios.org>, qemu devel list <qemu-devel@nongnu.org>, edk2-devel-ml01 <edk2-devel@ml01.01.org>, Kevin O'Connor <kevin@koconnor.net>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Ben Warren <ben@skyportsystems.com>, Dongjiu Geng <gengdongjiu@huawei.com>, Igor Mammedov <imammedo@redhat.com>, "Jordan Justen (Intel address)" <jordan.l.justen@intel.com>, "Leif Lindholm (Linaro address)" <leif.lindholm@linaro.org>, Shannon Zhao <zhaoshenglong@huawei.com>, Stefan Berger <stefanb@linux.vnet.ibm.com>, Xiao Guangrong <guangrong.xiao@linux.intel.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-On 06/06/2017 08:02 PM, Halil Pasic wrote:
-> 
-> 
-> On 06/06/2017 10:21 AM, Christian Borntraeger wrote:
->> On 06/02/2017 04:05 PM, Halil Pasic wrote:
->>> Let's vmstatify virtio_ccw_save_config and virtio_ccw_load_config for
->>> flexibility (extending using subsections) and for fun.
->>>
->>> To achieve this we need to hack the config_vector, which is VirtIODevice
->>> (that is common virtio) state, in the middle of the VirtioCcwDevice state
->>> representation.  This is somewhat ugly, but we have no choice because the
->>> stream format needs to be preserved.
->>>
->>> Almost no changes in behavior. Exception is everything that comes with
->>> vmstate like extra bookkeeping about what's in the stream, and maybe some
->>> extra checks and better error reporting.
->>>
->>> Signed-off-by: Halil Pasic <pasic@linux.vnet.ibm.com>
->>> Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
->>> Reviewed-by: Juan Quintela <quintela@redhat.com>
->>> Reviewed-by: Cornelia Huck <cornelia.huck@de.ibm.com>
->>> ---
->>> @Christian: I have re-tested with 2.5 (because of the rebase).
->>> AFAIU this is pretty much ready to be picked.
+On 06/05/17 18:02, Michael S. Tsirkin wrote:
+> On Sat, Jun 03, 2017 at 09:36:23AM +0200, Laszlo Ersek wrote:
+>> On 06/02/17 17:45, Laszlo Ersek wrote:
 >>
+>>> The patches can cause linker/loader breakage when old firmware is booted
+>>> on new QEMU. However, that's no problem (it's nothing new), the next
+>>> release of QEMU should bundle the new firmware binaries as always.
 >>
->> I wanted to pick this, but it collides with yout patch
->>    s390x/css: catch section mismatch on load
+>> Dave made a good point (which I should have realized myself, really!),
+>> namely if you launch old fw on old qemu, then migrate the guest to a new
+>> qemu and then reboot the guest on the target host, within the migrated
+>> VM, things will break.
 >>
+>> So that makes this approach dead in the water.
 >>
->> Can you rebase it on this patch
->> (see https://github.com/borntraeger/qemu/commits/s390-next)
->>
->>
+>> Possible mitigations I could think of:
+>> - Make it machine type dependent. Complicated (we don't usually bind
+>> ACPI generation to machine types) and wouldn't help existing devices.
+>> - Let the firmware negotiate these extensions. Very complicated (new
+>> fw-cfg files are needed for negotiation) and wouldn't help existing devices.
 > 
-> Hm, that's tricky because I actually have to do the equivalent
-> of 's390x/css: catch section mismatch on load' as part of this.
-> I have just sent out an RFC showing in that direction. There
-> however I have to touch common vmstate stuff. I have initially
-> hoped 's390x/css: catch section mismatch on load' into master
-> soon and I can do a 2 patch series on top of that (first
-> patch common vmstate stuff, second patch the adaptation of
-> this patch).
+> This last option *shouldn't* be complicated. If it is something's wrong.
 > 
-> Here is a link to my RFC:
+> Maybe we made a mistake when we added etc/smi/*features*.
 > 
-> https://lists.nongnu.org/archive/html/qemu-devel/2017-06/msg01413.html
+> It's not too late to move these to etc/*features* for new
+> machine types if we want to and if you can do the firmware
+> work. Then you'd just take out a bit and be done with it.
 > 
-> What is in your opinion the best way to resolve this?
+> I don't insist on doing the ACPI thing now but I do think
+> infrastructure for negotiating extensions should be there.
 
-I have "s390x/css: catch section mismatch on load" on my next branch and the vmstatify patch
-is the only reason why I did not yet send the pull request for the pending patches since I
-hoped that I can send both. Since the section mismatch contains cc stable, I actually want it
-applied before and a separate patch.
-So I will just go ahead and send my patch queue tomorrow (with a pull request on friday) and we 
-will handle this patch with the next chunk?
+Different drivers in the firmware would need to negotiate different
+questions / features with QEMU independently of each other. The "thing"
+in OVMF that negotiates (and uses) the SMI broadcast is very-very
+different and separate from the "thing" in OVMF that handles the ACPI
+linker/loader script.
+
+As one example, the first "thing" mentioned above is not even built into
+ArmVirtQemu (only into OVMF, i.e. x86), while the second "thing" is
+built into both aarch64 and x86 firmware.
+
+So, I think we couldn't share the same fw_cfg files (if they needed
+write access & lock-down too, i.e. actual negotiation from the firmware)
+between wildly unrelated features.
+
+The virtio feature negotiation is different because each device gets its
+own negotiation, and that maps very well to UEFI concepts too.
+
+BTW, do we have a specific concern relating to the number of fw_cfg
+files? That count can now be raised from machine type to machine type,
+but Paolo didn't seem to like raising the current value (or maybe I
+misunderstood him):
+
+http://mid.mail-archive.com/2e6dec37-8b69-979b-c856-406233273066@redhat.com
+
+... Also, above I wrote, with regard to feature negotiation, that it
+"wouldn't help existing devices". By that I mean this:
+
+Consider the NOACPI content hint as an example. If the firmware doesn't
+negotiate it (before selecting and downloading the ACPI payload), then
+QEMU cannot generate the NOACPI content hint. In turn QEMU must keep the
+OVMF SDT Header Probe suppressor (those paddings and AML additions) enabled.
+
+But, for the QEMU developers it means that the suppressor code has to be
+kept around forever, for compatibility with old machine types. And if
+you do that, then why add a negotiable NOACPI hint at all? That would
+just further complicate device code (because now you have to generate
+two different AML payloads), where the old one (the one with the
+explicit suppressor) would work just fine "forever".
+
+Thanks,
+Laszlo
