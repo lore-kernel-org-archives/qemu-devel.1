@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40925)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42780)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bru.dominguez@gmail.com>) id 1dIAd2-00072Y-01
-	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 05:18:21 -0400
+	(envelope-from <stefanha@gmail.com>) id 1dIAn4-0000nU-Re
+	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 05:28:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bru.dominguez@gmail.com>) id 1dIAcx-0007J9-O1
-	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 05:18:19 -0400
-Received: from mail-wm0-x241.google.com ([2a00:1450:400c:c09::241]:36766)
+	(envelope-from <stefanha@gmail.com>) id 1dIAn0-0004eu-PK
+	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 05:28:42 -0400
+Received: from mail-wm0-x22f.google.com ([2a00:1450:400c:c09::22f]:33945)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bru.dominguez@gmail.com>)
-	id 1dIAcx-0007CC-Er
-	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 05:18:15 -0400
-Received: by mail-wm0-x241.google.com with SMTP id k15so33917034wmh.3
-	for <qemu-devel@nongnu.org>; Tue, 06 Jun 2017 02:18:11 -0700 (PDT)
-MIME-Version: 1.0
-In-Reply-To: <CALfaEa0MirxK6ESnepptGLiugYZBOSQVxe=R72h+c_-GBXkYzQ@mail.gmail.com>
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1dIAn0-0004cS-JC
+	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 05:28:38 -0400
+Received: by mail-wm0-x22f.google.com with SMTP id d64so3683570wmf.1
+	for <qemu-devel@nongnu.org>; Tue, 06 Jun 2017 02:28:35 -0700 (PDT)
+Date: Tue, 6 Jun 2017 10:28:31 +0100
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20170606092831.GA8013@stefanha-x1.localdomain>
 References: <CALfaEa0MirxK6ESnepptGLiugYZBOSQVxe=R72h+c_-GBXkYzQ@mail.gmail.com>
-From: Bruno Dominguez <bru.dominguez@gmail.com>
-Date: Tue, 6 Jun 2017 10:18:09 +0100
-Message-ID: <CALfaEa2FhTpiE_1fqBmTcxsV=ovRAxv2+=wA0Zz_5bk0yTff6g@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="envbJBWh7q8WU6mo"
+Content-Disposition: inline
+In-Reply-To: <CALfaEa0MirxK6ESnepptGLiugYZBOSQVxe=R72h+c_-GBXkYzQ@mail.gmail.com>
 Subject: Re: [Qemu-devel] [PATCH] split c and cxx extra flags
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -28,85 +29,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org
+To: Bruno Dominguez <bru.dominguez@gmail.com>
+Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>
 
-Adding Peter Maydell in the cc and removing Claudio Fontana (It fails
-sending to that address)
 
-Bruno.
+--envbJBWh7q8WU6mo
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-2017-06-02 14:07 GMT+01:00 Bruno Dominguez <bru.dominguez@gmail.com>:
+On Fri, Jun 02, 2017 at 02:07:26PM +0100, Bruno Dominguez wrote:
 > There was no possibility to add specific cxx flags using the configure
 > file. So A new entrance has been created to support it.
->
+>=20
 > Duplication of information in configure and rules.mak. Taking
 > QEMU_CFLAGS and add them to QEMU_CXXFLAGS, now the value of
 > QEMU_CXXFLAGS is stored in config-host.mak, so there is no need for
 > it.
->
+>=20
 > The makefile for libvixl was adding flags for QEMU_CXXFLAGS in
 > QEMU_CFLAGS because of the addition in rules.mak. That was removed, so
 > adding them where it should be.
->
+>=20
 > -----
 > Signed-off-by: Bruno Dominguez <bru.dominguez@gmail.com>
 > -----
->
-> diff --git a/configure b/configure
-> index 0586ec9..2fff3cc 100755
-> --- a/configure
-> +++ b/configure
-> @@ -91,7 +91,8 @@ update_cxxflags() {
->      # Set QEMU_CXXFLAGS from QEMU_CFLAGS by filtering out those
->      # options which some versions of GCC's C++ compiler complain about
->      # because they only make sense for C programs.
-> -    QEMU_CXXFLAGS=
-> +    QEMU_CXXFLAGS="$QEMU_CXXFLAGS -D__STDC_LIMIT_MACROS"
-> +
->      for arg in $QEMU_CFLAGS; do
->          case $arg in
->              -Wstrict-prototypes|-Wmissing-prototypes|-Wnested-externs|\
-> @@ -102,6 +103,8 @@ update_cxxflags() {
->                  ;;
->          esac
->      done
-> +
-> +
->  }
->
->  compile_object() {
-> @@ -344,6 +347,9 @@ for opt do
->    --extra-cflags=*) QEMU_CFLAGS="$QEMU_CFLAGS $optarg"
->                      EXTRA_CFLAGS="$optarg"
->    ;;
-> +  --extra-cxxflags=*) QEMU_CXXFLAGS="$QEMU_CXXFLAGS $optarg"
-> +                      EXTRA_CXXFLAGS="$optarg"
-> +  ;;
->    --extra-ldflags=*) LDFLAGS="$LDFLAGS $optarg"
->                       EXTRA_LDFLAGS="$optarg"
->    ;;
-> @@ -787,6 +793,8 @@ for opt do
->    ;;
->    --extra-cflags=*)
->    ;;
-> +  --extra-cxxflags=*)
-> +  ;;
->    --extra-ldflags=*)
->    ;;
->    --enable-debug-info)
+
+Please follow the code submission guidelines:
+http://wiki.qemu.org/Contribute/SubmitAPatch
+
+ * The commit message (email subject) should have a prefix describing
+   the affected component.  Use "git log ./configure" for inspiration.
+   I suggest the following:
+
+     configure: split c and cxx extra flags
+
+ * Use git-format-patch(1) so that your patch applies cleanly.  Your
+   email has:
+
+   ----
+   Signed-off-by: ...
+   ----
+
+   This is not the format recognized by tools.  Instead the
+   Signed-off-by: should be part of the commit description (no '----')
+   and then a line with just three hyphens ('---') denotes the end of
+   the commit description:
+
+   Signed-off-by: ...
+   ---
+
+ * The email must not be line-wrapped since that breaks the patch.  If
+   you use git-send-email(1) to submit patches then this is taken care
+   of automatically.
+
 > @@ -1304,6 +1312,7 @@ Advanced options (experts only):
->    --cxx=CXX                use C++ compiler CXX [$cxx]
->    --objcc=OBJCC            use Objective-C compiler OBJCC [$objcc]
->    --extra-cflags=CFLAGS    append extra C compiler flags QEMU_CFLAGS
-> +  --extra-cxxflags=CXXFLAGS append extra CXX compiler flags QEMU_CXXFLAGS
->    --extra-ldflags=LDFLAGS  append extra linker flags LDFLAGS
->    --make=MAKE              use specified make [$make]
->    --install=INSTALL        use specified install [$install]
-> @@ -1489,37 +1498,6 @@ if test "$bogus_os" = "yes"; then
+>    --cxx=3DCXX                use C++ compiler CXX [$cxx]
+>    --objcc=3DOBJCC            use Objective-C compiler OBJCC [$objcc]
+>    --extra-cflags=3DCFLAGS    append extra C compiler flags QEMU_CFLAGS
+> +  --extra-cxxflags=3DCXXFLAGS append extra CXX compiler flags QEMU_CXXFL=
+AGS
+
+For consistency with the --cxx=3D option description:
+
+s/CXX compiler/C++ compiler/
+
+> @@ -1489,37 +1498,6 @@ if test "$bogus_os" =3D "yes"; then
 >      error_exit "Unrecognized host OS $targetos"
 >  fi
->
+>=20
 > -# Check that the C++ compiler exists and works with the C compiler
 > -if has $cxx; then
 > -    cat > $TMPC <<EOF
@@ -131,103 +122,36 @@ Bruno.
 > -    else
 > -        echo "C++ compiler $cxx does not work with C compiler $cc"
 > -        echo "Disabling C++ specific optional code"
-> -        cxx=
+> -        cxx=3D
 > -    fi
 > -else
-> -    echo "No C++ compiler available; disabling C++ specific optional code"
-> -    cxx=
+> -    echo "No C++ compiler available; disabling C++ specific optional cod=
+e"
+> -    cxx=3D
 > -fi
 > -
->  gcc_flags="-Wold-style-declaration -Wold-style-definition -Wtype-limits"
->  gcc_flags="-Wformat-security -Wformat-y2k -Winit-self
-> -Wignored-qualifiers $gcc_flags"
->  gcc_flags="-Wno-missing-include-dirs -Wempty-body -Wnested-externs $gcc_flags"
-> @@ -5063,6 +5041,38 @@ EOF
->    fi
->  fi
->
-> +# Check that the C++ compiler exists and works with the C compiler.
-> +# All the QEMU_CXXFLAGS are based on QEMU_CFLAGS. Keep this at the
-> end to don't miss any other that could be added.
-> +if has $cxx; then
-> +    cat > $TMPC <<EOF
-> +int c_function(void);
-> +int main(void) { return c_function(); }
-> +EOF
-> +
-> +    compile_object
-> +
-> +    cat > $TMPCXX <<EOF
-> +extern "C" {
-> +   int c_function(void);
-> +}
-> +int c_function(void) { return 42; }
-> +EOF
-> +
-> +    update_cxxflags
-> +
-> +    if do_cxx $QEMU_CXXFLAGS -o $TMPE $TMPCXX $TMPO $LDFLAGS; then
-> +        # C++ compiler $cxx works ok with C compiler $cc
-> +        :
-> +    else
-> +        echo "C++ compiler $cxx does not work with C compiler $cc"
-> +        echo "Disabling C++ specific optional code"
-> +        cxx=
-> +    fi
-> +else
-> +    echo "No C++ compiler available; disabling C++ specific optional code"
-> +    cxx=
-> +fi
-> +
->  echo_version() {
->      if test "$1" = "yes" ; then
->          echo "($2)"
-> @@ -5268,6 +5278,7 @@ if test "$mingw32" = "no" ; then
->  fi
->  echo "qemu_helperdir=$libexecdir" >> $config_host_mak
->  echo "extra_cflags=$EXTRA_CFLAGS" >> $config_host_mak
-> +echo "extra_cxxflags=$EXTRA_CXXFLAGS" >> $config_host_mak
->  echo "extra_ldflags=$EXTRA_LDFLAGS" >> $config_host_mak
->  echo "qemu_localedir=$qemu_localedir" >> $config_host_mak
->  echo "libs_softmmu=$libs_softmmu" >> $config_host_mak
-> @@ -5906,6 +5917,7 @@ echo "WINDRES=$windres" >> $config_host_mak
->  echo "CFLAGS=$CFLAGS" >> $config_host_mak
->  echo "CFLAGS_NOPIE=$CFLAGS_NOPIE" >> $config_host_mak
->  echo "QEMU_CFLAGS=$QEMU_CFLAGS" >> $config_host_mak
-> +echo "QEMU_CXXFLAGS=$QEMU_CXXFLAGS" >> $config_host_mak
->  echo "QEMU_INCLUDES=$QEMU_INCLUDES" >> $config_host_mak
->  if test "$sparse" = "yes" ; then
->    echo "CC           := REAL_CC=\"\$(CC)\" cgcc"       >> $config_host_mak
-> diff --git a/disas/libvixl/Makefile.objs b/disas/libvixl/Makefile.objs
-> index bbe7695..dbf7def 100644
-> --- a/disas/libvixl/Makefile.objs
-> +++ b/disas/libvixl/Makefile.objs
-> @@ -6,6 +6,6 @@ libvixl_OBJS = vixl/utils.o \
->
->  # The -Wno-sign-compare is needed only for gcc 4.6, which complains about
->  # some signed-unsigned equality comparisons which later gcc versions do not.
-> -$(addprefix $(obj)/,$(libvixl_OBJS)): QEMU_CFLAGS :=
-> -I$(SRC_PATH)/disas/libvixl $(QEMU_CFLAGS) -Wno-sign-compare
-> +$(addprefix $(obj)/,$(libvixl_OBJS)): QEMU_CXXFLAGS :=
-> -I$(SRC_PATH)/disas/libvixl $(QEMU_CXXFLAGS) -Wno-sign-compare
->
->  common-obj-$(CONFIG_ARM_A64_DIS) += $(libvixl_OBJS)
-> diff --git a/rules.mak b/rules.mak
-> index 1c0eabb..2a2fb72 100644
-> --- a/rules.mak
-> +++ b/rules.mak
-> @@ -20,9 +20,6 @@ MAKEFLAGS += -rR
->  %.mak:
->  clean-target:
->
-> -# Flags for C++ compilation
-> -QEMU_CXXFLAGS = -D__STDC_LIMIT_MACROS $(filter-out
-> -Wstrict-prototypes -Wmissing-prototypes -Wnested-externs
-> -Wold-style-declaration -Wold-style-definition -Wredundant-decls,
-> $(QEMU_CFLAGS))
-> -
->  # Flags for dependency generation
->  QEMU_DGFLAGS += -MMD -MP -MT $@ -MF $(@D)/$(*F).d
->
->
+
+Why move this code?
+
+>=20
 > Bruno
+>=20
+
+This signature will break tools that apply the patch.  It's easiest to
+use git-send-email(1) to avoid problems like this.
+
+--envbJBWh7q8WU6mo
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJZNnW/AAoJEJykq7OBq3PIlGgH/jmrZfuLgd+yfV3ebsWHFH79
+tu89xUxw1jCoHtmZiTFVsOTK5ZH+axKE3zeIV88Dh22EjQ9NUmJMdXQ+ZUdvUzBG
+DG9IRSaHOsy9j0LTQNtGqrUcChtpoj1tFnifVK+RFOwnGVfGGlUlyAdcmhb9XXrp
+U8xdWiBEbYf8ks3utEkjvG9t6fhgSv98FbmQWvjFl/9FLGg/j65ClKP5vAwxR0kA
+4P5rNjKPoNzKhLka7DjRoqC6Dao5DfLHacd1KSwbr3oNVRdjRQEIvnF4vn5A2da/
+5IqvSD+kGWHzYWN6P7OIx8LdrttISm/vTMMFcowDnuUJEC9qHGTgarh7Eg2/eWg=
+=veB6
+-----END PGP SIGNATURE-----
+
+--envbJBWh7q8WU6mo--
