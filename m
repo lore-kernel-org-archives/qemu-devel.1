@@ -1,27 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51262)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53518)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1dID7t-0002mW-Ko
-	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 07:58:23 -0400
+	(envelope-from <marcandre.lureau@gmail.com>) id 1dIDDH-0004kb-Ph
+	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 08:03:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1dID7s-0005Jl-9R
-	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 07:58:21 -0400
-Received: from mail-lf0-x22e.google.com ([2a00:1450:4010:c07::22e]:34404)
+	(envelope-from <marcandre.lureau@gmail.com>) id 1dIDDF-0007nT-J7
+	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 08:03:55 -0400
+Received: from mail-lf0-x241.google.com ([2a00:1450:4010:c07::241]:36319)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1dID7r-0005ID-UG
-	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 07:58:20 -0400
-Received: by mail-lf0-x22e.google.com with SMTP id v20so53074027lfa.1
-	for <qemu-devel@nongnu.org>; Tue, 06 Jun 2017 04:58:19 -0700 (PDT)
+	id 1dIDDF-0007mo-8B
+	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 08:03:53 -0400
+Received: by mail-lf0-x241.google.com with SMTP id x81so6271024lfb.3
+	for <qemu-devel@nongnu.org>; Tue, 06 Jun 2017 05:03:53 -0700 (PDT)
 MIME-Version: 1.0
-References: <2b2311b1b070a0b03973e39deccf4682de4a6cd4.1496686997.git.alistair.francis@xilinx.com>
-In-Reply-To: <2b2311b1b070a0b03973e39deccf4682de4a6cd4.1496686997.git.alistair.francis@xilinx.com>
+References: <1496666711-14630-1-git-send-email-amarnath.valluri@intel.com>
+	<1496666711-14630-7-git-send-email-amarnath.valluri@intel.com>
+In-Reply-To: <1496666711-14630-7-git-send-email-amarnath.valluri@intel.com>
 From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Tue, 06 Jun 2017 11:58:07 +0000
-Message-ID: <CAJ+F1CLuPkWjG3Hn8hfaxTApn6+ouqh5nJZNWSQYX1C3_HRFqA@mail.gmail.com>
+Date: Tue, 06 Jun 2017 12:03:40 +0000
+Message-ID: <CAJ+F1CKGC9YM_BWrnrUG7cseFgXmcmzOpX2wiPr1G7U8d2cyhA@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v1 1/1] char-socket: Don't report TCP
- socket waiting as an error
+Subject: Re: [Qemu-devel] [PATCH v5 6/8] tpm-backend: Move realloc_buffer()
+ implementation to tpm-tis model
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,82 +31,149 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alistair Francis <alistair.francis@xilinx.com>, qemu-devel@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>, pbonzini@redhat.com
-Cc: alistair23@gmail.com
+To: Amarnath Valluri <amarnath.valluri@intel.com>, qemu-devel@nongnu.org
 
-Hi
-
-On Mon, Jun 5, 2017 at 10:37 PM Alistair Francis <
-alistair.francis@xilinx.com> wrote:
-
-> When QEMU is waiting for a TCP socket connection it reports that message =
-as
-> an error. This isn't an error though, so let's change the report to just
-> use qemu_log().
+On Mon, Jun 5, 2017 at 4:44 PM Amarnath Valluri <amarnath.valluri@intel.com=
 >
+wrote:
+
+> buffer reallocation is very unlikely to be backend specific. Hence move
+> inside
+> the tis.
 >
-I don't think this is a good idea, since stdout output my be mixed with
-console or other expected output.
+> Signed-off-by: Amarnath Valluri <amarnath.valluri@intel.com>
+> Reviewed-by: Stefan Berger <stefanb@linux.vnet.ibm.com>
+>
 
-In fact, it used to be on stdout, and got moved to stderr:
-
-commit fdca2124adc293f84f2b7aaf0df43faa6b6bf420
-Author: Gerd Hoffmann <kraxel@redhat.com>
-Date:   Mon Jun 24 08:39:49 2013 +0200
-
-    qemu-char: print notification to stderr
-
-    Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
-    Reviewed-by: Laszlo Ersek <lersek@redhat.com>
-    Signed-off-by: Michael Tokarev <mjt@tls.msk.ru>
-
-diff --git a/qemu-char.c b/qemu-char.c
-index e3b3224886..371f6308c5 100644
---- a/qemu-char.c
-+++ b/qemu-char.c
-@@ -2666,8 +2666,8 @@ static CharDriverState *qemu_chr_open_socket_fd(int
-fd, bool do_nodelay,
-     }
-
-     if (is_listen && is_waitconnect) {
--        printf("QEMU waiting for connection on: %s\n",
--               chr->filename);
-+        fprintf(stderr, "QEMU waiting for connection on: %s\n",
-+                chr->filename);
+Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
 
-Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
+
 > ---
+>  backends/tpm.c               |  9 ---------
+>  hw/tpm/tpm_passthrough.c     | 12 ------------
+>  hw/tpm/tpm_tis.c             | 14 ++++++++++++--
+>  include/sysemu/tpm_backend.h | 12 ------------
+>  4 files changed, 12 insertions(+), 35 deletions(-)
 >
->  chardev/char-socket.c | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
+> diff --git a/backends/tpm.c b/backends/tpm.c
+> index 4ae6129..3519570 100644
+> --- a/backends/tpm.c
+> +++ b/backends/tpm.c
+> @@ -71,15 +71,6 @@ bool tpm_backend_had_startup_error(TPMBackend *s)
+>      return k->ops->had_startup_error(s);
+>  }
 >
-> diff --git a/chardev/char-socket.c b/chardev/char-socket.c
-> index ccc499cfa1..a9884fa85b 100644
-> --- a/chardev/char-socket.c
-> +++ b/chardev/char-socket.c
-> @@ -27,6 +27,7 @@
->  #include "io/channel-tls.h"
->  #include "qemu/error-report.h"
->  #include "qapi/error.h"
-> +#include "qemu/log.h"
->  #include "qapi/clone-visitor.h"
+> -size_t tpm_backend_realloc_buffer(TPMBackend *s, TPMSizedBuffer *sb)
+> -{
+> -    TPMBackendClass *k =3D TPM_BACKEND_GET_CLASS(s);
+> -
+> -    assert(k->ops->realloc_buffer);
+> -
+> -    return k->ops->realloc_buffer(sb);
+> -}
+> -
+>  void tpm_backend_deliver_request(TPMBackend *s)
+>  {
+>      g_thread_pool_push(s->thread_pool,
+> (gpointer)TPM_BACKEND_CMD_PROCESS_CMD,
+> diff --git a/hw/tpm/tpm_passthrough.c b/hw/tpm/tpm_passthrough.c
+> index c7706e4..4ac47ed 100644
+> --- a/hw/tpm/tpm_passthrough.c
+> +++ b/hw/tpm/tpm_passthrough.c
+> @@ -258,17 +258,6 @@ static bool
+> tpm_passthrough_get_startup_error(TPMBackend *tb)
+>      return tpm_pt->had_startup_error;
+>  }
 >
->  #include "chardev/char-io.h"
-> @@ -765,7 +766,7 @@ static int tcp_chr_wait_connected(Chardev *chr, Error
-> **errp)
->       * in TLS and telnet cases, only wait for an accepted socket */
->      while (!s->ioc) {
->          if (s->is_listen) {
-> -            error_report("QEMU waiting for connection on: %s",
-> +            qemu_log("QEMU waiting for connection on: %s",
->                           chr->filename);
->              qio_channel_set_blocking(QIO_CHANNEL(s->listen_ioc), true,
-> NULL);
->              tcp_chr_accept(QIO_CHANNEL(s->listen_ioc), G_IO_IN, chr);
+> -static size_t tpm_passthrough_realloc_buffer(TPMSizedBuffer *sb)
+> -{
+> -    size_t wanted_size =3D 4096; /* Linux tpm.c buffer size */
+> -
+> -    if (sb->size !=3D wanted_size) {
+> -        sb->buffer =3D g_realloc(sb->buffer, wanted_size);
+> -        sb->size =3D wanted_size;
+> -    }
+> -    return sb->size;
+> -}
+> -
+>  static void tpm_passthrough_cancel_cmd(TPMBackend *tb)
+>  {
+>      TPMPassthruState *tpm_pt =3D TPM_PASSTHROUGH(tb);
+> @@ -475,7 +464,6 @@ static const TPMDriverOps tpm_passthrough_driver =3D =
+{
+>      .opts                     =3D tpm_passthrough_cmdline_opts,
+>      .desc                     =3D "Passthrough TPM backend driver",
+>      .create                   =3D tpm_passthrough_create,
+> -    .realloc_buffer           =3D tpm_passthrough_realloc_buffer,
+>      .reset                    =3D tpm_passthrough_reset,
+>      .had_startup_error        =3D tpm_passthrough_get_startup_error,
+>      .cancel_cmd               =3D tpm_passthrough_cancel_cmd,
+> diff --git a/hw/tpm/tpm_tis.c b/hw/tpm/tpm_tis.c
+> index a6440fe..d5118e7 100644
+> --- a/hw/tpm/tpm_tis.c
+> +++ b/hw/tpm/tpm_tis.c
+> @@ -963,6 +963,16 @@ static int tpm_tis_do_startup_tpm(TPMState *s)
+>      return tpm_backend_startup_tpm(s->be_driver);
+>  }
+>
+> +static void tpm_tis_realloc_buffer(TPMSizedBuffer *sb)
+> +{
+> +    size_t wanted_size =3D 4096; /* Linux tpm.c buffer size */
+> +
+> +    if (sb->size !=3D wanted_size) {
+> +        sb->buffer =3D g_realloc(sb->buffer, wanted_size);
+> +        sb->size =3D wanted_size;
+> +    }
+> +}
+> +
+>  /*
+>   * Get the TPMVersion of the backend device being used
+>   */
+> @@ -1010,9 +1020,9 @@ static void tpm_tis_reset(DeviceState *dev)
+>          tis->loc[c].state =3D TPM_TIS_STATE_IDLE;
+>
+>          tis->loc[c].w_offset =3D 0;
+> -        tpm_backend_realloc_buffer(s->be_driver, &tis->loc[c].w_buffer);
+> +        tpm_tis_realloc_buffer(&tis->loc[c].w_buffer);
+>          tis->loc[c].r_offset =3D 0;
+> -        tpm_backend_realloc_buffer(s->be_driver, &tis->loc[c].r_buffer);
+> +        tpm_tis_realloc_buffer(&tis->loc[c].r_buffer);
+>      }
+>
+>      tpm_tis_do_startup_tpm(s);
+> diff --git a/include/sysemu/tpm_backend.h b/include/sysemu/tpm_backend.h
+> index 6e5bb8d..bebfba3 100644
+> --- a/include/sysemu/tpm_backend.h
+> +++ b/include/sysemu/tpm_backend.h
+> @@ -85,8 +85,6 @@ struct TPMDriverOps {
+>      /* returns true if nothing will ever answer TPM requests */
+>      bool (*had_startup_error)(TPMBackend *t);
+>
+> -    size_t (*realloc_buffer)(TPMSizedBuffer *sb);
+> -
+>      void (*reset)(TPMBackend *t);
+>
+>      void (*cancel_cmd)(TPMBackend *t);
+> @@ -132,16 +130,6 @@ int tpm_backend_startup_tpm(TPMBackend *s);
+>  bool tpm_backend_had_startup_error(TPMBackend *s);
+>
+>  /**
+> - * tpm_backend_realloc_buffer:
+> - * @s: the backend
+> - * @sb: the TPMSizedBuffer to re-allocated to the size suitable for the
+> - *      backend.
+> - *
+> - * This function returns the size of the allocated buffer
+> - */
+> -size_t tpm_backend_realloc_buffer(TPMBackend *s, TPMSizedBuffer *sb);
+> -
+> -/**
+>   * tpm_backend_deliver_request:
+>   * @s: the backend to send the request to
+>   *
 > --
-> 2.11.0
->
+> 2.7.4
 >
 > --
 Marc-Andr=C3=A9 Lureau
