@@ -1,38 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40610)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41065)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1dIH5u-00088y-Mf
-	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 12:12:40 -0400
+	(envelope-from <armbru@redhat.com>) id 1dIH7U-00015O-8O
+	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 12:14:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1dIH5s-0003wf-DX
-	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 12:12:34 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:41837
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1dIH5s-0003wD-7t
-	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 12:12:32 -0400
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v56G8kWi091941
-	for <qemu-devel@nongnu.org>; Tue, 6 Jun 2017 12:12:31 -0400
-Received: from e06smtp11.uk.ibm.com (e06smtp11.uk.ibm.com [195.75.94.107])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2awp6by97y-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 06 Jun 2017 12:12:31 -0400
-Received: from localhost
-	by e06smtp11.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <groug@kaod.org>;
-	Tue, 6 Jun 2017 17:12:29 +0100
-From: Greg Kurz <groug@kaod.org>
-Date: Tue, 06 Jun 2017 18:12:24 +0200
-In-Reply-To: <149676256806.31274.17021734547869850899.stgit@bahia.lab.toulouse-stg.fr.ibm.com>
-References: <149676256806.31274.17021734547869850899.stgit@bahia.lab.toulouse-stg.fr.ibm.com>
+	(envelope-from <armbru@redhat.com>) id 1dIH7R-00059n-Jy
+	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 12:14:12 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53878)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dIH7R-00059U-Di
+	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 12:14:09 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <cover.1496387804.git.maozy.fnst@cn.fujitsu.com>
+	<ffa2cc4d0706fa522a5e581af14dadb03aec323a.1496387804.git.maozy.fnst@cn.fujitsu.com>
+	<20170606182354-mutt-send-email-mst@kernel.org>
+Date: Tue, 06 Jun 2017 18:14:02 +0200
+In-Reply-To: <20170606182354-mutt-send-email-mst@kernel.org> (Michael
+	S. Tsirkin's message of "Tue, 6 Jun 2017 18:26:21 +0300")
+Message-ID: <87efuxjdpx.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Message-Id: <149676554488.4134.16095044562334102742.stgit@bahia.lab.toulouse-stg.fr.ibm.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v2] target/ppc: pass const string to
- kvmppc_is_mem_backend_page_size_ok()
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v2 1/6] pci: Clean up error checking in
+ pci_add_capability()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -41,69 +29,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>, qemu-ppc@nongnu.org, qemu-stable@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>, marcel@redhat.com, qemu-devel@nongnu.org
 
-This function has three implementations. Two are stubs that do nothing
-and the third one only passes the obj_path argument to:
+"Michael S. Tsirkin" <mst@redhat.com> writes:
 
-Object *object_resolve_path(const char *path, bool *ambiguous);
+> On Fri, Jun 02, 2017 at 03:54:37PM +0800, Mao Zhongyi wrote:
+>> On success, pci_add_capability2() returns a positive value. On
+>> failure, it sets an error and return a negative value.
+>> 
+>> pci_add_capability() laboriously checks this behavior. No other
+>> caller does. Drop the checks from pci_add_capability().
+>> 
+>> Cc: mst@redhat.com
+>> Cc: marcel@redhat.com
+>> Cc: armbru@redhat.com
+>> Signed-off-by: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
+>> Reviewed-by: Marcel Apfelbaum <marcel@redhat.com>
+>> ---
+>>  hw/pci/pci.c | 6 +-----
+>>  1 file changed, 1 insertion(+), 5 deletions(-)
+>> 
+>> diff --git a/hw/pci/pci.c b/hw/pci/pci.c
+>> index 98ccc27..53566b8 100644
+>> --- a/hw/pci/pci.c
+>> +++ b/hw/pci/pci.c
+>> @@ -2270,12 +2270,8 @@ int pci_add_capability(PCIDevice *pdev, uint8_t cap_id,
+>>      Error *local_err = NULL;
+>>  
+>>      ret = pci_add_capability2(pdev, cap_id, offset, size, &local_err);
+>> -    if (local_err) {
+>> -        assert(ret < 0);
+>> +    if (ret < 0) {
+>>          error_report_err(local_err);
+>> -    } else {
+>> -        /* success implies a positive offset in config space */
+>> -        assert(ret > 0);
+>>      }
+>>      return ret;
+>>  }
+>
+>
+> I don't see why this is a good idea. You drop a bunch of
+> asserts, so naturally code is slightly tighter. We could gain
+> the same by building with NDEBUG but we don't, we rather
+> have more safety.
 
-Signed-off-by: Greg Kurz <groug@kaod.org>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
----
-v2: - also patch inline stub
-    - renamed patch and added changelog
----
- target/ppc/kvm.c     |    4 ++--
- target/ppc/kvm_ppc.h |    4 ++--
- 2 files changed, 4 insertions(+), 4 deletions(-)
-
-diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
-index 51249ce79e55..88817620766c 100644
---- a/target/ppc/kvm.c
-+++ b/target/ppc/kvm.c
-@@ -478,7 +478,7 @@ static void kvm_fixup_page_sizes(PowerPCCPU *cpu)
-     }
- }
-=20
--bool kvmppc_is_mem_backend_page_size_ok(char *obj_path)
-+bool kvmppc_is_mem_backend_page_size_ok(const char *obj_path)
- {
-     Object *mem_obj =3D object_resolve_path(obj_path, NULL);
-     char *mempath =3D object_property_get_str(mem_obj, "mem-path", NULL)=
-;
-@@ -499,7 +499,7 @@ static inline void kvm_fixup_page_sizes(PowerPCCPU *c=
-pu)
- {
- }
-=20
--bool kvmppc_is_mem_backend_page_size_ok(char *obj_path)
-+bool kvmppc_is_mem_backend_page_size_ok(const char *obj_path)
- {
-     return true;
- }
-diff --git a/target/ppc/kvm_ppc.h b/target/ppc/kvm_ppc.h
-index f48243d13ffc..eab7c8fdb325 100644
---- a/target/ppc/kvm_ppc.h
-+++ b/target/ppc/kvm_ppc.h
-@@ -64,7 +64,7 @@ int kvmppc_enable_hwrng(void);
- int kvmppc_put_books_sregs(PowerPCCPU *cpu);
- PowerPCCPUClass *kvm_ppc_get_host_cpu_class(void);
-=20
--bool kvmppc_is_mem_backend_page_size_ok(char *obj_path);
-+bool kvmppc_is_mem_backend_page_size_ok(const char *obj_path);
-=20
- #else
-=20
-@@ -211,7 +211,7 @@ static inline uint64_t kvmppc_rma_size(uint64_t curre=
-nt_size,
-     return ram_size;
- }
-=20
--static inline bool kvmppc_is_mem_backend_page_size_ok(char *obj_path)
-+static inline bool kvmppc_is_mem_backend_page_size_ok(const char *obj_pa=
-th)
- {
-     return true;
- }
+It's a good idea because it's what we do basically everywhere when a
+function sets an error and returns a distinct error value.
