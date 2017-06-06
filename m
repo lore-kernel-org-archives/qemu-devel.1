@@ -1,29 +1,41 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53176)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54713)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dI9mi-0001Ay-RZ
-	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 04:24:17 -0400
+	(envelope-from <borntraeger@de.ibm.com>) id 1dI9tX-0002oT-No
+	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 04:31:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dI9mi-0006uq-2r
-	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 04:24:16 -0400
-Received: from mail-pf0-x22e.google.com ([2607:f8b0:400e:c00::22e]:33328)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1dI9mh-0006uk-T6
-	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 04:24:16 -0400
-Received: by mail-pf0-x22e.google.com with SMTP id 83so37620517pfr.0
-	for <qemu-devel@nongnu.org>; Tue, 06 Jun 2017 01:24:15 -0700 (PDT)
-Sender: Richard Henderson <rth7680@gmail.com>
-References: <1496702979-26132-1-git-send-email-cota@braap.org>
-	<1496702979-26132-4-git-send-email-cota@braap.org>
-From: Richard Henderson <rth@twiddle.net>
-Message-ID: <015d442b-a44e-0ebc-470c-e3289b109ca6@twiddle.net>
-Date: Tue, 6 Jun 2017 01:24:11 -0700
+	(envelope-from <borntraeger@de.ibm.com>) id 1dI9tS-0001mN-Rd
+	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 04:31:19 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:36511
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
+	id 1dI9tS-0001mH-KU
+	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 04:31:14 -0400
+Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v568SoIF017100
+	for <qemu-devel@nongnu.org>; Tue, 6 Jun 2017 04:31:13 -0400
+Received: from e17.ny.us.ibm.com (e17.ny.us.ibm.com [129.33.205.207])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2awp6b794w-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Tue, 06 Jun 2017 04:31:13 -0400
+Received: from localhost
+	by e17.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
+	Tue, 6 Jun 2017 04:31:12 -0400
+References: <20170531193434.6918-1-david@redhat.com>
+	<20170531193434.6918-2-david@redhat.com>
+From: Christian Borntraeger <borntraeger@de.ibm.com>
+Date: Tue, 6 Jun 2017 10:31:07 +0200
 MIME-Version: 1.0
-In-Reply-To: <1496702979-26132-4-git-send-email-cota@braap.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
+In-Reply-To: <20170531193434.6918-2-david@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-IE
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 3/3] tcg: allocate TB structs before the
- corresponding translated code
+Message-Id: <b04767ab-a3c4-7a02-33d7-3e27837ec17d@de.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH v1 1/2] s390x/cpumodel: take care of the
+ cpuid format bit for KVM
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,27 +44,17 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Emilio G. Cota" <cota@braap.org>, qemu-devel@nongnu.org
-Cc: alex.bennee@linaro.org, Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, Pranith Kumar <bobby.prani@gmail.com>
+To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
+Cc: rth@twiddle.net, Aurelien Jarno <aurelien@aurel32.net>, thuth@redhat.com, Cornelia Huck <cornelia.huck@de.ibm.com>, "Jason J . Herne" <jjherne@linux.vnet.ibm.com>
 
-On 06/05/2017 03:49 PM, Emilio G. Cota wrote:
-> +TranslationBlock *tcg_tb_alloc(TCGContext *s)
-> +{
-> +    void *aligned;
-> +
-> +    aligned = (void *)ROUND_UP((uintptr_t)s->code_gen_ptr, QEMU_CACHELINE_SIZE);
-> +    if (unlikely(aligned + sizeof(TranslationBlock) > s->code_gen_highwater)) {
-> +        return NULL;
-> +    }
-> +    s->code_gen_ptr += aligned - s->code_gen_ptr + sizeof(TranslationBlock);
-> +    return aligned;
+On 05/31/2017 09:34 PM, David Hildenbrand wrote:
+> Let's also properly forward that bit. It should always be set. I
+> verified it under z/VM, it seems to be always set there. For now,
+> zKVM guests never get that bit set when the CPU model is active.
+> 
+> The PoP mentiones, that z800 + z900 (HW generation 7) always set this
+> bit to 0, so let's take care of that.
+> 
+> Signed-off-by: David Hildenbrand <david@redhat.com>
 
-We don't really need the 2/3 patch.  We don't gain anything by telling the 
-compiler that the structure is more aligned than it needs to be.
-
-We can query the line size at runtime, as suggested by Pranith, and use that 
-for the alignment here.  Which means that the binary isn't tied to a particular 
-cpu implementation, which is clearly preferable for distributions.
-
-
-r~
+applied, thanks.
