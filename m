@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37996)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39376)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dIIbn-0000zx-Ed
-	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 13:49:36 -0400
+	(envelope-from <lersek@redhat.com>) id 1dIIei-0002oG-3V
+	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 13:52:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dIIbh-0002nG-TA
-	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 13:49:35 -0400
-Received: from mail-wr0-x22a.google.com ([2a00:1450:400c:c0c::22a]:36631)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1dIIbh-0002n4-Lx
-	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 13:49:29 -0400
-Received: by mail-wr0-x22a.google.com with SMTP id v111so50857414wrc.3
-	for <qemu-devel@nongnu.org>; Tue, 06 Jun 2017 10:49:29 -0700 (PDT)
+	(envelope-from <lersek@redhat.com>) id 1dIIee-0003o0-DY
+	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 13:52:36 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34476)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1dIIee-0003nl-7S
+	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 13:52:32 -0400
+References: <c76b36de-ebf9-c662-d454-0a95b43901e8@redhat.com>
+	<2ff62b03-d71b-93c4-79bf-10682b229758@redhat.com>
+	<20170605115429.29c252f6@nial.brq.redhat.com>
+From: Laszlo Ersek <lersek@redhat.com>
+Message-ID: <7a08004a-cc4d-6144-4fc8-4b85062033e8@redhat.com>
+Date: Tue, 6 Jun 2017 19:52:21 +0200
 MIME-Version: 1.0
-In-Reply-To: <20170606025135.2685-2-david@gibson.dropbear.id.au>
-References: <20170606025135.2685-1-david@gibson.dropbear.id.au>
-	<20170606025135.2685-2-david@gibson.dropbear.id.au>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 6 Jun 2017 18:49:08 +0100
-Message-ID: <CAFEAcA9arhJuzCs=ec4dW+_cgSodi0NWTnBB+-4mwAjSGMaLDA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL 01/17] migration: remove register_savevm()
+In-Reply-To: <20170605115429.29c252f6@nial.brq.redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] allocation zone extensions for the firmware
+ linker/loader
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,45 +30,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: Alexander Graf <agraf@suse.de>, "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Michael Roth <mdroth@linux.vnet.ibm.com>, Laurent Vivier <lvivier@redhat.com>, Juan Quintela <quintela@redhat.com>
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: SeaBIOS devel list <SeaBIOS@seabios.org>, qemu devel list <qemu-devel@nongnu.org>, edk2-devel-ml01 <edk2-devel@ml01.01.org>, Stefan Berger <stefanb@linux.vnet.ibm.com>, Ben Warren <ben@skyportsystems.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Xiao Guangrong <guangrong.xiao@linux.intel.com>, "Jordan Justen (Intel address)" <jordan.l.justen@intel.com>, "Michael S. Tsirkin" <mst@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, "Leif Lindholm (Linaro address)" <leif.lindholm@linaro.org>, Dongjiu Geng <gengdongjiu@huawei.com>, Kevin O'Connor <kevin@koconnor.net>, Gerd Hoffmann <kraxel@redhat.com>, Shannon Zhao <zhaoshenglong@huawei.com>
 
-On 6 June 2017 at 03:51, David Gibson <david@gibson.dropbear.id.au> wrote:
-> From: Laurent Vivier <lvivier@redhat.com>
->
-> We can replace the four remaining calls of register_savevm() by
-> calls to register_savevm_live(). So we can remove the function and
-> as we don't allocate anymore the ops pointer with g_new0()
-> we don't have to free it then.
->
-> Signed-off-by: Laurent Vivier <lvivier@redhat.com>
-> Reviewed-by: Juan Quintela <quintela@redhat.com>
-> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-> ---
->  hw/net/vmxnet3.c            |  8 ++++++--
->  hw/s390x/s390-skeys.c       |  9 +++++++--
->  hw/s390x/s390-virtio-ccw.c  |  8 ++++++--
->  include/migration/vmstate.h |  8 --------
->  migration/savevm.c          | 16 ----------------
->  slirp/slirp.c               |  8 ++++++--
->  6 files changed, 25 insertions(+), 32 deletions(-)
+On 06/05/17 11:54, Igor Mammedov wrote:
 
-Great to see register_savevm() finally disappearing.
+> BTW:
+> how OVMF would deal with booting 32-bit OS if it would allocate
+> ACPI tables above 4Gb?
+> For BIOS on baremetal I'd expect some switch in settings, something
+> like "Disable 32-bit OS support".
 
-Any chance of an update to docs/migration.txt, which still
-mentions register_savevm(), but on the other hand doesn't
-say anything about register_savevm_live() and unregister_savevm().
-(Doc comments in the .h file for those functions would be
-nice too...)
+In order to answer your question exhaustively, I'd have to ponder this a
+lot longer. For now my basic answer is the following:
 
-Things that would be interesting to explain/document:
- * what is special about vmxnet3 that makes it the only pci device
-   that needs to use this rather than having a vmstate struct?
- * why does s390-skeys call the register function with a NULL
-   pointer but the unregister pointer with a device pointer?
+- If you can allocate memory above 4GB in the DXE phase, that means your
+DXE and BDS phases are 64-bit. Which in turn implies you *cannot* boot a
+32-bit OS at all.
 
-(Could we replace the uses of these which pass a dev pointer
-with vmstate structs and then drop the dev parameter?)
+Generally speaking, with PI / UEFI, the bitness of the firmware (the DXE
+and the BDS phases) and the bitness of the OS (incl. its UEFI boot
+loader) must be identical.
 
-thanks
--- PMM
+As a trick, Linux can work around this, in *one* direction -- 64-bit
+Linux can run on 32-bit UEFI firmware (on x86; not sure about other
+arches). But, the other direction (32-bit UEFI OS on 64-bit firmware)
+cannot work, minimally because you can only call the UEFI runtime
+services in 64-bit mode.
+
+In short (again, this is quite rudimentary), if your memory allocation
+in the DXE and/or BDS phases ends up being served from above 4GB, you
+won't be booting a 32-bit-only OS.
+
+Thanks
+Laszlo
