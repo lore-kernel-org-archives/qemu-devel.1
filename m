@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48349)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48363)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dIO0B-00012n-3I
+	(envelope-from <bounces@canonical.com>) id 1dIO0C-00012t-19
 	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 19:35:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dIO05-0002xC-Tx
-	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 19:35:07 -0400
-Received: from indium.canonical.com ([91.189.90.7]:47200)
+	(envelope-from <bounces@canonical.com>) id 1dIO06-0002xl-SX
+	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 19:35:08 -0400
+Received: from indium.canonical.com ([91.189.90.7]:47240)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1dIO05-0002w7-Oi
-	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 19:35:01 -0400
+	id 1dIO06-0002xd-Ln
+	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 19:35:02 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1dIO03-0007ho-Dj
-	for <qemu-devel@nongnu.org>; Tue, 06 Jun 2017 23:34:59 +0000
+	id 1dIO05-0007hS-9A
+	for <qemu-devel@nongnu.org>; Tue, 06 Jun 2017 23:35:01 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 602C52E8199
-	for <qemu-devel@nongnu.org>; Tue,  6 Jun 2017 23:34:59 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id E036F2E8195
+	for <qemu-devel@nongnu.org>; Tue,  6 Jun 2017 23:35:00 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Tue, 06 Jun 2017 23:16:13 -0000
+Date: Tue, 06 Jun 2017 23:17:35 -0000
 From: ChristianEhrhardt <1319100@bugs.launchpad.net>
 Reply-To: Bug 1319100 <1319100@bugs.launchpad.net>
 Sender: bounces@canonical.com
 References: <20140513155625.16564.49635.malonedeb@soybean.canonical.com>
-Message-Id: <149679097300.29123.10392138346518240342.malone@wampee.canonical.com>
+Message-Id: <149679105555.506.3586317168986798744.malone@chaenomeles.canonical.com>
 Errors-To: bounces@canonical.com
 Subject: [Qemu-devel] [Bug 1319100] Re: qemu-arm-static bug in signal
  handling causes mono and java to hang
@@ -39,10 +39,8 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Fixed in 2.7 and thereby >=3DZesty
-
-** Changed in: qemu-kvm (Ubuntu)
-       Status: Confirmed =3D> Fix Released
+I can't guess very well how important this would be for an SRU (or not),
+leaving that up for user feedback to be decided.
 
 -- =
 
