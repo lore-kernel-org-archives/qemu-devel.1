@@ -1,26 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48395)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48891)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1dIBC4-0007Cy-9E
-	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 05:54:33 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1dIBDq-0007qY-Ew
+	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 05:56:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1dIBC1-00070h-Ml
-	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 05:54:32 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:55218)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1dIBC1-00070Q-GC
-	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 05:54:29 -0400
-Date: Tue, 6 Jun 2017 10:54:25 +0100
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20170606095425.GA19655@stefanha-x1.localdomain>
-References: <148434048970.31446.17153056211582691244.stgit@frigg.lan>
-	<20170601195544.GB10517@flamenco>
+	(envelope-from <peter.maydell@linaro.org>) id 1dIBDp-0007xJ-EI
+	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 05:56:22 -0400
+Received: from mail-wm0-x22e.google.com ([2a00:1450:400c:c09::22e]:35333)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1dIBDp-0007xA-7f
+	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 05:56:21 -0400
+Received: by mail-wm0-x22e.google.com with SMTP id x70so33225176wme.0
+	for <qemu-devel@nongnu.org>; Tue, 06 Jun 2017 02:56:20 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="BOKacYhQ+x31HxR3"
-Content-Disposition: inline
-In-Reply-To: <20170601195544.GB10517@flamenco>
-Subject: Re: [Qemu-devel] [PATCH v7 0/7] trace: [tcg] Optimize per-vCPU
- tracing states with separate TB caches
+In-Reply-To: <20170602160848.4913-5-alex.bennee@linaro.org>
+References: <20170602160848.4913-1-alex.bennee@linaro.org>
+	<20170602160848.4913-5-alex.bennee@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 6 Jun 2017 10:55:59 +0100
+Message-ID: <CAFEAcA9hJYecyXxAvvKfyG5G67YAYd6YV-Y9iOfTNK3njd0+kA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [RISU PATCH v4 04/10] risu: a bit more verbosity
+ when running
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,48 +31,135 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Emilio G. Cota" <cota@braap.org>
-Cc: =?iso-8859-1?Q?Llu=EDs?= Vilanova <vilanova@ac.upc.edu>, qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
+On 2 June 2017 at 17:08, Alex Benn=C3=A9e <alex.bennee@linaro.org> wrote:
+> Before this is could seem a little quite when running as you had no
+> indication stuff was happening (or how fast). I only dump on the master
+> side as I want to minimise the amount of qemu logs to sift through.
+>
+> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+>
+> --
+> v3
+>   - use portable fmt string for image_start_address
+>   - include arm dumping position
+> ---
+>  risu.c         | 15 +++++++++++++--
+>  risu.h         |  3 +++
+>  risu_aarch64.c |  3 +++
+>  risu_arm.c     |  3 +++
+>  4 files changed, 22 insertions(+), 2 deletions(-)
+>
+> diff --git a/risu.c b/risu.c
+> index 7e42160..bcdc219 100644
+> --- a/risu.c
+> +++ b/risu.c
+> @@ -37,6 +37,16 @@ sigjmp_buf jmpbuf;
+>  /* Should we test for FP exception status bits? */
+>  int test_fp_exc =3D 0;
+>
+> +long executed_tests =3D 0;
+> +void report_test_status(void *pc)
+> +{
+> +   executed_tests +=3D 1;
+> +   if (executed_tests % 100 =3D=3D 0) {
+> +      fprintf(stderr,"Executed %ld test instructions (pc=3D%p)\r",
+> +              executed_tests, pc);
 
---BOKacYhQ+x31HxR3
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+This gets called from signal handlers, so you can't use stdio.
 
-On Thu, Jun 01, 2017 at 03:55:44PM -0400, Emilio G. Cota wrote:
-> On Fri, Jan 13, 2017 at 21:48:09 +0100, Llu=EDs Vilanova wrote:
-> (snip)
-> > To handle both issues, this series integrates the dynamic tracing event=
- state
-> > into the TB hashing function, so that vCPUs tracing different events wi=
-ll use
-> > separate TBs. Note that only events with the 'vcpu' property are used f=
-or
-> > hashing (as stored in the bitmap of CPUState->trace_dstate).
->=20
-> Is this going to be picked up by anyone? AFAICT the patchset is close
-> to being merge-ready.
+> +   }
+> +}
+> +
+>  void master_sigill(int sig, siginfo_t *si, void *uc)
+>  {
+>     switch (recv_and_compare_register_info(master_socket, uc))
+> @@ -61,6 +71,7 @@ void apprentice_sigill(int sig, siginfo_t *si, void *uc=
+)
+>           return;
+>        case 1:
+>           /* end of test */
+> +         fprintf(stderr, "\nend of test\n");
 
-You left comments and the discussion with Richard Henderson is also not
-complete yet.
+Can't use stdio in a signal handler.
 
-Once there is consensus I will merge it.
+>           exit(0);
+>        default:
+>           /* mismatch */
+> @@ -129,7 +140,7 @@ int master(int sock)
+>     }
+>     master_socket =3D sock;
+>     set_sigill_handler(&master_sigill);
+> -   fprintf(stderr, "starting image\n");
+> +   fprintf(stderr, "starting master image at 0x%"PRIxPTR"\n", image_star=
+t_address);
+>     image_start();
+>     fprintf(stderr, "image returned unexpectedly\n");
+>     exit(1);
+> @@ -139,7 +150,7 @@ int apprentice(int sock)
+>  {
+>     apprentice_socket =3D sock;
+>     set_sigill_handler(&apprentice_sigill);
+> -   fprintf(stderr, "starting image\n");
+> +   fprintf(stderr, "starting apprentice image at 0x%"PRIxPTR"\n", image_=
+start_address);
+>     image_start();
+>     fprintf(stderr, "image returned unexpectedly\n");
+>     exit(1);
+> diff --git a/risu.h b/risu.h
+> index 883bcf7..1eeb885 100644
+> --- a/risu.h
+> +++ b/risu.h
+> @@ -37,6 +37,7 @@ extern uintptr_t image_start_address;
+>  extern void *memblock;
+>
+>  extern int test_fp_exc;
+> +extern int ismaster;
+>
+>  /* Ops code under test can request from risu: */
+>  #define OP_COMPARE 0
+> @@ -72,6 +73,8 @@ int recv_and_compare_register_info(int sock, void *uc);
+>   */
+>  int report_match_status(void);
+>
+> +void report_test_status(void *pc);
+> +
+>  /* Interface provided by CPU-specific code: */
+>
+>  /* Move the PC past this faulting insn by adjusting ucontext
+> diff --git a/risu_aarch64.c b/risu_aarch64.c
+> index 9c6809d..5625979 100644
+> --- a/risu_aarch64.c
+> +++ b/risu_aarch64.c
+> @@ -16,6 +16,9 @@ void advance_pc(void *vuc)
+>  {
+>      ucontext_t *uc =3D vuc;
+>      uc->uc_mcontext.pc +=3D 4;
+> +    if (ismaster) {
+> +      report_test_status((void *) uc->uc_mcontext.pc);
+> +    }
 
-Stefan
+If we're going to print something we should do it in the
+arch-independent code that calls advance_pc(), rather than
+duplicating the code in each arch backend.
 
---BOKacYhQ+x31HxR3
-Content-Type: application/pgp-signature; name="signature.asc"
+>  }
+>
+>  void set_ucontext_paramreg(void *vuc, uint64_t value)
+> diff --git a/risu_arm.c b/risu_arm.c
+> index f570828..eaf4f6c 100644
+> --- a/risu_arm.c
+> +++ b/risu_arm.c
+> @@ -44,6 +44,9 @@ void advance_pc(void *vuc)
+>  {
+>     ucontext_t *uc =3D vuc;
+>     uc->uc_mcontext.arm_pc +=3D insnsize(uc);
+> +   if (ismaster) {
+> +      report_test_status((void *) uc->uc_mcontext.arm_pc);
+> +   }
+>  }
 
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJZNnvRAAoJEJykq7OBq3PIuTYIAI5ketctiB0jHrPTrvAhinvg
-Jcm4AgKRt5XavhRPdWPeRLwet+MvDn/NpdXp+W0zp7nGdPgLcCWDS4HsQyH6foya
-va9xFdIjgphMMiVBKq/1irP+1+Q8exIkkIjHWwIY8Zjh8tGZADK0R+UJKJVnkPXe
-zYIokJ+ftab8fvDlwIFkbbGxU8tYwFt2BgfnUFlaECmAbaz1Gh1adC+zYHX5cE4U
-kAT0q6wcXAC8gb5Ju7bkipEM9HrbmbDHiTJpw8CEtK1RzfYa+ZmdjDv6fIYwdXa2
-RzGQvv18jExu6myU+AqeZ+kOsGE2jAcjdOFa5rFolMo+UMt3uZOXmcQtpdsdHcw=
-=0oUq
------END PGP SIGNATURE-----
-
---BOKacYhQ+x31HxR3--
+thanks
+-- PMM
