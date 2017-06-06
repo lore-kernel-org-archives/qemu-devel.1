@@ -1,35 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50732)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50728)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1dIJES-0006PN-Az
-	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 14:29:33 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1dIJEN-00034W-RJ
+	(envelope-from <borntraeger@de.ibm.com>) id 1dIJER-0006OV-PT
 	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 14:29:32 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:38850)
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <borntraeger@de.ibm.com>) id 1dIJEM-00034A-SG
+	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 14:29:31 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:58105)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
-	id 1dIJEN-000343-Hb
-	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 14:29:27 -0400
-Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
+	id 1dIJEM-00033R-IG
+	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 14:29:26 -0400
+Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
 	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v56IT5C7115921
+	v56IT4Mb109493
 	for <qemu-devel@nongnu.org>; Tue, 6 Jun 2017 14:29:25 -0400
-Received: from e06smtp12.uk.ibm.com (e06smtp12.uk.ibm.com [195.75.94.108])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2aww80y4vf-1
+Received: from e06smtp14.uk.ibm.com (e06smtp14.uk.ibm.com [195.75.94.110])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2aww9sf3pq-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
 	for <qemu-devel@nongnu.org>; Tue, 06 Jun 2017 14:29:25 -0400
 Received: from localhost
-	by e06smtp12.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	by e06smtp14.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
 	Only! Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
 	Tue, 6 Jun 2017 19:29:22 +0100
 From: Christian Borntraeger <borntraeger@de.ibm.com>
-Date: Tue,  6 Jun 2017 20:29:14 +0200
+Date: Tue,  6 Jun 2017 20:29:15 +0200
 In-Reply-To: <1496773755-53343-1-git-send-email-borntraeger@de.ibm.com>
 References: <1496773755-53343-1-git-send-email-borntraeger@de.ibm.com>
-Message-Id: <1496773755-53343-5-git-send-email-borntraeger@de.ibm.com>
-Subject: [Qemu-devel] [PATCH 4/5] s390x/cpumodel: take care of the cpuid
- format bit for KVM
+Message-Id: <1496773755-53343-6-git-send-email-borntraeger@de.ibm.com>
+Subject: [Qemu-devel] [PATCH 5/5] s390x/cpumodel: improve defintion search
+ without an IBC
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -43,85 +43,74 @@ Cc: qemu-devel <qemu-devel@nongnu.org>, Alexander Graf <agraf@suse.de>, Richard 
 
 From: David Hildenbrand <david@redhat.com>
 
-Let's also properly forward that bit. It should always be set. I
-verified it under z/VM, it seems to be always set there. For now,
-zKVM guests never get that bit set when the CPU model is active.
+Currently, under z/VM on a 0x2827, QEMU will detect a 0x2828 if no
+IBC value is provided. QEMU will simply take the last model of that HW
+generation, which happens to be the BC version.
 
-The PoP mentiones, that z800 + z900 (HW generation 7) always set this
-bit to 0, so let's take care of that.
+Let's improve our search for that case by selecting the latest CPU
+definition that matches the CPU type. This for example will avoid
+detecting an z13 as a z13s.
+
+We might still detect a GA2 version on a GA1 system, but as we don't
+have further information at hand, there isn't too much we can do about
+it. The alternative of always presenting the oldest GA is not backward
+compatible, e.g:
+You're running on 0x2827 GA2.
+Old QEMU version indicated "0x2828 GA1 == 0x2827 GA2". After you updated
+QEMU, you suddenly detect "0x2827 GA1". You're previous libvirt guest
+might suddenly refuse to run.
+
+In the end presenting a newer GA level does not matter because:
+
+1: All GAX models share the same base feature set. A GAX++ might
+support "more features".
+2: Without an IBC, the guest can't detect the GA version.
+
+If we have no IBC (esp. unblocked_ibc == 0), the IBC we will present
+to the guest in read_SCP_info() will be 0. The guest will not know
+which GA version it has. The problem of missing IBC propagates.
+
+If we don't have a feature of the GA++ version, also our guest won't
+have it. So in summary, the guest also has no idea of its GA version.
 
 Signed-off-by: David Hildenbrand <david@redhat.com>
-Message-Id: <20170531193434.6918-2-david@redhat.com>
+Message-Id: <20170531193434.6918-3-david@redhat.com>
 Acked-by: Jason J. Herne <jjherne@linux.vnet.ibm.com>
+Reviewed-by: Halil Pasic <pasic@linux.vnet.ibm.com>
 Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
+[improve patch description by reusing mailing list discussion]
 ---
- target/s390x/cpu_models.c |  1 +
- target/s390x/cpu_models.h | 10 +++++++---
- target/s390x/kvm.c        |  1 +
- 3 files changed, 9 insertions(+), 3 deletions(-)
+ target/s390x/cpu_models.c | 9 +++++++++
+ 1 file changed, 9 insertions(+)
 
 diff --git a/target/s390x/cpu_models.c b/target/s390x/cpu_models.c
-index 8d27363..9e23535 100644
+index 9e23535..b6220c8 100644
 --- a/target/s390x/cpu_models.c
 +++ b/target/s390x/cpu_models.c
-@@ -740,6 +740,7 @@ void s390_realize_cpu_model(CPUState *cs, Error **errp)
-     /* copy over properties that can vary */
-     cpu->model->lowest_ibc = max_model->lowest_ibc;
-     cpu->model->cpu_id = max_model->cpu_id;
-+    cpu->model->cpu_id_format = max_model->cpu_id_format;
-     cpu->model->cpu_ver = max_model->cpu_ver;
- 
-     check_consistency(cpu->model);
-diff --git a/target/s390x/cpu_models.h b/target/s390x/cpu_models.h
-index 136a602..d41f8d6 100644
---- a/target/s390x/cpu_models.h
-+++ b/target/s390x/cpu_models.h
-@@ -46,6 +46,7 @@ typedef struct S390CPUModel {
-     /* values copied from the "host" model, can change during migration */
-     uint16_t lowest_ibc;    /* lowest IBC that the hardware supports */
-     uint32_t cpu_id;        /* CPU id */
-+    uint8_t cpu_id_format;  /* CPU id format bit */
-     uint8_t cpu_ver;        /* CPU version, usually "ff" for kvm */
- } S390CPUModel;
- 
-@@ -54,12 +55,14 @@ typedef struct S390CPUModel {
-  *
-  * bits 0-7: Zeroes (ff for kvm)
-  * bits 8-31: CPU ID (serial number)
-- * bits 32-48: Machine type
-- * bits 48-63: Zeroes
-+ * bits 32-47: Machine type
-+ * bit  48: CPU ID format
-+ * bits 49-63: Zeroes
-  */
- #define cpuid_type(x)     (((x) >> 16) & 0xffff)
- #define cpuid_id(x)       (((x) >> 32) & 0xffffff)
- #define cpuid_ver(x)      (((x) >> 56) & 0xff)
-+#define cpuid_format(x)   (((x) >> 15) & 0x1)
- 
- #define lowest_ibc(x)     (((uint32_t)(x) >> 16) & 0xfff)
- #define unblocked_ibc(x)  ((uint32_t)(x) & 0xfff)
-@@ -92,7 +95,8 @@ static inline uint64_t s390_cpuid_from_cpu_model(const S390CPUModel *model)
+@@ -184,6 +184,7 @@ const S390CPUDef *s390_find_cpu_def(uint16_t type, uint8_t gen, uint8_t ec_ga,
+                                     S390FeatBitmap features)
  {
-     return ((uint64_t)model->cpu_ver << 56) |
-            ((uint64_t)model->cpu_id << 32) |
--           ((uint64_t)model->def->type << 16);
-+           ((uint64_t)model->def->type << 16) |
-+           (model->def->gen == 7 ? 0 : (uint64_t)model->cpu_id_format << 15);
- }
- S390CPUDef const *s390_find_cpu_def(uint16_t type, uint8_t gen, uint8_t ec_ga,
-                                     S390FeatBitmap features);
-diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
-index ba1e60f..a3d0019 100644
---- a/target/s390x/kvm.c
-+++ b/target/s390x/kvm.c
-@@ -2580,6 +2580,7 @@ void kvm_s390_get_host_cpu_model(S390CPUModel *model, Error **errp)
-         unblocked_ibc = unblocked_ibc(prop.ibc);
-     }
-     model->cpu_id = cpuid_id(prop.cpuid);
-+    model->cpu_id_format = cpuid_format(prop.cpuid);
-     model->cpu_ver = 0xff;
+     const S390CPUDef *last_compatible = NULL;
++    const S390CPUDef *matching_cpu_type = NULL;
+     int i;
  
-     /* get supported cpu features indicated via STFL(E) */
+     if (!gen) {
+@@ -218,8 +219,16 @@ const S390CPUDef *s390_find_cpu_def(uint16_t type, uint8_t gen, uint8_t ec_ga,
+         if (def->type == type && def->ec_ga == ec_ga) {
+             return def;
+         }
++        /* remember if we've at least seen one with the same cpu type */
++        if (def->type == type) {
++            matching_cpu_type = def;
++        }
+         last_compatible = def;
+     }
++    /* prefer the model with the same cpu type, esp. don't take the BC for EC */
++    if (matching_cpu_type) {
++        return matching_cpu_type;
++    }
+     return last_compatible;
+ }
+ 
 -- 
 2.7.4
