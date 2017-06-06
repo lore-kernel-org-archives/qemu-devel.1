@@ -1,28 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51204)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51227)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dIEpl-00048l-Sl
-	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 09:47:46 -0400
+	(envelope-from <kraxel@redhat.com>) id 1dIEpq-0004AW-QU
+	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 09:47:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dIEpf-0008W1-V6
+	(envelope-from <kraxel@redhat.com>) id 1dIEpl-00006B-Ua
+	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 09:47:50 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42802)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1dIEpl-00005f-Ma
 	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 09:47:45 -0400
-Received: from mail-wm0-x231.google.com ([2a00:1450:400c:c09::231]:38837)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1dIEpf-0008Vt-PF
-	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 09:47:39 -0400
-Received: by mail-wm0-x231.google.com with SMTP id n195so101116742wmg.1
-	for <qemu-devel@nongnu.org>; Tue, 06 Jun 2017 06:47:39 -0700 (PDT)
-MIME-Version: 1.0
-In-Reply-To: <20170602160848.4913-10-alex.bennee@linaro.org>
-References: <20170602160848.4913-1-alex.bennee@linaro.org>
-	<20170602160848.4913-10-alex.bennee@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 6 Jun 2017 14:47:17 +0100
-Message-ID: <CAFEAcA81E8LTdQjMHypTZwEueoytJ2n1_C9ofwJmZ=esU++c+g@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RISU PATCH v4 09/10] new: record_traces.sh helper
- script
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 4591A334583
+	for <qemu-devel@nongnu.org>; Tue,  6 Jun 2017 13:47:44 +0000 (UTC)
+From: Gerd Hoffmann <kraxel@redhat.com>
+Date: Tue,  6 Jun 2017 15:47:36 +0200
+Message-Id: <20170606134736.26080-1-kraxel@redhat.com>
+Subject: [Qemu-devel] [PATCH] keymaps: add tracing
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,60 +27,128 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org
+Cc: Gerd Hoffmann <kraxel@redhat.com>
 
-On 2 June 2017 at 17:08, Alex Benn=C3=A9e <alex.bennee@linaro.org> wrote:
-> A simple script to run through a bunch of binaries and generate their
-> trace files.
->
-> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
->
-> ---
-> v3
->   - allow overriding of RISU binary
-> ---
->  record_traces.sh | 20 ++++++++++++++++++++
->  1 file changed, 20 insertions(+)
->  create mode 100755 record_traces.sh
->
-> diff --git a/record_traces.sh b/record_traces.sh
-> new file mode 100755
-> index 0000000..78ce47f
-> --- /dev/null
-> +++ b/record_traces.sh
-> @@ -0,0 +1,20 @@
-> +#!/bin/sh
-> +#
-> +# Record traces
-> +#
-> +# A risu helper script to batch process a bunch of binaries and record t=
-heir outputs
-> +#
+Drop commented debug logging, add trace points instead.
 
-Can we have a license statement, copyright line and a
-usage summary, please? (Ditto patch 10). I'm not sure if
-these scripts are intended for testing purposes or as
-something that risu users might want to use -- if the
-latter then also documenting them in README would be
-a good idea.
+Also cleanup parser code a bit, the key name is copied into a new
+variable instead of patching the input line, that way we can log
+the unmodified line.
 
-> +set -e
-> +
-> +if test -z "$RISU"; then
-> +    script_dir=3D$(CDPATH=3D cd -- "$(dirname -- "$0")" && pwd -P)
-> +    RISU=3D${script_dir}/risu
-> +fi
-> +
-> +for f in $@; do
-> +    echo "Running risu against $f"
-> +    t=3D"$f.trace"
-> +    ${RISU} --master $f -t $t
-> +    echo "Checking trace file OK"
-> +    ${RISU} $f -t $t
-> +done
-> --
-> 2.13.0
+Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+---
+ ui/keymaps.c    | 33 ++++++++++++++++++---------------
+ ui/trace-events |  5 +++++
+ 2 files changed, 23 insertions(+), 15 deletions(-)
 
-thanks
--- PMM
+diff --git a/ui/keymaps.c b/ui/keymaps.c
+index 8899a0b31e..fa00b82027 100644
+--- a/ui/keymaps.c
++++ b/ui/keymaps.c
+@@ -25,6 +25,7 @@
+ #include "qemu/osdep.h"
+ #include "keymaps.h"
+ #include "sysemu/sysemu.h"
++#include "trace.h"
+ 
+ static int get_keysym(const name2keysym_t *table,
+                       const char *name)
+@@ -71,18 +72,14 @@ static void add_to_key_range(struct key_range **krp, int code) {
+ 
+ static void add_keysym(char *line, int keysym, int keycode, kbd_layout_t *k) {
+     if (keysym < MAX_NORMAL_KEYCODE) {
+-        /* fprintf(stderr,"Setting keysym %s (%d) to %d\n",
+-                   line, keysym, keycode); */
++        trace_keymap_add("normal", keysym, keycode, line);
+         k->keysym2keycode[keysym] = keycode;
+     } else {
+         if (k->extra_count >= MAX_EXTRA_COUNT) {
+             fprintf(stderr, "Warning: Could not assign keysym %s (0x%x)"
+                     " because of memory constraints.\n", line, keysym);
+         } else {
+-#if 0
+-            fprintf(stderr, "Setting %d: %d,%d\n",
+-                    k->extra_count, keysym, keycode);
+-#endif
++            trace_keymap_add("extra", keysym, keycode, line);
+             k->keysym2keycode_extra[k->extra_count].
+             keysym = keysym;
+             k->keysym2keycode_extra[k->extra_count].
+@@ -99,9 +96,11 @@ static kbd_layout_t *parse_keyboard_layout(const name2keysym_t *table,
+     FILE *f;
+     char * filename;
+     char line[1024];
++    char keyname[64];
+     int len;
+ 
+     filename = qemu_find_file(QEMU_FILE_TYPE_KEYMAP, language);
++    trace_keymap_parse(filename);
+     f = filename ? fopen(filename, "r") : NULL;
+     g_free(filename);
+     if (!f) {
+@@ -130,18 +129,21 @@ static kbd_layout_t *parse_keyboard_layout(const name2keysym_t *table,
+         if (!strncmp(line, "include ", 8)) {
+             parse_keyboard_layout(table, line + 8, k);
+         } else {
+-            char *end_of_keysym = line;
+-            while (*end_of_keysym != 0 && *end_of_keysym != ' ') {
+-                end_of_keysym++;
++            int offset = 0;
++            while (line[offset] != 0 &&
++                   line[offset] != ' ' &&
++                   offset < sizeof(keyname) - 1) {
++                keyname[offset] = line[offset];
++                offset++;
+             }
+-            if (*end_of_keysym) {
++            keyname[offset] = 0;
++            if (strlen(keyname)) {
+                 int keysym;
+-                *end_of_keysym = 0;
+-                keysym = get_keysym(table, line);
++                keysym = get_keysym(table, keyname);
+                 if (keysym == 0) {
+                     /* fprintf(stderr, "Warning: unknown keysym %s\n", line);*/
+                 } else {
+-                    const char *rest = end_of_keysym + 1;
++                    const char *rest = line + offset + 1;
+                     int keycode = strtol(rest, NULL, 0);
+ 
+                     if (strstr(rest, "numlock")) {
+@@ -165,10 +167,10 @@ static kbd_layout_t *parse_keyboard_layout(const name2keysym_t *table,
+ 
+                     if (strstr(rest, "addupper")) {
+                         char *c;
+-                        for (c = line; *c; c++) {
++                        for (c = keyname; *c; c++) {
+                             *c = qemu_toupper(*c);
+                         }
+-                        keysym = get_keysym(table, line);
++                        keysym = get_keysym(table, keyname);
+                         if (keysym) {
+                             add_keysym(line, keysym,
+                                        keycode | SCANCODE_SHIFT, k);
+@@ -194,6 +196,7 @@ int keysym2scancode(void *kbd_layout, int keysym)
+     kbd_layout_t *k = kbd_layout;
+     if (keysym < MAX_NORMAL_KEYCODE) {
+         if (k->keysym2keycode[keysym] == 0) {
++            trace_keymap_unmapped(keysym);
+             fprintf(stderr, "Warning: no scancode found for keysym %d\n",
+                     keysym);
+         }
+diff --git a/ui/trace-events b/ui/trace-events
+index 93fe5482e6..19ce5f85f6 100644
+--- a/ui/trace-events
++++ b/ui/trace-events
+@@ -46,3 +46,8 @@ qemu_spice_create_primary_surface(int qid, uint32_t sid, void *surface, int asyn
+ qemu_spice_destroy_primary_surface(int qid, uint32_t sid, int async) "%d sid=%u async=%d"
+ qemu_spice_wakeup(uint32_t qid) "%d"
+ qemu_spice_create_update(uint32_t left, uint32_t right, uint32_t top, uint32_t bottom) "lr %d -> %d,  tb -> %d -> %d"
++
++# ui/keymaps.c
++keymap_parse(const char *file) "file %s"
++keymap_add(const char *type, int sym, int code, const char *line) "%-6s sym=0x%04x code=0x%04x (line: %s)"
++keymap_unmapped(int sym) "sym=0x%04x"
+-- 
+2.9.3
