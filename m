@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54229)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54222)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dI4av-0003Ud-8h
+	(envelope-from <dgibson@ozlabs.org>) id 1dI4au-0003Ub-MX
 	for qemu-devel@nongnu.org; Mon, 05 Jun 2017 22:51:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dI4at-0002wq-R0
-	for qemu-devel@nongnu.org; Mon, 05 Jun 2017 22:51:45 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1dI4at-0002wy-Qn
+	for qemu-devel@nongnu.org; Mon, 05 Jun 2017 22:51:44 -0400
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Tue,  6 Jun 2017 12:51:20 +1000
-Message-Id: <20170606025135.2685-3-david@gibson.dropbear.id.au>
-In-Reply-To: <20170606025135.2685-1-david@gibson.dropbear.id.au>
-References: <20170606025135.2685-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [PULL 02/17] migration: Mark CPU states dirty before
- incoming migration/loadvm
+Date: Tue,  6 Jun 2017 12:51:18 +1000
+Message-Id: <20170606025135.2685-1-david@gibson.dropbear.id.au>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL 00/17] ppc-for-2.10 queue 20170606
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,176 +21,94 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org
-Cc: agraf@suse.de, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, mdroth@linux.vnet.ibm.com, David Gibson <david@gibson.dropbear.id.au>, Juan Quintela <quintela@redhat.com>, Dave Gilbert <dgilbert@redhat.com>
+Cc: agraf@suse.de, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, mdroth@linux.vnet.ibm.com, David Gibson <david@gibson.dropbear.id.au>
 
-As a rule, CPU internal state should never be updated when
-!cpu->kvm_vcpu_dirty (or the HAX equivalent).  If that is done, then
-subsequent calls to cpu_synchronize_state() - usually safe and idempotent -
-will clobber state.
+The following changes since commit 199e19ee538eb61fd08b1c1ee5aa838ebdcc96=
+8e:
 
-However, we routinely do this during a loadvm or incoming migration.
-Usually this is called shortly after a reset, which will clear all the cpu
-dirty flags with cpu_synchronize_all_post_reset().  Nothing is expected
-to set the dirty flags again before the cpu state is loaded from the
-incoming stream.
+  Merge remote-tracking branch 'remotes/mjt/tags/trivial-patches-fetch' i=
+nto staging (2017-06-05 15:28:12 +0100)
 
-This means that it isn't safe to call cpu_synchronize_state() from a
-post_load handler, which is non-obvious and potentially inconvenient.
+are available in the git repository at:
 
-We could cpu_synchronize_all_state() before the loadvm, but that would be
-overkill since a) we expect the state to already be synchronized from the
-reset and b) we expect to completely rewrite the state with a call to
-cpu_synchronize_all_post_init() at the end of qemu_loadvm_state().
+  git://github.com/dgibson/qemu.git tags/ppc-for-2.10-20170606
 
-To clear this up, this patch introduces cpu_synchronize_pre_loadvm() and
-associated helpers, which simply marks the cpu state as dirty without
-actually changing anything.  i.e. it says we want to discard any existing
-KVM (or HAX) state and replace it with what we're going to load.
+for you to fetch changes up to 91dcb1ffa67cfa41a13dcc89dd44e2310b5773b0:
 
-Cc: Juan Quintela <quintela@redhat.com>
-Cc: Dave Gilbert <dgilbert@redhat.com>
-Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-Reviewed-by: Juan Quintela <quintela@redhat.com>
----
- cpus.c                    |  9 +++++++++
- include/sysemu/cpus.h     |  1 +
- include/sysemu/hax.h      |  1 +
- include/sysemu/hw_accel.h | 10 ++++++++++
- include/sysemu/kvm.h      |  1 +
- kvm-all.c                 | 10 ++++++++++
- migration/savevm.c        |  2 ++
- target/i386/hax-all.c     | 10 ++++++++++
- 8 files changed, 44 insertions(+)
+  spapr: Remove some non-useful properties on DRC objects (2017-06-06 09:=
+24:25 +1000)
 
-diff --git a/cpus.c b/cpus.c
-index 516e5cb..6398439 100644
---- a/cpus.c
-+++ b/cpus.c
-@@ -921,6 +921,15 @@ void cpu_synchronize_all_post_init(void)
-     }
- }
- 
-+void cpu_synchronize_all_pre_loadvm(void)
-+{
-+    CPUState *cpu;
-+
-+    CPU_FOREACH(cpu) {
-+        cpu_synchronize_pre_loadvm(cpu);
-+    }
-+}
-+
- static int do_vm_stop(RunState state)
- {
-     int ret = 0;
-diff --git a/include/sysemu/cpus.h b/include/sysemu/cpus.h
-index a8053f1..731756d 100644
---- a/include/sysemu/cpus.h
-+++ b/include/sysemu/cpus.h
-@@ -27,6 +27,7 @@ void qemu_timer_notify_cb(void *opaque, QEMUClockType type);
- void cpu_synchronize_all_states(void);
- void cpu_synchronize_all_post_reset(void);
- void cpu_synchronize_all_post_init(void);
-+void cpu_synchronize_all_pre_loadvm(void);
- 
- void qtest_clock_warp(int64_t dest);
- 
-diff --git a/include/sysemu/hax.h b/include/sysemu/hax.h
-index d9f0239..232a68a 100644
---- a/include/sysemu/hax.h
-+++ b/include/sysemu/hax.h
-@@ -33,6 +33,7 @@ int hax_populate_ram(uint64_t va, uint32_t size);
- void hax_cpu_synchronize_state(CPUState *cpu);
- void hax_cpu_synchronize_post_reset(CPUState *cpu);
- void hax_cpu_synchronize_post_init(CPUState *cpu);
-+void hax_cpu_synchronize_pre_loadvm(CPUState *cpu);
- 
- #ifdef CONFIG_HAX
- 
-diff --git a/include/sysemu/hw_accel.h b/include/sysemu/hw_accel.h
-index c9b3105..469ffda 100644
---- a/include/sysemu/hw_accel.h
-+++ b/include/sysemu/hw_accel.h
-@@ -45,4 +45,14 @@ static inline void cpu_synchronize_post_init(CPUState *cpu)
-     }
- }
- 
-+static inline void cpu_synchronize_pre_loadvm(CPUState *cpu)
-+{
-+    if (kvm_enabled()) {
-+        kvm_cpu_synchronize_pre_loadvm(cpu);
-+    }
-+    if (hax_enabled()) {
-+        hax_cpu_synchronize_pre_loadvm(cpu);
-+    }
-+}
-+
- #endif /* QEMU_HW_ACCEL_H */
-diff --git a/include/sysemu/kvm.h b/include/sysemu/kvm.h
-index 5cc83f2..a45c145 100644
---- a/include/sysemu/kvm.h
-+++ b/include/sysemu/kvm.h
-@@ -459,6 +459,7 @@ int kvm_physical_memory_addr_from_host(KVMState *s, void *ram_addr,
- void kvm_cpu_synchronize_state(CPUState *cpu);
- void kvm_cpu_synchronize_post_reset(CPUState *cpu);
- void kvm_cpu_synchronize_post_init(CPUState *cpu);
-+void kvm_cpu_synchronize_pre_loadvm(CPUState *cpu);
- 
- void kvm_init_cpu_signals(CPUState *cpu);
- 
-diff --git a/kvm-all.c b/kvm-all.c
-index 7df27c8..494b925 100644
---- a/kvm-all.c
-+++ b/kvm-all.c
-@@ -1896,6 +1896,16 @@ void kvm_cpu_synchronize_post_init(CPUState *cpu)
-     run_on_cpu(cpu, do_kvm_cpu_synchronize_post_init, RUN_ON_CPU_NULL);
- }
- 
-+static void do_kvm_cpu_synchronize_pre_loadvm(CPUState *cpu, run_on_cpu_data arg)
-+{
-+    cpu->kvm_vcpu_dirty = true;
-+}
-+
-+void kvm_cpu_synchronize_pre_loadvm(CPUState *cpu)
-+{
-+    run_on_cpu(cpu, do_kvm_cpu_synchronize_pre_loadvm, RUN_ON_CPU_NULL);
-+}
-+
- #ifdef KVM_HAVE_MCE_INJECTION
- static __thread void *pending_sigbus_addr;
- static __thread int pending_sigbus_code;
-diff --git a/migration/savevm.c b/migration/savevm.c
-index 035c127..1993ca2 100644
---- a/migration/savevm.c
-+++ b/migration/savevm.c
-@@ -1999,6 +1999,8 @@ int qemu_loadvm_state(QEMUFile *f)
-         }
-     }
- 
-+    cpu_synchronize_all_pre_loadvm();
-+
-     ret = qemu_loadvm_state_main(f, mis);
-     qemu_event_set(&mis->main_thread_load_event);
- 
-diff --git a/target/i386/hax-all.c b/target/i386/hax-all.c
-index 7346931..097db5c 100644
---- a/target/i386/hax-all.c
-+++ b/target/i386/hax-all.c
-@@ -635,6 +635,16 @@ void hax_cpu_synchronize_post_init(CPUState *cpu)
-     run_on_cpu(cpu, do_hax_cpu_synchronize_post_init, RUN_ON_CPU_NULL);
- }
- 
-+static void do_hax_cpu_synchronize_pre_loadvm(CPUState *cpu, run_on_cpu_data arg)
-+{
-+    cpu->hax_vcpu_dirty = true;
-+}
-+
-+void hax_cpu_synchronize_pre_loadvm(CPUState *cpu)
-+{
-+    run_on_cpu(cpu, do_hax_cpu_synchronize_pre_loadvm, RUN_ON_CPU_NULL);
-+}
-+
- int hax_smp_cpu_exec(CPUState *cpu)
- {
-     CPUArchState *env = (CPUArchState *) (cpu->env_ptr);
--- 
-2.9.4
+----------------------------------------------------------------
+ppc patch queue 2017-06-06
+
+Accumulated patches for ppc targets and the pseries machine type.
+
+The big thing in this batch is a start on a substantial cleanup of the
+pseries hotplug mechanisms, which were pretty confusing.  For now
+these shouldn't cause substantial behavioural changes, but I am hoping
+these lead to clearer code and eventually to fixes for the bugs we
+have in hotplug handling, particularly when hotplug and migration are
+combined.
+
+The remaining patches are mostly bugfixes.
+
+----------------------------------------------------------------
+Aaron Larson (1):
+      target-ppc: Fix openpic timer read register offset
+
+C=C3=A9dric Le Goater (1):
+      ppc/pnv: check the return value of fdt_setprop()
+
+David Gibson (10):
+      migration: Mark CPU states dirty before incoming migration/loadvm
+      spapr: Move DRC RTAS calls into spapr_drc.c
+      spapr: Abolish DRC get_fdt method
+      spapr: Abolish DRC set_configured method
+      spapr: Make DRC get_index and get_type methods into plain functions
+      spapr: Introduce DRC subclasses
+      spapr: Clean up spapr_dr_connector_by_*()
+      spapr: Move configure-connector state into DRC
+      spapr: Eliminate spapr_drc_get_type_str()
+      spapr: Remove some non-useful properties on DRC objects
+
+Felipe Franciosi (1):
+      spapr: Allow boot from vhost-*-scsi backends
+
+Greg Kurz (1):
+      spapr/drc: don't migrate DRC of cold-plugged CPUs and LMBs
+
+Laurent Vivier (1):
+      migration: remove register_savevm()
+
+Peter Maydell (1):
+      spapr_nvram: Check return value from blk_getlength()
+
+Suraj Jitindar Singh (1):
+      target/ppc: Fixup set_spr error in h_register_process_table
+
+ cpus.c                      |   9 +
+ hw/intc/openpic.c           |  22 +-
+ hw/net/vmxnet3.c            |   8 +-
+ hw/nvram/spapr_nvram.c      |  10 +-
+ hw/ppc/pnv.c                |   5 +-
+ hw/ppc/spapr.c              |  58 +++--
+ hw/ppc/spapr_drc.c          | 573 +++++++++++++++++++++++++++++++-------=
+------
+ hw/ppc/spapr_events.c       |  12 +-
+ hw/ppc/spapr_hcall.c        |   5 +-
+ hw/ppc/spapr_pci.c          |  13 +-
+ hw/ppc/spapr_rtas.c         | 304 -----------------------
+ hw/s390x/s390-skeys.c       |   9 +-
+ hw/s390x/s390-virtio-ccw.c  |   8 +-
+ include/hw/ppc/spapr.h      |  14 --
+ include/hw/ppc/spapr_drc.h  |  69 +++++-
+ include/migration/vmstate.h |   8 -
+ include/sysemu/cpus.h       |   1 +
+ include/sysemu/hax.h        |   1 +
+ include/sysemu/hw_accel.h   |  10 +
+ include/sysemu/kvm.h        |   1 +
+ kvm-all.c                   |  10 +
+ migration/savevm.c          |  18 +-
+ slirp/slirp.c               |   8 +-
+ target/i386/hax-all.c       |  10 +
+ 24 files changed, 595 insertions(+), 591 deletions(-)
