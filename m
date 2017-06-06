@@ -1,32 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49010)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49590)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dIEfk-0008KA-FQ
-	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 09:37:25 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1dIEiF-00018p-V6
+	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 09:40:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dIEff-0004hx-Lh
-	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 09:37:24 -0400
-Received: from mail-yb0-x243.google.com ([2607:f8b0:4002:c09::243]:35142)
+	(envelope-from <peter.maydell@linaro.org>) id 1dIEiE-00066d-EI
+	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 09:39:59 -0400
+Received: from mail-wm0-x236.google.com ([2a00:1450:400c:c09::236]:37870)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dIEff-0004hr-HG
-	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 09:37:19 -0400
-Received: by mail-yb0-x243.google.com with SMTP id p198so3980441yba.2
-	for <qemu-devel@nongnu.org>; Tue, 06 Jun 2017 06:37:19 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <2b2311b1b070a0b03973e39deccf4682de4a6cd4.1496686997.git.alistair.francis@xilinx.com>
-	<CAJ+F1CLuPkWjG3Hn8hfaxTApn6+ouqh5nJZNWSQYX1C3_HRFqA@mail.gmail.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <e340cdb9-3c97-8624-81d9-f7888f819a68@amsat.org>
-Date: Tue, 6 Jun 2017 10:37:16 -0300
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1dIEiE-00065x-4M
+	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 09:39:58 -0400
+Received: by mail-wm0-x236.google.com with SMTP id d73so49175337wma.0
+	for <qemu-devel@nongnu.org>; Tue, 06 Jun 2017 06:39:57 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <CAJ+F1CLuPkWjG3Hn8hfaxTApn6+ouqh5nJZNWSQYX1C3_HRFqA@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v1 1/1] char-socket: Don't report TCP
- socket waiting as an error
+In-Reply-To: <20170602160848.4913-8-alex.bennee@linaro.org>
+References: <20170602160848.4913-1-alex.bennee@linaro.org>
+	<20170602160848.4913-8-alex.bennee@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 6 Jun 2017 14:39:35 +0100
+Message-ID: <CAFEAcA-8wW2qBEsk-awcsRsaAKdnERmYTfwsoSMBwQqiahDfnw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [RISU PATCH v4 07/10] risu: add simple trace and
+ replay support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,89 +31,258 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@gmail.com>, Alistair Francis <alistair.francis@xilinx.com>, qemu-devel@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>, pbonzini@redhat.com
-Cc: alistair23@gmail.com
+To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-On 06/06/2017 08:58 AM, Marc-André Lureau wrote:
-> Hi
+On 2 June 2017 at 17:08, Alex Benn=C3=A9e <alex.bennee@linaro.org> wrote:
+> This adds a very dumb and easily breakable trace and replay support. In
+> --master mode the various risu ops trigger a write of register/memory
+> state into a binary file which can be played back to an apprentice.
+> Currently there is no validation of the image source so feeding the
+> wrong image will fail straight away.
 >
-> On Mon, Jun 5, 2017 at 10:37 PM Alistair Francis <
-> alistair.francis@xilinx.com> wrote:
+> The trace files will get very big for any appreciable sized test file
+> and this will be addressed in later patches.
 >
->> When QEMU is waiting for a TCP socket connection it reports that message as
->> an error. This isn't an error though, so let's change the report to just
->> use qemu_log().
->>
->>
-> I don't think this is a good idea, since stdout output my be mixed with
-> console or other expected output.
+> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
 >
-> In fact, it used to be on stdout, and got moved to stderr:
+> ---
+> v4
+>   - fix formatting mess
+>   - abort() instead of reporting de-sync
+>   - don't fake return for compiler
+> v3
+>   - fix options parsing
+>   - re-factored so no need for copy & paste
+> v2
+>   - moved read/write functions into main risu.c
+>   - cleaned up formatting
+>   - report more in apprentice --trace mode
+> ---
+>  risu.c | 97 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++---=
+------
+>  1 file changed, 84 insertions(+), 13 deletions(-)
+>
+> diff --git a/risu.c b/risu.c
+> index 22571cd..137cbbf 100644
+> --- a/risu.c
+> +++ b/risu.c
+> @@ -31,6 +31,7 @@
+>  void *memblock =3D 0;
+>
+>  int apprentice_socket, master_socket;
+> +int trace_file =3D 0;
+>
+>  sigjmp_buf jmpbuf;
+>
+> @@ -40,10 +41,12 @@ int test_fp_exc =3D 0;
+>  long executed_tests =3D 0;
+>  void report_test_status(void *pc)
+>  {
+> -   executed_tests +=3D 1;
+> -   if (executed_tests % 100 =3D=3D 0) {
+> -      fprintf(stderr,"Executed %ld test instructions (pc=3D%p)\r",
+> -              executed_tests, pc);
+> +   if (ismaster || trace_file) {
+> +      executed_tests +=3D 1;
+> +      if (executed_tests % 100 =3D=3D 0) {
+> +         fprintf(stderr,"Executed %ld test instructions (pc=3D%p)\r",
+> +                 executed_tests, pc);
+> +      }
+>     }
+>  }
+>
+> @@ -54,6 +57,12 @@ int read_sock(void *ptr, size_t bytes)
+>     return recv_data_pkt(master_socket, ptr, bytes);
+>  }
+>
+> +int write_trace(void *ptr, size_t bytes)
+> +{
+> +   size_t res =3D write(trace_file, ptr, bytes);
+> +   return (res =3D=3D bytes) ? 0 : 1;
+> +}
+> +
+>  void respond_sock(int r)
+>  {
+>     send_response_byte(master_socket, r);
+> @@ -66,9 +75,36 @@ int write_sock(void *ptr, size_t bytes)
+>     return send_data_pkt(apprentice_socket, ptr, bytes);
+>  }
+>
+> +int read_trace(void *ptr, size_t bytes)
+> +{
+> +   size_t res =3D read(trace_file, ptr, bytes);
+> +   return (res =3D=3D bytes) ? 0 : 1;
+> +}
+> +
+> +void respond_trace(int r)
+> +{
+> +   switch (r) {
+> +      case 0: /* test ok */
+> +      case 1: /* end of test */
+> +         break;
+> +      default:
+> +         /* should not get here */
+> +         abort();
+> +         break;
+> +   }
+> +}
+> +
+>  void master_sigill(int sig, siginfo_t *si, void *uc)
+>  {
+> -   switch (recv_and_compare_register_info(read_sock, respond_sock, uc))
+> +   int r;
+> +
+> +   if (trace_file) {
+> +      r =3D send_register_info(write_trace, uc);
+> +   } else {
+> +      r =3D recv_and_compare_register_info(read_sock, respond_sock, uc);
+> +   }
 
-This is somehow confusing. I don't think it is worth having another 
-qemu_log_stderr() function rather than using error_report() but this 
-very call might deserve a comment explaining this unusual use. What do 
-you think?
+It's a bit weird that in the trace file case we send the data
+from the master, but in the normal case we send it from
+the apprentice end.
 
+> +
+> +   switch (r)
+>     {
+>        case 0:
+>           /* match OK */
+> @@ -82,7 +118,15 @@ void master_sigill(int sig, siginfo_t *si, void *uc)
 >
-> commit fdca2124adc293f84f2b7aaf0df43faa6b6bf420
-> Author: Gerd Hoffmann <kraxel@redhat.com>
-> Date:   Mon Jun 24 08:39:49 2013 +0200
+>  void apprentice_sigill(int sig, siginfo_t *si, void *uc)
+>  {
+> -   switch (send_register_info(write_sock, uc))
+> +   int r;
+> +
+> +   if (trace_file) {
+> +      r =3D recv_and_compare_register_info(read_trace, respond_trace, uc=
+);
+> +   } else {
+> +      r =3D send_register_info(write_sock, uc);
+> +   }
+> +
+> +   switch (r)
+>     {
+>        case 0:
+>           /* match OK */
+> @@ -94,6 +138,9 @@ void apprentice_sigill(int sig, siginfo_t *si, void *u=
+c)
+>           exit(0);
+>        default:
+>           /* mismatch */
+> +         if (trace_file) {
+> +            report_match_status();
+> +         }
+
+report_match_status() uses stdio, you can't call it from a signal handler.
+
+>           exit(1);
+>     }
+>  }
+> @@ -155,7 +202,13 @@ int master(int sock)
+>  {
+>     if (sigsetjmp(jmpbuf, 1))
+>     {
+> -      return report_match_status();
+> +      if (trace_file) {
+> +         close(trace_file);
+> +         fprintf(stderr,"\nDone...\n");
+> +         return 0;
+> +      } else {
+> +         return report_match_status();
+> +      }
+>     }
+>     master_socket =3D sock;
+>     set_sigill_handler(&master_sigill);
+> @@ -184,6 +237,7 @@ void usage (void)
+>     fprintf(stderr, "between master and apprentice risu processes.\n\n");
+>     fprintf(stderr, "Options:\n");
+>     fprintf(stderr, "  --master          Be the master (server)\n");
+> +   fprintf(stderr, "  -t, --trace=3DFILE  Record/playback trace file\n")=
+;
+>     fprintf(stderr, "  -h, --host=3DHOST   Specify master host machine (a=
+pprentice only)\n");
+>     fprintf(stderr, "  -p, --port=3DPORT   Specify the port to connect to=
+/listen on (default 9191)\n");
+>  }
+> @@ -194,6 +248,7 @@ int main(int argc, char **argv)
+>     uint16_t port =3D 9191;
+>     char *hostname =3D "localhost";
+>     char *imgfile;
+> +   char *trace_fn =3D NULL;
+>     int sock;
 >
->     qemu-char: print notification to stderr
+>     // TODO clean this up later
+> @@ -204,13 +259,14 @@ int main(int argc, char **argv)
+>           {
+>              { "help", no_argument, 0, '?'},
+>              { "master", no_argument, &ismaster, 1 },
+> +            { "trace", required_argument, 0, 't' },
+>              { "host", required_argument, 0, 'h' },
+>              { "port", required_argument, 0, 'p' },
+>              { "test-fp-exc", no_argument, &test_fp_exc, 1 },
+>              { 0,0,0,0 }
+>           };
+>        int optidx =3D 0;
+> -      int c =3D getopt_long(argc, argv, "h:p:", longopts, &optidx);
+> +      int c =3D getopt_long(argc, argv, "h:p:t:", longopts, &optidx);
+>        if (c =3D=3D -1)
+>        {
+>           break;
+> @@ -223,6 +279,11 @@ int main(int argc, char **argv)
+>              /* flag set by getopt_long, do nothing */
+>              break;
+>           }
+> +         case 't':
+> +         {
+> +           trace_fn =3D optarg;
+> +           break;
+> +         }
+>           case 'h':
+>           {
+>              hostname =3D optarg;
+> @@ -253,17 +314,27 @@ int main(int argc, char **argv)
+>     }
 >
->     Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
->     Reviewed-by: Laszlo Ersek <lersek@redhat.com>
->     Signed-off-by: Michael Tokarev <mjt@tls.msk.ru>
+>     load_image(imgfile);
+> -
+> +
+>     if (ismaster)
+>     {
+> -      fprintf(stderr, "master port %d\n", port);
+> -      sock =3D master_connect(port);
+> +      if (trace_fn)
+> +      {
+> +         trace_file =3D open(trace_fn, O_WRONLY|O_CREAT, S_IRWXU);
+> +      } else {
+> +         fprintf(stderr, "master port %d\n", port);
+> +         sock =3D master_connect(port);
+> +      }
+>        return master(sock);
+
+Doesn't this call master() with an uninitialized sock if
+the trace file is in use ?
+
+>     }
+>     else
+>     {
+> -      fprintf(stderr, "apprentice host %s port %d\n", hostname, port);
+> -      sock =3D apprentice_connect(hostname, port);
+> +      if (trace_fn)
+> +      {
+> +         trace_file =3D open(trace_fn, O_RDONLY);
+> +      } else {
+> +         fprintf(stderr, "apprentice host %s port %d\n", hostname, port)=
+;
+> +         sock =3D apprentice_connect(hostname, port);
+> +      }
+>        return apprentice(sock);
+>     }
+>  }
+> --
+> 2.13.0
 >
-> diff --git a/qemu-char.c b/qemu-char.c
-> index e3b3224886..371f6308c5 100644
-> --- a/qemu-char.c
-> +++ b/qemu-char.c
-> @@ -2666,8 +2666,8 @@ static CharDriverState *qemu_chr_open_socket_fd(int
-> fd, bool do_nodelay,
->      }
->
->      if (is_listen && is_waitconnect) {
-> -        printf("QEMU waiting for connection on: %s\n",
-> -               chr->filename);
-> +        fprintf(stderr, "QEMU waiting for connection on: %s\n",
-> +                chr->filename);
->
->
-> Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
->> ---
->>
->>  chardev/char-socket.c | 3 ++-
->>  1 file changed, 2 insertions(+), 1 deletion(-)
->>
->> diff --git a/chardev/char-socket.c b/chardev/char-socket.c
->> index ccc499cfa1..a9884fa85b 100644
->> --- a/chardev/char-socket.c
->> +++ b/chardev/char-socket.c
->> @@ -27,6 +27,7 @@
->>  #include "io/channel-tls.h"
->>  #include "qemu/error-report.h"
->>  #include "qapi/error.h"
->> +#include "qemu/log.h"
->>  #include "qapi/clone-visitor.h"
->>
->>  #include "chardev/char-io.h"
->> @@ -765,7 +766,7 @@ static int tcp_chr_wait_connected(Chardev *chr, Error
->> **errp)
->>       * in TLS and telnet cases, only wait for an accepted socket */
->>      while (!s->ioc) {
->>          if (s->is_listen) {
->> -            error_report("QEMU waiting for connection on: %s",
->> +            qemu_log("QEMU waiting for connection on: %s",
->>                           chr->filename);
->>              qio_channel_set_blocking(QIO_CHANNEL(s->listen_ioc), true,
->> NULL);
->>              tcp_chr_accept(QIO_CHANNEL(s->listen_ioc), G_IO_IN, chr);
->> --
->> 2.11.0
->>
->>
->> --
-> Marc-André Lureau
->
+
+thanks
+-- PMM
