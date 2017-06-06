@@ -1,28 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55761)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57702)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <guangrong.xiao@gmail.com>) id 1dI4fu-0008Sl-W4
-	for qemu-devel@nongnu.org; Mon, 05 Jun 2017 22:56:55 -0400
+	(envelope-from <peterx@redhat.com>) id 1dI4mf-0007CK-1E
+	for qemu-devel@nongnu.org; Mon, 05 Jun 2017 23:03:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <guangrong.xiao@gmail.com>) id 1dI4fr-0005Av-QZ
-	for qemu-devel@nongnu.org; Mon, 05 Jun 2017 22:56:55 -0400
-Received: from mail-pg0-x242.google.com ([2607:f8b0:400e:c05::242]:34162)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <guangrong.xiao@gmail.com>)
-	id 1dI4fr-00059l-IR
-	for qemu-devel@nongnu.org; Mon, 05 Jun 2017 22:56:51 -0400
-Received: by mail-pg0-x242.google.com with SMTP id v14so8000388pgn.1
-	for <qemu-devel@nongnu.org>; Mon, 05 Jun 2017 19:56:49 -0700 (PDT)
-References: <20170503105224.19049-1-xiaoguangrong@tencent.com>
-	<593509FB.3070605@huawei.com>
-From: Xiao Guangrong <guangrong.xiao@gmail.com>
-Message-ID: <7f5df260-63e3-7f7e-ff79-d2bc6fbf57f9@gmail.com>
-Date: Tue, 6 Jun 2017 10:56:55 +0800
+	(envelope-from <peterx@redhat.com>) id 1dI4me-0008Fv-63
+	for qemu-devel@nongnu.org; Mon, 05 Jun 2017 23:03:53 -0400
+Date: Tue, 6 Jun 2017 11:03:34 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20170606030334.GA23580@pxdev.xzpeter.org>
+References: <20170605104851.61818-1-haoqf@linux.vnet.ibm.com>
+	<20170605104851.61818-2-haoqf@linux.vnet.ibm.com>
 MIME-Version: 1.0
-In-Reply-To: <593509FB.3070605@huawei.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 0/7] KVM: MMU: fast write protect
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20170605104851.61818-2-haoqf@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH v1 1/1] qemu/migration: fix the double free
+ problem on from_src_file
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,43 +24,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jay Zhou <jianjay.zhou@huawei.com>, pbonzini@redhat.com, mtosatti@redhat.com, avi.kivity@gmail.com, rkrcmar@redhat.com
-Cc: Xiao Guangrong <xiaoguangrong@tencent.com>, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, qemu-devel@nongnu.org
+To: QingFeng Hao <haoqf@linux.vnet.ibm.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, borntraeger@de.ibm.com, cornelia.huck@de.ibm.com, liujbjl@linux.vnet.ibm.com, kwolf@redhat.com, famz@redhat.com
 
-
-
-On 06/05/2017 03:36 PM, Jay Zhou wrote:
-
->>   /* enable ucontrol for s390 */
->>   struct kvm_s390_ucas_mapping {
->> diff --git a/memory.c b/memory.c
->> index 4c95aaf..b836675 100644
->> --- a/memory.c
->> +++ b/memory.c
->> @@ -809,6 +809,13 @@ static void address_space_update_ioeventfds(AddressSpace *as)
->>       flatview_unref(view);
->>   }
->>
->> +static write_protect_all_fn write_func;
+On Mon, Jun 05, 2017 at 12:48:51PM +0200, QingFeng Hao wrote:
+> In load_vmstate, mis->from_src_file is freed twice, the first free is by
+> qemu_fclose, the second is by migration_incoming_state_destroy and
+> it causes Illegal instruction exception. The fix is just to remove the
+> first free.
 > 
-> I think there should be a declaration in memory.h,
+> This problem is found by qemu-iotests case 068 since commit
+> "660819b migration: shut src return path unconditionally". The error is:
+> 068 1s ... - output mismatch (see 068.out.bad)
+>     --- tests/qemu-iotests/068.out	2017-05-06 01:00:26.417270437 +0200
+>     +++ 068.out.bad	2017-06-03 13:59:55.360274640 +0200
+>     @@ -6,6 +6,8 @@
+>      QEMU X.Y.Z monitor - type 'help' for more information
+>      (qemu) savevm 0
+>      (qemu) quit
+>     +./common.config: line 107: 242472 Illegal instruction     (core dumped) ( if [ -n "${QEMU_NEED_PID}" ]; then
+>     +    echo $BASHPID > "${QEMU_TEST_DIR}/qemu-${_QEMU_HANDLE}.pid";
+>     +fi; exec "$QEMU_PROG" $QEMU_OPTIONS "$@" )
+>      QEMU X.Y.Z monitor - type 'help' for more information
+>     -(qemu) quit
+>     -*** done
+>     +(qemu) *** done
 > 
-> diff --git a/include/exec/memory.h b/include/exec/memory.h
-> index 7fc3f48..31f3098 100644
-> --- a/include/exec/memory.h
-> +++ b/include/exec/memory.h
-> @@ -1152,6 +1152,9 @@ void memory_global_dirty_log_start(void);
->    */
->   void memory_global_dirty_log_stop(void);
+> Signed-off-by: QingFeng Hao <haoqf@linux.vnet.ibm.com>
+> ---
+>  migration/savevm.c | 1 -
+>  1 file changed, 1 deletion(-)
 > 
-> +typedef void (*write_protect_all_fn)(bool write);
-> +void memory_register_write_protect_all(write_protect_all_fn func);
-> +
->   void mtree_info(fprintf_function mon_printf, void *f);
-> 
+> diff --git a/migration/savevm.c b/migration/savevm.c
+> index 9c320f59d0..853e14e34e 100644
+> --- a/migration/savevm.c
+> +++ b/migration/savevm.c
+> @@ -2290,7 +2290,6 @@ int load_snapshot(const char *name, Error **errp)
+>  
+>      aio_context_acquire(aio_context);
+>      ret = qemu_loadvm_state(f);
+> -    qemu_fclose(f);
+>      aio_context_release(aio_context);
+>  
+>      migration_incoming_state_destroy();
 
-Thanks for your suggestion, Jay!
+Thanks QingFeng for the fix!
 
-This code just demonstrates how to enable this feature in QEMU, i will
-carefully consider it and merger your suggestion when the formal patch
-is posted out.
+Reviewed-by: Peter Xu <peterx@redhat.com>
+
+Though here instead of removing the fclose(), not sure whether this is
+nicer:
+
+diff --git a/migration/savevm.c b/migration/savevm.c
+index 9c320f5..1feb519 100644
+--- a/migration/savevm.c
++++ b/migration/savevm.c
+@@ -2233,7 +2233,6 @@ int load_snapshot(const char *name, Error **errp)
+     QEMUFile *f;
+     int ret;
+     AioContext *aio_context;
+-    MigrationIncomingState *mis = migration_incoming_get_current();
+ 
+     if (!bdrv_all_can_snapshot(&bs)) {
+         error_setg(errp,
+@@ -2286,7 +2285,6 @@ int load_snapshot(const char *name, Error **errp)
+     }
+ 
+     qemu_system_reset(SHUTDOWN_CAUSE_NONE);
+-    mis->from_src_file = f;
+ 
+     aio_context_acquire(aio_context);
+     ret = qemu_loadvm_state(f);
+
+Since I see we setup from_src_file but we don't really use it. If we
+remove that line, we can also remove the
+migration_incoming_get_current() call altogether.
+
+Either way work for me. So my r-b stands always. :-)
+
+-- 
+Peter Xu
