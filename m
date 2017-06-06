@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51714)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52923)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dIGNO-0004Rr-Bd
-	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 11:26:35 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1dIGPZ-00070P-1J
+	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 11:28:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dIGNK-0008HF-K0
-	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 11:26:34 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34580)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1dIGNK-0008H7-Dg
-	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 11:26:30 -0400
-References: <20170606150115.17264-1-pbonzini@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <e1b46b93-b3b7-baab-c387-aa71baef832e@redhat.com>
-Date: Tue, 6 Jun 2017 17:26:22 +0200
+	(envelope-from <peter.maydell@linaro.org>) id 1dIGPY-0000sc-7x
+	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 11:28:49 -0400
+Received: from mail-wm0-x22a.google.com ([2a00:1450:400c:c09::22a]:35013)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1dIGPY-0000sD-21
+	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 11:28:48 -0400
+Received: by mail-wm0-x22a.google.com with SMTP id x70so39753003wme.0
+	for <qemu-devel@nongnu.org>; Tue, 06 Jun 2017 08:28:47 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20170606150115.17264-1-pbonzini@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] docs: create config/,
- devel/ and spin/ subdirectories
+In-Reply-To: <149676257351.31274.10816877292939465521.stgit@bahia.lab.toulouse-stg.fr.ibm.com>
+References: <149676256254.31274.13156728863519964419.stgit@bahia.lab.toulouse-stg.fr.ibm.com>
+	<149676257351.31274.10816877292939465521.stgit@bahia.lab.toulouse-stg.fr.ibm.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 6 Jun 2017 16:28:26 +0100
+Message-ID: <CAFEAcA9zBLPbkQECRaU0qM4-dKio31EqbkQQzK47rturNqcZpQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH 2/3] target/ppc: fix memory leak in
+ kvmppc_is_mem_backend_page_size_ok()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,45 +30,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
-Cc: stefanha@redhat.com, peter.maydell@linaro.org, berrange@redhat.com
+To: Greg Kurz <groug@kaod.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Thomas Huth <thuth@redhat.com>, "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>, qemu-stable <qemu-stable@nongnu.org>, David Gibson <david@gibson.dropbear.id.au>
 
-On 06.06.2017 17:01, Paolo Bonzini wrote:
-> Developer documentation should be its own manual.  As a start, move all
-> developer-oriented files to a separate directory.
-> 
-> Also move non-text files to their own directories: docs/config/ for
-> QEMU -readconfig input, and docs/spin/ for formal models to be used
-> with the SPIN model checker.
-> 
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+On 6 June 2017 at 16:22, Greg Kurz <groug@kaod.org> wrote:
+> The string returned by object_property_get_str() is dynamically allocated.
+>
+> Signed-off-by: Greg Kurz <groug@kaod.org>
 > ---
->  docs/{ => config}/ich9-ehci-uhci.cfg       | 0
->  docs/{ => config}/mach-virt-graphical.cfg  | 0
->  docs/{ => config}/mach-virt-serial.cfg     | 0
->  docs/{ => config}/q35-emulated.cfg         | 0
->  docs/{ => config}/q35-virtio-graphical.cfg | 0
->  docs/{ => config}/q35-virtio-serial.cfg    | 0
->  docs/{ => devel}/atomics.txt               | 0
->  docs/{ => devel}/bitmaps.md                | 0
->  docs/{ => devel}/blkdebug.txt              | 0
->  docs/{ => devel}/blkverify.txt             | 0
->  docs/{ => devel}/build-system.txt          | 0
->  docs/{ => devel}/lockcnt.txt               | 0
->  docs/{ => devel}/memory.txt                | 0
->  docs/{ => devel}/migration.txt             | 0
->  docs/{ => devel}/multi-thread-tcg.txt      | 0
->  docs/{ => devel}/multiple-iothreads.txt    | 0
->  docs/{ => devel}/qapi-code-gen.txt         | 0
->  docs/{ => devel}/rcu.txt                   | 0
->  docs/{ => devel}/tracing.txt               | 0
->  docs/{ => devel}/virtio-migration.txt      | 0
->  docs/{ => devel}/writing-qmp-commands.txt  | 0
->  docs/{ => spin}/aio_notify.promela         | 0
->  docs/{ => spin}/aio_notify_accept.promela  | 0
->  docs/{ => spin}/aio_notify_bug.promela     | 0
->  docs/{ => spin}/tcg-exclusive.promela      | 0
->  docs/{ => spin}/win32-qemu-event.promela   | 0
->  26 files changed, 0 insertions(+), 0 deletions(-)
+>  target/ppc/kvm.c |    1 +
+>  1 file changed, 1 insertion(+)
+>
+> diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
+> index 88817620766c..f2f7c531bc7b 100644
+> --- a/target/ppc/kvm.c
+> +++ b/target/ppc/kvm.c
+> @@ -486,6 +486,7 @@ bool kvmppc_is_mem_backend_page_size_ok(const char *obj_path)
+>
+>      if (mempath) {
+>          pagesize = qemu_mempath_getpagesize(mempath);
+> +        g_free(mempath);
+>      } else {
+>          pagesize = getpagesize();
+>      }
 
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+Huh, I wasn't expecting this function to free its argument.
+If we take that API then don't we also need to change the
+two other implementations of it in the tree? Having the
+single caller do the g_free() seems simpler...
+
+thanks
+-- PMM
