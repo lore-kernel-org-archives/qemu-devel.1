@@ -1,23 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40543)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41264)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1dIIjU-00042d-Oo
-	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 13:57:33 -0400
+	(envelope-from <dan.j.williams@intel.com>) id 1dIIl6-0004pO-Kr
+	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 13:59:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1dIIjU-00067i-2q
-	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 13:57:32 -0400
-From: Juan Quintela <quintela@redhat.com>
-In-Reply-To: <20170606124953.GD5448@noname.redhat.com> (Kevin Wolf's message
-	of "Tue, 6 Jun 2017 14:49:53 +0200")
-References: <20170606052438.35405-1-haoqf@linux.vnet.ibm.com>
-	<20170606052438.35405-2-haoqf@linux.vnet.ibm.com>
-	<20170606124953.GD5448@noname.redhat.com>
-Reply-To: quintela@redhat.com
-Date: Tue, 06 Jun 2017 19:57:16 +0200
-Message-ID: <874lvt579f.fsf@secure.mitica>
+	(envelope-from <dan.j.williams@intel.com>) id 1dIIl5-00070O-Jd
+	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 13:59:12 -0400
+Received: from mail-ot0-x229.google.com ([2607:f8b0:4003:c0f::229]:33725)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <dan.j.williams@intel.com>)
+	id 1dIIl5-0006zZ-Dj
+	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 13:59:11 -0400
+Received: by mail-ot0-x229.google.com with SMTP id k4so19984068otd.0
+	for <qemu-devel@nongnu.org>; Tue, 06 Jun 2017 10:59:08 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v2 1/1] qemu/migration: fix the double free
- problem on from_src_file
+In-Reply-To: <20170606072229.9302-3-haozhong.zhang@intel.com>
+References: <20170606072229.9302-1-haozhong.zhang@intel.com>
+	<20170606072229.9302-3-haozhong.zhang@intel.com>
+From: Dan Williams <dan.j.williams@intel.com>
+Date: Tue, 6 Jun 2017 10:59:07 -0700
+Message-ID: <CAPcyv4hf+XAabjswqhkq7HsixBuBnivJuwgC7tvdzHC3_EDhxg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v2 2/4] nvdimm: warn if the backend is not
+ a DAX device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,53 +30,133 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: QingFeng Hao <haoqf@linux.vnet.ibm.com>, famz@redhat.com, qemu-block@nongnu.org, liujbjl@linux.vnet.ibm.com, qemu-devel@nongnu.org, peterx@redhat.com, dgilbert@redhat.com, borntraeger@de.ibm.com, cornelia.huck@de.ibm.com
+To: Haozhong Zhang <haozhong.zhang@intel.com>
+Cc: qemu-devel@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Xiao Guangrong <guangrong.xiao@gmail.com>, Stefan Hajnoczi <stefanha@gmail.com>
 
-Kevin Wolf <kwolf@redhat.com> wrote:
-> Am 06.06.2017 um 07:24 hat QingFeng Hao geschrieben:
->> In load_snapshot, mis->from_src_file is freed twice, the first free is by
->> qemu_fclose, the second is by migration_incoming_state_destroy and
->> it causes Illegal instruction exception. The fix is just to remove the
->> first free.
->> 
->> This problem is found by qemu-iotests case 068 since commit
->> "660819b migration: shut src return path unconditionally". The error is:
->> 068 1s ... - output mismatch (see 068.out.bad)
->>     --- tests/qemu-iotests/068.out	2017-05-06 01:00:26.417270437 +0200
->>     +++ 068.out.bad	2017-06-03 13:59:55.360274640 +0200
->>     @@ -6,6 +6,8 @@
->>      QEMU X.Y.Z monitor - type 'help' for more information
->>      (qemu) savevm 0
->>      (qemu) quit
->>     +./common.config: line 107: 242472 Illegal instruction     (core dumped) ( if [ -n "${QEMU_NEED_PID}" ]; then
->>     +    echo $BASHPID > "${QEMU_TEST_DIR}/qemu-${_QEMU_HANDLE}.pid";
->>     +fi; exec "$QEMU_PROG" $QEMU_OPTIONS "$@" )
->>      QEMU X.Y.Z monitor - type 'help' for more information
->>     -(qemu) quit
->>     -*** done
->>     +(qemu) *** done
->> 
->> Signed-off-by: QingFeng Hao <haoqf@linux.vnet.ibm.com>
->> Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
->> Reviewed-by: Peter Xu <peterx@redhat.com>
+On Tue, Jun 6, 2017 at 12:22 AM, Haozhong Zhang
+<haozhong.zhang@intel.com> wrote:
+> Applications in Linux guest that use device-dax never trigger flush
+> that can be trapped by KVM/QEMU. Meanwhile, if the host backend is not
+> device-dax, QEMU cannot guarantee the persistence of guest writes.
+> Before solving this flushing problem, QEMU should warn users if the
+> host backend is not device-dax.
 >
-> Dave, as you only gave R-b rather than merging the patch, should this be
-> merged through the block tree?
-
-I got it.  I will send a pull request later Today.
-
-
+> Signed-off-by: Haozhong Zhang <haozhong.zhang@intel.com>
+> Message-id: CAPcyv4hV2-ZW8SMCRtD0P_86KgR3DHOvNe+6T5SY2u7wXg3gEg@mail.gmail.com
+> ---
+>  hw/mem/nvdimm.c      |  6 ++++++
+>  include/qemu/osdep.h |  9 ++++++++
+>  util/osdep.c         | 61 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+>  3 files changed, 76 insertions(+)
 >
-> Did we check other callers of migration_incoming_state_destroy()?
+> diff --git a/hw/mem/nvdimm.c b/hw/mem/nvdimm.c
+> index a9b0863f20..b23542fbdf 100644
+> --- a/hw/mem/nvdimm.c
+> +++ b/hw/mem/nvdimm.c
+> @@ -26,6 +26,7 @@
+>  #include "qapi/error.h"
+>  #include "qapi/visitor.h"
+>  #include "hw/mem/nvdimm.h"
+> +#include "qemu/error-report.h"
 >
-> For example, qmp_xen_load_devices_state() looks suspicious, too.
+>  static void nvdimm_get_label_size(Object *obj, Visitor *v, const char *name,
+>                                    void *opaque, Error **errp)
+> @@ -84,6 +85,11 @@ static void nvdimm_realize(PCDIMMDevice *dimm, Error **errp)
+>      NVDIMMDevice *nvdimm = NVDIMM(dimm);
+>      uint64_t align, pmem_size, size = memory_region_size(mr);
 >
-> I can't tell for postcopy_ram_listen_thread() - commit 660819b didn't
-> seem to remove a qemu_fclose() call there, but I can't see one left
-> behind either. Was the file leaked before commit 660819b or am I
-> missing something?
+> +    if (!qemu_fd_is_dev_dax(memory_region_get_fd(mr))) {
+> +        error_report("warning: nvdimm backend does not look like a DAX device, "
+> +                     "unable to guarantee persistence of guest writes");
+> +    }
+> +
+>      align = memory_region_get_alignment(mr);
+>
+>      pmem_size = size - nvdimm->label_size;
+> diff --git a/include/qemu/osdep.h b/include/qemu/osdep.h
+> index 1c9f5e260c..7f26af371e 100644
+> --- a/include/qemu/osdep.h
+> +++ b/include/qemu/osdep.h
+> @@ -470,4 +470,13 @@ char *qemu_get_pid_name(pid_t pid);
+>   */
+>  pid_t qemu_fork(Error **errp);
+>
+> +/**
+> + * qemu_fd_is_dev_dax:
+> + *
+> + * Check whether @fd describes a DAX device.
+> + *
+> + * Returns true if it is; otherwise, return false.
+> + */
+> +bool qemu_fd_is_dev_dax(int fd);
+> +
+>  #endif
+> diff --git a/util/osdep.c b/util/osdep.c
+> index a2863c8e53..02881f96bc 100644
+> --- a/util/osdep.c
+> +++ b/util/osdep.c
+> @@ -471,3 +471,64 @@ writev(int fd, const struct iovec *iov, int iov_cnt)
+>      return readv_writev(fd, iov, iov_cnt, true);
+>  }
+>  #endif
+> +
+> +#ifdef __linux__
+> +static ssize_t qemu_dev_dax_sysfs_read(int fd, const char *entry,
+> +                                       char *buf, size_t len)
+> +{
+> +    ssize_t read_bytes;
+> +    struct stat st;
+> +    unsigned int major, minor;
+> +    char *path, *pos;
+> +    int sysfs_fd;
+> +
+> +    if (fstat(fd, &st)) {
+> +        return 0;
+> +    }
+> +
+> +    major = major(st.st_rdev);
+> +    minor = minor(st.st_rdev);
+> +    path = g_strdup_printf("/sys/dev/char/%u:%u/%s", major, minor, entry);
+> +
+> +    sysfs_fd = open(path, O_RDONLY);
+> +    g_free(path);
+> +    if (sysfs_fd == -1) {
+> +        return 0;
+> +    }
+> +
+> +    read_bytes = read(sysfs_fd, buf, len - 1);
+> +    close(sysfs_fd);
+> +    if (read_bytes > 0) {
+> +        buf[read_bytes] = '\0';
+> +        pos = g_strstr_len(buf, read_bytes, "\n");
+> +        if (pos) {
+> +            *pos = '\0';
+> +        }
+> +    }
+> +
+> +    return read_bytes;
+> +}
+> +#endif /* __linux__ */
+> +
+> +bool qemu_fd_is_dev_dax(int fd)
+> +{
+> +    bool is_dax = false;
+> +
+> +#ifdef __linux__
+> +    char devtype[7];
+> +    ssize_t len;
+> +
+> +    if (fd == -1) {
+> +        return false;
+> +    }
+> +
+> +    len = qemu_dev_dax_sysfs_read(fd, "device/devtype",
+> +                                  devtype, sizeof(devtype));
+> +    if (len <= 0) {
+> +        return false;
+> +    }
+> +    is_dax = !strncmp(devtype, "nd_dax", len);
 
-I will take a look at those.
-
-Thanks, Juan.
+There's no guarantee that device-dax instances are always parented by
+an "nd_dax" device-type. A more reliable check is to see if
+"/sys/dev/char/%u:%u/subsystem" points to "/sys/class/dax".
