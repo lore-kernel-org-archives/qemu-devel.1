@@ -1,34 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53367)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53932)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dIOJI-0007vJ-4w
-	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 19:54:53 -0400
+	(envelope-from <alistair23@gmail.com>) id 1dIOKZ-0000Tl-4f
+	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 19:56:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dIOJE-0003OW-Vu
-	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 19:54:52 -0400
-Received: from indium.canonical.com ([91.189.90.7]:49269)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1dIOJE-0003OI-N8
-	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 19:54:48 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1dIOJD-0006YO-Mn
-	for <qemu-devel@nongnu.org>; Tue, 06 Jun 2017 23:54:47 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 8080C2E81B0
-	for <qemu-devel@nongnu.org>; Tue,  6 Jun 2017 23:54:47 +0000 (UTC)
+	(envelope-from <alistair23@gmail.com>) id 1dIOKY-0004G6-7V
+	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 19:56:11 -0400
+Received: from mail-wm0-x22e.google.com ([2a00:1450:400c:c09::22e]:35783)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alistair23@gmail.com>)
+	id 1dIOKX-0004Fm-WF
+	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 19:56:10 -0400
+Received: by mail-wm0-x22e.google.com with SMTP id x70so47248576wme.0
+	for <qemu-devel@nongnu.org>; Tue, 06 Jun 2017 16:56:09 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 06 Jun 2017 23:38:13 -0000
-From: ChristianEhrhardt <1589923@bugs.launchpad.net>
-Reply-To: Bug 1589923 <1589923@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20160607104531.2663.45779.malonedeb@chaenomeles.canonical.com>
-Message-Id: <149679229383.5360.15205803873835010702.malone@soybean.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1589923] Re: https websockets not working in 2.5
- or 2.6
+Sender: alistair23@gmail.com
+In-Reply-To: <270686d0-1ca8-965f-a14a-397f45616deb@redhat.com>
+References: <2b2311b1b070a0b03973e39deccf4682de4a6cd4.1496686997.git.alistair.francis@xilinx.com>
+	<CAJ+F1CLuPkWjG3Hn8hfaxTApn6+ouqh5nJZNWSQYX1C3_HRFqA@mail.gmail.com>
+	<e340cdb9-3c97-8624-81d9-f7888f819a68@amsat.org>
+	<CAKmqyKOOhu7iKuW4naNi0+7cwayLaftkPf=gS7uBakMvKavxVQ@mail.gmail.com>
+	<270686d0-1ca8-965f-a14a-397f45616deb@redhat.com>
+From: Alistair Francis <alistair.francis@xilinx.com>
+Date: Tue, 6 Jun 2017 16:55:38 -0700
+Message-ID: <CAKmqyKM=e4zDG-jv-MdHQH3pqtLzBSnq7F-YWeB7S+bw91udVg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v1 1/1] char-socket: Don't report TCP
+ socket waiting as an error
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,163 +34,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Alistair Francis <alistair.francis@xilinx.com>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>, =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Gerd Hoffmann <kraxel@redhat.com>
 
-Fixed in >=3D2.7 and thereby >=3DZesty.
-Needs to be considered for SRUs now.
+On Tue, Jun 6, 2017 at 3:14 PM, Paolo Bonzini <pbonzini@redhat.com> wrote:
+>
+>
+> On 06/06/2017 18:30, Alistair Francis wrote:
+>>>
+>>> This is somehow confusing. I don't think it is worth having another
+>>> qemu_log_stderr() function rather than using error_report() but this very
+>>> call might deserve a comment explaining this unusual use. What do you think?
+>>
+>> The problem with stderr is that this isn't an error. Some uses of QEMU
+>> (inside Eclipse for example) flag everything printed on stderr as red
+>> which confuses users that they are seeing an error when they really
+>> aren't.
+>
+> But they are wrong.  Would it work for you to work around it, by making
+> QEMU use a client (connect) rather than a server (listen) socket?
 
-** Also affects: qemu (Ubuntu Yakkety)
-   Importance: Undecided
-       Status: New
+No, we use QEMU as both so we will always have this issue.
 
-** Also affects: qemu (Ubuntu Xenial)
-   Importance: Undecided
-       Status: New
+>
+>> Also all the uses of this message that I have seen (there are probably
+>> others though) stops QEMU until the connection is made, which means it
+>> doesn't matter if it is mixed up in console output.
+>
+> It may not mix up, but it would break programs expecting only console
+> output to be on stdout.
 
-** Changed in: qemu (Ubuntu)
-       Status: Triaged =3D> Fix Released
+Is that something we guarantee that stdout will only ever be program output?
 
-** Changed in: qemu (Ubuntu Xenial)
-       Status: New =3D> Triaged
+Thanks,
+Alistair
 
-** Changed in: qemu (Ubuntu Yakkety)
-       Status: New =3D> Triaged
-
-** Tags added: server-next
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1589923
-
-Title:
-  https websockets not working in 2.5 or 2.6
-
-Status in QEMU:
-  Fix Released
-Status in qemu package in Ubuntu:
-  Fix Released
-Status in qemu source package in Xenial:
-  Triaged
-Status in qemu source package in Yakkety:
-  Triaged
-Status in Arch Linux:
-  New
-
-Bug description:
-  % gdb --args ./x86_64-softmmu/qemu-system-x86_64 -vnc 0.0.0.0:1,tls,x509=
-=3D/etc/pki/libvirt-le,websocket=3D5701 =
-
-                          =
-
-  GNU gdb (GDB) 7.11
-  Copyright (C) 2016 Free Software Foundation, Inc.
-  License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.h=
-tml>
-  This is free software: you are free to change and redistribute it.
-  There is NO WARRANTY, to the extent permitted by law.  Type "show copying"
-  and "show warranty" for details.
-  This GDB was configured as "x86_64-pc-linux-gnu".
-  Type "show configuration" for configuration details.
-  For bug reporting instructions, please see:
-  <http://www.gnu.org/software/gdb/bugs/>.
-  Find the GDB manual and other documentation resources online at:
-  <http://www.gnu.org/software/gdb/documentation/>.
-  For help, type "help".
-  Type "apropos word" to search for commands related to "word"...
-  Reading symbols from ./x86_64-softmmu/qemu-system-x86_64...done.
-  (gdb) run
-  Starting program: /home/ben/qemu/qemu-2.6.0/x86_64-softmmu/qemu-system-x8=
-6_64 -vnc 0.0.0.0:1,tls,x509=3D/etc/pki/libvirt-le,websocket=3D5701
-  [Thread debugging using libthread_db enabled]
-  Using host libthread_db library "/usr/lib/libthread_db.so.1".
-  [New Thread 0x7fffe16f6700 (LWP 12767)]
-  [New Thread 0x7fffde2d4700 (LWP 12768)]
-  [New Thread 0x7fffd3fff700 (LWP 12769)]
-  Initializing VNC server with x509 no auth
-  Client sioc=3D0x55555874d6b0 ws=3D1 auth=3D1 subauth=3D0
-  New client on socket 0x55555874d6b0
-  vnc_set_share_mode/0x55555874d6b0: undefined -> connecting
-  TLS Websocket connection required
-  Start TLS WS handshake process
-  Handshake failed TLS handshake failed: The TLS connection was non-properl=
-y terminated.
-  Closing down client sock: protocol error
-  vnc_set_share_mode/0x55555779f510: connecting -> disconnected
-  Client sioc=3D0x55555873c6a0 ws=3D1 auth=3D1 subauth=3D0
-  New client on socket 0x55555873c6a0
-  vnc_set_share_mode/0x55555873c6a0: undefined -> connecting
-  TLS Websocket connection required
-  Start TLS WS handshake process
-  TLS handshake complete, starting websocket handshake
-  Websocket negotiate starting
-  Websock handshake complete, starting VNC protocol
-  Write Plain: Pending output 0x555557b91c60 size 4096 offset 12. Wait SSF 0
-  Wrote wire 0x555557b91c60 12 -> 12
-
-  Thread 1 "qemu-system-x86" received signal SIGSEGV, Segmentation fault.
-  0x0000000000000001 in ?? ()
-  (gdb) thread apply all bt
-
-  Thread 4 (Thread 0x7fffd3fff700 (LWP 12769)):
-  #0  0x00007fffef35a09f in pthread_cond_wait@@GLIBC_2.3.2 () from /usr/lib=
-/libpthread.so.0
-  #1  0x0000555555a20bd9 in qemu_cond_wait (cond=3Dcond@entry=3D0x555558726=
-7e0, =
-
-      mutex=3Dmutex@entry=3D0x555558726810) at util/qemu-thread-posix.c:123
-  #2  0x00005555559770ab in vnc_worker_thread_loop (queue=3Dqueue@entry=3D0=
-x5555587267e0)
-      at ui/vnc-jobs.c:228
-  #3  0x00005555559775e8 in vnc_worker_thread (arg=3D0x5555587267e0) at ui/=
-vnc-jobs.c:335
-  #4  0x00007fffef354474 in start_thread () from /usr/lib/libpthread.so.0
-  #5  0x00007fffea43c69d in clone () from /usr/lib/libc.so.6
-
-  Thread 3 (Thread 0x7fffde2d4700 (LWP 12768)):
-  #0  0x00007fffef35a09f in pthread_cond_wait@@GLIBC_2.3.2 () from /usr/lib=
-/libpthread.so.0
-  #1  0x0000555555a20bd9 in qemu_cond_wait (cond=3D<optimized out>, =
-
-  ---Type <return> to continue, or q <return> to quit---
-      emu_global_mutex>) at util/qemu-thread-posix.c:123
-  #2  0x0000555555715edf in qemu_tcg_wait_io_event (cpu=3D0x5555564ee840) a=
-t /home/ben/qemu/qemu-2.6.0/cpus.c:1015
-  #3  qemu_tcg_cpu_thread_fn (arg=3D<optimized out>) at /home/ben/qemu/qemu=
--2.6.0/cpus.c:1161
-  #4  0x00007fffef354474 in start_thread () from /usr/lib/libpthread.so.0
-  #5  0x00007fffea43c69d in clone () from /usr/lib/libc.so.6
-
-  Thread 2 (Thread 0x7fffe16f6700 (LWP 12767)):
-  #0  0x00007fffea438229 in syscall () from /usr/lib/libc.so.6
-  #1  0x0000555555a20ee8 in futex_wait (val=3D<optimized out>, ev=3D<optimi=
-zed out>) at util/qemu-thread-posix.c:292
-  #2  qemu_event_wait (ev=3Dev@entry=3D0x55555641ece4 <rcu_call_ready_event=
->) at util/qemu-thread-posix.c:399
-  #3  0x0000555555a2f2ae in call_rcu_thread (opaque=3D<optimized out>) at u=
-til/rcu.c:250
-  #4  0x00007fffef354474 in start_thread () from /usr/lib/libpthread.so.0
-  #5  0x00007fffea43c69d in clone () from /usr/lib/libc.so.6
-
-  Thread 1 (Thread 0x7ffff7f5bb00 (LWP 12763)):
-  #0  0x0000000000000001 in ?? ()
-  #1  0x00005555559efb53 in qio_task_free (task=3D0x555558212140) at io/tas=
-k.c:58
-  #2  0x00005555559efd89 in qio_task_complete (task=3Dtask@entry=3D0x555558=
-212140) at io/task.c:145
-  #3  0x00005555559ef5aa in qio_channel_websock_handshake_send (ioc=3D0x555=
-55873c6a0, condition=3D<optimized out>, =
-
-      user_data=3D0x555558212140) at io/channel-websock.c:289
-  #4  0x00007fffecf59c8a in g_main_context_dispatch () from /usr/lib/libgli=
-b-2.0.so.0
-  #5  0x000055555598a6b3 in glib_pollfds_poll () at main-loop.c:213
-  #6  os_host_main_loop_wait (timeout=3D<optimized out>) at main-loop.c:258
-  #7  main_loop_wait (nonblocking=3D<optimized out>) at main-loop.c:506
-  #8  0x00005555556e1fbd in main_loop () at vl.c:1934
-  #9  main (argc=3D<optimized out>, argv=3D<optimized out>, envp=3D<optimiz=
-ed out>) at vl.c:4656
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1589923/+subscriptions
+>
+>> I just think that this message to most users isn't helpful and they
+>> probably don't even read it, so printing to stderr seems like a bit
+>> much.
+>
+> I would compare it with dd's output.  It goes to stderr even though it's
+> not an error.
+>
+> Paolo
+>
