@@ -1,25 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48097)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48144)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quwenruo@cn.fujitsu.com>) id 1dI3yC-0001xB-OH
-	for qemu-devel@nongnu.org; Mon, 05 Jun 2017 22:11:45 -0400
+	(envelope-from <peterx@redhat.com>) id 1dI3ya-00027R-Ii
+	for qemu-devel@nongnu.org; Mon, 05 Jun 2017 22:12:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quwenruo@cn.fujitsu.com>) id 1dI3y9-0001O6-JE
-	for qemu-devel@nongnu.org; Mon, 05 Jun 2017 22:11:44 -0400
-Received: from [59.151.112.132] (port=24800 helo=heian.cn.fujitsu.com)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quwenruo@cn.fujitsu.com>) id 1dI3y9-0001Kd-6v
-	for qemu-devel@nongnu.org; Mon, 05 Jun 2017 22:11:41 -0400
-Received: from G08CNEXCHPEKD02.g08.fujitsu.local (unknown [10.167.33.83])
-	by cn.fujitsu.com (Postfix) with ESMTP id 0FB0D47C6106
-	for <qemu-devel@nongnu.org>; Tue,  6 Jun 2017 10:11:26 +0800 (CST)
-From: Qu Wenruo <quwenruo@cn.fujitsu.com>
-Message-ID: <82427b34-3de0-9f8a-a9de-1903adeb9619@cn.fujitsu.com>
-Date: Tue, 6 Jun 2017 10:11:23 +0800
+	(envelope-from <peterx@redhat.com>) id 1dI3yX-0001To-6o
+	for qemu-devel@nongnu.org; Mon, 05 Jun 2017 22:12:08 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55150)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1dI3yW-0001So-To
+	for qemu-devel@nongnu.org; Mon, 05 Jun 2017 22:12:05 -0400
+Date: Tue, 6 Jun 2017 10:11:56 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20170606021156.GL4056@pxdev.xzpeter.org>
+References: <20170601130325.6433-1-marcandre.lureau@redhat.com>
+	<20170601130325.6433-2-marcandre.lureau@redhat.com>
+	<465a7b69-a3c0-1492-8e30-c562a76cd65a@redhat.com>
+	<0a434f41-1131-713d-1fc9-a9edba425f7a@redhat.com>
+	<CAJ+F1CKL6OXetG6Liwf3NrpNv3K8PR6_SQ5=rfjyRwa3pJ7nuA@mail.gmail.com>
+	<20170605072438.qvxosyib2vpwl3a7@kamzik.brq.redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] [BUG] Failed to compile using gcc7.1
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20170605072438.qvxosyib2vpwl3a7@kamzik.brq.redhat.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 1/4] dump: add DumpInfo structure
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,38 +32,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Andrew Jones <drjones@redhat.com>
+Cc: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@gmail.com>, Eric Blake <eblake@redhat.com>, Laszlo Ersek <lersek@redhat.com>, qemu-devel@nongnu.org, Wen Congyang <wency@cn.fujitsu.com>, anderson@redhat.com
 
-Hi all,
+On Mon, Jun 05, 2017 at 09:24:38AM +0200, Andrew Jones wrote:
+> On Fri, Jun 02, 2017 at 09:46:35AM +0000, Marc-Andr=C3=A9 Lureau wrote:
+> > Hi
+> >=20
+> > On Thu, Jun 1, 2017 at 10:19 PM Eric Blake <eblake@redhat.com> wrote:
+> >=20
+> > > On 06/01/2017 01:06 PM, Laszlo Ersek wrote:
+> > > > On 06/01/17 15:03, Marc-Andr=C3=A9 Lureau wrote:
+> > > >> One way or another, the guest could communicate various dump inf=
+o (via
+> > > >> guest agent or vmcoreinfo device) and populate that structure. I=
+t can
+> > > >> then be used to augment the dump with various details, as done i=
+n the
+> > > >> following patch.
+> > > >>
+> > > >> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.c=
+om>
+> > > >> ---
+> > > >>  include/sysemu/dump-info.h | 18 ++++++++++++++++++
+> > > >>  dump.c                     |  3 +++
+> > > >>  2 files changed, 21 insertions(+)
+> > > >>  create mode 100644 include/sysemu/dump-info.h
+> > > >>
+> > > >> diff --git a/include/sysemu/dump-info.h b/include/sysemu/dump-in=
+fo.h
+> > > >> new file mode 100644
+> > > >> index 0000000000..d2378e15e2
+> > > >> --- /dev/null
+> > > >> +++ b/include/sysemu/dump-info.h
+> > > >> @@ -0,0 +1,18 @@
+> > > >> +#ifndef DUMP_INFO_H
+> > > >> +#define DUMP_INFO_H
+> > >
+> > > >>
+> > > >
+> > > > Can you please spell out, in the commit message, the reason for
+> > > > introducing a new header file? (I suspect your reason, but it sho=
+uld be
+> > > > documented explicitly.)
+> > >
+> > > Also, should you have a copyright header in the new file?  And does
+> > > MAINTAINERS cover it?
+> > >
+> >=20
+> > None of the dump support is covered. Based on commit history, I can s=
+uggest
+> > Wen Congyang, as original author.
+> > Sadly, Qiao Nuohan cannot be reached with his mail today (anyone know=
+s if
+> > he is still contributing?). Laszlo has done significant changes and r=
+eviews
+> > too. I can also propose myself to help with reviews.
+> >=20
+> > Wen or Laszla, do you want to be the main maintainer?
+>=20
+> What about Peter Xu (CC'ed)? He'll have to state whether he has time an=
+d
+> interest, but I see he's contributed quite a bit to dump.c.
 
-After upgrading gcc from 6.3.1 to 7.1.1, qemu can't be compiled with gcc.
+I believe those were the first commits of mine when working on
+detached dump, after that I didn't really work on it anymore. So I
+guess I may not be the best candidate.
 
-The error is:
+Also, I admit my bandwidth is limited as well recently. Thanks Drew
+for mentioning me anyway. :-)
 
-------
-   CC      block/blkdebug.o
-block/blkdebug.c: In function 'blkdebug_refresh_filename':
-block/blkdebug.c:693:31: error: '%s' directive output may be truncated 
-writing up to 4095 bytes into a region of size 4086 
-[-Werror=format-truncation=]
-                   "blkdebug:%s:%s", s->config_file ?: "",
-                                ^~
-In file included from /usr/include/stdio.h:939:0,
-                  from /home/adam/qemu/include/qemu/osdep.h:68,
-                  from block/blkdebug.c:25:
-/usr/include/bits/stdio2.h:64:10: note: '__builtin___snprintf_chk' 
-output 11 or more bytes (assuming 4106) into a destination of size 4096
-    return __builtin___snprintf_chk (__s, __n, __USE_FORTIFY_LEVEL - 1,
-           ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-         __bos (__s), __fmt, __va_arg_pack ());
-         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-cc1: all warnings being treated as errors
-make: *** [/home/adam/qemu/rules.mak:69: block/blkdebug.o] Error 1
-------
-
-It seems that gcc 7 is introducing more restrict check for printf.
-If using clang, although there are some extra warning, it can at least 
-pass the compile.
-
-Thanks,
-Qu
+--=20
+Peter Xu
