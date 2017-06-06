@@ -1,21 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38878)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38873)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <haozhong.zhang@intel.com>) id 1dI8pL-0000mr-Vp
+	(envelope-from <haozhong.zhang@intel.com>) id 1dI8pL-0000mi-Q1
 	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 03:22:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <haozhong.zhang@intel.com>) id 1dI8pK-0005LQ-02
+	(envelope-from <haozhong.zhang@intel.com>) id 1dI8pH-0005KX-2K
 	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 03:22:55 -0400
 Received: from mga03.intel.com ([134.134.136.65]:58638)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <haozhong.zhang@intel.com>)
-	id 1dI8pJ-0005K6-KL
-	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 03:22:53 -0400
+	id 1dI8pG-0005K6-Qh
+	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 03:22:51 -0400
 From: Haozhong Zhang <haozhong.zhang@intel.com>
-Date: Tue,  6 Jun 2017 15:22:28 +0800
-Message-Id: <20170606072229.9302-4-haozhong.zhang@intel.com>
+Date: Tue,  6 Jun 2017 15:22:26 +0800
+Message-Id: <20170606072229.9302-2-haozhong.zhang@intel.com>
 In-Reply-To: <20170606072229.9302-1-haozhong.zhang@intel.com>
 References: <20170606072229.9302-1-haozhong.zhang@intel.com>
-Subject: [Qemu-devel] [PATCH v2 3/4] nvdimm: add a boolean option "restrict"
+Subject: [Qemu-devel] [PATCH v2 1/4] nvdimm: add a macro for property
+ "label-size"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,146 +28,38 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: "Michael S. Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Xiao Guangrong <guangrong.xiao@gmail.com>, Stefan Hajnoczi <stefanha@gmail.com>, Dan Williams <dan.j.williams@intel.com>, Haozhong Zhang <haozhong.zhang@intel.com>
 
-If a vNVDIMM device is not backed by a DAX device and its "restrict"
-option is enabled, bit 3 of state flags in its region mapping
-structure will be set, in order to notify the guest of the lack of
-write persistence guarantee. Once this bit is set, the guest OS may
-mark the vNVDIMM device as read-only.
-
-This option is disabled by default for backwards compatibility. It's
-recommended to enable for the formal usage.
-
 Signed-off-by: Haozhong Zhang <haozhong.zhang@intel.com>
 ---
- hw/acpi/nvdimm.c        | 16 ++++++++++++++++
- hw/mem/nvdimm.c         | 38 +++++++++++++++++++++++++++++++++++++-
- include/hw/mem/nvdimm.h |  5 +++++
- 3 files changed, 58 insertions(+), 1 deletion(-)
+ hw/mem/nvdimm.c         | 2 +-
+ include/hw/mem/nvdimm.h | 3 +++
+ 2 files changed, 4 insertions(+), 1 deletion(-)
 
-diff --git a/hw/acpi/nvdimm.c b/hw/acpi/nvdimm.c
-index 8e7d6ec034..fd1ef6dc65 100644
---- a/hw/acpi/nvdimm.c
-+++ b/hw/acpi/nvdimm.c
-@@ -138,6 +138,8 @@ struct NvdimmNfitMemDev {
- } QEMU_PACKED;
- typedef struct NvdimmNfitMemDev NvdimmNfitMemDev;
- 
-+#define ACPI_NFIT_MEM_NOT_ARMED    (1 << 3)
-+
- /*
-  * NVDIMM Control Region Structure
-  *
-@@ -289,6 +291,10 @@ nvdimm_build_structure_memdev(GArray *structures, DeviceState *dev)
-     int slot = object_property_get_int(OBJECT(dev), PC_DIMM_SLOT_PROP,
-                                             NULL);
-     uint32_t handle = nvdimm_slot_to_handle(slot);
-+    bool dev_dax = object_property_get_bool(OBJECT(dev), NVDIMM_DEV_DAX_PROP,
-+                                            NULL);
-+    bool restrict_mode = object_property_get_bool(OBJECT(dev),
-+                                                  NVDIMM_RESTRICT_PROP, NULL);
- 
-     nfit_memdev = acpi_data_push(structures, sizeof(*nfit_memdev));
- 
-@@ -312,6 +318,16 @@ nvdimm_build_structure_memdev(GArray *structures, DeviceState *dev)
- 
-     /* Only one interleave for PMEM. */
-     nfit_memdev->interleave_ways = cpu_to_le16(1);
-+
-+    /*
-+     * If a vNVDIMM device in the restrict mode and is not backed by a
-+     * DAX device, QEMU will set ACPI_NFIT_MEM_NOT_ARMED bit of state
-+     * flags in its region mapping structure, in order to notify the
-+     * guest of the lack of write persistence guarantee.
-+     */
-+    if (!dev_dax && restrict_mode) {
-+        nfit_memdev->flags = cpu_to_le16(ACPI_NFIT_MEM_NOT_ARMED);
-+    }
- }
- 
- /*
 diff --git a/hw/mem/nvdimm.c b/hw/mem/nvdimm.c
-index b23542fbdf..cda416e5c8 100644
+index db896b0bb6..a9b0863f20 100644
 --- a/hw/mem/nvdimm.c
 +++ b/hw/mem/nvdimm.c
-@@ -65,11 +65,46 @@ out:
-     error_propagate(errp, local_err);
- }
+@@ -66,7 +66,7 @@ out:
  
-+static bool nvdimm_get_backend_dev_dax(Object *obj, Error **errp)
-+{
-+    NVDIMMDevice *nvdimm = NVDIMM(obj);
-+
-+    return nvdimm->backend_dev_dax;
-+}
-+
-+static bool nvdimm_get_restrict(Object *obj, Error **errp)
-+{
-+    NVDIMMDevice *nvdimm = NVDIMM(obj);
-+
-+    return nvdimm->restrict_mode;
-+}
-+
-+static void nvdimm_set_restrict(Object *obj, bool val, Error **errp)
-+{
-+    DeviceState *dev = DEVICE(obj);
-+    NVDIMMDevice *nvdimm = NVDIMM(obj);
-+    Error *local_err = NULL;
-+
-+    if (dev->realized) {
-+        error_setg(&local_err, "cannot change property value");
-+        goto out;
-+    }
-+
-+    nvdimm->restrict_mode = val;
-+
-+ out:
-+    error_propagate(errp, local_err);
-+}
-+
  static void nvdimm_init(Object *obj)
  {
-     object_property_add(obj, NVDIMM_LABEL_SIZE_PROP, "int",
+-    object_property_add(obj, "label-size", "int",
++    object_property_add(obj, NVDIMM_LABEL_SIZE_PROP, "int",
                          nvdimm_get_label_size, nvdimm_set_label_size, NULL,
                          NULL, NULL);
-+    object_property_add_bool(obj, NVDIMM_DEV_DAX_PROP,
-+                             nvdimm_get_backend_dev_dax, NULL, NULL);
-+    object_property_add_bool(obj, NVDIMM_RESTRICT_PROP,
-+                             nvdimm_get_restrict, nvdimm_set_restrict, NULL);
  }
- 
- static MemoryRegion *nvdimm_get_memory_region(PCDIMMDevice *dimm)
-@@ -85,7 +120,8 @@ static void nvdimm_realize(PCDIMMDevice *dimm, Error **errp)
-     NVDIMMDevice *nvdimm = NVDIMM(dimm);
-     uint64_t align, pmem_size, size = memory_region_size(mr);
- 
--    if (!qemu_fd_is_dev_dax(memory_region_get_fd(mr))) {
-+    nvdimm->backend_dev_dax = qemu_fd_is_dev_dax(memory_region_get_fd(mr));
-+    if (!nvdimm->backend_dev_dax) {
-         error_report("warning: nvdimm backend does not look like a DAX device, "
-                      "unable to guarantee persistence of guest writes");
-     }
 diff --git a/include/hw/mem/nvdimm.h b/include/hw/mem/nvdimm.h
-index f1f3987055..2fbe0d7858 100644
+index 03e1ff9558..f1f3987055 100644
 --- a/include/hw/mem/nvdimm.h
 +++ b/include/hw/mem/nvdimm.h
-@@ -49,6 +49,8 @@
+@@ -47,6 +47,9 @@
+ #define NVDIMM_CLASS(oc) OBJECT_CLASS_CHECK(NVDIMMClass, (oc), TYPE_NVDIMM)
+ #define NVDIMM_GET_CLASS(obj) OBJECT_GET_CLASS(NVDIMMClass, (obj), \
                                                 TYPE_NVDIMM)
- 
- #define NVDIMM_LABEL_SIZE_PROP "label-size"
-+#define NVDIMM_DEV_DAX_PROP    "dev-dax"
-+#define NVDIMM_RESTRICT_PROP   "restrict"
- 
++
++#define NVDIMM_LABEL_SIZE_PROP "label-size"
++
  struct NVDIMMDevice {
      /* private */
-@@ -74,6 +76,9 @@ struct NVDIMMDevice {
-      * guest via ACPI NFIT and _FIT method if NVDIMM hotplug is supported.
-      */
-     MemoryRegion nvdimm_mr;
-+
-+    bool backend_dev_dax;
-+    bool restrict_mode;
- };
- typedef struct NVDIMMDevice NVDIMMDevice;
- 
+     PCDIMMDevice parent_obj;
 -- 
 2.11.0
