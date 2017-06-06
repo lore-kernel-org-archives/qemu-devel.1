@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43881)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43936)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1dICeq-0000TB-UU
-	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 07:28:22 -0400
+	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1dICev-0000VS-MA
+	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 07:28:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1dICen-0002kU-HI
-	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 07:28:20 -0400
+	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1dICep-0002lc-1H
+	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 07:28:24 -0400
 Received: from [59.151.112.132] (port=55441 helo=heian.cn.fujitsu.com)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1dICem-0002g4-Jk
-	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 07:28:17 -0400
+	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1dICeo-0002g4-9x
+	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 07:28:18 -0400
 From: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
-Date: Tue, 6 Jun 2017 19:26:29 +0800
-Message-ID: <8533d2df3734029324eec5b3edc546bd148dc3ef.1496746391.git.maozy.fnst@cn.fujitsu.com>
+Date: Tue, 6 Jun 2017 19:26:32 +0800
+Message-ID: <4842dd61954d23862cf834a00847376bc54fb4da.1496746391.git.maozy.fnst@cn.fujitsu.com>
 In-Reply-To: <cover.1496746390.git.maozy.fnst@cn.fujitsu.com>
 References: <cover.1496746390.git.maozy.fnst@cn.fujitsu.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v3 4/7] net/eepro100: Fix code style
+Subject: [Qemu-devel] [PATCH v3 7/7] pci: Convert shpc_init() to Error
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,277 +26,211 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: jasowang@redhat.com, armbru@redhat.com
+Cc: mst@redhat.com, marcel@redhat.com, armbru@redhat.com
 
-It reports a code style problem(ERROR: "foo * bar" should be "foo *bar")
-when running checkpatch.pl. So fix it to conform to the coding standards.
+In order to propagate error message better, convert shpc_init() to
+Error also convert the pci_bridge_dev_initfn() to realize.
 
-Cc: jasowang@redhat.com
+Cc: mst@redhat.com
+Cc: marcel@redhat.com
 Cc: armbru@redhat.com
 Signed-off-by: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
 ---
- hw/net/eepro100.c | 62 +++++++++++++++++++++++++++----------------------------
- 1 file changed, 31 insertions(+), 31 deletions(-)
+ hw/pci-bridge/pci_bridge_dev.c | 21 ++++++++-------------
+ hw/pci/shpc.c                  | 11 +++++------
+ hw/pci/slotid_cap.c            | 11 +++++------
+ include/hw/pci/shpc.h          |  3 ++-
+ include/hw/pci/slotid_cap.h    |  3 ++-
+ 5 files changed, 22 insertions(+), 27 deletions(-)
 
-diff --git a/hw/net/eepro100.c b/hw/net/eepro100.c
-index da36816..62e989c 100644
---- a/hw/net/eepro100.c
-+++ b/hw/net/eepro100.c
-@@ -405,7 +405,7 @@ enum scb_stat_ack {
-     stat_ack_tx = (stat_ack_cu_idle | stat_ack_cu_cmd_done),
+diff --git a/hw/pci-bridge/pci_bridge_dev.c b/hw/pci-bridge/pci_bridge_dev.c
+index 5dbd933..30c4186 100644
+--- a/hw/pci-bridge/pci_bridge_dev.c
++++ b/hw/pci-bridge/pci_bridge_dev.c
+@@ -49,12 +49,11 @@ struct PCIBridgeDev {
  };
+ typedef struct PCIBridgeDev PCIBridgeDev;
  
--static void disable_interrupt(EEPRO100State * s)
-+static void disable_interrupt(EEPRO100State *s)
+-static int pci_bridge_dev_initfn(PCIDevice *dev)
++static void pci_bridge_dev_realize(PCIDevice *dev, Error **errp)
  {
-     if (s->int_stat) {
-         TRACE(INT, logout("interrupt disabled\n"));
-@@ -414,7 +414,7 @@ static void disable_interrupt(EEPRO100State * s)
+     PCIBridge *br = PCI_BRIDGE(dev);
+     PCIBridgeDev *bridge_dev = PCI_BRIDGE_DEV(dev);
+     int err;
+-    Error *local_err = NULL;
+ 
+     pci_bridge_initfn(dev, TYPE_PCI_BUS);
+ 
+@@ -62,7 +61,7 @@ static int pci_bridge_dev_initfn(PCIDevice *dev)
+         dev->config[PCI_INTERRUPT_PIN] = 0x1;
+         memory_region_init(&bridge_dev->bar, OBJECT(dev), "shpc-bar",
+                            shpc_bar_size(dev));
+-        err = shpc_init(dev, &br->sec_bus, &bridge_dev->bar, 0);
++        err = shpc_init(dev, &br->sec_bus, &bridge_dev->bar, 0, errp);
+         if (err) {
+             goto shpc_error;
+         }
+@@ -71,7 +70,7 @@ static int pci_bridge_dev_initfn(PCIDevice *dev)
+         bridge_dev->msi = ON_OFF_AUTO_OFF;
      }
- }
  
--static void enable_interrupt(EEPRO100State * s)
-+static void enable_interrupt(EEPRO100State *s)
- {
-     if (!s->int_stat) {
-         TRACE(INT, logout("interrupt enabled\n"));
-@@ -423,7 +423,7 @@ static void enable_interrupt(EEPRO100State * s)
+-    err = slotid_cap_init(dev, 0, bridge_dev->chassis_nr, 0);
++    err = slotid_cap_init(dev, 0, bridge_dev->chassis_nr, 0, errp);
+     if (err) {
+         goto slotid_error;
      }
- }
+@@ -79,20 +78,18 @@ static int pci_bridge_dev_initfn(PCIDevice *dev)
+     if (bridge_dev->msi != ON_OFF_AUTO_OFF) {
+         /* it means SHPC exists, because MSI is needed by SHPC */
  
--static void eepro100_acknowledge(EEPRO100State * s)
-+static void eepro100_acknowledge(EEPRO100State *s)
- {
-     s->scb_stat &= ~s->mem[SCBAck];
-     s->mem[SCBAck] = s->scb_stat;
-@@ -432,7 +432,7 @@ static void eepro100_acknowledge(EEPRO100State * s)
+-        err = msi_init(dev, 0, 1, true, true, &local_err);
++        err = msi_init(dev, 0, 1, true, true, errp);
+         /* Any error other than -ENOTSUP(board's MSI support is broken)
+          * is a programming error */
+         assert(!err || err == -ENOTSUP);
+         if (err && bridge_dev->msi == ON_OFF_AUTO_ON) {
+             /* Can't satisfy user's explicit msi=on request, fail */
+-            error_append_hint(&local_err, "You have to use msi=auto (default) "
++            error_append_hint(errp, "You have to use msi=auto (default) "
+                     "or msi=off with this machine type.\n");
+-            error_report_err(local_err);
+             goto msi_error;
+         }
+-        assert(!local_err || bridge_dev->msi == ON_OFF_AUTO_AUTO);
++        assert(bridge_dev->msi == ON_OFF_AUTO_AUTO);
+         /* With msi=auto, we fall back to MSI off silently */
+-        error_free(local_err);
      }
- }
  
--static void eepro100_interrupt(EEPRO100State * s, uint8_t status)
-+static void eepro100_interrupt(EEPRO100State *s, uint8_t status)
- {
-     uint8_t mask = ~s->mem[SCBIntmask];
-     s->mem[SCBAck] |= status;
-@@ -449,52 +449,52 @@ static void eepro100_interrupt(EEPRO100State * s, uint8_t status)
+     if (shpc_present(dev)) {
+@@ -101,7 +98,7 @@ static int pci_bridge_dev_initfn(PCIDevice *dev)
+         pci_register_bar(dev, 0, PCI_BASE_ADDRESS_SPACE_MEMORY |
+                          PCI_BASE_ADDRESS_MEM_TYPE_64, &bridge_dev->bar);
      }
+-    return 0;
++    return;
+ 
+ msi_error:
+     slotid_cap_cleanup(dev);
+@@ -111,8 +108,6 @@ slotid_error:
+     }
+ shpc_error:
+     pci_bridge_exitfn(dev);
+-
+-    return err;
  }
  
--static void eepro100_cx_interrupt(EEPRO100State * s)
-+static void eepro100_cx_interrupt(EEPRO100State *s)
- {
-     /* CU completed action command. */
-     /* Transmit not ok (82557 only, not in emulation). */
-     eepro100_interrupt(s, 0x80);
+ static void pci_bridge_dev_exitfn(PCIDevice *dev)
+@@ -216,7 +211,7 @@ static void pci_bridge_dev_class_init(ObjectClass *klass, void *data)
+     PCIDeviceClass *k = PCI_DEVICE_CLASS(klass);
+     HotplugHandlerClass *hc = HOTPLUG_HANDLER_CLASS(klass);
+ 
+-    k->init = pci_bridge_dev_initfn;
++    k->realize = pci_bridge_dev_realize;
+     k->exit = pci_bridge_dev_exitfn;
+     k->config_write = pci_bridge_dev_write_config;
+     k->vendor_id = PCI_VENDOR_ID_REDHAT;
+diff --git a/hw/pci/shpc.c b/hw/pci/shpc.c
+index d72d5e4..69fc14b 100644
+--- a/hw/pci/shpc.c
++++ b/hw/pci/shpc.c
+@@ -446,16 +446,14 @@ static void shpc_cap_update_dword(PCIDevice *d)
  }
  
--static void eepro100_cna_interrupt(EEPRO100State * s)
-+static void eepro100_cna_interrupt(EEPRO100State *s)
+ /* Add SHPC capability to the config space for the device. */
+-static int shpc_cap_add_config(PCIDevice *d)
++static int shpc_cap_add_config(PCIDevice *d, Error **errp)
  {
-     /* CU left the active state. */
-     eepro100_interrupt(s, 0x20);
+     uint8_t *config;
+     int config_offset;
+-    Error *local_err = NULL;
+     config_offset = pci_add_capability(d, PCI_CAP_ID_SHPC,
+                                        0, SHPC_CAP_LENGTH,
+-                                       &local_err);
++                                       errp);
+     if (config_offset < 0) {
+-        error_report_err(local_err);
+         return config_offset;
+     }
+     config = d->config + config_offset;
+@@ -584,13 +582,14 @@ void shpc_device_hot_unplug_request_cb(HotplugHandler *hotplug_dev,
  }
  
--static void eepro100_fr_interrupt(EEPRO100State * s)
-+static void eepro100_fr_interrupt(EEPRO100State *s)
+ /* Initialize the SHPC structure in bridge's BAR. */
+-int shpc_init(PCIDevice *d, PCIBus *sec_bus, MemoryRegion *bar, unsigned offset)
++int shpc_init(PCIDevice *d, PCIBus *sec_bus, MemoryRegion *bar,
++              unsigned offset, Error **errp)
  {
-     /* RU received a complete frame. */
-     eepro100_interrupt(s, 0x40);
- }
+     int i, ret;
+     int nslots = SHPC_MAX_SLOTS; /* TODO: qdev property? */
+     SHPCDevice *shpc = d->shpc = g_malloc0(sizeof(*d->shpc));
+     shpc->sec_bus = sec_bus;
+-    ret = shpc_cap_add_config(d);
++    ret = shpc_cap_add_config(d, errp);
+     if (ret) {
+         g_free(d->shpc);
+         return ret;
+diff --git a/hw/pci/slotid_cap.c b/hw/pci/slotid_cap.c
+index bdca205..36d021b 100644
+--- a/hw/pci/slotid_cap.c
++++ b/hw/pci/slotid_cap.c
+@@ -9,14 +9,14 @@
  
--static void eepro100_rnr_interrupt(EEPRO100State * s)
-+static void eepro100_rnr_interrupt(EEPRO100State *s)
+ int slotid_cap_init(PCIDevice *d, int nslots,
+                     uint8_t chassis,
+-                    unsigned offset)
++                    unsigned offset,
++                    Error **errp)
  {
-     /* RU is not ready. */
-     eepro100_interrupt(s, 0x10);
- }
+     int cap;
+-    Error *local_err = NULL;
  
--static void eepro100_mdi_interrupt(EEPRO100State * s)
-+static void eepro100_mdi_interrupt(EEPRO100State *s)
- {
-     /* MDI completed read or write cycle. */
-     eepro100_interrupt(s, 0x08);
- }
+     if (!chassis) {
+-        error_report("Bridge chassis not specified. Each bridge is required "
+-                     "to be assigned a unique chassis id > 0.");
++        error_setg(errp, "Bridge chassis not specified. Each bridge is required"
++                   " to be assigned a unique chassis id > 0.");
+         return -EINVAL;
+     }
+     if (nslots < 0 || nslots > (PCI_SID_ESR_NSLOTS >> SLOTID_NSLOTS_SHIFT)) {
+@@ -25,9 +25,8 @@ int slotid_cap_init(PCIDevice *d, int nslots,
+     }
  
--static void eepro100_swi_interrupt(EEPRO100State * s)
-+static void eepro100_swi_interrupt(EEPRO100State *s)
- {
-     /* Software has requested an interrupt. */
-     eepro100_interrupt(s, 0x04);
- }
+     cap = pci_add_capability(d, PCI_CAP_ID_SLOTID, offset,
+-                             SLOTID_CAP_LENGTH, &local_err);
++                             SLOTID_CAP_LENGTH, errp);
+     if (cap < 0) {
+-        error_report_err(local_err);
+         return cap;
+     }
+     /* We make each chassis unique, this way each bridge is First in Chassis */
+diff --git a/include/hw/pci/shpc.h b/include/hw/pci/shpc.h
+index b208554..1ea88b1 100644
+--- a/include/hw/pci/shpc.h
++++ b/include/hw/pci/shpc.h
+@@ -39,7 +39,8 @@ struct SHPCDevice {
  
- #if 0
--static void eepro100_fcp_interrupt(EEPRO100State * s)
-+static void eepro100_fcp_interrupt(EEPRO100State *s)
- {
-     /* Flow control pause interrupt (82558 and later). */
-     eepro100_interrupt(s, 0x01);
- }
+ void shpc_reset(PCIDevice *d);
+ int shpc_bar_size(PCIDevice *dev);
+-int shpc_init(PCIDevice *dev, PCIBus *sec_bus, MemoryRegion *bar, unsigned off);
++int shpc_init(PCIDevice *dev, PCIBus *sec_bus, MemoryRegion *bar,
++              unsigned off, Error **errp);
+ void shpc_cleanup(PCIDevice *dev, MemoryRegion *bar);
+ void shpc_free(PCIDevice *dev);
+ void shpc_cap_write_config(PCIDevice *d, uint32_t addr, uint32_t val, int len);
+diff --git a/include/hw/pci/slotid_cap.h b/include/hw/pci/slotid_cap.h
+index 70db047..a777ea0 100644
+--- a/include/hw/pci/slotid_cap.h
++++ b/include/hw/pci/slotid_cap.h
+@@ -5,7 +5,8 @@
+ 
+ int slotid_cap_init(PCIDevice *dev, int nslots,
+                     uint8_t chassis,
+-                    unsigned offset);
++                    unsigned offset,
++                    Error **errp);
+ void slotid_cap_cleanup(PCIDevice *dev);
+ 
  #endif
- 
--static void e100_pci_reset(EEPRO100State * s)
-+static void e100_pci_reset(EEPRO100State *s)
- {
-     E100PCIDeviceInfo *info = eepro100_get_class(s);
-     uint32_t device = s->device;
-@@ -598,7 +598,7 @@ static void e100_pci_reset(EEPRO100State * s)
- #endif /* EEPROM_SIZE > 0 */
- }
- 
--static void nic_selective_reset(EEPRO100State * s)
-+static void nic_selective_reset(EEPRO100State *s)
- {
-     size_t i;
-     uint16_t *eeprom_contents = eeprom93xx_data(s->eeprom);
-@@ -669,7 +669,7 @@ static char *regname(uint32_t addr)
-  ****************************************************************************/
- 
- #if 0
--static uint16_t eepro100_read_command(EEPRO100State * s)
-+static uint16_t eepro100_read_command(EEPRO100State *s)
- {
-     uint16_t val = 0xffff;
-     TRACE(OTHER, logout("val=0x%04x\n", val));
-@@ -694,27 +694,27 @@ enum commands {
-     CmdTxFlex = 0x0008,         /* Use "Flexible mode" for CmdTx command. */
- };
- 
--static cu_state_t get_cu_state(EEPRO100State * s)
-+static cu_state_t get_cu_state(EEPRO100State *s)
- {
-     return ((s->mem[SCBStatus] & BITS(7, 6)) >> 6);
- }
- 
--static void set_cu_state(EEPRO100State * s, cu_state_t state)
-+static void set_cu_state(EEPRO100State *s, cu_state_t state)
- {
-     s->mem[SCBStatus] = (s->mem[SCBStatus] & ~BITS(7, 6)) + (state << 6);
- }
- 
--static ru_state_t get_ru_state(EEPRO100State * s)
-+static ru_state_t get_ru_state(EEPRO100State *s)
- {
-     return ((s->mem[SCBStatus] & BITS(5, 2)) >> 2);
- }
- 
--static void set_ru_state(EEPRO100State * s, ru_state_t state)
-+static void set_ru_state(EEPRO100State *s, ru_state_t state)
- {
-     s->mem[SCBStatus] = (s->mem[SCBStatus] & ~BITS(5, 2)) + (state << 2);
- }
- 
--static void dump_statistics(EEPRO100State * s)
-+static void dump_statistics(EEPRO100State *s)
- {
-     /* Dump statistical data. Most data is never changed by the emulation
-      * and always 0, so we first just copy the whole block and then those
-@@ -962,7 +962,7 @@ static void action_command(EEPRO100State *s)
-     /* List is empty. Now CU is idle or suspended. */
- }
- 
--static void eepro100_cu_command(EEPRO100State * s, uint8_t val)
-+static void eepro100_cu_command(EEPRO100State *s, uint8_t val)
- {
-     cu_state_t cu_state;
-     switch (val) {
-@@ -1036,7 +1036,7 @@ static void eepro100_cu_command(EEPRO100State * s, uint8_t val)
-     }
- }
- 
--static void eepro100_ru_command(EEPRO100State * s, uint8_t val)
-+static void eepro100_ru_command(EEPRO100State *s, uint8_t val)
- {
-     switch (val) {
-     case RU_NOP:
-@@ -1084,7 +1084,7 @@ static void eepro100_ru_command(EEPRO100State * s, uint8_t val)
-     }
- }
- 
--static void eepro100_write_command(EEPRO100State * s, uint8_t val)
-+static void eepro100_write_command(EEPRO100State *s, uint8_t val)
- {
-     eepro100_ru_command(s, val & 0x0f);
-     eepro100_cu_command(s, val & 0xf0);
-@@ -1106,7 +1106,7 @@ static void eepro100_write_command(EEPRO100State * s, uint8_t val)
- #define EEPROM_DI       0x04
- #define EEPROM_DO       0x08
- 
--static uint16_t eepro100_read_eeprom(EEPRO100State * s)
-+static uint16_t eepro100_read_eeprom(EEPRO100State *s)
- {
-     uint16_t val = e100_read_reg2(s, SCBeeprom);
-     if (eeprom93xx_read(s->eeprom)) {
-@@ -1170,7 +1170,7 @@ static const char *reg2name(uint8_t reg)
- }
- #endif                          /* DEBUG_EEPRO100 */
- 
--static uint32_t eepro100_read_mdi(EEPRO100State * s)
-+static uint32_t eepro100_read_mdi(EEPRO100State *s)
- {
-     uint32_t val = e100_read_reg4(s, SCBCtrlMDI);
- 
-@@ -1302,7 +1302,7 @@ typedef struct {
-     uint32_t st_result;         /* Self Test Results */
- } eepro100_selftest_t;
- 
--static uint32_t eepro100_read_port(EEPRO100State * s)
-+static uint32_t eepro100_read_port(EEPRO100State *s)
- {
-     return 0;
- }
-@@ -1340,7 +1340,7 @@ static void eepro100_write_port(EEPRO100State *s)
-  *
-  ****************************************************************************/
- 
--static uint8_t eepro100_read1(EEPRO100State * s, uint32_t addr)
-+static uint8_t eepro100_read1(EEPRO100State *s, uint32_t addr)
- {
-     uint8_t val = 0;
-     if (addr <= sizeof(s->mem) - sizeof(val)) {
-@@ -1393,7 +1393,7 @@ static uint8_t eepro100_read1(EEPRO100State * s, uint32_t addr)
-     return val;
- }
- 
--static uint16_t eepro100_read2(EEPRO100State * s, uint32_t addr)
-+static uint16_t eepro100_read2(EEPRO100State *s, uint32_t addr)
- {
-     uint16_t val = 0;
-     if (addr <= sizeof(s->mem) - sizeof(val)) {
-@@ -1421,7 +1421,7 @@ static uint16_t eepro100_read2(EEPRO100State * s, uint32_t addr)
-     return val;
- }
- 
--static uint32_t eepro100_read4(EEPRO100State * s, uint32_t addr)
-+static uint32_t eepro100_read4(EEPRO100State *s, uint32_t addr)
- {
-     uint32_t val = 0;
-     if (addr <= sizeof(s->mem) - sizeof(val)) {
-@@ -1453,7 +1453,7 @@ static uint32_t eepro100_read4(EEPRO100State * s, uint32_t addr)
-     return val;
- }
- 
--static void eepro100_write1(EEPRO100State * s, uint32_t addr, uint8_t val)
-+static void eepro100_write1(EEPRO100State *s, uint32_t addr, uint8_t val)
- {
-     /* SCBStatus is readonly. */
-     if (addr > SCBStatus && addr <= sizeof(s->mem) - sizeof(val)) {
-@@ -1519,7 +1519,7 @@ static void eepro100_write1(EEPRO100State * s, uint32_t addr, uint8_t val)
-     }
- }
- 
--static void eepro100_write2(EEPRO100State * s, uint32_t addr, uint16_t val)
-+static void eepro100_write2(EEPRO100State *s, uint32_t addr, uint16_t val)
- {
-     /* SCBStatus is readonly. */
-     if (addr > SCBStatus && addr <= sizeof(s->mem) - sizeof(val)) {
-@@ -1565,7 +1565,7 @@ static void eepro100_write2(EEPRO100State * s, uint32_t addr, uint16_t val)
-     }
- }
- 
--static void eepro100_write4(EEPRO100State * s, uint32_t addr, uint32_t val)
-+static void eepro100_write4(EEPRO100State *s, uint32_t addr, uint32_t val)
- {
-     if (addr <= sizeof(s->mem) - sizeof(val)) {
-         e100_write_reg4(s, addr, val);
 -- 
 2.9.3
