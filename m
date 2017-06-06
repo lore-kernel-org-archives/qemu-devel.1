@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51706)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51714)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1dIGNM-0004Q4-87
-	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 11:26:33 -0400
+	(envelope-from <thuth@redhat.com>) id 1dIGNO-0004Rr-Bd
+	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 11:26:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1dIGNH-0008Gf-N1
-	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 11:26:32 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:42674)
+	(envelope-from <thuth@redhat.com>) id 1dIGNK-0008HF-K0
+	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 11:26:34 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34580)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1dIGNH-0008GQ-Hv
-	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 11:26:27 -0400
-Date: Tue, 6 Jun 2017 18:26:21 +0300
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20170606182354-mutt-send-email-mst@kernel.org>
-References: <cover.1496387804.git.maozy.fnst@cn.fujitsu.com>
-	<ffa2cc4d0706fa522a5e581af14dadb03aec323a.1496387804.git.maozy.fnst@cn.fujitsu.com>
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1dIGNK-0008H7-Dg
+	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 11:26:30 -0400
+References: <20170606150115.17264-1-pbonzini@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <e1b46b93-b3b7-baab-c387-aa71baef832e@redhat.com>
+Date: Tue, 6 Jun 2017 17:26:22 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ffa2cc4d0706fa522a5e581af14dadb03aec323a.1496387804.git.maozy.fnst@cn.fujitsu.com>
-Subject: Re: [Qemu-devel] [PATCH v2 1/6] pci: Clean up error checking in
- pci_add_capability()
+In-Reply-To: <20170606150115.17264-1-pbonzini@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] docs: create config/,
+ devel/ and spin/ subdirectories
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,52 +28,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
-Cc: qemu-devel@nongnu.org, marcel@redhat.com, armbru@redhat.com
+To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+Cc: stefanha@redhat.com, peter.maydell@linaro.org, berrange@redhat.com
 
-On Fri, Jun 02, 2017 at 03:54:37PM +0800, Mao Zhongyi wrote:
-> On success, pci_add_capability2() returns a positive value. On
-> failure, it sets an error and return a negative value.
+On 06.06.2017 17:01, Paolo Bonzini wrote:
+> Developer documentation should be its own manual.  As a start, move all
+> developer-oriented files to a separate directory.
 > 
-> pci_add_capability() laboriously checks this behavior. No other
-> caller does. Drop the checks from pci_add_capability().
+> Also move non-text files to their own directories: docs/config/ for
+> QEMU -readconfig input, and docs/spin/ for formal models to be used
+> with the SPIN model checker.
 > 
-> Cc: mst@redhat.com
-> Cc: marcel@redhat.com
-> Cc: armbru@redhat.com
-> Signed-off-by: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
-> Reviewed-by: Marcel Apfelbaum <marcel@redhat.com>
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 > ---
->  hw/pci/pci.c | 6 +-----
->  1 file changed, 1 insertion(+), 5 deletions(-)
-> 
-> diff --git a/hw/pci/pci.c b/hw/pci/pci.c
-> index 98ccc27..53566b8 100644
-> --- a/hw/pci/pci.c
-> +++ b/hw/pci/pci.c
-> @@ -2270,12 +2270,8 @@ int pci_add_capability(PCIDevice *pdev, uint8_t cap_id,
->      Error *local_err = NULL;
->  
->      ret = pci_add_capability2(pdev, cap_id, offset, size, &local_err);
-> -    if (local_err) {
-> -        assert(ret < 0);
-> +    if (ret < 0) {
->          error_report_err(local_err);
-> -    } else {
-> -        /* success implies a positive offset in config space */
-> -        assert(ret > 0);
->      }
->      return ret;
->  }
+>  docs/{ => config}/ich9-ehci-uhci.cfg       | 0
+>  docs/{ => config}/mach-virt-graphical.cfg  | 0
+>  docs/{ => config}/mach-virt-serial.cfg     | 0
+>  docs/{ => config}/q35-emulated.cfg         | 0
+>  docs/{ => config}/q35-virtio-graphical.cfg | 0
+>  docs/{ => config}/q35-virtio-serial.cfg    | 0
+>  docs/{ => devel}/atomics.txt               | 0
+>  docs/{ => devel}/bitmaps.md                | 0
+>  docs/{ => devel}/blkdebug.txt              | 0
+>  docs/{ => devel}/blkverify.txt             | 0
+>  docs/{ => devel}/build-system.txt          | 0
+>  docs/{ => devel}/lockcnt.txt               | 0
+>  docs/{ => devel}/memory.txt                | 0
+>  docs/{ => devel}/migration.txt             | 0
+>  docs/{ => devel}/multi-thread-tcg.txt      | 0
+>  docs/{ => devel}/multiple-iothreads.txt    | 0
+>  docs/{ => devel}/qapi-code-gen.txt         | 0
+>  docs/{ => devel}/rcu.txt                   | 0
+>  docs/{ => devel}/tracing.txt               | 0
+>  docs/{ => devel}/virtio-migration.txt      | 0
+>  docs/{ => devel}/writing-qmp-commands.txt  | 0
+>  docs/{ => spin}/aio_notify.promela         | 0
+>  docs/{ => spin}/aio_notify_accept.promela  | 0
+>  docs/{ => spin}/aio_notify_bug.promela     | 0
+>  docs/{ => spin}/tcg-exclusive.promela      | 0
+>  docs/{ => spin}/win32-qemu-event.promela   | 0
+>  26 files changed, 0 insertions(+), 0 deletions(-)
 
-
-I don't see why this is a good idea. You drop a bunch of
-asserts, so naturally code is slightly tighter. We could gain
-the same by building with NDEBUG but we don't, we rather
-have more safety.
-
-> -- 
-> 2.9.3
-> 
-> 
-> 
+Reviewed-by: Thomas Huth <thuth@redhat.com>
