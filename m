@@ -1,30 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51231)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51672)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1dI9fT-0005Rw-LX
-	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 04:16:48 -0400
+	(envelope-from <rth7680@gmail.com>) id 1dI9h8-0006hR-3c
+	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 04:18:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1dI9fO-00032W-2B
-	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 04:16:47 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:55816)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1dI9fN-00030H-OC
-	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 04:16:41 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 9E6DF61D05
-	for <qemu-devel@nongnu.org>; Tue,  6 Jun 2017 08:16:40 +0000 (UTC)
-Date: Tue, 6 Jun 2017 16:16:34 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20170606081634.GE27621@pxdev.xzpeter.org>
-References: <20170601220813.30535-1-quintela@redhat.com>
-	<20170601220813.30535-6-quintela@redhat.com>
+	(envelope-from <rth7680@gmail.com>) id 1dI9h7-0003Wl-Br
+	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 04:18:30 -0400
+Received: from mail-pf0-x22c.google.com ([2607:f8b0:400e:c00::22c]:35316)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1dI9h7-0003WF-5X
+	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 04:18:29 -0400
+Received: by mail-pf0-x22c.google.com with SMTP id l89so20925049pfi.2
+	for <qemu-devel@nongnu.org>; Tue, 06 Jun 2017 01:18:27 -0700 (PDT)
+Sender: Richard Henderson <rth7680@gmail.com>
+References: <1496702979-26132-1-git-send-email-cota@braap.org>
+	<1496702979-26132-2-git-send-email-cota@braap.org>
+	<CAJhHMCDHLrU5NEuZGJqkVcJyQnXYsrdcYbNiNw4DAgiT=0R9pQ@mail.gmail.com>
+From: Richard Henderson <rth@twiddle.net>
+Message-ID: <8a4bac1c-9c7e-5f60-ac1c-c5aced0f8dbc@twiddle.net>
+Date: Tue, 6 Jun 2017 01:18:23 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20170601220813.30535-6-quintela@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 5/5] ram: Make RAMState dynamic
+In-Reply-To: <CAJhHMCDHLrU5NEuZGJqkVcJyQnXYsrdcYbNiNw4DAgiT=0R9pQ@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 1/3] compiler: define QEMU_CACHELINE_SIZE
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,219 +32,13 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Juan Quintela <quintela@redhat.com>
-Cc: qemu-devel@nongnu.org, dgilbert@redhat.com, lvivier@redhat.com
+To: Pranith Kumar <bobby.prani@gmail.com>, "Emilio G. Cota" <cota@braap.org>
+Cc: qemu-devel <qemu-devel@nongnu.org>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>
 
-On Fri, Jun 02, 2017 at 12:08:13AM +0200, Juan Quintela wrote:
-> We create the variable while we are at migration and we remove it
-> after migration.
-> 
-> Signed-off-by: Juan Quintela <quintela@redhat.com>
-> ---
->  migration/ram.c | 52 ++++++++++++++++++++++++++++++++--------------------
->  1 file changed, 32 insertions(+), 20 deletions(-)
-> 
-> diff --git a/migration/ram.c b/migration/ram.c
-> index 6c48219..1164f14 100644
-> --- a/migration/ram.c
-> +++ b/migration/ram.c
-> @@ -199,7 +199,7 @@ struct RAMState {
->  };
->  typedef struct RAMState RAMState;
->  
-> -static RAMState ram_state;
-> +static RAMState *ram_state;
->  
->  MigrationStats ram_counters;
->  
-> @@ -783,7 +783,7 @@ static int ram_save_page(RAMState *rs, PageSearchStatus *pss, bool last_stage)
->  static int do_compress_ram_page(QEMUFile *f, RAMBlock *block,
->                                  ram_addr_t offset)
->  {
-> -    RAMState *rs = &ram_state;
-> +    RAMState *rs = ram_state;
->      int bytes_sent, blen;
->      uint8_t *p = block->host + (offset & TARGET_PAGE_MASK);
->  
-> @@ -1130,7 +1130,7 @@ static void migration_page_queue_free(RAMState *rs)
->  int ram_save_queue_pages(const char *rbname, ram_addr_t start, ram_addr_t len)
->  {
->      RAMBlock *ramblock;
-> -    RAMState *rs = &ram_state;
-> +    RAMState *rs = ram_state;
->  
->      ram_counters.postcopy_requests++;
->      rcu_read_lock();
-> @@ -1351,7 +1351,7 @@ void free_xbzrle_decoded_buf(void)
->  
->  static void ram_migration_cleanup(void *opaque)
->  {
-> -    RAMState *rs = opaque;
-> +    RAMState **rsp = opaque;
->      RAMBlock *block;
->  
->      /* caller have hold iothread lock or is in a bh, so there is
-> @@ -1378,7 +1378,9 @@ static void ram_migration_cleanup(void *opaque)
->          XBZRLE.zero_target_page = NULL;
->      }
->      XBZRLE_cache_unlock();
-> -    migration_page_queue_free(rs);
-> +    migration_page_queue_free(*rsp);
-> +    g_free(*rsp);
-> +    *rsp = NULL;
->  }
->  
->  static void ram_state_reset(RAMState *rs)
-> @@ -1703,7 +1705,7 @@ static int postcopy_chunk_hostpages(MigrationState *ms, RAMBlock *block)
->   */
->  int ram_postcopy_send_discard_bitmap(MigrationState *ms)
->  {
-> -    RAMState *rs = &ram_state;
-> +    RAMState *rs = ram_state;
->      RAMBlock *block;
->      int ret;
->  
-> @@ -1786,12 +1788,13 @@ err:
->      return ret;
->  }
->  
-> -static int ram_state_init(RAMState *rs)
-> +static int ram_state_init(RAMState **rsp)
->  {
-> -    memset(rs, 0, sizeof(*rs));
-> -    qemu_mutex_init(&rs->bitmap_mutex);
-> -    qemu_mutex_init(&rs->src_page_req_mutex);
-> -    QSIMPLEQ_INIT(&rs->src_page_requests);
-> +    *rsp = g_new0(RAMState, 1);
-> +
-> +    qemu_mutex_init(&(*rsp)->bitmap_mutex);
-> +    qemu_mutex_init(&(*rsp)->src_page_req_mutex);
-> +    QSIMPLEQ_INIT(&(*rsp)->src_page_requests);
->  
->      if (migrate_use_xbzrle()) {
->          XBZRLE_cache_lock();
-> @@ -1802,6 +1805,8 @@ static int ram_state_init(RAMState *rs)
->          if (!XBZRLE.cache) {
->              XBZRLE_cache_unlock();
->              error_report("Error creating cache");
-> +            g_free(*rsp);
-> +            *rsp = NULL;
->              return -1;
->          }
->          XBZRLE_cache_unlock();
-> @@ -1810,6 +1815,8 @@ static int ram_state_init(RAMState *rs)
->          XBZRLE.encoded_buf = g_try_malloc0(TARGET_PAGE_SIZE);
->          if (!XBZRLE.encoded_buf) {
->              error_report("Error allocating encoded_buf");
-> +            g_free(*rsp);
-> +            *rsp = NULL;
->              return -1;
->          }
->  
-> @@ -1818,6 +1825,8 @@ static int ram_state_init(RAMState *rs)
->              error_report("Error allocating current_buf");
->              g_free(XBZRLE.encoded_buf);
->              XBZRLE.encoded_buf = NULL;
-> +            g_free(*rsp);
-> +            *rsp = NULL;
+On 06/05/2017 10:39 PM, Pranith Kumar wrote:
+> Is there any reason not to use sysconf(_SC_LEVEL1_DCACHE_LINESIZE)?
 
-Though may not be directly related to this patch, but... do we need to
-destroy the two mutexes as well?
+That's an excellent idea.  In fact... see reply to 3/3.
 
-        (*rsp)->bitmap_mutex
-        (*rsp)->src_page_req_mutex
 
-Also a nit: These several places I would slightly prefer a "goto
-xbzrle_fail", then:
-
-xbzrle_fail:
-    if (XBZRLE.encoded_buf) {
-        g_free(XBZRLE.encoded_buf);
-        XBZRLE.encoded_buf = NULL;
-    }
-    qemu_mutex_destroy(&(*rsp)->bitmap_mutex);
-    qemu_mutex_destroy(&(*rsp)->src_page_req_mutex);
-    g_free(*rsp);
-    *rsp = NULL;
-    return -1;
-
-The rest looks okay to me. Thanks,
-
->              return -1;
->          }
->      }
-> @@ -1827,7 +1836,7 @@ static int ram_state_init(RAMState *rs)
->  
->      qemu_mutex_lock_ramlist();
->      rcu_read_lock();
-> -    ram_state_reset(rs);
-> +    ram_state_reset(*rsp);
->  
->      /* Skip setting bitmap if there is no RAM */
->      if (ram_bytes_total()) {
-> @@ -1852,7 +1861,7 @@ static int ram_state_init(RAMState *rs)
->      ram_counters.remaining_pages = ram_bytes_total() >> TARGET_PAGE_BITS;
->  
->      memory_global_dirty_log_start();
-> -    migration_bitmap_sync(rs);
-> +    migration_bitmap_sync(*rsp);
->      qemu_mutex_unlock_ramlist();
->      qemu_mutex_unlock_iothread();
->      rcu_read_unlock();
-> @@ -1877,16 +1886,16 @@ static int ram_state_init(RAMState *rs)
->   */
->  static int ram_save_setup(QEMUFile *f, void *opaque)
->  {
-> -    RAMState *rs = opaque;
-> +    RAMState **rsp = opaque;
->      RAMBlock *block;
->  
->      /* migration has already setup the bitmap, reuse it. */
->      if (!migration_in_colo_state()) {
-> -        if (ram_state_init(rs) < 0) {
-> +        if (ram_state_init(rsp) != 0) {
->              return -1;
-> -         }
-> +        }
->      }
-> -    rs->f = f;
-> +    (*rsp)->f = f;
->  
->      rcu_read_lock();
->  
-> @@ -1921,7 +1930,8 @@ static int ram_save_setup(QEMUFile *f, void *opaque)
->   */
->  static int ram_save_iterate(QEMUFile *f, void *opaque)
->  {
-> -    RAMState *rs = opaque;
-> +    RAMState **temp = opaque;
-> +    RAMState *rs = *temp;
->      int ret;
->      int i;
->      int64_t t0;
-> @@ -1996,7 +2006,8 @@ static int ram_save_iterate(QEMUFile *f, void *opaque)
->   */
->  static int ram_save_complete(QEMUFile *f, void *opaque)
->  {
-> -    RAMState *rs = opaque;
-> +    RAMState **temp = opaque;
-> +    RAMState *rs = *temp;
->  
->      rcu_read_lock();
->  
-> @@ -2033,7 +2044,8 @@ static void ram_save_pending(QEMUFile *f, void *opaque, uint64_t max_size,
->                               uint64_t *non_postcopiable_pending,
->                               uint64_t *postcopiable_pending)
->  {
-> -    RAMState *rs = opaque;
-> +    RAMState **temp = opaque;
-> +    RAMState *rs = *temp;
->      uint64_t remaining_size;
->  
->      remaining_size = ram_counters.remaining_pages * TARGET_PAGE_SIZE;
-> -- 
-> 2.9.4
-> 
-
--- 
-Peter Xu
+r~
