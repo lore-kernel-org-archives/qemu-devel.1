@@ -1,28 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57751)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58804)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bru.dominguez@gmail.com>) id 1dIDTn-0004bj-6m
-	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 08:21:01 -0400
+	(envelope-from <armbru@redhat.com>) id 1dIDWz-0007PU-Bz
+	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 08:24:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bru.dominguez@gmail.com>) id 1dIDTm-0006mJ-0c
-	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 08:20:59 -0400
-Received: from mail-wm0-x241.google.com ([2a00:1450:400c:c09::241]:33236)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bru.dominguez@gmail.com>)
-	id 1dIDTl-0006mD-N4
-	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 08:20:57 -0400
-Received: by mail-wm0-x241.google.com with SMTP id x3so7417749wme.0
-	for <qemu-devel@nongnu.org>; Tue, 06 Jun 2017 05:20:57 -0700 (PDT)
+	(envelope-from <armbru@redhat.com>) id 1dIDWv-0007ri-B4
+	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 08:24:17 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:57422)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dIDWv-0007qZ-2T
+	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 08:24:13 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 2C048142A78
+	for <qemu-devel@nongnu.org>; Tue,  6 Jun 2017 12:24:12 +0000 (UTC)
+From: Markus Armbruster <armbru@redhat.com>
+References: <20170531135709.345-1-marcandre.lureau@redhat.com>
+	<20170531135709.345-32-marcandre.lureau@redhat.com>
+Date: Tue, 06 Jun 2017 14:24:08 +0200
+In-Reply-To: <20170531135709.345-32-marcandre.lureau@redhat.com>
+	(=?utf-8?Q?=22Marc-Andr=C3=A9?=
+	Lureau"'s message of "Wed, 31 May 2017 17:56:55 +0400")
+Message-ID: <87k24ptic7.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <CAJSP0QXffef=Ds7SeTFeCWi7iAjjUarUBzvc+hzLc6AhzQwMsA@mail.gmail.com>
-References: <CALfaEa0MirxK6ESnepptGLiugYZBOSQVxe=R72h+c_-GBXkYzQ@mail.gmail.com>
-	<20170606092831.GA8013@stefanha-x1.localdomain>
-	<CALfaEa0T+rcZjmehm=Rdr+NOApTOKsizpCWcQ6ssErhU=nuUTA@mail.gmail.com>
-	<CAJSP0QXffef=Ds7SeTFeCWi7iAjjUarUBzvc+hzLc6AhzQwMsA@mail.gmail.com>
-From: Bruno Dominguez <bru.dominguez@gmail.com>
-Date: Tue, 6 Jun 2017 13:20:55 +0100
-Message-ID: <CALfaEa1Uqo-uW5y01oCoCxAHUxzDjHTEcLF505Uk0Tg47Kk-Ew@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH] split c and cxx extra flags
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 31/45] acpi: use get_uint() for
+ "pci-hole*" properties
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,187 +36,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@gmail.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>
+To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
+Cc: qemu-devel@nongnu.org
 
-sending again the patch with the correct format and:
+Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
 
-1. Matching --extra-cxxflags description with --cxx
-2. Removing some extra spaces indicated by checkpatch script.
+> Those properties use visit_type_uint*()
+>
+> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> ---
+>  hw/i386/acpi-build.c | 24 ++++++++++++------------
+>  1 file changed, 12 insertions(+), 12 deletions(-)
+>
+> diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
+> index 8ae0373541..64a277b974 100644
+> --- a/hw/i386/acpi-build.c
+> +++ b/hw/i386/acpi-build.c
+> @@ -247,19 +247,19 @@ static void acpi_get_pci_holes(Range *hole, Range *=
+hole64)
+>      g_assert(pci_host);
+>=20=20
+>      range_set_bounds1(hole,
+> -                      object_property_get_int(pci_host,
+> -                                              PCI_HOST_PROP_PCI_HOLE_STA=
+RT,
+> -                                              NULL),
+> -                      object_property_get_int(pci_host,
+> -                                              PCI_HOST_PROP_PCI_HOLE_END,
+> -                                              NULL));
+> +                      object_property_get_uint(pci_host,
+> +                                               PCI_HOST_PROP_PCI_HOLE_ST=
+ART,
+> +                                               NULL),
+> +                      object_property_get_uint(pci_host,
+> +                                               PCI_HOST_PROP_PCI_HOLE_EN=
+D,
+> +                                               NULL));
+>      range_set_bounds1(hole64,
+> -                      object_property_get_int(pci_host,
+> -                                              PCI_HOST_PROP_PCI_HOLE64_S=
+TART,
+> -                                              NULL),
+> -                      object_property_get_int(pci_host,
+> -                                              PCI_HOST_PROP_PCI_HOLE64_E=
+ND,
+> -                                              NULL));
+> +                      object_property_get_uint(pci_host,
+> +                                               PCI_HOST_PROP_PCI_HOLE64_=
+START,
+> +                                               NULL),
+> +                      object_property_get_uint(pci_host,
+> +                                               PCI_HOST_PROP_PCI_HOLE64_=
+END,
+> +                                               NULL));
+>  }
+>=20=20
+>  #define ACPI_PORT_SMI_CMD           0x00b2 /* TODO: this is APM_CNT_IOPO=
+RT */
 
-Signed-off-by: Bruno Dominguez <bru.dominguez@gmail.com>
----
- configure                   | 74 +++++++++++++++++++++++++--------------------
- disas/libvixl/Makefile.objs |  2 +-
- rules.mak                   |  3 --
- 3 files changed, 43 insertions(+), 36 deletions(-)
+Related to the hw/pci-host/ part of PATCH 17.  Reshuffling stuff to ease
+review is almost certainly not worth the trouble.
 
-diff --git a/configure b/configure
-index 0586ec9..4ab0d0f 100755
---- a/configure
-+++ b/configure
-@@ -91,7 +91,8 @@ update_cxxflags() {
-     # Set QEMU_CXXFLAGS from QEMU_CFLAGS by filtering out those
-     # options which some versions of GCC's C++ compiler complain about
-     # because they only make sense for C programs.
--    QEMU_CXXFLAGS=
-+    QEMU_CXXFLAGS="$QEMU_CXXFLAGS -D__STDC_LIMIT_MACROS"
-+
-     for arg in $QEMU_CFLAGS; do
-         case $arg in
-             -Wstrict-prototypes|-Wmissing-prototypes|-Wnested-externs|\
-@@ -344,6 +345,9 @@ for opt do
-   --extra-cflags=*) QEMU_CFLAGS="$QEMU_CFLAGS $optarg"
-                     EXTRA_CFLAGS="$optarg"
-   ;;
-+  --extra-cxxflags=*) QEMU_CXXFLAGS="$QEMU_CXXFLAGS $optarg"
-+                      EXTRA_CXXFLAGS="$optarg"
-+  ;;
-   --extra-ldflags=*) LDFLAGS="$LDFLAGS $optarg"
-                      EXTRA_LDFLAGS="$optarg"
-   ;;
-@@ -787,6 +791,8 @@ for opt do
-   ;;
-   --extra-cflags=*)
-   ;;
-+  --extra-cxxflags=*)
-+  ;;
-   --extra-ldflags=*)
-   ;;
-   --enable-debug-info)
-@@ -1304,6 +1310,7 @@ Advanced options (experts only):
-   --cxx=CXX                use C++ compiler CXX [$cxx]
-   --objcc=OBJCC            use Objective-C compiler OBJCC [$objcc]
-   --extra-cflags=CFLAGS    append extra C compiler flags QEMU_CFLAGS
-+  --extra-cxxflags=CXXFLAGS append extra C++ compiler flags QEMU_CXXFLAGS
-   --extra-ldflags=LDFLAGS  append extra linker flags LDFLAGS
-   --make=MAKE              use specified make [$make]
-   --install=INSTALL        use specified install [$install]
-@@ -1489,37 +1496,6 @@ if test "$bogus_os" = "yes"; then
-     error_exit "Unrecognized host OS $targetos"
- fi
-
--# Check that the C++ compiler exists and works with the C compiler
--if has $cxx; then
--    cat > $TMPC <<EOF
--int c_function(void);
--int main(void) { return c_function(); }
--EOF
--
--    compile_object
--
--    cat > $TMPCXX <<EOF
--extern "C" {
--   int c_function(void);
--}
--int c_function(void) { return 42; }
--EOF
--
--    update_cxxflags
--
--    if do_cxx $QEMU_CXXFLAGS -o $TMPE $TMPCXX $TMPO $LDFLAGS; then
--        # C++ compiler $cxx works ok with C compiler $cc
--        :
--    else
--        echo "C++ compiler $cxx does not work with C compiler $cc"
--        echo "Disabling C++ specific optional code"
--        cxx=
--    fi
--else
--    echo "No C++ compiler available; disabling C++ specific optional code"
--    cxx=
--fi
--
- gcc_flags="-Wold-style-declaration -Wold-style-definition -Wtype-limits"
- gcc_flags="-Wformat-security -Wformat-y2k -Winit-self
--Wignored-qualifiers $gcc_flags"
- gcc_flags="-Wno-missing-include-dirs -Wempty-body -Wnested-externs $gcc_flags"
-@@ -5063,6 +5039,38 @@ EOF
-   fi
- fi
-
-+# Check that the C++ compiler exists and works with the C compiler.
-+# All the QEMU_CXXFLAGS are based on QEMU_CFLAGS. Keep this at the
-end to don't miss any other that could be added.
-+if has $cxx; then
-+    cat > $TMPC <<EOF
-+int c_function(void);
-+int main(void) { return c_function(); }
-+EOF
-+
-+    compile_object
-+
-+    cat > $TMPCXX <<EOF
-+extern "C" {
-+   int c_function(void);
-+}
-+int c_function(void) { return 42; }
-+EOF
-+
-+    update_cxxflags
-+
-+    if do_cxx $QEMU_CXXFLAGS -o $TMPE $TMPCXX $TMPO $LDFLAGS; then
-+        # C++ compiler $cxx works ok with C compiler $cc
-+        :
-+    else
-+        echo "C++ compiler $cxx does not work with C compiler $cc"
-+        echo "Disabling C++ specific optional code"
-+        cxx=
-+    fi
-+else
-+    echo "No C++ compiler available; disabling C++ specific optional code"
-+    cxx=
-+fi
-+
- echo_version() {
-     if test "$1" = "yes" ; then
-         echo "($2)"
-@@ -5268,6 +5276,7 @@ if test "$mingw32" = "no" ; then
- fi
- echo "qemu_helperdir=$libexecdir" >> $config_host_mak
- echo "extra_cflags=$EXTRA_CFLAGS" >> $config_host_mak
-+echo "extra_cxxflags=$EXTRA_CXXFLAGS" >> $config_host_mak
- echo "extra_ldflags=$EXTRA_LDFLAGS" >> $config_host_mak
- echo "qemu_localedir=$qemu_localedir" >> $config_host_mak
- echo "libs_softmmu=$libs_softmmu" >> $config_host_mak
-@@ -5906,6 +5915,7 @@ echo "WINDRES=$windres" >> $config_host_mak
- echo "CFLAGS=$CFLAGS" >> $config_host_mak
- echo "CFLAGS_NOPIE=$CFLAGS_NOPIE" >> $config_host_mak
- echo "QEMU_CFLAGS=$QEMU_CFLAGS" >> $config_host_mak
-+echo "QEMU_CXXFLAGS=$QEMU_CXXFLAGS" >> $config_host_mak
- echo "QEMU_INCLUDES=$QEMU_INCLUDES" >> $config_host_mak
- if test "$sparse" = "yes" ; then
-   echo "CC           := REAL_CC=\"\$(CC)\" cgcc"       >> $config_host_mak
-diff --git a/disas/libvixl/Makefile.objs b/disas/libvixl/Makefile.objs
-index bbe7695..dbf7def 100644
---- a/disas/libvixl/Makefile.objs
-+++ b/disas/libvixl/Makefile.objs
-@@ -6,6 +6,6 @@ libvixl_OBJS = vixl/utils.o \
-
- # The -Wno-sign-compare is needed only for gcc 4.6, which complains about
- # some signed-unsigned equality comparisons which later gcc versions do not.
--$(addprefix $(obj)/,$(libvixl_OBJS)): QEMU_CFLAGS :=
--I$(SRC_PATH)/disas/libvixl $(QEMU_CFLAGS) -Wno-sign-compare
-+$(addprefix $(obj)/,$(libvixl_OBJS)): QEMU_CXXFLAGS :=
--I$(SRC_PATH)/disas/libvixl $(QEMU_CXXFLAGS) -Wno-sign-compare
-
- common-obj-$(CONFIG_ARM_A64_DIS) += $(libvixl_OBJS)
-diff --git a/rules.mak b/rules.mak
-index 1c0eabb..2a2fb72 100644
---- a/rules.mak
-+++ b/rules.mak
-@@ -20,9 +20,6 @@ MAKEFLAGS += -rR
- %.mak:
- clean-target:
-
--# Flags for C++ compilation
--QEMU_CXXFLAGS = -D__STDC_LIMIT_MACROS $(filter-out
--Wstrict-prototypes -Wmissing-prototypes -Wnested-externs
--Wold-style-declaration -Wold-style-definition -Wredundant-decls,
-$(QEMU_CFLAGS))
--
- # Flags for dependency generation
- QEMU_DGFLAGS += -MMD -MP -MT $@ -MF $(@D)/$(*F).d
-
---
-1.9.1
+I like how PATCH 22-42 justify each change in the commit message.
