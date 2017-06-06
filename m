@@ -1,39 +1,39 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59054)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59081)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1dIICH-0005kF-UD
-	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 13:23:15 -0400
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1dIICJ-0005kT-RN
+	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 13:23:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1dIICD-0000Ky-06
-	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 13:23:13 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:43903
-	helo=mx0a-001b2d01.pphosted.com)
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1dIICF-0000Lo-74
+	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 13:23:15 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:44101)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <mdroth@linux.vnet.ibm.com>)
-	id 1dIICC-0000Km-Pb
-	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 13:23:08 -0400
-Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v56HIbJ9075735
-	for <qemu-devel@nongnu.org>; Tue, 6 Jun 2017 13:23:07 -0400
-Received: from e17.ny.us.ibm.com (e17.ny.us.ibm.com [129.33.205.207])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2awy7kvy77-1
+	id 1dIICE-0000LM-UY
+	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 13:23:11 -0400
+Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v56HIX97059836
+	for <qemu-devel@nongnu.org>; Tue, 6 Jun 2017 13:23:09 -0400
+Received: from e12.ny.us.ibm.com (e12.ny.us.ibm.com [129.33.205.202])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2awxj1yasq-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 06 Jun 2017 13:23:07 -0400
+	for <qemu-devel@nongnu.org>; Tue, 06 Jun 2017 13:23:09 -0400
 Received: from localhost
-	by e17.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	by e12.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
 	Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <mdroth@linux.vnet.ibm.com>;
-	Tue, 6 Jun 2017 13:23:06 -0400
+	Tue, 6 Jun 2017 13:23:08 -0400
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 From: Michael Roth <mdroth@linux.vnet.ibm.com>
-In-Reply-To: <20170606083221.9299-3-david@gibson.dropbear.id.au>
+In-Reply-To: <20170606083221.9299-5-david@gibson.dropbear.id.au>
 References: <20170606083221.9299-1-david@gibson.dropbear.id.au>
-	<20170606083221.9299-3-david@gibson.dropbear.id.au>
-Date: Tue, 06 Jun 2017 11:21:24 -0500
-Message-Id: <149676608476.2548.3465140774718898504@loki>
-Subject: Re: [Qemu-devel] [PATCH 2/7] spapr: Abolish DRC get_name method
+	<20170606083221.9299-5-david@gibson.dropbear.id.au>
+Date: Tue, 06 Jun 2017 12:20:34 -0500
+Message-Id: <149676963454.2548.14093683337609424658@loki>
+Subject: Re: [Qemu-devel] [PATCH 4/7] spapr: Don't misuse DR-indicator in
+ spapr_recover_pending_dimm_state()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -45,14 +45,32 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: David Gibson <david@gibson.dropbear.id.au>
 Cc: lvivier@redhat.com, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, bharata@linux.vnet.ibm.com, sursingh@redhat.com, groug@kaod.org
 
-Quoting David Gibson (2017-06-06 03:32:16)
-> DRConnectorClass has a get_name method, however:
->   * There's only one implementation, and only ever likely to be one
->   * There's exactly one caller, which is (now) local
->   * The implementation is trivial
+Quoting David Gibson (2017-06-06 03:32:18)
+> With some combinations of migration and hotplug we can lost temporary sta=
+te
+> indicating how many DRCs (guest side hotplug handles) are still connected
+> to a DIMM object in the process of removal.  When we hit that situation
+> spapr_recover_pending_dimm_state() is used to scan more extensively and
+> work out the right number.
 > =
 
-> So just open-code what we need.
+> It does this using drc->indicator state to determine what state of
+> disconnection the DRC is in.  However, this is not safe, because the
+> indicator state is guest settable - in fact it's more-or-less a purely
+> guest->host notification mechanism which should have no bearing on the
+> internals of hotplug state management.
+> =
+
+> So, replace the test for this with a test on drc->dev, which is a purely
+> qemu side managed variable, and updated the same BQL critical section as
+> the indicator state.
+> =
+
+> This does introduce an off-by-one change, because the indicator state was
+> updated before the call to spapr_lmb_release() on the current DRC, whereas
+> drc->dev is updated afterwards.  That's corrected by always decrementing
+> the nr_lmbs value instead of only doing so in the case where we didn't
+> have to recover information.
 > =
 
 > Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
@@ -60,75 +78,43 @@ Quoting David Gibson (2017-06-06 03:32:16)
 Reviewed-by: Michael Roth <mdroth@linux.vnet.ibm.com>
 
 > ---
->  hw/ppc/spapr_drc.c         | 11 ++---------
->  include/hw/ppc/spapr_drc.h |  1 -
->  2 files changed, 2 insertions(+), 10 deletions(-)
+>  hw/ppc/spapr.c | 11 ++++++-----
+>  1 file changed, 6 insertions(+), 5 deletions(-)
 > =
 
-> diff --git a/hw/ppc/spapr_drc.c b/hw/ppc/spapr_drc.c
-> index da3779e..9140b48 100644
-> --- a/hw/ppc/spapr_drc.c
-> +++ b/hw/ppc/spapr_drc.c
-> @@ -167,11 +167,6 @@ static uint32_t set_allocation_state(sPAPRDRConnecto=
-r *drc,
->      return RTAS_OUT_SUCCESS;
->  }
+> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> index 671cdbb..e8cecaf 100644
+> --- a/hw/ppc/spapr.c
+> +++ b/hw/ppc/spapr.c
+> @@ -2683,7 +2683,7 @@ static sPAPRDIMMState *spapr_recover_pending_dimm_s=
+tate(sPAPRMachineState *ms,
+>          drc =3D spapr_drc_by_id(TYPE_SPAPR_DRC_LMB,
+>                                addr / SPAPR_MEMORY_BLOCK_SIZE);
+>          g_assert(drc);
+> -        if (drc->indicator_state !=3D SPAPR_DR_INDICATOR_STATE_INACTIVE)=
+ {
+> +        if (drc->dev) {
+>              avail_lmbs++;
+>          }
+>          addr +=3D SPAPR_MEMORY_BLOCK_SIZE;
+> @@ -2707,10 +2707,11 @@ void spapr_lmb_release(DeviceState *dev)
+>       * during the unplug process. In this case recover it. */
+>      if (ds =3D=3D NULL) {
+>          ds =3D spapr_recover_pending_dimm_state(spapr, PC_DIMM(dev));
+> -        if (ds->nr_lmbs) {
+> -            return;
+> -        }
+> -    } else if (--ds->nr_lmbs) {
+> +        /* The DRC being examined by the caller at least must be counted=
+ */
+> +        g_assert(ds->nr_lmbs);
+> +    }
+> +
+> +    if (--ds->nr_lmbs) {
+>          return;
+>      }
 > =
 
-> -static const char *get_name(sPAPRDRConnector *drc)
-> -{
-> -    return drc->name;
-> -}
-> -
->  /* has the guest been notified of device attachment? */
->  static void set_signalled(sPAPRDRConnector *drc)
->  {
-> @@ -221,8 +216,7 @@ static void prop_get_index(Object *obj, Visitor *v, c=
-onst char *name,
->  static char *prop_get_name(Object *obj, Error **errp)
->  {
->      sPAPRDRConnector *drc =3D SPAPR_DR_CONNECTOR(obj);
-> -    sPAPRDRConnectorClass *drck =3D SPAPR_DR_CONNECTOR_GET_CLASS(drc);
-> -    return g_strdup(drck->get_name(drc));
-> +    return g_strdup(drc->name);
->  }
-> =
-
->  static void prop_get_fdt(Object *obj, Visitor *v, const char *name,
-> @@ -653,7 +647,6 @@ static void spapr_dr_connector_class_init(ObjectClass=
- *k, void *data)
->      drck->set_isolation_state =3D set_isolation_state;
->      drck->set_indicator_state =3D set_indicator_state;
->      drck->set_allocation_state =3D set_allocation_state;
-> -    drck->get_name =3D get_name;
->      drck->attach =3D attach;
->      drck->detach =3D detach;
->      drck->release_pending =3D release_pending;
-> @@ -848,7 +841,7 @@ int spapr_drc_populate_dt(void *fdt, int fdt_offset, =
-Object *owner,
->          g_array_append_val(drc_power_domains, drc_power_domain);
-> =
-
->          /* ibm,drc-names */
-> -        drc_names =3D g_string_append(drc_names, drck->get_name(drc));
-> +        drc_names =3D g_string_append(drc_names, drc->name);
->          drc_names =3D g_string_insert_len(drc_names, -1, "\0", 1);
-> =
-
->          /* ibm,drc-types */
-> diff --git a/include/hw/ppc/spapr_drc.h b/include/hw/ppc/spapr_drc.h
-> index f892b94..795b7dd 100644
-> --- a/include/hw/ppc/spapr_drc.h
-> +++ b/include/hw/ppc/spapr_drc.h
-> @@ -223,7 +223,6 @@ typedef struct sPAPRDRConnectorClass {
->                                      sPAPRDRIndicatorState state);
->      uint32_t (*set_allocation_state)(sPAPRDRConnector *drc,
->                                       sPAPRDRAllocationState state);
-> -    const char *(*get_name)(sPAPRDRConnector *drc);
-> =
-
->      /* QEMU interfaces for managing hotplug operations */
->      void (*attach)(sPAPRDRConnector *drc, DeviceState *d, void *fdt,
 > -- =
 
 > 2.9.4
