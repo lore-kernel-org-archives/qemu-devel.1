@@ -1,25 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42262)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50947)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sf@sfritsch.de>) id 1dIKSH-0001vv-14
-	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 15:47:54 -0400
+	(envelope-from <gm.ijewski@web.de>) id 1dIL5y-0005Ao-TC
+	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 16:28:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sf@sfritsch.de>) id 1dIKSG-0003m5-39
-	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 15:47:53 -0400
-Received: from manul.sfritsch.de ([2a01:4f8:172:195f:112::2]:36054)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <sf@sfritsch.de>) id 1dIKSF-0003j1-Sc
-	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 15:47:52 -0400
-Date: Tue, 6 Jun 2017 21:47:47 +0200 (CEST)
-From: Stefan Fritsch <sf@sfritsch.de>
-In-Reply-To: <87a85ljdhn.fsf@dusky.pond.sub.org>
-Message-ID: <alpine.DEB.2.11.1706062141260.14384@manul.sfritsch.de>
-References: <20170605085254.16485-1-sf@sfritsch.de>
-	<e27e8fb4-64fa-9ba9-26a2-aa2af758462b@redhat.com>
-	<39506179-0abd-5bba-89a2-fe89e6f3a167@redhat.com>
-	<87a85ljdhn.fsf@dusky.pond.sub.org>
+	(envelope-from <gm.ijewski@web.de>) id 1dIL5u-0007MT-RU
+	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 16:28:54 -0400
+Received: from mout.web.de ([212.227.15.14]:64899)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <gm.ijewski@web.de>) id 1dIL5u-0007Jm-GI
+	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 16:28:50 -0400
+References: <1496702979-26132-1-git-send-email-cota@braap.org>
+	<1496702979-26132-2-git-send-email-cota@braap.org>
+	<CAJhHMCDHLrU5NEuZGJqkVcJyQnXYsrdcYbNiNw4DAgiT=0R9pQ@mail.gmail.com>
+	<20170606161152.GA6109@flamenco>
+	<8bc72799-f469-9728-fb4b-83b47b89a701@twiddle.net>
+From: Geert Martin Ijewski <gm.ijewski@web.de>
+Message-ID: <d7d34a47-2513-030d-17f7-ce2680197573@web.de>
+Date: Tue, 6 Jun 2017 22:28:23 +0200
 MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
-Subject: Re: [Qemu-devel] [PATCH] Add chardev-send-break monitor command
+In-Reply-To: <8bc72799-f469-9728-fb4b-83b47b89a701@twiddle.net>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: de-DE
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 1/3] compiler: define QEMU_CACHELINE_SIZE
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,79 +31,137 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org, =?ISO-8859-15?Q?Marc-Andr=E9_Lureau?= <marcandre.lureau@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Richard Henderson <rth@twiddle.net>, "Emilio G. Cota" <cota@braap.org>, Pranith Kumar <bobby.prani@gmail.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, qemu-devel <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>
 
-On Tue, 6 Jun 2017, Markus Armbruster wrote:
-> >> Is there an obvious test that we can enhance to add coverage of the new
-> >> QMP command?
-> >
-> > You could have a new test covering hw/char/serial.c, but I wouldn't let
-> > that hold the patch.
+Am 06.06.2017 um 19:39 schrieb Richard Henderson:
+> On 06/06/2017 09:11 AM, Emilio G. Cota wrote:
+>> On Tue, Jun 06, 2017 at 01:39:45 -0400, Pranith Kumar wrote:
+>>> On Mon, Jun 5, 2017 at 6:49 PM, Emilio G. Cota <cota@braap.org> wrote:
+>>>> This is a constant used as a hint for padding structs to hopefully 
+>>>> avoid
+>>>> false cache line sharing.
+>>>>
+>>>> The constant can be set at configure time by defining 
+>>>> QEMU_CACHELINE_SIZE
+>>>> via --extra-cflags. If not set there, we try to obtain the value from
+>>>> the machine running the configure script. If we fail, we default to
+>>>> reasonable values, i.e. 128 bytes for ppc64 and 64 bytes for all 
+>>>> others.
+>> (snip)
+>>> Is there any reason not to use sysconf(_SC_LEVEL1_DCACHE_LINESIZE)?
+>>
+>> I tried using sysconf, but it doesn't work on the PowerPC machine I have
+>> access to (it returns 0). It might be a machine-specific thing though-I
+>> don't know. Here's the machine's `uname -a':
+>>    Linux gcc2-power8.osuosl.org 3.10.0-514.10.2.el7.ppc64le #1 SMP Fri 
+>> Mar \
+>>      3 16:16:38 GMT 2017 ppc64le ppc64le ppc64le GNU/Linux
 > 
-> Holding patches is pretty much the only leverage I have to get tests for
-> new stuff :)
+> Well that's unfortunate.
 > 
-> Asking for tests that cover all of serial.c wouldn't be fair.  But I am
-> asking for basic test coverage of new QMP commands.
+> Doing some digging, the kernel has provided the info to userland via elf 
+> auxv data since the beginning of time (aka initial git repository 
+> build), but glibc still does not export that information properly for ppc.
+> 
+> For ppc, you can get what we want from qemu_getauxval(AT_ICACHEBSIZE).  
+> Indeed, we already have 4 different system dependent methods for 
+> determining the icache size in tcg/ppc/tcg-target.inc.c.
+> 
+> So what I think we ought to do is create a new util/cachesize.c like so:
+> 
+> unsigned qemu_icache_linesize = 64;
+> unsigned qemu_dcache_linesize = 64;
+> 
+> static void init_icache_data(void)
+> {
+> #ifdef _SC_LEVEL1_ICACHE_LINESIZE
+>      {
+>          long x = sysconf(_SC_LEVEL1_ICACHE_LINESIZE);
+>          if (x > 0) {
+>              qemu_icache_linesize = x;
+>              return;
+>          }
+>      }
+> #endif
+> #ifdef AT_ICACHEBSIZE
+>      {
+>          unsigned long x = qemu_getauxval(AT_ICACHEBSIZE);
+>          if (x > 0) {
+>              qemu_icache_linesize = x;
+>              return;
+>          }
+>      }
+> #endif
+>      // Other system specific methods.
 
-One can easily extend tests/test-hmp.c, but AFAICS that only checks that 
-qemu does not crash when the command is executed.
+On a fully patched Windows 10 with an i5-4690 this code works for me (TM):
 
-But I have managed to extend tests/test-char.c to call 
-qmp_chardev_send_break() in the char_file_test() (see below). Is that what 
-you had in mind? It seems it is not possible to use 
-qtest_qmp_discard_response() from a unit test, so I don't know how to send 
-actual json from inside test-char.c
+#ifdef _WIN32
+     {
+         DWORD bufferSize = 0;
+         if (!GetLogicalProcessorInformation(0, &bufferSize) &&
+                 GetLastError() == ERROR_INSUFFICIENT_BUFFER)
+         {
+             PSYSTEM_LOGICAL_PROCESSOR_INFORMATION buffer =
+ 
+(PSYSTEM_LOGICAL_PROCESSOR_INFORMATION)g_malloc0(bufferSize);
+             if (GetLogicalProcessorInformation(buffer, &bufferSize)) {
+                 size_t i = 0,
+                     numOfProcessors =
+                         bufferSize /
+                         sizeof(SYSTEM_LOGICAL_PROCESSOR_INFORMATION);
+                 for (; i < numOfProcessors; i++) {
+                     if (buffer[i].Relationship == RelationCache &&
+                         buffer[i].Cache.Level == 1 &&
+                         (  buffer[i].Cache.Type == CacheUnified ||
+                            buffer[i].Cache.Type == CacheInstruction)
+                         )
+                     {
+                         qemu_icache_linesize = buffer[i].Cache.LineSize;
+                         break;
+                     }
+                 }
+             }
+             g_free(buffer);
+         }
+     }
+#endif
 
-Cheers,
-Stefan
+I don't particularly like that stair of ifs style, so I guess if I were 
+to do a proper patch this should become a function.
+> }
+> 
+> static void init_dcache_data(void)
+> {
+>      // Similarly.
 
+The code from above, just s/CacheInstruction/CacheData/ and 
+s/qemu_icache/qemu_dcache/
+> }
+> 
+> static void __attribute__((constructor)) init_cache_data(void)
+> {
+>      init_icache_data();
+>      init_dcache_data();
+> }
+> 
+> In particular, I think you want to be padding to the icache linesize 
+> rather than the dcache linesize since what we're attempting is to avoid 
+> writable data in the icache.
+> 
+> 
+> r~
+> 
+> 
 
-diff --git a/tests/test-char.c b/tests/test-char.c
-index dfe856cb85..ad20b55f77 100644
---- a/tests/test-char.c
-+++ b/tests/test-char.c
-@@ -53,7 +53,9 @@ static void fe_event(void *opaque, int event)
-     FeHandler *h = opaque;
- 
-     h->last_event = event;
--    quit = true;
-+    if (event != CHR_EVENT_BREAK) {
-+        quit = true;
-+    }
- }
- 
- #ifdef CONFIG_HAS_GLIB_SUBPROCESS_TESTS
-@@ -491,7 +493,7 @@ static void char_file_test(void)
- 
-         file.in = fifo;
-         file.has_in = true;
--        chr = qemu_chardev_new(NULL, TYPE_CHARDEV_FILE, &backend,
-+        chr = qemu_chardev_new("label-file", TYPE_CHARDEV_FILE, &backend,
-                                &error_abort);
- 
-         qemu_chr_fe_init(&be, chr, &error_abort);
-@@ -501,6 +503,10 @@ static void char_file_test(void)
-                                  fe_event,
-                                  &fe, NULL, true);
- 
-+        g_assert_cmpint(fe.last_event, !=, CHR_EVENT_BREAK);
-+        qmp_chardev_send_break("label-file", NULL);
-+        g_assert_cmpint(fe.last_event, ==, CHR_EVENT_BREAK);
-+
-         main_loop();
- 
-         close(fd);
-diff --git a/tests/test-hmp.c b/tests/test-hmp.c
-index 99e35ec15a..6dfa0c36e2 100644
---- a/tests/test-hmp.c
-+++ b/tests/test-hmp.c
-@@ -22,6 +22,7 @@ static int verbose;
- static const char *hmp_cmds[] = {
-     "boot_set ndc",
-     "chardev-add null,id=testchardev1",
-+    "chardev-send-break testchardev1",
-     "chardev-remove testchardev1",
-     "commit all",
-     "cpu-add 1",
+To quote from the documentation:
+"RelationCache: [... snip ...]
+Windows Server 2003:  This value is not supported until Windows Server 
+2003 with SP1 and Windows XP Professional x64 Edition." --
+https://msdn.microsoft.com/en-us/library/windows/desktop/ms686694(v=vs.85).aspx
+
+I'm not sure if that is considered a problem, as both systems aren't 
+supported anymore for almost 2 years now.
+
+Geert
