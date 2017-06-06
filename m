@@ -1,32 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46170)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48097)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1dI3nM-0007YL-2q
-	for qemu-devel@nongnu.org; Mon, 05 Jun 2017 22:00:33 -0400
+	(envelope-from <quwenruo@cn.fujitsu.com>) id 1dI3yC-0001xB-OH
+	for qemu-devel@nongnu.org; Mon, 05 Jun 2017 22:11:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1dI3nH-0004qW-8z
-	for qemu-devel@nongnu.org; Mon, 05 Jun 2017 22:00:32 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:42536)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1dI3nH-0004q2-2e
-	for qemu-devel@nongnu.org; Mon, 05 Jun 2017 22:00:27 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id B4CD180C11
-	for <qemu-devel@nongnu.org>; Tue,  6 Jun 2017 02:00:25 +0000 (UTC)
-Date: Tue, 6 Jun 2017 10:00:21 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20170606020021.GJ4056@pxdev.xzpeter.org>
-References: <1495176212-14446-1-git-send-email-peterx@redhat.com>
-	<1495176212-14446-5-git-send-email-peterx@redhat.com>
-	<d74b1067-d582-78af-d849-8d8b7b837dcf@redhat.com>
+	(envelope-from <quwenruo@cn.fujitsu.com>) id 1dI3y9-0001O6-JE
+	for qemu-devel@nongnu.org; Mon, 05 Jun 2017 22:11:44 -0400
+Received: from [59.151.112.132] (port=24800 helo=heian.cn.fujitsu.com)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <quwenruo@cn.fujitsu.com>) id 1dI3y9-0001Kd-6v
+	for qemu-devel@nongnu.org; Mon, 05 Jun 2017 22:11:41 -0400
+Received: from G08CNEXCHPEKD02.g08.fujitsu.local (unknown [10.167.33.83])
+	by cn.fujitsu.com (Postfix) with ESMTP id 0FB0D47C6106
+	for <qemu-devel@nongnu.org>; Tue,  6 Jun 2017 10:11:26 +0800 (CST)
+From: Qu Wenruo <quwenruo@cn.fujitsu.com>
+Message-ID: <82427b34-3de0-9f8a-a9de-1903adeb9619@cn.fujitsu.com>
+Date: Tue, 6 Jun 2017 10:11:23 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <d74b1067-d582-78af-d849-8d8b7b837dcf@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH RFC 4/6] migration: shut src return path
- unconditionally
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: [Qemu-devel] [BUG] Failed to compile using gcc7.1
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,50 +28,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: qemu-devel@nongnu.org, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Juan Quintela <quintela@redhat.com>
+To: qemu-devel@nongnu.org
 
-On Mon, Jun 05, 2017 at 03:22:24PM -0500, Eric Blake wrote:
-> On 05/19/2017 01:43 AM, Peter Xu wrote:
-> > We were do the shutting off only for postcopy. Now we do this as long as
-> > the source return path is there.
-> > 
-> > Moving the cleanup of from_src_file there too.
-> > 
-> > Signed-off-by: Peter Xu <peterx@redhat.com>
-> > ---
-> >  migration/migration.c    | 8 +++++++-
-> >  migration/postcopy-ram.c | 1 -
-> >  2 files changed, 7 insertions(+), 2 deletions(-)
-> 
-> This commit causes a regression in qemu-iotests 68:
-> 
-> $ cd tests/qemu-iotests
-> $ ./check -qcow2 68
-> ...
-> 068 1s ... - output mismatch (see 068.out.bad)
-> --- /home/eblake/qemu-tmp2/tests/qemu-iotests/068.out	2017-05-30
-> 09:27:26.795821748 -0500
-> +++ 068.out.bad	2017-06-05 15:21:18.566816816 -0500
-> @@ -6,6 +6,8 @@
->  QEMU X.Y.Z monitor - type 'help' for more information
->  (qemu) savevm 0
->  (qemu) quit
-> +./common.config: line 107:  1912 Segmentation fault      (core dumped)
-> ( if [ -n "${QEMU_NEED_PID}" ]; then
-> +    echo $BASHPID > "${QEMU_TEST_DIR}/qemu-${_QEMU_HANDLE}.pid";
-> +fi; exec "$QEMU_PROG" $QEMU_OPTIONS "$@" )
->  QEMU X.Y.Z monitor - type 'help' for more information
-> -(qemu) quit
-> -*** done
-> +(qemu) *** done
-> Failures: 068
-> Failed 1 of 1 tests
-> 
-> I didn't investigate further; but am hoping you'll be able to fix the
-> segfault and get the test working again.
+Hi all,
 
-Sorry for that! I will have a look.
+After upgrading gcc from 6.3.1 to 7.1.1, qemu can't be compiled with gcc.
 
--- 
-Peter Xu
+The error is:
+
+------
+   CC      block/blkdebug.o
+block/blkdebug.c: In function 'blkdebug_refresh_filename':
+block/blkdebug.c:693:31: error: '%s' directive output may be truncated 
+writing up to 4095 bytes into a region of size 4086 
+[-Werror=format-truncation=]
+                   "blkdebug:%s:%s", s->config_file ?: "",
+                                ^~
+In file included from /usr/include/stdio.h:939:0,
+                  from /home/adam/qemu/include/qemu/osdep.h:68,
+                  from block/blkdebug.c:25:
+/usr/include/bits/stdio2.h:64:10: note: '__builtin___snprintf_chk' 
+output 11 or more bytes (assuming 4106) into a destination of size 4096
+    return __builtin___snprintf_chk (__s, __n, __USE_FORTIFY_LEVEL - 1,
+           ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+         __bos (__s), __fmt, __va_arg_pack ());
+         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+cc1: all warnings being treated as errors
+make: *** [/home/adam/qemu/rules.mak:69: block/blkdebug.o] Error 1
+------
+
+It seems that gcc 7 is introducing more restrict check for printf.
+If using clang, although there are some extra warning, it can at least 
+pass the compile.
+
+Thanks,
+Qu
