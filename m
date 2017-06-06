@@ -1,33 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33433)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33765)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1dIIMe-0002LL-ND
-	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 13:33:57 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1dIINz-0003A3-CV
+	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 13:35:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1dIIMZ-0004sH-RT
-	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 13:33:56 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:48990)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1dIIMZ-0004rR-MO
-	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 13:33:51 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 6777EDF865
-	for <qemu-devel@nongnu.org>; Tue,  6 Jun 2017 17:33:46 +0000 (UTC)
-From: Juan Quintela <quintela@redhat.com>
-In-Reply-To: <20170606080550.GD27621@pxdev.xzpeter.org> (Peter Xu's message of
-	"Tue, 6 Jun 2017 16:05:50 +0800")
-References: <20170601220813.30535-1-quintela@redhat.com>
-	<20170601220813.30535-5-quintela@redhat.com>
-	<20170605123444.GK2109@work-vm>
-	<20170606080550.GD27621@pxdev.xzpeter.org>
-Reply-To: quintela@redhat.com
-Date: Tue, 06 Jun 2017 19:33:45 +0200
-Message-ID: <87ink958cm.fsf@secure.mitica>
+	(envelope-from <peter.maydell@linaro.org>) id 1dIINy-0005U7-HQ
+	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 13:35:19 -0400
+Received: from mail-wr0-x232.google.com ([2a00:1450:400c:c0c::232]:32867)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1dIINy-0005Tu-9m
+	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 13:35:18 -0400
+Received: by mail-wr0-x232.google.com with SMTP id v104so57313383wrb.0
+	for <qemu-devel@nongnu.org>; Tue, 06 Jun 2017 10:35:18 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH 4/5] ram: Use MigrationStats for statistics
+In-Reply-To: <1496746329-32047-1-git-send-email-jcmvbkbc@gmail.com>
+References: <1496746329-32047-1-git-send-email-jcmvbkbc@gmail.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 6 Jun 2017 18:34:56 +0100
+Message-ID: <CAFEAcA_UBTXqzJRkrRjcdWWoAr2dMsP5kVk1baiECwo=+Optvg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL v2 0/4] target/xtensa fixes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,50 +28,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-devel@nongnu.org, lvivier@redhat.com
+To: Max Filippov <jcmvbkbc@gmail.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-Peter Xu <peterx@redhat.com> wrote:
-> On Mon, Jun 05, 2017 at 01:34:45PM +0100, Dr. David Alan Gilbert wrote:
->> * Juan Quintela (quintela@redhat.com) wrote:
->> > RAM Statistics need to survive migration to make info migrate work, so we
->> > need to store them outside of RAMState.  As we already have an struct
->> > with those fields, just used them. (MigrationStats and XBZRLECacheStats).
->> > 
->> > Signed-off-by: Juan Quintela <quintela@redhat.com>
->> 
->> Hmm OK; this feels very much like it's the opposite of 180f61f from
->> March; these variables keep moving around over the last couple of months
->> - are they going to stay still now?
+On 6 June 2017 at 11:52, Max Filippov <jcmvbkbc@gmail.com> wrote:
+> Hi Peter,
 >
-> O:-)
+> please pull my current target/xtensa queue.
+> Changes v1->v2:
+> - re-base series to the latest mainline, fixing breakage caused by chardev
+>   code rearrangement.
 >
-> Meanwhile, I don't know whether it'll be necessary to remove all the
-> functions like ram_bytes_transferred(), e.g., it would be just:
+> The following changes since commit a0d4aac7467dd02e5657b79e867f067330266a24:
 >
-> uint64_t ram_bytes_transferred(void)
-> {
-> -    return ram_state.bytes_transferred;
-> +    return ram_counters.transferred;
-> }
+>   Merge remote-tracking branch 'remotes/rth/tags/pull-tcg-20170605' into staging (2017-06-05 18:03:43 +0100)
 >
-> But I'm okay with either.
+> are available in the git repository at:
+>
+>   git://github.com/OSLL/qemu-xtensa.git tags/20170606-xtensa
+>
+> for you to fetch changes up to dd7b952b793e341c905355581a21cdbaa8b13c31:
+>
+>   target/xtensa: handle unknown registers in gdbstub (2017-06-06 02:40:48 -0700)
+>
+> ----------------------------------------------------------------
+> target/xtensa fixes:
+>
+> - fix read/write simcall mapping flags and return value;
+> - use -serial option to direct console output of sim machine to QEMU chardev;
+> - fix handling of unknown registers in the gdbstub.
+>
 
-That value was only used for filling the statistics.  And we are filling
-a struct from another struct of the exact same type.  Going through an
-exported function looks stranger.
+Applied, thanks.
 
-And as said in $commit, the idea was that creating a new counter was
-easy, right now you have to:
-
-- add it to MigrationParam (still have to do this)
-- add it to MigrationParams (still have to do this)
-- create the field in MigrationStats or RAMState
-- create a function that exports it
-- add that function in ram.h to export it
-- add it on qmp_query (still have to do this)
-
-So, we are moving from 6 steps to 3 steps.  I think we are much better
-now, no? O:-)
-
-Later, Juan.
+-- PMM
