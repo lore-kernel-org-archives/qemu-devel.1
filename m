@@ -1,26 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54893)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56284)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1dIHx0-00075z-Uc
-	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 13:07:28 -0400
+	(envelope-from <cota@braap.org>) id 1dII2n-00013B-Bj
+	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 13:13:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1dIHwx-0002Ia-QI
-	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 13:07:26 -0400
-Resent-Message-Id: <E1dIHwx-0002Ia-QI@eggs.gnu.org>
-Received: from sender-of-o52.zoho.com ([135.84.80.217]:21458)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1dIHwx-0002IK-JJ
-	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 13:07:23 -0400
-Reply-To: <qemu-devel@nongnu.org>
-In-Reply-To: <20170606121747.25356-1-pbonzini@redhat.com>
-Message-ID: <149676882877.4849.9151155301030733942@f98a8425f76e>
+	(envelope-from <cota@braap.org>) id 1dII2k-0004ld-76
+	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 13:13:25 -0400
+Received: from out1-smtp.messagingengine.com ([66.111.4.25]:35383)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1dII2j-0004lW-Ny
+	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 13:13:22 -0400
+Date: Tue, 6 Jun 2017 13:13:20 -0400
+From: "Emilio G. Cota" <cota@braap.org>
+Message-ID: <20170606171320.GA8115@flamenco>
+References: <CAJhHMCBwu-pVAyxN+w8SSo19wi3DW3JCRRF-K1Sj9zYqGYkFvQ@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Tue, 6 Jun 2017 10:07:09 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH 0/7] megasas: fix TOCTOU and segmentation
- fault bugs
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAJhHMCBwu-pVAyxN+w8SSo19wi3DW3JCRRF-K1Sj9zYqGYkFvQ@mail.gmail.com>
+Subject: Re: [Qemu-devel] GSoC 2017 Proposal: TCG performance enhancements
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,55 +27,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: pbonzini@redhat.com
-Cc: famz@redhat.com, qemu-devel@nongnu.org, zyy4013@stu.ouc.edu.cn, hare@suse.de, ppandit@redhat.com
+To: Pranith Kumar <bobby.prani@gmail.com>
+Cc: Richard Henderson <rth@twiddle.net>, Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, qemu-devel <qemu-devel@nongnu.org>
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
-c3NhZ2UtaWQ6IDIwMTcwNjA2MTIxNzQ3LjI1MzU2LTEtcGJvbnppbmlAcmVkaGF0LmNvbQpTdWJq
-ZWN0OiBbUWVtdS1kZXZlbF0gW1BBVENIIDAvN10gbWVnYXNhczogZml4IFRPQ1RPVSBhbmQgc2Vn
-bWVudGF0aW9uIGZhdWx0IGJ1Z3MKCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jh
-c2gKCkJBU0U9YmFzZQpuPTEKdG90YWw9JChnaXQgbG9nIC0tb25lbGluZSAkQkFTRS4uIHwgd2Mg
-LWwpCmZhaWxlZD0wCgpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBj
-b25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQoKY29tbWl0cz0iJChnaXQgbG9nIC0tZm9y
-bWF0PSVIIC0tcmV2ZXJzZSAkQkFTRS4uKSIKZm9yIGMgaW4gJGNvbW1pdHM7IGRvCiAgICBlY2hv
-ICJDaGVja2luZyBQQVRDSCAkbi8kdG90YWw6ICQoZ2l0IGxvZyAtbiAxIC0tZm9ybWF0PSVzICRj
-KS4uLiIKICAgIGlmICEgZ2l0IHNob3cgJGMgLS1mb3JtYXQ9ZW1haWwgfCAuL3NjcmlwdHMvY2hl
-Y2twYXRjaC5wbCAtLW1haWxiYWNrIC07IHRoZW4KICAgICAgICBmYWlsZWQ9MQogICAgICAgIGVj
-aG8KICAgIGZpCiAgICBuPSQoKG4rMSkpCmRvbmUKCmV4aXQgJGZhaWxlZAo9PT0gVEVTVCBTQ1JJ
-UFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcx
-MzM4NApGcm9tIGh0dHBzOi8vZ2l0aHViLmNvbS9wYXRjaGV3LXByb2plY3QvcWVtdQogLSBbdGFn
-IHVwZGF0ZV0gICAgICBwYXRjaGV3LzE0OTY3NjU1NDQ4OC40MTM0LjE2MDk1MDQ0NTYyMzM0MTAy
-NzQyLnN0Z2l0QGJhaGlhLmxhYi50b3Vsb3VzZS1zdGcuZnIuaWJtLmNvbSAtPiBwYXRjaGV3LzE0
-OTY3NjU1NDQ4OC40MTM0LjE2MDk1MDQ0NTYyMzM0MTAyNzQyLnN0Z2l0QGJhaGlhLmxhYi50b3Vs
-b3VzZS1zdGcuZnIuaWJtLmNvbQogKiBbbmV3IHRhZ10gICAgICAgICBwYXRjaGV3LzIwMTcwNjA2
-MTYyNjUyLjExMjEyMi0xLXZzZW1lbnRzb3ZAdmlydHVvenpvLmNvbSAtPiBwYXRjaGV3LzIwMTcw
-NjA2MTYyNjUyLjExMjEyMi0xLXZzZW1lbnRzb3ZAdmlydHVvenpvLmNvbQpTd2l0Y2hlZCB0byBh
-IG5ldyBicmFuY2ggJ3Rlc3QnCjBiODJlNDcgbWVnYXNhczogYWx3YXlzIHN0b3JlIFNDU0lSZXF1
-ZXN0KiBpbnRvIE1lZ2FzYXNDbWQKMmNlNTFiYSBtZWdhc2FzOiBkbyBub3QgcmVhZCBTQ1NJIHJl
-cSBwYXJhbWV0ZXJzIG1vcmUgdGhhbiBvbmNlIGZyb20gZnJhbWUKNjFiNWVjNCBtZWdhc2FzOiBk
-byBub3QgcmVhZCBjb21tYW5kIG1vcmUgdGhhbiBvbmNlIGZyb20gZnJhbWUKNTRhZjE2NyBtZWdh
-c2FzOiBkbyBub3QgcmVhZCBEQ01EIG9wY29kZSBtb3JlIHRoYW4gb25jZSBmcm9tIGZyYW1lCjZi
-MDIwOTEgbWVnYXNhczogZG8gbm90IHJlYWQgaW92ZWMgY291bnQgbW9yZSB0aGFuIG9uY2UgZnJv
-bSBmcmFtZQo0ODQwMWMyIG1lZ2FzYXM6IGRvIG5vdCByZWFkIHNlbnNlIGxlbmd0aCBtb3JlIHRo
-YW4gb25jZSBmcm9tIGZyYW1lCjk1MjA0NzIgbWVnYXNhczogYWRkIHF0ZXN0Cgo9PT0gT1VUUFVU
-IEJFR0lOID09PQpDaGVja2luZyBQQVRDSCAxLzc6IG1lZ2FzYXM6IGFkZCBxdGVzdC4uLgpDaGVj
-a2luZyBQQVRDSCAyLzc6IG1lZ2FzYXM6IGRvIG5vdCByZWFkIHNlbnNlIGxlbmd0aCBtb3JlIHRo
-YW4gb25jZSBmcm9tIGZyYW1lLi4uCkNoZWNraW5nIFBBVENIIDMvNzogbWVnYXNhczogZG8gbm90
-IHJlYWQgaW92ZWMgY291bnQgbW9yZSB0aGFuIG9uY2UgZnJvbSBmcmFtZS4uLgpDaGVja2luZyBQ
-QVRDSCA0Lzc6IG1lZ2FzYXM6IGRvIG5vdCByZWFkIERDTUQgb3Bjb2RlIG1vcmUgdGhhbiBvbmNl
-IGZyb20gZnJhbWUuLi4KQ2hlY2tpbmcgUEFUQ0ggNS83OiBtZWdhc2FzOiBkbyBub3QgcmVhZCBj
-b21tYW5kIG1vcmUgdGhhbiBvbmNlIGZyb20gZnJhbWUuLi4KQ2hlY2tpbmcgUEFUQ0ggNi83OiBt
-ZWdhc2FzOiBkbyBub3QgcmVhZCBTQ1NJIHJlcSBwYXJhbWV0ZXJzIG1vcmUgdGhhbiBvbmNlIGZy
-b20gZnJhbWUuLi4KQ2hlY2tpbmcgUEFUQ0ggNy83OiBtZWdhc2FzOiBhbHdheXMgc3RvcmUgU0NT
-SVJlcXVlc3QqIGludG8gTWVnYXNhc0NtZC4uLgpFUlJPUjogc3BhY2UgcmVxdWlyZWQgYWZ0ZXIg
-dGhhdCAnLCcgKGN0eDpWeFYpCiMxMzk6IEZJTEU6IHRlc3RzL21lZ2FzYXMtdGVzdC5jOjU2Ogor
-ICAgIGRldiA9IHFwY2lfZGV2aWNlX2ZpbmQocXMtPnBjaWJ1cywgUVBDSV9ERVZGTig0LDApKTsK
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIF4KCnRv
-dGFsOiAxIGVycm9ycywgMCB3YXJuaW5ncywgMTQwIGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2gg
-aGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9y
-cwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUK
-Q0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21t
-YW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2Fs
-bHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVl
-ZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEBmcmVlbGlzdHMub3Jn
+On Sat, Mar 25, 2017 at 12:52:35 -0400, Pranith Kumar wrote:
+(snip)
+> * Implement an LRU translation block code cache.
+> 
+>   In the current TCG design, when the translation cache fills up, we flush all
+>   the translated blocks (TBs) to free up space. We can improve this situation
+>   by not flushing the TBs that were recently used i.e., by implementing an LRU
+>   policy for freeing the blocks. This should avoid the re-translation overhead
+>   for frequently used blocks and improve performance.
+
+I doubt this will yield any benefits because:
+
+- I still have not found a workload where the performance bottleneck is
+  code retranslation due to unnecessary flushes (unless of course we
+  artificially restrict the size of code_gen_buffer.)
+- To keep track of LRU you need at least one extra instruction on every
+  TB, e.g. to increase a counter or add a timestamp. This might be expensive
+  and possibly a scalability bottleneck (e.g. what to do when several
+  cores are executing the same TB?).
+- tb_find_pc now does a simple binary search. This is easy because we
+  know that TB's are allocated from code_gen_buffer in order. If they
+  were out of order, we'd need another data structure (e.g. some sort of
+  tree) to have quick searches. This is not a fast path though so this
+  could be OK.
+
+(snip)
+> Please let me know if you have any comments or suggestions. Also please let me
+> know if there are other enhancements that are easily implementable to increase
+> TCG performance as part of this project or otherwise.
+
+My not-necessarily-easy-to-implement wishlist would be:
+
+- Reduction of tb_lock contention when booting many cores. For instance,
+  booting 64 aarch64 cores on a 64-core host shows quite a bit of contention (host
+  cores are 80% idle, i.e. waiting to acquire tb_lock); fortunately this is not a
+  big deal (e.g. 4s for booting 1 core vs. ~14s to boot 64) and anyway most
+  long-running workloads are cached a lot more effectively.
+  Still, it would make sense to consider the option of not going through tb_lock
+  etc. (via a private cache? or simply not caching at all) for code that is not
+  executed many times. Another option is to translate privately, and only acquire
+  tb_lock to copy the translated code to the shared buffer.
+
+- Instrumentation. I think QEMU should have a good interface to enable
+  dynamic binary instrumentation. This has many uses and in fact there
+  are quite a few forks of QEMU doing this.
+  I think Lluís Vilanova's work [1] is a good start to eventually get
+  something upstream.
+
+		Emilio
+
+[1] https://projects.gso.ac.upc.edu/projects/qemu-dbi
