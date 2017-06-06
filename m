@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47316)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47405)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rkagan@virtuozzo.com>) id 1dIJ5G-0005fc-Mq
-	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 14:20:03 -0400
+	(envelope-from <rkagan@virtuozzo.com>) id 1dIJ5M-0005kw-3d
+	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 14:20:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rkagan@virtuozzo.com>) id 1dIJ5E-0007DN-LR
-	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 14:20:02 -0400
-Received: from mail-eopbgr30133.outbound.protection.outlook.com
-	([40.107.3.133]:4192
+	(envelope-from <rkagan@virtuozzo.com>) id 1dIJ5H-0007H7-Lc
+	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 14:20:08 -0400
+Received: from mail-eopbgr30138.outbound.protection.outlook.com
+	([40.107.3.138]:64275
 	helo=EUR03-AM5-obe.outbound.protection.outlook.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <rkagan@virtuozzo.com>)
-	id 1dIJ5E-00075V-Ay
-	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 14:20:00 -0400
+	id 1dIJ5H-0007Ep-DE
+	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 14:20:03 -0400
 From: Roman Kagan <rkagan@virtuozzo.com>
-Date: Tue,  6 Jun 2017 21:19:30 +0300
-Message-Id: <20170606181948.16238-6-rkagan@virtuozzo.com>
+Date: Tue,  6 Jun 2017 21:19:32 +0300
+Message-Id: <20170606181948.16238-8-rkagan@virtuozzo.com>
 In-Reply-To: <20170606181948.16238-1-rkagan@virtuozzo.com>
 References: <20170606181948.16238-1-rkagan@virtuozzo.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH 05/23] hyperv: ensure VP index equal to QEMU
- cpu_index
+Subject: [Qemu-devel] [PATCH 07/23] hyperv_testdev: refactor for readability
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,97 +31,187 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Paolo Bonzini <pbonzini@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Evgeny Yakovlev <eyakovlev@virtuozzo.com>, "Denis V . Lunev" <den@openvz.org>
 
-Hyper-V identifies vcpus by the virtual processor (VP) index which is
-normally queried by the guest via HV_X64_MSR_VP_INDEX msr.
-
-It has to be owned by QEMU in order to preserve it across migration.
-
-However, the current implementation in KVM doesn't allow to set this
-msr, and KVM uses its own notion of VP index.  Fortunately, the way
-vcpus are created in QEMU/KVM basically guarantees that the KVM value is
-equal to QEMU cpu_index.
-
-So, for back and forward compatibility, attempt to set the msr at vcpu
-init time to cpu_index, but ignore the errors; then query the msr value
-from KVM and assert that it's equal to cpu_index.  On current kernels
-this will work by luck; future ones will accept the value from
-userspace.
+Make hyperv_testdev slightly easier to follow and enhance in future.
+For that, put the hyperv sint routes (wrapped in a helper structure) on
+a linked list rather than a fixed-size array.
 
 Signed-off-by: Roman Kagan <rkagan@virtuozzo.com>
 ---
- target/i386/hyperv.h |  2 ++
- target/i386/hyperv.c |  5 +++++
- target/i386/kvm.c    | 26 ++++++++++++++++++++++++++
- 3 files changed, 33 insertions(+)
+ hw/misc/hyperv_testdev.c | 113 ++++++++++++++++++++++-------------------------
+ 1 file changed, 52 insertions(+), 61 deletions(-)
 
-diff --git a/target/i386/hyperv.h b/target/i386/hyperv.h
-index 0c3b562..35da0b1 100644
---- a/target/i386/hyperv.h
-+++ b/target/i386/hyperv.h
-@@ -39,4 +39,6 @@ void kvm_hv_sint_route_destroy(HvSintRoute *sint_route);
+diff --git a/hw/misc/hyperv_testdev.c b/hw/misc/hyperv_testdev.c
+index dbd7cdd..da87630 100644
+--- a/hw/misc/hyperv_testdev.c
++++ b/hw/misc/hyperv_testdev.c
+@@ -12,6 +12,7 @@
+  */
  
- int kvm_hv_sint_route_set_sint(HvSintRoute *sint_route);
+ #include "qemu/osdep.h"
++#include "qemu/queue.h"
+ #include <linux/kvm.h>
+ #include "hw/hw.h"
+ #include "hw/qdev.h"
+@@ -20,12 +21,17 @@
+ #include "target/i386/hyperv.h"
+ #include "kvm_i386.h"
  
-+uint32_t hyperv_vp_index(X86CPU *cpu);
-+
- #endif
-diff --git a/target/i386/hyperv.c b/target/i386/hyperv.c
-index 227185c..27de5bc 100644
---- a/target/i386/hyperv.c
-+++ b/target/i386/hyperv.c
-@@ -16,6 +16,11 @@
- #include "hyperv.h"
- #include "hyperv_proto.h"
+-#define HV_TEST_DEV_MAX_SINT_ROUTES 64
++typedef struct TestSintRoute {
++    QLIST_ENTRY(TestSintRoute) le;
++    uint8_t cpu;
++    uint8_t sint;
++    HvSintRoute *sint_route;
++} TestSintRoute;
  
-+uint32_t hyperv_vp_index(X86CPU *cpu)
-+{
-+    return CPU(cpu)->cpu_index;
-+}
-+
- int kvm_hv_handle_exit(X86CPU *cpu, struct kvm_hyperv_exit *exit)
+ struct HypervTestDev {
+     ISADevice parent_obj;
+     MemoryRegion sint_control;
+-    HvSintRoute *sint_route[HV_TEST_DEV_MAX_SINT_ROUTES];
++    QLIST_HEAD(, TestSintRoute) sint_routes;
+ };
+ typedef struct HypervTestDev HypervTestDev;
+ 
+@@ -39,88 +45,73 @@ enum {
+     HV_TEST_DEV_SINT_ROUTE_SET_SINT
+ };
+ 
+-static int alloc_sint_route_index(HypervTestDev *dev)
++static void sint_route_create(HypervTestDev *dev, uint8_t cpu, uint8_t sint)
  {
-     CPUX86State *env = &cpu->env;
-diff --git a/target/i386/kvm.c b/target/i386/kvm.c
-index 251aa95..eb9cde4 100644
---- a/target/i386/kvm.c
-+++ b/target/i386/kvm.c
-@@ -610,11 +610,37 @@ static int kvm_arch_set_tsc_khz(CPUState *cs)
-     return 0;
+-    int i;
++    TestSintRoute *sint_route;
+ 
+-    for (i = 0; i < ARRAY_SIZE(dev->sint_route); i++) {
+-        if (dev->sint_route[i] == NULL) {
+-            return i;
+-        }
+-    }
+-    return -1;
+-}
++    sint_route = g_new0(TestSintRoute, 1);
++    assert(sint_route);
+ 
+-static void free_sint_route_index(HypervTestDev *dev, int i)
+-{
+-    assert(i >= 0 && i < ARRAY_SIZE(dev->sint_route));
+-    dev->sint_route[i] = NULL;
++    sint_route->cpu = cpu;
++    sint_route->sint = sint;
++
++    sint_route->sint_route = kvm_hv_sint_route_create(cpu, sint, NULL);
++    assert(sint_route->sint_route);
++
++    QLIST_INSERT_HEAD(&dev->sint_routes, sint_route, le);
  }
  
-+static void hyperv_set_vp_index(CPUState *cs)
-+{
-+    struct {
-+        struct kvm_msrs info;
-+        struct kvm_msr_entry entries[1];
-+    } msr_data;
-+    int ret;
-+
-+    msr_data.info.nmsrs = 1;
-+    msr_data.entries[0].index = HV_X64_MSR_VP_INDEX;
-+
-+    /*
-+     * Some kernels don't support setting HV_X64_MSR_VP_INDEX.  However,
-+     * they use VP_INDEX equal to cpu_index due to the way vcpus are created.
-+     * So ignore the errors from SET_MSRS, but verify that GET_MSRS returns the
-+     * expected value.
-+     */
-+    msr_data.entries[0].data = cs->cpu_index;
-+    kvm_vcpu_ioctl(cs, KVM_SET_MSRS, &msr_data);
-+    ret = kvm_vcpu_ioctl(cs, KVM_GET_MSRS, &msr_data);
-+    assert(ret == 1);
-+    assert(msr_data.entries[0].data == cs->cpu_index);
+-static int find_sint_route_index(HypervTestDev *dev, uint32_t vcpu_id,
+-                                 uint32_t sint)
++static TestSintRoute *sint_route_find(HypervTestDev *dev,
++                                      uint8_t cpu, uint8_t sint)
+ {
+-    HvSintRoute *sint_route;
+-    int i;
++    TestSintRoute *sint_route;
+ 
+-    for (i = 0; i < ARRAY_SIZE(dev->sint_route); i++) {
+-        sint_route = dev->sint_route[i];
+-        if (sint_route && sint_route->vcpu_id == vcpu_id &&
+-            sint_route->sint == sint) {
+-            return i;
++    QLIST_FOREACH(sint_route, &dev->sint_routes, le) {
++        if (sint_route->cpu == cpu && sint_route->sint == sint) {
++            return sint_route;
+         }
+     }
+-    return -1;
++    assert(false);
++    return NULL;
+ }
+ 
+-static void hv_synic_test_dev_control(HypervTestDev *dev, uint32_t ctl,
+-                                      uint32_t vcpu_id, uint32_t sint)
++static void sint_route_destroy(HypervTestDev *dev, uint8_t cpu, uint8_t sint)
+ {
+-    int i;
+-    HvSintRoute *sint_route;
++    TestSintRoute *sint_route;
+ 
+-    switch (ctl) {
+-    case HV_TEST_DEV_SINT_ROUTE_CREATE:
+-        i = alloc_sint_route_index(dev);
+-        assert(i >= 0);
+-        sint_route = kvm_hv_sint_route_create(vcpu_id, sint, NULL);
+-        assert(sint_route);
+-        dev->sint_route[i] = sint_route;
+-        break;
+-    case HV_TEST_DEV_SINT_ROUTE_DESTROY:
+-        i = find_sint_route_index(dev, vcpu_id, sint);
+-        assert(i >= 0);
+-        sint_route = dev->sint_route[i];
+-        kvm_hv_sint_route_destroy(sint_route);
+-        free_sint_route_index(dev, i);
+-        break;
+-    case HV_TEST_DEV_SINT_ROUTE_SET_SINT:
+-        i = find_sint_route_index(dev, vcpu_id, sint);
+-        assert(i >= 0);
+-        sint_route = dev->sint_route[i];
+-        kvm_hv_sint_route_set_sint(sint_route);
+-        break;
+-    default:
+-        break;
+-    }
++    sint_route = sint_route_find(dev, cpu, sint);
++    QLIST_REMOVE(sint_route, le);
++    kvm_hv_sint_route_destroy(sint_route->sint_route);
++    g_free(sint_route);
 +}
 +
- static int hyperv_handle_properties(CPUState *cs)
- {
-     X86CPU *cpu = X86_CPU(cs);
-     CPUX86State *env = &cpu->env;
- 
-+    hyperv_set_vp_index(cs);
++static void sint_route_set_sint(HypervTestDev *dev, uint8_t cpu, uint8_t sint)
++{
++    TestSintRoute *sint_route;
 +
-     if (cpu->hyperv_time &&
-             kvm_check_extension(cs->kvm_state, KVM_CAP_HYPERV_TIME) <= 0) {
-         cpu->hyperv_time = false;
++    sint_route = sint_route_find(dev, cpu, sint);
++
++    kvm_hv_sint_route_set_sint(sint_route->sint_route);
+ }
+ 
+ static void hv_test_dev_control(void *opaque, hwaddr addr, uint64_t data,
+                                 uint32_t len)
+ {
+     HypervTestDev *dev = HYPERV_TEST_DEV(opaque);
+-    uint8_t ctl;
++    uint8_t sint = data & 0xFF;
++    uint8_t vcpu_id = (data >> 8ULL) & 0xFF;
++    uint8_t ctl = (data >> 16ULL) & 0xFF;
+ 
+-    ctl = (data >> 16ULL) & 0xFF;
+     switch (ctl) {
+     case HV_TEST_DEV_SINT_ROUTE_CREATE:
++        sint_route_create(dev, vcpu_id, sint);
++        break;
+     case HV_TEST_DEV_SINT_ROUTE_DESTROY:
+-    case HV_TEST_DEV_SINT_ROUTE_SET_SINT: {
+-        uint8_t sint = data & 0xFF;
+-        uint8_t vcpu_id = (data >> 8ULL) & 0xFF;
+-        hv_synic_test_dev_control(dev, ctl, vcpu_id, sint);
++        sint_route_destroy(dev, vcpu_id, sint);
++        break;
++    case HV_TEST_DEV_SINT_ROUTE_SET_SINT:
++        sint_route_set_sint(dev, vcpu_id, sint);
+         break;
+-    }
+     default:
+         break;
+     }
+@@ -139,7 +130,7 @@ static void hv_test_dev_realizefn(DeviceState *d, Error **errp)
+     HypervTestDev *dev = HYPERV_TEST_DEV(d);
+     MemoryRegion *io = isa_address_space_io(isa);
+ 
+-    memset(dev->sint_route, 0, sizeof(dev->sint_route));
++    QLIST_INIT(&dev->sint_routes);
+     memory_region_init_io(&dev->sint_control, OBJECT(dev),
+                           &synic_test_sint_ops, dev,
+                           "hyperv-testdev-ctl", 4);
 -- 
 2.9.4
