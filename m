@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38192)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38218)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1dICIV-00050n-2K
+	(envelope-from <kraxel@redhat.com>) id 1dICIX-00052U-W8
 	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 07:05:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1dICIT-0002iw-Bt
-	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 07:05:15 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:44310)
+	(envelope-from <kraxel@redhat.com>) id 1dICIR-0002iL-TG
+	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 07:05:17 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:44228)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1dICIT-0002ie-42
-	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 07:05:13 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1dICIR-0002hu-KY
+	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 07:05:11 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 318EABDD4
-	for <qemu-devel@nongnu.org>; Tue,  6 Jun 2017 11:05:12 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 9D53530AF4D
+	for <qemu-devel@nongnu.org>; Tue,  6 Jun 2017 11:05:10 +0000 (UTC)
 From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Tue,  6 Jun 2017 13:04:58 +0200
-Message-Id: <20170606110459.9771-4-kraxel@redhat.com>
+Date: Tue,  6 Jun 2017 13:04:59 +0200
+Message-Id: <20170606110459.9771-5-kraxel@redhat.com>
 In-Reply-To: <20170606110459.9771-1-kraxel@redhat.com>
 References: <20170606110459.9771-1-kraxel@redhat.com>
-Subject: [Qemu-devel] [PATCH 3/4] sdl2: use framebuffer helper functions.
+Subject: [Qemu-devel] [PATCH 4/4] gtk: use framebuffer helper functions.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,29 +34,19 @@ Cc: Gerd Hoffmann <kraxel@redhat.com>
 
 Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
 ---
- include/ui/sdl2.h |  8 ++++++--
- ui/sdl2-gl.c      | 38 ++++++++------------------------------
- 2 files changed, 14 insertions(+), 32 deletions(-)
+ include/ui/gtk.h |  4 ++--
+ ui/gtk-egl.c     | 38 ++++++++------------------------------
+ ui/gtk-gl-area.c | 26 +++++++-------------------
+ 3 files changed, 17 insertions(+), 51 deletions(-)
 
-diff --git a/include/ui/sdl2.h b/include/ui/sdl2.h
-index aaf226c2c0..454367ac84 100644
---- a/include/ui/sdl2.h
-+++ b/include/ui/sdl2.h
-@@ -7,6 +7,10 @@
- #include <SDL.h>
- #include <SDL_syswm.h>
- 
-+#ifdef CONFIG_OPENGL
-+# include "ui/egl-helpers.h"
-+#endif
-+
- struct sdl2_console {
-     DisplayChangeListener dcl;
-     DisplaySurface *surface;
-@@ -23,8 +27,8 @@ struct sdl2_console {
-     SDL_GLContext winctx;
- #ifdef CONFIG_OPENGL
-     ConsoleGLState *gls;
+diff --git a/include/ui/gtk.h b/include/ui/gtk.h
+index ca9a2268de..2f7b720358 100644
+--- a/include/ui/gtk.h
++++ b/include/ui/gtk.h
+@@ -52,8 +52,8 @@ typedef struct VirtualGfxConsole {
+     EGLSurface esurface;
+     int glupdates;
+     int x, y, w, h;
 -    GLuint tex_id;
 -    GLuint fbo_id;
 +    egl_fb guest_fb;
@@ -64,89 +54,155 @@ index aaf226c2c0..454367ac84 100644
      bool y0_top;
      bool scanout_mode;
  #endif
-diff --git a/ui/sdl2-gl.c b/ui/sdl2-gl.c
-index 1cd77e2c16..6640d0a9c8 100644
---- a/ui/sdl2-gl.c
-+++ b/ui/sdl2-gl.c
-@@ -42,14 +42,7 @@ static void sdl2_set_scanout_mode(struct sdl2_console *scon, bool scanout)
+diff --git a/ui/gtk-egl.c b/ui/gtk-egl.c
+index cf48cca259..c40f028b4b 100644
+--- a/ui/gtk-egl.c
++++ b/ui/gtk-egl.c
+@@ -30,14 +30,7 @@ static void gtk_egl_set_scanout_mode(VirtualConsole *vc, bool scanout)
  
-     scon->scanout_mode = scanout;
-     if (!scon->scanout_mode) {
--        if (scon->fbo_id) {
+     vc->gfx.scanout_mode = scanout;
+     if (!vc->gfx.scanout_mode) {
+-        if (vc->gfx.fbo_id) {
 -            glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT,
 -                                      GL_COLOR_ATTACHMENT0_EXT,
 -                                      GL_TEXTURE_2D, 0, 0);
--            glDeleteFramebuffers(1, &scon->fbo_id);
 -            glBindFramebuffer(GL_FRAMEBUFFER_EXT, 0);
--            scon->fbo_id = 0;
+-            glDeleteFramebuffers(1, &vc->gfx.fbo_id);
+-            vc->gfx.fbo_id = 0;
 -        }
-+        egl_fb_destroy(&scon->guest_fb);
-         if (scon->surface) {
-             surface_gl_destroy_texture(scon->gls, scon->surface);
-             surface_gl_create_texture(scon->gls, scon->surface);
-@@ -191,7 +184,6 @@ void sdl2_gl_scanout_disable(DisplayChangeListener *dcl)
-     assert(scon->opengl);
-     scon->w = 0;
-     scon->h = 0;
--    scon->tex_id = 0;
-     sdl2_set_scanout_mode(scon, false);
++        egl_fb_destroy(&vc->gfx.guest_fb);
+         if (vc->gfx.surface) {
+             surface_gl_destroy_texture(vc->gfx.gls, vc->gfx.ds);
+             surface_gl_create_texture(vc->gfx.gls, vc->gfx.ds);
+@@ -176,7 +169,6 @@ void gd_egl_scanout_disable(DisplayChangeListener *dcl)
+ 
+     vc->gfx.w = 0;
+     vc->gfx.h = 0;
+-    vc->gfx.tex_id = 0;
+     gtk_egl_set_scanout_mode(vc, false);
  }
  
-@@ -210,48 +202,34 @@ void sdl2_gl_scanout_texture(DisplayChangeListener *dcl,
-     scon->y = y;
-     scon->w = w;
-     scon->h = h;
--    scon->tex_id = backing_id;
-     scon->y0_top = backing_y_0_top;
+@@ -192,20 +184,14 @@ void gd_egl_scanout_texture(DisplayChangeListener *dcl,
+     vc->gfx.y = y;
+     vc->gfx.w = w;
+     vc->gfx.h = h;
+-    vc->gfx.tex_id = backing_id;
+     vc->gfx.y0_top = backing_y_0_top;
  
-     SDL_GL_MakeCurrent(scon->real_window, scon->winctx);
+     eglMakeCurrent(qemu_egl_display, vc->gfx.esurface,
+                    vc->gfx.esurface, vc->gfx.ectx);
  
-     sdl2_set_scanout_mode(scon, true);
--    if (!scon->fbo_id) {
--        glGenFramebuffers(1, &scon->fbo_id);
+     gtk_egl_set_scanout_mode(vc, true);
+-    if (!vc->gfx.fbo_id) {
+-        glGenFramebuffers(1, &vc->gfx.fbo_id);
 -    }
 -
--    glBindFramebuffer(GL_FRAMEBUFFER_EXT, scon->fbo_id);
+-    glBindFramebuffer(GL_FRAMEBUFFER_EXT, vc->gfx.fbo_id);
 -    glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT,
--                              GL_TEXTURE_2D, scon->tex_id, 0);
-+    egl_fb_create_for_tex(&scon->guest_fb, backing_width, backing_height,
+-                              GL_TEXTURE_2D, vc->gfx.tex_id, 0);
++    egl_fb_create_for_tex(&vc->gfx.guest_fb, backing_width, backing_height,
 +                          backing_id);
  }
  
- void sdl2_gl_scanout_flush(DisplayChangeListener *dcl,
-                            uint32_t x, uint32_t y, uint32_t w, uint32_t h)
+ void gd_egl_scanout_flush(DisplayChangeListener *dcl,
+@@ -213,30 +199,22 @@ void gd_egl_scanout_flush(DisplayChangeListener *dcl,
  {
-     struct sdl2_console *scon = container_of(dcl, struct sdl2_console, dcl);
+     VirtualConsole *vc = container_of(dcl, VirtualConsole, gfx.dcl);
+     GdkWindow *window;
 -    int ww, wh, y1, y2;
  
-     assert(scon->opengl);
-     if (!scon->scanout_mode) {
+     if (!vc->gfx.scanout_mode) {
          return;
      }
--    if (!scon->fbo_id) {
-+    if (!scon->guest_fb.framebuffer) {
+-    if (!vc->gfx.fbo_id) {
++    if (!vc->gfx.guest_fb.framebuffer) {
          return;
      }
  
-     SDL_GL_MakeCurrent(scon->real_window, scon->winctx);
+     eglMakeCurrent(qemu_egl_display, vc->gfx.esurface,
+                    vc->gfx.esurface, vc->gfx.ectx);
  
--    glBindFramebuffer(GL_READ_FRAMEBUFFER, scon->fbo_id);
+-    glBindFramebuffer(GL_READ_FRAMEBUFFER, vc->gfx.fbo_id);
 -    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
 -
--    SDL_GetWindowSize(scon->real_window, &ww, &wh);
+     window = gtk_widget_get_window(vc->gfx.drawing_area);
+-    gdk_drawable_get_size(window, &ww, &wh);
 -    glViewport(0, 0, ww, wh);
--    y1 = scon->y0_top ? 0 : scon->h;
--    y2 = scon->y0_top ? scon->h : 0;
--    glBlitFramebuffer(0, y1, scon->w, y2,
+-    y1 = vc->gfx.y0_top ? 0 : vc->gfx.h;
+-    y2 = vc->gfx.y0_top ? vc->gfx.h : 0;
+-    glBlitFramebuffer(0, y1, vc->gfx.w, y2,
 -                      0, 0, ww, wh,
 -                      GL_COLOR_BUFFER_BIT, GL_NEAREST);
--    glBindFramebuffer(GL_FRAMEBUFFER_EXT, scon->fbo_id);
-+    SDL_GetWindowSize(scon->real_window,
-+                      &scon->win_fb.width,
-+                      &scon->win_fb.height);
-+    egl_fb_blit(&scon->win_fb, &scon->guest_fb, !scon->y0_top);
+-    glBindFramebuffer(GL_FRAMEBUFFER_EXT, vc->gfx.fbo_id);
++    gdk_drawable_get_size(window,
++                          &vc->gfx.win_fb.width,
++                          &vc->gfx.win_fb.height);
++    egl_fb_blit(&vc->gfx.win_fb, &vc->gfx.guest_fb, !vc->gfx.y0_top);
  
-     SDL_GL_SwapWindow(scon->real_window);
+     eglSwapBuffers(qemu_egl_display, vc->gfx.esurface);
  }
+diff --git a/ui/gtk-gl-area.c b/ui/gtk-gl-area.c
+index b05c665cbb..18b298fc21 100644
+--- a/ui/gtk-gl-area.c
++++ b/ui/gtk-gl-area.c
+@@ -26,14 +26,7 @@ static void gtk_gl_area_set_scanout_mode(VirtualConsole *vc, bool scanout)
+ 
+     vc->gfx.scanout_mode = scanout;
+     if (!vc->gfx.scanout_mode) {
+-        if (vc->gfx.fbo_id) {
+-            glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT,
+-                                      GL_COLOR_ATTACHMENT0_EXT,
+-                                      GL_TEXTURE_2D, 0, 0);
+-            glBindFramebuffer(GL_FRAMEBUFFER_EXT, 0);
+-            glDeleteFramebuffers(1, &vc->gfx.fbo_id);
+-            vc->gfx.fbo_id = 0;
+-        }
++        egl_fb_destroy(&vc->gfx.guest_fb);
+         if (vc->gfx.surface) {
+             surface_gl_destroy_texture(vc->gfx.gls, vc->gfx.ds);
+             surface_gl_create_texture(vc->gfx.gls, vc->gfx.ds);
+@@ -56,11 +49,11 @@ void gd_gl_area_draw(VirtualConsole *vc)
+     wh = gtk_widget_get_allocated_height(vc->gfx.drawing_area);
+ 
+     if (vc->gfx.scanout_mode) {
+-        if (!vc->gfx.fbo_id) {
++        if (!vc->gfx.guest_fb.framebuffer) {
+             return;
+         }
+ 
+-        glBindFramebuffer(GL_READ_FRAMEBUFFER, vc->gfx.fbo_id);
++        glBindFramebuffer(GL_READ_FRAMEBUFFER, vc->gfx.guest_fb.framebuffer);
+         /* GtkGLArea sets GL_DRAW_FRAMEBUFFER for us */
+ 
+         glViewport(0, 0, ww, wh);
+@@ -181,24 +174,19 @@ void gd_gl_area_scanout_texture(DisplayChangeListener *dcl,
+     vc->gfx.y = y;
+     vc->gfx.w = w;
+     vc->gfx.h = h;
+-    vc->gfx.tex_id = backing_id;
+     vc->gfx.y0_top = backing_y_0_top;
+ 
+     gtk_gl_area_make_current(GTK_GL_AREA(vc->gfx.drawing_area));
+ 
+-    if (vc->gfx.tex_id == 0 || vc->gfx.w == 0 || vc->gfx.h == 0) {
++    if (vc->gfx.guest_fb.framebuffer  == 0 ||
++        vc->gfx.w == 0 || vc->gfx.h == 0) {
+         gtk_gl_area_set_scanout_mode(vc, false);
+         return;
+     }
+ 
+     gtk_gl_area_set_scanout_mode(vc, true);
+-    if (!vc->gfx.fbo_id) {
+-        glGenFramebuffers(1, &vc->gfx.fbo_id);
+-    }
+-
+-    glBindFramebuffer(GL_FRAMEBUFFER_EXT, vc->gfx.fbo_id);
+-    glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT,
+-                              GL_TEXTURE_2D, vc->gfx.tex_id, 0);
++    egl_fb_create_for_tex(&vc->gfx.guest_fb, backing_width, backing_height,
++                          backing_id);
+ }
+ 
+ void gd_gl_area_scanout_flush(DisplayChangeListener *dcl,
 -- 
 2.9.3
