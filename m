@@ -1,33 +1,39 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58409)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59054)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dIIAG-0004BO-3t
-	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 13:21:09 -0400
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1dIICH-0005kF-UD
+	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 13:23:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dIIAB-00085e-4y
-	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 13:21:08 -0400
-Received: from indium.canonical.com ([91.189.90.7]:42305)
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1dIICD-0000Ky-06
+	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 13:23:13 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:43903
+	helo=mx0a-001b2d01.pphosted.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1dIIAA-00085Q-UZ
-	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 13:21:03 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1dIIA7-0007Mi-C6
-	for <qemu-devel@nongnu.org>; Tue, 06 Jun 2017 17:20:59 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 0C79E2E81A0
-	for <qemu-devel@nongnu.org>; Tue,  6 Jun 2017 17:20:58 +0000 (UTC)
-MIME-Version: 1.0
+	(Exim 4.71) (envelope-from <mdroth@linux.vnet.ibm.com>)
+	id 1dIICC-0000Km-Pb
+	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 13:23:08 -0400
+Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v56HIbJ9075735
+	for <qemu-devel@nongnu.org>; Tue, 6 Jun 2017 13:23:07 -0400
+Received: from e17.ny.us.ibm.com (e17.ny.us.ibm.com [129.33.205.207])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2awy7kvy77-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Tue, 06 Jun 2017 13:23:07 -0400
+Received: from localhost
+	by e17.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <mdroth@linux.vnet.ibm.com>;
+	Tue, 6 Jun 2017 13:23:06 -0400
 Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-Date: Tue, 06 Jun 2017 17:05:58 -0000
-From: Ziemowit Pierzycki <ziemowit@pierzycki.com>
-Reply-To: Bug 1696180 <1696180@bugs.launchpad.net>
-Sender: bounces@canonical.com
-Message-Id: <149676875833.612.2775062648799367879.malonedeb@chaenomeles.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1696180] [NEW] Issues with qemu-img, libgfapi,
- and encryption at rest
+From: Michael Roth <mdroth@linux.vnet.ibm.com>
+In-Reply-To: <20170606083221.9299-3-david@gibson.dropbear.id.au>
+References: <20170606083221.9299-1-david@gibson.dropbear.id.au>
+	<20170606083221.9299-3-david@gibson.dropbear.id.au>
+Date: Tue, 06 Jun 2017 11:21:24 -0500
+Message-Id: <149676608476.2548.3465140774718898504@loki>
+Subject: Re: [Qemu-devel] [PATCH 2/7] spapr: Abolish DRC get_name method
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,112 +42,94 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: lvivier@redhat.com, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, bharata@linux.vnet.ibm.com, sursingh@redhat.com, groug@kaod.org
 
-Public bug reported:
+Quoting David Gibson (2017-06-06 03:32:16)
+> DRConnectorClass has a get_name method, however:
+>   * There's only one implementation, and only ever likely to be one
+>   * There's exactly one caller, which is (now) local
+>   * The implementation is trivial
+> =
 
-Hi,
+> So just open-code what we need.
+> =
 
-Encryption-at-rest has been supported for some time now.  The client is
-responsible for encrypting the files with a help of a master key file.
-I have a properly setup environment and everything appears to be working
-fine but when I use qemu-img to move a file to gluster I get the
-following:
+> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 
+Reviewed-by: Michael Roth <mdroth@linux.vnet.ibm.com>
 
-# qemu-img convert -f raw -O raw linux.iso gluster://gluster01/virt0/linux.=
-raw
-[2017-06-06 16:52:25.489720] E [mem-pool.c:579:mem_put] (-->/lib64/libglust=
-erfs.so.0(syncop_lookup+0x4e5) [0x7f30f7a36d35] -->/lib64/libglusterfs.so.0=
-(+0x59f02) [0x7f30f7a32f02] -->/lib64/libglusterfs.so.0(mem_put+0x190) [0x7=
-f30f7a24a60] ) 0-mem-pool: mem-pool ptr is NULL
-[2017-06-06 16:52:25.490778] E [mem-pool.c:579:mem_put] (-->/lib64/libglust=
-erfs.so.0(syncop_lookup+0x4e5) [0x7f30f7a36d35] -->/lib64/libglusterfs.so.0=
-(+0x59f02) [0x7f30f7a32f02] -->/lib64/libglusterfs.so.0(mem_put+0x190) [0x7=
-f30f7a24a60] ) 0-mem-pool: mem-pool ptr is NULL
-[2017-06-06 16:52:25.492263] E [mem-pool.c:579:mem_put] (-->/lib64/libglust=
-erfs.so.0(syncop_lookup+0x4e5) [0x7f30f7a36d35] -->/lib64/libglusterfs.so.0=
-(+0x59f02) [0x7f30f7a32f02] -->/lib64/libglusterfs.so.0(mem_put+0x190) [0x7=
-f30f7a24a60] ) 0-mem-pool: mem-pool ptr is NULL
-[2017-06-06 16:52:25.497226] E [mem-pool.c:579:mem_put] (-->/lib64/libglust=
-erfs.so.0(syncop_create+0x44d) [0x7f30f7a3cf5d] -->/lib64/libglusterfs.so.0=
-(+0x59f02) [0x7f30f7a32f02] -->/lib64/libglusterfs.so.0(mem_put+0x190) [0x7=
-f30f7a24a60] ) 0-mem-pool: mem-pool ptr is NULL
+> ---
+>  hw/ppc/spapr_drc.c         | 11 ++---------
+>  include/hw/ppc/spapr_drc.h |  1 -
+>  2 files changed, 2 insertions(+), 10 deletions(-)
+> =
 
-On and on until I get this message:
+> diff --git a/hw/ppc/spapr_drc.c b/hw/ppc/spapr_drc.c
+> index da3779e..9140b48 100644
+> --- a/hw/ppc/spapr_drc.c
+> +++ b/hw/ppc/spapr_drc.c
+> @@ -167,11 +167,6 @@ static uint32_t set_allocation_state(sPAPRDRConnecto=
+r *drc,
+>      return RTAS_OUT_SUCCESS;
+>  }
+> =
 
-[2017-06-06 17:00:03.467361] E [MSGID: 108006] [afr-common.c:4409:afr_notif=
-y] 0-virt0-replicate-0: All subvolumes are down. Going offline until atleas=
-t one of them comes back up.
-[2017-06-06 17:00:03.467442] E [MSGID: 108006] [afr-common.c:4409:afr_notif=
-y] 0-virt0-replicate-1: All subvolumes are down. Going offline until atleas=
-t one of them comes back up.
+> -static const char *get_name(sPAPRDRConnector *drc)
+> -{
+> -    return drc->name;
+> -}
+> -
+>  /* has the guest been notified of device attachment? */
+>  static void set_signalled(sPAPRDRConnector *drc)
+>  {
+> @@ -221,8 +216,7 @@ static void prop_get_index(Object *obj, Visitor *v, c=
+onst char *name,
+>  static char *prop_get_name(Object *obj, Error **errp)
+>  {
+>      sPAPRDRConnector *drc =3D SPAPR_DR_CONNECTOR(obj);
+> -    sPAPRDRConnectorClass *drck =3D SPAPR_DR_CONNECTOR_GET_CLASS(drc);
+> -    return g_strdup(drck->get_name(drc));
+> +    return g_strdup(drc->name);
+>  }
+> =
 
-I asked for help assuming it's a problem with glusterfs and was told it
-appears qemu-img's implementation of libgfapi doesn't call the xlator
-function correctly.
+>  static void prop_get_fdt(Object *obj, Visitor *v, const char *name,
+> @@ -653,7 +647,6 @@ static void spapr_dr_connector_class_init(ObjectClass=
+ *k, void *data)
+>      drck->set_isolation_state =3D set_isolation_state;
+>      drck->set_indicator_state =3D set_indicator_state;
+>      drck->set_allocation_state =3D set_allocation_state;
+> -    drck->get_name =3D get_name;
+>      drck->attach =3D attach;
+>      drck->detach =3D detach;
+>      drck->release_pending =3D release_pending;
+> @@ -848,7 +841,7 @@ int spapr_drc_populate_dt(void *fdt, int fdt_offset, =
+Object *owner,
+>          g_array_append_val(drc_power_domains, drc_power_domain);
+> =
 
-** Affects: qemu
-     Importance: Undecided
-         Status: New
+>          /* ibm,drc-names */
+> -        drc_names =3D g_string_append(drc_names, drck->get_name(drc));
+> +        drc_names =3D g_string_append(drc_names, drc->name);
+>          drc_names =3D g_string_insert_len(drc_names, -1, "\0", 1);
+> =
 
+>          /* ibm,drc-types */
+> diff --git a/include/hw/ppc/spapr_drc.h b/include/hw/ppc/spapr_drc.h
+> index f892b94..795b7dd 100644
+> --- a/include/hw/ppc/spapr_drc.h
+> +++ b/include/hw/ppc/spapr_drc.h
+> @@ -223,7 +223,6 @@ typedef struct sPAPRDRConnectorClass {
+>                                      sPAPRDRIndicatorState state);
+>      uint32_t (*set_allocation_state)(sPAPRDRConnector *drc,
+>                                       sPAPRDRAllocationState state);
+> -    const char *(*get_name)(sPAPRDRConnector *drc);
+> =
 
-** Tags: glusterfs libgfapi qemu
+>      /* QEMU interfaces for managing hotplug operations */
+>      void (*attach)(sPAPRDRConnector *drc, DeviceState *d, void *fdt,
+> -- =
 
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1696180
-
-Title:
-  Issues with qemu-img, libgfapi, and encryption at rest
-
-Status in QEMU:
-  New
-
-Bug description:
-  Hi,
-
-  Encryption-at-rest has been supported for some time now.  The client
-  is responsible for encrypting the files with a help of a master key
-  file.  I have a properly setup environment and everything appears to
-  be working fine but when I use qemu-img to move a file to gluster I
-  get the following:
-
-  =
-
-  # qemu-img convert -f raw -O raw linux.iso gluster://gluster01/virt0/linu=
-x.raw
-  [2017-06-06 16:52:25.489720] E [mem-pool.c:579:mem_put] (-->/lib64/libglu=
-sterfs.so.0(syncop_lookup+0x4e5) [0x7f30f7a36d35] -->/lib64/libglusterfs.so=
-.0(+0x59f02) [0x7f30f7a32f02] -->/lib64/libglusterfs.so.0(mem_put+0x190) [0=
-x7f30f7a24a60] ) 0-mem-pool: mem-pool ptr is NULL
-  [2017-06-06 16:52:25.490778] E [mem-pool.c:579:mem_put] (-->/lib64/libglu=
-sterfs.so.0(syncop_lookup+0x4e5) [0x7f30f7a36d35] -->/lib64/libglusterfs.so=
-.0(+0x59f02) [0x7f30f7a32f02] -->/lib64/libglusterfs.so.0(mem_put+0x190) [0=
-x7f30f7a24a60] ) 0-mem-pool: mem-pool ptr is NULL
-  [2017-06-06 16:52:25.492263] E [mem-pool.c:579:mem_put] (-->/lib64/libglu=
-sterfs.so.0(syncop_lookup+0x4e5) [0x7f30f7a36d35] -->/lib64/libglusterfs.so=
-.0(+0x59f02) [0x7f30f7a32f02] -->/lib64/libglusterfs.so.0(mem_put+0x190) [0=
-x7f30f7a24a60] ) 0-mem-pool: mem-pool ptr is NULL
-  [2017-06-06 16:52:25.497226] E [mem-pool.c:579:mem_put] (-->/lib64/libglu=
-sterfs.so.0(syncop_create+0x44d) [0x7f30f7a3cf5d] -->/lib64/libglusterfs.so=
-.0(+0x59f02) [0x7f30f7a32f02] -->/lib64/libglusterfs.so.0(mem_put+0x190) [0=
-x7f30f7a24a60] ) 0-mem-pool: mem-pool ptr is NULL
-
-  On and on until I get this message:
-
-  [2017-06-06 17:00:03.467361] E [MSGID: 108006] [afr-common.c:4409:afr_not=
-ify] 0-virt0-replicate-0: All subvolumes are down. Going offline until atle=
-ast one of them comes back up.
-  [2017-06-06 17:00:03.467442] E [MSGID: 108006] [afr-common.c:4409:afr_not=
-ify] 0-virt0-replicate-1: All subvolumes are down. Going offline until atle=
-ast one of them comes back up.
-
-  I asked for help assuming it's a problem with glusterfs and was told
-  it appears qemu-img's implementation of libgfapi doesn't call the
-  xlator function correctly.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1696180/+subscriptions
+> 2.9.4
+>=20
