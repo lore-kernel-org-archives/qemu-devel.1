@@ -1,29 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60534)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42262)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dIJqH-0007g1-I9
-	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 15:08:38 -0400
+	(envelope-from <sf@sfritsch.de>) id 1dIKSH-0001vv-14
+	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 15:47:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dIJqE-0004Jp-Dy
-	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 15:08:37 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:38722)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dIJqE-0004JR-5f
-	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 15:08:34 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <20170531135709.345-1-marcandre.lureau@redhat.com>
-	<20170531135709.345-9-marcandre.lureau@redhat.com>
-	<87o9u7re8c.fsf@dusky.pond.sub.org>
-	<CAJ+F1CKve9_W2q4CvBnbHdoyrie6rjNub1q0Nds9MGrcOGpZ_Q@mail.gmail.com>
-Date: Tue, 06 Jun 2017 21:08:31 +0200
-In-Reply-To: <CAJ+F1CKve9_W2q4CvBnbHdoyrie6rjNub1q0Nds9MGrcOGpZ_Q@mail.gmail.com>
-	(=?utf-8?Q?=22Marc-Andr=C3=A9?= Lureau"'s message of "Tue, 06 Jun 2017
-	16:14:39 +0000")
-Message-ID: <87d1ahexxs.fsf@dusky.pond.sub.org>
+	(envelope-from <sf@sfritsch.de>) id 1dIKSG-0003m5-39
+	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 15:47:53 -0400
+Received: from manul.sfritsch.de ([2a01:4f8:172:195f:112::2]:36054)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <sf@sfritsch.de>) id 1dIKSF-0003j1-Sc
+	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 15:47:52 -0400
+Date: Tue, 6 Jun 2017 21:47:47 +0200 (CEST)
+From: Stefan Fritsch <sf@sfritsch.de>
+In-Reply-To: <87a85ljdhn.fsf@dusky.pond.sub.org>
+Message-ID: <alpine.DEB.2.11.1706062141260.14384@manul.sfritsch.de>
+References: <20170605085254.16485-1-sf@sfritsch.de>
+	<e27e8fb4-64fa-9ba9-26a2-aa2af758462b@redhat.com>
+	<39506179-0abd-5bba-89a2-fe89e6f3a167@redhat.com>
+	<87a85ljdhn.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 08/45] tests: add more int/number ranges
- checks
+Content-Type: TEXT/PLAIN; charset=US-ASCII
+Subject: Re: [Qemu-devel] [PATCH] Add chardev-send-break monitor command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,76 +28,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@gmail.com>
-Cc: qemu-devel@nongnu.org
+To: Markus Armbruster <armbru@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org, =?ISO-8859-15?Q?Marc-Andr=E9_Lureau?= <marcandre.lureau@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-Marc-Andr=C3=A9 Lureau <marcandre.lureau@gmail.com> writes:
+On Tue, 6 Jun 2017, Markus Armbruster wrote:
+> >> Is there an obvious test that we can enhance to add coverage of the new
+> >> QMP command?
+> >
+> > You could have a new test covering hw/char/serial.c, but I wouldn't let
+> > that hold the patch.
+> 
+> Holding patches is pretty much the only leverage I have to get tests for
+> new stuff :)
+> 
+> Asking for tests that cover all of serial.c wouldn't be fair.  But I am
+> asking for basic test coverage of new QMP commands.
 
-> Hi
->
-> On Thu, Jun 1, 2017 at 6:10 PM Markus Armbruster <armbru@redhat.com> wrot=
-e:
->
->> Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
->>
->> > Suggested by Markus Armbruster:
->> >
->> > We should systematically cover the integers, in particular the
->> > boundaries (because that's where bugs like to hide):
->> >
->> > * Integers in [-2^63,0) can be visited with visit_type_int() and
->> >   visit_type_number().
->> >
->> > * Integers in [0,2^63) can be visited with visit_type_int(),
->> >   visit_type_uint64() and visit_type_number().
->> >
->> > * Integers in [2^63,2^64) can be visited with visit_type_uint64() and
->> >   visit_type_number().
->> >
->> > * Integers outside [-2^63,2^53) can be visited with visit_type_number(=
-).
->> >
->> > In any case, visit_type_number() loses precision beyond 53 bits.
->> >
->> > Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-[...]
->> > @@ -260,6 +272,26 @@ static void test_visitor_in_number(TestInputVisit=
-orData *data,
->> >      g_assert_cmpfloat(res, =3D=3D, value);
->> >  }
->> >
->> > +static void test_visitor_in_large_number(TestInputVisitorData *data,
->> > +                                         const void *unused)
->> > +{
->> > +    Error *err =3D NULL;
->> > +    double res =3D 0;
->> > +    int64_t i64;
->> > +    uint64_t u64;
->> > +    Visitor *v;
->> > +
->> > +    v =3D visitor_input_test_init(data, "-18446744073709551616"); /* =
--2^64 */
->> > +
->> > +    visit_type_number(v, NULL, &res, &error_abort);
->>
->> Shouldn't we check res has the expected value?
->>
->>
-> Is the precision loss during conversion  going to be the same on all arch=
-s?
+One can easily extend tests/test-hmp.c, but AFAICS that only checks that 
+qemu does not crash when the command is executed.
 
-Yes.  Precision is 53 bits on all hosts that matter, because double is
-IEEE 754 / IEC 60559 double precision on all hosts that matter.
+But I have managed to extend tests/test-char.c to call 
+qmp_chardev_send_break() in the char_file_test() (see below). Is that what 
+you had in mind? It seems it is not possible to use 
+qtest_qmp_discard_response() from a unit test, so I don't know how to send 
+actual json from inside test-char.c
 
-For pedantic portability, you may guard with #ifdef __STDC_IEC_559__.
-ISO/IEC 9899 =C2=A76.8.10 Predefined macro names:
+Cheers,
+Stefan
 
-       __STDC_IEC_559__ The   integer   constant   1,  intended  to
-                indicate conformance to the specifications in annex
-                F (IEC 60559 floating-point arithmetic).
 
-Annex F (normative) section F.2 Types:
-
-         -- The double type matches the IEC 60559 double format.
-
-I wouldn't bother.
+diff --git a/tests/test-char.c b/tests/test-char.c
+index dfe856cb85..ad20b55f77 100644
+--- a/tests/test-char.c
++++ b/tests/test-char.c
+@@ -53,7 +53,9 @@ static void fe_event(void *opaque, int event)
+     FeHandler *h = opaque;
+ 
+     h->last_event = event;
+-    quit = true;
++    if (event != CHR_EVENT_BREAK) {
++        quit = true;
++    }
+ }
+ 
+ #ifdef CONFIG_HAS_GLIB_SUBPROCESS_TESTS
+@@ -491,7 +493,7 @@ static void char_file_test(void)
+ 
+         file.in = fifo;
+         file.has_in = true;
+-        chr = qemu_chardev_new(NULL, TYPE_CHARDEV_FILE, &backend,
++        chr = qemu_chardev_new("label-file", TYPE_CHARDEV_FILE, &backend,
+                                &error_abort);
+ 
+         qemu_chr_fe_init(&be, chr, &error_abort);
+@@ -501,6 +503,10 @@ static void char_file_test(void)
+                                  fe_event,
+                                  &fe, NULL, true);
+ 
++        g_assert_cmpint(fe.last_event, !=, CHR_EVENT_BREAK);
++        qmp_chardev_send_break("label-file", NULL);
++        g_assert_cmpint(fe.last_event, ==, CHR_EVENT_BREAK);
++
+         main_loop();
+ 
+         close(fd);
+diff --git a/tests/test-hmp.c b/tests/test-hmp.c
+index 99e35ec15a..6dfa0c36e2 100644
+--- a/tests/test-hmp.c
++++ b/tests/test-hmp.c
+@@ -22,6 +22,7 @@ static int verbose;
+ static const char *hmp_cmds[] = {
+     "boot_set ndc",
+     "chardev-add null,id=testchardev1",
++    "chardev-send-break testchardev1",
+     "chardev-remove testchardev1",
+     "commit all",
+     "cpu-add 1",
