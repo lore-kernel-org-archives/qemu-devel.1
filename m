@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54265)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54277)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dI4aw-0003Us-UZ
-	for qemu-devel@nongnu.org; Mon, 05 Jun 2017 22:51:48 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1dI4ax-0003Ut-IC
+	for qemu-devel@nongnu.org; Mon, 05 Jun 2017 22:51:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dI4at-0002wu-RJ
-	for qemu-devel@nongnu.org; Mon, 05 Jun 2017 22:51:46 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1dI4aw-0002yS-Bq
+	for qemu-devel@nongnu.org; Mon, 05 Jun 2017 22:51:47 -0400
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Tue,  6 Jun 2017 12:51:22 +1000
-Message-Id: <20170606025135.2685-5-david@gibson.dropbear.id.au>
+Date: Tue,  6 Jun 2017 12:51:25 +1000
+Message-Id: <20170606025135.2685-8-david@gibson.dropbear.id.au>
 In-Reply-To: <20170606025135.2685-1-david@gibson.dropbear.id.au>
 References: <20170606025135.2685-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [PULL 04/17] spapr: Abolish DRC get_fdt method
+Subject: [Qemu-devel] [PULL 07/17] target-ppc: Fix openpic timer read
+ register offset
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,116 +21,97 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org
-Cc: agraf@suse.de, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, mdroth@linux.vnet.ibm.com, David Gibson <david@gibson.dropbear.id.au>
+Cc: agraf@suse.de, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, mdroth@linux.vnet.ibm.com, Aaron Larson <alarson@ddci.com>, David Gibson <david@gibson.dropbear.id.au>
 
-The DRConnectorClass includes a get_fdt method.  However
-  * There's only one implementation, and there's only likely to ever be one
-  * Both callers are local to spapr_drc
-  * Each caller only uses one half of the actual implementation
+From: Aaron Larson <alarson@ddci.com>
 
-So abolish get_fdt() entirely, and just open-code what we need.
+openpic_tmr_read() is incorrectly computing register offset of the
+TCCR, TBCR, TVPR, and TDR registers when accessing the open pic timer
+registers.  Specifically the offset of timer registers for
+openpic_tmr_read() is not accounting for the timer frequency reporting
+register (TFFR) which is the first register in the "tmr" memory
+region.
 
+openpic_tmr_write() *is* correctly computing the offset by adding
+0x10f0 to the address prior to computing the register index.  This
+patch instead subtracts 0x10 in both the read and write routines and
+eliminates some other gratuitous differences between the functions.
+
+Signed-off-by: Aaron Larson <alarson@ddci.com>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-Reviewed-by: Laurent Vivier <lvivier@redhat.com>
-Reviewed-by: Greg Kurz <groug@kaod.org>
-Tested-by: Daniel Barboza <danielhb@linux.vnet.ibm.com>
 ---
- hw/ppc/spapr_drc.c         | 23 ++++++-----------------
- include/hw/ppc/spapr_drc.h |  1 -
- 2 files changed, 6 insertions(+), 18 deletions(-)
+ hw/intc/openpic.c | 22 ++++++++++------------
+ 1 file changed, 10 insertions(+), 12 deletions(-)
 
-diff --git a/hw/ppc/spapr_drc.c b/hw/ppc/spapr_drc.c
-index ae8800d..f5b7b68 100644
---- a/hw/ppc/spapr_drc.c
-+++ b/hw/ppc/spapr_drc.c
-@@ -199,14 +199,6 @@ static const char *get_name(sPAPRDRConnector *drc)
-     return drc->name;
+diff --git a/hw/intc/openpic.c b/hw/intc/openpic.c
+index 4349e45..f966d06 100644
+--- a/hw/intc/openpic.c
++++ b/hw/intc/openpic.c
+@@ -796,27 +796,24 @@ static uint64_t openpic_gbl_read(void *opaque, hwaddr addr, unsigned len)
  }
  
--static const void *get_fdt(sPAPRDRConnector *drc, int *fdt_start_offset)
--{
--    if (fdt_start_offset) {
--        *fdt_start_offset = drc->fdt_start_offset;
--    }
--    return drc->fdt;
--}
--
- static void set_configured(sPAPRDRConnector *drc)
+ static void openpic_tmr_write(void *opaque, hwaddr addr, uint64_t val,
+-                                unsigned len)
++                              unsigned len)
  {
-     trace_spapr_drc_set_configured(get_index(drc));
-@@ -753,7 +745,6 @@ static void spapr_dr_connector_class_init(ObjectClass *k, void *data)
-     drck->get_index = get_index;
-     drck->get_type = get_type;
-     drck->get_name = get_name;
--    drck->get_fdt = get_fdt;
-     drck->set_configured = set_configured;
-     drck->entity_sense = entity_sense;
-     drck->attach = attach;
-@@ -1126,7 +1117,6 @@ static void rtas_ibm_configure_connector(PowerPCCPU *cpu,
-     sPAPRConfigureConnectorState *ccs;
-     sPAPRDRCCResponse resp = SPAPR_DR_CC_RESPONSE_CONTINUE;
-     int rc;
--    const void *fdt;
+     OpenPICState *opp = opaque;
+     int idx;
  
-     if (nargs != 2 || nret != 1) {
-         rtas_st(rets, 0, RTAS_OUT_PARAM_ERROR);
-@@ -1144,8 +1134,7 @@ static void rtas_ibm_configure_connector(PowerPCCPU *cpu,
+-    addr += 0x10f0;
+-
+     DPRINTF("%s: addr %#" HWADDR_PRIx " <= %08" PRIx64 "\n",
+-            __func__, addr, val);
++            __func__, (addr + 0x10f0), val);
+     if (addr & 0xF) {
+         return;
      }
  
-     drck = SPAPR_DR_CONNECTOR_GET_CLASS(drc);
--    fdt = drck->get_fdt(drc, NULL);
--    if (!fdt) {
-+    if (!drc->fdt) {
-         trace_spapr_rtas_ibm_configure_connector_missing_fdt(drc_index);
-         rc = SPAPR_DR_CC_RESPONSE_NOT_CONFIGURABLE;
+-    if (addr == 0x10f0) {
++    if (addr == 0) {
+         /* TFRR */
+         opp->tfrr = val;
+         return;
+     }
+-
++    addr -= 0x10;  /* correct for TFRR */
+     idx = (addr >> 6) & 0x3;
+-    addr = addr & 0x30;
+ 
+     switch (addr & 0x30) {
+     case 0x00: /* TCCR */
+@@ -844,16 +841,17 @@ static uint64_t openpic_tmr_read(void *opaque, hwaddr addr, unsigned len)
+     uint32_t retval = -1;
+     int idx;
+ 
+-    DPRINTF("%s: addr %#" HWADDR_PRIx "\n", __func__, addr);
++    DPRINTF("%s: addr %#" HWADDR_PRIx "\n", __func__, addr + 0x10f0);
+     if (addr & 0xF) {
          goto out;
-@@ -1154,7 +1143,7 @@ static void rtas_ibm_configure_connector(PowerPCCPU *cpu,
-     ccs = spapr_ccs_find(spapr, drc_index);
-     if (!ccs) {
-         ccs = g_new0(sPAPRConfigureConnectorState, 1);
--        (void)drck->get_fdt(drc, &ccs->fdt_offset);
-+        ccs->fdt_offset = drc->fdt_start_offset;
-         ccs->drc_index = drc_index;
-         spapr_ccs_add(spapr, ccs);
      }
-@@ -1165,12 +1154,12 @@ static void rtas_ibm_configure_connector(PowerPCCPU *cpu,
-         const struct fdt_property *prop;
-         int fdt_offset_next, prop_len;
- 
--        tag = fdt_next_tag(fdt, ccs->fdt_offset, &fdt_offset_next);
-+        tag = fdt_next_tag(drc->fdt, ccs->fdt_offset, &fdt_offset_next);
- 
-         switch (tag) {
-         case FDT_BEGIN_NODE:
-             ccs->fdt_depth++;
--            name = fdt_get_name(fdt, ccs->fdt_offset, NULL);
-+            name = fdt_get_name(drc->fdt, ccs->fdt_offset, NULL);
- 
-             /* provide the name of the next OF node */
-             wa_offset = CC_VAL_DATA_OFFSET;
-@@ -1193,9 +1182,9 @@ static void rtas_ibm_configure_connector(PowerPCCPU *cpu,
-             }
-             break;
-         case FDT_PROP:
--            prop = fdt_get_property_by_offset(fdt, ccs->fdt_offset,
-+            prop = fdt_get_property_by_offset(drc->fdt, ccs->fdt_offset,
-                                               &prop_len);
--            name = fdt_string(fdt, fdt32_to_cpu(prop->nameoff));
-+            name = fdt_string(drc->fdt, fdt32_to_cpu(prop->nameoff));
- 
-             /* provide the name of the next OF property */
-             wa_offset = CC_VAL_DATA_OFFSET;
-diff --git a/include/hw/ppc/spapr_drc.h b/include/hw/ppc/spapr_drc.h
-index 813b9ff..80db955 100644
---- a/include/hw/ppc/spapr_drc.h
-+++ b/include/hw/ppc/spapr_drc.h
-@@ -178,7 +178,6 @@ typedef struct sPAPRDRConnectorClass {
-     uint32_t (*entity_sense)(sPAPRDRConnector *drc, sPAPRDREntitySense *state);
- 
-     /* QEMU interfaces for managing FDT/configure-connector */
--    const void *(*get_fdt)(sPAPRDRConnector *drc, int *fdt_start_offset);
-     void (*set_configured)(sPAPRDRConnector *drc);
- 
-     /* QEMU interfaces for managing hotplug operations */
+-    idx = (addr >> 6) & 0x3;
+-    if (addr == 0x0) {
++    if (addr == 0) {
+         /* TFRR */
+         retval = opp->tfrr;
+         goto out;
+     }
++    addr -= 0x10;  /* correct for TFRR */
++    idx = (addr >> 6) & 0x3;
+     switch (addr & 0x30) {
+     case 0x00: /* TCCR */
+         retval = opp->timers[idx].tccr;
+@@ -861,10 +859,10 @@ static uint64_t openpic_tmr_read(void *opaque, hwaddr addr, unsigned len)
+     case 0x10: /* TBCR */
+         retval = opp->timers[idx].tbcr;
+         break;
+-    case 0x20: /* TIPV */
++    case 0x20: /* TVPR */
+         retval = read_IRQreg_ivpr(opp, opp->irq_tim0 + idx);
+         break;
+-    case 0x30: /* TIDE (TIDR) */
++    case 0x30: /* TDR */
+         retval = read_IRQreg_idr(opp, opp->irq_tim0 + idx);
+         break;
+     }
 -- 
 2.9.4
