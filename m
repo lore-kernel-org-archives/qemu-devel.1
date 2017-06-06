@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36511)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38886)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1dIAN9-0001mC-EK
-	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 05:02:00 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1dIAVE-0004Al-Ej
+	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 05:10:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1dIAN6-0008S9-BT
-	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 05:01:55 -0400
-Received: from mailhub.sw.ru ([195.214.232.25]:32900 helo=relay.sw.ru)
+	(envelope-from <vsementsov@virtuozzo.com>) id 1dIAV9-0003hn-Ca
+	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 05:10:16 -0400
+Received: from mailhub.sw.ru ([195.214.232.25]:43076 helo=relay.sw.ru)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
-	id 1dIAN5-0008Rl-Uu
-	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 05:01:52 -0400
+	id 1dIAV9-0003eh-0i
+	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 05:10:11 -0400
 References: <20170530143052.165002-1-vsementsov@virtuozzo.com>
-	<20170530143052.165002-19-vsementsov@virtuozzo.com>
-	<426afe4b-30b9-8d85-67d5-20af3bae775d@redhat.com>
+	<20170530143052.165002-20-vsementsov@virtuozzo.com>
+	<ca6625b0-1be4-fa44-f6fe-da935621d6b3@redhat.com>
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <31f65f46-29f2-db09-e2aa-42cd62bcd0c6@virtuozzo.com>
-Date: Tue, 6 Jun 2017 12:01:46 +0300
+Message-ID: <90014201-59ca-1a22-660d-2046a240ea45@virtuozzo.com>
+Date: Tue, 6 Jun 2017 12:10:07 +0300
 MIME-Version: 1.0
-In-Reply-To: <426afe4b-30b9-8d85-67d5-20af3bae775d@redhat.com>
+In-Reply-To: <ca6625b0-1be4-fa44-f6fe-da935621d6b3@redhat.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 7bit
 Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH 18/19] nbd/client: refactor TRACE of
- NBD_MAGIC
+Subject: Re: [Qemu-devel] [PATCH 19/19] nbd: use generic trace subsystem
+ instead of TRACE macro
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,59 +32,47 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
-Cc: pbonzini@redhat.com, den@openvz.org
+Cc: pbonzini@redhat.com, den@openvz.org, Stefan Hajnoczi <stefanha@redhat.com>
 
-05.06.2017 18:06, Eric Blake wrote:
+05.06.2017 18:23, Eric Blake wrote:
+> [adding Stefan as trace maintainer]
+>
 > On 05/30/2017 09:30 AM, Vladimir Sementsov-Ogievskiy wrote:
 >> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 >> ---
->>   nbd/client.c | 26 +++++++++++++++++---------
->>   1 file changed, 17 insertions(+), 9 deletions(-)
->>
->> diff --git a/nbd/client.c b/nbd/client.c
->> index 3d15596120..52f7981c9c 100644
->> --- a/nbd/client.c
->> +++ b/nbd/client.c
->> @@ -426,6 +426,21 @@ static QIOChannel *nbd_receive_starttls(QIOChannel *ioc,
->>       return QIO_CHANNEL(tioc);
->>   }
->>   
->> +static const char *nbd_magic_to_string(char *out, const char *in,
->> +                                       size_t count)
->> +{
->> +    size_t i;
->> +
->> +    for (i = 0; i < count; ++i) {
->> +        if (in[i] == '\0') {
->> +            out[i] = '\0';
->> +            break;
->> +        }
->> +        out[i] = qemu_isprint(in[i]) ? in[i] : '.';
->> +    }
->> +
->> +    return out;
->> +}
-> Do we really need this?
->
->> -    TRACE("Magic is %c%c%c%c%c%c%c%c",
->> -          qemu_isprint(buf[0]) ? buf[0] : '.',
->> -          qemu_isprint(buf[1]) ? buf[1] : '.',
->> -          qemu_isprint(buf[2]) ? buf[2] : '.',
->> -          qemu_isprint(buf[3]) ? buf[3] : '.',
->> -          qemu_isprint(buf[4]) ? buf[4] : '.',
->> -          qemu_isprint(buf[5]) ? buf[5] : '.',
->> -          qemu_isprint(buf[6]) ? buf[6] : '.',
->> -          qemu_isprint(buf[7]) ? buf[7] : '.');
->> +    TRACE("Magic is %s", nbd_magic_to_string(print_buf, buf, 9));
-> Would it be any simpler to just print the received magic as a 64-bit
-> number in hex, instead of trying to string-ize it?  Either the client
-> sends the right magic (the usual case), so we don't need to waste time
-> string-izing it, or the client is bogus and sent us garbage (where
-> printing a hex value is just as efficient as string-izing things to see
-> what the garbage actually was).
->
-agree.
+>>   Makefile.objs      |  1 +
+>>   nbd/client.c       | 77 ++++++++++++++++++++++++----------------------------
+>>   nbd/nbd-internal.h | 19 -------------
+>>   nbd/server.c       | 79 ++++++++++++++++++++++++++----------------------------
+>>   nbd/trace-events   | 67 +++++++++++++++++++++++++++++++++++++++++++++
+>>   5 files changed, 141 insertions(+), 102 deletions(-)
 
+[...]
+
+>>           goto fail;
+>>       }
+>>       magic = be64_to_cpu(magic);
+>> -    TRACE("Magic is 0x%" PRIx64, magic);
+>> +    trace_nbd_receive_negotiate_magic2(magic);
+> In fact, I think you only need one trace function for tracing an 8-byte
+> magic number, that can be called from more than one spot.
+
+You've touched interesting point: is it normal to create 
+trace-functions, used as different trace-points? So should 
+trace-point-name describe point in the program or not? I've thought it 
+should.
+
+>
+>> @@ -501,15 +499,16 @@ int nbd_receive_negotiate(QIOChannel *ioc, const char *name, uint16_t *flags,
+>>               goto fail;
+>>           }
+>>           globalflags = be16_to_cpu(globalflags);
+>> -        TRACE("Global flags are %" PRIx32, globalflags);
+>> +        trace_nbd_receive_negotiate_server_flags(
+>> +            globalflags,
+>> +            !!(globalflags & NBD_FLAG_FIXED_NEWSTYLE),
+>> +            !!(globalflags & NBD_FLAG_NO_ZEROES));
+> Why do we have to trace particular b
 
 
 -- 
