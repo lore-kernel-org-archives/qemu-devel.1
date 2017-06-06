@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42780)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43736)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1dIAn4-0000nU-Re
-	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 05:28:43 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1dIArz-0002Mg-6G
+	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 05:33:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1dIAn0-0004eu-PK
-	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 05:28:42 -0400
-Received: from mail-wm0-x22f.google.com ([2a00:1450:400c:c09::22f]:33945)
+	(envelope-from <alex.bennee@linaro.org>) id 1dIArv-00069A-Sl
+	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 05:33:47 -0400
+Received: from mail-wr0-x22d.google.com ([2a00:1450:400c:c0c::22d]:36378)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1dIAn0-0004cS-JC
-	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 05:28:38 -0400
-Received: by mail-wm0-x22f.google.com with SMTP id d64so3683570wmf.1
-	for <qemu-devel@nongnu.org>; Tue, 06 Jun 2017 02:28:35 -0700 (PDT)
-Date: Tue, 6 Jun 2017 10:28:31 +0100
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20170606092831.GA8013@stefanha-x1.localdomain>
-References: <CALfaEa0MirxK6ESnepptGLiugYZBOSQVxe=R72h+c_-GBXkYzQ@mail.gmail.com>
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1dIArv-00068M-J4
+	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 05:33:43 -0400
+Received: by mail-wr0-x22d.google.com with SMTP id v111so44840036wrc.3
+	for <qemu-devel@nongnu.org>; Tue, 06 Jun 2017 02:33:43 -0700 (PDT)
+References: <20170505103822.20641-1-alex.bennee@linaro.org>
+	<001901d2dde9$e34034c0$a9c09e40$@ru>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <001901d2dde9$e34034c0$a9c09e40$@ru>
+Date: Tue, 06 Jun 2017 10:34:05 +0100
+Message-ID: <87wp8pcvea.fsf@linaro.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="envbJBWh7q8WU6mo"
-Content-Disposition: inline
-In-Reply-To: <CALfaEa0MirxK6ESnepptGLiugYZBOSQVxe=R72h+c_-GBXkYzQ@mail.gmail.com>
-Subject: Re: [Qemu-devel] [PATCH] split c and cxx extra flags
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [RFC PATCH v1 0/9] BQL and Replay Lock changes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,129 +30,129 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Bruno Dominguez <bru.dominguez@gmail.com>
-Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>
+To: Pavel Dovgalyuk <dovgaluk@ispras.ru>
+Cc: pbonzini@redhat.com, boost.lists@gmail.com, pavel.dovgaluk@ispras.ru, cota@braap.org, qemu-devel@nongnu.org
 
 
---envbJBWh7q8WU6mo
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Pavel Dovgalyuk <dovgaluk@ispras.ru> writes:
 
-On Fri, Jun 02, 2017 at 02:07:26PM +0100, Bruno Dominguez wrote:
-> There was no possibility to add specific cxx flags using the configure
-> file. So A new entrance has been created to support it.
->=20
-> Duplication of information in configure and rules.mak. Taking
-> QEMU_CFLAGS and add them to QEMU_CXXFLAGS, now the value of
-> QEMU_CXXFLAGS is stored in config-host.mak, so there is no need for
-> it.
->=20
-> The makefile for libvixl was adding flags for QEMU_CXXFLAGS in
-> QEMU_CFLAGS because of the addition in rules.mak. That was removed, so
-> adding them where it should be.
->=20
-> -----
-> Signed-off-by: Bruno Dominguez <bru.dominguez@gmail.com>
-> -----
+> Alex,
+>
+> Do you have newer fixed version of these patches?
 
-Please follow the code submission guidelines:
-http://wiki.qemu.org/Contribute/SubmitAPatch
+I was waiting to see if there where any other review comments for the
+rest of the RFC series before re-spinning.
 
- * The commit message (email subject) should have a prefix describing
-   the affected component.  Use "git log ./configure" for inspiration.
-   I suggest the following:
+>
+> Pavel Dovgalyuk
+>
+>
+>> -----Original Message-----
+>> From: Alex Bennée [mailto:alex.bennee@linaro.org]
+>> Sent: Friday, May 05, 2017 1:38 PM
+>> To: pbonzini@redhat.com; boost.lists@gmail.com; pavel.dovgaluk@ispras.ru
+>> Cc: cota@braap.org; qemu-devel@nongnu.org; Alex Bennée
+>> Subject: [RFC PATCH v1 0/9] BQL and Replay Lock changes
+>>
+>> Hi,
+>>
+>> This RFC does two principle things. It continues the push to reduce
+>> the BQL lock contention to a minimum by dropping the BQL for most of
+>> the run loop - eventually only holding it for timer processing and
+>> sleeping. The second part is an attempt to fix the breakage caused to
+>> record/replay by the previous work reducing the BQL in 2.9.
+>>
+>> The patch breakdown is as follows:
+>>
+>>  - target/arm/arm-powertctl: drop BQL assertions
+>>
+>> This just fixes a bogus assert. The async work doesn't need BQL
+>> protection as it is all done in the context of the vCPU (meaning
+>> nothing else should be messing with it). However going forward we will
+>> need to audit all the async work calls to make sure they are fine to
+>> run outside of the BQL.
+>>
+>>  - cpus: push BQL lock to qemu_*_wait_io_event
+>>  - cpus: only take BQL for sleeping threads
+>>
+>> The BQL reduction is done in two stages, mainly to make bisection
+>> easier.
+>>
+>>  - replay/replay-internal.c: track holding of replay_lock
+>>  - replay: make locking visible outside replay code
+>>  - replay: push replay_mutex_lock up the call tree
+>>
+>> There is still more work to do here but essentially replay_lock now
+>> replaces the BQL in keeping synchronisation between main-loop and the
+>> TCG thread - it is no longer a fine lock for the replay log but a
+>> gross lock that keeps batches of updates together. So far I have been
+>> testing with the simple testcase:
+>>
+>>   ./arm-softmmu/qemu-system-arm -machine type=vexpress-a9 -m 1024 \
+>>     -display none -smp 1 -kernel ../images/vexpress-kernel.img \
+>>     -dtb ../images/vexpress-v2p-ca9.dtb  \
+>>     -append "console=ttyAMA0" -serial mon:stdio \
+>>     -icount shift=7,rr=record,rrfile=replay.bin
+>>
+>> ..and that works fine. However more complex testing with more devices
+>> to exercise the async events code is needed here. One change that
+>> needs some careful care is we are now not dropping the replay_mutex
+>> lock between events.
+>>
+>> And finally:
+>>
+>>  - scripts/qemu-gdb: add simple tcg lock status helper
+>>  - util/qemu-thread-*: add qemu_lock, locked and unlock trace events
+>>  - scripts/analyse-locks-simpletrace.py: script to analyse lock times
+>>
+>> These are helpers I wrote while debugging the locking. The GDB helper
+>> is fairly dump but does attempt to show where locks are held. The
+>> qemu-lock tracing is a little hacky but could prove useful in doing
+>> more detailed lock analysis.
+>>
+>> Any thoughts/comments? Does this seem like a reasonable direction to
+>> go?
+>>
+>> Alex Bennée (9):
+>>   target/arm/arm-powertctl: drop BQL assertions
+>>   cpus: push BQL lock to qemu_*_wait_io_event
+>>   cpus: only take BQL for sleeping threads
+>>   replay/replay-internal.c: track holding of replay_lock
+>>   replay: make locking visible outside replay code
+>>   replay: push replay_mutex_lock up the call tree
+>>   scripts/qemu-gdb: add simple tcg lock status helper
+>>   util/qemu-thread-*: add qemu_lock, locked and unlock trace events
+>>   scripts/analyse-locks-simpletrace.py: script to analyse lock times
+>>
+>>  cpus-common.c                        | 13 ++---
+>>  cpus.c                               | 57 ++++++++++++++++++---
+>>  docs/replay.txt                      | 19 +++++++
+>>  include/qemu/thread.h                |  7 ++-
+>>  include/sysemu/replay.h              | 16 ++++++
+>>  kvm-all.c                            |  4 --
+>>  replay/replay-char.c                 | 21 +++-----
+>>  replay/replay-events.c               | 18 ++-----
+>>  replay/replay-internal.c             | 22 +++++++-
+>>  replay/replay-internal.h             |  5 +-
+>>  replay/replay-time.c                 | 10 ++--
+>>  replay/replay.c                      | 40 +++++++--------
+>>  scripts/analyse-locks-simpletrace.py | 99 ++++++++++++++++++++++++++++++++++++
+>>  scripts/qemu-gdb.py                  |  3 +-
+>>  scripts/qemugdb/tcg.py               | 46 +++++++++++++++++
+>>  stubs/replay.c                       | 15 ++++++
+>>  target/arm/arm-powerctl.c            |  8 ---
+>>  target/i386/hax-all.c                |  2 -
+>>  util/main-loop.c                     | 23 +++++++--
+>>  util/qemu-thread-posix.c             | 11 +++-
+>>  util/trace-events                    |  5 ++
+>>  vl.c                                 |  2 +
+>>  22 files changed, 353 insertions(+), 93 deletions(-)
+>>  create mode 100755 scripts/analyse-locks-simpletrace.py
+>>  create mode 100644 scripts/qemugdb/tcg.py
+>>
+>> --
+>> 2.11.0
 
-     configure: split c and cxx extra flags
 
- * Use git-format-patch(1) so that your patch applies cleanly.  Your
-   email has:
-
-   ----
-   Signed-off-by: ...
-   ----
-
-   This is not the format recognized by tools.  Instead the
-   Signed-off-by: should be part of the commit description (no '----')
-   and then a line with just three hyphens ('---') denotes the end of
-   the commit description:
-
-   Signed-off-by: ...
-   ---
-
- * The email must not be line-wrapped since that breaks the patch.  If
-   you use git-send-email(1) to submit patches then this is taken care
-   of automatically.
-
-> @@ -1304,6 +1312,7 @@ Advanced options (experts only):
->    --cxx=3DCXX                use C++ compiler CXX [$cxx]
->    --objcc=3DOBJCC            use Objective-C compiler OBJCC [$objcc]
->    --extra-cflags=3DCFLAGS    append extra C compiler flags QEMU_CFLAGS
-> +  --extra-cxxflags=3DCXXFLAGS append extra CXX compiler flags QEMU_CXXFL=
-AGS
-
-For consistency with the --cxx=3D option description:
-
-s/CXX compiler/C++ compiler/
-
-> @@ -1489,37 +1498,6 @@ if test "$bogus_os" =3D "yes"; then
->      error_exit "Unrecognized host OS $targetos"
->  fi
->=20
-> -# Check that the C++ compiler exists and works with the C compiler
-> -if has $cxx; then
-> -    cat > $TMPC <<EOF
-> -int c_function(void);
-> -int main(void) { return c_function(); }
-> -EOF
-> -
-> -    compile_object
-> -
-> -    cat > $TMPCXX <<EOF
-> -extern "C" {
-> -   int c_function(void);
-> -}
-> -int c_function(void) { return 42; }
-> -EOF
-> -
-> -    update_cxxflags
-> -
-> -    if do_cxx $QEMU_CXXFLAGS -o $TMPE $TMPCXX $TMPO $LDFLAGS; then
-> -        # C++ compiler $cxx works ok with C compiler $cc
-> -        :
-> -    else
-> -        echo "C++ compiler $cxx does not work with C compiler $cc"
-> -        echo "Disabling C++ specific optional code"
-> -        cxx=3D
-> -    fi
-> -else
-> -    echo "No C++ compiler available; disabling C++ specific optional cod=
-e"
-> -    cxx=3D
-> -fi
-> -
-
-Why move this code?
-
->=20
-> Bruno
->=20
-
-This signature will break tools that apply the patch.  It's easiest to
-use git-send-email(1) to avoid problems like this.
-
---envbJBWh7q8WU6mo
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJZNnW/AAoJEJykq7OBq3PIlGgH/jmrZfuLgd+yfV3ebsWHFH79
-tu89xUxw1jCoHtmZiTFVsOTK5ZH+axKE3zeIV88Dh22EjQ9NUmJMdXQ+ZUdvUzBG
-DG9IRSaHOsy9j0LTQNtGqrUcChtpoj1tFnifVK+RFOwnGVfGGlUlyAdcmhb9XXrp
-U8xdWiBEbYf8ks3utEkjvG9t6fhgSv98FbmQWvjFl/9FLGg/j65ClKP5vAwxR0kA
-4P5rNjKPoNzKhLka7DjRoqC6Dao5DfLHacd1KSwbr3oNVRdjRQEIvnF4vn5A2da/
-5IqvSD+kGWHzYWN6P7OIx8LdrttISm/vTMMFcowDnuUJEC9qHGTgarh7Eg2/eWg=
-=veB6
------END PGP SIGNATURE-----
-
---envbJBWh7q8WU6mo--
+--
+Alex Bennée
