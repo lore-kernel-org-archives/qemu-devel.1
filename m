@@ -1,32 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35020)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35354)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1dIISQ-0004Hd-Vu
-	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 13:39:55 -0400
+	(envelope-from <bounces@canonical.com>) id 1dIITh-0005Do-6Q
+	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 13:41:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1dIISN-00074b-2Y
-	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 13:39:55 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:36038)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1dIISM-00074A-TJ
-	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 13:39:51 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id C206C4E02D
-	for <qemu-devel@nongnu.org>; Tue,  6 Jun 2017 17:39:44 +0000 (UTC)
-From: Juan Quintela <quintela@redhat.com>
-In-Reply-To: <20170606081634.GE27621@pxdev.xzpeter.org> (Peter Xu's message of
-	"Tue, 6 Jun 2017 16:16:34 +0800")
-References: <20170601220813.30535-1-quintela@redhat.com>
-	<20170601220813.30535-6-quintela@redhat.com>
-	<20170606081634.GE27621@pxdev.xzpeter.org>
-Reply-To: quintela@redhat.com
-Date: Tue, 06 Jun 2017 19:39:41 +0200
-Message-ID: <87efux582q.fsf@secure.mitica>
+	(envelope-from <bounces@canonical.com>) id 1dIITd-0007a7-9t
+	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 13:41:13 -0400
+Received: from indium.canonical.com ([91.189.90.7]:47468)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1dIITd-0007Zx-3i
+	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 13:41:09 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1dIITb-0007Ou-SZ
+	for <qemu-devel@nongnu.org>; Tue, 06 Jun 2017 17:41:08 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id B62DE2E8198
+	for <qemu-devel@nongnu.org>; Tue,  6 Jun 2017 17:41:07 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH 5/5] ram: Make RAMState dynamic
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 06 Jun 2017 17:32:33 -0000
+From: Thomas Huth <1696180@bugs.launchpad.net>
+Reply-To: Bug 1696180 <1696180@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <149676875833.612.2775062648799367879.malonedeb@chaenomeles.canonical.com>
+Message-Id: <149677035291.32456.13422707859315886268.malone@chaenomeles.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1696180] Re: Issues with qemu-img, libgfapi,
+ and encryption at rest
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,48 +37,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: qemu-devel@nongnu.org, dgilbert@redhat.com, lvivier@redhat.com
+To: qemu-devel@nongnu.org
 
-Peter Xu <peterx@redhat.com> wrote:
-> On Fri, Jun 02, 2017 at 12:08:13AM +0200, Juan Quintela wrote:
->> We create the variable while we are at migration and we remove it
->> after migration.
->> 
->> Signed-off-by: Juan Quintela <quintela@redhat.com>
+When reporting bugs to the QEMU project, please always try with the
+latest release first (distros are often not shipping the latest
+version). So can you please try with the latest release of QEMU
+(currently version 2.9.0)?
 
->> @@ -1818,6 +1825,8 @@ static int ram_state_init(RAMState *rs)
->>              error_report("Error allocating current_buf");
->>              g_free(XBZRLE.encoded_buf);
->>              XBZRLE.encoded_buf = NULL;
->> +            g_free(*rsp);
->> +            *rsp = NULL;
->
-> Though may not be directly related to this patch, but... do we need to
-> destroy the two mutexes as well?
->
->         (*rsp)->bitmap_mutex
->         (*rsp)->src_page_req_mutex
->
+** Changed in: qemu
+       Status: New =3D> Incomplete
 
-I guess so.  Will do on a next series.
+-- =
 
-> Also a nit: These several places I would slightly prefer a "goto
-> xbzrle_fail", then:
->
-> xbzrle_fail:
->     if (XBZRLE.encoded_buf) {
->         g_free(XBZRLE.encoded_buf);
->         XBZRLE.encoded_buf = NULL;
->     }
->     qemu_mutex_destroy(&(*rsp)->bitmap_mutex);
->     qemu_mutex_destroy(&(*rsp)->src_page_req_mutex);
->     g_free(*rsp);
->     *rsp = NULL;
->     return -1;
->
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1696180
 
-My idea is to split the XBZRLE bits from being all overal the code.  But
-that would be later O:-)
+Title:
+  Issues with qemu-img, libgfapi, and encryption at rest
 
-Later, Juan.
+Status in QEMU:
+  Incomplete
+
+Bug description:
+  Hi,
+
+  Encryption-at-rest has been supported for some time now.  The client
+  is responsible for encrypting the files with a help of a master key
+  file.  I have a properly setup environment and everything appears to
+  be working fine but when I use qemu-img to move a file to gluster I
+  get the following:
+
+  =
+
+  # qemu-img convert -f raw -O raw linux.iso gluster://gluster01/virt0/linu=
+x.raw
+  [2017-06-06 16:52:25.489720] E [mem-pool.c:579:mem_put] (-->/lib64/libglu=
+sterfs.so.0(syncop_lookup+0x4e5) [0x7f30f7a36d35] -->/lib64/libglusterfs.so=
+.0(+0x59f02) [0x7f30f7a32f02] -->/lib64/libglusterfs.so.0(mem_put+0x190) [0=
+x7f30f7a24a60] ) 0-mem-pool: mem-pool ptr is NULL
+  [2017-06-06 16:52:25.490778] E [mem-pool.c:579:mem_put] (-->/lib64/libglu=
+sterfs.so.0(syncop_lookup+0x4e5) [0x7f30f7a36d35] -->/lib64/libglusterfs.so=
+.0(+0x59f02) [0x7f30f7a32f02] -->/lib64/libglusterfs.so.0(mem_put+0x190) [0=
+x7f30f7a24a60] ) 0-mem-pool: mem-pool ptr is NULL
+  [2017-06-06 16:52:25.492263] E [mem-pool.c:579:mem_put] (-->/lib64/libglu=
+sterfs.so.0(syncop_lookup+0x4e5) [0x7f30f7a36d35] -->/lib64/libglusterfs.so=
+.0(+0x59f02) [0x7f30f7a32f02] -->/lib64/libglusterfs.so.0(mem_put+0x190) [0=
+x7f30f7a24a60] ) 0-mem-pool: mem-pool ptr is NULL
+  [2017-06-06 16:52:25.497226] E [mem-pool.c:579:mem_put] (-->/lib64/libglu=
+sterfs.so.0(syncop_create+0x44d) [0x7f30f7a3cf5d] -->/lib64/libglusterfs.so=
+.0(+0x59f02) [0x7f30f7a32f02] -->/lib64/libglusterfs.so.0(mem_put+0x190) [0=
+x7f30f7a24a60] ) 0-mem-pool: mem-pool ptr is NULL
+
+  On and on until I get this message:
+
+  [2017-06-06 17:00:03.467361] E [MSGID: 108006] [afr-common.c:4409:afr_not=
+ify] 0-virt0-replicate-0: All subvolumes are down. Going offline until atle=
+ast one of them comes back up.
+  [2017-06-06 17:00:03.467442] E [MSGID: 108006] [afr-common.c:4409:afr_not=
+ify] 0-virt0-replicate-1: All subvolumes are down. Going offline until atle=
+ast one of them comes back up.
+
+  I asked for help assuming it's a problem with glusterfs and was told
+  it appears qemu-img's implementation of libgfapi doesn't call the
+  xlator function correctly.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1696180/+subscriptions
