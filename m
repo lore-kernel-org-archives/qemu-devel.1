@@ -1,35 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50728)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56751)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1dIJER-0006OV-PT
-	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 14:29:32 -0400
+	(envelope-from <armbru@redhat.com>) id 1dIJbq-0003AV-W4
+	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 14:53:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1dIJEM-00034A-SG
-	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 14:29:31 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:58105)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
-	id 1dIJEM-00033R-IG
-	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 14:29:26 -0400
-Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v56IT4Mb109493
-	for <qemu-devel@nongnu.org>; Tue, 6 Jun 2017 14:29:25 -0400
-Received: from e06smtp14.uk.ibm.com (e06smtp14.uk.ibm.com [195.75.94.110])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2aww9sf3pq-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 06 Jun 2017 14:29:25 -0400
-Received: from localhost
-	by e06smtp14.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
-	Tue, 6 Jun 2017 19:29:22 +0100
-From: Christian Borntraeger <borntraeger@de.ibm.com>
-Date: Tue,  6 Jun 2017 20:29:15 +0200
-In-Reply-To: <1496773755-53343-1-git-send-email-borntraeger@de.ibm.com>
-References: <1496773755-53343-1-git-send-email-borntraeger@de.ibm.com>
-Message-Id: <1496773755-53343-6-git-send-email-borntraeger@de.ibm.com>
-Subject: [Qemu-devel] [PATCH 5/5] s390x/cpumodel: improve defintion search
- without an IBC
+	(envelope-from <armbru@redhat.com>) id 1dIJbn-0006dG-NA
+	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 14:53:43 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54374)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dIJbn-0006d3-Ed
+	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 14:53:39 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <cover.1496387804.git.maozy.fnst@cn.fujitsu.com>
+	<ffa2cc4d0706fa522a5e581af14dadb03aec323a.1496387804.git.maozy.fnst@cn.fujitsu.com>
+	<20170606182354-mutt-send-email-mst@kernel.org>
+	<87efuxjdpx.fsf@dusky.pond.sub.org>
+	<20170606210555-mutt-send-email-mst@kernel.org>
+Date: Tue, 06 Jun 2017 20:53:31 +0200
+In-Reply-To: <20170606210555-mutt-send-email-mst@kernel.org> (Michael
+	S. Tsirkin's message of "Tue, 6 Jun 2017 21:06:42 +0300")
+Message-ID: <87lgp5eyms.fsf@dusky.pond.sub.org>
+MIME-Version: 1.0
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v2 1/6] pci: Clean up error checking in
+ pci_add_capability()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,79 +31,90 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-devel <qemu-devel@nongnu.org>, Alexander Graf <agraf@suse.de>, Richard Henderson <rth@twiddle.net>, Cornelia Huck <cornelia.huck@de.ibm.com>, David Hildenbrand <david@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: marcel@redhat.com, Mao Zhongyi <maozy.fnst@cn.fujitsu.com>, qemu-devel@nongnu.org
 
-From: David Hildenbrand <david@redhat.com>
+"Michael S. Tsirkin" <mst@redhat.com> writes:
 
-Currently, under z/VM on a 0x2827, QEMU will detect a 0x2828 if no
-IBC value is provided. QEMU will simply take the last model of that HW
-generation, which happens to be the BC version.
+> On Tue, Jun 06, 2017 at 06:14:02PM +0200, Markus Armbruster wrote:
+>> "Michael S. Tsirkin" <mst@redhat.com> writes:
+>> 
+>> > On Fri, Jun 02, 2017 at 03:54:37PM +0800, Mao Zhongyi wrote:
+>> >> On success, pci_add_capability2() returns a positive value. On
+>> >> failure, it sets an error and return a negative value.
+>> >> 
+>> >> pci_add_capability() laboriously checks this behavior. No other
+>> >> caller does. Drop the checks from pci_add_capability().
+>> >> 
+>> >> Cc: mst@redhat.com
+>> >> Cc: marcel@redhat.com
+>> >> Cc: armbru@redhat.com
+>> >> Signed-off-by: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
+>> >> Reviewed-by: Marcel Apfelbaum <marcel@redhat.com>
+>> >> ---
+>> >>  hw/pci/pci.c | 6 +-----
+>> >>  1 file changed, 1 insertion(+), 5 deletions(-)
+>> >> 
+>> >> diff --git a/hw/pci/pci.c b/hw/pci/pci.c
+>> >> index 98ccc27..53566b8 100644
+>> >> --- a/hw/pci/pci.c
+>> >> +++ b/hw/pci/pci.c
+>> >> @@ -2270,12 +2270,8 @@ int pci_add_capability(PCIDevice *pdev, uint8_t cap_id,
+>> >>      Error *local_err = NULL;
+>> >>  
+>> >>      ret = pci_add_capability2(pdev, cap_id, offset, size, &local_err);
+>> >> -    if (local_err) {
+>> >> -        assert(ret < 0);
+>> >> +    if (ret < 0) {
+>> >>          error_report_err(local_err);
+>> >> -    } else {
+>> >> -        /* success implies a positive offset in config space */
+>> >> -        assert(ret > 0);
+>> >>      }
+>> >>      return ret;
+>> >>  }
+>> >
+>> >
+>> > I don't see why this is a good idea. You drop a bunch of
+>> > asserts, so naturally code is slightly tighter. We could gain
+>> > the same by building with NDEBUG but we don't, we rather
+>> > have more safety.
+>> 
+>> It's a good idea because it's what we do basically everywhere when a
+>> function sets an error and returns a distinct error value.
+>
+> We typically just do
+>
+          func(arg1, arg2, &local_err);
+>         if (local_err) {
+>             error_report_err(local_err);
+> 		...
+> 	}
 
-Let's improve our search for that case by selecting the latest CPU
-definition that matches the CPU type. This for example will avoid
-detecting an z13 as a z13s.
+That one's fine.
 
-We might still detect a GA2 version on a GA1 system, but as we don't
-have further information at hand, there isn't too much we can do about
-it. The alternative of always presenting the oldest GA is not backward
-compatible, e.g:
-You're running on 0x2827 GA2.
-Old QEMU version indicated "0x2828 GA1 == 0x2827 GA2". After you updated
-QEMU, you suddenly detect "0x2827 GA1". You're previous libvirt guest
-might suddenly refuse to run.
+Equally fine:
 
-In the end presenting a newer GA level does not matter because:
+          ret = func(arg1, arg2, &local_err);
+          if (ret < 0) {
+              error_report_err(local_err);
+              ...
+          }
 
-1: All GAX models share the same base feature set. A GAX++ might
-support "more features".
-2: Without an IBC, the guest can't detect the GA version.
+When func(...) is short, then
 
-If we have no IBC (esp. unblocked_ibc == 0), the IBC we will present
-to the guest in read_SCP_info() will be 0. The guest will not know
-which GA version it has. The problem of missing IBC propagates.
+          if (func(arg1, arg2, &local_err) < 0) {
+              error_report_err(local_err);
+              ...
+          }
 
-If we don't have a feature of the GA++ version, also our guest won't
-have it. So in summary, the guest also has no idea of its GA version.
+is also fine.
 
-Signed-off-by: David Hildenbrand <david@redhat.com>
-Message-Id: <20170531193434.6918-3-david@redhat.com>
-Acked-by: Jason J. Herne <jjherne@linux.vnet.ibm.com>
-Reviewed-by: Halil Pasic <pasic@linux.vnet.ibm.com>
-Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
-[improve patch description by reusing mailing list discussion]
----
- target/s390x/cpu_models.c | 9 +++++++++
- 1 file changed, 9 insertions(+)
+Whether you check the Error * variable or a distinct error return value
+is purely a matter of taste (I prefer return value when possible).
+Keeping matters of taste locally consistent can make sense.
 
-diff --git a/target/s390x/cpu_models.c b/target/s390x/cpu_models.c
-index 9e23535..b6220c8 100644
---- a/target/s390x/cpu_models.c
-+++ b/target/s390x/cpu_models.c
-@@ -184,6 +184,7 @@ const S390CPUDef *s390_find_cpu_def(uint16_t type, uint8_t gen, uint8_t ec_ga,
-                                     S390FeatBitmap features)
- {
-     const S390CPUDef *last_compatible = NULL;
-+    const S390CPUDef *matching_cpu_type = NULL;
-     int i;
- 
-     if (!gen) {
-@@ -218,8 +219,16 @@ const S390CPUDef *s390_find_cpu_def(uint16_t type, uint8_t gen, uint8_t ec_ga,
-         if (def->type == type && def->ec_ga == ec_ga) {
-             return def;
-         }
-+        /* remember if we've at least seen one with the same cpu type */
-+        if (def->type == type) {
-+            matching_cpu_type = def;
-+        }
-         last_compatible = def;
-     }
-+    /* prefer the model with the same cpu type, esp. don't take the BC for EC */
-+    if (matching_cpu_type) {
-+        return matching_cpu_type;
-+    }
-     return last_compatible;
- }
- 
--- 
-2.7.4
+What matters is keeping the error checking short and to the point.
+Asserting that the callee returns the distinct error value if and only
+if it sets an error is unusual precisely because it's not worth the
+distraction.  Mao Zhongyi's patch cleans it up here.
