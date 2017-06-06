@@ -1,25 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58633)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58887)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dIFJ0-0006Gr-Ve
-	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 10:18:02 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1dIFJi-0006cl-LL
+	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 10:18:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dIFIx-0003iZ-PS
-	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 10:17:58 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43604)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1dIFIx-0003hO-GL
-	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 10:17:55 -0400
-References: <20170605085254.16485-1-sf@sfritsch.de>
-	<e27e8fb4-64fa-9ba9-26a2-aa2af758462b@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <39506179-0abd-5bba-89a2-fe89e6f3a167@redhat.com>
-Date: Tue, 6 Jun 2017 16:17:42 +0200
+	(envelope-from <alex.bennee@linaro.org>) id 1dIFJf-0004FE-ES
+	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 10:18:42 -0400
+Received: from mail-wm0-x236.google.com ([2a00:1450:400c:c09::236]:37796)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1dIFJf-0004Ez-5f
+	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 10:18:39 -0400
+Received: by mail-wm0-x236.google.com with SMTP id d73so50022456wma.0
+	for <qemu-devel@nongnu.org>; Tue, 06 Jun 2017 07:18:39 -0700 (PDT)
+References: <20170602160848.4913-1-alex.bennee@linaro.org>
+	<20170602160848.4913-8-alex.bennee@linaro.org>
+	<CAFEAcA-8wW2qBEsk-awcsRsaAKdnERmYTfwsoSMBwQqiahDfnw@mail.gmail.com>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <CAFEAcA-8wW2qBEsk-awcsRsaAKdnERmYTfwsoSMBwQqiahDfnw@mail.gmail.com>
+Date: Tue, 06 Jun 2017 15:19:02 +0100
+Message-ID: <87poehci7d.fsf@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <e27e8fb4-64fa-9ba9-26a2-aa2af758462b@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="XLgVmO8SG9sIj3i7eBS8cjHBCsNpjq1OU"
-Subject: Re: [Qemu-devel] [PATCH] Add chardev-send-break monitor command
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [RISU PATCH v4 07/10] risu: add simple trace and
+ replay support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,70 +32,270 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, Stefan Fritsch <sf@sfritsch.de>, qemu-devel@nongnu.org
-Cc: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Markus Armbruster <armbru@redhat.com>
-
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---XLgVmO8SG9sIj3i7eBS8cjHBCsNpjq1OU
-From: Paolo Bonzini <pbonzini@redhat.com>
-To: Eric Blake <eblake@redhat.com>, Stefan Fritsch <sf@sfritsch.de>,
- qemu-devel@nongnu.org
-Cc: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Markus Armbruster <armbru@redhat.com>
-Message-ID: <39506179-0abd-5bba-89a2-fe89e6f3a167@redhat.com>
-Subject: Re: [PATCH] Add chardev-send-break monitor command
-References: <20170605085254.16485-1-sf@sfritsch.de>
- <e27e8fb4-64fa-9ba9-26a2-aa2af758462b@redhat.com>
-In-Reply-To: <e27e8fb4-64fa-9ba9-26a2-aa2af758462b@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
 
+Peter Maydell <peter.maydell@linaro.org> writes:
 
-On 05/06/2017 14:24, Eric Blake wrote:
-> On 06/05/2017 03:52 AM, Stefan Fritsch wrote:
->> Sending a break on a serial console can be useful for debugging the
->> guest. But not all chardev backends support sending breaks (only telne=
-t
->> and mux do). The chardev-send-break command allows to send a break eve=
-n
->> if using other backends.
+> On 2 June 2017 at 17:08, Alex Bennée <alex.bennee@linaro.org> wrote:
+>> This adds a very dumb and easily breakable trace and replay support. In
+>> --master mode the various risu ops trigger a write of register/memory
+>> state into a binary file which can be played back to an apprentice.
+>> Currently there is no validation of the image source so feeding the
+>> wrong image will fail straight away.
 >>
->> Signed-off-by: Stefan Fritsch <sf@sfritsch.de>
+>> The trace files will get very big for any appreciable sized test file
+>> and this will be addressed in later patches.
+>>
+>> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+>>
 >> ---
->>  chardev/char.c   | 12 ++++++++++++
->>  hmp-commands.hx  | 16 ++++++++++++++++
->>  hmp.c            |  8 ++++++++
->>  hmp.h            |  1 +
->>  qapi-schema.json | 20 ++++++++++++++++++++
->>  5 files changed, 57 insertions(+)
->=20
-> Is there an obvious test that we can enhance to add coverage of the new=
+>> v4
+>>   - fix formatting mess
+>>   - abort() instead of reporting de-sync
+>>   - don't fake return for compiler
+>> v3
+>>   - fix options parsing
+>>   - re-factored so no need for copy & paste
+>> v2
+>>   - moved read/write functions into main risu.c
+>>   - cleaned up formatting
+>>   - report more in apprentice --trace mode
+>> ---
+>>  risu.c | 97 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++---------
+>>  1 file changed, 84 insertions(+), 13 deletions(-)
+>>
+>> diff --git a/risu.c b/risu.c
+>> index 22571cd..137cbbf 100644
+>> --- a/risu.c
+>> +++ b/risu.c
+>> @@ -31,6 +31,7 @@
+>>  void *memblock = 0;
+>>
+>>  int apprentice_socket, master_socket;
+>> +int trace_file = 0;
+>>
+>>  sigjmp_buf jmpbuf;
+>>
+>> @@ -40,10 +41,12 @@ int test_fp_exc = 0;
+>>  long executed_tests = 0;
+>>  void report_test_status(void *pc)
+>>  {
+>> -   executed_tests += 1;
+>> -   if (executed_tests % 100 == 0) {
+>> -      fprintf(stderr,"Executed %ld test instructions (pc=%p)\r",
+>> -              executed_tests, pc);
+>> +   if (ismaster || trace_file) {
+>> +      executed_tests += 1;
+>> +      if (executed_tests % 100 == 0) {
+>> +         fprintf(stderr,"Executed %ld test instructions (pc=%p)\r",
+>> +                 executed_tests, pc);
+>> +      }
+>>     }
+>>  }
+>>
+>> @@ -54,6 +57,12 @@ int read_sock(void *ptr, size_t bytes)
+>>     return recv_data_pkt(master_socket, ptr, bytes);
+>>  }
+>>
+>> +int write_trace(void *ptr, size_t bytes)
+>> +{
+>> +   size_t res = write(trace_file, ptr, bytes);
+>> +   return (res == bytes) ? 0 : 1;
+>> +}
+>> +
+>>  void respond_sock(int r)
+>>  {
+>>     send_response_byte(master_socket, r);
+>> @@ -66,9 +75,36 @@ int write_sock(void *ptr, size_t bytes)
+>>     return send_data_pkt(apprentice_socket, ptr, bytes);
+>>  }
+>>
+>> +int read_trace(void *ptr, size_t bytes)
+>> +{
+>> +   size_t res = read(trace_file, ptr, bytes);
+>> +   return (res == bytes) ? 0 : 1;
+>> +}
+>> +
+>> +void respond_trace(int r)
+>> +{
+>> +   switch (r) {
+>> +      case 0: /* test ok */
+>> +      case 1: /* end of test */
+>> +         break;
+>> +      default:
+>> +         /* should not get here */
+>> +         abort();
+>> +         break;
+>> +   }
+>> +}
+>> +
+>>  void master_sigill(int sig, siginfo_t *si, void *uc)
+>>  {
+>> -   switch (recv_and_compare_register_info(read_sock, respond_sock, uc))
+>> +   int r;
+>> +
+>> +   if (trace_file) {
+>> +      r = send_register_info(write_trace, uc);
+>> +   } else {
+>> +      r = recv_and_compare_register_info(read_sock, respond_sock, uc);
+>> +   }
+>
+> It's a bit weird that in the trace file case we send the data
+> from the master, but in the normal case we send it from
+> the apprentice end.
 
-> QMP command?
+It seemed the natural way round (master generating the "gold" stream
+that the apprentice checks). I could switch it or make the apprentice
+responsible for checking it's own work?
 
-You could have a new test covering hw/char/serial.c, but I wouldn't let
-that hold the patch.
+>
+>> +
+>> +   switch (r)
+>>     {
+>>        case 0:
+>>           /* match OK */
+>> @@ -82,7 +118,15 @@ void master_sigill(int sig, siginfo_t *si, void *uc)
+>>
+>>  void apprentice_sigill(int sig, siginfo_t *si, void *uc)
+>>  {
+>> -   switch (send_register_info(write_sock, uc))
+>> +   int r;
+>> +
+>> +   if (trace_file) {
+>> +      r = recv_and_compare_register_info(read_trace, respond_trace, uc);
+>> +   } else {
+>> +      r = send_register_info(write_sock, uc);
+>> +   }
+>> +
+>> +   switch (r)
+>>     {
+>>        case 0:
+>>           /* match OK */
+>> @@ -94,6 +138,9 @@ void apprentice_sigill(int sig, siginfo_t *si, void *uc)
+>>           exit(0);
+>>        default:
+>>           /* mismatch */
+>> +         if (trace_file) {
+>> +            report_match_status();
+>> +         }
+>
+> report_match_status() uses stdio, you can't call it from a signal
+> handler.
 
-Paolo
+Oops, I'll sigjmp.
+
+>
+>>           exit(1);
+>>     }
+>>  }
+>> @@ -155,7 +202,13 @@ int master(int sock)
+>>  {
+>>     if (sigsetjmp(jmpbuf, 1))
+>>     {
+>> -      return report_match_status();
+>> +      if (trace_file) {
+>> +         close(trace_file);
+>> +         fprintf(stderr,"\nDone...\n");
+>> +         return 0;
+>> +      } else {
+>> +         return report_match_status();
+>> +      }
+>>     }
+>>     master_socket = sock;
+>>     set_sigill_handler(&master_sigill);
+>> @@ -184,6 +237,7 @@ void usage (void)
+>>     fprintf(stderr, "between master and apprentice risu processes.\n\n");
+>>     fprintf(stderr, "Options:\n");
+>>     fprintf(stderr, "  --master          Be the master (server)\n");
+>> +   fprintf(stderr, "  -t, --trace=FILE  Record/playback trace file\n");
+>>     fprintf(stderr, "  -h, --host=HOST   Specify master host machine (apprentice only)\n");
+>>     fprintf(stderr, "  -p, --port=PORT   Specify the port to connect to/listen on (default 9191)\n");
+>>  }
+>> @@ -194,6 +248,7 @@ int main(int argc, char **argv)
+>>     uint16_t port = 9191;
+>>     char *hostname = "localhost";
+>>     char *imgfile;
+>> +   char *trace_fn = NULL;
+>>     int sock;
+>>
+>>     // TODO clean this up later
+>> @@ -204,13 +259,14 @@ int main(int argc, char **argv)
+>>           {
+>>              { "help", no_argument, 0, '?'},
+>>              { "master", no_argument, &ismaster, 1 },
+>> +            { "trace", required_argument, 0, 't' },
+>>              { "host", required_argument, 0, 'h' },
+>>              { "port", required_argument, 0, 'p' },
+>>              { "test-fp-exc", no_argument, &test_fp_exc, 1 },
+>>              { 0,0,0,0 }
+>>           };
+>>        int optidx = 0;
+>> -      int c = getopt_long(argc, argv, "h:p:", longopts, &optidx);
+>> +      int c = getopt_long(argc, argv, "h:p:t:", longopts, &optidx);
+>>        if (c == -1)
+>>        {
+>>           break;
+>> @@ -223,6 +279,11 @@ int main(int argc, char **argv)
+>>              /* flag set by getopt_long, do nothing */
+>>              break;
+>>           }
+>> +         case 't':
+>> +         {
+>> +           trace_fn = optarg;
+>> +           break;
+>> +         }
+>>           case 'h':
+>>           {
+>>              hostname = optarg;
+>> @@ -253,17 +314,27 @@ int main(int argc, char **argv)
+>>     }
+>>
+>>     load_image(imgfile);
+>> -
+>> +
+>>     if (ismaster)
+>>     {
+>> -      fprintf(stderr, "master port %d\n", port);
+>> -      sock = master_connect(port);
+>> +      if (trace_fn)
+>> +      {
+>> +         trace_file = open(trace_fn, O_WRONLY|O_CREAT, S_IRWXU);
+>> +      } else {
+>> +         fprintf(stderr, "master port %d\n", port);
+>> +         sock = master_connect(port);
+>> +      }
+>>        return master(sock);
+>
+> Doesn't this call master() with an uninitialized sock if
+> the trace file is in use ?
+
+Hmm yes I can clean that up.
+
+>
+>>     }
+>>     else
+>>     {
+>> -      fprintf(stderr, "apprentice host %s port %d\n", hostname, port);
+>> -      sock = apprentice_connect(hostname, port);
+>> +      if (trace_fn)
+>> +      {
+>> +         trace_file = open(trace_fn, O_RDONLY);
+>> +      } else {
+>> +         fprintf(stderr, "apprentice host %s port %d\n", hostname, port);
+>> +         sock = apprentice_connect(hostname, port);
+>> +      }
+>>        return apprentice(sock);
+>>     }
+>>  }
+>> --
+>> 2.13.0
+>>
+>
+> thanks
+> -- PMM
 
 
---XLgVmO8SG9sIj3i7eBS8cjHBCsNpjq1OU
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEE8TM4V0tmI4mGbHaCv/vSX3jHroMFAlk2uYYACgkQv/vSX3jH
-roMD5gf8Cw8c91h3FPnyiPY/2w8bBCB27GtXyrdkJb5sFug3UiPgLUNBQ0in+HlV
-0NYc6yVM7eepIKrd35IgOwmdBuXmcf+j2W2ZlWj+bzztVg3JSSUUPdQLn9f8d3cM
-U4xqz34NIaWWpNByX2wx2+/x/KQtyaMSCl3zq42CMTbHhcMkelG35dkygKYQsuP/
-5IJZjpuowNicXzhbyWi85WQIn5ioWp/1MJWpLVBThgBXHQy7Gyref7bHPY5SEm07
-S1ggyVQJMDLmswtwv5WvTIoz2LOnT3i1Zs+ewpE92TuLQNp3H6ts0n4Cs/Zi9/K1
-nGmUes1HOnc7302OKcGMoIyEVQqwIw==
-=83yd
------END PGP SIGNATURE-----
-
---XLgVmO8SG9sIj3i7eBS8cjHBCsNpjq1OU--
+--
+Alex Bennée
