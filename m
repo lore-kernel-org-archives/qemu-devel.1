@@ -1,25 +1,38 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40415)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40610)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1dIH5I-0007ny-V3
-	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 12:11:57 -0400
+	(envelope-from <groug@kaod.org>) id 1dIH5u-00088y-Mf
+	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 12:12:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1dIH5G-0003bA-9l
-	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 12:11:56 -0400
-Received: from out1-smtp.messagingengine.com ([66.111.4.25]:55487)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cota@braap.org>) id 1dIH5F-0003ZL-Ss
-	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 12:11:54 -0400
-Date: Tue, 6 Jun 2017 12:11:52 -0400
-From: "Emilio G. Cota" <cota@braap.org>
-Message-ID: <20170606161152.GA6109@flamenco>
-References: <1496702979-26132-1-git-send-email-cota@braap.org>
-	<1496702979-26132-2-git-send-email-cota@braap.org>
-	<CAJhHMCDHLrU5NEuZGJqkVcJyQnXYsrdcYbNiNw4DAgiT=0R9pQ@mail.gmail.com>
+	(envelope-from <groug@kaod.org>) id 1dIH5s-0003wf-DX
+	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 12:12:34 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:41837
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1dIH5s-0003wD-7t
+	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 12:12:32 -0400
+Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v56G8kWi091941
+	for <qemu-devel@nongnu.org>; Tue, 6 Jun 2017 12:12:31 -0400
+Received: from e06smtp11.uk.ibm.com (e06smtp11.uk.ibm.com [195.75.94.107])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2awp6by97y-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Tue, 06 Jun 2017 12:12:31 -0400
+Received: from localhost
+	by e06smtp11.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <groug@kaod.org>;
+	Tue, 6 Jun 2017 17:12:29 +0100
+From: Greg Kurz <groug@kaod.org>
+Date: Tue, 06 Jun 2017 18:12:24 +0200
+In-Reply-To: <149676256806.31274.17021734547869850899.stgit@bahia.lab.toulouse-stg.fr.ibm.com>
+References: <149676256806.31274.17021734547869850899.stgit@bahia.lab.toulouse-stg.fr.ibm.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAJhHMCDHLrU5NEuZGJqkVcJyQnXYsrdcYbNiNw4DAgiT=0R9pQ@mail.gmail.com>
-Subject: Re: [Qemu-devel] [PATCH v2 1/3] compiler: define QEMU_CACHELINE_SIZE
+Content-Type: text/plain; charset="utf-8"
+Message-Id: <149676554488.4134.16095044562334102742.stgit@bahia.lab.toulouse-stg.fr.ibm.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v2] target/ppc: pass const string to
+ kvmppc_is_mem_backend_page_size_ok()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,25 +41,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Pranith Kumar <bobby.prani@gmail.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>, Richard Henderson <rth@twiddle.net>, Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>, qemu-ppc@nongnu.org, qemu-stable@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
 
-On Tue, Jun 06, 2017 at 01:39:45 -0400, Pranith Kumar wrote:
-> On Mon, Jun 5, 2017 at 6:49 PM, Emilio G. Cota <cota@braap.org> wrote:
-> > This is a constant used as a hint for padding structs to hopefully avoid
-> > false cache line sharing.
-> >
-> > The constant can be set at configure time by defining QEMU_CACHELINE_SIZE
-> > via --extra-cflags. If not set there, we try to obtain the value from
-> > the machine running the configure script. If we fail, we default to
-> > reasonable values, i.e. 128 bytes for ppc64 and 64 bytes for all others.
-(snip)
-> Is there any reason not to use sysconf(_SC_LEVEL1_DCACHE_LINESIZE)?
+This function has three implementations. Two are stubs that do nothing
+and the third one only passes the obj_path argument to:
 
-I tried using sysconf, but it doesn't work on the PowerPC machine I have
-access to (it returns 0). It might be a machine-specific thing though-I
-don't know. Here's the machine's `uname -a':
-  Linux gcc2-power8.osuosl.org 3.10.0-514.10.2.el7.ppc64le #1 SMP Fri Mar \
-    3 16:16:38 GMT 2017 ppc64le ppc64le ppc64le GNU/Linux
+Object *object_resolve_path(const char *path, bool *ambiguous);
 
-		E.
+Signed-off-by: Greg Kurz <groug@kaod.org>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+---
+v2: - also patch inline stub
+    - renamed patch and added changelog
+---
+ target/ppc/kvm.c     |    4 ++--
+ target/ppc/kvm_ppc.h |    4 ++--
+ 2 files changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
+index 51249ce79e55..88817620766c 100644
+--- a/target/ppc/kvm.c
++++ b/target/ppc/kvm.c
+@@ -478,7 +478,7 @@ static void kvm_fixup_page_sizes(PowerPCCPU *cpu)
+     }
+ }
+=20
+-bool kvmppc_is_mem_backend_page_size_ok(char *obj_path)
++bool kvmppc_is_mem_backend_page_size_ok(const char *obj_path)
+ {
+     Object *mem_obj =3D object_resolve_path(obj_path, NULL);
+     char *mempath =3D object_property_get_str(mem_obj, "mem-path", NULL)=
+;
+@@ -499,7 +499,7 @@ static inline void kvm_fixup_page_sizes(PowerPCCPU *c=
+pu)
+ {
+ }
+=20
+-bool kvmppc_is_mem_backend_page_size_ok(char *obj_path)
++bool kvmppc_is_mem_backend_page_size_ok(const char *obj_path)
+ {
+     return true;
+ }
+diff --git a/target/ppc/kvm_ppc.h b/target/ppc/kvm_ppc.h
+index f48243d13ffc..eab7c8fdb325 100644
+--- a/target/ppc/kvm_ppc.h
++++ b/target/ppc/kvm_ppc.h
+@@ -64,7 +64,7 @@ int kvmppc_enable_hwrng(void);
+ int kvmppc_put_books_sregs(PowerPCCPU *cpu);
+ PowerPCCPUClass *kvm_ppc_get_host_cpu_class(void);
+=20
+-bool kvmppc_is_mem_backend_page_size_ok(char *obj_path);
++bool kvmppc_is_mem_backend_page_size_ok(const char *obj_path);
+=20
+ #else
+=20
+@@ -211,7 +211,7 @@ static inline uint64_t kvmppc_rma_size(uint64_t curre=
+nt_size,
+     return ram_size;
+ }
+=20
+-static inline bool kvmppc_is_mem_backend_page_size_ok(char *obj_path)
++static inline bool kvmppc_is_mem_backend_page_size_ok(const char *obj_pa=
+th)
+ {
+     return true;
+ }
