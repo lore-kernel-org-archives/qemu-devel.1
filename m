@@ -1,24 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42135)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43877)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1dICY0-0004uc-A4
-	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 07:21:22 -0400
+	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1dICeq-0000T9-TL
+	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 07:28:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1dICXv-0000HQ-SP
-	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 07:21:16 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53582)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1dICXv-0000Gb-NC
-	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 07:21:11 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id C3E5DC83E
-	for <qemu-devel@nongnu.org>; Tue,  6 Jun 2017 11:21:10 +0000 (UTC)
-From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Tue,  6 Jun 2017 13:21:02 +0200
-Message-Id: <20170606112105.13331-1-kraxel@redhat.com>
-Subject: [Qemu-devel] [PATCH 0/3] reset queue in ps2_reset_keyboard
+	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1dICen-0002kq-My
+	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 07:28:20 -0400
+Received: from [59.151.112.132] (port=38614 helo=heian.cn.fujitsu.com)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1dICen-0002jT-B0
+	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 07:28:17 -0400
+From: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
+Date: Tue, 6 Jun 2017 19:26:28 +0800
+Message-ID: <0d7a09056c63d112c6de0169352c82e5d4517080.1496746391.git.maozy.fnst@cn.fujitsu.com>
+In-Reply-To: <cover.1496746390.git.maozy.fnst@cn.fujitsu.com>
+References: <cover.1496746390.git.maozy.fnst@cn.fujitsu.com>
+MIME-Version: 1.0
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH v3 3/7] pci: Fix the return value checking
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,25 +26,75 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Gerd Hoffmann <kraxel@redhat.com>
+Cc: dmitry@daynix.com, jasowang@redhat.com, kraxel@redhat.com, alex.williamson@redhat.com, armbru@redhat.com
 
-  Hi,
+pci_add_capability returns a strictly positive value on success,
+correct asserts.
 
-Patches 1+2 are small cleanups and refactorings,
-patch 3 is the actual fix.
+Cc: dmitry@daynix.com
+Cc: jasowang@redhat.com
+Cc: kraxel@redhat.com
+Cc: alex.williamson@redhat.com
+Cc: armbru@redhat.com
+Signed-off-by: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
+---
+ hw/net/e1000e.c   | 2 +-
+ hw/net/eepro100.c | 2 +-
+ hw/usb/hcd-xhci.c | 2 +-
+ hw/vfio/pci.c     | 2 +-
+ 4 files changed, 4 insertions(+), 4 deletions(-)
 
-cheers,
-  Gerd
-
-Gerd Hoffmann (3):
-  ps2: add and use PS2State typedef
-  ps2: add ps2_reset_queue
-  ps2: reset queue in ps2_reset_keyboard
-
- include/hw/input/ps2.h  |  4 ++--
- include/qemu/typedefs.h |  1 +
- hw/input/ps2.c          | 28 ++++++++++++++++------------
- 3 files changed, 19 insertions(+), 14 deletions(-)
-
+diff --git a/hw/net/e1000e.c b/hw/net/e1000e.c
+index 6e23493..8259d67 100644
+--- a/hw/net/e1000e.c
++++ b/hw/net/e1000e.c
+@@ -374,7 +374,7 @@ e1000e_add_pm_capability(PCIDevice *pdev, uint8_t offset, uint16_t pmc)
+ {
+     int ret = pci_add_capability(pdev, PCI_CAP_ID_PM, offset, PCI_PM_SIZEOF);
+ 
+-    if (ret >= 0) {
++    if (ret > 0) {
+         pci_set_word(pdev->config + offset + PCI_PM_PMC,
+                      PCI_PM_CAP_VER_1_1 |
+                      pmc);
+diff --git a/hw/net/eepro100.c b/hw/net/eepro100.c
+index 4bf71f2..da36816 100644
+--- a/hw/net/eepro100.c
++++ b/hw/net/eepro100.c
+@@ -571,7 +571,7 @@ static void e100_pci_reset(EEPRO100State * s)
+         int cfg_offset = 0xdc;
+         int r = pci_add_capability(&s->dev, PCI_CAP_ID_PM,
+                                    cfg_offset, PCI_PM_SIZEOF);
+-        assert(r >= 0);
++        assert(r > 0);
+         pci_set_word(pci_conf + cfg_offset + PCI_PM_PMC, 0x7e21);
+ #if 0 /* TODO: replace dummy code for power management emulation. */
+         /* TODO: Power Management Control / Status. */
+diff --git a/hw/usb/hcd-xhci.c b/hw/usb/hcd-xhci.c
+index a0c7960..ab42f86 100644
+--- a/hw/usb/hcd-xhci.c
++++ b/hw/usb/hcd-xhci.c
+@@ -3417,7 +3417,7 @@ static void usb_xhci_realize(struct PCIDevice *dev, Error **errp)
+     if (pci_bus_is_express(dev->bus) ||
+         xhci_get_flag(xhci, XHCI_FLAG_FORCE_PCIE_ENDCAP)) {
+         ret = pcie_endpoint_cap_init(dev, 0xa0);
+-        assert(ret >= 0);
++        assert(ret > 0);
+     }
+ 
+     if (xhci->msix != ON_OFF_AUTO_OFF) {
+diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
+index 32aca77..5881968 100644
+--- a/hw/vfio/pci.c
++++ b/hw/vfio/pci.c
+@@ -1744,7 +1744,7 @@ static int vfio_setup_pcie_cap(VFIOPCIDevice *vdev, int pos, uint8_t size,
+     }
+ 
+     pos = pci_add_capability(&vdev->pdev, PCI_CAP_ID_EXP, pos, size);
+-    if (pos >= 0) {
++    if (pos > 0) {
+         vdev->pdev.exp.exp_cap = pos;
+     }
+ 
 -- 
 2.9.3
