@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38876)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40453)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <haozhong.zhang@intel.com>) id 1dI8pL-0000mp-Ur
-	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 03:22:59 -0400
+	(envelope-from <sundeep.lkml@gmail.com>) id 1dI8xY-00066q-K4
+	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 03:31:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <haozhong.zhang@intel.com>) id 1dI8pH-0005L2-UU
-	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 03:22:55 -0400
-Received: from mga03.intel.com ([134.134.136.65]:58638)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <haozhong.zhang@intel.com>)
-	id 1dI8pH-0005K6-Jd
-	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 03:22:51 -0400
-From: Haozhong Zhang <haozhong.zhang@intel.com>
-Date: Tue,  6 Jun 2017 15:22:27 +0800
-Message-Id: <20170606072229.9302-3-haozhong.zhang@intel.com>
-In-Reply-To: <20170606072229.9302-1-haozhong.zhang@intel.com>
-References: <20170606072229.9302-1-haozhong.zhang@intel.com>
-Subject: [Qemu-devel] [PATCH v2 2/4] nvdimm: warn if the backend is not a
- DAX device
+	(envelope-from <sundeep.lkml@gmail.com>) id 1dI8xW-0000Mo-LB
+	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 03:31:24 -0400
+MIME-Version: 1.0
+In-Reply-To: <6c077dcf-e8a8-aae9-9023-f197007a98dc@amsat.org>
+References: <1494949133-2202-1-git-send-email-sundeep.lkml@gmail.com>
+	<1494949133-2202-6-git-send-email-sundeep.lkml@gmail.com>
+	<6c077dcf-e8a8-aae9-9023-f197007a98dc@amsat.org>
+From: sundeep subbaraya <sundeep.lkml@gmail.com>
+Date: Tue, 6 Jun 2017 13:01:19 +0530
+Message-ID: <CALHRZuqu-oP46EF7Y8AAtAr_orJaGNDZzba9NS833DNJQ-KVQg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [Qemu devel v5 PATCH 5/5] msf2: Add Emcraft's
+ Smartfusion2 SOM kit.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,133 +25,165 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Xiao Guangrong <guangrong.xiao@gmail.com>, Stefan Hajnoczi <stefanha@gmail.com>, Dan Williams <dan.j.williams@intel.com>, Haozhong Zhang <haozhong.zhang@intel.com>
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Alistair Francis <alistair23@gmail.com>
 
-Applications in Linux guest that use device-dax never trigger flush
-that can be trapped by KVM/QEMU. Meanwhile, if the host backend is not
-device-dax, QEMU cannot guarantee the persistence of guest writes.
-Before solving this flushing problem, QEMU should warn users if the
-host backend is not device-dax.
+Hi Philippe,
 
-Signed-off-by: Haozhong Zhang <haozhong.zhang@intel.com>
-Message-id: CAPcyv4hV2-ZW8SMCRtD0P_86KgR3DHOvNe+6T5SY2u7wXg3gEg@mail.gmail.com
----
- hw/mem/nvdimm.c      |  6 ++++++
- include/qemu/osdep.h |  9 ++++++++
- util/osdep.c         | 61 ++++++++++++++++++++++++++++++++++++++++++++++++++++
- 3 files changed, 76 insertions(+)
+On Wed, May 31, 2017 at 11:34 AM, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.=
+org>
+wrote:
 
-diff --git a/hw/mem/nvdimm.c b/hw/mem/nvdimm.c
-index a9b0863f20..b23542fbdf 100644
---- a/hw/mem/nvdimm.c
-+++ b/hw/mem/nvdimm.c
-@@ -26,6 +26,7 @@
- #include "qapi/error.h"
- #include "qapi/visitor.h"
- #include "hw/mem/nvdimm.h"
-+#include "qemu/error-report.h"
- 
- static void nvdimm_get_label_size(Object *obj, Visitor *v, const char *name,
-                                   void *opaque, Error **errp)
-@@ -84,6 +85,11 @@ static void nvdimm_realize(PCDIMMDevice *dimm, Error **errp)
-     NVDIMMDevice *nvdimm = NVDIMM(dimm);
-     uint64_t align, pmem_size, size = memory_region_size(mr);
- 
-+    if (!qemu_fd_is_dev_dax(memory_region_get_fd(mr))) {
-+        error_report("warning: nvdimm backend does not look like a DAX device, "
-+                     "unable to guarantee persistence of guest writes");
-+    }
-+
-     align = memory_region_get_alignment(mr);
- 
-     pmem_size = size - nvdimm->label_size;
-diff --git a/include/qemu/osdep.h b/include/qemu/osdep.h
-index 1c9f5e260c..7f26af371e 100644
---- a/include/qemu/osdep.h
-+++ b/include/qemu/osdep.h
-@@ -470,4 +470,13 @@ char *qemu_get_pid_name(pid_t pid);
-  */
- pid_t qemu_fork(Error **errp);
- 
-+/**
-+ * qemu_fd_is_dev_dax:
-+ *
-+ * Check whether @fd describes a DAX device.
-+ *
-+ * Returns true if it is; otherwise, return false.
-+ */
-+bool qemu_fd_is_dev_dax(int fd);
-+
- #endif
-diff --git a/util/osdep.c b/util/osdep.c
-index a2863c8e53..02881f96bc 100644
---- a/util/osdep.c
-+++ b/util/osdep.c
-@@ -471,3 +471,64 @@ writev(int fd, const struct iovec *iov, int iov_cnt)
-     return readv_writev(fd, iov, iov_cnt, true);
- }
- #endif
-+
-+#ifdef __linux__
-+static ssize_t qemu_dev_dax_sysfs_read(int fd, const char *entry,
-+                                       char *buf, size_t len)
-+{
-+    ssize_t read_bytes;
-+    struct stat st;
-+    unsigned int major, minor;
-+    char *path, *pos;
-+    int sysfs_fd;
-+
-+    if (fstat(fd, &st)) {
-+        return 0;
-+    }
-+
-+    major = major(st.st_rdev);
-+    minor = minor(st.st_rdev);
-+    path = g_strdup_printf("/sys/dev/char/%u:%u/%s", major, minor, entry);
-+
-+    sysfs_fd = open(path, O_RDONLY);
-+    g_free(path);
-+    if (sysfs_fd == -1) {
-+        return 0;
-+    }
-+
-+    read_bytes = read(sysfs_fd, buf, len - 1);
-+    close(sysfs_fd);
-+    if (read_bytes > 0) {
-+        buf[read_bytes] = '\0';
-+        pos = g_strstr_len(buf, read_bytes, "\n");
-+        if (pos) {
-+            *pos = '\0';
-+        }
-+    }
-+
-+    return read_bytes;
-+}
-+#endif /* __linux__ */
-+
-+bool qemu_fd_is_dev_dax(int fd)
-+{
-+    bool is_dax = false;
-+
-+#ifdef __linux__
-+    char devtype[7];
-+    ssize_t len;
-+
-+    if (fd == -1) {
-+        return false;
-+    }
-+
-+    len = qemu_dev_dax_sysfs_read(fd, "device/devtype",
-+                                  devtype, sizeof(devtype));
-+    if (len <= 0) {
-+        return false;
-+    }
-+    is_dax = !strncmp(devtype, "nd_dax", len);
-+#endif /* __linux__ */
-+
-+    return is_dax;
-+}
--- 
-2.11.0
+> Hi Subbaraya,
+>
+>
+> On 05/16/2017 12:38 PM, Subbaraya Sundeep wrote:
+>
+>> Emulated Emcraft's Smartfusion2 System On Module starter
+>> kit.
+>>
+>> Signed-off-by: Subbaraya Sundeep <sundeep.lkml@gmail.com>
+>> ---
+>>  hw/arm/Makefile.objs |  1 +
+>>  hw/arm/msf2-som.c    | 89 ++++++++++++++++++++++++++++++
+>> ++++++++++++++++++++++
+>>  2 files changed, 90 insertions(+)
+>>  create mode 100644 hw/arm/msf2-som.c
+>>
+>> diff --git a/hw/arm/Makefile.objs b/hw/arm/Makefile.objs
+>> index c828061..4b02093 100644
+>> --- a/hw/arm/Makefile.objs
+>> +++ b/hw/arm/Makefile.objs
+>> @@ -5,6 +5,7 @@ obj-y +=3D omap_sx1.o palm.o realview.o spitz.o stellari=
+s.o
+>>  obj-y +=3D tosa.o versatilepb.o vexpress.o virt.o xilinx_zynq.o z2.o
+>>  obj-$(CONFIG_ACPI) +=3D virt-acpi-build.o
+>>  obj-y +=3D netduino2.o
+>> +obj-y +=3D msf2-som.o
+>>  obj-y +=3D sysbus-fdt.o
+>>
+>>  obj-y +=3D armv7m.o exynos4210.o pxa2xx.o pxa2xx_gpio.o pxa2xx_pic.o
+>> diff --git a/hw/arm/msf2-som.c b/hw/arm/msf2-som.c
+>> new file mode 100644
+>> index 0000000..cd2b759
+>> --- /dev/null
+>> +++ b/hw/arm/msf2-som.c
+>> @@ -0,0 +1,89 @@
+>> +/*
+>> + * SmartFusion2 SOM starter kit(from Emcraft) emulation.
+>> + *
+>> + * Copyright (c) 2017 Subbaraya Sundeep <sundeep.lkml@gmail.com>
+>> + *
+>> + * Permission is hereby granted, free of charge, to any person obtainin=
+g
+>> a copy
+>> + * of this software and associated documentation files (the "Software")=
+,
+>> to deal
+>> + * in the Software without restriction, including without limitation th=
+e
+>> rights
+>> + * to use, copy, modify, merge, publish, distribute, sublicense, and/or
+>> sell
+>> + * copies of the Software, and to permit persons to whom the Software i=
+s
+>> + * furnished to do so, subject to the following conditions:
+>> + *
+>> + * The above copyright notice and this permission notice shall be
+>> included in
+>> + * all copies or substantial portions of the Software.
+>> + *
+>> + * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+>> EXPRESS OR
+>> + * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+>> MERCHANTABILITY,
+>> + * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT
+>> SHALL
+>> + * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR
+>> OTHER
+>> + * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
+>> ARISING FROM,
+>> + * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+>> DEALINGS IN
+>> + * THE SOFTWARE.
+>> + */
+>> +
+>> +#include "qemu/osdep.h"
+>> +#include "qapi/error.h"
+>> +#include "hw/boards.h"
+>> +#include "hw/arm/msf2-soc.h"
+>> +#include "hw/arm/arm.h"
+>> +#include "exec/address-spaces.h"
+>> +
+>> +#define DDR_BASE_ADDRESS      0xA0000000
+>> +#define DDR_SIZE              (64 * M_BYTE)
+>> +
+>> +static void emcraft_sf2_init(MachineState *machine)
+>> +{
+>> +    DeviceState *dev;
+>> +    DeviceState *spi_flash;
+>> +    MSF2State *soc;
+>> +    DriveInfo *dinfo =3D drive_get_next(IF_MTD);
+>> +    qemu_irq cs_line;
+>> +    SSIBus *spi_bus;
+>> +    MemoryRegion *sysmem =3D get_system_memory();
+>> +    MemoryRegion *ddr =3D g_new(MemoryRegion, 1);
+>> +
+>> +    memory_region_init_ram(ddr, NULL, "ddr-ram", DDR_SIZE,
+>> +                           &error_fatal);
+>> +    vmstate_register_ram_global(ddr);
+>> +    memory_region_add_subregion(sysmem, DDR_BASE_ADDRESS, ddr);
+>> +
+>> +    dev =3D qdev_create(NULL, TYPE_MSF2_SOC);
+>> +    qdev_prop_set_string(dev, "part-name", "M2S010");
+>> +    qdev_prop_set_uint64(dev, "eNVM-size", M2S010_ENVM_SIZE);
+>> +    qdev_prop_set_uint64(dev, "eSRAM-size", M2S010_ESRAM_SIZE);
+>> +
+>> +    /*
+>> +     * pclk0 and pclk1 are configurable in Libero.
+>> +     * Emcraft's SoM kit comes with these settings by default.
+>> +     */
+>> +    qdev_prop_set_uint32(dev, "pclk0", 71 * 1000000);
+>> +    qdev_prop_set_uint32(dev, "pclk1", 71 * 1000000);
+>> +
+>> +    object_property_set_bool(OBJECT(dev), true, "realized",
+>> &error_fatal);
+>> +
+>> +    soc =3D MSF2_SOC(dev);
+>> +
+>> +    /* Attach SPI flash to SPI0 controller */
+>> +    spi_bus =3D (SSIBus *)qdev_get_child_bus(dev, "spi0");
+>> +    spi_flash =3D ssi_create_slave_no_init(spi_bus, "s25sl12801");
+>> +    qdev_prop_set_uint8(spi_flash, "spansion-cr2nv", 1);
+>> +    if (dinfo) {
+>> +        qdev_prop_set_drive(spi_flash, "drive",
+>> blk_by_legacy_dinfo(dinfo),
+>> +                                    &error_fatal);
+>> +    }
+>> +    qdev_init_nofail(spi_flash);
+>> +    cs_line =3D qdev_get_gpio_in_named(spi_flash, SSI_GPIO_CS, 0);
+>> +    sysbus_connect_irq(SYS_BUS_DEVICE(&soc->spi[0]), 1, cs_line);
+>> +
+>> +    armv7m_load_kernel(ARM_CPU(first_cpu), machine->kernel_filename,
+>> +                       soc->envm_size);
+>> +}
+>> +
+>> +static void emcraft_sf2_machine_init(MachineClass *mc)
+>> +{
+>> +    mc->desc =3D "SmartFusion2 SOM kit from Emcraft";
+>> +    mc->init =3D emcraft_sf2_init;
+>> +}
+>> +
+>> +DEFINE_MACHINE("smartfusion2-som", emcraft_sf2_machine_init)
+>>
+>
+> Here I still disagree with the machine name, what do you think about
+> "emcraft-sf2" or "emcraft-m2s[-fg484-som]" as described by Emcraft in the=
+ir
+> website (but shorter is easier to type)?
+>
+
+I missed this. I will use emcraft-sf2 for machine name.
+
+Thanks,
+Sundeep
