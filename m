@@ -1,40 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40910)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42240)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1dINb3-00029x-Fa
-	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 19:09:10 -0400
+	(envelope-from <cota@braap.org>) id 1dINeL-0003wY-O2
+	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 19:12:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1dINb0-0000px-Ab
-	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 19:09:09 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:35326
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mdroth@linux.vnet.ibm.com>)
-	id 1dINb0-0000pg-4E
-	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 19:09:06 -0400
-Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v56N8i5p179975
-	for <qemu-devel@nongnu.org>; Tue, 6 Jun 2017 19:09:05 -0400
-Received: from e32.co.us.ibm.com (e32.co.us.ibm.com [32.97.110.150])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2awy7m8ptd-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 06 Jun 2017 19:09:04 -0400
-Received: from localhost
-	by e32.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <mdroth@linux.vnet.ibm.com>;
-	Tue, 6 Jun 2017 17:09:04 -0600
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-From: Michael Roth <mdroth@linux.vnet.ibm.com>
-In-Reply-To: <20170606130534.11019-2-david@gibson.dropbear.id.au>
-References: <20170606130534.11019-1-david@gibson.dropbear.id.au>
-	<20170606130534.11019-2-david@gibson.dropbear.id.au>
-Date: Tue, 06 Jun 2017 16:37:27 -0500
-Message-Id: <149678504780.2548.15705693006952673484@loki>
-Subject: Re: [Qemu-devel] [RFC 1/3] spapr: Fold spapr_phb_add_pci_device()
- into its only caller
+	(envelope-from <cota@braap.org>) id 1dINeI-0002IB-J1
+	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 19:12:33 -0400
+Received: from out1-smtp.messagingengine.com ([66.111.4.25]:56951)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1dINeI-0002Gl-0o
+	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 19:12:30 -0400
+From: "Emilio G. Cota" <cota@braap.org>
+Date: Tue,  6 Jun 2017 19:12:24 -0400
+Message-Id: <1496790745-314-2-git-send-email-cota@braap.org>
+In-Reply-To: <1496790745-314-1-git-send-email-cota@braap.org>
+References: <1496790745-314-1-git-send-email-cota@braap.org>
+Subject: [Qemu-devel] [PATCH v3 1/2] util: add cacheinfo
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -43,142 +23,212 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: bharata@linux.vnet.ibm.com, sursingh@redhat.com, groug@kaod.org, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: Richard Henderson <rth@twiddle.net>, alex.bennee@linaro.org, Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, Pranith Kumar <bobby.prani@gmail.com>, Geert Martin Ijewski <gm.ijewski@web.de>
 
-Quoting David Gibson (2017-06-06 08:05:32)
-> This function is fairly short, and so is its only caller.  There's no
-> particular logical distinction between them, so fold them together.
-> =
+Add helpers to gather cache info from the host at init-time.
 
-> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-> ---
->  hw/ppc/spapr_pci.c | 53 ++++++++++++++++++++++--------------------------=
------
->  1 file changed, 22 insertions(+), 31 deletions(-)
-> =
+For now, only export the host's I/D cache line sizes, which we
+will use to improve cache locality to avoid false sharing.
 
-> diff --git a/hw/ppc/spapr_pci.c b/hw/ppc/spapr_pci.c
-> index 46e736d..a216f61 100644
-> --- a/hw/ppc/spapr_pci.c
-> +++ b/hw/ppc/spapr_pci.c
-> @@ -1344,30 +1344,6 @@ static int spapr_create_pci_child_dt(sPAPRPHBState=
- *phb, PCIDevice *dev,
->      return offset;
->  }
-> =
+Suggested-by: Richard Henderson <rth@twiddle.net>
+Suggested-by: Geert Martin Ijewski <gm.ijewski@web.de>
+Tested-by:    Geert Martin Ijewski <gm.ijewski@web.de>
+Signed-off-by: Emilio G. Cota <cota@braap.org>
+---
+ include/qemu/osdep.h |   3 +
+ util/Makefile.objs   |   1 +
+ util/cacheinfo.c     | 158 +++++++++++++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 162 insertions(+)
+ create mode 100644 util/cacheinfo.c
 
-> -static void spapr_phb_add_pci_device(sPAPRDRConnector *drc,
-> -                                     sPAPRPHBState *phb,
-> -                                     PCIDevice *pdev,
-> -                                     Error **errp)
-> -{
-> -    DeviceState *dev =3D DEVICE(pdev);
-> -    void *fdt =3D NULL;
-> -    int fdt_start_offset =3D 0, fdt_size;
-> -
-> -    fdt =3D create_device_tree(&fdt_size);
-> -    fdt_start_offset =3D spapr_create_pci_child_dt(phb, pdev, fdt, 0);
-> -    if (!fdt_start_offset) {
-> -        error_setg(errp, "Failed to create pci child device tree node");
-> -        goto out;
-> -    }
-> -
-> -    spapr_drc_attach(drc, DEVICE(pdev),
-> -                     fdt, fdt_start_offset, !dev->hotplugged, errp);
-> -out:
-> -    if (*errp) {
-> -        g_free(fdt);
-> -    }
-> -}
-> -
->  /* Callback to be called during DRC release. */
->  void spapr_phb_remove_pci_device_cb(DeviceState *dev)
->  {
-> @@ -1429,6 +1405,8 @@ static void spapr_phb_hot_plug_child(HotplugHandler=
- *plug_handler,
->      Error *local_err =3D NULL;
->      PCIBus *bus =3D PCI_BUS(qdev_get_parent_bus(DEVICE(pdev)));
->      uint32_t slotnr =3D PCI_SLOT(pdev->devfn);
-> +    void *fdt =3D NULL;
-> +    int fdt_start_offset, fdt_size;
-> =
-
->      /* if DR is disabled we don't need to do anything in the case of
->       * hotplug or coldplug callbacks
-> @@ -1438,10 +1416,10 @@ static void spapr_phb_hot_plug_child(HotplugHandl=
-er *plug_handler,
->           * we need to let them know it's not enabled
->           */
->          if (plugged_dev->hotplugged) {
-> -            error_setg(errp, QERR_BUS_NO_HOTPLUG,
-> +            error_setg(&local_err, QERR_BUS_NO_HOTPLUG,
->                         object_get_typename(OBJECT(phb)));
->          }
-> -        return;
-> +        goto out;
->      }
-> =
-
->      g_assert(drc);
-> @@ -1452,16 +1430,23 @@ static void spapr_phb_hot_plug_child(HotplugHandl=
-er *plug_handler,
->       */
->      if (plugged_dev->hotplugged && bus->devices[PCI_DEVFN(slotnr, 0)] &&
->          PCI_FUNC(pdev->devfn) !=3D 0) {
-> -        error_setg(errp, "PCI: slot %d function 0 already ocuppied by %s=
-,"
-> +        error_setg(&local_err, "PCI: slot %d function 0 already ocuppied=
- by %s,"
->                     " additional functions can no longer be exposed to gu=
-est.",
->                     slotnr, bus->devices[PCI_DEVFN(slotnr, 0)]->name);
-> -        return;
-> +        goto out;
->      }
-> =
-
-> -    spapr_phb_add_pci_device(drc, phb, pdev, &local_err);
-
-Since we never used local_err outside propagating it and immediately
-bailing, and since we bail on errp in all prior callers, maybe we
-should just drop local_err completely in favor errp.
-
-> +    fdt =3D create_device_tree(&fdt_size);
-> +    fdt_start_offset =3D spapr_create_pci_child_dt(phb, pdev, fdt, 0);
-> +    if (!fdt_start_offset) {
-> +        error_setg(&local_err, "Failed to create pci child device tree n=
-ode");
-> +        goto out;
-> +    }
-> +
-> +    spapr_drc_attach(drc, DEVICE(pdev), fdt, fdt_start_offset,
-> +                     !plugged_dev->hotplugged, &local_err);
->      if (local_err) {
-> -        error_propagate(errp, local_err);
-> -        return;
-> +        goto out;
->      }
-> =
-
->      /* If this is function 0, signal hotplug for all the device function=
-s.
-> @@ -1485,6 +1470,12 @@ static void spapr_phb_hot_plug_child(HotplugHandle=
-r *plug_handler,
->              }
->          }
->      }
-> +
-> +out:
-> +    if (local_err) {
-> +        error_propagate(errp, local_err);
-> +        g_free(fdt);
-> +    }
->  }
-> =
-
->  static void spapr_phb_hot_unplug_child(HotplugHandler *plug_handler,
-> -- =
-
-> 2.9.4
->=20
+diff --git a/include/qemu/osdep.h b/include/qemu/osdep.h
+index 1c9f5e2..ee43521 100644
+--- a/include/qemu/osdep.h
++++ b/include/qemu/osdep.h
+@@ -470,4 +470,7 @@ char *qemu_get_pid_name(pid_t pid);
+  */
+ pid_t qemu_fork(Error **errp);
+ 
++extern int qemu_icache_linesize;
++extern int qemu_dcache_linesize;
++
+ #endif
+diff --git a/util/Makefile.objs b/util/Makefile.objs
+index c6205eb..94d9477 100644
+--- a/util/Makefile.objs
++++ b/util/Makefile.objs
+@@ -20,6 +20,7 @@ util-obj-y += host-utils.o
+ util-obj-y += bitmap.o bitops.o hbitmap.o
+ util-obj-y += fifo8.o
+ util-obj-y += acl.o
++util-obj-y += cacheinfo.o
+ util-obj-y += error.o qemu-error.o
+ util-obj-y += id.o
+ util-obj-y += iov.o qemu-config.o qemu-sockets.o uri.o notify.o
+diff --git a/util/cacheinfo.c b/util/cacheinfo.c
+new file mode 100644
+index 0000000..8c52c77
+--- /dev/null
++++ b/util/cacheinfo.c
+@@ -0,0 +1,158 @@
++/*
++ * cacheinfo.c - helpers to query the host about its caches
++ *
++ * Copyright (C) 2017, Emilio G. Cota <cota@braap.org>
++ * License: GNU GPL, version 2 or later.
++ *   See the COPYING file in the top-level directory.
++ */
++
++#include "qemu/osdep.h"
++
++int qemu_icache_linesize = 64;
++int qemu_dcache_linesize = 64;
++
++#ifdef _WIN32
++static unsigned int linesize_win(PROCESSOR_CACHE_TYPE type)
++{
++    PSYSTEM_LOGICAL_PROCESSOR_INFORMATION buf;
++    DWORD size = 0;
++    unsigned int ret = 0;
++    BOOL success;
++    size_t n;
++    size_t i;
++
++    success = GetLogicalProcessorInformation(0, &size);
++    if (success || GetLastError() != ERROR_INSUFFICIENT_BUF) {
++        return 0;
++    }
++    buf = (PSYSTEM_LOGICAL_PROCESSOR_INFORMATION)g_malloc0(size);
++    if (!GetLogicalProcessorInformation(buf, &size)) {
++        goto out;
++    }
++
++    n = size / sizeof(SYSTEM_LOGICAL_PROCESSOR_INFORMATION);
++    for (i = 0; i < n; i++) {
++        if (buf[i].Relationship == RelationCache &&
++            buf[i].Cache.Level == 1 &&
++            (buf[i].Cache.Type == CacheUnified ||
++             buf[i].Cache.Type == type)) {
++            ret = buf[i].Cache.LineSize;
++            break;
++        }
++    }
++ out:
++    g_free(buf);
++    return ret;
++}
++#endif
++
++#ifdef __APPLE__
++#include <sys/sysctl.h>
++
++unsigned int linesize_apple(void)
++{
++    unsigned long bytes;
++    size_t len = sizeof(bytes);
++
++    /* There's only a single sysctl for both I/D cache line sizes */
++    if (sysctlbyname("hw.cachelinesize", &bytes, &len, NULL, 0)) {
++        return 0;
++    }
++    return bytes;
++}
++#endif
++
++static void icache_info(void)
++{
++    #ifdef _SC_LEVEL1_ICACHE_LINESIZE
++    {
++        long x = sysconf(_SC_LEVEL1_ICACHE_LINESIZE);
++
++        if (x > 0) {
++            qemu_icache_linesize = x;
++            return;
++        }
++    }
++    #endif
++    #ifdef AT_ICACHEBSIZE
++    /* glibc does not always export this through sysconf, e.g. on PPC */
++    {
++        unsigned long x = qemu_getauxval(AT_ICACHEBSIZE);
++
++        if (x > 0) {
++            qemu_icache_linesize = x;
++            return;
++        }
++    }
++    #endif
++    #ifdef _WIN32
++    {
++        unsigned int x = linesize_win(CacheInstruction);
++
++        if (x > 0) {
++            qemu_icache_linesize = x;
++            return;
++        }
++    }
++    #endif
++    #ifdef __APPLE__
++    {
++        unsigned int x = linesize_apple();
++
++        if (x > 0) {
++            qemu_icache_linesize = x;
++            return;
++        }
++    }
++    #endif
++}
++
++static void dcache_info(void)
++{
++    #ifdef _SC_LEVEL1_DCACHE_LINESIZE
++    {
++        long x = sysconf(_SC_LEVEL1_DCACHE_LINESIZE);
++
++        if (x > 0) {
++            qemu_dcache_linesize = x;
++            return;
++        }
++    }
++    #endif
++    #ifdef AT_DCACHEBSIZE
++    {
++        unsigned long x = qemu_getauxval(AT_DCACHEBSIZE);
++
++        if (x > 0) {
++            qemu_dcache_linesize = x;
++            return;
++        }
++    }
++    #endif
++    #ifdef _WIN32
++    {
++        unsigned int x = linesize_win(CacheData);
++
++        if (x > 0) {
++            qemu_dcache_linesize = x;
++            return;
++        }
++    }
++    #endif
++    #ifdef __APPLE__
++    {
++        unsigned int x = linesize_apple();
++
++        if (x > 0) {
++            qemu_dcache_linesize = x;
++            return;
++        }
++    }
++    #endif
++}
++
++static void __attribute__((constructor)) cacheinfo_init(void)
++{
++    icache_info();
++    dcache_info();
++}
+-- 
+2.7.4
