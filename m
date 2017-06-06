@@ -1,32 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38616)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38660)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1dI8oO-0008LS-Nx
-	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 03:21:57 -0400
+	(envelope-from <armbru@redhat.com>) id 1dI8ok-0000Fg-6R
+	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 03:22:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1dI8oJ-000580-HO
-	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 03:21:56 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:35326)
+	(envelope-from <armbru@redhat.com>) id 1dI8of-0005CC-UL
+	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 03:22:18 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46226)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1dI8oJ-00057s-8h
-	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 03:21:51 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id DE1F161B8A
-	for <qemu-devel@nongnu.org>; Tue,  6 Jun 2017 07:21:49 +0000 (UTC)
-Date: Tue, 6 Jun 2017 15:21:43 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20170606072143.GA27621@pxdev.xzpeter.org>
-References: <20170601214056.30387-1-quintela@redhat.com>
-	<20170601214056.30387-4-quintela@redhat.com>
-	<20170602175529.GE2081@work-vm>
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dI8of-0005C1-Lt
+	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 03:22:13 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <CAFEAcA_pErWnoUh_-fxaBMZB1L=4jYxUXYfx9CA5uVnx0H2_pw@mail.gmail.com>
+	<87f8f3e0-754d-7de5-4c2a-4b0930adb7fe@redhat.com>
+Date: Tue, 06 Jun 2017 09:22:09 +0200
+In-Reply-To: <87f8f3e0-754d-7de5-4c2a-4b0930adb7fe@redhat.com> (Paolo
+	Bonzini's message of "Mon, 5 Jun 2017 15:32:56 +0200")
+Message-ID: <87vao91sym.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20170602175529.GE2081@work-vm>
-Subject: Re: [Qemu-devel] [PATCH 3/4] ram: Print block stats also in the
- complete case
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] qdev properties vs qom object properties
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,89 +27,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org, lvivier@redhat.com
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
 
-On Fri, Jun 02, 2017 at 06:55:30PM +0100, Dr. David Alan Gilbert wrote:
-> * Juan Quintela (quintela@redhat.com) wrote:
-> > To make things easier, I just moved it to populate_ram_info().
-> 
-> Blk is not RAM; better to create a separate function.
+Paolo Bonzini <pbonzini@redhat.com> writes:
 
-Agree...
+> On 05/06/2017 15:10, Peter Maydell wrote:
+>> I perpetually get confused about qdev properties vs QOM object
+>> properties.
+>> 
+>> Why do we have both of these APIs?
+>> How do they interact?
+>
+> qdev properties are just a wrapper around QOM object properties, taking
+> care of:
+>
+> - not allowing to set the property after realize
+>
+> - providing default values
+>
+> - letting people use the familiar DEFINE_PROP_* array syntax
 
-Maybe rename populate_ram_info() into more general name?
-migrate_info_populate()?
+It's not just familiar, it's also much easier to reason about, because
+it's *data*, not code.  For instance, when I see DEFINE_PROP_UINT8(), I
+immediately know it's uint8_t.  With QOM, I commonly have to figure out
+WTF the getter and setter will do at run time.  I spent a few hours last
+week doing just that, and it sure feels like a severe case of OOPitis to
+me.
 
-(Also, I think auto convergence is not RAM-related as well, so same
- comment may apply to patch 2)
+Message-ID: <877f1ep4xv.fsf@dusky.pond.sub.org>
+https://lists.gnu.org/archive/html/qemu-devel/2017-05/msg04353.html
 
-Thanks,
+> - pretty printing for "info qtree" (which right now is only used by PCI
+> devfn and vlan properties)
+>
+>> Which is the recommended one for new device code?
+>> Do we have a transition plan for old code?
+>> Where should I be looking for the documentation on this?
+>
+> There is no transition plan, qdev properties are not going to go away
+> soon unless someone actually makes a plan.
 
-> 
-> Dave
-> 
-> > Signed-off-by: Juan Quintela <quintela@redhat.com>
-> > ---
-> >  migration/migration.c | 26 ++++++++------------------
-> >  1 file changed, 8 insertions(+), 18 deletions(-)
-> > 
-> > diff --git a/migration/migration.c b/migration/migration.c
-> > index 7f79da0..8289544 100644
-> > --- a/migration/migration.c
-> > +++ b/migration/migration.c
-> > @@ -509,6 +509,14 @@ static void populate_ram_info(MigrationInfo *info, MigrationState *s)
-> >          info->cpu_throttle_percentage = cpu_throttle_get_percentage();
-> >      }
-> >  
-> > +    if (blk_mig_active()) {
-> > +        info->has_disk = true;
-> > +        info->disk = g_malloc0(sizeof(*info->disk));
-> > +        info->disk->transferred = blk_mig_bytes_transferred();
-> > +        info->disk->remaining = blk_mig_bytes_remaining();
-> > +        info->disk->total = blk_mig_bytes_total();
-> > +    }
-> > +
-> >      if (s->state != MIGRATION_STATUS_COMPLETED) {
-> >          info->ram->remaining = ram_bytes_remaining();
-> >          info->ram->dirty_pages_rate = ram_dirty_pages_rate();
-> > @@ -540,15 +548,6 @@ MigrationInfo *qmp_query_migrate(Error **errp)
-> >          info->setup_time = s->setup_time;
-> >  
-> >          populate_ram_info(info, s);
-> > -
-> > -        if (blk_mig_active()) {
-> > -            info->has_disk = true;
-> > -            info->disk = g_malloc0(sizeof(*info->disk));
-> > -            info->disk->transferred = blk_mig_bytes_transferred();
-> > -            info->disk->remaining = blk_mig_bytes_remaining();
-> > -            info->disk->total = blk_mig_bytes_total();
-> > -        }
-> > -
-> >          break;
-> >      case MIGRATION_STATUS_POSTCOPY_ACTIVE:
-> >          /* Mostly the same as active; TODO add some postcopy stats */
-> > @@ -562,15 +561,6 @@ MigrationInfo *qmp_query_migrate(Error **errp)
-> >          info->setup_time = s->setup_time;
-> >  
-> >          populate_ram_info(info, s);
-> > -
-> > -        if (blk_mig_active()) {
-> > -            info->has_disk = true;
-> > -            info->disk = g_malloc0(sizeof(*info->disk));
-> > -            info->disk->transferred = blk_mig_bytes_transferred();
-> > -            info->disk->remaining = blk_mig_bytes_remaining();
-> > -            info->disk->total = blk_mig_bytes_total();
-> > -        }
-> > -
-> >          break;
-> >      case MIGRATION_STATUS_COLO:
-> >          info->has_status = true;
-> > -- 
-> > 2.9.4
-> > 
-> --
-> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+Any plan to replace properties defined as data by properties defined in
+code will be a hard sell with me.  I think we should go back to data
+unless the problem at hand *requires* code.
 
--- 
-Peter Xu
+> Now that there are QOM class properties, it would actually be feasible
+> to make qdev_property_add_static define QOM properties on the class
+> rather than the object.  In other words, instead of
+>
+>     dc->props = virtio_serial_pci_properties;
+>
+> you'd have something like:
+>
+>     qdev_add_class_properties(klass, usb_tablet_properties);
+>
+> or even inlined calls like the following:
+>
+>     QDEV_DEFINE_CLASS_PROP_UINT32(klass, "usb_version", USBHIDState,
+>                                   usb_version, 2);
+>     QDEV_DEFINE_CLASS_PROP_STRING(klass, "display", USBHIDState,
+>                                   display);
+>     QDEV_DEFINE_CLASS_PROP_UINT32(klass, "head", USBHIDState, head, 0);
+
+Sufficiently restricted code can be almost as simple as data.  Still,
+why not make it data?  Your examples scream to be data.
+
+>> For a specific example, I see that target/arm is the only code
+>> using qdev_property_add_static(), but there's no indication
+>> that the function is deprecated or what the right thing to be
+>> doing instead is. Any suggestions?
+>
+> The weird thing in ARM code is that the set of properties depends on the
+> CPU model.  That's the only reason why it uses
+> qdev_property_add_static() as far as I can see.
+>
+> Paolo
