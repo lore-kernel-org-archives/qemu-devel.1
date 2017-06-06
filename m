@@ -1,29 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51845)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58324)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1dIBTs-0003Ar-QH
-	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 06:13:01 -0400
+	(envelope-from <peterx@redhat.com>) id 1dIBlK-0006hA-Di
+	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 06:30:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1dIBTo-0006JA-MJ
-	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 06:12:56 -0400
-Received: from mail-wm0-x22a.google.com ([2a00:1450:400c:c09::22a]:37683)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1dIBTo-0006IM-Fo
-	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 06:12:52 -0400
-Received: by mail-wm0-x22a.google.com with SMTP id d73so45287804wma.0
-	for <qemu-devel@nongnu.org>; Tue, 06 Jun 2017 03:12:52 -0700 (PDT)
-References: <20170602160848.4913-1-alex.bennee@linaro.org>
-	<20170602160848.4913-6-alex.bennee@linaro.org>
-	<CAFEAcA_g6u+bsmb2JkqmBmy-N14BHFcTJTsvUTO27_q1nmbYgg@mail.gmail.com>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <CAFEAcA_g6u+bsmb2JkqmBmy-N14BHFcTJTsvUTO27_q1nmbYgg@mail.gmail.com>
-Date: Tue, 06 Jun 2017 11:13:14 +0100
-Message-ID: <87tw3tctl1.fsf@linaro.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [RISU PATCH v4 05/10] risu: paramterise
- send/receive functions
+	(envelope-from <peterx@redhat.com>) id 1dIBlI-00061f-SR
+	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 06:30:58 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:57256)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1dIBlI-00061Y-JR
+	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 06:30:56 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id A06B180B56
+	for <qemu-devel@nongnu.org>; Tue,  6 Jun 2017 10:30:55 +0000 (UTC)
+From: Peter Xu <peterx@redhat.com>
+Date: Tue,  6 Jun 2017 18:30:37 +0800
+Message-Id: <1496745042-2379-2-git-send-email-peterx@redhat.com>
+In-Reply-To: <1496745042-2379-1-git-send-email-peterx@redhat.com>
+References: <1496745042-2379-1-git-send-email-peterx@redhat.com>
+Subject: [Qemu-devel] [PATCH 1/6] migration: let MigrationState be a qdev
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,37 +29,147 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org
+Cc: Markus Armbruster <armbru@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Juan Quintela <quintela@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, peterx@redhat.com
 
+Let the old man "MigrationState" join the object family. Direct benefit
+is that we can start to use all the property features derived from
+current QDev, like: HW_COMPAT_* bits, command line setup for migration
+parameters (so will never need to set them up each time using HMP/QMP,
+this is really, really attractive for test writters), etc.
 
-Peter Maydell <peter.maydell@linaro.org> writes:
+I see no reason to disallow this happen yet. So let's start from this
+one, to see whether it would be anything good.
 
-> On 2 June 2017 at 17:08, Alex Bennée <alex.bennee@linaro.org> wrote:
->> This is a precursor to record/playback support. Instead of passing the
->> socket fd we now pass helper functions for reading/writing and
->> responding. This will allow us to do the rest of the record/playback
->> cleanly outside of the main worker function.
->>
->> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
->
->> -        } else if (!reginfo_is_eq(&master_ri, &apprentice_ri)) {
->> +         } else if (!reginfo_is_eq(&master_ri, &apprentice_ri)) {
->>              /* register mismatch */
->>              resp = 2;
->> -
->> -        } else if (op == OP_TESTEND) {
->> +         } else if (op == OP_TESTEND) {
->>              resp = 1;
->> -        }
->
-> [etc]
->
-> If you're going to fix the indent can you put that in
-> its own patch, please? Much easier to review that way.
+No functional change at all.
 
-Damn I forgotten that got munged. Can we agree on what the indent should
-be for risu? 3 or 4, space or tabs?
+Signed-off-by: Peter Xu <peterx@redhat.com>
+---
+ include/migration/migration.h | 19 +++++++++++++++
+ migration/migration.c         | 57 +++++++++++++++++++++++++++++--------------
+ 2 files changed, 58 insertions(+), 18 deletions(-)
 
---
-Alex Bennée
+diff --git a/include/migration/migration.h b/include/migration/migration.h
+index 79b5484..bd0186c 100644
+--- a/include/migration/migration.h
++++ b/include/migration/migration.h
+@@ -21,6 +21,7 @@
+ #include "qapi-types.h"
+ #include "exec/cpu-common.h"
+ #include "qemu/coroutine_int.h"
++#include "hw/qdev.h"
+ 
+ #define QEMU_VM_FILE_MAGIC           0x5145564d
+ #define QEMU_VM_FILE_VERSION_COMPAT  0x00000002
+@@ -49,6 +50,8 @@ enum mig_rp_message_type {
+     MIG_RP_MSG_MAX
+ };
+ 
++#define TYPE_MIGRATION "migration"
++
+ /* State for the incoming migration */
+ struct MigrationIncomingState {
+     QEMUFile *from_src_file;
+@@ -91,8 +94,24 @@ struct MigrationIncomingState {
+ MigrationIncomingState *migration_incoming_get_current(void);
+ void migration_incoming_state_destroy(void);
+ 
++#define MIGRATION_CLASS(klass) \
++    OBJECT_CLASS_CHECK(MigrationClass, (klass), TYPE_MIGRATION)
++#define MIGRATION_OBJ(obj) \
++    OBJECT_CHECK(MigrationState, (obj), TYPE_MIGRATION)
++#define MIGRATION_GET_CLASS(obj) \
++    OBJECT_GET_CLASS(MigrationClass, (obj), TYPE_MIGRATION)
++
++typedef struct MigrationClass {
++    /*< private >*/
++    DeviceClass parent_class;
++} MigrationClass;
++
+ struct MigrationState
+ {
++    /*< private >*/
++    DeviceState parent_obj;
++
++    /*< public >*/
+     size_t bytes_xfer;
+     size_t xfer_limit;
+     QemuThread thread;
+diff --git a/migration/migration.c b/migration/migration.c
+index 48c94c9..483b027 100644
+--- a/migration/migration.c
++++ b/migration/migration.c
+@@ -94,28 +94,14 @@ static bool deferred_incoming;
+ MigrationState *migrate_get_current(void)
+ {
+     static bool once;
+-    static MigrationState current_migration = {
+-        .state = MIGRATION_STATUS_NONE,
+-        .xbzrle_cache_size = DEFAULT_MIGRATE_CACHE_SIZE,
+-        .mbps = -1,
+-        .parameters = {
+-            .compress_level = DEFAULT_MIGRATE_COMPRESS_LEVEL,
+-            .compress_threads = DEFAULT_MIGRATE_COMPRESS_THREAD_COUNT,
+-            .decompress_threads = DEFAULT_MIGRATE_DECOMPRESS_THREAD_COUNT,
+-            .cpu_throttle_initial = DEFAULT_MIGRATE_CPU_THROTTLE_INITIAL,
+-            .cpu_throttle_increment = DEFAULT_MIGRATE_CPU_THROTTLE_INCREMENT,
+-            .max_bandwidth = MAX_THROTTLE,
+-            .downtime_limit = DEFAULT_MIGRATE_SET_DOWNTIME,
+-            .x_checkpoint_delay = DEFAULT_MIGRATE_X_CHECKPOINT_DELAY,
+-        },
+-    };
++    static MigrationState *current_migration;
+ 
+     if (!once) {
+-        current_migration.parameters.tls_creds = g_strdup("");
+-        current_migration.parameters.tls_hostname = g_strdup("");
++        current_migration = MIGRATION_OBJ(object_new(TYPE_MIGRATION));
+         once = true;
+     }
+-    return &current_migration;
++
++    return current_migration;
+ }
+ 
+ MigrationIncomingState *migration_incoming_get_current(void)
+@@ -2123,3 +2109,38 @@ void migrate_fd_connect(MigrationState *s)
+     s->migration_thread_running = true;
+ }
+ 
++static void migration_instance_init(Object *obj)
++{
++    MigrationState *ms = MIGRATION_OBJ(obj);
++
++    ms->state = MIGRATION_STATUS_NONE;
++    ms->xbzrle_cache_size = DEFAULT_MIGRATE_CACHE_SIZE;
++    ms->mbps = -1;
++    ms->parameters = (MigrationParameters) {
++        .compress_level = DEFAULT_MIGRATE_COMPRESS_LEVEL,
++        .compress_threads = DEFAULT_MIGRATE_COMPRESS_THREAD_COUNT,
++        .decompress_threads = DEFAULT_MIGRATE_DECOMPRESS_THREAD_COUNT,
++        .cpu_throttle_initial = DEFAULT_MIGRATE_CPU_THROTTLE_INITIAL,
++        .cpu_throttle_increment = DEFAULT_MIGRATE_CPU_THROTTLE_INCREMENT,
++        .max_bandwidth = MAX_THROTTLE,
++        .downtime_limit = DEFAULT_MIGRATE_SET_DOWNTIME,
++        .x_checkpoint_delay = DEFAULT_MIGRATE_X_CHECKPOINT_DELAY,
++    };
++    ms->parameters.tls_creds = g_strdup("");
++    ms->parameters.tls_hostname = g_strdup("");
++}
++
++static const TypeInfo migration_type = {
++    .name = TYPE_MIGRATION,
++    .parent = TYPE_DEVICE,
++    .class_size = sizeof(MigrationClass),
++    .instance_size = sizeof(MigrationState),
++    .instance_init = migration_instance_init,
++};
++
++static void register_migration_types(void)
++{
++    type_register_static(&migration_type);
++}
++
++type_init(register_migration_types);
+-- 
+2.7.4
