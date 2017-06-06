@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47510)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47595)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rkagan@virtuozzo.com>) id 1dIJ5T-0005wp-W6
-	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 14:20:17 -0400
+	(envelope-from <rkagan@virtuozzo.com>) id 1dIJ5a-00062o-HK
+	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 14:20:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rkagan@virtuozzo.com>) id 1dIJ5Q-0007Ne-5C
-	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 14:20:15 -0400
-Received: from mail-eopbgr30107.outbound.protection.outlook.com
-	([40.107.3.107]:56200
+	(envelope-from <rkagan@virtuozzo.com>) id 1dIJ5V-0007PS-SB
+	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 14:20:22 -0400
+Received: from mail-eopbgr30121.outbound.protection.outlook.com
+	([40.107.3.121]:59392
 	helo=EUR03-AM5-obe.outbound.protection.outlook.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <rkagan@virtuozzo.com>)
-	id 1dIJ5P-0007MD-TJ
-	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 14:20:12 -0400
+	id 1dIJ5V-0007PE-Go
+	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 14:20:17 -0400
 From: Roman Kagan <rkagan@virtuozzo.com>
-Date: Tue,  6 Jun 2017 21:19:40 +0300
-Message-Id: <20170606181948.16238-16-rkagan@virtuozzo.com>
+Date: Tue,  6 Jun 2017 21:19:44 +0300
+Message-Id: <20170606181948.16238-20-rkagan@virtuozzo.com>
 In-Reply-To: <20170606181948.16238-1-rkagan@virtuozzo.com>
 References: <20170606181948.16238-1-rkagan@virtuozzo.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH 15/23] hyperv: make overlay pages for SynIC
+Subject: [Qemu-devel] [PATCH 19/23] hyperv: process SIGNAL_EVENT hypercall
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,164 +31,174 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Paolo Bonzini <pbonzini@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Evgeny Yakovlev <eyakovlev@virtuozzo.com>, "Denis V . Lunev" <den@openvz.org>
 
-Per Hyper-V spec, SynIC message and event flag pages are to be
-implemented as so called overlay pages.  That is, they are owned by the
-hypervisor and, when mapped into the guest physical address space,
-overlay the guest physical pages such that
+Add handling of SIGNAL_EVENT hypercall.  For that, provide an interface
+to associate an EventNotifier with an event connection number, so that
+it's signaled when the SIGNAL_EVENT hypercall with the matching
+parameters is called by the guest.
 
-1) the overlaid guest page becomes invisible to the guest CPUs until the
-   overlay page is turned off
-2) the contents of the overlay page is preserved when it's turned off
-   and back on, even at a different address; it's only zeroed at vcpu
-   reset
-
-This particular nature of SynIC message and event flag pages is ignored
-in the current code, and guest physical pages are used directly instead.
-This (mostly) works because the actual guests seem not to depend on the
-features listed above.
-
-This patch implements those pages as the spec mandates.  Besides being
-more correct, it will help to work around certain lifetime issues with
-the current code (in a followup patch).
+TODO: we should be able to move this to KVM and avoid expensive user
+exit just to look up an eventfd by connection number and signal it.
 
 Signed-off-by: Roman Kagan <rkagan@virtuozzo.com>
 ---
- target/i386/hyperv.c | 67 +++++++++++++++++++++++++++++++++++++++++++++++-----
- 1 file changed, 61 insertions(+), 6 deletions(-)
+ target/i386/hyperv.h |   2 +
+ target/i386/hyperv.c | 113 +++++++++++++++++++++++++++++++++++++++++++++++++--
+ 2 files changed, 111 insertions(+), 4 deletions(-)
 
+diff --git a/target/i386/hyperv.h b/target/i386/hyperv.h
+index a2d4304..d2630ac 100644
+--- a/target/i386/hyperv.h
++++ b/target/i386/hyperv.h
+@@ -41,4 +41,6 @@ int hyperv_post_msg(HvSintRoute *sint_route, struct hyperv_message *msg);
+ 
+ int hyperv_set_evt_flag(HvSintRoute *sint_route, unsigned evtno);
+ 
++int hyperv_set_evt_notifier(uint32_t conn_id, EventNotifier *notifier);
++
+ #endif
 diff --git a/target/i386/hyperv.c b/target/i386/hyperv.c
-index 2d9e9fe..165133a 100644
+index dcf49e4..030184e 100644
 --- a/target/i386/hyperv.c
 +++ b/target/i386/hyperv.c
-@@ -15,6 +15,9 @@
- #include "qemu/main-loop.h"
- #include "qapi/error.h"
- #include "hw/qdev-properties.h"
-+#include "exec/address-spaces.h"
-+#include "sysemu/cpus.h"
-+#include "migration/vmstate.h"
+@@ -18,6 +18,9 @@
+ #include "exec/address-spaces.h"
+ #include "sysemu/cpus.h"
+ #include "qemu/bitops.h"
++#include "qemu/queue.h"
++#include "qemu/rcu.h"
++#include "qemu/rcu_queue.h"
+ #include "migration/vmstate.h"
  #include "hyperv.h"
  #include "hyperv_proto.h"
- 
-@@ -26,6 +29,10 @@ typedef struct SynICState {
-     bool enabled;
-     hwaddr msg_page_addr;
-     hwaddr evt_page_addr;
-+    MemoryRegion msg_page_mr;
-+    MemoryRegion evt_page_mr;
-+    struct hyperv_message_page *msg_page;
-+    struct hyperv_event_flags_page *evt_page;
- } SynICState;
- 
- #define TYPE_SYNIC "hyperv-synic"
-@@ -65,6 +72,17 @@ static void synic_update_msg_page_addr(SynICState *synic)
-     uint64_t msr = synic->cpu->env.msr_hv_synic_msg_page;
-     hwaddr new_addr = (msr & HV_SIMP_ENABLE) ? (msr & TARGET_PAGE_MASK) : 0;
- 
-+    if (new_addr == synic->msg_page_addr) {
-+        return;
-+    }
-+
-+    if (synic->msg_page_addr) {
-+        memory_region_del_subregion(get_system_memory(), &synic->msg_page_mr);
-+    }
-+    if (new_addr) {
-+        memory_region_add_subregion(get_system_memory(), new_addr,
-+                                    &synic->msg_page_mr);
-+    }
-     synic->msg_page_addr = new_addr;
+@@ -229,6 +232,106 @@ static void async_synic_update(CPUState *cs, run_on_cpu_data data)
+     qemu_mutex_unlock_iothread();
  }
  
-@@ -73,6 +91,17 @@ static void synic_update_evt_page_addr(SynICState *synic)
-     uint64_t msr = synic->cpu->env.msr_hv_synic_evt_page;
-     hwaddr new_addr = (msr & HV_SIEFP_ENABLE) ? (msr & TARGET_PAGE_MASK) : 0;
- 
-+    if (new_addr == synic->evt_page_addr) {
-+        return;
-+    }
++typedef struct EvtHandler {
++    struct rcu_head rcu;
++    QLIST_ENTRY(EvtHandler) le;
++    uint32_t conn_id;
++    EventNotifier *notifier;
++} EvtHandler;
 +
-+    if (synic->evt_page_addr) {
-+        memory_region_del_subregion(get_system_memory(), &synic->evt_page_mr);
-+    }
-+    if (new_addr) {
-+        memory_region_add_subregion(get_system_memory(), new_addr,
-+                                    &synic->evt_page_mr);
-+    }
-     synic->evt_page_addr = new_addr;
- }
- 
-@@ -83,6 +112,15 @@ static void synic_update(SynICState *synic)
-     synic_update_evt_page_addr(synic);
- }
- 
++static QLIST_HEAD(, EvtHandler) evt_handlers;
++static QemuMutex evt_handlers_mutex;
 +
-+static void async_synic_update(CPUState *cs, run_on_cpu_data data)
++static void __attribute__((constructor)) hv_init(void)
 +{
-+    SynICState *synic = data.host_ptr;
-+    qemu_mutex_lock_iothread();
-+    synic_update(synic);
-+    qemu_mutex_unlock_iothread();
++    QLIST_INIT(&evt_handlers);
++    qemu_mutex_init(&evt_handlers_mutex);
++}
++
++int hyperv_set_evt_notifier(uint32_t conn_id, EventNotifier *notifier)
++{
++    int ret;
++    EvtHandler *eh;
++
++    qemu_mutex_lock(&evt_handlers_mutex);
++    QLIST_FOREACH(eh, &evt_handlers, le) {
++        if (eh->conn_id == conn_id) {
++            if (notifier) {
++                ret = -EEXIST;
++            } else {
++                QLIST_REMOVE_RCU(eh, le);
++                g_free_rcu(eh, rcu);
++                ret = 0;
++            }
++            goto unlock;
++        }
++    }
++
++    if (notifier) {
++        eh = g_new(EvtHandler, 1);
++        eh->conn_id = conn_id;
++        eh->notifier = notifier;
++        QLIST_INSERT_HEAD_RCU(&evt_handlers, eh, le);
++        ret = 0;
++    } else {
++        ret = -ENOENT;
++    }
++unlock:
++    qemu_mutex_unlock(&evt_handlers_mutex);
++    return ret;
++}
++
++static uint64_t sigevent_params(hwaddr addr, uint32_t *conn_id)
++{
++    uint64_t ret;
++    hwaddr len;
++    struct hyperv_signal_event_input *msg;
++
++    if (addr & (__alignof__(*msg) - 1)) {
++        return HV_STATUS_INVALID_ALIGNMENT;
++    }
++
++    len = sizeof(*msg);
++    msg = cpu_physical_memory_map(addr, &len, 0);
++    if (len < sizeof(*msg)) {
++        ret = HV_STATUS_INSUFFICIENT_MEMORY;
++    } else {
++        *conn_id = (msg->connection_id & HV_CONNECTION_ID_MASK) +
++            msg->flag_number;
++        ret = 0;
++    }
++    cpu_physical_memory_unmap(msg, len, 0, 0);
++    return ret;
++}
++
++static uint64_t hvcall_signal_event(uint64_t param, bool fast)
++{
++    uint64_t ret;
++    uint32_t conn_id;
++    EvtHandler *eh;
++
++    if (likely(fast)) {
++        conn_id = (param & 0xffffffff) + ((param >> 32) & 0xffff);
++    } else {
++        ret = sigevent_params(param, &conn_id);
++        if (ret) {
++            return ret;
++        }
++    }
++
++    ret = HV_STATUS_INVALID_CONNECTION_ID;
++    rcu_read_lock();
++    QLIST_FOREACH_RCU(eh, &evt_handlers, le) {
++        if (eh->conn_id == conn_id) {
++            event_notifier_set(eh->notifier);
++            ret = 0;
++            break;
++        }
++    }
++    rcu_read_unlock();
++    return ret;
 +}
 +
  int kvm_hv_handle_exit(X86CPU *cpu, struct kvm_hyperv_exit *exit)
  {
      CPUX86State *env = &cpu->env;
-@@ -93,11 +131,6 @@ int kvm_hv_handle_exit(X86CPU *cpu, struct kvm_hyperv_exit *exit)
-             return -1;
-         }
- 
--        /*
--         * For now just track changes in SynIC control and msg/evt pages msr's.
--         * When SynIC messaging/events processing will be added in future
--         * here we will do messages queues flushing and pages remapping.
--         */
-         switch (exit->u.synic.msr) {
-         case HV_X64_MSR_SCONTROL:
-             env->msr_hv_synic_control = exit->u.synic.control;
-@@ -111,7 +144,8 @@ int kvm_hv_handle_exit(X86CPU *cpu, struct kvm_hyperv_exit *exit)
-         default:
-             return -1;
-         }
--        synic_update(get_synic(cpu));
-+        async_safe_run_on_cpu(CPU(cpu), async_synic_update,
-+                              RUN_ON_CPU_HOST_PTR(get_synic(cpu)));
+@@ -256,16 +359,18 @@ int kvm_hv_handle_exit(X86CPU *cpu, struct kvm_hyperv_exit *exit)
+                               RUN_ON_CPU_HOST_PTR(get_synic(cpu)));
          return 0;
      case KVM_EXIT_HYPERV_HCALL: {
-         uint16_t code;
-@@ -245,13 +279,34 @@ static void synic_realize(DeviceState *dev, Error **errp)
- {
-     Object *obj = OBJECT(dev);
-     SynICState *synic = SYNIC(dev);
-+    char *msgp_name, *evtp_name;
-+    uint32_t vp_index;
+-        uint16_t code;
++        uint16_t code = exit->u.hcall.input & 0xffff;
++        bool fast = exit->u.hcall.input & HV_HYPERCALL_FAST;
++        uint64_t param = exit->u.hcall.params[0];
  
-     synic->cpu = X86_CPU(obj->parent);
-+
-+    /* memory region names have to be globally unique */
-+    vp_index = hyperv_vp_index(synic->cpu);
-+    msgp_name = g_strdup_printf("synic-%u-msg-page", vp_index);
-+    evtp_name = g_strdup_printf("synic-%u-evt-page", vp_index);
-+
-+    memory_region_init_ram(&synic->msg_page_mr, obj, msgp_name,
-+                           sizeof(*synic->msg_page), &error_abort);
-+    memory_region_init_ram(&synic->evt_page_mr, obj, evtp_name,
-+                           sizeof(*synic->evt_page), &error_abort);
-+    vmstate_register_ram(&synic->msg_page_mr, dev);
-+    vmstate_register_ram(&synic->evt_page_mr, dev);
-+    synic->msg_page = memory_region_get_ram_ptr(&synic->msg_page_mr);
-+    synic->evt_page = memory_region_get_ram_ptr(&synic->evt_page_mr);
-+
-+    g_free(msgp_name);
-+    g_free(evtp_name);
- }
- 
- static void synic_reset(DeviceState *dev)
- {
-     SynICState *synic = SYNIC(dev);
-+    memset(synic->msg_page, 0, sizeof(*synic->msg_page));
-+    memset(synic->evt_page, 0, sizeof(*synic->evt_page));
-     synic_update(synic);
- }
- 
+-        code  = exit->u.hcall.input & 0xffff;
+         switch (code) {
+-        case HV_POST_MESSAGE:
+         case HV_SIGNAL_EVENT:
++            exit->u.hcall.result = hvcall_signal_event(param, fast);
++            break;
+         default:
+             exit->u.hcall.result = HV_STATUS_INVALID_HYPERCALL_CODE;
+-            return 0;
+         }
++        return 0;
+     }
+     default:
+         return -1;
 -- 
 2.9.4
