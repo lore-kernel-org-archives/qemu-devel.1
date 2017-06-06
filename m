@@ -1,22 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41846)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42803)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sundeep.lkml@gmail.com>) id 1dI91T-0000JM-Fe
-	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 03:35:30 -0400
+	(envelope-from <quwenruo@cn.fujitsu.com>) id 1dI94X-0003CW-SW
+	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 03:38:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sundeep.lkml@gmail.com>) id 1dI91Q-0002P5-GV
-	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 03:35:27 -0400
+	(envelope-from <quwenruo@cn.fujitsu.com>) id 1dI94W-0003qS-Ud
+	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 03:38:37 -0400
+From: Qu Wenruo <quwenruo@cn.fujitsu.com>
+Date: Tue, 6 Jun 2017 15:38:06 +0800
+Message-ID: <20170606073806.8180-2-quwenruo@cn.fujitsu.com>
+In-Reply-To: <20170606073806.8180-1-quwenruo@cn.fujitsu.com>
+References: <20170606073806.8180-1-quwenruo@cn.fujitsu.com>
 MIME-Version: 1.0
-In-Reply-To: <553a2ef3-cbf3-f876-cbf0-3d46bb24e14b@amsat.org>
-References: <1494949133-2202-1-git-send-email-sundeep.lkml@gmail.com>
-	<1494949133-2202-5-git-send-email-sundeep.lkml@gmail.com>
-	<553a2ef3-cbf3-f876-cbf0-3d46bb24e14b@amsat.org>
-From: sundeep subbaraya <sundeep.lkml@gmail.com>
-Date: Tue, 6 Jun 2017 13:05:23 +0530
-Message-ID: <CALHRZupvEtr-ZkPu=WF7LtUjczzFSBDuku8VHK6w=vj-tX=D=Q@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [Qemu devel v5 PATCH 4/5] msf2: Add Smartfusion2
- SoC.
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH 2/2] nvme: Check PSDT flag for admin and rw
+ command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,405 +22,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Alistair Francis <alistair23@gmail.com>
+To: qemu-devel@nongnu.org, qemu-block@nongnu.org, keith.busch@intel.com
 
-Hi Philippe,
+Check PRP or SGL for Data Transfer(PSDT) flag for admin and read/write
+commands.
 
-On Wed, May 31, 2017 at 11:13 AM, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.=
-org>
-wrote:
+For NVMe-over-PCIE, admin sq entry should not set SGL bits.
+and rw sq entry PSDT flag should not be set beyond controller support.
 
-> Hi Subbaraya,
->
-> So far so good!
->
->
-> On 05/16/2017 12:38 PM, Subbaraya Sundeep wrote:
->
->> Smartfusion2 SoC has hardened Microcontroller subsystem
->> and flash based FPGA fabric. This patch adds support for
->> Microcontroller subsystem in the SoC.
->>
->> Signed-off-by: Subbaraya Sundeep <sundeep.lkml@gmail.com>
->> ---
->>  default-configs/arm-softmmu.mak |   1 +
->>  hw/arm/Makefile.objs            |   1 +
->>  hw/arm/msf2-soc.c               | 201 ++++++++++++++++++++++++++++++
->> ++++++++++
->>  include/hw/arm/msf2-soc.h       |  69 ++++++++++++++
->>  4 files changed, 272 insertions(+)
->>  create mode 100644 hw/arm/msf2-soc.c
->>  create mode 100644 include/hw/arm/msf2-soc.h
->>
->> diff --git a/default-configs/arm-softmmu.mak
->> b/default-configs/arm-softmmu.mak
->> index 78d7af0..7062512 100644
->> --- a/default-configs/arm-softmmu.mak
->> +++ b/default-configs/arm-softmmu.mak
->> @@ -122,3 +122,4 @@ CONFIG_ACPI=3Dy
->>  CONFIG_SMBIOS=3Dy
->>  CONFIG_ASPEED_SOC=3Dy
->>  CONFIG_GPIO_KEY=3Dy
->> +CONFIG_MSF2=3Dy
->> diff --git a/hw/arm/Makefile.objs b/hw/arm/Makefile.objs
->> index 4c5c4ee..c828061 100644
->> --- a/hw/arm/Makefile.objs
->> +++ b/hw/arm/Makefile.objs
->> @@ -18,3 +18,4 @@ obj-$(CONFIG_FSL_IMX25) +=3D fsl-imx25.o imx25_pdk.o
->>  obj-$(CONFIG_FSL_IMX31) +=3D fsl-imx31.o kzm.o
->>  obj-$(CONFIG_FSL_IMX6) +=3D fsl-imx6.o sabrelite.o
->>  obj-$(CONFIG_ASPEED_SOC) +=3D aspeed_soc.o aspeed.o
->> +obj-$(CONFIG_MSF2) +=3D msf2-soc.o
->> diff --git a/hw/arm/msf2-soc.c b/hw/arm/msf2-soc.c
->> new file mode 100644
->> index 0000000..329e30c
->> --- /dev/null
->> +++ b/hw/arm/msf2-soc.c
->> @@ -0,0 +1,201 @@
->> +/*
->> + * SmartFusion2 SoC emulation.
->> + *
->> + * Copyright (c) 2017 Subbaraya Sundeep <sundeep.lkml@gmail.com>
->> + *
->> + * Permission is hereby granted, free of charge, to any person obtainin=
-g
->> a copy
->> + * of this software and associated documentation files (the "Software")=
-,
->> to deal
->> + * in the Software without restriction, including without limitation th=
-e
->> rights
->> + * to use, copy, modify, merge, publish, distribute, sublicense, and/or
->> sell
->> + * copies of the Software, and to permit persons to whom the Software i=
-s
->> + * furnished to do so, subject to the following conditions:
->> + *
->> + * The above copyright notice and this permission notice shall be
->> included in
->> + * all copies or substantial portions of the Software.
->> + *
->> + * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
->> EXPRESS OR
->> + * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
->> MERCHANTABILITY,
->> + * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT
->> SHALL
->> + * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR
->> OTHER
->> + * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
->> ARISING FROM,
->> + * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
->> DEALINGS IN
->> + * THE SOFTWARE.
->> + */
->> +
->> +#include "qemu/osdep.h"
->> +#include "qapi/error.h"
->> +#include "qemu-common.h"
->> +#include "hw/arm/arm.h"
->> +#include "exec/address-spaces.h"
->> +#include "hw/char/serial.h"
->> +#include "hw/boards.h"
->> +#include "sysemu/block-backend.h"
->> +#include "hw/arm/msf2-soc.h"
->> +
->> +#define MSF2_TIMER_BASE     0x40004000
->> +#define MSF2_SYSREG_BASE    0x40038000
->> +
->> +#define MSF2_TIMER_IRQ0     14
->> +#define MSF2_TIMER_IRQ1     15
->> +
->> +static const uint32_t spi_addr[MSF2_NUM_SPIS] =3D { 0x40001000 ,
->> 0x40011000 };
->> +static const uint32_t uart_addr[MSF2_NUM_UARTS] =3D { 0x40000000 ,
->> 0x40010000 };
->> +
->> +static const int spi_irq[MSF2_NUM_SPIS] =3D { 2, 3 };
->> +static const int uart_irq[MSF2_NUM_UARTS] =3D { 10, 11 };
->>
->
-> Maybe you can declare timer_irq[] here instead of the defines, to keep a
-> common style.
+Although currently either linux kernel NVMe-over-PCIE host driver uses
+SGL nor qemu nvme controller supports it, it's never a bad idea to
+enhance the check.
 
+Signed-off-by: Qu Wenruo <quwenruo@cn.fujitsu.com>
+---
+ hw/block/nvme.c | 11 +++++++++++
+ hw/block/nvme.h |  7 ++++++-
+ 2 files changed, 17 insertions(+), 1 deletion(-)
 
-Ok will change.
-
->
->
-> +
->> +static void m2sxxx_soc_initfn(Object *obj)
->> +{
->> +    MSF2State *s =3D MSF2_SOC(obj);
->> +    int i;
->> +
->> +    object_initialize(&s->armv7m, sizeof(s->armv7m), TYPE_ARMV7M);
->> +    qdev_set_parent_bus(DEVICE(&s->armv7m), sysbus_get_default());
->> +
->> +    object_initialize(&s->sysreg, sizeof(s->sysreg), TYPE_MSF2_SYSREG);
->> +    qdev_set_parent_bus(DEVICE(&s->sysreg), sysbus_get_default());
->> +
->> +    object_initialize(&s->timer, sizeof(s->timer), TYPE_MSS_TIMER);
->> +    qdev_set_parent_bus(DEVICE(&s->timer), sysbus_get_default());
->> +
->> +    for (i =3D 0; i < MSF2_NUM_SPIS; i++) {
->> +        object_initialize(&s->spi[i], sizeof(s->spi[i]),
->> +                          TYPE_MSS_SPI);
->> +        qdev_set_parent_bus(DEVICE(&s->spi[i]), sysbus_get_default());
->> +    }
->> +}
->> +
->> +static void m2sxxx_soc_realize(DeviceState *dev_soc, Error **errp)
->> +{
->> +    MSF2State *s =3D MSF2_SOC(dev_soc);
->> +    DeviceState *dev, *armv7m;
->> +    SysBusDevice *busdev;
->> +    Error *err =3D NULL;
->> +    int i;
->> +
->> +    MemoryRegion *system_memory =3D get_system_memory();
->> +    MemoryRegion *nvm =3D g_new(MemoryRegion, 1);
->> +    MemoryRegion *nvm_alias =3D g_new(MemoryRegion, 1);
->> +    MemoryRegion *sram =3D g_new(MemoryRegion, 1);
->> +
->> +    memory_region_init_ram(nvm, NULL, "MSF2.eNVM", s->envm_size,
->> +                           &error_fatal);
->> +
->> +    /*
->> +     * On power-on, the eNVM region 0x60000000 is automatically
->> +     * remapped to the Cortex-M3 processor executable region
->> +     * start address (0x0). We do not support remapping other eNVM,
->> +     * eSRAM and DDR regions by guest(via Sysreg) currently.
->> +     */
->> +    memory_region_init_alias(nvm_alias, NULL, "MSF2.eNVM.alias",
->> +                             nvm, 0, s->envm_size);
->> +    vmstate_register_ram_global(nvm);
->> +
->> +    memory_region_set_readonly(nvm, true);
->> +    memory_region_set_readonly(nvm_alias, true);
->> +
->> +    memory_region_add_subregion(system_memory, ENVM_BASE_ADDRESS, nvm);
->> +    memory_region_add_subregion(system_memory, 0, nvm_alias);
->> +
->> +    memory_region_init_ram(sram, NULL, "MSF2.eSRAM", s->esram_size,
->> +                           &error_fatal);
->> +    vmstate_register_ram_global(sram);
->> +    memory_region_add_subregion(system_memory, SRAM_BASE_ADDRESS, sram)=
-;
->> +
->> +    armv7m =3D DEVICE(&s->armv7m);
->> +    qdev_prop_set_uint32(armv7m, "num-irq", 81);
->> +    qdev_prop_set_string(armv7m, "cpu-model", "cortex-m3");
->> +    object_property_set_link(OBJECT(&s->armv7m),
->> OBJECT(get_system_memory()),
->> +                                     "memory", &error_abort);
->> +    object_property_set_bool(OBJECT(&s->armv7m), true, "realized",
->> &err);
->> +    if (err !=3D NULL) {
->> +        error_propagate(errp, err);
->> +        return;
->> +    }
->> +
->> +    for (i =3D 0; i < MSF2_NUM_UARTS; i++) {
->> +        if (serial_hds[i]) {
->> +            serial_mm_init(get_system_memory(), uart_addr[i], 2,
->> +                           qdev_get_gpio_in(armv7m, uart_irq[i]),
->> +                           115200, serial_hds[i], DEVICE_NATIVE_ENDIAN)=
-;
->> +        }
->> +    }
->> +
->> +    dev =3D DEVICE(&s->timer);
->> +    /* pclk0 is the timer input clock */
->> +    qdev_prop_set_uint32(dev, "clock-frequency", s->pclk0);
->> +    object_property_set_bool(OBJECT(&s->timer), true, "realized", &err)=
-;
->> +    if (err !=3D NULL) {
->> +        error_propagate(errp, err);
->> +        return;
->> +    }
->> +    busdev =3D SYS_BUS_DEVICE(dev);
->> +    sysbus_mmio_map(busdev, 0, MSF2_TIMER_BASE);
->> +    sysbus_connect_irq(busdev, 0,
->> +                           qdev_get_gpio_in(armv7m, MSF2_TIMER_IRQ0));
->> +    sysbus_connect_irq(busdev, 1,
->> +                           qdev_get_gpio_in(armv7m, MSF2_TIMER_IRQ1));
->> +
->> +    dev =3D DEVICE(&s->sysreg);
->> +    object_property_set_bool(OBJECT(&s->sysreg), true, "realized",
->> &err);
->> +    if (err !=3D NULL) {
->> +        error_propagate(errp, err);
->> +        return;
->> +    }
->> +    busdev =3D SYS_BUS_DEVICE(dev);
->> +    sysbus_mmio_map(busdev, 0, MSF2_SYSREG_BASE);
->> +
->> +    for (i =3D 0; i < MSF2_NUM_SPIS; i++) {
->> +        gchar *bus_name =3D g_strdup_printf("spi%d", i);
->> +
->> +        object_property_set_bool(OBJECT(&s->spi[i]), true, "realized",
->> &err);
->> +        if (err !=3D NULL) {
->> +            g_free(bus_name);
->> +            error_propagate(errp, err);
->> +            return;
->> +        }
->> +
->> +        sysbus_mmio_map(SYS_BUS_DEVICE(&s->spi[i]), 0, spi_addr[i]);
->> +        sysbus_connect_irq(SYS_BUS_DEVICE(&s->spi[i]), 0,
->> +                           qdev_get_gpio_in(armv7m, spi_irq[i]));
->> +
->> +        /* Alias controller SPI bus to the SoC itself */
->> +        object_property_add_alias(OBJECT(s), bus_name,
->> +                                  OBJECT(&s->spi[i]), "spi0",
->> +                                  &error_abort);
->> +        g_free(bus_name);
->> +    }
->> +}
->> +
->> +static Property m2sxxx_soc_properties[] =3D {
->> +    DEFINE_PROP_STRING("part-name", MSF2State, part_name),
->> +    DEFINE_PROP_UINT64("eNVM-size", MSF2State, envm_size,
->> MSF2_ENVM_SIZE),
->> +    DEFINE_PROP_UINT64("eSRAM-size", MSF2State, esram_size,
->> MSF2_ESRAM_SIZE),
->> +    /* Libero GUI shows 100Mhz as default for clocks */
->> +    DEFINE_PROP_UINT32("pclk0", MSF2State, pclk0, 100 * 1000000),
->> +    DEFINE_PROP_UINT32("pclk1", MSF2State, pclk1, 100 * 1000000),
->> +    DEFINE_PROP_END_OF_LIST(),
->> +};
->> +
->> +static void m2sxxx_soc_class_init(ObjectClass *klass, void *data)
->> +{
->> +    DeviceClass *dc =3D DEVICE_CLASS(klass);
->> +
->> +    dc->realize =3D m2sxxx_soc_realize;
->> +    dc->props =3D m2sxxx_soc_properties;
->> +}
->> +
->> +static const TypeInfo m2sxxx_soc_info =3D {
->> +    .name          =3D TYPE_MSF2_SOC,
->> +    .parent        =3D TYPE_SYS_BUS_DEVICE,
->> +    .instance_size =3D sizeof(MSF2State),
->> +    .instance_init =3D m2sxxx_soc_initfn,
->> +    .class_init    =3D m2sxxx_soc_class_init,
->> +};
->> +
->> +static void m2sxxx_soc_types(void)
->> +{
->> +    type_register_static(&m2sxxx_soc_info);
->> +}
->> +
->> +type_init(m2sxxx_soc_types)
->> diff --git a/include/hw/arm/msf2-soc.h b/include/hw/arm/msf2-soc.h
->> new file mode 100644
->> index 0000000..67adddb
->> --- /dev/null
->> +++ b/include/hw/arm/msf2-soc.h
->> @@ -0,0 +1,69 @@
->> +/*
->> + * Microsemi Smartfusion2 SoC
->> + *
->> + * Copyright (c) 2017 Subbaraya Sundeep <sundeep.lkml@gmail.com>
->> + *
->> + * Permission is hereby granted, free of charge, to any person obtainin=
-g
->> a copy
->> + * of this software and associated documentation files (the "Software")=
-,
->> to deal
->> + * in the Software without restriction, including without limitation th=
-e
->> rights
->> + * to use, copy, modify, merge, publish, distribute, sublicense, and/or
->> sell
->> + * copies of the Software, and to permit persons to whom the Software i=
-s
->> + * furnished to do so, subject to the following conditions:
->> + *
->> + * The above copyright notice and this permission notice shall be
->> included in
->> + * all copies or substantial portions of the Software.
->> + *
->> + * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
->> EXPRESS OR
->> + * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
->> MERCHANTABILITY,
->> + * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT
->> SHALL
->> + * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR
->> OTHER
->> + * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
->> ARISING FROM,
->> + * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
->> DEALINGS IN
->> + * THE SOFTWARE.
->> + */
->> +
->> +#ifndef HW_ARM_MSF2_SOC_H
->> +#define HW_ARM_MSF2_SOC_H
->> +
->> +#include "hw/misc/msf2-sysreg.h"
->> +#include "hw/timer/mss-timer.h"
->> +#include "hw/ssi/mss-spi.h"
->> +#include "hw/arm/armv7m.h"
->> +#include "qemu/cutils.h"
->> +
->> +#define TYPE_MSF2_SOC     "msf2-soc"
->> +#define MSF2_SOC(obj)     OBJECT_CHECK(MSF2State, (obj), TYPE_MSF2_SOC)
->> +
->> +#define MSF2_NUM_SPIS         2
->> +#define MSF2_NUM_UARTS        2
->> +
->>
->
-> from here ...
->
-> +#define ENVM_BASE_ADDRESS     0x60000000
->> +
->> +#define SRAM_BASE_ADDRESS     0x20000000
->> +
->> +#define MSF2_ENVM_SIZE        (512 * K_BYTE)
->> +#define MSF2_ESRAM_SIZE       (64 * K_BYTE)
->> +
->> +#define M2S010_ENVM_SIZE      (256 * K_BYTE)
->> +#define M2S010_ESRAM_SIZE     (64 * K_BYTE)
->> +
->>
->
-> ... to here can go in C source.
-
-
-Ok will change it.
-
->
->
-> +typedef struct MSF2State {
->> +    /*< private >*/
->> +    SysBusDevice parent_obj;
->> +    /*< public >*/
->> +
->> +    ARMv7MState armv7m;
->> +
->> +    char *part_name;
->> +    uint64_t envm_size;
->> +    uint64_t esram_size;
->> +
->> +    uint32_t pclk0;
->> +    uint32_t pclk1;
->> +
->> +    MSF2SysregState sysreg;
->> +    MSSTimerState timer;
->> +    MSSSpiState spi[MSF2_NUM_SPIS];
->> +} MSF2State;
->> +
->> +#endif
->>
->>
-> Regards,
->
-> Phil.
->
+diff --git a/hw/block/nvme.c b/hw/block/nvme.c
+index fa1069160e..b2579594d9 100644
+--- a/hw/block/nvme.c
++++ b/hw/block/nvme.c
+@@ -284,6 +284,10 @@ static uint16_t nvme_rw(NvmeCtrl *n, NvmeNamespace *ns, NvmeCmd *cmd,
+         block_acct_invalid(blk_get_stats(n->conf.blk), acct);
+         return NVME_LBA_RANGE | NVME_DNR;
+     }
++    if (!n->id_ctrl.sgls && NVME_CMD_FLAGS_PSDT(rw->flags)) {
++        block_acct_invalid(blk_get_stats(n->conf.blk), acct);
++        return NVME_INVALID_FIELD | NVME_DNR;
++    }
+ 
+     if (nvme_map_prp(&req->qsg, prp1, prp2, data_size, n)) {
+         block_acct_invalid(blk_get_stats(n->conf.blk), acct);
+@@ -618,6 +622,11 @@ static uint16_t nvme_set_feature(NvmeCtrl *n, NvmeCmd *cmd, NvmeRequest *req)
+ 
+ static uint16_t nvme_admin_cmd(NvmeCtrl *n, NvmeCmd *cmd, NvmeRequest *req)
+ {
++    /* Admin cmd for NVMe-over-PCIE should NOT use SGL */
++    if (NVME_CMD_FLAGS_PSDT(cmd->flags)) {
++        return NVME_INVALID_FIELD | NVME_DNR;
++    }
++
+     switch (cmd->opcode) {
+     case NVME_ADM_CMD_DELETE_SQ:
+         return nvme_del_sq(n, cmd);
+@@ -967,6 +976,8 @@ static int nvme_init(PCIDevice *pci_dev)
+     if (blk_enable_write_cache(n->conf.blk)) {
+         id->vwc = 1;
+     }
++    /* TODO: Support SGL in NVMe-over-PCIE in both qemu and kernel */
++    id->sgls = 0;
+ 
+     n->bar.cap = 0;
+     NVME_CAP_SET_MQES(n->bar.cap, 0x7ff);
+diff --git a/hw/block/nvme.h b/hw/block/nvme.h
+index 26be663d2d..caf21c5f94 100644
+--- a/hw/block/nvme.h
++++ b/hw/block/nvme.h
+@@ -229,9 +229,14 @@ typedef union NvmeDataPtr{
+     NvmeKeyedSGLDesc    ksgl;
+ } NvmeDataPtr;
+ 
++#define _NVME_CMD_FLAGS_FUSE_MASK    ((1 << 0)  + (1 << 1))
++#define _NVME_CMD_FLAGS_PSDT_MASK    ((1 << 15) + (1 << 14))
++#define NVME_CMD_FLAGS_FUSE(flags)  ((flags) & _NVME_CMD_FLAGS_FUSE_MASK)
++#define NVME_CMD_FLAGS_PSDT(flags)  ((flags) & _NVME_CMD_FLAGS_PSDT_MASK)
++
+ typedef struct NvmeCmd {
+     uint8_t     opcode;
+-    uint8_t     fuse;
++    uint8_t     flags;
+     uint16_t    cid;
+     uint32_t    nsid;
+     uint64_t    res1;
+-- 
+2.13.0
