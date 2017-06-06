@@ -1,22 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45084)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45461)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dIHL2-0000bL-1z
-	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 12:28:12 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1dIHMg-0002Pj-W2
+	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 12:29:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dIHKy-0002du-RW
-	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 12:28:12 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43200)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dIHKy-0002dj-Kq
-	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 12:28:08 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <20170606151757.32473-1-pbonzini@redhat.com>
-Date: Tue, 06 Jun 2017 18:28:03 +0200
-In-Reply-To: <20170606151757.32473-1-pbonzini@redhat.com> (Paolo Bonzini's
-	message of "Tue, 6 Jun 2017 17:17:57 +0200")
-Message-ID: <871sqxjd2k.fsf@dusky.pond.sub.org>
+	(envelope-from <peter.maydell@linaro.org>) id 1dIHMg-0003QJ-9h
+	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 12:29:54 -0400
+Received: from mail-wm0-x234.google.com ([2a00:1450:400c:c09::234]:38538)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1dIHMg-0003Q9-3T
+	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 12:29:54 -0400
+Received: by mail-wm0-x234.google.com with SMTP id n195so104500131wmg.1
+	for <qemu-devel@nongnu.org>; Tue, 06 Jun 2017 09:29:53 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain
+In-Reply-To: <871sqxjd2k.fsf@dusky.pond.sub.org>
+References: <20170606151757.32473-1-pbonzini@redhat.com>
+	<871sqxjd2k.fsf@dusky.pond.sub.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 6 Jun 2017 17:29:32 +0100
+Message-ID: <CAFEAcA_92Uca62XUs51TQKyto1D=zGWYWC-htrw_nF3D4P3o6Q@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Subject: Re: [Qemu-devel] [PATCH] docs: create interop/ subdirectory
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -26,17 +29,23 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: qemu-devel@nongnu.org, marcandre.lureau@redhat.com, thuth@redhat.com, peter.maydell@linaro.org
+To: Markus Armbruster <armbru@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>, Thomas Huth <thuth@redhat.com>
 
-Paolo Bonzini <pbonzini@redhat.com> writes:
-
-> This is for the future interoperability & management guide.  It includes
-> the QAPI docs, including the automatically generated ones, other socket
-> protocols (vhost-user, VNC), and the qcow2 file format.
+On 6 June 2017 at 17:28, Markus Armbruster <armbru@redhat.com> wrote:
+> Paolo Bonzini <pbonzini@redhat.com> writes:
 >
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+>> This is for the future interoperability & management guide.  It includes
+>> the QAPI docs, including the automatically generated ones, other socket
+>> protocols (vhost-user, VNC), and the qcow2 file format.
+>>
+>> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+>
+> No objections to adding a bit more structure to docs/ this way.  Can't
+> say I like the name interop/, though.  Oh well, it's not my bikeshed to
+> paint :)
 
-No objections to adding a bit more structure to docs/ this way.  Can't
-say I like the name interop/, though.  Oh well, it's not my bikeshed to
-paint :)
+OTOH there is a certain amusement to be had from putting
+some of our documentation under 'spin/' :-)
+
+-- PMM
