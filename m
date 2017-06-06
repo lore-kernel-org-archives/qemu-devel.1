@@ -1,20 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35063)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35157)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcmvbkbc@gmail.com>) id 1dIC79-0007vj-Iw
-	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 06:53:32 -0400
+	(envelope-from <kraxel@redhat.com>) id 1dIC7S-00086A-Ck
+	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 06:53:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcmvbkbc@gmail.com>) id 1dIC76-0006Aj-Hs
-	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 06:53:31 -0400
-Received: from mail-lf0-x231.google.com ([2a00:1450:4010:c07::231]:35949)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <jcmvbkbc@gmail.com>) id 1dIC76-0006AW-9k
-	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 06:53:28 -0400
-Received: by mail-lf0-x231.google.com with SMTP id o83so36552340lff.3
-	for <qemu-devel@nongnu.org>; Tue, 06 Jun 2017 03:53:28 -0700 (PDT)
-From: Max Filippov <jcmvbkbc@gmail.com>
-Date: Tue,  6 Jun 2017 03:52:09 -0700
-Message-Id: <1496746329-32047-1-git-send-email-jcmvbkbc@gmail.com>
-Subject: [Qemu-devel] [PULL v2 0/4] target/xtensa fixes
+	(envelope-from <kraxel@redhat.com>) id 1dIC7P-0006Kh-An
+	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 06:53:50 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40902)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1dIC7P-0006JJ-65
+	for qemu-devel@nongnu.org; Tue, 06 Jun 2017 06:53:47 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id EA87785376
+	for <qemu-devel@nongnu.org>; Tue,  6 Jun 2017 10:53:45 +0000 (UTC)
+From: Gerd Hoffmann <kraxel@redhat.com>
+Date: Tue,  6 Jun 2017 12:53:35 +0200
+Message-Id: <20170606105339.3613-1-kraxel@redhat.com>
+Subject: [Qemu-devel] [PATCH 0/4] gtk/sdl: use newer versions by default,
+ deprecate the old ones.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,47 +29,28 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Max Filippov <jcmvbkbc@gmail.com>
+Cc: Gerd Hoffmann <kraxel@redhat.com>
 
-Hi Peter,
+  Hi,
 
-please pull my current target/xtensa queue.
-Changes v1->v2:
-- re-base series to the latest mainline, fixing breakage caused by chardev
-  code rearrangement.
+High time to use new versions (gtk3 and SDL2) by default.  This patch
+series switches over qemu to prefer the newer versions and adds a
+deprecation warning for the old versions.
 
-The following changes since commit a0d4aac7467dd02e5657b79e867f067330266a24:
+Note that qemu uses the new versions automatically for quite a while
+already in case the older isn't installed.
 
-  Merge remote-tracking branch 'remotes/rth/tags/pull-tcg-20170605' into staging (2017-06-05 18:03:43 +0100)
+cheers,
+  Gerd
 
-are available in the git repository at:
+Gerd Hoffmann (4):
+  gtk: prefer gtk3 over gtk2
+  sdl: prefer sdl2 over sdl1
+  gtk: add deprecation warning for gtk2
+  sdl: add deprecation warning for sdl1
 
-  git://github.com/OSLL/qemu-xtensa.git tags/20170606-xtensa
-
-for you to fetch changes up to dd7b952b793e341c905355581a21cdbaa8b13c31:
-
-  target/xtensa: handle unknown registers in gdbstub (2017-06-06 02:40:48 -0700)
-
-----------------------------------------------------------------
-target/xtensa fixes:
-
-- fix read/write simcall mapping flags and return value;
-- use -serial option to direct console output of sim machine to QEMU chardev;
-- fix handling of unknown registers in the gdbstub.
-
-----------------------------------------------------------------
-Max Filippov (4):
-      target/xtensa: fix mapping direction in read/write simcalls
-      target/xtensa: fix return value of read/write simcalls
-      target/xtensa: support output to chardev console
-      target/xtensa: handle unknown registers in gdbstub
-
- hw/xtensa/sim.c             |  4 ++
- target/xtensa/cpu.h         |  1 +
- target/xtensa/gdbstub.c     | 13 +++++--
- target/xtensa/xtensa-semi.c | 91 +++++++++++++++++++++++++++++++++++----------
- 4 files changed, 87 insertions(+), 22 deletions(-)
+ configure | 36 ++++++++++++++++++++++++------------
+ 1 file changed, 24 insertions(+), 12 deletions(-)
 
 -- 
-Thanks.
--- Max
+2.9.3
